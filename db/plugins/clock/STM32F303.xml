@@ -4,6 +4,9 @@
    <Background  imageName="STM32F303E" name="STM32F303E"  x="-20" y="-26">
         <Condition Diagnostic="" Expression="DIE446	"/>
     </Background>
+	<Background  imageName="STM32F303xEwithTimer20andADC34" name="STM32F303xEwithTimer20andADC34"  x="551" y="490">
+        <Condition Diagnostic="" Expression="ADC3_Exist"/>
+    </Background> 
     <Tree id="ClockTree">
         <!--clock source-->
         <!--HSI ***DiviseurPLL,FLITFCLK,I2C1,I2C2,SYSclock,USART(1..5),MCOMult***-->
@@ -113,27 +116,27 @@
         <!-- MCO -->
         <!-- diviseur PLL et MCO -->
       
-        <Element id="MCOMultDivisor" type="devisor" refParameter="RCC_MCOMult_Clock_Source_FROM_PLLMUL" x="499" y="900" >
+        <Element id="MCOMultDivisor" type="devisor" refParameter="RCC_MCOMult_Clock_Source_FROM_PLLMUL" x="490" y="903" refEnable="MCOEnable" >
             <Input signalId="PLLCLK" from="PLLMUL" />
             <Output signalId="PLLCLK_MCO" to="MCOMult" />
         </Element>
         <!-- MCO input** LSI,HSE,HSI,PLLdiviseur,SYSclock -->
      
-        <Element id="MCOMult" type="multiplexor" refParameter="RCC_MCOSource" x="465" y="830" refEnable="MCOEnable">
+        <Element id="MCOMult" type="multiplexor" refParameter="RCC_MCOSource" x="457" y="830" refEnable="MCOEnable">
             <Input signalId="HSI8" from="HSIRC" refValue="RCC_MCOSOURCE_HSI" />
             <Input signalId="LSE" from="LSEOSC" refValue="RCC_MCOSOURCE_LSE" />
             <Input signalId="HSE" from="HSEOSC" refValue="RCC_MCOSOURCE_HSE" />
-            <Input signalId="PLLCLK_MCO" from="MCOMultDivisor" refValue="RCC_MCOSOURCE_PLLCLK_DIV2" />
+            <Input signalId="PLLCLK_MCO" from="MCOMultDivisor"  />
             <Input signalId="LSI" from="LSIRC" refValue="RCC_MCOSOURCE_LSI" />
             <Input signalId="SYSCLKOUT" from="SysCLKOutput" refValue="RCC_MCOSOURCE_SYSCLK" />
             <Output signalId="MCOout" to="MCODivisor" />
         </Element>
       
-        <Element id="MCODivisor" type="devisor" refParameter="RCC_MCODiv" x="383" y="885" refEnable="MCOEnable" >
+        <Element id="MCODivisor" type="devisor" refParameter="RCC_MCODiv" x="378" y="887" refEnable="MCOEnable" >
             <Input signalId="MCOout" from="MCOMult" />
             <Output signalId="MCOoutDiv" to="MCOoutput" />
         </Element>
-        <Element id="MCOoutput" type="output" refParameter="MCOFreq_Value" x="301" y="883" refEnable="MCOEnable">
+        <Element id="MCOoutput" type="output" refParameter="MCOFreq_Value" x="301" y="885" refEnable="MCOEnable">
             <Input signalId="MCOoutDiv" from="MCODivisor" />
         </Element>
        
@@ -220,23 +223,47 @@
         </Element>
 		<!--TIM2 mux input**tim multiplicateur,APB2prescaler**-->
         <Element id="TIMMUX2" type="multiplexor" refParameter="TIM2Selection" x="740" y="978" refEnable="Tim2Enable">
-            
+            		<Condition Diagnostic="" Expression="ADC3_Exist"/>
+
             <Input signalId="PLLCLK" from="PLLMUL" refValue="RCC_TIM2CLK_PLLCLK" />
             <Input signalId="Tim1CLKout" from="TimPrescOut1" refValue="RCC_TIM2CLK_HCLK" />
             <Output signalId="TIM2MUXout" to="TIM2out" />
         </Element>
         <Element id="TIM2out" type="activeOutput" refParameter="TIM2Freq_Value" x="781" y="990" refEnable="Tim2Enable">
+				            		<Condition Diagnostic="" Expression="ADC3_Exist"/>
+
+            <Input signalId="TIM2MUXout" from="TIMMUX2" />
+        </Element>
+<Element id="TIMMUX2" type="multiplexor" refParameter="TIM2Selection" x="740" y="866" refEnable="Tim2Enable">
+            
+            <Input signalId="PLLCLK" from="PLLMUL" refValue="RCC_TIM2CLK_PLLCLK" />
+            <Input signalId="Tim1CLKout" from="TimPrescOut1" refValue="RCC_TIM2CLK_HCLK" />
+            <Output signalId="TIM2MUXout" to="TIM2out" />
+        </Element>
+        <Element id="TIM2out" type="activeOutput" refParameter="TIM2Freq_Value" x="781" y="878" refEnable="Tim2Enable">
             <Input signalId="TIM2MUXout" from="TIMMUX2" />
         </Element>
 		
 		<!--TIM3 mux input**tim multiplicateur,APB2prescaler**-->
-        <Element id="TIMMUX3" type="multiplexor" refParameter="TIM3Selection" x="640" y="1030" refEnable="Tim3Enable,Tim4Enable">
-            
-            <Input signalId="PLLCLK" from="PLLMUL" refValue="RCC_TIM3CLK_PLLCLK" />
-            <Input signalId="Tim1CLKout" from="TimPrescOut1" refValue="RCC_TIM3CLK_HCLK" />
+        <Element id="TIMMUX3" type="multiplexor" refParameter="TIM34Selection" x="640" y="1030" refEnable="Tim3Enable,Tim4Enable">
+            		<Condition Diagnostic="" Expression="ADC3_Exist"/>
+
+            <Input signalId="PLLCLK" from="PLLMUL" refValue="RCC_TIM34CLK_PLLCLK" />
+            <Input signalId="Tim1CLKout" from="TimPrescOut1" refValue="RCC_TIM34CLK_HCLK" />
             <Output signalId="TIM3MUXout" to="TIM3out" />
         </Element>
         <Element id="TIM3out" type="activeOutput" refParameter="TIM3Freq_Value" x="781" y="1043" refEnable="Tim3Enable,Tim4Enable">
+		            		<Condition Diagnostic="" Expression="ADC3_Exist"/>
+
+            <Input signalId="TIM3MUXout" from="TIMMUX3" />
+        </Element>
+		<Element id="TIMMUX3" type="multiplexor" refParameter="TIM34Selection" x="640" y="918" refEnable="Tim3Enable,Tim4Enable">
+            
+            <Input signalId="PLLCLK" from="PLLMUL" refValue="RCC_TIM34CLK_PLLCLK" />
+            <Input signalId="Tim1CLKout" from="TimPrescOut1" refValue="RCC_TIM34CLK_HCLK" />
+            <Output signalId="TIM3MUXout" to="TIM3out" />
+        </Element>
+        <Element id="TIM3out" type="activeOutput" refParameter="TIM3Freq_Value" x="781" y="930" refEnable="Tim3Enable,Tim4Enable">
             <Input signalId="TIM3MUXout" from="TIMMUX3" />
         </Element>
 		
@@ -288,6 +315,7 @@
         <Element id="TIM1out" type="activeOutput" refParameter="TIM1Freq_Value" x="781" y="657" refEnable="Tim1Enable">
             <Input signalId="TIM1MUXout" from="TIMMUX1" />
         </Element>
+		
         <!--TIM8 mux input**tim multiplicateur,APB2prescaler**-->
         <Element id="TIMMUX8" type="multiplexor" refParameter="TIM8Selection" x="640" y="696" refEnable="Tim8Enable">
          
@@ -298,30 +326,76 @@
         <Element id="TIM8out" type="activeOutput" refParameter="TIM8Freq_Value" x="781" y="708" refEnable="Tim8Enable">
             <Input signalId="TIM8MUXout" from="TIMMUX8" />
         </Element>
+		<!--TIM15 for302xE line-->
 		<Element id="TIMMUX15" type="multiplexor" refParameter="TIM15Selection" x="740" y="755" refEnable="Tim15Enable">
+		<Condition Diagnostic="" Expression="ADC3_Exist"/>
             <Input signalId="TIMMULCLK" from="TIMMUL" refValue="RCC_TIM15CLK_PLLCLK" />
             <Input signalId="Tim2CLKout" from="TimPrescOut2" refValue="RCC_TIM15CLK_HCLK" />
             <Output signalId="TIM15MUXout" to="TIM15out" />
         </Element>
         <Element id="TIM15out" type="activeOutput" refParameter="TIM15Freq_Value" x="781" y="768" refEnable="Tim15Enable">
+				            		<Condition Diagnostic="" Expression="ADC3_Exist"/>
+
 			<Input signalId="TIM15MUXout" from="TIMMUX15" />
         </Element>
+        <Element id="TIMMUX15" type="multiplexor" refParameter="TIM15Selection" x="640" y="696" refEnable="Tim15Enable">
+         
+            <Input signalId="TIMMULCLK" from="TIMMUL" refValue="RCC_TIM15CLK_PLLCLK" />
+            <Input signalId="Tim2CLKout" from="TimPrescOut2" refValue="RCC_TIM15CLK_HCLK" />
+            <Output signalId="TIM15MUXout" to="TIM15out" />
+        </Element>
+        <Element id="TIM15out" type="activeOutput" refParameter="TIM15Freq_Value" x="781" y="708" refEnable="Tim15Enable">
+            <Input signalId="TIM15MUXout" from="TIMMUX15" />
+        </Element>
+		
+		<!--TIM16 for302xE line-->
 		<Element id="TIMMUX16" type="multiplexor" refParameter="TIM16Selection" x="640" y="808" refEnable="Tim16Enable">
+		<Condition Diagnostic="" Expression="ADC3_Exist"/>
             <Input signalId="TIMMULCLK" from="TIMMUL" refValue="RCC_TIM16CLK_PLLCLK" />
             <Input signalId="Tim2CLKout" from="TimPrescOut2" refValue="RCC_TIM16CLK_HCLK" />
             <Output signalId="TIM16MUXout" to="TIM16out" />
         </Element>
         <Element id="TIM16out" type="activeOutput" refParameter="TIM16Freq_Value" x="781" y="820" refEnable="Tim16Enable">
+				            		<Condition Diagnostic="" Expression="ADC3_Exist"/>
+
 			<Input signalId="TIM16MUXout" from="TIMMUX16" />
         </Element>
+		<Element id="TIMMUX16" type="multiplexor" refParameter="TIM16Selection" x="740" y="755" refEnable="Tim16Enable">
+		         
+
+            <Input signalId="TIMMULCLK" from="TIMMUL" refValue="RCC_TIM16CLK_PLLCLK" />
+            <Input signalId="Tim2CLKout" from="TimPrescOut2" refValue="RCC_TIM16CLK_HCLK" />
+            <Output signalId="TIM16MUXout" to="TIM16out" />
+        </Element>
+        <Element id="TIM16out" type="activeOutput" refParameter="TIM16Freq_Value" x="781" y="768" refEnable="Tim16Enable">
+			<Input signalId="TIM16MUXout" from="TIMMUX16" />
+        </Element>
+		
+		
+		
 		<Element id="TIMMUX17" type="multiplexor" refParameter="TIM17Selection" x="740" y="866" refEnable="Tim17Enable">
+		 <Condition Diagnostic="" Expression="ADC3_Exist"/>
             <Input signalId="TIMMULCLK" from="TIMMUL" refValue="RCC_TIM17CLK_PLLCLK" />
             <Input signalId="Tim2CLKout" from="TimPrescOut2" refValue="RCC_TIM17CLK_HCLK" />
             <Output signalId="TIM17MUXout" to="TIM17out" />
         </Element>
         <Element id="TIM17out" type="activeOutput" refParameter="TIM17Freq_Value" x="781" y="878" refEnable="Tim17Enable">
+				            		<Condition Diagnostic="" Expression="ADC3_Exist"/>
+
 			<Input signalId="TIM17MUXout" from="TIMMUX17" />
         </Element>
+		<Element id="TIMMUX17" type="multiplexor" refParameter="TIM17Selection" x="640" y="808" refEnable="Tim17Enable">
+				        
+
+            <Input signalId="TIMMULCLK" from="TIMMUL" refValue="RCC_TIM17CLK_PLLCLK" />
+            <Input signalId="Tim2CLKout" from="TimPrescOut2" refValue="RCC_TIM17CLK_HCLK" />
+            <Output signalId="TIM17MUXout" to="TIM17out" />
+        </Element>
+        <Element id="TIM17out" type="activeOutput" refParameter="TIM17Freq_Value" x="781" y="820" refEnable="Tim17Enable">
+			<Input signalId="TIM17MUXout" from="TIMMUX17" />
+        </Element>
+		
+		
 		<Element id="TIMMUX20" type="multiplexor" refParameter="TIM20Selection" x="640" y="918" refEnable="Tim20Enable">
             <Input signalId="TIMMULCLK" from="TIMMUL" refValue="RCC_TIM20CLK_PLLCLK" />
             <Input signalId="Tim2CLKout" from="TimPrescOut2" refValue="RCC_TIM20CLK_HCLK" />
@@ -502,7 +576,7 @@
         <Signal id="AHBCLK" />
         <Signal id="AHBCLK2" refParameter="" />
         <Signal id="PCLK1" refParameter="" />
-        <Signal id="APB1PeriphClock" refParameter="APB2Freq_Value"  />
+        <Signal id="APB1PeriphClock" refParameter="APB1Freq_Value"  />
         <Signal id="Tim1CLK" refParameter="" />
         <Signal id="Tim2CLKout" refParameter="" />
         <Signal id="Tim1CLKout" refParameter="" />
@@ -715,40 +789,100 @@
 	
 	 <!--TIM labels-->
     <Label id="TIM1Output" type="SpecialInfo" posX="845" posY="660" text="To TIM1 (MHz)" refEnable="Tim1Enable"/> 	
-    <Label id="TIM8Output" type="SpecialInfo" posX="845" posY="715" text="To TIM8 (MHz)" refEnable="Tim8Enable"/> 	
     <Label id="TIM1uxLabel" type="muxLabel" text="TIM1 source Mux" posX="689" posY="608" refEnable="Tim1Enable"/>
-    <Label id="TIM8uxLabel" type="muxLabel" text="TIM8 source Mux" posX="590" posY="665" refEnable="Tim8Enable"/>
+  
     <Label id="TIM1PCLK2Label" type="signal" text="PCLK2" posX="690" posY="669" refEnable="Tim1Enable"/>
     <Label id="TIM1PCLK2Label" type="signal" text="PLLCLK" posX="600" posY="629" refEnable="Tim1Enable"/>
     <Label id="TIM1PCLK2Label" type="signal" text="PLL_Mul2" posX="690" posY="629" refEnable="Tim1Enable"/>
     <Label id="TIM8PCLK2Label" type="signal" text="PLL_Mul2" posX="590" posY="685" refEnable="Tim8Enable"/>
     <Label id="TIM8PCLK2Label" type="signal" text="PCLK2" posX="590" posY="725" refEnable="Tim8Enable"/>
- 
+	  <Label id="TIM8uxLabel" type="muxLabel" text="TIM8 source Mux" posX="590" posY="665" refEnable="Tim8Enable"/>
+     <Label id="TIM8Output" type="SpecialInfo" posX="845" posY="715" text="To TIM8 (MHz)" refEnable="Tim8Enable"/> 	
+<!--tim15-->
 	<Label id="TIM15Output" type="SpecialInfo" posX="845" posY="775" text="To TIM15 (MHz)" refEnable="Tim15Enable"> 
+			 <Condition Diagnostic="" Expression="ADC3_Exist"/>
+
 	</Label>
 	 <Label id="TIM15uxLabel" type="muxLabel" text="TIM15 source Mux" posX="689" posY="725" refEnable="Tim15Enable"> 
-	</Label>
+			 <Condition Diagnostic="" Expression="ADC3_Exist"/>
+
+			 </Label>
     <Label id="TIM15PCLK2Label" type="signal" text="PCLK2" posX="690" posY="782" refEnable="Tim15Enable"> 
-	</Label>
+			 <Condition Diagnostic="" Expression="ADC3_Exist"/>
+
+			 </Label>
     <Label id="TIM15PCLK2Label" type="signal" text="PLL_Mul2" posX="690" posY="742" refEnable="Tim15Enable"> 
+	
+			 <Condition Diagnostic="" Expression="ADC3_Exist"/>
+</Label>
+	
+	
+	<Label id="TIM15Output" type="SpecialInfo" posX="845" posY="715" text="To TIM15 (MHz)" refEnable="Tim15Enable"> 
+	<Condition Diagnostic="" Expression="!ADC3_Exist"/>
+	</Label>
+	 <Label id="TIM15uxLabel" type="muxLabel" text="TIM15 source Mux" posX="590" posY="665" refEnable="Tim15Enable"> 
+	<Condition Diagnostic="" Expression="!ADC3_Exist"/>
+	</Label>
+    <Label id="TIM15PCLK2Label" type="signal" text="PCLK2" posX="590" posY="725" refEnable="Tim15Enable"> 
+	<Condition Diagnostic="" Expression="!ADC3_Exist"/>
+	</Label>
+    
+	<Label id="TIM15PCLK2Label" type="signal" text="PLL_Mul2" posX="590" posY="685" refEnable="Tim15Enable"> 
+	<Condition Diagnostic="" Expression="!ADC3_Exist"/>
 	</Label>
 	<!--tim16-->
 	<Label id="TIM16Output" type="SpecialInfo" posX="845" posY="825" text="To TIM16 (MHz)" refEnable="Tim16Enable"> 
-	</Label>
+				 <Condition Diagnostic="" Expression="ADC3_Exist"/>
+
+				 </Label>
 	 <Label id="TIM16uxLabel" type="muxLabel" text="TIM16 source Mux" posX="590" posY="775" refEnable="Tim16Enable"> 
-	</Label>
+				 <Condition Diagnostic="" Expression="ADC3_Exist"/>
+</Label>
     <Label id="TIM16PCLK2Label" type="signal" text="PCLK2" posX="590" posY="835" refEnable="Tim16Enable"> 
-	</Label>
+				 <Condition Diagnostic="" Expression="ADC3_Exist"/>
+</Label>
     <Label id="TIM16PCLK2Label" type="signal" text="PLL_Mul2" posX="590" posY="795" refEnable="Tim16Enable"> 
-	</Label>
+				 <Condition Diagnostic="" Expression="ADC3_Exist"/>
+</Label>
+	
+	
+	<Label id="TIM16Output" type="SpecialInfo" posX="845" posY="775" text="To TIM16 (MHz)" refEnable="Tim16Enable"> 
+		<Condition Diagnostic="" Expression="!ADC3_Exist"/>
+</Label>
+	 <Label id="TIM16uxLabel" type="muxLabel" text="TIM16 source Mux" posX="689" posY="725" refEnable="Tim16Enable"> 
+		<Condition Diagnostic="" Expression="!ADC3_Exist"/>
+</Label>
+    <Label id="TIM16PCLK2Label" type="signal" text="PCLK2" posX="690" posY="782" refEnable="Tim16Enable"> 
+		<Condition Diagnostic="" Expression="!ADC3_Exist"/>
+</Label>
+    <Label id="TIM16PCLK2Label" type="signal" text="PLL_Mul2" posX="690" posY="742" refEnable="Tim16Enable"> 
+		<Condition Diagnostic="" Expression="!ADC3_Exist"/>
+</Label>
 	<!--tim17-->
 	<Label id="TIM17Output" type="SpecialInfo" posX="845" posY="885" text="To TIM17 (MHz)" refEnable="Tim17Enable"> 
-	</Label>
+					 <Condition Diagnostic="" Expression="ADC3_Exist"/>
+</Label>
 	 <Label id="TIM17uxLabel" type="muxLabel" text="TIM17 source Mux" posX="689" posY="835" refEnable="Tim17Enable"> 
-	</Label>
+					 <Condition Diagnostic="" Expression="ADC3_Exist"/>
+</Label>
     <Label id="TIM17PCLK2Label" type="signal" text="PCLK2" posX="690" posY="892" refEnable="Tim17Enable"> 
-	</Label>
+					 <Condition Diagnostic="" Expression="ADC3_Exist"/>
+</Label>
     <Label id="TIM17PCLK2Label" type="signal" text="PLL_Mul2" posX="690" posY="852" refEnable="Tim17Enable"> 
+					 <Condition Diagnostic="" Expression="ADC3_Exist"/>
+</Label>
+	
+	<Label id="TIM17Output" type="SpecialInfo" posX="845" posY="825" text="To TIM17 (MHz)" refEnable="Tim17Enable"> 
+	<Condition Diagnostic="" Expression="!ADC3_Exist"/>
+	</Label>
+	 <Label id="TIM17uxLabel" type="muxLabel" text="TIM17 source Mux" posX="590" posY="775" refEnable="Tim17Enable"> 
+	<Condition Diagnostic="" Expression="!ADC3_Exist"/>
+	</Label>
+    <Label id="TIM17PCLK2Label" type="signal" text="PCLK2" posX="590" posY="835" refEnable="Tim17Enable"> 
+	<Condition Diagnostic="" Expression="!ADC3_Exist"/>
+	</Label>
+    <Label id="TIM17PCLK2Label" type="signal" text="PLL_Mul2" posX="590" posY="795" refEnable="Tim17Enable"> 
+	<Condition Diagnostic="" Expression="!ADC3_Exist"/>
 	</Label>
 	
 	<!--tim20-->
@@ -763,22 +897,56 @@
 	
 	<!--tim2-->
 	<Label id="TIM2Output" type="SpecialInfo" posX="845" posY="995" text="To TIM2 (MHz)" refEnable="Tim2Enable"> 
-	</Label>
+						 <Condition Diagnostic="" Expression="ADC3_Exist"/>
+</Label>
 	<Label id="TIM2uxLabel" type="muxLabel" text="TIM2 source Mux" posX="689" posY="947" refEnable="Tim2Enable"> 
-	</Label>
+						 <Condition Diagnostic="" Expression="ADC3_Exist"/>
+</Label>
 	<Label id="TIM2PCLK2Label" type="signal" text="PCLK1" posX="700" posY="1004" refEnable="Tim2Enable"> 
-	</Label>
+						 <Condition Diagnostic="" Expression="ADC3_Exist"/>
+</Label>
     <Label id="TIM2PCLK2Label" type="signal" text="PLLCLK" posX="700" posY="964" refEnable="Tim2Enable"> 
-	</Label>
+						 <Condition Diagnostic="" Expression="ADC3_Exist"/>
+</Label>
+	
+	<Label id="TIM2Output" type="SpecialInfo" posX="845" posY="885" text="To TIM2 (MHz)" refEnable="Tim2Enable"> 
+		<Condition Diagnostic="" Expression="!ADC3_Exist"/>
+</Label>
+	<Label id="TIM2uxLabel" type="muxLabel" text="TIM2 source Mux" posX="689" posY="835" refEnable="Tim2Enable"> 
+		<Condition Diagnostic="" Expression="!ADC3_Exist"/>
+</Label>
+	<Label id="TIM2PCLK2Label" type="signal" text="PCLK1" posX="690" posY="892" refEnable="Tim2Enable"> 
+		<Condition Diagnostic="" Expression="!ADC3_Exist"/>
+</Label>
+    <Label id="TIM2PCLK2Label" type="signal" text="PLLCLK" posX="690" posY="852" refEnable="Tim2Enable"> 
+		<Condition Diagnostic="" Expression="!ADC3_Exist"/>
+</Label>
 	
 	<!--tim3-->
 	<Label id="TIM3Output" type="SpecialInfo" posX="845" posY="1050" text="To TIM3/TIM4 (MHz)" refEnable="Tim3Enable,Tim4Enable"> 
+	<Condition Diagnostic="" Expression="ADC3_Exist"/>
 	</Label>
 	<Label id="TIM3uxLabel" type="muxLabel" text="TIM3/4 source Mux" posX="590" posY="998" refEnable="Tim3Enable,Tim4Enable"> 
+	<Condition Diagnostic="" Expression="ADC3_Exist"/>
 	</Label>
 	<Label id="TIM3PCLK2Label" type="signal" text="PCLK1" posX="600" posY="1058" refEnable="Tim3Enable,Tim4Enable"> 
+	<Condition Diagnostic="" Expression="ADC3_Exist"/>
 	</Label>
     <Label id="TIM3PCLK2Label" type="signal" text="PLLCLK" posX="600" posY="1018" refEnable="Tim3Enable,Tim4Enable"> 
+	<Condition Diagnostic="" Expression="ADC3_Exist"/>
+	</Label>
+	
+	<Label id="TIM3Output" type="SpecialInfo" posX="845" posY="935" text="To TIM3/TIM4 (MHz)" refEnable="Tim3Enable,Tim4Enable"> 
+	<Condition Diagnostic="" Expression="!ADC3_Exist"/>
+	</Label>
+	<Label id="TIM3uxLabel" type="muxLabel" text="TIM3/4 source Mux" posX="590" posY="888" refEnable="Tim3Enable,Tim4Enable"> 
+	<Condition Diagnostic="" Expression="!ADC3_Exist"/>
+	</Label>
+	<Label id="TIM3PCLK2Label" type="signal" text="PCLK1" posX="590" posY="948" refEnable="Tim3Enable,Tim4Enable"> 
+	<Condition Diagnostic="" Expression="!ADC3_Exist"/>
+	</Label>
+    <Label id="TIM3PCLK2Label" type="signal" text="PLLCLK" posX="590" posY="908" refEnable="Tim3Enable,Tim4Enable"> 
+	<Condition Diagnostic="" Expression="!ADC3_Exist"/>
 	</Label>
     
 
@@ -791,21 +959,23 @@
     <Label id="MCOMuxLabel" type="muxLabel" text="MCO source Mux" posX="443" posY="795" refEnable="MCOEnable">
     </Label>
    
-    <Label id="MCOHSELabel" type="signal" text="LSE" posX="553" posY="845" refEnable="MCOEnable">
+    <Label id="MCOHSELabel" type="signal" text="LSE" posX="563" posY="845" refEnable="MCOEnable">
     </Label>
-    <Label id="MCOPLLLabel" type="signal" text="PLLCLK" posX="537" posY="897" refEnable="MCOEnable">
+    <Label id="MCOPLLLabel" type="signal" text="PLLCLK" posX="547" posY="897" refEnable="MCOEnable">
     </Label>
 
-    <Label id="MCOLSILabel" type="signal" text="LSI" posX="553" posY="922" refEnable="MCOEnable">
+    <Label id="MCOLSILabel" type="signal" text="LSI" posX="563" posY="922" refEnable="MCOEnable">
     </Label>
    
-    <Label id="MCOLSELabel" type="signal" text="HSE" posX="553" posY="872" refEnable="MCOEnable">
+    <Label id="MCOLSELabel" type="signal" text="HSE" posX="563" posY="872" refEnable="MCOEnable">
     </Label>
-    <Label id="MCOHSILabel" type="signal" text="HSI" posX="553" posY="819" refEnable="MCOEnable">
+    <Label id="MCOHSILabel" type="signal" text="HSI" posX="563" posY="819" refEnable="MCOEnable">
     </Label>
   
-    <Label id="MCOSYSCLKLabel" type="signal" text="SYSCLK" posX="537" posY="947" refEnable="MCOEnable">
+    <Label id="MCOSYSCLKLabel" type="signal" text="SYSCLK" posX="547" posY="947" refEnable="MCOEnable">
     </Label>
+	<Label id="ABP1labelPCLK1" type="signal" text="PCLK1" posX="1055" posY="415" />
+	<Label id="ABP2labelPCLK2" type="signal" text="PCLK2" posX="1055" posY="486" />
    <BButton id="CSSEnable" text="CSS" refParameter="EnbaleCSS" x="617" y="460"/>
     
    

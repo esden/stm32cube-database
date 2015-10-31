@@ -512,6 +512,9 @@
             <PossibleValue Value="TIM_OCFAST_DISABLE" Comment="Disable"/>
             <PossibleValue Value="TIM_OCFAST_ENABLE" Comment="Enable" Condition="!(Semaphore_TIM_OCMODE_PWM1$IpInstance|Semaphore_TIM_OCMODE_PWM2$IpInstance)" Diagnostic="Fast mode is only available in Modes : PWM Mode 1 or PWM mode 2" Action="Disable"/>
          </RefParameter>
+        <RefParameter Name="DefaultOCFastMode" Comment="Fast Mode" DefaultValue="TIM_OCFAST_DISABLE" Type="list" Visible="false">
+            <PossibleValue Value="TIM_OCFAST_DISABLE" Comment="Disable"/>
+         </RefParameter>
         <RefParameter Name="OCMode_forced" Comment="Mode" DefaultValue="TIM_OCMODE_FORCED_ACTIVE" Type="list" >
             <PossibleValue Value="TIM_OCMODE_FORCED_ACTIVE" Comment="Forced Active"/>
             <PossibleValue Value="TIM_OCMODE_FORCED_INACTIVE" Comment="Forced Inactive"/>
@@ -871,7 +874,7 @@
 <!-- TIM_MasterOutputTrigger TIMER INSTANCE DEPENDENT -->
 <!-- parametrage limite pour TIM6 et TIM7-->
     <RefParameter Name="TIM_MasterOutputTrigger" Comment="Trigger Event Selection" DefaultValue="TIM_TRGO_RESET" Type="list" Group="Trigger Output (TRGO) Parameters">
-        <Condition Diagnostic="" Expression="!(($IpNumber=6)|($IpNumber=7)|($IpNumber=18)|($IpNumber=9)|($IpNumber=12)|($IpNumber=10)|($IpNumber=11)|($IpNumber=13)|($IpNumber=14)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17)|($IpNumber=21)|($IpNumber=22))"/>
+        <Condition Diagnostic="" Expression="!(($IpNumber=6)|($IpNumber=7)|($IpNumber=18)|($IpNumber=9)|($IpNumber=12)|($IpNumber=10)|($IpNumber=11)|($IpNumber=13)|($IpNumber=14)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17)|($IpNumber=21)|($IpNumber=22)) &amp; !Semaphore_Xored_Inputs_Hall_Sensor_Interface$IpInstance"/>
         <PossibleValue Value="TIM_TRGO_RESET" Comment="Reset (UG bit from TIMx_EGR)"/>
         <PossibleValue Value="TIM_TRGO_ENABLE" Comment="Enable (CNT_EN)"/>
         <PossibleValue Value="TIM_TRGO_UPDATE" Comment="Update Event"/>
@@ -880,6 +883,9 @@
         <PossibleValue Value="TIM_TRGO_OC2REF" Comment="Output Compare (OC2REF)"/>
         <PossibleValue Value="TIM_TRGO_OC3REF" Comment="Output Compare (OC3REF)"/>
         <PossibleValue Value="TIM_TRGO_OC4REF" Comment="Output Compare (OC4REF)"/>
+    </RefParameter>
+    <RefParameter Name="TIM_MasterOutputTrigger" Comment="Trigger Event Selection" DefaultValue="null" Type="list" Group="Trigger Output (TRGO) Parameters" Visible="false">
+        <Condition Diagnostic="" Expression="!(($IpNumber=6)|($IpNumber=7)|($IpNumber=18)|($IpNumber=9)|($IpNumber=12)|($IpNumber=10)|($IpNumber=11)|($IpNumber=13)|($IpNumber=14)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17)|($IpNumber=21)|($IpNumber=22)) &amp; Semaphore_Xored_Inputs_Hall_Sensor_Interface$IpInstance"/>
     </RefParameter>
      <RefParameter Name="TIM_MasterOutputTrigger" Comment="Trigger Event Selection" DefaultValue="TIM_TRGO_RESET" Type="list" Group="Trigger Output (TRGO) Parameters">
         <Condition Diagnostic="" Expression="($IpNumber=15)|($IpNumber=21)|($IpNumber=22)"/>
@@ -900,9 +906,12 @@
         <Condition Diagnostic="" Expression="(($IpNumber=9)|($IpNumber=12)|($IpNumber=10)|($IpNumber=11)|($IpNumber=13)|($IpNumber=14)|($IpNumber=16)|($IpNumber=17))"/>
     </RefParameter>
     <RefParameter Name="TIM_MasterSlaveMode" Comment="Master/Slave Mode  " DefaultValue="TIM_MASTERSLAVEMODE_DISABLE" Type="list" Group="Trigger Output (TRGO) Parameters" Visible="true">
-        <Condition Diagnostic="" Expression="!(($IpNumber=6)|($IpNumber=7)|($IpNumber=18)|($IpNumber=9)|($IpNumber=12)|($IpNumber=10)|($IpNumber=11)|($IpNumber=13)|($IpNumber=14)|($IpNumber=16)|($IpNumber=17))"/>
+        <Condition Diagnostic="" Expression="!(($IpNumber=6)|($IpNumber=7)|($IpNumber=18)|($IpNumber=9)|($IpNumber=12)|($IpNumber=10)|($IpNumber=11)|($IpNumber=13)|($IpNumber=14)|($IpNumber=16)|($IpNumber=17))  &amp; !Semaphore_Xored_Inputs_Hall_Sensor_Interface$IpInstance"/>
         <PossibleValue Value="TIM_MASTERSLAVEMODE_DISABLE" Comment="Disable (no sync between this TIM (Master) and its Slaves"/>
         <PossibleValue Value="TIM_MASTERSLAVEMODE_ENABLE" Comment="Enable (sync between this TIM (Master) and its Slaves (through TRGO))"/>
+    </RefParameter>
+    <RefParameter Name="TIM_MasterSlaveMode" Comment="Master/Slave Mode  " DefaultValue="null" Type="list" Group="Trigger Output (TRGO) Parameters" Visible="false">
+        <Condition Diagnostic="" Expression="!(($IpNumber=6)|($IpNumber=7)|($IpNumber=18)|($IpNumber=9)|($IpNumber=12)|($IpNumber=10)|($IpNumber=11)|($IpNumber=13)|($IpNumber=14)|($IpNumber=16)|($IpNumber=17)) &amp; Semaphore_Xored_Inputs_Hall_Sensor_Interface$IpInstance"/>
     </RefParameter>
     <RefParameter Name="TIM_MasterSlaveMode" Comment="Master/Slave Mode  " DefaultValue="null" Type="list" Group="Trigger Output (TRGO) Parameters" Visible="false">
         <Condition Diagnostic="" Expression="(($IpNumber=9)|($IpNumber=12)|($IpNumber=10)|($IpNumber=11)|($IpNumber=13)|($IpNumber=14)|($IpNumber=16)|($IpNumber=17))"/>
@@ -1095,9 +1104,9 @@
             <PossibleValue Value="TIM2_TI4_COMP2" Comment="TIM2 Channel 4 input connected to COMP2_OUT"/>
             <PossibleValue Value="TIM2_TI4_COMP1" Comment="TIM2 Channel 4 input connected to COMP1_OUT"/>
     </RefParameter>
-    <RefParameter Name="TIM2_ETR_REMAP" Comment="ETR remap capabilities for TIM2" DefaultValue="TIM2_TI4_COMP2" Type="list" Group="ETR remap capabilities for TIM2">
+    <RefParameter Name="TIM2_ETR_REMAP" Comment="ETR remap capabilities for TIM2" DefaultValue="TIM2_ETR_HSI48" Type="list" Group="ETR remap capabilities for TIM2">
             <PossibleValue Value="TIM2_ETR_HSI48" Comment="TIM2 ETR input is connected to HSI48" Semaphore="SEM2RCC_HSI48_REQUIRED_$IpInstance"/>
-            <PossibleValue Value="TIM2_ETR_LSE" Comment="TIM2 ETR input is connected to LSE" Semaphore="SEM2RCC_LSE_REQUIRED_$IpInstance"/>
+            <PossibleValue Value="TIM2_ETR_LSE" Comment="TIM2 ETR input is connected to LSE" Semaphore="SEM2RCC_LSE_REQUIRED_$IpInstance" Condition="!(LSEOscillator|LSEByPass)" Action="Disable" Diagnostic="LSE Oscillator must be activated in the RCC IP (Pinout view)"/>
             <PossibleValue Value="TIM2_ETR_COMP2_OUT" Comment="TIM2 ETR input is connected to COMP2_OUT"/>
             <PossibleValue Value="TIM2_ETR_COMP1_OUT" Comment="TIM2 ETR input is connected to COMP1_OUT"/>
     </RefParameter>
@@ -1107,23 +1116,23 @@
     </RefParameter>
     <RefParameter Name="TIM21_TI1_REMAP" Comment="TI1 remap capabilities for TIM21" DefaultValue="TIM21_TI1_MCO" Type="list" Group="ETR remap capabilities for TIM21">
             <PossibleValue Value="TIM21_TI1_MCO" Comment="TIM21 Channel 1 is connected to MCO clock" Semaphore="SEM2RCC_MCO_REQUIRED_$IpInstance"/>
-            <PossibleValue Value="TIM21_TI1_RTC_WKUT_IT" Comment="TIM21 Channel 1 is connected to RTC WAKEUP interrupt"/>
-            <PossibleValue Value="TIM21_TI1_HSE_RTC" Comment="TIM21 Channel 1 is connected to HSE_RTC clock" Semaphore="SEM2RCC_HSE_REQUIRED_$IpInstance"/>
+            <PossibleValue Value="TIM21_TI1_RTC_WKUT_IT" Comment="TIM21 Channel 1 is connected to RTC WAKEUP interrupt" Condition="!(RTC_WKUP_IRQn | RTC_IRQn)" Diagnostic="RTC wakeUp and associated NVIC interrupt must be enabled" Action="Disable"/>
+            <PossibleValue Value="TIM21_TI1_HSE_RTC" Comment="TIM21 Channel 1 is connected to HSE_RTC clock" Semaphore="SEM2RCC_HSE_REQUIRED_$IpInstance" Condition="!(HSEOscillator|HSEByPass)" Action="Disable" Diagnostic="HSE Oscillator must be activated in the RCC IP (Pinout view)"/>
             <PossibleValue Value="TIM21_TI1_MSI" Comment="TIM21 Channel 1 is connected to MSI clock" Semaphore="SEM2RCC_MSI_REQUIRED_$IpInstance"/>
-            <PossibleValue Value="TIM21_TI1_LSE" Comment="TIM21 Channel 1 is connected to LSE clock" Semaphore="SEM2RCC_LSE_REQUIRED_$IpInstance"/>
+            <PossibleValue Value="TIM21_TI1_LSE" Comment="TIM21 Channel 1 is connected to LSE clock" Semaphore="SEM2RCC_LSE_REQUIRED_$IpInstance" Condition="!(LSEOscillator|LSEByPass)" Action="Disable" Diagnostic="LSE Oscillator must be activated in the RCC IP (Pinout view)"/>
             <PossibleValue Value="TIM21_TI1_LSI" Comment="TIM21 Channel 1 is connected to LSI clock" Semaphore="SEM2RCC_LSI_REQUIRED_$IpInstance"/>
             <PossibleValue Value="TIM21_TI1_COMP1_OUT" Comment="TIM21 Channel 1 is connected to COMP1_OUT"/>
     </RefParameter>
     <RefParameter Name="TIM21_ETR_REMAP" Comment="ETR remap capabilities for TIM21" DefaultValue="TIM21_ETR_COMP2_OUT" Type="list" Group="ETR remap capabilities for TIM21">
             <PossibleValue Value="TIM21_ETR_COMP2_OUT" Comment="TIM21 ETR input connected to COMP2_OUT"/>
             <PossibleValue Value="TIM21_ETR_COMP1_OUT" Comment="TIM21 ETR input connected to COMP1_OUT"/>
-            <PossibleValue Value="TIM21_ETR_LSE" Comment="TIM21 ETR input connected to LSE clock" Semaphore="SEM2RCC_LSE_REQUIRED_$IpInstance"/>
+            <PossibleValue Value="TIM21_ETR_LSE" Comment="TIM21 ETR input connected to LSE clock" Semaphore="SEM2RCC_LSE_REQUIRED_$IpInstance" Condition="!(LSEOscillator|LSEByPass)" Action="Disable" Diagnostic="LSE Oscillator must be activated in the RCC IP (Pinout view)"/>
     </RefParameter>
 <!-- for TIM22 of L0 family -->
     <RefParameter Name="TIM22_ETR_REMAP" Comment="ETR remap capabilities for TIM22" DefaultValue="TIM22_ETR_COMP2_OUT" Type="list" Group="ETR remap capabilities for TIM22">
             <PossibleValue Value="TIM22_ETR_COMP2_OUT" Comment="TIM22 ETR input is connected to COMP2_OUT"/>
             <PossibleValue Value="TIM22_ETR_COMP1_OUT" Comment="TIM22 ETR input is connected to COMP1_OUT"/>
-            <PossibleValue Value="TIM22_ETR_LSE" Comment="TIM22 ETR input is connected to LSE clock" Semaphore="SEM2RCC_LSE_REQUIRED_$IpInstance"/>
+            <PossibleValue Value="TIM22_ETR_LSE" Comment="TIM22 ETR input is connected to LSE clock" Semaphore="SEM2RCC_LSE_REQUIRED_$IpInstance" Condition="!(LSEOscillator|LSEByPass)" Action="Disable" Diagnostic="LSE Oscillator must be activated in the RCC IP (Pinout view)"/>
     </RefParameter>
     <RefParameter Name="TIM22_TI1_REMAP" Comment="TI1 remap capabilities for TIM22" DefaultValue="TIM22_TI1_COMP2_OUT" Type="list" Group="TI1 remap capabilities for TIM22">
             <PossibleValue Value="TIM22_TI1_COMP2_OUT" Comment="TIM22 Channel 1 is connected to COMP2_OUT"/>
@@ -1428,6 +1437,7 @@
            </Parameter>
            <Parameter Name="OCMode_1" />
            <Parameter Name="Pulse" />
+           <Parameter Name="DefaultOCFastMode" />
            <Parameter Name="OCPolarity_1" />
            <Parameter Name="OCNPolarity_1" />
            <Parameter Name="OCIdleState_1" />
@@ -1443,6 +1453,7 @@
            </Parameter>
            <Parameter Name="OCMode_2" />
            <Parameter Name="Pulse" />
+           <Parameter Name="DefaultOCFastMode" />
            <Parameter Name="OCPolarity_2" />
            <Parameter Name="OCNPolarity_2" />
            <Parameter Name="OCIdleState_2" />
@@ -1458,6 +1469,7 @@
            </Parameter>
            <Parameter Name="OCMode_3" />
            <Parameter Name="Pulse" />
+           <Parameter Name="DefaultOCFastMode" />
            <Parameter Name="OCPolarity_3" />
            <Parameter Name="OCNPolarity_3" />
            <Parameter Name="OCIdleState_3" />
@@ -1473,6 +1485,7 @@
            </Parameter>
            <Parameter Name="OCMode_4" />
            <Parameter Name="Pulse" />
+           <Parameter Name="DefaultOCFastMode" />
            <Parameter Name="OCPolarity_4" />
            <Parameter Name="OCIdleState_4" />
            <Parameter Name="OCNIdleState_4" />
@@ -1488,6 +1501,7 @@
            </Parameter>
            <Parameter Name="OCMode_1" />
            <Parameter Name="Pulse" />
+           <Parameter Name="DefaultOCFastMode" />
            <Parameter Name="OCPolarity_1" />
            <Parameter Name="OCNPolarity_1" />
            <Parameter Name="OCIdleState_1" />
@@ -1503,6 +1517,7 @@
            </Parameter>
            <Parameter Name="OCMode_2" />
            <Parameter Name="Pulse" />
+           <Parameter Name="DefaultOCFastMode" />
            <Parameter Name="OCPolarity_2" />
            <Parameter Name="OCNPolarity_2" />
            <Parameter Name="OCIdleState_2" />
@@ -1518,6 +1533,7 @@
            </Parameter>
            <Parameter Name="OCMode_3" />
            <Parameter Name="Pulse" />
+           <Parameter Name="DefaultOCFastMode" />
            <Parameter Name="OCPolarity_3" />
            <Parameter Name="OCNPolarity_3" />
            <Parameter Name="OCIdleState_3" />
@@ -1533,6 +1549,7 @@
            </Parameter>
            <Parameter Name="OCMode_4" />
            <Parameter Name="Pulse" />
+           <Parameter Name="DefaultOCFastMode" />
            <Parameter Name="OCPolarity_4" />
            <Parameter Name="OCIdleState_4" />
            <Parameter Name="OCNIdleState_4" />
@@ -1547,6 +1564,7 @@
            </Parameter>
            <Parameter Name="OCMode_1" />
            <Parameter Name="Pulse" />
+           <Parameter Name="DefaultOCFastMode" />
            <Parameter Name="OCPolarity_1" />
            <Parameter Name="OCNPolarity_1" />
            <Parameter Name="OCIdleState_1" />
@@ -1562,6 +1580,7 @@
            </Parameter>
            <Parameter Name="OCMode_2" />
            <Parameter Name="Pulse" />
+           <Parameter Name="DefaultOCFastMode" />
            <Parameter Name="OCPolarity_2" />
            <Parameter Name="OCNPolarity_2" />
            <Parameter Name="OCIdleState_2" />
@@ -1577,6 +1596,7 @@
            </Parameter>
            <Parameter Name="OCMode_3" />
            <Parameter Name="Pulse" />
+           <Parameter Name="DefaultOCFastMode" />
            <Parameter Name="OCPolarity_3" />
            <Parameter Name="OCNPolarity_3" />
            <Parameter Name="OCIdleState_3" />
@@ -1592,6 +1612,7 @@
            </Parameter>
            <Parameter Name="OCMode_1" />
            <Parameter Name="Pulse" />
+           <Parameter Name="DefaultOCFastMode" />
            <Parameter Name="OCPolarity_1" />
            <Parameter Name="OCNPolarity_1" />
            <Parameter Name="OCIdleState_1" />
@@ -1607,6 +1628,7 @@
            </Parameter>
            <Parameter Name="OCMode_2" />
            <Parameter Name="Pulse" />
+           <Parameter Name="DefaultOCFastMode" />
            <Parameter Name="OCPolarity_2" />
            <Parameter Name="OCNPolarity_2" />
            <Parameter Name="OCIdleState_2" />
@@ -1622,6 +1644,7 @@
            </Parameter>
            <Parameter Name="OCMode_3" />
           <Parameter Name="Pulse" />
+           <Parameter Name="DefaultOCFastMode" />
            <Parameter Name="OCPolarity_3" />
            <Parameter Name="OCNPolarity_3" />
            <Parameter Name="OCIdleState_3" />
@@ -1640,6 +1663,7 @@
            </Parameter>
            <Parameter Name="OCMode_forced"/>
           <Parameter Name="Pulse" />
+           <Parameter Name="DefaultOCFastMode" />
            <Parameter Name="OCPolarity_1" />
            <Parameter Name="OCNPolarity_1" />
            <Parameter Name="OCIdleState_1" />
@@ -1655,6 +1679,7 @@
            </Parameter>
            <Parameter Name="OCMode_forced"/>
           <Parameter Name="Pulse" />
+           <Parameter Name="DefaultOCFastMode" />
            <Parameter Name="OCPolarity_2" />
            <Parameter Name="OCNPolarity_2" />
            <Parameter Name="OCIdleState_2" />
@@ -1670,6 +1695,7 @@
            </Parameter>
            <Parameter Name="OCMode_forced"/>
           <Parameter Name="Pulse" />
+           <Parameter Name="DefaultOCFastMode" />
            <Parameter Name="OCPolarity_3" />
            <Parameter Name="OCNPolarity_3" />
            <Parameter Name="OCIdleState_3" />
@@ -1685,6 +1711,7 @@
            </Parameter>
            <Parameter Name="OCMode_forced"/>
           <Parameter Name="Pulse" />
+           <Parameter Name="DefaultOCFastMode" />
            <Parameter Name="OCPolarity_4" />
            <Parameter Name="OCIdleState_4" />
            <Parameter Name="OCNIdleState_4" />
@@ -1699,6 +1726,7 @@
            </Parameter>
            <Parameter Name="OCMode_forced"/>
            <Parameter Name="Pulse" />
+           <Parameter Name="DefaultOCFastMode" />
            <Parameter Name="OCPolarity_1" />
            <Parameter Name="OCNPolarity_1" />
            <Parameter Name="OCIdleState_1" />
@@ -1714,6 +1742,7 @@
            </Parameter>
            <Parameter Name="OCMode_forced"/>
           <Parameter Name="Pulse" />
+           <Parameter Name="DefaultOCFastMode" />
            <Parameter Name="OCPolarity_2" />
            <Parameter Name="OCNPolarity_2" />
            <Parameter Name="OCIdleState_2" />
@@ -1729,6 +1758,7 @@
            </Parameter>
            <Parameter Name="OCMode_forced"/>
            <Parameter Name="Pulse" />
+           <Parameter Name="DefaultOCFastMode" />
            <Parameter Name="OCPolarity_3" />
            <Parameter Name="OCNPolarity_3" />
            <Parameter Name="OCIdleState_3" />
@@ -1744,6 +1774,7 @@
            </Parameter>
            <Parameter Name="OCMode_forced" />
            <Parameter Name="Pulse" />
+           <Parameter Name="DefaultOCFastMode" />
            <Parameter Name="OCPolarity_1" />
            <Parameter Name="OCNPolarity_1" />
            <Parameter Name="OCIdleState_1" />
@@ -1759,6 +1790,7 @@
            </Parameter>
            <Parameter Name="OCMode_forced"/>
            <Parameter Name="Pulse" />
+           <Parameter Name="DefaultOCFastMode" />
            <Parameter Name="OCPolarity_2" />
            <Parameter Name="OCNPolarity_2" />
            <Parameter Name="OCIdleState_2" />
@@ -1774,6 +1806,7 @@
            </Parameter>
            <Parameter Name="OCMode_forced"/>
           <Parameter Name="Pulse" />
+           <Parameter Name="DefaultOCFastMode" />
            <Parameter Name="OCPolarity_3" />
            <Parameter Name="OCNPolarity_3" />
            <Parameter Name="OCIdleState_3" />

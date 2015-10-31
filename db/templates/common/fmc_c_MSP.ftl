@@ -498,6 +498,9 @@
 #nstatic int ${mspinitvar} = 0;
 
 #nstatic void HAL_${ipvar.ipName}_MspInit(void){
+#t/* USER CODE BEGIN ${ipvar.ipName}_MspInit 0 */
+
+#n#t/* USER CODE END ${ipvar.ipName}_MspInit 0 */
 [#assign services = getInitServiceMode(ipvar.ipName)]
 [#if services.gpio??]
   [#assign service=services.gpio]
@@ -515,7 +518,11 @@
 #t}
 #t${mspinitvar} = 1;
 [#assign ipHandler = "h" + ipvar.ipName?lower_case]
+
 [@generateServiceCode ipName=ipvar.ipName serviceType="Init" modeName=ipvar.ipName instHandler=ipHandler tabN=1/]
+#t/* USER CODE BEGIN ${ipvar.ipName}_MspInit 1 */
+
+#n#t/* USER CODE END ${ipvar.ipName}_MspInit 1 */
 }
 
 [#list halModeList?split(" ") as mode]
@@ -578,7 +585,13 @@
     [#if words[0]??]
       [@generateServiceCode ipName=words[0] serviceType="Init" modeName=mode instHandler=ipHandler tabN=1/] 
     [/#if]
+#t/* USER CODE BEGIN ${mode}_MspInit 0 */
+
+#n#t/* USER CODE END ${mode}_MspInit 0 */
 #tHAL_${ipvar.ipName}_MspInit();
+#t/* USER CODE BEGIN ${mode}_MspInit 1 */
+
+#n#t/* USER CODE END ${mode}_MspInit 1 */
 }
   [/#if]
 [/#list][#-- list halModeList?split(" ") as mode --]
@@ -589,12 +602,19 @@
 #nstatic int ${mspdeinitvar} = 0;
 
 #nstatic void HAL_${ipvar.ipName}_MspDeInit(void){
+#t/* USER CODE BEGIN ${ipvar.ipName}_MspDeInit 0 */
+
+#n#t/* USER CODE END ${ipvar.ipName}_MspDeInit 0 */
 #tif (${mspdeinitvar}) {
 #t#treturn;
 #t}
 #t${mspdeinitvar} = 1;
 [#assign ipHandler = "h" + ipvar.ipName?lower_case]
+
 [@generateServiceCode ipName=ipvar.ipName serviceType="DeInit" modeName=ipvar.ipName instHandler=ipHandler tabN=1/]
+#t/* USER CODE BEGIN ${ipvar.ipName}_MspDeInit 1 */
+
+#n#t/* USER CODE END ${ipvar.ipName}_MspDeInit 1 */
 }
 
 [#list halModeList?split(" ") as mode]
@@ -619,7 +639,13 @@
     [#if words[0]??]
       [@generateServiceCode ipName=words[0] serviceType="DeInit" modeName=mode instHandler=ipHandler tabN=1/] 
     [/#if]
+#t/* USER CODE BEGIN ${mode}_MspDeInit 0 */
+
+#n#t/* USER CODE END ${mode}_MspDeInit 0 */
 #tHAL_${ipvar.ipName}_MspDeInit();
+#t/* USER CODE BEGIN ${mode}_MspDeInit 1 */
+
+#n#t/* USER CODE END ${mode}_MspDeInit 1 */
 }
   [/#if]
 [/#list]

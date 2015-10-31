@@ -339,30 +339,52 @@
 	</RefParameter>
 	
 	<RefParameter Name="_USE_LFN" Comment="USE_LFN (Use Long Filename)" DefaultValue="3" Type="list" Group="Locale and Namespace Parameters" TabName="Set Defines">
-		<Condition Diagnostic="" Expression="S_FS_REENTRANT_0"/>
+		<Condition Diagnostic="" Expression="(_LFN_UNICODE = 1) &amp; (S_FS_REENTRANT_0)"/>
+		<PossibleValue Comment="Enabled with static working buffer on the BSS" Value="1" Semaphore="S_USE_LFN_1"/>
+		<PossibleValue Comment="Enabled with dynamic working buffer on the STACK" Value="2"/>
+		<PossibleValue Comment="Enabled with dynamic working buffer on the HEAP" Value="3"/>
+	    <Description>The USE_LFN option switches the LFN feature.&lt;br&gt;- 0: Disable LFN feature. MAX_LFN has no effect.&lt;br&gt;- 1: Enable LFN with static working buffer on the BSS. Always NOT reentrant.&lt;br&gt;- 2: Enable LFN with dynamic working buffer on the STACK.&lt;br&gt;- 3: Enable LFN with dynamic working buffer on the HEAP.&lt;br&gt;To enable LFN feature, Unicode handling functions ff_convert() and ff_wtoupper() function must be added to the project.&lt;br&gt;The LFN working buffer occupies (MAX_LFN + 1) * 2 bytes. When use stack for the working buffer, take care on stack overflow. &lt;br&gt;When use heap memory for the working buffer, memory management functions, ff_memalloc() and ff_memfree(), must be added to the project.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: &lt;br&gt;USE_LFN = 0 (Disabled) not possible : it requires LFN_UNICODE != 1 (Unicode).</Description>
+	</RefParameter>
+	
+	<RefParameter Name="_USE_LFN" Comment="USE_LFN (Use Long Filename)" DefaultValue="3" Type="list" Group="Locale and Namespace Parameters" TabName="Set Defines">
+		<Condition Diagnostic="" Expression="(_LFN_UNICODE = 1) &amp; (!S_FS_REENTRANT_0)"/>
+		<PossibleValue Comment="Enabled with dynamic working buffer on the STACK" Value="2"/>
+		<PossibleValue Comment="Enabled with dynamic working buffer on the HEAP" Value="3"/>
+	    <Description>The USE_LFN option switches the LFN feature.&lt;br&gt;- 0: Disable LFN feature. MAX_LFN has no effect.&lt;br&gt;- 1: Enable LFN with static working buffer on the BSS. Always NOT reentrant.&lt;br&gt;- 2: Enable LFN with dynamic working buffer on the STACK.&lt;br&gt;- 3: Enable LFN with dynamic working buffer on the HEAP.&lt;br&gt;To enable LFN feature, Unicode handling functions ff_convert() and ff_wtoupper() function must be added to the project.&lt;br&gt;The LFN working buffer occupies (MAX_LFN + 1) * 2 bytes. When use stack for the working buffer, take care on stack overflow. &lt;br&gt;When use heap memory for the working buffer, memory management functions, ff_memalloc() and ff_memfree(), must be added to the project.&lt;br&gt;&lt;b&gt;Dependencies&lt;/b&gt;: &lt;br&gt;1) USE_LFN = 0 (Disabled) not possible : it requires LFN_UNICODE != 1 (Unicode) &lt;br&gt;2) USE_LFN = 1 (Enabled with static working buffer on the BSS) not possible : it requires FS_REENTRANT = 0 (Disabled).</Description>
+	</RefParameter>
+	
+	<RefParameter Name="_USE_LFN" Comment="USE_LFN (Use Long Filename)" DefaultValue="3" Type="list" Group="Locale and Namespace Parameters" TabName="Set Defines">
+	    <Condition Diagnostic="" Expression="(_LFN_UNICODE = 0) &amp; (!S_FS_REENTRANT_0)"/>
+		<PossibleValue Comment="Disabled" Value="0"/>
+		<PossibleValue Comment="Enabled with dynamic working buffer on the STACK" Value="2"/>
+		<PossibleValue Comment="Enabled with dynamic working buffer on the HEAP" Value="3"/>
+		<Description>The USE_LFN option switches the LFN feature.&lt;br&gt;- 0: Disable LFN feature. MAX_LFN has no effect.&lt;br&gt;- 1: Enable LFN with static working buffer on the BSS. Always NOT reentrant.&lt;br&gt;- 2: Enable LFN with dynamic working buffer on the STACK.&lt;br&gt;- 3: Enable LFN with dynamic working buffer on the HEAP.&lt;br&gt;To enable LFN feature, Unicode handling functions ff_convert() and ff_wtoupper() function must be added to the project.&lt;br&gt;The LFN working buffer occupies (MAX_LFN + 1) * 2 bytes. When use stack for the working buffer, take care on stack overflow. &lt;br&gt;When use heap memory for the working buffer, memory management functions, ff_memalloc() and ff_memfree(), must be added to the project.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: &lt;br&gt;USE_LFN = 1 not possible: it requires FS_REENTRANT = 0 (Disabled).</Description>
+	</RefParameter>   
+	
+	<RefParameter Name="_USE_LFN" Comment="USE_LFN (Use Long Filename)" DefaultValue="3" Type="list" Group="Locale and Namespace Parameters" TabName="Set Defines">
 		<PossibleValue Comment="Disabled" Value="0"/>
 		<PossibleValue Comment="Enabled with static working buffer on the BSS" Value="1" Semaphore="S_USE_LFN_1"/>
 		<PossibleValue Comment="Enabled with dynamic working buffer on the STACK" Value="2"/>
 		<PossibleValue Comment="Enabled with dynamic working buffer on the HEAP" Value="3"/>
-	    <Description>The USE_LFN option switches the LFN feature.&lt;br&gt;- 0: Disable LFN feature. MAX_LFN has no effect.&lt;br&gt;- 1: Enable LFN with static working buffer on the BSS. Always NOT reentrant.&lt;br&gt;- 2: Enable LFN with dynamic working buffer on the STACK.&lt;br&gt;- 3: Enable LFN with dynamic working buffer on the HEAP.&lt;br&gt;To enable LFN feature, Unicode handling functions ff_convert() and ff_wtoupper() function must be added to the project.&lt;br&gt;The LFN working buffer occupies (MAX_LFN + 1) * 2 bytes. When use stack for the working buffer, take care on stack overflow. &lt;br&gt;When use heap memory for the working buffer, memory management functions, ff_memalloc() and ff_memfree(), must be added to the project.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: USE_LFN = 1 possible as FS_REENTRANT = 0 (Disabled).</Description>
+	    <Description>The USE_LFN option switches the LFN feature.&lt;br&gt;- 0: Disable LFN feature. MAX_LFN has no effect.&lt;br&gt;- 1: Enable LFN with static working buffer on the BSS. Always NOT reentrant.&lt;br&gt;- 2: Enable LFN with dynamic working buffer on the STACK.&lt;br&gt;- 3: Enable LFN with dynamic working buffer on the HEAP.&lt;br&gt;To enable LFN feature, Unicode handling functions ff_convert() and ff_wtoupper() function must be added to the project.&lt;br&gt;The LFN working buffer occupies (MAX_LFN + 1) * 2 bytes. When use stack for the working buffer, take care on stack overflow. &lt;br&gt;When use heap memory for the working buffer, memory management functions, ff_memalloc() and ff_memfree(), must be added to the project.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: &lt;br&gt;All choices available as FS_REENTRANT = 0 (Disabled) and LFN_UNICODE = 0 (ANSI/OEM).</Description>
 	</RefParameter>
-	
-	<RefParameter Name="_USE_LFN" Comment="USE_LFN (Use Long Filename)" DefaultValue="3" Type="list" Group="Locale and Namespace Parameters" TabName="Set Defines">
-		<PossibleValue Comment="Disabled" Value="0"/>
-		<PossibleValue Comment="Enabled with dynamic working buffer on the STACK" Value="2"/>
-		<PossibleValue Comment="Enabled with dynamic working buffer on the HEAP" Value="3"/>
-		<Description>The USE_LFN option switches the LFN feature.&lt;br&gt;- 0: Disable LFN feature. MAX_LFN has no effect.&lt;br&gt;- 1: Enable LFN with static working buffer on the BSS. Always NOT reentrant.&lt;br&gt;- 2: Enable LFN with dynamic working buffer on the STACK.&lt;br&gt;- 3: Enable LFN with dynamic working buffer on the HEAP.&lt;br&gt;To enable LFN feature, Unicode handling functions ff_convert() and ff_wtoupper() function must be added to the project.&lt;br&gt;The LFN working buffer occupies (MAX_LFN + 1) * 2 bytes. When use stack for the working buffer, take care on stack overflow. &lt;br&gt;When use heap memory for the working buffer, memory management functions, ff_memalloc() and ff_memfree(), must be added to the project.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: USE_LFN = 1 not possible: it requires FS_REENTRANT = 0 (Disabled).</Description>
-	</RefParameter>   
 	
 	<RefParameter Name="_MAX_LFN" Comment="MAX_LFN (Max Long Filename)" DefaultValue="255" Max="255" Min="12"  Type="integer" Group="Locale and Namespace Parameters" TabName="Set Defines">
 	    <Description>Maximum LFN length to handle.</Description>
 	</RefParameter>
 	
 	<RefParameter Name="_LFN_UNICODE" Comment="LFN_UNICODE (Enable Unicode)" DefaultValue="0" Type="list" Group="Locale and Namespace Parameters" TabName="Set Defines">
+		<Condition Diagnostic="" Expression="!(_USE_LFN = 0)"/>
 		<PossibleValue Comment="ANSI/OEM" Value="0"/>
 		<PossibleValue Comment="Unicode" Value="1"/>
 		<Description>To switch the character encoding on the FatFs API to Unicode, enable LFN feature (USE_LFN set to Enabled) and set LFN_UNICODE to 1 (Unicode).</Description>
 	</RefParameter>
+
+	<RefParameter Name="_LFN_UNICODE" Comment="LFN_UNICODE (Enable Unicode)" DefaultValue="0" Type="list" Group="Locale and Namespace Parameters" TabName="Set Defines">
+		<PossibleValue Comment="ANSI/OEM" Value="0"/>
+		<Description>To switch the character encoding on the FatFs API to Unicode, enable LFN feature (USE_LFN set to Enabled) and set LFN_UNICODE to 1 (Unicode). &lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;:&lt;br&gt;Must be set to 0 (ANSI/OEM) as USE_LFN is set to 0 (Disabled)</Description>
+	</RefParameter>
+
 	
 	<RefParameter Name="_STRF_ENCODE" Comment="STRF_ENCODE (Character encoding)" DefaultValue="3" Type="list" Group="Locale and Namespace Parameters" TabName="Set Defines">
 		<PossibleValue Comment="ANSI/OEM" Value="0"/>

@@ -85,6 +85,11 @@
 		<PossibleValue Comment="9 Bits (including Parity)" Value="IRDA_WORDLENGTH_9B"/>
 	</RefParameter>
 	
+	 <RefParameter Comment="Word Length" DefaultValue="UART_WORDLENGTH_8B" Name="WordLength" Type="list" Group="Basic Parameters">
+	<Condition Expression="$IpInstance_LIN" Diagnostic=""/>
+		<PossibleValue Comment="8 Bits (including Parity)" Value="UART_WORDLENGTH_8B"/>
+	</RefParameter>
+	
 	<RefParameter Comment="Word Length" DefaultValue="UART_WORDLENGTH_7B" Name="WordLength" Type="list" Group="Basic Parameters">
 		<Condition Expression="(DIE439|DIE438|DIE446) &amp; (!$IpInstance_LIN)" Diagnostic=""/>
 	    <PossibleValue Comment="7 Bits (including Parity)" Value="UART_WORDLENGTH_7B" Semaphore="$IpInstance_Uart_7B"/>
@@ -231,9 +236,8 @@
 	</RefParameter>
 
 	<!-- Prescaler Parameters for USART/IrDa/SmartCard Clock Mode -->
-	<RefParameter Comment="Prescaler" DefaultValue="1" Name="Prescaler" Type="list" Group="Advanced Parameters">
+	<RefParameter Comment="Prescaler" DefaultValue="1" Min="1" Max="1" Name="Prescaler" Type="integer" Group="Advanced Parameters">
 		<Condition Expression="(PowerMode = IRDA_POWERMODE_NORMAL) &amp; (VirtualMode = VM_IRDA)" Diagnostic=""/>
-		<PossibleValue Comment="1" Value="1"/>
 	</RefParameter>
 	<RefParameter Comment="Prescaler for SmartCard Clock (Divide by x2)" DefaultValue="10" Max="31" Min="1" Name="Prescaler" Type="integer" Group="Clock Parameters">
 		<Condition Expression="VirtualMode = VM_SMARTCARD" Diagnostic=""/>
@@ -268,7 +272,12 @@
 	<PossibleValue Comment="Enable" Value="SMARTCARD_TIMEOUT_ENABLED"/>
 	<PossibleValue Comment="Disable" Value="SMARTCARD_TIMEOUT_DISABLED"/>
 	</RefParameter>
-	<RefParameter Comment="Receiver TimeOut Value" DefaultValue="0" Max="16777215" Min="0" Name="TimeOutValue" Type="integer" Group="Advanced Parameters"/>
+	
+	<RefParameter Comment="Receiver TimeOut Value" DefaultValue="0" Max="16777215" Min="0" Name="TimeOutValue" Type="integer" Group="Advanced Parameters">
+	<Condition Expression="TimeOutEnable = SMARTCARD_TIMEOUT_ENABLED"  Diagnostic=""/>
+	</RefParameter>
+	<RefParameter Comment="Receiver TimeOut Value" DefaultValue="null"  Name="TimeOutValue" Type="integer" Visible="false"  Group="Advanced Parameters"/>
+	
     <RefParameter Comment="SmartCard Block Length" DefaultValue="0" Max="255" Min="0" Name="BlockLength" Type="integer" Group="Advanced Parameters"/>
     <RefParameter Comment="Number of retries in receive and transmit mode" DefaultValue="0" Max="7" Min="0" Name="AutoRetryCount" Type="integer" Group="Advanced Parameters"/>
 
@@ -280,12 +289,27 @@
 	</RefParameter>
 	
     <!-- Address for MultiProcessor --> 
+		<RefParameter Comment="Wake-Up Address" DefaultValue="0" Max="63" Min="0" Name="Address" Type="integer" Group="Advanced Parameters">
+		<Condition Expression="WakeUpMethod=UART_WAKEUPMETHOD_ADDRESSMARK &amp; AddressLength = UART_ADDRESS_DETECT_7B &amp; WordLength=UART_WORDLENGTH_7B"  Diagnostic=""/>
+	</RefParameter>
 	<RefParameter Comment="Wake-Up Address" DefaultValue="0" Max="127" Min="0" Name="Address" Type="integer" Group="Advanced Parameters">
-		<Condition Expression="WakeUpMethod = UART_WAKEUPMETHOD_ADDRESSMARK" Diagnostic=""/>
+			<Condition Expression="WakeUpMethod=UART_WAKEUPMETHOD_ADDRESSMARK &amp; AddressLength = UART_ADDRESS_DETECT_7B &amp; WordLength=UART_WORDLENGTH_8B"  Diagnostic=""/>
+	</RefParameter>
+	<RefParameter Comment="Wake-Up Address" DefaultValue="0" Max="255" Min="0" Name="Address" Type="integer" Group="Advanced Parameters">
+			<Condition Expression="WakeUpMethod=UART_WAKEUPMETHOD_ADDRESSMARK &amp; AddressLength = UART_ADDRESS_DETECT_7B &amp; WordLength=UART_WORDLENGTH_9B"  Diagnostic=""/>
+	</RefParameter>
+	<RefParameter Comment="Wake-Up Address" DefaultValue="0" Max="15" Min="0" Name="Address" Type="integer" Group="Advanced Parameters">
+		<Condition Expression="WakeUpMethod=UART_WAKEUPMETHOD_ADDRESSMARK" Diagnostic=""/>
 	</RefParameter>
 	<RefParameter Comment="Wake-Up Address" DefaultValue="0" Max="0" Min="0" Name="Address" Type="integer" Group="Advanced Parameters" Visible="false" />
 	
-	
+		<!-- Specifics RefParameters for MultiProcessor Only. Adress length -->
+	<RefParameter Comment="Wake-Up Method" DefaultValue="UART_ADDRESS_DETECT_4B" Name="AddressLength" Type="list" Group="Advanced Parameters">
+		 <Condition Expression="WakeUpMethod=UART_WAKEUPMETHOD_ADDRESSMARK" Diagnostic=""/>
+		<PossibleValue Comment="4 Bits" Value="UART_ADDRESS_DETECT_4B"/>
+		<PossibleValue Comment="7 Bits" Value="UART_ADDRESS_DETECT_7B"/>
+	</RefParameter>
+	<RefParameter Comment="Wake-Up Method" DefaultValue="null" Name="AddressLength" Type="list" Visible="false" Group="Advanced Parameters"/>
 	
 	<!--Specifics RefParameters for LIN. Line BreakLength -->
 	<RefParameter Comment="Break Detect Length" DefaultValue="UART_LINBREAKDETECTLENGTH_10B" Name="BreakDetectLength" Type="list" Group="Advanced Parameters">
@@ -746,13 +770,7 @@
 	</RefMode>
 		
 	<!-- RefMode for 'MultiProcessor Communication' UART -->
-	<RefMode Name="Multiprocessor_communication" HalMode="UART" BaseMode="usartBasic">
-		<ConfigForMode>Uart_MultiProcessor_Init</ConfigForMode>
-		<Parameter Name="VirtualMode">
-			<PossibleValue>VM_ASYNC</PossibleValue>
-		</Parameter>
-		<!-- Basic Parameters -->
-	  
+	<RefMode Name="multiprocessor"  BaseMode="usartBasic" Abstract="true" >  
 		<Parameter Name="WordLength"/>
 		<Parameter Name="Parity"/>
 		<Parameter Name="StopBits"/>
@@ -763,6 +781,7 @@
 		<Parameter Name="OneBitSampling"/>
 		<Parameter Name="WakeUpMethod"/>
 		<Parameter Name="Address"/>
+		<Parameter Name="AddressLength"/>
 		<!-- Advanced Features -->
 		<Parameter Name="AutoBaudRateEnableParam"/>
 		<Parameter Name="TxPinLevelInvertParam"/>
@@ -773,6 +792,21 @@
 		<Parameter Name="DMADisableonRxErrorParam"/>
 		<Parameter Name="AutoBaudRateMode"/>
 		<Parameter Name="MSBFirstParam"/>
+	</RefMode>
+	
+	<RefMode Name="Multiprocessor_communication" HalMode="UART" BaseMode="multiprocessor">
+	 <Condition Expression="WakeUpMethod=UART_WAKEUPMETHOD_ADDRESSMARK" Diagnostic=""/>
+		<ConfigForMode>Uart_MultiProcessor_Ex_Init</ConfigForMode>
+		<Parameter Name="VirtualMode">
+			<PossibleValue>VM_ASYNC</PossibleValue>
+		</Parameter>
+	</RefMode>
+	
+	<RefMode Name="Multiprocessor_communication" HalMode="UART" BaseMode="multiprocessor">
+		<ConfigForMode>Uart_MultiProcessor_Init</ConfigForMode>
+		<Parameter Name="VirtualMode">
+			<PossibleValue>VM_ASYNC</PossibleValue>
+		</Parameter>
 	</RefMode>
 	
 	<!-- RefModes for IRDA -->
@@ -945,8 +979,8 @@
 			<ModeLogicOperator Name="XOR">
 				<Mode Name="Asynchronous">
 					<SignalLogicalOp Name="AND">
-						<Signal Name="RX"/>
-						<Signal Name="TX"/>
+						<Signal Name="RX" IOMode="AlternateFunctionPushPullPULLUP"/>
+						<Signal Name="TX" IOMode="AlternateFunctionPushPullPULLUP"/>
 					</SignalLogicalOp>
 					<Semaphore>$IpInstance_Asynchronous</Semaphore>
 					<Semaphore>Asynchronous</Semaphore>
@@ -960,7 +994,7 @@
 				</Mode>
 				<Mode Name="Half_duplex(single_wire_mode)" UserName="Single Wire (Half-Duplex)" >
 					<SignalLogicalOp Name="AND">
-						<Signal Name="TX"/>
+						<Signal Name="TX" IOMode="AlternateFunctionOpenDrain"/>
 					</SignalLogicalOp>
 				</Mode>
 				<Mode Name="Multiprocessor_communication" UserName="Multiprocessor Communication">

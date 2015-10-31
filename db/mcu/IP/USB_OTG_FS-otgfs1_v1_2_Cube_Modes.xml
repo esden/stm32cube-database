@@ -31,8 +31,7 @@
 	
 	<!-- Virtual Mode Parameter, to define RefParameter in function of RefMode -->
 	<RefParameter Comment="" DefaultValue="Host_Only" Name="VirtualMode" Type="list" Visible="false" Group="Basic Parameters" >
-		<PossibleValue Comment="" Value="Host_Only"/>
-		<PossibleValue Comment="" Value="Device_DP_DM"/>
+		<PossibleValue Comment="" Value="Host_Only"/>		
 		<PossibleValue Comment="" Value="Device_Only"/>
 	</RefParameter>
 	
@@ -103,11 +102,13 @@
 	</RefParameter>
 	
 	<RefParameter Comment="VBUS sensing" DefaultValue="ENABLE" Name="vbus_sensing_enable" Type="List">
-		<Condition Expression="VBUS_SENSING_ON" Diagnostic=""/>	
+		<!--<Condition Expression="(VBUS_SENSING_ON) &amp; (VirtualMode = Device_Only)" Diagnostic=""/>	-->
+		<Condition Expression="VirtualMode = Device_Only" Diagnostic=""/>
 		<PossibleValue Value="ENABLE" Comment="Enabled"/>
+		<PossibleValue Value="DISABLE" Comment="Disabled"/>	
 	</RefParameter>
 	
-	<RefParameter Comment="VBUS sensing" DefaultValue="DISABLE" Name="vbus_sensing_enable" Type="List" Group="">
+	<RefParameter Comment="VBUS sensing" DefaultValue="DISABLE" Name="vbus_sensing_enable" Type="List" Group="" Visible="false">
 		<PossibleValue Value="ENABLE" Comment="Enabled"/>
 		<PossibleValue Value="DISABLE" Comment="Disabled"/>		
 	</RefParameter>
@@ -194,7 +195,7 @@
 		-->
 		<Parameter Name="use_external_vbus">
 			<PossibleValue>ENABLE</PossibleValue>
-		</Parameter>
+		</Parameter>		
 	</RefMode>
 	
 	<!-- Tracker 232811 -->
@@ -261,8 +262,9 @@
 			</ModeLogicOperator>
 			<Semaphore>USB_FS_HS</Semaphore>
 			<!-- to keep compatibility with device mode -->
-			<!--<Condition Expression="MW_USB_OTG_FS_MW_DEVICE | MW_USB_OTG_FS_MW_HOST | OTG_DUAL_ROLE_DEVICE" Diagnostic="USB Mode must be selected first"/>--> 
-			<Condition Expression="MW_USB_OTG_FS_MW_HOST | OTG_DUAL_ROLE_DEVICE" Diagnostic="USB Mode must be selected first"/> 
+			<!-- tracker 287417 -->
+			<Condition Expression="MW_USB_OTG_FS_MW_DEVICE | MW_USB_OTG_FS_MW_HOST | OTG_DUAL_ROLE_DEVICE" Diagnostic="USB Mode must be selected first"/> 
+			<!--<Condition Expression="MW_USB_OTG_FS_MW_HOST | OTG_DUAL_ROLE_DEVICE" Diagnostic="USB Mode must be selected first"/> --> 
 			<!--<Condition Expression="USB_OTG_FS_HOST" Diagnostic=""/> -->
 		</Mode>
 	</ModeLogicOperator>

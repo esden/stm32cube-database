@@ -493,7 +493,7 @@
                     #t#tif(hpcd->Init.low_power_enable == 1)
                     #t#t{
                     #t#t#t/* Enable EXTI Line 18 for USB wakeup */
-                    [#if FamilyName=="STM32L1"][#-- FamilyName=="STM32F3"|| to be added on V4.5 --]
+                    [#if FamilyName=="STM32F3"||FamilyName=="STM32L1"][#-- FamilyName=="STM32F3"|| to be added on V4.5 --]
                       #t#t#t__HAL_USB_EXTI_CLEAR_FLAG();
                       #t#t#t__HAL_USB_EXTI_SET_RISING_EDGE_TRIGGER();
                     [/#if]
@@ -551,7 +551,19 @@
 [#-- DeInit NVIC if DeInit --]
     [#if nvicExist&&service??&&service.nvic?size>0]#n#t#t/* Peripheral interrupt Deinit*/[#--#n#t#tHAL_NVIC_DisableIRQ([#if service.nvic.vector??]${service.nvic.vector}[/#if]);--]
 [#list service.nvic as initVector]                
-                #t#tHAL_NVIC_DisableIRQ(${initVector.vector});
+                [#if initVector.shared=="false"]             
+                #t#tHAL_NVIC_DisableIRQ(${initVector.vector});#n
+                [#else]
+
+#t/* USER CODE BEGIN ${ipName}:${initVector.vector} disable */
+#t#t/**
+#t#t* Uncomment the line below to disable the "${initVector.vector}" interrupt 
+#t#t*        Be aware, disabling shared interrupt may affect other IPs
+#t#t*/
+#t#t/* HAL_NVIC_DisableIRQ(${initVector.vector}); */
+#t/* USER CODE END ${ipName}:${initVector.vector} disable */
+#n
+                [/#if]
             [/#list]
     [/#if]
 

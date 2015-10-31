@@ -493,7 +493,7 @@
                     #t#tif(hpcd->Init.low_power_enable == 1)
                     #t#t{
                     #t#t#t/* Enable EXTI Line 18 for USB wakeup */
-                    [#if FamilyName=="STM32L1"][#-- FamilyName=="STM32F3"|| to be added on V4.5 --]
+                    [#if FamilyName=="STM32F3"||FamilyName=="STM32L1"][#-- FamilyName=="STM32F3"|| to be added on V4.5 --]
                       #t#t#t__HAL_USB_EXTI_CLEAR_FLAG();
                       #t#t#t__HAL_USB_EXTI_SET_RISING_EDGE_TRIGGER();
                     [/#if]

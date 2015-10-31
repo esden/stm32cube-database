@@ -32,7 +32,7 @@
 	    <Description>Sets the maximum priority that can be assigned to a task. &lt;br&gt; Tasks can be assigned a priority from zero, which is the lowest priority, to (MAX_PRIORITIES-1), which is the highest priority.</Description>
 	</RefParameter>
 	
-	<RefParameter Name="configMINIMAL_STACK_SIZE" Comment="MINIMAL_STACK_SIZE" DefaultValue="128" Max="=configTOTAL_HEAP_SIZE/4" Min="1"  Type="integer" Group="Kernel settings" TabName="Config parameters">
+	<RefParameter Name="configMINIMAL_STACK_SIZE" Comment="MINIMAL_STACK_SIZE" DefaultValue="128" Max="=configTOTAL_HEAP_SIZE/4" Min="64"  Type="integer" Group="Kernel settings" TabName="Config parameters">
 	    <Description>Sets the size of the stack allocated to the idle task. The value is specified in words, not bytes. &lt;br&gt; &lt;b&gt;Warning: &lt;/b&gt; &lt;br&gt;The value chosen by the user should take into account the number of threads, the total heap size and the system stack size. If the totality of used stack size is higher than the total heap size, FreeRTOS will not be able to create and manage the tasks.</Description>
 	</RefParameter>
 	
@@ -181,9 +181,14 @@
 	</RefParameter>
 	
 	<RefParameter Name="configUSE_TIMERS" Comment="USE_TIMERS" DefaultValue="0" Type="list" Group="Software timer definitions" TabName="Config parameters">
+		<Condition Diagnostic="Both values allowed as xTaskGetSchedulerState equals to 1 (Enabled)" Expression="INCLUDE_xTaskGetSchedulerState=1"/>
 		<PossibleValue Comment="Disabled" Value="0"/>
 		<PossibleValue Comment="Enabled" Value="1"/>
 		<Description>Set to 1 (Enabled) to include software timer functionality, or 0 (Disabled) to omit software timer functionality.</Description>
+	</RefParameter>
+		<RefParameter Name="configUSE_TIMERS" Comment="USE_TIMERS" DefaultValue="1" Type="list" Group="Software timer definitions" TabName="Config parameters">
+		<PossibleValue Comment="Enabled" Value="1"/>
+		<Description>Set to 1 (Enabled) to include software timer functionality. &lt;br&gt;&lt;b&gt;Dependency:&lt;/b&gt;&lt;br&gt;Forced to 1 (Enabled) as xTaskGetSchedulerState equals to 0 (constraint due to the call to xPortSysTickHandler() in the interruption file).</Description>
 	</RefParameter>
 	
 	<!-- must be defined if configUSE_TIMERS == 1 -->
@@ -271,11 +276,15 @@
 	</RefParameter>
 	
 	<RefParameter Name="INCLUDE_xTaskGetSchedulerState" Comment="xTaskGetSchedulerState" DefaultValue="1" Type="list" Group="Include definitions" TabName="Include parameters">
+        <Condition Diagnostic="Both values allowed as configUSE_TIMERS is enabled" Expression="configUSE_TIMERS=1"/>
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
         <Description>It is one of the macros allowing those components of the real time kernel not utilized by your application to be excluded from your build. &lt;br&gt; - this ensures the RTOS does not use any more ROM or RAM than necessary for your particular embedded application. &lt;br&gt; To include the xTaskGetSchedulerState() API function, set xTaskGetSchedulerState to 1 (Enabled)&lt;br&gt; To exclude it from your build, set xTaskGetSchedulerState to 0 (Disabled) </Description>
     </RefParameter>
-    
+	<RefParameter Name="INCLUDE_xTaskGetSchedulerState" Comment="xTaskGetSchedulerState" DefaultValue="1" Type="list" Group="Include definitions" TabName="Include parameters">
+        <PossibleValue Comment="Enabled" Value="1"/>
+        <Description>It is one of the macros allowing those components of the real time kernel not utilized by your application to be excluded from your build. &lt;br&gt; - this ensures the RTOS does not use any more ROM or RAM than necessary for your particular embedded application. &lt;br&gt; To include the xTaskGetSchedulerState() API function, set xTaskGetSchedulerState to 1 (Enabled)&lt;br&gt; To exclude it from your build, set xTaskGetSchedulerState to 0 (Disabled).&lt;br&gt;&lt;b&gt;Dependency:&lt;/b&gt;&lt;br&gt;Forced to 1 (Enabled) as configUSE_TIMERS equals to 0 (constraint due to the call to xPortSysTickHandler() in the interruption file) </Description>
+    </RefParameter>    
 	
 	<RefParameter Name="THREADS_CONFIG" Comment="Code generation" DefaultValue="0" Type="list" Group="Threads config" TabName="Threads parameters" >
 		<PossibleValue Comment="Default (one single thread)" Value="0" Semaphore="S_SINGLE_THREAD"/>

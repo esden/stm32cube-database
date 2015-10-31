@@ -479,8 +479,8 @@ void HAL_MspInit(void)
         #t#t   HAL_SD_ReadBlocks_DMA or HAL_SD_WriteBlocks_DMA. */
         [/#if]
         [#if FamilyName=="STM32L1" && dmaconfig.dmaRequestName=="SD_MMC"]
-        #t#t/* Use BSP_SD_ReadBlocks_DMA and BSP_SD_WriteBlocks_DMA
-        #t#t   instead of HAL_SD_ReadBlocks_DMA and HAL_SD_WriteBlocks_DMA. */
+        #t#t/* Be sure to change transfer direction before calling
+        #t#t   HAL_SD_ReadBlocks_DMA or HAL_SD_WriteBlocks_DMA. */
         [/#if]
         [/#if]   [#-- if more than one dma handler--]  
         [#list dmaconfig.dmaHandel as dmaH]
@@ -593,11 +593,14 @@ void HAL_MspInit(void)
     [/#if]
     [#if nvicExist]
         [#if initService.nvic??]
+#t/* System interrupt init*/
 [#if ipName?contains("USB")]
                 [#-- WorkAround for USB low power and remap macro--]
                 [#if USB_interruptRemapMacro??]
                   #t#t${USB_interruptRemapMacro};
                 [/#if]
+
+
                 [#list initService.nvic as initVector]
                   [#if !initVector.vector?contains("WKUP") && !initVector.vector?contains("WakeUp")]
                     #t#tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
@@ -614,7 +617,7 @@ void HAL_MspInit(void)
                     #t#tif(hpcd->Init.low_power_enable == 1)
                     #t#t{
                     #t#t#t/* Enable EXTI Line 18 for USB wakeup */
-                    [#if FamilyName=="STM32L1"][#-- FamilyName=="STM32F3"|| to be added on V4.5 --]
+                    [#if FamilyName=="STM32F3"||FamilyName=="STM32L1"][#-- FamilyName=="STM32F3"|| to be added on V4.5 --]
                       #t#t#t__HAL_USB_EXTI_CLEAR_FLAG();
                       #t#t#t__HAL_USB_EXTI_SET_RISING_EDGE_TRIGGER();
                     [/#if]
@@ -678,9 +681,20 @@ void HAL_MspInit(void)
              [/#if]    
         [/#if] [#-- if DMA exist --]
         [#-- DeInit NVIC if DeInit --]
-        [#if service??&&service.nvic??&&nvicExist&&service.nvic?size>0]#n#t#t/* Peripheral interrupt Deinit*/[#--#n#t#tHAL_NVIC_DisableIRQ([#if service.nvic.vector??]${service.nvic.vector}[/#if]);--]
-            [#list service.nvic as initVector]             
-                #t#tHAL_NVIC_DisableIRQ(${initVector.vector});
+        [#if service??&&service.nvic??&&nvicExist&&service.nvic?size>0]#n#t#t/* Peripheral interrupt DeInit*/[#--#n#t#tHAL_NVIC_DisableIRQ([#if service.nvic.vector??]${service.nvic.vector}[/#if]);--]
+            [#list service.nvic as initVector]
+                [#if initVector.shared=="false"]             
+                #t#tHAL_NVIC_DisableIRQ(${initVector.vector});#n
+                [#else]
+#t/* USER CODE BEGIN ${ipName}:${initVector.vector} disable */
+#t#t/**
+#t#t* Uncomment the line below to disable the "${initVector.vector}" interrupt 
+#t#t*        Be aware, disabling shared interrupt may affect other IPs
+#t#t*/
+#t#t/* HAL_NVIC_DisableIRQ(${initVector.vector}); */
+#t/* USER CODE END ${ipName}:${initVector.vector} disable */
+#n
+                [/#if]
             [/#list]
         [/#if]
     [/#if]
@@ -774,6 +788,9 @@ static int ${entry.value}=0;
 
 #n#t/* USER CODE END ${words[0]?replace("I2S","SPI")}_MspInit 0 */    
         [@generateServiceCode ipName=words[0] serviceType="Init" modeName=mode instHandler=ipHandler tabN=2/] 
+#t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspInit 1 */
+
+#n#t/* USER CODE END ${words[0]?replace("I2S","SPI")}_MspInit 1 */   
     #t} 
     [#assign i = 0]
     [#list words as inst]

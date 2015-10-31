@@ -368,12 +368,12 @@
                                     [/#if] [#-- if genericType=Array --]
                                     [#if argument.value!="" && argument.value!="N/A"]
                                     [#if instanceIndex??&&fargument.context=="global"][#assign varName=fargument.name +"." +instanceIndex][#else][#assign varName=fargument.name][/#if]
-                                        [#assign indicator = varName+"."+argument.name+" = "+argValue]
-                                        [#assign indicatorName = varName+"."+argument.name] 
+                                        [#assign indicator = varName+"."+argument.name+" = "+argValue+" "]
+                                        [#assign indicatorName = varName+"."+argument.name]
                                         [#if !listofDeclaration?contains(indicator)][#-- if not repeted --]  
                                             [#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"][#assign varName=fargument.name +"." +instanceIndex]${fargument.name}${instanceIndex}[#else][#assign varName=fargument.name]${fargument.name}[/#if].${argument.name} = ${argValue};                                        
                                             [#assign listofDeclaration = listofDeclaration?replace(indicatorName+" =","")]
-                                            [#assign listofDeclaration = listofDeclaration +", "+ varName+"."+argument.name+" = "+argValue]                                                                                 
+                                            [#assign listofDeclaration = listofDeclaration +", "+ varName+"."+argument.name+" = "+argValue+" "]                                                                                 
                                         [/#if]
                                     [#else]
                                     [#if nTab==2]#t#t[#else]#t[/#if]//[#if instanceIndex??&&fargument.context=="global"]${fargument.name}${instanceIndex}[#else]${fargument.name}[/#if].${argument.name} = [#if argument.value!="N/A"]${argValue}[/#if];
@@ -386,7 +386,7 @@
                                                 [#if  (argument.value??&& argument.value!="__NULL") && (argument.value?contains("$Index"))]
                                                     [#assign instanceValue=argument.value?replace("$Index",index)]
 [#if instanceIndex??&&fargument.context=="global"][#assign varName=fargument.name +instanceIndex][#else][#assign varName=fargument.name][/#if]
-                                                    [#assign indicator = varName+"."+argument.name+" = "+instanceValue]
+                                                    [#assign indicator = varName+"."+argument.name+" = "+instanceValue+" "]
                                                     [#if !listofDeclaration?contains(indicator)]    [#-- if not repeted --]
                                                     [#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"]${fargument.name}${instanceIndex}[#else]${fargument.name}[/#if].${argument.name} = ${instanceValue};
                                                             [#assign listofDeclaration = listofDeclaration +", "+ indicator]
@@ -394,7 +394,7 @@
                                                     [/#if]
                                                 [#else]
 [#if instanceIndex??&&fargument.context=="global"][#assign varName=fargument.name+instanceIndex][#else][#assign varName=fargument.name][/#if] [#if argument.value?? && argument.value!="__NULL"][#assign argv =argument.value][#else][#assign argv=inst][/#if]
-                                                   [#assign indicator = varName+"."+argument.name+" = "+argv]
+                                                   [#assign indicator = varName+"."+argument.name+" = "+argv+" "]
                                                    [#if !listofDeclaration?contains(indicator)] [#-- if not repeted --]
                                                     [#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"]${fargument.name}${instanceIndex}[#else]${fargument.name}[/#if].${argument.name} = [#if argument.value?? && argument.value!="__NULL"]${argument.value};[#else]${inst};[/#if]
                                                             [#assign listofDeclaration = listofDeclaration +", "+ indicator]
@@ -440,7 +440,7 @@
                                         [#assign argValue="&"+argument2.name+"[0]"]
                                     [/#if] [#-- if genericType=Array --]
 [#if instanceIndex??&&fargument.context=="global"][#assign varName=fargument.name +instanceIndex][#else][#assign varName=fargument.name][/#if]
-                                                    [#assign indicator = varName+"."+argument.name+"."+argument2.name+" = "+argValue]
+                                                    [#assign indicator = varName+"."+argument.name+"."+argument2.name+" = "+argValue+" "]
                                                     [#if !listofDeclaration?contains(indicator)]  [#-- if not repeted --]
                                                         [#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"]${fargument.name}${instanceIndex}[#else]${fargument.name}[/#if].${argument.name}.${argument2.name} = ${argValue};                                    
                                                             
@@ -456,7 +456,7 @@
                                     [/#if]
                                     [#if argument2.status=="OK"]
 [#if instanceIndex??&&fargument.context=="global"][#assign varName=fargument.name +instanceIndex][#else][#assign varName=fargument.name][/#if]
-                                         [#assign indicator = varName+"."+argument.name+"."+argument2.name+" = "+argValue]
+                                         [#assign indicator = varName+"."+argument.name+"."+argument2.name+" = "+argValue+" "]
                                          [#if !listofDeclaration?contains(indicator)]  [#-- if not repeted --]   
                                             [#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"]${fargument.name}${instanceIndex}[#else]${fargument.name}[/#if].${argument.name}.${argument2.name} = ${argValue};
                                             [#assign listofDeclaration = listofDeclaration +", "+ indicator]                                            
@@ -483,7 +483,7 @@
                                         [#assign argValue="&"+argument3.name+"[0]"]
                                     [/#if] [#-- if genericType=Array --]
 [#if instanceIndex??&&fargument.context=="global"][#assign varName=fargument.name +instanceIndex][#else][#assign varName=fargument.name][/#if]
-                                         [#assign indicator = varName+"."+argument.name+"."+argument2.name+"."+argument3.name+" = "+argValue]
+                                         [#assign indicator = varName+"."+argument.name+"."+argument2.name+"."+argument3.name+" = "+argValue+ " "]
                                          [#if !listofDeclaration?contains(indicator)]  [#-- if not repeted --]                                      
                                             [#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"]${fargument.name}${instanceIndex}[#else]${fargument.name}[/#if].${argument.name}.${argument2.name}.${argument3.name} = ${argValue};                                    
                                             [#assign listofDeclaration = listofDeclaration +", "+ indicator]
@@ -491,7 +491,7 @@
                                [#else] [#-- !argument.mandatory --]
                                     [#if argument3.status=="KO"]
 [#if instanceIndex??&&fargument.context=="global"][#assign varName=fargument.name +instanceIndex][#else][#assign varName=fargument.name][/#if]
-                                         [#assign indicator = varName+"."+argument.name+"."+argument2.name+"."+argument3.name+" = "+argValue]
+                                         [#assign indicator = varName+"."+argument.name+"."+argument2.name+"."+argument3.name+" = "+argValue+" "] 
                                          [#if !listofDeclaration?contains(indicator)]  [#-- if not repeted --]  
                                             [#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"]${fargument.name}${instanceIndex}[#else]${fargument.name}[/#if].${argument.name}.${argument2.name}.${argument3.name} = ${argValue};
                                             [#assign listofDeclaration = listofDeclaration +", "+ indicator]
@@ -534,12 +534,12 @@
 				[#assign retval=argument.name]
 			[/#if]
 		    [/#list]
-[#if S_FATFS_SDIO??] [#-- if HAL_SD_Init  and SDIO is used with FATFS--]
+[#if S_FATFS_SDIO?? && inst=="SDIO"] [#-- if HAL_SD_Init  and SDIO is used with FATFS--]
 [#else]		    [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n
 [/#if]
 		    		
             [#else]
-                    [#if S_FATFS_SDIO??] [#-- if HAL_SD_Init  and SDIO is used with FATFS--][#else][#if nTab==2]#t#t[#else]#t[/#if]${method.name}();#n[/#if]
+                    [#if S_FATFS_SDIO?? && inst=="SDIO"] [#-- if HAL_SD_Init  and SDIO is used with FATFS--][#else][#if nTab==2]#t#t[#else]#t[/#if]${method.name}();#n[/#if]
                 [/#if]			
 		[/#if]
 		[#if method.status=="KO"]

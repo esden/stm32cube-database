@@ -14,7 +14,7 @@
 		<PossibleValue Comment="LSI" Value="RCC_OSCILLATORTYPE_LSI"/>
 	</RefParameter>
 	<RefParameter Visible="false" Comment="LSI used flag" DefaultValue="1" Name="LSIUsed" Type="integer" Min="1" Max="1">
-		<Condition Expression="(SEM2RCC_LSI_REQUIRED_TIM5 &amp; TIM5 &amp; Semaphore_input_Channel4TIM5)|IWDGUsed_ForRCC|((RCC_RTC_Clock_Source=RCC_RTCCLKSOURCE_LSI)&amp;(RTCUsed_ForRCC))" Diagnostic=""/>
+		<Condition Expression="(SEM2RCC_LSI_REQUIRED_TIM5 &amp; TIM5 &amp; Semaphore_input_Channel4_directTIM5)|IWDGUsed_ForRCC|((RCC_RTC_Clock_Source=RCC_RTCCLKSOURCE_LSI)&amp;(RTCUsed_ForRCC))" Diagnostic=""/>
 	</RefParameter>
 	<RefParameter Visible="false" Comment="LSI used flag" DefaultValue="0" Name="LSIUsed" Type="integer" Min="0" Max="0"/>
 	<RefParameter Visible="false" Comment="Lsi State" DefaultValue="RCC_LSI_OFF" Name="LSIState" Type="list">
@@ -33,7 +33,7 @@
 		<PossibleValue Comment="HSE" Value="RCC_OSCILLATORTYPE_HSE"/>
 	</RefParameter>
 	<RefParameter Visible="false" Comment="HSE used flag" DefaultValue="1" Name="HSEUsed" Type="integer" Min="1" Max="1">
-		<Condition Expression="(SEM2RCC_HSE_REQUIRED_TIM11 &amp; TIM11 &amp; Semaphore_input_Channel1TIM11)|(RTCUsed_ForRCC&amp;!((RCC_RTC_Clock_Source=RCC_RTCCLKSOURCE_LSE)|(RCC_RTC_Clock_Source=RCC_RTCCLKSOURCE_LSI)))|(PLLSource=RCC_PLLSOURCE_HSE)|(SYSCLKSource=RCC_SYSCLKSOURCE_HSE)|((RCC_MCO1Source=RCC_MCO1SOURCE_HSE)&amp;(MCO1Config))|((RCC_MCO2Source=RCC_MCO2SOURCE_HSE)&amp;(MCO2Config))" Diagnostic="SYSCLK source OR PLL source OR RTC source OR MCO1 source OR MCO2 source"/>
+		<Condition Expression="((HSEByPass|HSEOscillator)&amp;(SEM2RCC_HSE_REQUIRED_TIM11 &amp; TIM11 &amp; Semaphore_input_Channel1TIM11))|(RTCUsed_ForRCC&amp;!((RCC_RTC_Clock_Source=RCC_RTCCLKSOURCE_LSE)|(RCC_RTC_Clock_Source=RCC_RTCCLKSOURCE_LSI)))|(PLLSource=RCC_PLLSOURCE_HSE)|(SYSCLKSource=RCC_SYSCLKSOURCE_HSE)|((RCC_MCO1Source=RCC_MCO1SOURCE_HSE)&amp;(MCO1Config))|((RCC_MCO2Source=RCC_MCO2SOURCE_HSE)&amp;(MCO2Config))" Diagnostic="SYSCLK source OR PLL source OR RTC source OR MCO1 source OR MCO2 source"/>
 	</RefParameter>
 	<RefParameter Visible="false" Comment="HSE Is Used" DefaultValue="0" Name="HSEUsed" Min="0" Type="integer"/>
 	<RefParameter Visible="false" Comment="Hse State" DefaultValue="RCC_HSE_BYPASS" Name="HSEState" Type="list">
@@ -41,7 +41,7 @@
 		<PossibleValue Comment="Hse Bypass" Value="RCC_HSE_BYPASS" Semaphore="HSEEnabled"/>
 	</RefParameter>
 	<RefParameter Visible="false" Comment="Hse State" DefaultValue="RCC_HSE_ON" Name="HSEState" Type="list">
-		<Condition Diagnostic="HSE ON" Expression="(SEM2RCC_HSE_REQUIRED_TIM11 &amp; TIM11 &amp; Semaphore_input_Channel1TIM11)|HSEOscillator"/>
+		<Condition Diagnostic="HSE ON" Expression="HSEOscillator"/>
 		<PossibleValue Comment="Hse ON" Value="RCC_HSE_ON" Semaphore="HSEEnabled"/>
 	</RefParameter>
 	<RefParameter Visible="false" Comment="Hse State" DefaultValue="RCC_HSE_OFF" Name="HSEState" Type="list">
@@ -63,7 +63,7 @@
 		<PossibleValue Comment="Lse Bypass" Value="RCC_LSE_BYPASS"/>
 	</RefParameter>
 	<RefParameter Visible="false" Comment="Lse State" DefaultValue="RCC_LSE_ON" Name="LSEState" Type="list">
-		<Condition Diagnostic="LSE ON" Expression="(SEM2RCC_LSE_REQUIRED_TIM5 &amp; TIM5 &amp; Semaphore_input_Channel4TIM5)|LSEOscillator"/>
+		<Condition Diagnostic="LSE ON" Expression="LSEOscillator"/>
 		<PossibleValue Comment="Lse ON" Value="RCC_LSE_ON"/>
 	</RefParameter>
 	<RefParameter Visible="false" Comment="Lse State" DefaultValue="RCC_LSE_OFF" Name="LSEState" Type="list">
@@ -246,40 +246,113 @@
 		<PossibleValue Comment="4" Value="RCC_MCODIV_4"/>
 		<PossibleValue Comment="5" Value="RCC_MCODIV_5"/>
 	</RefParameter>
-	<RefParameter Visible="false" Comment="RTC Clock Source" Name="RCC_RTC_Clock_Source" DefaultValue="RCC_RTCCLKSOURCE_LSI" Type="list" IP="RTC">
-		<PossibleValue Comment="LSE" Value="RCC_RTCCLKSOURCE_LSE"/>
-		<PossibleValue Comment="LSI" Value="RCC_RTCCLKSOURCE_LSI"/>
-		<PossibleValue Comment="2" Value="RCC_RTCCLKSOURCE_HSE_DIV2"/>
-		<PossibleValue Comment="3" Value="RCC_RTCCLKSOURCE_HSE_DIV3"/>
-		<PossibleValue Comment="4" Value="RCC_RTCCLKSOURCE_HSE_DIV4"/>
-		<PossibleValue Comment="5" Value="RCC_RTCCLKSOURCE_HSE_DIV5"/>
-		<PossibleValue Comment="6" Value="RCC_RTCCLKSOURCE_HSE_DIV6"/>
-		<PossibleValue Comment="7" Value="RCC_RTCCLKSOURCE_HSE_DIV7"/>
-		<PossibleValue Comment="8" Value="RCC_RTCCLKSOURCE_HSE_DIV8"/>
-		<PossibleValue Comment="9" Value="RCC_RTCCLKSOURCE_HSE_DIV9"/>
-		<PossibleValue Comment="10" Value="RCC_RTCCLKSOURCE_HSE_DIV10"/>
-		<PossibleValue Comment="11" Value="RCC_RTCCLKSOURCE_HSE_DIV11"/>
-		<PossibleValue Comment="12" Value="RCC_RTCCLKSOURCE_HSE_DIV12"/>
-		<PossibleValue Comment="13" Value="RCC_RTCCLKSOURCE_HSE_DIV13"/>
-		<PossibleValue Comment="14" Value="RCC_RTCCLKSOURCE_HSE_DIV14"/>
-		<PossibleValue Comment="15" Value="RCC_RTCCLKSOURCE_HSE_DIV15"/>
-		<PossibleValue Comment="16" Value="RCC_RTCCLKSOURCE_HSE_DIV16"/>
-		<PossibleValue Comment="17" Value="RCC_RTCCLKSOURCE_HSE_DIV17"/>
-		<PossibleValue Comment="18" Value="RCC_RTCCLKSOURCE_HSE_DIV18"/>
-		<PossibleValue Comment="19" Value="RCC_RTCCLKSOURCE_HSE_DIV19"/>
-		<PossibleValue Comment="20" Value="RCC_RTCCLKSOURCE_HSE_DIV20"/>
-		<PossibleValue Comment="21" Value="RCC_RTCCLKSOURCE_HSE_DIV21"/>
-		<PossibleValue Comment="22" Value="RCC_RTCCLKSOURCE_HSE_DIV22"/>
-		<PossibleValue Comment="23" Value="RCC_RTCCLKSOURCE_HSE_DIV23"/>
-		<PossibleValue Comment="24" Value="RCC_RTCCLKSOURCE_HSE_DIV24"/>
-		<PossibleValue Comment="25" Value="RCC_RTCCLKSOURCE_HSE_DIV25"/>
-		<PossibleValue Comment="26" Value="RCC_RTCCLKSOURCE_HSE_DIV26"/>
-		<PossibleValue Comment="27" Value="RCC_RTCCLKSOURCE_HSE_DIV27"/>
-		<PossibleValue Comment="28" Value="RCC_RTCCLKSOURCE_HSE_DIV28"/>
-		<PossibleValue Comment="29" Value="RCC_RTCCLKSOURCE_HSE_DIV29"/>
-		<PossibleValue Comment="30" Value="RCC_RTCCLKSOURCE_HSE_DIV30"/>
-		<PossibleValue Comment="31" Value="RCC_RTCCLKSOURCE_HSE_DIV31"/>
-	</RefParameter>
+	<!-- RTC  MUX-->
+	<!-- RTC mustbe HSE DIv when Timer remap HSE is selected-->
+  
+    <RefParameter Visible="false" Comment="PLL Source" DefaultValue="RCC_RTCCLKSOURCE_HSE_DIV2" Name="RCC_RTC_Clock_SourceVirtual" Type="list">
+        <Condition Diagnostic="RTC Mux should have HSE as input when TIM11 remap is used" Expression="((HSEByPass|HSEOscillator)&amp;(SEM2RCC_HSE_REQUIRED_TIM11 &amp; TIM11 &amp; Semaphore_input_Channel1TIM11)) "/>
+        <PossibleValue Comment="2" Value="RCC_RTCCLKSOURCE_HSE_DIV2"/>
+        <PossibleValue Comment="3" Value="RCC_RTCCLKSOURCE_HSE_DIV3"/>
+        <PossibleValue Comment="4" Value="RCC_RTCCLKSOURCE_HSE_DIV4"/>
+        <PossibleValue Comment="5" Value="RCC_RTCCLKSOURCE_HSE_DIV5"/>
+        <PossibleValue Comment="6" Value="RCC_RTCCLKSOURCE_HSE_DIV6"/>
+        <PossibleValue Comment="7" Value="RCC_RTCCLKSOURCE_HSE_DIV7"/>
+        <PossibleValue Comment="8" Value="RCC_RTCCLKSOURCE_HSE_DIV8"/>
+        <PossibleValue Comment="9" Value="RCC_RTCCLKSOURCE_HSE_DIV9"/>
+        <PossibleValue Comment="10" Value="RCC_RTCCLKSOURCE_HSE_DIV10"/>
+        <PossibleValue Comment="11" Value="RCC_RTCCLKSOURCE_HSE_DIV11"/>
+        <PossibleValue Comment="12" Value="RCC_RTCCLKSOURCE_HSE_DIV12"/>
+        <PossibleValue Comment="13" Value="RCC_RTCCLKSOURCE_HSE_DIV13"/>
+        <PossibleValue Comment="14" Value="RCC_RTCCLKSOURCE_HSE_DIV14"/>
+        <PossibleValue Comment="15" Value="RCC_RTCCLKSOURCE_HSE_DIV15"/>
+        <PossibleValue Comment="16" Value="RCC_RTCCLKSOURCE_HSE_DIV16"/>
+        <PossibleValue Comment="17" Value="RCC_RTCCLKSOURCE_HSE_DIV17"/>
+        <PossibleValue Comment="18" Value="RCC_RTCCLKSOURCE_HSE_DIV18"/>
+        <PossibleValue Comment="19" Value="RCC_RTCCLKSOURCE_HSE_DIV19"/>
+        <PossibleValue Comment="20" Value="RCC_RTCCLKSOURCE_HSE_DIV20"/>
+        <PossibleValue Comment="21" Value="RCC_RTCCLKSOURCE_HSE_DIV21"/>
+        <PossibleValue Comment="22" Value="RCC_RTCCLKSOURCE_HSE_DIV22"/>
+        <PossibleValue Comment="23" Value="RCC_RTCCLKSOURCE_HSE_DIV23"/>
+        <PossibleValue Comment="24" Value="RCC_RTCCLKSOURCE_HSE_DIV24"/>
+        <PossibleValue Comment="25" Value="RCC_RTCCLKSOURCE_HSE_DIV25"/>
+        <PossibleValue Comment="26" Value="RCC_RTCCLKSOURCE_HSE_DIV26"/>
+        <PossibleValue Comment="27" Value="RCC_RTCCLKSOURCE_HSE_DIV27"/>
+        <PossibleValue Comment="28" Value="RCC_RTCCLKSOURCE_HSE_DIV28"/>
+        <PossibleValue Comment="29" Value="RCC_RTCCLKSOURCE_HSE_DIV29"/>
+        <PossibleValue Comment="30" Value="RCC_RTCCLKSOURCE_HSE_DIV30"/>
+        <PossibleValue Comment="31" Value="RCC_RTCCLKSOURCE_HSE_DIV31"/>
+    </RefParameter>
+    <RefParameter Visible="false" Comment="PLL Source" DefaultValue="RCC_RTCCLKSOURCE_LSI" Name="RCC_RTC_Clock_SourceVirtual" Type="list">
+        <PossibleValue Comment="LSE" Value="RCC_RTCCLKSOURCE_LSE"/>
+        <PossibleValue Comment="LSI" Value="RCC_RTCCLKSOURCE_LSI"/>
+        <PossibleValue Comment="2" Value="RCC_RTCCLKSOURCE_HSE_DIV2"/>
+        <PossibleValue Comment="3" Value="RCC_RTCCLKSOURCE_HSE_DIV3"/>
+        <PossibleValue Comment="4" Value="RCC_RTCCLKSOURCE_HSE_DIV4"/>
+        <PossibleValue Comment="5" Value="RCC_RTCCLKSOURCE_HSE_DIV5"/>
+        <PossibleValue Comment="6" Value="RCC_RTCCLKSOURCE_HSE_DIV6"/>
+        <PossibleValue Comment="7" Value="RCC_RTCCLKSOURCE_HSE_DIV7"/>
+        <PossibleValue Comment="8" Value="RCC_RTCCLKSOURCE_HSE_DIV8"/>
+        <PossibleValue Comment="9" Value="RCC_RTCCLKSOURCE_HSE_DIV9"/>
+        <PossibleValue Comment="10" Value="RCC_RTCCLKSOURCE_HSE_DIV10"/>
+        <PossibleValue Comment="11" Value="RCC_RTCCLKSOURCE_HSE_DIV11"/>
+        <PossibleValue Comment="12" Value="RCC_RTCCLKSOURCE_HSE_DIV12"/>
+        <PossibleValue Comment="13" Value="RCC_RTCCLKSOURCE_HSE_DIV13"/>
+        <PossibleValue Comment="14" Value="RCC_RTCCLKSOURCE_HSE_DIV14"/>
+        <PossibleValue Comment="15" Value="RCC_RTCCLKSOURCE_HSE_DIV15"/>
+        <PossibleValue Comment="16" Value="RCC_RTCCLKSOURCE_HSE_DIV16"/>
+        <PossibleValue Comment="17" Value="RCC_RTCCLKSOURCE_HSE_DIV17"/>
+        <PossibleValue Comment="18" Value="RCC_RTCCLKSOURCE_HSE_DIV18"/>
+        <PossibleValue Comment="19" Value="RCC_RTCCLKSOURCE_HSE_DIV19"/>
+        <PossibleValue Comment="20" Value="RCC_RTCCLKSOURCE_HSE_DIV20"/>
+        <PossibleValue Comment="21" Value="RCC_RTCCLKSOURCE_HSE_DIV21"/>
+        <PossibleValue Comment="22" Value="RCC_RTCCLKSOURCE_HSE_DIV22"/>
+        <PossibleValue Comment="23" Value="RCC_RTCCLKSOURCE_HSE_DIV23"/>
+        <PossibleValue Comment="24" Value="RCC_RTCCLKSOURCE_HSE_DIV24"/>
+        <PossibleValue Comment="25" Value="RCC_RTCCLKSOURCE_HSE_DIV25"/>
+        <PossibleValue Comment="26" Value="RCC_RTCCLKSOURCE_HSE_DIV26"/>
+        <PossibleValue Comment="27" Value="RCC_RTCCLKSOURCE_HSE_DIV27"/>
+        <PossibleValue Comment="28" Value="RCC_RTCCLKSOURCE_HSE_DIV28"/>
+        <PossibleValue Comment="29" Value="RCC_RTCCLKSOURCE_HSE_DIV29"/>
+        <PossibleValue Comment="30" Value="RCC_RTCCLKSOURCE_HSE_DIV30"/>
+        <PossibleValue Comment="31" Value="RCC_RTCCLKSOURCE_HSE_DIV31"/>
+    </RefParameter>
+    <RefParameter Visible="false" Comment="PLL Source" DefaultValue="+RCC_RTC_Clock_SourceVirtual" Name="RCC_RTC_Clock_SourceVirtualString" Type="string"/>
+ 
+	
+    <RefParameter Visible="false" Comment="RTC Clock Source"  DefaultValue="+RCC_RTC_Clock_SourceVirtualString" Name="RCC_RTC_Clock_Source" Type="list" IP="RTC">
+        <PossibleValue Comment="LSE" Value="RCC_RTCCLKSOURCE_LSE"/>
+        <PossibleValue Comment="LSI" Value="RCC_RTCCLKSOURCE_LSI"/>
+        <PossibleValue Comment="2" Value="RCC_RTCCLKSOURCE_HSE_DIV2"/>
+        <PossibleValue Comment="3" Value="RCC_RTCCLKSOURCE_HSE_DIV3"/>
+        <PossibleValue Comment="4" Value="RCC_RTCCLKSOURCE_HSE_DIV4"/>
+        <PossibleValue Comment="5" Value="RCC_RTCCLKSOURCE_HSE_DIV5"/>
+        <PossibleValue Comment="6" Value="RCC_RTCCLKSOURCE_HSE_DIV6"/>
+        <PossibleValue Comment="7" Value="RCC_RTCCLKSOURCE_HSE_DIV7"/>
+        <PossibleValue Comment="8" Value="RCC_RTCCLKSOURCE_HSE_DIV8"/>
+        <PossibleValue Comment="9" Value="RCC_RTCCLKSOURCE_HSE_DIV9"/>
+        <PossibleValue Comment="10" Value="RCC_RTCCLKSOURCE_HSE_DIV10"/>
+        <PossibleValue Comment="11" Value="RCC_RTCCLKSOURCE_HSE_DIV11"/>
+        <PossibleValue Comment="12" Value="RCC_RTCCLKSOURCE_HSE_DIV12"/>
+        <PossibleValue Comment="13" Value="RCC_RTCCLKSOURCE_HSE_DIV13"/>
+        <PossibleValue Comment="14" Value="RCC_RTCCLKSOURCE_HSE_DIV14"/>
+        <PossibleValue Comment="15" Value="RCC_RTCCLKSOURCE_HSE_DIV15"/>
+        <PossibleValue Comment="16" Value="RCC_RTCCLKSOURCE_HSE_DIV16"/>
+        <PossibleValue Comment="17" Value="RCC_RTCCLKSOURCE_HSE_DIV17"/>
+        <PossibleValue Comment="18" Value="RCC_RTCCLKSOURCE_HSE_DIV18"/>
+        <PossibleValue Comment="19" Value="RCC_RTCCLKSOURCE_HSE_DIV19"/>
+        <PossibleValue Comment="20" Value="RCC_RTCCLKSOURCE_HSE_DIV20"/>
+        <PossibleValue Comment="21" Value="RCC_RTCCLKSOURCE_HSE_DIV21"/>
+        <PossibleValue Comment="22" Value="RCC_RTCCLKSOURCE_HSE_DIV22"/>
+        <PossibleValue Comment="23" Value="RCC_RTCCLKSOURCE_HSE_DIV23"/>
+        <PossibleValue Comment="24" Value="RCC_RTCCLKSOURCE_HSE_DIV24"/>
+        <PossibleValue Comment="25" Value="RCC_RTCCLKSOURCE_HSE_DIV25"/>
+        <PossibleValue Comment="26" Value="RCC_RTCCLKSOURCE_HSE_DIV26"/>
+        <PossibleValue Comment="27" Value="RCC_RTCCLKSOURCE_HSE_DIV27"/>
+        <PossibleValue Comment="28" Value="RCC_RTCCLKSOURCE_HSE_DIV28"/>
+        <PossibleValue Comment="29" Value="RCC_RTCCLKSOURCE_HSE_DIV29"/>
+        <PossibleValue Comment="30" Value="RCC_RTCCLKSOURCE_HSE_DIV30"/>
+        <PossibleValue Comment="31" Value="RCC_RTCCLKSOURCE_HSE_DIV31"/>
+    </RefParameter>
 	<RefParameter Visible="false" Comment="RTC Clock Source_HSEDiv" DefaultValue="RCC_RTCCLKSOURCE_HSE_DIV2" Name="RCC_RTC_Clock_Source_FROM_HSE" Type="list" IP="RTC">
 		<PossibleValue Comment="2" Value="RCC_RTCCLKSOURCE_HSE_DIV2"/>
 		<PossibleValue Comment="3" Value="RCC_RTCCLKSOURCE_HSE_DIV3"/>
@@ -405,7 +478,7 @@
 	</RefParameter>
 	<RefParameter Visible="false" Name="RCC_PERIPHCLK_I2SVar" Comment="RCC_PERIPHCLK_I2SVar" Type="list" DefaultValue=""/>
 	<RefParameter Visible="false" Name="RCC_PERIPHCLK_RTCVar" Comment="RCC_PERIPHCLK_RTCVar" Type="list" DefaultValue="RCC_PERIPHCLK_RTC">
-		<Condition Expression="(SEM2RCC_HSE_REQUIRED_TIM11 &amp; TIM11 &amp; Semaphore_input_Channel1TIM11)|RTCUsed_ForRCC" Diagnostic="RTC Prescaler Activated"/>
+		<Condition Expression="((HSEByPass|HSEOscillator)&amp;(SEM2RCC_HSE_REQUIRED_TIM11 &amp; TIM11 &amp; Semaphore_input_Channel1TIM11))|RTCUsed_ForRCC" Diagnostic="RTC Prescaler Activated"/>
 		<PossibleValue Value="RCC_PERIPHCLK_RTC" Comment="RCC_PERIPHCLK_RTC"/>
 	</RefParameter>
 	<RefParameter Visible="false" Name="RCC_PERIPHCLK_RTCVar" Comment="RCC_PERIPHCLK_RTC" Type="list" DefaultValue=""/>
@@ -418,7 +491,7 @@
 	</RefParameter>
 	<RefParameter Visible="false" Name="PLLI2SRARG" Comment="PLLI2SRARG" Type="list" DefaultValue="null"/>
 	<RefParameter Visible="false" Name="RTCClockSelectionARG" Comment="RTCClockSelectionARG" Type="list" DefaultValue="+RCC_RTC_Clock_Source">
-		<Condition Expression="(SEM2RCC_HSE_REQUIRED_TIM11 &amp; TIM11 &amp; Semaphore_input_Channel1TIM11)|RTCUsed_ForRCC" Diagnostic="PLLSAI is used for SAI"/>
+		<Condition Expression="((HSEByPass|HSEOscillator)&amp;(SEM2RCC_HSE_REQUIRED_TIM11 &amp; TIM11 &amp; Semaphore_input_Channel1TIM11))|RTCUsed_ForRCC" Diagnostic="PLLSAI is used for SAI"/>
 	</RefParameter>
 	<RefParameter Visible="false" Name="RTCClockSelectionARG" Comment="RTCClockSelectionARG" Type="list" DefaultValue="null"/>
 	
@@ -501,7 +574,7 @@
 	</RefParameter>
 	<RefParameter Visible="false" Comment="APB2CLKDividerARG" DefaultValue="null" Name="APB2CLKDividerARG" Type="list"/>
 	<RefParameter Visible="false" Comment="Periph Clock Selection" Name="PeriphClockSelectionARG" DefaultValue="+PeriphClockSelection" Type="list">
-	<Condition Expression="(SEM2RCC_HSE_REQUIRED_TIM11 &amp; TIM11 &amp; Semaphore_input_Channel1TIM11)|(I2SSourceIsPll &amp; I2SUsed_ForRCC)|((RCC_MCO2Source=RCC_MCO2SOURCE_PLLI2SCLK)&amp; (MCO2Config))|RTCUsed_ForRCC" Diagnostic="clock used by RCC"/>
+	<Condition Expression="((HSEByPass|HSEOscillator)&amp;(SEM2RCC_HSE_REQUIRED_TIM11 &amp; TIM11 &amp; Semaphore_input_Channel1TIM11))|(I2SSourceIsPll &amp; I2SUsed_ForRCC)|((RCC_MCO2Source=RCC_MCO2SOURCE_PLLI2SCLK)&amp; (MCO2Config))|RTCUsed_ForRCC" Diagnostic="clock used by RCC"/>
 	</RefParameter>
 	<RefParameter Visible="false" Comment="Periph Clock Selection" Name="PeriphClockSelectionARG" DefaultValue="null" Type="list"/>	
 	
@@ -509,7 +582,7 @@
 	<!-- Enable refParameters list -->
 	<!--RefEnabel Parameters -->
 	<RefParameter Visible="false" Name="EnableHSE" Comment="EnableHSE" Type="list" DefaultValue="true">
-		<Condition Expression="(SEM2RCC_HSE_REQUIRED_TIM11 &amp; TIM11 &amp; Semaphore_input_Channel1TIM11)|(HSEOscillator | HSEByPass)" Diagnostic="Disabled if RTC is used and HSE ON"/>
+		<Condition Expression="((HSEByPass|HSEOscillator)&amp;(SEM2RCC_HSE_REQUIRED_TIM11 &amp; TIM11 &amp; Semaphore_input_Channel1TIM11))|(HSEOscillator | HSEByPass)" Diagnostic="Disabled if RTC is used and HSE ON"/>
 		<PossibleValue Value="true" Comment="true"/>
 	</RefParameter>
 	<RefParameter Visible="false" Name="EnableHSE" Comment="EnableHSE" Type="list" DefaultValue="false">
@@ -517,21 +590,21 @@
 	</RefParameter>
 	<!--RTC Enable-->
 	<RefParameter Visible="false" Name="EnableHSERTCDevisor" Comment="RTC and HSE Oscillator" Type="list" DefaultValue="true" IP="RTC">
-		<Condition Expression="(SEM2RCC_HSE_REQUIRED_TIM11 &amp; TIM11 &amp; Semaphore_input_Channel1TIM11)|((RTCUsed_ForRCC) &amp; (HSEOscillator|HSEByPass))" Diagnostic="Disabled if RTC is used"/>
+		<Condition Expression="((HSEByPass|HSEOscillator)&amp;(SEM2RCC_HSE_REQUIRED_TIM11 &amp; TIM11 &amp; Semaphore_input_Channel1TIM11))|((RTCUsed_ForRCC) &amp; (HSEOscillator|HSEByPass))" Diagnostic="Disabled if RTC is used"/>
 		<PossibleValue Value="true" Comment="true"/>
 	</RefParameter>
 	<RefParameter Visible="false" Name="EnableHSERTCDevisor" Comment="RTC or HSE Oscillator" Type="list" DefaultValue="false" IP="RTC">
 		<PossibleValue Value="false" Comment="false"/>
 	</RefParameter>
 	<RefParameter Visible="false" Name="RTCEnable" Comment="RTC" Type="list" DefaultValue="true" IP="RTC">
-		<Condition Expression="(SEM2RCC_HSE_REQUIRED_TIM11 &amp; TIM11 &amp; Semaphore_input_Channel1TIM11)|RTCUsed_ForRCC" Diagnostic="Disabled if RTC is used"/>
+		<Condition Expression="((HSEByPass|HSEOscillator)&amp;(SEM2RCC_HSE_REQUIRED_TIM11 &amp; TIM11 &amp; Semaphore_input_Channel1TIM11))|RTCUsed_ForRCC" Diagnostic="Disabled if RTC is used"/>
 		<PossibleValue Value="true" Comment="true"/>
 	</RefParameter>
 	<RefParameter Visible="false" Name="RTCEnable" Comment="RTC" Type="list" DefaultValue="false" IP="RTC">
 		<PossibleValue Value="false" Comment="false"/>
 	</RefParameter>
 	<RefParameter Visible="false" Name="EnableLSERTC" Comment="EnableLSERTC" Type="list" DefaultValue="true" IP="RTC">
-		<Condition Expression="(RTCUsed_ForRCC) &amp; (LSEOscillator | LSEByPass)" Diagnostic="Disabled if RTC is used and LSE ON"/>
+        <Condition Expression="((HSEByPass|HSEOscillator)&amp;((SEM2RCC_HSE_REQUIRED_TIM11 &amp; TIM11 &amp; Semaphore_input_Channel1TIM11))|RTCUsed_ForRCC) &amp; (LSEOscillator | LSEByPass)" Diagnostic="Disabled if RTC is used and LSE ON"/>
 		<PossibleValue Value="true" Comment="true"/>
 	</RefParameter>
 	<RefParameter Visible="false" Name="EnableLSERTC" Comment="EnableLSERTC" Type="list" DefaultValue="false" IP="RTC">
@@ -839,6 +912,7 @@
         <Parameter Name="48MHZClocksFreq_Value"/>
         <Parameter Name="I2SClocksFreq_Value"/>
         <Parameter Name="VCOInputFreq_Value"/>
+		<Parameter Name="PLLSourceVirtual"/>
         <Parameter Name="PLLCLKFreq_Value"/>
         <Parameter Name="PLLCLKFreq_Value"/>
         <Parameter Name="VCOOutputFreq_Value"/>

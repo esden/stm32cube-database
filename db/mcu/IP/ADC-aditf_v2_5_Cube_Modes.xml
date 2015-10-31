@@ -23,14 +23,22 @@
     </RefParameter>
 	    
     <!-- ScanconvMode -->
-    <RefParameter Comment="Scan Conversion Mode" DefaultValue="DISABLE" Name="ScanConvMode" Type="list" Group="ADCgroup">
+    <!--RefParameter Comment="Scan Conversion Mode" DefaultValue="DISABLE" Name="ScanConvMode" Type="list" Group="ADCgroup">
         <PossibleValue Comment="Disabled" Value="DISABLE"/>
         <PossibleValue Comment="Enabled" Value="ENABLE"/>
         <Description>Enable or Disable the Scan Conversion Mode</Description>
-    </RefParameter>
-	    
+    </RefParameter-->
+    <RefParameter Comment="Scan Conversion Mode" DefaultValue="ENABLE" Name="ScanConvMode" Type="list" Group="ADCgroup">
+                <Condition Expression="(NbrOfConversion>1|InjNumberOfConversion>1)" Diagnostic=""/>
+                <PossibleValue Comment="Enabled" Value="ENABLE"/>
+            <Description>Enable or Disable the Scan Conversion Mode</Description>
+        </RefParameter>
+        <RefParameter Comment="Scan Conversion Mode" DefaultValue="DISABLE" Name="ScanConvMode" Type="list" Group="ADCgroup">
+            <PossibleValue Comment="Disabled" Value="DISABLE"/>
+            <Description>Enable or Disable the Scan Conversion Mode</Description>
+        </RefParameter>
     <!-- Possible values of ContinuousConvMode parameter -->
-    <RefParameter Comment="Continuous Conversion Mode" DefaultValue="DISABLE" Name="ContinuousConvMode" Type="uniqueElementList" Group="ADCgroup">
+    <RefParameter Comment="Continuous Conversion Mode" DefaultValue="DISABLE" Name="ContinuousConvMode" Type="list" Group="ADCgroup">
         <Condition Expression="DiscontinuousConvMode=ENABLE" Diagnostic="Continuous and Discontinuous modes could not be used at the same time"/>
         <PossibleValue Comment="Disabled" Value="DISABLE"/>
     </RefParameter>
@@ -41,14 +49,14 @@
     </RefParameter>
 	    
     <!-- Possible values of DiscontinuousConvMode parameter -->
-    <RefParameter Comment="Discontinuous Conversion Mode" DefaultValue="DISABLE" Name="DiscontinuousConvMode" Type="uniqueElementList">
-        <Condition Expression="ContinuousMode_$IpInstance" Diagnostic="Continuous and Discontinuous modes could not be used at the same time"/>
+    <RefParameter Comment="Discontinuous Conversion Mode" DefaultValue="DISABLE" Name="DiscontinuousConvMode" Type="list">
+        <Condition Expression="ContinuousMode_$IpInstance|ScanConvMode=DISABLE" Diagnostic="Continuous and Discontinuous modes could not be used at the same time"/>
         <PossibleValue Comment="Disabled" Value="DISABLE"/>
     </RefParameter>
-    <RefParameter Comment="Discontinuous Conversion Mode" DefaultValue="DISABLE" Name="DiscontinuousConvMode" Type="uniqueElementList">
+    <!--RefParameter Comment="Discontinuous Conversion Mode" DefaultValue="DISABLE" Name="DiscontinuousConvMode" Type="uniqueElementList">
         <Condition Expression="InjectedConvMode=Discontinuous" Diagnostic="Discontinuous mode could not be used for regular and inected conversion at the same time"/>
         <PossibleValue Comment="Disabled" Value="DISABLE"/>
-    </RefParameter>
+    </RefParameter-->
     <RefParameter Comment="Discontinuous Conversion Mode" DefaultValue="DISABLE" Name="DiscontinuousConvMode" Type="list">
         <PossibleValue Comment="Disabled" Value="DISABLE"/>
         <PossibleValue Comment="Enabled" Value="ENABLE"/>
@@ -57,7 +65,7 @@
 	    
     <!-- Possible values of NbrOfDiscConversion parameter -->
      <RefParameter Comment="Number Of Discontinuous Conversions" DefaultValue="null" Max="1" Min="1" Name="NbrOfDiscConversion" Type="integer" Visible="false">
-    	<Condition Expression="!(InjectedDiscontinuous_$IpInstance) &amp;(DiscontinuousConvMode=DISABLE)" Diagnostic=""/>
+    	<Condition Expression="(DiscontinuousConvMode=DISABLE)" Diagnostic=""/>
     </RefParameter>
     <RefParameter Comment="Number Of Discontinuous Conversions" DefaultValue="1" Max="8" Min="1" Name="NbrOfDiscConversion" Type="integer"/>
 	    
@@ -130,6 +138,8 @@
         														and we have two ADC version in F3 family -->
         <Parameter Name="ExternalTrigInjecConv"/>
         <Parameter Name="InjectedConvMode"/>
+        <Parameter Name="AutoInjectedConv"/>
+        <Parameter Name="InjectedDiscontinuousConvMode"/>
     </RefMode>
         
     <!-- Possible Value of InjNumberOfConversion parameter -->
@@ -184,12 +194,13 @@
         <Condition Expression="InjNumberOfConversion=0" Diagnostic=""/>
     </RefParameter>
     <!-- 
-    After verification : it's possible to use Discontinuous mode a the same time in Reg/Inj conversions.
+    After verification : it's possible to use Discontinuous mode a the same time in Reg/Inj conversions.-->
     <RefParameter Comment="Injected Conversion Mode" DefaultValue="None" Name="InjectedConvMode" Type="list">
-        <Condition Expression="DiscontinuousConvMode=ENABLE" Diagnostic="Discontinuous mode could not be used on regular and injected group at the same time"/>
+        <Condition Expression="ScanConvMode=DISABLE" Diagnostic="Discontinuous Mode is available only if Scan Conversion Mode is enabled"/>
         <PossibleValue Comment="None" Value="None"/>
         <PossibleValue Comment="Auto Injected Mode" Value="AutoInjected"  Semaphore="AutoInjected_$IpInstance"/>
-    </RefParameter> -->
+    </RefParameter> 
+    
     <RefParameter Comment="Injected Conversion Mode" DefaultValue="None" Name="InjectedConvMode" Type="list" Group="ADCgroup">
         <PossibleValue Comment="None" Value="None"/>
         <PossibleValue Comment="Discontinuous Mode" Value="Discontinuous" Semaphore="InjectedDiscontinuous_$IpInstance"/>
@@ -219,7 +230,12 @@
         <Parameter Name="Channel"/>
         <Parameter Name="SamplingTime"/>
     </RefMode>
-    
+    <RefMode Name="cpChannelRegularConversion" Comment="Regular Channel Settings">
+        <ConfigForMode>ADC_RegularChannelConfig</ConfigForMode>
+        <Parameter Name="Rank"/>
+        <Parameter Name="Channel"/>
+        <Parameter Name="SamplingTime"/>
+    </RefMode>
     <!-- Possible Value of Rank parameters -->
     <RefParameter Comment="Rank" DefaultValue="1" Max="16" Min="1" Name="Rank" Type="integer" Group="ADCChannel">
         <Description>The rank in the regular group sequencer</Description>
@@ -269,7 +285,13 @@
         <Parameter Name="SamplingTime"/>
         <Parameter Name="InjectedOffset"/>
     </RefMode>
-    
+     <RefMode Name="cpChannelInjectedConversion" Comment="Injected Channel Settings" >
+        <ConfigForMode>ADC_InjectedChannelConfig</ConfigForMode>
+        <Parameter Name="Rank"/>
+        <Parameter Name="Channel"/>
+        <Parameter Name="SamplingTime"/>
+        <Parameter Name="InjectedOffset"/>
+    </RefMode>
     <!-- Possible Value of InjectedOffset parameter -->
     <RefParameter Comment="Injected Offset" DefaultValue="0" Max="4095" Min="0" Name="InjectedOffset" Type="integer">
         <Description>Data offset for injected channel </Description>
@@ -438,7 +460,7 @@
     </RefParameter>
     
     <!-- Possible Value of AnalogWDChannel parameters -->
-    <RefParameter Comment="Analog WatchDog Channel" DefaultValue="channel" Name="AnalogWDChannel" Type="list" Group="ADCChannel">
+    <RefParameter Comment="Analog WatchDog Channel" DefaultValue="" Name="AnalogWDChannel" Type="list" Group="ADCChannel">
         <PossibleValue Comment="Channel 0" Value="ADC_CHANNEL_0"/>
         <PossibleValue Comment="Channel 1" Value="ADC_CHANNEL_1"/>
         <PossibleValue Comment="Channel 2" Value="ADC_CHANNEL_2"/>

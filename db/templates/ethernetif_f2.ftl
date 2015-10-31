@@ -38,7 +38,7 @@
 [#assign netif_callback = 0]
 [#assign lwip_arp = 0]
 [#if SWIP.defines??]
-	[#list SWIP.defines as definition] 	
+	[#list SWIP.defines as definition] 		
 		[#if (definition.name == "WITH_RTOS")]
 			[#if definition.value == "1"]
 				[#assign with_rtos = 1]
@@ -191,7 +191,7 @@ static void low_level_init(struct netif *netif)
   /* Initialize Rx Descriptors list: Chain Mode  */
   HAL_ETH_DMARxDescListInit(&heth, DMARxDscrTab, &Rx_Buff[0][0], ETH_RXBUFNB);
  
- #if LWIP_ARP || LWIP_ETHERNET 
+#if LWIP_ARP || LWIP_ETHERNET 
   /* set MAC hardware address length */
   netif->hwaddr_len = ETHARP_HWADDR_LEN;
   
@@ -357,10 +357,15 @@ static struct pbuf * low_level_input(struct netif *netif)
   uint32_t byteslefttocopy = 0;
   uint32_t i=0;
   
-  /* get received frame */
-  if (HAL_ETH_GetReceivedFrame(&heth) != HAL_OK)
-    return NULL;
 
+  /* get received frame */
+[#if with_rtos == 1]  
+  if (HAL_ETH_GetReceivedFrame_IT(&heth) != HAL_OK)
+[#else]
+  if (HAL_ETH_GetReceivedFrame(&heth) != HAL_OK)
+[/#if]  
+    return NULL;
+  
   /* Obtain the size of the packet and put it into the "len" variable. */
   len = heth.RxFrameInfos.length;
   buffer = (uint8_t *)heth.RxFrameInfos.buffer;
@@ -450,15 +455,17 @@ void ethernetif_input(struct netif *netif)
   {
     if (osSemaphoreWait( s_xSemaphore, TIME_WAITING_FOR_INPUT)==osOK)
     {
-      p = low_level_input( netif );
-      if   (p != NULL)
-      {
-        if (netif->input( p, netif) != ERR_OK )
+      do
+      {   
+        p = low_level_input( netif );
+        if   (p != NULL)
         {
-          pbuf_free(p);
-          p = NULL;
+          if (netif->input( p, netif) != ERR_OK )
+          {
+            pbuf_free(p);
+          }
         }
-      }
+      } while(p!=NULL);
     }
 [#else]
 
@@ -480,7 +487,7 @@ void ethernetif_input(struct netif *netif)
   }
 }
 
-[#if lwip_arp == 0]
+#if !LWIP_ARP
 /**
  * This function has to be completed by user in case of ARP OFF.
  *
@@ -491,11 +498,16 @@ static err_t low_level_output_arp_off(struct netif *netif, struct pbuf *q, ip_ad
 {  
   err_t errval;
   errval = ERR_OK;
+    
 /* USER CODE BEGIN 5 */ 
+    
 /* USER CODE END 5 */  
+    
   return errval;
+  
 }
-[/#if] [#-- endif lwip_arp --]
+#endif /* LWIP_ARP */ 
+
 /**
  * Should be called at the beginning of the program to set up the
  * network interface. It calls the function low_level_init() to do the
@@ -526,7 +538,7 @@ err_t ethernetif_init(struct netif *netif)
 #if LWIP_ARP || LWIP_ETHERNET
 #if LWIP_ARP
   netif->output = etharp_output;
-#else 
+#else
   /* The user should write ist own code in low_level_output_arp_off function */
   netif->output = low_level_output_arp_off;
 #endif /* LWIP_ARP */ 
@@ -538,11 +550,9 @@ err_t ethernetif_init(struct netif *netif)
 
   return ERR_OK;
 }
-[#if lwip_arp == 0]
+
 /* USER CODE BEGIN 6 */
-[#else]
-/* USER CODE BEGIN 5 */
-[/#if]
+
 /**
 * @brief  Returns the current time in milliseconds
 *         when LWIP_TIMERS == 1 and NO_SYS == 1
@@ -564,11 +574,9 @@ u32_t sys_now(void)
 {
   return HAL_GetTick();
 }
-[#if lwip_arp == 0]
+
 /* USER CODE END 6 */
-[#else]
-/* USER CODE END 5 */
-[/#if]
+
 
 /**
   * @brief  This function sets the netif link status.
@@ -633,20 +641,13 @@ void ethernetif_set_link(void const *argument)
 [/#if]  
 }
 
-[#if lwip_arp == 0]
+
 /* USER CODE BEGIN 7 */
-[#else]
-/* USER CODE BEGIN 6 */
-[/#if]
-  
-[#if lwip_arp == 0]
+
 /* USER CODE END 7 */
-[#else]
-/* USER CODE END 6 */ 
-[/#if] 
 
-[#if netif_callback == 1]
 
+#if LWIP_NETIF_LINK_CALLBACK
 /**
   * @brief  Link callback function, this function is called on change of link status
   *         to update low level driver configuration.
@@ -734,6 +735,7 @@ void ethernetif_update_config(struct netif *netif)
   ethernetif_notify_conn_changed(netif);
 }
 
+/* USER CODE BEGIN 8 */
 /**
   * @brief  This function notify user about link status changement.
   * @param  netif: the network interface
@@ -741,21 +743,16 @@ void ethernetif_update_config(struct netif *netif)
   */
 __weak void ethernetif_notify_conn_changed(struct netif *netif)
 {
-  /* NOTE : This is function clould be implemented in user file 
+  /* NOTE : This is function could be implemented in user file 
             when the callback is needed,
   */
-[#if lwip_arp == 0]
-/* USER CODE BEGIN 8 */
-[#else]
-  /* USER CODE BEGIN 7 */
-[/#if]
-  
-[#if lwip_arp == 0]
-/* USER CODE END 8 */
-[#else]
-  /* USER CODE END 7 */ 
-[/#if] 
+
 }
-[/#if]
+/* USER CODE END 8 */ 
+#endif /* LWIP_NETIF_LINK_CALLBACK */
+
+/* USER CODE BEGIN 9 */
+
+/* USER CODE END 9 */
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
 

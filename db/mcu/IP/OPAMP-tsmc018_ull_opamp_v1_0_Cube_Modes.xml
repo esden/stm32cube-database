@@ -301,7 +301,7 @@
 		<PossibleValue Comment="Connected To VM0" Value="OPAMP_PGACONNECT_VM0"/>
 	</RefParameter>
 	<RefParameter Comment="PGA Inverting Pin" DefaultValue="OPAMP_PGACONNECT_VM0" Name="PgaConnect" Type="list" Visible="false" Group="Basic Parameters">
-	    <Condition Expression="PB10_OPAMP4_VINM &amp; $IpInstance_Timer_Controlled &amp; ($IpNumber=4) &amp; ($IpInstance_PGA|$IpInstance_PGA_Connected)" Diagnostic=""/>
+	    <Condition Expression="PB10_OPAMP4_VINM &amp; ($IpNumber=4) &amp; ($IpInstance_PGA|$IpInstance_PGA_Connected)" Diagnostic=""/>
 		<PossibleValue Comment="Connected To VM0" Value="OPAMP_PGACONNECT_VM0"/>
 	</RefParameter>
 	
@@ -766,12 +766,12 @@
 					</SignalLogicalOp>
 					<Semaphore>$IpInstance_STANDALONE</Semaphore>
 				</Mode>
-				<Mode Name="Standalone-DAC_OUT2-INP" RemoveCondition="($IpNumber=2)|($IpNumber=4)|!(DAC:$modeexist_DAC_OUT2)">
+				<Mode Name="Standalone-DAC_OUT2-INP" RemoveCondition="($IpNumber=2)|($IpNumber=4)|(!(DAC:$modeexist_DAC_OUT2) &amp; !(DAC1:$modeexist_DAC_OUT2))">
 					<SignalLogicalOp Name="AND">
 						<Signal Name="VINM"/>
 						<Signal Name="VOUT"/>
 					</SignalLogicalOp>
-				<Condition Expression="(DAC_OUT2_Conf) &amp; (($Index=1) |($Index=3))" Diagnostic="Only active when DAC channel out2 is enabled"/>
+				<Condition Expression="((DAC_OUT2_Conf)|(DAC1_OUT2_Conf)) &amp; (($Index=1) |($Index=3))" Diagnostic="Only active when DAC channel out2 is enabled"/>
 					<Semaphore>$IpInstance_STANDALONE</Semaphore>
 				</Mode>
 				<Mode Name="Standalone-DAC_OUT1-INP" RemoveCondition="($IpNumber=1)|($IpNumber=2)|($IpNumber=3)">
@@ -779,7 +779,7 @@
 						<Signal Name="VINM"/>
 						<Signal Name="VOUT"/>
 					</SignalLogicalOp>
-				<Condition Expression="(DAC_OUT1_Conf) &amp; ($Index=4)" Diagnostic="Only active when DAC channel out1 is enabled"/>
+				<Condition Expression="((DAC_OUT1_Conf)|(DAC1_OUT1_Conf)) &amp; ($Index=4)" Diagnostic="Only active when DAC channel out1 is enabled"/>
 				<Semaphore>$IpInstance_STANDALONE</Semaphore>
 				</Mode>
 				<Mode Name="Follower">
@@ -789,18 +789,18 @@
 					</SignalLogicalOp>
 					<Semaphore>$IpInstance_FOLLOWER</Semaphore>
 				</Mode>
-				<Mode Name="Follower-DAC_OUT2-INP" RemoveCondition="($IpNumber=2)|($IpNumber=4)|!(DAC:$modeexist_DAC_OUT2)">
+				<Mode Name="Follower-DAC_OUT2-INP" RemoveCondition="($IpNumber=2)|($IpNumber=4)|(!(DAC:$modeexist_DAC_OUT2) &amp; !(DAC1:$modeexist_DAC_OUT2))">
 					<SignalLogicalOp Name="AND">
 						<Signal Name="VOUT"/>
 					</SignalLogicalOp>
-					<Condition Expression="(DAC_OUT2_Conf) &amp; (($Index=1) |($Index=3))" Diagnostic="Only active when DAC channel out2 is enabled"/>
+					<Condition Expression="((DAC_OUT2_Conf)|(DAC1_OUT2_Conf)) &amp; (($Index=1) |($Index=3))" Diagnostic="Only active when DAC channel out2 is enabled"/>
 					<Semaphore>$IpInstance_FOLLOWER</Semaphore>
 				</Mode>
 				<Mode Name="Follower-DAC_OUT1-INP" RemoveCondition="($IpNumber=1)|($IpNumber=2)|($IpNumber=3)">
 					<SignalLogicalOp Name="AND">
 						<Signal Name="VOUT"/>
 					</SignalLogicalOp>
-					<Condition Expression="(DAC_OUT1_Conf) &amp; ($Index=4)" Diagnostic="Only active when DAC channel out1 is enabled"/>
+					<Condition Expression="((DAC_OUT1_Conf)|(DAC1_OUT1_Conf)) &amp; ($Index=4)" Diagnostic="Only active when DAC channel out1 is enabled"/>
 						<Semaphore>$IpInstance_FOLLOWER</Semaphore>
 				</Mode>
 				<Mode Name="PGA Not Connected">
@@ -811,11 +811,11 @@
 						<Semaphore>$IpInstance_PGA</Semaphore>
 						<Semaphore>$IpInstance_PGA_Not_Connected</Semaphore>
 				</Mode>
-				<Mode Name="PGA Not Connected-DAC_OUT2-INP" RemoveCondition="($IpNumber=2)|($IpNumber=4)|!(DAC:$modeexist_DAC_OUT2)">
+				<Mode Name="PGA Not Connected-DAC_OUT2-INP" RemoveCondition="($IpNumber=2)|($IpNumber=4)|(!(DAC:$modeexist_DAC_OUT2) &amp; !(DAC1:$modeexist_DAC_OUT2))">
 					<SignalLogicalOp Name="AND">
 						<Signal Name="VOUT"/>
 					</SignalLogicalOp>
-                    <Condition Expression="(DAC_OUT2_Conf) &amp; (($Index=1) |($Index=3))" Diagnostic="Only active when DAC channel out2 is enabled"/>
+                    <Condition Expression="((DAC_OUT2_Conf)|(DAC1_OUT2_Conf)) &amp; (($Index=1) |($Index=3))" Diagnostic="Only active when DAC channel out2 is enabled"/>
 						<Semaphore>$IpInstance_PGA</Semaphore>
 						<Semaphore>$IpInstance_PGA_Not_Connected</Semaphore>
 					</Mode>
@@ -823,16 +823,16 @@
 					<SignalLogicalOp Name="AND">
 						<Signal Name="VOUT"/>
 					</SignalLogicalOp>
-                    <Condition Expression="(DAC_OUT1_Conf) &amp; ($Index=4) " Diagnostic="Only active when DAC channel out1 is enabled"/>
+                    <Condition Expression="((DAC_OUT1_Conf)|(DAC1_OUT1_Conf)) &amp; ($Index=4) " Diagnostic="Only active when DAC channel out1 is enabled"/>
 						<Semaphore>$IpInstance_PGA</Semaphore>
 						<Semaphore>$IpInstance_PGA_Not_Connected</Semaphore>
 					</Mode>
-				<Mode Name="PGA Connected-DAC_OUT2-INP" RemoveCondition="($IpNumber=2)|($IpNumber=4)|!(DAC:$modeexist_DAC_OUT2)">
+				<Mode Name="PGA Connected-DAC_OUT2-INP" RemoveCondition="($IpNumber=2)|($IpNumber=4)|(!(DAC:$modeexist_DAC_OUT2) &amp; !(DAC1:$modeexist_DAC_OUT2))">
 					<SignalLogicalOp Name="AND">
 						<Signal Name="VINM"/>
 						<Signal Name="VOUT"/>
 					</SignalLogicalOp>
-				<Condition Expression="(DAC_OUT2_Conf) &amp; (($Index=1) |($Index=3)) " Diagnostic="Only active when DAC channel out2 is enabled"/>
+				<Condition Expression="((DAC_OUT2_Conf)|(DAC1_OUT2_Conf)) &amp; (($Index=1) |($Index=3)) " Diagnostic="Only active when DAC channel out2 is enabled"/>
 					<Semaphore>$IpInstance_PGA_Connected</Semaphore>
 				</Mode>
 				<Mode Name="PGA Connected-DAC_OUT1-INP" RemoveCondition="($IpNumber=1)|($IpNumber=2)|($IpNumber=3)">
@@ -840,7 +840,7 @@
 						<Signal Name="VINM"/>
 						<Signal Name="VOUT"/>
 					</SignalLogicalOp>
-                    <Condition Expression="(DAC_OUT1_Conf) &amp; ($Index=4) " Diagnostic="Only active when DAC channel out1 is enabled"/>
+                    <Condition Expression="((DAC_OUT1_Conf)|(DAC1_OUT1_Conf)) &amp; ($Index=4) " Diagnostic="Only active when DAC channel out1 is enabled"/>
 					<Semaphore>$IpInstance_PGA_Connected</Semaphore>
 				</Mode>
 				<Mode Name="PGA Connected">
@@ -887,7 +887,7 @@
 				</SignalLogicalOp>
 				<Semaphore>$IpInstance_Same_Inverting_Pin</Semaphore>
 			</Mode>
-			<Mode Name="Switching On Inverting Inputs Using Different Pins">
+			<Mode Name="Switching On Inverting Inputs Using Different Pins" RemoveCondition="LQFP48|LQFP32">
 			    <SignalLogicalOp Name="AND">
 						<Signal Name="VINM_SEC"/>
 				</SignalLogicalOp>

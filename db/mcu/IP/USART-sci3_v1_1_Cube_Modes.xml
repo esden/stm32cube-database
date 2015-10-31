@@ -29,10 +29,6 @@
         <RefParameter Comment="Auto Baudrate Mode arg" DefaultValue="null" Name="AutoBaudRateEnable" Type="list" Group="Advanced Features" Visible="false"/>
     
 	
-	<RefParameter Comment="Auto Baudrate" DefaultValue="UART_ADVFEATURE_AUTOBAUDRATE_DISABLE" Name="AutoBaudRateEnableParam" Type="list" Visible="false" Group="Advanced Features">
-		<Condition Expression="(WordLength = UART_WORDLENGTH_7B)" Diagnostic=""/>
-		<PossibleValue Comment="Disable" Value="UART_ADVFEATURE_AUTOBAUDRATE_DISABLE"/>
-	</RefParameter>
 	<RefParameter Comment="Auto Baudrate" DefaultValue="UART_ADVFEATURE_AUTOBAUDRATE_DISABLE" Name="AutoBaudRateEnableParam" Type="list" Group="Advanced Features">
 		<PossibleValue Comment="Disable" Value="UART_ADVFEATURE_AUTOBAUDRATE_DISABLE"/>
 		<PossibleValue Comment="Enable" Value="UART_ADVFEATURE_AUTOBAUDRATE_ENABLE" Semaphore="$IpInstance_UART_AutoBaudRate_Enable"/>
@@ -60,14 +56,14 @@
 	
 	<RefParameter Comment="Word Length" DefaultValue="USART_WORDLENGTH_7B" Name="WordLength" Type="list" Group="Basic Parameters">
 		<Condition Expression="(VirtualMode = VM_SYNC)" Diagnostic=""/>
-		<PossibleValue Comment="7 Bits (including Parity)" Value="USART_WORDLENGTH_7B"/>
+		<PossibleValue Comment="7 Bits (including Parity)" Value="USART_WORDLENGTH_7B" Semaphore="$IpInstance_Usart_7B"/>
 		<PossibleValue Comment="8 Bits (including Parity)" Value="USART_WORDLENGTH_8B"/>
 		<PossibleValue Comment="9 Bits (including Parity)" Value="USART_WORDLENGTH_9B"/>
 	</RefParameter>
 	
 	<RefParameter Comment="Word Length" DefaultValue="IRDA_WORDLENGTH_7B" Name="WordLength" Type="list" Group="Basic Parameters">
 		<Condition Expression="VirtualMode = VM_IRDA" Diagnostic=""/>
-		<PossibleValue Comment="7 Bits (including Parity)" Value="IRDA_WORDLENGTH_7B"/>
+		<PossibleValue Comment="7 Bits (including Parity)" Value="IRDA_WORDLENGTH_7B" Semaphore="$IpInstance_Irda_7B" />
 		<PossibleValue Comment="8 Bits (including Parity)" Value="IRDA_WORDLENGTH_8B"/>
 		<PossibleValue Comment="9 Bits (including Parity)" Value="IRDA_WORDLENGTH_9B"/>
 	</RefParameter>
@@ -80,8 +76,12 @@
 		<PossibleValue Comment="8 Bits (including Parity)" Value="IRDA_WORDLENGTH_8B"/>
 		<PossibleValue Comment="9 Bits (including Parity)" Value="IRDA_WORDLENGTH_9B"/>
 	</RefParameter>
+	<RefParameter Comment="Word Length" DefaultValue="UART_WORDLENGTH_8B" Name="WordLength" Type="list" Group="Basic Parameters">
+	     <Condition Expression="VirtualMode = VM_LIN" Diagnostic=""/>
+		<PossibleValue Comment="8 Bits (including Parity)" Value="UART_WORDLENGTH_8B"/>
+	</RefParameter>
 	<RefParameter Comment="Word Length" DefaultValue="UART_WORDLENGTH_7B" Name="WordLength" Type="list" Group="Basic Parameters">
-		<PossibleValue Comment="7 Bits (including Parity)" Value="UART_WORDLENGTH_7B"/>
+		<PossibleValue Comment="7 Bits (including Parity)" Value="UART_WORDLENGTH_7B" Semaphore="$IpInstance_Uart_7B" />
 		<PossibleValue Comment="8 Bits (including Parity)" Value="UART_WORDLENGTH_8B"/>
 		<PossibleValue Comment="9 Bits (including Parity)" Value="UART_WORDLENGTH_9B"/>
 	</RefParameter>
@@ -209,6 +209,11 @@
 	<RefParameter Comment="Clock Phase" DefaultValue="null" Name="CLKPhase" Type="integer" Visible="false"  Group="Clock Parameters"/>
 	
 	<RefParameter Comment="Clock Last Bit" DefaultValue="SMARTCARD_LASTBIT_DISABLE" Name="CLKLastBit" Type="list" Group="Clock Parameters">
+		<Condition Expression="VirtualClockMode = VM_SMARTCARD &amp; STM32F0 " Diagnostic=""/>
+		<PossibleValue Comment="Disable" Value="SMARTCARD_LASTBIT_DISABLED"/>
+		<PossibleValue Comment="Enable" Value="SMARTCARD_LASTBIT_ENABLED"/>
+	</RefParameter>
+	<RefParameter Comment="Clock Last Bit" DefaultValue="SMARTCARD_LASTBIT_DISABLE" Name="CLKLastBit" Type="list" Group="Clock Parameters">
 		<Condition Expression="VirtualClockMode = VM_SMARTCARD" Diagnostic=""/>
 		<PossibleValue Comment="Disable" Value="SMARTCARD_LASTBIT_DISABLE"/>
 		<PossibleValue Comment="Enable" Value="SMARTCARD_LASTBIT_ENABLE"/>
@@ -227,9 +232,8 @@
 	</RefParameter>
 	
 	<!-- Prescaler Parameters for IrDa/SmartCard Clock Mode -->
-	<RefParameter Comment="Prescaler" DefaultValue="1" Name="Prescaler" Type="list" Group="Advanced Parameters">
+	<RefParameter Comment="Prescaler" DefaultValue="1" Min="1" Max="1" Name="Prescaler" Type="integer" Group="Advanced Parameters">
 		<Condition Expression="(PowerMode= IRDA_POWERMODE_NORMAL) &amp; (VirtualMode = VM_IRDA)" Diagnostic=""/>
-		<PossibleValue Comment="1" Value="1"/>
 	</RefParameter>
 	<RefParameter Comment="Prescaler for SmartCard Clock (Divide by x2)" DefaultValue="10" Max="31" Min="1" Name="Prescaler" Type="integer" Group="Clock Parameters">
 		<Condition Expression="VirtualMode = VM_SMARTCARD" Diagnostic=""/>
@@ -249,7 +253,12 @@
 	<PossibleValue Comment="Enable" Value="SMARTCARD_TIMEOUT_ENABLED"/>
 	<PossibleValue Comment="Disable" Value="SMARTCARD_TIMEOUT_DISABLED"/>
 	</RefParameter>
-	<RefParameter Comment="Receiver TimeOut Value" DefaultValue="0" Max="16777215" Min="0" Name="TimeOutValue" Type="integer" Group="Advanced Parameters"/>
+	
+    <RefParameter Comment="Receiver TimeOut Value" DefaultValue="0" Max="16777215" Min="0" Name="TimeOutValue" Type="integer" Group="Advanced Parameters">
+	<Condition Expression="TimeOutEnable = SMARTCARD_TIMEOUT_ENABLED"  Diagnostic=""/>
+	</RefParameter>
+	<RefParameter Comment="Receiver TimeOut Value" DefaultValue="null"  Name="TimeOutValue" Type="integer" Visible="false"  Group="Advanced Parameters"/>
+	
     <RefParameter Comment="SmartCard Block Length" DefaultValue="0" Max="255" Min="0" Name="BlockLength" Type="integer" Group="Advanced Parameters"/>
     <RefParameter Comment="Number of retries in receive and transmit mode" DefaultValue="0" Max="7" Min="0" Name="AutoRetryCount" Type="integer" Group="Advanced Parameters"/>
 
@@ -637,6 +646,11 @@
 	<RefParameter Comment="" DefaultValue="" Name="IsMSBFirst" Type="list" Group="Advanced Features" Visible="false"/>
 	<!-- -->
 	<RefParameter Comment="Auto Baudrate Mode" DefaultValue="UART_ADVFEATURE_AUTOBAUDRATE_ONSTARTBIT" Name="AutoBaudRateMode" Type="list" Group="Advanced Features">
+		<Condition Expression="$IpInstance_UART_AutoBaudRate_Enable &amp; ($IpInstance_Usart_7B|$IpInstance_Irda_7B|$IpInstance_Uart_7B)" Diagnostic=""/>
+		<PossibleValue Comment="ON START BIT" Value="UART_ADVFEATURE_AUTOBAUDRATE_ONSTARTBIT"/>
+		<PossibleValue Comment="ON FALLING EDGE" Value="UART_ADVFEATURE_AUTOBAUDRATE_ONFALLINGEDGE"/>
+	</RefParameter>
+	<RefParameter Comment="Auto Baudrate Mode" DefaultValue="UART_ADVFEATURE_AUTOBAUDRATE_ONSTARTBIT" Name="AutoBaudRateMode" Type="list" Group="Advanced Features">
 		<Condition Expression="$IpInstance_UART_AutoBaudRate_Enable" Diagnostic=""/>
 		<PossibleValue Comment="ON START BIT" Value="UART_ADVFEATURE_AUTOBAUDRATE_ONSTARTBIT"/>
 		<PossibleValue Comment="ON FALLING EDGE" Value="UART_ADVFEATURE_AUTOBAUDRATE_ONFALLINGEDGE"/>
@@ -928,8 +942,8 @@
 			<ModeLogicOperator Name="XOR">
 				<Mode Name="Asynchronous">
 					<SignalLogicalOp Name="AND">
-						<Signal Name="RX"/>
-						<Signal Name="TX"/>
+						<Signal Name="RX" IOMode="AlternateFunctionPushPullPULLUP"/>
+						<Signal Name="TX" IOMode="AlternateFunctionPushPullPULLUP"/>
 					</SignalLogicalOp>
 					<Semaphore>$IpInstance_Asynchronous</Semaphore>
 				    <Semaphore>Asynchronous</Semaphore>
@@ -952,30 +966,30 @@
 						<Signal Name="TX"/>
 					</SignalLogicalOp>
 				</Mode>
-				<Mode Name="IrDA">
+				<Mode Name="IrDA" RemoveCondition="($IpNumber=4)|($IpNumber=5)|($IpNumber=6)|($IpNumber=7)|($IpNumber=8)">
 					<SignalLogicalOp Name="AND">
 						<Signal Name="RX"/>
 						<Signal Name="TX"/>
 					</SignalLogicalOp>
 				</Mode>
-				<Mode Name="LIN">
+				<Mode Name="LIN" RemoveCondition="($IpNumber=4)|($IpNumber=5)|($IpNumber=6)|($IpNumber=7)|($IpNumber=8)">
 					<SignalLogicalOp Name="AND">
 						<Signal Name="RX"/>
 						<Signal Name="TX"/>
 					</SignalLogicalOp>
 				</Mode>
-				<Mode Name="SmartCard">
+				<Mode Name="SmartCard" RemoveCondition="($IpNumber=4)|($IpNumber=5)|($IpNumber=6)|($IpNumber=7)|($IpNumber=8)">
 					<SignalLogicalOp Name="AND">
 						<Signal Name="TX" IOMode="AlternateFunctionOpenDrain"/>
 					</SignalLogicalOp>
 				</Mode>
-				<Mode Name="SmartCard_With_Clock" UserName="SmartCard with Card Clock">
+				<Mode Name="SmartCard_With_Clock" UserName="SmartCard with Card Clock" RemoveCondition="($IpNumber=4)|($IpNumber=5)|($IpNumber=6)|($IpNumber=7)|($IpNumber=8)">
 					<SignalLogicalOp Name="AND">
 						<Signal Name="TX" IOMode="AlternateFunctionOpenDrain"/>
 						<Signal Name="CK"/>
 					</SignalLogicalOp>
 				</Mode>
-				<Mode Name="ModbusCommunication" UserName="Modbus Communication">
+				<Mode Name="ModbusCommunication" UserName="Modbus Communication" RemoveCondition="($IpNumber=4)|($IpNumber=5)|($IpNumber=6)|($IpNumber=7)|($IpNumber=8)">
 					<SignalLogicalOp Name="AND">
 						<Signal Name="TX"/>
 					</SignalLogicalOp>
@@ -983,7 +997,7 @@
 			</ModeLogicOperator>
 		</Mode>
 		
-		<Mode Name = "Flow Control (RS232)">
+		<Mode Name = "Flow Control (RS232)" RemoveCondition="($IpNumber=5)|($IpNumber=6)|($IpNumber=7)|($IpNumber=8)">
 			<ModeLogicOperator Name="XOR">
 				<Mode Name="CTS_Only" UserName="CTS Only">
 					<SignalLogicalOp Name="AND">

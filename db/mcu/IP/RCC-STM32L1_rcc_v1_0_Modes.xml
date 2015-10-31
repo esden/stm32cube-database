@@ -148,8 +148,17 @@
         <PossibleValue Comment="Sysclksource Pllclk" Value="RCC_SYSCLKSOURCE_PLLCLK" Semaphore="PLLscale"/>
     </RefParameter>
 	
-    <!-- RTC  MUX-->
-    <RefParameter Visible="false"  Comment="RTC Clock Selection" DefaultValue="RCC_RTCCLKSOURCE_LSI" Name="RTCClockSelection" Type="list" IP="RTC,LCD">
+     <!-- RTC  MUX-->
+    <!-- condition to disable LSE and LSI when HSE TIM14 is selected-->
+    <RefParameter Visible="false" Comment="RTC Clock Selection" DefaultValue="RCC_RTCCLKSOURCE_HSE_DIV2" Name="RTCClockSelectionVirtual" Type="list">
+        <Condition Diagnostic="RTC Mux should have HSE as input when TIM11 remap is used" Expression="(Semaphore_input_Channel1TIM11 &amp; TIM11 &amp; SEM2RCC_HSE_REQUIRED_TIM11)"/>
+
+        <PossibleValue Comment="Rtcclksource Hse Div2"  Value="RCC_RTCCLKSOURCE_HSE_DIV2"/>
+        <PossibleValue Comment="Rtcclksource Hse Div4"  Value="RCC_RTCCLKSOURCE_HSE_DIV4"/>
+        <PossibleValue Comment="Rtcclksource Hse Div8"  Value="RCC_RTCCLKSOURCE_HSE_DIV8"/>
+        <PossibleValue Comment="Rtcclksource Hse Div16" Value="RCC_RTCCLKSOURCE_HSE_DIV16"/>
+    </RefParameter>
+    <RefParameter Visible="false" Comment="RTC Clock Selection" DefaultValue="RCC_RTCCLKSOURCE_LSI" Name="RTCClockSelectionVirtual" Type="list">
         <PossibleValue Comment="Rtcclksource Lse"       Value="RCC_RTCCLKSOURCE_LSE"/>
         <PossibleValue Comment="Rtcclksource Lsi"       Value="RCC_RTCCLKSOURCE_LSI"/>
         <PossibleValue Comment="Rtcclksource Hse Div2"  Value="RCC_RTCCLKSOURCE_HSE_DIV2"/>
@@ -157,7 +166,18 @@
         <PossibleValue Comment="Rtcclksource Hse Div8"  Value="RCC_RTCCLKSOURCE_HSE_DIV8"/>
         <PossibleValue Comment="Rtcclksource Hse Div16" Value="RCC_RTCCLKSOURCE_HSE_DIV16"/>
     </RefParameter>
-	
+    <RefParameter Visible="false" Comment="PLL Source" DefaultValue="+RTCClockSelectionVirtual" Name="RTCClockSelectionVirtualString" Type="string"/>
+ 
+   
+    <RefParameter Visible="false"  Comment="RTC Clock Selection" DefaultValue="+RTCClockSelectionVirtualString" Name="RTCClockSelection" Type="list" IP="RTC">
+        <PossibleValue Comment="Rtcclksource Lse"       Value="RCC_RTCCLKSOURCE_LSE"/>
+        <PossibleValue Comment="Rtcclksource Lsi"       Value="RCC_RTCCLKSOURCE_LSI"/>
+        <PossibleValue Comment="Rtcclksource Hse Div2"  Value="RCC_RTCCLKSOURCE_HSE_DIV2"/>
+        <PossibleValue Comment="Rtcclksource Hse Div4"  Value="RCC_RTCCLKSOURCE_HSE_DIV4"/>
+        <PossibleValue Comment="Rtcclksource Hse Div8"  Value="RCC_RTCCLKSOURCE_HSE_DIV8"/>
+        <PossibleValue Comment="Rtcclksource Hse Div16" Value="RCC_RTCCLKSOURCE_HSE_DIV16"/>
+       
+    </RefParameter>
 	
     <!-- MCO MUX-->
     <RefParameter Visible="false" Comment="MCO Clock Source" DefaultValue="RCC_MCO1SOURCE_SYSCLK" Name="RCC_MCOSource" Type="list">
@@ -358,10 +378,17 @@
     <RefParameter Name="PWR_Regulator_Voltage_Scale" Comment="Power Regulator Voltage Scale" Type="list" DefaultValue="PWR_REGULATOR_VOLTAGE_SCALE2" Group="Power Parameters">
         <Condition Diagnostic="" Expression="(((HCLKFreq_Value &gt; 4000000)))"/>
         <PossibleValue Value="PWR_REGULATOR_VOLTAGE_SCALE2" Comment="Power Regulator Voltage Scale 2" Semaphore="scale2"/>
+										        <PossibleValue Value="PWR_REGULATOR_VOLTAGE_SCALE1" Comment="Power Regulator Voltage Scale 1" Semaphore="scale1"/>
+
 
     </RefParameter>
     <RefParameter Name="PWR_Regulator_Voltage_Scale" Comment="Power Regulator Voltage Scale" Type="list" DefaultValue="PWR_REGULATOR_VOLTAGE_SCALE3" Group="Power Parameters">
         <PossibleValue Value="PWR_REGULATOR_VOLTAGE_SCALE3" Comment="Power Regulator Voltage Scale 3" Semaphore="scale3"/>
+				        <PossibleValue Value="PWR_REGULATOR_VOLTAGE_SCALE2" Comment="Power Regulator Voltage Scale 2" Semaphore="scale2"/>
+								        <PossibleValue Value="PWR_REGULATOR_VOLTAGE_SCALE1" Comment="Power Regulator Voltage Scale 1" Semaphore="scale1"/>
+
+
+
     </RefParameter>
   
     <RefParameter Name="FLatency" Comment="Flash Latency(WS)" Type="uniqueElementList" DefaultValue="FLASH_LATENCY_0" Group="System Parameters">
@@ -448,7 +475,7 @@
     </RefParameter>
 
     <RefParameter Visible="false" Name="EnableLSERTC" Comment="EnableLSERTC" Type="list" DefaultValue="true" IP="RTC,LCD">
-        <Condition Expression="(RTCUsed_ForRCC|LCDUsed_ForRCC) &amp; (LSEOscillator | LSEByPass)" Diagnostic="Disabled if RTC is used and LSE ON"/>
+        <Condition Expression="(RTCUsed_ForRCC|LCDUsed_ForRCC|(Semaphore_input_Channel1TIM11 &amp; TIM11 &amp; SEM2RCC_HSE_REQUIRED_TIM11)) &amp; (LSEOscillator | LSEByPass)" Diagnostic="Disabled if RTC is used and LSE ON"/>
         <PossibleValue Value="true" Comment="true"/>
     </RefParameter>
     <RefParameter Visible="false" Name="EnableLSERTC" Comment="EnableLSERTC" Type="list" DefaultValue="false" IP="RTC,LCD">
@@ -572,7 +599,7 @@
 	
     <!-- LSE used -->
     <RefParameter Visible="false" Comment="LSE Is Used" DefaultValue="1" Name="LSEUsed" Min="1" Type="integer">
-        <Condition Expression="(Semaphore_TI1_TIM10L1RemapTIM10 &amp; TIM10 &amp; SEM2RCC_LSE_REQUIRED1_TIM10)|((Semaphore_ClockSourceETRMode2TIM10|Semaphore_TriggerSourceETRTIM10|Semaphore_ETRasClearingSourceTIM10)&amp; !Semaphore_TIM10_ETR_Remap_TGOTIM10  &amp; TIM10 &amp; SEM2RCC_LSE_REQUIRED_TIM10)|((Semaphore_ClockSourceETRMode2TIM11|Semaphore_TriggerSourceETRTIM11|Semaphore_ETRasClearingSourceTIM11)&amp; !Semaphore_TIM11_ETR_Remap_TGOTIM11 &amp; TIM11 &amp; SEM2RCC_LSE_REQUIRED_TIM11)|(Semaphore_input_Channel1TIM9 &amp; TIM9 &amp; SEM2RCC_LSE_REQUIRED_TIM9)|((RCC_MCOSource=RCC_MCO1SOURCE_LSE)&amp; MCOConfig)|((RTCClockSelection=RCC_RTCCLKSOURCE_LSE) &amp;(RTCUsed_ForRCC|LCDUsed_ForRCC) )" Diagnostic="LSE is used if "/>
+        <Condition Expression="(Semaphore_TI1_TIM10L1RemapTIM10 &amp; TIM10 &amp; SEM2RCC_LSE_REQUIRED1_TIM10)|((Semaphore_ClockSourceETRMode2TIM10|Semaphore_TriggerSourceETRTIM10|Semaphore_ETRasClearingSourceTIM10)&amp; !Semaphore_TIM10_ETR_Remap_TGOTIM10  &amp; TIM10 &amp; SEM2RCC_LSE_REQUIRED_TIM10)|((Semaphore_ClockSourceETRMode2TIM11|Semaphore_TriggerSourceETRTIM11|Semaphore_ETRasClearingSourceTIM11)&amp; !Semaphore_TIM11_ETR_Remap_TGOTIM11 &amp; TIM11 &amp; SEM2RCC_LSE_REQUIRED_TIM11)|((Semaphore_input_Channel1TIM9 &amp; TIM9 &amp; SEM2RCC_LSE_REQUIRED_TIM9) &amp;(LSEByPass|LSEOscillator))|((RCC_MCOSource=RCC_MCO1SOURCE_LSE)&amp; MCOConfig)|((RTCClockSelection=RCC_RTCCLKSOURCE_LSE) &amp;(RTCUsed_ForRCC|LCDUsed_ForRCC) )" Diagnostic="LSE is used if "/>
     </RefParameter>
 	
     <RefParameter Visible="false" Comment="LSE Is Used" DefaultValue="0" Name="LSEUsed" Min="0" Type="integer"/>
@@ -584,7 +611,7 @@
     </RefParameter>
 	
     <RefParameter Visible="false" Comment="Lse State" DefaultValue="RCC_LSE_ON" Name="LSEState" Type="list">
-        <Condition Diagnostic="LSE ON" Expression="(Semaphore_TI1_TIM10L1RemapTIM10 &amp; TIM10 &amp; SEM2RCC_LSE_REQUIRED1_TIM10)|((Semaphore_ClockSourceETRMode2TIM10|Semaphore_TriggerSourceETRTIM10|Semaphore_ETRasClearingSourceTIM10) &amp; TIM10 &amp; SEM2RCC_LSE_REQUIRED_TIM10)|((Semaphore_ClockSourceETRMode2TIM11|Semaphore_TriggerSourceETRTIM11|Semaphore_ETRasClearingSourceTIM11) &amp; TIM11 &amp; SEM2RCC_LSE_REQUIRED_TIM11)|(Semaphore_input_Channel1TIM9 &amp; TIM9 &amp; SEM2RCC_LSE_REQUIRED_TIM9)|LSEOscillator"/>
+        <Condition Diagnostic="LSE ON" Expression="LSEOscillator"/>
         <PossibleValue Comment="Lse ON" Value="RCC_LSE_ON"/>
     </RefParameter>
 	
@@ -956,6 +983,7 @@
         <Parameter Name="ADCFreq_Value"/>
         <Parameter Name="MCOPinFreq_Value"/>
         <Parameter Name="VCOInputFreq_Value"/>
+		<Parameter Name="PLLSourceVirtual"/>
         <Parameter Name="VCOOutputFreq_Value"/>
         <Parameter Name="PLLCLKFreq_Value"/>
         <Parameter Name="EnableHSE"/>

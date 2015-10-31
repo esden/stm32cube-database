@@ -50,7 +50,7 @@
   */
   
 #define HAL_MODULE_ENABLED  
-  [#assign allModules = ["ADC", "CAN", "CEC", "HRTIM", "OPAMP", "SDADC", "TSC", "COMP","CRC","CRYP","DAC","I2C","I2S","IWDG","LCD","LPTIM","RNG","RTC","SPI","TIM","UART","USART","IRDA","SMARTCARD","SMBUS","WWDG", "PCD"]]
+  [#assign allModules = ["ADC", "CAN", "CEC", "NAND", "NOR", "PCCARD", "SRAM", "HRTIM", "OPAMP", "SDADC", "TSC", "COMP","CRC","CRYP","DAC","I2C","I2S","IWDG","LCD","LPTIM","RNG","RTC","SPI","TIM","UART","USART","IRDA","SMARTCARD","SMBUS","WWDG", "PCD"]]
   [#list allModules as module]
 	[#if isModuleUsed(module)]
 [#compress]#define HAL_${module}_MODULE_ENABLED[/#compress]
@@ -207,7 +207,7 @@
  #include "stm32f3xx_hal_flash.h"
 #endif /* HAL_FLASH_MODULE_ENABLED */
 
-[#--#ifdef HAL_SRAM_MODULE_ENABLED
+#ifdef HAL_SRAM_MODULE_ENABLED
   #include "stm32f3xx_hal_sram.h"
 #endif /* HAL_SRAM_MODULE_ENABLED */
 
@@ -222,7 +222,7 @@
 #ifdef HAL_PCCARD_MODULE_ENABLED
   #include "stm32f3xx_hal_pccard.h"
 #endif /* HAL_PCCARD_MODULE_ENABLED */ 
---]
+
 #ifdef HAL_HRTIM_MODULE_ENABLED
  #include "stm32f3xx_hal_hrtim.h"
 #endif /* HAL_HRTIM_MODULE_ENABLED */

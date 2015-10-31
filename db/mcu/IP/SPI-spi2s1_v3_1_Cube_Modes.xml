@@ -72,11 +72,18 @@
 		<PossibleValue Comment="256" Value="SPI_BAUDRATEPRESCALER_256"/>
 	</RefParameter>
 	<RefParameter Comment="Prescaler (for Baud Rate)" DefaultValue="null" Name="BaudRatePrescaler" Type="list" Group="Clock Parameters" Visible="false"/>
-
-	<RefParameter Comment="Baud Rate" DefaultValue="8000000" Name="CalculateBaudRate" Min="0" Max="42000000" Type="string" Group="Clock Parameters">
+	
+	<RefParameter Comment="Baud Rate" DefaultValue="8000000" Name="CalculateBaudRate" Min="0" Max="12000000" Type="string" Group="Clock Parameters" >
+		<Description>Calculated Baudrate value based on SPI Clock source and Prescaler</Description>
+		<Condition Expression="(($IpInstance_Slave &amp; (TIMode = SPI_TIMODE_ENABLED)) | $IpInstance_Master) &amp; ((RCC:VDD_VALUE &lt; 2.7) &amp; (RCC:VDD_VALUE &gt; 1.71)) &amp; ($IpInstance_Slave &amp; $IpInstance_Transmit)" Diagnostic=""/>
+	</RefParameter>
+	
+	<RefParameter Comment="Baud Rate" DefaultValue="8000000" Name="CalculateBaudRate" Min="0" Max="16000000" Type="string" Group="Clock Parameters" >
+		<Description>Calculated Baudrate value based on SPI Clock source and Prescaler</Description>
 		<Condition Expression="($IpInstance_Slave &amp; (TIMode = SPI_TIMODE_ENABLED)) | $IpInstance_Master" Diagnostic=""/>
 	</RefParameter>
-	<RefParameter Comment="Baud Rate" DefaultValue="8000000" Name="CalculateBaudRate" Min="0" Max="42000000" Type="string" Group="Clock Parameters" Visible="false"/>
+	
+	<RefParameter Comment="Baud Rate" DefaultValue="8000000" Name="CalculateBaudRate" Min="0" Max="18000000" Type="string" Group="Clock Parameters" Visible="false"/>
 		
 	<RefParameter Comment="Clock Polarity (CPOL)" DefaultValue="SPI_POLARITY_LOW" Name="CLKPolarity" Type="list" Group="Clock Parameters">
 		<Condition Expression="TIMode = SPI_TIMODE_DISABLED" Diagnostic=""/>
@@ -99,10 +106,10 @@
 		<PossibleValue Comment="Enabled" Value="SPI_CRCCALCULATION_ENABLED"/>
 	</RefParameter>
 	
-	<RefParameter Comment="CRC Polynomial" DefaultValue="X2+X1+X0" Max="16" Name="CRCPolynomial" Type="polynomial" Group="Advanced Parameters">
+	<RefParameter Comment="CRC Polynomial" DefaultValue="X1+X3" Max="16" Name="CRCPolynomial" Type="polynomialOdd" Group="Advanced Parameters">
 		<Condition Expression="CRCCalculation = SPI_CRCCALCULATION_ENABLED" Diagnostic=""/>
 	</RefParameter>
-	<RefParameter Comment="CRC Polynomial" DefaultValue="null" Max="16" Name="CRCPolynomial" Type="polynomial" Group="Advanced Parameters" Visible="false"/>
+	<RefParameter Comment="CRC Polynomial" DefaultValue="null" Max="16" Name="CRCPolynomial" Type="polynomialOdd" Group="Advanced Parameters" Visible="false"/>
 		
 	<RefParameter Comment="NSS Signal Type" DefaultValue="SPI_NSS_SOFT" Name="NSS" Type="list" Group="Advanced Parameters">
 		<Condition Expression="VirtualNSS = VM_NSSSOFT" Diagnostic=""/>
@@ -431,6 +438,7 @@
 					</SignalLogicalOp>
 					<Semaphore>$IpInstance_DmaTransmit</Semaphore>
 					<Semaphore>$IpInstance_Slave</Semaphore>
+					<Semaphore>$IpInstance_Transmit</Semaphore>
 				</Mode>
 			</ModeLogicOperator>
 			<Semaphore>$IpInstance</Semaphore>

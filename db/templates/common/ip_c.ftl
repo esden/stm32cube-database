@@ -428,8 +428,8 @@
                 #t#t   HAL_SD_ReadBlocks_DMA or HAL_SD_WriteBlocks_DMA. */
                 [/#if]
                 [#if FamilyName=="STM32L1" && dmaconfig.dmaRequestName=="SD_MMC"]
-                #t#t/* Use BSP_SD_ReadBlocks_DMA and BSP_SD_WriteBlocks_DMA
-                #t#t   instead of HAL_SD_ReadBlocks_DMA and HAL_SD_WriteBlocks_DMA. */
+                #t#t/* Be sure to change transfer direction before calling
+                #t#t   HAL_SD_ReadBlocks_DMA or HAL_SD_WriteBlocks_DMA. */
                 [/#if]
             [/#if]   [#-- if more than one dma handler--]  
             [#list dmaconfig.dmaHandel as dmaH]
@@ -568,7 +568,7 @@
                     #t#tif(hpcd->Init.low_power_enable == 1)
                     #t#t{
                     #t#t#t/* Enable EXTI Line 18 for USB wakeup */
-                    [#if FamilyName=="STM32L1"][#-- FamilyName=="STM32F3"|| to be added on V4.5 --]
+                    [#if FamilyName=="STM32F3"||FamilyName=="STM32L1"][#--  to be added on V4.5 --]
                       #t#t#t__HAL_USB_EXTI_CLEAR_FLAG();
                       #t#t#t__HAL_USB_EXTI_SET_RISING_EDGE_TRIGGER();
                     [/#if]

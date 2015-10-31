@@ -67,7 +67,6 @@
 		<Condition Expression="VirtualMode = VM_SYNC" Diagnostic=""/>
 		<PossibleValue Comment="1" Value="USART_STOPBITS_1"/>
 		<PossibleValue Comment="2" Value="USART_STOPBITS_2"/>
-		<PossibleValue Comment="0.5" Value="USART_STOPBITS_0_5"/>
 		<PossibleValue Comment="1.5" Value="USART_STOPBITS_1_5"/>
 	</RefParameter>
 	
@@ -175,11 +174,27 @@
 	</RefParameter>
 	
     <!-- Address for MultiProcessor --> 
+		<RefParameter Comment="Wake-Up Address" DefaultValue="0" Max="63" Min="0" Name="Address" Type="integer" Group="Advanced Parameters">
+		<Condition Expression="WakeUpMethod=UART_WAKEUPMETHOD_ADDRESSMARK &amp; AddressLength = UART_ADDRESS_DETECT_7B &amp; WordLength=UART_WORDLENGTH_7B"  Diagnostic=""/>
+	</RefParameter>
 	<RefParameter Comment="Wake-Up Address" DefaultValue="0" Max="127" Min="0" Name="Address" Type="integer" Group="Advanced Parameters">
-		<Condition Expression="WakeUpMethod = UART_WAKEUPMETHOD_ADDRESSMARK" Diagnostic=""/>
+			<Condition Expression="WakeUpMethod=UART_WAKEUPMETHOD_ADDRESSMARK &amp; AddressLength = UART_ADDRESS_DETECT_7B &amp; WordLength=UART_WORDLENGTH_8B"  Diagnostic=""/>
+	</RefParameter>
+	<RefParameter Comment="Wake-Up Address" DefaultValue="0" Max="255" Min="0" Name="Address" Type="integer" Group="Advanced Parameters">
+			<Condition Expression="WakeUpMethod=UART_WAKEUPMETHOD_ADDRESSMARK &amp; AddressLength = UART_ADDRESS_DETECT_7B &amp; WordLength=UART_WORDLENGTH_9B"  Diagnostic=""/>
+	</RefParameter>
+	<RefParameter Comment="Wake-Up Address" DefaultValue="0" Max="15" Min="0" Name="Address" Type="integer" Group="Advanced Parameters">
+		<Condition Expression="WakeUpMethod=UART_WAKEUPMETHOD_ADDRESSMARK " Diagnostic=""/>
 	</RefParameter>
 	<RefParameter Comment="Wake-Up Address" DefaultValue="0" Max="0" Min="0" Name="Address" Type="integer" Group="Advanced Parameters" Visible="false" />
 	
+		<!-- Specifics RefParameters for MultiProcessor Only. Adress length -->
+	<RefParameter Comment="Wake-Up Method" DefaultValue="UART_ADDRESS_DETECT_4B" Name="AddressLength" Type="list" Group="Advanced Parameters">
+		 <Condition Expression="WakeUpMethod=UART_WAKEUPMETHOD_ADDRESSMARK" Diagnostic=""/>
+		<PossibleValue Comment="4 Bits" Value="UART_ADDRESS_DETECT_4B"/>
+		<PossibleValue Comment="7 Bits" Value="UART_ADDRESS_DETECT_7B"/>
+	</RefParameter>
+	<RefParameter Comment="Wake-Up Method" DefaultValue="null" Name="AddressLength" Type="list" Visible="false" Group="Advanced Parameters"/>
 	
 	
 	
@@ -363,7 +378,7 @@
 	<!-- -->
 	
 	<RefParameter Comment="Auto Baudrate Mode" DefaultValue="UART_ADVFEATURE_AUTOBAUDRATE_ONSTARTBIT" Name="AutoBaudRateMode" Type="list" Group="Advanced Features">
-		<Condition Expression="$IpInstance_UART_AutoBaudRate_Enable &amp; ($IpInstance_Usart_7B|$IpInstance_Irda_7B|$IpInstance_Uart_7B)" Diagnostic=""/>
+		<Condition Expression="$IpInstance_UART_AutoBaudRate_Enable &amp; ($IpInstance_Usart_7B|$IpInstance_Irda_7B|$IpInstance_Uart_7B|DIE440|DIE444)" Diagnostic=""/>
 		<PossibleValue Comment="ON START BIT" Value="UART_ADVFEATURE_AUTOBAUDRATE_ONSTARTBIT"/>
 		<PossibleValue Comment="ON FALLING EDGE" Value="UART_ADVFEATURE_AUTOBAUDRATE_ONFALLINGEDGE"/>
 		
@@ -457,13 +472,7 @@
 	</RefMode>
 		
 	<!-- RefMode for 'MultiProcessor Communication' UART -->
-	<RefMode Name="Multiprocessor_communication" HalMode="UART" BaseMode="usartBasic">
-		<ConfigForMode>Uart_MultiProcessor_Init</ConfigForMode>
-		<Parameter Name="VirtualMode">
-			<PossibleValue>VM_ASYNC</PossibleValue>
-		</Parameter>
-		<!-- Basic Parameters -->
-	  
+		<RefMode Name="multiprocessor"  BaseMode="usartBasic" Abstract="true" >  
 		<Parameter Name="WordLength"/>
 		<Parameter Name="Parity"/>
 		<Parameter Name="StopBits"/>
@@ -474,6 +483,7 @@
 		<Parameter Name="OneBitSampling"/>
 		<Parameter Name="WakeUpMethod"/>
 		<Parameter Name="Address"/>
+		<Parameter Name="AddressLength"/>
 		<!-- Advanced Features -->
 		<Parameter Name="TxPinLevelInvertParam"/>
 		<Parameter Name="RxPinLevelInvertParam"/>
@@ -483,6 +493,23 @@
 		<Parameter Name="DMADisableonRxErrorParam"/>
 		<Parameter Name="AutoBaudRateMode"/>
 		<Parameter Name="MSBFirstParam"/>
+	</RefMode>
+	
+	<RefMode Name="Multiprocessor_communication" HalMode="UART" BaseMode="multiprocessor">
+	 <Condition Expression="WakeUpMethod=UART_WAKEUPMETHOD_ADDRESSMARK" Diagnostic=""/>
+		<ConfigForMode>Uart_MultiProcessor_Ex_Init</ConfigForMode>
+		<Parameter Name="VirtualMode">
+			<PossibleValue>VM_ASYNC</PossibleValue>
+		</Parameter>
+		<!-- Basic Parameters -->
+	  
+	</RefMode>
+	
+	<RefMode Name="Multiprocessor_communication" HalMode="UART" BaseMode="multiprocessor">
+		<ConfigForMode>Uart_MultiProcessor_Init</ConfigForMode>
+		<Parameter Name="VirtualMode">
+			<PossibleValue>VM_ASYNC</PossibleValue>
+		</Parameter>
 	</RefMode>
 	
 	
@@ -532,8 +559,8 @@
 			<ModeLogicOperator Name="XOR">
 				<Mode Name="Asynchronous">
 					<SignalLogicalOp Name="AND">
-						<Signal Name="RX"/>
-						<Signal Name="TX"/>
+						<Signal Name="RX" IOMode="AlternateFunctionPushPullPULLUP"/>
+						<Signal Name="TX" IOMode="AlternateFunctionPushPullPULLUP"/>
 					</SignalLogicalOp>
 					<Semaphore>$IpInstance_Asynchronous</Semaphore>
 					<Semaphore>Asynchronous</Semaphore>
@@ -547,7 +574,7 @@
 				</Mode>
 				<Mode Name="Half_duplex(single_wire_mode)" UserName="Single Wire (Half-Duplex)" >
 					<SignalLogicalOp Name="AND">
-						<Signal Name="TX"/>
+						<Signal Name="TX" IOMode="AlternateFunctionOpenDrain"/>
 					</SignalLogicalOp>
 				</Mode>
 				<Mode Name="Multiprocessor_communication" UserName="Multiprocessor Communication">
