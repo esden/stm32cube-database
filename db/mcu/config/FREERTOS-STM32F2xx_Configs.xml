@@ -9,10 +9,13 @@
         <Component Name="Middleware:FREERTOS:HEAP:$HEAP_NUMBER"/>
         <ConfigFile Name="CONFIG"/>
         <ConfigFile Name="HOOKS"/>
-        <ConfigFile Name="THREADS"/>
+        <ConfigFile Name="CREATION"/>
         <ConfigFile Name="INC"/>
         <ConfigFile Name="VARS"/>
+        <ConfigFile Name="PFP"/>
         <ConfigFile Name="THREADS_CODE"/>
+        <ConfigFile Name="USER_THREADS"/>
+        <ConfigFile Name="RTOS_START"/>
     </RefConfig>
         
     <LibMethod Name="osKernelStart" Comment="Start scheduler">
@@ -25,6 +28,18 @@
         <File Name="Source/*.c" Category="source"/>
         <File Name="Source/CMSIS_RTOS/*.c" Category="source"/>
         <File Name="Source/CMSIS_RTOS/*.h" Category="header"/>
+        <File Name="Source/portable/IAR/ARM_CM3/port.c" Category="nodelete"/>
+        <File Name="Source/portable/IAR/ARM_CM3/portasm.s" Category="nodelete"/>
+        <File Name="Source/portable/IAR/ARM_CM3/portmacro.h" Category="nodelete"/>        
+        <File Name="Source/portable/RVDS/ARM_CM3/port.c" Category="nodelete"/>
+        <File Name="Source/portable/RVDS/ARM_CM3/portmacro.h" Category="nodelete"/>        
+        <File Name="Source/portable/RVDS/ARM_CM3/port.c" Category="nodelete"/>
+        <File Name="Source/portable/RVDS/ARM_CM3/portmacro.h" Category="nodelete"/>        
+        <File Name="Source/portable/GCC/ARM_CM3/port.c" Category="nodelete"/>
+        <File Name="Source/portable/GCC/ARM_CM3/portmacro.h" Category="nodelete"/>        
+        <File Name="Source/portable/Tasking/ARM_CM3/port.c" Category="nodelete"/>
+        <File Name="Source/portable/Tasking/ARM_CM3/port_asm.asm" Category="nodelete"/>
+        <File Name="Source/portable/Tasking/ARM_CM3/portmacro.h" Category="nodelete"/>
         
         <SubComponent Csub="HEAP" Cvariant="1" >
             <File Name="Source/portable/MemMang/heap_1.c" Category="source"/>
@@ -63,28 +78,49 @@
         </SubComponent>
     </RefComponent>
     
-    
     <RefConfigFile Name="INC" Description="Header file for #include" Template="freertos_inc.ftl">
         <File Name="rtos_inc.tmp" Category="source" Version="7.6.0" Condition="all"/>
     </RefConfigFile>
+    
     <RefConfigFile Name="VARS" Description="Variable declarations for FreeRTOS" Template="freertos_vars.ftl">
         <File Name="rtos_vars.tmp" Category="source" Version="7.6.0" Condition="all"/>
-    </RefConfigFile>
-    <RefConfigFile Name="THREADS_CODE" Description="Thread code for FreeRTOS" Template="freertos_threads.ftl">
-        <File Name="rtos_threads.tmp" Category="source" Version="7.6.0" Condition="all"/>
-    </RefConfigFile>
-    <RefConfigFile Name="THREADS" Description="Definition and creation of threads, then launch the RTOS" Template="freertos_init_c.ftl">
-        <File Name="rtos_HalInit.tmp" Category="source" Version="7.6.0" Condition="all"/>
-        <!-- Parameters for FReeRTOS -->
+        <Argument Name="Threads" GenericType="rtos_list" Comment="User threads"/>
+        <Argument Name="Queues" GenericType="rtos_list" Comment="User queues"/>
+        <Argument Name="Timers" GenericType="rtos_list" Comment="User timers"/>     
+        <Argument Name="Mutexes" GenericType="rtos_list" Comment="User mutexes"/>  
+        <Argument Name="BinarySemaphores" GenericType="rtos_list" Comment="User binary semaphores"/>  
+        <Argument Name="Semaphores" GenericType="rtos_list" Comment="User counting semaphores"/>  
     </RefConfigFile>
     
-    <RefConfigFile Name="HOOKS" Description="Ooptional hook functions" Template="freertos_c.ftl">
-        <File Name="freertos.c" Category="source" Version="7.6.0" Condition="all"/>
-        <Argument Name="configGENERATE_RUN_TIME_STATS" GenericType="simple" Comment="When set to 1, a collection of run time statistics is enabled"/>
-        <Argument Name="configUSE_IDLE_HOOK" GenericType="simple" Comment="Set to 1 if you wish to use an idle hook, or 0 to omit it"/>
-        <Argument Name="configUSE_TICK_HOOK" GenericType="simple" Comment="Set to 1 if you wish to use a tick hook, or 0 to omit it"/>
-        <Argument Name="configCHECK_FOR_STACK_OVERFLOW" GenericType="simple" Comment=""/>
-        <Argument Name="configUSE_MALLOC_FAILED_HOOK" GenericType="simple" Comment="Set to 1 if you wish to use a malloc failed hook, or 0 to omit it"/>
+    <RefConfigFile Name="PFP" Description="Private Functions Prototypes for FreeRTOS" Template="freertos_pfp.ftl">
+        <File Name="rtos_pfp.tmp" Category="source" Version="7.6.0" Condition="all"/>
+        <Argument Name="Threads" GenericType="rtos_list" Comment="User threads"/>
+        <Argument Name="Timers" GenericType="rtos_list" Comment="User timers"/>
+    </RefConfigFile>
+    
+    <RefConfigFile Name="CREATION" Description="Variable creation then launch the RTOS" Template="freertos_init_c.ftl">
+        <File Name="rtos_HalInit.tmp" Category="source" Version="7.6.0" Condition="all"/>
+        <Argument Name="Threads" GenericType="rtos_list" Comment="User threads"/>
+        <Argument Name="Queues" GenericType="rtos_list" Comment="User queues"/>
+        <Argument Name="Timers" GenericType="rtos_list" Comment="User timers"/>     
+        <Argument Name="Mutexes" GenericType="rtos_list" Comment="User mutexes"/>  
+        <Argument Name="BinarySemaphores" GenericType="rtos_list" Comment="User binary semaphores"/>  
+        <Argument Name="Semaphores" GenericType="rtos_list" Comment="User counting semaphores"/>  
+    </RefConfigFile>    
+
+    <RefConfigFile Name="RTOS_START" Description="Code to start the kernel" Template="freertos_start.ftl">
+        <File Name="rtos_start.tmp" Category="source" Version="7.6.0" Condition="all"/>
+    </RefConfigFile>
+    
+    <RefConfigFile Name="THREADS_CODE" Description="FreeRTOS default thread" Template="freertos_threads.ftl">
+        <File Name="rtos_threads.tmp" Category="source" Version="7.6.0" Condition="all"/>
+        <Argument Name="Threads" GenericType="rtos_list" Comment="User threads"/>
+    </RefConfigFile>
+    
+    <RefConfigFile Name="USER_THREADS" Description="FreeRTOS user threads" Template="freertos_user_threads.ftl">
+        <File Name="rtos_user_threads.tmp" Category="source" Version="7.6.0" Condition="all"/>
+        <Argument Name="Threads" GenericType="rtos_list" Comment="User threads"/>
+        <Argument Name="Timers" GenericType="rtos_list" Comment="User timers"/>
     </RefConfigFile>
     
     <!-- use generic template file "mw_conf.ftl" to generate header file containing #define -->
@@ -142,10 +178,32 @@
         <Argument Name="INCLUDE_xTaskGetSchedulerState" GenericType="simple" Comment=""/> 
         
         <Argument Name="configASSERT( x )" GenericType="simple" Comment=""/>
+
+        <!-- New for all families -->   
+        <Argument Name="configUSE_ALTERNATIVE_API" GenericType="simple" Comment=""/> 
+        <Argument Name="INCLUDE_xTaskResumeFromISR" GenericType="simple" Comment=""/>         
+        <Argument Name="INCLUDE_xQueueGetMutexHolder" GenericType="simple" Comment=""/>
+        <Argument Name="INCLUDE_xSemaphoreGetMutexHolder" GenericType="simple" Comment=""/>
+        <Argument Name="INCLUDE_pcTaskGetTaskName" GenericType="simple" Comment=""/>
+        <Argument Name="INCLUDE_uxTaskGetStackHighWaterMark" GenericType="simple" Comment=""/>
+        <Argument Name="INCLUDE_xTaskGetCurrentTaskHandle" GenericType="simple" Comment=""/>
+        <Argument Name="INCLUDE_eTaskGetState" GenericType="simple" Comment=""/>
+        
+        <Argument Name="CMSIS_version" GenericType="simple" Comment=""/>
         
         <!-- <Argument Name="configUSE_MALLOC_FAILED_HOOK" GenericType="simple" Comment=""/> -->
         <!-- <Argument Name="configUSE_APPLICATION_TASK_TAG" GenericType="simple" Comment=""/> -->
         
+    </RefConfigFile>
+    
+    <RefConfigFile Name="HOOKS" Description="Optional hook functions" Template="freertos_c.ftl">
+        <File Name="freertos.c" Category="source" Version="7.6.0" Condition="all"/>
+        <Argument Name="configGENERATE_RUN_TIME_STATS" GenericType="simple" Comment="When set to 1, a collection of run time statistics is enabled"/>
+        <Argument Name="configUSE_IDLE_HOOK" GenericType="simple" Comment="Set to 1 if you wish to use an idle hook, or 0 to omit it"/>
+        <Argument Name="configUSE_TICK_HOOK" GenericType="simple" Comment="Set to 1 if you wish to use a tick hook, or 0 to omit it"/>
+        <Argument Name="configCHECK_FOR_STACK_OVERFLOW" GenericType="simple" Comment=""/>
+        <Argument Name="configUSE_MALLOC_FAILED_HOOK" GenericType="simple" Comment="Set to 1 if you wish to use a malloc failed hook, or 0 to omit it"/>
+        <!--  New for FreeRTOS 8.1.2 -->
     </RefConfigFile>
     
 </IP>

@@ -423,7 +423,7 @@
             [#if dmaconfig.dmaHandel?size > 1] [#-- if more than one dma handler--]
                 #t#t/* Several peripheral DMA handle pointers point to the same DMA handle.
                 #t#t   Be aware that there is only one stream to perform all the requested DMAs. */
-                [#if (FamilyName=="STM32F2" || FamilyName=="STM32F4") && dmaconfig.dmaRequestName=="SDIO"]
+                [#if (FamilyName=="STM32F1" || FamilyName=="STM32F2" || FamilyName=="STM32F4") && dmaconfig.dmaRequestName=="SDIO"]
                 #t#t/* Be sure to change transfer direction before calling
                 #t#t   HAL_SD_ReadBlocks_DMA or HAL_SD_WriteBlocks_DMA. */
                 [/#if]
@@ -501,6 +501,14 @@
     [#if serviceType=="Init"] 
            [#if initService.clock??]
             [#if initService.clock!="none"]
+    [#if FamilyName=="STM32F1" && ipName=="RTC"]
+
+#t#tHAL_PWR_EnableBkUpAccess();
+
+#t#t/* Enable BKP CLK enable for backup registers */
+#t#t__HAL_RCC_BKP_CLK_ENABLE();                    
+
+                [/#if]
                 #t#t/* Peripheral clock enable */ 
             [#list initService.clock?split(';') as clock]    
 [#if ipvar.clkCommonResource.entrySet()?contains(clock?trim)]#t#t${clock?trim?replace("__","")?replace("_ENABLE","")}_ENABLED++;
@@ -584,10 +592,20 @@
                     [/#if]
                     [#if ipName?contains("_HS")]
                         #t#t#t__HAL_USB_HS_EXTI_ENABLE_IT();
+                    [#elseif ipName?contains("OTG_FS")&&FamilyName=="STM32F1"]
+                        #t#t#t__HAL_USB_OTG_FS_WAKEUP_EXTI_CLEAR_FLAG();
+                        #t#t#t__HAL_USB_OTG_FS_WAKEUP_EXTI_ENABLE_RISING_EDGE();
+                        #t#t#t__HAL_USB_OTG_FS_WAKEUP_EXTI_ENABLE_IT();
                     [#elseif ipName?contains("_FS")]
                         #t#t#t__HAL_USB_FS_EXTI_ENABLE_IT();
                     [#else]
-                        #t#t#t__HAL_USB_EXTI_ENABLE_IT();
+                        [#if FamilyName=="STM32F1"] [#-- use new macro naming for F1--]
+                            #t#t#t__HAL_USB_WAKEUP_EXTI_CLEAR_FLAG();
+                            #t#t#t__HAL_USB_WAKEUP_EXTI_ENABLE_RISING_EDGE();
+                            #t#t#t__HAL_USB_WAKEUP_EXTI_ENABLE_IT();
+                        [#else]
+                            #t#t#t__HAL_USB_EXTI_ENABLE_IT(); 
+                        [/#if]
                     [/#if]
                     [#list initService.nvic as initVector]
                        [#if initVector.vector?contains("WKUP") || initVector.vector?contains("WakeUp")]

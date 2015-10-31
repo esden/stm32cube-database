@@ -3,7 +3,7 @@
   ******************************************************************************
   * File Name          : freertos.c
   * Date               : ${date}
-  * Description        : Optional code that may be needed for compiling freertos applications
+  * Description        : Code for freertos applications
   ******************************************************************************
   *
   * COPYRIGHT(c) ${year} STMicroelectronics
@@ -33,13 +33,64 @@
   ******************************************************************************
   */
 
+[#compress]
+[#assign inMain = 0]
+[#assign useNewHandle = 0]
+
+[#list SWIPdatas as SWIP]
+    [#if SWIP.variables??]
+    	[#list SWIP.variables as variable]	
+	      [#if variable.name=="HALCompliant"]
+	         [#assign inMain = 1]
+	      [/#if]   
+	    [/#list]
+    [/#if]
+[/#list]
+
+[#list SWIPdatas as SWIP]
+    [#if SWIP.defines??]     
+	  [#list SWIP.defines as definition]
+	    [#if definition.name=="configENABLE_BACKWARD_COMPATIBILITY"]
+	      [#if definition.value=="0"]
+	        [#assign useNewHandle = 1]
+          [/#if]   
+	    [/#if]
+	  [/#list]
+    [/#if]
+[/#list]
+
 /* Includes ------------------------------------------------------------------*/
 #include "FreeRTOS.h"
 #include "task.h"
-/* USER CODE BEGIN 0 */
+[/#compress]
 
-/* USER CODE END 0 */
+[#if inMain == 0]
+[@common.optinclude name="Src/rtos_inc.tmp"/][#--include freertos includes --]
+[/#if]
 
+/* USER CODE BEGIN Includes */     
+
+/* USER CODE END Includes */
+
+[#compress]
+/* Variables -----------------------------------------------------------------*/
+[#if inMain == 0]
+[@common.optinclude name="Src/rtos_vars.tmp"/]
+[/#if]
+#n/* USER CODE BEGIN Variables */
+#n
+#n/* USER CODE END Variables */
+#n     
+/* Function prototypes -------------------------------------------------------*/
+[#if inMain == 0]
+[@common.optinclude name="Src/rtos_pfp.tmp"/]
+[/#if]
+
+#n/* USER CODE BEGIN FunctionPrototypes */
+#n   
+#n/* USER CODE END FunctionPrototypes */
+         
+/* Hook prototypes */
 [#list SWIPdatas as SWIP]
     [#if SWIP.defines??]
      [#list SWIP.defines as definition]
@@ -61,7 +112,11 @@ void vApplicationTickHook(void);
         [/#if]      
         [#if definition.name=="configCHECK_FOR_STACK_OVERFLOW"]
           [#if definition.value !="0"]
-void vApplicationStackOverflowHook(xTaskHandle xTask, signed char *pcTaskName);      
+            [#if useNewHandle==0]
+void vApplicationStackOverflowHook(xTaskHandle xTask, signed char *pcTaskName);  
+            [#else]
+void vApplicationStackOverflowHook(TaskHandle_t xTask, signed char *pcTaskName); 
+            [/#if]     
           [/#if]
         [/#if]
         [#if definition.name=="configUSE_MALLOC_FAILED_HOOK"]
@@ -73,13 +128,13 @@ void vApplicationMallocFailedHook(void);
  [/#if]
 [/#list]
 
-[#compress]
 [#list SWIPdatas as SWIP]
     [#if SWIP.defines??]     
 	  [#list SWIP.defines as definition]	
 	    [#if definition.name=="configGENERATE_RUN_TIME_STATS"]
 	      [#if definition.value=="1"]
-#n/* USER CODE BEGIN 1 */
+#n
+/* USER CODE BEGIN 1 */
 /* Functions needed when configGENERATE_RUN_TIME_STATS is on */
 void configureTimerForRunTimeStats(void) 
 {
@@ -96,7 +151,8 @@ void configureTimerForRunTimeStats(void)
 		    
 		[#if definition.name=="configUSE_IDLE_HOOK"]
 	      [#if definition.value=="1"]
-#n/* USER CODE BEGIN 2 */
+#n
+/* USER CODE BEGIN 2 */
 void vApplicationIdleHook( void ) 
 {
 #t    /* vApplicationIdleHook() will only be called if configUSE_IDLE_HOOK is set
@@ -131,7 +187,11 @@ void vApplicationTickHook( void )
 	    [#if definition.name=="configCHECK_FOR_STACK_OVERFLOW"]
 	      [#if definition.value !="0"]
 #n/* USER CODE BEGIN 4 */
-void vApplicationStackOverflowHook(xTaskHandle xTask, signed char *pcTaskName) 
+[#if useNewHandle==0]
+void vApplicationStackOverflowHook(xTaskHandle xTask, signed char *pcTaskName)
+[#else]
+void vApplicationStackOverflowHook(TaskHandle_t xTask, signed char *pcTaskName)
+[/#if]
 {
 #t    /* Run time stack overflow checking is performed if
 #t    configCHECK_FOR_STACK_OVERFLOW is defined to 1 or 2. This hook function is
@@ -166,5 +226,22 @@ void vApplicationMallocFailedHook(void)
 [/#list]
 [/#compress]
 
+[#if inMain == 0]
+#n
+/* Init FreeRTOS */
+
+void MX_FREERTOS_Init() {
+#t/* USER CODE BEGIN Init */
+#t     
+#t/* USER CODE END Init */
+[@common.optinclude name="Src/rtos_HalInit.tmp"/]
+}
+
+[@common.optinclude name="Src/rtos_user_threads.tmp"/] 
+[/#if]   
+
+/* USER CODE BEGIN Application */
+     
+/* USER CODE END Application */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

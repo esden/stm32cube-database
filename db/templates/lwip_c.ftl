@@ -450,7 +450,6 @@ void MX_LWIP_Init(void)
 [/#if] [#-- endif lwip_dhcp --] 
 
   /* add the network interface */
-#if LWIP_ARP
 [#if with_rtos == 0]
   netif_add(&gnetif, &ipaddr, &netmask, &gw, NULL, &ethernetif_init, &ethernet_input);
 [#else]
@@ -476,7 +475,6 @@ void MX_LWIP_Init(void)
   netif_set_link_callback(&gnetif, ethernetif_update_config);
 [/#if]
 
-#endif  /* LWIP_ARP || LWIP_ETHERNET */
 
 [#if lwip_dhcp == 1]
 dhcp_start(&gnetif);

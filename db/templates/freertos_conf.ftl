@@ -76,8 +76,38 @@
 [#assign fileName = SWIP.fileName]   
 [#assign version = SWIP.version]   
 
+[#assign CMSIS_version = "100"]
+
+[#assign configUSE_TIMERS = "0"]
+[#assign configCHECK_FOR_STACK_OVERFLOW = "0"]
+[#assign configUSE_APPLICATION_TASK_TAG = "0"]
+[#assign configUSE_MALLOC_FAILED_HOOK = "0"]
+[#assign configUSE_MUTEXES = "0"]
+[#assign configUSE_RECURSIVE_MUTEXES = "0"]
+[#assign configUSE_COUNTING_SEMAPHORES = "0"]
+[#assign configGENERATE_RUN_TIME_STATS = "0"]
+[#assign configIDLE_SHOULD_YIELD = "1"]
+
+[#assign xTaskResumeFromISR = "1"]
+[#assign xQueueGetMutexHolder = "0"]
+[#assign xSemaphoreGetMutexHolder = "0"]
+[#assign pcTaskGetTaskName = "0"]
+[#assign uxTaskGetStackHighWaterMark = "0"]
+[#assign xTaskGetCurrentTaskHandle = "0"]
+[#assign eTaskGetState = "0"]
+[#assign configUSE_ALTERNATIVE_API = "0"]
+
+[#-- Since FreeRTOS v8 --] 
+[#assign xEventGroupSetBitFromISR = "0"]
+[#assign xTimerPendFunctionCall = "0"]
+[#assign configENABLE_BACKWARD_COMPATIBILITY = "1"]
+[#assign configUSE_PORT_OPTIMISED_TASK_SELECTION = "0"]
+
 [#if SWIP.defines??]
 	[#list SWIP.defines as definition]	
+      [#if definition.name=="CMSIS_version"]
+	      [#assign CMSIS_version = definition.value]
+	  [/#if]
 	  [#if definition.name=="configUSE_PREEMPTION"]
 	      [#assign valueUsePreemption = definition.value]
 	  [/#if]
@@ -112,31 +142,31 @@
 	      [#assign valueUse16BitTicks = definition.value]
 	  [/#if]	
 	  [#if definition.name=="configIDLE_SHOULD_YIELD"]
-	      [#assign valueIdleShouldYield = definition.value]
+	      [#assign configIDLE_SHOULD_YIELD = definition.value]
 	  [/#if]
 	  [#if definition.name=="configUSE_MUTEXES"]
-	      [#assign valueUseMutexes = definition.value]
+	      [#assign configUSE_MUTEXES = definition.value]
 	  [/#if]	
 	  [#if definition.name=="configQUEUE_REGISTRY_SIZE"]
 	      [#assign valueQueueRegistrySize = definition.value]
 	  [/#if]	
 	  [#if definition.name=="configCHECK_FOR_STACK_OVERFLOW"]
-	      [#assign valueCheckForStackOverflow = definition.value]
+	      [#assign configCHECK_FOR_STACK_OVERFLOW = definition.value]
 	  [/#if]
 	  [#if definition.name=="configUSE_RECURSIVE_MUTEXES"]
-	      [#assign valueUseRecursiveMutexes = definition.value]
+	      [#assign configUSE_RECURSIVE_MUTEXES = definition.value]
 	  [/#if]	
 	  [#if definition.name=="configUSE_MALLOC_FAILED_HOOK"]
-	      [#assign valueUseMalocFailedHook = definition.value]
+	      [#assign configUSE_MALLOC_FAILED_HOOK = definition.value]
 	  [/#if]
 	  [#if definition.name=="configUSE_APPLICATION_TASK_TAG"]
-	      [#assign valueUseApplicationTaskTag = definition.value]
+	      [#assign configUSE_APPLICATION_TASK_TAG = definition.value]
 	  [/#if]	
 	  [#if definition.name=="configUSE_COUNTING_SEMAPHORES"]
-	      [#assign valueUseCountingSemaphores = definition.value]
+	      [#assign configUSE_COUNTING_SEMAPHORES = definition.value]
 	  [/#if]
 	  [#if definition.name=="configGENERATE_RUN_TIME_STATS"]
-	      [#assign valueGenerateRunTimeStats = definition.value]
+	      [#assign configGENERATE_RUN_TIME_STATS = definition.value]
 	  [/#if]
 	  [#if definition.name=="configUSE_CO_ROUTINES"]
 	      [#assign valueUseCoRoutines = definition.value]
@@ -145,7 +175,7 @@
 	      [#assign valueMaxCoRoutinePriorities = definition.value]
 	  [/#if]
 	  [#if definition.name=="configUSE_TIMERS"]
-	      [#assign valueUseTimers = definition.value]
+	      [#assign configUSE_TIMERS = definition.value]
 	  [/#if]	  
 	  [#if definition.name=="configTIMER_TASK_PRIORITY"]
 	      [#assign valueTimerTaskPriority = definition.value]
@@ -191,7 +221,45 @@
 	  [/#if] 	
 	  [#if definition.name=="configASSERT( x )"]
 	      [#assign valueAssert = definition.value]
-	  [/#if] 	  
+	  [/#if]
+	  [#-- New ones for all families --]  
+	  [#if definition.name=="INCLUDE_xTaskResumeFromISR"]
+	      [#assign xTaskResumeFromISR = definition.value]
+	  [/#if]
+	  [#if definition.name=="INCLUDE_xQueueGetMutexHolder"]
+	      [#assign xQueueGetMutexHolder = definition.value]
+	  [/#if]
+	  [#if definition.name=="INCLUDE_xSemaphoreGetMutexHolder"]
+	      [#assign xSemaphoreGetMutexHolder = definition.value]
+	  [/#if]
+	  [#if definition.name=="INCLUDE_pcTaskGetTaskName"]
+	      [#assign pcTaskGetTaskName = definition.value]
+	  [/#if]	  
+	  [#if definition.name=="INCLUDE_uxTaskGetStackHighWaterMark"]
+	      [#assign uxTaskGetStackHighWaterMark = definition.value]
+	  [/#if]	  
+	  [#if definition.name=="INCLUDE_xTaskGetCurrentTaskHandle"]
+	      [#assign xTaskGetCurrentTaskHandle = definition.value]
+	  [/#if]
+	  [#if definition.name=="INCLUDE_eTaskGetState"]
+	      [#assign eTaskGetState = definition.value]
+	  [/#if]
+	  [#if definition.name=="configUSE_ALTERNATIVE_API"]
+	      [#assign configUSE_ALTERNATIVE_API = definition.value]
+	  [/#if]
+	  [#-- New ones from freertos 8.1.2 --]  
+	  [#if definition.name=="INCLUDE_xEventGroupSetBitFromISR"]
+	      [#assign xEventGroupSetBitFromISR = definition.value] 
+	  [/#if]
+	  [#if definition.name=="INCLUDE_xTimerPendFunctionCall"]
+	      [#assign xTimerPendFunctionCall = definition.value]
+	  [/#if]
+	  [#if definition.name=="configENABLE_BACKWARD_COMPATIBILITY"]
+	      [#assign configENABLE_BACKWARD_COMPATIBILITY = definition.value] 
+	  [/#if]
+	  [#if definition.name=="configUSE_PORT_OPTIMISED_TASK_SELECTION"]
+	      [#assign configUSE_PORT_OPTIMISED_TASK_SELECTION = definition.value]
+	  [/#if]
 	[/#list]
 [/#if]
 [/#list]
@@ -206,68 +274,123 @@
  *
  * See http://www.freertos.org/a00110.html.
  *----------------------------------------------------------*/
- 
+
+/* USER CODE BEGIN Includes */   	      
+/* Section where include file can be added */
+/* USER CODE END Includes */ 
+
 /* Ensure stdint is only used by the compiler, and not the assembler. */
 #if defined(__ICCARM__) || defined(__CC_ARM) || defined(__GNUC__)
     #include <stdint.h>
     extern uint32_t SystemCoreClock;
-	[#list SWIPdatas as SWIP]  
-     [#if SWIP.defines??]
-	  [#list SWIP.defines as definition]	
-	    [#if definition.name=="configGENERATE_RUN_TIME_STATS"]
-	      [#if definition.value=="1"]
+[#if configGENERATE_RUN_TIME_STATS=="1"]
 /* USER CODE BEGIN 0 */   	      
     extern void configureTimerForRunTimeStats(void);
     extern unsigned long getRunTimeCounterValue(void);  
 /* USER CODE END 0 */       
-	      [/#if]
-	    [/#if]
-	  [/#list]
-	 [/#if]
-	[/#list]
+[/#if]
 #endif
 
-#define configUSE_PREEMPTION              ${valueUsePreemption}
-#define configUSE_IDLE_HOOK               ${valueUseIdleHook}
-#define configUSE_TICK_HOOK               ${valueUseTickHook}
-#define configCPU_CLOCK_HZ                (${valueCpuClock})
-#define configTICK_RATE_HZ                ((portTickType)${valueTickRate})
-#define configMAX_PRIORITIES              ((unsigned portBASE_TYPE)${valueMaxPriorities})
-#define configMINIMAL_STACK_SIZE          ((unsigned short)${valueMinimalStackSize})
-#define configTOTAL_HEAP_SIZE             ((size_t)${valueTotalHeapSize})
-#define configMAX_TASK_NAME_LEN           (${valueMaxTaskNameLen})
-#define configUSE_TRACE_FACILITY          ${valueUseTraceFacility}
-#define configUSE_16_BIT_TICKS            ${valueUse16BitTicks}
-#define configIDLE_SHOULD_YIELD           ${valueIdleShouldYield}
-#define configUSE_MUTEXES                 ${valueUseMutexes}
-#define configQUEUE_REGISTRY_SIZE         ${valueQueueRegistrySize}
-#define configCHECK_FOR_STACK_OVERFLOW    ${valueCheckForStackOverflow}
-#define configUSE_RECURSIVE_MUTEXES       ${valueUseRecursiveMutexes}
-#define configUSE_MALLOC_FAILED_HOOK      ${valueUseMalocFailedHook}
-#define configUSE_APPLICATION_TASK_TAG    ${valueUseApplicationTaskTag}
-#define configUSE_COUNTING_SEMAPHORES     ${valueUseCountingSemaphores}
-#define configGENERATE_RUN_TIME_STATS     ${valueGenerateRunTimeStats}
+#define configUSE_PREEMPTION                     ${valueUsePreemption}
+#define configUSE_IDLE_HOOK                      ${valueUseIdleHook}
+#define configUSE_TICK_HOOK                      ${valueUseTickHook}
+#define configCPU_CLOCK_HZ                       ( ${valueCpuClock} )
+[#if CMSIS_version=="100"]
+#define configTICK_RATE_HZ                       ((portTickType)${valueTickRate})
+[#else]
+#define configTICK_RATE_HZ                       ((TickType_t)${valueTickRate})
+[/#if]
+#define configMAX_PRIORITIES                     ( ${valueMaxPriorities} )
+#define configMINIMAL_STACK_SIZE                 ((uint16_t)${valueMinimalStackSize})
+#define configTOTAL_HEAP_SIZE                    ((size_t)${valueTotalHeapSize})
+#define configMAX_TASK_NAME_LEN                  ( ${valueMaxTaskNameLen} )
+#define configUSE_TRACE_FACILITY                 ${valueUseTraceFacility}
+#define configUSE_16_BIT_TICKS                   ${valueUse16BitTicks}
+[#if configIDLE_SHOULD_YIELD=="0"]
+#define configIDLE_SHOULD_YIELD                  0
+[/#if]
+[#if configUSE_MUTEXES=="1"]
+#define configUSE_MUTEXES                        1
+[/#if]
+#define configQUEUE_REGISTRY_SIZE                ${valueQueueRegistrySize}
+[#if configCHECK_FOR_STACK_OVERFLOW !="0"]
+#define configCHECK_FOR_STACK_OVERFLOW           ${configCHECK_FOR_STACK_OVERFLOW}
+[/#if]
+[#if configUSE_RECURSIVE_MUTEXES=="1"]
+#define configUSE_RECURSIVE_MUTEXES              1
+[/#if]
+[#if configUSE_MALLOC_FAILED_HOOK=="1"]
+#define configUSE_MALLOC_FAILED_HOOK             1
+[/#if]
+[#if configUSE_APPLICATION_TASK_TAG=="1"]
+#define configUSE_APPLICATION_TASK_TAG           1
+[/#if]
+[#if configUSE_COUNTING_SEMAPHORES=="1"]
+#define configUSE_COUNTING_SEMAPHORES            1
+[/#if]
+[#if configGENERATE_RUN_TIME_STATS=="1"]
+#define configGENERATE_RUN_TIME_STATS            1
+[/#if]
+[#if configUSE_ALTERNATIVE_API=="1"]
+#define configUSE_ALTERNATIVE_API                1   /* Deprecated! */
+[/#if]
+[#if configENABLE_BACKWARD_COMPATIBILITY=="0"]
+#define configENABLE_BACKWARD_COMPATIBILITY      0
+[/#if]
+[#if configUSE_PORT_OPTIMISED_TASK_SELECTION=="1"]
+#define configUSE_PORT_OPTIMISED_TASK_SELECTION  1
+[/#if]
 
 /* Co-routine definitions. */
-#define configUSE_CO_ROUTINES           ${valueUseCoRoutines}
-#define configMAX_CO_ROUTINE_PRIORITIES (${valueMaxCoRoutinePriorities})
+#define configUSE_CO_ROUTINES                    ${valueUseCoRoutines}
+#define configMAX_CO_ROUTINE_PRIORITIES          ( ${valueMaxCoRoutinePriorities} )
 
+[#if configUSE_TIMERS=="1"]
 /* Software timer definitions. */
-#define configUSE_TIMERS             ${valueUseTimers}
-#define configTIMER_TASK_PRIORITY    (${valueTimerTaskPriority})
-#define configTIMER_QUEUE_LENGTH     ${valueTimerQueueLength}
-#define configTIMER_TASK_STACK_DEPTH ${valueTimerTaskStackDepth}
+#define configUSE_TIMERS                         1
+#define configTIMER_TASK_PRIORITY                ( ${valueTimerTaskPriority} )
+#define configTIMER_QUEUE_LENGTH                 ${valueTimerQueueLength}
+#define configTIMER_TASK_STACK_DEPTH             ${valueTimerTaskStackDepth}
+[/#if]
 
 /* Set the following definitions to 1 to include the API function, or zero
 to exclude the API function. */
-#define INCLUDE_vTaskPrioritySet       ${valueTaskPrioritySet}
-#define INCLUDE_uxTaskPriorityGet      ${valueTaskPriorityGet}
-#define INCLUDE_vTaskDelete            ${valueTaskDelete}
-#define INCLUDE_vTaskCleanUpResources  ${valueTaskCleanUpResources}
-#define INCLUDE_vTaskSuspend           ${valueTaskSuspend}
-#define INCLUDE_vTaskDelayUntil        ${valueTaskDelayUntil}
-#define INCLUDE_vTaskDelay             ${valueTaskDelay}
-#define INCLUDE_xTaskGetSchedulerState ${valueGetSchedulerState}
+#define INCLUDE_vTaskPrioritySet            ${valueTaskPrioritySet}
+#define INCLUDE_uxTaskPriorityGet           ${valueTaskPriorityGet}
+#define INCLUDE_vTaskDelete                 ${valueTaskDelete}
+#define INCLUDE_vTaskCleanUpResources       ${valueTaskCleanUpResources}
+#define INCLUDE_vTaskSuspend                ${valueTaskSuspend}
+#define INCLUDE_vTaskDelayUntil             ${valueTaskDelayUntil}
+#define INCLUDE_vTaskDelay                  ${valueTaskDelay}
+#define INCLUDE_xTaskGetSchedulerState      ${valueGetSchedulerState}
+
+[#if xTaskResumeFromISR=="0"]
+#define INCLUDE_xTaskResumeFromISR          0
+[/#if]
+[#if xEventGroupSetBitFromISR=="1"]
+#define INCLUDE_xEventGroupSetBitFromISR    1
+[/#if]
+[#if xTimerPendFunctionCall=="1"]
+#define INCLUDE_xTimerPendFunctionCall      1
+[/#if]
+[#if xQueueGetMutexHolder=="1"]
+#define INCLUDE_xQueueGetMutexHolder        1
+[/#if]
+[#if xSemaphoreGetMutexHolder=="1"]
+#define INCLUDE_xSemaphoreGetMutexHolder    1
+[/#if]
+[#if pcTaskGetTaskName=="1"]
+#define INCLUDE_pcTaskGetTaskName           1
+[/#if]
+[#if uxTaskGetStackHighWaterMark=="1"]
+#define INCLUDE_uxTaskGetStackHighWaterMark 1
+[/#if]
+[#if xTaskGetCurrentTaskHandle=="1"]
+#define INCLUDE_xTaskGetCurrentTaskHandle   1
+[/#if]
+[#if eTaskGetState=="1"]
+#define INCLUDE_eTaskGetState               1
+[/#if]
 
 /* Cortex-M specific definitions. */
 #ifdef __NVIC_PRIO_BITS
@@ -309,20 +432,16 @@ standard names. */
               to prevent overwriting SysTick_Handler defined within STM32Cube HAL */
 /* #define xPortSysTickHandler SysTick_Handler */
 
-[#list SWIPdatas as SWIP]  
- [#if SWIP.defines??]
-  [#list SWIP.defines as definition]	
-   [#if definition.name=="configGENERATE_RUN_TIME_STATS"]
-    [#if definition.value=="1"]
+[#if configGENERATE_RUN_TIME_STATS=="1"]
 /* USER CODE BEGIN 2 */    
 /* Definitions needed when configGENERATE_RUN_TIME_STATS is on */
 #define portCONFIGURE_TIMER_FOR_RUN_TIME_STATS configureTimerForRunTimeStats
 #define portGET_RUN_TIME_COUNTER_VALUE getRunTimeCounterValue    
 /* USER CODE END 2 */
-    [/#if]
-   [/#if]
-  [/#list]
- [/#if]
-[/#list]
+[/#if]
+
+/* USER CODE BEGIN Defines */   	      
+/* Section where parameter definitions can be added (for instance, to override default ones in FreeRTOS.h) */
+/* USER CODE END Defines */ 
 
 #endif /* FREERTOS_CONFIG_H */

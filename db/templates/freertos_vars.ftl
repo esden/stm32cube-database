@@ -1,4 +1,78 @@
 [#ftl]
 [#compress]
-static void StartThread(void const * argument);
+[#list SWIPdatas as SWIP]
+  [#if SWIP.variables??]  
+	[#list SWIP.variables as variable]
+	
+	  [#if variable.name=="Threads"]
+	    [#assign s = variable.valueList]
+	    [#assign index = 0]
+        [#list s as i]
+          [#if index == 0]
+            [#assign threadName = i]
+          [/#if]
+          [#assign index = index + 1]
+        [/#list]
+        osThreadId ${threadName}Handle;
+      [/#if]
+      
+      [#if variable.name=="Mutexes"]
+	    [#assign s = variable.valueList]
+        [#list s as mutexName]
+        osMutexId ${mutexName}Handle;
+        [/#list]
+      [/#if]
+      
+      [#if variable.name=="Timers"]
+	    [#assign s = variable.valueList]
+	    [#assign index = 0]
+        [#list s as i]
+          [#if index == 0]
+            [#assign timerName = i]
+          [/#if]
+          [#assign index = index + 1]
+        [/#list]
+        osTimerId ${timerName}Handle;
+      [/#if]
+      
+      [#if variable.name=="Queues"]
+	    [#assign s = variable.valueList]
+	    [#assign index = 0]
+        [#list s as i]
+          [#if index == 0]
+            [#assign queueName = i]
+          [/#if] 
+          [#assign index = index + 1]
+        [/#list] 
+        osMessageQId ${queueName}Handle;
+      [/#if]
+      
+      [#if variable.name=="Semaphores"]
+	    [#assign s = variable.valueList]
+	    [#assign index = 0]
+        [#list s as i]
+          [#if index == 0]
+            [#assign semaphoreName = i]
+          [/#if] 
+          [#assign index = index + 1]
+        [/#list] 
+        osSemaphoreId ${semaphoreName}Handle;
+      [/#if]
+      
+      [#if variable.name=="BinarySemaphores"]
+	    [#assign s = variable.valueList]
+	    [#assign index = 0]
+        [#list s as i]
+          [#if index == 0]
+            [#assign semaphoreName = i]
+          [/#if] 
+          [#assign index = index + 1]
+        [/#list] 
+        osSemaphoreId ${semaphoreName}Handle;
+      [/#if]
+      
+    [/#list] 
+     
+  [/#if]
+[/#list]
 [/#compress]

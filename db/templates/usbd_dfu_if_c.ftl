@@ -99,11 +99,13 @@ static uint8_t *MEM_If_Read_HS  (uint8_t *src, uint8_t *dest, uint32_t Len);
 static uint16_t MEM_If_DeInit_HS(void);
 static uint16_t MEM_If_GetStatus_HS (uint32_t Add, uint8_t Cmd, uint8_t *buffer);
 [/#if]
-
+#if defined ( __ICCARM__ ) /*!< IAR Compiler */
+  #pragma data_alignment=4   
+#endif
 [#if handleNameFS == "FS" || handleNameUSB_FS == "FS"]
-USBD_DFU_MediaTypeDef USBD_DFU_fops_FS =
+__ALIGN_BEGIN USBD_DFU_MediaTypeDef USBD_DFU_fops_FS __ALIGN_END =
 {
-    "DFU MEDIA",
+    (uint8_t *)"DFU MEDIA",
     MEM_If_Init_FS,
     MEM_If_DeInit_FS,
     MEM_If_Erase_FS,
@@ -114,9 +116,9 @@ USBD_DFU_MediaTypeDef USBD_DFU_fops_FS =
 [/#if]
 
 [#if handleNameHS == "HS"]
-USBD_DFU_MediaTypeDef USBD_DFU_fops_HS =
+__ALIGN_BEGIN USBD_DFU_MediaTypeDef USBD_DFU_fops_HS __ALIGN_END =
 {
-    "DFU MEDIA",
+    (uint8_t *)"DFU MEDIA",
     MEM_If_Init_HS,
     MEM_If_DeInit_HS,
     MEM_If_Erase_HS,
@@ -131,7 +133,7 @@ USBD_DFU_MediaTypeDef USBD_DFU_fops_HS =
   * @brief  MEM_If_Init_FS
   *         Memory initialization routine.
   * @param  None
-  * @retval 0 if operation is successeful, MAL_FAIL else.
+  * @retval 0 if operation is successful, MAL_FAIL else.
   */
 uint16_t MEM_If_Init_FS(void)
 { 
@@ -142,9 +144,9 @@ uint16_t MEM_If_Init_FS(void)
 
 /**
   * @brief  MEM_If_DeInit_FS
-  *         Memory deinitialization routine.
+  *         De-Initializes Memory.
   * @param  None
-  * @retval 0 if operation is successeful, MAL_FAIL else.
+  * @retval 0 if operation is successful, MAL_FAIL else.
   */
 uint16_t MEM_If_DeInit_FS(void)
 { 
@@ -157,7 +159,7 @@ uint16_t MEM_If_DeInit_FS(void)
   * @brief  MEM_If_Erase_FS
   *         Erase sector.
   * @param  Add: Address of sector to be erased.
-  * @retval 0 if operation is successeful, MAL_FAIL else.
+  * @retval 0 if operation is successful, MAL_FAIL else.
   */
 uint16_t MEM_If_Erase_FS(uint32_t Add)
 {
@@ -169,9 +171,10 @@ uint16_t MEM_If_Erase_FS(uint32_t Add)
 /**
   * @brief  MEM_If_Write_FS
   *         Memory write routine.
-  * @param  Add: Address to be written to.
+  * @param  src: Pointer to the source buffer. Address to be written to.
+  * @param  dest: Pointer to the destination buffer.
   * @param  Len: Number of data to be written (in bytes).
-  * @retval 0 if operation is successeful, MAL_FAIL else.
+  * @retval 0 if operation is successful, MAL_FAIL else.
   */
 uint16_t MEM_If_Write_FS(uint8_t *src, uint8_t *dest, uint32_t Len)
 {
@@ -183,9 +186,10 @@ uint16_t MEM_If_Write_FS(uint8_t *src, uint8_t *dest, uint32_t Len)
 /**
   * @brief  MEM_If_Read_FS
   *         Memory read routine.
-  * @param  Add: Address to be read from.
+  * @param  src: Pointer to the source buffer. Address to be written to.
+  * @param  dest: Pointer to the destination buffer.
   * @param  Len: Number of data to be read (in bytes).
-  * @retval Pointer to the phyisical address where data should be read.
+  * @retval Pointer to the physical address where data should be read.
   */
 uint8_t *MEM_If_Read_FS (uint8_t *src, uint8_t *dest, uint32_t Len)
 {
@@ -197,10 +201,11 @@ uint8_t *MEM_If_Read_FS (uint8_t *src, uint8_t *dest, uint32_t Len)
 
 /**
   * @brief  Flash_If_GetStatus_FS
-  *         Memory read routine.
+  *         Get status routine.
   * @param  Add: Address to be read from.
-  * @param  cmd: Number of data to be read (in bytes).
-  * @retval Pointer to the phyisical address where data should be read.
+  * @param  Cmd: Number of data to be read (in bytes).
+  * @param  buffer: used for returning the time necessary for a program or an erase operation
+  * @retval 0 if operation is successful
   */
 uint16_t MEM_If_GetStatus_FS (uint32_t Add, uint8_t Cmd, uint8_t *buffer)
 {
@@ -226,7 +231,7 @@ uint16_t MEM_If_GetStatus_FS (uint32_t Add, uint8_t Cmd, uint8_t *buffer)
   * @brief  MEM_If_Init_HS
   *         Memory initialization routine.
   * @param  None
-  * @retval 0 if operation is successeful, MAL_FAIL else.
+  * @retval 0 if operation is successful, MAL_FAIL else.
   */
 uint16_t MEM_If_Init_HS(void)
 { 
@@ -237,9 +242,9 @@ uint16_t MEM_If_Init_HS(void)
 
 /**
   * @brief  MEM_If_DeInit_HS
-  *         Memory deinitialization routine.
+   *         De-Initializes Memory.
   * @param  None
-  * @retval 0 if operation is successeful, MAL_FAIL else.
+  * @retval 0 if operation is successful, MAL_FAIL else.
   */
 uint16_t MEM_If_DeInit_HS(void)
 { 
@@ -252,7 +257,7 @@ uint16_t MEM_If_DeInit_HS(void)
   * @brief  MEM_If_Erase_HS
   *         Erase sector.
   * @param  Add: Address of sector to be erased.
-  * @retval 0 if operation is successeful, MAL_FAIL else.
+  * @retval 0 if operation is successful, MAL_FAIL else.
   */
 uint16_t MEM_If_Erase_HS(uint32_t Add)
 {
@@ -264,9 +269,10 @@ uint16_t MEM_If_Erase_HS(uint32_t Add)
 /**
   * @brief  MEM_If_Write_HS
   *         Memory write routine.
-  * @param  Add: Address to be written to.
+  * @param  src: Pointer to the source buffer. Address to be written to.
+  * @param  dest: Pointer to the destination buffer.
   * @param  Len: Number of data to be written (in bytes).
-  * @retval 0 if operation is successeful, MAL_FAIL else.
+  * @retval 0 if operation is successful, MAL_FAIL else.
   */
 uint16_t MEM_If_Write_HS(uint8_t *src, uint8_t *dest, uint32_t Len)
 {
@@ -278,9 +284,10 @@ uint16_t MEM_If_Write_HS(uint8_t *src, uint8_t *dest, uint32_t Len)
 /**
   * @brief  MEM_If_Read_HS
   *         Memory read routine.
-  * @param  Add: Address to be read from.
+  * @param  src: Pointer to the source buffer. Address to be written to.
+  * @param  dest: Pointer to the destination buffer.
   * @param  Len: Number of data to be read (in bytes).
-  * @retval Pointer to the phyisical address where data should be read.
+  * @retval Pointer to the physical address where data should be read.
   */
 uint8_t *MEM_If_Read_HS (uint8_t *src, uint8_t *dest, uint32_t Len)
 {
@@ -292,10 +299,11 @@ uint8_t *MEM_If_Read_HS (uint8_t *src, uint8_t *dest, uint32_t Len)
 
 /**
   * @brief  Flash_If_GetStatus_HS
-  *         Memory read routine.
+  *         Get status routine.
   * @param  Add: Address to be read from.
-  * @param  cmd: Number of data to be read (in bytes).
-  * @retval Pointer to the phyisical address where data should be read.
+  * @param  Cmd: Number of data to be read (in bytes).
+  * @param  buffer: used for returning the time necessary for a program or an erase operation
+  * @retval 0 if operation is successful
   */
 uint16_t MEM_If_GetStatus_HS (uint32_t Add, uint8_t Cmd, uint8_t *buffer)
 {

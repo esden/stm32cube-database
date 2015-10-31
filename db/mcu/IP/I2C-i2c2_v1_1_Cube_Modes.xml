@@ -99,7 +99,7 @@
     </RefParameter>  
     
     <RefParameter Comment="Primary slave address" DefaultValue="0" Max="1023" Min="0" Name="OwnAddress" Type="integer" Group="Slave Features">
-    	<Description>The generated value of the address is shifted left by 1 bit.</Description>        
+    	
     </RefParameter>
     
     <RefParameter Comment="Primary slave address" DefaultValue="=(OwnAddress*2)" Max="1023" Min="0" Name="OwnAddress1" Type="integer" Group="Slave Features" Visible="false">
@@ -111,13 +111,25 @@
     </RefParameter>
 
 
+<RefParameter Comment="Secondary slave address" DefaultValue="0" Max="0" Min="0" Name="OwnAddress2" Type="integer" Group="Slave Features" Visible="false">
+        <Condition Diagnostic="Address value from 0 to 127" Expression="DualAddressMode=I2C_DUALADDRESS_DISABLED"/>        
+		        <Description>The generated value of the address is shifted left by 1 bit.</Description>       
+    </RefParameter>
+	   
+    
+    <RefParameter Comment="Secondary slave address" DefaultValue="0" Max="127" Min="0" Name="OwnAddress2" Type="integer" Group="Slave Features" Visible="true">
+	        <Description>The generated value of the address is shifted left by 1 bit.</Description>       
+
+    </RefParameter>
+
+
 <!--specifier seconde address pour slave avec 7 bit adressage et dual mode activer -->
-<RefParameter Comment="Secondary slave address" DefaultValue="0" Max="127" Min="0" Name="OwnAddress2" Type="integer" Group="Slave Features" Visible="false">
+<RefParameter Comment="Secondary slave address" DefaultValue="=(OwnAddress2*2)" Max="127" Min="0" Name="OwnAddress22" Type="integer" Group="Slave Features" Visible="false">
         <Condition Diagnostic="Address value from 0 to 127" Expression="DualAddressMode=I2C_DUALADDRESS_DISABLED"/>    
 <PossibleValue Comment=" 0" Value="0"/>			
 </RefParameter>
     
-<RefParameter Comment="Secondary slave address" DefaultValue="0" Max="127" Min="0" Name="OwnAddress2" Type="integer" Group="Slave Features" Visible="true">
+<RefParameter Comment="Secondary slave address" DefaultValue="=(OwnAddress2*2)" Max="127" Min="0" Name="OwnAddress22" Type="integer" Group="Slave Features" Visible="false">
     
 </RefParameter>
     
@@ -211,9 +223,13 @@
 </RefParameter>
 			
 <!--Specifies the Timout Register value  -->
-				
-				 <RefParameter Comment="Timeout" DefaultValue="0x00000000" Name="Timeout" Type="string" Group="Timeout configuration"/>
-				 
+<RefParameter Comment="Timeout" DefaultValue="0x00008019" Name="Timeout" Type="string" Group="Timeout configuration">
+<Condition Expression="STM32L0" Diagnostic=""/>
+</RefParameter>
+<RefParameter Comment="Timeout" DefaultValue="0x00008061" Name="Timeout" Type="string" Group="Timeout configuration">
+<Condition Expression="STM32F0|STM32F1|STM32F3" Diagnostic=""/>
+</RefParameter>
+<RefParameter Comment="Timeout" DefaultValue="0x00008019" Name="Timeout" Type="string" Group="Timeout configuration"/>
 				 
 <!--SMBus Features -->
 <!-- Specifies if Packet Error Check mode is selected-->							
@@ -246,34 +262,77 @@
         <PossibleValue Comment="10-bit" Value="SMBUS_ADDRESSINGMODE_10BIT"/>       
 </RefParameter>
 <RefParameter Comment="Primary Address Length selection" DefaultValue="null" Name="SMBusAddressingMode" Type="list" Group="SMBus Slave Features" Visible="false" />
-	
-	<RefParameter Comment="Secondary slave address" DefaultValue="0" Max="127" Min="0" Name="SMBusOwnAddress1" Type="integer" Group="SMBus Slave Features" Visible="false">
+
+
+<RefParameter Comment="Primary slave address" DefaultValue="0" Max="127" Min="0" Name="SMBusOwnAddress" Type="integer" Group="SMBus Slave Features" Visible="false">
+        <Description>The generated value of the address is shifted left by 1 bit.</Description>       
+
         <Condition Diagnostic="" Expression="SMBusPeripheralMode=SMBUS_PERIPHERAL_MODE_SMBUS_SLAVE_ARP"/>   
 		<PossibleValue Comment=" 0" Value="0"/>	
 </RefParameter>
-<RefParameter Comment="Primary slave address" DefaultValue="0" Max="127" Min="0" Name="SMBusOwnAddress1" Type="integer" Group="SMBus Slave Features">
+<RefParameter Comment="Primary slave address" DefaultValue="0" Max="127" Min="0" Name="SMBusOwnAddress" Type="integer" Group="SMBus Slave Features">
+        <Description>The generated value of the address is shifted left by 1 bit.</Description>       
+
         <Condition Diagnostic="Address value from 0 to 127" Expression="SMBusAddressingMode=SMBUS_ADDRESSINGMODE_7BIT"/>        
 </RefParameter> 
-
     
-<RefParameter Comment="Primary slave address" DefaultValue="0" Max="127" Min="0" Name="SMBusOwnAddress1" Type="integer" Group="SMBus Slave Features">
+<RefParameter Comment="Primary slave address" DefaultValue="0" Max="127" Min="0" Name="SMBusOwnAddress" Type="integer" Group="SMBus Slave Features">
+        <Description>The generated value of the address is shifted left by 1 bit.</Description>       
+
         <Condition Diagnostic="Address value from 0 to 127" Expression="SMBusDualAddressMode=SMBUS_DUALADDRESS_ENABLED"/>        
 </RefParameter>  
     
     
-<RefParameter Comment="Primary slave address" DefaultValue="0" Max="1023" Min="0" Name="SMBusOwnAddress1" Type="integer" Group="SMBus Slave Features">        
+<RefParameter Comment="Primary slave address" DefaultValue="0" Max="1023" Min="0" Name="SMBusOwnAddress" Type="integer" Group="SMBus Slave Features">     
+   
+</RefParameter>
+
+<RefParameter Comment="Primary slave address" DefaultValue="0" Max="127" Min="0" Name="SMBusOwnAddress1" Type="integer" Group="SMBus Slave Features" Visible="false">
+        <Condition Diagnostic="" Expression="SMBusPeripheralMode=SMBUS_PERIPHERAL_MODE_SMBUS_SLAVE_ARP"/>   
+		<PossibleValue Comment=" 0" Value="0"/>	
+</RefParameter>
+<RefParameter Comment="Primary slave address" DefaultValue="=SMBusOwnAddress*2" Max="127" Min="0" Name="SMBusOwnAddress1" Type="integer" Group="SMBus Slave Features" Visible="false">
+        <Condition Diagnostic="Address value from 0 to 127" Expression="SMBusAddressingMode=SMBUS_ADDRESSINGMODE_7BIT"/>        
+</RefParameter> 
+    
+<RefParameter Comment="Primary slave address" DefaultValue="=SMBusOwnAddress*2" Max="127" Min="0" Name="SMBusOwnAddress1" Type="integer" Group="SMBus Slave Features" Visible="false">
+        <Condition Diagnostic="Address value from 0 to 127" Expression="SMBusDualAddressMode=SMBUS_DUALADDRESS_ENABLED"/>        
+</RefParameter>  
+    
+    
+<RefParameter Comment="Primary slave address" DefaultValue="=SMBusOwnAddress" Max="1023" Min="0" Name="SMBusOwnAddress1" Type="integer" Group="SMBus Slave Features" Visible="false">        
 </RefParameter>
     
 <RefParameter Comment="Secondary slave address" DefaultValue="0" Max="127" Min="0" Name="SMBusOwnAddress2" Type="integer" Group="SMBus Slave Features" Visible="false">
+        <Description>The generated value of the address is shifted left by 1 bit.</Description>       
+
         <Condition Diagnostic="Address value from 0 to 127" Expression="SMBusDualAddressMode=SMBUS_DUALADDRESS_DISABLED"/>  
 <PossibleValue Comment=" 0" Value="0"/>			
 </RefParameter>
     
 <RefParameter Comment="Secondary slave address" DefaultValue="0" Max="127" Min="0" Name="SMBusOwnAddress2" Type="integer" Group="SMBus Slave Features" Visible="true">
+        <Description>The generated value of the address is shifted left by 1 bit.</Description>       
+
         <Condition Diagnostic="Address value from 0 to 127" Expression="SMBusDualAddressMode=SMBUS_DUALADDRESS_ENABLED"/>  
 </RefParameter>
     
 <RefParameter Comment="Secondary slave address" DefaultValue="0" Max="127" Min="0" Name="SMBusOwnAddress2" Type="integer" Group="SMBus Slave Features" Visible="false">
+        <Description>The generated value of the address is shifted left by 1 bit.</Description>       
+
+       <!-- <Condition Diagnostic="Address value from 0 to 127" Expression="SMBusDualAddressMode=SMBUS_DUALADDRESS_ENABLED"/> -->  
+</RefParameter>
+
+
+<RefParameter Comment="Secondary slave address" DefaultValue="0" Max="127" Min="0" Name="SMBusOwnAddress22" Type="integer" Group="SMBus Slave Features" Visible="false">
+        <Condition Diagnostic="Address value from 0 to 127" Expression="SMBusDualAddressMode=SMBUS_DUALADDRESS_DISABLED"/>  
+<PossibleValue Comment=" 0" Value="0"/>			
+</RefParameter>
+    
+<RefParameter Comment="Secondary slave address" DefaultValue="=SMBusOwnAddress2*2" Max="127" Min="0" Name="SMBusOwnAddress22" Type="integer" Group="SMBus Slave Features" Visible="false">
+        <Condition Diagnostic="Address value from 0 to 127" Expression="SMBusDualAddressMode=SMBUS_DUALADDRESS_ENABLED"/>  
+</RefParameter>
+    
+<RefParameter Comment="Secondary slave address" DefaultValue="0" Max="127" Min="0" Name="SMBusOwnAddress22" Type="integer" Group="SMBus Slave Features" Visible="false">
        <!-- <Condition Diagnostic="Address value from 0 to 127" Expression="SMBusDualAddressMode=SMBUS_DUALADDRESS_ENABLED"/> -->  
 </RefParameter>
         
@@ -349,10 +408,9 @@
 
 	
 <!-- RefMode for SMBus -->
+	<RefMode Name="SMBus_common" Abstract="true">
 	
-	<RefMode Name="SMBus-two-wire-Interface" HalMode="SMBUS">
-	  <ConfigForMode>SMBus_init</ConfigForMode>      
-        <Parameter Name="I2C_Speed_Mode"/>
+    	<Parameter Name="I2C_Speed_Mode"/>
         <Parameter Name="Speed"/>      
         <Parameter Name="I2C_Rise_Time"/>
         <Parameter Name="I2C_Fall_Time"/>
@@ -364,7 +422,7 @@
 		<Parameter Name="SMBusNoStretchMode"/> 
 	    <Parameter Name="SMBusGeneralCallMode"/>
 		<Parameter Name="SMBusAddressingMode"/>	
-		<Parameter Name="SMBusOwnAddress1"/>
+		<Parameter Name="SMBusOwnAddress"/>
 	    <Parameter Name="SMBusDualAddressMode"/>  
 		<Parameter Name="SMBusOwnAddress2"/>  
         <Parameter Name="SMBusOwnAddress2Masks"/>	
@@ -375,37 +433,18 @@
 		<Parameter Name="TIMEOUTA_idle"/>
 		<Parameter Name="TIMEOUT_time"/>
 		<Parameter Name="Timeout"/>
-        
         <Parameter Name="Instance"/>
+		
+	</RefMode>
+	
+	<RefMode Name="SMBus-two-wire-Interface" HalMode="SMBUS" BaseMode="SMBus_common">
+	  <ConfigForMode>SMBus_init</ConfigForMode>      
     </RefMode> 
-	<RefMode Name="SMBus-Alert-mode" HalMode="SMBUS">
+	
+	
+	<RefMode Name="SMBus-Alert-mode" HalMode="SMBUS" BaseMode="SMBus_common">
 	  <ConfigForMode>SMBus_init</ConfigForMode>   
 	  <ConfigForMode>SMBus_alert</ConfigForMode>   
-             <Parameter Name="I2C_Speed_Mode"/>
-        <Parameter Name="Speed"/>      
-        <Parameter Name="I2C_Rise_Time"/>
-        <Parameter Name="I2C_Fall_Time"/>
-        <Parameter Name="I2C_Coeff_DF"/>
-		<Parameter Name="SMBusAnalogFilter"/>
-		<Parameter Name="Timing"/>
-		<Parameter Name="SMBusPacketErrorCheckMode"/>
-		<Parameter Name="SMBusPeripheralMode"/>
-		<Parameter Name="SMBusNoStretchMode"/> 
-	    <Parameter Name="SMBusGeneralCallMode"/>
-		<Parameter Name="SMBusAddressingMode"/>	
-		<Parameter Name="SMBusOwnAddress1"/>
-	    <Parameter Name="SMBusDualAddressMode"/>  
-		<Parameter Name="SMBusOwnAddress2"/>  
-        <Parameter Name="SMBusOwnAddress2Masks"/>	
-		<Parameter Name="TEXTEN"/>
-		<Parameter Name="TIMEOUTB_Master"/>
-		<Parameter Name="TIMEOUTB_Slave"/>
-		<Parameter Name="TIDLE"/>
-		<Parameter Name="TIMEOUTA_idle"/>
-		<Parameter Name="TIMEOUT_time"/>
-		<Parameter Name="Timeout"/>
-        
-        <Parameter Name="Instance"/>
     </RefMode> 
 
 

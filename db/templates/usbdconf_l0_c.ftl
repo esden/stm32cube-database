@@ -61,6 +61,8 @@
 		[#if variable.value?contains("CCID")][#assign className = "CCID"][/#if]
 		[#if variable.value?contains("MTP")][#assign className = "MTP"][/#if]
 		[#if variable.value?contains("CDC")][#assign className = "CDC"][/#if]
+		[#if variable.value?contains("CUSTOMHID")][#assign className = "CUSTOMHID"][/#if]
+		
 		[#if variable.value?contains("OTG_FS")][#assign handleNameFS = "FS"][/#if]
 		[#if variable.value?contains("USB_FS")][#assign handleNameUSB_FS = "FS"][/#if]
 		[#if variable.value?contains("OTG_HS")][#assign handleNameHS = "HS"][/#if]
@@ -70,6 +72,30 @@
 [#-- Global variables --]
 [/#compress]
 [/#list]
+[#if className == "AUDIO"]
+#include "usbd_audio.h"
+[/#if] 
+[#if className == "DFU"]
+#include "usbd_dfu.h"
+[/#if]  
+[#if className == "HID"]
+#include "usbd_hid.h"
+[/#if]  
+[#if className == "MSC"]
+#include "usbd_msc.h"
+[/#if]  
+[#if className == "CDC"]
+#include "usbd_cdc.h"
+[/#if]  
+[#if className == "CUSTOMHID"]
+#include "usbd_customhid.h"
+[/#if]   
+[#if className == "CCID"]
+#include "usbd_ccid.h"
+[/#if]
+[#if className == "MTP"]
+#include "usbd_mtp.h"
+[/#if]  
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
@@ -120,7 +146,7 @@ extern void SystemClock_Config(void);
 [/#if]
 
 /**
-  * @brief  Setup stage callback
+  * @brief  Setup Stage callback
   * @param  hpcd: PCD handle
   * @retval None
   */
@@ -130,7 +156,7 @@ void HAL_PCD_SetupStageCallback(PCD_HandleTypeDef *hpcd)
 }
 
 /**
-  * @brief  Data Out stage callback.
+  * @brief  Data Out Stage callback.
   * @param  hpcd: PCD handle
   * @param  epnum: Endpoint Number
   * @retval None
@@ -141,7 +167,7 @@ void HAL_PCD_DataOutStageCallback(PCD_HandleTypeDef *hpcd, uint8_t epnum)
 }
 
 /**
-  * @brief  Data In stage callback..
+  * @brief  Data In Stage callback..
   * @param  hpcd: PCD handle
   * @param  epnum: Endpoint Number
   * @retval None
@@ -194,11 +220,13 @@ void HAL_PCD_ResetCallback(PCD_HandleTypeDef *hpcd)
 
 /**
   * @brief  Suspend callback.
+  * When Low power mode is enabled the debug cannot be used (IAR, Keil doesn't support it)
   * @param  hpcd: PCD handle
   * @retval None
   */
 void HAL_PCD_SuspendCallback(PCD_HandleTypeDef *hpcd)
 {
+  /* Inform USB library that core enters in suspend Mode */
   USBD_LL_Suspend(hpcd->pData);
   /*Enter in STOP mode */
   /* USER CODE BEGIN 2 */
@@ -212,6 +240,7 @@ void HAL_PCD_SuspendCallback(PCD_HandleTypeDef *hpcd)
 
 /**
   * @brief  Resume callback.
+  * When Low power mode is enabled the debug cannot be used (IAR, Keil doesn't support it)
   * @param  hpcd: PCD handle
   * @retval None
   */
@@ -231,7 +260,7 @@ void HAL_PCD_ResumeCallback(PCD_HandleTypeDef *hpcd)
 }
 
 /**
-  * @brief  ISOC Out Incomplete callback.
+  * @brief  ISOOUTIncomplete callback.
   * @param  hpcd: PCD handle
   * @param  epnum: Endpoint Number
   * @retval None
@@ -242,7 +271,7 @@ void HAL_PCD_ISOOUTIncompleteCallback(PCD_HandleTypeDef *hpcd, uint8_t epnum)
 }
 
 /**
-  * @brief  ISOC In Incomplete callback.
+  * @brief  ISOINIncomplete callback.
   * @param  hpcd: PCD handle
   * @param  epnum: Endpoint Number
   * @retval None
@@ -253,7 +282,7 @@ void HAL_PCD_ISOINIncompleteCallback(PCD_HandleTypeDef *hpcd, uint8_t epnum)
 }
 
 /**
-  * @brief  Connect callback.
+  * @brief  ConnectCallback callback.
   * @param  hpcd: PCD handle
   * @retval None
   */
@@ -323,6 +352,10 @@ USBD_StatusTypeDef  USBD_LL_Init (USBD_HandleTypeDef *pdev)
 #tHAL_PCDEx_PMAConfig(pdev->pData , 0x81 , PCD_SNG_BUF, 0xC0);  
 #tHAL_PCDEx_PMAConfig(pdev->pData , 0x01 , PCD_SNG_BUF, 0x110);
 #tHAL_PCDEx_PMAConfig(pdev->pData , 0x82 , PCD_SNG_BUF, 0x100);  
+[/#if]
+[#if className == "CUSTOMHID"]
+#tHAL_PCDEx_PMAConfig(pdev->pData , CUSTOM_HID_EPIN_ADDR , PCD_SNG_BUF, 0x98);  
+#tHAL_PCDEx_PMAConfig(pdev->pData , CUSTOM_HID_EPOUT_ADDR , PCD_SNG_BUF, 0xD8);  
 [/#if]
 [/#if]
 #treturn USBD_OK;
@@ -531,7 +564,41 @@ void  USBD_LL_Delay (uint32_t Delay)
   */
 void *USBD_static_malloc(uint32_t size)
 {
-  static uint32_t mem[MAX_STATIC_ALLOC_SIZE];
+[#if className == "AUDIO"]
+  //static uint8_t mem[sizeof(USBD_AUDIO_HandleTypeDef)];
+  /* USER CODE BEGIN 4 */ 
+  /**
+  * To compute the request size you must use the formula:
+    AUDIO_OUT_PACKET = (USBD_AUDIO_FREQ * 2 * 2) /1000)
+    AUDIO_TOTAL_BUF_SIZE = AUDIO_OUT_PACKET * AUDIO_OUT_PACKET_NUM with 
+	Number of sub-packets in the audio transfer buffer. You can modify this value but always make sure
+    that it is an even number and higher than 3 
+	AUDIO_OUT_PACKET_NUM = 80
+  */  
+  static uint8_t mem[512];
+  /* USER CODE END 4 */
+[/#if] 
+[#if className == "DFU"]
+ static uint8_t mem[sizeof(USBD_DFU_HandleTypeDef)];
+[/#if]  
+[#if className == "HID"]
+  static uint8_t mem[sizeof(USBD_HID_HandleTypeDef)];
+[/#if]  
+[#if className == "MSC"]
+ static uint8_t mem[sizeof(USBD_MSC_BOT_HandleTypeDef)];
+[/#if]  
+[#if className == "CDC"]
+  static uint8_t mem[sizeof(USBD_CDC_HandleTypeDef)];
+[/#if]  
+[#if className == "CUSTOMHID"]
+  static uint32_t mem[sizeof(USBD_CUSTOM_HID_HandleTypeDef)];
+[/#if]   
+[#if className == "CCID"]
+  static uint32_t mem[sizeof(USBD_CCID_HandleTypeDef)];
+[/#if]  
+[#if className == "MTP"]
+  static uint32_t mem[sizeof(USBD_MTP_HandleTypeDef)];
+[/#if]
   return mem;
 }
 
@@ -545,7 +612,7 @@ void USBD_static_free(void *p)
 
 }
 
-/* USER CODE BEGIN 4 */
+/* USER CODE BEGIN 5 */
 /**
   * @brief  Configures system clock after wake-up from USB Resume CallBack: 
   *         enable HSI, PLL and select PLL as system clock source.
@@ -554,9 +621,9 @@ void USBD_static_free(void *p)
   */
 static void SystemClockConfig_Resume(void)
 {
-	SystemClock_Config();
+  SystemClock_Config();
 }
-/* USER CODE END 4 */
+/* USER CODE END 5 */
 
 
 /**
@@ -567,7 +634,7 @@ static void SystemClockConfig_Resume(void)
 */
 void HAL_PCDEx_SetConnectionState(PCD_HandleTypeDef *hpcd, uint8_t state)
 {
-/* USER CODE BEGIN 5 */
+/* USER CODE BEGIN 6 */
   if (state == 1)
   {
     /* Configure Low Connection State */
@@ -578,7 +645,7 @@ void HAL_PCDEx_SetConnectionState(PCD_HandleTypeDef *hpcd, uint8_t state)
     /* Configure High Connection State */
    
   } 
-/* USER CODE END 5 */
+/* USER CODE END 6 */
 }
 
 

@@ -35,6 +35,18 @@
   ******************************************************************************
   */
 
+[#-- SWIPdatas is a list of SWIPconfigModel --]  
+[#list SWIPdatas as SWIP]  
+[#assign NEW_DISKIO_API = "0"]
+ [#if SWIP.defines??]
+	[#list SWIP.defines as definition]	
+      [#if definition.name=="NEW_DISKIO_API"]
+	      [#assign NEW_DISKIO_API = definition.value]
+	  [/#if]
+	[/#list]
+ [/#if]
+[/#list]  
+
 /* USER CODE BEGIN 0 */
 
 /* Includes ------------------------------------------------------------------*/
@@ -52,9 +64,15 @@ static volatile DSTATUS Stat = STA_NOINIT;
 /* Private function prototypes -----------------------------------------------*/
 DSTATUS USER_initialize (void);
 DSTATUS USER_status (void);
+[#if NEW_DISKIO_API=="1"]
+DRESULT USER_read (BYTE*, DWORD, UINT);
+#if _USE_WRITE == 1
+  DRESULT USER_write (const BYTE*, DWORD, UINT);
+[#else]
 DRESULT USER_read (BYTE*, DWORD, BYTE);
 #if _USE_WRITE == 1
   DRESULT USER_write (const BYTE*, DWORD, BYTE);
+[/#if]
 #endif /* _USE_WRITE == 1 */
 #if _USE_IOCTL == 1
   DRESULT USER_ioctl (BYTE, void*);
@@ -111,7 +129,11 @@ DSTATUS USER_status(void)
   * @param  count: Number of sectors to read (1..128)
   * @retval DRESULT: Operation result
   */
+[#if NEW_DISKIO_API=="1"]
+DRESULT USER_read(BYTE *buff, DWORD sector, UINT count)
+[#else]
 DRESULT USER_read(BYTE *buff, DWORD sector, BYTE count)
+[/#if]
 {
   /* USER CODE HERE */
   
@@ -126,7 +148,11 @@ DRESULT USER_read(BYTE *buff, DWORD sector, BYTE count)
   * @retval DRESULT: Operation result
   */
 #if _USE_WRITE == 1
+[#if NEW_DISKIO_API=="1"]
+DRESULT USER_write(const BYTE *buff, DWORD sector, UINT count)
+[#else]
 DRESULT USER_write(const BYTE *buff, DWORD sector, BYTE count)
+[/#if]
 { 
   /* USER CODE HERE */
 

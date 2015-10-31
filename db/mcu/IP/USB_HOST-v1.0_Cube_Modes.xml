@@ -8,17 +8,18 @@
  	Name="USB_HOST"
  	Version="v1.0_Cube">
   <About>USB_HOST: Universal Serial Bus Host</About>
-	
-	<!-- #define to be generated in usb_conf.h -->		
 		
+	<!-- #define to be generated in usb_conf.h -->
+	<!-- Common RefParameter for mono and multi instance -->
+	<!-- i.e. USB_FS and USB_HS are together on Host/Device mode --> 	
+	<!-- Begin -->		
 	<!-- a voir si c'est utile en mode HOST -->
 	<RefParameter Name="USBH_MAX_NUM_ENDPOINTS" Comment="USBH_MAX_NUM_ENDPOINTS (Maximum number of endpoints)" Min="1" Max="255"  DefaultValue="5" Type="integer" Group="">
 		<Condition Expression="(VirtualModeFS = All_Classes) | (VirtualModeHS = All_Classes)" Diagnostic=""/>				
 		<Description>Maximum number of supported endpoints per interface for All Classes</Description>
 	</RefParameter>	
 	
-	<RefParameter Name="USBH_MAX_NUM_ENDPOINTS" Comment="USBH_MAX_NUM_ENDPOINTS (Maximum number of endpoints)" Min="1" Max="255"  DefaultValue="5" Type="integer" Group="">
-		<!--<Condition Expression="(USBH_USE_OS = 1)&amp;(VirtualMode = Audio)" Diagnostic=""/>	-->	
+	<RefParameter Name="USBH_MAX_NUM_ENDPOINTS" Comment="USBH_MAX_NUM_ENDPOINTS (Maximum number of endpoints)" Min="1" Max="255"  DefaultValue="5" Type="integer" Group="">		
 		<Condition Expression="(USBH_USE_OS = 1)&amp;((VirtualModeFS = Audio) | (VirtualModeHS = Audio))" Diagnostic=""/>				
 		<Description>Maximum number of supported endpoints per interface</Description>
 	</RefParameter>		
@@ -27,18 +28,15 @@
 		<Description>Maximum number of supported endpoints per interface</Description>
 	</RefParameter>		
 	
-	<RefParameter Name="USBH_MAX_NUM_INTERFACES" Comment="USBH_MAX_NUM_INTERFACES (Maximun number of interfaces)"  Min="1" Max="255" DefaultValue="10" Type="integer" Group="">
-		<!--<Condition Expression="VirtualMode = All_Classes " Diagnostic=""/>-->
+	<RefParameter Name="USBH_MAX_NUM_INTERFACES" Comment="USBH_MAX_NUM_INTERFACES (Maximun number of interfaces)"  Min="1" Max="255" DefaultValue="10" Type="integer" Group="">		
 		<Condition Expression="(VirtualModeFS = All_Classes) | (VirtualModeHS = All_Classes)" Diagnostic=""/>	
 		<Description>Maximum number of supported Interfaces</Description>
 	</RefParameter>
-	<RefParameter Name="USBH_MAX_NUM_INTERFACES" Comment="USBH_MAX_NUM_INTERFACES (Maximun number of interfaces)"  Min="1" Max="255" DefaultValue="10" Type="integer" Group="">
-		<!--<Condition Expression="(USBH_USE_OS = 1)&amp;(VirtualMode = Audio)" Diagnostic=""/>-->	
+	<RefParameter Name="USBH_MAX_NUM_INTERFACES" Comment="USBH_MAX_NUM_INTERFACES (Maximun number of interfaces)"  Min="1" Max="255" DefaultValue="10" Type="integer" Group="">		
 		<Condition Expression="(USBH_USE_OS = 1)&amp;((VirtualModeFS = Audio) | (VirtualModeHS = Audio))" Diagnostic=""/>
 		<Description>Maximum number of supported Interfaces</Description>
 	</RefParameter>
-	<RefParameter Name="USBH_MAX_NUM_INTERFACES" Comment="USBH_MAX_NUM_INTERFACES (Maximun number of interfaces)"  Min="1" Max="255" DefaultValue="10" Type="integer" Group="">
-		<!--<Condition Expression="VirtualMode = Audio " Diagnostic=""/>-->
+	<RefParameter Name="USBH_MAX_NUM_INTERFACES" Comment="USBH_MAX_NUM_INTERFACES (Maximun number of interfaces)"  Min="1" Max="255" DefaultValue="10" Type="integer" Group="">		
 		<Condition Expression="(VirtualModeFS = Audio) | (VirtualModeHS = Audio)" Diagnostic=""/>	
 		<Description>Maximum number of supported Interfaces</Description>
 	</RefParameter>	
@@ -46,8 +44,7 @@
 		<Description>Maximum number of supported Interfaces</Description>
 	</RefParameter>
 	
-	<RefParameter Name="USBH_MAX_NUM_SUPPORTED_CLASS" Comment="USBH_MAX_NUM_SUPPORTED_CLASS (Maximun number of supported class)"  Min="1" Max="255"  DefaultValue="5" Type="integer" Group="" >	
-		<!--<Condition Expression="VirtualMode = All_Classes" Diagnostic=""/>-->
+	<RefParameter Name="USBH_MAX_NUM_SUPPORTED_CLASS" Comment="USBH_MAX_NUM_SUPPORTED_CLASS (Maximun number of supported class)"  Min="1" Max="255"  DefaultValue="5" Type="integer" Group="" >			
 		<Condition Expression="(VirtualModeFS = All_Classes) | (VirtualModeHS = All_Classes)" Diagnostic=""/>
 		<Description>Maximum number of supported Classes</Description>
 	</RefParameter>	
@@ -88,7 +85,7 @@
 		<PossibleValue Comment="Enabled" Value="1"/>				
 		<Description>Allow to keep full configuration descriptor in RAM when further parsing is needed</Description>
 	</RefParameter>
-	<RefParameter Name="USBH_KEEP_CFG_DESCRIPTOR" Comment="USBH_KEEP_CFG_DESCRIPTOR (Keep the configuration into RAM) " DefaultValue="0" Type="list" Group="" Visible="true">		
+	<RefParameter Name="USBH_KEEP_CFG_DESCRIPTOR" Comment="USBH_KEEP_CFG_DESCRIPTOR (Keep the configuration into RAM) " DefaultValue="1" Type="list" Group="" Visible="true">		
 		<PossibleValue Comment="Enabled" Value="1"/>	
 		<PossibleValue Comment="Disabled" Value="0"/>
 		<Description>Allow to keep full configuration descriptor in RAM when further parsing is needed</Description>
@@ -202,46 +199,78 @@
 	
 	
 	<!-- RefMode for USB HOST : Support AUDIO Class-->
-	<RefMode Name="AUDIO_FS" Abstract="true" HalMode="">
+	<RefMode Name="AUDIO_FS" Abstract="false" HalMode="">
 		<ConfigForMode>USB_HOST_AUDIO_FS</ConfigForMode>
 		<Parameter Name="VirtualModeFS">		
 			<PossibleValue>Audio</PossibleValue>
 		</Parameter>
 		<!-- Parameters for Function and Buffer Configurations -->
 		<Parameter Name="USBH_MAX_NUM_ENDPOINTS">
-			<!--<PossibleValue>2</PossibleValue>-->	
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
 		</Parameter>					
-		<Parameter Name="USBH_MAX_NUM_INTERFACES"/>	
-		<Parameter Name="USBH_MAX_NUM_SUPPORTED_CLASS"/>	
-		<Parameter Name="USBH_MAX_NUM_CONFIGURATION"/>		
-		<Parameter Name="USBH_KEEP_CFG_DESCRIPTOR"/>			
-		<Parameter Name="USBH_MAX_SIZE_CONFIGURATION"/>			
-		<Parameter Name="USBH_MAX_DATA_BUFFER"/>			
-		<Parameter Name="USBH_DEBUG_LEVEL"/>			
-		<Parameter Name="USBH_USE_OS"/>
+		<Parameter Name="USBH_MAX_NUM_INTERFACES">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>	
+		<Parameter Name="USBH_MAX_NUM_SUPPORTED_CLASS">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>	
+		<Parameter Name="USBH_MAX_NUM_CONFIGURATION">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>		
+		<Parameter Name="USBH_KEEP_CFG_DESCRIPTOR">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>			
+		<Parameter Name="USBH_MAX_SIZE_CONFIGURATION">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>			
+		<Parameter Name="USBH_MAX_DATA_BUFFER">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>			
+		<Parameter Name="USBH_DEBUG_LEVEL">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>			
+		<Parameter Name="USBH_USE_OS">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>
 		<Parameter Name="hUsbHost"/>
 		<Parameter Name="id"/>
 		<Parameter Name="USBH_HandleTypeDef">
 			<PossibleValue>hUsbHostFS</PossibleValue>
 		</Parameter>
 	</RefMode>
-	<RefMode Name="AUDIO_HS" Abstract="true" HalMode="">
+	<RefMode Name="AUDIO_HS" Abstract="false" HalMode="">
 		<ConfigForMode>USB_HOST_AUDIO_HS</ConfigForMode>
 		<Parameter Name="VirtualModeHS">		
 			<PossibleValue>Audio</PossibleValue>
 		</Parameter>
 		<!-- Parameters for Function and Buffer Configurations -->
 		<Parameter Name="USBH_MAX_NUM_ENDPOINTS">
-			<!--<PossibleValue>2</PossibleValue>	-->
+			<Condition Expression="(USB_HOST_HS_CLASSES) | (USB_HOST_FS_CLASSES)" Diagnostic=""/>
 		</Parameter>					
-		<Parameter Name="USBH_MAX_NUM_INTERFACES"/>	
-		<Parameter Name="USBH_MAX_NUM_SUPPORTED_CLASS"/>	
-		<Parameter Name="USBH_MAX_NUM_CONFIGURATION"/>		
-		<Parameter Name="USBH_KEEP_CFG_DESCRIPTOR"/>			
-		<Parameter Name="USBH_MAX_SIZE_CONFIGURATION"/>			
-		<Parameter Name="USBH_MAX_DATA_BUFFER"/>			
-		<Parameter Name="USBH_DEBUG_LEVEL"/>			
-		<Parameter Name="USBH_USE_OS"/>
+		<Parameter Name="USBH_MAX_NUM_INTERFACES">
+			<Condition Expression="(USB_HOST_HS_CLASSES) | (USB_HOST_FS_CLASSES)" Diagnostic=""/>
+		</Parameter>	
+		<Parameter Name="USBH_MAX_NUM_SUPPORTED_CLASS">
+			<Condition Expression="(USB_HOST_HS_CLASSES) | (USB_HOST_FS_CLASSES)" Diagnostic=""/>
+		</Parameter>	
+		<Parameter Name="USBH_MAX_NUM_CONFIGURATION">
+			<Condition Expression="(USB_HOST_HS_CLASSES) | (USB_HOST_FS_CLASSES)" Diagnostic=""/>
+		</Parameter>		
+		<Parameter Name="USBH_KEEP_CFG_DESCRIPTOR">
+			<Condition Expression="(USB_HOST_HS_CLASSES) | (USB_HOST_FS_CLASSES)" Diagnostic=""/>
+		</Parameter>			
+		<Parameter Name="USBH_MAX_SIZE_CONFIGURATION">
+			<Condition Expression="(USB_HOST_HS_CLASSES) | (USB_HOST_FS_CLASSES)" Diagnostic=""/>
+		</Parameter>			
+		<Parameter Name="USBH_MAX_DATA_BUFFER">
+			<Condition Expression="(USB_HOST_HS_CLASSES) | (USB_HOST_FS_CLASSES)" Diagnostic=""/>
+		</Parameter>			
+		<Parameter Name="USBH_DEBUG_LEVEL">
+			<Condition Expression="(USB_HOST_HS_CLASSES) | (USB_HOST_FS_CLASSES)" Diagnostic=""/>
+		</Parameter>			
+		<Parameter Name="USBH_USE_OS">
+			<Condition Expression="(USB_HOST_HS_CLASSES) | (USB_HOST_FS_CLASSES)" Diagnostic=""/>
+		</Parameter>
 		<Parameter Name="hUsbHost"/>
 		<Parameter Name="id"/>
 		<Parameter Name="USBH_HandleTypeDef">
@@ -251,46 +280,78 @@
 	
 	
 	<!-- RefMode for USB HOST : Support CDC Class (Virtual Port Com)-->
-	<RefMode Name="CDC_FS" Abstract="true" HalMode="">
+	<RefMode Name="CDC_FS" Abstract="false" HalMode="">
 		<ConfigForMode>USB_HOST_CDC_FS</ConfigForMode>
 		<Parameter Name="VirtualModeFS">		
 			<PossibleValue>Cdc</PossibleValue>
 		</Parameter>
 		<!-- Parameters for Function and Buffer Configurations -->		
 		<Parameter Name="USBH_MAX_NUM_ENDPOINTS">
-			<!--<PossibleValue>2</PossibleValue>-->
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
 		</Parameter>					
-		<Parameter Name="USBH_MAX_NUM_INTERFACES"/>	
-		<Parameter Name="USBH_MAX_NUM_SUPPORTED_CLASS"/>	
-		<Parameter Name="USBH_MAX_NUM_CONFIGURATION"/>		
-		<Parameter Name="USBH_KEEP_CFG_DESCRIPTOR"/>			
-		<Parameter Name="USBH_MAX_SIZE_CONFIGURATION"/>			
-		<Parameter Name="USBH_MAX_DATA_BUFFER"/>			
-		<Parameter Name="USBH_DEBUG_LEVEL"/>			
-		<Parameter Name="USBH_USE_OS"/>
+		<Parameter Name="USBH_MAX_NUM_INTERFACES">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>	
+		<Parameter Name="USBH_MAX_NUM_SUPPORTED_CLASS">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>	
+		<Parameter Name="USBH_MAX_NUM_CONFIGURATION">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>		
+		<Parameter Name="USBH_KEEP_CFG_DESCRIPTOR">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>			
+		<Parameter Name="USBH_MAX_SIZE_CONFIGURATION">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>			
+		<Parameter Name="USBH_MAX_DATA_BUFFER">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>			
+		<Parameter Name="USBH_DEBUG_LEVEL">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>			
+		<Parameter Name="USBH_USE_OS">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>
 		<Parameter Name="hUsbHost"/>
 		<Parameter Name="id"/>
 		<Parameter Name="USBH_HandleTypeDef">
 			<PossibleValue>hUsbHostFS</PossibleValue>
 		</Parameter>
 	</RefMode>	
-	<RefMode Name="CDC_HS" Abstract="true" HalMode="">
+	<RefMode Name="CDC_HS" Abstract="false" HalMode="">
 		<ConfigForMode>USB_HOST_CDC_HS</ConfigForMode>
 		<Parameter Name="VirtualModeHS">		
 			<PossibleValue>Cdc</PossibleValue>
 		</Parameter>
 		<!-- Parameters for Function and Buffer Configurations -->		
 		<Parameter Name="USBH_MAX_NUM_ENDPOINTS">
-			<!--<PossibleValue>2</PossibleValue>-->
+			<Condition Expression="(USB_HOST_HS_CLASSES) | (USB_HOST_FS_CLASSES)" Diagnostic=""/>
 		</Parameter>					
-		<Parameter Name="USBH_MAX_NUM_INTERFACES"/>	
-		<Parameter Name="USBH_MAX_NUM_SUPPORTED_CLASS"/>	
-		<Parameter Name="USBH_MAX_NUM_CONFIGURATION"/>		
-		<Parameter Name="USBH_KEEP_CFG_DESCRIPTOR"/>			
-		<Parameter Name="USBH_MAX_SIZE_CONFIGURATION"/>			
-		<Parameter Name="USBH_MAX_DATA_BUFFER"/>			
-		<Parameter Name="USBH_DEBUG_LEVEL"/>			
-		<Parameter Name="USBH_USE_OS"/>
+		<Parameter Name="USBH_MAX_NUM_INTERFACES">
+			<Condition Expression="(USB_HOST_HS_CLASSES) | (USB_HOST_FS_CLASSES)" Diagnostic=""/>
+		</Parameter>	
+		<Parameter Name="USBH_MAX_NUM_SUPPORTED_CLASS">
+			<Condition Expression="(USB_HOST_HS_CLASSES) | (USB_HOST_FS_CLASSES)" Diagnostic=""/>
+		</Parameter>	
+		<Parameter Name="USBH_MAX_NUM_CONFIGURATION">
+			<Condition Expression="(USB_HOST_HS_CLASSES) | (USB_HOST_FS_CLASSES)" Diagnostic=""/>
+		</Parameter>		
+		<Parameter Name="USBH_KEEP_CFG_DESCRIPTOR">
+			<Condition Expression="(USB_HOST_HS_CLASSES) | (USB_HOST_FS_CLASSES)" Diagnostic=""/>
+		</Parameter>			
+		<Parameter Name="USBH_MAX_SIZE_CONFIGURATION">
+			<Condition Expression="(USB_HOST_HS_CLASSES) | (USB_HOST_FS_CLASSES)" Diagnostic=""/>
+		</Parameter>			
+		<Parameter Name="USBH_MAX_DATA_BUFFER">
+			<Condition Expression="(USB_HOST_HS_CLASSES) | (USB_HOST_FS_CLASSES)" Diagnostic=""/>
+		</Parameter>			
+		<Parameter Name="USBH_DEBUG_LEVEL">
+			<Condition Expression="(USB_HOST_HS_CLASSES) | (USB_HOST_FS_CLASSES)" Diagnostic=""/>
+		</Parameter>			
+		<Parameter Name="USBH_USE_OS">
+			<Condition Expression="(USB_HOST_HS_CLASSES) | (USB_HOST_FS_CLASSES)" Diagnostic=""/>
+		</Parameter>
 		<Parameter Name="hUsbHost"/>
 		<Parameter Name="id"/>
 		<Parameter Name="USBH_HandleTypeDef">
@@ -299,44 +360,78 @@
 	</RefMode>	
 	
 	<!-- RefMode for USB HOST : Support HID Class-->
-	<RefMode Name="HID_FS" Abstract="true" HalMode="">
+	<RefMode Name="HID_FS" Abstract="false" HalMode="">
 		<ConfigForMode>USB_HOST_HID_FS</ConfigForMode>
 		<Parameter Name="VirtualModeFS">		
 			<PossibleValue>Hid</PossibleValue>
 		</Parameter>
 		<!-- Parameters for Function and Buffer Configurations -->		
 		<Parameter Name="USBH_MAX_NUM_ENDPOINTS">
-			<!--<PossibleValue>2</PossibleValue>-->
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
 		</Parameter>					
-		<Parameter Name="USBH_MAX_NUM_INTERFACES"/>	
-		<Parameter Name="USBH_MAX_NUM_SUPPORTED_CLASS"/>	
-		<Parameter Name="USBH_MAX_NUM_CONFIGURATION"/>		
-		<Parameter Name="USBH_KEEP_CFG_DESCRIPTOR"/>			
-		<Parameter Name="USBH_MAX_SIZE_CONFIGURATION"/>			
-		<Parameter Name="USBH_MAX_DATA_BUFFER"/>			
-		<Parameter Name="USBH_DEBUG_LEVEL"/>			
-		<Parameter Name="USBH_USE_OS"/>
+		<Parameter Name="USBH_MAX_NUM_INTERFACES">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>	
+		<Parameter Name="USBH_MAX_NUM_SUPPORTED_CLASS">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>	
+		<Parameter Name="USBH_MAX_NUM_CONFIGURATION">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>		
+		<Parameter Name="USBH_KEEP_CFG_DESCRIPTOR">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>			
+		<Parameter Name="USBH_MAX_SIZE_CONFIGURATION">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>			
+		<Parameter Name="USBH_MAX_DATA_BUFFER">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>			
+		<Parameter Name="USBH_DEBUG_LEVEL">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>			
+		<Parameter Name="USBH_USE_OS">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>
 		<Parameter Name="hUsbHost"/>
 		<Parameter Name="id"/>
 		<Parameter Name="USBH_HandleTypeDef">
 			<PossibleValue>hUsbHostFS</PossibleValue>
 		</Parameter>
 	</RefMode>
-	<RefMode Name="HID_HS" Abstract="true" HalMode="">
+	<RefMode Name="HID_HS" Abstract="false" HalMode="">
 		<ConfigForMode>USB_HOST_HID_HS</ConfigForMode>
 		<Parameter Name="VirtualModeHS">		
 			<PossibleValue>Hid</PossibleValue>
 		</Parameter>
 		<!-- Parameters for Function and Buffer Configurations -->		
-		<Parameter Name="USBH_MAX_NUM_ENDPOINTS"/>					
-		<Parameter Name="USBH_MAX_NUM_INTERFACES"/>	
-		<Parameter Name="USBH_MAX_NUM_SUPPORTED_CLASS"/>	
-		<Parameter Name="USBH_MAX_NUM_CONFIGURATION"/>		
-		<Parameter Name="USBH_KEEP_CFG_DESCRIPTOR"/>			
-		<Parameter Name="USBH_MAX_SIZE_CONFIGURATION"/>			
-		<Parameter Name="USBH_MAX_DATA_BUFFER"/>			
-		<Parameter Name="USBH_DEBUG_LEVEL"/>			
-		<Parameter Name="USBH_USE_OS"/>
+		<Parameter Name="USBH_MAX_NUM_ENDPOINTS">
+			<Condition Expression="(USB_HOST_HS_CLASSES) | (USB_HOST_FS_CLASSES)" Diagnostic=""/>
+		</Parameter>					
+		<Parameter Name="USBH_MAX_NUM_INTERFACES">
+			<Condition Expression="(USB_HOST_HS_CLASSES) | (USB_HOST_FS_CLASSES)" Diagnostic=""/>
+		</Parameter>	
+		<Parameter Name="USBH_MAX_NUM_SUPPORTED_CLASS">
+			<Condition Expression="(USB_HOST_HS_CLASSES) | (USB_HOST_FS_CLASSES)" Diagnostic=""/>
+		</Parameter>	
+		<Parameter Name="USBH_MAX_NUM_CONFIGURATION">
+			<Condition Expression="(USB_HOST_HS_CLASSES) | (USB_HOST_FS_CLASSES)" Diagnostic=""/>
+		</Parameter>		
+		<Parameter Name="USBH_KEEP_CFG_DESCRIPTOR">
+			<Condition Expression="(USB_HOST_HS_CLASSES) | (USB_HOST_FS_CLASSES)" Diagnostic=""/>
+		</Parameter>			
+		<Parameter Name="USBH_MAX_SIZE_CONFIGURATION">
+			<Condition Expression="(USB_HOST_HS_CLASSES) | (USB_HOST_FS_CLASSES)" Diagnostic=""/>
+		</Parameter>			
+		<Parameter Name="USBH_MAX_DATA_BUFFER">
+			<Condition Expression="(USB_HOST_HS_CLASSES) | (USB_HOST_FS_CLASSES)" Diagnostic=""/>
+		</Parameter>			
+		<Parameter Name="USBH_DEBUG_LEVEL">
+			<Condition Expression="(USB_HOST_HS_CLASSES) | (USB_HOST_FS_CLASSES)" Diagnostic=""/>
+		</Parameter>			
+		<Parameter Name="USBH_USE_OS">
+			<Condition Expression="(USB_HOST_HS_CLASSES) | (USB_HOST_FS_CLASSES)" Diagnostic=""/>
+		</Parameter>
 		<Parameter Name="hUsbHost"/>
 		<Parameter Name="id"/>
 		<Parameter Name="USBH_HandleTypeDef">
@@ -345,42 +440,78 @@
 	</RefMode>
 	
 	<!-- RefMode for USB HOST : Support MSC Class (Mass Storage)-->
-	<RefMode Name="MSC_FS" Abstract="true" HalMode="">
+	<RefMode Name="MSC_FS" Abstract="false" HalMode="">
 		<ConfigForMode>USB_HOST_MSC_FS</ConfigForMode>
 		<Parameter Name="VirtualModeFS">		
 			<PossibleValue>Msc</PossibleValue>
 		</Parameter>
 		<!-- Parameters for Function and Buffer Configurations -->		
-		<Parameter Name="USBH_MAX_NUM_ENDPOINTS"/>					
-		<Parameter Name="USBH_MAX_NUM_INTERFACES"/>	
-		<Parameter Name="USBH_MAX_NUM_SUPPORTED_CLASS"/>	
-		<Parameter Name="USBH_MAX_NUM_CONFIGURATION"/>		
-		<Parameter Name="USBH_KEEP_CFG_DESCRIPTOR"/>			
-		<Parameter Name="USBH_MAX_SIZE_CONFIGURATION"/>			
-		<Parameter Name="USBH_MAX_DATA_BUFFER"/>			
-		<Parameter Name="USBH_DEBUG_LEVEL"/>			
-		<Parameter Name="USBH_USE_OS"/>	
+		<Parameter Name="USBH_MAX_NUM_ENDPOINTS">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>					
+		<Parameter Name="USBH_MAX_NUM_INTERFACES">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>	
+		<Parameter Name="USBH_MAX_NUM_SUPPORTED_CLASS">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>	
+		<Parameter Name="USBH_MAX_NUM_CONFIGURATION">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>		
+		<Parameter Name="USBH_KEEP_CFG_DESCRIPTOR">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>			
+		<Parameter Name="USBH_MAX_SIZE_CONFIGURATION">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>			
+		<Parameter Name="USBH_MAX_DATA_BUFFER">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>			
+		<Parameter Name="USBH_DEBUG_LEVEL">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>			
+		<Parameter Name="USBH_USE_OS">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>
 		<Parameter Name="hUsbHost"/>
 		<Parameter Name="id"/>
 		<Parameter Name="USBH_HandleTypeDef">
 			<PossibleValue>hUsbHostFS</PossibleValue>
 		</Parameter>
 	</RefMode>
-	<RefMode Name="MSC_HS" Abstract="true" HalMode="">
+	<RefMode Name="MSC_HS" Abstract="false" HalMode="">
 		<ConfigForMode>USB_HOST_MSC_HS</ConfigForMode>
 		<Parameter Name="VirtualModeHS">		
 			<PossibleValue>Msc</PossibleValue>
 		</Parameter>
 		<!-- Parameters for Function and Buffer Configurations -->		
-		<Parameter Name="USBH_MAX_NUM_ENDPOINTS"/>					
-		<Parameter Name="USBH_MAX_NUM_INTERFACES"/>	
-		<Parameter Name="USBH_MAX_NUM_SUPPORTED_CLASS"/>	
-		<Parameter Name="USBH_MAX_NUM_CONFIGURATION"/>		
-		<Parameter Name="USBH_KEEP_CFG_DESCRIPTOR"/>			
-		<Parameter Name="USBH_MAX_SIZE_CONFIGURATION"/>			
-		<Parameter Name="USBH_MAX_DATA_BUFFER"/>			
-		<Parameter Name="USBH_DEBUG_LEVEL"/>			
-		<Parameter Name="USBH_USE_OS"/>	
+		<Parameter Name="USBH_MAX_NUM_ENDPOINTS">
+			<Condition Expression="(USB_HOST_HS_CLASSES) | (USB_HOST_FS_CLASSES)" Diagnostic=""/>
+		</Parameter>					
+		<Parameter Name="USBH_MAX_NUM_INTERFACES">
+			<Condition Expression="(USB_HOST_HS_CLASSES) | (USB_HOST_FS_CLASSES)" Diagnostic=""/>
+		</Parameter>	
+		<Parameter Name="USBH_MAX_NUM_SUPPORTED_CLASS">
+			<Condition Expression="(USB_HOST_HS_CLASSES) | (USB_HOST_FS_CLASSES)" Diagnostic=""/>
+		</Parameter>	
+		<Parameter Name="USBH_MAX_NUM_CONFIGURATION">
+			<Condition Expression="(USB_HOST_HS_CLASSES) | (USB_HOST_FS_CLASSES)" Diagnostic=""/>
+		</Parameter>		
+		<Parameter Name="USBH_KEEP_CFG_DESCRIPTOR">
+			<Condition Expression="(USB_HOST_HS_CLASSES) | (USB_HOST_FS_CLASSES)" Diagnostic=""/>
+		</Parameter>			
+		<Parameter Name="USBH_MAX_SIZE_CONFIGURATION">
+			<Condition Expression="(USB_HOST_HS_CLASSES) | (USB_HOST_FS_CLASSES)" Diagnostic=""/>
+		</Parameter>			
+		<Parameter Name="USBH_MAX_DATA_BUFFER">
+			<Condition Expression="(USB_HOST_HS_CLASSES) | (USB_HOST_FS_CLASSES)" Diagnostic=""/>
+		</Parameter>			
+		<Parameter Name="USBH_DEBUG_LEVEL">
+			<Condition Expression="(USB_HOST_HS_CLASSES) | (USB_HOST_FS_CLASSES)" Diagnostic=""/>
+		</Parameter>			
+		<Parameter Name="USBH_USE_OS">
+			<Condition Expression="(USB_HOST_HS_CLASSES) | (USB_HOST_FS_CLASSES)" Diagnostic=""/>
+		</Parameter>	
 		<Parameter Name="hUsbHost"/>
 		<Parameter Name="id"/>
 		<Parameter Name="USBH_HandleTypeDef">
@@ -389,42 +520,78 @@
 	</RefMode>
 	
 	<!-- RefMode for USB HOST : Support MSC Class (Mass Storage)-->
-	<RefMode Name="ALL_Classes_FS"  Abstract="true" HalMode="">
+	<RefMode Name="ALL_Classes_FS"  Abstract="false" HalMode="">
 		<ConfigForMode>USB_HOST_ALL_CLASSES_FS</ConfigForMode>
 		<Parameter Name="VirtualModeFS">		
 			<PossibleValue>All_Classes</PossibleValue>
 		</Parameter>
 		<!-- Parameters for Function and Buffer Configurations -->		
-		<Parameter Name="USBH_MAX_NUM_ENDPOINTS"/>					
-		<Parameter Name="USBH_MAX_NUM_INTERFACES"/>	
-		<Parameter Name="USBH_MAX_NUM_SUPPORTED_CLASS"/>	
-		<Parameter Name="USBH_MAX_NUM_CONFIGURATION"/>		
-		<Parameter Name="USBH_KEEP_CFG_DESCRIPTOR"/>			
-		<Parameter Name="USBH_MAX_SIZE_CONFIGURATION"/>			
-		<Parameter Name="USBH_MAX_DATA_BUFFER"/>			
-		<Parameter Name="USBH_DEBUG_LEVEL"/>			
-		<Parameter Name="USBH_USE_OS"/>	
+		<Parameter Name="USBH_MAX_NUM_ENDPOINTS">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>					
+		<Parameter Name="USBH_MAX_NUM_INTERFACES">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>	
+		<Parameter Name="USBH_MAX_NUM_SUPPORTED_CLASS">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>	
+		<Parameter Name="USBH_MAX_NUM_CONFIGURATION">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>		
+		<Parameter Name="USBH_KEEP_CFG_DESCRIPTOR">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>			
+		<Parameter Name="USBH_MAX_SIZE_CONFIGURATION">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>			
+		<Parameter Name="USBH_MAX_DATA_BUFFER">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>			
+		<Parameter Name="USBH_DEBUG_LEVEL">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>			
+		<Parameter Name="USBH_USE_OS">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>
 		<Parameter Name="hUsbHost"/>
 		<Parameter Name="id"/>
 		<Parameter Name="USBH_HandleTypeDef">
 			<PossibleValue>hUsbHostFS</PossibleValue>
 		</Parameter>
 	</RefMode>
-	<RefMode Name="ALL_Classes_HS"  Abstract="true" HalMode="">
+	<RefMode Name="ALL_Classes_HS"  Abstract="false" HalMode="">
 		<ConfigForMode>USB_HOST_ALL_CLASSES_HS</ConfigForMode>
 		<Parameter Name="VirtualModeHS">		
 			<PossibleValue>All_Classes</PossibleValue>
 		</Parameter>
 		<!-- Parameters for Function and Buffer Configurations -->		
-		<Parameter Name="USBH_MAX_NUM_ENDPOINTS"/>					
-		<Parameter Name="USBH_MAX_NUM_INTERFACES"/>	
-		<Parameter Name="USBH_MAX_NUM_SUPPORTED_CLASS"/>	
-		<Parameter Name="USBH_MAX_NUM_CONFIGURATION"/>		
-		<Parameter Name="USBH_KEEP_CFG_DESCRIPTOR"/>			
-		<Parameter Name="USBH_MAX_SIZE_CONFIGURATION"/>			
-		<Parameter Name="USBH_MAX_DATA_BUFFER"/>			
-		<Parameter Name="USBH_DEBUG_LEVEL"/>			
-		<Parameter Name="USBH_USE_OS"/>	
+		<Parameter Name="USBH_MAX_NUM_ENDPOINTS">
+			<Condition Expression="(USB_HOST_HS_CLASSES) | (USB_HOST_FS_CLASSES)" Diagnostic=""/>
+		</Parameter>					
+		<Parameter Name="USBH_MAX_NUM_INTERFACES">
+			<Condition Expression="(USB_HOST_HS_CLASSES) | (USB_HOST_FS_CLASSES)" Diagnostic=""/>
+		</Parameter>	
+		<Parameter Name="USBH_MAX_NUM_SUPPORTED_CLASS">
+			<Condition Expression="(USB_HOST_HS_CLASSES) | (USB_HOST_FS_CLASSES)" Diagnostic=""/>
+		</Parameter>	
+		<Parameter Name="USBH_MAX_NUM_CONFIGURATION">
+			<Condition Expression="(USB_HOST_HS_CLASSES) | (USB_HOST_FS_CLASSES)" Diagnostic=""/>
+		</Parameter>		
+		<Parameter Name="USBH_KEEP_CFG_DESCRIPTOR">
+			<Condition Expression="(USB_HOST_HS_CLASSES) | (USB_HOST_FS_CLASSES)" Diagnostic=""/>
+		</Parameter>			
+		<Parameter Name="USBH_MAX_SIZE_CONFIGURATION">
+			<Condition Expression="(USB_HOST_HS_CLASSES) | (USB_HOST_FS_CLASSES)" Diagnostic=""/>
+		</Parameter>			
+		<Parameter Name="USBH_MAX_DATA_BUFFER">
+			<Condition Expression="(USB_HOST_HS_CLASSES) | (USB_HOST_FS_CLASSES)" Diagnostic=""/>
+		</Parameter>			
+		<Parameter Name="USBH_DEBUG_LEVEL">
+			<Condition Expression="(USB_HOST_HS_CLASSES) | (USB_HOST_FS_CLASSES)" Diagnostic=""/>
+		</Parameter>			
+		<Parameter Name="USBH_USE_OS">
+			<Condition Expression="(USB_HOST_HS_CLASSES) | (USB_HOST_FS_CLASSES)" Diagnostic=""/>
+		</Parameter>
 		<Parameter Name="hUsbHost"/>
 		<Parameter Name="id"/>
 		<Parameter Name="USBH_HandleTypeDef">
@@ -433,43 +600,75 @@
 	</RefMode>
 	
 	<!-- RefMode for USB HOST : Support MTP Class-->
-	<RefMode Name="MTP_FS" Abstract="true" HalMode="">
+	<RefMode Name="MTP_FS" Abstract="false" HalMode="">
 		<ConfigForMode>USB_HOST_MTP_FS</ConfigForMode>
 		<Parameter Name="VirtualModeFS">		
 			<PossibleValue>Mtp</PossibleValue>
 		</Parameter>
 		<!-- Parameters for Function and Buffer Configurations -->
 		<Parameter Name="USBH_MAX_NUM_ENDPOINTS">
-			<!--<PossibleValue>2</PossibleValue>-->
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
 		</Parameter>					
-		<Parameter Name="USBH_MAX_NUM_INTERFACES"/>	
-		<Parameter Name="USBH_MAX_NUM_SUPPORTED_CLASS"/>	
-		<Parameter Name="USBH_MAX_NUM_CONFIGURATION"/>		
-		<Parameter Name="USBH_KEEP_CFG_DESCRIPTOR"/>			
-		<Parameter Name="USBH_MAX_SIZE_CONFIGURATION"/>			
-		<Parameter Name="USBH_MAX_DATA_BUFFER"/>			
-		<Parameter Name="USBH_DEBUG_LEVEL"/>			
-		<Parameter Name="USBH_USE_OS"/>
+		<Parameter Name="USBH_MAX_NUM_INTERFACES">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>	
+		<Parameter Name="USBH_MAX_NUM_SUPPORTED_CLASS">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>	
+		<Parameter Name="USBH_MAX_NUM_CONFIGURATION">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>		
+		<Parameter Name="USBH_KEEP_CFG_DESCRIPTOR">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>			
+		<Parameter Name="USBH_MAX_SIZE_CONFIGURATION">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>			
+		<Parameter Name="USBH_MAX_DATA_BUFFER">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>			
+		<Parameter Name="USBH_DEBUG_LEVEL">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>			
+		<Parameter Name="USBH_USE_OS">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>
 		<Parameter Name="hUsbHost"/>
 		<Parameter Name="id"/>
 	</RefMode>
-	<RefMode Name="MTP_HS" Abstract="true" HalMode="">
+	<RefMode Name="MTP_HS" Abstract="false" HalMode="">
 		<ConfigForMode>USB_HOST_MTP_HS</ConfigForMode>
 		<Parameter Name="VirtualModeHS">		
 			<PossibleValue>Mtp</PossibleValue>
 		</Parameter>
 		<!-- Parameters for Function and Buffer Configurations -->
 		<Parameter Name="USBH_MAX_NUM_ENDPOINTS">
-			<!--<PossibleValue>2</PossibleValue>-->
+			<Condition Expression="(USB_HOST_HS_CLASSES) | (USB_HOST_FS_CLASSES)" Diagnostic=""/>
 		</Parameter>					
-		<Parameter Name="USBH_MAX_NUM_INTERFACES"/>	
-		<Parameter Name="USBH_MAX_NUM_SUPPORTED_CLASS"/>	
-		<Parameter Name="USBH_MAX_NUM_CONFIGURATION"/>		
-		<Parameter Name="USBH_KEEP_CFG_DESCRIPTOR"/>			
-		<Parameter Name="USBH_MAX_SIZE_CONFIGURATION"/>			
-		<Parameter Name="USBH_MAX_DATA_BUFFER"/>			
-		<Parameter Name="USBH_DEBUG_LEVEL"/>			
-		<Parameter Name="USBH_USE_OS"/>
+		<Parameter Name="USBH_MAX_NUM_INTERFACES">
+			<Condition Expression="(USB_HOST_HS_CLASSES) | (USB_HOST_FS_CLASSES)" Diagnostic=""/>
+		</Parameter>	
+		<Parameter Name="USBH_MAX_NUM_SUPPORTED_CLASS">
+			<Condition Expression="(USB_HOST_HS_CLASSES) | (USB_HOST_FS_CLASSES)" Diagnostic=""/>
+		</Parameter>	
+		<Parameter Name="USBH_MAX_NUM_CONFIGURATION">
+			<Condition Expression="(USB_HOST_HS_CLASSES) | (USB_HOST_FS_CLASSES)" Diagnostic=""/>
+		</Parameter>		
+		<Parameter Name="USBH_KEEP_CFG_DESCRIPTOR">
+			<Condition Expression="(USB_HOST_HS_CLASSES) | (USB_HOST_FS_CLASSES)" Diagnostic=""/>
+		</Parameter>			
+		<Parameter Name="USBH_MAX_SIZE_CONFIGURATION">
+			<Condition Expression="(USB_HOST_HS_CLASSES) | (USB_HOST_FS_CLASSES)" Diagnostic=""/>
+		</Parameter>			
+		<Parameter Name="USBH_MAX_DATA_BUFFER">
+			<Condition Expression="(USB_HOST_HS_CLASSES) | (USB_HOST_FS_CLASSES)" Diagnostic=""/>
+		</Parameter>			
+		<Parameter Name="USBH_DEBUG_LEVEL">
+			<Condition Expression="(USB_HOST_HS_CLASSES) | (USB_HOST_FS_CLASSES)" Diagnostic=""/>
+		</Parameter>			
+		<Parameter Name="USBH_USE_OS">
+			<Condition Expression="(USB_HOST_HS_CLASSES) | (USB_HOST_FS_CLASSES)" Diagnostic=""/>
+		</Parameter>
 		<Parameter Name="hUsbHost"/>
 		<Parameter Name="id"/>
 	</RefMode>
@@ -484,36 +683,42 @@
 								<Signal IOMode="" Name="VS_USB_HOST_AUDIO_HS"/>
 							</SignalLogicalOp>
 							<Semaphore>HOST_HIGH_SPEED</Semaphore>
+							<Semaphore>AUDIO_HS</Semaphore>
 						</Mode>
 						<Mode Name="HID_HS" UserName="Human Interface Host Class (HID)">
 							<SignalLogicalOp Name="AND">
 								<Signal IOMode="" Name="VS_USB_HOST_HID_HS"/>								
 							</SignalLogicalOp>
 							<Semaphore>HOST_HIGH_SPEED</Semaphore>
+							<Semaphore>HID_HS</Semaphore>
 						</Mode>
 						<Mode Name="MSC_HS" UserName="Mass Storage Host Class">
 							<SignalLogicalOp Name="AND">
 								<Signal IOMode="" Name="VS_USB_HOST_MSC_HS"/>
 							</SignalLogicalOp>
 							<Semaphore>USB_HOST_MSC_HS</Semaphore>
+							<Semaphore>MSC_HS</Semaphore>
 						</Mode>
 						<Mode Name="CDC_HS" UserName="Communication Host Class (Virtual Port Com)">
 							<SignalLogicalOp Name="AND">
 								<Signal IOMode="" Name="VS_USB_HOST_CDC_HS"/>
 							</SignalLogicalOp>
 							<Semaphore>HOST_HIGH_SPEED</Semaphore>
+							<Semaphore>CDC_HS</Semaphore>
 						</Mode>	
 						<Mode Name="MTP_HS" UserName="Media Transfer Protocol Class (MTP)">
 							<SignalLogicalOp Name="AND">
 								<Signal IOMode="" Name="VS_USB_HOST_MTP_HS"/>
 							</SignalLogicalOp>
 							<Semaphore>HOST_HIGH_SPEED</Semaphore>
+							<Semaphore>MTP_HS</Semaphore>
 						</Mode>	
 						<Mode Name="ALL_Classes_HS" UserName="Host Supporting ALL Classes">
 							<SignalLogicalOp Name="AND">
 								<Signal IOMode="" Name="VS_USB_HOST_ALL_CLASS_HS"/>
 							</SignalLogicalOp>
-							<Semaphore>USB_HOST_ALL_CLASS</Semaphore>					
+							<Semaphore>USB_HOST_ALL_CLASS</Semaphore>
+							<Semaphore>ALL_Classes_HS</Semaphore>
 						</Mode>	
 					</ModeLogicOperator>
 					<Semaphore>USB_HOST_HS_CLASSES</Semaphore>
@@ -528,36 +733,42 @@
 								<Signal IOMode="" Name="VS_USB_HOST_AUDIO_FS"/>
 							</SignalLogicalOp>
 							<Semaphore>HOST_FULL_SPEED</Semaphore>
+							<Semaphore>AUDIO_FS</Semaphore>
 						</Mode>
 						<Mode Name="HID_FS" UserName="Human Interface Host Class (HID)">
 							<SignalLogicalOp Name="AND">
 								<Signal IOMode="" Name="VS_USB_HOST_HID_FS"/>
 							</SignalLogicalOp>
 							<Semaphore>HOST_FULL_SPEED</Semaphore>
+							<Semaphore>HID_FS</Semaphore>
 						</Mode>
 						<Mode Name="MSC_FS" UserName="Mass Storage Host Class">
 							<SignalLogicalOp Name="AND">
 								<Signal IOMode="" Name="VS_USB_HOST_MSC_FS"/>
 							</SignalLogicalOp>
 							<Semaphore>USB_HOST_MSC_FS</Semaphore>
+							<Semaphore>MSC_FS</Semaphore>
 						</Mode>
 						<Mode Name="CDC_FS" UserName="Communication Host Class (Virtual Port Com)">
 							<SignalLogicalOp Name="AND">
 								<Signal IOMode="" Name="VS_USB_HOST_CDC_FS"/>
 							</SignalLogicalOp>
 							<Semaphore>HOST_FULL_SPEED</Semaphore>
+							<Semaphore>CDC_FS</Semaphore>
 						</Mode>	
 						<Mode Name="MTP_FS" UserName="Media Transfer Protocol Class (MTP)">
 							<SignalLogicalOp Name="AND">
 								<Signal IOMode="" Name="VS_USB_HOST_MTP_FS"/>
 							</SignalLogicalOp>
 							<Semaphore>HOST_FULL_SPEED</Semaphore>
+							<Semaphore>MTP_FS</Semaphore>
 						</Mode>	
 						<Mode Name="ALL_Classes_FS" UserName="Host Supporting ALL Classes">
 							<SignalLogicalOp Name="AND">
 								<Signal IOMode="" Name="VS_USB_HOST_ALL_CLASS_FS"/>
 							</SignalLogicalOp>
-							<Semaphore>USB_HOST_ALL_CLASS</Semaphore>					
+							<Semaphore>USB_HOST_ALL_CLASS</Semaphore>
+							<Semaphore>ALL_Classes_FS</Semaphore>
 						</Mode>								
 					</ModeLogicOperator>
 					<Semaphore>USB_HOST_FS_CLASSES</Semaphore>

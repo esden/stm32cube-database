@@ -42,6 +42,7 @@
 [#assign includeClassHid = 0] 
 [#assign includeClassMsc = 0] 
 [#assign includeClassMtp = 0]
+[#assign includeClassCustomHid = 0]
 
 [#assign instanceNb = 0]
 [#assign instanceNbCallBack = 0]
@@ -103,6 +104,14 @@
 	[#assign includeClassMtp = 1] 
 #include "usbd_mtp.h"
 	[/#if]
+	
+	[#if className == "customhid"]
+		[#if includeClassCustomHid == 0]
+		[#assign includeClassCustomHid = 1] 	
+#include "usbd_customhid.h"
+#include "usbd_custom_hid_if.h"
+		[/#if]
+	[/#if]
 [/#if]
 
 	[#if className == "audio"]
@@ -133,6 +142,14 @@
 		[#if includeClassHid == 0]
 		[#assign includeClassHid = 1] 	
 #include "usbd_hid.h"
+		[/#if]
+	[/#if]
+
+	[#if className == "customhid"]
+		[#if includeClassCustomHid == 0]
+		[#assign includeClassCustomHid = 1] 	
+#include "usbd_customhid.h"
+#include "usbd_custom_hid_if.h"
 		[/#if]
 	[/#if]
 	

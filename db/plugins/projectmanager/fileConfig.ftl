@@ -5,6 +5,9 @@
 <CMSIS>${CMSISPath}</CMSIS>  
  [#-- list of toolchains to be generated: EWARM,MDK-ARM,TrueSTUDIO,RIDE: This tag can contain one or more than one toolchain: EWARM,MDK-ARM,TrueSTUDIO,RIDE --]
 <Toolchain>${ide}</Toolchain>
+[#if ide="MDK-ARM"]
+	<Toolversion>${Toolversion}</Toolversion>
+[/#if]
 <Version>${version}</Version>
 
 <filestoremove>
@@ -32,19 +35,25 @@
     <name>${Configuration} Configuration</name>				[#-- project configuration name. Ex: STM32F407_EVAL --]
     <device>${project.deviceId}</device>		 [#--  STM32 selected device. Ex: STM32F407ZE --]
 	[#--optional part--]
-     [#-- <optimization>${project.compilerOptimization}</optimization> --]
-     <optimization></optimization>
+    <debugprobe>${DebugMode}</debugprobe>
+    [#-- <optimization>${project.compilerOptimization}</optimization> --]
+    <optimization></optimization>
     <Adefines>
        <define></define>
     </Adefines>
+    <UsedFreeRTOS>${usedfreeRTOS}</UsedFreeRTOS>
     <Aincludes>
-   		[#if ide=="EWARM" ]
-	   		<include>$PROJ_DIR$\..\..\Inc</include>
-   		[#elseif ide=="TrueSTUDIO" ]
-   			<include>..\..\..\..\Inc</include>
+    	[#if usedfreeRTOS=="true"]
+	   		[#if ide=="EWARM" ]
+		   		<include>$PROJ_DIR$\${RelativePath}Inc</include>
+	   		[#elseif ide=="TrueSTUDIO" ]
+	   			<include>..\..\${RelativePath}Inc</include>
+		    [#else]
+		   		<include>${RelativePath}Inc</include>
+		    [/#if]
 	    [#else]
-	   		<include>..\..\Inc</include>
-	    [/#if]
+	    	<include></include>
+    	[/#if]
     </Aincludes>
 	<Cdefines>
 	   [#list CdefinesList as define]
@@ -55,7 +64,7 @@
     [#-- End of optional part--]
 	<Cincludes>
 	 [#-- required includes for all generated projects --]
-	 <include>..\..\Inc</include>
+	 <include>${RelativePath}Inc</include>
      [#-- <include>${CMSISPath}\Device\ST\${family}\Include</include>
      <include>${CMSISPath}\Include</include> --]
 	   [#list halIncludePaths as halIncludePath]
@@ -128,31 +137,31 @@
 		  <group>  
 		   	<name>FreeRTOS</name>
 		    <file>
-	        <name>..\..\Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c</name>
+	        <name>${RelativePath}Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c</name>
 	      </file>
 	       <file>
-	        <name>..\..\Middlewares/Third_Party/FreeRTOS/Source/portable/IAR/ARM_CM4F/port.c</name>
+	        <name>${RelativePath}Middlewares/Third_Party/FreeRTOS/Source/portable/IAR/ARM_CM4F/port.c</name>
 	      </file>
 	       <file>
-	        <name>..\..\Middlewares/Third_Party/FreeRTOS/Source/portable/IAR/ARM_CM4F/portasm.s</name>
+	        <name>${RelativePath}Middlewares/Third_Party/FreeRTOS/Source/portable/IAR/ARM_CM4F/portasm.s</name>
 	      </file>
 	       <file>
-	        <name>..\..\Middlewares/Third_Party/FreeRTOS/Source/croutine.c</name>
+	        <name>${RelativePath}Middlewares/Third_Party/FreeRTOS/Source/croutine.c</name>
 	      </file>
 	       <file>
-	        <name>..\..\Middlewares/Third_Party/FreeRTOS/Source/list.c</name>
+	        <name>${RelativePath}Middlewares/Third_Party/FreeRTOS/Source/list.c</name>
 	      </file>
 	       <file>
-	        <name>..\..\Middlewares/Third_Party/FreeRTOS/Source/queue.c</name>
+	        <name>${RelativePath}Middlewares/Third_Party/FreeRTOS/Source/queue.c</name>
 	      </file>
 	       <file>
-	        <name>..\..\Middlewares/Third_Party/FreeRTOS/Source/tasks.c</name>
+	        <name>${RelativePath}Middlewares/Third_Party/FreeRTOS/Source/tasks.c</name>
 	      </file>
 	       <file>
-	        <name>..\..\Middlewares/Third_Party/FreeRTOS/Source/timers.c</name>
+	        <name>${RelativePath}Middlewares/Third_Party/FreeRTOS/Source/timers.c</name>
 	      </file>
 	       <file>
-	        <name>..\..\Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.c</name>
+	        <name>${RelativePath}Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.c</name>
 	      </file>
 	    </group>
 	    <group>  

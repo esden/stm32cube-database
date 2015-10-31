@@ -18,6 +18,7 @@
 [#-- End extract hal mode list used by all instances of the ip --]
 
 [#-- Define includes --]
+
 [#list IP.configModelList as instanceData]
 [#if instanceData.initServices??]
     [#if instanceData.initServices.gpio??]
@@ -435,6 +436,13 @@
     [#if serviceType=="Init"] 
            [#if initService.clock??]
             [#if initService.clock!="none"]
+                [#if FamilyName=="STM32F1" && ipName=="RTC"]
+#t#tHAL_PWR_EnableBkUpAccess();
+
+#t#t/* Enable BKP CLK enable for backup registers */
+#t#t__HAL_RCC_BKP_CLK_ENABLE();                    
+
+                [/#if]
                 #t#t/* Enable Peripheral clock */
             [#list initService.clock?split(';') as clock]            
                #t#t${clock?trim}();
@@ -510,11 +518,20 @@
                     [/#if]
                     [#if ipName?contains("_HS")]
                         #t#t#t__HAL_USB_HS_EXTI_ENABLE_IT();
-                    
+                    [#elseif ipName?contains("OTG_FS")&&FamilyName=="STM32F1"]
+                        #t#t#t__HAL_USB_OTG_FS_WAKEUP_EXTI_CLEAR_FLAG();
+                        #t#t#t__HAL_USB_OTG_FS_WAKEUP_EXTI_ENABLE_RISING_EDGE();
+                        #t#t#t__HAL_USB_OTG_FS_WAKEUP_EXTI_ENABLE_IT();
                     [#elseif ipName?contains("_FS")]
                         #t#t#t__HAL_USB_FS_EXTI_ENABLE_IT();
                     [#else]
-                        #t#t#t__HAL_USB_EXTI_ENABLE_IT();
+                        [#if FamilyName=="STM32F1"] [#-- use new macro naming for F1--]
+                            #t#t#t__HAL_USB_WAKEUP_EXTI_CLEAR_FLAG();
+                            #t#t#t__HAL_USB_WAKEUP_EXTI_ENABLE_RISING_EDGE();
+                            #t#t#t__HAL_USB_WAKEUP_EXTI_ENABLE_IT();
+                        [#else]
+                            #t#t#t__HAL_USB_EXTI_ENABLE_IT(); 
+                        [/#if]
                     [/#if]
                     [#list initService.nvic as initVector]
                        [#if initVector.vector?contains("WKUP") || initVector.vector?contains("WakeUp")]

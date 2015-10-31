@@ -74,6 +74,14 @@
 [#include "Src/usb_otg_hs_vars.tmp"]
 [/#if]
 
+/* USER CODE BEGIN 0 */
+/* USER CODE END 0 */
+
+/* Private function prototypes -----------------------------------------------*/
+/* Private functions ---------------------------------------------------------*/
+/* USER CODE BEGIN 1 */
+/* USER CODE END 1 */
+
 /*******************************************************************************
                        LL Driver Callbacks (PCD -> USB Device Library)
 *******************************************************************************/
@@ -172,21 +180,41 @@ void HAL_PCD_ResetCallback(PCD_HandleTypeDef *hpcd)
 
 /**
   * @brief  Suspend callback.
+  * When Low power mode is enabled the debug cannot be used (IAR, Keil doesn't support it)
   * @param  hpcd: PCD handle
   * @retval None
   */
 void HAL_PCD_SuspendCallback(PCD_HandleTypeDef *hpcd)
-{
+{  
+  /* Inform USB library that core enters in suspend Mode */
   USBD_LL_Suspend(hpcd->pData);
+  __HAL_PCD_GATE_PHYCLOCK(hpcd);
+  /*Enter in STOP mode */
+  /* USER CODE BEGIN 2 */
+  if (hpcd->Init.low_power_enable)
+  {
+    /* Set SLEEPDEEP bit and SleepOnExit of Cortex System Control Register */
+    //SCB->SCR |= (uint32_t)((uint32_t)(SCB_SCR_SLEEPDEEP_Msk | SCB_SCR_SLEEPONEXIT_Msk));
+  }
+  /* USER CODE END 2 */
 }
 
 /**
   * @brief  Resume callback.
+    When Low power mode is enabled the debug cannot be used (IAR, Keil doesn't support it)
   * @param  hpcd: PCD handle
   * @retval None
   */
 void HAL_PCD_ResumeCallback(PCD_HandleTypeDef *hpcd)
 {
+  /* USER CODE BEGIN 3 */
+  if (hpcd->Init.low_power_enable)
+  {    
+    /* Reset SLEEPDEEP bit of Cortex System Control Register */
+    //SCB->SCR &= (uint32_t)~((uint32_t)(SCB_SCR_SLEEPDEEP_Msk | SCB_SCR_SLEEPONEXIT_Msk));    
+  }  
+  /* USER CODE END 3 */
+  __HAL_PCD_UNGATE_PHYCLOCK(hpcd);
   USBD_LL_Resume(hpcd->pData);
 }
 

@@ -39,11 +39,6 @@
 	</RefParameter>
 	
 	<RefParameter Comment="Frame Format" DefaultValue="SPI_TIMODE_DISABLED" Name="TIMode" Type="list" Group="Basic Parameters">
-		<Condition Expression="(VirtualNSS = VM_NSSHARD) &amp; (DIE427 | DIE436 | DIE429 | DIE437)" Diagnostic="" />
-		<PossibleValue Comment="Motorola" Value="SPI_TIMODE_DISABLED"/>
-		<PossibleValue Comment="TI" Value="SPI_TIMODE_ENABLED"/>
-	</RefParameter>
-	<RefParameter Comment="Frame Format" DefaultValue="SPI_TIMODE_DISABLED" Name="TIMode" Type="list" Group="Basic Parameters">
 		<PossibleValue Comment="Motorola" Value="SPI_TIMODE_DISABLED"/>
 	</RefParameter>
 	
@@ -71,6 +66,14 @@
 		<PossibleValue Comment="256" Value="SPI_BAUDRATEPRESCALER_256"/>
 	</RefParameter>
 	
+	<RefParameter Comment="Baud Rate" DefaultValue="8000000" Name="CalculateBaudRate" Min="0" Max="18000000" Type="string" Group="Clock Parameters" >
+		<Description>Calculated Baudrate value based on SPI Clock source and Prescaler</Description>
+		<Condition Expression="DIE430" Diagnostic=""/>
+	</RefParameter>
+	<RefParameter Comment="Baud Rate" DefaultValue="8000000" Name="CalculateBaudRate" Min="0" Max="16000000" Type="string" Group="Clock Parameters" >
+		<Description>Calculated Baudrate value based on SPI Clock source and Prescaler</Description>
+		<Condition Expression="DIE416" Diagnostic=""/>
+	</RefParameter>
 	<RefParameter Comment="Baud Rate" DefaultValue="8000000" Name="CalculateBaudRate" Min="0" Max="12000000" Type="string" Group="Clock Parameters" >
 		<Description>Calculated Baudrate value based on SPI Clock source and Prescaler</Description>
 		<Condition Expression="$IpInstance_Slave &amp; $IpInstance_Transmit" Diagnostic=""/>
@@ -80,8 +83,8 @@
 		<Description>Calculated Baudrate value based on SPI Clock source and Prescaler</Description>
 		<Condition Expression="($IpInstance_Slave &amp; (TIMode = SPI_TIMODE_ENABLED)) | $IpInstance_Master" Diagnostic=""/>
 	</RefParameter>
-	
-	<RefParameter Comment="Baud Rate" DefaultValue="8000000" Name="CalculateBaudRate" Min="0" Max="42000000" Type="string" Group="Clock Parameters" >
+    
+	<RefParameter Comment="Baud Rate" DefaultValue="8000000" Name="CalculateBaudRate" Min="0" Max="12000000" Type="string" Group="Clock Parameters" >
 		<Description>Calculated Baudrate value based on SPI Clock source and Prescaler</Description>
 	</RefParameter>
 		
@@ -367,7 +370,7 @@
             <ModeLogicOperator Name="XOR">
 				<Mode Name="Full_Duplex_Master" UserName="Full-Duplex Master">
 					<SignalLogicalOp Name="AND">
-						<Signal Name="MISO"/>
+						<Signal Name="MISO" IOMode="Input"/>
 						<Signal Name="MOSI"/>
 						<Signal Name="SCK"/>
 					</SignalLogicalOp>
@@ -376,9 +379,9 @@
 				</Mode>
 				<Mode Name="Full_Duplex_Slave" UserName="Full-Duplex Slave">
 					<SignalLogicalOp Name="AND">
-						<Signal Name="MISO"/>
-						<Signal Name="MOSI"/>
-						<Signal Name="SCK"/>
+						<Signal Name="MISO" IOMode="AlternateFunctionOpenDrainAndPushPull"/>
+						<Signal Name="MOSI" IOMode="Input"/>
+						<Signal Name="SCK" IOMode="Input"/>
 					</SignalLogicalOp>
 					<Semaphore>$IpInstance_DmaTransmit</Semaphore>
 					<Semaphore>$IpInstance_DmaReceive</Semaphore>
@@ -394,8 +397,8 @@
 				</Mode>
             	<Mode Name="Simplex_Bidirectional_Slave" UserName="Half-Duplex Slave">
 					<SignalLogicalOp Name="AND">
-						<Signal Name="MISO"/>
-						<Signal Name="SCK"/>
+						<Signal Name="MISO" IOMode="AlternateFunctionOpenDrainAndPushPull"/>
+						<Signal Name="SCK" IOMode="Input"/>
 					</SignalLogicalOp>
             		<Semaphore>$IpInstance_DmaTransmit</Semaphore>
             		<Semaphore>$IpInstance_DmaReceive</Semaphore>
@@ -412,7 +415,7 @@
             		<!-- SPI is in 'Full-Duplex' Mode, but only 'Slave In' line is on pinout -->
 					<SignalLogicalOp Name="AND">
 						<Signal Name="MOSI"/>	
-						<Signal Name="SCK"/>
+						<Signal Name="SCK" IOMode="Input"/>
 					</SignalLogicalOp>
             		<Semaphore>$IpInstance_DmaReceive</Semaphore>
 				</Mode>
@@ -428,7 +431,7 @@
             		<!-- SPI is in 'Full-Duplex' Mode, but only 'Slave Out' line is on pinout -->
 					<SignalLogicalOp Name="AND">
 						<Signal Name="MISO"/>
-						<Signal Name="SCK"/>
+						<Signal Name="SCK" IOMode="Input"/>
 					</SignalLogicalOp>
             		<Semaphore>$IpInstance_DmaTransmit</Semaphore>
 					<Semaphore>$IpInstance_Slave</Semaphore>

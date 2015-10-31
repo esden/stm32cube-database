@@ -164,8 +164,10 @@ USBD_AUDIO_ItfTypeDef USBD_AUDIO_fops_HS =
 /**
   * @brief  AUDIO_Init_FS
   *         Initializes the AUDIO media low layer over USB FS IP
-  * @param  None
-  * @retval Result of the opeartion: USBD_OK if all operations are OK else USBD_FAIL
+  * @param  AudioFreq: Audio frequency used to play the audio stream.
+  * @param  Volume: Initial volume level (from 0 (Mute) to 100 (Max))
+  * @param  options: Reserved for future use 
+  * @retval Result of the operation: USBD_OK if all operations are OK else USBD_FAIL
   */
 static int8_t AUDIO_Init_FS(uint32_t  AudioFreq, uint32_t Volume, uint32_t options)
 {
@@ -178,8 +180,8 @@ static int8_t AUDIO_Init_FS(uint32_t  AudioFreq, uint32_t Volume, uint32_t optio
 /**
   * @brief  AUDIO_DeInit_FS
   *         DeInitializes the AUDIO media low layer
-  * @param  None
-  * @retval Result of the opeartion: USBD_OK if all operations are OK else USBD_FAIL
+  * @param  options: Reserved for future use
+  * @retval Result of the operation: USBD_OK if all operations are OK else USBD_FAIL
   */
 static int8_t AUDIO_DeInit_FS(uint32_t options)
 {
@@ -191,11 +193,11 @@ static int8_t AUDIO_DeInit_FS(uint32_t options)
 
 /**
   * @brief  AUDIO_AudioCmd_FS
-  *         AUDIO command handler 
-  * @param  Buf: Buffer of data to be sent
+  *         Handles AUDIO command.
+  * @param  pbuf: Pointer to buffer of data to be sent
   * @param  size: Number of data to be sent (in bytes)
-  * @param  cmd: command opcode
-  * @retval Result of the opeartion: USBD_OK if all operations are OK else USBD_FAIL
+  * @param  cmd: Command opcode
+  * @retval Result of the operation: USBD_OK if all operations are OK else USBD_FAIL
   */
 static int8_t AUDIO_AudioCmd_FS (uint8_t* pbuf, uint32_t size, uint8_t cmd)
 {
@@ -214,9 +216,10 @@ static int8_t AUDIO_AudioCmd_FS (uint8_t* pbuf, uint32_t size, uint8_t cmd)
 }
 
 /**
-  * @brief  AUDIO_VolumeCtl_FS              
+  * @brief  AUDIO_VolumeCtl_FS   
+  *         Controls AUDIO Volume.
   * @param  vol: volume level (0..100)
-  * @retval Result of the opeartion: USBD_OK if all operations are OK else USBD_FAIL
+  * @retval Result of the operation: USBD_OK if all operations are OK else USBD_FAIL
   */
 static int8_t AUDIO_VolumeCtl_FS (uint8_t vol)
 {
@@ -226,9 +229,10 @@ static int8_t AUDIO_VolumeCtl_FS (uint8_t vol)
 }
 
 /**
-  * @brief  AUDIO_MuteCtl_FS              
-  * @param  cmd: vmute command
-  * @retval Result of the opeartion: USBD_OK if all operations are OK else USBD_FAIL
+  * @brief  AUDIO_MuteCtl_FS
+  *         Controls AUDIO Mute.   
+  * @param  cmd: command opcode
+  * @retval Result of the operation: USBD_OK if all operations are OK else USBD_FAIL
   */
 static int8_t AUDIO_MuteCtl_FS (uint8_t cmd)
 {
@@ -239,8 +243,8 @@ static int8_t AUDIO_MuteCtl_FS (uint8_t cmd)
 
 /**
   * @brief  AUDIO_PeriodicT_FS              
-  * @param  cmd
-  * @retval Result of the opeartion: USBD_OK if all operations are OK else USBD_FAIL
+  * @param  cmd: Command opcode
+  * @retval Result of the operation: USBD_OK if all operations are OK else USBD_FAIL
   */
 static int8_t AUDIO_PeriodicTC_FS (uint8_t cmd)
 {
@@ -250,9 +254,10 @@ static int8_t AUDIO_PeriodicTC_FS (uint8_t cmd)
 }
 
 /**
-  * @brief  AUDIO_GetState_FS       
+  * @brief  AUDIO_GetState_FS
+  *         Gets AUDIO State.  
   * @param  None
-  * @retval Result of the opeartion: USBD_OK if all operations are OK else USBD_FAIL
+  * @retval Result of the operation: USBD_OK if all operations are OK else USBD_FAIL
   */
 static int8_t AUDIO_GetState_FS (void)
 {
@@ -289,8 +294,10 @@ void HalfTransfer_CallBack_FS(void)
 /**
   * @brief  AUDIO_Init_HS
   *         Initializes the AUDIO media low layer over ths USB HS IP
-  * @param  None
-  * @retval Result of the opeartion: USBD_OK if all operations are OK else USBD_FAIL
+  * @param  AudioFreq: Audio frequency used to play the audio stream.
+  * @param  Volume: Initial volume level (from 0 (Mute) to 100 (Max))
+  * @param  options: Reserved for future use 
+  * @retval Result of the operation: USBD_OK if all operations are OK else USBD_FAIL
   */
 static int8_t AUDIO_Init_HS(uint32_t  AudioFreq, uint32_t Volume, uint32_t options)
 {
@@ -303,8 +310,8 @@ static int8_t AUDIO_Init_HS(uint32_t  AudioFreq, uint32_t Volume, uint32_t optio
 /**
   * @brief  AUDIO_DeInit_HS
   *         DeInitializes the AUDIO media low layer
-  * @param  None
-  * @retval Result of the opeartion: USBD_OK if all operations are OK else USBD_FAIL
+  * @param  options: Reserved for future use
+  * @retval Result of the operation: USBD_OK if all operations are OK else USBD_FAIL
   */
 static int8_t AUDIO_DeInit_HS(uint32_t options)
 {
@@ -315,11 +322,11 @@ static int8_t AUDIO_DeInit_HS(uint32_t options)
 
 /**
   * @brief  AUDIO_AudioCmd_HS
-  *         AUDIO command handler 
-  * @param  Buf: Buffer of data to be sent
+  *         Handles AUDIO command.
+  * @param  pbuf: Pointer to buffer of data to be sent
   * @param  size: Number of data to be sent (in bytes)
-  * @param  cmd: command opcode
-  * @retval Result of the opeartion: USBD_OK if all operations are OK else USBD_FAIL
+  * @param  cmd: Command opcode
+  * @retval Result of the operation: USBD_OK if all operations are OK else USBD_FAIL
   */
 static int8_t AUDIO_AudioCmd_HS (uint8_t* pbuf, uint32_t size, uint8_t cmd)
 {
@@ -338,9 +345,10 @@ static int8_t AUDIO_AudioCmd_HS (uint8_t* pbuf, uint32_t size, uint8_t cmd)
 }
 
 /**
-  * @brief  AUDIO_VolumeCtl_HS              
+  * @brief  AUDIO_VolumeCtl_HS
+  *         Controls AUDIO Volume.  
   * @param  vol: volume level (0..100)
-  * @retval Result of the opeartion: USBD_OK if all operations are OK else USBD_FAIL
+  * @retval Result of the operation: USBD_OK if all operations are OK else USBD_FAIL
   */
 static int8_t AUDIO_VolumeCtl_HS (uint8_t vol)
 {
@@ -350,9 +358,10 @@ static int8_t AUDIO_VolumeCtl_HS (uint8_t vol)
 }
 
 /**
-  * @brief  AUDIO_MuteCtl_HS              
-  * @param  cmd: vmute command
-  * @retval Result of the opeartion: USBD_OK if all operations are OK else USBD_FAIL
+  * @brief  AUDIO_MuteCtl_HS
+  *         Controls AUDIO Mute.     
+  * @param  cmd: command opcode
+  * @retval Result of the operation: USBD_OK if all operations are OK else USBD_FAIL
   */
 static int8_t AUDIO_MuteCtl_HS (uint8_t cmd)
 {
@@ -363,8 +372,8 @@ static int8_t AUDIO_MuteCtl_HS (uint8_t cmd)
 
 /**
   * @brief  AUDIO_PeriodicTC_HS              
-  * @param  cmd
-  * @retval Result of the opeartion: USBD_OK if all operations are OK else USBD_FAIL
+  * @param  cmd: command opcode
+  * @retval Result of the operation: USBD_OK if all operations are OK else USBD_FAIL
   */
 static int8_t AUDIO_PeriodicTC_HS (uint8_t cmd)
 {
@@ -374,9 +383,10 @@ static int8_t AUDIO_PeriodicTC_HS (uint8_t cmd)
 }
 
 /**
-  * @brief  AUDIO_GetState_HS              
+  * @brief  AUDIO_GetState_HS
+  *         Gets AUDIO State.  
   * @param  None
-  * @retval Result of the opeartion: USBD_OK if all operations are OK else USBD_FAIL
+  * @retval Result of the operation: USBD_OK if all operations are OK else USBD_FAIL
   */
 static int8_t AUDIO_GetState_HS (void)
 {

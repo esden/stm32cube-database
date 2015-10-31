@@ -5,7 +5,11 @@
   <About>CAN: Controller Area Network</About>
 	
 	<!--**** Generic RefParameters for CAN Modes ****-->
-	<RefParameter Name="Instance" DefaultValue="CAN$Index" Comment="Instance" Type="" Visible="false" Group="Basic Parameters"/>
+        <RefParameter Name="Instance" DefaultValue="CAN1" Comment="Instance" Type="" Visible="false" Group="Basic Parameters">
+            <Condition Expression="!($Index=2) &amp; STM32F1 " Diagnostic=""/>
+        </RefParameter>
+        	<RefParameter Name="Instance" DefaultValue="CAN$Index" Comment="Instance" Type="" Visible="false" Group="Basic Parameters"/>
+
 	
 	<!--**** 'Bit Timings' RefParameters for CAN Modes ****-->
 	<RefParameter Comment="Prescaler (for Time Quantum)" DefaultValue="16" Max="1024" Min="1" Name="Prescaler" Type="integer" Group="Bit Timings Parameters"/>
@@ -47,8 +51,8 @@
 		<PossibleValue Comment="8 Times" Value="CAN_BS2_8TQ"/>
 	</RefParameter>
 	
-	<RefParameter Comment="Time Quantum" DefaultValue="1000" Name="CalculateTimeQuantum" Type="string" Unit="nS" Group="Bit Timings Parameters"/>
-	<RefParameter Comment="Time for one Bit" DefaultValue="1000" Name="CalculateTimeBit" Type="string" Unit="nS" Group="Bit Timings Parameters"/>
+	<RefParameter Comment="Time Quantum" DefaultValue="1000" Name="CalculateTimeQuantum" Type="string" Unit="ns" Group="Bit Timings Parameters"/>
+	<RefParameter Comment="Time for one Bit" DefaultValue="1000" Name="CalculateTimeBit" Type="string" Unit="ns" Group="Bit Timings Parameters"/>
 	
 	<!-- **** Transmission RefParameters for CAN Modes ****-->
 	<RefParameter Comment="Time Triggered Communication Mode" DefaultValue="DISABLE" Name="TTCM" Type="list" Group="Basic Parameters">
@@ -187,13 +191,16 @@
 		<PossibleValue Comment="Loopback combined with Silent" Value="CAN_MODE_SILENT_LOOPBACK"/>
 	</RefParameter>
 	
+	
+	 <RefMode Name="canBasic" Abstract="true">
+            		<Parameter Name="Prescaler"/>
+        </RefMode>
 		
 	<!-- RefMode for 'Master' CAN Mode -->
 	<!-- For the Moment, only one Filter can be Parameter (90% of use cases). -->
-	<RefMode Name="Master">
+	<RefMode Name="Master" BaseMode="canBasic">
 		<ConfigForMode>Can_Init</ConfigForMode>
 		<!-- 'Bit Timings' Parameters -->
-		<Parameter Name="Prescaler"/>
 		<Parameter Name="CalculateTimeQuantum"/>
 		<Parameter Name="BS1"/>
 		<Parameter Name="BS2"/>
@@ -228,10 +235,9 @@
 	
 	<!-- RefMode for 'Slave' CAN Mode. -->
 	<!-- For the Moment, only one Filter can be Parameter (90% of use cases). -->
-	<RefMode Name="Slave">
+	<RefMode Name="Slave" BaseMode="canBasic">
 		<ConfigForMode>Can_Init</ConfigForMode>
 		<!-- 'Bit Timing' Parameters -->
-		<Parameter Name="Prescaler"/>
 		<Parameter Name="CalculateTimeQuantum"/>
 		<Parameter Name="BS1"/>
 		<Parameter Name="BS2"/>

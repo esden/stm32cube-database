@@ -1,4 +1,19 @@
 [#ftl]
+
+[#compress]
+[#-- Add global dma Handler --]
+[#list IPdatas as IP]  
+[#list IP.configModelList as instanceData]
+    [#if instanceData.dmaHandel??]
+        [#list instanceData.dmaHandel as dHandle]
+            extern ${dHandle};#n
+        [/#list]
+    [/#if]
+[/#list]
+[/#list]
+
+[/#compress]
+
 [#list IPdatas as IP]  
 [#assign ipvar = IP]
 
@@ -316,7 +331,7 @@
                     [#list method.arguments as fargument]
                         [#if fargument.genericType == "struct" && fargument.context??]
                             [#if fargument.context=="global"]
-#tstatic ${fargument.typeName} ${fargument.name}_${dmaRequest.dmaRequestName?lower_case};
+[#--#tstatic ${fargument.typeName} ${fargument.name}_${dmaRequest.dmaRequestName?lower_case};--]
                             [/#if]
                         [/#if]
                     [/#list]

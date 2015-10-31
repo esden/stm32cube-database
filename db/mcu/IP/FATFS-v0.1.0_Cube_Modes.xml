@@ -8,6 +8,23 @@
  	Name="FATFS"
  	Version="v0.1.0_Cube">
   <About>FATFS: FAT File System</About>
+  
+  	<!-- Semaphore of NEW_DISKIO_API TO BE UPDATED when FW packages come and support that new API for Diskio_drvTypeDef -->
+	<RefParameter Name="NEW_DISKIO_API" Comment="NEW_DISKIO_API" DefaultValue="1" Type="integer" Visible="false">
+	    <!-- <Condition Diagnostic="New version available for F1" Expression="STM32F1"/> -->
+	    <!-- <Condition Diagnostic="New version available for F1 and F4" Expression="STM32F1 | STM32F4"/>  -->
+	    <Condition Diagnostic="New version available for F0, F1 and F4" Expression="STM32F0 | STM32F1 | STM32F4"/>
+	</RefParameter>
+	<RefParameter Name="NEW_DISKIO_API" Comment="NEW_DISKIO_API" DefaultValue="0" Type="integer" Visible="false">
+	</RefParameter>
+  
+    <RefParameter Name="SD_MODE" Comment="SD MODE" DefaultValue="4" Type="integer" Visible="false">
+	    <Condition Diagnostic="SDIO 4 bits" Expression="SD_Card &amp; Bus4Bits"/>
+	</RefParameter>	
+  	<RefParameter Name="SD_MODE" Comment="SD MODE" DefaultValue="1" Type="integer" Visible="false">
+	    <Condition Diagnostic="SDIO 1 bit" Expression="SD_Card &amp; Bus1Bit"/>
+	</RefParameter>
+	<RefParameter Name="SD_MODE" Comment="SD MODE" DefaultValue="null" Type="integer" Visible="false"/>
 	
 	<RefParameter Name="Instance" DefaultValue="FATFS" Comment="Instance" Type="" Visible="false"/>
 	
@@ -81,22 +98,22 @@
 
 	<!-- choose one instance in the selected SRAM ones -->
 	<RefParameter Name="VIRTUAL_SRAM1" Type="integer" Comment="SRAM1 on" DefaultValue="1" Group="SRAM" Visible="false">
-	    <Condition Expression="(Sram1|Psram1|MuxedPsram1)" Diagnostic=""/>
+	    <Condition Expression="(Sram1|Psram1|MuxedPsram1|Lcd1)" Diagnostic=""/>
     </RefParameter>	
     <RefParameter Name="VIRTUAL_SRAM1" Type="integer" Comment="SRAM1 off" DefaultValue="0" Group="SRAM" Visible="false"/>
 
 	<RefParameter Name="VIRTUAL_SRAM2" Type="integer" Comment="SRAM2 on" DefaultValue="1" Group="SRAM" Visible="false">
-	    <Condition Expression="(Sram2|Psram2|MuxedPsram2)" Diagnostic=""/>
+	    <Condition Expression="(Sram2|Psram2|MuxedPsram2|Lcd2)" Diagnostic=""/>
     </RefParameter>	
     <RefParameter Name="VIRTUAL_SRAM2" Type="integer" Comment="SRAM2 off" DefaultValue="0" Group="SRAM" Visible="false"/>
 
 	<RefParameter Name="VIRTUAL_SRAM3" Type="integer" Comment="SRAM3 on" DefaultValue="1" Group="SRAM" Visible="false">
-	    <Condition Expression="(Sram3|Psram3|MuxedPsram3)" Diagnostic=""/>
+	    <Condition Expression="(Sram3|Psram3|MuxedPsram3|Lcd3)" Diagnostic=""/>
     </RefParameter>	
     <RefParameter Name="VIRTUAL_SRAM3" Type="integer" Comment="SRAM2 off" DefaultValue="0" Group="SRAM" Visible="false"/>
 
 	<RefParameter Name="VIRTUAL_SRAM4" Type="integer" Comment="SRAM4 on" DefaultValue="1" Group="SRAM" Visible="false">
-	    <Condition Expression="(Sram4|Psram4|MuxedPsram4)" Diagnostic=""/>
+	    <Condition Expression="(Sram4|Psram4|MuxedPsram4|Lcd4)" Diagnostic=""/>
     </RefParameter>	
     <RefParameter Name="VIRTUAL_SRAM4" Type="integer" Comment="SRAM4 off" DefaultValue="0" Group="SRAM" Visible="false"/>
 
@@ -534,6 +551,14 @@
 	</RefParameter>
 	
 	<RefParameter Name="_FS_NOFSINFO" Comment="FS_NOFSINFO (Force full FAT scan)" DefaultValue="0" Type="list" Group="Physical Drive Parameters" TabName="Set Defines">
+		<Condition Diagnostic="4 possbile values since support of R0.10b version" Expression="STM32F1"/>
+		<PossibleValue Comment="0" Value="0"/>
+		<PossibleValue Comment="1" Value="1"/>
+		<PossibleValue Comment="2" Value="2"/>
+		<PossibleValue Comment="3" Value="3"/>
+		<Description>If you need to know correct free space on the FAT32 volume, set bit 0 of this option and f_getfree() function at first time after volume mount will force a full FAT scan.&lt;br&gt;Bit 1 controls the last allocated cluster number as bit 0.&lt;br&gt; - bit0=0: Use free cluster count in the FSINFO if available.&lt;br&gt; - bit0=1: Do not trust free cluster count in the FSINFO.&lt;br&gt; - bit1=0: Use last allocated cluster number in the FSINFO if available. &lt;br&gt; - bit1=1: Do not trust last allocated cluster number in the FSINFO.</Description>
+	</RefParameter>
+	<RefParameter Name="_FS_NOFSINFO" Comment="FS_NOFSINFO (Force full FAT scan)" DefaultValue="0" Type="list" Group="Physical Drive Parameters" TabName="Set Defines">
 		<PossibleValue Comment="0" Value="0"/>
 		<PossibleValue Comment="1" Value="1"/>
 		<Description>If you need to know the correct free space on the FAT32 volume, set this option to 1 and f_getfree() function at first time after volume mount will force a full FAT scan.&lt;br&gt; - 0: Load all informations in the FSINFO if available.&lt;br&gt; - 1: Do not trust free cluster count in the FSINFO.</Description>
@@ -644,6 +669,7 @@
 	<RefMode Name="SDIO" BaseMode="FatFS_Basemode" Abstract="false">
 		<ConfigForMode>FATFS_SDIO_Init</ConfigForMode>
 		<Parameter Name="_HSD"/>
+		<Parameter Name="SD_MODE"/>
 	</RefMode>
 	
 	<!-- RefMode for FSMC NAND16 FATFS -->
@@ -674,6 +700,7 @@
     <!-- RefMode for GENERIC FATFS -->
 	<RefMode Name="User_defined" BaseMode="FatFS_Basemode" Abstract="false">
 		<ConfigForMode>FATFS_USER_DEFINED_Init</ConfigForMode>
+		<Parameter Name="NEW_DISKIO_API"/>
 	</RefMode>
 	
 	
@@ -711,7 +738,7 @@
 					<Semaphore>S_FATFS_SRAM</Semaphore>
 				</Mode>
 			   </ModeLogicOperator>
-			<Condition Expression="Sram1|Sram2|Sram3|Sram4|Psram1|Psram2|Psram3|Psram4|MuxedPsram1|MuxedPsram2|MuxedPsram3|MuxedPsram4" Diagnostic="Active only with at least one SRAM IP configured"/>
+			<Condition Expression="Sram1|Sram2|Sram3|Sram4|Psram1|Psram2|Psram3|Psram4|MuxedPsram1|MuxedPsram2|MuxedPsram3|MuxedPsram4|Lcd1|Lcd2|Lcd3|Lcd4" Diagnostic="Active only with at least one SRAM IP configured"/>
 		</Mode>
 
 		<Mode Name="SDIO" UserName="SD Card" RemoveCondition="!SDIO:$modeexist_SD_1_bit">

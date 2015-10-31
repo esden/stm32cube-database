@@ -35,6 +35,21 @@
   ******************************************************************************
   */
 
+[#list SWIPdatas as SWIP]  
+[#if SWIP.defines??]
+ [#list SWIP.defines as definition] 
+  [#if definition.name="SD_MODE"]                 
+   [#if definition.value="1"]
+    [#assign bits=1]
+   [/#if]
+   [#if definition.value="4"]
+#define BUS_4BITS 1
+    [#assign bits=4]
+   [/#if]
+  [/#if]
+ [/#list]
+[/#if]
+[/#list]
 /* USER CODE BEGIN 0 */
 /* Includes ------------------------------------------------------------------*/
 #include "bsp_driver_sd.h"
@@ -51,46 +66,30 @@ extern HAL_SD_CardInfoTypedef SDCardInfo;
   * @retval SD status
   */
 uint8_t BSP_SD_Init(void)
-{ 
+{
   uint8_t SD_state = MSD_OK;
-  
   /* Check if the SD card is plugged in the slot */
   if (BSP_SD_IsDetected() != SD_PRESENT)
   {
     return MSD_ERROR;
   }
-  
   SD_state = HAL_SD_Init(&hsd, &SDCardInfo);
+#ifdef BUS_4BITS
   if (SD_state == MSD_OK)
   {
-    HAL_SD_CardStatusTypedef CardStatus;
-    HAL_SD_GetCardStatus(&hsd, &CardStatus);
-      
-    if (CardStatus.DAT_BUS_WIDTH == 4) 
+    if (HAL_SD_WideBusOperation_Config(&hsd, SDIO_BUS_WIDE_4B) != SD_OK)
     {
-      if (HAL_SD_WideBusOperation_Config(&hsd, SDIO_BUS_WIDE_4B) != SD_OK)
-      {
-        SD_state = MSD_ERROR;
-      } 
-      else
-      {
-        SD_state = MSD_OK;
-      }
+      SD_state = MSD_ERROR;
     }
     else
-    {  
-      if (HAL_SD_WideBusOperation_Config(&hsd, SDIO_BUS_WIDE_1B) != SD_OK)
-      {
-        SD_state = MSD_ERROR;
-      } 
-      else
-      {
-        SD_state = MSD_OK;
-      }
+    {
+      SD_state = MSD_OK;
     }
-  } 
-  return  SD_state;  
+  }
+#endif
+  return SD_state;
 }
+
 
 /**
   * @brief  Configures Interrupt mode for SD detection pin.

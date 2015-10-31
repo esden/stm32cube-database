@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<IP DBVersion="V4.0" IPType="peripheral" IpGroup="Connectivity" Name="UART" Version="sci2_v1_1_Cube" 
+	xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" 
+	ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd" 
+	xmlns="http://mcd.rou.st.com/modules.php?name=mcu">
+  <About>UART: Universal Asynchronous Receiver Transmitter</About>
+	
+	<!-- Generic RefParameters for UART/IrDA Modes -->
+	<RefParameter Name="Instance" DefaultValue="UART$Index" Comment="Instance" Type="" Visible="false"/>
+	
+	<!-- Virtual Mode Parameter, to define RefParameter in function of RefMode -->
+	<RefParameter Comment="" DefaultValue="Asynchronous" Name="VirtualMode" Type="list" Visible="false" Group="Basic Parameters" >
+		<PossibleValue Comment="" Value="Asynchronous"/>
+		<PossibleValue Comment="" Value="IrDA"/>
+		<PossibleValue Comment="" Value="Lin"/>
+	</RefParameter>
+	
+	<!-- Word Length Parameters ; based on Uart Instance (AHB Clock), and if IrDa Mode on a Small maximum. -->
+	<RefParameter Comment="Baud Rate" DefaultValue="38400" Max="115200" Min="110" Unit="Bits/s" Name="BaudRate" Type="integer" Group="Basic Parameters">
+		<Condition Expression="VirtualMode = IrDA" Diagnostic=""/>
+	</RefParameter>
+	<RefParameter Comment="Baud Rate" DefaultValue="115200" Max="5250000" Min="110" Unit="Bits/s" Name="BaudRate" Type="integer" Group="Basic Parameters"/>
+	
+
+	<!-- Word Length Parameters for IrDa and Others (based on Asyncronous). -->
+	<RefParameter Comment="Word Length" DefaultValue="IRDA_WORDLENGTH_8B" Name="WordLength" Type="list" Group="Basic Parameters">
+		<Condition Expression="VirtualMode = IrDA" Diagnostic=""/>
+		<PossibleValue Comment="8 Bits (including Parity)" Value="IRDA_WORDLENGTH_8B"/>
+		<PossibleValue Comment="9 Bits (including Parity)" Value="IRDA_WORDLENGTH_9B"/>
+	</RefParameter>
+	<RefParameter Comment="Word Length" DefaultValue="UART_WORDLENGTH_8B" Name="WordLength" Type="list" Group="Basic Parameters">
+	    <Condition Expression="$IpInstance_LIN" Diagnostic=""/>
+		<PossibleValue Comment="8 Bits (including Parity)" Value="UART_WORDLENGTH_8B"/>
+	</RefParameter>
+	<RefParameter Comment="Word Length" DefaultValue="UART_WORDLENGTH_8B" Name="WordLength" Type="list" Group="Basic Parameters">
+		<PossibleValue Comment="8 Bits (including Parity)" Value="UART_WORDLENGTH_8B"/>
+		<PossibleValue Comment="9 Bits (including Parity)" Value="UART_WORDLENGTH_9B"/>
+	</RefParameter>
+	
+	<!-- Stop Bits Parameters for all (based on Asyncronous). N.B. IrDa do not have Stop Bits -->
+	<RefParameter Comment="Stop Bits" DefaultValue="UART_STOPBITS_1" Name="StopBits" Type="list" Group="Basic Parameters">
+		<PossibleValue Comment="1" Value="UART_STOPBITS_1"/>
+		<PossibleValue Comment="2" Value="UART_STOPBITS_2"/>
+	</RefParameter>
+	
+	<!-- Parity Parameters for IrDa and Others (based on Asyncronous). -->
+	<RefParameter Comment="Parity" DefaultValue="IRDA_PARITY_NONE" Name="Parity" Type="list" Group="Basic Parameters">
+		<Condition Expression="VirtualMode = IrDA" Diagnostic=""/>
+		<PossibleValue Comment="None" Value="IRDA_PARITY_NONE"/>
+		<PossibleValue Comment="Even" Value="IRDA_PARITY_EVEN"/>
+		<PossibleValue Comment="Odd" Value="IRDA_PARITY_ODD"/>
+	</RefParameter>
+	<RefParameter Comment="Parity" DefaultValue="UART_PARITY_NONE" Name="Parity" Type="list" Group="Basic Parameters">
+		<PossibleValue Comment="None" Value="UART_PARITY_NONE"/>
+		<PossibleValue Comment="Even" Value="UART_PARITY_EVEN"/>
+		<PossibleValue Comment="Odd" Value="UART_PARITY_ODD"/>
+	</RefParameter>
+	
+	<!-- DataDirection Parameters for IrDa and Others (based on Asyncronous). -->
+	<RefParameter Comment="Data Direction" DefaultValue="IRDA_MODE_TX_RX" Name="Mode" Type="list" Group="Advanced Parameters">
+		<Condition Expression="VirtualMode = IrDA" Diagnostic=""/>
+		<PossibleValue Comment="Receive and Transmit" Value="IRDA_MODE_TX_RX"/>
+		<PossibleValue Comment="Receive Only" Value="IRDA_MODE_RX"/>
+		<PossibleValue Comment="Transmit Only" Value="IRDA_MODE_TX"/>
+	</RefParameter>
+	<RefParameter Comment="Data Direction" DefaultValue="UART_MODE_TX_RX" Name="Mode" Type="list" Group="Advanced Parameters">
+		<!-- Parameters for UART Modes -->
+		<PossibleValue Comment="Receive and Transmit" Value="UART_MODE_TX_RX"/>
+		<PossibleValue Comment="Receive Only" Value="UART_MODE_RX"/>
+		<PossibleValue Comment="Transmit Only" Value="UART_MODE_TX"/>
+	</RefParameter>
+	
+	<!-- Specifics RefParameters for UART Mode -->
+	<RefParameter Comment="Hardware Flow Control" DefaultValue="UART_HWCONTROL_NONE" Name="HwFlowCtl" Type="list" Group="Basic Parameters" Visible="false">
+		<PossibleValue Comment="None" Value="UART_HWCONTROL_NONE"/>
+		<PossibleValue Comment="RTS Only" Value="UART_HWCONTROL_RTS"/>
+		<PossibleValue Comment="CTS Only" Value="UART_HWCONTROL_CTS"/>
+		<PossibleValue Comment="RTS/CTS" Value="UART_HWCONTROL_RTS_CTS"/>
+	</RefParameter>
+	
+	<RefParameter Comment="Over Sampling" DefaultValue="UART_OVERSAMPLING_16" Name="OverSampling" Type="list" Group="Advanced Parameters">
+		<PossibleValue Comment="16 Samples" Value="UART_OVERSAMPLING_16"/>
+	</RefParameter>
+	
+		
+	<!-- Specifics RefParameters for IrDa Mode -->
+	<RefParameter Comment="IrDa Mode" DefaultValue="IRDA_POWERMODE_NORMAL" Name="IrDAMode" Type="list" Group="Advanced Parameters">
+		<PossibleValue Comment="Low Power" Value="IRDA_POWERMODE_LOWPOWER"/>
+		<PossibleValue Comment="Normal Power" Value="IRDA_POWERMODE_NORMAL"/>
+	</RefParameter>
+	
+	<!-- Prescaler Parameters for IrDa Clock Mode -->
+	<RefParameter Comment="Prescaler" DefaultValue="1" Min="1" Max="1" Name="Prescaler" Type="integer" Group="Advanced Parameters">
+		<Condition Expression="IrDAMode = IRDA_POWERMODE_NORMAL" Diagnostic=""/>
+	</RefParameter>
+	<RefParameter Comment="Prescaler" DefaultValue="11" Max="255" Min="1" Name="Prescaler" Type="integer" Group="Advanced Parameters"/>
+	
+	<!-- WakeUp Method Parameters for MultiProcessor. -->
+	<RefParameter Comment="Wake-Up Method" DefaultValue="UART_WAKEUPMETHOD_IDLELINE" Name="WakeUpMethode" Type="list" Group="Advanced Parameters">
+	<Condition Expression="DIE436|DIE427|DIE437|DIE416|STM32F1" Diagnostic=""/>
+		<PossibleValue Comment="Idle Line" Value="UART_WAKEUPMETHOD_IDLELINE"/>
+		<PossibleValue Comment="Address Mark" Value="UART_WAKEUPMETHOD_ADDRESSMARK"/>
+	</RefParameter>
+	<RefParameter Comment="Wake-Up Method" DefaultValue="UART_WAKEUPMETHODE_IDLELINE" Name="WakeUpMethode" Type="list" Group="Advanced Parameters">
+		<PossibleValue Comment="Idle Line" Value="UART_WAKEUPMETHODE_IDLELINE"/>
+		<PossibleValue Comment="Address Mark" Value="UART_WAKEUPMETHODE_ADDRESSMARK"/>
+	</RefParameter>
+	
+	<!-- Address for MultiProcessor --> 
+	<RefParameter Comment="Wake-Up Address" DefaultValue="0" Max="15" Min="0" Name="Address" Type="integer" Group="Advanced Parameters">
+		<Condition Expression="WakeUpMethode = UART_WAKEUPMETHODE_ADDRESSMARK" Diagnostic=""/>
+	</RefParameter>
+	<RefParameter Comment="Wake-Up Address" DefaultValue="0" Max="0" Min="0" Name="Address" Type="integer" Group="Advanced Parameters" Visible="false" />
+	
+	<!-- BreakLength Parameters for Lin. -->
+	<RefParameter Comment="Break Detect Length" DefaultValue="UART_LINBREAKDETECTLENGTH_10B" Name="BreakDetectLength" Type="list" Group="Advanced Parameters">
+		<PossibleValue Comment="10 Bits" Value="UART_LINBREAKDETECTLENGTH_10B"/>
+		<PossibleValue Comment="11 Bits" Value="UART_LINBREAKDETECTLENGTH_11B"/>
+	</RefParameter>
+	
+         <RefMode Name="usartBasic" Abstract="true">
+            		<Parameter Name="BaudRate"/>
+        </RefMode>
+	
+	
+	<!-- RefMode for Asynchronous UART -->
+	<RefMode Name="Asynchronous" HalMode="UART" BaseMode="usartBasic">
+		<ConfigForMode>Uart_Init</ConfigForMode>
+		<Parameter Name="VirtualMode">
+			<PossibleValue>Asynchronous</PossibleValue>
+		</Parameter>
+		<!-- Basic Parameters -->
+		
+		<Parameter Name="WordLength"/>
+		<Parameter Name="Parity"/>
+		<Parameter Name="StopBits"/>
+		<!--  Advanced Parameters -->
+		<Parameter Name="Mode"/>
+		<Parameter Name="OverSampling"/>
+	</RefMode>
+	
+	<!-- RefMode for 'Single Wire' UART -->
+	<RefMode Name="Half_duplex(single_wire_mode)" HalMode="UART" BaseMode="usartBasic">
+		<ConfigForMode>Uart_HalfDuplex_Init</ConfigForMode>
+		<Parameter Name="VirtualMode">
+			<PossibleValue>Asynchronous</PossibleValue>
+		</Parameter>
+		<!-- Basic Parameters -->
+	
+		<Parameter Name="WordLength"/>
+		<Parameter Name="Parity"/>
+		<Parameter Name="StopBits"/>
+		<!--  Advanced Parameters -->
+		<Parameter Name="Mode"/>
+		<Parameter Name="OverSampling"/>
+	</RefMode>
+		
+	<!-- RefMode for 'MultiProcessor Communication' UART -->
+	<RefMode Name="Multiprocessor_communication" HalMode="UART" BaseMode="usartBasic">
+		<ConfigForMode>Uart_MultiProcessor_Init</ConfigForMode>
+		<Parameter Name="VirtualMode">
+			<PossibleValue>Asynchronous</PossibleValue>
+		</Parameter>
+		<!-- Basic Parameters -->
+		
+		<Parameter Name="WordLength"/>
+		<Parameter Name="Parity"/>
+		<Parameter Name="StopBits"/>
+		<!--  Advanced Parameters -->
+		<Parameter Name="Mode"/>
+		<Parameter Name="OverSampling"/>
+		<Parameter Name="WakeUpMethode"/>
+		<Parameter Name="Address"/>
+	</RefMode>
+	
+	<!-- RefModes for IRDA -->
+	<RefMode Name="IrDA" HalMode="IRDA" BaseMode="usartBasic">
+		<ConfigForMode>IrDa_Init</ConfigForMode>
+		<Parameter Name="VirtualMode">
+			<PossibleValue>IrDA</PossibleValue>
+		</Parameter>
+		<!-- Basic Parameters -->
+		
+		<Parameter Name="WordLength"/>
+		<Parameter Name="Parity"/>
+		<!-- Advanced Parameters -->
+		<Parameter Name="Mode"/>
+		<Parameter Name="IrDAMode"/>
+		<Parameter Name="Prescaler"/>
+	</RefMode>
+	
+	<!-- RefModes for LIN -->
+	<RefMode Name="LIN" HalMode="UART" BaseMode="usartBasic">
+		<ConfigForMode>Uart_Lin_Init</ConfigForMode>
+		<Parameter Name="VirtualMode">
+			<PossibleValue>Asynchronous</PossibleValue>
+		</Parameter>
+		<!-- Basic Parameters -->
+		
+		<Parameter Name="WordLength"/>
+		<Parameter Name="Parity"/>
+		<Parameter Name="StopBits"/>
+		<!--  Advanced Parameters -->
+		<Parameter Name="Mode"/>
+		<Parameter Name="BreakDetectLength"/>
+	</RefMode>
+	
+	
+	<!-- ModeLogicOperator for UART/IRDA -->
+	<ModeLogicOperator Name="OR">
+		<Mode Name="Mode">
+			<ModeLogicOperator Name="XOR">
+				<Mode Name="Asynchronous">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="RX" />
+						<Signal Name="TX" IOMode="AlternateFunctionPushPullPULLUP"/>
+					</SignalLogicalOp>
+					<Semaphore>Asynchronous</Semaphore>
+				</Mode>
+				<Mode Name="Half_duplex(single_wire_mode)" UserName="Single Wire (Half-Duplex)">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="TX" IOMode="AlternateFunctionOpenDrain"/>
+					</SignalLogicalOp>
+				</Mode>
+				<Mode Name="Multiprocessor_communication" UserName="Multiprocessor Communication">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="RX"/>
+						<Signal Name="TX"/>
+					</SignalLogicalOp>
+				</Mode>
+				<Mode Name="IrDA">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="RX"/>
+						<Signal Name="TX"/>
+					</SignalLogicalOp>
+				</Mode>
+				<Mode Name="LIN">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="RX"/>
+						<Signal Name="TX"/>
+					</SignalLogicalOp>
+					<Semaphore>$IpInstance_LIN</Semaphore>
+				</Mode>
+			</ModeLogicOperator>
+		</Mode>
+	</ModeLogicOperator>
+	
+	<!-- RefSignal for UART/IRDA -->
+	<RefSignal IOMode="InputFloatingAndPullUp" Name="RX"/>
+	<RefSignal IOMode="AlternateFunctionPushPullUp" Name="TX"/>
+</IP>

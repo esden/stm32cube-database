@@ -83,8 +83,8 @@
   /* USER CODE BEGIN 1 */
 /* Define size for the receive and transmit buffer over CDC */
 /* It's up to user to redefine and/or remove those define */
-#define APP_RX_DATA_SIZE  512
-#define APP_TX_DATA_SIZE  512
+#define APP_RX_DATA_SIZE  4
+#define APP_TX_DATA_SIZE  4
   /* USER CODE END 1 */  
 /**
   * @}
@@ -190,7 +190,7 @@ USBD_CDC_ItfTypeDef USBD_Interface_fops_HS =
   * @brief  CDC_Init_FS
   *         Initializes the CDC media low layer over the FS USB IP
   * @param  None
-  * @retval Result of the opeartion: USBD_OK if all operations are OK else USBD_FAIL
+  * @retval Result of the operation: USBD_OK if all operations are OK else USBD_FAIL
   */
 static int8_t CDC_Init_FS(void)
 {
@@ -207,7 +207,7 @@ static int8_t CDC_Init_FS(void)
   * @brief  CDC_DeInit_FS
   *         DeInitializes the CDC media low layer
   * @param  None
-  * @retval Result of the opeartion: USBD_OK if all operations are OK else USBD_FAIL
+  * @retval Result of the operation: USBD_OK if all operations are OK else USBD_FAIL
   */
 static int8_t CDC_DeInit_FS(void)
 {
@@ -220,10 +220,10 @@ static int8_t CDC_DeInit_FS(void)
 /**
   * @brief  CDC_Control_FS
   *         Manage the CDC class requests
-  * @param  Cmd: Command code            
-  * @param  Buf: Buffer containing command data (request parameters)
-  * @param  Len: Number of data to be sent (in bytes)
-  * @retval Result of the opeartion: USBD_OK if all operations are OK else USBD_FAIL
+  * @param  cmd: Command code            
+  * @param  pbuf: Buffer containing command data (request parameters)
+  * @param  length: Number of data to be sent (in bytes)
+  * @retval Result of the operation: USBD_OK if all operations are OK else USBD_FAIL
   */
 static int8_t CDC_Control_FS  (uint8_t cmd, uint8_t* pbuf, uint16_t length)
 { 
@@ -304,7 +304,7 @@ static int8_t CDC_Control_FS  (uint8_t cmd, uint8_t* pbuf, uint16_t length)
   *                 
   * @param  Buf: Buffer of data to be received
   * @param  Len: Number of data received (in bytes)
-  * @retval Result of the opeartion: USBD_OK if all operations are OK else USBD_FAIL
+  * @retval Result of the operation: USBD_OK if all operations are OK else USBD_FAIL
   */
 static int8_t CDC_Receive_FS (uint8_t* Buf, uint32_t *Len)
 {
@@ -322,7 +322,7 @@ static int8_t CDC_Receive_FS (uint8_t* Buf, uint32_t *Len)
   *                 
   * @param  Buf: Buffer of data to be send
   * @param  Len: Number of data to be send (in bytes)
-  * @retval Result of the opeartion: USBD_OK if all operations are OK else USBD_FAIL or USBD_BUSY
+  * @retval Result of the operation: USBD_OK if all operations are OK else USBD_FAIL or USBD_BUSY
   */
 uint8_t CDC_Transmit_FS(uint8_t* Buf, uint16_t Len)
 {
@@ -340,7 +340,7 @@ uint8_t CDC_Transmit_FS(uint8_t* Buf, uint16_t Len)
   * @brief  CDC_Init_HS
   *         Initializes the CDC media low layer over the USB HS IP
   * @param  None
-  * @retval Result of the opeartion: USBD_OK if all operations are OK else USBD_FAIL
+  * @retval Result of the operation: USBD_OK if all operations are OK else USBD_FAIL
   */
 static int8_t CDC_Init_HS(void)
 {
@@ -357,7 +357,7 @@ static int8_t CDC_Init_HS(void)
   * @brief  CDC_DeInit_HS
   *         DeInitializes the CDC media low layer
   * @param  None
-  * @retval Result of the opeartion: USBD_OK if all operations are OK else USBD_FAIL
+  * @retval Result of the operation: USBD_OK if all operations are OK else USBD_FAIL
   */
 static int8_t CDC_DeInit_HS(void)
 {
@@ -370,10 +370,10 @@ static int8_t CDC_DeInit_HS(void)
 /**
   * @brief  CDC_Control_HS
   *         Manage the CDC class requests
-  * @param  Cmd: Command code            
-  * @param  Buf: Buffer containing command data (request parameters)
-  * @param  Len: Number of data to be sent (in bytes)
-  * @retval Result of the opeartion: USBD_OK if all operations are OK else USBD_FAIL
+  * @param  cmd: Command code            
+  * @param  pbuf: Buffer containing command data (request parameters)
+  * @param  length: Number of data to be sent (in bytes)
+  * @retval Result of the operation: USBD_OK if all operations are OK else USBD_FAIL
   */
 static int8_t CDC_Control_HS  (uint8_t cmd, uint8_t* pbuf, uint16_t length)
 { 
@@ -454,7 +454,7 @@ static int8_t CDC_Control_HS  (uint8_t cmd, uint8_t* pbuf, uint16_t length)
   *                 
   * @param  Buf: Buffer of data to be received
   * @param  Len: Number of data received (in bytes)
-  * @retval Result of the opeartion: USBD_OK if all operations are OK else USBD_FAIL
+  * @retval Result of the operation: USBD_OK if all operations are OK else USBD_FAIL
   */
 static int8_t CDC_Receive_HS (uint8_t* Buf, uint32_t *Len)
 {
@@ -471,7 +471,7 @@ static int8_t CDC_Receive_HS (uint8_t* Buf, uint32_t *Len)
   *                 
   * @param  Buf: Buffer of data to be send
   * @param  Len: Number of data to be send (in bytes)
-  * @retval Result of the opeartion: USBD_OK if all operations are OK else USBD_FAIL or USBD_BUSY
+  * @retval Result of the operation: USBD_OK if all operations are OK else USBD_FAIL or USBD_BUSY
   */
 uint8_t CDC_Transmit_HS(uint8_t* Buf, uint16_t Len)
 {

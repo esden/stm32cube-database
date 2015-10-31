@@ -47,6 +47,7 @@
     [/#if]
 [/#list]
 [/#list]
+
 [/#compress]
 
 /* USER CODE BEGIN 0 */
@@ -474,7 +475,7 @@ void HAL_MspInit(void)
         [#if dmaconfig.dmaHandel?size > 1] [#-- if more than one dma handler--]
         #t#t/* Several peripheral DMA handle pointers point to the same DMA handle.
         #t#t   Be aware that there is only one stream to perform all the requested DMAs. */
-        [#if (FamilyName=="STM32F2" || FamilyName=="STM32F4") && dmaconfig.dmaRequestName=="SDIO"]
+        [#if (FamilyName=="STM32F1" || FamilyName=="STM32F2" || FamilyName=="STM32F4") && dmaconfig.dmaRequestName=="SDIO"]
         #t#t/* Be sure to change transfer direction before calling
         #t#t   HAL_SD_ReadBlocks_DMA or HAL_SD_WriteBlocks_DMA. */
         [/#if]
@@ -617,7 +618,7 @@ void HAL_MspInit(void)
                     #t#tif(hpcd->Init.low_power_enable == 1)
                     #t#t{
                     #t#t#t/* Enable EXTI Line 18 for USB wakeup */
-                    [#if FamilyName=="STM32F3"||FamilyName=="STM32L1"][#-- FamilyName=="STM32F3"|| to be added on V4.5 --]
+                    [#if FamilyName=="STM32F3"||FamilyName=="STM32L1"]
                       #t#t#t__HAL_USB_EXTI_CLEAR_FLAG();
                       #t#t#t__HAL_USB_EXTI_SET_RISING_EDGE_TRIGGER();
                     [/#if]
@@ -634,11 +635,21 @@ void HAL_MspInit(void)
                     [/#if]
                     [#if ipName?contains("_HS")]
                         #t#t#t__HAL_USB_HS_EXTI_ENABLE_IT();
-                    
+                    [#elseif ipName?contains("OTG_FS")&&FamilyName=="STM32F1"]
+                        #t#t#t__HAL_USB_OTG_FS_WAKEUP_EXTI_CLEAR_FLAG();
+                        #t#t#t__HAL_USB_OTG_FS_WAKEUP_EXTI_ENABLE_RISING_EDGE();
+                        #t#t#t__HAL_USB_OTG_FS_WAKEUP_EXTI_ENABLE_IT();
+
                     [#elseif ipName?contains("_FS")]
                         #t#t#t__HAL_USB_FS_EXTI_ENABLE_IT();
                     [#else]
-                        #t#t#t__HAL_USB_EXTI_ENABLE_IT();                     
+                        [#if FamilyName=="STM32F1"] [#-- use new macro naming for F1--]
+                            #t#t#t__HAL_USB_WAKEUP_EXTI_CLEAR_FLAG();
+                            #t#t#t__HAL_USB_WAKEUP_EXTI_ENABLE_RISING_EDGE();
+                            #t#t#t__HAL_USB_WAKEUP_EXTI_ENABLE_IT();
+                        [#else]
+                            #t#t#t__HAL_USB_EXTI_ENABLE_IT(); 
+                        [/#if]
                     [/#if]
                     [#list initService.nvic as initVector]
                        [#if initVector.vector?contains("WKUP") || initVector.vector?contains("WakeUp")]

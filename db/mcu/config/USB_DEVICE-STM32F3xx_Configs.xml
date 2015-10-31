@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
-<IP DBVersion="V4.0" Name="USB_DEVICE" Version="STM32Cube_FW_F3_V0.5.0" RootFolder="Middlewares/ST/STM32_USB_Device_Library/" CodeTemplate="usbdevice_c.ftl;usbdevice_h.ftl"
+<IP DBVersion="V4.0" Name="USB_DEVICE" Version="STM32Cube_FW_F3_V1.1.0" RootFolder="Middlewares/ST/STM32_USB_Device_Library/" CodeTemplate="usbdevice_c.ftl;usbdevice_h.ftl"
     IncludeFile="stm32f3xx.h;stm32f3xx_hal.h;usbd_def.h"
     xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance"
     ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Configs.xsd"
@@ -150,6 +150,36 @@
         <ConfigFile Name="USBD_DESC_FS_C"/>
     </RefConfig>
     
+    <!-- Custom HID Class -->    
+    <RefConfig Name="USB_DEVICE_CUSTOM_HID_FS" Comment="CUSTOMHID">
+        <CallLibMethod Name="USBD_Init">
+            <MethodArg Name="hUsbDevice" ParameterName="hUsbDeviceFS"/>
+            <!--<MethodArg Name="USBD_DESC" ParameterName="HID_Desc"/>-->
+            <MethodArg Name="USBD_DESC" ParameterName="FS_Desc"/>
+            <MethodArg Name="id" ParameterName="DEVICE_FS"/>
+        </CallLibMethod> 
+        <CallLibMethod Name="USBD_RegisterClass">
+            <MethodArg Name="hUsbDevice" ParameterName="hUsbDeviceFS"/>
+            <MethodArg Name="USBD_CLASS" ParameterName="USBD_CUSTOM_HID"/>
+        </CallLibMethod>  
+        <CallLibMethod Name="USBD_CUSTOM_HID_RegisterInterface">
+            <MethodArg Name="hUsbDevice" ParameterName="hUsbDeviceFS"/>
+            <MethodArg Name="USBD_USER_CALLBACK" ParameterName="USBD_CustomHID_fops_FS"/>
+        </CallLibMethod> 
+        <CallLibMethod Name="USBD_Start">
+            <MethodArg Name="hUsbDevice" ParameterName="hUsbDeviceFS"/>
+        </CallLibMethod>  
+        <Component Name="Middlewares:USB_DEVICE:CUSTOM_HID"/>
+        <ConfigFile Name="USBD_CONF_CUSTOM_HID_H"/>        
+        <ConfigFile Name="USBD_CONF_FS_C"/>
+        <ConfigFile Name="USBD_DESC_H"/> 
+        <ConfigFile Name="USBD_DESC_C"/>
+        <ConfigFile Name="USBD_DESC_FS_H"/> 
+        <ConfigFile Name="USBD_DESC_FS_C"/>
+        <ConfigFile Name="USBD_INF_CUSTOM_HID_H_FS"/> 
+        <ConfigFile Name="USBD_INF_CUSTOM_HID_C_FS"/>
+    </RefConfig>
+    
     <!-- Msc Class -->    
     <RefConfig Name="USB_DEVICE_MSC_FS" Comment="MSC">
         <CallLibMethod Name="USBD_Init">
@@ -249,6 +279,13 @@
         <Argument Comment="" AddressOf="true" Name="USBD_USER_CALLBACK" GenericType="simple"  TypeName="int" Context="local;NOT_INIT"/>                                 
     </LibMethod>
     
+    <LibMethod Name="USBD_CUSTOM_HID_RegisterInterface" Comment="">
+        <Argument Name="hUsbDevice" GenericType="struct" AddressOf="true"  TypeName="USBD_HandleTypeDef" Context="global;NOT_INIT">
+            <Argument AddressOf="false" GenericType="simple" Name="dev_config" OptimizationCondition="equal"/>          
+        </Argument> 
+        <Argument Comment="" AddressOf="true" Name="USBD_USER_CALLBACK" GenericType="simple"  TypeName="int" Context="local;NOT_INIT"/>                                 
+    </LibMethod>
+    
     <LibMethod Name="USBD_DFU_RegisterMedia" Comment="">
         <Argument Name="hUsbDevice" GenericType="struct" AddressOf="true"  TypeName="USBD_HandleTypeDef" Context="global;NOT_INIT">
             <Argument AddressOf="false" GenericType="simple" Name="dev_config" OptimizationCondition="equal"/>           
@@ -291,6 +328,10 @@
             <File Name="Class/HID/Inc/usbd_hid.h" Category="header"/>
             <File Name="Class/HID/Src/usbd_hid.c" Category="source"/>
         </SubComponent>
+        <SubComponent Csub="CUSTOM_HID" Description="Custom Human Interface Device">
+            <File Name="Class/CustomHID/Inc/usbd_customhid.h" Category="header"/>
+            <File Name="Class/CustomHID/Src/usbd_customhid.c" Category="source"/>
+        </SubComponent>
         <SubComponent Csub="MSC" Description="Mass Storage">
             <File Name="Class/MSC/Inc/usbd_msc.h" Category="header"/>
             <File Name="Class/MSC/Inc/usbd_msc_bot.h" Category="header"/>
@@ -307,7 +348,7 @@
         </SubComponent>
     </RefComponent>
     
-    <RefConfigFile Name="USBD_CONF_AUDIO_H" Description="Header file for #define" Template="usbdconf_l0_h.ftl">      
+    <RefConfigFile Name="USBD_CONF_AUDIO_H" Description="Header file for #define" Template="usbdconf_f3_h.ftl">      
         <File Name="usbd_conf.h" Category="header" Version="" Condition="all"/>
         <!-- Parameters for Function and Buffer Configurations -->
         <Argument Name="USBD_MAX_NUM_INTERFACES" GenericType="simple" Comment=""/>
@@ -317,10 +358,9 @@
         <Argument Name="USBD_DEBUG_LEVEL" GenericType="simple" Comment=""/>         
         <Argument Name="USBD_SELF_POWERED" GenericType="simple" Comment=""/>
         <Argument Name="USBD_AUDIO_FREQ" GenericType="simple" Comment=""/>
-        <Argument Name="MAX_STATIC_ALLOC_SIZE" GenericType="simple" Comment=""/>
-    </RefConfigFile> 
+     </RefConfigFile> 
     
-    <RefConfigFile Name="USBD_CONF_CCID_H" Description="Header file for #define" Template="usbdconf_l0_h.ftl">      
+    <RefConfigFile Name="USBD_CONF_CCID_H" Description="Header file for #define" Template="usbdconf_f3_h.ftl">      
         <File Name="usbd_conf.h" Category="header" Version="" Condition="all"/>
         <!-- Parameters for Function and Buffer Configurations -->
         <Argument Name="USBD_MAX_NUM_INTERFACES" GenericType="simple" Comment=""/>
@@ -331,10 +371,9 @@
         <Argument Name="USBD_SELF_POWERED" GenericType="simple" Comment=""/>
         <Argument Name="CCID_BULK_EP_MAX_PACKET" GenericType="simple" Comment=""/>
         <Argument Name="CCID_INTR_EP_MAX_PACKET" GenericType="simple" Comment=""/>
-        <Argument Name="MAX_STATIC_ALLOC_SIZE" GenericType="simple" Comment=""/>
-    </RefConfigFile> 
+     </RefConfigFile> 
     
-    <RefConfigFile Name="USBD_CONF_CDC_H" Description="Header file for #define" Template="usbdconf_l0_h.ftl">      
+    <RefConfigFile Name="USBD_CONF_CDC_H" Description="Header file for #define" Template="usbdconf_f3_h.ftl">      
         <File Name="usbd_conf.h" Category="header" Version="" Condition="all"/>
         <!-- Parameters for Function and Buffer Configurations -->
         <Argument Name="USBD_MAX_NUM_INTERFACES" GenericType="simple" Comment=""/>
@@ -344,10 +383,9 @@
         <Argument Name="USBD_DEBUG_LEVEL" GenericType="simple" Comment=""/>         
         <Argument Name="USBD_SELF_POWERED" GenericType="simple" Comment=""/>
         <Argument Name="USBD_CDC_INTERVAL" GenericType="simple" Comment=""/>
-        <Argument Name="MAX_STATIC_ALLOC_SIZE" GenericType="simple" Comment=""/>
-    </RefConfigFile>
+     </RefConfigFile>
     
-    <RefConfigFile Name="USBD_CONF_DFU_H" Description="Header file for #define" Template="usbdconf_l0_h.ftl">      
+    <RefConfigFile Name="USBD_CONF_DFU_H" Description="Header file for #define" Template="usbdconf_f3_h.ftl">      
         <File Name="usbd_conf.h" Category="header" Version="" Condition="all"/>
         <!-- Parameters for Function and Buffer Configurations -->
         <Argument Name="USBD_MAX_NUM_INTERFACES" GenericType="simple" Comment=""/>
@@ -359,10 +397,9 @@
         <Argument Name="USBD_DFU_MAX_ITF_NUM" GenericType="simple" Comment=""/>
         <Argument Name="USBD_DFU_XFER_SIZE" GenericType="simple" Comment=""/>
         <Argument Name="USBD_DFU_APP_DEFAULT_ADD" GenericType="simple" Comment=""/>
-        <Argument Name="MAX_STATIC_ALLOC_SIZE" GenericType="simple" Comment=""/>
     </RefConfigFile>
     
-    <RefConfigFile Name="USBD_CONF_HID_H" Description="Header file for #define" Template="usbdconf_l0_h.ftl">      
+    <RefConfigFile Name="USBD_CONF_HID_H" Description="Header file for #define" Template="usbdconf_f3_h.ftl">      
         <File Name="usbd_conf.h" Category="header" Version="" Condition="all"/>
         <!-- Parameters for Function and Buffer Configurations -->
         <Argument Name="USBD_MAX_NUM_INTERFACES" GenericType="simple" Comment=""/>
@@ -371,10 +408,22 @@
         <Argument Name="USBD_SUPPORT_USER_STRING" GenericType="simple" Comment=""/>     
         <Argument Name="USBD_DEBUG_LEVEL" GenericType="simple" Comment=""/>         
         <Argument Name="USBD_SELF_POWERED" GenericType="simple" Comment=""/>   
-        <Argument Name="MAX_STATIC_ALLOC_SIZE" GenericType="simple" Comment=""/>
+     </RefConfigFile>
+    
+    <RefConfigFile Name="USBD_CONF_CUSTOM_HID_H" Description="Header file for #define" Template="usbdconf_f3_h.ftl">      
+        <File Name="usbd_conf.h" Category="header" Version="" Condition="all"/>
+        <!-- Parameters for Function and Buffer Configurations -->
+        <Argument Name="USBD_MAX_NUM_INTERFACES" GenericType="simple" Comment=""/>
+        <Argument Name="USBD_MAX_NUM_CONFIGURATION" GenericType="simple" Comment=""/>
+        <Argument Name="USBD_MAX_STR_DESC_SIZ" GenericType="simple" Comment=""/>
+        <Argument Name="USBD_SUPPORT_USER_STRING" GenericType="simple" Comment=""/>     
+        <Argument Name="USBD_DEBUG_LEVEL" GenericType="simple" Comment=""/>         
+        <Argument Name="USBD_SELF_POWERED" GenericType="simple" Comment=""/> 
+        <Argument Name="USBD_CUSTOMHID_OUTREPORT_BUF_SIZE" GenericType="simple" Comment=""/> 
+        <Argument Name="USBD_CUSTOM_HID_REPORT_DESC_SIZE" GenericType="simple" Comment=""/>  
     </RefConfigFile>
     
-    <RefConfigFile Name="USBD_CONF_MSC_H" Description="Header file for #define" Template="usbdconf_l0_h.ftl">      
+    <RefConfigFile Name="USBD_CONF_MSC_H" Description="Header file for #define" Template="usbdconf_f3_h.ftl">      
         <File Name="usbd_conf.h" Category="header" Version="" Condition="all"/>
         <!-- Parameters for Function and Buffer Configurations -->
         <Argument Name="USBD_MAX_NUM_INTERFACES" GenericType="simple" Comment=""/>
@@ -384,12 +433,11 @@
         <Argument Name="USBD_DEBUG_LEVEL" GenericType="simple" Comment=""/>         
         <Argument Name="USBD_SELF_POWERED" GenericType="simple" Comment=""/>
         <Argument Name="MSC_MEDIA_PACKET" GenericType="simple" Comment=""/>
-        <Argument Name="MAX_STATIC_ALLOC_SIZE" GenericType="simple" Comment=""/>
     </RefConfigFile>
     
    
     
-    <RefConfigFile Name="USBD_CONF_FS_C" Description="C file for Low Level Driver" Template="usbdconf_l0_c.ftl">      
+    <RefConfigFile Name="USBD_CONF_FS_C" Description="C file for Low Level Driver" Template="usbdconf_f3_c.ftl">      
         <File Name="usbd_conf.c" Category="source" Version="" Condition="all"/>
         <Argument Name="USBD_HandleTypeDef_TEST" GenericType="struct" AddressOf="true"  TypeName="USBD_HandleTypeDefTest" Context="global"/>   
         <Argument Name="CLASS_NAME" GenericType="struct"  AddressOf="true"  TypeName="USBD_HandleTypeDefTest" Context="global"/>        
@@ -494,5 +542,17 @@
         <Argument Name="USBD_HandleTypeDef_TEST" GenericType="struct" AddressOf="true"  TypeName="USBD_HandleTypeDef" Context="global"/>   
     </RefConfigFile>
  
+   <RefConfigFile Name="USBD_INF_CUSTOM_HID_H_FS" Description="Header file for #define" Template="usbd_custom_hid_if_h.ftl">      
+        <File Name="usbd_custom_hid_if.h" Category="header" Version="" Condition="all"/>
+        <!-- Parameters for Function and Buffer Configurations -->
+        <Argument Name="USBD_MAX_NUM_INTERFACES" GenericType="simple" Comment=""/>  
+       <Argument Name="USBD_HandleTypeDef_TEST" GenericType="struct" AddressOf="true"  TypeName="USBD_HandleTypeDef" Context="global"/>     
+    </RefConfigFile>    
+    <RefConfigFile Name="USBD_INF_CUSTOM_HID_C_FS" Description="C file for Low Level Driver" Template="usbd_custom_hid_if_c.ftl">      
+        <File Name="usbd_custom_hid_if.c" Category="source" Version="" Condition="all"/>
+        <!-- Parameters for Function and Buffer Configurations -->
+        <Argument Name="USBD_MAX_NUM_INTERFACES" GenericType="simple" Comment=""/>
+        <Argument Name="USBD_HandleTypeDef_TEST" GenericType="struct" AddressOf="true"  TypeName="USBD_HandleTypeDef" Context="global"/>             
+    </RefConfigFile>
    
 </IP>

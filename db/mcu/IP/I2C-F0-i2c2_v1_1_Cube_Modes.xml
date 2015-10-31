@@ -7,7 +7,7 @@
 				<RefParameter Comment="I2C Speed Mode " DefaultValue="I2C_Standard" Name="I2C_Speed_Mode" Type="list" Group="Timing configuration">
                         <PossibleValue Comment="Standard Mode" Value="I2C_Standard"/>
 						<PossibleValue Comment="Fast Mode" Value="I2C_Fast"/>
-						<PossibleValue Comment="Fast Mode Plus" Value="I2C_Fast_Plus" Condition="(STM32F030C8Tx|STM32F030R8Tx|STM32F051R8Tx|STM32F051C8Tx|STM32F051R8Ux|STM32F051C8ux) &amp; ($Index=2)" Diagnostic="not available for listed part number" Action="Remove"/>
+						<PossibleValue Comment="Fast Mode Plus" Value="I2C_Fast_Plus" Condition="(STM32F030C8Tx|STM32F030R8Tx|STM32F051R8Tx|STM32F051C8Tx|STM32F051R8Ux|STM32F051C8ux|STM32F0x0_Value_Line) &amp; ($Index=2)" Diagnostic="not available for listed part number" Action="Remove"/>
                 </RefParameter>	
 <!--Specifies if The analog noise filter is present on the SDA and SCL inputs-->
 				<RefParameter Comment="Analog Filter" DefaultValue="SMBUS_ANALOGFILTER_ENABLED" Name="SMBusAnalogFilter" Type="list" Group="Timing configuration">
@@ -91,7 +91,7 @@
     </RefParameter>  
     
     <RefParameter Comment="Primary slave address" DefaultValue="0" Max="1023" Min="0" Name="OwnAddress" Type="integer" Group="Slave Features">
-    	<Description>The generated value of the address is shifted left by 1 bit.</Description>        
+    	  
     </RefParameter>
     
     <RefParameter Comment="Primary slave address" DefaultValue="=(OwnAddress*2)" Max="1023" Min="0" Name="OwnAddress1" Type="integer" Group="Slave Features" Visible="false">
@@ -103,18 +103,26 @@
     </RefParameter>
 
 
+<RefParameter Comment="Secondary slave address" DefaultValue="0" Max="0" Min="0" Name="OwnAddress2" Type="integer" Group="Slave Features" Visible="false">
+        <Condition Diagnostic="Address value from 0 to 127" Expression="DualAddressMode=I2C_DUALADDRESS_DISABLED"/>        
+		        <Description>The generated value of the address is shifted left by 1 bit.</Description>       
+    </RefParameter>
+	   
+    
+    <RefParameter Comment="Secondary slave address" DefaultValue="0" Max="127" Min="0" Name="OwnAddress2" Type="integer" Group="Slave Features" Visible="true">
+	        <Description>The generated value of the address is shifted left by 1 bit.</Description>       
+
+    </RefParameter>
+
+
 <!--specifier seconde address pour slave avec 7 bit adressage et dual mode activer -->
-<RefParameter Comment="Secondary slave address" DefaultValue="0" Max="127" Min="0" Name="OwnAddress2" Type="integer" Group="Slave Features" Visible="false">
+<RefParameter Comment="Secondary slave address" DefaultValue="=(OwnAddress2*2)" Max="127" Min="0" Name="OwnAddress22" Type="integer" Group="Slave Features" Visible="false">
         <Condition Diagnostic="Address value from 0 to 127" Expression="DualAddressMode=I2C_DUALADDRESS_DISABLED"/>    
 <PossibleValue Comment=" 0" Value="0"/>			
 </RefParameter>
     
-<RefParameter Comment="Secondary slave address" DefaultValue="0" Max="127" Min="0" Name="OwnAddress2" Type="integer" Group="Slave Features" Visible="true">
-        <Condition Diagnostic="Address value from 0 to 127" Expression="DualAddressMode=I2C_DUALADDRESS_ENABLED"/>  
-</RefParameter>
+<RefParameter Comment="Secondary slave address" DefaultValue="=(OwnAddress2*2)" Max="127" Min="0" Name="OwnAddress22" Type="integer" Group="Slave Features" Visible="false">
     
-<RefParameter Comment="Secondary slave address" DefaultValue="0" Max="127" Min="0" Name="OwnAddress2" Type="integer" Group="Slave Features" Visible="false">
-       <!-- <Condition Diagnostic="Address value from 0 to 127" Expression="DualAddressMode=I2C_DUALADDRESS_ENABLED"/> -->  
 </RefParameter>
 
 <!--specifier if dual mode active -->
@@ -205,8 +213,13 @@
 			
 <!--Specifies the Timout Register value  -->
 				
-				 <RefParameter Comment="Timeout" DefaultValue="0x00000000" Name="Timeout" Type="string" Group="Timeout configuration"/>
-				 
+<RefParameter Comment="Timeout" DefaultValue="0x00008019" Name="Timeout" Type="string" Group="Timeout configuration">
+<Condition Expression="STM32L0" Diagnostic=""/>
+</RefParameter>
+<RefParameter Comment="Timeout" DefaultValue="0x00008061" Name="Timeout" Type="string" Group="Timeout configuration">
+<Condition Expression="STM32F0|STM32F1|STM32F3" Diagnostic=""/>
+</RefParameter>
+<RefParameter Comment="Timeout" DefaultValue="0x00008019" Name="Timeout" Type="string" Group="Timeout configuration"/>				 
 				 
 <!--SMBus Features -->
 <!-- Specifies if Packet Error Check mode is selected-->							

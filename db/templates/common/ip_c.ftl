@@ -423,7 +423,7 @@
             [#if dmaconfig.dmaHandel?size > 1] [#-- if more than one dma handler--]
                 #t#t/* Several peripheral DMA handle pointers point to the same DMA handle.
                 #t#t   Be aware that there is only one stream to perform all the requested DMAs. */
-                [#if (FamilyName=="STM32F2" || FamilyName=="STM32F4") && dmaconfig.dmaRequestName=="SDIO"]
+                [#if (FamilyName=="STM32F1" || FamilyName=="STM32F2" || FamilyName=="STM32F4") && dmaconfig.dmaRequestName=="SDIO"]
                 #t#t/* Be sure to change transfer direction before calling
                 #t#t   HAL_SD_ReadBlocks_DMA or HAL_SD_WriteBlocks_DMA. */
                 [/#if]
@@ -584,10 +584,20 @@
                     [/#if]
                     [#if ipName?contains("_HS")]
                         #t#t#t__HAL_USB_HS_EXTI_ENABLE_IT();
+                    [#elseif ipName?contains("OTG_FS")&&FamilyName=="STM32F1"]
+                        #t#t#t__HAL_USB_OTG_FS_WAKEUP_EXTI_CLEAR_FLAG();
+                        #t#t#t__HAL_USB_OTG_FS_WAKEUP_EXTI_ENABLE_RISING_EDGE();
+                        #t#t#t__HAL_USB_OTG_FS_WAKEUP_EXTI_ENABLE_IT();
                     [#elseif ipName?contains("_FS")]
                         #t#t#t__HAL_USB_FS_EXTI_ENABLE_IT();
                     [#else]
-                        #t#t#t__HAL_USB_EXTI_ENABLE_IT();
+                        [#if FamilyName=="STM32F1"] [#-- use new macro naming for F1--]
+                            #t#t#t__HAL_USB_WAKEUP_EXTI_CLEAR_FLAG();
+                            #t#t#t__HAL_USB_WAKEUP_EXTI_ENABLE_RISING_EDGE();
+                            #t#t#t__HAL_USB_WAKEUP_EXTI_ENABLE_IT();
+                        [#else]
+                            #t#t#t__HAL_USB_EXTI_ENABLE_IT(); 
+                        [/#if]
                     [/#if]
                     [#list initService.nvic as initVector]
                        [#if initVector.vector?contains("WKUP") || initVector.vector?contains("WakeUp")]
@@ -627,7 +637,19 @@
 [#-- DeInit NVIC if DeInit --]
     [#if service??&&service.nvic??&&nvicExist&&service.nvic?size>0]#n#t#t/* Peripheral interrupt Deinit*/[#--#n#t#tHAL_NVIC_DisableIRQ([#if service.nvic.vector??]${service.nvic.vector}[/#if]);--]
 [#list service.nvic as initVector]                
-                #t#tHAL_NVIC_DisableIRQ(${initVector.vector});
+               [#if initVector.shared=="false"]             
+                #t#tHAL_NVIC_DisableIRQ(${initVector.vector});#n
+                [#else]
+#t/* USER CODE BEGIN ${ipName}:${initVector.vector} disable */
+#t#t/**
+#t#t* Uncomment the line below to disable the "${initVector.vector}" interrupt 
+#t#t*        Be aware, disabling shared interrupt may affect other IPs
+#t#t*/
+#t#t/* HAL_NVIC_DisableIRQ(${initVector.vector}); */
+#t/* USER CODE END ${ipName}:${initVector.vector} disable */
+#n
+
+                [/#if]
             [/#list]
     [/#if]
 

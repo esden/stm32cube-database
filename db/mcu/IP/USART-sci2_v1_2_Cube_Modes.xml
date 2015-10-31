@@ -36,6 +36,10 @@
 		<PossibleValue Comment="8 Bits (including Parity)" Value="IRDA_WORDLENGTH_8B"/>
 		<PossibleValue Comment="9 Bits (including Parity)" Value="IRDA_WORDLENGTH_9B"/>
 	</RefParameter>
+	<RefParameter Comment="Word Length" DefaultValue="SMARTCARD_WORDLENGTH_9B" Name="WordLength" Type="list" Group="Basic Parameters">
+		<Condition Expression="VirtualMode = VM_SMARTCARD &amp; STM32F1 " Diagnostic=""/>
+		<PossibleValue Comment="9 Bits (including Parity)" Value="SMARTCARD_WORDLENGTH_9B"/>
+	</RefParameter>
 	<RefParameter Comment="Word Length" DefaultValue="SMARTCARD_WORDLENGTH_8B" Name="WordLength" Type="list" Group="Basic Parameters">
 		<Condition Expression="VirtualMode = VM_SMARTCARD" Diagnostic=""/>
 		<PossibleValue Comment="8 Bits (including Parity)" Value="SMARTCARD_WORDLENGTH_8B"/>
@@ -84,9 +88,8 @@
 		<PossibleValue Comment="Even" Value="IRDA_PARITY_EVEN"/>
 		<PossibleValue Comment="Odd" Value="IRDA_PARITY_ODD"/>
 	</RefParameter>
-	<RefParameter Comment="Parity" DefaultValue="SMARTCARD_PARITY_NONE" Name="Parity" Type="list" Group="Basic Parameters">
+	<RefParameter Comment="Parity" DefaultValue="SMARTCARD_PARITY_EVEN" Name="Parity" Type="list" Group="Basic Parameters">
 		<Condition Expression="VirtualMode = VM_SMARTCARD" Diagnostic=""/>
-		<PossibleValue Comment="None" Value="SMARTCARD_PARITY_NONE"/>
 		<PossibleValue Comment="Even" Value="SMARTCARD_PARITY_EVEN"/>
 		<PossibleValue Comment="Odd" Value="SMARTCARD_PARITY_ODD"/>
 	</RefParameter>
@@ -138,6 +141,10 @@
 		<PossibleValue Comment="None" Value="UART_HWCONTROL_NONE"/>
 	</RefParameter>
 	
+	<RefParameter Comment="Over Sampling" DefaultValue="UART_OVERSAMPLING_16" Name="OverSampling" Type="list" Group="Advanced Parameters">
+		<Condition Expression="STM32F1" Diagnostic=""/>
+		<PossibleValue Comment="16 Samples" Value="UART_OVERSAMPLING_16"/>
+	</RefParameter>
 	<RefParameter Comment="Over Sampling" DefaultValue="UART_OVERSAMPLING_16" Name="OverSampling" Type="list" Group="Advanced Parameters">
 		<PossibleValue Comment="16 Samples" Value="UART_OVERSAMPLING_16"/>
 		<PossibleValue Comment="8 Samples" Value="UART_OVERSAMPLING_8"/>
@@ -212,7 +219,7 @@
 	
 	<!-- Specifics RefParameters for MultiProcessor Only. WakeUp Method -->
 	<RefParameter Comment="Wake-Up Method" DefaultValue="UART_WAKEUPMETHOD_IDLELINE" Name="WakeUpMethode" Type="list" Group="Advanced Parameters">
-	<Condition Expression="DIE436|DIE427|DIE437|DIE416" Diagnostic=""/>
+	<Condition Expression="DIE436|DIE427|DIE437|DIE416|STM32F1" Diagnostic=""/>
 		<PossibleValue Comment="Idle Line" Value="UART_WAKEUPMETHOD_IDLELINE"/>
 		<PossibleValue Comment="Address Mark" Value="UART_WAKEUPMETHOD_ADDRESSMARK"/>
 	</RefParameter>
@@ -237,6 +244,7 @@
 	 <RefMode Name="usartBasic" Abstract="true">
             		<Parameter Name="BaudRate"/>
         </RefMode>
+		
 	<!-- RefMode for Asynchronous UART -->
 	<RefMode Name="Asynchronous" HalMode="UART" BaseMode="usartBasic">
 		<ConfigForMode>Uart_Init</ConfigForMode>
@@ -351,7 +359,7 @@
 	</RefMode>
 	
 	<!-- RefModes for SmartCard with Clock -->
-	<RefMode Name="SmartCard_With_Clock" HalMode="SMARTCARD" BaseMode="usartBasic">
+	<RefMode Name="SmartCard_With_Clock" HalMode="SMARTCARD" BaseMode="usartBasic" Abstract="true">
 		<ConfigForMode>SmartCard_Init</ConfigForMode>
 		<Parameter Name="VirtualMode">
 			<PossibleValue>VM_SMARTCARD</PossibleValue>
@@ -360,6 +368,7 @@
 			<PossibleValue>VM_SMARTCARD</PossibleValue>
 		</Parameter>
 		<!-- Basic Parameters -->
+		
 		<Parameter Name="WordLength"/>
 		<Parameter Name="Parity"/>
 		<Parameter Name="StopBits"/>

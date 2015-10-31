@@ -106,7 +106,7 @@ static int8_t STORAGE_GetMaxLun_FS (void);
 
 /* USER CODE BEGIN 0 */ 
 /* USB Mass storage Standard Inquiry Data */
-int8_t  STORAGE_Inquirydata_FS[] = {//36
+const int8_t  STORAGE_Inquirydata_FS[] = {//36
   
   /* LUN 0 */
   0x00,		
@@ -145,7 +145,7 @@ static int8_t STORAGE_GetMaxLun_HS (void);
 
 /* USER CODE BEGIN 1 */ 
 /* USB Mass storage Standard Inquiry Data */
-int8_t  STORAGE_Inquirydata_HS[] = {//36
+const int8_t  STORAGE_Inquirydata_HS[] = {//36
   
   /* LUN 0 */
   0x00,		
@@ -175,7 +175,7 @@ USBD_StorageTypeDef USBD_Storage_Interface_fops_FS =
   STORAGE_Read_FS,
   STORAGE_Write_FS,
   STORAGE_GetMaxLun_FS,
-  STORAGE_Inquirydata_FS,
+  (int8_t *)STORAGE_Inquirydata_FS,
 };
 [/#if]
 
@@ -189,7 +189,7 @@ USBD_StorageTypeDef USBD_Storage_Interface_fops_HS =
   STORAGE_Read_HS,
   STORAGE_Write_HS,
   STORAGE_GetMaxLun_HS,
-  STORAGE_Inquirydata_HS,
+  (int8_t *)STORAGE_Inquirydata_HS,
 };
 [/#if]
 
