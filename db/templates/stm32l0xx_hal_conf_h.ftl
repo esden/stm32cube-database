@@ -107,9 +107,26 @@
   *        (when HSI is used as system clock source, directly or through the PLL). 
   */
 #if !defined  (HSI_VALUE)
-  #define HSI_VALUE    ((uint32_t)[#if hsi_value??]${hsi_value}[#else]16000000[/#if]) /*!< Value of the Internal oscillator in Hz*/
+  #define HSI_VALUE    ((uint32_t)16000000) /*!< Value of the Internal oscillator in Hz*/
 #endif /* HSI_VALUE */
-   
+
+/**
+  * @brief Internal High Speed oscillator for USB (HSI48) value.
+  */
+#if !defined  (HSI48_VALUE) 
+#define HSI48_VALUE ((uint32_t)48000000) /*!< Value of the Internal High Speed oscillator for USB in Hz.
+                                             The real value may vary depending on the variations
+                                             in voltage and temperature.  */
+#endif /* HSI48_VALUE */
+
+/**
+  * @brief Internal Low Speed oscillator (LSI) value.
+  */
+#if !defined  (LSI_VALUE) 
+ #define LSI_VALUE  ((uint32_t)37000)       /*!< LSI Typical Value in Hz*/
+#endif /* LSI_VALUE */                      /*!< Value of the Internal Low Speed oscillator in Hz
+                                             The real value may vary depending on the variations
+                                             in voltage and temperature.*/   
 /**
   * @brief External Low Speed oscillator (LSE) value.
   *        This value is used by the UART, RTC HAL module to compute the system frequency
@@ -137,7 +154,7 @@
 #define  USE_RTOS                     [#if advancedSettings?? && advancedSettings.USE_RTOS??]${advancedSettings.USE_RTOS}[#else]0[/#if]     
 #define  PREFETCH_ENABLE              [#if PREFETCH_ENABLE??]${PREFETCH_ENABLE}[#else]1[/#if]              
 #define  PREREAD_ENABLE               [#if INSTRUCTION_CACHE_ENABLE??]${INSTRUCTION_CACHE_ENABLE}[#else]0[/#if]
-#define  BUFFER_CACHE_DISABLE         [#if DATA_CACHE_ENABLE??]${DATA_CACHE_ENABLE}[#else]0[/#if]
+#define  BUFFER_CACHE_DISABLE         [#if DATA_CACHE_ENABLE??][#if DATA_CACHE_ENABLE=="0"]1[#else]0[/#if][#else]0[/#if]
 
 /* ########################## Assert Selection ############################## */
 /**

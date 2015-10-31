@@ -17,12 +17,18 @@
 	    <Condition Diagnostic="New version available for F1" Expression="STM32F1"/> 
 	</RefParameter>
 	<RefParameter Name="NEW_DISKIO_API" Comment="NEW_DISKIO_API" DefaultValue="2" Type="integer" Visible="false">
+	    <Condition Diagnostic="New version available for F2" Expression="STM32F2"/> 
+	</RefParameter>
+	<RefParameter Name="NEW_DISKIO_API" Comment="NEW_DISKIO_API" DefaultValue="2" Type="integer" Visible="false">
 	    <Condition Diagnostic="New version available for F4" Expression="STM32F4"/> 
 	</RefParameter>
 	<RefParameter Name="NEW_DISKIO_API" Comment="NEW_DISKIO_API" DefaultValue="2" Type="integer" Visible="false">
 	    <Condition Diagnostic="New version available for F7" Expression="STM32F7"/> 
 	</RefParameter>
-	<RefParameter Name="NEW_DISKIO_API" Comment="NEW_DISKIO_API" DefaultValue="1" Type="integer" Visible="false">
+	<RefParameter Name="NEW_DISKIO_API" Comment="NEW_DISKIO_API" DefaultValue="2" Type="integer" Visible="false">
+	    <Condition Diagnostic="New version available for L0" Expression="STM32L0"/> 
+	</RefParameter>
+	<RefParameter Name="NEW_DISKIO_API" Comment="NEW_DISKIO_API" DefaultValue="2" Type="integer" Visible="false">
 	    <Condition Diagnostic="New version available for L1" Expression="STM32L1"/> 
 	</RefParameter>
 	<RefParameter Name="NEW_DISKIO_API" Comment="NEW_DISKIO_API" DefaultValue="2" Type="integer" Visible="false">
@@ -39,8 +45,8 @@
 	    <PossibleValue Comment="New version of FatFS" Value="R0.11"/>
 	    <Condition Diagnostic="Version available for F1" Expression="STM32F1"/>
 	</RefParameter>
-	<RefParameter Name="FATFS_version" Comment="FATFS version" DefaultValue="R0.10" Type="String" Group="Version" TabName="Set Defines">
-		<PossibleValue Comment="Previous version of FatFS" Value="R0.10" />
+	<RefParameter Name="FATFS_version" Comment="FATFS version" DefaultValue="R0.11" Type="String" Group="Version" TabName="Set Defines">
+	    <PossibleValue Comment="New version of FatFS" Value="R0.11"/>
 	    <Condition Diagnostic="Version available for F2" Expression="STM32F2"/>	
 	</RefParameter>
 	<RefParameter Name="FATFS_version" Comment="FATFS version" DefaultValue="R0.10" Type="String" Group="Version" TabName="Set Defines">
@@ -55,12 +61,12 @@
 	    <PossibleValue Comment="New version of FatFS" Value="R0.11"/>
 	    <Condition Diagnostic="Version available for F7" Expression="STM32F7"/>
 	</RefParameter>
-	<RefParameter Name="FATFS_version" Comment="FATFS version" DefaultValue="R0.10" Type="String" Group="Version" TabName="Set Defines">
-		<PossibleValue Comment="Previous version of FatFS" Value="R0.10" />
+	<RefParameter Name="FATFS_version" Comment="FATFS version" DefaultValue="R0.11" Type="String" Group="Version" TabName="Set Defines">
+		<PossibleValue Comment="New version of FatFS" Value="R0.11" />
 	    <Condition Diagnostic="Version available for L0" Expression="STM32L0"/>	
 	</RefParameter>	
-	<RefParameter Name="FATFS_version" Comment="FATFS version" DefaultValue="R0.10b" Type="String" Group="Version" TabName="Set Defines">
-	    <PossibleValue Comment="New version of FatFS" Value="R0.10b"/>
+	<RefParameter Name="FATFS_version" Comment="FATFS version" DefaultValue="R0.11" Type="String" Group="Version" TabName="Set Defines">
+	    <PossibleValue Comment="New version of FatFS" Value="R0.11"/>
 	    <Condition Diagnostic="Version available for L1" Expression="STM32L1"/>
 	</RefParameter>
 	<RefParameter Name="FATFS_version" Comment="FATFS version" DefaultValue="R0.11" Type="String" Group="Version" TabName="Set Defines">
@@ -89,13 +95,19 @@
 	<RefParameter Name="SD_MODE" Comment="SD MODE" DefaultValue="null" Type="integer" Visible="false"/>
 	
 	<RefParameter Name="Instance" DefaultValue="FATFS" Comment="Instance" Type="" Visible="false"/>
+
+	<!-- #322733 -->
+	<RefParameter Name="_HSD" Comment="SDMMC instance" DefaultValue="hsd" Type="list" Group="SDIO/SDMMC" TabName="IPs instances">
+	    <Condition Diagnostic="SDMMC available and selected" Expression="(SD_Card | SD_Card_4) &amp; (STM32L4 | STM32F7)"/>
+		<PossibleValue Comment="SDMMC1" Value="hsd"/>
+	</RefParameter>
 	
-	<RefParameter Name="_HSD" Comment="SDIO instance" DefaultValue="hsd" Type="list" Group="SDIO" TabName="IPs instances">
+	<RefParameter Name="_HSD" Comment="SDIO instance" DefaultValue="hsd" Type="list" Group="SDIO/SDMMC" TabName="IPs instances">
 	    <Condition Diagnostic="SDIO available and selected" Expression="SD_Card | SD_Card_4"/>
 		<PossibleValue Comment="SDIO1" Value="hsd"/>
 	</RefParameter>
 	
-	<RefParameter Name="_HSD" Comment="SDIO instance" DefaultValue="null" Type="list" Group="SDIO" TabName="IPs instances">
+	<RefParameter Name="_HSD" Comment="SDIO/SDMMC instance" DefaultValue="null" Type="list" Group="SDIO/SDMMC" TabName="IPs instances">
 	</RefParameter>
 	
 	
@@ -377,7 +389,7 @@
 		<Description>This option is available only for usbh diskio interface (see the usbh_diskio.c file) and allows to disable the management of the unaligned buffer. &lt;br&gt;When STM32 USB OTG HS or FS IP is used with internal DMA enabled, this define is set to 0 (Disabled) to align data into 32bits through an internal scratch buffer before being processed by the DMA. &lt;br&gt;Otherwise (DMA not used), this define is set to 1 (Enabled) to avoid Data alignment and improve the performance. &lt;br&gt;Please note that if _USE_BUFF_WO_ALIGNMENT is set to 1 and an unaligned 32bits buffer is forwarded to the FatFs Write/Read functions, an error will be returned. (0: default value or 1: unaligned buffer return an error). */</Description>
 	</RefParameter>
 	<RefParameter Name="_USE_BUFF_WO_ALIGNMENT" Comment="USE_BUFF_WO_ALIGNMENT (Data alignment management)" DefaultValue="1" Type="uniqueElementList" Group="Function Parameters" TabName="Set Defines">
-		<Condition Diagnostic="Available in CubeMx since R0.11 version (STM parameter)" Expression="S_FATFS_USB &amp; (NEW_DISKIO_API = 2) "/>
+		<Condition Diagnostic="Available in CubeMx since R0.11 version (STM parameter)" Expression="S_FATFS_USB &amp; (NEW_DISKIO_API = 2)"/>
 		<PossibleValue Comment="Enabled" Value="1"/>
 		<Description>This option is available only for usbh diskio interface (see the usbh_diskio.c file) and allows to disable the management of the unaligned buffer. &lt;br&gt;When STM32 USB OTG HS or FS IP is used with internal DMA enabled, this define is set to 0 (Disabled) to align data into 32bits through an internal scratch buffer before being processed by the DMA. &lt;br&gt;Otherwise (DMA not used), this define is set to 1 (Enabled) to avoid Data alignment and improve the performance. &lt;br&gt;Please note that if _USE_BUFF_WO_ALIGNMENT is set to 1 and an unaligned 32bits buffer is forwarded to the FatFs Write/Read functions, an error will be returned. (0: default value or 1: unaligned buffer return an error). */</Description>
 	</RefParameter>

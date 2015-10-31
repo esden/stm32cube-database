@@ -54,7 +54,7 @@ uint8_t BSP_SRAM_Init(void)
   * @param  uwStartAddress: Read start address
   * @param  pData: Pointer to data to be read
   * @param  uwDataSize: Size of read data from the memory   
-  * @retval SRAM status
+  * @retval SRAM status : SRAM_OK or SRAM_ERROR.
   */
 uint8_t BSP_SRAM_ReadData(uint32_t uwStartAddress, uint16_t *pData, uint32_t uwDataSize)
 { 
@@ -73,7 +73,7 @@ uint8_t BSP_SRAM_ReadData(uint32_t uwStartAddress, uint16_t *pData, uint32_t uwD
   * @param  uwStartAddress: Read start address
   * @param  pData: Pointer to data to be read
   * @param  uwDataSize: Size of read data from the memory   
-  * @retval SRAM status
+  * @retval SRAM status : SRAM_OK or SRAM_ERROR.
   */
 uint8_t BSP_SRAM_ReadData_DMA(uint32_t uwStartAddress, uint16_t *pData, uint32_t uwDataSize)
 {
@@ -92,7 +92,7 @@ uint8_t BSP_SRAM_ReadData_DMA(uint32_t uwStartAddress, uint16_t *pData, uint32_t
   * @param  uwStartAddress: Write start address
   * @param  pData: Pointer to data to be written
   * @param  uwDataSize: Size of written data from the memory   
-  * @retval SRAM status
+  * @retval SRAM status : SRAM_OK or SRAM_ERROR.
   */
 uint8_t BSP_SRAM_WriteData(uint32_t uwStartAddress, uint16_t *pData, uint32_t uwDataSize) 
 { 
@@ -111,7 +111,7 @@ uint8_t BSP_SRAM_WriteData(uint32_t uwStartAddress, uint16_t *pData, uint32_t uw
   * @param  uwStartAddress: Write start address
   * @param  pData: Pointer to data to be written
   * @param  uwDataSize: Size of written data from the memory   
-  * @retval SRAM status
+  * @retval SRAM status : SRAM_OK or SRAM_ERROR.
   */
 uint8_t BSP_SRAM_WriteData_DMA(uint32_t uwStartAddress, uint16_t *pData, uint32_t uwDataSize) 
 {

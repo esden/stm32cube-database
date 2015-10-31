@@ -159,12 +159,39 @@
 	        <PossibleValue Comment="ADC 6-bit resolution" Value="ADC_RESOLUTION_6B" Condition="isNotAllowed_6b" Diagnostic="In case of usage of channels on injected group, ADC frequency should be low than AHB clock frequency /2 for resolution 6 bits." Action="Disable" Semaphore="ADC_RESOLUTION6b_$IpInstance"/>
 	        <Description>Resolution of the ADC conversion</Description>
 	    </RefParameter>
-	    <!-- possible value of DataAlign parameter -->
-	    <RefParameter Comment="Data Alignment" DefaultValue="ADC_DATAALIGN_RIGHT" Name="DataAlign" Type="list" Group="ADCgroup">
-	        <PossibleValue Comment="Right alignment" Value="ADC_DATAALIGN_RIGHT"/>
-	        <PossibleValue Comment="Left alignment" Value="ADC_DATAALIGN_LEFT"/>
-	        <Description>Select the alignment of the data stored after conversion.</Description>
-	    </RefParameter>
+    
+	     <!-- possible value of DataAlign parameter -->
+    <RefParameter Comment="Data Alignment" DefaultValue="ADC_DATAALIGN_RIGHT" Name="DataAlign" Type="list" Group="ADCgroup">
+     <Condition Expression="EnableRegularConversion=ENABLE &amp; InjNumberOfConversion > 0 &amp; Regular_OversamplingMode_Enabled_$IpInstance &amp; Injected_OversamplingMode_Enabled_$IpInstance" Diagnostic=""/>
+        <PossibleValue Comment="Right alignment" Value="ADC_DATAALIGN_RIGHT"/>
+         <PossibleValue Comment="Left alignment" Value="ADC_DATAALIGN_LEFT" Condition="Regular_OversamplingMode_Enabled_$IpInstance &amp; Injected_OversamplingMode_Enabled_$IpInstance" Action="Disable" Diagnostic="The alignment mode is not available in both Regular and Injected coversion: working with oversampling the data are always provided right-aligned"/>
+        <Description>Select the alignment of the data stored after conversion.</Description>
+    </RefParameter>
+    <RefParameter Comment="Data Alignment" DefaultValue="ADC_DATAALIGN_RIGHT" Name="DataAlign" Type="list" Group="ADCgroup">
+     <Condition Expression="EnableRegularConversion=ENABLE &amp; InjNumberOfConversion > 0 &amp; Regular_OversamplingMode_Enabled_$IpInstance" Diagnostic=""/>
+        <PossibleValue Comment="Right alignment" Value="ADC_DATAALIGN_RIGHT"/>
+         <PossibleValue Comment="Left alignment" Value="ADC_DATAALIGN_LEFT" />
+        <Description>The alignment mode is available only on for Injected conversion. &lt;br/&gt; Regular conversion working with oversampling: the data are always provided right-aligned.</Description>
+    </RefParameter>
+    <RefParameter Comment="Data Alignment" DefaultValue="ADC_DATAALIGN_RIGHT" Name="DataAlign" Type="list" Group="ADCgroup">
+     <Condition Expression="EnableRegularConversion=ENABLE &amp; InjNumberOfConversion > 0 &amp; Injected_OversamplingMode_Enabled_$IpInstance" Diagnostic=""/>
+        <PossibleValue Comment="Right alignment" Value="ADC_DATAALIGN_RIGHT"/>
+         <PossibleValue Comment="Left alignment" Value="ADC_DATAALIGN_LEFT"/>
+        <Description>The alignment mode is available only on for Regular conversion. &lt;br/&gt; Injected conversion working with oversampling: the data are always provided right-aligned.</Description>
+    </RefParameter>
+    
+     <RefParameter Comment="Data Alignment" DefaultValue="ADC_DATAALIGN_RIGHT" Name="DataAlign" Type="list" Group="ADCgroup">
+     <Condition Expression="((InjNumberOfConversion > 0) &amp; Injected_OversamplingMode_Enabled_$IpInstance) | ((EnableRegularConversion=ENABLE) &amp; Regular_OversamplingMode_Enabled_$IpInstance)" Diagnostic=""/>
+        <PossibleValue Comment="Right alignment" Value="ADC_DATAALIGN_RIGHT"/>
+         <PossibleValue Comment="Left alignment" Value="ADC_DATAALIGN_LEFT" Condition="Injected_OversamplingMode_Enabled_$IpInstance | Regular_OversamplingMode_Enabled_$IpInstance" Action="Disable" Diagnostic="The alignment mode is not available when working with oversampling: the data are always provided right-aligned"/>
+        <Description>Select the alignment of the data stored after conversion.</Description>
+    </RefParameter>
+    <RefParameter Comment="Data Alignment" DefaultValue="ADC_DATAALIGN_RIGHT" Name="DataAlign" Type="list" Group="ADCgroup">
+        <PossibleValue Comment="Right alignment" Value="ADC_DATAALIGN_RIGHT"/>
+         <PossibleValue Comment="Left alignment" Value="ADC_DATAALIGN_LEFT"/>
+        <Description>Select the alignment of the data stored after conversion.</Description>
+    </RefParameter>
+    
 	    
             <!-- ScanconvMode -->
        <RefParameter Comment="Scan Conversion Mode" DefaultValue="ENABLE" Name="ScanConvMode" Type="list" Group="ADCgroup">
@@ -179,9 +206,10 @@
 	            
        <!-- Possible values of ContinuousConvMode parameter -->
        <RefParameter Comment="Continuous Conversion Mode" DefaultValue="DISABLE" Name="ContinuousConvMode" Type="list" Group="ADCgroup">
-            <Condition Expression="DiscontinuousConvMode=ENABLE" Diagnostic="Continuous and Discontinuous modes could not be used at the same time"/>
             <PossibleValue Comment="Disabled" Value="DISABLE"/>
+            <PossibleValue Comment="Enabled" Value="ENABLE" Condition="DiscontinuousConvMode = ENABLE" Action="Disable" Diagnostic="Continuous and Discontinuous modes could not be used at the same time" />          
        </RefParameter>
+       
        <RefParameter Comment="Continuous Conversion Mode" DefaultValue="ENABLE" Name="ContinuousConvMode" Type="list" Group="ADCgroup">
 	        <Condition Expression="($IpNumber=2) &amp; USE_ADC2 &amp; USE_ADC1 &amp; (ADC1:ContinuousConvMode=ENABLE)" Diagnostic="The slave must have the same value of the master"/>
 	        <PossibleValue Comment="Enabled" Value="ENABLE" Semaphore="ContinuousMode_$IpInstance"/>
@@ -192,24 +220,15 @@
 	        <PossibleValue Comment="Disabled" Value="DISABLE"/>
 	        <Description>Enable or Disable the Continuous Conversion Mode</Description>
 	    </RefParameter>
-	   <RefParameter Comment="Continuous Conversion Mode" DefaultValue="DISABLE" Name="ContinuousConvMode" Type="list" Group="ADCgroup">
-	        <PossibleValue Comment="Disabled" Value="DISABLE"/>
-	        <PossibleValue Comment="Enabled" Value="ENABLE" Semaphore="ContinuousMode_$IpInstance"/>
-	        <Description>Enable or Disable the Continuous Conversion Mode</Description>
-	    </RefParameter>
 	    
 		        <!-- Possible values of DiscontinuousConvMode parameter -->
-        <RefParameter Comment="Discontinuous Conversion Mode" DefaultValue="DISABLE" Name="DiscontinuousConvMode" Type="list" Group="ADCgroup">
-            <Condition Expression="ContinuousMode_$IpInstance|ScanConvMode=ADC_SCAN_DISABLE" Diagnostic="Continuous and Discontinuous modes could not be used at the same time"/>
+		
+         <RefParameter Comment="Discontinuous Conversion Mode" DefaultValue="DISABLE" Name="DiscontinuousConvMode" Type="list" Group="ADCgroup">
             <PossibleValue Comment="Disabled" Value="DISABLE"/>
-        </RefParameter>
-  
-        <RefParameter Comment="Discontinuous Conversion Mode" DefaultValue="DISABLE" Name="DiscontinuousConvMode" Type="list" Group="ADCgroup">
-            <PossibleValue Comment="Disabled" Value="DISABLE"/>
-            <PossibleValue Comment="Enabled" Value="ENABLE"/>
+            <PossibleValue Comment="Enabled" Value="ENABLE"  Condition="ContinuousConvMode = ENABLE" Action="Disable" Diagnostic="Continuous and Discontinuous modes could not be used at the same time"/>
             <Description>Enable or Disable the Discontinuous Conversion Mode</Description>
         </RefParameter>
-		
+  		
 	   <!-- Possible values of NbrOfDiscConversion parameter -->
        <RefParameter Comment="Number Of Discontinuous Conversions" DefaultValue="null" Max="1" Min="1" Name="NbrOfDiscConversion" Type="integer" Visible="false">
     	  <Condition Expression="DiscontinuousConvMode=DISABLE" Diagnostic=""/>
@@ -259,7 +278,7 @@
     </RefParameter>
 	<RefParameter Comment="Enable Regular Oversampling" DefaultValue="DISABLE" Name="OversamplingMode" Type="list" Group="ADC_Regular_ConversionMode">
 	 <Condition Expression="EnableRegularConversion=ENABLE" Diagnostic=""/>
-        <PossibleValue Comment="Enable" Value="ENABLE"/>
+        <PossibleValue Comment="Enable" Value="ENABLE" Semaphore="Regular_OversamplingMode_Enabled_$IpInstance"/>
         <PossibleValue Comment="Disable" Value="DISABLE" />
         <Description>Enable/Disable Regular Oversampling</Description> 
 	</RefParameter>	
@@ -301,7 +320,7 @@
    </RefParameter>
     <RefParameter Comment="Regular Oversampling Mode" DefaultValue="ADC_REGOVERSAMPLING_CONTINUED_MODE" Name="OversamplingStopReset" Type="list" Group="ADCgroup" >
           <Condition Expression="OversamplingMode=ENABLE" Diagnostic=""/>
-		  <PossibleValue Comment="Oversampling Continued Mode" Value="ADC_REGOVERSAMPLING_CONTINUED_MODE" Condition="EnableInjectedConversion_$IpInstance" Action="Disable" Diagnostic="Oversampling Continued Mode available only when Injected Oversampling Disabled" />
+		  <PossibleValue Comment="Oversampling Continued Mode" Value="ADC_REGOVERSAMPLING_CONTINUED_MODE" Condition="Injected_OversamplingMode_Enabled_$IpInstance" Action="Disable" Diagnostic="Oversampling Continued Mode available only when Injected Oversampling Disabled" />
 		  <PossibleValue Comment="Oversampling Resumed Mode" Value="ADC_REGOVERSAMPLING_RESUMED_MODE"/>		  
    </RefParameter>
    
@@ -311,7 +330,7 @@
     <RefParameter Comment="Triggered Regular Oversampling" DefaultValue="ADC_TRIGGEREDMODE_SINGLE_TRIGGER" Name="TriggeredMode" Type="list" Group="ADCgroup">
           <Condition Expression="OversamplingMode=ENABLE" Diagnostic=""/>
 		  <PossibleValue Comment="Single trigger for all oversampled conversions" Value="ADC_TRIGGEREDMODE_SINGLE_TRIGGER"/>
-		  <PossibleValue Comment="Trigger for each oversampled conversion" Value="ADC_TRIGGEREDMODE_MULTI_TRIGGER" Condition="OversamplingStopReset=ADC_REGOVERSAMPLING_CONTINUED_MODE | EnableInjectedConversion_$IpInstance" Action="Disable" Diagnostic="Multi-Trigger Oversampled conversion available Only When: Oversampling Resumed Mode Selected And Injected Oversampling Disabled " />
+		  <PossibleValue Comment="Trigger for each oversampled conversion" Value="ADC_TRIGGEREDMODE_MULTI_TRIGGER" Condition="OversamplingStopReset=ADC_REGOVERSAMPLING_CONTINUED_MODE | Injected_OversamplingMode_Enabled_$IpInstance" Action="Disable" Diagnostic="Multi-Trigger Oversampled conversion available Only When: Oversampling Resumed Mode Selected And Injected Oversampling Disabled " />
    </RefParameter>
   
 	<!-- Possible values of NbrOfConversionFlag parameter  !!!! what is the utility of this? !!!!-->
@@ -392,6 +411,11 @@
       </RefParameter>
 	
 		  <!-- Possible Value of OffsetNumber parameters  -->
+		  <RefParameter Comment="Offset Number" DefaultValue="ADC_OFFSET_NONE" Name="OffsetNumber" Type="list" Group="ADCgroup">
+		         <Condition Expression="Regular_OversamplingMode_Enabled_$IpInstance" Diagnostic=""/>
+			     <PossibleValue Comment="No offset" Value="ADC_OFFSET_NONE"/>
+			     <Description>Offset correction is not supported in oversampling mode</Description>
+			</RefParameter>
 		<RefParameter Comment="Offset Number" DefaultValue="ADC_OFFSET_NONE" Name="OffsetNumber" Type="list" Group="ADCgroup">
 			     <PossibleValue Comment="No offset" Value="ADC_OFFSET_NONE"/>
 			     <PossibleValue Comment="1 offset" Value="ADC_OFFSET_1"/>
@@ -402,6 +426,11 @@
 			</RefParameter>
 			    
 			    <!-- Possible Value of OffsetNumber parameters: Min and Max of this parameter depend on ADC resolution -->
+		<RefParameter Comment="Offset" DefaultValue="0"  Name="Offset" Type="integer" Group="ADCgroup" Visible="false">
+			     <Condition Expression="Regular_OversamplingMode_Enabled_$IpInstance | OffsetNumber = ADC_OFFSET_NONE" Diagnostic="" />
+			     <Description>Data offset for regular channel</Description>
+		</RefParameter>
+		
 		<RefParameter Comment="Offset" DefaultValue="0" Max="4095" Min="0" Name="Offset" Type="integer" Group="ADCgroup">
 			     <Condition Expression="ADC_RESOLUTION12b_$IpInstance" Diagnostic="" />
 			     <Description>Data offset for regular channel</Description>
@@ -519,7 +548,7 @@
     </RefParameter>
 	<RefParameter Comment="Enable Injected Oversampling" DefaultValue="DISABLE" Name="EnableInjectedOversampling" Type="list" Group="ADC_Injected_ConversionMode">
 	<Condition Expression="EnableInjectedConversion=ENABLE" Diagnostic=""/>
-        <PossibleValue Comment="Enable" Value="ENABLE" Condition="InjNumberOfConversion=0" Action="Disable" Semaphore="EnableInjectedConversion_$IpInstance" Diagnostic="Number of Injected Conversion should be grater then 0" />
+        <PossibleValue Comment="Enable" Value="ENABLE" Condition="InjNumberOfConversion=0" Action="Disable" Semaphore="Injected_OversamplingMode_Enabled_$IpInstance" Diagnostic="Number of Injected Conversion should be grater then 0" />
         <PossibleValue Comment="Disable" Value="DISABLE" />
         <Description>Enable/Disable Injected Oversampling</Description> 
     </RefParameter>
@@ -633,17 +662,11 @@
     <RefParameter Comment="Injected Conversion Mode" DefaultValue="null" Name="InjectedConvMode" Type="list" Visible="false" Group="ADCgroup">
            <Condition Expression="(EnableInjectedConversion=DISABLE | InjNumberOfConversion=0)" Diagnostic="In case of usage of channels on injected group, ADC frequency should be low than AHB clock frequency /4 for resolution 12 or 10 bits, AHB clock frequency /3 for resolution 8 bits, AHB clock frequency /2 for resolution 6 bits."/>
      </RefParameter>          
-    <RefParameter Comment="Injected Conversion Mode" DefaultValue="None" Name="InjectedConvMode" Type="list">
-		<Condition Expression="ScanConvMode=ADC_SCAN_DISABLE" Diagnostic="Discontinuous Mode is available only if Scan Conversion Mode is enabled"/>
-		<PossibleValue Comment="None" Value="None"/>
-		<PossibleValue Comment="Auto Injected Mode" Value="AutoInjected"/>
-        <Description>Injected Conversion Mode selection</Description>
-	</RefParameter>
+     
     <RefParameter Comment="Injected Conversion Mode" DefaultValue="None" Name="InjectedConvMode" Type="list" Group="ADCgroup">
-        <Condition Expression="ScanConvMode=ADC_SCAN_ENABLE" Diagnostic="Discontinuous Mode is available only if Scan Conversion Mode is enabled"/>
         <PossibleValue Comment="None" Value="None"/>
         <PossibleValue Comment="Discontinuous Mode" Value="Discontinuous" Semaphore="InjectedDiscontinuous_$IpInstance"/>
-        <PossibleValue Comment="Auto Injected Mode" Value="AutoInjected"  Semaphore="AutoInjected_$IpInstance"/>
+        <PossibleValue Comment="Auto Injected Mode" Value="AutoInjected"  Semaphore="AutoInjected_$IpInstance" Condition="DiscontinuousConvMode = ENABLE" Action="Disable" Diagnostic="It is not possible to use both auto-injected mode and discontinuous mode simultaneously" />
         <Description>Injected Conversion Mode selection</Description>
     </RefParameter>
     <RefParameter Comment="Injected Discontinuous Conversion Mode" DefaultValue="ENABLE" Name="InjectedDiscontinuousConvMode" Type="list" Visible="false">
@@ -683,34 +706,40 @@
     <RefParameter Comment="Offset Number" DefaultValue="ADC_OFFSET_NONE" Name="InjectedOffsetNumber" Type="list" Group="ADCgroup" Visible="false">
          <Condition Expression="EnableInjectedConversion=DISABLE" Diagnostic="In case of usage of channels on injected group, ADC frequency should be low than AHB clock frequency /4 for resolution 12 or 10 bits, AHB clock frequency /3 for resolution 8 bits, AHB clock frequency /2 for resolution 6 bits."/>
     </RefParameter>
+
+    <RefParameter Comment="Offset Number" DefaultValue="ADC_OFFSET_NONE" Name="InjectedOffsetNumber" Type="list" Group="ADCgroup">
+          <Condition Expression="Injected_OversamplingMode_Enabled_$IpInstance" Diagnostic=""/>
+          <PossibleValue Comment="No offset" Value="ADC_OFFSET_NONE"/>
+          <Description>Offset correction is not supported in oversampling mode</Description>
+    </RefParameter>
     <RefParameter Comment="Offset Number" DefaultValue="ADC_OFFSET_NONE" Name="InjectedOffsetNumber" Type="list" Group="ADCgroup">
           <PossibleValue Comment="No offset" Value="ADC_OFFSET_NONE"/>
           <PossibleValue Comment="1 offset" Value="ADC_OFFSET_1"/>
           <PossibleValue Comment="2 offsets" Value="ADC_OFFSET_2"/>
           <PossibleValue Comment="3 offsets" Value="ADC_OFFSET_3"/>
           <PossibleValue Comment="4 offsets" Value="ADC_OFFSET_4"/>
-          <Description>Regular Channel x offset number selection</Description>
+          <Description>Injected Channel x offset number selection</Description>
     </RefParameter>
 			     
     <!-- Possible Value of InjectedOffset parameters: Min and Max of this parameter depend on ADC resolution -->
     <RefParameter Comment="Injected Offset" DefaultValue="0" Max="4095" Min="0" Name="InjectedOffset" Type="integer" Group="ADCgroup" Visible="false">
-        <Condition Expression="EnableInjectedConversion=DISABLE" Diagnostic="In case of usage of channels on injected group, ADC frequency should be low than AHB clock frequency /4 for resolution 12 or 10 bits, AHB clock frequency /3 for resolution 8 bits, AHB clock frequency /2 for resolution 6 bits."/>  
+        <Condition Expression="EnableInjectedConversion=DISABLE | Injected_OversamplingMode_Enabled_$IpInstance | InjectedOffsetNumber = ADC_OFFSET_NONE" Diagnostic="In case of usage of channels on injected group, ADC frequency should be low than AHB clock frequency /4 for resolution 12 or 10 bits, AHB clock frequency /3 for resolution 8 bits, AHB clock frequency /2 for resolution 6 bits."/>  
     </RefParameter>
     <RefParameter Comment="Injected Offset" DefaultValue="0" Max="4095" Min="0" Name="InjectedOffset" Type="integer" Group="ADCgroup">
         <Condition Expression="ADC_RESOLUTION12b_$IpInstance" Diagnostic="" />
-        <Description>Data offset for regular channel</Description>
+        <Description>Data offset for Injected channel</Description>
     </RefParameter>
     <RefParameter Comment="Injected Offset" DefaultValue="0" Max="1023" Min="0" Name="InjectedOffset" Type="integer" Group="ADCgroup">
         <Condition Expression="ADC_RESOLUTION10b_$IpInstance" Diagnostic="" />
-        <Description>Data offset for regular channel</Description>
+        <Description>Data offset for Injected channel</Description>
     </RefParameter>
     <RefParameter Comment="Injected Offset" DefaultValue="0" Max="255" Min="0" Name="InjectedOffset" Type="integer" Group="ADCgroup">
         <Condition Expression="ADC_RESOLUTION8b_$IpInstance" Diagnostic="" />
-        <Description>Data offset for regular channel</Description>
+        <Description>Data offset for Injected channel</Description>
     </RefParameter>
     <RefParameter Comment="Injected Offset" DefaultValue="0" Max="63" Min="0" Name="InjectedOffset" Type="integer" Group="ADCgroup">
         <Condition Expression="ADC_RESOLUTION6b_$IpInstance" Diagnostic="" />
-        <Description>Data offset for regular channel</Description>
+        <Description>Data offset for Injected channel</Description>
     </RefParameter>
     <RefParameter Comment="Injected Offset" DefaultValue="0" Max="4095" Min="0" Name="InjectedOffset" Type="integer" Group="ADCgroup">
         <Description>Data offset for injected channel </Description>
@@ -729,7 +758,7 @@
 			 <PossibleValue Comment="92.5 Cycles" Value="ADC_SAMPLETIME_92CYCLES_5"/>
 			 <PossibleValue Comment="247.5 Cycles" Value="ADC_SAMPLETIME_247CYCLES_5"/>
 			 <PossibleValue Comment="640.5 Cycles" Value="ADC_SAMPLETIME_640CYCLES_5"/>
-             <Description>Regular Channel x sampling time selection</Description>
+             <Description>Injected Channel x sampling time selection</Description>
     </RefParameter>
  
     <RefParameter Comment="Injected HighThreshold" DefaultValue="null" Name="InjHighThreshold" Type="list" Group="ADCChannel" Visible="false">
@@ -1888,7 +1917,7 @@
             <Semaphore>channelSelected$IpInstance</Semaphore>
             <Condition Expression="!IN3DiffUsed_$IpInstance" Diagnostic="Channel4 is already used"/>
         </Mode>
-        <Mode Name="IN5">
+        <Mode Name="IN5" RemoveCondition="($IpNumber=3)" >
             <ModeLogicOperator Name="XOR">
                 <Mode Name="IN5-Differential" UserName="IN5 Differential">
                     <SignalLogicalOp Name="AND">
@@ -2078,7 +2107,7 @@
             <Semaphore>channelSelected$IpInstance</Semaphore>
             <Condition Expression="!IN11DiffUsed_$IpInstance" Diagnostic="Channel12 is already used"/>
         </Mode>
-        <Mode Name="IN13" RemoveCondition="($IpNumber=3)">
+        <Mode Name="IN13" >
             <ModeLogicOperator Name="XOR">
                 <Mode Name="IN13-Differential" UserName="IN13 Differential">
                     <SignalLogicalOp Name="AND">
@@ -2272,33 +2301,33 @@
     <RefSignal IOMode="EXTI" Name="EXTI11" ShareableGroupName="GPXTI11"/>
     <RefSignal IOMode="EXTI" Name="EXTI15" ShareableGroupName="GPXTI15"/>
     
-    <RefSignal IOMode="Analog" Name="IN1" ShareableGroupName="ADCx_IN1:ADC1,ADC2,ADC3"/>
-    <RefSignal IOMode="Analog" Name="IN2" ShareableGroupName="ADCx_IN2:ADC1,ADC2,ADC3"/>
-    <RefSignal IOMode="Analog" Name="IN3" ShareableGroupName="ADCx_IN3:ADC1,ADC2,ADC3"/>
+    <RefSignal IOMode="AnalogForADC" Name="IN1" ShareableGroupName="ADCx_IN1:ADC1,ADC2,ADC3"/>
+    <RefSignal IOMode="AnalogForADC" Name="IN2" ShareableGroupName="ADCx_IN2:ADC1,ADC2,ADC3"/>
+    <RefSignal IOMode="AnalogForADC" Name="IN3" ShareableGroupName="ADCx_IN3:ADC1,ADC2,ADC3"/>
     
-    <RefSignal IOMode="Analog" Name="OPAMP1_OUT" Virtual="true"/>
-    <RefSignal IOMode="Analog" Name="OPAMP2_OUT" Virtual="true"/>
+    <RefSignal IOMode="AnalogForADC" Name="OPAMP1_OUT" Virtual="true"/>
+    <RefSignal IOMode="AnalogForADC" Name="OPAMP2_OUT" Virtual="true"/>
 
-    <RefSignal IOMode="Analog" Name="IN4" ShareableGroupName="ADCx_IN4:ADC1,ADC2,ADC3"/>
-    <RefSignal IOMode="Analog" Name="IN5" ShareableGroupName="ADCx_IN5:ADC1,ADC2"/>
-    <RefSignal IOMode="Analog" Name="IN6" ShareableGroupName="ADCx_IN6:ADC1,ADC2" />
-    <RefSignal IOMode="Analog" Name="IN7" ShareableGroupName="ADCx_IN7:ADC1,ADC2" />
-    <RefSignal IOMode="Analog" Name="IN8"  ShareableGroupName="ADCx_IN8:ADC1,ADC2"/>
-    <RefSignal IOMode="Analog" Name="IN9" ShareableGroupName="ADCx_IN9:ADC1,ADC2" />
-    <RefSignal IOMode="Analog" Name="IN10" ShareableGroupName="ADCx_IN10:ADC1,ADC2" />
-    <RefSignal IOMode="Analog" Name="IN11" ShareableGroupName="ADCx_IN11:ADC1,ADC2" />
-    <RefSignal IOMode="Analog" Name="IN12" ShareableGroupName="ADCx_IN12:ADC1,ADC2"/>
-    <RefSignal IOMode="Analog" Name="IN13" ShareableGroupName="ADCx_IN13:ADC1,ADC2"/>
-    <RefSignal IOMode="Analog" Name="IN14" ShareableGroupName="ADCx_IN14:ADC1,ADC2"/>
-    <RefSignal IOMode="Analog" Name="IN15" ShareableGroupName="ADCx_IN15:ADC1,ADC2"/>
-    <RefSignal IOMode="Analog" Name="IN16" ShareableGroupName="ADCx_IN16:ADC1,ADC2"/>
+    <RefSignal IOMode="AnalogForADC" Name="IN4" ShareableGroupName="ADCx_IN4:ADC1,ADC2,ADC3"/>
+    <RefSignal IOMode="AnalogForADC" Name="IN5" ShareableGroupName="ADCx_IN5:ADC1,ADC2"/>
+    <RefSignal IOMode="AnalogForADC" Name="IN6" ShareableGroupName="ADCx_IN6:ADC1,ADC2" />
+    <RefSignal IOMode="AnalogForADC" Name="IN7" ShareableGroupName="ADCx_IN7:ADC1,ADC2" />
+    <RefSignal IOMode="AnalogForADC" Name="IN8"  ShareableGroupName="ADCx_IN8:ADC1,ADC2"/>
+    <RefSignal IOMode="AnalogForADC" Name="IN9" ShareableGroupName="ADCx_IN9:ADC1,ADC2" />
+    <RefSignal IOMode="AnalogForADC" Name="IN10" ShareableGroupName="ADCx_IN10:ADC1,ADC2" />
+    <RefSignal IOMode="AnalogForADC" Name="IN11" ShareableGroupName="ADCx_IN11:ADC1,ADC2" />
+    <RefSignal IOMode="AnalogForADC" Name="IN12" ShareableGroupName="ADCx_IN12:ADC1,ADC2"/>
+    <RefSignal IOMode="AnalogForADC" Name="IN13" ShareableGroupName="ADCx_IN13:ADC1,ADC2"/>
+    <RefSignal IOMode="AnalogForADC" Name="IN14" ShareableGroupName="ADCx_IN14:ADC1,ADC2"/>
+    <RefSignal IOMode="AnalogForADC" Name="IN15" ShareableGroupName="ADCx_IN15:ADC1,ADC2"/>
+    <RefSignal IOMode="AnalogForADC" Name="IN16" ShareableGroupName="ADCx_IN16:ADC1,ADC2"/>
     
-    <RefSignal IOMode="Analog" Name="TempSens_Input" Virtual="true"/>
-    <RefSignal IOMode="Analog" Name="Vref_Input" Virtual="true"/>
-    <RefSignal IOMode="Analog" Name="Vbat_Input" Virtual="true"/>
+    <RefSignal IOMode="AnalogForADC" Name="TempSens_Input" Virtual="true"/>
+    <RefSignal IOMode="AnalogForADC" Name="Vref_Input" Virtual="true"/>
+    <RefSignal IOMode="AnalogForADC" Name="Vbat_Input" Virtual="true"/>
     
-    <RefSignal IOMode="Analog" Name="VS_DAC1_OUT1_L4" Virtual="true"/>
-    <RefSignal IOMode="Analog" Name="VS_DAC1_OUT2_L4" Virtual="true"/>
+    <RefSignal IOMode="AnalogForADC" Name="VS_DAC1_OUT1_L4" Virtual="true"/>
+    <RefSignal IOMode="AnalogForADC" Name="VS_DAC1_OUT2_L4" Virtual="true"/>
   
     
     <Semaphore>USE_$IpInstance</Semaphore>

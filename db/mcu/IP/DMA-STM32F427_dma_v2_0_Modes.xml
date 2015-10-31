@@ -34,18 +34,47 @@
 		<PossibleValue Comment="Memory To Peripheral" Value="DMA_MEMORY_TO_PERIPH"/>
 		<PossibleValue Comment="Memory To Memory" Value="DMA_MEMORY_TO_MEMORY"/>
 	</RefParameter>
+	<RefParameter Comment="Peripheral Increment" DefaultValue="DMA_PINC_ENABLE" Group="" Name="PeriphInc" Type="list">
+		<PossibleValue Comment="Peripheral Inc Enable" Value="DMA_PINC_ENABLE"/>
+		<PossibleValue Comment="Peripheral Inc Disable" Value="DMA_PINC_DISABLE"/>
+		<Condition Diagnostic="" Expression="Direction=DMA_MEMORY_TO_MEMORY"/>
+	</RefParameter>
 	<RefParameter Comment="Peripheral Increment" DefaultValue="DMA_PINC_DISABLE" Group="" Name="PeriphInc" Type="list">
 		<PossibleValue Comment="Peripheral Inc Enable" Value="DMA_PINC_ENABLE"/>
 		<PossibleValue Comment="Peripheral Inc Disable" Value="DMA_PINC_DISABLE"/>
 	</RefParameter>
-	<RefParameter Comment="Memory Increment" DefaultValue="DMA_MINC_DISABLE" Group="" Name="MemInc" Type="list">
+	<RefParameter Comment="Memory Increment" DefaultValue="DMA_MINC_ENABLE" Group="" Name="MemInc" Type="list">
 		<PossibleValue Comment="Memory Inc Enable" Value="DMA_MINC_ENABLE"/>
 		<PossibleValue Comment="Memory Inc Disable" Value="DMA_MINC_DISABLE"/>
+	</RefParameter>
+	<RefParameter Comment="Peripheral Data Alignment" DefaultValue="DMA_PDATAALIGN_WORD" Group="" Name="PeriphDataAlignment" Type="list">
+		<PossibleValue Comment="Byte" Value="DMA_PDATAALIGN_BYTE"/>
+		<PossibleValue Comment="Half Word" Value="DMA_PDATAALIGN_HALFWORD"/>
+		<PossibleValue Comment="Word" Value="DMA_PDATAALIGN_WORD"/>
+		<Condition Diagnostic="" Expression="(TEMP_SAI1_A_REQUEST_SEM|TEMP_SAI1_B_REQUEST_SEM|TEMP_TIM2_IP_SEM|TEMP_TIM5_IP_SEM)"/>
+	</RefParameter>
+	<RefParameter Comment="Peripheral Data Alignment" DefaultValue="DMA_PDATAALIGN_HALFWORD" Group="" Name="PeriphDataAlignment" Type="list">
+		<PossibleValue Comment="Byte" Value="DMA_PDATAALIGN_BYTE"/>
+		<PossibleValue Comment="Half Word" Value="DMA_PDATAALIGN_HALFWORD"/>
+		<PossibleValue Comment="Word" Value="DMA_PDATAALIGN_WORD"/>
+		<Condition Diagnostic="" Expression="(TEMP_ADC1_REQUEST_SEM|TEMP_ADC2_REQUEST_SEM|TEMP_ADC3_REQUEST_SEM|TEMP_DAC1_REQUEST_SEM|TEMP_DAC2_REQUEST_SEM|TEMP_TIM1_IP_SEM|TEMP_TIM3_IP_SEM|TEMP_TIM4_IP_SEM|TEMP_TIM6_IP_SEM|TEMP_TIM7_IP_SEM|TEMP_TIM8_IP_SEM)"/>
 	</RefParameter>
 	<RefParameter Comment="Peripheral Data Alignment" DefaultValue="DMA_PDATAALIGN_BYTE" Group="" Name="PeriphDataAlignment" Type="list">
 		<PossibleValue Comment="Byte" Value="DMA_PDATAALIGN_BYTE"/>
 		<PossibleValue Comment="Half Word" Value="DMA_PDATAALIGN_HALFWORD"/>
 		<PossibleValue Comment="Word" Value="DMA_PDATAALIGN_WORD"/>
+	</RefParameter>
+	<RefParameter Comment="Memomry Data Alignment" DefaultValue="DMA_MDATAALIGN_WORD" Group="" Name="MemDataAlignment" Type="list">
+		<PossibleValue Comment="Byte" Value="DMA_MDATAALIGN_BYTE"/>
+		<PossibleValue Comment="Half Word" Value="DMA_MDATAALIGN_HALFWORD"/>
+		<PossibleValue Comment="Word" Value="DMA_MDATAALIGN_WORD"/>
+		<Condition Diagnostic="" Expression="(TEMP_DCMI_REQUEST_SEM|TEMP_SAI1_A_REQUEST_SEM|TEMP_SAI1_B_REQUEST_SEM|TEMP_SDIO_REQUEST_SEM|TEMP_SDIO_RX_REQUEST_SEM|TEMP_SDIO_TX_REQUEST_SEM|TEMP_TIM2_IP_SEM|TEMP_TIM5_IP_SEM)"/>
+	</RefParameter>
+	<RefParameter Comment="Memomry Data Alignment" DefaultValue="DMA_MDATAALIGN_HALFWORD" Group="" Name="MemDataAlignment" Type="list">
+		<PossibleValue Comment="Byte" Value="DMA_MDATAALIGN_BYTE"/>
+		<PossibleValue Comment="Half Word" Value="DMA_MDATAALIGN_HALFWORD"/>
+		<PossibleValue Comment="Word" Value="DMA_MDATAALIGN_WORD"/>
+		<Condition Diagnostic="" Expression="(TEMP_ADC1_REQUEST_SEM|TEMP_ADC2_REQUEST_SEM|TEMP_ADC3_REQUEST_SEM|TEMP_DAC1_REQUEST_SEM|TEMP_DAC2_REQUEST_SEM|TEMP_TIM1_IP_SEM|TEMP_TIM3_IP_SEM|TEMP_TIM4_IP_SEM|TEMP_TIM6_IP_SEM|TEMP_TIM7_IP_SEM|TEMP_TIM8_IP_SEM)"/>
 	</RefParameter>
 	<RefParameter Comment="Memomry Data Alignment" DefaultValue="DMA_MDATAALIGN_BYTE" Group="" Name="MemDataAlignment" Type="list">
 		<PossibleValue Comment="Byte" Value="DMA_MDATAALIGN_BYTE"/>
@@ -101,6 +130,11 @@
 	</RefParameter>
 	<RefParameter Comment="Memory Burst" DefaultValue="null" Group="" Name="MemBurst" Type="list" Visible="false">
 		<Condition Diagnostic="" Expression="FIFOMode=DMA_FIFOMODE_DISABLE"/>
+	</RefParameter>
+	<RefParameter Comment="Memory Burst" DefaultValue="DMA_MBURST_INC4" Group="" Name="MemBurst" Type="list">
+		<PossibleValue Comment="Single" Value="DMA_MBURST_SINGLE"/>
+		<PossibleValue Comment="4 Increment" Value="DMA_MBURST_INC4"/>
+		<Condition Diagnostic="" Expression="MemDataAlignment=DMA_MDATAALIGN_WORD&amp;(TEMP_SDIO_REQUEST_SEM|TEMP_SDIO_RX_REQUEST_SEM|TEMP_SDIO_TX_REQUEST_SEM)"/>
 	</RefParameter>
 	<RefParameter Comment="Memory Burst" DefaultValue="DMA_MBURST_SINGLE" Group="" Name="MemBurst" Type="list">
 		<PossibleValue Comment="Single" Value="DMA_MBURST_SINGLE"/>
@@ -209,6 +243,9 @@
 		<Parameter Name="IpInstance">
 			<PossibleValue>ADC1</PossibleValue>
 		</Parameter>
+		<Parameter Name="PeriphInc">
+			<PossibleValue>DMA_PINC_DISABLE</PossibleValue>
+		</Parameter>
 	</RefMode>
 	<RefMode BaseMode="DMA_Request" Comment="ADC2" Name="ADC2">
 		<Parameter Name="Channel">
@@ -226,6 +263,9 @@
 		</Parameter>
 		<Parameter Name="IpInstance">
 			<PossibleValue>ADC2</PossibleValue>
+		</Parameter>
+		<Parameter Name="PeriphInc">
+			<PossibleValue>DMA_PINC_DISABLE</PossibleValue>
 		</Parameter>
 	</RefMode>
 	<RefMode BaseMode="DMA_Request" Comment="ADC3" Name="ADC3">
@@ -245,6 +285,9 @@
 		<Parameter Name="IpInstance">
 			<PossibleValue>ADC3</PossibleValue>
 		</Parameter>
+		<Parameter Name="PeriphInc">
+			<PossibleValue>DMA_PINC_DISABLE</PossibleValue>
+		</Parameter>
 	</RefMode>
 	<RefMode BaseMode="DMA_Request" Comment="CRYP_IN" Name="CRYP_IN">
 		<Parameter Name="Channel">
@@ -262,6 +305,9 @@
 		</Parameter>
 		<Parameter Name="IpInstance">
 			<PossibleValue>CRYP</PossibleValue>
+		</Parameter>
+		<Parameter Name="PeriphInc">
+			<PossibleValue>DMA_PINC_DISABLE</PossibleValue>
 		</Parameter>
 	</RefMode>
 	<RefMode BaseMode="DMA_Request" Comment="CRYP_OUT" Name="CRYP_OUT">
@@ -281,6 +327,9 @@
 		<Parameter Name="IpInstance">
 			<PossibleValue>CRYP</PossibleValue>
 		</Parameter>
+		<Parameter Name="PeriphInc">
+			<PossibleValue>DMA_PINC_DISABLE</PossibleValue>
+		</Parameter>
 	</RefMode>
 	<RefMode BaseMode="DMA_Request" Comment="DAC1" Name="DAC1">
 		<Parameter Name="Channel">
@@ -298,6 +347,9 @@
 		</Parameter>
 		<Parameter Name="IpInstance">
 			<PossibleValue>DAC</PossibleValue>
+		</Parameter>
+		<Parameter Name="PeriphInc">
+			<PossibleValue>DMA_PINC_DISABLE</PossibleValue>
 		</Parameter>
 	</RefMode>
 	<RefMode BaseMode="DMA_Request" Comment="DAC2" Name="DAC2">
@@ -317,6 +369,9 @@
 		<Parameter Name="IpInstance">
 			<PossibleValue>DAC</PossibleValue>
 		</Parameter>
+		<Parameter Name="PeriphInc">
+			<PossibleValue>DMA_PINC_DISABLE</PossibleValue>
+		</Parameter>
 	</RefMode>
 	<RefMode BaseMode="DMA_Request" Comment="DCMI" Name="DCMI">
 		<Parameter Name="Channel">
@@ -334,6 +389,12 @@
 		</Parameter>
 		<Parameter Name="IpInstance">
 			<PossibleValue>DCMI</PossibleValue>
+		</Parameter>
+		<Parameter Name="PeriphInc">
+			<PossibleValue>DMA_PINC_DISABLE</PossibleValue>
+		</Parameter>
+		<Parameter Name="PeriphDataAlignment">
+			<PossibleValue>DMA_PDATAALIGN_WORD</PossibleValue>
 		</Parameter>
 	</RefMode>
 	<RefMode BaseMode="DMA_Request" Comment="HASH_IN" Name="HASH_IN">
@@ -353,6 +414,9 @@
 		<Parameter Name="IpInstance">
 			<PossibleValue>HASH</PossibleValue>
 		</Parameter>
+		<Parameter Name="PeriphInc">
+			<PossibleValue>DMA_PINC_DISABLE</PossibleValue>
+		</Parameter>
 	</RefMode>
 	<RefMode BaseMode="DMA_Request" Comment="I2C1_RX" Name="I2C1_RX">
 		<Parameter Name="Channel">
@@ -370,6 +434,9 @@
 		</Parameter>
 		<Parameter Name="IpInstance">
 			<PossibleValue>I2C1</PossibleValue>
+		</Parameter>
+		<Parameter Name="PeriphInc">
+			<PossibleValue>DMA_PINC_DISABLE</PossibleValue>
 		</Parameter>
 	</RefMode>
 	<RefMode BaseMode="DMA_Request" Comment="I2C1_TX" Name="I2C1_TX">
@@ -389,6 +456,9 @@
 		<Parameter Name="IpInstance">
 			<PossibleValue>I2C1</PossibleValue>
 		</Parameter>
+		<Parameter Name="PeriphInc">
+			<PossibleValue>DMA_PINC_DISABLE</PossibleValue>
+		</Parameter>
 	</RefMode>
 	<RefMode BaseMode="DMA_Request" Comment="I2C2_RX" Name="I2C2_RX">
 		<Parameter Name="Channel">
@@ -406,6 +476,9 @@
 		</Parameter>
 		<Parameter Name="IpInstance">
 			<PossibleValue>I2C2</PossibleValue>
+		</Parameter>
+		<Parameter Name="PeriphInc">
+			<PossibleValue>DMA_PINC_DISABLE</PossibleValue>
 		</Parameter>
 	</RefMode>
 	<RefMode BaseMode="DMA_Request" Comment="I2C2_TX" Name="I2C2_TX">
@@ -425,6 +498,9 @@
 		<Parameter Name="IpInstance">
 			<PossibleValue>I2C2</PossibleValue>
 		</Parameter>
+		<Parameter Name="PeriphInc">
+			<PossibleValue>DMA_PINC_DISABLE</PossibleValue>
+		</Parameter>
 	</RefMode>
 	<RefMode BaseMode="DMA_Request" Comment="I2C3_RX" Name="I2C3_RX">
 		<Parameter Name="Channel">
@@ -442,6 +518,9 @@
 		</Parameter>
 		<Parameter Name="IpInstance">
 			<PossibleValue>I2C3</PossibleValue>
+		</Parameter>
+		<Parameter Name="PeriphInc">
+			<PossibleValue>DMA_PINC_DISABLE</PossibleValue>
 		</Parameter>
 	</RefMode>
 	<RefMode BaseMode="DMA_Request" Comment="I2C3_TX" Name="I2C3_TX">
@@ -461,6 +540,9 @@
 		<Parameter Name="IpInstance">
 			<PossibleValue>I2C3</PossibleValue>
 		</Parameter>
+		<Parameter Name="PeriphInc">
+			<PossibleValue>DMA_PINC_DISABLE</PossibleValue>
+		</Parameter>
 	</RefMode>
 	<RefMode BaseMode="DMA_Request" Comment="I2S2_EXT_RX" Name="I2S2_EXT_RX">
 		<Parameter Name="Channel">
@@ -478,6 +560,9 @@
 		</Parameter>
 		<Parameter Name="IpInstance">
 			<PossibleValue>I2S2</PossibleValue>
+		</Parameter>
+		<Parameter Name="PeriphInc">
+			<PossibleValue>DMA_PINC_DISABLE</PossibleValue>
 		</Parameter>
 	</RefMode>
 	<RefMode BaseMode="DMA_Request" Comment="I2S2_EXT_TX" Name="I2S2_EXT_TX">
@@ -497,6 +582,9 @@
 		<Parameter Name="IpInstance">
 			<PossibleValue>I2S2</PossibleValue>
 		</Parameter>
+		<Parameter Name="PeriphInc">
+			<PossibleValue>DMA_PINC_DISABLE</PossibleValue>
+		</Parameter>
 	</RefMode>
 	<RefMode BaseMode="DMA_Request" Comment="I2S3_EXT_RX" Name="I2S3_EXT_RX">
 		<Parameter Name="Channel">
@@ -514,6 +602,9 @@
 		</Parameter>
 		<Parameter Name="IpInstance">
 			<PossibleValue>I2S3</PossibleValue>
+		</Parameter>
+		<Parameter Name="PeriphInc">
+			<PossibleValue>DMA_PINC_DISABLE</PossibleValue>
 		</Parameter>
 	</RefMode>
 	<RefMode BaseMode="DMA_Request" Comment="I2S3_EXT_RX:DMA_CHANNEL_2" Name="I2S3_EXT_RX:DMA_CHANNEL_2">
@@ -533,6 +624,9 @@
 		<Parameter Name="IpInstance">
 			<PossibleValue>I2S3</PossibleValue>
 		</Parameter>
+		<Parameter Name="PeriphInc">
+			<PossibleValue>DMA_PINC_DISABLE</PossibleValue>
+		</Parameter>
 	</RefMode>
 	<RefMode BaseMode="DMA_Request" Comment="I2S3_EXT_TX" Name="I2S3_EXT_TX">
 		<Parameter Name="Channel">
@@ -550,6 +644,9 @@
 		</Parameter>
 		<Parameter Name="IpInstance">
 			<PossibleValue>I2S3</PossibleValue>
+		</Parameter>
+		<Parameter Name="PeriphInc">
+			<PossibleValue>DMA_PINC_DISABLE</PossibleValue>
 		</Parameter>
 	</RefMode>
 	<RefMode BaseMode="DMA_Request" Comment="SAI1_A" Name="SAI1_A">
@@ -571,6 +668,9 @@
 		<Parameter Name="IpInstance">
 			<PossibleValue>SAI1</PossibleValue>
 		</Parameter>
+		<Parameter Name="PeriphInc">
+			<PossibleValue>DMA_PINC_DISABLE</PossibleValue>
+		</Parameter>
 	</RefMode>
 	<RefMode BaseMode="DMA_Request" Comment="SAI1_B" Name="SAI1_B">
 		<Parameter Name="Channel">
@@ -590,6 +690,9 @@
 		</Parameter>
 		<Parameter Name="IpInstance">
 			<PossibleValue>SAI1</PossibleValue>
+		</Parameter>
+		<Parameter Name="PeriphInc">
+			<PossibleValue>DMA_PINC_DISABLE</PossibleValue>
 		</Parameter>
 	</RefMode>
 	<RefMode BaseMode="DMA_Request" Comment="SAI1_B:DMA_CHANNEL_0" Name="SAI1_B:DMA_CHANNEL_0">
@@ -611,6 +714,9 @@
 		<Parameter Name="IpInstance">
 			<PossibleValue>SAI1</PossibleValue>
 		</Parameter>
+		<Parameter Name="PeriphInc">
+			<PossibleValue>DMA_PINC_DISABLE</PossibleValue>
+		</Parameter>
 	</RefMode>
 	<RefMode BaseMode="DMA_Request" Comment="SDIO" Name="SDIO">
 		<Parameter Name="Channel">
@@ -625,12 +731,25 @@
 			<PossibleValue>hdmatx</PossibleValue>
 		</Parameter>
 		<Parameter Name="Mode">
-			<PossibleValue>DMA_NORMAL</PossibleValue>
-			<PossibleValue>DMA_CIRCULAR</PossibleValue>
 			<PossibleValue>DMA_PFCTRL</PossibleValue>
 		</Parameter>
 		<Parameter Name="IpInstance">
 			<PossibleValue>SDIO</PossibleValue>
+		</Parameter>
+		<Parameter Name="PeriphInc">
+			<PossibleValue>DMA_PINC_DISABLE</PossibleValue>
+		</Parameter>
+		<Parameter Name="PeriphDataAlignment">
+			<PossibleValue>DMA_PDATAALIGN_WORD</PossibleValue>
+		</Parameter>
+		<Parameter Name="FIFOMode">
+			<PossibleValue>DMA_FIFOMODE_ENABLE</PossibleValue>
+		</Parameter>
+		<Parameter Name="FIFOThreshold">
+			<PossibleValue>DMA_FIFO_THRESHOLD_FULL</PossibleValue>
+		</Parameter>
+		<Parameter Name="PeriphBurst">
+			<PossibleValue>DMA_PBURST_INC4</PossibleValue>
 		</Parameter>
 	</RefMode>
 	<RefMode BaseMode="DMA_Request" Comment="SDIO:Conflict:SDIO_RX,SDIO_TX" Name="SDIO:Conflict:SDIO_RX,SDIO_TX">
@@ -646,12 +765,25 @@
 			<PossibleValue>hdmatx</PossibleValue>
 		</Parameter>
 		<Parameter Name="Mode">
-			<PossibleValue>DMA_NORMAL</PossibleValue>
-			<PossibleValue>DMA_CIRCULAR</PossibleValue>
 			<PossibleValue>DMA_PFCTRL</PossibleValue>
 		</Parameter>
 		<Parameter Name="IpInstance">
 			<PossibleValue>SDIO</PossibleValue>
+		</Parameter>
+		<Parameter Name="PeriphInc">
+			<PossibleValue>DMA_PINC_DISABLE</PossibleValue>
+		</Parameter>
+		<Parameter Name="PeriphDataAlignment">
+			<PossibleValue>DMA_PDATAALIGN_WORD</PossibleValue>
+		</Parameter>
+		<Parameter Name="FIFOMode">
+			<PossibleValue>DMA_FIFOMODE_ENABLE</PossibleValue>
+		</Parameter>
+		<Parameter Name="FIFOThreshold">
+			<PossibleValue>DMA_FIFO_THRESHOLD_FULL</PossibleValue>
+		</Parameter>
+		<Parameter Name="PeriphBurst">
+			<PossibleValue>DMA_PBURST_INC4</PossibleValue>
 		</Parameter>
 	</RefMode>
 	<RefMode BaseMode="DMA_Request" Comment="SDIO_RX" Name="SDIO_RX">
@@ -665,12 +797,25 @@
 			<PossibleValue>hdmarx</PossibleValue>
 		</Parameter>
 		<Parameter Name="Mode">
-			<PossibleValue>DMA_NORMAL</PossibleValue>
-			<PossibleValue>DMA_CIRCULAR</PossibleValue>
 			<PossibleValue>DMA_PFCTRL</PossibleValue>
 		</Parameter>
 		<Parameter Name="IpInstance">
 			<PossibleValue>SDIO</PossibleValue>
+		</Parameter>
+		<Parameter Name="PeriphInc">
+			<PossibleValue>DMA_PINC_DISABLE</PossibleValue>
+		</Parameter>
+		<Parameter Name="PeriphDataAlignment">
+			<PossibleValue>DMA_PDATAALIGN_WORD</PossibleValue>
+		</Parameter>
+		<Parameter Name="FIFOMode">
+			<PossibleValue>DMA_FIFOMODE_ENABLE</PossibleValue>
+		</Parameter>
+		<Parameter Name="FIFOThreshold">
+			<PossibleValue>DMA_FIFO_THRESHOLD_FULL</PossibleValue>
+		</Parameter>
+		<Parameter Name="PeriphBurst">
+			<PossibleValue>DMA_PBURST_INC4</PossibleValue>
 		</Parameter>
 	</RefMode>
 	<RefMode BaseMode="DMA_Request" Comment="SDIO_RX:Conflict:SDIO" Name="SDIO_RX:Conflict:SDIO">
@@ -684,12 +829,25 @@
 			<PossibleValue>hdmarx</PossibleValue>
 		</Parameter>
 		<Parameter Name="Mode">
-			<PossibleValue>DMA_NORMAL</PossibleValue>
-			<PossibleValue>DMA_CIRCULAR</PossibleValue>
 			<PossibleValue>DMA_PFCTRL</PossibleValue>
 		</Parameter>
 		<Parameter Name="IpInstance">
 			<PossibleValue>SDIO</PossibleValue>
+		</Parameter>
+		<Parameter Name="PeriphInc">
+			<PossibleValue>DMA_PINC_DISABLE</PossibleValue>
+		</Parameter>
+		<Parameter Name="PeriphDataAlignment">
+			<PossibleValue>DMA_PDATAALIGN_WORD</PossibleValue>
+		</Parameter>
+		<Parameter Name="FIFOMode">
+			<PossibleValue>DMA_FIFOMODE_ENABLE</PossibleValue>
+		</Parameter>
+		<Parameter Name="FIFOThreshold">
+			<PossibleValue>DMA_FIFO_THRESHOLD_FULL</PossibleValue>
+		</Parameter>
+		<Parameter Name="PeriphBurst">
+			<PossibleValue>DMA_PBURST_INC4</PossibleValue>
 		</Parameter>
 	</RefMode>
 	<RefMode BaseMode="DMA_Request" Comment="SDIO_TX" Name="SDIO_TX">
@@ -703,12 +861,25 @@
 			<PossibleValue>hdmatx</PossibleValue>
 		</Parameter>
 		<Parameter Name="Mode">
-			<PossibleValue>DMA_NORMAL</PossibleValue>
-			<PossibleValue>DMA_CIRCULAR</PossibleValue>
 			<PossibleValue>DMA_PFCTRL</PossibleValue>
 		</Parameter>
 		<Parameter Name="IpInstance">
 			<PossibleValue>SDIO</PossibleValue>
+		</Parameter>
+		<Parameter Name="PeriphInc">
+			<PossibleValue>DMA_PINC_DISABLE</PossibleValue>
+		</Parameter>
+		<Parameter Name="PeriphDataAlignment">
+			<PossibleValue>DMA_PDATAALIGN_WORD</PossibleValue>
+		</Parameter>
+		<Parameter Name="FIFOMode">
+			<PossibleValue>DMA_FIFOMODE_ENABLE</PossibleValue>
+		</Parameter>
+		<Parameter Name="FIFOThreshold">
+			<PossibleValue>DMA_FIFO_THRESHOLD_FULL</PossibleValue>
+		</Parameter>
+		<Parameter Name="PeriphBurst">
+			<PossibleValue>DMA_PBURST_INC4</PossibleValue>
 		</Parameter>
 	</RefMode>
 	<RefMode BaseMode="DMA_Request" Comment="SDIO_TX:Conflict:SDIO" Name="SDIO_TX:Conflict:SDIO">
@@ -722,12 +893,25 @@
 			<PossibleValue>hdmatx</PossibleValue>
 		</Parameter>
 		<Parameter Name="Mode">
-			<PossibleValue>DMA_NORMAL</PossibleValue>
-			<PossibleValue>DMA_CIRCULAR</PossibleValue>
 			<PossibleValue>DMA_PFCTRL</PossibleValue>
 		</Parameter>
 		<Parameter Name="IpInstance">
 			<PossibleValue>SDIO</PossibleValue>
+		</Parameter>
+		<Parameter Name="PeriphInc">
+			<PossibleValue>DMA_PINC_DISABLE</PossibleValue>
+		</Parameter>
+		<Parameter Name="PeriphDataAlignment">
+			<PossibleValue>DMA_PDATAALIGN_WORD</PossibleValue>
+		</Parameter>
+		<Parameter Name="FIFOMode">
+			<PossibleValue>DMA_FIFOMODE_ENABLE</PossibleValue>
+		</Parameter>
+		<Parameter Name="FIFOThreshold">
+			<PossibleValue>DMA_FIFO_THRESHOLD_FULL</PossibleValue>
+		</Parameter>
+		<Parameter Name="PeriphBurst">
+			<PossibleValue>DMA_PBURST_INC4</PossibleValue>
 		</Parameter>
 	</RefMode>
 	<RefMode BaseMode="DMA_Request" Comment="SPI1_RX" Name="SPI1_RX">
@@ -747,6 +931,9 @@
 		<Parameter Name="IpInstance">
 			<PossibleValue>SPI1</PossibleValue>
 		</Parameter>
+		<Parameter Name="PeriphInc">
+			<PossibleValue>DMA_PINC_DISABLE</PossibleValue>
+		</Parameter>
 	</RefMode>
 	<RefMode BaseMode="DMA_Request" Comment="SPI1_TX" Name="SPI1_TX">
 		<Parameter Name="Channel">
@@ -764,6 +951,9 @@
 		</Parameter>
 		<Parameter Name="IpInstance">
 			<PossibleValue>SPI1</PossibleValue>
+		</Parameter>
+		<Parameter Name="PeriphInc">
+			<PossibleValue>DMA_PINC_DISABLE</PossibleValue>
 		</Parameter>
 	</RefMode>
 	<RefMode BaseMode="DMA_Request" Comment="SPI2_RX" Name="SPI2_RX">
@@ -783,6 +973,9 @@
 		<Parameter Name="IpInstance">
 			<PossibleValue>SPI2:I2S2</PossibleValue>
 		</Parameter>
+		<Parameter Name="PeriphInc">
+			<PossibleValue>DMA_PINC_DISABLE</PossibleValue>
+		</Parameter>
 	</RefMode>
 	<RefMode BaseMode="DMA_Request" Comment="SPI2_TX" Name="SPI2_TX">
 		<Parameter Name="Channel">
@@ -800,6 +993,9 @@
 		</Parameter>
 		<Parameter Name="IpInstance">
 			<PossibleValue>SPI2:I2S2</PossibleValue>
+		</Parameter>
+		<Parameter Name="PeriphInc">
+			<PossibleValue>DMA_PINC_DISABLE</PossibleValue>
 		</Parameter>
 	</RefMode>
 	<RefMode BaseMode="DMA_Request" Comment="SPI3_RX" Name="SPI3_RX">
@@ -819,6 +1015,9 @@
 		<Parameter Name="IpInstance">
 			<PossibleValue>SPI3:I2S3</PossibleValue>
 		</Parameter>
+		<Parameter Name="PeriphInc">
+			<PossibleValue>DMA_PINC_DISABLE</PossibleValue>
+		</Parameter>
 	</RefMode>
 	<RefMode BaseMode="DMA_Request" Comment="SPI3_TX" Name="SPI3_TX">
 		<Parameter Name="Channel">
@@ -836,6 +1035,9 @@
 		</Parameter>
 		<Parameter Name="IpInstance">
 			<PossibleValue>SPI3:I2S3</PossibleValue>
+		</Parameter>
+		<Parameter Name="PeriphInc">
+			<PossibleValue>DMA_PINC_DISABLE</PossibleValue>
 		</Parameter>
 	</RefMode>
 	<RefMode BaseMode="DMA_Request" Comment="SPI4_RX" Name="SPI4_RX">
@@ -855,6 +1057,9 @@
 		<Parameter Name="IpInstance">
 			<PossibleValue>SPI4</PossibleValue>
 		</Parameter>
+		<Parameter Name="PeriphInc">
+			<PossibleValue>DMA_PINC_DISABLE</PossibleValue>
+		</Parameter>
 	</RefMode>
 	<RefMode BaseMode="DMA_Request" Comment="SPI4_RX:DMA_CHANNEL_5" Name="SPI4_RX:DMA_CHANNEL_5">
 		<Parameter Name="Channel">
@@ -872,6 +1077,9 @@
 		</Parameter>
 		<Parameter Name="IpInstance">
 			<PossibleValue>SPI4</PossibleValue>
+		</Parameter>
+		<Parameter Name="PeriphInc">
+			<PossibleValue>DMA_PINC_DISABLE</PossibleValue>
 		</Parameter>
 	</RefMode>
 	<RefMode BaseMode="DMA_Request" Comment="SPI4_TX" Name="SPI4_TX">
@@ -891,6 +1099,9 @@
 		<Parameter Name="IpInstance">
 			<PossibleValue>SPI4</PossibleValue>
 		</Parameter>
+		<Parameter Name="PeriphInc">
+			<PossibleValue>DMA_PINC_DISABLE</PossibleValue>
+		</Parameter>
 	</RefMode>
 	<RefMode BaseMode="DMA_Request" Comment="SPI4_TX:DMA_CHANNEL_5" Name="SPI4_TX:DMA_CHANNEL_5">
 		<Parameter Name="Channel">
@@ -908,6 +1119,9 @@
 		</Parameter>
 		<Parameter Name="IpInstance">
 			<PossibleValue>SPI4</PossibleValue>
+		</Parameter>
+		<Parameter Name="PeriphInc">
+			<PossibleValue>DMA_PINC_DISABLE</PossibleValue>
 		</Parameter>
 	</RefMode>
 	<RefMode BaseMode="DMA_Request" Comment="SPI5_RX" Name="SPI5_RX">
@@ -927,6 +1141,9 @@
 		<Parameter Name="IpInstance">
 			<PossibleValue>SPI5</PossibleValue>
 		</Parameter>
+		<Parameter Name="PeriphInc">
+			<PossibleValue>DMA_PINC_DISABLE</PossibleValue>
+		</Parameter>
 	</RefMode>
 	<RefMode BaseMode="DMA_Request" Comment="SPI5_RX:DMA_CHANNEL_7" Name="SPI5_RX:DMA_CHANNEL_7">
 		<Parameter Name="Channel">
@@ -944,6 +1161,9 @@
 		</Parameter>
 		<Parameter Name="IpInstance">
 			<PossibleValue>SPI5</PossibleValue>
+		</Parameter>
+		<Parameter Name="PeriphInc">
+			<PossibleValue>DMA_PINC_DISABLE</PossibleValue>
 		</Parameter>
 	</RefMode>
 	<RefMode BaseMode="DMA_Request" Comment="SPI5_TX" Name="SPI5_TX">
@@ -963,6 +1183,9 @@
 		<Parameter Name="IpInstance">
 			<PossibleValue>SPI5</PossibleValue>
 		</Parameter>
+		<Parameter Name="PeriphInc">
+			<PossibleValue>DMA_PINC_DISABLE</PossibleValue>
+		</Parameter>
 	</RefMode>
 	<RefMode BaseMode="DMA_Request" Comment="SPI5_TX:DMA_CHANNEL_7" Name="SPI5_TX:DMA_CHANNEL_7">
 		<Parameter Name="Channel">
@@ -980,6 +1203,9 @@
 		</Parameter>
 		<Parameter Name="IpInstance">
 			<PossibleValue>SPI5</PossibleValue>
+		</Parameter>
+		<Parameter Name="PeriphInc">
+			<PossibleValue>DMA_PINC_DISABLE</PossibleValue>
 		</Parameter>
 	</RefMode>
 	<RefMode BaseMode="DMA_Request" Comment="SPI6_RX" Name="SPI6_RX">
@@ -999,6 +1225,9 @@
 		<Parameter Name="IpInstance">
 			<PossibleValue>SPI6</PossibleValue>
 		</Parameter>
+		<Parameter Name="PeriphInc">
+			<PossibleValue>DMA_PINC_DISABLE</PossibleValue>
+		</Parameter>
 	</RefMode>
 	<RefMode BaseMode="DMA_Request" Comment="SPI6_TX" Name="SPI6_TX">
 		<Parameter Name="Channel">
@@ -1016,6 +1245,9 @@
 		</Parameter>
 		<Parameter Name="IpInstance">
 			<PossibleValue>SPI6</PossibleValue>
+		</Parameter>
+		<Parameter Name="PeriphInc">
+			<PossibleValue>DMA_PINC_DISABLE</PossibleValue>
 		</Parameter>
 	</RefMode>
 	<RefMode BaseMode="DMA_Request" Comment="TIM1_CH1" Name="TIM1_CH1">
@@ -1658,6 +1890,9 @@
 		<Parameter Name="IpInstance">
 			<PossibleValue>UART4</PossibleValue>
 		</Parameter>
+		<Parameter Name="PeriphInc">
+			<PossibleValue>DMA_PINC_DISABLE</PossibleValue>
+		</Parameter>
 	</RefMode>
 	<RefMode BaseMode="DMA_Request" Comment="UART4_TX" Name="UART4_TX">
 		<Parameter Name="Channel">
@@ -1675,6 +1910,9 @@
 		</Parameter>
 		<Parameter Name="IpInstance">
 			<PossibleValue>UART4</PossibleValue>
+		</Parameter>
+		<Parameter Name="PeriphInc">
+			<PossibleValue>DMA_PINC_DISABLE</PossibleValue>
 		</Parameter>
 	</RefMode>
 	<RefMode BaseMode="DMA_Request" Comment="UART5_RX" Name="UART5_RX">
@@ -1694,6 +1932,9 @@
 		<Parameter Name="IpInstance">
 			<PossibleValue>UART5</PossibleValue>
 		</Parameter>
+		<Parameter Name="PeriphInc">
+			<PossibleValue>DMA_PINC_DISABLE</PossibleValue>
+		</Parameter>
 	</RefMode>
 	<RefMode BaseMode="DMA_Request" Comment="UART5_TX" Name="UART5_TX">
 		<Parameter Name="Channel">
@@ -1711,6 +1952,9 @@
 		</Parameter>
 		<Parameter Name="IpInstance">
 			<PossibleValue>UART5</PossibleValue>
+		</Parameter>
+		<Parameter Name="PeriphInc">
+			<PossibleValue>DMA_PINC_DISABLE</PossibleValue>
 		</Parameter>
 	</RefMode>
 	<RefMode BaseMode="DMA_Request" Comment="UART7_RX" Name="UART7_RX">
@@ -1730,6 +1974,9 @@
 		<Parameter Name="IpInstance">
 			<PossibleValue>UART7</PossibleValue>
 		</Parameter>
+		<Parameter Name="PeriphInc">
+			<PossibleValue>DMA_PINC_DISABLE</PossibleValue>
+		</Parameter>
 	</RefMode>
 	<RefMode BaseMode="DMA_Request" Comment="UART7_TX" Name="UART7_TX">
 		<Parameter Name="Channel">
@@ -1747,6 +1994,9 @@
 		</Parameter>
 		<Parameter Name="IpInstance">
 			<PossibleValue>UART7</PossibleValue>
+		</Parameter>
+		<Parameter Name="PeriphInc">
+			<PossibleValue>DMA_PINC_DISABLE</PossibleValue>
 		</Parameter>
 	</RefMode>
 	<RefMode BaseMode="DMA_Request" Comment="UART8_RX" Name="UART8_RX">
@@ -1766,6 +2016,9 @@
 		<Parameter Name="IpInstance">
 			<PossibleValue>UART8</PossibleValue>
 		</Parameter>
+		<Parameter Name="PeriphInc">
+			<PossibleValue>DMA_PINC_DISABLE</PossibleValue>
+		</Parameter>
 	</RefMode>
 	<RefMode BaseMode="DMA_Request" Comment="UART8_TX" Name="UART8_TX">
 		<Parameter Name="Channel">
@@ -1783,6 +2036,9 @@
 		</Parameter>
 		<Parameter Name="IpInstance">
 			<PossibleValue>UART8</PossibleValue>
+		</Parameter>
+		<Parameter Name="PeriphInc">
+			<PossibleValue>DMA_PINC_DISABLE</PossibleValue>
 		</Parameter>
 	</RefMode>
 	<RefMode BaseMode="DMA_Request" Comment="USART1_RX" Name="USART1_RX">
@@ -1802,6 +2058,9 @@
 		<Parameter Name="IpInstance">
 			<PossibleValue>USART1</PossibleValue>
 		</Parameter>
+		<Parameter Name="PeriphInc">
+			<PossibleValue>DMA_PINC_DISABLE</PossibleValue>
+		</Parameter>
 	</RefMode>
 	<RefMode BaseMode="DMA_Request" Comment="USART1_TX" Name="USART1_TX">
 		<Parameter Name="Channel">
@@ -1819,6 +2078,9 @@
 		</Parameter>
 		<Parameter Name="IpInstance">
 			<PossibleValue>USART1</PossibleValue>
+		</Parameter>
+		<Parameter Name="PeriphInc">
+			<PossibleValue>DMA_PINC_DISABLE</PossibleValue>
 		</Parameter>
 	</RefMode>
 	<RefMode BaseMode="DMA_Request" Comment="USART2_RX" Name="USART2_RX">
@@ -1838,6 +2100,9 @@
 		<Parameter Name="IpInstance">
 			<PossibleValue>USART2</PossibleValue>
 		</Parameter>
+		<Parameter Name="PeriphInc">
+			<PossibleValue>DMA_PINC_DISABLE</PossibleValue>
+		</Parameter>
 	</RefMode>
 	<RefMode BaseMode="DMA_Request" Comment="USART2_TX" Name="USART2_TX">
 		<Parameter Name="Channel">
@@ -1855,6 +2120,9 @@
 		</Parameter>
 		<Parameter Name="IpInstance">
 			<PossibleValue>USART2</PossibleValue>
+		</Parameter>
+		<Parameter Name="PeriphInc">
+			<PossibleValue>DMA_PINC_DISABLE</PossibleValue>
 		</Parameter>
 	</RefMode>
 	<RefMode BaseMode="DMA_Request" Comment="USART3_RX" Name="USART3_RX">
@@ -1874,6 +2142,9 @@
 		<Parameter Name="IpInstance">
 			<PossibleValue>USART3</PossibleValue>
 		</Parameter>
+		<Parameter Name="PeriphInc">
+			<PossibleValue>DMA_PINC_DISABLE</PossibleValue>
+		</Parameter>
 	</RefMode>
 	<RefMode BaseMode="DMA_Request" Comment="USART3_TX" Name="USART3_TX">
 		<Parameter Name="Channel">
@@ -1891,6 +2162,9 @@
 		</Parameter>
 		<Parameter Name="IpInstance">
 			<PossibleValue>USART3</PossibleValue>
+		</Parameter>
+		<Parameter Name="PeriphInc">
+			<PossibleValue>DMA_PINC_DISABLE</PossibleValue>
 		</Parameter>
 	</RefMode>
 	<RefMode BaseMode="DMA_Request" Comment="USART3_TX:DMA_CHANNEL_7" Name="USART3_TX:DMA_CHANNEL_7">
@@ -1910,6 +2184,9 @@
 		<Parameter Name="IpInstance">
 			<PossibleValue>USART3</PossibleValue>
 		</Parameter>
+		<Parameter Name="PeriphInc">
+			<PossibleValue>DMA_PINC_DISABLE</PossibleValue>
+		</Parameter>
 	</RefMode>
 	<RefMode BaseMode="DMA_Request" Comment="USART6_RX" Name="USART6_RX">
 		<Parameter Name="Channel">
@@ -1927,6 +2204,9 @@
 		</Parameter>
 		<Parameter Name="IpInstance">
 			<PossibleValue>USART6</PossibleValue>
+		</Parameter>
+		<Parameter Name="PeriphInc">
+			<PossibleValue>DMA_PINC_DISABLE</PossibleValue>
 		</Parameter>
 	</RefMode>
 	<RefMode BaseMode="DMA_Request" Comment="USART6_TX" Name="USART6_TX">
@@ -1946,6 +2226,9 @@
 		<Parameter Name="IpInstance">
 			<PossibleValue>USART6</PossibleValue>
 		</Parameter>
+		<Parameter Name="PeriphInc">
+			<PossibleValue>DMA_PINC_DISABLE</PossibleValue>
+		</Parameter>
 	</RefMode>
 	<ModeLogicOperator Name="OR">
 		<Mode Name="DMA1">
@@ -1962,16 +2245,24 @@
 						<Mode Name="I2S3_EXT_RX">
 							<Condition Diagnostic="" Expression="I2S3_TX&amp;I2S3_I2S_FULL_DUPLEX"/>
 						</Mode>
-						<Mode Name="UART5_RX"/>
-						<Mode Name="UART8_TX"/>
+						<Mode Name="UART5_RX">
+							<Condition Diagnostic="" Expression="S_UART5_TX_RX|S_UART5_RX"/>
+						</Mode>
+						<Mode Name="UART8_TX">
+							<Condition Diagnostic="" Expression="S_UART8_TX_RX|S_UART8_TX"/>
+						</Mode>
 						<Mode Name="TIM5_CH3/UP"/>
 					</ModeLogicOperator>
 				</Mode>
 				<Mode Name="DMA1_Stream1">
 					<ModeLogicOperator Name="XOR">
 						<Mode Name="TIM2_UP/CH3"/>
-						<Mode Name="USART3_RX"/>
-						<Mode Name="UART7_TX"/>
+						<Mode Name="USART3_RX">
+							<Condition Diagnostic="" Expression="S_USART3_TX_RX|S_USART3_RX"/>
+						</Mode>
+						<Mode Name="UART7_TX">
+							<Condition Diagnostic="" Expression="S_UART7_TX_RX|S_UART7_TX"/>
+						</Mode>
 						<Mode Name="TIM5_CH4/TRIG">
 							<Condition Diagnostic="" Expression="Semaphore_CaptureCompare_4_DMA_EnableTIM5|Semaphore_Trigger_DMA_EnableTIM5"/>
 						</Mode>
@@ -1988,7 +2279,9 @@
 							<Condition Diagnostic="" Expression="I2S3_TX&amp;I2S3_I2S_FULL_DUPLEX"/>
 						</Mode>
 						<Mode Name="I2C3_RX"/>
-						<Mode Name="UART4_RX"/>
+						<Mode Name="UART4_RX">
+							<Condition Diagnostic="" Expression="S_UART4_TX_RX|S_UART4_RX"/>
+						</Mode>
 						<Mode Name="TIM3_CH4/UP"/>
 						<Mode Name="TIM5_CH1">
 							<Condition Diagnostic="" Expression="Semaphore_CaptureCompare_1_DMA_EnableTIM5"/>
@@ -2007,8 +2300,12 @@
 						<Mode Name="I2S2_EXT_RX">
 							<Condition Diagnostic="" Expression="I2S2_TX&amp;I2S2_I2S_FULL_DUPLEX"/>
 						</Mode>
-						<Mode Name="USART3_TX"/>
-						<Mode Name="UART7_RX"/>
+						<Mode Name="USART3_TX">
+							<Condition Diagnostic="" Expression="S_USART3_TX_RX|S_USART3_TX"/>
+						</Mode>
+						<Mode Name="UART7_RX">
+							<Condition Diagnostic="" Expression="S_UART7_TX_RX|S_UART7_RX"/>
+						</Mode>
 						<Mode Name="TIM5_CH4/TRIG">
 							<Condition Diagnostic="" Expression="Semaphore_CaptureCompare_4_DMA_EnableTIM5|Semaphore_Trigger_DMA_EnableTIM5"/>
 						</Mode>
@@ -2025,14 +2322,18 @@
 							<Condition Diagnostic="" Expression="I2S2_RX&amp;I2S2_I2S_FULL_DUPLEX"/>
 						</Mode>
 						<Mode Name="I2C3_TX"/>
-						<Mode Name="UART4_TX"/>
+						<Mode Name="UART4_TX">
+							<Condition Diagnostic="" Expression="S_UART4_TX_RX|S_UART4_TX"/>
+						</Mode>
 						<Mode Name="TIM3_CH1/TRIG">
 							<Condition Diagnostic="" Expression="Semaphore_CaptureCompare_1_DMA_EnableTIM3|Semaphore_Trigger_DMA_EnableTIM3"/>
 						</Mode>
 						<Mode Name="TIM5_CH2">
 							<Condition Diagnostic="" Expression="Semaphore_CaptureCompare_2_DMA_EnableTIM5"/>
 						</Mode>
-						<Mode Name="USART3_TX:DMA_CHANNEL_7"/>
+						<Mode Name="USART3_TX:DMA_CHANNEL_7">
+							<Condition Diagnostic="" Expression="S_USART3_TX_RX|S_USART3_TX"/>
+						</Mode>
 					</ModeLogicOperator>
 				</Mode>
 				<Mode Name="DMA1_Stream5">
@@ -2047,7 +2348,9 @@
 						<Mode Name="TIM2_CH1">
 							<Condition Diagnostic="" Expression="Semaphore_CaptureCompare_1_DMA_EnableTIM2"/>
 						</Mode>
-						<Mode Name="USART2_RX"/>
+						<Mode Name="USART2_RX">
+							<Condition Diagnostic="" Expression="S_USART2_TX_RX|S_USART2_RX"/>
+						</Mode>
 						<Mode Name="TIM3_CH2">
 							<Condition Diagnostic="" Expression="Semaphore_CaptureCompare_2_DMA_EnableTIM3"/>
 						</Mode>
@@ -2063,8 +2366,12 @@
 						<Mode Name="TIM2_CH2/CH4">
 							<Condition Diagnostic="" Expression="Semaphore_CaptureCompare_2_DMA_EnableTIM2|Semaphore_CaptureCompare_4_DMA_EnableTIM2"/>
 						</Mode>
-						<Mode Name="USART2_TX"/>
-						<Mode Name="UART8_RX"/>
+						<Mode Name="USART2_TX">
+							<Condition Diagnostic="" Expression="S_USART2_TX_RX|S_USART2_TX"/>
+						</Mode>
+						<Mode Name="UART8_RX">
+							<Condition Diagnostic="" Expression="S_UART8_TX_RX|S_UART8_RX"/>
+						</Mode>
 						<Mode Name="TIM5_UP"/>
 						<Mode Name="DAC2">
 							<Condition Diagnostic="" Expression="DAC_OUT2_Conf"/>
@@ -2081,7 +2388,9 @@
 							<Condition Diagnostic="" Expression="Semaphore_CaptureCompare_3_DMA_EnableTIM4"/>
 						</Mode>
 						<Mode Name="TIM2_UP/CH4"/>
-						<Mode Name="UART5_TX"/>
+						<Mode Name="UART5_TX">
+							<Condition Diagnostic="" Expression="S_UART5_TX_RX|S_UART5_TX"/>
+						</Mode>
 						<Mode Name="TIM3_CH3">
 							<Condition Diagnostic="" Expression="Semaphore_CaptureCompare_3_DMA_EnableTIM3"/>
 						</Mode>
@@ -2125,7 +2434,9 @@
 						<Mode Name="SPI4_TX">
 							<Condition Diagnostic="" Expression="SPI4_DmaTransmit"/>
 						</Mode>
-						<Mode Name="USART6_RX"/>
+						<Mode Name="USART6_RX">
+							<Condition Diagnostic="" Expression="S_USART6_TX_RX|S_USART6_RX"/>
+						</Mode>
 						<Mode Name="TIM1_CH1">
 							<Condition Diagnostic="" Expression="Semaphore_CaptureCompare_1_DMA_EnableTIM1"/>
 						</Mode>
@@ -2144,8 +2455,12 @@
 						<Mode Name="SPI1_RX">
 							<Condition Diagnostic="" Expression="SPI1_DmaReceive"/>
 						</Mode>
-						<Mode Name="USART1_RX"/>
-						<Mode Name="USART6_RX"/>
+						<Mode Name="USART1_RX">
+							<Condition Diagnostic="" Expression="S_USART1_TX_RX|S_USART1_RX"/>
+						</Mode>
+						<Mode Name="USART6_RX">
+							<Condition Diagnostic="" Expression="S_USART6_TX_RX|S_USART6_RX"/>
+						</Mode>
 						<Mode Name="TIM1_CH2">
 							<Condition Diagnostic="" Expression="Semaphore_CaptureCompare_2_DMA_EnableTIM1"/>
 						</Mode>
@@ -2217,7 +2532,9 @@
 						<Mode Name="SPI1_TX">
 							<Condition Diagnostic="" Expression="SPI1_DmaTransmit"/>
 						</Mode>
-						<Mode Name="USART1_RX"/>
+						<Mode Name="USART1_RX">
+							<Condition Diagnostic="" Expression="S_USART1_TX_RX|S_USART1_RX"/>
+						</Mode>
 						<Mode Name="TIM1_UP"/>
 						<Mode Name="SPI5_RX:DMA_CHANNEL_7">
 							<Condition Diagnostic="" Expression="SPI5_DmaReceive"/>
@@ -2237,7 +2554,9 @@
 						<Mode Name="SDIO"/>
 						<Mode Name="SDIO_RX"/>
 						<Mode Name="SDIO_TX"/>
-						<Mode Name="USART6_TX"/>
+						<Mode Name="USART6_TX">
+							<Condition Diagnostic="" Expression="S_USART6_TX_RX|S_USART6_TX"/>
+						</Mode>
 						<Mode Name="TIM1_CH3">
 							<Condition Diagnostic="" Expression="Semaphore_CaptureCompare_3_DMA_EnableTIM1"/>
 						</Mode>
@@ -2251,8 +2570,12 @@
 						<Mode Name="MEMTOMEM"/>
 						<Mode Name="DCMI"/>
 						<Mode Name="HASH_IN"/>
-						<Mode Name="USART1_TX"/>
-						<Mode Name="USART6_TX"/>
+						<Mode Name="USART1_TX">
+							<Condition Diagnostic="" Expression="S_USART1_TX_RX|S_USART1_TX"/>
+						</Mode>
+						<Mode Name="USART6_TX">
+							<Condition Diagnostic="" Expression="S_USART6_TX_RX|S_USART6_TX"/>
+						</Mode>
 						<Mode Name="TIM8_CH4/TRIG/COM"/>
 					</ModeLogicOperator>
 				</Mode>

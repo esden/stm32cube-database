@@ -54,31 +54,121 @@
 [#-- Global variables --]
 [/#compress]
 [/#list]
+
 #ifdef __cplusplus
  extern "C" {
 #endif
+
 /* Includes ------------------------------------------------------------------*/
 #include "usbd_audio.h"
+/* USER CODE BEGIN INCLUDE */
+/* USER CODE END INCLUDE */
 
-/* Exported types ------------------------------------------------------------*/
-/* Exported constants --------------------------------------------------------*/
+/** @addtogroup STM32_USB_OTG_DEVICE_LIBRARY
+  * @{
+  */
+  
+/** @defgroup USBD_AUDIO_IF
+  * @brief header 
+  * @{
+  */ 
+
+/** @defgroup USBD_AUDIO_IF_Exported_Defines
+  * @{
+  */ 
+/* USER CODE BEGIN EXPORTED_DEFINES  */
+/* USER CODE END  EXPORTED_DEFINES */
+
+/**
+  * @}
+  */ 
+
+/** @defgroup USBD_AUDIO_IF_Exported_Types
+  * @{
+  */  
+/* USER CODE BEGIN EXPORTED_TYPES  */
+/* USER CODE END  EXPORTED_TYPES */
+
+/**
+  * @}
+  */ 
+
+/** @defgroup USBD_AUDIO_IF_Exported_Macros
+  * @{
+  */ 
+/* USER CODE BEGIN EXPORTED_MACRO  */
+/* USER CODE END  EXPORTED_MACRO */
+
+/**
+  * @}
+  */ 
+
+/** @defgroup USBD_AUDIO_IF_Exported_Variables
+  * @{
+  */ 
 [#if handleNameFS == "FS" || handleNameUSB_FS == "FS"]
-extern USBD_AUDIO_ItfTypeDef  USBD_AUDIO_fops_FS;
+#textern USBD_AUDIO_ItfTypeDef  USBD_AUDIO_fops_FS;
 [/#if]
 [#if handleNameHS == "HS"]
-extern USBD_AUDIO_ItfTypeDef  USBD_AUDIO_fops_HS;
+#textern USBD_AUDIO_ItfTypeDef  USBD_AUDIO_fops_HS;
 [/#if]
 
-/* Exported macro ------------------------------------------------------------*/
-/* Exported functions ------------------------------------------------------- */
+/* USER CODE BEGIN EXPORTED_VARIABLES  */
+/* USER CODE END  EXPORTED_VARIABLES */
+
+/**
+  * @}
+  */ 
+
+
+/** @defgroup USBD_AUDIO_IF_Exported_FunctionsPrototype
+  * @{
+  */ 
 [#if handleNameFS == "FS" || handleNameUSB_FS == "FS"]
-void TransferComplete_CallBack_FS(void);
-void HalfTransfer_CallBack_FS(void);
+/**
+  * @brief  Manages the DMA full Transfer complete event.
+  * @param  None
+  * @retval None
+  */
+#tvoid TransferComplete_CallBack_FS(void);
+
+/**
+  * @brief  Manages the DMA Half Transfer complete event.
+  * @param  None
+  * @retval None
+  */
+#tvoid HalfTransfer_CallBack_FS(void);
 [/#if]
 [#if handleNameHS == "HS"]
-void TransferComplete_CallBack_HS(void);
-void HalfTransfer_CallBack_HS(void);
+/**
+  * @brief  Manages the DMA full Transfer complete event.
+  * @param  None
+  * @retval None
+  */
+#tvoid TransferComplete_CallBack_HS(void);
+
+/**
+  * @brief  Manages the DMA Half Transfer complete event.
+  * @param  None
+  * @retval None
+  */
+#tvoid HalfTransfer_CallBack_HS(void);
 [/#if]
+
+/* USER CODE BEGIN EXPORTED_FUNCTIONS  */
+/* USER CODE END  EXPORTED_FUNCTIONS */
+/**
+  * @}
+  */ 
+
+/**
+  * @}
+  */ 
+
+/**
+  * @}
+  */ 
+  
 #ifdef __cplusplus
 }
 #endif

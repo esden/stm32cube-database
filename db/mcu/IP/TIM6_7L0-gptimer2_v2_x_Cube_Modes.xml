@@ -1112,7 +1112,7 @@
 <!--TIM2_ETR_REMAP-->
     <RefParameter Name="TIM2_ETR_REMAP" Comment="ETR remap capabilities for TIM2" DefaultValue="TIM2_ETR_HSI48" Type="list" Group="ETR remap capabilities for TIM2">
             <Condition Diagnostic="" Expression="DIE447"/>
-            <PossibleValue Value="TIM2_ETR_HSI48" Comment="TIM2 ETR input is connected to HSI48" Semaphore="SEM2RCC_HSI48_REQUIRED_$IpInstance"/>
+            <PossibleValue Value="TIM2_ETR_HSI48" Comment="TIM2 ETR input is connected to HSI48" Semaphore="SEM2RCC_HSI48_REQUIRED_$IpInstance" Condition="!USB_Exist" Action="remove"/>
             <PossibleValue Value="TIM2_ETR_LSE" Comment="TIM2 ETR input is connected to LSE" Semaphore="SEM2RCC_LSE_REQUIRED_$IpInstance" Condition="!(LSEOscillator|LSEByPass)" Action="Disable" Diagnostic="LSE Oscillator must be activated in the RCC IP (Pinout view)"/>
             <PossibleValue Value="TIM2_ETR_COMP2_OUT" Comment="TIM2 ETR input is connected to COMP2_OUT"/>
             <PossibleValue Value="TIM2_ETR_COMP1_OUT" Comment="TIM2 ETR input is connected to COMP1_OUT"/>
@@ -1120,7 +1120,7 @@
     </RefParameter>
     <RefParameter Name="TIM2_ETR_REMAP" Comment="ETR remap capabilities for TIM2" DefaultValue="TIM2_ETR_HSI48" Type="list" Group="ETR remap capabilities for TIM2">
             <Condition Diagnostic="" Expression="DIE417"/>
-            <PossibleValue Value="TIM2_ETR_HSI48" Comment="TIM2 ETR input is connected to HSI48" Semaphore="SEM2RCC_HSI48_REQUIRED_$IpInstance"/>
+            <PossibleValue Value="TIM2_ETR_HSI48" Comment="TIM2 ETR input is connected to HSI48" Semaphore="SEM2RCC_HSI48_REQUIRED_$IpInstance" Condition="!USB_Exist" Action="remove"/>
             <PossibleValue Value="TIM2_ETR_LSE" Comment="TIM2 ETR input is connected to LSE" Semaphore="SEM2RCC_LSE_REQUIRED_$IpInstance" Condition="!(LSEOscillator|LSEByPass)" Action="Disable" Diagnostic="LSE Oscillator must be activated in the RCC IP (Pinout view)"/>
             <PossibleValue Value="TIM2_ETR_COMP2_OUT" Comment="TIM2 ETR input is connected to COMP2_OUT"/>
             <PossibleValue Value="TIM2_ETR_COMP1_OUT" Comment="TIM2 ETR input is connected to COMP1_OUT"/>
@@ -1161,7 +1161,7 @@
 -->
 <!-- REWORK of TI1 REMAP for TIM3_L0 -->
     <RefParameter Name="TIM3_TI1_REMAP" Comment="TI1 remap capabilities for TIM3" DefaultValue="TIM3_TI1_GPIO" Type="list" Group="TI1 remap capabilities for TIM3">
-            <Condition Diagnostic="" Expression="PE3_S_TIM3_CH1|PA6_S_TIM3_CH1|PC6_S_TIM3_CH1|PB4_S_TIM3_CH1"/>
+            <Condition Diagnostic="" Expression="(PE3_S_TIM3_CH1|PA6_S_TIM3_CH1|PC6_S_TIM3_CH1|PB4_S_TIM3_CH1)&amp; Semaphore_CH1pinUsedTIM3"/>
             <PossibleValue Value="TIM3_TI1_GPIO" Comment="TIM3 TI1 input is connected to GPIO"/>
     </RefParameter>
     <RefParameter Name="TIM3_TI1_REMAP" Comment="TI1 remap capabilities for TIM3" DefaultValue="TIM3_TI1_USB_SOF" Type="list" Group="TI1 remap capabilities for TIM3">
@@ -1169,7 +1169,7 @@
             <PossibleValue Value="TIM3_TI1_USB_SOF" Comment="TIM3 TI1 input is connected to USB_SOF"/>
     </RefParameter>
     <RefParameter Name="TIM3_TI1_REMAP" Comment="TI1 remap capabilities for TIM3" DefaultValue="__NULL" Type="list" Group="TI1 remap capabilities for TIM3">
-            <Condition Diagnostic="" Expression="!(Semaphore_L0_REMAP_TIM3_TI1_USB_SOF|PE3_S_TIM3_CH1|PA6_S_TIM3_CH1|PC6_S_TIM3_CH1|PB4_S_TIM3_CH1)"/>
+            <Condition Diagnostic="" Expression="!(Semaphore_L0_REMAP_TIM3_TI1_USB_SOF|((PE3_S_TIM3_CH1|PA6_S_TIM3_CH1|PC6_S_TIM3_CH1|PB4_S_TIM3_CH1)&amp; Semaphore_CH1pinUsedTIM3))"/>
             <PossibleValue Value="__NULL" Comment="TIM3 TI1 input is connected USB_SOF not generated"/>
     </RefParameter>
 <!-- REWORK of TI1 REMAP for TIM3_L0 -->
@@ -2875,9 +2875,9 @@
                                         <Semaphore>Semaphore_L0_REMAP_$IpInstance_TI1_USB_SOF</Semaphore>
                                         <Semaphore>Semaphore_input_Channel1$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_input_Channel1_direct$IpInstance</Semaphore>
-                                        <Semaphore>Semaphore_CH1pinUsed$IpInstance</Semaphore>
 <!-- USB IP needed, but None of PE3,PA6,PC6 or PB4 should remain attach to TIM3_CH1 even in orange in package view-->
-                                       <Condition Diagnostic="Channel1 may be already used as input for the Slave mode controller, Locked in the Package view or USB IP must be selected" Expression="((Semaphore_SMC_Reset$IpInstance)|!(Semaphore_ClockTriggerSourceOnTI1$IpInstance))&amp; MW_USB_MW_DEVICE&amp;!(PE3_S_TIM3_CH1|PA6_S_TIM3_CH1|PC6_S_TIM3_CH1|PB4_S_TIM3_CH1)"/>
+<!-- <Condition Diagnostic="Channel1 may be already used as input for the Slave mode controller, Locked in the Package view or USB IP must be selected" Expression="((Semaphore_SMC_Reset$IpInstance)|!(Semaphore_ClockTriggerSourceOnTI1$IpInstance))&amp; MW_USB_MW_DEVICE&amp;!(PE3_S_TIM3_CH1|PA6_S_TIM3_CH1|PC6_S_TIM3_CH1|PB4_S_TIM3_CH1)"/>-->
+                                       <Condition Diagnostic="Channel1 may be already used as input for the Slave mode controller, Locked in the Package view or USB IP must be selected" Expression="((Semaphore_SMC_Reset$IpInstance)|!(Semaphore_ClockTriggerSourceOnTI1$IpInstance))&amp; MW_USB_MW_DEVICE"/>
      <SignalLogicalOp Name="AND">
       <Signal Name="VS_NoInput1"/>
      </SignalLogicalOp>

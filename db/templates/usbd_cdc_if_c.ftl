@@ -53,6 +53,8 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "usbd_cdc_if.h"
+/* USER CODE BEGIN INCLUDE */
+/* USER CODE END INCLUDE */
 
 /** @addtogroup STM32_USB_OTG_DEVICE_LIBRARY
   * @{
@@ -67,8 +69,8 @@
 /** @defgroup USBD_CDC_Private_TypesDefinitions
   * @{
   */ 
-  /* USER CODE BEGIN 0 */ 
-  /* USER CODE END 0 */ 
+/* USER CODE BEGIN PRIVATE TYPES  */
+/* USER CODE END PRIVATE TYPES */ 
 /**
   * @}
   */ 
@@ -77,12 +79,12 @@
 /** @defgroup USBD_CDC_Private_Defines
   * @{
   */ 
-  /* USER CODE BEGIN 1 */
+/* USER CODE BEGIN PRIVATE DEFINES  */
 /* Define size for the receive and transmit buffer over CDC */
 /* It's up to user to redefine and/or remove those define */
 #define APP_RX_DATA_SIZE  4
 #define APP_TX_DATA_SIZE  4
-  /* USER CODE END 1 */  
+/* USER CODE END PRIVATE DEFINES */
 /**
   * @}
   */ 
@@ -91,8 +93,9 @@
 /** @defgroup USBD_CDC_Private_Macros
   * @{
   */ 
-  /* USER CODE BEGIN 2 */ 
-  /* USER CODE END 2 */
+/* USER CODE BEGIN PRIVATE_MACRO  */
+/* USER CODE END PRIVATE_MACRO */
+
 /**
   * @}
   */ 
@@ -122,22 +125,32 @@ uint8_t UserTxBufferHS[APP_TX_DATA_SIZE];
 
 
 /* USB handler declaration */
-[#if handleNameFS == "FS" || handleNameUSB_FS == "FS"]
 /* Handle for USB Full Speed IP */
-USBD_HandleTypeDef  *hUsbDevice_0;
+[#if handleNameFS == "FS" || handleNameUSB_FS == "FS"]
+#tUSBD_HandleTypeDef  *hUsbDevice_0;
 [/#if]
-
 [#if handleNameHS == "HS"]
 /* Handle for USB High Speed IP */
-USBD_HandleTypeDef  *hUsbDevice_1;
+#tUSBD_HandleTypeDef  *hUsbDevice_1;
 [/#if]
+/* USER CODE BEGIN PRIVATE_VARIABLES  */
+/* USER CODE END  PRIVATE VARIABLES */
+
+/**
+  * @}
+  */ 
   
+/** @defgroup USBD_CDC_IF_Exported_Variables
+  * @{
+  */ 
 [#if handleNameFS == "FS" || handleNameUSB_FS == "FS"]
-extern USBD_HandleTypeDef hUsbDeviceFS;
+#textern USBD_HandleTypeDef hUsbDeviceFS;
 [/#if]
 [#if handleNameHS == "HS"]
-extern USBD_HandleTypeDef hUsbDeviceHS;  
+#textern USBD_HandleTypeDef hUsbDeviceHS;  
 [/#if]
+/* USER CODE BEGIN EXPORTED_VARIABLES  */
+/* USER CODE END  EXPORTED_VARIABLES */
 
 /**
   * @}
@@ -159,7 +172,13 @@ static int8_t CDC_DeInit_HS   (void);
 static int8_t CDC_Control_HS  (uint8_t cmd, uint8_t* pbuf, uint16_t length);
 static int8_t CDC_Receive_HS  (uint8_t* pbuf, uint32_t *Len);
 [/#if]
+/* USER CODE BEGIN PRIVATE_FUNCTIONS_DECLARATION */
+/* USER CODE END  PRIVATE_FUNCTIONS_DECLARATION */
 
+/**
+  * @}
+  */ 
+  
 [#if handleNameFS == "FS" || handleNameUSB_FS == "FS"]
 USBD_CDC_ItfTypeDef USBD_Interface_fops_FS = 
 {
@@ -479,9 +498,9 @@ uint8_t CDC_Transmit_HS(uint8_t* Buf, uint16_t Len)
   return result;
 }
 [/#if]
-/**
-  * @}
-  */ 
+
+/* USER CODE BEGIN PRIVATE_FUNCTIONS_IMPLEMENTATION */
+/* USER CODE END  PRIVATE_FUNCTIONS_IMPLEMENTATION */
 
 /**
   * @}

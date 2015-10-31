@@ -130,6 +130,28 @@ static void MPU_Config(void);
 [#if USB_HOST?? && !FREERTOS??]
 #nvoid MX_USB_HOST_Process(void);
 [/#if]
+[#-- PostInit declaration --]
+[#if Peripherals??]
+[#list Peripherals as Peripheral]
+[#if Peripheral??]
+[#list Peripheral as IP]
+[#list IP.configModelList as instanceData]
+[#if instanceData.initServices??]
+    [#if instanceData.initServices.gpioOut??]
+        [#list instanceData.initCallBackInitMethodList as initCallBack]
+            [#if initCallBack?contains("PostInit")]
+            #nvoid ${initCallBack}(${instanceData.halMode}_HandleTypeDef *h${instanceData.halMode?lower_case});
+            [/#if]
+        [/#list]
+    [/#if]
+[/#if]
+[/#list]
+[/#list]
+[/#if]
+[/#list]
+[/#if]
+
+[#-- PostInit declaration : End --]
 #n
 /* USER CODE BEGIN PFP */
 /* Private function prototypes -----------------------------------------------*/
@@ -239,7 +261,20 @@ void SystemClock_Config(void)
     [#--list configModel.configs as config--] [#--list1--]
    [#compress] [@common.generateConfigModelCode configModel=configModel inst=clockInst  nTab=1 index=""/][/#compress]#n
     [#--/#list--]
-[/#list][/#if]}[/#if]
+[/#list][/#if]
+[#-- configure systick interrupts  --]
+[#if systemVectors??]
+[#list systemVectors as initVector] 
+[#if initVector.vector=="SysTick_IRQn"]
+#t/* ${initVector.vector} interrupt configuration */
+#tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
+[#if initVector.systemHandler=="false"]
+  #tHAL_NVIC_EnableIRQ(${initVector.vector});#n
+[/#if]
+[/#if]
+[/#list]
+[/#if]
+}[/#if]
 #n
 
 [/#compress]
@@ -269,6 +304,16 @@ void SystemClock_Config(void)
         [#--list instanceData.configs as config--]
             [#if instanceData.instIndex??][@common.generateConfigModelListCode configModel=instanceData inst=instName  nTab=1 index=instanceData.instIndex/][#else][@common.generateConfigModelListCode configModel=instanceData inst=instName  nTab=1 index=""/][/#if]
         [#--/#list--]
+[#if instanceData.initServices??]
+    [#if instanceData.initServices.gpioOut??]
+        [#list instanceData.initCallBackInitMethodList as initCallBack]
+            [#if initCallBack?contains("PostInit")]
+            #t${initCallBack}(&h${instanceData.halMode?lower_case}${instanceData.instIndex});
+            [/#if]
+        [/#list]
+    [/#if]
+[/#if]
+
 #n}#n
 [/#if]
 [/#list]

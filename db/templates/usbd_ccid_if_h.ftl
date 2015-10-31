@@ -57,8 +57,11 @@
 #ifdef __cplusplus
  extern "C" {
 #endif
+
 /* Includes ------------------------------------------------------------------*/
 #include "usbd_ccid.h"
+/* USER CODE BEGIN INCLUDE */
+/* USER CODE END INCLUDE */
 
 /** @addtogroup STM32_USB_OTG_DEVICE_LIBRARY
   * @{
@@ -72,6 +75,9 @@
 /** @defgroup USBD_CCID_IF_Exported_Defines
   * @{
   */ 
+/* USER CODE BEGIN EXPORTED_DEFINES  */
+/* USER CODE END  EXPORTED_DEFINES */
+
 /**
   * @}
   */ 
@@ -79,8 +85,9 @@
 
 /** @defgroup USBD_CCID_IF_Exported_Types
   * @{
-  */
-
+  */  
+/* USER CODE BEGIN EXPORTED_TYPES  */
+/* USER CODE END  EXPORTED_TYPES */
 
 /**
   * @}
@@ -91,6 +98,8 @@
 /** @defgroup USBD_CCID_IF_Exported_Macros
   * @{
   */ 
+/* USER CODE BEGIN EXPORTED_MACRO  */
+/* USER CODE END  EXPORTED_MACRO */
 
 /**
   * @}
@@ -99,12 +108,16 @@
 /** @defgroup USBD_CCID_IF_Exported_Variables
   * @{
   */ 
-[#if handleNameFS == "FS"]  
-extern USBD_CCID_ItfTypeDef  USBD_CCID_fops_FS;
+[#if handleNameFS == "FS" || handleNameUSB_FS == "FS"]
+#textern USBD_CCID_ItfTypeDef  USBD_CCID_fops_FS;
 [/#if]
 [#if handleNameHS == "HS"]  
-extern USBD_CCID_ItfTypeDef  USBD_CCID_fops_HS;
+#textern USBD_CCID_ItfTypeDef  USBD_CCID_fops_HS;
 [/#if]
+
+/* USER CODE BEGIN EXPORTED_VARIABLES  */
+/* USER CODE END  EXPORTED_VARIABLES */
+
 /**
   * @}
   */ 
@@ -112,21 +125,18 @@ extern USBD_CCID_ItfTypeDef  USBD_CCID_fops_HS;
 /** @defgroup USBD_CCID_IF_Exported_FunctionsPrototype
   * @{
   */ 
+/* USER CODE BEGIN EXPORTED_FUNCTIONS  */
+/* USER CODE END  EXPORTED_FUNCTIONS */
 
 /**
   * @}
   */ 
+  
 #ifdef __cplusplus
 }
 #endif
 
 #endif /* __USBD_CCID_IF_H_ */
 
-/**
-  * @}
-  */ 
 
-/**
-* @}
-*/ 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

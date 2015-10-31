@@ -548,7 +548,11 @@
                             #t#t#t/* Enable EXTI Line 18 for USB wakeup */                            
                         [/#if]
                     [#else]
-                        #t#t#t/* Enable EXTI Line 20 for USB wakeup */
+                        [#if FamilyName=="STM32L0"]
+                            #t#t#t/* Enable EXTI Line 18 for USB wakeup */
+                        [#else]
+                            #t#t#t/* Enable EXTI Line 20 for USB wakeup */                            
+                        [/#if]
                     [/#if]
                     [#if FamilyName=="STM32F3"||FamilyName=="STM32L1"][#-- FamilyName=="STM32F3"|| to be added on V4.5 --]
                       #t#t#t__HAL_USB_EXTI_CLEAR_FLAG();
@@ -781,6 +785,118 @@
 [/#compress]
 [/#if]
 [#-- Section2:End --]
+
+[#-- Section2-1: Msp Post Init --]
+[#if ipvar.initCallBacks??]
+[#compress]
+[#assign DFSDM_var = "false"]
+[#list ipvar.initCallBacks.entrySet() as entry]
+[#assign instanceList = entry.value]
+[#assign mode=entry.key?replace("_MspInit","")?replace("MspInit","")?replace("_BspInit","")?replace("HAL_","")]
+
+[#assign ipHandler = "h" + mode?lower_case]
+[#--Check if the Msp init will be empty start--] 
+    [#assign mspIsEmpty1="yes"] 
+    [#list instanceList as inst]
+     [#if getInitServiceMode(inst)??]
+        [#assign services = getInitServiceMode(inst)]
+        [#if (services.gpioOut??)]
+            [#assign mspIsEmpty1="no"] 
+            [#break]
+        [/#if]
+     [/#if]
+    [/#list]
+[#-- Check if the Msp init will be empty end -- ]
+[#if  mode?contains("DFSDM") && DFSDM_var == "false"]
+int DFSDM_Init = 0;
+[#assign DFSDM_var = "true"]
+[/#if]
+[#-- #nvoid HAL_${mode}_MspInit(${mode}_HandleTypeDef* h${mode?lower_case}){--] 
+[#if (mspIsEmpty1=="no")&&(!mode?contains("TIM")||mode?contains("LPTIM")||mode?contains("HRTIM"))]
+#nvoid ${entry.key?replace("MspInit","MspPostInit")}(${mode}_HandleTypeDef* h${mode?lower_case})
+{
+#n
+[#else]
+[#if (mspIsEmpty1=="no")]
+#nvoid ${entry.key?replace("MspInit","MspPostInit")}(TIM_HandleTypeDef* h${mode?lower_case})
+{
+#n
+[/#if]
+[/#if]
+
+
+[#assign words = instanceList]
+[#-- declare Variable GPIO_InitTypeDef once --]
+       [#assign v = ""]
+[#assign mspExist="false"]
+[#list words as inst] [#-- loop on ip instances datas --] 
+ [#assign services = getInitServiceMode(inst)]
+ [#if services.gpioOut??][#assign service=services.gpioOut]
+        [#list service.variables as variable] [#-- variables declaration --]
+            [#if v?contains(variable.name)]
+            [#-- no matches--]
+            [#else]
+#t${variable.value} ${variable.name};
+                [#assign v = v + " "+ variable.name/]	
+            [/#if]	
+        [/#list]  
+[/#if]
+[/#list]
+[#-- --]
+[#if mspIsEmpty1=="no"]
+[#if  words[0] == "DFSDM"]
+#tif(DFSDM_Init == 0)
+[#else]
+ #tif(h${mode?lower_case}->Instance==${words[0]?replace("I2S","SPI")})
+[/#if]
+#t{
+[#if words?size > 1] [#-- Check if there is more than one ip instance--]    
+#t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspInit 0 */
+
+#n#t/* USER CODE END ${words[0]?replace("I2S","SPI")}_MspInit 0 */    
+        [@generateConfigCode ipName=words[0] type="Init" serviceName="gpioOut" instHandler=ipHandler tabN=2/]  
+#t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspInit 1 */
+
+#n#t/* USER CODE END ${words[0]?replace("I2S","SPI")}_MspInit 1 */   
+    #t} 
+    [#assign i = 0]
+    [#list words as inst]
+    [#if i>0]    
+    #telse if(h${mode?lower_case}->Instance==${words[i]?replace("I2S","SPI")})
+    #t{
+#t/* USER CODE BEGIN ${words[i]?replace("I2S","SPI")}_MspInit 0 */
+
+#n#t/* USER CODE END ${words[i]?replace("I2S","SPI")}_MspInit 0 */
+       #t[@generateConfigCode ipName=words[i] type="Init" serviceName="gpioOut" instHandler=ipHandler tabN=2/] 
+#t/* USER CODE BEGIN ${words[i]?replace("I2S","SPI")}_MspInit 1 */
+
+#n#t/* USER CODE END ${words[i]?replace("I2S","SPI")}_MspInit 1 */    
+#t}
+        [/#if]
+        [#assign i = i + 1]
+    [/#list]
+[#else]
+    [#if words[0]??]
+#t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspInit 0 */
+
+#n#t/* USER CODE END ${words[0]?replace("I2S","SPI")}_MspInit 0 */
+    #t[@generateConfigCode ipName=words[0] type="Init" serviceName="gpioOut" instHandler=ipHandler tabN=2/]
+    
+#t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspInit 1 */
+
+#n#t/* USER CODE END ${words[0]?replace("I2S","SPI")}_MspInit 1 */
+[/#if]
+#t}
+[/#if]
+
+#n}#n
+[/#if] [#-- mspIsEmpty1=="no" --]
+[#--break--] [#-- use the first msp--]
+[/#list]
+[/#compress]
+[/#if]
+[#-- Section2-1:End --]
+[#-- --]
 
 
 [#if ipvar.deInitCallBacks??]

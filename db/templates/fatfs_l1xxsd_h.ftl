@@ -41,7 +41,6 @@
  extern "C" {
 #endif 
 
-/* USER CODE BEGIN 0 */
 /* Includes ------------------------------------------------------------------*/
 #include "stm32l1xx_hal.h"
 
@@ -69,6 +68,7 @@
 #define SD_PORT                  ${IpName}
 	[/#if]
 [/#if]
+/* USER CODE BEGIN 0 */
    
 /* DMA definitions for SD DMA transfer */
 /*

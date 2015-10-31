@@ -262,14 +262,9 @@
 	    </RefParameter>
 	    
         <!-- Possible values of DiscontinuousConvMode parameter -->
-        <RefParameter Comment="Discontinuous Conversion Mode" DefaultValue="DISABLE" Name="DiscontinuousConvMode" Type="list" Group="ADCgroup">
-            <Condition Expression="ContinuousMode_$IpInstance|ScanConvMode=ADC_SCAN_DISABLE" Diagnostic="Continuous and Discontinuous modes could not be used at the same time"/>
+      <RefParameter Comment="Discontinuous Conversion Mode" DefaultValue="DISABLE" Name="DiscontinuousConvMode" Type="list" Group="ADCgroup">
             <PossibleValue Comment="Disabled" Value="DISABLE"/>
-        </RefParameter>
-
-        <RefParameter Comment="Discontinuous Conversion Mode" DefaultValue="DISABLE" Name="DiscontinuousConvMode" Type="list" Group="ADCgroup">
-            <PossibleValue Comment="Disabled" Value="DISABLE"/>
-            <PossibleValue Comment="Enabled" Value="ENABLE"/>
+            <PossibleValue Comment="Enabled" Value="ENABLE"  Condition="ContinuousConvMode = ENABLE" Action="Disable" Diagnostic="Continuous and Discontinuous modes could not be used at the same time"/>
             <Description>Enable or Disable the Discontinuous Conversion Mode</Description>
         </RefParameter>
         
@@ -780,24 +775,13 @@
                     <PossibleValue Comment="None" Value="None"/>
                     <PossibleValue Comment="Auto Injected Mode" Value="AutoInjected"  Semaphore="AutoInjected_$IpInstance"/>
                 </RefParameter> -->
-                <RefParameter Comment="Injected Conversion Mode" DefaultValue="None" Name="InjectedConvMode" Type="list">
-		<Condition Expression="ScanConvMode=ADC_SCAN_DISABLE" Diagnostic="Discontinuous Mode is available only if Scan Conversion Mode is enabled"/>
-		<PossibleValue Comment="None" Value="None"/>
-		<PossibleValue Comment="Auto Injected Mode" Value="AutoInjected"/>
-                <Description>Injected Conversion Mode selection</Description>
-	</RefParameter>
                 <RefParameter Comment="Injected Conversion Mode" DefaultValue="None" Name="InjectedConvMode" Type="list" Group="ADCgroup">
-                    <Condition Expression="ScanConvMode=ADC_SCAN_ENABLE" Diagnostic="Discontinuous Mode is available only if Scan Conversion Mode is enabled"/>
                     <PossibleValue Comment="None" Value="None"/>
                     <PossibleValue Comment="Discontinuous Mode" Value="Discontinuous" Semaphore="InjectedDiscontinuous_$IpInstance"/>
-                    <PossibleValue Comment="Auto Injected Mode" Value="AutoInjected"  Semaphore="AutoInjected_$IpInstance"/>
+                    <PossibleValue Comment="Auto Injected Mode" Value="AutoInjected"  Semaphore="AutoInjected_$IpInstance" Condition="DiscontinuousConvMode = ENABLE" Action="Disable" Diagnostic="It is not possible to use both auto-injected mode and discontinuous mode simultaneously" />
                     <Description>Injected Conversion Mode selection</Description>
                 </RefParameter>
-                <RefParameter Comment="Injected Conversion Mode" DefaultValue="None" Name="InjectedConvMode" Type="list" Group="ADCgroup">
-                    <PossibleValue Comment="None" Value="None"/>
-                    <PossibleValue Comment="Auto Injected Mode" Value="AutoInjected"  Semaphore="AutoInjected_$IpInstance"/>
-                    <Description>Injected Conversion Mode selection</Description>
-                </RefParameter>
+
                 <RefParameter Comment="Injected Discontinuous Conversion Mode" DefaultValue="ENABLE" Name="InjectedDiscontinuousConvMode" Type="list" Visible="false">
                     <Condition Expression="InjectedDiscontinuous_$IpInstance" Diagnostic=""/>
                     <PossibleValue Comment="Enabled" Value="ENABLE"/>

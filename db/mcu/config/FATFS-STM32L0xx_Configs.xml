@@ -19,7 +19,6 @@
         <Component Name="Middleware:FATFS:USBH"/>
         <Component Name="Middleware:FATFS:CODE_PAGE:$VIRTUAL_CODE_PAGE"/>
         <ConfigFile Name="FF_CONF"/>
-        <!--  <ConfigFile Name="FF_HANDLES"/> -->  
         <ConfigFile Name="FATFS_INIT"/>
         <ConfigFile Name="FATFS_HEADER"/>
     </RefConfig>
@@ -29,7 +28,6 @@
         <Component Name="Middleware:FATFS:NAND"/>
         <Component Name="Middleware:FATFS:CODE_PAGE:$VIRTUAL_CODE_PAGE"/>
         <ConfigFile Name="FF_CONF"/>
-        <!--  <ConfigFile Name="FF_HANDLES"/> -->  
         <ConfigFile Name="FATFS_INIT"/>
         <ConfigFile Name="FATFS_HEADER"/>
     </RefConfig>
@@ -92,16 +90,18 @@
     <!-- use specific template file "fatfs_conf_l0.ftl" to generate header file containing #define -->
    
     <RefConfigFile Name="FF_CONF" Description="Header file for #define" Template="fatfs_conf_l0.ftl">      
-        <File Name="ffconf.h" Category="header" Version="R0.1.0" Condition="all"/>
+        <File Name="ffconf.h" Category="header" Version="R0.11" Condition="all"/>
         <!-- Parameters for Function and Buffer Configurations -->
         <Argument Name="_FS_TINY" GenericType="simple" Comment="0:Normal or 1:Tiny"/>
         <Argument Name="_FS_READONLY" GenericType="simple" Comment="0:Read/Write or 1:Read only"/>
         <Argument Name="_FS_MINIMIZE" GenericType="simple" Comment="0 to 3"/>
         <Argument Name="_USE_STRFUNC" GenericType="simple" Comment="0:Disable or 1-2:Enable"/>
+        <Argument Name="_USE_FIND" GenericType="simple" Comment="0:Disable or 1:Enable"/>                  <!-- New in R0.11 --> 
         <Argument Name="_USE_MKFS" GenericType="simple" Comment="0:Disable or 1:Enable"/>
         <Argument Name="_USE_FORWARD" GenericType="simple" Comment="0:Disable or 1:Enable"/>
         <Argument Name="_USE_LABEL" GenericType="simple" Comment="0:Disable or 1:Enable"/>
         <Argument Name="_USE_FASTSEEK" GenericType="simple" Comment="0:Disable or 1:Enable"/>
+        <Argument Name="_USE_BUFF_WO_ALIGNMENT" GenericType="simple" Comment="0:Disable or 1:Enable"/>     <!-- New in R0.11 --> 
         <!-- Parameters for Locale and Namespace Configurations -->
         <Argument Name="_CODE_PAGE" GenericType="simple" Comment="The _CODE_PAGE specifies the OEM code page to be used on the target system"/>
         <Argument Name="_USE_LFN" GenericType="simple" Comment="0 to 3"/>
@@ -112,35 +112,46 @@
         <!-- Parameters for Physical Drive Configurations  -->
         <Argument Name="_VOLUMES" GenericType="simple" Comment="Number of volumes (logical drives) to be used"/>
         <Argument Name="_MAX_SS" GenericType="simple" Comment="512, 1024, 2048 or 4096"/>
-        <!-- <Argument Name="_MIN_SS" GenericType="simple" Comment="512, 1024, 2048 or 4096"/> -->
+        <Argument Name="_MIN_SS" GenericType="simple" Comment="512, 1024, 2048 or 4096"/>
         <Argument Name="_MULTI_PARTITION" GenericType="simple" Comment="0:Single partition, 1:Enable multiple partition"/>
-        <Argument Name="_USE_ERASE" GenericType="simple" Comment="0:Disable or 1:Enable"/>
+        <Argument Name="_USE_TRIM" GenericType="simple" Comment="0:Disable or 1:Enable"/>                  <!-- Renamed in R0.11 --> 
         <Argument Name="_FS_NOFSINFO" GenericType="simple" Comment="0: Load all informations in the FSINFO if available, 1: Do not trust free cluster count in the FSINFO"/>
         <!-- Parameters for System Configurations   -->
+        <Argument Name="_FS_NORTC" GenericType="simple" Comment="0 or 1"/>                                 <!-- New in R0.11 -->  
+        <Argument Name="_NORTC_YEAR" GenericType="simple" Comment="1980..2107"/>                           <!-- New in R0.11 -->  
+        <Argument Name="_NORTC_MON" GenericType="simple" Comment="1..12"/>                                 <!-- New in R0.11 -->  
+        <Argument Name="_NORTC_MDAY" GenericType="simple" Comment="1..31"/>                                <!-- New in R0.11 -->  
         <Argument Name="_WORD_ACCESS" GenericType="simple" Comment="0 or 1"/>
         <Argument Name="_FS_REENTRANT" GenericType="simple" Comment="0:Disable or 1:Enable"/>
         <Argument Name="_FS_TIMEOUT" GenericType="simple" Comment="Timeout period in unit of time ticks"/>
         <Argument Name="_SYNC_t" GenericType="simple" Comment="O/S dependent type of sync object. e.g. HANDLE, OS_EVENT*, ID and etc.."/>		
         <Argument Name="_FS_LOCK" GenericType="simple" Comment="0:Disable or >=1:Enable"/>        
+        <!-- Internal: for detecting enabled modes and include the right files -->
+        <Argument Name="_FS_FATFS_SDIO" GenericType="simple" Comment="0:Disable or >=1:Enable"/> 
+        <Argument Name="_FS_FATFS_SRAM" GenericType="simple" Comment="0:Disable or >=1:Enable"/> 
+        <Argument Name="_FS_FATFS_USB" GenericType="simple" Comment="0:Disable or >=1:Enable"/> 
+        <Argument Name="_HUSBH" GenericType="simple" Comment=""/>
     </RefConfigFile> 
    
     <!-- Generate a generic diskio C driver file  -->
     <RefConfigFile Name="USER_DISKIO_C" Description="GENERIC C diskio driver file" Template="generic_diskio_c.ftl">       
-        <File Name="user_diskio.c" Category="source" Version="R0.1.0" Condition="all"/>                                         
+        <File Name="user_diskio.c" Category="source" Version="R0.11" Condition="all"/>                      
+        <Argument Name="NEW_DISKIO_API" GenericType="simple" Comment=""/>                    
     </RefConfigFile>
     
     <!-- Generate a generic diskio H driver file -->
     <RefConfigFile Name="USER_DISKIO_H" Description="GENERIC H driver file" Template="generic_diskio_h.ftl">       
-        <File Name="user_diskio.h" Category="header" Version="R0.1.0" Condition="all"/>                    
+        <File Name="user_diskio.h" Category="header" Version="R0.11" Condition="all"/>                    
     </RefConfigFile>
     
     <!-- Generate a init code file (fatfs.c) -->
     <RefConfigFile Name="FATFS_INIT" Description="FATFS Init code file" Template="fatfs_init.ftl">       
-        <File Name="fatfs.c" Category="source" Version="R0.1.0" Condition="all"/>                    
+        <File Name="fatfs.c" Category="source" Version="R0.11" Condition="all"/>        
+        <Argument Name="_FS_NORTC" GenericType="simple" Comment="0 or 1"/>                           <!-- New in R0.11 -->                  
     </RefConfigFile>
     
     <!-- Generate header for the init code file (fatfs.h) -->
     <RefConfigFile Name="FATFS_HEADER" Description="FATFS header file" Template="fatfs_header.ftl">       
-        <File Name="fatfs.h" Category="source" Version="R0.1.0" Condition="all"/>                    
+        <File Name="fatfs.h" Category="source" Version="R0.11" Condition="all"/>                    
     </RefConfigFile>
 </IP>

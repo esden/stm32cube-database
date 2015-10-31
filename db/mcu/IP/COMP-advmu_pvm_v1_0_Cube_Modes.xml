@@ -75,10 +75,14 @@
 		<PossibleValue Comment="Low Speed" Value="COMP_MODE_LOWSPEED"/>
 	</RefParameter>
 	
-	<RefParameter Comment="Interrupt Trigger Mode" DefaultValue="COMP_TRIGGERMODE_IT_RISING" Name="TriggerMode" Type="list" Group="Basic Parameters">
-		<PossibleValue Comment="Rising Edge" Value="COMP_TRIGGERMODE_IT_RISING" Semaphore="$IpInstance_EXTI_IT_ENABLED"/>
-		<PossibleValue Comment="Falling Edge" Value="COMP_TRIGGERMODE_IT_FALLING" Semaphore="$IpInstance_EXTI_IT_ENABLED"/>
-		<PossibleValue Comment="Rising/Falling Edge" Value="COMP_TRIGGERMODE_IT_RISING_FALLING" Semaphore="$IpInstance_EXTI_IT_ENABLED"/>
+	<RefParameter Comment="Trigger Mode" DefaultValue="COMP_TRIGGERMODE_NONE" Name="TriggerMode" Type="list" Group="Basic Parameters">
+		<PossibleValue Comment="None" Value="COMP_TRIGGERMODE_NONE"/>
+		<PossibleValue Comment="Event mode with Rising Edge detection" Value="COMP_TRIGGERMODE_EVENT_RISING" Semaphore="$IpInstance_EXTI_EVT_ENABLED"/>
+		<PossibleValue Comment="Event mode with Falling Edge detection" Value="COMP_TRIGGERMODE_EVENT_FALLING" Semaphore="$IpInstance_EXTI_EVT_ENABLED"/>
+		<PossibleValue Comment="Event mode with Rising/Falling Edges detection" Value="COMP_TRIGGERMODE_EVENT_RISING_FALLING" Semaphore="$IpInstance_EXTI_EVT_ENABLED"/>
+		<PossibleValue Comment="Interrupt mode with Rising Edge detection" Value="COMP_TRIGGERMODE_IT_RISING" Semaphore="$IpInstance_EXTI_IT_ENABLED"/>
+		<PossibleValue Comment="Interrupt mode with Falling Edge detection" Value="COMP_TRIGGERMODE_IT_FALLING" Semaphore="$IpInstance_EXTI_IT_ENABLED"/>
+		<PossibleValue Comment="Interrupt mode with Rising/Falling Edges detection" Value="COMP_TRIGGERMODE_IT_RISING_FALLING" Semaphore="$IpInstance_EXTI_IT_ENABLED"/>
 	</RefParameter>
 	
 	<RefParameter Comment="Output Polarity" DefaultValue="COMP_OUTPUTPOL_NONINVERTED" Name="OutputPol" Type="list" Group="Basic Parameters">
@@ -88,8 +92,10 @@
 	
 	<RefParameter Comment="Low Power Timer (LPTIM) Connection" DefaultValue="COMP_LPTIMCONNECTION_DISABLED" Name="LPTIMConnection" Type="list" Group="Basic Parameters">
         <PossibleValue Comment="Disabled" Value="COMP_LPTIMCONNECTION_DISABLED"/>
-		<PossibleValue Comment="Enabled" Value="COMP_LPTIMCONNECTION_ENABLED" Semaphore="Semaphore_$IpInstance_LPTIM_enabled" />
+		<PossibleValue Comment="Enable COMP to LPTIM IN1 connection" Value="COMP_LPTIMCONNECTION_IN1_ENABLED" Semaphore="Semaphore_$IpInstance_LPTIM_enabled" Condition="(($IpNumber=1)&amp; Semaphore_COMP2_LPTIM_enabled)|(($IpNumber=2)&amp; Semaphore_COMP1_LPTIM_enabled)" Action="Disable" Diagnostic="This cannot be set while the other comparator uses the link toward LPTIM"/>
+		<PossibleValue Comment="Enable COMP to LPTIM IN2 connection" Value="COMP_LPTIMCONNECTION_IN2_ENABLED" Semaphore="Semaphore_$IpInstance_IN2_LPTIM_enabled" Condition="!$IpNumber=2" Action="Remove"/>
     </RefParameter>
+
 	
 
 	<!-- InputPlus is the default Mode -->
@@ -145,7 +151,11 @@
 			<PossibleValue>COMP_INVERTINGINPUT_DAC1</PossibleValue>
 		</Parameter>	
 	</RefMode>
-	
+	<RefMode Name="INM_DACOUT2">
+		<Parameter Name="InvertingInput">
+			<PossibleValue>COMP_INVERTINGINPUT_IO2</PossibleValue>
+		</Parameter>	
+	</RefMode>	
 	
 	
 	
@@ -182,6 +192,12 @@
 						<Signal Name="VS_DACOUT1"/>
 					</SignalLogicalOp>
 					<Condition Expression="(DAC_OUT1_Conf)" Diagnostic="Need to have an 'DAC Out 1' activated"/>
+				</Mode>
+				<Mode Name="INM_DACOUT2" UserName="DAC OUT2" RemoveCondition="!(DAC:$modeexist_DAC_OUT2)">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="VS_DACOUT2"/>
+					</SignalLogicalOp>
+					<Condition Expression="(DAC_OUT2_Conf)" Diagnostic="Need to have an 'DAC Out 2' activated"/>
 				</Mode>
 				<Mode Name="VREFINT" UserName="Internal VRef" >
 					<SignalLogicalOp Name="AND">

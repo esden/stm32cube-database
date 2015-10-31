@@ -5,13 +5,13 @@
     <!--Les multiplicateurs-->
     
     <!--PLL MUL-->
-    <RefParameter Visible="false" Comment="PLLN" DefaultValue="192" Max="432" Min="100" Name="PLLN" Type="integer"/>
+    <RefParameter Visible="false" Comment="PLLN" DefaultValue="192" Max="432" Min="50" Name="PLLN" Type="integer"/>
 	
     <!--PLLI2S MUL-->
-    <RefParameter Visible="false" Comment="PLLSAIN" DefaultValue="192" Max="432" Min="49" Name="PLLSAIN" Type="integer"/>
+    <RefParameter Visible="false" Comment="PLLSAIN" DefaultValue="192" Max="432" Min="50" Name="PLLSAIN" Type="integer"/>
 	
     <!--PLLSAI MUL-->
-    <RefParameter Visible="false" Comment="PLLI2SN" DefaultValue="192" Max="432" Min="100" Name="PLLI2SN" Type="integer"/>
+    <RefParameter Visible="false" Comment="PLLI2SN" DefaultValue="192" Max="432" Min="50" Name="PLLI2SN" Type="integer"/>
 	
     <!--APB1 MUL for TIM-->
     <RefParameter Visible="false" Comment="APB1 Timer Clock Divider" DefaultValue="1" Name="APB1TimCLKDivider" Type="integer" Max="1" Min="1">
@@ -459,12 +459,7 @@
         <Condition Diagnostic="RNG activated" Expression="RNGUsed_ForRCC"/>
     </RefParameter>
     <RefParameter Visible="false" Comment="USB Clock Source"     Name="USBFreq_Value"       DefaultValue="48000000"                Type="double" Display="value/1000000" Unit="MHz" Min="48000000" Max="48000000"/>
-		
-    <RefParameter Visible="false" Comment="PLLQCLK"   Name="PLLQCLKFreq_Value" DefaultValue="48000000" Max="75000000"  Type="double" Display="value/1000000" Unit="MHz">
-        <Condition Diagnostic="PLL not used" Expression="((USB_OTG_HSEmbeddedPHYUsed_ForRCC|USB_OTG_FSUsed_ForRCC)&amp;USBSourceisPLLQ)|(USBSourceisPLLQ &amp; SDIOSourceIsClock48&amp;SDIOUsed_ForRCC)"/>
-    </RefParameter>
-    <RefParameter Visible="false" Comment="PLLQCLK"   Name="PLLQCLKFreq_Value" DefaultValue="96000000"  Type="double" Display="value/1000000" Unit="MHz"/>
-		<!--SDIO-->
+<!--SDIO-->
 	<RefParameter Visible="false" Comment="SDIO Clock Source"    Name="SDIOFreq_Value"      DefaultValue="48000000" IP="SDIO"      Type="double" Display="value/1000000" Unit="MHz"  Max="48000000"/>
 		<!--SAI A-B-->
 	<RefParameter Visible="false" Comment="SAIA Clock Source"    Name="SAIAFreq_Value"      DefaultValue="48000000" IP="SAIA"      Type="double" Display="value/1000000" Unit="MHz"/>
@@ -498,11 +493,11 @@
     
     <!--MAin PLL frequency-->
     <RefParameter Visible="false" Comment="VCOInput" Name="VCOInputFreq_Value" DefaultValue="1000000" Min="950000" Max="2100000" Type="double" Display="value/1000000" Unit="MHz">
-        <Condition Diagnostic="PLLM used" Expression="PLLUsed=1|(SysSourceIsPLLclk)|((USB_OTG_HSEmbeddedPHYUsed_ForRCC|USB_OTG_FSUsed_ForRCC)&amp;USBSourceisPLLQ)|(USBSourceisPLLQ &amp; SDIOSourceIsClock48&amp;SDIOUsed_ForRCC)|((DSIUsed_ForRCC)&amp;DSISourceisPLLRR)"/>
+        <Condition Diagnostic="PLLM used" Expression="PLLUsed=1|(SysSourceIsPLLclk)|((USB_OTG_HSEmbeddedPHYUsed_ForRCC|USB_OTG_FSUsed_ForRCC|RNGUsed_ForRCC)&amp;USBSourceisPLLQ)|(USBSourceisPLLQ &amp; SDIOSourceIsClock48&amp;SDIOUsed_ForRCC)|((DSIUsed_ForRCC)&amp;DSISourceisPLLRR)"/>
     </RefParameter>
     <RefParameter Visible="false" Comment="VCOInput" Name="VCOInputFreq_Value" DefaultValue="1000000"  Type="double" Display="value/1000000" Unit="MHz"/>
     
-    <RefParameter Visible="false" Comment="VCOOutput" Name="VCOOutputFreq_Value" DefaultValue="192000000" Min="192000000" Max="432000000" Type="double" Display="value/1000000" Unit="MHz">
+    <RefParameter Visible="false" Comment="VCOOutput" Name="VCOOutputFreq_Value" DefaultValue="192000000" Min="100000000" Max="432000000" Type="double" Display="value/1000000" Unit="MHz">
         <Condition Diagnostic="PLL not used" Expression="PLLUsed=1"/>
     </RefParameter>
 		<RefParameter Visible="false" Comment="VCOOutput" Name="VCOOutputFreq_Value" DefaultValue="192000000"  Type="double" Display="value/1000000" Unit="MHz"/>
@@ -510,7 +505,11 @@
     <!--        <Condition Diagnostic="PLL not used" Expression="PLLUsed=1"/>-->
     <!--RefParameter-->
 
+		<RefParameter Visible="false" Comment="PLL Clock" Name="PLLCLKFreq_Value" DefaultValue="96000000" Max="180000000" Min="24000000" Type="double" Display="value/1000000" Unit="MHz">
+		   <Condition Diagnostic="PLL not used" Expression="PLLUsed=1"/>
+    </RefParameter>
 		<RefParameter Visible="false" Comment="PLL Clock" Name="PLLCLKFreq_Value" DefaultValue="96000000"  Type="double" Display="value/1000000" Unit="MHz"/>
+		
 
    <RefParameter Visible="false" Comment="48MHz Clocks" Name="48MHZClocksFreq_Value" DefaultValue="48000000" Min="47880000" Max="48120000" Type="double" Display="value/1000000" Unit="MHz">
 		<Condition Diagnostic="USB activated" Expression="USB_OTG_FSUsed_ForRCC|USB_OTG_HSEmbeddedPHYUsed_ForRCC"/>
@@ -521,7 +520,12 @@
         <Condition Diagnostic="PLLR used" Expression="DSIUsed_ForRCC &amp; DSISourceisPLLR"/>
     </RefParameter>
     <RefParameter Visible="false" Comment="PLLRCLK"   Name="PLLRCLKFreq_Value" DefaultValue="96000000"  Type="double" Display="value/1000000" Unit="MHz"/>
-
+		
+    <RefParameter Visible="false" Comment="PLLQCLK"   Name="PLLQCLKFreq_Value" DefaultValue="48000000" Max="75000000"   Type="double" Display="value/1000000" Unit="MHz">
+        <Condition Diagnostic="PLL not used" Expression="((USB_OTG_HSEmbeddedPHYUsed_ForRCC|USB_OTG_FSUsed_ForRCC|RNGUsed_ForRCC)&amp;USBSourceisPLLQ)|(USBSourceisPLLQ &amp; SDIOSourceIsClock48&amp;SDIOUsed_ForRCC)"/>
+    </RefParameter>
+    <RefParameter Visible="false" Comment="PLLQCLK"   Name="PLLQCLKFreq_Value" DefaultValue="96000000"  Type="double" Display="value/1000000" Unit="MHz"/>
+		
    
     <!--MAin PLLI2S frequency-->
     <RefParameter Visible="false" Comment="VCOI2SInput" Name="VCOI2SInputFreq_Value" DefaultValue="1000000" Min="950000" Max="2100000"  Type="double" Display="value/1000000" Unit="MHz">
@@ -529,7 +533,7 @@
     </RefParameter>
     <RefParameter Visible="false" Comment="VCOI2SInput" Name="VCOI2SInputFreq_Value" DefaultValue="192000000"   Type="double" Display="value/1000000" Unit="MHz"/>
 		
-    <RefParameter Visible="false" Comment="VCOI2SOutput" Name="VCOI2SOutputFreq_Value" DefaultValue="192000000" Min="192000000" Max="432000000"   Type="double" Display="value/1000000" Unit="MHz">
+    <RefParameter Visible="false" Comment="VCOI2SOutput" Name="VCOI2SOutputFreq_Value" DefaultValue="192000000" Min="100000000" Max="432000000"   Type="double" Display="value/1000000" Unit="MHz">
         <Condition Diagnostic="PLLI2SM  used" Expression="(MCO2Config &amp; MCOSourceIsPLLI2S)|(I2SSourceIsPLLI2S&amp; I2SUsed_ForRCC)|(SAIASourceIsPLLI2S&amp; SAIAUsed_ForRCC)|(SAIBSourceIsPLLI2S&amp; SAIBUsed_ForRCC)"/>
     </RefParameter>
     <RefParameter Visible="false" Comment="VCOI2SOutput" Name="VCOI2SOutputFreq_Value" DefaultValue="96000000"  Type="double" Display="value/1000000" Unit="MHz"/><!--prescaler R output -->
@@ -547,18 +551,18 @@
     <!--MAin PLLSAI frequency-->
 		
     <RefParameter Visible="false" Comment="VCOSAIInput" Name="VCOSAIInputFreq_Value" DefaultValue="1000000" Min="950000" Max="2100000"  Type="double" Display="value/1000000" Unit="MHz">
-        <Condition Diagnostic="PLLSAIM  used" Expression="(USBSourceisPLLSAIP &amp; (USB_OTG_FSUsed_ForRCC|USB_OTG_HSEmbeddedPHYUsed_ForRCC|(SDIOSourceIsClock48&amp;SDIOUsed_ForRCC))) |(SAIASourceIsPLLSAI &amp; SAIAUsed_ForRCC)|(SAIBSourceIsPLLSAI &amp;SAIBUsed_ForRCC)|(LTDCUsed_ForRCC)"/>
+        <Condition Diagnostic="PLLSAIM  used" Expression="(USBSourceisPLLSAIP &amp; (USB_OTG_FSUsed_ForRCC|USB_OTG_HSEmbeddedPHYUsed_ForRCC|(SDIOSourceIsClock48&amp;SDIOUsed_ForRCC)|RNGUsed_ForRCC)) |(SAIASourceIsPLLSAI &amp; SAIAUsed_ForRCC)|(SAIBSourceIsPLLSAI &amp;SAIBUsed_ForRCC)|(LTDCUsed_ForRCC)"/>
     </RefParameter>
     <RefParameter Visible="false" Comment="VCOSAIInput" Name="VCOSAIInputFreq_Value"  DefaultValue="192000000"  Type="double" Display="value/1000000" Unit="MHz"/>
 	
-    <RefParameter Visible="false" Comment="VCOSAIOutput" Name="VCOSAIOutputFreq_Value" DefaultValue="192000000" Min="192000000" Max="432000000"  Type="double" Display="value/1000000" Unit="MHz">
-        <Condition Diagnostic="PLLSAIM  used" Expression="(USBSourceisPLLSAIP &amp; (USB_OTG_FSUsed_ForRCC|USB_OTG_HSEmbeddedPHYUsed_ForRCC|(SDIOSourceIsClock48&amp;SDIOUsed_ForRCC))) |(SAIASourceIsPLLSAI &amp; SAIAUsed_ForRCC)|(SAIBSourceIsPLLSAI &amp;SAIBUsed_ForRCC)|(LTDCUsed_ForRCC)"/>
+    <RefParameter Visible="false" Comment="VCOSAIOutput" Name="VCOSAIOutputFreq_Value" DefaultValue="192000000" Min="100000000" Max="432000000"  Type="double" Display="value/1000000" Unit="MHz">
+        <Condition Diagnostic="PLLSAIM  used" Expression="(USBSourceisPLLSAIP &amp; (USB_OTG_FSUsed_ForRCC|USB_OTG_HSEmbeddedPHYUsed_ForRCC|(SDIOSourceIsClock48&amp;SDIOUsed_ForRCC)|RNGUsed_ForRCC)) |(SAIASourceIsPLLSAI &amp; SAIAUsed_ForRCC)|(SAIBSourceIsPLLSAI &amp;SAIBUsed_ForRCC)|(LTDCUsed_ForRCC)"/>
     </RefParameter>
     <RefParameter Visible="false" Comment="VCOSAIOutput" Name="VCOSAIOutputFreq_Value"  DefaultValue="192000000"  Type="double" Display="value/1000000" Unit="MHz"/>
 	
 	
     <RefParameter Visible="false" Comment="PLLSAIP Output" Name="PLLSAIPCLKFreq_Value" Max="216000000" DefaultValue="192000000"  Type="double" Display="value/1000000" Unit="MHz">
-        <Condition Diagnostic="PLLSAIP not used" Expression="(USBSourceisPLLSAIP &amp; (USB_OTG_FSUsed_ForRCC|USB_OTG_HSEmbeddedPHYUsed_ForRCC|(SDIOSourceIsClock48&amp;SDIOUsed_ForRCC))) "/>
+        <Condition Diagnostic="PLLSAIP not used" Expression="(USBSourceisPLLSAIP &amp; (USB_OTG_FSUsed_ForRCC|USB_OTG_HSEmbeddedPHYUsed_ForRCC|(SDIOSourceIsClock48&amp;SDIOUsed_ForRCC)|RNGUsed_ForRCC)) "/>
     </RefParameter>
     <RefParameter Visible="false" Comment="PLLSAIP Output" Name="PLLSAIPCLKFreq_Value"  DefaultValue="192000000"  Type="double" Display="value/1000000" Unit="MHz"/>
 	
@@ -826,7 +830,7 @@
 	
     <!-- Main PLL state control-->
     <RefParameter Visible="false" Comment="MainPLL Is Used" DefaultValue="1" Name="PLLUsed" Min="1" Type="integer">
-        <Condition Expression="((SYSCLKSource=RCC_SYSCLKSOURCE_PLLCLK)|((RCC_MCO1Source=RCC_MCO1SOURCE_PLLCLK)&amp; MCO1Config)|((RCC_MCO2Source=RCC_MCO2SOURCE_PLLCLK)&amp; MCO2Config)|USBSourceisPLLQ &amp;(USB_OTG_HSEmbeddedPHYUsed_ForRCC|USB_OTG_FSUsed_ForRCC|SDIOUsed_ForRCC) | (DSIUsed_ForRCC &amp; DSICLockSelection=DSISourceisPLLR))" Diagnostic="LSE is used if "/>
+        <Condition Expression="((SYSCLKSource=RCC_SYSCLKSOURCE_PLLCLK)|((RCC_MCO1Source=RCC_MCO1SOURCE_PLLCLK)&amp; MCO1Config)|((RCC_MCO2Source=RCC_MCO2SOURCE_PLLCLK)&amp; MCO2Config)|USBSourceisPLLQ &amp;(USB_OTG_HSEmbeddedPHYUsed_ForRCC|USB_OTG_FSUsed_ForRCC|SDIOUsed_ForRCC|RNGUsed_ForRCC) | (DSIUsed_ForRCC &amp; DSICLockSelection=DSISourceisPLLR))" Diagnostic="LSE is used if "/>
     </RefParameter>
     <RefParameter Visible="false" Comment="Main PLL is Used" DefaultValue="0" Name="PLLUsed" Min="0" Type="integer"/>
     <RefParameter Visible="false" Comment="Pll State" DefaultValue="RCC_PLL_OFF" Name="PLLState" Type="list">

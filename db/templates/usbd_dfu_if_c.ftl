@@ -64,34 +64,88 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "usbd_dfu_if.h"
+/* USER CODE BEGIN INCLUDE */
+/* USER CODE END INCLUDE */
+
+/** @addtogroup STM32_USB_OTG_DEVICE_LIBRARY
+  * @{
+  */
+/** @defgroup USBD_DFU 
+  * @brief usbd core module
+  * @{
+  */ 
+
+/** @defgroup USBD_DFU_Private_TypesDefinitions
+  * @{
+  */ 
+/* USER CODE BEGIN PRIVATE_TYPES  */
+/* USER CODE END PRIVATE_TYPES */ 
+/**
+  * @}
+  */ 
 
 
-/* Private typedef -----------------------------------------------------------*/
-/* Private define ------------------------------------------------------------*/
-#define FLASH_DESC_STR      "${DFU_MEDIA}"
-/* Private macro -------------------------------------------------------------*/
-/* Private variables ---------------------------------------------------------*/
+/** @defgroup USBD_DFU_Private_Defines
+  * @{
+  */ 
+#define FLASH_DESC_STR      "${DFU_MEDIA}"  
+/* USER CODE BEGIN PRIVATE_DEFINES  */
+/* USER CODE END PRIVATE_DEFINES */
+  
+/**
+  * @}
+  */ 
+
+
+/** @defgroup USBD_DFU_Private_Macros
+  * @{
+  */ 
+/* USER CODE BEGIN PRIVATE_MACRO  */
+/* USER CODE END PRIVATE_MACRO */
+
+/**
+  * @}
+  */ 
+
+/** @defgroup USBD_AUDIO_IF_Private_Variables
+  * @{
+  */
 /* USB handler declaration */
 [#if handleNameFS == "FS" || handleNameUSB_FS == "FS"]
 /* Handle for USB Full Speed IP */
-USBD_HandleTypeDef  *hUsbDevice_0;
+#tUSBD_HandleTypeDef  *hUsbDevice_0;
 [/#if]
 
 [#if handleNameHS == "HS"]
 /* Handle for USB High Speed IP */
-USBD_HandleTypeDef  *hUsbDevice_1;
+#tUSBD_HandleTypeDef  *hUsbDevice_1;
 [/#if]
+/* USER CODE BEGIN PRIVATE_VARIABLES  */
+/* USER CODE END  PRIVATE_VARIABLES */
 
+/**
+  * @}
+  */ 
+  
+/** @defgroup USBD_DFU_IF_Exported_Variables
+  * @{
+  */ 
 [#if handleNameFS == "FS" || handleNameUSB_FS == "FS"]
-extern USBD_HandleTypeDef hUsbDeviceFS;
+#textern USBD_HandleTypeDef hUsbDeviceFS;
 [/#if]
 [#if handleNameHS == "HS"]
-extern USBD_HandleTypeDef hUsbDeviceHS;  
+#textern USBD_HandleTypeDef hUsbDeviceHS;  
 [/#if]
+/* USER CODE BEGIN EXPORTED_VARIABLES  */
+/* USER CODE END  EXPORTED_VARIABLES */
 
-/* Private function prototypes -----------------------------------------------*/
-/* Extern function prototypes ------------------------------------------------*/
-/* Private functions ---------------------------------------------------------*/
+/**
+  * @}
+  */ 
+  
+/** @defgroup USBD_DFU_Private_FunctionPrototypes
+  * @{
+  */
 [#if handleNameFS == "FS" || handleNameUSB_FS == "FS"]
 static uint16_t MEM_If_Init_FS(void);
 static uint16_t MEM_If_Erase_FS (uint32_t Add);
@@ -109,7 +163,13 @@ static uint8_t *MEM_If_Read_HS  (uint8_t *src, uint8_t *dest, uint32_t Len);
 static uint16_t MEM_If_DeInit_HS(void);
 static uint16_t MEM_If_GetStatus_HS (uint32_t Add, uint8_t Cmd, uint8_t *buffer);
 [/#if]
+/* USER CODE BEGIN PRIVATE_FUNCTIONS_DECLARATION */
+/* USER CODE END  PRIVATE_FUNCTIONS_DECLARATION */
 
+/**
+  * @}
+  */ 
+  
 #if defined ( __ICCARM__ ) /*!< IAR Compiler */
   #pragma data_alignment=4   
 #endif
@@ -139,6 +199,7 @@ __ALIGN_BEGIN USBD_DFU_MediaTypeDef USBD_DFU_fops_HS __ALIGN_END =
 };
 [/#if]
 
+/* Private functions ---------------------------------------------------------*/
 [#if handleNameFS == "FS" || handleNameUSB_FS == "FS"]
 /**
   * @brief  MEM_If_Init_FS
@@ -334,5 +395,16 @@ uint16_t MEM_If_GetStatus_HS (uint32_t Add, uint8_t Cmd, uint8_t *buffer)
   /* USER CODE END 12 */  
 }
 [/#if]
+
+/* USER CODE BEGIN PRIVATE_FUNCTIONS_IMPLEMENTATION */
+/* USER CODE END  PRIVATE_FUNCTIONS_IMPLEMENTATION */
+
+/**
+  * @}
+  */ 
+
+/**
+  * @}
+  */  
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
 

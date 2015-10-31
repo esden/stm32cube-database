@@ -46,6 +46,12 @@
 [/#list]
 [/#if]
 #n
+[#if LabelDefines??][#-- user defines declaration --]
+[#assign defines = LabelDefines.get(0)]
+[#list defines.entrySet() as define]
+#define ${define.key} ${define.value}
+[/#list]
+[/#if]
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */

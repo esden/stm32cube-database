@@ -60,18 +60,24 @@
 #endif
 /* Includes ------------------------------------------------------------------*/
 #include "usbd_customhid.h"
+/* USER CODE BEGIN INCLUDE */
+/* USER CODE END INCLUDE */
 
 /** @addtogroup STM32_USB_OTG_DEVICE_LIBRARY
   * @{
   */
   
 /** @defgroup USBD_CUSTOM_HID
+  * @brief header 
   * @{
   */ 
 
 /** @defgroup USBD_CUSTOM_HID_Exported_Defines
   * @{
   */ 
+/* USER CODE BEGIN EXPORTED_DEFINES  */
+/* USER CODE END  EXPORTED_DEFINES */
+
 /**
   * @}
   */ 
@@ -79,8 +85,9 @@
 
 /** @defgroup USBD_CUSTOM_HID_Exported_Types
   * @{
-  */
-
+  */  
+/* USER CODE BEGIN EXPORTED_TYPES  */
+/* USER CODE END  EXPORTED_TYPES */
 
 /**
   * @}
@@ -91,6 +98,8 @@
 /** @defgroup USBD_CUSTOM_HID_Exported_Macros
   * @{
   */ 
+/* USER CODE BEGIN EXPORTED_MACRO  */
+/* USER CODE END  EXPORTED_MACRO */
 
 /**
   * @}
@@ -100,11 +109,15 @@
   * @{
   */ 
 [#if handleNameFS == "FS" || handleNameUSB_FS == "FS"]  
-extern USBD_CUSTOM_HID_ItfTypeDef  USBD_CustomHID_fops_FS;
+#textern USBD_CUSTOM_HID_ItfTypeDef  USBD_CustomHID_fops_FS;
 [/#if]
 [#if handleNameHS == "HS"]
-extern USBD_CUSTOM_HID_ItfTypeDef  USBD_CustomHID_fops_HS;
+#textern USBD_CUSTOM_HID_ItfTypeDef  USBD_CustomHID_fops_HS;
 [/#if]
+
+/* USER CODE BEGIN EXPORTED_VARIABLES  */
+/* USER CODE END  EXPORTED_VARIABLES */
+
 /**
   * @}
   */ 
@@ -114,21 +127,25 @@ extern USBD_CUSTOM_HID_ItfTypeDef  USBD_CustomHID_fops_HS;
   */ 
 
 
+
+/* USER CODE BEGIN EXPORTED_FUNCTIONS  */
+/* USER CODE END  EXPORTED_FUNCTIONS */
 /**
   * @}
-  */ 
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif /* __USBD_CUSTOM_HID_IF_H_ */
-
+  */
+   
 /**
   * @}
   */ 
 
 /**
 * @}
-*/ 
+*/
+ 
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* __USBD_CUSTOM_HID_IF_H_ */
+
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

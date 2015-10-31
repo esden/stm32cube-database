@@ -51,33 +51,89 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "usbd_ccid_if.h"
+/* USER CODE BEGIN INCLUDE */
+/* USER CODE END INCLUDE */
+
+/** @addtogroup STM32_USB_OTG_DEVICE_LIBRARY
+  * @{
+  */
 
 
-/* Private typedef -----------------------------------------------------------*/
-/* Private define ------------------------------------------------------------*/
-/* Private macro -------------------------------------------------------------*/
-/* Private variables ---------------------------------------------------------*/
+/** @defgroup USBD_CCID 
+  * @brief usbd core module
+  * @{
+  */ 
+
+/** @defgroup USBD_CCID_Private_TypesDefinitions
+  * @{
+  */ 
+/* USER CODE BEGIN PRIVATE_TYPES  */
+/* USER CODE END PRIVATE_TYPES */ 
+/**
+  * @}
+  */ 
+
+
+/** @defgroup USBD_CCID_Private_Defines
+  * @{
+  */ 
+/* USER CODE BEGIN PRIVATE_DEFINES  */
+/* USER CODE END PRIVATE_DEFINES */
+  
+/**
+  * @}
+  */ 
+
+
+/** @defgroup USBD_CCID_Private_Macros
+  * @{
+  */ 
+/* USER CODE BEGIN PRIVATE_MACRO  */
+/* USER CODE END PRIVATE_MACRO */
+
+/**
+  * @}
+  */ 
+
+/** @defgroup USBD_CCID_IF_Private_Variables
+  * @{
+  */
 /* USB handler declaration */
-[#if handleNameFS == "FS" || handleNameUSB_FS == "FS"]
 /* Handle for USB Full Speed IP */
-USBD_HandleTypeDef  *hUsbDevice_0;
+[#if handleNameFS == "FS" || handleNameUSB_FS == "FS"]
+#tUSBD_HandleTypeDef  *hUsbDevice_0;
 [/#if]
 
 [#if handleNameHS == "HS"]
 /* Handle for USB High Speed IP */
-USBD_HandleTypeDef  *hUsbDevice_1;
+#tUSBD_HandleTypeDef  *hUsbDevice_1;
 [/#if]
+/* USER CODE BEGIN PRIVATE_VARIABLES  */
+/* USER CODE END  PRIVATE_VARIABLES */
+
+/**
+  * @}
+  */ 
   
+/** @defgroup USBD_CCID_IF_Exported_Variables
+  * @{
+  */ 
 [#if handleNameFS == "FS" || handleNameUSB_FS == "FS"]
-extern USBD_HandleTypeDef hUsbDeviceFS;
+#textern USBD_HandleTypeDef hUsbDeviceFS;
 [/#if]
 [#if handleNameHS == "HS"]
-extern USBD_HandleTypeDef hUsbDeviceHS;  
+#textern USBD_HandleTypeDef hUsbDeviceHS;  
 [/#if]
+/* USER CODE BEGIN EXPORTED_VARIABLES  */
+/* USER CODE END  EXPORTED_VARIABLES */
 
-/* Private function prototypes -----------------------------------------------*/
-/* Extern function prototypes ------------------------------------------------*/
-/* Private functions ---------------------------------------------------------*/
+/**
+  * @}
+  */ 
+  
+/** @defgroup USBD_CCID_Private_FunctionPrototypes
+  * @{
+  */
 [#if handleNameFS == "FS" || handleNameUSB_FS == "FS"]
 static int8_t SC_If_Init_FS(void);
 static int8_t SC_If_DeInit_FS(void);
@@ -89,7 +145,13 @@ static int8_t SC_If_Init_HS(void);
 static int8_t SC_If_DeInit_HS(void);
 static int8_t SC_If_Decode_HS (uint8_t msg, uint8_t *pbuf, uint16_t length);
 [/#if]
+/* USER CODE BEGIN PRIVATE FUNCTIONS DECLARATION */
+/* USER CODE END  PRIVATE FUNCTIONS DECLARATION */
 
+/**
+  * @}
+  */ 
+  
 [#if handleNameFS == "FS" || handleNameUSB_FS == "FS"]
 USBD_CCID_ItfTypeDef USBD_CCID_fops_FS =
 {
@@ -256,4 +318,15 @@ int8_t SC_If_Decode_HS (uint8_t msg, uint8_t *pbuf, uint16_t length)
   /* USER CODE END 5 */   
 }
 [/#if]
+
+/* USER CODE BEGIN PRIVATE_FUNCTIONS_IMPLEMENTATION */
+/* USER CODE END  PRIVATE_FUNCTIONS_IMPLEMENTATION */
+
+/**
+  * @}
+  */ 
+
+/**
+  * @}
+  */  
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

@@ -85,6 +85,22 @@ extern ${variable.value} ${variable.name};
 [#list halModeList?split(" ") as mode]
 [/#list]
 [/#list]
+[#-- PostInit declaration --]
+[#list IPdatas as IP]  
+[#list IP.configModelList as instanceData]
+[#if instanceData.initServices??]
+    [#if instanceData.initServices.gpioOut??]
+        [#list instanceData.initCallBackInitMethodList as initCallBack]
+            [#if initCallBack?contains("PostInit")]
+            #nvoid ${initCallBack}(${instanceData.halMode}_HandleTypeDef *h${instanceData.halMode?lower_case});
+            [/#if]
+        [/#list]
+    [/#if]
+[/#if]
+[/#list]
+
+[/#list]
+[#-- PostInit declaration : End --]
 [#compress]
 #n/* USER CODE BEGIN Prototypes */
 #n     

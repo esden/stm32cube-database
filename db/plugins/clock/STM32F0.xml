@@ -81,9 +81,7 @@
     <Background  imageName="STM32F0WithUSB " name="STM32F0WithUSB "   x="646" y="538">
         <Condition Diagnostic="" Expression="STM32F0x0_Value_Line &amp; USB_Exist"/>
     </Background>
-	<Background  imageName="STM32F0MCOWithoutLSEandLSI" name="STM32F0MCOWithoutLSEandLSI "   x="99" y="760">
-        <Condition Diagnostic="" Expression="STM32F0x0_Value_Line &amp; DIE440"/>
-    </Background>
+
    
     <Tree id="ClockTree">
         <!--clock source-->
@@ -289,12 +287,7 @@
         </Element>
         <!-- MCO -->
         <!-- diviseur PLL et MCO -->
-		<Element id="MCOMultDivisor" type="devisor" refParameter="RCC_MCOMult_Clock_Source_FROM_PLLMUL" x="435" y="737" refEnable="MCOEnable">
-            <Condition Diagnostic="" Expression="DIE440 &amp; STM32F0x0_Value_Line"/>
-
-            <Input signalId="PLLCLK" from="PLLMUL" />
-            <Output signalId="PLLCLK_MCO" to="MCOMult" />
-        </Element>
+		
         <Element id="MCOMultDivisor" type="devisor" refParameter="RCC_MCOMult_Clock_Source_FROM_PLLMUL" x="493" y="721" refEnable="MCOEnable">
 		<Condition Diagnostic="" Expression="(DIE448|DIE445)&amp;STM32F0x0_Value_Line &amp; !TSSOP20" />
             <Input signalId="PLLCLK" from="PLLMUL" />
@@ -327,15 +320,7 @@
             <Input signalId="PLLCLK" from="PLLMUL" />
             <Output signalId="PLLCLK_MCO" to="MCOMult" />
         </Element>
-		<Element id="MCOMult" type="multiplexor" refParameter="RCC_MCOSource" x="402" y="740" refEnable="MCOEnable">
-            <Condition Diagnostic="" Expression="DIE440&amp; STM32F0x0_Value_Line"/>
-            <Input signalId="PLLCLK_MCO" from="MCOMultDivisor" refValue="RCC_MCOSOURCE_PLLCLK_DIV2" />
-            <Input signalId="HSI8" from="HSIRC" refValue="RCC_MCOSOURCE_HSI" />
-            <Input signalId="HSI14" from="HSIRC14" refValue="RCC_MCOSOURCE_HSI14" />
-            <Input signalId="HSE" from="HSEOSC" refValue="RCC_MCOSOURCE_HSE" />
-            <Input signalId="SYSCLKOUT" from="SysCLKOutput" refValue="RCC_MCOSOURCE_SYSCLK" />
-            <Output signalId="MCOout" to="MCOoutput" />
-        </Element>
+
        
         <!-- MCO input** LSI,HSE,HSI,PLLdiviseur,SYSclock -->
         <Element id="MCOMult" type="multiplexor" refParameter="RCC_MCOSource" x="462" y="727" refEnable="MCOEnable">
@@ -422,11 +407,7 @@
             <Condition Diagnostic="" Expression="!DIE440 &amp; !TSSOP20"/>
             <Input signalId="MCODivOut" from="MCODivider" />
         </Element>
-		 <Element id="MCOoutput" type="output" refParameter="MCOFreq_Value" x="315" y="785" refEnable="MCOEnable">
-            <Condition Diagnostic="" Expression=" DIE440 &amp; STM32F0x0_Value_Line"/>
-
-            <Input signalId="MCOout" from="MCOMult" />
-        </Element>
+		
         <Element id="MCOoutput" type="output" refParameter="MCOFreq_Value" x="315" y="795" refEnable="MCOEnable">
             <Condition Diagnostic="" Expression=" !TSSOP20"/>
 
@@ -1082,43 +1063,33 @@
     <Label id="MCOMuxLabel" type="muxLabel" text="MCO source Mux" posX="385" posY="700" refEnable="MCOEnable">
         <Condition Diagnostic="" Expression="DIE440&amp;(!DIE444&amp; !UFQFPN32&amp;!UFQFPN28&amp;!UFQFPN36&amp;!TSSOP20&amp;!LQFP32)"/>
     </Label>
-  <Label id="MCOPLLLabel" type="signal" text="PLLCLK" posX="488" posY="733" refEnable="MCOEnable">
-        <Condition Diagnostic="" Expression="DIE440&amp;STM32F0x0_Value_Line"/>
-    </Label>
+
     <Label id="MCOPLLLabel" type="signal" text="PLLCLK" posX="488" posY="714" refEnable="MCOEnable">
-        <Condition Diagnostic="" Expression="DIE440&amp;( !UFQFPN32&amp;!UFQFPN28&amp;!UFQFPN36&amp;!TSSOP20&amp;!LQFP32)&amp; !STM32F0x0_Value_Line"/>
+        <Condition Diagnostic="" Expression="DIE440&amp;( !UFQFPN32&amp;!UFQFPN28&amp;!UFQFPN36&amp;!TSSOP20&amp;!LQFP32)"/>
     </Label> 
 	
-    <Label id="MCOHSILabel" type="signal" text="HSI" posX="502" posY="758" refEnable="MCOEnable">
-        <Condition Diagnostic="" Expression="DIE440&amp;STM32F0x0_Value_Line"/>
-    </Label>
+
     <Label id="MCOHSILabel" type="signal" text="HSI" posX="502" posY="741" refEnable="MCOEnable">
-        <Condition Diagnostic="" Expression="DIE440&amp;( !UFQFPN32&amp;!UFQFPN28&amp;!UFQFPN36&amp;!TSSOP20&amp;!LQFP32) &amp; !STM32F0x0_Value_Line"/>
-    </Label>
-    <Label id="MCOHSI14Label" type="signal" text="HSI14" posX="492" posY="782" refEnable="MCOEnable">
-        <Condition Diagnostic="" Expression="DIE440&amp;STM32F0x0_Value_Line"/>
-    </Label>
-    <Label id="MCOHSI14Label" type="signal" text="HSI14" posX="492" posY="769" refEnable="MCOEnable">
-        <Condition Diagnostic="" Expression="DIE440&amp;( !UFQFPN32&amp;!UFQFPN28&amp;!UFQFPN36&amp;!TSSOP20&amp;!LQFP32)&amp; !STM32F0x0_Value_Line"/>
-    </Label>
-    <Label id="MCOHSELabel" type="signal" text="HSE" posX="500" posY="807" refEnable="MCOEnable">
-        <Condition Diagnostic="" Expression="DIE440&amp;STM32F0x0_Value_Line"/>
-    </Label>
-    <Label id="MCOHSELabel" type="signal" text="HSE" posX="500" posY="795" refEnable="MCOEnable">
-        <Condition Diagnostic="" Expression="DIE440&amp;( !UFQFPN32&amp;!UFQFPN28&amp;!UFQFPN36&amp;!TSSOP20&amp;!LQFP32) &amp;!STM32F0x0_Value_Line"/>
-    </Label>
-    <Label id="MCOLSILabel" type="signal" text="LSI" posX="503" posY="822" refEnable="MCOEnable">
-        <Condition Diagnostic="" Expression="DIE440&amp;( !UFQFPN32&amp;!UFQFPN28&amp;!UFQFPN36&amp;!TSSOP20&amp;!LQFP32) &amp;!STM32F0x0_Value_Line"/>
-    </Label>
-    <Label id="MCOLSELabel" type="signal" text="LSE" posX="503" posY="849" refEnable="MCOEnable">
-        <Condition Diagnostic="" Expression="DIE440&amp;( !UFQFPN32&amp;!UFQFPN28&amp;!TSSOP20&amp;!LQFP32)&amp;!STM32F0x0_Value_Line"/>
-    </Label>
-    <Label id="MCOSYSCLKLabel" type="signal" text="SYSCLK" posX="484" posY="835" refEnable="MCOEnable">
-        <Condition Diagnostic="" Expression="DIE440&amp;STM32F0x0_Value_Line"/>
+        <Condition Diagnostic="" Expression="DIE440&amp;( !UFQFPN32&amp;!UFQFPN28&amp;!UFQFPN36&amp;!TSSOP20&amp;!LQFP32) "/>
     </Label>
 
+    <Label id="MCOHSI14Label" type="signal" text="HSI14" posX="492" posY="769" refEnable="MCOEnable">
+        <Condition Diagnostic="" Expression="DIE440&amp;( !UFQFPN32&amp;!UFQFPN28&amp;!UFQFPN36&amp;!TSSOP20&amp;!LQFP32)"/>
+    </Label>
+
+    <Label id="MCOHSELabel" type="signal" text="HSE" posX="500" posY="795" refEnable="MCOEnable">
+        <Condition Diagnostic="" Expression="DIE440&amp;( !UFQFPN32&amp;!UFQFPN28&amp;!UFQFPN36&amp;!TSSOP20&amp;!LQFP32) "/>
+    </Label>
+    <Label id="MCOLSILabel" type="signal" text="LSI" posX="503" posY="822" refEnable="MCOEnable">
+        <Condition Diagnostic="" Expression="DIE440&amp;( !UFQFPN32&amp;!UFQFPN28&amp;!UFQFPN36&amp;!TSSOP20&amp;!LQFP32) "/>
+    </Label>
+    <Label id="MCOLSELabel" type="signal" text="LSE" posX="503" posY="849" refEnable="MCOEnable">
+        <Condition Diagnostic="" Expression="DIE440&amp;( !UFQFPN32&amp;!UFQFPN28&amp;!TSSOP20&amp;!LQFP32)"/>
+    </Label>
+
+
     <Label id="MCOSYSCLKLabel" type="signal" text="SYSCLK" posX="484" posY="874" refEnable="MCOEnable">
-        <Condition Diagnostic="" Expression="DIE440&amp;( !UFQFPN32&amp;!UFQFPN28&amp;!UFQFPN36&amp;!TSSOP20&amp;!LQFP32) &amp; !STM32F0x0_Value_Line"/>
+        <Condition Diagnostic="" Expression="DIE440&amp;( !UFQFPN32&amp;!UFQFPN28&amp;!UFQFPN36&amp;!TSSOP20&amp;!LQFP32) "/>
     </Label>
 
     <!--MCO with No Divisor Without LSE -->   

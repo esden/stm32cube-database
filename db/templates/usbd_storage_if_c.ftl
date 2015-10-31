@@ -53,55 +53,62 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "usbd_storage_if.h"
+/* USER CODE BEGIN INCLUDE */
+/* USER CODE END INCLUDE */
 
-/* Private typedef -----------------------------------------------------------*/
-/* Private define ------------------------------------------------------------*/
-/* Private macro -------------------------------------------------------------*/
-/* Private variables ---------------------------------------------------------*/
-/* USB handler declaration */
-[#if handleNameFS == "FS" || handleNameUSB_FS == "FS"]
-/* Handle for USB Full Speed IP */
-USBD_HandleTypeDef  *hUsbDevice_0;
-[/#if]
+/** @addtogroup STM32_USB_OTG_DEVICE_LIBRARY
+  * @{
+  */
 
-[#if handleNameHS == "HS"]
-/* Handle for USB High Speed IP */
-USBD_HandleTypeDef  *hUsbDevice_1;
-[/#if]
 
-[#if handleNameFS == "FS" || handleNameUSB_FS == "FS"]
-extern USBD_HandleTypeDef hUsbDeviceFS;
-[/#if]
-[#if handleNameHS == "HS"]
-extern USBD_HandleTypeDef hUsbDeviceHS;  
-[/#if]
+/** @defgroup USBD_STORAGE 
+  * @brief usbd core module
+  * @{
+  */ 
 
-/* Private function prototypes -----------------------------------------------*/
-/* Extern function prototypes ------------------------------------------------*/
-/* Private functions ---------------------------------------------------------*/
+/** @defgroup USBD_STORAGE_Private_TypesDefinitions
+  * @{
+  */ 
+/* USER CODE BEGIN PRIVATE_TYPES  */
+/* USER CODE END PRIVATE_TYPES */ 
+/**
+  * @}
+  */ 
 
+
+/** @defgroup USBD_STORAGE_Private_Defines
+  * @{
+  */ 
 #define STORAGE_LUN_NBR                  1  
 #define STORAGE_BLK_NBR                  0x10000  
 #define STORAGE_BLK_SIZ                  0x200
 
-[#if handleNameFS == "FS" || handleNameUSB_FS == "FS"]
-static int8_t STORAGE_Init_FS (uint8_t lun);
-static int8_t STORAGE_GetCapacity_FS (uint8_t lun, 
-                           uint32_t *block_num, 
-                           uint16_t *block_size);
-static int8_t  STORAGE_IsReady_FS (uint8_t lun);
-static int8_t  STORAGE_IsWriteProtected_FS (uint8_t lun);
-static int8_t STORAGE_Read_FS (uint8_t lun, 
-                        uint8_t *buf, 
-                        uint32_t blk_addr,
-                        uint16_t blk_len);
-static int8_t STORAGE_Write_FS (uint8_t lun, 
-                        uint8_t *buf, 
-                        uint32_t blk_addr,
-                        uint16_t blk_len);
-static int8_t STORAGE_GetMaxLun_FS (void);
+/* USER CODE BEGIN PRIVATE_DEFINES  */
+/* USER CODE END PRIVATE_DEFINES */
+  
+/**
+  * @}
+  */ 
 
-/* USER CODE BEGIN 0 */ 
+
+/** @defgroup USBD_STORAGE_Private_Macros
+  * @{
+  */ 
+/* USER CODE BEGIN PRIVATE_MACRO  */
+/* USER CODE END PRIVATE_MACRO */
+
+/**
+  * @}
+  */ 
+
+/** @defgroup USBD_STORAGE_IF_Private_Variables
+  * @{
+  */
+/* USB handler declaration */
+/* Handle for USB Full Speed IP */
+[#if handleNameFS == "FS" || handleNameUSB_FS == "FS"]
+#tUSBD_HandleTypeDef  *hUsbDevice_0;
+/* USER CODE BEGIN INQUIRY_DATA_FS */ 
 /* USB Mass storage Standard Inquiry Data */
 const int8_t  STORAGE_Inquirydata_FS[] = {//36
   
@@ -119,8 +126,74 @@ const int8_t  STORAGE_Inquirydata_FS[] = {//36
   ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',
   '0', '.', '0' ,'1',                     /* Version      : 4 Bytes */
 }; 
-/* USER CODE END 0 */ 
+/* USER CODE END INQUIRY_DATA_FS */ 
+[/#if]
 
+[#if handleNameHS == "HS"]
+/* Handle for USB High Speed IP */
+#tUSBD_HandleTypeDef  *hUsbDevice_1;
+/* USER CODE BEGIN INQUIRY_DATA_HS */ 
+/* USB Mass storage Standard Inquiry Data */
+const int8_t  STORAGE_Inquirydata_HS[] = {//36
+  
+  /* LUN 0 */
+  0x00,		
+  0x80,		
+  0x02,		
+  0x02,
+  (STANDARD_INQUIRY_DATA_LEN - 5),
+  0x00,
+  0x00,	
+  0x00,
+  'S', 'T', 'M', ' ', ' ', ' ', ' ', ' ', /* Manufacturer : 8 bytes */
+  'P', 'r', 'o', 'd', 'u', 'c', 't', ' ', /* Product      : 16 Bytes */
+  ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',
+  '0', '.', '0' ,'1',                     /* Version      : 4 Bytes */
+}; 
+/* USER CODE END INQUIRY_DATA_HS */ 
+[/#if]
+/* USER CODE BEGIN PRIVATE_VARIABLES  */
+/* USER CODE END  PRIVATE_VARIABLES */
+
+/**
+  * @}
+  */ 
+ 
+/** @defgroup USBD_STORAGE_IF_Exported_Variables
+  * @{
+  */ 
+[#if handleNameFS == "FS" || handleNameUSB_FS == "FS"]
+#textern USBD_HandleTypeDef hUsbDeviceFS;
+[/#if]
+[#if handleNameHS == "HS"]
+#textern USBD_HandleTypeDef hUsbDeviceHS;  
+[/#if]
+/* USER CODE BEGIN EXPORTED_VARIABLES  */
+/* USER CODE END  EXPORTED_VARIABLES */
+
+/**
+  * @}
+  */ 
+  
+/** @defgroup USBD_STORAGE_Private_FunctionPrototypes
+  * @{
+  */
+[#if handleNameFS == "FS" || handleNameUSB_FS == "FS"]
+static int8_t STORAGE_Init_FS (uint8_t lun);
+static int8_t STORAGE_GetCapacity_FS (uint8_t lun, 
+                           uint32_t *block_num, 
+                           uint16_t *block_size);
+static int8_t  STORAGE_IsReady_FS (uint8_t lun);
+static int8_t  STORAGE_IsWriteProtected_FS (uint8_t lun);
+static int8_t STORAGE_Read_FS (uint8_t lun, 
+                        uint8_t *buf, 
+                        uint32_t blk_addr,
+                        uint16_t blk_len);
+static int8_t STORAGE_Write_FS (uint8_t lun, 
+                        uint8_t *buf, 
+                        uint32_t blk_addr,
+                        uint16_t blk_len);
+static int8_t STORAGE_GetMaxLun_FS (void);
 [/#if]
 
 [#if handleNameHS == "HS"]
@@ -139,29 +212,14 @@ static int8_t STORAGE_Write_HS (uint8_t lun,
                         uint32_t blk_addr,
                         uint16_t blk_len);
 static int8_t STORAGE_GetMaxLun_HS (void);
-
-/* USER CODE BEGIN 1 */ 
-/* USB Mass storage Standard Inquiry Data */
-const int8_t  STORAGE_Inquirydata_HS[] = {//36
-  
-  /* LUN 0 */
-  0x00,		
-  0x80,		
-  0x02,		
-  0x02,
-  (STANDARD_INQUIRY_DATA_LEN - 5),
-  0x00,
-  0x00,	
-  0x00,
-  'S', 'T', 'M', ' ', ' ', ' ', ' ', ' ', /* Manufacturer : 8 bytes */
-  'P', 'r', 'o', 'd', 'u', 'c', 't', ' ', /* Product      : 16 Bytes */
-  ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',
-  '0', '.', '0' ,'1',                     /* Version      : 4 Bytes */
-};
-/* USER CODE END 1 */  
 [/#if]
+/* USER CODE BEGIN PRIVATE_FUNCTIONS_DECLARATION */
+/* USER CODE END  PRIVATE_FUNCTIONS_DECLARATION */
 
-
+/**
+  * @}
+  */ 
+  
 [#if handleNameFS == "FS" || handleNameUSB_FS == "FS"]
 USBD_StorageTypeDef USBD_Storage_Interface_fops_FS =
 {
@@ -190,6 +248,7 @@ USBD_StorageTypeDef USBD_Storage_Interface_fops_HS =
 };
 [/#if]
 
+/* Private functions ---------------------------------------------------------*/
 [#if handleNameFS == "FS" || handleNameUSB_FS == "FS"]
 /*******************************************************************************
 * Function Name  : STORAGE_Init_FS
@@ -405,4 +464,15 @@ int8_t STORAGE_GetMaxLun_HS (void)
   /* USER CODE END 15 */   
 }
 [/#if]
+
+/* USER CODE BEGIN PRIVATE_FUNCTIONS_IMPLEMENTATION */
+/* USER CODE END  PRIVATE_FUNCTIONS_IMPLEMENTATION */
+
+/**
+  * @}
+  */ 
+
+/**
+  * @}
+  */  
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

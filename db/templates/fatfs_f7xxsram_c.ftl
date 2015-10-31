@@ -45,7 +45,8 @@
   */
 uint8_t BSP_SRAM_Init(void)
 { 
-  static uint8_t sram_status = SRAM_ERROR;
+  static uint8_t sramstatus = SRAM_ERROR;
+  
   /* place for custom code */
   
   return sramstatus;

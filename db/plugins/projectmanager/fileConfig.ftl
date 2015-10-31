@@ -34,6 +34,9 @@
   <config>
     <name>${Configuration} Configuration</name>				[#-- project configuration name. Ex: STM32F407_EVAL --]
     <device>${project.deviceId}</device>		 [#--  STM32 selected device. Ex: STM32F407ZE --]
+    [#if ide=="EWARM" || ide=="MDK-ARM"]
+    	<cpuclock>${cpuclock}</cpuclock>
+    [/#if]
     [#if boardName != ""]
     	<board>${boardName}</board>
     [/#if]
@@ -50,10 +53,10 @@
     	[#if usedfreeRTOS=="true"]
 	   		[#if ide=="EWARM" ]
 		   		<include>$PROJ_DIR$\${RelativePath}Inc</include>
-	   		[#elseif ide=="TrueSTUDIO" ]
-	   			<include>..\..\${RelativePath}Inc</include>
+	   		[#elseif ide=="MDK-ARM" ]
+	   			<include>${RelativePath}Inc</include>
 		    [#else]
-		   		<include>${RelativePath}Inc</include>
+		   		<include></include>
 		    [/#if]
 	    [#else]
 	    	<include></include>

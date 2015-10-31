@@ -12,16 +12,16 @@
     </Background>
     
     <Background name="STM32L0-WithoutHSE" imageName="STM32L0-WithoutHSE-RNGBlock" x="131" y="287">
-        <Condition Diagnostic="" Expression="(LQFP32|UFQFPN32|WLCSP36)"/>
+        <Condition Diagnostic="" Expression="(LQFP32|UFQFPN32|WLCSP36)&amp;!(DIE425)"/>
     </Background>
     <Background name="STM32L0_RTCBlockWithouHSE" imageName="STM32L0_RTCBlockWithouHSE" x="94" y="45">
-        <Condition Diagnostic="" Expression="(LQFP32|UFQFPN32|WLCSP36)"/>
+        <Condition Diagnostic="" Expression="(LQFP32|UFQFPN32|WLCSP36)&amp;!(DIE425)"/>
     </Background>
     <Background name="STM32L0_MCOBlockWithouHSE" imageName="STM32L0_MCOBlockWithouHSE" x="399" y="756">
-        <Condition Diagnostic="" Expression="(LQFP32|UFQFPN32|WLCSP36)&amp; STM32L0x1"/>
+        <Condition Diagnostic="" Expression="(LQFP32|UFQFPN32|WLCSP36)&amp; STM32L0x1 &amp; !DIE425"/>
     </Background>
     <Background name="STM32L0_MCOBlockWithouHSE" imageName="STM32L0_MCOBlockWithouHSEWith48" x="403" y="727">
-        <Condition Diagnostic="" Expression="((!LQFP32&amp; !UFQFPN32 &amp; !WLCSP36)&amp; STM32L0x1) |((LQFP32|UFQFPN32|WLCSP36)&amp; !STM32L0x1)"/>
+        <Condition Diagnostic="" Expression="((!LQFP32&amp; !UFQFPN32 &amp; !WLCSP36)&amp; STM32L0x1) |((LQFP32|UFQFPN32|WLCSP36)&amp; !STM32L0x1)|DIE425"/>
     </Background>
     <Background name="STM32L0_UARTBlockWithouLPUART" imageName="STM32L0withoutuart" x="930" y="435">
         <Condition Diagnostic="" Expression="DIE425&amp;!LPUART1_Exist"/>
@@ -32,11 +32,14 @@
 	<Background name="STM32L0_UARTBlockWithouLPUART" imageName="STM32L0_UARTBlockWithouLPUART" x="930" y="435">
         <Condition Diagnostic="" Expression="!LPUART1_Exist"/>
     </Background>
+	<Background name="STM32L0_withI2C3" imageName="STM32L0_withI2C3" x="550" y="870">
+        <Condition Diagnostic="" Expression="I2C3_Exist"/>
+    </Background>
     
     
     <Tree id="ClockTree">
         <Element id="HSIRC" type="fixedSource" isKey="true" refParameter="HSI16_VALUE" x="302" y="500" >
-            <Condition Diagnostic="" Expression="(LQFP32|UFQFPN32|WLCSP36)"/>
+            <Condition Diagnostic="" Expression="(LQFP32|UFQFPN32|WLCSP36)&amp;!(STM32L0x1 &amp;DIE425)"/>
             <Output signalId="HSI16" to="HSIRCDiv"/>
         </Element>
         <Element id="HSIRC" type="fixedSource" isKey="true" refParameter="HSI_VALUE" x="302" y="515">
@@ -53,7 +56,7 @@
 
         </Element>
         <Element id="HSIRCDiv" type="devisor" isKey="true" refParameter="HSIRCDiv" x="370" y="503">
-            <Condition Diagnostic="" Expression="(LQFP32|UFQFPN32|WLCSP36)"/>
+            <Condition Diagnostic="" Expression="(LQFP32|UFQFPN32|WLCSP36)&amp;!(DIE425)"/>
             <Input signalId="HSI16" from="HSIRC"/>
             <Output signalId="HSI" to="SysClkSource"/>
             <Output signalId="HSI" to="PLLSource"/>
@@ -63,6 +66,7 @@
             <Output signalId="HSI" to="USART2Mult"/>
             <Output signalId="HSI" to="USART1Mult"/>
             <Output signalId="HSI" to="I2C1Mult"/>
+            <Output signalId="HSI" to="I2C3Mult"/>
             <Output signalId="HSI" to="ADCOutput"/>
         </Element>
         <Element id="HSIRCDiv" type="devisor" isKey="true" refParameter="HSIRCDiv" x="360" y="517">
@@ -75,17 +79,18 @@
             <Output signalId="HSI" to="USART2Mult"/>
             <Output signalId="HSI" to="USART1Mult"/>
             <Output signalId="HSI" to="I2C1Mult"/>
+            <Output signalId="HSI" to="I2C3Mult"/>
             <Output signalId="HSI" to="ADCOutput"/>
         </Element>
         <Element id="HSEOSC" type="variedSource" x="205" y="410" refParameter="HSE_VALUE" >
-            <Condition Diagnostic="" Expression="(!LQFP32 &amp; !UFQFPN32 &amp; !WLCSP36)"/>
+            <Condition Diagnostic="" Expression="(!LQFP32 &amp; !UFQFPN32 &amp; !WLCSP36) |DIE425"/>
             <Output signalId="HSE" to="SysClkSource"/>
             <Output signalId="HSE" to="HSERTCDevisor"/>
             <Output signalId="HSE" to="PLLSource"/>
             <Output signalId="HSE" to="MCOMult"/>
         </Element>
         <Element id="LSIRC" type="fixedSource" refParameter="LSI_VALUE" x="302" y="250">
-            <Condition Diagnostic="" Expression="(!LQFP32 &amp; !UFQFPN32 &amp; !WLCSP36)"/>
+            <Condition Diagnostic="" Expression="(!LQFP32 &amp; !UFQFPN32 &amp; !WLCSP36)|DIE425"/>
             <Output signalId="LSI" to="IWDGOutput"/>
             <Output signalId="LSI" to="RTCClkSource"/>
             <Output signalId="LSI" to="MCOMult"/>
@@ -98,7 +103,7 @@
             <Output signalId="LSI" to="LPTIMMult"/>
         </Element>
         <Element id="LSEOSC" type="variedSource" refParameter="LSE_VALUE" x="205" y="190">
-            <Condition Diagnostic="" Expression="(LQFP32|UFQFPN32|WLCSP36)"/>
+            <Condition Diagnostic="" Expression="(LQFP32|UFQFPN32|WLCSP36)&amp;!(DIE425)"/>
             <Output signalId="LSE" to="RTCClkSource"/>
             <Output signalId="LSE" to="MCOMult"/>
             <Output signalId="LSE" to="LPTIMMult"/>
@@ -115,7 +120,7 @@
             <Output signalId="LSE" to="USART1Mult"/>
         </Element>
         <Element id="RTCClkSource" type="multiplexor" refParameter="RTCClockSelection,RTCClockSelectionVirtual" x="531" y="183" refEnable="RTCEnable,LCDEnable">
-            <Condition Diagnostic="" Expression="(!LQFP32 &amp; !UFQFPN32 &amp; !WLCSP36)"/>
+            <Condition Diagnostic="" Expression="(!LQFP32 &amp; !UFQFPN32 &amp; !WLCSP36)|DIE425"/>
             <Input signalId="HSE_RTC" from="HSERTCDevisor"/>
             <Input signalId="LSE" from="LSEOSC" refValue="RCC_RTCCLKSOURCE_LSE"/>
             <Input signalId="LSI" from="LSIRC" refValue="RCC_RTCCLKSOURCE_LSI"/>
@@ -139,7 +144,7 @@
             <Input signalId="LSI" from="LSIRC"/>
         </Element>
         <Element id="HSERTCDevisor" type="devisor" refParameter="RCC_RTC_Clock_Source_FROM_HSE" x="415" y="183" refEnable="EnableHSERTCDevisor,EnableHSELCDDevisor">
-            <Condition Diagnostic="" Expression="(!LQFP32 &amp; !UFQFPN32 &amp; !WLCSP36)"/>
+            <Condition Diagnostic="" Expression="(!LQFP32 &amp; !UFQFPN32 &amp; !WLCSP36)|DIE425"/>
             <Input signalId="HSE" from="HSEOSC"/>
             <Output to="RTCClkSource" signalId="HSE_RTC"/>
         </Element>
@@ -169,6 +174,7 @@
             <Output signalId="SYSCLKOUT" to="USART2Mult"/>
             <Output signalId="SYSCLKOUT" to="USART1Mult"/>
             <Output signalId="SYSCLKOUT" to="I2C1Mult"/>
+            <Output signalId="SYSCLKOUT" to="I2C3Mult"/>
         </Element>
         <Element id="PWROutput" type="activeOutput" refParameter="PWRFreq_Value" x="1103" y="195">
             <Input signalId="SYSCLKOUT" from="SysCLKOutput"/>
@@ -202,6 +208,7 @@
             <Output to="LPUARTMult" signalId="PCLK1"/>
             <Output to="USART2Mult" signalId="PCLK1"/>
             <Output to="I2C1Mult" signalId="PCLK1"/>
+            <Output to="I2C3Mult" signalId="PCLK1"/>
         </Element>
         <Element id="APB1Output" type="activeOutput" refParameter="APB1Freq_Value" x="1102" y="330">
             <Input signalId="PCLK1" from="APB1Prescaler"/>
@@ -302,8 +309,19 @@
         <Element id="I2C1Output" type="activeOutput" refParameter="I2C1Freq_Value" x="1100" y="582" refEnable="I2C1Enable">
             <Input signalId="I2C1CLK" from="I2C1Mult"/>
         </Element>
+		    <Element id="I2C3Mult" type="multiplexor" refParameter="I2c3ClockSelection" x="665" y="810" refEnable="I2C3Enable">
+            <Condition Diagnostic="" Expression="I2C3_Exist"/>
+            <Input signalId="PCLK1" from="APB1Prescaler" refValue="RCC_I2C3CLKSOURCE_PCLK1"/>
+            <Input signalId="HSI" from="HSIRCDiv" refValue="RCC_I2C3CLKSOURCE_HSI"/>
+            <Input signalId="SYSCLKOUT" from="SysCLKOutput" refValue="RCC_I2C3CLKSOURCE_SYSCLK"/>
+            <Output signalId="I2C3CLK" to="I2C3Output"/>
+        </Element>
+        <Element id="I2C3Output" type="activeOutput" refParameter="I2C3Freq_Value" x="730" y="842" refEnable="I2C3Enable">
+            <Condition Diagnostic="" Expression="I2C3_Exist"/>
+            <Input signalId="I2C3CLK" from="I2C3Mult"/>
+        </Element>
         <Element id="MCOMult" type="multiplexor" refParameter="RCC_MCOSource" x="499" y="740" refEnable="MCOEnable">
-            <Condition Diagnostic="" Expression="(LQFP32 | UFQFPN32|WLCSP36)&amp;STM32L0x1"/>
+            <Condition Diagnostic="" Expression="(LQFP32 | UFQFPN32|WLCSP36)&amp;STM32L0x1 &amp;!DIE425"/>
             <Input signalId="LSE" from="LSEOSC" refValue="RCC_MCO1SOURCE_LSE"/>
             <Input signalId="LSI" from="LSIRC" refValue="RCC_MCO1SOURCE_LSI"/>
             <Input signalId="HSE" from="HSEOSC" refValue="RCC_MCO1SOURCE_HSE"/>
@@ -412,6 +430,7 @@
         <Signal id="USART2CLK" refParameter="USART2Freq_Value"/>
         <Signal id="USART1CLK" refParameter="USART1Freq_Value"/>
         <Signal id="I2C1CLK" refParameter="I2C1Freq_Value"/>
+        <Signal id="I2C3CLK" refParameter="I2C3Freq_Value"/>
     </Signals>
     <Label id="PWR" type="SpecialInfo" posX="1164" posY="200" text="CK_PWR (MHz)"/>
     <Label id="HCLK1" type="SpecialInfo" posX="1164" posY="232" text="FCLK (MHz)"/>
@@ -426,9 +445,15 @@
     <Label id="HCLK6" type="SpecialInfo" posX="1164" posY="405" text="APB2 peripheral clocks (MHz)"/>
     <Label id="HCLK4" type="SpecialInfo" posX="1164" posY="435" text="APB2 timer clocks (MHz)"/>
 
-    <Label id="HCLK8" type="SpecialInfo" posX="795" posY="577" text="USBCLK (MHz)" refEnable="USBEnable"/>
-    <Label id="HCLK8" type="SpecialInfo" posX="795" posY="627" text="RNGCLK (MHz)" refEnable="RNGEnable"/>
-    <Label id="USART1CLK" type="SpecialInfo" posX="1164" posY="525" text="USART1CLK (MHz)" refEnable="USART1Enable"/>
+    <Label id="HCLK8" type="SpecialInfo" posX="795" posY="577" text="USBCLK (MHz)" refEnable="USBEnable">
+	<Condition Diagnostic="" Expression="USB_Exist"/>
+	 </Label> 
+    <Label id="HCLK8" type="SpecialInfo" posX="795" posY="627" text="RNGCLK (MHz)" refEnable="RNGEnable">
+	<Condition Diagnostic="" Expression="RNG_Exist"/>
+	 </Label> 
+    <Label id="USART1CLK" type="SpecialInfo" posX="1164" posY="525" text="USART1CLK (MHz)" refEnable="USART1Enable">
+	 <Condition Diagnostic="" Expression="USART1_Exist"/>
+	 </Label> 
     <Label id="USART2CLK" type="SpecialInfo" posX="1164" posY="855" text="USART2CLK (MHz)" refEnable="USART2Enable"/>
     <Label id="LPTimer" type="SpecialInfo" posX="1166" posY="744" text="LPTIMCLK (MHz)" refEnable="LPTIMEnable">
         <Condition Diagnostic="" Expression="!LPUART1_Exist"/>
@@ -442,6 +467,9 @@
     <Label id="I2C1" type="SpecialInfo" posX="1165" posY="587" text="I2C1CLK (MHz)" refEnable="I2C1Enable">
         <Condition Diagnostic="" Expression=" LPUART1_Exist"/>
     </Label>
+    <Label id="I2C3" type="SpecialInfo" posX="795" posY="847" text="I2C3CLK (MHz)" refEnable="I2C3Enable">
+        <Condition Diagnostic="" Expression="I2C3_Exist"/>
+    </Label>
     <Label id="LPUART" type="SpecialInfo" posX="1166" posY="744" text="LPUARTCLK (MHz)" refEnable="LPUARTEnable"/>
 
     <Label id="AHBPrescalerLabel" type="info" posX="835" posY="422" text="AHB Prescaler"/>
@@ -450,33 +478,35 @@
     <Label id="SystemCLKMuxLabel" type="muxLabel" posX="670" posY="335" text="System Clock Mux"/>
     <Label id="MSILabel" type="signal" posX="678" posY="356" text="MSI"/>
     <Label id="HSILabel" type="signal" posX="678" posY="388" text="HSI 16">
-        <Condition Diagnostic="" Expression="(LQFP32|UFQFPN32|WLCSP36)"/>
+        <Condition Diagnostic="" Expression="(LQFP32|UFQFPN32|WLCSP36)&amp; !DIE425"/>
     </Label>
     <Label id="HSILabel" type="signal" posX="678" posY="381" text="HSI 16">
-        <Condition Diagnostic="" Expression="(!LQFP32 &amp; !UFQFPN32 &amp; !WLCSP36)"/>
+        <Condition Diagnostic="" Expression="(!LQFP32 &amp; !UFQFPN32 &amp; !WLCSP36)|DIE425"/>
     </Label>
     <Label id="HSELabel" type="signal" posX="678" posY="406" text="HSE">
-        <Condition Diagnostic="" Expression="(!LQFP32 &amp; !UFQFPN32 &amp; !WLCSP36)"/>
+        <Condition Diagnostic="" Expression="(!LQFP32 &amp; !UFQFPN32 &amp; !WLCSP36)|DIE425"/>
     </Label>
     <Label id="PLLCLKLabel" type="signal" posX="676" posY="426" text="PLLCLK">
-        <Condition Diagnostic="" Expression="(LQFP32|UFQFPN32|WLCSP36)"/>
+        <Condition Diagnostic="" Expression="(LQFP32|UFQFPN32|WLCSP36)&amp; !DIE425"/>
     </Label>
     <Label id="PLLCLKLabel" type="signal" posX="676" posY="431" text="PLLCLK">
-        <Condition Diagnostic="" Expression="(!LQFP32 &amp; !UFQFPN32 &amp; !WLCSP36)"/>
+        <Condition Diagnostic="" Expression="(!LQFP32 &amp; !UFQFPN32 &amp; !WLCSP36)|DIE425"/>
     </Label>
     <Label id="HSIRCLabel" type="info" posX="302" posY="525" text="HSI RC">
-        <Condition Diagnostic="" Expression="(LQFP32|UFQFPN32|WLCSP36)"/>
+        <Condition Diagnostic="" Expression="(LQFP32|UFQFPN32|WLCSP36)&amp; !DIE425"/>
     </Label>
     <Label id="HSIRCLabel" type="info" posX="302" posY="540" text="HSI RC">
-        <Condition Diagnostic="" Expression="(!LQFP32 &amp; !UFQFPN32 &amp; !WLCSP36)"/>
+        <Condition Diagnostic="" Expression="(!LQFP32 &amp; !UFQFPN32 &amp; !WLCSP36)|DIE425"/>
     </Label>
     <Label id="HSIRCCstLabel" type="constraint" posX="302" posY="485" text="16 MHz">
-        <Condition Diagnostic="" Expression="(LQFP32|UFQFPN32|WLCSP36)"/>
+        <Condition Diagnostic="" Expression="(LQFP32|UFQFPN32|WLCSP36)&amp; !DIE425"/>
     </Label>
     <Label id="HSIRCCstLabel" type="constraint" posX="302" posY="500" text="16 MHz">
-        <Condition Diagnostic="" Expression="(!LQFP32 &amp; !UFQFPN32 &amp; !WLCSP36)"/>
+        <Condition Diagnostic="" Expression="(!LQFP32 &amp; !UFQFPN32 &amp; !WLCSP36)|DIE425"/>
     </Label>
-    <Label id="48Mux" type="muxLabel" posX="665" posY="534" text="48M Source Mux" refEnable="USBEnable,RNGEnable"/>
+    <Label id="48Mux" type="muxLabel" posX="665" posY="534" text="48M Source Mux" refEnable="USBEnable,RNGEnable">
+	<Condition Diagnostic="" Expression="USB_Exist"/>
+	 </Label> 
     <Label id="msi" type="signal" posX="369" posY="592" text="ck_rc48">
         <Condition Diagnostic="" Expression="!STM32L0x1"/>
     </Label> 
@@ -487,8 +517,14 @@
     </Label>
     <Label id="I2C1Mux" type="muxLabel" posX="922" posY="524" text="I2C1 Source Mux" refEnable="I2C1Enable">
         <Condition Diagnostic="" Expression="LPUART1_Exist"/>
+    </Label> 
+
+	<Label id="I2C3Mux" type="muxLabel" posX="620" posY="780" text="I2C3 Source Mux" refEnable="I2C3Enable">
+        <Condition Diagnostic="" Expression="I2C3_Exist"/>
     </Label>
-    <Label id="USART1Mux" type="muxLabel" posX="1005" posY="460" text="USART1 Source Mux" refEnable="USART1Enable"/>
+    <Label id="USART1Mux" type="muxLabel" posX="1005" posY="460" text="USART1 Source Mux" refEnable="USART1Enable">
+	 <Condition Diagnostic="" Expression="USART1_Exist"/>
+	 </Label> 
     <Label id="USART2Mux" type="muxLabel" posX="1005" posY="789" text="USART2 Source Mux" refEnable="USART2Enable"/>
     <Label id="LPTIMMux" type="muxLabel" posX="920" posY="677" text="LPTIM Source Mux" refEnable="LPTIMEnable">
 
@@ -502,7 +538,7 @@
     </Label>
     <Label id="MCOLabel" type="info" text="(MHz) MCO" posX="230" posY="800" refEnable="MCOEnable"/>
     <Label id="MCOMuxLabel" type="muxLabel" text="MCO Source Mux" posX="467" posY="705" refEnable="MCOEnable">
-        <Condition Diagnostic="" Expression="(LQFP32|UFQFPN32|WLCSP36)&amp; STM32L0x1 "/>
+        <Condition Diagnostic="" Expression="(LQFP32|UFQFPN32|WLCSP36)&amp; STM32L0x1 &amp; !DIE425 "/>
     </Label>
     <Label id="MCOMuxLabel" type="muxLabel" text="MCO Source Mux" posX="467" posY="690" refEnable="MCOEnable">
 
@@ -510,51 +546,51 @@
     </Label>
     <Label id="MCOMuxLabel" type="muxLabel" text="MCO Source Mux" posX="467" posY="690" refEnable="MCOEnable">
 
-        <Condition Diagnostic="" Expression="((!LQFP32 &amp; !UFQFPN32 &amp; !WLCSP36))|((LQFP32|UFQFPN32|WLCSP36)&amp; !STM32L0x1)"/>
+        <Condition Diagnostic="" Expression="((!LQFP32 &amp; !UFQFPN32 &amp; !WLCSP36))|((LQFP32|UFQFPN32|WLCSP36)&amp; !STM32L0x1)|DIE425"/>
     </Label>
 
     <Label id="MCOLSELabel" type="signal" text="LSE" posX="528" posY="727" refEnable="MCOEnable">
-        <Condition Diagnostic="" Expression="(LQFP32|UFQFPN32|WLCSP36)&amp; STM32L0x1 "/>
+        <Condition Diagnostic="" Expression="(LQFP32|UFQFPN32|WLCSP36)&amp; STM32L0x1 &amp; !DIE425 "/>
     </Label>
     <Label id="MCOLSELabel" type="signal" text="LSE" posX="528" posY="710" refEnable="MCOEnable">
-        <Condition Diagnostic="" Expression="((!LQFP32 &amp; !UFQFPN32 &amp; !WLCSP36))|((LQFP32|UFQFPN32|WLCSP36)&amp; !STM32L0x1)"/>
+        <Condition Diagnostic="" Expression="((!LQFP32 &amp; !UFQFPN32 &amp; !WLCSP36))|((LQFP32|UFQFPN32|WLCSP36)&amp; !STM32L0x1)|DIE425"/>
     </Label>
     <Label id="MCOLSILabel" type="signal" text="LSI" posX="528" posY="754" refEnable="MCOEnable">
-        <Condition Diagnostic="" Expression="(LQFP32|UFQFPN32|WLCSP36)&amp; STM32L0x1"/>
+        <Condition Diagnostic="" Expression="(LQFP32|UFQFPN32|WLCSP36)&amp; STM32L0x1 &amp; !DIE425"/>
     </Label>
     <Label id="MCOLSILabel" type="signal" text="LSI" posX="528" posY="735" refEnable="MCOEnable">
-        <Condition Diagnostic="" Expression="((!LQFP32 &amp; !UFQFPN32 &amp; !WLCSP36))|((LQFP32|UFQFPN32|WLCSP36)&amp; !STM32L0x1)"/>
+        <Condition Diagnostic="" Expression="((!LQFP32 &amp; !UFQFPN32 &amp; !WLCSP36))|((LQFP32|UFQFPN32|WLCSP36)&amp; !STM32L0x1)|DIE425"/>
     </Label>
     <Label id="MCOHSELabel" type="signal" text="HSE" posX="528" posY="758" refEnable="MCOEnable">
-        <Condition Diagnostic="" Expression="((!LQFP32 &amp; !UFQFPN32 &amp; !WLCSP36))"/>
+        <Condition Diagnostic="" Expression="((!LQFP32 &amp; !UFQFPN32 &amp; !WLCSP36))| DIE425"/>
     </Label>
     <Label id="MCOHSILabel" type="signal" text="HSI 16" posX="528" posY="758" refEnable="MCOEnable">
         <Condition Diagnostic="" Expression="((LQFP32|UFQFPN32|WLCSP36)&amp; !STM32L0x1)"/>
     </Label>
      <Label id="MCOHSILabel" type="signal" text="HSI 16" posX="528" posY="777" refEnable="MCOEnable">
-        <Condition Diagnostic="" Expression="((LQFP32|UFQFPN32|WLCSP36)&amp; STM32L0x1)"/>
+        <Condition Diagnostic="" Expression="((LQFP32|UFQFPN32|WLCSP36)&amp; STM32L0x1)&amp;!DIE425"/>
     </Label>
     
     <Label id="MCOHSILabel" type="signal" text="HSI 16" posX="528" posY="782" refEnable="MCOEnable">
-        <Condition Diagnostic="" Expression="((!LQFP32 &amp; !UFQFPN32 &amp; !WLCSP36))"/>
+        <Condition Diagnostic="" Expression="((!LQFP32 &amp; !UFQFPN32 &amp; !WLCSP36))|DIE425"/>
     </Label>
     <Label id="MCOPLLCLKLabel" type="signal" text="PLLCLK" posX="528" posY="803" refEnable="MCOEnable">
-        <Condition Diagnostic="" Expression="(LQFP32|UFQFPN32|WLCSP36)&amp; STM32L0x1"/>
+        <Condition Diagnostic="" Expression="(LQFP32|UFQFPN32|WLCSP36)&amp; STM32L0x1&amp;!DIE425"/>
     </Label>
     <Label id="MCOPLLCLKLabel" type="signal" text="PLLCLK" posX="528" posY="782" refEnable="MCOEnable">
         <Condition Diagnostic="" Expression="((LQFP32|UFQFPN32|WLCSP36)&amp; !STM32L0x1)"/>
     </Label>
     <Label id="MCOPLLCLKLabel" type="signal" text="PLLCLK" posX="528" posY="807" refEnable="MCOEnable">
-        <Condition Diagnostic="" Expression="((!LQFP32 &amp; !UFQFPN32 &amp; !WLCSP36))"/>
+        <Condition Diagnostic="" Expression="((!LQFP32 &amp; !UFQFPN32 &amp; !WLCSP36))|DIE425"/>
     </Label>
     <Label id="MCOSYSCLKLabel" type="signal" text="SYSCLK" posX="528" posY="829" refEnable="MCOEnable">
-        <Condition Diagnostic="" Expression="(LQFP32|UFQFPN32|WLCSP36)&amp; STM32L0x1"/>
+        <Condition Diagnostic="" Expression="(LQFP32|UFQFPN32|WLCSP36)&amp; STM32L0x1&amp;!DIE425"/>
     </Label>
      <Label id="MCOSYSCLKLabel" type="signal" text="SYSCLK" posX="528" posY="808" refEnable="MCOEnable">
         <Condition Diagnostic="" Expression="(LQFP32|UFQFPN32|WLCSP36)&amp; !STM32L0x1"/>
     </Label>
     <Label id="MCOSYSCLKLabel" type="signal" text="SYSCLK" posX="528" posY="832" refEnable="MCOEnable">
-        <Condition Diagnostic="" Expression="((!LQFP32 &amp; !UFQFPN32 &amp; !WLCSP36))"/>
+        <Condition Diagnostic="" Expression="((!LQFP32 &amp; !UFQFPN32 &amp; !WLCSP36))|DIE425"/>
     </Label>
     <Label id="PLLILabel" type="muxLabel" text="PLL" posX="490" posY="550">
         <Condition Diagnostic="" Expression="STM32L0x1"/>
@@ -563,13 +599,13 @@
         <Condition Diagnostic="" Expression="!STM32L0x1"/>
     </Label>   
     <Label id="MCOMSILabel" type="signal" text="MSI" posX="528" posY="856" refEnable="MCOEnable">
-        <Condition Diagnostic="" Expression="(LQFP32|UFQFPN32|WLCSP36)&amp; STM32L0x1"/>
+        <Condition Diagnostic="" Expression="(LQFP32|UFQFPN32|WLCSP36)&amp; STM32L0x1&amp;!DIE425"/>
     </Label>   
     <Label id="MCOMSILabel" type="signal" text="MSI" posX="528" posY="837" refEnable="MCOEnable">
         <Condition Diagnostic="" Expression="(LQFP32|UFQFPN32|WLCSP36)&amp; !STM32L0x1"/>
     </Label>
     <Label id="MCOMSILabel" type="signal" text="MSI" posX="528" posY="860" refEnable="MCOEnable">
-        <Condition Diagnostic="" Expression="((!LQFP32 &amp; !UFQFPN32 &amp; !WLCSP36))"/>
+        <Condition Diagnostic="" Expression="((!LQFP32 &amp; !UFQFPN32 &amp; !WLCSP36))|DIE425"/>
     </Label>
     <Label id="MCOHSI48Label" type="signal" text="HSI 48" posX="528" posY="887" refEnable="MCOEnable">
         <Condition Diagnostic="" Expression="!STM32L0x1 &amp; ((!LQFP32 &amp; !UFQFPN32 &amp; !WLCSP36))"/>
@@ -587,43 +623,45 @@
         <Condition Diagnostic="" Expression="(!LQFP32 &amp; !UFQFPN32&amp;!STM32L0x1&amp;!STM32L0x2&amp; !WLCSP36)"/>
     </Label>
     <Label id="RTCMux" type="muxLabel" posX="500" posY="168" text="RTC Source Mux" refEnable="RTCEnable,LCDEnable">
-        <Condition Diagnostic="" Expression="(LQFP32|UFQFPN32|WLCSP36)&amp;(STM32L0x1|STM32L0x2)"/>
+        <Condition Diagnostic="" Expression="(LQFP32|UFQFPN32|WLCSP36)&amp;(!DIE425|STM32L0x2)"/>
     </Label>
      <Label id="RTCMux" type="muxLabel" posX="500" posY="158" text="RTC Source Mux" refEnable="RTCEnable,LCDEnable">
-        <Condition Diagnostic="" Expression="(!LQFP32&amp; !WLCSP36 &amp; !UFQFPN32&amp;(STM32L0x1|STM32L0x2))"/>
+        <Condition Diagnostic="" Expression="(!LQFP32&amp; !WLCSP36 &amp; !UFQFPN32&amp;(STM32L0x1|STM32L0x2))|DIE425"/>
     </Label>
     <Label id="LSEForRTCLabel" type="signal" text="LSE" posX="500" posY="190" refEnable="EnableLSERTC">
-        <Condition Diagnostic="" Expression="(LQFP32|UFQFPN32|WLCSP36)"/>
+        <Condition Diagnostic="" Expression="(LQFP32|UFQFPN32|WLCSP36)&amp; !DIE425"/>
     </Label>
     <Label id="LSEForRTCLabel" type="signal" text="LSE" posX="500" posY="212" refEnable="EnableLSERTC">
-        <Condition Diagnostic="" Expression="(!LQFP32 &amp; !UFQFPN32 &amp; !WLCSP36)"/>
+        <Condition Diagnostic="" Expression="(!LQFP32 &amp; !UFQFPN32 &amp; !WLCSP36)|DIE425"/>
     </Label>
     <Label id="LSIForRTCLabel" type="signal" text="LSI" posX="500" posY="227" refEnable="RTCEnable,LCDEnable">
-        <Condition Diagnostic="" Expression="(LQFP32|UFQFPN32|WLCSP36)"/>
+        <Condition Diagnostic="" Expression="(LQFP32|UFQFPN32|WLCSP36)&amp; !DIE425"/>
     </Label>
     <Label id="LSIForRTCLabel" type="signal" text="LSI" posX="500" posY="246" refEnable="RTCEnable,LCDEnable">
-        <Condition Diagnostic="" Expression="(!LQFP32 &amp; !UFQFPN32 &amp; !WLCSP36)"/>
+        <Condition Diagnostic="" Expression="(!LQFP32 &amp; !UFQFPN32 &amp; !WLCSP36)|DIE425"/>
     </Label>
     <Label id="HSEForRTCLabel" type="signal" text="HSE" posX="385" posY="178" refEnable="EnableHSERTCDevisor,EnableHSELCDDevisor">
-        <Condition Diagnostic="" Expression="(!LQFP32 &amp; !UFQFPN32 &amp; !WLCSP36)"/>
+        <Condition Diagnostic="" Expression="(!LQFP32 &amp; !UFQFPN32 &amp; !WLCSP36)|DIE425"/>
     </Label>
     <Label id="HSERTCForRTCLabel" type="signal" text="HSE_RTC" posX="476" posY="178" refEnable="EnableHSERTCDevisor,EnableHSELCDDevisor">
-        <Condition Diagnostic="" Expression="(!LQFP32 &amp; !UFQFPN32 &amp; !WLCSP36)"/>
+        <Condition Diagnostic="" Expression="(!LQFP32 &amp; !UFQFPN32 &amp; !WLCSP36)|DIE425"/>
     </Label>
 	
     <Label id="RTCOutputLabel" type="SpecialInfo" text="RTC (KHz)" posX="665" posY="219" refEnable="RTCEnable"/>
-    <Label id="LCDOutputLabel" type="SpecialInfo" text="LCD (KHz)" posX="665" posY="172" refEnable="LCDEnable"/>
+    <Label id="LCDOutputLabel" type="SpecialInfo" text="LCD (KHz)" posX="665" posY="172" refEnable="LCDEnable">
+	<Condition Diagnostic="" Expression="!STM32L0x1&amp;!STM32L0x2"/>
+	 </Label> 
     <Label id="LSI_RCLabel" type="Info" posX="302" posY="255" text="LSI RC">
-        <Condition Diagnostic="" Expression="(LQFP32|UFQFPN32|WLCSP36)"/>
+        <Condition Diagnostic="" Expression="(LQFP32|UFQFPN32|WLCSP36)&amp; !DIE425"/>
     </Label> 
     <Label id="LSI_RCLabel" type="Info" posX="302" posY="275" text="LSI RC">
-        <Condition Diagnostic="" Expression="(!LQFP32 &amp; !UFQFPN32 &amp; !WLCSP36)"/>
+        <Condition Diagnostic="" Expression="(!LQFP32 &amp; !UFQFPN32 &amp; !WLCSP36)|DIE425"/>
     </Label> 
     <Label id="LSI_RCcST" type="constraint" posX="302" posY="217" text="37 KHz">
-        <Condition Diagnostic="" Expression="(LQFP32|UFQFPN32|WLCSP36)"/>
+        <Condition Diagnostic="" Expression="(LQFP32|UFQFPN32|WLCSP36)&amp; !DIE425"/>
     </Label>  
     <Label id="LSI_RCcST" type="constraint" posX="302" posY="237" text="37 KHz">
-        <Condition Diagnostic="" Expression="(!LQFP32 &amp; !UFQFPN32 &amp; !WLCSP36)"/>
+        <Condition Diagnostic="" Expression="(!LQFP32 &amp; !UFQFPN32 &amp; !WLCSP36)|DIE425"/>
     </Label>  
     <Label id="MSI_RCLabel" type="Info" posX="304" posY="386" text="MSI RC"/>
     <Label id="48_RCLabel" type="Info" posX="302" posY="620" text="RC 48 MHz">
@@ -631,21 +669,29 @@
     </Label>   
     <Label id="ToIWDGLabel" type="SpecialInfo" text="IWDG (KHz)" posX="665" posY="305" refEnable="IWDGEnable"/>
     <Label id="PLLSourcMuxLabel" type="muxLabel" text="PLL Source Mux" posX="430" posY="456">
-        <Condition Diagnostic="" Expression="(!LQFP32 &amp; !UFQFPN32 &amp; !WLCSP36)"/>
+        <Condition Diagnostic="" Expression="(!LQFP32 &amp; !UFQFPN32 &amp; !WLCSP36)|DIE425"/>
     </Label>
     <Label id="PLLSourcMuxHSILabel" type="signal" text="HSI 16" posX="418" posY="511">
-        <Condition Diagnostic="" Expression="(!LQFP32 &amp; !UFQFPN32 &amp; !WLCSP36)"/>
+        <Condition Diagnostic="" Expression="(!LQFP32 &amp; !UFQFPN32 &amp; !WLCSP36) |DIE425"/>
     </Label>
     <Label id="PLLSourcMuxHSELabel" type="signal" text="HSE" posX="418" posY="473">
-        <Condition Diagnostic="" Expression="(!LQFP32 &amp; !UFQFPN32 &amp; !WLCSP36)"/>
+        <Condition Diagnostic="" Expression="(!LQFP32 &amp; !UFQFPN32 &amp; !WLCSP36) |DIE425"/>
     </Label>
     <!--  <Label id="48MuxHSILabel" type="signal" text="PLLCLK" posX="618" posY="551"/>
     <Label id="48MuxHSELabel" type="signal" text="ck_rc48" posX="618" posY="591" />-->
 
-    <Label id="APB2Label" type="signal" text="PCLK2" posX="1018" posY="477" refEnable="USART1Enable"/>
-    <Label id="SYSCLKLabel" type="signal" text="SYSCLK" posX="1018" posY="501" refEnable="USART1Enable"/>
-    <Label id="HSILabel" type="signal" text="HSI 16" posX="1018" posY="527" refEnable="USART1Enable"/>
-    <Label id="LSELabel" type="signal" text="LSE" posX="1018" posY="553" refEnable="USART1Enable"/>
+    <Label id="APB2Label" type="signal" text="PCLK2" posX="1018" posY="477" refEnable="USART1Enable">
+	 <Condition Diagnostic="" Expression="USART1_Exist"/>
+	 </Label> 
+    <Label id="SYSCLKLabel" type="signal" text="SYSCLK" posX="1018" posY="501" refEnable="USART1Enable">
+	 <Condition Diagnostic="" Expression="USART1_Exist"/>
+	 </Label> 
+    <Label id="HSILabel" type="signal" text="HSI 16" posX="1018" posY="527" refEnable="USART1Enable">
+	 <Condition Diagnostic="" Expression="USART1_Exist"/>
+	 </Label> 
+    <Label id="LSELabel" type="signal" text="LSE" posX="1018" posY="553" refEnable="USART1Enable">
+	 <Condition Diagnostic="" Expression="USART1_Exist"/>
+	 </Label> 
 
     <Label id="LSILabel" type="signal" text="LSI"  posX="926" posY="695" refEnable="LPTIMEnable">
         <Condition Diagnostic="" Expression="!LPUART1_Exist"/>
@@ -713,6 +759,17 @@
     <Label id="SYSCLKLabel" type="signal" text="SYSCLK" posX="926" posY="614" refEnable="I2C1Enable">
         <Condition Diagnostic="" Expression="LPUART1_Exist"/>
     </Label>
+	
+	
+	  <Label id="I2C3PCLK1Label" type="signal" text="PCLK1" posX="620" posY="800" refEnable="I2C3Enable">
+        <Condition Diagnostic="" Expression="I2C3_Exist"/>
+    </Label>
+    <Label id="I2C3HSILabel" type="signal" text="HSI 16" posX="620" posY="835" refEnable="I2C3Enable">
+        <Condition Diagnostic="" Expression="I2C3_Exist"/>
+    </Label>
+    <Label id="I2C3SYSCLKLabel" type="signal" text="SYSCLK" posX="620" posY="870" refEnable="I2C3Enable">
+        <Condition Diagnostic="" Expression="I2C3_Exist"/>
+    </Label>
     <Label id="PCLK1Label" type="signal" text="PCLK1" posX="926" posY="695" refEnable="LPUARTEnable"/>
     <Label id="LSELabel" type="signal" text="LSE" posX="926" posY="722" refEnable="LPUARTEnable"/>
     <Label id="HSILabel" type="signal" text="HSI 16" posX="926" posY="745" refEnable="LPUARTEnable"/>
@@ -725,15 +782,15 @@
 	<Label id="ABP2labelPCLK2" type="signal" text="PCLK2" posX="1055" posY="413" />
 
     <BButton id="CSSEnable" text="CSS" refParameter="EnbaleCSS" x="695" y="480">
-        <Condition Diagnostic="" Expression="(!LQFP32 &amp; !UFQFPN32 &amp; !WLCSP36)"/>
+        <Condition Diagnostic="" Expression="(!LQFP32 &amp; !UFQFPN32 &amp; !WLCSP36)|DIE425"/>
     </BButton>
     <BButton id="CSSLSEEnable" text="CSS" refParameter="EnableCSSLSE" x="510" y="270">
 
-        <Condition Diagnostic="" Expression="(LQFP32|UFQFPN32|WLCSP36)"/>
+        <Condition Diagnostic="" Expression="(LQFP32|UFQFPN32|WLCSP36)&amp; !DIE425"/>
     </BButton>
     
     <BButton id="CSSLSEEnable" text="CSS" refParameter="EnableCSSLSE" x="510" y="290">
-        <Condition Diagnostic="" Expression="(!LQFP32 &amp; !UFQFPN32 &amp; !WLCSP36)"/>
+        <Condition Diagnostic="" Expression="(!LQFP32 &amp; !UFQFPN32 &amp; !WLCSP36)|DIE425"/>
     </BButton>
     
 </Clock>

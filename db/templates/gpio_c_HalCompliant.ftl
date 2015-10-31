@@ -69,7 +69,7 @@ void MX_${data.ipName}_GPIO_Init(void)
                     [/#if]
                     [/#list]
                     [#compress]
-                    #n#t/*Configure GPIO [#if pin?split("|")?size>1]pins[#else]pin[/#if] : [#list pin?split("|") as x][#assign i =x?split("_")] [#assign j =i?last]${port}${j} [/#list] */[/#compress]
+  [#--comment of GPIO configuration--]  #n#t/*Configure GPIO [#if pin?split("|")?size>1]pins[#else]pin[/#if] : [#list pin?split("|") as x][#if x?contains("GPIO_PIN")][#assign i =x?split("_")] [#assign j =i?last]${port}${j}[#else]${x} [/#if] [/#list] */[/#compress]
                 [#else]
                 [#if method.comment??]#n#t/*[#compress]${method.comment} */[/#compress][/#if]			
                 [/#if]    

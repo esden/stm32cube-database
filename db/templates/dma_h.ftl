@@ -45,6 +45,11 @@
 #include "${include}"
 [/#list]
 #n
+/* DMA memory to memory transfer handles -------------------------------------*/
+[#list variables as variable]
+extern ${variable.value} ${variable.name};
+[/#list]
+#n
 /* USER CODE BEGIN Includes */
 
 /* USER CODE END Includes */

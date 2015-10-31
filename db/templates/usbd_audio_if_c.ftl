@@ -53,6 +53,8 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "usbd_audio_if.h"
+/* USER CODE BEGIN INCLUDE */
+/* USER CODE END INCLUDE */
 
 /** @addtogroup STM32_USB_OTG_DEVICE_LIBRARY
   * @{
@@ -67,6 +69,8 @@
 /** @defgroup USBD_AUDIO_Private_TypesDefinitions
   * @{
   */ 
+/* USER CODE BEGIN PRIVATE_TYPES  */
+/* USER CODE END PRIVATE_TYPES */ 
 /**
   * @}
   */ 
@@ -75,6 +79,9 @@
 /** @defgroup USBD_AUDIO_Private_Defines
   * @{
   */ 
+/* USER CODE BEGIN PRIVATE_DEFINES  */
+/* USER CODE END PRIVATE_DEFINES */
+  
 /**
   * @}
   */ 
@@ -83,30 +90,48 @@
 /** @defgroup USBD_AUDIO_Private_Macros
   * @{
   */ 
+/* USER CODE BEGIN PRIVATE_MACRO  */
+/* USER CODE END PRIVATE_MACRO */
 
 /**
   * @}
   */ 
 
-/* Private variables ---------------------------------------------------------*/
+/** @defgroup USBD_AUDIO_IF_Private_Variables
+  * @{
+  */
 /* USB handler declaration */
 /* Handle for USB Full Speed IP */
 [#if handleNameFS == "FS" || handleNameUSB_FS == "FS"]
-USBD_HandleTypeDef  *hUsbDevice_0;
+#tUSBD_HandleTypeDef  *hUsbDevice_0;
 [/#if]
-
 [#if handleNameHS == "HS"]
 /* Handle for USB High Speed IP */
-USBD_HandleTypeDef  *hUsbDevice_1;
+#tUSBD_HandleTypeDef  *hUsbDevice_1;
 [/#if]
+/* USER CODE BEGIN PRIVATE_VARIABLES  */
+/* USER CODE END  PRIVATE_VARIABLES */
+
+/**
+  * @}
+  */ 
   
+/** @defgroup USBD_AUDIO_IF_Exported_Variables
+  * @{
+  */ 
 [#if handleNameFS == "FS" || handleNameUSB_FS == "FS"]
-extern USBD_HandleTypeDef hUsbDeviceFS;
+#textern USBD_HandleTypeDef hUsbDeviceFS;
 [/#if]
 [#if handleNameHS == "HS"]
-extern USBD_HandleTypeDef hUsbDeviceHS;  
+#textern USBD_HandleTypeDef hUsbDeviceHS;  
 [/#if]
+/* USER CODE BEGIN EXPORTED_VARIABLES  */
+/* USER CODE END  EXPORTED_VARIABLES */
 
+/**
+  * @}
+  */ 
+  
 /** @defgroup USBD_AUDIO_Private_FunctionPrototypes
   * @{
   */
@@ -129,7 +154,13 @@ static int8_t  AUDIO_MuteCtl_HS      (uint8_t cmd);
 static int8_t  AUDIO_PeriodicTC_HS   (uint8_t cmd);
 static int8_t  AUDIO_GetState_HS     (void);
 [/#if]
+/* USER CODE BEGIN PRIVATE_FUNCTIONS_DECLARATION */
+/* USER CODE END  PRIVATE_FUNCTIONS_DECLARATION */
 
+/**
+  * @}
+  */ 
+  
 [#if handleNameFS == "FS" || handleNameUSB_FS == "FS"]
 USBD_AUDIO_ItfTypeDef USBD_AUDIO_fops_FS = 
 {
@@ -416,9 +447,9 @@ void HalfTransfer_CallBack_HS(void)
   /* USER CODE END 17 */
 }
 [/#if]
-/**
-  * @}
-  */ 
+
+/* USER CODE BEGIN PRIVATE_FUNCTIONS_IMPLEMENTATION */
+/* USER CODE END  PRIVATE_FUNCTIONS_IMPLEMENTATION */
 
 /**
   * @}
@@ -426,7 +457,6 @@ void HalfTransfer_CallBack_HS(void)
 
 /**
   * @}
-  */ 
-
+  */  
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
 

@@ -75,8 +75,34 @@
 		<Parameter Name="FlashID" />
 		<Parameter Name="DualFlash" />
 	</RefMode>
+        <RefMode Name="Single Bank 1 2IOs" HalMode="QUADSPI">
+		<ConfigForMode>QSPI_Init</ConfigForMode>
+		
+		<!-- General -->
+		<Parameter Name="ClockPrescaler" />
+		<Parameter Name="FifoThreshold" />
+		<Parameter Name="SampleShifting" />
+		<Parameter Name="FlashSize" />
+		<Parameter Name="ChipSelectHighTime" />
+		<Parameter Name="ClockMode" />
+		<Parameter Name="FlashID" />
+		<Parameter Name="DualFlash" />
+	</RefMode>
 
 	<RefMode Name="Single Bank 2" HalMode="QUADSPI">
+		<ConfigForMode>QSPI_Init</ConfigForMode>
+
+		<!-- General -->
+		<Parameter Name="ClockPrescaler" />
+		<Parameter Name="FifoThreshold" />
+		<Parameter Name="SampleShifting" />
+		<Parameter Name="FlashSize" />
+		<Parameter Name="ChipSelectHighTime" />
+		<Parameter Name="ClockMode" />
+		<Parameter Name="FlashID" />
+		<Parameter Name="DualFlash" />
+	</RefMode>
+        <RefMode Name="Single Bank 2 2IOs" HalMode="QUADSPI">
 		<ConfigForMode>QSPI_Init</ConfigForMode>
 
 		<!-- General -->
@@ -103,85 +129,136 @@
 		<Parameter Name="FlashID" />
 		<Parameter Name="DualFlash" />
 	</RefMode>
+        <RefMode Name="Dual Bank 2IOs" HalMode="QUADSPI">
+		<ConfigForMode>QSPI_Init</ConfigForMode>
+
+		<!-- General -->
+		<Parameter Name="ClockPrescaler" />
+		<Parameter Name="FifoThreshold" />
+		<Parameter Name="SampleShifting" />
+		<Parameter Name="FlashSize" />
+		<Parameter Name="ChipSelectHighTime" />
+		<Parameter Name="ClockMode" />
+		<Parameter Name="FlashID" />
+		<Parameter Name="DualFlash" />
+	</RefMode>
 
 	<!-- ************************************* Modes ********************************************* -->
-	<ModeLogicOperator Name="OR">
-	
-		<Mode Name="Bank Mode">
-			<ModeLogicOperator Name="XOR">
-				<Mode Name="Single Bank 1">
-					<SignalLogicalOp Name="AND">
-						<Signal Name="BK1_IO0" />
-						<Signal Name="BK1_IO1" />
-						<Signal Name="BK1_IO2" />
-						<Signal Name="BK1_IO3" />
-						<Signal Name="BK1_NCS" />
-						<Signal Name="CLK" />
-					</SignalLogicalOp>
-					<Semaphore>bank_1</Semaphore>
-				</Mode>
-				<Mode Name="Single Bank 2">
-					<SignalLogicalOp Name="AND">
-						<Signal Name="BK2_IO0" />
-						<Signal Name="BK2_IO1" />
-						<Signal Name="BK2_IO2" />
-						<Signal Name="BK2_IO3" />
-						<Signal Name="BK2_NCS" />
-						<Signal Name="CLK" />
-					</SignalLogicalOp>
-					<Semaphore>bank_2</Semaphore>
-				</Mode>
-				<Mode Name="Dual Bank">
-					<SignalLogicalOp Name="AND">
-						<Signal Name="BK1_IO0" />
-						<Signal Name="BK1_IO1" />
-						<Signal Name="BK1_IO2" />
-						<Signal Name="BK1_IO3" />
-						<Signal Name="BK2_IO0" />
-						<Signal Name="BK2_IO1" />
-						<Signal Name="BK2_IO2" />
-						<Signal Name="BK2_IO3" />
-						<Signal Name="CLK" />
-					</SignalLogicalOp>
-					<Semaphore>Dualbank</Semaphore>
-				</Mode>
-			</ModeLogicOperator>
-		</Mode>
-		<Mode Name="Chip Select for Dual bank">
-			<ModeLogicOperator Name="XOR">
-				<Mode Name="Enable Chip Select 1 for both banks">
-					<SignalLogicalOp Name="AND">
-						<Signal Name="BK1_NCS" />
-					</SignalLogicalOp>
-				</Mode>
-				<Mode Name="Enable Chip Select 2 for both banks">
-					<SignalLogicalOp Name="AND">
-						<Signal Name="BK2_NCS" />
-					</SignalLogicalOp>
-				</Mode>
-				<Mode Name="Enable Chip Select for each bank">
-					<SignalLogicalOp Name="AND">
-						<Signal Name="BK1_NCS" />
-						<Signal Name="BK2_NCS" />
-					</SignalLogicalOp>
-				</Mode>
-			</ModeLogicOperator>
-			<Semaphore>ChipSelect</Semaphore>
-			<Condition Expression="Dualbank" Diagnostic="Dual Bank mode must be enabled"/>
-		</Mode>
-	</ModeLogicOperator>
+        <ModeLogicOperator Name="OR">
+            
+            <Mode Name="QuadSPI Mode">
+                <ModeLogicOperator Name="XOR">
+                    <Mode  Name="Single Bank 1 2IOs" UserName="Bank1 with Single/Dual Lines">
+                        <SignalLogicalOp Name="AND">
+                            <Signal Name="BK1_IO0" />
+                            <Signal Name="BK1_IO1" />						
+                            <Signal Name="BK1_NCS" />
+                            <Signal Name="CLK" />
+                        </SignalLogicalOp>
+                        <!--Condition Expression="bank_1| (DIE421&amp;LQFP64)" Diagnostic=""/-->
+                        <Semaphore>QSPI_Selected</Semaphore>
+                    </Mode>
+                    <Mode Name="Single Bank 1" UserName="Bank1 with Quad SPI Lines">
+                        <SignalLogicalOp Name="AND">
+                            <Signal Name="BK1_IO0" />
+                            <Signal Name="BK1_IO1" />
+                            <Signal Name="BK1_IO2" />
+                            <Signal Name="BK1_IO3" />						
+                            <Signal Name="BK1_NCS" />
+                            <Signal Name="CLK" />
+                        </SignalLogicalOp>
+                        <Semaphore>QSPI_Selected</Semaphore>
+                        <!--Condition Expression="bank_1" Diagnostic=""/-->
+                    </Mode>
+                    <Mode Name="Single Bank 2 2IOs" UserName="Bank2 with Single/Dual Lines" RemoveCondition="DIE421&amp;LQFP64">
+                        <SignalLogicalOp Name="AND">
+                            <Signal Name="BK2_IO0" />
+                            <Signal Name="BK2_IO1" />						
+                            <Signal Name="BK2_NCS" />
+                            <Signal Name="CLK" />
+                        </SignalLogicalOp>
+                        <Semaphore>QSPI_Selected</Semaphore>
+                        <!--Condition Expression="bank_2" Diagnostic=""/-->
+                    </Mode>
+                    <Mode Name="Single Bank 2" UserName="Bank2 with Quad SPI Lines"  RemoveCondition="DIE421&amp;LQFP64">
+                        <SignalLogicalOp Name="AND">
+                            <Signal Name="BK2_IO0" />
+                            <Signal Name="BK2_IO1" />
+                            <Signal Name="BK2_IO2" />
+                            <Signal Name="BK2_IO3" />						
+                            <Signal Name="BK2_NCS" />
+                            <Signal Name="CLK" />
+                        </SignalLogicalOp>
+                        <Semaphore>QSPI_Selected</Semaphore>
+                        <!--Condition Expression="bank_2" Diagnostic=""/-->
+                    </Mode>
+                    <Mode Name="Dual Bank 2IOs" UserName="Dual Bank with Single/Dual Lines"  RemoveCondition="DIE421&amp;LQFP64">
+                        <SignalLogicalOp Name="AND">
+                            <Signal Name="BK1_IO0" />
+                            <Signal Name="BK1_IO1" />						
+                            <Signal Name="BK2_IO0" />
+                            <Signal Name="BK2_IO1" />						
+                            <Signal Name="CLK" />
+                        </SignalLogicalOp>
+                        <!--Condition Expression="Dualbank" Diagnostic=""/-->
+                        <Semaphore>Dualbank</Semaphore>
+                    </Mode>
+                    <Mode Name="Dual Bank" UserName="Dual Bank with Quad Lines"  RemoveCondition="DIE421&amp;LQFP64">
+                        <SignalLogicalOp Name="AND">
+                            <Signal Name="BK1_IO0" />
+                            <Signal Name="BK1_IO1" />
+                            <Signal Name="BK1_IO2" />
+                            <Signal Name="BK1_IO3" />						
+                            <Signal Name="BK2_IO0" />
+                            <Signal Name="BK2_IO1" />
+                            <Signal Name="BK2_IO2" />
+                            <Signal Name="BK2_IO3" />
+                            <Signal Name="CLK" />
+                        </SignalLogicalOp>
+                        <!--Condition Expression="Dualbank" Diagnostic=""/-->
+                        <Semaphore>Dualbank</Semaphore>
+                    </Mode>                    
+                </ModeLogicOperator>
+                <Semaphore>QSPI_Selected</Semaphore>
+            </Mode>
+            <Mode Name="Chip Select for Dual bank"  RemoveCondition="DIE421&amp;LQFP64">
+                <ModeLogicOperator Name="XOR">
+                    <Mode Name="Enable Chip Select 1 for both banks">
+                        <SignalLogicalOp Name="AND">
+                            <Signal Name="BK1_NCS" />
+                        </SignalLogicalOp>
+                    </Mode>
+                    <Mode Name="Enable Chip Select 2 for both banks">
+                        <SignalLogicalOp Name="AND">
+                            <Signal Name="BK2_NCS" />
+                        </SignalLogicalOp>
+                    </Mode>
+                    <Mode Name="Enable Chip Select for each bank">
+                        <SignalLogicalOp Name="AND">
+                            <Signal Name="BK1_NCS" />
+                            <Signal Name="BK2_NCS" />
+                        </SignalLogicalOp>
+                    </Mode>
+                </ModeLogicOperator>
+                <Semaphore>ChipSelect</Semaphore>
+                <Condition Expression="Dualbank" Diagnostic="Dual Bank mode must be enabled"/>
+            </Mode>
+        </ModeLogicOperator>
 
 
-	<RefSignal IOMode="AlternateFunctionPushPull" Name="BK1_IO0" />
-	<RefSignal IOMode="AlternateFunctionPushPull" Name="BK1_IO1" />
-	<RefSignal IOMode="AlternateFunctionPushPull" Name="BK1_IO2" />
-	<RefSignal IOMode="AlternateFunctionPushPull" Name="BK1_IO3" />
-	<RefSignal IOMode="AlternateFunctionPushPull" Name="BK2_IO0" />
-	<RefSignal IOMode="AlternateFunctionPushPull" Name="BK2_IO1" />
-	<RefSignal IOMode="AlternateFunctionPushPull" Name="BK2_IO2" />
-	<RefSignal IOMode="AlternateFunctionPushPull" Name="BK2_IO3" />
-	<RefSignal IOMode="AlternateFunctionPushPull" Name="BK1_NCS" />
-	<RefSignal IOMode="AlternateFunctionPushPull" Name="BK2_NCS" />
-	<RefSignal IOMode="AlternateFunctionPushPull" Name="CLK" />
+        <RefSignal IOMode="AlternateFunctionPushPull" Name="BK1_IO0" />
+        <RefSignal IOMode="AlternateFunctionPushPull" Name="BK1_IO1" />
+        <RefSignal IOMode="AlternateFunctionPushPull" Name="BK1_IO2" />
+        <RefSignal IOMode="AlternateFunctionPushPull" Name="BK1_IO3" />
+        <RefSignal IOMode="AlternateFunctionPushPull" Name="BK2_IO0" />
+        <RefSignal IOMode="AlternateFunctionPushPull" Name="BK2_IO1" />
+        <RefSignal IOMode="AlternateFunctionPushPull" Name="BK2_IO2" />
+        <RefSignal IOMode="AlternateFunctionPushPull" Name="BK2_IO3" />
+        <RefSignal IOMode="AlternateFunctionPushPull" Name="BK1_NCS" />
+        <RefSignal IOMode="AlternateFunctionPushPull" Name="BK2_NCS" />
+        <RefSignal IOMode="AlternateFunctionPushPull" Name="CLK" />
+        <RefSignal Name="VS_BK1" Virtual="true"/>
+        <RefSignal Name="VS_BK2" Virtual="true"/>
+        <RefSignal Name="VS_dual" Virtual="true"/>
 	
 </IP>

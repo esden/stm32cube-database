@@ -53,12 +53,52 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "usbd_custom_hid_if.h"
+/* USER CODE BEGIN INCLUDE */
+/* USER CODE END INCLUDE */
+/** @addtogroup STM32_USB_OTG_DEVICE_LIBRARY
+  * @{
+  */
 
-/* Private typedef -----------------------------------------------------------*/
-/* Private define ------------------------------------------------------------*/
-/* Private macro -------------------------------------------------------------*/
-/* Private variables ---------------------------------------------------------*/
 
+/** @defgroup USBD_CUSTOM_HID 
+  * @brief usbd core module
+  * @{
+  */ 
+
+/** @defgroup USBD_CUSTOM_HID_Private_TypesDefinitions
+  * @{
+  */ 
+/* USER CODE BEGIN PRIVATE_TYPES  */
+/* USER CODE END PRIVATE_TYPES */ 
+/**
+  * @}
+  */ 
+
+
+/** @defgroup USBD_CUSTOM_HID_Private_Defines
+  * @{
+  */ 
+/* USER CODE BEGIN PRIVATE_DEFINES  */
+/* USER CODE END PRIVATE_DEFINES */
+  
+/**
+  * @}
+  */ 
+
+
+/** @defgroup USBD_CUSTOM_HID_Private_Macros
+  * @{
+  */ 
+/* USER CODE BEGIN PRIVATE_MACRO  */
+/* USER CODE END PRIVATE_MACRO */
+
+/**
+  * @}
+  */ 
+
+/** @defgroup USBD_AUDIO_IF_Private_Variables
+ * @{
+ */
 [#if handleNameFS == "FS" || handleNameUSB_FS == "FS"]
 __ALIGN_BEGIN static uint8_t CUSTOM_HID_ReportDesc_FS[USBD_CUSTOM_HID_REPORT_DESC_SIZE] __ALIGN_END =
 {
@@ -70,7 +110,7 @@ __ALIGN_BEGIN static uint8_t CUSTOM_HID_ReportDesc_FS[USBD_CUSTOM_HID_REPORT_DES
 }; 
 /* USB handler declaration */
 /* Handle for USB Full Speed IP */
-USBD_HandleTypeDef  *hUsbDevice_0;
+#tUSBD_HandleTypeDef  *hUsbDevice_0;
 [/#if]
 
 [#if handleNameHS == "HS"]
@@ -83,32 +123,44 @@ __ALIGN_BEGIN static uint8_t CUSTOM_HID_ReportDesc_HS[USBD_CUSTOM_HID_REPORT_DES
 }; 
 /* USB handler declaration */
 /* Handle for USB High Speed IP */
-USBD_HandleTypeDef  *hUsbDevice_1;
+#tUSBD_HandleTypeDef  *hUsbDevice_1;
 [/#if]
+/* USER CODE BEGIN PRIVATE_VARIABLES  */
+/* USER CODE END  PRIVATE_VARIABLES */
+/**
+  * @}
+  */ 
+  
+/** @defgroup USBD_CUSTOM_HID_IF_Exported_Variables
+  * @{
+  */ 
 [#if handleNameFS == "FS" || handleNameUSB_FS == "FS"]
-extern USBD_HandleTypeDef hUsbDeviceFS;
+#textern USBD_HandleTypeDef hUsbDeviceFS;
 [/#if]
 [#if handleNameHS == "HS"]
-extern USBD_HandleTypeDef hUsbDeviceHS;  
+#textern USBD_HandleTypeDef hUsbDeviceHS;  
 [/#if]
+/* USER CODE BEGIN EXPORTED_VARIABLES  */
+/* USER CODE END  EXPORTED_VARIABLES */
 
-/* Private function prototypes -----------------------------------------------*/
-/* Extern function prototypes ------------------------------------------------*/
-/* Private functions ---------------------------------------------------------*/
+/**
+  * @}
+  */ 
+  
+/** @defgroup USBD_CUSTOM_HID_Private_FunctionPrototypes
+  * @{
+  */
 [#if handleNameFS == "FS" || handleNameUSB_FS == "FS"]
 static int8_t CUSTOM_HID_Init_FS     (void);
 static int8_t CUSTOM_HID_DeInit_FS   (void);
 static int8_t CUSTOM_HID_OutEvent_FS (uint8_t event_idx, uint8_t state);
-/* USER CODE BEGIN 2 */ 
-/* USER CODE END 2 */ 
+ 
 [/#if]
 
 [#if handleNameHS == "HS"]
 static int8_t CUSTOM_HID_Init_HS     (void);
 static int8_t CUSTOM_HID_DeInit_HS   (void);
 static int8_t CUSTOM_HID_OutEvent_HS (uint8_t event_idx, uint8_t state);
-/* USER CODE BEGIN 3 */ 
-/* USER CODE END 3 */  
 [/#if]
 
 
@@ -251,4 +303,15 @@ static int8_t USBD_CUSTOM_HID_SendReport_HS ( uint8_t *report,uint16_t len)
 */
 /* USER CODE END 11 */ 
 [/#if]
+
+/* USER CODE BEGIN PRIVATE_FUNCTIONS_IMPLEMENTATION */
+/* USER CODE END  PRIVATE_FUNCTIONS_IMPLEMENTATION */
+
+/**
+  * @}
+  */ 
+
+/**
+  * @}
+  */  
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
