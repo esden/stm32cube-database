@@ -65,9 +65,9 @@
     </RefParameter>
 	
     <!-- possible value of ScanConvMode parameter -->
-    <RefParameter Comment="Scan Mode" DefaultValue="DISABLE" Name="ScanConvMode" Type="list" Group="ADCgroup">
-        <PossibleValue Comment="Disabled" Value="DISABLE"/>
-        <PossibleValue Comment="Enabled" Value="ENABLE"/>
+    <RefParameter Comment="Scan Mode" DefaultValue="ADC_SCAN_DISABLE" Name="ScanConvMode" Type="list" Group="ADCgroup">
+        <PossibleValue Comment="Disabled" Value="ADC_SCAN_DISABLE"/>
+        <PossibleValue Comment="Enabled" Value="ADC_SCAN_ENABLE"/>
         <Description>Enable/Disable DMA Continuous Requests</Description>
     </RefParameter>
     
@@ -84,7 +84,7 @@
 	    
     <!-- Possible values of DiscontinuousConvMode parameter -->
     <RefParameter Comment="Discontinuous Conversion Mode" DefaultValue="DISABLE" Name="DiscontinuousConvMode" Type="list">
-        <Condition Expression="ContinuousMode|ScanConvMode=DISABLE" Diagnostic="Continuous and Discontinuous modes could not be used at the same time"/>
+        <Condition Expression="ContinuousMode|ScanConvMode=ADC_SCAN_DISABLE" Diagnostic="Continuous and Discontinuous modes could not be used at the same time"/>
         <PossibleValue Comment="Disabled" Value="DISABLE"/>
     </RefParameter>
     <!--RefParameter Comment="Discontinuous Conversion Mode" DefaultValue="DISABLE" Name="DiscontinuousConvMode" Type="uniqueElementList">
@@ -92,7 +92,7 @@
         <PossibleValue Comment="Disabled" Value="DISABLE"/>
     </RefParameter-->
     <RefParameter Comment="Discontinuous Conversion Mode" DefaultValue="DISABLE" Name="DiscontinuousConvMode" Type="list">
-        <Condition Expression="ScanConvMode=DISABLE" Diagnostic="Discontinuous mode is used only if Scan Mode is enabled"/>
+        <Condition Expression="ScanConvMode=ADC_SCAN_DISABLE" Diagnostic="Discontinuous mode is used only if Scan Mode is enabled"/>
         <PossibleValue Comment="Disabled" Value="DISABLE"/>
     </RefParameter>
     <RefParameter Comment="Discontinuous Conversion Mode" DefaultValue="DISABLE" Name="DiscontinuousConvMode" Type="list">
@@ -194,17 +194,17 @@
         <PossibleValue Comment="EXTI Line11" Value="ADC_EXTERNALTRIGCONV_Ext_IT11"/>
     </RefParameter>
     <RefParameter Comment="External Trigger Conversion Source" DefaultValue="ADC_EXTERNALTRIGCONV_T9_CC2" Name="ExternalTrigConv" Type="list" Group="ADCgroup">
-        <PossibleValue Comment="Timer 2 Capture Compare 3 event" Value="ADC_EXTERNALTRIGCONV_T2_CC3"/>
-        <PossibleValue Comment="Timer 2 Capture Compare 2 event" Value="ADC_EXTERNALTRIGCONV_T2_CC2"/>
-        <PossibleValue Comment="Timer 2 Trigger Out event" Value="ADC_EXTERNALTRIGCONV_T2_TRGO"/>
-        <PossibleValue Comment="Timer 3 Capture Compare 1 event" Value="ADC_EXTERNALTRIGCONV_T3_CC1"/>
-        <PossibleValue Comment="Timer 3 Capture Compare 3 event" Value="ADC_EXTERNALTRIGCONV_T3_CC3"/>
-        <PossibleValue Comment="Timer 3 Trigger Out event" Value="ADC_EXTERNALTRIGCONV_T3_TRGO"/>
-        <PossibleValue Comment="Timer 4 Capture Compare 4 event" Value="ADC_EXTERNALTRIGCONV_T4_CC4"/>
-        <PossibleValue Comment="Timer 4 Trigger Out event" Value="ADC_EXTERNALTRIGCONV_T4_TRGO"/>
-        <PossibleValue Comment="Timer 6 Trigger Out event" Value="ADC_EXTERNALTRIGCONV_T6_TRGO"/>
-        <PossibleValue Comment="Timer 9 Capture Compare 2 event" Value="ADC_EXTERNALTRIGCONV_T9_CC2"/>
-        <PossibleValue Comment="Timer 9 Trigger Out event" Value="ADC_EXTERNALTRIGCONV_T9_TRGO"/>
+        <PossibleValue Comment="Timer 2 Capture Compare 3 event" Value="ADC_EXTERNALTRIGCONV_T2_CC3"  Condition="!TIM2_Exist" Diagnostic="" Action="Remove"/>
+        <PossibleValue Comment="Timer 2 Capture Compare 2 event" Value="ADC_EXTERNALTRIGCONV_T2_CC2"  Condition="!TIM2_Exist" Diagnostic="" Action="Remove"/>
+        <PossibleValue Comment="Timer 2 Trigger Out event" Value="ADC_EXTERNALTRIGCONV_T2_TRGO"  Condition="!TIM2_Exist" Diagnostic="" Action="Remove"/>
+        <PossibleValue Comment="Timer 3 Capture Compare 1 event" Value="ADC_EXTERNALTRIGCONV_T3_CC1"  Condition="!TIM3_Exist" Diagnostic="" Action="Remove"/>
+        <PossibleValue Comment="Timer 3 Capture Compare 3 event" Value="ADC_EXTERNALTRIGCONV_T3_CC3"  Condition="!TIM3_Exist" Diagnostic="" Action="Remove"/>
+        <PossibleValue Comment="Timer 3 Trigger Out event" Value="ADC_EXTERNALTRIGCONV_T3_TRGO"  Condition="!TIM3_Exist" Diagnostic="" Action="Remove"/>
+        <PossibleValue Comment="Timer 4 Capture Compare 4 event" Value="ADC_EXTERNALTRIGCONV_T4_CC4"  Condition="!TIM4_Exist" Diagnostic="" Action="Remove"/>
+        <PossibleValue Comment="Timer 4 Trigger Out event" Value="ADC_EXTERNALTRIGCONV_T4_TRGO"  Condition="!TIM4_Exist" Diagnostic="" Action="Remove"/>
+        <PossibleValue Comment="Timer 6 Trigger Out event" Value="ADC_EXTERNALTRIGCONV_T6_TRGO"  Condition="!TIM6_Exist" Diagnostic="" Action="Remove"/>
+        <PossibleValue Comment="Timer 9 Capture Compare 2 event" Value="ADC_EXTERNALTRIGCONV_T9_CC2" Condition="!TIM9_Exist" Diagnostic="" Action="Remove" />
+        <PossibleValue Comment="Timer 9 Trigger Out event" Value="ADC_EXTERNALTRIGCONV_T9_TRGO" Condition="!TIM9_Exist" Diagnostic="" Action="Remove"/>
         <PossibleValue Comment="Software Trigger" Value="ADC_SOFTWARE_START"/>
         <Description>Select the external event used to trigger the start of conversion of a regular group</Description>
     </RefParameter>
@@ -331,17 +331,17 @@
     </RefParameter>
 		    
     <RefParameter Comment="External Trigger Source" DefaultValue="ADC_EXTERNALTRIGINJECCONV_T9_CC1" Name="ExternalTrigInjecConv" Type="list" Group="ADCgroup">
-        <PossibleValue Comment="Timer 2 Capture Compare 1 event" Value="ADC_EXTERNALTRIGINJECCONV_T2_CC1"/>
-        <PossibleValue Comment="Timer 2 Trigger Out event" Value="ADC_EXTERNALTRIGINJECCONV_T2_TRGO"/>
-        <PossibleValue Comment="Timer 3 Capture Compare 4 event" Value="ADC_EXTERNALTRIGINJECCONV_T3_CC4"/>
-        <PossibleValue Comment="Timer 4 Trigger Out event" Value="ADC_EXTERNALTRIGINJECCONV_T4_TRGO"/>
-        <PossibleValue Comment="Timer 4 Capture Compare 1 event" Value="ADC_EXTERNALTRIGINJECCONV_T4_CC1"/>
-        <PossibleValue Comment="Timer 4 Capture Compare 2 event" Value="ADC_EXTERNALTRIGINJECCONV_T4_CC2"/>
-        <PossibleValue Comment="Timer 4 Capture Compare 3 event" Value="ADC_EXTERNALTRIGINJECCONV_T4_CC3"/>
-        <PossibleValue Comment="Timer 7 Trigger Out event" Value="ADC_EXTERNALTRIGINJECCONV_T7_TRGO"/>
-        <PossibleValue Comment="Timer 9 Capture Compare 1 event" Value="ADC_EXTERNALTRIGINJECCONV_T9_CC1"/>
-        <PossibleValue Comment="Timer 9 Trigger Out event" Value="ADC_EXTERNALTRIGINJECCONV_T9_TRGO"/>
-        <PossibleValue Comment="Timer 10 Capture Compare 1 event" Value="ADC_EXTERNALTRIGINJECCONV_T10_CC1"/>
+        <PossibleValue Comment="Timer 2 Capture Compare 1 event" Value="ADC_EXTERNALTRIGINJECCONV_T2_CC1" Condition="!TIM2_Exist" Diagnostic="" Action="Remove"/>
+        <PossibleValue Comment="Timer 2 Trigger Out event" Value="ADC_EXTERNALTRIGINJECCONV_T2_TRGO" Condition="!TIM2_Exist" Diagnostic="" Action="Remove"/>
+        <PossibleValue Comment="Timer 3 Capture Compare 4 event" Value="ADC_EXTERNALTRIGINJECCONV_T3_CC4" Condition="!TIM3_Exist" Diagnostic="" Action="Remove"/>
+        <PossibleValue Comment="Timer 4 Trigger Out event" Value="ADC_EXTERNALTRIGINJECCONV_T4_TRGO" Condition="!TIM4_Exist" Diagnostic="" Action="Remove"/>
+        <PossibleValue Comment="Timer 4 Capture Compare 1 event" Value="ADC_EXTERNALTRIGINJECCONV_T4_CC1" Condition="!TIM4_Exist" Diagnostic="" Action="Remove"/>
+        <PossibleValue Comment="Timer 4 Capture Compare 2 event" Value="ADC_EXTERNALTRIGINJECCONV_T4_CC2" Condition="!TIM4_Exist" Diagnostic="" Action="Remove"/>
+        <PossibleValue Comment="Timer 4 Capture Compare 3 event" Value="ADC_EXTERNALTRIGINJECCONV_T4_CC3" Condition="!TIM4_Exist" Diagnostic="" Action="Remove"/>
+        <PossibleValue Comment="Timer 7 Trigger Out event" Value="ADC_EXTERNALTRIGINJECCONV_T7_TRGO" Condition="!TIM7_Exist" Diagnostic="" Action="Remove"/>
+        <PossibleValue Comment="Timer 9 Capture Compare 1 event" Value="ADC_EXTERNALTRIGINJECCONV_T9_CC1" Condition="!TIM9_Exist" Diagnostic="" Action="Remove"/>
+        <PossibleValue Comment="Timer 9 Trigger Out event" Value="ADC_EXTERNALTRIGINJECCONV_T9_TRGO" Condition="!TIM9_Exist" Diagnostic="" Action="Remove"/>
+        <PossibleValue Comment="Timer 10 Capture Compare 1 event" Value="ADC_EXTERNALTRIGINJECCONV_T10_CC1" Condition="!TIM10_Exist" Diagnostic="" Action="Remove"/>
         <PossibleValue Comment="Software Trigger" Value="ADC_INJECTED_SOFTWARE_START"/>
         <Description>Select the external event used to trigger the start of conversion of an injected group</Description>
     </RefParameter>
@@ -351,7 +351,7 @@
         <Condition Expression="InjNumberOfConversion=0" Diagnostic=""/>
     </RefParameter>
     <RefParameter Comment="Injected Conversion Mode" DefaultValue="None" Name="InjectedConvMode" Type="list">
-        <Condition Expression="ScanConvMode=DISABLE" Diagnostic="Discontinuous mode could not be used on regular and injected group at the same time"/>
+        <Condition Expression="ScanConvMode=ADC_SCAN_DISABLE" Diagnostic="Discontinuous mode could not be used on regular and injected group at the same time"/>
         <PossibleValue Comment="None" Value="None"/>
         <PossibleValue Comment="Auto Injected Mode" Value="AutoInjected"  Semaphore="AutoInjected_$IpInstance"/>
     </RefParameter>
@@ -481,19 +481,17 @@
         <Condition Expression="(InjNumberOfConversion=0)" Diagnostic=""/>
         <PossibleValue Comment="Single regular channel" Value="ADC_ANALOGWATCHDOG_SINGLE_REG"  Semaphore="SingleRegular$IpInstance"/>
         <PossibleValue Comment="Single regular or injected channel" Value="ADC_ANALOGWATCHDOG_SINGLE_REGINJEC" Semaphore="SingleInjectedOrRegular$IpInstance"/>
-        <PossibleValue Comment="All regular channel" Value="ADC_ANALOGWATCHDOG_ALL_REG" Semaphore="AllRegular$IpInstance"/>
-        <PossibleValue Comment="All regular and injected channel" Value="ADC_ANALOGWATCHDOG_ALL_REGINJEC" Semaphore="AllRegInjected$IpInstance"/>
-        <PossibleValue Comment="None" Value="ADC_ANALOGWATCHDOG_NONE" Semaphore="NoneWDG$IpInstance"/>
+        <PossibleValue Comment="All regular channels" Value="ADC_ANALOGWATCHDOG_ALL_REG" Semaphore="AllRegular$IpInstance"/>
+        <PossibleValue Comment="All regular and injected channels" Value="ADC_ANALOGWATCHDOG_ALL_REGINJEC" Semaphore="AllRegInjected$IpInstance"/>
         <Description>Configures the ADC analog watchdog mode.</Description>
     </RefParameter>
     <RefParameter Comment="Watchdog Mode" DefaultValue="ADC_ANALOGWATCHDOG_NONE" Name="WatchdogMode" Type="list" Group="ADCgroup">
         <PossibleValue Comment="Single regular channel" Value="ADC_ANALOGWATCHDOG_SINGLE_REG" Semaphore="SingleRegular$IpInstance" />
         <PossibleValue Comment="Single injected channel" Value="ADC_ANALOGWATCHDOG_SINGLE_INJEC" Semaphore="SingleInjected$IpInstance" />
         <PossibleValue Comment="Single regular or injected channel" Value="ADC_ANALOGWATCHDOG_SINGLE_REGINJEC" Semaphore="SingleInjectedOrRegular$IpInstance" />
-        <PossibleValue Comment="All regular channel" Value="ADC_ANALOGWATCHDOG_ALL_REG" Semaphore="AllRegular$IpInstance"/>
-        <PossibleValue Comment="All injected channel" Value="ADC_ANALOGWATCHDOG_ALL_INJEC" Semaphore="AllInjected$IpInstance"/>
-        <PossibleValue Comment="All regular and injected channel" Value="ADC_ANALOGWATCHDOG_ALL_REGINJEC" Semaphore="AllRegInjected$IpInstance"/>
-        <PossibleValue Comment="None" Value="ADC_ANALOGWATCHDOG_NONE" Semaphore="NoneWDG$IpInstance"/>
+        <PossibleValue Comment="All regular channels" Value="ADC_ANALOGWATCHDOG_ALL_REG" Semaphore="AllRegular$IpInstance"/>
+        <PossibleValue Comment="All injected channels" Value="ADC_ANALOGWATCHDOG_ALL_INJEC" Semaphore="AllInjected$IpInstance"/>
+        <PossibleValue Comment="All regular and injected channels" Value="ADC_ANALOGWATCHDOG_ALL_REGINJEC" Semaphore="AllRegInjected$IpInstance"/>
         <Description>Configures the ADC analog watchdog mode.</Description>
     </RefParameter>
 

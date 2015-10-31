@@ -143,12 +143,9 @@
 
     <!--Les multiplexeurs-->
     <!-- PLL source MUX-->
-    <RefParameter Visible="false" Comment="PLL Source" DefaultValue="RCC_PLLSOURCE_HSE" Name="PLLSourceVirtual" Type="list">
-        <Condition Diagnostic="PLL Mux should have HSE Crystal/Ceramic as input" Expression="(USBUsed_ForRCC&amp;PLLSource=RCC_PLLSOURCE_HSI)| (USBUsed_ForRCC&amp;PLLSource=RCC_PLLSOURCE_HSE&amp;!HSEOscillator) "/>
-    </RefParameter>
     	
     <RefParameter Visible="false" Comment="PLL Source" DefaultValue="RCC_PLLSOURCE_HSE" Name="PLLSourceVirtual" Type="list">
-        <Condition Diagnostic="PLL Mux should have HSE Crystal/Ceramic as input" Expression="(USBUsed_ForRCC&amp;PLLSource=RCC_PLLSOURCE_HSE&amp;HSEOscillator) "/>
+        <Condition Diagnostic="PLL Mux should have HSE as input" Expression="(USBUsed_ForRCC) "/>
         <PossibleValue Comment="Pllsource Hse" Value="RCC_PLLSOURCE_HSE"/>
     </RefParameter>
     <RefParameter Visible="false" Comment="PLL Source" DefaultValue="RCC_PLLSOURCE_HSI" Name="PLLSourceVirtual" Type="list">
@@ -353,7 +350,7 @@
     <RefParameter Visible="false" Comment="USB"          Name="USBFreq_Value"    DefaultValue="8000000"  Max="48000000" Min="48000000"  Type="double" Display="value/1000000" Unit="MHz"/>
     <!--AHB out freq-->
     <RefParameter Visible="false" Comment="HCLK"         Name="AHBFreq_Value"    DefaultValue="8000000"    Type="double" Display="value/1000000" Unit="MHz"/>
-    <RefParameter Visible="false" Comment="HCLK"         Name="HCLKFreq_Value"   DefaultValue="8000000"    Type="double" Max="72000000" IP="DMA-2D,CAMERAITF" Display="value/1000000" Unit="MHz"/>
+    <RefParameter Visible="false" Comment="HCLK"         Name="HCLKFreq_Value"   DefaultValue="8000000"    Type="double" Max="72000000" IP="DMA-2D,CAMERAITF,ADC1,ADC2,ADC3,ADC4" Display="value/1000000" Unit="MHz"/>
     <!--RTC freq de la sortie-->
     <RefParameter Visible="false" Comment="RTC clock"    Name="RTCFreq_Value"               DefaultValue="40000"   Type="double" IP="RTC"  Display="value/1000" Unit="KHz" />
     <RefParameter Visible="false" Comment="RTC HSE DIV"  Name="RTCHSEDivFreq_Value"         DefaultValue="250000"    Type="double" Display="value/1000000" Unit="MHz"/>
@@ -397,7 +394,7 @@
         <Condition Diagnostic="APB2 Divider or AHB Divider must be /2" Expression="((TIM20SourcePLL &amp;TIM20)|(TIM1SourcePLL &amp;TIM1)|(TIM8SourcePLL &amp;TIM8)|(TIM15SourcePLL &amp;TIM15)|(TIM16SourcePLL &amp;TIM16)|(TIM17SourcePLL &amp;TIM17))"/>
     </RefParameter>
     <RefParameter Visible="false" Comment="" Name="APB2Freq_ValueConstraintsText" DefaultValue="" Type="string" Display="value/1000000" Unit="MHz"/>
-    <RefParameter Visible="false" Comment="APB2 peripheral clocks" Name="APB2Freq_Value"    DefaultValue="8000000"   Max="72000000"  Type="double" Display="value/1000000" Unit="MHz" IP="I2S1,I2S4,SPI4,SPI1,ADC1,ADC2,ADC3,ADC4,USART1" />
+    <RefParameter Visible="false" Comment="APB2 peripheral clocks" Name="APB2Freq_Value"    DefaultValue="8000000"   Max="72000000"  Type="double" Display="value/1000000" Unit="MHz" IP="I2S1,I2S4,SPI4,SPI1,USART1" />
     <RefParameter Visible="false" Comment="APB1 timers clocks"     Name="APB1TimFreq_Value" DefaultValue="8000000"   Type="double" IP="TIMER6,TIMER2,TIMER3,TIMER4,TIMER5,TIMER12,TIMER13,TIMER14,TIMER18,TIMER7" Display="value/1000000" Unit="MHz"/>
     <RefParameter Visible="false" Comment="APB2 timers clocks"     Name="APB2TimFreq_Value" DefaultValue="8000000"   Type="double" IP="TIMER1,TIMER8,TIMER17,TIMER16,TIMER15,TIMER20,TIMER19,HRTIMER1" Display="value/1000000" Unit="MHz"/>
     <RefParameter Visible="false" Comment="PLL MCO DIV output"     Name="PLLMCOFreq_Value"  DefaultValue="4000000"   Type="double"  Display="value/1000000" Unit="MHz"/>
@@ -1291,19 +1288,11 @@
     <RefParameter Name="FLatency" Comment="Flash Latency(WS)" Type="uniqueElementList" DefaultValue="FLASH_LATENCY_2" Group="System Parameters">
         <PossibleValue Value="FLASH_LATENCY_2" Comment="2 WS (3 CPU cycle)"/>
     </RefParameter>
-    <RefParameter Name="INSTRUCTION_CACHE_ENABLE" Comment="Instruction Cache" Type="list" DefaultValue="0" Group="System Parameters">
-        <PossibleValue Value="1" Comment="Enabled"/>
-        <PossibleValue Value="0" Comment="Disabled"/>
-    </RefParameter>
     <RefParameter Name="PREFETCH_ENABLE" Comment="Prefetch Buffer" Type="list" DefaultValue="1" Group="System Parameters">
         <Condition Expression="!AHBCLKDivider1" Diagnostic=""/>
         <PossibleValue Value="1" Comment="Enabled"/>
     </RefParameter>
     <RefParameter Name="PREFETCH_ENABLE" Comment="Prefetch Buffer" Type="list" DefaultValue="1" Group="System Parameters">
-        <PossibleValue Value="1" Comment="Enabled"/>
-        <PossibleValue Value="0" Comment="Disabled"/>
-    </RefParameter>
-    <RefParameter Name="DATA_CACHE_ENABLE" Comment="Data Cache" Type="list" DefaultValue="0" Group="System Parameters">
         <PossibleValue Value="1" Comment="Enabled"/>
         <PossibleValue Value="0" Comment="Disabled"/>
     </RefParameter>
@@ -1505,9 +1494,7 @@
     </RefMode>
     <RefMode Name="AdvancedSettings">
         <Parameter Name="VDD_VALUE"/>
-        <Parameter Name="INSTRUCTION_CACHE_ENABLE"/>
         <Parameter Name="PREFETCH_ENABLE"/>
-        <Parameter Name="DATA_CACHE_ENABLE"/>
         <Parameter Name="FLatency"/>
         <Parameter Name="HSICalibrationValue"/>
     </RefMode>

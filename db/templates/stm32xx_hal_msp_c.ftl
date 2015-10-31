@@ -543,8 +543,8 @@ void HAL_MspInit(void)
             [/#if]            
         [/#list]
         [/#if]    
-   
     [#if serviceType=="Init"] 
+        [#if !ipName?contains("I2C")] [#-- if not I2C --]
            [#if initService.clock??]
             [#if initService.clock!="none"]
     [#if FamilyName=="STM32F1" && ipName=="RTC"]
@@ -569,7 +569,7 @@ void HAL_MspInit(void)
                  #t#t/* Peripheral clock enable */
                  #t#t__${ipName}_CLK_ENABLE(); 
            [/#if]
-
+      [/#if] [#-- not I2C --]
    [#else] 
         [#if initService.clock??]
             [#if initService.clock!="none"]
@@ -593,6 +593,27 @@ void HAL_MspInit(void)
     
     [#if gpioExist]
 #t[@generateConfigCode ipName=ipName type=serviceType serviceName="gpio" instHandler=instHandler tabN=tabN/]
+[#-- if I2C clk_enable should be after GPIO Init Begin --]
+    [#if serviceType=="Init" && ipName?contains("I2C")] 
+           [#if initService.clock??]
+            [#if initService.clock!="none"]
+               #t#t/* Peripheral clock enable */
+                [#list initService.clock?split(';') as clock]
+                    [#if ipvar.clkCommonResource.entrySet()?contains(clock?trim)]#t#t${clock?trim?replace("__","")?replace("_ENABLE","")}_ENABLED++;
+                    #t#tif(${clock?trim?replace("__","")?replace("_ENABLE","")}_ENABLED==1){          
+                        #t#t#t${clock?trim}();
+                    [#if ipvar.clkCommonResource.entrySet()?contains(clock?trim)]#t#t}[/#if]  
+                    [#else]
+                        #t#t${clock?trim}();
+                    [/#if]        
+                [/#list]
+            [/#if]
+            [#else]
+                 #t#t/* Peripheral clock enable */
+                 #t#t__${ipName}_CLK_ENABLE(); 
+           [/#if]
+[/#if]
+[#-- if I2C clk_enable should be after GPIO Init End --]
 [/#if]
     [#if serviceType=="Init"] 
     [#if dmaExist]#n#t#t/* Peripheral DMA init*/

@@ -3,6 +3,31 @@
 	xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd" 
 	xmlns="http://mcd.rou.st.com/modules.php?name=mcu">
 	<About>SYS: System</About>
+	<!-- ADC settings -->
+	<RefMode Name="VREFINT_ADC_PB0" Comment="VREFINT_ADC Connection">
+        <ConfigForMode>SYS_VREFINT_ADC</ConfigForMode>
+        <Parameter Name="SYSCFG_Vrefint_OUTPUT"/>
+    </RefMode>
+	<RefMode Name="VREFINT_ADC_PB1" Comment="VREFINT_ADC Connection">
+        <ConfigForMode>SYS_VREFINT_ADC</ConfigForMode>
+        <Parameter Name="SYSCFG_Vrefint_OUTPUT"/>
+    </RefMode>
+	<RefMode Name="VREFINT_ADC_PB0_PB1" Comment="VREFINT_ADC Connection">
+        <ConfigForMode>SYS_VREFINT_ADC</ConfigForMode>
+        <Parameter Name="SYSCFG_Vrefint_OUTPUT"/>
+    </RefMode>
+	
+	<RefParameter Comment="SYSCFG Vrefint OUTPUT" DefaultValue="SYSCFG_VREFINT_OUT_PB0" Name="SYSCFG_Vrefint_OUTPUT" Type="list" Visible="false">
+		  <Condition Expression="VREFINT_OUT_PB0_USED" Diagnostic=""/>
+    </RefParameter>
+	<RefParameter Comment="SYSCFG Vrefint OUTPUT" DefaultValue="SYSCFG_VREFINT_OUT_PB1" Name="SYSCFG_Vrefint_OUTPUT" Type="list" Visible="false">
+		  <Condition Expression="VREFINT_OUT_PB1_USED" Diagnostic=""/>
+    </RefParameter>
+	<RefParameter Comment="SYSCFG Vrefint OUTPUT" DefaultValue="SYSCFG_VREFINT_OUT_PB0_PB1" Name="SYSCFG_Vrefint_OUTPUT" Type="list" Visible="false">
+		  <Condition Expression="VREFINT_OUT_PB0_PB1_USED" Diagnostic=""/>
+    </RefParameter>
+	<RefParameter Comment="SYSCFG Vrefint OUTPUT" DefaultValue="null" Name="SYSCFG_Vrefint_OUTPUT" Type="list" Visible="false">
+    </RefParameter>
 	
 	<!-- Modes for Debug (JTAG and Trace) -->
 	<ModeLogicOperator Name="OR">
@@ -37,6 +62,42 @@
 				</Mode>
 			</ModeLogicOperator>
 		</Mode>
+		<Mode Name="VREFINT_ADC"  UserName="VREFINT_ADC Connection">
+			<ModeLogicOperator Name="XOR">
+				<Mode Name="VREFINT_ADC_PB0" UserName="PB0 connected">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="VREF_OUT_PB0"/>
+						
+					</SignalLogicalOp>
+					<Semaphore>VREFINT_OUT_PB0_USED</Semaphore>
+				</Mode>
+				<Mode Name="VREFINT_ADC_PB1" UserName="PB1 connected">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="VREF_OUT_PB1"/>
+						
+					</SignalLogicalOp>
+					<Semaphore>VREFINT_OUT_PB1_USED</Semaphore>
+				</Mode>
+				<Mode Name="VREFINT_ADC_PB0_PB1" UserName="PB0 and PB1 connected">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="VREF_OUT_PB0"/>
+						<Signal Name="VREF_OUT_PB1"/>						
+					</SignalLogicalOp>
+					<Semaphore>VREFINT_OUT_PB0_PB1_USED</Semaphore>
+				</Mode>
+			</ModeLogicOperator>
+		</Mode>
+		<!-- Programmable Voltage Detector-->
+		<Mode Name="PVD"  UserName="Programmable Voltage Detector">
+			<ModeLogicOperator Name="OR">
+				<Mode Name="PVD">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="VREF_PVD_IN"/>
+					</SignalLogicalOp>
+				</Mode>
+			</ModeLogicOperator>
+		</Mode>
+		
 	</ModeLogicOperator>
 	
 	<!-- RefSignal for System -->
@@ -44,4 +105,7 @@
 	<RefSignal IOMode="System" Name="SWDIO"/>
 	<RefSignal IOMode="System" Name="WKUP1"/>
 	<RefSignal IOMode="System" Name="WKUP2"/>
+	<RefSignal IOMode="Analog" Name="VREF_OUT_PB0"/>
+    <RefSignal IOMode="Analog" Name="VREF_OUT_PB1"/>
+	<RefSignal IOMode="Analog" Name="VREF_PVD_IN"/>
 </IP>

@@ -88,6 +88,7 @@
 [/#compress]
 [/#list]
 
+#define  USB_SIZ_BOS_DESC            0x0C
 
 /**
   * @}
@@ -118,6 +119,10 @@ uint8_t *     USBD_FS_InterfaceStrDescriptor( USBD_SpeedTypeDef speed , uint16_t
 uint8_t *     USBD_FS_USRStringDesc (USBD_SpeedTypeDef speed, uint8_t idx , uint16_t *length);  
 #endif /* USB_SUPPORT_USER_STRING_DESC */  
 
+#if (USBD_LPM_ENABLED == 1)
+uint8_t *USBD_FS_USR_BOSDescriptor(USBD_SpeedTypeDef speed , uint16_t *length);
+#endif
+
 USBD_DescriptorsTypeDef FS_Desc =
 {
   USBD_FS_DeviceDescriptor,
@@ -127,6 +132,9 @@ USBD_DescriptorsTypeDef FS_Desc =
   USBD_FS_SerialStrDescriptor,
   USBD_FS_ConfigStrDescriptor,
   USBD_FS_InterfaceStrDescriptor,
+#if (USBD_LPM_ENABLED == 1)  
+  USBD_FS_USR_BOSDescriptor,
+#endif  
 };
 
 #if defined ( __ICCARM__ ) /*!< IAR Compiler */
@@ -137,7 +145,13 @@ __ALIGN_BEGIN uint8_t USBD_FS_DeviceDesc[USB_LEN_DEV_DESC] __ALIGN_END =
   {
     0x12,                       /*bLength */
     USB_DESC_TYPE_DEVICE,       /*bDescriptorType*/
-    0x00,                       /*bcdUSB */
+#if (USBD_LPM_ENABLED == 1)
+    0x01,                       /*bcdUSB */ /* changed to USB version 2.01 
+                                               in order to support LPM L1 suspend
+                                               resume test of USBCV3.0*/
+#else  
+    0x00,                       /* bcdUSB */
+#endif  
     0x02,
     0x00,                       /*bDeviceClass*/
     0x00,                       /*bDeviceSubClass*/
@@ -153,8 +167,32 @@ __ALIGN_BEGIN uint8_t USBD_FS_DeviceDesc[USB_LEN_DEV_DESC] __ALIGN_END =
     USBD_IDX_PRODUCT_STR,       /*Index of product string*/
     USBD_IDX_SERIAL_STR,        /*Index of serial number string*/
     USBD_MAX_NUM_CONFIGURATION  /*bNumConfigurations*/
-  } ; /* USB_DeviceDescriptor */
+  } ; 
+/* USB_DeviceDescriptor */
+/* BOS descriptor */
+#if (USBD_LPM_ENABLED == 1)
+#if defined ( __ICCARM__ ) /*!< IAR Compiler */
+  #pragma data_alignment=4   
+#endif
+__ALIGN_BEGIN  uint8_t USBD_FS_BOSDesc[USB_SIZ_BOS_DESC] __ALIGN_END =
+{
+  0x5,
+  USB_DESC_TYPE_BOS,
+  0xC,
+  0x0,
+  0x1,  /* 1 device capability */
+        /* device capability*/
+  0x7,
+  USB_DEVICE_CAPABITY_TYPE,
+  0x2,
+  0x2, /*LPM capability bit set */
+  0x0,
+  0x0,
+  0x0
+};
+#endif
 [/#if]
+
 [#if HS == 1]
 uint8_t *     USBD_HS_DeviceDescriptor( USBD_SpeedTypeDef speed , uint16_t *length);
 uint8_t *     USBD_HS_LangIDStrDescriptor( USBD_SpeedTypeDef speed , uint16_t *length);
@@ -168,6 +206,10 @@ uint8_t *     USBD_HS_InterfaceStrDescriptor( USBD_SpeedTypeDef speed , uint16_t
 uint8_t *     USBD_HS_USRStringDesc (USBD_SpeedTypeDef speed, uint8_t idx , uint16_t *length);  
 #endif /* USB_SUPPORT_USER_STRING_DESC */  
 
+#if (USBD_LPM_ENABLED == 1)
+uint8_t *USBD_HS_USR_BOSDescriptor(USBD_SpeedTypeDef speed , uint16_t *length);
+#endif
+
 USBD_DescriptorsTypeDef HS_Desc =
 {
   USBD_HS_DeviceDescriptor,
@@ -177,6 +219,9 @@ USBD_DescriptorsTypeDef HS_Desc =
   USBD_HS_SerialStrDescriptor,
   USBD_HS_ConfigStrDescriptor,
   USBD_HS_InterfaceStrDescriptor,
+#if (USBD_LPM_ENABLED == 1)  
+  USBD_HS_USR_BOSDescriptor,
+#endif  
 };
 
 #if defined ( __ICCARM__ ) /*!< IAR Compiler */
@@ -187,7 +232,14 @@ __ALIGN_BEGIN uint8_t USBD_HS_DeviceDesc[USB_LEN_DEV_DESC] __ALIGN_END =
   {
     0x12,                       /*bLength */
     USB_DESC_TYPE_DEVICE,       /*bDescriptorType*/
-    0x00,                       /*bcdUSB */
+#if (USBD_LPM_ENABLED == 1)
+    0x01,                       /*bcdUSB */ /* changed to USB version 2.01 
+                                               in order to support LPM L1 suspend
+                                               resume test of USBCV3.0*/
+#else  
+    0x00,                       /* bcdUSB */
+#endif  
+
     0x02,
     0x00,                       /*bDeviceClass*/
     0x00,                       /*bDeviceSubClass*/
@@ -205,6 +257,28 @@ __ALIGN_BEGIN uint8_t USBD_HS_DeviceDesc[USB_LEN_DEV_DESC] __ALIGN_END =
     USBD_MAX_NUM_CONFIGURATION  /*bNumConfigurations*/
   } ; 
 /* USB_DeviceDescriptor */
+/* BOS descriptor */
+#if (USBD_LPM_ENABLED == 1)
+#if defined ( __ICCARM__ ) /*!< IAR Compiler */
+  #pragma data_alignment=4   
+#endif
+__ALIGN_BEGIN  uint8_t USBD_HS_BOSDesc[USB_SIZ_BOS_DESC] __ALIGN_END =
+{
+  0x5,
+  USB_DESC_TYPE_BOS,
+  0xC,
+  0x0,
+  0x1,  /* 1 device capability */
+        /* device capability*/
+  0x7,
+  USB_DEVICE_CAPABITY_TYPE,
+  0x2,
+  0x2, /*LPM capability bit set */
+  0x0,
+  0x0,
+  0x0
+};
+#endif
 [/#if]
 
 #if defined ( __ICCARM__ ) /*!< IAR Compiler */
@@ -361,6 +435,21 @@ uint8_t *  USBD_HS_InterfaceStrDescriptor( USBD_SpeedTypeDef speed , uint16_t *l
   }
   return USBD_StrDesc;  
 }
+
+#if (USBD_LPM_ENABLED == 1)
+/**
+  * @brief  USBD_HS_USR_BOSDescriptor 
+  *         return the BOS descriptor
+  * @param  speed : current device speed
+  * @param  length : pointer to data length variable
+  * @retval pointer to descriptor buffer
+  */
+uint8_t *USBD_HS_USR_BOSDescriptor(USBD_SpeedTypeDef speed , uint16_t *length)
+{
+  *length = sizeof(USBD_HS_BOSDesc);
+  return (uint8_t*)USBD_HS_BOSDesc;
+}
+#endif
 [/#if]
 
 [#if FS == 1]
@@ -484,6 +573,21 @@ uint8_t *  USBD_FS_InterfaceStrDescriptor( USBD_SpeedTypeDef speed , uint16_t *l
   }
   return USBD_StrDesc;  
 }
+
+#if (USBD_LPM_ENABLED == 1)
+/**
+  * @brief  USBD_FS_USR_BOSDescriptor 
+  *         return the BOS descriptor
+  * @param  speed : current device speed
+  * @param  length : pointer to data length variable
+  * @retval pointer to descriptor buffer
+  */
+uint8_t *USBD_FS_USR_BOSDescriptor(USBD_SpeedTypeDef speed , uint16_t *length)
+{
+  *length = sizeof(USBD_FS_BOSDesc);
+  return (uint8_t*)USBD_FS_BOSDesc;
+}
+#endif
 [/#if]
 /**
   * @}

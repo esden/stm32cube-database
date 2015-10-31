@@ -57,6 +57,9 @@
 [#-- Global variables --]
 [/#compress]
 [/#list]
+#ifdef __cplusplus
+ extern "C" {
+#endif
 
 /* Includes ------------------------------------------------------------------*/
 #include "usbd_msc.h"
@@ -118,6 +121,11 @@ extern USBD_StorageTypeDef  USBD_Storage_Interface_fops_HS;
 /**
   * @}
   */ 
+
+#ifdef __cplusplus
+}
+#endif
+
 
 #endif /* __USBD_STORAGE_IF_H_ */
 

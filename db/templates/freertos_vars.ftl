@@ -19,7 +19,9 @@
       [#if variable.name=="Mutexes"]
 	    [#assign s = variable.valueList]
         [#list s as mutexName]
-        osMutexId ${mutexName}Handle;
+        [#if mutexName != "0"]
+          osMutexId ${mutexName}Handle;
+        [/#if] 
         [/#list]
       [/#if]
       
@@ -32,7 +34,9 @@
           [/#if]
           [#assign index = index + 1]
         [/#list]
-        osTimerId ${timerName}Handle;
+        [#if timerName != "0"]
+          osTimerId ${timerName}Handle;
+        [/#if]  
       [/#if]
       
       [#if variable.name=="Queues"]
@@ -44,7 +48,9 @@
           [/#if] 
           [#assign index = index + 1]
         [/#list] 
-        osMessageQId ${queueName}Handle;
+        [#if queueName != "0"]
+          osMessageQId ${queueName}Handle;
+        [/#if]  
       [/#if]
       
       [#if variable.name=="Semaphores"]
@@ -55,8 +61,10 @@
             [#assign semaphoreName = i]
           [/#if] 
           [#assign index = index + 1]
-        [/#list] 
-        osSemaphoreId ${semaphoreName}Handle;
+        [/#list]
+        [#if semaphoreName != "0"]
+          osSemaphoreId ${semaphoreName}Handle;
+        [/#if]
       [/#if]
       
       [#if variable.name=="BinarySemaphores"]
@@ -67,8 +75,10 @@
             [#assign semaphoreName = i]
           [/#if] 
           [#assign index = index + 1]
-        [/#list] 
-        osSemaphoreId ${semaphoreName}Handle;
+        [/#list]
+        [#if semaphoreName != "0"]
+          osSemaphoreId ${semaphoreName}Handle;
+        [/#if]
       [/#if]
       
     [/#list] 

@@ -1,26 +1,30 @@
 <?xml version='1.0' encoding='UTF-8' standalone='no'?>
 <IP xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://mcd.rou.st.com/modules.php?name=mcu" DBVersion="V4.0" Name="I2C" ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd" Version="i2c1_v1_5_Cube" IPType="peripheral">
-  <About>I2C: Inter Integrated Circuit interface</About>
+    <About>I2C: Inter Integrated Circuit interface</About>
     <RefParameter Name="Instance" DefaultValue="I2C$Index" Comment="Instance" Type="" Visible="false"/>
     
-    <RefParameter Comment="I2C Clock Speed (Hz)" DefaultValue="100000" Max="400000" Min="0" Name="ClockSpeed" Type="integer" Group="Master Features">
-        <Description>standard up to 100KHz, Fast up to 400 Khz</Description>
+    
+    <RefParameter Comment="I2C Speed Mode " DefaultValue="I2C_Standard" Name="I2C_Mode" Type="list" Group="Master Features">
+        <PossibleValue Comment="Standard Mode" Value="I2C_Standard"/>
+        <PossibleValue Comment="Fast Mode" Value="I2C_Fast" Semaphore="I2C_Fast" Condition="(RCC:APB1Freq_Value &lt; 4000000)" Diagnostic="APB1 Frequency should be > 4 MHz" Action="disable"/>
     </RefParameter>
- 
+    <RefParameter Comment="I2C Clock Speed (Hz)" DefaultValue="100000" Max="400000" Min="100000" Name="ClockSpeed" Type="integer" Group="Master Features">
+        <Condition Diagnostic="Speed > at 100Khz" Expression="I2C_Mode = I2C_Fast"/>  
+        <Description>Fast up to 400 Khz</Description>
+    </RefParameter>
+    <RefParameter Comment="I2C Clock Speed (Hz)" DefaultValue="100000" Max="100000" Min="0" Name="ClockSpeed" Type="integer" Group="Master Features">
+        <Description>standard up to 100KHz</Description>
+    </RefParameter>
     <RefParameter Comment="Fast Mode Duty Cycle" DefaultValue="I2C_DUTYCYCLE_2" Name="DutyCycle" Type="list" Group="Master Features" Visible="true">
-        <Condition Diagnostic="Speed > at 100Khz" Expression="ClockSpeed &gt;= 100000"/>                 
+        <Condition Diagnostic="Speed > at 100Khz" Expression="I2C_Mode = I2C_Fast"/>                 
         <PossibleValue Comment="Duty cycle Tlow/Thigh = 2" Value="I2C_DUTYCYCLE_2" />
         <PossibleValue Comment="Duty cycle Tlow/Thigh = 16/9" Value="I2C_DUTYCYCLE_16_9"/>
-    </RefParameter>    
-    
+    </RefParameter>       
+ 
     <RefParameter Comment="Fast Mode Duty Cycle" DefaultValue="I2C_DUTYCYCLE_2" Name="DutyCycle" Type="list" Group="Master Features" Visible="false">
-        <Condition Diagnostic="Speed less than 100Khz" Expression="ClockSpeed &lt; 100000"/>   
         <PossibleValue Comment="Duty cycle Tlow/Thigh = 2" Value="I2C_DUTYCYCLE_2" />
     </RefParameter>
-    
-	<RefParameter Comment="Fast Mode Duty Cycle" DefaultValue="null" Name="DutyCycle" Type="list" Group="Master Features" Visible="false"/>
-    
-    
+       
     <!-- OwnAddress and OwnAddress1 parameters are both declared to handle the shit in case of 7-bits addressing and the no-Shift in case of 10-bits addressing-->
     <RefParameter Comment="Primary slave address" DefaultValue="0" Max="127" Min="0" Name="OwnAddress" Type="integer" Group="Slave Features">
         <Condition Diagnostic="Address value from 0 to 127" Expression="AddressingMode=I2C_ADDRESSINGMODE_7BIT"/>
@@ -37,11 +41,11 @@
     </RefParameter>
     
     <RefParameter Comment="Primary slave address" DefaultValue="=(OwnAddress*2)" Max="1023" Min="0" Name="OwnAddress1" Type="integer" Group="Slave Features" Visible="false">
-    	<Condition Diagnostic="Address value from 0 to 127" Expression="AddressingMode=I2C_ADDRESSINGMODE_7BIT"/>
-    	<Description>The generated value of the address is shifted left by 1 bit.</Description>        
+        <Condition Diagnostic="Address value from 0 to 127" Expression="AddressingMode=I2C_ADDRESSINGMODE_7BIT"/>
+        <Description>The generated value of the address is shifted left by 1 bit.</Description>        
     </RefParameter>
     <RefParameter Comment="Primary slave address" DefaultValue="=OwnAddress" Max="1023" Min="0" Name="OwnAddress1" Type="integer" Group="Slave Features" Visible="false">
-    	<Description>The generated value of the address is shifted left by 1 bit.</Description>        
+        <Description>The generated value of the address is shifted left by 1 bit.</Description>        
     </RefParameter>
     
     <!--RefParameter Comment="Primary Address Length selection : 7 bit" DefaultValue="I2C_ADDRESSINGMODE_7BIT" Name="AddressingMode" Type="integer" Group="Slave Features"-->
@@ -55,30 +59,30 @@
         <PossibleValue Comment="7-bit" Value="I2C_ADDRESSINGMODE_7BIT"/>
         <PossibleValue Comment="10-bit" Value="I2C_ADDRESSINGMODE_10BIT"/>       
     </RefParameter>
-	    <RefParameter Visible="false" Comment="Primary Address Length selection" DefaultValue="null" Name="AddressingMode" Type="list" Group="Slave"  />
+    <RefParameter Visible="false" Comment="Primary Address Length selection" DefaultValue="null" Name="AddressingMode" Type="list" Group="Slave"  />
 
     
     <RefParameter Comment="Secondary slave address" DefaultValue="0" Max="0" Min="0" Name="OwnAddress2" Type="integer" Group="Slave Features" Visible="false">
         <Condition Diagnostic="Address value from 0 to 127" Expression="DualAddressMode=I2C_DUALADDRESS_DISABLED"/>        
-		        <Description>The generated value of the address is shifted left by 1 bit.</Description>       
+        <Description>The generated value of the address is shifted left by 1 bit.</Description>       
     </RefParameter>
 	   
     
     <RefParameter Comment="Secondary slave address" DefaultValue="0" Max="127" Min="0" Name="OwnAddress2" Type="integer" Group="Slave Features" Visible="true">
-	        <Description>The generated value of the address is shifted left by 1 bit.</Description>       
+        <Description>The generated value of the address is shifted left by 1 bit.</Description>       
 
     </RefParameter>
 
 
-<!--specifier seconde address pour slave avec 7 bit adressage et dual mode activer -->
-<RefParameter Comment="Secondary slave address" DefaultValue="=(OwnAddress2*2)" Max="127" Min="0" Name="OwnAddress22" Type="integer" Group="Slave Features" Visible="false">
+    <!--specifier seconde address pour slave avec 7 bit adressage et dual mode activer -->
+    <RefParameter Comment="Secondary slave address" DefaultValue="=(OwnAddress2*2)" Max="127" Min="0" Name="OwnAddress22" Type="integer" Group="Slave Features" Visible="false">
         <Condition Diagnostic="Address value from 0 to 127" Expression="DualAddressMode=I2C_DUALADDRESS_DISABLED"/>    
-<PossibleValue Comment=" 0" Value="0"/>			
-</RefParameter>
+        <PossibleValue Comment=" 0" Value="0"/>			
+    </RefParameter>
     
-<RefParameter Comment="Secondary slave address" DefaultValue="=(OwnAddress2*2)" Max="127" Min="0" Name="OwnAddress22" Type="integer" Group="Slave Features" Visible="false">
+    <RefParameter Comment="Secondary slave address" DefaultValue="=(OwnAddress2*2)" Max="127" Min="0" Name="OwnAddress22" Type="integer" Group="Slave Features" Visible="false">
     
-</RefParameter>
+    </RefParameter>
         
     <RefParameter Comment="Dual Address Acknowledged" DefaultValue="I2C_DUALADDRESS_DISABLED" Name="DualAddressMode" Type="list" Group="Slave Features">
         <Condition Diagnostic="When primary address is 7 bits length we can have a dual address" Expression="AddressingMode=I2C_ADDRESSINGMODE_7BIT"/>  
@@ -96,21 +100,22 @@
     </RefParameter>
     
     <RefParameter Comment="Clock No Stretch Mode" DefaultValue="I2C_NOSTRETCH_DISABLED" Name="NoStretchMode" Type="list" Group="Slave Features">
-    	<PossibleValue Comment="Clock Stretch Disabled" Value="I2C_NOSTRETCH_DISABLED"/>
-        <PossibleValue Comment="Clock Stretch Enabled" Value="I2C_NOSTRETCH_ENABLED"/>
+        <PossibleValue Comment="Disabled" Value="I2C_NOSTRETCH_DISABLED"/>
+        <PossibleValue Comment="Enabled" Value="I2C_NOSTRETCH_ENABLED"/>
     </RefParameter>
     
     
     <!-- RefMode for I2C -->
     <RefMode Name="I2C" HalMode="I2C">
-        <ConfigForMode>I2C</ConfigForMode>   
-        <Parameter Name="ClockSpeed"/>
+        <ConfigForMode>I2C</ConfigForMode>  
+        <Parameter Name="I2C_Mode"/> 
+        <Parameter Name="ClockSpeed"/>       
         <Parameter Name="DutyCycle"/>
         <Parameter Name="NoStretchMode"/> 
         <Parameter Name="AddressingMode"/>
+		<Parameter Name="DualAddressMode"/>          
         <Parameter Name="OwnAddress"/>
         <Parameter Name="OwnAddress2"/>             
-        <Parameter Name="DualAddressMode"/>           
         <Parameter Name="GeneralCallMode"/> 
         <Parameter Name="Instance"/>
     </RefMode>
@@ -126,23 +131,24 @@
                     </SignalLogicalOp>
                     <Semaphore>$IpInstance_Dma</Semaphore>
                 </Mode>
-		        <Mode Name="SMBus-Alert-mode">
-					<SignalLogicalOp Name="AND">
-						<Signal Name="SCL"/>
-						<Signal Name="SDA"/>
-						<Signal Name="SMBA"/>
-					</SignalLogicalOp>
-				</Mode>
-				<Mode Name="SMBus-two-wire-Interface">
-					<SignalLogicalOp Name="AND">
-						<Signal Name="SCL"/>
-						<Signal Name="SDA"/>
-					</SignalLogicalOp>
-				</Mode>
-			</ModeLogicOperator>
-		</Mode>
+                <Mode Name="SMBus-Alert-mode">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="SCL"/>
+                        <Signal Name="SDA"/>
+                        <Signal Name="SMBA"/>
+                    </SignalLogicalOp>
+                </Mode>
+                <Mode Name="SMBus-two-wire-Interface">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="SCL"/>
+                        <Signal Name="SDA"/>
+                    </SignalLogicalOp>
+                </Mode>
+            </ModeLogicOperator>
+        </Mode>
     </ModeLogicOperator>
     <RefSignal IOMode="AlternateFunctionOpenDrain" Name="SCL"/>        
     <RefSignal IOMode="AlternateFunctionOpenDrain" Name="SDA"/>       
     <RefSignal IOMode="AlternateFunctionOpenDrain" Name="SMBA"/>
+    <Semaphore>$IpInstanceUsed_ForRCC</Semaphore>
 </IP>

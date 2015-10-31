@@ -84,8 +84,29 @@
 /* Function prototypes -------------------------------------------------------*/
 [#if inMain == 0]
 [@common.optinclude name="Src/rtos_pfp.tmp"/]
+#n
+ [#list SWIPdatas as SWIP]
+  [#if SWIP.variables??]
+	[#list SWIP.variables as variable]
+	  [#if variable.name=="MiddlewareInUse"]
+	  [#assign s = variable.valueList]
+	  [#assign index = 0] 
+        [#list s as i] 
+          [#if index == 0]
+            [#assign mw = i]
+          [/#if]
+          [#assign index = index + 1]
+        [/#list]
+extern void MX_${mw}_Init(void);
+	  [/#if]
+    [/#list]
+  [/#if]
+ [/#list]
+void MX_FREERTOS_Init(void);  /* (MISRA C 2004 rule 8.1) */
 [/#if]
 
+
+#n
 #n/* USER CODE BEGIN FunctionPrototypes */
 #n   
 #n/* USER CODE END FunctionPrototypes */
@@ -230,13 +251,13 @@ void vApplicationMallocFailedHook(void)
 #n
 /* Init FreeRTOS */
 
-void MX_FREERTOS_Init() {
+void MX_FREERTOS_Init(void) {
 #t/* USER CODE BEGIN Init */
 #t     
 #t/* USER CODE END Init */
 [@common.optinclude name="Src/rtos_HalInit.tmp"/]
 }
-
+[@common.optinclude name="Src/rtos_threads.tmp"/]
 [@common.optinclude name="Src/rtos_user_threads.tmp"/] 
 [/#if]   
 

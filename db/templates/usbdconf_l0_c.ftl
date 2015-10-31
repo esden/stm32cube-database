@@ -111,7 +111,7 @@
 [/#if]
 
 /* USER CODE BEGIN 0 */
-__IO uint32_t remotewakeupon=0;
+
 /* USER CODE END 0 */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -247,13 +247,12 @@ void HAL_PCD_SuspendCallback(PCD_HandleTypeDef *hpcd)
 void HAL_PCD_ResumeCallback(PCD_HandleTypeDef *hpcd)
 {
   /* USER CODE BEGIN 3 */
-  if ((hpcd->Init.low_power_enable)&&(remotewakeupon == 0))
+  if (hpcd->Init.low_power_enable)
   {
-    SystemClockConfig_Resume();
     /* Reset SLEEPDEEP bit of Cortex System Control Register */
-    SCB->SCR &= (uint32_t)~((uint32_t)(SCB_SCR_SLEEPDEEP_Msk | SCB_SCR_SLEEPONEXIT_Msk));    
+    SCB->SCR &= (uint32_t)~((uint32_t)(SCB_SCR_SLEEPDEEP_Msk | SCB_SCR_SLEEPONEXIT_Msk));   
+    SystemClockConfig_Resume(); 
   }
-  remotewakeupon=0;
   /* USER CODE END 3 */
   USBD_LL_Resume(hpcd->pData);
   

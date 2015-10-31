@@ -68,24 +68,27 @@
 	</RefParameter>
 	
 	<!-- Enabled only for AllClasses, Audio and CDC , other Enabled/Disbaled -->
+	<!-- Tracker 307627 -->
 	<RefParameter Name="USBH_KEEP_CFG_DESCRIPTOR" Comment="USBH_KEEP_CFG_DESCRIPTOR (Keep the configuration into RAM) " DefaultValue="1" Type="list" Group="" Visible="true">
-		<Condition Expression="(VirtualModeHS = Audio) | (VirtualModeFS = Audio) " Diagnostic=""/>
+		<Condition Expression="(VirtualModeHS = Audio) | (AUDIO_HOST_FS) " Diagnostic=""/>
 		<PossibleValue Comment="Enabled" Value="1"/>			
 		<Description>Allow to keep full configuration descriptor in RAM when further parsing is needed</Description>
 	</RefParameter>
-	<RefParameter Name="USBH_KEEP_CFG_DESCRIPTOR" Comment="USBH_KEEP_CFG_DESCRIPTOR (Keep the configuration into RAM) " DefaultValue="1" Type="list" Group="" Visible="true">
-		<!--<Condition Expression="VirtualMode = Cdc " Diagnostic=""/>-->
+	<!-- Tracker 307679 -->
+	<!--
+	<RefParameter Name="USBH_KEEP_CFG_DESCRIPTOR" Comment="USBH_KEEP_CFG_DESCRIPTOR (Keep the configuration into RAM) " DefaultValue="1" Type="list" Group="" Visible="true">		
 		<Condition Expression="(VirtualModeHS = Cdc) | (VirtualModeFS = Cdc) " Diagnostic=""/>
 		<PossibleValue Comment="Enabled" Value="1"/>			
 		<Description>Allow to keep full configuration descriptor in RAM when further parsing is needed</Description>
-	</RefParameter>	
-	<RefParameter Name="USBH_KEEP_CFG_DESCRIPTOR" Comment="USBH_KEEP_CFG_DESCRIPTOR (Keep the configuration into RAM) " DefaultValue="1" Type="list" Group="" Visible="true">
-		<!--<Condition Expression="VirtualMode = All_Classes " Diagnostic=""/>-->
+	</RefParameter>
+	-->	
+	<RefParameter Name="USBH_KEEP_CFG_DESCRIPTOR" Comment="USBH_KEEP_CFG_DESCRIPTOR (Keep the configuration into RAM) " DefaultValue="1" Type="list" Group="" Visible="true">		
 		<Condition Expression="(VirtualModeHS = All_Classes) | (VirtualModeFS = All_Classes) " Diagnostic=""/>
 		<PossibleValue Comment="Enabled" Value="1"/>				
 		<Description>Allow to keep full configuration descriptor in RAM when further parsing is needed</Description>
 	</RefParameter>
 	<RefParameter Name="USBH_KEEP_CFG_DESCRIPTOR" Comment="USBH_KEEP_CFG_DESCRIPTOR (Keep the configuration into RAM) " DefaultValue="1" Type="list" Group="" Visible="true">		
+		<!--<Condition Expression="(VirtualModeHS != Audio) &amp; (VirtualModeFS != Audio) &amp; (VirtualModeHS != All_Classes) &amp; (VirtualModeFS != All_Classes)" Diagnostic=""/>-->
 		<PossibleValue Comment="Enabled" Value="1"/>	
 		<PossibleValue Comment="Disabled" Value="0"/>
 		<Description>Allow to keep full configuration descriptor in RAM when further parsing is needed</Description>
@@ -95,7 +98,7 @@
 		<Description>Maximum size of configuration descriptor</Description>
 	</RefParameter>
 	
-	<RefParameter Name="USBH_MAX_DATA_BUFFER" Comment="USBH_MAX_DATA_BUFFER (Maximun size of temporary data)" Min="0" Max="65536" DefaultValue="512" Type="integer" Group="" Visible="true" Unit="byte">			
+	<RefParameter Name="USBH_MAX_DATA_BUFFER" Comment="USBH_MAX_DATA_BUFFER (Maximun size of temporary data)" Min="1" Max="65536" DefaultValue="512" Type="integer" Group="" Visible="true" Unit="byte">			
 		<Description>Maximum size for USB descriptor container</Description>
 	</RefParameter>
 	
@@ -217,7 +220,7 @@
 		<Parameter Name="USBH_MAX_NUM_CONFIGURATION">
 			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
 		</Parameter>		
-		<Parameter Name="USBH_KEEP_CFG_DESCRIPTOR">
+		<Parameter Name="USBH_KEEP_CFG_DESCRIPTOR">			
 			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
 		</Parameter>			
 		<Parameter Name="USBH_MAX_SIZE_CONFIGURATION">
@@ -256,7 +259,7 @@
 		<Parameter Name="USBH_MAX_NUM_CONFIGURATION">
 			<Condition Expression="(USB_HOST_HS_CLASSES) | (USB_HOST_FS_CLASSES)" Diagnostic=""/>
 		</Parameter>		
-		<Parameter Name="USBH_KEEP_CFG_DESCRIPTOR">
+		<Parameter Name="USBH_KEEP_CFG_DESCRIPTOR">			
 			<Condition Expression="(USB_HOST_HS_CLASSES) | (USB_HOST_FS_CLASSES)" Diagnostic=""/>
 		</Parameter>			
 		<Parameter Name="USBH_MAX_SIZE_CONFIGURATION">
@@ -538,7 +541,7 @@
 		<Parameter Name="USBH_MAX_NUM_CONFIGURATION">
 			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
 		</Parameter>		
-		<Parameter Name="USBH_KEEP_CFG_DESCRIPTOR">
+		<Parameter Name="USBH_KEEP_CFG_DESCRIPTOR">			
 			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
 		</Parameter>			
 		<Parameter Name="USBH_MAX_SIZE_CONFIGURATION">
@@ -577,7 +580,7 @@
 		<Parameter Name="USBH_MAX_NUM_CONFIGURATION">
 			<Condition Expression="(USB_HOST_HS_CLASSES) | (USB_HOST_FS_CLASSES)" Diagnostic=""/>
 		</Parameter>		
-		<Parameter Name="USBH_KEEP_CFG_DESCRIPTOR">
+		<Parameter Name="USBH_KEEP_CFG_DESCRIPTOR">			
 			<Condition Expression="(USB_HOST_HS_CLASSES) | (USB_HOST_FS_CLASSES)" Diagnostic=""/>
 		</Parameter>			
 		<Parameter Name="USBH_MAX_SIZE_CONFIGURATION">
@@ -683,35 +686,35 @@
 								<Signal IOMode="" Name="VS_USB_HOST_AUDIO_HS"/>
 							</SignalLogicalOp>
 							<Semaphore>HOST_HIGH_SPEED</Semaphore>
-							<Semaphore>AUDIO_HS</Semaphore>
+							<Semaphore>AUDIO_HOST_HS</Semaphore>
 						</Mode>
 						<Mode Name="HID_HS" UserName="Human Interface Host Class (HID)">
 							<SignalLogicalOp Name="AND">
 								<Signal IOMode="" Name="VS_USB_HOST_HID_HS"/>								
 							</SignalLogicalOp>
 							<Semaphore>HOST_HIGH_SPEED</Semaphore>
-							<Semaphore>HID_HS</Semaphore>
+							<Semaphore>HID_HOST_HS</Semaphore>
 						</Mode>
 						<Mode Name="MSC_HS" UserName="Mass Storage Host Class">
 							<SignalLogicalOp Name="AND">
 								<Signal IOMode="" Name="VS_USB_HOST_MSC_HS"/>
 							</SignalLogicalOp>
 							<Semaphore>USB_HOST_MSC_HS</Semaphore>
-							<Semaphore>MSC_HS</Semaphore>
+							<Semaphore>MSC_HOST_HS</Semaphore>
 						</Mode>
 						<Mode Name="CDC_HS" UserName="Communication Host Class (Virtual Port Com)">
 							<SignalLogicalOp Name="AND">
 								<Signal IOMode="" Name="VS_USB_HOST_CDC_HS"/>
 							</SignalLogicalOp>
 							<Semaphore>HOST_HIGH_SPEED</Semaphore>
-							<Semaphore>CDC_HS</Semaphore>
+							<Semaphore>CDC_HOST_HS</Semaphore>
 						</Mode>	
 						<Mode Name="MTP_HS" UserName="Media Transfer Protocol Class (MTP)">
 							<SignalLogicalOp Name="AND">
 								<Signal IOMode="" Name="VS_USB_HOST_MTP_HS"/>
 							</SignalLogicalOp>
 							<Semaphore>HOST_HIGH_SPEED</Semaphore>
-							<Semaphore>MTP_HS</Semaphore>
+							<Semaphore>MTP_HOST_HS</Semaphore>
 						</Mode>	
 						<Mode Name="ALL_Classes_HS" UserName="Host Supporting ALL Classes">
 							<SignalLogicalOp Name="AND">
@@ -733,35 +736,35 @@
 								<Signal IOMode="" Name="VS_USB_HOST_AUDIO_FS"/>
 							</SignalLogicalOp>
 							<Semaphore>HOST_FULL_SPEED</Semaphore>
-							<Semaphore>AUDIO_FS</Semaphore>
+							<Semaphore>AUDIO_HOST_FS</Semaphore>
 						</Mode>
 						<Mode Name="HID_FS" UserName="Human Interface Host Class (HID)">
 							<SignalLogicalOp Name="AND">
 								<Signal IOMode="" Name="VS_USB_HOST_HID_FS"/>
 							</SignalLogicalOp>
 							<Semaphore>HOST_FULL_SPEED</Semaphore>
-							<Semaphore>HID_FS</Semaphore>
+							<Semaphore>HID_HOST_FS</Semaphore>
 						</Mode>
 						<Mode Name="MSC_FS" UserName="Mass Storage Host Class">
 							<SignalLogicalOp Name="AND">
 								<Signal IOMode="" Name="VS_USB_HOST_MSC_FS"/>
 							</SignalLogicalOp>
 							<Semaphore>USB_HOST_MSC_FS</Semaphore>
-							<Semaphore>MSC_FS</Semaphore>
+							<Semaphore>MSC_HOST_FS</Semaphore>
 						</Mode>
 						<Mode Name="CDC_FS" UserName="Communication Host Class (Virtual Port Com)">
 							<SignalLogicalOp Name="AND">
 								<Signal IOMode="" Name="VS_USB_HOST_CDC_FS"/>
 							</SignalLogicalOp>
 							<Semaphore>HOST_FULL_SPEED</Semaphore>
-							<Semaphore>CDC_FS</Semaphore>
+							<Semaphore>CDC_HOST_FS</Semaphore>
 						</Mode>	
 						<Mode Name="MTP_FS" UserName="Media Transfer Protocol Class (MTP)">
 							<SignalLogicalOp Name="AND">
 								<Signal IOMode="" Name="VS_USB_HOST_MTP_FS"/>
 							</SignalLogicalOp>
 							<Semaphore>HOST_FULL_SPEED</Semaphore>
-							<Semaphore>MTP_FS</Semaphore>
+							<Semaphore>MTP_HOST_FS</Semaphore>
 						</Mode>	
 						<Mode Name="ALL_Classes_FS" UserName="Host Supporting ALL Classes">
 							<SignalLogicalOp Name="AND">

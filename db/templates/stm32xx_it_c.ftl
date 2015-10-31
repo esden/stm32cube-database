@@ -34,14 +34,29 @@
   */
 [#compress]
 /* Includes ------------------------------------------------------------------*/
-[#--#include "stm32f4xx_it.h"   --]
 #include "${FamilyName?lower_case}xx_hal.h"
 #include "${FamilyName?lower_case}xx.h"
 #include "${FamilyName?lower_case}xx_it.h"
 [#if FREERTOS??] [#-- If FreeRtos is used --]
 #include "cmsis_os.h"
 [/#if]
+
+[#assign noUsbWakeUpInterruptHalHandler = missingUsbWakeUpInterruptHalHandler()]
+[#if noUsbWakeUpInterruptHalHandler]
+  [#list nvic as vector]
+    [#assign requireSystemClockConfig = usbWakeUpVector(vector.name)]
+    [#if requireSystemClockConfig]
+      [#break]
+    [/#if]
+  [/#list]
+  [#if requireSystemClockConfig]
+#n
+/* External functions --------------------------------------------------------*/
+void SystemClock_Config(void);
+  [/#if]
+[/#if]
 [/#compress]
+
 [#assign CortexName = "Cortex"]
 [#if FamilyName=="STM32F4" || FamilyName=="STM32F3"]
   [#assign CortexName = "Cortex-M4"]
@@ -56,13 +71,13 @@
 /* USER CODE BEGIN 0 */
 
 /* USER CODE END 0 */
+
+[#compress]
 /* External variables --------------------------------------------------------*/
 [#if FREERTOS??] [#-- If FreeRtos is used --]
 extern void xPortSysTickHandler(void);
 [/#if]
 
-
-[#compress]
 [#assign handleList = ""]
 [#list handlers as handler]
   [#list handler.entrySet() as entry]
@@ -79,6 +94,20 @@ extern ${ipHandler.handlerType} ${ipHandler.handler};
 /******************************************************************************/
 /*            ${CortexName} Processor Interruption and Exception Handlers         */ 
 /******************************************************************************/
+
+[#compress]
+[#list nvic as vector]
+[#if vector.systemHandler]
+/**
+  * @brief  This function handles ${vector.comment}.  
+  */
+void ${vector.irqHandler}(void)
+{
+      #t${vector.halHandler}
+}#n
+[/#if]
+[/#list]
+[/#compress]
 
 [#macro usbWakeupClearFlagMacro vectorName]
   [#if FamilyName=="STM32F1"]
@@ -107,9 +136,39 @@ extern ${ipHandler.handlerType} ${ipHandler.handler};
   [/#if]
 [/#macro]
 
+[#function usbWakeUpVector(vectorName)]
+  [#if (vectorName?contains("USB") || vectorName?contains("OTG_FS") || vectorName?contains("OTG_HS")) && (vectorName?contains("WKUP") || vectorName?contains("WakeUp"))]
+    [#return true]
+  [#else]
+    [#return false]
+  [/#if]
+[/#function]
+
+[#function missingUsbWakeUpInterruptHalHandler()]
+  [#switch (FamilyName)]
+    [#case "STM32F1"]
+    [#case "STM32F2"]
+    [#case "STM32F3"]
+    [#case "STM32F4"]
+    [#case "STM32F7"]
+    [#case "STM32L1"]
+      [#return true]
+  [/#switch]
+  [#return false]
+[/#function]
+
+/******************************************************************************/
+/* ${FamilyName}xx Peripheral Interrupt Handlers                                    */
+/* Add here the Interrupt Handlers for the used peripherals.                  */
+/* For the available peripheral interrupt handler names,                      */
+/* please refer to the startup file (startup_${FamilyName?lower_case}xx.s).                    */
+/******************************************************************************/
+
 [#compress]
 
 [#list nvic as vector]
+
+[#if vector.systemHandler==false]
 /**
   * @brief  This function handles ${vector.comment}.  
   */
@@ -145,9 +204,6 @@ void ${vector.irqHandler}(void)
       #t${vector.halHandler}
 [#else]
   [#if vector.halHandler != "" && vector.halHandler != "NONE"]
-    [#if (vector.name?contains("USB") || vector.name?contains("OTG_FS") || vector.name?contains("OTG_HS")) && (vector.name?contains("WKUP") || vector.name?contains("WakeUp"))]
-      [#-- #t[@usbWakeupClearFlagMacro vectorName=vector.name/] --]
-    [/#if]
     [#if vector.ipHandle != ""]
       #t${vector.halHandler}(&${vector.ipHandle});
     [#else]
@@ -159,6 +215,7 @@ void ${vector.irqHandler}(void)
 
 #n#t/* USER CODE END ${vector.name} 1 */
 }#n
+[/#if]
 [/#list]
 [/#compress]
 

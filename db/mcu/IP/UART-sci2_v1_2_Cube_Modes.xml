@@ -71,11 +71,20 @@
 	</RefParameter>
 	
 	<!-- Specifics RefParameters for UART Mode -->
-	<RefParameter Comment="Hardware Flow Control" DefaultValue="UART_HWCONTROL_NONE" Name="HwFlowCtl" Type="list" Group="Basic Parameters" Visible="false">
-		<PossibleValue Comment="None" Value="UART_HWCONTROL_NONE"/>
+		<RefParameter Comment="Hardware Flow Control" DefaultValue="UART_HWCONTROL_RTS" Name="HwFlowCtl" Type="list" Group="Basic Parameters" Visible="false" >	
+	<Condition Expression="$IpInstance_Request" Diagnostic=""/>
 		<PossibleValue Comment="RTS Only" Value="UART_HWCONTROL_RTS"/>
+	</RefParameter>
+	<RefParameter Comment="Hardware Flow Control" DefaultValue="UART_HWCONTROL_CTS" Name="HwFlowCtl" Type="list" Group="Basic Parameters" Visible="false" >
+		<Condition Expression="$IpInstance_Clear" Diagnostic=""/>
 		<PossibleValue Comment="CTS Only" Value="UART_HWCONTROL_CTS"/>
+	</RefParameter>
+	<RefParameter Comment="Hardware Flow Control" DefaultValue="UART_HWCONTROL_RTS_CTS" Name="HwFlowCtl" Type="list" Group="Basic Parameters" Visible="false" >
+		<Condition Expression="$IpInstance_CTS_RTS" Diagnostic=""/>
 		<PossibleValue Comment="RTS/CTS" Value="UART_HWCONTROL_RTS_CTS"/>
+	</RefParameter>
+	<RefParameter Comment="Hardware Flow Control" DefaultValue="UART_HWCONTROL_NONE" Name="HwFlowCtl" Type="list" Group="Basic Parameters" Visible="false" >
+		<PossibleValue Comment="None" Value="UART_HWCONTROL_NONE"/>
 	</RefParameter>
 	
 	<RefParameter Comment="Over Sampling" DefaultValue="UART_OVERSAMPLING_16" Name="OverSampling" Type="list" Group="Advanced Parameters">
@@ -209,6 +218,28 @@
 		<Parameter Name="BreakDetectLength"/>
 	</RefMode>
 	
+		<!-- RefModes for Harwdware Flow Control -->
+	<RefMode Name="CTS_Only">
+		<!-- Basic Parameters -->
+		<Parameter Name="HwFlowCtl">
+			<PossibleValue>UART_HWCONTROL_CTS</PossibleValue>
+		</Parameter>
+	</RefMode>
+	
+	<RefMode Name="RTS_Only">
+		<!-- Basic Parameters -->
+		<Parameter Name="HwFlowCtl">
+			<PossibleValue>UART_HWCONTROL_RTS</PossibleValue>
+		</Parameter>
+	</RefMode>
+	
+	<RefMode Name="CTS_RTS">
+		<!-- Basic Parameters -->
+		<Parameter Name="HwFlowCtl">
+			<PossibleValue>UART_HWCONTROL_RTS_CTS</PossibleValue>
+		</Parameter>
+	</RefMode>
+
 	
 	<!-- ModeLogicOperator for UART/IRDA -->
 	<ModeLogicOperator Name="OR">
@@ -219,6 +250,7 @@
 						<Signal Name="RX" IOMode="AlternateFunctionPushPullPULLUP"/>
 						<Signal Name="TX" IOMode="AlternateFunctionPushPullPULLUP"/>
 					</SignalLogicalOp>
+					<Semaphore>$IpInstance_Asynchronous</Semaphore>
 					<Semaphore>Asynchronous</Semaphore>
 				</Mode>
 				<Mode Name="Half_duplex(single_wire_mode)" UserName="Single Wire (Half-Duplex)">
@@ -247,9 +279,35 @@
 				</Mode>
 			</ModeLogicOperator>
 		</Mode>
+		<Mode Name = "Flow Control (RS232)">
+			<ModeLogicOperator Name="XOR">
+				<Mode Name="CTS_Only" UserName="CTS Only">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="CTS"/>
+					</SignalLogicalOp>
+					<Semaphore>$IpInstance_Clear</Semaphore>
+				</Mode>
+				<Mode Name="RTS_Only" UserName="RTS Only">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="RTS"/>
+					</SignalLogicalOp>
+					<Semaphore>$IpInstance_Request</Semaphore>
+				</Mode>
+				<Mode Name="CTS_RTS" UserName="CTS/RTS">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="CTS"/>
+						<Signal Name="RTS"/>
+					</SignalLogicalOp>
+					<Semaphore>$IpInstance_CTS_RTS</Semaphore>
+				</Mode>
+			</ModeLogicOperator>
+			<Condition Expression="$IpInstance_Asynchronous" Diagnostic="Active only with Asynchronous Mode"/>
+	</Mode>
 	</ModeLogicOperator>
 	
 	<!-- RefSignal for UART/IRDA -->
+		<RefSignal IOMode="AlternateFunctionPushPull" Name="CTS"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="RTS"/>
 	<RefSignal IOMode="AlternateFunctionPushPullUp" Name="RX"/>
 	<RefSignal IOMode="AlternateFunctionPushPullUp" Name="TX"/>
 </IP>

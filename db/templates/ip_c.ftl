@@ -499,33 +499,31 @@
         [/#list]
         [/#if]    
     [#if serviceType=="Init"] 
-           [#if initService.clock??]
-            [#if initService.clock!="none"]
-    [#if FamilyName=="STM32F1" && ipName=="RTC"]
-
-#t#tHAL_PWR_EnableBkUpAccess();
-
-#t#t/* Enable BKP CLK enable for backup registers */
-#t#t__HAL_RCC_BKP_CLK_ENABLE();                    
-
+        [#if !ipName?contains("I2C")] [#-- if not I2C --]
+            [#if initService.clock??]
+                [#if initService.clock!="none"]
+                    [#if FamilyName=="STM32F1" && ipName=="RTC"]
+                        #t#tHAL_PWR_EnableBkUpAccess();
+                        #t#t/* Enable BKP CLK enable for backup registers */
+                        #t#t__HAL_RCC_BKP_CLK_ENABLE();                    
+                    [/#if]
+                        #t#t/* Peripheral clock enable */ 
+                    [#list initService.clock?split(';') as clock]    
+                        [#if ipvar.clkCommonResource.entrySet()?contains(clock?trim)]#t#t${clock?trim?replace("__","")?replace("_ENABLE","")}_ENABLED++;
+                            #t#tif(${clock?trim?replace("__","")?replace("_ENABLE","")}_ENABLED==1){          
+                            #t#t#t${clock?trim}();
+                            [#if ipvar.clkCommonResource.entrySet()?contains(clock?trim)]#t#t}[/#if]  
+                        [#else]
+                           #t#t${clock?trim}();
+                        [/#if]
+                    [/#list]
                 [/#if]
-                #t#t/* Peripheral clock enable */ 
-            [#list initService.clock?split(';') as clock]    
-[#if ipvar.clkCommonResource.entrySet()?contains(clock?trim)]#t#t${clock?trim?replace("__","")?replace("_ENABLE","")}_ENABLED++;
-#t#tif(${clock?trim?replace("__","")?replace("_ENABLE","")}_ENABLED==1){          
-                   #t#t#t${clock?trim}();
-[#if ipvar.clkCommonResource.entrySet()?contains(clock?trim)]#t#t}[/#if]  
-[#else]
-                   #t#t${clock?trim}();
-[/#if]
-            [/#list]
-            [/#if]
             [#else]
-                 #t#t/* Peripheral clock enable */
-                 #t#t__${ipName}_CLK_ENABLE(); 
-           [/#if]
-           
-    [#else]           
+                #t#t/* Peripheral clock enable */
+                #t#t__${ipName}_CLK_ENABLE(); 
+            [/#if]
+        [/#if] [#-- if not I2C --]
+    [#else]  [#-- serviceType = deInit --]     
         [#if initService.clock??]
             [#if initService.clock!="none"]
                #t#t/* Peripheral clock disable */
@@ -545,8 +543,29 @@
          [/#if]
     [/#if]
     [#if gpioExist]
-#t[@generateConfigCode ipName=ipName type=serviceType serviceName="gpio" instHandler=instHandler tabN=tabN/]
+        #t[@generateConfigCode ipName=ipName type=serviceType serviceName="gpio" instHandler=instHandler tabN=tabN/]
+    [/#if]
+[#-- if I2C clk_enable should be after GPIO Init Begin --]
+    [#if serviceType=="Init" && ipName?contains("I2C")] 
+           [#if initService.clock??]
+            [#if initService.clock!="none"]
+               #t#t/* Peripheral clock enable */
+                [#list initService.clock?split(';') as clock]
+                    [#if ipvar.clkCommonResource.entrySet()?contains(clock?trim)]#t#t${clock?trim?replace("__","")?replace("_ENABLE","")}_ENABLED++;
+                    #t#tif(${clock?trim?replace("__","")?replace("_ENABLE","")}_ENABLED==1){          
+                        #t#t#t${clock?trim}();
+                    [#if ipvar.clkCommonResource.entrySet()?contains(clock?trim)]#t#t}[/#if]  
+                    [#else]
+                        #t#t${clock?trim}();
+                    [/#if]        
+                [/#list]
+            [/#if]
+            [#else]
+                 #t#t/* Peripheral clock enable */
+                 #t#t__${ipName}_CLK_ENABLE(); 
+           [/#if]
 [/#if]
+[#-- if I2C clk_enable should be after GPIO Init End --]    
 [#if serviceType=="Init"] 
     [#if dmaExist]#n#t#t/* Peripheral DMA init*/
 #t[@generateConfigCode ipName=ipName type=serviceType serviceName="dma" instHandler=instHandler tabN=tabN/]

@@ -39,15 +39,22 @@
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __${inclusion_protection}__
 #define __${inclusion_protection}__
+#ifdef __cplusplus
+ extern "C" {
+#endif
 /* Includes ------------------------------------------------------------------*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 [#if SWIncludes??]
 [#list SWIncludes as include]
+[#assign includeFile = include]
+[#if  includeFile!="usbd_def.h"]
 #include "${include}"
+[/#if]
 [/#list]
 [/#if]
+
 
 /** @addtogroup USBD_OTG_DRIVER
   * @{
@@ -96,6 +103,7 @@ extern ${variable.value} ${variable.name};
 [/#if]
 [/#compress]
 [/#list]
+#n
 
 /****************************************/
 /* #define for FS and HS identification */
@@ -184,7 +192,9 @@ extern ${variable.value} ${variable.name};
 /**
   * @}
   */ 
-
+#ifdef __cplusplus
+}
+#endif
 
 #endif //__USBD_CONF__H__
 

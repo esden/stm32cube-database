@@ -73,6 +73,9 @@
 [#if handleNameHS == "HS"]
 [#include "Src/usb_otg_hs_vars.tmp"]
 [/#if]
+#n
+/* External functions --------------------------------------------------------*/
+void SystemClock_Config(void);
 
 /* USER CODE BEGIN 0 */
 /* USER CODE END 0 */
@@ -186,7 +189,7 @@ void HAL_PCD_ResetCallback(PCD_HandleTypeDef *hpcd)
   */
 void HAL_PCD_SuspendCallback(PCD_HandleTypeDef *hpcd)
 {  
-  /* Inform USB library that core enters in suspend Mode */
+   /* Inform USB library that core enters in suspend Mode */
   USBD_LL_Suspend(hpcd->pData);
   __HAL_PCD_GATE_PHYCLOCK(hpcd);
   /*Enter in STOP mode */
@@ -194,7 +197,7 @@ void HAL_PCD_SuspendCallback(PCD_HandleTypeDef *hpcd)
   if (hpcd->Init.low_power_enable)
   {
     /* Set SLEEPDEEP bit and SleepOnExit of Cortex System Control Register */
-    //SCB->SCR |= (uint32_t)((uint32_t)(SCB_SCR_SLEEPDEEP_Msk | SCB_SCR_SLEEPONEXIT_Msk));
+    SCB->SCR |= (uint32_t)((uint32_t)(SCB_SCR_SLEEPDEEP_Msk | SCB_SCR_SLEEPONEXIT_Msk));
   }
   /* USER CODE END 2 */
 }
@@ -208,13 +211,7 @@ void HAL_PCD_SuspendCallback(PCD_HandleTypeDef *hpcd)
 void HAL_PCD_ResumeCallback(PCD_HandleTypeDef *hpcd)
 {
   /* USER CODE BEGIN 3 */
-  if (hpcd->Init.low_power_enable)
-  {    
-    /* Reset SLEEPDEEP bit of Cortex System Control Register */
-    //SCB->SCR &= (uint32_t)~((uint32_t)(SCB_SCR_SLEEPDEEP_Msk | SCB_SCR_SLEEPONEXIT_Msk));    
-  }  
   /* USER CODE END 3 */
-  __HAL_PCD_UNGATE_PHYCLOCK(hpcd);
   USBD_LL_Resume(hpcd->pData);
 }
 
@@ -491,6 +488,43 @@ uint32_t USBD_LL_GetRxDataSize  (USBD_HandleTypeDef *pdev, uint8_t  ep_addr)
   return HAL_PCD_EP_GetRxCount(pdev->pData, ep_addr);
 }
 
+#if (USBD_LPM_ENABLED == 1)
+/**
+  * @brief  HAL_PCDEx_LPM_Callback : Send LPM message to user layer
+  * @param  hpcd: PCD handle
+  * @param  msg: LPM message
+  * @retval HAL status
+  */
+void HAL_PCDEx_LPM_Callback(PCD_HandleTypeDef *hpcd, PCD_LPM_MsgTypeDef msg)
+{
+  switch ( msg)
+  {
+  case PCD_LPM_L0_ACTIVE:
+    if (hpcd->Init.low_power_enable)
+    {
+      SystemClock_Config();
+      
+      /* Reset SLEEPDEEP bit of Cortex System Control Register */
+      SCB->SCR &= (uint32_t)~((uint32_t)(SCB_SCR_SLEEPDEEP_Msk | SCB_SCR_SLEEPONEXIT_Msk));
+    }
+    __HAL_PCD_UNGATE_PHYCLOCK(hpcd);
+    USBD_LL_Resume(hpcd->pData);    
+    break;
+    
+  case PCD_LPM_L1_ACTIVE:
+    __HAL_PCD_GATE_PHYCLOCK(hpcd);
+    USBD_LL_Suspend(hpcd->pData);
+    
+    /*Enter in STOP mode */
+    if (hpcd->Init.low_power_enable)
+    {   
+      /* Set SLEEPDEEP bit and SleepOnExit of Cortex System Control Register */
+      SCB->SCR |= (uint32_t)((uint32_t)(SCB_SCR_SLEEPDEEP_Msk | SCB_SCR_SLEEPONEXIT_Msk));
+    }     
+    break;   
+  }
+}
+#endif
 /**
   * @brief  Delays routine for the USB Device Library.
   * @param  Delay: Delay in ms

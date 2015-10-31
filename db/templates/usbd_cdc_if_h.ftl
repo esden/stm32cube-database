@@ -57,6 +57,9 @@
 [/#compress]
 [/#list]
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
 /* Includes ------------------------------------------------------------------*/
 #include "usbd_cdc.h"
 
@@ -87,7 +90,12 @@ uint8_t CDC_Transmit_HS(uint8_t* Buf, uint16_t Len);
 
 /**
   * @}
-  */ 
+  */
+
+#ifdef __cplusplus
+}
+#endif
+  
 #endif /* __USBD_CDC_IF_H */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

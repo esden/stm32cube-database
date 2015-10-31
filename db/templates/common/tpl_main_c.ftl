@@ -39,10 +39,9 @@
 #include "${FamilyName?lower_case}xx_hal.h"
 [/#if]
 [@common.optinclude name="Src/rtos_inc.tmp"/][#--include freertos includes --]
-[@common.optinclude name="Src/fatfs_inc.tmp"/][#--include fatafs includes --]
 [#-- if !HALCompliant??--][#-- if HALCompliant Begin --]
 [#list ips as ip]
-[#if !ip?contains("FREERTOS") && !ip?contains("FATFS")&& !ip?contains("NVIC")]
+[#if !ip?contains("FREERTOS") && !ip?contains("NVIC")]
 #include "${ip?lower_case}.h"
 [/#if]
 [/#list]
@@ -89,11 +88,14 @@ ${dHandle};
     [#--ADD FMC Code End--]
     [#-- Add FSMC Code Begin--]
     [@common.optinclude name="Src/mx_FSMC_GV.tmp"/]
-    [#--ADD FSMC Code End--]    
+    [#--ADD FSMC Code End--] 
+    [#-- RTOS variables --]
+    [#-- ADD RTOS Code Begin--]
+    [@common.optinclude name="Src/rtos_vars.tmp"/]   
+    [#-- ADD RTOS Code End--]
     [/#compress]
-[/#if][#-- if HALCompliant End --]
-[#-- FATFS variables --]#n
-    [@common.optinclude name="Src/fatfs_vars.tmp"/]
+[/#if][#-- if HALCompliant End --] 
+
     [#-- Global variables --]
 [#-- If HAL compliant generate Global variable : Peripherals handler -End --]
 #n#n
@@ -108,13 +110,18 @@ void SystemClock_Config(void); [#-- remove static --]
 [/#if]
 
 [#-- modif for freeRtos 21 Augst 2014 --]
-[@common.optinclude name="Src/rtos_vars.tmp"/]
-[#if HALCompliant??] 
-[#list voids as void]
-[#if !void?contains("FREERTOS") && !void?contains("FATFS")&& !void?contains("LWIP")&& !void?contains("USB_DEVICE")&& !void?contains("USB_HOST")]
-static void ${""?right_pad(2)}${void}(void);
+[#if FREERTOS??]
+ [#if !HALCompliant??]           [#-- modif for freeRtos 24th Nov. 2014 --]
+ void MX_FREERTOS_Init(void); 
+ [/#if]
 [/#if]
-[/#list]
+[#if HALCompliant??] 
+ [#list voids as void]
+  [#if !void?contains("FREERTOS")&&!void?contains("FATFS")&& !void?contains("LWIP")&& !void?contains("USB_DEVICE")&& !void?contains("USB_HOST")]
+  static void ${""?right_pad(2)}${void}(void);
+  [/#if]
+ [/#list]
+ [@common.optinclude name="Src/rtos_pfp.tmp"/]
 [/#if]
 [/#compress]
 [#if USB_HOST?? && !FREERTOS??]
@@ -124,6 +131,11 @@ static void ${""?right_pad(2)}${void}(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
+#n
+#n
+/* USER CODE BEGIN 0 */
+
+/* USER CODE END 0 */
 #n
 int main(void)
 {
@@ -142,7 +154,7 @@ int main(void)
 [/#if]
 #n#t/* Initialize all configured peripherals */
 [#list voids as void]
-[#if !void?contains("FREERTOS") && !void?contains("FATFS")]
+[#if !void?contains("FREERTOS")]
 #t${void}();
 [/#if]
 [/#list]
@@ -153,23 +165,35 @@ int main(void)
 #t/* USER CODE END 2 */
 #n
 [#if FREERTOS??] [#-- If FreeRtos is used --]
-[@common.optinclude name="Src/rtos_HalInit.tmp"/] [#-- include generated tmp file22 Augst 2014 --]
-[#else]
-[@common.optinclude name="Src/fatfs_HalInit.tmp"/]
+  [#if HALCompliant??]
+  [@common.optinclude name="Src/rtos_HalInit.tmp"/] [#-- include generated tmp file22 Augst 2014 --]
+  [#else]
+  /* Call init function for freertos objects (in freertos.c) */
+  MX_FREERTOS_Init();
+  [/#if]
+
+  [@common.optinclude name="Src/rtos_start.tmp"/] [#-- include generated tmp file 13 Nov 2014 --] 
+  /* We should never get here as control is now taken by the scheduler */
 [/#if]
 
 [#-- if !FREERTOS?? --] 
 #n
-#t/* USER CODE BEGIN 3 */
+
 #t/* Infinite loop */
 #twhile (1)
-#t{#n
+#t{
+#t/* USER CODE BEGIN WHILE */
+
+#t/* USER CODE END WHILE */
 [#if USB_HOST?? && !FREERTOS??]
 #t#tMX_USB_HOST_Process();
 [/#if]
 #n
-#t}
+#t/* USER CODE BEGIN 3 */
+
 #t/* USER CODE END 3 */
+#t}
+
 #n
 [#-- if --]
 
@@ -246,9 +270,10 @@ void SystemClock_Config(void)
 
 /* USER CODE END 4 */
 #n
-[#if FREERTOS??] [#-- If FreeRtos is used --]
-[@common.optinclude name="Src/rtos_threads.tmp"/]
 
+[#if HALCompliant??] [#-- If FreeRtos is used --]
+[@common.optinclude name="Src/rtos_threads.tmp"/]
+[@common.optinclude name="Src/rtos_user_threads.tmp"/] 
 [/#if] [#-- If FreeRtos is used --]
 
 [#compress] 

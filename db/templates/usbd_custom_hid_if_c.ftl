@@ -80,8 +80,9 @@ USBD_HandleTypeDef  *hUsbDevice_0;
 __ALIGN_BEGIN static uint8_t CUSTOM_HID_ReportDesc_HS[USBD_CUSTOM_HID_REPORT_DESC_SIZE] __ALIGN_END =
 {
   /* USER CODE BEGIN 1 */ 
-  0x00
+  0x00,
   /* USER CODE END 1 */   
+   0xC0    /*     END_COLLECTION	             */
 }; 
 /* USB handler declaration */
 /* Handle for USB High Speed IP */

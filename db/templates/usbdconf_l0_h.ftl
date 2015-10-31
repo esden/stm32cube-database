@@ -39,6 +39,10 @@
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __${inclusion_protection}__
 #define __${inclusion_protection}__
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 /* Includes ------------------------------------------------------------------*/
 #include <stdio.h>
 #include <stdlib.h>
@@ -185,6 +189,10 @@ extern ${variable.value} ${variable.name};
 /* Exported functions ------------------------------------------------------- */
 void *USBD_static_malloc(uint32_t size);
 void USBD_static_free(void *p);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //__USBD_CONF__H__
 

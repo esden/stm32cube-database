@@ -62,7 +62,9 @@
 [#-- Global variables --]
 [#if SWIP.variables??]
 	[#list SWIP.variables as variable]
+	   [#if variable.name != "HALCompliant"]
 extern ${variable.value} ${variable.name};
+       [/#if]
 	[/#list]
 [/#if]
 
@@ -119,7 +121,10 @@ extern ${variable.value} ${variable.name};
 	  [/#if]
       [#if definition.name=="_MAX_SS"]
 	      [#assign valueMaxSectorSize = definition.value]
-	  [/#if]	  
+	  [/#if]	 
+	  [#if definition.name=="_MIN_SS"]
+	      [#assign valueMinSectorSize = definition.value]
+	  [/#if]	 
       [#if definition.name=="_USE_ERASE"]
 	      [#assign valueUseErase = definition.value]
 	  [/#if]	  	  
@@ -292,7 +297,7 @@ extern ${variable.value} ${variable.name};
 */
 
 
-#define _MIN_SS    ${valueMaxSectorSize}  /* 512, 1024, 2048 or 4096 */
+#define _MIN_SS    ${valueMinSectorSize}  /* 512, 1024, 2048 or 4096 */
 #define _MAX_SS    ${valueMaxSectorSize}  /* 512, 1024, 2048 or 4096 */
 /* These options configure the range of sector size to be supported. (512, 1024, 2048 or
 /  4096) Always set both 512 for most systems, all memory card and harddisk. But a larger

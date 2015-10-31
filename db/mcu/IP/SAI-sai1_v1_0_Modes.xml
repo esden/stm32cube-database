@@ -87,7 +87,9 @@
 		<Condition Expression="Protocol=SAI_AC97_PROTOCOL" Diagnostic=""/>
 	</RefParameter>
 	<RefParameter Comment="    Frame Length" DefaultValue="8" Name="FrameLength" Type="list" Group="Data Frame Parameters">
-		<Condition Expression="(MClockEnable=SAI_MASTERCLOCK_ENABLE) &amp; (NoDivider=SAI_MASTERDIVIDER_ENABLED)" Diagnostic=""/>
+		<!-- Tracker 293854 -->
+		<!--<Condition Expression="(MClockEnable=SAI_MASTERCLOCK_ENABLE) &amp; (NoDivider=SAI_MASTERDIVIDER_ENABLED)" Diagnostic=""/>-->
+		<Condition Expression="(VirtualMode=VM_MASTER) &amp; (NoDivider=SAI_MASTERDIVIDER_ENABLED)" Diagnostic=""/>
 		<PossibleValue Comment="8 bits" Value="8"/>
 		<PossibleValue Comment="16 bits" Value="16"/>
 		<PossibleValue Comment="32 bits" Value="32"/>
@@ -269,7 +271,7 @@
 	<RefParameter Comment="    Master Clock Divider" DefaultValue="null" Name="NoDivider" Type="integer" Visible="false" Group="Clock Parameters" />
 	
 	<RefParameter Comment="    Audio Frequency" DefaultValue="SAI_AUDIO_FREQUENCY_192K" Name="AudioFrequency" Type="list" Group="Clock Parameters">
-		<Condition Expression="VirtualMode=VM_MASTER" Diagnostic=""/>
+		<Condition Expression="(((VirtualMode=VM_MASTER) &amp; (NoDivider=SAI_MASTERDIVIDER_ENABLED)) &amp; !((Protocol=SAI_AC97_PROTOCOL)))" Diagnostic=""/>				
 		<PossibleValue Comment="192 KHz" Value="SAI_AUDIO_FREQUENCY_192K"/>
 		<PossibleValue Comment="96 KHz" Value="SAI_AUDIO_FREQUENCY_96K"/>
 		<PossibleValue Comment="48 KHz" Value="SAI_AUDIO_FREQUENCY_48K"/>
@@ -279,6 +281,11 @@
 		<PossibleValue Comment="16 KHz" Value="SAI_AUDIO_FREQUENCY_16K"/>
 		<PossibleValue Comment="11 KHz" Value="SAI_AUDIO_FREQUENCY_11K"/>
 		<PossibleValue Comment="8 KHz" Value="SAI_AUDIO_FREQUENCY_8K"/>
+		<PossibleValue Comment="Use MCKDIV" Value="SAI_AUDIO_FREQUENCY_MCKDIV"/>
+	</RefParameter>
+	<RefParameter Comment="    Audio Frequency" DefaultValue="SAI_AUDIO_FREQUENCY_48K" Name="AudioFrequency" Type="list" Group="Clock Parameters">
+		<Condition Expression="(Protocol=SAI_AC97_PROTOCOL)" Diagnostic="set the PLL SAI at 12.288Mhz (48Khz * 256)"/>				
+		<PossibleValue Comment="48 KHz" Value="SAI_AUDIO_FREQUENCY_48K"/>		
 	</RefParameter>
 	<RefParameter Comment="    Audio Frequency" DefaultValue="null" Name="AudioFrequency" Type="integer" Visible="false" Group="Clock Parameters"/>
 
@@ -852,7 +859,7 @@
 				</Mode>
 			</ModeLogicOperator>
 			<Semaphore>SAIAUsed_ForRCC</Semaphore>
-			<Semaphore>$IpInstance_SAIBUsed_ForRCC</Semaphore>
+			<Semaphore>$IpInstance_SAIAUsed_ForRCC</Semaphore>
 		</Mode>		
 		
 		<Mode Name="SAI_B_Mode" UserName="SAI_B Mode">

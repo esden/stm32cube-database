@@ -58,6 +58,9 @@
 [/#compress]
 [/#list]
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
 /* Includes ------------------------------------------------------------------*/
 #include "usbd_customhid.h"
 
@@ -117,6 +120,10 @@ extern USBD_CUSTOM_HID_ItfTypeDef  USBD_CustomHID_fops_HS;
 /**
   * @}
   */ 
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __USBD_CUSTOM_HID_IF_H_ */
 

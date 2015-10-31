@@ -111,16 +111,13 @@
 [/#if]
 
 /* USER CODE BEGIN 0 */
-__IO uint32_t remotewakeupon=0;
 /* USER CODE END 0 */
 
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
 /* USER CODE BEGIN 1 */
-static void SystemClockConfig_Resume(void);
 /* USER CODE END 1 */
 void HAL_PCDEx_SetConnectionState(PCD_HandleTypeDef *hpcd, uint8_t state);
-extern void SystemClock_Config(void);
 
 /*******************************************************************************
                        LL Driver Callbacks (PCD -> USB Device Library)
@@ -229,11 +226,14 @@ void HAL_PCD_SuspendCallback(PCD_HandleTypeDef *hpcd)
   /* Inform USB library that core enters in suspend Mode */
   USBD_LL_Suspend(hpcd->pData);
   /*Enter in STOP mode */
-  /* USER CODE BEGIN 2 */
+  /* USER CODE BEGIN 2 */  
+  [#if handleNameFS == "FS"]
+  __HAL_PCD_GATE_PHYCLOCK(hpcd);
+  [/#if]
   if (hpcd->Init.low_power_enable)
   {
     /* Set SLEEPDEEP bit and SleepOnExit of Cortex System Control Register */
-    //SCB->SCR |= (uint32_t)((uint32_t)(SCB_SCR_SLEEPDEEP_Msk | SCB_SCR_SLEEPONEXIT_Msk));
+    SCB->SCR |= (uint32_t)((uint32_t)(SCB_SCR_SLEEPDEEP_Msk | SCB_SCR_SLEEPONEXIT_Msk));
   }
   /* USER CODE END 2 */
 }
@@ -247,13 +247,6 @@ void HAL_PCD_SuspendCallback(PCD_HandleTypeDef *hpcd)
 void HAL_PCD_ResumeCallback(PCD_HandleTypeDef *hpcd)
 {
   /* USER CODE BEGIN 3 */
-  if ((hpcd->Init.low_power_enable)&&(remotewakeupon == 0))
-  {
-    SystemClockConfig_Resume();
-    /* Reset SLEEPDEEP bit of Cortex System Control Register */
-    //SCB->SCR &= (uint32_t)~((uint32_t)(SCB_SCR_SLEEPDEEP_Msk | SCB_SCR_SLEEPONEXIT_Msk));    
-  }
-  remotewakeupon=0;
   /* USER CODE END 3 */
   USBD_LL_Resume(hpcd->pData);
   
@@ -623,20 +616,6 @@ void USBD_static_free(void *p)
 [/#if]
 }
 
-/* USER CODE BEGIN 5 */
-/**
-  * @brief  Configures system clock after wake-up from USB Resume CallBack: 
-  *         enable HSI, PLL and select PLL as system clock source.
-  * @param  None
-  * @retval None
-  */
-static void SystemClockConfig_Resume(void)
-{
-	SystemClock_Config();
-}
-/* USER CODE END 5 */
-
-
 /**
 * @brief Software Device Connection
 * @param hpcd: PCD handle
@@ -645,7 +624,7 @@ static void SystemClockConfig_Resume(void)
 */
 void HAL_PCDEx_SetConnectionState(PCD_HandleTypeDef *hpcd, uint8_t state)
 {
-/* USER CODE BEGIN 6 */
+/* USER CODE BEGIN 5 */
   if (state == 1)
   {
     /* Configure Low Connection State */
@@ -656,7 +635,7 @@ void HAL_PCDEx_SetConnectionState(PCD_HandleTypeDef *hpcd, uint8_t state)
     /* Configure High Connection State */
    
   } 
-/* USER CODE END 6 */
+/* USER CODE END 5 */
 }
 
 

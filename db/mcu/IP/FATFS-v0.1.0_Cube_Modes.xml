@@ -537,7 +537,36 @@
 		<PossibleValue Comment="4096" Value="4096"/>
 		<Description>Maximum sector size to be handled.&lt;br&gt; Four possible values: 512, 1024, 2048, 4096.&lt;br&gt; Always set &lt;b&gt;512&lt;/b&gt; for memory card and hard disk but a larger value may be required for on-board flash memory, floppy disk and optical disk.&lt;br&gt; When MAX_SS is larger than 512, it configures FatFs to variable sector size and GET_SECTOR_SIZE command must be implemented to the disk_ioctl() function.</Description>
 	</RefParameter>
+
+	<RefParameter Name="_MIN_SS" Comment="MIN_SS (Minimum Sector Size)" DefaultValue="512" Type="list" Group="Physical Drive Parameters" TabName="Set Defines">
+		<Condition Diagnostic="Four possible values: 512, 1024, 2048 and 4096."  Expression="_MAX_SS = 4096"/>
+		<PossibleValue Comment="512" Value="512"/>
+		<PossibleValue Comment="1024" Value="1024"/>
+		<PossibleValue Comment="2048" Value="2048"/>
+		<PossibleValue Comment="4096" Value="4096"/>
+		<Description>Minimum sector size to be handled.&lt;br&gt; Note: must be less than or equal to _MAX_SS.</Description>
+	</RefParameter>
 	
+	<RefParameter Name="_MIN_SS" Comment="MIN_SS (Minimum Sector Size)" DefaultValue="512" Type="list" Group="Physical Drive Parameters" TabName="Set Defines">
+		<Condition Diagnostic="Three possible values: 512, 1024 and 2048."  Expression="_MAX_SS = 2048"/>
+		<PossibleValue Comment="512" Value="512"/>
+		<PossibleValue Comment="1024" Value="1024"/>
+		<PossibleValue Comment="2048" Value="2048"/>
+		<Description>Minimum sector size to be handled.&lt;br&gt; Note: must be less than or equal to _MAX_SS.</Description>
+	</RefParameter>
+	
+	<RefParameter Name="_MIN_SS" Comment="MIN_SS (Minimum Sector Size)" DefaultValue="512" Type="list" Group="Physical Drive Parameters" TabName="Set Defines">
+		<Condition Diagnostic="Two possible values: 512 and 1024."  Expression="_MAX_SS = 1024"/>
+		<PossibleValue Comment="512" Value="512"/>
+		<PossibleValue Comment="1024" Value="1024"/>
+		<Description>Minimum sector size to be handled.&lt;br&gt; Note: must be less than or equal to _MAX_SS.</Description>
+	</RefParameter>
+
+	<RefParameter Name="_MIN_SS" Comment="MIN_SS (Minimum Sector Size)" DefaultValue="512" Type="list" Group="Physical Drive Parameters" TabName="Set Defines">
+		<PossibleValue Comment="512" Value="512"/>
+		<Description>Minimum sector size to be handled.&lt;br&gt; Note: must be less than or equal to _MAX_SS.</Description>
+	</RefParameter>
+		
 	<RefParameter Name="_MULTI_PARTITION" Comment="MULTI_PARTITION (Volume partitions feature)" DefaultValue="0" Type="list" Group="Physical Drive Parameters" TabName="Set Defines">
 		<PossibleValue Comment="Disabled" Value="0"/>
 		<PossibleValue Comment="Enabled" Value="1"/>
@@ -551,7 +580,7 @@
 	</RefParameter>
 	
 	<RefParameter Name="_FS_NOFSINFO" Comment="FS_NOFSINFO (Force full FAT scan)" DefaultValue="0" Type="list" Group="Physical Drive Parameters" TabName="Set Defines">
-		<Condition Diagnostic="4 possbile values since support of R0.10b version" Expression="STM32F1"/>
+		<Condition Diagnostic="4 possible values since support of R0.10b version" Expression="NEW_DISKIO_API"/>
 		<PossibleValue Comment="0" Value="0"/>
 		<PossibleValue Comment="1" Value="1"/>
 		<PossibleValue Comment="2" Value="2"/>
@@ -561,7 +590,7 @@
 	<RefParameter Name="_FS_NOFSINFO" Comment="FS_NOFSINFO (Force full FAT scan)" DefaultValue="0" Type="list" Group="Physical Drive Parameters" TabName="Set Defines">
 		<PossibleValue Comment="0" Value="0"/>
 		<PossibleValue Comment="1" Value="1"/>
-		<Description>If you need to know the correct free space on the FAT32 volume, set this option to 1 and f_getfree() function at first time after volume mount will force a full FAT scan.&lt;br&gt; - 0: Load all informations in the FSINFO if available.&lt;br&gt; - 1: Do not trust free cluster count in the FSINFO.</Description>
+		<Description>If you need to know the correct free space on the FAT32 volume, set this option to 1 and f_getfree() function at first time after volume mount will force a full FAT scan.&lt;br&gt; - 0: Load all information in the FSINFO if available.&lt;br&gt; - 1: Do not trust free cluster count in the FSINFO.</Description>
 	</RefParameter>
 	
 	<RefParameter Name="_WORD_ACCESS" Comment="WORD_ACCESS (Platform dependent access option)" DefaultValue="0" Type="list" Group="System Parameters" TabName="Set Defines">
@@ -654,6 +683,7 @@
 		<!-- Parameters for Physical Drive Configurations  -->
 		<Parameter Name="_VOLUMES"/>
 		<Parameter Name="_MAX_SS"/>
+		<Parameter Name="_MIN_SS"/>
 		<Parameter Name="_MULTI_PARTITION"/>
 		<Parameter Name="_USE_ERASE"/>
 		<Parameter Name="_FS_NOFSINFO"/>
@@ -752,8 +782,7 @@
 			</ModeLogicOperator>
 			<Condition Expression="SD_Card|SD_Card_4" Diagnostic="Active only with SDIO IP configured in a SD mode"/>
 		</Mode>
-			
-						  	
+							  	
 		<Mode Name="USB" UserName="USB Disk" RemoveCondition="!USB_HOST:$modeexist_MSC_HS &amp; !USB_HOST:$modeexist_MSC_FS">
 			<ModeLogicOperator Name="XOR">
 				<Mode Name="USB">

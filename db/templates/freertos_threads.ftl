@@ -1,6 +1,19 @@
 [#ftl]
+
 [#assign nbThreads = 0]
-[#assign defaultTaskFunction = "toto"]
+[#assign defaultTaskFunction = "defaultName"]
+[#assign inMain = 0]
+
+[#list SWIPdatas as SWIP]
+    [#if SWIP.variables??]
+    	[#list SWIP.variables as variable]	
+	      [#if variable.name=="HALCompliant"]
+	         [#assign inMain = 1]
+	      [/#if]   
+	    [/#list]
+    [/#if]
+[/#list]
+
 [#list SWIPdatas as SWIP]
   [#if SWIP.variables??]  
 	[#list SWIP.variables as variable]	
@@ -22,7 +35,8 @@
   [/#if]
 [/#list]
 [#assign mw = "empty"]
-#n#nvoid ${defaultTaskFunction}(void const * argument)
+#n#n/* ${defaultTaskFunction} function */
+void ${defaultTaskFunction}(void const * argument)
 {
 [#list SWIPdatas as SWIP]
   [#if SWIP.variables??]
@@ -36,25 +50,27 @@
           [/#if]
           [#assign index = index + 1]
         [/#list]
-        [#if mw == "FATFS"]
-[@common.optinclude name="Src/fatfs_HalInit.tmp"/] 
-        [#else]
 #t/* init code for ${mw?replace("MX_","")?replace("_Init","")} */
 #tMX_${mw}_Init();#n
-        [/#if]
 	  [/#if]
     [/#list]
   [/#if]
 [/#list]
 #n
+[#if inMain == 1]
 #t/* USER CODE BEGIN 5 */
- 
+[#else]
+#t/* USER CODE BEGIN ${defaultTaskFunction} */
+[/#if]
 #t/* Infinite loop */
 #tfor(;;)
 #t{
 #t#tosDelay(1);
 #t}
-
+[#if inMain == 1]
 #t/* USER CODE END 5 */ 
-#n
+[#else]
+#t/* USER CODE END ${defaultTaskFunction} */
+[/#if]
 }
+#n

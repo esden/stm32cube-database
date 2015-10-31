@@ -12,9 +12,11 @@
 	<!-- Semaphore of CMSIS_version TO BE UPDATED when FW packages come and support new FreeRTOS and CMSI versions -->
 	<RefParameter Name="CMSIS_version" Comment="CMSIS_version" DefaultValue="102" Type="integer" Visible="false">
 	    <!-- <Condition Diagnostic="New version available for F1 and F4" Expression="STM32F1 | STM32F4"/> -->
+	    <PossibleValue Comment="New version of CMSIS" Value="102" Semaphore="S_FREERTOS_V8"/>
 	    <Condition Diagnostic="New version available for F0, F1 and F4" Expression="STM32F0 | STM32F1 | STM32F4"/>
 	</RefParameter>
 	<RefParameter Name="CMSIS_version" Comment="CMSIS_version" DefaultValue="100" Type="integer" Visible="false">
+		<PossibleValue Comment="New version of CMSIS" Value="100" Semaphore="S_FREERTOS_V7"/>
 	</RefParameter>
 
 	<RefParameter Name="RAM_SIZE" Comment="RAM_SIZE" DefaultValue="=$RamSize" Type="integer" Visible="false"/>
@@ -323,16 +325,18 @@
         <Description>Set to 1 to include the 'alternative' queue functions in the build, or 0 to omit the 'alternative' queue functions from the build. The alternative API is described within the queue.h header file. &lt;br&gt;&lt;b&gt;Note:&lt;/b&gt;&lt;br&gt;The alternative API is deprecated and should not be used in new designs.</Description>
 	</RefParameter>
 	
+	<RefParameter Name="INCLUDE_xTaskResumeFromISR" Comment="xTaskResumeFromISR" DefaultValue="0" Type="list" Group="Include definitions" TabName="Include parameters">
+        <Condition Diagnostic="Must be disabled when vTaskSuspend is disabled" Expression="INCLUDE_vTaskSuspend=0"/> 
+	    <PossibleValue Comment="Disabled" Value="0"/>
+        <Description>It is one of the macros allowing those components of the real time kernel not utilized by your application to be excluded from your build. &lt;br&gt; - this ensures the RTOS does not use any more ROM or RAM than necessary for your particular embedded application. &lt;br&gt; To include the xTaskResumeFromISR() API function, set xTaskResumeFromISR and vTaskSuspend to 1 (Enabled).&lt;br&gt; To exclude it from your build, set xTaskResumeFromISR or vTaskSuspend to 0 (Disabled).</Description>
+	</RefParameter>
+	
     <RefParameter Name="INCLUDE_xTaskResumeFromISR" Comment="xTaskResumeFromISR" DefaultValue="1" Type="list" Group="Include definitions" TabName="Include parameters">
-        <Condition Diagnostic="Both values allowed as vTaskSuspend is enabled" Expression="INCLUDE_vTaskSuspend=1"/>
 	    <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
         <Description>It is one of the macros allowing those components of the real time kernel not utilized by your application to be excluded from your build. &lt;br&gt; - this ensures the RTOS does not use any more ROM or RAM than necessary for your particular embedded application. &lt;br&gt; To include the xTaskResumeFromISR() API function, set xTaskResumeFromISR and vTaskSuspend to 1 (Enabled).&lt;br&gt; To exclude it from your build, set xTaskResumeFromISR or vTaskSuspend to 0 (Disabled).</Description>
 	</RefParameter>
-	<RefParameter Name="INCLUDE_xTaskResumeFromISR" Comment="xTaskResumeFromISR" DefaultValue="0" Type="uniqueElementList" Group="Include definitions" TabName="Include parameters">
-	    <PossibleValue Comment="Disabled" Value="0"/>
-        <Description>It is one of the macros allowing those components of the real time kernel not utilized by your application to be excluded from your build. &lt;br&gt; - this ensures the RTOS does not use any more ROM or RAM than necessary for your particular embedded application. &lt;br&gt; To include the xTaskResumeFromISR() API function, set xTaskResumeFromISR and vTaskSuspend to 1 (Enabled).&lt;br&gt; To exclude it from your build, set xTaskResumeFromISR or vTaskSuspend to 0 (Disabled).</Description>
-	</RefParameter>
+
 	
     <RefParameter Name="INCLUDE_xQueueGetMutexHolder" Comment="xQueueGetMutexHolder" DefaultValue="0" Type="list" Group="Include definitions" TabName="Include parameters">
 	    <PossibleValue Comment="Disabled" Value="0"/>

@@ -13,14 +13,16 @@
 	  [#if variable.name=="Mutexes"]
 	    [#assign s = variable.valueList]
         [#list s as mutexName]
-        [#assign nbM = nbM + 1]
-        [#if nbM == 1]
-        #n#t/* Create the mutex(es) */
+        [#if mutexName != "0"]
+          [#assign nbM = nbM + 1]
+          [#if nbM == 1]
+            #n#t/* Create the mutex(es) */
+          [/#if]
+          #t/* definition and creation of ${mutexName} */
+          #tosMutexDef(${mutexName});
+          #t${mutexName}Handle = osMutexCreate(osMutex(${mutexName}));
+          #n       
         [/#if]
-        #t/* definition and creation of ${mutexName} */
-        #tosMutexDef(${mutexName});
-        #t${mutexName}Handle = osMutexCreate(osMutex(${mutexName}));
-        #n
         [/#list]
       [/#if] 	
 	[/#list]
@@ -47,14 +49,16 @@
           [/#if]
           [#assign index = index + 1]
         [/#list]
-        [#assign nbSemaphores = nbSemaphores + 1]
-        [#if nbSemaphores == 1]
-          #n#t/* Create the semaphores(s) */
+        [#if semaphoreName != "0"] 
+          [#assign nbSemaphores = nbSemaphores + 1]
+          [#if nbSemaphores == 1]
+            #n#t/* Create the semaphores(s) */
+          [/#if]
+          #t/* definition and creation of ${semaphoreName} */        
+          #tosSemaphoreDef(${semaphoreName});
+          #t${semaphoreName}Handle = osSemaphoreCreate(osSemaphore(${semaphoreName}), 1);
+          #n
         [/#if]
-        #t/* definition and creation of ${semaphoreName} */        
-        #tosSemaphoreDef(${semaphoreName});
-        #t${semaphoreName}Handle = osSemaphoreCreate(osSemaphore(${semaphoreName}), 1);
-        #n
       [/#if]
 	[/#list]
   [/#if]
@@ -75,14 +79,16 @@
           [/#if]
           [#assign index = index + 1]
         [/#list]
-        [#assign nbSemaphores = nbSemaphores + 1]
-        [#if nbSemaphores == 1]
-          #n#t/* Create the semaphores(s) */
+        [#if semaphoreName != "0"] 
+          [#assign nbSemaphores = nbSemaphores + 1]
+          [#if nbSemaphores == 1]
+            #n#t/* Create the semaphores(s) */
+          [/#if]
+          #t/* definition and creation of ${semaphoreName} */        
+          #tosSemaphoreDef(${semaphoreName});
+          #t${semaphoreName}Handle = osSemaphoreCreate(osSemaphore(${semaphoreName}), ${semaphoreCount}); 
+          #n 
         [/#if]
-        #t/* definition and creation of ${semaphoreName} */        
-        #tosSemaphoreDef(${semaphoreName});
-        #t${semaphoreName}Handle = osSemaphoreCreate(osSemaphore(${semaphoreName}), ${semaphoreCount}); 
-        #n 
       [/#if]
 	[/#list]
   [/#if]
@@ -111,14 +117,16 @@
           [/#if]
           [#assign index = index + 1]
         [/#list]
-        [#assign nbTimers = nbTimers + 1]
-        [#if nbTimers == 1]
-          #n#t/* Create the timer(s) */
-        [/#if]
-        #t/* definition and creation of ${timerName} */        
-        #tosTimerDef(${timerName}, ${timerCallback});
-        #t${timerName}Handle = osTimerCreate(osTimer(${timerName}), ${timerType}, NULL); 
-        #n         
+        [#if timerName != "0"] 
+          [#assign nbTimers = nbTimers + 1]
+          [#if nbTimers == 1]
+            #n#t/* Create the timer(s) */
+          [/#if]
+          #t/* definition and creation of ${timerName} */        
+          #tosTimerDef(${timerName}, ${timerCallback});
+          #t${timerName}Handle = osTimerCreate(osTimer(${timerName}), ${timerType}, NULL); 
+          #n
+        [/#if]       
       [/#if]
 	[/#list]
   [/#if]
@@ -193,14 +201,16 @@
           [/#if]
           [#assign index = index + 1]
         [/#list]
-        [#assign nbQueues = nbQueues + 1]
-        [#if nbQueues == 1]
-          #n#t/* Create the queue(s) */
+        [#if queueName != "0"]       
+          [#assign nbQueues = nbQueues + 1]
+          [#if nbQueues == 1]
+            #n#t/* Create the queue(s) */
+          [/#if]
+          #t/* definition and creation of ${queueName} */
+          #tosMessageQDef(${queueName}, ${queueSize}, ${queueElementType});
+          #t${queueName}Handle = osMessageCreate(osMessageQ(${queueName}), NULL);
+          #n
         [/#if]
-        #t/* definition and creation of ${queueName} */
-        #tosMessageQDef(${queueName}, ${queueSize}, ${queueElementType});
-        #t${queueName}Handle = osMessageCreate(osMessageQ(${queueName}), NULL);
-        #n
       [/#if]
 	[/#list]
   [/#if]

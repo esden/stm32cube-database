@@ -57,12 +57,52 @@
 [/#compress]
 [/#list]
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
 /* Includes ------------------------------------------------------------------*/
 #include "usbd_dfu.h"
 
-/* Exported types ------------------------------------------------------------*/
-/* Exported constants --------------------------------------------------------*/
-/* Exported cariables --------------------------------------------------------*/
+/** @addtogroup STM32_USB_DEVICE_LIBRARY
+  * @{
+  */
+  
+/** @defgroup USBD_MEDIA
+  * @brief header file for the usbd_dfu_if.c file
+  * @{
+  */ 
+
+/** @defgroup USBD_MEDIA_Exported_Defines
+  * @{
+  */ 
+/**
+  * @}
+  */ 
+
+
+/** @defgroup USBD_MEDIA_Exported_Types
+  * @{
+  */
+
+
+/**
+  * @}
+  */ 
+
+
+
+/** @defgroup USBD_MEDIA_Exported_Macros
+  * @{
+  */ 
+
+/**
+  * @}
+  */ 
+
+/** @defgroup USBD_MEDIA_Exported_Variables
+  * @{
+  */ 
+
 [#if handleNameFS == "FS" || handleNameUSB_FS == "FS"]
 extern USBD_DFU_MediaTypeDef  USBD_DFU_fops_FS;
 [/#if]
@@ -70,8 +110,30 @@ extern USBD_DFU_MediaTypeDef  USBD_DFU_fops_FS;
 extern USBD_DFU_MediaTypeDef  USBD_DFU_fops_HS;
 [/#if]
 
-/* Exported macro ------------------------------------------------------------*/
-/* Exported functions ------------------------------------------------------- */
+/**
+  * @}
+  */ 
+
+/** @defgroup USBD_MEDIA_Exported_FunctionsPrototype
+  * @{
+  */ 
+
+
+/**
+  * @}
+  */ 
+#ifdef __cplusplus
+}
+#endif
+
 #endif /* __USBD_DFU_IF_H */
+
+/**
+  * @}
+  */ 
+
+/**
+* @}
+*/ 
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

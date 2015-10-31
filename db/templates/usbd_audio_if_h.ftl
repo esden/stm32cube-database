@@ -57,6 +57,9 @@
 [#-- Global variables --]
 [/#compress]
 [/#list]
+#ifdef __cplusplus
+ extern "C" {
+#endif
 /* Includes ------------------------------------------------------------------*/
 #include "usbd_audio.h"
 
@@ -79,6 +82,10 @@ void HalfTransfer_CallBack_FS(void);
 void TransferComplete_CallBack_HS(void);
 void HalfTransfer_CallBack_HS(void);
 [/#if]
+#ifdef __cplusplus
+}
+#endif
+
 #endif /* __USBD_AUDIO_IF_H */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

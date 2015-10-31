@@ -124,12 +124,8 @@
 		<PossibleValue Comment="" Value="PWR_REGULATOR_VOLTAGE_SCALE2"/>
 		<PossibleValue Comment="" Value="PWR_REGULATOR_VOLTAGE_SCALE3"/>
 	</RefParameter>
-	<RefParameter Visible="false" Comment="PLL Source" DefaultValue="RCC_PLLSOURCE_HSE" Name="PLLSourceVirtual" Type="list">
-        <Condition Diagnostic="PLL Mux should have HSE Crystal/Ceramic as input" Expression="((USB_OTG_FSUsed_ForRCC|USB_OTG_HSEmbeddedPHYUsed_ForRCC)&amp;PLLSource=RCC_PLLSOURCE_HSI)| ((USB_OTG_FSUsed_ForRCC|USB_OTG_HSEmbeddedPHYUsed_ForRCC)&amp;PLLSource=RCC_PLLSOURCE_HSE&amp;!HSEOscillator) "/>
-    </RefParameter>
-    	
     <RefParameter Visible="false" Comment="PLL Source" DefaultValue="RCC_PLLSOURCE_HSE" Name="PLLSourceVirtual" Type="list">
-        <Condition Diagnostic="PLL Mux should have HSE Crystal/Ceramic as input" Expression="((USB_OTG_FSUsed_ForRCC|USB_OTG_HSEmbeddedPHYUsed_ForRCC)&amp;PLLSource=RCC_PLLSOURCE_HSE&amp;HSEOscillator) "/>
+        <Condition Diagnostic="PLL Mux should have HSE as input" Expression="((USB_OTG_FSUsed_ForRCC|USB_OTG_HSEmbeddedPHYUsed_ForRCC)) "/>
         <PossibleValue Comment="Pllsource Hse" Value="RCC_PLLSOURCE_HSE"/>
     </RefParameter>
     <RefParameter Visible="false" Comment="PLL Source" DefaultValue="RCC_PLLSOURCE_HSI" Name="PLLSourceVirtual" Type="list">
@@ -448,11 +444,20 @@
 	</RefParameter>
 	<RefParameter Visible="false" Comment="AHB Clock" Name="HCLKFreq_Value" DefaultValue="16000000" Max="84000000" Type="double" IP="DMA-2D,CAMERAITF" Display="value/1000000" Unit="MHz"/>
                
-        
-	<RefParameter Visible="false" Comment="APB1 Peripheral Clock" Name="APB1Freq_Value" DefaultValue="16000000" Max="42000000" Type="double" IP="DAC1,DAC2,WinWATCHDOG,CAN1,CAN2,I2C1,I2C2,I2C3,SPI3,SPI2,UART4,UART7,UART8,USART2,USART3,UART5" Display="value/1000000" Unit="MHz"/>
+        <RefParameter Visible="false" Comment="APB1 Peripheral Clock" Name="APB1Freq_Value" DefaultValue="16000000" Max="42000000" Min="4000000" Type="double" IP="DAC1,DAC2,WinWATCHDOG,CAN1,CAN2,I2C1,I2C2,I2C3,FMPI2C1,SPI3,SPI2,UART4,UART7,UART8,USART2,USART3,UART5" Display="value/1000000" Unit="MHz">
+		<Condition Diagnostic="overDrive activated" Expression="( (I2C_Fast &amp; (I2C1Used_ForRCC|I2C2Used_ForRCC|I2C3Used_ForRCC)))"/>
+	</RefParameter>
+        <RefParameter Visible="false" Comment="APB1 Peripheral Clock" Name="APB1Freq_Value" DefaultValue="16000000" Max="42000000" Min="2000000" Type="double" IP="DAC1,DAC2,WinWATCHDOG,CAN1,CAN2,I2C1,I2C2,I2C3,FMPI2C1,SPI3,SPI2,UART4,UART7,UART8,USART2,USART3,UART5" Display="value/1000000" Unit="MHz">
+		<Condition Diagnostic="overDrive activated" Expression="( ((I2C1Used_ForRCC|I2C2Used_ForRCC|I2C3Used_ForRCC)))"/>
+	</RefParameter>
+        <RefParameter Visible="false" Comment="APB1 Peripheral Clock" Name="APB1Freq_Value" DefaultValue="16000000" Max="42000000" Min="=RTCFreq_Value*4" Type="double" IP="DAC1,DAC2,WinWATCHDOG,CAN1,CAN2,I2C1,I2C2,I2C3,FMPI2C1,SPI3,SPI2,UART4,UART7,UART8,USART2,USART3,UART5" Display="value/1000000" Unit="MHz">
+		<Condition Diagnostic="overDrive activated" Expression="RTCUsed_ForRCC"/>
+	</RefParameter>
+	<RefParameter Visible="false" Comment="APB1 Peripheral Clock" Name="APB1Freq_Value" DefaultValue="16000000" Max="42000000" Type="double" IP="DAC1,DAC2,WinWATCHDOG,CAN1,CAN2,I2C1,I2C2,I2C3,FMPI2C1,SPI3,SPI2,UART4,UART7,UART8,USART2,USART3,UART5" Display="value/1000000" Unit="MHz"/>
+	
 	<RefParameter Visible="false" Comment="APB2 Peripheral Clock" Name="APB2Freq_Value" DefaultValue="16000000" Max="84000000" Type="double" IP="ADC1,ADC2,ADC3,SPI1,SPI4,SPI5,SPI6,USART1,USART6,EXTI,SDIO" Display="value/1000000" Unit="MHz"/>
 	<RefParameter Visible="false" Comment="IWDG" Name="WatchDogFreq_Value" DefaultValue="32000" Type="double" IP="IWATCHDOG" Display="value/1000" Unit="KHz"/>
-	<RefParameter Visible="false" Comment="RTC" Name="RTCFreq_Value" Type="double" DefaultValue="32000" IP="RTC" Max="1000000" Display="value/1000" Unit="KHz">
+    <RefParameter Visible="false" Comment="RTC Clock Source"     Name="RTCFreq_Value" Type="double" DefaultValue="32000" IP="RTC" Max="1000000" Min="1000000" Display="value/1000" Unit="KHz">
 		<Condition Diagnostic="RTC Has HSE as source" Expression="(!(RCC_RTC_Clock_Source=RCC_RTCCLKSOURCE_LSE)&amp;!(RCC_RTC_Clock_Source=RCC_RTCCLKSOURCE_LSI))"/>
 	</RefParameter>
 	<RefParameter Visible="false" Comment="RTC" Name="RTCFreq_Value" Type="double" IP="RTC" DefaultValue="32000" Display="value/1000" Unit="KHz"/>
@@ -467,8 +472,8 @@
 		<Condition Diagnostic="USB activated" Expression="USB_OTG_FSUsed_ForRCC|USB_OTG_HSEmbeddedPHYUsed_ForRCC"/>
 	</RefParameter>
 	<RefParameter Visible="false" Comment="48MHz Clocks" Name="48MHZClocksFreq_Value" DefaultValue="48000000" Max="48000000" Type="double" Display="value/1000000" Unit="MHz"/>
-	<RefParameter Visible="false" Comment="I2S Clock" Name="I2SClocksFreq_Value" DefaultValue="96000000" Type="double" IP="I2S1,I2S2,I2S3" Display="value/1000000" Unit="MHz"/>
-	<RefParameter Visible="false" Comment="VCOInput" Name="VCOInputFreq_Value" DefaultValue="1000000" Min="1000000" Max="2000000" Type="double" Display="value/1000000" Unit="MHz">
+	<RefParameter Visible="false" Comment="I2S Clock" Name="I2SClocksFreq_Value" DefaultValue="96000000" Max="192000000" Type="double" IP="I2S1,I2S2,I2S3" Display="value/1000000" Unit="MHz"/>
+	<RefParameter Visible="false" Comment="VCOInput" Name="VCOInputFreq_Value" DefaultValue="1000000" Min="950000" Max="2100000" Type="double" Display="value/1000000" Unit="MHz">
         <Condition Diagnostic="PLL not used" Expression="PLLUsed=1|((I2SSourceIsPll &amp; I2SUsed_ForRCC)|((RCC_MCO2Source=RCC_MCO2SOURCE_PLLI2SCLK)&amp; MCO2Config))"/>
     </RefParameter>
 		<RefParameter Visible="false" Comment="VCOInput" Name="VCOInputFreq_Value" DefaultValue="1000000"  Type="double" Display="value/1000000" Unit="MHz"/>
@@ -506,11 +511,16 @@
 
 
 <!--params for Code Generation for IPs -->
-	<RefParameter Visible="false" Comment="Periph Clock Selection" Name="PeriphClockSelection" DefaultValue="+RCC_PERIPHCLK_I2SVar+|RCC_PERIPHCLK_RTCVar" Type="list"/>
+	<RefParameter Visible="false" Comment="Periph Clock Selection" Name="PeriphClockSelection" DefaultValue="+RCC_PERIPHCLK_PLLI2SVar+|RCC_PERIPHCLK_I2SVar+|RCC_PERIPHCLK_RTCVar" Type="list"/>
 
 
+    <RefParameter Visible="false" Name="RCC_PERIPHCLK_PLLI2SVar" Comment="RCC_PERIPHCLK_PLLI2SVar" Type="list" DefaultValue="RCC_PERIPHCLK_PLLI2S">
+        <Condition Expression="((RCC_MCO2Source=RCC_MCO2SOURCE_PLLI2SCLK)&amp; MCO2Config)" Diagnostic="I2S Activated and source is PLLI2S"/>
+        <PossibleValue Value="RCC_PERIPHCLK_PLLI2S" Comment="RCC_PERIPHCLK_PLLI2S"/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="RCC_PERIPHCLK_PLLI2SVar" Comment="RCC_PERIPHCLK_PLLI2SVar" Type="list" DefaultValue=""/>
 	<RefParameter Visible="false" Name="RCC_PERIPHCLK_I2SVar" Comment="RCC_PERIPHCLK_I2SVar" Type="list" DefaultValue="RCC_PERIPHCLK_I2S">
-		<Condition Expression="(I2SSourceIsPll &amp; I2SUsed_ForRCC)|((RCC_MCO2Source=RCC_MCO2SOURCE_PLLI2SCLK)&amp; MCO2Config)" Diagnostic="I2S Activated and source is PLLI2S"/>
+		<Condition Expression="(I2SSourceIsPll &amp; I2SUsed_ForRCC)" Diagnostic="I2S Activated and source is PLLI2S"/>
 		<PossibleValue Value="RCC_PERIPHCLK_I2S" Comment="RCC_PERIPHCLK_I2S"/>
 	</RefParameter>
 	<RefParameter Visible="false" Name="RCC_PERIPHCLK_I2SVar" Comment="RCC_PERIPHCLK_I2SVar" Type="list" DefaultValue=""/>
@@ -936,10 +946,10 @@
         <PossibleValue Value="FLASH_LATENCY_7" Comment="7 WS (8 CPU cycle)"/>
         <PossibleValue Value="FLASH_LATENCY_8" Comment="8 WS (9 CPU cycle)"/>
     </RefParameter>
-    <RefParameter Comment="HSI Calibration Value" DefaultValue="6" Min="0" Max="31" Name="HSICalibrationValue" Type="integer" Group="RCC Parameters"/>
+    <RefParameter Comment="HSI Calibration Value" DefaultValue="16" Min="0" Max="31" Name="HSICalibrationValue" Type="integer" Group="RCC Parameters"/>
     <RefParameter Visible="false" Name="EnbaleCSS" Comment="Clock Security System: available only when HSE is used directly or undirectly as System Clock" Type="list" DefaultValue="false">
         <Condition Diagnostic="" Expression="(((PLLSource=RCC_PLLSOURCE_HSE) &amp;SYSCLKSource=RCC_SYSCLKSOURCE_PLLCLK )|(SYSCLKSource=RCC_SYSCLKSOURCE_HSE)) &amp; (HSEOscillator | HSEByPass)"/>
-        <PossibleValue Value="true" Comment="Enabled"/>
+        <PossibleValue Value="true" Comment="Enabled" Semaphore="CSSEnabled"/>
         <PossibleValue Value="false" Comment="Disabled"/>
     </RefParameter>
 
@@ -971,11 +981,28 @@
 		        <PossibleValue Value="PWR_REGULATOR_VOLTAGE_SCALE1" Comment="Power Regulator Voltage Scale 1"/>
 
     </RefParameter>
+	
+	<RefParameter Visible="false" Comment="MainPLL Is Used" DefaultValue="1" Name="PLLMUsed" Min="1" Type="integer">
+		<Condition Expression="(I2SSourceIsPll &amp; I2SUsed_ForRCC)|((RCC_MCO2Source=RCC_MCO2SOURCE_PLLI2SCLK)&amp; MCO2Config)" Diagnostic="LSE is used if "/>
+	</RefParameter>
+	<RefParameter Visible="false" Comment="Main PLL is Used" DefaultValue="0" Name="PLLMUsed" Min="0" Type="integer"/>
+	<RefParameter Visible="false" Name="PLLMARGForMacro" Comment="PLLMARGForMacro" Type="list" DefaultValue="+PLLM">
+        <Condition Diagnostic="PLLSAIP not used" Expression=" ((PLLMUsed=1) &amp; PLLState=RCC_PLL_OFF)"/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="PLLMARGForMacro" Comment="PLLMARGForMacro" Type="list" DefaultValue="null"/>
+	
+	<RefParameter Visible="false" Name="PLLSourceMARGForMacro" Comment="PLLSourceMARGForMacro" Type="list" DefaultValue="+PLLSource">
+        <Condition Diagnostic="PLLSAIP not used" Expression=" ((PLLMUsed=1) &amp; PLLState=RCC_PLL_OFF)"/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="PLLSourceMARGForMacro" Comment="PLLSourceMARGForMacro" Type="list" DefaultValue="null"/>
     
     <RefMode Name="ClockTree">
+	    <ConfigForMode>RCC_PLL_PLLM_CONFIG</ConfigForMode>
+        <ConfigForMode>RCC_PLL_PLLSOURCE_CONFIG</ConfigForMode>
         <ConfigForMode>RCC_ConfigVoltageScaling</ConfigForMode>
         <ConfigForMode>RCC_OSCConfig</ConfigForMode>        
         <ConfigForMode>PWR_ActivateOverDrive</ConfigForMode>
+		
         <ConfigForMode>RCC_ClockConfig</ConfigForMode>        
         <ConfigForMode>RCC_MCO1Config</ConfigForMode>        
         <ConfigForMode>RCC_MCO2Config</ConfigForMode>        

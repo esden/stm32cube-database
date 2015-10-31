@@ -41,6 +41,9 @@
 #ifndef __${inclusion_protection}__
 #define __${inclusion_protection}__
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
 /* Includes ------------------------------------------------------------------*/
 [#if includes??]
 [#list includes as include]
@@ -114,13 +117,13 @@ extern USBD_DescriptorsTypeDef FS_Desc;
 /** @defgroup USBD_DESC_Exported_FunctionsPrototype
   * @{
   */ 
-
-
-
   
 /**
   * @}
   */ 
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __USBD_DESC_H */
 

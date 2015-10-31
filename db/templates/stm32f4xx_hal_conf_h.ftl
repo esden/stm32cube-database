@@ -49,12 +49,13 @@
   * @brief This is the list of modules to be used in the HAL driver 
   */
 #define HAL_MODULE_ENABLED  
-  [#assign allModules = ["ADC", "CAN", "CRC", "CRYP", "DAC", "DCMI", "DMA2D", "ETH", "NAND", "NOR", "PCCARD", "SRAM", "SDRAM", "HASH", "I2C", "I2S", "IWDG", "LTDC", "RNG", "RTC", "SAI", "SD", "SPI", "TIM", "UART", "USART", "IRDA", "SMARTCARD", "WWDG", "PCD", "HCD"]]
+
+  [#assign allModules = ["ADC","CAN","CRC","CRYP","DAC","DCMI","DMA2D","ETH","NAND","NOR","PCCARD","SRAM","SDRAM","HASH","I2C","I2S","IWDG","LTDC","RNG","RTC","SAI","SD","SPI","TIM","UART","USART","IRDA","SMARTCARD","WWDG","PCD","HCD","QSPI","QUADSPI","CEC","FMPI2C","SPDIFRX"]]
   [#list allModules as module]
 	[#if isModuleUsed(module)]
-[#compress]#define HAL_${module}_MODULE_ENABLED[/#compress]
+[#compress]#define HAL_${module?replace("QUADSPI","QSPI")}_MODULE_ENABLED[/#compress]
 	[#else]
-//#define HAL_${module}_MODULE_ENABLED   
+//#define HAL_${module?replace("QUADSPI","QSPI")}_MODULE_ENABLED   
 	[/#if]	
   [/#list]
   [#function isModuleUsed moduleName]
@@ -362,6 +363,22 @@
 #ifdef HAL_HCD_MODULE_ENABLED
  #include "stm32f4xx_hal_hcd.h"
 #endif /* HAL_HCD_MODULE_ENABLED */
+
+#ifdef HAL_QSPI_MODULE_ENABLED
+ #include "stm32f4xx_hal_qspi.h"
+#endif /* HAL_QSPI_MODULE_ENABLED */
+
+#ifdef HAL_CEC_MODULE_ENABLED
+ #include "stm32f4xx_hal_cec.h"
+#endif /* HAL_CEC_MODULE_ENABLED */
+
+#ifdef HAL_FMPI2C_MODULE_ENABLED
+ #include "stm32f4xx_hal_fmpi2c.h"
+#endif /* HAL_FMPI2C_MODULE_ENABLED */
+
+#ifdef HAL_SPDIFRX_MODULE_ENABLED
+ #include "stm32f4xx_hal_spdifrx.h"
+#endif /* HAL_SPDIFRX_MODULE_ENABLED */
    
 /* Exported macro ------------------------------------------------------------*/
 #ifdef  USE_FULL_ASSERT

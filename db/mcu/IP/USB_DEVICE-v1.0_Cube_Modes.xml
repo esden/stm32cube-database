@@ -22,7 +22,7 @@
 	</RefParameter>
 		
 	
-	<RefParameter Name="USBD_MAX_STR_DESC_SIZ" Comment="USBD_MAX_STR_DESC_SIZ (Maximum size for the string descriptors)" Min="0" Max="65536" DefaultValue="512"  Type="integer" Group="Basic Parameters" Unit="bytes">		
+	<RefParameter Name="USBD_MAX_STR_DESC_SIZ" Comment="USBD_MAX_STR_DESC_SIZ (Maximum size for the string descriptors)" Min="1" Max="65536" DefaultValue="512"  Type="integer" Group="Basic Parameters" Unit="bytes">		
 		<Description>Maximum size of string descriptors</Description>
 	</RefParameter>
 	
@@ -51,6 +51,14 @@
 		</Description>
 	</RefParameter>
 	
+	<!-- Link Power Management -->
+	<RefParameter Name="USBD_LPM_ENABLED" Comment="USBD_LPM_ENABLED (Link Power Management)" DefaultValue="1" Type="integer" Min="1" Max="1" Group="Basic Parameters" Visible="true">
+		<Condition Expression="STM32F446 | STM32L4xx" Diagnostic=""/>
+		<Description>The Link Power mmanagement available for STM32F446 and STM32L4xx</Description>	
+	</RefParameter>
+	<RefParameter Name="USBD_LPM_ENABLED" Comment="USBD_LPM_ENABLED (Link Power Management)" DefaultValue="0" Type="integer" Min="0" Max="0" Group="Basic Parameters" Visible="false">		
+		<Description>The Link Power mmanagement available for STM32F446 and STM32L4xx</Description>	
+	</RefParameter>
 	
 	<!-- Specific RefParameter for mono and multi instance -->
 	<!-- Device Descriptors Configuration -->
@@ -146,7 +154,7 @@
 	<RefParameter Name="PID_FS" Comment="PID (Product IDentifier)" DefaultValue="1" Type="integer" Min="0" Max="65535" Group="Device Descriptor FS" TabName="Device Descriptor">
 		<Description>The Product Identfier value present on the Device Descriptor</Description>		
 	</RefParameter>
-
+	
 	<!-- Audio Class -->
 	<RefParameter Name="PRODUCT_STRING_HS" Comment="PRODUCT_STRING (Product Identifier)" DefaultValue="STM32 Audio Class" Type="stringRW" Group="Device Descriptor HS" TabName="Device Descriptor">
 		<Condition Expression="VirtualModeHS = Audio_HS" Diagnostic=""/>
@@ -499,19 +507,19 @@
 		<Description>Class Driver Structure size</Description>
 	</RefParameter>
 	
-	<RefParameter Name="USBD_CUSTOMHID_OUTREPORT_BUF_SIZE" Comment="USBD_CUSTOMHID_OUTREPORT_BUF_SIZE (Maximum report buffer size (OUT ENDPOINT))" DefaultValue="2"  Min="1" Max="64" Type="integer" Group="Class Parameters" Visible="true">
+	<RefParameter Name="USBD_CUSTOMHID_OUTREPORT_BUF_SIZE" Comment="USBD_CUSTOMHID_OUTREPORT_BUF_SIZE (Maximum report buffer size (OUT ENDPOINT))" DefaultValue="2"  Min="2" Max="64" Type="integer" Group="Class Parameters" Visible="true">
 		<Condition Expression="VirtualMode = CustomHid" Diagnostic=""/>	
 		<Description>Custom HID Class out report buffer size (OUT ENDPOINT)</Description>
 	</RefParameter>
-	<RefParameter Name="USBD_CUSTOMHID_OUTREPORT_BUF_SIZE" Comment="USBD_CUSTOMHID_OUTREPORT_BUF_SIZE (Maximum report buffer size (OUT ENDPOINT))" DefaultValue="2"  Min="1" Max="64" Type="integer" Group="Class Parameters" Visible="true">		
+	<RefParameter Name="USBD_CUSTOMHID_OUTREPORT_BUF_SIZE" Comment="USBD_CUSTOMHID_OUTREPORT_BUF_SIZE (Maximum report buffer size (OUT ENDPOINT))" DefaultValue="2"  Min="2" Max="64" Type="integer" Group="Class Parameters" Visible="true">		
 		<Description>Custom HID Class out report buffer size (OUT ENDPOINT)</Description>
 	</RefParameter>
 	
-	<RefParameter Name="USBD_CUSTOM_HID_REPORT_DESC_SIZE" Comment="USBD_CUSTOM_HID_REPORT_DESC_SIZE (Total length for Report descriptor (IN ENDPOINT))" DefaultValue="2"  Min="1" Max="255" Type="integer" Group="Class Parameters" Visible="true">
+	<RefParameter Name="USBD_CUSTOM_HID_REPORT_DESC_SIZE" Comment="USBD_CUSTOM_HID_REPORT_DESC_SIZE (Total length for Report descriptor (IN ENDPOINT))" DefaultValue="2"  Min="2" Max="255" Type="integer" Group="Class Parameters" Visible="true">
 		<Condition Expression="VirtualMode = CustomHid" Diagnostic=""/>	
 		<Description>Custom HID Total length of Report descriptor (IN ENDPOINT)</Description>
 	</RefParameter>
-	<RefParameter Name="USBD_CUSTOM_HID_REPORT_DESC_SIZE" Comment="USBD_CUSTOM_HID_REPORT_DESC_SIZE (Total length for Report descriptor (IN ENDPOINT))" DefaultValue="2"  Min="1" Max="255" Type="integer" Group="Class Parameters" Visible="true">		
+	<RefParameter Name="USBD_CUSTOM_HID_REPORT_DESC_SIZE" Comment="USBD_CUSTOM_HID_REPORT_DESC_SIZE (Total length for Report descriptor (IN ENDPOINT))" DefaultValue="2"  Min="2" Max="255" Type="integer" Group="Class Parameters" Visible="true">		
 		<Description>Custom HID Total length of Report descriptor (IN ENDPOINT)</Description>
 	</RefParameter>
 	
@@ -564,7 +572,7 @@
 		<Description>Maximum number of supported interfaces </Description>
 	</RefParameter>
 	
-	<RefParameter Name="USBD_DFU_XFER_SIZE" Comment="USBD_DFU_XFER_SIZE" Min="1" Max="32768" DefaultValue="1024" Type="integer" Group="Class Parameters" Visible="true" Unit="Bytes">
+	<RefParameter Name="USBD_DFU_XFER_SIZE" Comment="USBD_DFU_XFER_SIZE" Min="5" Max="32768" DefaultValue="1024" Type="integer" Group="Class Parameters" Visible="true" Unit="Bytes">
 		<Condition Expression="VirtualMode = Dfu" Diagnostic=""/>		
 		<!--<PossibleValue Value="1024" Comment="1024"/>-->
 		<Description>Maximum DFU transfert size</Description>
@@ -860,6 +868,10 @@
 		<Parameter Name="MANUFACTURER_STRING">
 			<Condition Expression="(USB_DEVICE_HS_CLASSES) | (USB_DEVICE_FS_CLASSES)" Diagnostic=""/>
 		</Parameter>
+		<!-- Parameters for Link Power Management -->
+		<Parameter Name="USBD_LPM_ENABLED">
+			<Condition Expression="(USB_DEVICE_HS_CLASSES) | (USB_DEVICE_FS_CLASSES)" Diagnostic=""/>
+		</Parameter>				
 		<!-- Parameters for Device Descriptors -->			
 		<Parameter Name="PID_HS"/>		
 		<Parameter Name="PRODUCT_STRING_HS"/>
@@ -915,6 +927,10 @@
 		</Parameter>
 		<Parameter Name="MANUFACTURER_STRING">
 			<Condition Expression="(USB_DEVICE_FS_CLASSES) &amp; (!USB_DEVICE_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>
+		<!-- Parameters for Link Power Management -->
+		<Parameter Name="USBD_LPM_ENABLED">
+			<Condition Expression="(USB_DEVICE_FS_CLASSES) &amp; (!USB_DEVICE_HS_CLASSES)" Diagnostic=""/>			
 		</Parameter>
 		<!-- Parameters for Device Descriptors -->
 		<Parameter Name="PID_FS"/>
@@ -973,7 +989,10 @@
 		</Parameter>
 		<Parameter Name="MANUFACTURER_STRING">
 			<Condition Expression="(USB_DEVICE_HS_CLASSES) | (USB_DEVICE_FS_CLASSES)" Diagnostic=""/>
-		</Parameter>					
+		</Parameter>
+		<Parameter Name="USBD_LPM_ENABLED">
+			<Condition Expression="(USB_DEVICE_HS_CLASSES) | (USB_DEVICE_FS_CLASSES)" Diagnostic=""/>
+		</Parameter>						
 		<!-- Parameters for Device Descriptors -->		
 		<Parameter Name="PID_HS"/>			
 		<Parameter Name="PRODUCT_STRING_HS"/>
@@ -1030,7 +1049,11 @@
 		</Parameter>
 		<Parameter Name="MANUFACTURER_STRING">
 			<Condition Expression="(USB_DEVICE_FS_CLASSES) &amp; (!USB_DEVICE_HS_CLASSES)" Diagnostic=""/>
-		</Parameter>					
+		</Parameter>
+		<!-- Parameters for Link Power Management -->
+		<Parameter Name="USBD_LPM_ENABLED">
+			<Condition Expression="(USB_DEVICE_FS_CLASSES) &amp; (!USB_DEVICE_HS_CLASSES)" Diagnostic=""/>			
+		</Parameter>		
 		<!-- Parameters for Device Descriptors -->			
 		<Parameter Name="PID_FS"/>		
 		<Parameter Name="PRODUCT_STRING_FS"/>
@@ -1091,6 +1114,9 @@
 		</Parameter>
 		<Parameter Name="MANUFACTURER_STRING">
 			<Condition Expression="(USB_DEVICE_HS_CLASSES) | (USB_DEVICE_FS_CLASSES)" Diagnostic=""/>
+		</Parameter>
+		<Parameter Name="USBD_LPM_ENABLED">
+			<Condition Expression="(USB_DEVICE_HS_CLASSES) | (USB_DEVICE_FS_CLASSES)" Diagnostic=""/>
 		</Parameter>						
 		<!-- Parameters for Device Descriptors -->		
 		<Parameter Name="PID_HS"/>			
@@ -1148,6 +1174,10 @@
 		<Parameter Name="MANUFACTURER_STRING">
 			<Condition Expression="(USB_DEVICE_FS_CLASSES) &amp; (!USB_DEVICE_HS_CLASSES)" Diagnostic=""/>
 		</Parameter>	
+		<!-- Parameters for Link Power Management -->
+		<Parameter Name="USBD_LPM_ENABLED">
+			<Condition Expression="(USB_DEVICE_FS_CLASSES) &amp; (!USB_DEVICE_HS_CLASSES)" Diagnostic=""/>			
+		</Parameter>				
 		<!-- Parameters for Device Descriptors -->				
 		<Parameter Name="PID_FS"/>			
 		<Parameter Name="PRODUCT_STRING_FS"/>
@@ -1205,7 +1235,10 @@
 		</Parameter>
 		<Parameter Name="MANUFACTURER_STRING">
 			<Condition Expression="(USB_DEVICE_HS_CLASSES) | (USB_DEVICE_FS_CLASSES)" Diagnostic=""/>
-		</Parameter>					
+		</Parameter>
+		<Parameter Name="USBD_LPM_ENABLED">
+			<Condition Expression="(USB_DEVICE_HS_CLASSES) | (USB_DEVICE_FS_CLASSES)" Diagnostic=""/>
+		</Parameter>						
 		<!-- Parameters for Device Descriptors -->		
 		<Parameter Name="PID_HS"/>		
 		<Parameter Name="PRODUCT_STRING_HS"/>
@@ -1267,6 +1300,10 @@
 		</Parameter>
 		<Parameter Name="MANUFACTURER_STRING">
 			<Condition Expression="(USB_DEVICE_FS_CLASSES) &amp; (!USB_DEVICE_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>
+		<!-- Parameters for Link Power Management -->
+		<Parameter Name="USBD_LPM_ENABLED">
+			<Condition Expression="(USB_DEVICE_FS_CLASSES) &amp; (!USB_DEVICE_HS_CLASSES)" Diagnostic=""/>			
 		</Parameter>				
 		<!-- Parameters for Device Descriptors -->				
 		<Parameter Name="PID_FS"/>			
@@ -1331,7 +1368,10 @@
 		</Parameter>
 		<Parameter Name="MANUFACTURER_STRING">
 			<Condition Expression="(USB_DEVICE_HS_CLASSES) | (USB_DEVICE_FS_CLASSES)" Diagnostic=""/>
-		</Parameter>		
+		</Parameter>
+		<Parameter Name="USBD_LPM_ENABLED">
+			<Condition Expression="(USB_DEVICE_HS_CLASSES) | (USB_DEVICE_FS_CLASSES)" Diagnostic=""/>
+		</Parameter>						
 		<!-- Parameters for Device Descriptors -->		
 		<Parameter Name="PID_HS"/>	
 		<Parameter Name="PRODUCT_STRING_HS"/>
@@ -1384,7 +1424,11 @@
 		</Parameter>
 		<Parameter Name="MANUFACTURER_STRING">
 			<Condition Expression="(USB_DEVICE_FS_CLASSES) &amp; (!USB_DEVICE_HS_CLASSES)" Diagnostic=""/>
-		</Parameter>	
+		</Parameter>
+		<!-- Parameters for Link Power Management -->
+		<Parameter Name="USBD_LPM_ENABLED">
+			<Condition Expression="(USB_DEVICE_FS_CLASSES) &amp; (!USB_DEVICE_HS_CLASSES)" Diagnostic=""/>			
+		</Parameter>				
 		<!-- Parameters for Device Descriptors -->		
 		<Parameter Name="PID_FS"/>	
 		<Parameter Name="PRODUCT_STRING_FS"/>
@@ -1439,7 +1483,10 @@
 		</Parameter>
 		<Parameter Name="MANUFACTURER_STRING">
 			<Condition Expression="(USB_DEVICE_HS_CLASSES) | (USB_DEVICE_FS_CLASSES)" Diagnostic=""/>
-		</Parameter>			
+		</Parameter>
+		<Parameter Name="USBD_LPM_ENABLED">
+			<Condition Expression="(USB_DEVICE_HS_CLASSES) | (USB_DEVICE_FS_CLASSES)" Diagnostic=""/>
+		</Parameter>						
 		<!-- Parameters for Device Descriptors -->		
 		<Parameter Name="PID_HS"/>		
 		<Parameter Name="PRODUCT_STRING_HS"/>
@@ -1498,6 +1545,10 @@
 		</Parameter>
 		<Parameter Name="MANUFACTURER_STRING">
 			<Condition Expression="(USB_DEVICE_FS_CLASSES) &amp; (!USB_DEVICE_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>
+		<!-- Parameters for Link Power Management -->
+		<Parameter Name="USBD_LPM_ENABLED">
+			<Condition Expression="(USB_DEVICE_FS_CLASSES) &amp; (!USB_DEVICE_HS_CLASSES)" Diagnostic=""/>			
 		</Parameter>		
 		<!-- Parameters for Device Descriptors -->		
 		<Parameter Name="PID_FS"/>		
@@ -1560,6 +1611,9 @@
 		</Parameter>
 		<Parameter Name="MANUFACTURER_STRING">
 			<Condition Expression="(USB_DEVICE_HS_CLASSES) | (USB_DEVICE_FS_CLASSES)" Diagnostic=""/>
+		</Parameter>
+		<Parameter Name="USBD_LPM_ENABLED">
+			<Condition Expression="(USB_DEVICE_HS_CLASSES) | (USB_DEVICE_FS_CLASSES)" Diagnostic=""/>
 		</Parameter>						
 		<!-- Parameters for Device Descriptors -->		
 		<Parameter Name="PID_HS"/>		
@@ -1616,7 +1670,11 @@
 		</Parameter>
 		<Parameter Name="MANUFACTURER_STRING">
 			<Condition Expression="(USB_DEVICE_FS_CLASSES) &amp; (!USB_DEVICE_HS_CLASSES)" Diagnostic=""/>
-		</Parameter>						
+		</Parameter>	
+		<!-- Parameters for Link Power Management -->
+		<Parameter Name="USBD_LPM_ENABLED">
+			<Condition Expression="(USB_DEVICE_FS_CLASSES) &amp; (!USB_DEVICE_HS_CLASSES)" Diagnostic=""/>			
+		</Parameter>				
 		<!-- Parameters for Device Descriptors -->		
 		<Parameter Name="PID_FS"/>		
 		<Parameter Name="PRODUCT_STRING_FS"/>
@@ -1674,7 +1732,10 @@
 		</Parameter>
 		<Parameter Name="MANUFACTURER_STRING">
 			<Condition Expression="(USB_DEVICE_HS_CLASSES) | (USB_DEVICE_FS_CLASSES)" Diagnostic=""/>
-		</Parameter>		
+		</Parameter>
+		<Parameter Name="USBD_LPM_ENABLED">
+			<Condition Expression="(USB_DEVICE_HS_CLASSES) | (USB_DEVICE_FS_CLASSES)" Diagnostic=""/>
+		</Parameter>						
 		<!-- Parameters for Device Descriptors -->		
 		<Parameter Name="PID_HS"/>		
 		<Parameter Name="PRODUCT_STRING_HS"/>
@@ -1727,7 +1788,11 @@
 		</Parameter>
 		<Parameter Name="MANUFACTURER_STRING">
 			<Condition Expression="(USB_DEVICE_FS_CLASSES) &amp; (!USB_DEVICE_HS_CLASSES)" Diagnostic=""/>
-		</Parameter>	
+		</Parameter>
+		<!-- Parameters for Link Power Management -->
+		<Parameter Name="USBD_LPM_ENABLED">
+			<Condition Expression="(USB_DEVICE_FS_CLASSES) &amp; (!USB_DEVICE_HS_CLASSES)" Diagnostic=""/>			
+		</Parameter>				
 		<!-- Parameters for Device Descriptors -->		
 		<Parameter Name="PID_FS"/>		
 		<Parameter Name="PRODUCT_STRING_FS"/>
@@ -1753,6 +1818,7 @@
 					</SignalLogicalOp>
 					<Semaphore>DEVICE_HIGH_SPEED</Semaphore>
 					<Semaphore>AUDIO_HS</Semaphore>
+					<Condition Expression="!AUDIO_FS" Diagnostic="The USB AUDIO class share the same audio frequency"/>										
 				</Mode>
 				<!--
 				<Mode Name="CCID_HS" UserName="CCID_HS">
@@ -1776,6 +1842,7 @@
 					</SignalLogicalOp>
 					<Semaphore>DEVICE_HIGH_SPEED</Semaphore>
 					<Semaphore>DFU_HS</Semaphore>
+					<Condition Expression="!DFU_FS" Diagnostic="The USB DFU class cannot share the same memory address"/>
 				</Mode>	
 				<Mode Name="HID_HS" UserName="Human Interface Device Class (HID)">				
 					<SignalLogicalOp Name="AND">
@@ -1812,8 +1879,9 @@
 				-->
 			</ModeLogicOperator>
 			<Semaphore>USB_DEVICE_HS_CLASSES</Semaphore>
-			<!--<Condition Expression="(MW_USB_OTG_HS_MW_DEVICE | MW_USB_OTG_HS_MW_FS_DEVICE) &amp; (!USB_DEVICE_FS_CLASSES)" Diagnostic="Activate only when configuring USB_OTG_HS in Device mode"/>-->
-			<Condition Expression="(MW_USB_OTG_HS_MW_DEVICE | MW_USB_OTG_HS_MW_FS_DEVICE)" Diagnostic="Active only when USB_OTG_HS IP is configured in Device mode"/>			
+			<!--<Condition Expression="(MW_USB_OTG_HS_MW_DEVICE | MW_USB_OTG_HS_MW_FS_DEVICE) &amp; (!USB_DEVICE_FS_CLASSES)" Diagnostic="Active only when USB_OTG_HS IP is configured in Device mode"/>-->
+			<!-- Tracker 306857 -->			
+			<Condition Expression="(MW_USB_OTG_HS_MW_DEVICE | MW_USB_OTG_HS_MW_FS_DEVICE)" Diagnostic="Active only when USB_OTG_HS IP is configured in Device mode"/>
 		</Mode>
 		<Mode Name="Class For FS IP">
 			<ModeLogicOperator Name="XOR">
@@ -1823,6 +1891,7 @@
 					</SignalLogicalOp>
 					<Semaphore>DEVICE_FULL_SPEED</Semaphore>
 					<Semaphore>AUDIO_FS</Semaphore>
+					<Condition Expression="!AUDIO_HS" Diagnostic="The USB AUDIO share the same audio frequency"/>					
 				</Mode>
 				<!--<Mode Name="CCID_FS" UserName="CCID_FS">
 					<SignalLogicalOp Name="AND">
@@ -1845,6 +1914,7 @@
 					</SignalLogicalOp>
 					<Semaphore>DEVICE_FULL_SPEED</Semaphore>
 					<Semaphore>DFU_FS</Semaphore>
+					<Condition Expression="!DFU_HS" Diagnostic="The USB DFU class cannot share the same memory address"/>
 				</Mode>					
 				<Mode Name="HID_FS" UserName="Human Interface Device Class (HID)">				
 					<SignalLogicalOp Name="AND">
@@ -1880,8 +1950,9 @@
 				-->
 			</ModeLogicOperator>	
 			<Semaphore>USB_DEVICE_FS_CLASSES</Semaphore>
-			<!--<Condition Expression="(MW_USB_OTG_FS_MW_DEVICE) &amp; (!USB_DEVICE_HS_CLASSES)" Diagnostic="Activate only when configuring USB_OTG_FS in Device mode"/>-->
-			<Condition Expression="(MW_USB_OTG_FS_MW_DEVICE | MW_USB_MW_DEVICE)" Diagnostic="Active only when USB_OTG_FS IP is configured in Device mode"/>
+			<!--<Condition Expression="(MW_USB_OTG_FS_MW_DEVICE | MW_USB_MW_DEVICE)&amp; (!USB_DEVICE_HS_CLASSES)" Diagnostic="Active only when USB_OTG_FS IP is configured in Device mode"/>-->
+			<!-- Trqacker 306857 -->
+			<Condition Expression="(MW_USB_OTG_FS_MW_DEVICE | MW_USB_MW_DEVICE)" Diagnostic="Active only when USB_OTG_FS IP is configured in Device mode"/>			
 		</Mode>
 	</ModeLogicOperator>
 	

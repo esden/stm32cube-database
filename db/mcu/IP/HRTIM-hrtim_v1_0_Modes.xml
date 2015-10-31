@@ -639,6 +639,14 @@
 <!-- BEGIN    for   DLL Calibration, common HRTIMER configuration  to be called once -->
 
 <RefParameter Comment="High Resolution to reach steps down to 217 ps (4.6GHz Equivalent Frequency)" DefaultValue="NoDLLCalibration" Name="EnableCalibration" Type="list" TabName="High Resolution" Group="High Resolution Setting">
+        <Condition Diagnostic="" Expression="(RCC:$IpInstanceFreq_Value) &lt; 128000000"/>
+        <PossibleValue Comment="Disable" Value="NoDLLCalibration"/>
+        <PossibleValue Comment="Enabled with Simple DLL Calibration" Value="DLLSimpleCalibration" Semaphore="Semaphore_HRTIMER_DLLSimpleCalibration$IpInstance" Condition="(RCC:$IpInstanceFreq_Value) &lt; 128000000" Diagnostic="HRTIMER Frequency must be set to 128MHz or 144MHz  Use the clock issued from the PLL for HRTIMER Clock and SYSCLOCK" Action="Disable"/>
+        <PossibleValue Comment="Enabled with DLL Calibration with IT Generation" Value="DLLITCalibration" Semaphore="Semaphore_HRTIMER_DLLITCalibration$IpInstance" Condition="(RCC:$IpInstanceFreq_Value) &lt; 128000000" Diagnostic="HRTIMER Frequency must be set to 128MHz or 144MHz  Use the clock issued from the PLL for HRTIMER Clock and SYSCLOCK" Action="Disable"/>
+</RefParameter> 
+
+<RefParameter Comment="High Resolution to reach steps down to 217 ps (4.6GHz Equivalent Frequency)" DefaultValue="DLLSimpleCalibration" Name="EnableCalibration" Type="list" TabName="High Resolution" Group="High Resolution Setting">
+        <Condition Diagnostic="" Expression="!(RCC:$IpInstanceFreq_Value) &lt; 128000000"/>
         <PossibleValue Comment="Disable" Value="NoDLLCalibration"/>
         <PossibleValue Comment="Enabled with Simple DLL Calibration" Value="DLLSimpleCalibration" Semaphore="Semaphore_HRTIMER_DLLSimpleCalibration$IpInstance" Condition="(RCC:$IpInstanceFreq_Value) &lt; 128000000" Diagnostic="HRTIMER Frequency must be set to 128MHz or 144MHz  Use the clock issued from the PLL for HRTIMER Clock and SYSCLOCK" Action="Disable"/>
         <PossibleValue Comment="Enabled with DLL Calibration with IT Generation" Value="DLLITCalibration" Semaphore="Semaphore_HRTIMER_DLLITCalibration$IpInstance" Condition="(RCC:$IpInstanceFreq_Value) &lt; 128000000" Diagnostic="HRTIMER Frequency must be set to 128MHz or 144MHz  Use the clock issued from the PLL for HRTIMER Clock and SYSCLOCK" Action="Disable"/>
@@ -646,7 +654,7 @@
 
 
 
-<RefParameter Comment="Calibration Rate" DefaultValue="HRTIM_SINGLE_CALIBRATION" Name="CalibrationRate_IT" Type="list" TabName="High Resolution" Group="Calibration Settings">
+<RefParameter Comment="Calibration Rate" DefaultValue="HRTIM_CALIBRATIONRATE_14" Name="CalibrationRate_IT" Type="list" TabName="High Resolution" Group="Calibration Settings">
         <Condition Diagnostic="" Expression="Semaphore_HRTIMER_DLLITCalibration$IpInstance"/>
         <PossibleValue Comment="Non periodic DLL calibration" Value="HRTIM_SINGLE_CALIBRATION"/> 
         <PossibleValue Comment="Periodic DLL calibration: T : 1048576 mult tHRTIM (7.3 ms)" Value="HRTIM_CALIBRATIONRATE_7300" /> 
@@ -660,7 +668,7 @@
         <PossibleValue Comment="disable" Value="__NULL"/> 
 </RefParameter>
 
-<RefParameter Comment="Calibration Rate" DefaultValue="HRTIM_SINGLE_CALIBRATION" Name="CalibrationRate_nonIT" Type="list" TabName="High Resolution" Group="Calibration Settings">
+<RefParameter Comment="Calibration Rate" DefaultValue="HRTIM_CALIBRATIONRATE_14" Name="CalibrationRate_nonIT" Type="list" TabName="High Resolution" Group="Calibration Settings">
         <Condition Diagnostic="" Expression="Semaphore_HRTIMER_DLLSimpleCalibration$IpInstance"/>
         <PossibleValue Comment="Non periodic DLL calibration" Value="HRTIM_SINGLE_CALIBRATION" /> 
         <PossibleValue Comment="Periodic DLL calibration: T : 1048576 mult tHRTIM (7.3 ms)" Value="HRTIM_CALIBRATIONRATE_7300"/> 
@@ -675,7 +683,7 @@
 </RefParameter>
 
 
-<RefParameter Comment="Timeout (in ms)" DefaultValue="0" Max="4294967295" Min="0" Name="Timeout" Type="integer" TabName="High Resolution" Group="Polling">
+<RefParameter Comment="Timeout (in ms)" DefaultValue="10" Max="4294967295" Min="0" Name="Timeout" Type="integer" TabName="High Resolution" Group="Polling">
         <Condition Diagnostic="" Expression="(Semaphore_HRTIMER_DLLSimpleCalibration$IpInstance)"/>
 </RefParameter>
 
@@ -3359,7 +3367,7 @@
  </RefParameter>
 
 
- <RefParameter Comment="Prescaler Ratio" DefaultValue="HRTIM_PRESCALERRATIO_DIV1" Name="PrescalerRatio_TA" Type="list"  Group="Time Base Setting">
+ <RefParameter Comment="Prescaler Ratio" DefaultValue="HRTIM_PRESCALERRATIO_MUL32" Name="PrescalerRatio_TA" Type="list"  Group="Time Base Setting">
         <PossibleValue Comment="Multiply by 32 - fHRCK: 4.608 GHz for fHRTIM=144MHz" Value="HRTIM_PRESCALERRATIO_MUL32" Semaphore="Semaphore_TA_PSCK0$IpInstance" Condition="!(Semaphore_HRTIMER_DLLSimpleCalibration$IpInstance | Semaphore_HRTIMER_DLLITCalibration$IpInstance)" Diagnostic="High Resolution must be set" Action="Disable"/>
         <PossibleValue Comment="Multiply by 16 - fHRCK: 2.304 GHz for fHRTIM=144MHz" Value="HRTIM_PRESCALERRATIO_MUL16" Semaphore="Semaphore_TA_PSCK1$IpInstance" Condition="!(Semaphore_HRTIMER_DLLSimpleCalibration$IpInstance | Semaphore_HRTIMER_DLLITCalibration$IpInstance)" Diagnostic="High Resolution must be set" Action="Disable"/>
         <PossibleValue Comment="Multiply by 8 - fHRCK: 1.152 GHz for fHRTIM=144MHz" Value="HRTIM_PRESCALERRATIO_MUL8" Semaphore="Semaphore_TA_PSCK2$IpInstance" Condition="!(Semaphore_HRTIMER_DLLSimpleCalibration$IpInstance | Semaphore_HRTIMER_DLLITCalibration$IpInstance)" Diagnostic="High Resolution must be set" Action="Disable"/>
@@ -3370,7 +3378,7 @@
         <PossibleValue Comment="Divide by 4 - fHRCK: 36 MHz for fHRTIM=144MHz" Value="HRTIM_PRESCALERRATIO_DIV4" Semaphore="Semaphore_TA_PSCK7$IpInstance"/>
  </RefParameter>
  
-<RefParameter Comment="Prescaler Ratio" DefaultValue="HRTIM_PRESCALERRATIO_DIV1" Name="PrescalerRatio_TB" Type="list"   Group="Time Base Setting">
+<RefParameter Comment="Prescaler Ratio" DefaultValue="HRTIM_PRESCALERRATIO_MUL32" Name="PrescalerRatio_TB" Type="list"   Group="Time Base Setting">
         <PossibleValue Comment="Multiply by 32 - fHRCK: 4.608 GHz for fHRTIM=144MHz" Value="HRTIM_PRESCALERRATIO_MUL32" Semaphore="Semaphore_TB_PSCK0$IpInstance" Condition="!(Semaphore_HRTIMER_DLLSimpleCalibration$IpInstance | Semaphore_HRTIMER_DLLITCalibration$IpInstance)" Diagnostic="High Resolution must be set" Action="Disable"/>
         <PossibleValue Comment="Multiply by 16 - fHRCK: 2.304 GHz for fHRTIM=144MHz" Value="HRTIM_PRESCALERRATIO_MUL16" Semaphore="Semaphore_TB_PSCK1$IpInstance" Condition="!(Semaphore_HRTIMER_DLLSimpleCalibration$IpInstance | Semaphore_HRTIMER_DLLITCalibration$IpInstance)" Diagnostic="High Resolution must be set" Action="Disable"/>
         <PossibleValue Comment="Multiply by 8 - fHRCK: 1.152 GHz for fHRTIM=144MHz" Value="HRTIM_PRESCALERRATIO_MUL8" Semaphore="Semaphore_TB_PSCK2$IpInstance" Condition="!(Semaphore_HRTIMER_DLLSimpleCalibration$IpInstance | Semaphore_HRTIMER_DLLITCalibration$IpInstance)" Diagnostic="High Resolution must be set" Action="Disable"/>
@@ -3380,7 +3388,7 @@
         <PossibleValue Comment="Divide by 2 - fHRCK: 72 MHz for fHRTIM=144MHz" Value="HRTIM_PRESCALERRATIO_DIV2" Semaphore="Semaphore_TB_PSCK6$IpInstance"/>
         <PossibleValue Comment="Divide by 4 - fHRCK: 36 MHz for fHRTIM=144MHz" Value="HRTIM_PRESCALERRATIO_DIV4" Semaphore="Semaphore_TB_PSCK7$IpInstance"/>
  </RefParameter>
- <RefParameter Comment="Prescaler Ratio" DefaultValue="HRTIM_PRESCALERRATIO_DIV1" Name="PrescalerRatio_TC" Type="list"   Group="Time Base Setting">
+ <RefParameter Comment="Prescaler Ratio" DefaultValue="HRTIM_PRESCALERRATIO_MUL32" Name="PrescalerRatio_TC" Type="list"   Group="Time Base Setting">
         <PossibleValue Comment="Multiply by 32 - fHRCK: 4.608 GHz for fHRTIM=144MHz" Value="HRTIM_PRESCALERRATIO_MUL32" Semaphore="Semaphore_TC_PSCK0$IpInstance" Condition="!(Semaphore_HRTIMER_DLLSimpleCalibration$IpInstance | Semaphore_HRTIMER_DLLITCalibration$IpInstance)" Diagnostic="High Resolution must be set" Action="Disable"/>
         <PossibleValue Comment="Multiply by 16 - fHRCK: 2.304 GHz for fHRTIM=144MHz" Value="HRTIM_PRESCALERRATIO_MUL16" Semaphore="Semaphore_TC_PSCK1$IpInstance" Condition="!(Semaphore_HRTIMER_DLLSimpleCalibration$IpInstance | Semaphore_HRTIMER_DLLITCalibration$IpInstance)" Diagnostic="High Resolution must be set" Action="Disable"/>
         <PossibleValue Comment="Multiply by 8 - fHRCK: 1.152 GHz for fHRTIM=144MHz" Value="HRTIM_PRESCALERRATIO_MUL8" Semaphore="Semaphore_TC_PSCK2$IpInstance" Condition="!(Semaphore_HRTIMER_DLLSimpleCalibration$IpInstance | Semaphore_HRTIMER_DLLITCalibration$IpInstance)" Diagnostic="High Resolution must be set" Action="Disable"/>
@@ -3391,7 +3399,7 @@
         <PossibleValue Comment="Divide by 4 - fHRCK: 36 MHz for fHRTIM=144MHz" Value="HRTIM_PRESCALERRATIO_DIV4" Semaphore="Semaphore_TC_PSCK7$IpInstance"/>
  </RefParameter>
  
-<RefParameter Comment="Prescaler Ratio" DefaultValue="HRTIM_PRESCALERRATIO_DIV1" Name="PrescalerRatio_TD" Type="list"   Group="Time Base Setting">
+<RefParameter Comment="Prescaler Ratio" DefaultValue="HRTIM_PRESCALERRATIO_MUL32" Name="PrescalerRatio_TD" Type="list"   Group="Time Base Setting">
         <PossibleValue Comment="Multiply by 32 - fHRCK: 4.608 GHz for fHRTIM=144MHz" Value="HRTIM_PRESCALERRATIO_MUL32" Semaphore="Semaphore_TD_PSCK0$IpInstance" Condition="!(Semaphore_HRTIMER_DLLSimpleCalibration$IpInstance | Semaphore_HRTIMER_DLLITCalibration$IpInstance)" Diagnostic="High Resolution must be set" Action="Disable"/>
         <PossibleValue Comment="Multiply by 16 - fHRCK: 2.304 GHz for fHRTIM=144MHz" Value="HRTIM_PRESCALERRATIO_MUL16" Semaphore="Semaphore_TD_PSCK1$IpInstance" Condition="!(Semaphore_HRTIMER_DLLSimpleCalibration$IpInstance | Semaphore_HRTIMER_DLLITCalibration$IpInstance)" Diagnostic="High Resolution must be set" Action="Disable"/>
         <PossibleValue Comment="Multiply by 8 - fHRCK: 1.152 GHz for fHRTIM=144MHz" Value="HRTIM_PRESCALERRATIO_MUL8" Semaphore="Semaphore_TD_PSCK2$IpInstance" Condition="!(Semaphore_HRTIMER_DLLSimpleCalibration$IpInstance | Semaphore_HRTIMER_DLLITCalibration$IpInstance)" Diagnostic="High Resolution must be set" Action="Disable"/>
@@ -3402,7 +3410,7 @@
         <PossibleValue Comment="Divide by 4 - fHRCK: 36 MHz for fHRTIM=144MHz" Value="HRTIM_PRESCALERRATIO_DIV4" Semaphore="Semaphore_TD_PSCK7$IpInstance"/>
  </RefParameter>
  
-<RefParameter Comment="Prescaler Ratio" DefaultValue="HRTIM_PRESCALERRATIO_DIV1" Name="PrescalerRatio_TE" Type="list"   Group="Time Base Setting">
+<RefParameter Comment="Prescaler Ratio" DefaultValue="HRTIM_PRESCALERRATIO_MUL32" Name="PrescalerRatio_TE" Type="list"   Group="Time Base Setting">
         <PossibleValue Comment="Multiply by 32 - fHRCK: 4.608 GHz for fHRTIM=144MHz" Value="HRTIM_PRESCALERRATIO_MUL32" Semaphore="Semaphore_TE_PSCK0$IpInstance" Condition="!(Semaphore_HRTIMER_DLLSimpleCalibration$IpInstance | Semaphore_HRTIMER_DLLITCalibration$IpInstance)" Diagnostic="High Resolution must be set" Action="Disable"/>
         <PossibleValue Comment="Multiply by 16 - fHRCK: 2.304 GHz for fHRTIM=144MHz" Value="HRTIM_PRESCALERRATIO_MUL16" Semaphore="Semaphore_TE_PSCK1$IpInstance" Condition="!(Semaphore_HRTIMER_DLLSimpleCalibration$IpInstance | Semaphore_HRTIMER_DLLITCalibration$IpInstance)" Diagnostic="High Resolution must be set" Action="Disable"/>
         <PossibleValue Comment="Multiply by 8 - fHRCK: 1.152 GHz for fHRTIM=144MHz" Value="HRTIM_PRESCALERRATIO_MUL8" Semaphore="Semaphore_TE_PSCK2$IpInstance" Condition="!(Semaphore_HRTIMER_DLLSimpleCalibration$IpInstance | Semaphore_HRTIMER_DLLITCalibration$IpInstance)" Diagnostic="High Resolution must be set" Action="Disable"/>
@@ -3413,7 +3421,7 @@
         <PossibleValue Comment="Divide by 4 - fHRCK: 36 MHz for fHRTIM=144MHz" Value="HRTIM_PRESCALERRATIO_DIV4" Semaphore="Semaphore_TE_PSCK7$IpInstance"/>
  </RefParameter>
  
-<RefParameter Comment="Prescaler Ratio" DefaultValue="HRTIM_PRESCALERRATIO_DIV1" Name="PrescalerRatio_MASTER" Type="list"  Group="Time Base Setting">
+<RefParameter Comment="Prescaler Ratio" DefaultValue="HRTIM_PRESCALERRATIO_MUL32" Name="PrescalerRatio_MASTER" Type="list"  Group="Time Base Setting">
         <PossibleValue Comment="Multiply by 32 - fHRCK: 4.608 GHz for fHRTIM=144MHz" Value="HRTIM_PRESCALERRATIO_MUL32" Semaphore="Semaphore_MASTER_PSCK0$IpInstance" Condition="!(Semaphore_HRTIMER_DLLSimpleCalibration$IpInstance | Semaphore_HRTIMER_DLLITCalibration$IpInstance)" Diagnostic="High Resolution must be set" Action="Disable"/>
         <PossibleValue Comment="Multiply by 16 - fHRCK: 2.304 GHz for fHRTIM=144MHz" Value="HRTIM_PRESCALERRATIO_MUL16" Semaphore="Semaphore_MASTER_PSCK1$IpInstance" Condition="!(Semaphore_HRTIMER_DLLSimpleCalibration$IpInstance | Semaphore_HRTIMER_DLLITCalibration$IpInstance)" Diagnostic="High Resolution must be set" Action="Disable"/>
         <PossibleValue Comment="Multiply by 8 - fHRCK: 1.152 GHz for fHRTIM=144MHz" Value="HRTIM_PRESCALERRATIO_MUL8" Semaphore="Semaphore_MASTER_PSCK2$IpInstance" Condition="!(Semaphore_HRTIMER_DLLSimpleCalibration$IpInstance | Semaphore_HRTIMER_DLLITCalibration$IpInstance)" Diagnostic="High Resolution must be set" Action="Disable"/>
@@ -4337,8 +4345,8 @@
 
 
 <RefParameter Comment="Set Source" DefaultValue="HRTIM_OUTPUTSET_NONE" Name="SetSource_TA" Type="list" >
-        <PossibleValue Comment="Reset the output set crossbar " Value="HRTIM_OUTPUTSET_NONE"/>
-        <PossibleValue Comment="Timer reset event coming solely from software or SYNC input forces the output to its active state" Value="HRTIM_OUTPUTSET_RESYNC"/>
+        <PossibleValue Comment="No source is selected" Value="HRTIM_OUTPUTSET_NONE"/>
+        <PossibleValue Comment="Timer counter reset event coming solely from software or SYNC input forces the output to its active state" Value="HRTIM_OUTPUTSET_RESYNC"/>
         <PossibleValue Comment="Timer period event forces the output to its active state " Value="HRTIM_OUTPUTSET_TIMPER"  Condition="!Semaphore_TA_Enable$IpInstance" Diagnostic="Timer  must be configured" Action="Disable"/>    
         <PossibleValue Comment="Timer compare 1 event forces the output to its active state " Value="HRTIM_OUTPUTSET_TIMCMP1"  Condition="!Semaphore_TA_CompareUnit1$IpInstance" Diagnostic="Timer Compare 1 Register must be configured" Action="Disable"/>    
         <PossibleValue Comment="Timer compare 2 event forces the output to its active state " Value="HRTIM_OUTPUTSET_TIMCMP2" Condition="!Semaphore_TA_CompareUnit2$IpInstance" Diagnostic="Timer Compare 2 Register must be configured" Action="Disable"/>    
@@ -4372,8 +4380,8 @@
 </RefParameter>
 
 <RefParameter Comment="Set Source" DefaultValue="HRTIM_OUTPUTSET_NONE" Name="SetSource_TB" Type="list" >
-        <PossibleValue Comment="Reset the output set crossbar " Value="HRTIM_OUTPUTSET_NONE"/>
-        <PossibleValue Comment="Timer reset event coming solely from software or SYNC input forces the output to its active state" Value="HRTIM_OUTPUTSET_RESYNC"/>
+        <PossibleValue Comment="No source is selected" Value="HRTIM_OUTPUTSET_NONE"/>
+        <PossibleValue Comment="Timer counter reset event coming solely from software or SYNC input forces the output to its active state" Value="HRTIM_OUTPUTSET_RESYNC"/>
         <PossibleValue Comment="Timer period event forces the output to its active state " Value="HRTIM_OUTPUTSET_TIMPER"  Condition="!Semaphore_TB_Enable$IpInstance" Diagnostic="Timer  must be configured" Action="Disable"/>    
         <PossibleValue Comment="Timer compare 1 event forces the output to its active state " Value="HRTIM_OUTPUTSET_TIMCMP1"  Condition="!Semaphore_TB_CompareUnit1$IpInstance" Diagnostic="Timer Compare 1 Register must be configured" Action="Disable"/>    
         <PossibleValue Comment="Timer compare 2 event forces the output to its active state " Value="HRTIM_OUTPUTSET_TIMCMP2" Condition="!Semaphore_TB_CompareUnit2$IpInstance" Diagnostic="Timer Compare 2 Register must be configured" Action="Disable"/>    
@@ -4407,8 +4415,8 @@
 </RefParameter>
 
 <RefParameter Comment="Set Source" DefaultValue="HRTIM_OUTPUTSET_NONE" Name="SetSource_TC" Type="list" >
-        <PossibleValue Comment="Reset the output set crossbar " Value="HRTIM_OUTPUTSET_NONE"/>
-        <PossibleValue Comment="Timer reset event coming solely from software or SYNC input forces the output to its active state" Value="HRTIM_OUTPUTSET_RESYNC"/>
+        <PossibleValue Comment="No source is selected" Value="HRTIM_OUTPUTSET_NONE"/>
+        <PossibleValue Comment="Timer counter reset event coming solely from software or SYNC input forces the output to its active state" Value="HRTIM_OUTPUTSET_RESYNC"/>
         <PossibleValue Comment="Timer period event forces the output to its active state " Value="HRTIM_OUTPUTSET_TIMPER"  Condition="!Semaphore_TC_Enable$IpInstance" Diagnostic="Timer  must be configured" Action="Disable"/>    
         <PossibleValue Comment="Timer compare 1 event forces the output to its active state " Value="HRTIM_OUTPUTSET_TIMCMP1"  Condition="!Semaphore_TC_CompareUnit1$IpInstance" Diagnostic="Timer Compare 1 Register must be configured" Action="Disable"/>    
         <PossibleValue Comment="Timer compare 2 event forces the output to its active state " Value="HRTIM_OUTPUTSET_TIMCMP2" Condition="!Semaphore_TC_CompareUnit2$IpInstance" Diagnostic="Timer Compare 2 Register must be configured" Action="Disable"/>    
@@ -4442,8 +4450,8 @@
 </RefParameter>
 
 <RefParameter Comment="Set Source" DefaultValue="HRTIM_OUTPUTSET_NONE" Name="SetSource_TD" Type="list" >
-        <PossibleValue Comment="Reset the output set crossbar " Value="HRTIM_OUTPUTSET_NONE"/>
-        <PossibleValue Comment="Timer reset event coming solely from software or SYNC input forces the output to its active state" Value="HRTIM_OUTPUTSET_RESYNC"/>
+        <PossibleValue Comment="No source is selected" Value="HRTIM_OUTPUTSET_NONE"/>
+        <PossibleValue Comment="Timer counter reset event coming solely from software or SYNC input forces the output to its active state" Value="HRTIM_OUTPUTSET_RESYNC"/>
         <PossibleValue Comment="Timer period event forces the output to its active state " Value="HRTIM_OUTPUTSET_TIMPER"  Condition="!Semaphore_TD_Enable$IpInstance" Diagnostic="Timer  must be configured" Action="Disable"/>    
         <PossibleValue Comment="Timer compare 1 event forces the output to its active state " Value="HRTIM_OUTPUTSET_TIMCMP1"  Condition="!Semaphore_TD_CompareUnit1$IpInstance" Diagnostic="Timer Compare 1 Register must be configured" Action="Disable"/>    
         <PossibleValue Comment="Timer compare 2 event forces the output to its active state " Value="HRTIM_OUTPUTSET_TIMCMP2" Condition="!Semaphore_TD_CompareUnit2$IpInstance" Diagnostic="Timer Compare 2 Register must be configured" Action="Disable"/>    
@@ -4477,8 +4485,8 @@
 </RefParameter>
 
 <RefParameter Comment="Set Source" DefaultValue="HRTIM_OUTPUTSET_NONE" Name="SetSource_TE" Type="list" >
-        <PossibleValue Comment="Reset the output set crossbar " Value="HRTIM_OUTPUTSET_NONE"/>
-        <PossibleValue Comment="Timer reset event coming solely from software or SYNC input forces the output to its active state" Value="HRTIM_OUTPUTSET_RESYNC"/>
+        <PossibleValue Comment="No source is selected" Value="HRTIM_OUTPUTSET_NONE"/>
+        <PossibleValue Comment="Timer counter reset event coming solely from software or SYNC input forces the output to its active state" Value="HRTIM_OUTPUTSET_RESYNC"/>
         <PossibleValue Comment="Timer period event forces the output to its active state " Value="HRTIM_OUTPUTSET_TIMPER"  Condition="!Semaphore_TE_Enable$IpInstance" Diagnostic="Timer  must be configured" Action="Disable"/>    
         <PossibleValue Comment="Timer compare 1 event forces the output to its active state " Value="HRTIM_OUTPUTSET_TIMCMP1"  Condition="!Semaphore_TE_CompareUnit1$IpInstance" Diagnostic="Timer Compare 1 Register must be configured" Action="Disable"/>    
         <PossibleValue Comment="Timer compare 2 event forces the output to its active state " Value="HRTIM_OUTPUTSET_TIMCMP2" Condition="!Semaphore_TE_CompareUnit2$IpInstance" Diagnostic="Timer Compare 2 Register must be configured" Action="Disable"/>    
@@ -4527,7 +4535,7 @@
 </RefParameter>
 <RefParameter Comment="Set Source" DefaultValue="HRTIM_OUTPUTSET_NONE"  Type="list"  Name="ORingSetOutput2_TA"  Group="Output 2 Configuration" Visible="false">
              <Condition Diagnostic="" Expression="!(NumberSetSource2_TA &gt; 0)"/> 
- <PossibleValue Comment="Reset the output reset crossbar " Value="HRTIM_OUTPUTSET_NONE"/>
+ <PossibleValue Comment="No source is selected" Value="HRTIM_OUTPUTSET_NONE"/>
 </RefParameter>
 
 <RefParameter Comment="Set Source" DefaultValue="/-SetOutput2_Source1+|SetOutput2_Source2+|SetOutput2_Source3+|SetOutput2_Source4+|SetOutput2_Source5+|SetOutput2_Source6+|SetOutput2_Source7+|SetOutput2_Source8+|SetOutput2_Source9+|SetOutput2_Source10+|SetOutput2_Source11+|SetOutput2_Source12+|SetOutput2_Source13+|SetOutput2_Source14+|SetOutput2_Source15+|SetOutput2_Source16+|SetOutput2_Source17+|SetOutput2_Source18+|SetOutput2_Source19+|SetOutput2_Source20+|SetOutput2_Source21+|SetOutput2_Source22+|SetOutput2_Source23+|SetOutput2_Source24+|SetOutput2_Source25+|SetOutput2_Source26+|SetOutput2_Source27+|SetOutput2_Source28+|SetOutput2_Source29+|SetOutput2_Source30+|SetOutput2_Source31+|SetOutput2_Source32/\|HRTIM_OUTPUTSET_NONE//HRTIM_OUTPUTSET_NONE\|/"  Type="list"  Name="ORingSetOutput2_TB"  Visible="false">
@@ -4535,7 +4543,7 @@
 </RefParameter>
 <RefParameter Comment="Set Source" DefaultValue="HRTIM_OUTPUTSET_NONE"  Type="list"  Name="ORingSetOutput2_TB"  Group="Output 2 Configuration" Visible="false">
              <Condition Diagnostic="" Expression="!(NumberSetSource2_TB &gt; 0)"/> 
- <PossibleValue Comment="Reset the output reset crossbar " Value="HRTIM_OUTPUTSET_NONE"/>
+ <PossibleValue Comment="No source is selected" Value="HRTIM_OUTPUTSET_NONE"/>
 </RefParameter>
 
 <RefParameter Comment="Set Source" DefaultValue="/-SetOutput2_Source1+|SetOutput2_Source2+|SetOutput2_Source3+|SetOutput2_Source4+|SetOutput2_Source5+|SetOutput2_Source6+|SetOutput2_Source7+|SetOutput2_Source8+|SetOutput2_Source9+|SetOutput2_Source10+|SetOutput2_Source11+|SetOutput2_Source12+|SetOutput2_Source13+|SetOutput2_Source14+|SetOutput2_Source15+|SetOutput2_Source16+|SetOutput2_Source17+|SetOutput2_Source18+|SetOutput2_Source19+|SetOutput2_Source20+|SetOutput2_Source21+|SetOutput2_Source22+|SetOutput2_Source23+|SetOutput2_Source24+|SetOutput2_Source25+|SetOutput2_Source26+|SetOutput2_Source27+|SetOutput2_Source28+|SetOutput2_Source29+|SetOutput2_Source30+|SetOutput2_Source31+|SetOutput2_Source32/\|HRTIM_OUTPUTSET_NONE//HRTIM_OUTPUTSET_NONE\|/"  Type="list"  Name="ORingSetOutput2_TC"  Visible="false">
@@ -4543,7 +4551,7 @@
 </RefParameter>
 <RefParameter Comment="Set Source" DefaultValue="HRTIM_OUTPUTSET_NONE"  Type="list"  Name="ORingSetOutput2_TC"  Group="Output 2 Configuration" Visible="false">
              <Condition Diagnostic="" Expression="!(NumberSetSource2_TC &gt; 0)"/> 
- <PossibleValue Comment="Reset the output reset crossbar " Value="HRTIM_OUTPUTSET_NONE"/>
+ <PossibleValue Comment="No source is selected" Value="HRTIM_OUTPUTSET_NONE"/>
 </RefParameter>
 
 <RefParameter Comment="Set Source" DefaultValue="/-SetOutput2_Source1+|SetOutput2_Source2+|SetOutput2_Source3+|SetOutput2_Source4+|SetOutput2_Source5+|SetOutput2_Source6+|SetOutput2_Source7+|SetOutput2_Source8+|SetOutput2_Source9+|SetOutput2_Source10+|SetOutput2_Source11+|SetOutput2_Source12+|SetOutput2_Source13+|SetOutput2_Source14+|SetOutput2_Source15+|SetOutput2_Source16+|SetOutput2_Source17+|SetOutput2_Source18+|SetOutput2_Source19+|SetOutput2_Source20+|SetOutput2_Source21+|SetOutput2_Source22+|SetOutput2_Source23+|SetOutput2_Source24+|SetOutput2_Source25+|SetOutput2_Source26+|SetOutput2_Source27+|SetOutput2_Source28+|SetOutput2_Source29+|SetOutput2_Source30+|SetOutput2_Source31+|SetOutput2_Source32/\|HRTIM_OUTPUTSET_NONE//HRTIM_OUTPUTSET_NONE\|/"  Type="list"  Name="ORingSetOutput2_TD"  Visible="false">
@@ -4551,7 +4559,7 @@
 </RefParameter>
 <RefParameter Comment="Set Source" DefaultValue="HRTIM_OUTPUTSET_NONE"  Type="list"  Name="ORingSetOutput2_TD"  Group="Output 2 Configuration" Visible="false">
              <Condition Diagnostic="" Expression="!(NumberSetSource2_TD &gt; 0)"/> 
- <PossibleValue Comment="Reset the output reset crossbar " Value="HRTIM_OUTPUTSET_NONE"/>
+ <PossibleValue Comment="No source is selected" Value="HRTIM_OUTPUTSET_NONE"/>
 </RefParameter>
 
 <RefParameter Comment="Set Source" DefaultValue="/-SetOutput2_Source1+|SetOutput2_Source2+|SetOutput2_Source3+|SetOutput2_Source4+|SetOutput2_Source5+|SetOutput2_Source6+|SetOutput2_Source7+|SetOutput2_Source8+|SetOutput2_Source9+|SetOutput2_Source10+|SetOutput2_Source11+|SetOutput2_Source12+|SetOutput2_Source13+|SetOutput2_Source14+|SetOutput2_Source15+|SetOutput2_Source16+|SetOutput2_Source17+|SetOutput2_Source18+|SetOutput2_Source19+|SetOutput2_Source20+|SetOutput2_Source21+|SetOutput2_Source22+|SetOutput2_Source23+|SetOutput2_Source24+|SetOutput2_Source25+|SetOutput2_Source26+|SetOutput2_Source27+|SetOutput2_Source28+|SetOutput2_Source29+|SetOutput2_Source30+|SetOutput2_Source31+|SetOutput2_Source32/\|HRTIM_OUTPUTSET_NONE//HRTIM_OUTPUTSET_NONE\|/"  Type="list"  Name="ORingSetOutput2_TE"  Visible="false">
@@ -4559,7 +4567,7 @@
 </RefParameter>
 <RefParameter Comment="Set Source" DefaultValue="HRTIM_OUTPUTSET_NONE"  Type="list"  Name="ORingSetOutput2_TE"  Group="Output 2 Configuration" Visible="false">
              <Condition Diagnostic="" Expression="!(NumberSetSource2_TE &gt; 0)"/> 
- <PossibleValue Comment="Reset the output reset crossbar " Value="HRTIM_OUTPUTSET_NONE"/>
+ <PossibleValue Comment="No source is selected" Value="HRTIM_OUTPUTSET_NONE"/>
 </RefParameter>
 
 
@@ -4611,8 +4619,8 @@
 
 
 <RefParameter Comment="Reset Source" DefaultValue="HRTIM_OUTPUTRESET_NONE" Name="ResetSource" Type="list">
-        <PossibleValue Comment="Reset the output reset crossbar " Value="HRTIM_OUTPUTRESET_NONE"/>
-        <PossibleValue Comment="Timer reset event coming solely from software or SYNC input forces the output to its inactive state " Value="HRTIM_OUTPUTRESET_RESYNC"/>
+        <PossibleValue Comment="No source is selected" Value="HRTIM_OUTPUTRESET_NONE"/>
+        <PossibleValue Comment="Timer counter reset event coming solely from software or SYNC input forces the output to its inactive state " Value="HRTIM_OUTPUTRESET_RESYNC"/>
         <PossibleValue Comment="Timer period event forces the output to its inactive state " Value="HRTIM_OUTPUTRESET_TIMPER"/>
         <PossibleValue Comment="Timer compare 1 event forces the output to its inactive state " Value="HRTIM_OUTPUTRESET_TIMCMP1"/>
         <PossibleValue Comment="Timer compare 2 event forces the output to its inactive state " Value="HRTIM_OUTPUTRESET_TIMCMP2"/>
@@ -4650,8 +4658,8 @@
 <!--RESETSOURCE-->
 
 <RefParameter Comment="Reset Source" DefaultValue="HRTIM_OUTPUTRESET_NONE" Name="ResetSource_TA" Type="list">
-        <PossibleValue Comment="Reset the output set crossbar " Value="HRTIM_OUTPUTRESET_NONE"/>
-        <PossibleValue Comment="Timer reset event coming solely from software or SYNC input forces the output to its inactive state" Value="HRTIM_OUTPUTRESET_RESYNC"/>
+        <PossibleValue Comment="No source is selected" Value="HRTIM_OUTPUTRESET_NONE"/>
+        <PossibleValue Comment="Timer counter reset event coming solely from software or SYNC input forces the output to its inactive state" Value="HRTIM_OUTPUTRESET_RESYNC"/>
         <PossibleValue Comment="Timer period event forces the output to its inactive state " Value="HRTIM_OUTPUTRESET_TIMPER"  Condition="!Semaphore_TA_Enable$IpInstance" Diagnostic="Timer  must be configured" Action="Disable"/>    
         <PossibleValue Comment="Timer compare 1 event forces the output to its inactive state " Value="HRTIM_OUTPUTRESET_TIMCMP1"  Condition="!Semaphore_TA_CompareUnit1$IpInstance" Diagnostic="Timer Compare 1 Register must be configured" Action="Disable"/>    
         <PossibleValue Comment="Timer compare 2 event forces the output to its inactive state " Value="HRTIM_OUTPUTRESET_TIMCMP2" Condition="!Semaphore_TA_CompareUnit2$IpInstance" Diagnostic="Timer Compare 2 Register must be configured" Action="Disable"/>    
@@ -4685,8 +4693,8 @@
 </RefParameter>
 
 <RefParameter Comment="Reset Source" DefaultValue="HRTIM_OUTPUTRESET_NONE" Name="ResetSource_TB" Type="list">
-        <PossibleValue Comment="Reset the output set crossbar " Value="HRTIM_OUTPUTRESET_NONE"/>
-        <PossibleValue Comment="Timer reset event coming solely from software or SYNC input forces the output to its inactive state" Value="HRTIM_OUTPUTRESET_RESYNC"/>
+        <PossibleValue Comment="No source is selected" Value="HRTIM_OUTPUTRESET_NONE"/>
+        <PossibleValue Comment="Timer counter reset event coming solely from software or SYNC input forces the output to its inactive state" Value="HRTIM_OUTPUTRESET_RESYNC"/>
         <PossibleValue Comment="Timer period event forces the output to its inactive state " Value="HRTIM_OUTPUTRESET_TIMPER"  Condition="!Semaphore_TB_Enable$IpInstance" Diagnostic="Timer  must be configured" Action="Disable"/>    
         <PossibleValue Comment="Timer compare 1 event forces the output to its inactive state " Value="HRTIM_OUTPUTRESET_TIMCMP1"  Condition="!Semaphore_TB_CompareUnit1$IpInstance" Diagnostic="Timer Compare 1 Register must be configured" Action="Disable"/>    
         <PossibleValue Comment="Timer compare 2 event forces the output to its inactive state " Value="HRTIM_OUTPUTRESET_TIMCMP2" Condition="!Semaphore_TB_CompareUnit2$IpInstance" Diagnostic="Timer Compare 2 Register must be configured" Action="Disable"/>    
@@ -4720,8 +4728,8 @@
 </RefParameter>
 
 <RefParameter Comment="Reset Source" DefaultValue="HRTIM_OUTPUTRESET_NONE" Name="ResetSource_TC" Type="list">
-        <PossibleValue Comment="Reset the output set crossbar " Value="HRTIM_OUTPUTRESET_NONE"/>
-        <PossibleValue Comment="Timer reset event coming solely from software or SYNC input forces the output to its inactive state" Value="HRTIM_OUTPUTRESET_RESYNC"/>
+        <PossibleValue Comment="No source is selected" Value="HRTIM_OUTPUTRESET_NONE"/>
+        <PossibleValue Comment="Timer counter reset event coming solely from software or SYNC input forces the output to its inactive state" Value="HRTIM_OUTPUTRESET_RESYNC"/>
         <PossibleValue Comment="Timer period event forces the output to its inactive state " Value="HRTIM_OUTPUTRESET_TIMPER"  Condition="!Semaphore_TC_Enable$IpInstance" Diagnostic="Timer  must be configured" Action="Disable"/>    
         <PossibleValue Comment="Timer compare 1 event forces the output to its inactive state " Value="HRTIM_OUTPUTRESET_TIMCMP1"  Condition="!Semaphore_TC_CompareUnit1$IpInstance" Diagnostic="Timer Compare 1 Register must be configured" Action="Disable"/>    
         <PossibleValue Comment="Timer compare 2 event forces the output to its inactive state " Value="HRTIM_OUTPUTRESET_TIMCMP2" Condition="!Semaphore_TC_CompareUnit2$IpInstance" Diagnostic="Timer Compare 2 Register must be configured" Action="Disable"/>    
@@ -4755,8 +4763,8 @@
 </RefParameter>
 
 <RefParameter Comment="Reset Source" DefaultValue="HRTIM_OUTPUTRESET_NONE" Name="ResetSource_TD" Type="list">
-        <PossibleValue Comment="Reset the output set crossbar " Value="HRTIM_OUTPUTRESET_NONE"/>
-        <PossibleValue Comment="Timer reset event coming solely from software or SYNC input forces the output to its inactive state" Value="HRTIM_OUTPUTRESET_RESYNC"/>
+        <PossibleValue Comment="No source is selected" Value="HRTIM_OUTPUTRESET_NONE"/>
+        <PossibleValue Comment="Timer counter reset event coming solely from software or SYNC input forces the output to its inactive state" Value="HRTIM_OUTPUTRESET_RESYNC"/>
         <PossibleValue Comment="Timer period event forces the output to its inactive state " Value="HRTIM_OUTPUTRESET_TIMPER"  Condition="!Semaphore_TD_Enable$IpInstance" Diagnostic="Timer  must be configured" Action="Disable"/>    
         <PossibleValue Comment="Timer compare 1 event forces the output to its inactive state " Value="HRTIM_OUTPUTRESET_TIMCMP1"  Condition="!Semaphore_TD_CompareUnit1$IpInstance" Diagnostic="Timer Compare 1 Register must be configured" Action="Disable"/>    
         <PossibleValue Comment="Timer compare 2 event forces the output to its inactive state " Value="HRTIM_OUTPUTRESET_TIMCMP2" Condition="!Semaphore_TD_CompareUnit2$IpInstance" Diagnostic="Timer Compare 2 Register must be configured" Action="Disable"/>    
@@ -4790,8 +4798,8 @@
 </RefParameter>
 
 <RefParameter Comment="Reset Source" DefaultValue="HRTIM_OUTPUTRESET_NONE" Name="ResetSource_TE" Type="list">
-        <PossibleValue Comment="Reset the output set crossbar " Value="HRTIM_OUTPUTRESET_NONE"/>
-        <PossibleValue Comment="Timer reset event coming solely from software or SYNC input forces the output to its inactive state" Value="HRTIM_OUTPUTRESET_RESYNC"/>
+        <PossibleValue Comment="No source is selected" Value="HRTIM_OUTPUTRESET_NONE"/>
+        <PossibleValue Comment="Timer counter reset event coming solely from software or SYNC input forces the output to its inactive state" Value="HRTIM_OUTPUTRESET_RESYNC"/>
         <PossibleValue Comment="Timer period event forces the output to its inactive state " Value="HRTIM_OUTPUTRESET_TIMPER"  Condition="!Semaphore_TE_Enable$IpInstance" Diagnostic="Timer  must be configured" Action="Disable"/>    
         <PossibleValue Comment="Timer compare 1 event forces the output to its inactive state " Value="HRTIM_OUTPUTRESET_TIMCMP1"  Condition="!Semaphore_TE_CompareUnit1$IpInstance" Diagnostic="Timer Compare 1 Register must be configured" Action="Disable"/>    
         <PossibleValue Comment="Timer compare 2 event forces the output to its inactive state " Value="HRTIM_OUTPUTRESET_TIMCMP2" Condition="!Semaphore_TE_CompareUnit2$IpInstance" Diagnostic="Timer Compare 2 Register must be configured" Action="Disable"/>    
@@ -4839,7 +4847,7 @@
 </RefParameter>
 <RefParameter Comment="Reset Source" DefaultValue="HRTIM_OUTPUTRESET_NONE"  Type="list"  Name="ORingResetOutput2_TA"  Group="Output 2 Configuration" Visible="false">
              <Condition Diagnostic="" Expression="!(NumberResetSource2_TA &gt; 0)"/> 
- <PossibleValue Comment="Reset the output reset crossbar " Value="HRTIM_OUTPUTRESET_NONE"/>
+ <PossibleValue Comment="No source is selected" Value="HRTIM_OUTPUTRESET_NONE"/>
 </RefParameter>
 
 <RefParameter Comment="Reset Source" DefaultValue="/-ResetOutput2_Source1+|ResetOutput2_Source2+|ResetOutput2_Source3+|ResetOutput2_Source4+|ResetOutput2_Source5+|ResetOutput2_Source6+|ResetOutput2_Source7+|ResetOutput2_Source8+|ResetOutput2_Source9+|ResetOutput2_Source10+|ResetOutput2_Source11+|ResetOutput2_Source12+|ResetOutput2_Source13+|ResetOutput2_Source14+|ResetOutput2_Source15+|ResetOutput2_Source16+|ResetOutput2_Source17+|ResetOutput2_Source18+|ResetOutput2_Source19+|ResetOutput2_Source20+|ResetOutput2_Source21+|ResetOutput2_Source22+|ResetOutput2_Source23+|ResetOutput2_Source24+|ResetOutput2_Source25+|ResetOutput2_Source26+|ResetOutput2_Source27+|ResetOutput2_Source28+|ResetOutput2_Source29+|ResetOutput2_Source30+|ResetOutput2_Source31+|ResetOutput2_Source32/\|HRTIM_OUTPUTRESET_NONE//HRTIM_OUTPUTRESET_NONE\|/"  Type="list"  Name="ORingResetOutput2_TB"  Visible="false">
@@ -4847,7 +4855,7 @@
 </RefParameter>
 <RefParameter Comment="Reset Source" DefaultValue="HRTIM_OUTPUTRESET_NONE"  Type="list"  Name="ORingResetOutput2_TB"  Group="Output 2 Configuration" Visible="false">
              <Condition Diagnostic="" Expression="!(NumberResetSource2_TB &gt; 0)"/> 
- <PossibleValue Comment="Reset the output reset crossbar " Value="HRTIM_OUTPUTRESET_NONE"/>
+ <PossibleValue Comment="No source is selected" Value="HRTIM_OUTPUTRESET_NONE"/>
 </RefParameter>
 
 <RefParameter Comment="Reset Source" DefaultValue="/-ResetOutput2_Source1+|ResetOutput2_Source2+|ResetOutput2_Source3+|ResetOutput2_Source4+|ResetOutput2_Source5+|ResetOutput2_Source6+|ResetOutput2_Source7+|ResetOutput2_Source8+|ResetOutput2_Source9+|ResetOutput2_Source10+|ResetOutput2_Source11+|ResetOutput2_Source12+|ResetOutput2_Source13+|ResetOutput2_Source14+|ResetOutput2_Source15+|ResetOutput2_Source16+|ResetOutput2_Source17+|ResetOutput2_Source18+|ResetOutput2_Source19+|ResetOutput2_Source20+|ResetOutput2_Source21+|ResetOutput2_Source22+|ResetOutput2_Source23+|ResetOutput2_Source24+|ResetOutput2_Source25+|ResetOutput2_Source26+|ResetOutput2_Source27+|ResetOutput2_Source28+|ResetOutput2_Source29+|ResetOutput2_Source30+|ResetOutput2_Source31+|ResetOutput2_Source32/\|HRTIM_OUTPUTRESET_NONE//HRTIM_OUTPUTRESET_NONE\|/"  Type="list"  Name="ORingResetOutput2_TC"  Visible="false">
@@ -4855,7 +4863,7 @@
 </RefParameter>
 <RefParameter Comment="Reset Source" DefaultValue="HRTIM_OUTPUTRESET_NONE"  Type="list"  Name="ORingResetOutput2_TC"  Group="Output 2 Configuration" Visible="false">
              <Condition Diagnostic="" Expression="!(NumberResetSource2_TC &gt; 0)"/> 
- <PossibleValue Comment="Reset the output reset crossbar " Value="HRTIM_OUTPUTRESET_NONE"/>
+ <PossibleValue Comment="No source is selected" Value="HRTIM_OUTPUTRESET_NONE"/>
 </RefParameter>
 
 <RefParameter Comment="Reset Source" DefaultValue="/-ResetOutput2_Source1+|ResetOutput2_Source2+|ResetOutput2_Source3+|ResetOutput2_Source4+|ResetOutput2_Source5+|ResetOutput2_Source6+|ResetOutput2_Source7+|ResetOutput2_Source8+|ResetOutput2_Source9+|ResetOutput2_Source10+|ResetOutput2_Source11+|ResetOutput2_Source12+|ResetOutput2_Source13+|ResetOutput2_Source14+|ResetOutput2_Source15+|ResetOutput2_Source16+|ResetOutput2_Source17+|ResetOutput2_Source18+|ResetOutput2_Source19+|ResetOutput2_Source20+|ResetOutput2_Source21+|ResetOutput2_Source22+|ResetOutput2_Source23+|ResetOutput2_Source24+|ResetOutput2_Source25+|ResetOutput2_Source26+|ResetOutput2_Source27+|ResetOutput2_Source28+|ResetOutput2_Source29+|ResetOutput2_Source30+|ResetOutput2_Source31+|ResetOutput2_Source32/\|HRTIM_OUTPUTRESET_NONE//HRTIM_OUTPUTRESET_NONE\|/"  Type="list"  Name="ORingResetOutput2_TD"  Visible="false">
@@ -4863,7 +4871,7 @@
 </RefParameter>
 <RefParameter Comment="Reset Source" DefaultValue="HRTIM_OUTPUTRESET_NONE"  Type="list"  Name="ORingResetOutput2_TD"  Group="Output 2 Configuration" Visible="false">
              <Condition Diagnostic="" Expression="!(NumberResetSource2_TD &gt; 0)"/> 
- <PossibleValue Comment="Reset the output reset crossbar " Value="HRTIM_OUTPUTRESET_NONE"/>
+ <PossibleValue Comment="No source is selected" Value="HRTIM_OUTPUTRESET_NONE"/>
 </RefParameter>
 
 <RefParameter Comment="Reset Source" DefaultValue="/-ResetOutput2_Source1+|ResetOutput2_Source2+|ResetOutput2_Source3+|ResetOutput2_Source4+|ResetOutput2_Source5+|ResetOutput2_Source6+|ResetOutput2_Source7+|ResetOutput2_Source8+|ResetOutput2_Source9+|ResetOutput2_Source10+|ResetOutput2_Source11+|ResetOutput2_Source12+|ResetOutput2_Source13+|ResetOutput2_Source14+|ResetOutput2_Source15+|ResetOutput2_Source16+|ResetOutput2_Source17+|ResetOutput2_Source18+|ResetOutput2_Source19+|ResetOutput2_Source20+|ResetOutput2_Source21+|ResetOutput2_Source22+|ResetOutput2_Source23+|ResetOutput2_Source24+|ResetOutput2_Source25+|ResetOutput2_Source26+|ResetOutput2_Source27+|ResetOutput2_Source28+|ResetOutput2_Source29+|ResetOutput2_Source30+|ResetOutput2_Source31+|ResetOutput2_Source32/\|HRTIM_OUTPUTRESET_NONE//HRTIM_OUTPUTRESET_NONE\|/"  Type="list"  Name="ORingResetOutput2_TE"  Visible="false">
@@ -4871,7 +4879,7 @@
 </RefParameter>
 <RefParameter Comment="Reset Source" DefaultValue="HRTIM_OUTPUTRESET_NONE"  Type="list"  Name="ORingResetOutput2_TE"  Group="Output 2 Configuration" Visible="false">
              <Condition Diagnostic="" Expression="!(NumberResetSource2_TE &gt; 0)"/> 
- <PossibleValue Comment="Reset the output reset crossbar " Value="HRTIM_OUTPUTRESET_NONE"/>
+ <PossibleValue Comment="No source is selected" Value="HRTIM_OUTPUTRESET_NONE"/>
 </RefParameter>
 
 <!--RESETSOURCE -->
@@ -16443,7 +16451,7 @@
 
 	</ModeLogicOperator>
 
-            <RefSignal IOMode="AlternateFunctionOpenDrainAndPushPullDefaultPP" Name="SCOUT"/>
+            <RefSignal IOMode="AlternateFunctionOpenDrainAndPushPullDefaultPPHIGHSPEED" Name="SCOUT"/>
             <RefSignal IOMode="AlternateFunctionPushPull" Name="SCIN"/>
             <RefSignal IOMode="AlternateFunctionPushPull" Name="EEV1"/>
             <RefSignal IOMode="AlternateFunctionPushPull" Name="EEV2"/>
@@ -16460,16 +16468,16 @@
             <RefSignal IOMode="AlternateFunctionPushPull" Name="FLT3"/>
             <RefSignal IOMode="AlternateFunctionPushPull" Name="FLT4"/>
             <RefSignal IOMode="AlternateFunctionPushPull" Name="FLT5"/>
-            <RefSignal IOMode="AlternateFunctionOpenDrainAndPushPullDefaultPP" Name="CHA1"/>
-            <RefSignal IOMode="AlternateFunctionOpenDrainAndPushPullDefaultPP" Name="CHA2"/>
-            <RefSignal IOMode="AlternateFunctionOpenDrainAndPushPullDefaultPP" Name="CHB1"/>
-            <RefSignal IOMode="AlternateFunctionOpenDrainAndPushPullDefaultPP" Name="CHB2"/>
-            <RefSignal IOMode="AlternateFunctionOpenDrainAndPushPullDefaultPP" Name="CHC1"/>
-            <RefSignal IOMode="AlternateFunctionOpenDrainAndPushPullDefaultPP" Name="CHC2"/>
-            <RefSignal IOMode="AlternateFunctionOpenDrainAndPushPullDefaultPP" Name="CHD1"/>
-            <RefSignal IOMode="AlternateFunctionOpenDrainAndPushPullDefaultPP" Name="CHD2"/>
-            <RefSignal IOMode="AlternateFunctionOpenDrainAndPushPullDefaultPP" Name="CHE1"/>
-            <RefSignal IOMode="AlternateFunctionOpenDrainAndPushPullDefaultPP" Name="CHE2"/>
+            <RefSignal IOMode="AlternateFunctionOpenDrainAndPushPullDefaultPPHIGHSPEED" Name="CHA1"/>
+            <RefSignal IOMode="AlternateFunctionOpenDrainAndPushPullDefaultPPHIGHSPEED" Name="CHA2"/>
+            <RefSignal IOMode="AlternateFunctionOpenDrainAndPushPullDefaultPPHIGHSPEED" Name="CHB1"/>
+            <RefSignal IOMode="AlternateFunctionOpenDrainAndPushPullDefaultPPHIGHSPEED" Name="CHB2"/>
+            <RefSignal IOMode="AlternateFunctionOpenDrainAndPushPullDefaultPPHIGHSPEED" Name="CHC1"/>
+            <RefSignal IOMode="AlternateFunctionOpenDrainAndPushPullDefaultPPHIGHSPEED" Name="CHC2"/>
+            <RefSignal IOMode="AlternateFunctionOpenDrainAndPushPullDefaultPPHIGHSPEED" Name="CHD1"/>
+            <RefSignal IOMode="AlternateFunctionOpenDrainAndPushPullDefaultPPHIGHSPEED" Name="CHD2"/>
+            <RefSignal IOMode="AlternateFunctionOpenDrainAndPushPullDefaultPPHIGHSPEED" Name="CHE1"/>
+            <RefSignal IOMode="AlternateFunctionOpenDrainAndPushPullDefaultPPHIGHSPEED" Name="CHE2"/>
 
 	<RefSignal Name="VS_hrtimEnable"           Virtual="true"/>
 	<RefSignal Name="VS_hrtimMasterTimerNoOutput"   Virtual="true"/>

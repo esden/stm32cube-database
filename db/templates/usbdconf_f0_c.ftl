@@ -111,7 +111,7 @@
 [/#if]
 
 /* USER CODE BEGIN 0 */
-__IO uint32_t remotewakeupon=0;
+
 /* USER CODE END 0 */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -233,7 +233,7 @@ void HAL_PCD_SuspendCallback(PCD_HandleTypeDef *hpcd)
   if (hpcd->Init.low_power_enable)
   {
     /* Set SLEEPDEEP bit and SleepOnExit of Cortex System Control Register */
-    //SCB->SCR |= (uint32_t)((uint32_t)(SCB_SCR_SLEEPDEEP_Msk | SCB_SCR_SLEEPONEXIT_Msk));
+    SCB->SCR |= (uint32_t)((uint32_t)(SCB_SCR_SLEEPDEEP_Msk | SCB_SCR_SLEEPONEXIT_Msk));
   }
   /* USER CODE END 2 */
 }
@@ -247,13 +247,12 @@ void HAL_PCD_SuspendCallback(PCD_HandleTypeDef *hpcd)
 void HAL_PCD_ResumeCallback(PCD_HandleTypeDef *hpcd)
 {
   /* USER CODE BEGIN 3 */
-  if ((hpcd->Init.low_power_enable)&&(remotewakeupon == 0))
-  {
-    SystemClockConfig_Resume();
+  if (hpcd->Init.low_power_enable)
+  {    
     /* Reset SLEEPDEEP bit of Cortex System Control Register */
-    //SCB->SCR &= (uint32_t)~((uint32_t)(SCB_SCR_SLEEPDEEP_Msk | SCB_SCR_SLEEPONEXIT_Msk));    
+    SCB->SCR &= (uint32_t)~((uint32_t)(SCB_SCR_SLEEPDEEP_Msk | SCB_SCR_SLEEPONEXIT_Msk));   
+    SystemClockConfig_Resume(); 
   }
-  remotewakeupon=0;
   /* USER CODE END 3 */
   USBD_LL_Resume(hpcd->pData);
   
@@ -621,7 +620,7 @@ void USBD_static_free(void *p)
   */
 static void SystemClockConfig_Resume(void)
 {
-	SystemClock_Config();
+  SystemClock_Config();
 }
 /* USER CODE END 5 */
 

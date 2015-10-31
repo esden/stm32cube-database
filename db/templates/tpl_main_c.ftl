@@ -39,10 +39,9 @@
 #include "${FamilyName?lower_case}xx_hal.h"
 [/#if]
 [@common.optinclude name="Src/rtos_inc.tmp"/][#--include freertos includes --]
-[@common.optinclude name="Src/fatfs_inc.tmp"/][#--include fatafs includes --]
 [#-- if !HALCompliant??--][#-- if HALCompliant Begin --]
 [#list ips as ip]
-[#if !ip?contains("FREERTOS") && !ip?contains("FATFS")&& !ip?contains("NVIC")]
+[#if !ip?contains("FREERTOS") && !ip?contains("NVIC")]
 #include "${ip?lower_case}.h"
 [/#if]
 [/#list]
@@ -93,11 +92,9 @@ ${dHandle};
     [#-- RTOS variables --]
     [#-- ADD RTOS Code Begin--]
     [@common.optinclude name="Src/rtos_vars.tmp"/]   
-    [#-- ADD RTOS Code Begin--]
+    [#-- ADD RTOS Code End--]
     [/#compress]
-[/#if][#-- if HALCompliant End --]
-[#-- FATFS variables --]#n
-    [@common.optinclude name="Src/fatfs_vars.tmp"/]
+[/#if][#-- if HALCompliant End --] 
 
     [#-- Global variables --]
 [#-- If HAL compliant generate Global variable : Peripherals handler -End --]
@@ -157,7 +154,7 @@ int main(void)
 [/#if]
 #n#t/* Initialize all configured peripherals */
 [#list voids as void]
-[#if !void?contains("FREERTOS") && !void?contains("FATFS")]
+[#if !void?contains("FREERTOS")]
 #t${void}();
 [/#if]
 [/#list]
@@ -177,23 +174,25 @@ int main(void)
 
   [@common.optinclude name="Src/rtos_start.tmp"/] [#-- include generated tmp file 13 Nov 2014 --] 
   /* We should never get here as control is now taken by the scheduler */
-  
-[#else]
-[@common.optinclude name="Src/fatfs_HalInit.tmp"/]
 [/#if]
 
 [#-- if !FREERTOS?? --] 
 #n
-#t/* USER CODE BEGIN 3 */
+
 #t/* Infinite loop */
+#t/* USER CODE BEGIN WHILE */
 #twhile (1)
-#t{#n
+#t{
+#t/* USER CODE END WHILE */
 [#if USB_HOST?? && !FREERTOS??]
 #t#tMX_USB_HOST_Process();
 [/#if]
 #n
+#t/* USER CODE BEGIN 3 */
+
 #t}
 #t/* USER CODE END 3 */
+
 #n
 [#-- if --]
 
@@ -258,7 +257,7 @@ void SystemClock_Config(void)
 [/#compress]
 [/#list][/#if]
 [/#list]
-[@common.optinclude name="Src/DMA.tmp"/][#-- ADD DMA Code--]
+[@common.optinclude name="Src/dma.tmp"/][#-- ADD DMA Code--]
 [@common.optinclude name="Src/mx_FMC_HC.tmp"/][#-- FMC Init --]
 [@common.optinclude name="Src/gpio.tmp"/][#-- ADD GPIO Code--]
 [/#if] [#-- if HALCompliant End --]
@@ -270,8 +269,9 @@ void SystemClock_Config(void)
 
 /* USER CODE END 4 */
 #n
-[@common.optinclude name="Src/rtos_threads.tmp"/]
+
 [#if HALCompliant??] [#-- If FreeRtos is used --]
+[@common.optinclude name="Src/rtos_threads.tmp"/]
 [@common.optinclude name="Src/rtos_user_threads.tmp"/] 
 [/#if] [#-- If FreeRtos is used --]
 
