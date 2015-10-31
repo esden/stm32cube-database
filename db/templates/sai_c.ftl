@@ -35,7 +35,7 @@
 [#list IPdatas as IP]  
 [#assign ipvar = IP]
 /* Includes ------------------------------------------------------------------*/
-#include "${name}.h"
+#include "${name?lower_case}.h"
 [#assign useGpio = false]
 [#assign useDma = false]
 [#assign useNvic = false]
@@ -142,8 +142,12 @@
         [#assign prefixList = dmaCurrentRequest?split("_")]
         [#list prefixList as p][#assign prefix= p][/#list]        
       [#if dmaconfig.dmaHandel?size > 1] [#-- if more than one dma handler--]
+        [#assign channel="channel"]
+        [#if (FamilyName=="STM32F2" || FamilyName=="STM32F4" || FamilyName=="STM32F7")]
+          [#assign channel="stream"]
+        [/#if]
 #t#t/* Several peripheral DMA handle pointers point to the same DMA handle.
-#t#t   Be aware that there is only one stream to perform all the requested DMAs. */
+#t#t   Be aware that there is only one ${channel} to perform all the requested DMAs. */
                             [#list dmaconfig.dmaHandel as dmaH]
 #t#t__HAL_LINKDMA(${instHandler},${dmaH},hdma_${dmaconfig.dmaRequestName?lower_case});
                             [/#list]
@@ -160,8 +164,12 @@
         [#list prefixList as p][#assign prefix= p][/#list]
         
        [#if dmaconfig.dmaHandel?size > 1] [#-- if more than one dma handler--]
+        [#assign channel="channel"]
+        [#if (FamilyName=="STM32F2" || FamilyName=="STM32F4" || FamilyName=="STM32F7")]
+          [#assign channel="stream"]
+        [/#if]
 #t#t/* Several peripheral DMA handle pointers point to the same DMA handle.
-#t#t   Be aware that there is only one stream to perform all the requested DMAs. */
+#t#t   Be aware that there is only one ${channel} to perform all the requested DMAs. */
                             [#list dmaconfig.dmaHandel as dmaH]
 #t#t__HAL_LINKDMA(${instHandler},${dmaH},hdma_${dmaconfig.dmaRequestName?lower_case});
                             [/#list]

@@ -59,7 +59,7 @@ void SystemClock_Config(void);
 [#assign CortexName = "Cortex"]
 [#if FamilyName=="STM32F7"]
   [#assign CortexName = "Cortex-M7"]
-[#elseif FamilyName=="STM32F4" || FamilyName=="STM32F3"]
+[#elseif FamilyName=="STM32F4" || FamilyName=="STM32F3" || FamilyName=="STM32L4"]
   [#assign CortexName = "Cortex-M4"]
 [#elseif FamilyName=="STM32F1" || FamilyName=="STM32F2" || FamilyName=="STM32L1"]
   [#assign CortexName = "Cortex-M3"]

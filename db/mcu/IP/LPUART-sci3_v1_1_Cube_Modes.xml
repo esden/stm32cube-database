@@ -21,9 +21,12 @@
 	
 
 	<RefParameter Comment="Auto Baudrate Mode" DefaultValue="UART_ADVFEATURE_AUTOBAUDRATE_DISABLE" Name="AutoBaudRateEnableParam" Type="list" Group="Advanced Features">
+	<Condition Expression="!DIE415" Diagnostic=""/>
 		<PossibleValue Comment="Disable" Value="UART_ADVFEATURE_AUTOBAUDRATE_DISABLE"/>
 		<PossibleValue Comment="Enable" Value="UART_ADVFEATURE_AUTOBAUDRATE_ENABLE" Semaphore="$IpInstance_UART_AutoBaudRate_Enable"/>
 	</RefParameter>
+	<RefParameter Comment="Auto Baudrate Mode" DefaultValue="null" Name="AutoBaudRateEnableParam" Type="list" Visible="false" Group="Advanced Features"/>
+		
 	<RefParameter Comment="" DefaultValue="UART_ADVFEATURE_AUTOBAUDRATE_INIT" Name="IsAutoBaudRateMode" Type="list" Group="Advanced Features" Visible="false">
 		<Condition Expression="$IpInstance_UART_AutoBaudRate_Enable" Diagnostic=""/>
 		<PossibleValue Comment="" Value="UART_ADVFEATURE_AUTOBAUDRATE_INIT"/>
@@ -66,10 +69,7 @@
 	<RefParameter Comment="Hardware Flow Control" DefaultValue="UART_HWCONTROL_NONE" Name="HwFlowCtl" Type="list" Group="Basic Parameters" Visible="false">
 		<PossibleValue Comment="None" Value="UART_HWCONTROL_NONE"/>
 	</RefParameter>
-	<RefParameter Comment="Over Sampling" DefaultValue="UART_OVERSAMPLING_16" Name="OverSampling" Type="list" Group="Advanced Parameters">
-		<PossibleValue Comment="16 Samples" Value="UART_OVERSAMPLING_16"/>
-		<PossibleValue Comment="8 Samples" Value="UART_OVERSAMPLING_8"/>
-	</RefParameter>
+	
 	<RefParameter Comment="Single Sample" DefaultValue="UART_ONEBIT_SAMPLING_DISABLED" Name="OneBitSampling" Type="list" Group="Advanced Parameters">
 		<PossibleValue Comment="Disable" Value="UART_ONEBIT_SAMPLING_DISABLED"/>
 		<PossibleValue Comment="Enable" Value="UART_ONEBIT_SAMPLING_ENABLED"/>
@@ -235,6 +235,32 @@
 		
 	<!-- RefMode for Asynchronous UART -->
 	<RefMode Name="Asynchronous" HalMode="UART">
+		<Condition Expression="$IpInstance_HardwareControl" Diagnostic=""/>
+
+		<!-- Basic Parameters -->
+		<Parameter Name="BaudRate"/>
+		<Parameter Name="WordLength"/>
+		<Parameter Name="Parity"/>
+		<Parameter Name="StopBits"/>
+		<Parameter Name="HwFlowCtl"/>
+		<!-- Advanced Parameters -->
+		<Parameter Name="Mode"/>
+		<Parameter Name="OneBitSampling"/>
+		<!-- Advanced Features -->
+		<Parameter Name="AutoBaudRateEnableParam"/>
+		<Parameter Name="TxPinLevelInvertParam"/>
+		<Parameter Name="RxPinLevelInvertParam"/>
+		<Parameter Name="DataInvertParam"/>
+		<Parameter Name="SwapParam"/>
+		<Parameter Name="OverrunDisableParam"/>
+		<Parameter Name="DMADisableonRxErrorParam"/>
+		<Parameter Name="AutoBaudRateMode"/>
+		<Parameter Name="MSBFirstParam"/>
+	</RefMode>
+		
+		
+	<!-- RefMode for Asynchronous UART -->
+	<RefMode Name="Asynchronous" HalMode="UART">
 		<ConfigForMode>Lpuart_Init</ConfigForMode>
 		<!-- Basic Parameters -->
 		<Parameter Name="BaudRate"/>
@@ -244,7 +270,6 @@
 		<Parameter Name="HwFlowCtl"/>
 		<!-- Advanced Parameters -->
 		<Parameter Name="Mode"/>
-		<Parameter Name="OverSampling"/>
 		<Parameter Name="OneBitSampling"/>
 		<!-- Advanced Features -->
 		<Parameter Name="AutoBaudRateEnableParam"/>
@@ -267,7 +292,6 @@
 		<Parameter Name="StopBits"/>
 		<!--  Advanced Parameters -->
 		<Parameter Name="Mode"/>
-		<Parameter Name="OverSampling"/>
 		<Parameter Name="OneBitSampling"/>
 		<!-- Advanced Features -->
 		<Parameter Name="AutoBaudRateEnableParam"/>
@@ -290,7 +314,6 @@
 		<Parameter Name="StopBits"/>
 		<!--  Advanced Parameters -->
 		<Parameter Name="Mode"/>
-		<Parameter Name="OverSampling"/>
 		<Parameter Name="OneBitSampling"/>
 		<Parameter Name="WakeUpMethod"/>
 		<Parameter Name="Address"/>
@@ -340,8 +363,8 @@
 			<ModeLogicOperator Name="XOR">
 				<Mode Name="Asynchronous">
 					<SignalLogicalOp Name="AND">
-						<Signal Name="RX"/>
-						<Signal Name="TX"/>
+						<Signal Name="RX" IOMode="AlternateFunctionPushPullPULLUP"/>
+						<Signal Name="TX" IOMode="AlternateFunctionPushPullPULLUP"/>
 					</SignalLogicalOp>
 					<Semaphore>$IpInstance_Asynchronous</Semaphore>
 					<Semaphore>Asynchronous</Semaphore>

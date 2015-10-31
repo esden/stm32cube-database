@@ -1,0 +1,357 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<IP DBVersion="V4.0" IPType="peripheral" Name="SYS" Version="STM32L47x_sys_v1_0"
+	xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance"
+	ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd"
+	xmlns="http://mcd.rou.st.com/modules.php?name=mcu">
+	<About>SYS: System</About>
+
+	<RefParameter Comment="PVD detection Level" DefaultValue="PWR_PVDLEVEL_7"
+		Name="PVDLevel" Type="list" Visible="false">
+		<Condition Expression="Sem_ExternalAnalogVoltage"
+			Diagnostic="" />
+		<PossibleValue Comment="PWR PVD LEVEL 7" Value="PWR_PVDLEVEL_7" />
+	</RefParameter>
+	<RefParameter Comment="PVD detection Level" DefaultValue="PWR_PVDLEVEL_0"
+		Name="PVDLevel" Type="list">
+		<Condition Expression="!Sem_ExternalAnalogVoltage"
+			Diagnostic="" />
+		<PossibleValue Comment="PWR PVD LEVEL 0 (2.0 V)" Value="PWR_PVDLEVEL_0" />
+		<PossibleValue Comment="PWR PVD LEVEL 1 (2.2 V)" Value="PWR_PVDLEVEL_1" />
+		<PossibleValue Comment="PWR PVD LEVEL 2 (2.4 V)" Value="PWR_PVDLEVEL_2" />
+		<PossibleValue Comment="PWR PVD LEVEL 3 (2.5 V)" Value="PWR_PVDLEVEL_3" />
+		<PossibleValue Comment="PWR PVD LEVEL 4 (2.6 V)" Value="PWR_PVDLEVEL_4" />
+		<PossibleValue Comment="PWR PVD LEVEL 5 (2.8 V)" Value="PWR_PVDLEVEL_5" />
+		<PossibleValue Comment="PWR PVD LEVEL 6 (2.9 V)" Value="PWR_PVDLEVEL_6" />
+	</RefParameter>
+
+	<RefParameter Comment="Mode" DefaultValue="PWR_PVM_MODE_NORMAL"
+		Name="Mode" Type="list">
+		<Description>Mode: Specifies the operating mode for the selected pins.</Description>
+		<PossibleValue Comment="basic mode is used " Value="PWR_PVM_MODE_NORMAL" />
+		<PossibleValue
+			Comment="External Interrupt Mode with Rising edge trigger detection "
+			Value="PWR_PVM_MODE_IT_RISING" />
+		<PossibleValue
+			Comment="External Interrupt Mode with Falling edge trigger detection "
+			Value="PWR_PVM_MODE_IT_FALLING" />
+		<PossibleValue
+			Comment="External Interrupt Mode with Rising/Falling edge trigger detection "
+			Value="PWR_PVM_MODE_IT_RISING_FALLING" />
+		<PossibleValue Comment="Event Mode with Rising edge trigger detection "
+			Value="PWR_PVM_MODE_EVENT_RISING" />
+		<PossibleValue Comment="Event Mode with Falling edge trigger detection "
+			Value="PWR_PVM_MODE_EVENT_FALLING" />
+		<PossibleValue
+			Comment="Event Mode with Rising/Falling edge trigger detection "
+			Value="PWR_PVM_MODE_EVENT_RISING_FALLING" />
+	</RefParameter>
+
+	<RefParameter Comment="High impedance mode" DefaultValue="SYSCFG_VREFBUF_HIGH_IMPEDANCE_ENABLE" Name="HighImpedanceMode" Type="list" Visible="false">
+		 <Condition Expression="Sem_ExternalMode | Sem_HoldMode" Diagnostic="" />
+		<PossibleValue Comment="Enable" Value="SYSCFG_VREFBUF_HIGH_IMPEDANCE_ENABLE" />
+	</RefParameter>
+	
+	<RefParameter Comment="High impedance mode" DefaultValue="SYSCFG_VREFBUF_HIGH_IMPEDANCE_DISABLE" Name="HighImpedanceMode" Type="list" Visible="false">
+		 <Condition Expression="Sem_VREFBUFOFF | Sem_InternalMode" Diagnostic="" />
+		<PossibleValue Comment="Disable" Value="SYSCFG_VREFBUF_HIGH_IMPEDANCE_DISABLE" />
+	</RefParameter>
+	
+   <RefParameter Comment="High impedance mode" DefaultValue="null" Name="HighImpedanceMode" Type="list" Visible="false"/>
+
+	<RefParameter Comment="Internal Voltage reference scale" DefaultValue="SYSCFG_VREFBUF_VOLTAGE_SCALE0" Name="VoltageScaling" Type="list">
+		<Condition Expression="Sem_InternalMode" Diagnostic="" />
+		<PossibleValue Comment="SCALE 0: around 2.048 V" Value="SYSCFG_VREFBUF_VOLTAGE_SCALE0" />
+		<PossibleValue Comment="SCALE 1: around 2.5 V" Value="SYSCFG_VREFBUF_VOLTAGE_SCALE1" />
+	</RefParameter>
+	
+	<RefParameter Comment="Internal Voltage reference scale" DefaultValue="null" Name="VoltageScaling" Type="list" Visible="false" />
+	
+	<RefParameter Comment="Trimming Mode" DefaultValue="__NULL" Name="TrimmingMode" Type="list">
+	    <Condition Expression="Sem_InternalMode" Diagnostic=""/>
+		<PossibleValue Comment="Factory Trimming" Value="__NULL" />
+		<PossibleValue Comment="User Trimming" Value="USER_TRIMMING" />
+	</RefParameter>
+	
+	<RefParameter Comment="Trimming Mode" DefaultValue="null" Name="TrimmingMode" Type="list" Visible="false" />
+	
+	<RefParameter Comment="Trimming Value" DefaultValue="0" Max="63" Min="0" Name="TrimmingValue" Type="integer">
+    	<Condition Expression="TrimmingMode = USER_TRIMMING &amp; Sem_InternalMode" Diagnostic=""/>
+    </RefParameter>
+    
+    <RefParameter Comment="Trimming Value" DefaultValue="null" Max="63" Min="0" Name="TrimmingValue" Type="integer" Visible="false"/>
+
+
+	<RefMode Name="PVD_ext" 
+		Group="Programmable_Voltage_Detector_Settings">
+		<ConfigForMode>PVDConfig</ConfigForMode>
+		<ConfigForMode>PVDEnable</ConfigForMode>
+		<Parameter Name="PVDLevel" />
+		<Parameter Name="Mode" />
+	</RefMode>
+	<RefMode Name="PVD_int" 
+		Group="Programmable_Voltage_Detector_Settings">
+		<ConfigForMode>PVDConfig</ConfigForMode>
+		<ConfigForMode>PVDEnable</ConfigForMode>
+		<Parameter Name="PVDLevel" />
+		<Parameter Name="Mode" />
+	</RefMode>
+
+	<RefMode Name="VREFBUFOFFMode" Group="Voltage_Reference_Buffer_Settings">
+		<ConfigForMode>VREFBUFMODEConfigDisable</ConfigForMode>
+		<ConfigForMode>HighImpedanceModeConfig</ConfigForMode>
+		<Parameter Name="HighImpedanceMode" />
+	</RefMode>
+	
+	<RefMode Name="ExternalMode" Group="Voltage_Reference_Buffer_Settings">
+		<ConfigForMode>VREFBUFMODEConfigDisable</ConfigForMode>
+		<ConfigForMode>HighImpedanceModeConfig</ConfigForMode>
+		<Parameter Name="HighImpedanceMode" />
+	</RefMode>
+	
+	<RefMode Name="InternalMode" Group="Voltage_Reference_Buffer_Settings">
+	    <ConfigForMode>TrimmingValueConfig</ConfigForMode>
+    	<ConfigForMode>InternalVoltageReferenceScaleConfig</ConfigForMode>
+		<ConfigForMode>VREFBUFMODEConfigEnable</ConfigForMode>
+		<ConfigForMode>HighImpedanceModeConfig</ConfigForMode>	
+		<Parameter Name="HighImpedanceMode" />
+		<Parameter Name="TrimmingMode" />
+		<Parameter Name="TrimmingValue" />
+		<Parameter Name="VoltageScaling" />
+		
+	</RefMode>
+	
+	<RefMode Name="HoldMode" Group="Voltage_Reference_Buffer_Settings">
+		<ConfigForMode>VREFBUFMODEConfigEnable</ConfigForMode>
+		<ConfigForMode>HighImpedanceModeConfig</ConfigForMode>
+		<Parameter Name="HighImpedanceMode" />
+	</RefMode>
+
+	<!-- Modes for Debug (JTAG and Trace) -->
+	<ModeLogicOperator Name="OR">
+		<Mode Name="Debug">
+			<ModeLogicOperator Name="XOR">
+				<Mode Name="JTAG(4-pin)" UserName="JTAG (4 pins)">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="JTCK-SWCLK" />
+						<Signal Name="JTDI" />
+						<Signal Name="JTDO-SWO" />
+						<Signal Name="JTMS-SWDIO" />
+					</SignalLogicalOp>
+					<Semaphore>JTAG</Semaphore>
+				</Mode>
+
+				<Mode Name="JTAG(5-pin)" UserName="JTAG (5 pins)">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="JTCK-SWCLK" />
+						<Signal Name="JTDI" />
+						<Signal Name="JTDO-SWO" />
+						<Signal Name="JTMS-SWDIO" />
+						<Signal Name="JTRST" />
+					</SignalLogicalOp>
+					<Semaphore>JTAG</Semaphore>
+				</Mode>
+
+				<Mode Name="Serial-Wire" UserName="Serial Wire Debug (SWD)">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="JTCK-SWCLK" />
+						<Signal Name="JTMS-SWDIO" />
+					</SignalLogicalOp>
+				</Mode>
+
+				<Mode Name="Trace-Asynchronous_SW" UserName="SWD and Asynchronous Trace">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="JTMS-SWDIO" />
+						<Signal Name="JTCK-SWCLK" />
+						<Signal Name="JTDO-SWO" />
+					</SignalLogicalOp>
+				</Mode>
+
+				<Mode Name="Trace-Synchro(1bit)_JTAG" UserName="JTAG and Synchronous Trace (1 bit)">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="JTMS-SWDIO" />
+						<Signal Name="JTCK-SWCLK" />
+						<Signal Name="JTDO-SWO" />
+						<Signal Name="JTDI" />
+						<Signal Name="TRACECLK" />
+						<Signal Name="TRACED0" />
+					</SignalLogicalOp>
+					<Semaphore>JTAG</Semaphore>
+				</Mode>
+
+				<Mode Name="Trace-Synchro(2bits)_JTAG" UserName="JTAG and Synchronous Trace (2 bits)">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="JTMS-SWDIO" />
+						<Signal Name="JTCK-SWCLK" />
+						<Signal Name="JTDO-SWO" />
+						<Signal Name="JTDI" />
+						<Signal Name="TRACECLK" />
+						<Signal Name="TRACED0" />
+						<Signal Name="TRACED1" />
+					</SignalLogicalOp>
+					<Semaphore>JTAG</Semaphore>
+				</Mode>
+
+				<Mode Name="Trace-Synchro(4bits)_JTAG" UserName="JTAG and Synchronous Trace (4 bits)">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="JTMS-SWDIO" />
+						<Signal Name="JTCK-SWCLK" />
+						<Signal Name="JTDO-SWO" />
+						<Signal Name="JTDI" />
+						<Signal Name="TRACECLK" />
+						<Signal Name="TRACED0" />
+						<Signal Name="TRACED1" />
+						<Signal Name="TRACED2" />
+						<Signal Name="TRACED3" />
+					</SignalLogicalOp>
+					<Semaphore>JTAG</Semaphore>
+				</Mode>
+
+				<Mode Name="Trace-Synchro(1bit)_SW" UserName="SWD and Synchronous Trace (1 bit)">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="JTMS-SWDIO" />
+						<Signal Name="JTCK-SWCLK" />
+						<Signal Name="TRACECLK" />
+						<Signal Name="TRACED0" />
+					</SignalLogicalOp>
+				</Mode>
+
+				<Mode Name="Trace-Synchro(2bit)_SW" UserName="SWD and Synchronous Trace (2 bits)">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="JTMS-SWDIO" />
+						<Signal Name="JTCK-SWCLK" />
+						<Signal Name="TRACECLK" />
+						<Signal Name="TRACED0" />
+						<Signal Name="TRACED1" />
+					</SignalLogicalOp>
+				</Mode>
+
+				<Mode Name="Trace-Synchro(4bit)_SW" UserName="SWD and Synchronous Trace (4 bits)">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="JTMS-SWDIO" />
+						<Signal Name="JTCK-SWCLK" />
+						<Signal Name="TRACECLK" />
+						<Signal Name="TRACED0" />
+						<Signal Name="TRACED1" />
+						<Signal Name="TRACED2" />
+						<Signal Name="TRACED3" />
+					</SignalLogicalOp>
+				</Mode>
+			</ModeLogicOperator>
+		</Mode>
+
+		<Mode Name="SYS-WakeUp1" UserName="System Wake-Up 1">
+			<ModeLogicOperator Name="OR">
+				<Mode Name="SYS-WakeUp1">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="WKUP1" />
+					</SignalLogicalOp>
+				</Mode>
+			</ModeLogicOperator>
+		</Mode>
+		<Mode Name="SYS-WakeUp2" UserName="System Wake-Up 2">
+			<ModeLogicOperator Name="OR">
+				<Mode Name="SYS-WakeUp2">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="WKUP2" />
+					</SignalLogicalOp>
+				</Mode>
+			</ModeLogicOperator>
+		</Mode>
+		<Mode Name="SYS-WakeUp3" UserName="System Wake-Up 3">
+			<ModeLogicOperator Name="OR">
+				<Mode Name="SYS-WakeUp3">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="WKUP3" />
+					</SignalLogicalOp>
+				</Mode>
+			</ModeLogicOperator>
+		</Mode>
+		<Mode Name="SYS-WakeUp4" UserName="System Wake-Up 4">
+			<ModeLogicOperator Name="OR">
+				<Mode Name="SYS-WakeUp4">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="WKUP4" />
+					</SignalLogicalOp>
+				</Mode>
+			</ModeLogicOperator>
+		</Mode>
+		<Mode Name="SYS-WakeUp5" UserName="System Wake-Up 5">
+			<ModeLogicOperator Name="OR">
+				<Mode Name="SYS-WakeUp5">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="WKUP5" />
+					</SignalLogicalOp>
+				</Mode>
+			</ModeLogicOperator>
+		</Mode>
+		<Mode Name="PowerVD" UserName="Power Voltage Detector In">
+			<ModeLogicOperator Name="XOR">
+				<Mode Name="PVD_ext"
+					UserName="Power Voltage Detector In (External input analog voltage)">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="PVD_IN" />
+					</SignalLogicalOp>
+					<Semaphore>Sem_ExternalAnalogVoltage</Semaphore>
+					<Semaphore>PVD_INTERRUPT</Semaphore>
+
+				</Mode>
+				<Mode Name="PVD_int"
+					UserName="Power Voltage Detector In (Internal analog voltage)">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="V_PVD_IN" />
+					</SignalLogicalOp>
+					<Semaphore>PVD_INTERRUPT</Semaphore>
+				</Mode>
+			</ModeLogicOperator>
+		</Mode>
+		<Mode Name="VREFBUFMODE" UserName="VREFBUF Mode" RemoveCondition="LQFP64">
+			<ModeLogicOperator Name="XOR">
+				<Mode Name="VREFBUFOFFMode" UserName="VREFBUF buffer OFF">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="V_VREFBUF" />
+					</SignalLogicalOp>
+					<Semaphore>Sem_VREFBUFOFF</Semaphore>
+				</Mode>
+				<Mode Name="ExternalMode" UserName="External voltage reference">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="V_VREFBUF" />
+					</SignalLogicalOp>
+					<Semaphore>Sem_ExternalMode</Semaphore>
+				</Mode>				
+				<Mode Name="InternalMode" UserName="Internal voltage reference">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="$SingleInstanceVREFBUF_OUT" />
+					</SignalLogicalOp>
+					<Semaphore>Sem_InternalMode</Semaphore>
+				</Mode>				
+				<Mode Name="HoldMode" UserName="Hold">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="V_VREFBUF" />
+					</SignalLogicalOp>
+					<Semaphore>Sem_HoldMode</Semaphore>
+				</Mode>					
+			</ModeLogicOperator>
+		</Mode>		
+	</ModeLogicOperator>
+
+	<!-- RefSignal for System -->
+	<RefSignal IOMode="System" Name="JTCK-SWCLK" />
+	<RefSignal IOMode="System" Name="JTDI" />
+	<RefSignal IOMode="System" Name="JTDO-SWO" />
+	<RefSignal IOMode="System" Name="JTMS-SWDIO" />
+	<RefSignal IOMode="System" Name="JTRST" />
+	<RefSignal IOMode="System" Name="TRACECLK" />
+	<RefSignal IOMode="System" Name="TRACED0" />
+	<RefSignal IOMode="System" Name="TRACED1" />
+	<RefSignal IOMode="System" Name="TRACED2" />
+	<RefSignal IOMode="System" Name="TRACED3" />
+	<RefSignal IOMode="System" Name="WKUP1" />
+	<RefSignal IOMode="System" Name="WKUP2" />
+	<RefSignal IOMode="System" Name="WKUP3" />
+	<RefSignal IOMode="System" Name="WKUP4" />
+	<RefSignal IOMode="System" Name="WKUP5" />
+	<RefSignal IOMode="Analog" Name="PVD_IN" />
+	<RefSignal IOMode="Analog" Name="V_PVD_IN" Virtual="true" />
+	<RefSignal IOMode="Analog" Name="V_VREFBUF" Virtual="true" />
+	<RefSignal IOMode="System" Name="$SingleInstanceVREFBUF_OUT" />
+</IP>

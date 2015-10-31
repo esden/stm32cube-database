@@ -1,0 +1,705 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<IP DBVersion="V3.0" IPType="peripheral" Name="OPAMP" Version="tsmc018_ull_opamp_v1_0_L4_Cube" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../db/IP_Modes_V3_0.xsd" xmlns="http://mcd.rou.st.com/modules.php?name=mcu">
+	
+	
+<About>OPAMP: Operational Amplifier</About>
+	
+	
+	<RefParameter Name="Instance" DefaultValue="OPAMP$Index" Comment="Instance" Type="" Visible="false"/>
+	
+	<RefParameter Comment="Power Supply Range" DefaultValue="OPAMP_POWERSUPPLY_LOW" Name="PowerSupplyRange" Type="list"  Group="Basic Parameters">
+		<PossibleValue Comment="Power Supply Range Low" Value="OPAMP_POWERSUPPLY_LOW"/>
+		<PossibleValue Comment="Power Supply Range High" Value="OPAMP_POWERSUPPLY_HIGH"/>
+	</RefParameter>
+	
+	<RefParameter Comment="Power Mode" DefaultValue="OPAMP_POWERMODE_NORMAL" Name="PowerMode" Type="list"  Group="Basic Parameters">
+		<PossibleValue Comment="Normal" Value="OPAMP_POWERMODE_NORMAL"/>
+		<PossibleValue Comment="Low Power" Value="OPAMP_POWERMODE_LOWPOWER"/>
+	</RefParameter>
+	
+	<!-- NonInvertingInput -->
+	<RefParameter Comment="Non Inverting Input" DefaultValue="OPAMP_NONINVERTINGINPUT_DAC_CH" Name="NonInvertingInput" Type="list" Visible="false" Group="Basic Parameters">
+	  <Condition Expression="$IpInstance_Dac" Diagnostic=""/>
+		<PossibleValue Comment="OPAMP Non Inverting Input connected internally to DAC channel" Value="OPAMP_NONINVERTINGINPUT_DAC_CH"/>
+	</RefParameter>
+	
+	<RefParameter Comment="Non Inverting Input" DefaultValue="OPAMP_NONINVERTINGINPUT_IO0" Name="NonInvertingInput" Type="list" Visible="false" Group="Basic Parameters">
+		<PossibleValue Comment="OPAMP Non Inverting Input IO0" Value="OPAMP_NONINVERTINGINPUT_IO0"/>
+	</RefParameter>
+	
+	<RefParameter Comment="Non Inverting Input" DefaultValue="null" Name="NonInvertingInput" Type="list" Visible="false" Group="Basic Parameters"/>
+		
+	<!-- InvertingInput -->
+	
+	<RefParameter Comment="Inverting Input" DefaultValue="OPAMP_INVERTINGINPUT_IO0" Name="InvertingInput" Type="list" Visible="false" Group="Basic Parameters">
+	    <Condition Expression="PA1_OPAMP1_VINM &amp; ($IpNumber=1) &amp; ($IpInstance_STANDALONE|$IpInstance_PGA_Connected)" Diagnostic=""/>
+		<PossibleValue Comment="OPAMP Inverting Input IO0" Value="OPAMP_INVERTINGINPUT_IO0"/>
+	</RefParameter>
+	<RefParameter Comment="Inverting Input" DefaultValue="OPAMP_INVERTINGINPUT_IO0" Name="InvertingInput" Type="list" Visible="false" Group="Basic Parameters">
+	    <Condition Expression="PA7_OPAMP2_VINM &amp; ($IpNumber=2) &amp; ($IpInstance_STANDALONE|$IpInstance_PGA_Connected)" Diagnostic=""/>
+		<PossibleValue Comment="OPAMP Inverting Input IO0" Value="OPAMP_INVERTINGINPUT_IO0"/>
+	</RefParameter>
+	
+	<RefParameter Comment="Inverting Input" DefaultValue="OPAMP_INVERTINGINPUT_IO1" Name="InvertingInput" Type="list" Visible="false" Group="Basic Parameters">
+		 <Condition Expression="($IpInstance_STANDALONE|$IpInstance_PGA_Connected)" Diagnostic=""/>
+		<PossibleValue Comment="OPAMP Inverting Input IO1" Value="OPAMP_INVERTINGINPUT_IO1"/>
+	</RefParameter>
+	<RefParameter Comment="Inverting Input" DefaultValue="OPAMP_INVERTINGINPUT_CONNECT_NO" Name="InvertingInput" Type="list" Visible="false" Group="Basic Parameters">
+		 <Condition Expression="($IpInstance_PGA_Not_Connected)" Diagnostic=""/>
+		<PossibleValue Comment="OPAMP INVERTINGINPUT CONNECT NO" Value="OPAMP_INVERTINGINPUT_CONNECT_NO"/>
+	</RefParameter>
+	
+	<RefParameter Comment="Inverting Input" DefaultValue="null" Name="InvertingInput" Type="list" Visible="false" Group="Basic Parameters"/>
+		
+	
+
+	
+	
+	
+	
+	  
+	   <!-- PgaGain  -->
+	
+    <RefParameter Comment="PGA Gain" DefaultValue="OPAMP_PGA_GAIN_2" Name="PgaGain" Type="list" Group="Basic Parameters">
+	    <Condition Expression="$IpInstance_PGA|$IpInstance_PGA_Connected|$IpInstance_PGA_Not_Connected" Diagnostic=""/>
+		<PossibleValue Comment="2" Value="OPAMP_PGA_GAIN_2"/>
+		<PossibleValue Comment="4" Value="OPAMP_PGA_GAIN_4"/>
+		<PossibleValue Comment="8" Value="OPAMP_PGA_GAIN_8"/>
+		<PossibleValue Comment="16" Value="OPAMP_PGA_GAIN_16"/>
+	</RefParameter>
+	 <RefParameter Comment="PGA Gain" DefaultValue="null" Name="PgaGain" Type="list" Visible="false" Group="Basic Parameters"/>
+	 
+	<RefParameter Comment="User Trimming" DefaultValue="OPAMP_TRIMMING_FACTORY" Name="UserTrimming" Type="list" Group="Basic Parameters">
+		<PossibleValue Comment="Enable" Value="OPAMP_TRIMMING_USER" Semaphore="$IpInstance_User_Trimming"/>
+		<PossibleValue Comment="Disable" Value="OPAMP_TRIMMING_FACTORY"/>
+	</RefParameter>
+	<RefParameter Comment="Self Calibration" DefaultValue="Disable" Name="SelfCalibration" Type="list" Group="Basic Parameters">
+	    <Condition Expression="$IpInstance_User_Trimming" Diagnostic=""/>
+		<PossibleValue Comment="Enable" Value="Enable" Semaphore="$IpInstance_Self_Calibrate"/>
+		<PossibleValue Comment="Disable" Value="Disable"/>
+	</RefParameter>
+	<RefParameter Comment="Self Calibration" DefaultValue="Disable" Name="SelfCalibration" Type="list" Visible="false" Group="Basic Parameters">
+		<PossibleValue Comment="Enable" Value="Enable" />
+		<PossibleValue Comment="Disable" Value="Disable"/>
+	</RefParameter>
+		
+	
+	<RefParameter Comment="OffSet Trimming Value (PMOS)" DefaultValue="16" Max="31" Min="0"  Name="TrimmingValueP" Type="integer" Visible="false" Group="Basic Parameters">
+		<Condition Expression="SelfCalibration = Enable &amp;   PowerMode = OPAMP_POWERMODE_NORMAL" Diagnostic=""/>
+	</RefParameter>
+	<RefParameter Comment="OffSet Trimming Value (PMOS)" DefaultValue="16" Max="31" Min="0"  Name="TrimmingValueP" Type="integer" Group="Basic Parameters">
+		<Condition Expression="UserTrimming = OPAMP_TRIMMING_USER &amp;   PowerMode = OPAMP_POWERMODE_NORMAL" Diagnostic=""/>
+	</RefParameter>
+	<RefParameter Comment="OffSet Trimming Value (PMOS)" DefaultValue="null"  Name="TrimmingValueP" Type="integer" Visible="false" Group="Basic Parameters"/>
+		
+	
+	<RefParameter Comment="OffSet Trimming Value (NMOS)" DefaultValue="16" Max="31" Min="0"  Name="TrimmingValueN" Type="integer" Visible="false" Group="Basic Parameters">
+        <Condition Expression="SelfCalibration = Enable &amp;   PowerMode = OPAMP_POWERMODE_NORMAL" Diagnostic=""/>
+	</RefParameter>
+	<RefParameter Comment="OffSet Trimming Value (NMOS)" DefaultValue="16" Max="31" Min="0"  Name="TrimmingValueN" Type="integer" Group="Basic Parameters">
+        <Condition Expression="UserTrimming = OPAMP_TRIMMING_USER &amp;   PowerMode = OPAMP_POWERMODE_NORMAL" Diagnostic=""/>
+	</RefParameter>
+	<RefParameter Comment="OffSet Trimming Value (NMOS)" DefaultValue="null"  Name="TrimmingValueN" Type="integer" Visible="false" Group="Basic Parameters"/>
+    
+    <RefParameter Comment="OffSet Trimming Value Low Power (PMOS)" DefaultValue="16" Max="31" Min="0"  Name="TrimmingValuePLowPower" Type="integer" Visible="false" Group="Basic Parameters">
+		<Condition Expression=" SelfCalibration = Enable &amp;  PowerMode = OPAMP_POWERMODE_LOWPOWER" Diagnostic=""/>
+	</RefParameter>
+	<RefParameter Comment="OffSet Trimming Value Low Power (PMOS)" DefaultValue="16" Max="31" Min="0"  Name="TrimmingValuePLowPower" Type="integer" Group="Basic Parameters">
+		<Condition Expression="UserTrimming = OPAMP_TRIMMING_USER &amp;  PowerMode = OPAMP_POWERMODE_LOWPOWER" Diagnostic=""/>
+	</RefParameter>
+	<RefParameter Comment="OffSet Trimming Value Low Power (PMOS)" DefaultValue="null"  Name="TrimmingValuePLowPower" Type="integer" Visible="false" Group="Basic Parameters"/>
+		
+	
+	
+	<RefParameter Comment="OffSet Trimming Value Low Power (NMOS)" DefaultValue="16" Max="30" Min="0"  Name="TrimmingValueNLowPower" Type="integer" Visible="false" Group="Basic Parameters">
+        <Condition Expression=" SelfCalibration = Enable &amp; PowerMode = OPAMP_POWERMODE_LOWPOWER" Diagnostic=""/>
+	</RefParameter>
+	<RefParameter Comment="OffSet Trimming Value Low Power (NMOS)" DefaultValue="16" Max="30" Min="0"  Name="TrimmingValueNLowPower" Type="integer" Group="Basic Parameters">
+        <Condition Expression="UserTrimming = OPAMP_TRIMMING_USER &amp;  PowerMode = OPAMP_POWERMODE_LOWPOWER" Diagnostic=""/>
+	</RefParameter>
+	<RefParameter Comment="OffSet Trimming Value Low Power (NMOS)" DefaultValue="null"  Name="TrimmingValueNLowPower" Type="integer" Visible="false" Group="Basic Parameters"/>
+		
+	
+	<RefParameter Comment="Mode" DefaultValue="OPAMP_STANDALONE_MODE" Name="Mode" Type="list" Group="Basic Parameters" Visible="false" >	
+	<Condition Expression="$IpInstance_STANDALONE" Diagnostic=""/>
+		<PossibleValue Comment="Standalone" Value="OPAMP_STANDALONE_MODE"/>
+	</RefParameter>
+	<RefParameter Comment="Mode" DefaultValue="OPAMP_PGA_MODE" Name="Mode" Type="list" Group="Basic Parameters" Visible="false" >	
+	<Condition Expression="$IpInstance_PGA|$IpInstance_PGA_Connected|$IpInstance_PGA_Not_Connected" Diagnostic=""/>
+		<PossibleValue Comment="Pga" Value="OPAMP_PGA_MODE"/>
+	</RefParameter>
+	<RefParameter Comment="Mode" DefaultValue="OPAMP_FOLLOWER_MODE" Name="Mode" Type="list" Group="Basic Parameters" Visible="false" >	
+		<PossibleValue Comment="Follower" Value="OPAMP_FOLLOWER_MODE"/>
+	</RefParameter>
+	<RefMode Name="powerSupply" Abstract="true">
+		<!-- Basic Parameters -->	
+		<Parameter Name="PowerSupplyRange"/>
+	</RefMode>
+	<!-- RefModes for Ext-Gain-Setting mode -->
+	<RefMode Name="Standalone" HalMode="OPAMP" BaseMode="powerSupply">
+	<Condition Expression="$IpInstance_Self_Calibrate" Diagnostic=""/>
+		<ConfigForMode>OPAMP_Init</ConfigForMode>
+		<ConfigForMode>OPAMP_SelfCalibration</ConfigForMode>
+		<!-- Basic Parameters -->	
+		
+	
+		<Parameter Name="InvertingInput"/>
+		<Parameter Name="NonInvertingInput"/>
+		<Parameter Name="PowerMode"/>
+		<Parameter Name="UserTrimming"/>
+		<Parameter Name="SelfCalibration"/>
+		<Parameter Name="TrimmingValueP"/>
+		<Parameter Name="TrimmingValueN"/>
+		<Parameter Name="TrimmingValuePLowPower"/>
+		<Parameter Name="TrimmingValueNLowPower"/>
+		<Parameter Name="Mode"/>
+	</RefMode>
+	<RefMode Name="Standalone" HalMode="OPAMP" BaseMode="powerSupply">
+		<ConfigForMode>OPAMP_Init</ConfigForMode>
+		<!-- Basic Parameters -->	
+		
+		<Parameter Name="InvertingInput"/>
+		<Parameter Name="NonInvertingInput"/>
+		<Parameter Name="PowerMode"/>
+		<Parameter Name="UserTrimming"/>
+		<Parameter Name="SelfCalibration"/>
+		<Parameter Name="TrimmingValueP"/>
+		<Parameter Name="TrimmingValueN"/>
+		<Parameter Name="TrimmingValuePLowPower"/>
+		<Parameter Name="TrimmingValueNLowPower"/>
+		<Parameter Name="Mode"/>
+	</RefMode>
+	
+	
+	
+	<!-- RefModes for Ext-Gain-Setting-DAC-INP mode -->
+	<RefMode Name="Standalone-DAC_OUT1-INP" HalMode="OPAMP" BaseMode="powerSupply">
+	<Condition Expression="$IpInstance_Self_Calibrate" Diagnostic=""/>
+		<ConfigForMode>OPAMP_Init</ConfigForMode>
+		<ConfigForMode>OPAMP_SelfCalibration</ConfigForMode>
+		<!-- Basic Parameters -->	
+		
+		<Parameter Name="InvertingInput"/>
+		<Parameter Name="NonInvertingInput"/>
+		<Parameter Name="PowerMode"/>
+		<Parameter Name="UserTrimming"/>
+		<Parameter Name="SelfCalibration"/>
+		<Parameter Name="TrimmingValueP"/>
+		<Parameter Name="TrimmingValueN"/>
+		<Parameter Name="TrimmingValuePLowPower"/>
+		<Parameter Name="TrimmingValueNLowPower"/>
+		<Parameter Name="Mode"/>
+	</RefMode>
+	<RefMode Name="Standalone-DAC_OUT1-INP" HalMode="OPAMP" BaseMode="powerSupply">
+		<ConfigForMode>OPAMP_Init</ConfigForMode>
+		<!-- Basic Parameters -->	
+		
+		<Parameter Name="InvertingInput"/>
+		<Parameter Name="NonInvertingInput"/>
+		<Parameter Name="PowerMode"/>
+		<Parameter Name="UserTrimming"/>
+		<Parameter Name="SelfCalibration"/>
+		<Parameter Name="TrimmingValueP"/>
+		<Parameter Name="TrimmingValueN"/>
+		<Parameter Name="TrimmingValuePLowPower"/>
+		<Parameter Name="TrimmingValueNLowPower"/>
+		<Parameter Name="Mode"/>
+	</RefMode>
+	
+		<RefMode Name="Standalone-DAC_OUT2-INP" HalMode="OPAMP" BaseMode="powerSupply">
+	<Condition Expression="$IpInstance_Self_Calibrate" Diagnostic=""/>
+		<ConfigForMode>OPAMP_Init</ConfigForMode>
+		<ConfigForMode>OPAMP_SelfCalibration</ConfigForMode>
+		<!-- Basic Parameters -->	
+		
+		<Parameter Name="InvertingInput"/>
+		<Parameter Name="NonInvertingInput"/>
+		<Parameter Name="PowerMode"/>
+		<Parameter Name="UserTrimming"/>
+		<Parameter Name="SelfCalibration"/>
+		<Parameter Name="TrimmingValueP"/>
+		<Parameter Name="TrimmingValueN"/>
+		<Parameter Name="TrimmingValuePLowPower"/>
+		<Parameter Name="TrimmingValueNLowPower"/>
+		<Parameter Name="Mode"/>
+	</RefMode>
+	<RefMode Name="Standalone-DAC_OUT2-INP" HalMode="OPAMP" BaseMode="powerSupply">
+		<ConfigForMode>OPAMP_Init</ConfigForMode>
+		<!-- Basic Parameters -->	
+		
+		<Parameter Name="InvertingInput"/>
+		<Parameter Name="NonInvertingInput"/>
+		<Parameter Name="PowerMode"/>
+		<Parameter Name="UserTrimming"/>
+		<Parameter Name="SelfCalibration"/>
+		<Parameter Name="TrimmingValueP"/>
+		<Parameter Name="TrimmingValueN"/>
+		<Parameter Name="TrimmingValuePLowPower"/>
+		<Parameter Name="TrimmingValueNLowPower"/>
+		<Parameter Name="Mode"/>
+	</RefMode>
+	
+	
+	
+	
+	
+	<!-- RefModes for Follower configuration mode -->
+	<RefMode Name="Follower" HalMode="OPAMP" BaseMode="powerSupply">
+		<Condition Expression="$IpInstance_Self_Calibrate" Diagnostic=""/>
+		<ConfigForMode>OPAMP_Init</ConfigForMode>
+		<ConfigForMode>OPAMP_SelfCalibration</ConfigForMode>
+		<!-- Basic Parameters -->
+		
+		<Parameter Name="NonInvertingInput"/>
+		<Parameter Name="PowerMode"/>
+		<Parameter Name="UserTrimming"/>
+		<Parameter Name="SelfCalibration"/>
+		<Parameter Name="TrimmingValueP"/>
+		<Parameter Name="TrimmingValueN"/>
+		<Parameter Name="TrimmingValuePLowPower"/>
+		<Parameter Name="TrimmingValueNLowPower"/>
+		<Parameter Name="Mode"/>
+	</RefMode>
+	<RefMode Name="Follower" HalMode="OPAMP" BaseMode="powerSupply">
+		<ConfigForMode>OPAMP_Init</ConfigForMode>
+		<!-- Basic Parameters -->
+	
+		<Parameter Name="NonInvertingInput"/>
+		<Parameter Name="PowerMode"/>
+		<Parameter Name="UserTrimming"/>
+		<Parameter Name="SelfCalibration"/>
+		<Parameter Name="TrimmingValueP"/>
+		<Parameter Name="TrimmingValueN"/>
+		<Parameter Name="TrimmingValuePLowPower"/>
+		<Parameter Name="TrimmingValueNLowPower"/>
+		<Parameter Name="Mode"/>
+	</RefMode>
+	
+	
+		<!-- RefModes for Follower-DAC-INP configuration mode -->
+	<RefMode Name="Follower-DAC_OUT1-INP" HalMode="OPAMP" BaseMode="powerSupply">
+	<Condition Expression="$IpInstance_Self_Calibrate" Diagnostic=""/>
+		<ConfigForMode>OPAMP_Init</ConfigForMode>
+		<ConfigForMode>OPAMP_SelfCalibration</ConfigForMode>
+		<!-- Basic Parameters -->
+		
+		<Parameter Name="NonInvertingInput"/>
+		<Parameter Name="PowerMode"/>
+		<Parameter Name="UserTrimming"/>
+		<Parameter Name="SelfCalibration"/>
+		<Parameter Name="TrimmingValueP"/>
+		<Parameter Name="TrimmingValueN"/>
+		<Parameter Name="TrimmingValuePLowPower"/>
+		<Parameter Name="TrimmingValueNLowPower"/>
+		<Parameter Name="Mode"/>
+	</RefMode>
+	<RefMode Name="Follower-DAC_OUT1-INP" HalMode="OPAMP" BaseMode="powerSupply">
+		<ConfigForMode>OPAMP_Init</ConfigForMode>
+		<!-- Basic Parameters -->
+		
+		<Parameter Name="NonInvertingInput"/>
+		<Parameter Name="PowerMode"/>
+		<Parameter Name="UserTrimming"/>
+		<Parameter Name="SelfCalibration"/>
+		<Parameter Name="TrimmingValueP"/>
+		<Parameter Name="TrimmingValueN"/>
+		<Parameter Name="TrimmingValuePLowPower"/>
+		<Parameter Name="TrimmingValueNLowPower"/>
+		<Parameter Name="Mode"/>
+	</RefMode>
+	
+	<RefMode Name="Follower-DAC_OUT2-INP" HalMode="OPAMP" BaseMode="powerSupply">
+	<Condition Expression="$IpInstance_Self_Calibrate" Diagnostic=""/>
+		<ConfigForMode>OPAMP_Init</ConfigForMode>
+		<ConfigForMode>OPAMP_SelfCalibration</ConfigForMode>
+		<!-- Basic Parameters -->
+		
+		<Parameter Name="NonInvertingInput"/>
+		<Parameter Name="PowerMode"/>
+		<Parameter Name="UserTrimming"/>
+		<Parameter Name="SelfCalibration"/>
+		<Parameter Name="TrimmingValueP"/>
+		<Parameter Name="TrimmingValueN"/>
+		<Parameter Name="TrimmingValuePLowPower"/>
+		<Parameter Name="TrimmingValueNLowPower"/>
+		<Parameter Name="Mode"/>
+	</RefMode>
+	<RefMode Name="Follower-DAC_OUT2-INP" HalMode="OPAMP" BaseMode="powerSupply">
+		<ConfigForMode>OPAMP_Init</ConfigForMode>
+		<!-- Basic Parameters -->
+
+		<Parameter Name="NonInvertingInput"/>
+		<Parameter Name="PowerMode"/>
+		<Parameter Name="UserTrimming"/>
+		<Parameter Name="SelfCalibration"/>
+		<Parameter Name="TrimmingValueP"/>
+		<Parameter Name="TrimmingValueN"/>
+		<Parameter Name="TrimmingValuePLowPower"/>
+		<Parameter Name="TrimmingValueNLowPower"/>
+		<Parameter Name="Mode"/>
+	</RefMode>
+	
+	
+	
+	
+	
+	
+	
+	
+	<!-- RefModes for Int-Gain-Setting-Ext-Capacitance mode -->
+	<RefMode Name="PGA Connected" HalMode="OPAMP" BaseMode="powerSupply">
+	<Condition Expression="$IpInstance_Self_Calibrate" Diagnostic=""/>
+		<ConfigForMode>OPAMP_Init</ConfigForMode>
+		<ConfigForMode>OPAMP_SelfCalibration</ConfigForMode>
+		<!-- Basic Parameters -->
+		
+		<Parameter Name="InvertingInput"/>
+		<Parameter Name="NonInvertingInput"/>
+		<Parameter Name="PowerMode"/>
+		<Parameter Name="PgaGain"/>
+		<Parameter Name="UserTrimming"/>
+		<Parameter Name="SelfCalibration"/>
+		<Parameter Name="TrimmingValueP"/>
+		<Parameter Name="TrimmingValueN"/>
+		<Parameter Name="TrimmingValuePLowPower"/>
+		<Parameter Name="TrimmingValueNLowPower"/>
+		<Parameter Name="Mode"/>
+	</RefMode>
+	<RefMode Name="PGA Connected" HalMode="OPAMP" BaseMode="powerSupply">
+		<ConfigForMode>OPAMP_Init</ConfigForMode>
+		
+		<!-- Basic Parameters -->
+	
+		<Parameter Name="InvertingInput"/>
+		<Parameter Name="NonInvertingInput"/>
+		<Parameter Name="PowerMode"/>
+		<Parameter Name="PgaGain"/>
+		<Parameter Name="UserTrimming"/>
+		<Parameter Name="SelfCalibration"/>
+		<Parameter Name="TrimmingValueP"/>
+		<Parameter Name="TrimmingValueN"/>
+		<Parameter Name="TrimmingValuePLowPower"/>
+		<Parameter Name="TrimmingValueNLowPower"/>
+		<Parameter Name="Mode"/>
+	</RefMode>
+	
+	
+ 
+ <!-- RefModes for Int-Gain-Setting-DAC-INP-Ext-Capacitance mode -->
+
+	<RefMode Name="PGA Connected-DAC_OUT1-INP" HalMode="OPAMP" BaseMode="powerSupply">
+	<Condition Expression="$IpInstance_Self_Calibrate" Diagnostic=""/>
+		<ConfigForMode>OPAMP_Init</ConfigForMode>
+		<ConfigForMode>OPAMP_SelfCalibration</ConfigForMode>
+		
+	
+		<Parameter Name="InvertingInput"/>
+		<Parameter Name="NonInvertingInput"/>
+		<Parameter Name="PowerMode"/>
+		<Parameter Name="PgaGain"/>
+		<Parameter Name="UserTrimming"/>
+		<Parameter Name="SelfCalibration"/>
+		<Parameter Name="TrimmingValueP"/>
+		<Parameter Name="TrimmingValueN"/>
+		<Parameter Name="TrimmingValuePLowPower"/>
+		<Parameter Name="TrimmingValueNLowPower"/>
+		<Parameter Name="Mode"/>
+	</RefMode>
+	<RefMode Name="PGA Connected-DAC_OUT1-INP" HalMode="OPAMP" BaseMode="powerSupply">
+		<ConfigForMode>OPAMP_Init</ConfigForMode>
+	
+	
+		<Parameter Name="InvertingInput"/>
+		<Parameter Name="NonInvertingInput"/>
+		<Parameter Name="PowerMode"/>
+		<Parameter Name="PgaGain"/>
+		<Parameter Name="UserTrimming"/>
+		<Parameter Name="SelfCalibration"/>
+		<Parameter Name="TrimmingValueP"/>
+		<Parameter Name="TrimmingValueN"/>
+		<Parameter Name="TrimmingValuePLowPower"/>
+		<Parameter Name="TrimmingValueNLowPower"/>
+		<Parameter Name="Mode"/>
+	</RefMode>
+	
+	<RefMode Name="PGA Connected-DAC_OUT2-INP" HalMode="OPAMP" BaseMode="powerSupply">
+	<Condition Expression="$IpInstance_Self_Calibrate" Diagnostic=""/>
+		<ConfigForMode>OPAMP_Init</ConfigForMode>
+		<ConfigForMode>OPAMP_SelfCalibration</ConfigForMode>
+		
+		
+		<Parameter Name="InvertingInput"/>
+		<Parameter Name="NonInvertingInput"/>
+		<Parameter Name="PowerMode"/>
+		<Parameter Name="PgaGain"/>
+		<Parameter Name="UserTrimming"/>
+		<Parameter Name="SelfCalibration"/>
+		<Parameter Name="TrimmingValueP"/>
+		<Parameter Name="TrimmingValueN"/>
+		<Parameter Name="TrimmingValuePLowPower"/>
+		<Parameter Name="TrimmingValueNLowPower"/>
+		<Parameter Name="Mode"/>
+	</RefMode>
+	<RefMode Name="PGA Connected-DAC_OUT2-INP" HalMode="OPAMP" BaseMode="powerSupply">
+		<ConfigForMode>OPAMP_Init</ConfigForMode>
+		
+	
+		<Parameter Name="InvertingInput"/>
+		<Parameter Name="NonInvertingInput"/>
+		<Parameter Name="PowerMode"/>
+		<Parameter Name="PgaGain"/>
+		<Parameter Name="UserTrimming"/>
+		<Parameter Name="SelfCalibration"/>
+		<Parameter Name="TrimmingValueP"/>
+		<Parameter Name="TrimmingValueN"/>
+		<Parameter Name="TrimmingValuePLowPower"/>
+		<Parameter Name="TrimmingValueNLowPower"/>
+		<Parameter Name="Mode"/>
+	</RefMode>
+	
+	<RefMode Name="PGA Not Connected" HalMode="OPAMP" BaseMode="powerSupply">
+	<Condition Expression="$IpInstance_Self_Calibrate" Diagnostic=""/>
+		<ConfigForMode>OPAMP_Init</ConfigForMode>
+		<ConfigForMode>OPAMP_SelfCalibration</ConfigForMode>
+		<!-- Basic Parameters -->
+		
+		<Parameter Name="InvertingInput"/>
+		<Parameter Name="NonInvertingInput"/>
+		<Parameter Name="PowerMode"/>
+		<Parameter Name="PgaGain"/>
+		<Parameter Name="UserTrimming"/>
+		<Parameter Name="SelfCalibration"/>
+		<Parameter Name="TrimmingValueP"/>
+		<Parameter Name="TrimmingValueN"/>
+		<Parameter Name="TrimmingValuePLowPower"/>
+		<Parameter Name="TrimmingValueNLowPower"/>
+		<Parameter Name="Mode"/>
+	</RefMode>
+	<RefMode Name="PGA Not Connected" HalMode="OPAMP" BaseMode="powerSupply">
+		<ConfigForMode>OPAMP_Init</ConfigForMode>
+		
+		<!-- Basic Parameters -->
+	
+		<Parameter Name="InvertingInput"/>
+		<Parameter Name="NonInvertingInput"/>
+		<Parameter Name="PowerMode"/>
+		<Parameter Name="PgaGain"/>
+		<Parameter Name="UserTrimming"/>
+		<Parameter Name="SelfCalibration"/>
+		<Parameter Name="TrimmingValueP"/>
+		<Parameter Name="TrimmingValueN"/>
+		<Parameter Name="TrimmingValuePLowPower"/>
+		<Parameter Name="TrimmingValueNLowPower"/>
+		<Parameter Name="Mode"/>
+	</RefMode>
+	
+	
+ 
+ <!-- RefModes for Int-Gain-Setting-DAC-INP-Ext-Capacitance mode -->
+
+	<RefMode Name="PGA Not Connected-DAC_OUT1-INP" HalMode="OPAMP" BaseMode="powerSupply">
+	<Condition Expression="$IpInstance_Self_Calibrate" Diagnostic=""/>
+		<ConfigForMode>OPAMP_Init</ConfigForMode>
+		<ConfigForMode>OPAMP_SelfCalibration</ConfigForMode>
+		
+	
+		<Parameter Name="InvertingInput"/>
+		<Parameter Name="NonInvertingInput"/>
+		<Parameter Name="PowerMode"/>
+		<Parameter Name="PgaGain"/>
+		<Parameter Name="UserTrimming"/>
+		<Parameter Name="SelfCalibration"/>
+		<Parameter Name="TrimmingValueP"/>
+		<Parameter Name="TrimmingValueN"/>
+		<Parameter Name="TrimmingValuePLowPower"/>
+		<Parameter Name="TrimmingValueNLowPower"/>
+		<Parameter Name="Mode"/>
+	</RefMode>
+	<RefMode Name="PGA Not Connected-DAC_OUT1-INP" HalMode="OPAMP" BaseMode="powerSupply">
+		<ConfigForMode>OPAMP_Init</ConfigForMode>
+	
+	
+		<Parameter Name="InvertingInput"/>
+		<Parameter Name="NonInvertingInput"/>
+		<Parameter Name="PowerMode"/>
+		<Parameter Name="PgaGain"/>
+		<Parameter Name="UserTrimming"/>
+		<Parameter Name="SelfCalibration"/>
+		<Parameter Name="TrimmingValueP"/>
+		<Parameter Name="TrimmingValueN"/>
+		<Parameter Name="TrimmingValuePLowPower"/>
+		<Parameter Name="TrimmingValueNLowPower"/>
+		<Parameter Name="Mode"/>
+	</RefMode>
+	
+	<RefMode Name="PGA Not Connected-DAC_OUT2-INP" HalMode="OPAMP" BaseMode="powerSupply">
+	<Condition Expression="$IpInstance_Self_Calibrate" Diagnostic=""/>
+		<ConfigForMode>OPAMP_Init</ConfigForMode>
+		<ConfigForMode>OPAMP_SelfCalibration</ConfigForMode>
+		
+		
+		<Parameter Name="InvertingInput"/>
+		<Parameter Name="NonInvertingInput"/>
+		<Parameter Name="PowerMode"/>
+		<Parameter Name="PgaGain"/>
+		<Parameter Name="UserTrimming"/>
+		<Parameter Name="SelfCalibration"/>
+		<Parameter Name="TrimmingValueP"/>
+		<Parameter Name="TrimmingValueN"/>
+		<Parameter Name="TrimmingValuePLowPower"/>
+		<Parameter Name="TrimmingValueNLowPower"/>
+		<Parameter Name="Mode"/>
+	</RefMode>
+	<RefMode Name="PGA Not Connected-DAC_OUT2-INP" HalMode="OPAMP" BaseMode="powerSupply">
+		<ConfigForMode>OPAMP_Init</ConfigForMode>
+		
+	
+		<Parameter Name="InvertingInput"/>
+		<Parameter Name="NonInvertingInput"/>
+		<Parameter Name="PowerMode"/>
+		<Parameter Name="PgaGain"/>
+		<Parameter Name="UserTrimming"/>
+		<Parameter Name="SelfCalibration"/>
+		<Parameter Name="TrimmingValueP"/>
+		<Parameter Name="TrimmingValueN"/>
+		<Parameter Name="TrimmingValuePLowPower"/>
+		<Parameter Name="TrimmingValueNLowPower"/>
+		<Parameter Name="Mode"/>
+	</RefMode>
+	
+  
+	
+	<ModeLogicOperator Name="AND">
+		<Mode Name="Mode">
+			<ModeLogicOperator Name="XOR">
+				<Mode Name="Standalone">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="VINM"/>
+						<Signal Name="VINP"/>
+						<Signal Name="VOUT"/>
+					</SignalLogicalOp>
+					<Semaphore>$IpInstance_STANDALONE</Semaphore>
+				</Mode>
+				<Mode Name="Standalone-DAC_OUT2-INP" RemoveCondition="($IpNumber=1)|(!(DAC:$modeexist_DAC_OUT2) &amp; !(DAC1:$modeexist_DAC_OUT2))">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="VINM"/>
+						<Signal Name="VOUT"/>
+					</SignalLogicalOp>
+				<Condition Expression="((DAC_OUT2_Conf)|(DAC1_OUT2_Conf)) &amp; ($Index=2) " Diagnostic="Only active when DAC channel out2 is enabled"/>
+					<Semaphore>$IpInstance_STANDALONE</Semaphore>
+					<Semaphore>$IpInstance_Dac</Semaphore>
+				</Mode>
+				<Mode Name="Standalone-DAC_OUT1-INP" RemoveCondition="($IpNumber=2)">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="VINM"/>
+						<Signal Name="VOUT"/>
+					</SignalLogicalOp>
+				<Condition Expression="((DAC_OUT1_Conf)|(DAC1_OUT1_Conf)) &amp; ($Index=1)" Diagnostic="Only active when DAC channel out1 is enabled"/>
+				<Semaphore>$IpInstance_STANDALONE</Semaphore>
+				<Semaphore>$IpInstance_Dac</Semaphore>
+				</Mode>
+				<Mode Name="Follower">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="VINP"/>
+						<Signal Name="VOUT"/>
+					</SignalLogicalOp>
+					<Semaphore>$IpInstance_FOLLOWER</Semaphore>
+				</Mode>
+				<Mode Name="Follower-DAC_OUT2-INP" RemoveCondition="($IpNumber=1)|(!(DAC:$modeexist_DAC_OUT2) &amp; !(DAC1:$modeexist_DAC_OUT2))">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="VOUT"/>
+					</SignalLogicalOp>
+					<Condition Expression="((DAC_OUT2_Conf)|(DAC1_OUT2_Conf)) &amp; ($Index=2) " Diagnostic="Only active when DAC channel out2 is enabled"/>
+					<Semaphore>$IpInstance_FOLLOWER</Semaphore>
+					<Semaphore>$IpInstance_Dac</Semaphore>
+				</Mode>
+				<Mode Name="Follower-DAC_OUT1-INP" RemoveCondition="($IpNumber=2)">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="VOUT"/>
+					</SignalLogicalOp>
+					<Condition Expression="((DAC_OUT1_Conf)|(DAC1_OUT1_Conf)) &amp; ($Index=1)" Diagnostic="Only active when DAC channel out1 is enabled"/>
+						<Semaphore>$IpInstance_FOLLOWER</Semaphore>
+						<Semaphore>$IpInstance_Dac</Semaphore>
+				</Mode>	
+				
+			
+				<Mode Name="PGA Connected">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="VINM"/>
+						<Signal Name="VINP"/>
+						<Signal Name="VOUT"/>
+					</SignalLogicalOp>
+					<Semaphore>$IpInstance_PGA_Connected</Semaphore>
+				</Mode>
+				<Mode Name="PGA Connected-DAC_OUT2-INP" RemoveCondition="($IpNumber=1)|(!(DAC:$modeexist_DAC_OUT2) &amp; !(DAC1:$modeexist_DAC_OUT2))">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="VINM"/>
+						<Signal Name="VOUT"/>
+					</SignalLogicalOp>
+			<Condition Expression="((DAC_OUT2_Conf)|(DAC1_OUT2_Conf)) &amp; ($Index=2) " Diagnostic="Only active when DAC channel out2 is enabled"/>
+					<Semaphore>$IpInstance_PGA_Connected</Semaphore>
+					<Semaphore>$IpInstance_Dac</Semaphore>
+				</Mode>
+				<Mode Name="PGA Connected-DAC_OUT1-INP" RemoveCondition="($IpNumber=2)">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="VINM"/>
+						<Signal Name="VOUT"/>
+					</SignalLogicalOp>
+                  <Condition Expression="((DAC_OUT1_Conf)|(DAC1_OUT1_Conf)) &amp; ($Index=1)" Diagnostic="Only active when DAC channel out1 is enabled"/>
+					<Semaphore>$IpInstance_PGA_Connected</Semaphore>
+					<Semaphore>$IpInstance_Dac</Semaphore>
+				</Mode>
+				
+				<Mode Name="PGA Not Connected">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="VINP"/>
+						<Signal Name="VOUT"/>
+					</SignalLogicalOp>
+					<Semaphore>$IpInstance_PGA_Not_Connected</Semaphore>
+				</Mode>
+				<Mode Name="PGA Not Connected-DAC_OUT2-INP" RemoveCondition="($IpNumber=1)|(!(DAC:$modeexist_DAC_OUT2) &amp; !(DAC1:$modeexist_DAC_OUT2))">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="VOUT"/>
+					</SignalLogicalOp>
+			<Condition Expression="((DAC_OUT2_Conf)|(DAC1_OUT2_Conf)) &amp; ($Index=2) " Diagnostic="Only active when DAC channel out2 is enabled"/>
+					<Semaphore>$IpInstance_PGA_Not_Connected</Semaphore>
+					<Semaphore>$IpInstance_Dac</Semaphore>
+				</Mode>
+				<Mode Name="PGA Not Connected-DAC_OUT1-INP" RemoveCondition="($IpNumber=2)">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="VOUT"/>
+					</SignalLogicalOp>
+                  <Condition Expression="((DAC_OUT1_Conf)|(DAC1_OUT1_Conf)) &amp; ($Index=1)" Diagnostic="Only active when DAC channel out1 is enabled"/>
+					<Semaphore>$IpInstance_PGA_Not_Connected</Semaphore>
+					<Semaphore>$IpInstance_Dac</Semaphore>
+				</Mode>
+			</ModeLogicOperator>
+			<Semaphore>$IpInstance_OUTPUT_SELECTED_AS_ADC_INPUT</Semaphore>
+		</Mode>
+		
+	<!--	<Mode Name="Timer Controlled Mux Mode">
+		 <ModeLogicOperator Name="OR">
+		    <Mode Name="Connected To VM0">
+			    <SignalLogicalOp Name="AND">
+						<Signal Name="VINM_SEC"/>
+						<Signal Name="VINP_SEC"/>
+				</SignalLogicalOp>
+			</Mode>
+		</ModeLogicOperator>
+		<Semaphore>$IpInstance_Timer_Controlled</Semaphore>
+		<Condition Expression="TIM1" Diagnostic="Only active when TIM1 is enabled"/>
+		</Mode>	-->
+		
+	
+
+		</ModeLogicOperator>
+	
+	
+	<RefSignal IOMode="Analog" Name="VINM"/>
+	<RefSignal IOMode="Analog" Name="VINP"/>
+
+	<RefSignal IOMode="Analog" Name="VOUT"/>
+</IP>
+
+	
+	

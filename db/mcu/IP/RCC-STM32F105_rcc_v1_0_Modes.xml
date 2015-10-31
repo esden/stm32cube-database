@@ -239,9 +239,9 @@
         <PossibleValue Comment="MCO1SRC HSE"          Value="RCC_MCO1SOURCE_HSE"/>
         <PossibleValue Comment="MCO1SRC PLLCLK"       Value="RCC_MCO1SOURCE_PLLCLK"/>   
         <PossibleValue Comment="MCO1SRC PLL2CLK"      Value="RCC_MCO1SOURCE_PLL2CLK"/>   
-        <PossibleValue Comment="MCO1SRC PLL3CLK div2" Value="RCC_MCO1SOURCE_PLL3CLK_DIV2"/>   
+        <PossibleValue Comment="MCO1SRC PLL3CLK div2" Value="RCC_MCO1SOURCE_PLL3CLK_DIV2" Semaphore="MCOissourcePLL3Div2"/>   
         <PossibleValue Comment="MCO1SRC HSE Ext"      Value="RCC_MCO1SOURCE_EXT_HSE"/>   
-        <PossibleValue Comment="MCO1SRC PLL3CLK"      Value="RCC_MCO1SOURCE_PLL3CLK"/>   
+        <PossibleValue Comment="MCO1SRC PLL3CLK"      Value="RCC_MCO1SOURCE_PLL3CLK"      Semaphore="MCOissourcePLL3"/>   
     </RefParameter>
 	
 	
@@ -631,7 +631,7 @@
 	
 	
     <RefParameter Visible="false" Name="RCC_PERIPHCLK_I2S2Var" Comment="RCC_PERIPHCLK_I2S2Var" Type="list" DefaultValue="RCC_PERIPHCLK_I2S2">
-        <Condition Expression="I2S2Used_ForRCC | PLL3Used=1" Diagnostic="I2S2 Activated"/>
+        <Condition Expression="I2S2Used_ForRCC " Diagnostic="I2S2 Activated"/>
         <PossibleValue Comment="Periphclk ADC" Value="RCC_PERIPHCLK_I2S2"/>
     </RefParameter>
     <RefParameter Visible="false" Name="RCC_PERIPHCLK_I2S2Var" Comment="RCC_PERIPHCLK_I2S2Var" Type="list" DefaultValue=""/>
@@ -881,6 +881,15 @@
         <PossibleValue Comment="1" Value="RCC_MCODIV_1"/>
 
     </RefParameter>
+	    <RefParameter Visible="false" Comment="PLL3ARG" DefaultValue="+Prediv2" Name="PLL3ARG" Type="list">
+        <Condition Diagnostic="PLL used" Expression="MCOissourcePLL3|MCOissourcePLL3Div2"/>
+    </RefParameter>
+    <RefParameter Visible="false" Comment="PLL3ARG" DefaultValue="null" Name="PLL3ARG" Type="list"/>
+	
+	    <RefParameter Visible="false" Comment="PLLI2SARG2" DefaultValue="+PLL3Mul" Name="PLLI2SARG2" Type="list">
+        <Condition Diagnostic="PLL used" Expression="MCOissourcePLL3|MCOissourcePLL3Div2"/>
+    </RefParameter>
+    <RefParameter Visible="false" Comment="PLLI2SARG2" DefaultValue="null" Name="PLLI2SARG2" Type="list"/>
     
     
     <RefMode Name="ClockTree">
@@ -892,6 +901,10 @@
 
          <ConfigForMode>RCC_interrupt_Time_SYSTICK_Config</ConfigForMode>
 		 <ConfigForMode>RCC_SYSTICK_CONFIG</ConfigForMode>
+		 <ConfigForMode>RCC_HSE_PREDIV2_CONFIG</ConfigForMode>
+		 <ConfigForMode>RCC_PLLI2S_CONFIG</ConfigForMode>
+		 <ConfigForMode>RCC_PLLI2S_ENABLE</ConfigForMode>
+		 
         <Parameter Name="PLLMUL"/>
         <Parameter Name="APB1TimCLKDivider"/>
         <Parameter Name="APB2TimCLKDivider"/>

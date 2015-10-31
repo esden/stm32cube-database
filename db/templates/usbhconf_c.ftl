@@ -402,6 +402,14 @@ USBH_StatusTypeDef  USBH_LL_DriverVBUS (USBH_HandleTypeDef *phost, uint8_t state
     /* Drive high Charge pump */
     /* USER CODE BEGIN 1 */ 
     /* ToDo: Add IOE driver control */	
+    [#if handleNameFS == "FS"]
+    if (phost->id == HOST_FS) {    
+    }
+    [/#if] 
+    [#if handleNameHS == "HS"]
+    if (phost->id == HOST_HS) {
+    }
+    [/#if]     
     /* USER CODE END 1 */ 
   }
   else
@@ -409,6 +417,14 @@ USBH_StatusTypeDef  USBH_LL_DriverVBUS (USBH_HandleTypeDef *phost, uint8_t state
     /* Drive low Charge pump */
     /* USER CODE BEGIN 2 */
     /* ToDo: Add IOE driver control */	
+	[#if handleNameFS == "FS"]
+    if (phost->id == HOST_FS) {    
+    }
+    [/#if] 
+    [#if handleNameHS == "HS"]
+    if (phost->id == HOST_HS) {
+    }
+    [/#if] 
     /* USER CODE END 2 */
   }
 [/#if]

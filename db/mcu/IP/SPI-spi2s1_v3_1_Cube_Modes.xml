@@ -43,6 +43,24 @@
 		<PossibleValue Comment="TI" Value="SPI_TIMODE_ENABLED" Condition="!(VirtualNSS = VM_NSSHARD)" Diagnostic="Hardware NSS signal must be enabled first"/>
 	</RefParameter>
 	
+	
+	<RefParameter Comment="Data Size" DefaultValue="SPI_DATASIZE_4BIT" Name="DataSize" Type="list" Group="Basic Parameters">
+		<Condition Expression="STM32L4" Diagnostic="" />
+		<PossibleValue Comment="4 Bits" Value="SPI_DATASIZE_4BIT"/>
+		<PossibleValue Comment="5 Bits" Value="SPI_DATASIZE_5BIT"/>
+		<PossibleValue Comment="6 Bits" Value="SPI_DATASIZE_6BIT"/>
+		<PossibleValue Comment="7 Bits" Value="SPI_DATASIZE_7BIT"/>
+		<PossibleValue Comment="8 Bits" Value="SPI_DATASIZE_8BIT"/>
+		<PossibleValue Comment="9 Bits" Value="SPI_DATASIZE_9BIT"/>
+		<PossibleValue Comment="10 Bits" Value="SPI_DATASIZE_10BIT"/>
+		<PossibleValue Comment="11 Bits" Value="SPI_DATASIZE_11BIT"/>
+		<PossibleValue Comment="12 Bits" Value="SPI_DATASIZE_12BIT"/>
+		<PossibleValue Comment="13 Bits" Value="SPI_DATASIZE_13BIT"/>
+		<PossibleValue Comment="14 Bits" Value="SPI_DATASIZE_14BIT"/>
+		<PossibleValue Comment="15 Bits" Value="SPI_DATASIZE_15BIT"/>
+		<PossibleValue Comment="16 Bits" Value="SPI_DATASIZE_16BIT"/>
+	</RefParameter>
+	
 	<RefParameter Comment="Data Size" DefaultValue="SPI_DATASIZE_8BIT" Name="DataSize" Type="list" Group="Basic Parameters">
 		<PossibleValue Comment="8 Bits" Value="SPI_DATASIZE_8BIT"/>
 		<PossibleValue Comment="16 Bits" Value="SPI_DATASIZE_16BIT"/>
@@ -99,14 +117,40 @@
 	<!-- Advanced RefParameters for SPI --> 
 	<RefParameter Comment="CRC Calculation" DefaultValue="SPI_CRCCALCULATION_DISABLED" Name="CRCCalculation" Type="list" Group="Advanced Parameters">
 		<PossibleValue Comment="Disabled" Value="SPI_CRCCALCULATION_DISABLED"/>
-		<PossibleValue Comment="Enabled" Value="SPI_CRCCALCULATION_ENABLED"/>
+		<PossibleValue Comment="Enabled" Value="SPI_CRCCALCULATION_ENABLED" Condition="!(DataSize=SPI_DATASIZE_8BIT)  &amp; !(DataSize=SPI_DATASIZE_16BIT)" Diagnostic="SPI_CRCCALCULATION_ENABLED is available only if Data Size is 8 or 16 bits" Action="DISABLE"/>
+	</RefParameter>
+	
+	<RefParameter Comment="CRC Length" DefaultValue="SPI_CRC_LENGTH_DATASIZE" Name="CRCLength" Type="list" Group="Advanced Parameters">
+		<Condition Expression="(CRCCalculation = SPI_CRCCALCULATION_ENABLED) &amp; ((DataSize = SPI_DATASIZE_8BIT) | (DataSize =SPI_DATASIZE_16BIT))" Diagnostic=""/>
+		<PossibleValue Comment="Aligned with the data size" Value="SPI_CRC_LENGTH_DATASIZE"/>
+		<PossibleValue Comment="CRC 8 Bits" Value="SPI_CRC_LENGTH_8BIT"/>
+		<PossibleValue Comment="CRC 16 Bits" Value="SPI_CRC_LENGTH_16BIT"/>
+	</RefParameter>
+	<RefParameter Comment="CRC Length" DefaultValue="SPI_CRC_LENGTH_DATASIZE" Name="CRCLength" Type="list" Visible="false">		
+            <PossibleValue Comment="Aligned with the data size" Value="SPI_CRC_LENGTH_DATASIZE"/>
+    </RefParameter>
+	
+	<RefParameter Comment="CRC Polynomial" DefaultValue="X1+X3" Max="8" Name="CRCPolynomial" Type="polynomialOdd" Group="Advanced Parameters">
+		<Condition Expression="(CRCCalculation = SPI_CRCCALCULATION_ENABLED) &amp; (((DataSize = SPI_DATASIZE_8BIT) &amp; (CRCLength = SPI_CRC_LENGTH_DATASIZE)) | (CRCLength = SPI_CRC_LENGTH_8BIT))" Diagnostic=""/>
 	</RefParameter>
 	
 	<RefParameter Comment="CRC Polynomial" DefaultValue="X1+X3" Max="16" Name="CRCPolynomial" Type="polynomialOdd" Group="Advanced Parameters">
-		<Condition Expression="CRCCalculation = SPI_CRCCALCULATION_ENABLED" Diagnostic=""/>
+		<Condition Expression="(CRCCalculation = SPI_CRCCALCULATION_ENABLED) &amp; (((DataSize = SPI_DATASIZE_16BIT) &amp; (CRCLength = SPI_CRC_LENGTH_DATASIZE)) | (CRCLength = SPI_CRC_LENGTH_16BIT))" Diagnostic=""/>
 	</RefParameter>
-	<RefParameter Comment="CRC Polynomial" DefaultValue="X1+X3" Max="16" Name="CRCPolynomial" Type="polynomialOdd" Group="Advanced Parameters" Visible="false"/>
+	
+	<RefParameter Comment="CRC Polynomial" DefaultValue="10" Max="X1+X3" Min="X1+X3" Name="CRCPolynomial" Type="list" Group="Advanced Parameters" Visible="false">
+        <PossibleValue Comment="X1+X3" Value="10"/>
+        </RefParameter>
 		
+	<RefParameter Comment="NSSP Mode" DefaultValue="SPI_NSS_PULSE_ENABLED" Name="NSSPMode" Type="list" Group="Advanced Parameters">
+	 <Condition Expression="$IpInstance_Master &amp; (TIMode = SPI_TIMODE_DISABLED) &amp; (CLKPhase = SPI_PHASE_1EDGE)" Diagnostic=""/>
+	 	<PossibleValue Comment="Enabled" Value="SPI_NSS_PULSE_ENABLED"/>
+		<PossibleValue Comment="Disabled" Value="SPI_NSS_PULSE_DISABLED"/>
+	</RefParameter>
+	<RefParameter Comment="NSSP Mode" DefaultValue="SPI_NSS_PULSE_DISABLED" Name="NSSPMode" Type="list" Visible="false">
+    	<PossibleValue Comment="Disabled" Value="SPI_NSS_PULSE_DISABLED"/>
+    </RefParameter>
+	
 	<RefParameter Comment="NSS Signal Type" DefaultValue="SPI_NSS_SOFT" Name="NSS" Type="list" Group="Advanced Parameters">
 		<Condition Expression="VirtualNSS = VM_NSSSOFT" Diagnostic=""/>
 		<PossibleValue Comment="Software" Value="SPI_NSS_SOFT"/>
@@ -157,7 +201,9 @@
 		<Parameter Name="CLKPhase"/>
 		<!-- Selected Mode User Advanced Parameters -->
 		<Parameter Name="CRCCalculation"/>
+		<Parameter Name="CRCLength"/>
 		<Parameter Name="CRCPolynomial"/>
+		<Parameter Name="NSSPMode"/> 
 		<Parameter Name="NSS"/>
 	</RefMode>
 	
@@ -185,7 +231,9 @@
 		<Parameter Name="CLKPhase"/>
 		<!-- Selected Mode User Advanced Parameters -->
 		<Parameter Name="CRCCalculation"/>
+		<Parameter Name="CRCLength"/>
 		<Parameter Name="CRCPolynomial"/>
+		<Parameter Name="NSSPMode"/>
 		<Parameter Name="NSS"/>
 	</RefMode>
 	
@@ -213,7 +261,9 @@
 		<Parameter Name="CLKPhase"/>
 		<!-- Selected Mode User Advanced Parameters -->
 		<Parameter Name="CRCCalculation"/>
+		<Parameter Name="CRCLength"/>
 		<Parameter Name="CRCPolynomial"/>
+		<Parameter Name="NSSPMode"/>
 		<Parameter Name="NSS"/>
 	</RefMode>
 	
@@ -241,7 +291,9 @@
 		<Parameter Name="CLKPhase"/>
 		<!-- Selected Mode User Advanced Parameters -->
 		<Parameter Name="CRCCalculation"/>
+		<Parameter Name="CRCLength"/>
 		<Parameter Name="CRCPolynomial"/>
+		<Parameter Name="NSSPMode"/>
 		<Parameter Name="NSS"/>
 	</RefMode>
 	
@@ -269,7 +321,9 @@
 		<Parameter Name="CLKPhase"/>
 		<!-- Selected Mode User Advanced Parameters -->
 		<Parameter Name="CRCCalculation"/>
+		<Parameter Name="CRCLength"/>
 		<Parameter Name="CRCPolynomial"/>
+		<Parameter Name="NSSPMode"/>
 		<Parameter Name="NSS"/>
 	</RefMode>
 	
@@ -297,7 +351,9 @@
 		<Parameter Name="CLKPhase"/>
 		<!-- Selected Mode User Advanced Parameters -->
 		<Parameter Name="CRCCalculation"/>
+		<Parameter Name="CRCLength"/>
 		<Parameter Name="CRCPolynomial"/>
+		<Parameter Name="NSSPMode"/>
 		<Parameter Name="NSS"/>
 	</RefMode>
 	
@@ -325,7 +381,9 @@
 		<Parameter Name="CLKPhase"/>
 		<!-- Selected Mode User Advanced Parameters -->
 		<Parameter Name="CRCCalculation"/>
+		<Parameter Name="CRCLength"/>
 		<Parameter Name="CRCPolynomial"/>
+		<Parameter Name="NSSPMode"/>
 		<Parameter Name="NSS"/>
 	</RefMode>
 	
@@ -353,7 +411,9 @@
 		<Parameter Name="CLKPhase"/>
 		<!-- Selected Mode User Advanced Parameters -->
 		<Parameter Name="CRCCalculation"/>
+		<Parameter Name="CRCLength"/>
 		<Parameter Name="CRCPolynomial"/>
+		<Parameter Name="NSSPMode"/>
 		<Parameter Name="NSS"/>
 	</RefMode>
 	

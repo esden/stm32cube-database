@@ -41,6 +41,8 @@
  extern "C" {
 #endif
 
+[#--include "mxconstants.h"--]
+
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
 
@@ -129,7 +131,7 @@
 [#if advancedSettings??][#assign advancedSettings = advancedSettings[0]][/#if]
   
 #define  VDD_VALUE					  ((uint32_t)[#if vdd_value??]${vdd_value})[#else]3300)[/#if] /*!< Value of VDD in mv */           
-#define  TICK_INT_PRIORITY            ((uint32_t)[#if TICK_INT_PRIORITY??]${TICK_INT_PRIORITY}[#else]0x000F)[/#if])    /*!< tick interrupt priority */            
+#define  TICK_INT_PRIORITY            ((uint32_t)[#if TICK_INT_PRIORITY??]${TICK_INT_PRIORITY}[#else]0x000F[/#if])    /*!< tick interrupt priority */            
 #define  USE_RTOS                     [#if advancedSettings?? && advancedSettings.USE_RTOS??]${advancedSettings.USE_RTOS}[#else]0[/#if]     
 #define  PREFETCH_ENABLE              [#if PREFETCH_ENABLE??]${PREFETCH_ENABLE}[#else]1[/#if]
 #define  INSTRUCTION_CACHE_ENABLE     [#if INSTRUCTION_CACHE_ENABLE??]${INSTRUCTION_CACHE_ENABLE}[#else]1[/#if]

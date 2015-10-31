@@ -232,14 +232,14 @@
 	<RefParameter Comment="Clock Last Bit" DefaultValue="null" Name="CLKLastBit" Type="integer" Visible="false" Group="Clock Parameters"/>
 	
     <!-- Specifics RefParameters for IrDa Mode -->
-	<RefParameter Comment="IrDa Mode" DefaultValue="IRDA_POWERMODE_NORMAL" Name="PowerMode" Type="list" Group="Advanced Parameters">
+	<RefParameter Comment="Power Mode" DefaultValue="IRDA_POWERMODE_NORMAL" Name="PowerMode" Type="list" Group="Advanced Parameters">
 		<PossibleValue Comment="Low Power" Value="IRDA_POWERMODE_LOWPOWER"/>
 		<PossibleValue Comment="Normal Power" Value="IRDA_POWERMODE_NORMAL"/>
 	</RefParameter>
 	
 	<!-- Prescaler Parameters for IrDa/SmartCard Clock Mode -->
 	<RefParameter Comment="Prescaler" DefaultValue="1" Min="1" Max="1" Name="Prescaler" Type="integer" Group="Advanced Parameters">
-		<Condition Expression="(PowerMode= IRDA_POWERMODE_NORMAL) &amp; (VirtualMode = VM_IRDA)" Diagnostic=""/>
+		<Condition Expression="(PowerMode= IRDA_POWERMODE_NORMAL) &amp; (VirtualMode = VM_IRDA) &amp; (!DIE415)" Diagnostic=""/>
 	</RefParameter>
 	<RefParameter Comment="Prescaler for SmartCard Clock (Divide by x2)" DefaultValue="10" Max="31" Min="1" Name="Prescaler" Type="integer" Group="Clock Parameters">
 		<Condition Expression="VirtualMode = VM_SMARTCARD" Diagnostic=""/>
@@ -527,17 +527,17 @@
     <RefParameter Comment="Overrun State arg" DefaultValue="null" Name="OverrunDisable" Type="list" Group="Advanced Features" Visible="false"/>
 	
 	
-	<RefParameter Comment="Overrun Disable" DefaultValue="SMARTCARD_ADVFEATURE_OVERRUN_ENABLE" Name="OverrunDisableParam" Type="list" Group="Advanced Features">
+	<RefParameter Comment="Overrun Disable" DefaultValue="SMARTCARD_ADVFEATURE_OVERRUN_DISABLE" Name="OverrunDisableParam" Type="list" Group="Advanced Features">
 	    <Condition Expression="VirtualClockMode = VM_SMARTCARD" Diagnostic=""/>
 	    <PossibleValue Comment="Disable" Value="SMARTCARD_ADVFEATURE_OVERRUN_DISABLE"/>
 		<PossibleValue Comment="Enable" Value="SMARTCARD_ADVFEATURE_OVERRUN_ENABLE" />
 	</RefParameter>
-	<RefParameter Comment="Overrun Disable" DefaultValue="SMARTCARD_ADVFEATURE_OVERRUN_ENABLE" Name="OverrunDisableParam" Type="list" Group="Advanced Features">
+	<RefParameter Comment="Overrun Disable" DefaultValue="SMARTCARD_ADVFEATURE_OVERRUN_DISABLE" Name="OverrunDisableParam" Type="list" Group="Advanced Features">
 	    <Condition Expression="VirtualMode = VM_SMARTCARD" Diagnostic=""/>
 	    <PossibleValue Comment="Disable" Value="SMARTCARD_ADVFEATURE_OVERRUN_DISABLE"/>
 		<PossibleValue Comment="Enable" Value="SMARTCARD_ADVFEATURE_OVERRUN_ENABLE" />
 	</RefParameter>
-	<RefParameter Comment="Overrun Disable" DefaultValue="UART_ADVFEATURE_OVERRUN_ENABLE" Name="OverrunDisableParam" Type="list" Group="Advanced Features">
+	<RefParameter Comment="Overrun Disable" DefaultValue="UART_ADVFEATURE_OVERRUN_DISABLE" Name="OverrunDisableParam" Type="list" Group="Advanced Features">
 		<PossibleValue Comment="Disable" Value="UART_ADVFEATURE_OVERRUN_DISABLE"/>
 		<PossibleValue Comment="Enable" Value="UART_ADVFEATURE_OVERRUN_ENABLE" Semaphore="$IpInstance_OverrunDisableENABLE"/>
 	</RefParameter>
@@ -575,17 +575,17 @@
     </RefParameter>
     <RefParameter Comment="DMA State arg" DefaultValue="null" Name="DMADisableonRxError" Type="list" Group="Advanced Features" Visible="false"/>
 	
-	<RefParameter Comment="DMA Disable on RX Error" DefaultValue="SMARTCARD_ADVFEATURE_DMA_ENABLEONRXERROR" Name="DMADisableonRxErrorParam" Type="list" Group="Advanced Features">
+	<RefParameter Comment="DMA Disable on RX Error" DefaultValue="SMARTCARD_ADVFEATURE_DMA_DISABLEONRXERROR" Name="DMADisableonRxErrorParam" Type="list" Group="Advanced Features">
 	    <Condition Expression="VirtualClockMode = VM_SMARTCARD" Diagnostic=""/>
 		<PossibleValue Comment="Disable" Value="SMARTCARD_ADVFEATURE_DMA_DISABLEONRXERROR"/>
 		<PossibleValue Comment="Enable" Value="SMARTCARD_ADVFEATURE_DMA_ENABLEONRXERROR" />
 	</RefParameter>
-	<RefParameter Comment="DMA Disable on RX Error" DefaultValue="SMARTCARD_ADVFEATURE_DMA_ENABLEONRXERROR" Name="DMADisableonRxErrorParam" Type="list" Group="Advanced Features">
+	<RefParameter Comment="DMA Disable on RX Error" DefaultValue="SMARTCARD_ADVFEATURE_DMA_DISABLEONRXERROR" Name="DMADisableonRxErrorParam" Type="list" Group="Advanced Features">
 	    <Condition Expression="VirtualMode = VM_SMARTCARD" Diagnostic=""/>
 		<PossibleValue Comment="Disable" Value="SMARTCARD_ADVFEATURE_DMA_DISABLEONRXERROR"/>
 		<PossibleValue Comment="Enable" Value="SMARTCARD_ADVFEATURE_DMA_ENABLEONRXERROR" />
 	</RefParameter>
-	<RefParameter Comment="DMA Disable on RX Error" DefaultValue="UART_ADVFEATURE_DMA_ENABLEONRXERROR" Name="DMADisableonRxErrorParam" Type="list" Group="Advanced Features">
+	<RefParameter Comment="DMA Disable on RX Error" DefaultValue="UART_ADVFEATURE_DMA_DISABLEONRXERROR" Name="DMADisableonRxErrorParam" Type="list" Group="Advanced Features">
 		<PossibleValue Comment="Disable" Value="UART_ADVFEATURE_DMA_DISABLEONRXERROR"/>
 		<PossibleValue Comment="Enable" Value="UART_ADVFEATURE_DMA_ENABLEONRXERROR" Semaphore="$IpInstance_DMADisableonRxErrorENABLE"/>
 	</RefParameter>
@@ -848,7 +848,7 @@
 	</RefMode>
 	
 	<!-- RefModes for RS485 -->
-	<RefMode Name="Hardware Control (RS485)" HalMode="UART">
+	<RefMode Name="Hardware Flow Control (RS485)" HalMode="UART">
 		<ConfigForMode>Uart_RS485_Init</ConfigForMode>
 		<Parameter Name="VirtualMode">
 			<PossibleValue>VM_ASYNC</PossibleValue>
@@ -1030,7 +1030,7 @@
 			</ModeLogicOperator>
 		</Mode>
 		
-		<Mode Name = "Flow Control (RS232)" RemoveCondition="($IpNumber=5)|($IpNumber=7)|($IpNumber=8)">
+		<Mode Name = "Hardware Flow Control (RS232)" RemoveCondition="($IpNumber=5)|($IpNumber=7)|($IpNumber=8)">
 			<ModeLogicOperator Name="XOR">
 				<Mode Name="CTS_Only" UserName="CTS Only">
 					<SignalLogicalOp Name="AND">
@@ -1067,9 +1067,9 @@
 			<Condition Expression="$IpInstance_SmartCard" Diagnostic="Active only with SmartCard Mode"/>
 		</Mode>
 		-->
-		<Mode Name="Hardware Control (RS485)">
+		<Mode Name="Hardware Flow Control (RS485)">
 		    <ModeLogicOperator Name="XOR">
-				 <Mode Name="Hardware Control (RS485)">
+				 <Mode Name="Hardware Flow Control (RS485)">
 					<SignalLogicalOp Name="AND">
 						<Signal Name="DE"/>
 					</SignalLogicalOp>

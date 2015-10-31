@@ -3,6 +3,7 @@
 
 [#assign nbThreads = 0]
 [#assign nbM = 0]
+[#assign nbRM = 0]
 [#assign nbTimers = 0]
 [#assign nbQueues = 0]
 [#assign nbSemaphores = 0]
@@ -21,6 +22,28 @@
           #t/* definition and creation of ${mutexName} */
           #tosMutexDef(${mutexName});
           #t${mutexName}Handle = osMutexCreate(osMutex(${mutexName}));
+          #n       
+        [/#if]
+        [/#list]
+      [/#if] 	
+	[/#list]
+  [/#if]
+[/#list]
+
+[#list SWIPdatas as SWIP]
+  [#if SWIP.variables??]
+	[#list SWIP.variables as variable]
+	  [#if variable.name=="RecursiveMutexes"]
+	    [#assign s = variable.valueList]
+        [#list s as mutexName]
+        [#if mutexName != "0"]
+          [#assign nbRM = nbRM + 1]
+          [#if nbRM == 1]
+            #n#t/* Create the recursive mutex(es) */
+          [/#if]
+          #t/* definition and creation of ${mutexName} */
+          #tosMutexDef(${mutexName});
+          #t${mutexName}Handle = osRecursiveMutexCreate(osMutex(${mutexName}));
           #n       
         [/#if]
         [/#list]

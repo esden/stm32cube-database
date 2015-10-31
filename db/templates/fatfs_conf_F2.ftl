@@ -288,7 +288,6 @@ extern ${variable.value} ${variable.name};
 / is tied to the partitions listed in VolToPart[]. */
 
 
-#define _MIN_SS    ${valueMinSectorSize}  /* 512, 1024, 2048 or 4096 */
 #define _MAX_SS    ${valueMaxSectorSize}  /* 512, 1024, 2048 or 4096 */
 /* Maximum sector size to be handled.
 /  Always set 512 for memory card and hard disk but a larger value may be

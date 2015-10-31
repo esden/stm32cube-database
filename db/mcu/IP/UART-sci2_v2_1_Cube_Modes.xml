@@ -9,13 +9,17 @@
 	
 	
 		<!-- Baud Rate Parameters Asynchronous. -->
+	<RefParameter Comment="Baud Rate" DefaultValue="115200" Max="115200" Min="115200" Unit="Bits/s" Name="BaudRate" Type="integer" Visible="false" Group="Basic Parameters">
+            <Condition Expression="$IpInstance_UART_AutoBaudRate_Enable" Diagnostic=""/>
+	</RefParameter>
+	
 	<RefParameter Comment="Baud Rate" DefaultValue="38400" Max="9000000" Min="110" Unit="Bits/s" Name="BaudRate" Type="integer" Visible="true" Group="Basic Parameters"/>
 		
 	
 	<!-- Word Length Parameters for Synchronous, IrDa, and  Asyncronous. -->
 	
 	<RefParameter Comment="Word Length" DefaultValue="IRDA_WORDLENGTH_7B" Name="WordLength" Type="list" Group="Basic Parameters">
-		<Condition Expression="$IpInstance_IRDA &amp; DIE449" Diagnostic=""/>
+		<Condition Expression="$IpInstance_IRDA &amp; (DIE449|DIE415)" Diagnostic=""/>
 		<PossibleValue Comment="7 Bits (including Parity)" Value="IRDA_WORDLENGTH_7B" Semaphore="$IpInstance_Irda_7B" />
 		<PossibleValue Comment="8 Bits (including Parity)" Value="IRDA_WORDLENGTH_8B"/>
 		<PossibleValue Comment="9 Bits (including Parity)" Value="IRDA_WORDLENGTH_9B"/>
@@ -32,7 +36,7 @@
 	</RefParameter>
 	
 	<RefParameter Comment="Word Length" DefaultValue="UART_WORDLENGTH_7B" Name="WordLength" Type="list" Group="Basic Parameters">
-	<Condition Expression="DIE449" Diagnostic=""/>
+	<Condition Expression="(DIE449|DIE415)" Diagnostic=""/>
 	    <PossibleValue Comment="7 Bits (including Parity)" Value="UART_WORDLENGTH_7B" Semaphore="$IpInstance_Uart_7B" />
 		<PossibleValue Comment="8 Bits (including Parity)" Value="UART_WORDLENGTH_8B"/>
 		<PossibleValue Comment="9 Bits (including Parity)" Value="UART_WORDLENGTH_9B"/>
@@ -60,10 +64,11 @@
 		<PossibleValue Comment="Odd" Value="UART_PARITY_ODD"/>
 	</RefParameter>
 
-	<RefParameter Comment="IrDa Mode" DefaultValue="IRDA_MODE_DISABLE" Name="Mode" Type="list" Group="Advanced Parameters">
+	<RefParameter Comment="Data Direction" DefaultValue="IRDA_MODE_TX_RX" Name="Mode" Type="list" Group="Advanced Parameters">
 		<Condition Expression="$IpInstance_IRDA" Diagnostic=""/>
-		<PossibleValue Comment="Disable" Value="IRDA_MODE_DISABLE"/>
-		<PossibleValue Comment="Enable" Value="IRDA_MODE_ENABLE"/>
+		<PossibleValue Comment="Receive and Transmit" Value="IRDA_MODE_TX_RX"/>
+		<PossibleValue Comment="Receive Only" Value="IRDA_MODE_RX"/>
+		<PossibleValue Comment="Transmit Only" Value="IRDA_MODE_TX"/>
 	</RefParameter>
 	<RefParameter Comment="Data Direction" DefaultValue="UART_MODE_TX_RX" Name="Mode" Type="list" Group="Advanced Parameters">
 		<PossibleValue Comment="Receive and Transmit" Value="UART_MODE_TX_RX"/>
@@ -128,7 +133,7 @@
 	</RefParameter>
 	
 	<RefParameter Comment="Prescaler" DefaultValue="1" Min="1" Max="1" Name="Prescaler" Type="integer" Group="Advanced Parameters">
-		<Condition Expression="PowerMode = IRDA_POWERMODE_NORMAL" Diagnostic=""/>
+		<Condition Expression="PowerMode = IRDA_POWERMODE_NORMAL &amp; (!DIE415)" Diagnostic=""/>
 	</RefParameter>
 	
 	<RefParameter Comment="Prescaler" DefaultValue="10" Max="255" Min="1" Name="Prescaler" Type="integer" Group="Advanced Parameters"/>
@@ -306,7 +311,7 @@
 	<RefParameter Comment="" DefaultValue="" Name="IsMSBFirst" Type="list" Group="Advanced Features" Visible="false"/>
 	<!-- -->
 		<RefParameter Comment="Auto Baudrate" DefaultValue="UART_ADVFEATURE_AUTOBAUDRATE_DISABLE" Name="AutoBaudRateEnableParam" Type="list" Group="Advanced Features">
-		<Condition Expression="DIE449" Diagnostic=""/>
+		<Condition Expression="DIE449|DIE415" Diagnostic=""/>
 		<PossibleValue Comment="Disable" Value="UART_ADVFEATURE_AUTOBAUDRATE_DISABLE"/>
 		<PossibleValue Comment="Enable" Value="UART_ADVFEATURE_AUTOBAUDRATE_ENABLE" Semaphore="$IpInstance_UART_AutoBaudRate_Enable"/>
 	</RefParameter>
@@ -325,11 +330,45 @@
 		<PossibleValue Comment="ON 0X55 FRAME" Value="UART_ADVFEATURE_AUTOBAUDRATE_ON0X55FRAME"/>
 	</RefParameter>
 	<RefParameter Comment="Auto Baudrate Mode" DefaultValue="null" Name="AutoBaudRateMode" Type="list" Group="Advanced Features" Visible="false"/>
+   
+   <!--Specifics RefParameters for RS485 -->
+	<RefParameter Comment="Polarity" DefaultValue="UART_DE_POLARITY_HIGH" Name="UART_DEPolarity" Type="list" Group="Advanced Parameters">
+		<PossibleValue Comment="High" Value="UART_DE_POLARITY_HIGH"/>
+		<PossibleValue Comment="Low" Value="UART_DE_POLARITY_LOW"/>
+	</RefParameter>
+    <RefParameter Comment="Assertion Time" DefaultValue="0" Max="31" Min="0" Unit="Sample Time Unit" Name="UART_DEAssertionTime" Type="integer" Group="Advanced Parameters"/>
+	<RefParameter Comment="Deassertion Time" DefaultValue="0" Max="31" Min="0" Unit="Sample Time Unit" Name="UART_DEDeassertionTime" Type="integer" Group="Advanced Parameters"/>
 
 	 <RefMode Name="usartBasic" Abstract="true">
             		<Parameter Name="BaudRate"/>
         </RefMode>
-        
+      
+
+
+     <RefMode Name="Asynchronous" HalMode="UART" BaseMode="usartBasic">
+		<Condition Expression="$IpInstance_HardwareControl" Diagnostic=""/>
+		<!-- Basic Parameters -->
+		
+		<Parameter Name="WordLength"/>
+		<Parameter Name="Parity"/>
+		<Parameter Name="StopBits"/>
+		<Parameter Name="HwFlowCtl"/>
+		<!-- Advanced Parameters -->
+		<Parameter Name="Mode"/>
+		<Parameter Name="OverSampling" />
+		<Parameter Name="OneBitSampling"/>
+		<!-- Advanced Features -->
+		<Parameter Name="AutoBaudRateEnableParam"/>
+		<Parameter Name="AutoBaudRateMode"/>
+		<Parameter Name="TxPinLevelInvertParam"/>
+		<Parameter Name="RxPinLevelInvertParam"/>
+		<Parameter Name="DataInvertParam"/>
+		<Parameter Name="SwapParam"/>
+		<Parameter Name="OverrunDisableParam"/>
+		<Parameter Name="DMADisableonRxErrorParam"/>
+		<Parameter Name="MSBFirstParam"/>
+	</RefMode>
+	  
 	<!-- RefMode for Asynchronous UART -->
 	<RefMode Name="Asynchronous" HalMode="UART" BaseMode="usartBasic">
 		<ConfigForMode>Uart_Init</ConfigForMode>
@@ -345,13 +384,13 @@
 		<Parameter Name="OneBitSampling" />
 		<!-- Advanced Features -->
 		<Parameter Name="AutoBaudRateEnableParam"/>
+		<Parameter Name="AutoBaudRateMode"/>
 		<Parameter Name="TxPinLevelInvertParam"/>
 		<Parameter Name="RxPinLevelInvertParam"/>
 		<Parameter Name="DataInvertParam"/>
 		<Parameter Name="SwapParam"/>
 		<Parameter Name="OverrunDisableParam"/>
-		<Parameter Name="DMADisableonRxErrorParam"/>
-		<Parameter Name="AutoBaudRateMode"/>
+		<Parameter Name="DMADisableonRxErrorParam"/>	
 		<Parameter Name="MSBFirstParam"/>
 	</RefMode>
 	
@@ -370,13 +409,13 @@
 		<Parameter Name="OneBitSampling" />
 		<!-- Advanced Features -->
 		<Parameter Name="AutoBaudRateEnableParam"/>
+		<Parameter Name="AutoBaudRateMode"/>
 		<Parameter Name="TxPinLevelInvertParam"/>
 		<Parameter Name="RxPinLevelInvertParam"/>
 		<Parameter Name="DataInvertParam"/>
 		<Parameter Name="SwapParam"/>
 		<Parameter Name="OverrunDisableParam"/>
-		<Parameter Name="DMADisableonRxErrorParam"/>
-		<Parameter Name="AutoBaudRateMode"/>
+		<Parameter Name="DMADisableonRxErrorParam"/>	
 		<Parameter Name="MSBFirstParam"/>
 	</RefMode>
 		
@@ -397,13 +436,13 @@
 		<Parameter Name="Address"/>
 		<!-- Advanced Features -->
 		<Parameter Name="AutoBaudRateEnableParam"/>
+		<Parameter Name="AutoBaudRateMode"/>
 		<Parameter Name="TxPinLevelInvertParam"/>
 		<Parameter Name="RxPinLevelInvertParam"/>
 		<Parameter Name="DataInvertParam"/>
 		<Parameter Name="SwapParam"/>
 		<Parameter Name="OverrunDisableParam"/>
 		<Parameter Name="DMADisableonRxErrorParam"/>
-		<Parameter Name="AutoBaudRateMode"/>
 		<Parameter Name="MSBFirstParam"/>
 	</RefMode>
 
@@ -423,13 +462,13 @@
 		<Parameter Name="BreakDetectLength"/>
 		<!-- Advanced Features -->
 		<Parameter Name="AutoBaudRateEnableParam"/>
+		<Parameter Name="AutoBaudRateMode"/>
 		<Parameter Name="TxPinLevelInvertParam"/>
 		<Parameter Name="RxPinLevelInvertParam"/>
 		<Parameter Name="DataInvertParam"/>
 		<Parameter Name="SwapParam"/>
 		<Parameter Name="OverrunDisableParam"/>
-		<Parameter Name="DMADisableonRxErrorParam"/>
-		<Parameter Name="AutoBaudRateMode"/>
+		<Parameter Name="DMADisableonRxErrorParam"/>	
 		<Parameter Name="MSBFirstParam"/>
 	</RefMode>
 	
@@ -469,7 +508,13 @@
 	</RefMode>
 
 	
-	
+		<!-- RefModes for RS485 -->
+	<RefMode Name="Hardware Flow Control (RS485)" HalMode="UART">
+		<ConfigForMode>Uart_RS485_Init</ConfigForMode>
+		<Parameter Name="UART_DEPolarity"/>
+		<Parameter Name="UART_DEAssertionTime"/>
+		<Parameter Name="UART_DEDeassertionTime"/>
+	</RefMode>
 	
 	
 	
@@ -523,7 +568,7 @@
 		</Mode>
 	
 	
-	<Mode Name = "Flow Control (RS232)">
+	<Mode Name = "Hardware Flow Control (RS232)">
 			<ModeLogicOperator Name="XOR">
 				<Mode Name="CTS_Only" UserName="CTS Only">
 					<SignalLogicalOp Name="AND">
@@ -545,13 +590,26 @@
 					<Semaphore>$IpInstance_CTS_RTS</Semaphore>
 				</Mode>
 			</ModeLogicOperator>
-			<Condition Expression="$IpInstance_Asynchronous" Diagnostic="Active only with Asynchronous Mode"/>
+			<Condition Expression="$IpInstance_Asynchronous &amp; !$IpInstance_HardwareControl" Diagnostic="Active only with Asynchronous Mode"/>
+			<Semaphore>$IpInstance_FlowControl</Semaphore>
+	</Mode>
+	<Mode Name="Hardware Flow Control (RS485)">
+		    <ModeLogicOperator Name="XOR">
+				 <Mode Name="Hardware Flow Control (RS485)">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="DE"/>
+					</SignalLogicalOp>
+		        </Mode>
+		    </ModeLogicOperator>
+		<Condition Expression="!$IpInstance_FlowControl &amp; $IpInstance_Asynchronous" Diagnostic="Active only with Asynchronous Mode"/>
+		<Semaphore>$IpInstance_HardwareControl</Semaphore>
 	</Mode>
 		</ModeLogicOperator>
 	
 	<!-- RefSignal for UART/IRDA/Modbus -->
 	<RefSignal IOMode="AlternateFunctionPushPull" Name="CTS"/>
 	<RefSignal IOMode="AlternateFunctionPushPull" Name="RTS"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="DE"/>
 	<RefSignal IOMode="AlternateFunctionPushPullUp" Name="RX"/>
 	<RefSignal IOMode="AlternateFunctionPushPullUp" Name="TX"/>
 	<Semaphore>$IpInstanceUsed_ForRCC</Semaphore>

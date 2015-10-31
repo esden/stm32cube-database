@@ -49,6 +49,28 @@ void MX_FATFS_Init(void)
 #t/* USER CODE END Init */
 }
 
+[#list SWIPdatas as SWIP]  
+[#if SWIP.defines??]
+[#list SWIP.defines as definition]
+[#if definition.name="_FS_NORTC"]                           
+[#if definition.value="0"]
+/**
+  * @brief  Gets Time from RTC 
+  * @param  None
+  * @retval Time in DWORD
+  */
+DWORD get_fattime(void)
+{
+#t/* USER CODE BEGIN get_fattime */
+  return 0;
+#t/* USER CODE END get_fattime */  
+}
+[/#if] 
+[/#if]
+[/#list]
+[/#if]
+[/#list]
+
 /* USER CODE BEGIN Application */
      
 /* USER CODE END Application */

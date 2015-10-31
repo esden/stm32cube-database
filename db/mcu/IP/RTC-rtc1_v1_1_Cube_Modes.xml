@@ -20,14 +20,13 @@
 	<!-- Output Signal for Alarm A, Alarm B, WAKEUP -->
 	
 	<RefParameter Comment="Output" DefaultValue="RTC_OUTPUTSOURCE_NONE" Name="OutPut" Type="list" Group="General">
-		<Condition Diagnostic="" Expression="TAMPER_ENABLED"/>
+		<Condition Diagnostic="" Expression="TAMPER_ENABLED|RTC_noOutput"/>
 		<PossibleValue Comment="No output on the TAMPER pin" Value="RTC_OUTPUTSOURCE_NONE"/>
 	</RefParameter>
 	
-	<RefParameter Comment="Output" DefaultValue="RTC_OUTPUTSOURCE_NONE" Name="OutPut" Type="list" Group="General">
-		<PossibleValue Comment="No output on the TAMPER pin" Value="RTC_OUTPUTSOURCE_NONE"/>
+	<RefParameter Comment="Output" DefaultValue="RTC_OUTPUTSOURCE_ALARM" Name="OutPut" Type="list" Group="General">
+            	<PossibleValue Comment="Alarm pulse signal on the TAMPER pin" Value="RTC_OUTPUTSOURCE_ALARM"/>
 		<PossibleValue Comment="RTC clock with a frequency divided by 64 on the TAMPER pin" Value="RTC_OUTPUTSOURCE_CALIBCLOCK"/>
-		<PossibleValue Comment="Alarm pulse signal on the TAMPER pin" Value="RTC_OUTPUTSOURCE_ALARM"/>
 		<PossibleValue Comment="Second pulse signal on the TAMPER pin" Value="RTC_OUTPUTSOURCE_SECOND" Semaphore="RTC_GLOBAL_INTERRUPT_ON"/>
 	</RefParameter>
 	
@@ -172,23 +171,29 @@
 		<ConfigForMode>RTC_SetAlarm_A</ConfigForMode>
                 <Parameter Name="Alarm_A"/>
 	</RefMode>
-	
+        	
 	<!--##################################################################################################-->
 	<!--############################################# Modes Definition ###################################-->
 	<!--##################################################################################################-->
 	
 	<ModeLogicOperator Name="OR">
-		<Mode Name="RTC OUT">
-			<ModeLogicOperator Name="XOR">
-				<Mode Name="RTC OUT" UserName="RTC Output">
-					<SignalLogicalOp Name="AND">
-						<Signal Name="OUT"/>
-					</SignalLogicalOp>
-                                        <Semaphore>RTC_ALARM_INTERRUPT</Semaphore>
-				</Mode>
-			</ModeLogicOperator>
-			<Semaphore>RTC_ALARM_INTERRUPT</Semaphore>
-		</Mode>
+            <Mode Name="RTC OUT">
+                <ModeLogicOperator Name="XOR">			
+                    <Mode Name="RTC OUT" UserName="No RTC Output">
+                        <SignalLogicalOp Name="AND">
+                            <Signal Name="No_RTC_Output"/>
+                        </SignalLogicalOp>
+                        <Semaphore>RTC_noOutput</Semaphore>
+                        <Semaphore>RTC_ALARM_INTERRUPT</Semaphore>
+                    </Mode>               
+                    <Mode Name="RTC OUT" UserName="RTC Output on the Tamper pin">
+                        <SignalLogicalOp Name="AND">
+                            <Signal Name="OUT"/>
+                        </SignalLogicalOp>
+                        <Semaphore>RTC_ALARM_INTERRUPT</Semaphore>
+                    </Mode>			
+                </ModeLogicOperator>
+            </Mode>
 		
 		<Mode Name="Tamper">
 			<ModeLogicOperator Name="XOR">

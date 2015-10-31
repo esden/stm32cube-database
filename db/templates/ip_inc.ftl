@@ -1,2 +1,2 @@
 [#ftl]
-#include "${name}.h"
+#include "${name?lower_case}.h"

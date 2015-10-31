@@ -183,7 +183,73 @@
 [/#macro]
 [#-- macro getLocalVariable of a config End--]
 
+[#--------------DMA DFSDM--]
+[#-- macro generate service code for MspInit/MspDeInit Start--]
+[#macro generateServiceCodeDFSDM ipName serviceType modeName instHandler tabN]
+    [#if serviceType=="Init"]
+        [#assign initService = getInitServiceMode(ipName)]
+    [#else]
+        [#assign initService = getDeInitServiceMode(ipName)]
+    [/#if]
+    [#assign gpioExist = false]
+    [#assign dmaExist = false]
+    [#assign nvicExist = false]
+    [#if initService?? && initService.entrySet??]
+    [#list initService.entrySet() as entry]
+        [#if entry.key=="dma"  && modeName?contains("DFSDM_Filter")]
+        [#assign dmaExist = true]
+        [/#if]
+        [#if entry.key=="nvic" && initService.nvic?size!=0 && (modeName?contains("DFSDM_Filter")||!modeName?contains("DFSDM"))]
+        [#assign nvicExist = true]
+        [/#if]
+        [#if entry.key=="gpio"]
+        [#assign gpioExist = true]
+        [/#if]            
+    [/#list]
+    [/#if]    
+   
+      
+    [#if serviceType=="Init"] 
+        [#if dmaExist]#n#t#t/* Peripheral DMA init*/
+        #t[@generateConfigCode ipName=ipName type=serviceType serviceName="dma" instHandler=instHandler tabN=tabN/]
+        [/#if] 
+    [#else] [#-- if Deinit DMA --]
+    [#assign service = getInitServiceMode(ipName)] 
+        [#if dmaExist]#n#t#t/* Peripheral DMA DeInit*/
+            [#assign dmaservice =service.dma]
+            [#if dmaservice??]
+               [#-- list dmaservice as dmaconfig (Not necessary for DFSDM: applicable for all handler)--]
+                    [#assign dmaconfig = dmaservice[0]]
+                   [#if dmaconfig.dmaRequestName==""]
+                        [#assign dmaCurrentRequest = dmaconfig.instanceName?lower_case]
+                   [#else]
+                        [#assign dmaCurrentRequest = dmaconfig.dmaRequestName?lower_case]
+                   [/#if]
+                   [#assign prefixList = dmaCurrentRequest?split("_")] 
+            [#assign ind=""]
+[#if dmaCurrentRequest?contains("dfsdm")]
+    [#assign ind=dmaconfig.dmaRequestName?replace("DFSDM","") ]
+[#-- #tif(${instHandler}->Instance == DFSDM_Filter${ind}){ --]
+[/#if]
+                   [#list prefixList as p][#assign prefix= p][/#list]
+                        [#assign ipdmahandler1 = "hdma" + prefix]
+                        [#-- [#if getDmaHandler(ipName)!=""][#assign ipdmahandler = getDmaHandler(ipName)][#else][#assign ipdmahandler = ipdmahandler1][/#if]--]
+                        [#if dmaconfig.dmaHandel??][#assign ipdmahandler = dmaconfig.dmaHandel][#else][#assign ipdmahandler = ipdmahandler1][/#if]                     
+                            [#list dmaconfig.dmaHandel as dmaH]
+                                #t#tHAL_DMA_DeInit(${instHandler}->${dmaH});
+                            [/#list]
+[#if dmaCurrentRequest?contains("dfsdm")]
+[#-- #t} --]
+#n
+[/#if]                        
+                    [#-- /#list (Not necessary for DFSDM: applicable for all handler) --] [#-- list dmaService as dmaconfig --]
+             [/#if]    
+        [/#if]
+    [/#if]   
+[/#macro]
 
+[#-- End macro add service code --]
+[#--------------DMA DFSDM --]
 [#-- macro generateConfigModelCode --]
 
 [#macro generateConfigModelCode configModel inst nTab index]
@@ -440,20 +506,40 @@
 [#if serviceName=="dma" && dmaService??]
  [#assign instanceIndex =""]
     [#list dmaService as dmaconfig] 
+[#if dmaconfig.dmaRequestName=""]
+            [#assign dmaCurrentRequest = dmaconfig.instanceName?lower_case]
+        [#else]
+            [#assign dmaCurrentRequest = dmaconfig.dmaRequestName?lower_case]
+        [/#if]
+[#--workAround DFSDM--]
+ [#assign ind="" ]
+[#if dmaCurrentRequest?contains("dfsdm")]
+    [#assign ind=dmaconfig.dmaRequestName?replace("DFSDM","") ]
+#tif(${instHandler}->Instance == DFSDM_Filter${ind}){
+[/#if]
      [@generateConfigModelCode configModel=dmaconfig inst=ipName  nTab=tabN index=""/]
-        [#assign dmaCurrentRequest = dmaconfig.instanceName?lower_case]
         [#assign prefixList = dmaCurrentRequest?split("_")]
         [#list prefixList as p][#assign prefix= p][/#list]
         
             [#-- #t__HAL_LINKDMA(${instHandler},[#if dmaconfig.dmaHandel??]${dmaconfig.dmaHandel}[#else]hdma${prefix}[/#if],hdma_${dmaconfig.instanceName?lower_case});#n --]
             [#if dmaconfig.dmaHandel?size > 1] [#-- if more than one dma handler--]
+                [#assign channel="channel"]
+                [#if (FamilyName=="STM32F2" || FamilyName=="STM32F4" || FamilyName=="STM32F7")]
+                  [#assign channel="stream"]
+                [/#if]
                 #t#t/* Several peripheral DMA handle pointers point to the same DMA handle.
-                #t#t   Be aware that there is only one stream to perform all the requested DMAs. */
+                #t#t   Be aware that there is only one ${channel} to perform all the requested DMAs. */
+                [#assign one_sdio_request=false]
                 [#if (FamilyName=="STM32F1" || FamilyName=="STM32F2" || FamilyName=="STM32F4") && dmaconfig.dmaRequestName=="SDIO"]
-                #t#t/* Be sure to change transfer direction before calling
-                #t#t   HAL_SD_ReadBlocks_DMA or HAL_SD_WriteBlocks_DMA. */
+                  [#assign one_sdio_request=true]
                 [/#if]
                 [#if FamilyName=="STM32L1" && dmaconfig.dmaRequestName=="SD_MMC"]
+                  [#assign one_sdio_request=true]
+                [/#if]
+                [#if (FamilyName=="STM32F7" || FamilyName=="STM32L4") && dmaconfig.dmaRequestName=="SDMMC1"]
+                  [#assign one_sdio_request=true]
+                [/#if]
+                [#if one_sdio_request]
                 #t#t/* Be sure to change transfer direction before calling
                 #t#t   HAL_SD_ReadBlocks_DMA or HAL_SD_WriteBlocks_DMA. */
                 [/#if]
@@ -462,10 +548,18 @@
                 [#if dmaconfig.dmaRequestName==""] [#-- if dma request name different from instanceName: case of I2S1 for example --]
                     #t#t__HAL_LINKDMA(${instHandler},${dmaH},hdma_${dmaconfig.instanceName?lower_case});
                 [#else]
+        [#--workAround DFSDM--]
+            [#assign ind=""]
+            [#if dmaconfig.dmaRequestName?contains("DFSDM")]
+                [#assign ind=dmaconfig.dmaRequestName?replace("DFSDM","")]
+            [/#if]
                     #t#t__HAL_LINKDMA(${instHandler},${dmaH},hdma_${dmaconfig.dmaRequestName?lower_case});
                 [/#if]
             [/#list]
             [#-- #t#t__HAL_LINKDMA(${instHandler},[#if dmaconfig.dmaHandel??]${dmaconfig.dmaHandel}[#else]hdma${prefix}[/#if],hdma_${dmaconfig.instanceName?lower_case});#n --]
+[#if dmaCurrentRequest?contains("dfsdm")]
+    #t}
+[/#if]
 #n
     [/#list] [#-- list dmaService as dmaconfig --]
 #n
@@ -513,10 +607,10 @@
         [#assign nvicExist = false]
         [#if initService?? && initService.entrySet??]
         [#list initService.entrySet() as entry]
-            [#if entry.key=="dma"]
+            [#if entry.key=="dma" && !modeName?contains("DFSDM")]
             [#assign dmaExist = true]
             [/#if]
-            [#if entry.key=="nvic"]
+            [#if entry.key=="nvic" && initService.nvic?size!=0 && !modeName?contains("DFSDM_Filter")]
             [#assign nvicExist = true]
             [/#if]
             [#if entry.key=="gpio"]
@@ -595,8 +689,24 @@
 [#if serviceType=="Init"] 
     [#if dmaExist]#n#t#t/* Peripheral DMA init*/
 #t[@generateConfigCode ipName=ipName type=serviceType serviceName="dma" instHandler=instHandler tabN=tabN/]
-
     [/#if]
+[#-- bug 322189 Init--]
+[#if ipName?contains("OTG_FS")&&FamilyName=="STM32L4"]
+#n#t#t/* Enable VDDUSB */
+  #t#tif(__HAL_RCC_PWR_IS_CLK_DISABLED())
+  #t#t{
+    #t#t#t__HAL_RCC_PWR_CLK_ENABLE();
+    
+    #t#t#tHAL_PWREx_EnableVddUSB();
+    
+    #t#t#t__HAL_RCC_PWR_CLK_DISABLE();
+  #t#t}
+  #t#telse
+  #t#t{
+    #t#t#tHAL_PWREx_EnableVddUSB();
+  #t#t}
+[/#if]
+[#-- bug 322189 Init End--]
     [#if nvicExist]
         [#if initService??&&initService.nvic??&&initService.nvic?size>0]
            #n#t#t/* Peripheral interrupt init*/
@@ -613,7 +723,7 @@
                 [/#list]
                 [#assign lowPower = "no"]
                 [#list initService.nvic as initVector]
-                   [#if initVector.vector?contains("WKUP") || initVector.vector?contains("WakeUp") || (initVector.vector == "USB_IRQn" && USB_INTERRUPT_WAKEUP??)]
+                   [#if initVector.vector?contains("WKUP") || initVector.vector?contains("WakeUp") || (((initVector.vector == "USB_IRQn")||(initVector.vector == "OTG_FS_IRQn")) && USB_INTERRUPT_WAKEUP??)]
                       [#assign lowPower = "yes"]
                    [/#if]
                 [/#list]
@@ -649,8 +759,10 @@
                         #t#t#t__HAL_USB_OTG_FS_WAKEUP_EXTI_CLEAR_FLAG();
                         #t#t#t__HAL_USB_OTG_FS_WAKEUP_EXTI_ENABLE_RISING_EDGE();
                         #t#t#t__HAL_USB_OTG_FS_WAKEUP_EXTI_ENABLE_IT();
-                    [#elseif ipName?contains("_FS")]
-                        #t#t#t__HAL_USB_FS_EXTI_ENABLE_IT();
+                    [#elseif ipName?contains("OTG_FS")&&FamilyName=="STM32L4"]
+                        #t#t#t__HAL_USB_OTG_FS_WAKEUP_EXTI_ENABLE_IT();
+                    [#elseif ipName?contains("_FS")]                      
+                              #t#t#t__HAL_USB_FS_EXTI_ENABLE_IT();
                     [#else]
                         [#if FamilyName=="STM32F1"] [#-- use new macro naming for F1--]
                             #t#t#t__HAL_USB_WAKEUP_EXTI_CLEAR_FLAG();
@@ -678,7 +790,23 @@
     [/#if]
     [#else] [#-- else serviceType = DeInit --]
  [#assign service = getInitServiceMode(ipName)]
-
+[#-- bug 322189 DeInit--]
+[#if ipName?contains("OTG_FS")&&FamilyName=="STM32L4"]
+#n#t#t/* Disable VDDUSB */
+  #t#tif(__HAL_RCC_PWR_IS_CLK_DISABLED())
+  #t#t{
+    #t#t#t__HAL_RCC_PWR_CLK_ENABLE();
+    
+    #t#t#tHAL_PWREx_DisableVddUSB();
+    
+    #t#t#t__HAL_RCC_PWR_CLK_DISABLE();
+  #t#t}
+  #t#telse
+  #t#t{
+    #t#t#tHAL_PWREx_DisableVddUSB();
+  #t#t}
+[/#if]
+[#-- bug 322189 DeInit End--]
     [#if dmaExist]#n#t#t/* Peripheral DMA DeInit*/    
  [#assign dmaservice =service.dma]
  [#if dmaservice??]
@@ -686,11 +814,16 @@
         [#assign dmaCurrentRequest = dmaconfig.instanceName?lower_case]
         [#assign prefixList = dmaCurrentRequest?split("_")]
         [#list prefixList as p][#assign prefix= p][/#list]
+[#assign ind=""]
+            [#--workAround DFSDM--]
+            [#if dmaconfig.dmaRequestName?contains("DFSDM")]
+                [#assign ind=dmaconfig.dmaRequestName?replace("DFSDM","")]
+            [/#if]
         [#assign ipdmahandler1 = "hdma" + prefix]
          [#-- [#if getDmaHandler(ipName)!=""][#assign ipdmahandler = getDmaHandler(ipName)][#else][#assign ipdmahandler = ipdmahandler1][/#if]--]
            [#if dmaconfig.dmaHandel??][#assign ipdmahandler = dmaconfig.dmaHandel][#else][#assign ipdmahandler = ipdmahandler1][/#if]
                 [#list dmaconfig.dmaHandel as dmaH]
-                                #t#tHAL_DMA_DeInit(${instHandler}->${dmaH});
+                                #t#tHAL_DMA_DeInit(${instHandler}->${dmaH}); 
                             [/#list]
     [/#list] [#-- list dmaService as dmaconfig --]
 [/#if]    
@@ -772,13 +905,17 @@ static int ${entry.value}=0;
 [#-- Section2: Msp Init --]
 [#if ipvar.initCallBacks??]
 [#compress]
+[#assign DFSDM_var = "false"]
 [#list ipvar.initCallBacks.entrySet() as entry]#n
 [#assign instanceList = entry.value]
-[#assign mode=entry.key?replace("_MspInit","")?replace("_BspInit","")?replace("HAL_","")]
+[#assign mode=entry.key?replace("_MspInit","")?replace("MspInit","")?replace("_BspInit","")?replace("HAL_","")]
 
 [#assign ipHandler = "h" + mode?lower_case]
 
-
+[#if  mode?contains("DFSDM") && DFSDM_var == "false"]
+int DFSDM_Init = 0;
+[#assign DFSDM_var = "true"]
+[/#if]
 [#-- #nvoid HAL_${mode}_MspInit(${mode}_HandleTypeDef* h${mode?lower_case}){--] 
 [#if name !="TIM"]
 #nvoid ${entry.key}(${mode}_HandleTypeDef* h${mode?lower_case})
@@ -843,7 +980,11 @@ static int ${entry.value}=0;
 [/#list]
 [#-- --]
 [#if mspIsEmpty=="no"]
+[#if  words[0] == "DFSDM"]
+#tif(DFSDM_Init == 0)
+[#else]
  #tif(h${mode?lower_case}->Instance==${words[0]?replace("I2S","SPI")})
+[/#if]
 #t{
 [#if words?size > 1] [#-- Check if there is more than one ip instance--]        
 #t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspInit 0 */
@@ -883,7 +1024,10 @@ static int ${entry.value}=0;
 #t}
 [/#if]
 [/#if] [#-- inist not empty --]
-
+[#if  words[0] == "DFSDM"]
+#tDFSDM_Init++;
+[@generateServiceCodeDFSDM ipName=words[0] serviceType="Init" modeName=mode instHandler=ipHandler tabN=2/]
+[/#if]
 }
 [#--break--] [#-- use the first msp--]
 [/#list]
@@ -894,7 +1038,7 @@ static int ${entry.value}=0;
 [#compress]
 [#list ipvar.deInitCallBacks.entrySet() as entry]#n
 [#assign instanceList = entry.value]
-[#assign mode=entry.key?replace("_MspDeInit","")?replace("_BspDeInit","")?replace("HAL_","")]
+[#assign mode=entry.key?replace("_MspDeInit","")?replace("MspDeInit","")?replace("_BspDeInit","")?replace("HAL_","")]
 [#assign ipHandler = "h" + mode?lower_case]
 [#if name !="TIM"]
 #nvoid ${entry.key}(${mode}_HandleTypeDef* h${mode?lower_case})
@@ -906,7 +1050,12 @@ static int ${entry.value}=0;
 #n
 [#if mspIsEmpty=="no"]
 [#assign words = instanceList]
+[#if words[0] == "DFSDM"]
+#tDFSDM_Init-- ;
+#tif(DFSDM_Init == 0)
+[#else]
 #tif(h${mode?lower_case}->Instance==${words[0]?replace("I2S","SPI")})
+[/#if]
 #t{
 [#if words?size > 1] [#-- Check if there is more than one ip instance--]
  [#assign deInitService = getDeInitServiceMode(words[0])]    
@@ -942,11 +1091,15 @@ static int ${entry.value}=0;
 
 #n#t/* USER CODE END ${words[0]?replace("I2S","SPI")}_MspDeInit 0 */
 [@generateServiceCode ipName=words[0] serviceType="DeInit" modeName=mode instHandler=ipHandler tabN=2/] 
+#t}
+[#if words[0] == "DFSDM"]
+[@generateServiceCodeDFSDM ipName=words[0] serviceType="DeInit" modeName=mode instHandler=ipHandler tabN=2/]
+[/#if]
 #t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspDeInit 1 */
 
 #n#t/* USER CODE END ${words[0]?replace("I2S","SPI")}_MspDeInit 1 */
 [/#if]
-#t}
+
 [/#if]
 [/#if]
 }

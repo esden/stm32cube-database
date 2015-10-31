@@ -41,6 +41,8 @@
  extern "C" {
 #endif
 
+[#--include "mxconstants.h"--]
+
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
 
@@ -49,7 +51,7 @@
   * @brief This is the list of modules to be used in the HAL driver 
   */
 #define HAL_MODULE_ENABLED  
-  [#assign allModules = ["ADC","COMP","CRC","CRYP","DAC","I2C","I2S","IWDG","LCD","LPTIM","RNG","RTC","SPI","TIM", "TSC","UART","USART","IRDA","SMARTCARD","SMBUS","WWDG", "PCD"]]
+  [#assign allModules = ["ADC","COMP","CRC","CRYP","DAC","I2S","IWDG","LCD","LPTIM","RNG","RTC","SPI","TIM", "TSC","UART","USART","IRDA","SMARTCARD","SMBUS","WWDG", "PCD"]]
   [#list allModules as module]
 	[#if isModuleUsed(module)]
 [#compress]#define HAL_${module}_MODULE_ENABLED[/#compress]
@@ -69,10 +71,12 @@
   [/#function]
 #define HAL_GPIO_MODULE_ENABLED
 #define HAL_DMA_MODULE_ENABLED
+#define HAL_I2C_MODULE_ENABLED
 #define HAL_RCC_MODULE_ENABLED
 #define HAL_FLASH_MODULE_ENABLED
 #define HAL_PWR_MODULE_ENABLED
 #define HAL_CORTEX_MODULE_ENABLED
+
 
 /* ########################## Oscillator Values adaptation ####################*/
 /**

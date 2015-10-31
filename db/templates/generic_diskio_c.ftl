@@ -59,22 +59,42 @@
 static volatile DSTATUS Stat = STA_NOINIT;
 
 /* Private function prototypes -----------------------------------------------*/
+[#if NEW_DISKIO_API=="2"]         [#-- Aligned with R0.11 --]  
+DSTATUS USER_initialize (BYTE);
+DSTATUS USER_status (BYTE);
+DRESULT USER_read (BYTE, BYTE*, DWORD, UINT);
+#if _USE_WRITE == 1
+  DRESULT USER_write (BYTE, const BYTE*, DWORD, UINT);  
+#endif /* _USE_WRITE == 1 */
+#if _USE_IOCTL == 1
+  DRESULT USER_ioctl (BYTE, BYTE, void*);  
+#endif /* _USE_IOCTL == 1 */
+[/#if]
+
+[#if NEW_DISKIO_API=="1"]         [#-- Aligned with R0.10b --]  
 DSTATUS USER_initialize (void);
 DSTATUS USER_status (void);
-[#if NEW_DISKIO_API=="1"]
 DRESULT USER_read (BYTE*, DWORD, UINT);
 #if _USE_WRITE == 1
   DRESULT USER_write (const BYTE*, DWORD, UINT);
-[#else]
-DRESULT USER_read (BYTE*, DWORD, BYTE);
-#if _USE_WRITE == 1
-  DRESULT USER_write (const BYTE*, DWORD, BYTE);
-[/#if]
 #endif /* _USE_WRITE == 1 */
 #if _USE_IOCTL == 1
   DRESULT USER_ioctl (BYTE, void*);
 #endif /* _USE_IOCTL == 1 */
-  
+[/#if]
+
+[#if NEW_DISKIO_API=="0"]         [#-- Aligned with R0.10 --]  
+DSTATUS USER_initialize (void);
+DSTATUS USER_status (void);
+DRESULT USER_read (BYTE*, DWORD, BYTE);
+#if _USE_WRITE == 1
+  DRESULT USER_write (const BYTE*, DWORD, BYTE);
+#endif /* _USE_WRITE == 1 */
+#if _USE_IOCTL == 1
+  DRESULT USER_ioctl (BYTE, void*);
+#endif /* _USE_IOCTL == 1 */
+[/#if]
+ 
 Diskio_drvTypeDef  USER_Driver =
 {
   USER_initialize,
@@ -90,12 +110,23 @@ Diskio_drvTypeDef  USER_Driver =
 
 /* Private functions ---------------------------------------------------------*/
 
+[#if NEW_DISKIO_API=="2"]         [#-- Aligned with R0.11 --]
+/**
+  * @brief  Initializes a Drive
+  * @param  pdrv: Physical drive number (0..)
+  * @retval DSTATUS: Operation status
+  */
+DSTATUS USER_initialize (
+	BYTE pdrv           /* Physical drive nmuber to identify the drive */
+)
+[#else]
 /**
   * @brief  Initializes a Drive
   * @param  None
   * @retval DSTATUS: Operation status
   */
 DSTATUS USER_initialize(void)
+[/#if]
 {
   Stat = STA_NOINIT;
   
@@ -105,12 +136,24 @@ DSTATUS USER_initialize(void)
   return Stat;
 }
 
+
+[#if NEW_DISKIO_API=="2"]         [#-- Aligned with R0.11 --]  
+/**
+  * @brief  Gets Disk Status 
+  * @param  pdrv: Physical drive number (0..)
+  * @retval DSTATUS: Operation status
+  */
+DSTATUS USER_status (
+	BYTE pdrv       /* Physical drive nmuber to identify the drive */
+)
+[#else]
 /**
   * @brief  Gets Disk Status
   * @param  None
   * @retval DSTATUS: Operation status
   */
 DSTATUS USER_status(void)
+[/#if]
 {
   Stat = STA_NOINIT;
   
@@ -119,6 +162,24 @@ DSTATUS USER_status(void)
   return Stat;
 }
 
+
+[#if NEW_DISKIO_API=="2"]
+/**
+  * @brief  Reads Sector(s) 
+  * @param  pdrv: Physical drive number (0..)
+  * @param  *buff: Data buffer to store read data
+  * @param  sector: Sector address (LBA)
+  * @param  count: Number of sectors to read (1..128)
+  * @retval DRESULT: Operation result
+  */
+DRESULT USER_read (
+	BYTE pdrv,      /* Physical drive nmuber to identify the drive */
+	BYTE *buff,     /* Data buffer to store read data */
+	DWORD sector,   /* Sector address in LBA */
+	UINT count      /* Number of sectors to read */
+)
+[/#if]
+[#if NEW_DISKIO_API=="1"]
 /**
   * @brief  Reads Sector(s)
   * @param  *buff: Data buffer to store read data
@@ -126,9 +187,16 @@ DSTATUS USER_status(void)
   * @param  count: Number of sectors to read (1..128)
   * @retval DRESULT: Operation result
   */
-[#if NEW_DISKIO_API=="1"]
 DRESULT USER_read(BYTE *buff, DWORD sector, UINT count)
-[#else]
+[/#if]
+[#if NEW_DISKIO_API=="0"]
+/**
+  * @brief  Reads Sector(s)
+  * @param  *buff: Data buffer to store read data
+  * @param  sector: Sector address (LBA)
+  * @param  count: Number of sectors to read (1..128)
+  * @retval DRESULT: Operation result
+  */
 DRESULT USER_read(BYTE *buff, DWORD sector, BYTE count)
 [/#if]
 {
@@ -137,6 +205,25 @@ DRESULT USER_read(BYTE *buff, DWORD sector, BYTE count)
   return RES_OK;
 }
 
+
+[#if NEW_DISKIO_API=="2"]
+/**
+  * @brief  Writes Sector(s)  
+  * @param  pdrv: Physical drive number (0..)
+  * @param  *buff: Data to be written
+  * @param  sector: Sector address (LBA)
+  * @param  count: Number of sectors to write (1..128)
+  * @retval DRESULT: Operation result
+  */
+#if _USE_WRITE == 1
+DRESULT USER_write (
+	BYTE pdrv,          /* Physical drive nmuber to identify the drive */
+	const BYTE *buff,   /* Data to be written */
+	DWORD sector,       /* Sector address in LBA */
+	UINT count          /* Number of sectors to write */
+)
+[/#if]
+[#if NEW_DISKIO_API=="1"]
 /**
   * @brief  Writes Sector(s)
   * @param  *buff: Data to be written
@@ -145,9 +232,17 @@ DRESULT USER_read(BYTE *buff, DWORD sector, BYTE count)
   * @retval DRESULT: Operation result
   */
 #if _USE_WRITE == 1
-[#if NEW_DISKIO_API=="1"]
 DRESULT USER_write(const BYTE *buff, DWORD sector, UINT count)
-[#else]
+[/#if]
+[#if NEW_DISKIO_API=="0"]
+/**
+  * @brief  Writes Sector(s)
+  * @param  *buff: Data to be written
+  * @param  sector: Sector address (LBA)
+  * @param  count: Number of sectors to write (1..128)
+  * @retval DRESULT: Operation result
+  */
+#if _USE_WRITE == 1
 DRESULT USER_write(const BYTE *buff, DWORD sector, BYTE count)
 [/#if]
 { 
@@ -157,6 +252,29 @@ DRESULT USER_write(const BYTE *buff, DWORD sector, BYTE count)
 }
 #endif /* _USE_WRITE == 1 */
 
+[#if NEW_DISKIO_API=="2"]
+/**
+  * @brief  I/O control operation  
+  * @param  pdrv: Physical drive number (0..)
+  * @param  cmd: Control code
+  * @param  *buff: Buffer to send/receive control data
+  * @retval DRESULT: Operation result
+  */
+#if _USE_IOCTL == 1
+DRESULT USER_ioctl (
+	BYTE pdrv,      /* Physical drive nmuber (0..) */
+	BYTE cmd,       /* Control code */
+	void *buff      /* Buffer to send/receive control data */
+)
+{
+  DRESULT res = RES_ERROR;
+  
+  /* USER CODE HERE */
+
+  return res;
+}
+#endif /* _USE_IOCTL == 1 */
+[#else]
 /**
   * @brief  I/O control operation
   * @param  cmd: Control code
@@ -173,6 +291,8 @@ DRESULT USER_ioctl(BYTE cmd, void *buff)
   return res;
 }
 #endif /* _USE_IOCTL == 1 */
+[/#if]
+
 
 /* USER CODE END 0 */
 

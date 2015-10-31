@@ -10,20 +10,75 @@
   <About>FATFS: FAT File System</About>
   
   	<!-- Semaphore of NEW_DISKIO_API TO BE UPDATED when FW packages come and support that new API for Diskio_drvTypeDef -->
+	<RefParameter Name="NEW_DISKIO_API" Comment="NEW_DISKIO_API" DefaultValue="2" Type="integer" Visible="false">
+	    <Condition Diagnostic="New version available for F0" Expression="STM32F0"/> 
+	</RefParameter>
 	<RefParameter Name="NEW_DISKIO_API" Comment="NEW_DISKIO_API" DefaultValue="1" Type="integer" Visible="false">
-	    <!-- <Condition Diagnostic="New version available for F1" Expression="STM32F1"/> -->
-	    <!-- <Condition Diagnostic="New version available for F1 and F4" Expression="STM32F1 | STM32F4"/>  -->
-	    <Condition Diagnostic="New version available for F0, F1, F4, L1 and F7" Expression="STM32F0 | STM32F1 | STM32F4 | STM32F7 | STM32L1"/>
+	    <Condition Diagnostic="New version available for F1" Expression="STM32F1"/> 
+	</RefParameter>
+	<RefParameter Name="NEW_DISKIO_API" Comment="NEW_DISKIO_API" DefaultValue="1" Type="integer" Visible="false">
+	    <Condition Diagnostic="New version available for F4" Expression="STM32F4"/> 
+	</RefParameter>
+	<RefParameter Name="NEW_DISKIO_API" Comment="NEW_DISKIO_API" DefaultValue="2" Type="integer" Visible="false">
+	    <Condition Diagnostic="New version available for F7" Expression="STM32F7"/> 
+	</RefParameter>
+	<RefParameter Name="NEW_DISKIO_API" Comment="NEW_DISKIO_API" DefaultValue="1" Type="integer" Visible="false">
+	    <Condition Diagnostic="New version available for L1" Expression="STM32L1"/> 
+	</RefParameter>
+	<RefParameter Name="NEW_DISKIO_API" Comment="NEW_DISKIO_API" DefaultValue="2" Type="integer" Visible="false">
+	    <Condition Diagnostic="New version available for L4" Expression="STM32L4"/> 
 	</RefParameter>
 	<RefParameter Name="NEW_DISKIO_API" Comment="NEW_DISKIO_API" DefaultValue="0" Type="integer" Visible="false">
 	</RefParameter>
+
+	<RefParameter Name="FATFS_version" Comment="FATFS version" DefaultValue="R0.11" Type="String" Group="Version" TabName="Set Defines">
+	    <PossibleValue Comment="New version of FatFS" Value="R0.11"/>
+	    <Condition Diagnostic="Version available for F0" Expression="STM32F0"/>
+	</RefParameter>
 	<RefParameter Name="FATFS_version" Comment="FATFS version" DefaultValue="R0.10b" Type="String" Group="Version" TabName="Set Defines">
 	    <PossibleValue Comment="New version of FatFS" Value="R0.10b"/>
-	    <Condition Diagnostic="Version available for F0, F1, F4, L1 and F7" Expression="NEW_DISKIO_API=1"/>
+	    <Condition Diagnostic="Version available for F1" Expression="STM32F1"/>
 	</RefParameter>
 	<RefParameter Name="FATFS_version" Comment="FATFS version" DefaultValue="R0.10" Type="String" Group="Version" TabName="Set Defines">
-		<PossibleValue Comment="Previous version of CMSIS" Value="R0.10" />
+		<PossibleValue Comment="Previous version of FatFS" Value="R0.10" />
+	    <Condition Diagnostic="Version available for F2" Expression="STM32F2"/>	
 	</RefParameter>
+	<RefParameter Name="FATFS_version" Comment="FATFS version" DefaultValue="R0.10" Type="String" Group="Version" TabName="Set Defines">
+		<PossibleValue Comment="Previous version of FatFS" Value="R0.10" />
+	    <Condition Diagnostic="Version available for F3" Expression="STM32F3"/>	
+	</RefParameter>
+	<RefParameter Name="FATFS_version" Comment="FATFS version" DefaultValue="R0.10b" Type="String" Group="Version" TabName="Set Defines">
+	    <PossibleValue Comment="New version of FatFS" Value="R0.10b"/>
+	    <Condition Diagnostic="Version available for F4" Expression="STM32F4"/>
+	</RefParameter>
+	<RefParameter Name="FATFS_version" Comment="FATFS version" DefaultValue="R0.11" Type="String" Group="Version" TabName="Set Defines">
+	    <PossibleValue Comment="New version of FatFS" Value="R0.11"/>
+	    <Condition Diagnostic="Version available for F7" Expression="STM32F7"/>
+	</RefParameter>
+	<RefParameter Name="FATFS_version" Comment="FATFS version" DefaultValue="R0.10" Type="String" Group="Version" TabName="Set Defines">
+		<PossibleValue Comment="Previous version of FatFS" Value="R0.10" />
+	    <Condition Diagnostic="Version available for L0" Expression="STM32L0"/>	
+	</RefParameter>	
+	<RefParameter Name="FATFS_version" Comment="FATFS version" DefaultValue="R0.10b" Type="String" Group="Version" TabName="Set Defines">
+	    <PossibleValue Comment="New version of FatFS" Value="R0.10b"/>
+	    <Condition Diagnostic="Version available for L1" Expression="STM32L1"/>
+	</RefParameter>
+	<RefParameter Name="FATFS_version" Comment="FATFS version" DefaultValue="R0.11" Type="String" Group="Version" TabName="Set Defines">
+	    <PossibleValue Comment="Latest version of FatFS" Value="R0.11"/>
+	    <Condition Diagnostic="Version available for L4" Expression="STM32L4"/>
+	</RefParameter>	
+	<RefParameter Name="FATFS_version" Comment="FATFS version" DefaultValue="R0.10" Type="String" Group="Version" TabName="Set Defines">
+		<PossibleValue Comment="Default version of FatFS" Value="R0.10" />
+	</RefParameter>
+  
+    <!-- Since R0.11, max value for VOLUMEs is 9 (no more 10) -->
+    <RefParameter Name="MAX_VOLUMES_VALUE" Comment="Max value for the volumes parameter" DefaultValue="9" Type="integer" Visible="false">
+        <PossibleValue Comment="Since R0.11, max is 9" Value="9"/>
+	    <Condition Diagnostic="Since R0.11, max is 9" Expression="NEW_DISKIO_API = 2"/>
+	</RefParameter>	
+     <RefParameter Name="MAX_VOLUMES_VALUE" Comment="Max value for the volumes parameter" DefaultValue="10" Type="integer" Visible="false">
+        <PossibleValue Comment="Before R0.11, max is 10" Value="10"/>
+	</RefParameter>	
   
     <RefParameter Name="SD_MODE" Comment="SD MODE" DefaultValue="4" Type="integer" Visible="false">
 	    <Condition Diagnostic="SDIO 4 bits" Expression="SD_Card &amp; Bus4Bits"/>
@@ -261,6 +316,19 @@
 		<PossibleValue Comment="Enabled with LF -> CRLF conversion" Value="2"/>
 		<Description>To enable string functions (f_gets, f_putc, f_puts, ...), set USE_STRFUNC to 1 or 2.&lt;br&gt;When set to 2, makes a LF -> CRLF conversion.</Description>
 	</RefParameter>
+
+    <!--  New in Fatfs R0.11 -->
+	<RefParameter Name="_USE_FIND" Comment="USE_FIND (Find functions)" DefaultValue="0" Type="list" Group="Function Parameters" TabName="Set Defines">
+		<Condition Diagnostic="Available in CubeMx since R0.11 version" Expression="NEW_DISKIO_API = 2"/>
+		<PossibleValue Comment="Disabled" Value="0"/>
+		<PossibleValue Comment="Enabled" Value="1"/>
+		<Description>This option switches filtered directory read feature and related functions, f_findfirst() and f_findnext(). (0:Disable or 1:Enable).</Description>
+	</RefParameter>
+	<RefParameter Name="_USE_FIND" Comment="USE_FIND (Find functions)" DefaultValue="0" Type="list" Group="Function Parameters" TabName="Set Defines" Visible="false">
+		<PossibleValue Comment="Disabled" Value="0"/>
+		<Description>This option switches filtered directory read feature and related functions, f_findfirst() and f_findnext(). (0:Disable or 1:Enable)</Description>
+	</RefParameter>
+	<!--  New in Fatfs R0.11 -->
 	
 	<RefParameter Name="_USE_MKFS" Comment="USE_MKFS (Make filesystem function)" DefaultValue="1" Type="list" Group="Function Parameters" TabName="Set Defines">
 		<PossibleValue Comment="Disabled" Value="0"/>
@@ -285,6 +353,23 @@
 		<PossibleValue Comment="Enabled" Value="1"/>
 		<Description>To enable fast seek feature, set USE_FASTSEEK to 1 (Enabled).</Description>
 	</RefParameter>	
+	
+	<!--  New in Fatfs R0.11 -->
+	<RefParameter Name="_USE_BUFF_WO_ALIGNMENT" Comment="USE_BUFF_WO_ALIGNMENT (Data alignment management)" DefaultValue="0" Type="uniqueElementList" Group="Function Parameters" TabName="Set Defines">
+		<Condition Diagnostic="Available in CubeMx since R0.11 version (STM parameter)" Expression="(NEW_DISKIO_API = 2)  &amp; SEM_USE_BUFF_WO_ALIGNMENT=1"/>
+		<PossibleValue Comment="Disabled" Value="0"/>
+		<Description>This option is available only for usbh diskio interface (see the usbh_diskio.c file) and allows to disable the management of the unaligned buffer. &lt;br&gt;When STM32 USB OTG HS or FS IP is used with internal DMA enabled, this define is set to 0 (Disabled) to align data into 32bits through an internal scratch buffer before being processed by the DMA. &lt;br&gt;Otherwise (DMA not used), this define is set to 1 (Enabled) to avoid Data alignment and improve the performance. &lt;br&gt;Please note that if _USE_BUFF_WO_ALIGNMENT is set to 1 and an unaligned 32bits buffer is forwarded to the FatFs Write/Read functions, an error will be returned. (0: default value or 1: unaligned buffer return an error). */</Description>
+	</RefParameter>
+	<RefParameter Name="_USE_BUFF_WO_ALIGNMENT" Comment="USE_BUFF_WO_ALIGNMENT (Data alignment management)" DefaultValue="1" Type="uniqueElementList" Group="Function Parameters" TabName="Set Defines">
+		<Condition Diagnostic="Available in CubeMx since R0.11 version (STM parameter)" Expression="(NEW_DISKIO_API = 2) &amp; SEM_USE_BUFF_WO_ALIGNMENT=0"/>
+		<PossibleValue Comment="Enabled" Value="1"/>
+		<Description>This option is available only for usbh diskio interface (see the usbh_diskio.c file) and allows to disable the management of the unaligned buffer. &lt;br&gt;When STM32 USB OTG HS or FS IP is used with internal DMA enabled, this define is set to 0 (Disabled) to align data into 32bits through an internal scratch buffer before being processed by the DMA. &lt;br&gt;Otherwise (DMA not used), this define is set to 1 (Enabled) to avoid Data alignment and improve the performance. &lt;br&gt;Please note that if _USE_BUFF_WO_ALIGNMENT is set to 1 and an unaligned 32bits buffer is forwarded to the FatFs Write/Read functions, an error will be returned. (0: default value or 1: unaligned buffer return an error). */</Description>
+	</RefParameter>
+	<RefParameter Name="_USE_BUFF_WO_ALIGNMENT" Comment="USE_BUFF_WO_ALIGNMENT (Data alignment management)" DefaultValue="0" Type="list" Group="Function Parameters" TabName="Set Defines" Visible="false">
+		<PossibleValue Comment="Enabled" Value="1"/>
+		<Description>This option is available only for usbh diskio interface and allows to disable the management of the unaligned buffer. &lt;br&gt;When STM32 USB OTG HS or FS IP is used with internal DMA enabled, this define is set to 0 to align data into 32bits through an internal scratch buffer before being processed by the DMA. &lt;br&gt;Otherwise (DMA not used), this define is set to 1 to avoid Data alignment and improve the performance. &lt;br&gt;Please note that if _USE_BUFF_WO_ALIGNMENT is set to 1 and an unaligned 32bits buffer is forwarded to the FatFs Write/Read functions, an error will be returned. (0: default value or 1: unaligned buffer return an error). */</Description>
+	</RefParameter>
+	<!--  New in Fatfs R0.11 -->	
 	
 	<RefParameter Name="VIRTUAL_CODE_PAGE" Type="integer" Comment="" DefaultValue="932" Group="Locale and Namespace Parameters" Visible="false">
 	    <Condition Expression="_CODE_PAGE=932 &amp; !_USE_LFN=0" Diagnostic=""/>
@@ -425,114 +510,114 @@
 		<Description>The FS_RPATH option configures relative path feature.&lt;br&gt; - 0: Disable relative path feature and remove related functions.&lt;br&gt; - 1: Enable relative path. f_chdrive() and f_chdir() function are available.&lt;br&gt; - 2: f_getcwd() function is available in addition to 1.&lt;br&gt; Note that output of the f_readdir() function is affected by this option.</Description>
 	</RefParameter>
 	
-	<RefParameter Name="_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="5" Max="10" Min="5"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
+	<RefParameter Name="_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="5" Max="=MAX_VOLUMES_VALUE" Min="5"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
 	    <Condition Diagnostic="" Expression="S_FATFS_SDIO &amp; S_FATFS_SDRAM &amp; S_FATFS_USB &amp; S_FATFS_SRAM &amp; S_FATFS_Generic"/>
 	    <Description>Number of volumes (logical drives) to be used.</Description>
 	</RefParameter>
-    <RefParameter Name="_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="4" Max="10" Min="4"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
+    <RefParameter Name="_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="4" Max="=MAX_VOLUMES_VALUE" Min="4"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
 	    <Condition Diagnostic="" Expression="S_FATFS_SDIO &amp; S_FATFS_SDRAM &amp; S_FATFS_USB &amp; S_FATFS_SRAM &amp; !S_FATFS_Generic"/>
 	    <Description>Number of volumes (logical drives) to be used.</Description>
 	</RefParameter>
-	<RefParameter Name="_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="4" Max="10" Min="4"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
+	<RefParameter Name="_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="4" Max="=MAX_VOLUMES_VALUE" Min="4"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
 	    <Condition Diagnostic="" Expression="S_FATFS_SDIO &amp; S_FATFS_SDRAM &amp; S_FATFS_USB &amp; !S_FATFS_SRAM &amp; S_FATFS_Generic"/>
 	    <Description>Number of volumes (logical drives) to be used.</Description>
 	</RefParameter>
-	<RefParameter Name="_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="4" Max="10" Min="4"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
+	<RefParameter Name="_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="4" Max="=MAX_VOLUMES_VALUE" Min="4"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
 	    <Condition Diagnostic="" Expression="S_FATFS_SDIO &amp; S_FATFS_SDRAM &amp; !S_FATFS_USB &amp; S_FATFS_SRAM &amp; S_FATFS_Generic"/>
 	    <Description>Number of volumes (logical drives) to be used.</Description>
 	</RefParameter>
-	<RefParameter Name="_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="4" Max="10" Min="4"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
+	<RefParameter Name="_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="4" Max="=MAX_VOLUMES_VALUE" Min="4"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
 	    <Condition Diagnostic="" Expression="S_FATFS_SDIO &amp; !S_FATFS_SDRAM &amp; S_FATFS_USB &amp; S_FATFS_SRAM &amp; S_FATFS_Generic"/>
 	    <Description>Number of volumes (logical drives) to be used.</Description>
 	</RefParameter>
-	<RefParameter Name="_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="4" Max="10" Min="4"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
+	<RefParameter Name="_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="4" Max="=MAX_VOLUMES_VALUE" Min="4"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
 	    <Condition Diagnostic="" Expression="!S_FATFS_SDIO &amp; S_FATFS_SDRAM &amp; S_FATFS_USB &amp; S_FATFS_SRAM &amp; S_FATFS_Generic"/>
 	    <Description>Number of volumes (logical drives) to be used.</Description>
 	</RefParameter>
-	<RefParameter Name="_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="3" Max="10" Min="3"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
+	<RefParameter Name="_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="3" Max="=MAX_VOLUMES_VALUE" Min="3"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
 	    <Condition Diagnostic="" Expression="S_FATFS_SDIO &amp; S_FATFS_SDRAM &amp; S_FATFS_USB &amp; !S_FATFS_SRAM &amp; !S_FATFS_Generic"/>
 	    <Description>Number of volumes (logical drives) to be used.</Description>
 	</RefParameter>
-	<RefParameter Name="_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="3" Max="10" Min="3"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
+	<RefParameter Name="_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="3" Max="=MAX_VOLUMES_VALUE" Min="3"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
 	    <Condition Diagnostic="" Expression="S_FATFS_SDIO &amp; S_FATFS_SDRAM &amp; !S_FATFS_USB &amp; !S_FATFS_SRAM &amp; S_FATFS_Generic"/>
 	    <Description>Number of volumes (logical drives) to be used.</Description>
 	</RefParameter>
-	<RefParameter Name="_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="3" Max="10" Min="3"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
+	<RefParameter Name="_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="3" Max="=MAX_VOLUMES_VALUE" Min="3"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
 	    <Condition Diagnostic="" Expression="S_FATFS_SDIO &amp; !S_FATFS_SDRAM &amp; !S_FATFS_USB &amp; S_FATFS_SRAM &amp; S_FATFS_Generic"/>
 	    <Description>Number of volumes (logical drives) to be used.</Description>
 	</RefParameter>
-	<RefParameter Name="_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="3" Max="10" Min="3"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
+	<RefParameter Name="_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="3" Max="=MAX_VOLUMES_VALUE" Min="3"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
 	    <Condition Diagnostic="" Expression="!S_FATFS_SDIO &amp; !S_FATFS_SDRAM &amp; S_FATFS_USB &amp; S_FATFS_SRAM &amp; S_FATFS_Generic"/>
 	    <Description>Number of volumes (logical drives) to be used.</Description>
 	</RefParameter>
-	<RefParameter Name="_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="3" Max="10" Min="3"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
+	<RefParameter Name="_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="3" Max="=MAX_VOLUMES_VALUE" Min="3"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
 	    <Condition Diagnostic="" Expression="!S_FATFS_SDIO &amp; S_FATFS_SDRAM &amp; !S_FATFS_USB &amp; S_FATFS_SRAM &amp; S_FATFS_Generic"/>
 	    <Description>Number of volumes (logical drives) to be used.</Description>
 	</RefParameter>	
-	<RefParameter Name="_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="3" Max="10" Min="3"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
+	<RefParameter Name="_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="3" Max="=MAX_VOLUMES_VALUE" Min="3"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
 	    <Condition Diagnostic="" Expression="!S_FATFS_SDIO &amp; S_FATFS_SDRAM &amp; S_FATFS_USB &amp; !S_FATFS_SRAM &amp; S_FATFS_Generic"/>
 	    <Description>Number of volumes (logical drives) to be used.</Description>
 	</RefParameter>	
-	<RefParameter Name="_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="3" Max="10" Min="3"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
+	<RefParameter Name="_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="3" Max="=MAX_VOLUMES_VALUE" Min="3"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
 	    <Condition Diagnostic="" Expression="!S_FATFS_SDIO &amp; S_FATFS_SDRAM &amp; S_FATFS_USB &amp; S_FATFS_SRAM &amp; !S_FATFS_Generic"/>
 	    <Description>Number of volumes (logical drives) to be used.</Description>
 	</RefParameter>		
-	<RefParameter Name="_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="3" Max="10" Min="3"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
+	<RefParameter Name="_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="3" Max="=MAX_VOLUMES_VALUE" Min="3"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
 	    <Condition Diagnostic="" Expression="S_FATFS_SDIO &amp; !S_FATFS_SDRAM &amp; S_FATFS_USB &amp; !S_FATFS_SRAM &amp; S_FATFS_Generic"/>
 	    <Description>Number of volumes (logical drives) to be used.</Description>
 	</RefParameter>		
-	<RefParameter Name="_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="3" Max="10" Min="3"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
+	<RefParameter Name="_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="3" Max="=MAX_VOLUMES_VALUE" Min="3"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
 	    <Condition Diagnostic="" Expression="S_FATFS_SDIO &amp; !S_FATFS_SDRAM &amp; S_FATFS_USB &amp; S_FATFS_SRAM &amp; !S_FATFS_Generic"/>
 	    <Description>Number of volumes (logical drives) to be used.</Description>
 	</RefParameter>		
-	<RefParameter Name="_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="3" Max="10" Min="3"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
+	<RefParameter Name="_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="3" Max="=MAX_VOLUMES_VALUE" Min="3"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
 	    <Condition Diagnostic="" Expression="S_FATFS_SDIO &amp; S_FATFS_SDRAM &amp; !S_FATFS_USB &amp; S_FATFS_SRAM &amp; !S_FATFS_Generic"/>
 	    <Description>Number of volumes (logical drives) to be used.</Description>
 	</RefParameter>		
 	
-	<RefParameter Name="_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="2" Max="10" Min="2"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
+	<RefParameter Name="_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="2" Max="=MAX_VOLUMES_VALUE" Min="2"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
 	    <Condition Diagnostic="" Expression="!S_FATFS_SDIO &amp; !S_FATFS_SDRAM &amp; !S_FATFS_USB &amp; S_FATFS_SRAM &amp; S_FATFS_Generic"/>
 	    <Description>Number of volumes (logical drives) to be used.</Description>
 	</RefParameter>
-	<RefParameter Name="_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="2" Max="10" Min="2"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
+	<RefParameter Name="_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="2" Max="=MAX_VOLUMES_VALUE" Min="2"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
 	    <Condition Diagnostic="" Expression="!S_FATFS_SDIO &amp; !S_FATFS_SDRAM &amp; S_FATFS_USB &amp; S_FATFS_SRAM &amp; !S_FATFS_Generic"/>
 	    <Description>Number of volumes (logical drives) to be used.</Description>
 	</RefParameter>
-	<RefParameter Name="_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="2" Max="10" Min="2"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
+	<RefParameter Name="_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="2" Max="=MAX_VOLUMES_VALUE" Min="2"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
 	    <Condition Diagnostic="" Expression="!S_FATFS_SDIO &amp; S_FATFS_SDRAM &amp; S_FATFS_USB &amp; !S_FATFS_SRAM &amp; !S_FATFS_Generic"/>
 	    <Description>Number of volumes (logical drives) to be used.</Description>
 	</RefParameter>
 	
-	<RefParameter Name="_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="2" Max="10" Min="2"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
+	<RefParameter Name="_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="2" Max="=MAX_VOLUMES_VALUE" Min="2"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
 	    <Condition Diagnostic="" Expression="S_FATFS_SDIO &amp; S_FATFS_SDRAM &amp; !S_FATFS_USB &amp; !S_FATFS_SRAM &amp; !S_FATFS_Generic"/>
 	    <Description>Number of volumes (logical drives) to be used.</Description>
 	</RefParameter>
-	<RefParameter Name="_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="2" Max="10" Min="2"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
+	<RefParameter Name="_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="2" Max="=MAX_VOLUMES_VALUE" Min="2"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
 	    <Condition Diagnostic="" Expression="S_FATFS_SDIO &amp; !S_FATFS_SDRAM &amp; S_FATFS_USB &amp; !S_FATFS_SRAM &amp; !S_FATFS_Generic"/>
 	    <Description>Number of volumes (logical drives) to be used.</Description>
 	</RefParameter>	
-	<RefParameter Name="_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="2" Max="10" Min="2"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
+	<RefParameter Name="_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="2" Max="=MAX_VOLUMES_VALUE" Min="2"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
 	    <Condition Diagnostic="" Expression="S_FATFS_SDIO &amp; !S_FATFS_SDRAM &amp; !S_FATFS_USB &amp; S_FATFS_SRAM &amp; !S_FATFS_Generic"/>
 	    <Description>Number of volumes (logical drives) to be used.</Description>
 	</RefParameter>	
-	<RefParameter Name="_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="2" Max="10" Min="2"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
+	<RefParameter Name="_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="2" Max="=MAX_VOLUMES_VALUE" Min="2"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
 	    <Condition Diagnostic="" Expression="S_FATFS_SDIO &amp; !S_FATFS_SDRAM &amp; !S_FATFS_USB &amp; !S_FATFS_SRAM &amp; S_FATFS_Generic"/>
 	    <Description>Number of volumes (logical drives) to be used.</Description>
 	</RefParameter>		
-	<RefParameter Name="_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="2" Max="10" Min="2"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
+	<RefParameter Name="_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="2" Max="=MAX_VOLUMES_VALUE" Min="2"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
 	    <Condition Diagnostic="" Expression="!S_FATFS_SDIO &amp; S_FATFS_SDRAM &amp; !S_FATFS_USB &amp; S_FATFS_SRAM &amp; !S_FATFS_Generic"/>
 	    <Description>Number of volumes (logical drives) to be used.</Description>
 	</RefParameter>		
-	<RefParameter Name="_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="2" Max="10" Min="2"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
+	<RefParameter Name="_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="2" Max="=MAX_VOLUMES_VALUE" Min="2"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
 	    <Condition Diagnostic="" Expression="!S_FATFS_SDIO &amp; S_FATFS_SDRAM &amp; !S_FATFS_USB &amp; !S_FATFS_SRAM &amp; S_FATFS_Generic"/>
 	    <Description>Number of volumes (logical drives) to be used.</Description>
 	</RefParameter>		
-	<RefParameter Name="_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="2" Max="10" Min="2"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
+	<RefParameter Name="_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="2" Max="=MAX_VOLUMES_VALUE" Min="2"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
 	    <Condition Diagnostic="" Expression="!S_FATFS_SDIO &amp; !S_FATFS_SDRAM &amp; S_FATFS_USB &amp; !S_FATFS_SRAM &amp; S_FATFS_Generic"/>
 	    <Description>Number of volumes (logical drives) to be used.</Description>
 	</RefParameter>		
 	
-    <RefParameter Name="_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="1" Max="10" Min="1"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
+    <RefParameter Name="_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="1" Max="=MAX_VOLUMES_VALUE" Min="1"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
 	    <Description>Number of volumes (logical drives) to be used.</Description>
 	</RefParameter>
 	
@@ -544,6 +629,12 @@
 		<PossibleValue Comment="4096" Value="4096"/>
 		<Description>Maximum sector size to be handled.&lt;br&gt; Four possible values: 512, 1024, 2048, 4096.&lt;br&gt; Always set &lt;b&gt;512&lt;/b&gt; for memory card and hard disk but a larger value may be required for on-board flash memory, floppy disk and optical disk.&lt;br&gt; When MAX_SS is larger than 512, it configures FatFs to variable sector size and GET_SECTOR_SIZE command must be implemented to the disk_ioctl() function.</Description>
 	</RefParameter>
+	
+	<!--  Tracker 316293 -->
+	<RefParameter Name="_MIN_SS" Comment="MIN_SS (Minimum Sector Size)" DefaultValue="0" Type="list" Group="Physical Drive Parameters" TabName="Set Defines" Visible="false">
+		<Condition Diagnostic="Not defined in R0.10. Not visible"  Expression="NEW_DISKIO_API = 0"/>
+		<PossibleValue Comment="0" Value="0"/>
+	</RefParameter>		
 
 	<RefParameter Name="_MIN_SS" Comment="MIN_SS (Minimum Sector Size)" DefaultValue="512" Type="list" Group="Physical Drive Parameters" TabName="Set Defines">
 		<Condition Diagnostic="Four possible values: 512, 1024, 2048 and 4096."  Expression="_MAX_SS = 4096"/>
@@ -581,13 +672,29 @@
 	</RefParameter>
 	
 	<RefParameter Name="_USE_ERASE" Comment="USE_ERASE (Erase feature)" DefaultValue="0" Type="list" Group="Physical Drive Parameters" TabName="Set Defines">
+		<Condition Diagnostic="Available till R0.10b version" Expression="(NEW_DISKIO_API = 0) | (NEW_DISKIO_API = 1)"/>
 		<PossibleValue Comment="Disabled" Value="0"/>
 		<PossibleValue Comment="Enabled" Value="1"/>
 		<Description>To enable sector erase feature, set USE_ERASE to 1 (Enabled). Also CTRL_ERASE_SECTOR command should be added to the disk_ioctl() function.</Description>
 	</RefParameter>
+	<RefParameter Name="_USE_ERASE" Comment="USE_ERASE (Erase feature)" DefaultValue="0" Type="list" Group="Physical Drive Parameters" TabName="Set Defines" Visible="false">
+		<PossibleValue Comment="Disabled" Value="0"/>
+		<Description>To enable sector erase feature, set USE_ERASE to 1 (Enabled). Also CTRL_ERASE_SECTOR command should be added to the disk_ioctl() function.</Description>
+	</RefParameter>
+
+	<RefParameter Name="_USE_TRIM" Comment="USE_TRIM (Erase feature)" DefaultValue="0" Type="list" Group="Physical Drive Parameters" TabName="Set Defines">
+		<Condition Diagnostic="Available since R0.11 version (previously named _USE_ERASE)" Expression="NEW_DISKIO_API = 2"/>
+		<PossibleValue Comment="Disabled" Value="0"/>
+		<PossibleValue Comment="Enabled" Value="1"/>
+		<Description>This option switches ATA-TRIM feature. (0:Disable or 1:Enable) To enable Trim feature, also CTRL_TRIM command should be implemented to the disk_ioctl() function.</Description>
+	</RefParameter>
+	<RefParameter Name="_USE_TRIM" Comment="_USE_TRIM (Erase feature)" DefaultValue="0" Type="list" Group="Physical Drive Parameters" TabName="Set Defines" Visible="false">
+		<PossibleValue Comment="Disabled" Value="0"/>
+		<Description>This option switches ATA-TRIM feature. (0:Disable or 1:Enable) To enable Trim feature, also CTRL_TRIM command should be implemented to the disk_ioctl() function.</Description>
+	</RefParameter>
 	
 	<RefParameter Name="_FS_NOFSINFO" Comment="FS_NOFSINFO (Force full FAT scan)" DefaultValue="0" Type="list" Group="Physical Drive Parameters" TabName="Set Defines">
-		<Condition Diagnostic="4 possible values since support of R0.10b version" Expression="NEW_DISKIO_API"/>
+		<Condition Diagnostic="4 possible values since support of R0.10b version" Expression="(NEW_DISKIO_API = 1) | (NEW_DISKIO_API = 2)"/>
 		<PossibleValue Comment="0" Value="0"/>
 		<PossibleValue Comment="1" Value="1"/>
 		<PossibleValue Comment="2" Value="2"/>
@@ -600,12 +707,62 @@
 		<Description>If you need to know the correct free space on the FAT32 volume, set this option to 1 and f_getfree() function at first time after volume mount will force a full FAT scan.&lt;br&gt; - 0: Load all information in the FSINFO if available.&lt;br&gt; - 1: Do not trust free cluster count in the FSINFO.</Description>
 	</RefParameter>
 	
+	<!--  New in Fatfs R0.11 -->
+	<RefParameter Name="_FS_NORTC" Comment="FS_NORTC (Timestamp feature)" DefaultValue="0" Type="list" Group="System Parameters" TabName="Set Defines">
+		<Condition Diagnostic="Available in CubeMx since R0.11 version" Expression="NEW_DISKIO_API = 2"/>
+		<PossibleValue Comment="Fixed timestamp" Value="1"/>
+		<PossibleValue Comment="Dynamic timestamp" Value="0"/>
+		<Description>The _FS_NORTC option switches timestamp feature. &lt;br&gt;- If the system does not have an RTC function or valid timestamp is not needed, set _FS_NORTC to 1 (Fixed timestamp) to disable the timestamp feature. All objects modified by FatFs will have a fixed timestamp defined by _NORTC_MON, _NORTC_MDAY and _NORTC_YEAR. &lt;br&gt;- When timestamp feature is enabled (Dynamic timestamp), get_fattime() function need to be added to the project to read current time form RTC and generate a timestamp. _NORTC_MON, _NORTC_MDAY and _NORTC_YEAR have no effect. </Description>
+	</RefParameter>
+	<RefParameter Name="_FS_NORTC" Comment="FS_NORTC (Timestamp feature)" DefaultValue="0" Type="list" Group="System Parameters" TabName="Set Defines" Visible="false">
+		<PossibleValue Comment="Fixed timestamp" Value="1"/>
+		<Description>The _FS_NORTC option switches timestamp feature. &lt;br&gt;- If the system does not have an RTC function or valid timestamp is not needed, set _FS_NORTC to 1 (Fixed timestamp) to disable the timestamp feature. All objects modified by FatFs will have a fixed timestamp defined by _NORTC_MON, _NORTC_MDAY and _NORTC_YEAR. &lt;br&gt;- When timestamp feature is enabled (Dynamic timestamp), get_fattime() function need to be added to the project to read current time form RTC and generate a timestamp. _NORTC_MON, _NORTC_MDAY and _NORTC_YEAR have no effect. </Description>
+	</RefParameter>	
+	
+	<RefParameter Name="_NORTC_YEAR" Comment="      NORTC_YEAR (Year for timestamp)" DefaultValue="2015" Max="2107" Min="1980" Type="integer" Group="System Parameters" TabName="Set Defines">
+		<Condition Diagnostic="Available in CubeMx since R0.11 version" Expression="(NEW_DISKIO_API = 2) &amp; (_FS_NORTC = 1)"/>
+		<Description>As FS_NORTC is enabled, it is the year part of the timestamps used by Fatfs. </Description>
+	</RefParameter>
+	<RefParameter Name="_NORTC_YEAR" Comment="      NORTC_YEAR (Year for timestamp)" DefaultValue="2015" Type="uniqueElementList" Group="System Parameters" TabName="Set Defines">
+		<Condition Diagnostic="Available in CubeMx since R0.11 version" Expression="(NEW_DISKIO_API = 2) &amp; (_FS_NORTC = 0)"/>
+		<Description>Useless as FS_NORTC is disabled (otherwise, it is the year part of the timestamps used by Fatfs). </Description>
+	</RefParameter>
+	<RefParameter Name="_NORTC_YEAR" Comment="      NORTC_YEAR (Year for timestamp)" DefaultValue="2015" Type="uniqueElementList" Group="System Parameters" TabName="Set Defines" Visible="false">
+		<Description>When FS_NORTC is enabled, year part of the timestamps used by Fatfs. </Description>
+	</RefParameter>	 
+
+  	<RefParameter Name="_NORTC_MON" Comment="      NORTC_MON (Month for timestamp)" DefaultValue="6" Max="12" Min="1" Type="integer" Group="System Parameters" TabName="Set Defines">
+		<Condition Diagnostic="Available in CubeMx since R0.11 version" Expression="(NEW_DISKIO_API = 2) &amp; (_FS_NORTC = 1)"/>
+		<Description>As FS_NORTC is enabled, it is the month part of the timestamps used by Fatfs.</Description>
+	</RefParameter>
+	<RefParameter Name="_NORTC_MON" Comment="      NORTC_MON (Month for timestamp)" DefaultValue="6" Type="uniqueElementList" Group="System Parameters" TabName="Set Defines">
+		<Condition Diagnostic="Available in CubeMx since R0.11 version" Expression="(NEW_DISKIO_API = 2) &amp; (_FS_NORTC = 0)"/>
+		<Description>Useless as FS_NORTC is disabled (otherwise, it is the month part of the timestamps used by Fatfs). </Description>
+	</RefParameter>
+	<RefParameter Name="_NORTC_MON" Comment="      NORTC_MON (Month for timestamp)" DefaultValue="6" Type="uniqueElementList" Group="System Parameters" TabName="Set Defines" Visible="false">
+		<Description>When FS_NORTC is enabled, month part of the timestamps used by Fatfs. </Description>
+	</RefParameter>		
+
+	<RefParameter Name="_NORTC_MDAY" Comment="      NORTC_MDAY (Day for timestamp)" DefaultValue="4" Max="31" Min="1" Type="integer" Group="System Parameters" TabName="Set Defines">
+		<Condition Diagnostic="Available in CubeMx since R0.11 version" Expression="(NEW_DISKIO_API = 2) &amp; (_FS_NORTC = 1)"/>
+		<Description>As FS_NORTC is enabled, it is the day part of the timestamps used by Fatfs. </Description>
+	</RefParameter>
+	<RefParameter Name="_NORTC_MDAY" Comment="      NORTC_MDAY (Day for timestamp)" DefaultValue="4" Type="uniqueElementList" Group="System Parameters" TabName="Set Defines">
+		<Condition Diagnostic="Available in CubeMx since R0.11 version" Expression="(NEW_DISKIO_API = 2) &amp; (_FS_NORTC = 0)"/>
+		<Description>Useless as FS_NORTC is disabled (otherwise, it is the day part of the timestamps used by Fatfs). </Description>
+	</RefParameter>
+	<RefParameter Name="_NORTC_MDAY" Comment="      NORTC_MDAY (Day for timestamp)" DefaultValue="4" Type="uniqueElementList" Group="System Parameters" TabName="Set Defines" Visible="false">
+		<Description>When FS_NORTC is enabled, day part of the timestamps used by Fatfs. </Description>
+	</RefParameter>	
+	<!--  New in Fatfs R0.11 -->
+	
+	
 	<RefParameter Name="_WORD_ACCESS" Comment="WORD_ACCESS (Platform dependent access option)" DefaultValue="0" Type="list" Group="System Parameters" TabName="Set Defines">
 		<PossibleValue Comment="Byte access" Value="0"/>
 		<PossibleValue Comment="Word access" Value="1"/>
 		<Description>The WORD_ACCESS option is an only platform dependent option. It defines which access method is used to the word data on the FAT volume.&lt;br&gt; - 0: Byte-by-byte access. Always compatible with all platforms.&lt;br&gt; - 1: Word access. &lt;b&gt;Do not choose this unless under both the following conditions.&lt;/b&gt;&lt;br&gt;&#160;&#160;&#160;&#160; - Byte order on the memory is little-endian. &lt;br&gt;&#160;&#160;&#160;&#160; - Address miss-aligned word access is always allowed for all instructions.&lt;br&gt; If it is the case, WORD_ACCESS can also be set to 1 to improve performance and reduce code size.</Description>
 	</RefParameter>
-	
+
 	<RefParameter Name="_FS_REENTRANT" Comment="FS_REENTRANT (Re-Entrancy)" DefaultValue="1" Type="list" Group="System Parameters" TabName="Set Defines">
 		<Condition Diagnostic="FS_REENTRANT forced to 1 as FREERTOS enabled" Expression="S_FREERTOS"/>
 		<PossibleValue Comment="Enabled" Value="1"/>
@@ -677,10 +834,12 @@
 		<Parameter Name="_FS_READONLY"/>
 		<Parameter Name="_FS_MINIMIZE"/>
 		<Parameter Name="_USE_STRFUNC"/>
+		<Parameter Name="_USE_FIND"/>
 		<Parameter Name="_USE_MKFS"/>
 		<Parameter Name="_USE_FORWARD"/>
 		<Parameter Name="_USE_LABEL"/>
 		<Parameter Name="_USE_FASTSEEK"/>
+		<Parameter Name="_USE_BUFF_WO_ALIGNMENT"/>
 		<!-- Parameters for Locale and Namespace Configurations -->
 		<Parameter Name="_CODE_PAGE"/>
 		<Parameter Name="_USE_LFN"/>
@@ -694,8 +853,13 @@
 		<Parameter Name="_MIN_SS"/>
 		<Parameter Name="_MULTI_PARTITION"/>
 		<Parameter Name="_USE_ERASE"/>
+		<Parameter Name="_USE_TRIM"/>
 		<Parameter Name="_FS_NOFSINFO"/>
 		<!-- Parameters for System Configurations   -->
+		<Parameter Name="_FS_NORTC"/>
+		<Parameter Name="_NORTC_YEAR"/>
+		<Parameter Name="_NORTC_MON"/>
+		<Parameter Name="_NORTC_MDAY"/>	
 		<Parameter Name="_WORD_ACCESS"/>
 		<Parameter Name="_FS_REENTRANT"/>
 		<Parameter Name="_FS_TIMEOUT"/>

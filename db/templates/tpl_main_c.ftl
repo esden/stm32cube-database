@@ -31,7 +31,6 @@
   *
   ******************************************************************************
   */
-
 [#compress]
 /* Includes ------------------------------------------------------------------*/
 [#if isHalSupported??]
@@ -98,7 +97,9 @@ ${dHandle};
     [#-- Global variables --]
 [#-- If HAL compliant generate Global variable : Peripherals handler -End --]
 #n#n
+
 /* USER CODE BEGIN PV */
+/* Private variables ---------------------------------------------------------*/
 
 /* USER CODE END PV */
 #n
@@ -131,6 +132,7 @@ static void MPU_Config(void);
 [/#if]
 #n
 /* USER CODE BEGIN PFP */
+/* Private function prototypes -----------------------------------------------*/
 
 /* USER CODE END PFP */
 #n

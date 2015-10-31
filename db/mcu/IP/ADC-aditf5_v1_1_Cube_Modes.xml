@@ -1106,13 +1106,23 @@
         <Condition Expression="EnableAnalogWatchDog1=false" Diagnostic=""/>
     </RefParameter>
     <RefParameter Comment="Watchdog Mode" DefaultValue="ADC_ANALOGWATCHDOG_SINGLE_REG" Name="WatchdogMode" Type="list" Group="ADCgroup">
-        <Condition Expression="(InjNumberOfConversion=0)" Diagnostic=""/>
+        <Condition Expression="((InjNumberOfConversion=0) | (EnableInjectedConversion = DISABLE))&amp; (EnableRegularConversion = ENABLE)" Diagnostic=""/>
         <PossibleValue Comment="Single regular channel" Value="ADC_ANALOGWATCHDOG_SINGLE_REG"  Semaphore="SingleRegular$IpInstance"/>
         <PossibleValue Comment="Single regular or injected channel" Value="ADC_ANALOGWATCHDOG_SINGLE_REGINJEC" Semaphore="SingleInjectedOrRegular$IpInstance"/>
         <PossibleValue Comment="All regular channels" Value="ADC_ANALOGWATCHDOG_ALL_REG" Semaphore="AllRegular$IpInstance"/>
         <PossibleValue Comment="All regular and injected channels" Value="ADC_ANALOGWATCHDOG_ALL_REGINJEC" Semaphore="AllRegInjected$IpInstance"/>
         <Description>Configures the ADC analog watchdog mode.</Description>
     </RefParameter>
+	
+	<RefParameter Comment="Watchdog Mode" DefaultValue="ADC_ANALOGWATCHDOG_SINGLE_INJEC" Name="WatchdogMode" Type="list" Group="ADCgroup">
+        <Condition Expression="(!(InjNumberOfConversion = 0)) &amp;(EnableInjectedConversion = ENABLE) &amp; (EnableRegularConversion = DISABLE)" Diagnostic=""/>
+        <PossibleValue Comment="Single injected channel" Value="ADC_ANALOGWATCHDOG_SINGLE_INJEC" Semaphore="SingleInjected$IpInstance" />
+		<PossibleValue Comment="Single regular or injected channel" Value="ADC_ANALOGWATCHDOG_SINGLE_REGINJEC" Semaphore="SingleInjectedOrRegular$IpInstance" />
+        <PossibleValue Comment="All injected channels" Value="ADC_ANALOGWATCHDOG_ALL_INJEC" Semaphore="AllInjected$IpInstance"/>
+        <PossibleValue Comment="All regular and injected channels" Value="ADC_ANALOGWATCHDOG_ALL_REGINJEC" Semaphore="AllRegInjected$IpInstance"/>
+        <Description>Configures the ADC analog watchdog mode.</Description>
+    </RefParameter>
+	
     <RefParameter Comment="Watchdog Mode" DefaultValue="ADC_ANALOGWATCHDOG_SINGLE_REG" Name="WatchdogMode" Type="list" Group="ADCgroup">
         <PossibleValue Comment="Single regular channel" Value="ADC_ANALOGWATCHDOG_SINGLE_REG" Semaphore="SingleRegular$IpInstance" />
         <PossibleValue Comment="Single injected channel" Value="ADC_ANALOGWATCHDOG_SINGLE_INJEC" Semaphore="SingleInjected$IpInstance" />
@@ -1454,16 +1464,18 @@
     
     <!-- ChannelForWatchDog used to specify witch channel list to be available for analog watch dog mode-->
     <!-- ChannelForWatchDog used to specify witch channel list to be available for analog watch dog mode-->
-    <RefParameter Comment="Channel type for WatchDog" DefaultValue="Regular" Name="ChannelForWatchDog" Type="list" Visible="false">
-        <Condition Expression="SingleRegular$IpInstance" Diagnostic=""/>
+     
+	<RefParameter Comment="Channel type for WatchDog" DefaultValue="Regular" Name="ChannelForWatchDog" Type="list" Visible="false">
+        <Condition Expression="WatchdogMode = ADC_ANALOGWATCHDOG_SINGLE_REG" Diagnostic=""/>
         <PossibleValue Comment="Regular" Value="Regular"/>
     </RefParameter>
-    <RefParameter Comment="Channel type for WatchDog" DefaultValue="Injected" Name="ChannelForWatchDog" Type="list" Visible="false">
-        <Condition Expression="SingleInjected$IpInstance" Diagnostic=""/>
+	<RefParameter Comment="Channel type for WatchDog" DefaultValue="Injected" Name="ChannelForWatchDog" Type="list" Visible="false">
+        <Condition Expression="WatchdogMode = ADC_ANALOGWATCHDOG_SINGLE_INJEC" Diagnostic=""/>
         <PossibleValue Comment="Injected" Value="Injected"/>
     </RefParameter>
+   
     <RefParameter Comment="Channel type for WatchDog" DefaultValue="InjectedOrRegular" Name="ChannelForWatchDog" Type="list" Visible="false">
-        <Condition Expression="SingleInjectedOrRegular$IpInstance" Diagnostic=""/>
+        <Condition Expression="WatchdogMode = ADC_ANALOGWATCHDOG_SINGLE_REGINJEC" Diagnostic=""/>
         <PossibleValue Comment="InjectedOrRegular" Value="InjectedOrRegular"/>
     </RefParameter>
     <RefParameter Comment="Channel type for WatchDog" DefaultValue="none" Name="ChannelForWatchDog" Type="list" Visible="false">

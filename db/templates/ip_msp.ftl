@@ -495,6 +495,23 @@
 [/#if]
 [#-- if I2C clk_enable should be after GPIO Init End --]
     [#if serviceType=="Init"] 
+[#-- bug 322189 Init--]
+[#if ipName?contains("OTG_FS")&&FamilyName=="STM32L4"]
+#n#t#t/* Enable VDDUSB */
+  #t#tif(__HAL_RCC_PWR_IS_CLK_DISABLED())
+  #t#t{
+    #t#t#t__HAL_RCC_PWR_CLK_ENABLE();
+    
+    #t#t#tHAL_PWREx_EnableVddUSB();
+    
+    #t#t#t__HAL_RCC_PWR_CLK_DISABLE();
+  #t#t}
+  #t#telse
+  #t#t{
+    #t#t#tHAL_PWREx_EnableVddUSB();
+  #t#t}
+[/#if]
+[#-- bug 322189 Init End--]
     [#if dmaExist]#n#t#t/* Peripheral DMA init*/
 
 #t[@generateConfigCode ipName=ipName type=serviceType serviceName="dma" instHandler=instHandler tabN=tabN/]
@@ -517,7 +534,7 @@
                 [/#list]
                 [#assign lowPower = "no"]
                 [#list initService.nvic as initVector]
-                   [#if initVector.vector?contains("WKUP") || initVector.vector?contains("WakeUp") || (initVector.vector == "USB_IRQn" && USB_INTERRUPT_WAKEUP??)]
+                   [#if initVector.vector?contains("WKUP") || initVector.vector?contains("WakeUp") || ((initVector.vector == "USB_IRQn"||(initVector.vector == "OTG_FS_IRQn")) && USB_INTERRUPT_WAKEUP??)]
                       [#assign lowPower = "yes"]
                    [/#if]
                 [/#list]
@@ -554,8 +571,10 @@
                         #t#t#t__HAL_USB_OTG_FS_WAKEUP_EXTI_CLEAR_FLAG();
                         #t#t#t__HAL_USB_OTG_FS_WAKEUP_EXTI_ENABLE_RISING_EDGE();
                         #t#t#t__HAL_USB_OTG_FS_WAKEUP_EXTI_ENABLE_IT();
+                    [#elseif ipName?contains("OTG_FS")&&FamilyName=="STM32L4"]
+                        #t#t#t__HAL_USB_OTG_FS_WAKEUP_EXTI_ENABLE_IT();
                     [#elseif ipName?contains("_FS")]
-                        #t#t#t__HAL_USB_FS_EXTI_ENABLE_IT();
+                        #t#t#t__HAL_USB_FS_EXTI_ENABLE_IT();                        
                     [#else]
                         [#if FamilyName=="STM32F1"] [#-- use new macro naming for F1--]
                             #t#t#t__HAL_USB_WAKEUP_EXTI_CLEAR_FLAG();
@@ -583,6 +602,23 @@
     [/#if]
     [#else] [#-- else serviceType = DeInit --]
 [#assign service = getInitServiceMode(ipName)]
+[#-- bug 322189 DeInit--]
+[#if ipName?contains("OTG_FS")&&FamilyName=="STM32L4"]
+#n#t#t/* Disable VDDUSB */
+  #t#tif(__HAL_RCC_PWR_IS_CLK_DISABLED())
+  #t#t{
+    #t#t#t__HAL_RCC_PWR_CLK_ENABLE();
+    
+    #t#t#tHAL_PWREx_DisableVddUSB();
+    
+    #t#t#t__HAL_RCC_PWR_CLK_DISABLE();
+  #t#t}
+  #t#telse
+  #t#t{
+    #t#t#tHAL_PWREx_DisableVddUSB();
+  #t#t}
+[/#if]
+[#-- bug 322189 DeInit End--]
     [#if dmaExist]#n#t#t/* Peripheral DMA DeInit*/     
  [#assign dmaservice =service.dma]
  [#if dmaservice??]
@@ -629,7 +665,7 @@
 [#list ipvar.initCallBacks.entrySet() as entry] 
 [#assign instanceList = entry.value] 
 [#if (instanceList?size==1 && (name==instanceList.get(0)||name=="USB")) || instanceList?size>1]
-[#assign mode=entry.key?replace("_MspInit","")?replace("_BspInit","")?replace("HAL_","")]
+[#assign mode=entry.key?replace("_MspInit","")?replace("MspInit","")?replace("_BspInit","")?replace("HAL_","")]
 
 [#assign ipHandler = "h" + mode?lower_case]
 
@@ -752,7 +788,7 @@
 [#list ipvar.deInitCallBacks.entrySet() as entry]
 [#assign instanceList = entry.value]
 [#if (instanceList?size==1 && (name==instanceList.get(0)||name=="USB"))  || instanceList?size>1]
-[#assign mode=entry.key?replace("_MspDeInit","")?replace("_BspDeInit","")?replace("HAL_","")]
+[#assign mode=entry.key?replace("_MspDeInit","")?replace("MspDeInit","")?replace("_BspDeInit","")?replace("HAL_","")]
 [#assign ipHandler = "h" + mode?lower_case]
 [#if name !="TIM"]
 #nvoid ${entry.key}(${mode}_HandleTypeDef* h${mode?lower_case})

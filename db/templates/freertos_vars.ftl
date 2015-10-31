@@ -25,6 +25,15 @@
         [/#list]
       [/#if]
       
+      [#if variable.name=="RecursiveMutexes"]
+	    [#assign s = variable.valueList]
+        [#list s as mutexName]
+        [#if mutexName != "0"]
+          osMutexId ${mutexName}Handle; 
+        [/#if] 
+        [/#list]
+      [/#if]
+      
       [#if variable.name=="Timers"]
 	    [#assign s = variable.valueList]
 	    [#assign index = 0]

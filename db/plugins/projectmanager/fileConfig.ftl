@@ -61,7 +61,7 @@
     </Aincludes>
 	<Cdefines>
 	   [#list CdefinesList as define]
-       <include>${define}</include>
+       <define>${define}</define>
         [/#list]
 	   [#-- <define>__weak=__attribute__((weak))</define> --]
     </Cdefines>
