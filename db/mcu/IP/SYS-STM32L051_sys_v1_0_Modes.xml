@@ -16,7 +16,35 @@
         <ConfigForMode>SYS_VREFINT_ADC</ConfigForMode>
         <Parameter Name="SYSCFG_Vrefint_OUTPUT"/>
     </RefMode>
+    
+     <RefMode Name="PVD" Group="Programmable_Voltage_Detector_Settings" >
+        <ConfigForMode>PVDConfig</ConfigForMode>
+        <ConfigForMode>PVDEnable</ConfigForMode>
+        <Parameter Name="PVDLevel"/>
+        <Parameter Name="Mode"/>
+    </RefMode>
 	
+	<RefParameter Comment="PVD detection Level" DefaultValue="PWR_PVDLEVEL_7" Name="PVDLevel" Type="list" Visible="false" >
+     <Condition Expression="Sem_ExternalAnalogVoltage" Diagnostic=""/>       
+        <PossibleValue Comment="PWR PVD LEVEL 7" Value="PWR_PVDLEVEL_7"/>
+    </RefParameter> 	
+    <RefParameter Comment="PVD detection Level" DefaultValue="PWR_PVDLEVEL_0" Name="PVDLevel" Type="list" >
+        <PossibleValue Comment="PWR PVD LEVEL 0 (1.9 V)" Value="PWR_PVDLEVEL_0"/>
+        <PossibleValue Comment="PWR PVD LEVEL 1 (2.1 V)" Value="PWR_PVDLEVEL_1"/>
+        <PossibleValue Comment="PWR PVD LEVEL 2 (2.3 V)" Value="PWR_PVDLEVEL_2"/>
+        <PossibleValue Comment="PWR PVD LEVEL 3 (2.5 V)" Value="PWR_PVDLEVEL_3"/>
+        <PossibleValue Comment="PWR PVD LEVEL 4 (2.7 V)" Value="PWR_PVDLEVEL_4"/>
+        <PossibleValue Comment="PWR PVD LEVEL 5 (2.9 V)" Value="PWR_PVDLEVEL_5"/>
+        <PossibleValue Comment="PWR PVD LEVEL 6 (3.1 V)" Value="PWR_PVDLEVEL_6"/>
+    </RefParameter>
+    
+     <RefParameter Comment="PWR PVD Mode" DefaultValue="PWR_PVD_MODE_NORMAL" Name="Mode" Type="list">
+        <PossibleValue Comment="Event Mode" Value="PWR_MODE_EVT"/>
+        <PossibleValue Comment="External Interrupt Mode with Rising edge trigger detection" Value="PWR_MODE_IT_RISING"/>
+        <PossibleValue Comment="External Interrupt Mode with Falling edge trigger detection" Value="PWR_MODE_IT_FALLING"/>
+        <PossibleValue Comment="External Interrupt Mode with Rising/Falling edge trigger detection" Value="PWR_MODE_IT_RISING_FALLING"/>
+    </RefParameter>
+    
 	<RefParameter Comment="SYSCFG Vrefint OUTPUT" DefaultValue="SYSCFG_VREFINT_OUT_PB0" Name="SYSCFG_Vrefint_OUTPUT" Type="list" Visible="false">
 		  <Condition Expression="VREFINT_OUT_PB0_USED" Diagnostic=""/>
     </RefParameter>
@@ -88,12 +116,24 @@
 			</ModeLogicOperator>
 		</Mode>
 		<!-- Programmable Voltage Detector-->
-		<Mode Name="PVD"  UserName="Programmable Voltage Detector">
-			<ModeLogicOperator Name="OR">
-				<Mode Name="PVD">
+		<Mode Name="PowerVD" UserName="Power Voltage Detector In">
+			<ModeLogicOperator Name="XOR">
+				<Mode Name="PVD"
+					UserName="Power Voltage Detector In (External input analog voltage)">
 					<SignalLogicalOp Name="AND">
-						<Signal Name="VREF_PVD_IN"/>
+						<Signal Name="PVD_IN" />
 					</SignalLogicalOp>
+					<Semaphore>Sem_ExternalAnalogVoltage</Semaphore>
+					<Semaphore>PVD_INTERRUPT</Semaphore>
+
+				</Mode>
+				<Mode Name="PVD"
+					UserName="Power Voltage Detector In (Internal analog voltage)">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="V_PVD_IN" />
+					</SignalLogicalOp>
+					<Semaphore>PVD_INTERRUPT</Semaphore>
+
 				</Mode>
 			</ModeLogicOperator>
 		</Mode>
@@ -107,5 +147,6 @@
 	<RefSignal IOMode="System" Name="WKUP2"/>
 	<RefSignal IOMode="Analog" Name="VREF_OUT_PB0"/>
     <RefSignal IOMode="Analog" Name="VREF_OUT_PB1"/>
-	<RefSignal IOMode="Analog" Name="VREF_PVD_IN"/>
+	<RefSignal IOMode="Analog" Name="PVD_IN"/>
+	<RefSignal IOMode="Analog" Name="V_PVD_IN" Virtual="true"/>
 </IP>

@@ -1,12 +1,13 @@
 [#ftl]
 /**
  ******************************************************************************
-  * @file    bsp_driver_sdram.h
+  * @file    bsp_driver_sdram.h (based on stm3269i_eval_sdram.h)
   * @brief   This file contains the common defines and functions prototypes for  
   *          the bsp_driver_sdram.c driver.
   ******************************************************************************
+  * @attention
   *
-  * COPYRIGHT(c) ${year} STMicroelectronics
+  * <h2><center>&copy; COPYRIGHT(c) 2015 STMicroelectronics</center></h2>
   *
   * Redistribution and use in source and binary forms, with or without modification,
   * are permitted provided that the following conditions are met:
@@ -63,34 +64,31 @@
 /** 
   * @brief  SDRAM status structure definition  
   */     
-#define   SDRAM_OK         0x00
-#define   SDRAM_ERROR      0x01
+#define   SDRAM_OK         ((uint8_t)0x00)
+#define   SDRAM_ERROR      ((uint8_t)0x01)
 
-/* Exported types ------------------------------------------------------------*/ 
-/* Exported constants --------------------------------------------------------*/   
+/** @defgroup STM32469I-EVAL_SDRAM_Exported_Constants STM32469I EVAL SDRAM Exported Constants
+  * @{
+  */
 #define SDRAM_DEVICE_ADDR  ((uint32_t)0xC0000000)
-#define SDRAM_DEVICE_SIZE  ((uint32_t)0x800000)  /* SDRAM device size in MBytes */
 
-/* #define SDRAM_MEMORY_WIDTH            FMC_SDRAM_MEM_BUS_WIDTH_8  */
-/* #define SDRAM_MEMORY_WIDTH            FMC_SDRAM_MEM_BUS_WIDTH_16 */
-//#define SDRAM_MEMORY_WIDTH               FMC_SDRAM_MEM_BUS_WIDTH_32
+ /* SDRAM device size in MBytes */
+ #define SDRAM_DEVICE_SIZE  ((uint32_t)0x800000)
 
-//#define SDCLOCK_PERIOD                   FMC_SDRAM_CLOCK_PERIOD_2
-/* #define SDCLOCK_PERIOD                FMC_SDRAM_CLOCK_PERIOD_3 */
+//#define SDRAM_MEMORY_WIDTH FMC_SDRAM_MEM_BUS_WIDTH_32
+//#define SDCLOCK_PERIOD     FMC_SDRAM_CLOCK_PERIOD_2
 
-//#define SDRAM_READBURST                  FMC_SDRAM_RBURST_DISABLE 
-/* #define SDRAM_READBURST               FMC_SDRAM_RBURST_ENABLE */    
-
-//#define REFRESH_COUNT                    ((uint32_t)1292)   /* SDRAM refresh counter */
-   
-#define SDRAM_TIMEOUT     ((uint32_t)0xFFFF) 
+/* SDRAM refresh counter (90 MHz SD clock) */
+//#define REFRESH_COUNT       ((uint32_t)0x0569)
+#define  SDRAM_TIMEOUT      ((uint32_t)0xFFFF)
 
 /* DMA definitions for SDRAM DMA transfer */
-//#define __DMAx_CLK_ENABLE                 __DMA2_CLK_ENABLE
-//#define SDRAM_DMAx_CHANNEL                DMA_CHANNEL_0
-//#define SDRAM_DMAx_STREAM                 DMA2_Stream0  
-//#define SDRAM_DMAx_IRQn                   DMA2_Stream0_IRQn
-//#define SDRAM_DMAx_IRQHandler             DMA2_Stream0_IRQHandler 
+//#define __DMAx_CLK_ENABLE     __HAL_RCC_DMA2_CLK_ENABLE
+//#define __DMAx_CLK_DISABLE    __HAL_RCC_DMA2_CLK_DISABLE
+//#define SDRAM_DMAx_CHANNEL    DMA_CHANNEL_0
+//#define SDRAM_DMAx_STREAM     DMA2_Stream0
+//#define SDRAM_DMAx_IRQn       DMA2_Stream0_IRQn
+//#define SDRAM_DMAx_IRQHandler DMA2_Stream0_IRQHandler
    
 
 /**
@@ -105,8 +103,8 @@
 //#define SDRAM_MODEREG_CAS_LATENCY_2              ((uint16_t)0x0020)
 //#define SDRAM_MODEREG_CAS_LATENCY_3              ((uint16_t)0x0030)
 //#define SDRAM_MODEREG_OPERATING_MODE_STANDARD    ((uint16_t)0x0000)
-#define SDRAM_MODEREG_WRITEBURST_MODE_PROGRAMMED ((uint16_t)0x0000) 
-#define SDRAM_MODEREG_WRITEBURST_MODE_SINGLE     ((uint16_t)0x0200)  
+//#define SDRAM_MODEREG_WRITEBURST_MODE_PROGRAMMED ((uint16_t)0x0000) 
+//#define SDRAM_MODEREG_WRITEBURST_MODE_SINGLE     ((uint16_t)0x0200)  
 
 extern SDRAM_HandleTypeDef _HSDRAM;
 

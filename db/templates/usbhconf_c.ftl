@@ -50,6 +50,18 @@
 [#assign handleNameHS = ""]
 [#assign instanceNb = 0]
 [#assign includeMspDone = 0] 
+[#assign IpInstanceFS = ""]
+[#assign IpInstanceHS = ""]
+[#if BspIpDatas??]
+	[#list BspIpDatas as BSPIP]
+		[#if BSPIP.ipName?contains("FS")]
+			[#assign IpInstanceFS = "FS"] 
+		[/#if]
+		[#if BSPIP.ipName?contains("HS")]
+			[#assign IpInstanceHS = "HS"] 
+		[/#if]
+	[/#list]  
+[/#if]	
 
 [#list SWIPdatas as SWIP]  
 [#compress]
@@ -382,51 +394,62 @@ USBH_URBStateTypeDef  USBH_LL_GetURBState (USBH_HandleTypeDef *phost, uint8_t pi
   */
 USBH_StatusTypeDef  USBH_LL_DriverVBUS (USBH_HandleTypeDef *phost, uint8_t state)
 { 
-[#if BspPlatform == "true"]
-[#if handleNameFS == "FS"]
+[#if IpInstanceFS == "FS" && handleNameFS == "FS"]
   if (phost->id == HOST_FS) {
     MX_DriverVbusFS(state);
   }
 [/#if] 
-[#if handleNameHS == "HS"]
+[#if IpInstanceHS == "HS" && handleNameHS == "HS" ]
   if (phost->id == HOST_HS) {
     MX_DriverVbusHS(state);
   }
 [/#if]  
-[/#if]  
-[#if BspPlatform == "false"]
- /* USER CODE BEGIN 0 */ 
- /* USER CODE END 0 */
-  if(state == 0)
-  {
-    /* Drive high Charge pump */
-    /* USER CODE BEGIN 1 */ 
-    /* ToDo: Add IOE driver control */	
-    [#if handleNameFS == "FS"]
-    if (phost->id == HOST_FS) {    
+
+[#if IpInstanceFS == "" || IpInstanceHS == ""]   
+  /* USER CODE BEGIN 0 */
+  /* USER CODE END 0*/     
+  [#if handleNameFS == "FS" && IpInstanceFS == ""]  
+  if (phost->id == HOST_FS) 
+  { 
+    if (state == 0)
+    {   
+      /* Drive high Charge pump */
+      /* ToDo: Add IOE driver control */	   
+      /* USER CODE BEGIN DRIVE_HIGH_CHARGE_FOR_FS */
+    
+      /* USER CODE END DRIVE_HIGH_CHARGE_FOR_FS */ 
+    } 
+    else
+    {
+      /* Drive low Charge pump */
+      /* ToDo: Add IOE driver control */	
+      /* USER CODE BEGIN DRIVE_LOW_CHARGE_FOR_FS */
+   
+      /* USER CODE END DRIVE_HIGH_CHARGE_FOR_FS */ 
     }
-    [/#if] 
-    [#if handleNameHS == "HS"]
-    if (phost->id == HOST_HS) {
+  }	
+  [/#if] 
+  [#if handleNameHS == "HS" && IpInstanceHS == ""]
+  if (phost->id == HOST_HS) 
+  {  
+    if (state == 0)	  
+    {
+      /* Drive high Charge pump */
+      /* ToDo: Add IOE driver control */	   
+      /* USER CODE BEGIN DRIVE_HIGH_CHARGE_FOR_HS */
+ 
+	  /* USER CODE END DRIVE_HIGH_CHARGE_FOR_HS */ 
     }
-    [/#if]     
-    /* USER CODE END 1 */ 
+    else
+    {
+      /* Drive low Charge pump */
+      /* ToDo: Add IOE driver control */	
+      /* USER CODE BEGIN DRIVE_LOW_CHARGE_FOR_HS */
+		
+      /* USER CODE BEGIN DRIVE_LOW_CHARGE_FOR_HS */    	 
+    }  
   }
-  else
-  {
-    /* Drive low Charge pump */
-    /* USER CODE BEGIN 2 */
-    /* ToDo: Add IOE driver control */	
-	[#if handleNameFS == "FS"]
-    if (phost->id == HOST_FS) {    
-    }
-    [/#if] 
-    [#if handleNameHS == "HS"]
-    if (phost->id == HOST_HS) {
-    }
-    [/#if] 
-    /* USER CODE END 2 */
-  }
+  [/#if]       
 [/#if]
   HAL_Delay(200);
   return USBH_OK;  

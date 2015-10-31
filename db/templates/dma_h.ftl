@@ -44,9 +44,22 @@
 [#list includes as include]
 #include "${include}"
 [/#list]
+#n
+/* USER CODE BEGIN Includes */
 
+/* USER CODE END Includes */
+#n
+/* USER CODE BEGIN Private defines */
+
+/* USER CODE END Private defines */
+#n
 void MX_DMA_Init(void);
-
+[#compress]
+#n/* USER CODE BEGIN Prototypes */
+#n     
+/* USER CODE END Prototypes */
+#n
+[/#compress]
 #ifdef __cplusplus
 }
 #endif

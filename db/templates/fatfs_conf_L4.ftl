@@ -217,6 +217,7 @@ extern ${variable.value} ${variable.name};
 /* This option switches f_forward() function. (0:Disable or 1:Enable)
 /  To enable it, also _FS_TINY need to be set to 1. */
 
+[#if valueUseBuffWoAlignment != "2"]      [#-- "2" means useless == not to be generated --]
 #define _USE_BUFF_WO_ALIGNMENT  ${valueUseBuffWoAlignment}
 /* This option is available only for usbh diskio interface and allows to disable
 /  the management of the unaligned buffer.
@@ -227,7 +228,7 @@ extern ${variable.value} ${variable.name};
 /  Please note that if _USE_BUFF_WO_ALIGNMENT is set to 1 and an unaligned 32bits
 /  buffer is forwarded to the FatFs Write/Read functions, an error will be returned. 
 /  (0: default value or 1: unaligned buffer return an error). */
-
+[/#if]
 /*-----------------------------------------------------------------------------/
 / Locale and Namespace Configurations
 /-----------------------------------------------------------------------------*/

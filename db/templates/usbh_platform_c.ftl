@@ -99,11 +99,13 @@ extern ${IpNameFS}_HandleTypeDef h${IpInstanceFS?lower_case};
 [#if IpNameHS?contains("GPIO")]
 [#else]
 /* External variables ---------------------------------------------------------*/
+[#if IpInstanceFS !=IpInstanceHS]
 extern ${IpNameHS}_HandleTypeDef h${IpInstanceHS?lower_case};
 [/#if]
 [/#if]
+[/#if]
 
-
+[#if IpNameFS != ""]
 /**
   * @brief  MX_DriverVBUS 
   *         Drive VBUS.
@@ -115,16 +117,20 @@ extern ${IpNameHS}_HandleTypeDef h${IpInstanceHS?lower_case};
 void MX_DriverVbusFS( uint8_t state) 
 { 
 [#if IpNameFS?contains("GPIO")]
+  uint8_t data = state; 
+  /* USER CODE BEGIN PREPARE_GPIO_DATA_VBUS_FS */
   if(state == 0)
   {
-    /* Drive high Charge pump */
-    HAL_GPIO_WritePin(${IpNameFS},${IpInstanceFS},GPIO_PIN_SET);
+    /* Drive high Charge pump */ 	     
+    data = GPIO_PIN_SET;
   }
   else
   {
     /* Drive low Charge pump */
-    HAL_GPIO_WritePin(${IpNameFS},${IpInstanceFS},GPIO_PIN_RESET);
+    data = GPIO_PIN_RESET;
   }
+  /* USER CODE END PREPARE_GPIO_DATA_VBUS_FS */
+  HAL_GPIO_WritePin(${IpNameFS},${IpInstanceFS},(GPIO_PinState)data);
 [#else] 
   [#if IpNameFS?contains("I2C")]
   uint8_t Component_Reg  = ${I2CRegFS};
@@ -132,24 +138,26 @@ void MX_DriverVbusFS( uint8_t state)
   [/#if]   
   [#if IpNameFS?contains("I2C")]
   uint8_t Component_Addr = ${I2CAddrFS} << 1;    
-  /* USER CODE BEGIN PREPARE_DATA */    
+  /* USER CODE BEGIN PREPARE_I2C_DATA_VBUS_FS */    
   uint8_t data = state;
-  /* USER CODE END PREPARE_DATA */  
+  /* USER CODE END PREPARE_I2C_DATA_VBUS_FS */  
   uint8_t data_tmp = 0;
   status = HAL_${IpNameFS}_Mem_Read(&h${IpInstanceFS?lower_case}, Component_Addr, (uint16_t)Component_Reg, ${IpNameFS}_MEMADD_SIZE_8BIT, &data_tmp, 1, 100);
   data |= data_tmp;
   status = HAL_${IpNameFS}_Mem_Write(&h${IpInstanceFS?lower_case},Component_Addr,(uint16_t)Component_Reg, ${IpNameFS}_MEMADD_SIZE_8BIT,&data, 1, 100);
-  /* USER CODE BEGIN CHECK_STATUS */   
+  /* USER CODE BEGIN CHECK_STATUS_VBUS_FS */   
   /* Check the communication status */
   if(status != HAL_OK)
   {
   
   }
-  /* USER CODE END CHECK_STATUS */  
+  /* USER CODE END CHECK_STATUS_VBUS_FS */  
   [/#if]
 [/#if]
 }
+[/#if]
 
+[#if IpNameHS != ""]
 /**
   * @brief  MX_DriverVbusHS
   *         Drive VBUS.
@@ -161,16 +169,20 @@ void MX_DriverVbusFS( uint8_t state)
 void MX_DriverVbusHS( uint8_t state) 
 { 
 [#if IpNameHS?contains("GPIO")]
+  uint8_t data = state; 
+  /* USER CODE BEGIN PREPARE_GPIO_DATA_VBUS_HS */
   if(state == 0)
   {
-    /* Drive high Charge pump */
-    HAL_GPIO_WritePin(${IpNameHS},${IpInstanceHS},GPIO_PIN_SET);
+    /* Drive high Charge pump */ 	     
+    data = GPIO_PIN_SET;
   }
   else
   {
     /* Drive low Charge pump */
-    HAL_GPIO_WritePin(${IpNameHS},${IpInstanceHS},GPIO_PIN_RESET);
+    data = GPIO_PIN_RESET;
   }
+  /* USER CODE END PREPARE_GPIO_DATA_VBUS_HS */
+  HAL_GPIO_WritePin(${IpNameHS},${IpInstanceHS},(GPIO_PinState)data);
 [#else] 
   [#if IpNameHS?contains("I2C")]
   uint8_t Component_Reg  = ${I2CRegHS};
@@ -178,18 +190,21 @@ void MX_DriverVbusHS( uint8_t state)
   [/#if]   
   [#if IpNameHS?contains("I2C")]
   uint8_t Component_Addr = ${I2CAddrHS} << 1;  
+  /* USER CODE BEGIN PREPARE_DATA_VBUS_HS */
   uint8_t data = state;
+  /* USER CODE END PREPARE_DATA_VBUS_HS */
   uint8_t data_tmp = 0;
   status = HAL_${IpNameHS}_Mem_Read(&h${IpInstanceHS?lower_case}, Component_Addr, (uint16_t)Component_Reg, ${IpNameHS}_MEMADD_SIZE_8BIT, &data_tmp, 1, 100); 
   data |= data_tmp;
-  status = HAL_${IpNameHS}_Mem_Write(&h${IpInstanceHS?lower_case},Component_Addr,(uint16_t)Component_Reg, ${IpNameHS}_MEMADD_SIZE_8BIT,&data, 1, 100);   
+  status = HAL_${IpNameHS}_Mem_Write(&h${IpInstanceHS?lower_case},Component_Addr,(uint16_t)Component_Reg, ${IpNameHS}_MEMADD_SIZE_8BIT,&data, 1, 100);  
+  /* USER CODE BEGIN CHECK_STATUS_VBUS_HS */   
   /* Check the communication status */
   if(status != HAL_OK)
   {
   
   }
-  /* USER CODE BEGIN 1 */  
-  /* USER CODE END 1 */  
+   /* USER CODE END CHECK_STATUS_VBUS_HS */  
   [/#if]
 [/#if]
 }
+[/#if]

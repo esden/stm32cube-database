@@ -3,10 +3,11 @@
  ******************************************************************************
   * @file    bsp_driver_sram.h (based on stm32756g_eval_sram.h)
   * @brief   This file contains the common defines and functions prototypes for  
-  *          the stm32f7xx_sram.c driver.
+  *          the bsp_driver_sram.c driver.
   ******************************************************************************
+  * @attention
   *
-  * COPYRIGHT(c) ${year} STMicroelectronics
+  * <h2><center>&copy; COPYRIGHT(c) 2015 STMicroelectronics</center></h2>
   *
   * Redistribution and use in source and binary forms, with or without modification,
   * are permitted provided that the following conditions are met:

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?> <!-- STM32F446xx -->
 <Die xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../../../../doc/V4/Development/Specifications/db/plugins/power/die.xsd" Number="421">
     <Datasheets>
-        <Datasheet Ref="Yes" DocId="027107" Rev="2" InternetId="DM00141306" DS="10693"> <!-- STM32F446xx -->        
+        <Datasheet Ref="Yes" DocId="027107" Rev="4" InternetId="DM00141306" DS="10693"> <!-- STM32F446xx -->        
         </Datasheet>        
     </Datasheets>
     <MaxCurrent Value="160000000"/>
@@ -406,9 +406,9 @@
                     <Consumption PeripheralMode="OUT1" Range="Scale2-Medium" ConsumptionByMHz="2720" GlobalConsumption="475000"/>
                     <Consumption PeripheralMode="OUT2" Range="Scale2-Medium" ConsumptionByMHz="2720" GlobalConsumption="475000"/>
                     <Consumption PeripheralMode="OUT1+OUT2" Range="Scale2-Medium" ConsumptionByMHz="2720" GlobalConsumption="950000"/>
-                    <Consumption PeripheralMode="OUT1" Range="Scale3-Low" ConsumptionIndepClockByMHz="2400" GlobalConsumption="475000"/>
-                    <Consumption PeripheralMode="OUT2" Range="Scale3-Low" ConsumptionIndepClockByMHz="2400" GlobalConsumption="475000"/>
-                    <Consumption PeripheralMode="OUT1+OUT2" Range="Scale3-Low" ConsumptionIndepClockByMHz="2400" GlobalConsumption="950000"/>               
+                    <Consumption PeripheralMode="OUT1" Range="Scale3-Low" ConsumptionByMHz="2400" GlobalConsumption="475000"/>
+                    <Consumption PeripheralMode="OUT2" Range="Scale3-Low" ConsumptionByMHz="2400" GlobalConsumption="475000"/>
+                    <Consumption PeripheralMode="OUT1+OUT2" Range="Scale3-Low" ConsumptionByMHz="2400" GlobalConsumption="950000"/>               
                 </PowerModes>
             </PeripheralConsumption>
         </Peripheral>  
@@ -558,18 +558,32 @@
         </Peripheral>
         <Peripheral Name="IWDG" ImpactPinout="Yes:IWDG" Type="Digital" Prescaler="APB1">
             <PeripheralConsumption Vdd="3.3" Temperature="25">
-                <PowerModes PowerModesList="STANDBY">
+                <PowerModes PowerModesList="RUN,SLEEP,STOP_NM (Normal Mode),STOP_UDM (Under Drive),STANDBY">
                     <Consumption GlobalConsumption="250"/>                    
                 </PowerModes>
             </PeripheralConsumption>
         </Peripheral>
         <Peripheral Name="RTC" ImpactPinout="Yes:RTC" Type="Analog" Prescaler="APB1">
             <PeripheralConsumption Vdd="3.3" Temperature="25">
-                <PowerModes PowerModesList="RUN,SLEEP,STOP,STANDBY">
+                <PowerModes PowerModesList="RUN,SLEEP,STOP_NM (Normal Mode),STOP_UDM (Under Drive),STANDBY">
                     <Consumption GlobalConsumption="0"/>                    
                 </PowerModes>
             </PeripheralConsumption>
-        </Peripheral>               
+        </Peripheral>
+        <Peripheral Name="PVD" LinkedPeripheral="BOR" ImpactPinout="No" Type="Analog" Prescaler="APB1">
+            <PeripheralConsumption Vdd="3.3" Temperature="25">
+                <PowerModes PowerModesList="RUN,SLEEP,STOP_NM (Normal Mode),STOP_UDM (Under Drive),STANDBY">
+                    <Consumption GlobalConsumption="0"/>
+                </PowerModes>                
+            </PeripheralConsumption>
+        </Peripheral>
+        <Peripheral Name="BOR" ImpactPinout="No" Type="Analog" Prescaler="APB1">
+            <PeripheralConsumption Vdd="3.3" Temperature="25">
+                <PowerModes PowerModesList="STANDBY">
+                    <Consumption GlobalConsumption="0"/>
+                </PowerModes>
+            </PeripheralConsumption>
+        </Peripheral>
     </Peripherals>
     <PeripheralsLists>
         <PowerMode Name="RUN">
@@ -581,13 +595,15 @@
         <PowerMode Name="STOP_NM (Normal Mode)">
             <Filter IpsFromList="Include"/>
             <Peripheral Name="RTC"/>
-            <Peripheral Name="PVD"/>
+            <Peripheral Name="PVD/BOR"/>
+            <Peripheral Name="IWDG"/>
         </PowerMode>
         <PowerMode Name="STOP_UDM (Under Drive)">
             <Filter IpsFromList="Include"/>
             <Peripheral Name="RTC"/>
-            <Peripheral Name="PVD"/>
-        </PowerMode>
+            <Peripheral Name="PVD/BOR"/>
+            <Peripheral Name="IWDG"/>
+        </PowerMode> 
         <PowerMode Name="STANDBY"> <!-- cf 3.17 para of datasheet -->
             <Filter IpsFromList="Include"/>
             <Peripheral Name="RTC"/>

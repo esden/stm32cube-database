@@ -1,11 +1,12 @@
 [#ftl]
 /**
  ******************************************************************************
-  * @file    bsp_driver_sdram.c (based on XXX_eval_sdram.c)
+  * @file    bsp_driver_sdram.c (based on stm32756g_eval_sdram.c)
   * @brief   This file includes a generic SDRAM driver.
   ******************************************************************************
+  * @attention
   *
-  * COPYRIGHT(c) ${year} STMicroelectronics
+  * <h2><center>&copy; COPYRIGHT(c) 2015 STMicroelectronics</center></h2>
   *
   * Redistribution and use in source and binary forms, with or without modification,
   * are permitted provided that the following conditions are met:
@@ -48,7 +49,8 @@
   */
 uint8_t BSP_SDRAM_Init(void)
 { 
-  static uint8_t sdramstatus = SDRAM_OK;
+  static uint8_t sdramstatus = SDRAM_ERROR;
+  /* place for custom code */
   
   return sdramstatus;
 }

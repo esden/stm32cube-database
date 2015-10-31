@@ -42,5 +42,9 @@
 	[#assign instNameHS = "HS"] 
 [/#if]
 [/#list]
+[#if instNameFS != ""]
 void MX_DriverVbusFS(uint8_t state); 
+[/#if]
+[#if instNameHS != ""]
 void MX_DriverVbusHS(uint8_t state); 
+[/#if]

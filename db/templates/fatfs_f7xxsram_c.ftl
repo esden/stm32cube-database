@@ -4,8 +4,9 @@
   * @file    bsp_driver_sram.c (based on STM32756g_eval_sram.c)
   * @brief   This file includes a generic SRAM driver.
   ******************************************************************************
+  * @attention
   *
-  * COPYRIGHT(c) ${year} STMicroelectronics
+  * <h2><center>&copy; COPYRIGHT(c) 2015 STMicroelectronics</center></h2>
   *
   * Redistribution and use in source and binary forms, with or without modification,
   * are permitted provided that the following conditions are met:
@@ -44,7 +45,8 @@
   */
 uint8_t BSP_SRAM_Init(void)
 { 
-  static uint8_t sramstatus = SRAM_OK;
+  static uint8_t sram_status = SRAM_ERROR;
+  /* place for custom code */
   
   return sramstatus;
 }

@@ -223,6 +223,7 @@ void HAL_PCD_ResetCallback(PCD_HandleTypeDef *hpcd)
   */
 void HAL_PCD_SuspendCallback(PCD_HandleTypeDef *hpcd)
 {
+  /* Inform USB library that core enters in suspend Mode */
   USBD_LL_Suspend(hpcd->pData);
   /*Enter in STOP mode */
   /* USER CODE BEGIN 2 */
@@ -250,7 +251,7 @@ void HAL_PCD_ResumeCallback(PCD_HandleTypeDef *hpcd)
 }
 
 /**
-  * @brief  ISOC Out Incomplete callback.
+  * @brief  ISOOUTIncomplete callback.
   * @param  hpcd: PCD handle
   * @param  epnum: Endpoint Number
   * @retval None
@@ -261,7 +262,7 @@ void HAL_PCD_ISOOUTIncompleteCallback(PCD_HandleTypeDef *hpcd, uint8_t epnum)
 }
 
 /**
-  * @brief  ISOC In Incomplete callback.
+  * @brief  ISOINIncomplete callback.
   * @param  hpcd: PCD handle
   * @param  epnum: Endpoint Number
   * @retval None
@@ -272,7 +273,7 @@ void HAL_PCD_ISOINIncompleteCallback(PCD_HandleTypeDef *hpcd, uint8_t epnum)
 }
 
 /**
-  * @brief  Connect callback.
+  * @brief  ConnectCallback callback.
   * @param  hpcd: PCD handle
   * @retval None
   */
@@ -569,28 +570,25 @@ void *USBD_static_malloc(uint32_t size)
   /* USER CODE END 4 */
 [/#if]  
 [#if className == "DFU"]
-  //static uint32_t mem[sizeof(USBD_DFU_HandleTypeDef)];
-  static uint8_t mem[512];
+  static uint32_t mem[(sizeof(USBD_DFU_HandleTypeDef)/4)+1];//On 32-bit boundary
 [/#if]  
 [#if className == "HID"]
-  static uint32_t mem[sizeof(USBD_HID_HandleTypeDef)];
+  static uint32_t mem[(sizeof(USBD_HID_HandleTypeDef)/4)+1];//On 32-bit boundary
 [/#if]  
 [#if className == "MSC"]
-  //static uint32_t mem[sizeof(USBD_MSC_BOT_HandleTypeDef)];
-  static uint8_t mem[512];
+  static uint32_t mem[(sizeof(USBD_MSC_BOT_HandleTypeDef)/4)+1];//On 32-bit boundary
 [/#if]  
 [#if className == "CDC"]
-  //static uint32_t mem[sizeof(USBD_CDC_HandleTypeDef)];
-  static uint8_t mem[512];
+  static uint32_t mem[(sizeof(USBD_CDC_HandleTypeDef)/4)+1];//On 32-bit boundary
 [/#if]  
 [#if className == "CUSTOMHID"]
-  static uint32_t mem[sizeof(USBD_CUSTOM_HID_HandleTypeDef)];
+  static uint32_t mem[(sizeof(USBD_CUSTOM_HID_HandleTypeDef)/4+1)];//On 32-bit boundary
 [/#if]   
 [#if className == "CCID"]
-  static uint32_t mem[sizeof(USBD_CCID_HandleTypeDef)];
+  static uint32_t mem[(sizeof(USBD_CCID_HandleTypeDef)/4)+1];//On 32-bit boundary
 [/#if]  
 [#if className == "MTP"]
-  static uint32_t mem[sizeof(USBD_MTP_HandleTypeDef)];
+  static uint32_t mem[(sizeof(USBD_MTP_HandleTypeDef)/4)+1];//On 32-bit boundary
 [/#if]
   return mem;
 }

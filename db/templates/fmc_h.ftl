@@ -45,7 +45,11 @@
 #include "${include}"
 [/#list]
 [/#if]
+#n
+/* USER CODE BEGIN Includes */
 
+/* USER CODE END Includes */
+#n
 [#list IPdatas as IP]  
 [#assign ipvar = IP]
 [#-- Global variables --]
@@ -75,7 +79,11 @@ extern ${variable.value} ${variable.name};
   [/#list]
 [/#if]
 [#-- End extract hal mode list used by all instances of the ip --]
+#n
+/* USER CODE BEGIN Private defines */
 
+/* USER CODE END Private defines */
+#n
 [#list IP.configModelList as instanceData]
   [#assign instName = instanceData.instanceName]
   [#assign instMode= instanceData.halMode]
@@ -92,7 +100,12 @@ void HAL_${mode}_MspDeInit(${mode}_HandleTypeDef* h${mode?lower_case});
 [/#if]
 [/#list]
 [/#list]
-
+[#compress]
+#n/* USER CODE BEGIN Prototypes */
+#n     
+/* USER CODE END Prototypes */
+#n
+[/#compress]
 #ifdef __cplusplus
 }
 #endif

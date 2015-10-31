@@ -41,7 +41,7 @@
  extern "C" {
 #endif
 
-[#--include "mxconstants.h" --]
+#include "mxconstants.h" [#-- for user defines --]
 
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/

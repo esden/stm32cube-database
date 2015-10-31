@@ -45,7 +45,11 @@
 #include "${include}"
 [/#list]
 [/#if]
+#n
+/* USER CODE BEGIN Includes */
 
+/* USER CODE END Includes */
+#n
 [#list IPdatas as IP]  
 [#assign ipvar = IP]
 [#-- Global variables --]
@@ -59,6 +63,11 @@ extern ${variable.value} ${variable.name};
 [/#if]
 [#-- Global variables --]
 
+#n
+/* USER CODE BEGIN Private defines */
+
+/* USER CODE END Private defines */
+#n
 [#-- extract hal mode list used by all instances of the ip --]
 [#assign halModeList= ""]
 
@@ -76,7 +85,12 @@ extern ${variable.value} ${variable.name};
 [#list halModeList?split(" ") as mode]
 [/#list]
 [/#list]
-
+[#compress]
+#n/* USER CODE BEGIN Prototypes */
+#n     
+/* USER CODE END Prototypes */
+#n
+[/#compress]
 #ifdef __cplusplus
 }
 #endif

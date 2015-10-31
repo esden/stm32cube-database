@@ -477,13 +477,13 @@
                 <PowerModes PowerModesList="RUN,SLEEP">
                     <Consumption PeripheralMode="OUT1" Range="Scale1-High" ConsumptionByMHz="2890" GlobalConsumption="800000"/> <!-- Analog part taken from note 4. Table (Peripheral current consumption) -->
                     <Consumption PeripheralMode="OUT1" Range="Scale2-Medium" ConsumptionByMHz="2250" GlobalConsumption="800000"/> <!-- Analog part taken from note 4. Table (Peripheral current consumption) -->
-                    <Consumption PeripheralMode="OUT1" Range="Scale3-Low" ConsumptionIndepClockByMHz="2130" GlobalConsumption="800000"/> <!-- Analog part taken from note 4. Table (Peripheral current consumption) -->
+                    <Consumption PeripheralMode="OUT1" Range="Scale3-Low" ConsumptionByMHz="2130" GlobalConsumption="800000"/> <!-- Analog part taken from note 4. Table (Peripheral current consumption) -->
                     <Consumption PeripheralMode="OUT2" Range="Scale1-High" ConsumptionByMHz="2890" GlobalConsumption="800000"/> <!-- Analog part taken from note 4. Table (Peripheral current consumption) -->
                     <Consumption PeripheralMode="OUT2" Range="Scale2-Medium" ConsumptionByMHz="2250" GlobalConsumption="800000"/> <!-- Analog part taken from note 4. Table (Peripheral current consumption) -->
-                    <Consumption PeripheralMode="OUT2" Range="Scale3-Low" ConsumptionIndepClockByMHz="2130" GlobalConsumption="800000"/> <!-- Analog part taken from note 4. Table (Peripheral current consumption) -->
+                    <Consumption PeripheralMode="OUT2" Range="Scale3-Low" ConsumptionByMHz="2130" GlobalConsumption="800000"/> <!-- Analog part taken from note 4. Table (Peripheral current consumption) -->
                     <Consumption PeripheralMode="OUT1+OUT2" Range="Scale1-High" ConsumptionByMHz="2890" GlobalConsumption="1600000"/> <!-- Analog part taken from note 4. Table (Peripheral current consumption) -->
                     <Consumption PeripheralMode="OUT1+OUT2" Range="Scale2-Medium" ConsumptionByMHz="2250" GlobalConsumption="1600000"/> <!-- Analog part taken from note 4. Table (Peripheral current consumption) -->
-                    <Consumption PeripheralMode="OUT1+OUT2" Range="Scale3-Low" ConsumptionIndepClockByMHz="2130" GlobalConsumption="1600000"/> <!-- Analog part taken from note 4. Table (Peripheral current consumption) -->
+                    <Consumption PeripheralMode="OUT1+OUT2" Range="Scale3-Low" ConsumptionByMHz="2130" GlobalConsumption="1600000"/> <!-- Analog part taken from note 4. Table (Peripheral current consumption) -->
                 </PowerModes>
             </PeripheralConsumption>
         </Peripheral>
@@ -507,15 +507,29 @@
         </Peripheral>  
         <Peripheral Name="IWDG" ImpactPinout="Yes:IWDG" Type="Digital" Prescaler="APB1">
             <PeripheralConsumption Vdd="3.3" Temperature="25">
-                <PowerModes PowerModesList="STANDBY">
+                <PowerModes PowerModesList="RUN,SLEEP,STOP_NM (Normal Mode),STOP_UDM (Under Drive),STANDBY">
                     <Consumption GlobalConsumption="250"/>                    
                 </PowerModes>
             </PeripheralConsumption>
         </Peripheral>
         <Peripheral Name="RTC" ImpactPinout="Yes:RTC" Type="Analog" Prescaler="APB1">
             <PeripheralConsumption Vdd="3.3" Temperature="25">
-                <PowerModes PowerModesList="STOP,STANDBY">
+                <PowerModes PowerModesList="RUN,SLEEP,STOP_NM (Normal Mode),STOP_UDM (Under Drive),STANDBY">
                     <Consumption GlobalConsumption="0"/>                    
+                </PowerModes>
+            </PeripheralConsumption>
+        </Peripheral>
+        <Peripheral Name="PVD" LinkedPeripheral="BOR" ImpactPinout="No" Type="Analog" Prescaler="APB1">
+            <PeripheralConsumption Vdd="3.3" Temperature="25">
+                <PowerModes PowerModesList="RUN,SLEEP,STOP_NM (Normal Mode),STOP_UDM (Under Drive),STANDBY">
+                    <Consumption GlobalConsumption="0"/>
+                </PowerModes>                
+            </PeripheralConsumption>
+        </Peripheral>
+        <Peripheral Name="BOR" ImpactPinout="No" Type="Analog" Prescaler="APB1">
+            <PeripheralConsumption Vdd="3.3" Temperature="25">
+                <PowerModes PowerModesList="STANDBY">
+                    <Consumption GlobalConsumption="0"/>
                 </PowerModes>
             </PeripheralConsumption>
         </Peripheral>
@@ -654,7 +668,7 @@
                 </PowerModes>
             </PeripheralConsumption>
         </Peripheral>
-        <Peripheral Name="LCD" ImpactPinout="Yes:LCD" Type="Digital" Prescaler="APB2">
+        <Peripheral Name="LTDC" ImpactPinout="Yes:LTDC" Type="Digital" Prescaler="APB2">
             <PeripheralConsumption Vdd="3.3" Temperature="25">
                 <PowerModes PowerModesList="RUN,SLEEP">
                     <Consumption Range="Scale1-High" ConsumptionByMHz="39890"/>
@@ -680,11 +694,18 @@
         <PowerMode Name="SLEEP">
             <Filter IpsFromList="All"/>
         </PowerMode>
-        <PowerMode Name="STOP">
+        <PowerMode Name="STOP_NM (Normal Mode)">
             <Filter IpsFromList="Include"/>
             <Peripheral Name="RTC"/>
-            <Peripheral Name="PVD"/>
+            <Peripheral Name="PVD/BOR"/>
+            <Peripheral Name="IWDG"/>
         </PowerMode>
+        <PowerMode Name="STOP_UDM (Under Drive)">
+            <Filter IpsFromList="Include"/>
+            <Peripheral Name="RTC"/>
+            <Peripheral Name="PVD/BOR"/>
+            <Peripheral Name="IWDG"/>
+        </PowerMode>  
         <PowerMode Name="STANDBY"> <!-- cf 3.17 para of datasheet -->
             <Filter IpsFromList="Include"/>
             <Peripheral Name="RTC"/>

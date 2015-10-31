@@ -44,6 +44,15 @@
 [#list includes as include]
 #include "${include}"
 [/#list]
+#n
+/* USER CODE BEGIN Includes */
+
+/* USER CODE END Includes */
+#n
+/* USER CODE BEGIN Private defines */
+
+/* USER CODE END Private defines */
+#n
 [#list datas as data]
 [#if data.ipName=="gpio"]
 void MX_GPIO_Init(void);
@@ -51,6 +60,12 @@ void MX_GPIO_Init(void);
 void MX_${data.ipName}_GPIO_Init(void);
 [/#if]
 [/#list]
+[#compress]
+#n/* USER CODE BEGIN Prototypes */
+#n     
+/* USER CODE END Prototypes */
+#n
+[/#compress]
 #ifdef __cplusplus
 }
 #endif

@@ -5,8 +5,9 @@
   * @brief   This file contains the common defines and functions prototypes for 
   *          the bsp_driver_sd.c driver.
   ******************************************************************************
+  * @attention
   *
-  * COPYRIGHT(c) ${year} STMicroelectronics
+  * <h2><center>&copy; COPYRIGHT(c) 2015 STMicroelectronics</center></h2>
   *
   * Redistribution and use in source and binary forms, with or without modification,
   * are permitted provided that the following conditions are met:

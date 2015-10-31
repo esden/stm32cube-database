@@ -95,27 +95,27 @@
 	
 	<!-- DataDirection Parameters for Synchronous, IrDa, SmartCard and Others (based on Asyncronous). -->
 	<RefParameter Comment="Data Direction" DefaultValue="USART_MODE_TX_RX" Name="Mode" Type="list" Group="Advanced Parameters">
-		<Condition Expression="VirtualMode = VM_SYNC" Diagnostic=""/>
-		<PossibleValue Comment="Receive and Transmit" Value="USART_MODE_TX_RX"/>
-		<PossibleValue Comment="Receive Only" Value="USART_MODE_RX"/>
-		<PossibleValue Comment="Transmit Only" Value="USART_MODE_TX"/>
+		<Condition Expression="$IpInstance_Synchronous" Diagnostic=""/>
+		<PossibleValue Comment="Receive and Transmit" Value="USART_MODE_TX_RX" Semaphore="S_$IpInstance_TX_RX"/>
+		<PossibleValue Comment="Receive Only" Value="USART_MODE_RX" Semaphore="S_$IpInstance_RX"/>
+		<PossibleValue Comment="Transmit Only" Value="USART_MODE_TX" Semaphore="S_$IpInstance_TX"/>
 	</RefParameter>
 	<RefParameter Comment="Data Direction" DefaultValue="IRDA_MODE_TX_RX" Name="Mode" Type="list" Group="Advanced Parameters">
-		<Condition Expression="VirtualMode = VM_IRDA" Diagnostic=""/>
-		<PossibleValue Comment="Receive and Transmit" Value="IRDA_MODE_TX_RX"/>
-		<PossibleValue Comment="Receive Only" Value="IRDA_MODE_RX"/>
-		<PossibleValue Comment="Transmit Only" Value="IRDA_MODE_TX"/>
+		<Condition Expression="$IpInstance_IrDA" Diagnostic=""/>
+		<PossibleValue Comment="Receive and Transmit" Value="IRDA_MODE_TX_RX" Semaphore="S_$IpInstance_TX_RX"/>
+		<PossibleValue Comment="Receive Only" Value="IRDA_MODE_RX" Semaphore="S_$IpInstance_RX"/>
+		<PossibleValue Comment="Transmit Only" Value="IRDA_MODE_TX" Semaphore="S_$IpInstance_TX"/>
 	</RefParameter>
 	<RefParameter Comment="Data Direction" DefaultValue="SMARTCARD_MODE_TX_RX" Name="Mode" Type="list" Group="Advanced Parameters">
-		<Condition Expression="VirtualMode = VM_SMARTCARD" Diagnostic=""/>
-		<PossibleValue Comment="Receive and Transmit" Value="SMARTCARD_MODE_TX_RX"/>
-		<PossibleValue Comment="Receive Only" Value="SMARTCARD_MODE_RX"/>
-		<PossibleValue Comment="Transmit Only" Value="SMARTCARD_MODE_TX"/>
+		<Condition Expression="$IpInstance_SmartCard" Diagnostic=""/>
+		<PossibleValue Comment="Receive and Transmit" Value="SMARTCARD_MODE_TX_RX" Semaphore="S_$IpInstance_TX_RX"/>
+		<PossibleValue Comment="Receive Only" Value="SMARTCARD_MODE_RX" Semaphore="S_$IpInstance_RX"/>
+		<PossibleValue Comment="Transmit Only" Value="SMARTCARD_MODE_TX" Semaphore="S_$IpInstance_TX"/>
 	</RefParameter>
 	<RefParameter Comment="Data Direction" DefaultValue="UART_MODE_TX_RX" Name="Mode" Type="list" Group="Advanced Parameters">
-		<PossibleValue Comment="Receive and Transmit" Value="UART_MODE_TX_RX"/>
-		<PossibleValue Comment="Receive Only" Value="UART_MODE_RX"/>
-		<PossibleValue Comment="Transmit Only" Value="UART_MODE_TX"/>
+		<PossibleValue Comment="Receive and Transmit" Value="UART_MODE_TX_RX" Semaphore="S_$IpInstance_TX_RX"/>
+		<PossibleValue Comment="Receive Only" Value="UART_MODE_RX" Semaphore="S_$IpInstance_RX"/>
+		<PossibleValue Comment="Transmit Only" Value="UART_MODE_TX" Semaphore="S_$IpInstance_TX"/>
 	</RefParameter>
 	
 	<!-- Specifics RefParameters for UART Mode only -->
@@ -183,7 +183,7 @@
 		
 		
 	<!-- Specifics RefParameters for IrDa Mode -->
-	<RefParameter Comment="IrDa Mode" DefaultValue="IRDA_POWERMODE_LOWPOWER" Name="IrDAMode" Type="list" Group="Advanced Parameters">
+	<RefParameter Comment="Power Mode" DefaultValue="IRDA_POWERMODE_NORMAL" Name="IrDAMode" Type="list" Group="Advanced Parameters">
 		<PossibleValue Comment="Low Power" Value="IRDA_POWERMODE_LOWPOWER"/>
 		<PossibleValue Comment="Normal Power" Value="IRDA_POWERMODE_NORMAL"/>
 	</RefParameter>
@@ -192,8 +192,9 @@
 	<RefParameter Comment="Prescaler" DefaultValue="1" Min="1" Max="1" Name="Prescaler" Type="integer" Group="Advanced Parameters">
 		<Condition Expression="(IrDAMode = IRDA_POWERMODE_NORMAL) &amp; (VirtualMode = VM_IRDA)" Diagnostic=""/>
 	</RefParameter>
-	<RefParameter Comment="Prescaler for SmartCard Clock (Divide by x2)" DefaultValue="10" Max="31" Min="1" Name="Prescaler" Type="integer" Group="Clock Parameters">
+	<RefParameter Comment="Prescaler" DefaultValue="10" Max="31" Min="1" Name="Prescaler" Type="integer" Group="Clock Parameters">
 		<Condition Expression="(VirtualMode=VM_SMARTCARD) &amp; (VirtualClockMode=VM_SMARTCARD)" Diagnostic=""/>
+		  <Description>The value given in the register is multiplied by 2 to give the division factor of the source clock frequency.</Description>
 	</RefParameter>
 	<RefParameter Comment="Prescaler" DefaultValue="null" Max="255" Min="1" Name="Prescaler" Type="integer" Group="Advanced Parameters">
 		<Condition Expression="VirtualMode = VM_SMARTCARD" Diagnostic=""/>
@@ -420,6 +421,7 @@
 						<Signal Name="RX"/>
 						<Signal Name="TX"/>
 					</SignalLogicalOp>
+					<Semaphore>$IpInstance_Synchronous</Semaphore>
 				</Mode>
 				<Mode Name="Half_duplex(single_wire_mode)" UserName="Single Wire (Half-Duplex)" >
 					<SignalLogicalOp Name="AND">
@@ -437,6 +439,7 @@
 						<Signal Name="RX"/>
 						<Signal Name="TX"/>
 					</SignalLogicalOp>
+					<Semaphore>$IpInstance_IrDA</Semaphore>
 				</Mode>
 				<Mode Name="LIN">
 					<SignalLogicalOp Name="AND">
@@ -449,12 +452,14 @@
 					<SignalLogicalOp Name="AND">
 						<Signal Name="TX" IOMode="AlternateFunctionOpenDrain"/>
 					</SignalLogicalOp>
+					<Semaphore>$IpInstance_SmartCard</Semaphore>
 				</Mode>
 				<Mode Name="SmartCard_With_Clock" UserName="SmartCard with Card Clock">
 					<SignalLogicalOp Name="AND">
 						<Signal Name="TX" IOMode="AlternateFunctionOpenDrain"/>
 						<Signal Name="CK"/>
 					</SignalLogicalOp>
+					<Semaphore>$IpInstance_SmartCard</Semaphore>
 				</Mode>
 			</ModeLogicOperator>
 		</Mode>
@@ -501,6 +506,6 @@
 	<RefSignal IOMode="AlternateFunctionPushPull" Name="CK"/>
 	<RefSignal IOMode="AlternateFunctionPushPull" Name="CTS"/>
 	<RefSignal IOMode="AlternateFunctionPushPull" Name="RTS"/>
-	<RefSignal IOMode="AlternateFunctionPushPullUp" Name="RX"/>
-	<RefSignal IOMode="AlternateFunctionPushPullUp" Name="TX"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="RX"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="TX"/>
 </IP>
