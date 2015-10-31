@@ -1,0 +1,13 @@
+[#ftl]
+[#list IPdatas as IP]  
+[#assign ipvar = IP]
+[#list IP.configModelList as instanceData]
+        [#assign instName = instanceData.instanceName]
+        [#assign instMode= instanceData.halMode]
+		[#assign ipName = instanceData.ipName]	
+uint8_t ${instName}_DriverNum;      /* FatFS ${instName} part */
+char ${instName}_Path[4];           /* ${instName} logical drive path */
+[#-- FATFS ${instName}_FatFs; --]
+[#-- extern Diskio_drvTypeDef ${instName}_Driver; --]
+[/#list]
+[/#list]

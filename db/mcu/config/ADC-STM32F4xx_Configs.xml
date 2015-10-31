@@ -1,0 +1,761 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
+<IP xmlns="http://mcd.rou.st.com/modules.php?name=mcu" DBVersion="V4.0" Name="STM32Cube_FW_F4_V0.8.0" Version="V0.8.0" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Configs.xsd">
+	<RefConfig Name="multiMode" Comment="Configure the ADC multi-mode">
+		<CallLibMethod Name="HAL_ADCEx_MultiModeConfigChannel"/>
+	</RefConfig>
+	<RefConfig Name="ADC_RegularConfig" Comment="Configure the global features of the ADC (Clock, Resolution, Data Alignment and number of conversion)">
+		<CallLibMethod Name="HAL_ADC_Init"/>
+		<ImplementCallBack Name="HAL_ADC_MspInit"/>
+		<ImplementCallBack Name="HAL_ADC_MspDeInit"/>
+	</RefConfig>
+	<RefConfig Name="ADC_RegularChannelConfig" Comment="Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.">
+		<CallLibMethod Name="HAL_ADC_ConfigChannel"/>
+	</RefConfig>
+	<RefConfig Name="ADC_InjectedChannelConfig" Comment="Configures for the selected ADC injected channel its corresponding rank in the sequencer and its sample time">
+		<CallLibMethod Name="HAL_ADCEx_InjectedConfigChannel">
+			<MethodArg Name="InjectedNbrOfConversion" ParameterName="InjNbrOfConversion"/>
+			<MethodArg Name="InjectedChannel" ParameterName="Channel"/>
+			<MethodArg Name="InjectedRank" ParameterName="Rank"/>
+			<MethodArg Name="InjectedSamplingTime" ParameterName="SamplingTime"/>
+		</CallLibMethod>
+	</RefConfig>
+	<RefConfig Name="ADC_AnalogWDGConfig" Comment="Configure the analog watchdog">
+		<CallLibMethod Name="HAL_ADC_AnalogWDGConfig">
+			<MethodArg Name="Channel" ParameterName="WatchdogChannel"/>
+		</CallLibMethod>
+	</RefConfig>
+	<LibMethod Comment="" Name="HAL_ADC_Init">
+		<Argument AddressOf="true" Context="global" GenericType="struct" Name="hadc" TypeName="ADC_HandleTypeDef">
+			<Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="ADC_TypeDef"/>
+			<Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="ADC_InitTypeDef">
+				<Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="Resolution" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ScanConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ContinuousConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DiscontinuousConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="NbrOfDiscConversion" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ExternalTrigConvEdge" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ExternalTrigConv" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DataAlign" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="NbrOfConversion" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DMAContinuousRequests" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="EOCSelection" OptimizationCondition="equal"/>
+			</Argument>
+			<Argument AddressOf="false" GenericType="enum" Name="State" TypeName="HAL_ADC_StateTypeDef"/>
+			<Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+			<Argument AddressOf="false" GenericType="simple" Name="NbrOfConversionCount" OptimizationCondition="equal"/>
+			<Argument AddressOf="true" GenericType="simple" Name="DMA_Handle" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+		</Argument>
+	</LibMethod>
+	<LibMethod Comment="" Name="HAL_ADC_ConfigChannel">
+		<Argument AddressOf="true" Context="global" GenericType="struct" Name="hadc" TypeName="ADC_HandleTypeDef">
+			<Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="ADC_TypeDef"/>
+			<Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="ADC_InitTypeDef">
+				<Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="Resolution" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ScanConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ContinuousConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DiscontinuousConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="NbrOfDiscConversion" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ExternalTrigConvEdge" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ExternalTrigConv" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DataAlign" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="NbrOfConversion" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DMAContinuousRequests" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="EOCSelection" OptimizationCondition="equal"/>
+			</Argument>
+			<Argument AddressOf="false" GenericType="enum" Name="State" TypeName="HAL_ADC_StateTypeDef"/>
+			<Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+			<Argument AddressOf="false" GenericType="simple" Name="NbrOfConversionCount" OptimizationCondition="equal"/>
+			<Argument AddressOf="true" GenericType="simple" Name="DMA_Handle" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+		</Argument>
+		<Argument AddressOf="true" GenericType="struct" Name="sConfig" TypeName="ADC_ChannelConfTypeDef">
+			<Argument AddressOf="false" GenericType="simple" Name="Channel" OptimizationCondition="equal"/>
+			<Argument AddressOf="false" GenericType="simple" Name="Rank" OptimizationCondition="equal"/>
+			<Argument AddressOf="false" GenericType="simple" Name="SamplingTime" OptimizationCondition="equal"/>
+			<Argument AddressOf="false" GenericType="simple" Name="Offset" OptimizationCondition="equal"/>
+		</Argument>
+	</LibMethod>
+	<LibMethod Comment="" Name="HAL_ADCEx_InjectedConfigChannel">
+		<Argument AddressOf="true" Context="global" GenericType="struct" Name="hadc" TypeName="ADC_HandleTypeDef">
+			<Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="ADC_TypeDef"/>
+			<Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="ADC_InitTypeDef">
+				<Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="Resolution" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ScanConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ContinuousConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DiscontinuousConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="NbrOfDiscConversion" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ExternalTrigConvEdge" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ExternalTrigConv" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DataAlign" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="NbrOfConversion" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DMAContinuousRequests" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="EOCSelection" OptimizationCondition="equal"/>
+			</Argument>
+			<Argument AddressOf="false" GenericType="enum" Name="State" TypeName="HAL_ADC_StateTypeDef"/>
+			<Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+			<Argument AddressOf="false" GenericType="simple" Name="NbrOfConversionCount" OptimizationCondition="equal"/>
+			<Argument AddressOf="true" GenericType="simple" Name="DMA_Handle" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+		</Argument>
+		<Argument AddressOf="true" GenericType="struct" Name="sConfigInjected" TypeName="ADC_InjectionConfTypeDef">
+			<Argument AddressOf="false" GenericType="simple" Name="InjectedChannel" OptimizationCondition="equal"/>
+			<Argument AddressOf="false" GenericType="simple" Name="InjectedRank" OptimizationCondition="equal"/>
+			<Argument AddressOf="false" GenericType="simple" Name="InjectedNbrOfConversion" OptimizationCondition="equal"/>
+			<Argument AddressOf="false" GenericType="simple" Name="InjectedSamplingTime" OptimizationCondition="equal"/>
+			<Argument AddressOf="false" GenericType="simple" Name="ExternalTrigInjecConvEdge" OptimizationCondition="equal"/>
+			<Argument AddressOf="false" GenericType="simple" Name="ExternalTrigInjecConv" OptimizationCondition="equal"/>
+			<Argument AddressOf="false" GenericType="simple" Name="AutoInjectedConv" OptimizationCondition="equal"/>
+			<Argument AddressOf="false" GenericType="simple" Name="InjectedDiscontinuousConvMode" OptimizationCondition="equal"/>
+			<Argument AddressOf="false" GenericType="simple" Name="InjectedOffset" OptimizationCondition="equal"/>
+		</Argument>
+	</LibMethod>
+	<LibMethod Comment="" Name="HAL_ADCEx_MultiModeConfigChannel">
+		<Argument AddressOf="true" Context="global" GenericType="struct" Name="hadc" TypeName="ADC_HandleTypeDef">
+			<Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="ADC_TypeDef"/>
+			<Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="ADC_InitTypeDef">
+				<Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="Resolution" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ScanConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ContinuousConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DiscontinuousConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="NbrOfDiscConversion" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ExternalTrigConvEdge" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ExternalTrigConv" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DataAlign" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="NbrOfConversion" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DMAContinuousRequests" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="EOCSelection" OptimizationCondition="equal"/>
+			</Argument>
+			<Argument AddressOf="false" GenericType="enum" Name="State" TypeName="HAL_ADC_StateTypeDef"/>
+			<Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+			<Argument AddressOf="false" GenericType="simple" Name="NbrOfConversionCount" OptimizationCondition="equal"/>
+			<Argument AddressOf="true" GenericType="simple" Name="DMA_Handle" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+		</Argument>
+		<Argument AddressOf="true" GenericType="struct" Name="multimode" TypeName="ADC_MultiModeTypeDef">
+			<Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+			<Argument AddressOf="false" GenericType="simple" Name="DMAAccessMode" OptimizationCondition="equal"/>
+			<Argument AddressOf="false" GenericType="simple" Name="TwoSamplingDelay" OptimizationCondition="equal"/>
+		</Argument>
+	</LibMethod>
+	<LibMethod Comment="" Name="HAL_ADC_AnalogWDGConfig">
+		<Argument AddressOf="true" Context="global" GenericType="struct" Name="hadc" TypeName="ADC_HandleTypeDef">
+			<Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="ADC_TypeDef"/>
+			<Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="ADC_InitTypeDef">
+				<Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="Resolution" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ScanConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ContinuousConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DiscontinuousConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="NbrOfDiscConversion" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ExternalTrigConvEdge" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ExternalTrigConv" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DataAlign" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="NbrOfConversion" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DMAContinuousRequests" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="EOCSelection" OptimizationCondition="equal"/>
+			</Argument>
+			<Argument AddressOf="false" GenericType="enum" Name="State" TypeName="HAL_ADC_StateTypeDef"/>
+			<Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+			<Argument AddressOf="false" GenericType="simple" Name="NbrOfConversionCount" OptimizationCondition="equal"/>
+			<Argument AddressOf="true" GenericType="simple" Name="DMA_Handle" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+		</Argument>
+		<Argument AddressOf="true" GenericType="struct" Name="AnalogWDGConfig" TypeName="ADC_AnalogWDGConfTypeDef">
+			<Argument AddressOf="false" GenericType="simple" Name="WatchdogMode" OptimizationCondition="equal"/>
+			<Argument AddressOf="false" GenericType="simple" Name="HighThreshold" OptimizationCondition="equal"/>
+			<Argument AddressOf="false" GenericType="simple" Name="LowThreshold" OptimizationCondition="equal"/>
+			<Argument AddressOf="false" GenericType="simple" Name="Channel" OptimizationCondition="equal"/>
+			<Argument AddressOf="false" GenericType="simple" Name="ITMode" OptimizationCondition="equal"/>
+		</Argument>
+	</LibMethod>
+	<LibMethod Comment="" Name="HAL_ADC_DeInit">
+		<Argument AddressOf="true" Context="global" GenericType="struct" Name="hadc" TypeName="ADC_HandleTypeDef">
+			<Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="ADC_TypeDef"/>
+			<Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="ADC_InitTypeDef">
+				<Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="Resolution" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ScanConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ContinuousConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DiscontinuousConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="NbrOfDiscConversion" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ExternalTrigConvEdge" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ExternalTrigConv" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DataAlign" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="NbrOfConversion" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DMAContinuousRequests" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="EOCSelection" OptimizationCondition="equal"/>
+			</Argument>
+			<Argument AddressOf="false" GenericType="enum" Name="State" TypeName="HAL_ADC_StateTypeDef"/>
+			<Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+			<Argument AddressOf="false" GenericType="simple" Name="NbrOfConversionCount" OptimizationCondition="equal"/>
+			<Argument AddressOf="true" GenericType="simple" Name="DMA_Handle" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+		</Argument>
+	</LibMethod>
+	<LibMethod Comment="" Name="HAL_ADC_BspInit">
+		<Argument AddressOf="true" Context="global" GenericType="struct" Name="hadc" TypeName="ADC_HandleTypeDef">
+			<Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="ADC_TypeDef"/>
+			<Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="ADC_InitTypeDef">
+				<Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="Resolution" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ScanConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ContinuousConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DiscontinuousConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="NbrOfDiscConversion" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ExternalTrigConvEdge" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ExternalTrigConv" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DataAlign" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="NbrOfConversion" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DMAContinuousRequests" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="EOCSelection" OptimizationCondition="equal"/>
+			</Argument>
+			<Argument AddressOf="false" GenericType="enum" Name="State" TypeName="HAL_ADC_StateTypeDef"/>
+			<Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+			<Argument AddressOf="false" GenericType="simple" Name="NbrOfConversionCount" OptimizationCondition="equal"/>
+			<Argument AddressOf="true" GenericType="simple" Name="DMA_Handle" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+		</Argument>
+	</LibMethod>
+	<LibMethod Comment="" Name="HAL_ADC_BspDeInit">
+		<Argument AddressOf="true" Context="global" GenericType="struct" Name="hadc" TypeName="ADC_HandleTypeDef">
+			<Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="ADC_TypeDef"/>
+			<Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="ADC_InitTypeDef">
+				<Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="Resolution" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ScanConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ContinuousConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DiscontinuousConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="NbrOfDiscConversion" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ExternalTrigConvEdge" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ExternalTrigConv" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DataAlign" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="NbrOfConversion" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DMAContinuousRequests" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="EOCSelection" OptimizationCondition="equal"/>
+			</Argument>
+			<Argument AddressOf="false" GenericType="enum" Name="State" TypeName="HAL_ADC_StateTypeDef"/>
+			<Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+			<Argument AddressOf="false" GenericType="simple" Name="NbrOfConversionCount" OptimizationCondition="equal"/>
+			<Argument AddressOf="true" GenericType="simple" Name="DMA_Handle" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+		</Argument>
+	</LibMethod>
+	<LibMethod Comment="" Name="HAL_ADC_Start">
+		<Argument AddressOf="true" Context="global" GenericType="struct" Name="hadc" TypeName="ADC_HandleTypeDef">
+			<Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="ADC_TypeDef"/>
+			<Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="ADC_InitTypeDef">
+				<Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="Resolution" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ScanConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ContinuousConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DiscontinuousConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="NbrOfDiscConversion" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ExternalTrigConvEdge" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ExternalTrigConv" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DataAlign" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="NbrOfConversion" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DMAContinuousRequests" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="EOCSelection" OptimizationCondition="equal"/>
+			</Argument>
+			<Argument AddressOf="false" GenericType="enum" Name="State" TypeName="HAL_ADC_StateTypeDef"/>
+			<Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+			<Argument AddressOf="false" GenericType="simple" Name="NbrOfConversionCount" OptimizationCondition="equal"/>
+			<Argument AddressOf="true" GenericType="simple" Name="DMA_Handle" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+		</Argument>
+	</LibMethod>
+	<LibMethod Comment="" Name="HAL_ADC_Stop">
+		<Argument AddressOf="true" Context="global" GenericType="struct" Name="hadc" TypeName="ADC_HandleTypeDef">
+			<Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="ADC_TypeDef"/>
+			<Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="ADC_InitTypeDef">
+				<Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="Resolution" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ScanConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ContinuousConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DiscontinuousConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="NbrOfDiscConversion" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ExternalTrigConvEdge" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ExternalTrigConv" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DataAlign" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="NbrOfConversion" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DMAContinuousRequests" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="EOCSelection" OptimizationCondition="equal"/>
+			</Argument>
+			<Argument AddressOf="false" GenericType="enum" Name="State" TypeName="HAL_ADC_StateTypeDef"/>
+			<Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+			<Argument AddressOf="false" GenericType="simple" Name="NbrOfConversionCount" OptimizationCondition="equal"/>
+			<Argument AddressOf="true" GenericType="simple" Name="DMA_Handle" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+		</Argument>
+	</LibMethod>
+	<LibMethod Comment="" Name="HAL_ADC_Start_IT">
+		<Argument AddressOf="true" Context="global" GenericType="struct" Name="hadc" TypeName="ADC_HandleTypeDef">
+			<Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="ADC_TypeDef"/>
+			<Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="ADC_InitTypeDef">
+				<Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="Resolution" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ScanConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ContinuousConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DiscontinuousConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="NbrOfDiscConversion" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ExternalTrigConvEdge" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ExternalTrigConv" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DataAlign" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="NbrOfConversion" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DMAContinuousRequests" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="EOCSelection" OptimizationCondition="equal"/>
+			</Argument>
+			<Argument AddressOf="false" GenericType="enum" Name="State" TypeName="HAL_ADC_StateTypeDef"/>
+			<Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+			<Argument AddressOf="false" GenericType="simple" Name="NbrOfConversionCount" OptimizationCondition="equal"/>
+			<Argument AddressOf="true" GenericType="simple" Name="DMA_Handle" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+		</Argument>
+	</LibMethod>
+	<LibMethod Comment="" Name="HAL_ADC_Stop_IT">
+		<Argument AddressOf="true" Context="global" GenericType="struct" Name="hadc" TypeName="ADC_HandleTypeDef">
+			<Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="ADC_TypeDef"/>
+			<Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="ADC_InitTypeDef">
+				<Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="Resolution" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ScanConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ContinuousConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DiscontinuousConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="NbrOfDiscConversion" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ExternalTrigConvEdge" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ExternalTrigConv" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DataAlign" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="NbrOfConversion" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DMAContinuousRequests" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="EOCSelection" OptimizationCondition="equal"/>
+			</Argument>
+			<Argument AddressOf="false" GenericType="enum" Name="State" TypeName="HAL_ADC_StateTypeDef"/>
+			<Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+			<Argument AddressOf="false" GenericType="simple" Name="NbrOfConversionCount" OptimizationCondition="equal"/>
+			<Argument AddressOf="true" GenericType="simple" Name="DMA_Handle" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+		</Argument>
+	</LibMethod>
+	<LibMethod Comment="" Name="HAL_ADC_Start_DMA">
+		<Argument AddressOf="true" Context="global" GenericType="struct" Name="hadc" TypeName="ADC_HandleTypeDef">
+			<Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="ADC_TypeDef"/>
+			<Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="ADC_InitTypeDef">
+				<Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="Resolution" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ScanConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ContinuousConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DiscontinuousConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="NbrOfDiscConversion" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ExternalTrigConvEdge" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ExternalTrigConv" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DataAlign" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="NbrOfConversion" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DMAContinuousRequests" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="EOCSelection" OptimizationCondition="equal"/>
+			</Argument>
+			<Argument AddressOf="false" GenericType="enum" Name="State" TypeName="HAL_ADC_StateTypeDef"/>
+			<Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+			<Argument AddressOf="false" GenericType="simple" Name="NbrOfConversionCount" OptimizationCondition="equal"/>
+			<Argument AddressOf="true" GenericType="simple" Name="DMA_Handle" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+		</Argument>
+		<Argument AddressOf="true" GenericType="simple" Name="pData" OptimizationCondition="equal"/>
+		<Argument AddressOf="false" GenericType="simple" Name="Length" OptimizationCondition="equal"/>
+	</LibMethod>
+	<LibMethod Comment="" Name="HAL_ADC_Stop_DMA">
+		<Argument AddressOf="true" Context="global" GenericType="struct" Name="hadc" TypeName="ADC_HandleTypeDef">
+			<Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="ADC_TypeDef"/>
+			<Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="ADC_InitTypeDef">
+				<Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="Resolution" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ScanConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ContinuousConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DiscontinuousConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="NbrOfDiscConversion" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ExternalTrigConvEdge" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ExternalTrigConv" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DataAlign" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="NbrOfConversion" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DMAContinuousRequests" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="EOCSelection" OptimizationCondition="equal"/>
+			</Argument>
+			<Argument AddressOf="false" GenericType="enum" Name="State" TypeName="HAL_ADC_StateTypeDef"/>
+			<Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+			<Argument AddressOf="false" GenericType="simple" Name="NbrOfConversionCount" OptimizationCondition="equal"/>
+			<Argument AddressOf="true" GenericType="simple" Name="DMA_Handle" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+		</Argument>
+	</LibMethod>
+	<LibMethod Comment="" Name="HAL_ADC_InjectedStart">
+		<Argument AddressOf="true" Context="global" GenericType="struct" Name="hadc" TypeName="ADC_HandleTypeDef">
+			<Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="ADC_TypeDef"/>
+			<Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="ADC_InitTypeDef">
+				<Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="Resolution" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ScanConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ContinuousConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DiscontinuousConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="NbrOfDiscConversion" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ExternalTrigConvEdge" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ExternalTrigConv" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DataAlign" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="NbrOfConversion" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DMAContinuousRequests" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="EOCSelection" OptimizationCondition="equal"/>
+			</Argument>
+			<Argument AddressOf="false" GenericType="enum" Name="State" TypeName="HAL_ADC_StateTypeDef"/>
+			<Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+			<Argument AddressOf="false" GenericType="simple" Name="NbrOfConversionCount" OptimizationCondition="equal"/>
+			<Argument AddressOf="true" GenericType="simple" Name="DMA_Handle" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+		</Argument>
+	</LibMethod>
+	<LibMethod Comment="" Name="HAL_ADC_InjectedStop">
+		<Argument AddressOf="true" Context="global" GenericType="struct" Name="hadc" TypeName="ADC_HandleTypeDef">
+			<Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="ADC_TypeDef"/>
+			<Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="ADC_InitTypeDef">
+				<Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="Resolution" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ScanConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ContinuousConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DiscontinuousConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="NbrOfDiscConversion" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ExternalTrigConvEdge" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ExternalTrigConv" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DataAlign" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="NbrOfConversion" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DMAContinuousRequests" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="EOCSelection" OptimizationCondition="equal"/>
+			</Argument>
+			<Argument AddressOf="false" GenericType="enum" Name="State" TypeName="HAL_ADC_StateTypeDef"/>
+			<Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+			<Argument AddressOf="false" GenericType="simple" Name="NbrOfConversionCount" OptimizationCondition="equal"/>
+			<Argument AddressOf="true" GenericType="simple" Name="DMA_Handle" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+		</Argument>
+	</LibMethod>
+	<LibMethod Comment="" Name="HAL_ADC_InjectedStart_IT">
+		<Argument AddressOf="true" Context="global" GenericType="struct" Name="hadc" TypeName="ADC_HandleTypeDef">
+			<Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="ADC_TypeDef"/>
+			<Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="ADC_InitTypeDef">
+				<Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="Resolution" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ScanConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ContinuousConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DiscontinuousConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="NbrOfDiscConversion" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ExternalTrigConvEdge" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ExternalTrigConv" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DataAlign" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="NbrOfConversion" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DMAContinuousRequests" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="EOCSelection" OptimizationCondition="equal"/>
+			</Argument>
+			<Argument AddressOf="false" GenericType="enum" Name="State" TypeName="HAL_ADC_StateTypeDef"/>
+			<Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+			<Argument AddressOf="false" GenericType="simple" Name="NbrOfConversionCount" OptimizationCondition="equal"/>
+			<Argument AddressOf="true" GenericType="simple" Name="DMA_Handle" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+		</Argument>
+	</LibMethod>
+	<LibMethod Comment="" Name="HAL_ADC_InjectedStop_IT">
+		<Argument AddressOf="true" Context="global" GenericType="struct" Name="hadc" TypeName="ADC_HandleTypeDef">
+			<Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="ADC_TypeDef"/>
+			<Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="ADC_InitTypeDef">
+				<Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="Resolution" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ScanConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ContinuousConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DiscontinuousConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="NbrOfDiscConversion" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ExternalTrigConvEdge" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ExternalTrigConv" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DataAlign" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="NbrOfConversion" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DMAContinuousRequests" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="EOCSelection" OptimizationCondition="equal"/>
+			</Argument>
+			<Argument AddressOf="false" GenericType="enum" Name="State" TypeName="HAL_ADC_StateTypeDef"/>
+			<Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+			<Argument AddressOf="false" GenericType="simple" Name="NbrOfConversionCount" OptimizationCondition="equal"/>
+			<Argument AddressOf="true" GenericType="simple" Name="DMA_Handle" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+		</Argument>
+	</LibMethod>
+	<LibMethod Comment="" Name="HAL_ADC_MultiModeStart_DMA">
+		<Argument AddressOf="true" Context="global" GenericType="struct" Name="hadc" TypeName="ADC_HandleTypeDef">
+			<Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="ADC_TypeDef"/>
+			<Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="ADC_InitTypeDef">
+				<Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="Resolution" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ScanConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ContinuousConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DiscontinuousConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="NbrOfDiscConversion" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ExternalTrigConvEdge" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ExternalTrigConv" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DataAlign" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="NbrOfConversion" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DMAContinuousRequests" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="EOCSelection" OptimizationCondition="equal"/>
+			</Argument>
+			<Argument AddressOf="false" GenericType="enum" Name="State" TypeName="HAL_ADC_StateTypeDef"/>
+			<Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+			<Argument AddressOf="false" GenericType="simple" Name="NbrOfConversionCount" OptimizationCondition="equal"/>
+			<Argument AddressOf="true" GenericType="simple" Name="DMA_Handle" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+		</Argument>
+		<Argument AddressOf="true" GenericType="simple" Name="pData" OptimizationCondition="equal"/>
+		<Argument AddressOf="false" GenericType="simple" Name="Length" OptimizationCondition="equal"/>
+	</LibMethod>
+	<LibMethod Comment="" Name="HAL_ADC_MultiModeStop_DMA">
+		<Argument AddressOf="true" Context="global" GenericType="struct" Name="hadc" TypeName="ADC_HandleTypeDef">
+			<Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="ADC_TypeDef"/>
+			<Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="ADC_InitTypeDef">
+				<Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="Resolution" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ScanConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ContinuousConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DiscontinuousConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="NbrOfDiscConversion" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ExternalTrigConvEdge" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ExternalTrigConv" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DataAlign" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="NbrOfConversion" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DMAContinuousRequests" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="EOCSelection" OptimizationCondition="equal"/>
+			</Argument>
+			<Argument AddressOf="false" GenericType="enum" Name="State" TypeName="HAL_ADC_StateTypeDef"/>
+			<Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+			<Argument AddressOf="false" GenericType="simple" Name="NbrOfConversionCount" OptimizationCondition="equal"/>
+			<Argument AddressOf="true" GenericType="simple" Name="DMA_Handle" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+		</Argument>
+	</LibMethod>
+	<LibMethod Comment="" Name="HAL_ADC_GetValue">
+		<Argument AddressOf="true" Context="global" GenericType="struct" Name="hadc" TypeName="ADC_HandleTypeDef">
+			<Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="ADC_TypeDef"/>
+			<Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="ADC_InitTypeDef">
+				<Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="Resolution" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ScanConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ContinuousConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DiscontinuousConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="NbrOfDiscConversion" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ExternalTrigConvEdge" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ExternalTrigConv" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DataAlign" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="NbrOfConversion" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DMAContinuousRequests" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="EOCSelection" OptimizationCondition="equal"/>
+			</Argument>
+			<Argument AddressOf="false" GenericType="enum" Name="State" TypeName="HAL_ADC_StateTypeDef"/>
+			<Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+			<Argument AddressOf="false" GenericType="simple" Name="NbrOfConversionCount" OptimizationCondition="equal"/>
+			<Argument AddressOf="true" GenericType="simple" Name="DMA_Handle" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+		</Argument>
+	</LibMethod>
+	<LibMethod Comment="" Name="HAL_ADC_InjectedGetValue">
+		<Argument AddressOf="true" Context="global" GenericType="struct" Name="hadc" TypeName="ADC_HandleTypeDef">
+			<Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="ADC_TypeDef"/>
+			<Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="ADC_InitTypeDef">
+				<Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="Resolution" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ScanConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ContinuousConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DiscontinuousConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="NbrOfDiscConversion" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ExternalTrigConvEdge" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ExternalTrigConv" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DataAlign" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="NbrOfConversion" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DMAContinuousRequests" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="EOCSelection" OptimizationCondition="equal"/>
+			</Argument>
+			<Argument AddressOf="false" GenericType="enum" Name="State" TypeName="HAL_ADC_StateTypeDef"/>
+			<Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+			<Argument AddressOf="false" GenericType="simple" Name="NbrOfConversionCount" OptimizationCondition="equal"/>
+			<Argument AddressOf="true" GenericType="simple" Name="DMA_Handle" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+		</Argument>
+		<Argument AddressOf="false" GenericType="simple" Name="ADC_InjectedChannel" OptimizationCondition="equal"/>
+	</LibMethod>
+	<LibMethod Comment="" Name="HAL_ADC_MultiModeGetValue">
+		<Argument AddressOf="true" Context="global" GenericType="struct" Name="hadc" TypeName="ADC_HandleTypeDef">
+			<Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="ADC_TypeDef"/>
+			<Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="ADC_InitTypeDef">
+				<Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="Resolution" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ScanConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ContinuousConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DiscontinuousConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="NbrOfDiscConversion" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ExternalTrigConvEdge" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ExternalTrigConv" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DataAlign" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="NbrOfConversion" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DMAContinuousRequests" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="EOCSelection" OptimizationCondition="equal"/>
+			</Argument>
+			<Argument AddressOf="false" GenericType="enum" Name="State" TypeName="HAL_ADC_StateTypeDef"/>
+			<Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+			<Argument AddressOf="false" GenericType="simple" Name="NbrOfConversionCount" OptimizationCondition="equal"/>
+			<Argument AddressOf="true" GenericType="simple" Name="DMA_Handle" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+		</Argument>
+	</LibMethod>
+	<LibMethod Comment="" Name="HAL_ADC_GetState">
+		<Argument AddressOf="true" Context="global" GenericType="struct" Name="hadc" TypeName="ADC_HandleTypeDef">
+			<Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="ADC_TypeDef"/>
+			<Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="ADC_InitTypeDef">
+				<Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="Resolution" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ScanConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ContinuousConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DiscontinuousConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="NbrOfDiscConversion" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ExternalTrigConvEdge" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ExternalTrigConv" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DataAlign" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="NbrOfConversion" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DMAContinuousRequests" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="EOCSelection" OptimizationCondition="equal"/>
+			</Argument>
+			<Argument AddressOf="false" GenericType="enum" Name="State" TypeName="HAL_ADC_StateTypeDef"/>
+			<Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+			<Argument AddressOf="false" GenericType="simple" Name="NbrOfConversionCount" OptimizationCondition="equal"/>
+			<Argument AddressOf="true" GenericType="simple" Name="DMA_Handle" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+		</Argument>
+	</LibMethod>
+	<LibMethod Comment="" Name="HAL_ADC_PollForConversion">
+		<Argument AddressOf="true" Context="global" GenericType="struct" Name="hadc" TypeName="ADC_HandleTypeDef">
+			<Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="ADC_TypeDef"/>
+			<Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="ADC_InitTypeDef">
+				<Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="Resolution" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ScanConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ContinuousConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DiscontinuousConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="NbrOfDiscConversion" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ExternalTrigConvEdge" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ExternalTrigConv" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DataAlign" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="NbrOfConversion" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DMAContinuousRequests" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="EOCSelection" OptimizationCondition="equal"/>
+			</Argument>
+			<Argument AddressOf="false" GenericType="enum" Name="State" TypeName="HAL_ADC_StateTypeDef"/>
+			<Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+			<Argument AddressOf="false" GenericType="simple" Name="NbrOfConversionCount" OptimizationCondition="equal"/>
+			<Argument AddressOf="true" GenericType="simple" Name="DMA_Handle" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+		</Argument>
+		<Argument AddressOf="false" GenericType="simple" Name="ConversionType" OptimizationCondition="equal"/>
+		<Argument AddressOf="false" GenericType="simple" Name="timeout" OptimizationCondition="equal"/>
+	</LibMethod>
+	<LibMethod Comment="" Name="HAL_ADC_PollForEvent">
+		<Argument AddressOf="true" Context="global" GenericType="struct" Name="hadc" TypeName="ADC_HandleTypeDef">
+			<Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="ADC_TypeDef"/>
+			<Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="ADC_InitTypeDef">
+				<Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="Resolution" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ScanConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ContinuousConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DiscontinuousConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="NbrOfDiscConversion" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ExternalTrigConvEdge" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ExternalTrigConv" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DataAlign" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="NbrOfConversion" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DMAContinuousRequests" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="EOCSelection" OptimizationCondition="equal"/>
+			</Argument>
+			<Argument AddressOf="false" GenericType="enum" Name="State" TypeName="HAL_ADC_StateTypeDef"/>
+			<Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+			<Argument AddressOf="false" GenericType="simple" Name="NbrOfConversionCount" OptimizationCondition="equal"/>
+			<Argument AddressOf="true" GenericType="simple" Name="DMA_Handle" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+		</Argument>
+		<Argument AddressOf="false" GenericType="simple" Name="EventType" OptimizationCondition="equal"/>
+		<Argument AddressOf="false" GenericType="simple" Name="timeout" OptimizationCondition="equal"/>
+	</LibMethod>
+	<LibMethod Comment="" Name="HAL_ADC_IRQHandler">
+		<Argument AddressOf="true" Context="global" GenericType="struct" Name="hadc" TypeName="ADC_HandleTypeDef">
+			<Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="ADC_TypeDef"/>
+			<Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="ADC_InitTypeDef">
+				<Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="Resolution" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ScanConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ContinuousConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DiscontinuousConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="NbrOfDiscConversion" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ExternalTrigConvEdge" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ExternalTrigConv" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DataAlign" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="NbrOfConversion" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DMAContinuousRequests" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="EOCSelection" OptimizationCondition="equal"/>
+			</Argument>
+			<Argument AddressOf="false" GenericType="enum" Name="State" TypeName="HAL_ADC_StateTypeDef"/>
+			<Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+			<Argument AddressOf="false" GenericType="simple" Name="NbrOfConversionCount" OptimizationCondition="equal"/>
+			<Argument AddressOf="true" GenericType="simple" Name="DMA_Handle" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+		</Argument>
+	</LibMethod>
+	<LibMethod Comment="" Name="HAL_ADC_ConvCpltCallback">
+		<Argument AddressOf="true" Context="global" GenericType="struct" Name="hadc" TypeName="ADC_HandleTypeDef">
+			<Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="ADC_TypeDef"/>
+			<Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="ADC_InitTypeDef">
+				<Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="Resolution" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ScanConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ContinuousConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DiscontinuousConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="NbrOfDiscConversion" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ExternalTrigConvEdge" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ExternalTrigConv" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DataAlign" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="NbrOfConversion" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DMAContinuousRequests" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="EOCSelection" OptimizationCondition="equal"/>
+			</Argument>
+			<Argument AddressOf="false" GenericType="enum" Name="State" TypeName="HAL_ADC_StateTypeDef"/>
+			<Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+			<Argument AddressOf="false" GenericType="simple" Name="NbrOfConversionCount" OptimizationCondition="equal"/>
+			<Argument AddressOf="true" GenericType="simple" Name="DMA_Handle" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+		</Argument>
+	</LibMethod>
+	<LibMethod Comment="" Name="HAL_ADC_LevelOutOfWindowCallback">
+		<Argument AddressOf="true" Context="global" GenericType="struct" Name="hadc" TypeName="ADC_HandleTypeDef">
+			<Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="ADC_TypeDef"/>
+			<Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="ADC_InitTypeDef">
+				<Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="Resolution" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ScanConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ContinuousConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DiscontinuousConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="NbrOfDiscConversion" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ExternalTrigConvEdge" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ExternalTrigConv" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DataAlign" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="NbrOfConversion" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DMAContinuousRequests" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="EOCSelection" OptimizationCondition="equal"/>
+			</Argument>
+			<Argument AddressOf="false" GenericType="enum" Name="State" TypeName="HAL_ADC_StateTypeDef"/>
+			<Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+			<Argument AddressOf="false" GenericType="simple" Name="NbrOfConversionCount" OptimizationCondition="equal"/>
+			<Argument AddressOf="true" GenericType="simple" Name="DMA_Handle" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+		</Argument>
+	</LibMethod>
+	<LibMethod Comment="" Name="HAL_ADC_ErrorCallback">
+		<Argument AddressOf="true" Context="global" GenericType="struct" Name="hadc" TypeName="ADC_HandleTypeDef">
+			<Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="ADC_TypeDef"/>
+			<Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="ADC_InitTypeDef">
+				<Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="Resolution" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ScanConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ContinuousConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DiscontinuousConvMode" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="NbrOfDiscConversion" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ExternalTrigConvEdge" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="ExternalTrigConv" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DataAlign" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="NbrOfConversion" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="DMAContinuousRequests" OptimizationCondition="equal"/>
+				<Argument AddressOf="false" GenericType="simple" Name="EOCSelection" OptimizationCondition="equal"/>
+			</Argument>
+			<Argument AddressOf="false" GenericType="enum" Name="State" TypeName="HAL_ADC_StateTypeDef"/>
+			<Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+			<Argument AddressOf="false" GenericType="simple" Name="NbrOfConversionCount" OptimizationCondition="equal"/>
+			<Argument AddressOf="true" GenericType="simple" Name="DMA_Handle" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+		</Argument>
+	</LibMethod>
+        <RefComponent Cclass="HAL" Cgroup="ADC" Cversion="0.8.0">		
+		<File Category="header" Name="Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_adc.h" />
+		<File Category="source" Name="Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c" />
+<File Category="header" Name="Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_adc_ex.h" />
+		<File Category="source" Name="Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc_ex.c" />		
+	</RefComponent>        
+</IP>

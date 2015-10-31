@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<IP DBVersion="V4.0" IPType="peripheral" Name="ETH" Version="ethermac110_v2_0_Cube" 
+	xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" 
+	ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd" 
+	xmlns="http://mcd.rou.st.com/modules.php?name=mcu">
+  <About>ETH: Ethernet MAC interface</About>
+	<!-- Generic RefParameters for ETH MII/RMII Modes -->
+	<!-- Generic RefParameters for ETH MII/RMII Modes Extracted from HAL Library with LibExtractor-->
+	<RefParameter Name="hal_eth_init_status" DefaultValue="1" Comment="" Type="" Visible="false"/>
+	<RefParameter Name="Instance" DefaultValue="ETH" Comment="Instance" Type="" Visible="false"/>
+	<RefParameter Comment="Auto Negotiation" DefaultValue="ETH_AUTONEGOTIATION_ENABLE" Name="AutoNegotiation" Type="list" Group="Advanced parameters">
+		<PossibleValue Comment="Enabled" Value="ETH_AUTONEGOTIATION_ENABLE"/>
+		<PossibleValue Comment="Disabled" Value="ETH_AUTONEGOTIATION_DISABLE"/>
+	</RefParameter>
+	
+	<RefParameter Comment="Speed" DefaultValue="null" Name="Speed" Type="list" Group="Advanced parameters" Visible="false">
+		<Condition Diagnostic="" Expression="AutoNegotiation=ETH_AUTONEGOTIATION_ENABLE"/>        		
+		<PossibleValue Comment="10 MBits/s" Value="ETH_SPEED_10M"/>
+		<PossibleValue Comment="100 MBits/s" Value="ETH_SPEED_100M"/>
+	</RefParameter>
+	<RefParameter Comment="Speed" DefaultValue="ETH_SPEED_100M" Name="Speed" Type="list" Group="Advanced parameters" Visible="true">
+		<Condition Diagnostic="" Expression="AutoNegotiation=ETH_AUTONEGOTIATION_DISABLE"/>        		
+		<PossibleValue Comment="10 MBits/s" Value="ETH_SPEED_10M"/>
+		<PossibleValue Comment="100 MBits/s" Value="ETH_SPEED_100M"/>
+	</RefParameter>	
+	
+	<RefParameter Comment="Duplex Mode" DefaultValue="null" Name="DuplexMode" Type="list" Group="Advanced parameters" Visible="false">
+		<Condition Diagnostic="" Expression="AutoNegotiation=ETH_AUTONEGOTIATION_ENABLE"/> 
+		<PossibleValue Comment="Full Duplex" Value="ETH_MODE_FULLDUPLEX"/>
+		<PossibleValue Comment="Half Duplex" Value="ETH_MODE_HALFDUPLEX"/>
+	</RefParameter>
+	
+	<RefParameter Comment="Duplex Mode" DefaultValue="ETH_MODE_FULLDUPLEX" Name="DuplexMode" Type="list" Group="Advanced parameters" Visible="true">
+		<Condition Diagnostic="" Expression="AutoNegotiation=ETH_AUTONEGOTIATION_DISABLE"/> 
+		<PossibleValue Comment="Full Duplex" Value="ETH_MODE_FULLDUPLEX"/>
+		<PossibleValue Comment="Half Duplex" Value="ETH_MODE_HALFDUPLEX"/>
+	</RefParameter>
+	
+	<RefParameter Comment="PHY Address" DefaultValue="1" Max="31" Min="0" Name="PhyAddress" Type="integer" Group="General parameters"/>
+	
+	<!-- ST MicroElectronics prefixe Adress -->
+	<RefParameter Comment="Ethernet MAC Address" ArraySize="6" ArrayTypeElement="uint8_t;16" Name="MACAddr" Type="Array" Separator=":" Group="General parameters" DefaultValue="00:80:E1:00:00:00"/>
+	
+	<RefParameter Comment="Rx Mode" DefaultValue="ETH_RXINTERRUPT_MODE" Name="RxMode" Type="list" Group="Basic parameters">
+		<Condition Diagnostic="" Expression="S_FREERTOS &amp;S_LWIP"/>
+		<PossibleValue Comment="Interrupt Mode" Value="ETH_RXINTERRUPT_MODE"/>
+		<!--<PossibleValue Comment="Polling Mode" Value="ETH_RXPOLLING_MODE"/>-->
+	</RefParameter>
+	<RefParameter Comment="Rx Mode" DefaultValue="ETH_RXPOLLING_MODE" Name="RxMode" Type="list" Group="Basic parameters">
+		<Condition Diagnostic="" Expression="S_LWIP"/>
+		<PossibleValue Comment="Polling Mode" Value="ETH_RXPOLLING_MODE"/>
+	</RefParameter>
+	<RefParameter Comment="Rx Mode" DefaultValue="ETH_RXPOLLING_MODE" Name="RxMode" Type="list" Group="Basic parameters">
+		<PossibleValue Comment="Interrupt Mode" Value="ETH_RXINTERRUPT_MODE"/>
+		<PossibleValue Comment="Polling Mode" Value="ETH_RXPOLLING_MODE"/>
+	</RefParameter>	
+	<RefParameter Comment="Media Interface" DefaultValue="ETH_MEDIA_INTERFACE_MII" Name="MediaInterface" Type="list" Group="General parameters" Visible="false">
+		<PossibleValue Value="ETH_MEDIA_INTERFACE_MII" Comment=""/>
+		<PossibleValue Value="ETH_MEDIA_INTERFACE_RMII" Comment=""/>
+	</RefParameter>
+	<RefParameter Comment="Checksum Mode" DefaultValue="ETH_CHECKSUM_BY_HARDWARE" Name="ChecksumMode" Type="list" Group="Basic parameters">
+		<PossibleValue Comment="By hardware" Value="ETH_CHECKSUM_BY_HARDWARE" />
+		<PossibleValue Comment="By software" Value="ETH_CHECKSUM_BY_SOFTWARE"/>
+	</RefParameter>
+	<!-- RefMode for ETH -->
+	<RefMode Name="MII" HalMode="ETH">
+		<ConfigForMode>Init</ConfigForMode>   
+		<Parameter Name="AutoNegotiation"/>
+		<Parameter Name="Speed"/>
+		<Parameter Name="DuplexMode"/> 
+		<Parameter Name="MACAddr"/>
+		<Parameter Name="RxMode"/>
+		<Parameter Name="ChecksumMode"/>
+		<Parameter Name="PhyAddress"/>
+		<Parameter Name="MediaInterface">
+			<PossibleValue>ETH_MEDIA_INTERFACE_MII</PossibleValue>
+		</Parameter>
+		<Parameter Name="Instance"/>
+	</RefMode>
+	<!--
+	<RefMode Name="MII_PTP_Synchro" HalMode="ETH">
+		<ConfigForMode>Init</ConfigForMode>   
+		<Parameter Name="AutoNegotiation"/>
+		<Parameter Name="Speed"/>
+		<Parameter Name="DuplexMode"/> 
+		<Parameter Name="MACAddr"/>
+		<Parameter Name="RxMode"/>
+		<Parameter Name="ChecksumMode"/>		
+		<Parameter Name="PhyAddress"/>
+		<Parameter Name="MediaInterface">
+			<PossibleValue>ETH_MEDIA_INTERFACE_MII</PossibleValue>
+		</Parameter>
+		<Parameter Name="Instance"/>
+	</RefMode>
+	-->
+	<RefMode Name="RMII" HalMode="ETH">
+		<ConfigForMode>Init</ConfigForMode>   
+		<Parameter Name="AutoNegotiation"/>
+		<Parameter Name="Speed"/>
+		<Parameter Name="DuplexMode"/> 
+		<Parameter Name="MACAddr"/>
+		<Parameter Name="RxMode"/>
+		<Parameter Name="ChecksumMode"/> 
+		<Parameter Name="PhyAddress"/>
+		<Parameter Name="MediaInterface">
+			<PossibleValue>ETH_MEDIA_INTERFACE_RMII</PossibleValue>
+		</Parameter>
+		<Parameter Name="Instance"/>
+	</RefMode>
+	<!--
+	<RefMode Name="RMII_PTP_Synchro" HalMode="ETH">
+		<ConfigForMode>Init</ConfigForMode>   
+		<Parameter Name="AutoNegotiation"/>
+		<Parameter Name="Speed"/>
+		<Parameter Name="DuplexMode"/> 
+		<Parameter Name="MACAddr"/>
+		<Parameter Name="RxMode"/>
+		<Parameter Name="ChecksumMode"/> 
+		<Parameter Name="PhyAddress"/>
+		<Parameter Name="MediaInterface">
+			<PossibleValue>ETH_MEDIA_INTERFACE_RMII</PossibleValue>
+		</Parameter>
+		<Parameter Name="Instance"/>
+	</RefMode>
+	-->
+	<ModeLogicOperator Name="OR">
+		<Mode Name="Mode">
+			<ModeLogicOperator Name="XOR">
+				<Mode Name="MII">				
+					<SignalLogicalOp Name="AND">
+						<Signal Name="COL"/>
+						<Signal Name="CRS"/>
+						<Signal Name="MDC"/>
+						<Signal Name="MDIO"/>
+						<Signal Name="RXD0"/>
+						<Signal Name="RXD1"/>
+						<Signal Name="RXD2"/>
+						<Signal Name="RXD3"/>
+						<Signal Name="RX_CLK"/>
+						<Signal Name="RX_DV"/>
+						<Signal Name="RX_ER"/>
+						<Signal Name="TXD0"/>
+						<Signal Name="TXD1"/>
+						<Signal Name="TXD2"/>
+						<Signal Name="TXD3"/>
+						<Signal Name="TX_CLK"/>
+						<Signal Name="TX_EN"/>
+					</SignalLogicalOp>
+					<!--<Semaphore>MII</Semaphore>-->	
+					<Semaphore>MW_ETH_MW</Semaphore>
+				</Mode>
+				<Mode Name="MII_PTP_Synchro">				
+					<SignalLogicalOp Name="AND">
+						<Signal Name="COL"/>
+						<Signal Name="CRS"/>
+						<Signal Name="MDC"/>
+						<Signal Name="MDIO"/>
+						<Signal Name="PPS_OUT"/>
+						<Signal Name="RXD0"/>
+						<Signal Name="RXD1"/>
+						<Signal Name="RXD2"/>
+						<Signal Name="RXD3"/>
+						<Signal Name="RX_CLK"/>
+						<Signal Name="RX_DV"/>
+						<Signal Name="RX_ER"/>
+						<Signal Name="TXD0"/>
+						<Signal Name="TXD1"/>
+						<Signal Name="TXD2"/>
+						<Signal Name="TXD3"/>
+						<Signal Name="TX_CLK"/>
+						<Signal Name="TX_EN"/>
+					</SignalLogicalOp>
+					<!--<Semaphore>MII_PTP_Synchro</Semaphore>-->
+					<Semaphore>MW_ETH_MW</Semaphore>
+					<Condition Expression="(Semaphore_ETH_TriggerSourceITR1TIM2)&amp;(Semaphore_ETH_ControllerModeTIM2)" Diagnostic="Only active when TIM2 has an enabled Slave Mode with ITR1 as trigger source"/>
+
+				</Mode>			
+				<Mode Name="RMII">				
+					<SignalLogicalOp Name="AND">
+						<Signal Name="CRS_DV"/>
+						<Signal Name="MDC"/>
+						<Signal Name="MDIO"/>
+						<Signal Name="REF_CLK"/>
+						<Signal Name="RXD0"/>
+						<Signal Name="RXD1"/>
+						<Signal Name="TXD0"/>
+						<Signal Name="TXD1"/>
+						<Signal Name="TX_EN"/>
+					</SignalLogicalOp>
+					<!--<Semaphore>RMII</Semaphore>-->
+					<Semaphore>MW_ETH_MW</Semaphore>
+				</Mode>
+				<Mode Name="RMII_PTP_Synchro">				
+					<SignalLogicalOp Name="AND">
+						<Signal Name="CRS_DV"/>
+						<Signal Name="MDC"/>
+						<Signal Name="MDIO"/>
+						<Signal Name="PPS_OUT"/>
+						<Signal Name="REF_CLK"/>
+						<Signal Name="RXD0"/>
+						<Signal Name="RXD1"/>
+						<Signal Name="TXD0"/>
+						<Signal Name="TXD1"/>
+						<Signal Name="TX_EN"/>
+					</SignalLogicalOp>
+					<!--<Semaphore>RMII_PTP_Synchro</Semaphore>-->
+					<Semaphore>MW_ETH_MW</Semaphore>
+					<Condition Expression="(Semaphore_ETH_TriggerSourceITR1TIM2)&amp;(Semaphore_ETH_ControllerModeTIM2)" Diagnostic="Only active when TIM2 has an enabled Slave Mode with ITR1 as trigger source"/>
+			
+				</Mode>
+			</ModeLogicOperator>
+			<Semaphore>ETHUsed_ForRCC</Semaphore>
+		</Mode>
+	</ModeLogicOperator>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="COL"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="CRS"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="CRS_DV"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="MDC"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="MDIO"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="PPS_OUT"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="RXD0"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="RXD1"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="RXD2"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="RXD3"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="RX_CLK"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="REF_CLK"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="RX_DV"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="RX_ER"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="TXD0"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="TXD1"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="TXD2"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="TXD3"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="TX_CLK"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="TX_EN"/>
+</IP>

@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
+<IP DBVersion="V4.0" Name="FATFS" Version="STM32Cube_FW_F2_V0.2.0" RootFolder="Middlewares/Third_Party/FatFs/" CodeTemplate="fatfs_c.ftl;fatfs_h.ftl"
+    IncludeFile="ff.h;ff_gen_drv.h"
+    xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance"
+    ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Configs.xsd"
+    xmlns="http://mcd.rou.st.com/modules.php?name=mcu">
+
+<!-- MZA, Can we use the field comment to set the instance name (i.e. FATFS_SDIO, FSTAFS_USB )-->
+    <RefConfig Name="FATFS_SDIO_Init" Comment="SD">          
+        <Component Name="Middleware:FATFS:SDIO"/>
+        <Component Name="Middleware:FATFS:CODE_PAGE:$VIRTUAL_CODE_PAGE"/>
+        <ConfigFile Name="FF_CONF"/>  
+        <ConfigFile Name="FF_HANDLES"/> 
+        <ConfigFile Name="F2XX_SD_C"/> 
+        <ConfigFile Name="F2XX_SD_H"/> 
+    </RefConfig>
+    
+    <RefConfig Name="FATFS_USB_Init" Comment="USBH">             
+        <Component Name="Middleware:FATFS:USBH"/>
+        <Component Name="Middleware:FATFS:CODE_PAGE:$VIRTUAL_CODE_PAGE"/>
+        <ConfigFile Name="FF_CONF"/>
+        <ConfigFile Name="FF_HANDLES"/> 
+    </RefConfig>
+    
+    <RefConfig Name="FATFS_FSMC_NAND16_Init" Comment="NAND">      
+        <Component Name="Middleware:FATFS:NAND"/>
+        <Component Name="Middleware:FATFS:CODE_PAGE:$VIRTUAL_CODE_PAGE"/>
+        <ConfigFile Name="FF_CONF"/>
+        <ConfigFile Name="FF_HANDLES"/> 
+    </RefConfig>
+       
+    <RefConfig Name="FATFS_FSMC_SDRAM_Init" Comment="SDRAMDISK">      
+        <Component Name="Middleware:FATFS:SDRAM"/>
+        <Component Name="Middleware:FATFS:CODE_PAGE:$VIRTUAL_CODE_PAGE"/>
+        <ConfigFile Name="FF_CONF"/>
+        <ConfigFile Name="FF_HANDLES"/> 
+        <ConfigFile Name="F2XX_SDRAM_C"/> 
+        <ConfigFile Name="F2XX_SDRAM_H"/> 
+    </RefConfig>
+    
+    <RefConfig Name="FATFS_USER_DEFINED_Init" Comment="USER">             
+        <Component Name="Middleware:FATFS:GENERIC"/>
+        <Component Name="Middleware:FATFS:CODE_PAGE:$VIRTUAL_CODE_PAGE"/>
+        <ConfigFile Name="FF_CONF"/>
+        <ConfigFile Name="FF_HANDLES"/>
+        <ConfigFile Name="F2XX_DISKIO_C"/>
+        <ConfigFile Name="F2XX_DISKIO_H"/>
+    </RefConfig>
+       
+    <RefComponent Cclass="Middleware" Cgroup="FATFS" Cversion="0.1.0">
+        <File Name="src/*.h" Category="header"/>
+        <File Name="src/*.c" Category="source"/>
+        <File Name="src/option/syscall.c" Category="source"/>
+   
+        <SubComponent Csub="CODE_PAGE" Cvariant="932" >
+            <File Name="src/option/cc932.c" Category="source"/>
+        </SubComponent>
+        <SubComponent Csub="CODE_PAGE" Cvariant="936" >
+            <File Name="src/option/cc936.c" Category="source"/>
+        </SubComponent>
+        <SubComponent Csub="CODE_PAGE" Cvariant="949" >
+            <File Name="src/option/cc949.c" Category="source"/>
+        </SubComponent>
+        <SubComponent Csub="CODE_PAGE" Cvariant="950" >
+            <File Name="src/option/cc950.c" Category="source"/>
+        </SubComponent>
+        <SubComponent Csub="CODE_PAGE" Cvariant="1252" >
+            <File Name="src/option/ccsbcs.c" Category="source"/>
+        </SubComponent>
+        
+        <SubComponent Csub="SDIO">
+            <File Name="src/drivers/sd_diskio.c" Category="source"/>
+            <File Name="src/drivers/sd_diskio.h" Category="header"/>
+        </SubComponent>
+        <!-- <SubComponent Csub="SDRAM">
+            <File Name="src/drivers/sdram_diskio.c" Category="source"/>
+            <File Name="src/drivers/sdram_diskio.h" Category="header"/>
+        </SubComponent> -->
+        <SubComponent Csub="USBH">
+            <File Name="src/drivers/usbh_diskio.c" Category="source"/>
+            <File Name="src/drivers/usbh_diskio.h" Category="header"/>
+        </SubComponent>
+    </RefComponent>
+           
+    <RefConfigFile Name="FF_HANDLES" Description="Header file for handles" Template="fatfs_handles.ftl">      
+        <File Name="fatfs_handles.h" Category="header" Version="R0.1.0" Condition="all"/>
+        <!-- <Argument Name="_HSDRAM" GenericType="simple" Comment=""/> -->
+        <Argument Name="_HSD" GenericType="simple" Comment=""/>
+        <Argument Name="_HUSBH" GenericType="simple" Comment=""/>
+    </RefConfigFile> 
+    
+    <!-- use generique template file "mw_conf.ftl" to generate header file containing #define -->
+   
+    <RefConfigFile Name="FF_CONF" Description="Header file for #define" Template="fatfs_conf_F2.ftl">      
+        <File Name="ffconf.h" Category="header" Version="R0.1.0" Condition="all"/>
+        <!-- Parameters for Function and Buffer Configurations -->
+        <Argument Name="_FS_TINY" GenericType="simple" Comment="0:Normal or 1:Tiny"/>
+        <Argument Name="_FS_READONLY" GenericType="simple" Comment="0:Read/Write or 1:Read only"/>
+        <Argument Name="_FS_MINIMIZE" GenericType="simple" Comment="0 to 3"/>
+        <Argument Name="_USE_STRFUNC" GenericType="simple" Comment="0:Disable or 1-2:Enable"/>
+        <Argument Name="_USE_MKFS" GenericType="simple" Comment="0:Disable or 1:Enable"/>
+        <Argument Name="_USE_FORWARD" GenericType="simple" Comment="0:Disable or 1:Enable"/>
+        <Argument Name="_USE_LABEL" GenericType="simple" Comment="0:Disable or 1:Enable"/>
+        <Argument Name="_USE_FASTSEEK" GenericType="simple" Comment="0:Disable or 1:Enable"/>
+        <!-- Parameters for Locale and Namespace Configurations -->
+        <Argument Name="_CODE_PAGE" GenericType="simple" Comment="The _CODE_PAGE specifies the OEM code page to be used on the target system"/>
+        <Argument Name="_USE_LFN" GenericType="simple" Comment="0 to 3"/>
+        <Argument Name="_MAX_LFN" GenericType="simple" Comment="Maximum LFN length to handle (12 to 255)"/>
+        <Argument Name="_LFN_UNICODE" GenericType="simple" Comment="0:ANSI/OEM or 1:Unicode"/>
+        <Argument Name="_STRF_ENCODE" GenericType="simple" Comment="0:ANSI/OEM, 1:UTF-16LE, 2:UTF-16BE, 3:UTF-8"/>
+        <Argument Name="_FS_RPATH" GenericType="simple" Comment="0 to 2"/>	
+        <!-- Parameters for Physical Drive Configurations  -->
+        <Argument Name="_VOLUMES" GenericType="simple" Comment="Number of volumes (logical drives) to be used"/>
+        <Argument Name="_MAX_SS" GenericType="simple" Comment="512, 1024, 2048 or 4096"/>
+        <Argument Name="_MULTI_PARTITION" GenericType="simple" Comment="0:Single partition, 1:Enable multiple partition"/>
+        <Argument Name="_USE_ERASE" GenericType="simple" Comment="0:Disable or 1:Enable"/>
+        <Argument Name="_FS_NOFSINFO" GenericType="simple" Comment="0: Load all informations in the FSINFO if available, 1: Do not trust free cluster count in the FSINFO"/>
+        <!-- Parameters for System Configurations   -->
+        <Argument Name="_WORD_ACCESS" GenericType="simple" Comment="0 or 1"/>
+        <Argument Name="_FS_REENTRANT" GenericType="simple" Comment="0:Disable or 1:Enable"/>
+        <Argument Name="_FS_TIMEOUT" GenericType="simple" Comment="Timeout period in unit of time ticks"/>
+        <Argument Name="_SYNC_t" GenericType="simple" Comment="O/S dependent type of sync object. e.g. HANDLE, OS_EVENT*, ID and etc.."/>		
+        <Argument Name="_FS_LOCK" GenericType="simple" Comment="0:Disable or >=1:Enable"/>        
+        <!-- Internal: for detecting enabled modes and include the right files -->
+        <Argument Name="_FS_FATFS_SDIO" GenericType="simple" Comment="0:Disable or >=1:Enable"/> 
+        <Argument Name="_FS_FATFS_SDRAM" GenericType="simple" Comment="0:Disable or >=1:Enable"/> 
+        <Argument Name="_FS_FATFS_USB" GenericType="simple" Comment="0:Disable or >=1:Enable"/> 
+    </RefConfigFile> 
+       
+    <!-- Generate a driver file for SD that uses the right IP handle -->
+    <RefConfigFile Name="F2XX_SD_C" Description="C driver file for SD" Template="fatfs_f2xxsd_c.ftl">       
+        <File Name="stm32f2xx_sd.c" Category="source" Version="R0.1.0" Condition="all"/>                   
+    </RefConfigFile>
+    
+    <!-- Generate a driver file for SD that uses the right IP handle -->
+    <RefConfigFile Name="F2XX_SD_H" Description="H driver file for SD" Template="fatfs_f2xxsd_h.ftl">       
+        <File Name="stm32f2xx_sd.h" Category="header" Version="R0.1.0" Condition="all"/>        
+    </RefConfigFile>
+    
+    <!-- Generate a generic C driver file  -->
+    <RefConfigFile Name="F2XX_GENERIC_C" Description="GENERIC C driver file" Template="fatfs_generic_c.ftl">       
+        <File Name="stm32f2xx_generic.c" Category="source" Version="R0.1.0" Condition="all"/>                      
+    </RefConfigFile>
+    
+    <!-- Generate a generic H driver file -->
+    <RefConfigFile Name="F2XX_GENERIC_H" Description="GENERIC H driver file" Template="fatfs_generic_h.ftl">       
+        <File Name="stm32f2xx_generic.h" Category="header" Version="R0.1.0" Condition="all"/>                    
+    </RefConfigFile>
+    
+        <!-- Generate a generic diskio C driver file  -->
+    <RefConfigFile Name="F2XX_DISKIO_C" Description="GENERIC C diskio driver file" Template="generic_diskio_c.ftl">       
+        <File Name="user_diskio.c" Category="source" Version="R0.1.0" Condition="all"/>                      
+    </RefConfigFile>
+    
+    <!-- Generate a generic diskio H driver file -->
+    <RefConfigFile Name="F2XX_DISKIO_H" Description="GENERIC H driver file" Template="generic_diskio_h.ftl">       
+        <File Name="user_diskio.h" Category="header" Version="R0.1.0" Condition="all"/>                    
+    </RefConfigFile>
+   
+</IP>

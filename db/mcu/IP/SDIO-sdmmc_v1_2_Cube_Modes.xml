@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<IP DBVersion="V3.0" IPType="peripheral" Name="SDIO" Version="sdmmc_v1_2_Cube" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../db/IP_Modes_V3_0.xsd" xmlns="http://mcd.rou.st.com/modules.php?name=mcu">
+  <About>SDIO: Secure Digital Input/Output interface</About>
+
+    <!-- Generic RefParameters for SDIO --> 
+    <RefParameter Comment="SDIO instance" DefaultValue="SDIO$Index" Name="Instance" Type="list" Visible="false"/> 
+
+    <RefParameter     Name="ClockEdge" Comment="Clock transition on which the bit capture" DefaultValue="SDIO_CLOCK_EDGE_RISING" Type="list"  Group="SDIO parameters">
+      <Condition Diagnostic="SD_ClockBypass" Expression="SD_Card"/>
+        <PossibleValue Value="SDIO_CLOCK_EDGE_RISING" Comment="Capture the clock on the rising transition"/>
+    </RefParameter>    
+    <RefParameter     Name="ClockEdge" Comment="Clock transition on which the bit capture" DefaultValue="SDIO_CLOCK_EDGE_RISING" Type="list"  Group="SDIO parameters">
+        <PossibleValue Value="SDIO_CLOCK_EDGE_RISING" Comment="Capture the clock on the rising transition"/>
+        <PossibleValue Value="SDIO_CLOCK_EDGE_FALLING" Comment="Capture the clock on the falling transition"/>
+    </RefParameter>    
+
+     <RefParameter     Name="ClockBypass" Comment="SDIO Clock divider bypass enable" DefaultValue="SDIO_CLOCK_BYPASS_DISABLE" Type="list"  Group="SDIO parameters">
+        <Condition Diagnostic="SD_ClockBypass" Expression="SD_Card"/>
+        <PossibleValue Value="SDIO_CLOCK_BYPASS_DISABLE" Comment="Disable the Bypass of clock divider"/>
+    </RefParameter>   
+     <RefParameter     Name="ClockBypass" Comment="SDIO Clock divider bypass enable" DefaultValue="SDIO_CLOCK_BYPASS_DISABLE" Type="list"  Group="SDIO parameters">
+        <PossibleValue Value="SDIO_CLOCK_BYPASS_DISABLE" Comment="Disable the Bypass of clock divider"/>
+        <PossibleValue Value="SDIO_CLOCK_BYPASS_ENABLE" Comment="Enable the Bypass of clock divider"/>
+     </RefParameter>   
+
+     <RefParameter     Name="ClockPowerSave" Comment="SDIO Clock output enable or disable when the bus is idle" DefaultValue="SDIO_CLOCK_POWER_SAVE_DISABLE" Type="list" Group="SDIO parameters">
+        <Condition Diagnostic="SD_ClockPowerSave" Expression="SD_Card"/>
+        <PossibleValue Value="SDIO_CLOCK_POWER_SAVE_DISABLE" Comment="Disable the power save for the clock"/>
+    </RefParameter> 
+    <RefParameter     Name="ClockPowerSave" Comment="SDIO Clock output enable when the bus is idle" DefaultValue="SDIO_CLOCK_POWER_SAVE_DISABLE" Type="list" Group="SDIO parameters">
+       <PossibleValue Value="SDIO_CLOCK_POWER_SAVE_DISABLE" Comment="Disable the power save for the clock"/>
+        <PossibleValue Value="SDIO_CLOCK_POWER_SAVE_ENABLE" Comment="Enable the power save for the clock"/>
+     </RefParameter>    
+
+     <RefParameter     Name="BusWide" Comment="SDIO bus width : 8 bits." Type="list" Visible="false" >
+         <Condition Diagnostic="BusWide" Expression="Bus8Bits"/>
+         <PossibleValue Value="SDIO_BUS_WIDE_8B" Comment="Bus wide 8-bit data"/>
+     </RefParameter> 
+     <RefParameter     Name="BusWide" Comment="SDIO bus width : 4 bits." Type="list" Visible="false">
+      <Condition Diagnostic="BusWide" Expression="Bus4Bits"/>
+      <PossibleValue Value="SDIO_BUS_WIDE_4B" Comment="Bus wide 4-bit data"/>
+     </RefParameter> 
+     <RefParameter     Name="BusWide" Comment="SDIO bus width : 1 bits." Type="list" Visible="false">
+        <PossibleValue Value="SDIO_BUS_WIDE_1B" Comment="Bus wide 1-bit data|SD_Card"/>
+     </RefParameter>  
+
+     <RefParameter     Name="HardwareFlowControl" Comment="SDIO hardware flow control" DefaultValue="SDIO_HARDWARE_FLOW_CONTROL_DISABLE" Type="list"  Group="SDIO parameters">
+        <Condition Diagnostic="SD_HardwareFlowControl" Expression="SD_Card"/>
+        <PossibleValue Value="SDIO_HARDWARE_FLOW_CONTROL_DISABLE" Comment="The hardware control flow is disabled"/>
+    </RefParameter>   
+     <RefParameter     Name="HardwareFlowControl" Comment="SDIO hardware flow control" DefaultValue="SDIO_HARDWARE_FLOW_CONTROL_DISABLE" Type="list"  Group="SDIO parameters">
+        <PossibleValue Value="SDIO_HARDWARE_FLOW_CONTROL_DISABLE" Comment="The hardware control flow is disabled"/>
+        <PossibleValue Value="SDIO_HARDWARE_FLOW_CONTROL_ENABLE" Comment="The hardware control flow is enabled"/>
+     </RefParameter>   
+
+     <RefParameter   Name="ClockDiv" Comment="Clock frequency of the SDIO controller must be between 186 KHz and 24 MHz" DefaultValue="0" Max="255" Min="0" Type="integer" Group="SDIO parameters">
+    </RefParameter> 
+
+ 
+  <!-- RefMode for SD-1-bit -->
+    <RefMode Name="SD_1_bit" Comment="SD 1 bit" HalMode="SD">
+        <ConfigForMode>SD_Init</ConfigForMode>
+    </RefMode>
+
+
+  <!-- RefMode for SD-4-bits-Wide-bus -->
+    <RefMode Name="SD_4_bits_Wide_bus" Comment="SD 4 bits Wide bus" HalMode="SD">
+        <ConfigForMode>SD_Init</ConfigForMode>
+    </RefMode>
+
+    <ModeLogicOperator Name="OR">
+		<Mode Name="Mode">
+			<ModeLogicOperator Name="XOR">
+				<Mode Name="SD_1_bit" UserName="SD 1 bit">
+                    <Semaphore>SD_Card</Semaphore>
+					<SignalLogicalOp Name="AND">
+						<Signal Name="CK"/>
+						<Signal Name="CMD"/>
+						<Signal Name="D0"/>
+					</SignalLogicalOp>
+				</Mode>
+				<Mode Name="SD_4_bits_Wide_bus" UserName="SD 4 bits Wide bus">
+                    <Semaphore>SD_Card_4</Semaphore>
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="CK"/>
+                        <Signal Name="CMD"/>
+                        <Signal Name="D0"/>
+                        <Signal Name="D1"/>
+						<Signal Name="D2"/>
+						<Signal Name="D3"/>
+					</SignalLogicalOp>
+				</Mode>
+				<Mode Name="mmc_1_bit" UserName="MMC 1 bit">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="CK"/>
+						<Signal Name="CMD"/>
+						<Signal Name="D0"/>
+					</SignalLogicalOp>
+				</Mode>
+				<Mode Name="mmc_4_bits_Wide_bus"  UserName="MMC 4 bits Wide bus">
+                    <Semaphore>Bus4Bits</Semaphore>
+					<SignalLogicalOp Name="AND">
+						<Signal Name="CK"/>
+						<Signal Name="CMD"/>
+						<Signal Name="D0"/>
+						<Signal Name="D1"/>
+						<Signal Name="D2"/>
+						<Signal Name="D3"/>
+					</SignalLogicalOp>
+				</Mode>
+				<Mode Name="mmc_8_bits_Wide_bus"   UserName="MMC 8 bits Wide bus">
+                    <Semaphore>Bus8Bits</Semaphore>
+					<SignalLogicalOp Name="AND">
+						<Signal Name="CK"/>
+						<Signal Name="CMD"/>
+						<Signal Name="D0"/>
+						<Signal Name="D1"/>
+						<Signal Name="D2"/>
+						<Signal Name="D3"/>
+						<Signal Name="D4"/>
+						<Signal Name="D5"/>
+						<Signal Name="D6"/>
+						<Signal Name="D7"/>
+					</SignalLogicalOp>
+				</Mode>
+			</ModeLogicOperator>
+		</Mode>
+	</ModeLogicOperator>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="CK"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="CMD"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="D0"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="D1"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="D2"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="D3"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="D4"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="D5"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="D6"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="D7"/>
+    <Semaphore>SDIOUsed_ForRCC</Semaphore>
+</IP>

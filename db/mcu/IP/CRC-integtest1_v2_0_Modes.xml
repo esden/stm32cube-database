@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<IP DBVersion="V4.0" IPType="service" IpGroup="System" Name="CRC" Version="integtest1_v2_0" 
+	xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance"
+ 	ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd"
+ 	xmlns="http://mcd.rou.st.com/modules.php?name=mcu">
+  <About>CRC: Cyclic Redundancy Check calculation unit</About>
+	
+	<!-- Generic RefParameters for CRC --> 
+	<RefParameter Name="Instance" DefaultValue="CRC" Comment="Instance" Type="" Visible="false"/>
+
+	<RefParameter Comment="Default Polynomial State" DefaultValue="DEFAULT_POLYNOMIAL_ENABLE" Name="DefaultPolynomialUse" Type="list" Group="Basic Parameters">
+		<PossibleValue Comment="Enable" Value="DEFAULT_POLYNOMIAL_ENABLE"/>
+		<PossibleValue Comment="Disable" Value="DEFAULT_POLYNOMIAL_DISABLE"/>
+	</RefParameter>
+	<RefParameter Comment="Default Init Value State" DefaultValue="DEFAULT_INIT_VALUE_ENABLE" Name="DefaultInitValueUse" Type="list" Group="Basic Parameters">
+		<PossibleValue Comment="Enable" Value="DEFAULT_INIT_VALUE_ENABLE"/>
+		<PossibleValue Comment="Disable" Value="DEFAULT_INIT_VALUE_DISABLE"/>
+	</RefParameter>
+
+	<RefParameter Comment="CRC Generating Polynomial" DefaultValue="0" Max="4294967295" Min="0" Name="GeneratingPolynomial" Type="integer" Group="Basic Parameters">
+		<Condition Expression="(DefaultPolynomialUse=DEFAULT_POLYNOMIAL_DISABLE)&amp;(CRCLength=CRC_POLYLENGTH_32B)" Diagnostic=""/>
+	</RefParameter>
+	<RefParameter Comment="CRC Generating Polynomial" DefaultValue="0"  Max="65535" Min="0" Name="GeneratingPolynomial" Type="integer" Group="Basic Parameters">
+		<Condition Expression="(DefaultPolynomialUse=DEFAULT_POLYNOMIAL_DISABLE)&amp;(CRCLength=CRC_POLYLENGTH_16B)" Diagnostic=""/>
+	</RefParameter>
+	<RefParameter Comment="CRC Generating Polynomial" DefaultValue="0"  Max="255" Min="0" Name="GeneratingPolynomial" Type="integer" Group="Basic Parameters">
+		<Condition Expression="(DefaultPolynomialUse=DEFAULT_POLYNOMIAL_DISABLE)&amp;(CRCLength=CRC_POLYLENGTH_8B)" Diagnostic=""/>
+	</RefParameter>
+	<RefParameter Comment="CRC Generating Polynomial" DefaultValue="0"  Max="127" Min="0" Name="GeneratingPolynomial" Type="integer" Group="Basic Parameters">
+		<Condition Expression="(DefaultPolynomialUse=DEFAULT_POLYNOMIAL_DISABLE)&amp;(CRCLength=CRC_POLYLENGTH_7B)" Diagnostic=""/>
+	</RefParameter>
+	
+	<RefParameter Comment="Polynomial Size" DefaultValue="CRC_POLYLENGTH_32B" Name="CRCLength" Type="list" Group="Basic Parameters">
+		<Condition Expression="DefaultPolynomialUse=DEFAULT_POLYNOMIAL_DISABLE" Diagnostic=""/>
+		<PossibleValue Comment="32-bit" Value="CRC_POLYLENGTH_32B"/>
+		<PossibleValue Comment="16-bit" Value="CRC_POLYLENGTH_16B"/>
+		<PossibleValue Comment="8-bit" Value="CRC_POLYLENGTH_8B"/>
+		<PossibleValue Comment="7-bit" Value="CRC_POLYLENGTH_7B"/>
+	</RefParameter>
+	<RefParameter Comment="Init Value For CRC computation" DefaultValue="0"  Max="4294967295" Min="0" Name="InitValue" Type="integer" Group="Basic Parameters">
+		<Condition Expression="DefaultInitValueUse=DEFAULT_INIT_VALUE_DISABLE" Diagnostic=""/>
+	</RefParameter>
+	<RefParameter Comment="Input Data Inversion Mode" DefaultValue="CRC_INPUTDATA_INVERSION_NONE" Name="InputDataInversionMode" Type="list" Group="Advanced Parameters">
+		<PossibleValue Comment="None" Value="CRC_INPUTDATA_INVERSION_NONE"/>
+		<PossibleValue Comment="Byte" Value="CRC_INPUTDATA_INVERSION_BYTE"/>
+		<PossibleValue Comment="Halfword" Value="CRC_INPUTDATA_INVERSION_HALFWORD"/>
+		<PossibleValue Comment="Word" Value="CRC_INPUTDATA_INVERSION_WORD"/>
+	</RefParameter>
+	<RefParameter Comment="Output Data Inversion Mode" DefaultValue="CRC_OUTPUTDATA_INVERSION_DISABLED" Name="OutputDataInversionMode" Type="list" Group="Advanced Parameters">
+		<PossibleValue Comment="Disable" Value="CRC_OUTPUTDATA_INVERSION_DISABLED"/>
+		<PossibleValue Comment="Enable" Value="CRC_OUTPUTDATA_INVERSION_ENABLED"/>
+	</RefParameter>
+	<RefParameter Comment="Input Data Format" DefaultValue="CRC_INPUTDATA_FORMAT_BYTES" Name="InputDataFormat" Type="list" Group="Advanced Parameters">
+		<PossibleValue Comment="Bytes" Value="CRC_INPUTDATA_FORMAT_BYTES"/>
+		<PossibleValue Comment="HalfWords" Value="CRC_INPUTDATA_FORMAT_HALFWORDS"/>
+		<PossibleValue Comment="Words" Value="CRC_INPUTDATA_FORMAT_WORDS"/>
+		<PossibleValue Comment="Undefined" Value="CRC_INPUTDATA_FORMAT_UNDEFINED"/>
+	</RefParameter>
+	
+	
+	<RefMode Name="CRC_Activate" >
+		<ConfigForMode>Crc_Init</ConfigForMode>
+			
+		<Parameter Name="DefaultPolynomialUse"/>
+		<Parameter Name="DefaultInitValueUse"/>
+		<Parameter Name="CRCLength"/>
+		<Parameter Name="InitValue"/>
+		<Parameter Name="GeneratingPolynomial"/>
+		<Parameter Name="InputDataInversionMode"/>
+		<Parameter Name="OutputDataInversionMode"/>
+		<Parameter Name="InputDataFormat"/>
+	</RefMode>
+	
+	<!-- ModeLogicOperator for CRC -->
+	<ModeLogicOperator Name="OR">
+		<Mode Name="CRC_State" UserName="Activated">
+			<ModeLogicOperator Name="XOR">
+				<Mode Name="CRC_Activate" UserName="Activated">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="VS_CRC" />
+					</SignalLogicalOp>
+				</Mode>
+			</ModeLogicOperator>
+		</Mode>
+	</ModeLogicOperator>
+	
+	<!-- RefSignal for CRC -->
+	<RefSignal Name="VS_CRC" Virtual="true"/>
+</IP>

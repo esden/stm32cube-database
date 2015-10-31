@@ -1,0 +1,1057 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<IP DBVersion="V4.0" IPType="peripheral" Name="ADC" Version="aditf2_v1_1_Cube" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://mcd.rou.st.com/modules.php?name=mcu" ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu file:///C:/Dev_Build8/MicroXplorer/doc/V4/Development/Specifications/db/IP_Modes.xsd">
+	<About>ADC: Analog to Digital Converter</About>
+	<RefParameter Comment="Clock Prescaler" DefaultValue="ADC_CLOCKPRESCALER_PCLK_DIV2" Name="ClockPrescaler" Type="list" Group="ADCsgroup">
+		<PossibleValue Comment="PCLK2 divided by 2" Value="ADC_CLOCKPRESCALER_PCLK_DIV2"/>
+		<PossibleValue Comment="PCLK2 divided by 4" Value="ADC_CLOCKPRESCALER_PCLK_DIV4"/>
+		<PossibleValue Comment="PCLK2 divided by 6" Value="ADC_CLOCKPRESCALER_PCLK_DIV6"/>
+		<PossibleValue Comment="PCLK2 divided by 8" Value="ADC_CLOCKPRESCALER_PCLK_DIV8"/>
+		<Description>frequency of the clock to the ADC. The clock is common for all the ADCs.</Description>
+	</RefParameter>
+	<RefParameter Comment="ADC instance" DefaultValue="ADC$Index" Name="Instance" Type="list" Group="ADCgroup" Visible="false"/>
+	<RefParameter Comment="Resolution" DefaultValue="ADC_RESOLUTION12b" Name="Resolution" Type="list" Group="ADCgroup">
+		<PossibleValue Comment="12 bits (15 ADC Clock cycles)" Value="ADC_RESOLUTION12b"/>
+		<PossibleValue Comment="10 bits (13 ADC Clock cycles)" Value="ADC_RESOLUTION10b"/>
+		<PossibleValue Comment="8 bits (11 ADC Clock cycles)" Value="ADC_RESOLUTION8b" /> <!-- Semaphore="RESOLUTION8b$IpInstance"-->
+		<PossibleValue Comment="6 bits (9 ADC Clock cycles)" Value="ADC_RESOLUTION6b"/> <!-- Semaphore="RESOLUTION6b$IpInstance"-->
+		<Description>Resolution of the ADC conversion</Description>
+	</RefParameter>
+	<RefParameter Comment="Scan Conversion Mode" DefaultValue="DISABLE" Name="ScanConvMode" Type="list" Group="ADCgroup">
+		<PossibleValue Comment="Disabled" Value="DISABLE"/>
+		<PossibleValue Comment="Enabled" Value="ENABLE"/>
+		<Description>Enable or Disable the Scan Coverion Mode</Description>
+	</RefParameter>
+	<RefParameter Comment="Continuous Conversion Mode" DefaultValue="DISABLE" Name="ContinuousConvMode" Type="uniqueElementList" Group="ADCgroup">
+		<Condition Expression="DiscontinuousConvMode=ENABLE" Diagnostic="Continuous and Discontinuous modes could not be used at the same time"/>
+		<PossibleValue Comment="Disabled" Value="DISABLE"/>
+	</RefParameter>
+	<RefParameter Comment="Continuous Conversion Mode" DefaultValue="DISABLE" Name="ContinuousConvMode" Type="list" Group="ADCgroup">
+		<PossibleValue Comment="Disabled" Value="DISABLE"/>
+		<PossibleValue Comment="Enabled" Value="ENABLE" Semaphore="ContinuousMode_$IpInstance"/>
+		<Description>Enable or Disable the Continuous Conversion Mode</Description>
+	</RefParameter>
+	<RefParameter Comment="Discontinuous Conversion Mode" DefaultValue="DISABLE" Name="DiscontinuousConvMode" Type="uniqueElementList">
+		<Condition Expression="ContinuousMode_$IpInstance" Diagnostic="Continuous and Discontinuous modes could not be used at the same time"/>
+		<PossibleValue Comment="Disabled" Value="DISABLE"/>
+	</RefParameter>	
+	<RefParameter Comment="Discontinuous Conversion Mode" DefaultValue="DISABLE" Name="DiscontinuousConvMode" Type="uniqueElementList">
+		<Condition Expression="InjectedDiscontinuous_$IpInstance" Diagnostic="Discontinuous mode could not be used for regular and injected conversion at the same time"/>
+		<PossibleValue Comment="Disabled" Value="DISABLE"/>
+	</RefParameter>
+	<RefParameter Comment="Discontinuous Conversion Mode" DefaultValue="DISABLE" Name="DiscontinuousConvMode" Type="list">
+		<PossibleValue Comment="Disabled" Value="DISABLE"/>
+		<PossibleValue Comment="Enabled" Value="ENABLE"/>
+		<Description>Enable or Disable the Discontinuous Conversion Mode</Description>
+	</RefParameter>
+	<RefParameter Comment="Number Of Discontinuous Conversions" DefaultValue="1" Max="8" Min="1" Name="NbrOfDiscConversion" Type="integer"/>
+	<RefParameter Comment="External Trigger Conversion Edge" DefaultValue="null" Name="ExternalTrigConvEdge" Type="list" Group="ADCgroup" Visible="false">
+		<Condition Expression="($IpNumber=2)&amp;!(Mode=ADC_MODE_INDEPENDENT)&amp;!(TripleMode3)&amp;!(DualMode3)" Diagnostic=""/>
+	</RefParameter>
+	<!-- -->
+	<!--Regular External trigger should not be available for multiMode -->
+	<RefParameter Comment="External Trigger Conversion Edge" DefaultValue="null" Name="ExternalTrigConvEdge" Type="list" Group="ADCgroup" Visible="false">
+		<Condition Expression="($IpNumber=3)&amp;(TripleMode0|TripleMode1|TripleMode_Interl|TripleMode_REGSIMULT | TripleMode_REGSIMULT1)" Diagnostic=""/>
+	</RefParameter>
+	<RefParameter Comment="External Trigger Conversion Edge" DefaultValue="ADC_EXTERNALTRIGCONVEDGE_NONE" Name="ExternalTrigConvEdge" Type="list" Group="ADCgroup">
+		<PossibleValue Comment="None" Value="ADC_EXTERNALTRIGCONVEDGE_NONE"/>
+		<PossibleValue Comment="Trigger detection on the rising edge" Value="ADC_EXTERNALTRIGCONVEDGE_RISING"/>
+		<PossibleValue Comment="Trigger detection on the falling edge" Value="ADC_EXTERNALTRIGCONVEDGE_FALLING"/>
+		<PossibleValue Comment="Trigger detection on both the rising and falling edges" Value="ADC_EXTERNALTRIGCONVEDGE_RISINGFALLING"/>
+		<Description>Select the external trigger polarity and enable the trigger of a regular group</Description>
+	</RefParameter>
+	<RefParameter Comment="External Trigger Conversion Source" DefaultValue="null" Name="ExternalTrigConv" Type="list" Group="ADCgroup" Visible="false">
+		<Condition Expression="(ExternalTrigConvEdge=ADC_EXTERNALTRIGCONVEDGE_NONE)|(($IpNumber=2)&amp;!(Mode=ADC_MODE_INDEPENDENT)&amp;!(TripleMode3)&amp;!(DualMode3))" Diagnostic=""/>
+	</RefParameter>
+	<RefParameter Comment="External Trigger Conversion Source" DefaultValue="null" Name="ExternalTrigConv" Type="list" Group="ADCgroup" Visible="false">
+		<Condition Expression="(ExternalTrigConvEdge=ADC_EXTERNALTRIGCONVEDGE_NONE)|(($IpNumber=3)&amp;(TripleMode0|TripleMode1|TripleMode_Interl|TripleMode_REGSIMULT | TripleMode_REGSIMULT1))" Diagnostic=""/>
+	</RefParameter>
+	<RefParameter Comment="External Trigger Conversion Source" DefaultValue="ADC_EXTERNALTRIGCONV_Ext_IT11" Name="ExternalTrigConv" Type="list" Group="ADCgroup">
+		<Condition Expression="!(ExternalTrigConvEdge=ADC_EXTERNALTRIGCONVEDGE_NONE)&amp;(RegularExternalTrigger)" Diagnostic="EXTI Line11 is used for External-Trigger-for-Regular-conversion mode."/>
+		<PossibleValue Comment="EXTI Line11" Value="ADC_EXTERNALTRIGCONV_Ext_IT11"/>
+	</RefParameter>
+	<RefParameter Comment="External Trigger Conversion Source" DefaultValue="ADC_EXTERNALTRIGCONV_T1_CC1" Name="ExternalTrigConv" Type="list" Group="ADCgroup">
+		<PossibleValue Comment="Timer 1 Capture Compare 1 event" Value="ADC_EXTERNALTRIGCONV_T1_CC1"/>
+		<PossibleValue Comment="Timer 1 Capture Compare 2 event" Value="ADC_EXTERNALTRIGCONV_T1_CC2"/>
+		<PossibleValue Comment="Timer 1 Capture Compare 3 event" Value="ADC_EXTERNALTRIGCONV_T1_CC3"/>
+		<PossibleValue Comment="Timer 2 Capture Compare 2 event" Value="ADC_EXTERNALTRIGCONV_T2_CC2"/>
+		<PossibleValue Comment="Timer 2 Capture Compare 3 event" Value="ADC_EXTERNALTRIGCONV_T2_CC3"/>
+		<PossibleValue Comment="Timer 2 Capture Compare 4 event" Value="ADC_EXTERNALTRIGCONV_T2_CC4"/>
+		<PossibleValue Comment="Timer 2 Trigger Out event" Value="ADC_EXTERNALTRIGCONV_T2_TRGO"/>
+		<PossibleValue Comment="Timer 3 Capture Compare 1 event" Value="ADC_EXTERNALTRIGCONV_T3_CC1"/>
+		<PossibleValue Comment="Timer 3 Trigger Out event" Value="ADC_EXTERNALTRIGCONV_T3_TRGO"/>
+		<PossibleValue Comment="Timer 4 Capture Compare 4 event" Value="ADC_EXTERNALTRIGCONV_T4_CC4"/>
+		<PossibleValue Comment="Timer 5 Capture Compare 1 event" Value="ADC_EXTERNALTRIGCONV_T5_CC1"/>
+		<PossibleValue Comment="Timer 5 Capture Compare 2 event" Value="ADC_EXTERNALTRIGCONV_T5_CC2"/>
+		<PossibleValue Comment="Timer 5 Capture Compare 3 event" Value="ADC_EXTERNALTRIGCONV_T5_CC3"/>
+		<PossibleValue Comment="Timer 8 Capture Compare 1 event" Value="ADC_EXTERNALTRIGCONV_T8_CC1"/>
+		<PossibleValue Comment="Timer 8 Trigger Out event" Value="ADC_EXTERNALTRIGCONV_T8_TRGO"/>
+		<Description>Select the external event used to trigger the start of conversion of a regular group</Description>
+	</RefParameter>
+	<!-- DataAlign -->
+	<RefParameter Comment="Data Alignment" DefaultValue="ADC_DATAALIGN_RIGHT" Name="DataAlign" Type="list" Group="ADCgroup">
+		<PossibleValue Comment="Right alignment" Value="ADC_DATAALIGN_RIGHT"/>
+		<PossibleValue Comment="Left alignment" Value="ADC_DATAALIGN_LEFT"/>
+		<Description>Select the alignment of the data stored after conversion.</Description>
+	</RefParameter>
+	<RefParameter Comment="Number Of Conversion Flag" DefaultValue="0" Max="1" Min="0" Name="NbrOfConversionFlag" Type="integer" Group="ADCgroup" Visible="false"/>
+	<RefParameter Comment="Number Of Conversion" DefaultValue="1" Max="16" Min="1" Name="NbrOfConversion" Type="integer" Group="ADCgroup">
+		<Description>Number of regular channels to be converted</Description>
+	</RefParameter>
+    <!-- <RefParameter Comment="DMA Continuous Requests" DefaultValue="null" Name="DMAContinuousRequests" Type="list" Group="ADCgroup" Visible="false">
+		<Condition Expression="!(Mode=ADC_MODE_INDEPENDENT)" Diagnostic="Diasabled in ADC multi mode"/>
+	</RefParameter> -->
+	<!--RefParameter Comment="DMA Continuous Requests" DefaultValue="ENABLE" Name="DMAContinuousRequests" Type="list" Group="ADCgroup">
+	  <Condition Diagnostic="" Expression="DMARequest_$IpInstance"/>
+		<PossibleValue Comment="Enabled" Value="ENABLE" Semaphore="Semaphore_DMAContinuousRequests_Enable$IpInstance"/>
+		<Description>Enable/Disable DMA Continuous Requests</Description>
+	</RefParameter-->
+	<RefParameter Comment="DMA Continuous Requests" DefaultValue="DISABLE" Name="DMAContinuousRequests" Type="list" Group="ADCgroup">
+		<PossibleValue Comment="Disabled" Value="DISABLE"/>
+		<PossibleValue Comment="Enabled" Value="ENABLE" Semaphore="Semaphore_DMAContinuousRequests_Enable$IpInstance"/>
+		<Description>Enable/Disable DMA Continuous Requests</Description>
+	</RefParameter>
+	<RefParameter Comment="End Of Conversion Selection" DefaultValue="EOC_SINGLE_CONV" Name="EOCSelection" Type="list" Group="ADCgroup">
+		<PossibleValue Comment="EOC flag at the end of single channel conversion" Value="EOC_SINGLE_CONV"/>
+		<PossibleValue Comment="EOC flag at the end of all conversions" Value="EOC_SEQ_CONV"/>
+		<Description>Regular channel end of conversion selection</Description>
+	</RefParameter>
+	<RefParameter Comment="Channel" DefaultValue="ADC_CHANNEL_0" Name="Channel" Type="list" Visible="true" Group="ADCChannel">
+		<Condition Expression="master=1" Diagnostic=""/>
+		<PossibleValue Comment="Channel 0" Value="ADC_CHANNEL_0"/>
+		<PossibleValue Comment="Channel 1" Value="ADC_CHANNEL_1"/>
+		<PossibleValue Comment="Channel 2" Value="ADC_CHANNEL_2"/>
+		<PossibleValue Comment="Channel 3" Value="ADC_CHANNEL_3"/>
+		<PossibleValue Comment="Channel 4" Value="ADC_CHANNEL_4"/>
+		<PossibleValue Comment="Channel 5" Value="ADC_CHANNEL_5"/>
+		<PossibleValue Comment="Channel 6" Value="ADC_CHANNEL_6"/>
+		<PossibleValue Comment="Channel 7" Value="ADC_CHANNEL_7"/>
+		<PossibleValue Comment="Channel 8" Value="ADC_CHANNEL_8"/>
+		<PossibleValue Comment="Channel 9" Value="ADC_CHANNEL_9"/>
+		<PossibleValue Comment="Channel 10" Value="ADC_CHANNEL_10"/>
+		<PossibleValue Comment="Channel 11" Value="ADC_CHANNEL_11"/>
+		<PossibleValue Comment="Channel 12" Value="ADC_CHANNEL_12"/>
+		<PossibleValue Comment="Channel 13" Value="ADC_CHANNEL_13"/>
+		<PossibleValue Comment="Channel 14" Value="ADC_CHANNEL_14"/>
+		<PossibleValue Comment="Channel 15" Value="ADC_CHANNEL_15"/>
+		<PossibleValue Comment="Channel 16" Value="ADC_CHANNEL_16"/>
+		<PossibleValue Comment="Channel 17" Value="ADC_CHANNEL_17"/>
+		<PossibleValue Comment="Channel 18" Value="ADC_CHANNEL_18"/>
+		<PossibleValue Comment="Channel Temperature Sensor" Value="ADC_CHANNEL_TEMPSENSOR"/>
+		<PossibleValue Comment="Channel Vrefint" Value="ADC_CHANNEL_VREFINT"/>
+		<PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT"/>
+	</RefParameter>
+	<RefParameter Comment="Channel" DefaultValue="ADC_CHANNEL_0" Name="Channel" Type="list" Visible="true" Group="ADCChannel">
+		<PossibleValue Comment="Channel 0" Value="ADC_CHANNEL_0"/>
+		<PossibleValue Comment="Channel 1" Value="ADC_CHANNEL_1"/>
+		<PossibleValue Comment="Channel 2" Value="ADC_CHANNEL_2"/>
+		<PossibleValue Comment="Channel 3" Value="ADC_CHANNEL_3"/>
+		<PossibleValue Comment="Channel 4" Value="ADC_CHANNEL_4"/>
+		<PossibleValue Comment="Channel 5" Value="ADC_CHANNEL_5"/>
+		<PossibleValue Comment="Channel 6" Value="ADC_CHANNEL_6"/>
+		<PossibleValue Comment="Channel 7" Value="ADC_CHANNEL_7"/>
+		<PossibleValue Comment="Channel 8" Value="ADC_CHANNEL_8"/>
+		<PossibleValue Comment="Channel 9" Value="ADC_CHANNEL_9"/>
+		<PossibleValue Comment="Channel 10" Value="ADC_CHANNEL_10"/>
+		<PossibleValue Comment="Channel 11" Value="ADC_CHANNEL_11"/>
+		<PossibleValue Comment="Channel 12" Value="ADC_CHANNEL_12"/>
+		<PossibleValue Comment="Channel 13" Value="ADC_CHANNEL_13"/>
+		<PossibleValue Comment="Channel 14" Value="ADC_CHANNEL_14"/>
+		<PossibleValue Comment="Channel 15" Value="ADC_CHANNEL_15"/>
+		<PossibleValue Comment="Channel 16" Value="ADC_CHANNEL_16"/>
+		<PossibleValue Comment="Channel 17" Value="ADC_CHANNEL_17"/>
+		<PossibleValue Comment="Channel 18" Value="ADC_CHANNEL_18"/>
+	</RefParameter>
+	<!-- List of all available channel used to -->
+	<RefParameter Comment="Channel" DefaultValue="ADC_CHANNEL_0" Name="AllChannels" Type="list" Visible="true" Group="ADCChannel">
+		<PossibleValue Comment="Channel 0" Value="ADC_CHANNEL_0"/>
+		<PossibleValue Comment="Channel 1" Value="ADC_CHANNEL_1"/>
+		<PossibleValue Comment="Channel 2" Value="ADC_CHANNEL_2"/>
+		<PossibleValue Comment="Channel 3" Value="ADC_CHANNEL_3"/>
+		<PossibleValue Comment="Channel 4" Value="ADC_CHANNEL_4"/>
+		<PossibleValue Comment="Channel 5" Value="ADC_CHANNEL_5"/>
+		<PossibleValue Comment="Channel 6" Value="ADC_CHANNEL_6"/>
+		<PossibleValue Comment="Channel 7" Value="ADC_CHANNEL_7"/>
+		<PossibleValue Comment="Channel 8" Value="ADC_CHANNEL_8"/>
+		<PossibleValue Comment="Channel 9" Value="ADC_CHANNEL_9"/>
+		<PossibleValue Comment="Channel 10" Value="ADC_CHANNEL_10"/>
+		<PossibleValue Comment="Channel 11" Value="ADC_CHANNEL_11"/>
+		<PossibleValue Comment="Channel 12" Value="ADC_CHANNEL_12"/>
+		<PossibleValue Comment="Channel 13" Value="ADC_CHANNEL_13"/>
+		<PossibleValue Comment="Channel 14" Value="ADC_CHANNEL_14"/>
+		<PossibleValue Comment="Channel 15" Value="ADC_CHANNEL_15"/>
+		<PossibleValue Comment="Channel 16" Value="ADC_CHANNEL_16"/>
+		<PossibleValue Comment="Channel 17" Value="ADC_CHANNEL_17"/>
+		<PossibleValue Comment="Channel 18" Value="ADC_CHANNEL_18"/>
+		<PossibleValue Comment="Channel Temperature Sensor" Value="ADC_CHANNEL_TEMPSENSOR"/>
+		<PossibleValue Comment="Channel Vrefint" Value="ADC_CHANNEL_VREFINT"/>
+		<PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT"/>
+	</RefParameter>
+	<RefParameter Comment="Available Channel" DefaultValue="ADC_CHANNEL_0" Name="Available_Channel" Type="list" Visible="false" Group="ADCChannel">
+		<!-- <Condition Expression="master=1" Diagnostic="TEMPSENSOR, VREFINT and VBATshould be available only for ADC1 (master)"/>
+		<PossibleValue Comment="Channel Temperature Sensor" Value="ADC_CHANNEL_TEMPSENSOR"/>
+		<PossibleValue Comment="Channel Vrefint" Value="ADC_CHANNEL_VREFINT"/>
+		<PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT"/> -->
+	</RefParameter>
+	<RefParameter Comment="Available Channel" DefaultValue="ADC_CHANNEL_0" Name="Available_Channel" Type="list" Visible="false" Group="ADCChannel">
+		<PossibleValue Comment="Channel 0" Value="ADC_CHANNEL_0"/>
+	</RefParameter>
+	<!-- InjNumberOfConversion -->
+	<!--injected conversion not autorized for regular simultanious mode AND for ADC2 if Mode!=Independent mode AND for ADC3 if Triple mode-->
+	<RefParameter Comment="Number Of Conversions" DefaultValue="0" Max="0" Min="0" Name="InjNumberOfConversion" Type="integer" Group="ADCgroup" Visible="false">
+		<Condition Expression="($IpNumber=3)&amp;(TripleMode_REGSIMULT)" Diagnostic="The injected conversion should be disabled in regular simultaneous mode"/>
+	</RefParameter>
+	<RefParameter Comment="Number Of Conversions" DefaultValue="0" Max="0" Min="0" Name="InjNumberOfConversion" Type="integer" Group="ADCgroup" Visible="false">
+		<Condition Expression="($IpNumber=1)&amp;(DualMode_REGSIMULT)" Diagnostic="The injected conversion should be disabled in regular simultaneous mode"/>
+	</RefParameter>
+	<RefParameter Comment="Number Of Conversions" DefaultValue="0" Max="0" Min="0" Name="InjNumberOfConversion" Type="integer" Group="ADCgroup" Visible="false">
+		<Condition Expression="($IpNumber=1)&amp;(TripleMode_REGSIMULT)" Diagnostic="The injected conversion should be disabled in regular simultaneous mode"/>
+	</RefParameter>
+	<RefParameter Comment="Number Of Conversions" DefaultValue="0" Max="0" Min="0" Name="InjNumberOfConversion" Type="integer" Group="ADCgroup" Visible="false">
+		<Condition Expression="(($IpNumber=2)&amp;(DualMode_REGSIMULT | TripleMode_REGSIMULT))" Diagnostic="The injected conversion should be disabled in regular simultaneous mode"/>
+	</RefParameter>
+	<RefParameter Comment="Number Of Conversions" DefaultValue="0" Max="4" Min="0" Name="InjNumberOfConversion" Type="integer" Group="ADCgroup">
+		<Description>Number of injected channels to be converted</Description>
+	</RefParameter>
+	<!-- -->
+	<RefParameter Comment="Master Flag" DefaultValue="0" Max="1" Min="0" Name="master" Type="integer" Visible="false"/>
+	<!-- added to be able to detect if the current instance is the master (ADC1) will be set by the code -->
+	<RefParameter Comment="Rank" DefaultValue="1" Max="16" Min="1" Name="Rank" Type="integer" Group="ADCChannel">
+		<Description>The rank in the regular group sequencer</Description>
+	</RefParameter>
+	<RefParameter Comment="Injected Rank" DefaultValue="1" Max="4" Min="1" Name="InjectedRank" Type="integer">
+		<Description>The rank in the regular group sequencer</Description>
+	</RefParameter>
+	<RefParameter Comment="Sampling Time" DefaultValue="ADC_SAMPLETIME_3CYCLES" Name="SamplingTime" Type="list" Group="ADCChannel">
+		<PossibleValue Comment="3 Cycles" Value="ADC_SAMPLETIME_3CYCLES"/>
+		<PossibleValue Comment="15 Cycles" Value="ADC_SAMPLETIME_15CYCLES"/>
+		<PossibleValue Comment="28 Cycles" Value="ADC_SAMPLETIME_28CYCLES"/>
+		<PossibleValue Comment="56 Cycles" Value="ADC_SAMPLETIME_56CYCLES"/>
+		<PossibleValue Comment="84 Cycles" Value="ADC_SAMPLETIME_84CYCLES"/>
+		<PossibleValue Comment="112 Cycles" Value="ADC_SAMPLETIME_112CYCLES"/>
+		<PossibleValue Comment="144 Cycles" Value="ADC_SAMPLETIME_144CYCLES"/>
+		<PossibleValue Comment="480 Cycles" Value="ADC_SAMPLETIME_480CYCLES"/>
+		<Description>Regular Channel x sampling time selection</Description>
+	</RefParameter>
+	<RefParameter Comment="Injected Sampling Time" DefaultValue="ADC_SAMPLETIME_3CYCLES" Name="InjectedSamplingTime" Type="list">
+		<PossibleValue Comment="3 Cycles" Value="ADC_SAMPLETIME_3CYCLES"/>
+		<PossibleValue Comment="15 Cycles" Value="ADC_SAMPLETIME_15CYCLES"/>
+		<PossibleValue Comment="28 Cycles" Value="ADC_SAMPLETIME_28CYCLES"/>
+		<PossibleValue Comment="56 Cycles" Value="ADC_SAMPLETIME_56CYCLES"/>
+		<PossibleValue Comment="84 Cycles" Value="ADC_SAMPLETIME_84CYCLES"/>
+		<PossibleValue Comment="112 Cycles" Value="ADC_SAMPLETIME_112CYCLES"/>
+		<PossibleValue Comment="144 Cycles" Value="ADC_SAMPLETIME_144CYCLES"/>
+		<PossibleValue Comment="480 Cycles" Value="ADC_SAMPLETIME_480CYCLES"/>
+		<Description>Injected Channel x sampling time selection</Description>
+	</RefParameter>
+	<RefParameter Comment="External Trigger Edge" DefaultValue="null" Name="ExternalTrigInjecConvEdge" Type="list" Group="ADCgroup" Visible="false">
+		<Condition Expression="InjNumberOfConversion=0" Diagnostic=""/>
+	</RefParameter>
+	<RefParameter Comment="Offset" DefaultValue="null" Max="2047" Min="0" Name="Offset" Type="integer" Group="ADCChannel">
+		<Description>Data offset for regular channel </Description>	
+	</RefParameter>
+	<RefParameter Comment="External Trigger Edge" DefaultValue="null" Name="ExternalTrigInjecConvEdge" Type="list" Group="ADCgroup" Visible="false">
+		<Condition Expression="($IpNumber=2)&amp;!(Mode=ADC_MODE_INDEPENDENT)" Diagnostic=""/>
+	</RefParameter>
+	<RefParameter Comment="External Trigger Edge" DefaultValue="null" Name="ExternalTrigInjecConvEdge" Type="list" Group="ADCgroup" Visible="false">
+		<Condition Expression="($IpNumber=3)&amp;(TripleMode|TripleMode_REGSIMULT|TripleMode0|TripleMode_REGSIMULT1| TripleMode1| TripleMode_REGSIMULT |TripleMode_Interl |TripleMode3)" Diagnostic=""/>
+	</RefParameter>
+	<RefParameter Comment="External Trigger Edge" DefaultValue="ADC_EXTERNALTRIGINJECCONVEDGE_NONE" Name="ExternalTrigInjecConvEdge" Type="list" Group="ADCgroup" Visible="true">
+		<Condition Expression="AutoInjected_$IpInstance &amp;!(InjNumberOfConversion=0)" Diagnostic=""/>
+		<PossibleValue Comment="None" Value="ADC_EXTERNALTRIGINJECCONVEDGE_NONE"/>
+	</RefParameter>
+	<RefParameter Comment="External Trigger Edge" DefaultValue="ADC_EXTERNALTRIGINJECCONVEDGE_NONE" Name="ExternalTrigInjecConvEdge" Type="list" Group="ADCgroup">
+		<PossibleValue Comment="None" Value="ADC_EXTERNALTRIGINJECCONVEDGE_NONE"/>
+		<PossibleValue Comment="Trigger detection on the rising edge" Value="ADC_EXTERNALTRIGINJECCONVEDGE_RISING"/>
+		<PossibleValue Comment="Trigger detection on the falling edge" Value="ADC_EXTERNALTRIGINJECCONVEDGE_FALLING"/>
+		<PossibleValue Comment="Trigger detection on both the rising and falling edges" Value="ADC_EXTERNALTRIGINJECCONVEDGE_RISINGFALLING"/>
+		<Description>Select the external trigger polarity and enable the trigger of a injected group</Description>
+	</RefParameter>
+	<RefParameter Comment="External Trigger Source" DefaultValue="null" Name="ExternalTrigInjecConv" Type="list" Group="ADCgroup" Visible="false">
+		<Condition Expression="(ExternalTrigInjecConvEdge=ADC_EXTERNALTRIGINJECCONVEDGE_NONE)" Diagnostic="External Trigger mode is selected"/>
+	</RefParameter>
+	<RefParameter Comment="External Trigger Source" DefaultValue="null" Name="ExternalTrigInjecConv" Type="list" Group="ADCgroup" Visible="false">
+		<Condition Expression="($IpNumber=2)&amp;!(Mode=ADC_MODE_INDEPENDENT)" Diagnostic="External Trigger mode is selected"/>
+	</RefParameter>
+	<RefParameter Comment="External Trigger Source" DefaultValue="null" Name="ExternalTrigInjecConv" Type="list" Group="ADCgroup" Visible="false">
+		<Condition Expression="($IpNumber=3)&amp;(TripleMode|TripleMode_REGSIMULT|TripleMode0|TripleMode_REGSIMULT1| TripleMode1| TripleMode_REGSIMULT |TripleMode_Interl |TripleMode3)" Diagnostic="External Trigger mode is selected"/>
+	</RefParameter>
+	<RefParameter Comment="External Trigger Source" DefaultValue="null" Name="ExternalTrigInjecConv" Type="list" Group="ADCgroup" Visible="false">
+		<Condition Expression="(InjNumberOfConversion=0)" Diagnostic="not available only for master instance"/>
+	</RefParameter>
+	<RefParameter Comment="External Trigger Source" DefaultValue="ADC_EXTERNALTRIGINJECCONV_T1_CC4" Name="ExternalTrigInjecConv" Type="list" Group="ADCgroup">
+		<Condition Expression="!(ExternalTrigInjecConvEdge=ADC_EXTERNALTRIGINJECCONVEDGE_NONE)&amp;(InjectedExternalTrigger)" Diagnostic=""/>
+		<PossibleValue Comment="EXTI line15" Value="ADC_EXTERNALTRIGINJECCONV_EXT_IT15"/>
+		<Description>EXTI Line15 is used for External-Trigger-for-Injected-conversion mode</Description>
+	</RefParameter>
+	<RefParameter Comment="External Trigger Source" DefaultValue="ADC_EXTERNALTRIGINJECCONV_T1_CC4" Name="ExternalTrigInjecConv" Type="list" Group="ADCgroup">
+		<PossibleValue Comment="Timer 1 Capture Compare 4 event" Value="ADC_EXTERNALTRIGINJECCONV_T1_CC4"/>
+		<PossibleValue Comment="Timer 1 Trigger Out event" Value="ADC_EXTERNALTRIGINJECCONV_T1_TRGO"/>
+		<PossibleValue Comment="Timer 2 Capture Compare 1 event" Value="ADC_EXTERNALTRIGINJECCONV_T2_CC1"/>
+		<PossibleValue Comment="Timer 2 Trigger Out event" Value="ADC_EXTERNALTRIGINJECCONV_T2_TRGO"/>
+		<PossibleValue Comment="Timer 3 Capture Compare 2 event" Value="ADC_EXTERNALTRIGINJECCONV_T3_CC2"/>
+		<PossibleValue Comment="Timer 3 Capture Compare 4 event" Value="ADC_EXTERNALTRIGINJECCONV_T3_CC4"/>
+		<PossibleValue Comment="Timer 4 Capture Compare 1 event" Value="ADC_EXTERNALTRIGINJECCONV_T4_CC1"/>
+		<PossibleValue Comment="Timer 4 Capture Compare 2 event" Value="ADC_EXTERNALTRIGINJECCONV_T4_CC2"/>
+		<PossibleValue Comment="Timer 4 Capture Compare 3 event" Value="ADC_EXTERNALTRIGINJECCONV_T4_CC3"/>
+		<PossibleValue Comment="Timer 4 Trigger Out event" Value="ADC_EXTERNALTRIGINJECCONV_T4_TRGO"/>
+		<PossibleValue Comment="Timer 5 Capture Compare 4 event" Value="ADC_EXTERNALTRIGINJECCONV_T5_CC4"/>
+		<PossibleValue Comment="Timer 5 Trigger Out event" Value="ADC_EXTERNALTRIGINJECCONV_T5_TRGO"/>
+		<PossibleValue Comment="Timer 8 Capture Compare 2 event" Value="ADC_EXTERNALTRIGINJECCONV_T8_CC2"/>
+		<PossibleValue Comment="Timer 8 Capture Compare 3 event" Value="ADC_EXTERNALTRIGINJECCONV_T8_CC3"/>
+		<PossibleValue Comment="Timer 8 Capture Compare 4 event" Value="ADC_EXTERNALTRIGINJECCONV_T8_CC4"/>
+		<Description>Select the external event used to trigger the start of conversion of an injected group</Description>
+	</RefParameter>
+	
+	<RefParameter Comment="Mode" DefaultValue="ADC_MODE_INDEPENDENT" Name="Mode" Type="list" Group="ADCsgroup">
+		<Condition Expression="USE_ADC1&amp;USE_ADC2&amp;USE_ADC3&amp;(ADC1:InjNumberOfConversion=0)&amp;(ADC2:InjNumberOfConversion=0)&amp;(ADC3:InjNumberOfConversion=0)" Diagnostic="All mode are available if ADC1, ADC2 and ADC3 are used"/>
+		<PossibleValue Comment="Independent mode" Value="ADC_MODE_INDEPENDENT"/>
+		<PossibleValue Comment="Dual combined regular simultaneous + injected simultaneous mode" Value="ADC_DUALMODE_REGSIMULT_INJECSIMULT" Semaphore="DualMode0"/>
+		<PossibleValue Comment="Dual combined regular simultaneous + alternate trigger mode" Value="ADC_DUALMODE_REGSIMULT_ALTERTRIG" Semaphore="DualMode_REGSIMULT1"/>
+		<PossibleValue Comment="Dual injected simultaneous mode only" Value="ADC_DUALMODE_INJECSIMULT" Semaphore="DualMode1"/>
+		<PossibleValue Comment="Dual regular simultaneous mode only" Value="ADC_DUALMODE_REGSIMULT" Semaphore="DualMode_REGSIMULT"/>
+		<PossibleValue Comment="Dual interleaved mode only" Value="ADC_DUALMODE_INTERL" Semaphore="DualMode_Interl"/>
+		<PossibleValue Comment="Dual alternate trigger mode only" Value="ADC_DUALMODE_ALTERTRIG" Semaphore="DualMode3"/>
+		<PossibleValue Comment="Triple combined regular simultaneous + injected simultaneous mode" Value="ADC_TRIPLEMODE_REGSIMULT_INJECSIMULT" Semaphore="TripleMode0"/>
+		<PossibleValue Comment="Triple combined regular simultaneous + alternate trigger mode" Value="ADC_TRIPLEMODE_REGSIMULT_AlterTrig" Semaphore="TripleMode_REGSIMULT1"/>
+		<PossibleValue Comment="Triple injected simultaneous mode only" Value="ADC_TRIPLEMODE_INJECSIMULT" Semaphore="TripleMode1"/>
+		<PossibleValue Comment="Triple regular simultaneous mode only" Value="ADC_TRIPLEMODE_REGSIMULT" Semaphore="TripleMode_REGSIMULT"/>
+		<PossibleValue Comment="Triple interleaved mode only" Value="ADC_TRIPLEMODE_INTERL" Semaphore="TripleMode_Interl"/>
+		<PossibleValue Comment="Triple alternate trigger mode only" Value="ADC_TRIPLEMODE_ALTERTRIG" Semaphore="TripleMode3"/>
+		<Description>Multi ADC mode selection</Description>
+	</RefParameter>
+	<RefParameter Comment="Mode" DefaultValue="ADC_MODE_INDEPENDENT" Name="Mode" Type="list" Group="ADCsgroup">
+		<Condition Expression="USE_ADC1&amp;USE_ADC2&amp;(ADC1:InjNumberOfConversion=0)&amp;(ADC2:InjNumberOfConversion=0)" Diagnostic="Triple mode should not be available if ADC3 is not used"/>
+		<PossibleValue Comment="Independent mode" Value="ADC_MODE_INDEPENDENT"/>
+		<PossibleValue Comment="Dual combined regular simultaneous + injected simultaneous mode" Value="ADC_DUALMODE_REGSIMULT_INJECSIMULT" Semaphore="DualMode0"/>
+		<PossibleValue Comment="Dual combined regular simultaneous + alternate trigger mode" Value="ADC_DUALMODE_REGSIMULT_ALTERTRIG" Semaphore="DualMode_REGSIMULT1"/>
+		<PossibleValue Comment="Dual injected simultaneous mode only" Value="ADC_DUALMODE_INJECSIMULT" Semaphore="DualMode1"/>
+		<PossibleValue Comment="Dual regular simultaneous mode only" Value="ADC_DUALMODE_REGSIMULT" Semaphore="DualMode_REGSIMULT"/>
+		<PossibleValue Comment="Dual interleaved mode only" Value="ADC_DUALMODE_INTERL" Semaphore="DualMode_Interl"/>
+		<PossibleValue Comment="Dual alternate trigger mode only" Value="ADC_DUALMODE_ALTERTRIG" Semaphore="DualMode3"/>
+		<Description>Multi ADC mode selection</Description>
+	</RefParameter>
+	<RefParameter Comment="Mode" DefaultValue="ADC_MODE_INDEPENDENT" Name="Mode" Type="list" Group="ADCsgroup">
+		<Condition Expression="USE_ADC1&amp;USE_ADC2&amp;USE_ADC3" Diagnostic="Regular simultanious mode should not be available for injected conversion"/>
+		<PossibleValue Comment="Independent mode" Value="ADC_MODE_INDEPENDENT"/>
+		<PossibleValue Comment="Dual combined regular simultaneous + injected simultaneous mode" Value="ADC_DUALMODE_REGSIMULT_INJECSIMULT" Semaphore="DualMode0"/>
+		<PossibleValue Comment="Dual injected simultaneous mode only" Value="ADC_DUALMODE_INJECSIMULT" Semaphore="DualMode1"/>
+		<PossibleValue Comment="Dual interleaved mode only" Value="ADC_DUALMODE_INTERL" Semaphore="DualMode_Interl"/>
+		<PossibleValue Comment="Dual alternate trigger mode only" Value="ADC_DUALMODE_ALTERTRIG" Semaphore="DualMode3"/>
+		<PossibleValue Comment="Triple combined regular simultaneous + injected simultaneous mode" Value="ADC_TRIPLEMODE_REGSIMULT_INJECSIMULT" Semaphore="TripleMode0"/>
+		<PossibleValue Comment="Triple injected simultaneous mode only" Value="ADC_TRIPLEMODE_INJECSIMULT" Semaphore="TripleMode1"/>
+		<PossibleValue Comment="Triple interleaved mode only" Value="ADC_TRIPLEMODE_INTERL" Semaphore="TripleMode_Interl"/>
+		<PossibleValue Comment="Triple alternate trigger mode only" Value="ADC_TRIPLEMODE_ALTERTRIG" Semaphore="TripleMode3"/>
+		<Description>Multi ADC mode selection</Description>
+	</RefParameter>
+	<RefParameter Comment="Mode" DefaultValue="ADC_MODE_INDEPENDENT" Name="Mode" Type="list" Group="ADCsgroup">
+		<Condition Expression="USE_ADC1&amp;USE_ADC2" Diagnostic="Regular simultanious mode should not be available for injected conversion"/>
+		<PossibleValue Comment="Independent mode" Value="ADC_MODE_INDEPENDENT"/>
+		<PossibleValue Comment="Dual combined regular simultaneous + injected simultaneous mode" Value="ADC_DUALMODE_REGSIMULT_INJECSIMULT" Semaphore="DualMode0"/>
+		<PossibleValue Comment="Dual injected simultaneous mode only" Value="ADC_DUALMODE_INJECSIMULT" Semaphore="DualMode1"/>
+		<PossibleValue Comment="Dual interleaved mode only" Value="ADC_DUALMODE_INTERL" Semaphore="DualMode_Interl"/>
+		<PossibleValue Comment="Dual alternate trigger mode only" Value="ADC_DUALMODE_ALTERTRIG" Semaphore="DualMode3"/>
+	</RefParameter>
+	
+	<!--RefParameter Comment="Mode" DefaultValue="ADC_MODE_INDEPENDENT" Name="Mode" Type="list" Group="ADCsgroup">
+		<Condition Expression="USE_ADC1&amp;!USE_ADC2&amp;USE_ADC3" Diagnostic="Only independent mode is available if ADC2 and ADC3 are not used"/>
+		<PossibleValue Comment="Independent mode" Value="ADC_MODE_INDEPENDENT"/>
+		<Description>Multi ADC mode selection</Description>
+	</RefParameter-->
+	<RefParameter Comment="Mode" DefaultValue="ADC_MODE_INDEPENDENT" Name="Mode" Type="list" Group="ADCsgroup">
+		<PossibleValue Comment="Independent mode" Value="ADC_MODE_INDEPENDENT"/>
+		<Description>Multi ADC mode selection</Description>
+	</RefParameter>
+	
+	<RefParameter Comment="DMA Access Mode" DefaultValue="ADC_DMAACCESSMODE_2" Name="DMAAccessMode" Type="list" Group="ADCsgroup">
+		<Condition Expression="(DMARequest_$IpInstance)&amp;(DualMode_REGSIMULT|DualMode0|DualMode_REGSIMULT1)" Diagnostic="DMA access mode should be available only if multi mode is used in regular simultanious"/>
+		<!-- <PossibleValue Comment="DMA access mode disabled" Value="ADC_DMAACCESSMODE_DISABLED"/> -->
+		<PossibleValue Comment="DMA access mode 2" Value="ADC_DMAACCESSMODE_2" Semaphore="Semaphore_DMAAccessMode2_Enable$IpInstance"/>
+	</RefParameter>
+	<RefParameter Comment="DMA Access Mode" DefaultValue="ADC_DMAACCESSMODE_DISABLED" Name="DMAAccessMode" Type="list" Group="ADCsgroup">
+		<Condition Expression="DualMode_REGSIMULT|DualMode0|DualMode_REGSIMULT1" Diagnostic="DMA access mode should be available only if multi mode is used in regular simultanious"/>
+		<PossibleValue Comment="DMA access mode disabled" Value="ADC_DMAACCESSMODE_DISABLED"/>
+		<!--PossibleValue Comment="DMA access mode 1" Value="ADC_DMAACCESSMODE_1"/-->
+		<PossibleValue Comment="DMA access mode 2" Value="ADC_DMAACCESSMODE_2" Semaphore="Semaphore_DMAAccessMode2_Enable$IpInstance"/>
+	</RefParameter>
+	
+	<RefParameter Comment="DMA Access Mode" DefaultValue="ADC_DMAACCESSMODE_1" Name="DMAAccessMode" Type="list" Group="ADCsgroup">
+		<Condition Expression="(DMARequest_$IpInstance)&amp;(TripleMode_REGSIMULT|TripleMode_REGSIMULT1|TripleMode0)" Diagnostic="DMA access mode should be available only if multi mode is used in regular simultanious"/>
+		<!-- <PossibleValue Comment="DMA access mode disabled" Value="ADC_DMAACCESSMODE_DISABLED"/> -->
+		<PossibleValue Comment="DMA access mode 1" Value="ADC_DMAACCESSMODE_1" Semaphore="Semaphore_DMAAccessMode1_Enable$IpInstance"/>
+	</RefParameter>
+	<RefParameter Comment="DMA Access Mode" DefaultValue="ADC_DMAACCESSMODE_DISABLED" Name="DMAAccessMode" Type="list" Group="ADCsgroup">
+		<Condition Expression="TripleMode_REGSIMULT|TripleMode_REGSIMULT1|TripleMode0" Diagnostic="DMA access mode should be available only if multi mode is used in regular simultanious"/>
+		<PossibleValue Comment="DMA access mode disabled" Value="ADC_DMAACCESSMODE_DISABLED"/>
+		<PossibleValue Comment="DMA access mode 1" Value="ADC_DMAACCESSMODE_1" Semaphore="Semaphore_DMAAccessMode1_Enable$IpInstance"/>
+	</RefParameter>
+	
+	<RefParameter Comment="DMA Access Mode" DefaultValue="ADC_DMAACCESSMODE_3" Name="DMAAccessMode" Type="list" Group="ADCsgroup">
+		<Condition Expression="(DMARequest_$IpInstance)&amp;(TripleMode_Interl)&amp;(((ADC1:Resolution=ADC_RESOLUTION8b)&amp;(ADC2:Resolution=ADC_RESOLUTION8b)&amp;(ADC3:Resolution=ADC_RESOLUTION8b))|((ADC1:Resolution=ADC_RESOLUTION6b)&amp;(ADC2:Resolution=ADC_RESOLUTION6b)&amp;(ADC3:Resolution=ADC_RESOLUTION6b)))" Diagnostic="DMA Access mode 3 is used in interleaved mode in 6-bit and 8-bit resolutions."/>
+		<!-- <PossibleValue Comment="DMA access mode disabled" Value="ADC_DMAACCESSMODE_DISABLED"/> -->
+		<PossibleValue Comment="DMA access mode 2" Value="ADC_DMAACCESSMODE_2" Semaphore="Semaphore_DMAAccessMode2_Enable$IpInstance"/>
+		<PossibleValue Comment="DMA access mode 3" Value="ADC_DMAACCESSMODE_3" Semaphore="Semaphore_DMAAccessMode3_Enable$IpInstance"/>
+	</RefParameter>
+	<RefParameter Comment="DMA Access Mode" DefaultValue="ADC_DMAACCESSMODE_DISABLED" Name="DMAAccessMode" Type="list" Group="ADCsgroup">
+		<Condition Expression="(TripleMode_Interl)&amp;(((ADC1:Resolution=ADC_RESOLUTION8b)&amp;(ADC2:Resolution=ADC_RESOLUTION8b)&amp;(ADC3:Resolution=ADC_RESOLUTION8b))|((ADC1:Resolution=ADC_RESOLUTION6b)&amp;(ADC2:Resolution=ADC_RESOLUTION6b)&amp;(ADC3:Resolution=ADC_RESOLUTION6b)))" Diagnostic="DMA Access mode 3 is used in interleaved mode in 6-bit and 8-bit resolutions."/>
+		<PossibleValue Comment="DMA access mode disabled" Value="ADC_DMAACCESSMODE_DISABLED"/>
+		<PossibleValue Comment="DMA access mode 2" Value="ADC_DMAACCESSMODE_2" Semaphore="Semaphore_DMAAccessMode2_Enable$IpInstance"/>
+		<PossibleValue Comment="DMA access mode 3" Value="ADC_DMAACCESSMODE_3" Semaphore="Semaphore_DMAAccessMode3_Enable$IpInstance"/>
+	</RefParameter>
+	
+	<RefParameter Comment="DMA Access Mode" DefaultValue="ADC_DMAACCESSMODE_3" Name="DMAAccessMode" Type="list" Group="ADCsgroup">
+		<Condition Expression="(DMARequest_$IpInstance)&amp;(DualMode_Interl)&amp;(((ADC1:Resolution=ADC_RESOLUTION8b)&amp;(ADC2:Resolution=ADC_RESOLUTION8b))|((ADC1:Resolution=ADC_RESOLUTION6b)&amp;(ADC2:Resolution=ADC_RESOLUTION6b)))" Diagnostic="DMA Access mode 3 is used in interleaved mode in 6-bit and 8-bit resolutions."/>
+		<!-- <PossibleValue Comment="DMA access mode disabled" Value="ADC_DMAACCESSMODE_DISABLED"/> -->
+		<PossibleValue Comment="DMA access mode 2" Value="ADC_DMAACCESSMODE_2" Semaphore="Semaphore_DMAAccessMode2_Enable$IpInstance"/>
+		<PossibleValue Comment="DMA access mode 3" Value="ADC_DMAACCESSMODE_3" Semaphore="Semaphore_DMAAccessMode3_Enable$IpInstance"/>
+	</RefParameter>
+	<RefParameter Comment="DMA Access Mode" DefaultValue="ADC_DMAACCESSMODE_DISABLED" Name="DMAAccessMode" Type="list" Group="ADCsgroup">
+		<Condition Expression="(DualMode_Interl)&amp;(((ADC1:Resolution=ADC_RESOLUTION8b)&amp;(ADC2:Resolution=ADC_RESOLUTION8b))|((ADC1:Resolution=ADC_RESOLUTION6b)&amp;(ADC2:Resolution=ADC_RESOLUTION6b)))" Diagnostic="DMA Access mode 3 is used in interleaved mode in 6-bit and 8-bit resolutions."/>
+		<PossibleValue Comment="DMA access mode disabled" Value="ADC_DMAACCESSMODE_DISABLED"/>
+		<PossibleValue Comment="DMA access mode 2" Value="ADC_DMAACCESSMODE_2" Semaphore="Semaphore_DMAAccessMode2_Enable$IpInstance"/>
+		<PossibleValue Comment="DMA access mode 3" Value="ADC_DMAACCESSMODE_3" Semaphore="Semaphore_DMAAccessMode3_Enable$IpInstance"/>
+	</RefParameter>
+	
+	<RefParameter Comment="DMA Access Mode" DefaultValue="ADC_DMAACCESSMODE_2" Name="DMAAccessMode" Type="list" Group="ADCsgroup">
+		<Condition Expression="(DMARequest_$IpInstance)&amp;(TripleMode_Interl|DualMode_Interl)" Diagnostic="DAM Access mode 2 is used in interleaved mode and in regular simultaneous mode (for Dual ADC mode only)."/>
+		<!-- <PossibleValue Comment="DMA access mode disabled" Value="ADC_DMAACCESSMODE_DISABLED"/> -->
+		<PossibleValue Comment="DMA access mode 2" Value="ADC_DMAACCESSMODE_2" Semaphore="Semaphore_DMAAccessMode2_Enable$IpInstance"/>
+	</RefParameter>
+	<RefParameter Comment="DMA Access Mode" DefaultValue="ADC_DMAACCESSMODE_DISABLED" Name="DMAAccessMode" Type="list" Group="ADCsgroup">
+		<Condition Expression="TripleMode_Interl|DualMode_Interl" Diagnostic="DAM Access mode 2 is used in interleaved mode and in regular simultaneous mode (for Dual ADC mode only)."/>
+		<PossibleValue Comment="DMA access mode disabled" Value="ADC_DMAACCESSMODE_DISABLED"/>
+		<PossibleValue Comment="DMA access mode 2" Value="ADC_DMAACCESSMODE_2" Semaphore="Semaphore_DMAAccessMode2_Enable$IpInstance"/>
+	</RefParameter>
+	
+	<RefParameter Comment="DMA Access Mode" DefaultValue="null" Name="DMAAccessMode" Type="list" Group="ADCsgroup" Visible="false">
+	</RefParameter>
+	
+	<RefParameter Comment="Delay between 2 sampling phases" DefaultValue="ADC_TWOSAMPLINGDELAY_5CYCLES" Name="TwoSamplingDelay" Type="list" Group="ADCsgroup">
+		<PossibleValue Comment="5 Cycles" Value="ADC_TWOSAMPLINGDELAY_5CYCLES"/>
+		<PossibleValue Comment="6 Cycles" Value="ADC_TWOSAMPLINGDELAY_6CYCLES"/>
+		<PossibleValue Comment="7 Cycles" Value="ADC_TWOSAMPLINGDELAY_7CYCLES"/>
+		<PossibleValue Comment="8 Cycles" Value="ADC_TWOSAMPLINGDELAY_8CYCLES"/>
+		<PossibleValue Comment="9 Cycles" Value="ADC_TWOSAMPLINGDELAY_9CYCLES"/>
+		<PossibleValue Comment="10 Cycles" Value="ADC_TWOSAMPLINGDELAY_10CYCLES"/>
+		<PossibleValue Comment="11 Cycles" Value="ADC_TWOSAMPLINGDELAY_11CYCLES"/>
+		<PossibleValue Comment="12 Cycles" Value="ADC_TWOSAMPLINGDELAY_12CYCLES"/>
+		<PossibleValue Comment="13 Cycles" Value="ADC_TWOSAMPLINGDELAY_13CYCLES"/>
+		<PossibleValue Comment="14 Cycles" Value="ADC_TWOSAMPLINGDELAY_14CYCLES"/>
+		<PossibleValue Comment="15 Cycles" Value="ADC_TWOSAMPLINGDELAY_15CYCLES"/>
+		<PossibleValue Comment="16 Cycles" Value="ADC_TWOSAMPLINGDELAY_16CYCLES"/>
+		<PossibleValue Comment="17 Cycles" Value="ADC_TWOSAMPLINGDELAY_17CYCLES"/>
+		<PossibleValue Comment="18 Cycles" Value="ADC_TWOSAMPLINGDELAY_18CYCLES"/>
+		<PossibleValue Comment="19 Cycles" Value="ADC_TWOSAMPLINGDELAY_19CYCLES"/>
+		<PossibleValue Comment="20 Cycles" Value="ADC_TWOSAMPLINGDELAY_20CYCLES"/>
+		<Description>Delay between 2 sampling phases</Description>
+	</RefParameter>
+	<RefParameter Comment="Watchdog Mode" DefaultValue="null" Name="WatchdogMode" Type="list" Group="ADCgroup" Visible="false">
+		<Condition Expression="EnableAnalogWatchDog=false" Diagnostic=""/>
+	</RefParameter>
+        <RefParameter Comment="Watchdog Mode" DefaultValue="ADC_ANALOGWATCHDOG_SINGLE_REG" Name="WatchdogMode" Type="list" Group="ADCgroup">
+                <Condition Expression="InjNumberOfConversion=0" Diagnostic=""/>
+		<PossibleValue Comment="Single regular channel" Value="ADC_ANALOGWATCHDOG_SINGLE_REG"  Semaphore="SingleRegular$IpInstance"/>
+		<PossibleValue Comment="Single regular or injected channel" Value="ADC_ANALOGWATCHDOG_SINGLE_REGINJEC" Semaphore="SingleInjectedOrRegular$IpInstance"/>
+		<PossibleValue Comment="All regular channel" Value="ADC_ANALOGWATCHDOG_ALL_REG"/>
+		<PossibleValue Comment="All regular and injected channel" Value="ADC_ANALOGWATCHDOG_ALL_REGINJEC"/>
+		<PossibleValue Comment="None" Value="ADC_ANALOGWATCHDOG_NONE"/>
+		<Description>Configures the ADC analog watchdog mode.</Description>
+	</RefParameter>
+	<RefParameter Comment="Watchdog Mode" DefaultValue="ADC_ANALOGWATCHDOG_SINGLE_REG" Name="WatchdogMode" Type="list" Group="ADCgroup">
+		<PossibleValue Comment="Single regular channel" Value="ADC_ANALOGWATCHDOG_SINGLE_REG"  Semaphore="SingleRegular$IpInstance"/>
+		<PossibleValue Comment="Single injected channel" Value="ADC_ANALOGWATCHDOG_SINGLE_INJEC" Semaphore="SingleInjected$IpInstance"/>
+		<PossibleValue Comment="Single regular or injected channel" Value="ADC_ANALOGWATCHDOG_SINGLE_REGINJEC" Semaphore="SingleInjectedOrRegular$IpInstance"/>
+		<PossibleValue Comment="All regular channel" Value="ADC_ANALOGWATCHDOG_ALL_REG" Semaphore="AllRegular$IpInstance"/>
+		<PossibleValue Comment="All injected channel" Value="ADC_ANALOGWATCHDOG_ALL_INJEC" Semaphore="AllInjected$IpInstance"/>
+		<PossibleValue Comment="All regular and injected channel" Value="ADC_ANALOGWATCHDOG_ALL_REGINJEC" Semaphore="AllRegInjected$IpInstance"/>
+		<PossibleValue Comment="None" Value="ADC_ANALOGWATCHDOG_NONE" Semaphore="NoneWDG$IpInstance"/>
+		<Description>Configures the ADC analog watchdog mode.</Description>
+	</RefParameter>
+	<!-- -->
+	<RefParameter Comment="Analog WatchDog Channel" DefaultValue="null" Name="WatchdogChannel" Type="list" Group="ADCChannel" Visible="false">
+		<Condition Expression="(EnableAnalogWatchDog=false)" Diagnostic=""/>
+	</RefParameter>
+       <RefParameter Comment="Analog WatchDog Channel" DefaultValue="null" Name="WatchdogChannel" Type="list" Group="ADCChannel" Visible="false">
+		<Condition Expression="AllRegular$IpInstance" Diagnostic=""/>
+	</RefParameter>
+        <RefParameter Comment="Analog WatchDog Channel" DefaultValue="null" Name="WatchdogChannel" Type="list" Group="ADCChannel" Visible="false">
+		<Condition Expression="AllInjected$IpInstance" Diagnostic=""/>
+	</RefParameter>
+        <RefParameter Comment="Analog WatchDog Channel" DefaultValue="null" Name="WatchdogChannel" Type="list" Group="ADCChannel" Visible="false">
+		<Condition Expression="AllRegInjected$IpInstance|NoneWDG$IpInstance" Diagnostic=""/>
+	</RefParameter>
+        
+	<RefParameter Comment="Analog WatchDog Channel" DefaultValue="" Name="WatchdogChannel" Type="list" Group="ADCChannel" Visible="true">
+		<PossibleValue Comment="Channel 0" Value="ADC_CHANNEL_0"/>
+		<PossibleValue Comment="Channel 1" Value="ADC_CHANNEL_1"/>
+		<PossibleValue Comment="Channel 2" Value="ADC_CHANNEL_2"/>
+		<PossibleValue Comment="Channel 3" Value="ADC_CHANNEL_3"/>
+		<PossibleValue Comment="Channel 4" Value="ADC_CHANNEL_4"/>
+		<PossibleValue Comment="Channel 5" Value="ADC_CHANNEL_5"/>
+		<PossibleValue Comment="Channel 6" Value="ADC_CHANNEL_6"/>
+		<PossibleValue Comment="Channel 7" Value="ADC_CHANNEL_7"/>
+		<PossibleValue Comment="Channel 8" Value="ADC_CHANNEL_8"/>
+		<PossibleValue Comment="Channel 9" Value="ADC_CHANNEL_9"/>
+		<PossibleValue Comment="Channel 10" Value="ADC_CHANNEL_10"/>
+		<PossibleValue Comment="Channel 11" Value="ADC_CHANNEL_11"/>
+		<PossibleValue Comment="Channel 12" Value="ADC_CHANNEL_12"/>
+		<PossibleValue Comment="Channel 13" Value="ADC_CHANNEL_13"/>
+		<PossibleValue Comment="Channel 14" Value="ADC_CHANNEL_14"/>
+		<PossibleValue Comment="Channel 15" Value="ADC_CHANNEL_15"/>
+		<PossibleValue Comment="Channel 16" Value="ADC_CHANNEL_16"/>
+		<PossibleValue Comment="Channel 17" Value="ADC_CHANNEL_17"/>
+		<PossibleValue Comment="Channel 18" Value="ADC_CHANNEL_18"/>
+		<PossibleValue Comment="Channel Temperature sensor" Value="ADC_CHANNEL_TEMPSENSOR"/>
+		<PossibleValue Comment="Channel Vrefint" Value="ADC_CHANNEL_VREFINT"/>
+		<PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT"/>
+		<Description>ADC channel for the analog watchdog</Description>
+	</RefParameter>
+	<!-- ChannelForWatchDog used to specify witch channel list to be available for analog watch dog mode-->
+	<RefParameter Comment="Channel type for WatchDog" DefaultValue="Regular" Name="ChannelForWatchDog" Type="list" Visible="false">
+		<Condition Expression="SingleRegular$IpInstance" Diagnostic=""/>
+		<PossibleValue Comment="Regular" Value="Regular"/>
+	</RefParameter>
+	<RefParameter Comment="Channel type for WatchDog" DefaultValue="Injected" Name="ChannelForWatchDog" Type="list" Visible="false">
+		<Condition Expression="SingleInjected$IpInstance" Diagnostic=""/>
+		<PossibleValue Comment="Injected" Value="Injected"/>
+	</RefParameter>
+	<RefParameter Comment="Channel type for WatchDog" DefaultValue="InjectedOrRegular" Name="ChannelForWatchDog" Type="list" Visible="false">
+		<Condition Expression="SingleInjectedOrRegular$IpInstance" Diagnostic=""/>
+		<PossibleValue Comment="InjectedOrRegular" Value="InjectedOrRegular"/>
+	</RefParameter>
+	<RefParameter Comment="Channel type for WatchDog" DefaultValue="none" Name="ChannelForWatchDog" Type="list" Visible="false">
+		<PossibleValue Comment="none" Value="none"/>
+	</RefParameter>
+	<!--	<Condition Expression="!(WatchdogMode=ADC_ANALOGWATCHDOG_SINGLE_REG)&amp;!(WatchdogMode=ADC_ANALOGWATCHDOG_SINGLE_INJEC)&amp;!(WatchdogMode=ADC_ANALOGWATCHDOG_SINGLE_REGINJEC)" Diagnostic=""/>-->
+	<RefParameter Comment="Analog WatchDog Channel" DefaultValue="channel" Name="AnalogWDChannel" Type="list" Group="ADCChannel">
+		<Condition Expression="master=1" Diagnostic=""/>
+		<PossibleValue Comment="Channel 0" Value="ADC_CHANNEL_0"/>
+		<PossibleValue Comment="Channel 1" Value="ADC_CHANNEL_1"/>
+		<PossibleValue Comment="Channel 2" Value="ADC_CHANNEL_2"/>
+		<PossibleValue Comment="Channel 3" Value="ADC_CHANNEL_3"/>
+		<PossibleValue Comment="Channel 4" Value="ADC_CHANNEL_4"/>
+		<PossibleValue Comment="Channel 5" Value="ADC_CHANNEL_5"/>
+		<PossibleValue Comment="Channel 6" Value="ADC_CHANNEL_6"/>
+		<PossibleValue Comment="Channel 7" Value="ADC_CHANNEL_7"/>
+		<PossibleValue Comment="Channel 8" Value="ADC_CHANNEL_8"/>
+		<PossibleValue Comment="Channel 9" Value="ADC_CHANNEL_9"/>
+		<PossibleValue Comment="Channel 10" Value="ADC_CHANNEL_10"/>
+		<PossibleValue Comment="Channel 11" Value="ADC_CHANNEL_11"/>
+		<PossibleValue Comment="Channel 12" Value="ADC_CHANNEL_12"/>
+		<PossibleValue Comment="Channel 13" Value="ADC_CHANNEL_13"/>
+		<PossibleValue Comment="Channel 14" Value="ADC_CHANNEL_14"/>
+		<PossibleValue Comment="Channel 15" Value="ADC_CHANNEL_15"/>
+		<PossibleValue Comment="Channel 16" Value="ADC_CHANNEL_16"/>
+		<PossibleValue Comment="Channel 17" Value="ADC_CHANNEL_17"/>
+		<PossibleValue Comment="Channel 18" Value="ADC_CHANNEL_18"/>
+		<PossibleValue Comment="Channel Temperature sensor" Value="ADC_CHANNEL_TEMPSENSOR"/>
+		<PossibleValue Comment="Channel Vrefint" Value="ADC_CHANNEL_VREFINT"/>
+		<PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT"/>
+		<Description>ADC channel for the analog watchdog</Description> 
+	</RefParameter>
+	<RefParameter Comment="Analog WatchDog Channel" DefaultValue="channel" Name="AnalogWDChannel" Type="list" Group="ADCChannel">
+		<PossibleValue Comment="Channel 0" Value="ADC_CHANNEL_0"/>
+		<PossibleValue Comment="Channel 1" Value="ADC_CHANNEL_1"/>
+		<PossibleValue Comment="Channel 2" Value="ADC_CHANNEL_2"/>
+		<PossibleValue Comment="Channel 3" Value="ADC_CHANNEL_3"/>
+		<PossibleValue Comment="Channel 4" Value="ADC_CHANNEL_4"/>
+		<PossibleValue Comment="Channel 5" Value="ADC_CHANNEL_5"/>
+		<PossibleValue Comment="Channel 6" Value="ADC_CHANNEL_6"/>
+		<PossibleValue Comment="Channel 7" Value="ADC_CHANNEL_7"/>
+		<PossibleValue Comment="Channel 8" Value="ADC_CHANNEL_8"/>
+		<PossibleValue Comment="Channel 9" Value="ADC_CHANNEL_9"/>
+		<PossibleValue Comment="Channel 10" Value="ADC_CHANNEL_10"/>
+		<PossibleValue Comment="Channel 11" Value="ADC_CHANNEL_11"/>
+		<PossibleValue Comment="Channel 12" Value="ADC_CHANNEL_12"/>
+		<PossibleValue Comment="Channel 13" Value="ADC_CHANNEL_13"/>
+		<PossibleValue Comment="Channel 14" Value="ADC_CHANNEL_14"/>
+		<PossibleValue Comment="Channel 15" Value="ADC_CHANNEL_15"/>
+		<PossibleValue Comment="Channel 16" Value="ADC_CHANNEL_16"/>
+		<PossibleValue Comment="Channel 17" Value="ADC_CHANNEL_17"/>
+		<PossibleValue Comment="Channel 18" Value="ADC_CHANNEL_18"/>
+		<Description>ADC channel for the analog watchdog</Description> 
+	</RefParameter>
+	<RefParameter Comment="High Threshold" DefaultValue="null" Name="HighThreshold" Type="list" Group="ADCgroup" Visible="false">
+		<Condition Expression="EnableAnalogWatchDog=false" Diagnostic=""/>
+	</RefParameter>
+	<RefParameter Comment="High Threshold" DefaultValue="0" Max="4095" Min="0" Name="HighThreshold" Type="integer" Group="ADCgroup">
+		<Description>Configures the ADC analog watchdog High threshold value.</Description>	
+	</RefParameter>
+	<RefParameter Comment="Low Threshold" DefaultValue="null" Name="LowThreshold" Type="list" Group="ADCgroup" Visible="false">
+		<Condition Expression="EnableAnalogWatchDog=false" Diagnostic=""/>
+	</RefParameter>
+
+	<RefParameter Comment="Low Threshold" DefaultValue="0" Max="4095" Min="0" Name="LowThreshold" Type="integer" Group="ADCgroup">
+	<Description>Configures the ADC analog watchdog Low threshold value.</Description>
+	</RefParameter>
+	<RefParameter Comment="Interrupt Mode" DefaultValue="null" Name="ITMode" Type="list" Group="ADCgroup" Visible="false">
+		<Condition Expression="EnableAnalogWatchDog=false" Diagnostic=""/>
+	</RefParameter>
+	<RefParameter Comment="Interrupt Mode" DefaultValue="DISABLE" Name="ITMode" Type="list" Group="ADCgroup">
+		<PossibleValue Comment="Disabled" Value="DISABLE"/>
+		<PossibleValue Comment="Enabled" Value="ENABLE"/>
+		<Description>Specifies whether the analog watchdog is configured is interrupt mode or in polling mode.</Description>
+	</RefParameter>
+	<RefParameter Comment="Enable Analog WatchDog Mode" DefaultValue="false" Name="EnableAnalogWatchDog" Type="boolean" Group="ADCgroup">
+		<PossibleValue Comment="true" Value="true"/>
+		<PossibleValue Comment="false" Value="false"/>
+		<Description>Enable/Disable Analog WatchDog Mode</Description> 
+	</RefParameter>
+	<RefParameter Comment="Injected Conversion Mode" DefaultValue="null" Name="InjectedConvMode" Type="list" Visible="false">
+		<Condition Expression="InjNumberOfConversion=0" Diagnostic=""/>
+	</RefParameter>
+	<!-- <RefParameter Comment="Injected Conversion Mode" DefaultValue="None" Name="InjectedConvMode" Type="list">
+                <Condition Expression="DiscontinuousConvMode=ENABLE" Diagnostic=""/>
+		<PossibleValue Comment="None" Value="None"/>
+		<PossibleValue Comment="Auto Injetcted Mode" Value="AutoInjected"/>
+	</RefParameter>-->
+	<RefParameter Comment="Injected Conversion Mode" DefaultValue="None" Name="InjectedConvMode" Type="list">
+		<Condition Expression="DiscontinuousConvMode=ENABLE" Diagnostic="Discontinuous mode could not be used on regular and injected group at the same time"/>
+		<PossibleValue Comment="None" Value="None"/>
+		<PossibleValue Comment="Auto Injected Mode" Value="AutoInjected"/>
+	</RefParameter>
+	<RefParameter Comment="Injected Conversion Mode" DefaultValue="None" Name="InjectedConvMode" Type="list">
+		<PossibleValue Comment="None" Value="None"/>
+		<PossibleValue Comment="Discontinuous Mode" Value="Discontinuous" Semaphore="InjectedDiscontinuous_$IpInstance"/>
+		<PossibleValue Comment="Auto Injected Mode" Value="AutoInjected"  Semaphore="AutoInjected_$IpInstance"/>
+		<Description>Injected Conversion Mode selection</Description>
+	</RefParameter>
+	<RefParameter Comment="Injected Discontinuous Conversion Mode" DefaultValue="ENABLE" Name="InjectedDiscontinuousConvMode" Type="list" Visible="false">
+		<Condition Expression="InjectedDiscontinuous_$IpInstance" Diagnostic=""/>
+		<PossibleValue Comment="Enabled" Value="ENABLE"/>
+	</RefParameter>
+	<RefParameter Comment="Injected Discontinuous Conversion Mode" DefaultValue="null" Name="InjectedDiscontinuousConvMode" Type="list" Visible="false">
+	</RefParameter>
+	<RefParameter Comment="Automatic Injected Conversion" DefaultValue="ENABLE" Name="AutoInjectedConv" Type="list" Visible="false">
+		<Condition Expression="AutoInjected_$IpInstance" Diagnostic=""/>
+		<PossibleValue Comment="Enabled" Value="ENABLE"/>
+	</RefParameter>
+	<RefParameter Comment="Automatic Injected Conversion" DefaultValue="null" Name="AutoInjectedConv" Type="list" Visible="false"/>
+	
+	<RefParameter Comment="Injected Offset" DefaultValue="0" Max="4095" Min="0" Name="InjectedOffset" Type="integer">
+		<Description>Data offset for injected channel </Description>
+	</RefParameter>
+	<RefMode Name="ADCs_Common_Settings" Comment="ADCs Common Settings" Group="ADCs_Common_Settings">
+		<ConfigForMode>multiMode</ConfigForMode>
+		<Parameter Name="Mode"/>
+		<Parameter Name="DMAAccessMode"/>
+		<Parameter Name="TwoSamplingDelay"/>
+	</RefMode>
+	<RefMode Name="ADC_Settings" Comment="ADCx Settings" Group="ADC_Settings">
+		<ConfigForMode>ADC_RegularConfig</ConfigForMode>
+		<Parameter Name="ClockPrescaler"/>
+		<Parameter Name="Resolution"/>
+		<Parameter Name="master"/>
+		<Parameter Name="DataAlign"/>
+		<Parameter Name="ScanConvMode"/>
+		<Parameter Name="ContinuousConvMode"/>
+		<Parameter Name="DiscontinuousConvMode"/>
+		<Parameter Name="NbrOfDiscConversion"/>
+		<Parameter Name="DMAContinuousRequests"/>
+		<Parameter Name="EOCSelection"/>
+	</RefMode>
+	<RefMode Name="ADC_Regular_ConversionMode" Comment="Regular Conversion Settings" Group="ADC_Regular_ConversionMode" Abstract="true">
+		<Parameter Name="NbrOfConversionFlag"/>
+		<Parameter Name="NbrOfConversion"/>
+		<Parameter Name="ExternalTrigConvEdge"/>
+		<Parameter Name="ExternalTrigConv"/>
+	</RefMode>
+	<RefMode Name="ADC_Injected_ConversionMode" Comment="Injected Conversion Settings" Group="ADC_Injected_ConversionMode" Abstract="true">
+		<Parameter Name="InjNumberOfConversion"/>
+		<Parameter Name="ExternalTrigInjecConvEdge"/>
+		<Parameter Name="ExternalTrigInjecConv"/>
+		<Parameter Name="InjectedConvMode"/>
+		<Parameter Name="AutoInjectedConv"/>
+		<Parameter Name="InjectedDiscontinuousConvMode"/>
+	</RefMode>
+	<RefMode Name="ChannelRegularConversion" Comment="Regular Channel Settings" BaseMode="ADC_Regular_ConversionMode" Group="ADC_Regular_ConversionMode">
+		<ConfigForMode>ADC_RegularChannelConfig</ConfigForMode>
+		<Parameter Name="Rank"/>
+		<Parameter Name="Channel"/>
+		<Parameter Name="SamplingTime"/>
+	</RefMode>
+	<RefMode Name="ChannelInjectedConversion" Comment="Injected Channel Settings" BaseMode="ADC_Injected_ConversionMode" Group="ADC_Injected_ConversionMode">
+		<ConfigForMode>ADC_InjectedChannelConfig</ConfigForMode>
+		<Parameter Name="Rank"/>
+		<Parameter Name="Channel"/>
+		<Parameter Name="SamplingTime"/>
+		<Parameter Name="InjectedOffset"/>
+	</RefMode>
+	<RefMode Name="ChannelRegularConversionCopy" Comment="Regular Channel Settings">
+		<Parameter Name="Rank"/>
+		<Parameter Name="Channel"/>
+		<Parameter Name="SamplingTime"/>
+	</RefMode>
+	<RefMode Name="ChannelInjectedConversionCopy" Comment="Injected Channel Settings">
+		<Parameter Name="Rank"/>
+		<Parameter Name="Channel"/>
+		<Parameter Name="SamplingTime"/>
+		<Parameter Name="InjectedOffset"/>
+	</RefMode>
+	<RefMode Name="WatchDog" Comment="" Group="WatchDog">
+		<ConfigForMode>ADC_AnalogWDGConfig</ConfigForMode>
+		<Parameter Name="EnableAnalogWatchDog"/>
+		<Parameter Name="WatchdogMode"/>
+		<Parameter Name="WatchdogChannel"/>
+		<Parameter Name="HighThreshold"/>
+		<Parameter Name="LowThreshold"/>
+		<Parameter Name="ITMode"/>
+	</RefMode>
+	<!--<RefMode Name="WatchDogCopy" Comment="">
+		<ConfigForMode>ADC_AnalogWDGConfig</ConfigForMode>
+		<Parameter Name="EnableAnalogWatchDog"/>
+		<Parameter Name="WatchdogMode"/>
+                <Parameter Name="WatchdogChannel"/>
+		<Parameter Name="HighThreshold"/>
+		<Parameter Name="LowThreshold"/>
+		<Parameter Name="ITMode"/>
+	</RefMode>-->
+	<RefMode Name="IN0" Comment="">
+		<Parameter Name="Channel" RefParameter="Channel">
+			<PossibleValue>ADC_CHANNEL_0</PossibleValue>
+		</Parameter>
+	</RefMode>
+	<RefMode Name="IN1" Comment="">
+		<Parameter Name="Channel" RefParameter="Channel">
+			<PossibleValue>ADC_CHANNEL_1</PossibleValue>
+		</Parameter>
+	</RefMode>
+	<RefMode Name="IN2" Comment="">
+		<Parameter Name="Channel">
+			<PossibleValue>ADC_CHANNEL_2</PossibleValue>
+		</Parameter>
+	</RefMode>
+	<RefMode Name="IN3" Comment="">
+		<Parameter Name="Channel">
+			<PossibleValue>ADC_CHANNEL_3</PossibleValue>
+		</Parameter>
+	</RefMode>
+	<RefMode Name="IN4" Comment="">
+		<Parameter Name="Channel">
+			<PossibleValue>ADC_CHANNEL_4</PossibleValue>
+		</Parameter>
+	</RefMode>
+	<RefMode Name="IN5" Comment="">
+		<Parameter Name="Channel">
+			<PossibleValue>ADC_CHANNEL_5</PossibleValue>
+		</Parameter>
+	</RefMode>
+	<RefMode Name="IN6" Comment="">
+		<Parameter Name="Channel">
+			<PossibleValue>ADC_CHANNEL_6</PossibleValue>
+		</Parameter>
+	</RefMode>
+	<RefMode Name="IN7" Comment="">
+		<Parameter Name="Channel">
+			<PossibleValue>ADC_CHANNEL_7</PossibleValue>
+		</Parameter>
+	</RefMode>
+	<RefMode Name="IN8" Comment="">
+		<Parameter Name="Channel">
+			<PossibleValue>ADC_CHANNEL_8</PossibleValue>
+		</Parameter>
+	</RefMode>
+	<RefMode Name="IN9" Comment="">
+		<Parameter Name="Channel">
+			<PossibleValue>ADC_CHANNEL_9</PossibleValue>
+		</Parameter>
+	</RefMode>
+	<RefMode Name="IN10" Comment="">
+		<Parameter Name="Channel">
+			<PossibleValue>ADC_CHANNEL_10</PossibleValue>
+		</Parameter>
+	</RefMode>
+	<RefMode Name="IN11" Comment="">
+		<Parameter Name="Channel">
+			<PossibleValue>ADC_CHANNEL_11</PossibleValue>
+		</Parameter>
+	</RefMode>
+	<RefMode Name="IN12" Comment="">
+		<Parameter Name="Channel">
+			<PossibleValue>ADC_CHANNEL_12</PossibleValue>
+		</Parameter>
+	</RefMode>
+	<RefMode Name="IN13" Comment="">
+		<Parameter Name="Channel">
+			<PossibleValue>ADC_CHANNEL_13</PossibleValue>
+		</Parameter>
+	</RefMode>
+	<RefMode Name="IN14" Comment="">
+		<Parameter Name="Channel">
+			<PossibleValue>ADC_CHANNEL_14</PossibleValue>
+		</Parameter>
+	</RefMode>
+	<RefMode Name="IN15" Comment="">
+		<Parameter Name="Channel">
+			<PossibleValue>ADC_CHANNEL_15</PossibleValue>
+		</Parameter>
+	</RefMode>
+	<RefMode Name="IN-TempSens" Comment="">
+        <Parameter Name="Channel">
+            <PossibleValue>ADC_CHANNEL_TEMPSENSOR</PossibleValue>
+        </Parameter>
+    </RefMode>
+     <RefMode Name="IN-Vrefint" Comment="">
+        <Parameter Name="Channel">
+            <PossibleValue>ADC_CHANNEL_VREFINT</PossibleValue>
+        </Parameter>
+    </RefMode>
+     <RefMode Name="IN-Vbat" Comment="">
+        <Parameter Name="Channel">
+            <PossibleValue>ADC_CHANNEL_VBAT</PossibleValue>
+        </Parameter>
+    </RefMode>
+	<RefMode Name="External-Trigger-for-Injected-conversion" Comment="">
+		<!--<Parameter Name="ExternalTrigInjecConv">
+			<PossibleValue>ADC_EXTERNALTRIGINJECCONV_EXT_IT15</PossibleValue>
+		</Parameter>-->
+	</RefMode>
+	<RefMode Name="External-Trigger-for-Regular-conversion" Comment="">
+		<!--<Parameter Name="ExternalTrigConv">
+			<PossibleValue>ADC_EXTERNALTRIGCONV_Ext_IT11</PossibleValue>
+		</Parameter>-->
+	</RefMode>
+	<ModeLogicOperator Name="OR">
+		<Mode Name="IN0">
+			<ModeLogicOperator Name="OR">
+				<Mode Name="IN0">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="IN0"/>
+					</SignalLogicalOp>
+				</Mode>
+			</ModeLogicOperator>
+			<Semaphore>channelSelected$IpInstance</Semaphore>
+		</Mode>
+		<Mode Name="IN1">
+			<ModeLogicOperator Name="OR">
+				<Mode Name="IN1">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="IN1"/>
+					</SignalLogicalOp>
+				</Mode>
+			</ModeLogicOperator>
+			<Semaphore>channelSelected$IpInstance</Semaphore>
+		</Mode>
+		<Mode Name="IN2">
+			<ModeLogicOperator Name="OR">
+				<Mode Name="IN2">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="IN2"/>
+					</SignalLogicalOp>
+				</Mode>
+			</ModeLogicOperator>
+			<Semaphore>channelSelected$IpInstance</Semaphore>
+		</Mode>
+		<Mode Name="IN3">
+			<ModeLogicOperator Name="OR">
+				<Mode Name="IN3">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="IN3"/>
+					</SignalLogicalOp>
+				</Mode>
+			</ModeLogicOperator>
+			<Semaphore>channelSelected$IpInstance</Semaphore>
+		</Mode>
+		<Mode Name="IN4">
+			<ModeLogicOperator Name="OR">
+				<Mode Name="IN4">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="IN4"/>
+					</SignalLogicalOp>
+				</Mode>
+			</ModeLogicOperator>
+			<Semaphore>channelSelected$IpInstance</Semaphore>
+		</Mode>
+		<Mode Name="IN5">
+			<ModeLogicOperator Name="OR">
+				<Mode Name="IN5">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="IN5"/>
+					</SignalLogicalOp>
+				</Mode>
+			</ModeLogicOperator>
+			<Semaphore>channelSelected$IpInstance</Semaphore>
+		</Mode>
+		<Mode Name="IN6">
+			<ModeLogicOperator Name="OR">
+				<Mode Name="IN6">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="IN6"/>
+					</SignalLogicalOp>
+				</Mode>
+			</ModeLogicOperator>
+			<Semaphore>channelSelected$IpInstance</Semaphore>
+		</Mode>
+		<Mode Name="IN7">
+			<ModeLogicOperator Name="OR">
+				<Mode Name="IN7">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="IN7"/>
+					</SignalLogicalOp>
+				</Mode>
+			</ModeLogicOperator>
+			<Semaphore>channelSelected$IpInstance</Semaphore>
+		</Mode>
+		<Mode Name="IN8">
+			<ModeLogicOperator Name="OR">
+				<Mode Name="IN8">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="IN8"/>
+					</SignalLogicalOp>
+				</Mode>
+			</ModeLogicOperator>
+			<Semaphore>channelSelected$IpInstance</Semaphore>
+		</Mode>
+		<Mode Name="IN9">
+			<ModeLogicOperator Name="OR">
+				<Mode Name="IN9">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="IN9"/>
+					</SignalLogicalOp>
+				</Mode>
+			</ModeLogicOperator>
+			<Semaphore>channelSelected$IpInstance</Semaphore>
+		</Mode>
+		<Mode Name="IN10">
+			<ModeLogicOperator Name="OR">
+				<Mode Name="IN10">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="IN10"/>
+					</SignalLogicalOp>
+				</Mode>
+			</ModeLogicOperator>
+			<Semaphore>channelSelected$IpInstance</Semaphore>
+		</Mode>
+		<Mode Name="IN11">
+			<ModeLogicOperator Name="OR">
+				<Mode Name="IN11">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="IN11"/>
+					</SignalLogicalOp>
+				</Mode>
+			</ModeLogicOperator>
+			<Semaphore>channelSelected$IpInstance</Semaphore>
+		</Mode>
+		<Mode Name="IN12">
+			<ModeLogicOperator Name="OR">
+				<Mode Name="IN12">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="IN12"/>
+					</SignalLogicalOp>
+				</Mode>
+			</ModeLogicOperator>
+			<Semaphore>channelSelected$IpInstance</Semaphore>
+		</Mode>
+		<Mode Name="IN13">
+			<ModeLogicOperator Name="OR">
+				<Mode Name="IN13">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="IN13"/>
+					</SignalLogicalOp>
+				</Mode>
+			</ModeLogicOperator>
+			<Semaphore>channelSelected$IpInstance</Semaphore>
+		</Mode>
+		<Mode Name="IN14">
+			<ModeLogicOperator Name="OR">
+				<Mode Name="IN14">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="IN14"/>
+					</SignalLogicalOp>
+				</Mode>
+			</ModeLogicOperator>
+			<Semaphore>channelSelected$IpInstance</Semaphore>
+		</Mode>
+		<Mode Name="IN15">
+			<ModeLogicOperator Name="OR">
+				<Mode Name="IN15">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="IN15"/>
+					</SignalLogicalOp>
+				</Mode>
+			</ModeLogicOperator>
+			<Semaphore>channelSelected$IpInstance</Semaphore>
+		</Mode>
+		
+		<!-- Internal channels -->
+        <Mode Name="IN-TempSens" UserName="Temperature Sensor Channel" RemoveCondition="($IpNumber=2)|($IpNumber=3)">
+            <ModeLogicOperator Name="XOR">
+		        <Mode Name="IN-TempSens" UserName="Single-ended">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="TempSens_Input"/>
+					</SignalLogicalOp>
+				</Mode>
+			</ModeLogicOperator>
+			<Semaphore>channelSelected$IpInstance</Semaphore>
+		</Mode>
+		<Mode Name="IN-Vrefint" UserName="Vrefint Channel" RemoveCondition="($IpNumber=2)|($IpNumber=3)">
+            <ModeLogicOperator Name="XOR">
+		        <Mode Name="IN-Vrefint" UserName="Vrefint Channel">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="Vref_Input"/>
+					</SignalLogicalOp>
+				</Mode>
+			</ModeLogicOperator>
+			<Semaphore>channelSelected$IpInstance</Semaphore>
+		</Mode>
+		<Mode Name="IN-Vbat" UserName="Vbat Channel" RemoveCondition="($IpNumber=2)|($IpNumber=3)">
+            <ModeLogicOperator Name="XOR">
+		        <Mode Name="IN-Vbat" UserName="Vbat Channel">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="Vbat_Input"/>
+					</SignalLogicalOp>
+				</Mode>
+			</ModeLogicOperator>
+			<Semaphore>channelSelected$IpInstance</Semaphore>
+		</Mode>
+		<Mode Name="External-Trigger-for-Injected-conversion">
+			<ModeLogicOperator Name="XOR">
+				<Mode Name="External-Trigger-for-Injected-conversion">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="EXTI15"/>
+					</SignalLogicalOp>
+					<Semaphore>InjectedExternalTrigger</Semaphore>
+					<Condition Expression="channelSelected$IpInstance" Diagnostic="Available only if at least one channel is selected"/>
+				</Mode>
+			</ModeLogicOperator>
+		</Mode>
+		<Mode Name="External-Trigger-for-Regular-conversion">
+			<ModeLogicOperator Name="OR">
+				<Mode Name="External-Trigger-for-Regular-conversion">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="EXTI11"/>
+					</SignalLogicalOp>
+					<Semaphore>RegularExternalTrigger</Semaphore>
+					<Condition Expression="channelSelected$IpInstance" Diagnostic="Available only if at least one channel is selected"/>
+				</Mode>
+			</ModeLogicOperator>
+		</Mode>
+	</ModeLogicOperator>
+	
+	<RefSignal IOMode="EXTI" Name="EXTI11" ShareableGroupName="GPXTI11"/>
+	<!-- GPXTI is a keyword -->
+	<RefSignal IOMode="EXTI" Name="EXTI15" ShareableGroupName="GPXTI15"/>
+	<!-- GPXTI is a keyword -->
+	<!--	<RefSignal IOMode="EXTI" Name="EXTI11"/>-->
+	<!--	<RefSignal IOMode="EXTI" Name="EXTI15"/>-->
+	<RefSignal IOMode="Analog" Name="IN0" ShareableGroupName="ADCx_IN0"/>
+	<RefSignal IOMode="Analog" Name="IN1" ShareableGroupName="ADCx_IN1"/>
+	<RefSignal IOMode="Analog" Name="IN2" ShareableGroupName="ADCx_IN2"/>
+	<RefSignal IOMode="Analog" Name="IN3" ShareableGroupName="ADCx_IN3"/>
+	<RefSignal IOMode="Analog" Name="IN4" ShareableGroupName="ADCx_IN4:ADC1,ADC2"/>
+	<RefSignal IOMode="Analog" Name="IN5" ShareableGroupName="ADCx_IN5:ADC1,ADC2"/>
+	<RefSignal IOMode="Analog" Name="IN6" ShareableGroupName="ADCx_IN6:ADC1,ADC2"/>
+	<RefSignal IOMode="Analog" Name="IN7" ShareableGroupName="ADCx_IN7:ADC1,ADC2"/>
+	<RefSignal IOMode="Analog" Name="IN8" ShareableGroupName="ADCx_IN8:ADC1,ADC2"/>
+	<RefSignal IOMode="Analog" Name="IN9" ShareableGroupName="ADCx_IN9:ADC1,ADC2"/>
+	<RefSignal IOMode="Analog" Name="IN10" ShareableGroupName="ADCx_IN10"/>
+	<RefSignal IOMode="Analog" Name="IN11" ShareableGroupName="ADCx_IN11"/>
+	<RefSignal IOMode="Analog" Name="IN12" ShareableGroupName="ADCx_IN12"/>
+	<RefSignal IOMode="Analog" Name="IN13" ShareableGroupName="ADCx_IN13"/>
+	<RefSignal IOMode="Analog" Name="IN14" ShareableGroupName="ADCx_IN14:ADC1,ADC2"/>
+	<RefSignal IOMode="Analog" Name="IN15" ShareableGroupName="ADCx_IN15:ADC1,ADC2"/>
+	<RefSignal IOMode="Analog" Name="TempSens_Input" Virtual="true"/>
+	<RefSignal IOMode="Analog" Name="Vref_Input" Virtual="true"/>
+	<RefSignal IOMode="Analog" Name="Vbat_Input" Virtual="true"/>
+	<RefSignal Name="VS_ADCs_Common_Settings" Virtual="true"/>
+	<Semaphore>USE_$IpInstance</Semaphore>
+</IP>
