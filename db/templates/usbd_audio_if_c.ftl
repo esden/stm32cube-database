@@ -34,6 +34,25 @@
   *
   ******************************************************************************
 */
+[#assign handleNameFS = ""]
+[#assign handleNameHS = ""]
+[#assign handleNameUSB_FS = ""]
+[#list SWIPdatas as SWIP]  
+[#compress]
+[#-- Section2: Create global Variables for each middle ware instance --] 
+[#-- Global variables --]
+[#if SWIP.variables??]
+	[#list SWIP.variables as variable]	
+		[#-- extern ${variable.type} --][#if variable.value??][#--${variable.value};--]				
+		[#if variable.value?contains("FS")][#assign handleNameFS = "FS"][/#if]		
+		[#if variable.value?contains("USB_FS")][#assign handleNameUSB_FS = "FS"][/#if]		
+		[#if variable.value?contains("HS")][#assign handleNameHS = "HS"][/#if]
+		[/#if]		
+	[/#list]
+[/#if]
+[#-- Global variables --]
+[/#compress]
+[/#list]
 
 /* Includes ------------------------------------------------------------------*/
 #include "usbd_audio_if.h"
@@ -72,127 +91,324 @@
   * @}
   */ 
 
+/* Private variables ---------------------------------------------------------*/
+/* USB handler declaration */
+/* Handle for USB Full Speed IP */
+[#if handleNameFS == "FS" || handleNameUSB_FS == "FS"]
+USBD_HandleTypeDef  *hUsbDevice_0;
+[/#if]
+
+[#if handleNameHS == "HS"]
+/* Handle for USB High Speed IP */
+USBD_HandleTypeDef  *hUsbDevice_1;
+[/#if]
+  
+[#if handleNameFS == "FS" || handleNameUSB_FS == "FS"]
+extern USBD_HandleTypeDef hUsbDeviceFS;
+[/#if]
+[#if handleNameHS == "HS"]
+extern USBD_HandleTypeDef hUsbDeviceHS;  
+[/#if]
 
 /** @defgroup USBD_AUDIO_Private_FunctionPrototypes
   * @{
   */
+[#if handleNameFS == "FS" || handleNameUSB_FS == "FS"]
+static int8_t  AUDIO_Init_FS         (uint32_t  AudioFreq, uint32_t Volume, uint32_t options);
+static int8_t  AUDIO_DeInit_FS       (uint32_t options);
+static int8_t  AUDIO_AudioCmd_FS     (uint8_t* pbuf, uint32_t size, uint8_t cmd);
+static int8_t  AUDIO_VolumeCtl_FS    (uint8_t vol);
+static int8_t  AUDIO_MuteCtl_FS      (uint8_t cmd);
+static int8_t  AUDIO_PeriodicTC_FS   (uint8_t cmd);
+static int8_t  AUDIO_GetState_FS     (void);
+[/#if]
 
-static int8_t  AUDIO_Init         (uint32_t  AudioFreq, uint32_t Volume, uint32_t options);
-static int8_t  AUDIO_DeInit       (uint32_t options);
-static int8_t  AUDIO_AudioCmd     (uint8_t* pbuf, uint32_t size, uint8_t cmd);
-static int8_t  AUDIO_VolumeCtl    (uint8_t vol);
-static int8_t  AUDIO_MuteCtl      (uint8_t cmd);
-static int8_t  AUDIO_PeriodicTC   (uint8_t cmd);
-static int8_t  AUDIO_GetState     (void);
+[#if handleNameHS == "HS"]
+static int8_t  AUDIO_Init_HS         (uint32_t  AudioFreq, uint32_t Volume, uint32_t options);
+static int8_t  AUDIO_DeInit_HS       (uint32_t options);
+static int8_t  AUDIO_AudioCmd_HS     (uint8_t* pbuf, uint32_t size, uint8_t cmd);
+static int8_t  AUDIO_VolumeCtl_HS    (uint8_t vol);
+static int8_t  AUDIO_MuteCtl_HS      (uint8_t cmd);
+static int8_t  AUDIO_PeriodicTC_HS   (uint8_t cmd);
+static int8_t  AUDIO_GetState_HS     (void);
+[/#if]
 
-USBD_AUDIO_ItfTypeDef USBD_AUDIO_fops = 
+[#if handleNameFS == "FS" || handleNameUSB_FS == "FS"]
+USBD_AUDIO_ItfTypeDef USBD_AUDIO_fops_FS = 
 {
-  AUDIO_Init,
-  AUDIO_DeInit,
-  AUDIO_AudioCmd,
-  AUDIO_VolumeCtl,
-  AUDIO_MuteCtl,
-  AUDIO_PeriodicTC,
-  AUDIO_GetState,
+  AUDIO_Init_FS,
+  AUDIO_DeInit_FS,
+  AUDIO_AudioCmd_FS,
+  AUDIO_VolumeCtl_FS,
+  AUDIO_MuteCtl_FS,
+  AUDIO_PeriodicTC_FS,
+  AUDIO_GetState_FS,
 };
+[/#if]
+
+[#if handleNameHS == "HS"]
+USBD_AUDIO_ItfTypeDef USBD_AUDIO_fops_HS = 
+{
+  AUDIO_Init_HS,
+  AUDIO_DeInit_HS,
+  AUDIO_AudioCmd_HS,
+  AUDIO_VolumeCtl_HS,
+  AUDIO_MuteCtl_HS,
+  AUDIO_PeriodicTC_HS,
+  AUDIO_GetState_HS,
+};
+[/#if]
 
 /* Private functions ---------------------------------------------------------*/
-
+[#if handleNameFS == "FS" || handleNameUSB_FS == "FS"]
 /**
-  * @brief  AUDIO_Init
-  *         Initializes the AUDIO media low layer
+  * @brief  AUDIO_Init_FS
+  *         Initializes the AUDIO media low layer over USB FS IP
   * @param  None
   * @retval Result of the opeartion: USBD_OK if all operations are OK else USBD_FAIL
   */
-static int8_t AUDIO_Init(uint32_t  AudioFreq, uint32_t Volume, uint32_t options)
+static int8_t AUDIO_Init_FS(uint32_t  AudioFreq, uint32_t Volume, uint32_t options)
 {
+  hUsbDevice_0 = &hUsbDeviceFS;
   /* USER CODE BEGIN 0 */
-  /*
-     Add your initialization code here 
-  */  
-  return (0);
+  return (USBD_OK);
   /* USER CODE END 0 */
 }
 
 /**
-  * @brief  AUDIO_DeInit
+  * @brief  AUDIO_DeInit_FS
   *         DeInitializes the AUDIO media low layer
   * @param  None
   * @retval Result of the opeartion: USBD_OK if all operations are OK else USBD_FAIL
   */
-static int8_t AUDIO_DeInit(uint32_t options)
+static int8_t AUDIO_DeInit_FS(uint32_t options)
 {
   /* USER CODE BEGIN 1 */ 
- /*
-     Add your deinitialization code here 
-  */  
-  return (0);
+  return (USBD_OK);
   /* USER CODE END 1 */
 }
 
 
 /**
-  * @brief  AUDIO_AudioCmd
+  * @brief  AUDIO_AudioCmd_FS
   *         AUDIO command handler 
   * @param  Buf: Buffer of data to be sent
   * @param  size: Number of data to be sent (in bytes)
   * @param  cmd: command opcode
   * @retval Result of the opeartion: USBD_OK if all operations are OK else USBD_FAIL
   */
-static int8_t AUDIO_AudioCmd (uint8_t* pbuf, uint32_t size, uint8_t cmd)
+static int8_t AUDIO_AudioCmd_FS (uint8_t* pbuf, uint32_t size, uint8_t cmd)
 {
   /* USER CODE BEGIN 2 */
-  return (0);
+  switch(cmd)
+  {
+    case AUDIO_CMD_START:    
+    break;
+  
+    case AUDIO_CMD_PLAY:   
+    break;	
+  }
+  return (USBD_OK);
   /* USER CODE END 2 */
+  
 }
 
 /**
-  * @brief  AUDIO_VolumeCtl              
+  * @brief  AUDIO_VolumeCtl_FS              
   * @param  vol: volume level (0..100)
   * @retval Result of the opeartion: USBD_OK if all operations are OK else USBD_FAIL
   */
-static int8_t AUDIO_VolumeCtl (uint8_t vol)
+static int8_t AUDIO_VolumeCtl_FS (uint8_t vol)
 {
   /* USER CODE BEGIN 3 */ 
-  return (0);
+  return (USBD_OK);
   /* USER CODE END 3 */
 }
 
 /**
-  * @brief  AUDIO_MuteCtl              
+  * @brief  AUDIO_MuteCtl_FS              
   * @param  cmd: vmute command
   * @retval Result of the opeartion: USBD_OK if all operations are OK else USBD_FAIL
   */
-static int8_t AUDIO_MuteCtl (uint8_t cmd)
+static int8_t AUDIO_MuteCtl_FS (uint8_t cmd)
 {
   /* USER CODE BEGIN 4 */ 
-  return (0);
+  return (USBD_OK);
   /* USER CODE END 4 */
 }
 
 /**
-  * @brief  AUDIO_PeriodicTC              
+  * @brief  AUDIO_PeriodicT_FS              
   * @param  cmd
   * @retval Result of the opeartion: USBD_OK if all operations are OK else USBD_FAIL
   */
-static int8_t AUDIO_PeriodicTC (uint8_t cmd)
+static int8_t AUDIO_PeriodicTC_FS (uint8_t cmd)
 {
   /* USER CODE BEGIN 5 */ 
-  return (0);
+  return (USBD_OK);
   /* USER CODE END 5 */
 }
 
 /**
-  * @brief  AUDIO_GetState              
+  * @brief  AUDIO_GetState_FS       
   * @param  None
   * @retval Result of the opeartion: USBD_OK if all operations are OK else USBD_FAIL
   */
-static int8_t AUDIO_GetState (void)
+static int8_t AUDIO_GetState_FS (void)
 {
   /* USER CODE BEGIN 6 */ 
-  return (0);
+  return (USBD_OK);
   /* USER CODE END 6 */
 }
+
+/**
+  * @brief  Manages the DMA full Transfer complete event.
+  * @param  None
+  * @retval None
+  */
+void TransferComplete_CallBack_FS(void)
+{
+  /* USER CODE BEGIN 7 */ 
+  USBD_AUDIO_Sync(hUsbDevice_0, AUDIO_OFFSET_FULL);
+  /* USER CODE END 7 */
+}
+
+/**
+  * @brief  Manages the DMA Half Transfer complete event.
+  * @param  None
+  * @retval None
+  */
+void HalfTransfer_CallBack_FS(void)
+{ 
+  /* USER CODE BEGIN 8 */ 
+  USBD_AUDIO_Sync(hUsbDevice_0, AUDIO_OFFSET_HALF);
+  /* USER CODE END 8 */
+}
+[/#if]
+[#if handleNameHS == "HS"]
+/**
+  * @brief  AUDIO_Init_HS
+  *         Initializes the AUDIO media low layer over ths USB HS IP
+  * @param  None
+  * @retval Result of the opeartion: USBD_OK if all operations are OK else USBD_FAIL
+  */
+static int8_t AUDIO_Init_HS(uint32_t  AudioFreq, uint32_t Volume, uint32_t options)
+{
+  hUsbDevice_1 = &hUsbDeviceHS;
+  /* USER CODE BEGIN 9 */ 
+  return (USBD_OK);
+  /* USER CODE END 9 */
+}
+
+/**
+  * @brief  AUDIO_DeInit_HS
+  *         DeInitializes the AUDIO media low layer
+  * @param  None
+  * @retval Result of the opeartion: USBD_OK if all operations are OK else USBD_FAIL
+  */
+static int8_t AUDIO_DeInit_HS(uint32_t options)
+{
+  /* USER CODE BEGIN 10 */ 
+  return (USBD_OK);
+  /* USER CODE END 10 */
+}
+
+/**
+  * @brief  AUDIO_AudioCmd_HS
+  *         AUDIO command handler 
+  * @param  Buf: Buffer of data to be sent
+  * @param  size: Number of data to be sent (in bytes)
+  * @param  cmd: command opcode
+  * @retval Result of the opeartion: USBD_OK if all operations are OK else USBD_FAIL
+  */
+static int8_t AUDIO_AudioCmd_HS (uint8_t* pbuf, uint32_t size, uint8_t cmd)
+{
+  /* USER CODE BEGIN 11 */
+  switch(cmd)
+  {
+    case AUDIO_CMD_START:    
+    break;
+  
+    case AUDIO_CMD_PLAY:   
+    break;	
+  }
+  return (USBD_OK);
+  /* USER CODE END 11 */
+  
+}
+
+/**
+  * @brief  AUDIO_VolumeCtl_HS              
+  * @param  vol: volume level (0..100)
+  * @retval Result of the opeartion: USBD_OK if all operations are OK else USBD_FAIL
+  */
+static int8_t AUDIO_VolumeCtl_HS (uint8_t vol)
+{
+  /* USER CODE BEGIN 12 */ 
+  return (USBD_OK);
+  /* USER CODE END 12 */
+}
+
+/**
+  * @brief  AUDIO_MuteCtl_HS              
+  * @param  cmd: vmute command
+  * @retval Result of the opeartion: USBD_OK if all operations are OK else USBD_FAIL
+  */
+static int8_t AUDIO_MuteCtl_HS (uint8_t cmd)
+{
+  /* USER CODE BEGIN 13 */ 
+  return (USBD_OK);
+  /* USER CODE END 13 */
+}
+
+/**
+  * @brief  AUDIO_PeriodicTC_HS              
+  * @param  cmd
+  * @retval Result of the opeartion: USBD_OK if all operations are OK else USBD_FAIL
+  */
+static int8_t AUDIO_PeriodicTC_HS (uint8_t cmd)
+{
+  /* USER CODE BEGIN 14 */ 
+  return (USBD_OK);
+  /* USER CODE END 14 */
+}
+
+/**
+  * @brief  AUDIO_GetState_HS              
+  * @param  None
+  * @retval Result of the opeartion: USBD_OK if all operations are OK else USBD_FAIL
+  */
+static int8_t AUDIO_GetState_HS (void)
+{
+  /* USER CODE BEGIN 15 */ 
+  return (USBD_OK);
+  /* USER CODE END 15 */
+}
+
+/**
+  * @brief  Manages the DMA full Transfer complete event.
+  * @param  None
+  * @retval None
+  */
+void TransferComplete_CallBack_HS(void)
+{
+  /* USER CODE BEGIN 16 */ 
+  USBD_AUDIO_Sync(hUsbDevice_1, AUDIO_OFFSET_FULL);
+  /* USER CODE END 16 */
+}
+
+/**
+  * @brief  Manages the DMA Half Transfer complete event.
+  * @param  None
+  * @retval None
+  */
+void HalfTransfer_CallBack_HS(void)
+{ 
+  /* USER CODE BEGIN 17 */ 
+  USBD_AUDIO_Sync(hUsbDevice_1, AUDIO_OFFSET_HALF);
+  /* USER CODE END 17 */
+}
+[/#if]
 /**
   * @}
   */ 

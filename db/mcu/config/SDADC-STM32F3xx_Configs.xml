@@ -1,0 +1,1227 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
+<IP xmlns="http://mcd.rou.st.com/modules.php?name=mcu" DBVersion="V4.0" Name="SDADC" Version="STM32Cube_FW_F3_V0.3.1" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Configs.xsd">
+    <RefConfig Name="SDADC_Init" Comment="Configure the SDADC low power mode, fast conversion mode,#n#tslow clock mode and SDADC1 reference voltage">
+        <CallLibMethod Name="HAL_SDADC_Init"/>
+        <ImplementCallBack Name="HAL_SDADC_MspInit"/>
+        <ImplementCallBack Name="HAL_SDADC_MspDeInit"/>
+    </RefConfig>
+    
+    <RefConfig Name="SDADC_ChannelConfig0" Comment="Set parameters for SDADC configuration 0 Register">
+    	 <CallLibMethod Name="HAL_SDADC_PrepareChannelConfig">
+    	 	<MethodArg Name="ConfIndex" ParameterName="ConfIndex0"/>
+    	 	<MethodArg Name="InputMode" ParameterName="InputMode0"/>
+    	 	<MethodArg Name="Gain" ParameterName="Gain0"/>
+    	 	<MethodArg Name="CommonMode" ParameterName="CommonMode0"/>
+    	 	<MethodArg Name="Offset" ParameterName="Offset0"/>
+    	 </CallLibMethod>
+    </RefConfig>
+    <RefConfig Name="SDADC_ChannelConfig1" Comment="Set parameters for SDADC configuration 1 Register">
+    	 <CallLibMethod Name="HAL_SDADC_PrepareChannelConfig">
+    	 	<MethodArg Name="ConfIndex" ParameterName="ConfIndex1"/>
+    	 	<MethodArg Name="InputMode" ParameterName="InputMode1"/>
+    	 	<MethodArg Name="Gain" ParameterName="Gain1"/>
+    	 	<MethodArg Name="CommonMode" ParameterName="CommonMode1"/>
+    	 	<MethodArg Name="Offset" ParameterName="Offset1"/>
+    	 </CallLibMethod>
+    </RefConfig>
+    <RefConfig Name="SDADC_ChannelConfig2" Comment="Set parameters for SDADC configuration 2 Register">
+    	 <CallLibMethod Name="HAL_SDADC_PrepareChannelConfig">
+    	 	<MethodArg Name="ConfIndex" ParameterName="ConfIndex2"/>
+    	 	<MethodArg Name="InputMode" ParameterName="InputMode2"/>
+    	 	<MethodArg Name="Gain" ParameterName="Gain2"/>
+    	 	<MethodArg Name="CommonMode" ParameterName="CommonMode2"/>
+    	 	<MethodArg Name="Offset" ParameterName="Offset2"/>
+    	 </CallLibMethod>
+    </RefConfig>
+    
+    <RefConfig Name="SDADC_ConfigRegular" Comment="Configure The Regular Mode">
+ 	   <CallLibMethod Name="HAL_SDADC_SelectRegularTrigger"/>
+ 	   <CallLibMethod Name="HAL_SDADC_MultiModeConfigChannel"/>
+    </RefConfig>
+     <RefConfig Name="SDADC_ConfigRegularChannel" Comment="Configure the Regular Channel">
+    	<CallLibMethod Name="HAL_SDADC_AssociateChannelConfig"/>
+        <CallLibMethod Name="HAL_SDADC_ConfigChannel"/>
+    </RefConfig>
+    
+    <RefConfig Name="SDADC_InjectedConfig" Comment="Configure the Injected Mode">
+        <CallLibMethod Name="HAL_SDADC_SelectInjectedDelay"/>
+        <CallLibMethod Name="HAL_SDADC_SelectInjectedExtTrigger"/>
+        <CallLibMethod Name="HAL_SDADC_SelectInjectedTrigger">
+        	<MethodArg Name="Trigger" ParameterName="InjectedTrigger"/>
+        </CallLibMethod>
+        <CallLibMethod Name="HAL_SDADC_InjectedMultiModeConfigChannel">
+        	<MethodArg Name="MultimodeType" ParameterName="InjectedMultimodeType"/>
+        </CallLibMethod>
+    </RefConfig>
+    <RefConfig Name="SDADC_InjectedConfigChannel" Comment="Configure the Injected Channel">
+    	<CallLibMethod Name="HAL_SDADC_AssociateChannelConfig"/>
+        <CallLibMethod Name="HAL_SDADC_InjectedConfigChannel"/>
+    </RefConfig>
+    
+    <!-- <RefConfig Name="SDADC_MultiRegularConfig" Comment="Configure the Multi Regular Mode">
+        <CallLibMethod Name="HAL_SDADC_MultiModeConfigChannel"/>
+    </RefConfig>
+    <RefConfig Name="SDADC_MultiInjectedConfig" Comment="Configure the Multi Injected Mode">
+        <CallLibMethod Name="HAL_SDADC_InjectedMultiModeConfigChannel">
+        	<MethodArg Name="MultimodeType" ParameterName="InjectedMultimodeType"/>
+        </CallLibMethod>
+    </RefConfig> -->
+    
+    <LibMethod Comment="" Name="HAL_SDADC_Init">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hsdadc" TypeName="SDADC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="SDADC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="SDADC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="IdleLowPowerMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="FastConversionMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SlowClockMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ReferenceVoltage" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="hdma" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedChannelsNbr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjConvRemaining" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ExtTriggerEdge" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_SDADC_DeInit">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hsdadc" TypeName="SDADC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="SDADC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="SDADC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="IdleLowPowerMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="FastConversionMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SlowClockMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ReferenceVoltage" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="hdma" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedChannelsNbr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjConvRemaining" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ExtTriggerEdge" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_SDADC_MspInit">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hsdadc" TypeName="SDADC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="SDADC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="SDADC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="IdleLowPowerMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="FastConversionMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SlowClockMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ReferenceVoltage" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="hdma" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedChannelsNbr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjConvRemaining" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ExtTriggerEdge" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_SDADC_MspDeInit">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hsdadc" TypeName="SDADC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="SDADC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="SDADC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="IdleLowPowerMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="FastConversionMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SlowClockMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ReferenceVoltage" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="hdma" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedChannelsNbr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjConvRemaining" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ExtTriggerEdge" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_SDADC_PrepareChannelConfig">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hsdadc" TypeName="SDADC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="SDADC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="SDADC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="IdleLowPowerMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="FastConversionMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SlowClockMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ReferenceVoltage" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="hdma" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedChannelsNbr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjConvRemaining" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ExtTriggerEdge" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="false" GenericType="simple" Name="ConfIndex" OptimizationCondition="equal"/>
+        <Argument AddressOf="true" GenericType="struct" Name="ConfParamStruct" TypeName="SDADC_ConfParamTypeDef">
+            <Argument AddressOf="false" GenericType="simple" Name="InputMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Gain" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="CommonMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Offset" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_SDADC_AssociateChannelConfig">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hsdadc" TypeName="SDADC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="SDADC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="SDADC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="IdleLowPowerMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="FastConversionMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SlowClockMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ReferenceVoltage" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="hdma" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedChannelsNbr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjConvRemaining" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ExtTriggerEdge" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="false" GenericType="simple" Name="Channel" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="ConfIndex" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_SDADC_ConfigChannel">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hsdadc" TypeName="SDADC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="SDADC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="SDADC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="IdleLowPowerMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="FastConversionMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SlowClockMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ReferenceVoltage" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="hdma" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedChannelsNbr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjConvRemaining" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ExtTriggerEdge" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="false" GenericType="simple" Name="Channel" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="ContinuousMode" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_SDADC_InjectedConfigChannel">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hsdadc" TypeName="SDADC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="SDADC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="SDADC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="IdleLowPowerMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="FastConversionMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SlowClockMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ReferenceVoltage" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="hdma" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedChannelsNbr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjConvRemaining" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ExtTriggerEdge" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="false" GenericType="simple" Name="Channel" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="ContinuousMode" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_SDADC_SelectInjectedExtTrigger">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hsdadc" TypeName="SDADC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="SDADC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="SDADC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="IdleLowPowerMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="FastConversionMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SlowClockMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ReferenceVoltage" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="hdma" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedChannelsNbr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjConvRemaining" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ExtTriggerEdge" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="false" GenericType="simple" Name="InjectedExtTrigger" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="ExtTriggerEdge" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_SDADC_SelectInjectedDelay">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hsdadc" TypeName="SDADC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="SDADC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="SDADC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="IdleLowPowerMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="FastConversionMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SlowClockMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ReferenceVoltage" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="hdma" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedChannelsNbr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjConvRemaining" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ExtTriggerEdge" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="false" GenericType="simple" Name="InjectedDelay" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_SDADC_SelectRegularTrigger">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hsdadc" TypeName="SDADC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="SDADC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="SDADC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="IdleLowPowerMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="FastConversionMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SlowClockMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ReferenceVoltage" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="hdma" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedChannelsNbr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjConvRemaining" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ExtTriggerEdge" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="false" GenericType="simple" Name="Trigger" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_SDADC_SelectInjectedTrigger">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hsdadc" TypeName="SDADC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="SDADC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="SDADC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="IdleLowPowerMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="FastConversionMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SlowClockMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ReferenceVoltage" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="hdma" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedChannelsNbr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjConvRemaining" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ExtTriggerEdge" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="false" GenericType="simple" Name="Trigger" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_SDADC_MultiModeConfigChannel">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hsdadc" TypeName="SDADC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="SDADC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="SDADC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="IdleLowPowerMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="FastConversionMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SlowClockMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ReferenceVoltage" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="hdma" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedChannelsNbr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjConvRemaining" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ExtTriggerEdge" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="false" GenericType="simple" Name="MultimodeType" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_SDADC_InjectedMultiModeConfigChannel">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hsdadc" TypeName="SDADC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="SDADC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="SDADC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="IdleLowPowerMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="FastConversionMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SlowClockMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ReferenceVoltage" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="hdma" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedChannelsNbr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjConvRemaining" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ExtTriggerEdge" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="false" GenericType="simple" Name="MultimodeType" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_SDADC_CalibrationStart">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hsdadc" TypeName="SDADC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="SDADC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="SDADC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="IdleLowPowerMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="FastConversionMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SlowClockMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ReferenceVoltage" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="hdma" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedChannelsNbr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjConvRemaining" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ExtTriggerEdge" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="false" GenericType="simple" Name="CalibrationSequence" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_SDADC_CalibrationStart_IT">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hsdadc" TypeName="SDADC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="SDADC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="SDADC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="IdleLowPowerMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="FastConversionMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SlowClockMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ReferenceVoltage" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="hdma" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedChannelsNbr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjConvRemaining" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ExtTriggerEdge" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="false" GenericType="simple" Name="CalibrationSequence" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_SDADC_Start">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hsdadc" TypeName="SDADC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="SDADC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="SDADC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="IdleLowPowerMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="FastConversionMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SlowClockMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ReferenceVoltage" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="hdma" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedChannelsNbr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjConvRemaining" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ExtTriggerEdge" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_SDADC_Start_IT">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hsdadc" TypeName="SDADC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="SDADC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="SDADC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="IdleLowPowerMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="FastConversionMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SlowClockMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ReferenceVoltage" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="hdma" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedChannelsNbr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjConvRemaining" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ExtTriggerEdge" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_SDADC_Start_DMA">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hsdadc" TypeName="SDADC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="SDADC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="SDADC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="IdleLowPowerMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="FastConversionMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SlowClockMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ReferenceVoltage" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="hdma" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedChannelsNbr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjConvRemaining" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ExtTriggerEdge" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="true" GenericType="simple" Name="pData" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Length" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_SDADC_Stop">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hsdadc" TypeName="SDADC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="SDADC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="SDADC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="IdleLowPowerMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="FastConversionMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SlowClockMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ReferenceVoltage" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="hdma" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedChannelsNbr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjConvRemaining" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ExtTriggerEdge" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_SDADC_Stop_IT">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hsdadc" TypeName="SDADC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="SDADC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="SDADC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="IdleLowPowerMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="FastConversionMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SlowClockMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ReferenceVoltage" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="hdma" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedChannelsNbr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjConvRemaining" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ExtTriggerEdge" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_SDADC_Stop_DMA">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hsdadc" TypeName="SDADC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="SDADC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="SDADC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="IdleLowPowerMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="FastConversionMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SlowClockMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ReferenceVoltage" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="hdma" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedChannelsNbr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjConvRemaining" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ExtTriggerEdge" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_SDADC_InjectedStart">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hsdadc" TypeName="SDADC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="SDADC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="SDADC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="IdleLowPowerMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="FastConversionMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SlowClockMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ReferenceVoltage" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="hdma" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedChannelsNbr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjConvRemaining" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ExtTriggerEdge" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_SDADC_InjectedStart_IT">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hsdadc" TypeName="SDADC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="SDADC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="SDADC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="IdleLowPowerMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="FastConversionMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SlowClockMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ReferenceVoltage" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="hdma" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedChannelsNbr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjConvRemaining" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ExtTriggerEdge" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_SDADC_InjectedStart_DMA">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hsdadc" TypeName="SDADC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="SDADC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="SDADC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="IdleLowPowerMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="FastConversionMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SlowClockMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ReferenceVoltage" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="hdma" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedChannelsNbr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjConvRemaining" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ExtTriggerEdge" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="true" GenericType="simple" Name="pData" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Length" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_SDADC_InjectedStop">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hsdadc" TypeName="SDADC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="SDADC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="SDADC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="IdleLowPowerMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="FastConversionMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SlowClockMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ReferenceVoltage" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="hdma" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedChannelsNbr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjConvRemaining" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ExtTriggerEdge" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_SDADC_InjectedStop_IT">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hsdadc" TypeName="SDADC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="SDADC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="SDADC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="IdleLowPowerMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="FastConversionMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SlowClockMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ReferenceVoltage" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="hdma" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedChannelsNbr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjConvRemaining" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ExtTriggerEdge" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_SDADC_InjectedStop_DMA">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hsdadc" TypeName="SDADC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="SDADC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="SDADC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="IdleLowPowerMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="FastConversionMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SlowClockMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ReferenceVoltage" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="hdma" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedChannelsNbr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjConvRemaining" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ExtTriggerEdge" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_SDADC_MultiModeStart_DMA">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hsdadc" TypeName="SDADC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="SDADC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="SDADC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="IdleLowPowerMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="FastConversionMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SlowClockMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ReferenceVoltage" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="hdma" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedChannelsNbr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjConvRemaining" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ExtTriggerEdge" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="true" GenericType="simple" Name="pData" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Length" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_SDADC_MultiModeStop_DMA">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hsdadc" TypeName="SDADC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="SDADC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="SDADC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="IdleLowPowerMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="FastConversionMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SlowClockMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ReferenceVoltage" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="hdma" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedChannelsNbr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjConvRemaining" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ExtTriggerEdge" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_SDADC_InjectedMultiModeStart_DMA">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hsdadc" TypeName="SDADC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="SDADC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="SDADC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="IdleLowPowerMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="FastConversionMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SlowClockMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ReferenceVoltage" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="hdma" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedChannelsNbr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjConvRemaining" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ExtTriggerEdge" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="true" GenericType="simple" Name="pData" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Length" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_SDADC_InjectedMultiModeStop_DMA">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hsdadc" TypeName="SDADC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="SDADC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="SDADC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="IdleLowPowerMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="FastConversionMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SlowClockMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ReferenceVoltage" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="hdma" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedChannelsNbr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjConvRemaining" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ExtTriggerEdge" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_SDADC_GetValue">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hsdadc" TypeName="SDADC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="SDADC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="SDADC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="IdleLowPowerMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="FastConversionMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SlowClockMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ReferenceVoltage" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="hdma" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedChannelsNbr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjConvRemaining" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ExtTriggerEdge" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_SDADC_InjectedGetValue">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hsdadc" TypeName="SDADC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="SDADC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="SDADC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="IdleLowPowerMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="FastConversionMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SlowClockMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ReferenceVoltage" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="hdma" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedChannelsNbr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjConvRemaining" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ExtTriggerEdge" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="true" GenericType="simple" Name="Channel" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_SDADC_MultiModeGetValue">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hsdadc" TypeName="SDADC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="SDADC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="SDADC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="IdleLowPowerMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="FastConversionMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SlowClockMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ReferenceVoltage" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="hdma" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedChannelsNbr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjConvRemaining" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ExtTriggerEdge" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_SDADC_InjectedMultiModeGetValue">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hsdadc" TypeName="SDADC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="SDADC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="SDADC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="IdleLowPowerMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="FastConversionMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SlowClockMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ReferenceVoltage" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="hdma" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedChannelsNbr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjConvRemaining" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ExtTriggerEdge" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_SDADC_IRQHandler">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hsdadc" TypeName="SDADC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="SDADC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="SDADC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="IdleLowPowerMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="FastConversionMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SlowClockMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ReferenceVoltage" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="hdma" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedChannelsNbr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjConvRemaining" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ExtTriggerEdge" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_SDADC_PollForCalibEvent">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hsdadc" TypeName="SDADC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="SDADC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="SDADC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="IdleLowPowerMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="FastConversionMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SlowClockMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ReferenceVoltage" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="hdma" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedChannelsNbr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjConvRemaining" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ExtTriggerEdge" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="false" GenericType="simple" Name="Timeout" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_SDADC_PollForConversion">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hsdadc" TypeName="SDADC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="SDADC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="SDADC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="IdleLowPowerMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="FastConversionMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SlowClockMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ReferenceVoltage" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="hdma" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedChannelsNbr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjConvRemaining" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ExtTriggerEdge" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="false" GenericType="simple" Name="Timeout" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_SDADC_PollForInjectedConversion">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hsdadc" TypeName="SDADC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="SDADC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="SDADC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="IdleLowPowerMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="FastConversionMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SlowClockMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ReferenceVoltage" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="hdma" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedChannelsNbr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjConvRemaining" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ExtTriggerEdge" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="false" GenericType="simple" Name="Timeout" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_SDADC_CalibrationCpltCallback">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hsdadc" TypeName="SDADC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="SDADC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="SDADC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="IdleLowPowerMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="FastConversionMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SlowClockMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ReferenceVoltage" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="hdma" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedChannelsNbr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjConvRemaining" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ExtTriggerEdge" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_SDADC_ConvHalfCpltCallback">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hsdadc" TypeName="SDADC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="SDADC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="SDADC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="IdleLowPowerMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="FastConversionMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SlowClockMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ReferenceVoltage" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="hdma" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedChannelsNbr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjConvRemaining" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ExtTriggerEdge" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_SDADC_ConvCpltCallback">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hsdadc" TypeName="SDADC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="SDADC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="SDADC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="IdleLowPowerMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="FastConversionMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SlowClockMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ReferenceVoltage" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="hdma" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedChannelsNbr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjConvRemaining" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ExtTriggerEdge" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_SDADC_InjectedConvHalfCpltCallback">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hsdadc" TypeName="SDADC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="SDADC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="SDADC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="IdleLowPowerMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="FastConversionMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SlowClockMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ReferenceVoltage" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="hdma" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedChannelsNbr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjConvRemaining" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ExtTriggerEdge" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_SDADC_InjectedConvCpltCallback">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hsdadc" TypeName="SDADC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="SDADC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="SDADC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="IdleLowPowerMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="FastConversionMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SlowClockMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ReferenceVoltage" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="hdma" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedChannelsNbr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjConvRemaining" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ExtTriggerEdge" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_SDADC_ErrorCallback">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hsdadc" TypeName="SDADC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="SDADC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="SDADC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="IdleLowPowerMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="FastConversionMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SlowClockMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ReferenceVoltage" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="hdma" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedChannelsNbr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjConvRemaining" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ExtTriggerEdge" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_SDADC_GetState">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hsdadc" TypeName="SDADC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="SDADC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="SDADC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="IdleLowPowerMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="FastConversionMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SlowClockMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ReferenceVoltage" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="hdma" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedChannelsNbr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjConvRemaining" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ExtTriggerEdge" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_SDADC_GetError">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hsdadc" TypeName="SDADC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="SDADC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="SDADC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="IdleLowPowerMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="FastConversionMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SlowClockMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ReferenceVoltage" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="hdma" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedContMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedChannelsNbr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjConvRemaining" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedTrigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ExtTriggerEdge" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RegularMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedMultimode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="SDADC_DMARegularHalfConvCplt">
+        <Argument AddressOf="true" GenericType="simple" Name="hdma" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="SDADC_DMARegularConvCplt">
+        <Argument AddressOf="true" GenericType="simple" Name="hdma" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="SDADC_DMAInjectedHalfConvCplt">
+        <Argument AddressOf="true" GenericType="simple" Name="hdma" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="SDADC_DMAInjectedConvCplt">
+        <Argument AddressOf="true" GenericType="simple" Name="hdma" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="SDADC_DMAError">
+        <Argument AddressOf="true" GenericType="simple" Name="hdma" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+    </LibMethod>
+    <RefComponent Cclass="HAL" Cgroup="SDADC" Cversion="0.3.1">
+        <File Category="header" Name="Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_sdadc.h"/>
+        <File Category="source" Name="Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_sdadc.c"/>
+    </RefComponent>
+</IP>

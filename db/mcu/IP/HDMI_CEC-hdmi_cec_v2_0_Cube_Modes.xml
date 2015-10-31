@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<IP DBVersion="V3.0" IPType="Peripheral" Name="HDMI_CEC" Version="hdmi_cec_v2_0_Cube" IpGroup="System" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../db/IP_Modes_V3_0.xsd" xmlns="http://mcd.rou.st.com/modules.php?name=mcu">
+  <About>HDMI_CEC:  High-definition multimedia interface (HDMI) - consumer electronics control (CEC)</About>
+    <RefParameter Comment="CEC instance" DefaultValue="CEC" Name="Instance" Type="list" Visible="false"/> 
+
+    <RefParameter Name="Tolerance" Comment="Rx-Tolerance" DefaultValue="CEC_STANDARD_TOLERANCE"  Type="list"  Group="Configuration parameters">
+        <PossibleValue Value="CEC_STANDARD_TOLERANCE" Comment="Standard tolerance"/>
+        <PossibleValue Value="CEC_EXTENDED_TOLERANCE" Comment="Extended tolerance"/>
+     </RefParameter>   
+
+     <RefParameter Name="ListenMode" Comment="Listening mode" Type="list"  DefaultValue="CEC_FULL_LISTENING_MODE" Group="Configuration parameters">
+        <PossibleValue Value="CEC_REDUCED_LISTENING_MODE" Comment="Receive messages for this device and broadcast"/>
+        <PossibleValue Value="CEC_FULL_LISTENING_MODE" Comment="Receive all messages"/>
+     </RefParameter> 
+
+     <RefParameter  Name="SignalFreeTimeOption" Comment="Signal Free Time" Type="list"  DefaultValue="CEC_DEFAULT_SFT" Group="Configuration parameters">
+        <PossibleValue Value="CEC_DEFAULT_SFT" Comment="Signal Free Time default"/>
+        <PossibleValue Value="CEC_0_5_BITPERIOD_SFT" Comment="Signal Free Time 0.5 bit "/>
+        <PossibleValue Value="CEC_1_5_BITPERIOD_SFT" Comment="Signal Free Time 1.5 bit "/>
+        <PossibleValue Value="CEC_2_5_BITPERIOD_SFT" Comment="Signal Free Time 2.5 bit "/>
+        <PossibleValue Value="CEC_3_5_BITPERIOD_SFT" Comment="Signal Free Time 3.5 bit "/>
+        <PossibleValue Value="CEC_4_5_BITPERIOD_SFT" Comment="Signal Free Time 4.5 bit "/>
+        <PossibleValue Value="CEC_5_5_BITPERIOD_SFT" Comment="Signal Free Time 5.5 bit "/>
+        <PossibleValue Value="CEC_6_5_BITPERIOD_SFT" Comment="Signal Free Time 6.5 bit "/>
+     </RefParameter>   
+
+      <RefParameter  Name="OwnAddress" Comment="CEC device address (hexadecimal)" Type="hex" DefaultValue="0xFF"  Max="0x7FFF" Min="0" Group="Address parameters">
+     </RefParameter>   
+
+      <RefParameter  Name="InitiatorAddress" Comment="Initiator address (decimal)" Type="integer"  DefaultValue="7" Max="15" Min="0" Group="Address parameters">
+     </RefParameter>   
+
+     <RefParameter     Name="BREErrorBitGen" Comment="Rx-Stop on Bit Rising Error" Type="list" DefaultValue="CEC_BRE_ERRORBIT_NO_GENERATION" Group="Error handling">
+        <PossibleValue Value="CEC_BRE_ERRORBIT_NO_GENERATION" Comment="No error bit generation."/>
+        <PossibleValue Value="CEC_BRE_ERRORBIT_GENERATION" Comment="Error-bit generation if BRESTP is set."/>
+     </RefParameter> 
+
+     <RefParameter     Name="LBPEErrorBitGen" Comment="Error Bit on Long Bit Period Error" Type="list" DefaultValue="CEC_BRE_ERRORBIT_NO_GENERATION" Group="Error handling">
+        <PossibleValue Value="CEC_LBPE_ERRORBIT_NO_GENERATION" Comment="No error bit generation."/>
+        <PossibleValue Value="CEC_LBPE_ERRORBIT_GENERATION" Comment="Error bit generation"/>
+     </RefParameter>   
+
+     <RefParameter     Name="BRERxStop" Comment="Stop-Rx on Bit Rising Error" Type="list"  DefaultValue="CEC_RX_STOP_ON_BRE"  Group="Error handling">
+        <PossibleValue Value="CEC_NO_RX_STOP_ON_BRE" Comment="Reception is not stopped"/>
+        <PossibleValue Value="CEC_RX_STOP_ON_BRE" Comment="Reception is stopped"/>
+     </RefParameter>   
+
+     <RefParameter     Name="BroadcastMsgNoErrorBitGen" Comment="Error Bit Generation in Broadcast" Type="list"  DefaultValue="CEC_LBPE_ERRORBIT_NO_GENERATION" Group="Error handling">
+        <PossibleValue Value="CEC_BROADCASTERROR_NO_ERRORBIT_GENERATION" Comment="No error Bit Generation on Broadcast message"/>
+        <PossibleValue Value="CEC_BROADCASTERROR_ERRORBIT_GENERATION" Comment="Error Bit Generation on Broadcast message"/>
+     </RefParameter> 
+
+    <!-- RefMode for CEC -->
+    <RefMode Name="CEC_Activate" HalMode="CEC">
+        <ConfigForMode>CEC_Init</ConfigForMode>
+	<Parameter Name="Tolerance"/>
+	<Parameter Name="SignalFreeTimeOption"/>
+        <Parameter Name="ListenMode"/>
+        <Parameter Name="OwnAddress"/>
+        <Parameter Name="InitiatorAddress"/>
+        <Parameter Name="BRERxStop"/>
+        <Parameter Name="BroadcastMsgNoErrorBitGen"/>
+        <Parameter Name="LBPEErrorBitGen"/>
+    </RefMode>
+
+	<ModeLogicOperator Name="OR">
+	        <Mode Name="CEC_State" UserName="Activated">
+			<ModeLogicOperator Name="XOR">
+				<Mode Name="CEC_Activate" UserName="Activated">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="$SingleInstanceCEC"/>
+					</SignalLogicalOp>
+				</Mode>
+			</ModeLogicOperator>
+		</Mode>
+	</ModeLogicOperator>
+
+    <!-- RefSignal for CEC -->
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="$SingleInstanceCEC"/>
+     <Semaphore>CECUsed_ForRCC</Semaphore>
+</IP>

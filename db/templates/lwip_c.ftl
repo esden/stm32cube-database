@@ -84,21 +84,10 @@
 [#include "Src/eth_vars.tmp"]
 
 [#compress][#if lwip_dhcp == 1]
-/* DHCP process states */
-#define DHCP_START 1
-#define DHCP_WAIT_ADDRESS 2
-#define DHCP_ADDRESS_ASSIGNED 3
-#define DHCP_TIMEOUT 4
-#define DHCP_LINK_DOWN 5
-[/#if] [#-- endif lwip_dhcp --][/#compress]
-[#compress][#if lwip_dhcp == 1]
-#define MAX_DHCP_TRIES  4
-
 [#if with_rtos == 0]
 uint32_t DHCPfineTimer = 0;
 uint32_t DHCPcoarseTimer = 0;
-[/#if] [#-- endif with_rtos --] 
-__IO uint8_t DHCP_state;
+[/#if] [#-- endif with_rtos --]
 [/#if] [#-- endif lwip_dhcp --][/#compress] 
 [#-- IPdatas is a list of IPconfigModel --]  
 [#list IPdatas as IP]  
@@ -394,7 +383,7 @@ __IO uint8_t DHCP_state;
 /* Variables Initialization */
 [#if IP.variables??]
 	[#list IP.variables as variable]
-	[#if variable.generiqueType=="Array"]	
+	[#if variable.generiqueType=="Array" && lwip_dhcp==0]	
 		${variable.value} ${variable.name}[${variable.arraySize}];
 	[#else]
 		[#if (variable.name == "ipaddr") || (variable.name == "netmask") || (variable.name == "gw") || (variable.name == "gnetif")]
@@ -461,7 +450,7 @@ void MX_LWIP_Init(void)
 [/#if] [#-- endif lwip_dhcp --] 
 
   /* add the network interface */
-#if LWIP_ARP || LWIP_ETHERNET
+#if LWIP_ARP
 [#if with_rtos == 0]
   netif_add(&gnetif, &ipaddr, &netmask, &gw, NULL, &ethernetif_init, &ethernet_input);
 [#else]
@@ -488,6 +477,10 @@ void MX_LWIP_Init(void)
 [/#if]
 
 #endif  /* LWIP_ARP || LWIP_ETHERNET */
+
+[#if lwip_dhcp == 1]
+dhcp_start(&gnetif);
+[/#if] [#-- endif lwip_dhcp --] 
 
 #n/* USER CODE BEGIN 3 */
 

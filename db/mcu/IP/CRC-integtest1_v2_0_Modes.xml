@@ -8,6 +8,12 @@
 	<!-- Generic RefParameters for CRC --> 
 	<RefParameter Name="Instance" DefaultValue="CRC" Comment="Instance" Type="" Visible="false"/>
 
+	
+	<RefParameter Comment="Default Polynomial State" DefaultValue="DEFAULT_POLYNOMIAL_ENABLE" Name="DefaultPolynomialUse" Type="list" Group="Basic Parameters">
+	    <Condition Expression="(STM32F030C6Tx|STM32F030C8Tx|STM32F030F4Px|STM32F030K6Tx|STM32F030R8Tx|STM32F031C4Tx|STM32F031C6Tx|STM32F031F4PTx|STM32F031F6Px|STM32F031G4Ux|STM32F031G6Ux|STM32F031K4Ux|STM32F031K6Ux|STM32F031K6Tx|STM32F051C4Tx|STM32F051C6Tx|STM32F051C6Ux|STM32F051C6Ux|STM32F051C8Tx|STM32F051C8Ux|STM32F051K4Tx|STM32F051K4Ux|STM32F051K6Tx|STM32F051K6Ux|STM32F051K8Tx|STM32F051K8Ux|STM32F051R4Tx|STM32F051R6Tx|STM32F051R8Tx|STM32F038C6Tx|STM32F038F6Px|STM32F038G6Ux|STM32F038K6Ux|STM32F048C6Tx|STM32F048C6Tx|STM32F048C6Ux|STM32F048G6Ux|STM32F048T6Yx|STM32F038C6Ux|STM32F042C4Tx|STM32F042C6Tx|STM32F042C4Ux|STM32F042C6Ux|STM32F042F4Px|STM32F042F6Px|STM32F042G4Ux|STM32F042G6Ux|STM32F042K4Tx|STM32F042K6Tx|STM32F042K4Ux|STM32F042K6Ux|STM32F042T6Yx|STM32F048K6Ux|STM32F058C8Ux|STM32F058R8Tx)" Diagnostic=""/>
+		<PossibleValue Comment="Enable" Value="DEFAULT_POLYNOMIAL_ENABLE"/>
+	</RefParameter>
+	
 	<RefParameter Comment="Default Polynomial State" DefaultValue="DEFAULT_POLYNOMIAL_ENABLE" Name="DefaultPolynomialUse" Type="list" Group="Basic Parameters">
 		<PossibleValue Comment="Enable" Value="DEFAULT_POLYNOMIAL_ENABLE"/>
 		<PossibleValue Comment="Disable" Value="DEFAULT_POLYNOMIAL_DISABLE"/>
@@ -17,18 +23,20 @@
 		<PossibleValue Comment="Disable" Value="DEFAULT_INIT_VALUE_DISABLE"/>
 	</RefParameter>
 
-	<RefParameter Comment="CRC Generating Polynomial" DefaultValue="0" Max="4294967295" Min="0" Name="GeneratingPolynomial" Type="integer" Group="Basic Parameters">
+	<RefParameter Comment="CRC Generating Polynomial" DefaultValue="X26+X23+X22+X16+X12+X11+X10+X8+X7+X5+X4+X2+X1+X0" Max="32"  Name="GeneratingPolynomial" Type="polynomial" Group="Basic Parameters">
 		<Condition Expression="(DefaultPolynomialUse=DEFAULT_POLYNOMIAL_DISABLE)&amp;(CRCLength=CRC_POLYLENGTH_32B)" Diagnostic=""/>
 	</RefParameter>
-	<RefParameter Comment="CRC Generating Polynomial" DefaultValue="0"  Max="65535" Min="0" Name="GeneratingPolynomial" Type="integer" Group="Basic Parameters">
+	<RefParameter Comment="CRC Generating Polynomial" DefaultValue="X2+X1+X0"  Max="16"  Name="GeneratingPolynomial" Type="polynomial" Group="Basic Parameters">
 		<Condition Expression="(DefaultPolynomialUse=DEFAULT_POLYNOMIAL_DISABLE)&amp;(CRCLength=CRC_POLYLENGTH_16B)" Diagnostic=""/>
 	</RefParameter>
-	<RefParameter Comment="CRC Generating Polynomial" DefaultValue="0"  Max="255" Min="0" Name="GeneratingPolynomial" Type="integer" Group="Basic Parameters">
+	<RefParameter Comment="CRC Generating Polynomial" DefaultValue="X2+X1+X0"  Max="8"  Name="GeneratingPolynomial" Type="polynomial" Group="Basic Parameters">
 		<Condition Expression="(DefaultPolynomialUse=DEFAULT_POLYNOMIAL_DISABLE)&amp;(CRCLength=CRC_POLYLENGTH_8B)" Diagnostic=""/>
 	</RefParameter>
-	<RefParameter Comment="CRC Generating Polynomial" DefaultValue="0"  Max="127" Min="0" Name="GeneratingPolynomial" Type="integer" Group="Basic Parameters">
+	<RefParameter Comment="CRC Generating Polynomial" DefaultValue="X2+X1+X0"  Max="7"  Name="GeneratingPolynomial" Type="polynomial" Group="Basic Parameters">
 		<Condition Expression="(DefaultPolynomialUse=DEFAULT_POLYNOMIAL_DISABLE)&amp;(CRCLength=CRC_POLYLENGTH_7B)" Diagnostic=""/>
 	</RefParameter>
+	<RefParameter Comment="CRC Generating Polynomial" DefaultValue="null"    Name="GeneratingPolynomial" Type="polynomial" Visible="false" Group="Basic Parameters"/>
+	
 	
 	<RefParameter Comment="Polynomial Size" DefaultValue="CRC_POLYLENGTH_32B" Name="CRCLength" Type="list" Group="Basic Parameters">
 		<Condition Expression="DefaultPolynomialUse=DEFAULT_POLYNOMIAL_DISABLE" Diagnostic=""/>
@@ -37,9 +45,13 @@
 		<PossibleValue Comment="8-bit" Value="CRC_POLYLENGTH_8B"/>
 		<PossibleValue Comment="7-bit" Value="CRC_POLYLENGTH_7B"/>
 	</RefParameter>
+		<RefParameter Comment="Polynomial Size" DefaultValue="null" Name="CRCLength" Type="list" Visible="false" Group="Basic Parameters"/>
+		
 	<RefParameter Comment="Init Value For CRC computation" DefaultValue="0"  Max="4294967295" Min="0" Name="InitValue" Type="integer" Group="Basic Parameters">
 		<Condition Expression="DefaultInitValueUse=DEFAULT_INIT_VALUE_DISABLE" Diagnostic=""/>
 	</RefParameter>
+	<RefParameter Comment="Init Value For CRC computation" DefaultValue="null"   Name="InitValue" Type="integer" Visible="false" Group="Basic Parameters"/>
+	
 	<RefParameter Comment="Input Data Inversion Mode" DefaultValue="CRC_INPUTDATA_INVERSION_NONE" Name="InputDataInversionMode" Type="list" Group="Advanced Parameters">
 		<PossibleValue Comment="None" Value="CRC_INPUTDATA_INVERSION_NONE"/>
 		<PossibleValue Comment="Byte" Value="CRC_INPUTDATA_INVERSION_BYTE"/>
@@ -54,22 +66,34 @@
 		<PossibleValue Comment="Bytes" Value="CRC_INPUTDATA_FORMAT_BYTES"/>
 		<PossibleValue Comment="HalfWords" Value="CRC_INPUTDATA_FORMAT_HALFWORDS"/>
 		<PossibleValue Comment="Words" Value="CRC_INPUTDATA_FORMAT_WORDS"/>
-		<PossibleValue Comment="Undefined" Value="CRC_INPUTDATA_FORMAT_UNDEFINED"/>
 	</RefParameter>
 	
-	
-	<RefMode Name="CRC_Activate" >
-		<ConfigForMode>Crc_Init</ConfigForMode>
-			
-		<Parameter Name="DefaultPolynomialUse"/>
-		<Parameter Name="DefaultInitValueUse"/>
+         <RefMode Name="crcBasic" Abstract="true">
+            	<Parameter Name="DefaultPolynomialUse"/>
 		<Parameter Name="CRCLength"/>
-		<Parameter Name="InitValue"/>
 		<Parameter Name="GeneratingPolynomial"/>
+		<Parameter Name="DefaultInitValueUse"/>
+		<Parameter Name="InitValue"/>
 		<Parameter Name="InputDataInversionMode"/>
 		<Parameter Name="OutputDataInversionMode"/>
-		<Parameter Name="InputDataFormat"/>
+		<Parameter Name="InputDataFormat"/>	
+        </RefMode>
+	
+	<RefMode Name="CRC_Activate" BaseMode="crcBasic">
+	    <Condition Expression="DefaultPolynomialUse=DEFAULT_POLYNOMIAL_DISABLE &amp; (DIE445|DIE440|DIE444|DIE448|DIE442)" Diagnostic=""/>
+		<ConfigForMode>Crc_Ex_Init</ConfigForMode>		
 	</RefMode>
+	
+	<RefMode Name="CRC_Activate" BaseMode="crcBasic">
+	 <Condition Expression="DefaultPolynomialUse=DEFAULT_POLYNOMIAL_ENABLE &amp; (DIE445|DIE440|DIE444|DIE448|DIE442)" Diagnostic=""/>
+		<ConfigForMode>Crc_Init</ConfigForMode>	
+	</RefMode>
+	
+	<RefMode Name="CRC_Activate" BaseMode="crcBasic">
+		<ConfigForMode>Crc_Init</ConfigForMode>	
+		
+	</RefMode>
+	
 	
 	<!-- ModeLogicOperator for CRC -->
 	<ModeLogicOperator Name="OR">

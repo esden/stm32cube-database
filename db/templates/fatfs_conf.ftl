@@ -4,6 +4,8 @@
 [#assign temp = s?replace(".","__")]
 [#assign inclusion_protection = temp?upper_case]
 /*---------------------------------------------------------------------------/
+/  FatFs - FAT file system module configuration file  R0.10  (C)ChaN, 2013
+/----------------------------------------------------------------------------/
 /
 / CAUTION! Do not forget to make clean the project after any changes to
 / the configuration options.
@@ -22,12 +24,17 @@
 [#list SWIP.defines as definition] 
 [#if definition.name="_FS_FATFS_SDIO"]                           
 [#if definition.value="1"]
-#include "stm32f4xx_sd.h"
+#include "bsp_driver_sd.h"
 [/#if] 
 [/#if]
 [#if definition.name="_FS_FATFS_SDRAM"]                           
 [#if definition.value="1"]
-#include "stm32f4xx_sdram.h"
+#include "bsp_driver_sdram.h"
+[/#if] 
+[/#if]
+[#if definition.name="_FS_FATFS_SRAM"]                           
+[#if definition.value="1"]
+#include "bsp_driver_sram.h"
 [/#if] 
 [/#if]
 [#if definition.name="_FS_FATFS_USB"]                           

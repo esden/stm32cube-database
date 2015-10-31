@@ -176,6 +176,9 @@
 	  [/#if] 
 	  [#if definition.name=="INCLUDE_vTaskDelay"]
 	      [#assign valueTaskDelay = definition.value]
+	  [/#if]
+	  [#if definition.name=="INCLUDE_xTaskGetSchedulerState"]
+	      [#assign valueGetSchedulerState = definition.value]
 	  [/#if] 
 	  [#if definition.name=="configPRIO_BITS"]
 	      [#assign valuePrioBits = definition.value]
@@ -257,13 +260,14 @@
 
 /* Set the following definitions to 1 to include the API function, or zero
 to exclude the API function. */
-#define INCLUDE_vTaskPrioritySet      ${valueTaskPrioritySet}
-#define INCLUDE_uxTaskPriorityGet     ${valueTaskPriorityGet}
-#define INCLUDE_vTaskDelete           ${valueTaskDelete}
-#define INCLUDE_vTaskCleanUpResources ${valueTaskCleanUpResources}
-#define INCLUDE_vTaskSuspend          ${valueTaskSuspend}
-#define INCLUDE_vTaskDelayUntil       ${valueTaskDelayUntil}
-#define INCLUDE_vTaskDelay            ${valueTaskDelay}
+#define INCLUDE_vTaskPrioritySet       ${valueTaskPrioritySet}
+#define INCLUDE_uxTaskPriorityGet      ${valueTaskPriorityGet}
+#define INCLUDE_vTaskDelete            ${valueTaskDelete}
+#define INCLUDE_vTaskCleanUpResources  ${valueTaskCleanUpResources}
+#define INCLUDE_vTaskSuspend           ${valueTaskSuspend}
+#define INCLUDE_vTaskDelayUntil        ${valueTaskDelayUntil}
+#define INCLUDE_vTaskDelay             ${valueTaskDelay}
+#define INCLUDE_xTaskGetSchedulerState ${valueGetSchedulerState}
 
 /* Cortex-M specific definitions. */
 #ifdef __NVIC_PRIO_BITS

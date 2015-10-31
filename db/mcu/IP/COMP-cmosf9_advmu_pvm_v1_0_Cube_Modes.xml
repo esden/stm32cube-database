@@ -67,20 +67,29 @@
 
 	<!-- Generic Parameters -->
 	<RefParameter Comment="Speed Mode" DefaultValue="COMP_MODE_HIGHSPEED" Name="Mode" Type="list" Group="Basic Parameters">
-		<PossibleValue Comment="High Speed " Value="COMP_MODE_HIGHSPEED"/>
-		<PossibleValue Comment="Low Speed " Value="COMP_MODE_LOWSPEED"/>
+		<Condition Expression="($IpNumber=2)" Diagnostic=""/>
+		<PossibleValue Comment="High Speed" Value="COMP_MODE_HIGHSPEED"/>
+		<PossibleValue Comment="Low Speed" Value="COMP_MODE_LOWSPEED"/>
+	</RefParameter>
+	<RefParameter Comment="Speed Mode" DefaultValue="COMP_MODE_LOWSPEED" Name="Mode" Type="list" Group="Basic Parameters" Visible="false">
+		<PossibleValue Comment="Low Speed" Value="COMP_MODE_LOWSPEED"/>
 	</RefParameter>
 	
-	<RefParameter Comment="Trigger Mode" DefaultValue="COMP_TRIGGERMODE_IT_RISING" Name="TriggerMode" Type="list" Group="Basic Parameters">
+	<RefParameter Comment="Interrupt Trigger Mode" DefaultValue="COMP_TRIGGERMODE_IT_RISING" Name="TriggerMode" Type="list" Group="Basic Parameters">
 		<PossibleValue Comment="Rising Edge" Value="COMP_TRIGGERMODE_IT_RISING"/>
 		<PossibleValue Comment="Falling Edge" Value="COMP_TRIGGERMODE_IT_FALLING"/>
 		<PossibleValue Comment="Rising/Falling Edge" Value="COMP_TRIGGERMODE_IT_RISING_FALLING"/>
 	</RefParameter>
 	
 	<RefParameter Comment="Output Polarity" DefaultValue="COMP_OUTPUTPOL_NONINVERTED" Name="OutputPol" Type="list" Group="Basic Parameters">
-		<PossibleValue Comment="Not Inverted " Value="COMP_OUTPUTPOL_NONINVERTED"/>
-		<PossibleValue Comment="Inverted " Value="COMP_OUTPUTPOL_INVERTED"/>
+		<PossibleValue Comment="Not Inverted" Value="COMP_OUTPUTPOL_NONINVERTED"/>
+		<PossibleValue Comment="Inverted" Value="COMP_OUTPUTPOL_INVERTED"/>
 	</RefParameter>
+	
+	<RefParameter Comment="Low Power Timer (LPTIM) Connection" DefaultValue="COMP_LPTIMCONNECTION_DISABLED" Name="LPTIMConnection" Type="list" Group="Basic Parameters">
+        <PossibleValue Comment="Disabled" Value="COMP_LPTIMCONNECTION_DISABLED"/>
+		<PossibleValue Comment="Enabled" Value="COMP_LPTIMCONNECTION_ENABLED" Semaphore="Semaphore_$IpInstance_LPTIM_enabled" />
+    </RefParameter>
 	
 
 	<!-- InputPlus is the default Mode -->
@@ -89,6 +98,7 @@
 		<Parameter Name="Mode"/>
 		<Parameter Name="TriggerMode"/>
 		<Parameter Name="OutputPol"/>
+		<Parameter Name="LPTIMConnection"/>
 	</RefMode>
 	
 	
@@ -171,7 +181,7 @@
 					<SignalLogicalOp Name="AND">
 						<Signal Name="VS_DACOUT1"/>
 					</SignalLogicalOp>
-					<Condition Expression="(OUT1_Conf)" Diagnostic="Need to have an 'DAC Out 1' activated"/>
+					<Condition Expression="(DAC_OUT1_Conf)" Diagnostic="Need to have an 'DAC Out 1' activated"/>
 				</Mode>
 				<Mode Name="VREFINT" UserName="Internal VRef" >
 					<SignalLogicalOp Name="AND">

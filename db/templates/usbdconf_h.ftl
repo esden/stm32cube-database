@@ -84,7 +84,7 @@ extern ${variable.value} ${variable.name};
 /*---------- [#if definition.comments??]${definition.comments} [/#if] -----------*/
 [#-- Tracker 253306 --]
     [#if definition.name="USBD_DFU_APP_DEFAULT_ADD"]  
-#define ${definition.name} #t#t0x${value}  
+#define ${definition.name} #t#t${value}  
     [/#if]	
     [#if definition.name!="USBD_DFU_APP_DEFAULT_ADD"]  
 #define ${definition.name} #t#t${value}  

@@ -1,6 +1,38 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <IP DBVersion="V3.0" IPType="peripheral" Name="SYS" Version="STM32L152x8_sys_v1_0" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../db/IP_Modes_V3_0.xsd" xmlns="http://mcd.rou.st.com/modules.php?name=mcu">
-	<ModeLogicOperator Name="OR">
+<RefParameter Comment="PVD detection Level" DefaultValue="PWR_PVDLEVEL_7" Name="PVDLevel" Type="list" >
+     <Condition Expression="Sem_ExternalAnalogVoltage" Diagnostic=""/>       
+        <PossibleValue Comment="PWR PVD LEVEL 7" Value="PWR_PVDLEVEL_7"/>
+    </RefParameter> 	
+    <RefParameter Comment="PVD detection Level" DefaultValue="PWR_PVDLEVEL_0" Name="PVDLevel" Type="list" >
+        <PossibleValue Comment="PWR PVD LEVEL 0 (1.9 V)" Value="PWR_PVDLEVEL_0"/>
+        <PossibleValue Comment="PWR PVD LEVEL 1 (2.1 V)" Value="PWR_PVDLEVEL_1"/>
+        <PossibleValue Comment="PWR PVD LEVEL 2 (2.3 V)" Value="PWR_PVDLEVEL_2"/>
+        <PossibleValue Comment="PWR PVD LEVEL 3 (2.5 V)" Value="PWR_PVDLEVEL_3"/>
+        <PossibleValue Comment="PWR PVD LEVEL 4 (2.7 V)" Value="PWR_PVDLEVEL_4"/>
+        <PossibleValue Comment="PWR PVD LEVEL 5 (2.9 V)" Value="PWR_PVDLEVEL_5"/>
+        <PossibleValue Comment="PWR PVD LEVEL 6 (3.1 V)" Value="PWR_PVDLEVEL_6"/>
+    </RefParameter>
+    
+     <RefParameter Comment="PWR PVD Mode" DefaultValue="PWR_PVD_MODE_NORMAL" Name="Mode" Type="list">
+        <PossibleValue Comment="Basic mode" Value="PWR_PVD_MODE_NORMAL"/>
+        <PossibleValue Comment="External Interrupt Mode with Rising edge trigger detection" Value="PWR_PVD_MODE_IT_RISING"/>
+        <PossibleValue Comment="External Interrupt Mode with Falling edge trigger detection" Value="PWR_PVD_MODE_IT_FALLING"/>
+        <PossibleValue Comment="External Interrupt Mode with Rising/Falling edge trigger detection" Value="PWR_PVD_MODE_IT_RISING_FALLING"/>
+        <PossibleValue Comment="Event Mode with Rising edge trigger detection" Value="PWR_PVD_MODE_EVENT_RISING"/>
+        <PossibleValue Comment="Event Mode with Falling edge trigger detection" Value="PWR_PVD_MODE_EVENT_FALLING"/>
+        <PossibleValue Comment="Event Mode with Rising/Falling edge trigger detection" Value="PWR_PVD_MODE_EVENT_RISING_FALLING"/>
+    </RefParameter>
+    <RefMode Name="PVD" HalMode="COMP">        
+        <ConfigForMode>PVDConfig</ConfigForMode>
+        <ConfigForMode>PVDEnable</ConfigForMode>
+        <Parameter Name="PVDLevel"/>
+        <Parameter Name="Mode"/>
+    </RefMode>
+    <RefMode Name="Voltage_reference"  HalMode="COMP">
+        <ConfigForMode>VrefOutConfig</ConfigForMode>
+    </RefMode>
+    <ModeLogicOperator Name="OR">
 		<Mode Name="Debug">
 			<ModeLogicOperator Name="XOR">
 				<Mode Name="Serial-Wire">
@@ -96,48 +128,7 @@
 					</SignalLogicalOp>
 				</Mode>
 			</ModeLogicOperator>
-		</Mode>
-		<Mode Name="OSC">
-			<ModeLogicOperator Name="XOR">
-				<Mode Name="HSE-External-Clock-Source">
-					<SignalLogicalOp Name="AND">
-						<Signal Name="OSC_IN"/>
-						<Signal Name="OSC_OUT"/>
-					</SignalLogicalOp>
-				</Mode>
-				<Mode Name="HSE-External-Oscillator">
-					<SignalLogicalOp Name="AND">
-						<Signal Name="OSC_IN"/>
-						<Signal Name="OSC_OUT"/>
-					</SignalLogicalOp>
-				</Mode>
-			</ModeLogicOperator>
-		</Mode>
-		<Mode Name="OSC32">
-			<ModeLogicOperator Name="XOR">
-				<Mode Name="LSE-External-Clock-Source">
-					<SignalLogicalOp Name="AND">
-						<Signal Name="OSC32_IN"/>
-						<Signal Name="OSC32_OUT"/>
-					</SignalLogicalOp>
-				</Mode>
-				<Mode Name="LSE-External-Oscillator">
-					<SignalLogicalOp Name="AND">
-						<Signal Name="OSC32_IN"/>
-						<Signal Name="OSC32_OUT"/>
-					</SignalLogicalOp>
-				</Mode>
-			</ModeLogicOperator>
-		</Mode>
-		<Mode Name="Clock-out-1">
-			<ModeLogicOperator Name="OR">
-				<Mode Name="Clock-out-1">
-					<SignalLogicalOp Name="AND">
-						<Signal Name="MCO"/>
-					</SignalLogicalOp>
-				</Mode>
-			</ModeLogicOperator>
-		</Mode>
+		</Mode>			
 		<Mode Name="SYS_WKUP1">
 			<ModeLogicOperator Name="OR">
 				<Mode Name="SYS_WKUP1">
@@ -165,21 +156,31 @@
 				</Mode>
 			</ModeLogicOperator>
 		</Mode>
-		<Mode Name="TAMPER/TIMESTAMP/ALARM_OUT/512Hz">
+                <Mode Name="Voltage_reference" UserName="Voltage Reference Out">
 			<ModeLogicOperator Name="OR">
-				<Mode Name="TAMPER/TIMESTAMP/ALARM_OUT/512Hz">
+				<Mode Name="Voltage_reference">
 					<SignalLogicalOp Name="AND">
-						<Signal Name="RTC_AF1"/>
+						<Signal Name="V_REF_OUT"/>
 					</SignalLogicalOp>
 				</Mode>
 			</ModeLogicOperator>
 		</Mode>
-		<Mode Name="RTC_50_60Hz">
-			<ModeLogicOperator Name="OR">
-				<Mode Name="RTC_50_60Hz">
+                <Mode Name="PowerVD" UserName="Power Voltage Detector In">
+			<ModeLogicOperator Name="XOR">
+				<Mode Name="PVD" UserName="Power Voltage Detector In (External input analog voltage)">
 					<SignalLogicalOp Name="AND">
-						<Signal Name="RTC_REFIN"/>
-					</SignalLogicalOp>
+						<Signal Name="PVD_IN"/>
+                                        </SignalLogicalOp>
+                                        <Semaphore>Sem_ExternalAnalogVoltage</Semaphore>
+                                        <Semaphore>PVD_INTERRUPT</Semaphore>
+
+                                </Mode>
+                                <Mode Name="PVD" UserName="Power Voltage Detector In (Internal analog voltage)">
+                                    <SignalLogicalOp Name="AND">
+                                        <Signal Name="V_PVD_IN"/>
+                                    </SignalLogicalOp>
+                                    <Semaphore>PVD_INTERRUPT</Semaphore>
+
 				</Mode>
 			</ModeLogicOperator>
 		</Mode>
@@ -189,19 +190,16 @@
 	<RefSignal IOMode="System" Name="JTDO-TRACESWO"/>
 	<RefSignal IOMode="System" Name="JTMS-SWDIO"/>
 	<RefSignal IOMode="System" Name="JTRST"/>
-	<RefSignal IOMode="GPIO" Name="MCO"/>
-	<RefSignal IOMode="System" Name="OSC32_IN"/>
-	<RefSignal IOMode="System" Name="OSC32_OUT"/>
-	<RefSignal IOMode="System" Name="OSC_IN"/>
-	<RefSignal IOMode="System" Name="OSC_OUT"/>
-	<RefSignal IOMode="System" Name="RTC_AF1"/>
-	<RefSignal IOMode="GPIO" Name="RTC_REFIN"/>
-	<RefSignal IOMode="System" Name="TRACECK"/>
-	<RefSignal IOMode="System" Name="TRACED0"/>
-	<RefSignal IOMode="System" Name="TRACED1"/>
-	<RefSignal IOMode="System" Name="TRACED2"/>
-	<RefSignal IOMode="System" Name="TRACED3"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="TRACECK"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="TRACED0"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="TRACED1"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="TRACED2"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="TRACED3"/>
 	<RefSignal IOMode="System" Name="WKUP1"/>
 	<RefSignal IOMode="System" Name="WKUP2"/>
 	<RefSignal IOMode="System" Name="WKUP3"/>
+        <RefSignal IOMode="Analog" Name="PVD_IN"/>
+	<RefSignal IOMode="Analog" Name="V_REF_OUT"/>
+            <RefSignal IOMode="Analog" Name="V_PVD_IN" Virtual="true"/>
+
 </IP>

@@ -19,7 +19,7 @@
 	<RefParameter Comment="Scan Conversion Mode" DefaultValue="DISABLE" Name="ScanConvMode" Type="list" Group="ADCgroup">
 		<PossibleValue Comment="Disabled" Value="DISABLE"/>
 		<PossibleValue Comment="Enabled" Value="ENABLE"/>
-		<Description>Enable or Disable the Scan Coverion Mode</Description>
+		<Description>Enable or Disable the Scan Conversion Mode</Description>
 	</RefParameter>
 	<RefParameter Comment="Continuous Conversion Mode" DefaultValue="DISABLE" Name="ContinuousConvMode" Type="uniqueElementList" Group="ADCgroup">
 		<Condition Expression="DiscontinuousConvMode=ENABLE" Diagnostic="Continuous and Discontinuous modes could not be used at the same time"/>
@@ -43,9 +43,12 @@
 		<PossibleValue Comment="Enabled" Value="ENABLE"/>
 		<Description>Enable or Disable the Discontinuous Conversion Mode</Description>
 	</RefParameter>
+            <RefParameter Comment="Number Of Discontinuous Conversions" DefaultValue="null" Max="1" Min="1" Name="NbrOfDiscConversion" Type="integer" Visible="false">
+    	<Condition Expression="!(InjectedDiscontinuous_$IpInstance) &amp;(DiscontinuousConvMode=DISABLE)" Diagnostic=""/>
+    </RefParameter>
 	<RefParameter Comment="Number Of Discontinuous Conversions" DefaultValue="1" Max="8" Min="1" Name="NbrOfDiscConversion" Type="integer"/>
 	<RefParameter Comment="External Trigger Conversion Edge" DefaultValue="null" Name="ExternalTrigConvEdge" Type="list" Group="ADCgroup" Visible="false">
-		<Condition Expression="($IpNumber=2)&amp;!(Mode=ADC_MODE_INDEPENDENT)&amp;!(TripleMode3)&amp;!(DualMode3)" Diagnostic=""/>
+		<Condition Expression="($IpNumber=2)&amp;!(Mode=__NULL)&amp;!(TripleMode3)&amp;!(DualMode3)" Diagnostic=""/>
 	</RefParameter>
 	<!-- -->
 	<!--Regular External trigger should not be available for multiMode -->
@@ -60,7 +63,7 @@
 		<Description>Select the external trigger polarity and enable the trigger of a regular group</Description>
 	</RefParameter>
 	<RefParameter Comment="External Trigger Conversion Source" DefaultValue="null" Name="ExternalTrigConv" Type="list" Group="ADCgroup" Visible="false">
-		<Condition Expression="(ExternalTrigConvEdge=ADC_EXTERNALTRIGCONVEDGE_NONE)|(($IpNumber=2)&amp;!(Mode=ADC_MODE_INDEPENDENT)&amp;!(TripleMode3)&amp;!(DualMode3))" Diagnostic=""/>
+		<Condition Expression="(ExternalTrigConvEdge=ADC_EXTERNALTRIGCONVEDGE_NONE)|(($IpNumber=2)&amp;!(Mode=__NULL)&amp;!(TripleMode3)&amp;!(DualMode3))" Diagnostic=""/>
 	</RefParameter>
 	<RefParameter Comment="External Trigger Conversion Source" DefaultValue="null" Name="ExternalTrigConv" Type="list" Group="ADCgroup" Visible="false">
 		<Condition Expression="(ExternalTrigConvEdge=ADC_EXTERNALTRIGCONVEDGE_NONE)|(($IpNumber=3)&amp;(TripleMode0|TripleMode1|TripleMode_Interl|TripleMode_REGSIMULT | TripleMode_REGSIMULT1))" Diagnostic=""/>
@@ -98,7 +101,7 @@
 		<Description>Number of regular channels to be converted</Description>
 	</RefParameter>
     <!-- <RefParameter Comment="DMA Continuous Requests" DefaultValue="null" Name="DMAContinuousRequests" Type="list" Group="ADCgroup" Visible="false">
-		<Condition Expression="!(Mode=ADC_MODE_INDEPENDENT)" Diagnostic="Diasabled in ADC multi mode"/>
+		<Condition Expression="!(Mode=__NULL)" Diagnostic="Diasabled in ADC multi mode"/>
 	</RefParameter> -->
 	<!--RefParameter Comment="DMA Continuous Requests" DefaultValue="ENABLE" Name="DMAContinuousRequests" Type="list" Group="ADCgroup">
 	  <Condition Diagnostic="" Expression="DMARequest_$IpInstance"/>
@@ -250,7 +253,7 @@
 		<Description>Data offset for regular channel </Description>	
 	</RefParameter>
 	<RefParameter Comment="External Trigger Edge" DefaultValue="null" Name="ExternalTrigInjecConvEdge" Type="list" Group="ADCgroup" Visible="false">
-		<Condition Expression="($IpNumber=2)&amp;!(Mode=ADC_MODE_INDEPENDENT)" Diagnostic=""/>
+		<Condition Expression="($IpNumber=2)&amp;!(Mode=__NULL)" Diagnostic=""/>
 	</RefParameter>
 	<RefParameter Comment="External Trigger Edge" DefaultValue="null" Name="ExternalTrigInjecConvEdge" Type="list" Group="ADCgroup" Visible="false">
 		<Condition Expression="($IpNumber=3)&amp;(TripleMode|TripleMode_REGSIMULT|TripleMode0|TripleMode_REGSIMULT1| TripleMode1| TripleMode_REGSIMULT |TripleMode_Interl |TripleMode3)" Diagnostic=""/>
@@ -270,7 +273,7 @@
 		<Condition Expression="(ExternalTrigInjecConvEdge=ADC_EXTERNALTRIGINJECCONVEDGE_NONE)" Diagnostic="External Trigger mode is selected"/>
 	</RefParameter>
 	<RefParameter Comment="External Trigger Source" DefaultValue="null" Name="ExternalTrigInjecConv" Type="list" Group="ADCgroup" Visible="false">
-		<Condition Expression="($IpNumber=2)&amp;!(Mode=ADC_MODE_INDEPENDENT)" Diagnostic="External Trigger mode is selected"/>
+		<Condition Expression="($IpNumber=2)&amp;!(Mode=__NULL)" Diagnostic="External Trigger mode is selected"/>
 	</RefParameter>
 	<RefParameter Comment="External Trigger Source" DefaultValue="null" Name="ExternalTrigInjecConv" Type="list" Group="ADCgroup" Visible="false">
 		<Condition Expression="($IpNumber=3)&amp;(TripleMode|TripleMode_REGSIMULT|TripleMode0|TripleMode_REGSIMULT1| TripleMode1| TripleMode_REGSIMULT |TripleMode_Interl |TripleMode3)" Diagnostic="External Trigger mode is selected"/>
@@ -302,9 +305,9 @@
 		<Description>Select the external event used to trigger the start of conversion of an injected group</Description>
 	</RefParameter>
 	
-	<RefParameter Comment="Mode" DefaultValue="ADC_MODE_INDEPENDENT" Name="Mode" Type="list" Group="ADCsgroup">
+	<RefParameter Comment="Mode" DefaultValue="__NULL" Name="Mode" Type="list" Group="ADCsgroup">
 		<Condition Expression="USE_ADC1&amp;USE_ADC2&amp;USE_ADC3&amp;(ADC1:InjNumberOfConversion=0)&amp;(ADC2:InjNumberOfConversion=0)&amp;(ADC3:InjNumberOfConversion=0)" Diagnostic="All mode are available if ADC1, ADC2 and ADC3 are used"/>
-		<PossibleValue Comment="Independent mode" Value="ADC_MODE_INDEPENDENT"/>
+		<PossibleValue Comment="Independent mode" Value="__NULL"/>
 		<PossibleValue Comment="Dual combined regular simultaneous + injected simultaneous mode" Value="ADC_DUALMODE_REGSIMULT_INJECSIMULT" Semaphore="DualMode0"/>
 		<PossibleValue Comment="Dual combined regular simultaneous + alternate trigger mode" Value="ADC_DUALMODE_REGSIMULT_ALTERTRIG" Semaphore="DualMode_REGSIMULT1"/>
 		<PossibleValue Comment="Dual injected simultaneous mode only" Value="ADC_DUALMODE_INJECSIMULT" Semaphore="DualMode1"/>
@@ -319,9 +322,9 @@
 		<PossibleValue Comment="Triple alternate trigger mode only" Value="ADC_TRIPLEMODE_ALTERTRIG" Semaphore="TripleMode3"/>
 		<Description>Multi ADC mode selection</Description>
 	</RefParameter>
-	<RefParameter Comment="Mode" DefaultValue="ADC_MODE_INDEPENDENT" Name="Mode" Type="list" Group="ADCsgroup">
+	<RefParameter Comment="Mode" DefaultValue="__NULL" Name="Mode" Type="list" Group="ADCsgroup">
 		<Condition Expression="USE_ADC1&amp;USE_ADC2&amp;(ADC1:InjNumberOfConversion=0)&amp;(ADC2:InjNumberOfConversion=0)" Diagnostic="Triple mode should not be available if ADC3 is not used"/>
-		<PossibleValue Comment="Independent mode" Value="ADC_MODE_INDEPENDENT"/>
+		<PossibleValue Comment="Independent mode" Value="__NULL"/>
 		<PossibleValue Comment="Dual combined regular simultaneous + injected simultaneous mode" Value="ADC_DUALMODE_REGSIMULT_INJECSIMULT" Semaphore="DualMode0"/>
 		<PossibleValue Comment="Dual combined regular simultaneous + alternate trigger mode" Value="ADC_DUALMODE_REGSIMULT_ALTERTRIG" Semaphore="DualMode_REGSIMULT1"/>
 		<PossibleValue Comment="Dual injected simultaneous mode only" Value="ADC_DUALMODE_INJECSIMULT" Semaphore="DualMode1"/>
@@ -330,9 +333,9 @@
 		<PossibleValue Comment="Dual alternate trigger mode only" Value="ADC_DUALMODE_ALTERTRIG" Semaphore="DualMode3"/>
 		<Description>Multi ADC mode selection</Description>
 	</RefParameter>
-	<RefParameter Comment="Mode" DefaultValue="ADC_MODE_INDEPENDENT" Name="Mode" Type="list" Group="ADCsgroup">
+	<RefParameter Comment="Mode" DefaultValue="__NULL" Name="Mode" Type="list" Group="ADCsgroup">
 		<Condition Expression="USE_ADC1&amp;USE_ADC2&amp;USE_ADC3" Diagnostic="Regular simultanious mode should not be available for injected conversion"/>
-		<PossibleValue Comment="Independent mode" Value="ADC_MODE_INDEPENDENT"/>
+		<PossibleValue Comment="Independent mode" Value="__NULL"/>
 		<PossibleValue Comment="Dual combined regular simultaneous + injected simultaneous mode" Value="ADC_DUALMODE_REGSIMULT_INJECSIMULT" Semaphore="DualMode0"/>
 		<PossibleValue Comment="Dual injected simultaneous mode only" Value="ADC_DUALMODE_INJECSIMULT" Semaphore="DualMode1"/>
 		<PossibleValue Comment="Dual interleaved mode only" Value="ADC_DUALMODE_INTERL" Semaphore="DualMode_Interl"/>
@@ -343,22 +346,22 @@
 		<PossibleValue Comment="Triple alternate trigger mode only" Value="ADC_TRIPLEMODE_ALTERTRIG" Semaphore="TripleMode3"/>
 		<Description>Multi ADC mode selection</Description>
 	</RefParameter>
-	<RefParameter Comment="Mode" DefaultValue="ADC_MODE_INDEPENDENT" Name="Mode" Type="list" Group="ADCsgroup">
+	<RefParameter Comment="Mode" DefaultValue="__NULL" Name="Mode" Type="list" Group="ADCsgroup">
 		<Condition Expression="USE_ADC1&amp;USE_ADC2" Diagnostic="Regular simultanious mode should not be available for injected conversion"/>
-		<PossibleValue Comment="Independent mode" Value="ADC_MODE_INDEPENDENT"/>
+		<PossibleValue Comment="Independent mode" Value="__NULL"/>
 		<PossibleValue Comment="Dual combined regular simultaneous + injected simultaneous mode" Value="ADC_DUALMODE_REGSIMULT_INJECSIMULT" Semaphore="DualMode0"/>
 		<PossibleValue Comment="Dual injected simultaneous mode only" Value="ADC_DUALMODE_INJECSIMULT" Semaphore="DualMode1"/>
 		<PossibleValue Comment="Dual interleaved mode only" Value="ADC_DUALMODE_INTERL" Semaphore="DualMode_Interl"/>
 		<PossibleValue Comment="Dual alternate trigger mode only" Value="ADC_DUALMODE_ALTERTRIG" Semaphore="DualMode3"/>
 	</RefParameter>
 	
-	<!--RefParameter Comment="Mode" DefaultValue="ADC_MODE_INDEPENDENT" Name="Mode" Type="list" Group="ADCsgroup">
+	<!--RefParameter Comment="Mode" DefaultValue="__NULL" Name="Mode" Type="list" Group="ADCsgroup">
 		<Condition Expression="USE_ADC1&amp;!USE_ADC2&amp;USE_ADC3" Diagnostic="Only independent mode is available if ADC2 and ADC3 are not used"/>
-		<PossibleValue Comment="Independent mode" Value="ADC_MODE_INDEPENDENT"/>
+		<PossibleValue Comment="Independent mode" Value="__NULL"/>
 		<Description>Multi ADC mode selection</Description>
 	</RefParameter-->
-	<RefParameter Comment="Mode" DefaultValue="ADC_MODE_INDEPENDENT" Name="Mode" Type="list" Group="ADCsgroup">
-		<PossibleValue Comment="Independent mode" Value="ADC_MODE_INDEPENDENT"/>
+	<RefParameter Comment="Mode" DefaultValue="__NULL" Name="Mode" Type="list" Group="ADCsgroup">
+		<PossibleValue Comment="Independent mode" Value="__NULL"/>
 		<Description>Multi ADC mode selection</Description>
 	</RefParameter>
 	
@@ -424,7 +427,9 @@
 	
 	<RefParameter Comment="DMA Access Mode" DefaultValue="null" Name="DMAAccessMode" Type="list" Group="ADCsgroup" Visible="false">
 	</RefParameter>
-	
+		<RefParameter Comment="Delay between 2 sampling phases" DefaultValue="null" Name="TwoSamplingDelay" Type="list" Group="ADCsgroup" Visible="false">
+                    <Condition Expression="Mode=__NULL" Diagnostic=""/>
+                </RefParameter>
 	<RefParameter Comment="Delay between 2 sampling phases" DefaultValue="ADC_TWOSAMPLINGDELAY_5CYCLES" Name="TwoSamplingDelay" Type="list" Group="ADCsgroup">
 		<PossibleValue Comment="5 Cycles" Value="ADC_TWOSAMPLINGDELAY_5CYCLES"/>
 		<PossibleValue Comment="6 Cycles" Value="ADC_TWOSAMPLINGDELAY_6CYCLES"/>
@@ -573,14 +578,14 @@
 	<RefParameter Comment="High Threshold" DefaultValue="null" Name="HighThreshold" Type="list" Group="ADCgroup" Visible="false">
 		<Condition Expression="EnableAnalogWatchDog=false" Diagnostic=""/>
 	</RefParameter>
-	<RefParameter Comment="High Threshold" DefaultValue="0" Max="4095" Min="0" Name="HighThreshold" Type="integer" Group="ADCgroup">
+	<RefParameter Comment="High Threshold" DefaultValue="0" Max="4095" Min="=LowThreshold" Name="HighThreshold" Type="integer" Group="ADCgroup">
 		<Description>Configures the ADC analog watchdog High threshold value.</Description>	
 	</RefParameter>
 	<RefParameter Comment="Low Threshold" DefaultValue="null" Name="LowThreshold" Type="list" Group="ADCgroup" Visible="false">
 		<Condition Expression="EnableAnalogWatchDog=false" Diagnostic=""/>
 	</RefParameter>
 
-	<RefParameter Comment="Low Threshold" DefaultValue="0" Max="4095" Min="0" Name="LowThreshold" Type="integer" Group="ADCgroup">
+	<RefParameter Comment="Low Threshold" DefaultValue="0" Max="=HighThreshold" Min="0" Name="LowThreshold" Type="integer" Group="ADCgroup">
 	<Description>Configures the ADC analog watchdog Low threshold value.</Description>
 	</RefParameter>
 	<RefParameter Comment="Interrupt Mode" DefaultValue="null" Name="ITMode" Type="list" Group="ADCgroup" Visible="false">
@@ -619,18 +624,22 @@
 		<Condition Expression="InjectedDiscontinuous_$IpInstance" Diagnostic=""/>
 		<PossibleValue Comment="Enabled" Value="ENABLE"/>
 	</RefParameter>
-	<RefParameter Comment="Injected Discontinuous Conversion Mode" DefaultValue="null" Name="InjectedDiscontinuousConvMode" Type="list" Visible="false">
+	<RefParameter Comment="Injected Discontinuous Conversion Mode" DefaultValue="DISABLE" Name="InjectedDiscontinuousConvMode" Type="list" Visible="false">
+		<PossibleValue Comment="Disable" Value="DISABLE"/>
 	</RefParameter>
 	<RefParameter Comment="Automatic Injected Conversion" DefaultValue="ENABLE" Name="AutoInjectedConv" Type="list" Visible="false">
 		<Condition Expression="AutoInjected_$IpInstance" Diagnostic=""/>
 		<PossibleValue Comment="Enabled" Value="ENABLE"/>
 	</RefParameter>
-	<RefParameter Comment="Automatic Injected Conversion" DefaultValue="null" Name="AutoInjectedConv" Type="list" Visible="false"/>
+	<RefParameter Comment="Automatic Injected Conversion" DefaultValue="DISABLE" Name="AutoInjectedConv" Type="list" Visible="false">
+		<PossibleValue Comment="Disable" Value="DISABLE"/>
+	</RefParameter>
 	
 	<RefParameter Comment="Injected Offset" DefaultValue="0" Max="4095" Min="0" Name="InjectedOffset" Type="integer">
 		<Description>Data offset for injected channel </Description>
 	</RefParameter>
 	<RefMode Name="ADCs_Common_Settings" Comment="ADCs Common Settings" Group="ADCs_Common_Settings">
+                <Condition Expression="ADC1_Exist &amp;(ADC2_Exist|ADC3_Exist)" Diagnostic=""/>
 		<ConfigForMode>multiMode</ConfigForMode>
 		<Parameter Name="Mode"/>
 		<Parameter Name="DMAAccessMode"/>

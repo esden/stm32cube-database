@@ -10,16 +10,14 @@
 		<PossibleValue Comment="Hourformat 12" Value="RTC_HOURFORMAT_12"/>
 		<PossibleValue Comment="Hourformat 24" Value="RTC_HOURFORMAT_24"/>
 	</RefParameter>
-	<RefParameter Comment="Asynchronous Predivider value" DefaultValue="127" Max="127" Min="127" Name="AsynchPrediv" Type="list" Group="General">
+	<RefParameter Comment="Asynchronous Predivider value" DefaultValue="127" Max="127" Min="127" Name="AsynchPrediv" Type="integer" Group="General">
 		<Condition Diagnostic="" Expression="Prediv_With_REFIN"/>
-		<PossibleValue Comment="127" Value="127"/>
 	</RefParameter>
 	<RefParameter Comment="Asynchronous Predivider value" DefaultValue="127" Max="127" Min="0" Name="AsynchPrediv" Type="integer" Group="General"/>
-	<RefParameter Comment="Synchronous Predivider value" DefaultValue="255" Max="32767" Min="0" Name="SynchPrediv" Type="list" Group="General">
+	<RefParameter Comment="Synchronous Predivider value" DefaultValue="255" Max="255" Min="255" Name="SynchPrediv" Type="integer" Group="General">
 		<Condition Diagnostic="" Expression="Prediv_With_REFIN"/>
-		<PossibleValue Comment="255" Value="255"/>
 	</RefParameter>
-	<RefParameter Comment="Synchronous Predivider value" DefaultValue="255" Max="32767" Min="0" Name="SynchPrediv" Type="integer" Group="General"/>
+	<RefParameter Comment="Synchronous Predivider value" DefaultValue="255" Max="255" Min="0" Name="SynchPrediv" Type="integer" Group="General"/>
 	<!-- Output Signal for Alarm A, Alarm B, WAKEUP -->
 	<RefParameter Comment="Output" DefaultValue="RTC_OUTPUT_ALARMA" Name="OutPut" Type="list" Group="General" Visible="false">
 		<Condition Diagnostic="Alarms A outputed" Expression="AlarmA_Outputed"/>
@@ -83,7 +81,7 @@
 		<PossibleValue Comment="Hourformat12 PM" Value="RTC_HOURFORMAT12_PM"/>
 	</RefParameter>
 	
-	<RefParameter Comment="Day Light Saving: value of hour adjustment" DefaultValue="RTC_DAYLIGHTSAVING_SUB1H" Name="DayLightSaving" Type="list" Group="Calendar Time">
+	<RefParameter Comment="Day Light Saving: value of hour adjustment" DefaultValue="RTC_DAYLIGHTSAVING_NONE" Name="DayLightSaving" Type="list" Group="Calendar Time">
 		<PossibleValue Comment="Daylightsaving None" Value="RTC_DAYLIGHTSAVING_NONE"/>
 		<PossibleValue Comment="Daylightsaving Sub1h" Value="RTC_DAYLIGHTSAVING_SUB1H"/>
 		<PossibleValue Comment="Daylightsaving Add1h" Value="RTC_DAYLIGHTSAVING_ADD1H"/>
@@ -272,13 +270,18 @@
 		<PossibleValue Comment="High Level" Value="RTC_TAMPERTRIGGER_HIGHLEVEL"/>
 	</RefParameter>
 	<RefParameter Comment="Tamper 1 No Erase" DefaultValue="RTC_TAMPERERASEBACKUP_ENABLED" Name="NoErase_1" Type="list" Group="Tamper">
+		<Condition Diagnostic="" Expression="STM32L0"/>
 		<PossibleValue Comment="No Erase Enabled" Value="RTC_TAMPERERASEBACKUP_ENABLED"/>
 		<PossibleValue Comment="No Erase Disabled" Value="RTC_TAMPERERASEBACKUP_DISABLED"/>
 	</RefParameter>
+	<RefParameter Comment="Tamper 1 No Erase" DefaultValue="null" Name="NoErase_1" Type="list" Group="Tamper" Visible="false"/>
+	
 	<RefParameter Comment="Tamper 1 Mask Flag" DefaultValue="RTC_MASKTAMPERFLAG_DISABLED" Name="MaskFlag_1" Type="list" Group="Tamper">
+		<Condition Diagnostic="" Expression="STM32L0"/>
 		<PossibleValue Comment="Mask Flag Disabled" Value="RTC_MASKTAMPERFLAG_DISABLED"/>
 		<PossibleValue Comment="Mask Flag Enabled" Value="RTC_MASKTAMPERFLAG_ENABLED"/>
 	</RefParameter>
+	<RefParameter Comment="Tamper 1 Mask Flag" DefaultValue="null" Name="MaskFlag_1" Type="list" Group="Tamper" Visible="false"/>
 	
 	<RefParameter Comment="Tamper Interruption" DefaultValue="RTC_TAMPER1_INTERRUPT" Name="Interrupt" Type="list" Group="Tamper">
 		<Condition Diagnostic="" Expression="RTC_IRQn &amp; Tamper1_ON &amp; !Tamper2_ON &amp; STM32L0"/>
@@ -310,14 +313,18 @@
 	</RefParameter>
 	
 	<RefParameter Comment="Tamper 2 No Erase" DefaultValue="RTC_TAMPERERASEBACKUP_ENABLED" Name="NoErase_2" Type="list" Group="Tamper">
+		<Condition Diagnostic="" Expression="STM32L0"/>
 		<PossibleValue Comment="No Erase Enabled" Value="RTC_TAMPERERASEBACKUP_ENABLED"/>
 		<PossibleValue Comment="No Erase Disabled" Value="RTC_TAMPERERASEBACKUP_DISABLED"/>
 	</RefParameter>
+	<RefParameter Comment="Tamper 2 No Erase" DefaultValue="null" Name="NoErase_2" Type="list" Group="Tamper" Visible="false"/>
 	
 	<RefParameter Comment="Tamper 2 Mask Flag" DefaultValue="RTC_MASKTAMPERFLAG_DISABLED" Name="MaskFlag_2" Type="list" Group="Tamper">
+		<Condition Diagnostic="" Expression="STM32L0"/>
 		<PossibleValue Comment="Mask Flag Disabled" Value="RTC_MASKTAMPERFLAG_DISABLED"/>
 		<PossibleValue Comment="Mask Flag Enabled" Value="RTC_MASKTAMPERFLAG_ENABLED"/>
 	</RefParameter>
+	<RefParameter Comment="Tamper 2 Mask Flag" DefaultValue="null" Name="MaskFlag_2" Type="list" Group="Tamper" Visible="false"/>
 	
 	<RefParameter Comment="Tamper" DefaultValue="RTC_TAMPER_3" Name="Tamper_3" Type="list" Group="Tamper" Visible="false">
 		<PossibleValue Comment="Tamper 3" Value="RTC_TAMPER_3"/>
@@ -423,7 +430,17 @@
 			<PossibleValue>RTC_TIMESTAMPPIN_PC13</PossibleValue>
 		</Parameter>
 	</RefMode>
-
+	
+	<RefMode Name="Tamper 1 enabled - Input Enabled to TAMP1" HalMode="RTC" BaseMode="Tamper">
+		<Condition Diagnostic="" Expression="TAMP_STAMP_IRQn | RTC_IRQn"/>
+		<ConfigForMode>RTC_SetTamper_1_IT</ConfigForMode>
+		<Parameter Name="Tamper_1">
+			<PossibleValue>RTC_TAMPER_1</PossibleValue>
+		</Parameter>
+		<Parameter Name="Trigger_1"/>
+		<Parameter Name="NoErase_1"/>
+		<Parameter Name="MaskFlag_1"/>
+	</RefMode>
 	<RefMode Name="Tamper 1 enabled - Input Enabled to TAMP1" HalMode="RTC" BaseMode="Tamper">
 		<ConfigForMode>RTC_SetTamper_1</ConfigForMode>
 		<Parameter Name="Tamper_1">
@@ -435,8 +452,18 @@
 	</RefMode>
 	
 	<RefMode Name="Tamper 2 enabled - Input Enabled to TAMP2" HalMode="RTC" BaseMode="Tamper">
+		<Condition Diagnostic="" Expression="TAMP_STAMP_IRQn | RTC_IRQn"/>
+		<ConfigForMode>RTC_SetTamper_2_IT</ConfigForMode>
+		<Parameter Name="Tamper_2">
+			<PossibleValue>RTC_TAMPER_2</PossibleValue>
+		</Parameter>
+		<Parameter Name="Trigger_2"/>
+		<Parameter Name="NoErase_2"/>
+		<Parameter Name="MaskFlag_2"/>
+	</RefMode>
+	<RefMode Name="Tamper 2 enabled - Input Enabled to TAMP2" HalMode="RTC" BaseMode="Tamper">
 		<ConfigForMode>RTC_SetTamper_2</ConfigForMode>
-			<Parameter Name="Tamper_2">
+		<Parameter Name="Tamper_2">
 			<PossibleValue>RTC_TAMPER_2</PossibleValue>
 		</Parameter>
 		<Parameter Name="Trigger_2"/>
@@ -444,6 +471,14 @@
 		<Parameter Name="MaskFlag_2"/>
 	</RefMode>
 	
+	<RefMode Name="Tamper 3 enabled - Input Enabled to TAMP3" HalMode="RTC" BaseMode="Tamper">
+		<Condition Diagnostic="" Expression="TAMP_STAMP_IRQn | RTC_IRQn"/>
+		<ConfigForMode>RTC_SetTamper_3_IT</ConfigForMode>
+			<Parameter Name="Tamper_3">
+			<PossibleValue>RTC_TAMPER_3</PossibleValue>
+		</Parameter>
+		<Parameter Name="Trigger_3"/>
+	</RefMode>
 	<RefMode Name="Tamper 3 enabled - Input Enabled to TAMP3" HalMode="RTC" BaseMode="Tamper">
 		<ConfigForMode>RTC_SetTamper_3</ConfigForMode>
 			<Parameter Name="Tamper_3">
@@ -465,6 +500,19 @@
 	</RefMode>
 	
 	<RefMode Name="Alarm A" HalMode="RTC" BaseMode="RTC_Init_And_Calender_Settings">
+		<Condition Diagnostic="" Expression="RTC_Alarm_IRQn | RTC_IRQn"/>
+		<ConfigForMode>RTC_SetAlarm_A_IT</ConfigForMode>
+		<!-- Basic Parameters -->
+		<Parameter Name="AlarmMask"/>
+		<Parameter Name="AlarmSubSecondMask"/>
+		<Parameter Name="AlarmDateWeekDaySel"/>
+		<Parameter Name="AlarmDateWeekDay"/>
+		<Parameter Name="AlarmDateWeekDay"/>
+		<Parameter Name="Alarm">
+			<PossibleValue>RTC_ALARM_A</PossibleValue>
+		</Parameter>
+	</RefMode>
+	<RefMode Name="Alarm A" HalMode="RTC" BaseMode="RTC_Init_And_Calender_Settings">
 		<ConfigForMode>RTC_SetAlarm_A</ConfigForMode>
 		<!-- Basic Parameters -->
 		<Parameter Name="AlarmMask"/>
@@ -476,7 +524,20 @@
 			<PossibleValue>RTC_ALARM_A</PossibleValue>
 		</Parameter>
 	</RefMode>
-	
+
+	<RefMode Name="Alarm B" HalMode="RTC" BaseMode="RTC_Init_And_Calender_Settings">
+		<Condition Diagnostic="" Expression="RTC_Alarm_IRQn | RTC_IRQn"/>
+		<ConfigForMode>RTC_SetAlarm_B_IT</ConfigForMode>
+		<!-- Basic Parameters -->
+		<Parameter Name="AlarmMask_B"/>
+		<Parameter Name="AlarmSubSecondMask_B"/>
+		<Parameter Name="AlarmDateWeekDaySel_B"/>
+		<Parameter Name="AlarmDateWeekDay_B"/>
+		<Parameter Name="AlarmDateWeekDay_B"/>
+		<Parameter Name="Alarm_B">
+			<PossibleValue>RTC_ALARM_B</PossibleValue>
+		</Parameter>
+	</RefMode>
 	<RefMode Name="Alarm B" HalMode="RTC" BaseMode="RTC_Init_And_Calender_Settings">
 		<ConfigForMode>RTC_SetAlarm_B</ConfigForMode>
 		<!-- Basic Parameters -->
@@ -491,12 +552,26 @@
 	</RefMode>
 
 	<RefMode Name="WakeUp" HalMode="RTC" BaseMode="RTC_Init_And_Calender_Settings">
+		<Condition Diagnostic="" Expression="RTC_WKUP_IRQn | RTC_IRQn"/>
+		<ConfigForMode>RTC_WakeUp_IT</ConfigForMode>
+		<!-- Basic Parameters -->
+		<Parameter Name="WakeUpClock"/>
+		<Parameter Name="WakeUpCounter"/>
+	</RefMode>
+	<RefMode Name="WakeUp" HalMode="RTC" BaseMode="RTC_Init_And_Calender_Settings">
 		<ConfigForMode>RTC_WakeUp</ConfigForMode>
 		<!-- Basic Parameters -->
 		<Parameter Name="WakeUpClock"/>
 		<Parameter Name="WakeUpCounter"/>
 	</RefMode>
 	
+	<RefMode Name="Timestamp" HalMode="RTC" BaseMode="RTC_Init_And_Calender_Settings" Abstract="true">
+		<Condition Diagnostic="" Expression="TAMP_STAMP_IRQn | RTC_IRQn"/>
+		<ConfigForMode>RTC_Timestamp_IT</ConfigForMode>
+		<!-- Basic Parameters -->
+		<Parameter Name="TimeStampEdge"/>
+		<Parameter Name="TimeStampPin"/>
+	</RefMode>
 	<RefMode Name="Timestamp" HalMode="RTC" BaseMode="RTC_Init_And_Calender_Settings" Abstract="true">
 		<ConfigForMode>RTC_Timestamp</ConfigForMode>
 		<!-- Basic Parameters -->
@@ -520,7 +595,7 @@
 	<ModeLogicOperator Name="OR">
 		<Mode Name="Alarm A">
 			<ModeLogicOperator Name="XOR">
-				<Mode Name="Alarm A" UserName="Internal Alarm">
+				<Mode Name="Alarm A" UserName="Internal Alarm A">
 					<SignalLogicalOp Name="AND">
 						<Signal Name="VS_RTC_Alarm_A_Intern"/>
 					</SignalLogicalOp>
@@ -533,10 +608,11 @@
 					<Semaphore>AlarmA_Outputed</Semaphore>
 				</Mode>
 			</ModeLogicOperator>
+			<Semaphore>RTC_ALARM_INTERRUPT</Semaphore>
 		</Mode>
-		<Mode Name="Alarm B">
+		<Mode Name="Alarm B" RemoveCondition="STM32F0">
 			<ModeLogicOperator Name="XOR">
-				<Mode Name="Alarm B" UserName="Internal Alarm">
+				<Mode Name="Alarm B" UserName="Internal Alarm B">
 					<SignalLogicalOp Name="AND">
 						<Signal Name="VS_RTC_Alarm_B_Intern"/>
 					</SignalLogicalOp>
@@ -549,8 +625,9 @@
 					<Semaphore>AlarmB_Outputed</Semaphore>
 				</Mode>
 			</ModeLogicOperator>
+			<Semaphore>RTC_ALARM_INTERRUPT</Semaphore>
 		</Mode>
-		<Mode Name="WakeUp">
+		<Mode Name="WakeUp" RemoveCondition="DIE445 | DIE444 | DIE440">
 			<ModeLogicOperator Name="XOR">
 				<Mode Name="WakeUp" UserName="Internal WakeUp">
 					<SignalLogicalOp Name="AND">
@@ -565,6 +642,7 @@
 					<Semaphore>WakeUp_Outputed</Semaphore>
 				</Mode>
 			</ModeLogicOperator>
+			<Semaphore>RTC_WAKEUP_INTERRUPT</Semaphore>
 		</Mode>
 		<Mode Name="Timestamp">
 			<ModeLogicOperator Name="XOR">
@@ -574,6 +652,7 @@
 					</SignalLogicalOp>
 				</Mode>
 			</ModeLogicOperator>
+			<Semaphore>RTC_TIMESTAMP_INTERRUPT</Semaphore>
 		</Mode>
 		<Mode Name="Tamper 1">
 			<ModeLogicOperator Name="XOR">
@@ -584,6 +663,7 @@
 				</Mode>
 			</ModeLogicOperator>
 			<Semaphore>Tamper1_ON</Semaphore>
+			<Semaphore>RTC_TAMPER_INTERRUPT</Semaphore>
 		</Mode>
 		<Mode Name="Tamper 2">
 			<ModeLogicOperator Name="XOR">
@@ -594,6 +674,7 @@
 				</Mode>
 			</ModeLogicOperator>
 			<Semaphore>Tamper2_ON</Semaphore>
+			<Semaphore>RTC_TAMPER_INTERRUPT</Semaphore>
 		</Mode>
 		<Mode Name="Tamper 3">
 			<ModeLogicOperator Name="XOR">
@@ -603,6 +684,7 @@
 					</SignalLogicalOp>
 				</Mode>
 			</ModeLogicOperator>
+			<Semaphore>RTC_TAMPER_INTERRUPT</Semaphore>
 		</Mode>
 		<Mode Name="Calibration">
 			<ModeLogicOperator Name="XOR">
@@ -654,7 +736,7 @@
 	<RefSignal IOMode="System" Name="TS"/>
 	<RefSignal IOMode="RTCAlternateFunctionPushPull" Name="OUT_ALARM"/>
 	<RefSignal IOMode="RTCAlternateFunctionPushPull" Name="OUT_CALIB"/>
-	<RefSignal IOMode="AlternateFunctionPushPull" Name="REFIN"/>
+	<RefSignal IOMode="RTCAlternateFunctionPushPull" Name="REFIN"/>
 	<!-- Virtual RefSignals-->
 	<RefSignal Name="VS_RTC_Activate" Virtual="true"/>
 	<RefSignal Name="VS_RTC_WakeUp_intern" Virtual="true"/>

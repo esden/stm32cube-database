@@ -78,7 +78,6 @@ void ethernetif_input(struct netif *netif);
 
 [#if use_rtos == 1]
 void ethernetif_set_link(void const *argument);
-void ETHERNET_IRQHandler(void);
 [#else]
 void ethernetif_set_link(struct netif *netif);
 [/#if]

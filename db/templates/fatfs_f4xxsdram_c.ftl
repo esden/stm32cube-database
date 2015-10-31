@@ -1,7 +1,7 @@
 [#ftl]
 /**
  ******************************************************************************
-  * @file    stm32f4xx_sdram.c (based on stm324x9i_eval_sdram.c)
+  * @file    bsp_driver_sdram.c (based on stm324x9i_eval_sdram.c)
   * @author  MCD Teams
   * @version V1.0.0
   * @date    ${date}
@@ -38,7 +38,7 @@
 /* USER CODE BEGIN 0 */
 
 /* Includes ------------------------------------------------------------------*/
-#include "stm32f4xx_sdram.h"
+#include "bsp_driver_sdram.h"
    
 /** @defgroup STM32F4XX_Private_Functions
   * @{

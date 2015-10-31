@@ -95,7 +95,7 @@
         <PossibleValue Comment="2 Byte(s)" Value="2"/>
         <Description>This parameter should be set to the alignment of the CPU: 4 byte alignment or 2 byte alignment.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: PBUF_POOL_BUFSIZE must be greater than MEM_ALIGNMENT.</Description>
     </RefParameter>
-    <RefParameter Name="MEM_SIZE" Comment="MEM_SIZE (Heap Memory Size)" Type="integer" Unit="Byte(s)" Group="Memory Options" DefaultValue="1600" TabName="All LwIP Options" Mode="Basic" Min="0" Max="2147483648" >
+    <RefParameter Name="MEM_SIZE" Comment="MEM_SIZE (Heap Memory Size)" Type="integer" Unit="Byte(s)" Group="Memory Options" DefaultValue="1600" TabName="All LwIP Options" Mode="Basic" Min="0" Max="2147483647" >
         <Description>Size of the heap memory. If the application will send a lot of data that needs to be copied, this should be set high.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: None.</Description>
     </RefParameter>
     <RefParameter Name="MEMP_SEPARATE_POOLS" Comment="MEMP_SEPARATE_POOLS (Memory Pool Separation)" Type="list" Group="Memory Options" DefaultValue="0" TabName="All LwIP Options" Mode="Advanced" >
@@ -148,7 +148,7 @@
     <RefParameter Name="MEMP_NUM_TCP_SEG" Comment="MEMP_NUM_TCP_SEG (Number of TCP Segments simultaneously queued)" Type="integer" Group="Internal Memory Pool Sizes" DefaultValue="16" TabName="All LwIP Options" Mode="Basic" Min="=IF(LWIP_TCP &amp; !MEMP_MEM_MALLOC, TCP_SND_QUEUELEN, 0)" Max="2147483647" >
         <Description>Number of simultaneously queued TCP segments (requires the LWIP_TCP option).&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: MEMP_NUM_TCP_SEG must be greater than TCP_SND_QUEUELEN when LWIP_TCP is enabled and MEMP_MEM_MALLOC disabled.</Description>
     </RefParameter>
-    <RefParameter Name="MEMP_NUM_REASSDATA" Comment="MEMP_NUM_REASSDATA (Number of IP packets simultaneously queued for reassembly)" Type="integer" Group="Internal Memory Pool Sizes" DefaultValue="5" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="=IF(!MEMP_MEM_MALLOC &amp; IP_REASSEMBLY, IP_REASS_MAX_PBUFS, 2147483647)" >
+    <RefParameter Name="MEMP_NUM_REASSDATA" Comment="MEMP_NUM_REASSDATA (Number of IP packets simultaneously queued for reassembly)" Type="integer" Group="Internal Memory Pool Sizes" DefaultValue="5" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="=IF(!MEMP_MEM_MALLOC &amp; IP_REASSEMBLY, IP_REASS_MAX_PBUFS, 1000000)" >
         <Description>Number of IP packets simultaneously queued for reassembly (whole packets, not fragments!).&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: MEMP_NUM_REASSDATA must be less than IP_REASS_MAX_PBUFS when IP_REASSEMBLY is enabled and MEMP_MEM_MALLOC disabled.</Description>
     </RefParameter>
     <RefParameter Name="MEMP_NUM_FRAG_PBUF" Comment="MEMP_NUM_FRAG_PBUF (Number of IP Fragments simultaneously sent)" Type="integer" Group="Internal Memory Pool Sizes" DefaultValue="15" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="2147483647" >
@@ -166,7 +166,7 @@
     <RefParameter Name="MEMP_NUM_NETBUF" Comment="MEMP_NUM_NETBUF (Number of Netbufs Structures)" Type="integer" Group="Internal Memory Pool Sizes" DefaultValue="2" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="2147483647" >
         <Description>Number of netbuf structures which may be in use simultaneously (only needed if you use the sequential API like LWIP_NETCONN or LWIP_SOCKET).&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: None.</Description>
     </RefParameter>
-    <RefParameter Name="MEMP_NUM_NETCONN" Comment="MEMP_NUM_NETCONN (Number of Netconns Structures)" Type="integer" Group="Internal Memory Pool Sizes" DefaultValue="4" TabName="All LwIP Options" Mode="Advanced" Min="=IF(LWIP_NETCONN &amp; MEMP_MEM_MALLOC &amp; LWIP_SOCKET, 1, 0)" Max="=IF(LWIP_NETCONN &amp; !MEMP_MEM_MALLOC, MEMP_NUM_TCP_PCB + MEMP_NUM_TCP_PCB_LISTEN + MEMP_NUM_UDP_PCB + MEMP_NUM_RAW_PCB, 2147483647)" >
+    <RefParameter Name="MEMP_NUM_NETCONN" Comment="MEMP_NUM_NETCONN (Number of Netconns Structures)" Type="integer" Group="Internal Memory Pool Sizes" DefaultValue="4" TabName="All LwIP Options" Mode="Advanced" Min="=IF(LWIP_NETCONN &amp; MEMP_MEM_MALLOC &amp; LWIP_SOCKET, 1, 0)" Max="=IF(LWIP_NETCONN &amp; !MEMP_MEM_MALLOC, MEMP_NUM_TCP_PCB + MEMP_NUM_TCP_PCB_LISTEN + MEMP_NUM_UDP_PCB + MEMP_NUM_RAW_PCB, 1000000)" >
         <Description>Number of struct netconns (only needed if you use the sequential API, like like LWIP_NETCONN or LWIP_SOCKET).&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: There are 2 dependencies:&lt;br&gt;1) When LWIP_NETCONN=1 and MEMP_MEM_MALLOC=0, MEMP_NUM_NETCONN must not ecceed MEMP_NUM_TCP_PCB + MEMP_NUM_TCP_PCB_LISTEN + MEMP_NUM_UDP_PCB + MEMP_NUM_RAW_PCB&lt;br&gt;2) When LWIP_NETCONN, LWIP_SOCKET and MEMP_MEM_MALLOC are all enabled, MEMP_NUM_NETCONN must be greater than 0.</Description>
     </RefParameter>
     <RefParameter Name="MEMP_NUM_TCPIP_MSG_API" Comment="MEMP_NUM_TCPIP_MSG_API (Number of TCPIP Message Structures Used for Callback)" Type="integer" Group="Internal Memory Pool Sizes" DefaultValue="8" TabName="All LwIP Options" Mode="Advanced" Min="=IF(!MEMP_MEM_MALLOC &amp; (LWIP_NETCONN | LWIP_SOCKET), 1, 0)" Max="2147483647" >
@@ -196,18 +196,18 @@
     <RefParameter Name="MEMP_NUM_PPPOE_INTERFACES" Comment="MEMP_NUM_PPPOE_INTERFACES (Number of Concurrent Active PPPoE Interfaces)" Type="integer" Group="Internal Memory Pool Sizes" DefaultValue="1" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="2147483647" >
         <Description>Number of concurrently active PPPoE interfaces (only used with PPPOE_SUPPORT=1)</Description>
     </RefParameter>
-    <RefParameter Name="PBUF_POOL_SIZE" Comment="PBUF_POOL_SIZE (Number of Buffers in the Pbuf Pool)" Type="integer" Group="Internal Memory Pool Sizes" DefaultValue="16" TabName="All LwIP Options" Mode="Basic" Min="1" Max="2147483647" >
+    <RefParameter Name="PBUF_POOL_SIZE" Comment="PBUF_POOL_SIZE (Number of Buffers in the Pbuf Pool)" Type="integer" Group="Pbuf Options" DefaultValue="16" TabName="All LwIP Options" Mode="Basic" Min="1" Max="2147483647" >
         <Description>Number of buffers in the pbuf pool.</Description>
     </RefParameter>
     <RefParameter Name="LWIP_ARP" Comment="LWIP_ARP (ARP Functionality)" Type="list" Group="ARP Options" DefaultValue="1" TabName="All LwIP Options" Mode="Basic" >
         <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: Use LWIP_ARP requires LWIP_ETHERNET." Expression="LWIP_ETHERNET"/>
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
-        <Description>Enable ARP (Address Resolution Protocol) functionality.</Description>
+        <Description>Enable ARP (Address Resolution Protocol) functionality. When ARP is disabled, either PPP or SLIPIF should be enabled or user protocol interface should be added.</Description>
     </RefParameter>
     <RefParameter Name="LWIP_ARP" Comment="LWIP_ARP (ARP Functionality)" Type="list" Group="ARP Options" DefaultValue="0" TabName="All LwIP Options" Mode="Basic" >
         <PossibleValue Comment="Disabled" Value="0"/>
-        <Description>Enable ARP (Address Resolution Protocol) functionality.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Use LWIP_ARP requires LWIP_ETHERNET.</Description>
+        <Description>Enable ARP (Address Resolution Protocol) functionality. When ARP is disabled, either PPP or SLIPIF should be enabled or user protocol interface should be added.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Use LWIP_ARP requires LWIP_ETHERNET.</Description>
     </RefParameter>
     <RefParameter Name="ARP_TABLE_SIZE" Comment="ARP_TABLE_SIZE (Number of Active MAC-IP Address Pairs Cached)" Type="integer" Group="ARP Options" DefaultValue="10" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="2147483647" >
         <Description>Number of active MAC-IP address pairs cached.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: None.</Description>
@@ -232,11 +232,11 @@
         <PossibleValue Comment="Enabled" Value="1"/>
         <Description>When this parameter is enabled, receiving ethernet packets with VLAN header is supported.&lt;br&gt;Additionally, you can define ETHARP_VLAN_CHECK to an u16_t VLAN ID to check. If ETHARP_VLAN_CHECK is defined, only VLAN-traffic for this VLAN is accepted. If ETHARP_VLAN_CHECK is not defined, all traffic is accepted. Alternatively, define a function/define ETHARP_VLAN_CHECK_FN(eth_hdr, vlan) that returns 1 to accept a packet or 0 to drop a packet.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: None.</Description>
     </RefParameter>
-    <RefParameter Name="LWIP_ETHERNET" Comment="LWIP_ETHERNET (Ethernet Module)" Type="list" Group="ARP Options" DefaultValue="=LWIP_ARP | PPPOE_SUPPORT" TabName="All LwIP Options" Mode="Advanced" >
+    <RefParameter Name="LWIP_ETHERNET" Comment="LWIP_ETHERNET (Ethernet Module)" Type="list" Group="ARP Options" DefaultValue="1" TabName="All LwIP Options" Mode="Advanced" >
         <PossibleValue Comment="Enabled" Value="1"/>
         <Description>When this parameter is enabled, ethernet is supported for PPPoE even though ARP might be disabled.&lt;br&gt;&lt;b&gt;Warning&lt;/b&gt;: Ethernet needs to be kept activated to enable LwIP in STM32CubeMX.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: LWIP_ETHERNET needs to be turned on for LWIP_ARP or PPPOE_SUPPORT.</Description>
     </RefParameter>
-    <RefParameter Name="ETH_PAD_SIZE" Comment="ETH_PAD_SIZE (Bytes Added before Ethernet Header)" Type="integer" Unit="Byte(s)" Group="ARP Options" DefaultValue="0" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="2147483648" >
+    <RefParameter Name="ETH_PAD_SIZE" Comment="ETH_PAD_SIZE (Bytes Added before Ethernet Header)" Type="integer" Unit="Byte(s)" Group="ARP Options" DefaultValue="0" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="2147483647" >
         <Description>Number of bytes added before the ethernet header to ensure  alignment of payload after that header.&lt;br&gt;Since the header is 14 bytes long, without this padding e.g. addresses in the IP header will not be aligned on a 32-bit boundary, so setting this to 2 can speed up 32-bit-platforms.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: By default PBUF_LINK_HLEN value is set to ETH_PAD_SIZE+14.</Description>
     </RefParameter>
     <RefParameter Name="ETHARP_SUPPORT_STATIC_ENTRIES" Comment="ETHARP_SUPPORT_STATIC_ENTRIES (Support Static ARP Table Entries)" Type="list" Group="ARP Options" DefaultValue="0" TabName="All LwIP Options" Mode="Advanced" >
@@ -264,7 +264,7 @@
         <PossibleValue Comment="Enabled" Value="1"/>
         <Description>When this parameter is enabled, outgoing IP packets are fragmented if their size exceeds MTU. Note that this option does not affect incoming packet sizes, which can be controlled via IP_REASSEMBLY.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Some dependencies with IP_FRAG_USES_STATIC_BUF and LWIP_NETIF_TX_SINGLE_PBUF.</Description>
     </RefParameter>
-    <RefParameter Name="IP_REASS_MAXAGE" Comment="IP_REASS_MAXAGE (IP Packets Fragmentation if Size exceeds MTU)" Type="integer" Unit="Second(s)" Group="IP Options" DefaultValue="3" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="2000000000" >
+    <RefParameter Name="IP_REASS_MAXAGE" Comment="IP_REASS_MAXAGE (IP Packets Fragmentation if Size exceeds MTU)" Type="integer" Unit="Second(s)" Group="IP Options" DefaultValue="3" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="2147483647" >
         <Description>Maximum time (in multiples of IP_TMR_INTERVAL - so seconds, normally) a fragmented IP packet waits for all fragments to arrive. If not all fragments arrived in this time, the whole packet is discarded.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: None.</Description>
     </RefParameter>
     <RefParameter Name="IP_REASS_MAX_PBUFS" Comment="IP_REASS_MAX_PBUFS (Maximum of Pbufs waiting to Be Reassembled)" Type="integer" Group="IP Options" DefaultValue="10" TabName="All LwIP Options" Mode="Advanced" Min="=IF(MEMP_MEM_MALLOC &amp; IP_REASSEMBLY, MEMP_NUM_REASSDATA, 0)" Max="2147483647" >
@@ -278,7 +278,7 @@
     <RefParameter Name="IP_FRAG_MAX_MTU" Comment="IP_FRAG_MAX_MTU (MAX MTU on any Interface for IP Fragmatation Buffer)" Type="Integer" Unit="Bytes(s)" Group="IP Options" DefaultValue="1500" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="2147483647" >
         <Description>When this parameter is enabled, it is assumed that max MTU on any interface for IP frag buffer (requires IP_FRAG_USES_STATIC_BUF=1).&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: IP_FRAG_MAX_MTU requires IP_FRAG_USES_STATIC_BUF enabled.</Description>
     </RefParameter>
-    <RefParameter Name="IP_DEFAULT_TTL" Comment="IP_DEFAULT_TTL (Time-To-Live Used by Transport Layers)" Type="Integer" Unit="Second(s)" Group="IP Options" DefaultValue="255" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="2000000000" >
+    <RefParameter Name="IP_DEFAULT_TTL" Comment="IP_DEFAULT_TTL (Time-To-Live Used by Transport Layers)" Type="Integer" Unit="Second(s)" Group="IP Options" DefaultValue="255" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="2147483647" >
         <Description>Default value for Time-To-Live used by transport layers.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: IP_DEFAULT_TTL is used to set by default: ICMP_TTL, RAW_TTL, UDP_TTL and TCP_TTL.</Description>
     </RefParameter>
     <RefParameter Name="IP_SOF_BROADCAST" Comment="IP_SOF_BROADCAST (Broadcast Filter per Pcb on UDP and Raw Send Operations)" Type="list" Group="IP Options" DefaultValue="0" TabName="All LwIP Options" Mode="Advanced" >
@@ -311,7 +311,7 @@
         <PossibleValue Comment="Enabled" Value="1"/>
         <Description>This option enables ICMP (Internet Control Message Protocol) module inside the IP stack.Be careful, disable that make your product non-compliant to RFC1122.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: None.</Description>
     </RefParameter>
-    <RefParameter Name="ICMP_TTL" Comment="ICMP_TTL (Time-To-Live Used by ICMP Packets)" Type="Integer" Unit="Second(s)" Group="ICMP Options" DefaultValue="=IP_DEFAULT_TTL" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="2000000000" >
+    <RefParameter Name="ICMP_TTL" Comment="ICMP_TTL (Time-To-Live Used by ICMP Packets)" Type="Integer" Unit="Second(s)" Group="ICMP Options" DefaultValue="=IP_DEFAULT_TTL" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="2147483647" >
         <Description>Default value for Time-To-Live used by ICMP packets.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: None.</Description>
     </RefParameter>
     <RefParameter Name="LWIP_BROADCAST_PING" Comment="LWIP_BROADCAST_PING (Respond to Broadcast Pings)" Type="list" Group="ICMP Options" DefaultValue="0" TabName="All LwIP Options" Mode="Advanced" >
@@ -334,10 +334,10 @@
         <PossibleValue Comment="Disabled" Value="0"/>
         <Description>If this parameter is enabled, the application layer to hook into the IP layer itself is enabled.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Use LWIP_RAW requires MEMP_NUM_RAW_PCB&gt;0 when MEMP_MEM_MALLOC is disabled.</Description>
     </RefParameter>
-    <RefParameter Name="RAW_TTL" Comment="RAW_TTL (Time-To-Live Used by Raw Packets)" Type="Integer" Unit="Second(s)" Group="Raw Options" DefaultValue="=IP_DEFAULT_TTL" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="2000000000" >
+    <RefParameter Name="RAW_TTL" Comment="RAW_TTL (Time-To-Live Used by Raw Packets)" Type="Integer" Unit="Second(s)" Group="Raw Options" DefaultValue="=IP_DEFAULT_TTL" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="2147483647" >
         <Description>Default value for Time-To-Live used by Raw packets.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: None.</Description>
     </RefParameter>
-    <RefParameter Name="DHCP_DOES_ARP_CHECK" Comment="DHCP_DOES_ARP_CHECK (ARP Check on Offered Address)" Type="list" Group="DHCP Options" DefaultValue="0" TabName="All LwIP Options" Mode="Advanced" >
+    <RefParameter Name="DHCP_DOES_ARP_CHECK" Comment="DHCP_DOES_ARP_CHECK (ARP Check on Offered Address)" Type="list" Group="DHCP Options" DefaultValue="1" TabName="All LwIP Options" Mode="Advanced" >
         <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: Use DHCP_DOES_ARP_CHECK requires LWIP_DHCP and LWIP_ARP both enabled." Expression="(LWIP_DHCP &amp; LWIP_ARP)"/>
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
@@ -396,13 +396,13 @@
         <PossibleValue Comment="Enabled" Value="1"/>
         <Description>Only allow SNMP write actions that are 'safe' (e.g. disabeling netifs is not a safe action and disabled when SNMP_SAFE_REQUESTS = 1). Unsafe requests are disabled by default!&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: None.</Description>
     </RefParameter>
-    <RefParameter Name="SNMP_MAX_OCTET_STRING_LEN" Comment="SNMP_MAX_OCTET_STRING_LEN (SNMP Maximum Length of Strings Used)" Type="Integer" Unit="Byte(s)" Group="SNMP Options" DefaultValue="127" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="2147483648" >
+    <RefParameter Name="SNMP_MAX_OCTET_STRING_LEN" Comment="SNMP_MAX_OCTET_STRING_LEN (SNMP Maximum Length of Strings Used)" Type="Integer" Unit="Byte(s)" Group="SNMP Options" DefaultValue="127" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="2147483647" >
         <Description>Maximum length of strings used. This affects the size of MEMP_SNMP_VALUE elements.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: None.</Description>
     </RefParameter>
     <RefParameter Name="SNMP_MAX_TREE_DEPTH" Comment="SNMP_MAX_TREE_DEPTH (Maximum Depth of SNMP Tree)" Type="Integer" Group="SNMP Options" DefaultValue="15" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="2147483647" >
         <Description>Maximum depth of the SNMP tree. With private MIBs enabled, this depends on your MIB! This affects the size of MEMP_SNMP_VALUE elements.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: None.</Description>
     </RefParameter>
-    <RefParameter Name="SNMP_MAX_VALUE_SIZE" Comment="SNMP_MAX_VALUE_SIZE (Size of MEMP_SNMP_VALUE Elements)" Type="Integer" Unit="Byte(s)" Group="SNMP Options" DefaultValue="128" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="2147483648" >
+    <RefParameter Name="SNMP_MAX_VALUE_SIZE" Comment="SNMP_MAX_VALUE_SIZE (Size of MEMP_SNMP_VALUE Elements)" Type="Integer" Unit="Byte(s)" Group="SNMP Options" DefaultValue="128" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="2147483647" >
         <Description>The size of the MEMP_SNMP_VALUE elements, normally calculated from SNMP_MAX_OCTET_STRING_LEN and SNMP_MAX_TREE_DEPTH.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: None.</Description>
     </RefParameter>
     <RefParameter Name="LWIP_IGMP" Comment="LWIP_IGMP (IGMP Module)" Type="list" Group="Protocols Options" DefaultValue="0" TabName="General" Mode="Basic" >
@@ -428,7 +428,7 @@
     <RefParameter Name="DNS_TABLE_SIZE" Comment="DNS_TABLE_SIZE (DNS Maximum Number of Entries)" Type="Integer" Group="DNS Options" DefaultValue="4" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="2147483647" >
         <Description>DNS maximum number of entries to maintain locally.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: None.</Description>
     </RefParameter>
-    <RefParameter Name="DNS_MAX_NAME_LENGTH" Comment="DNS_MAX_NAME_LENGTH (DNS Maximum Host Name Length)" Type="Integer" Unit="Byte(s)" Group="DNS Options" DefaultValue="256" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="2147483648" >
+    <RefParameter Name="DNS_MAX_NAME_LENGTH" Comment="DNS_MAX_NAME_LENGTH (DNS Maximum Host Name Length)" Type="Integer" Unit="Byte(s)" Group="DNS Options" DefaultValue="256" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="2147483647" >
         <Description>DNS maximum host name length supported in the name table.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: None.</Description>
     </RefParameter>
     <RefParameter Name="DNS_MAX_SERVERS" Comment="DNS_MAX_SERVERS (Maximum Number of DNS Servers)" Type="Integer" Group="DNS Options" DefaultValue="2" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="2147483647" >
@@ -439,7 +439,7 @@
         <PossibleValue Comment="Enabled" Value="1"/>
         <Description>DNS do a name checking between the query and the response.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: None.</Description>
     </RefParameter>
-    <RefParameter Name="DNS_MSG_SIZE" Comment="DNS_MSG_SIZE (DNS Message Maximum Size)" Type="Integer" Unit="Byte(s)" Group="DNS Options" DefaultValue="512" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="2147483648" >
+    <RefParameter Name="DNS_MSG_SIZE" Comment="DNS_MSG_SIZE (DNS Message Maximum Size)" Type="Integer" Unit="Byte(s)" Group="DNS Options" DefaultValue="512" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="2147483647" >
         <Description>DNS message max. size. Default value is RFC compliant.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: None.</Description>
     </RefParameter>
     <RefParameter Name="DNS_LOCAL_HOSTLIST" Comment="DNS_LOCAL_HOSTLIST (DNS Local host-to-address List Implementation)" Type="list" Group="DNS Options" DefaultValue="0" TabName="All LwIP Options" Mode="Advanced" >
@@ -501,13 +501,13 @@
     <RefParameter Name="TCP_TTL" Comment="TCP_TTL (Number of Time-To-Live Used by TCP Packets)" Type="Integer" Group="TCP Options" DefaultValue="=IP_DEFAULT_TTL" TabName="All LwIP Options" Mode="Basic" Min="0" Max="2147483647" >
         <Description>Default TCP Time-To-Live value.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: None.</Description>
     </RefParameter>
-    <RefParameter Name="TCP_WND" Comment="TCP_WND (TCP Receive Window Maximum Size)" Type="Integer" Unit="Byte(s)" Group="TCP Options" DefaultValue="2144" TabName="All LwIP Options" Mode="Basic" Min="=IF(!LWIP_TCP, 0, 2*TCP_MSS)" Max="=IF(!LWIP_TCP, 2147483648, IF(!MEMP_MEM_MALLOC, IF( (PBUF_POOL_SIZE*(PBUF_POOL_BUFSIZE-(PBUF_LINK_HLEN+20+20))) &lt; 65535, (PBUF_POOL_SIZE*(PBUF_POOL_BUFSIZE-(PBUF_LINK_HLEN+20+20))),65535), 65535))" >
+    <RefParameter Name="TCP_WND" Comment="TCP_WND (TCP Receive Window Maximum Size)" Type="Integer" Unit="Byte(s)" Group="TCP Options" DefaultValue="2144" TabName="All LwIP Options" Mode="Basic" Min="=IF(!LWIP_TCP, 0, 2*TCP_MSS)" Max="=IF(!LWIP_TCP, 1000000, IF(!MEMP_MEM_MALLOC, IF( (PBUF_POOL_SIZE*(PBUF_POOL_BUFSIZE-(PBUF_LINK_HLEN+20+20))) &lt; 65535, (PBUF_POOL_SIZE*(PBUF_POOL_BUFSIZE-(PBUF_LINK_HLEN+20+20))),65535), 65535))" >
         <Description>Size of a TCP window.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: If you use TCP_WND with LWIP_TCP enabled, the minimum value advised by the stack is 2*TCP_MSS and the maximun must be limited to PBUF_POOL_SIZE*(PBUF_POOL_BUFSIZE-(PBUF_LINK_HLEN+20+20)) or 65535. In case of Max value lower than Min value, please update other dependent parameters like TCP_MSS.</Description>
     </RefParameter>
-    <RefParameter Name="TCP_MAXRTX" Comment="TCP_MAXRTX (Maximum Number of Retransmissions of Data Segments)" Type="Integer" Group="TCP Options" DefaultValue="12" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="=IF(!LWIP_TCP, 2147483647, 12)" >
+    <RefParameter Name="TCP_MAXRTX" Comment="TCP_MAXRTX (Maximum Number of Retransmissions of Data Segments)" Type="Integer" Group="TCP Options" DefaultValue="12" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="=IF(!LWIP_TCP, 1000000, 12)" >
         <Description>Maximum number of retransmissions of data segments.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: If LWIP_TCP=1, TCP_MAXRTX must less or equal to 12.</Description>
     </RefParameter>
-    <RefParameter Name="TCP_SYNMAXRTX" Comment="TCP_SYNMAXRTX (Maximum Number of Retransmissions of SYN Segments)" Type="Integer" Group="TCP Options" DefaultValue="6" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="=IF(!LWIP_TCP, 2147483647, 12)" >
+    <RefParameter Name="TCP_SYNMAXRTX" Comment="TCP_SYNMAXRTX (Maximum Number of Retransmissions of SYN Segments)" Type="Integer" Group="TCP Options" DefaultValue="6" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="=IF(!LWIP_TCP, 1000000, 12)" >
         <Description>Maximum number of retransmissions of SYN segments.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: If LWIP_TCP=1, TCP_SYNMAXRTX must less or equal to 12.</Description>
     </RefParameter>
     <RefParameter Name="TCP_QUEUE_OOSEQ" Comment="TCP_QUEUE_OOSEQ (Allow Out-Of-Order Incoming Packets)" Type="list" Group="TCP Options" DefaultValue="=LWIP_TCP" TabName="All LwIP Options" Mode="Basic" >
@@ -523,19 +523,19 @@
         <PossibleValue Comment="Enabled" Value="1"/>
         <Description>Maximum size of a segment that TCP really sends, the 'effective send MSS,' MUST be the smaller of the send MSS (which reflects the available reassembly buffer size at the remote host) and the largest size permitted by the IP layer (RFC 1122) Setting this to 1 enables code that checks TCP_MSS against the MTU of the netif used for a connection and limits the MSS if it would be too big otherwise.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: None.</Description>
     </RefParameter>
-    <RefParameter Name="TCP_SND_BUF" Comment="TCP_SND_BUF (TCP Sender Buffer Space)" Type="Integer" Unit="Byte(s)" Group="TCP Options" DefaultValue="1072" TabName="All LwIP Options" Mode="Basic" Min="=IF(LWIP_TCP, TCP_MSS*2, 0)" Max="2147483648" >
+    <RefParameter Name="TCP_SND_BUF" Comment="TCP_SND_BUF (TCP Sender Buffer Space)" Type="Integer" Unit="Byte(s)" Group="TCP Options" DefaultValue="1072" TabName="All LwIP Options" Mode="Basic" Min="=IF(LWIP_TCP, TCP_MSS*2, 0)" Max="2147483647" >
         <Description>TCP sender buffer space (bytes). To achieve good performance.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Use TCP_SND_BUF requires TCP enabled. When TCP_LWIP is enabled, TCP_SND_BUF must ne greater than TCP_SNDLOWAT and greater than 2*TCP_MSS. TCP_SND_BUF value is also used to set value of TCP_SND_QUEUELEN and TCP_SNDLOWAT.</Description>
     </RefParameter>
-    <RefParameter Name="TCP_SND_QUEUELEN" Comment="TCP_SND_QUEUELEN (Number of Packet Buffers Allowed for TCP Sender)" Type="Integer" Unit="Byte(s)" Group="TCP Options" DefaultValue="9" TabName="All LwIP Options" Mode="Basic" Min="=IF(!LWIP_TCP, 2 * TCP_SND_BUF/TCP_MSS, IF((2 * (TCP_SND_BUF / TCP_MSS))&gt;2, IF( (2 * (TCP_SND_BUF / TCP_MSS)) &gt; TCP_SNDQUEUELOWAT, (2 * (TCP_SND_BUF / TCP_MSS)), IF(TCP_SNDQUEUELOWAT &gt; (2 * (TCP_SND_BUF / TCP_MSS)),TCP_SNDQUEUELOWAT,(2 * (TCP_SND_BUF / TCP_MSS)))),2))" Max="=IF(!LWIP_TCP, 2147483647, 65535)" >
+    <RefParameter Name="TCP_SND_QUEUELEN" Comment="TCP_SND_QUEUELEN (Number of Packet Buffers Allowed for TCP Sender)" Type="Integer" Unit="Byte(s)" Group="TCP Options" DefaultValue="9" TabName="All LwIP Options" Mode="Basic" Min="=IF(!LWIP_TCP, 2 * TCP_SND_BUF/TCP_MSS, IF((2 * (TCP_SND_BUF / TCP_MSS))&gt;2, IF( (2 * (TCP_SND_BUF / TCP_MSS)) &gt; TCP_SNDQUEUELOWAT, (2 * (TCP_SND_BUF / TCP_MSS)), IF(TCP_SNDQUEUELOWAT &gt; (2 * (TCP_SND_BUF / TCP_MSS)),TCP_SNDQUEUELOWAT,(2 * (TCP_SND_BUF / TCP_MSS)))),2))" Max="=IF(!LWIP_TCP, 1000000, 65535)" >
         <Description>TCP sender buffer space (pbufs).&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: This must be greater than or equal to (2 * TCP_SND_BUF/TCP_MSS) and lower than 65535 Bytes if LWIP_TCP is enabled.</Description>
     </RefParameter>
-    <RefParameter Name="TCP_SNDLOWAT" Comment="TCP_SNDLOWAT (TCP Writable Space)" Type="Integer" Unit="Byte(s)" Group="TCP Options" DefaultValue="=TCP_SND_BUF-1" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="=IF(LWIP_TCP, TCP_SND_BUF-1, 2147483648)" >
+    <RefParameter Name="TCP_SNDLOWAT" Comment="TCP_SNDLOWAT (TCP Writable Space)" Type="Integer" Unit="Byte(s)" Group="TCP Options" DefaultValue="=TCP_SND_BUF-1" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="=IF(LWIP_TCP, TCP_SND_BUF-1, 1000000)" >
         <Description>TCP writable space (bytes). This must be less than TCP_SND_BUF. It is the amount of space which must be available in the TCP snd_buf for select to return writable (combined with TCP_SNDQUEUELOWAT).&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: TCP_SNDLOWAT must be less than TCP_SND_BUF when LWIP_TCP is enabled.</Description>
     </RefParameter>
-    <RefParameter Name="TCP_SNDQUEUELOWAT" Comment="TCP_SNDQUEUELOWAT (TCP Writable Buffers)" Type="Integer" Unit="Byte(s)" Group="TCP Options" DefaultValue="5" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="=IF(LWIP_TCP, TCP_SND_QUEUELEN-1, 2147483648)" >
+    <RefParameter Name="TCP_SNDQUEUELOWAT" Comment="TCP_SNDQUEUELOWAT (TCP Writable Buffers)" Type="Integer" Unit="Byte(s)" Group="TCP Options" DefaultValue="5" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="=IF(LWIP_TCP, TCP_SND_QUEUELEN-1, 1000000)" >
         <Description>TCP writable bufs (pbuf count).This must be less than TCP_SND_QUEUELEN. If the number of pbufs queued on a pcb drops below this number, select returns writable (combined with TCP_SNDLOWAT).&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: TCP_SNDQUEUELOWAT must be less than TCP_SND_QUEUELEN when LWIP_TCP is enabled.</Description>
     </RefParameter>
-    <RefParameter Name="TCP_OOSEQ_MAX_BYTES" Comment="TCP_OOSEQ_MAX_BYTES (Maximum Number of Bytes Queued on ooseq per Pcb)" Type="Integer" Unit="Byte(s)" Group="TCP Options" DefaultValue="0" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="2147483648" >
+    <RefParameter Name="TCP_OOSEQ_MAX_BYTES" Comment="TCP_OOSEQ_MAX_BYTES (Maximum Number of Bytes Queued on ooseq per Pcb)" Type="Integer" Unit="Byte(s)" Group="TCP Options" DefaultValue="0" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="2147483647" >
         <Description>Maximum number of bytes queued on ooseq per pcb. Default is 0 (no limit). Only valid for TCP_QUEUE_OOSEQ=0.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: None.</Description>
     </RefParameter>
     <RefParameter Name="TCP_OOSEQ_MAX_PBUFS" Comment="TCP_OOSEQ_MAX_PBUFS (Maximum Number of Pbufs Queued on ooseq per Pcb)" Type="Integer" Group="TCP Options" DefaultValue="0" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="2147483647" >
@@ -551,7 +551,7 @@
         <PossibleValue Comment="Disabled" Value="0"/>
         <Description>When this parameter is enabled, the backlog option for tcp listen pcb is set.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Use TCP_LISTEN_BACKLOG requires LWIP_TCP, and TCP_DEFAULT_LISTEN_BACKLOG must be less than 256 and greater or equal than 0.</Description>
     </RefParameter>
-    <RefParameter Name="TCP_DEFAULT_LISTEN_BACKLOG" Comment="TCP_DEFAULT_LISTEN_BACKLOG (Maximum Allowed Backlog for TCP Listen Netconns)" Type="integer" Unit="Byte(s)" Group="TCP Options" DefaultValue="255" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="=IF(LWIP_TCP &amp; TCP_LISTEN_BACKLOG, 255, 2147483648)" >
+    <RefParameter Name="TCP_DEFAULT_LISTEN_BACKLOG" Comment="TCP_DEFAULT_LISTEN_BACKLOG (Maximum Allowed Backlog for TCP Listen Netconns)" Type="integer" Unit="Byte(s)" Group="TCP Options" DefaultValue="255" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="=IF(LWIP_TCP &amp; TCP_LISTEN_BACKLOG, 255, 1000000)" >
         <Description>Maximum allowed backlog for TCP listen netconns. This backlog is used unless another is explicitly specified. 0xff is the maximum (u8_t).&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Link with LWIP_TCP and TCP_LISTEN_BACKLOG parameters: when LWIP_TCP and TCP_LISTEN_BACKLOG are enabled, TCP_DEFAULT_LISTEN_BACKLOG must less than 256.</Description>
     </RefParameter>
     <RefParameter Name="TCP_OVERSIZE" Comment="TCP_OVERSIZE (Maximum Number of Bytes that tcp_write)" Type="list" Unit="Byte(s)" Group="TCP Options" DefaultValue="TCP_MSS" TabName="All LwIP Options" Mode="Advanced" >
@@ -567,7 +567,7 @@
         <PossibleValue Comment="Enabled" Value="1"/>
         <Description>Support the TCP timestamp option.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: None.</Description>
     </RefParameter>
-    <RefParameter Name="TCP_WND_UPDATE_THRESHOLD" Comment="TCP_WND_UPDATE_THRESHOLD (TCP Window Update Threshold)" Type="Integer" Unit="Byte(s)" Group="TCP Options" DefaultValue="=TCP_WND/4" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="2147483648" >
+    <RefParameter Name="TCP_WND_UPDATE_THRESHOLD" Comment="TCP_WND_UPDATE_THRESHOLD (TCP Window Update Threshold)" Type="Integer" Unit="Byte(s)" Group="TCP Options" DefaultValue="=TCP_WND/4" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="2147483647" >
         <Description>Difference in window to trigger an explicit window update.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: None.</Description>
     </RefParameter>
     <RefParameter Name="LWIP_EVENT_API" Comment="LWIP_EVENT_API (LwIP Event API)" Type="list" Group="TCP Options" DefaultValue="0" TabName="All LwIP Options" Mode="Advanced" >
@@ -596,7 +596,7 @@
     <RefParameter Name="PBUF_LINK_HLEN" Comment="PBUF_LINK_HLEN (Number of Bytes for Link Level Header)" Type="Integer" Unit="Byte(s)" Group="Pbuf Options" DefaultValue="=14+ETH_PAD_SIZE" TabName="All LwIP Options" Mode="Advanced" Min="14" Max="=PBUF_POOL_BUFSIZE-PBUF_IP_HLEN-PBUF_TRANSPORT_HLEN-1" >
         <Description>Number of bytes that should be allocated for a link level header. The default is 14, the standard value for Ethernet.&lt;br&gt;&lt;b&gt;Warning&lt;/b&gt;: To handle corner cases, PBUF_LINK_HLEN must be less than PBUF_POOL_BUFSIZE - 40 (IP_HLEN + PBUF_TRANSPORT_HLEN) and greater or equal than 14.</Description>
     </RefParameter>
-    <RefParameter Name="PBUF_POOL_BUFSIZE" Comment="PBUF_POOL_BUFSIZE (Size of each pbuf in the pbuf pool)" Type="Integer" Unit="Byte(s)" Group="Pbuf Options" DefaultValue="=536+40+14+2" TabName="All LwIP Options" Mode="Basic" Min="=55" Max="2147483648" >
+    <RefParameter Name="PBUF_POOL_BUFSIZE" Comment="PBUF_POOL_BUFSIZE (Size of each pbuf in the pbuf pool)" Type="Integer" Unit="Byte(s)" Group="Pbuf Options" DefaultValue="=536+40+14+2" TabName="All LwIP Options" Mode="Basic" Min="=55" Max="2147483647" >
         <Description>Size of each pbuf in the pbuf pool. The default is designed to accomodate single full size TCP frame in one pbuf, including TCP_MSS, IP header, and link header.&lt;br&gt;&lt;b&gt;Warning&lt;/b&gt;: To handle corner cases, PBUF_POOL_BUFSIZE should be greater or equal than 55 (15 + PBUF_IP_HLEN + PBUF_TRANSPORT_HLEN).</Description>
     </RefParameter>
     <RefParameter Name="PBUF_IP_HLEN" Comment="PBUF_IP_HLEN (PBUF_IP_HLEN)" Type="Integer" Group="Pbuf Options" DefaultValue="20" Min="0" Max="65535" Visible="false"/>
@@ -680,11 +680,11 @@
     <RefParameter Name="TCPIP_THREAD_NAME" Comment="TCPIP_THREAD_NAME (TCPIP Thread Name)" Type="StringRW" Group="Thread Options" DefaultValue="&quot;tcpip_thread&quot;" TabName="All LwIP Options" Mode="Basic" Visible="false">
         <Description>Name assigned to the main tcpip thread.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: TCPIP_THREAD_NAME is used only of NO_SYS=0.</Description>
     </RefParameter>
-    <RefParameter Name="TCPIP_THREAD_STACKSIZE" Comment="TCPIP_THREAD_STACKSIZE (TCPIP Thread Stack Size)" Type="Integer" Unit="Byte(s)" Group="Thread Options" DefaultValue="0" TabName="All LwIP Options" Mode="Basic" Min="0" Max="2147483648" >
+    <RefParameter Name="TCPIP_THREAD_STACKSIZE" Comment="TCPIP_THREAD_STACKSIZE (TCPIP Thread Stack Size)" Type="Integer" Unit="Byte(s)" Group="Thread Options" DefaultValue="0" TabName="All LwIP Options" Mode="Basic" Min="0" Max="2147483647" >
         <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: TCPIP_THREAD_STACKSIZE is used only of NO_SYS=0." Expression="!NO_SYS"/>
         <Description>Stack size used by the main tcpip thread. The stack size value itself is platform-dependent, but is passed to sys_thread_new() when the thread is created.</Description>
     </RefParameter>
-    <RefParameter Name="TCPIP_THREAD_STACKSIZE" Comment="TCPIP_THREAD_STACKSIZE (TCPIP Thread Stack Size)" Type="Integer" Unit="Byte(s)" Group="Thread Options" DefaultValue="0" TabName="All LwIP Options" Mode="Basic" Min="0" Max="2147483648" Visible="false">
+    <RefParameter Name="TCPIP_THREAD_STACKSIZE" Comment="TCPIP_THREAD_STACKSIZE (TCPIP Thread Stack Size)" Type="Integer" Unit="Byte(s)" Group="Thread Options" DefaultValue="0" TabName="All LwIP Options" Mode="Basic" Min="0" Max="2147483647" Visible="false">
         <Description>Stack size used by the main tcpip thread. The stack size value itself is platform-dependent, but is passed to sys_thread_new() when the thread is created.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: TCPIP_THREAD_STACKSIZE is used only of NO_SYS=0.</Description>
     </RefParameter>
     <RefParameter Name="TCPIP_THREAD_PRIO" Comment="TCPIP_THREAD_PRIO (TCPIP Thread Priority Level)" Type="Integer" Group="Thread Options" DefaultValue="1" TabName="All LwIP Options" Mode="Basic" Min="0" Max="2147483647" >
@@ -694,11 +694,11 @@
     <RefParameter Name="TCPIP_THREAD_PRIO" Comment="TCPIP_THREAD_PRIO (TCPIP Thread Priority Level)" Type="Integer" Group="Thread Options" DefaultValue="1" TabName="All LwIP Options" Mode="Basic" Min="0" Max="2147483647" Visible="false">
         <Description>Priority assigned to the main tcpip thread. The priority value itself is platform-dependent, but is passed to sys_thread_new() when the thread is created.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: TCPIP_THREAD_PRIO is used only of NO_SYS=0.</Description>
     </RefParameter>
-    <RefParameter Name="TCPIP_MBOX_SIZE" Comment="TCPIP_MBOX_SIZE (TCPIP Mailbox Size)" Type="Integer" Unit="Byte(s)" Group="Thread Options" DefaultValue="0" TabName="All LwIP Options" Mode="Basic" Min="0" Max="2147483648" >
+    <RefParameter Name="TCPIP_MBOX_SIZE" Comment="TCPIP_MBOX_SIZE (TCPIP Mailbox Size)" Type="Integer" Unit="Byte(s)" Group="Thread Options" DefaultValue="0" TabName="All LwIP Options" Mode="Basic" Min="0" Max="2147483647" >
         <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: TCPIP_MBOX_SIZE is used only of NO_SYS=0." Expression="!NO_SYS"/>
         <Description>Mailbox size for the tcpip thread messages. The queue size value itself is platform-dependent, but is passed to sys_mbox_new() when tcpip_init is called.</Description>
     </RefParameter>
-    <RefParameter Name="TCPIP_MBOX_SIZE" Comment="TCPIP_MBOX_SIZE (TCPIP Mailbox Size)" Type="Integer" Unit="Byte(s)" Group="Thread Options" DefaultValue="0" TabName="All LwIP Options" Mode="Basic" Min="0" Max="2147483648" Visible="false">
+    <RefParameter Name="TCPIP_MBOX_SIZE" Comment="TCPIP_MBOX_SIZE (TCPIP Mailbox Size)" Type="Integer" Unit="Byte(s)" Group="Thread Options" DefaultValue="0" TabName="All LwIP Options" Mode="Basic" Min="0" Max="2147483647" Visible="false">
         <Description>Mailbox size for the tcpip thread messages. The queue size value itself is platform-dependent, but is passed to sys_mbox_new() when tcpip_init is called.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: TCPIP_MBOX_SIZE is used only of NO_SYS=0.</Description>
     </RefParameter>
     <RefParameter Name="SLIPIF_THREAD_NAME" Comment="SLIPIF_THREAD_NAME (TCPIP SLIPIF Loop Thread Name)" Type="StringRW" Group="Thread Options" DefaultValue="&quot;slipif_loop&quot;" TabName="All LwIP Options" Mode="Advanced" >
@@ -996,29 +996,29 @@
         <Description>Disable System stats.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: SYS_STATS requires LWIP_STATS disabled.</Description>
     </RefParameter>
     <RefParameter Name="PPP_SUPPORT" Comment="PPP_SUPPORT (PPP Module)" Type="list" Group="PPP Options" DefaultValue="0" TabName="All LwIP Options" Mode="Advanced" >
-        <Condition Diagnostic="&lt;b&gt;Warning: up to user to take care!&lt;/b&gt;: Enable PPP requires user specific code not generated by STM32Cube MX nor provided by the stack. This is reserved for advanced users.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Use PPP_SUPPORT requires PPPOS_SUPPORT or PPPOE_SUPPORT turned on." Expression="PPPOS_SUPPORT|PPPOE_SUPPORT"/>
+        <Condition Diagnostic="&lt;b&gt;Warning: up to user to take care!&lt;/b&gt;: Enable PPP requires user specific code not generated by STM32Cube MX. This is reserved for advanced users.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Use PPP_SUPPORT requires PPPOS_SUPPORT or PPPOE_SUPPORT turned on." Expression="PPPOS_SUPPORT|PPPOE_SUPPORT"/>
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
         <Description>When this parameter is enabled, Point-to-Point Protocol (PPP) is enabled.</Description>
     </RefParameter>
     <RefParameter Name="PPP_SUPPORT" Comment="PPP_SUPPORT (PPP Module)" Type="list" Group="PPP Options" DefaultValue="0" TabName="All LwIP Options" Mode="Advanced" >
         <PossibleValue Comment="Disabled" Value="0"/>
-        <Description>When this parameter is enabled, Point-to-Point Protocol (PPP) is enabled.&lt;br&gt;&lt;b&gt;Warning: up to user to take care!&lt;/b&gt;: Enable PPP requires user specific code not generated by STM32Cube MX nor provided by the stack. This is reserved for advanced users.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Use PPP_SUPPORT requires PPPOS_SUPPORT or PPPOE_SUPPORT turned on.</Description>
+        <Description>When this parameter is enabled, Point-to-Point Protocol (PPP) is enabled.&lt;br&gt;&lt;b&gt;Warning: up to user to take care!&lt;/b&gt;: Enable PPP requires user specific code not generated by STM32Cube MX. This is reserved for advanced users.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Use PPP_SUPPORT requires PPPOS_SUPPORT or PPPOE_SUPPORT turned on.</Description>
     </RefParameter>
     <RefParameter Name="PPPOE_SUPPORT" Comment="PPPOE_SUPPORT (PPP Over Ethernet)" Type="list" Group="PPP Options" DefaultValue="0" TabName="All LwIP Options" Mode="Advanced" >
         <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: Use PPPOE_SUPPORT requires LWIP_ETHERNET." Expression="LWIP_ETHERNET"/>
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
-        <Description>Enable PPP Over Ethernet.&lt;br&gt;&lt;b&gt;Warning&lt;/b&gt;: Enable PPP requires user specific code not generated by STM32Cube MX nor provided by the stack. This is reserved for advanced users.</Description>
+        <Description>Enable PPP Over Ethernet.&lt;br&gt;&lt;b&gt;Warning&lt;/b&gt;: Enable PPP requires user specific code not generated by STM32Cube MX. This is reserved for advanced users.</Description>
     </RefParameter>
     <RefParameter Name="PPPOE_SUPPORT" Comment="PPPOE_SUPPORT (PPP Over Ethernet)" Type="list" Group="PPP Options" DefaultValue="0" TabName="All LwIP Options" Mode="Advanced" >
         <PossibleValue Comment="Disabled" Value="0"/>
-        <Description>Enable PPP Over Ethernet.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Use PPPOE_SUPPORT requires LWIP_ETHERNET.&lt;br&gt;&lt;b&gt;Warning&lt;/b&gt;: Enable PPP requires user specific code not generated by STM32Cube MX nor provided by the stack. This is reserved for advanced users.</Description>
+        <Description>Enable PPP Over Ethernet.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Use PPPOE_SUPPORT requires LWIP_ETHERNET.&lt;br&gt;&lt;b&gt;Warning&lt;/b&gt;: Enable PPP requires user specific code not generated by STM32Cube MX. This is reserved for advanced users.</Description>
     </RefParameter>
     <RefParameter Name="PPPOS_SUPPORT" Comment="PPPOS_SUPPORT (PPP Over Serial)" Type="list" Group="PPP Options" DefaultValue="=PPP_SUPPORT" TabName="All LwIP Options" Mode="Advanced" >
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
-        <Description>Enable PPP Over Serial.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: PPP_SUPPORT needs either PPPOS_SUPPORT or PPPOE_SUPPORT turned on.&lt;br&gt;&lt;b&gt;Warning&lt;/b&gt;: Enable PPP requires user specific code not generated by STM32Cube MX nor provided by the stack. This is reserved for advanced users.</Description>
+        <Description>Enable PPP Over Serial.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: PPP_SUPPORT needs either PPPOS_SUPPORT or PPPOE_SUPPORT turned on.&lt;br&gt;&lt;b&gt;Warning&lt;/b&gt;: Enable PPP requires user specific code not generated by STM32Cube MX. This is reserved for advanced users.</Description>
     </RefParameter>
     <RefParameter Name="NUM_PPP" Comment="NUM_PPP (PPP Sessions)" Type="list" Group="PPP Options" DefaultValue="1" TabName="All LwIP Options" Mode="Advanced" >
         <PossibleValue Comment="Disabled" Value="0"/>
@@ -1057,7 +1057,7 @@
         <PossibleValue Comment="Enabled" Value="1"/>
         <Description>Support MD5 (see also CHAP).&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: None.</Description>
     </RefParameter>
-    <RefParameter Name="FSM_DEFTIMEOUT" Comment="FSM_DEFTIMEOUT (FSM Timeout)" Type="Integer" Unit="Second(s)" Group="PPP Options" DefaultValue="6" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="2000000000" >
+    <RefParameter Name="FSM_DEFTIMEOUT" Comment="FSM_DEFTIMEOUT (FSM Timeout)" Type="Integer" Unit="Second(s)" Group="PPP Options" DefaultValue="6" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="2147483647" >
         <Description>Timeout time in seconds.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: None.</Description>
     </RefParameter>
     <RefParameter Name="FSM_DEFMAXTERMREQS" Comment="FSM_DEFMAXTERMREQS (Maximum Number of Terminate-Request Transmissions)" Type="Integer" Group="PPP Options" DefaultValue="2" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="2147483647" >
@@ -1069,25 +1069,25 @@
     <RefParameter Name="FSM_DEFMAXNAKLOOPS" Comment="FSM_DEFMAXNAKLOOPS (Maximum Number of Nak Loops)" Type="Integer" Group="PPP Options" DefaultValue="5" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="2147483647" >
         <Description>Set the Maximum number of nak loops.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: None.</Description>
     </RefParameter>
-    <RefParameter Name="UPAP_DEFTIMEOUT" Comment="UPAP_DEFTIMEOUT (Timeout for Retransmitting Request)" Type="Integer" Unit="Second(s)" Group="PPP Options" DefaultValue="6" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="2000000000" >
+    <RefParameter Name="UPAP_DEFTIMEOUT" Comment="UPAP_DEFTIMEOUT (Timeout for Retransmitting Request)" Type="Integer" Unit="Second(s)" Group="PPP Options" DefaultValue="6" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="2147483647" >
         <Description>Set the Timeout (seconds) for retransmitting request with User/Password Authentication Protocol.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: None.</Description>
     </RefParameter>
-    <RefParameter Name="UPAP_DEFREQTIME" Comment="UPAP_DEFREQTIME (Time to wait for Authentification Request from Peer)" Type="Integer" Unit="Second(s)" Group="PPP Options" DefaultValue="30" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="2000000000" >
+    <RefParameter Name="UPAP_DEFREQTIME" Comment="UPAP_DEFREQTIME (Time to wait for Authentification Request from Peer)" Type="Integer" Unit="Second(s)" Group="PPP Options" DefaultValue="30" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="2147483647" >
         <Description>Time to wait for auth-req from peer with User/Password Authentication Protocol.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: None.</Description>
     </RefParameter>
-    <RefParameter Name="CHAP_DEFTIMEOUT" Comment="CHAP_DEFTIMEOUT (CHAP Timeout)" Type="Integer" Unit="Second(s)" Group="PPP Options" DefaultValue="6" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="2000000000" >
+    <RefParameter Name="CHAP_DEFTIMEOUT" Comment="CHAP_DEFTIMEOUT (CHAP Timeout)" Type="Integer" Unit="Second(s)" Group="PPP Options" DefaultValue="6" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="2147483647" >
         <Description>CHAP (Challenge Handshake Authentication Protocol) Timeout time in seconds.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: None.</Description>
     </RefParameter>
-    <RefParameter Name="CHAP_DEFTRANSMITS" Comment="CHAP_DEFTRANSMITS (CHAP Maximum Times to send Challenge)" Type="Integer" Unit="Second(s)" Group="PPP Options" DefaultValue="10" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="2000000000" >
+    <RefParameter Name="CHAP_DEFTRANSMITS" Comment="CHAP_DEFTRANSMITS (CHAP Maximum Times to send Challenge)" Type="Integer" Unit="Second(s)" Group="PPP Options" DefaultValue="10" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="2147483647" >
         <Description>Max times to send challenge with Challenge Handshake Authentication Protocol.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: None.</Description>
     </RefParameter>
-    <RefParameter Name="LCP_ECHOINTERVAL" Comment="LCP_ECHOINTERVAL (Interval between Keepalive Echo Requests)" Type="Integer" Unit="Second(s)" Group="PPP Options" DefaultValue="0" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="2000000000" >
+    <RefParameter Name="LCP_ECHOINTERVAL" Comment="LCP_ECHOINTERVAL (Interval between Keepalive Echo Requests)" Type="Integer" Unit="Second(s)" Group="PPP Options" DefaultValue="0" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="2147483647" >
         <Description>Interval in seconds between keepalive echo requests, 0 to disable in Link Control Protocol.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: None.</Description>
     </RefParameter>
     <RefParameter Name="LCP_MAXECHOFAILS" Comment="LCP_MAXECHOFAILS (Number of Unanswered Echo Requests before Failure)" Type="Integer" Group="PPP Options" DefaultValue="3" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="2147483647" >
         <Description>Number of unanswered echo requests before failure in Link Control Protocol.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: None.</Description>
     </RefParameter>
-    <RefParameter Name="PPP_MAXIDLEFLAG" Comment="PPP_MAXIDLEFLAG (Maximum Xmit Idle Time before Resend Flag Char)" Type="Integer" Unit="Second(s)" Group="PPP Options" DefaultValue="100" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="2000000000" >
+    <RefParameter Name="PPP_MAXIDLEFLAG" Comment="PPP_MAXIDLEFLAG (Maximum Xmit Idle Time before Resend Flag Char)" Type="Integer" Unit="Second(s)" Group="PPP Options" DefaultValue="100" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="2147483647" >
         <Description>Max Xmit idle time (in jiffies) before resend flag char.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: None.</Description>
     </RefParameter>
     <RefParameter Name="PPP_MTU" Comment="PPP_MTU (Number of Default MTU Size of Info Field)" Type="Integer" Group="PPP Options" DefaultValue="1500" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="2147483647" >
@@ -1111,43 +1111,43 @@
     <RefParameter Name="PPP_MINMRU" Comment="PPP_MINMRU (Minimum Number of MRU Allowed)" Type="Integer" Group="PPP Options" DefaultValue="128" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="2147483647" >
         <Description>Minimum negotiated Maximum Receive Unit (MRU) mandated by PPP protocol.&lt;br&gt;&lt;b&gt;Warning&lt;/b&gt;: No MRUs below this.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: None.</Description>
     </RefParameter>
-    <RefParameter Name="MAXNAMELEN" Comment="MAXNAMELEN (Maximum Length of Hostname or Name for Authentification)" Type="Integer" Unit="Byte(s)" Group="PPP Options" DefaultValue="256" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="2147483648" >
+    <RefParameter Name="MAXNAMELEN" Comment="MAXNAMELEN (Maximum Length of Hostname or Name for Authentification)" Type="Integer" Unit="Byte(s)" Group="PPP Options" DefaultValue="256" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="2147483647" >
         <Description>Maximum length of hostname or name for auth.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: None.</Description>
     </RefParameter>
-    <RefParameter Name="MAXSECRETLEN" Comment="MAXSECRETLEN (Maximum Length of Password)" Type="Integer" Unit="Byte(s)" Group="PPP Options" DefaultValue="256" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="2147483648" >
+    <RefParameter Name="MAXSECRETLEN" Comment="MAXSECRETLEN (Maximum Length of Password)" Type="Integer" Unit="Byte(s)" Group="PPP Options" DefaultValue="256" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="2147483647" >
         <Description>Maximum length of password or secret.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: None.</Description>
     </RefParameter>
-    <RefParameter Name="CHECKSUM_GEN_IP" Comment="CHECKSUM_GEN_IP (Generate Software Checksum for Outgoing IP Packets)" Type="list" Group="Checksum Options" DefaultValue="1" TabName="All LwIP Options" Mode="Basic" >
+    <RefParameter Name="CHECKSUM_GEN_IP" Comment="CHECKSUM_GEN_IP (Generate Software Checksum for Outgoing IP Packets)" Type="list" Group="Checksum Options" DefaultValue="0" TabName="All LwIP Options" Mode="Basic" >
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
         <Description>Generate checksums in software for outgoing IP packets.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: None.</Description>
     </RefParameter>
-    <RefParameter Name="CHECKSUM_GEN_UDP" Comment="CHECKSUM_GEN_UDP (Generate Software Checksum for Outgoing UDP Packets)" Type="list" Group="Checksum Options" DefaultValue="1" TabName="All LwIP Options" Mode="Basic" >
+    <RefParameter Name="CHECKSUM_GEN_UDP" Comment="CHECKSUM_GEN_UDP (Generate Software Checksum for Outgoing UDP Packets)" Type="list" Group="Checksum Options" DefaultValue="0" TabName="All LwIP Options" Mode="Basic" >
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
         <Description>Generate checksums in software for outgoing UDP packets.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: None.</Description>
     </RefParameter>
-    <RefParameter Name="CHECKSUM_GEN_TCP" Comment="CHECKSUM_GEN_TCP (Generate Software Checksum for Outgoing TCP Packets)" Type="list" Group="Checksum Options" DefaultValue="1" TabName="All LwIP Options" Mode="Basic" >
+    <RefParameter Name="CHECKSUM_GEN_TCP" Comment="CHECKSUM_GEN_TCP (Generate Software Checksum for Outgoing TCP Packets)" Type="list" Group="Checksum Options" DefaultValue="0" TabName="All LwIP Options" Mode="Basic" >
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
         <Description>Generate checksums in software for outgoing TCP packets.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: None.</Description>
     </RefParameter>
-    <RefParameter Name="CHECKSUM_GEN_ICMP" Comment="CHECKSUM_GEN_ICMP (Generate Software Checksum for Outgoing ICMP Packets)" Type="list" Group="Checksum Options" DefaultValue="1" TabName="All LwIP Options" Mode="Basic" >
+    <RefParameter Name="CHECKSUM_GEN_ICMP" Comment="CHECKSUM_GEN_ICMP (Generate Software Checksum for Outgoing ICMP Packets)" Type="list" Group="Checksum Options" DefaultValue="0" TabName="All LwIP Options" Mode="Basic" >
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
         <Description>Generate checksums in software for outgoing ICMP packets.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: None.</Description>
     </RefParameter>
-    <RefParameter Name="CHECKSUM_CHECK_IP" Comment="CHECKSUM_CHECK_IP (Generate Software Checksum for Incoming IP Packets)" Type="list" Group="Checksum Options" DefaultValue="1" TabName="All LwIP Options" Mode="Basic" >
+    <RefParameter Name="CHECKSUM_CHECK_IP" Comment="CHECKSUM_CHECK_IP (Generate Software Checksum for Incoming IP Packets)" Type="list" Group="Checksum Options" DefaultValue="0" TabName="All LwIP Options" Mode="Basic" >
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
         <Description>Check checksums in software for Incoming IP packets.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: None.</Description>
     </RefParameter>
-    <RefParameter Name="CHECKSUM_CHECK_UDP" Comment="CHECKSUM_CHECK_UDP (Generate Software Checksum for Incoming UDP Packets)" Type="list" Group="Checksum Options" DefaultValue="1" TabName="All LwIP Options" Mode="Basic" >
+    <RefParameter Name="CHECKSUM_CHECK_UDP" Comment="CHECKSUM_CHECK_UDP (Generate Software Checksum for Incoming UDP Packets)" Type="list" Group="Checksum Options" DefaultValue="0" TabName="All LwIP Options" Mode="Basic" >
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
         <Description>Check checksums in software for Incoming UDP packets.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: None.</Description>
     </RefParameter>
-    <RefParameter Name="CHECKSUM_CHECK_TCP" Comment="CHECKSUM_CHECK_TCP (Generate Software Checksum for Incoming TCP Packets)" Type="list" Group="Checksum Options" DefaultValue="1" TabName="All LwIP Options" Mode="Basic" >
+    <RefParameter Name="CHECKSUM_CHECK_TCP" Comment="CHECKSUM_CHECK_TCP (Generate Software Checksum for Incoming TCP Packets)" Type="list" Group="Checksum Options" DefaultValue="0" TabName="All LwIP Options" Mode="Basic" >
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
         <Description>Check checksums in software for Incoming TCP packets.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: None.</Description>

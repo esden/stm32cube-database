@@ -117,8 +117,11 @@ extern ${variable.value} ${variable.name};
 				[#if definition.defaultValue != definition.value]
 					[#if (definition.name=="NETMASK_ADDRESS") || (definition.name=="GATEWAY_ADDRESS") || (definition.name=="IP_ADDRESS") || (definition.name=="heth") || (definition.name=="gnetif") || (definition.name=="ipaddr") || (definition.name=="netmask") || (definition.name=="gw")]
 					[#else]
+					   [#if ((definition.name=="CHECKSUM_GEN_IP") && (definition.value == "1")) || ((definition.name=="CHECKSUM_GEN_UDP") && (definition.value == "1")) || ((definition.name=="CHECKSUM_GEN_TCP") && (definition.value == "1")) || ((definition.name=="CHECKSUM_GEN_ICMP") && (definition.value == "1")) || ((definition.name=="CHECKSUM_CHECK_IP") && (definition.value == "1")) || ((definition.name=="CHECKSUM_CHECK_UDP") && (definition.value == "1")) || ((definition.name=="CHECKSUM_CHECK_TCP") && (definition.value == "1"))]
+					   [#else]
 /*----- Default Value for ${definition.name}: ${definition.defaultValue} -----*/
 #define ${definition.name}   ${definition.value}
+                       [/#if]                     
 					[/#if]
 				[#else]
 					[#if (definition.name=="NO_SYS")]
@@ -148,15 +151,50 @@ extern ${variable.value} ${variable.name};
 					[#if (definition.name=="LWIP_DHCP")]						
 /*----- Default Value for ${definition.name}: 0 -----*/  
 #define ${definition.name}   ${definition.value}
-					[/#if]					
+					[/#if]		
+                    [#if (definition.name=="LWIP_ETHERNET")]                     
+/*----- Default Value for ${definition.name}:0 -----*/ 
+#define ${definition.name}  ${definition.value}
+                    [/#if]	
+                    [#if (definition.name=="CHECKSUM_GEN_IP") && (definition.value == "0")]            
+/*----- Default Value for ${definition.name}: 1 -----*/ 
+#define ${definition.name}   ${definition.value}
+                    [/#if]
+                    [#if (definition.name=="CHECKSUM_GEN_UDP") && (definition.value == "0")]            
+/*----- Default Value for ${definition.name}: 1 -----*/ 
+#define ${definition.name}   ${definition.value}
+                    [/#if]
+                    [#if (definition.name=="CHECKSUM_GEN_TCP") && (definition.value == "0")]            
+/*----- Default Value for ${definition.name}: 1 -----*/ 
+#define ${definition.name}   ${definition.value}
+                    [/#if]
+                    [#if (definition.name=="CHECKSUM_GEN_ICMP") && (definition.value == "0")]            
+/*----- Default Value for ${definition.name}: 1 -----*/ 
+#define ${definition.name}   ${definition.value}
+                    [/#if]
+                    [#if (definition.name=="CHECKSUM_CHECK_IP") && (definition.value == "0")]            
+/*----- Default Value for ${definition.name}: 1 -----*/ 
+#define ${definition.name}   ${definition.value}
+                    [/#if]
+                    [#if (definition.name=="CHECKSUM_CHECK_UDP") && (definition.value == "0")]            
+/*----- Default Value for ${definition.name}: 1 -----*/ 
+#define ${definition.name}   ${definition.value}
+                    [/#if]
+                    [#if (definition.name=="CHECKSUM_CHECK_TCP") && (definition.value == "0")]            
+/*----- Default Value for ${definition.name}: 1 -----*/ 
+#define ${definition.name}   ${definition.value}
+                    [/#if]                              							
 				[/#if]	
 			[/#if]				
 		[#else]
 			[#if definition.defaultValue != definition.value]
 				[#if (definition.name=="NETMASK_ADDRESS") || (definition.name=="GATEWAY_ADDRESS") || (definition.name=="IP_ADDRESS") || (definition.name=="heth") || (definition.name=="gnetif") || (definition.name=="ipaddr") || (definition.name=="netmask") || (definition.name=="gw")]
 				[#else]
+                       [#if ((definition.name=="CHECKSUM_GEN_IP") && (definition.value == "1")) || ((definition.name=="CHECKSUM_GEN_UDP") && (definition.value == "1")) || ((definition.name=="CHECKSUM_GEN_TCP") && (definition.value == "1")) || ((definition.name=="CHECKSUM_GEN_ICMP") && (definition.value == "1")) || ((definition.name=="CHECKSUM_CHECK_IP") && (definition.value == "1")) || ((definition.name=="CHECKSUM_CHECK_UDP") && (definition.value == "1")) || ((definition.name=="CHECKSUM_CHECK_TCP") && (definition.value == "1"))]
+                       [#else]
 /*----- Default Value for ${definition.name}: ${definition.defaultValue} -----*/
-#define ${definition.name}   ${definition.value}		
+#define ${definition.name}   ${definition.value}
+                       [/#if] 	
 				[/#if]
 			[#else]			
 				[#if (definition.name=="NO_SYS")]
@@ -186,7 +224,39 @@ extern ${variable.value} ${variable.name};
 			    [#if (definition.name=="LWIP_DHCP")]			    
 /*----- Default Value for ${definition.name}: 0 -----*/  
 #define ${definition.name}   ${definition.value}
-				[/#if]				
+				[/#if]	
+                [#if (definition.name=="LWIP_ETHERNET")]            
+/*----- Default Value for ${definition.name}: 0 -----*/ 
+#define ${definition.name}   ${definition.value}
+                [/#if]		
+                [#if (definition.name=="CHECKSUM_GEN_IP") && (definition.value == "0")]            
+/*----- Default Value for ${definition.name}: 1 -----*/ 
+#define ${definition.name}   ${definition.value}
+                [/#if]
+                [#if (definition.name=="CHECKSUM_GEN_UDP") && (definition.value == "0")]            
+/*----- Default Value for ${definition.name}: 1 -----*/ 
+#define ${definition.name}   ${definition.value}
+                [/#if]
+                [#if (definition.name=="CHECKSUM_GEN_TCP") && (definition.value == "0")]            
+/*----- Default Value for ${definition.name}: 1 -----*/ 
+#define ${definition.name}   ${definition.value}
+                [/#if]
+                [#if (definition.name=="CHECKSUM_GEN_ICMP") && (definition.value == "0")]            
+/*----- Default Value for ${definition.name}: 1 -----*/ 
+#define ${definition.name}   ${definition.value}
+                [/#if]
+                [#if (definition.name=="CHECKSUM_CHECK_IP") && (definition.value == "0")]            
+/*----- Default Value for ${definition.name}: 1 -----*/ 
+#define ${definition.name}   ${definition.value}
+                [/#if]
+                [#if (definition.name=="CHECKSUM_CHECK_UDP") && (definition.value == "0")]            
+/*----- Default Value for ${definition.name}: 1 -----*/ 
+#define ${definition.name}   ${definition.value}
+                [/#if]
+                [#if (definition.name=="CHECKSUM_CHECK_TCP") && (definition.value == "0")]            
+/*----- Default Value for ${definition.name}: 1 -----*/ 
+#define ${definition.name}   ${definition.value}
+                [/#if]               				
 			[/#if]
 		[/#if]
 	[/#list]

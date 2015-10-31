@@ -32,7 +32,7 @@
   *
   ******************************************************************************
   */
-  
+
 /* Includes ------------------------------------------------------------------*/
 #include "FreeRTOS.h"
 #include "task.h"
@@ -69,55 +69,60 @@ void vApplicationStackOverflowHook(xTaskHandle xTask, signed char *pcTaskName);
 void vApplicationMallocFailedHook(void);       
           [/#if]
         [/#if]             
-     [/#list]    
-     
+     [/#list]
+ [/#if]
+[/#list]
+
+[#compress]
+[#list SWIPdatas as SWIP]
+    [#if SWIP.defines??]     
 	  [#list SWIP.defines as definition]	
 	    [#if definition.name=="configGENERATE_RUN_TIME_STATS"]
 	      [#if definition.value=="1"]
-/* USER CODE BEGIN 1 */
+#n/* USER CODE BEGIN 1 */
 /* Functions needed when configGENERATE_RUN_TIME_STATS is on */
 void configureTimerForRunTimeStats(void) 
 {
-    
+#n    
 }
 
-unsigned long getRunTimeCounterValue(void) 
+#nunsigned long getRunTimeCounterValue(void) 
 {
     return 0;
 }  
 /* USER CODE END 1 */
 	      [/#if]
 	    [/#if]
-	    
+		    
 		[#if definition.name=="configUSE_IDLE_HOOK"]
 	      [#if definition.value=="1"]
-/* USER CODE BEGIN 2 */
+#n/* USER CODE BEGIN 2 */
 void vApplicationIdleHook( void ) 
 {
-    /* vApplicationIdleHook() will only be called if configUSE_IDLE_HOOK is set
-    to 1 in FreeRTOSConfig.h.  It will be called on each iteration of the idle
-    task.  It is essential that code added to this hook function never attempts
-    to block in any way (for example, call xQueueReceive() with a block time
-    specified, or call vTaskDelay()).  If the application makes use of the
-    vTaskDelete() API function (as this demo application does) then it is also
-    important that vApplicationIdleHook() is permitted to return to its calling
-    function, because it is the responsibility of the idle task to clean up
-    memory allocated by the kernel to any task that has since been deleted. */
+#t    /* vApplicationIdleHook() will only be called if configUSE_IDLE_HOOK is set
+#t    to 1 in FreeRTOSConfig.h.  It will be called on each iteration of the idle
+#t    task.  It is essential that code added to this hook function never attempts
+#t    to block in any way (for example, call xQueueReceive() with a block time
+#t    specified, or call vTaskDelay()).  If the application makes use of the
+#t    vTaskDelete() API function (as this demo application does) then it is also
+#t    important that vApplicationIdleHook() is permitted to return to its calling
+#t    function, because it is the responsibility of the idle task to clean up
+#t    memory allocated by the kernel to any task that has since been deleted. */
 }
 /* USER CODE END 2 */  
 	      [/#if]
-	    [/#if]    
-	    
+	    [/#if]  
+
 	    [#if definition.name=="configUSE_TICK_HOOK"]
 	      [#if definition.value=="1"]
-/* USER CODE BEGIN 3 */
+#n/* USER CODE BEGIN 3 */
 void vApplicationTickHook( void ) 
 {
-    /* This function will be called by each tick interrupt if
-    configUSE_TICK_HOOK is set to 1 in FreeRTOSConfig.h.  User code can be
-    added here, but the tick hook is called from an interrupt context, so
-    code must not attempt to block, and only the interrupt safe FreeRTOS API
-    functions can be used (those that end in FromISR()). */ 
+#t    /* This function will be called by each tick interrupt if
+#t    configUSE_TICK_HOOK is set to 1 in FreeRTOSConfig.h.  User code can be
+#t    added here, but the tick hook is called from an interrupt context, so
+#t    code must not attempt to block, and only the interrupt safe FreeRTOS API
+#t    functions can be used (those that end in FromISR()). */ 
 }
  /* USER CODE END 3 */ 	      
 	      [/#if]
@@ -125,12 +130,12 @@ void vApplicationTickHook( void )
 	        
 	    [#if definition.name=="configCHECK_FOR_STACK_OVERFLOW"]
 	      [#if definition.value !="0"]
-/* USER CODE BEGIN 4 */
+#n/* USER CODE BEGIN 4 */
 void vApplicationStackOverflowHook(xTaskHandle xTask, signed char *pcTaskName) 
 {
-    /* Run time stack overflow checking is performed if
-    configCHECK_FOR_STACK_OVERFLOW is defined to 1 or 2. This hook function is
-    called if a stack overflow is detected. */ 
+#t    /* Run time stack overflow checking is performed if
+#t    configCHECK_FOR_STACK_OVERFLOW is defined to 1 or 2. This hook function is
+#t    called if a stack overflow is detected. */ 
 }
  /* USER CODE END 4 */ 
 	      [/#if]
@@ -138,19 +143,19 @@ void vApplicationStackOverflowHook(xTaskHandle xTask, signed char *pcTaskName)
 	    
 	    [#if definition.name=="configUSE_MALLOC_FAILED_HOOK"]
 	      [#if definition.value=="1"]
-/* USER CODE BEGIN 5 */
+#n/* USER CODE BEGIN 5 */
 void vApplicationMallocFailedHook(void) 
 {
-    /* vApplicationMallocFailedHook() will only be called if
-    configUSE_MALLOC_FAILED_HOOK is set to 1 in FreeRTOSConfig.h.  It is a hook
-    function that will get called if a call to pvPortMalloc() fails.
-    pvPortMalloc() is called internally by the kernel whenever a task, queue,
-    timer or semaphore is created.  It is also called by various parts of the
-    demo application.  If heap_1.c or heap_2.c are used, then the size of the
-    heap available to pvPortMalloc() is defined by configTOTAL_HEAP_SIZE in
-    FreeRTOSConfig.h, and the xPortGetFreeHeapSize() API function can be used
-    to query the size of free heap space that remains (although it does not
-    provide information on how the remaining heap might be fragmented). */
+#t    /* vApplicationMallocFailedHook() will only be called if
+#t    configUSE_MALLOC_FAILED_HOOK is set to 1 in FreeRTOSConfig.h.  It is a hook
+#t    function that will get called if a call to pvPortMalloc() fails.
+#t    pvPortMalloc() is called internally by the kernel whenever a task, queue,
+#t    timer or semaphore is created.  It is also called by various parts of the
+#t    demo application.  If heap_1.c or heap_2.c are used, then the size of the
+#t    heap available to pvPortMalloc() is defined by configTOTAL_HEAP_SIZE in
+#t    FreeRTOSConfig.h, and the xPortGetFreeHeapSize() API function can be used
+#t    to query the size of free heap space that remains (although it does not
+#t    provide information on how the remaining heap might be fragmented). */
 }
 /* USER CODE END 5 */
 	      [/#if]
@@ -159,14 +164,7 @@ void vApplicationMallocFailedHook(void)
 	  [/#list]
 	 [/#if]
 [/#list]
+[/#compress]
 
-
-/**
-  * @}
-  */
-
-/**
-  * @}
-  */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

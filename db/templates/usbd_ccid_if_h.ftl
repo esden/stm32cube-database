@@ -37,6 +37,25 @@
 
 #ifndef __USBD_CCID_IF_H_
 #define __USBD_CCID_IF_H_
+[#assign handleNameFS = ""]
+[#assign handleNameUSB_FS = ""]
+[#assign handleNameHS = ""]
+[#list SWIPdatas as SWIP]  
+[#compress]
+[#-- Section2: Create global Variables for each middle ware instance --] 
+[#-- Global variables --]
+[#if SWIP.variables??]
+	[#list SWIP.variables as variable]	
+		[#-- extern ${variable.type} --][#if variable.value??][#--${variable.value};--]				
+		[#if variable.value?contains("OTG_FS")][#assign handleNameFS = "FS"][/#if]
+		[#if variable.value?contains("USB_FS")][#assign handleNameUSB_FS = "FS"][/#if]				
+		[#if variable.value?contains("OTG_HS")][#assign handleNameHS = "HS"][/#if]
+		[/#if]		
+	[/#list]
+[/#if]
+[#-- Global variables --]
+[/#compress]
+[/#list]
 
 /* Includes ------------------------------------------------------------------*/
 #include "usbd_ccid.h"
@@ -80,7 +99,12 @@
 /** @defgroup USBD_CCID_IF_Exported_Variables
   * @{
   */ 
-extern USBD_CCID_ItfTypeDef  USBD_CCID_fops;
+[#if handleNameFS == "FS"]  
+extern USBD_CCID_ItfTypeDef  USBD_CCID_fops_FS;
+[/#if]
+[#if handleNameHS == "HS"]  
+extern USBD_CCID_ItfTypeDef  USBD_CCID_fops_HS;
+[/#if]
 /**
   * @}
   */ 

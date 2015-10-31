@@ -29,7 +29,7 @@
 
 <configs>
   <config>
-    <name>${project.projectName} Configuration</name>				[#-- project configuration name. Ex: STM32F407_EVAL --]
+    <name>${Configuration} Configuration</name>				[#-- project configuration name. Ex: STM32F407_EVAL --]
     <device>${project.deviceId}</device>		 [#--  STM32 selected device. Ex: STM32F407ZE --]
 	[#--optional part--]
      [#-- <optimization>${project.compilerOptimization}</optimization> --]
@@ -40,9 +40,11 @@
     <Aincludes>
    		[#if ide=="EWARM" ]
 	   		<include>$PROJ_DIR$\..\..\Inc</include>
-	   [#else]
+   		[#elseif ide=="TrueSTUDIO" ]
+   			<include>..\..\..\..\Inc</include>
+	    [#else]
 	   		<include>..\..\Inc</include>
-	   [/#if]
+	    [/#if]
     </Aincludes>
 	<Cdefines>
 	   [#list CdefinesList as define]

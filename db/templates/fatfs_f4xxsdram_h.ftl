@@ -1,12 +1,12 @@
 [#ftl]
 /**
  ******************************************************************************
-  * @file    stm32f4xx_sdram.h
+  * @file    bsp_driver_sdram.h
   * @author  MCD Teams
   * @version V1.0.0
   * @date    ${date}
   * @brief   This file contains the common defines and functions prototypes for  
-  *          the stm32f4xx_sdram.c driver.
+  *          the bsp_driver_sdram.c driver.
   ******************************************************************************
   *
   * COPYRIGHT(c) ${year} STMicroelectronics

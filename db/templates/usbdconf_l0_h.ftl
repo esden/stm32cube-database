@@ -85,7 +85,7 @@ extern ${variable.value} ${variable.name};
 /*---------- [#if definition.comments??]${definition.comments} [/#if] -----------*/
 [#-- Tracker 253306 --]
     [#if definition.name="USBD_DFU_APP_DEFAULT_ADD"]  
-#define ${definition.name} #t#t0x${value}  
+#define ${definition.name} #t#t${value}  
     [/#if]	
     [#if definition.name!="USBD_DFU_APP_DEFAULT_ADD"]  
 #define ${definition.name} #t#t${value}  
@@ -183,9 +183,6 @@ extern ${variable.value} ${variable.name};
   * @}
   */ 
 /* Exported functions ------------------------------------------------------- */
-/* USER CODE BEGIN 0 */
-void WakeUp_Callback(void);
-/* USER CODE END 0 */
 void *USBD_static_malloc(uint32_t size);
 void USBD_static_free(void *p);
 

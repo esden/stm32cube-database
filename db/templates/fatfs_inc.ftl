@@ -17,6 +17,9 @@
    [#if instName=="SDRAMDISK"]
    #include "sdram_diskio.h"     /* defines SDRAMDISK_Driver as external */
    [/#if]
+   [#if instName=="SRAMDISK"]
+   #include "sram_diskio.h"      /* defines SRAMDISK_Driver as external */
+   [/#if]
    [#if instName=="USBH"]
    #include "usbh_diskio.h"      /* defines USBH_Driver as external */
    [/#if]

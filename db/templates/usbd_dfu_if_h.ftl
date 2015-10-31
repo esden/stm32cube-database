@@ -37,14 +37,38 @@
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __USBD_DFU_IF_H
 #define __USBD_DFU_IF_H
+[#assign handleNameFS = ""]
+[#assign handleNameUSB_FS = ""]
+[#assign handleNameHS = ""]
+[#list SWIPdatas as SWIP]  
+[#compress]
+[#-- Section2: Create global Variables for each middle ware instance --] 
+[#-- Global variables --]
+[#if SWIP.variables??]
+	[#list SWIP.variables as variable]	
+		[#-- extern ${variable.type} --][#if variable.value??][#--${variable.value};--]				
+		[#if variable.value?contains("OTG_FS")][#assign handleNameFS = "FS"][/#if]
+		[#if variable.value?contains("USB_FS")][#assign handleNameUSB_FS = "FS"][/#if]				
+		[#if variable.value?contains("OTG_HS")][#assign handleNameHS = "HS"][/#if]
+		[/#if]		
+	[/#list]
+[/#if]
+[#-- Global variables --]
+[/#compress]
+[/#list]
 
 /* Includes ------------------------------------------------------------------*/
 #include "usbd_dfu.h"
 
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
-
-extern USBD_DFU_MediaTypeDef  USBD_DFU_fops;
+/* Exported cariables --------------------------------------------------------*/
+[#if handleNameFS == "FS" || handleNameUSB_FS == "FS"]
+extern USBD_DFU_MediaTypeDef  USBD_DFU_fops_FS;
+[/#if]
+[#if handleNameHS == "HS"]
+extern USBD_DFU_MediaTypeDef  USBD_DFU_fops_HS;
+[/#if]
 
 /* Exported macro ------------------------------------------------------------*/
 /* Exported functions ------------------------------------------------------- */

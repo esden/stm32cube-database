@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
-<IP DBVersion="V4.0" Name="FREERTOS" Version="STM32Cube_FW_F4_V0.8.3" RootFolder="Middlewares/Third_Party/FreeRTOS/" CodeTemplate="" IncludeFile="cmsis_os.h"
+<IP DBVersion="V4.0" Name="FREERTOS" Version="STM32Cube_FW_F4_V1.0.0" RootFolder="Middlewares/Third_Party/FreeRTOS/" CodeTemplate="freertos_c.ftl" IncludeFile="cmsis_os.h"
     xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance"
     ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Configs.xsd"
     xmlns="http://mcd.rou.st.com/modules.php?name=mcu">
@@ -7,9 +7,12 @@
     <RefConfig Name="FREERTOS_ENABLE_Init" Comment="">       
         <CallLibMethod Name="osKernelStart"/>                 
         <Component Name="Middleware:FREERTOS:HEAP:$HEAP_NUMBER"/>
-		<ConfigFile Name="CONFIG"/>
-		<ConfigFile Name="HOOKS"/>
-        <!-- <ConfigFile Name="THREADS"/> -->
+        <ConfigFile Name="CONFIG"/>
+        <ConfigFile Name="HOOKS"/>
+        <ConfigFile Name="THREADS"/>
+        <ConfigFile Name="INC"/>
+        <ConfigFile Name="VARS"/>
+        <ConfigFile Name="THREADS_CODE"/>
     </RefConfig>
         
     <LibMethod Name="osKernelStart" Comment="Start scheduler">
@@ -22,10 +25,6 @@
         <File Name="Source/*.c" Category="source"/>
         <File Name="Source/CMSIS_RTOS/*.c" Category="source"/>
         <File Name="Source/CMSIS_RTOS/*.h" Category="header"/>
-        <!-- <File Name="Source/portable/MemMang/heap_4.c" Category="source"/> -->
-        <!-- <File Name="Source/portable/IAR/ARM_CM4F/port.c" Category="source"/> -->
-        <!-- <File Name="Source/portable/IAR/ARM_CM4F/portasm.s" Category="source"/> -->
-        <!-- <File Name="Source/portable/IAR/ARM_CM4F/portmacro.h" Category="header"/> -->
         
         <SubComponent Csub="HEAP" Cvariant="1" >
             <File Name="Source/portable/MemMang/heap_1.c" Category="source"/>
@@ -65,12 +64,20 @@
     </RefComponent>
     
     
-    <RefConfigFile Name="THREADS" Description="Header file for #define" Template="mw_conf.ftl">
-        <File Name="FreeRTOS_threads.tmp" Category="header" Version="7.6.0" Condition="all"/>
-        <!-- Parameters for FReeRTOS -->
-        <Argument Name="THREADS_CONFIG" GenericType="simple" Comment="TBD"/>
-        <Argument Name="THREAD1" GenericType="simple" Comment="TBD"/>
-        <Argument Name="THREAD2" GenericType="simple" Comment="TBD"/>
+    <RefConfigFile Name="INC" Description="Header file for #include" Template="freertos_inc.ftl">
+        <File Name="rtos_inc.tmp" Category="source" Version="7.6.0" Condition="all"/>
+    </RefConfigFile>
+    
+    <RefConfigFile Name="VARS" Description="Variable declarations for FreeRTOS" Template="freertos_vars.ftl">
+        <File Name="rtos_vars.tmp" Category="source" Version="7.6.0" Condition="all"/>
+    </RefConfigFile>
+    
+    <RefConfigFile Name="THREADS_CODE" Description="Thread code for FreeRTOS" Template="freertos_threads.ftl">
+        <File Name="rtos_threads.tmp" Category="source" Version="7.6.0" Condition="all"/>
+    </RefConfigFile>
+    
+    <RefConfigFile Name="THREADS" Description="Definition and creation of threads, then launch the RTOS" Template="freertos_init_c.ftl">
+        <File Name="rtos_HalInit.tmp" Category="source" Version="7.6.0" Condition="all"/>
     </RefConfigFile>
     
     <RefConfigFile Name="HOOKS" Description="Ooptional hook functions" Template="freertos_c.ftl">
@@ -79,7 +86,7 @@
         <Argument Name="configUSE_IDLE_HOOK" GenericType="simple" Comment="Set to 1 if you wish to use an idle hook, or 0 to omit it"/>
         <Argument Name="configUSE_TICK_HOOK" GenericType="simple" Comment="Set to 1 if you wish to use a tick hook, or 0 to omit it"/>
         <Argument Name="configCHECK_FOR_STACK_OVERFLOW" GenericType="simple" Comment=""/>
-        <Argument Name="configUSE_MALLOC_FAILED_HOOK" GenericType="simple" Comment="Set to 1 if you wish to use a malof failed hook, or 0 to omit it"/>
+        <Argument Name="configUSE_MALLOC_FAILED_HOOK" GenericType="simple" Comment="Set to 1 if you wish to use a malloc failed hook, or 0 to omit it"/>
     </RefConfigFile>
     
     <!-- use generic template file "mw_conf.ftl" to generate header file containing #define -->
@@ -103,7 +110,7 @@
         
         <Argument Name="configUSE_IDLE_HOOK" GenericType="simple" Comment="Set to 1 if you wish to use an idle hook, or 0 to omit it"/>
         <Argument Name="configUSE_TICK_HOOK" GenericType="simple" Comment="Set to 1 if you wish to use a tick hook, or 0 to omit it"/>
-        <Argument Name="configUSE_MALLOC_FAILED_HOOK" GenericType="simple" Comment="Set to 1 if you wish to use a malof failed hook, or 0 to omit it"/>
+        <Argument Name="configUSE_MALLOC_FAILED_HOOK" GenericType="simple" Comment="Set to 1 if you wish to use a malloc failed hook, or 0 to omit it"/>
         
         <!--  <Argument Name="configUSE_TICK_HOOK" GenericType="simple" Comment=
             "&#xD;Tick hook: when set to 1, the application must provide the hook function (a callback) with the following prototype: &#xD;    void vApplicationTickHook( void );&#xD;"/> -->
@@ -134,6 +141,7 @@
         <Argument Name="INCLUDE_vTaskSuspend" GenericType="simple" Comment=""/>
         <Argument Name="INCLUDE_vTaskDelayUntil" GenericType="simple" Comment=""/>
         <Argument Name="INCLUDE_vTaskDelay" GenericType="simple" Comment=""/>  
+        <Argument Name="INCLUDE_xTaskGetSchedulerState" GenericType="simple" Comment=""/> 
         
         <Argument Name="configASSERT( x )" GenericType="simple" Comment=""/>
         

@@ -16,8 +16,12 @@
     
     <!-- Begin Configuration RefParameters -->
     <!-- Begin NOR Flash 1 RefParameters -->
+    <RefParameter Comment="NS Coherent Pinout" DefaultValue="MEMORY_NADV_KO" Name="NSCoherentPinout1" Type="list" TabName="NOR/PSRAM 1" Group="NOR/PSRAM control" Visible="false">
+        <Condition Expression="((Address1&amp;Data1)|NorPsramDataAddress1)&amp;(NorFlash1|MuxedNorFlash1)&amp;NorPsramClock1&amp;!AddressValid1" Diagnostic=""/>
+        <PossibleValue Comment="PINOUT OK" Value="MEMORY_NADV_KO"/>
+    </RefParameter>
     <RefParameter Comment="NS Coherent Pinout" DefaultValue="MEMORY_PINOUT_OK" Name="NSCoherentPinout1" Type="list" TabName="NOR/PSRAM 1" Group="NOR/PSRAM control" Visible="false">
-        <Condition Expression="(Address1&amp;Data1)|NorPsramDataAddress1" Diagnostic=""/>
+        <Condition Expression="((Address1|OneBitAddress1)&amp;Data1)|NorPsramDataAddress1" Diagnostic=""/>
         <PossibleValue Comment="PINOUT OK" Value="MEMORY_PINOUT_OK"/>
     </RefParameter>
     <RefParameter Comment="NS Coherent Pinout" DefaultValue="MEMORY_PINOUT_KO" Name="NSCoherentPinout1" Type="list" TabName="NOR/PSRAM 1" Group="NOR/PSRAM control" Visible="false">
@@ -49,7 +53,7 @@
     <!-- FSMC_BCRx -->
     <!-- FSMC_BCRx MUXEN -->
     <RefParameter Comment="Data address multiplexing" DefaultValue="FSMC_DATA_ADDRESS_MUX_DISABLE" Name="DataAddressMux1" Type="list" TabName="NOR/PSRAM 1" Group="NOR/PSRAM control" Visible="false">
-        <Condition Expression="Sram1|Rom1" Diagnostic=""/>
+        <Condition Expression="Sram1|Rom1|Lcd1" Diagnostic=""/>
         <PossibleValue Comment="Disabled" Value="FSMC_DATA_ADDRESS_MUX_DISABLE"/>
     </RefParameter>
     <RefParameter Comment="Data address multiplexing" DefaultValue="FSMC_DATA_ADDRESS_MUX_DISABLE" Name="DataAddressMux1" Type="list" TabName="NOR/PSRAM 1" Group="NOR/PSRAM control" Visible="false">
@@ -70,6 +74,10 @@
         <Condition Expression="Rom1" Diagnostic=""/>
         <PossibleValue Comment="ROM" Value="FSMC_MEMORY_TYPE_SRAM"/>
     </RefParameter>
+    <RefParameter Comment="Memory type" DefaultValue="FSMC_MEMORY_TYPE_SRAM" Name="MemoryType1" Type="list" TabName="NOR/PSRAM 1" Group="NOR/PSRAM control">
+        <Condition Expression="Lcd1" Diagnostic=""/>
+        <PossibleValue Comment="LCD Interface" Value="FSMC_MEMORY_TYPE_SRAM"/>
+    </RefParameter>
     <RefParameter Comment="Memory type" DefaultValue="FSMC_MEMORY_TYPE_PSRAM" Name="MemoryType1" Type="list" TabName="NOR/PSRAM 1" Group="NOR/PSRAM control">
         <Condition Expression="Psram1|MuxedPsram1" Diagnostic=""/>
         <PossibleValue Comment="PSRAM" Value="FSMC_MEMORY_TYPE_PSRAM"/>
@@ -86,11 +94,11 @@
     </RefParameter>
     <!-- FSMC_BCRx MWID -->
     <RefParameter Comment="Data size" DefaultValue="FSMC_NORSRAM_MEM_BUS_WIDTH_8" Name="NSMemoryDataWidth1" Type="list" TabName="NOR/PSRAM 1" Group="NOR/PSRAM control" Visible="false">
-        <Condition Expression="((NorFlash1|Psram1|Sram1|Rom1)&amp;_8_bit_data1)|_8b_da1|_9b_da1|_10b_da1|_11b_da1|_12b_da1|_13b_da1|_14b_da1|_15b_da1" Diagnostic=""/>
+        <Condition Expression="((NorFlash1|Psram1|Sram1|Rom1|Lcd1)&amp;_8_bit_data1)|_8b_da1|_9b_da1|_10b_da1|_11b_da1|_12b_da1|_13b_da1|_14b_da1|_15b_da1" Diagnostic=""/>
         <PossibleValue Comment="8 bits" Value="FSMC_NORSRAM_MEM_BUS_WIDTH_8"/>
     </RefParameter>
     <RefParameter Comment="Data size" DefaultValue="FSMC_NORSRAM_MEM_BUS_WIDTH_16" Name="NSMemoryDataWidth1" Type="list" TabName="NOR/PSRAM 1" Group="NOR/PSRAM control" Visible="false">
-        <Condition Expression="(NorFlash1|Psram1|Sram1|Rom1)&amp;_16_bit_data1" Diagnostic=""/>
+        <Condition Expression="(NorFlash1|Psram1|Sram1|Rom1|Lcd1)&amp;_16_bit_data1" Diagnostic=""/>
         <PossibleValue Comment="16 bits" Value="FSMC_NORSRAM_MEM_BUS_WIDTH_16"/>
     </RefParameter>
     <RefParameter Comment="Data size" DefaultValue="FSMC_NORSRAM_MEM_BUS_WIDTH_16" Name="NSMemoryDataWidth1" Type="list" TabName="NOR/PSRAM 1" Group="NOR/PSRAM control">
@@ -102,29 +110,16 @@
     </RefParameter>
     <RefParameter Comment="Data size" DefaultValue="FSMC_NORSRAM_MEM_BUS_WIDTH_16" Name="NSMemoryDataWidth1" Type="list" TabName="NOR/PSRAM 1" Group="NOR/PSRAM control"/>
     <!-- FSMC_BCRx BURSTEN -->
-    <RefParameter Comment="Burst read" DefaultValue="FSMC_BURST_ACCESS_MODE_DISABLE" Name="BurstAccessMode1" Type="list" TabName="NOR/PSRAM 1" Group="NOR/PSRAM control" Visible="false">
-        <Condition Expression="Sram1|Rom1|!NorPsramClock1" Diagnostic=""/>
-        <PossibleValue Comment="Disabled" Value="FSMC_BURST_ACCESS_MODE_DISABLE"/>
-    </RefParameter>
     <RefParameter Comment="Burst read" DefaultValue="FSMC_BURST_ACCESS_MODE_ENABLE" Name="BurstAccessMode1" Type="list" TabName="NOR/PSRAM 1" Group="NOR/PSRAM control" Visible="false">
-        <Condition Expression="NorPsramClock1&amp;(NorFlash1|MuxedNorFlash1)" Diagnostic=""/>
+        <Condition Expression="BurstReadMode1" Diagnostic=""/>
         <PossibleValue Comment="Enabled" Value="FSMC_BURST_ACCESS_MODE_ENABLE"/>
     </RefParameter>
-    <RefParameter Comment="Burst read" DefaultValue="FSMC_BURST_ACCESS_MODE_ENABLE" Name="BurstAccessMode1" Type="list" TabName="NOR/PSRAM 1" Group="NOR/PSRAM control">
-        <Condition Expression="NorPsramClock1&amp;NorPsramChipSelect1_1&amp;ContinuousClockMode1" Diagnostic="For the memory with a Chip Select mode set to NE1, burst read accesses must be enabled in continuous clock mode."/>
-        <PossibleValue Comment="Enabled" Value="FSMC_BURST_ACCESS_MODE_ENABLE"/>
-    </RefParameter>
-    <RefParameter Comment="Burst read" DefaultValue="FSMC_BURST_ACCESS_MODE_DISABLE" Name="BurstAccessMode1" Type="list" TabName="NOR/PSRAM 1" Group="NOR/PSRAM control">
-        <Condition Expression="NorPsramClock1&amp;(Psram1|MuxedPsram1)" Diagnostic=""/>
-        <PossibleValue Comment="Disabled" Value="FSMC_BURST_ACCESS_MODE_DISABLE"/>
-        <PossibleValue Comment="Enabled" Value="FSMC_BURST_ACCESS_MODE_ENABLE" Semaphore="BurstReadMode1"/>
-    </RefParameter>
-    <RefParameter Comment="Burst read" DefaultValue="FSMC_BURST_ACCESS_MODE_DISABLE" Name="BurstAccessMode1" Type="list" TabName="NOR/PSRAM 1" Group="NOR/PSRAM control">
+    <RefParameter Comment="Burst read" DefaultValue="FSMC_BURST_ACCESS_MODE_DISABLE" Name="BurstAccessMode1" Type="list" TabName="NOR/PSRAM 1" Group="NOR/PSRAM control" Visible="false">
         <PossibleValue Comment="Disabled" Value="FSMC_BURST_ACCESS_MODE_DISABLE"/>
     </RefParameter>
     <!-- FSMC_BCRx WAITPOL -->
     <RefParameter Comment="Wait signal polarity" DefaultValue="FSMC_WAIT_SIGNAL_POLARITY_LOW" Name="WaitSignalPolarity1" Type="list" TabName="NOR/PSRAM 1" Group="NOR/PSRAM control">
-        <Condition Expression="NorPsramWait1&amp;((WaitSignal1=FSMC_WAIT_SIGNAL_ENABLE)|(AsynchronousWait1=FSMC_ASYNCHRONOUS_WAIT_ENABLE))" Diagnostic=""/>
+        <Condition Expression="NorPsramWait1" Diagnostic=""/>
         <PossibleValue Comment="Low polarity" Value="FSMC_WAIT_SIGNAL_POLARITY_LOW"/>
         <PossibleValue Comment="High polarity" Value="FSMC_WAIT_SIGNAL_POLARITY_HIGH"/>
     </RefParameter>
@@ -137,7 +132,7 @@
     </RefParameter>
     <!-- FSMC_BCRx WAITCFG -->
     <RefParameter Comment="Wait timing configuration" DefaultValue="FSMC_WAIT_TIMING_BEFORE_WS" Name="WaitSignalActive1" Type="list" TabName="NOR/PSRAM 1" Group="NOR/PSRAM control">
-        <Condition Expression="(NorFlash1|MuxedNorFlash1)&amp;(WaitSignal1=FSMC_WAIT_SIGNAL_ENABLE)" Diagnostic=""/>
+        <Condition Expression="(NorFlash1|MuxedNorFlash1)&amp;SynchronousWaitMode1" Diagnostic=""/>
         <PossibleValue Comment="Wait active before wait state" Value="FSMC_WAIT_TIMING_BEFORE_WS"/>
         <PossibleValue Comment="Wait active during wait state" Value="FSMC_WAIT_TIMING_DURING_WS"/>
     </RefParameter>
@@ -149,14 +144,17 @@
         <Condition Expression="Rom1" Diagnostic=""/>
         <PossibleValue Comment="Disabled" Value="FSMC_WRITE_OPERATION_DISABLE"/>
     </RefParameter>
+    <RefParameter Comment="Write operation" DefaultValue="FSMC_WRITE_OPERATION_ENABLE" Name="WriteOperation1" Type="list" TabName="NOR/PSRAM 1" Group="NOR/PSRAM control">
+        <Condition Expression="Lcd1" Diagnostic=""/>
+        <PossibleValue Comment="Enabled" Value="FSMC_WRITE_OPERATION_ENABLE"/>
+    </RefParameter>
     <RefParameter Comment="Write operation" DefaultValue="FSMC_WRITE_OPERATION_DISABLE" Name="WriteOperation1" Type="list" TabName="NOR/PSRAM 1" Group="NOR/PSRAM control">
         <PossibleValue Comment="Disabled" Value="FSMC_WRITE_OPERATION_DISABLE"/>
         <PossibleValue Comment="Enabled" Value="FSMC_WRITE_OPERATION_ENABLE"/>
     </RefParameter>
     <!-- FSMC_BCRx WAITEN -->
-    <RefParameter Comment="Wait state insertion" DefaultValue="FSMC_WAIT_SIGNAL_DISABLE" Name="WaitSignal1" Type="list" TabName="NOR/PSRAM 1" Group="NOR/PSRAM control">
-        <Condition Expression="NorPsramWait1&amp;(BurstReadMode1|BurstWriteMode1)" Diagnostic=""/>
-        <PossibleValue Comment="Disabled" Value="FSMC_WAIT_SIGNAL_DISABLE"/>
+    <RefParameter Comment="Wait state insertion" DefaultValue="FSMC_WAIT_SIGNAL_ENABLE" Name="WaitSignal1" Type="list" TabName="NOR/PSRAM 1" Group="NOR/PSRAM control" Visible="false">
+        <Condition Expression="SynchronousWaitMode1" Diagnostic=""/>
         <PossibleValue Comment="Enabled" Value="FSMC_WAIT_SIGNAL_ENABLE"/>
     </RefParameter>
     <RefParameter Comment="Wait state insertion" DefaultValue="FSMC_WAIT_SIGNAL_DISABLE" Name="WaitSignal1" Type="list" TabName="NOR/PSRAM 1" Group="NOR/PSRAM control" Visible="false">
@@ -164,7 +162,7 @@
     </RefParameter>
     <!-- FSMC_BCRx EXTMOD -->
     <RefParameter Comment="Extended mode" DefaultValue="FSMC_EXTENDED_MODE_DISABLE" Name="ExtendedMode1" Type="list" TabName="NOR/PSRAM 1" Group="NOR/PSRAM control" Visible="false">
-        <Condition Expression="Rom1" Diagnostic=""/>
+        <Condition Expression="MuxedNorFlash1|MuxedPsram1|Rom1|Lcd1" Diagnostic=""/>
         <PossibleValue Comment="Disabled" Value="FSMC_EXTENDED_MODE_DISABLE"/>
     </RefParameter>
     <RefParameter Comment="Extended mode" DefaultValue="FSMC_EXTENDED_MODE_DISABLE" Name="ExtendedMode1" Type="list" TabName="NOR/PSRAM 1" Group="NOR/PSRAM control" Visible="false">
@@ -177,37 +175,31 @@
         <PossibleValue Comment="Enabled" Value="FSMC_EXTENDED_MODE_ENABLE"/>
     </RefParameter>
     <!-- FSMC_BCRx ASYNCWAIT -->
-    <RefParameter Comment="Asynchronous wait" DefaultValue="FSMC_ASYNCHRONOUS_WAIT_DISABLE" Name="AsynchronousWait1" Type="list" TabName="NOR/PSRAM 1" Group="NOR/PSRAM control">
-        <Condition Expression="NorPsramWait1&amp;!(BurstReadMode1&amp;BurstWriteMode1)" Diagnostic=""/>
-        <PossibleValue Comment="Disabled" Value="FSMC_ASYNCHRONOUS_WAIT_DISABLE"/>
+    <RefParameter Comment="Asynchronous wait" DefaultValue="FSMC_ASYNCHRONOUS_WAIT_ENABLE" Name="AsynchronousWait1" Type="list" TabName="NOR/PSRAM 1" Group="NOR/PSRAM control" Visible="false">
+        <Condition Expression="AsynchronousWaitMode1" Diagnostic=""/>
         <PossibleValue Comment="Enabled" Value="FSMC_ASYNCHRONOUS_WAIT_ENABLE"/>
     </RefParameter>
     <RefParameter Comment="Asynchronous wait" DefaultValue="FSMC_ASYNCHRONOUS_WAIT_DISABLE" Name="AsynchronousWait1" Type="list" TabName="NOR/PSRAM 1" Group="NOR/PSRAM control" Visible="false">
         <PossibleValue Comment="Disabled" Value="FSMC_ASYNCHRONOUS_WAIT_DISABLE"/>
     </RefParameter>
     <!-- FSMC_BCRx CBURSTRW -->
+    <RefParameter Comment="Burst write" DefaultValue="FSMC_WRITE_BURST_ENABLE" Name="WriteBurst1" Type="list" TabName="NOR/PSRAM 1" Group="NOR/PSRAM control" Visible="false">
+        <Condition Expression="BurstWriteMode1" Diagnostic=""/>
+        <PossibleValue Comment="Enabled" Value="FSMC_WRITE_BURST_ENABLE"/>
+    </RefParameter>
     <RefParameter Comment="Burst write" DefaultValue="FSMC_WRITE_BURST_DISABLE" Name="WriteBurst1" Type="list" TabName="NOR/PSRAM 1" Group="NOR/PSRAM control" Visible="false">
-        <Condition Expression="NorFlash1|MuxedNorFlash1|Sram1|Rom1" Diagnostic=""/>
-        <PossibleValue Comment="Disabled" Value="FSMC_WRITE_BURST_DISABLE"/>
-    </RefParameter>
-    <RefParameter Comment="Burst write" DefaultValue="FSMC_WRITE_BURST_DISABLE" Name="WriteBurst1" Type="list" TabName="NOR/PSRAM 1" Group="NOR/PSRAM control">
-        <Condition Expression="NorPsramClock1" Diagnostic=""/>
-        <PossibleValue Comment="Disabled" Value="FSMC_WRITE_BURST_DISABLE"/>
-        <PossibleValue Comment="Enabled" Value="FSMC_WRITE_BURST_ENABLE" Semaphore="BurstWriteMode1"/>
-    </RefParameter>
-    <RefParameter Comment="Burst write" DefaultValue="FSMC_WRITE_BURST_DISABLE" Name="WriteBurst1" Type="list" TabName="NOR/PSRAM 1" Group="NOR/PSRAM control">
         <PossibleValue Comment="Disabled" Value="FSMC_WRITE_BURST_DISABLE"/>
     </RefParameter>
 
     <!-- FSMC_BTRx -->
     <!-- FSMC_BTRx ADDSET -->
-    <!-- Address setup time unused for PSRAM and in synchronous mode -->
+    <!-- Address setup time unused in synchronous mode -->
     <RefParameter Comment="Address setup time in HCLK clock cycles" DefaultValue="15" Name="AddressSetupTime1" Type="list" TabName="NOR/PSRAM 1" Group="NOR/PSRAM timing" Visible="false">
-      <Condition Expression="Psram1|MuxedPsram1|BurstReadMode1|BurstWriteMode1" Diagnostic=""/>
+      <Condition Expression="BurstReadMode1|BurstWriteMode1" Diagnostic=""/>
       <PossibleValue Comment="15" Value="15"/>
     </RefParameter>
     <RefParameter Comment="Address setup time in HCLK clock cycles" DefaultValue="15" Max="15" Min="1" Name="AddressSetupTime1" Type="integer" TabName="NOR/PSRAM 1" Group="NOR/PSRAM timing">
-      <Condition Expression="MuxedNorFlash1|AccessModeD1" Diagnostic=""/>
+      <Condition Expression="MuxedNorFlash1|MuxedPsram1|AccessModeD1" Diagnostic=""/>
     </RefParameter>
     <RefParameter Comment="Address setup time in HCLK clock cycles" DefaultValue="15" Max="15" Min="0" Name="AddressSetupTime1" Type="integer" TabName="NOR/PSRAM 1" Group="NOR/PSRAM timing"/>
     <!-- FSMC_BTRx ADDHLD -->
@@ -222,13 +214,10 @@
     </RefParameter>
     <RefParameter Comment="Data setup time in HCLK clock cycles" DefaultValue="255" Max="255" Min="1" Name="DataSetupTime1" Type="integer" TabName="NOR/PSRAM 1" Group="NOR/PSRAM timing"/>
     <!-- FSMC_BTRx BUSTURN -->
-    <RefParameter Comment="Bus turn around time in HCLK clock cycles" DefaultValue="15" Max="15" Min="0" Name="BusTurnAroundDuration1" Type="integer" TabName="NOR/PSRAM 1" Group="NOR/PSRAM timing" Visible="false">
-      <Condition Expression="BurstWriteMode1" Diagnostic=""/>
-    </RefParameter>
     <RefParameter Comment="Bus turn around time in HCLK clock cycles" DefaultValue="15" Max="15" Min="0" Name="BusTurnAroundDuration1" Type="integer" TabName="NOR/PSRAM 1" Group="NOR/PSRAM timing"/>
     <!-- FSMC_BTRx CLKDIV -->
     <RefParameter Comment="CLK clock divide ratio" DefaultValue="16" Name="CLKDivision1" Type="list" TabName="NOR/PSRAM 1" Group="NOR/PSRAM timing" Visible="false">
-      <Condition Expression="Sram1|Rom1" Diagnostic=""/>
+      <Condition Expression="Sram1|Rom1|Lcd1" Diagnostic=""/>
       <PossibleValue Comment="16" Value="16"/>
     </RefParameter>
     <RefParameter Comment="CLK clock divide ratio" DefaultValue="16" Name="CLKDivision1" Type="list" TabName="NOR/PSRAM 1" Group="NOR/PSRAM timing" Visible="false">
@@ -238,7 +227,7 @@
     <RefParameter Comment="CLK clock divide ratio" DefaultValue="16" Max="16" Min="2" Name="CLKDivision1" Type="integer" TabName="NOR/PSRAM 1" Group="NOR/PSRAM timing"/>
     <!-- FSMC_BTRx DATLAT -->
     <RefParameter Comment="Data latency in CLK clock cycles" DefaultValue="17" Name="DataLatency1" Type="list" TabName="NOR/PSRAM 1" Group="NOR/PSRAM timing" Visible="false">
-      <Condition Expression="Sram1|Rom1" Diagnostic=""/>
+      <Condition Expression="Sram1|Rom1|Lcd1" Diagnostic=""/>
       <PossibleValue Comment="17" Value="17"/>
     </RefParameter>
     <RefParameter Comment="Data latency in CLK clock cycles" DefaultValue="17" Name="DataLatency1" Type="list" TabName="NOR/PSRAM 1" Group="NOR/PSRAM timing" Visible="false">
@@ -260,15 +249,15 @@
         <PossibleValue Comment="A" Value="FSMC_ACCESS_MODE_A"/>
     </RefParameter>
     <RefParameter Comment="Access mode" DefaultValue="FSMC_ACCESS_MODE_B" Name="AccessMode1" Type="list" TabName="NOR/PSRAM 1" Group="NOR/PSRAM timing">
-        <Condition Expression="NorFlash1|MuxedNorFlash1" Diagnostic="Nor Flash"/>
+        <Condition Expression="NorFlash1" Diagnostic="Nor Flash"/>
         <PossibleValue Comment="B" Value="FSMC_ACCESS_MODE_B"/>
         <PossibleValue Comment="C" Value="FSMC_ACCESS_MODE_C"/>
-        <PossibleValue Comment="D" Value="FSMC_ACCESS_MODE_D"/>
+        <PossibleValue Comment="D" Value="FSMC_ACCESS_MODE_D" Semaphore="AccessModeD1"/>
     </RefParameter>
     <RefParameter Comment="Access mode" DefaultValue="FSMC_ACCESS_MODE_A" Name="AccessMode1" Type="list" TabName="NOR/PSRAM 1" Group="NOR/PSRAM timing">
-        <Condition Expression="Psram1|MuxedPsram1|Sram1|Rom1" Diagnostic="PSRAM/SRAM/ROM"/>
+        <Condition Expression="Psram1|Sram1" Diagnostic="PSRAM/SRAM"/>
         <PossibleValue Comment="A" Value="FSMC_ACCESS_MODE_A"/>
-        <PossibleValue Comment="D" Value="FSMC_ACCESS_MODE_D"/>
+        <PossibleValue Comment="D" Value="FSMC_ACCESS_MODE_D" Semaphore="AccessModeD1"/>
     </RefParameter>
     <RefParameter Comment="Access mode" DefaultValue="FSMC_ACCESS_MODE_A" Name="AccessMode1" Type="list" TabName="NOR/PSRAM 1" Group="NOR/PSRAM timing">
         <PossibleValue Comment="A" Value="FSMC_ACCESS_MODE_A"/>
@@ -282,10 +271,6 @@
     <RefParameter Comment="Extended address setup time" DefaultValue="null" Name="ExtendedAddressSetupTime1" Type="list" TabName="NOR/PSRAM 1" Group="NOR/PSRAM timing for write accesses" Visible="false">
         <Condition Diagnostic="" Expression="ExtendedMode1=FSMC_EXTENDED_MODE_DISABLE"/>
     </RefParameter>
-    <RefParameter Comment="Extended address setup time" DefaultValue="15" Name="ExtendedAddressSetupTime1" Type="list" TabName="NOR/PSRAM 1" Group="NOR/PSRAM timing for write accesses" Visible="false">
-      <Condition Expression="MuxedNorFlash1|Psram1|MuxedPsram1|Sram1|Rom1" Diagnostic=""/>
-      <PossibleValue Comment="15" Value="15"/>
-    </RefParameter>
     <RefParameter Comment="Extended address setup time" DefaultValue="15" Max="15" Min="1" Name="ExtendedAddressSetupTime1" Type="integer" TabName="NOR/PSRAM 1" Group="NOR/PSRAM timing for write accesses">
       <Condition Expression="ExtendedAccessModeD1" Diagnostic=""/>
     </RefParameter>
@@ -295,7 +280,7 @@
         <Condition Diagnostic="" Expression="ExtendedMode1=FSMC_EXTENDED_MODE_DISABLE"/>
     </RefParameter>
     <RefParameter Comment="Extended address hold time" DefaultValue="15" Max="15" Min="1" Name="ExtendedAddressHoldTime1" Type="integer" TabName="NOR/PSRAM 1" Group="NOR/PSRAM timing for write accesses">
-      <Condition Expression="(MuxedNorFlash1|MuxedPsram1)|ExtendedAccessModeD1" Diagnostic=""/>
+      <Condition Expression="ExtendedAccessModeD1" Diagnostic=""/>
     </RefParameter>
     <RefParameter Comment="Extended address hold time" DefaultValue="15" Max="15" Min="1" Name="ExtendedAddressHoldTime1" Type="integer" TabName="NOR/PSRAM 1" Group="NOR/PSRAM timing for write accesses" Visible="false"/>
     <!-- FSMC_BWTRx DATAST -->
@@ -328,15 +313,15 @@
         <Condition Diagnostic="" Expression="ExtendedMode1=FSMC_EXTENDED_MODE_DISABLE"/>
     </RefParameter>
     <RefParameter Comment="Extended access mode" DefaultValue="FSMC_ACCESS_MODE_B" Name="ExtendedAccessMode1" Type="list" TabName="NOR/PSRAM 1" Group="NOR/PSRAM timing for write accesses">
-        <Condition Expression="NorFlash1|MuxedNorFlash1" Diagnostic="Nor Flash"/>
+        <Condition Expression="NorFlash1" Diagnostic="Nor Flash"/>
         <PossibleValue Comment="B" Value="FSMC_ACCESS_MODE_B"/>
         <PossibleValue Comment="C" Value="FSMC_ACCESS_MODE_C"/>
-        <PossibleValue Comment="D" Value="FSMC_ACCESS_MODE_D"/>
+        <PossibleValue Comment="D" Value="FSMC_ACCESS_MODE_D" Semaphore="ExtendedAccessModeD1"/>
     </RefParameter>
     <RefParameter Comment="Extended access mode" DefaultValue="FSMC_ACCESS_MODE_A" Name="ExtendedAccessMode1" Type="list" TabName="NOR/PSRAM 1" Group="NOR/PSRAM timing for write accesses">
-        <Condition Expression="Psram1|MuxedPsram1|Sram1|Rom1" Diagnostic="PSRAM/SRAM/ROM"/>
+        <Condition Expression="Psram1|Sram1" Diagnostic="PSRAM/SRAM"/>
         <PossibleValue Comment="A" Value="FSMC_ACCESS_MODE_A"/>
-        <PossibleValue Comment="D" Value="FSMC_ACCESS_MODE_D"/>
+        <PossibleValue Comment="D" Value="FSMC_ACCESS_MODE_D" Semaphore="ExtendedAccessModeD1"/>
     </RefParameter>
     <RefParameter Comment="Extended access mode" DefaultValue="FSMC_ACCESS_MODE_A" Name="ExtendedAccessMode1" Type="list" TabName="NOR/PSRAM 1" Group="NOR/PSRAM timing for write accesses">
         <PossibleValue Comment="A" Value="FSMC_ACCESS_MODE_A"/>
@@ -346,8 +331,12 @@
     </RefParameter>
     <!-- End NOR Flash 1 RefParameters -->
     <!-- Begin NOR Flash 2 RefParameters -->
+    <RefParameter Comment="NS Coherent Pinout" DefaultValue="MEMORY_NADV_KO" Name="NSCoherentPinout2" Type="list" TabName="NOR/PSRAM 2" Group="NOR/PSRAM control" Visible="false">
+        <Condition Expression="((Address2&amp;Data2)|NorPsramDataAddress2)&amp;(NorFlash2|MuxedNorFlash2)&amp;NorPsramClock2&amp;!AddressValid2" Diagnostic=""/>
+        <PossibleValue Comment="PINOUT OK" Value="MEMORY_NADV_KO"/>
+    </RefParameter>
     <RefParameter Comment="NS Coherent Pinout" DefaultValue="MEMORY_PINOUT_OK" Name="NSCoherentPinout2" Type="list" TabName="NOR/PSRAM 2" Group="NOR/PSRAM control" Visible="false">
-        <Condition Expression="(Address2&amp;Data2)|NorPsramDataAddress2" Diagnostic=""/>
+        <Condition Expression="((Address2|OneBitAddress2)&amp;Data2)|NorPsramDataAddress2" Diagnostic=""/>
         <PossibleValue Comment="PINOUT OK" Value="MEMORY_PINOUT_OK"/>
     </RefParameter>
     <RefParameter Comment="NS Coherent Pinout" DefaultValue="MEMORY_PINOUT_KO" Name="NSCoherentPinout2" Type="list" TabName="NOR/PSRAM 2" Group="NOR/PSRAM control" Visible="false">
@@ -379,7 +368,7 @@
     <!-- FSMC_BCRx -->
     <!-- FSMC_BCRx MUXEN -->
     <RefParameter Comment="Data address multiplexing" DefaultValue="FSMC_DATA_ADDRESS_MUX_DISABLE" Name="DataAddressMux2" Type="list" TabName="NOR/PSRAM 2" Group="NOR/PSRAM control" Visible="false">
-        <Condition Expression="Sram2|Rom2" Diagnostic=""/>
+        <Condition Expression="Sram2|Rom2|Lcd2" Diagnostic=""/>
         <PossibleValue Comment="Disabled" Value="FSMC_DATA_ADDRESS_MUX_DISABLE"/>
     </RefParameter>
     <RefParameter Comment="Data address multiplexing" DefaultValue="FSMC_DATA_ADDRESS_MUX_DISABLE" Name="DataAddressMux2" Type="list" TabName="NOR/PSRAM 2" Group="NOR/PSRAM control" Visible="false">
@@ -400,6 +389,10 @@
         <Condition Expression="Rom2" Diagnostic=""/>
         <PossibleValue Comment="ROM" Value="FSMC_MEMORY_TYPE_SRAM"/>
     </RefParameter>
+    <RefParameter Comment="Memory type" DefaultValue="FSMC_MEMORY_TYPE_SRAM" Name="MemoryType2" Type="list" TabName="NOR/PSRAM 2" Group="NOR/PSRAM control">
+        <Condition Expression="Lcd2" Diagnostic=""/>
+        <PossibleValue Comment="LCD Interface" Value="FSMC_MEMORY_TYPE_SRAM"/>
+    </RefParameter>
     <RefParameter Comment="Memory type" DefaultValue="FSMC_MEMORY_TYPE_PSRAM" Name="MemoryType2" Type="list" TabName="NOR/PSRAM 2" Group="NOR/PSRAM control">
         <Condition Expression="Psram2|MuxedPsram2" Diagnostic=""/>
         <PossibleValue Comment="PSRAM" Value="FSMC_MEMORY_TYPE_PSRAM"/>
@@ -416,11 +409,11 @@
     </RefParameter>
     <!-- FSMC_BCRx MWID -->
     <RefParameter Comment="Data size" DefaultValue="FSMC_NORSRAM_MEM_BUS_WIDTH_8" Name="NSMemoryDataWidth2" Type="list" TabName="NOR/PSRAM 2" Group="NOR/PSRAM control" Visible="false">
-        <Condition Expression="((NorFlash2|Psram2|Sram2|Rom2)&amp;_8_bit_data2)|_8b_da2|_9b_da2|_10b_da2|_11b_da2|_12b_da2|_13b_da2|_14b_da2|_15b_da2" Diagnostic=""/>
+        <Condition Expression="((NorFlash2|Psram2|Sram2|Rom2|Lcd2)&amp;_8_bit_data2)|_8b_da2|_9b_da2|_10b_da2|_11b_da2|_12b_da2|_13b_da2|_14b_da2|_15b_da2" Diagnostic=""/>
         <PossibleValue Comment="8 bits" Value="FSMC_NORSRAM_MEM_BUS_WIDTH_8"/>
     </RefParameter>
     <RefParameter Comment="Data size" DefaultValue="FSMC_NORSRAM_MEM_BUS_WIDTH_16" Name="NSMemoryDataWidth2" Type="list" TabName="NOR/PSRAM 2" Group="NOR/PSRAM control" Visible="false">
-        <Condition Expression="(NorFlash2|Psram2|Sram2|Rom2)&amp;_16_bit_data2" Diagnostic=""/>
+        <Condition Expression="(NorFlash2|Psram2|Sram2|Rom2|Lcd2)&amp;_16_bit_data2" Diagnostic=""/>
         <PossibleValue Comment="16 bits" Value="FSMC_NORSRAM_MEM_BUS_WIDTH_16"/>
     </RefParameter>
     <RefParameter Comment="Data size" DefaultValue="FSMC_NORSRAM_MEM_BUS_WIDTH_16" Name="NSMemoryDataWidth2" Type="list" TabName="NOR/PSRAM 2" Group="NOR/PSRAM control">
@@ -432,29 +425,16 @@
     </RefParameter>
     <RefParameter Comment="Data size" DefaultValue="FSMC_NORSRAM_MEM_BUS_WIDTH_16" Name="NSMemoryDataWidth2" Type="list" TabName="NOR/PSRAM 2" Group="NOR/PSRAM control"/>
     <!-- FSMC_BCRx BURSTEN -->
-    <RefParameter Comment="Burst read" DefaultValue="FSMC_BURST_ACCESS_MODE_DISABLE" Name="BurstAccessMode2" Type="list" TabName="NOR/PSRAM 2" Group="NOR/PSRAM control" Visible="false">
-        <Condition Expression="Sram2|Rom2|!NorPsramClock2" Diagnostic=""/>
-        <PossibleValue Comment="Disabled" Value="FSMC_BURST_ACCESS_MODE_DISABLE"/>
-    </RefParameter>
     <RefParameter Comment="Burst read" DefaultValue="FSMC_BURST_ACCESS_MODE_ENABLE" Name="BurstAccessMode2" Type="list" TabName="NOR/PSRAM 2" Group="NOR/PSRAM control" Visible="false">
-        <Condition Expression="NorPsramClock2&amp;(NorFlash2|MuxedNorFlash2)" Diagnostic=""/>
+        <Condition Expression="BurstReadMode2" Diagnostic=""/>
         <PossibleValue Comment="Enabled" Value="FSMC_BURST_ACCESS_MODE_ENABLE"/>
     </RefParameter>
-    <RefParameter Comment="Burst read" DefaultValue="FSMC_BURST_ACCESS_MODE_ENABLE" Name="BurstAccessMode2" Type="list" TabName="NOR/PSRAM 2" Group="NOR/PSRAM control">
-        <Condition Expression="NorPsramClock2&amp;NorPsramChipSelect1_2&amp;ContinuousClockMode2" Diagnostic="For the memory with a Chip Select mode set to NE1, burst read accesses must be enabled in continuous clock mode."/>
-        <PossibleValue Comment="Enabled" Value="FSMC_BURST_ACCESS_MODE_ENABLE"/>
-    </RefParameter>
-    <RefParameter Comment="Burst read" DefaultValue="FSMC_BURST_ACCESS_MODE_DISABLE" Name="BurstAccessMode2" Type="list" TabName="NOR/PSRAM 2" Group="NOR/PSRAM control">
-        <Condition Expression="NorPsramClock2&amp;(Psram2|MuxedPsram2)" Diagnostic=""/>
-        <PossibleValue Comment="Disabled" Value="FSMC_BURST_ACCESS_MODE_DISABLE"/>
-        <PossibleValue Comment="Enabled" Value="FSMC_BURST_ACCESS_MODE_ENABLE" Semaphore="BurstReadMode2"/>
-    </RefParameter>
-    <RefParameter Comment="Burst read" DefaultValue="FSMC_BURST_ACCESS_MODE_DISABLE" Name="BurstAccessMode2" Type="list" TabName="NOR/PSRAM 2" Group="NOR/PSRAM control">
+    <RefParameter Comment="Burst read" DefaultValue="FSMC_BURST_ACCESS_MODE_DISABLE" Name="BurstAccessMode2" Type="list" TabName="NOR/PSRAM 2" Group="NOR/PSRAM control" Visible="false">
         <PossibleValue Comment="Disabled" Value="FSMC_BURST_ACCESS_MODE_DISABLE"/>
     </RefParameter>
     <!-- FSMC_BCRx WAITPOL -->
     <RefParameter Comment="Wait signal polarity" DefaultValue="FSMC_WAIT_SIGNAL_POLARITY_LOW" Name="WaitSignalPolarity2" Type="list" TabName="NOR/PSRAM 2" Group="NOR/PSRAM control">
-        <Condition Expression="NorPsramWait2&amp;((WaitSignal2=FSMC_WAIT_SIGNAL_ENABLE)|(AsynchronousWait2=FSMC_ASYNCHRONOUS_WAIT_ENABLE))" Diagnostic=""/>
+        <Condition Expression="NorPsramWait2" Diagnostic=""/>
         <PossibleValue Comment="Low polarity" Value="FSMC_WAIT_SIGNAL_POLARITY_LOW"/>
         <PossibleValue Comment="High polarity" Value="FSMC_WAIT_SIGNAL_POLARITY_HIGH"/>
     </RefParameter>
@@ -467,7 +447,7 @@
     </RefParameter>
     <!-- FSMC_BCRx WAITCFG -->
     <RefParameter Comment="Wait timing configuration" DefaultValue="FSMC_WAIT_TIMING_BEFORE_WS" Name="WaitSignalActive2" Type="list" TabName="NOR/PSRAM 2" Group="NOR/PSRAM control">
-        <Condition Expression="(NorFlash2|MuxedNorFlash2)&amp;(WaitSignal2=FSMC_WAIT_SIGNAL_ENABLE)" Diagnostic=""/>
+        <Condition Expression="(NorFlash2|MuxedNorFlash2)&amp;SynchronousWaitMode2" Diagnostic=""/>
         <PossibleValue Comment="Wait active before wait state" Value="FSMC_WAIT_TIMING_BEFORE_WS"/>
         <PossibleValue Comment="Wait active during wait state" Value="FSMC_WAIT_TIMING_DURING_WS"/>
     </RefParameter>
@@ -479,14 +459,17 @@
         <Condition Expression="Rom2" Diagnostic=""/>
         <PossibleValue Comment="Disabled" Value="FSMC_WRITE_OPERATION_DISABLE"/>
     </RefParameter>
+    <RefParameter Comment="Write operation" DefaultValue="FSMC_WRITE_OPERATION_ENABLE" Name="WriteOperation2" Type="list" TabName="NOR/PSRAM 2" Group="NOR/PSRAM control">
+        <Condition Expression="Lcd2" Diagnostic=""/>
+        <PossibleValue Comment="Enabled" Value="FSMC_WRITE_OPERATION_ENABLE"/>
+    </RefParameter>
     <RefParameter Comment="Write operation" DefaultValue="FSMC_WRITE_OPERATION_DISABLE" Name="WriteOperation2" Type="list" TabName="NOR/PSRAM 2" Group="NOR/PSRAM control">
         <PossibleValue Comment="Disabled" Value="FSMC_WRITE_OPERATION_DISABLE"/>
         <PossibleValue Comment="Enabled" Value="FSMC_WRITE_OPERATION_ENABLE"/>
     </RefParameter>
     <!-- FSMC_BCRx WAITEN -->
-    <RefParameter Comment="Wait state insertion" DefaultValue="FSMC_WAIT_SIGNAL_DISABLE" Name="WaitSignal2" Type="list" TabName="NOR/PSRAM 2" Group="NOR/PSRAM control">
-        <Condition Expression="NorPsramWait2&amp;(BurstReadMode2|BurstWriteMode2)" Diagnostic=""/>
-        <PossibleValue Comment="Disabled" Value="FSMC_WAIT_SIGNAL_DISABLE"/>
+    <RefParameter Comment="Wait state insertion" DefaultValue="FSMC_WAIT_SIGNAL_ENABLE" Name="WaitSignal2" Type="list" TabName="NOR/PSRAM 2" Group="NOR/PSRAM control" Visible="false">
+        <Condition Expression="SynchronousWaitMode2" Diagnostic=""/>
         <PossibleValue Comment="Enabled" Value="FSMC_WAIT_SIGNAL_ENABLE"/>
     </RefParameter>
     <RefParameter Comment="Wait state insertion" DefaultValue="FSMC_WAIT_SIGNAL_DISABLE" Name="WaitSignal2" Type="list" TabName="NOR/PSRAM 2" Group="NOR/PSRAM control" Visible="false">
@@ -494,7 +477,7 @@
     </RefParameter>
     <!-- FSMC_BCRx EXTMOD -->
     <RefParameter Comment="Extended mode" DefaultValue="FSMC_EXTENDED_MODE_DISABLE" Name="ExtendedMode2" Type="list" TabName="NOR/PSRAM 2" Group="NOR/PSRAM control" Visible="false">
-        <Condition Expression="Rom2" Diagnostic=""/>
+        <Condition Expression="MuxedNorFlash2|MuxedPsram2|Rom2|Lcd2" Diagnostic=""/>
         <PossibleValue Comment="Disabled" Value="FSMC_EXTENDED_MODE_DISABLE"/>
     </RefParameter>
     <RefParameter Comment="Extended mode" DefaultValue="FSMC_EXTENDED_MODE_DISABLE" Name="ExtendedMode2" Type="list" TabName="NOR/PSRAM 2" Group="NOR/PSRAM control" Visible="false">
@@ -507,37 +490,31 @@
         <PossibleValue Comment="Enabled" Value="FSMC_EXTENDED_MODE_ENABLE"/>
     </RefParameter>
     <!-- FSMC_BCRx ASYNCWAIT -->
-    <RefParameter Comment="Asynchronous wait" DefaultValue="FSMC_ASYNCHRONOUS_WAIT_DISABLE" Name="AsynchronousWait2" Type="list" TabName="NOR/PSRAM 2" Group="NOR/PSRAM control">
-        <Condition Expression="NorPsramWait2&amp;!(BurstReadMode2&amp;BurstWriteMode2)" Diagnostic=""/>
-        <PossibleValue Comment="Disabled" Value="FSMC_ASYNCHRONOUS_WAIT_DISABLE"/>
+    <RefParameter Comment="Asynchronous wait" DefaultValue="FSMC_ASYNCHRONOUS_WAIT_ENABLE" Name="AsynchronousWait2" Type="list" TabName="NOR/PSRAM 2" Group="NOR/PSRAM control" Visible="false">
+        <Condition Expression="AsynchronousWaitMode2" Diagnostic=""/>
         <PossibleValue Comment="Enabled" Value="FSMC_ASYNCHRONOUS_WAIT_ENABLE"/>
     </RefParameter>
     <RefParameter Comment="Asynchronous wait" DefaultValue="FSMC_ASYNCHRONOUS_WAIT_DISABLE" Name="AsynchronousWait2" Type="list" TabName="NOR/PSRAM 2" Group="NOR/PSRAM control" Visible="false">
         <PossibleValue Comment="Disabled" Value="FSMC_ASYNCHRONOUS_WAIT_DISABLE"/>
     </RefParameter>
     <!-- FSMC_BCRx CBURSTRW -->
+    <RefParameter Comment="Burst write" DefaultValue="FSMC_WRITE_BURST_ENABLE" Name="WriteBurst2" Type="list" TabName="NOR/PSRAM 2" Group="NOR/PSRAM control" Visible="false">
+        <Condition Expression="BurstWriteMode2" Diagnostic=""/>
+        <PossibleValue Comment="Enabled" Value="FSMC_WRITE_BURST_ENABLE"/>
+    </RefParameter>
     <RefParameter Comment="Burst write" DefaultValue="FSMC_WRITE_BURST_DISABLE" Name="WriteBurst2" Type="list" TabName="NOR/PSRAM 2" Group="NOR/PSRAM control" Visible="false">
-        <Condition Expression="NorFlash2|MuxedNorFlash2|Sram2|Rom2" Diagnostic=""/>
-        <PossibleValue Comment="Disabled" Value="FSMC_WRITE_BURST_DISABLE"/>
-    </RefParameter>
-    <RefParameter Comment="Burst write" DefaultValue="FSMC_WRITE_BURST_DISABLE" Name="WriteBurst2" Type="list" TabName="NOR/PSRAM 2" Group="NOR/PSRAM control">
-        <Condition Expression="NorPsramClock2" Diagnostic=""/>
-        <PossibleValue Comment="Disabled" Value="FSMC_WRITE_BURST_DISABLE"/>
-        <PossibleValue Comment="Enabled" Value="FSMC_WRITE_BURST_ENABLE" Semaphore="BurstWriteMode2"/>
-    </RefParameter>
-    <RefParameter Comment="Burst write" DefaultValue="FSMC_WRITE_BURST_DISABLE" Name="WriteBurst2" Type="list" TabName="NOR/PSRAM 2" Group="NOR/PSRAM control">
         <PossibleValue Comment="Disabled" Value="FSMC_WRITE_BURST_DISABLE"/>
     </RefParameter>
 
     <!-- FSMC_BTRx -->
     <!-- FSMC_BTRx ADDSET -->
-    <!-- Address setup time unused for PSRAM and in synchronous mode -->
+    <!-- Address setup time unused in synchronous mode -->
     <RefParameter Comment="Address setup time in HCLK clock cycles" DefaultValue="15" Name="AddressSetupTime2" Type="list" TabName="NOR/PSRAM 2" Group="NOR/PSRAM timing" Visible="false">
-      <Condition Expression="Psram2|MuxedPsram2|BurstReadMode2|BurstWriteMode2" Diagnostic=""/>
+      <Condition Expression="BurstReadMode2|BurstWriteMode2" Diagnostic=""/>
       <PossibleValue Comment="15" Value="15"/>
     </RefParameter>
     <RefParameter Comment="Address setup time in HCLK clock cycles" DefaultValue="15" Max="15" Min="1" Name="AddressSetupTime2" Type="integer" TabName="NOR/PSRAM 2" Group="NOR/PSRAM timing">
-      <Condition Expression="MuxedNorFlash2|AccessModeD2" Diagnostic=""/>
+      <Condition Expression="MuxedNorFlash2|MuxedPsram2|AccessModeD2" Diagnostic=""/>
     </RefParameter>
     <RefParameter Comment="Address setup time in HCLK clock cycles" DefaultValue="15" Max="15" Min="0" Name="AddressSetupTime2" Type="integer" TabName="NOR/PSRAM 2" Group="NOR/PSRAM timing"/>
     <!-- FSMC_BTRx ADDHLD -->
@@ -552,13 +529,10 @@
     </RefParameter>
     <RefParameter Comment="Data setup time in HCLK clock cycles" DefaultValue="255" Max="255" Min="1" Name="DataSetupTime2" Type="integer" TabName="NOR/PSRAM 2" Group="NOR/PSRAM timing"/>
     <!-- FSMC_BTRx BUSTURN -->
-    <RefParameter Comment="Bus turn around time in HCLK clock cycles" DefaultValue="15" Max="15" Min="0" Name="BusTurnAroundDuration2" Type="integer" TabName="NOR/PSRAM 2" Group="NOR/PSRAM timing" Visible="false">
-      <Condition Expression="BurstWriteMode2" Diagnostic=""/>
-    </RefParameter>
     <RefParameter Comment="Bus turn around time in HCLK clock cycles" DefaultValue="15" Max="15" Min="0" Name="BusTurnAroundDuration2" Type="integer" TabName="NOR/PSRAM 2" Group="NOR/PSRAM timing"/>
     <!-- FSMC_BTRx CLKDIV -->
     <RefParameter Comment="CLK clock divide ratio" DefaultValue="16" Name="CLKDivision2" Type="list" TabName="NOR/PSRAM 2" Group="NOR/PSRAM timing" Visible="false">
-      <Condition Expression="Sram2|Rom2" Diagnostic=""/>
+      <Condition Expression="Sram2|Rom2|Lcd2" Diagnostic=""/>
       <PossibleValue Comment="16" Value="16"/>
     </RefParameter>
     <RefParameter Comment="CLK clock divide ratio" DefaultValue="16" Name="CLKDivision2" Type="list" TabName="NOR/PSRAM 2" Group="NOR/PSRAM timing" Visible="false">
@@ -568,7 +542,7 @@
     <RefParameter Comment="CLK clock divide ratio" DefaultValue="16" Max="16" Min="2" Name="CLKDivision2" Type="integer" TabName="NOR/PSRAM 2" Group="NOR/PSRAM timing"/>
     <!-- FSMC_BTRx DATLAT -->
     <RefParameter Comment="Data latency in CLK clock cycles" DefaultValue="17" Name="DataLatency2" Type="list" TabName="NOR/PSRAM 2" Group="NOR/PSRAM timing" Visible="false">
-      <Condition Expression="Sram2|Rom2" Diagnostic=""/>
+      <Condition Expression="Sram2|Rom2|Lcd2" Diagnostic=""/>
       <PossibleValue Comment="17" Value="17"/>
     </RefParameter>
     <RefParameter Comment="Data latency in CLK clock cycles" DefaultValue="17" Name="DataLatency2" Type="list" TabName="NOR/PSRAM 2" Group="NOR/PSRAM timing" Visible="false">
@@ -590,15 +564,15 @@
         <PossibleValue Comment="A" Value="FSMC_ACCESS_MODE_A"/>
     </RefParameter>
     <RefParameter Comment="Access mode" DefaultValue="FSMC_ACCESS_MODE_B" Name="AccessMode2" Type="list" TabName="NOR/PSRAM 2" Group="NOR/PSRAM timing">
-        <Condition Expression="NorFlash2|MuxedNorFlash2" Diagnostic="Nor Flash"/>
+        <Condition Expression="NorFlash2" Diagnostic="Nor Flash"/>
         <PossibleValue Comment="B" Value="FSMC_ACCESS_MODE_B"/>
         <PossibleValue Comment="C" Value="FSMC_ACCESS_MODE_C"/>
-        <PossibleValue Comment="D" Value="FSMC_ACCESS_MODE_D"/>
+        <PossibleValue Comment="D" Value="FSMC_ACCESS_MODE_D" Semaphore="AccessModeD2"/>
     </RefParameter>
     <RefParameter Comment="Access mode" DefaultValue="FSMC_ACCESS_MODE_A" Name="AccessMode2" Type="list" TabName="NOR/PSRAM 2" Group="NOR/PSRAM timing">
-        <Condition Expression="Psram2|MuxedPsram2|Sram2|Rom2" Diagnostic="PSRAM/SRAM/ROM"/>
+        <Condition Expression="Psram2|Sram2" Diagnostic="PSRAM/SRAM"/>
         <PossibleValue Comment="A" Value="FSMC_ACCESS_MODE_A"/>
-        <PossibleValue Comment="D" Value="FSMC_ACCESS_MODE_D"/>
+        <PossibleValue Comment="D" Value="FSMC_ACCESS_MODE_D" Semaphore="AccessModeD2"/>
     </RefParameter>
     <RefParameter Comment="Access mode" DefaultValue="FSMC_ACCESS_MODE_A" Name="AccessMode2" Type="list" TabName="NOR/PSRAM 2" Group="NOR/PSRAM timing">
         <PossibleValue Comment="A" Value="FSMC_ACCESS_MODE_A"/>
@@ -612,10 +586,6 @@
     <RefParameter Comment="Extended address setup time" DefaultValue="null" Name="ExtendedAddressSetupTime2" Type="list" TabName="NOR/PSRAM 2" Group="NOR/PSRAM timing for write accesses" Visible="false">
         <Condition Diagnostic="" Expression="ExtendedMode2=FSMC_EXTENDED_MODE_DISABLE"/>
     </RefParameter>
-    <RefParameter Comment="Extended address setup time" DefaultValue="15" Name="ExtendedAddressSetupTime2" Type="list" TabName="NOR/PSRAM 2" Group="NOR/PSRAM timing for write accesses" Visible="false">
-      <Condition Expression="MuxedNorFlash2|Psram2|MuxedPsram2|Sram2|Rom2" Diagnostic=""/>
-      <PossibleValue Comment="15" Value="15"/>
-    </RefParameter>
     <RefParameter Comment="Extended address setup time" DefaultValue="15" Max="15" Min="1" Name="ExtendedAddressSetupTime2" Type="integer" TabName="NOR/PSRAM 2" Group="NOR/PSRAM timing for write accesses">
       <Condition Expression="ExtendedAccessModeD2" Diagnostic=""/>
     </RefParameter>
@@ -625,7 +595,7 @@
         <Condition Diagnostic="" Expression="ExtendedMode2=FSMC_EXTENDED_MODE_DISABLE"/>
     </RefParameter>
     <RefParameter Comment="Extended address hold time" DefaultValue="15" Max="15" Min="1" Name="ExtendedAddressHoldTime2" Type="integer" TabName="NOR/PSRAM 2" Group="NOR/PSRAM timing for write accesses">
-      <Condition Expression="(MuxedNorFlash2|MuxedPsram2)|ExtendedAccessModeD2" Diagnostic=""/>
+      <Condition Expression="ExtendedAccessModeD2" Diagnostic=""/>
     </RefParameter>
     <RefParameter Comment="Extended address hold time" DefaultValue="15" Max="15" Min="1" Name="ExtendedAddressHoldTime2" Type="integer" TabName="NOR/PSRAM 2" Group="NOR/PSRAM timing for write accesses" Visible="false"/>
     <!-- FSMC_BWTRx DATAST -->
@@ -658,15 +628,15 @@
         <Condition Diagnostic="" Expression="ExtendedMode2=FSMC_EXTENDED_MODE_DISABLE"/>
     </RefParameter>
     <RefParameter Comment="Extended access mode" DefaultValue="FSMC_ACCESS_MODE_B" Name="ExtendedAccessMode2" Type="list" TabName="NOR/PSRAM 2" Group="NOR/PSRAM timing for write accesses">
-        <Condition Expression="NorFlash2|MuxedNorFlash2" Diagnostic="Nor Flash"/>
+        <Condition Expression="NorFlash2" Diagnostic="Nor Flash"/>
         <PossibleValue Comment="B" Value="FSMC_ACCESS_MODE_B"/>
         <PossibleValue Comment="C" Value="FSMC_ACCESS_MODE_C"/>
-        <PossibleValue Comment="D" Value="FSMC_ACCESS_MODE_D"/>
+        <PossibleValue Comment="D" Value="FSMC_ACCESS_MODE_D" Semaphore="ExtendedAccessModeD2"/>
     </RefParameter>
     <RefParameter Comment="Extended access mode" DefaultValue="FSMC_ACCESS_MODE_A" Name="ExtendedAccessMode2" Type="list" TabName="NOR/PSRAM 2" Group="NOR/PSRAM timing for write accesses">
-        <Condition Expression="Psram2|MuxedPsram2|Sram2|Rom2" Diagnostic="PSRAM/SRAM/ROM"/>
+        <Condition Expression="Psram2|Sram2" Diagnostic="PSRAM/SRAM"/>
         <PossibleValue Comment="A" Value="FSMC_ACCESS_MODE_A"/>
-        <PossibleValue Comment="D" Value="FSMC_ACCESS_MODE_D"/>
+        <PossibleValue Comment="D" Value="FSMC_ACCESS_MODE_D" Semaphore="ExtendedAccessModeD2"/>
     </RefParameter>
     <RefParameter Comment="Extended access mode" DefaultValue="FSMC_ACCESS_MODE_A" Name="ExtendedAccessMode2" Type="list" TabName="NOR/PSRAM 2" Group="NOR/PSRAM timing for write accesses">
         <PossibleValue Comment="A" Value="FSMC_ACCESS_MODE_A"/>
@@ -676,8 +646,12 @@
     </RefParameter>
     <!-- End NOR Flash 2 RefParameters -->
     <!-- Begin NOR Flash 3 RefParameters -->
+    <RefParameter Comment="NS Coherent Pinout" DefaultValue="MEMORY_NADV_KO" Name="NSCoherentPinout3" Type="list" TabName="NOR/PSRAM 3" Group="NOR/PSRAM control" Visible="false">
+        <Condition Expression="((Address3&amp;Data3)|NorPsramDataAddress3)&amp;(NorFlash3|MuxedNorFlash3)&amp;NorPsramClock3&amp;!AddressValid3" Diagnostic=""/>
+        <PossibleValue Comment="PINOUT OK" Value="MEMORY_NADV_KO"/>
+    </RefParameter>
     <RefParameter Comment="NS Coherent Pinout" DefaultValue="MEMORY_PINOUT_OK" Name="NSCoherentPinout3" Type="list" TabName="NOR/PSRAM 3" Group="NOR/PSRAM control" Visible="false">
-        <Condition Expression="(Address3&amp;Data3)|NorPsramDataAddress3" Diagnostic=""/>
+        <Condition Expression="((Address3|OneBitAddress3)&amp;Data3)|NorPsramDataAddress3" Diagnostic=""/>
         <PossibleValue Comment="PINOUT OK" Value="MEMORY_PINOUT_OK"/>
     </RefParameter>
     <RefParameter Comment="NS Coherent Pinout" DefaultValue="MEMORY_PINOUT_KO" Name="NSCoherentPinout3" Type="list" TabName="NOR/PSRAM 3" Group="NOR/PSRAM control" Visible="false">
@@ -709,7 +683,7 @@
     <!-- FSMC_BCRx -->
     <!-- FSMC_BCRx MUXEN -->
     <RefParameter Comment="Data address multiplexing" DefaultValue="FSMC_DATA_ADDRESS_MUX_DISABLE" Name="DataAddressMux3" Type="list" TabName="NOR/PSRAM 3" Group="NOR/PSRAM control" Visible="false">
-        <Condition Expression="Sram3|Rom3" Diagnostic=""/>
+        <Condition Expression="Sram3|Rom3|Lcd3" Diagnostic=""/>
         <PossibleValue Comment="Disabled" Value="FSMC_DATA_ADDRESS_MUX_DISABLE"/>
     </RefParameter>
     <RefParameter Comment="Data address multiplexing" DefaultValue="FSMC_DATA_ADDRESS_MUX_DISABLE" Name="DataAddressMux3" Type="list" TabName="NOR/PSRAM 3" Group="NOR/PSRAM control" Visible="false">
@@ -730,6 +704,10 @@
         <Condition Expression="Rom3" Diagnostic=""/>
         <PossibleValue Comment="ROM" Value="FSMC_MEMORY_TYPE_SRAM"/>
     </RefParameter>
+    <RefParameter Comment="Memory type" DefaultValue="FSMC_MEMORY_TYPE_SRAM" Name="MemoryType3" Type="list" TabName="NOR/PSRAM 3" Group="NOR/PSRAM control">
+        <Condition Expression="Lcd3" Diagnostic=""/>
+        <PossibleValue Comment="LCD Interface" Value="FSMC_MEMORY_TYPE_SRAM"/>
+    </RefParameter>
     <RefParameter Comment="Memory type" DefaultValue="FSMC_MEMORY_TYPE_PSRAM" Name="MemoryType3" Type="list" TabName="NOR/PSRAM 3" Group="NOR/PSRAM control">
         <Condition Expression="Psram3|MuxedPsram3" Diagnostic=""/>
         <PossibleValue Comment="PSRAM" Value="FSMC_MEMORY_TYPE_PSRAM"/>
@@ -746,11 +724,11 @@
     </RefParameter>
     <!-- FSMC_BCRx MWID -->
     <RefParameter Comment="Data size" DefaultValue="FSMC_NORSRAM_MEM_BUS_WIDTH_8" Name="NSMemoryDataWidth3" Type="list" TabName="NOR/PSRAM 3" Group="NOR/PSRAM control" Visible="false">
-        <Condition Expression="((NorFlash3|Psram3|Sram3|Rom3)&amp;_8_bit_data3)|_8b_da3|_9b_da3|_10b_da3|_11b_da3|_12b_da3|_13b_da3|_14b_da3|_15b_da3" Diagnostic=""/>
+        <Condition Expression="((NorFlash3|Psram3|Sram3|Rom3|Lcd3)&amp;_8_bit_data3)|_8b_da3|_9b_da3|_10b_da3|_11b_da3|_12b_da3|_13b_da3|_14b_da3|_15b_da3" Diagnostic=""/>
         <PossibleValue Comment="8 bits" Value="FSMC_NORSRAM_MEM_BUS_WIDTH_8"/>
     </RefParameter>
     <RefParameter Comment="Data size" DefaultValue="FSMC_NORSRAM_MEM_BUS_WIDTH_16" Name="NSMemoryDataWidth3" Type="list" TabName="NOR/PSRAM 3" Group="NOR/PSRAM control" Visible="false">
-        <Condition Expression="(NorFlash3|Psram3|Sram3|Rom3)&amp;_16_bit_data3" Diagnostic=""/>
+        <Condition Expression="(NorFlash3|Psram3|Sram3|Rom3|Lcd3)&amp;_16_bit_data3" Diagnostic=""/>
         <PossibleValue Comment="16 bits" Value="FSMC_NORSRAM_MEM_BUS_WIDTH_16"/>
     </RefParameter>
     <RefParameter Comment="Data size" DefaultValue="FSMC_NORSRAM_MEM_BUS_WIDTH_16" Name="NSMemoryDataWidth3" Type="list" TabName="NOR/PSRAM 3" Group="NOR/PSRAM control">
@@ -762,29 +740,16 @@
     </RefParameter>
     <RefParameter Comment="Data size" DefaultValue="FSMC_NORSRAM_MEM_BUS_WIDTH_16" Name="NSMemoryDataWidth3" Type="list" TabName="NOR/PSRAM 3" Group="NOR/PSRAM control"/>
     <!-- FSMC_BCRx BURSTEN -->
-    <RefParameter Comment="Burst read" DefaultValue="FSMC_BURST_ACCESS_MODE_DISABLE" Name="BurstAccessMode3" Type="list" TabName="NOR/PSRAM 3" Group="NOR/PSRAM control" Visible="false">
-        <Condition Expression="Sram3|Rom3|!NorPsramClock3" Diagnostic=""/>
-        <PossibleValue Comment="Disabled" Value="FSMC_BURST_ACCESS_MODE_DISABLE"/>
-    </RefParameter>
     <RefParameter Comment="Burst read" DefaultValue="FSMC_BURST_ACCESS_MODE_ENABLE" Name="BurstAccessMode3" Type="list" TabName="NOR/PSRAM 3" Group="NOR/PSRAM control" Visible="false">
-        <Condition Expression="NorPsramClock3&amp;(NorFlash3|MuxedNorFlash3)" Diagnostic=""/>
+        <Condition Expression="BurstReadMode3" Diagnostic=""/>
         <PossibleValue Comment="Enabled" Value="FSMC_BURST_ACCESS_MODE_ENABLE"/>
     </RefParameter>
-    <RefParameter Comment="Burst read" DefaultValue="FSMC_BURST_ACCESS_MODE_ENABLE" Name="BurstAccessMode3" Type="list" TabName="NOR/PSRAM 3" Group="NOR/PSRAM control">
-        <Condition Expression="NorPsramClock3&amp;NorPsramChipSelect1_3&amp;ContinuousClockMode3" Diagnostic="For the memory with a Chip Select mode set to NE1, burst read accesses must be enabled in continuous clock mode."/>
-        <PossibleValue Comment="Enabled" Value="FSMC_BURST_ACCESS_MODE_ENABLE"/>
-    </RefParameter>
-    <RefParameter Comment="Burst read" DefaultValue="FSMC_BURST_ACCESS_MODE_DISABLE" Name="BurstAccessMode3" Type="list" TabName="NOR/PSRAM 3" Group="NOR/PSRAM control">
-        <Condition Expression="NorPsramClock3&amp;(Psram3|MuxedPsram3)" Diagnostic=""/>
-        <PossibleValue Comment="Disabled" Value="FSMC_BURST_ACCESS_MODE_DISABLE"/>
-        <PossibleValue Comment="Enabled" Value="FSMC_BURST_ACCESS_MODE_ENABLE" Semaphore="BurstReadMode3"/>
-    </RefParameter>
-    <RefParameter Comment="Burst read" DefaultValue="FSMC_BURST_ACCESS_MODE_DISABLE" Name="BurstAccessMode3" Type="list" TabName="NOR/PSRAM 3" Group="NOR/PSRAM control">
+    <RefParameter Comment="Burst read" DefaultValue="FSMC_BURST_ACCESS_MODE_DISABLE" Name="BurstAccessMode3" Type="list" TabName="NOR/PSRAM 3" Group="NOR/PSRAM control" Visible="false">
         <PossibleValue Comment="Disabled" Value="FSMC_BURST_ACCESS_MODE_DISABLE"/>
     </RefParameter>
     <!-- FSMC_BCRx WAITPOL -->
     <RefParameter Comment="Wait signal polarity" DefaultValue="FSMC_WAIT_SIGNAL_POLARITY_LOW" Name="WaitSignalPolarity3" Type="list" TabName="NOR/PSRAM 3" Group="NOR/PSRAM control">
-        <Condition Expression="NorPsramWait3&amp;((WaitSignal3=FSMC_WAIT_SIGNAL_ENABLE)|(AsynchronousWait3=FSMC_ASYNCHRONOUS_WAIT_ENABLE))" Diagnostic=""/>
+        <Condition Expression="NorPsramWait3" Diagnostic=""/>
         <PossibleValue Comment="Low polarity" Value="FSMC_WAIT_SIGNAL_POLARITY_LOW"/>
         <PossibleValue Comment="High polarity" Value="FSMC_WAIT_SIGNAL_POLARITY_HIGH"/>
     </RefParameter>
@@ -797,7 +762,7 @@
     </RefParameter>
     <!-- FSMC_BCRx WAITCFG -->
     <RefParameter Comment="Wait timing configuration" DefaultValue="FSMC_WAIT_TIMING_BEFORE_WS" Name="WaitSignalActive3" Type="list" TabName="NOR/PSRAM 3" Group="NOR/PSRAM control">
-        <Condition Expression="(NorFlash3|MuxedNorFlash3)&amp;(WaitSignal3=FSMC_WAIT_SIGNAL_ENABLE)" Diagnostic=""/>
+        <Condition Expression="(NorFlash3|MuxedNorFlash3)&amp;SynchronousWaitMode3" Diagnostic=""/>
         <PossibleValue Comment="Wait active before wait state" Value="FSMC_WAIT_TIMING_BEFORE_WS"/>
         <PossibleValue Comment="Wait active during wait state" Value="FSMC_WAIT_TIMING_DURING_WS"/>
     </RefParameter>
@@ -809,14 +774,17 @@
         <Condition Expression="Rom3" Diagnostic=""/>
         <PossibleValue Comment="Disabled" Value="FSMC_WRITE_OPERATION_DISABLE"/>
     </RefParameter>
+    <RefParameter Comment="Write operation" DefaultValue="FSMC_WRITE_OPERATION_ENABLE" Name="WriteOperation3" Type="list" TabName="NOR/PSRAM 3" Group="NOR/PSRAM control">
+        <Condition Expression="Lcd3" Diagnostic=""/>
+        <PossibleValue Comment="Enabled" Value="FSMC_WRITE_OPERATION_ENABLE"/>
+    </RefParameter>
     <RefParameter Comment="Write operation" DefaultValue="FSMC_WRITE_OPERATION_DISABLE" Name="WriteOperation3" Type="list" TabName="NOR/PSRAM 3" Group="NOR/PSRAM control">
         <PossibleValue Comment="Disabled" Value="FSMC_WRITE_OPERATION_DISABLE"/>
         <PossibleValue Comment="Enabled" Value="FSMC_WRITE_OPERATION_ENABLE"/>
     </RefParameter>
     <!-- FSMC_BCRx WAITEN -->
-    <RefParameter Comment="Wait state insertion" DefaultValue="FSMC_WAIT_SIGNAL_DISABLE" Name="WaitSignal3" Type="list" TabName="NOR/PSRAM 3" Group="NOR/PSRAM control">
-        <Condition Expression="NorPsramWait3&amp;(BurstReadMode3|BurstWriteMode3)" Diagnostic=""/>
-        <PossibleValue Comment="Disabled" Value="FSMC_WAIT_SIGNAL_DISABLE"/>
+    <RefParameter Comment="Wait state insertion" DefaultValue="FSMC_WAIT_SIGNAL_ENABLE" Name="WaitSignal3" Type="list" TabName="NOR/PSRAM 3" Group="NOR/PSRAM control" Visible="false">
+        <Condition Expression="SynchronousWaitMode3" Diagnostic=""/>
         <PossibleValue Comment="Enabled" Value="FSMC_WAIT_SIGNAL_ENABLE"/>
     </RefParameter>
     <RefParameter Comment="Wait state insertion" DefaultValue="FSMC_WAIT_SIGNAL_DISABLE" Name="WaitSignal3" Type="list" TabName="NOR/PSRAM 3" Group="NOR/PSRAM control" Visible="false">
@@ -824,7 +792,7 @@
     </RefParameter>
     <!-- FSMC_BCRx EXTMOD -->
     <RefParameter Comment="Extended mode" DefaultValue="FSMC_EXTENDED_MODE_DISABLE" Name="ExtendedMode3" Type="list" TabName="NOR/PSRAM 3" Group="NOR/PSRAM control" Visible="false">
-        <Condition Expression="Rom3" Diagnostic=""/>
+        <Condition Expression="MuxedNorFlash3|MuxedPsram3|Rom3|Lcd3" Diagnostic=""/>
         <PossibleValue Comment="Disabled" Value="FSMC_EXTENDED_MODE_DISABLE"/>
     </RefParameter>
     <RefParameter Comment="Extended mode" DefaultValue="FSMC_EXTENDED_MODE_DISABLE" Name="ExtendedMode3" Type="list" TabName="NOR/PSRAM 3" Group="NOR/PSRAM control" Visible="false">
@@ -837,37 +805,31 @@
         <PossibleValue Comment="Enabled" Value="FSMC_EXTENDED_MODE_ENABLE"/>
     </RefParameter>
     <!-- FSMC_BCRx ASYNCWAIT -->
-    <RefParameter Comment="Asynchronous wait" DefaultValue="FSMC_ASYNCHRONOUS_WAIT_DISABLE" Name="AsynchronousWait3" Type="list" TabName="NOR/PSRAM 3" Group="NOR/PSRAM control">
-        <Condition Expression="NorPsramWait3&amp;!(BurstReadMode3&amp;BurstWriteMode3)" Diagnostic=""/>
-        <PossibleValue Comment="Disabled" Value="FSMC_ASYNCHRONOUS_WAIT_DISABLE"/>
+    <RefParameter Comment="Asynchronous wait" DefaultValue="FSMC_ASYNCHRONOUS_WAIT_ENABLE" Name="AsynchronousWait3" Type="list" TabName="NOR/PSRAM 3" Group="NOR/PSRAM control" Visible="false">
+        <Condition Expression="AsynchronousWaitMode3" Diagnostic=""/>
         <PossibleValue Comment="Enabled" Value="FSMC_ASYNCHRONOUS_WAIT_ENABLE"/>
     </RefParameter>
     <RefParameter Comment="Asynchronous wait" DefaultValue="FSMC_ASYNCHRONOUS_WAIT_DISABLE" Name="AsynchronousWait3" Type="list" TabName="NOR/PSRAM 3" Group="NOR/PSRAM control" Visible="false">
         <PossibleValue Comment="Disabled" Value="FSMC_ASYNCHRONOUS_WAIT_DISABLE"/>
     </RefParameter>
     <!-- FSMC_BCRx CBURSTRW -->
+    <RefParameter Comment="Burst write" DefaultValue="FSMC_WRITE_BURST_ENABLE" Name="WriteBurst3" Type="list" TabName="NOR/PSRAM 3" Group="NOR/PSRAM control" Visible="false">
+        <Condition Expression="BurstWriteMode3" Diagnostic=""/>
+        <PossibleValue Comment="Enabled" Value="FSMC_WRITE_BURST_ENABLE"/>
+    </RefParameter>
     <RefParameter Comment="Burst write" DefaultValue="FSMC_WRITE_BURST_DISABLE" Name="WriteBurst3" Type="list" TabName="NOR/PSRAM 3" Group="NOR/PSRAM control" Visible="false">
-        <Condition Expression="NorFlash3|MuxedNorFlash3|Sram3|Rom3" Diagnostic=""/>
-        <PossibleValue Comment="Disabled" Value="FSMC_WRITE_BURST_DISABLE"/>
-    </RefParameter>
-    <RefParameter Comment="Burst write" DefaultValue="FSMC_WRITE_BURST_DISABLE" Name="WriteBurst3" Type="list" TabName="NOR/PSRAM 3" Group="NOR/PSRAM control">
-        <Condition Expression="NorPsramClock3" Diagnostic=""/>
-        <PossibleValue Comment="Disabled" Value="FSMC_WRITE_BURST_DISABLE"/>
-        <PossibleValue Comment="Enabled" Value="FSMC_WRITE_BURST_ENABLE" Semaphore="BurstWriteMode3"/>
-    </RefParameter>
-    <RefParameter Comment="Burst write" DefaultValue="FSMC_WRITE_BURST_DISABLE" Name="WriteBurst3" Type="list" TabName="NOR/PSRAM 3" Group="NOR/PSRAM control">
         <PossibleValue Comment="Disabled" Value="FSMC_WRITE_BURST_DISABLE"/>
     </RefParameter>
 
     <!-- FSMC_BTRx -->
     <!-- FSMC_BTRx ADDSET -->
-    <!-- Address setup time unused for PSRAM and in synchronous mode -->
+    <!-- Address setup time unused in synchronous mode -->
     <RefParameter Comment="Address setup time in HCLK clock cycles" DefaultValue="15" Name="AddressSetupTime3" Type="list" TabName="NOR/PSRAM 3" Group="NOR/PSRAM timing" Visible="false">
-      <Condition Expression="Psram3|MuxedPsram3|BurstReadMode3|BurstWriteMode3" Diagnostic=""/>
+      <Condition Expression="BurstReadMode3|BurstWriteMode3" Diagnostic=""/>
       <PossibleValue Comment="15" Value="15"/>
     </RefParameter>
     <RefParameter Comment="Address setup time in HCLK clock cycles" DefaultValue="15" Max="15" Min="1" Name="AddressSetupTime3" Type="integer" TabName="NOR/PSRAM 3" Group="NOR/PSRAM timing">
-      <Condition Expression="MuxedNorFlash3|AccessModeD3" Diagnostic=""/>
+      <Condition Expression="MuxedNorFlash3|MuxedPsram3|AccessModeD3" Diagnostic=""/>
     </RefParameter>
     <RefParameter Comment="Address setup time in HCLK clock cycles" DefaultValue="15" Max="15" Min="0" Name="AddressSetupTime3" Type="integer" TabName="NOR/PSRAM 3" Group="NOR/PSRAM timing"/>
     <!-- FSMC_BTRx ADDHLD -->
@@ -882,13 +844,10 @@
     </RefParameter>
     <RefParameter Comment="Data setup time in HCLK clock cycles" DefaultValue="255" Max="255" Min="1" Name="DataSetupTime3" Type="integer" TabName="NOR/PSRAM 3" Group="NOR/PSRAM timing"/>
     <!-- FSMC_BTRx BUSTURN -->
-    <RefParameter Comment="Bus turn around time in HCLK clock cycles" DefaultValue="15" Max="15" Min="0" Name="BusTurnAroundDuration3" Type="integer" TabName="NOR/PSRAM 3" Group="NOR/PSRAM timing" Visible="false">
-      <Condition Expression="BurstWriteMode3" Diagnostic=""/>
-    </RefParameter>
     <RefParameter Comment="Bus turn around time in HCLK clock cycles" DefaultValue="15" Max="15" Min="0" Name="BusTurnAroundDuration3" Type="integer" TabName="NOR/PSRAM 3" Group="NOR/PSRAM timing"/>
     <!-- FSMC_BTRx CLKDIV -->
     <RefParameter Comment="CLK clock divide ratio" DefaultValue="16" Name="CLKDivision3" Type="list" TabName="NOR/PSRAM 3" Group="NOR/PSRAM timing" Visible="false">
-      <Condition Expression="Sram3|Rom3" Diagnostic=""/>
+      <Condition Expression="Sram3|Rom3|Lcd3" Diagnostic=""/>
       <PossibleValue Comment="16" Value="16"/>
     </RefParameter>
     <RefParameter Comment="CLK clock divide ratio" DefaultValue="16" Name="CLKDivision3" Type="list" TabName="NOR/PSRAM 3" Group="NOR/PSRAM timing" Visible="false">
@@ -898,7 +857,7 @@
     <RefParameter Comment="CLK clock divide ratio" DefaultValue="16" Max="16" Min="2" Name="CLKDivision3" Type="integer" TabName="NOR/PSRAM 3" Group="NOR/PSRAM timing"/>
     <!-- FSMC_BTRx DATLAT -->
     <RefParameter Comment="Data latency in CLK clock cycles" DefaultValue="17" Name="DataLatency3" Type="list" TabName="NOR/PSRAM 3" Group="NOR/PSRAM timing" Visible="false">
-      <Condition Expression="Sram3|Rom3" Diagnostic=""/>
+      <Condition Expression="Sram3|Rom3|Lcd3" Diagnostic=""/>
       <PossibleValue Comment="17" Value="17"/>
     </RefParameter>
     <RefParameter Comment="Data latency in CLK clock cycles" DefaultValue="17" Name="DataLatency3" Type="list" TabName="NOR/PSRAM 3" Group="NOR/PSRAM timing" Visible="false">
@@ -920,15 +879,15 @@
         <PossibleValue Comment="A" Value="FSMC_ACCESS_MODE_A"/>
     </RefParameter>
     <RefParameter Comment="Access mode" DefaultValue="FSMC_ACCESS_MODE_B" Name="AccessMode3" Type="list" TabName="NOR/PSRAM 3" Group="NOR/PSRAM timing">
-        <Condition Expression="NorFlash3|MuxedNorFlash3" Diagnostic="Nor Flash"/>
+        <Condition Expression="NorFlash3" Diagnostic="Nor Flash"/>
         <PossibleValue Comment="B" Value="FSMC_ACCESS_MODE_B"/>
         <PossibleValue Comment="C" Value="FSMC_ACCESS_MODE_C"/>
-        <PossibleValue Comment="D" Value="FSMC_ACCESS_MODE_D"/>
+        <PossibleValue Comment="D" Value="FSMC_ACCESS_MODE_D" Semaphore="AccessModeD3"/>
     </RefParameter>
     <RefParameter Comment="Access mode" DefaultValue="FSMC_ACCESS_MODE_A" Name="AccessMode3" Type="list" TabName="NOR/PSRAM 3" Group="NOR/PSRAM timing">
-        <Condition Expression="Psram3|MuxedPsram3|Sram3|Rom3" Diagnostic="PSRAM/SRAM/ROM"/>
+        <Condition Expression="Psram3|Sram3" Diagnostic="PSRAM/SRAM"/>
         <PossibleValue Comment="A" Value="FSMC_ACCESS_MODE_A"/>
-        <PossibleValue Comment="D" Value="FSMC_ACCESS_MODE_D"/>
+        <PossibleValue Comment="D" Value="FSMC_ACCESS_MODE_D" Semaphore="AccessModeD3"/>
     </RefParameter>
     <RefParameter Comment="Access mode" DefaultValue="FSMC_ACCESS_MODE_A" Name="AccessMode3" Type="list" TabName="NOR/PSRAM 3" Group="NOR/PSRAM timing">
         <PossibleValue Comment="A" Value="FSMC_ACCESS_MODE_A"/>
@@ -942,10 +901,6 @@
     <RefParameter Comment="Extended address setup time" DefaultValue="null" Name="ExtendedAddressSetupTime3" Type="list" TabName="NOR/PSRAM 3" Group="NOR/PSRAM timing for write accesses" Visible="false">
         <Condition Diagnostic="" Expression="ExtendedMode3=FSMC_EXTENDED_MODE_DISABLE"/>
     </RefParameter>
-    <RefParameter Comment="Extended address setup time" DefaultValue="15" Name="ExtendedAddressSetupTime3" Type="list" TabName="NOR/PSRAM 3" Group="NOR/PSRAM timing for write accesses" Visible="false">
-      <Condition Expression="MuxedNorFlash3|Psram3|MuxedPsram3|Sram3|Rom3" Diagnostic=""/>
-      <PossibleValue Comment="15" Value="15"/>
-    </RefParameter>
     <RefParameter Comment="Extended address setup time" DefaultValue="15" Max="15" Min="1" Name="ExtendedAddressSetupTime3" Type="integer" TabName="NOR/PSRAM 3" Group="NOR/PSRAM timing for write accesses">
       <Condition Expression="ExtendedAccessModeD3" Diagnostic=""/>
     </RefParameter>
@@ -955,7 +910,7 @@
         <Condition Diagnostic="" Expression="ExtendedMode3=FSMC_EXTENDED_MODE_DISABLE"/>
     </RefParameter>
     <RefParameter Comment="Extended address hold time" DefaultValue="15" Max="15" Min="1" Name="ExtendedAddressHoldTime3" Type="integer" TabName="NOR/PSRAM 3" Group="NOR/PSRAM timing for write accesses">
-      <Condition Expression="(MuxedNorFlash3|MuxedPsram3)|ExtendedAccessModeD3" Diagnostic=""/>
+      <Condition Expression="ExtendedAccessModeD3" Diagnostic=""/>
     </RefParameter>
     <RefParameter Comment="Extended address hold time" DefaultValue="15" Max="15" Min="1" Name="ExtendedAddressHoldTime3" Type="integer" TabName="NOR/PSRAM 3" Group="NOR/PSRAM timing for write accesses" Visible="false"/>
     <!-- FSMC_BWTRx DATAST -->
@@ -988,15 +943,15 @@
         <Condition Diagnostic="" Expression="ExtendedMode3=FSMC_EXTENDED_MODE_DISABLE"/>
     </RefParameter>
     <RefParameter Comment="Extended access mode" DefaultValue="FSMC_ACCESS_MODE_B" Name="ExtendedAccessMode3" Type="list" TabName="NOR/PSRAM 3" Group="NOR/PSRAM timing for write accesses">
-        <Condition Expression="NorFlash3|MuxedNorFlash3" Diagnostic="Nor Flash"/>
+        <Condition Expression="NorFlash3" Diagnostic="Nor Flash"/>
         <PossibleValue Comment="B" Value="FSMC_ACCESS_MODE_B"/>
         <PossibleValue Comment="C" Value="FSMC_ACCESS_MODE_C"/>
-        <PossibleValue Comment="D" Value="FSMC_ACCESS_MODE_D"/>
+        <PossibleValue Comment="D" Value="FSMC_ACCESS_MODE_D" Semaphore="ExtendedAccessModeD3"/>
     </RefParameter>
     <RefParameter Comment="Extended access mode" DefaultValue="FSMC_ACCESS_MODE_A" Name="ExtendedAccessMode3" Type="list" TabName="NOR/PSRAM 3" Group="NOR/PSRAM timing for write accesses">
-        <Condition Expression="Psram3|MuxedPsram3|Sram3|Rom3" Diagnostic="PSRAM/SRAM/ROM"/>
+        <Condition Expression="Psram3|Sram3" Diagnostic="PSRAM/SRAM"/>
         <PossibleValue Comment="A" Value="FSMC_ACCESS_MODE_A"/>
-        <PossibleValue Comment="D" Value="FSMC_ACCESS_MODE_D"/>
+        <PossibleValue Comment="D" Value="FSMC_ACCESS_MODE_D" Semaphore="ExtendedAccessModeD3"/>
     </RefParameter>
     <RefParameter Comment="Extended access mode" DefaultValue="FSMC_ACCESS_MODE_A" Name="ExtendedAccessMode3" Type="list" TabName="NOR/PSRAM 3" Group="NOR/PSRAM timing for write accesses">
         <PossibleValue Comment="A" Value="FSMC_ACCESS_MODE_A"/>
@@ -1006,8 +961,12 @@
     </RefParameter>
     <!-- End NOR Flash 3 RefParameters -->
     <!-- Begin NOR Flash 4 RefParameters -->
+    <RefParameter Comment="NS Coherent Pinout" DefaultValue="MEMORY_NADV_KO" Name="NSCoherentPinout4" Type="list" TabName="NOR/PSRAM 4" Group="NOR/PSRAM control" Visible="false">
+        <Condition Expression="((Address4&amp;Data4)|NorPsramDataAddress4)&amp;(NorFlash4|MuxedNorFlash4)&amp;NorPsramClock4&amp;!AddressValid4" Diagnostic=""/>
+        <PossibleValue Comment="PINOUT OK" Value="MEMORY_NADV_KO"/>
+    </RefParameter>
     <RefParameter Comment="NS Coherent Pinout" DefaultValue="MEMORY_PINOUT_OK" Name="NSCoherentPinout4" Type="list" TabName="NOR/PSRAM 4" Group="NOR/PSRAM control" Visible="false">
-        <Condition Expression="(Address4&amp;Data4)|NorPsramDataAddress4" Diagnostic=""/>
+        <Condition Expression="((Address4|OneBitAddress4)&amp;Data4)|NorPsramDataAddress4" Diagnostic=""/>
         <PossibleValue Comment="PINOUT OK" Value="MEMORY_PINOUT_OK"/>
     </RefParameter>
     <RefParameter Comment="NS Coherent Pinout" DefaultValue="MEMORY_PINOUT_KO" Name="NSCoherentPinout4" Type="list" TabName="NOR/PSRAM 4" Group="NOR/PSRAM control" Visible="false">
@@ -1039,7 +998,7 @@
     <!-- FSMC_BCRx -->
     <!-- FSMC_BCRx MUXEN -->
     <RefParameter Comment="Data address multiplexing" DefaultValue="FSMC_DATA_ADDRESS_MUX_DISABLE" Name="DataAddressMux4" Type="list" TabName="NOR/PSRAM 4" Group="NOR/PSRAM control" Visible="false">
-        <Condition Expression="Sram4|Rom4" Diagnostic=""/>
+        <Condition Expression="Sram4|Rom4|Lcd4" Diagnostic=""/>
         <PossibleValue Comment="Disabled" Value="FSMC_DATA_ADDRESS_MUX_DISABLE"/>
     </RefParameter>
     <RefParameter Comment="Data address multiplexing" DefaultValue="FSMC_DATA_ADDRESS_MUX_DISABLE" Name="DataAddressMux4" Type="list" TabName="NOR/PSRAM 4" Group="NOR/PSRAM control" Visible="false">
@@ -1060,6 +1019,10 @@
         <Condition Expression="Rom4" Diagnostic=""/>
         <PossibleValue Comment="ROM" Value="FSMC_MEMORY_TYPE_SRAM"/>
     </RefParameter>
+    <RefParameter Comment="Memory type" DefaultValue="FSMC_MEMORY_TYPE_SRAM" Name="MemoryType4" Type="list" TabName="NOR/PSRAM 4" Group="NOR/PSRAM control">
+        <Condition Expression="Lcd4" Diagnostic=""/>
+        <PossibleValue Comment="LCD Interface" Value="FSMC_MEMORY_TYPE_SRAM"/>
+    </RefParameter>
     <RefParameter Comment="Memory type" DefaultValue="FSMC_MEMORY_TYPE_PSRAM" Name="MemoryType4" Type="list" TabName="NOR/PSRAM 4" Group="NOR/PSRAM control">
         <Condition Expression="Psram4|MuxedPsram4" Diagnostic=""/>
         <PossibleValue Comment="PSRAM" Value="FSMC_MEMORY_TYPE_PSRAM"/>
@@ -1076,11 +1039,11 @@
     </RefParameter>
     <!-- FSMC_BCRx MWID -->
     <RefParameter Comment="Data size" DefaultValue="FSMC_NORSRAM_MEM_BUS_WIDTH_8" Name="NSMemoryDataWidth4" Type="list" TabName="NOR/PSRAM 4" Group="NOR/PSRAM control" Visible="false">
-        <Condition Expression="((NorFlash4|Psram4|Sram4|Rom4)&amp;_8_bit_data4)|_8b_da4|_9b_da4|_10b_da4|_11b_da4|_12b_da4|_13b_da4|_14b_da4|_15b_da4" Diagnostic=""/>
+        <Condition Expression="((NorFlash4|Psram4|Sram4|Rom4|Lcd4)&amp;_8_bit_data4)|_8b_da4|_9b_da4|_10b_da4|_11b_da4|_12b_da4|_13b_da4|_14b_da4|_15b_da4" Diagnostic=""/>
         <PossibleValue Comment="8 bits" Value="FSMC_NORSRAM_MEM_BUS_WIDTH_8"/>
     </RefParameter>
     <RefParameter Comment="Data size" DefaultValue="FSMC_NORSRAM_MEM_BUS_WIDTH_16" Name="NSMemoryDataWidth4" Type="list" TabName="NOR/PSRAM 4" Group="NOR/PSRAM control" Visible="false">
-        <Condition Expression="(NorFlash4|Psram4|Sram4|Rom4)&amp;_16_bit_data4" Diagnostic=""/>
+        <Condition Expression="(NorFlash4|Psram4|Sram4|Rom4|Lcd4)&amp;_16_bit_data4" Diagnostic=""/>
         <PossibleValue Comment="16 bits" Value="FSMC_NORSRAM_MEM_BUS_WIDTH_16"/>
     </RefParameter>
     <RefParameter Comment="Data size" DefaultValue="FSMC_NORSRAM_MEM_BUS_WIDTH_16" Name="NSMemoryDataWidth4" Type="list" TabName="NOR/PSRAM 4" Group="NOR/PSRAM control">
@@ -1092,29 +1055,16 @@
     </RefParameter>
     <RefParameter Comment="Data size" DefaultValue="FSMC_NORSRAM_MEM_BUS_WIDTH_16" Name="NSMemoryDataWidth4" Type="list" TabName="NOR/PSRAM 4" Group="NOR/PSRAM control"/>
     <!-- FSMC_BCRx BURSTEN -->
-    <RefParameter Comment="Burst read" DefaultValue="FSMC_BURST_ACCESS_MODE_DISABLE" Name="BurstAccessMode4" Type="list" TabName="NOR/PSRAM 4" Group="NOR/PSRAM control" Visible="false">
-        <Condition Expression="Sram4|Rom4|!NorPsramClock4" Diagnostic=""/>
-        <PossibleValue Comment="Disabled" Value="FSMC_BURST_ACCESS_MODE_DISABLE"/>
-    </RefParameter>
     <RefParameter Comment="Burst read" DefaultValue="FSMC_BURST_ACCESS_MODE_ENABLE" Name="BurstAccessMode4" Type="list" TabName="NOR/PSRAM 4" Group="NOR/PSRAM control" Visible="false">
-        <Condition Expression="NorPsramClock4&amp;(NorFlash4|MuxedNorFlash4)" Diagnostic=""/>
+        <Condition Expression="BurstReadMode4" Diagnostic=""/>
         <PossibleValue Comment="Enabled" Value="FSMC_BURST_ACCESS_MODE_ENABLE"/>
     </RefParameter>
-    <RefParameter Comment="Burst read" DefaultValue="FSMC_BURST_ACCESS_MODE_ENABLE" Name="BurstAccessMode4" Type="list" TabName="NOR/PSRAM 4" Group="NOR/PSRAM control">
-        <Condition Expression="NorPsramClock4&amp;NorPsramChipSelect1_4&amp;ContinuousClockMode4" Diagnostic="For the memory with a Chip Select mode set to NE1, burst read accesses must be enabled in continuous clock mode."/>
-        <PossibleValue Comment="Enabled" Value="FSMC_BURST_ACCESS_MODE_ENABLE"/>
-    </RefParameter>
-    <RefParameter Comment="Burst read" DefaultValue="FSMC_BURST_ACCESS_MODE_DISABLE" Name="BurstAccessMode4" Type="list" TabName="NOR/PSRAM 4" Group="NOR/PSRAM control">
-        <Condition Expression="NorPsramClock4&amp;(Psram4|MuxedPsram4)" Diagnostic=""/>
-        <PossibleValue Comment="Disabled" Value="FSMC_BURST_ACCESS_MODE_DISABLE"/>
-        <PossibleValue Comment="Enabled" Value="FSMC_BURST_ACCESS_MODE_ENABLE" Semaphore="BurstReadMode4"/>
-    </RefParameter>
-    <RefParameter Comment="Burst read" DefaultValue="FSMC_BURST_ACCESS_MODE_DISABLE" Name="BurstAccessMode4" Type="list" TabName="NOR/PSRAM 4" Group="NOR/PSRAM control">
+    <RefParameter Comment="Burst read" DefaultValue="FSMC_BURST_ACCESS_MODE_DISABLE" Name="BurstAccessMode4" Type="list" TabName="NOR/PSRAM 4" Group="NOR/PSRAM control" Visible="false">
         <PossibleValue Comment="Disabled" Value="FSMC_BURST_ACCESS_MODE_DISABLE"/>
     </RefParameter>
     <!-- FSMC_BCRx WAITPOL -->
     <RefParameter Comment="Wait signal polarity" DefaultValue="FSMC_WAIT_SIGNAL_POLARITY_LOW" Name="WaitSignalPolarity4" Type="list" TabName="NOR/PSRAM 4" Group="NOR/PSRAM control">
-        <Condition Expression="NorPsramWait4&amp;((WaitSignal4=FSMC_WAIT_SIGNAL_ENABLE)|(AsynchronousWait4=FSMC_ASYNCHRONOUS_WAIT_ENABLE))" Diagnostic=""/>
+        <Condition Expression="NorPsramWait4" Diagnostic=""/>
         <PossibleValue Comment="Low polarity" Value="FSMC_WAIT_SIGNAL_POLARITY_LOW"/>
         <PossibleValue Comment="High polarity" Value="FSMC_WAIT_SIGNAL_POLARITY_HIGH"/>
     </RefParameter>
@@ -1127,7 +1077,7 @@
     </RefParameter>
     <!-- FSMC_BCRx WAITCFG -->
     <RefParameter Comment="Wait timing configuration" DefaultValue="FSMC_WAIT_TIMING_BEFORE_WS" Name="WaitSignalActive4" Type="list" TabName="NOR/PSRAM 4" Group="NOR/PSRAM control">
-        <Condition Expression="(NorFlash4|MuxedNorFlash4)&amp;(WaitSignal4=FSMC_WAIT_SIGNAL_ENABLE)" Diagnostic=""/>
+        <Condition Expression="(NorFlash4|MuxedNorFlash4)&amp;SynchronousWaitMode4" Diagnostic=""/>
         <PossibleValue Comment="Wait active before wait state" Value="FSMC_WAIT_TIMING_BEFORE_WS"/>
         <PossibleValue Comment="Wait active during wait state" Value="FSMC_WAIT_TIMING_DURING_WS"/>
     </RefParameter>
@@ -1139,14 +1089,17 @@
         <Condition Expression="Rom4" Diagnostic=""/>
         <PossibleValue Comment="Disabled" Value="FSMC_WRITE_OPERATION_DISABLE"/>
     </RefParameter>
+    <RefParameter Comment="Write operation" DefaultValue="FSMC_WRITE_OPERATION_ENABLE" Name="WriteOperation4" Type="list" TabName="NOR/PSRAM 4" Group="NOR/PSRAM control">
+        <Condition Expression="Lcd4" Diagnostic=""/>
+        <PossibleValue Comment="Enabled" Value="FSMC_WRITE_OPERATION_ENABLE"/>
+    </RefParameter>
     <RefParameter Comment="Write operation" DefaultValue="FSMC_WRITE_OPERATION_DISABLE" Name="WriteOperation4" Type="list" TabName="NOR/PSRAM 4" Group="NOR/PSRAM control">
         <PossibleValue Comment="Disabled" Value="FSMC_WRITE_OPERATION_DISABLE"/>
         <PossibleValue Comment="Enabled" Value="FSMC_WRITE_OPERATION_ENABLE"/>
     </RefParameter>
     <!-- FSMC_BCRx WAITEN -->
-    <RefParameter Comment="Wait state insertion" DefaultValue="FSMC_WAIT_SIGNAL_DISABLE" Name="WaitSignal4" Type="list" TabName="NOR/PSRAM 4" Group="NOR/PSRAM control">
-        <Condition Expression="NorPsramWait4&amp;(BurstReadMode4|BurstWriteMode4)" Diagnostic=""/>
-        <PossibleValue Comment="Disabled" Value="FSMC_WAIT_SIGNAL_DISABLE"/>
+    <RefParameter Comment="Wait state insertion" DefaultValue="FSMC_WAIT_SIGNAL_ENABLE" Name="WaitSignal4" Type="list" TabName="NOR/PSRAM 4" Group="NOR/PSRAM control" Visible="false">
+        <Condition Expression="SynchronousWaitMode4" Diagnostic=""/>
         <PossibleValue Comment="Enabled" Value="FSMC_WAIT_SIGNAL_ENABLE"/>
     </RefParameter>
     <RefParameter Comment="Wait state insertion" DefaultValue="FSMC_WAIT_SIGNAL_DISABLE" Name="WaitSignal4" Type="list" TabName="NOR/PSRAM 4" Group="NOR/PSRAM control" Visible="false">
@@ -1154,7 +1107,7 @@
     </RefParameter>
     <!-- FSMC_BCRx EXTMOD -->
     <RefParameter Comment="Extended mode" DefaultValue="FSMC_EXTENDED_MODE_DISABLE" Name="ExtendedMode4" Type="list" TabName="NOR/PSRAM 4" Group="NOR/PSRAM control" Visible="false">
-        <Condition Expression="Rom4" Diagnostic=""/>
+        <Condition Expression="MuxedNorFlash4|MuxedPsram4|Rom4|Lcd4" Diagnostic=""/>
         <PossibleValue Comment="Disabled" Value="FSMC_EXTENDED_MODE_DISABLE"/>
     </RefParameter>
     <RefParameter Comment="Extended mode" DefaultValue="FSMC_EXTENDED_MODE_DISABLE" Name="ExtendedMode4" Type="list" TabName="NOR/PSRAM 4" Group="NOR/PSRAM control" Visible="false">
@@ -1167,37 +1120,31 @@
         <PossibleValue Comment="Enabled" Value="FSMC_EXTENDED_MODE_ENABLE"/>
     </RefParameter>
     <!-- FSMC_BCRx ASYNCWAIT -->
-    <RefParameter Comment="Asynchronous wait" DefaultValue="FSMC_ASYNCHRONOUS_WAIT_DISABLE" Name="AsynchronousWait4" Type="list" TabName="NOR/PSRAM 4" Group="NOR/PSRAM control">
-        <Condition Expression="NorPsramWait4&amp;!(BurstReadMode4&amp;BurstWriteMode4)" Diagnostic=""/>
-        <PossibleValue Comment="Disabled" Value="FSMC_ASYNCHRONOUS_WAIT_DISABLE"/>
+    <RefParameter Comment="Asynchronous wait" DefaultValue="FSMC_ASYNCHRONOUS_WAIT_ENABLE" Name="AsynchronousWait4" Type="list" TabName="NOR/PSRAM 4" Group="NOR/PSRAM control" Visible="false">
+        <Condition Expression="AsynchronousWaitMode4" Diagnostic=""/>
         <PossibleValue Comment="Enabled" Value="FSMC_ASYNCHRONOUS_WAIT_ENABLE"/>
     </RefParameter>
     <RefParameter Comment="Asynchronous wait" DefaultValue="FSMC_ASYNCHRONOUS_WAIT_DISABLE" Name="AsynchronousWait4" Type="list" TabName="NOR/PSRAM 4" Group="NOR/PSRAM control" Visible="false">
         <PossibleValue Comment="Disabled" Value="FSMC_ASYNCHRONOUS_WAIT_DISABLE"/>
     </RefParameter>
     <!-- FSMC_BCRx CBURSTRW -->
+    <RefParameter Comment="Burst write" DefaultValue="FSMC_WRITE_BURST_ENABLE" Name="WriteBurst4" Type="list" TabName="NOR/PSRAM 4" Group="NOR/PSRAM control" Visible="false">
+        <Condition Expression="BurstWriteMode4" Diagnostic=""/>
+        <PossibleValue Comment="Enabled" Value="FSMC_WRITE_BURST_ENABLE"/>
+    </RefParameter>
     <RefParameter Comment="Burst write" DefaultValue="FSMC_WRITE_BURST_DISABLE" Name="WriteBurst4" Type="list" TabName="NOR/PSRAM 4" Group="NOR/PSRAM control" Visible="false">
-        <Condition Expression="NorFlash4|MuxedNorFlash4|Sram4|Rom4" Diagnostic=""/>
-        <PossibleValue Comment="Disabled" Value="FSMC_WRITE_BURST_DISABLE"/>
-    </RefParameter>
-    <RefParameter Comment="Burst write" DefaultValue="FSMC_WRITE_BURST_DISABLE" Name="WriteBurst4" Type="list" TabName="NOR/PSRAM 4" Group="NOR/PSRAM control">
-        <Condition Expression="NorPsramClock4" Diagnostic=""/>
-        <PossibleValue Comment="Disabled" Value="FSMC_WRITE_BURST_DISABLE"/>
-        <PossibleValue Comment="Enabled" Value="FSMC_WRITE_BURST_ENABLE" Semaphore="BurstWriteMode4"/>
-    </RefParameter>
-    <RefParameter Comment="Burst write" DefaultValue="FSMC_WRITE_BURST_DISABLE" Name="WriteBurst4" Type="list" TabName="NOR/PSRAM 4" Group="NOR/PSRAM control">
         <PossibleValue Comment="Disabled" Value="FSMC_WRITE_BURST_DISABLE"/>
     </RefParameter>
 
     <!-- FSMC_BTRx -->
     <!-- FSMC_BTRx ADDSET -->
-    <!-- Address setup time unused for PSRAM and in synchronous mode -->
+    <!-- Address setup time unused in synchronous mode -->
     <RefParameter Comment="Address setup time in HCLK clock cycles" DefaultValue="15" Name="AddressSetupTime4" Type="list" TabName="NOR/PSRAM 4" Group="NOR/PSRAM timing" Visible="false">
-      <Condition Expression="Psram4|MuxedPsram4|BurstReadMode4|BurstWriteMode4" Diagnostic=""/>
+      <Condition Expression="BurstReadMode4|BurstWriteMode4" Diagnostic=""/>
       <PossibleValue Comment="15" Value="15"/>
     </RefParameter>
     <RefParameter Comment="Address setup time in HCLK clock cycles" DefaultValue="15" Max="15" Min="1" Name="AddressSetupTime4" Type="integer" TabName="NOR/PSRAM 4" Group="NOR/PSRAM timing">
-      <Condition Expression="MuxedNorFlash4|AccessModeD4" Diagnostic=""/>
+      <Condition Expression="MuxedNorFlash4|MuxedPsram4|AccessModeD4" Diagnostic=""/>
     </RefParameter>
     <RefParameter Comment="Address setup time in HCLK clock cycles" DefaultValue="15" Max="15" Min="0" Name="AddressSetupTime4" Type="integer" TabName="NOR/PSRAM 4" Group="NOR/PSRAM timing"/>
     <!-- FSMC_BTRx ADDHLD -->
@@ -1212,13 +1159,10 @@
     </RefParameter>
     <RefParameter Comment="Data setup time in HCLK clock cycles" DefaultValue="255" Max="255" Min="1" Name="DataSetupTime4" Type="integer" TabName="NOR/PSRAM 4" Group="NOR/PSRAM timing"/>
     <!-- FSMC_BTRx BUSTURN -->
-    <RefParameter Comment="Bus turn around time in HCLK clock cycles" DefaultValue="15" Max="15" Min="0" Name="BusTurnAroundDuration4" Type="integer" TabName="NOR/PSRAM 4" Group="NOR/PSRAM timing" Visible="false">
-      <Condition Expression="BurstWriteMode4" Diagnostic=""/>
-    </RefParameter>
     <RefParameter Comment="Bus turn around time in HCLK clock cycles" DefaultValue="15" Max="15" Min="0" Name="BusTurnAroundDuration4" Type="integer" TabName="NOR/PSRAM 4" Group="NOR/PSRAM timing"/>
     <!-- FSMC_BTRx CLKDIV -->
     <RefParameter Comment="CLK clock divide ratio" DefaultValue="16" Name="CLKDivision4" Type="list" TabName="NOR/PSRAM 4" Group="NOR/PSRAM timing" Visible="false">
-      <Condition Expression="Sram4|Rom4" Diagnostic=""/>
+      <Condition Expression="Sram4|Rom4|Lcd4" Diagnostic=""/>
       <PossibleValue Comment="16" Value="16"/>
     </RefParameter>
     <RefParameter Comment="CLK clock divide ratio" DefaultValue="16" Name="CLKDivision4" Type="list" TabName="NOR/PSRAM 4" Group="NOR/PSRAM timing" Visible="false">
@@ -1228,7 +1172,7 @@
     <RefParameter Comment="CLK clock divide ratio" DefaultValue="16" Max="16" Min="2" Name="CLKDivision4" Type="integer" TabName="NOR/PSRAM 4" Group="NOR/PSRAM timing"/>
     <!-- FSMC_BTRx DATLAT -->
     <RefParameter Comment="Data latency in CLK clock cycles" DefaultValue="17" Name="DataLatency4" Type="list" TabName="NOR/PSRAM 4" Group="NOR/PSRAM timing" Visible="false">
-      <Condition Expression="Sram4|Rom4" Diagnostic=""/>
+      <Condition Expression="Sram4|Rom4|Lcd4" Diagnostic=""/>
       <PossibleValue Comment="17" Value="17"/>
     </RefParameter>
     <RefParameter Comment="Data latency in CLK clock cycles" DefaultValue="17" Name="DataLatency4" Type="list" TabName="NOR/PSRAM 4" Group="NOR/PSRAM timing" Visible="false">
@@ -1250,15 +1194,15 @@
         <PossibleValue Comment="A" Value="FSMC_ACCESS_MODE_A"/>
     </RefParameter>
     <RefParameter Comment="Access mode" DefaultValue="FSMC_ACCESS_MODE_B" Name="AccessMode4" Type="list" TabName="NOR/PSRAM 4" Group="NOR/PSRAM timing">
-        <Condition Expression="NorFlash4|MuxedNorFlash4" Diagnostic="Nor Flash"/>
+        <Condition Expression="NorFlash4" Diagnostic="Nor Flash"/>
         <PossibleValue Comment="B" Value="FSMC_ACCESS_MODE_B"/>
         <PossibleValue Comment="C" Value="FSMC_ACCESS_MODE_C"/>
-        <PossibleValue Comment="D" Value="FSMC_ACCESS_MODE_D"/>
+        <PossibleValue Comment="D" Value="FSMC_ACCESS_MODE_D" Semaphore="AccessModeD4"/>
     </RefParameter>
     <RefParameter Comment="Access mode" DefaultValue="FSMC_ACCESS_MODE_A" Name="AccessMode4" Type="list" TabName="NOR/PSRAM 4" Group="NOR/PSRAM timing">
-        <Condition Expression="Psram4|MuxedPsram4|Sram4|Rom4" Diagnostic="PSRAM/SRAM/ROM"/>
+        <Condition Expression="Psram4|Sram4" Diagnostic="PSRAM/SRAM"/>
         <PossibleValue Comment="A" Value="FSMC_ACCESS_MODE_A"/>
-        <PossibleValue Comment="D" Value="FSMC_ACCESS_MODE_D"/>
+        <PossibleValue Comment="D" Value="FSMC_ACCESS_MODE_D" Semaphore="AccessModeD4"/>
     </RefParameter>
     <RefParameter Comment="Access mode" DefaultValue="FSMC_ACCESS_MODE_A" Name="AccessMode4" Type="list" TabName="NOR/PSRAM 4" Group="NOR/PSRAM timing">
         <PossibleValue Comment="A" Value="FSMC_ACCESS_MODE_A"/>
@@ -1272,10 +1216,6 @@
     <RefParameter Comment="Extended address setup time" DefaultValue="null" Name="ExtendedAddressSetupTime4" Type="list" TabName="NOR/PSRAM 4" Group="NOR/PSRAM timing for write accesses" Visible="false">
         <Condition Diagnostic="" Expression="ExtendedMode4=FSMC_EXTENDED_MODE_DISABLE"/>
     </RefParameter>
-    <RefParameter Comment="Extended address setup time" DefaultValue="15" Name="ExtendedAddressSetupTime4" Type="list" TabName="NOR/PSRAM 4" Group="NOR/PSRAM timing for write accesses" Visible="false">
-      <Condition Expression="MuxedNorFlash4|Psram4|MuxedPsram4|Sram4|Rom4" Diagnostic=""/>
-      <PossibleValue Comment="15" Value="15"/>
-    </RefParameter>
     <RefParameter Comment="Extended address setup time" DefaultValue="15" Max="15" Min="1" Name="ExtendedAddressSetupTime4" Type="integer" TabName="NOR/PSRAM 4" Group="NOR/PSRAM timing for write accesses">
       <Condition Expression="ExtendedAccessModeD4" Diagnostic=""/>
     </RefParameter>
@@ -1285,7 +1225,7 @@
         <Condition Diagnostic="" Expression="ExtendedMode4=FSMC_EXTENDED_MODE_DISABLE"/>
     </RefParameter>
     <RefParameter Comment="Extended address hold time" DefaultValue="15" Max="15" Min="1" Name="ExtendedAddressHoldTime4" Type="integer" TabName="NOR/PSRAM 4" Group="NOR/PSRAM timing for write accesses">
-      <Condition Expression="(MuxedNorFlash4|MuxedPsram4)|ExtendedAccessModeD4" Diagnostic=""/>
+      <Condition Expression="ExtendedAccessModeD4" Diagnostic=""/>
     </RefParameter>
     <RefParameter Comment="Extended address hold time" DefaultValue="15" Max="15" Min="1" Name="ExtendedAddressHoldTime4" Type="integer" TabName="NOR/PSRAM 4" Group="NOR/PSRAM timing for write accesses" Visible="false"/>
     <!-- FSMC_BWTRx DATAST -->
@@ -1318,15 +1258,15 @@
         <Condition Diagnostic="" Expression="ExtendedMode4=FSMC_EXTENDED_MODE_DISABLE"/>
     </RefParameter>
     <RefParameter Comment="Extended access mode" DefaultValue="FSMC_ACCESS_MODE_B" Name="ExtendedAccessMode4" Type="list" TabName="NOR/PSRAM 4" Group="NOR/PSRAM timing for write accesses">
-        <Condition Expression="NorFlash4|MuxedNorFlash4" Diagnostic="Nor Flash"/>
+        <Condition Expression="NorFlash4" Diagnostic="Nor Flash"/>
         <PossibleValue Comment="B" Value="FSMC_ACCESS_MODE_B"/>
         <PossibleValue Comment="C" Value="FSMC_ACCESS_MODE_C"/>
-        <PossibleValue Comment="D" Value="FSMC_ACCESS_MODE_D"/>
+        <PossibleValue Comment="D" Value="FSMC_ACCESS_MODE_D" Semaphore="ExtendedAccessModeD4"/>
     </RefParameter>
     <RefParameter Comment="Extended access mode" DefaultValue="FSMC_ACCESS_MODE_A" Name="ExtendedAccessMode4" Type="list" TabName="NOR/PSRAM 4" Group="NOR/PSRAM timing for write accesses">
-        <Condition Expression="Psram4|MuxedPsram4|Sram4|Rom4" Diagnostic="PSRAM/SRAM/ROM"/>
+        <Condition Expression="Psram4|Sram4" Diagnostic="PSRAM/SRAM"/>
         <PossibleValue Comment="A" Value="FSMC_ACCESS_MODE_A"/>
-        <PossibleValue Comment="D" Value="FSMC_ACCESS_MODE_D"/>
+        <PossibleValue Comment="D" Value="FSMC_ACCESS_MODE_D" Semaphore="ExtendedAccessModeD4"/>
     </RefParameter>
     <RefParameter Comment="Extended access mode" DefaultValue="FSMC_ACCESS_MODE_A" Name="ExtendedAccessMode4" Type="list" TabName="NOR/PSRAM 4" Group="NOR/PSRAM timing for write accesses">
         <PossibleValue Comment="A" Value="FSMC_ACCESS_MODE_A"/>
@@ -1397,15 +1337,13 @@
 
     <!-- FSMC_PMEMx -->
     <!-- FSMC_PMEMx MEMSETx -->
-    <RefParameter Comment="Common space setup time" DefaultValue="255" Max="255" Min="0" Name="CommonSpaceSetupTime1" Type="integer" Display="value+1" TabName="NAND 1" Group="NAND common space timing in HCLK cycles"/><!--COMPACT_FLASH-->
-    <RefParameter Comment="Common space setup time" DefaultValue="255" Max="255" Min="0" Name="CommonSpaceSetupTime1" Type="integer" Display="value+2" TabName="NAND 1" Group="NAND common space timing in HCLK cycles"/><!--NAND_FLASH-->
+    <RefParameter Comment="Common space setup time" DefaultValue="255" Max="255" Min="0" Name="CommonSpaceSetupTime1" Type="integer" Display="value+2" TabName="NAND 1" Group="NAND common space timing in HCLK cycles"/>
     <!-- FSMC_PMEMx MEMWAITx -->
     <RefParameter Comment="Common space wait setup time" DefaultValue="255" Max="255" Min="1" Name="CommonSpaceWaitSetupTime1" Type="integer" Display="value+1" TabName="NAND 1" Group="NAND common space timing in HCLK cycles"/>
     <!-- FSMC_PMEMx MEMHOLDx -->
     <RefParameter Comment="Common space hold setup time" DefaultValue="255" Max="255" Min="1" Name="CommonSpaceHoldSetupTime1" Type="integer" TabName="NAND 1" Group="NAND common space timing in HCLK cycles"/>
     <!-- FSMC_PMEMx MEMHIZx -->
-    <RefParameter Comment="Common space Hi-Z setup time" DefaultValue="255" Max="255" Min="0" Name="CommonSpaceHiZSetupTime1" Type="integer" TabName="NAND 1" Group="NAND common space timing in HCLK cycles"/><!--COMPACT_FLASH-->
-    <RefParameter Comment="Common space Hi-Z setup time" DefaultValue="255" Max="255" Min="0" Name="CommonSpaceHiZSetupTime1" Type="integer" Display="value+1" TabName="NAND 1" Group="NAND common space timing in HCLK cycles"/><!--NAND_FLASH-->
+    <RefParameter Comment="Common space Hi-Z setup time" DefaultValue="255" Max="255" Min="0" Name="CommonSpaceHiZSetupTime1" Type="integer" Display="value+1" TabName="NAND 1" Group="NAND common space timing in HCLK cycles"/>
 
     <!-- FSMC_PATTx -->
     <!-- FSMC_PATTx ATTSETx -->
@@ -1479,15 +1417,13 @@
 
     <!-- FSMC_PMEMx -->
     <!-- FSMC_PMEMx MEMSETx -->
-    <RefParameter Comment="Common space setup time" DefaultValue="255" Max="255" Min="0" Name="CommonSpaceSetupTime2" Type="integer" Display="value+1" TabName="NAND 2" Group="NAND common space timing in HCLK cycles"/><!--COMPACT_FLASH-->
-    <RefParameter Comment="Common space setup time" DefaultValue="255" Max="255" Min="0" Name="CommonSpaceSetupTime2" Type="integer" Display="value+2" TabName="NAND 2" Group="NAND common space timing in HCLK cycles"/><!--NAND_FLASH-->
+    <RefParameter Comment="Common space setup time" DefaultValue="255" Max="255" Min="0" Name="CommonSpaceSetupTime2" Type="integer" Display="value+2" TabName="NAND 2" Group="NAND common space timing in HCLK cycles"/>
     <!-- FSMC_PMEMx MEMWAITx -->
     <RefParameter Comment="Common space wait setup time" DefaultValue="255" Max="255" Min="1" Name="CommonSpaceWaitSetupTime2" Type="integer" Display="value+1" TabName="NAND 2" Group="NAND common space timing in HCLK cycles"/>
     <!-- FSMC_PMEMx MEMHOLDx -->
     <RefParameter Comment="Common space hold setup time" DefaultValue="255" Max="255" Min="1" Name="CommonSpaceHoldSetupTime2" Type="integer" TabName="NAND 2" Group="NAND common space timing in HCLK cycles"/>
     <!-- FSMC_PMEMx MEMHIZx -->
-    <RefParameter Comment="Common space Hi-Z setup time" DefaultValue="255" Max="255" Min="0" Name="CommonSpaceHiZSetupTime2" Type="integer" TabName="NAND 2" Group="NAND common space timing in HCLK cycles"/><!--COMPACT_FLASH-->
-    <RefParameter Comment="Common space Hi-Z setup time" DefaultValue="255" Max="255" Min="0" Name="CommonSpaceHiZSetupTime2" Type="integer" Display="value+1" TabName="NAND 2" Group="NAND common space timing in HCLK cycles"/><!--NAND_FLASH-->
+    <RefParameter Comment="Common space Hi-Z setup time" DefaultValue="255" Max="255" Min="0" Name="CommonSpaceHiZSetupTime2" Type="integer" Display="value+1" TabName="NAND 2" Group="NAND common space timing in HCLK cycles"/>
 
     <!-- FSMC_PATTx -->
     <!-- FSMC_PATTx ATTSETx -->
@@ -1519,15 +1455,13 @@
 
     <!-- FSMC_PMEMx -->
     <!-- FSMC_PMEMx MEMSETx -->
-    <RefParameter Comment="Common space setup time" DefaultValue="255" Max="255" Min="0" Name="CommonSpaceSetupTime3" Type="integer" Display="value+1" TabName="CF" Group="CF common space timing in HCLK cycles"/><!--COMPACT_FLASH-->
-    <RefParameter Comment="Common space setup time" DefaultValue="255" Max="255" Min="0" Name="CommonSpaceSetupTime3" Type="integer" Display="value+2" TabName="CF" Group="CF common space timing in HCLK cycles"/><!--NAND_FLASH-->
+    <RefParameter Comment="Common space setup time" DefaultValue="255" Max="255" Min="0" Name="CommonSpaceSetupTime3" Type="integer" Display="value+1" TabName="CF" Group="CF common space timing in HCLK cycles"/>
     <!-- FSMC_PMEMx MEMWAITx -->
     <RefParameter Comment="Common space wait setup time" DefaultValue="255" Max="255" Min="1" Name="CommonSpaceWaitSetupTime3" Type="integer" Display="value+1" TabName="CF" Group="CF common space timing in HCLK cycles"/>
     <!-- FSMC_PMEMx MEMHOLDx -->
     <RefParameter Comment="Common space hold setup time" DefaultValue="255" Max="255" Min="1" Name="CommonSpaceHoldSetupTime3" Type="integer" TabName="CF" Group="CF common space timing in HCLK cycles"/>
     <!-- FSMC_PMEMx MEMHIZx -->
-    <RefParameter Comment="Common space Hi-Z setup time" DefaultValue="255" Max="255" Min="0" Name="CommonSpaceHiZSetupTime3" Type="integer" TabName="CF" Group="CF common space timing in HCLK cycles"/><!--COMPACT_FLASH-->
-    <RefParameter Comment="Common space Hi-Z setup time" DefaultValue="255" Max="255" Min="0" Name="CommonSpaceHiZSetupTime3" Type="integer" Display="value+1" TabName="CF" Group="CF common space timing in HCLK cycles"/><!--NAND_FLASH-->
+    <RefParameter Comment="Common space Hi-Z setup time" DefaultValue="255" Max="255" Min="0" Name="CommonSpaceHiZSetupTime3" Type="integer" TabName="CF" Group="CF common space timing in HCLK cycles"/>
 
     <!-- FSMC_PATTx -->
     <!-- FSMC_PATTx ATTSETx -->
@@ -1622,6 +1556,7 @@
    <RefMode Name="Psram1" Comment="Psram" BaseMode="HAL_SRAM1_Init" HalMode="SRAM"/>
    <RefMode Name="Sram1" Comment="Sram" BaseMode="HAL_SRAM1_Init" HalMode="SRAM"/>
    <RefMode Name="Rom1" Comment="Rom" BaseMode="HAL_SRAM1_Init" HalMode="SRAM"/>
+   <RefMode Name="Lcd1" Comment="Lcd Interface" BaseMode="HAL_SRAM1_Init" HalMode="SRAM"/>
    <!-- End NON_MUX_MEMORY RefModes -->
    <RefMode Name="MuxedNorFlash1" Comment="Muxed NOR Flash" BaseMode="HAL_NOR1_Init" HalMode="NOR"/>
    <RefMode Name="MuxedPsram1" Comment="Muxed Psram" BaseMode="HAL_SRAM1_Init" HalMode="SRAM"/>
@@ -1677,6 +1612,7 @@
    <RefMode Name="Psram2" Comment="Psram" BaseMode="HAL_SRAM2_Init" HalMode="SRAM"/>
    <RefMode Name="Sram2" Comment="Sram" BaseMode="HAL_SRAM2_Init" HalMode="SRAM"/>
    <RefMode Name="Rom2" Comment="Rom" BaseMode="HAL_SRAM2_Init" HalMode="SRAM"/>
+   <RefMode Name="Lcd2" Comment="Lcd Interface" BaseMode="HAL_SRAM2_Init" HalMode="SRAM"/>
    <!-- End NON_MUX_MEMORY RefModes -->
    <RefMode Name="MuxedNorFlash2" Comment="Muxed NOR Flash" BaseMode="HAL_NOR2_Init" HalMode="NOR"/>
    <RefMode Name="MuxedPsram2" Comment="Muxed Psram" BaseMode="HAL_SRAM2_Init" HalMode="SRAM"/>
@@ -1732,6 +1668,7 @@
    <RefMode Name="Psram3" Comment="Psram" BaseMode="HAL_SRAM3_Init" HalMode="SRAM"/>
    <RefMode Name="Sram3" Comment="Sram" BaseMode="HAL_SRAM3_Init" HalMode="SRAM"/>
    <RefMode Name="Rom3" Comment="Rom" BaseMode="HAL_SRAM3_Init" HalMode="SRAM"/>
+   <RefMode Name="Lcd3" Comment="Lcd Interface" BaseMode="HAL_SRAM3_Init" HalMode="SRAM"/>
    <!-- End NON_MUX_MEMORY RefModes -->
    <RefMode Name="MuxedNorFlash3" Comment="Muxed NOR Flash" BaseMode="HAL_NOR3_Init" HalMode="NOR"/>
    <RefMode Name="MuxedPsram3" Comment="Muxed Psram" BaseMode="HAL_SRAM3_Init" HalMode="SRAM"/>
@@ -1787,6 +1724,7 @@
    <RefMode Name="Psram4" Comment="Psram" BaseMode="HAL_SRAM4_Init" HalMode="SRAM"/>
    <RefMode Name="Sram4" Comment="Sram" BaseMode="HAL_SRAM4_Init" HalMode="SRAM"/>
    <RefMode Name="Rom4" Comment="Rom" BaseMode="HAL_SRAM4_Init" HalMode="SRAM"/>
+   <RefMode Name="Lcd4" Comment="Lcd Interface" BaseMode="HAL_SRAM4_Init" HalMode="SRAM"/>
    <!-- End NON_MUX_MEMORY RefModes -->
    <RefMode Name="MuxedNorFlash4" Comment="Muxed NOR Flash" BaseMode="HAL_NOR4_Init" HalMode="NOR"/>
    <RefMode Name="MuxedPsram4" Comment="Muxed Psram" BaseMode="HAL_SRAM4_Init" HalMode="SRAM"/>
@@ -1931,7 +1869,6 @@
             <!-- Begin NON_MUX_MEMORY Modes -->
             <Mode Name="NorFlash1" UserName="NOR Flash">
               <SignalLogicalOp Name="AND">
-                <Signal Name="NL"/>
                 <Signal Name="NOE"/>
                 <Signal Name="NWE"/>
               </SignalLogicalOp>
@@ -1958,10 +1895,16 @@
               </SignalLogicalOp>
               <Semaphore>Rom1</Semaphore>
             </Mode>
+            <Mode Name="Lcd1" UserName="LCD Interface">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="NOE"/>
+                <Signal Name="NWE"/>
+              </SignalLogicalOp>
+              <Semaphore>Lcd1</Semaphore>
+            </Mode>
             <!-- End NON_MUX_MEMORY Modes -->
             <Mode Name="MuxedNorFlash1" UserName="Muxed NOR Flash">
               <SignalLogicalOp Name="AND">
-                <Signal Name="NL"/>
                 <Signal Name="NOE"/>
                 <Signal Name="NWE"/>
               </SignalLogicalOp>
@@ -1974,7 +1917,7 @@
                 <Signal Name="NWE"/>
               </SignalLogicalOp>
               <Semaphore>MuxedPsram1</Semaphore>
-            </Mode>                            
+            </Mode>
           </ModeLogicOperator>
           <Condition Expression="NorPsramChipSelect1" Diagnostic="Chip select disabled"/>
         </Mode>
@@ -2115,6 +2058,142 @@
           <Semaphore>Address1</Semaphore>
           <Condition Expression="NorFlash1|Psram1|Sram1|Rom1" Diagnostic="Memory type should be NOR Flash or PSRAM or SRAM or ROM"/>
         </Mode>
+        <Mode Name="OneBitAddress1" UserName="LCD register select">
+          <ModeLogicOperator Name="XOR">
+            <Mode Name="A0_1" UserName="A0">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A0"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A1_1" UserName="A1">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A1"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A2_1" UserName="A2">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A2"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A3_1" UserName="A3">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A3"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A4_1" UserName="A4">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A4"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A5_1" UserName="A5">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A5"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A6_1" UserName="A6">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A6"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A7_1" UserName="A7">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A7"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A8_1" UserName="A8">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A8"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A9_1" UserName="A9">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A9"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A10_1" UserName="A10">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A10"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A11_1" UserName="A11">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A11"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A12_1" UserName="A12">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A12"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A13_1" UserName="A13">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A13"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A14_1" UserName="A14">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A14"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A15_1" UserName="A15">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A15"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A16_1" UserName="A16">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A16"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A17_1" UserName="A17">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A17"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A18_1" UserName="A18">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A18"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A19_1" UserName="A19">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A19"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A20_1" UserName="A20">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A20"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A21_1" UserName="A21">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A21"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A22_1" UserName="A22">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A22"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A23_1" UserName="A23">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A23"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A24_1" UserName="A24">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A24"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A25_1" UserName="A25">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A25"/>
+              </SignalLogicalOp>
+            </Mode>
+          </ModeLogicOperator>
+          <Semaphore>OneBitAddress1</Semaphore>
+          <Condition Expression="Lcd1" Diagnostic="Only available for LCD Interface"/>
+        </Mode>
         <Mode Name="Data1" UserName="Data">
           <SignalLogicalOp Name="AND">
             <Signal Name="D0"/>
@@ -2145,7 +2224,7 @@
             </Mode>
           </ModeLogicOperator>
           <Semaphore>Data1</Semaphore>
-          <Condition Expression="Address1" Diagnostic="Address disabled"/>
+          <Condition Expression="Address1|OneBitAddress1" Diagnostic="Address or LCD register select disabled"/>
         </Mode>
         <!-- End NON_MUX_ADDRESS_DATA Modes -->
         <Mode Name="NorPsramDataAddress1" UserName="Data/Address">
@@ -2276,26 +2355,58 @@
           <Condition Expression="MuxedNorFlash1|MuxedPsram1" Diagnostic="Memory type should be multiplexed NOR Flash or multiplexed PSRAM"/>
         </Mode>
         <Mode Name="NorPsramClock1" UserName="Clock">
-          <ModeLogicOperator Name="OR">
-            <Mode Name="NorPsramClock1" UserName="Clock">
-              <SignalLogicalOp Name="AND">
-                <Signal Name="CLK"/>
-              </SignalLogicalOp>
+          <SignalLogicalOp Name="AND">
+            <Signal Name="CLK"/>
+          </SignalLogicalOp>
+          <ModeLogicOperator Name="XOR">
+            <Mode Name="BurstRead1" UserName="Burst Read">
+                <Semaphore>BurstReadMode1</Semaphore>
+            </Mode>
+            <Mode Name="BurstWrite1" UserName="Burst Write">
+                <Semaphore>BurstWriteMode1</Semaphore>
+                <Condition Expression="Psram1|MuxedPsram1" Diagnostic="Only for PSRAM"/>
+            </Mode>
+            <Mode Name="BurstReadWrite1" UserName="Burst Read Write">
+                <Semaphore>BurstReadMode1</Semaphore>
+                <Semaphore>BurstWriteMode1</Semaphore>
+                <Condition Expression="Psram1|MuxedPsram1" Diagnostic="Only for PSRAM"/>
             </Mode>
           </ModeLogicOperator>
           <Semaphore>NorPsramClock1</Semaphore>
           <Condition Expression="NorFlash1|MuxedNorFlash1|Psram1|MuxedPsram1" Diagnostic="Only for NOR Flash and PSRAM"/>
         </Mode>
-        <Mode Name="NorPsramWait1" UserName="Wait">
+        <Mode Name="AddressValid1" UserName="Address valid">
           <ModeLogicOperator Name="OR">
-            <Mode Name="NorPsramWait1" UserName="Wait">
+            <Mode Name="AddressValid1" UserName="Address valid">
               <SignalLogicalOp Name="AND">
-                <Signal Name="NWAIT"/>
+                <Signal Name="NL"/>
               </SignalLogicalOp>
             </Mode>
           </ModeLogicOperator>
+          <Semaphore>AddressValid1</Semaphore>
+          <Condition Expression="NorFlash1|MuxedNorFlash1" Diagnostic="Optional only for asynchronous NOR Flash"/>
+        </Mode>
+        <Mode Name="NorPsramWait1" UserName="Wait">
+          <SignalLogicalOp Name="AND">
+            <Signal Name="NWAIT"/>
+          </SignalLogicalOp>
+          <ModeLogicOperator Name="XOR">
+            <Mode Name="AsynchronousWait1" UserName="Asynchronous">
+              <Semaphore>AsynchronousWaitMode1</Semaphore>
+              <Condition Expression="!NorPsramClock1|((!BurstReadMode1|!BurstWriteMode1)&amp;(Psram1|MuxedPsram1))" Diagnostic="Only for asynchronous accesses"/>
+            </Mode>
+            <Mode Name="SynchronousWait1" UserName="Synchronous">
+              <Semaphore>SynchronousWaitMode1</Semaphore>
+              <Condition Expression="NorPsramClock1" Diagnostic="Only for synchronous accesses"/>
+            </Mode>
+            <Mode Name="AsynchronousSynchronousWait1" UserName="Asynchronous Synchronous">
+              <Semaphore>AsynchronousWaitMode1</Semaphore>
+              <Semaphore>SynchronousWaitMode1</Semaphore>
+              <Condition Expression="NorPsramClock1&amp;(!BurstReadMode1|!BurstWriteMode1)&amp;(Psram1|MuxedPsram1)" Diagnostic="Only for PSRAM with either asynchronous read and synchronous write accesses or synchronous read and asynchronous write accesses"/>
+            </Mode>
+          </ModeLogicOperator>
           <Semaphore>NorPsramWait1</Semaphore>
-          <Condition Expression="NorFlash1|MuxedNorFlash1|Psram1|MuxedPsram1" Diagnostic="Only for NOR Flash and PSRAM"/>
+          <Condition Expression="NorFlash1|MuxedNorFlash1|Psram1|MuxedPsram1|Sram1" Diagnostic="Only for NOR Flash, PSRAM and SRAM"/>
         </Mode>
         <Mode Name="Psram/Sram/ByteEnable1" UserName="Byte enable">
           <ModeLogicOperator Name="XOR">
@@ -2307,7 +2418,7 @@
               <Condition Expression="_16_bit_data1|_16b_da1|_17b_da1|_18b_da1|_19b_da1|_20b_da1|_21b_da1|_22b_da1|_23b_da1|_24b_da1|_25b_da1|_26b_da1" Diagnostic="Only for 16-bit PSRAM and SRAM"/>
             </Mode>
           </ModeLogicOperator>
-          <Condition Expression="((Psram1|Sram1)&amp;(_16_bit_data1|_32_bit_data1))|(MuxedPsram1&amp;(_16b_da1|_17b_da1|_18b_da1|_19b_da1|_20b_da1|_21b_da1|_22b_da1|_23b_da1|_24b_da1|_25b_da1|_26b_da1))" Diagnostic="Only for 16-bit or 32-bit PSRAM and SRAM"/>
+          <Condition Expression="((Psram1|Sram1)&amp;_16_bit_data1)|(MuxedPsram1&amp;(_16b_da1|_17b_da1|_18b_da1|_19b_da1|_20b_da1|_21b_da1|_22b_da1|_23b_da1|_24b_da1|_25b_da1|_26b_da1))" Diagnostic="Only for 16-bit PSRAM and SRAM"/>
         </Mode>
       </ModeLogicOperator>
     </Mode>
@@ -2350,7 +2461,6 @@
             <!-- Begin NON_MUX_MEMORY Modes -->
             <Mode Name="NorFlash2" UserName="NOR Flash">
               <SignalLogicalOp Name="AND">
-                <Signal Name="NL"/>
                 <Signal Name="NOE"/>
                 <Signal Name="NWE"/>
               </SignalLogicalOp>
@@ -2377,10 +2487,16 @@
               </SignalLogicalOp>
               <Semaphore>Rom2</Semaphore>
             </Mode>
+            <Mode Name="Lcd2" UserName="LCD Interface">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="NOE"/>
+                <Signal Name="NWE"/>
+              </SignalLogicalOp>
+              <Semaphore>Lcd2</Semaphore>
+            </Mode>
             <!-- End NON_MUX_MEMORY Modes -->
             <Mode Name="MuxedNorFlash2" UserName="Muxed NOR Flash">
               <SignalLogicalOp Name="AND">
-                <Signal Name="NL"/>
                 <Signal Name="NOE"/>
                 <Signal Name="NWE"/>
               </SignalLogicalOp>
@@ -2393,7 +2509,7 @@
                 <Signal Name="NWE"/>
               </SignalLogicalOp>
               <Semaphore>MuxedPsram2</Semaphore>
-            </Mode>                            
+            </Mode>
           </ModeLogicOperator>
           <Condition Expression="NorPsramChipSelect2" Diagnostic="Chip select disabled"/>
         </Mode>
@@ -2534,6 +2650,142 @@
           <Semaphore>Address2</Semaphore>
           <Condition Expression="NorFlash2|Psram2|Sram2|Rom2" Diagnostic="Memory type should be NOR Flash or PSRAM or SRAM or ROM"/>
         </Mode>
+        <Mode Name="OneBitAddress2" UserName="LCD register select">
+          <ModeLogicOperator Name="XOR">
+            <Mode Name="A0_2" UserName="A0">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A0"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A1_2" UserName="A1">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A1"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A2_2" UserName="A2">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A2"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A3_2" UserName="A3">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A3"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A4_2" UserName="A4">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A4"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A5_2" UserName="A5">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A5"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A6_2" UserName="A6">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A6"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A7_2" UserName="A7">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A7"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A8_2" UserName="A8">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A8"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A9_2" UserName="A9">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A9"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A10_2" UserName="A10">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A10"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A11_2" UserName="A11">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A11"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A12_2" UserName="A12">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A12"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A13_2" UserName="A13">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A13"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A14_2" UserName="A14">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A14"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A15_2" UserName="A15">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A15"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A16_2" UserName="A16">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A16"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A17_2" UserName="A17">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A17"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A18_2" UserName="A18">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A18"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A19_2" UserName="A19">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A19"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A20_2" UserName="A20">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A20"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A21_2" UserName="A21">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A21"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A22_2" UserName="A22">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A22"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A23_2" UserName="A23">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A23"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A24_2" UserName="A24">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A24"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A25_2" UserName="A25">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A25"/>
+              </SignalLogicalOp>
+            </Mode>
+          </ModeLogicOperator>
+          <Semaphore>OneBitAddress2</Semaphore>
+          <Condition Expression="Lcd2" Diagnostic="Only available for LCD Interface"/>
+        </Mode>
         <Mode Name="Data2" UserName="Data">
           <SignalLogicalOp Name="AND">
             <Signal Name="D0"/>
@@ -2564,7 +2816,7 @@
             </Mode>
           </ModeLogicOperator>
           <Semaphore>Data2</Semaphore>
-          <Condition Expression="Address2" Diagnostic="Address disabled"/>
+          <Condition Expression="Address2|OneBitAddress2" Diagnostic="Address or LCD register select disabled"/>
         </Mode>
         <!-- End NON_MUX_ADDRESS_DATA Modes -->
         <Mode Name="NorPsramDataAddress2" UserName="Data/Address">
@@ -2695,26 +2947,58 @@
           <Condition Expression="MuxedNorFlash2|MuxedPsram2" Diagnostic="Memory type should be multiplexed NOR Flash or multiplexed PSRAM"/>
         </Mode>
         <Mode Name="NorPsramClock2" UserName="Clock">
-          <ModeLogicOperator Name="OR">
-            <Mode Name="NorPsramClock2" UserName="Clock">
-              <SignalLogicalOp Name="AND">
-                <Signal Name="CLK"/>
-              </SignalLogicalOp>
+          <SignalLogicalOp Name="AND">
+            <Signal Name="CLK"/>
+          </SignalLogicalOp>
+          <ModeLogicOperator Name="XOR">
+            <Mode Name="BurstRead2" UserName="Burst Read">
+                <Semaphore>BurstReadMode2</Semaphore>
+            </Mode>
+            <Mode Name="BurstWrite2" UserName="Burst Write">
+                <Semaphore>BurstWriteMode2</Semaphore>
+                <Condition Expression="Psram2|MuxedPsram2" Diagnostic="Only for PSRAM"/>
+            </Mode>
+            <Mode Name="BurstReadWrite2" UserName="Burst Read Write">
+                <Semaphore>BurstReadMode2</Semaphore>
+                <Semaphore>BurstWriteMode2</Semaphore>
+                <Condition Expression="Psram2|MuxedPsram2" Diagnostic="Only for PSRAM"/>
             </Mode>
           </ModeLogicOperator>
           <Semaphore>NorPsramClock2</Semaphore>
           <Condition Expression="NorFlash2|MuxedNorFlash2|Psram2|MuxedPsram2" Diagnostic="Only for NOR Flash and PSRAM"/>
         </Mode>
-        <Mode Name="NorPsramWait2" UserName="Wait">
+        <Mode Name="AddressValid2" UserName="Address valid">
           <ModeLogicOperator Name="OR">
-            <Mode Name="NorPsramWait2" UserName="Wait">
+            <Mode Name="AddressValid2" UserName="Address valid">
               <SignalLogicalOp Name="AND">
-                <Signal Name="NWAIT"/>
+                <Signal Name="NL"/>
               </SignalLogicalOp>
             </Mode>
           </ModeLogicOperator>
+          <Semaphore>AddressValid2</Semaphore>
+          <Condition Expression="NorFlash2|MuxedNorFlash2" Diagnostic="Optional only for asynchronous NOR Flash"/>
+        </Mode>
+        <Mode Name="NorPsramWait2" UserName="Wait">
+          <SignalLogicalOp Name="AND">
+            <Signal Name="NWAIT"/>
+          </SignalLogicalOp>
+          <ModeLogicOperator Name="XOR">
+            <Mode Name="AsynchronousWait2" UserName="Asynchronous">
+              <Semaphore>AsynchronousWaitMode2</Semaphore>
+              <Condition Expression="!NorPsramClock2|((!BurstReadMode2|!BurstWriteMode2)&amp;(Psram2|MuxedPsram2))" Diagnostic="Only for asynchronous accesses"/>
+            </Mode>
+            <Mode Name="SynchronousWait2" UserName="Synchronous">
+              <Semaphore>SynchronousWaitMode2</Semaphore>
+              <Condition Expression="NorPsramClock2" Diagnostic="Only for synchronous accesses"/>
+            </Mode>
+            <Mode Name="AsynchronousSynchronousWait2" UserName="Asynchronous Synchronous">
+              <Semaphore>AsynchronousWaitMode2</Semaphore>
+              <Semaphore>SynchronousWaitMode2</Semaphore>
+              <Condition Expression="NorPsramClock2&amp;(!BurstReadMode2|!BurstWriteMode2)&amp;(Psram2|MuxedPsram2)" Diagnostic="Only for PSRAM with either asynchronous read and synchronous write accesses or synchronous read and asynchronous write accesses"/>
+            </Mode>
+          </ModeLogicOperator>
           <Semaphore>NorPsramWait2</Semaphore>
-          <Condition Expression="NorFlash2|MuxedNorFlash2|Psram2|MuxedPsram2" Diagnostic="Only for NOR Flash and PSRAM"/>
+          <Condition Expression="NorFlash2|MuxedNorFlash2|Psram2|MuxedPsram2|Sram2" Diagnostic="Only for NOR Flash, PSRAM and SRAM"/>
         </Mode>
         <Mode Name="Psram/Sram/ByteEnable2" UserName="Byte enable">
           <ModeLogicOperator Name="XOR">
@@ -2726,7 +3010,7 @@
               <Condition Expression="_16_bit_data2|_16b_da2|_17b_da2|_18b_da2|_19b_da2|_20b_da2|_21b_da2|_22b_da2|_23b_da2|_24b_da2|_25b_da2|_26b_da2" Diagnostic="Only for 16-bit PSRAM and SRAM"/>
             </Mode>
           </ModeLogicOperator>
-          <Condition Expression="((Psram2|Sram2)&amp;(_16_bit_data2|_32_bit_data2))|(MuxedPsram2&amp;(_16b_da2|_17b_da2|_18b_da2|_19b_da2|_20b_da2|_21b_da2|_22b_da2|_23b_da2|_24b_da2|_25b_da2|_26b_da2))" Diagnostic="Only for 16-bit or 32-bit PSRAM and SRAM"/>
+          <Condition Expression="((Psram2|Sram2)&amp;_16_bit_data2)|(MuxedPsram2&amp;(_16b_da2|_17b_da2|_18b_da2|_19b_da2|_20b_da2|_21b_da2|_22b_da2|_23b_da2|_24b_da2|_25b_da2|_26b_da2))" Diagnostic="Only for 16-bit PSRAM and SRAM"/>
         </Mode>
       </ModeLogicOperator>
     </Mode>
@@ -2769,7 +3053,6 @@
             <!-- Begin NON_MUX_MEMORY Modes -->
             <Mode Name="NorFlash3" UserName="NOR Flash">
               <SignalLogicalOp Name="AND">
-                <Signal Name="NL"/>
                 <Signal Name="NOE"/>
                 <Signal Name="NWE"/>
               </SignalLogicalOp>
@@ -2796,10 +3079,16 @@
               </SignalLogicalOp>
               <Semaphore>Rom3</Semaphore>
             </Mode>
+            <Mode Name="Lcd3" UserName="LCD Interface">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="NOE"/>
+                <Signal Name="NWE"/>
+              </SignalLogicalOp>
+              <Semaphore>Lcd3</Semaphore>
+            </Mode>
             <!-- End NON_MUX_MEMORY Modes -->
             <Mode Name="MuxedNorFlash3" UserName="Muxed NOR Flash">
               <SignalLogicalOp Name="AND">
-                <Signal Name="NL"/>
                 <Signal Name="NOE"/>
                 <Signal Name="NWE"/>
               </SignalLogicalOp>
@@ -2812,7 +3101,7 @@
                 <Signal Name="NWE"/>
               </SignalLogicalOp>
               <Semaphore>MuxedPsram3</Semaphore>
-            </Mode>                            
+            </Mode>
           </ModeLogicOperator>
           <Condition Expression="NorPsramChipSelect3" Diagnostic="Chip select disabled"/>
         </Mode>
@@ -2953,6 +3242,142 @@
           <Semaphore>Address3</Semaphore>
           <Condition Expression="NorFlash3|Psram3|Sram3|Rom3" Diagnostic="Memory type should be NOR Flash or PSRAM or SRAM or ROM"/>
         </Mode>
+        <Mode Name="OneBitAddress3" UserName="LCD register select">
+          <ModeLogicOperator Name="XOR">
+            <Mode Name="A0_3" UserName="A0">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A0"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A1_3" UserName="A1">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A1"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A2_3" UserName="A2">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A2"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A3_3" UserName="A3">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A3"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A4_3" UserName="A4">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A4"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A5_3" UserName="A5">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A5"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A6_3" UserName="A6">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A6"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A7_3" UserName="A7">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A7"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A8_3" UserName="A8">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A8"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A9_3" UserName="A9">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A9"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A10_3" UserName="A10">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A10"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A11_3" UserName="A11">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A11"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A12_3" UserName="A12">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A12"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A13_3" UserName="A13">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A13"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A14_3" UserName="A14">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A14"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A15_3" UserName="A15">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A15"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A16_3" UserName="A16">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A16"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A17_3" UserName="A17">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A17"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A18_3" UserName="A18">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A18"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A19_3" UserName="A19">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A19"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A20_3" UserName="A20">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A20"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A21_3" UserName="A21">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A21"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A22_3" UserName="A22">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A22"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A23_3" UserName="A23">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A23"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A24_3" UserName="A24">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A24"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A25_3" UserName="A25">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A25"/>
+              </SignalLogicalOp>
+            </Mode>
+          </ModeLogicOperator>
+          <Semaphore>OneBitAddress3</Semaphore>
+          <Condition Expression="Lcd3" Diagnostic="Only available for LCD Interface"/>
+        </Mode>
         <Mode Name="Data3" UserName="Data">
           <SignalLogicalOp Name="AND">
             <Signal Name="D0"/>
@@ -2983,7 +3408,7 @@
             </Mode>
           </ModeLogicOperator>
           <Semaphore>Data3</Semaphore>
-          <Condition Expression="Address3" Diagnostic="Address disabled"/>
+          <Condition Expression="Address3|OneBitAddress3" Diagnostic="Address or LCD register select disabled"/>
         </Mode>
         <!-- End NON_MUX_ADDRESS_DATA Modes -->
         <Mode Name="NorPsramDataAddress3" UserName="Data/Address">
@@ -3114,26 +3539,58 @@
           <Condition Expression="MuxedNorFlash3|MuxedPsram3" Diagnostic="Memory type should be multiplexed NOR Flash or multiplexed PSRAM"/>
         </Mode>
         <Mode Name="NorPsramClock3" UserName="Clock">
-          <ModeLogicOperator Name="OR">
-            <Mode Name="NorPsramClock3" UserName="Clock">
-              <SignalLogicalOp Name="AND">
-                <Signal Name="CLK"/>
-              </SignalLogicalOp>
+          <SignalLogicalOp Name="AND">
+            <Signal Name="CLK"/>
+          </SignalLogicalOp>
+          <ModeLogicOperator Name="XOR">
+            <Mode Name="BurstRead3" UserName="Burst Read">
+                <Semaphore>BurstReadMode3</Semaphore>
+            </Mode>
+            <Mode Name="BurstWrite3" UserName="Burst Write">
+                <Semaphore>BurstWriteMode3</Semaphore>
+                <Condition Expression="Psram3|MuxedPsram3" Diagnostic="Only for PSRAM"/>
+            </Mode>
+            <Mode Name="BurstReadWrite3" UserName="Burst Read Write">
+                <Semaphore>BurstReadMode3</Semaphore>
+                <Semaphore>BurstWriteMode3</Semaphore>
+                <Condition Expression="Psram3|MuxedPsram3" Diagnostic="Only for PSRAM"/>
             </Mode>
           </ModeLogicOperator>
           <Semaphore>NorPsramClock3</Semaphore>
           <Condition Expression="NorFlash3|MuxedNorFlash3|Psram3|MuxedPsram3" Diagnostic="Only for NOR Flash and PSRAM"/>
         </Mode>
-        <Mode Name="NorPsramWait3" UserName="Wait">
+        <Mode Name="AddressValid3" UserName="Address valid">
           <ModeLogicOperator Name="OR">
-            <Mode Name="NorPsramWait3" UserName="Wait">
+            <Mode Name="AddressValid3" UserName="Address valid">
               <SignalLogicalOp Name="AND">
-                <Signal Name="NWAIT"/>
+                <Signal Name="NL"/>
               </SignalLogicalOp>
             </Mode>
           </ModeLogicOperator>
+          <Semaphore>AddressValid3</Semaphore>
+          <Condition Expression="NorFlash3|MuxedNorFlash3" Diagnostic="Optional only for asynchronous NOR Flash"/>
+        </Mode>
+        <Mode Name="NorPsramWait3" UserName="Wait">
+          <SignalLogicalOp Name="AND">
+            <Signal Name="NWAIT"/>
+          </SignalLogicalOp>
+          <ModeLogicOperator Name="XOR">
+            <Mode Name="AsynchronousWait3" UserName="Asynchronous">
+              <Semaphore>AsynchronousWaitMode3</Semaphore>
+              <Condition Expression="!NorPsramClock3|((!BurstReadMode3|!BurstWriteMode3)&amp;(Psram3|MuxedPsram3))" Diagnostic="Only for asynchronous accesses"/>
+            </Mode>
+            <Mode Name="SynchronousWait3" UserName="Synchronous">
+              <Semaphore>SynchronousWaitMode3</Semaphore>
+              <Condition Expression="NorPsramClock3" Diagnostic="Only for synchronous accesses"/>
+            </Mode>
+            <Mode Name="AsynchronousSynchronousWait3" UserName="Asynchronous Synchronous">
+              <Semaphore>AsynchronousWaitMode3</Semaphore>
+              <Semaphore>SynchronousWaitMode3</Semaphore>
+              <Condition Expression="NorPsramClock3&amp;(!BurstReadMode3|!BurstWriteMode3)&amp;(Psram3|MuxedPsram3)" Diagnostic="Only for PSRAM with either asynchronous read and synchronous write accesses or synchronous read and asynchronous write accesses"/>
+            </Mode>
+          </ModeLogicOperator>
           <Semaphore>NorPsramWait3</Semaphore>
-          <Condition Expression="NorFlash3|MuxedNorFlash3|Psram3|MuxedPsram3" Diagnostic="Only for NOR Flash and PSRAM"/>
+          <Condition Expression="NorFlash3|MuxedNorFlash3|Psram3|MuxedPsram3|Sram3" Diagnostic="Only for NOR Flash, PSRAM and SRAM"/>
         </Mode>
         <Mode Name="Psram/Sram/ByteEnable3" UserName="Byte enable">
           <ModeLogicOperator Name="XOR">
@@ -3145,7 +3602,7 @@
               <Condition Expression="_16_bit_data3|_16b_da3|_17b_da3|_18b_da3|_19b_da3|_20b_da3|_21b_da3|_22b_da3|_23b_da3|_24b_da3|_25b_da3|_26b_da3" Diagnostic="Only for 16-bit PSRAM and SRAM"/>
             </Mode>
           </ModeLogicOperator>
-          <Condition Expression="((Psram3|Sram3)&amp;(_16_bit_data3|_32_bit_data3))|(MuxedPsram3&amp;(_16b_da3|_17b_da3|_18b_da3|_19b_da3|_20b_da3|_21b_da3|_22b_da3|_23b_da3|_24b_da3|_25b_da3|_26b_da3))" Diagnostic="Only for 16-bit or 32-bit PSRAM and SRAM"/>
+          <Condition Expression="((Psram3|Sram3)&amp;_16_bit_data3)|(MuxedPsram3&amp;(_16b_da3|_17b_da3|_18b_da3|_19b_da3|_20b_da3|_21b_da3|_22b_da3|_23b_da3|_24b_da3|_25b_da3|_26b_da3))" Diagnostic="Only for 16-bit PSRAM and SRAM"/>
         </Mode>
       </ModeLogicOperator>
     </Mode>
@@ -3188,7 +3645,6 @@
             <!-- Begin NON_MUX_MEMORY Modes -->
             <Mode Name="NorFlash4" UserName="NOR Flash">
               <SignalLogicalOp Name="AND">
-                <Signal Name="NL"/>
                 <Signal Name="NOE"/>
                 <Signal Name="NWE"/>
               </SignalLogicalOp>
@@ -3215,10 +3671,16 @@
               </SignalLogicalOp>
               <Semaphore>Rom4</Semaphore>
             </Mode>
+            <Mode Name="Lcd4" UserName="LCD Interface">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="NOE"/>
+                <Signal Name="NWE"/>
+              </SignalLogicalOp>
+              <Semaphore>Lcd4</Semaphore>
+            </Mode>
             <!-- End NON_MUX_MEMORY Modes -->
             <Mode Name="MuxedNorFlash4" UserName="Muxed NOR Flash">
               <SignalLogicalOp Name="AND">
-                <Signal Name="NL"/>
                 <Signal Name="NOE"/>
                 <Signal Name="NWE"/>
               </SignalLogicalOp>
@@ -3231,7 +3693,7 @@
                 <Signal Name="NWE"/>
               </SignalLogicalOp>
               <Semaphore>MuxedPsram4</Semaphore>
-            </Mode>                            
+            </Mode>
           </ModeLogicOperator>
           <Condition Expression="NorPsramChipSelect4" Diagnostic="Chip select disabled"/>
         </Mode>
@@ -3372,6 +3834,142 @@
           <Semaphore>Address4</Semaphore>
           <Condition Expression="NorFlash4|Psram4|Sram4|Rom4" Diagnostic="Memory type should be NOR Flash or PSRAM or SRAM or ROM"/>
         </Mode>
+        <Mode Name="OneBitAddress4" UserName="LCD register select">
+          <ModeLogicOperator Name="XOR">
+            <Mode Name="A0_4" UserName="A0">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A0"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A1_4" UserName="A1">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A1"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A2_4" UserName="A2">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A2"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A3_4" UserName="A3">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A3"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A4_4" UserName="A4">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A4"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A5_4" UserName="A5">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A5"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A6_4" UserName="A6">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A6"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A7_4" UserName="A7">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A7"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A8_4" UserName="A8">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A8"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A9_4" UserName="A9">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A9"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A10_4" UserName="A10">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A10"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A11_4" UserName="A11">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A11"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A12_4" UserName="A12">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A12"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A13_4" UserName="A13">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A13"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A14_4" UserName="A14">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A14"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A15_4" UserName="A15">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A15"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A16_4" UserName="A16">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A16"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A17_4" UserName="A17">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A17"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A18_4" UserName="A18">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A18"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A19_4" UserName="A19">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A19"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A20_4" UserName="A20">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A20"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A21_4" UserName="A21">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A21"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A22_4" UserName="A22">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A22"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A23_4" UserName="A23">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A23"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A24_4" UserName="A24">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A24"/>
+              </SignalLogicalOp>
+            </Mode>
+            <Mode Name="A25_4" UserName="A25">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="A25"/>
+              </SignalLogicalOp>
+            </Mode>
+          </ModeLogicOperator>
+          <Semaphore>OneBitAddress4</Semaphore>
+          <Condition Expression="Lcd4" Diagnostic="Only available for LCD Interface"/>
+        </Mode>
         <Mode Name="Data4" UserName="Data">
           <SignalLogicalOp Name="AND">
             <Signal Name="D0"/>
@@ -3402,7 +4000,7 @@
             </Mode>
           </ModeLogicOperator>
           <Semaphore>Data4</Semaphore>
-          <Condition Expression="Address4" Diagnostic="Address disabled"/>
+          <Condition Expression="Address4|OneBitAddress4" Diagnostic="Address or LCD register select disabled"/>
         </Mode>
         <!-- End NON_MUX_ADDRESS_DATA Modes -->
         <Mode Name="NorPsramDataAddress4" UserName="Data/Address">
@@ -3533,26 +4131,58 @@
           <Condition Expression="MuxedNorFlash4|MuxedPsram4" Diagnostic="Memory type should be multiplexed NOR Flash or multiplexed PSRAM"/>
         </Mode>
         <Mode Name="NorPsramClock4" UserName="Clock">
-          <ModeLogicOperator Name="OR">
-            <Mode Name="NorPsramClock4" UserName="Clock">
-              <SignalLogicalOp Name="AND">
-                <Signal Name="CLK"/>
-              </SignalLogicalOp>
+          <SignalLogicalOp Name="AND">
+            <Signal Name="CLK"/>
+          </SignalLogicalOp>
+          <ModeLogicOperator Name="XOR">
+            <Mode Name="BurstRead4" UserName="Burst Read">
+                <Semaphore>BurstReadMode4</Semaphore>
+            </Mode>
+            <Mode Name="BurstWrite4" UserName="Burst Write">
+                <Semaphore>BurstWriteMode4</Semaphore>
+                <Condition Expression="Psram4|MuxedPsram4" Diagnostic="Only for PSRAM"/>
+            </Mode>
+            <Mode Name="BurstReadWrite4" UserName="Burst Read Write">
+                <Semaphore>BurstReadMode4</Semaphore>
+                <Semaphore>BurstWriteMode4</Semaphore>
+                <Condition Expression="Psram4|MuxedPsram4" Diagnostic="Only for PSRAM"/>
             </Mode>
           </ModeLogicOperator>
           <Semaphore>NorPsramClock4</Semaphore>
           <Condition Expression="NorFlash4|MuxedNorFlash4|Psram4|MuxedPsram4" Diagnostic="Only for NOR Flash and PSRAM"/>
         </Mode>
-        <Mode Name="NorPsramWait4" UserName="Wait">
+        <Mode Name="AddressValid4" UserName="Address valid">
           <ModeLogicOperator Name="OR">
-            <Mode Name="NorPsramWait4" UserName="Wait">
+            <Mode Name="AddressValid4" UserName="Address valid">
               <SignalLogicalOp Name="AND">
-                <Signal Name="NWAIT"/>
+                <Signal Name="NL"/>
               </SignalLogicalOp>
             </Mode>
           </ModeLogicOperator>
+          <Semaphore>AddressValid4</Semaphore>
+          <Condition Expression="NorFlash4|MuxedNorFlash4" Diagnostic="Optional only for asynchronous NOR Flash"/>
+        </Mode>
+        <Mode Name="NorPsramWait4" UserName="Wait">
+          <SignalLogicalOp Name="AND">
+            <Signal Name="NWAIT"/>
+          </SignalLogicalOp>
+          <ModeLogicOperator Name="XOR">
+            <Mode Name="AsynchronousWait4" UserName="Asynchronous">
+              <Semaphore>AsynchronousWaitMode4</Semaphore>
+              <Condition Expression="!NorPsramClock4|((!BurstReadMode4|!BurstWriteMode4)&amp;(Psram4|MuxedPsram4))" Diagnostic="Only for asynchronous accesses"/>
+            </Mode>
+            <Mode Name="SynchronousWait4" UserName="Synchronous">
+              <Semaphore>SynchronousWaitMode4</Semaphore>
+              <Condition Expression="NorPsramClock4" Diagnostic="Only for synchronous accesses"/>
+            </Mode>
+            <Mode Name="AsynchronousSynchronousWait4" UserName="Asynchronous Synchronous">
+              <Semaphore>AsynchronousWaitMode4</Semaphore>
+              <Semaphore>SynchronousWaitMode4</Semaphore>
+              <Condition Expression="NorPsramClock4&amp;(!BurstReadMode4|!BurstWriteMode4)&amp;(Psram4|MuxedPsram4)" Diagnostic="Only for PSRAM with either asynchronous read and synchronous write accesses or synchronous read and asynchronous write accesses"/>
+            </Mode>
+          </ModeLogicOperator>
           <Semaphore>NorPsramWait4</Semaphore>
-          <Condition Expression="NorFlash4|MuxedNorFlash4|Psram4|MuxedPsram4" Diagnostic="Only for NOR Flash and PSRAM"/>
+          <Condition Expression="NorFlash4|MuxedNorFlash4|Psram4|MuxedPsram4|Sram4" Diagnostic="Only for NOR Flash, PSRAM and SRAM"/>
         </Mode>
         <Mode Name="Psram/Sram/ByteEnable4" UserName="Byte enable">
           <ModeLogicOperator Name="XOR">
@@ -3564,7 +4194,7 @@
               <Condition Expression="_16_bit_data4|_16b_da4|_17b_da4|_18b_da4|_19b_da4|_20b_da4|_21b_da4|_22b_da4|_23b_da4|_24b_da4|_25b_da4|_26b_da4" Diagnostic="Only for 16-bit PSRAM and SRAM"/>
             </Mode>
           </ModeLogicOperator>
-          <Condition Expression="((Psram4|Sram4)&amp;(_16_bit_data4|_32_bit_data4))|(MuxedPsram4&amp;(_16b_da4|_17b_da4|_18b_da4|_19b_da4|_20b_da4|_21b_da4|_22b_da4|_23b_da4|_24b_da4|_25b_da4|_26b_da4))" Diagnostic="Only for 16-bit or 32-bit PSRAM and SRAM"/>
+          <Condition Expression="((Psram4|Sram4)&amp;_16_bit_data4)|(MuxedPsram4&amp;(_16b_da4|_17b_da4|_18b_da4|_19b_da4|_20b_da4|_21b_da4|_22b_da4|_23b_da4|_24b_da4|_25b_da4|_26b_da4))" Diagnostic="Only for 16-bit PSRAM and SRAM"/>
         </Mode>
       </ModeLogicOperator>
     </Mode>
@@ -3912,7 +4542,7 @@
         </Mode>
         <Mode Name="CompactFlashWait" UserName="Wait">
           <ModeLogicOperator Name="OR">
-            <Mode Name="Wait">
+            <Mode Name="CfWait" UserName="Wait">
               <SignalLogicalOp Name="AND">
                 <Signal Name="NWAIT"/>
               </SignalLogicalOp>
@@ -3923,7 +4553,7 @@
         </Mode>
         <Mode Name="CompactFlashInterrupt" UserName="Interrupt">
           <ModeLogicOperator Name="OR">
-            <Mode Name="Interrupt">
+            <Mode Name="CfInterrupt" UserName="Interrupt">
               <SignalLogicalOp Name="AND">
                 <Signal Name="INTR"/>
               </SignalLogicalOp>

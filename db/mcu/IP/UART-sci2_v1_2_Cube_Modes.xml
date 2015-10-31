@@ -93,6 +93,11 @@
 	<RefParameter Comment="Prescaler" DefaultValue="11" Max="255" Min="1" Name="Prescaler" Type="integer" Group="Advanced Parameters"/>
 	
 	<!-- WakeUp Method Parameters for MultiProcessor. -->
+	<RefParameter Comment="Wake-Up Method" DefaultValue="UART_WAKEUPMETHOD_IDLELINE" Name="WakeUpMethode" Type="list" Group="Advanced Parameters">
+	<Condition Expression="DIE436|DIE427|DIE437|DIE416" Diagnostic=""/>
+		<PossibleValue Comment="Idle Line" Value="UART_WAKEUPMETHOD_IDLELINE"/>
+		<PossibleValue Comment="Address Mark" Value="UART_WAKEUPMETHOD_ADDRESSMARK"/>
+	</RefParameter>
 	<RefParameter Comment="Wake-Up Method" DefaultValue="UART_WAKEUPMETHODE_IDLELINE" Name="WakeUpMethode" Type="list" Group="Advanced Parameters">
 		<PossibleValue Comment="Idle Line" Value="UART_WAKEUPMETHODE_IDLELINE"/>
 		<PossibleValue Comment="Address Mark" Value="UART_WAKEUPMETHODE_ADDRESSMARK"/>
@@ -102,7 +107,7 @@
 	<RefParameter Comment="Wake-Up Address" DefaultValue="0" Max="15" Min="0" Name="Address" Type="integer" Group="Advanced Parameters">
 		<Condition Expression="WakeUpMethode = UART_WAKEUPMETHODE_ADDRESSMARK" Diagnostic=""/>
 	</RefParameter>
-	<RefParameter Comment="Wake-Up Address" DefaultValue="0" Max="15" Min="0" Name="Address" Type="integer" Group="Advanced Parameters" Visible="false" />
+	<RefParameter Comment="Wake-Up Address" DefaultValue="0" Max="0" Min="0" Name="Address" Type="integer" Group="Advanced Parameters" Visible="false" />
 	
 	<!-- BreakLength Parameters for Lin. -->
 	<RefParameter Comment="Break Detect Length" DefaultValue="UART_LINBREAKDETECTLENGTH_10B" Name="BreakDetectLength" Type="list" Group="Advanced Parameters">
@@ -110,16 +115,19 @@
 		<PossibleValue Comment="11 Bits" Value="UART_LINBREAKDETECTLENGTH_11B"/>
 	</RefParameter>
 	
+         <RefMode Name="usartBasic" Abstract="true">
+            		<Parameter Name="BaudRate"/>
+        </RefMode>
 	
 	
 	<!-- RefMode for Asynchronous UART -->
-	<RefMode Name="Asynchronous" HalMode="UART">
+	<RefMode Name="Asynchronous" HalMode="UART" BaseMode="usartBasic">
 		<ConfigForMode>Uart_Init</ConfigForMode>
 		<Parameter Name="VirtualMode">
 			<PossibleValue>Asynchronous</PossibleValue>
 		</Parameter>
 		<!-- Basic Parameters -->
-		<Parameter Name="BaudRate"/>
+		
 		<Parameter Name="WordLength"/>
 		<Parameter Name="Parity"/>
 		<Parameter Name="StopBits"/>
@@ -129,13 +137,13 @@
 	</RefMode>
 	
 	<!-- RefMode for 'Single Wire' UART -->
-	<RefMode Name="Half_duplex(single_wire_mode)" HalMode="UART">
+	<RefMode Name="Half_duplex(single_wire_mode)" HalMode="UART" BaseMode="usartBasic">
 		<ConfigForMode>Uart_HalfDuplex_Init</ConfigForMode>
 		<Parameter Name="VirtualMode">
 			<PossibleValue>Asynchronous</PossibleValue>
 		</Parameter>
 		<!-- Basic Parameters -->
-		<Parameter Name="BaudRate"/>
+	
 		<Parameter Name="WordLength"/>
 		<Parameter Name="Parity"/>
 		<Parameter Name="StopBits"/>
@@ -145,13 +153,13 @@
 	</RefMode>
 		
 	<!-- RefMode for 'MultiProcessor Communication' UART -->
-	<RefMode Name="Multiprocessor_communication" HalMode="UART">
+	<RefMode Name="Multiprocessor_communication" HalMode="UART" BaseMode="usartBasic">
 		<ConfigForMode>Uart_MultiProcessor_Init</ConfigForMode>
 		<Parameter Name="VirtualMode">
 			<PossibleValue>Asynchronous</PossibleValue>
 		</Parameter>
 		<!-- Basic Parameters -->
-		<Parameter Name="BaudRate"/>
+		
 		<Parameter Name="WordLength"/>
 		<Parameter Name="Parity"/>
 		<Parameter Name="StopBits"/>
@@ -163,13 +171,13 @@
 	</RefMode>
 	
 	<!-- RefModes for IRDA -->
-	<RefMode Name="IrDA" HalMode="IRDA">
+	<RefMode Name="IrDA" HalMode="IRDA" BaseMode="usartBasic">
 		<ConfigForMode>IrDa_Init</ConfigForMode>
 		<Parameter Name="VirtualMode">
 			<PossibleValue>IrDA</PossibleValue>
 		</Parameter>
 		<!-- Basic Parameters -->
-		<Parameter Name="BaudRate"/>
+		
 		<Parameter Name="WordLength"/>
 		<Parameter Name="Parity"/>
 		<!-- Advanced Parameters -->
@@ -179,13 +187,13 @@
 	</RefMode>
 	
 	<!-- RefModes for LIN -->
-	<RefMode Name="LIN" HalMode="UART">
+	<RefMode Name="LIN" HalMode="UART" BaseMode="usartBasic">
 		<ConfigForMode>Uart_Lin_Init</ConfigForMode>
 		<Parameter Name="VirtualMode">
 			<PossibleValue>Asynchronous</PossibleValue>
 		</Parameter>
 		<!-- Basic Parameters -->
-		<Parameter Name="BaudRate"/>
+		
 		<Parameter Name="WordLength"/>
 		<Parameter Name="Parity"/>
 		<Parameter Name="StopBits"/>
@@ -204,6 +212,7 @@
 						<Signal Name="RX"/>
 						<Signal Name="TX"/>
 					</SignalLogicalOp>
+					<Semaphore>Asynchronous</Semaphore>
 				</Mode>
 				<Mode Name="Half_duplex(single_wire_mode)" UserName="Single Wire (Half-Duplex)">
 					<SignalLogicalOp Name="AND">
@@ -233,6 +242,6 @@
 	</ModeLogicOperator>
 	
 	<!-- RefSignal for UART/IRDA -->
-	<RefSignal IOMode="AlternateFunctionPushPull" Name="RX"/>
-	<RefSignal IOMode="AlternateFunctionPushPull" Name="TX"/>
+	<RefSignal IOMode="AlternateFunctionPushPullUp" Name="RX"/>
+	<RefSignal IOMode="AlternateFunctionPushPullUp" Name="TX"/>
 </IP>

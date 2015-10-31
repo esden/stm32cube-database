@@ -208,6 +208,11 @@
 	<RefParameter Comment="Guard Time" DefaultValue="0" Max="255" Min="0" Name="GuardTime" Type="integer" Group="Advanced Parameters"/>
 	
 	<!-- Specifics RefParameters for MultiProcessor Only. WakeUp Method -->
+	<RefParameter Comment="Wake-Up Method" DefaultValue="UART_WAKEUPMETHOD_IDLELINE" Name="WakeUpMethode" Type="list" Group="Advanced Parameters">
+	<Condition Expression="DIE436|DIE427|DIE437|DIE416" Diagnostic=""/>
+		<PossibleValue Comment="Idle Line" Value="UART_WAKEUPMETHOD_IDLELINE"/>
+		<PossibleValue Comment="Address Mark" Value="UART_WAKEUPMETHOD_ADDRESSMARK"/>
+	</RefParameter>
 	<RefParameter Comment="Wake-Up Method" DefaultValue="UART_WAKEUPMETHODE_IDLELINE" Name="WakeUpMethode" Type="list" Group="Advanced Parameters">
 		<PossibleValue Comment="Idle Line" Value="UART_WAKEUPMETHODE_IDLELINE"/>
 		<PossibleValue Comment="Address Mark" Value="UART_WAKEUPMETHODE_ADDRESSMARK"/>
@@ -217,7 +222,7 @@
 	<RefParameter Comment="Wake-Up Address" DefaultValue="0" Max="15" Min="0" Name="Address" Type="integer" Group="Advanced Parameters">
 		<Condition Expression="WakeUpMethode = UART_WAKEUPMETHODE_ADDRESSMARK" Diagnostic=""/>
 	</RefParameter>
-	<RefParameter Comment="Wake-Up Address" DefaultValue="0" Max="15" Min="0" Name="Address" Type="integer" Group="Advanced Parameters" Visible="false" />
+	<RefParameter Comment="Wake-Up Address" DefaultValue="0" Max="0" Min="0" Name="Address" Type="integer" Group="Advanced Parameters" Visible="false" />
 	
 	<!--Specifics RefParameters for LIN. Line BreakLength -->
 	<RefParameter Comment="Break Detect Length" DefaultValue="UART_LINBREAKDETECTLENGTH_10B" Name="BreakDetectLength" Type="list" Group="Advanced Parameters">
@@ -226,15 +231,16 @@
 	</RefParameter>
 	
 
-	
+	 <RefMode Name="usartBasic" Abstract="true">
+            		<Parameter Name="BaudRate"/>
+        </RefMode>
 	<!-- RefMode for Asynchronous UART -->
-	<RefMode Name="Asynchronous" HalMode="UART">
+	<RefMode Name="Asynchronous" HalMode="UART" BaseMode="usartBasic">
 		<ConfigForMode>Uart_Init</ConfigForMode>
 		<Parameter Name="VirtualMode">
 			<PossibleValue>VM_ASYNC</PossibleValue>
 		</Parameter>
 		<!-- Basic Parameters -->
-		<Parameter Name="BaudRate"/>
 		<Parameter Name="WordLength"/>
 		<Parameter Name="Parity"/>
 		<Parameter Name="StopBits"/>
@@ -245,13 +251,12 @@
 	</RefMode>
 	
 	<!-- RefMode for 'Synchronous' USART -->
-	<RefMode Name="Synchronous" HalMode="USART">
+	<RefMode Name="Synchronous" HalMode="USART" BaseMode="usartBasic">
 		<ConfigForMode>Usart_Init</ConfigForMode>
 		<Parameter Name="VirtualMode">
 			<PossibleValue>VM_SYNC</PossibleValue>
 		</Parameter>
 		<!-- Basic Parameters -->
-		<Parameter Name="BaudRate"/>
 		<Parameter Name="WordLength"/>
 		<Parameter Name="Parity"/>
 		<Parameter Name="StopBits"/>
@@ -264,13 +269,12 @@
 	</RefMode>
 	
 	<!-- RefMode for 'Single Wire' UART -->
-	<RefMode Name="Half_duplex(single_wire_mode)" HalMode="UART">
+	<RefMode Name="Half_duplex(single_wire_mode)" HalMode="UART" BaseMode="usartBasic">
 		<ConfigForMode>Uart_HalfDuplex_Init</ConfigForMode>
 		<Parameter Name="VirtualMode">
 			<PossibleValue>VM_ASYNC</PossibleValue>
 		</Parameter>
 		<!-- Basic Parameters -->
-		<Parameter Name="BaudRate"/>
 		<Parameter Name="WordLength"/>
 		<Parameter Name="Parity"/>
 		<Parameter Name="StopBits"/>
@@ -280,13 +284,12 @@
 	</RefMode>
 		
 	<!-- RefMode for 'MultiProcessor Communication' UART -->
-	<RefMode Name="Multiprocessor_communication" HalMode="UART">
+	<RefMode Name="Multiprocessor_communication" HalMode="UART" BaseMode="usartBasic">
 		<ConfigForMode>Uart_MultiProcessor_Init</ConfigForMode>
 		<Parameter Name="VirtualMode">
 			<PossibleValue>VM_ASYNC</PossibleValue>
 		</Parameter>
 		<!-- Basic Parameters -->
-		<Parameter Name="BaudRate"/>
 		<Parameter Name="WordLength"/>
 		<Parameter Name="Parity"/>
 		<Parameter Name="StopBits"/>
@@ -298,13 +301,12 @@
 	</RefMode>
 	
 	<!-- RefModes for IRDA -->
-	<RefMode Name="IrDA" HalMode="IRDA">
+	<RefMode Name="IrDA" HalMode="IRDA" BaseMode="usartBasic">
 		<ConfigForMode>IrDa_Init</ConfigForMode>
 		<Parameter Name="VirtualMode">
 			<PossibleValue>VM_IRDA</PossibleValue>
 		</Parameter>
 		<!-- Basic Parameters -->
-		<Parameter Name="BaudRate"/>
 		<Parameter Name="WordLength"/>
 		<Parameter Name="Parity"/>
 		<!-- Advanced Parameters -->
@@ -314,13 +316,12 @@
 	</RefMode>
 	
 	<!-- RefModes for LIN -->
-	<RefMode Name="LIN" HalMode="UART">
+	<RefMode Name="LIN" HalMode="UART" BaseMode="usartBasic">
 		<ConfigForMode>Uart_Lin_Init</ConfigForMode>
 		<Parameter Name="VirtualMode">
 			<PossibleValue>VM_ASYNC</PossibleValue>
 		</Parameter>
 		<!-- Basic Parameters -->
-		<Parameter Name="BaudRate"/>
 		<Parameter Name="WordLength"/>
 		<Parameter Name="Parity"/>
 		<Parameter Name="StopBits"/>
@@ -330,13 +331,12 @@
 	</RefMode>
 	
 	<!-- RefModes for SmartCard -->
-	<RefMode Name="SmartCard" HalMode="SMARTCARD">
+	<RefMode Name="SmartCard" HalMode="SMARTCARD" BaseMode="usartBasic">
 		<ConfigForMode>SmartCard_Init</ConfigForMode>
 		<Parameter Name="VirtualMode">
 			<PossibleValue>VM_SMARTCARD</PossibleValue>
 		</Parameter>
 		<!-- Basic Parameters -->
-		<Parameter Name="BaudRate"/>
 		<Parameter Name="WordLength"/>
 		<Parameter Name="Parity"/>
 		<Parameter Name="StopBits"/>
@@ -348,7 +348,7 @@
 	</RefMode>
 	
 	<!-- RefModes for SmartCard with Clock -->
-	<RefMode Name="SmartCard_With_Clock" HalMode="SMARTCARD">
+	<RefMode Name="SmartCard_With_Clock" HalMode="SMARTCARD" BaseMode="usartBasic">
 		<ConfigForMode>SmartCard_Init</ConfigForMode>
 		<Parameter Name="VirtualMode">
 			<PossibleValue>VM_SMARTCARD</PossibleValue>
@@ -357,7 +357,6 @@
 			<PossibleValue>VM_SMARTCARD</PossibleValue>
 		</Parameter>
 		<!-- Basic Parameters -->
-		<Parameter Name="BaudRate"/>
 		<Parameter Name="WordLength"/>
 		<Parameter Name="Parity"/>
 		<Parameter Name="StopBits"/>
@@ -407,6 +406,7 @@
 						<Signal Name="TX"/>
 					</SignalLogicalOp>
 					<Semaphore>$IpInstance_Asynchronous</Semaphore>
+					<Semaphore>Asynchronous</Semaphore>
 				</Mode>
 				<Mode Name="Synchronous">
 					<SignalLogicalOp Name="AND">
@@ -452,7 +452,7 @@
 			</ModeLogicOperator>
 		</Mode>
 		
-		<Mode Name = "Flow Control">
+		<Mode Name = "Flow Control (RS232)">
 			<ModeLogicOperator Name="XOR">
 				<Mode Name="CTS_Only" UserName="CTS Only">
 					<SignalLogicalOp Name="AND">
@@ -494,6 +494,6 @@
 	<RefSignal IOMode="AlternateFunctionPushPull" Name="CK"/>
 	<RefSignal IOMode="AlternateFunctionPushPull" Name="CTS"/>
 	<RefSignal IOMode="AlternateFunctionPushPull" Name="RTS"/>
-	<RefSignal IOMode="AlternateFunctionPushPull" Name="RX"/>
-	<RefSignal IOMode="AlternateFunctionPushPull" Name="TX"/>
+	<RefSignal IOMode="AlternateFunctionPushPullUp" Name="RX"/>
+	<RefSignal IOMode="AlternateFunctionPushPullUp" Name="TX"/>
 </IP>

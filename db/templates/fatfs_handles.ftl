@@ -55,7 +55,7 @@
 #ifdef __cplusplus
 }
 #endif
-#endif /*__ ${inclusion_protection}_H */
+#endif /*__ ${inclusion_protection}__ */
 
 /**
   * @}

@@ -4,7 +4,368 @@
 	ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd" 
 	xmlns="http://mcd.rou.st.com/modules.php?name=mcu">
 	
-	<!-- Modes Description for USART/UART/IRDA/SmartCard/ModBus -->
+	<!-- Generic RefParameters for USART/UART/IrDA/SmartCard Modes -->
+	<RefParameter Name="Instance" DefaultValue="USART$Index" Comment="Instance" Type="" Visible="false"/>
+	
+	<!-- Virtual Mode Parameter, to define RefParameter in function of RefMode -->
+	<RefParameter Comment="" DefaultValue="VM_ASYNC" Name="VirtualMode" Type="list" Visible="false" Group="Basic Parameters" >
+		<PossibleValue Comment="" Value="VM_ASYNC"/>
+		<PossibleValue Comment="" Value="VM_SYNC"/>	
+        <PossibleValue Comment="" Value="VM_IRDA"/>
+		<PossibleValue Comment="" Value="VM_SMARTCARD"/>		
+	</RefParameter>
+	
+	<!-- Baud Rate Parameters Asynchronous. -->
+	<RefParameter Comment="Baud Rate" DefaultValue="38400" Max="9000000" Min="110" Unit="Bits/s" Name="BaudRate" Type="integer" Group="Basic Parameters"/>
+	
+	<!-- Word Length Parameters for Synchronous, IrDa, and  Asyncronous. -->
+	<RefParameter Comment="Word Length" DefaultValue="USART_WORDLENGTH_8B" Name="WordLength" Type="list" Group="Basic Parameters">
+		<Condition Expression="VirtualMode = VM_SYNC" Diagnostic=""/>
+		<PossibleValue Comment="8 Bits (including Parity)" Value="USART_WORDLENGTH_8B"/>
+		<PossibleValue Comment="9 Bits (including Parity)" Value="USART_WORDLENGTH_9B"/>
+	</RefParameter>
+	<RefParameter Comment="Word Length" DefaultValue="IRDA_WORDLENGTH_8B" Name="WordLength" Type="list" Group="Basic Parameters">
+		<Condition Expression="VirtualMode = VM_IRDA" Diagnostic=""/>
+		<PossibleValue Comment="8 Bits (including Parity)" Value="IRDA_WORDLENGTH_8B"/>
+		<PossibleValue Comment="9 Bits (including Parity)" Value="IRDA_WORDLENGTH_9B"/>
+	</RefParameter>
+    <RefParameter Comment="Word Length" DefaultValue="UART_WORDLENGTH_8B" Name="WordLength" Type="list" Group="Basic Parameters">
+		<PossibleValue Comment="8 Bits (including Parity)" Value="UART_WORDLENGTH_8B"/>
+		<PossibleValue Comment="9 Bits (including Parity)" Value="UART_WORDLENGTH_9B"/>
+	</RefParameter>
+	
+	<!-- Stop Bits Parameters for Synchronous, and Asyncronous. -->
+	<RefParameter Comment="Stop Bits" DefaultValue="USART_STOPBITS_1" Name="StopBits" Type="list" Group="Basic Parameters">
+		<Condition Expression="VirtualMode = VM_SYNC" Diagnostic=""/>
+		<PossibleValue Comment="1" Value="USART_STOPBITS_1"/>
+		<PossibleValue Comment="2" Value="USART_STOPBITS_2"/>
+		<PossibleValue Comment="0.5" Value="USART_STOPBITS_0_5"/>
+		<PossibleValue Comment="1.5" Value="USART_STOPBITS_1_5"/>
+	</RefParameter>
+	<RefParameter Comment="Stop Bits" DefaultValue="UART_STOPBITS_1" Name="StopBits" Type="list" Group="Basic Parameters">
+	    <PossibleValue Comment="1" Value="UART_STOPBITS_1"/>
+		<PossibleValue Comment="2" Value="UART_STOPBITS_2"/>
+	</RefParameter>
+	
+	<!-- Parity Parameters for Synchronous,  IrDa, SmartCard and Asyncronous. -->
+	<RefParameter Comment="Parity" DefaultValue="USART_PARITY_NONE" Name="Parity" Type="list" Group="Basic Parameters">
+		<Condition Expression="VirtualMode = VM_SYNC" Diagnostic=""/>
+		<PossibleValue Comment="None" Value="USART_PARITY_NONE"/>
+		<PossibleValue Comment="Even" Value="USART_PARITY_EVEN"/>
+		<PossibleValue Comment="Odd" Value="USART_PARITY_ODD"/>
+	</RefParameter>
+	<RefParameter Comment="Parity" DefaultValue="SMARTCARD_PARITY_EVEN" Name="Parity" Type="list" Group="Basic Parameters">
+		<Condition Expression="VirtualMode = VM_SMARTCARD" Diagnostic=""/>
+		<PossibleValue Comment="Even" Value="SMARTCARD_PARITY_EVEN"/>
+		<PossibleValue Comment="Odd" Value="SMARTCARD_PARITY_ODD"/>
+	</RefParameter>
+	<RefParameter Comment="Parity" DefaultValue="IRDA_PARITY_NONE" Name="Parity" Type="list" Group="Basic Parameters">
+		<Condition Expression="VirtualMode = VM_IRDA" Diagnostic=""/>
+		<PossibleValue Comment="None" Value="IRDA_PARITY_NONE"/>
+		<PossibleValue Comment="Even" Value="IRDA_PARITY_EVEN"/>
+		<PossibleValue Comment="Odd" Value="IRDA_PARITY_ODD"/>
+	</RefParameter>
+		<RefParameter Comment="Parity" DefaultValue="UART_PARITY_NONE" Name="Parity" Type="list" Group="Basic Parameters">
+		<PossibleValue Comment="None" Value="UART_PARITY_NONE"/>
+		<PossibleValue Comment="Even" Value="UART_PARITY_EVEN"/>
+		<PossibleValue Comment="Odd" Value="UART_PARITY_ODD"/>
+	</RefParameter>
+	<!-- DataDirection Parameters for Synchronous,IrDa,SmartCard and Asyncronous. -->
+	<RefParameter Comment="Data Direction" DefaultValue="USART_MODE_TX_RX" Name="Mode" Type="list" Group="Advanced Parameters">
+		<Condition Expression="VirtualMode = VM_SYNC" Diagnostic=""/>
+		<PossibleValue Comment="Receive and Transmit" Value="USART_MODE_TX_RX"/>
+		<PossibleValue Comment="Receive Only" Value="USART_MODE_RX"/>
+		<PossibleValue Comment="Transmit Only" Value="USART_MODE_TX"/>
+	</RefParameter>
+	<RefParameter Comment="Data Direction" DefaultValue="SMARTCARD_MODE_RX" Name="Mode" Type="list" Group="Advanced Parameters">
+		<Condition Expression="VirtualMode = VM_SMARTCARD" Diagnostic=""/>
+		<PossibleValue Comment="Receive Only" Value="SMARTCARD_MODE_RX"/>
+		<PossibleValue Comment="Transmit Only" Value="SMARTCARD_MODE_TX"/>
+	</RefParameter>
+	<RefParameter Comment="IRDA_MODE State" DefaultValue="IRDA_MODE_DISABLE" Name="Mode" Type="list" Group="Advanced Parameters">
+		<Condition Expression="VirtualMode = VM_IRDA" Diagnostic=""/>
+		<PossibleValue Comment="Enable" Value="IRDA_MODE_DISABLE"/>
+		<PossibleValue Comment="Disable" Value="IRDA_MODE_ENABLE"/>
+	</RefParameter>
+		<RefParameter Comment="Data Direction" DefaultValue="UART_MODE_TX_RX" Name="Mode" Type="list" Group="Advanced Parameters">
+		<PossibleValue Comment="Receive and Transmit" Value="UART_MODE_TX_RX"/>
+		<PossibleValue Comment="Receive Only" Value="UART_MODE_RX"/>
+		<PossibleValue Comment="Transmit Only" Value="UART_MODE_TX"/>
+	</RefParameter>
+	
+	<!-- Specifics RefParameters for UART Mode only -->
+	<RefParameter Comment="Hardware Flow Control" DefaultValue="UART_HWCONTROL_NONE" Name="HwFlowCtl" Type="list" Group="Basic Parameters" Visible="false" >
+		<PossibleValue Comment="None" Value="UART_HWCONTROL_NONE"/>
+		<PossibleValue Comment="RTS Only" Value="UART_HWCONTROL_RTS"/>
+		<PossibleValue Comment="CTS Only" Value="UART_HWCONTROL_CTS"/>
+		<PossibleValue Comment="RTS/CTS" Value="UART_HWCONTROL_RTS_CTS"/>
+	</RefParameter>
+	
+	<RefParameter Comment="Over Sampling" DefaultValue="UART_OVERSAMPLING_16" Name="OverSampling" Type="list" Group="Advanced Parameters">
+		<PossibleValue Comment="16 Samples" Value="UART_OVERSAMPLING_16"/>
+		<PossibleValue Comment="8 Samples" Value="UART_OVERSAMPLING_8"/>
+	</RefParameter>
+	
+	<!-- Specifics RefParameters for USART /SmartCard Clock Mode -->
+	<RefParameter Comment="Clock Polarity" DefaultValue="SMARTCARD_POLARITY_LOW" Name="CLKPolarity" Type="list" Group="Clock Parameters">
+		<Condition Expression="VirtualClockMode = VM_SMARTCARD" Diagnostic=""/>
+		<PossibleValue Comment="Low" Value="SMARTCARD_POLARITY_LOW"/>
+		<PossibleValue Comment="High" Value="SMARTCARD_POLARITY_HIGH"/>
+	</RefParameter>
+	<RefParameter Comment="Clock Polarity" DefaultValue="USART_POLARITY_LOW" Name="CLKPolarity" Type="list" Group="Clock Parameters">
+		<Condition Expression="VirtualMode = VM_SYNC" Diagnostic=""/>
+		<PossibleValue Comment="Low" Value="USART_POLARITY_LOW"/>
+		<PossibleValue Comment="High" Value="USART_POLARITY_HIGH"/>
+	</RefParameter>
+	<RefParameter Comment="Clock Polarity" DefaultValue="null" Name="CLKPolarity" Type="integer" Visible="false" Group="Clock Parameters" />
+
+	<RefParameter Comment="Clock Phase" DefaultValue="SMARTCARD_PHASE_1EDGE" Name="CLKPhase" Type="list" Group="Clock Parameters">
+		<Condition Expression="VirtualClockMode = VM_SMARTCARD" Diagnostic=""/>
+		<PossibleValue Comment="One Edge" Value="SMARTCARD_PHASE_1EDGE"/>
+		<PossibleValue Comment="Two Edge" Value="SMARTCARD_PHASE_2EDGE"/>
+	</RefParameter>
+	<RefParameter Comment="Clock Phase" DefaultValue="USART_PHASE_1EDGE" Name="CLKPhase" Type="list" Group="Clock Parameters">
+		<Condition Expression="VirtualMode = VM_SYNC" Diagnostic=""/>
+		<PossibleValue Comment="One Edge" Value="USART_PHASE_1EDGE"/>
+		<PossibleValue Comment="Two Edge" Value="USART_PHASE_2EDGE"/>
+	</RefParameter>
+	<RefParameter Comment="Clock Phase" DefaultValue="null" Name="CLKPhase" Type="integer" Visible="false"  Group="Clock Parameters"/>
+
+	<RefParameter Comment="Clock Last Bit" DefaultValue="SMARTCARD_LASTBIT_DISABLE" Name="CLKLastBit" Type="list" Group="Clock Parameters">
+		<Condition Expression="VirtualClockMode = VM_SMARTCARD" Diagnostic=""/>
+		<PossibleValue Comment="Disable" Value="SMARTCARD_LASTBIT_DISABLED"/>
+		<PossibleValue Comment="Enable" Value="SMARTCARD_LASTBIT_ENABLE"/>
+	</RefParameter>
+	<RefParameter Comment="Clock Last Bit" DefaultValue="USART_LASTBIT_DISABLE" Name="CLKLastBit" Type="list" Group="Clock Parameters">
+		<Condition Expression="VirtualMode = VM_SYNC" Diagnostic=""/>
+		<PossibleValue Comment="Disable" Value="USART_LASTBIT_DISABLE"/>
+		<PossibleValue Comment="Enable" Value="USART_LASTBIT_ENABLE"/>
+	</RefParameter>
+	<RefParameter Comment="Clock Last Bit" DefaultValue="null" Name="CLKLastBit" Type="integer" Visible="false" Group="Clock Parameters"/>
+	
+	<!-- Specifics RefParameters for IrDa Mode -->
+	<RefParameter Comment="Power Mode" DefaultValue="IRDA_POWERMODE_LOWPOWER" Name="PowerMode" Type="list" Group="Advanced Parameters">
+		<PossibleValue Comment="Low Power" Value="IRDA_POWERMODE_LOWPOWER"/>
+		<PossibleValue Comment="Normal Power" Value="IRDA_POWERMODE_NORMAL"/>
+	</RefParameter>
+
+	<!-- Prescaler Parameters for USART/IrDa/SmartCard Clock Mode -->
+	<RefParameter Comment="Prescaler" DefaultValue="1" Name="Prescaler" Type="list" Group="Advanced Parameters">
+		<Condition Expression="(PowerMode = IRDA_POWERMODE_NORMAL) &amp; (VirtualMode = VM_IRDA)" Diagnostic=""/>
+		<PossibleValue Comment="1" Value="1"/>
+	</RefParameter>
+	<RefParameter Comment="Prescaler for SmartCard Clock (Divide by x2)" DefaultValue="10" Max="31" Min="1" Name="Prescaler" Type="integer" Group="Clock Parameters">
+		<Condition Expression="VirtualMode = VM_SMARTCARD" Diagnostic=""/>
+	</RefParameter>
+	<RefParameter Comment="Prescaler" DefaultValue="10" Max="255" Min="1" Name="Prescaler" Type="integer" Group="Advanced Parameters"/>
+	
+	<!-- OneBitSampling for SmartCard and Uart -->
+	<RefParameter Comment="ONEBIT_SAMPLING State" DefaultValue="SMARTCARD_ONEBIT_SAMPLING_DISABLED " Name="OneBitSampling" Type="list" Group="Advanced Parameters">
+		<Condition Expression="VirtualMode = VM_SMARTCARD" Diagnostic=""/>
+		<PossibleValue Comment="Disable" Value="SMARTCARD_ONEBIT_SAMPLING_DISABLED "/>
+		<PossibleValue Comment="Enable" Value="SMARTCARD_ONEBIT_SAMPLING_ENABLED"/>
+	</RefParameter>
+	<RefParameter Comment="ONEBIT_SAMPLING State" DefaultValue="UART_ONEBIT_SAMPLING_DISABLED " Name="OneBitSampling" Type="list" Group="Advanced Parameters">
+		<PossibleValue Comment="Disable" Value="UART_ONEBIT_SAMPLING_DISABLED "/>
+		<PossibleValue Comment="Enable" Value="UART_ONEBIT_SAMPLING_ENABLED"/>
+	</RefParameter>
+<!-- Specifics RefParameters for SmartCard Mode Only -->
+	<RefParameter Comment="Clock State" DefaultValue="SMARTCARD_CLOCK_DISABLED " Name="CLKEnable" Type="list" Group="Advanced Parameters">
+		<PossibleValue Comment="Disable" Value="SMARTCARD_CLOCK_DISABLED "/>
+		<PossibleValue Comment="Enable" Value="SMARTCARD_CLOCK_ENABLED"/>
+	</RefParameter>
+	
+	<RefParameter Comment="NAck if Parity Error" DefaultValue="SMARTCARDNACK_ENABLED" Name="NACKEnable" Type="list" Group="Advanced Parameters">
+		<PossibleValue Comment="Disable" Value="SMARTCARDNACK_DISABLED"/>
+		<PossibleValue Comment="Enable" Value="SMARTCARDNACK_ENABLED"/>
+	</RefParameter>
+	
+	<RefParameter Comment="Guard Time" DefaultValue="0" Max="255" Min="0" Name="GuardTime" Type="integer" Group="Advanced Parameters"/>
+	
+	<!-- Specifics RefParameters for MultiProcessor Only. WakeUp Method -->
+	<RefParameter Comment="Wake-Up Method" DefaultValue="UART_WAKEUPMETHOD_IDLELINE" Name="WakeUpMethod" Type="list" Group="Advanced Parameters">
+		<PossibleValue Comment="Idle Line" Value="UART_WAKEUPMETHOD_IDLELINE"/>
+		<PossibleValue Comment="Address Mark" Value="UART_WAKEUPMETHOD_ADDRESSMARK"/>
+	</RefParameter>
+	
+    <!-- Address for MultiProcessor --> 
+	<RefParameter Comment="Wake-Up Address" DefaultValue="0" Max="127" Min="0" Name="Address" Type="integer" Group="Advanced Parameters">
+		<Condition Expression="WakeUpMethod = UART_WAKEUPMETHOD_ADDRESSMARK" Diagnostic=""/>
+	</RefParameter>
+	<RefParameter Comment="Wake-Up Address" DefaultValue="0" Max="127" Min="0" Name="Address" Type="integer" Group="Advanced Parameters" Visible="false" />
+	
+	<!-- Address length RefParameters for MultiProcessor  -->
+	<RefParameter Comment="Address Length" DefaultValue="UART_ADDRESS_DETECT_4B" Name="AddressLength" Type="list" Group="Advanced Parameters">
+		<PossibleValue Comment="Idle Line" Value="UART_ADDRESS_DETECT_4B"/>
+		<PossibleValue Comment="Address Mark" Value="UART_ADDRESS_DETECT_7B"/>
+	</RefParameter>
+	
+	<!--Specifics RefParameters for LIN. Line BreakLength -->
+	<RefParameter Comment="Break Detect Length" DefaultValue="UART_LINBREAKDETECTLENGTH_10B" Name="BreakDetectLength" Type="list" Group="Advanced Parameters">
+		<PossibleValue Comment="10 Bits" Value="UART_LINBREAKDETECTLENGTH_10B"/>
+		<PossibleValue Comment="11 Bits" Value="UART_LINBREAKDETECTLENGTH_11B"/>
+	</RefParameter>
+	
+	
+	
+	
+	<!-- RefMode for Asynchronous UART -->
+	<RefMode Name="Asynchronous" HalMode="UART">
+		<ConfigForMode>Uart_Init</ConfigForMode>
+		<Parameter Name="VirtualMode">
+			<PossibleValue>VM_ASYNC</PossibleValue>
+		</Parameter>
+		<!-- Basic Parameters -->
+		<Parameter Name="BaudRate"/>
+		<Parameter Name="WordLength"/>
+		<Parameter Name="Parity"/>
+		<Parameter Name="StopBits"/>
+		<Parameter Name="HwFlowCtl"/>
+		<!-- Advanced Parameters -->
+		<Parameter Name="Mode"/>
+		<Parameter Name="OverSampling" />
+		<Parameter Name="OneBitSampling" />
+	</RefMode>
+	
+	<!-- RefMode for 'Synchronous' USART -->
+	<RefMode Name="Synchronous" HalMode="USART">
+		<ConfigForMode>Usart_Init</ConfigForMode>
+		<Parameter Name="VirtualMode">
+			<PossibleValue>VM_SYNC</PossibleValue>
+		</Parameter>
+		<!-- Basic Parameters -->
+		<Parameter Name="BaudRate"/>
+		<Parameter Name="WordLength"/>
+		<Parameter Name="Parity"/>
+		<Parameter Name="StopBits"/>
+		<!-- Advanced Parameters -->
+		<Parameter Name="Mode"/>
+		<!-- Clock Parameters -->
+		<Parameter Name="CLKPolarity"/>
+		<Parameter Name="CLKPhase"/>
+		<Parameter Name="CLKLastBit"/>
+	</RefMode>
+	
+<!-- RefMode for 'Single Wire' UART -->
+	<RefMode Name="Half_duplex(single_wire_mode)" HalMode="UART">
+		<ConfigForMode>Uart_HalfDuplex_Init</ConfigForMode>
+		<Parameter Name="VirtualMode">
+			<PossibleValue>VM_ASYNC</PossibleValue>
+		</Parameter>
+		<!-- Basic Parameters -->
+	    <Parameter Name="BaudRate"/>
+		<Parameter Name="WordLength"/>
+		<Parameter Name="Parity"/>
+		<Parameter Name="StopBits"/>
+		<Parameter Name="HwFlowCtl"/>
+		<!--  Advanced Parameters -->
+		<Parameter Name="Mode"/>
+		<Parameter Name="OverSampling"/>
+		<Parameter Name="OneBitSampling" />
+	</RefMode>
+		
+	<!-- RefMode for 'MultiProcessor Communication' UART -->
+	<RefMode Name="Multiprocessor_communication" HalMode="UART">
+		<ConfigForMode>Uart_MultiProcessor_Init</ConfigForMode>
+		<Parameter Name="VirtualMode">
+			<PossibleValue>VM_ASYNC</PossibleValue>
+		</Parameter>
+		<!-- Basic Parameters -->
+	    <Parameter Name="BaudRate"/>
+		<Parameter Name="WordLength"/>
+		<Parameter Name="Parity"/>
+		<Parameter Name="StopBits"/>
+		<Parameter Name="HwFlowCtl"/>
+		<!--  Advanced Parameters -->
+		<Parameter Name="Mode"/>
+		<Parameter Name="OverSampling"/>
+		<Parameter Name="OneBitSampling"/>
+		<Parameter Name="WakeUpMethod"/>
+		<Parameter Name="Address"/>
+		<Parameter Name="AddressLength"/>
+	</RefMode>
+	
+	<!-- RefModes for IRDA -->
+	<RefMode Name="IrDA" HalMode="IRDA">
+		<ConfigForMode>IrDa_Init</ConfigForMode>
+		<Parameter Name="VirtualMode">
+			<PossibleValue>VM_IRDA</PossibleValue>
+		</Parameter>
+		<!-- Basic Parameters -->
+		<Parameter Name="BaudRate"/>
+		<Parameter Name="WordLength"/>
+		<Parameter Name="Parity"/>
+		<!-- Advanced Parameters -->
+		<Parameter Name="Mode"/>
+		<Parameter Name="PowerMode"/>
+		<Parameter Name="Prescaler"/>
+	</RefMode>
+	
+	<!-- RefModes for LIN -->
+	<RefMode Name="LIN" HalMode="UART">
+		<ConfigForMode>Uart_Lin_Init</ConfigForMode>
+		<Parameter Name="VirtualMode">
+			<PossibleValue>VM_ASYNC</PossibleValue>
+		</Parameter>
+		<!-- Basic Parameters -->
+		<Parameter Name="BaudRate"/>
+		<Parameter Name="WordLength"/>
+		<Parameter Name="Parity"/>
+		<Parameter Name="StopBits"/>
+		<Parameter Name="HwFlowCtl"/>
+		<!--  Advanced Parameters -->
+		<Parameter Name="Mode"/>
+		<Parameter Name="OverSampling"/>
+		<Parameter Name="OneBitSampling"/>
+		<Parameter Name="BreakDetectLength"/>
+	</RefMode>
+	
+	<!-- RefModes for SmartCard -->
+	<RefMode Name="SmartCard" HalMode="SMARTCARD">
+		<ConfigForMode>SmartCard_Init</ConfigForMode>
+		<Parameter Name="VirtualMode">
+			<PossibleValue>VM_SMARTCARD</PossibleValue>
+		</Parameter>
+		<!-- Basic Parameters -->
+		<Parameter Name="BaudRate"/>
+		<Parameter Name="Parity"/>
+		<!-- Advanced Parameters -->
+		<Parameter Name="Mode"/>
+		<Parameter Name="OneBitSampling"/>
+		<Parameter Name="CLKEnable"/>
+		<Parameter Name="NACKEnable"/>
+		<Parameter Name="GuardTime"/>
+		<!-- Clock Parameters -->
+		<Parameter Name="Prescaler"/>
+		<Parameter Name="CLKPolarity"/>
+		<Parameter Name="CLKPhase"/>
+		<Parameter Name="CLKLastBit"/>
+	</RefMode>
+		
+	<!-- RefModes for Harwdware Flow Control -->
+	<RefMode Name="CTS_Only">
+		<!-- Basic Parameters -->
+		<Parameter Name="HwFlowCtl">
+			<PossibleValue>UART_HWCONTROL_CTS</PossibleValue>
+		</Parameter>
+	</RefMode>
+	
+	<RefMode Name="RTS_Only">
+		<!-- Basic Parameters -->
+		<Parameter Name="HwFlowCtl">
+			<PossibleValue>UART_HWCONTROL_RTS</PossibleValue>
+		</Parameter>
+	</RefMode>
+	
+	<RefMode Name="CTS_RTS">
+		<!-- Basic Parameters -->
+		<Parameter Name="HwFlowCtl">
+			<PossibleValue>UART_HWCONTROL_RTS_CTS</PossibleValue>
+		</Parameter>
+	</RefMode>
+	
+		
+	<!-- Modes Description for USART/UART/IRDA/SmartCard -->
 	<ModeLogicOperator Name="OR">
 		<Mode Name="Mode" >
 			<ModeLogicOperator Name="XOR">
@@ -53,12 +414,13 @@
 				</Mode>
 				<Mode Name="ModbusCommunication" UserName="Modbus Communication">
 					<SignalLogicalOp Name="AND">
+						<Signal Name="RX"/>
 						<Signal Name="TX"/>
+						<Signal Name="RTS"/>
 					</SignalLogicalOp>
 				</Mode>
 			</ModeLogicOperator>
 		</Mode>
-		
 		<Mode Name = "Flow Control">
 			<ModeLogicOperator Name="XOR">
 				<Mode Name="CTS_Only" UserName="CTS Only">
@@ -93,11 +455,10 @@
 		</Mode>
 	</ModeLogicOperator>
 	
-	<!-- RefSignal for USART/UART/IRDA/SmartCard/ModBus -->
-	<RefSignal IOMode="GPIO" Name="CK"/>
-	<RefSignal IOMode="GPIO" Name="CTS"/>
-	<RefSignal IOMode="GPIO" Name="RTS"/>
-	<RefSignal IOMode="GPIO" Name="RX"/>
-	<RefSignal IOMode="GPIO" Name="TX"/>
-
+	<!-- RefSignal for USART/UART/IRDA/SmartCard -->
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="CK"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="CTS"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="RTS"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="RX"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="TX"/>
 </IP>

@@ -1,12 +1,12 @@
 [#ftl]
 /**
  ******************************************************************************
-  * @file    stm32f2xx_sd.h (based on stm324x9i_eval_sd.h)
+  * @file    bsp_driver_sd.h (based on stm324x9i_eval_sd.h)
   * @author  MCD Teams
   * @version V1.0.0
   * @date    ${date}
   * @brief   This file contains the common defines and functions prototypes for 
-  *          the stm32f4xx_sd.c driver.
+  *          the bsp_driver_sd.c driver.
   ******************************************************************************
   *
   * COPYRIGHT(c) ${year} STMicroelectronics
@@ -56,6 +56,9 @@
   */     
 #define   MSD_OK         0x00
 #define   MSD_ERROR      0x01
+#ifndef SD_CardInfo
+  #define SD_CardInfo HAL_SD_CardInfoTypedef
+#endif
   
 /** @defgroup STM324x9I_EVAL_SD_Exported_Constants
   * @{

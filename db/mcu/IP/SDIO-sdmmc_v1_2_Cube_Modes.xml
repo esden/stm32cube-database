@@ -6,7 +6,7 @@
     <RefParameter Comment="SDIO instance" DefaultValue="SDIO$Index" Name="Instance" Type="list" Visible="false"/> 
 
     <RefParameter     Name="ClockEdge" Comment="Clock transition on which the bit capture" DefaultValue="SDIO_CLOCK_EDGE_RISING" Type="list"  Group="SDIO parameters">
-      <Condition Diagnostic="SD_ClockBypass" Expression="SD_Card"/>
+      <Condition Diagnostic="SD Card" Expression="SD_Card"/>
         <PossibleValue Value="SDIO_CLOCK_EDGE_RISING" Comment="Capture the clock on the rising transition"/>
     </RefParameter>    
     <RefParameter     Name="ClockEdge" Comment="Clock transition on which the bit capture" DefaultValue="SDIO_CLOCK_EDGE_RISING" Type="list"  Group="SDIO parameters">
@@ -15,7 +15,7 @@
     </RefParameter>    
 
      <RefParameter     Name="ClockBypass" Comment="SDIO Clock divider bypass enable" DefaultValue="SDIO_CLOCK_BYPASS_DISABLE" Type="list"  Group="SDIO parameters">
-        <Condition Diagnostic="SD_ClockBypass" Expression="SD_Card"/>
+        <Condition Diagnostic="SD Card" Expression="SD_Card"/>
         <PossibleValue Value="SDIO_CLOCK_BYPASS_DISABLE" Comment="Disable the Bypass of clock divider"/>
     </RefParameter>   
      <RefParameter     Name="ClockBypass" Comment="SDIO Clock divider bypass enable" DefaultValue="SDIO_CLOCK_BYPASS_DISABLE" Type="list"  Group="SDIO parameters">
@@ -24,7 +24,7 @@
      </RefParameter>   
 
      <RefParameter     Name="ClockPowerSave" Comment="SDIO Clock output enable or disable when the bus is idle" DefaultValue="SDIO_CLOCK_POWER_SAVE_DISABLE" Type="list" Group="SDIO parameters">
-        <Condition Diagnostic="SD_ClockPowerSave" Expression="SD_Card"/>
+        <Condition Diagnostic="SD Card" Expression="SD_Card"/>
         <PossibleValue Value="SDIO_CLOCK_POWER_SAVE_DISABLE" Comment="Disable the power save for the clock"/>
     </RefParameter> 
     <RefParameter     Name="ClockPowerSave" Comment="SDIO Clock output enable when the bus is idle" DefaultValue="SDIO_CLOCK_POWER_SAVE_DISABLE" Type="list" Group="SDIO parameters">
@@ -32,20 +32,20 @@
         <PossibleValue Value="SDIO_CLOCK_POWER_SAVE_ENABLE" Comment="Enable the power save for the clock"/>
      </RefParameter>    
 
-     <RefParameter     Name="BusWide" Comment="SDIO bus width : 8 bits." Type="list" Visible="false" >
-         <Condition Diagnostic="BusWide" Expression="Bus8Bits"/>
+     <RefParameter     Name="BusWide" Comment="SDIO bus width : 8 bits" Type="list" Visible="false" >
+         <Condition Diagnostic="Bus Width 8 Bits" Expression="Bus8Bits"/>
          <PossibleValue Value="SDIO_BUS_WIDE_8B" Comment="Bus wide 8-bit data"/>
      </RefParameter> 
-     <RefParameter     Name="BusWide" Comment="SDIO bus width : 4 bits." Type="list" Visible="false">
-      <Condition Diagnostic="BusWide" Expression="Bus4Bits"/>
+     <RefParameter     Name="BusWide" Comment="SDIO bus width : 4 bits" Type="list" Visible="false">
+      <Condition Diagnostic="Bus Width 4 Bits" Expression="Bus4Bits"/>
       <PossibleValue Value="SDIO_BUS_WIDE_4B" Comment="Bus wide 4-bit data"/>
      </RefParameter> 
-     <RefParameter     Name="BusWide" Comment="SDIO bus width : 1 bits." Type="list" Visible="false">
-        <PossibleValue Value="SDIO_BUS_WIDE_1B" Comment="Bus wide 1-bit data|SD_Card"/>
+     <RefParameter     Name="BusWide" Comment="SDIO bus width : 1 bits" Type="list" Visible="false">
+        <PossibleValue Value="SDIO_BUS_WIDE_1B" Comment="Bus wide 1-bit data"/>
      </RefParameter>  
 
      <RefParameter     Name="HardwareFlowControl" Comment="SDIO hardware flow control" DefaultValue="SDIO_HARDWARE_FLOW_CONTROL_DISABLE" Type="list"  Group="SDIO parameters">
-        <Condition Diagnostic="SD_HardwareFlowControl" Expression="SD_Card"/>
+        <Condition Diagnostic="SD Card" Expression="SD_Card"/>
         <PossibleValue Value="SDIO_HARDWARE_FLOW_CONTROL_DISABLE" Comment="The hardware control flow is disabled"/>
     </RefParameter>   
      <RefParameter     Name="HardwareFlowControl" Comment="SDIO hardware flow control" DefaultValue="SDIO_HARDWARE_FLOW_CONTROL_DISABLE" Type="list"  Group="SDIO parameters">
@@ -53,19 +53,24 @@
         <PossibleValue Value="SDIO_HARDWARE_FLOW_CONTROL_ENABLE" Comment="The hardware control flow is enabled"/>
      </RefParameter>   
 
-     <RefParameter   Name="ClockDiv" Comment="Clock frequency of the SDIO controller must be between 186 KHz and 24 MHz" DefaultValue="0" Max="255" Min="0" Type="integer" Group="SDIO parameters">
+     <RefParameter   Name="ClockDiv" Comment="SDIOCLK clock divide factor" DefaultValue="0" Max="255" Min="0" Type="integer" Group="SDIO parameters">
+      <Description>SDIO_CK = SDIOCLK / [CLKDIV + 2]. The output clock frequency can vary between 187 KHz and 24 MHz. It is advised to keep the default ClockDiv value (0) to have a maximum SDIO_CK frequency of 24 MHz.</Description>
     </RefParameter> 
 
  
   <!-- RefMode for SD-1-bit -->
     <RefMode Name="SD_1_bit" Comment="SD 1 bit" HalMode="SD">
         <ConfigForMode>SD_Init</ConfigForMode>
+        <Parameter Name="BusWide"/>
+        <Parameter Name="ClockDiv"/>
     </RefMode>
 
 
   <!-- RefMode for SD-4-bits-Wide-bus -->
     <RefMode Name="SD_4_bits_Wide_bus" Comment="SD 4 bits Wide bus" HalMode="SD">
         <ConfigForMode>SD_Init</ConfigForMode>
+        <Parameter Name="BusWide"/>
+        <Parameter Name="ClockDiv"/>
     </RefMode>
 
     <ModeLogicOperator Name="OR">
@@ -80,7 +85,8 @@
 					</SignalLogicalOp>
 				</Mode>
 				<Mode Name="SD_4_bits_Wide_bus" UserName="SD 4 bits Wide bus">
-                    <Semaphore>SD_Card_4</Semaphore>
+                    <Semaphore>SD_Card</Semaphore>
+                    <Semaphore>Bus4Bits</Semaphore>
                     <SignalLogicalOp Name="AND">
                         <Signal Name="CK"/>
                         <Signal Name="CMD"/>

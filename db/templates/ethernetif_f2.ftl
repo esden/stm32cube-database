@@ -36,6 +36,7 @@
 [#list SWIPdatas as SWIP]
 [#assign with_rtos = 0]
 [#assign netif_callback = 0]
+[#assign lwip_arp = 0]
 [#if SWIP.defines??]
 	[#list SWIP.defines as definition] 	
 		[#if (definition.name == "WITH_RTOS")]
@@ -53,6 +54,9 @@
 		[#if (definition.name == "LWIP_NETIF_LINK_CALLBACK") && (definition.value == "1")]
 			[#assign netif_callback = 1] 
 		[/#if]
+		[#if (definition.name == "LWIP_ARP") && (definition.value == "1")]
+            [#assign lwip_arp = 1] 
+        [/#if]
 	[/#list]
 [/#if] [#-- SWIP.defines --]
 [/#list][/#compress]
@@ -150,15 +154,6 @@ void HAL_ETH_RxCpltCallback(ETH_HandleTypeDef *heth)
   osSemaphoreRelease(s_xSemaphore);
 }
 
-/**
-  * @brief  Ethernet IRQ Handler
-  * @param  None
-  * @retval None
-  */
-void ETHERNET_IRQHandler(void)
-{
-  HAL_ETH_IRQHandler(&heth);
-}
 [/#if] [#-- endif with_rtos --]
 
 /* USER CODE BEGIN 4 */
@@ -211,9 +206,13 @@ static void low_level_init(struct netif *netif)
   /* maximum transfer unit */
   netif->mtu = 1500;
   
-  /* device capabilities */
+  /* Accept broadcast address and ARP traffic */
   /* don't set NETIF_FLAG_ETHARP if this device is not an ethernet one */
-  netif->flags |= NETIF_FLAG_BROADCAST | NETIF_FLAG_ETHARP;
+  #if LWIP_ARP
+    netif->flags |= NETIF_FLAG_BROADCAST | NETIF_FLAG_ETHARP;
+  # else 
+    netif->flags |= NETIF_FLAG_BROADCAST;
+  #endif /* LWIP_ARP */
   
 [#if with_rtos == 1]
 /* create a binary semaphore used for informing ethernetif of frame reception */
@@ -243,7 +242,7 @@ static void low_level_init(struct netif *netif)
     
   /* Enable Interrupt on change of link status */
   HAL_ETH_WritePHYRegister(&heth, PHY_MISR, regvalue);   
-#endif
+#endif /* LWIP_ARP || LWIP_ETHERNET */
 }
 
 /**
@@ -358,13 +357,10 @@ static struct pbuf * low_level_input(struct netif *netif)
   uint32_t byteslefttocopy = 0;
   uint32_t i=0;
   
-[#compress][#if with_rtos == 1]
   /* get received frame */
-  HAL_ETH_GetReceivedFrame_IT(&heth);
-[#else]
   if (HAL_ETH_GetReceivedFrame(&heth) != HAL_OK)
     return NULL;
-[/#if] [#-- endif with_rtos --][/#compress]  
+
   /* Obtain the size of the packet and put it into the "len" variable. */
   len = heth.RxFrameInfos.length;
   buffer = (uint8_t *)heth.RxFrameInfos.buffer;
@@ -484,6 +480,22 @@ void ethernetif_input(struct netif *netif)
   }
 }
 
+[#if lwip_arp == 0]
+/**
+ * This function has to be completed by user in case of ARP OFF.
+ *
+ * @param netif the lwip network interface structure for this ethernetif
+ * @return ERR_OK if ...
+ */
+static err_t low_level_output_arp_off(struct netif *netif, struct pbuf *q, ip_addr_t *ipaddr)
+{  
+  err_t errval;
+  errval = ERR_OK;
+/* USER CODE BEGIN 5 */ 
+/* USER CODE END 5 */  
+  return errval;
+}
+[/#if] [#-- endif lwip_arp --]
 /**
  * Should be called at the beginning of the program to set up the
  * network interface. It calls the function low_level_init() to do the
@@ -512,8 +524,13 @@ err_t ethernetif_init(struct netif *netif)
    * from it if you have to do some checks before sending (e.g. if link
    * is available...) */
 #if LWIP_ARP || LWIP_ETHERNET
+#if LWIP_ARP
   netif->output = etharp_output;
-#endif  /* ETHARP_SUPPORT_VLAN */
+#else 
+  /* The user should write ist own code in low_level_output_arp_off function */
+  netif->output = low_level_output_arp_off;
+#endif /* LWIP_ARP */ 
+#endif  /* LWIP_ARP || LWIP_ETHERNET */
   netif->linkoutput = low_level_output;
 
   /* initialize the hardware */
@@ -521,8 +538,11 @@ err_t ethernetif_init(struct netif *netif)
 
   return ERR_OK;
 }
-
+[#if lwip_arp == 0]
+/* USER CODE BEGIN 6 */
+[#else]
 /* USER CODE BEGIN 5 */
+[/#if]
 /**
 * @brief  Returns the current time in milliseconds
 *         when LWIP_TIMERS == 1 and NO_SYS == 1
@@ -544,7 +564,11 @@ u32_t sys_now(void)
 {
   return HAL_GetTick();
 }
+[#if lwip_arp == 0]
+/* USER CODE END 6 */
+[#else]
 /* USER CODE END 5 */
+[/#if]
 
 /**
   * @brief  This function sets the netif link status.
@@ -609,9 +633,17 @@ void ethernetif_set_link(void const *argument)
 [/#if]  
 }
 
+[#if lwip_arp == 0]
+/* USER CODE BEGIN 7 */
+[#else]
 /* USER CODE BEGIN 6 */
+[/#if]
   
+[#if lwip_arp == 0]
+/* USER CODE END 7 */
+[#else]
 /* USER CODE END 6 */ 
+[/#if] 
 
 [#if netif_callback == 1]
 
@@ -712,9 +744,17 @@ __weak void ethernetif_notify_conn_changed(struct netif *netif)
   /* NOTE : This is function clould be implemented in user file 
             when the callback is needed,
   */
+[#if lwip_arp == 0]
+/* USER CODE BEGIN 8 */
+[#else]
   /* USER CODE BEGIN 7 */
+[/#if]
   
+[#if lwip_arp == 0]
+/* USER CODE END 8 */
+[#else]
   /* USER CODE END 7 */ 
+[/#if] 
 }
 [/#if]
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

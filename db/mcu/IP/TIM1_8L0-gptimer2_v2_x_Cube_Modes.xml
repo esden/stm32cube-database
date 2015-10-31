@@ -3,6 +3,7 @@
  xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd"
  xmlns="http://mcd.rou.st.com/modules.php?name=mcu">
   <About>TIM: Timer</About>
+  <Semaphore>$IpInstance</Semaphore>
  <!-- Generic RefParameters for TIM Modes -->
  <RefParameter Name="Instance" DefaultValue="TIM$Index" Comment="Instance" Type="" Visible="false"/>
 <!--____________________________________________________________________-->
@@ -48,10 +49,10 @@
 <!-- Repetion Counter TIMER INSTANCE DEPENDENT -->
 <!-- ne doit etre parametre que pour TIM1 et TIM8-->
         <RefParameter Name="RepetitionCounter" Comment="Repetition Counter (RCR - 8 bits value)" DefaultValue="0" Max="255" Min="0" Type="integer" Group="Counter Settings">
-        <Condition Diagnostic="" Expression="($IpNumber=1)|($IpNumber=8)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17)"/>
+        <Condition Diagnostic="" Expression="($IpNumber=1)|($IpNumber=8)|($IpNumber=20)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17)"/>
         </RefParameter>
         <RefParameter Name="RepetitionCounter" Comment="Repetition Counter (RCR)" DefaultValue="null" Max="0" Min="0" Type="integer" Group="Counter Settings" Visible="false">
-        <Condition Diagnostic="" Expression="!(($IpNumber=1)|($IpNumber=8)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17))"/>
+        <Condition Diagnostic="" Expression="!(($IpNumber=1)|($IpNumber=8)|($IpNumber=20)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17))"/>
         </RefParameter>
 <!-- ___________________________________________-->
         <!-- **********************************************************************-->
@@ -121,29 +122,29 @@
             <PossibleValue Value="TIM_CLOCKSOURCE_TI2" Comment="clock_TI2FP2" />
         </RefParameter>
 <!--_____________________________Clock Prescaler ________________________-->
-        <RefParameter Name="ClockPrescaler" Comment="Clock Prescaler" DefaultValue="TIM_CLOCKPRESCALER_DIV1" Type="list" visible="true" Group="Clock">
+        <RefParameter Name="ClockPrescaler" Comment="Clock Prescaler" DefaultValue="TIM_CLOCKPRESCALER_DIV1" Type="list" Group="Clock">
             <Condition Diagnostic="" Expression="(Semaphore_ClockSourceETRMode1$IpInstance|Semaphore_ClockSourceETRMode2$IpInstance)"/>
             <PossibleValue Value="TIM_CLOCKPRESCALER_DIV1" Comment="Prescaler not used"/> <!--for ETR & TIx-->
             <PossibleValue Value="TIM_CLOCKPRESCALER_DIV2" Comment="Capture performed once every 2 events"/><!--for ETR-->
             <PossibleValue Value="TIM_CLOCKPRESCALER_DIV4" Comment="Capture performed once every 4 events"/><!--for ETR-->
             <PossibleValue Value="TIM_CLOCKPRESCALER_DIV8" Comment="Capture performed once every 8 events"/><!--for ETR-->
         </RefParameter>
-        <RefParameter Name="ClockPrescaler" Comment="Clock Prescaler" DefaultValue="null" Type="list" visible="false" Group="Clock">
+        <RefParameter Name="ClockPrescaler" Comment="Clock Prescaler" DefaultValue="null" Type="list" Visible="false" Group="Clock">
             <Condition Diagnostic="" Expression="!(Semaphore_ClockSourceETRMode1$IpInstance|Semaphore_ClockSourceETRMode2$IpInstance)"/>
         </RefParameter>
 <!--_____________________________Clock polarity ________________________-->
-        <RefParameter Name="ClockPolarity" Comment="Clock Polarity" DefaultValue="TIM_CLOCKPOLARITY_BOTHEDGE" Type="list" visible="true" Group="Clock">
+        <RefParameter Name="ClockPolarity" Comment="Clock Polarity" DefaultValue="TIM_CLOCKPOLARITY_BOTHEDGE" Type="list" Group="Clock">
             <Condition Diagnostic="" Expression="Semaphore_ClockSourceTI2FP2$IpInstance | Semaphore_ClockSourceTI1FP1$IpInstance | Semaphore_ClockSourceTI1ED$IpInstance "/>
             <PossibleValue Value="TIM_CLOCKPOLARITY_RISING" Comment="Rising Edge" /> <!--for TIx-->
             <PossibleValue Value="TIM_CLOCKPOLARITY_FALLING" Comment="Falling Edge"/> <!--for TIx-->
             <PossibleValue Value="TIM_CLOCKPOLARITY_BOTHEDGE" Comment="Both Edges" /> <!--for TIx-->
         </RefParameter>
-        <RefParameter Name="ClockPolarity" Comment="Clock Polarity" DefaultValue="TIM_CLOCKPOLARITY_NONINVERTED" Type="list" visible="true" Group="Clock">
+        <RefParameter Name="ClockPolarity" Comment="Clock Polarity" DefaultValue="TIM_CLOCKPOLARITY_NONINVERTED" Type="list" Group="Clock">
             <Condition Diagnostic="" Expression="Semaphore_ClockSourceETRMode1$IpInstance|Semaphore_ClockSourceETRMode2$IpInstance"/>
             <PossibleValue Value="TIM_CLOCKPOLARITY_INVERTED" Comment="Inverted" /> <!--for ETR-->
             <PossibleValue Value="TIM_CLOCKPOLARITY_NONINVERTED" Comment="non inverted"/> <!--for ETR-->
         </RefParameter>
-        <RefParameter Name="ClockPolarity" Comment="Clock Polarity" DefaultValue="null" Type="list" visible="false" Group="Clock">
+        <RefParameter Name="ClockPolarity" Comment="Clock Polarity" DefaultValue="null" Type="list" Visible="false" Group="Clock">
             <Condition Diagnostic="" Expression="!(Semaphore_ClockSourceTI2FP2$IpInstance | Semaphore_ClockSourceTI1FP1$IpInstance | Semaphore_ClockSourceTI1ED$IpInstance  |Semaphore_ClockSourceETRMode1$IpInstance|Semaphore_ClockSourceETRMode2$IpInstance)"/>
         </RefParameter>
 <!--_____________________________Clock Filter ________________________-->
@@ -282,7 +283,9 @@
             <PossibleValue Value="TIM_INPUTCHANNELPOLARITY_RISING" Comment="Rising Edge" />
         </RefParameter>
 -->
-        <RefParameter Name="ICPolarity_TRC" Comment="Polarity Selection" DefaultValue="null" Type="list" Visible="false">
+<!-- ICPolarity_TRC : set to default value whatever the adjacent use cases-->
+        <RefParameter Name="ICPolarity_TRC" Comment="Polarity Selection" DefaultValue="TIM_INPUTCHANNELPOLARITY_RISING" Type="list" Visible="false">
+            <PossibleValue Value="TIM_INPUTCHANNELPOLARITY_RISING" Comment="Rising Edge" />
         </RefParameter>
 <!--ICSelection-->
         <RefParameter Name="ICSelection" Comment="IC Selection" DefaultValue="TIM_ICSELECTION_DIRECTTI" Type="list" >
@@ -333,7 +336,18 @@
         <RefParameter Name="ICFilter_CH4" Comment="Input Filter (4 bits value)" DefaultValue="0" Max="0" Min="0" Type="integer" Visible="false" >
             <Condition Diagnostic="" Expression=" !Semaphore_input_Channel4_direct$IpInstance"/>
         </RefParameter>
-        <RefParameter Name="ICFilter_TRC" Comment="Input Filter (4 bits value)" DefaultValue="null" Type="List" Visible="false" >
+<!--ICFilter_TRC =Slave_TriggerFilter$Input_Capture1_from_TRC -->
+        <RefParameter Name="ICFilter_TRC_TI1" Comment="Input Filter (4 bits value)" DefaultValue="=Slave_TriggerFilter$TriggerSource_TI1ED" Min="=Slave_TriggerFilter$TriggerSource_TI1ED" Max="=Slave_TriggerFilter$TriggerSource_TI1ED" Type="integer" Visible="false" >
+            <Condition Diagnostic="" Expression="Semaphore_TriggerSourceTI1ED$IpInstance"/>
+        </RefParameter>
+        <RefParameter Name="ICFilter_TRC_TI1" Comment="Input Filter (4 bits value)" DefaultValue="0" Min="0" Max="15" Type="integer" Visible="false" >
+            <Condition Diagnostic="" Expression="!Semaphore_TriggerSourceTI1ED$IpInstance"/>
+        </RefParameter>
+        <RefParameter Name="ICFilter_TRC_TI2" Comment="Input Filter (4 bits value)" DefaultValue="0" Min="0" Max="15" Type="integer" Visible="false" >
+        </RefParameter>
+        <RefParameter Name="ICFilter_TRC_TI3" Comment="Input Filter (4 bits value)" DefaultValue="0" Min="0" Max="15" Type="integer" Visible="false" >
+        </RefParameter>
+        <RefParameter Name="ICFilter_TRC_TI4" Comment="Input Filter (4 bits value)" DefaultValue="0" Min="0" Max="15" Type="integer" Visible="false" >
         </RefParameter>
 <!-- *************************common DATA for trigger and SMS **********************************************-->
         <RefParameter Name="TIM_InputTrigger_List" Comment="Input Trigger " DefaultValue="TIM_TS_ITR0" Type="list" >
@@ -485,18 +499,18 @@
         </RefParameter>
 <!-- *************************DATA for Output compare***********************************************-->
         <RefParameter Name="Pulse" Comment="Pulse (32 bits value)" DefaultValue="0" Max="4294967295" Min="0" Type="integer">
-        <Condition Diagnostic="for  TIM2 and TIM5" Expression="(($IpNumber=2)|($IpNumber=5))"/>
+        <Condition Diagnostic="" Expression="(($IpNumber=2)|($IpNumber=5))"/>
         </RefParameter>
         <RefParameter Name="Pulse" Comment="Pulse (16 bits value)" DefaultValue="0" Max="65535" Min="0" Type="integer">
-        <Condition Diagnostic="for all timers except TIM2 and TIM5" Expression="!(($IpNumber=2)|($IpNumber=5))"/>
+        <Condition Diagnostic="" Expression="!(($IpNumber=2)|($IpNumber=5))"/>
         </RefParameter>
  <RefParameter Name="OCMode_PWM" Comment="Mode" DefaultValue="TIM_OCMODE_PWM1" Type="list" >
-            <PossibleValue Value="TIM_OCMODE_PWM1" Comment="PWM mode 1"/>
-            <PossibleValue Value="TIM_OCMODE_PWM2" Comment="PWM mode 2"/>
+            <PossibleValue Value="TIM_OCMODE_PWM1" Comment="PWM mode 1" Semaphore="Semaphore_TIM_OCMODE_PWM1$IpInstance"/>
+            <PossibleValue Value="TIM_OCMODE_PWM2" Comment="PWM mode 2" Semaphore="Semaphore_TIM_OCMODE_PWM2$IpInstance"/>
          </RefParameter>
         <RefParameter Name="OCFastMode_PWM" Comment="Fast Mode" DefaultValue="TIM_OCFAST_DISABLE" Type="list">
             <PossibleValue Value="TIM_OCFAST_DISABLE" Comment="Disable"/>
-            <PossibleValue Value="TIM_OCFAST_ENABLE" Comment="Enable"/>
+            <PossibleValue Value="TIM_OCFAST_ENABLE" Comment="Enable" Condition="!(Semaphore_TIM_OCMODE_PWM1$IpInstance|Semaphore_TIM_OCMODE_PWM2$IpInstance)" Diagnostic="Fast mode is only available in Modes : PWM Mode 1 or PWM mode 2" Action="Disable"/>
          </RefParameter>
         <RefParameter Name="OCMode_forced" Comment="Mode" DefaultValue="TIM_OCMODE_FORCED_ACTIVE" Type="list" >
             <PossibleValue Value="TIM_OCMODE_FORCED_ACTIVE" Comment="Forced Active"/>
@@ -563,34 +577,58 @@
             <PossibleValue Value="TIM_OCMODE_FORCED_INACTIVE" Comment="Forced Inactive"/>
         </RefParameter>
         <RefParameter Name="Pulse_1" Comment="Pulse (16 bits value)" DefaultValue="0" Max="65535" Min="0" Type="integer">
-        <Condition Diagnostic="for all timers except TIM2 and TIM5" Expression="!(($IpNumber=2)|($IpNumber=5))"/>
+        <Condition Diagnostic="" Expression="!(($IpNumber=2)|($IpNumber=5))"/>
         </RefParameter>
         <RefParameter Name="Pulse_1" Comment="Pulse (32 bits value)" DefaultValue="0" Max="4294967295" Min="0" Type="integer">
-        <Condition Diagnostic="for TIM2 and TIM5" Expression="(($IpNumber=2)|($IpNumber=5))"/>
+        <Condition Diagnostic="" Expression="(($IpNumber=2)|($IpNumber=5))"/>
         </RefParameter>
         <RefParameter Name="Pulse_2" Comment="Pulse (16 bits value)" DefaultValue="0" Max="65535" Min="0" Type="integer">
-        <Condition Diagnostic="for all timers except TIM2 and TIM5" Expression="!(($IpNumber=2)|($IpNumber=5))"/>
+        <Condition Diagnostic="" Expression="!(($IpNumber=2)|($IpNumber=5))"/>
         </RefParameter>
         <RefParameter Name="Pulse_2" Comment="Pulse (32 bits value)" DefaultValue="0" Max="4294967295" Min="0" Type="integer">
-        <Condition Diagnostic="for TIM2 and TIM5" Expression="(($IpNumber=2)|($IpNumber=5))"/>
+        <Condition Diagnostic="" Expression="(($IpNumber=2)|($IpNumber=5))"/>
         </RefParameter>
         <RefParameter Name="Pulse_3" Comment="Pulse (16 bits value)" DefaultValue="0" Max="65535" Min="0" Type="integer">
-        <Condition Diagnostic="for all timers except TIM2 and TIM5" Expression="!(($IpNumber=2)|($IpNumber=5))"/>
+        <Condition Diagnostic="" Expression="!(($IpNumber=2)|($IpNumber=5))"/>
         </RefParameter>
         <RefParameter Name="Pulse_3" Comment="Pulse (32 bits value)" DefaultValue="0" Max="4294967295" Min="0" Type="integer">
-        <Condition Diagnostic="for TIM2 and TIM5" Expression="(($IpNumber=2)|($IpNumber=5))"/>
+        <Condition Diagnostic="" Expression="(($IpNumber=2)|($IpNumber=5))"/>
         </RefParameter>
+<!--
         <RefParameter Name="OCPolarity_1" Comment="CH Polarity" DefaultValue="null" Type="list" >
             <Condition Diagnostic="" Expression="!Semaphore_Channel1x$IpInstance"/>
         </RefParameter>
+-->
+        <RefParameter Name="OCPolarity_1" Comment="CH Polarity" DefaultValue="TIM_OCPOLARITY_HIGH" Type="list" Visible="false" >
+            <Condition Diagnostic="" Expression="!Semaphore_Channel1x$IpInstance"/>
+            <PossibleValue Value="TIM_OCPOLARITY_HIGH" Comment="High"/>
+        </RefParameter>
+<!--
         <RefParameter Name="OCPolarity_2" Comment="CH Polarity" DefaultValue="null" Type="list" >
             <Condition Diagnostic="" Expression="!Semaphore_Channel2x$IpInstance"/>
         </RefParameter>
+-->
+        <RefParameter Name="OCPolarity_2" Comment="CH Polarity" DefaultValue="TIM_OCPOLARITY_HIGH" Type="list" Visible="false" >
+            <Condition Diagnostic="" Expression="!Semaphore_Channel2x$IpInstance"/>
+            <PossibleValue Value="TIM_OCPOLARITY_HIGH" Comment="High"/>
+        </RefParameter>
+<!--
         <RefParameter Name="OCPolarity_3" Comment="CH Polarity" DefaultValue="null" Type="list" >
             <Condition Diagnostic="" Expression="!Semaphore_Channel3x$IpInstance"/>
         </RefParameter>
+-->
+        <RefParameter Name="OCPolarity_3" Comment="CH Polarity" DefaultValue="TIM_OCPOLARITY_HIGH" Type="list" Visible="false" >
+            <Condition Diagnostic="" Expression="!Semaphore_Channel3x$IpInstance"/>
+            <PossibleValue Value="TIM_OCPOLARITY_HIGH" Comment="High"/>
+        </RefParameter>
+<!--
         <RefParameter Name="OCPolarity_4" Comment="CH Polarity" DefaultValue="null" Type="list" >
             <Condition Diagnostic="" Expression="!Semaphore_Channel4x$IpInstance"/>
+        </RefParameter>
+-->
+        <RefParameter Name="OCPolarity_4" Comment="CH Polarity" DefaultValue="TIM_OCPOLARITY_HIGH" Type="list" Visible="false" >
+            <Condition Diagnostic="" Expression="!Semaphore_Channel4x$IpInstance"/>
+            <PossibleValue Value="TIM_OCPOLARITY_HIGH" Comment="High"/>
         </RefParameter>
         <RefParameter Name="OCPolarity_1" Comment="CH Polarity" DefaultValue="TIM_OCPOLARITY_HIGH" Type="list" >
             <Condition Diagnostic="" Expression="Semaphore_Channel1x$IpInstance"/>
@@ -614,93 +652,172 @@
         </RefParameter>
 <!-- only for tim1 and tim8 -->
         <RefParameter Name="OCNPolarity_1" Comment="CHN Polarity" DefaultValue="TIM_OCNPOLARITY_HIGH" Type="list" >
-            <Condition Diagnostic="only for TIM1 and TIM8" Expression="((($IpNumber=1)|($IpNumber=8)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17)) &amp; Semaphore_Channel1N$IpInstance)"/>
+            <Condition Diagnostic="" Expression="((($IpNumber=1)|($IpNumber=8)|($IpNumber=20)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17)) &amp; Semaphore_Channel1N$IpInstance)"/>
             <PossibleValue Value="TIM_OCNPOLARITY_HIGH" Comment="High"/>
             <PossibleValue Value="TIM_OCNPOLARITY_LOW" Comment="Low"/>
+        </RefParameter>
+        <RefParameter Name="OCNPolarity_1" Comment="CHN Polarity" DefaultValue="TIM_OCNPOLARITY_HIGH" Type="list" Visible="false">
+            <Condition Diagnostic="" Expression="((($IpNumber=1)|($IpNumber=8)|($IpNumber=20)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17)) &amp; !Semaphore_Channel1N$IpInstance)"/>
+            <PossibleValue Value="TIM_OCNPOLARITY_HIGH" Comment="High"/>
         </RefParameter>
         <RefParameter Name="OCNPolarity_2" Comment="CHN Polarity" DefaultValue="TIM_OCNPOLARITY_HIGH" Type="list" >
-             <Condition Diagnostic="only for TIM1 and TIM8" Expression="((($IpNumber=1)|($IpNumber=8)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17))&amp; Semaphore_Channel2N$IpInstance)"/>
+             <Condition Diagnostic="" Expression="((($IpNumber=1)|($IpNumber=8)|($IpNumber=20)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17))&amp; Semaphore_Channel2N$IpInstance)"/>
             <PossibleValue Value="TIM_OCNPOLARITY_HIGH" Comment="High"/>
             <PossibleValue Value="TIM_OCNPOLARITY_LOW" Comment="Low"/>
+        </RefParameter>
+        <RefParameter Name="OCNPolarity_2" Comment="CHN Polarity" DefaultValue="TIM_OCNPOLARITY_HIGH" Type="list" Visible="false">
+            <Condition Diagnostic="" Expression="((($IpNumber=1)|($IpNumber=8)|($IpNumber=20)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17)) &amp; !Semaphore_Channel2N$IpInstance)"/>
+            <PossibleValue Value="TIM_OCNPOLARITY_HIGH" Comment="High"/>
         </RefParameter>
         <RefParameter Name="OCNPolarity_3" Comment="CHN Polarity" DefaultValue="TIM_OCNPOLARITY_HIGH" Type="list" >
-             <Condition Diagnostic="only for TIM1 and TIM8" Expression="((($IpNumber=1)|($IpNumber=8)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17))&amp; Semaphore_Channel3N$IpInstance)"/>
+             <Condition Diagnostic="" Expression="((($IpNumber=1)|($IpNumber=8)|($IpNumber=20)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17))&amp; Semaphore_Channel3N$IpInstance)"/>
             <PossibleValue Value="TIM_OCNPOLARITY_HIGH" Comment="High"/>
             <PossibleValue Value="TIM_OCNPOLARITY_LOW" Comment="Low"/>
         </RefParameter>
+        <RefParameter Name="OCNPolarity_3" Comment="CHN Polarity" DefaultValue="TIM_OCNPOLARITY_HIGH" Type="list" Visible="false">
+            <Condition Diagnostic="" Expression="((($IpNumber=1)|($IpNumber=8)|($IpNumber=20)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17)) &amp; !Semaphore_Channel3N$IpInstance)"/>
+            <PossibleValue Value="TIM_OCNPOLARITY_HIGH" Comment="High"/>
+        </RefParameter>
+<!--
        <RefParameter Name="OCNPolarity_1" Comment="CHN Polarity" DefaultValue="null" Type="list" >
-            <Condition Diagnostic="only for TIM1 and TIM8" Expression="!((($IpNumber=1)|($IpNumber=8)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17))|(!Semaphore_Channel1N$IpInstance))"/>
+            <Condition Diagnostic="" Expression="!((($IpNumber=1)|($IpNumber=8)|($IpNumber=20)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17))|(!Semaphore_Channel1N$IpInstance))"/>
         </RefParameter>
+-->
+       <RefParameter Name="OCNPolarity_1" Comment="CHN Polarity" DefaultValue="null" Type="list" Visible="false">
+            <Condition Diagnostic="" Expression="!((($IpNumber=1)|($IpNumber=8)|($IpNumber=20)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17)))"/>
+        </RefParameter>
+<!--
         <RefParameter Name="OCNPolarity_2" Comment="CHN Polarity" DefaultValue="null" Type="list" >
-             <Condition Diagnostic="only for TIM1 and TIM8" Expression="!((($IpNumber=1)|($IpNumber=8)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17))|(!Semaphore_Channel2N$IpInstance))"/>
+             <Condition Diagnostic="" Expression="!((($IpNumber=1)|($IpNumber=8)|($IpNumber=20)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17))|(!Semaphore_Channel2N$IpInstance))"/>
         </RefParameter>
+-->
+        <RefParameter Name="OCNPolarity_2" Comment="CHN Polarity" DefaultValue="null" Type="list" Visible="false" >
+             <Condition Diagnostic="" Expression="!((($IpNumber=1)|($IpNumber=8)|($IpNumber=20)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17)))"/>
+        </RefParameter>
+<!--
         <RefParameter Name="OCNPolarity_3" Comment="CHN Polarity" DefaultValue="null" Type="list" >
-             <Condition Diagnostic="only for TIM1 and TIM8" Expression="!((($IpNumber=1)|($IpNumber=8)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17))|(!Semaphore_Channel3N$IpInstance))"/>
+             <Condition Diagnostic="" Expression="!((($IpNumber=1)|($IpNumber=8)|($IpNumber=20)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17))|(!Semaphore_Channel3N$IpInstance))"/>
+        </RefParameter>
+-->
+        <RefParameter Name="OCNPolarity_3" Comment="CHN Polarity" DefaultValue="null" Type="list" Visible="false" >
+             <Condition Diagnostic="" Expression="!((($IpNumber=1)|($IpNumber=8)|($IpNumber=20)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17)))"/>
         </RefParameter>
 <!--OC Idle state parameter only for TIM1 and TIM8 -->
         <RefParameter Name="OCIdleState_1" Comment="CH Idle State" DefaultValue="TIM_OCIDLESTATE_RESET" Type="list">
-        <Condition Diagnostic="only for TIM1 and TIM8" Expression="((($IpNumber=1)|($IpNumber=8)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17)) &amp; Semaphore_Channel1x$IpInstance)"/>
+        <Condition Diagnostic="" Expression="((($IpNumber=1)|($IpNumber=8)|($IpNumber=20)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17)) &amp; Semaphore_Channel1x$IpInstance)"/>
             <PossibleValue Value="TIM_OCIDLESTATE_SET" Comment="Set"/>
+            <PossibleValue Value="TIM_OCIDLESTATE_RESET" Comment="Reset"/>
+         </RefParameter>
+        <RefParameter Name="OCIdleState_1" Comment="CH Idle State" DefaultValue="TIM_OCIDLESTATE_RESET" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="((($IpNumber=1)|($IpNumber=8)|($IpNumber=20)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17)) &amp;!Semaphore_Channel1x$IpInstance)"/>
             <PossibleValue Value="TIM_OCIDLESTATE_RESET" Comment="Reset"/>
          </RefParameter>
         <RefParameter Name="OCIdleState_2" Comment="CH Idle State" DefaultValue="TIM_OCIDLESTATE_RESET" Type="list">
-        <Condition Diagnostic="only for TIM1 and TIM8" Expression="((($IpNumber=1)|($IpNumber=8)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17))&amp; Semaphore_Channel2x$IpInstance)"/>
+        <Condition Diagnostic="" Expression="((($IpNumber=1)|($IpNumber=8)|($IpNumber=20)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17))&amp; Semaphore_Channel2x$IpInstance)"/>
             <PossibleValue Value="TIM_OCIDLESTATE_SET" Comment="Set"/>
+            <PossibleValue Value="TIM_OCIDLESTATE_RESET" Comment="Reset"/>
+         </RefParameter>
+        <RefParameter Name="OCIdleState_2" Comment="CH Idle State" DefaultValue="TIM_OCIDLESTATE_RESET" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="((($IpNumber=1)|($IpNumber=8)|($IpNumber=20)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17)) &amp;!Semaphore_Channel2x$IpInstance)"/>
             <PossibleValue Value="TIM_OCIDLESTATE_RESET" Comment="Reset"/>
          </RefParameter>
         <RefParameter Name="OCIdleState_3" Comment="CH Idle State" DefaultValue="TIM_OCIDLESTATE_RESET" Type="list">
-        <Condition Diagnostic="only for TIM1 and TIM8" Expression="((($IpNumber=1)|($IpNumber=8)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17))&amp; Semaphore_Channel3x$IpInstance)"/>
+        <Condition Diagnostic="" Expression="((($IpNumber=1)|($IpNumber=8)|($IpNumber=20)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17))&amp; Semaphore_Channel3x$IpInstance)"/>
             <PossibleValue Value="TIM_OCIDLESTATE_SET" Comment="Set"/>
+            <PossibleValue Value="TIM_OCIDLESTATE_RESET" Comment="Reset"/>
+         </RefParameter>
+        <RefParameter Name="OCIdleState_3" Comment="CH Idle State" DefaultValue="TIM_OCIDLESTATE_RESET" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="((($IpNumber=1)|($IpNumber=8)|($IpNumber=20)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17)) &amp;!Semaphore_Channel3x$IpInstance)"/>
             <PossibleValue Value="TIM_OCIDLESTATE_RESET" Comment="Reset"/>
          </RefParameter>
       <RefParameter Name="OCIdleState_4" Comment="CH Idle State" DefaultValue="TIM_OCIDLESTATE_RESET" Type="list">
-        <Condition Diagnostic="only for TIM1 and TIM8" Expression="((($IpNumber=1)|($IpNumber=8)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17))&amp; Semaphore_Channel4x$IpInstance)"/>
+        <Condition Diagnostic="" Expression="((($IpNumber=1)|($IpNumber=8)|($IpNumber=20)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17))&amp; Semaphore_Channel4x$IpInstance)"/>
             <PossibleValue Value="TIM_OCIDLESTATE_SET" Comment="Set"/>
             <PossibleValue Value="TIM_OCIDLESTATE_RESET" Comment="Reset"/>
          </RefParameter>
+        <RefParameter Name="OCIdleState_4" Comment="CH Idle State" DefaultValue="TIM_OCIDLESTATE_RESET" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="((($IpNumber=1)|($IpNumber=8)|($IpNumber=20)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17)) &amp;!Semaphore_Channel4x$IpInstance)"/>
+            <PossibleValue Value="TIM_OCIDLESTATE_RESET" Comment="Reset"/>
+         </RefParameter>
         <RefParameter Name="OCNIdleState_1" Comment="CHN Idle State" DefaultValue="TIM_OCNIDLESTATE_RESET" Type="list">
-        <Condition Diagnostic="only for TIM1 and TIM8" Expression="((($IpNumber=1)|($IpNumber=8)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17))&amp; Semaphore_Channel1N$IpInstance)"/>
+        <Condition Diagnostic="" Expression="((($IpNumber=1)|($IpNumber=8)|($IpNumber=20)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17))&amp; Semaphore_Channel1N$IpInstance)"/>
             <PossibleValue Value="TIM_OCNIDLESTATE_SET" Comment="Set"/>
+            <PossibleValue Value="TIM_OCNIDLESTATE_RESET" Comment="Reset"/>
+        </RefParameter>
+        <RefParameter Name="OCNIdleState_1" Comment="CHN Idle State" DefaultValue="TIM_OCNIDLESTATE_RESET" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="((($IpNumber=1)|($IpNumber=8)|($IpNumber=20)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17))&amp; !Semaphore_Channel1N$IpInstance)"/>
             <PossibleValue Value="TIM_OCNIDLESTATE_RESET" Comment="Reset"/>
         </RefParameter>
         <RefParameter Name="OCNIdleState_2" Comment="CHN Idle State" DefaultValue="TIM_OCNIDLESTATE_RESET" Type="list">
-        <Condition Diagnostic="only for TIM1 and TIM8" Expression="((($IpNumber=1)|($IpNumber=8)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17))&amp; Semaphore_Channel2N$IpInstance)"/>
+        <Condition Diagnostic="" Expression="((($IpNumber=1)|($IpNumber=8)|($IpNumber=20)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17))&amp; Semaphore_Channel2N$IpInstance)"/>
             <PossibleValue Value="TIM_OCNIDLESTATE_SET" Comment="Set"/>
+            <PossibleValue Value="TIM_OCNIDLESTATE_RESET" Comment="Reset"/>
+        </RefParameter>
+        <RefParameter Name="OCNIdleState_2" Comment="CHN Idle State" DefaultValue="TIM_OCNIDLESTATE_RESET" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="((($IpNumber=1)|($IpNumber=8)|($IpNumber=20)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17))&amp; !Semaphore_Channel2N$IpInstance)"/>
             <PossibleValue Value="TIM_OCNIDLESTATE_RESET" Comment="Reset"/>
         </RefParameter>
         <RefParameter Name="OCNIdleState_3" Comment="CHN Idle State" DefaultValue="TIM_OCNIDLESTATE_RESET" Type="list">
-        <Condition Diagnostic="only for TIM1 and TIM8" Expression="((($IpNumber=1)|($IpNumber=8)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17))&amp; Semaphore_Channel3N$IpInstance)"/>
+        <Condition Diagnostic="" Expression="((($IpNumber=1)|($IpNumber=8)|($IpNumber=20)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17))&amp; Semaphore_Channel3N$IpInstance)"/>
             <PossibleValue Value="TIM_OCNIDLESTATE_SET" Comment="Set"/>
+            <PossibleValue Value="TIM_OCNIDLESTATE_RESET" Comment="Reset"/>
+        </RefParameter>
+        <RefParameter Name="OCNIdleState_3" Comment="CHN Idle State" DefaultValue="TIM_OCNIDLESTATE_RESET" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="((($IpNumber=1)|($IpNumber=8)|($IpNumber=20)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17))&amp; !Semaphore_Channel3N$IpInstance)"/>
             <PossibleValue Value="TIM_OCNIDLESTATE_RESET" Comment="Reset"/>
         </RefParameter>
      <RefParameter Name="OCNIdleState_4" Comment="CHN Idle State" DefaultValue="TIM_OCNIDLESTATE_RESET" Type="list">
-        <Condition Diagnostic="only for TIM1 and TIM8" Expression="((($IpNumber=1)|($IpNumber=8)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17))&amp; Semaphore_Channel4N$IpInstance)"/>
+        <Condition Diagnostic="" Expression="((($IpNumber=1)|($IpNumber=8)|($IpNumber=20)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17))&amp; Semaphore_Channel4N$IpInstance)"/>
             <PossibleValue Value="TIM_OCNIDLESTATE_SET" Comment="Set"/>
             <PossibleValue Value="TIM_OCNIDLESTATE_RESET" Comment="Reset"/>
         </RefParameter>
+        <RefParameter Name="OCNIdleState_4" Comment="CHN Idle State" DefaultValue="TIM_OCNIDLESTATE_RESET" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="((($IpNumber=1)|($IpNumber=8)|($IpNumber=20)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17))&amp; !Semaphore_Channel4N$IpInstance)"/>
+            <PossibleValue Value="TIM_OCNIDLESTATE_RESET" Comment="Reset"/>
+        </RefParameter>
         <RefParameter Name="OCIdleState_1" Comment="CH Idle State" DefaultValue="null" Type="list" Visible="false">
-        <Condition Diagnostic="only for TIM1 and TIM8" Expression="!(($IpNumber=1)|($IpNumber=8)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17)|(!Semaphore_Channel1x$IpInstance))"/>
+        <Condition Diagnostic="" Expression="!(($IpNumber=1)|($IpNumber=8)|($IpNumber=20)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17)|(!Semaphore_Channel1x$IpInstance))"/>
         </RefParameter>
         <RefParameter Name="OCIdleState_2" Comment="CH Idle State" DefaultValue="null" Type="list" Visible="false">
-        <Condition Diagnostic="only for TIM1 and TIM8" Expression="!(($IpNumber=1)|($IpNumber=8)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17)|(!Semaphore_Channel2x$IpInstance))"/>
+        <Condition Diagnostic="" Expression="!(($IpNumber=1)|($IpNumber=8)|($IpNumber=20)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17)|(!Semaphore_Channel2x$IpInstance))"/>
         </RefParameter>
         <RefParameter Name="OCIdleState_3" Comment="CH Idle State" DefaultValue="null" Type="list" Visible="false" >
-        <Condition Diagnostic="only for TIM1 and TIM8" Expression="!(($IpNumber=1)|($IpNumber=8)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17)|(!Semaphore_Channel3x$IpInstance))"/>
+        <Condition Diagnostic="" Expression="!(($IpNumber=1)|($IpNumber=8)|($IpNumber=20)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17)|(!Semaphore_Channel3x$IpInstance))"/>
          </RefParameter>
         <RefParameter Name="OCIdleState_4" Comment="CH Idle State" DefaultValue="null" Type="list" Visible="false" >
-        <Condition Diagnostic="only for TIM1 and TIM8" Expression="!(($IpNumber=1)|($IpNumber=8)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17)|(!Semaphore_Channel4x$IpInstance))"/>
+        <Condition Diagnostic="" Expression="!(($IpNumber=1)|($IpNumber=8)|($IpNumber=20)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17)|(!Semaphore_Channel4x$IpInstance))"/>
          </RefParameter>
+<!--
         <RefParameter Name="OCNIdleState_1" Comment="CHN Idle State" DefaultValue="null" Type="list" Visible="false">
-        <Condition Diagnostic="only for TIM1 and TIM8" Expression="!(($IpNumber=1)|($IpNumber=8)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17)|(!Semaphore_Channel1N$IpInstance))"/>
+        <Condition Diagnostic="" Expression="!(($IpNumber=1)|($IpNumber=8)|($IpNumber=20)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17)|(!Semaphore_Channel1N$IpInstance))"/>
          </RefParameter>
+-->
+        <RefParameter Name="OCNIdleState_1" Comment="CHN Idle State" DefaultValue="null" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="!(($IpNumber=1)|($IpNumber=8)|($IpNumber=20)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17))"/>
+         </RefParameter>
+<!--
         <RefParameter Name="OCNIdleState_2" Comment="CHN Idle State" DefaultValue="null" Type="list" Visible="false">
-        <Condition Diagnostic="only for TIM1 and TIM8" Expression="!(($IpNumber=1)|($IpNumber=8)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17)|(!Semaphore_Channel2N$IpInstance))"/>
+        <Condition Diagnostic="" Expression="!(($IpNumber=1)|($IpNumber=8)|($IpNumber=20)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17)|(!Semaphore_Channel2N$IpInstance))"/>
         </RefParameter>
+-->
+        <RefParameter Name="OCNIdleState_2" Comment="CHN Idle State" DefaultValue="null" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="!(($IpNumber=1)|($IpNumber=8)|($IpNumber=20)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17))"/>
+        </RefParameter>
+<!--
         <RefParameter Name="OCNIdleState_3" Comment="CHN Idle State" DefaultValue="null" Type="list" Visible="false">
-        <Condition Diagnostic="only for TIM1 and TIM8" Expression="!(($IpNumber=1)|($IpNumber=8)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17)|(!Semaphore_Channel3N$IpInstance))"/>
+        <Condition Diagnostic="" Expression="!(($IpNumber=1)|($IpNumber=8)|($IpNumber=20)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17)|(!Semaphore_Channel3N$IpInstance))"/>
         </RefParameter>
+-->
+        <RefParameter Name="OCNIdleState_3" Comment="CHN Idle State" DefaultValue="null" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="!(($IpNumber=1)|($IpNumber=8)|($IpNumber=20)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17))"/>
+        </RefParameter>
+<!--
      <RefParameter Name="OCNIdleState_4" Comment="CHN Idle State" DefaultValue="null" Type="list" Visible="false">
-        <Condition Diagnostic="only for TIM1 and TIM8" Expression="!(($IpNumber=1)|($IpNumber=8)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17)|(!Semaphore_Channel4N$IpInstance))"/>
+        <Condition Diagnostic="" Expression="!(($IpNumber=1)|($IpNumber=8)|($IpNumber=20)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17)|(!Semaphore_Channel4N$IpInstance))"/>
+        </RefParameter>
+-->
+     <RefParameter Name="OCNIdleState_4" Comment="CHN Idle State" DefaultValue="null" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="!(($IpNumber=1)|($IpNumber=8)|($IpNumber=20)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17))"/>
         </RefParameter>
 <!--OC Idle state parameter only for TIM1 and TIM8 -->
 <!-- *************************DATA for ENCODER***********************************************-->
@@ -753,7 +870,7 @@
 <!-- ******************************** TRGO refparameter *********************************-->
 <!-- TIM_MasterOutputTrigger TIMER INSTANCE DEPENDENT -->
 <!-- parametrage limite pour TIM6 et TIM7-->
-    <RefParameter Name="TIM_MasterOutputTrigger" Comment="Trigger Event Selection" DefaultValue="TIM_TRGO_RESET" Type="list" Group="Trigger Ouput (TRGO) Parameters">
+    <RefParameter Name="TIM_MasterOutputTrigger" Comment="Trigger Event Selection" DefaultValue="TIM_TRGO_RESET" Type="list" Group="Trigger Output (TRGO) Parameters">
         <Condition Diagnostic="" Expression="!(($IpNumber=6)|($IpNumber=7)|($IpNumber=18)|($IpNumber=9)|($IpNumber=12)|($IpNumber=10)|($IpNumber=11)|($IpNumber=13)|($IpNumber=14)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17)|($IpNumber=21)|($IpNumber=22))"/>
         <PossibleValue Value="TIM_TRGO_RESET" Comment="Reset (UG bit from TIMx_EGR)"/>
         <PossibleValue Value="TIM_TRGO_ENABLE" Comment="Enable (CNT_EN)"/>
@@ -764,7 +881,7 @@
         <PossibleValue Value="TIM_TRGO_OC3REF" Comment="Output Compare (OC3REF)"/>
         <PossibleValue Value="TIM_TRGO_OC4REF" Comment="Output Compare (OC4REF)"/>
     </RefParameter>
-     <RefParameter Name="TIM_MasterOutputTrigger" Comment="Trigger Event Selection" DefaultValue="TIM_TRGO_RESET" Type="list" Group="Trigger Ouput (TRGO) Parameters">
+     <RefParameter Name="TIM_MasterOutputTrigger" Comment="Trigger Event Selection" DefaultValue="TIM_TRGO_RESET" Type="list" Group="Trigger Output (TRGO) Parameters">
         <Condition Diagnostic="" Expression="($IpNumber=15)|($IpNumber=21)|($IpNumber=22)"/>
         <PossibleValue Value="TIM_TRGO_RESET" Comment="Reset (UG bit from TIMx_EGR)"/>
         <PossibleValue Value="TIM_TRGO_ENABLE" Comment="Enable (CNT_EN)"/>
@@ -773,25 +890,25 @@
         <PossibleValue Value="TIM_TRGO_OC1REF" Comment="Output Compare (OC1REF)"/>
         <PossibleValue Value="TIM_TRGO_OC2REF" Comment="Output Compare (OC2REF)"/>
      </RefParameter>
-    <RefParameter Name="TIM_MasterOutputTrigger" Comment="Trigger Event Selection" DefaultValue="TIM_TRGO_RESET" Type="list" Group="Trigger Ouput (TRGO) Parameters">
+    <RefParameter Name="TIM_MasterOutputTrigger" Comment="Trigger Event Selection" DefaultValue="TIM_TRGO_RESET" Type="list" Group="Trigger Output (TRGO) Parameters">
         <Condition Diagnostic="" Expression="(($IpNumber=6)|($IpNumber=7)|($IpNumber=18))"/>
         <PossibleValue Value="TIM_TRGO_RESET" Comment="Reset (UG bit from TIMx_EGR)"/>
         <PossibleValue Value="TIM_TRGO_ENABLE" Comment="Enable (CNT_EN)"/>
         <PossibleValue Value="TIM_TRGO_UPDATE" Comment="Update Event"/>
     </RefParameter>
-    <RefParameter Name="TIM_MasterOutputTrigger" Comment="Trigger Event Selection" DefaultValue="null" Type="list" Group="Trigger Ouput (TRGO) Parameters" Visible="false">
+    <RefParameter Name="TIM_MasterOutputTrigger" Comment="Trigger Event Selection" DefaultValue="null" Type="list" Group="Trigger Output (TRGO) Parameters" Visible="false">
         <Condition Diagnostic="" Expression="(($IpNumber=9)|($IpNumber=12)|($IpNumber=10)|($IpNumber=11)|($IpNumber=13)|($IpNumber=14)|($IpNumber=16)|($IpNumber=17))"/>
     </RefParameter>
-    <RefParameter Name="TIM_MasterSlaveMode" Comment="Master/Slave Mode  " DefaultValue="TIM_MASTERSLAVEMODE_DISABLE" Type="list" Group="Trigger Ouput (TRGO) Parameters" Visible="true">
+    <RefParameter Name="TIM_MasterSlaveMode" Comment="Master/Slave Mode  " DefaultValue="TIM_MASTERSLAVEMODE_DISABLE" Type="list" Group="Trigger Output (TRGO) Parameters" Visible="true">
         <Condition Diagnostic="" Expression="!(($IpNumber=6)|($IpNumber=7)|($IpNumber=18)|($IpNumber=9)|($IpNumber=12)|($IpNumber=10)|($IpNumber=11)|($IpNumber=13)|($IpNumber=14)|($IpNumber=16)|($IpNumber=17))"/>
         <PossibleValue Value="TIM_MASTERSLAVEMODE_DISABLE" Comment="Disable (no sync between this TIM (Master) and its Slaves"/>
         <PossibleValue Value="TIM_MASTERSLAVEMODE_ENABLE" Comment="Enable (sync between this TIM (Master) and its Slaves (through TRGO))"/>
     </RefParameter>
-    <RefParameter Name="TIM_MasterSlaveMode" Comment="Master/Slave Mode  " DefaultValue="null" Type="list" Group="Trigger Ouput (TRGO) Parameters" Visible="false">
+    <RefParameter Name="TIM_MasterSlaveMode" Comment="Master/Slave Mode  " DefaultValue="null" Type="list" Group="Trigger Output (TRGO) Parameters" Visible="false">
         <Condition Diagnostic="" Expression="(($IpNumber=9)|($IpNumber=12)|($IpNumber=10)|($IpNumber=11)|($IpNumber=13)|($IpNumber=14)|($IpNumber=16)|($IpNumber=17))"/>
 <!-- <PossibleValue Value="TIM_MASTERSLAVEMODE_DISABLE" Comment="Disable (no sync between this TIM (Master) and its Slaves"/>-->
     </RefParameter>
-    <RefParameter Name="TIM_MasterSlaveMode" Comment="Master/Slave Mode  " DefaultValue="TIM_MASTERSLAVEMODE_DISABLE" Type="list" Group="Trigger Ouput (TRGO) Parameters" Visible="false">
+    <RefParameter Name="TIM_MasterSlaveMode" Comment="Master/Slave Mode  " DefaultValue="TIM_MASTERSLAVEMODE_DISABLE" Type="list" Group="Trigger Output (TRGO) Parameters" Visible="false">
         <Condition Diagnostic="" Expression="(($IpNumber=6)|($IpNumber=7)|($IpNumber=18))"/>
         <PossibleValue Value="TIM_MASTERSLAVEMODE_DISABLE" Comment="Disable (no sync between this TIM (Master) and its Slaves"/>
     </RefParameter>
@@ -799,65 +916,76 @@
 <!-- all parameters only present for TIM1&TIM8-->
 <!-- DeadTime, OSSR, OSSI only present if a channel has both X and XN outputs -->
     <RefParameter Name="DeadTime" Comment="Dead Time" DefaultValue="0" Max="255" Min="0" Type="integer" Group="Break And Dead Time management">
-        <Condition Diagnostic="" Expression="( ( ($IpNumber=1)|($IpNumber=8)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17) )&amp; Semaphore_output_X_XN$IpInstance )"/>
+        <Condition Diagnostic="" Expression="( ( ($IpNumber=1)|($IpNumber=8)|($IpNumber=20)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17) )&amp; Semaphore_output_X_XN$IpInstance )"/>
+    </RefParameter>
+    <RefParameter Name="DeadTime" Comment="Dead Time" DefaultValue="0" Max="0" Min="0" Type="integer" Group="Break And Dead Time management" Visible="false">
+        <Condition Diagnostic="" Expression="( ( ($IpNumber=1)|($IpNumber=8)|($IpNumber=20)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17) )&amp; !Semaphore_output_X_XN$IpInstance )&amp; Semaphore_output_Channel$IpInstance"/>
     </RefParameter>
     <RefParameter Name="DeadTime" Comment="Dead Time" DefaultValue="null" Max="0" Min="0" Type="integer" Group="Break And Dead Time management" Visible="false">
-        <Condition Diagnostic="" Expression="!( ( ($IpNumber=1)|($IpNumber=8)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17) )&amp; Semaphore_output_X_XN$IpInstance )"/>
+        <Condition Diagnostic="" Expression="!( ( ($IpNumber=1)|($IpNumber=8)|($IpNumber=20)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17)) &amp;Semaphore_output_Channel$IpInstance)"/>
     </RefParameter>
     <RefParameter Name="OffStateRunMode" Comment="Off State Selection for Run Mode (OSSR)  " DefaultValue="TIM_OSSR_DISABLE" Type="list" Group="Break And Dead Time management">
-        <Condition Diagnostic="" Expression="( ( ($IpNumber=1)|($IpNumber=8)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17) )&amp; Semaphore_output_X_XN$IpInstance )"/>
+        <Condition Diagnostic="" Expression="( ( (($IpNumber=1)&amp;Semaphore_OSSR_TIM_1_8_TIM1)|(($IpNumber=8)&amp;Semaphore_OSSR_TIM_1_8_TIM8)|(($IpNumber=20)&amp;Semaphore_OSSR_TIM_1_8_TIM20)|(($IpNumber=15)&amp;Semaphore_OSSR_TIM_15_16_17_TIM15)|(($IpNumber=16)&amp;Semaphore_OSSR_TIM_15_16_17_TIM16)|(($IpNumber=17)&amp;Semaphore_OSSR_TIM_15_16_17_TIM17) )&amp; Semaphore_output_Channel$IpInstance )&amp;!Semaphore_Activate_Break_Input2$IpInstance"/>
         <PossibleValue Value="TIM_OSSR_DISABLE" Comment="Disable"/>
         <PossibleValue Value="TIM_OSSR_ENABLE" Comment="Enable"/>
     </RefParameter>
+    <RefParameter Name="OffStateRunMode" Comment="Off State Selection for Run Mode (OSSR)  " DefaultValue="TIM_OSSR_ENABLE" Type="list" Group="Break And Dead Time management">
+        <Condition Diagnostic="" Expression="( ( (($IpNumber=1)&amp;Semaphore_OSSR_TIM_1_8_TIM1)|(($IpNumber=8)&amp;Semaphore_OSSR_TIM_1_8_TIM8)|(($IpNumber=20)&amp;Semaphore_OSSR_TIM_1_8_TIM20)|(($IpNumber=15)&amp;Semaphore_OSSR_TIM_15_16_17_TIM15)|(($IpNumber=16)&amp;Semaphore_OSSR_TIM_15_16_17_TIM16)|(($IpNumber=17)&amp;Semaphore_OSSR_TIM_15_16_17_TIM17) )&amp; Semaphore_output_Channel$IpInstance )&amp;Semaphore_Activate_Break_Input2$IpInstance"/>
+        <PossibleValue Value="TIM_OSSR_ENABLE" Comment="Enable"/>
+    </RefParameter>
     <RefParameter Name="OffStateRunMode" Comment="Off State Selection for Run Mode (OSSR)  " DefaultValue="null" Type="list" Group="Break And Dead Time management" Visible="false">
-        <Condition Diagnostic="" Expression="!( ( ($IpNumber=1)|($IpNumber=8)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17) )&amp; Semaphore_output_X_XN$IpInstance )"/>
+        <Condition Diagnostic="" Expression="!( ( (($IpNumber=1)&amp;Semaphore_OSSR_TIM_1_8_TIM1)|(($IpNumber=8)&amp;Semaphore_OSSR_TIM_1_8_TIM8)|(($IpNumber=20)&amp;Semaphore_OSSR_TIM_1_8_TIM20)|(($IpNumber=15)&amp;Semaphore_OSSR_TIM_15_16_17_TIM15)|(($IpNumber=16)&amp;Semaphore_OSSR_TIM_15_16_17_TIM16)|(($IpNumber=17)&amp;Semaphore_OSSR_TIM_15_16_17_TIM17) )&amp; Semaphore_output_Channel$IpInstance )"/>
     </RefParameter>
     <RefParameter Name="OffStateIDLEMode" Comment="Off State Selection for Idle Mode (OSSI)  " DefaultValue="TIM_OSSI_DISABLE" Type="list" Group="Break And Dead Time management" >
-    <Condition Diagnostic="" Expression="( ( ($IpNumber=1)|($IpNumber=8)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17) )&amp; Semaphore_output_X_XN$IpInstance )"/>
+    <Condition Diagnostic="" Expression="( ( ($IpNumber=1)|($IpNumber=8)|($IpNumber=20)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17) )&amp; Semaphore_output_Channel$IpInstance )&amp;!Semaphore_Activate_Break_Input2$IpInstance"/>
         <PossibleValue Value="TIM_OSSI_DISABLE" Comment="Disable"/>
         <PossibleValue Value="TIM_OSSI_ENABLE" Comment="Enable"/>
     </RefParameter>
+    <RefParameter Name="OffStateIDLEMode" Comment="Off State Selection for Idle Mode (OSSI)  " DefaultValue="TIM_OSSI_ENABLE" Type="list" Group="Break And Dead Time management" >
+    <Condition Diagnostic="" Expression="( ( ($IpNumber=1)|($IpNumber=8)|($IpNumber=20)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17) )&amp; Semaphore_output_Channel$IpInstance )&amp;Semaphore_Activate_Break_Input2$IpInstance"/>
+        <PossibleValue Value="TIM_OSSI_ENABLE" Comment="Enable"/>
+    </RefParameter>
     <RefParameter Name="OffStateIDLEMode" Comment="Off State Selection for Idle Mode (OSSI)  " DefaultValue="null" Type="list" Group="Break And Dead Time management" Visible="false">
-        <Condition Diagnostic="" Expression="!( ( ($IpNumber=1)|($IpNumber=8)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17) )&amp; Semaphore_output_X_XN$IpInstance )"/>
+        <Condition Diagnostic="" Expression="!( ( ($IpNumber=1)|($IpNumber=8)|($IpNumber=20)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17) )&amp; Semaphore_output_Channel$IpInstance )"/>
     </RefParameter>
 <!-- LockLevel, Break State , BreakPolarity, AutomaticOutput only present if a channel is configured as output-->
     <RefParameter Name="LockLevel" Comment="Lock Configuration  " DefaultValue="TIM_LOCKLEVEL_OFF" Type="list" Group="Break And Dead Time management">
-    <Condition Diagnostic="" Expression="( (($IpNumber=1)|($IpNumber=8)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17))&amp; Semaphore_output_Channel$IpInstance )"/>
+    <Condition Diagnostic="" Expression="( (($IpNumber=1)|($IpNumber=8)|($IpNumber=20)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17))&amp; Semaphore_output_Channel$IpInstance )"/>
         <PossibleValue Value="TIM_LOCKLEVEL_OFF" Comment="Off"/>
         <PossibleValue Value="TIM_LOCKLEVEL_1" Comment="Lock Level 1"/>
         <PossibleValue Value="TIM_LOCKLEVEL_2" Comment="Lock Level 2"/>
         <PossibleValue Value="TIM_LOCKLEVEL_3" Comment="Lock Level 3"/>
     </RefParameter>
     <RefParameter Name="LockLevel" Comment="Lock Configuration  " DefaultValue="null" Type="list" Group="Break And Dead Time management" Visible="false">
-    <Condition Diagnostic="" Expression="!((($IpNumber=1)|($IpNumber=8)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17))&amp; Semaphore_output_Channel$IpInstance )"/>
-    </RefParameter>-->
+    <Condition Diagnostic="" Expression="!((($IpNumber=1)|($IpNumber=8)|($IpNumber=20)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17))&amp; Semaphore_output_Channel$IpInstance )"/>
+    </RefParameter>
     <RefParameter Name="BreakState" Comment="Break State  " DefaultValue="TIM_BREAK_DISABLE" Type="list" Group="Break And Dead Time management">
-    <Condition Diagnostic="" Expression="((($IpNumber=1)|($IpNumber=8)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17))&amp; Semaphore_output_Channel$IpInstance &amp; !Semaphore_Activate_Break_Input$IpInstance)"/>
+    <Condition Diagnostic="" Expression="((($IpNumber=1)|($IpNumber=8)|($IpNumber=20)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17))&amp; Semaphore_output_Channel$IpInstance &amp; !Semaphore_Activate_Break_Input$IpInstance)"/>
         <PossibleValue Value="TIM_BREAK_DISABLE" Comment="Disable"/>
         <PossibleValue Value="TIM_BREAK_ENABLE" Comment="Enable"/>
     </RefParameter>
    <RefParameter Name="BreakState" Comment="Break State  " DefaultValue="TIM_BREAK_ENABLE" Type="list" Group="Break And Dead Time management">
-    <Condition Diagnostic="" Expression="((($IpNumber=1)|($IpNumber=8)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17))&amp; Semaphore_output_Channel$IpInstance &amp; Semaphore_Activate_Break_Input$IpInstance)"/>
+    <Condition Diagnostic="" Expression="((($IpNumber=1)|($IpNumber=8)|($IpNumber=20)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17))&amp; Semaphore_output_Channel$IpInstance &amp; Semaphore_Activate_Break_Input$IpInstance)"/>
         <PossibleValue Value="TIM_BREAK_ENABLE" Comment="Enable"/>
     </RefParameter>
     <RefParameter Name="BreakState" Comment="Break State  " DefaultValue="null" Type="list" Group="Break And Dead Time management" Visible="false">
-    <Condition Diagnostic="" Expression="!((($IpNumber=1)|($IpNumber=8)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17))&amp; Semaphore_output_Channel$IpInstance )"/>
+    <Condition Diagnostic="" Expression="!((($IpNumber=1)|($IpNumber=8)|($IpNumber=20)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17))&amp; Semaphore_output_Channel$IpInstance )"/>
     </RefParameter>
     <RefParameter Name="BreakPolarity" Comment="Break  Polarity  " DefaultValue="TIM_BREAKPOLARITY_HIGH" Type="list" Group="Break And Dead Time management">
-    <Condition Diagnostic="" Expression="((($IpNumber=1)|($IpNumber=8)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17))&amp; Semaphore_output_Channel$IpInstance )"/>
+    <Condition Diagnostic="" Expression="((($IpNumber=1)|($IpNumber=8)|($IpNumber=20)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17))&amp; Semaphore_output_Channel$IpInstance )"/>
         <PossibleValue Value="TIM_BREAKPOLARITY_HIGH" Comment="High"/>
         <PossibleValue Value="TIM_BREAKPOLARITY_LOW" Comment="Low"/>
     </RefParameter>
     <RefParameter Name="BreakPolarity" Comment="Break  Polarity  " DefaultValue="null" Type="list" Group="Break And Dead Time management" Visible="false">
-    <Condition Diagnostic="" Expression="!((($IpNumber=1)|($IpNumber=8)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17))&amp; Semaphore_output_Channel$IpInstance )"/>
+    <Condition Diagnostic="" Expression="!((($IpNumber=1)|($IpNumber=8)|($IpNumber=20)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17))&amp; Semaphore_output_Channel$IpInstance )"/>
     </RefParameter>
     <RefParameter Name="AutomaticOutput" Comment="Automatic Output State" DefaultValue="TIM_AUTOMATICOUTPUT_DISABLE" Type="list" Group="Break And Dead Time management">
-        <Condition Diagnostic="" Expression="((($IpNumber=1)|($IpNumber=8)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17))&amp; Semaphore_output_Channel$IpInstance )"/>
+        <Condition Diagnostic="" Expression="((($IpNumber=1)|($IpNumber=8)|($IpNumber=20)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17))&amp; Semaphore_output_Channel$IpInstance )"/>
         <PossibleValue Value="TIM_AUTOMATICOUTPUT_DISABLE" Comment="Disable"/>
         <PossibleValue Value="TIM_AUTOMATICOUTPUT_ENABLE" Comment="Enable"/>
     </RefParameter>
     <RefParameter Name="AutomaticOutput" Comment="Automatic Output State" DefaultValue="null" Type="list" Group="Break And Dead Time management" Visible="false">
-        <Condition Diagnostic="" Expression="!((($IpNumber=1)|($IpNumber=8)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17))&amp; Semaphore_output_Channel$IpInstance )"/>
+        <Condition Diagnostic="" Expression="!((($IpNumber=1)|($IpNumber=8)|($IpNumber=20)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17))&amp; Semaphore_output_Channel$IpInstance )"/>
     </RefParameter>
 <!-- ********************************Clear Input*********************************-->
     <RefParameter Name="ClearInputSource" Comment="Clear Input Source" DefaultValue="TIM_CLEARINPUTSOURCE_NONE" Type="list" Group="Clear Input" Visible="false">
@@ -961,6 +1089,46 @@
             <PossibleValue Value="TIM_TI1SELECTION_XORCOMBINATION" Comment="XOR enabled"/>
             <PossibleValue Value="TIM_TI1SELECTION_CH1" Comment="XOR disabled"/>
     </RefParameter>
+<!-- *******************************REMAP Functions*********************************-->
+<!-- for TIM2 of L0 family -->
+    <RefParameter Name="TIM2_TI4_REMAP" Comment="TI4 remap capabilities for TIM2" DefaultValue="TIM2_TI4_COMP2" Type="list" Group="TI4 remap capabilities for TIM2">
+            <PossibleValue Value="TIM2_TI4_COMP2" Comment="TIM2 Channel 4 input connected to COMP2_OUT"/>
+            <PossibleValue Value="TIM2_TI4_COMP1" Comment="TIM2 Channel 4 input connected to COMP1_OUT"/>
+    </RefParameter>
+    <RefParameter Name="TIM2_ETR_REMAP" Comment="ETR remap capabilities for TIM2" DefaultValue="TIM2_TI4_COMP2" Type="list" Group="ETR remap capabilities for TIM2">
+            <PossibleValue Value="TIM2_ETR_HSI48" Comment="TIM2 ETR input is connected to HSI48" Semaphore="SEM2RCC_HSI48_REQUIRED_$IpInstance"/>
+            <PossibleValue Value="TIM2_ETR_LSE" Comment="TIM2 ETR input is connected to LSE" Semaphore="SEM2RCC_LSE_REQUIRED_$IpInstance"/>
+            <PossibleValue Value="TIM2_ETR_COMP2_OUT" Comment="TIM2 ETR input is connected to COMP2_OUT"/>
+            <PossibleValue Value="TIM2_ETR_COMP1_OUT" Comment="TIM2 ETR input is connected to COMP1_OUT"/>
+    </RefParameter>
+<!-- for TIM21 of L0 family -->
+    <RefParameter Name="TIM21_TI2_REMAP" Comment="TI2 remap capabilities for TIM21" DefaultValue="TIM21_TI2_COMP2_OUT" Type="list" Group="ETR remap capabilities for TIM21">
+            <PossibleValue Value="TIM21_TI2_COMP2_OUT" Comment="TIM21 Channel 2 is connected to COMP2_OUT"/>
+    </RefParameter>
+    <RefParameter Name="TIM21_TI1_REMAP" Comment="TI1 remap capabilities for TIM21" DefaultValue="TIM21_TI1_MCO" Type="list" Group="ETR remap capabilities for TIM21">
+            <PossibleValue Value="TIM21_TI1_MCO" Comment="TIM21 Channel 1 is connected to MCO clock" Semaphore="SEM2RCC_MCO_REQUIRED_$IpInstance"/>
+            <PossibleValue Value="TIM21_TI1_RTC_WKUT_IT" Comment="TIM21 Channel 1 is connected to RTC WAKEUP interrupt"/>
+            <PossibleValue Value="TIM21_TI1_HSE_RTC" Comment="TIM21 Channel 1 is connected to HSE_RTC clock" Semaphore="SEM2RCC_HSE_REQUIRED_$IpInstance"/>
+            <PossibleValue Value="TIM21_TI1_MSI" Comment="TIM21 Channel 1 is connected to MSI clock" Semaphore="SEM2RCC_MSI_REQUIRED_$IpInstance"/>
+            <PossibleValue Value="TIM21_TI1_LSE" Comment="TIM21 Channel 1 is connected to LSE clock" Semaphore="SEM2RCC_LSE_REQUIRED_$IpInstance"/>
+            <PossibleValue Value="TIM21_TI1_LSI" Comment="TIM21 Channel 1 is connected to LSI clock" Semaphore="SEM2RCC_LSI_REQUIRED_$IpInstance"/>
+            <PossibleValue Value="TIM21_TI1_COMP1_OUT" Comment="TIM21 Channel 1 is connected to COMP1_OUT"/>
+    </RefParameter>
+    <RefParameter Name="TIM21_ETR_REMAP" Comment="ETR remap capabilities for TIM21" DefaultValue="TIM21_ETR_COMP2_OUT" Type="list" Group="ETR remap capabilities for TIM21">
+            <PossibleValue Value="TIM21_ETR_COMP2_OUT" Comment="TIM21 ETR input connected to COMP2_OUT"/>
+            <PossibleValue Value="TIM21_ETR_COMP1_OUT" Comment="TIM21 ETR input connected to COMP1_OUT"/>
+            <PossibleValue Value="TIM21_ETR_LSE" Comment="TIM21 ETR input connected to LSE clock" Semaphore="SEM2RCC_LSE_REQUIRED_$IpInstance"/>
+    </RefParameter>
+<!-- for TIM22 of L0 family -->
+    <RefParameter Name="TIM22_ETR_REMAP" Comment="ETR remap capabilities for TIM22" DefaultValue="TIM22_ETR_COMP2_OUT" Type="list" Group="ETR remap capabilities for TIM22">
+            <PossibleValue Value="TIM22_ETR_COMP2_OUT" Comment="TIM22 ETR input is connected to COMP2_OUT"/>
+            <PossibleValue Value="TIM22_ETR_COMP1_OUT" Comment="TIM22 ETR input is connected to COMP1_OUT"/>
+            <PossibleValue Value="TIM22_ETR_LSE" Comment="TIM22 ETR input is connected to LSE clock" Semaphore="SEM2RCC_LSE_REQUIRED_$IpInstance"/>
+    </RefParameter>
+    <RefParameter Name="TIM22_TI1_REMAP" Comment="TI1 remap capabilities for TIM22" DefaultValue="TIM22_TI1_COMP2_OUT" Type="list" Group="TI1 remap capabilities for TIM22">
+            <PossibleValue Value="TIM22_TI1_COMP2_OUT" Comment="TIM22 Channel 1 is connected to COMP2_OUT"/>
+            <PossibleValue Value="TIM22_TI1_COMP1_OUT" Comment="TIM22 Channel 1 is connected to COMP1_OUT"/>
+    </RefParameter>
 <!--/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\-->
 <!--/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/ REF MODE \/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\-->
 <!--/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\-->
@@ -1012,6 +1180,40 @@
            <Parameter Name="ICPrescaler" />
            <Parameter Name="ICFilter_CH1" />
          </RefMode>
+         <RefMode BaseMode ="Counter_init" Name="Input_Capture1_from_TI1_REMAP_TIM21" HalMode ="TIM_IC" Group="Input Capture Channel 1">
+           <ConfigForMode>TIM_MasterConfigSynchronization</ConfigForMode>
+           <ConfigForMode>TIM_ConfigBreakDeadTime</ConfigForMode>
+           <ConfigForMode>IC_Init</ConfigForMode>
+           <ConfigForMode>IC_ConfigChannel_CH1</ConfigForMode>
+           <Parameter Name="Channel" >
+               <PossibleValue>TIM_CHANNEL_1</PossibleValue>
+          </Parameter>
+           <Parameter Name="ICPolarity_CH1" />
+           <Parameter Name="ICSelection" >
+               <PossibleValue>TIM_ICSELECTION_DIRECTTI</PossibleValue>
+           </Parameter>
+           <Parameter Name="ICPrescaler" />
+           <Parameter Name="ICFilter_CH1" />
+           <ConfigForMode>RemapConfig_TIM21_TI1</ConfigForMode>
+           <Parameter Name="TIM21_TI1_REMAP" />
+         </RefMode>
+         <RefMode BaseMode ="Counter_init" Name="Input_Capture1_from_TI1_REMAP_TIM22" HalMode ="TIM_IC" Group="Input Capture Channel 1">
+           <ConfigForMode>TIM_MasterConfigSynchronization</ConfigForMode>
+           <ConfigForMode>TIM_ConfigBreakDeadTime</ConfigForMode>
+           <ConfigForMode>IC_Init</ConfigForMode>
+           <ConfigForMode>IC_ConfigChannel_CH1</ConfigForMode>
+           <Parameter Name="Channel" >
+               <PossibleValue>TIM_CHANNEL_1</PossibleValue>
+          </Parameter>
+           <Parameter Name="ICPolarity_CH1" />
+           <Parameter Name="ICSelection" >
+               <PossibleValue>TIM_ICSELECTION_DIRECTTI</PossibleValue>
+           </Parameter>
+           <Parameter Name="ICPrescaler" />
+           <Parameter Name="ICFilter_CH1" />
+           <ConfigForMode>RemapConfig_TIM22_TI1</ConfigForMode>
+           <Parameter Name="TIM22_TI1_REMAP" />
+         </RefMode>
          <RefMode BaseMode ="Counter_init" Name="Input_Capture1_from_TI2" HalMode ="TIM_IC" Group="Input Capture Channel 1">
            <ConfigForMode>TIM_MasterConfigSynchronization</ConfigForMode>
            <ConfigForMode>TIM_ConfigBreakDeadTime</ConfigForMode>
@@ -1032,7 +1234,7 @@
            <ConfigForMode>TIM_ConfigBreakDeadTime</ConfigForMode>
            <ConfigForMode>IC_Init</ConfigForMode>
            <ConfigForMode>SlaveConfigSynchronization</ConfigForMode>
-           <ConfigForMode>IC_ConfigChannel_TRC</ConfigForMode>
+           <ConfigForMode>IC_ConfigChannel_TRC1</ConfigForMode>
            <Parameter Name="Channel" >
                <PossibleValue>TIM_CHANNEL_1</PossibleValue>
           </Parameter>
@@ -1041,7 +1243,7 @@
                <PossibleValue>TIM_ICSELECTION_TRC</PossibleValue>
            </Parameter>
            <Parameter Name="ICPrescaler" />
-           <Parameter Name="ICFilter_TRC" />
+           <Parameter Name="ICFilter_TRC_TI1" />
          </RefMode>
          <RefMode BaseMode ="Counter_init" Name="Input_Capture2_from_TI2" HalMode ="TIM_IC" Group="Input Capture Channel 2">
            <ConfigForMode>TIM_MasterConfigSynchronization</ConfigForMode>
@@ -1057,6 +1259,23 @@
            </Parameter>
            <Parameter Name="ICPrescaler" />
            <Parameter Name="ICFilter_CH2" />
+         </RefMode>
+         <RefMode BaseMode ="Counter_init" Name="Input_Capture2_from_TI2_Remap" HalMode ="TIM_IC" Group="Input Capture Channel 2">
+           <ConfigForMode>TIM_MasterConfigSynchronization</ConfigForMode>
+           <ConfigForMode>TIM_ConfigBreakDeadTime</ConfigForMode>
+           <ConfigForMode>IC_Init</ConfigForMode>
+           <ConfigForMode>IC_ConfigChannel_CH2</ConfigForMode>
+           <Parameter Name="Channel" >
+               <PossibleValue>TIM_CHANNEL_2</PossibleValue>
+          </Parameter>
+           <Parameter Name="ICPolarity_CH2" />
+           <Parameter Name="ICSelection" >
+               <PossibleValue>TIM_ICSELECTION_DIRECTTI</PossibleValue>
+           </Parameter>
+           <Parameter Name="ICPrescaler" />
+           <Parameter Name="ICFilter_CH2" />
+           <ConfigForMode>RemapConfig_TIM21_TI2</ConfigForMode>
+           <Parameter Name="TIM21_TI2_REMAP" />
          </RefMode>
          <RefMode BaseMode ="Counter_init" Name="Input_Capture2_from_TI1" HalMode ="TIM_IC" Group="Input Capture Channel 2">
            <ConfigForMode>TIM_MasterConfigSynchronization</ConfigForMode>
@@ -1078,7 +1297,7 @@
            <ConfigForMode>TIM_ConfigBreakDeadTime</ConfigForMode>
            <ConfigForMode>SlaveConfigSynchronization</ConfigForMode>
            <ConfigForMode>IC_Init</ConfigForMode>
-           <ConfigForMode>IC_ConfigChannel_TRC</ConfigForMode>
+           <ConfigForMode>IC_ConfigChannel_TRC2</ConfigForMode>
            <Parameter Name="Channel" >
                <PossibleValue>TIM_CHANNEL_2</PossibleValue>
           </Parameter>
@@ -1087,7 +1306,7 @@
                <PossibleValue>TIM_ICSELECTION_TRC</PossibleValue>
            </Parameter>
            <Parameter Name="ICPrescaler" />
-           <Parameter Name="ICFilter_TRC" />
+           <Parameter Name="ICFilter_TRC_TI2" />
          </RefMode>
          <RefMode BaseMode ="Counter_init" Name="Input_Capture3_from_TI3" HalMode ="TIM_IC" Group="Input Capture Channel 3">
            <ConfigForMode>TIM_MasterConfigSynchronization</ConfigForMode>
@@ -1124,7 +1343,7 @@
            <ConfigForMode>TIM_ConfigBreakDeadTime</ConfigForMode>
            <ConfigForMode>IC_Init</ConfigForMode>
            <ConfigForMode>SlaveConfigSynchronization</ConfigForMode>
-           <ConfigForMode>IC_ConfigChannel_TRC</ConfigForMode>
+           <ConfigForMode>IC_ConfigChannel_TRC3</ConfigForMode>
            <Parameter Name="Channel" >
                <PossibleValue>TIM_CHANNEL_3</PossibleValue>
           </Parameter>
@@ -1133,7 +1352,7 @@
                <PossibleValue>TIM_ICSELECTION_TRC</PossibleValue>
            </Parameter>
            <Parameter Name="ICPrescaler" />
-           <Parameter Name="ICFilter_TRC" />
+           <Parameter Name="ICFilter_TRC_TI3" />
          </RefMode>
          <RefMode BaseMode ="Counter_init" Name="Input_Capture4_from_TI4" HalMode ="TIM_IC" Group="Input Capture Channel 4">
            <ConfigForMode>TIM_MasterConfigSynchronization</ConfigForMode>
@@ -1149,6 +1368,23 @@
            </Parameter>
            <Parameter Name="ICPrescaler" />
            <Parameter Name="ICFilter_CH4" />
+         </RefMode>
+         <RefMode BaseMode ="Counter_init" Name="Input_Capture4_from_TI4_Remap" HalMode ="TIM_IC" Group="Input Capture Channel 4">
+           <ConfigForMode>TIM_MasterConfigSynchronization</ConfigForMode>
+           <ConfigForMode>TIM_ConfigBreakDeadTime</ConfigForMode>
+           <ConfigForMode>IC_Init</ConfigForMode>
+           <ConfigForMode>IC_ConfigChannel_CH4</ConfigForMode>
+           <Parameter Name="Channel" >
+               <PossibleValue>TIM_CHANNEL_4</PossibleValue>
+          </Parameter>
+           <Parameter Name="ICPolarity_CH4" />
+           <Parameter Name="ICSelection" >
+               <PossibleValue>TIM_ICSELECTION_DIRECTTI</PossibleValue>
+           </Parameter>
+           <Parameter Name="ICPrescaler" />
+           <Parameter Name="ICFilter_CH4" />
+           <ConfigForMode>RemapConfig_TIM2_TI4</ConfigForMode>
+           <Parameter Name="TIM2_TI4_REMAP" />
          </RefMode>
          <RefMode BaseMode ="Counter_init" Name="Input_Capture4_from_TI3" HalMode ="TIM_IC" Group="Input Capture Channel 4">
            <ConfigForMode>TIM_MasterConfigSynchronization</ConfigForMode>
@@ -1170,7 +1406,7 @@
            <ConfigForMode>TIM_ConfigBreakDeadTime</ConfigForMode>
            <ConfigForMode>SlaveConfigSynchronization</ConfigForMode>
            <ConfigForMode>IC_Init</ConfigForMode>
-           <ConfigForMode>IC_ConfigChannel_TRC</ConfigForMode>
+           <ConfigForMode>IC_ConfigChannel_TRC4</ConfigForMode>
            <Parameter Name="Channel" >
                <PossibleValue>TIM_CHANNEL_4</PossibleValue>
           </Parameter>
@@ -1179,7 +1415,7 @@
                <PossibleValue>TIM_ICSELECTION_TRC</PossibleValue>
            </Parameter>
            <Parameter Name="ICPrescaler" />
-           <Parameter Name="ICFilter_TRC" />
+           <Parameter Name="ICFilter_TRC_TI4" />
          </RefMode>
 <!--****************************** Refmode OutputCompare ******************************-->
   <RefMode BaseMode ="Counter_init" Name="Output Compare1 No Output" HalMode ="TIM_OC" Group="Output Compare No Output Channel 1">
@@ -1193,7 +1429,9 @@
            <Parameter Name="OCMode_1" />
            <Parameter Name="Pulse" />
            <Parameter Name="OCPolarity_1" />
+           <Parameter Name="OCNPolarity_1" />
            <Parameter Name="OCIdleState_1" />
+           <Parameter Name="OCNIdleState_1" />
     </RefMode>
   <RefMode BaseMode ="Counter_init" Name="Output Compare2 No Output" HalMode ="TIM_OC" Group="Output Compare No Output Channel 2">
            <ConfigForMode>TIM_MasterConfigSynchronization</ConfigForMode>
@@ -1206,7 +1444,9 @@
            <Parameter Name="OCMode_2" />
            <Parameter Name="Pulse" />
            <Parameter Name="OCPolarity_2" />
+           <Parameter Name="OCNPolarity_2" />
            <Parameter Name="OCIdleState_2" />
+           <Parameter Name="OCNIdleState_2" />
     </RefMode>
 <RefMode BaseMode ="Counter_init" Name="Output Compare3 No Output" HalMode ="TIM_OC" Group="Output Compare No Output Channel 3">
            <ConfigForMode>TIM_MasterConfigSynchronization</ConfigForMode>
@@ -1219,7 +1459,9 @@
            <Parameter Name="OCMode_3" />
            <Parameter Name="Pulse" />
            <Parameter Name="OCPolarity_3" />
+           <Parameter Name="OCNPolarity_3" />
            <Parameter Name="OCIdleState_3" />
+           <Parameter Name="OCNIdleState_3" />
     </RefMode>
 <RefMode BaseMode ="Counter_init" Name="Output Compare4 No Output" HalMode ="TIM_OC" Group="Output Compare No Output Channel 4">
            <ConfigForMode>TIM_MasterConfigSynchronization</ConfigForMode>
@@ -1233,6 +1475,7 @@
            <Parameter Name="Pulse" />
            <Parameter Name="OCPolarity_4" />
            <Parameter Name="OCIdleState_4" />
+           <Parameter Name="OCNIdleState_4" />
     </RefMode>
          <RefMode BaseMode ="Counter_init" Name="Output Compare1 CH1" HalMode ="TIM_OC" Group="Output Compare Channel 1">
 <!---->
@@ -1246,7 +1489,9 @@
            <Parameter Name="OCMode_1" />
            <Parameter Name="Pulse" />
            <Parameter Name="OCPolarity_1" />
+           <Parameter Name="OCNPolarity_1" />
            <Parameter Name="OCIdleState_1" />
+           <Parameter Name="OCNIdleState_1" />
     </RefMode>
          <RefMode BaseMode ="Counter_init" Name="Output Compare2 CH2" HalMode ="TIM_OC" Group="Output Compare Channel 2">
            <ConfigForMode>TIM_MasterConfigSynchronization</ConfigForMode>
@@ -1259,7 +1504,9 @@
            <Parameter Name="OCMode_2" />
            <Parameter Name="Pulse" />
            <Parameter Name="OCPolarity_2" />
+           <Parameter Name="OCNPolarity_2" />
            <Parameter Name="OCIdleState_2" />
+           <Parameter Name="OCNIdleState_2" />
     </RefMode>
          <RefMode BaseMode ="Counter_init" Name="Output Compare3 CH3" HalMode ="TIM_OC" Group="Output Compare Channel 3">
            <ConfigForMode>TIM_MasterConfigSynchronization</ConfigForMode>
@@ -1272,7 +1519,9 @@
            <Parameter Name="OCMode_3" />
            <Parameter Name="Pulse" />
            <Parameter Name="OCPolarity_3" />
+           <Parameter Name="OCNPolarity_3" />
            <Parameter Name="OCIdleState_3" />
+           <Parameter Name="OCNIdleState_3" />
     </RefMode>
          <RefMode BaseMode ="Counter_init" Name="Output Compare4 CH4" HalMode ="TIM_OC" Group="Output Compare Channel 4">
            <ConfigForMode>TIM_MasterConfigSynchronization</ConfigForMode>
@@ -1286,6 +1535,7 @@
            <Parameter Name="Pulse" />
            <Parameter Name="OCPolarity_4" />
            <Parameter Name="OCIdleState_4" />
+           <Parameter Name="OCNIdleState_4" />
     </RefMode>
          <RefMode BaseMode ="Counter_init" Name="Output Compare1 CH1N" HalMode ="TIM_OC" Group="Output Compare Channel 1N">
            <ConfigForMode>TIM_MasterConfigSynchronization</ConfigForMode>
@@ -1297,7 +1547,9 @@
            </Parameter>
            <Parameter Name="OCMode_1" />
            <Parameter Name="Pulse" />
+           <Parameter Name="OCPolarity_1" />
            <Parameter Name="OCNPolarity_1" />
+           <Parameter Name="OCIdleState_1" />
            <Parameter Name="OCNIdleState_1" />
     </RefMode>
          <RefMode BaseMode ="Counter_init" Name="Output Compare2 CH2N" HalMode ="TIM_OC" Group="Output Compare Channel 2N">
@@ -1310,7 +1562,9 @@
            </Parameter>
            <Parameter Name="OCMode_2" />
            <Parameter Name="Pulse" />
+           <Parameter Name="OCPolarity_2" />
            <Parameter Name="OCNPolarity_2" />
+           <Parameter Name="OCIdleState_2" />
            <Parameter Name="OCNIdleState_2" />
     </RefMode>
          <RefMode BaseMode ="Counter_init" Name="Output Compare3 CH3N" HalMode ="TIM_OC" Group="Output Compare Channel 3N">
@@ -1323,7 +1577,9 @@
            </Parameter>
            <Parameter Name="OCMode_3" />
            <Parameter Name="Pulse" />
+           <Parameter Name="OCPolarity_3" />
            <Parameter Name="OCNPolarity_3" />
+           <Parameter Name="OCIdleState_3" />
            <Parameter Name="OCNIdleState_3" />
     </RefMode>
          <RefMode BaseMode ="Counter_init" Name="Output Compare1 CH1 CH1N" HalMode ="TIM_OC" Group="Output Compare Channel 1 and 1N">
@@ -1385,7 +1641,9 @@
            <Parameter Name="OCMode_forced"/>
           <Parameter Name="Pulse" />
            <Parameter Name="OCPolarity_1" />
+           <Parameter Name="OCNPolarity_1" />
            <Parameter Name="OCIdleState_1" />
+           <Parameter Name="OCNIdleState_1" />
     </RefMode>
          <RefMode BaseMode ="Counter_init" Name="Forced Output2 CH2" HalMode ="TIM_OC" Group="Forced Output Channel 2">
            <ConfigForMode>TIM_MasterConfigSynchronization</ConfigForMode>
@@ -1398,7 +1656,9 @@
            <Parameter Name="OCMode_forced"/>
           <Parameter Name="Pulse" />
            <Parameter Name="OCPolarity_2" />
+           <Parameter Name="OCNPolarity_2" />
            <Parameter Name="OCIdleState_2" />
+           <Parameter Name="OCNIdleState_2" />
     </RefMode>
          <RefMode BaseMode ="Counter_init" Name="Forced Output3 CH3" HalMode ="TIM_OC" Group="Forced Output Channel 3">
            <ConfigForMode>TIM_MasterConfigSynchronization</ConfigForMode>
@@ -1411,7 +1671,9 @@
            <Parameter Name="OCMode_forced"/>
           <Parameter Name="Pulse" />
            <Parameter Name="OCPolarity_3" />
+           <Parameter Name="OCNPolarity_3" />
            <Parameter Name="OCIdleState_3" />
+           <Parameter Name="OCNIdleState_3" />
     </RefMode>
          <RefMode BaseMode ="Counter_init" Name="Forced Output4 CH4" HalMode ="TIM_OC" Group="Forced Output Channel 4">
            <ConfigForMode>TIM_MasterConfigSynchronization</ConfigForMode>
@@ -1425,6 +1687,7 @@
           <Parameter Name="Pulse" />
            <Parameter Name="OCPolarity_4" />
            <Parameter Name="OCIdleState_4" />
+           <Parameter Name="OCNIdleState_4" />
     </RefMode>
          <RefMode BaseMode ="Counter_init" Name="Forced Output1 CH1N" HalMode ="TIM_OC" Group="Forced Output Channel 1N">
            <ConfigForMode>TIM_MasterConfigSynchronization</ConfigForMode>
@@ -1436,7 +1699,9 @@
            </Parameter>
            <Parameter Name="OCMode_forced"/>
            <Parameter Name="Pulse" />
+           <Parameter Name="OCPolarity_1" />
            <Parameter Name="OCNPolarity_1" />
+           <Parameter Name="OCIdleState_1" />
            <Parameter Name="OCNIdleState_1" />
     </RefMode>
          <RefMode BaseMode ="Counter_init" Name="Forced Output2 CH2N" HalMode ="TIM_OC" Group="Forced Output Channel 2N">
@@ -1449,7 +1714,9 @@
            </Parameter>
            <Parameter Name="OCMode_forced"/>
           <Parameter Name="Pulse" />
+           <Parameter Name="OCPolarity_2" />
            <Parameter Name="OCNPolarity_2" />
+           <Parameter Name="OCIdleState_2" />
            <Parameter Name="OCNIdleState_2" />
     </RefMode>
          <RefMode BaseMode ="Counter_init" Name="Forced Output3 CH3N" HalMode ="TIM_OC" Group="Forced Output Channel 3N">
@@ -1462,7 +1729,9 @@
            </Parameter>
            <Parameter Name="OCMode_forced"/>
            <Parameter Name="Pulse" />
+           <Parameter Name="OCPolarity_3" />
            <Parameter Name="OCNPolarity_3" />
+           <Parameter Name="OCIdleState_3" />
            <Parameter Name="OCNIdleState_3" />
     </RefMode>
          <RefMode BaseMode ="Counter_init" Name="Forced Output1 CH1 CH1N" HalMode ="TIM_OC" Group="Forced Output Channel 1 and  1N">
@@ -1524,7 +1793,9 @@
            <Parameter Name="Pulse" />
            <Parameter Name="OCFastMode_PWM" />
            <Parameter Name="OCPolarity_1" />
+           <Parameter Name="OCNPolarity_1" />
            <Parameter Name="OCIdleState_1" />
+           <Parameter Name="OCNIdleState_1" />
     </RefMode>
          <RefMode BaseMode ="Counter_init" Name="PWM Generation2 CH2" HalMode ="TIM_OC" Group="PWM Generation Channel 2">
            <ConfigForMode>TIM_MasterConfigSynchronization</ConfigForMode>
@@ -1538,7 +1809,9 @@
            <Parameter Name="Pulse" />
            <Parameter Name="OCFastMode_PWM" />
            <Parameter Name="OCPolarity_2" />
+           <Parameter Name="OCNPolarity_2" />
            <Parameter Name="OCIdleState_2" />
+           <Parameter Name="OCNIdleState_2" />
     </RefMode>
          <RefMode BaseMode ="Counter_init" Name="PWM Generation3 CH3" HalMode ="TIM_OC" Group="PWM Generation Channel 3">
            <ConfigForMode>TIM_MasterConfigSynchronization</ConfigForMode>
@@ -1552,7 +1825,9 @@
            <Parameter Name="Pulse" />
            <Parameter Name="OCFastMode_PWM" />
            <Parameter Name="OCPolarity_3" />
+           <Parameter Name="OCNPolarity_3" />
            <Parameter Name="OCIdleState_3" />
+           <Parameter Name="OCNIdleState_3" />
     </RefMode>
          <RefMode BaseMode ="Counter_init" Name="PWM Generation4 CH4" HalMode ="TIM_OC" Group="PWM Generation Channel 4">
            <ConfigForMode>TIM_MasterConfigSynchronization</ConfigForMode>
@@ -1567,6 +1842,7 @@
            <Parameter Name="OCFastMode_PWM" />
            <Parameter Name="OCPolarity_4" />
            <Parameter Name="OCIdleState_4" />
+           <Parameter Name="OCNIdleState_4" />
     </RefMode>
          <RefMode BaseMode ="Counter_init" Name="PWM Generation1 CH1N" HalMode ="TIM_OC" Group="PWM Generation Channel 1N">
            <ConfigForMode>TIM_MasterConfigSynchronization</ConfigForMode>
@@ -1579,7 +1855,9 @@
            <Parameter Name="OCMode_PWM"/>
            <Parameter Name="Pulse" />
            <Parameter Name="OCFastMode_PWM" />
+           <Parameter Name="OCPolarity_1" />
            <Parameter Name="OCNPolarity_1" />
+           <Parameter Name="OCIdleState_1" />
            <Parameter Name="OCNIdleState_1" />
     </RefMode>
          <RefMode BaseMode ="Counter_init" Name="PWM Generation2 CH2N" HalMode ="TIM_OC" Group="PWM Generation Channel 2N">
@@ -1593,7 +1871,9 @@
            <Parameter Name="OCMode_PWM"/>
            <Parameter Name="Pulse" />
            <Parameter Name="OCFastMode_PWM" />
+           <Parameter Name="OCPolarity_2" />
            <Parameter Name="OCNPolarity_2" />
+           <Parameter Name="OCIdleState_2" />
            <Parameter Name="OCNIdleState_2" />
     </RefMode>
          <RefMode BaseMode ="Counter_init" Name="PWM Generation3 CH3N" HalMode ="TIM_OC" Group="PWM Generation Channel 3N">
@@ -1607,7 +1887,9 @@
            <Parameter Name="OCMode_PWM"/>
            <Parameter Name="Pulse" />
            <Parameter Name="OCFastMode_PWM" />
+           <Parameter Name="OCPolarity_3" />
            <Parameter Name="OCNPolarity_3" />
+           <Parameter Name="OCIdleState_3" />
            <Parameter Name="OCNIdleState_3" />
     </RefMode>
          <RefMode BaseMode ="Counter_init" Name="PWM Generation1 CH1 CH1N" HalMode ="TIM_OC" Group="PWM Generation Channel 1 and 1N">
@@ -1677,7 +1959,9 @@
            <Parameter Name="OCMode_1" />
            <Parameter Name="Pulse" />
            <Parameter Name="OCPolarity_1" />
+           <Parameter Name="OCNPolarity_1" />
            <Parameter Name="OCIdleState_1" />
+           <Parameter Name="OCNIdleState_1" />
           <Parameter Name="ICPolarity" />
            <Parameter Name="ICSelection" />
            <Parameter Name="ICPrescaler" />
@@ -1696,7 +1980,9 @@
            <Parameter Name="OCMode_2" />
           <Parameter Name="Pulse" />
            <Parameter Name="OCPolarity_2" />
+           <Parameter Name="OCNPolarity_2" />
            <Parameter Name="OCIdleState_2" />
+           <Parameter Name="OCNIdleState_2" />
            <Parameter Name="ICPolarity" />
            <Parameter Name="ICSelection" />
            <Parameter Name="ICPrescaler" />
@@ -1714,7 +2000,9 @@
            </Parameter>
            <Parameter Name="OCMode_1" />
            <Parameter Name="Pulse" />
+           <Parameter Name="OCPolarity_1" />
            <Parameter Name="OCNPolarity_1" />
+           <Parameter Name="OCIdleState_1" />
            <Parameter Name="OCNIdleState_1" />
            <Parameter Name="ICPolarity" />
            <Parameter Name="ICSelection" />
@@ -1733,7 +2021,9 @@
            </Parameter>
            <Parameter Name="OCMode_2" />
            <Parameter Name="Pulse" />
+           <Parameter Name="OCPolarity_2" />
            <Parameter Name="OCNPolarity_2" />
+           <Parameter Name="OCIdleState_2" />
            <Parameter Name="OCNIdleState_2" />
            <Parameter Name="ICPolarity" />
            <Parameter Name="ICSelection" />
@@ -1882,6 +2172,60 @@
            <ConfigForMode>TIM_MasterConfigSynchronization</ConfigForMode>
            <ConfigForMode>TIM_ConfigBreakDeadTime</ConfigForMode>
     </RefMode>
+<RefMode BaseMode ="Counter_init" Name="ClockSourceETR_Mode2_Remap_TIM2" HalMode ="TIM_Base">
+           <Parameter Name="ClockPolarity" >
+                <PossibleValue>TIM_CLOCKPOLARITY_INVERTED</PossibleValue>
+                <PossibleValue>TIM_CLOCKPOLARITY_NONINVERTED</PossibleValue>
+           </Parameter>
+           <Parameter Name="ClockPrescaler" >
+                <PossibleValue>TIM_CLOCKPRESCALER_DIV1</PossibleValue>
+                <PossibleValue>TIM_CLOCKPRESCALER_DIV2</PossibleValue>
+                <PossibleValue>TIM_CLOCKPRESCALER_DIV4</PossibleValue>
+                <PossibleValue>TIM_CLOCKPRESCALER_DIV8</PossibleValue>
+           </Parameter>
+<!-- <Parameter Name="ClockFilter" />-->
+           <ConfigForMode>ConfigClockSource</ConfigForMode>
+           <ConfigForMode>TIM_MasterConfigSynchronization</ConfigForMode>
+           <ConfigForMode>TIM_ConfigBreakDeadTime</ConfigForMode>
+           <ConfigForMode>RemapConfig_TIM2_ETR</ConfigForMode>
+           <Parameter Name="TIM2_ETR_REMAP"/>
+    </RefMode>
+<RefMode BaseMode ="Counter_init" Name="ClockSourceETR_Mode2_Remap_TIM21" HalMode ="TIM_Base">
+           <Parameter Name="ClockPolarity" >
+                <PossibleValue>TIM_CLOCKPOLARITY_INVERTED</PossibleValue>
+                <PossibleValue>TIM_CLOCKPOLARITY_NONINVERTED</PossibleValue>
+           </Parameter>
+           <Parameter Name="ClockPrescaler" >
+                <PossibleValue>TIM_CLOCKPRESCALER_DIV1</PossibleValue>
+                <PossibleValue>TIM_CLOCKPRESCALER_DIV2</PossibleValue>
+                <PossibleValue>TIM_CLOCKPRESCALER_DIV4</PossibleValue>
+                <PossibleValue>TIM_CLOCKPRESCALER_DIV8</PossibleValue>
+           </Parameter>
+<!-- <Parameter Name="ClockFilter" />-->
+           <ConfigForMode>ConfigClockSource</ConfigForMode>
+           <ConfigForMode>TIM_MasterConfigSynchronization</ConfigForMode>
+           <ConfigForMode>TIM_ConfigBreakDeadTime</ConfigForMode>
+           <ConfigForMode>RemapConfig_TIM21_ETR</ConfigForMode>
+           <Parameter Name="TIM21_ETR_REMAP"/>
+    </RefMode>
+<RefMode BaseMode ="Counter_init" Name="ClockSourceETR_Mode2_Remap_TIM22" HalMode ="TIM_Base">
+           <Parameter Name="ClockPolarity" >
+                <PossibleValue>TIM_CLOCKPOLARITY_INVERTED</PossibleValue>
+                <PossibleValue>TIM_CLOCKPOLARITY_NONINVERTED</PossibleValue>
+           </Parameter>
+           <Parameter Name="ClockPrescaler" >
+                <PossibleValue>TIM_CLOCKPRESCALER_DIV1</PossibleValue>
+                <PossibleValue>TIM_CLOCKPRESCALER_DIV2</PossibleValue>
+                <PossibleValue>TIM_CLOCKPRESCALER_DIV4</PossibleValue>
+                <PossibleValue>TIM_CLOCKPRESCALER_DIV8</PossibleValue>
+           </Parameter>
+<!-- <Parameter Name="ClockFilter" />-->
+           <ConfigForMode>ConfigClockSource</ConfigForMode>
+           <ConfigForMode>TIM_MasterConfigSynchronization</ConfigForMode>
+           <ConfigForMode>TIM_ConfigBreakDeadTime</ConfigForMode>
+           <ConfigForMode>RemapConfig_TIM22_ETR</ConfigForMode>
+           <Parameter Name="TIM22_ETR_REMAP"/>
+    </RefMode>
          <RefMode BaseMode ="Counter_init" Name="ITR0" HalMode ="TIM_Base">
            <ConfigForMode>ConfigClockSource</ConfigForMode>
            <ConfigForMode>TIM_MasterConfigSynchronization</ConfigForMode>
@@ -1994,6 +2338,42 @@
            <ConfigForMode>TIM_MasterConfigSynchronization</ConfigForMode>
            <ConfigForMode>TIM_ConfigBreakDeadTime</ConfigForMode>
     </RefMode>
+ <RefMode BaseMode ="Counter_init" Name="TriggerSource_ETR_Remap_TIM2" HalMode ="TIM_Base">
+           <ConfigForMode>ConfigClockSource</ConfigForMode>
+           <ConfigForMode>SlaveConfigSynchronization</ConfigForMode>
+               <Parameter Name="Slave_TriggerPolarity" />
+               <Parameter Name="Slave_TriggerPrescaler" />
+               <Parameter Name="Slave_TriggerFilter" />
+               <Parameter Name="TIM_SlaveMode" />
+           <ConfigForMode>TIM_MasterConfigSynchronization</ConfigForMode>
+           <ConfigForMode>TIM_ConfigBreakDeadTime</ConfigForMode>
+           <ConfigForMode>RemapConfig_TIM2_ETR</ConfigForMode>
+           <Parameter Name="TIM2_ETR_REMAP"/>
+    </RefMode>
+ <RefMode BaseMode ="Counter_init" Name="TriggerSource_ETR_Remap_TIM21" HalMode ="TIM_Base">
+           <ConfigForMode>ConfigClockSource</ConfigForMode>
+           <ConfigForMode>SlaveConfigSynchronization</ConfigForMode>
+               <Parameter Name="Slave_TriggerPolarity" />
+               <Parameter Name="Slave_TriggerPrescaler" />
+               <Parameter Name="Slave_TriggerFilter" />
+               <Parameter Name="TIM_SlaveMode" />
+           <ConfigForMode>TIM_MasterConfigSynchronization</ConfigForMode>
+           <ConfigForMode>TIM_ConfigBreakDeadTime</ConfigForMode>
+           <ConfigForMode>RemapConfig_TIM21_ETR</ConfigForMode>
+           <Parameter Name="TIM21_ETR_REMAP"/>
+    </RefMode>
+ <RefMode BaseMode ="Counter_init" Name="TriggerSource_ETR_Remap_TIM22" HalMode ="TIM_Base">
+           <ConfigForMode>ConfigClockSource</ConfigForMode>
+           <ConfigForMode>SlaveConfigSynchronization</ConfigForMode>
+               <Parameter Name="Slave_TriggerPolarity" />
+               <Parameter Name="Slave_TriggerPrescaler" />
+               <Parameter Name="Slave_TriggerFilter" />
+               <Parameter Name="TIM_SlaveMode" />
+           <ConfigForMode>TIM_MasterConfigSynchronization</ConfigForMode>
+           <ConfigForMode>TIM_ConfigBreakDeadTime</ConfigForMode>
+           <ConfigForMode>RemapConfig_TIM22_ETR</ConfigForMode>
+           <Parameter Name="TIM22_ETR_REMAP"/>
+    </RefMode>
          <RefMode BaseMode ="Counter_init" Name="TriggerSource_TI1FP1" HalMode ="TIM_Base">
            <ConfigForMode>ConfigClockSource</ConfigForMode>
            <ConfigForMode>SlaveConfigSynchronization</ConfigForMode>
@@ -2026,6 +2406,45 @@
            <Parameter Name="ClearChannel3" />
            <Parameter Name="ClearChannel4" />
     </RefMode>
+         <RefMode BaseMode ="Empty" Name="ETR_as_clearing_source_through_remap_TIM2" HalMode ="">
+            <ConfigForMode>ConfigOCrefClear</ConfigForMode>
+           <Parameter Name="ClearInputSource" />
+           <Parameter Name="ClearInputPolarity" />
+           <Parameter Name="ClearInputPrescaler" />
+           <Parameter Name="ClearInputFilter" />
+           <Parameter Name="ClearChannel1" />
+           <Parameter Name="ClearChannel2" />
+           <Parameter Name="ClearChannel3" />
+           <Parameter Name="ClearChannel4" />
+           <ConfigForMode>RemapConfig_TIM2_ETR</ConfigForMode>
+           <Parameter Name="TIM2_ETR_REMAP" />
+    </RefMode>
+         <RefMode BaseMode ="Empty" Name="ETR_as_clearing_source_through_remap_TIM21" HalMode ="">
+            <ConfigForMode>ConfigOCrefClear</ConfigForMode>
+           <Parameter Name="ClearInputSource" />
+           <Parameter Name="ClearInputPolarity" />
+           <Parameter Name="ClearInputPrescaler" />
+           <Parameter Name="ClearInputFilter" />
+           <Parameter Name="ClearChannel1" />
+           <Parameter Name="ClearChannel2" />
+           <Parameter Name="ClearChannel3" />
+           <Parameter Name="ClearChannel4" />
+           <ConfigForMode>RemapConfig_TIM21_ETR</ConfigForMode>
+           <Parameter Name="TIM21_ETR_REMAP" />
+    </RefMode>
+         <RefMode BaseMode ="Empty" Name="ETR_as_clearing_source_through_remap_TIM22" HalMode ="">
+            <ConfigForMode>ConfigOCrefClear</ConfigForMode>
+           <Parameter Name="ClearInputSource" />
+           <Parameter Name="ClearInputPolarity" />
+           <Parameter Name="ClearInputPrescaler" />
+           <Parameter Name="ClearInputFilter" />
+           <Parameter Name="ClearChannel1" />
+           <Parameter Name="ClearChannel2" />
+           <Parameter Name="ClearChannel3" />
+           <Parameter Name="ClearChannel4" />
+           <ConfigForMode>RemapConfig_TIM22_ETR</ConfigForMode>
+           <Parameter Name="TIM22_ETR_REMAP" />
+    </RefMode>
 <!--********************* RefMode for XOR Gate Activation *******************************-->
          <RefMode BaseMode ="Empty" Name="XOR_enable" HalMode ="">
             <ConfigForMode>ConfigTI1Input</ConfigForMode>
@@ -2034,7 +2453,7 @@
 <!--/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/ MODES \/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\-->
 <!--/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\-->
  <ModeLogicOperator Name="OR">
-                <Mode Name="Activated" RemoveCondition="($IpNumber=1)|($IpNumber=2)|($IpNumber=3)|($IpNumber=4)|($IpNumber=5)|($IpNumber=8)|($IpNumber=9)|($IpNumber=12)|($IpNumber=15)|($IpNumber=19)|($IpNumber=21)|($IpNumber=22)">
+                <Mode Name="Activated" RemoveCondition="($IpNumber=1)|($IpNumber=2)|($IpNumber=3)|($IpNumber=4)|($IpNumber=5)|($IpNumber=8)|($IpNumber=9)|($IpNumber=12)|($IpNumber=15)|($IpNumber=19)|($IpNumber=20)|($IpNumber=21)|($IpNumber=22)">
    <ModeLogicOperator Name="OR">
     <Mode Name="Enable_Timer">
                                         <Semaphore>Semaphore_ClockSourceInternal$IpInstance</Semaphore>
@@ -2057,7 +2476,7 @@
       <Signal Name="VS_ControllerModeClock"/>
      </SignalLogicalOp>
     </Mode>
-    <Mode Name="Reset Mode" UserName="Reset Mode" Visible="true" RemoveCondition="($IpNumber=6)|($IpNumber=7)|($IpNumber=18)|($IpNumber=10)|($IpNumber=11)|($IpNumber=13)|($IpNumber=14)|($IpNumber=16)|($IpNumber=17)">
+    <Mode Name="Reset Mode" UserName="Reset Mode" RemoveCondition="($IpNumber=6)|($IpNumber=7)|($IpNumber=18)|($IpNumber=10)|($IpNumber=11)|($IpNumber=13)|($IpNumber=14)|($IpNumber=16)|($IpNumber=17)">
                                         <Semaphore>Semaphore_SMC_Reset$IpInstance</Semaphore>
                                         <Condition Expression="!(Semaphore_Multi_Channels$IpInstance)" Diagnostic="Controller function is fully managed by Combined_Channel mode"/>
      <SignalLogicalOp Name="AND">
@@ -2080,7 +2499,7 @@
    </ModeLogicOperator>
   </Mode>
                 <Mode Name="Trigger Source" RemoveCondition="($IpNumber=6)|($IpNumber=7)|($IpNumber=18)|($IpNumber=10)|($IpNumber=11)|($IpNumber=13)|($IpNumber=14)|($IpNumber=16)|($IpNumber=17)">
-                        <Condition Expression="!Semaphore_One_Pulse_Generation$IpInstance &amp;!Semaphore_Multi_Channels$IpInstance" Diagnostic="Trigger source selection is fully managed by One Pulse generation mode or by the Combined Channels selected mode" />-->
+                        <Condition Expression="!Semaphore_One_Pulse_Generation$IpInstance &amp;!Semaphore_Multi_Channels$IpInstance" Diagnostic="Trigger source selection is fully managed by One Pulse generation mode or by the Combined Channels selected mode" />
                         <Semaphore>Semaphore_TriggerSource$IpInstance</Semaphore>
                         <Semaphore>Semaphore_Trigger_DMA_Enable$IpInstance</Semaphore>
    <ModeLogicOperator Name="XOR">
@@ -2119,10 +2538,34 @@
      <SignalLogicalOp Name="AND">
       <Signal Name="ETR"/>
      </SignalLogicalOp>
-<!--TEST--> <Condition Expression=" (!Semaphore_ETRasClearingSource$IpInstance) &amp; (!Semaphore_ClockSourceETRMode1$IpInstance) &amp; (!Semaphore_ClockSourceETRMode2$IpInstance)&amp;!(Semaphore_input_Channel_TRC$IpInstance)&amp;(Semaphore_SMC_Trigger$IpInstance|Semaphore_SMC_Clock$IpInstance|Semaphore_SMC_Gated$IpInstance|Semaphore_SMC_Reset$IpInstance)" Diagnostic="Not available if (1)ETR is already used as a clearing source (2)ETR is already used as a Clock Source, or (3)if an input capture from TRC is already selected" />
+<!--TEST--> <Condition Expression=" (!Semaphore_ETRasClearingSource$IpInstance) &amp; (!Semaphore_ClockSourceETRMode1$IpInstance) &amp; (!Semaphore_ClockSourceETRMode2$IpInstance)&amp;!(Semaphore_input_Channel_TRC$IpInstance)&amp;(Semaphore_SMC_Trigger$IpInstance|Semaphore_SMC_Clock$IpInstance|Semaphore_SMC_Gated$IpInstance|Semaphore_SMC_Reset$IpInstance)" Diagnostic="An active Slave Mode should be selected first . This option might become unavailable if (1)ETR is already used as a clearing source (2)ETR is already used as a Clock Source, or (3)if an input capture from TRC is already selected" />
+    </Mode>
+    <Mode Name="TriggerSource_ETR_Remap_TIM2" UserName="ETR1 through Remap" RemoveCondition="!($IpNumber=2)">
+                                        <Semaphore>Semaphore_TriggerSourceETR$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_ETRpinUsed$IpInstance</Semaphore>
+     <SignalLogicalOp Name="AND">
+      <Signal Name="VS_NoETR"/>
+     </SignalLogicalOp>
+<!--TEST--> <Condition Expression=" (!Semaphore_ETRasClearingSource$IpInstance) &amp; (!Semaphore_ClockSourceETRMode1$IpInstance) &amp; (!Semaphore_ClockSourceETRMode2$IpInstance)&amp;!(Semaphore_input_Channel_TRC$IpInstance)&amp;(Semaphore_SMC_Trigger$IpInstance|Semaphore_SMC_Clock$IpInstance|Semaphore_SMC_Gated$IpInstance|Semaphore_SMC_Reset$IpInstance)" Diagnostic="An active Slave Mode should be selected first . This option might become unavailable if (1)ETR is already used as a clearing source (2)ETR is already used as a Clock Source, or (3)if an input capture from TRC is already selected" />
+    </Mode>
+    <Mode Name="TriggerSource_ETR_Remap_TIM21" UserName="ETR1 through Remap" RemoveCondition="!($IpNumber=21)">
+                                        <Semaphore>Semaphore_TriggerSourceETR$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_ETRpinUsed$IpInstance</Semaphore>
+     <SignalLogicalOp Name="AND">
+      <Signal Name="VS_NoETR"/>
+     </SignalLogicalOp>
+<!--TEST--> <Condition Expression=" (!Semaphore_ETRasClearingSource$IpInstance) &amp; (!Semaphore_ClockSourceETRMode1$IpInstance) &amp; (!Semaphore_ClockSourceETRMode2$IpInstance)&amp;!(Semaphore_input_Channel_TRC$IpInstance)&amp;(Semaphore_SMC_Trigger$IpInstance|Semaphore_SMC_Clock$IpInstance|Semaphore_SMC_Gated$IpInstance|Semaphore_SMC_Reset$IpInstance)" Diagnostic="An active Slave Mode should be selected first . This option might become unavailable if (1)ETR is already used as a clearing source (2)ETR is already used as a Clock Source, or (3)if an input capture from TRC is already selected" />
+    </Mode>
+    <Mode Name="TriggerSource_ETR_Remap_TIM22" UserName="ETR1 through Remap" RemoveCondition="!($IpNumber=22)">
+                                        <Semaphore>Semaphore_TriggerSourceETR$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_ETRpinUsed$IpInstance</Semaphore>
+     <SignalLogicalOp Name="AND">
+      <Signal Name="VS_NoETR"/>
+     </SignalLogicalOp>
+<!--TEST--> <Condition Expression=" (!Semaphore_ETRasClearingSource$IpInstance) &amp; (!Semaphore_ClockSourceETRMode1$IpInstance) &amp; (!Semaphore_ClockSourceETRMode2$IpInstance)&amp;!(Semaphore_input_Channel_TRC$IpInstance)&amp;(Semaphore_SMC_Trigger$IpInstance|Semaphore_SMC_Clock$IpInstance|Semaphore_SMC_Gated$IpInstance|Semaphore_SMC_Reset$IpInstance)" Diagnostic="An active Slave Mode should be selected first . This option might become unavailable if (1)ETR is already used as a clearing source (2)ETR is already used as a Clock Source, or (3)if an input capture from TRC is already selected" />
     </Mode>
     <Mode Name="TriggerSource_TI1ED" UserName="TI1_ED">
-<!--TEST--> <Condition Diagnostic="TI1ED cannot be  used in Gated controller mode" Expression="!(Semaphore_SMC_Gated$IpInstance|Semaphore_output_Channel1$IpInstance|((Semaphore_SMC_Trigger$IpInstance|Semaphore_SMC_Clock$IpInstance)&amp;(Semaphore_input_Channel1_direct$IpInstance|Semaphore_input_Channel2_indirect$IpInstance)))"/>
+<!--TEST--> <Condition Diagnostic="This option is not available if either Channel 1 is already set or the Slave mode controller is in Gated mode" Expression="!(Semaphore_SMC_Gated$IpInstance|Semaphore_output_Channel1$IpInstance|((Semaphore_SMC_Trigger$IpInstance|Semaphore_SMC_Clock$IpInstance)&amp;(Semaphore_input_Channel1_direct$IpInstance|Semaphore_input_Channel2_indirect$IpInstance)))"/>
                                         <Semaphore>Semaphore_TriggerSourceTI1ED$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_ClockTriggerSourceOnTI1$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_SourceTRC$IpInstance</Semaphore>
@@ -2132,7 +2575,7 @@
      </SignalLogicalOp>
     </Mode>
     <Mode Name="TriggerSource_TI1FP1" UserName="TI1FP1">
-<!--TEST--> <Condition Expression="!(Semaphore_output_Channel1$IpInstance|((Semaphore_SMC_Trigger$IpInstance|Semaphore_SMC_Clock$IpInstance|Semaphore_SMC_Gated$IpInstance)&amp;(Semaphore_input_Channel1_direct$IpInstance|Semaphore_input_Channel2_indirect$IpInstance)))&amp;(Semaphore_SMC_Trigger$IpInstance|Semaphore_SMC_Clock$IpInstance|Semaphore_SMC_Gated$IpInstance|Semaphore_SMC_Reset$IpInstance)" Diagnostic="Channel 1 is already used"/>
+<!--TEST--> <Condition Expression="!(Semaphore_output_Channel1$IpInstance|((Semaphore_SMC_Trigger$IpInstance|Semaphore_SMC_Clock$IpInstance|Semaphore_SMC_Gated$IpInstance)&amp;(Semaphore_input_Channel1_direct$IpInstance|Semaphore_input_Channel2_indirect$IpInstance)))&amp;(Semaphore_SMC_Trigger$IpInstance|Semaphore_SMC_Clock$IpInstance|Semaphore_SMC_Gated$IpInstance|Semaphore_SMC_Reset$IpInstance)" Diagnostic="An active Slave Mode should be selected first . This option might become unavailable if Channel 1 is already used"/>
                                         <Semaphore>Semaphore_TriggerSourceTI1FP1$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_ClockTriggerSourceOnTI1$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_CH1pinUsed$IpInstance</Semaphore>
@@ -2141,7 +2584,7 @@
      </SignalLogicalOp>
     </Mode>
     <Mode Name="TriggerSource_TI2FP2" UserName="TI2FP2">
-                                        <Condition Expression="!(Semaphore_output_Channel2$IpInstance|((Semaphore_SMC_Trigger$IpInstance|Semaphore_SMC_Clock$IpInstance|Semaphore_SMC_Gated$IpInstance)&amp;(Semaphore_input_Channel2_direct$IpInstance|Semaphore_input_Channel1_indirect$IpInstance)))&amp;(Semaphore_SMC_Trigger$IpInstance|Semaphore_SMC_Clock$IpInstance|Semaphore_SMC_Gated$IpInstance|Semaphore_SMC_Reset$IpInstance)" Diagnostic="Channel 2 is already used "/>
+                                        <Condition Expression="!(Semaphore_output_Channel2$IpInstance|((Semaphore_SMC_Trigger$IpInstance|Semaphore_SMC_Clock$IpInstance|Semaphore_SMC_Gated$IpInstance)&amp;(Semaphore_input_Channel2_direct$IpInstance|Semaphore_input_Channel1_indirect$IpInstance)))&amp;(Semaphore_SMC_Trigger$IpInstance|Semaphore_SMC_Clock$IpInstance|Semaphore_SMC_Gated$IpInstance|Semaphore_SMC_Reset$IpInstance)" Diagnostic="An active Slave Mode should be selected first . This option might become unavailable if Channel 2 is already used "/>
                                         <Semaphore>Semaphore_TriggerSourceTI2FP2$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_ClockTriggerSourceOnTI2$IpInstance</Semaphore>
      <SignalLogicalOp Name="AND">
@@ -2154,7 +2597,7 @@
                         <Semaphore>Semaphore_ClockSource$IpInstance</Semaphore>
                          <Condition Expression="!(Semaphore_Encoder_Interface$IpInstance)&amp;!(Semaphore_SMC_Clock$IpInstance)" Diagnostic="Not available in Encoder Mode or when the slave mode controller is in external clock mode 1"/>
    <ModeLogicOperator Name="XOR">
-    <Mode Name="Internal" UserName="Internal Clock" Visible="true" >
+    <Mode Name="Internal" UserName="Internal Clock" >
                                        <Condition Expression="!(Semaphore_SMC_Clock$IpInstance)" Diagnostic="Cannot be used while the slave mode controller is in external clock mode"/>
                                         <Semaphore>Semaphore_ClockSourceInternal$IpInstance</Semaphore>
      <SignalLogicalOp Name="AND">
@@ -2167,6 +2610,30 @@
                                         <Condition Expression="!(Semaphore_Encoder_Interface$IpInstance|Semaphore_SMC_Clock$IpInstance) &amp; (!Semaphore_ETRasClearingSource$IpInstance) &amp; (!Semaphore_TriggerSourceETR$IpInstance)" Diagnostic="Cannot be used (1) while Encoder mode is selected,(2) in External Clock mode,(3) while ETR is aready used as clearing source or as Trigger Source"/>
      <SignalLogicalOp Name="AND">
       <Signal Name="ETR"/>
+     </SignalLogicalOp>
+    </Mode>
+    <Mode Name="ClockSourceETR_Mode2_Remap_TIM2" UserName="ETR2 through Remap" RemoveCondition="!($IpNumber=2)">
+                                        <Semaphore>Semaphore_ClockSourceETRMode2$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_ETRpinUsed$IpInstance</Semaphore>
+                                        <Condition Expression="!(Semaphore_Encoder_Interface$IpInstance|Semaphore_SMC_Clock$IpInstance) &amp; (!Semaphore_ETRasClearingSource$IpInstance) &amp; (!Semaphore_TriggerSourceETR$IpInstance)" Diagnostic="Cannot be used (1) while Encoder mode is selected,(2) in External Clock mode,(3) while ETR is aready used as clearing source or as Trigger Source"/>
+     <SignalLogicalOp Name="AND">
+      <Signal Name="VS_NoETR"/>
+     </SignalLogicalOp>
+    </Mode>
+    <Mode Name="ClockSourceETR_Mode2_Remap_TIM21" UserName="ETR2 through Remap" RemoveCondition="!($IpNumber=21)">
+                                        <Semaphore>Semaphore_ClockSourceETRMode2$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_ETRpinUsed$IpInstance</Semaphore>
+                                        <Condition Expression="!(Semaphore_Encoder_Interface$IpInstance|Semaphore_SMC_Clock$IpInstance) &amp; (!Semaphore_ETRasClearingSource$IpInstance) &amp; (!Semaphore_TriggerSourceETR$IpInstance)" Diagnostic="Cannot be used (1) while Encoder mode is selected,(2) in External Clock mode,(3) while ETR is aready used as clearing source or as Trigger Source"/>
+     <SignalLogicalOp Name="AND">
+      <Signal Name="VS_NoETR"/>
+     </SignalLogicalOp>
+    </Mode>
+    <Mode Name="ClockSourceETR_Mode2_Remap_TIM22" UserName="ETR2 through Remap" RemoveCondition="!($IpNumber=22)">
+                                        <Semaphore>Semaphore_ClockSourceETRMode2$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_ETRpinUsed$IpInstance</Semaphore>
+                                        <Condition Expression="!(Semaphore_Encoder_Interface$IpInstance|Semaphore_SMC_Clock$IpInstance) &amp; (!Semaphore_ETRasClearingSource$IpInstance) &amp; (!Semaphore_TriggerSourceETR$IpInstance)" Diagnostic="Cannot be used (1) while Encoder mode is selected,(2) in External Clock mode,(3) while ETR is aready used as clearing source or as Trigger Source"/>
+     <SignalLogicalOp Name="AND">
+      <Signal Name="VS_NoETR"/>
      </SignalLogicalOp>
     </Mode>
                         </ModeLogicOperator>
@@ -2184,6 +2651,24 @@
       <Signal Name="CH1"/>
      </SignalLogicalOp>
     </Mode>
+    <Mode Name="Input_Capture1_from_TI1_REMAP_TIM21" UserName="Input Capture direct mode from Remap" RemoveCondition="!($IpNumber=21)">
+                                        <Semaphore>Semaphore_input_Channel1$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_input_Channel1_direct$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_CH1pinUsed$IpInstance</Semaphore>
+                                       <Condition Diagnostic="Channel1 is already used as input for the Slave mode controller" Expression="((Semaphore_SMC_Reset$IpInstance)|!(Semaphore_ClockTriggerSourceOnTI1$IpInstance))"/>
+     <SignalLogicalOp Name="AND">
+      <Signal Name="VS_NoInput1"/>
+     </SignalLogicalOp>
+    </Mode>
+    <Mode Name="Input_Capture1_from_TI1_REMAP_TIM22" UserName="Input Capture direct mode from Remap" RemoveCondition="!($IpNumber=22)">
+                                        <Semaphore>Semaphore_input_Channel1$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_input_Channel1_direct$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_CH1pinUsed$IpInstance</Semaphore>
+                                       <Condition Diagnostic="Channel1 is already used as input for the Slave mode controller" Expression="((Semaphore_SMC_Reset$IpInstance)|!(Semaphore_ClockTriggerSourceOnTI1$IpInstance))"/>
+     <SignalLogicalOp Name="AND">
+      <Signal Name="VS_NoInput1"/>
+     </SignalLogicalOp>
+    </Mode>
     <Mode Name="Input_Capture1_from_TI2" UserName="Input Capture indirect mode">
                                         <Semaphore>Semaphore_input_Channel1$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_input_Channel1_indirect$IpInstance</Semaphore>
@@ -2196,6 +2681,7 @@
                                         <Condition Diagnostic="An ITRx or TI1_ED must be selected as Clock/trigger source" Expression="Semaphore_SourceTRC$IpInstance"/>
                                         <Semaphore>Semaphore_input_Channel1$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_input_Channel_TRC$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_input_Channel_TRC_TI1$IpInstance</Semaphore>
      <SignalLogicalOp Name="AND">
       <Signal Name="VS_CH1"/>
      </SignalLogicalOp>
@@ -2207,6 +2693,8 @@
                                         <Semaphore>Semaphore_OC_No_output_Channel1$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_clearable$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_Channel1x$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_OSSR_TIM_1_8_$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_OSSR_TIM_15_16_17_$IpInstance</Semaphore>
                                  <SignalLogicalOp Name="AND">
       <Signal Name="VS_no_output1"/>
      </SignalLogicalOp>
@@ -2218,6 +2706,8 @@
                                         <Semaphore>Semaphore_clearable$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_Channel1x$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_CH1pinUsed$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_OSSR_TIM_1_8_$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_OSSR_TIM_15_16_17_$IpInstance</Semaphore>
      <SignalLogicalOp Name="AND">
       <Signal Name="CH1"/>
      </SignalLogicalOp>
@@ -2228,6 +2718,8 @@
                                         <Semaphore>Semaphore_output_Channel1$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_clearable$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_Channel1N$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_OSSR_TIM_1_8_$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_OSSR_TIM_15_16_17_$IpInstance</Semaphore>
      <SignalLogicalOp Name="AND">
       <Signal Name="CH1N"/>
      </SignalLogicalOp>
@@ -2235,12 +2727,14 @@
     <Mode Name="Output Compare1 CH1 CH1N" UserName="Output Compare CH1 CH1N">
                                         <Condition Diagnostic="(1) Channel1 cannot be used in output while TI1 is used as clock or trigger source, (2) mode not compatible with XOR funtion activation" Expression="!(Semaphore_ClockTriggerSourceOnTI1$IpInstance) &amp;!Semaphore_XOR_Activatedd$IpInstance"/>
                                         <Semaphore>Semaphore_output_Channel$IpInstance</Semaphore>
-- <Semaphore>Semaphore_output_Channel1$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_output_Channel1$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_clearable$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_output_X_XN$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_Channel1x$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_Channel1N$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_CH1pinUsed$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_OSSR_TIM_1_8_$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_OSSR_TIM_15_16_17_$IpInstance</Semaphore>
      <SignalLogicalOp Name="AND">
       <Signal Name="CH1"/>
       <Signal Name="CH1N"/>
@@ -2253,6 +2747,8 @@
                                         <Semaphore>Semaphore_clearable$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_Channel1x$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_CH1pinUsed$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_OSSR_TIM_1_8_$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_OSSR_TIM_15_16_17_$IpInstance</Semaphore>
      <SignalLogicalOp Name="AND">
       <Signal Name="CH1"/>
      </SignalLogicalOp>
@@ -2263,6 +2759,8 @@
                                         <Semaphore>Semaphore_output_Channel1$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_clearable$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_Channel1N$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_OSSR_TIM_1_8_$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_OSSR_TIM_15_16_17_$IpInstance</Semaphore>
      <SignalLogicalOp Name="AND">
       <Signal Name="CH1N"/>
      </SignalLogicalOp>
@@ -2270,12 +2768,14 @@
     <Mode Name="PWM Generation1 CH1 CH1N" UserName="PWM Generation CH1 CH1N">
                                         <Condition Diagnostic="(1) Channel1 cannot be used in output while TI1 is used as clock or trigger source, (2) mode not compatible with XOR funtion activation" Expression="!(Semaphore_ClockTriggerSourceOnTI1$IpInstance) &amp;!Semaphore_XOR_Activatedd$IpInstance"/>
                                         <Semaphore>Semaphore_output_Channel$IpInstance</Semaphore>
-- <Semaphore>Semaphore_output_Channel1$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_output_Channel1$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_clearable$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_output_X_XN$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_Channel1x$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_Channel1N$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_CH1pinUsed$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_OSSR_TIM_1_8_$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_OSSR_TIM_15_16_17_$IpInstance</Semaphore>
      <SignalLogicalOp Name="AND">
       <Signal Name="CH1"/>
       <Signal Name="CH1N"/>
@@ -2331,6 +2831,8 @@
                                         <Semaphore>Semaphore_forced_output_Channel1$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_Channel1x$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_CH1pinUsed$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_OSSR_TIM_1_8_$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_OSSR_TIM_15_16_17_$IpInstance</Semaphore>
      <SignalLogicalOp Name="AND">
       <Signal Name="CH1"/>
      </SignalLogicalOp>
@@ -2341,6 +2843,8 @@
                                         <Semaphore>Semaphore_output_Channel1$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_forced_output_Channel1$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_Channel1N$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_OSSR_TIM_1_8_$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_OSSR_TIM_15_16_17_$IpInstance</Semaphore>
      <SignalLogicalOp Name="AND">
       <Signal Name="CH1N"/>
      </SignalLogicalOp>
@@ -2354,6 +2858,8 @@
                                         <Semaphore>Semaphore_Channel1x$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_Channel1N$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_CH1pinUsed$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_OSSR_TIM_1_8_$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_OSSR_TIM_15_16_17_$IpInstance</Semaphore>
      <SignalLogicalOp Name="AND">
       <Signal Name="CH1"/>
       <Signal Name="CH1N"/>
@@ -2374,6 +2880,14 @@
       <Signal Name="CH2"/>
      </SignalLogicalOp>
     </Mode>
+    <Mode Name="Input_Capture2_from_TI2_Remap" UserName="Input Capture direct from remap" RemoveCondition="!($IpNumber=21)">
+                                        <Semaphore>Semaphore_input_Channel2$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_input_Channel2_direct$IpInstance</Semaphore>
+                                        <Condition Diagnostic="Channel2 is already used as input for the Slave mode controller" Expression="!((Semaphore_SMC_Clock$IpInstance|Semaphore_SMC_Gated$IpInstance|Semaphore_SMC_Trigger$IpInstance)&amp;(Semaphore_ClockTriggerSourceOnTI2$IpInstance))"/>
+     <SignalLogicalOp Name="AND">
+      <Signal Name="VS_NoInput2"/>
+     </SignalLogicalOp>
+    </Mode>
     <Mode Name="Input_Capture2_from_TI1" UserName="Input Capture indirect mode">
                                         <Semaphore>Semaphore_input_Channel2$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_input_Channel2_indirect$IpInstance</Semaphore>
@@ -2386,6 +2900,7 @@
                                         <Condition Diagnostic="An ITRX or TI1_ED must be selected as Clock/trigger source" Expression="Semaphore_SourceTRC$IpInstance"/>
                                         <Semaphore>Semaphore_input_Channel2$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_input_Channel_TRC$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_input_Channel_TRC_TI2$IpInstance</Semaphore>
      <SignalLogicalOp Name="AND">
       <Signal Name="VS_CH2"/>
      </SignalLogicalOp>
@@ -2397,6 +2912,7 @@
                                         <Semaphore>Semaphore_OC_No_output_Channel2$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_clearable$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_Channel2x$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_OSSR_TIM_1_8_$IpInstance</Semaphore>
                                  <SignalLogicalOp Name="AND">
       <Signal Name="VS_no_output2"/>
      </SignalLogicalOp>
@@ -2407,6 +2923,7 @@
                                         <Semaphore>Semaphore_output_Channel2$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_clearable$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_Channel2x$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_OSSR_TIM_1_8_$IpInstance</Semaphore>
      <SignalLogicalOp Name="AND">
       <Signal Name="CH2"/>
      </SignalLogicalOp>
@@ -2417,6 +2934,7 @@
                                         <Semaphore>Semaphore_output_Channel2$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_clearable$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_Channel2N$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_OSSR_TIM_1_8_$IpInstance</Semaphore>
      <SignalLogicalOp Name="AND">
       <Signal Name="CH2N"/>
      </SignalLogicalOp>
@@ -2429,6 +2947,7 @@
                                         <Semaphore>Semaphore_output_X_XN$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_Channel2N$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_Channel2x$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_OSSR_TIM_1_8_$IpInstance</Semaphore>
      <SignalLogicalOp Name="AND">
       <Signal Name="CH2"/>
       <Signal Name="CH2N"/>
@@ -2440,6 +2959,7 @@
                                         <Semaphore>Semaphore_output_Channel2$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_clearable$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_Channel2x$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_OSSR_TIM_1_8_$IpInstance</Semaphore>
      <SignalLogicalOp Name="AND">
       <Signal Name="CH2"/>
      </SignalLogicalOp>
@@ -2450,6 +2970,7 @@
                                         <Semaphore>Semaphore_output_Channel2$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_clearable$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_Channel2N$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_OSSR_TIM_1_8_$IpInstance</Semaphore>
      <SignalLogicalOp Name="AND">
       <Signal Name="CH2N"/>
      </SignalLogicalOp>
@@ -2462,6 +2983,7 @@
                                         <Semaphore>Semaphore_output_X_XN$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_Channel2x$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_Channel2N$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_OSSR_TIM_1_8_$IpInstance</Semaphore>
      <SignalLogicalOp Name="AND">
       <Signal Name="CH2"/>
       <Signal Name="CH2N"/>
@@ -2514,6 +3036,7 @@
                                         <Semaphore>Semaphore_output_Channel2$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_forced_output_Channel2$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_Channel2x$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_OSSR_TIM_1_8_$IpInstance</Semaphore>
      <SignalLogicalOp Name="AND">
       <Signal Name="CH2"/>
      </SignalLogicalOp>
@@ -2524,6 +3047,7 @@
                                         <Semaphore>Semaphore_output_Channel2$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_forced_output_Channel2$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_Channel2N$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_OSSR_TIM_1_8_$IpInstance</Semaphore>
      <SignalLogicalOp Name="AND">
       <Signal Name="CH2N"/>
      </SignalLogicalOp>
@@ -2536,6 +3060,7 @@
                                         <Semaphore>Semaphore_output_X_XN$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_Channel2N$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_Channel2x$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_OSSR_TIM_1_8_$IpInstance</Semaphore>
      <SignalLogicalOp Name="AND">
       <Signal Name="CH2"/>
       <Signal Name="CH2N"/>
@@ -2566,6 +3091,7 @@
                                         <Condition Diagnostic="An ITRX or TI1_ED must be selected as Clock/trigger source" Expression="Semaphore_SourceTRC$IpInstance"/>
                                         <Semaphore>Semaphore_input_Channel3$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_input_Channel_TRC$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_input_Channel_TRC_TI3$IpInstance</Semaphore>
      <SignalLogicalOp Name="AND">
       <Signal Name="VS_CH3"/>
      </SignalLogicalOp>
@@ -2577,6 +3103,7 @@
                                         <Semaphore>Semaphore_OC_No_output_Channel3$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_clearable$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_Channel3x$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_OSSR_TIM_1_8_$IpInstance</Semaphore>
                                  <SignalLogicalOp Name="AND">
       <Signal Name="VS_no_output3"/>
      </SignalLogicalOp>
@@ -2587,6 +3114,7 @@
                                         <Semaphore>Semaphore_output_Channel3$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_clearable$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_Channel3x$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_OSSR_TIM_1_8_$IpInstance</Semaphore>
      <SignalLogicalOp Name="AND">
       <Signal Name="CH3"/>
      </SignalLogicalOp>
@@ -2597,6 +3125,7 @@
                                         <Semaphore>Semaphore_output_Channel3$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_clearable$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_Channel3N$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_OSSR_TIM_1_8_$IpInstance</Semaphore>
      <SignalLogicalOp Name="AND">
       <Signal Name="CH3N"/>
      </SignalLogicalOp>
@@ -2609,6 +3138,7 @@
                                         <Semaphore>Semaphore_clearable$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_Channel3N$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_Channel3x$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_OSSR_TIM_1_8_$IpInstance</Semaphore>
      <SignalLogicalOp Name="AND">
       <Signal Name="CH3"/>
       <Signal Name="CH3N"/>
@@ -2620,6 +3150,7 @@
                                         <Semaphore>Semaphore_output_Channel3$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_clearable$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_Channel3x$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_OSSR_TIM_1_8_$IpInstance</Semaphore>
      <SignalLogicalOp Name="AND">
       <Signal Name="CH3"/>
      </SignalLogicalOp>
@@ -2630,6 +3161,7 @@
                                         <Semaphore>Semaphore_output_Channel3$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_clearable$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_Channel3N$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_OSSR_TIM_1_8_$IpInstance</Semaphore>
      <SignalLogicalOp Name="AND">
       <Signal Name="CH3N"/>
      </SignalLogicalOp>
@@ -2642,6 +3174,7 @@
                                         <Semaphore>Semaphore_clearable$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_Channel3N$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_Channel3x$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_OSSR_TIM_1_8_$IpInstance</Semaphore>
      <SignalLogicalOp Name="AND">
       <Signal Name="CH3"/>
       <Signal Name="CH3N"/>
@@ -2653,6 +3186,7 @@
                                         <Semaphore>Semaphore_output_Channel3$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_forced_output_Channel3$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_Channel3x$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_OSSR_TIM_1_8_$IpInstance</Semaphore>
      <SignalLogicalOp Name="AND">
       <Signal Name="CH3"/>
      </SignalLogicalOp>
@@ -2663,6 +3197,7 @@
                                         <Semaphore>Semaphore_output_Channel3$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_forced_output_Channel3$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_Channel3N$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_OSSR_TIM_1_8_$IpInstance</Semaphore>
      <SignalLogicalOp Name="AND">
       <Signal Name="CH3N"/>
      </SignalLogicalOp>
@@ -2675,6 +3210,7 @@
                                         <Semaphore>Semaphore_output_X_XN$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_Channel3N$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_Channel3x$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_OSSR_TIM_1_8_$IpInstance</Semaphore>
      <SignalLogicalOp Name="AND">
       <Signal Name="CH3"/>
       <Signal Name="CH3N"/>
@@ -2694,6 +3230,13 @@
       <Signal Name="CH4"/>
      </SignalLogicalOp>
     </Mode>
+    <Mode Name="Input_Capture4_from_TI4_Remap" UserName="Input Capture direct mode from Remap" RemoveCondition="!($IpNumber=2)">
+                                        <Semaphore>Semaphore_input_Channel4$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_input_Channel4_direct$IpInstance</Semaphore>
+     <SignalLogicalOp Name="AND">
+      <Signal Name="VS_NoInput4"/>
+     </SignalLogicalOp>
+    </Mode>
     <Mode Name="Input_Capture4_from_TI3" UserName="Input Capture indirect mode">
                                         <Semaphore>Semaphore_input_Channel4$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_input_Channel4_indirect$IpInstance</Semaphore>
@@ -2706,6 +3249,7 @@
                                         <Condition Diagnostic="An ITRx or TI1_ED must be selected as Clock/trigger source" Expression="Semaphore_SourceTRC$IpInstance"/>
                                         <Semaphore>Semaphore_input_Channel4$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_input_Channel_TRC$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_input_Channel_TRC_TI4$IpInstance</Semaphore>
      <SignalLogicalOp Name="AND">
       <Signal Name="VS_CH4"/>
      </SignalLogicalOp>
@@ -2716,7 +3260,7 @@
                                         <Semaphore>Semaphore_OC_No_output_Channel4$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_clearable$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_Channel4x$IpInstance</Semaphore>
-> <SignalLogicalOp Name="AND">
+                                 <SignalLogicalOp Name="AND">
       <Signal Name="VS_no_output4"/>
      </SignalLogicalOp>
     </Mode>
@@ -2753,7 +3297,7 @@
                         <Semaphore>Semaphore_Multi_Channels$IpInstance</Semaphore>
    <ModeLogicOperator Name="XOR">
     <Mode Name="Encoder_Interface" UserName="Encoder Mode" RemoveCondition="($IpNumber=6)|($IpNumber=7)|($IpNumber=18)|($IpNumber=9)|($IpNumber=10)|($IpNumber=11)|($IpNumber=12)|($IpNumber=13)|($IpNumber=14)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17)">
-                                <Condition Diagnostic="(1) Channel 1 , 2  must not be activated,(2)TI1 or TI2 shall not be used as clock/trigger source(3) external clock mode 2 must not be used ,(4) or slave mode must not be set" Expression="!(Semaphore_Channel1$IpInstance|Semaphore_Channel2$IpInstance|Semaphore_ClockTriggerSourceOnTI1$IpInstance|Semaphore_ClockTriggerSourceOnTI2$IpInstance) &amp; !(Semaphore_ClockSourceETRMode2$IpInstance|Semaphore_SMC_Clock$IpInstance|Semaphore_SMC_Reset$IpInstance|Semaphore_SMC_Gated$IpInstance|Semaphore_SMC_Trigger$IpInstance) &amp;!Semaphore_XOR_Activatedd$IpInstance" Visible="false"/>
+                                <Condition Diagnostic="(1) Channel 1 , 2  must not be activated,(2)TI1 or TI2 shall not be used as clock/trigger source(3) external clock mode 2 must not be used ,(4) or slave mode must not be set" Expression="!(Semaphore_Channel1$IpInstance|Semaphore_Channel2$IpInstance|Semaphore_ClockTriggerSourceOnTI1$IpInstance|Semaphore_ClockTriggerSourceOnTI2$IpInstance) &amp; !(Semaphore_ClockSourceETRMode2$IpInstance|Semaphore_SMC_Clock$IpInstance|Semaphore_SMC_Reset$IpInstance|Semaphore_SMC_Gated$IpInstance|Semaphore_SMC_Trigger$IpInstance) &amp;!Semaphore_XOR_Activatedd$IpInstance" />
                                         <Semaphore>Semaphore_Encoder_Interface$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_CH1pinUsed$IpInstance</Semaphore> <!-- correction F2-->
      <SignalLogicalOp Name="AND">
@@ -2762,7 +3306,7 @@
      </SignalLogicalOp>
     </Mode>
     <Mode Name="PWM_Input_1" UserName="PWM Input on CH1" RemoveCondition="($IpNumber=6)|($IpNumber=7)|($IpNumber=18)|($IpNumber=10)|($IpNumber=11)|($IpNumber=13)|($IpNumber=14)|($IpNumber=16)|($IpNumber=17)">
-                                        <Condition Diagnostic="PWM_Input_1 cannot be used (1) if Channel1 or Channel2 are already active,(2) if a Slave mode is already set ,(3)if the XOR function is activated" Expression="!(Semaphore_Channel1$IpInstance+Semaphore_Channel2$IpInstance|Semaphore_SMC_Clock$IpInstance|Semaphore_SMC_Reset$IpInstance|Semaphore_SMC_Gated$IpInstance|Semaphore_SMC_Trigger$IpInstance) &amp;!Semaphore_XOR_Activatedd$IpInstance" Visible="false"/>
+                                        <Condition Diagnostic="PWM_Input_1 cannot be used (1) if Channel1 or Channel2 are already active,(2) if a Slave mode is already set ,(3)if the XOR function is activated" Expression="!(Semaphore_Channel1$IpInstance+Semaphore_Channel2$IpInstance|Semaphore_SMC_Clock$IpInstance|Semaphore_SMC_Reset$IpInstance|Semaphore_SMC_Gated$IpInstance|Semaphore_SMC_Trigger$IpInstance) &amp;!Semaphore_XOR_Activatedd$IpInstance" />
                                         <Semaphore>Semaphore_PWM_Input_1$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_CaptureCompare_1_DMA_Enable$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_Trigger_DMA_Enable$IpInstance</Semaphore>
@@ -2778,10 +3322,10 @@
      <SignalLogicalOp Name="AND">
       <Signal Name="CH2"/>
      </SignalLogicalOp>
-                                        <Condition Diagnostic="PWM_Input_2 cannot be used (1) if Channel1 or Channel2 are already active,(2) if a Slave mode is already set ,(3)if the XOR function is activated" Expression="!(Semaphore_Channel1$IpInstance+Semaphore_Channel2$IpInstance|Semaphore_SMC_Clock$IpInstance|Semaphore_SMC_Reset$IpInstance|Semaphore_SMC_Gated$IpInstance|Semaphore_SMC_Trigger$IpInstance) &amp;!Semaphore_XOR_Activatedd$IpInstance" Visible="false"/>
+                                        <Condition Diagnostic="PWM_Input_2 cannot be used (1) if Channel1 or Channel2 are already active,(2) if a Slave mode is already set ,(3)if the XOR function is activated" Expression="!(Semaphore_Channel1$IpInstance+Semaphore_Channel2$IpInstance|Semaphore_SMC_Clock$IpInstance|Semaphore_SMC_Reset$IpInstance|Semaphore_SMC_Gated$IpInstance|Semaphore_SMC_Trigger$IpInstance) &amp;!Semaphore_XOR_Activatedd$IpInstance" />
     </Mode>
    </ModeLogicOperator>
-                        <Condition Diagnostic="Channel 1 must not be activated, nor any slave mode" Expression="!(Semaphore_Channel1$IpInstance)" Visible="false"/>
+                        <Condition Diagnostic="Channel 1 must not be activated, nor any slave mode" Expression="!(Semaphore_Channel1$IpInstance)" />
   </Mode>
   <Mode Name="Interrupt-On-Update">
                 <Semaphore>Semaphore_Interrupt_On_Update$IpInstance</Semaphore>
@@ -2790,7 +3334,7 @@
                 <Semaphore>Semaphore_Output_Trigger$IpInstance</Semaphore>
   </Mode>
   <Mode Name="Activate-Break-Input">
-                        <Condition Diagnostic="At least one channel must be set in output mode" Expression="((Semaphore_output_Channel1$IpInstance)&amp;!(Semaphore_OC_No_output_Channel1$IpInstance))|((Semaphore_output_Channel2$IpInstance)&amp;!(Semaphore_OC_No_output_Channel2$IpInstance))|((Semaphore_output_Channel3$IpInstance)&amp;!(Semaphore_OC_No_output_Channel3$IpInstance))|((Semaphore_output_Channel4$IpInstance)&amp;!(Semaphore_OC_No_output_Channel4$IpInstance))" Visible="false"/>
+                        <Condition Diagnostic="At least one channel must be set in output mode" Expression="((Semaphore_output_Channel1$IpInstance)&amp;!(Semaphore_OC_No_output_Channel1$IpInstance))|((Semaphore_output_Channel2$IpInstance)&amp;!(Semaphore_OC_No_output_Channel2$IpInstance))|((Semaphore_output_Channel3$IpInstance)&amp;!(Semaphore_OC_No_output_Channel3$IpInstance))|((Semaphore_output_Channel4$IpInstance)&amp;!(Semaphore_OC_No_output_Channel4$IpInstance))" />
    <ModeLogicOperator Name="OR">
     <Mode Name="Activate-Break-Input">
                                 <Semaphore>Semaphore_Activate_Break_Input$IpInstance</Semaphore>
@@ -2800,14 +3344,38 @@
     </Mode>
    </ModeLogicOperator>
   </Mode>
-                <Mode Name="Use-ETR-as-Clearing-Source">
-   <ModeLogicOperator Name="OR">
-    <Mode Name="ETR-as-clearing-source">
+                <Mode Name="Use ETR as Clearing Source">
+   <ModeLogicOperator Name="XOR">
+    <Mode Name="ETR-as-clearing-source" UserName="ETR IO as Clearing Source">
                                         <Semaphore>Semaphore_ETRasClearingSource$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_ETRpinUsed$IpInstance</Semaphore>
-                                        <Condition Diagnostic="activated only when a channel is configured in output and not all in forced_output Not available if ETR is used as Clock Source or Trigger Source" Expression="Semaphore_clearable$IpInstance &amp; (!Semaphore_TriggerSourceETR$IpInstance) &amp; (!Semaphore_ClockSourceETRMode1$IpInstance) &amp; (!Semaphore_ClockSourceETRMode2$IpInstance)" Visible="false"/>
+                                        <Condition Diagnostic="activated only when a channel is configured in output and not all in forced_output Not available if ETR is used as Clock Source or Trigger Source" Expression="Semaphore_clearable$IpInstance &amp; (!Semaphore_TriggerSourceETR$IpInstance) &amp; (!Semaphore_ClockSourceETRMode1$IpInstance) &amp; (!Semaphore_ClockSourceETRMode2$IpInstance)" />
      <SignalLogicalOp Name="AND">
       <Signal Name="ETR"/>
+     </SignalLogicalOp>
+    </Mode>
+    <Mode Name="ETR_as_clearing_source_through_remap_TIM2" UserName="ETR through remap" RemoveCondition="!($IpNumber=2)">
+                                        <Semaphore>Semaphore_ETRasClearingSource$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_ETRpinUsed$IpInstance</Semaphore>
+                                        <Condition Diagnostic="activated only when a channel is configured in output and not all in forced_output Not available if ETR is used as Clock Source or Trigger Source" Expression="Semaphore_clearable$IpInstance &amp; (!Semaphore_TriggerSourceETR$IpInstance) &amp; (!Semaphore_ClockSourceETRMode1$IpInstance) &amp; (!Semaphore_ClockSourceETRMode2$IpInstance)" />
+     <SignalLogicalOp Name="AND">
+      <Signal Name="VS_NoETR"/>
+     </SignalLogicalOp>
+    </Mode>
+    <Mode Name="ETR_as_clearing_source_through_remap_TIM21" UserName="ETR through remap" RemoveCondition="!($IpNumber=21)">
+                                        <Semaphore>Semaphore_ETRasClearingSource$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_ETRpinUsed$IpInstance</Semaphore>
+                                        <Condition Diagnostic="activated only when a channel is configured in output and not all in forced_output Not available if ETR is used as Clock Source or Trigger Source" Expression="Semaphore_clearable$IpInstance &amp; (!Semaphore_TriggerSourceETR$IpInstance) &amp; (!Semaphore_ClockSourceETRMode1$IpInstance) &amp; (!Semaphore_ClockSourceETRMode2$IpInstance)" />
+     <SignalLogicalOp Name="AND">
+      <Signal Name="VS_NoETR"/>
+     </SignalLogicalOp>
+    </Mode>
+    <Mode Name="ETR_as_clearing_source_through_remap_TIM22" UserName="ETR through remap" RemoveCondition="!($IpNumber=22)">
+                                        <Semaphore>Semaphore_ETRasClearingSource$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_ETRpinUsed$IpInstance</Semaphore>
+                                        <Condition Diagnostic="activated only when a channel is configured in output and not all in forced_output Not available if ETR is used as Clock Source or Trigger Source" Expression="Semaphore_clearable$IpInstance &amp; (!Semaphore_TriggerSourceETR$IpInstance) &amp; (!Semaphore_ClockSourceETRMode1$IpInstance) &amp; (!Semaphore_ClockSourceETRMode2$IpInstance)" />
+     <SignalLogicalOp Name="AND">
+      <Signal Name="VS_NoETR"/>
      </SignalLogicalOp>
     </Mode>
                         </ModeLogicOperator>
@@ -2828,11 +3396,9 @@
 <!--NOT CH1/CH2/CH3 in output-->
     <Mode Name="XOR_enable">
                                         <Semaphore>Semaphore_XOR_Activatedd$IpInstance</Semaphore>
-                                       <Condition Diagnostic="Channel 1 and 2 must be either a clock,a trigger source or set in input capture mode. channel 3 must be in an input capture direct mode" Expression="((Semaphore_ClockTriggerSourceOnTI1$IpInstance|Semaphore_input_Channel1_direct$IpInstance) &amp;(Semaphore_TriggerSourceTI2FP2$IpInstance|Semaphore_input_Channel2_direct$IpInstance) &amp; Semaphore_input_Channel3_direct$IpInstance) &amp;!Semaphore_Encoder_Interface$IpInstance &amp;!Semaphore_PWM_Input_1$IpInstance &amp;!Semaphore_PWM_Input_2$IpInstance &amp;!Semaphore_Xored_Inputs_Hall_Sensor_Interface$IpInstance"/>
-                                          <SignalLogicalOp Name="AND">
-      <Signal Name="CH1"/>
-      <Signal Name="CH2"/>
-      <Signal Name="CH3"/>
+                                        <Condition Diagnostic="Requires Channel 1 and 2, 1 and 3 or 1 and 2 and 3 to be set either as a clock, a trigger source or in input capture mode" Expression="((((Semaphore_ClockTriggerSourceOnTI1$IpInstance|Semaphore_input_Channel1_direct$IpInstance) &amp;(Semaphore_TriggerSourceTI2FP2$IpInstance|Semaphore_input_Channel2_direct$IpInstance)) &amp;(((Semaphore_input_Channel3_direct$IpInstance|!Semaphore_Channel3$IpInstance))))|(((Semaphore_ClockTriggerSourceOnTI1$IpInstance|Semaphore_input_Channel1_direct$IpInstance)&amp;(Semaphore_TriggerSourceTI2FP2$IpInstance|Semaphore_input_Channel2_direct$IpInstance|!Semaphore_Channel2$IpInstance)&amp;(Semaphore_input_Channel3_direct$IpInstance)))) &amp;!Semaphore_Encoder_Interface$IpInstance &amp;!Semaphore_PWM_Input_1$IpInstance &amp;!Semaphore_PWM_Input_2$IpInstance &amp;!Semaphore_Xored_Inputs_Hall_Sensor_Interface$IpInstance"/>
+                                <SignalLogicalOp Name="AND">
+     <Signal Name="VS_XOR"/>
     </SignalLogicalOp>
     </Mode>
                         </ModeLogicOperator>
@@ -2841,7 +3407,7 @@
    <ModeLogicOperator Name="OR">
     <Mode Name="OPM_bit" UserName="One pulse">
                                         <Semaphore>Semaphore_OPM_Activated$IpInstance</Semaphore>
-                                        <Condition Diagnostic="The timer needs to be activated" Expression="(($IpNumber=1)|($IpNumber=2)|($IpNumber=3)|($IpNumber=4)|($IpNumber=5)|($IpNumber=8)|($IpNumber=9)|($IpNumber=12)|($IpNumber=15)|($IpNumber=19)|($IpNumber=21)|($IpNumber=22))|Semaphore_Activated$IpInstance" Visible="false"/>
+                                        <Condition Diagnostic="The timer needs to be activated" Expression="(($IpNumber=1)|($IpNumber=2)|($IpNumber=3)|($IpNumber=4)|($IpNumber=5)|($IpNumber=8)|($IpNumber=9)|($IpNumber=12)|($IpNumber=15)|($IpNumber=19)|($IpNumber=20)|($IpNumber=21)|($IpNumber=22))|Semaphore_Activated$IpInstance" />
      <SignalLogicalOp Name="AND">
       <Signal Name="VS_OPM"/>
      </SignalLogicalOp>
@@ -2874,4 +3440,9 @@
  <RefSignal Name="VS_no_output3" Virtual="true"/>
  <RefSignal Name="VS_no_output4" Virtual="true"/>
  <RefSignal Name="VS_OPM" Virtual="true"/>
+ <RefSignal Name="VS_XOR" Virtual="true"/>
+ <RefSignal Name="VS_NoInput4" Virtual="true"/>
+ <RefSignal Name="VS_NoInput1" Virtual="true"/>
+ <RefSignal Name="VS_NoInput2" Virtual="true"/>
+ <RefSignal Name="VS_NoETR" Virtual="true"/>
 </IP>

@@ -1,0 +1,1059 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<IP DBVersion="V4.0" IPType="peripheral" IpGroup="Connectivity" Name="USART" Version="sci2_v2_2_Cube" 
+	xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" 
+	ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd" 
+	xmlns="http://mcd.rou.st.com/modules.php?name=mcu">
+	
+	 <About>USART: Universal Synchronous/Asynchronous Receiver Transmitter</About>
+	<!-- Generic RefParameters for USART/UART/IrDA/SmartCard Modes -->
+	<RefParameter Name="Instance" DefaultValue="USART$Index" Comment="Instance" Type="" Visible="false"/>
+	
+	<!-- Virtual Mode Parameter, to define RefParameter in function of RefMode -->
+	<RefParameter Comment="" DefaultValue="VM_ASYNC" Name="VirtualMode" Type="list" Visible="false" Group="Basic Parameters" >
+		<PossibleValue Comment="" Value="VM_ASYNC"/>
+		<PossibleValue Comment="" Value="VM_SYNC"/>	
+        <PossibleValue Comment="" Value="VM_IRDA"/>
+		<PossibleValue Comment="" Value="VM_SMARTCARD"/>
+        <PossibleValue Comment="" Value="VM_LIN"/>		
+	</RefParameter>
+	
+		<RefParameter Comment="" DefaultValue="VM_SYNC" Name="VirtualClockMode" Type="list" Visible="false" Group="Basic Parameters" >
+		<PossibleValue Comment="" Value="VM_SYNC"/>
+		<PossibleValue Comment="" Value="VM_SMARTCARD"/>
+	</RefParameter>
+	
+	
+	  <RefParameter Comment="Auto Baudrate Mode arg" DefaultValue="UART_ADVFEATURE_AUTOBAUDRATE_ENABLE" Name="AutoBaudRateEnable" Type="list" Group="Advanced Features" Visible="false">
+            <Condition Expression="$IpInstance_UART_AutoBaudRate_Enable" Diagnostic=""/>
+            <PossibleValue Comment="Enable" Value="UART_ADVFEATURE_AUTOBAUDRATE_ENABLE"/>
+        </RefParameter>
+        <RefParameter Comment="Auto Baudrate Mode arg" DefaultValue="null" Name="AutoBaudRateEnable" Type="list" Group="Advanced Features" Visible="false"/>
+    
+
+	<RefParameter Comment="Auto Baudrate" DefaultValue="UART_ADVFEATURE_AUTOBAUDRATE_DISABLE" Name="AutoBaudRateEnableParam" Type="list" Group="Advanced Features">
+		<PossibleValue Comment="Disable" Value="UART_ADVFEATURE_AUTOBAUDRATE_DISABLE"/>
+		<PossibleValue Comment="Enable" Value="UART_ADVFEATURE_AUTOBAUDRATE_ENABLE" Semaphore="$IpInstance_UART_AutoBaudRate_Enable"/>
+	</RefParameter>
+	<RefParameter Comment="" DefaultValue="UART_ADVFEATURE_AUTOBAUDRATE_INIT" Name="IsAutoBaudRateMode" Type="list" Group="Advanced Features" Visible="false">
+		<Condition Expression="$IpInstance_UART_AutoBaudRate_Enable" Diagnostic=""/>
+		<PossibleValue Comment="" Value="UART_ADVFEATURE_AUTOBAUDRATE_INIT"/>
+	</RefParameter>
+	<RefParameter Comment="" DefaultValue="" Name="IsAutoBaudRateMode" Type="list" Group="Advanced Features" Visible="false"/>
+
+		<!-- Baud Rate Parameters Asynchronous. -->
+	<RefParameter Comment="Baud Rate" DefaultValue="38400" Max="9000000" Min="110" Unit="Bits/s" Name="BaudRate" Type="integer" Visible="true" Group="Basic Parameters">
+		<Condition Expression="AutoBaudRateEnableParam = UART_ADVFEATURE_AUTOBAUDRATE_DISABLE" Diagnostic=""/>
+	</RefParameter>
+	<RefParameter Comment="Baud Rate" DefaultValue="38400" Max="9000000" Min="110" Unit="Bits/s" Name="BaudRate" Type="integer" Visible="false" Group="Basic Parameters">
+		<Condition Expression="AutoBaudRateEnableParam = UART_ADVFEATURE_AUTOBAUDRATE_ENABLE" Diagnostic=""/>
+	</RefParameter>
+	
+	        <RefParameter Comment="Baud Rate" DefaultValue="null" Name="BaudRate" Type="list" Visible="false" Group="Basic Parameters"/>
+
+
+	
+	
+	
+	<!-- Word Length Parameters for Synchronous, IrDa, and  Asyncronous. -->
+
+	
+	<RefParameter Comment="Word Length" DefaultValue="SMARTCARD_WORDLENGTH_9B" Name="WordLength" Type="list" Group="Basic Parameters">
+		<Condition Expression="VirtualMode = VM_SMARTCARD" Diagnostic=""/>
+		<PossibleValue Comment="9 Bits (including Parity)" Value="SMARTCARD_WORDLENGTH_9B"/>
+	</RefParameter>
+	
+	<RefParameter Comment="Word Length" DefaultValue="USART_WORDLENGTH_7B" Name="WordLength" Type="list" Group="Basic Parameters">
+		<Condition Expression="(DIE439|DIE438|DIE445|DIE448) &amp; VirtualMode = VM_SYNC" Diagnostic=""/>
+		<PossibleValue Comment="7 Bits (including Parity)" Value="USART_WORDLENGTH_7B" Semaphore="$IpInstance_Usart_7B"/>
+		<PossibleValue Comment="8 Bits (including Parity)" Value="USART_WORDLENGTH_8B"/>
+		<PossibleValue Comment="9 Bits (including Parity)" Value="USART_WORDLENGTH_9B"/>
+	</RefParameter>
+	<RefParameter Comment="Word Length" DefaultValue="USART_WORDLENGTH_8B" Name="WordLength" Type="list" Group="Basic Parameters">
+		<Condition Expression="VirtualMode = VM_SYNC" Diagnostic=""/>
+		<PossibleValue Comment="8 Bits (including Parity)" Value="USART_WORDLENGTH_8B"/>
+		<PossibleValue Comment="9 Bits (including Parity)" Value="USART_WORDLENGTH_9B"/>
+	</RefParameter>
+	
+	<RefParameter Comment="Word Length" DefaultValue="IRDA_WORDLENGTH_7B" Name="WordLength" Type="list" Group="Basic Parameters">
+		<Condition Expression="(DIE439|DIE438|DIE445|DIE448) &amp; VirtualMode = VM_IRDA" Diagnostic=""/>
+		<PossibleValue Comment="7 Bits (including Parity)" Value="IRDA_WORDLENGTH_7B" Semaphore="$IpInstance_Irda_7B"/>
+		<PossibleValue Comment="8 Bits (including Parity)" Value="IRDA_WORDLENGTH_8B"/>
+		<PossibleValue Comment="9 Bits (including Parity)" Value="IRDA_WORDLENGTH_9B"/>
+	</RefParameter>	
+	<RefParameter Comment="Word Length" DefaultValue="IRDA_WORDLENGTH_8B" Name="WordLength" Type="list" Group="Basic Parameters">
+		<Condition Expression="VirtualMode = VM_IRDA" Diagnostic=""/>
+		<PossibleValue Comment="8 Bits (including Parity)" Value="IRDA_WORDLENGTH_8B"/>
+		<PossibleValue Comment="9 Bits (including Parity)" Value="IRDA_WORDLENGTH_9B"/>
+	</RefParameter>
+	
+	
+	
+	 <RefParameter Comment="Word Length" DefaultValue="UART_WORDLENGTH_7B" Name="WordLength" Type="list" Group="Basic Parameters">
+	   <Condition Expression="(DIE439|DIE438|DIE445|DIE448) &amp; (!$IpInstance_LIN)" Diagnostic=""/>
+		  <PossibleValue Comment="7 Bits (including Parity)" Value="UART_WORDLENGTH_7B" Semaphore="$IpInstance_Uart_7B"/>
+		<PossibleValue Comment="8 Bits (including Parity)" Value="UART_WORDLENGTH_8B"/>
+		<PossibleValue Comment="9 Bits (including Parity)" Value="UART_WORDLENGTH_9B"/>
+	</RefParameter>
+	
+    <RefParameter Comment="Word Length" DefaultValue="UART_WORDLENGTH_8B" Name="WordLength" Type="list" Group="Basic Parameters">
+		<PossibleValue Comment="8 Bits (including Parity)" Value="UART_WORDLENGTH_8B"/>
+		<PossibleValue Comment="9 Bits (including Parity)" Value="UART_WORDLENGTH_9B"/>
+	</RefParameter>
+	
+	<!-- Stop Bits Parameters for Synchronous, and Asyncronous. -->
+	<RefParameter Comment="Stop Bits" DefaultValue="USART_STOPBITS_1" Name="StopBits" Type="list" Group="Basic Parameters">
+		<Condition Expression="VirtualMode = VM_SYNC" Diagnostic=""/>
+		<PossibleValue Comment="1" Value="USART_STOPBITS_1"/>
+		<PossibleValue Comment="2" Value="USART_STOPBITS_2"/>
+		<PossibleValue Comment="0.5" Value="USART_STOPBITS_0_5"/>
+		<PossibleValue Comment="1.5" Value="USART_STOPBITS_1_5"/>
+	</RefParameter>
+	<RefParameter Comment="Stop Bits" DefaultValue="SMARTCARD_STOPBITS_1_5" Name="StopBits" Type="list" Group="Basic Parameters">
+	   <Condition Expression="VirtualMode = VM_SMARTCARD" Diagnostic=""/>
+	   <PossibleValue Comment="1.5" Value="SMARTCARD_STOPBITS_1_5"/>
+	</RefParameter>
+	<RefParameter Comment="Stop Bits" DefaultValue="UART_STOPBITS_1" Name="StopBits" Type="list" Group="Basic Parameters">
+	    <PossibleValue Comment="1" Value="UART_STOPBITS_1"/>
+		<PossibleValue Comment="2" Value="UART_STOPBITS_2"/>
+	</RefParameter>
+	
+	<!-- Parity Parameters for Synchronous,  IrDa, SmartCard and Asyncronous. -->
+	<RefParameter Comment="Parity" DefaultValue="USART_PARITY_NONE" Name="Parity" Type="list" Group="Basic Parameters">
+		<Condition Expression="VirtualMode = VM_SYNC" Diagnostic=""/>
+		<PossibleValue Comment="None" Value="USART_PARITY_NONE"/>
+		<PossibleValue Comment="Even" Value="USART_PARITY_EVEN"/>
+		<PossibleValue Comment="Odd" Value="USART_PARITY_ODD"/>
+	</RefParameter>
+	<RefParameter Comment="Parity" DefaultValue="SMARTCARD_PARITY_EVEN" Name="Parity" Type="list" Group="Basic Parameters">
+		<Condition Expression="VirtualMode = VM_SMARTCARD" Diagnostic=""/>
+		<PossibleValue Comment="Even" Value="SMARTCARD_PARITY_EVEN"/>
+		<PossibleValue Comment="Odd" Value="SMARTCARD_PARITY_ODD"/>
+	</RefParameter>
+	<RefParameter Comment="Parity" DefaultValue="IRDA_PARITY_NONE" Name="Parity" Type="list" Group="Basic Parameters">
+		<Condition Expression="VirtualMode = VM_IRDA" Diagnostic=""/>
+		<PossibleValue Comment="None" Value="IRDA_PARITY_NONE"/>
+		<PossibleValue Comment="Even" Value="IRDA_PARITY_EVEN"/>
+		<PossibleValue Comment="Odd" Value="IRDA_PARITY_ODD"/>
+	</RefParameter>
+	<RefParameter Comment="Parity" DefaultValue="UART_PARITY_NONE" Name="Parity" Type="list" Group="Basic Parameters">
+		<PossibleValue Comment="None" Value="UART_PARITY_NONE"/>
+		<PossibleValue Comment="Even" Value="UART_PARITY_EVEN"/>
+		<PossibleValue Comment="Odd" Value="UART_PARITY_ODD"/>
+	</RefParameter>
+	<!-- DataDirection Parameters for Synchronous,IrDa,SmartCard and Asyncronous. -->
+	<RefParameter Comment="Data Direction" DefaultValue="USART_MODE_TX_RX" Name="Mode" Type="list" Group="Advanced Parameters">
+		<Condition Expression="VirtualMode = VM_SYNC" Diagnostic=""/>
+		<PossibleValue Comment="Receive and Transmit" Value="USART_MODE_TX_RX"/>
+		<PossibleValue Comment="Receive Only" Value="USART_MODE_RX"/>
+		<PossibleValue Comment="Transmit Only" Value="USART_MODE_TX"/>
+	</RefParameter>
+	<RefParameter Comment="Data Direction" DefaultValue="SMARTCARD_MODE_RX" Name="Mode" Type="list" Group="Advanced Parameters">
+		<Condition Expression="VirtualMode = VM_SMARTCARD" Diagnostic=""/>
+		<PossibleValue Comment="Receive Only" Value="SMARTCARD_MODE_RX"/>
+		<PossibleValue Comment="Transmit Only" Value="SMARTCARD_MODE_TX"/>
+		<PossibleValue Comment="Receive and Transmit" Value="SMARTCARD_MODE_TX_RX"/>
+	</RefParameter>
+	<RefParameter Comment="IrDa Mode" DefaultValue="IRDA_MODE_DISABLE" Name="Mode" Type="list" Group="Advanced Parameters">
+		<Condition Expression="VirtualMode = VM_IRDA" Diagnostic=""/>
+		<PossibleValue Comment="Enable" Value="IRDA_MODE_DISABLE"/>
+		<PossibleValue Comment="Disable" Value="IRDA_MODE_ENABLE"/>
+	</RefParameter>
+	<RefParameter Comment="Data Direction" DefaultValue="UART_MODE_TX_RX" Name="Mode" Type="list" Group="Advanced Parameters">
+		<PossibleValue Comment="Receive and Transmit" Value="UART_MODE_TX_RX"/>
+		<PossibleValue Comment="Receive Only" Value="UART_MODE_RX"/>
+		<PossibleValue Comment="Transmit Only" Value="UART_MODE_TX"/>
+	</RefParameter>
+	
+	<!-- Specifics RefParameters for UART Mode only -->
+	<RefParameter Comment="Hardware Flow Control" DefaultValue="UART_HWCONTROL_RTS" Name="HwFlowCtl" Type="list" Group="Basic Parameters" Visible="false" >	
+	<Condition Expression="$IpInstance_Request" Diagnostic=""/>
+		<PossibleValue Comment="RTS Only" Value="UART_HWCONTROL_RTS"/>
+	</RefParameter>
+	<RefParameter Comment="Hardware Flow Control" DefaultValue="UART_HWCONTROL_CTS" Name="HwFlowCtl" Type="list" Group="Basic Parameters" Visible="false" >
+		<Condition Expression="$IpInstance_Clear" Diagnostic=""/>
+		<PossibleValue Comment="CTS Only" Value="UART_HWCONTROL_CTS"/>
+	</RefParameter>
+	<RefParameter Comment="Hardware Flow Control" DefaultValue="UART_HWCONTROL_RTS_CTS" Name="HwFlowCtl" Type="list" Group="Basic Parameters" Visible="false" >
+		<Condition Expression="$IpInstance_CTS_RTS" Diagnostic=""/>
+		<PossibleValue Comment="RTS/CTS" Value="UART_HWCONTROL_RTS_CTS"/>
+	</RefParameter>
+	<RefParameter Comment="Hardware Flow Control" DefaultValue="UART_HWCONTROL_NONE" Name="HwFlowCtl" Type="list" Group="Basic Parameters" Visible="false" >
+		<PossibleValue Comment="None" Value="UART_HWCONTROL_NONE"/>
+	</RefParameter>
+	
+	<RefParameter Comment="Over Sampling" DefaultValue="UART_OVERSAMPLING_16" Name="OverSampling" Type="list" Group="Advanced Parameters">
+		<Condition Expression="$IpInstance_LIN" Diagnostic=""/>
+		<PossibleValue Comment="16 Samples" Value="UART_OVERSAMPLING_16"/>
+	</RefParameter>
+	<RefParameter Comment="Over Sampling" DefaultValue="UART_OVERSAMPLING_16" Name="OverSampling" Type="list" Group="Advanced Parameters">
+		<PossibleValue Comment="16 Samples" Value="UART_OVERSAMPLING_16"/>
+		<PossibleValue Comment="8 Samples" Value="UART_OVERSAMPLING_8"/>
+	</RefParameter>
+	
+	<!-- Specifics RefParameters for USART /SmartCard Clock Mode -->
+	<RefParameter Comment="Clock Polarity" DefaultValue="SMARTCARD_POLARITY_LOW" Name="CLKPolarity" Type="list" Group="Clock Parameters">
+		<Condition Expression="VirtualClockMode = VM_SMARTCARD" Diagnostic=""/>
+		<PossibleValue Comment="Low" Value="SMARTCARD_POLARITY_LOW"/>
+		<PossibleValue Comment="High" Value="SMARTCARD_POLARITY_HIGH"/>
+	</RefParameter>
+	<RefParameter Comment="Clock Polarity" DefaultValue="USART_POLARITY_LOW" Name="CLKPolarity" Type="list" Group="Clock Parameters">
+		<Condition Expression="VirtualMode = VM_SYNC" Diagnostic=""/>
+		<PossibleValue Comment="Low" Value="USART_POLARITY_LOW"/>
+		<PossibleValue Comment="High" Value="USART_POLARITY_HIGH"/>
+	</RefParameter>
+	<RefParameter Comment="Clock Polarity" DefaultValue="null" Name="CLKPolarity" Type="integer" Visible="false" Group="Clock Parameters" />
+
+	<RefParameter Comment="Clock Phase" DefaultValue="SMARTCARD_PHASE_1EDGE" Name="CLKPhase" Type="list" Group="Clock Parameters">
+		<Condition Expression="VirtualClockMode = VM_SMARTCARD" Diagnostic=""/>
+		<PossibleValue Comment="One Edge" Value="SMARTCARD_PHASE_1EDGE"/>
+		<PossibleValue Comment="Two Edge" Value="SMARTCARD_PHASE_2EDGE"/>
+	</RefParameter>
+	<RefParameter Comment="Clock Phase" DefaultValue="USART_PHASE_1EDGE" Name="CLKPhase" Type="list" Group="Clock Parameters">
+		<Condition Expression="VirtualMode = VM_SYNC" Diagnostic=""/>
+		<PossibleValue Comment="One Edge" Value="USART_PHASE_1EDGE"/>
+		<PossibleValue Comment="Two Edge" Value="USART_PHASE_2EDGE"/>
+	</RefParameter>
+	<RefParameter Comment="Clock Phase" DefaultValue="null" Name="CLKPhase" Type="integer" Visible="false"  Group="Clock Parameters"/>
+
+	<RefParameter Comment="Clock Last Bit" DefaultValue="SMARTCARD_LASTBIT_DISABLED" Name="CLKLastBit" Type="list" Group="Clock Parameters">
+		<Condition Expression="VirtualClockMode = VM_SMARTCARD" Diagnostic=""/>
+		<PossibleValue Comment="Disable" Value="SMARTCARD_LASTBIT_DISABLED"/>
+		<PossibleValue Comment="Enable" Value="SMARTCARD_LASTBIT_ENABLED"/>
+	</RefParameter>
+	<RefParameter Comment="Clock Last Bit" DefaultValue="USART_LASTBIT_DISABLE" Name="CLKLastBit" Type="list" Group="Clock Parameters">
+		<Condition Expression="VirtualMode = VM_SYNC" Diagnostic=""/>
+		<PossibleValue Comment="Disable" Value="USART_LASTBIT_DISABLE"/>
+		<PossibleValue Comment="Enable" Value="USART_LASTBIT_ENABLE"/>
+	</RefParameter>
+	<RefParameter Comment="Clock Last Bit" DefaultValue="null" Name="CLKLastBit" Type="integer" Visible="false" Group="Clock Parameters"/>
+	
+	<!-- Specifics RefParameters for IrDa Mode -->
+	<RefParameter Comment="Power Mode" DefaultValue="IRDA_POWERMODE_LOWPOWER" Name="PowerMode" Type="list" Group="Advanced Parameters">
+		<PossibleValue Comment="Low Power" Value="IRDA_POWERMODE_LOWPOWER"/>
+		<PossibleValue Comment="Normal Power" Value="IRDA_POWERMODE_NORMAL"/>
+	</RefParameter>
+
+	<!-- Prescaler Parameters for USART/IrDa/SmartCard Clock Mode -->
+	<RefParameter Comment="Prescaler" DefaultValue="1" Name="Prescaler" Type="list" Group="Advanced Parameters">
+		<Condition Expression="(PowerMode = IRDA_POWERMODE_NORMAL) &amp; (VirtualMode = VM_IRDA)" Diagnostic=""/>
+		<PossibleValue Comment="1" Value="1"/>
+	</RefParameter>
+	<RefParameter Comment="Prescaler for SmartCard Clock (Divide by x2)" DefaultValue="10" Max="31" Min="1" Name="Prescaler" Type="integer" Group="Clock Parameters">
+		<Condition Expression="VirtualMode = VM_SMARTCARD" Diagnostic=""/>
+	</RefParameter>
+	<RefParameter Comment="Prescaler" DefaultValue="10" Max="255" Min="1" Name="Prescaler" Type="integer" Group="Advanced Parameters"/>
+	
+	<!-- Calculate Speed, based on Prescaler Value on SmartCard Mode -->
+	<RefParameter Comment="SmartCard Clock Frequency" DefaultValue="4000000" Name="CalculateSpeed" Type="string" Group="Clock Parameters"/>
+	
+	<!-- OneBitSampling for SmartCard and Uart -->
+	<RefParameter Comment="Single Sample" DefaultValue="SMARTCARD_ONEBIT_SAMPLING_DISABLED " Name="OneBitSampling" Type="list" Group="Advanced Parameters">
+		<Condition Expression="VirtualMode = VM_SMARTCARD" Diagnostic=""/>
+		<PossibleValue Comment="Disable" Value="SMARTCARD_ONEBIT_SAMPLING_DISABLED "/>
+		<PossibleValue Comment="Enable" Value="SMARTCARD_ONEBIT_SAMPLING_ENABLED"/>
+	</RefParameter>
+	<RefParameter Comment="Single Sample" DefaultValue="UART_ONEBIT_SAMPLING_DISABLED " Name="OneBitSampling" Type="list" Group="Advanced Parameters">
+		<PossibleValue Comment="Disable" Value="UART_ONEBIT_SAMPLING_DISABLED "/>
+		<PossibleValue Comment="Enable" Value="UART_ONEBIT_SAMPLING_ENABLED"/>
+	</RefParameter>
+<!-- Specifics RefParameters for SmartCard Mode Only -->
+	<RefParameter Comment="Clock State" DefaultValue="SMARTCARD_CLOCK_DISABLED " Name="CLKEnable" Type="list" Group="Advanced Parameters">
+		<PossibleValue Comment="Disable" Value="SMARTCARD_CLOCK_DISABLED "/>
+		<PossibleValue Comment="Enable" Value="SMARTCARD_CLOCK_ENABLED"/>
+	</RefParameter>
+	
+	<RefParameter Comment="NACK If Parity Error" DefaultValue="SMARTCARD_NACK_ENABLED" Name="NACKEnable" Type="list" Group="Advanced Parameters">
+		<PossibleValue Comment="Disable" Value="SMARTCARD_NACK_DISABLED"/>
+		<PossibleValue Comment="Enable" Value="SMARTCARD_NACK_ENABLED"/>
+	</RefParameter>
+	
+	<RefParameter Comment="Guard Time" DefaultValue="0" Max="255" Min="0" Name="GuardTime" Type="integer" Group="Advanced Parameters"/>
+	<RefParameter Comment="Receiver TimeOut State" DefaultValue="SMARTCARD_TIMEOUT_DISABLED" Name="TimeOutEnable" Type="list" Group="Advanced Parameters">
+	<PossibleValue Comment="Enable" Value="SMARTCARD_TIMEOUT_ENABLED"/>
+	<PossibleValue Comment="Disable" Value="SMARTCARD_TIMEOUT_DISABLED"/>
+	</RefParameter>
+	<RefParameter Comment="Receiver TimeOut Value" DefaultValue="0" Max="16777215" Min="0" Name="TimeOutValue" Type="integer" Group="Advanced Parameters"/>
+    <RefParameter Comment="SmartCard Block Length" DefaultValue="0" Max="255" Min="0" Name="BlockLength" Type="integer" Group="Advanced Parameters"/>
+    <RefParameter Comment="Number of retries in receive and transmit mode" DefaultValue="0" Max="7" Min="0" Name="AutoRetryCount" Type="integer" Group="Advanced Parameters"/>
+
+	
+	<!-- Specifics RefParameters for MultiProcessor Only. WakeUp Method -->
+	<RefParameter Comment="Wake-Up Method" DefaultValue="UART_WAKEUPMETHOD_IDLELINE" Name="WakeUpMethod" Type="list" Group="Advanced Parameters">
+		<PossibleValue Comment="Idle Line" Value="UART_WAKEUPMETHOD_IDLELINE"/>
+		<PossibleValue Comment="Address Mark" Value="UART_WAKEUPMETHOD_ADDRESSMARK"/>
+	</RefParameter>
+	
+    <!-- Address for MultiProcessor --> 
+	<RefParameter Comment="Wake-Up Address" DefaultValue="0" Max="127" Min="0" Name="Address" Type="integer" Group="Advanced Parameters">
+		<Condition Expression="WakeUpMethod = UART_WAKEUPMETHOD_ADDRESSMARK" Diagnostic=""/>
+	</RefParameter>
+	<RefParameter Comment="Wake-Up Address" DefaultValue="0" Max="0" Min="0" Name="Address" Type="integer" Group="Advanced Parameters" Visible="false" />
+	
+	
+	
+	<!--Specifics RefParameters for LIN. Line BreakLength -->
+	<RefParameter Comment="Break Detect Length" DefaultValue="UART_LINBREAKDETECTLENGTH_10B" Name="BreakDetectLength" Type="list" Group="Advanced Parameters">
+		<PossibleValue Comment="10 Bits" Value="UART_LINBREAKDETECTLENGTH_10B"/>
+		<PossibleValue Comment="11 Bits" Value="UART_LINBREAKDETECTLENGTH_11B"/>
+	</RefParameter>
+	
+	
+	<!--Specifics RefParameters for RS485 -->
+	<RefParameter Comment="Polarity" DefaultValue="UART_DE_POLARITY_HIGH" Name="UART_DEPolarity" Type="list" Group="Advanced Parameters">
+		<PossibleValue Comment="High" Value="UART_DE_POLARITY_HIGH"/>
+		<PossibleValue Comment="Low" Value="UART_DE_POLARITY_LOW"/>
+	</RefParameter>
+    <RefParameter Comment="Assertion Time" DefaultValue="0" Max="31" Min="0" Unit="Sample Time Unit" Name="UART_DEAssertionTime" Type="integer" Group="Advanced Parameters"/>
+	<RefParameter Comment="Deassertion Time" DefaultValue="0" Max="31" Min="0" Unit="Sample Time Unit" Name="UART_DEDeassertionTime" Type="integer" Group="Advanced Parameters"/>
+
+	
+	
+		<!-- Advanceds features -->
+	<RefParameter Comment="SMARTCARD Advanced Features" DefaultValue="SMARTCARD_ADVFEATURE_NO_INIT" Name="AdvFeatureInit" Type="list" Group="Advanced Features" Visible="false">
+			<Condition Expression="!((TxPinLevelInvertParam = SMARTCARD_ADVFEATURE_TXINV_ENABLE)|(RxPinLevelInvertParam = SMARTCARD_ADVFEATURE_RXINV_ENABLE)|(DataInvertParam = SMARTCARD_ADVFEATURE_DATAINV_ENABLE)|(SwapParam = SMARTCARD_ADVFEATURE_SWAP_ENABLE)|(OverrunDisableParam = SMARTCARD_ADVFEATURE_OVERRUN_ENABLE)|(DMADisableonRxErrorParam = SMARTCARD_ADVFEATURE_DMA_ENABLEONRXERROR)|(MSBFirstParam = SMARTCARD_ADVFEATURE_MSBFIRST_ENABLE))&amp; (VirtualMode = VM_SMARTCARD)" Diagnostic=""/>
+		<PossibleValue Comment="" Value="SMARTCARD_ADVFEATURE_NO_INIT" Semaphore="$IpInstance_ADVFEATURE_NO_INIT"/>
+	</RefParameter>
+	<RefParameter Comment="UART Advanced Features" DefaultValue="UART_ADVFEATURE_NO_INIT" Name="AdvFeatureInit" Type="list" Group="Advanced Features" Visible="false">
+			<Condition Expression="!($IpInstance_TxPinLevelInvertENABLE|$IpInstance_RxPinLevelInvertENABLE|$IpInstance_DataInvertENABLE|$IpInstance_SwapENABLE|$IpInstance_OverrunDisableENABLE|$IpInstance_DMADisableonRxErrorENABLE|$IpInstance_MSBFirstENABLE|$IpInstance_UART_AutoBaudRate_Enable|(VirtualMode = VM_SMARTCARD))" Diagnostic=""/>
+		<PossibleValue Comment="" Value="UART_ADVFEATURE_NO_INIT" Semaphore="$IpInstance_ADVFEATURE_NO_INIT"/>
+	</RefParameter>
+
+		<RefParameter Visible="false" Comment="UART Advanced Features" DefaultValue="+IsClockTxPinLevelInvert+|IsClockRxPinLevelInvert+|IsClockDataInvert+|IsClockSwap+|IsClockOverrunDisable+|IsClockDMADisableonRxError+|IsClockMSBFirst" Name="AdvFeatureInit" Type="list">
+	        <Condition Expression="VirtualClockMode = VM_SMARTCARD" Diagnostic=""/>
+        </RefParameter>
+		<RefParameter Visible="false" Comment="UART Advanced Features" DefaultValue="+IsSmartCardTxPinLevelInvert+|IsSmartCardRxPinLevelInvert+|IsSmartCardDataInvert+|IsSmartCardSwap+|IsSmartCardOverrunDisable+|IsSmartCardDMADisableonRxError+|IsSmartCardMSBFirst" Name="AdvFeatureInit" Type="list">
+	        <Condition Expression="VirtualMode = VM_SMARTCARD" Diagnostic=""/>
+        </RefParameter>
+		
+	<RefParameter Visible="false" Comment="UART Advanced Features" DefaultValue="+IsTxPinLevelInvert+|IsRxPinLevelInvert+|IsDataInvert+|IsSwap+|IsOverrunDisable+|IsDMADisableonRxError+|IsMSBFirst+|IsAutoBaudRateMode" Name="AdvFeatureInit" Type="list"/>
+	<!-- TxPinLevelInvert -->
+	     <RefParameter Comment="TX Pin Active Level Is Inverted arg" DefaultValue="SMARTCARD_ADVFEATURE_TXINV_ENABLE" Name="TxPinLevelInvert" Type="list" Group="Advanced Features" Visible="false">
+            <Condition Expression="(TxPinLevelInvertParam = SMARTCARD_ADVFEATURE_TXINV_ENABLE) &amp; (VirtualClockMode = VM_SMARTCARD)" Diagnostic=""/>
+            <PossibleValue Comment="Enable" Value="SMARTCARD_ADVFEATURE_TXINV_ENABLE"/>
+        </RefParameter>
+	    <RefParameter Comment="TX Pin Active Level Is Inverted arg" DefaultValue="SMARTCARD_ADVFEATURE_TXINV_ENABLE" Name="TxPinLevelInvert" Type="list" Group="Advanced Features" Visible="false">
+            <Condition Expression="(TxPinLevelInvertParam = SMARTCARD_ADVFEATURE_TXINV_ENABLE) &amp; (VirtualMode = VM_SMARTCARD)" Diagnostic=""/>
+            <PossibleValue Comment="Enable" Value="SMARTCARD_ADVFEATURE_TXINV_ENABLE"/>
+        </RefParameter>
+        <RefParameter Comment="TX Pin Active Level Is Inverted arg" DefaultValue="UART_ADVFEATURE_TXINV_ENABLE" Name="TxPinLevelInvert" Type="list" Group="Advanced Features" Visible="false">
+            <Condition Expression="$IpInstance_TxPinLevelInvertENABLE" Diagnostic=""/>
+            <PossibleValue Comment="Enable" Value="UART_ADVFEATURE_TXINV_ENABLE"/>
+        </RefParameter>
+        <RefParameter Comment="TX Pin Active Level Is Inverted arg" DefaultValue="null" Name="TxPinLevelInvert" Type="list" Group="Advanced Features" Visible="false"/>
+   
+   <RefParameter Comment="SmartCard TX Pin Active Level Is Inverted" DefaultValue="SMARTCARD_ADVFEATURE_TXINV_DISABLE" Name="TxPinLevelInvertParam" Type="list" Group="Advanced Features">
+	<Condition Expression="VirtualClockMode = VM_SMARTCARD" Diagnostic=""/>
+       	<PossibleValue Comment="Disable" Value="SMARTCARD_ADVFEATURE_TXINV_DISABLE"/>
+		<PossibleValue Comment="Enable" Value="SMARTCARD_ADVFEATURE_TXINV_ENABLE" Semaphore="$IpInstance_CLOCK_TxPinLevelInvertENABLE"/>
+	</RefParameter>    
+   <RefParameter Comment="SmartCard TX Pin Active Level Is Inverted" DefaultValue="SMARTCARD_ADVFEATURE_TXINV_DISABLE" Name="TxPinLevelInvertParam" Type="list" Group="Advanced Features">
+	<Condition Expression="VirtualMode = VM_SMARTCARD" Diagnostic=""/>
+       	<PossibleValue Comment="Disable" Value="SMARTCARD_ADVFEATURE_TXINV_DISABLE"/>
+		<PossibleValue Comment="Enable" Value="SMARTCARD_ADVFEATURE_TXINV_ENABLE" Semaphore="$IpInstance_SC_TxPinLevelInvertENABLE"/>
+	</RefParameter>    
+    <RefParameter Comment="TX Pin Active Level Is Inverted" DefaultValue="UART_ADVFEATURE_TXINV_DISABLE" Name="TxPinLevelInvertParam" Type="list" Group="Advanced Features">
+		<PossibleValue Comment="Disable" Value="UART_ADVFEATURE_TXINV_DISABLE"/>
+		<PossibleValue Comment="Enable" Value="UART_ADVFEATURE_TXINV_ENABLE" Semaphore="$IpInstance_TxPinLevelInvertENABLE"/>
+	</RefParameter>
+	
+	<RefParameter Comment="CLOCK SMARTCARD IsTxPinLevelInvert" DefaultValue="SMARTCARD_ADVFEATURE_TXINVERT_INIT" Name="IsClockTxPinLevelInvert" Type="list" Group="Advanced Features" Visible="false">
+        <Condition Expression="$IpInstance_CLOCK_TxPinLevelInvertENABLE &amp; (VirtualClockMode = VM_SMARTCARD)" Diagnostic=""/>
+		<PossibleValue Comment="SMARTCARD_ADVFEATURE_TXINVERT_INIT" Value="SMARTCARD_ADVFEATURE_TXINVERT_INIT"/>
+	</RefParameter>
+	<RefParameter Comment="" DefaultValue="" Name="IsClockTxPinLevelInvert" Type="list" Group="Advanced Features" Visible="false"/>
+	<RefParameter Comment="SMARTCARD IsTxPinLevelInvert" DefaultValue="SMARTCARD_ADVFEATURE_TXINVERT_INIT" Name="IsSmartCardTxPinLevelInvert" Type="list" Group="Advanced Features" Visible="false">
+        <Condition Expression="$IpInstance_SC_TxPinLevelInvertENABLE" Diagnostic=""/>
+		<PossibleValue Comment="SMARTCARD_ADVFEATURE_TXINVERT_INIT" Value="SMARTCARD_ADVFEATURE_TXINVERT_INIT"/>
+	</RefParameter>
+	<RefParameter Comment="" DefaultValue="" Name="IsSmartCardTxPinLevelInvert" Type="list" Group="Advanced Features" Visible="false"/>
+	<RefParameter Comment="IsTxPinLevelInvert" DefaultValue="UART_ADVFEATURE_TXINVERT_INIT" Name="IsTxPinLevelInvert" Type="list" Group="Advanced Features" Visible="false">
+		<Condition Expression="$IpInstance_TxPinLevelInvertENABLE" Diagnostic=""/>
+		<PossibleValue Comment="" Value="UART_ADVFEATURE_TXINVERT_INIT"/>
+	</RefParameter>
+	<RefParameter Comment="" DefaultValue="" Name="IsTxPinLevelInvert" Type="list" Group="Advanced Features" Visible="false"/>
+        <!--RxPinLevelInvert -->
+	
+    <RefParameter Comment="RX Pin Active Level Is Inverted arg" DefaultValue="SMARTCARD_ADVFEATURE_RXINV_ENABLE" Name="RxPinLevelInvert" Type="list" Group="Advanced Features">
+            <Condition Expression="(RxPinLevelInvertParam = SMARTCARD_ADVFEATURE_RXINV_ENABLE) &amp; (VirtualClockMode = VM_SMARTCARD)" Diagnostic=""/>
+		<PossibleValue Comment="Enable" Value="SMARTCARD_ADVFEATURE_RXINV_ENABLE"/>
+	</RefParameter>	
+    <RefParameter Comment="RX Pin Active Level Is Inverted arg" DefaultValue="SMARTCARD_ADVFEATURE_RXINV_ENABLE" Name="RxPinLevelInvert" Type="list" Group="Advanced Features">
+            <Condition Expression="(RxPinLevelInvertParam = SMARTCARD_ADVFEATURE_RXINV_ENABLE) &amp; (VirtualMode = VM_SMARTCARD)" Diagnostic=""/>
+		<PossibleValue Comment="Enable" Value="SMARTCARD_ADVFEATURE_RXINV_ENABLE"/>
+	</RefParameter>
+	<RefParameter Comment="RX Pin Active Level Is Inverted arg" DefaultValue="UART_ADVFEATURE_RXINV_ENABLE" Name="RxPinLevelInvert" Type="list" Group="Advanced Features">
+            <Condition Expression="$IpInstance_RxPinLevelInvertENABLE" Diagnostic=""/>
+		<PossibleValue Comment="Enable" Value="UART_ADVFEATURE_RXINV_ENABLE"/>
+	</RefParameter>
+        <RefParameter Comment="RX Pin Active Level Is Inverted arg" DefaultValue="null" Name="RxPinLevelInvert" Type="list" Group="Advanced Features" Visible="false"/>
+	
+	<RefParameter Comment="SmartCard RX Pin Active Level Is Inverted" DefaultValue="SMARTCARD_ADVFEATURE_RXINV_DISABLE" Name="RxPinLevelInvertParam" Type="list" Group="Advanced Features">
+		<Condition Expression="VirtualClockMode = VM_SMARTCARD" Diagnostic=""/>
+		<PossibleValue Comment="Disable" Value="SMARTCARD_ADVFEATURE_RXINV_DISABLE"/>
+		<PossibleValue Comment="Enable" Value="SMARTCARD_ADVFEATURE_RXINV_ENABLE" Semaphore="$IpInstance_CLOCK_RXINV_ENABLE"/>
+	</RefParameter>
+	<RefParameter Comment="SmartCard RX Pin Active Level Is Inverted" DefaultValue="SMARTCARD_ADVFEATURE_RXINV_DISABLE" Name="RxPinLevelInvertParam" Type="list" Group="Advanced Features">
+		<Condition Expression="VirtualMode = VM_SMARTCARD" Diagnostic=""/>
+		<PossibleValue Comment="Disable" Value="SMARTCARD_ADVFEATURE_RXINV_DISABLE"/>
+		<PossibleValue Comment="Enable" Value="SMARTCARD_ADVFEATURE_RXINV_ENABLE" Semaphore="$IpInstance_SC_RXINV_ENABLE"/>
+	</RefParameter>
+	<RefParameter Comment="RX Pin Active Level Is Inverted" DefaultValue="UART_ADVFEATURE_RXINV_DISABLE" Name="RxPinLevelInvertParam" Type="list" Group="Advanced Features">
+		<PossibleValue Comment="Disable" Value="UART_ADVFEATURE_RXINV_DISABLE"/>
+		<PossibleValue Comment="Enable" Value="UART_ADVFEATURE_RXINV_ENABLE" Semaphore="$IpInstance_RxPinLevelInvertENABLE"/>
+	</RefParameter>
+	
+	<RefParameter Comment="CLOCK SMARTCARD IsRxPinLevelInvert" DefaultValue="SMARTCARD_ADVFEATURE_RXINVERT_INIT" Name="IsClockRxPinLevelInvert" Type="list" Group="Advanced Features" Visible="false">
+        <Condition Expression="$IpInstance_CLOCK_RXINV_ENABLE" Diagnostic=""/>
+		<PossibleValue Comment="CLOCK RXINVERT_INIT" Value="SMARTCARD_ADVFEATURE_RXINVERT_INIT"/>
+	</RefParameter>
+	<RefParameter Comment="" DefaultValue="" Name="IsClockRxPinLevelInvert" Type="list" Group="Advanced Features" Visible="false"/>
+	<RefParameter Comment="SMARTCARD IsRxPinLevelInvert" DefaultValue="SMARTCARD_ADVFEATURE_RXINVERT_INIT" Name="IsSmartCardRxPinLevelInvert" Type="list" Group="Advanced Features" Visible="false">
+        <Condition Expression="$IpInstance_SC_RXINV_ENABLE" Diagnostic=""/>
+		<PossibleValue Comment="RXINVERT_INIT" Value="SMARTCARD_ADVFEATURE_RXINVERT_INIT"/>
+	</RefParameter>
+	<RefParameter Comment="" DefaultValue="" Name="IsSmartCardRxPinLevelInvert" Type="list" Group="Advanced Features" Visible="false"/>
+	<RefParameter Comment="IsRxPinLevelInvert" DefaultValue="UART_ADVFEATURE_RXINVERT_INIT" Name="IsRxPinLevelInvert" Type="list" Group="Advanced Features" Visible="false">
+		<Condition Expression="$IpInstance_RxPinLevelInvertENABLE" Diagnostic=""/>
+		<PossibleValue Comment="" Value="UART_ADVFEATURE_RXINVERT_INIT"/>
+	</RefParameter>
+	<RefParameter Comment="" DefaultValue="" Name="IsRxPinLevelInvert" Type="list" Group="Advanced Features" Visible="false"/>
+       
+	   <!-- -->
+	  <RefParameter Comment="Data Are Inverted arg" DefaultValue="SMARTCARD_ADVFEATURE_DATAINV_ENABLE" Name="DataInvert" Type="list" Group="Advanced Features" Visible="false">
+            <Condition Expression="(DataInvertParam = SMARTCARD_ADVFEATURE_DATAINV_ENABLE)&amp; (VirtualClockMode = VM_SMARTCARD)" Diagnostic=""/>
+            <PossibleValue Comment="Enable" Value="SMARTCARD_ADVFEATURE_DATAINV_ENABLE"/>
+        </RefParameter>
+	  <RefParameter Comment="Data Are Inverted arg" DefaultValue="SMARTCARD_ADVFEATURE_DATAINV_ENABLE" Name="DataInvert" Type="list" Group="Advanced Features" Visible="false">
+            <Condition Expression="(DataInvertParam = SMARTCARD_ADVFEATURE_DATAINV_ENABLE)&amp; (VirtualMode = VM_SMARTCARD)" Diagnostic=""/>
+            <PossibleValue Comment="Enable" Value="SMARTCARD_ADVFEATURE_DATAINV_ENABLE"/>
+        </RefParameter>
+	  <RefParameter Comment="Data Are Inverted arg" DefaultValue="UART_ADVFEATURE_DATAINV_ENABLE" Name="DataInvert" Type="list" Group="Advanced Features" Visible="false">
+            <Condition Expression="$IpInstance_DataInvertENABLE" Diagnostic=""/>
+            <PossibleValue Comment="Enable" Value="UART_ADVFEATURE_DATAINV_ENABLE"/>
+        </RefParameter>
+        <RefParameter Comment="Data Are Inverted arg" DefaultValue="null" Name="DataInvert" Type="list" Group="Advanced Features" Visible="false"/>
+	
+	<RefParameter Comment="Data Are Inverted" DefaultValue="SMARTCARD_ADVFEATURE_DATAINV_DISABLE" Name="DataInvertParam" Type="list" Group="Advanced Features">
+		<Condition Expression="VirtualClockMode = VM_SMARTCARD" Diagnostic=""/>
+		<PossibleValue Comment="Disable" Value="SMARTCARD_ADVFEATURE_DATAINV_DISABLE"/>
+		<PossibleValue Comment="Enable" Value="SMARTCARD_ADVFEATURE_DATAINV_ENABLE" Semaphore="$IpInstance_Clock_DataInvertENABLE" />
+	</RefParameter>
+	<RefParameter Comment="Data Are Inverted" DefaultValue="SMARTCARD_ADVFEATURE_DATAINV_DISABLE" Name="DataInvertParam" Type="list" Group="Advanced Features">
+		<Condition Expression="VirtualMode = VM_SMARTCARD" Diagnostic=""/>
+		<PossibleValue Comment="Disable" Value="SMARTCARD_ADVFEATURE_DATAINV_DISABLE"/>
+		<PossibleValue Comment="Enable" Value="SMARTCARD_ADVFEATURE_DATAINV_ENABLE" Semaphore="$IpInstance_Sc_DataInvertENABLE" />
+	</RefParameter>
+	<RefParameter Comment="Data Are Inverted" DefaultValue="UART_ADVFEATURE_DATAINV_DISABLE" Name="DataInvertParam" Type="list" Group="Advanced Features">
+		<PossibleValue Comment="Disable" Value="UART_ADVFEATURE_DATAINV_DISABLE"/>
+		<PossibleValue Comment="Enable" Value="UART_ADVFEATURE_DATAINV_ENABLE"  Semaphore="$IpInstance_DataInvertENABLE"/>
+	</RefParameter>
+	
+	<RefParameter Comment="SMARTCARD IsDataInvert" DefaultValue="SMARTCARD_ADVFEATURE_DATAINVERT_INIT" Name="IsClockDataInvert" Type="list" Group="Advanced Features" Visible="false">
+        <Condition Expression="$IpInstance_Clock_DataInvertENABLE" Diagnostic=""/>
+		<PossibleValue Comment="CLOCK" Value="SMARTCARD_ADVFEATURE_DATAINVERT_INIT"/>
+	</RefParameter>
+	<RefParameter Comment="" DefaultValue="" Name="IsClockDataInvert" Type="list" Group="Advanced Features" Visible="false"/>
+	<RefParameter Comment="SMARTCARD IsDataInvert" DefaultValue="SMARTCARD_ADVFEATURE_DATAINVERT_INIT" Name="IsSmartCardDataInvert" Type="list" Group="Advanced Features" Visible="false">
+        <Condition Expression="$IpInstance_Sc_DataInvertENABLE" Diagnostic=""/>
+		<PossibleValue Comment="SMARTCARD" Value="SMARTCARD_ADVFEATURE_DATAINVERT_INIT"/>
+	</RefParameter>
+	<RefParameter Comment="" DefaultValue="" Name="IsSmartCardDataInvert" Type="list" Group="Advanced Features" Visible="false"/>
+
+	<RefParameter Comment="IsDataInvert" DefaultValue="UART_ADVFEATURE_DATAINVERT_INIT" Name="IsDataInvert" Type="list" Group="Advanced Features" Visible="false">
+		<Condition Expression="$IpInstance_DataInvertENABLE" Diagnostic=""/>
+		<PossibleValue Comment="" Value="UART_ADVFEATURE_DATAINVERT_INIT"/>
+	</RefParameter>
+	<RefParameter Comment="" DefaultValue="" Name="IsDataInvert" Type="list" Group="Advanced Features" Visible="false"/>
+     
+	 <!-- -->
+	<RefParameter Comment="TX and RX pins are swapped arg" DefaultValue="SMARTCARD_ADVFEATURE_SWAP_ENABLE" Name="Swap" Type="list" Group="Advanced Features" Visible="false">
+            <Condition Expression="(SwapParam = SMARTCARD_ADVFEATURE_SWAP_ENABLE) &amp; (VirtualClockMode = VM_SMARTCARD)" Diagnostic=""/>
+            <PossibleValue Comment="Enable" Value="SMARTCARD_ADVFEATURE_SWAP_ENABLE"/>
+    </RefParameter>
+	<RefParameter Comment="TX and RX pins are swapped arg" DefaultValue="SMARTCARD_ADVFEATURE_SWAP_ENABLE" Name="Swap" Type="list" Group="Advanced Features" Visible="false">
+            <Condition Expression="(SwapParam = SMARTCARD_ADVFEATURE_SWAP_ENABLE) &amp; (VirtualMode = VM_SMARTCARD)" Diagnostic=""/>
+            <PossibleValue Comment="Enable" Value="SMARTCARD_ADVFEATURE_SWAP_ENABLE"/>
+    </RefParameter>
+	<RefParameter Comment="TX and RX pins are swapped arg" DefaultValue="UART_ADVFEATURE_SWAP_ENABLE" Name="Swap" Type="list" Group="Advanced Features" Visible="false">
+            <Condition Expression="$IpInstance_SwapENABLE" Diagnostic=""/>
+            <PossibleValue Comment="Enable" Value="UART_ADVFEATURE_SWAP_ENABLE"/>
+    </RefParameter>
+    <RefParameter Comment="TX and RX pins are swapped arg" DefaultValue="null" Name="Swap" Type="list" Group="Advanced Features" Visible="false"/>
+	
+	<RefParameter Comment="TX and RX Pins Are Swapped" DefaultValue="SMARTCARD_ADVFEATURE_SWAP_DISABLE" Name="SwapParam" Type="list" Group="Advanced Features">
+		<Condition Expression="VirtualClockMode = VM_SMARTCARD" Diagnostic=""/>
+		<PossibleValue Comment="Disable" Value="SMARTCARD_ADVFEATURE_SWAP_DISABLE"/>
+		<PossibleValue Comment="Enable" Value="SMARTCARD_ADVFEATURE_SWAP_ENABLE"  />
+	</RefParameter>
+	<RefParameter Comment="TX and RX Pins Are Swapped" DefaultValue="SMARTCARD_ADVFEATURE_SWAP_DISABLE" Name="SwapParam" Type="list" Group="Advanced Features">
+		<Condition Expression="VirtualMode = VM_SMARTCARD" Diagnostic=""/>
+		<PossibleValue Comment="Disable" Value="SMARTCARD_ADVFEATURE_SWAP_DISABLE"/>
+		<PossibleValue Comment="Enable" Value="SMARTCARD_ADVFEATURE_SWAP_ENABLE"  />
+	</RefParameter>
+	<RefParameter Comment="TX and RX Pins Are Swapped" DefaultValue="UART_ADVFEATURE_SWAP_DISABLE" Name="SwapParam" Type="list" Group="Advanced Features">
+		<PossibleValue Comment="Disable" Value="UART_ADVFEATURE_SWAP_DISABLE"/>
+		<PossibleValue Comment="Enable" Value="UART_ADVFEATURE_SWAP_ENABLE"  Semaphore="$IpInstance_SwapENABLE"/>
+	</RefParameter>
+	
+	<RefParameter Comment="Clock IsSwap" DefaultValue="SMARTCARD_ADVFEATURE_SWAP_INIT" Name="IsClockSwap" Type="list" Group="Advanced Features" Visible="false">
+        <Condition Expression="(SwapParam = SMARTCARD_ADVFEATURE_SWAP_ENABLE) &amp; (VirtualClockMode = VM_SMARTCARD)" Diagnostic=""/>
+		<PossibleValue Comment="" Value="SMARTCARD_ADVFEATURE_SWAP_INIT"/>
+	</RefParameter>
+	<RefParameter Comment="" DefaultValue="" Name="IsClockSwap" Type="list" Group="Advanced Features" Visible="false"/>
+	
+	<RefParameter Comment="SMARTCARD IsSwap" DefaultValue="SMARTCARD_ADVFEATURE_SWAP_INIT" Name="IsSmartCardSwap" Type="list" Group="Advanced Features" Visible="false">
+        <Condition Expression="(SwapParam = SMARTCARD_ADVFEATURE_SWAP_ENABLE) &amp; (VirtualMode = VM_SMARTCARD)" Diagnostic=""/>
+		<PossibleValue Comment="SMARTCARD" Value="SMARTCARD_ADVFEATURE_SWAP_INIT"/>
+	</RefParameter>
+	<RefParameter Comment="" DefaultValue="" Name="IsSmartCardSwap" Type="list" Group="Advanced Features" Visible="false"/>
+	
+	<RefParameter Comment="IsSwap" DefaultValue="UART_ADVFEATURE_SWAP_INIT" Name="IsSwap" Type="list" Group="Advanced Features" Visible="false">
+		<Condition Expression="$IpInstance_SwapENABLE" Diagnostic=""/>
+		<PossibleValue Comment="" Value="UART_ADVFEATURE_SWAP_INIT"/>
+	</RefParameter>
+	<RefParameter Comment="" DefaultValue="" Name="IsSwap" Type="list" Group="Advanced Features" Visible="false"/>
+      
+	  <!-- -->
+	<RefParameter Comment="Overrun State arg" DefaultValue="SMARTCARD_ADVFEATURE_OVERRUN_ENABLE" Name="OverrunDisable" Type="list" Group="Advanced Features" Visible="false">
+            <Condition Expression="(OverrunDisableParam = SMARTCARD_ADVFEATURE_OVERRUN_ENABLE) &amp; (VirtualClockMode = VM_SMARTCARD)" Diagnostic=""/>
+            <PossibleValue Comment="Enable" Value="SMARTCARD_ADVFEATURE_OVERRUN_ENABLE"/>
+    </RefParameter> 
+	<RefParameter Comment="Overrun State arg" DefaultValue="SMARTCARD_ADVFEATURE_OVERRUN_ENABLE" Name="OverrunDisable" Type="list" Group="Advanced Features" Visible="false">
+            <Condition Expression="(OverrunDisableParam = SMARTCARD_ADVFEATURE_OVERRUN_ENABLE) &amp; (VirtualMode = VM_SMARTCARD)" Diagnostic=""/>
+            <PossibleValue Comment="Enable" Value="SMARTCARD_ADVFEATURE_OVERRUN_ENABLE"/>
+    </RefParameter> 
+	<RefParameter Comment="Overrun State arg" DefaultValue="UART_ADVFEATURE_OVERRUN_ENABLE" Name="OverrunDisable" Type="list" Group="Advanced Features" Visible="false">
+            <Condition Expression="$IpInstance_OverrunDisableENABLE" Diagnostic=""/>
+            <PossibleValue Comment="Enable" Value="UART_ADVFEATURE_OVERRUN_ENABLE"/>
+    </RefParameter>
+    <RefParameter Comment="Overrun State arg" DefaultValue="null" Name="OverrunDisable" Type="list" Group="Advanced Features" Visible="false"/>
+	
+	
+	<RefParameter Comment="Overrun Disable" DefaultValue="SMARTCARD_ADVFEATURE_OVERRUN_DISABLE" Name="OverrunDisableParam" Type="list" Group="Advanced Features">
+	    <Condition Expression="VirtualClockMode = VM_SMARTCARD" Diagnostic=""/>
+	    <PossibleValue Comment="Disable" Value="SMARTCARD_ADVFEATURE_OVERRUN_DISABLE"/>
+		<PossibleValue Comment="Enable" Value="SMARTCARD_ADVFEATURE_OVERRUN_ENABLE" />
+	</RefParameter>
+	<RefParameter Comment="Overrun Disable" DefaultValue="SMARTCARD_ADVFEATURE_OVERRUN_DISABLE" Name="OverrunDisableParam" Type="list" Group="Advanced Features">
+	    <Condition Expression="VirtualMode = VM_SMARTCARD" Diagnostic=""/>
+	    <PossibleValue Comment="Disable" Value="SMARTCARD_ADVFEATURE_OVERRUN_DISABLE"/>
+		<PossibleValue Comment="Enable" Value="SMARTCARD_ADVFEATURE_OVERRUN_ENABLE" />
+	</RefParameter>
+	<RefParameter Comment="Overrun Disable" DefaultValue="UART_ADVFEATURE_OVERRUN_DISABLE" Name="OverrunDisableParam" Type="list" Group="Advanced Features">
+		<PossibleValue Comment="Disable" Value="UART_ADVFEATURE_OVERRUN_DISABLE"/>
+		<PossibleValue Comment="Enable" Value="UART_ADVFEATURE_OVERRUN_ENABLE" Semaphore="$IpInstance_OverrunDisableENABLE"/>
+	</RefParameter>
+	
+	<RefParameter Comment="CLOCK" DefaultValue="SMARTCARD_ADVFEATURE_RXOVERRUNDISABLE_INIT" Name="IsClockOverrunDisable" Type="list" Group="Advanced Features" Visible="false">
+        <Condition Expression="(OverrunDisableParam = SMARTCARD_ADVFEATURE_OVERRUN_ENABLE) &amp; (VirtualClockMode = VM_SMARTCARD)" Diagnostic=""/>
+		<PossibleValue Comment="CLOCK" Value="SMARTCARD_ADVFEATURE_RXOVERRUNDISABLE_INIT"/>
+	</RefParameter>
+	<RefParameter Comment="" DefaultValue="" Name="IsClockOverrunDisable" Type="list" Group="Advanced Features" Visible="false"/>
+   
+	<RefParameter Comment="SMARTCARD" DefaultValue="SMARTCARD_ADVFEATURE_RXOVERRUNDISABLE_INIT" Name="IsSmartCardOverrunDisable" Type="list" Group="Advanced Features" Visible="false">
+        <Condition Expression="(OverrunDisableParam = SMARTCARD_ADVFEATURE_OVERRUN_ENABLE) &amp; (VirtualMode = VM_SMARTCARD)" Diagnostic=""/>
+		<PossibleValue Comment="SMARTCARD" Value="SMARTCARD_ADVFEATURE_RXOVERRUNDISABLE_INIT"/>
+	</RefParameter>
+	<RefParameter Comment="" DefaultValue="" Name="IsSmartCardOverrunDisable" Type="list" Group="Advanced Features" Visible="false"/>
+   
+	<RefParameter Comment="" DefaultValue="UART_ADVFEATURE_RXOVERRUNDISABLE_INIT" Name="IsOverrunDisable" Type="list" Group="Advanced Features" Visible="false">
+		<Condition Expression="$IpInstance_OverrunDisableENABLE" Diagnostic=""/>
+		<PossibleValue Comment="" Value="UART_ADVFEATURE_RXOVERRUNDISABLE_INIT"/>
+	</RefParameter>
+	<RefParameter Comment="" DefaultValue="" Name="IsOverrunDisable" Type="list" Group="Advanced Features" Visible="false"/>
+      
+	  <!-- -->
+	 <RefParameter Comment="DMA State arg" DefaultValue="SMARTCARD_ADVFEATURE_DMA_ENABLEONRXERROR" Name="DMADisableonRxError" Type="list" Group="Advanced Features" Visible="false">
+            <Condition Expression="(DMADisableonRxErrorParam = SMARTCARD_ADVFEATURE_DMA_ENABLEONRXERROR) &amp; (VirtualClockMode = VM_SMARTCARD)" Diagnostic=""/>
+            <PossibleValue Comment="Enable" Value="SMARTCARD_ADVFEATURE_DMA_ENABLEONRXERROR"/>
+    </RefParameter>  
+	<RefParameter Comment="DMA State arg" DefaultValue="SMARTCARD_ADVFEATURE_DMA_ENABLEONRXERROR" Name="DMADisableonRxError" Type="list" Group="Advanced Features" Visible="false">
+            <Condition Expression="(DMADisableonRxErrorParam = SMARTCARD_ADVFEATURE_DMA_ENABLEONRXERROR) &amp; (VirtualMode = VM_SMARTCARD)" Diagnostic=""/>
+            <PossibleValue Comment="Enable" Value="SMARTCARD_ADVFEATURE_DMA_ENABLEONRXERROR"/>
+    </RefParameter>  
+	<RefParameter Comment="DMA State arg" DefaultValue="UART_ADVFEATURE_DMA_ENABLEONRXERROR" Name="DMADisableonRxError" Type="list" Group="Advanced Features" Visible="false">
+            <Condition Expression="$IpInstance_DMADisableonRxErrorENABLE" Diagnostic=""/>
+            <PossibleValue Comment="Enable" Value="UART_ADVFEATURE_DMA_ENABLEONRXERROR"/>
+    </RefParameter>
+    <RefParameter Comment="DMA State arg" DefaultValue="null" Name="DMADisableonRxError" Type="list" Group="Advanced Features" Visible="false"/>
+	
+	<RefParameter Comment="DMA Disable on RX Error" DefaultValue="SMARTCARD_ADVFEATURE_DMA_DISABLEONRXERROR" Name="DMADisableonRxErrorParam" Type="list" Group="Advanced Features">
+	    <Condition Expression="VirtualClockMode = VM_SMARTCARD" Diagnostic=""/>
+		<PossibleValue Comment="Disable" Value="SMARTCARD_ADVFEATURE_DMA_DISABLEONRXERROR"/>
+		<PossibleValue Comment="Enable" Value="SMARTCARD_ADVFEATURE_DMA_ENABLEONRXERROR" />
+	</RefParameter>
+	<RefParameter Comment="DMA Disable on RX Error" DefaultValue="SMARTCARD_ADVFEATURE_DMA_DISABLEONRXERROR" Name="DMADisableonRxErrorParam" Type="list" Group="Advanced Features">
+	    <Condition Expression="VirtualMode = VM_SMARTCARD" Diagnostic=""/>
+		<PossibleValue Comment="Disable" Value="SMARTCARD_ADVFEATURE_DMA_DISABLEONRXERROR"/>
+		<PossibleValue Comment="Enable" Value="SMARTCARD_ADVFEATURE_DMA_ENABLEONRXERROR" />
+	</RefParameter>
+	<RefParameter Comment="DMA Disable on RX Error" DefaultValue="UART_ADVFEATURE_DMA_DISABLEONRXERROR" Name="DMADisableonRxErrorParam" Type="list" Group="Advanced Features">
+		<PossibleValue Comment="Disable" Value="UART_ADVFEATURE_DMA_DISABLEONRXERROR"/>
+		<PossibleValue Comment="Enable" Value="UART_ADVFEATURE_DMA_ENABLEONRXERROR" Semaphore="$IpInstance_DMADisableonRxErrorENABLE"/>
+	</RefParameter>
+	
+	<RefParameter Comment="SMARTCARD IsDMADisableonRxError" DefaultValue="SMARTCARD_ADVFEATURE_DMADISABLEONERROR_INIT" Name="IsClockDMADisableonRxError" Type="list" Group="Advanced Features" Visible="false">
+        <Condition Expression="(DMADisableonRxErrorParam = SMARTCARD_ADVFEATURE_DMA_ENABLEONRXERROR) &amp; (VirtualClockMode = VM_SMARTCARD)" Diagnostic=""/>
+		<PossibleValue Comment="CLOCK" Value="SMARTCARD_ADVFEATURE_DMADISABLEONERROR_INIT"/>
+	</RefParameter>
+	<RefParameter Comment="IsDMADisableonRxError" DefaultValue="" Name="IsClockDMADisableonRxError" Type="list" Group="Advanced Features" Visible="false"/>
+	<RefParameter Comment="SMARTCARD IsDMADisableonRxError" DefaultValue="SMARTCARD_ADVFEATURE_DMADISABLEONERROR_INIT" Name="IsSmartCardDMADisableonRxError" Type="list" Group="Advanced Features" Visible="false">
+        <Condition Expression="(DMADisableonRxErrorParam = SMARTCARD_ADVFEATURE_DMA_ENABLEONRXERROR) &amp; (VirtualMode = VM_SMARTCARD)" Diagnostic=""/>
+		<PossibleValue Comment="SMARTCARD" Value="SMARTCARD_ADVFEATURE_DMADISABLEONERROR_INIT"/>
+	</RefParameter>
+	<RefParameter Comment="IsDMADisableonRxError" DefaultValue="" Name="IsSmartCardDMADisableonRxError" Type="list" Group="Advanced Features" Visible="false"/>
+	<RefParameter Comment="" DefaultValue="UART_ADVFEATURE_DMADISABLEONERROR_INIT" Name="IsDMADisableonRxError" Type="list" Group="Advanced Features" Visible="false">
+		<Condition Expression="$IpInstance_DMADisableonRxErrorENABLE" Diagnostic=""/>
+		<PossibleValue Comment="" Value="UART_ADVFEATURE_DMADISABLEONERROR_INIT"/>
+	</RefParameter>
+	<RefParameter Comment="IsDMADisableonRxError" DefaultValue="" Name="IsDMADisableonRxError" Type="list" Group="Advanced Features" Visible="false"/>
+	<!-- -->
+	<RefParameter Comment="MSB Is Sent First arg" DefaultValue="SMARTCARD_ADVFEATURE_MSBFIRST_ENABLE" Name="MSBFirst" Type="list" Group="Advanced Features" Visible="false">
+            <Condition Expression="(MSBFirstParam = SMARTCARD_ADVFEATURE_MSBFIRST_ENABLE) &amp; (VirtualClockMode = VM_SMARTCARD)" Diagnostic=""/>
+            <PossibleValue Comment="Enable" Value="SMARTCARD_ADVFEATURE_MSBFIRST_ENABLE"/>
+    </RefParameter>
+	<RefParameter Comment="MSB Is Sent First arg" DefaultValue="SMARTCARD_ADVFEATURE_MSBFIRST_ENABLE" Name="MSBFirst" Type="list" Group="Advanced Features" Visible="false">
+            <Condition Expression="(MSBFirstParam = SMARTCARD_ADVFEATURE_MSBFIRST_ENABLE) &amp; (VirtualMode = VM_SMARTCARD)" Diagnostic=""/>
+            <PossibleValue Comment="Enable" Value="SMARTCARD_ADVFEATURE_MSBFIRST_ENABLE"/>
+    </RefParameter>
+    <RefParameter Comment="MSB Is Sent First arg" DefaultValue="UART_ADVFEATURE_MSBFIRST_ENABLE" Name="MSBFirst" Type="list" Group="Advanced Features" Visible="false">
+            <Condition Expression="$IpInstance_MSBFirstENABLE" Diagnostic=""/>
+            <PossibleValue Comment="Enable" Value="UART_ADVFEATURE_MSBFIRST_ENABLE"/>
+    </RefParameter>
+    <RefParameter Comment="MSB Is Sent First arg" DefaultValue="null" Name="MSBFirst" Type="list" Group="Advanced Features" Visible="false"/>
+	
+	<RefParameter Comment="MSB Is Sent First" DefaultValue="SMARTCARD_ADVFEATURE_MSBFIRST_DISABLE" Name="MSBFirstParam" Type="list" Group="Advanced Features">
+	    <Condition Expression="VirtualClockMode = VM_SMARTCARD" Diagnostic=""/>
+		<PossibleValue Comment="Disable" Value="SMARTCARD_ADVFEATURE_MSBFIRST_DISABLE"/>
+		<PossibleValue Comment="Enable" Value="SMARTCARD_ADVFEATURE_MSBFIRST_ENABLE" />
+	</RefParameter>
+	<RefParameter Comment="MSB Is Sent First" DefaultValue="SMARTCARD_ADVFEATURE_MSBFIRST_DISABLE" Name="MSBFirstParam" Type="list" Group="Advanced Features">
+	    <Condition Expression="VirtualMode = VM_SMARTCARD" Diagnostic=""/>
+		<PossibleValue Comment="Disable" Value="SMARTCARD_ADVFEATURE_MSBFIRST_DISABLE"/>
+		<PossibleValue Comment="Enable" Value="SMARTCARD_ADVFEATURE_MSBFIRST_ENABLE" />
+	</RefParameter>
+	<RefParameter Comment="MSB Is Sent First" DefaultValue="UART_ADVFEATURE_MSBFIRST_DISABLE" Name="MSBFirstParam" Type="list" Group="Advanced Features">
+		<PossibleValue Comment="Disable" Value="UART_ADVFEATURE_MSBFIRST_DISABLE"/>
+		<PossibleValue Comment="Enable" Value="UART_ADVFEATURE_MSBFIRST_ENABLE" Semaphore="$IpInstance_MSBFirstENABLE"/>
+	</RefParameter>
+	
+	<RefParameter Comment="SMARTCARD IsMSBFirst" DefaultValue="SMARTCARD_ADVFEATURE_MSBFIRST_INIT" Name="IsClockMSBFirst" Type="list" Group="Advanced Features" Visible="false">
+        <Condition Expression="(MSBFirstParam = SMARTCARD_ADVFEATURE_MSBFIRST_ENABLE) &amp; (VirtualClockMode = VM_SMARTCARD)" Diagnostic=""/>
+		<PossibleValue Comment="CLOCK" Value="SMARTCARD_ADVFEATURE_MSBFIRST_INIT"/>
+	</RefParameter>
+	<RefParameter Comment="" DefaultValue="" Name="IsClockMSBFirst" Type="list" Group="Advanced Features" Visible="false"/>
+	<RefParameter Comment="SMARTCARD IsMSBFirst" DefaultValue="SMARTCARD_ADVFEATURE_MSBFIRST_INIT" Name="IsSmartCardMSBFirst" Type="list" Group="Advanced Features" Visible="false">
+        <Condition Expression="(MSBFirstParam = SMARTCARD_ADVFEATURE_MSBFIRST_ENABLE) &amp; (VirtualMode = VM_SMARTCARD)" Diagnostic=""/>
+		<PossibleValue Comment="CLOCK" Value="SMARTCARD_ADVFEATURE_MSBFIRST_INIT"/>
+	</RefParameter>
+	<RefParameter Comment="" DefaultValue="" Name="IsSmartCardMSBFirst" Type="list" Group="Advanced Features" Visible="false"/>
+	<RefParameter Comment="IsMSBFirst" DefaultValue="UART_ADVFEATURE_MSBFIRST_INIT" Name="IsMSBFirst" Type="list" Group="Advanced Features" Visible="false">
+		<Condition Expression="$IpInstance_MSBFirstENABLE" Diagnostic=""/>
+		<PossibleValue Comment="SMARTCARD" Value="UART_ADVFEATURE_MSBFIRST_INIT"/>
+	</RefParameter>
+	<RefParameter Comment="" DefaultValue="" Name="IsMSBFirst" Type="list" Group="Advanced Features" Visible="false"/>
+	<!-- -->
+	
+	<RefParameter Comment="Auto Baudrate Mode" DefaultValue="UART_ADVFEATURE_AUTOBAUDRATE_ONSTARTBIT" Name="AutoBaudRateMode" Type="list" Group="Advanced Features">
+		<Condition Expression="$IpInstance_UART_AutoBaudRate_Enable &amp; ($IpInstance_Usart_7B|$IpInstance_Irda_7B|$IpInstance_Uart_7B)" Diagnostic=""/>
+		<PossibleValue Comment="ON START BIT" Value="UART_ADVFEATURE_AUTOBAUDRATE_ONSTARTBIT"/>
+		<PossibleValue Comment="ON FALLING EDGE" Value="UART_ADVFEATURE_AUTOBAUDRATE_ONFALLINGEDGE"/>
+		
+	</RefParameter>
+	<RefParameter Comment="Auto Baudrate Mode" DefaultValue="UART_ADVFEATURE_AUTOBAUDRATE_ONSTARTBIT" Name="AutoBaudRateMode" Type="list" Group="Advanced Features">
+		<Condition Expression="$IpInstance_UART_AutoBaudRate_Enable" Diagnostic=""/>
+		<PossibleValue Comment="ON START BIT" Value="UART_ADVFEATURE_AUTOBAUDRATE_ONSTARTBIT"/>
+		<PossibleValue Comment="ON FALLING EDGE" Value="UART_ADVFEATURE_AUTOBAUDRATE_ONFALLINGEDGE"/>
+		<PossibleValue Comment="ON 0X7F FRAME" Value="UART_ADVFEATURE_AUTOBAUDRATE_ON0X7FFRAME"/>
+		<PossibleValue Comment="ON 0X55 FRAME" Value="UART_ADVFEATURE_AUTOBAUDRATE_ON0X55FRAME"/>
+	</RefParameter>
+	
+	<RefParameter Comment="Auto Baudrate Mode" DefaultValue="null" Name="AutoBaudRateMode" Type="list" Group="Advanced Features" Visible="false"/>
+
+	
+	 <RefMode Name="usartBasic" Abstract="true">
+            		<Parameter Name="BaudRate"/>
+        </RefMode>
+	<!-- RefMode for Asynchronous UART -->
+	<RefMode Name="Asynchronous" HalMode="UART" BaseMode="usartBasic">
+		<ConfigForMode>Uart_Init</ConfigForMode>
+		<Parameter Name="VirtualMode">
+			<PossibleValue>VM_ASYNC</PossibleValue>
+		</Parameter>
+		<!-- Basic Parameters -->
+		
+		<Parameter Name="WordLength"/>
+		<Parameter Name="Parity"/>
+		<Parameter Name="StopBits"/>
+		<Parameter Name="HwFlowCtl"/>
+		<!-- Advanced Parameters -->
+		<Parameter Name="Mode"/>
+		<Parameter Name="OverSampling" />
+		<Parameter Name="OneBitSampling" />
+		<!-- Advanced Features -->
+		<Parameter Name="AutoBaudRateEnableParam"/>
+		<Parameter Name="TxPinLevelInvertParam"/>
+		<Parameter Name="RxPinLevelInvertParam"/>
+		<Parameter Name="DataInvertParam"/>
+		<Parameter Name="SwapParam"/>
+		<Parameter Name="OverrunDisableParam"/>
+		<Parameter Name="DMADisableonRxErrorParam"/>
+		<Parameter Name="AutoBaudRateMode"/>
+		<Parameter Name="MSBFirstParam"/>
+	</RefMode>
+	
+	<!-- RefMode for 'Synchronous' USART -->
+	<RefMode Name="Synchronous" HalMode="USART" BaseMode="usartBasic">
+		<ConfigForMode>Usart_Init</ConfigForMode>
+		<Parameter Name="VirtualMode">
+			<PossibleValue>VM_SYNC</PossibleValue>
+		</Parameter>
+		<!-- Basic Parameters -->
+	
+		<Parameter Name="WordLength"/>
+		<Parameter Name="Parity"/>
+		<Parameter Name="StopBits"/>
+		<!-- Advanced Parameters -->
+		<Parameter Name="Mode"/>
+		<!-- Clock Parameters -->
+		<Parameter Name="CLKPolarity"/>
+		<Parameter Name="CLKPhase"/>
+		<Parameter Name="CLKLastBit"/>
+	</RefMode>
+	
+<!-- RefMode for 'Single Wire' UART -->
+	<RefMode Name="Half_duplex(single_wire_mode)" HalMode="UART" BaseMode="usartBasic">
+		<ConfigForMode>Uart_HalfDuplex_Init</ConfigForMode>
+		<Parameter Name="VirtualMode">
+			<PossibleValue>VM_ASYNC</PossibleValue>
+		</Parameter>
+		<!-- Basic Parameters -->
+	
+		<Parameter Name="WordLength"/>
+		<Parameter Name="Parity"/>
+		<Parameter Name="StopBits"/>
+		<Parameter Name="HwFlowCtl"/>
+		<!--  Advanced Parameters -->
+		<Parameter Name="Mode"/>
+		<Parameter Name="OverSampling"/>
+		<Parameter Name="OneBitSampling" />
+		<!-- Advanced Features -->
+		<Parameter Name="AutoBaudRateEnableParam"/>
+		<Parameter Name="TxPinLevelInvertParam"/>
+		<Parameter Name="RxPinLevelInvertParam"/>
+		<Parameter Name="DataInvertParam"/>
+		<Parameter Name="SwapParam"/>
+		<Parameter Name="OverrunDisableParam"/>
+		<Parameter Name="DMADisableonRxErrorParam"/>
+		<Parameter Name="AutoBaudRateMode"/>
+		<Parameter Name="MSBFirstParam"/>
+	</RefMode>
+		
+	<!-- RefMode for 'MultiProcessor Communication' UART -->
+	<RefMode Name="Multiprocessor_communication" HalMode="UART" BaseMode="usartBasic">
+		<ConfigForMode>Uart_MultiProcessor_Init</ConfigForMode>
+		<Parameter Name="VirtualMode">
+			<PossibleValue>VM_ASYNC</PossibleValue>
+		</Parameter>
+		<!-- Basic Parameters -->
+	   
+		<Parameter Name="WordLength"/>
+		<Parameter Name="Parity"/>
+		<Parameter Name="StopBits"/>
+		<Parameter Name="HwFlowCtl"/>
+		<!--  Advanced Parameters -->
+		<Parameter Name="Mode"/>
+		<Parameter Name="OverSampling"/>
+		<Parameter Name="OneBitSampling"/>
+		<Parameter Name="WakeUpMethod"/>
+		<Parameter Name="Address"/>
+		<!-- Advanced Features -->
+		<Parameter Name="AutoBaudRateEnableParam"/>
+		<Parameter Name="TxPinLevelInvertParam"/>
+		<Parameter Name="RxPinLevelInvertParam"/>
+		<Parameter Name="DataInvertParam"/>
+		<Parameter Name="SwapParam"/>
+		<Parameter Name="OverrunDisableParam"/>
+		<Parameter Name="DMADisableonRxErrorParam"/>
+		<Parameter Name="AutoBaudRateMode"/>
+		<Parameter Name="MSBFirstParam"/>
+	</RefMode>
+	
+	<!-- RefModes for IRDA -->
+	<RefMode Name="IrDA" HalMode="IRDA" BaseMode="usartBasic">
+		<ConfigForMode>IrDa_Init</ConfigForMode>
+		<Parameter Name="VirtualMode">
+			<PossibleValue>VM_IRDA</PossibleValue>
+		</Parameter>
+		<!-- Basic Parameters -->
+		
+		<Parameter Name="WordLength"/>
+		<Parameter Name="Parity"/>
+		<!-- Advanced Parameters -->
+		<Parameter Name="Mode"/>
+		<Parameter Name="PowerMode"/>
+		<Parameter Name="Prescaler"/>
+	</RefMode>
+	
+	<!-- RefModes for LIN -->
+	<RefMode Name="LIN" HalMode="UART" BaseMode="usartBasic">
+		<ConfigForMode>Uart_Lin_Init</ConfigForMode>
+		<Parameter Name="VirtualMode">
+			<PossibleValue>VM_ASYNC</PossibleValue>
+		</Parameter>
+		<Parameter Name="VirtualMode">
+			<PossibleValue>VM_LIN</PossibleValue>
+		</Parameter>
+		<!-- Basic Parameters -->
+	
+		<Parameter Name="WordLength"/>
+		<Parameter Name="Parity"/>
+		<Parameter Name="StopBits"/>
+		<Parameter Name="HwFlowCtl"/>
+		<!--  Advanced Parameters -->
+		<Parameter Name="Mode"/>
+		<Parameter Name="OverSampling"/>
+		<Parameter Name="OneBitSampling"/>
+		<Parameter Name="BreakDetectLength"/>
+		<!-- Advanced Features -->
+		<Parameter Name="AutoBaudRateEnableParam"/>
+		<Parameter Name="TxPinLevelInvertParam"/>
+		<Parameter Name="RxPinLevelInvertParam"/>
+		<Parameter Name="DataInvertParam"/>
+		<Parameter Name="SwapParam"/>
+		<Parameter Name="OverrunDisableParam"/>
+		<Parameter Name="DMADisableonRxErrorParam"/>
+		<Parameter Name="AutoBaudRateMode"/>
+		<Parameter Name="MSBFirstParam"/>
+	</RefMode>
+	
+	<!-- RefModes for RS485 -->
+	<RefMode Name="RS485" HalMode="UART">
+		<ConfigForMode>Uart_RS485_Init</ConfigForMode>
+		<Parameter Name="VirtualMode">
+			<PossibleValue>VM_ASYNC</PossibleValue>
+		</Parameter>
+	
+	
+		<Parameter Name="UART_DEPolarity"/>
+		<Parameter Name="UART_DEAssertionTime"/>
+		<Parameter Name="UART_DEDeassertionTime"/>
+		
+	</RefMode>
+	
+	
+	<!-- RefModes for SmartCard -->
+	<RefMode Name="SmartCard" HalMode="SMARTCARD" BaseMode="usartBasic">
+		<ConfigForMode>SmartCard_Init</ConfigForMode>
+		<Parameter Name="VirtualMode">
+			<PossibleValue>VM_SMARTCARD</PossibleValue>
+		</Parameter>
+		<!-- Basic Parameters -->
+	
+		<Parameter Name="WordLength"/>
+		<Parameter Name="Parity"/>
+		<Parameter Name="StopBits"/>
+		<!-- Advanced Parameters -->
+		<Parameter Name="Mode"/>
+		<Parameter Name="NACKEnable"/>
+		<Parameter Name="GuardTime"/>
+		<Parameter Name="TimeOutEnable"/>
+		<Parameter Name="TimeOutValue"/>
+		<Parameter Name="BlockLength"/>
+		<Parameter Name="AutoRetryCount"/>
+		<Parameter Name="OneBitSampling"/>
+		<!-- Advanced Features -->
+		<Parameter Name="TxPinLevelInvertParam"/>
+		<Parameter Name="RxPinLevelInvertParam"/>
+		<Parameter Name="DataInvertParam"/>
+		<Parameter Name="SwapParam"/>
+		<Parameter Name="OverrunDisableParam"/>
+		<Parameter Name="DMADisableonRxErrorParam"/>
+		<Parameter Name="MSBFirstParam"/>
+		<Parameter Name="IsSmartCardTxPinLevelInvert"/>
+		<Parameter Name="IsSmartCardRxPinLevelInvert"/>
+		<Parameter Name="IsSmartCardDataInvert"/>
+		<Parameter Name="IsSmartCardSwap"/>
+		<Parameter Name="IsSmartCardOverrunDisable"/>
+		<Parameter Name="IsSmartCardDMADisableonRxError"/>
+		<Parameter Name="IsSmartCardMSBFirst"/>
+	</RefMode>
+		
+	<!-- RefModes for SmartCard with Clock -->
+	<RefMode Name="SmartCard_With_Clock" HalMode="SMARTCARD" BaseMode="usartBasic">
+		<ConfigForMode>SmartCard_Init</ConfigForMode>
+		<Parameter Name="VirtualMode">
+			<PossibleValue>VM_SMARTCARD</PossibleValue>
+		</Parameter>
+		<Parameter Name="VirtualClockMode">
+			<PossibleValue>VM_SMARTCARD</PossibleValue>
+		</Parameter>
+		<!-- Basic Parameters -->
+	
+		<Parameter Name="WordLength"/>
+		<Parameter Name="Parity"/>
+		<Parameter Name="StopBits"/>
+		<!-- Advanced Parameters -->
+		<Parameter Name="Mode"/>
+		<Parameter Name="NACKEnable" />
+		<Parameter Name="GuardTime"/>
+		<Parameter Name="TimeOutEnable"/>
+		<Parameter Name="TimeOutValue"/>
+		<Parameter Name="BlockLength"/>
+		<Parameter Name="AutoRetryCount"/>
+		<Parameter Name="OneBitSampling"/>
+		<!-- Clock Parameters -->
+		<Parameter Name="Prescaler"/>
+		<Parameter Name="CalculateSpeed"/>
+		<Parameter Name="CLKPolarity"/>
+		<Parameter Name="CLKPhase"/>
+		<Parameter Name="CLKLastBit"/>
+		<!-- Advanced Features -->
+		<Parameter Name="TxPinLevelInvertParam"/>
+		<Parameter Name="RxPinLevelInvertParam"/>
+		<Parameter Name="DataInvertParam"/>
+		<Parameter Name="SwapParam"/>
+		<Parameter Name="OverrunDisableParam"/>
+		<Parameter Name="DMADisableonRxErrorParam"/>
+		<Parameter Name="MSBFirstParam"/>
+		<Parameter Name="IsClockTxPinLevelInvert"/>
+		<Parameter Name="IsClockRxPinLevelInvert"/>
+		<Parameter Name="IsClockDataInvert"/>
+		<Parameter Name="IsClockSwap"/>
+		<Parameter Name="IsClockOverrunDisable"/>
+		<Parameter Name="IsClockDMADisableonRxError"/>
+		<Parameter Name="IsClockMSBFirst"/>
+	</RefMode>
+		
+	<!-- RefModes for Harwdware Flow Control -->
+	<RefMode Name="CTS_Only">
+		<!-- Basic Parameters -->
+		<Parameter Name="HwFlowCtl">
+			<PossibleValue>UART_HWCONTROL_CTS</PossibleValue>
+		</Parameter>
+	</RefMode>
+	
+	<RefMode Name="RTS_Only">
+		<!-- Basic Parameters -->
+		<Parameter Name="HwFlowCtl">
+			<PossibleValue>UART_HWCONTROL_RTS</PossibleValue>
+		</Parameter>
+	</RefMode>
+	
+	<RefMode Name="CTS_RTS">
+		<!-- Basic Parameters -->
+		<Parameter Name="HwFlowCtl">
+			<PossibleValue>UART_HWCONTROL_RTS_CTS</PossibleValue>
+		</Parameter>
+	</RefMode>
+	
+		
+	<!-- Modes Description for USART/UART/IRDA/SmartCard -->
+	<ModeLogicOperator Name="OR">
+		<Mode Name="Mode" >
+			<ModeLogicOperator Name="XOR">
+				<Mode Name="Asynchronous">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="RX"/>
+						<Signal Name="TX"/>
+					</SignalLogicalOp>
+					<Semaphore>$IpInstance_Asynchronous</Semaphore>
+					<Semaphore>Asynchronous</Semaphore>
+				</Mode>
+				<Mode Name="Synchronous">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="CK"/>
+						<Signal Name="RX"/>
+						<Signal Name="TX"/>
+					</SignalLogicalOp>
+				</Mode>
+				<Mode Name="Half_duplex(single_wire_mode)" UserName="Single Wire (Half-Duplex)" >
+					<SignalLogicalOp Name="AND">
+						<Signal Name="TX"/>
+					</SignalLogicalOp>
+				</Mode>
+				<Mode Name="Multiprocessor_communication" UserName="Multiprocessor Communication">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="RX"/>
+						<Signal Name="TX"/>
+					</SignalLogicalOp>
+				</Mode>
+				<Mode Name="IrDA" RemoveCondition="(STM32F030C6Tx|STM32F030C8Tx|STM32F030F4Px|STM32F030K6Tx|STM32F030R8Tx) &amp; ($IpNumber=1)">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="RX"/>
+						<Signal Name="TX"/>
+					</SignalLogicalOp>
+				</Mode>
+				<Mode Name="LIN" RemoveCondition="(STM32F030C6Tx|STM32F030C8Tx|STM32F030F4Px|STM32F030K6Tx|STM32F030R8Tx) &amp; ($IpNumber=1)">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="RX"/>
+						<Signal Name="TX"/>
+					</SignalLogicalOp>
+					<Semaphore>$IpInstance_LIN</Semaphore>
+				</Mode>
+				<Mode Name="SmartCard" RemoveCondition="(STM32F030C6Tx|STM32F030C8Tx|STM32F030F4Px|STM32F030K6Tx|STM32F030R8Tx) &amp; ($IpNumber=1)">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="TX" IOMode="AlternateFunctionOpenDrain"/>
+					</SignalLogicalOp>
+					<Semaphore>$IpInstance_SmartCard</Semaphore>
+				</Mode>
+				<Mode Name="SmartCard_With_Clock" UserName="SmartCard with Card Clock" RemoveCondition="(STM32F030C6Tx|STM32F030C8Tx|STM32F030F4Px|STM32F030K6Tx|STM32F030R8Tx)&amp; ($IpNumber=1)">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="TX" IOMode="AlternateFunctionOpenDrain"/>
+						<Signal Name="CK"/>
+					</SignalLogicalOp>
+				</Mode>
+				<Mode Name="ModbusCommunication" UserName="Modbus Communication" RemoveCondition="(STM32F030C6Tx|STM32F030C8Tx|STM32F030F4Px|STM32F030K6Tx|STM32F030R8Tx) &amp; ($IpNumber=1)">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="TX"/>
+					</SignalLogicalOp>
+				</Mode>
+			</ModeLogicOperator>
+		</Mode>
+		<Mode Name = "Flow Control (RS232)">
+			<ModeLogicOperator Name="XOR">
+				<Mode Name="CTS_Only" UserName="CTS Only">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="CTS"/>
+					</SignalLogicalOp>
+					<Semaphore>$IpInstance_Clear</Semaphore>
+				</Mode>
+				<Mode Name="RTS_Only" UserName="RTS Only">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="RTS"/>
+					</SignalLogicalOp>
+					<Semaphore>$IpInstance_Request</Semaphore>
+				</Mode>
+				<Mode Name="CTS_RTS" UserName="CTS/RTS">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="CTS"/>
+						<Signal Name="RTS"/>
+					</SignalLogicalOp>
+					<Semaphore>$IpInstance_CTS_RTS</Semaphore>
+				</Mode>
+			</ModeLogicOperator>
+			<Condition Expression="$IpInstance_Asynchronous &amp; !$IpInstance_HardwareControl" Diagnostic="Active only with Asynchronous Mode"/>
+			<Semaphore>$IpInstance_FlowControl</Semaphore>
+		</Mode>
+		<Mode Name="Hardware Control (RS485)" RemoveCondition="($IpNumber=1) &amp; (STM32F042F6Px|STM32F042F4Px|STM32F042G4Ux|STM32F042G6Ux|STM32F048G6Ux)">
+		    <ModeLogicOperator Name="XOR">
+				 <Mode Name="Hardware Control (RS485)">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="DE"/>
+					</SignalLogicalOp>
+		        </Mode>
+		    </ModeLogicOperator>
+		<Condition Expression="!$IpInstance_FlowControl &amp; $IpInstance_Asynchronous" Diagnostic="Active only with Asynchronous Mode"/>
+		<Semaphore>$IpInstance_HardwareControl</Semaphore>
+		</Mode>
+	</ModeLogicOperator>
+	
+	<!-- RefSignal for USART/UART/IRDA/SmartCard -->
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="CK"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="CTS"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="RTS"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="DE"/>
+	<RefSignal IOMode="AlternateFunctionPushPullUp" Name="RX"/>
+	<RefSignal IOMode="AlternateFunctionPushPullUp" Name="TX"/>
+	<Semaphore>$IpInstanceUsed_ForRCC</Semaphore>
+</IP>

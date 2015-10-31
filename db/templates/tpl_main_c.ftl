@@ -38,9 +38,7 @@
 [#if isHalSupported??]
 #include "${FamilyName?lower_case}xx_hal.h"
 [/#if]
-[#if FREERTOS??] [#-- If FreeRtos is used --]
-#include "cmsis_os.h"
-[/#if]
+[@common.optinclude name="Src/rtos_inc.tmp"/][#--include freertos includes --]
 [@common.optinclude name="Src/fatfs_inc.tmp"/][#--include fatafs includes --]
 [#-- if !HALCompliant??--][#-- if HALCompliant Begin --]
 [#list ips as ip]
@@ -50,6 +48,10 @@
 [/#list]
 [#-- /#if --]
 [/#compress]
+#n
+/* USER CODE BEGIN Includes */
+
+/* USER CODE END Includes */
 #n
 /* Private variables ---------------------------------------------------------*/
 [#-- If HAL compliant generate Global variable : Peripherals handler -Begin --]
@@ -95,18 +97,18 @@ ${dHandle};
     [#-- Global variables --]
 [#-- If HAL compliant generate Global variable : Peripherals handler -End --]
 #n#n
-/* USER CODE BEGIN 0 */
+/* USER CODE BEGIN PV */
 
-/* USER CODE END 0 */
+/* USER CODE END PV */
 #n
 [#compress]
 [#if clockConfig??]
 /* Private function prototypes -----------------------------------------------*/
-static void SystemClock_Config(void);
+void SystemClock_Config(void); [#-- remove static --]
 [/#if]
-[#if FREERTOS??] [#-- If FreeRtos is used --]
-static void StartThread(void const * argument);
-[/#if]
+
+[#-- modif for freeRtos 21 Augst 2014 --]
+[@common.optinclude name="Src/rtos_vars.tmp"/]
 [#if HALCompliant??] 
 [#list voids as void]
 [#if !void?contains("FREERTOS") && !void?contains("FATFS")&& !void?contains("LWIP")&& !void?contains("USB_DEVICE")&& !void?contains("USB_HOST")]
@@ -118,7 +120,15 @@ static void ${""?right_pad(2)}${void}(void);
 [#if USB_HOST?? && !FREERTOS??]
 #nvoid MX_USB_HOST_Process(void);
 [/#if]
+#n
+/* USER CODE BEGIN PFP */
 
+/* USER CODE END PFP */
+#n
+#n
+/* USER CODE BEGIN 0 */
+
+/* USER CODE END 0 */
 #n
 int main(void)
 {
@@ -148,17 +158,7 @@ int main(void)
 #t/* USER CODE END 2 */
 #n
 [#if FREERTOS??] [#-- If FreeRtos is used --]
-[#compress]
-#t/* Code generated for FreeRTOS */
-#t/* Create Start thread */
-#tosThreadDef(USER_Thread, StartThread, osPriorityNormal, 0, 2 * configMINIMAL_STACK_SIZE);
-#tosThreadCreate (osThread(USER_Thread), NULL);
-#n#t/* Start scheduler */
-#tosKernelStart(NULL, NULL);
-#n#t/* We should never get here as control is now taken by the scheduler */
-[#-- #tfor(;;); --]
-#n
-[/#compress]
+[@common.optinclude name="Src/rtos_HalInit.tmp"/] [#-- include generated tmp file22 Augst 2014 --]
 [#else]
 [@common.optinclude name="Src/fatfs_HalInit.tmp"/]
 [/#if]
@@ -184,7 +184,7 @@ int main(void)
 [#if clockConfig??]
 #n/** System Clock Configuration
  */
-static void SystemClock_Config(void)
+void SystemClock_Config(void)
 {
 #n
 [#compress]
@@ -220,7 +220,7 @@ static void SystemClock_Config(void)
 [#assign ipName = instanceData.ipName]
         [#assign halMode= instanceData.halMode]
         /* ${instName} init function */
-        [#if halMode!=ipName&&!ipName?contains("TIM")]void MX_${instName}_${halMode}_Init(void)[#else]void MX_${instName}_Init(void)[/#if]
+        [#if halMode!=ipName&&!ipName?contains("TIM")&&!ipName?contains("CEC")]void MX_${instName}_${halMode}_Init(void)[#else]void MX_${instName}_Init(void)[/#if]
 {
 #n
         [#-- assign ipInstanceIndex = instName?replace(name,"")--]
@@ -252,30 +252,8 @@ static void SystemClock_Config(void)
 /* USER CODE END 4 */
 #n
 [#if FREERTOS??] [#-- If FreeRtos is used --]
-#n#nstatic void StartThread(void const * argument) {
-#n
-    [#list middlewareVoids as mw]
-        [#if mw == "MX_FATFS_Init"]
-#t[@common.optinclude name="Src/fatfs_HalInit.tmp"/]          
-        [#else]
-          [#if mw != "MX_FREERTOS_Init"] [#-- if mw != from FREERTOS --]
-#t/* init code for ${mw?replace("MX_","")?replace("_Init","")} */
-#t${mw}();#n
-          [/#if]
-      [/#if]
-[/#list]   
-#n
-#t/* USER CODE BEGIN 5 */
- 
-#t/* Infinite loop */
-#tfor(;;)
-#t{
-#t#tosDelay(1);
-#t}
+[@common.optinclude name="Src/rtos_threads.tmp"/]
 
-#t/* USER CODE END 5 */ 
-#n
-}
 [/#if] [#-- If FreeRtos is used --]
 
 [#compress] 
@@ -291,8 +269,10 @@ static void SystemClock_Config(void)
 #t  */
 void assert_failed(uint8_t* file, uint32_t line)
 { 
+#t/* USER CODE BEGIN 6 */
 #t/* User can add his own implementation to report the file name and line number,
 #t#tex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
+#t/* USER CODE END 6 */
 #n
 }
 #n

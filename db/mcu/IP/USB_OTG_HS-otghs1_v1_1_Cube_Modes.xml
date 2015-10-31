@@ -11,26 +11,26 @@
 	<!-- Generic RefParameters for USB High Speed Host & Device Modes -->
 	<RefParameter Name="Instance" DefaultValue="USB_OTG_HS" Comment="Instance" Type="" Visible="false"/>	
 	
-	<RefParameter Comment="Device endpoints number" DefaultValue="null" Name= "dev_endpoints" Type="List" Visible="true">
+	<RefParameter Comment="Device endpoints number" DefaultValue="null" Name= "dev_endpoints" Type="List" Visible="false">
 		<Condition Expression="VirtualMode = Host_HS" Diagnostic=""/>
 		<PossibleValue Comment="11" Value="11"/>
 	</RefParameter>
 	
-	<RefParameter Comment="Device endpoints number" DefaultValue="null" Name= "dev_endpoints" Type="List" Visible="true">
+	<RefParameter Comment="Device endpoints number" DefaultValue="null" Name= "dev_endpoints" Type="List" Visible="false">
 		<Condition Expression="VirtualMode = Host_FS" Diagnostic=""/>
 		<PossibleValue Comment="11" Value="11"/>
 	</RefParameter>
 	
-	<RefParameter Comment="Device endpoints number" DefaultValue="11" Name= "dev_endpoints"  Min="1" Max="15" Type="integer" Visible="true">
+	<RefParameter Comment="Device endpoints number" DefaultValue="11" Name= "dev_endpoints"  Min="1" Max="15" Type="integer" Visible="false">
 		<!--<PossibleValue Comment="11" Value="11"/>-->
 	</RefParameter>
 	
 	
-	<RefParameter Comment="Host Channels" DefaultValue="15" Name="Host_channels"  Min="1" Max="15" Type="integer" Visible="true">	
+	<RefParameter Comment="Host Channels" DefaultValue="12" Name="Host_channels"  Min="1" Max="15" Type="integer" Visible="false">	
 		<Condition Expression="VirtualMode = Host_HS" Diagnostic=""/>
 		<!--<PossibleValue Comment="15" Value="15"/>-->
 	</RefParameter>
-	<RefParameter Comment="Host Channels" DefaultValue="15" Name="Host_channels"  Min="1" Max="15" Type="integer"  Visible="true">	
+	<RefParameter Comment="Host Channels" DefaultValue="12" Name="Host_channels"  Min="1" Max="15" Type="integer"  Visible="false">	
 		<Condition Expression="VirtualMode = Host_FS" Diagnostic=""/>
 		<!--<PossibleValue Comment="15" Value="15"/>-->
 	</RefParameter>
@@ -117,8 +117,18 @@
 		<PossibleValue Value="DISABLE" Comment="Disabled"/>		
 	</RefParameter>
 	
+	<RefParameter Comment="Low power" DefaultValue="DISABLE" Name="low_power_enable" Type="List" Visible="false">
+		<Condition Expression="MW_USB_OTG_HS_MW_HOST" Diagnostic=""/>			
+		<PossibleValue Value="DISABLE" Comment="Disabled"/>		
+	</RefParameter>
+	<RefParameter Comment="Low power" DefaultValue="DISABLE" Name="low_power_enable" Type="List" Visible="false">
+		<Condition Expression="MW_USB_OTG_HS_MW_FS_HOST" Diagnostic=""/>			
+		<PossibleValue Value="DISABLE" Comment="Disabled"/>		
+	</RefParameter>
+	
 	<RefParameter Comment="Low power" DefaultValue="ENABLE" Name="low_power_enable" Type="List">
-		<PossibleValue Value="ENABLE" Comment="Enabled"/>
+	  <Condition Expression="(!MW_USB_OTG_HS_MW_HOST)&amp;(!MW_USB_OTG_HS_MW_FS_HOST)" Diagnostic=""/>			
+		<PossibleValue Value="ENABLE" Comment="Enabled" Semaphore="$IpInstance_INTERRUPT_WAKEUP_ON"/>
 		<PossibleValue Value="DISABLE" Comment="Disabled"/>		
 	</RefParameter>
 	
@@ -153,7 +163,7 @@
 		<PossibleValue Value="DISABLE" Comment="Disabled"/>			
 	</RefParameter>
 	
-	<RefParameter Comment="Use external vbus" DefaultValue="DISABLE" Name="use_external_vbus" Type="List">
+	<RefParameter Comment="Use external vbus" DefaultValue="DISABLE" Name="use_external_vbus" Type="List" Visible="false">
 		<PossibleValue Value="ENABLE" Comment="Enabled"/>
 		<PossibleValue Value="DISABLE" Comment="Disabled"/>		
 	</RefParameter>
@@ -374,7 +384,8 @@
 				</Mode>			
 			</ModeLogicOperator>
 			<!-- Tracker 233898 -->
-			<Condition Expression=" MW_USB_OTG_HS_MW_FS_DEVICE | MW_USB_OTG_HS_MW_FS_HOST | OTG_DUAL_ROL_DEVICE_HS_FS" Diagnostic="USB External or Internal Phy Mode must be selected first"/>			
+			<!--<Condition Expression=" MW_USB_OTG_HS_MW_FS_DEVICE | MW_USB_OTG_HS_MW_FS_HOST | OTG_DUAL_ROL_DEVICE_HS_FS" Diagnostic="USB External or Internal Phy Mode must be selected first"/>-->
+			<Condition Expression=" MW_USB_OTG_HS_MW_FS_DEVICE | MW_USB_OTG_HS_MW_FS_HOST | OTG_DUAL_ROL_DEVICE_HS_FS | MW_USB_OTG_HS_MW_HOST |MW_USB_OTG_HS_MW_DEVICE" Diagnostic="USB External or Internal Phy Mode in Host or Device mode must be selected first"/>						
 		</Mode>
 		<Mode Name="Activate_VBUS">
 			<ModeLogicOperator Name="XOR">

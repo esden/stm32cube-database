@@ -24,7 +24,12 @@
 [#list SWIP.defines as definition] 
 [#if definition.name="_FS_FATFS_SDIO"]                           
 [#if definition.value="1"]
-#include "stm32f2xx_sd.h"
+#include "bsp_driver_sd.h"
+[/#if] 
+[/#if]
+[#if definition.name="_FS_FATFS_SRAM"]                           
+[#if definition.value="1"]
+#include "bsp_driver_sram.h"
 [/#if] 
 [/#if]
 [#if definition.name="_FS_FATFS_USB"]                           

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
-<IP xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://mcd.rou.st.com/modules.php?name=mcu" DBVersion="V4.0" Name="RCC" Version="rcc_v1_0" IPType="peripheral" 	ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd">
+<IP xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://mcd.rou.st.com/modules.php?name=mcu" DBVersion="V4.0" Name="RCC" Version="STM32F427-rcc_v1_0" IPType="peripheral" 	ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd">
 	<About>RCC: Reset and Clock Control</About>
 	<RefParameter Visible="false" Comment="Oscillator Type" DefaultValue="+OscillatorTypeHSI+|OscillatorTypeLSI+|OscillatorTypeHSE+|OscillatorTypeLSE" Name="OscillatorType" Type="list"/>
 	<!--	<RefParameter Comment="Clock Type HSE" DefaultValue="" Name="OscillatorTypeHSE" Type="list">
@@ -14,7 +14,7 @@
 		<PossibleValue Comment="LSI" Value="RCC_OSCILLATORTYPE_LSI"/>
 	</RefParameter>
 	<RefParameter Visible="false" Comment="LSI used flag" DefaultValue="1" Name="LSIUsed" Type="integer" Min="1" Max="1">
-		<Condition Expression="IWDGUsed_ForRCC|((RCC_RTC_Clock_Source=RCC_RTCCLKSOURCE_LSI)&amp;(RTCUsed_ForRCC))" Diagnostic=""/>
+		<Condition Expression="(SEM2RCC_LSI_REQUIRED_TIM5 &amp; TIM5 &amp; Semaphore_input_Channel4TIM5)|IWDGUsed_ForRCC|((RCC_RTC_Clock_Source=RCC_RTCCLKSOURCE_LSI)&amp;(RTCUsed_ForRCC))" Diagnostic=""/>
 	</RefParameter>
 	<RefParameter Visible="false" Comment="LSI used flag" DefaultValue="0" Name="LSIUsed" Type="integer" Min="0" Max="0"/>
 	<RefParameter Visible="false" Comment="Lsi State" DefaultValue="RCC_LSI_OFF" Name="LSIState" Type="list">
@@ -33,7 +33,7 @@
 		<PossibleValue Comment="HSE" Value="RCC_OSCILLATORTYPE_HSE"/>
 	</RefParameter>
 	<RefParameter Visible="false" Comment="HSE used flag" DefaultValue="1" Name="HSEUsed" Type="integer" Min="1" Max="1">
-		<Condition Expression="(RTCUsed_ForRCC&amp;!((RCC_RTC_Clock_Source=RCC_RTCCLKSOURCE_LSE)|(RCC_RTC_Clock_Source=RCC_RTCCLKSOURCE_LSI)))|(PLLSource=RCC_PLLSOURCE_HSE)|(SYSCLKSource=RCC_SYSCLKSOURCE_HSE)|((RCC_MCO1Source=RCC_MCO1SOURCE_HSE)&amp;(MCO1Config))|((RCC_MCO2Source=RCC_MCO2SOURCE_HSE)&amp;(MCO2Config))" Diagnostic="SYSCLK source OR PLL source OR RTC source OR MCO1 source OR MCO2 source"/>
+		<Condition Expression="(SEM2RCC_HSE_REQUIRED_TIM11 &amp; TIM11 &amp; Semaphore_input_Channel1TIM11)|(RTCUsed_ForRCC&amp;!((RCC_RTC_Clock_Source=RCC_RTCCLKSOURCE_LSE)|(RCC_RTC_Clock_Source=RCC_RTCCLKSOURCE_LSI)))|((PLLSource=RCC_PLLSOURCE_HSE) &amp; (PLLUsed=1))|(SYSCLKSource=RCC_SYSCLKSOURCE_HSE)|((RCC_MCO1Source=RCC_MCO1SOURCE_HSE)&amp;(MCO1Config))|((RCC_MCO2Source=RCC_MCO2SOURCE_HSE)&amp;(MCO2Config))" Diagnostic="SYSCLK source OR PLL source OR RTC source OR MCO1 source OR MCO2 source"/>
 	</RefParameter>
 	<RefParameter Visible="false" Comment="HSE Is Used" DefaultValue="0" Name="HSEUsed" Min="0" Type="integer"/>
 	<RefParameter Visible="false" Comment="Hse State" DefaultValue="RCC_HSE_BYPASS" Name="HSEState" Type="list">
@@ -41,7 +41,7 @@
 		<PossibleValue Comment="Hse Bypass" Value="RCC_HSE_BYPASS" Semaphore="HSEEnabled"/>
 	</RefParameter>
 	<RefParameter Visible="false" Comment="Hse State" DefaultValue="RCC_HSE_ON" Name="HSEState" Type="list">
-		<Condition Diagnostic="HSE ON" Expression="HSEOscillator"/>
+		<Condition Diagnostic="HSE ON" Expression="(SEM2RCC_HSE_REQUIRED_TIM11 &amp; TIM11 &amp; Semaphore_input_Channel1TIM11)|HSEOscillator"/>
 		<PossibleValue Comment="Hse ON" Value="RCC_HSE_ON" Semaphore="HSEEnabled"/>
 	</RefParameter>
 	<RefParameter Visible="false" Comment="Hse State" DefaultValue="RCC_HSE_OFF" Name="HSEState" Type="list">
@@ -55,7 +55,7 @@
 		<PossibleValue Comment="LSE" Value="RCC_OSCILLATORTYPE_LSE"/>
 	</RefParameter>
 	<RefParameter Visible="false" Comment="LSE Is Used" DefaultValue="1" Name="LSEUsed" Min="1" Type="integer">
-		<Condition Expression="(RCC_MCO1Source=RCC_MCO1SOURCE_LSE)|(RCC_RTC_Clock_Source=RCC_RTCCLKSOURCE_LSE)" Diagnostic="LSE is used if "/>
+		<Condition Expression="(SEM2RCC_LSE_REQUIRED_TIM5 &amp; TIM5 &amp; Semaphore_input_Channel4TIM5)|(RCC_MCO1Source=RCC_MCO1SOURCE_LSE)|(RCC_RTC_Clock_Source=RCC_RTCCLKSOURCE_LSE)" Diagnostic="LSE is used if "/>
 	</RefParameter>
 	<RefParameter Visible="false" Comment="LSE Is Used" DefaultValue="0" Name="LSEUsed" Min="0" Type="integer"/>
 	<RefParameter Visible="false" Comment="Lse State" DefaultValue="RCC_LSE_BYPASS" Name="LSEState" Type="list">
@@ -63,7 +63,7 @@
 		<PossibleValue Comment="Lse Bypass" Value="RCC_LSE_BYPASS"/>
 	</RefParameter>
 	<RefParameter Visible="false" Comment="Lse State" DefaultValue="RCC_LSE_ON" Name="LSEState" Type="list">
-		<Condition Diagnostic="LSE ON" Expression="LSEOscillator"/>
+		<Condition Diagnostic="LSE ON" Expression="(SEM2RCC_LSE_REQUIRED_TIM5 &amp; TIM5 &amp; Semaphore_input_Channel4TIM5)|LSEOscillator"/>
 		<PossibleValue Comment="Lse ON" Value="RCC_LSE_ON"/>
 	</RefParameter>
 	<RefParameter Visible="false" Comment="Lse State" DefaultValue="RCC_LSE_OFF" Name="LSEState" Type="list">
@@ -79,7 +79,7 @@
 		<PossibleValue Comment="HSI" Value="RCC_OSCILLATORTYPE_HSI"/>
 	</RefParameter>
 	<RefParameter Visible="false" Comment="HSI Is Used" DefaultValue="1" Name="HSIUsed" Min="1" Type="integer">
-		<Condition Expression="((PLLSource=RCC_PLLSOURCE_HSI)|(SYSCLKSource=RCC_SYSCLKSOURCE_HSI)|((RCC_MCO1Source=RCC_MCO1SOURCE_HSI)&amp;(MCO1Config)))" Diagnostic="LSE is used if "/>
+		<Condition Expression="(((PLLSource=RCC_PLLSOURCE_HSI) &amp; (PLLUsed=1))|(SYSCLKSource=RCC_SYSCLKSOURCE_HSI)|((RCC_MCO1Source=RCC_MCO1SOURCE_HSI)&amp;(MCO1Config)))" Diagnostic="LSE is used if "/>
 	</RefParameter>
 	<RefParameter Visible="false" Comment="HSI is Used" DefaultValue="0" Name="HSIUsed" Min="0" Type="integer"/>
 	<RefParameter Visible="false" Comment="Hsi State" DefaultValue="RCC_HSI_OFF" Name="HSIState" Type="list">
@@ -101,10 +101,24 @@
 	<RefParameter Visible="false" Comment="Pll State" DefaultValue="RCC_PLL_ON" Name="PLLState" Type="list">
 		<PossibleValue Comment="Pll ON" Value="RCC_PLL_ON"/>
 	</RefParameter>
-	<RefParameter Visible="false" Comment="PLL Source" DefaultValue="RCC_PLLSOURCE_HSI" Name="PLLSource" Type="list">
-		<PossibleValue Comment="Hsi" Value="RCC_PLLSOURCE_HSI"/>
-		<PossibleValue Comment="Hse" Value="RCC_PLLSOURCE_HSE"/>
-	</RefParameter>
+	<RefParameter Visible="false" Comment="PLL Source" DefaultValue="RCC_PLLSOURCE_HSE" Name="PLLSourceVirtual" Type="list">
+        <Condition Diagnostic="PLL Mux should have HSE Crystal/Ceramic as input" Expression="((USB_OTG_FSUsed_ForRCC|USB_OTG_HSEmbeddedPHYUsed_ForRCC)&amp;PLLSource=RCC_PLLSOURCE_HSI)| ((USB_OTG_FSUsed_ForRCC|USB_OTG_HSEmbeddedPHYUsed_ForRCC)&amp;PLLSource=RCC_PLLSOURCE_HSE&amp;!HSEOscillator) "/>
+    </RefParameter>
+    	
+    <RefParameter Visible="false" Comment="PLL Source" DefaultValue="RCC_PLLSOURCE_HSE" Name="PLLSourceVirtual" Type="list">
+        <Condition Diagnostic="PLL Mux should have HSE Crystal/Ceramic as input" Expression="((USB_OTG_FSUsed_ForRCC|USB_OTG_HSEmbeddedPHYUsed_ForRCC)) "/>
+        <PossibleValue Comment="Pllsource Hse" Value="RCC_PLLSOURCE_HSE"/>
+    </RefParameter>
+    <RefParameter Visible="false" Comment="PLL Source" DefaultValue="RCC_PLLSOURCE_HSI" Name="PLLSourceVirtual" Type="list">
+        <PossibleValue Comment="Pllsource Hsi" Value="RCC_PLLSOURCE_HSI"/>
+        <PossibleValue Comment="Pllsource Hse" Value="RCC_PLLSOURCE_HSE"/>
+    </RefParameter>
+    <RefParameter Visible="false" Comment="PLL Source" DefaultValue="+PLLSourceVirtual" Name="PLLSourceVirtualString" Type="string"/>
+ 
+    <RefParameter Visible="false" Comment="PLL Source" DefaultValue="+PLLSourceVirtualString" Name="PLLSource" Type="list">
+        <PossibleValue Comment="Pllsource Hsi" Value="RCC_PLLSOURCE_HSI" />
+        <PossibleValue Comment="Pllsource Hse" Value="RCC_PLLSOURCE_HSE"/>
+    </RefParameter>
 	<RefParameter Visible="false" Comment="PLLM" DefaultValue="16" Max="63" Min="2" Name="PLLM" Type="integer"/>
 	<RefParameter Visible="false" Comment="PLLN" DefaultValue="192" Max="432" Min="192" Name="PLLN" Type="integer"/>
 	<RefParameter Visible="false" Comment="PLLP" DefaultValue="RCC_PLLP_DIV2" Name="PLLP" Type="list">
@@ -309,7 +323,8 @@
 		<Condition Diagnostic="overDrive activated" Expression="(VDD_VALUE&lt; 1.8)|(VDD_VALUE&gt; 2.1)"/>
 	</RefParameter>
 	<RefParameter Visible="false" Comment="System Clock" Name="SYSCLKFreq_VALUE" DefaultValue="16000000" Max="168000000" Type="double" Display="value/1000000" Unit="MHz"/>
-	<!--HCLK Freq Value Param-->        <RefParameter Visible="false" Comment="HCLK Clock" Name="HCLKFreq_Value" DefaultValue="16000000" Max="180000000" Min="120000000" Type="double" IP="DMA-2D,CAMERAITF" Display="value/1000000" Unit="MHz">
+	<!--HCLK Freq Value Param-->     
+	<RefParameter Visible="false" Comment="HCLK Clock" Name="HCLKFreq_Value" DefaultValue="16000000" Max="180000000" Min="120000000" Type="double" IP="DMA-2D,CAMERAITF" Display="value/1000000" Unit="MHz">
 		<Condition Diagnostic="min value = 120Mhz if Over Drive Activated" Expression="((SYSCLKFreq_VALUE &gt; 168000000)&amp; (( (VDD_VALUE&lt; 1.8)|(VDD_VALUE&gt; 2.1))))"/>
 	</RefParameter>
  
@@ -367,16 +382,55 @@
 	<RefParameter Visible="false" Comment="SAI_A Clock" Name="SAI_AClocksFreq_Value" DefaultValue="12250000" Type="double" Display="value/1000000" Unit="MHz" IP="SAIA"/>
 	<RefParameter Visible="false" Comment="SAI_B Clock" Name="SAI_BClocksFreq_Value" DefaultValue="12250000" Type="double" Display="value/1000000" Unit="MHz" IP="SAIB"/>
 	<RefParameter Visible="false" Comment="LTCD Clock" Name="LCDTFTFreq_Value" DefaultValue="12250000" Type="double" IP="LTCD1" Display="value/1000000" Unit="MHz"/>
-	<RefParameter Visible="false" Comment="VCOInput" Name="VCOInputFreq_Value" DefaultValue="1000000" Min="1000000" Max="2000000" Type="double" Display="value/1000000" Unit="MHz"/>
-	<RefParameter Visible="false" Comment="PLL Clock" Name="PLLCLKFreq_Value" DefaultValue="96000000" Max="180000000" Type="double" Display="value/1000000" Unit="MHz">
-		<Condition Diagnostic="overDrive activated" Expression="(((HCLKFreq_Value &gt; 168000000)|(SYSCLKFreq_VALUE &gt; 168000000))&amp;( (VDD_VALUE&lt; 1.8)|(VDD_VALUE&gt; 2.1)))"/>
+	<RefParameter Visible="false" Comment="VCOInput" Name="VCOInputFreq_Value" DefaultValue="1000000" Min="1000000" Max="2000000" Type="double" Display="value/1000000" Unit="MHz">
+        <Condition Diagnostic="PLL not used" Expression="PLLUsed=1|((I2SSourceIsPll &amp; I2SUsed_ForRCC)|((RCC_MCO2Source=RCC_MCO2SOURCE_PLLI2SCLK)&amp; MCO2Config))|(SAIAUsed_ForRCC&amp;(SAISourceIsPllI2SA|SAISourceIsPllSAIA))|(SAIBUsed_ForRCC&amp;(SAISourceIsPllI2SB|SAISourceIsPllSAIB)|LTDCUsed_ForRCC)"/>
+    </RefParameter>
+		<RefParameter Visible="false" Comment="VCOInput" Name="VCOInputFreq_Value" DefaultValue="1000000"  Type="double" Display="value/1000000" Unit="MHz"/>
+
+	<RefParameter Visible="false" Comment="PLL Clock" Name="PLLCLKFreq_Value" DefaultValue="96000000" Max="180000000" Min="24000000" Type="double" Display="value/1000000" Unit="MHz">
+		<Condition Diagnostic="overDrive activated" Expression="PLLUsed=1 &amp; (((HCLKFreq_Value &gt; 168000000)|(SYSCLKFreq_VALUE &gt; 168000000))&amp;( (VDD_VALUE&lt; 1.8)|(VDD_VALUE&gt; 2.1)))"/>
 	</RefParameter>
-	<RefParameter Visible="false" Comment="PLL Clock" Name="PLLCLKFreq_Value" DefaultValue="96000000" Max="168000000" Type="double" Display="value/1000000" Unit="MHz"/>
-	<RefParameter Visible="false" Comment="VCOOutput" Name="VCOOutputFreq_Value" DefaultValue="192000000" Min="192000000" Max="432000000" Type="double" Display="value/1000000" Unit="MHz"/>
-	<RefParameter Visible="false" Comment="VCOI2SOutput" Name="VCOI2SOutputFreq_Value" DefaultValue="192000000" Type="double" Display="value/1000000" Unit="MHz"/>
-	<RefParameter Visible="false" Comment="VCOSAIOutput" Name="VCOSAIOutputFreq_Value" DefaultValue="192000000" Type="double" Display="value/1000000" Unit="MHz"/>
-	<RefParameter Visible="false" Comment="MCO1 Output frequency" Name="MCO1PinFreq_Value" DefaultValue="16000000" Type="double" Display="value/1000000" Unit="MHz"/>
-	<RefParameter Visible="false" Comment="MCO2 Output frequency" Name="MCO2PinFreq_Value" DefaultValue="16000000" Type="double" Display="value/1000000" Unit="MHz"/>
+	<RefParameter Visible="false" Comment="PLL Clock" Name="PLLCLKFreq_Value" DefaultValue="96000000" Max="168000000" Min="24000000" Type="double" Display="value/1000000" Unit="MHz">
+        <Condition Diagnostic="PLL not used" Expression="PLLUsed=1"/>
+    </RefParameter>
+		<RefParameter Visible="false" Comment="PLL Clock" Name="PLLCLKFreq_Value" DefaultValue="96000000"  Type="double" Display="value/1000000" Unit="MHz"/>
+
+	<RefParameter Visible="false" Comment="VCOOutput" Name="VCOOutputFreq_Value" DefaultValue="192000000" Min="192000000" Max="432000000" Type="double" Display="value/1000000" Unit="MHz">
+        <Condition Diagnostic="PLL not used" Expression="PLLUsed=1"/>
+    </RefParameter>
+		<RefParameter Visible="false" Comment="VCOOutput" Name="VCOOutputFreq_Value" DefaultValue="192000000"  Type="double" Display="value/1000000" Unit="MHz"/>
+		
+<!--prescaler N output -->
+	<RefParameter Visible="false" Comment="VCOI2SOutput" Name="VCOI2SOutputFreq_Value" DefaultValue="192000000" Max="432000000" Min="192000000"   Type="double" Display="value/1000000" Unit="MHz">
+        <Condition Diagnostic="PLL not used" Expression="((I2SSourceIsPll &amp; I2SUsed_ForRCC)|((RCC_MCO2Source=RCC_MCO2SOURCE_PLLI2SCLK)&amp; MCO2Config))|(SAIAUsed_ForRCC&amp;SAISourceIsPllI2SA)|(SAIBUsed_ForRCC&amp;SAISourceIsPllI2SB)"/>
+    </RefParameter>
+		<RefParameter Visible="false" Comment="VCOI2SOutput" Name="VCOI2SOutputFreq_Value" DefaultValue="192000000"   Type="double" Display="value/1000000" Unit="MHz"/>
+	
+	
+	<RefParameter Visible="false" Comment="VCOI2SOutput" Name="VcooutputI2S" DefaultValue="96000000" Max="216000000"   Type="double" Display="value/1000000" Unit="MHz">
+        <Condition Diagnostic="PLL not used" Expression="(I2SSourceIsPll &amp; I2SUsed_ForRCC)|((RCC_MCO2Source=RCC_MCO2SOURCE_PLLI2SCLK)&amp; MCO2Config)"/>
+    </RefParameter>
+		<RefParameter Visible="false" Comment="VCOI2SOutput" Name="VcooutputI2S" DefaultValue="96000000"  Type="double" Display="value/1000000" Unit="MHz"/><!--prescaler R output -->
+
+	<RefParameter Visible="false" Comment="VCOI2SOutput" Name="VcooutputI2SQ" DefaultValue="96000000" Max="216000000" Type="double" Display="value/1000000" Unit="MHz">
+        <Condition Diagnostic="PLL not used" Expression="(SAIAUsed_ForRCC&amp;SAISourceIsPllI2SA)|(SAIBUsed_ForRCC&amp;SAISourceIsPllI2SB)"/>
+    </RefParameter>
+	<RefParameter Visible="false" Comment="VCOI2SOutput" Name="VcooutputI2SQ" DefaultValue="96000000"  Type="double" Display="value/1000000" Unit="MHz"/><!--prescaler R output -->
+	
+	<RefParameter Visible="false" Comment="VCOSAIOutput" Name="VCOSAIOutputFreq_Value" Max="432000000" Min="192000000" DefaultValue="192000000"  Type="double" Display="value/1000000" Unit="MHz">
+        <Condition Diagnostic="PLL not used" Expression="(SAIAUsed_ForRCC&amp;SAISourceIsPllSAIA)|(SAIBUsed_ForRCC&amp;SAISourceIsPllSAIB)|LTDCUsed_ForRCC"/>
+    </RefParameter>
+	<RefParameter Visible="false" Comment="VCOSAIOutput" Name="VCOSAIOutputFreq_Value"  DefaultValue="192000000"  Type="double" Display="value/1000000" Unit="MHz"/>
+	<RefParameter Visible="false" Comment="VCOSAIOutput" Name="VCOSAIOutputFreq_ValueR" Max="216000000" DefaultValue="192000000"  Type="double" Display="value/1000000" Unit="MHz">
+        <Condition Diagnostic="PLL not used" Expression="LTDCUsed_ForRCC"/>
+    </RefParameter>
+	<RefParameter Visible="false" Comment="VCOSAIOutput" Name="VCOSAIOutputFreq_ValueR"  DefaultValue="192000000"  Type="double" Display="value/1000000" Unit="MHz"/>
+	<RefParameter Visible="false" Comment="VCOSAIOutput" Name="VCOSAIOutputFreq_ValueQ" Max="216000000" DefaultValue="192000000"  Type="double" Display="value/1000000" Unit="MHz">
+        <Condition Diagnostic="PLL not used" Expression="(SAIAUsed_ForRCC&amp;SAISourceIsPllSAIA)|(SAIBUsed_ForRCC&amp;SAISourceIsPllSAIB)"/>
+    </RefParameter>
+	<RefParameter Visible="false" Comment="VCOSAIOutput" Name="VCOSAIOutputFreq_ValueQ"  DefaultValue="192000000"  Type="double" Display="value/1000000" Unit="MHz"/>
+	<RefParameter Visible="false" Comment="MCO1 Output frequency" Name="MCO1PinFreq_Value" DefaultValue="16000000" Max="100000000" Type="double" Display="value/1000000" Unit="MHz"/>
+	<RefParameter Visible="false" Comment="MCO2 Output frequency" Name="MCO2PinFreq_Value" DefaultValue="16000000" Max="100000000" Type="double" Display="value/1000000" Unit="MHz"/>
 	<RefParameter Visible="false" Comment="Clock Source for I2S" DefaultValue="I2S_CLOCK_PLL" Name="I2SClockSource" Type="list" IP="I2S1,I2S2,I2S3">
 		<PossibleValue Comment="Clk Source Pll" Value="I2S_CLOCK_PLL" Semaphore="I2SSourceIsPll"/>
 		<PossibleValue Comment="Clk Source  Ext" Value="I2S_CLOCK_EXTERNAL"/>
@@ -408,7 +462,7 @@
 	<!-- Enable refParameters list -->
 	<!--RefEnabel Parameters -->
 	<RefParameter Visible="false" Name="EnableHSE" Comment="EnableHSE" Type="list" DefaultValue="true">
-		<Condition Expression="(HSEOscillator | HSEByPass)" Diagnostic="Disabled if RTC is used and HSE ON"/>
+		<Condition Expression="(HSEOscillator | HSEByPass)|(SEM2RCC_HSE_REQUIRED_TIM11 &amp; TIM11 &amp; Semaphore_input_Channel1TIM11)" Diagnostic="Disabled if RTC is used and HSE ON"/>
 		<PossibleValue Value="true" Comment="true"/>
 	</RefParameter>
 	<RefParameter Visible="false" Name="EnableHSE" Comment="EnableHSE" Type="list" DefaultValue="false">
@@ -416,14 +470,14 @@
 	</RefParameter>
 	<!--RTC Enable-->
 	<RefParameter Visible="false" Name="EnableHSERTCDevisor" Comment="RTC and HSE Oscillator" Type="list" DefaultValue="true" IP="RTC">
-		<Condition Expression="(RTCUsed_ForRCC) &amp; (HSEOscillator|HSEByPass)" Diagnostic="Disabled if RTC is used"/>
+		<Condition Expression="(RTCUsed_ForRCC) &amp; (HSEOscillator|HSEByPass)|(SEM2RCC_HSE_REQUIRED_TIM11 &amp; TIM11 &amp; Semaphore_input_Channel1TIM11)" Diagnostic="Disabled if RTC is used"/>
 		<PossibleValue Value="true" Comment="true"/>
 	</RefParameter>
 	<RefParameter Visible="false" Name="EnableHSERTCDevisor" Comment="RTC and HSE Oscillator" Type="list" DefaultValue="false" IP="RTC">
 		<PossibleValue Value="false" Comment="false"/>
 	</RefParameter>
 	<RefParameter Visible="false" Name="RTCEnable" Comment="RTC" Type="list" DefaultValue="true" IP="RTC">
-		<Condition Expression="RTCUsed_ForRCC" Diagnostic="Disabled if RTC is used"/>
+		<Condition Expression="RTCUsed_ForRCC |(SEM2RCC_HSE_REQUIRED_TIM11 &amp; TIM11 &amp; Semaphore_input_Channel1TIM11)" Diagnostic="Disabled if RTC is used"/>
 		<PossibleValue Value="true" Comment="true"/>
 	</RefParameter>
 	<RefParameter Visible="false" Name="RTCEnable" Comment="RTC" Type="list" DefaultValue="false" IP="RTC">
@@ -465,7 +519,7 @@
 	</RefParameter>
 	<!--params for Code Generation for IPs -->
 	<RefParameter Visible="false" Comment="Periph Clock Selection" Name="PeriphClockSelectionARG" DefaultValue="+PeriphClockSelection" Type="list">
-	<Condition Expression="(I2SSourceIsPll &amp; I2SUsed_ForRCC)|((RCC_MCO2Source=RCC_MCO2SOURCE_PLLI2SCLK)&amp; (MCO2Config))|RTCUsed_ForRCC|(SAIAUsed_ForRCC &amp; SAISourceIsPllI2SA)|(SAIBUsed_ForRCC &amp; SAISourceIsPllI2SB)|(SAIAUsed_ForRCC &amp; SAISourceIsPllSAIA)|(SAIBUsed_ForRCC &amp; SAISourceIsPllSAIB)|LTDCUsed_ForRCC|TimPrescalerEnabled" Diagnostic="clock used by RCC"/>
+	<Condition Expression="(SEM2RCC_HSE_REQUIRED_TIM11 &amp; TIM11 &amp; Semaphore_input_Channel1TIM11)|(I2SSourceIsPll &amp; I2SUsed_ForRCC)|((RCC_MCO2Source=RCC_MCO2SOURCE_PLLI2SCLK)&amp; (MCO2Config))|RTCUsed_ForRCC|(SAIAUsed_ForRCC &amp; SAISourceIsPllI2SA)|(SAIBUsed_ForRCC &amp; SAISourceIsPllI2SB)|(SAIAUsed_ForRCC &amp; SAISourceIsPllSAIA)|(SAIBUsed_ForRCC &amp; SAISourceIsPllSAIB)|LTDCUsed_ForRCC|TimPrescalerEnabled" Diagnostic="clock used by RCC"/>
 	</RefParameter>
 	<RefParameter Visible="false" Comment="Periph Clock Selection" Name="PeriphClockSelectionARG" DefaultValue="null" Type="list"/>
 	<RefParameter Visible="false" Comment="Periph Clock Selection" Name="PeriphClockSelection" DefaultValue="+RCC_PERIPHCLK_I2SVar+|RCC_PERIPHCLK_SAI_PLLI2SVar+|RCC_PERIPHCLK_SAI_PLLSAIVar+|RCC_PERIPHCLK_LTDCVar+|RCC_PERIPHCLK_TIMVar+|RCC_PERIPHCLK_RTCVar" Type="list"/>
@@ -499,7 +553,7 @@
 	</RefParameter>
 	<RefParameter Visible="false" Name="RCC_PERIPHCLK_TIMVar" Comment="RCC_PERIPHCLK_TIMVar" Type="list" DefaultValue=""/>
 	<RefParameter Visible="false" Name="RCC_PERIPHCLK_RTCVar" Comment="RCC_PERIPHCLK_RTCVar" Type="list" DefaultValue="RCC_PERIPHCLK_RTC">
-		<Condition Expression="RTCUsed_ForRCC" Diagnostic="RTC Prescaler Activated"/>
+		<Condition Expression="RTCUsed_ForRCC|(SEM2RCC_HSE_REQUIRED_TIM11 &amp; TIM11 &amp; Semaphore_input_Channel1TIM11)" Diagnostic="RTC Prescaler Activated"/>
 		<PossibleValue Value="RCC_PERIPHCLK_RTC" Comment="RCC_PERIPHCLK_RTC"/>
 	</RefParameter>
 	<RefParameter Visible="false" Name="RCC_PERIPHCLK_RTCVar" Comment="RCC_PERIPHCLK_RTC" Type="list" DefaultValue=""/>
@@ -540,7 +594,7 @@
 	</RefParameter>
 	<RefParameter Visible="false" Name="PLLSAIDivQARG" Comment="PLLSAIDivQARG" Type="list" DefaultValue="null"/>
 	<RefParameter Visible="false" Name="RTCClockSelectionARG" Comment="RTCClockSelectionARG" Type="list" DefaultValue="+RCC_RTC_Clock_Source">
-		<Condition Expression="RTCUsed_ForRCC" Diagnostic="PLLSAI is used for SAI"/>
+		<Condition Expression="(SEM2RCC_HSE_REQUIRED_TIM11 &amp; TIM11 &amp; Semaphore_input_Channel1TIM11)|RTCUsed_ForRCC" Diagnostic="PLLSAI is used for SAI"/>
 	</RefParameter>
 	<RefParameter Visible="false" Name="RTCClockSelectionARG" Comment="RTCClockSelectionARG" Type="list" DefaultValue="null"/>
 	<RefParameter Visible="false" Name="TIMPresSelectionARG" Comment="TIMPresSelectionARG" Type="list" DefaultValue="+RCC_TIM_PRescaler_Selection">
@@ -570,7 +624,7 @@
 	<RefParameter Visible="false" Comment="PLLStateARG" DefaultValue="+PLLState" Name="PLLStateARG" Type="list">
 		<Condition Diagnostic="PLL used" Expression="PLLUsed=1"/>
 	</RefParameter>
-	<RefParameter Visible="false" Comment="PLLStateARG" DefaultValue="null" Name="LSIStateARG" Type="list"/>
+	<RefParameter Visible="false" Comment="PLLStateARG" DefaultValue="RCC_PLL_NONE" Name="PLLStateARG" Type="list"/>
 	<RefParameter Visible="false" Comment="PLLSourceARG" DefaultValue="+PLLSource" Name="PLLSourceARG" Type="list">
 		<Condition Diagnostic="PLL used" Expression="PLLUsed=1"/>
 	</RefParameter>
@@ -1108,7 +1162,7 @@
                 </Mode>
             </ModeLogicOperator>
         </Mode>
-        <Mode Name="Clock-out-1" UserName="Master Clock Ouput 1">
+        <Mode Name="Clock-out-1" UserName="Master Clock Output 1">
             <ModeLogicOperator Name="OR">
                 <Mode Name="Clock-out-1">
                     <SignalLogicalOp Name="AND">
@@ -1118,7 +1172,7 @@
                 </Mode>
             </ModeLogicOperator>
         </Mode>
-        <Mode Name="Clock-out-2" UserName="Master Clock Ouput 2">
+        <Mode Name="Clock-out-2" UserName="Master Clock Output 2">
             <ModeLogicOperator Name="OR">
                 <Mode Name="Clock-out-2">
                     <SignalLogicalOp Name="AND">

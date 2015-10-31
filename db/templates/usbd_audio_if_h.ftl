@@ -38,17 +38,47 @@
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __USBD_AUDIO_IF_H
 #define __USBD_AUDIO_IF_H
-
+[#assign handleNameFS = ""]
+[#assign handleNameUSB_FS = ""]
+[#assign handleNameHS = ""]
+[#list SWIPdatas as SWIP]  
+[#compress]
+[#-- Section2: Create global Variables for each middle ware instance --] 
+[#-- Global variables --]
+[#if SWIP.variables??]
+	[#list SWIP.variables as variable]	
+		[#-- extern ${variable.type} --][#if variable.value??][#--${variable.value};--]				
+		[#if variable.value?contains("OTG_FS")][#assign handleNameFS = "FS"][/#if]
+		[#if variable.value?contains("USB_FS")][#assign handleNameUSB_FS = "FS"][/#if]				
+		[#if variable.value?contains("OTG_HS")][#assign handleNameHS = "HS"][/#if]
+		[/#if]		
+	[/#list]
+[/#if]
+[#-- Global variables --]
+[/#compress]
+[/#list]
 /* Includes ------------------------------------------------------------------*/
 #include "usbd_audio.h"
 
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
-
-extern USBD_AUDIO_ItfTypeDef  USBD_AUDIO_fops;
+[#if handleNameFS == "FS" || handleNameUSB_FS == "FS"]
+extern USBD_AUDIO_ItfTypeDef  USBD_AUDIO_fops_FS;
+[/#if]
+[#if handleNameHS == "HS"]
+extern USBD_AUDIO_ItfTypeDef  USBD_AUDIO_fops_HS;
+[/#if]
 
 /* Exported macro ------------------------------------------------------------*/
 /* Exported functions ------------------------------------------------------- */
+[#if handleNameFS == "FS" || handleNameUSB_FS == "FS"]
+void TransferComplete_CallBack_FS(void);
+void HalfTransfer_CallBack_FS(void);
+[/#if]
+[#if handleNameHS == "HS"]
+void TransferComplete_CallBack_HS(void);
+void HalfTransfer_CallBack_HS(void);
+[/#if]
 #endif /* __USBD_AUDIO_IF_H */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

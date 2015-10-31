@@ -206,29 +206,67 @@
 			<ModeLogicOperator Name="XOR">
 <!--				<Mode Name="Counter_mode_on_internal_clock" UserName="Counter mode on internal clock">-->
 				<Mode Name="Counts__internal_clock_event_00" UserName="Counts internal clock events">
-
                                         <Semaphore>Semaphore_CounterInternalClk$IpInstance</Semaphore>
 					<SignalLogicalOp Name="AND">
 						<Signal Name="VS_LPTIM_counterModeInternalClock"/>
 					</SignalLogicalOp>
 				</Mode>
 				<Mode Name="Counts_external_clock_with_synchro_01" UserName="Counts external Clock events with internal synchronization">
+                                        <Condition Diagnostic="COMP1 link to LPTIM must be disabled in COMP1 settings" Expression="!Semaphore_COMP1_LPTIM_enabled"/>
                                         <Semaphore>Semaphore_CounterExternalClk_synchro$IpInstance</Semaphore>
 					<SignalLogicalOp Name="AND">
 						<Signal Name="IN1"/>
 					</SignalLogicalOp>
 				</Mode>
-				<Mode Name="Counts_external_clock_standalone_1X" UserName="Standalone : counts  external Clock events">
+				<Mode Name="Counts_external_clock_with_synchro_01" UserName="Counts COMP1 events with internal synchronization">
+                                        <Condition Diagnostic="COMP1 link to LPTIM must be enabled in COMP1 settings" Expression="Semaphore_COMP1_LPTIM_enabled"/>
+                                        <Semaphore>Semaphore_CounterExternalClk_synchro$IpInstance</Semaphore>
+					<SignalLogicalOp Name="AND">
+						<Signal Name="VS_COMP1_LPTIM"/>
+					</SignalLogicalOp>
+				</Mode>
+				<Mode Name="Counts_external_clock_standalone_1X" UserName="Standalone : counts external Clock events">
+                                        <Condition Diagnostic="COMP1 link to LPTIM must be disabled in COMP1 settings" Expression="!Semaphore_COMP1_LPTIM_enabled"/>
                                         <Semaphore>Semaphore_CounterExternalClk_standalone$IpInstance</Semaphore>
 					<SignalLogicalOp Name="AND">
 						<Signal Name="IN1"/>
 					</SignalLogicalOp>
 				</Mode>
-				<Mode Name="Encoder_mode" UserName="Encoder mode">
+				<Mode Name="Counts_external_clock_standalone_1X" UserName="Standalone : counts COMP1 events">
+                                        <Condition Diagnostic="COMP1 link to LPTIM must be enabled in COMP1 settings" Expression="Semaphore_COMP1_LPTIM_enabled"/>
+                                        <Semaphore>Semaphore_CounterExternalClk_standalone$IpInstance</Semaphore>
+					<SignalLogicalOp Name="AND">
+						<Signal Name="VS_COMP1_LPTIM"/>
+					</SignalLogicalOp>
+				</Mode>
+				<Mode Name="Encoder_mode" UserName="Encoder mode: From IN1 And IN2 IOs">
+                                        <Condition Diagnostic="COMP1 and COMP2 links to LPTIM must be disabled in COMP1 and COMP2 settings" Expression="!Semaphore_COMP1_LPTIM_enabled &amp;!Semaphore_COMP2_LPTIM_enabled"/>
                                         <Semaphore>Semaphore_Encoder$IpInstance</Semaphore>
 					<SignalLogicalOp Name="AND">
 						<Signal Name="IN1"/>
 						<Signal Name="IN2"/>
+					</SignalLogicalOp>
+				</Mode>
+				<Mode Name="Encoder_mode" UserName="Encoder mode: From COMP1 And IN2 IO">
+                                        <Condition Diagnostic="COMP1 links to LPTIM must be enabled while COMP2 link to LPTIM must be disabled in COMP1 and COMP2 settings" Expression="Semaphore_COMP1_LPTIM_enabled &amp;!Semaphore_COMP2_LPTIM_enabled"/>
+                                        <Semaphore>Semaphore_Encoder$IpInstance</Semaphore>
+					<SignalLogicalOp Name="AND">
+						<Signal Name="IN2"/>
+					</SignalLogicalOp>
+				</Mode>
+				<Mode Name="Encoder_mode" UserName="Encoder mode: From IN1 IO And COMP2">
+                                        <Condition Diagnostic="COMP1 links to LPTIM must be disabled while COMP2 link to LPTIM must be enabled in COMP1 and COMP2 settings" Expression="!Semaphore_COMP1_LPTIM_enabled &amp;Semaphore_COMP2_LPTIM_enabled"/>
+                                        <Semaphore>Semaphore_Encoder$IpInstance</Semaphore>
+					<SignalLogicalOp Name="AND">
+						<Signal Name="IN1"/>
+					</SignalLogicalOp>
+				</Mode>
+				<Mode Name="Encoder_mode" UserName="Encoder mode: From COMP1 And COMP2">
+                                        <Condition Diagnostic="COMP1 and COMP2 links to LPTIM must be enabled in COMP1 and COMP2 settings" Expression="Semaphore_COMP1_LPTIM_enabled &amp;Semaphore_COMP2_LPTIM_enabled"/>
+
+                                        <Semaphore>Semaphore_Encoder$IpInstance</Semaphore>
+					<SignalLogicalOp Name="AND">
+						<Signal Name="VS_COMP1_LPTIM"/>
 					</SignalLogicalOp>
 				</Mode>
 			</ModeLogicOperator>
@@ -262,7 +300,7 @@
 	<RefSignal IOMode="AlternateFunctionPushPull" Name="IN2"/>
 	<RefSignal IOMode="AlternateFunctionPushPull" Name="ETR"/>
 	<RefSignal Name="VS_LPTIM_counterModeInternalClock" Virtual="true"/>
-
+	<RefSignal Name="VS_COMP1_LPTIM" Virtual="true"/>
 </IP>
 
 

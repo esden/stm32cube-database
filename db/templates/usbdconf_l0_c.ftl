@@ -46,14 +46,21 @@
 [#assign handleNameHS = ""]
 [#assign instanceNb = 0]
 [#assign includeMspDone = 0] 
-
+[#assign className = ""]
 [#list SWIPdatas as SWIP]  
 [#compress]
 [#-- Section2: Create global Variables for each middle ware instance --] 
 [#-- Global variables --]
 [#if SWIP.variables??]
 	[#list SWIP.variables as variable]			
-		[#-- extern ${variable.type} --][#if variable.value??][#--${variable.value};--]		
+		[#-- extern ${variable.type} --][#if variable.value??][#--${variable.value};--]
+		[#if variable.value?contains("MSC")][#assign className = "MSC"][/#if]
+		[#if variable.value?contains("DFU")][#assign className = "DFU"][/#if]
+		[#if variable.value?contains("HID")][#assign className = "HID"][/#if]
+		[#if variable.value?contains("AUDIO")][#assign className = "AUDIO"][/#if]
+		[#if variable.value?contains("CCID")][#assign className = "CCID"][/#if]
+		[#if variable.value?contains("MTP")][#assign className = "MTP"][/#if]
+		[#if variable.value?contains("CDC")][#assign className = "CDC"][/#if]
 		[#if variable.value?contains("OTG_FS")][#assign handleNameFS = "FS"][/#if]
 		[#if variable.value?contains("USB_FS")][#assign handleNameUSB_FS = "FS"][/#if]
 		[#if variable.value?contains("OTG_HS")][#assign handleNameHS = "HS"][/#if]
@@ -86,6 +93,8 @@ __IO uint32_t remotewakeupon=0;
 /* USER CODE BEGIN 1 */
 static void SystemClockConfig_Resume(void);
 /* USER CODE END 1 */
+void HAL_PCDEx_SetConnectionState(PCD_HandleTypeDef *hpcd, uint8_t state);
+extern void SystemClock_Config(void);
 
 /*******************************************************************************
                        LL Driver Callbacks (PCD -> USB Device Library)
@@ -267,8 +276,7 @@ void HAL_PCD_DisconnectCallback(PCD_HandleTypeDef *hpcd)
                        LL Driver Interface (USB Device Library --> PCD)
 *******************************************************************************/
 /**
-  * @brief  USBD_LL_Init 
-  *         Initialize the Low Level portion of the Device driver.
+  * @brief  Initializes the Low Level portion of the Device driver.
   * @param  pdev: Device handle
   * @retval USBD Status
   */
@@ -277,10 +285,10 @@ USBD_StatusTypeDef  USBD_LL_Init (USBD_HandleTypeDef *pdev)
 #t/* Init USB_IP */
 [#if handleNameFS == "FS"]
 #tif (pdev->id == DEVICE_FS) {
-#t[#include "Src/usb_otg_fs_HalInit.tmp"]
 #t/* Link The driver to the stack */	
 #thpcd_USB_OTG_FS.pData = pdev;
-#tpdev->pData = &hpcd_USB_OTG_FS; 
+#tpdev->pData = &hpcd_USB_OTG_FS;
+#t[#include "Src/usb_otg_fs_HalInit.tmp"] 
 #tHAL_PCD_SetRxFiFo(&hpcd_USB_OTG_FS, 0x80);
 #tHAL_PCD_SetTxFiFo(&hpcd_USB_OTG_FS, 0, 0x40);
 #tHAL_PCD_SetTxFiFo(&hpcd_USB_OTG_FS, 1, 0x80);
@@ -288,30 +296,40 @@ USBD_StatusTypeDef  USBD_LL_Init (USBD_HandleTypeDef *pdev)
 [/#if]
 [#if handleNameHS == "HS"]
 #tif (pdev->id == DEVICE_HS) {
-[#include "Src/usb_otg_hs_HalInit.tmp"]
 #t/* Link The driver to the stack */
 #thpcd_USB_OTG_HS.pData = pdev;
 #tpdev->pData = &hpcd_USB_OTG_HS;
+[#include "Src/usb_otg_hs_HalInit.tmp"]
 #tHAL_PCD_SetRxFiFo(&hpcd_USB_OTG_HS, 0x200);
 #tHAL_PCD_SetTxFiFo(&hpcd_USB_OTG_HS, 0, 0x80);
 #tHAL_PCD_SetTxFiFo(&hpcd_USB_OTG_HS, 1, 0x174);
 #t}
 [/#if]
 [#if handleNameUSB_FS == "FS"]
-[#include "Src/usb_HalInit.tmp"]
 #t/* Link The driver to the stack */
 #thpcd_USB_FS.pData = pdev;
 #tpdev->pData = &hpcd_USB_FS;
+[#include "Src/usb_HalInit.tmp"]
 #tHAL_PCDEx_PMAConfig(pdev->pData , 0x00 , PCD_SNG_BUF, 0x18);
 #tHAL_PCDEx_PMAConfig(pdev->pData , 0x80 , PCD_SNG_BUF, 0x58);
+[#if className == "MSC"]
+#tHAL_PCDEx_PMAConfig(pdev->pData , 0x81 , PCD_SNG_BUF, 0x98);  
+#tHAL_PCDEx_PMAConfig(pdev->pData , 0x01 , PCD_SNG_BUF, 0xD8);  
+[/#if]
+[#if className == "HID"]
 #tHAL_PCDEx_PMAConfig(pdev->pData , 0x81 , PCD_SNG_BUF, 0x100);  
+[/#if]
+[#if className == "CDC"]
+#tHAL_PCDEx_PMAConfig(pdev->pData , 0x81 , PCD_SNG_BUF, 0xC0);  
+#tHAL_PCDEx_PMAConfig(pdev->pData , 0x01 , PCD_SNG_BUF, 0x110);
+#tHAL_PCDEx_PMAConfig(pdev->pData , 0x82 , PCD_SNG_BUF, 0x100);  
+[/#if]
 [/#if]
 #treturn USBD_OK;
 }
 
 /**
-  * @brief  USBD_LL_DeInit 
-  *         De-Initialize the Low Level portion of the Device driver.
+  * @brief  De-Initializes the Low Level portion of the Device driver.
   * @param  pdev: Device handle
   * @retval USBD Status
   */
@@ -322,8 +340,7 @@ USBD_StatusTypeDef  USBD_LL_DeInit (USBD_HandleTypeDef *pdev)
 }
 
 /**
-  * @brief  USBD_LL_Start 
-  *         Start the Low Level portion of the Device driver.
+  * @brief  Starts the Low Level portion of the Device driver. 
   * @param  pdev: Device handle
   * @retval USBD Status
   */
@@ -334,8 +351,7 @@ USBD_StatusTypeDef  USBD_LL_Start(USBD_HandleTypeDef *pdev)
 }
 
 /**
-  * @brief  USBD_LL_Stop 
-  *         Stop the Low Level portion of the Device driver.
+  * @brief  Stops the Low Level portion of the Device driver.
   * @param  pdev: Device handle
   * @retval USBD Status
   */
@@ -346,12 +362,11 @@ USBD_StatusTypeDef  USBD_LL_Stop (USBD_HandleTypeDef *pdev)
 }
 
 /**
-  * @brief  USBD_LL_OpenEP 
-  *         Open an endpoint of the Low Level Driver.
-  * @param  pdev: device handle
+  * @brief  Opens an endpoint of the Low Level Driver.
+  * @param  pdev: Device handle
   * @param  ep_addr: Endpoint Number
   * @param  ep_type: Endpoint Type
-  * @param  ep_mps: Endpoint Max Packet Size                 
+  * @param  ep_mps: Endpoint Max Packet Size
   * @retval USBD Status
   */
 USBD_StatusTypeDef  USBD_LL_OpenEP  (USBD_HandleTypeDef *pdev, 
@@ -369,10 +384,9 @@ USBD_StatusTypeDef  USBD_LL_OpenEP  (USBD_HandleTypeDef *pdev,
 }
 
 /**
-  * @brief  USBD_LL_CloseEP 
-  *         Close an endpoint of the Low Level Driver.
-  * @param  pdev: device handle
-  * @param  ep_addr: Endpoint Number      
+  * @brief  Closes an endpoint of the Low Level Driver.
+  * @param  pdev: Device handle
+  * @param  ep_addr: Endpoint Number
   * @retval USBD Status
   */
 USBD_StatusTypeDef  USBD_LL_CloseEP (USBD_HandleTypeDef *pdev, uint8_t ep_addr)   
@@ -383,10 +397,9 @@ USBD_StatusTypeDef  USBD_LL_CloseEP (USBD_HandleTypeDef *pdev, uint8_t ep_addr)
 }
 
 /**
-  * @brief  USBD_LL_FlushEP 
-  *         Flush an endpoint of the Low Level Driver.
-  * @param  pdev: device handle
-  * @param  ep_addr: Endpoint Number      
+  * @brief  Flushes an endpoint of the Low Level Driver.
+  * @param  pdev: Device handle
+  * @param  ep_addr: Endpoint Number
   * @retval USBD Status
   */
 USBD_StatusTypeDef  USBD_LL_FlushEP (USBD_HandleTypeDef *pdev, uint8_t ep_addr)   
@@ -397,10 +410,9 @@ USBD_StatusTypeDef  USBD_LL_FlushEP (USBD_HandleTypeDef *pdev, uint8_t ep_addr)
 }
 
 /**
-  * @brief  USBD_LL_StallEP 
-  *         Set a Stall condition on an endpoint of the Low Level Driver.
-  * @param  pdev: device handle
-  * @param  ep_addr: Endpoint Number      
+  * @brief  Sets a Stall condition on an endpoint of the Low Level Driver.
+  * @param  pdev: Device handle
+  * @param  ep_addr: Endpoint Number
   * @retval USBD Status
   */
 USBD_StatusTypeDef  USBD_LL_StallEP (USBD_HandleTypeDef *pdev, uint8_t ep_addr)   
@@ -411,10 +423,9 @@ USBD_StatusTypeDef  USBD_LL_StallEP (USBD_HandleTypeDef *pdev, uint8_t ep_addr)
 }
 
 /**
-  * @brief  USBD_LL_ClearStallEP 
-  *         Clear a Stall condition on an endpoint of the Low Level Driver.
-  * @param  pdev: device handle
-  * @param  ep_addr: Endpoint Number      
+  * @brief  Clears a Stall condition on an endpoint of the Low Level Driver.
+  * @param  pdev: Device handle
+  * @param  ep_addr: Endpoint Number
   * @retval USBD Status
   */
 USBD_StatusTypeDef  USBD_LL_ClearStallEP (USBD_HandleTypeDef *pdev, uint8_t ep_addr)   
@@ -425,11 +436,10 @@ USBD_StatusTypeDef  USBD_LL_ClearStallEP (USBD_HandleTypeDef *pdev, uint8_t ep_a
 }
 
 /**
-  * @brief  USBD_LL_IsStallEP 
-  *         Return Stall condition.
-  * @param  pdev: device handle
-  * @param  ep_addr: Endpoint Number      
-* @retval Stall (1: yes, 0: No)
+  * @brief  Returns Stall condition.
+  * @param  pdev: Device handle
+  * @param  ep_addr: Endpoint Number
+  * @retval Stall (1: Yes, 0: No)
   */
 uint8_t USBD_LL_IsStallEP (USBD_HandleTypeDef *pdev, uint8_t ep_addr)   
 {
@@ -445,10 +455,9 @@ uint8_t USBD_LL_IsStallEP (USBD_HandleTypeDef *pdev, uint8_t ep_addr)
   }
 }
 /**
-  * @brief  USBD_LL_SetDevAddress 
-  *         Assign an USB address to the device
-  * @param  pdev: device handle
-  * @param  ep_addr: Endpoint Number      
+  * @brief  Assigns a USB address to the device.
+  * @param  pdev: Device handle
+  * @param  ep_addr: Endpoint Number
   * @retval USBD Status
   */
 USBD_StatusTypeDef  USBD_LL_SetUSBAddress (USBD_HandleTypeDef *pdev, uint8_t dev_addr)   
@@ -459,12 +468,11 @@ USBD_StatusTypeDef  USBD_LL_SetUSBAddress (USBD_HandleTypeDef *pdev, uint8_t dev
 }
 
 /**
-  * @brief  USBD_LL_Transmit 
-  *         Transmit data over an endpoint
-  * @param  pdev: device handle
+  * @brief  Transmits data over an endpoint.
+  * @param  pdev: Device handle
   * @param  ep_addr: Endpoint Number
-  * @param  pbuf:pointer to data to be sent    
-  * @param  size: data size    
+  * @param  pbuf: Pointer to data to be sent
+  * @param  size: Data size    
   * @retval USBD Status
   */
 USBD_StatusTypeDef  USBD_LL_Transmit (USBD_HandleTypeDef *pdev, 
@@ -478,12 +486,11 @@ USBD_StatusTypeDef  USBD_LL_Transmit (USBD_HandleTypeDef *pdev,
 }
 
 /**
-  * @brief  USBD_LL_PrepareReceive 
-  *         prepare an endpoint for reception
-  * @param  pdev: device handle
+  * @brief  Prepares an endpoint for reception.
+  * @param  pdev: Device handle
   * @param  ep_addr: Endpoint Number
-  * @param  pbuf:pointer to data to be received    
-  * @param  size: data size              
+  * @param  pbuf: Pointer to data to be received
+  * @param  size: Data size
   * @retval USBD Status
   */
 USBD_StatusTypeDef  USBD_LL_PrepareReceive(USBD_HandleTypeDef *pdev, 
@@ -497,9 +504,8 @@ USBD_StatusTypeDef  USBD_LL_PrepareReceive(USBD_HandleTypeDef *pdev,
 }
 
 /**
-  * @brief  USBD_LL_GetRxDataSize 
-  *         Return the last transfered packet size.
-  * @param  phost: Device handle
+  * @brief  Returns the last transfered packet size.
+  * @param  pdev: Device handle
   * @param  ep_addr: Endpoint Number
   * @retval Recived Data Size
   */
@@ -509,8 +515,7 @@ uint32_t USBD_LL_GetRxDataSize  (USBD_HandleTypeDef *pdev, uint8_t  ep_addr)
 }
 
 /**
-  * @brief  USBD_LL_Delay 
-  *         Delay routine for the USB Device Library
+  * @brief  Delays routine for the USB Device Library.
   * @param  Delay: Delay in ms
   * @retval None
   */
@@ -549,42 +554,32 @@ void USBD_static_free(void *p)
   */
 static void SystemClockConfig_Resume(void)
 {
+	SystemClock_Config();
 }
 /* USER CODE END 4 */
 
-/* USER CODE BEGIN 5 */
-/**
-  * @brief  WakeUp_Callback function
-  *         Handle remote-wakeup
-  * @param  
-  * @retval None
-  */
-void WakeUp_Callback(void)
-{
-   if ((((USBD_HandleTypeDef *)hpcd_USB_FS.pData)->dev_remote_wakeup == 1)&&
-         (((USBD_HandleTypeDef *)hpcd_USB_FS.pData)->dev_state == USBD_STATE_SUSPENDED))
-    {
-      if ((&hpcd_USB_FS)->Init.low_power_enable)
-      {
-        /* Reset SLEEPDEEP bit of Cortex System Control Register */
-        SCB->SCR &= (uint32_t)~((uint32_t)(SCB_SCR_SLEEPDEEP_Msk | SCB_SCR_SLEEPONEXIT_Msk));  
-    
-        SystemClockConfig_Resume();
-      }
-      
-      /* Activate Remote wakeup */
-      HAL_PCD_ActiveRemoteWakeup((&hpcd_USB_FS));
-      /* remote wakeup delay */
-      HAL_Delay(10);
-      /* Desactivate Remote wakeup */
-      HAL_PCD_DeActiveRemoteWakeup((&hpcd_USB_FS));
 
-      /* change remote_wakeup feature to 0*/
-      ((USBD_HandleTypeDef *)hpcd_USB_FS.pData)->dev_remote_wakeup=0;
-      
-      remotewakeupon = 1;
-    }
-}
+/**
+* @brief Software Device Connection
+* @param hpcd: PCD handle
+* @param state: connection state (0 : disconnected / 1: connected) 
+* @retval None
+*/
+void HAL_PCDEx_SetConnectionState(PCD_HandleTypeDef *hpcd, uint8_t state)
+{
+/* USER CODE BEGIN 5 */
+  if (state == 1)
+  {
+    /* Configure Low Connection State */
+	
+  }
+  else
+  {
+    /* Configure High Connection State */
+   
+  } 
 /* USER CODE END 5 */
+}
+
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

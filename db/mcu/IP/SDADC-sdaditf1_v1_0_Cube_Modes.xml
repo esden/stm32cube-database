@@ -1,0 +1,1122 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<IP DBVersion="V3.0" IPType="peripheral" Name="SDADC" Version="sdaditf1_v1_0_Cube" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../db/IP_Modes_V3_0.xsd" xmlns="http://mcd.rou.st.com/modules.php?name=mcu">
+	<About>SDADC: Sigma Delta Analog to Digital Converter</About>
+
+    <!-- Ref Mode for SDADC Initialization -->
+    <RefMode Name="General Settings" Group="General Settings">
+        <!-- It's not coherent with the specification to add multi ConfigForMode in a RefMode, but
+        this solution is token to avoid the duplication of many callLibMethod in the generated Code
+        because in the ADC plugin Regular and Injected RefMode are duplicated which cause duplication
+        of ConfigForMode -->
+        <ConfigForMode>SDADC_ConfigRegular</ConfigForMode>
+    	<ConfigForMode>SDADC_InjectedConfig</ConfigForMode>
+    	
+    	<ConfigForMode>SDADC_Init</ConfigForMode>
+        <Parameter Name="IdleLowPowerMode"/>
+        <Parameter Name="FastConversionMode"/>
+        <Parameter Name="SlowClockMode"/>
+        <Parameter Name="ReferenceVoltage"/>
+    </RefMode>
+    
+    	<!-- Instance parameter -->
+    	<RefParameter Comment="SDADC instance" DefaultValue="SDADC$Index" Name="Instance" Type="list" Group="SDADCgroup" Visible="false"/>
+   
+   		<!-- Low Power Mode Parameter -->
+	    <RefParameter Comment="Low Power Mode" DefaultValue="SDADC_LOWPOWER_NONE" Name="IdleLowPowerMode" Type="list">
+	        <PossibleValue Comment="None" Value="SDADC_LOWPOWER_NONE"/>
+	        <PossibleValue Comment="Power down" Value="SDADC_LOWPOWER_POWERDOWN"/>
+	        <PossibleValue Comment="Standby" Value="SDADC_LOWPOWER_STANDBY"/>
+	    </RefParameter>
+	    
+	    <!-- Fast Conversion Mode Parameter -->
+	    <RefParameter Comment="Fast Conversion Mode" DefaultValue="SDADC_FAST_CONV_DISABLE" Name="FastConversionMode" Type="list">
+	    	<Condition Expression="(EnableRegularconversion=DISABLE) &amp; (EnableInjectedConversion=DISABLE)" Diagnostic="Fast Conversion mode can be enabled only when Regular or Injected conversion mode is Enabled"/>
+	        <PossibleValue Comment="Disable" Value="SDADC_FAST_CONV_DISABLE"/>
+	        <Description>To enable Fast Conversion Mode you must have only one regular channel with continuous mode enabled for regular conversion, or only one injected channel with continuous mode enabled for injected conversion, or both one regular channel and one injected channel with continuous mode enabled for injected and regular conversions.</Description>
+	    </RefParameter>
+	    <RefParameter Comment="Fast Conversion Mode" DefaultValue="SDADC_FAST_CONV_DISABLE" Name="FastConversionMode" Type="list">
+	    	<Condition Expression="(ContinuousMode_isUsed_$IpInstance &amp; (EnableRegularconversion=ENABLE) &amp; (EnableInjectedConversion=DISABLE)) | ( InjectedContinuousMode_isUsed_$IpInstance &amp; (InjNumberOfConversion=1) &amp; (EnableRegularconversion=DISABLE)) | ((ContinuousMode_isUsed_$IpInstance &amp; (EnableRegularconversion=ENABLE)) &amp; ( InjectedContinuousMode_isUsed_$IpInstance &amp; (InjNumberOfConversion=1)))" Diagnostic="Fast Conversion mode can be enabled only when Continues mode is Enabled"/>
+	        <PossibleValue Comment="Disable" Value="SDADC_FAST_CONV_DISABLE"/>
+	        <PossibleValue Comment="Enable" Value="SDADC_FAST_CONV_ENABLE"/>
+	        <Description>To enable Fast Conversion Mode you must have only one regular channel with continuous mode enabled for regular conversion, or only one injected channel with continuous mode enabled for injected conversion, or both one regular channel and one injected channel with continuous mode enabled for injected and regular conversions.</Description>
+	    </RefParameter>
+	    <RefParameter Comment="Fast Conversion Mode" DefaultValue="SDADC_FAST_CONV_DISABLE" Name="FastConversionMode" Type="list">
+	        <PossibleValue Comment="Disable" Value="SDADC_FAST_CONV_DISABLE"/>
+	        <Description>To enable Fast Conversion Mode you must have only one regular channel with continuous mode enabled for regular conversion, or only one injected channel with continuous mode enabled for injected conversion, or both one regular channel and one injected channel with continuous mode enabled for injected and regular conversions.</Description>
+	    </RefParameter>
+	    
+	    <!-- Slow Clock Mode Parameter -->
+	    <RefParameter Comment="Slow Clock Mode" DefaultValue="SDADC_SLOW_CLOCK_DISABLE" Name="SlowClockMode" Type="list">
+	        <PossibleValue Comment="Disable" Value="SDADC_SLOW_CLOCK_DISABLE"/>
+	        <PossibleValue Comment="Enable" Value="SDADC_SLOW_CLOCK_ENABLE"/>
+	    </RefParameter>
+	    
+	    <!-- Reference Voltage Parameter -->
+	    <RefParameter Comment="Reference Voltage" DefaultValue="SDADC_VREF_EXT" Name="ReferenceVoltage" Type="list">
+	        <PossibleValue Comment="Forced externally using VREF pin " Value="SDADC_VREF_EXT"/>
+	        <PossibleValue Comment="Forced internally to 1.22V VREFINT " Value="SDADC_VREF_VREFINT1"/>
+	        <PossibleValue Comment="Forced internally to 1.8V VREFINT " Value="SDADC_VREF_VREFINT2"/>
+	        <PossibleValue Comment="Forced internally to VDDA " Value="SDADC_VREF_VDDA"/>
+	    </RefParameter>
+    	
+    <!-- RefMode to configure regular channel -->
+    <RefMode Name="Conversion Configuration 0" Group="Channel Configuration 0">
+    	<ConfigForMode>SDADC_ChannelConfig0</ConfigForMode>
+    	<!-- <Parameter Name="UseConfig0"/> -->
+    	<Parameter Name="ConfIndex0"/>
+    	<Parameter Name="InputMode0"/>
+    	<Parameter Name="Gain0"/>
+    	<Parameter Name="CommonMode0"/>
+    	<Parameter Name="Offset0"/>
+    </RefMode>
+    	
+    	<!-- Use Configuration parameter -->
+    	<RefParameter Comment="Configuration 0" DefaultValue="ENABLE" Name="UseConfig0" Type="list" Visible="false">
+    		<Condition Expression="ConversionConfiguration0Selected_$IpInstance" Diagnostic=""/>
+    		<PossibleValue Comment="Enable" Value="ENABLE"/>
+    		<PossibleValue Comment="Disable" Value="DISABLE"/>
+    	</RefParameter>
+    	<RefParameter Comment="Configuration 0" DefaultValue="DISABLE" Name="UseConfig0" Type="list">
+    		<PossibleValue Comment="Disable" Value="DISABLE"/>
+    		<PossibleValue Comment="Enable" Value="ENABLE"/>
+    	</RefParameter>
+    	
+    	<!-- ConfIndex Parameter -->
+    	<RefParameter Comment="Configuration Index" DefaultValue="null" Name="ConfIndex0" Type="list" Visible="false">
+	       	<Condition Expression="!(ConversionConfiguration0Selected_$IpInstance)" Diagnostic=""/>
+	    </RefParameter>
+    	<RefParameter Comment="Configuration Index" DefaultValue="SDADC_CONF_INDEX_0" Name="ConfIndex0" Type="list" Visible="false">
+	        <PossibleValue Comment="Configuration 0 selected" Value="SDADC_CONF_INDEX_0"/>
+	    </RefParameter>
+	    
+	    <!-- InputMode Parameter -->
+	     <RefParameter Comment="Input Mode" DefaultValue="null" Name="InputMode0" Type="list"  Visible="false">
+	       <Condition Expression="!(ConversionConfiguration0Selected_$IpInstance)" Diagnostic=""/>
+	    </RefParameter>
+	    <RefParameter Comment="Input Mode" DefaultValue="SDADC_INPUT_MODE_DIFF" Name="InputMode0" Type="list">
+	        <PossibleValue Comment="Differential mode" Value="SDADC_INPUT_MODE_DIFF"/>
+	        <PossibleValue Comment="Single-ended offset mode" Value="SDADC_INPUT_MODE_SE_OFFSET"/>
+	        <PossibleValue Comment="Single-ended zero-volt reference mode" Value="SDADC_INPUT_MODE_SE_ZERO_REFERENCE"/>
+	    </RefParameter>
+	    
+	   <!--  Gain Parameter -->
+	    <RefParameter Comment="Gain" DefaultValue="null" Name="Gain0" Type="list"  Visible="false">
+	     	 <Condition Expression="!(ConversionConfiguration0Selected_$IpInstance)" Diagnostic=""/>
+	    </RefParameter>
+	    <RefParameter Comment="Gain" DefaultValue="SDADC_GAIN_1" Name="Gain0" Type="list">
+	     	<PossibleValue Comment="equal to 1/2" Value="SDADC_GAIN_1_2"/>
+	        <PossibleValue Comment="equal to 1" Value="SDADC_GAIN_1"/>
+	        <PossibleValue Comment="equal to 2" Value="SDADC_GAIN_2"/>
+	        <PossibleValue Comment="equal to 4" Value="SDADC_GAIN_4"/>
+	        <PossibleValue Comment="equal to 8" Value="SDADC_GAIN_8"/>
+	        <PossibleValue Comment="equal to 16" Value="SDADC_GAIN_16"/>
+	        <PossibleValue Comment="equal to 32" Value="SDADC_GAIN_32"/>
+	    </RefParameter>
+	    
+	    <!-- Common Mode Parameter -->
+	     <RefParameter Comment="Common Mode" DefaultValue="null" Name="CommonMode0" Type="list"  Visible="false">
+	        <Condition Expression="!(ConversionConfiguration0Selected_$IpInstance)" Diagnostic=""/>
+	    </RefParameter>
+	    <RefParameter Comment="Common Mode" DefaultValue="SDADC_COMMON_MODE_VSSA" Name="CommonMode0" Type="list">
+	        <PossibleValue Comment="SDADC VSSA" Value="SDADC_COMMON_MODE_VSSA"/>
+	        <PossibleValue Comment="SDADC VDDA/2" Value="SDADC_COMMON_MODE_VDDA_2"/>
+	        <PossibleValue Comment="SDADC VDDA" Value="SDADC_COMMON_MODE_VDDA"/>
+	    </RefParameter>
+	    
+	    <!-- offset Parameter -->
+	    <RefParameter Comment="Offset" DefaultValue="null" Max="4095" Min="0" Name="Offset0" Type="integer"  Visible="false">
+	    	 <Condition Expression="!(ConversionConfiguration0Selected_$IpInstance)" Diagnostic=""/>
+	    </RefParameter>
+	    <RefParameter Comment="Offset" DefaultValue="0" Max="4095" Min="0" Name="Offset0" Type="integer"/>
+	    
+    <!-- RefMode to configure regular channel -->
+    <RefMode Name="Conversion Configuration 1" Group="Channel Configuration 1">
+    	<ConfigForMode>SDADC_ChannelConfig1</ConfigForMode>
+    	<!-- <Parameter Name="UseConfig1"/> -->
+    	<Parameter Name="ConfIndex1"/>
+    	<Parameter Name="InputMode1"/>
+    	<Parameter Name="Gain1"/>
+    	<Parameter Name="CommonMode1"/>
+    	<Parameter Name="Offset1"/>
+    </RefMode>
+    
+    	<!-- Use Configuration parameter -->
+    	<RefParameter Comment="Configuration 1" DefaultValue="ENABLE" Name="UseConfig1" Type="list" Visible="false">
+    		<Condition Expression="ConversionConfiguration1Selected_$IpInstance" Diagnostic=""/>
+    		<PossibleValue Comment="Enable" Value="ENABLE"/>
+    		<!-- <PossibleValue Comment="Disable" Value="DISABLE"/> -->
+    	</RefParameter>
+    	<RefParameter Comment="Configuration 1" DefaultValue="DISABLE" Name="UseConfig1" Type="list" Visible="false">
+    		<PossibleValue Comment="Disable" Value="DISABLE"/>
+    		<PossibleValue Comment="Enable" Value="ENABLE"/>
+    	</RefParameter>
+    	
+    	<!-- ConfIndex Parameter -->
+    	<RefParameter Comment="Configuration Index" DefaultValue="null" Name="ConfIndex1" Type="list" Visible="false">
+	       	<Condition Expression="!(ConversionConfiguration1Selected_$IpInstance)" Diagnostic=""/>
+	    </RefParameter>
+    	<RefParameter Comment="Configuration Index" DefaultValue="SDADC_CONF_INDEX_1" Name="ConfIndex1" Type="list" Visible="false">
+	        <PossibleValue Comment="Configuration 1 selected" Value="SDADC_CONF_INDEX_1"/>
+	    </RefParameter>
+	    
+	    <!-- InputMode Parameter -->
+	     <RefParameter Comment="Input Mode" DefaultValue="null" Name="InputMode1" Type="list"  Visible="false">
+	       <Condition Expression="!(ConversionConfiguration1Selected_$IpInstance)" Diagnostic=""/>
+	    </RefParameter>
+	    <RefParameter Comment="Input Mode" DefaultValue="SDADC_INPUT_MODE_DIFF" Name="InputMode1" Type="list">
+	        <PossibleValue Comment="Differential mode" Value="SDADC_INPUT_MODE_DIFF"/>
+	        <PossibleValue Comment="Single-ended offset mode" Value="SDADC_INPUT_MODE_SE_OFFSET"/>
+	        <PossibleValue Comment="Single-ended zero-volt reference mode" Value="SDADC_INPUT_MODE_SE_ZERO_REFERENCE"/>
+	    </RefParameter>
+	    
+	   <!--  Gain Parameter -->
+	    <RefParameter Comment="Gain" DefaultValue="null" Name="Gain1" Type="list"  Visible="false">
+	     	 <Condition Expression="!(ConversionConfiguration1Selected_$IpInstance)" Diagnostic=""/>
+	    </RefParameter>
+	    <RefParameter Comment="Gain" DefaultValue="SDADC_GAIN_1" Name="Gain1" Type="list">
+	     	<PossibleValue Comment="equal to 1/2" Value="SDADC_GAIN_1_2"/>
+	        <PossibleValue Comment="equal to 1" Value="SDADC_GAIN_1"/>
+	        <PossibleValue Comment="equal to 2" Value="SDADC_GAIN_2"/>
+	        <PossibleValue Comment="equal to 4" Value="SDADC_GAIN_4"/>
+	        <PossibleValue Comment="equal to 8" Value="SDADC_GAIN_8"/>
+	        <PossibleValue Comment="equal to 16" Value="SDADC_GAIN_16"/>
+	        <PossibleValue Comment="equal to 32" Value="SDADC_GAIN_32"/>
+	    </RefParameter>
+	    
+	    <!-- Common Mode Parameter -->
+	     <RefParameter Comment="Common Mode" DefaultValue="null" Name="CommonMode1" Type="list"  Visible="false">
+	        <Condition Expression="!(ConversionConfiguration1Selected_$IpInstance)" Diagnostic=""/>
+	    </RefParameter>
+	    <RefParameter Comment="Common Mode" DefaultValue="SDADC_COMMON_MODE_VSSA" Name="CommonMode1" Type="list">
+	        <PossibleValue Comment="SDADC VSSA" Value="SDADC_COMMON_MODE_VSSA"/>
+	        <PossibleValue Comment="SDADC VDDA/2" Value="SDADC_COMMON_MODE_VDDA_2"/>
+	        <PossibleValue Comment="SDADC VDDA" Value="SDADC_COMMON_MODE_VDDA"/>
+	    </RefParameter>
+	    
+	    <!-- offset Parameter -->
+	    <RefParameter Comment="Offset" DefaultValue="null" Max="4095" Min="0" Name="Offset1" Type="integer"  Visible="false">
+	    	 <Condition Expression="!(ConversionConfiguration1Selected_$IpInstance)" Diagnostic=""/>
+	    </RefParameter>
+	    <RefParameter Comment="Offset" DefaultValue="0" Max="4095" Min="0" Name="Offset1" Type="integer"/>
+	    
+    <!-- RefMode to configure regular channel -->
+    <RefMode Name="Conversion Configuration 2" Group="Channel Configuration 2">
+    	<ConfigForMode>SDADC_ChannelConfig2</ConfigForMode>
+    	<!-- <Parameter Name="UseConfig2"/> -->
+    	<Parameter Name="ConfIndex2"/>
+    	<Parameter Name="InputMode2"/>
+    	<Parameter Name="Gain2"/>
+    	<Parameter Name="CommonMode2"/>
+    	<Parameter Name="Offset2"/>
+    </RefMode>
+    
+    	<!-- Use Configuration parameter -->
+    	<RefParameter Comment="Configuration 2" DefaultValue="ENABLE" Name="UseConfig2" Type="list"  Visible="false">
+    		<Condition Expression="ConversionConfiguration2Selected_$IpInstance" Diagnostic=""/>
+    		<PossibleValue Comment="Enable" Value="ENABLE"/>
+    		<!-- <PossibleValue Comment="Disable" Value="DISABLE"/> -->
+    	</RefParameter>
+    	<RefParameter Comment="Configuration 2" DefaultValue="DISABLE" Name="UseConfig2" Type="list"  Visible="false">
+    		<PossibleValue Comment="Disable" Value="DISABLE"/>
+    		<PossibleValue Comment="Enable" Value="ENABLE"/>
+    	</RefParameter>
+    	
+	    <!-- ConfIndex Parameter -->
+	    <RefParameter Comment="Configuration Index" DefaultValue="null" Name="ConfIndex2" Type="list" Visible="false">
+	       	<Condition Expression="!(ConversionConfiguration2Selected_$IpInstance)" Diagnostic=""/>
+	    </RefParameter>
+    	<RefParameter Comment="Configuration Index" DefaultValue="SDADC_CONF_INDEX_2" Name="ConfIndex2" Type="list" Visible="false">
+	        <PossibleValue Comment="Configuration 2 selected" Value="SDADC_CONF_INDEX_2"/>
+	    </RefParameter>
+	    
+	    <!-- InputMode Parameter -->
+	    <RefParameter Comment="Input Mode" DefaultValue="null" Name="InputMode2" Type="list"  Visible="false">
+	       <Condition Expression="!(ConversionConfiguration2Selected_$IpInstance)" Diagnostic=""/>
+	    </RefParameter>
+	    <RefParameter Comment="Input Mode" DefaultValue="SDADC_INPUT_MODE_DIFF" Name="InputMode2" Type="list">
+	        <PossibleValue Comment="Differential mode" Value="SDADC_INPUT_MODE_DIFF"/>
+	        <PossibleValue Comment="Single-ended offset mode" Value="SDADC_INPUT_MODE_SE_OFFSET"/>
+	        <PossibleValue Comment="Single-ended zero-volt reference mode" Value="SDADC_INPUT_MODE_SE_ZERO_REFERENCE"/>
+	    </RefParameter>
+	    
+	   <!--  Gain Parameter -->
+	   <RefParameter Comment="Gain" DefaultValue="null" Name="Gain2" Type="list"  Visible="false">
+	     	 <Condition Expression="!(ConversionConfiguration2Selected_$IpInstance)" Diagnostic=""/>
+	    </RefParameter>
+	    <RefParameter Comment="Gain" DefaultValue="SDADC_GAIN_1" Name="Gain2" Type="list">
+	     	<PossibleValue Comment="equal to 1/2" Value="SDADC_GAIN_1_2"/>
+	        <PossibleValue Comment="equal to 1" Value="SDADC_GAIN_1"/>
+	        <PossibleValue Comment="equal to 2" Value="SDADC_GAIN_2"/>
+	        <PossibleValue Comment="equal to 4" Value="SDADC_GAIN_4"/>
+	        <PossibleValue Comment="equal to 8" Value="SDADC_GAIN_8"/>
+	        <PossibleValue Comment="equal to 16" Value="SDADC_GAIN_16"/>
+	        <PossibleValue Comment="equal to 32" Value="SDADC_GAIN_32"/>
+	    </RefParameter>
+	    
+	    <!-- Common Mode Parameter -->
+	    <RefParameter Comment="Common Mode" DefaultValue="null" Name="CommonMode2" Type="list"  Visible="false">
+	        <Condition Expression="!(ConversionConfiguration2Selected_$IpInstance)" Diagnostic=""/>
+	    </RefParameter>
+	    <RefParameter Comment="Common Mode" DefaultValue="SDADC_COMMON_MODE_VSSA" Name="CommonMode2" Type="list">
+	        <PossibleValue Comment="SDADC VSSA" Value="SDADC_COMMON_MODE_VSSA"/>
+	        <PossibleValue Comment="SDADC VDDA/2" Value="SDADC_COMMON_MODE_VDDA_2"/>
+	        <PossibleValue Comment="SDADC VDDA" Value="SDADC_COMMON_MODE_VDDA"/>
+	    </RefParameter>
+	    
+	    <!-- offset Parameter -->
+	    <RefParameter Comment="Offset" DefaultValue="null" Max="4095" Min="0" Name="Offset2" Type="integer"  Visible="false">
+	    	 <Condition Expression="!(ConversionConfiguration2Selected_$IpInstance)" Diagnostic=""/>
+	    </RefParameter>
+	    <RefParameter Comment="Offset" DefaultValue="0" Max="4095" Min="0" Name="Offset2" Type="integer"/>
+  
+  	<!--  -->
+  	<RefMode Name="SDADC Regular Conversions Settings" Comment="Regular Conversions Configuration" Group="SDADC Regular Conversions Settings" Abstract="true">
+    	<!-- <ConfigForMode>SDADC_ConfigRegularChannel</ConfigForMode> -->
+    	<Parameter Name="EnableRegularconversion" />
+    	<Parameter Name="NbrOfConversionFlag"/>
+    	<Parameter Name="NbrOfConversion"/>
+    	<Parameter Name="MultimodeType"/>
+        <Parameter Name="Trigger"/>
+        <Parameter Name="ContinuousMode"/>
+    	<!-- <Parameter Name="Channel"/>
+    	<Parameter Name="ConfIndex"/>
+    	<Parameter Name="ContinuousMode"/> -->
+    </RefMode>
+    
+    	<RefParameter Comment="Enable Regular Conversion" DefaultValue="DISABLE" Name="EnableRegularconversion" Type="list">
+    		<PossibleValue Comment="Disable" Value="DISABLE"/>
+    		<PossibleValue Comment="Enable" Value="ENABLE"/>
+    	</RefParameter>
+    	
+    	<!-- Possible values of MultimodeTpe parameter -->
+    	<RefParameter Comment="Mulimode type" DefaultValue="__NULL" Name="MultimodeType" Type="list" Group="ADCgroup" Visible="false">
+    		<Condition Expression="EnableRegularconversion=DISABLE" Diagnostic=""/>
+    	</RefParameter>
+         <RefParameter Comment="Mulimode type" DefaultValue="__NULL" Name="MultimodeType" Type="list" Group="ADCgroup" Visible="false">
+             <Condition Expression="!($Index=1)" Diagnostic=""/>
+        </RefParameter>
+       <RefParameter Comment="Mulimode type" DefaultValue="__NULL" Name="MultimodeType" Type="list" Group="ADCgroup">
+       		 <Condition Expression="((USE_SDADC2 &amp; (SDADC2:Trigger=SDADC_SYNCHRONOUS_TRIGGER)) &amp; (USE_SDADC3 &amp; (SDADC3:Trigger=SDADC_SYNCHRONOUS_TRIGGER)))" Diagnostic=""/>
+             <PossibleValue Comment="Disable" Value="__NULL"/>
+             <PossibleValue Comment="Get conversion values for SDADC1 and SDADC2" Value="SDADC_MULTIMODE_SDADC1_SDADC2"/>
+             <PossibleValue Comment="Get conversion values for SDADC1 and SDADC3" Value="SDADC_MULTIMODE_SDADC1_SDADC3"/>
+             <Description>Multimode Type</Description>
+        </RefParameter>
+        <RefParameter Comment="Mulimode type" DefaultValue="__NULL" Name="MultimodeType" Type="list" Group="ADCgroup">
+             <Condition Expression="(USE_SDADC3) &amp; (SDADC3:Trigger=SDADC_SYNCHRONOUS_TRIGGER)" Diagnostic=""/>
+             <PossibleValue Comment="Disable" Value="__NULL"/>
+             <PossibleValue Comment="Get conversion values for SDADC1 and SDADC3" Value="SDADC_MULTIMODE_SDADC1_SDADC3"/>
+             <Description>Multimode Type</Description>
+        </RefParameter>
+        <RefParameter Comment="Mulimode type" DefaultValue="__NULL" Name="MultimodeType" Type="list" Group="ADCgroup">
+             <Condition Expression="(USE_SDADC2)  &amp; (SDADC2:Trigger=SDADC_SYNCHRONOUS_TRIGGER)" Diagnostic=""/>
+             <PossibleValue Comment="Disable" Value="__NULL"/>
+             <PossibleValue Comment="Get conversion values for SDADC1 and SDADC2" Value="SDADC_MULTIMODE_SDADC1_SDADC2"/>
+             <Description>Multimode Type</Description>
+        </RefParameter>
+        <RefParameter Comment="Mulimode type" DefaultValue="__NULL" Name="MultimodeType" Type="list" Group="ADCgroup">
+             <PossibleValue Comment="Disable" Value="__NULL"/>
+             <Description>Multimode Type</Description>
+        </RefParameter>
+        
+    	<!-- Possible values of NbrOfConversionFlag parameter  !!!! what is the utility of this? !!!!-->
+        <RefParameter Comment="Number Of Conversion Flag" DefaultValue="0" Max="1" Min="0" Name="NbrOfConversionFlag" Type="integer" Group="ADCgroup" Visible="false"/>
+        
+        <!-- Possible values of NbrOfConversion parameter !!!!! the Group is not the same !!!!!! -->
+        <RefParameter Comment="Number Of Conversion" DefaultValue="1" Max="9" Min="1" Name="NbrOfConversion" Type="integer" Group="ADCgroup" Visible="false">
+            <Description>Number of regular channels to be converted</Description>
+        </RefParameter>
+        
+        <!-- Trigger Parameter -->
+    	<RefParameter Comment="Trigger type" DefaultValue="null" Name="Trigger" Type="list" Visible="false">
+    		<Condition Expression="EnableRegularconversion=DISABLE" Diagnostic=""/>
+    	</RefParameter>
+    	<RefParameter Comment="Trigger type" DefaultValue="SDADC_SOFTWARE_TRIGGER" Name="Trigger" Type="list">
+    		<Condition Expression="(($Index=3|$Index=2)&amp;(USE_SDADC1))" Diagnostic=""/>
+    		<PossibleValue Comment="Software trigger" Value="SDADC_SOFTWARE_TRIGGER"/>
+    		<PossibleValue Comment="Synchronous trigger" Value="SDADC_SYNCHRONOUS_TRIGGER"/>
+    	</RefParameter>
+    	<RefParameter Comment="Trigger type" DefaultValue="SDADC_SOFTWARE_TRIGGER" Name="Trigger" Type="list">
+    		<Condition Expression="USE_SDADC1" Diagnostic="only for SDADC2 and SDADC3"/>
+    		<PossibleValue Comment="Software trigger" Value="SDADC_SOFTWARE_TRIGGER"/>
+    	</RefParameter>
+    	<RefParameter Comment="Trigger type" DefaultValue="SDADC_SOFTWARE_TRIGGER" Name="Trigger" Type="list">
+    		<PossibleValue Comment="Software trigger" Value="SDADC_SOFTWARE_TRIGGER"/>
+    	</RefParameter>
+    	
+		<!--  -->
+		<RefMode Name="ChannelRegularConversion" Comment="Regular Conversions Configuration" BaseMode="SDADC Regular Conversions Settings" Group="SDADC Regular Conversions Settings">
+	    	<ConfigForMode>SDADC_ConfigRegularChannel</ConfigForMode>
+	    	<Parameter Name="Rank"/>
+	    	<Parameter Name="Channel"/>
+	    	<Parameter Name="ConfIndex"/>
+	    </RefMode>
+		<RefMode Name="CpChannelRegularConversion" Comment="Regular Conversions Configuration">
+	    	<ConfigForMode>SDADC_ConfigRegularChannel</ConfigForMode>
+	    	<Parameter Name="Rank"/>
+	    	<Parameter Name="Channel"/>
+	    	<Parameter Name="ConfIndex"/>
+	    </RefMode>
+	    
+	    	<!-- Possible Value of Rank parameters -->
+    		<RefParameter Comment="Channel Configuration" DefaultValue="null" Max="1" Min="1" Name="Rank" Type="integer" Visible="false">
+    			<Condition Expression="EnableRegularconversion=DISABLE" Diagnostic=""/>
+    		</RefParameter>
+	        <RefParameter Comment="Channel Configuration" DefaultValue="1" Max="1" Min="1" Name="Rank" Type="integer">
+		        <Description>The Configuration of the selected channel</Description>
+		    </RefParameter>
+		    
+	    	<RefParameter Comment="Channel" DefaultValue="null" Name="Channel" Type="list" Visible="false">
+		   		<Condition Expression="EnableRegularconversion=DISABLE" Diagnostic=""/>
+		    </RefParameter>
+		   	<RefParameter Comment="Channel" DefaultValue="" Name="Channel" Type="list">
+		        <PossibleValue Comment="Channel 0" Value="SDADC_CHANNEL_0"/>
+		        <PossibleValue Comment="Channel 1" Value="SDADC_CHANNEL_1"/>
+		        <PossibleValue Comment="Channel 2" Value="SDADC_CHANNEL_2"/>
+		        <PossibleValue Comment="Channel 3" Value="SDADC_CHANNEL_3"/>
+		        <PossibleValue Comment="Channel 4" Value="SDADC_CHANNEL_4"/>
+		        <PossibleValue Comment="Channel 5" Value="SDADC_CHANNEL_5"/>
+		        <PossibleValue Comment="Channel 6" Value="SDADC_CHANNEL_6"/>
+		        <PossibleValue Comment="Channel 7" Value="SDADC_CHANNEL_7"/>
+		        <PossibleValue Comment="Channel 8" Value="SDADC_CHANNEL_8"/>
+		    </RefParameter>
+		    
+	    	<!--  -->
+	    	<RefParameter Comment="Configuration Index" DefaultValue="SDADC_CONF_INDEX_1" Name="ConfIndex" Type="list" Visible="false">
+	    		<Condition Expression="EnableRegularconversion=DISABLE" Diagnostic=""/>
+    		</RefParameter>
+	    	<RefParameter Comment="Configuration Index" DefaultValue="SDADC_CONF_INDEX_1" Name="ConfIndex" Type="list">
+	    		<Condition Expression="ConversionConfiguration0Selected_$IpInstance&amp;ConversionConfiguration1Selected_$IpInstance&amp;ConversionConfiguration2Selected_$IpInstance" Diagnostic=""/>
+		        <PossibleValue Comment="Configuration 0" Value="SDADC_CONF_INDEX_0"/>
+		        <PossibleValue Comment="Configuration 1" Value="SDADC_CONF_INDEX_1"/>
+		        <PossibleValue Comment="Configuration 2" Value="SDADC_CONF_INDEX_2"/>
+		    </RefParameter>
+		    <RefParameter Comment="Configuration Index" DefaultValue="SDADC_CONF_INDEX_0" Name="ConfIndex" Type="list">
+	    		<Condition Expression="(ConversionConfiguration0Selected_$IpInstance)&amp;(ConversionConfiguration1Selected_$IpInstance)" Diagnostic=""/>
+		        <PossibleValue Comment="Configuration 0" Value="SDADC_CONF_INDEX_0"/>
+		        <PossibleValue Comment="Configuration 1" Value="SDADC_CONF_INDEX_1"/>
+		    </RefParameter>
+		    <RefParameter Comment="Configuration Index" DefaultValue="SDADC_CONF_INDEX_1" Name="ConfIndex" Type="list">
+	    		<Condition Expression="(ConversionConfiguration1Selected_$IpInstance)&amp;(ConversionConfiguration2Selected_$IpInstance)" Diagnostic=""/>
+		        <PossibleValue Comment="Configuration 1" Value="SDADC_CONF_INDEX_1"/>
+		        <PossibleValue Comment="Configuration 2" Value="SDADC_CONF_INDEX_2"/>
+		    </RefParameter>
+		    <RefParameter Comment="Configuration Index" DefaultValue="SDADC_CONF_INDEX_0" Name="ConfIndex" Type="list">
+	    		<Condition Expression="(ConversionConfiguration0Selected_$IpInstance)&amp;(ConversionConfiguration2Selected_$IpInstance)" Diagnostic=""/>
+		        <PossibleValue Comment="Configuration 0" Value="SDADC_CONF_INDEX_0"/>
+		        <PossibleValue Comment="Configuration 2" Value="SDADC_CONF_INDEX_2"/>
+		    </RefParameter>
+		    <RefParameter Comment="Configuration Index" DefaultValue="SDADC_CONF_INDEX_0" Name="ConfIndex" Type="list">
+	    		<Condition Expression="ConversionConfiguration0Selected_$IpInstance" Diagnostic=""/>
+		        <PossibleValue Comment="Configuration 0" Value="SDADC_CONF_INDEX_0"/>
+		    </RefParameter>
+		    <RefParameter Comment="Configuration Index" DefaultValue="SDADC_CONF_INDEX_1" Name="ConfIndex" Type="list">
+	    		<Condition Expression="ConversionConfiguration1Selected_$IpInstance" Diagnostic=""/>
+		        <PossibleValue Comment="Configuration 1" Value="SDADC_CONF_INDEX_1"/>
+		    </RefParameter>
+		    <RefParameter Comment="Configuration Index" DefaultValue="SDADC_CONF_INDEX_2" Name="ConfIndex" Type="list">
+	    		<Condition Expression="ConversionConfiguration2Selected_$IpInstance" Diagnostic=""/>
+		        <PossibleValue Comment="Configuration 2" Value="SDADC_CONF_INDEX_2"/>
+		    </RefParameter>
+		    <RefParameter Comment="Configuration Index" DefaultValue="null" Name="ConfIndex" Type="list">
+		    </RefParameter>
+		    
+		    <!--  -->
+		    <RefParameter Comment="Continuous Mode" DefaultValue="SDADC_CONTINUOUS_CONV_OFF" Name="ContinuousMode" Type="list" Visible="false">
+		    	<Condition Expression="EnableRegularconversion=DISABLE" Diagnostic=""/>
+    		</RefParameter>
+	    	<RefParameter Comment="Continuous Mode" DefaultValue="SDADC_CONTINUOUS_CONV_OFF" Name="ContinuousMode" Type="list">
+		         <PossibleValue Comment="Disabled" Value="SDADC_CONTINUOUS_CONV_OFF"/>
+		         <PossibleValue Comment="Enabled" Value="SDADC_CONTINUOUS_CONV_ON" Semaphore="ContinuousMode_isUsed_$IpInstance"/>              
+		    </RefParameter>
+	
+	<!-- <RefMode Name="ChannelInjectedConversion" Comment="Injected Channel Settings" BaseMode="ADC_Injected_ConversionMode" Group="ADC_Injected_ConversionMode"> -->
+	<RefMode Name="SDADC Injected Conversions Settings" Comment="Injected Channel Settings" Group="Injected Conversions Configuration">
+		<Parameter Name="EnableInjectedConversion"/>
+    	<Parameter Name="InjNumberOfConversion"/>
+    	<Parameter Name="InjectedTrigger"/>
+    	<Parameter Name="ExtTriggerEdge"/>
+        <Parameter Name="InjectedExtTrigger"/>
+        <Parameter Name="InjDelay"/>
+        <Parameter Name="InjectedMultimodeType"/>
+        <Parameter Name="InjectedContinuousMode"/>
+    </RefMode>
+    	
+    	<!-- Enable Injected Trigger -->
+    	<RefParameter Comment="Enable Injected Conversion" DefaultValue="DISABLE" Name="EnableInjectedConversion" Type="list">
+    		<PossibleValue Comment="Disable" Value="DISABLE"/>
+    		<PossibleValue Comment="Enable" Value="ENABLE" />
+    	</RefParameter>
+    	
+    	<!-- Possible Value of InjNumberOfConversion parameter -->
+    	<RefParameter Comment="Number of Channels To be onverted" DefaultValue="null" Max="9" Min="1" Name="InjNumberOfConversion" Type="integer" Group="ADCgroup" Visible="false">
+    		<Condition Expression="EnableInjectedConversion=DISABLE" Diagnostic=""/>
+    	</RefParameter>
+	    <RefParameter Comment="Number of Channels To be converted" DefaultValue="0" Max="9" Min="1" Name="InjNumberOfConversion" Type="integer" Group="ADCgroup">
+	        <Description>Number of injected channels to be converted</Description>
+	    </RefParameter>
+	    
+    	<!-- Trigger Parameter -->
+    	<RefParameter Comment="Trigger type" DefaultValue="null" Name="InjectedTrigger" Type="list" Visible="false">
+    		<Condition Expression="EnableInjectedConversion=DISABLE" Diagnostic=""/>
+    	</RefParameter>
+    	<RefParameter Comment="Trigger type" DefaultValue="SDADC_SOFTWARE_TRIGGER" Name="InjectedTrigger" Type="list">
+    		<Condition Expression="(($Index=3|$Index=2)&amp;(USE_SDADC1))" Diagnostic="only for SDADC2 and SDADC3"/>
+    		<PossibleValue Comment="Software trigger" Value="SDADC_SOFTWARE_TRIGGER"/>
+    		<PossibleValue Comment="Synchronous trigger" Value="SDADC_SYNCHRONOUS_TRIGGER"/>
+    		<PossibleValue Comment="External trigger" Value="SDADC_EXTERNAL_TRIGGER" Semaphore="External_Trigger_Selected"/>
+    	</RefParameter>
+    	<RefParameter Comment="Trigger type" DefaultValue="SDADC_SOFTWARE_TRIGGER" Name="InjectedTrigger" Type="list">
+    		<PossibleValue Comment="Software trigger" Value="SDADC_SOFTWARE_TRIGGER"/>
+    		<PossibleValue Comment="External trigger" Value="SDADC_EXTERNAL_TRIGGER" Semaphore="External_Trigger_Selected_$IpInstance"/>
+    	</RefParameter>
+  
+  		<RefParameter Comment="External Trigger Edge" DefaultValue="null" Name="ExtTriggerEdge" Type="list" Visible="false">
+  			<Condition Expression="EnableInjectedConversion=DISABLE" Diagnostic=""/>
+    	</RefParameter>
+  		<RefParameter Comment="External Trigger Edge" DefaultValue="SDADC_EXT_TRIG_RISING_EDGE" Name="ExtTriggerEdge" Type="list">
+    		<Condition Expression="External_Trigger_Selected_$IpInstance" Diagnostic="only for External Trigger"/>
+	    	<PossibleValue Comment="Rising edge" Value="SDADC_EXT_TRIG_RISING_EDGE"/>
+    		<PossibleValue Comment="Falling edge" Value="SDADC_EXT_TRIG_FALLING_EDGE"/>
+    		<PossibleValue Comment="Rising and falling edges" Value="SDADC_EXT_TRIG_BOTH_EDGES"/>
+    	</RefParameter>
+    	<RefParameter Comment="External Trigger Edge" DefaultValue="null" Name="ExtTriggerEdge" Type="list" Visible="false"/>
+    	
+    	<RefParameter Comment="External Trigger source" DefaultValue="null" Name="InjectedExtTrigger" Type="list" Visible="false">
+    		<Condition Expression="EnableInjectedConversion=DISABLE" Diagnostic=""/>
+    	</RefParameter>
+    	<RefParameter Comment="External Trigger source" DefaultValue="SDADC_EXT_TRIG_EXTI11" Name="InjectedExtTrigger" Type="list">
+    		<Condition Expression="(Exti11Trigger$IpInstance&amp;Exti15Trigger$IpInstance)&amp;(External_Trigger_Selected_$IpInstance)" Diagnostic="only for SDADC2 and SDADC3"/>
+    		<PossibleValue Comment="EXTI 11" Value="SDADC_EXT_TRIG_EXTI11"/>
+    		<PossibleValue Comment="EXTI 15" Value="SDADC_EXT_TRIG_EXTI15"/>
+    	</RefParameter>
+    	<RefParameter Comment="External Trigger source" DefaultValue="SDADC_EXT_TRIG_EXTI11" Name="InjectedExtTrigger" Type="list">
+    		<Condition Expression="(Exti11Trigger$IpInstance)&amp;(External_Trigger_Selected_$IpInstance)" Diagnostic="only for SDADC2 and SDADC3"/>
+    		<PossibleValue Comment="EXTI 11" Value="SDADC_EXT_TRIG_EXTI11"/>
+    	</RefParameter>
+    	<RefParameter Comment="External Trigger source" DefaultValue="SDADC_EXT_TRIG_EXTI15" Name="InjectedExtTrigger" Type="list">
+    		<Condition Expression="(Exti15Trigger$IpInstance)&amp;(External_Trigger_Selected_$IpInstance)" Diagnostic="only for SDADC2 and SDADC3"/>
+    		<PossibleValue Comment="EXTI 15" Value="SDADC_EXT_TRIG_EXTI15"/>
+    	</RefParameter>
+    	<RefParameter Comment="External Trigger source" DefaultValue="SDADC_EXT_TRIG_TIM13_CC1" Name="InjectedExtTrigger" Type="list">
+    		<Condition Expression="($Index=1)&amp;(External_Trigger_Selected_$IpInstance)" Diagnostic="only for SDADC1"/>
+    		<PossibleValue Comment="Timer 13 Capture Compare 1" Value="SDADC_EXT_TRIG_TIM13_CC1"/>
+    		<PossibleValue Comment="Timer 14 Capture Compare 1" Value="SDADC_EXT_TRIG_TIM14_CC1"/>
+    		<PossibleValue Comment="Timer 15 Capture Compare 1" Value="SDADC_EXT_TRIG_TIM15_CC2"/>
+    		<PossibleValue Comment="Timer 3 Capture Compare 1" Value="SDADC_EXT_TRIG_TIM3_CC1"/>
+    		<PossibleValue Comment="Timer 4 Capture Compare 1" Value="SDADC_EXT_TRIG_TIM4_CC1"/>
+    		<PossibleValue Comment="Timer 19 Capture Compare 2" Value="SDADC_EXT_TRIG_TIM19_CC2"/>
+    	</RefParameter>
+    	<RefParameter Comment="External Trigger source" DefaultValue="SDADC_EXT_TRIG_TIM17_CC1" Name="InjectedExtTrigger" Type="list">
+    		<Condition Expression="($Index=2)&amp;(External_Trigger_Selected_$IpInstance)" Diagnostic="only for SDADC2"/>
+    		<PossibleValue Comment="Timer 17 Capture Compare 1" Value="SDADC_EXT_TRIG_TIM17_CC1"/>
+    		<PossibleValue Comment="Timer 12 Capture Compare 1" Value="SDADC_EXT_TRIG_TIM12_CC1"/>
+    		<PossibleValue Comment="Timer 2 Capture Compare 3" Value="SDADC_EXT_TRIG_TIM2_CC3"/>
+    		<PossibleValue Comment="Timer 3 Capture Compare 2" Value="SDADC_EXT_TRIG_TIM3_CC2"/>
+    		<PossibleValue Comment="Timer 4 Capture Compare 2" Value="SDADC_EXT_TRIG_TIM4_CC2"/>
+    		<PossibleValue Comment="Timer 19 Capture Compare 3" Value="SDADC_EXT_TRIG_TIM19_CC3"/>
+    	</RefParameter>
+    	<RefParameter Comment="External Trigger source" DefaultValue="SDADC_EXT_TRIG_TIM16_CC1" Name="InjectedExtTrigger" Type="list">
+    		<Condition Expression="($Index=3)&amp;(External_Trigger_Selected_$IpInstance)" Diagnostic="only for SDADC1"/>
+    		<PossibleValue Comment="Timer 16 Capture Compare 1" Value="SDADC_EXT_TRIG_TIM16_CC1"/>
+    		<PossibleValue Comment="Timer 12 Capture Compare 2" Value="SDADC_EXT_TRIG_TIM12_CC2"/>
+    		<PossibleValue Comment="Timer 2 Capture Compare 4" Value="SDADC_EXT_TRIG_TIM2_CC4"/>
+    		<PossibleValue Comment="Timer 3 Capture Compare 3" Value="SDADC_EXT_TRIG_TIM3_CC3"/>
+    		<PossibleValue Comment="Timer 4 Capture Compare 3" Value="SDADC_EXT_TRIG_TIM4_CC3"/>
+    		<PossibleValue Comment="Timer 19 Capture Compare 4" Value="SDADC_EXT_TRIG_TIM19_CC4"/>
+    	</RefParameter>
+    	<RefParameter Comment="External Trigger source" DefaultValue="null" Name="InjectedExtTrigger" Type="list" Visible="false"/>
+		
+		<!-- Inj Delay Parameter -->
+		<RefParameter Comment="Injected Delay" DefaultValue="Disable" Name="InjDelay" Type="list" Visible="false">
+			<Condition Expression="EnableInjectedConversion=DISABLE" Diagnostic=""/>
+    	</RefParameter>
+		<RefParameter Comment="Injected Delay" DefaultValue="Disable" Name="InjDelay" Type="list">
+	    	<PossibleValue Comment="Disable" Value="Disable"/>
+    		<PossibleValue Comment="Enable" Value="Enable"/>
+    	</RefParameter>
+    	
+    	<!-- Injected Delay Parameter (used by code gen) -->
+    	<RefParameter Comment="Injected Delay" DefaultValue="null" Name="InjectedDelay" Type="list" Visible="false">
+	    	<Condition Expression="InjNumberOfConversion=0" Diagnostic=""/>
+    	</RefParameter>
+    	<RefParameter Comment="Injected Delay" DefaultValue="SDADC_INJECTED_DELAY_NONE" Name="InjectedDelay" Type="list" Visible="false">
+	    	<Condition Expression="(InjDelay=Disable)&amp;!(InjNumberOfConversion=0)" Diagnostic=""/>
+	    	<PossibleValue Comment="Disable" Value="SDADC_INJECTED_DELAY_NONE"/>
+    	</RefParameter>
+    	<RefParameter Comment="Injected Delay" DefaultValue="SDADC_INJECTED_DELAY" Name="InjectedDelay" Type="list" Visible="false">
+	    	<Condition Expression="(InjDelay=Enable)&amp;!(InjNumberOfConversion=0)" Diagnostic=""/>
+    		<PossibleValue Comment="Enable" Value="SDADC_INJECTED_DELAY"/>
+    	</RefParameter>
+    	<RefParameter Comment="Injected Delay" DefaultValue="SDADC_INJECTED_DELAY_NONE" Name="InjectedDelay" Type="list" Visible="false">
+	    	<PossibleValue Comment="Disable" Value="SDADC_INJECTED_DELAY_NONE"/>
+    		<PossibleValue Comment="Enable" Value="SDADC_INJECTED_DELAY"/>
+    	</RefParameter>
+    	
+    	<!-- Possible values of MultimodeTpe parameter -->
+    	<RefParameter Comment="Injected Mulimode type" DefaultValue="__NULL" Name="InjectedMultimodeType" Type="list" Group="ADCgroup" Visible="false">
+    		<Condition Expression="EnableInjectedConversion=DISABLE" Diagnostic=""/>
+    	</RefParameter>
+         <RefParameter Comment="Injected Mulimode type" DefaultValue="__NULL" Name="InjectedMultimodeType" Type="list" Group="ADCgroup" Visible="false">
+             <Condition Expression="!($Index=1)" Diagnostic=""/>
+        </RefParameter>
+       <RefParameter Comment="Injected Mulimode type" DefaultValue="__NULL" Name="InjectedMultimodeType" Type="list" Group="ADCgroup">
+       		 <Condition Expression="((USE_SDADC2 &amp; (SDADC2:InjectedTrigger=SDADC_SYNCHRONOUS_TRIGGER)) &amp; (USE_SDADC3 &amp; (SDADC3:InjectedTrigger=SDADC_SYNCHRONOUS_TRIGGER)))" Diagnostic=""/>
+             <PossibleValue Comment="Disable" Value="__NULL"/>
+             <PossibleValue Comment="Get conversion values for SDADC1 and SDADC2" Value="SDADC_MULTIMODE_SDADC1_SDADC2"/>
+             <PossibleValue Comment="Get conversion values for SDADC1 and SDADC3" Value="SDADC_MULTIMODE_SDADC1_SDADC3"/>
+             <Description>Multimode Type</Description>
+        </RefParameter>
+        <RefParameter Comment="Injected Mulimode type" DefaultValue="__NULL" Name="InjectedMultimodeType" Type="list" Group="ADCgroup">
+             <Condition Expression="(USE_SDADC3 &amp; (SDADC3:InjectedTrigger=SDADC_SYNCHRONOUS_TRIGGER))" Diagnostic=""/>
+             <PossibleValue Comment="Disable" Value="__NULL"/>
+             <PossibleValue Comment="Get conversion values for SDADC1 and SDADC3" Value="SDADC_MULTIMODE_SDADC1_SDADC3"/>
+             <Description>Multimode Type</Description>
+        </RefParameter>
+        <RefParameter Comment="Injected Mulimode type" DefaultValue="__NULL" Name="InjectedMultimodeType" Type="list" Group="ADCgroup">
+             <Condition Expression="(USE_SDADC2 &amp; (SDADC2:InjectedTrigger=SDADC_SYNCHRONOUS_TRIGGER))" Diagnostic=""/>
+             <PossibleValue Comment="Disable" Value="__NULL"/>
+             <PossibleValue Comment="Get conversion values for SDADC1 and SDADC2" Value="SDADC_MULTIMODE_SDADC1_SDADC2"/>
+             <Description>Multimode Type</Description>
+        </RefParameter>
+        <RefParameter Comment="Injected Mulimode type" DefaultValue="__NULL" Name="InjectedMultimodeType" Type="list" Group="ADCgroup">
+             <PossibleValue Comment="Disable" Value="__NULL"/>
+             <Description>Multimode Type</Description>
+        </RefParameter>
+        
+    <!-- <RefMode Name="ChannelInjectedConversion" Comment="Injected Channel Settings" BaseMode="ADC_Injected_ConversionMode" Group="ADC_Injected_ConversionMode"> -->	
+    <RefMode Name="ChannelInjectedConversion" Comment="Injected Channel Configuration" BaseMode="SDADC Injected Conversions Settings" Group="SDADC Injected Conversions Settings" >
+    	<ConfigForMode>SDADC_InjectedConfigChannel</ConfigForMode>
+    	<Parameter Name="InjectedRank"/>
+    	<Parameter Name="InjectedChannel"/>
+    	<Parameter Name="InjectedConfIndex"/>
+    </RefMode>
+    <RefMode Name="CpChannelInjectedConversion" Comment="Injected Channel Configuration">
+    	<ConfigForMode>SDADC_InjectedConfigChannel</ConfigForMode>
+    	<Parameter Name="InjectedRank"/>
+    	<Parameter Name="InjectedChannel"/>
+    	<Parameter Name="InjectedConfIndex"/>
+    </RefMode>
+    
+    		<!-- Possible Value of Rank parameters -->
+    		<RefParameter Comment="Channel Configuration" DefaultValue="null" Max="9" Min="1" Name="InjectedRank" Type="integer" Visible="false">
+    			<Condition Expression="EnableInjectedConversion=DISABLE" Diagnostic=""/>
+    		</RefParameter>
+	        <RefParameter Comment="Channel Configuration" DefaultValue="1" Max="9" Min="1" Name="InjectedRank" Type="integer">
+		        <Description>The Configuration of the selected channel</Description>
+		    </RefParameter>
+		    
+		    <!--  -->
+		     <RefParameter Comment="Channel" DefaultValue="SDADC_CHANNEL_0" Name="InjectedChannel" Type="list" Visible="false">
+		    	<Condition Expression="EnableInjectedConversion=DISABLE" Diagnostic=""/>
+    		</RefParameter>
+		    <RefParameter Comment="Channel" DefaultValue="SDADC_CHANNEL_0" Name="InjectedChannel" Type="list">
+		        <PossibleValue Comment="Channel 0" Value="SDADC_CHANNEL_0"/>
+		        <PossibleValue Comment="Channel 1" Value="SDADC_CHANNEL_1"/>
+		        <PossibleValue Comment="Channel 2" Value="SDADC_CHANNEL_2"/>
+		        <PossibleValue Comment="Channel 3" Value="SDADC_CHANNEL_3"/>
+		        <PossibleValue Comment="Channel 4" Value="SDADC_CHANNEL_4"/>
+		        <PossibleValue Comment="Channel 5" Value="SDADC_CHANNEL_5"/>
+		        <PossibleValue Comment="Channel 6" Value="SDADC_CHANNEL_6"/>
+		        <PossibleValue Comment="Channel 7" Value="SDADC_CHANNEL_7"/>
+		        <PossibleValue Comment="Channel 8" Value="SDADC_CHANNEL_8"/>
+		    </RefParameter>
+	    	<!--  -->
+	    	<RefParameter Comment="Configuration Index" DefaultValue="SDADC_CONF_INDEX_1" Name="InjectedConfIndex" Type="list" Visible="false">
+	    		<Condition Expression="EnableInjectedConversion=DISABLE" Diagnostic=""/>
+    		</RefParameter>
+	    	<RefParameter Comment="Configuration Index" DefaultValue="SDADC_CONF_INDEX_1" Name="InjectedConfIndex" Type="list">
+	    		<Condition Expression="ConversionConfiguration0Selected_$IpInstance&amp;ConversionConfiguration1Selected_$IpInstance&amp;ConversionConfiguration2Selected_$IpInstance" Diagnostic=""/>
+		        <PossibleValue Comment="Configuration 0" Value="SDADC_CONF_INDEX_0"/>
+		        <PossibleValue Comment="Configuration 1" Value="SDADC_CONF_INDEX_1"/>
+		        <PossibleValue Comment="Configuration 2" Value="SDADC_CONF_INDEX_2"/>
+		    </RefParameter>
+		    <RefParameter Comment="Configuration Index" DefaultValue="SDADC_CONF_INDEX_0" Name="InjectedConfIndex" Type="list">
+	    		<Condition Expression="(ConversionConfiguration0Selected_$IpInstance)&amp;(ConversionConfiguration1Selected_$IpInstance)" Diagnostic=""/>
+		        <PossibleValue Comment="Configuration 0" Value="SDADC_CONF_INDEX_0"/>
+		        <PossibleValue Comment="Configuration 1" Value="SDADC_CONF_INDEX_1"/>
+		    </RefParameter>
+		    <RefParameter Comment="Configuration Index" DefaultValue="SDADC_CONF_INDEX_1" Name="InjectedConfIndex" Type="list">
+	    		<Condition Expression="(ConversionConfiguration1Selected_$IpInstance)&amp;(ConversionConfiguration2Selected_$IpInstance)" Diagnostic=""/>
+		        <PossibleValue Comment="Configuration 1" Value="SDADC_CONF_INDEX_1"/>
+		        <PossibleValue Comment="Configuration 2" Value="SDADC_CONF_INDEX_2"/>
+		    </RefParameter>
+		    <RefParameter Comment="Configuration Index" DefaultValue="SDADC_CONF_INDEX_0" Name="InjectedConfIndex" Type="list">
+	    		<Condition Expression="(ConversionConfiguration0Selected_$IpInstance)&amp;(ConversionConfiguration2Selected_$IpInstance)" Diagnostic=""/>
+		        <PossibleValue Comment="Configuration 0" Value="SDADC_CONF_INDEX_0"/>
+		        <PossibleValue Comment="Configuration 2" Value="SDADC_CONF_INDEX_2"/>
+		    </RefParameter>
+		    <RefParameter Comment="Configuration Index" DefaultValue="SDADC_CONF_INDEX_0" Name="InjectedConfIndex" Type="list">
+	    		<Condition Expression="ConversionConfiguration0Selected_$IpInstance" Diagnostic=""/>
+		        <PossibleValue Comment="Configuration 0" Value="SDADC_CONF_INDEX_0"/>
+		    </RefParameter>
+		    <RefParameter Comment="Configuration Index" DefaultValue="SDADC_CONF_INDEX_1" Name="InjectedConfIndex" Type="list">
+	    		<Condition Expression="ConversionConfiguration1Selected_$IpInstance" Diagnostic=""/>
+		        <PossibleValue Comment="Configuration 1" Value="SDADC_CONF_INDEX_1"/>
+		    </RefParameter>
+		    <RefParameter Comment="Configuration Index" DefaultValue="SDADC_CONF_INDEX_2" Name="InjectedConfIndex" Type="list">
+	    		<Condition Expression="ConversionConfiguration2Selected_$IpInstance" Diagnostic=""/>
+		        <PossibleValue Comment="Configuration 2" Value="SDADC_CONF_INDEX_2"/>
+		    </RefParameter>
+		    <RefParameter Comment="Configuration Index" DefaultValue="null" Name="InjectedConfIndex" Type="list">
+		    </RefParameter>
+		    
+		    <!--  -->
+		    <RefParameter Comment="Continuous Mode" DefaultValue="SDADC_CONTINUOUS_CONV_OFF" Name="InjectedContinuousMode" Type="list" Visible="false">
+		    	<Condition Expression="EnableInjectedConversion=DISABLE" Diagnostic=""/>
+    		</RefParameter>
+	    	<RefParameter Comment="Continuous Mode" DefaultValue="SDADC_CONTINUOUS_CONV_OFF" Name="InjectedContinuousMode" Type="list">
+		         <PossibleValue Comment="Disabled" Value="SDADC_CONTINUOUS_CONV_OFF"/>
+		         <PossibleValue Comment="Enabled" Value="SDADC_CONTINUOUS_CONV_ON" Semaphore="InjectedContinuousMode_isUsed_$IpInstance"/>              
+		    </RefParameter>
+		    
+   	<!-- UnVisible parameters -->
+   	<RefParameter Comment="Master Flag" DefaultValue="0" Max="1" Min="0" Name="master" Type="integer" Visible="false"/>
+   	
+    <RefParameter Comment="Channel" DefaultValue="SDADC_CHANNEL_0" Name="AllChannels" Type="list" Visible="false">
+        <PossibleValue Comment="Channel 0" Value="SDADC_CHANNEL_0"/>
+        <PossibleValue Comment="Channel 1" Value="SDADC_CHANNEL_1"/>
+        <PossibleValue Comment="Channel 2" Value="SDADC_CHANNEL_2"/>
+        <PossibleValue Comment="Channel 3" Value="SDADC_CHANNEL_3"/>
+        <PossibleValue Comment="Channel 4" Value="SDADC_CHANNEL_4"/>
+        <PossibleValue Comment="Channel 5" Value="SDADC_CHANNEL_5"/>
+        <PossibleValue Comment="Channel 6" Value="SDADC_CHANNEL_6"/>
+        <PossibleValue Comment="Channel 7" Value="SDADC_CHANNEL_7"/>
+        <PossibleValue Comment="Channel 8" Value="SDADC_CHANNEL_8"/>
+    </RefParameter>
+    
+    <!-- Possible Value of AnalogWDChannel parameters -->
+    <RefParameter Comment="Analog WatchDog Channel" DefaultValue="channel" Name="AnalogWDChannel" Type="list" Group="ADCChannel">
+        <PossibleValue Comment="Channel 0" Value="SDADC_CHANNEL_0"/>
+        <PossibleValue Comment="Channel 1" Value="SDADC_CHANNEL_1"/>
+        <PossibleValue Comment="Channel 2" Value="SDADC_CHANNEL_2"/>
+        <PossibleValue Comment="Channel 3" Value="SDADC_CHANNEL_3"/>
+        <PossibleValue Comment="Channel 4" Value="SDADC_CHANNEL_4"/>
+        <PossibleValue Comment="Channel 5" Value="SDADC_CHANNEL_5"/>
+        <PossibleValue Comment="Channel 6" Value="SDADC_CHANNEL_6"/>
+        <PossibleValue Comment="Channel 7" Value="SDADC_CHANNEL_7"/>
+        <PossibleValue Comment="Channel 8" Value="SDADC_CHANNEL_8"/>
+        <Description>SDADC channel for the analog watchdog</Description> 
+    </RefParameter> 
+    
+     <RefParameter Comment="Analog WatchDog Channel" DefaultValue="channel" Name="WatchdogChannel" Type="list" Group="ADCChannel">
+        <PossibleValue Comment="Channel 0" Value="SDADC_CHANNEL_0"/>
+        <PossibleValue Comment="Channel 1" Value="SDADC_CHANNEL_1"/>
+        <PossibleValue Comment="Channel 2" Value="SDADC_CHANNEL_2"/>
+        <PossibleValue Comment="Channel 3" Value="SDADC_CHANNEL_3"/>
+        <PossibleValue Comment="Channel 4" Value="SDADC_CHANNEL_4"/>
+        <PossibleValue Comment="Channel 5" Value="SDADC_CHANNEL_5"/>
+        <PossibleValue Comment="Channel 6" Value="SDADC_CHANNEL_6"/>
+        <PossibleValue Comment="Channel 7" Value="SDADC_CHANNEL_7"/>
+        <PossibleValue Comment="Channel 8" Value="SDADC_CHANNEL_8"/>
+        <Description>SDADC channel for the analog watchdog</Description> 
+    </RefParameter>
+    	  
+    <!-- Channels RefMode -->  
+    <RefMode Name="IN0-Differential" Comment="">
+        <Parameter Name="Channel">
+            <PossibleValue>SDADC_CHANNEL_0</PossibleValue>
+        </Parameter>
+    </RefMode>
+    <RefMode Name="IN2-Differential" Comment="">
+        <Parameter Name="Channel">
+            <PossibleValue>SDADC_CHANNEL_2</PossibleValue>
+        </Parameter>
+    </RefMode>
+    <RefMode Name="IN4-Differential" Comment="">
+        <Parameter Name="Channel">
+            <PossibleValue>SDADC_CHANNEL_4</PossibleValue>
+        </Parameter>
+    </RefMode>
+    <RefMode Name="IN6-Differential" Comment="">
+        <Parameter Name="Channel">
+            <PossibleValue>SDADC_CHANNEL_6</PossibleValue>
+        </Parameter>
+    </RefMode>
+    <RefMode Name="IN8-Differential" Comment="">
+        <Parameter Name="Channel">
+            <PossibleValue>SDADC_CHANNEL_8</PossibleValue>
+        </Parameter>
+    </RefMode>
+    <RefMode Name="IN0-Single-Ended" Comment="">
+        <Parameter Name="Channel">
+            <PossibleValue>SDADC_CHANNEL_0</PossibleValue>
+        </Parameter>
+    </RefMode>
+    <!-- Single-Ended -->
+    <RefMode Name="IN1-Single-Ended" Comment="">
+        <Parameter Name="Channel">
+            <PossibleValue>SDADC_CHANNEL_1</PossibleValue>
+        </Parameter>
+    </RefMode>
+    <RefMode Name="IN2-Single-Ended" Comment="">
+        <Parameter Name="Channel">
+            <PossibleValue>SDADC_CHANNEL_2</PossibleValue>
+        </Parameter>
+    </RefMode>
+    <RefMode Name="IN3-Single-Ended" Comment="">
+        <Parameter Name="Channel">
+            <PossibleValue>SDADC_CHANNEL_3</PossibleValue>
+        </Parameter>
+    </RefMode>
+    <RefMode Name="IN4-Single-Ended" Comment="">
+        <Parameter Name="Channel">
+            <PossibleValue>SDADC_CHANNEL_4</PossibleValue>
+        </Parameter>
+    </RefMode>
+    <RefMode Name="IN5-Single-Ended" Comment="">
+        <Parameter Name="Channel">
+            <PossibleValue>SDADC_CHANNEL_5</PossibleValue>
+        </Parameter>
+    </RefMode>
+    <RefMode Name="IN6-Single-Ended" Comment="">
+        <Parameter Name="Channel">
+            <PossibleValue>SDADC_CHANNEL_6</PossibleValue>
+        </Parameter>
+    </RefMode>
+    <RefMode Name="IN7-Single-Ended" Comment="">
+        <Parameter Name="Channel">
+            <PossibleValue>SDADC_CHANNEL_7</PossibleValue>
+        </Parameter>
+    </RefMode>
+    <RefMode Name="IN8-Single-Ended" Comment="">
+        <Parameter Name="Channel">
+            <PossibleValue>SDADC_CHANNEL_8</PossibleValue>
+        </Parameter>
+    </RefMode>
+    
+    <!-- Single-Ended zero reference -->
+    <RefMode Name="IN1-Single-Ended zero reference" Comment="">
+        <Parameter Name="Channel">
+            <PossibleValue>SDADC_CHANNEL_1</PossibleValue>
+        </Parameter>
+    </RefMode>
+    <RefMode Name="IN2-Single-Ended zero reference" Comment="">
+        <Parameter Name="Channel">
+            <PossibleValue>SDADC_CHANNEL_2</PossibleValue>
+        </Parameter>
+    </RefMode>
+    <RefMode Name="IN3-Single-Ended zero reference" Comment="">
+        <Parameter Name="Channel">
+            <PossibleValue>SDADC_CHANNEL_3</PossibleValue>
+        </Parameter>
+    </RefMode>
+    <RefMode Name="IN4-Single-Ended zero reference" Comment="">
+        <Parameter Name="Channel">
+            <PossibleValue>SDADC_CHANNEL_4</PossibleValue>
+        </Parameter>
+    </RefMode>
+    <RefMode Name="IN5-Single-Ended zero reference" Comment="">
+        <Parameter Name="Channel">
+            <PossibleValue>SDADC_CHANNEL_5</PossibleValue>
+        </Parameter>
+    </RefMode>
+    <RefMode Name="IN6-Single-Ended zero reference" Comment="">
+        <Parameter Name="Channel">
+            <PossibleValue>SDADC_CHANNEL_6</PossibleValue>
+        </Parameter>
+    </RefMode>
+    <RefMode Name="IN7-Single-Ended zero reference" Comment="">
+        <Parameter Name="Channel">
+            <PossibleValue>SDADC_CHANNEL_7</PossibleValue>
+        </Parameter>
+    </RefMode>
+    <RefMode Name="IN8-Single-Ended zero reference" Comment="">
+        <Parameter Name="Channel">
+            <PossibleValue>SDADC_CHANNEL_8</PossibleValue>
+        </Parameter>
+    </RefMode>
+    
+    <RefMode Name="ConfigZero">
+    	<Parameter Name="UseConfig0"/>
+    </RefMode>
+    <RefMode Name="ConfigUn">
+    	<Parameter Name="UseConfig1"/>
+    </RefMode>
+    <RefMode Name="ConfigDeux">
+    	<Parameter Name="UseConfig2"/>
+    </RefMode>
+        		
+    <!-- Channel Mode -->
+    <ModeLogicOperator Name="OR">
+        <Mode Name="IN0">
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="IN0-Differential">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="AIN0P"/>
+                        <Signal Name="AIN0M"/>
+                    </SignalLogicalOp>
+                </Mode>
+                <Mode Name="IN0-Single-Ended">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="AIN0P"/>
+                    </SignalLogicalOp>
+                </Mode> 
+                <Mode Name="IN0-Single-Ended zero reference">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="AIN0P"/>
+                    </SignalLogicalOp>
+                </Mode>
+            </ModeLogicOperator>
+            <Semaphore>channelSelected$IpInstance</Semaphore>
+        </Mode>
+        <Mode Name="IN1">
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="IN1-Differential">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="AIN1P"/>
+                        <Signal Name="AIN1M"/>
+                    </SignalLogicalOp>
+                </Mode>
+                <Mode Name="IN1-Single-Ended">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="AIN1P"/>
+                    </SignalLogicalOp>
+                </Mode>
+                <Mode Name="IN1-Single-Ended zero reference">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="AIN1P"/>
+                    </SignalLogicalOp>
+                </Mode>
+            </ModeLogicOperator>
+            <Semaphore>channelSelected$IpInstance</Semaphore>
+        </Mode>
+        <Mode Name="IN2">
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="IN2-Differential">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="AIN2P"/>
+                        <Signal Name="AIN2M"/>
+                    </SignalLogicalOp>
+                </Mode>
+                <Mode Name="IN2-Single-Ended">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="AIN2P"/>
+                    </SignalLogicalOp>
+                </Mode>
+                <Mode Name="IN2-Single-Ended zero reference">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="AIN2P"/>
+                    </SignalLogicalOp>
+                </Mode>
+            </ModeLogicOperator>
+            <Semaphore>channelSelected$IpInstance</Semaphore>
+        </Mode>
+        <Mode Name="IN3">
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="IN3-Differential">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="AIN3P"/>
+                        <Signal Name="AIN3M"/>
+                    </SignalLogicalOp>
+                </Mode>
+                <Mode Name="IN3-Single-Ended">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="AIN3P"/>
+                    </SignalLogicalOp>
+                </Mode>
+                <Mode Name="IN3-Single-Ended zero reference">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="AIN3P"/>
+                    </SignalLogicalOp>
+                </Mode>
+            </ModeLogicOperator>
+            <Semaphore>channelSelected$IpInstance</Semaphore>
+        </Mode>
+        <Mode Name="IN4">
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="IN4-Differential">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="AIN4P"/>
+                        <Signal Name="AIN4M"/>
+                    </SignalLogicalOp>
+                </Mode>
+                <Mode Name="IN4-Single-Ended">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="AIN4P"/>
+                    </SignalLogicalOp>
+                </Mode>
+                <Mode Name="IN4-Single-Ended zero reference">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="AIN4P"/>
+                    </SignalLogicalOp>
+                </Mode>
+            </ModeLogicOperator>
+            <Semaphore>channelSelected$IpInstance</Semaphore>
+        </Mode>
+        <Mode Name="IN5">
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="IN5-Differential">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="AIN5P"/>
+                        <Signal Name="AIN5M"/>
+                    </SignalLogicalOp>
+                </Mode>
+                <Mode Name="IN5-Single-Ended">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="AIN5P"/>
+                    </SignalLogicalOp>
+                </Mode>
+                <Mode Name="IN5-Single-Ended zero reference">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="AIN5P"/>
+                    </SignalLogicalOp>
+                </Mode>
+            </ModeLogicOperator>
+            <Semaphore>channelSelected$IpInstance</Semaphore>
+        </Mode>
+        <Mode Name="IN6">
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="IN6-Differential">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="AIN6P"/>
+                        <Signal Name="AIN6M"/>
+                    </SignalLogicalOp>
+                </Mode>
+                <Mode Name="IN6-Single-Ended">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="AIN6P"/>
+                    </SignalLogicalOp>
+                </Mode>
+                <Mode Name="IN6-Single-Ended zero reference">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="AIN6P"/>
+                    </SignalLogicalOp>
+                </Mode>
+            </ModeLogicOperator>
+            <Semaphore>channelSelected$IpInstance</Semaphore>
+        </Mode>
+        <Mode Name="IN7">
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="IN7-Differential">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="AIN7P"/>
+                        <Signal Name="AIN7M"/>
+                    </SignalLogicalOp>
+                </Mode>
+                <Mode Name="IN7-Single-Ended">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="AIN7P"/>
+                    </SignalLogicalOp>
+                </Mode>
+                <Mode Name="IN7-Single-Ended zero reference">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="AIN7P"/>
+                    </SignalLogicalOp>
+                </Mode>
+            </ModeLogicOperator>
+            <Semaphore>channelSelected$IpInstance</Semaphore>
+        </Mode>
+        <Mode Name="IN8">
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="IN8-Differential">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="AIN8P"/>
+                        <Signal Name="AIN8M"/>
+                    </SignalLogicalOp>
+                </Mode>
+                <Mode Name="IN8-Single-Ended">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="AIN8P"/>
+                    </SignalLogicalOp>
+                </Mode>
+                <Mode Name="IN8-Single-Ended zero reference">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="AIN8P"/>
+                    </SignalLogicalOp>
+                </Mode>
+            </ModeLogicOperator>
+            <Semaphore>channelSelected$IpInstance</Semaphore>
+        </Mode>
+        <Mode Name="Injected-Conversion-Trigger" UserName="Conversion Trigger">
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="EXTI11-Injected-Conversion-Trigger" UserName="Injected Trigger EXTI11">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="EXTI11"/>
+                    </SignalLogicalOp>
+                    <Semaphore>Exti11Trigger$IpInstance</Semaphore>
+                    <Condition Expression="channelSelected$IpInstance" Diagnostic="Available only if at least one channel is selected"/>
+                </Mode>
+                <Mode Name="EXTI15-Injected-Conversion-Trigger" UserName="Injected Trigger EXTI15">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="EXTI15"/>
+                    </SignalLogicalOp>
+                    <Semaphore>Exti15Trigger$IpInstance</Semaphore>
+                    <Condition Expression="channelSelected$IpInstance" Diagnostic="Available only if at least one channel is selected"/>
+                </Mode>
+                <!-- <Mode Name="EXTI15-Injected-Conversion-Trigger" UserName="Injected Triggers EXTI11 and EXTI15">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="EXTI15"/>
+                        <Signal Name="EXTI11"/>
+                    </SignalLogicalOp>
+                    <Semaphore>Exti15Trigger$IpInstance</Semaphore>
+                    <Semaphore>Exti11Trigger$IpInstance</Semaphore>
+                    <Condition Expression="channelSelected$IpInstance" Diagnostic="Available only if at least one channel is selected"/>
+                </Mode> -->
+            </ModeLogicOperator>
+        </Mode>
+      		<Mode Name="ConfigZero" UserName="Conversion Configuration 0">
+      			<ModeLogicOperator Name="OR">
+      				<Mode Name="ConfigZero" UserName="Conversion Configuration 0">
+       					 <SignalLogicalOp Name="AND">
+                		       <Signal Name="CONF0"/>
+                	   </SignalLogicalOp>
+               	    </Mode>
+                  </ModeLogicOperator>
+                  <Condition Expression="channelSelected$IpInstance" Diagnostic="Available only if at least one channel is selected"/>
+                  <Semaphore>OneConversionConfigurationSelected</Semaphore>
+                  <Semaphore>ConversionConfiguration0Selected_$IpInstance</Semaphore>
+      		</Mode>
+      		<Mode Name="ConfigUn" UserName="Conversion Configuration 1">
+      			<ModeLogicOperator Name="OR">
+      				<Mode Name="ConfigUn" UserName="Conversion Configuration 1">
+      				 <SignalLogicalOp Name="AND">
+              	        <Signal Name="CONF1"/>
+                	 </SignalLogicalOp>
+                  </Mode>
+                </ModeLogicOperator>
+                <Condition Expression="channelSelected$IpInstance" Diagnostic="Available only if at least one channel is selected"/>
+                <Semaphore>OneConversionConfigurationSelected</Semaphore>
+                <Semaphore>ConversionConfiguration1Selected_$IpInstance</Semaphore>
+      		</Mode>
+      		<Mode Name="ConfigDeux" UserName="Conversion Configuration 2">
+      			<ModeLogicOperator Name="OR">
+      				<Mode Name="ConfigDeux" UserName="Conversion Configuration 2">
+      					 <SignalLogicalOp Name="AND">
+                		      <Signal Name="CONF2"/>
+              		    </SignalLogicalOp>
+                  </Mode>
+                </ModeLogicOperator>
+                <Condition Expression="channelSelected$IpInstance" Diagnostic="Available only if at least one channel is selected"/>
+                <Semaphore>OneConversionConfigurationSelected</Semaphore>
+                <Semaphore>ConversionConfiguration2Selected_$IpInstance</Semaphore>
+      		</Mode>
+    </ModeLogicOperator>
+    
+    <!-- Signals -->
+    <RefSignal IOMode="Analog" Name="AIN0P"/>
+    <RefSignal IOMode="Analog" Name="AIN0M" />
+    <RefSignal IOMode="Analog" Name="AIN1P"/>
+    <RefSignal IOMode="Analog" Name="AIN1M"/>
+    <RefSignal IOMode="Analog" Name="AIN2P"/>
+    <RefSignal IOMode="Analog" Name="AIN2M"/>
+    <RefSignal IOMode="Analog" Name="AIN3P"/>
+    <RefSignal IOMode="Analog" Name="AIN3M"/>
+    <RefSignal IOMode="Analog" Name="AIN4P"/>
+    <RefSignal IOMode="Analog" Name="AIN4M"/>
+    <RefSignal IOMode="Analog" Name="AIN5P"/>
+    <RefSignal IOMode="Analog" Name="AIN5M"/>
+    <RefSignal IOMode="Analog" Name="AIN6P"/>
+    <RefSignal IOMode="Analog" Name="AIN6M"/>
+    <RefSignal IOMode="Analog" Name="AIN7P"/>
+    <RefSignal IOMode="Analog" Name="AIN7M"/>
+    <RefSignal IOMode="Analog" Name="AIN8P"/>
+    <RefSignal IOMode="Analog" Name="AIN8M"/>
+    <RefSignal IOMode="Analog" Name="CONF0" Virtual="true"/>
+    <RefSignal IOMode="Analog" Name="CONF1" Virtual="true"/>
+    <RefSignal IOMode="Analog" Name="CONF2" Virtual="true"/>
+    <RefSignal IOMode="EXTI" Name="EXTI11" ShareableGroupName="GPXTI11"/>
+    <RefSignal IOMode="EXTI" Name="EXTI15" ShareableGroupName="GPXTI15"/>
+    
+    <Semaphore>USE_$IpInstance</Semaphore>
+</IP>
