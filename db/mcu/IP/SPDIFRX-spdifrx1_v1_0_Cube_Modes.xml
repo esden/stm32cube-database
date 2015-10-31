@@ -18,11 +18,11 @@
 
  <RefParameter Comment="Selected Input" DefaultValue="SPDIFRX_INPUT_IN0" Name="InputSelection" Type="list" Group="Pinout Selection" >
         <Description>Specifies the SPDIF input selection</Description>
-        <PossibleValue Comment="IN0" Value="SPDIFRX_INPUT_IN0"/>
-        <PossibleValue Comment="IN1" Value="SPDIFRX_INPUT_IN1"/>
-        <PossibleValue Comment="IN2" Value="SPDIFRX_INPUT_IN2"/>
-        <PossibleValue Comment="IN3" Value="SPDIFRX_INPUT_IN3"/>
-    </RefParameter>
+        <PossibleValue Comment="IN0" Value="SPDIFRX_INPUT_IN0" Condition="!Semaphore_$IpInstance_IN0" Diagnostic="Not selected in the pinout view" Action="Disable"/>
+        <PossibleValue Comment="IN1" Value="SPDIFRX_INPUT_IN1" Condition="!Semaphore_$IpInstance_IN1" Diagnostic="Not selected in the pinout view" Action="Disable"/>
+        <PossibleValue Comment="IN2" Value="SPDIFRX_INPUT_IN2" Condition="!Semaphore_$IpInstance_IN2" Diagnostic="Not selected in the pinout view" Action="Disable"/>
+        <PossibleValue Comment="IN3" Value="SPDIFRX_INPUT_IN3" Condition="!Semaphore_$IpInstance_IN3" Diagnostic="Not selected in the pinout view" Action="Disable"/>
+  </RefParameter>
 
 <!-- values has to be changed next release !!!!!!!!!!-->
     <RefParameter Comment="Retries" DefaultValue="SPDIFRX_MAXRETRIES_NONE" Name="Retries" Type="list" Group="Synchronization Configuration">
@@ -91,12 +91,10 @@
     </RefParameter>
 
 
-	<RefMode Name="IN0">
+	<RefMode Name="Common_Selection" Abstract="true">
 		<ConfigForMode>SPDIFRX_Init</ConfigForMode>
-		<Parameter Name="InputSelection">
-		   <PossibleValue>SPDIFRX_INPUT_IN0</PossibleValue>
-		</Parameter>	
-		<Parameter Name="frequenceIP"/>
+		<Parameter Name="InputSelection"/>
+		<Parameter Name="frequenceIP"/>            
 		<Parameter Name="MaxAudioRate"/>
 		<Parameter Name="WaitForActivity"/>
 		<Parameter Name="Retries"/>
@@ -108,117 +106,114 @@
 		<Parameter Name="ValidityBitMask"/>
 		<Parameter Name="ParityErrorMask"/>
 	</RefMode>
-	<RefMode Name="IN1">
-		<ConfigForMode>SPDIFRX_Init</ConfigForMode>
-		<Parameter Name="InputSelection">
-		   <PossibleValue>SPDIFRX_INPUT_IN1</PossibleValue>
-		</Parameter>
-		<Parameter Name="frequenceIP"/>
-		<Parameter Name="MaxAudioRate"/>	
-		<Parameter Name="WaitForActivity"/>
-		<Parameter Name="Retries"/>
-		<Parameter Name="ChannelSelection"/>
-		<Parameter Name="DataFormat"/>
-		<Parameter Name="StereoMode"/>
-		<Parameter Name="PreambleTypeMask"/>
-		<Parameter Name="ChannelStatusMask"/>
-		<Parameter Name="ValidityBitMask"/>
-		<Parameter Name="ParityErrorMask"/>
+	<RefMode BaseMode="Common_Selection" Name="IN0">
 	</RefMode>
-	<RefMode Name="IN2">
-		<ConfigForMode>SPDIFRX_Init</ConfigForMode>
-		<Parameter Name="InputSelection">
-		   <PossibleValue>SPDIFRX_INPUT_IN2</PossibleValue>
-		</Parameter>
-		<Parameter Name="frequenceIP"/>
-		<Parameter Name="MaxAudioRate"/>	
-		<Parameter Name="WaitForActivity"/>
-		<Parameter Name="Retries"/>
-		<Parameter Name="ChannelSelection"/>
-		<Parameter Name="DataFormat"/>
-		<Parameter Name="StereoMode"/>
-		<Parameter Name="PreambleTypeMask"/>
-		<Parameter Name="ChannelStatusMask"/>
-		<Parameter Name="ValidityBitMask"/>
-		<Parameter Name="ParityErrorMask"/>
+	<RefMode BaseMode="Common_Selection" Name="IN1">
 	</RefMode>
-	<RefMode Name="IN3">
-		<ConfigForMode>SPDIFRX_Init</ConfigForMode>
-		<Parameter Name="InputSelection">
-		   <PossibleValue>SPDIFRX_INPUT_IN3</PossibleValue>
-		</Parameter>	
-		<Parameter Name="frequenceIP"/>
-		<Parameter Name="MaxAudioRate"/>
-		<Parameter Name="WaitForActivity"/>
-		<Parameter Name="Retries"/>
-		<Parameter Name="ChannelSelection"/>
-		<Parameter Name="DataFormat"/>
-		<Parameter Name="StereoMode"/>
-		<Parameter Name="PreambleTypeMask"/>
-		<Parameter Name="ChannelStatusMask"/>
-		<Parameter Name="ValidityBitMask"/>
-		<Parameter Name="ParityErrorMask"/>
+	<RefMode BaseMode="Common_Selection" Name="IN2">
+	</RefMode>
+	<RefMode BaseMode="Common_Selection" Name="IN3">
 	</RefMode>
 
+
 	<ModeLogicOperator Name="OR">
-		<Mode Name="Input Selection">
-			<ModeLogicOperator Name="XOR">
-				<Mode Name="IN0">
+                              <Mode Name="IN0 Selection">
+                                <ModeLogicOperator Name="OR">
+                                    <Mode Name="IN0">
                                       <Semaphore>$IpInstanceUsed_ForRCC</Semaphore>
+                                      <Semaphore>Semaphore_$IpInstance_IN0</Semaphore>
 					<SignalLogicalOp Name="AND">
 						<Signal Name="IN0"/>
 					</SignalLogicalOp>
+                                    </Mode>
+		                 </ModeLogicOperator>
 				</Mode>
-	                        <Mode Name="IN1">
+			
+	                        <Mode Name="IN1 Selection">
+                                <ModeLogicOperator Name="OR">
+                                    <Mode Name="IN1">
                                       <Semaphore>$IpInstanceUsed_ForRCC</Semaphore>
+                                      <Semaphore>Semaphore_$IpInstance_IN1</Semaphore>
 					<SignalLogicalOp Name="AND">
 						<Signal Name="IN1"/>
 					</SignalLogicalOp>
+                                    </Mode>
+		                 </ModeLogicOperator>
 				</Mode>
-                                <Mode Name="IN2">
+	
+                                <Mode Name="IN2 Selection">
+                                <ModeLogicOperator Name="OR">
+                                    <Mode Name="IN2">
                                       <Semaphore>$IpInstanceUsed_ForRCC</Semaphore>
+                                      <Semaphore>Semaphore_$IpInstance_IN2</Semaphore>
 					<SignalLogicalOp Name="AND">
 						<Signal Name="IN2"/>
 					</SignalLogicalOp>
+                                    </Mode>
+		                 </ModeLogicOperator>
 				</Mode>
-                                <Mode Name="IN3">
+                                <Mode Name="IN3 Selection">
+                                <ModeLogicOperator Name="OR">
+                                    <Mode Name="IN3">
                                       <Semaphore>$IpInstanceUsed_ForRCC</Semaphore>
+                                      <Semaphore>Semaphore_$IpInstance_IN3</Semaphore>
 					<SignalLogicalOp Name="AND">
 						<Signal Name="IN3"/>
 					</SignalLogicalOp>
+                                    </Mode>
+		                 </ModeLogicOperator>
 				</Mode>
-                                <Mode Name="IN4">
+                                <Mode Name="IN4 Selection">
+                                <ModeLogicOperator Name="OR">
+                                    <Mode Name="IN4">
                                       <Semaphore>$IpInstanceUsed_ForRCC</Semaphore>
 					<SignalLogicalOp Name="AND">
 						<Signal Name="IN4"/>
 					</SignalLogicalOp>
+                                    </Mode>
+		                 </ModeLogicOperator>
 				</Mode>
-                                <Mode Name="IN5">
+                                <Mode Name="IN5 Selection">
+                                <ModeLogicOperator Name="OR">
+                                    <Mode Name="IN5">
                                       <Semaphore>$IpInstanceUsed_ForRCC</Semaphore>
 					<SignalLogicalOp Name="AND">
 						<Signal Name="IN5"/>
 					</SignalLogicalOp>
+                                    </Mode>
+		                 </ModeLogicOperator>
 				</Mode>
-                                <Mode Name="IN6">
+                                <Mode Name="IN6 Selection">
+                                <ModeLogicOperator Name="OR">
+                                    <Mode Name="IN6">
                                       <Semaphore>$IpInstanceUsed_ForRCC</Semaphore>
 					<SignalLogicalOp Name="AND">
 						<Signal Name="IN6"/>
 					</SignalLogicalOp>
+                                    </Mode>
+		                 </ModeLogicOperator>
 				</Mode>
-                                <Mode Name="IN7">
+                                <Mode Name="IN7 Selection">
+                                <ModeLogicOperator Name="OR">
+                                    <Mode Name="IN7">
                                       <Semaphore>$IpInstanceUsed_ForRCC</Semaphore>
 					<SignalLogicalOp Name="AND">
 						<Signal Name="IN7"/>
 					</SignalLogicalOp>
+                                    </Mode>
+		                 </ModeLogicOperator>
 				</Mode>
-                                <Mode Name="IN8">
+                                <Mode Name="IN8 Selection">
+                                <ModeLogicOperator Name="OR">
+                                    <Mode Name="IN8">
                                       <Semaphore>$IpInstanceUsed_ForRCC</Semaphore>
 					<SignalLogicalOp Name="AND">
 						<Signal Name="IN8"/>
 					</SignalLogicalOp>
+                                    </Mode>
+		                 </ModeLogicOperator>
 				</Mode>
-			</ModeLogicOperator>
-		</Mode>
+			
 	</ModeLogicOperator>
  
 	<RefSignal IOMode="AlternateFunctionPushPull" Name="IN0"/>

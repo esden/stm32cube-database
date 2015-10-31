@@ -89,6 +89,12 @@
 	
 	<!-- Stop Bits Parameters for Synchronous, SmartCard and Others (based on Asyncronous). N.B. IrDa do not have Stop Bits -->
 	<RefParameter Comment="Stop Bits" DefaultValue="USART_STOPBITS_1" Name="StopBits" Type="list" Group="Basic Parameters">
+		<Condition Expression="VirtualMode = VM_SYNC &amp; DIE449" Diagnostic=""/>
+		<PossibleValue Comment="1" Value="USART_STOPBITS_1"/>
+		<PossibleValue Comment="2" Value="USART_STOPBITS_2"/>
+		<PossibleValue Comment="1.5" Value="USART_STOPBITS_1_5"/>
+	</RefParameter>
+	<RefParameter Comment="Stop Bits" DefaultValue="USART_STOPBITS_1" Name="StopBits" Type="list" Group="Basic Parameters">
 		<Condition Expression="VirtualMode = VM_SYNC" Diagnostic=""/>
 		<PossibleValue Comment="1" Value="USART_STOPBITS_1"/>
 		<PossibleValue Comment="2" Value="USART_STOPBITS_2"/>
@@ -244,7 +250,7 @@
 	<RefParameter Comment="SmartCard Clock Frequency" DefaultValue="4000000" Name="CalculateSpeed" Type="string" Group="Clock Parameters"/>
 	
 	<!-- Specifics RefParameters for SmartCard Mode Only -->
-	<RefParameter Comment="NACK If Parity Error" DefaultValue="SMARTCARD_NACK_ENABLED" Name="NACKState" Type="list" Group="Advanced Parameters">
+	<RefParameter Comment="NACK If Parity Error" DefaultValue="SMARTCARD_NACK_DISABLED" Name="NACKState" Type="list" Group="Advanced Parameters">
 		<PossibleValue Comment="Enable" Value="SMARTCARD_NACK_ENABLED"/>
 		<PossibleValue Comment="Disable" Value="SMARTCARD_NACK_DISABLED"/>
 	</RefParameter>
@@ -521,17 +527,17 @@
     <RefParameter Comment="Overrun State arg" DefaultValue="null" Name="OverrunDisable" Type="list" Group="Advanced Features" Visible="false"/>
 	
 	
-	<RefParameter Comment="Overrun Disable" DefaultValue="SMARTCARD_ADVFEATURE_OVERRUN_DISABLE" Name="OverrunDisableParam" Type="list" Group="Advanced Features">
+	<RefParameter Comment="Overrun Disable" DefaultValue="SMARTCARD_ADVFEATURE_OVERRUN_ENABLE" Name="OverrunDisableParam" Type="list" Group="Advanced Features">
 	    <Condition Expression="VirtualClockMode = VM_SMARTCARD" Diagnostic=""/>
 	    <PossibleValue Comment="Disable" Value="SMARTCARD_ADVFEATURE_OVERRUN_DISABLE"/>
 		<PossibleValue Comment="Enable" Value="SMARTCARD_ADVFEATURE_OVERRUN_ENABLE" />
 	</RefParameter>
-	<RefParameter Comment="Overrun Disable" DefaultValue="SMARTCARD_ADVFEATURE_OVERRUN_DISABLE" Name="OverrunDisableParam" Type="list" Group="Advanced Features">
+	<RefParameter Comment="Overrun Disable" DefaultValue="SMARTCARD_ADVFEATURE_OVERRUN_ENABLE" Name="OverrunDisableParam" Type="list" Group="Advanced Features">
 	    <Condition Expression="VirtualMode = VM_SMARTCARD" Diagnostic=""/>
 	    <PossibleValue Comment="Disable" Value="SMARTCARD_ADVFEATURE_OVERRUN_DISABLE"/>
 		<PossibleValue Comment="Enable" Value="SMARTCARD_ADVFEATURE_OVERRUN_ENABLE" />
 	</RefParameter>
-	<RefParameter Comment="Overrun Disable" DefaultValue="UART_ADVFEATURE_OVERRUN_DISABLE" Name="OverrunDisableParam" Type="list" Group="Advanced Features">
+	<RefParameter Comment="Overrun Disable" DefaultValue="UART_ADVFEATURE_OVERRUN_ENABLE" Name="OverrunDisableParam" Type="list" Group="Advanced Features">
 		<PossibleValue Comment="Disable" Value="UART_ADVFEATURE_OVERRUN_DISABLE"/>
 		<PossibleValue Comment="Enable" Value="UART_ADVFEATURE_OVERRUN_ENABLE" Semaphore="$IpInstance_OverrunDisableENABLE"/>
 	</RefParameter>
@@ -569,17 +575,17 @@
     </RefParameter>
     <RefParameter Comment="DMA State arg" DefaultValue="null" Name="DMADisableonRxError" Type="list" Group="Advanced Features" Visible="false"/>
 	
-	<RefParameter Comment="DMA Disable on RX Error" DefaultValue="SMARTCARD_ADVFEATURE_DMA_DISABLEONRXERROR" Name="DMADisableonRxErrorParam" Type="list" Group="Advanced Features">
+	<RefParameter Comment="DMA Disable on RX Error" DefaultValue="SMARTCARD_ADVFEATURE_DMA_ENABLEONRXERROR" Name="DMADisableonRxErrorParam" Type="list" Group="Advanced Features">
 	    <Condition Expression="VirtualClockMode = VM_SMARTCARD" Diagnostic=""/>
 		<PossibleValue Comment="Disable" Value="SMARTCARD_ADVFEATURE_DMA_DISABLEONRXERROR"/>
 		<PossibleValue Comment="Enable" Value="SMARTCARD_ADVFEATURE_DMA_ENABLEONRXERROR" />
 	</RefParameter>
-	<RefParameter Comment="DMA Disable on RX Error" DefaultValue="SMARTCARD_ADVFEATURE_DMA_DISABLEONRXERROR" Name="DMADisableonRxErrorParam" Type="list" Group="Advanced Features">
+	<RefParameter Comment="DMA Disable on RX Error" DefaultValue="SMARTCARD_ADVFEATURE_DMA_ENABLEONRXERROR" Name="DMADisableonRxErrorParam" Type="list" Group="Advanced Features">
 	    <Condition Expression="VirtualMode = VM_SMARTCARD" Diagnostic=""/>
 		<PossibleValue Comment="Disable" Value="SMARTCARD_ADVFEATURE_DMA_DISABLEONRXERROR"/>
 		<PossibleValue Comment="Enable" Value="SMARTCARD_ADVFEATURE_DMA_ENABLEONRXERROR" />
 	</RefParameter>
-	<RefParameter Comment="DMA Disable on RX Error" DefaultValue="UART_ADVFEATURE_DMA_DISABLEONRXERROR" Name="DMADisableonRxErrorParam" Type="list" Group="Advanced Features">
+	<RefParameter Comment="DMA Disable on RX Error" DefaultValue="UART_ADVFEATURE_DMA_ENABLEONRXERROR" Name="DMADisableonRxErrorParam" Type="list" Group="Advanced Features">
 		<PossibleValue Comment="Disable" Value="UART_ADVFEATURE_DMA_DISABLEONRXERROR"/>
 		<PossibleValue Comment="Enable" Value="UART_ADVFEATURE_DMA_ENABLEONRXERROR" Semaphore="$IpInstance_DMADisableonRxErrorENABLE"/>
 	</RefParameter>
@@ -993,30 +999,30 @@
 						<Signal Name="TX"/>
 					</SignalLogicalOp>
 				</Mode>
-				<Mode Name="IrDA" RemoveCondition="($IpNumber=4)|($IpNumber=5)|($IpNumber=6)|($IpNumber=7)|($IpNumber=8)">
+				<Mode Name="IrDA" RemoveCondition="($IpNumber=4)|($IpNumber=5)|($IpNumber=7)|($IpNumber=8)">
 					<SignalLogicalOp Name="AND">
 						<Signal Name="RX"/>
 						<Signal Name="TX"/>
 					</SignalLogicalOp>
 				</Mode>
-				<Mode Name="LIN" RemoveCondition="($IpNumber=4)|($IpNumber=5)|($IpNumber=6)|($IpNumber=7)|($IpNumber=8)">
+				<Mode Name="LIN" RemoveCondition="($IpNumber=4)|($IpNumber=5)|($IpNumber=7)|($IpNumber=8)">
 					<SignalLogicalOp Name="AND">
 						<Signal Name="RX"/>
 						<Signal Name="TX"/>
 					</SignalLogicalOp>
 				</Mode>
-				<Mode Name="SmartCard" RemoveCondition="($IpNumber=4)|($IpNumber=5)|($IpNumber=6)|($IpNumber=7)|($IpNumber=8)">
+				<Mode Name="SmartCard" RemoveCondition="($IpNumber=4)|($IpNumber=5)|($IpNumber=7)|($IpNumber=8)">
 					<SignalLogicalOp Name="AND">
 						<Signal Name="TX" IOMode="AlternateFunctionOpenDrain"/>
 					</SignalLogicalOp>
 				</Mode>
-				<Mode Name="SmartCard_With_Clock" UserName="SmartCard with Card Clock" RemoveCondition="($IpNumber=4)|($IpNumber=5)|($IpNumber=6)|($IpNumber=7)|($IpNumber=8)">
+				<Mode Name="SmartCard_With_Clock" UserName="SmartCard with Card Clock" RemoveCondition="($IpNumber=4)|($IpNumber=5)|($IpNumber=7)|($IpNumber=8)">
 					<SignalLogicalOp Name="AND">
 						<Signal Name="TX" IOMode="AlternateFunctionOpenDrain"/>
 						<Signal Name="CK"/>
 					</SignalLogicalOp>
 				</Mode>
-				<Mode Name="ModbusCommunication" UserName="Modbus Communication" RemoveCondition="($IpNumber=4)|($IpNumber=5)|($IpNumber=6)|($IpNumber=7)|($IpNumber=8)">
+				<Mode Name="ModbusCommunication" UserName="Modbus Communication" RemoveCondition="($IpNumber=4)|($IpNumber=5)|($IpNumber=7)|($IpNumber=8)">
 					<SignalLogicalOp Name="AND">
 						<Signal Name="TX"/>
 					</SignalLogicalOp>
@@ -1024,7 +1030,7 @@
 			</ModeLogicOperator>
 		</Mode>
 		
-		<Mode Name = "Flow Control (RS232)" RemoveCondition="($IpNumber=5)|($IpNumber=6)|($IpNumber=7)|($IpNumber=8)">
+		<Mode Name = "Flow Control (RS232)" RemoveCondition="($IpNumber=5)|($IpNumber=7)|($IpNumber=8)">
 			<ModeLogicOperator Name="XOR">
 				<Mode Name="CTS_Only" UserName="CTS Only">
 					<SignalLogicalOp Name="AND">

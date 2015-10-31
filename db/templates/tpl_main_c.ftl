@@ -2,7 +2,6 @@
 /**
   ******************************************************************************
   * File Name          : main.c
-  * Date               : ${date}
   * Description        : Main program body
   ******************************************************************************
   *
@@ -41,7 +40,7 @@
 [@common.optinclude name="Src/rtos_inc.tmp"/][#--include freertos includes --]
 [#-- if !HALCompliant??--][#-- if HALCompliant Begin --]
 [#list ips as ip]
-[#if !ip?contains("FREERTOS") && !ip?contains("NVIC")]
+[#if !ip?contains("FREERTOS") && !ip?contains("NVIC")&& !ip?contains("CORTEX")]
 #include "${ip?lower_case}.h"
 [/#if]
 [/#list]
@@ -108,6 +107,9 @@ ${dHandle};
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void); [#-- remove static --]
 [/#if]
+[#if mpuControl??] [#-- if MPU config is enabled --]
+static void MPU_Config(void); 
+[/#if]    
 
 [#-- modif for freeRtos 21 Augst 2014 --]
 [#if FREERTOS??]
@@ -117,7 +119,7 @@ void SystemClock_Config(void); [#-- remove static --]
 [/#if]
 [#if HALCompliant??] 
  [#list voids as void]
-  [#if !void?contains("FREERTOS")&&!void?contains("FATFS")&& !void?contains("LWIP")&& !void?contains("USB_DEVICE")&& !void?contains("USB_HOST")]
+  [#if !void?contains("FREERTOS")&&!void?contains("FATFS")&& !void?contains("LWIP")&& !void?contains("USB_DEVICE")&& !void?contains("USB_HOST")&& !void?contains("CORTEX")]
   static void ${""?right_pad(2)}${void}(void);
   [/#if]
  [/#list]
@@ -145,6 +147,19 @@ int main(void)
 #t/* USER CODE END 1 */
 #n
 [#compress]
+[#if mpuControl??] [#-- if MPU config is enabled --]
+#t/* MPU Configuration----------------------------------------------------------*/
+    #tMPU_Config();
+[/#if]
+[#if ICache??] [#-- if CPU ICache is enabled --]
+#n#t/* Enable I-Cache-------------------------------------------------------------*/
+    #tSCB_EnableICache();
+[/#if]
+[#if DCache??] [#-- if CPU DCache config is enabled --]
+#n#t/* Enable D-Cache-------------------------------------------------------------*/
+    #tSCB_EnableDCache();
+[/#if]
+#n
 #t/* MCU Configuration----------------------------------------------------------*/
 [#if clockConfig??]
 #n#t/* Reset of all peripherals, Initializes the Flash interface and the Systick. */
@@ -154,7 +169,7 @@ int main(void)
 [/#if]
 #n#t/* Initialize all configured peripherals */
 [#list voids as void]
-[#if !void?contains("FREERTOS")]
+[#if !void?contains("FREERTOS")&&!void?contains("CORTEX")]
 #t${void}();
 [/#if]
 [/#list]
@@ -233,9 +248,10 @@ void SystemClock_Config(void)
 [#-- Section1: Create the void mx_<IpInstance>_<HalMode>_init() function for each ip instance --]
 [#compress]
 [#list IP.configModelList as instanceData]
-[#if instanceData.isMWUsed=="false"]
-     [#assign instName = instanceData.instanceName]
 [#assign ipName = instanceData.ipName]
+[#if instanceData.isMWUsed=="false" && !ipName?contains("CORTEX") ]
+     [#assign instName = instanceData.instanceName]
+
         [#assign halMode= instanceData.halMode]
         /* ${instName} init function */
         [#if halMode!=ipName&&!ipName?contains("TIM")&&!ipName?contains("CEC")]void MX_${instName}_${halMode}_Init(void)[#else]void MX_${instName}_Init(void)[/#if]
@@ -274,6 +290,11 @@ void SystemClock_Config(void)
 [@common.optinclude name="Src/rtos_threads.tmp"/]
 [@common.optinclude name="Src/rtos_user_threads.tmp"/] 
 [/#if] [#-- If FreeRtos is used --]
+
+[#if mpuControl??] [#-- if MPU config is enabled --]
+/* MPU Configuration */
+[@common.optinclude name="Src/cortex.tmp"/]
+[/#if]
 
 [#compress] 
 #n

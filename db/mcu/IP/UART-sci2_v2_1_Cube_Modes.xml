@@ -14,6 +14,12 @@
 	
 	<!-- Word Length Parameters for Synchronous, IrDa, and  Asyncronous. -->
 	
+	<RefParameter Comment="Word Length" DefaultValue="IRDA_WORDLENGTH_7B" Name="WordLength" Type="list" Group="Basic Parameters">
+		<Condition Expression="$IpInstance_IRDA &amp; DIE449" Diagnostic=""/>
+		<PossibleValue Comment="7 Bits (including Parity)" Value="IRDA_WORDLENGTH_7B" Semaphore="$IpInstance_Irda_7B" />
+		<PossibleValue Comment="8 Bits (including Parity)" Value="IRDA_WORDLENGTH_8B"/>
+		<PossibleValue Comment="9 Bits (including Parity)" Value="IRDA_WORDLENGTH_9B"/>
+	</RefParameter>
 	<RefParameter Comment="Word Length" DefaultValue="IRDA_WORDLENGTH_8B" Name="WordLength" Type="list" Group="Basic Parameters">
 		<Condition Expression="$IpInstance_IRDA" Diagnostic=""/>
 		<PossibleValue Comment="8 Bits (including Parity)" Value="IRDA_WORDLENGTH_8B"/>
@@ -23,6 +29,13 @@
 	<RefParameter Comment="Word Length" DefaultValue="UART_WORDLENGTH_8B" Name="WordLength" Type="list" Group="Basic Parameters">
 	     <Condition Expression="$IpInstance_LIN" Diagnostic=""/>
 		<PossibleValue Comment="8 Bits (including Parity)" Value="UART_WORDLENGTH_8B"/>
+	</RefParameter>
+	
+	<RefParameter Comment="Word Length" DefaultValue="UART_WORDLENGTH_7B" Name="WordLength" Type="list" Group="Basic Parameters">
+	<Condition Expression="DIE449" Diagnostic=""/>
+	    <PossibleValue Comment="7 Bits (including Parity)" Value="UART_WORDLENGTH_7B" Semaphore="$IpInstance_Uart_7B" />
+		<PossibleValue Comment="8 Bits (including Parity)" Value="UART_WORDLENGTH_8B"/>
+		<PossibleValue Comment="9 Bits (including Parity)" Value="UART_WORDLENGTH_9B"/>
 	</RefParameter>
 	
     <RefParameter Comment="Word Length" DefaultValue="UART_WORDLENGTH_8B" Name="WordLength" Type="list" Group="Basic Parameters">
@@ -49,8 +62,8 @@
 
 	<RefParameter Comment="IrDa Mode" DefaultValue="IRDA_MODE_DISABLE" Name="Mode" Type="list" Group="Advanced Parameters">
 		<Condition Expression="$IpInstance_IRDA" Diagnostic=""/>
-		<PossibleValue Comment="Enable" Value="IRDA_MODE_DISABLE"/>
-		<PossibleValue Comment="Disable" Value="IRDA_MODE_ENABLE"/>
+		<PossibleValue Comment="Disable" Value="IRDA_MODE_DISABLE"/>
+		<PossibleValue Comment="Enable" Value="IRDA_MODE_ENABLE"/>
 	</RefParameter>
 	<RefParameter Comment="Data Direction" DefaultValue="UART_MODE_TX_RX" Name="Mode" Type="list" Group="Advanced Parameters">
 		<PossibleValue Comment="Receive and Transmit" Value="UART_MODE_TX_RX"/>
@@ -109,7 +122,7 @@
 
 	
 	<!-- Specifics RefParameters for IrDa Mode -->
-	<RefParameter Comment="Power Mode" DefaultValue="IRDA_POWERMODE_LOWPOWER" Name="PowerMode" Type="list" Group="Advanced Parameters">
+	<RefParameter Comment="Power Mode" DefaultValue="IRDA_POWERMODE_NORMAL" Name="PowerMode" Type="list" Group="Advanced Parameters">
 		<PossibleValue Comment="Low Power" Value="IRDA_POWERMODE_LOWPOWER"/>
 		<PossibleValue Comment="Normal Power" Value="IRDA_POWERMODE_NORMAL"/>
 	</RefParameter>
@@ -292,6 +305,18 @@
 	</RefParameter>
 	<RefParameter Comment="" DefaultValue="" Name="IsMSBFirst" Type="list" Group="Advanced Features" Visible="false"/>
 	<!-- -->
+		<RefParameter Comment="Auto Baudrate" DefaultValue="UART_ADVFEATURE_AUTOBAUDRATE_DISABLE" Name="AutoBaudRateEnableParam" Type="list" Group="Advanced Features">
+		<Condition Expression="DIE449" Diagnostic=""/>
+		<PossibleValue Comment="Disable" Value="UART_ADVFEATURE_AUTOBAUDRATE_DISABLE"/>
+		<PossibleValue Comment="Enable" Value="UART_ADVFEATURE_AUTOBAUDRATE_ENABLE" Semaphore="$IpInstance_UART_AutoBaudRate_Enable"/>
+	</RefParameter>
+	
+	
+	<RefParameter Comment="Auto Baudrate Mode" DefaultValue="UART_ADVFEATURE_AUTOBAUDRATE_ONSTARTBIT" Name="AutoBaudRateMode" Type="list" Group="Advanced Features">
+		<Condition Expression="$IpInstance_UART_AutoBaudRate_Enable &amp; ($IpInstance_Irda_7B|$IpInstance_Uart_7B)" Diagnostic=""/>
+		<PossibleValue Comment="ON START BIT" Value="UART_ADVFEATURE_AUTOBAUDRATE_ONSTARTBIT"/>
+		<PossibleValue Comment="ON FALLING EDGE" Value="UART_ADVFEATURE_AUTOBAUDRATE_ONFALLINGEDGE"/>
+	</RefParameter>
 	<RefParameter Comment="Auto Baudrate Mode" DefaultValue="UART_ADVFEATURE_AUTOBAUDRATE_ONSTARTBIT" Name="AutoBaudRateMode" Type="list" Group="Advanced Features">
 		<Condition Expression="$IpInstance_UART_AutoBaudRate_Enable" Diagnostic=""/>
 		<PossibleValue Comment="ON START BIT" Value="UART_ADVFEATURE_AUTOBAUDRATE_ONSTARTBIT"/>
@@ -319,6 +344,7 @@
 		<Parameter Name="OverSampling" />
 		<Parameter Name="OneBitSampling" />
 		<!-- Advanced Features -->
+		<Parameter Name="AutoBaudRateEnableParam"/>
 		<Parameter Name="TxPinLevelInvertParam"/>
 		<Parameter Name="RxPinLevelInvertParam"/>
 		<Parameter Name="DataInvertParam"/>
@@ -343,6 +369,7 @@
 		<Parameter Name="OverSampling"/>
 		<Parameter Name="OneBitSampling" />
 		<!-- Advanced Features -->
+		<Parameter Name="AutoBaudRateEnableParam"/>
 		<Parameter Name="TxPinLevelInvertParam"/>
 		<Parameter Name="RxPinLevelInvertParam"/>
 		<Parameter Name="DataInvertParam"/>
@@ -369,6 +396,7 @@
 		<Parameter Name="WakeUpMethod"/>
 		<Parameter Name="Address"/>
 		<!-- Advanced Features -->
+		<Parameter Name="AutoBaudRateEnableParam"/>
 		<Parameter Name="TxPinLevelInvertParam"/>
 		<Parameter Name="RxPinLevelInvertParam"/>
 		<Parameter Name="DataInvertParam"/>
@@ -394,6 +422,7 @@
 		<Parameter Name="OneBitSampling"/>
 		<Parameter Name="BreakDetectLength"/>
 		<!-- Advanced Features -->
+		<Parameter Name="AutoBaudRateEnableParam"/>
 		<Parameter Name="TxPinLevelInvertParam"/>
 		<Parameter Name="RxPinLevelInvertParam"/>
 		<Parameter Name="DataInvertParam"/>

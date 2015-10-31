@@ -1,8 +1,7 @@
 [#ftl]
 /**
   ******************************************************************************
-  * @file           : ${name}
-  * @date           : ${date}   
+  * @file           : ${name}  
   * @version        : ${version}
 [#--  * @packageVersion : ${fwVersion} --]
   * @brief          : This file implements the board support package for the USB device library

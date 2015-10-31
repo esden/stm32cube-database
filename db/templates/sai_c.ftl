@@ -2,7 +2,6 @@
 /**
   ******************************************************************************
   * File Name          : ${name}.c
-  * Date               : ${date}
   * Description        : This file provides code for the configuration
   *                      of the ${name} instances.
   ******************************************************************************
@@ -381,7 +380,7 @@
 [#-- Global variables --]
 [#if IP.variables??]
 [#list IP.variables as variable]
-${variable.value} ${variable.name};
+[#--static--]${variable.value} ${variable.name};
 [/#list]
 [#-- Add global dma Handler --]
 [#list IP.configModelList as instanceData]
@@ -392,6 +391,16 @@ ${variable.value} ${variable.name};
     [/#if]
 [/#list]
 [/#if]
+
+[#--MZA the GetHandle() method is not ready, I propose to comment the template --]
+[#--if IP.variables??--]
+[#--list IP.variables as variable-]
+[#--${variable.value}* MX_${variable.name?substring(1)?upper_case}_GetHandle(void) {--]
+[#--  #treturn &${variable.name};--]
+[#--}--]
+[#--[/#list]--] [#-- fix bug 312391 --]
+[#--[/#if]--] [#-- fix bug 312391 --]
+
 [#-- Global variables --]#n
 [#list IP.configModelList as instanceData]
      [#assign instName = instanceData.instanceName]

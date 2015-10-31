@@ -2,7 +2,6 @@
 /**
   ******************************************************************************
   * File Name          : gpio.c
-  * Date               : ${date}
   * Description        : This file provides code for the configuration
   *                      of all used GPIO pins.
   ******************************************************************************

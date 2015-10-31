@@ -18,6 +18,7 @@
 [#-- End extract hal mode list used by all instances of the ip --]
 
 [#-- Define includes --]
+
 [#list IP.configModelList as instanceData]
 [#if instanceData.initServices??]
     [#if instanceData.initServices.gpio??]
@@ -435,6 +436,13 @@
     [#if serviceType=="Init"] 
            [#if initService.clock??]
             [#if initService.clock!="none"]
+                [#if FamilyName=="STM32F1" && ipName=="RTC"]
+#t#tHAL_PWR_EnableBkUpAccess();
+
+#t#t/* Enable BKP CLK enable for backup registers */
+#t#t__HAL_RCC_BKP_CLK_ENABLE();                    
+
+                [/#if]
                 #t#t/* Enable Peripheral clock */
             [#list initService.clock?split(';') as clock]            
                #t#t${clock?trim}();
@@ -471,6 +479,7 @@
     [/#if]
     [#if nvicExist]
         [#if initService.nvic??&&initService.nvic?size>0]
+#n#t#t/* Peripheral interrupt init*/
  [#-- WorkAround for USB low power--]
            [#if ipName?contains("USB")]
                 [#-- WorkAround for USB low power and remap macro--]
@@ -492,12 +501,20 @@
                 [#if lowPower == "yes"]
                     #t#tif(hpcd->Init.low_power_enable == 1)
                     #t#t{
-                    #t#t#t/* Enable EXTI Line 18 for USB wakeup */
+                    [#if ipName?contains("_FS")]
+                        [#if FamilyName=="STM32L4"]
+                            #t#t#t/* Enable EXTI Line 17 for USB wakeup */
+                        [#else]
+                            #t#t#t/* Enable EXTI Line 18 for USB wakeup */                            
+                        [/#if]
+                    [#else]
+                        #t#t#t/* Enable EXTI Line 20 for USB wakeup */
+                    [/#if]
                     [#if FamilyName=="STM32F3"||FamilyName=="STM32L1"][#-- FamilyName=="STM32F3"|| to be added on V4.5 --]
                       #t#t#t__HAL_USB_EXTI_CLEAR_FLAG();
                       #t#t#t__HAL_USB_EXTI_SET_RISING_EDGE_TRIGGER();
                     [/#if]
-                    [#if FamilyName=="STM32F2"||FamilyName=="STM32F4"]
+                    [#if FamilyName=="STM32F2"||FamilyName=="STM32F4"||FamilyName=="STM32F7"]
                         [#if ipName?contains("_FS")]
                             #t#t#t__HAL_USB_FS_EXTI_CLEAR_FLAG();
                             #t#t#t__HAL_USB_FS_EXTI_SET_RISING_EGDE_TRIGGER();
@@ -510,11 +527,20 @@
                     [/#if]
                     [#if ipName?contains("_HS")]
                         #t#t#t__HAL_USB_HS_EXTI_ENABLE_IT();
-                    
+                    [#elseif ipName?contains("OTG_FS")&&FamilyName=="STM32F1"]
+                        #t#t#t__HAL_USB_OTG_FS_WAKEUP_EXTI_CLEAR_FLAG();
+                        #t#t#t__HAL_USB_OTG_FS_WAKEUP_EXTI_ENABLE_RISING_EDGE();
+                        #t#t#t__HAL_USB_OTG_FS_WAKEUP_EXTI_ENABLE_IT();
                     [#elseif ipName?contains("_FS")]
                         #t#t#t__HAL_USB_FS_EXTI_ENABLE_IT();
                     [#else]
-                        #t#t#t__HAL_USB_EXTI_ENABLE_IT();
+                        [#if FamilyName=="STM32F1"] [#-- use new macro naming for F1--]
+                            #t#t#t__HAL_USB_WAKEUP_EXTI_CLEAR_FLAG();
+                            #t#t#t__HAL_USB_WAKEUP_EXTI_ENABLE_RISING_EDGE();
+                            #t#t#t__HAL_USB_WAKEUP_EXTI_ENABLE_IT();
+                        [#else]
+                            #t#t#t__HAL_USB_EXTI_ENABLE_IT(); 
+                        [/#if]
                     [/#if]
                     [#list initService.nvic as initVector]
                        [#if initVector.vector?contains("WKUP") || initVector.vector?contains("WakeUp")]
@@ -551,7 +577,19 @@
 [#-- DeInit NVIC if DeInit --]
     [#if nvicExist&&service??&&service.nvic?size>0]#n#t#t/* Peripheral interrupt Deinit*/[#--#n#t#tHAL_NVIC_DisableIRQ([#if service.nvic.vector??]${service.nvic.vector}[/#if]);--]
 [#list service.nvic as initVector]                
-                #t#tHAL_NVIC_DisableIRQ(${initVector.vector});
+                [#if initVector.shared=="false"]             
+                #t#tHAL_NVIC_DisableIRQ(${initVector.vector});#n
+                [#else]
+
+#t/* USER CODE BEGIN ${ipName}:${initVector.vector} disable */
+#t#t/**
+#t#t* Uncomment the line below to disable the "${initVector.vector}" interrupt 
+#t#t*        Be aware, disabling shared interrupt may affect other IPs
+#t#t*/
+#t#t/* HAL_NVIC_DisableIRQ(${initVector.vector}); */
+#t/* USER CODE END ${ipName}:${initVector.vector} disable */
+#n
+                [/#if]
             [/#list]
     [/#if]
 

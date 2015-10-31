@@ -1,8 +1,7 @@
 [#ftl]
 /**
   ******************************************************************************
-  * @file           : ${name}
-  * @date           : ${date}  
+  * @file           : ${name} 
   * @version        : ${version}
 [#--  * @packageVersion : ${fwVersion} --]
   * @brief          : Header for usbd_conf file.

@@ -1,11 +1,18 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <IP DBVersion="V4.0" IPType="peripheral" Name="ADC" Version="aditf2_v1_1_Cube" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://mcd.rou.st.com/modules.php?name=mcu" ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu file:///C:/Dev_Build8/MicroXplorer/doc/V4/Development/Specifications/db/IP_Modes.xsd">
 	<About>ADC: Analog to Digital Converter</About>
+	
+	<RefParameter Comment="Fadc Constraint" DefaultValue="30000000" Max="30000000" Min="600000" Name="FadcConstraint" Type="double" Visible="false">
+	<Condition Expression="STM32F2" Diagnostic=""/>
+	</RefParameter>
+	<RefParameter Comment="Fadc Constraint" DefaultValue="36000000" Max="36000000" Min="600000" Name="FadcConstraint" Type="double" Visible="false"/>
+	
+	
 	<RefParameter Comment="Clock Prescaler" DefaultValue="ADC_CLOCKPRESCALER_PCLK_DIV2" Name="ClockPrescaler" Type="list" Group="ADCsgroup">
-		<PossibleValue Comment="PCLK2 divided by 2" Value="ADC_CLOCKPRESCALER_PCLK_DIV2"/>
-		<PossibleValue Comment="PCLK2 divided by 4" Value="ADC_CLOCKPRESCALER_PCLK_DIV4"/>
-		<PossibleValue Comment="PCLK2 divided by 6" Value="ADC_CLOCKPRESCALER_PCLK_DIV6"/>
-		<PossibleValue Comment="PCLK2 divided by 8" Value="ADC_CLOCKPRESCALER_PCLK_DIV8"/>
+		<PossibleValue Comment="PCLK2 divided by 2" Value="ADC_CLOCKPRESCALER_PCLK_DIV2" Condition="ADC_CLOCKPRESCALER_PCLK_DIV2_$IpInstance" Diagnostic="Prescaler divider not respecting Fadc Min Max Constraint" Action="DISABLE"/>
+		<PossibleValue Comment="PCLK2 divided by 4" Value="ADC_CLOCKPRESCALER_PCLK_DIV4" Condition="ADC_CLOCKPRESCALER_PCLK_DIV4_$IpInstance" Diagnostic="Prescaler divider not respecting Fadc Min Max Constraint" Action="DISABLE"/>
+		<PossibleValue Comment="PCLK2 divided by 6" Value="ADC_CLOCKPRESCALER_PCLK_DIV6" Condition="ADC_CLOCKPRESCALER_PCLK_DIV6_$IpInstance" Diagnostic="Prescaler divider not respecting Fadc Min Max Constraint" Action="DISABLE"/>
+		<PossibleValue Comment="PCLK2 divided by 8" Value="ADC_CLOCKPRESCALER_PCLK_DIV8" Condition="ADC_CLOCKPRESCALER_PCLK_DIV8_$IpInstance" Diagnostic="Prescaler divider not respecting Fadc Min Max Constraint" Action="DISABLE"/>
 		<Description>frequency of the clock to the ADC. The clock is common for all the ADCs.</Description>
 	</RefParameter>
 	<RefParameter Comment="ADC instance" DefaultValue="ADC$Index" Name="Instance" Type="list" Group="ADCgroup" Visible="false"/>
@@ -69,8 +76,30 @@
 		<Condition Expression="(ExternalTrigConvEdge=ADC_EXTERNALTRIGCONVEDGE_NONE)|(($IpNumber=3)&amp;(TripleMode0|TripleMode1|TripleMode_Interl|TripleMode_REGSIMULT | TripleMode_REGSIMULT1))" Diagnostic=""/>
 	</RefParameter>
 	<RefParameter Comment="External Trigger Conversion Source" DefaultValue="ADC_EXTERNALTRIGCONV_Ext_IT11" Name="ExternalTrigConv" Type="list" Group="ADCgroup">
-		<Condition Expression="!(ExternalTrigConvEdge=ADC_EXTERNALTRIGCONVEDGE_NONE)&amp;(RegularExternalTrigger)" Diagnostic="EXTI Line11 is used for External-Trigger-for-Regular-conversion mode."/>
+		<Condition Expression="!(ExternalTrigConvEdge=ADC_EXTERNALTRIGCONVEDGE_NONE)&amp;(RegularExternalTrigger$IpInstance) &amp; !(STM32F7)" Diagnostic="EXTI Line11 is used for External-Trigger-for-Regular-conversion mode."/>
 		<PossibleValue Comment="EXTI Line11" Value="ADC_EXTERNALTRIGCONV_Ext_IT11"/>
+	</RefParameter>
+	<RefParameter Comment="External Trigger Conversion Source" DefaultValue="ADC_EXTERNALTRIGCONV_Ext_IT11" Name="ExternalTrigConv" Type="list" Group="ADCgroup">
+		<Condition Expression="!(ExternalTrigConvEdge=ADC_EXTERNALTRIGCONVEDGE_NONE)&amp;(RegularExternalTrigger$IpInstance)&amp; STM32F7" Diagnostic="EXTI Line11 is used for External-Trigger-for-Regular-conversion mode."/>
+		<PossibleValue Comment="EXTI Line11" Value="ADC_EXTERNALTRIGCONV_EXT_IT11"/>
+	</RefParameter>
+	<RefParameter Comment="External Trigger Conversion Source" DefaultValue="ADC_EXTERNALTRIGCONV_T1_CC1" Name="ExternalTrigConv" Type="list" Group="ADCgroup">
+	<Condition Expression="STM32F7" Diagnostic=""/>
+		<PossibleValue Comment="Timer 1 Capture Compare 1 event" Value="ADC_EXTERNALTRIGCONV_T1_CC1" Condition="!TIM1_Exist" Diagnostic="" Action="Remove"/>
+		<PossibleValue Comment="Timer 1 Capture Compare 2 event" Value="ADC_EXTERNALTRIGCONV_T1_CC2" Condition="!TIM1_Exist" Diagnostic="" Action="Remove"/>
+		<PossibleValue Comment="Timer 1 Capture Compare 3 event" Value="ADC_EXTERNALTRIGCONV_T1_CC3" Condition="!TIM1_Exist" Diagnostic="" Action="Remove"/>
+		<PossibleValue Comment="Timer 2 Capture Compare 2 event" Value="ADC_EXTERNALTRIGCONV_T2_CC2" Condition="!TIM2_Exist" Diagnostic="" Action="Remove"/>
+		<PossibleValue Comment="Timer 5 Trigger Out event" Value="ADC_EXTERNALTRIGCONV_T5_TRGO" Condition="!TIM5_Exist" Diagnostic="" Action="Remove"/>
+		<PossibleValue Comment="Timer 4 Capture Compare 4 event" Value="ADC_EXTERNALTRIGCONV_T4_CC4" Condition="!TIM4_Exist" Diagnostic="" Action="Remove"/>
+		<PossibleValue Comment="Timer 3 Capture Compare 4 event" Value="ADC_EXTERNALTRIGCONV_T3_CC4" Condition="!TIM3_Exist" Diagnostic="" Action="Remove"/>
+		<PossibleValue Comment="Timer 8 Trigger Out event" Value="ADC_EXTERNALTRIGCONV_T8_TRGO" Condition="!TIM8_Exist" Diagnostic="" Action="Remove"/>
+		<PossibleValue Comment="Timer 8 Trigger 2 Out event" Value="ADC_EXTERNALTRIGCONV_T8_TRGO2" Condition="!TIM8_Exist" Diagnostic="" Action="Remove"/>
+		<PossibleValue Comment="Timer 1 Trigger Out event" Value="ADC_EXTERNALTRIGCONV_T1_TRGO" Condition="!TIM1_Exist" Diagnostic="" Action="Remove"/>
+		<PossibleValue Comment="Timer 1 Trigger 2 Out event" Value="ADC_EXTERNALTRIGCONV_T1_TRGO2" Condition="!TIM1_Exist" Diagnostic="" Action="Remove"/>
+		<PossibleValue Comment="Timer 2 Trigger Out event" Value="ADC_EXTERNALTRIGCONV_T2_TRGO" Condition="!TIM2_Exist" Diagnostic="" Action="Remove"/>
+		<PossibleValue Comment="Timer 4 Trigger Out event" Value="ADC_EXTERNALTRIGCONV_T4_TRGO" Condition="!TIM4_Exist" Diagnostic="" Action="Remove"/>
+		<PossibleValue Comment="Timer 6 Trigger Out event" Value="ADC_EXTERNALTRIGCONV_T6_TRGO" Condition="!TIM6_Exist" Diagnostic="" Action="Remove"/>
+		<Description>Select the external event used to trigger the start of conversion of a regular group</Description>
 	</RefParameter>
 	<RefParameter Comment="External Trigger Conversion Source" DefaultValue="ADC_EXTERNALTRIGCONV_T1_CC1" Name="ExternalTrigConv" Type="list" Group="ADCgroup">
 		<PossibleValue Comment="Timer 1 Capture Compare 1 event" Value="ADC_EXTERNALTRIGCONV_T1_CC1" Condition="!TIM1_Exist" Diagnostic="" Action="Remove"/>
@@ -282,9 +311,27 @@
 		<Condition Expression="(InjNumberOfConversion=0)" Diagnostic="not available only for master instance"/>
 	</RefParameter>
 	<RefParameter Comment="External Trigger Source" DefaultValue="ADC_EXTERNALTRIGINJECCONV_T1_CC4" Name="ExternalTrigInjecConv" Type="list" Group="ADCgroup">
-		<Condition Expression="!(ExternalTrigInjecConvEdge=ADC_EXTERNALTRIGINJECCONVEDGE_NONE)&amp;(InjectedExternalTrigger)" Diagnostic=""/>
+		<Condition Expression="!(ExternalTrigInjecConvEdge=ADC_EXTERNALTRIGINJECCONVEDGE_NONE)&amp;(InjectedExternalTrigger$IpInstance)&amp;!(STM32F7)" Diagnostic=""/>
 		<PossibleValue Comment="EXTI line15" Value="ADC_EXTERNALTRIGINJECCONV_EXT_IT15"/>
 		<Description>EXTI Line15 is used for External-Trigger-for-Injected-conversion mode</Description>
+	</RefParameter>
+	<RefParameter Comment="External Trigger Source" DefaultValue="ADC_EXTERNALTRIGINJECCONV_T1_TRGO" Name="ExternalTrigInjecConv" Type="list" Group="ADCgroup">
+		<Condition Expression="STM32F7" Diagnostic=""/>
+    	<PossibleValue Comment="Timer 1 Trigger Out event" Value="ADC_EXTERNALTRIGINJECCONV_T1_TRGO" Condition="!TIM1_Exist" Diagnostic="" Action="Remove"/>
+		<PossibleValue Comment="Timer 1 Capture Compare 4 event" Value="ADC_EXTERNALTRIGINJECCONV_T1_CC4" Condition="!TIM1_Exist" Diagnostic="" Action="Remove"/>
+		<PossibleValue Comment="Timer 2 Trigger Out event" Value="ADC_EXTERNALTRIGINJECCONV_T2_TRGO" Condition="!TIM2_Exist" Diagnostic="" Action="Remove"/>
+		<PossibleValue Comment="Timer 2 Capture Compare 1 event" Value="ADC_EXTERNALTRIGINJECCONV_T2_CC1" Condition="!TIM2_Exist" Diagnostic="" Action="Remove"/>
+		<PossibleValue Comment="Timer 3 Capture Compare 4 event" Value="ADC_EXTERNALTRIGINJECCONV_T3_CC4" Condition="!TIM3_Exist" Diagnostic="" Action="Remove"/>
+		<PossibleValue Comment="Timer 4 Trigger Out event" Value="ADC_EXTERNALTRIGINJECCONV_T4_TRGO" Condition="!TIM4_Exist" Diagnostic="" Action="Remove"/>
+		<PossibleValue Comment="Timer 8 Capture Compare 4 event" Value="ADC_EXTERNALTRIGINJECCONV_T8_CC4" Condition="!TIM8_Exist" Diagnostic="" Action="Remove"/>
+		<PossibleValue Comment="Timer 1 Trigger 2 Out event" Value="ADC_EXTERNALTRIGINJECCONV_T1_TRGO2" Condition="!TIM1_Exist" Diagnostic="" Action="Remove"/>
+		<PossibleValue Comment="Timer 8 Trigger Out event" Value="ADC_EXTERNALTRIGINJECCONV_T8_TRGO" Condition="!TIM8_Exist" Diagnostic="" Action="Remove"/>
+		<PossibleValue Comment="Timer 8 Trigger 2 Out event" Value="ADC_EXTERNALTRIGINJECCONV_T8_TRGO2" Condition="!TIM8_Exist" Diagnostic="" Action="Remove"/>
+		<PossibleValue Comment="Timer 3 Capture Compare 3 event" Value="ADC_EXTERNALTRIGINJECCONV_T3_CC3" Condition="!TIM3_Exist" Diagnostic="" Action="Remove"/>	
+		<PossibleValue Comment="Timer 5 Trigger Out event" Value="ADC_EXTERNALTRIGINJECCONV_T5_TRGO" Condition="!TIM5_Exist" Diagnostic="" Action="Remove"/>
+		<PossibleValue Comment="Timer 3 Capture Compare 1 event" Value="ADC_EXTERNALTRIGINJECCONV_T3_CC1" Condition="!TIM3_Exist" Diagnostic="" Action="Remove"/>
+		<PossibleValue Comment="Timer 6 Trigger Out event" Value="ADC_EXTERNALTRIGINJECCONV_T6_TRGO" Condition="!TIM6_Exist" Diagnostic="" Action="Remove"/>
+		<Description>Select the external event used to trigger the start of conversion of an injected group</Description>
 	</RefParameter>
 	<RefParameter Comment="External Trigger Source" DefaultValue="ADC_EXTERNALTRIGINJECCONV_T1_CC4" Name="ExternalTrigInjecConv" Type="list" Group="ADCgroup">
 		<PossibleValue Comment="Timer 1 Capture Compare 4 event" Value="ADC_EXTERNALTRIGINJECCONV_T1_CC4" Condition="!TIM1_Exist" Diagnostic="" Action="Remove"/>
@@ -805,16 +852,18 @@
             <PossibleValue>ADC_CHANNEL_VBAT</PossibleValue>
         </Parameter>
     </RefMode>
-	<RefMode Name="External-Trigger-for-Injected-conversion" Comment="">
-		<!--<Parameter Name="ExternalTrigInjecConv">
+<!--	
+    <RefMode Name="External-Trigger-for-Injected-conversion" Comment="">
+		<Parameter Name="ExternalTrigInjecConv">
 			<PossibleValue>ADC_EXTERNALTRIGINJECCONV_EXT_IT15</PossibleValue>
-		</Parameter>-->
+		</Parameter>
 	</RefMode>
 	<RefMode Name="External-Trigger-for-Regular-conversion" Comment="">
-		<!--<Parameter Name="ExternalTrigConv">
+		<Parameter Name="ExternalTrigConv">
 			<PossibleValue>ADC_EXTERNALTRIGCONV_Ext_IT11</PossibleValue>
-		</Parameter>-->
+		</Parameter>
 	</RefMode>
+	-->
 	<ModeLogicOperator Name="OR">
 		<Mode Name="IN0">
 			<ModeLogicOperator Name="OR">
@@ -984,6 +1033,8 @@
 					<SignalLogicalOp Name="AND">
 						<Signal Name="TempSens_Input"/>
 					</SignalLogicalOp>
+					<Semaphore>Temperature_Sensor_$IpInstance</Semaphore>
+					<Condition Expression="!(Vbat_$IpInstance)" Diagnostic="Available only if Vbat Channel channel is not selected" />
 				</Mode>
 			</ModeLogicOperator>
 			<Semaphore>channelSelected$IpInstance</Semaphore>
@@ -1004,17 +1055,19 @@
 					<SignalLogicalOp Name="AND">
 						<Signal Name="Vbat_Input"/>
 					</SignalLogicalOp>
+					<Semaphore>Vbat_$IpInstance</Semaphore>
+			       <Condition Expression="!(Temperature_Sensor_$IpInstance)" Diagnostic="Available only if Temperature Sensor channel is not selected"/>
 				</Mode>
 			</ModeLogicOperator>
 			<Semaphore>channelSelected$IpInstance</Semaphore>
 		</Mode>
-		<Mode Name="External-Trigger-for-Injected-conversion">
+		<Mode Name="External-Trigger-for-Injected-conversion" RemoveCondition="STM32F7">
 			<ModeLogicOperator Name="XOR">
 				<Mode Name="External-Trigger-for-Injected-conversion">
 					<SignalLogicalOp Name="AND">
 						<Signal Name="EXTI15"/>
 					</SignalLogicalOp>
-					<Semaphore>InjectedExternalTrigger</Semaphore>
+					<Semaphore>InjectedExternalTrigger$IpInstance</Semaphore>
 					<Condition Expression="channelSelected$IpInstance" Diagnostic="Available only if at least one channel is selected"/>
 				</Mode>
 			</ModeLogicOperator>
@@ -1025,7 +1078,7 @@
 					<SignalLogicalOp Name="AND">
 						<Signal Name="EXTI11"/>
 					</SignalLogicalOp>
-					<Semaphore>RegularExternalTrigger</Semaphore>
+					<Semaphore>RegularExternalTrigger$IpInstance</Semaphore>
 					<Condition Expression="channelSelected$IpInstance" Diagnostic="Available only if at least one channel is selected"/>
 				</Mode>
 			</ModeLogicOperator>

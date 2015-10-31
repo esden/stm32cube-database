@@ -507,6 +507,7 @@
         <RefParameter Name="Pulse" Comment="Pulse (16 bits value)" DefaultValue="0" Max="65535" Min="0" Type="integer">
         <Condition Diagnostic="" Expression="!(($IpNumber=2)|($IpNumber=5))"/>
         </RefParameter>
+<!-- Semaphore_TIM_OCMODE_PWM1xxx and PWM2 are no more used ( see bug 314089) -->
         <RefParameter Name="OCMode_PWM" Comment="Mode" DefaultValue="TIM_OCMODE_PWM1" Type="list" >
             <Condition Diagnostic="" Expression="(($IpNumber=1)|($IpNumber=2)|($IpNumber=3)|($IpNumber=4)|($IpNumber=8)|($IpNumber=20))"/>
             <PossibleValue Value="TIM_OCMODE_PWM1" Comment="PWM mode 1" Semaphore="Semaphore_TIM_OCMODE_PWM1$IpInstance"/>
@@ -530,7 +531,10 @@
          </RefParameter>
         <RefParameter Name="OCFastMode_PWM" Comment="Fast Mode" DefaultValue="TIM_OCFAST_DISABLE" Type="list">
             <PossibleValue Value="TIM_OCFAST_DISABLE" Comment="Disable"/>
-            <PossibleValue Value="TIM_OCFAST_ENABLE" Comment="Enable" Condition="!(Semaphore_TIM_OCMODE_PWM1$IpInstance|Semaphore_TIM_OCMODE_PWM2$IpInstance)" Diagnostic="Fast mode is only available in Modes : PWM Mode 1 or PWM mode 2" Action="Disable"/>
+            <PossibleValue Value="TIM_OCFAST_ENABLE" Comment="Enable" />
+<!-- Semaphore_TIM_OCMODE_PWM1xxx and PWM2 are no more used ( see bug 314089) The condition is removed since the correction of that bug prevented to keep compatibility with previous version
+            <PossibleValue Value="TIM_OCFAST_ENABLE" Comment="Enable" Condition="!(Semaphore_TIM_OCMODE_PWM1$IpInstance|Semaphore_TIM_OCMODE_PWM2$IpInstance)" Diagnostic="Fast mode is only available in Modes : PWM Mode 1 or PWM mode 2" Action="Disable"/> Before revert of bug 314089
+-->
          </RefParameter>
         <RefParameter Name="DefaultOCFastMode" Comment="Fast Mode" DefaultValue="TIM_OCFAST_DISABLE" Type="list" Visible="false">
             <PossibleValue Value="TIM_OCFAST_DISABLE" Comment="Disable"/>
@@ -1171,6 +1175,7 @@
    <RefParameter Name="BreakState" Comment="BRK State" DefaultValue="TIM_BREAK_ENABLE" Type="list" Group="Break And Dead Time management - BRK Configuration">
     <Condition Diagnostic="" Expression="((($IpNumber=1)|($IpNumber=8)|($IpNumber=20)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17))&amp; Semaphore_output_Channel$IpInstance &amp; Semaphore_Activate_Break_Input$IpInstance)"/>
         <PossibleValue Value="TIM_BREAK_ENABLE" Comment="Enable"/>
+        <PossibleValue Value="TIM_BREAK_DISABLE" Comment="Disable"/>
     </RefParameter>
     <RefParameter Name="BreakState" Comment="BRK State" DefaultValue="null" Type="list" Group="Break And Dead Time management - BRK Configuration" Visible="false">
     <Condition Diagnostic="" Expression="!((($IpNumber=1)|($IpNumber=8)|($IpNumber=20)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17))&amp; Semaphore_output_Channel$IpInstance )"/>
@@ -1183,6 +1188,7 @@
    <RefParameter Name="Break2State" Comment="BRK2 State" DefaultValue="TIM_BREAK2_ENABLE" Type="list" Group="Break And Dead Time management - BRK2 Configuration">
     <Condition Diagnostic="" Expression="((($IpNumber=1)|($IpNumber=8)|($IpNumber=20))&amp; Semaphore_output_Channel$IpInstance &amp; Semaphore_Activate_Break_Input2$IpInstance)"/>
         <PossibleValue Value="TIM_BREAK2_ENABLE" Comment="Enable"/>
+        <PossibleValue Value="TIM_BREAK2_DISABLE" Comment="Disable"/>
     </RefParameter>
     <RefParameter Name="Break2State" Comment="BRK2 State" DefaultValue="null" Type="list" Group="Break And Dead Time management - BRK2 Configuration" Visible="false">
     <Condition Diagnostic="" Expression="!((($IpNumber=1)|($IpNumber=8)|($IpNumber=20))&amp; Semaphore_output_Channel$IpInstance)"/>
@@ -1224,6 +1230,11 @@
         <Condition Diagnostic="" Expression="!((($IpNumber=1)|($IpNumber=8)|($IpNumber=20)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17))&amp; Semaphore_output_Channel$IpInstance )"/>
     </RefParameter>
 <!-- ********************************Clear Input*********************************-->
+<!--BEGIN correction Bug 318788 -->
+    <RefParameter Name="ClearInputState" Comment="Clear Input State" DefaultValue="ENABLE" Type="list" Group="Clear Input" Visible="false">
+        <PossibleValue Value="ENABLE" Comment="enable"/>
+    </RefParameter>
+<!--END correction Bug 318788 -->
     <RefParameter Name="ClearInputSource" Comment="Clear Input Source" DefaultValue="TIM_CLEARINPUTSOURCE_ETR" Type="list" Group="Clear Input" Visible="true">
         <Condition Diagnostic="ETR selected as clearing source" Expression="(Semaphore_ETRasClearingSource$IpInstance)"/>
         <PossibleValue Value="TIM_CLEARINPUTSOURCE_ETR" Comment="Input Source ETR"/>

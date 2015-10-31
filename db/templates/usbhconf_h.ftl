@@ -2,7 +2,6 @@
 /**
   ******************************************************************************
   * @file           : ${name}
-  * @date           : ${date}
   * @version        : ${version}
 [#--  * @packageVersion : ${fwVersion} --]
   * @brief          : Header for usbh_conf file.
@@ -67,6 +66,9 @@ extern ${variable.value} ${variable.name};
 [#assign instName = SWIP.ipName]   
 [#assign fileName = SWIP.fileName]   
 [#assign version = SWIP.version]   
+[#assign os_priority = ""]
+[#assign os_stacksize = ""]
+
 
 /**
 	MiddleWare name : ${instName}
@@ -75,8 +77,16 @@ extern ${variable.value} ${variable.name};
 */
 [#if SWIP.defines??]
 	[#list SWIP.defines as definition]	
+[#if definition.name="USBH_PROCESS_PRIO"]
+	[#assign os_priority = definition.value]
+[/#if]
+[#if definition.name="USBH_PROCESS_STACK_SIZE"]
+	[#assign os_stacksize = definition.value]
+[/#if]	
+[#if definition.name!="USBH_PROCESS_STACK_SIZE" && definition.name!="USBH_PROCESS_PRIO"]	
 /*---------- [#if definition.comments??]${definition.comments} [/#if] -----------*/
 #define ${definition.name} #t#t ${definition.value} 
+[/#if]
 [#if definition.description??]${definition.description} [/#if]
 	[/#list]
 [/#if]
@@ -84,6 +94,7 @@ extern ${variable.value} ${variable.name};
 
 
 [/#list]
+
 
 /****************************************/
 /* #define for FS and HS identification */
@@ -95,7 +106,8 @@ extern ${variable.value} ${variable.name};
   */ 
 #if (USBH_USE_OS == 1)
   #include "cmsis_os.h"
-  #define   USBH_PROCESS_PRIO    osPriorityNormal
+  #define   USBH_PROCESS_PRIO          ${os_priority}
+  #define   USBH_PROCESS_STACK_SIZE    ((uint16_t)${os_stacksize})
 #endif    
 
  /* Memory management macros */   

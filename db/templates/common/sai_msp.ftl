@@ -1,4 +1,19 @@
 [#ftl]
+
+[#compress]
+[#-- Add global dma Handler --]
+[#list IPdatas as IP]  
+[#list IP.configModelList as instanceData]
+    [#if instanceData.dmaHandel??]
+        [#list instanceData.dmaHandel as dHandle]
+            extern ${dHandle};#n
+        [/#list]
+    [/#if]
+[/#list]
+[/#list]
+
+[/#compress]
+
 [#list IPdatas as IP]  
 [#assign ipvar = IP]
 
@@ -195,24 +210,45 @@
             [#assign gpioExistB = true]
             [/#if]            
         [/#list]
-        [/#if]    
-   
+        [/#if] 
+[#if gpioExistA]   
+ #t#tif(hsai->Instance==${ipName}_Block_A)  
+#t#t{    
     [#if serviceType=="Init"]  #t#t/* Peripheral clock enable */
+#t#tif (${ipName}_client == 0)
+#t#t{
            [#if initService.clock??]
             [#list initService.clock?split(';') as clock]
-               #t#t ${clock}(); 
+               #t#t#t ${clock}(); 
             [/#list]
             [#else]
-         #t#t__${ipName}_CLK_ENABLE();
+         #t#t#t__${ipName}_CLK_ENABLE();
            [/#if]
-    [#else]           
-        [#if (gpioExistA?? && !gpioExistB??)||(!gpioExistA?? && gpioExistB??)] #t#t/* Peripheral clock disable */ #n #t#t__${ipName}_CLK_DISABLE(); [#--  we should not disable the SAI clock if there are 2 blocks--] [/#if]
-    [/#if]
-    [#if gpioExistA]
-#t#tif(hsai->Instance==SAI1_Block_A)
-#t#t{
-#t#t[@generateConfigCode ipName=ipName type=serviceType serviceName="gpioA" instHandler=instHandler tabN=tabN/]
+[#if nvicExist]
+            [#if initService.nvic??&&initService.nvic?size>0]#n#t#t/* Peripheral interrupt init*/
+                [#list initService.nvic as initVector]
+                    #t#tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
+                    #t#tHAL_NVIC_EnableIRQ(${initVector.vector});
+                [/#list]
+            [/#if]
+        [/#if]
+#t#t}
+#t#t${ipName}_client ++;
+    [#else]    
+#t#t${ipName}_client --;
+#t#tif (${ipName}_client == 0)
+#t#t#t{       
+        #t#t#t/* Peripheral clock disable */ #n #t#t#t__${ipName}_CLK_DISABLE();
+[#if initService.nvic??]
+                [#list initService.nvic as initVector]                   
+                    #t#t#tHAL_NVIC_DisableIRQ(${initVector.vector});
+                [/#list]
+            [/#if]
+#t#t#t}
+    [/#if] 
 
+  
+#t#t[@generateConfigCode ipName=ipName type=serviceType serviceName="gpioA" instHandler=instHandler tabN=tabN/]
 [#if dmaExistA &&  serviceType=="Init"]#n#t#t/* Peripheral DMA init*/
 #t#t[@generateConfigCode ipName=ipName type=serviceType serviceName="dmaA" instHandler=instHandler tabN=tabN/]
 [#else]
@@ -240,9 +276,44 @@
  [/#if]
 #t#t}	
 [/#if]
+
 [#if gpioExistB]
-#t#tif(hsai->Instance==SAI1_Block_B)
+#t#tif(hsai->Instance==${ipName}_Block_B)
 #t#t{
+    [#if serviceType=="Init"]  #t#t#t/* Peripheral clock enable */
+#t#t#tif (${ipName}_client == 0)
+#t#t#t{
+           [#if initService.clock??]
+            [#list initService.clock?split(';') as clock]
+               #t#t#t ${clock}(); 
+            [/#list]
+            [#else]
+         #t#t#t__${ipName}_CLK_ENABLE();
+           [/#if]
+[#if nvicExist]
+            [#if initService.nvic??&&initService.nvic?size>0]#n#t#t#t/* Peripheral interrupt init*/
+                [#list initService.nvic as initVector]
+                    #t#t#tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
+                    #t#t#tHAL_NVIC_EnableIRQ(${initVector.vector});
+                [/#list]
+            [/#if]
+        [/#if]
+#t#t#t}
+#t#t${ipName}_client ++;
+    [#else]         
+#t#t${ipName}_client --;
+#t#t#tif (${ipName}_client == 0)
+#t#t#t{  
+        #t#t#t/* Peripheral clock disable */#n#t#t#t__${ipName}_CLK_DISABLE(); 
+[#if initService.nvic??]
+                [#list initService.nvic as initVector]                   
+                    #t#t#tHAL_NVIC_DisableIRQ(${initVector.vector});
+                [/#list]
+            [/#if]
+#t#t#t}
+    [/#if] 
+
+
 #t#t[@generateConfigCode ipName=ipName type=serviceType serviceName="gpioB" instHandler=instHandler tabN=tabN/]	
 [#if dmaExistB && serviceType=="Init"]#n#t#t/* Peripheral DMA init*/
 #t#t[@generateConfigCode ipName=ipName type=serviceType serviceName="dmaB" instHandler=instHandler tabN=tabN/]
@@ -267,22 +338,8 @@
 [/#if]
 #t#t}
 [/#if]
-    [#if serviceType=="Init"]     
-        [#if nvicExist]
-            [#if initService.nvic??&&initService.nvic?size>0]#n#t#t/* Peripheral interrupt init*/
-                [#list initService.nvic as initVector]
-                    #t#tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
-                    #t#tHAL_NVIC_EnableIRQ(${initVector.vector});
-                [/#list]
-            [/#if]
-        [/#if]
-    [#else] [#-- else serviceType = DeInit --]
-            [#if initService.nvic??]
-                [#list initService.nvic as initVector]                   
-                    #t#tHAL_NVIC_DisableIRQ(${initVector.vector});
-                [/#list]
-            [/#if]
-       [/#if]
+
+
 [/#macro]
 [#-- End macro add service code --]
 
@@ -294,6 +351,9 @@
 [#compress]
 [#list ipvar.initCallBacks.entrySet() as entry]
 [#assign instanceList = entry.value]
+[#list instanceList as saiInst]
+int ${saiInst}_client =0;
+[/#list]
 [#assign mode=entry.key?replace("_MspInit","")?replace("_BspInit","")?replace("HAL_","")]
 
 [#assign ipHandler = "h" + mode?lower_case]
@@ -316,7 +376,7 @@
                     [#list method.arguments as fargument]
                         [#if fargument.genericType == "struct" && fargument.context??]
                             [#if fargument.context=="global"]
-#tstatic ${fargument.typeName} ${fargument.name}_${dmaRequest.dmaRequestName?lower_case};
+[#--#tstatic ${fargument.typeName} ${fargument.name}_${dmaRequest.dmaRequestName?lower_case};--]
                             [/#if]
                         [/#if]
                     [/#list]
@@ -351,12 +411,34 @@
                 [#assign v = v + " "+ variable.name/]	
             [/#if]	
         [/#list]  
-[/#if][/#if]
+[/#if]
+[/#if]
+[#if services.gpioA??][#assign service=services.gpioA]
+        [#list service.variables as variable] [#-- variables declaration --]
+            [#if v?contains(variable.name)]
+            [#-- no matches--]
+            [#else]
+#t${variable.value} ${variable.name};
+                [#assign v = v + " "+ variable.name/]	
+            [/#if]	
+        [/#list]  
+[#else][#if services.gpioB??][#assign service=services.gpioB]
+        [#list service.variables as variable] [#-- variables declaration --]
+            [#if v?contains(variable.name)]
+            [#-- no matches--]
+            [#else]
+#t${variable.value} ${variable.name};
+                [#assign v = v + " "+ variable.name/]	
+            [/#if]	
+        [/#list]  
+[/#if]
+[/#if]
 [/#list]
 [#-- --]
-    [#if words[0]??]
-    [@generateServiceCode ipName=words[0] serviceType="Init" modeName=mode instHandler=ipHandler tabN=2/] 
-    [/#if]
+[#list words as sai]
+/* ${sai} */
+    [@generateServiceCode ipName=sai serviceType="Init" modeName=mode instHandler=ipHandler tabN=2/] 
+[/#list] 
 }
 [/#list]
 [/#compress]
@@ -375,27 +457,12 @@
 [#assign words = instanceList]
 {
 #n
-[#if words?size > 1] [#-- Check if there is more than one ip instance--]
- [#assign deInitService = getDeInitServiceMode(words[0])]    
-[@generateServiceCode ipName=words[0] serviceType="DeInit" modeName=mode instHandler=ipHandler tabN=2/] 
-#t}
-  [#assign i = 0]
-    [#list words as inst]
-        [#if i>0]
-#telse if(h${mode?lower_case}->Instance==${words[i]})
-#t{    
-[#@generateServiceCode ipName=words[i] serviceType="DeInit" modeName=mode instHandler=ipHandler tabN=2/] 
-#t}
-        [/#if]
-        [#assign i = i + 1]
-    [/#list]
-[#else]
-    [#-- only one ip instance ${instanceList}--]
-[#if words[0]??]
-[@generateServiceCode ipName=words[0] serviceType="DeInit" modeName=mode instHandler=ipHandler tabN=2/] 
-[/#if]
+
+[#list words as sai]
+/* ${sai} */
+    [@generateServiceCode ipName=sai serviceType="DeInit" modeName=mode instHandler=ipHandler tabN=2/] 
+[/#list]
 }
-[/#if]
 [/#list]
 [/#compress]
 [/#if]

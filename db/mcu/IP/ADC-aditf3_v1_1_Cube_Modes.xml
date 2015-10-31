@@ -21,12 +21,17 @@
     
     <!-- ADC Instance parameter needed in ADC_HandleTypeDef structure in the HAL -->
     <RefParameter Comment="ADC instance" DefaultValue="ADC1" Name="Instance" Type="list" Group="ADCgroup" Visible="false"/>
-        
+       		
+	<RefParameter Comment="Fadc Constraint" DefaultValue="4000000" Max="4000000" Min="480000" Name="FadcConstraint" Type="double" Visible="false">
+	<Condition Expression="(RCC:PWR_Regulator_Voltage_Scale = PWR_REGULATOR_VOLTAGE_SCALE3)" Diagnostic=""/>
+	</RefParameter>
+    <RefParameter Comment="Fadc Constraint" DefaultValue="16000000" Max="16000000" Min="480000" Name="FadcConstraint" Type="double" Visible="false"/>
+	
     <!-- Possible value of Prescaler parameter -->
     <RefParameter Comment="Clock Prescaler" DefaultValue="ADC_CLOCK_ASYNC_DIV1" Name="ClockPrescaler" Type="list" Group="ADCgroup">
-        <PossibleValue Comment="Asynchronous clock mode divided by 1" Value="ADC_CLOCK_ASYNC_DIV1"/>
-        <PossibleValue Comment="Asynchronous clock mode divided by 2" Value="ADC_CLOCK_ASYNC_DIV2"/>
-        <PossibleValue Comment="Asynchronous clock mode divided by 4" Value="ADC_CLOCK_ASYNC_DIV4"/>
+        <PossibleValue Comment="Asynchronous clock mode divided by 1" Value="ADC_CLOCK_ASYNC_DIV1" Condition="ADC_CLOCK_ASYNC_DIV1_$IpInstance" Diagnostic="Prescaler divider not respecting Fadc Min Max Constraint" Action="DISABLE"/>
+        <PossibleValue Comment="Asynchronous clock mode divided by 2" Value="ADC_CLOCK_ASYNC_DIV2" Condition="ADC_CLOCK_ASYNC_DIV2_$IpInstance" Diagnostic="Prescaler divider not respecting Fadc Min Max Constraint" Action="DISABLE"/>
+        <PossibleValue Comment="Asynchronous clock mode divided by 4" Value="ADC_CLOCK_ASYNC_DIV4" Condition="ADC_CLOCK_ASYNC_DIV4_$IpInstance" Diagnostic="Prescaler divider not respecting Fadc Min Max Constraint" Action="DISABLE"/>
         <Description>frequency of the clock to the ADC. The clock is common for all the ADCs.</Description>
     </RefParameter>
 	
@@ -190,8 +195,8 @@
         <PossibleValue Comment="Software Trigger" Value="ADC_SOFTWARE_START"/>
     </RefParameter>
     <RefParameter Comment="External Trigger Conversion Source" DefaultValue="ADC_EXTERNALTRIGCONV_EXT_IT11" Name="ExternalTrigConv" Type="list" Group="ADCgroup">
-        <Condition Expression="!(ExternalTrigConvEdge=ADC_EXTERNALTRIGCONVEDGE_NONE)&amp;(RegularExternalTrigger)" Diagnostic="EXTI Line11 is used for External-Trigger-for-Regular-conversion mode."/>
-        <PossibleValue Comment="EXTI Line11" Value="ADC_EXTERNALTRIGCONV_Ext_IT11"/>
+        <Condition Expression="!(ExternalTrigConvEdge=ADC_EXTERNALTRIGCONVEDGE_NONE)&amp;(RegularExternalTrigger$IpInstance)" Diagnostic="EXTI Line11 is used for External-Trigger-for-Regular-conversion mode."/>
+        <PossibleValue Comment="EXTI Line11" Value="ADC_EXTERNALTRIGCONV_EXT_IT11"/>
     </RefParameter>
     <RefParameter Comment="External Trigger Conversion Source" DefaultValue="ADC_EXTERNALTRIGCONV_T9_CC2" Name="ExternalTrigConv" Type="list" Group="ADCgroup">
         <PossibleValue Comment="Timer 2 Capture Compare 3 event" Value="ADC_EXTERNALTRIGCONV_T2_CC3"  Condition="!TIM2_Exist" Diagnostic="" Action="Remove"/>
@@ -325,7 +330,7 @@
         <Condition Expression="(ExternalTrigInjecConvEdge=ADC_EXTERNALTRIGINJECCONV_EDGE_NONE)" Diagnostic=""/>
     </RefParameter>
     <RefParameter Comment="External Trigger Source" DefaultValue="ADC_EXTERNALTRIGINJECCONV_EXT_IT15" Name="ExternalTrigInjecConv" Type="list" Group="ADCgroup">
-        <Condition Expression="!(ExternalTrigInjecConvEdge=ADC_EXTERNALTRIGINJECCONV_EDGE_NONE)&amp;(InjectedExternalTrigger)&amp;(USE_ADC1|USE_ADC2)" Diagnostic=""/>
+        <Condition Expression="!(ExternalTrigInjecConvEdge=ADC_EXTERNALTRIGINJECCONV_EDGE_NONE)&amp;(InjectedExternalTrigger$IpInstance)&amp;(USE_ADC1|USE_ADC2)" Diagnostic=""/>
         <PossibleValue Comment="EXTI line15" Value="ADC_EXTERNALTRIGINJECCONV_Ext_IT15"/>
         <Description>EXTI Line15 is used for External-Trigger-for-Injected-conversion mode</Description>
     </RefParameter>
@@ -1607,14 +1612,14 @@
                         <Signal Name="EXTI15"/>
                     </SignalLogicalOp>
                     <Condition Expression="channelSelected$IpInstance" Diagnostic="Available only if at least one channel is selected"/>
-                    <Semaphore>InjectedExternalTrigger</Semaphore>
+                    <Semaphore>InjectedExternalTrigger$IpInstance</Semaphore>
                 </Mode>
                 <Mode Name="EXTI11-Regular-Conversion-Trigger" UserName="Regular Trigger">
                     <SignalLogicalOp Name="AND">
                         <Signal Name="EXTI11"/>
                     </SignalLogicalOp>
                     <Condition Expression="channelSelected$IpInstance" Diagnostic="Available only if at least one channel is selected"/>
-                    <Semaphore>RegularExternalTrigger</Semaphore>
+                    <Semaphore>RegularExternalTrigger$IpInstance</Semaphore>
                 </Mode>
                 <Mode Name="EXTI15-Injected-Conversion-Trigger" UserName="Injected and Regular Trigger">
                     <SignalLogicalOp Name="AND">
@@ -1622,8 +1627,8 @@
                         <Signal Name="EXTI11"/>
                     </SignalLogicalOp>
                     <Condition Expression="channelSelected$IpInstance" Diagnostic="Available only if at least one channel is selected"/>
-                    <Semaphore>InjectedExternalTrigger</Semaphore>
-                    <Semaphore>RegularExternalTrigger</Semaphore>
+                    <Semaphore>InjectedExternalTrigger$IpInstance</Semaphore>
+                    <Semaphore>RegularExternalTrigger$IpInstance</Semaphore>
                 </Mode>
             </ModeLogicOperator>
         </Mode>

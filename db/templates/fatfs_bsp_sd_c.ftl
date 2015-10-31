@@ -2,9 +2,6 @@
 /**
  ******************************************************************************
   * @file    bsp_driver_sd.c (based on stm324x9i_eval_sd.c)
-  * @author  MCD Teams
-  * @version V1.0.0
-  * @date    ${date}
   * @brief   This file includes a generic uSD card driver.
   ******************************************************************************
   *
@@ -34,7 +31,7 @@
   *
   ******************************************************************************
   */
-
+[#if SWIPdatas??]
 [#list SWIPdatas as SWIP]  
 [#if SWIP.defines??]
  [#list SWIP.defines as definition] 
@@ -50,6 +47,7 @@
  [/#list]
 [/#if]
 [/#list]
+[/#if]
 /* USER CODE BEGIN 0 */
 /* Includes ------------------------------------------------------------------*/
 #include "bsp_driver_sd.h"
@@ -181,10 +179,6 @@ uint8_t BSP_SD_ReadBlocks_DMA(uint32_t *pData, uint64_t ReadAddr, uint32_t Block
   {
     SD_state = MSD_ERROR;
   }
-  else
-  {
-    SD_state = MSD_OK;
-  }
   
   /* Wait until transfer is complete */
   if(SD_state == MSD_OK)
@@ -218,10 +212,6 @@ uint8_t BSP_SD_WriteBlocks_DMA(uint32_t *pData, uint64_t WriteAddr, uint32_t Blo
   if(HAL_SD_WriteBlocks_DMA(&hsd, pData, WriteAddr, BlockSize, NumOfBlocks) != SD_OK)  
   {
     SD_state = MSD_ERROR;
-  }
-  else
-  {
-    SD_state = MSD_OK;
   }
   
   /* Wait until transfer is complete */
@@ -312,6 +302,7 @@ void BSP_SD_GetCardInfo(HAL_SD_CardInfoTypedef* CardInfo)
   /* Get SD card Information */
   HAL_SD_Get_CardInfo(&hsd, CardInfo);
 }
+/* USER CODE END 0 */
 
 /**
  * @brief  Detects if SD card is correctly plugged in the memory slot or not.
@@ -322,10 +313,29 @@ uint8_t BSP_SD_IsDetected(void)
 {
   __IO uint8_t status = SD_PRESENT;
 
-  /* TBI: add user code here depending on the hardware configuration used */
+  [#if Platform??]
+	[#if GPIO_IP??] 
+  /* Check SD card detect pin */
+  if (HAL_GPIO_ReadPin(SD_PORT,SD_PIN) == GPIO_PIN_RESET) {
+    status = SD_NOT_PRESENT;
+  }
+    [#else]
+  /* USER CODE BEGIN 1 */
+  /* user code can be inserted here */
+  /* USER CODE END 1 */    	
+	[/#if]
+  [#else]
+  /* USER CODE BEGIN 1 */
+  /* user code can be inserted here */
+  /* USER CODE END 1 */    
+  [/#if]
   
   return status;
 }
-/* USER CODE END 0 */
+
+/* USER CODE BEGIN AdditionalCode */
+/* user code can be inserted here */
+/* USER CODE END AdditionalCode */
+
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

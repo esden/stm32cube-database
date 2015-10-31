@@ -1,9 +1,8 @@
 [#ftl]
 /**
   ******************************************************************************
-  * File Name          : fatfs.c
-  * Date               : ${date}
-  * Description        : Code for fatfs applications
+  * @file   fatfs.c
+  * @brief  Code for fatfs applications
   ******************************************************************************
   *
   * COPYRIGHT(c) ${year} STMicroelectronics

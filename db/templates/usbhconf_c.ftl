@@ -2,7 +2,6 @@
 /**
   ******************************************************************************
   * @file            : ${name}
-  * @date            : ${date} 
   * @version         : ${version}
  [#-- * @packageVersion  : ${fwVersion} --]
   * @brief           : This file implements the board support package for the USB host library
@@ -40,6 +39,13 @@
 [/#list]
 [/#if]
 #include "usbh_core.h"
+[#assign BspPlatform = "false"]
+[#if Platform??]
+	[#if Platform = "true"]
+	[#assign BspPlatform = "true"]
+#include "usbh_platform.h"
+	[/#if]
+[/#if]	
 [#assign handleNameFS = ""]
 [#assign handleNameHS = ""]
 [#assign instanceNb = 0]
@@ -51,9 +57,9 @@
 [#-- Global variables --]
 [#if SWIP.variables??]
 	[#list SWIP.variables as variable]
-		[#-- extern ${variable.type} --][#if variable.value??][#--${variable.value}; --]
+		[#-- extern ${variable.type} --][#if variable.value??][#--${variable.value};--]
 		[#if variable.value?contains("FS")][#assign handleNameFS = "FS"][/#if]
-		[#if variable.value?contains("HS")][#assign handleNameHS = "HS"][/#if]
+		[#if variable.value?contains("HS")][#assign handleNameHS = "HS"][/#if]		
 		[/#if]
 	[/#list]
 [/#if]
@@ -376,23 +382,36 @@ USBH_URBStateTypeDef  USBH_LL_GetURBState (USBH_HandleTypeDef *phost, uint8_t pi
   */
 USBH_StatusTypeDef  USBH_LL_DriverVBUS (USBH_HandleTypeDef *phost, uint8_t state)
 { 
+[#if BspPlatform == "true"]
+[#if handleNameFS == "FS"]
+  if (phost->id == HOST_FS) {
+    MX_DriverVbusFS(state);
+  }
+[/#if] 
+[#if handleNameHS == "HS"]
+  if (phost->id == HOST_HS) {
+    MX_DriverVbusHS(state);
+  }
+[/#if]  
+[/#if]  
+[#if BspPlatform == "false"]
  /* USER CODE BEGIN 0 */ 
  /* USER CODE END 0 */
   if(state == 0)
   {
     /* Drive high Charge pump */
     /* USER CODE BEGIN 1 */ 
-    /* ToDo: Add IOE driver control */
+    /* ToDo: Add IOE driver control */	
     /* USER CODE END 1 */ 
   }
   else
   {
     /* Drive low Charge pump */
     /* USER CODE BEGIN 2 */
-    /* ToDo: Add IOE driver control */
+    /* ToDo: Add IOE driver control */	
     /* USER CODE END 2 */
   }
-
+[/#if]
   HAL_Delay(200);
   return USBH_OK;  
 }

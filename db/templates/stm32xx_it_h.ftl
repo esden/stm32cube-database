@@ -2,7 +2,6 @@
 /**
   ******************************************************************************
   * @file    ${FamilyName?lower_case}xx_it.h
-  * @date    ${date}
   * @brief   This file contains the headers of the interrupt handlers.
   ******************************************************************************
   *

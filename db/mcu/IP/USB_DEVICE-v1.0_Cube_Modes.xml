@@ -26,7 +26,18 @@
 		<Description>Maximum size of string descriptors</Description>
 	</RefParameter>
 	
-	<RefParameter Name="USBD_SUPPORT_USER_STRING" Comment="USBD_SUPPORT_USER_STRING (Enable user string descriptor)" DefaultValue="0"  Type="list" Group="Basic Parameters">
+	<!-- Tracker 312690 -->
+	<RefParameter Name="USBD_SUPPORT_USER_STRING" Comment="USBD_SUPPORT_USER_STRING (Enable user string descriptor)" DefaultValue="1"  Type="list" Group="Basic Parameters">
+		<Condition Expression="VirtualModeFS=Dfu_FS|VirtualModeHS=Dfu_HS" Diagnostic=""/>
+		<PossibleValue Comment="Enabled" Value="1"/>
+		<Description>Enable User string support</Description>
+	</RefParameter>
+	<RefParameter Name="USBD_SUPPORT_USER_STRING" Comment="USBD_SUPPORT_USER_STRING (Enable user string descriptor)" DefaultValue="1"  Type="list" Group="Basic Parameters">
+		<Condition Expression="VirtualModeFS=Custom_Hid_FS | VirtualModeHS=Custom_Hid_HS" Diagnostic=""/>
+		<PossibleValue Comment="Enabled" Value="1"/>
+		<Description>Enable User string support</Description>
+	</RefParameter>
+	<RefParameter Name="USBD_SUPPORT_USER_STRING" Comment="USBD_SUPPORT_USER_STRING (Enable user string descriptor)" DefaultValue="0"  Type="list" Group="Basic Parameters">		
 		<PossibleValue Comment="Disabled" Value="0"/>
 		<PossibleValue Comment="Enabled" Value="1"/>
 		<Description>Enable User string support</Description>
@@ -52,15 +63,48 @@
 	</RefParameter>
 	
 	<!-- Link Power Management -->
-	<RefParameter Name="USBD_LPM_ENABLED" Comment="USBD_LPM_ENABLED (Link Power Management)" DefaultValue="1" Type="integer" Min="1" Max="1" Group="Basic Parameters" Visible="true">
-		<Condition Expression="STM32F446 | STM32L4xx" Diagnostic=""/>
-		<Description>The Link Power mmanagement available for STM32F446 and STM32L4xx</Description>	
+	<RefParameter Name="USBD_LPM_ENABLED" Comment="USBD_LPM_ENABLED (Link Power Management)" DefaultValue="1" Type="list"  Group="Basic Parameters" Visible="true">		
+		<Condition Expression="STM32F446 | STM32L4xx | STM32F7" Diagnostic=""/>
+		<PossibleValue Value="0" Comment="0: Link Power Management not supported"/>
+		<PossibleValue Value="1" Comment="1: Link Power Management supported"/>
+		<Description>The Link Power mmanagement available for STM32F446, STM32F7 and STM32L4 families</Description>	
 	</RefParameter>
-	<RefParameter Name="USBD_LPM_ENABLED" Comment="USBD_LPM_ENABLED (Link Power Management)" DefaultValue="0" Type="integer" Min="0" Max="0" Group="Basic Parameters" Visible="false">		
-		<Description>The Link Power mmanagement available for STM32F446 and STM32L4xx</Description>	
+	<RefParameter Name="USBD_LPM_ENABLED" Comment="USBD_LPM_ENABLED (Link Power Management)" DefaultValue="0" Type="list" Group="Basic Parameters" Visible="false">		
+		<Description>The Link Power mmanagement available for STM32F446, STM32F7 and STM32L4 families</Description>	
 	</RefParameter>
 	
 	<!-- Specific RefParameter for mono and multi instance -->
+	<!-- Virtual Mode Parameter, to define RefParameter in function of RefMode -->
+	<RefParameter Comment="" DefaultValue="Ccid" Name="VirtualMode" Type="list" Visible="false" Group="Basic Parameters" >
+		<PossibleValue Comment="" Value="Audio"/>
+		<PossibleValue Comment="" Value="Ccid"/>
+		<PossibleValue Comment="" Value="Cdc"/>
+		<PossibleValue Comment="" Value="Dfu"/>
+		<PossibleValue Comment="" Value="Hid"/>
+		<PossibleValue Comment="" Value="CustomHid"/>
+		<PossibleValue Comment="" Value="Msc"/>							
+		<PossibleValue Comment="" Value="Mtp"/>
+	</RefParameter>
+	<RefParameter Comment="" DefaultValue="Audio" Name="VirtualModeHS" Type="list" Visible="false" Group="Basic Parameters" >
+		<PossibleValue Comment="" Value="Audio_HS"/>
+		<PossibleValue Comment="" Value="Ccid_HS"/>
+		<PossibleValue Comment="" Value="Cdc_HS"/>
+		<PossibleValue Comment="" Value="Dfu_HS"/>
+		<PossibleValue Comment="" Value="Hid_HS"/>
+		<PossibleValue Comment="" Value="Custom_Hid_HS"/>
+		<PossibleValue Comment="" Value="Msc_HS"/>							
+		<PossibleValue Comment="" Value="Mtp_HS"/>
+	</RefParameter>
+	<RefParameter Comment="" DefaultValue="Audio" Name="VirtualModeFS" Type="list" Visible="false" Group="Basic Parameters" >
+		<PossibleValue Comment="" Value="Audio_FS"/>
+		<PossibleValue Comment="" Value="Ccid_FS"/>
+		<PossibleValue Comment="" Value="Cdc_FS"/>
+		<PossibleValue Comment="" Value="Dfu_FS"/>
+		<PossibleValue Comment="" Value="Hid_FS"/>
+		<PossibleValue Comment="" Value="Custom_Hid_FS"/>
+		<PossibleValue Comment="" Value="Msc_FS"/>							
+		<PossibleValue Comment="" Value="Mtp_FS"/>
+	</RefParameter>
 	<!-- Device Descriptors Configuration -->
 	<RefParameter Name="VID" Comment="VID (Vendor IDentifier)" DefaultValue="1155" Type="integer" Min="0" Max="65535" Group="Device Descriptor" TabName="Device Descriptor">
 		<Description>The Vendor Identfier value present on the Device Descriptor</Description>
@@ -82,36 +126,28 @@
 	<!-- End -->
 	
 	<!-- Device Descriptors Configuration HS -->
-	<RefParameter Name="PID_HS" Comment="PID (Product IDentifier)" DefaultValue="22336" Type="integer" Min="0" Max="65535" Group="Device Descriptor HS" TabName="Device Descriptor">
-		<Condition Expression="VirtualModeHS = Audio_HS" Diagnostic=""/>	
+	<RefParameter Name="PID_AUDIO_HS" Comment="PID (Product IDentifier)" DefaultValue="22336" Type="integer" Min="0" Max="65535" Group="Device Descriptor HS" TabName="Device Descriptor">	
 		<Description>The Product Identfier value present on the Device Descriptor</Description>
 	</RefParameter>
-	<RefParameter Name="PID_HS" Comment="PID (Product IDentifier)" DefaultValue="8453" Type="integer" Min="0" Max="65535" Group="Device Descriptor HS" TabName="Device Descriptor">
-		<Condition Expression="VirtualModeHS = Ccid_HS" Diagnostic=""/>	
+	<RefParameter Name="PID_CCID_HS" Comment="PID (Product IDentifier)" DefaultValue="8453" Type="integer" Min="0" Max="65535" Group="Device Descriptor HS" TabName="Device Descriptor">
 		<Description>The Product Identfier value present on the Device Descriptor</Description>
 	</RefParameter>
-	<RefParameter Name="PID_HS" Comment="PID (Product IDentifier)" DefaultValue="22336" Type="integer" Min="0" Max="65535" Group="Device Descriptor HS" TabName="Device Descriptor">
-		<Condition Expression="VirtualModeHS = Cdc_HS" Diagnostic=""/>
+	<RefParameter Name="PID_CDC_HS" Comment="PID (Product IDentifier)" DefaultValue="22336" Type="integer" Min="0" Max="65535" Group="Device Descriptor HS" TabName="Device Descriptor">
 		<Description>The Product Identfier value present on the Device Descriptor</Description>
 	</RefParameter>
-	<RefParameter Name="PID_HS" Comment="PID (Product IDentifier)" DefaultValue="57105" Type="integer" Min="0" Max="65535" Group="Device Descriptor HS" TabName="Device Descriptor">
-		<Condition Expression="VirtualModeHS = Dfu_HS" Diagnostic=""/>
+	<RefParameter Name="PID_DFU_HS" Comment="PID (Product IDentifier)" DefaultValue="57105" Type="integer" Min="0" Max="65535" Group="Device Descriptor HS" TabName="Device Descriptor">
 		<Description>The Product Identfier value present on the Device Descriptor</Description>
 	</RefParameter>
-	<RefParameter Name="PID_HS" Comment="PID (Product IDentifier)" DefaultValue="22315" Type="integer" Min="0" Max="65535" Group="Device Descriptor HS" TabName="Device Descriptor">
-		<Condition Expression="VirtualModeHS = Hid_HS" Diagnostic=""/>
+	<RefParameter Name="PID_HID_HS" Comment="PID (Product IDentifier)" DefaultValue="22315" Type="integer" Min="0" Max="65535" Group="Device Descriptor HS" TabName="Device Descriptor">		
 		<Description>The Product Identfier value present on the Device Descriptor</Description>
 	</RefParameter>
-	<RefParameter Name="PID_HS" Comment="PID (Product IDentifier)" DefaultValue="22314" Type="integer" Min="0" Max="65535" Group="Device Descriptor HS" TabName="Device Descriptor">
-		<Condition Expression="VirtualModeHS = Msc_HS" Diagnostic=""/>
+	<RefParameter Name="PID_MSC_HS" Comment="PID (Product IDentifier)" DefaultValue="22314" Type="integer" Min="0" Max="65535" Group="Device Descriptor HS" TabName="Device Descriptor">
 		<Description>The Product Identfier value present on the Device Descriptor</Description>
 	</RefParameter>
-	<RefParameter Name="PID_HS" Comment="PID (Product IDentifier)" DefaultValue="22384" Type="integer" Min="0" Max="65535" Group="Device Descriptor HS" TabName="Device Descriptor">
-		<Condition Expression="VirtualModeHS = Mtp_HS" Diagnostic=""/>
+	<RefParameter Name="PID_MTP_HS" Comment="PID (Product IDentifier)" DefaultValue="22384" Type="integer" Min="0" Max="65535" Group="Device Descriptor HS" TabName="Device Descriptor">
 		<Description>The Product Identfier value present on the Device Descriptor</Description>
 	</RefParameter>	
-	<RefParameter Name="PID_HS" Comment="PID (Product IDentifier)" DefaultValue="22352 " Type="integer" Min="0" Max="65535" Group="Device Descriptor HS" TabName="Device Descriptor">
-		<Condition Expression="VirtualModeHS = Custom_Hid_HS" Diagnostic=""/>
+	<RefParameter Name="PID_CUSTOMHID_HS" Comment="PID (Product IDentifier)" DefaultValue="22352 " Type="integer" Min="0" Max="65535" Group="Device Descriptor HS" TabName="Device Descriptor">
 		<Description>The Product Identfier value present on the Device Descriptor</Description>
 	</RefParameter>	
 	<RefParameter Name="PID_HS" Comment="PID (Product IDentifier)" DefaultValue="0" Type="integer" Min="0" Max="65535" Group="Device Descriptor HS" TabName="Device Descriptor">
@@ -119,36 +155,28 @@
 	</RefParameter>	
 	
 	<!-- Device Descriptors Configuration FS -->
-	<RefParameter Name="PID_FS" Comment="PID (Product IDentifier)" DefaultValue="22336" Type="integer" Min="0" Max="65535" Group="Device Descriptor FS" TabName="Device Descriptor">
-		<Condition Expression="VirtualModeFS = Audio_FS" Diagnostic=""/>	
+	<RefParameter Name="PID_AUDIO_FS" Comment="PID (Product IDentifier)" DefaultValue="22336" Type="integer" Min="0" Max="65535" Group="Device Descriptor FS" TabName="Device Descriptor">	
 		<Description>The Product Identfier value present on the Device Descriptor</Description>
 	</RefParameter>
-	<RefParameter Name="PID_FS" Comment="PID (Product IDentifier)" DefaultValue="8453" Type="integer" Min="0" Max="65535" Group="Device Descriptor FS" TabName="Device Descriptor">
-		<Condition Expression="VirtualModeFS = Ccid_FS" Diagnostic=""/>	
+	<RefParameter Name="PID_CCID_FS" Comment="PID (Product IDentifier)" DefaultValue="8453" Type="integer" Min="0" Max="65535" Group="Device Descriptor FS" TabName="Device Descriptor">
 		<Description>The Product Identfier value present on the Device Descriptor</Description>
 	</RefParameter>
-	<RefParameter Name="PID_FS" Comment="PID (Product IDentifier)" DefaultValue="22336" Type="integer" Min="0" Max="65535" Group="Device Descriptor FS" TabName="Device Descriptor">
-		<Condition Expression="VirtualModeFS = Cdc_FS" Diagnostic=""/>
+	<RefParameter Name="PID_CDC_FS" Comment="PID (Product IDentifier)" DefaultValue="22336" Type="integer" Min="0" Max="65535" Group="Device Descriptor FS" TabName="Device Descriptor">
 		<Description>The Product Identfier value present on the Device Descriptor</Description>
 	</RefParameter>
-	<RefParameter Name="PID_FS" Comment="PID (Product IDentifier)" DefaultValue="57105" Type="integer" Min="0" Max="65535" Group="Device Descriptor FS" TabName="Device Descriptor">
-		<Condition Expression="VirtualModeFS = Dfu_FS" Diagnostic=""/>
+	<RefParameter Name="PID_DFU_FS" Comment="PID (Product IDentifier)" DefaultValue="57105" Type="integer" Min="0" Max="65535" Group="Device Descriptor FS" TabName="Device Descriptor">
 		<Description>The Product Identfier value present on the Device Descriptor</Description>
 	</RefParameter>
-	<RefParameter Name="PID_FS" Comment="PID (Product IDentifier)" DefaultValue="22315" Type="integer" Min="0" Max="65535" Group="Device Descriptor FS" TabName="Device Descriptor">
-		<Condition Expression="VirtualModeFS = Hid_FS" Diagnostic=""/>
+	<RefParameter Name="PID_HID_FS" Comment="PID (Product IDentifier)" DefaultValue="22315" Type="integer" Min="0" Max="65535" Group="Device Descriptor FS" TabName="Device Descriptor">
 		<Description>The Product Identfier value present on the Device Descriptor</Description>
 	</RefParameter>
-	<RefParameter Name="PID_FS" Comment="PID (Product IDentifier)" DefaultValue="22314" Type="integer" Min="0" Max="65535" Group="Device Descriptor FS" TabName="Device Descriptor">
-		<Condition Expression="VirtualModeFS = Msc_FS" Diagnostic=""/>
+	<RefParameter Name="PID_MSC_FS" Comment="PID (Product IDentifier)" DefaultValue="22314" Type="integer" Min="0" Max="65535" Group="Device Descriptor FS" TabName="Device Descriptor">
 		<Description>The Product Identfier value present on the Device Descriptor</Description>
 	</RefParameter>
-	<RefParameter Name="PID_FS" Comment="PID (Product IDentifier)" DefaultValue="22384" Type="integer" Min="0" Max="65535" Group="Device Descriptor FS" TabName="Device Descriptor">
-		<Condition Expression="VirtualModeFS = Mtp_FS" Diagnostic=""/>
+	<RefParameter Name="PID_MTP_FS" Comment="PID (Product IDentifier)" DefaultValue="22384" Type="integer" Min="0" Max="65535" Group="Device Descriptor FS" TabName="Device Descriptor">
 		<Description>The Product Identfier value present on the Device Descriptor</Description>
 	</RefParameter>	
-	<RefParameter Name="PID_FS" Comment="PID (Product IDentifier)" DefaultValue="22352 " Type="integer" Min="0" Max="65535" Group="Device Descriptor FS" TabName="Device Descriptor">
-		<Condition Expression="VirtualModeFS = Custom_Hid_FS" Diagnostic=""/>
+	<RefParameter Name="PID_CUSTOMHID_FS" Comment="PID (Product IDentifier)" DefaultValue="22352 " Type="integer" Min="0" Max="65535" Group="Device Descriptor FS" TabName="Device Descriptor">
 		<Description>The Product Identfier value present on the Device Descriptor</Description>
 	</RefParameter>	
 	<RefParameter Name="PID_FS" Comment="PID (Product IDentifier)" DefaultValue="1" Type="integer" Min="0" Max="65535" Group="Device Descriptor FS" TabName="Device Descriptor">
@@ -156,282 +184,218 @@
 	</RefParameter>
 	
 	<!-- Audio Class -->
-	<RefParameter Name="PRODUCT_STRING_HS" Comment="PRODUCT_STRING (Product Identifier)" DefaultValue="STM32 Audio Class" Type="stringRW" Group="Device Descriptor HS" TabName="Device Descriptor">
-		<Condition Expression="VirtualModeHS = Audio_HS" Diagnostic=""/>
+	<RefParameter Name="PRODUCT_STRING_AUDIO_HS" Comment="PRODUCT_STRING (Product Identifier)" DefaultValue="STM32 Audio Class" Type="stringRW" Group="Device Descriptor HS" TabName="Device Descriptor">
 		<Description>The product identifier</Description>
 	</RefParameter>
-	<RefParameter Name="SERIALNUMBER_STRING_HS" Comment="SERIALNUMBER_STRING (Serial number)" DefaultValue="00000000001A" Type="stringRW" Group="Device Descriptor HS" TabName="Device Descriptor">	
-		<Condition Expression="VirtualModeHS = Audio_HS" Diagnostic=""/>
+	<RefParameter Name="SERIALNUMBER_STRING_AUDIO_HS" Comment="SERIALNUMBER_STRING (Serial number)" DefaultValue="00000000001A" Type="stringRW" Group="Device Descriptor HS" TabName="Device Descriptor">	
 		<Description>The serial number identifier</Description>
 	</RefParameter>
-	<RefParameter Name="CONFIGURATION_STRING_HS" Comment="CONFIGURATION_STRING (Configuration Identifier)" DefaultValue="AUDIO Config" Type="stringRW" Group="Device Descriptor HS" TabName="Device Descriptor">
-		<Condition Expression="VirtualModeHS = Audio_HS" Diagnostic=""/>
+	<RefParameter Name="CONFIGURATION_STRING_AUDIO_HS" Comment="CONFIGURATION_STRING (Configuration Identifier)" DefaultValue="AUDIO Config" Type="stringRW" Group="Device Descriptor HS" TabName="Device Descriptor">
 		<Description>The configuration identifier</Description>
 	</RefParameter>
-	<RefParameter Name="INTERFACE_STRING_HS" Comment="INTERFACE_STRING (Interface Identifier)" DefaultValue="AUDIO Interface" Type="stringRW" Group="Device Descriptor HS" TabName="Device Descriptor">
-		<Condition Expression="VirtualModeHS = Audio_HS" Diagnostic=""/>
+	<RefParameter Name="INTERFACE_STRING_AUDIO_HS" Comment="INTERFACE_STRING (Interface Identifier)" DefaultValue="AUDIO Interface" Type="stringRW" Group="Device Descriptor HS" TabName="Device Descriptor">
 		<Description>The interface identifier</Description>
 	</RefParameter>
 	
-	<RefParameter Name="PRODUCT_STRING_FS" Comment="PRODUCT_STRING (Product Identifier)" DefaultValue="STM32 Audio Class" Type="stringRW" Group="Device Descriptor FS" TabName="Device Descriptor">
+	<RefParameter Name="PRODUCT_STRING_AUDIO_FS" Comment="PRODUCT_STRING (Product Identifier)" DefaultValue="STM32 Audio Class" Type="stringRW" Group="Device Descriptor FS" TabName="Device Descriptor">
 		<Condition Expression="VirtualModeFS = Audio_FS" Diagnostic=""/>
 		<Description>The product identifier</Description>
 	</RefParameter>
-	<RefParameter Name="SERIALNUMBER_STRING_FS" Comment="SERIALNUMBER_STRING (Serial number)" DefaultValue="00000000001A" Type="stringRW" Group="Device Descriptor FS" TabName="Device Descriptor">	
-		<Condition Expression="VirtualModeFS = Audio_FS" Diagnostic=""/>
+	<RefParameter Name="SERIALNUMBER_STRING_AUDIO_FS" Comment="SERIALNUMBER_STRING (Serial number)" DefaultValue="00000000001A" Type="stringRW" Group="Device Descriptor FS" TabName="Device Descriptor">	
 		<Description>The serial number identifier</Description>
 	</RefParameter>
-	<RefParameter Name="CONFIGURATION_STRING_FS" Comment="CONFIGURATION_STRING (Configuration Identifier)" DefaultValue="AUDIO Config" Type="stringRW" Group="Device Descriptor FS" TabName="Device Descriptor">
-		<Condition Expression="VirtualModeFS = Audio_FS" Diagnostic=""/>
+	<RefParameter Name="CONFIGURATION_STRING_AUDIO_FS" Comment="CONFIGURATION_STRING (Configuration Identifier)" DefaultValue="AUDIO Config" Type="stringRW" Group="Device Descriptor FS" TabName="Device Descriptor">
 		<Description>The configuration identifier</Description>
 	</RefParameter>
-	<RefParameter Name="INTERFACE_STRING_FS" Comment="INTERFACE_STRING (Interface Identifier)" DefaultValue="AUDIO Interface" Type="stringRW" Group="Device Descriptor FS" TabName="Device Descriptor">
-		<Condition Expression="VirtualModeFS = Audio_FS" Diagnostic=""/>
+	<RefParameter Name="INTERFACE_STRING_AUDIO_FS" Comment="INTERFACE_STRING (Interface Identifier)" DefaultValue="AUDIO Interface" Type="stringRW" Group="Device Descriptor FS" TabName="Device Descriptor">
 		<Description>The interface identifier</Description>
 	</RefParameter>
 	
 	<!-- Ccid Class -->
-	<RefParameter Name="PRODUCT_STRING_HS" Comment="PRODUCT_STRING (Product Identifier)" DefaultValue="STM32 Ccid Class" Type="stringRW" Group="Device Descriptor HS" TabName="Device Descriptor">
-		<Condition Expression="VirtualModeHS = Ccid_HS" Diagnostic=""/>
+	<RefParameter Name="PRODUCT_STRING_CCID_HS" Comment="PRODUCT_STRING (Product Identifier)" DefaultValue="STM32 Ccid Class" Type="stringRW" Group="Device Descriptor HS" TabName="Device Descriptor">
 		<Description>The product identifier</Description>
 	</RefParameter>
-	<RefParameter Name="SERIALNUMBER_STRING_HS" Comment="SERIALNUMBER_STRING (Serial number)" DefaultValue="00000000001A" Type="stringRW" Group="Device Descriptor HS" TabName="Device Descriptor">	
-		<Condition Expression="VirtualModeHS = Ccid_HS" Diagnostic=""/>
+	<RefParameter Name="SERIALNUMBER_STRING_CCID_HS" Comment="SERIALNUMBER_STRING (Serial number)" DefaultValue="00000000001A" Type="stringRW" Group="Device Descriptor HS" TabName="Device Descriptor">	
 		<Description>The serial number identifier</Description>
 	</RefParameter>
-	<RefParameter Name="CONFIGURATION_STRING_HS" Comment="CONFIGURATION_STRING (Configuration Identifier)" DefaultValue="CCID Config" Type="stringRW" Group="Device Descriptor HS" TabName="Device Descriptor">
-		<Condition Expression="VirtualModeHS = Ccid_HS" Diagnostic=""/>
+	<RefParameter Name="CONFIGURATION_STRING_CCID_HS" Comment="CONFIGURATION_STRING (Configuration Identifier)" DefaultValue="CCID Config" Type="stringRW" Group="Device Descriptor HS" TabName="Device Descriptor">
 		<Description>The configuration identifier</Description>
 	</RefParameter>
-	<RefParameter Name="INTERFACE_STRING_HS" Comment="INTERFACE_STRING (Interface Identifier)" DefaultValue="CCID Interface" Type="stringRW" Group="Device Descriptor HS" TabName="Device Descriptor">
-		<Condition Expression="VirtualModeHS = Ccid_HS" Diagnostic=""/>
+	<RefParameter Name="INTERFACE_STRING_CCID_HS" Comment="INTERFACE_STRING (Interface Identifier)" DefaultValue="CCID Interface" Type="stringRW" Group="Device Descriptor HS" TabName="Device Descriptor">
 		<Description>The interface identifier</Description>
 	</RefParameter>
 	
-	<RefParameter Name="PRODUCT_STRING_FS" Comment="PRODUCT_STRING (Product Identifier)" DefaultValue="STM32 Ccid Class" Type="stringRW" Group="Device Descriptor FS" TabName="Device Descriptor">
-		<Condition Expression="VirtualModeFS = Ccid_FS" Diagnostic=""/>
+	<RefParameter Name="PRODUCT_STRING_CCID_FS" Comment="PRODUCT_STRING (Product Identifier)" DefaultValue="STM32 Ccid Class" Type="stringRW" Group="Device Descriptor FS" TabName="Device Descriptor">
 		<Description>The product identifier</Description>
 	</RefParameter>
-	<RefParameter Name="SERIALNUMBER_STRING_FS" Comment="SERIALNUMBER_STRING (Serial number)" DefaultValue="00000000001A" Type="stringRW" Group="Device Descriptor FS" TabName="Device Descriptor">	
-		<Condition Expression="VirtualModeFS = Ccid_FS" Diagnostic=""/>
+	<RefParameter Name="SERIALNUMBER_STRING_CCID_FS" Comment="SERIALNUMBER_STRING (Serial number)" DefaultValue="00000000001A" Type="stringRW" Group="Device Descriptor FS" TabName="Device Descriptor">	
 		<Description>The serial number identifier</Description>
 	</RefParameter>
-	<RefParameter Name="CONFIGURATION_STRING_FS" Comment="CONFIGURATION_STRING (Configuration Identifier)" DefaultValue="CCID Config" Type="stringRW" Group="Device Descriptor FS" TabName="Device Descriptor">
-		<Condition Expression="VirtualModeFS = Ccid_FS" Diagnostic=""/>
+	<RefParameter Name="CONFIGURATION_STRING_CCID_FS" Comment="CONFIGURATION_STRING (Configuration Identifier)" DefaultValue="CCID Config" Type="stringRW" Group="Device Descriptor FS" TabName="Device Descriptor">
 		<Description>The configuration identifier</Description>
 	</RefParameter>
-	<RefParameter Name="INTERFACE_STRING_FS" Comment="INTERFACE_STRING (Interface Identifier)" DefaultValue="CCID Interface" Type="stringRW" Group="Device Descriptor FS" TabName="Device Descriptor">
-		<Condition Expression="VirtualModeFS = Ccid_FS" Diagnostic=""/>
+	<RefParameter Name="INTERFACE_STRING_CCID_FS" Comment="INTERFACE_STRING (Interface Identifier)" DefaultValue="CCID Interface" Type="stringRW" Group="Device Descriptor FS" TabName="Device Descriptor">
 		<Description>The interface identifier</Description>
 	</RefParameter>
 	
 	<!-- Cdc Class -->
-	<RefParameter Name="PRODUCT_STRING_HS" Comment="PRODUCT_STRING (Product Identifier)" DefaultValue="STM32 Virtual ComPort" Type="stringRW" Group="Device Descriptor HS" TabName="Device Descriptor">
-		<Condition Expression="VirtualModeHS = Cdc_HS" Diagnostic=""/>
+	<RefParameter Name="PRODUCT_STRING_CDC_HS" Comment="PRODUCT_STRING (Product Identifier)" DefaultValue="STM32 Virtual ComPort" Type="stringRW" Group="Device Descriptor HS" TabName="Device Descriptor">
 		<Description>The product identifier</Description>
 	</RefParameter>
-	<RefParameter Name="SERIALNUMBER_STRING_HS" Comment="SERIALNUMBER_STRING (Serial number)" DefaultValue="00000000001A" Type="stringRW" Group="Device Descriptor HS" TabName="Device Descriptor">	
-		<Condition Expression="VirtualModeHS = Cdc_HS" Diagnostic=""/>
+	<RefParameter Name="SERIALNUMBER_STRING_CDC_HS" Comment="SERIALNUMBER_STRING (Serial number)" DefaultValue="00000000001A" Type="stringRW" Group="Device Descriptor HS" TabName="Device Descriptor">	
 		<Description>The serial number identifier</Description>
 	</RefParameter>
-	<RefParameter Name="CONFIGURATION_STRING_HS" Comment="CONFIGURATION_STRING (Configuration Identifier)" DefaultValue="CDC Config" Type="stringRW" Group="Device Descriptor HS" TabName="Device Descriptor">
-		<Condition Expression="VirtualModeHS = Cdc_HS" Diagnostic=""/>
+	<RefParameter Name="CONFIGURATION_STRING_CDC_HS" Comment="CONFIGURATION_STRING (Configuration Identifier)" DefaultValue="CDC Config" Type="stringRW" Group="Device Descriptor HS" TabName="Device Descriptor">
 		<Description>The configuration identifier</Description>
 	</RefParameter>
-	<RefParameter Name="INTERFACE_STRING_HS" Comment="INTERFACE_STRING (Interface Identifier)" DefaultValue="CDC Interface" Type="stringRW" Group="Device Descriptor HS" TabName="Device Descriptor">
-		<Condition Expression="VirtualModeHS = Cdc_HS" Diagnostic=""/>
+	<RefParameter Name="INTERFACE_STRING_CDC_HS" Comment="INTERFACE_STRING (Interface Identifier)" DefaultValue="CDC Interface" Type="stringRW" Group="Device Descriptor HS" TabName="Device Descriptor">
 		<Description>The interface identifier</Description>
 	</RefParameter>
 	
-	<RefParameter Name="PRODUCT_STRING_FS" Comment="PRODUCT_STRING (Product Identifier)" DefaultValue="STM32 Virtual ComPort" Type="stringRW" Group="Device Descriptor FS" TabName="Device Descriptor">
-		<Condition Expression="VirtualModeFS = Cdc_FS" Diagnostic=""/>
+	<RefParameter Name="PRODUCT_STRING_CDC_FS" Comment="PRODUCT_STRING (Product Identifier)" DefaultValue="STM32 Virtual ComPort" Type="stringRW" Group="Device Descriptor FS" TabName="Device Descriptor">
 		<Description>The product identifier</Description>
 	</RefParameter>
-	<RefParameter Name="SERIALNUMBER_STRING_FS" Comment="SERIALNUMBER_STRING (Serial number)" DefaultValue="00000000001A" Type="stringRW" Group="Device Descriptor FS" TabName="Device Descriptor">	
-		<Condition Expression="VirtualModeFS = Cdc_FS" Diagnostic=""/>
+	<RefParameter Name="SERIALNUMBER_STRING_CDC_FS" Comment="SERIALNUMBER_STRING (Serial number)" DefaultValue="00000000001A" Type="stringRW" Group="Device Descriptor FS" TabName="Device Descriptor">	
 		<Description>The serial number identifier</Description>
 	</RefParameter>
-	<RefParameter Name="CONFIGURATION_STRING_FS" Comment="CONFIGURATION_STRING (Configuration Identifier)" DefaultValue="CDC Config" Type="stringRW" Group="Device Descriptor FS" TabName="Device Descriptor">
-		<Condition Expression="VirtualModeFS = Cdc_FS" Diagnostic=""/>
+	<RefParameter Name="CONFIGURATION_STRING_CDC_FS" Comment="CONFIGURATION_STRING (Configuration Identifier)" DefaultValue="CDC Config" Type="stringRW" Group="Device Descriptor FS" TabName="Device Descriptor">
 		<Description>The configuration identifier</Description>
 	</RefParameter>
-	<RefParameter Name="INTERFACE_STRING_FS" Comment="INTERFACE_STRING (Interface Identifier)" DefaultValue="CDC Interface" Type="stringRW" Group="Device Descriptor FS" TabName="Device Descriptor">
-		<Condition Expression="VirtualModeFS = Cdc_FS" Diagnostic=""/>
+	<RefParameter Name="INTERFACE_STRING_CDC_FS" Comment="INTERFACE_STRING (Interface Identifier)" DefaultValue="CDC Interface" Type="stringRW" Group="Device Descriptor FS" TabName="Device Descriptor">
 		<Description>The interface identifier</Description>
 	</RefParameter>
 	
 	<!-- Dfu Class -->
-	<RefParameter Name="PRODUCT_STRING_HS" Comment="PRODUCT_STRING (Product Identifier)" DefaultValue="STM32 DownLoad Firmware Update" Type="stringRW" Group="Device Descriptor HS" TabName="Device Descriptor">
-		<Condition Expression="VirtualModeHS = Dfu_HS" Diagnostic=""/>
+	<RefParameter Name="PRODUCT_STRING_DFU_HS" Comment="PRODUCT_STRING (Product Identifier)" DefaultValue="STM32 DownLoad Firmware Update" Type="stringRW" Group="Device Descriptor HS" TabName="Device Descriptor">
 		<Description>The product identifier</Description>
 	</RefParameter>
-	<RefParameter Name="SERIALNUMBER_STRING_HS" Comment="SERIALNUMBER_STRING (Serial number)" DefaultValue="00000000001A" Type="stringRW" Group="Device Descriptor HS" TabName="Device Descriptor">	
-		<Condition Expression="VirtualModeHS = Dfu_HS" Diagnostic=""/>
+	<RefParameter Name="SERIALNUMBER_STRING_DFU_HS" Comment="SERIALNUMBER_STRING (Serial number)" DefaultValue="00000000001A" Type="stringRW" Group="Device Descriptor HS" TabName="Device Descriptor">	
 		<Description>The serial number identifier</Description>
 	</RefParameter>
-	<RefParameter Name="CONFIGURATION_STRING_HS" Comment="CONFIGURATION_STRING (Configuration Identifier)" DefaultValue="DFU Config" Type="stringRW" Group="Device Descriptor HS" TabName="Device Descriptor">
-		<Condition Expression="VirtualModeHS = Dfu_HS" Diagnostic=""/>
+	<RefParameter Name="CONFIGURATION_STRING_DFU_HS" Comment="CONFIGURATION_STRING (Configuration Identifier)" DefaultValue="DFU Config" Type="stringRW" Group="Device Descriptor HS" TabName="Device Descriptor">
 		<Description>The configuration identifier</Description>
 	</RefParameter>
-	<RefParameter Name="INTERFACE_STRING_HS" Comment="INTERFACE_STRING (Interface Identifier)" DefaultValue="DFU Interface" Type="stringRW" Group="Device Descriptor HS" TabName="Device Descriptor">
-		<Condition Expression="VirtualModeHS = Dfu_HS" Diagnostic=""/>
+	<RefParameter Name="INTERFACE_STRING_DFU_HS" Comment="INTERFACE_STRING (Interface Identifier)" DefaultValue="DFU Interface" Type="stringRW" Group="Device Descriptor HS" TabName="Device Descriptor">
 		<Description>The interface identifier</Description>
-	</RefParameter>
-	
-	<RefParameter Name="PRODUCT_STRING_FS" Comment="PRODUCT_STRING (Product Identifier)" DefaultValue="STM32 DownLoad Firmware Update" Type="stringRW" Group="Device Descriptor FS" TabName="Device Descriptor">
-		<Condition Expression="VirtualModeFS = Dfu_FS" Diagnostic=""/>
+	</RefParameter>	
+	<RefParameter Name="PRODUCT_STRING_DFU_FS" Comment="PRODUCT_STRING (Product Identifier)" DefaultValue="STM32 DownLoad Firmware Update" Type="stringRW" Group="Device Descriptor FS" TabName="Device Descriptor">
 		<Description>The product identifier</Description>
 	</RefParameter>
-	<RefParameter Name="SERIALNUMBER_STRING_FS" Comment="SERIALNUMBER_STRING (Serial number)" DefaultValue="00000000001A" Type="stringRW" Group="Device Descriptor FS" TabName="Device Descriptor">	
-		<Condition Expression="VirtualModeFS = Dfu_FS" Diagnostic=""/>
+	<RefParameter Name="SERIALNUMBER_STRING_DFU_FS" Comment="SERIALNUMBER_STRING (Serial number)" DefaultValue="00000000001A" Type="stringRW" Group="Device Descriptor FS" TabName="Device Descriptor">	
 		<Description>The serial number identifier</Description>
 	</RefParameter>
-	<RefParameter Name="CONFIGURATION_STRING_FS" Comment="CONFIGURATION_STRING (Configuration Identifier)" DefaultValue="DFU Config" Type="stringRW" Group="Device Descriptor FS" TabName="Device Descriptor">
-		<Condition Expression="VirtualModeFS = Dfu_FS" Diagnostic=""/>
+	<RefParameter Name="CONFIGURATION_STRING_DFU_FS" Comment="CONFIGURATION_STRING (Configuration Identifier)" DefaultValue="DFU Config" Type="stringRW" Group="Device Descriptor FS" TabName="Device Descriptor">
 		<Description>The configuration identifier</Description>
 	</RefParameter>
-	<RefParameter Name="INTERFACE_STRING_FS" Comment="INTERFACE_STRING (Interface Identifier)" DefaultValue="DFU Interface" Type="stringRW" Group="Device Descriptor FS" TabName="Device Descriptor">
-		<Condition Expression="VirtualModeFS = Dfu_FS" Diagnostic=""/>
+	<RefParameter Name="INTERFACE_STRING_DFU_FS" Comment="INTERFACE_STRING (Interface Identifier)" DefaultValue="DFU Interface" Type="stringRW" Group="Device Descriptor FS" TabName="Device Descriptor">
 		<Description>The interface identifier</Description>
 	</RefParameter>
 	
 	<!-- Hid Class -->
-	<RefParameter Name="PRODUCT_STRING_HS" Comment="PRODUCT_STRING (Product Identifier)" DefaultValue="STM32 Human interface" Type="stringRW" Group="Device Descriptor HS" TabName="Device Descriptor">
-		<Condition Expression="VirtualModeHS = Hid_HS" Diagnostic=""/>
+	<RefParameter Name="PRODUCT_STRING_HID_HS" Comment="PRODUCT_STRING (Product Identifier)" DefaultValue="STM32 Human interface" Type="stringRW" Group="Device Descriptor HS" TabName="Device Descriptor">
 		<Description>The product identifier</Description>
 	</RefParameter>
-	<RefParameter Name="SERIALNUMBER_STRING_HS" Comment="SERIALNUMBER_STRING (Serial number)" DefaultValue="00000000001A" Type="stringRW" Group="Device Descriptor HS" TabName="Device Descriptor">	
-		<Condition Expression="VirtualModeHS = Hid_HS" Diagnostic=""/>
+	<RefParameter Name="SERIALNUMBER_STRING_HID_HS" Comment="SERIALNUMBER_STRING (Serial number)" DefaultValue="00000000001A" Type="stringRW" Group="Device Descriptor HS" TabName="Device Descriptor">	
 		<Description>The serial number identifier</Description>
 	</RefParameter>
-	<RefParameter Name="CONFIGURATION_STRING_HS" Comment="CONFIGURATION_STRING (Configuration Identifier)" DefaultValue="HID Config" Type="stringRW" Group="Device Descriptor HS" TabName="Device Descriptor">
-		<Condition Expression="VirtualModeHS = Hid_HS" Diagnostic=""/>
+	<RefParameter Name="CONFIGURATION_STRING_HID_HS" Comment="CONFIGURATION_STRING (Configuration Identifier)" DefaultValue="HID Config" Type="stringRW" Group="Device Descriptor HS" TabName="Device Descriptor">
 		<Description>The configuration identifier</Description>
 	</RefParameter>
-	<RefParameter Name="INTERFACE_STRING_HS" Comment="INTERFACE_STRING (Interface Identifier)" DefaultValue="HID Interface" Type="stringRW" Group="Device Descriptor HS" TabName="Device Descriptor">
-		<Condition Expression="VirtualModeHS = Hid_HS" Diagnostic=""/>
+	<RefParameter Name="INTERFACE_STRING_HID_HS" Comment="INTERFACE_STRING (Interface Identifier)" DefaultValue="HID Interface" Type="stringRW" Group="Device Descriptor HS" TabName="Device Descriptor">
 		<Description>The interface identifier</Description>
 	</RefParameter>
 	
-	<RefParameter Name="PRODUCT_STRING_FS" Comment="PRODUCT_STRING (Product Identifier)" DefaultValue="STM32 Human interface" Type="stringRW" Group="Device Descriptor FS" TabName="Device Descriptor">
-		<Condition Expression="VirtualModeFS = Hid_FS" Diagnostic=""/>
+	<RefParameter Name="PRODUCT_STRING_HID_FS" Comment="PRODUCT_STRING (Product Identifier)" DefaultValue="STM32 Human interface" Type="stringRW" Group="Device Descriptor FS" TabName="Device Descriptor">
 		<Description>The product identifier</Description>
 	</RefParameter>
-	<RefParameter Name="SERIALNUMBER_STRING_FS" Comment="SERIALNUMBER_STRING (Serial number)" DefaultValue="00000000001A" Type="stringRW" Group="Device Descriptor FS" TabName="Device Descriptor">	
-		<Condition Expression="VirtualModeFS = Hid_FS" Diagnostic=""/>
+	<RefParameter Name="SERIALNUMBER_STRING_HID_FS" Comment="SERIALNUMBER_STRING (Serial number)" DefaultValue="00000000001A" Type="stringRW" Group="Device Descriptor FS" TabName="Device Descriptor">	
 		<Description>The serial number identifier</Description>
 	</RefParameter>
-	<RefParameter Name="CONFIGURATION_STRING_FS" Comment="CONFIGURATION_STRING (Configuration Identifier)" DefaultValue="HID Config" Type="stringRW" Group="Device Descriptor FS" TabName="Device Descriptor">
-		<Condition Expression="VirtualModeFS = Hid_FS" Diagnostic=""/>
+	<RefParameter Name="CONFIGURATION_STRING_HID_FS" Comment="CONFIGURATION_STRING (Configuration Identifier)" DefaultValue="HID Config" Type="stringRW" Group="Device Descriptor FS" TabName="Device Descriptor">
 		<Description>The configuration identifier</Description>
 	</RefParameter>
-	<RefParameter Name="INTERFACE_STRING_FS" Comment="INTERFACE_STRING (Interface Identifier)" DefaultValue="HID Interface" Type="stringRW" Group="Device Descriptor FS" TabName="Device Descriptor">
-		<Condition Expression="VirtualModeFS = Hid_FS" Diagnostic=""/>
+	<RefParameter Name="INTERFACE_STRING_HID_FS" Comment="INTERFACE_STRING (Interface Identifier)" DefaultValue="HID Interface" Type="stringRW" Group="Device Descriptor FS" TabName="Device Descriptor">
 		<Description>The interface identifier</Description>
 	</RefParameter>
 	
 	<!-- Custom Hid Class -->
-	<RefParameter Name="PRODUCT_STRING_HS" Comment="PRODUCT_STRING (Product Identifier)" DefaultValue="STM32 Custom Human interface" Type="stringRW" Group="Device Descriptor HS" TabName="Device Descriptor">
-		<Condition Expression="VirtualModeHS = Custom_Hid_HS" Diagnostic=""/>
+	<RefParameter Name="PRODUCT_STRING_CUSTOMHID_HS" Comment="PRODUCT_STRING (Product Identifier)" DefaultValue="STM32 Custom Human interface" Type="stringRW" Group="Device Descriptor HS" TabName="Device Descriptor">
 		<Description>The product identifier</Description>
 	</RefParameter>
-	<RefParameter Name="SERIALNUMBER_STRING_HS" Comment="SERIALNUMBER_STRING (Serial number)" DefaultValue="00000000001A" Type="stringRW" Group="Device Descriptor HS" TabName="Device Descriptor">	
-		<Condition Expression="VirtualModeHS = Custom_Hid_HS" Diagnostic=""/>
+	<RefParameter Name="SERIALNUMBER_STRING_CUSTOMHID_HS" Comment="SERIALNUMBER_STRING (Serial number)" DefaultValue="00000000001A" Type="stringRW" Group="Device Descriptor HS" TabName="Device Descriptor">	
 		<Description>The serial number identifier</Description>
 	</RefParameter>
-	<RefParameter Name="CONFIGURATION_STRING_HS" Comment="CONFIGURATION_STRING (Configuration Identifier)" DefaultValue="Custom HID Config" Type="stringRW" Group="Device Descriptor HS" TabName="Device Descriptor">
-		<Condition Expression="VirtualModeHS = Custom_Hid_HS" Diagnostic=""/>
+	<RefParameter Name="CONFIGURATION_STRING_CUSTOMHID_HS" Comment="CONFIGURATION_STRING (Configuration Identifier)" DefaultValue="Custom HID Config" Type="stringRW" Group="Device Descriptor HS" TabName="Device Descriptor">
 		<Description>The configuration identifier</Description>
 	</RefParameter>
-	<RefParameter Name="INTERFACE_STRING_HS" Comment="INTERFACE_STRING (Interface Identifier)" DefaultValue="Custom HID Interface" Type="stringRW" Group="Device Descriptor HS" TabName="Device Descriptor">
-		<Condition Expression="VirtualModeHS = Custom_Hid_HS" Diagnostic=""/>
+	<RefParameter Name="INTERFACE_STRING_CUSTOMHID_HS" Comment="INTERFACE_STRING (Interface Identifier)" DefaultValue="Custom HID Interface" Type="stringRW" Group="Device Descriptor HS" TabName="Device Descriptor">
 		<Description>The interface identifier</Description>
 	</RefParameter>
 	
-	<RefParameter Name="PRODUCT_STRING_FS" Comment="PRODUCT_STRING (Product Identifier)" DefaultValue="STM32 Custom Human interface" Type="stringRW" Group="Device Descriptor FS" TabName="Device Descriptor">
-		<Condition Expression="VirtualModeFS = Custom_Hid_FS" Diagnostic=""/>
+	<RefParameter Name="PRODUCT_STRING_CUSTOMHID_FS" Comment="PRODUCT_STRING (Product Identifier)" DefaultValue="STM32 Custom Human interface" Type="stringRW" Group="Device Descriptor FS" TabName="Device Descriptor">
 		<Description>The product identifier</Description>
 	</RefParameter>
-	<RefParameter Name="SERIALNUMBER_STRING_FS" Comment="SERIALNUMBER_STRING (Serial number)" DefaultValue="00000000001A" Type="stringRW" Group="Device Descriptor FS" TabName="Device Descriptor">	
-		<Condition Expression="VirtualModeFS = Custom_Hid_FS" Diagnostic=""/>
+	<RefParameter Name="SERIALNUMBER_STRING_CUSTOMHID_FS" Comment="SERIALNUMBER_STRING (Serial number)" DefaultValue="00000000001A" Type="stringRW" Group="Device Descriptor FS" TabName="Device Descriptor">			
 		<Description>The serial number identifier</Description>
 	</RefParameter>
-	<RefParameter Name="CONFIGURATION_STRING_FS" Comment="CONFIGURATION_STRING (Configuration Identifier)" DefaultValue="Custom HID Config" Type="stringRW" Group="Device Descriptor FS" TabName="Device Descriptor">
-		<Condition Expression="VirtualModeFS = Custom_Hid_FS" Diagnostic=""/>
+	<RefParameter Name="CONFIGURATION_STRING_CUSTOMHID_FS" Comment="CONFIGURATION_STRING (Configuration Identifier)" DefaultValue="Custom HID Config" Type="stringRW" Group="Device Descriptor FS" TabName="Device Descriptor">
 		<Description>The configuration identifier</Description>
 	</RefParameter>
-	<RefParameter Name="INTERFACE_STRING_FS" Comment="INTERFACE_STRING (Interface Identifier)" DefaultValue="Custom HID Interface" Type="stringRW" Group="Device Descriptor FS" TabName="Device Descriptor">
-		<Condition Expression="VirtualModeFS = Custom_Hid_FS" Diagnostic=""/>
+	<RefParameter Name="INTERFACE_STRING_CUSTOMHID_FS" Comment="INTERFACE_STRING (Interface Identifier)" DefaultValue="Custom HID Interface" Type="stringRW" Group="Device Descriptor FS" TabName="Device Descriptor">
 		<Description>The interface identifier</Description>
 	</RefParameter>
 	
 	<!-- MSC Class -->
-	<RefParameter Name="PRODUCT_STRING_HS" Comment="PRODUCT_STRING (Product Identifier)" DefaultValue="STM32 Mass Storage" Type="stringRW" Group="Device Descriptor HS" TabName="Device Descriptor">	
-		<Condition Expression="VirtualModeHS = Msc_HS" Diagnostic=""/>
+	<RefParameter Name="PRODUCT_STRING_MSC_HS" Comment="PRODUCT_STRING (Product Identifier)" DefaultValue="STM32 Mass Storage" Type="stringRW" Group="Device Descriptor HS" TabName="Device Descriptor">	
 		<Description>The product identifier</Description>
 	</RefParameter>	
-	<RefParameter Name="SERIALNUMBER_STRING_HS" Comment="SERIALNUMBER_STRING (Serial number)" DefaultValue="00000000001A" Type="stringRW" Group="Device Descriptor HS" TabName="Device Descriptor">	
-		<Condition Expression="VirtualModeHS = Msc_HS" Diagnostic=""/>
+	<RefParameter Name="SERIALNUMBER_STRING_MSC_HS" Comment="SERIALNUMBER_STRING (Serial number)" DefaultValue="00000000001A" Type="stringRW" Group="Device Descriptor HS" TabName="Device Descriptor">	
 		<Description>The serial number identifier</Description>
 	</RefParameter>	
-	<RefParameter Name="CONFIGURATION_STRING_HS" Comment="CONFIGURATION_STRING (Configuration Identifier)" DefaultValue="MSC Config" Type="stringRW" Group="Device Descriptor HS" TabName="Device Descriptor">
-		<Condition Expression="VirtualModeHS = Msc_HS" Diagnostic=""/>
+	<RefParameter Name="CONFIGURATION_STRING_MSC_HS" Comment="CONFIGURATION_STRING (Configuration Identifier)" DefaultValue="MSC Config" Type="stringRW" Group="Device Descriptor HS" TabName="Device Descriptor">
 		<Description>The configuration identifier</Description>
 	</RefParameter>
-	<RefParameter Name="INTERFACE_STRING_HS" Comment="INTERFACE_STRING (Interface Identifier)" DefaultValue="MSC Interface" Type="stringRW" Group="Device Descriptor HS" TabName="Device Descriptor">
-		<Condition Expression="VirtualModeHS = Msc_HS" Diagnostic=""/>
+	<RefParameter Name="INTERFACE_STRING_MSC_HS" Comment="INTERFACE_STRING (Interface Identifier)" DefaultValue="MSC Interface" Type="stringRW" Group="Device Descriptor HS" TabName="Device Descriptor">
 		<Description>The interface identifier</Description>
 	</RefParameter>
 	
-	<RefParameter Name="PRODUCT_STRING_FS" Comment="PRODUCT_STRING (Product Identifier)" DefaultValue="STM32 Mass Storage" Type="stringRW" Group="Device Descriptor FS" TabName="Device Descriptor">	
-		<Condition Expression="VirtualModeFS = Msc_FS" Diagnostic=""/>
+	<RefParameter Name="PRODUCT_STRING_MSC_FS" Comment="PRODUCT_STRING (Product Identifier)" DefaultValue="STM32 Mass Storage" Type="stringRW" Group="Device Descriptor FS" TabName="Device Descriptor">	
 		<Description>The product identifier</Description>
 	</RefParameter>	
-	<RefParameter Name="SERIALNUMBER_STRING_FS" Comment="SERIALNUMBER_STRING (Serial number)" DefaultValue="00000000001A" Type="stringRW" Group="Device Descriptor FS" TabName="Device Descriptor">	
-		<Condition Expression="VirtualModeFS = Msc_FS" Diagnostic=""/>
+	<RefParameter Name="SERIALNUMBER_STRING_MSC_FS" Comment="SERIALNUMBER_STRING (Serial number)" DefaultValue="00000000001A" Type="stringRW" Group="Device Descriptor FS" TabName="Device Descriptor">	
 		<Description>The serial number identifier</Description>
 	</RefParameter>	
-	<RefParameter Name="CONFIGURATION_STRING_FS" Comment="CONFIGURATION_STRING (Configuration Identifier)" DefaultValue="MSC Config" Type="stringRW" Group="Device Descriptor FS" TabName="Device Descriptor">
-		<Condition Expression="VirtualModeFS = Msc_FS" Diagnostic=""/>
+	<RefParameter Name="CONFIGURATION_STRING_MSC_FS" Comment="CONFIGURATION_STRING (Configuration Identifier)" DefaultValue="MSC Config" Type="stringRW" Group="Device Descriptor FS" TabName="Device Descriptor">
 		<Description>The configuration identifier</Description>
 	</RefParameter>
-	<RefParameter Name="INTERFACE_STRING_FS" Comment="INTERFACE_STRING (Interface Identifier)" DefaultValue="MSC Interface" Type="stringRW" Group="Device Descriptor FS" TabName="Device Descriptor">
-		<Condition Expression="VirtualModeFS = Msc_FS" Diagnostic=""/>
+	<RefParameter Name="INTERFACE_STRING_MSC_FS" Comment="INTERFACE_STRING (Interface Identifier)" DefaultValue="MSC Interface" Type="stringRW" Group="Device Descriptor FS" TabName="Device Descriptor">
 		<Description>The interface identifier</Description>
 	</RefParameter>
 	
 	<!-- MTP Class -->
-	<RefParameter Name="PRODUCT_STRING_HS" Comment="PRODUCT_STRING (Product Identifier)" DefaultValue="STM32 Mtp Class" Type="stringRW" Group="Device Descriptor HS" TabName="Device Descriptor">	
-		<Condition Expression="VirtualModeHS = Mtp_HS" Diagnostic=""/>
+	<RefParameter Name="PRODUCT_STRING_MTP_HS" Comment="PRODUCT_STRING (Product Identifier)" DefaultValue="STM32 Mtp Class" Type="stringRW" Group="Device Descriptor HS" TabName="Device Descriptor">	
 		<Description>The product identifier</Description>
 	</RefParameter>	
-	<RefParameter Name="SERIALNUMBER_STRING_HS" Comment="SERIALNUMBER_STRING (Serial number)" DefaultValue="00000000001A" Type="stringRW" Group="Device Descriptor HS" TabName="Device Descriptor">	
-		<Condition Expression="VirtualModeHS = Mtp_HS" Diagnostic=""/>
+	<RefParameter Name="SERIALNUMBER_STRING_MTP_HS" Comment="SERIALNUMBER_STRING (Serial number)" DefaultValue="00000000001A" Type="stringRW" Group="Device Descriptor HS" TabName="Device Descriptor">	
 		<Description>The serial number identifier</Description>
 	</RefParameter>	
-	<RefParameter Name="CONFIGURATION_STRING_HS" Comment="CONFIGURATION_STRING (Configuration Identifier)" DefaultValue="MTP Config" Type="stringRW" Group="Device Descriptor HS" TabName="Device Descriptor">
-		<Condition Expression="VirtualModeHS = Mtp_HS" Diagnostic=""/>
+	<RefParameter Name="CONFIGURATION_STRING_MTP_HS" Comment="CONFIGURATION_STRING (Configuration Identifier)" DefaultValue="MTP Config" Type="stringRW" Group="Device Descriptor HS" TabName="Device Descriptor">
 		<Description>The configuration identifier</Description>
 	</RefParameter>
-	<RefParameter Name="INTERFACE_STRING_HS" Comment="INTERFACE_STRING (Interface Identifier)" DefaultValue="MTP Interface" Type="stringRW" Group="Device Descriptor HS" TabName="Device Descriptor">
-		<Condition Expression="VirtualModeHS = Mtp_HS" Diagnostic=""/>
+	<RefParameter Name="INTERFACE_STRING_MTP_HS" Comment="INTERFACE_STRING (Interface Identifier)" DefaultValue="MTP Interface" Type="stringRW" Group="Device Descriptor HS" TabName="Device Descriptor">
 		<Description>The interface identifier</Description>
 	</RefParameter>
 	
-	<RefParameter Name="PRODUCT_STRING_FS" Comment="PRODUCT_STRING (Product Identifier)" DefaultValue="STM32 Mtp Class" Type="stringRW" Group="Device Descriptor FS" TabName="Device Descriptor">	
-		<Condition Expression="VirtualModeFS = Mtp_FS" Diagnostic=""/>
+	<RefParameter Name="PRODUCT_STRING_MTP_FS" Comment="PRODUCT_STRING (Product Identifier)" DefaultValue="STM32 Mtp Class" Type="stringRW" Group="Device Descriptor FS" TabName="Device Descriptor">	
 		<Description>The product identifier</Description>
 	</RefParameter>	
-	<RefParameter Name="SERIALNUMBER_STRING_FS" Comment="SERIALNUMBER_STRING (Serial number)" DefaultValue="00000000001A" Type="stringRW" Group="Device Descriptor FS" TabName="Device Descriptor">	
-		<Condition Expression="VirtualModeFS = Mtp_FS" Diagnostic=""/>
+	<RefParameter Name="SERIALNUMBER_STRING_MTP_FS" Comment="SERIALNUMBER_STRING (Serial number)" DefaultValue="00000000001A" Type="stringRW" Group="Device Descriptor FS" TabName="Device Descriptor">	
 		<Description>The serial number identifier</Description>
 	</RefParameter>	
-	<RefParameter Name="CONFIGURATION_STRING_FS" Comment="CONFIGURATION_STRING (Configuration Identifier)" DefaultValue="MTP Config" Type="stringRW" Group="Device Descriptor FS" TabName="Device Descriptor">
-		<Condition Expression="VirtualModeFS = Mtp_FS" Diagnostic=""/>
+	<RefParameter Name="CONFIGURATION_STRING_MTP_FS" Comment="CONFIGURATION_STRING (Configuration Identifier)" DefaultValue="MTP Config" Type="stringRW" Group="Device Descriptor FS" TabName="Device Descriptor">
 		<Description>The configuration identifier</Description>
 	</RefParameter>
-	<RefParameter Name="INTERFACE_STRING_FS" Comment="INTERFACE_STRING (Interface Identifier)" DefaultValue="MTP Interface" Type="stringRW" Group="Device Descriptor FS" TabName="Device Descriptor">
-		<Condition Expression="VirtualModeFS = Mtp_FS" Diagnostic=""/>
+	<RefParameter Name="INTERFACE_STRING_MTP_FS" Comment="INTERFACE_STRING (Interface Identifier)" DefaultValue="MTP Interface" Type="stringRW" Group="Device Descriptor FS" TabName="Device Descriptor">
 		<Description>The interface identifier</Description>
 	</RefParameter>
 	
@@ -458,6 +422,7 @@
 	<RefParameter Name="CONFIGURATION_STRING_FS" Comment="CONFIGURATION_STRING (Configuration Identifier)" DefaultValue="" Type="stringRW" Group="Device Descriptor FS" TabName="Device Descriptor">
 		<Description>The configuration identifier</Description>
 	</RefParameter>
+
 	<RefParameter Name="INTERFACE_STRING_FS" Comment="INTERFACE_STRING (Interface Identifier)" DefaultValue="" Type="stringRW" Group="Device Descriptor FS" TabName="Device Descriptor">
 		<Description>The interface identifier</Description>
 	</RefParameter>
@@ -581,6 +546,58 @@
 		<!--<PossibleValue Value="1024" Comment="1024"/>-->
 		<Description>Maximum DFU transfert size</Description>
 	</RefParameter>	
+	
+	<RefParameter Name="USBD_DFU_MEDIA" Comment="USBD_DFU_MEDIA Interface"  DefaultValue="@Internal Flash   /0x08000000/03*016Ka,01*016Kg,01*064Kg,07*128Kg,04*016Kg,01*064Kg,07*128Kg" Type="stringRW" Group="Class Parameters" Visible="true" Unit="">
+		<Condition Expression="VirtualMode = Dfu" Diagnostic=""/>				
+		<Description>The description of the flash (used by PC tool DFuSe)
+			Each Alternate setting string descriptor must follow this memory mapping so that the PC
+			Host Software can decode the right mapping for the selected device:
+			● @: To detect that this is a special mapping descriptor (to avoid decoding standard
+			descriptor)
+			● /: for separator between zones
+			● Maximum 8 digits per address starting by “0x”
+			● /: for separator between zones
+			● Maximum of 2 digits for the number of sectors
+			● *: For separator between number of sectors and sector size
+			● Maximum 3 digits for sector size between 0 and 999
+			● 1 digit for the sector size multiplier. Valid entries are: B (byte), K (Kilo), M (Mega)
+			● 1 digit for the sector type as follows:
+			– a (0x41): Readable
+			– b (0x42): Erasable
+			– c (0x43): Readable and Erasabled (0x44): Writeable
+			– e (0x45): Readable and Writeable
+			– f (0x46): Erasable and Writeable
+			– g (0x47): Readable, Erasable and Writeable
+			Note: If the target memory is not contiguous, the user can add the new sectors to be decoded just
+			after a slash"/" as shown in the following example:
+			"@Flash /0xF000/1*4Ka/0xE000/1*4Kg/0x8000/2*24Kg"
+		</Description>
+	</RefParameter>	
+	<RefParameter Name="USBD_DFU_MEDIA" Comment="USBD_DFU_MEDIA Interface"  DefaultValue="@Internal Flash   /0x08000000/03*016Ka,01*016Kg,01*064Kg,07*128Kg,04*016Kg,01*064Kg,07*128Kg" Type="stringRW" Group="Class Parameters" Visible="true" Unit="">	
+		<Description>The description of the flash (used by PC tool DFuSe)
+			Each Alternate setting string descriptor must follow this memory mapping so that the PC
+			Host Software can decode the right mapping for the selected device:
+			● @: To detect that this is a special mapping descriptor (to avoid decoding standard
+			descriptor)
+			● /: for separator between zones
+			● Maximum 8 digits per address starting by “0x”
+			● /: for separator between zones
+			● Maximum of 2 digits for the number of sectors
+			● *: For separator between number of sectors and sector size
+			● Maximum 3 digits for sector size between 0 and 999
+			● 1 digit for the sector size multiplier. Valid entries are: B (byte), K (Kilo), M (Mega)
+			● 1 digit for the sector type as follows:
+			– a (0x41): Readable
+			– b (0x42): Erasable
+			– c (0x43): Readable and Erasabled (0x44): Writeable
+			– e (0x45): Readable and Writeable
+			– f (0x46): Erasable and Writeable
+			– g (0x47): Readable, Erasable and Writeable
+			Note: If the target memory is not contiguous, the user can add the new sectors to be decoded just
+			after a slash"/" as shown in the following example:
+			"@Flash /0xF000/1*4Ka/0xE000/1*4Kg/0x8000/2*24Kg"
+		</Description>
+	</RefParameter>	
 
 	<!-- a new Type is available Type = Hex 
 		usage:
@@ -596,36 +613,7 @@
 	</RefParameter>
 	
 	<!-- Virtual Mode Parameter, to define RefParameter in function of RefMode -->
-	<RefParameter Comment="" DefaultValue="Ccid" Name="VirtualMode" Type="list" Visible="false" Group="Basic Parameters" >
-		<PossibleValue Comment="" Value="Audio"/>
-		<PossibleValue Comment="" Value="Ccid"/>
-		<PossibleValue Comment="" Value="Cdc"/>
-		<PossibleValue Comment="" Value="Dfu"/>
-		<PossibleValue Comment="" Value="Hid"/>
-		<PossibleValue Comment="" Value="CustomHid"/>
-		<PossibleValue Comment="" Value="Msc"/>							
-		<PossibleValue Comment="" Value="Mtp"/>
-	</RefParameter>
-	<RefParameter Comment="" DefaultValue="Audio" Name="VirtualModeHS" Type="list" Visible="false" Group="Basic Parameters" >
-		<PossibleValue Comment="" Value="Audio_HS"/>
-		<PossibleValue Comment="" Value="Ccid_HS"/>
-		<PossibleValue Comment="" Value="Cdc_HS"/>
-		<PossibleValue Comment="" Value="Dfu_HS"/>
-		<PossibleValue Comment="" Value="Hid_HS"/>
-		<PossibleValue Comment="" Value="Custom_Hid_HS"/>
-		<PossibleValue Comment="" Value="Msc_HS"/>							
-		<PossibleValue Comment="" Value="Mtp_HS"/>
-	</RefParameter>
-	<RefParameter Comment="" DefaultValue="Audio" Name="VirtualModeFS" Type="list" Visible="false" Group="Basic Parameters" >
-		<PossibleValue Comment="" Value="Audio_FS"/>
-		<PossibleValue Comment="" Value="Ccid_FS"/>
-		<PossibleValue Comment="" Value="Cdc_FS"/>
-		<PossibleValue Comment="" Value="Dfu_FS"/>
-		<PossibleValue Comment="" Value="Hid_FS"/>
-		<PossibleValue Comment="" Value="Custom_Hid_FS"/>
-		<PossibleValue Comment="" Value="Msc_FS"/>							
-		<PossibleValue Comment="" Value="Mtp_FS"/>
-	</RefParameter>
+	
 	
 	<!-- This RefParameter is defined in order to be able to have the LibMethod with the status == OK -->
 	<RefParameter Name="dev_config" Comment="dev_config" DefaultValue="0" Type="list" Group="" Visible="false"/>
@@ -873,11 +861,11 @@
 			<Condition Expression="(USB_DEVICE_HS_CLASSES) | (USB_DEVICE_FS_CLASSES)" Diagnostic=""/>
 		</Parameter>				
 		<!-- Parameters for Device Descriptors -->			
-		<Parameter Name="PID_HS"/>		
-		<Parameter Name="PRODUCT_STRING_HS"/>
-		<Parameter Name="SERIALNUMBER_STRING_HS"/>
-		<Parameter Name="CONFIGURATION_STRING_HS"/>
-		<Parameter Name="INTERFACE_STRING_HS"/>
+		<Parameter Name="PID_AUDIO_HS"/>		
+		<Parameter Name="PRODUCT_STRING_AUDIO_HS"/>
+		<Parameter Name="SERIALNUMBER_STRING_AUDIO_HS"/>
+		<Parameter Name="CONFIGURATION_STRING_AUDIO_HS"/>
+		<Parameter Name="INTERFACE_STRING_AUDIO_HS"/>
 		<Parameter Name="hUsbDevice"/>
 		<Parameter Name="USBD_HandleTypeDef">
 			<PossibleValue>hUsbDeviceHS</PossibleValue>
@@ -933,11 +921,11 @@
 			<Condition Expression="(USB_DEVICE_FS_CLASSES) &amp; (!USB_DEVICE_HS_CLASSES)" Diagnostic=""/>			
 		</Parameter>
 		<!-- Parameters for Device Descriptors -->
-		<Parameter Name="PID_FS"/>
-		<Parameter Name="PRODUCT_STRING_FS"/>
-		<Parameter Name="SERIALNUMBER_STRING_FS"/>
-		<Parameter Name="CONFIGURATION_STRING_FS"/>
-		<Parameter Name="INTERFACE_STRING_FS"/>
+		<Parameter Name="PID_AUDIO_FS"/>
+		<Parameter Name="PRODUCT_STRING_AUDIO_FS"/>
+		<Parameter Name="SERIALNUMBER_STRING_AUDIO_FS"/>
+		<Parameter Name="CONFIGURATION_STRING_AUDIO_FS"/>
+		<Parameter Name="INTERFACE_STRING_AUDIO_FS"/>
 		<Parameter Name="hUsbDevice"/>
 		<Parameter Name="USBD_HandleTypeDef">
 			<PossibleValue>hUsbDeviceFS</PossibleValue>
@@ -994,11 +982,11 @@
 			<Condition Expression="(USB_DEVICE_HS_CLASSES) | (USB_DEVICE_FS_CLASSES)" Diagnostic=""/>
 		</Parameter>						
 		<!-- Parameters for Device Descriptors -->		
-		<Parameter Name="PID_HS"/>			
-		<Parameter Name="PRODUCT_STRING_HS"/>
-		<Parameter Name="SERIALNUMBER_STRING_HS"/>
-		<Parameter Name="CONFIGURATION_STRING_HS"/>
-		<Parameter Name="INTERFACE_STRING_HS"/>
+		<Parameter Name="PID_CCID_HS"/>			
+		<Parameter Name="PRODUCT_STRING_CCID_HS"/>
+		<Parameter Name="SERIALNUMBER_STRING_CCID_HS"/>
+		<Parameter Name="CONFIGURATION_STRING_CCID_HS"/>
+		<Parameter Name="INTERFACE_STRING_CCID_HS"/>
 		<Parameter Name="hUsbDevice"/>
 		<Parameter Name="USBD_HandleTypeDef">
 			<PossibleValue>hUsbDeviceHS</PossibleValue>
@@ -1055,11 +1043,11 @@
 			<Condition Expression="(USB_DEVICE_FS_CLASSES) &amp; (!USB_DEVICE_HS_CLASSES)" Diagnostic=""/>			
 		</Parameter>		
 		<!-- Parameters for Device Descriptors -->			
-		<Parameter Name="PID_FS"/>		
-		<Parameter Name="PRODUCT_STRING_FS"/>
-		<Parameter Name="SERIALNUMBER_STRING_FS"/>
-		<Parameter Name="CONFIGURATION_STRING_FS"/>
-		<Parameter Name="INTERFACE_STRING_FS"/>
+		<Parameter Name="PID_CCID_FS"/>		
+		<Parameter Name="PRODUCT_STRING_CCID_FS"/>
+		<Parameter Name="SERIALNUMBER_STRING_CCID_FS"/>
+		<Parameter Name="CONFIGURATION_STRING_CCID_FS"/>
+		<Parameter Name="INTERFACE_STRING_CCID_FS"/>
 		<Parameter Name="hUsbDevice"/>
 		<Parameter Name="USBD_HandleTypeDef">
 			<PossibleValue>hUsbDeviceFS</PossibleValue>
@@ -1119,11 +1107,11 @@
 			<Condition Expression="(USB_DEVICE_HS_CLASSES) | (USB_DEVICE_FS_CLASSES)" Diagnostic=""/>
 		</Parameter>						
 		<!-- Parameters for Device Descriptors -->		
-		<Parameter Name="PID_HS"/>			
-		<Parameter Name="PRODUCT_STRING_HS"/>
-		<Parameter Name="SERIALNUMBER_STRING_HS"/>
-		<Parameter Name="CONFIGURATION_STRING_HS"/>
-		<Parameter Name="INTERFACE_STRING_HS"/>
+		<Parameter Name="PID_CDC_HS"/>			
+		<Parameter Name="PRODUCT_STRING_CDC_HS"/>
+		<Parameter Name="SERIALNUMBER_STRING_CDC_HS"/>
+		<Parameter Name="CONFIGURATION_STRING_CDC_HS"/>
+		<Parameter Name="INTERFACE_STRING_CDC_HS"/>
 		<Parameter Name="hUsbDevice"/>
 		<Parameter Name="USBD_HandleTypeDef">
 			<PossibleValue>hUsbDeviceHS</PossibleValue>
@@ -1179,11 +1167,11 @@
 			<Condition Expression="(USB_DEVICE_FS_CLASSES) &amp; (!USB_DEVICE_HS_CLASSES)" Diagnostic=""/>			
 		</Parameter>				
 		<!-- Parameters for Device Descriptors -->				
-		<Parameter Name="PID_FS"/>			
-		<Parameter Name="PRODUCT_STRING_FS"/>
-		<Parameter Name="SERIALNUMBER_STRING_FS"/>
-		<Parameter Name="CONFIGURATION_STRING_FS"/>
-		<Parameter Name="INTERFACE_STRING_FS"/>
+		<Parameter Name="PID_CDC_FS"/>			
+		<Parameter Name="PRODUCT_STRING_CDC_FS"/>
+		<Parameter Name="SERIALNUMBER_STRING_CDC_FS"/>
+		<Parameter Name="CONFIGURATION_STRING_CDC_FS"/>
+		<Parameter Name="INTERFACE_STRING_CDC_FS"/>
 		<Parameter Name="hUsbDevice"/>
 		<Parameter Name="USBD_HandleTypeDef">
 			<PossibleValue>hUsbDeviceFS</PossibleValue>
@@ -1215,8 +1203,9 @@
 		<Parameter Name="USBD_MAX_STR_DESC_SIZ">
 			<Condition Expression="(USB_DEVICE_HS_CLASSES) | (USB_DEVICE_FS_CLASSES)" Diagnostic=""/>
 		</Parameter>
-		<Parameter Name="USBD_SUPPORT_USER_STRING">
+		<Parameter Name="USBD_SUPPORT_USER_STRING">			
 			<Condition Expression="(USB_DEVICE_HS_CLASSES) | (USB_DEVICE_FS_CLASSES)" Diagnostic=""/>
+			<PossibleValue>1</PossibleValue>
 		</Parameter>
 		<Parameter Name="USBD_SELF_POWERED">
 			<Condition Expression="(USB_DEVICE_HS_CLASSES) | (USB_DEVICE_FS_CLASSES)" Diagnostic=""/>
@@ -1240,11 +1229,11 @@
 			<Condition Expression="(USB_DEVICE_HS_CLASSES) | (USB_DEVICE_FS_CLASSES)" Diagnostic=""/>
 		</Parameter>						
 		<!-- Parameters for Device Descriptors -->		
-		<Parameter Name="PID_HS"/>		
-		<Parameter Name="PRODUCT_STRING_HS"/>
-		<Parameter Name="SERIALNUMBER_STRING_HS"/>
-		<Parameter Name="CONFIGURATION_STRING_HS"/>
-		<Parameter Name="INTERFACE_STRING_HS"/>
+		<Parameter Name="PID_DFU_HS"/>		
+		<Parameter Name="PRODUCT_STRING_DFU_HS"/>
+		<Parameter Name="SERIALNUMBER_STRING_DFU_HS"/>
+		<Parameter Name="CONFIGURATION_STRING_DFU_HS"/>
+		<Parameter Name="INTERFACE_STRING_DFU_HS"/>
 		<Parameter Name="hUsbDevice"/>
 		<Parameter Name="USBD_HandleTypeDef">
 			<PossibleValue>hUsbDeviceHS</PossibleValue>
@@ -1259,6 +1248,9 @@
 			<Condition Expression="(DFU_HS) | (DFU_FS)" Diagnostic=""/>
 		</Parameter>	
 		<Parameter Name="USBD_DFU_APP_DEFAULT_ADD">
+			<Condition Expression="(DFU_HS) | (DFU_FS)" Diagnostic=""/>
+		</Parameter>
+		<Parameter Name="USBD_DFU_MEDIA">
 			<Condition Expression="(DFU_HS) | (DFU_FS)" Diagnostic=""/>
 		</Parameter>
 	</RefMode>
@@ -1282,6 +1274,7 @@
 		</Parameter>
 		<Parameter Name="USBD_SUPPORT_USER_STRING">
 			<Condition Expression="(USB_DEVICE_FS_CLASSES) &amp; (!USB_DEVICE_HS_CLASSES)" Diagnostic=""/>
+			<PossibleValue>1</PossibleValue>
 		</Parameter>
 		<Parameter Name="USBD_SELF_POWERED">
 			<Condition Expression="(USB_DEVICE_FS_CLASSES) &amp; (!USB_DEVICE_HS_CLASSES)" Diagnostic=""/>
@@ -1306,11 +1299,11 @@
 			<Condition Expression="(USB_DEVICE_FS_CLASSES) &amp; (!USB_DEVICE_HS_CLASSES)" Diagnostic=""/>			
 		</Parameter>				
 		<!-- Parameters for Device Descriptors -->				
-		<Parameter Name="PID_FS"/>			
-		<Parameter Name="PRODUCT_STRING_FS"/>
-		<Parameter Name="SERIALNUMBER_STRING_FS"/>
-		<Parameter Name="CONFIGURATION_STRING_FS"/>
-		<Parameter Name="INTERFACE_STRING_FS"/>
+		<Parameter Name="PID_DFU_FS"/>			
+		<Parameter Name="PRODUCT_STRING_DFU_FS"/>
+		<Parameter Name="SERIALNUMBER_STRING_DFU_FS"/>
+		<Parameter Name="CONFIGURATION_STRING_DFU_FS"/>
+		<Parameter Name="INTERFACE_STRING_DFU_FS"/>
 		<Parameter Name="hUsbDevice"/>
 		<Parameter Name="USBD_HandleTypeDef">
 			<PossibleValue>hUsbDeviceFS</PossibleValue>
@@ -1325,6 +1318,9 @@
 			<Condition Expression="(DFU_FS) &amp; (!DFU_HS)" Diagnostic=""/>
 		</Parameter>	
 		<Parameter Name="USBD_DFU_APP_DEFAULT_ADD">
+			<Condition Expression="(DFU_FS) &amp; (!DFU_HS)" Diagnostic=""/>
+		</Parameter>
+		<Parameter Name="USBD_DFU_MEDIA">
 			<Condition Expression="(DFU_FS) &amp; (!DFU_HS)" Diagnostic=""/>
 		</Parameter>
 	</RefMode>
@@ -1373,11 +1369,11 @@
 			<Condition Expression="(USB_DEVICE_HS_CLASSES) | (USB_DEVICE_FS_CLASSES)" Diagnostic=""/>
 		</Parameter>						
 		<!-- Parameters for Device Descriptors -->		
-		<Parameter Name="PID_HS"/>	
-		<Parameter Name="PRODUCT_STRING_HS"/>
-		<Parameter Name="SERIALNUMBER_STRING_HS"/>
-		<Parameter Name="CONFIGURATION_STRING_HS"/>
-		<Parameter Name="INTERFACE_STRING_HS"/>
+		<Parameter Name="PID_HID_HS"/>	
+		<Parameter Name="PRODUCT_STRING_HID_HS"/>
+		<Parameter Name="SERIALNUMBER_STRING_HID_HS"/>
+		<Parameter Name="CONFIGURATION_STRING_HID_HS"/>
+		<Parameter Name="INTERFACE_STRING_HID_HS"/>
 		<Parameter Name="hUsbDevice"/>
 		<Parameter Name="USBD_HandleTypeDef">
 			<PossibleValue>hUsbDeviceHS</PossibleValue>
@@ -1430,11 +1426,11 @@
 			<Condition Expression="(USB_DEVICE_FS_CLASSES) &amp; (!USB_DEVICE_HS_CLASSES)" Diagnostic=""/>			
 		</Parameter>				
 		<!-- Parameters for Device Descriptors -->		
-		<Parameter Name="PID_FS"/>	
-		<Parameter Name="PRODUCT_STRING_FS"/>
-		<Parameter Name="SERIALNUMBER_STRING_FS"/>
-		<Parameter Name="CONFIGURATION_STRING_FS"/>
-		<Parameter Name="INTERFACE_STRING_FS"/>
+		<Parameter Name="PID_HID_FS"/>	
+		<Parameter Name="PRODUCT_STRING_HID_FS"/>
+		<Parameter Name="SERIALNUMBER_STRING_HID_FS"/>
+		<Parameter Name="CONFIGURATION_STRING_HID_FS"/>
+		<Parameter Name="INTERFACE_STRING_HID_FS"/>
 		<Parameter Name="hUsbDevice"/>
 		<Parameter Name="USBD_HandleTypeDef">
 			<PossibleValue>hUsbDeviceFS</PossibleValue>
@@ -1448,7 +1444,7 @@
 	<RefMode Name="CUSTOM_HID_HS" Abstract="false">
 		<ConfigForMode>USB_DEVICE_CUSTOM_HID_HS</ConfigForMode>
 		<Parameter Name="VirtualMode">		
-			<PossibleValue>Custom_Hid</PossibleValue>
+			<PossibleValue>CustomHid</PossibleValue>
 		</Parameter>
 		<Parameter Name="VirtualModeHS">		
 			<PossibleValue>Custom_Hid_HS</PossibleValue>
@@ -1465,6 +1461,7 @@
 		</Parameter>
 		<Parameter Name="USBD_SUPPORT_USER_STRING">
 			<Condition Expression="(USB_DEVICE_HS_CLASSES) | (USB_DEVICE_FS_CLASSES)" Diagnostic=""/>
+			<PossibleValue>1</PossibleValue>
 		</Parameter>
 		<Parameter Name="USBD_SELF_POWERED">
 			<Condition Expression="(USB_DEVICE_HS_CLASSES) | (USB_DEVICE_FS_CLASSES)" Diagnostic=""/>
@@ -1488,11 +1485,11 @@
 			<Condition Expression="(USB_DEVICE_HS_CLASSES) | (USB_DEVICE_FS_CLASSES)" Diagnostic=""/>
 		</Parameter>						
 		<!-- Parameters for Device Descriptors -->		
-		<Parameter Name="PID_HS"/>		
-		<Parameter Name="PRODUCT_STRING_HS"/>
-		<Parameter Name="SERIALNUMBER_STRING_HS"/>
-		<Parameter Name="CONFIGURATION_STRING_HS"/>
-		<Parameter Name="INTERFACE_STRING_HS"/>		
+		<Parameter Name="PID_CUSTOMHID_HS"/>		
+		<Parameter Name="PRODUCT_STRING_CUSTOMHID_HS"/>
+		<Parameter Name="SERIALNUMBER_STRING_CUSTOMHID_HS"/>
+		<Parameter Name="CONFIGURATION_STRING_CUSTOMHID_HS"/>
+		<Parameter Name="INTERFACE_STRING_CUSTOMHID_HS"/>		
 		<Parameter Name="hUsbDevice"/>
 		<Parameter Name="USBD_HandleTypeDef">
 			<PossibleValue>hUsbDeviceHS</PossibleValue>
@@ -1510,7 +1507,7 @@
 	<RefMode Name="CUSTOM_HID_FS" Abstract="false">
 		<ConfigForMode>USB_DEVICE_CUSTOM_HID_FS</ConfigForMode>
 		<Parameter Name="VirtualMode">		
-			<PossibleValue>Custom_Hid</PossibleValue>
+			<PossibleValue>CustomHid</PossibleValue>
 		</Parameter>
 		<Parameter Name="VirtualModeFS">		
 			<PossibleValue>Custom_Hid_FS</PossibleValue>
@@ -1527,6 +1524,7 @@
 		</Parameter>
 		<Parameter Name="USBD_SUPPORT_USER_STRING">
 			<Condition Expression="(USB_DEVICE_FS_CLASSES) &amp; (!USB_DEVICE_HS_CLASSES)" Diagnostic=""/>
+			<PossibleValue>1</PossibleValue>
 		</Parameter>
 		<Parameter Name="USBD_SELF_POWERED">
 			<Condition Expression="(USB_DEVICE_FS_CLASSES) &amp; (!USB_DEVICE_HS_CLASSES)" Diagnostic=""/>
@@ -1551,11 +1549,11 @@
 			<Condition Expression="(USB_DEVICE_FS_CLASSES) &amp; (!USB_DEVICE_HS_CLASSES)" Diagnostic=""/>			
 		</Parameter>		
 		<!-- Parameters for Device Descriptors -->		
-		<Parameter Name="PID_FS"/>		
-		<Parameter Name="PRODUCT_STRING_FS"/>
-		<Parameter Name="SERIALNUMBER_STRING_FS"/>
-		<Parameter Name="CONFIGURATION_STRING_FS"/>
-		<Parameter Name="INTERFACE_STRING_FS"/>
+		<Parameter Name="PID_CUSTOMHID_FS"/>		
+		<Parameter Name="PRODUCT_STRING_CUSTOMHID_FS"/>
+		<Parameter Name="SERIALNUMBER_STRING_CUSTOMHID_FS"/>
+		<Parameter Name="CONFIGURATION_STRING_CUSTOMHID_FS"/>
+		<Parameter Name="INTERFACE_STRING_CUSTOMHID_FS"/>
 		
 		<Parameter Name="hUsbDevice"/>
 		<Parameter Name="USBD_HandleTypeDef">
@@ -1616,11 +1614,11 @@
 			<Condition Expression="(USB_DEVICE_HS_CLASSES) | (USB_DEVICE_FS_CLASSES)" Diagnostic=""/>
 		</Parameter>						
 		<!-- Parameters for Device Descriptors -->		
-		<Parameter Name="PID_HS"/>		
-		<Parameter Name="PRODUCT_STRING_HS"/>
-		<Parameter Name="SERIALNUMBER_STRING_HS"/>
-		<Parameter Name="CONFIGURATION_STRING_HS"/>
-		<Parameter Name="INTERFACE_STRING_HS"/>
+		<Parameter Name="PID_MSC_HS"/>		
+		<Parameter Name="PRODUCT_STRING_MSC_HS"/>
+		<Parameter Name="SERIALNUMBER_STRING_MSC_HS"/>
+		<Parameter Name="CONFIGURATION_STRING_MSC_HS"/>
+		<Parameter Name="INTERFACE_STRING_MSC_HS"/>
 		<Parameter Name="hUsbDevice"/>
 		<Parameter Name="USBD_HandleTypeDef">
 			<PossibleValue>hUsbDeviceHS</PossibleValue>
@@ -1676,11 +1674,11 @@
 			<Condition Expression="(USB_DEVICE_FS_CLASSES) &amp; (!USB_DEVICE_HS_CLASSES)" Diagnostic=""/>			
 		</Parameter>				
 		<!-- Parameters for Device Descriptors -->		
-		<Parameter Name="PID_FS"/>		
-		<Parameter Name="PRODUCT_STRING_FS"/>
-		<Parameter Name="SERIALNUMBER_STRING_FS"/>
-		<Parameter Name="CONFIGURATION_STRING_FS"/>
-		<Parameter Name="INTERFACE_STRING_FS"/>
+		<Parameter Name="PID_MSC_FS"/>		
+		<Parameter Name="PRODUCT_STRING_MSC_FS"/>
+		<Parameter Name="SERIALNUMBER_STRING_MSC_FS"/>
+		<Parameter Name="CONFIGURATION_STRING_MSC_FS"/>
+		<Parameter Name="INTERFACE_STRING_MSC_FS"/>
 		<Parameter Name="hUsbDevice"/>
 		<Parameter Name="USBD_HandleTypeDef">
 			<PossibleValue>hUsbDeviceFS</PossibleValue>
@@ -1737,11 +1735,11 @@
 			<Condition Expression="(USB_DEVICE_HS_CLASSES) | (USB_DEVICE_FS_CLASSES)" Diagnostic=""/>
 		</Parameter>						
 		<!-- Parameters for Device Descriptors -->		
-		<Parameter Name="PID_HS"/>		
-		<Parameter Name="PRODUCT_STRING_HS"/>
-		<Parameter Name="SERIALNUMBER_STRING_HS"/>
-		<Parameter Name="CONFIGURATION_STRING_HS"/>
-		<Parameter Name="INTERFACE_STRING_HS"/>
+		<Parameter Name="PID_MTP_HS"/>		
+		<Parameter Name="PRODUCT_STRING_MTP_HS"/>
+		<Parameter Name="SERIALNUMBER_STRING_MTP_HS"/>
+		<Parameter Name="CONFIGURATION_STRING_MTP_HS"/>
+		<Parameter Name="INTERFACE_STRING_MTP_HS"/>
 		<Parameter Name="hUsbDevice"/>
 		<Parameter Name="USBD_HandleTypeDef">
 			<PossibleValue>hUsbDeviceHS</PossibleValue>
@@ -1794,11 +1792,11 @@
 			<Condition Expression="(USB_DEVICE_FS_CLASSES) &amp; (!USB_DEVICE_HS_CLASSES)" Diagnostic=""/>			
 		</Parameter>				
 		<!-- Parameters for Device Descriptors -->		
-		<Parameter Name="PID_FS"/>		
-		<Parameter Name="PRODUCT_STRING_FS"/>
-		<Parameter Name="SERIALNUMBER_STRING_FS"/>
-		<Parameter Name="CONFIGURATION_STRING_FS"/>
-		<Parameter Name="INTERFACE_STRING_FS"/>
+		<Parameter Name="PID_MTP_FS"/>		
+		<Parameter Name="PRODUCT_STRING_MTP_FS"/>
+		<Parameter Name="SERIALNUMBER_STRING_MTP_FS"/>
+		<Parameter Name="CONFIGURATION_STRING_MTP_FS"/>
+		<Parameter Name="INTERFACE_STRING_MTP_FS"/>
 		<Parameter Name="hUsbDevice"/>
 		<Parameter Name="USBD_HandleTypeDef">
 			<PossibleValue>hUsbDeviceFS</PossibleValue>

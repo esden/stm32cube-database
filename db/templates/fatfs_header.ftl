@@ -1,9 +1,8 @@
 [#ftl]
 /**
   ******************************************************************************
-  * File Name          : fatfs.h
-  * Date               : ${date}
-  * Description        : Header for fatfs applications
+  * @file   fatfs.h
+  * @brief  Header for fatfs applications
   ******************************************************************************
   *
   * COPYRIGHT(c) ${year} STMicroelectronics

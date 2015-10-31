@@ -362,7 +362,7 @@
 	</RefMode>
 		
 	
-	<!-- Modes for COMP. Defined for BigScorpio & Scorpio2 (Category 2/3/4/5). Caution : COMP1 do not work with an ADC activated -->
+	<!-- Modes for COMP. Defined for BigScorpio & Scorpio2 (Category 2/3/4/5). Caution : COMP1 do not work with an ADC activated unless in Windows mode ( Bug 315353)-->
 	<ModeLogicOperator Name="OR">
 		<Mode Name="InputPlus" UserName="Input [+]" >
 			<ModeLogicOperator Name="XOR">
@@ -371,36 +371,35 @@
 						<Signal Name="INP"/>
 					</SignalLogicalOp>
 					<Semaphore>$IpInstance_ExternalInputPlus</Semaphore>
+		                	<Condition Expression="(($IpNumber=1) &amp; !USE_ADC) | ($IpNumber=2)" Diagnostic="ADC must be disabled"/>
 				</Mode>
 				<Mode Name="INP_OPAMP1" UserName="OPAMP 1" RemoveCondition="!(OPAMP1:$modeexist_Filter) | ($IpNumber=2)" >
 					<SignalLogicalOp Name="AND">
 						<Signal Name="VS_OPAMP1"/>
 					</SignalLogicalOp>
-					<Condition Expression="OPAMP1" Diagnostic="Need to have an 'OPAMP 1' activated"/>
+					<Condition Expression="OPAMP1 &amp;(($IpNumber=1) &amp; !USE_ADC) | ($IpNumber=2) " Diagnostic="Need to have an 'OPAMP 1' activated"/>
 				</Mode>
 				<Mode Name="INP_OPAMP2" UserName="OPAMP 2" RemoveCondition="!(OPAMP2:$modeexist_Filter) | ($IpNumber=2)">
 					<SignalLogicalOp Name="AND">
 						<Signal Name="VS_OPAMP2"/>
 					</SignalLogicalOp>
-					<Condition Expression="OPAMP2" Diagnostic="Need to have an 'OPAMP 2' activated"/>
+					<Condition Expression="OPAMP2 &amp;(($IpNumber=1) &amp; !USE_ADC) | ($IpNumber=2) " Diagnostic="Need to have an 'OPAMP 2' activated"/>
 				</Mode>
 				<Mode Name="INP_OPAMP3" UserName="OPAMP 3" RemoveCondition="!(OPAMP3:$modeexist_Filter) | ($IpNumber=2)">
 					<SignalLogicalOp Name="AND">
 						<Signal Name="VS_OPAMP3"/>
 					</SignalLogicalOp>
-					<Condition Expression="OPAMP3" Diagnostic="Need to have an 'OPAMP 3' activated"/>
+					<Condition Expression="OPAMP3 &amp;(($IpNumber=1) &amp; !USE_ADC) | ($IpNumber=2) " Diagnostic="Need to have an 'OPAMP 3' activated"/>
 				</Mode>
 				<Mode Name="WindowMode" UserName="Window Mode" RemoveCondition="($IpNumber=2)" >
 					<SignalLogicalOp Name="AND">
 						<Signal Name="VS_WindowMode"/>
 					</SignalLogicalOp>
 					<Semaphore>$IpInstance_WindowsMode</Semaphore>
-					<Condition Expression="(($IpNumber=1) &amp; COMP2_ExternalInputPlus)" 
-								Diagnostic="Need to have an INP (External Input [+]) on next Comparator"/>
+					<Condition Expression="(($IpNumber=1) &amp; COMP2_ExternalInputPlus)" Diagnostic="Need to have an INP (External Input [+]) on next Comparator"/>
 				</Mode>
 			</ModeLogicOperator>
 			<Semaphore>$IpInstance_InputPlus</Semaphore>
-			<Condition Expression="(($IpNumber=1) &amp; !USE_ADC) | ($IpNumber=2)" Diagnostic="ADC must be disabled"/>
 		</Mode>
 		
 		<Mode Name="InputNeg" UserName="Input [-]" RemoveCondition="($IpNumber=1)">

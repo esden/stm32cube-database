@@ -10,22 +10,49 @@
   <About>FREERTOS: Free Real Time Operating System</About>
 	
 	<!-- Semaphore of CMSIS_version TO BE UPDATED when FW packages come and support new FreeRTOS and CMSI versions -->
-	<RefParameter Name="CMSIS_version" Comment="CMSIS_version" DefaultValue="102" Type="integer" Visible="false">
+	<RefParameter Name="CMSIS_version" Comment="CMSIS-RTOS version" DefaultValue="1.02" Type="String" Group="Versions" TabName="Config parameters">
 	    <!-- <Condition Diagnostic="New version available for F1 and F4" Expression="STM32F1 | STM32F4"/> -->
-	    <PossibleValue Comment="New version of CMSIS" Value="102" Semaphore="S_FREERTOS_V8"/>
-	    <Condition Diagnostic="New version available for F0, F1 and F4" Expression="STM32F0 | STM32F1 | STM32F4"/>
+	    <PossibleValue Comment="New version of CMSIS" Value="1.02" Semaphore="S_FREERTOS_V8"/>
+	    <Condition Diagnostic="Version available for F0, F1, F4, L1 and F7" Expression="STM32F0 | STM32F1 | STM32F4 | STM32L1 | STM32F7"/>
 	</RefParameter>
-	<RefParameter Name="CMSIS_version" Comment="CMSIS_version" DefaultValue="100" Type="integer" Visible="false">
-		<PossibleValue Comment="New version of CMSIS" Value="100" Semaphore="S_FREERTOS_V7"/>
+	<RefParameter Name="CMSIS_version" Comment="CMSIS-RTOS version" DefaultValue="1.00" Type="String" Group="Versions" TabName="Config parameters">
+		<PossibleValue Comment="Previous version of CMSIS" Value="1.00" Semaphore="S_FREERTOS_V7"/>
+	</RefParameter>
+
+	<RefParameter Name="FREERTOS_version" Comment="FreeRTOS version" DefaultValue="8.2.1" Type="String" Group="Versions" TabName="Config parameters">
+	    <PossibleValue Comment="New version of FreeRTOS" Value="8.2.1" Semaphore="S_VERSION_8_2_1"/>
+	    <Condition Diagnostic="New version available for F7" Expression="STM32F7"/>
+	</RefParameter>
+	<RefParameter Name="FREERTOS_version" Comment="FreeRTOS version" DefaultValue="8.1.2" Type="String" Group="Versions" TabName="Config parameters">
+	    <PossibleValue Comment="Previous version of FreeRTOS" Value="8.1.2" Semaphore="S_VERSION_8_1_2"/>
+	    <Condition Diagnostic="Version available for F0, F1, F4 and L1" Expression="STM32F0 | STM32F1 | STM32F4 | STM32L1"/>
+	</RefParameter>
+	<RefParameter Name="FREERTOS_version" Comment="FreeRTOS version" DefaultValue="7.6.0" Type="String" Group="Versions" TabName="Config parameters">
+		<PossibleValue Comment="Oldest version of FreeRTOS" Value="7.6.0" Semaphore="S_VERSION_7_6_0"/>
 	</RefParameter>
 
 	<RefParameter Name="RAM_SIZE" Comment="RAM_SIZE" DefaultValue="=$RamSize" Type="integer" Visible="false"/>
-	<RefParameter Name="MAX_RAM_SIZE" Comment="MAX RAM SIZE" DefaultValue="4000" Type="integer" Visible="false">
+	<RefParameter Name="MAX_RAM_SIZE" Comment="MAX RAM SIZE" DefaultValue="4096" Type="integer" Visible="false">
 	    <Condition Diagnostic="Security belt when ramSize fetched is null" Expression="RAM_SIZE=0"/>
 	</RefParameter>
 	<RefParameter Name="MAX_RAM_SIZE" Comment="MAX RAM SIZE" DefaultValue="=1024*RAM_SIZE" Type="integer" Visible="false">
 	</RefParameter>
 	
+<!-- 
+	<RefParameter Name="USB_HOST_ON" Comment="Check if USBH is enabled" DefaultValue="=(USB_HOST_FS_CLASSES | USB_HOST_HS_CLASSES)" Type="integer" Visible="false"/>
+    <RefParameter Name="USBH_PRIO" Comment="USBH prio" DefaultValue="=USB_HOST:USBH_PROCESS_PRIO" Type="String" Visible="false"/>
+-->
+
+<!--  
+	<RefParameter Name="MIN_PRIO" Comment="Min Prio" DefaultValue="1" Type="integer" Visible="false">
+	    <Condition Diagnostic="Get usbh prio" Expression="USB_HOST_ON=1 &amp; USBH_PRIO_IDLE"/>
+	</RefParameter>
+	<RefParameter Name="MIN_PRIO" Comment="Min Prio" DefaultValue="2" Type="integer" Visible="false">
+	    <Condition Diagnostic="Get usbh prio" Expression="USB_HOST_ON=1 &amp; USBH_PRIO_LOW"/>
+	</RefParameter>
+	<RefParameter Name="MIN_PRIO" Comment="Min Prio" DefaultValue="4" Type="integer" Visible="false">
+	</RefParameter>	
+-->	
 
 	<!-- #define to be generated in FreeRTOSConfig.h as required by FreeRTOS.h -->
 
@@ -53,10 +80,14 @@
 	    <Description>Sets the maximum priority that can be assigned to a task. &lt;br&gt; Tasks can be assigned a priority from zero, which is the lowest priority, to (MAX_PRIORITIES-1), which is the highest priority.</Description>
 	</RefParameter>
 	
-    
-	<RefParameter Name="configMINIMAL_STACK_SIZE" Comment="MINIMAL_STACK_SIZE" DefaultValue="128" Max="=configTOTAL_HEAP_SIZE/4" Min="64"  Type="integer" Group="Kernel settings" TabName="Config parameters">
-	    <Description>Sets the size of the stack allocated to the idle task. The value is specified in words, not bytes. &lt;br&gt; &lt;b&gt;Warning: &lt;/b&gt; &lt;br&gt;The value chosen by the user should take into account the number of threads, the total heap size and the system stack size. If the totality of used stack size is higher than the total heap size, FreeRTOS will not be able to create and manage the tasks.</Description>
+    <RefParameter Name="configMINIMAL_STACK_SIZE" Comment="MINIMAL_STACK_SIZE" DefaultValue="96" Unit="Words" Max="=configTOTAL_HEAP_SIZE/4" Min="64"  Type="integer" Group="Kernel settings" TabName="Config parameters">
+		<Condition Diagnostic="Default value set to 96 for a target with only 4K RAM " Expression="MAX_RAM_SIZE=4096"/>
+	    <Description>Sets the size of the stack allocated to the idle task. The value is specified in words, not bytes. &lt;br&gt; &lt;b&gt;Warning: &lt;/b&gt; &lt;br&gt;The value chosen by the user should take into account the number of threads, the total heap size and the system stack size. If the totality of used stack size is higher than the total heap size, FreeRTOS will not be able to create and manage the tasks.&lt;br&gt;For information: max value = configTOTAL_HEAP_SIZE/4 </Description>
 	</RefParameter>
+	<RefParameter Name="configMINIMAL_STACK_SIZE" Comment="MINIMAL_STACK_SIZE" DefaultValue="128" Unit="Words" Max="=configTOTAL_HEAP_SIZE/4" Min="64"  Type="integer" Group="Kernel settings" TabName="Config parameters">
+	    <Description>Sets the size of the stack allocated to the idle task. The value is specified in words, not bytes. &lt;br&gt; &lt;b&gt;Warning: &lt;/b&gt; &lt;br&gt;The value chosen by the user should take into account the number of threads, the total heap size and the system stack size. If the totality of used stack size is higher than the total heap size, FreeRTOS will not be able to create and manage the tasks.&lt;br&gt;For information: max value = configTOTAL_HEAP_SIZE/4 </Description>
+	</RefParameter>
+	
 	
 	<!-- NOTE: Now takes into account the default task name (defaultTask) for the minimum value of that length !  (12 instead of 1) -->
 	<RefParameter Name="configMAX_TASK_NAME_LEN" Comment="MAX_TASK_NAME_LEN" DefaultValue="16" Max="255" Min="12" Type="integer" Group="Kernel settings" TabName="Config parameters">
@@ -113,42 +144,50 @@
 	    <Description>The total amount of RAM available to the RTOS kernel. &lt;br&gt;TOTAL_HEAP_SIZE setting has no effect unless heap_1.c, heap_2.c or heap_4.c are being used by the application (see &lt;b&gt;Memory Management scheme&lt;/b&gt; parameter for more information). &lt;br&gt; &lt;b&gt;Warning: &lt;/b&gt; &lt;br&gt;The value chosen by the user should take into account the application consumption of RAM otherwise it will lead to link issues!</Description>
 	</RefParameter>
 	-->
-	<RefParameter Name="configTOTAL_HEAP_SIZE" Comment="TOTAL_HEAP_SIZE" DefaultValue="15360" Unit="Byte(s)" Type="integer" Max="=1024*$RamSize" Min="=configMINIMAL_STACK_SIZE*4" Group="Kernel settings" TabName="Config parameters">
+	<RefParameter Name="configTOTAL_HEAP_SIZE" Comment="TOTAL_HEAP_SIZE" DefaultValue="2048" Unit="Bytes" Type="integer" Max="=1024*$RamSize" Min="=configMINIMAL_STACK_SIZE*4" Group="Kernel settings" TabName="Config parameters">
+	    <Condition Diagnostic="Values for an MCU with 4K of RAM" Expression="MAX_RAM_SIZE=4096"/>
+	    <Description>The total amount of RAM available to the RTOS kernel. &lt;br&gt;TOTAL_HEAP_SIZE setting has no effect unless heap_1.c, heap_2.c or heap_4.c are being used by the application (see &lt;b&gt;Memory Management scheme&lt;/b&gt; parameter for more information). &lt;br&gt; &lt;b&gt;Warning: &lt;/b&gt; &lt;br&gt;The value chosen by the user should take into account the application consumption of RAM otherwise it will lead to link issues!&lt;br&gt;For information: min value = configMINIMAL_STACK_SIZE*4</Description>
+	</RefParameter>
+	<RefParameter Name="configTOTAL_HEAP_SIZE" Comment="TOTAL_HEAP_SIZE" DefaultValue="15360" Unit="Bytes" Type="integer" Max="=1024*$RamSize" Min="=configMINIMAL_STACK_SIZE*4" Group="Kernel settings" TabName="Config parameters">
 	    <Condition Diagnostic="Values for F4" Expression="STM32F4"/>
-	    <Description>The total amount of RAM available to the RTOS kernel. &lt;br&gt;TOTAL_HEAP_SIZE setting has no effect unless heap_1.c, heap_2.c or heap_4.c are being used by the application (see &lt;b&gt;Memory Management scheme&lt;/b&gt; parameter for more information). &lt;br&gt; &lt;b&gt;Warning: &lt;/b&gt; &lt;br&gt;The value chosen by the user should take into account the application consumption of RAM otherwise it will lead to link issues!</Description>
+	    <Description>The total amount of RAM available to the RTOS kernel. &lt;br&gt;TOTAL_HEAP_SIZE setting has no effect unless heap_1.c, heap_2.c or heap_4.c are being used by the application (see &lt;b&gt;Memory Management scheme&lt;/b&gt; parameter for more information). &lt;br&gt; &lt;b&gt;Warning: &lt;/b&gt; &lt;br&gt;The value chosen by the user should take into account the application consumption of RAM otherwise it will lead to link issues!&lt;br&gt;For information: min value = configMINIMAL_STACK_SIZE*4</Description>
 	</RefParameter>
-	<RefParameter Name="configTOTAL_HEAP_SIZE" Comment="TOTAL_HEAP_SIZE" DefaultValue="15360" Unit="Byte(s)" Type="integer" Max="=1024*$RamSize" Min="=configMINIMAL_STACK_SIZE*4" Group="Kernel settings" TabName="Config parameters">
+	<RefParameter Name="configTOTAL_HEAP_SIZE" Comment="TOTAL_HEAP_SIZE" DefaultValue="15360" Unit="Bytes" Type="integer" Max="=1024*$RamSize" Min="=configMINIMAL_STACK_SIZE*4" Group="Kernel settings" TabName="Config parameters">
 	    <Condition Diagnostic="Values for F2" Expression="STM32F2"/>
-	    <Description>The total amount of RAM available to the RTOS kernel. &lt;br&gt;TOTAL_HEAP_SIZE setting has no effect unless heap_1.c, heap_2.c or heap_4.c are being used by the application (see &lt;b&gt;Memory Management scheme&lt;/b&gt; parameter for more information). &lt;br&gt; &lt;b&gt;Warning: &lt;/b&gt; &lt;br&gt;The value chosen by the user should take into account the application consumption of RAM otherwise it will lead to link issues!</Description>
+	    <Description>The total amount of RAM available to the RTOS kernel. &lt;br&gt;TOTAL_HEAP_SIZE setting has no effect unless heap_1.c, heap_2.c or heap_4.c are being used by the application (see &lt;b&gt;Memory Management scheme&lt;/b&gt; parameter for more information). &lt;br&gt; &lt;b&gt;Warning: &lt;/b&gt; &lt;br&gt;The value chosen by the user should take into account the application consumption of RAM otherwise it will lead to link issues!&lt;br&gt;For information: min value = configMINIMAL_STACK_SIZE*4</Description>
 	</RefParameter>
-	<RefParameter Name="configTOTAL_HEAP_SIZE" Comment="TOTAL_HEAP_SIZE" DefaultValue="3000" Unit="Byte(s)" Type="integer" Max="=1024*$RamSize" Min="=configMINIMAL_STACK_SIZE*4" Group="Kernel settings" TabName="Config parameters">
+	<RefParameter Name="configTOTAL_HEAP_SIZE" Comment="TOTAL_HEAP_SIZE" DefaultValue="3072" Unit="Bytes" Type="integer" Max="=1024*$RamSize" Min="=configMINIMAL_STACK_SIZE*4" Group="Kernel settings" TabName="Config parameters">
 	    <Condition Diagnostic="Values for L0" Expression="STM32l0"/>
-	    <Description>The total amount of RAM available to the RTOS kernel. &lt;br&gt;TOTAL_HEAP_SIZE setting has no effect unless heap_1.c, heap_2.c or heap_4.c are being used by the application (see &lt;b&gt;Memory Management scheme&lt;/b&gt; parameter for more information). &lt;br&gt; &lt;b&gt;Warning: &lt;/b&gt; &lt;br&gt;The value chosen by the user should take into account the application consumption of RAM otherwise it will lead to link issues!</Description>
+	    <Description>The total amount of RAM available to the RTOS kernel. &lt;br&gt;TOTAL_HEAP_SIZE setting has no effect unless heap_1.c, heap_2.c or heap_4.c are being used by the application (see &lt;b&gt;Memory Management scheme&lt;/b&gt; parameter for more information). &lt;br&gt; &lt;b&gt;Warning: &lt;/b&gt; &lt;br&gt;The value chosen by the user should take into account the application consumption of RAM otherwise it will lead to link issues!&lt;br&gt;For information: min value = configMINIMAL_STACK_SIZE*4</Description>
 	</RefParameter>
-	<RefParameter Name="configTOTAL_HEAP_SIZE" Comment="TOTAL_HEAP_SIZE" DefaultValue="2000" Unit="Byte(s)" Type="integer" Max="=MAX_RAM_SIZE" Min="=configMINIMAL_STACK_SIZE*4" Group="Kernel settings" TabName="Config parameters">
+	<RefParameter Name="configTOTAL_HEAP_SIZE" Comment="TOTAL_HEAP_SIZE" DefaultValue="3072" Unit="Bytes" Type="integer" Max="=MAX_RAM_SIZE" Min="=configMINIMAL_STACK_SIZE*4" Group="Kernel settings" TabName="Config parameters">
 	    <Condition Diagnostic="Values for F0" Expression="STM32F0"/>
-	    <Description>The total amount of RAM available to the RTOS kernel. &lt;br&gt;TOTAL_HEAP_SIZE setting has no effect unless heap_1.c, heap_2.c or heap_4.c are being used by the application (see &lt;b&gt;Memory Management scheme&lt;/b&gt; parameter for more information). &lt;br&gt; &lt;b&gt;Warning: &lt;/b&gt; &lt;br&gt;The value chosen by the user should take into account the application consumption of RAM otherwise it will lead to link issues!</Description>
+	    <Description>The total amount of RAM available to the RTOS kernel. &lt;br&gt;TOTAL_HEAP_SIZE setting has no effect unless heap_1.c, heap_2.c or heap_4.c are being used by the application (see &lt;b&gt;Memory Management scheme&lt;/b&gt; parameter for more information). &lt;br&gt; &lt;b&gt;Warning: &lt;/b&gt; &lt;br&gt;The value chosen by the user should take into account the application consumption of RAM otherwise it will lead to link issues!&lt;br&gt;For information: min value = configMINIMAL_STACK_SIZE*4</Description>
 	</RefParameter>
-		<RefParameter Name="configTOTAL_HEAP_SIZE" Comment="TOTAL_HEAP_SIZE" DefaultValue="3000" Unit="Byte(s)" Type="integer" Max="=1024*$RamSize" Min="=configMINIMAL_STACK_SIZE*4" Group="Kernel settings" TabName="Config parameters">
+		<RefParameter Name="configTOTAL_HEAP_SIZE" Comment="TOTAL_HEAP_SIZE" DefaultValue="3072" Unit="Bytes" Type="integer" Max="=1024*$RamSize" Min="=configMINIMAL_STACK_SIZE*4" Group="Kernel settings" TabName="Config parameters">
 	    <Condition Diagnostic="Values for F3" Expression="STM32F3"/>
-	    <Description>The total amount of RAM available to the RTOS kernel. &lt;br&gt;TOTAL_HEAP_SIZE setting has no effect unless heap_1.c, heap_2.c or heap_4.c are being used by the application (see &lt;b&gt;Memory Management scheme&lt;/b&gt; parameter for more information). &lt;br&gt; &lt;b&gt;Warning: &lt;/b&gt; &lt;br&gt;The value chosen by the user should take into account the application consumption of RAM otherwise it will lead to link issues!</Description>
+	    <Description>The total amount of RAM available to the RTOS kernel. &lt;br&gt;TOTAL_HEAP_SIZE setting has no effect unless heap_1.c, heap_2.c or heap_4.c are being used by the application (see &lt;b&gt;Memory Management scheme&lt;/b&gt; parameter for more information). &lt;br&gt; &lt;b&gt;Warning: &lt;/b&gt; &lt;br&gt;The value chosen by the user should take into account the application consumption of RAM otherwise it will lead to link issues!&lt;br&gt;For information: min value = configMINIMAL_STACK_SIZE*4</Description>
 	</RefParameter>
-    <RefParameter Name="configTOTAL_HEAP_SIZE" Comment="TOTAL_HEAP_SIZE" DefaultValue="2000" Unit="Byte(s)" Type="integer" Max="=1024*$RamSize" Min="=configMINIMAL_STACK_SIZE*4" Group="Kernel settings" TabName="Config parameters">
+    <RefParameter Name="configTOTAL_HEAP_SIZE" Comment="TOTAL_HEAP_SIZE" DefaultValue="3072" Unit="Bytes" Type="integer" Max="=1024*$RamSize" Min="=configMINIMAL_STACK_SIZE*4" Group="Kernel settings" TabName="Config parameters">
 	    <Condition Diagnostic="Values for l1" Expression="STM32L1"/>
-	    <Description>The total amount of RAM available to the RTOS kernel. &lt;br&gt;TOTAL_HEAP_SIZE setting has no effect unless heap_1.c, heap_2.c or heap_4.c are being used by the application (see &lt;b&gt;Memory Management scheme&lt;/b&gt; parameter for more information). &lt;br&gt; &lt;b&gt;Warning: &lt;/b&gt; &lt;br&gt;The value chosen by the user should take into account the application consumption of RAM otherwise it will lead to link issues!</Description>
+	    <Description>The total amount of RAM available to the RTOS kernel. &lt;br&gt;TOTAL_HEAP_SIZE setting has no effect unless heap_1.c, heap_2.c or heap_4.c are being used by the application (see &lt;b&gt;Memory Management scheme&lt;/b&gt; parameter for more information). &lt;br&gt; &lt;b&gt;Warning: &lt;/b&gt; &lt;br&gt;The value chosen by the user should take into account the application consumption of RAM otherwise it will lead to link issues!&lt;br&gt;For information: min value = configMINIMAL_STACK_SIZE*4</Description>
 	</RefParameter>
-    <RefParameter Name="configTOTAL_HEAP_SIZE" Comment="TOTAL_HEAP_SIZE" DefaultValue="2000" Unit="Byte(s)" Type="integer" Max="=1024*$RamSize" Min="=configMINIMAL_STACK_SIZE*4" Group="Kernel settings" TabName="Config parameters">
+    <RefParameter Name="configTOTAL_HEAP_SIZE" Comment="TOTAL_HEAP_SIZE" DefaultValue="3072" Unit="Bytes" Type="integer" Max="=1024*$RamSize" Min="=configMINIMAL_STACK_SIZE*4" Group="Kernel settings" TabName="Config parameters">
 	    <Condition Diagnostic="Values for F1" Expression="STM32F1"/>
-	    <Description>The total amount of RAM available to the RTOS kernel. &lt;br&gt;TOTAL_HEAP_SIZE setting has no effect unless heap_1.c, heap_2.c or heap_4.c are being used by the application (see &lt;b&gt;Memory Management scheme&lt;/b&gt; parameter for more information). &lt;br&gt; &lt;b&gt;Warning: &lt;/b&gt; &lt;br&gt;The value chosen by the user should take into account the application consumption of RAM otherwise it will lead to link issues!</Description>
+	    <Description>The total amount of RAM available to the RTOS kernel. &lt;br&gt;TOTAL_HEAP_SIZE setting has no effect unless heap_1.c, heap_2.c or heap_4.c are being used by the application (see &lt;b&gt;Memory Management scheme&lt;/b&gt; parameter for more information). &lt;br&gt; &lt;b&gt;Warning: &lt;/b&gt; &lt;br&gt;The value chosen by the user should take into account the application consumption of RAM otherwise it will lead to link issues!&lt;br&gt;For information: min value = configMINIMAL_STACK_SIZE*4</Description>
+	</RefParameter>
+	<RefParameter Name="configTOTAL_HEAP_SIZE" Comment="TOTAL_HEAP_SIZE" DefaultValue="15360" Unit="Bytes" Type="integer" Max="=1024*$RamSize" Min="=configMINIMAL_STACK_SIZE*4" Group="Kernel settings" TabName="Config parameters">
+		<Condition Diagnostic="Values for F7" Expression="STM32F7"/>
+	    <Description>The total amount of RAM available to the RTOS kernel. &lt;br&gt;TOTAL_HEAP_SIZE setting has no effect unless heap_1.c, heap_2.c or heap_4.c are being used by the application (see &lt;b&gt;Memory Management scheme&lt;/b&gt; parameter for more information). &lt;br&gt; &lt;b&gt;Warning: &lt;/b&gt; &lt;br&gt;The value chosen by the user should take into account the application consumption of RAM otherwise it will lead to link issues!&lt;br&gt;For information: min value = configMINIMAL_STACK_SIZE*4</Description>
 	</RefParameter>
     <!-- <RefParameter Name="configTOTAL_HEAP_SIZE" Comment="TOTAL_HEAP_SIZE" DefaultValue="2000" Unit="Byte(s)" Type="integer" Max="=1024*($RamSize-1)" Min="1" Group="Kernel settings" TabName="Config parameters">  -->
-	<RefParameter Name="configTOTAL_HEAP_SIZE" Comment="TOTAL_HEAP_SIZE" DefaultValue="2000" Unit="Byte(s)" Type="integer" Max="=1024*$RamSize" Min="=configMINIMAL_STACK_SIZE*4" Group="Kernel settings" TabName="Config parameters">
-	    <Description>The total amount of RAM available to the RTOS kernel. &lt;br&gt;TOTAL_HEAP_SIZE setting has no effect unless heap_1.c, heap_2.c or heap_4.c are being used by the application (see &lt;b&gt;Memory Management scheme&lt;/b&gt; parameter for more information). &lt;br&gt; &lt;b&gt;Warning: &lt;/b&gt; &lt;br&gt;The value chosen by the user should take into account the application consumption of RAM otherwise it will lead to link issues!</Description>
+	<RefParameter Name="configTOTAL_HEAP_SIZE" Comment="TOTAL_HEAP_SIZE" DefaultValue="3072" Unit="Bytes" Type="integer" Max="=1024*$RamSize" Min="=configMINIMAL_STACK_SIZE*4" Group="Kernel settings" TabName="Config parameters">
+	    <Description>The total amount of RAM available to the RTOS kernel. &lt;br&gt;TOTAL_HEAP_SIZE setting has no effect unless heap_1.c, heap_2.c or heap_4.c are being used by the application (see &lt;b&gt;Memory Management scheme&lt;/b&gt; parameter for more information). &lt;br&gt; &lt;b&gt;Warning: &lt;/b&gt; &lt;br&gt;The value chosen by the user should take into account the application consumption of RAM otherwise it will lead to link issues!&lt;br&gt;For information: min value = configMINIMAL_STACK_SIZE*4</Description>
 	</RefParameter>	
 	
 	<!-- To choose the HEAP version for the project -->
 	<RefParameter Name="HEAP_NUMBER" Comment="Memory Management scheme" DefaultValue="4" Type="list" Group="Kernel settings" TabName="Config parameters">
-        <Condition Diagnostic="Values for F0, F1 and F4 (FreeRTOS v8)" Expression="CMSIS_version=102"/>
+        <Condition Diagnostic="Values for FreeRTOS v8" Expression="CMSIS_version=1.02"/>
 		<PossibleValue Comment="heap_1" Value="1"/>
 		<PossibleValue Comment="heap_2" Value="2"/>
 		<PossibleValue Comment="heap_3" Value="3"/>
@@ -216,7 +255,7 @@
 		<Condition Diagnostic="Both values allowed" Expression="INCLUDE_xTaskGetSchedulerState=1 &amp; INCLUDE_xTimerPendFunctionCall=0 &amp; INCLUDE_xEventGroupSetBitFromISR=0"/>
 		<PossibleValue Comment="Disabled" Value="0"/>
 		<PossibleValue Comment="Enabled" Value="1"/>
-		<Description>Set to 1 (Enabled) to include software timer functionality, or 0 (Disabled) to omit software timer functionality.</Description>
+		<Description>Set to 1 (Enabled) to include software timer functionality, or 0 (Disabled) to omit software timer functionality. &lt;br&gt;&lt;b&gt;Note:&lt;/b&gt;&lt;br&gt;When enabled, memory will be allocated for the timer task: size requested (in Bytes) = 8 * configMINIMAL_STACK_SIZE.</Description>
 	</RefParameter>
 	<RefParameter Name="configUSE_TIMERS" Comment="USE_TIMERS" DefaultValue="1" Type="uniqueElementList" Group="Software timer definitions" TabName="Config parameters">
 		<PossibleValue Comment="Enabled" Value="1"/>
@@ -227,6 +266,11 @@
 	<RefParameter Name="configTIMER_TASK_PRIORITY" Comment="TIMER_TASK_PRIORITY" DefaultValue="2" Max="=configMAX_PRIORITIES-1" Min="0"  Type="integer" Group="Software timer definitions" TabName="Config parameters">
 	    <Description>Sets the priority of the software timer service/daemon task.</Description>
 	</RefParameter>
+	<!-- 
+	<RefParameter Name="configTIMER_TASK_PRIORITY" Comment="TIMER_TASK_PRIORITY" DefaultValue="0" Max="0" Min="0" Type="integer" Group="Software timer definitions" TabName="Config parameters">
+	    <Description>Sets the priority of the software timer service/daemon task.</Description>
+	</RefParameter> 
+	-->
 
 	<!-- must be defined if configUSE_TIMERS == 1 -->
 	<RefParameter Name="configTIMER_QUEUE_LENGTH" Comment="TIMER_QUEUE_LENGTH" DefaultValue="10" Max="255" Min="1"  Type="integer" Group="Software timer definitions" TabName="Config parameters">
@@ -238,7 +282,7 @@
 	<RefParameter Name="configTIMER_TASK_STACK_DEPTH" Comment="" DefaultValue="( configMINIMAL_STACK_SIZE * 2 )" Type="" Visible="false"/>
 	
 	<RefParameter Name="configLIBRARY_LOWEST_INTERRUPT_PRIORITY" Comment="LIBRARY_LOWEST_INTERRUPT_PRIORITY" DefaultValue="15" Max="15" Min="1"  Type="integer" Group="Interrupt nesting behaviour configuration" TabName="Config parameters">
-	    <Condition Diagnostic="Values for F1/F2/F3/F4/L1" Expression="STM32F4 | STM32F2 | STM32F3 | STM32L1 | STM32F1"/>
+	    <Condition Diagnostic="Values for F1/F2/F3/F4/L1/F7" Expression="STM32F4 | STM32F2 | STM32F3 | STM32L1 | STM32F1 | STM32F7"/>
 	    <Description>The lowest interrupt priority that can be used in a call to a "set priority" function.</Description>
 	</RefParameter>
 	<RefParameter Name="configLIBRARY_LOWEST_INTERRUPT_PRIORITY" Comment="LIBRARY_LOWEST_INTERRUPT_PRIORITY" DefaultValue="3" Max="3" Min="1"  Type="integer" Group="Interrupt nesting behaviour configuration" TabName="Config parameters">
@@ -247,7 +291,7 @@
 	
     <!-- <RefParameter Name="configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY" Comment="LIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY" DefaultValue="5" Max="15" Min="1"  Type="integer" Group="Interrupt nesting behaviour configuration" TabName="Config parameters">  -->
 	<RefParameter Name="configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY" Comment="LIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY" DefaultValue="5" Max="=configLIBRARY_LOWEST_INTERRUPT_PRIORITY" Min="1" Type="integer" Group="Interrupt nesting behaviour configuration" TabName="Config parameters">
-	    <Condition Diagnostic="Values for F1/F2/F3/F4/L1" Expression="STM32F4 | STM32F2 | STM32F3 | STM32L1 | STM32F1"/>
+	    <Condition Diagnostic="Values for F1/F2/F3/F4/L1/F7" Expression="STM32F4 | STM32F2 | STM32F3 | STM32L1 | STM32F1 | STM32F7"/>
 	    <Description>The highest interrupt priority that can be used by any interrupt service routine that makes calls to interrupt safe FreeRTOS API functions. &lt;br&gt; DO NOT CALL INTERRUPT SAFE FREERTOS API FUNCTIONS FROM ANY INTERRUPT THAT HAS A HIGHER PRIORITY THAN THIS! (higher priorities are lower numeric values).</Description>
 	</RefParameter>
 	<!-- <RefParameter Name="configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY" Comment="LIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY" DefaultValue="3" Max="3" Min="1"  Type="integer" Group="Interrupt nesting behaviour configuration" TabName="Config parameters"> -->
@@ -291,10 +335,16 @@
 	</RefParameter>
 		
 	<RefParameter Name="INCLUDE_vTaskSuspend" Comment="vTaskSuspend" DefaultValue="1" Type="list" Group="Include definitions" TabName="Include parameters">
+	    <Condition Diagnostic="Forced to enabled (cannot be disabled when configUSE_TICKLESS_IDLE=1)" Expression="configUSE_TICKLESS_IDLE=1"/>
+		<PossibleValue Comment="Enabled" Value="1"/>
+		<Description>It is one of the macros allowing those components of the real time kernel not utilized by your application to be excluded from your build. &lt;br&gt; - this ensures the RTOS does not use any more ROM or RAM than necessary for your particular embedded application. &lt;br&gt; To include the vTaskSuspend() API function, set vTaskSuspend to 1 (Enabled)&lt;br&gt; To exclude it from your build, set vTaskSuspend to 0 (Disabled) </Description>
+	</RefParameter>
+	<RefParameter Name="INCLUDE_vTaskSuspend" Comment="vTaskSuspend" DefaultValue="1" Type="list" Group="Include definitions" TabName="Include parameters">
 		<PossibleValue Comment="Disabled" Value="0"/>
 		<PossibleValue Comment="Enabled" Value="1"/>
 		<Description>It is one of the macros allowing those components of the real time kernel not utilized by your application to be excluded from your build. &lt;br&gt; - this ensures the RTOS does not use any more ROM or RAM than necessary for your particular embedded application. &lt;br&gt; To include the vTaskSuspend() API function, set vTaskSuspend to 1 (Enabled)&lt;br&gt; To exclude it from your build, set vTaskSuspend to 0 (Disabled) </Description>
 	</RefParameter>
+
 	
 	<RefParameter Name="INCLUDE_vTaskDelayUntil" Comment="vTaskDelayUntil" DefaultValue="0" Type="list" Group="Include definitions" TabName="Include parameters">
 		<PossibleValue Comment="Disabled" Value="0"/>
@@ -374,15 +424,15 @@
         <Description>It is one of the macros allowing those components of the real time kernel not utilized by your application to be excluded from your build. &lt;br&gt; - this ensures the RTOS does not use any more ROM or RAM than necessary for your particular embedded application. &lt;br&gt; To include the eTaskGetState() API function, set eTaskGetState to 1 (Enabled)&lt;br&gt; To exclude it from your build, set eTaskGetState to 0 (Disabled).</Description>
 	</RefParameter>
 	
-    <!--  New for FreeRTOS 8.1.2 -->
+    <!--  New for CMSIS v1.02 / FreeRTOS 8.1.2 -->
     <RefParameter Name="INCLUDE_xEventGroupSetBitFromISR" Comment="xEventGroupSetBitFromISR" DefaultValue="0" Type="list" Group="Include definitions" TabName="Include parameters" Visible="true">
-	    <Condition Diagnostic="Available since support of FreeRTOS v8" Expression="CMSIS_version=102 &amp; INCLUDE_xTimerPendFunctionCall=1"/>
+	    <Condition Diagnostic="Available since support of FreeRTOS v8" Expression="CMSIS_version=1.02 &amp; INCLUDE_xTimerPendFunctionCall=1"/>
 	    <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
 	    <Description>Set bits (flags) within an RTOS event group. A version of xEventGroupSetBits() that can be called from an interrupt service routine (ISR). &lt;br&gt;&lt;b&gt;Note:&lt;/b&gt;&lt;br&gt;INCLUDE_xTimerPendFunctionCall must be set to 1 to make the xEventGroupSetBitFromISR() function available.</Description>
 	</RefParameter>
 	<RefParameter Name="INCLUDE_xEventGroupSetBitFromISR" Comment="xEventGroupSetBitFromISR" DefaultValue="0" Type="list" Group="Include definitions" TabName="Include parameters" Visible="true">
-	    <Condition Diagnostic="Available since support of FreeRTOS v8" Expression="CMSIS_version=102 &amp; INCLUDE_xTimerPendFunctionCall=0"/>
+	    <Condition Diagnostic="Available since support of FreeRTOS v8" Expression="CMSIS_version=1.02 &amp; INCLUDE_xTimerPendFunctionCall=0"/>
 	    <PossibleValue Comment="Disabled" Value="0"/>
 	    <Description>Set bits (flags) within an RTOS event group. A version of xEventGroupSetBits() that can be called from an interrupt service routine (ISR). &lt;br&gt;&lt;b&gt;Note:&lt;/b&gt;&lt;br&gt;INCLUDE_xTimerPendFunctionCall must be set to 1 to make the xEventGroupSetBitFromISR() function available. &lt;br&gt;&lt;b&gt;Dependency:&lt;/b&gt;&lt;br&gt; Must be set to 0 (Disabled) when xTimerPendFunctionCall = 0 (Disabled).</Description>
 	</RefParameter>
@@ -391,13 +441,13 @@
 	</RefParameter>
     
     <RefParameter Name="INCLUDE_xTimerPendFunctionCall" Comment="xTimerPendFunctionCall" DefaultValue="0" Type="list" Group="Include definitions" TabName="Include parameters" Visible="true">
-	    <Condition Diagnostic="Available since support of FreeRTOS v8" Expression="CMSIS_version=102 &amp; configUSE_TIMERS=1"/>
+	    <Condition Diagnostic="Available since support of FreeRTOS v8" Expression="CMSIS_version=1.02 &amp; configUSE_TIMERS=1"/>
 	    <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
 	    <Description>Used to pend the execution of a function to the RTOS daemon task (the timer service task, hence this function is pre-fixed with 'Timer'). &lt;br&gt;&lt;b&gt;Note:&lt;/b&gt;&lt;br&gt; configUSE_TIMERS must be set to 1 to make the xTimerPendFunctionCall() function available</Description>
 	</RefParameter>
 	<RefParameter Name="INCLUDE_xTimerPendFunctionCall" Comment="xTimerPendFunctionCall" DefaultValue="0" Type="uniqueElementList" Group="Include definitions" TabName="Include parameters" Visible="true">
-	    <Condition Diagnostic="Available since support of FreeRTOS v8" Expression="CMSIS_version=102 &amp; configUSE_TIMERS=0"/>
+	    <Condition Diagnostic="Available since support of FreeRTOS v8" Expression="CMSIS_version=1.02 &amp; configUSE_TIMERS=0"/>
 	    <PossibleValue Comment="Disabled" Value="0"/>
 	    <Description>Used to pend the execution of a function to the RTOS daemon task (the timer service task, hence this function is pre-fixed with 'Timer'). &lt;br&gt;&lt;b&gt;Note:&lt;/b&gt;&lt;br&gt; configUSE_TIMERS must be set to 1 to make the xTimerPendFunctionCall() function available &lt;br&gt;&lt;b&gt;Dependency:&lt;/b&gt;&lt;br&gt; Forced to 0 (Disabled) as configUSE_TIMERS is Disabled.</Description>
 	</RefParameter>
@@ -406,7 +456,7 @@
 	</RefParameter>
 	
     <RefParameter Name="configENABLE_BACKWARD_COMPATIBILITY" Comment="ENABLE_BACKWARD_COMPATIBILITY" DefaultValue="1" Type="list" Group="Kernel settings" TabName="Config parameters" Visible="true">
-	    <Condition Diagnostic="Available since support of FreeRTOS v8" Expression="CMSIS_version=102"/>
+	    <Condition Diagnostic="Available since support of FreeRTOS v8" Expression="CMSIS_version=1.02"/>
 	    <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
 	    <Description>The FreeRTOS.h header file includes a set of #define macros that map the names of data types used in versions of FreeRTOS prior to version 8.0.0 to the names used in FreeRTOS version 8.0.0. &lt;br&gt;The macros allow application code to update the version of FreeRTOS they are built against from a pre 8.0.0 version to a post 8.0.0 version without modification. &lt;br&gt;Setting configENABLE_BACKWARD_COMPATIBILITY to 0 in FreeRTOSConfig.h excludes the macros from the build, and in so doing allowing validation that no pre version 8.0.0 names are being used. </Description>
@@ -416,41 +466,71 @@
 	</RefParameter>
 
     <RefParameter Name="configUSE_PORT_OPTIMISED_TASK_SELECTION" Comment="USE_PORT_OPTIMISED_TASK_SELECTION" DefaultValue="0" Type="uniqueElementList" Group="Kernel settings" TabName="Config parameters" Visible="true">
-	    <Condition Diagnostic="configUSE_PORT_OPTIMISED_TASK_SELECTION must always be disabled with M0 cortex" Expression="CMSIS_version=102 &amp; (STM32F0 | STM32L0)"/>
+	    <Condition Diagnostic="configUSE_PORT_OPTIMISED_TASK_SELECTION must always be disabled with M0 cortex" Expression="CMSIS_version=1.02 &amp; (STM32F0 | STM32L0)"/>
 	    <PossibleValue Comment="Disabled" Value="0"/>
 	    <Description>Some FreeRTOS ports have two methods of selecting the next task to execute - a generic method, and a method that is specific to that port.&lt;br&gt;The Generic method:&lt;br&gt;- Is used when configUSE_PORT_OPTIMISED_TASK_SELECTION is set to 0, or when a port specific method is not implemented.&lt;br&gt;- Can be used with all FreeRTOS ports.&lt;br&gt;- Is completely written in C, making it less efficient than a port specific method.&lt;br&gt;- Does not impose a limit on the maximum number of available priorities.&lt;br&gt;A port specific method:&lt;br&gt;- Is not available for all ports.&lt;br&gt;- Is used when configUSE_PORT_OPTIMISED_TASK_SELECTION is set to 1.&lt;br&gt;- Relies on one or more architecture specific assembly instructions (typically a Count Leading Zeros [CLZ] of equivalent instruction) so can only be used with the architecture for which it was specifically written.&lt;br&gt;- Is more efficient than the generic method.&lt;br&gt;- Typically imposes a limit of 32 on the maximum number of available priorities.</Description>
 	</RefParameter>
     <RefParameter Name="configUSE_PORT_OPTIMISED_TASK_SELECTION" Comment="USE_PORT_OPTIMISED_TASK_SELECTION" DefaultValue="0" Type="list" Group="Kernel settings" TabName="Config parameters" Visible="true">
-	    <Condition Diagnostic="configUSE_PORT_OPTIMISED_TASK_SELECTION can only be set to 1 when configMAX_PRIORITIES is less than or equal to 32" Expression="CMSIS_version=102 &amp; (configMAX_PRIORITIES &lt; 33)"/>
+	    <Condition Diagnostic="configUSE_PORT_OPTIMISED_TASK_SELECTION can only be set to 1 when configMAX_PRIORITIES is less than or equal to 32" Expression="CMSIS_version=1.02 &amp; (configMAX_PRIORITIES &lt; 33)"/>
 	    <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
 	    <Description>Some FreeRTOS ports have two methods of selecting the next task to execute - a generic method, and a method that is specific to that port.&lt;br&gt;The Generic method:&lt;br&gt;- Is used when configUSE_PORT_OPTIMISED_TASK_SELECTION is set to 0, or when a port specific method is not implemented.&lt;br&gt;- Can be used with all FreeRTOS ports.&lt;br&gt;- Is completely written in C, making it less efficient than a port specific method.&lt;br&gt;- Does not impose a limit on the maximum number of available priorities.&lt;br&gt;A port specific method:&lt;br&gt;- Is not available for all ports.&lt;br&gt;- Is used when configUSE_PORT_OPTIMISED_TASK_SELECTION is set to 1.&lt;br&gt;- Relies on one or more architecture specific assembly instructions (typically a Count Leading Zeros [CLZ] of equivalent instruction) so can only be used with the architecture for which it was specifically written.&lt;br&gt;- Is more efficient than the generic method.&lt;br&gt;- Typically imposes a limit of 32 on the maximum number of available priorities.</Description>
 	</RefParameter>
 	 <RefParameter Name="configUSE_PORT_OPTIMISED_TASK_SELECTION" Comment="USE_PORT_OPTIMISED_TASK_SELECTION" DefaultValue="0" Type="list" Group="Kernel settings" TabName="Config parameters" Visible="true">
-	    <Condition Diagnostic="configUSE_PORT_OPTIMISED_TASK_SELECTION can only be set to 1 when configMAX_PRIORITIES is less than or equal to 32" Expression="CMSIS_version=102 &amp; (configMAX_PRIORITIES &gt; 32)"/>
+	    <Condition Diagnostic="configUSE_PORT_OPTIMISED_TASK_SELECTION can only be set to 1 when configMAX_PRIORITIES is less than or equal to 32" Expression="CMSIS_version=1.02 &amp; (configMAX_PRIORITIES &gt; 32)"/>
 	    <PossibleValue Comment="Disabled" Value="0"/>
 	    <Description>Some FreeRTOS ports have two methods of selecting the next task to execute - a generic method, and a method that is specific to that port.&lt;br&gt;The Generic method:&lt;br&gt;- Is used when configUSE_PORT_OPTIMISED_TASK_SELECTION is set to 0, or when a port specific method is not implemented.&lt;br&gt;- Can be used with all FreeRTOS ports.&lt;br&gt;- Is completely written in C, making it less efficient than a port specific method.&lt;br&gt;- Does not impose a limit on the maximum number of available priorities.&lt;br&gt;A port specific method:&lt;br&gt;- Is not available for all ports.&lt;br&gt;- Is used when configUSE_PORT_OPTIMISED_TASK_SELECTION is set to 1.&lt;br&gt;- Relies on one or more architecture specific assembly instructions (typically a Count Leading Zeros [CLZ] of equivalent instruction) so can only be used with the architecture for which it was specifically written.&lt;br&gt;- Is more efficient than the generic method.&lt;br&gt;- Typically imposes a limit of 32 on the maximum number of available priorities.</Description>
 	</RefParameter>
 	<RefParameter Name="configUSE_PORT_OPTIMISED_TASK_SELECTION" Comment="USE_PORT_OPTIMISED_TASK_SELECTION" DefaultValue="null" Type="integer" Group="Kernel settings" TabName="Config parameters" Visible="false">
 	    <Description>Some FreeRTOS ports have two methods of selecting the next task to execute - a generic method, and a method that is specific to that port.&lt;br&gt;The Generic method:&lt;br&gt;- Is used when configUSE_PORT_OPTIMISED_TASK_SELECTION is set to 0, or when a port specific method is not implemented.&lt;br&gt;- Can be used with all FreeRTOS ports.&lt;br&gt;- Is completely written in C, making it less efficient than a port specific method.&lt;br&gt;- Does not impose a limit on the maximum number of available priorities.&lt;br&gt;A port specific method:&lt;br&gt;- Is not available for all ports.&lt;br&gt;- Is used when configUSE_PORT_OPTIMISED_TASK_SELECTION is set to 1.&lt;br&gt;- Relies on one or more architecture specific assembly instructions (typically a Count Leading Zeros [CLZ] of equivalent instruction) so can only be used with the architecture for which it was specifically written.&lt;br&gt;- Is more efficient than the generic method.&lt;br&gt;- Typically imposes a limit of 32 on the maximum number of available priorities.</Description>
-	</RefParameter>      
+	</RefParameter>    
+	
+	<!--  New for FreeRTOS 8.2.1 -->  
+    <RefParameter Name="configUSE_TICKLESS_IDLE" Comment="USE_TICKLESS_IDLE" DefaultValue="0" Type="list" Group="Kernel settings" TabName="Config parameters" Visible="true">
+	    <Condition Diagnostic="" Expression="S_VERSION_8_2_1 &amp; INCLUDE_vTaskSuspend=1"/>
+	    <PossibleValue Comment="Disabled" Value="0"/>
+        <PossibleValue Comment="Enabled" Value="1"/>
+	    <Description>By setting the configUSE_TICKLESS_IDLE, the idle task suppresses ticks and the processor stays in a low power mode for as long as possible.&lt;br&gt;When set to 1 (Enabled), two macros, configPRE_SLEEP_PROCESSING and configPOST_SLEEP_PROCESSING are generated in FreeRTOSConfig.h, and two empty functions, PreSleepProcessing and PostSleepProcessing generated in freertos.c (to be completed with user code).</Description>
+	</RefParameter>
+    <RefParameter Name="configUSE_TICKLESS_IDLE" Comment="USE_TICKLESS_IDLE" DefaultValue="0" Type="list" Group="Kernel settings" TabName="Config parameters" Visible="true">
+	    <Condition Diagnostic="Forced to 0 (Disabled) : cannot be enabled when INCLUDE_vTaskSuspend = 0 (Disabled)" Expression="S_VERSION_8_2_1 &amp; INCLUDE_vTaskSuspend=0"/>
+	    <PossibleValue Comment="Disabled" Value="0"/>
+	    <Description>By setting the configUSE_TICKLESS_IDLE, the idle task suppresses ticks and the processor stays in a low power mode for as long as possible.</Description>
+	</RefParameter>
+	<RefParameter Name="configUSE_TICKLESS_IDLE" Comment="configUSE_TICKLESS_IDLE" DefaultValue="0" Type="integer" Group="Kernel settings" TabName="Config parameters" Visible="false">
+	    <Description>By setting the configUSE_TICKLESS_IDLE, the idle task suppresses ticks and the processor stays in a low power mode for as long as possible.</Description>
+	</RefParameter>	
+	
+	<RefParameter Name="configUSE_TASK_NOTIFICATIONS" Comment="USE_TASK_NOTIFICATIONS" DefaultValue="1" Type="list" Group="Kernel settings" TabName="Config parameters" Visible="true">
+	    <Condition Diagnostic="Added since support of FreeRTOS v8.2.1" Expression="S_VERSION_8_2_1"/>
+	    <PossibleValue Comment="Disabled" Value="0"/>
+        <PossibleValue Comment="Enabled" Value="1"/>
+	    <Description>Each RTOS task has a 32-bit notification value. An RTOS task notification is an event sent directly to a task that can unblock the receiving task, and optionally update the receiving task's notification value.&lt;br&gt;RTOS task notification functionality is enabled by default, and can be excluded from a build (saving 8 bytes per task) by setting configUSE_TASK_NOTIFICATIONS to 0 in FreeRTOSConfig.h (achieved when setting USE_TASK_NOTIFICATIONS to Disabled). </Description>
+	</RefParameter>
+		<RefParameter Name="configUSE_TASK_NOTIFICATIONS" Comment="USE_TASK_NOTIFICATIONS" DefaultValue="0" Type="integer" Group="Kernel settings" TabName="Config parameters" Visible="false">
+	    <Description>Each RTOS task has a 32-bit notification value. An RTOS task notification is an event sent directly to a task that can unblock the receiving task, and optionally update the receiving task's notification value.&lt;br&gt;RTOS task notification functionality is enabled by default, and can be excluded from a build (saving 8 bytes per task) by setting configUSE_TASK_NOTIFICATIONS to 0 in FreeRTOSConfig.h (achieved when setting USE_TASK_NOTIFICATIONS to Disabled). </Description>
+	</RefParameter>
 	
 	<!-- Custom GUI data -->
 	<RefParameter Name="FirstAddedTab" Comment="First additional tab" DefaultValue="Tasks and Queues" Type="string" Visible="false"/>
 	<RefParameter Name="SecondAddedTab" Comment="Second additional tab" DefaultValue="Timers and Semaphores" Type="string" Visible="false"/>
 	
 	<RefParameter Name="TasksTableTitle" Comment="Title for the tasks table" DefaultValue="Tasks" Type="string" Visible="false"/>
-	<RefParameter Name="TasksColumns" Comment="Names for the table columns" DefaultValue="Name;Task Priority;Stack size;Entry function" Type="string" Visible="false"/>
+	<RefParameter Name="TasksColumns" Comment="Names for the table columns" DefaultValue="Name;Task Priority;Stack size (Words);Entry function" Type="string" Visible="false"/>
 	<!-- User data to save in .ioc and load from .ioc -->
 	<RefParameter Name="MaxTasks" Comment="Maximum number of tasks" DefaultValue="15" Type="integer" Visible="false"/>
 	<RefParameter Name="TasksKeys" Comment="Keys for config file" DefaultValue="Tasks01;Tasks02" Type="string" Visible="false"/>
 	<RefParameter Name="Tasks01" Comment="Tasks (1 to 15)" DefaultValue="" Type="string" Visible="false"/>
 	<RefParameter Name="Tasks02" Comment="Tasks (16 to ..)" DefaultValue="" Type="string" Visible="false"/>
-	
+		 
+	<RefParameter Name="QueuesColumns" Comment="Names for the table columns" DefaultValue="Name;Queue size;Item size" Type="string" Visible="false"/>
+	<!-- User data to save in .ioc and load from .ioc -->
     <RefParameter Name="MaxQueues" Comment="Maximum number of queues" DefaultValue="15" Type="integer" Visible="false"/>
     <RefParameter Name="QueuesKeys" Comment="Keys for config file" DefaultValue="Queues01" Type="string" Visible="false"/>
 	<RefParameter Name="Queues01" Comment="Queues (1 to 15)" DefaultValue="" Type="string" Visible="false"/>
 	
+	<RefParameter Name="TimersColumns" Comment="Names for the table columns" DefaultValue="Name;Callback;Type" Type="string" Visible="false"/>
+	<!-- User data to save in .ioc and load from .ioc -->
 	<RefParameter Name="MaxTimers" Comment="Maximum number of timers" DefaultValue="20" Type="integer" Visible="false"/>
     <RefParameter Name="TimersKeys" Comment="Keys for config file" DefaultValue="Timers01" Type="string" Visible="false"/>	
 	<RefParameter Name="Timers01" Comment="Timers (1 to 20)" DefaultValue="" Type="string" Visible="false"/>
@@ -471,6 +551,8 @@
 	<RefMode Name="Enabled" Abstract="true">
 		<ConfigForMode>FREERTOS_ENABLE_Init</ConfigForMode>
 
+		<Parameter Name="CMSIS_version"/>
+		<Parameter Name="FREERTOS_version"/>
 		<Parameter Name="configUSE_PREEMPTION"/>
 		<Parameter Name="configCPU_CLOCK_HZ"/>
 		<Parameter Name="configTICK_RATE_HZ"/>
@@ -528,6 +610,8 @@
 		<Parameter Name="INCLUDE_uxTaskGetStackHighWaterMark"/>
 		<Parameter Name="INCLUDE_xTaskGetCurrentTaskHandle"/>		
 		<Parameter Name="INCLUDE_eTaskGetState"/>
+	
+		<Parameter Name="CMSIS_version"/>
 		
 		<!--  new ones for freertos v8 -->
 		<Parameter Name="INCLUDE_xEventGroupSetBitFromISR"/>
@@ -535,8 +619,10 @@
 		<Parameter Name="configENABLE_BACKWARD_COMPATIBILITY"/>
 		<Parameter Name="configUSE_PORT_OPTIMISED_TASK_SELECTION"/>
 		
-		<Parameter Name="CMSIS_version"/>
-				
+		<!--  new ones for freertos v8.2.1 -->
+		<Parameter Name="configUSE_TICKLESS_IDLE"/>
+		<Parameter Name="configUSE_TASK_NOTIFICATIONS"/>
+		
 		<!-- Useful when saving keys in the .ioc file -->	
 		<Parameter Name="Tasks01"/>
 	    <Parameter Name="Tasks02"/>

@@ -376,8 +376,15 @@
 		<PossibleValue Comment="30" Value="RCC_RTCCLKSOURCE_HSE_DIV30"/>
 		<PossibleValue Comment="31" Value="RCC_RTCCLKSOURCE_HSE_DIV31"/>
 	</RefParameter>
-	<RefParameter Visible="false" Comment="Cortex Div" Name="Cortex_Div" Type="integer" DefaultValue="8" Max="8" Min="8"/>
-	<!--   Frequency values-->
+<RefParameter Visible="false" Comment="Cortex Div" DefaultValue="SYSTICK_CLKSOURCE_HCLK" Name="Cortex_Div" Type="list">
+         <PossibleValue Comment="1" Value="SYSTICK_CLKSOURCE_HCLK" Semaphore="HCLKDiv1"/>
+		 <PossibleValue Comment="8" Value="SYSTICK_CLKSOURCE_HCLK_DIV8"/>
+   </RefParameter>
+      <RefParameter Visible="false" Comment="Cortex_DivARG" DefaultValue="HAL_RCC_GetHCLKFreq()/1000" Name="Cortex_DivARG" Type="String">
+        <Condition Expression="HCLKDiv1" Diagnostic=""/>
+    </RefParameter>	
+    <RefParameter Visible="false" Comment="Cortex_DivARG" DefaultValue="HAL_RCC_GetHCLKFreq()/8000" Name="Cortex_DivARG" Type="String"/>
+   <!--   Frequency values-->
 	<RefParameter Visible="false" Comment="HSE OSC" Name="HSE_VALUE" DefaultValue="25000000" Max="50000000" Min="1000000" Type="double" Display="value/1000000" Unit="MHz">
             <Condition Diagnostic="HSEByPass" Expression="HSEByPass"/>
         </RefParameter>
@@ -1076,7 +1083,7 @@
 		        <PossibleValue Value="PWR_REGULATOR_VOLTAGE_SCALE1" Comment="Power Regulator Voltage Scale 1"/>
     </RefParameter>
     <RefParameter Name="PWREXT_OverDrive" Comment="Power Over Drive" Type="list" DefaultValue="PWREXT_OverDrive_DESACTIVATED" Group="Power Parameters">
-        <Condition Diagnostic="" Expression="(((HCLKFreq_Value &lt; 168000000)|(HCLKFreq_Value = 168000000))&amp;(HCLKFreq_Value &gt; 120000000))"/>     
+        <Condition Diagnostic="" Expression="(((HCLKFreq_Value &lt; 168000000)|(HCLKFreq_Value = 168000000))&amp;(HCLKFreq_Value &gt; 120000000))|((PWR_Regulator_Voltage_Scale=PWR_REGULATOR_VOLTAGE_SCALE2)|(PWR_Regulator_Voltage_Scale=PWR_REGULATOR_VOLTAGE_SCALE1))"/>     
         <PossibleValue Value="PWREXT_OverDrive_ACTIVATED" Comment="Enabled" />
         <PossibleValue Value="PWREXT_OverDrive_DESACTIVATED" Comment="Disabled" />
     </RefParameter>
@@ -1109,11 +1116,13 @@
         <ConfigForMode>RCC_ConfigVoltageScaling</ConfigForMode>
         <ConfigForMode>RCC_OSCConfig</ConfigForMode>        
         <ConfigForMode>PWR_ActivateOverDrive</ConfigForMode>
-		
+		 
         <ConfigForMode>RCC_ClockConfig</ConfigForMode>        
         <ConfigForMode>RCC_MCO1Config</ConfigForMode>        
         <ConfigForMode>RCC_MCO2Config</ConfigForMode>        
         <ConfigForMode>RCC_CSS_Enable</ConfigForMode>
+		<ConfigForMode>RCC_interrupt_Time_SYSTICK_Config</ConfigForMode>
+		<ConfigForMode>RCC_SYSTICK_CONFIG</ConfigForMode>
         <Parameter Name="OscillatorType"/>
         <Parameter Name="OscillatorTypeLSI"/>
         <Parameter Name="LSIUsed"/>

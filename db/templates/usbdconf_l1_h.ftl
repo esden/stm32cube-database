@@ -2,7 +2,6 @@
 /**
   ******************************************************************************
   * @file           : ${name}
-  * @date           : ${date}  
   * @version        : ${version}
 [#--  * @packageVersion : ${fwVersion} --]
   * @brief          : Header for usbd_conf file.

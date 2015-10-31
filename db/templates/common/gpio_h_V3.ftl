@@ -2,7 +2,6 @@
 /**
   ******************************************************************************
   * File Name          : gpio.h
-  * Date               : ${date}
   * Description        : This file contains all the functions prototypes for 
   *                      the gpio  
   ******************************************************************************

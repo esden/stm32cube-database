@@ -88,9 +88,15 @@
         
     </RefParameter>
     <!--diviseur de AHB /8 pour cortex sys timer-->
-    <RefParameter Visible="false" Comment="Cortex timer system Div" Name="TimSys_Div" Type="integer" DefaultValue="8" Max="8" Min="8"/>
+ <RefParameter Visible="false" Comment="Cortex timer system Div" DefaultValue="SYSTICK_CLKSOURCE_HCLK" Name="TimSys_Div" Type="list">
+         <PossibleValue Comment="1" Value="SYSTICK_CLKSOURCE_HCLK" Semaphore="HCLKDiv1"/>
+		 <PossibleValue Comment="8" Value="SYSTICK_CLKSOURCE_HCLK_DIV8"/>
+    </RefParameter> 
    
-
+   <RefParameter Visible="false" Comment="Cortex_DivARG" DefaultValue="HAL_RCC_GetHCLKFreq()/1000" Name="Cortex_DivARG" Type="String">
+        <Condition Expression="HCLKDiv1" Diagnostic=""/>
+    </RefParameter>	
+    <RefParameter Visible="false" Comment="Cortex_DivARG" DefaultValue="HAL_RCC_GetHCLKFreq()/8000" Name="Cortex_DivARG" Type="String"/>
     <!--diviseur APB1 1..16-->
     <RefParameter Visible="false"  Comment="APB1 Clock Divider" DefaultValue="RCC_HCLK_DIV1" Name="APB1CLKDivider" Type="list">
         <PossibleValue Comment="1"  Value="RCC_HCLK_DIV1"/>
@@ -241,10 +247,12 @@
     <RefParameter Visible="false" Comment="I2S2 clock"            Name="I2S2Freq_Value"        DefaultValue="8000000"   Type="double" IP="I2S2"  Display="value/1000000" Unit="MHz"/>
     <RefParameter Visible="false" Comment="I2S3 clock"            Name="I2S3Freq_Value"        DefaultValue="8000000"   Type="double" IP="I2S3"  Display="value/1000000" Unit="MHz"/>
     <!--APBx frequency-->
+	<RefParameter Visible="false" Comment="APB1 peripheral clocks" Name="APB1Freq_Value"       DefaultValue="8000000"   Max="36000000" Min="10000000" Type="double" IP="CAN,WWDG,USART2,USART3,UART4,UART5,SPI2,I2S2,SPI3,I2S3,I2C1,I2C2,DAC" Display="value/1000000" Unit="MHz">
+        <Condition Diagnostic="USB" Expression="USBUsed_ForRCC"/>
+    </RefParameter>
     <RefParameter Visible="false" Comment="APB1 peripheral clocks" Name="APB1Freq_Value"       DefaultValue="8000000"   Max="36000000"  Type="double" IP="CAN,WWDG,USART2,USART3,UART4,UART5,SPI2,I2S2,SPI3,I2S3,I2C1,I2C2,DAC" Display="value/1000000" Unit="MHz">
         <Condition Diagnostic="APB1 max for STM32F101" Expression="STM32F101 | STM32F103"/>
-    </RefParameter>
-	
+    </RefParameter>	
     <RefParameter Visible="false" Comment="APB1 peripheral clocks" Name="APB1Freq_Value"       DefaultValue="8000000"   Max="24000000"  Type="double" IP="CAN,WWDG,USART2,USART3,UART4,UART5,SPI2,I2S2,SPI3,I2S3,I2C1,I2C2,DAC" Display="value/1000000" Unit="MHz">
 
     </RefParameter>
@@ -516,7 +524,7 @@
 	
     <!--  PLL state control-->
     <RefParameter Visible="false" Comment="MainPLL Is Used" DefaultValue="1" Name="PLLUsed" Min="1" Type="integer">
-        <Condition Expression="( (SYSCLKSource=RCC_SYSCLKSOURCE_PLLCLK) | ((RCC_MCOSource=RCC_MCO1SOURCE_PLLCLK) &amp; MCOConfig)  )" Diagnostic=" "/>
+        <Condition Expression="( (SYSCLKSource=RCC_SYSCLKSOURCE_PLLCLK) | ((RCC_MCOSource=RCC_MCO1SOURCE_PLLCLK) &amp; MCOConfig) |USBUsed_ForRCC  )" Diagnostic=" "/>
     </RefParameter>
     <RefParameter Visible="false" Comment="Main PLL is Used" DefaultValue="0" Name="PLLUsed" Min="0" Type="integer"/>
 	
@@ -772,9 +780,9 @@
         <ConfigForMode>RCC_ClockConfig</ConfigForMode>    
         <ConfigForMode>RCC_MCOConfig</ConfigForMode> 
         <ConfigForMode>RCC_CSS_Enable</ConfigForMode>
-        <ConfigForMode>RCC_AFIO_CLK_ENABLE</ConfigForMode>
-
-        
+        <!--ConfigForMode>RCC_AFIO_CLK_ENABLE</ConfigForMode-->
+ <ConfigForMode>RCC_interrupt_Time_SYSTICK_Config</ConfigForMode>
+		 <ConfigForMode>RCC_SYSTICK_CONFIG</ConfigForMode>
         <Parameter Name="PLLMUL"/>
         <Parameter Name="APB1TimCLKDivider"/>
         <Parameter Name="APB2TimCLKDivider"/>

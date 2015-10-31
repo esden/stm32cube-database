@@ -434,6 +434,8 @@
         [/#if]    
     
     [#if serviceType=="Init"] 
+        [#if !ipName?contains("I2C") && !ipName?contains("USB")] [#-- if not I2C and not USB --]
+
            [#if initService.clock??]
             [#if initService.clock!="none"]
                 [#if FamilyName=="STM32F1" && ipName=="RTC"]
@@ -452,7 +454,7 @@
                  #t#t/* Peripheral clock enable */
                  #t#t__${ipName}_CLK_ENABLE(); 
            [/#if]
-          
+  [/#if] [#-- not I2C --]         
     [#else]           
         [#if initService.clock??]
             [#if initService.clock!="none"]
@@ -471,6 +473,27 @@
 
 #t[@generateConfigCode ipName=ipName type=serviceType serviceName="gpio" instHandler=instHandler tabN=tabN/]
 [/#if]
+[#-- if I2C clk_enable should be after GPIO Init Begin --]
+    [#if serviceType=="Init" && (ipName?contains("I2C")||(ipName?contains("USB")))] 
+           [#if initService.clock??]
+            [#if initService.clock!="none"]
+               #t#t/* Peripheral clock enable */
+                [#list initService.clock?split(';') as clock]
+                    [#if ipvar.clkCommonResource.entrySet()?contains(clock?trim)]#t#t${clock?trim?replace("__","")?replace("_ENABLE","")}_ENABLED++;
+                    #t#tif(${clock?trim?replace("__","")?replace("_ENABLE","")}_ENABLED==1){          
+                        #t#t#t${clock?trim}();
+                    [#if ipvar.clkCommonResource.entrySet()?contains(clock?trim)]#t#t}[/#if]  
+                    [#else]
+                        #t#t${clock?trim}();
+                    [/#if]        
+                [/#list]
+            [/#if]
+            [#else]
+                 #t#t/* Peripheral clock enable */
+                 #t#t__${ipName}_CLK_ENABLE(); 
+           [/#if]
+[/#if]
+[#-- if I2C clk_enable should be after GPIO Init End --]
     [#if serviceType=="Init"] 
     [#if dmaExist]#n#t#t/* Peripheral DMA init*/
 
@@ -479,6 +502,7 @@
     [/#if]
     [#if nvicExist]
         [#if initService.nvic??&&initService.nvic?size>0]
+#n#t#t/* Peripheral interrupt init*/
  [#-- WorkAround for USB low power--]
            [#if ipName?contains("USB")]
                 [#-- WorkAround for USB low power and remap macro--]
@@ -500,12 +524,20 @@
                 [#if lowPower == "yes"]
                     #t#tif(hpcd->Init.low_power_enable == 1)
                     #t#t{
-                    #t#t#t/* Enable EXTI Line 18 for USB wakeup */
+                    [#if ipName?contains("_FS")]
+                        [#if FamilyName=="STM32L4"]
+                            #t#t#t/* Enable EXTI Line 17 for USB wakeup */
+                        [#else]
+                            #t#t#t/* Enable EXTI Line 18 for USB wakeup */                            
+                        [/#if]
+                    [#else]
+                        #t#t#t/* Enable EXTI Line 20 for USB wakeup */
+                    [/#if]
                     [#if FamilyName=="STM32F3"||FamilyName=="STM32L1"][#-- FamilyName=="STM32F3"|| to be added on V4.5 --]
                       #t#t#t__HAL_USB_EXTI_CLEAR_FLAG();
                       #t#t#t__HAL_USB_EXTI_SET_RISING_EDGE_TRIGGER();
                     [/#if]
-                    [#if FamilyName=="STM32F2"||FamilyName=="STM32F4"]
+                    [#if FamilyName=="STM32F2"||FamilyName=="STM32F4"||FamilyName=="STM32F7"]
                         [#if ipName?contains("_FS")]
                             #t#t#t__HAL_USB_FS_EXTI_CLEAR_FLAG();
                             #t#t#t__HAL_USB_FS_EXTI_SET_RISING_EGDE_TRIGGER();

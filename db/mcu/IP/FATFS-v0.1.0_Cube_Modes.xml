@@ -13,9 +13,16 @@
 	<RefParameter Name="NEW_DISKIO_API" Comment="NEW_DISKIO_API" DefaultValue="1" Type="integer" Visible="false">
 	    <!-- <Condition Diagnostic="New version available for F1" Expression="STM32F1"/> -->
 	    <!-- <Condition Diagnostic="New version available for F1 and F4" Expression="STM32F1 | STM32F4"/>  -->
-	    <Condition Diagnostic="New version available for F0, F1 and F4" Expression="STM32F0 | STM32F1 | STM32F4"/>
+	    <Condition Diagnostic="New version available for F0, F1, F4, L1 and F7" Expression="STM32F0 | STM32F1 | STM32F4 | STM32F7 | STM32L1"/>
 	</RefParameter>
 	<RefParameter Name="NEW_DISKIO_API" Comment="NEW_DISKIO_API" DefaultValue="0" Type="integer" Visible="false">
+	</RefParameter>
+	<RefParameter Name="FATFS_version" Comment="FATFS version" DefaultValue="R0.10b" Type="String" Group="Version" TabName="Set Defines">
+	    <PossibleValue Comment="New version of FatFS" Value="R0.10b"/>
+	    <Condition Diagnostic="Version available for F0, F1, F4, L1 and F7" Expression="NEW_DISKIO_API=1"/>
+	</RefParameter>
+	<RefParameter Name="FATFS_version" Comment="FATFS version" DefaultValue="R0.10" Type="String" Group="Version" TabName="Set Defines">
+		<PossibleValue Comment="Previous version of CMSIS" Value="R0.10" />
 	</RefParameter>
   
     <RefParameter Name="SD_MODE" Comment="SD MODE" DefaultValue="4" Type="integer" Visible="false">
@@ -53,7 +60,7 @@
 		<PossibleValue Comment="USB Host MSC HS" Value="hUsbHostHS"/>
 	</RefParameter>
 	
-	<RefParameter Name="_HUSBH" Comment="USBH instance" DefaultValue="null" Type="list" Group="USBH" TabName="IPs instances" Visible="false">
+	<RefParameter Name="_HUSBH" Comment="USBH instance" DefaultValue="null" Type="list" Group="USBH" TabName="IPs instances" Visible="true">
 	</RefParameter>
 		
 	
@@ -664,6 +671,7 @@
 	
 	<!-- Basemode for FATFS -->
 	<RefMode Name="FatFS_Basemode" Comment="Internal basemode for FATFS" Abstract="true">
+		<Parameter Name="FATFS_version"/>
 		<!-- Parameters for Function and Buffer Configurations -->
 		<Parameter Name="_FS_TINY"/>
 		<Parameter Name="_FS_READONLY"/>
@@ -700,6 +708,16 @@
 		<ConfigForMode>FATFS_SDIO_Init</ConfigForMode>
 		<Parameter Name="_HSD"/>
 		<Parameter Name="SD_MODE"/>
+		<BspDependency Name="Detect_SDIO" Comment="The presence of the SD card can be detected through a GPIO in Input Mode" BspIpName="GPIO" BspModeName="Input"/>
+		<!--
+		<BspDependency Name="Detect_SDIO" Comment="The GPIO is capable to detect the presence of the SD card" BspIpName="I2C" BspModeName="I2C"/>
+		
+		
+		
+		<BspDependency Name="Detect_SDIO_Bis" Comment="The GPIO is capable to detect the presence of the SD card" BspIpName="GPIO" BspModeName="Input"/>
+		<BspDependency Name="Detect_SDIO_Third" Comment="The I2C is capable to detect the presence of the SD card" BspIpName="I2C" BspModeName="I2C"/>
+		-->
+		
 	</RefMode>
 	
 	<!-- RefMode for FSMC NAND16 FATFS -->
@@ -771,7 +789,7 @@
 			<Condition Expression="Sram1|Sram2|Sram3|Sram4|Psram1|Psram2|Psram3|Psram4|MuxedPsram1|MuxedPsram2|MuxedPsram3|MuxedPsram4|Lcd1|Lcd2|Lcd3|Lcd4" Diagnostic="Active only with at least one SRAM IP configured"/>
 		</Mode>
 
-		<Mode Name="SDIO" UserName="SD Card" RemoveCondition="!SDIO:$modeexist_SD_1_bit">
+		<Mode Name="SDIO" UserName="SD Card" RemoveCondition="!SDIO:$modeexist_SD_1_bit &amp; !SDMMC:$modeexist_SD_1_bit &amp; !SDMMC1:$modeexist_SD_1_bit">
 			<ModeLogicOperator Name="NONE">
 				<Mode Name="SDIO">
 					<SignalLogicalOp Name="AND">
@@ -780,7 +798,7 @@
 					<Semaphore>S_FATFS_SDIO</Semaphore>
 				</Mode>
 			</ModeLogicOperator>
-			<Condition Expression="SD_Card|SD_Card_4" Diagnostic="Active only with SDIO IP configured in a SD mode"/>
+			<Condition Expression="SD_Card|SD_Card_4" Diagnostic="Active only with SDIO/SDMMC IP configured in a SD mode"/>
 		</Mode>
 							  	
 		<Mode Name="USB" UserName="USB Disk" RemoveCondition="!USB_HOST:$modeexist_MSC_HS &amp; !USB_HOST:$modeexist_MSC_FS">

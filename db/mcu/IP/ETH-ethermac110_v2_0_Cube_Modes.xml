@@ -8,6 +8,11 @@
 	<!-- Generic RefParameters for ETH MII/RMII Modes Extracted from HAL Library with LibExtractor-->
 	<RefParameter Name="hal_eth_init_status" DefaultValue="1" Comment="" Type="" Visible="false"/>
 	<RefParameter Name="Instance" DefaultValue="ETH" Comment="Instance" Type="" Visible="false"/>
+	<RefParameter Comment="Auto Negotiation" DefaultValue="ETH_AUTONEGOTIATION_DISABLE" Name="AutoNegotiation" Type="list" Group="Advanced : Ethernet Media Configuration">
+	<Condition Diagnostic="" Expression="MW_ETH_Half_Duplex|MW_ETH_Full_Duplex"/>  
+		<PossibleValue Comment="Disabled" Value="ETH_AUTONEGOTIATION_DISABLE"/>
+	</RefParameter>
+	
 	<RefParameter Comment="Auto Negotiation" DefaultValue="ETH_AUTONEGOTIATION_ENABLE" Name="AutoNegotiation" Type="list" Group="Advanced : Ethernet Media Configuration">
 		<PossibleValue Comment="Enabled" Value="ETH_AUTONEGOTIATION_ENABLE"/>
 		<PossibleValue Comment="Disabled" Value="ETH_AUTONEGOTIATION_DISABLE"/>
@@ -24,7 +29,15 @@
 		<PossibleValue Comment="100 MBits/s" Value="ETH_SPEED_100M"/>
 	</RefParameter>	
 	<RefParameter Comment="Speed" DefaultValue="null" Name="Speed" Type="list" Group="Advanced parameters" Visible="false"/>
-
+   
+   <RefParameter Comment="Duplex Mode" DefaultValue="ETH_MODE_FULLDUPLEX" Name="DuplexMode" Type="list" Group="Advanced : Ethernet Media Configuration" Visible="true">
+		<Condition Diagnostic="" Expression="MW_ETH_Full_Duplex"/> 
+		<PossibleValue Comment="Full Duplex" Value="ETH_MODE_FULLDUPLEX"/>
+	</RefParameter>
+	<RefParameter Comment="Duplex Mode" DefaultValue="ETH_MODE_HALFDUPLEX" Name="DuplexMode" Type="list" Group="Advanced : Ethernet Media Configuration" Visible="true">
+		<Condition Diagnostic="" Expression="MW_ETH_Half_Duplex"/> 
+		<PossibleValue Comment="Half Duplex" Value="ETH_MODE_HALFDUPLEX"/>
+	</RefParameter>
 	<RefParameter Comment="Duplex Mode" DefaultValue="null" Name="DuplexMode" Type="list" Group="Advanced : Ethernet Media Configuration" Visible="false">
 		<Condition Diagnostic="" Expression="AutoNegotiation=ETH_AUTONEGOTIATION_ENABLE"/> 
 		<PossibleValue Comment="Full Duplex" Value="ETH_MODE_FULLDUPLEX"/>
@@ -65,6 +78,34 @@
 	</RefParameter>
 	<!-- RefMode for ETH -->
 	<RefMode Name="MII" HalMode="ETH">
+		<ConfigForMode>Init</ConfigForMode>   
+		<Parameter Name="AutoNegotiation"/>
+		<Parameter Name="Speed"/>
+		<Parameter Name="DuplexMode"/> 
+		<Parameter Name="MACAddr"/>
+		<Parameter Name="RxMode"/>
+		<Parameter Name="ChecksumMode"/>
+		<Parameter Name="PhyAddress"/>
+		<Parameter Name="MediaInterface">
+			<PossibleValue>ETH_MEDIA_INTERFACE_MII</PossibleValue>
+		</Parameter>
+		<Parameter Name="Instance"/>
+	</RefMode>
+	<RefMode Name="MII Half Duplex Only" HalMode="ETH">
+		<ConfigForMode>Init</ConfigForMode>   
+		<Parameter Name="AutoNegotiation"/>
+		<Parameter Name="Speed"/>
+		<Parameter Name="DuplexMode"/> 
+		<Parameter Name="MACAddr"/>
+		<Parameter Name="RxMode"/>
+		<Parameter Name="ChecksumMode"/>
+		<Parameter Name="PhyAddress"/>
+		<Parameter Name="MediaInterface">
+			<PossibleValue>ETH_MEDIA_INTERFACE_MII</PossibleValue>
+		</Parameter>
+		<Parameter Name="Instance"/>
+	</RefMode>
+	<RefMode Name="MII Full Duplex Only" HalMode="ETH">
 		<ConfigForMode>Init</ConfigForMode>   
 		<Parameter Name="AutoNegotiation"/>
 		<Parameter Name="Speed"/>
@@ -150,6 +191,51 @@
 					<!--<Semaphore>MII</Semaphore>-->	
 					<Semaphore>MW_ETH_MW</Semaphore>
 				</Mode>
+				<Mode Name="MII Half Duplex Only">				
+					<SignalLogicalOp Name="AND">
+						<Signal Name="COL"/>
+						<Signal Name="CRS"/>
+						<Signal Name="MDC"/>
+						<Signal Name="MDIO"/>
+						<Signal Name="RXD0"/>
+						<Signal Name="RXD1"/>
+						<Signal Name="RXD2"/>
+						<Signal Name="RXD3"/>
+						<Signal Name="RX_CLK"/>
+						<Signal Name="RX_DV"/>
+						<Signal Name="RX_ER"/>
+						<Signal Name="TXD0"/>
+						<Signal Name="TXD1"/>
+						<Signal Name="TXD2"/>
+						<Signal Name="TXD3"/>
+						<Signal Name="TX_CLK"/>
+						<Signal Name="TX_EN"/>
+					</SignalLogicalOp>
+					<!--<Semaphore>MII</Semaphore>-->	
+					<Semaphore>MW_ETH_MW</Semaphore>
+				    <Semaphore>MW_ETH_Half_Duplex</Semaphore>
+				</Mode>
+				<Mode Name="MII Full Duplex Only">				
+					<SignalLogicalOp Name="AND">
+						<Signal Name="MDC"/>
+						<Signal Name="MDIO"/>
+						<Signal Name="RXD0"/>
+						<Signal Name="RXD1"/>
+						<Signal Name="RXD2"/>
+						<Signal Name="RXD3"/>
+						<Signal Name="RX_CLK"/>
+						<Signal Name="RX_DV"/>
+						<Signal Name="TXD0"/>
+						<Signal Name="TXD1"/>
+						<Signal Name="TXD2"/>
+						<Signal Name="TXD3"/>
+						<Signal Name="TX_CLK"/>
+						<Signal Name="TX_EN"/>
+					</SignalLogicalOp>
+					<!--<Semaphore>MII</Semaphore>-->	
+					<Semaphore>MW_ETH_MW</Semaphore>
+					<Semaphore>MW_ETH_Full_Duplex</Semaphore>
+				</Mode>
 				<Mode Name="MII_PTP_Synchro">				
 					<SignalLogicalOp Name="AND">
 						<Signal Name="COL"/>
@@ -175,7 +261,57 @@
 					<Semaphore>MW_ETH_MW</Semaphore>
 					<Condition Expression="(Semaphore_ETH_TriggerSourceITR1TIM2)&amp;(Semaphore_ETH_ControllerModeTIM2)" Diagnostic="Only active when TIM2 has an enabled Slave Mode with ITR1 as trigger source"/>
 
-				</Mode>			
+				</Mode>	
+                <Mode Name="MII Full Duplex Only_PTP_Synchro">				
+					<SignalLogicalOp Name="AND">
+					
+						<Signal Name="MDC"/>
+						<Signal Name="MDIO"/>
+						<Signal Name="PPS_OUT"/>
+						<Signal Name="RXD0"/>
+						<Signal Name="RXD1"/>
+						<Signal Name="RXD2"/>
+						<Signal Name="RXD3"/>
+						<Signal Name="RX_CLK"/>
+						<Signal Name="RX_DV"/>
+						<Signal Name="TXD0"/>
+						<Signal Name="TXD1"/>
+						<Signal Name="TXD2"/>
+						<Signal Name="TXD3"/>
+						<Signal Name="TX_CLK"/>
+						<Signal Name="TX_EN"/>
+					</SignalLogicalOp>
+					<!--<Semaphore>MII_PTP_Synchro</Semaphore>-->
+					<Semaphore>MW_ETH_MW</Semaphore>
+					<Condition Expression="(Semaphore_ETH_TriggerSourceITR1TIM2)&amp;(Semaphore_ETH_ControllerModeTIM2)" Diagnostic="Only active when TIM2 has an enabled Slave Mode with ITR1 as trigger source"/>
+
+				</Mode>	
+				<Mode Name="MII Half Duplex Only_PTP_Synchro">				
+					<SignalLogicalOp Name="AND">
+						<Signal Name="COL"/>
+						<Signal Name="CRS"/>
+						<Signal Name="MDC"/>
+						<Signal Name="MDIO"/>
+						<Signal Name="PPS_OUT"/>
+						<Signal Name="RXD0"/>
+						<Signal Name="RXD1"/>
+						<Signal Name="RXD2"/>
+						<Signal Name="RXD3"/>
+						<Signal Name="RX_CLK"/>
+						<Signal Name="RX_DV"/>
+						<Signal Name="RX_ER"/>
+						<Signal Name="TXD0"/>
+						<Signal Name="TXD1"/>
+						<Signal Name="TXD2"/>
+						<Signal Name="TXD3"/>
+						<Signal Name="TX_CLK"/>
+						<Signal Name="TX_EN"/>
+					</SignalLogicalOp>
+					<!--<Semaphore>MII_PTP_Synchro</Semaphore>-->
+					<Semaphore>MW_ETH_MW</Semaphore>
+					<Condition Expression="(Semaphore_ETH_TriggerSourceITR1TIM2)&amp;(Semaphore_ETH_ControllerModeTIM2)" Diagnostic="Only active when TIM2 has an enabled Slave Mode with ITR1 as trigger source"/>
+
+				</Mode>					
 				<Mode Name="RMII">				
 					<SignalLogicalOp Name="AND">
 						<Signal Name="CRS_DV"/>

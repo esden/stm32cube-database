@@ -1,6 +1,6 @@
 [#ftl]
 [#compress]
-[#assign CMSIS_version = "100"]
+[#assign CMSIS_version = "1.00"]
 
 [#list SWIPdatas as SWIP]
   [#if SWIP.variables??]
@@ -12,7 +12,7 @@
   [/#if]
 [/#list]
 
-[#if CMSIS_version == "100"]
+[#if CMSIS_version == "1.00"]
 /* Start scheduler */
 #tosKernelStart(NULL, NULL);
 [#else]

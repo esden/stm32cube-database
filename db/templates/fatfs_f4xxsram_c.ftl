@@ -2,9 +2,6 @@
 /**
  ******************************************************************************
   * @file    bsp_driver_sram.c (based on stm324x9i_eval_sram.c)
-  * @author  MCD Teams
-  * @version V1.0.0
-  * @date    ${date}
   * @brief   This file includes a generic SRAM driver.
   ******************************************************************************
   *

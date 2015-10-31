@@ -2,7 +2,6 @@
 /**
   ******************************************************************************
   * @file           : ${name}
-  * @date           : ${date}  
   * @version        : ${version}
 [#--  * @packageVersion : ${fwVersion} --]
   * @brief          : Header for usbd_conf file.
@@ -50,7 +49,7 @@
 [#list SWIncludes as include]
 [#assign includeFile = include]
 [#if  includeFile!="usbd_def.h"]
-#include "${include}"
+#include "${includeFile}"
 [/#if]
 [/#list]
 [/#if]

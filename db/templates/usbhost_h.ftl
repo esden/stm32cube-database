@@ -2,7 +2,6 @@
 /**
  ******************************************************************************
   * @file            : ${name}
-  * @date            : ${date} 
   * @version         : ${version}
 [#--  * @packageVersion  : ${fwVersion} --]
   * @brief           : Header for usb_host file.
@@ -41,6 +40,7 @@
  extern "C" {
 #endif
 [#assign ipName=""]
+[#assign useOs=""]
 
 /* Includes ------------------------------------------------------------------*/
 [#if includes??]
@@ -53,7 +53,7 @@
 [#assign ipvar = IP]
 [#-- Global variables --]
 [#if IP.variables??]
-	[#list IP.variables as variable]
+	[#list IP.variables as variable]	   
 	[#--[#if variable.value?contains("Handle")]--]
 [#--extern ${variable.value} ${variable.name};--]
 	[#--[/#if]--]
@@ -84,7 +84,9 @@ typedef enum {
 }ApplicationTypeDef;
 		
 void MX_${ipName}_Init(void);
+[#if !FREERTOS??]
 void MX_${ipName}_Process(void);
+[/#if]
 [#list halModeList?split(" ") as mode]
 [#if mode !=""]
 void HAL_${mode}_BspInit(${mode}_HandleTypeDef* h${mode?lower_case});

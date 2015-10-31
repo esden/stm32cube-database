@@ -2,7 +2,6 @@
 /**
  ******************************************************************************
   * @file            : ${name}
-  * @date            : ${date} 
   * @version         : ${version}
 [#--  * @packageVersion  : ${fwVersion} --]
   * @brief           :  This file implements the USB Host 
@@ -499,9 +498,9 @@ void MX_${name}_Init(void)
 [/#list]
 [/#list]
 [/#compress]
-
-
 }
+
+[#if !FREERTOS??]
 /*
  * Background task
 */ 
@@ -519,7 +518,7 @@ void MX_USB_HOST_Process()
 [/#if]
 [/#list]
 }
-
+[/#if]
 /*
  * user callbak definition
 */ 

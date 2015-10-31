@@ -34,10 +34,14 @@
   <config>
     <name>${Configuration} Configuration</name>				[#-- project configuration name. Ex: STM32F407_EVAL --]
     <device>${project.deviceId}</device>		 [#--  STM32 selected device. Ex: STM32F407ZE --]
-	[#--optional part--]
+    [#if boardName != ""]
+    	<board>${boardName}</board>
+    [/#if]
+    [#--optional part--]
     <debugprobe>${DebugMode}</debugprobe>
     [#-- <optimization>${project.compilerOptimization}</optimization> --]
     <optimization></optimization>
+    <icfloc>${icfloc}</icfloc>
     <Adefines>
        <define></define>
     </Adefines>

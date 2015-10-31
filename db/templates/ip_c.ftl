@@ -2,7 +2,6 @@
 /**
   ******************************************************************************
   * File Name          : ${name}.c
-  * Date               : ${date}
   * Description        : This file provides code for the configuration
   *                      of the ${name} instances.
   ******************************************************************************
@@ -42,6 +41,26 @@
 [#assign useDma = false]
 [#assign useNvic = false]
 
+[#-- Tracker 276386 -- GetHandle Start --]
+[#compress]
+[#assign handlerList = ""]
+[#if handlers??]
+  [#list handlers as handler]
+    [#list handler.entrySet() as entry]
+      [#list entry.value as ipHandler]
+        [#if !(handlerList?contains("("+ipHandler.handler+")"))]
+[#--static ${ipHandler.handlerType} ${ipHandler.handler}; --]
+        [/#if]
+[#assign handlerList = handlerList + " "+ "("+ipHandler.handler+")"]
+    [/#list]
+  [/#list]
+[/#list]
+[/#if]
+[#-- Tracker 276386 -- GetHandle End --]
+#n
+[#assign handlerList = ""]
+
+[/#compress]
 
 [#-- extract hal mode list used by all instances of the ip --]
 [#assign halModeList= ""]
@@ -75,7 +94,14 @@
 #include "dma.h"
 [/#if]
 [#-- End Define includes --]
-
+[#-- Tracker 276386 -- GetHandle Start --]
+#n
+[#if IP.variables??]
+[#list IP.variables as variable]
+[#-- static ${variable.value} ${variable.name}; --]
+[/#list]
+[/#if]
+[#-- Tracker 276386 -- GetHandle End --]
 [#-- Function getInitServiceMode --]
 [#function getInitServiceMode(ipname1)]
     [#-- assign initServicesList = {"test0":"test1"}--]
@@ -499,7 +525,7 @@
         [/#list]
         [/#if]    
     [#if serviceType=="Init"] 
-        [#if !ipName?contains("I2C")] [#-- if not I2C --]
+        [#if !ipName?contains("I2C")&& !ipName?contains("USB")] [#-- if not I2C --]
             [#if initService.clock??]
                 [#if initService.clock!="none"]
                     [#if FamilyName=="STM32F1" && ipName=="RTC"]
@@ -546,7 +572,7 @@
         #t[@generateConfigCode ipName=ipName type=serviceType serviceName="gpio" instHandler=instHandler tabN=tabN/]
     [/#if]
 [#-- if I2C clk_enable should be after GPIO Init Begin --]
-    [#if serviceType=="Init" && ipName?contains("I2C")] 
+    [#if serviceType=="Init" && (ipName?contains("I2C")||ipName?contains("USB"))] 
            [#if initService.clock??]
             [#if initService.clock!="none"]
                #t#t/* Peripheral clock enable */
@@ -594,12 +620,20 @@
                 [#if lowPower == "yes"]
                     #t#tif(hpcd->Init.low_power_enable == 1)
                     #t#t{
-                    #t#t#t/* Enable EXTI Line 18 for USB wakeup */
+                    [#if ipName?contains("_FS")]
+                        [#if FamilyName=="STM32L4"]
+                            #t#t#t/* Enable EXTI Line 17 for USB wakeup */
+                        [#else]
+                            #t#t#t/* Enable EXTI Line 18 for USB wakeup */                            
+                        [/#if]
+                    [#else]
+                        #t#t#t/* Enable EXTI Line 20 for USB wakeup */
+                    [/#if]
                     [#if FamilyName=="STM32F3"||FamilyName=="STM32L1"][#--  to be added on V4.5 --]
                       #t#t#t__HAL_USB_EXTI_CLEAR_FLAG();
                       #t#t#t__HAL_USB_EXTI_SET_RISING_EDGE_TRIGGER();
                     [/#if]
-                    [#if FamilyName=="STM32F2"||FamilyName=="STM32F4"]
+                    [#if FamilyName=="STM32F2"||FamilyName=="STM32F4"||FamilyName=="STM32F7"]
                         [#if ipName?contains("_FS")]
                             #t#t#t__HAL_USB_FS_EXTI_CLEAR_FLAG();
                             #t#t#t__HAL_USB_FS_EXTI_SET_RISING_EGDE_TRIGGER();
@@ -690,6 +724,11 @@
 [#-- Global variables --]
 [#if IP.variables??]
 [#list IP.variables as variable]
+[#-- Tracker 276386 -- GetHandle Start --]
+[#--${variable.value}* MX_${variable.name?substring(1)?upper_case}_GetHandle(void) {--]
+[#--#treturn &${variable.name};--]
+[#--}--]
+[#-- Tracker 276386 -- GetHandle End --]
 ${variable.value} ${variable.name};
 [/#list]
 [#-- Add global dma Handler --]

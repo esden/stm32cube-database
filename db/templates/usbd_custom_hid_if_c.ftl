@@ -2,9 +2,6 @@
 /**
   ******************************************************************************
   * @file           : usbd_custom_hid_if.c
-  * @author         : MCD Application Team
-  * @version        : V2.2.0
-  * @date           : 13-June-2014
   * @brief          : USB Device Custom HID interface file.
   ******************************************************************************
   * COPYRIGHT(c) ${year} STMicroelectronics

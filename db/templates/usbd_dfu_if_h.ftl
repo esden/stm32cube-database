@@ -2,9 +2,6 @@
 /**
   ******************************************************************************
   * @file           : usbd_dfu_if.h
-  * @author         : MCD Application Team
-  * @version        : V1.1.0
-  * @date           : 19-March-2012
   * @brief          : Header for usbd_dfu_if file.
   ******************************************************************************
   * COPYRIGHT(c) ${year} STMicroelectronics

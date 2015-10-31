@@ -2,9 +2,6 @@
 /**
  ******************************************************************************
   * @file    bsp_driver_sd.h (based on stm324x9i_eval_sd.h)
-  * @author  MCD Teams
-  * @version V1.0.0
-  * @date    ${date}
   * @brief   This file contains the common defines and functions prototypes for 
   *          the bsp_driver_sd.c driver.
   ******************************************************************************
@@ -36,7 +33,6 @@
   ******************************************************************************
   */
 
-
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __STM32L1XX_SD_H
 #define __STM32L1XX_SD_H
@@ -67,6 +63,12 @@
 
 #define SD_PRESENT               ((uint8_t)0x01)
 #define SD_NOT_PRESENT           ((uint8_t)0x00)
+[#if Platform??]
+	[#if GPIO_IP??] 
+#define SD_PIN                   ${IpInstance}
+#define SD_PORT                  ${IpName}
+	[/#if]
+[/#if]
    
 /* DMA definitions for SD DMA transfer */
 /*

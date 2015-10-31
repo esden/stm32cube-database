@@ -2,7 +2,6 @@
 /**
   ******************************************************************************
   * File Name          : dma.h
-  * Date               : ${date}
   * Description        : This file contains all the function prototypes for
   *                      the dma.c file
   ******************************************************************************

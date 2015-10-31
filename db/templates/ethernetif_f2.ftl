@@ -2,7 +2,6 @@
 /**
   ******************************************************************************
   * File Name          : ethernetif.c
-  * Date               : ${date}
   * Description        : This file provides code for the configuration
   *                      of the ${name} MiddleWare.
   ******************************************************************************

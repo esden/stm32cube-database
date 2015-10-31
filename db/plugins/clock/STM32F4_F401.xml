@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Clock xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" savedConfig="false" xsi:noNamespaceSchemaLocation="file:///C:/Dev/CLOCK/MicroXplorer_s/MCU_Clock.xsd">
+	<Background  imageName="STM32F401withI2S" name="STM32F401withI2S"  x="116" y="569">
+        <Condition Diagnostic="" Expression="!UFQFPN48 &amp; !WLCSP49"/>
+    </Background>
+	<Background  imageName="STM32F4withMCO2" name="STM32F4withMCO2"  x="112" y="700">
+        <Condition Diagnostic="" Expression="!UFQFPN48 &amp; !WLCSP49"/>
+    </Background> 
 	<Tree id="ClockTree">
 		<Element id="HSIRC" type="fixedSource" isKey="true" refParameter="HSI_VALUE" x="302" y="343">
 			<Output signalId="HSI" to="SysClkSource"/>
@@ -128,6 +134,11 @@
 			<Output signalId="I2SExtClock" to="I2SSrc"/>
 			
 		</Element>
+		<Element id="I2SClocksOutput" type="activeOutput" refParameter="I2SClocksFreq_Value" x="1102" y="595" refEnable="I2SEnable">
+		        <Condition Diagnostic="" Expression="UFQFPN48 |WLCSP49"/>
+
+			<Input signalId="I2SCLK" from="I2SSrc"/>
+		</Element>
 		<Element id="I2SClocksOutput" type="activeOutput" refParameter="I2SClocksFreq_Value" x="1102" y="614" refEnable="I2SEnable">
 			<Input signalId="I2SCLK" from="I2SSrc"/>
 		</Element>
@@ -239,7 +250,13 @@
 	<Label id="HCLK7" type="SpecialInfo" posX="1163" posY="493" text="APB2 timer clocks (MHz)"/>
 	<Label id="HCLK8" type="SpecialInfo" posX="1163" posY="525" text="48MHz clocks (MHz)" refEnable="USBFSEnable,USBHSEnable,RNGEnable,SDIOEnable"/>
 	<!--Element id="USBOTGOutput" type="activeOutput" refParameter="48MHZClocksFreq_Value" x="1101" y="520" refEnable="USBFSEnable"-->
-	<Label id="I2SCLK" type="SpecialInfo" posX="1163" posY="618" text="I2S clocks (MHz)" refEnable="I2SEnable"/>
+	<Label id="I2SCLK" type="SpecialInfo" posX="1163" posY="600" text="I2S clocks (MHz)" refEnable="I2SEnable">
+	<Condition Diagnostic="" Expression="UFQFPN48 |WLCSP49"/>
+			</Label>
+	<Label id="I2SCLK" type="SpecialInfo" posX="1163" posY="618" text="I2S clocks (MHz)" refEnable="I2SEnable">
+	<Condition Diagnostic="" Expression="!UFQFPN48 &amp; !WLCSP49"/>
+			</Label>
+	
 	<!--Element id="I2SClocksOutput" type="output" refParameter="I2SClocksFreq_Value" x="1102" y="584" -->
 	<Label id="APB1Presc" type="Info" posX="953" posY="372" text="APB1 Prescaler"/>
 	<Label id="APB2Presc" type="Info" posX="956" posY="439" text="APB2 Prescaler"/>
@@ -266,24 +283,42 @@
 	<!--<Label id="OSCINLabel" type="signal" posX="213" posY="484" text="OSC32_IN" refEnable="EnableHSE"/>
 	<Label id="OSCOUTLabel" type="signal" posX="205" posY="501" text="OSC32_OUT" refEnable="EnableHSE"/>-->
 	<!-- I2S -->
-	<Label id="I2SMux" type="muxLabel" posX="995" posY="572" text="I2S source Mux"  refEnable="I2SEnable"/>
+	<Label id="I2SMux" type="muxLabel" posX="995" posY="572" text="I2S source Mux"  refEnable="I2SEnable">
+	<Condition Diagnostic="" Expression="!UFQFPN48 &amp; !WLCSP49"/>
+			</Label>
 	<!--<Label id="I2SExtClk" type="signal" posX="970" posY="622" text="Ext.clock"  refEnable="EnableExtClockForI2S"/>-->
 	<!--Element id="I2SSrc" type="multiplexor" refParameter="I2SClockSource" x="1022" y="567" refEnable="I2SCloclsOutPutEnable"-->
-	<Label id="PllI2SClk" type="signal" posX="963" posY="589" text="PLLI2SCLK" refEnable="I2SEnable"/>
+	<Label id="PllI2SClk" type="signal" posX="963" posY="589" text="PLLI2SCLK" refEnable="I2SEnable">
+	<Condition Diagnostic="" Expression="!UFQFPN48 &amp; !WLCSP49"/>
+			</Label>
 	<Label id="PLLI2SNLabel" type="info" posX="678" posY="615" text="* N" refEnable="I2SEnable,MCO2OutPutEnable"/>
 	<Label id="PLLI2SRLabel" type="info" posX="757" posY="614" text="/ R" refEnable="I2SEnable,MCO2OutPutEnable"/><!--to do add SAI-->
 	<Label id="PLLI2SLabel" type="muxLabel" posX="620" posY="620" text="PLLI2S" refEnable="I2SEnable,MCO2OutPutEnable"/><!--to do add SAI-->
 	<!--Element id="PLLI2SQ" type="devisor" refParameter="PLLI2SQ" x="673" y="655" refEnable="I2SCloclsOutPutEnable"-->
 	<Label id="PLLI2SOutLabel" type="signal" posX="820" posY="589" text="PLLI2SCLK" refEnable="PLLI2SCLKSAIA_BEnable"/> <!-- Active if SAIA or SAIB -->
-	<Label id="I2SExtClk" type="signal" posX="969" posY="628" text="Ext.clock" refEnable="EnableExtClockForI2S"/>
+	<Label id="I2SExtClk" type="signal" posX="969" posY="628" text="Ext.clock" refEnable="EnableExtClockForI2S">
+	<Condition Diagnostic="" Expression="!UFQFPN48 &amp; !WLCSP49"/>
+			</Label>
 
 	<!--MCO1/2-->
-	<Label id="MCO2Label" type="signal" text="(MHz) MCO2" posX="225" posY="726" refEnable="MCO2OutPutEnable"/>
-	<Label id="MCO2MuxLabel" type="muxLabel" text="MCO2 source Mux" posX="412" posY="658" refEnable="MCO2OutPutEnable"/>
-	<Label id="MCO2SYSCLKLabel" type="signal" text="SYSCLK" posX="490" posY="678" refEnable="MCO2OutPutEnable"/>
-	<Label id="MCO2PLLI2SLabel" type="signal" text="PLLI2SCLK" posX="490" posY="704" refEnable="MCO2OutPutEnable"/>
-	<Label id="MCO2HSELabel" type="signal" text="HSE" posX="490" posY="728" refEnable="MCO2OutPutEnable"/>
-	<Label id="MCO2PLLLabel" type="signal" text="PLLCLK" posX="490" posY="754" refEnable="MCO2OutPutEnable"/>
+	<Label id="MCO2Label" type="signal" text="(MHz) MCO2" posX="225" posY="726" refEnable="MCO2OutPutEnable">
+	<Condition Diagnostic="" Expression="!UFQFPN48 &amp; !WLCSP49"/>
+			</Label>
+	<Label id="MCO2MuxLabel" type="muxLabel" text="MCO2 source Mux" posX="412" posY="658" refEnable="MCO2OutPutEnable">
+	<Condition Diagnostic="" Expression="!UFQFPN48 &amp; !WLCSP49"/>
+			</Label>
+	<Label id="MCO2SYSCLKLabel" type="signal" text="SYSCLK" posX="490" posY="678" refEnable="MCO2OutPutEnable">
+	<Condition Diagnostic="" Expression="!UFQFPN48 &amp; !WLCSP49"/>
+			</Label>
+	<Label id="MCO2PLLI2SLabel" type="signal" text="PLLI2SCLK" posX="490" posY="704" refEnable="MCO2OutPutEnable">
+	<Condition Diagnostic="" Expression="!UFQFPN48 &amp; !WLCSP49"/>
+			</Label>
+	<Label id="MCO2HSELabel" type="signal" text="HSE" posX="490" posY="728" refEnable="MCO2OutPutEnable">
+	<Condition Diagnostic="" Expression="!UFQFPN48 &amp; !WLCSP49"/>
+			</Label>
+	<Label id="MCO2PLLLabel" type="signal" text="PLLCLK" posX="490" posY="754" refEnable="MCO2OutPutEnable">
+	<Condition Diagnostic="" Expression="!UFQFPN48 &amp; !WLCSP49"/>
+			</Label>
 	<Label id="MCO1MuxLabel" type="muxLabel" text="MCO1 source Mux" posX="442" posY="790" refEnable="MCO1OutPutEnable"/>
 	<Label id="MCO1Label" type="signal" text="(MHz) MCO1" posX="227" posY="858" refEnable="MCO1OutPutEnable"/>
 	<Label id="MCO1LSELabel" type="signal" text="LSE" posX="490" posY="812" refEnable="MCO1OutPutEnable"/>

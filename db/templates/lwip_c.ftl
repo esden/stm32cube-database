@@ -2,7 +2,6 @@
 /**
  ******************************************************************************
   * File Name          : ${name}.c
-  * Date               : ${date}
   * Description        : This file provides initialization code for LWIP
   *                      middleWare.
   ******************************************************************************

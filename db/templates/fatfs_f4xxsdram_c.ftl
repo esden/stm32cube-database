@@ -2,9 +2,6 @@
 /**
  ******************************************************************************
   * @file    bsp_driver_sdram.c (based on stm324x9i_eval_sdram.c)
-  * @author  MCD Teams
-  * @version V1.0.0
-  * @date    ${date}
   * @brief   This file includes a generic SDRAM driver.
   ******************************************************************************
   *

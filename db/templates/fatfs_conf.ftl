@@ -17,7 +17,7 @@
 /*-----------------------------------------------------------------------------/
 / Additional user header to be used  
 /-----------------------------------------------------------------------------*/
-
+[#assign usbhInUse = 0]
 #include "stm32f4xx_hal.h"
 [#list SWIPdatas as SWIP]  
 [#if SWIP.defines??]
@@ -41,8 +41,7 @@
 [#if definition.value="1"]
 #include "usbh_core.h"
 #include "usbh_msc.h"
-#include "fatfs_handles.h"
-#define HOST_HANDLE _HUSBH
+[#assign usbhInUse = 1]
 [/#if] 
 [/#if]
 [#if definition.name="_FS_REENTRANT"]                           
@@ -71,6 +70,12 @@ extern ${variable.value} ${variable.name};
 [#-- Global variables --]
 [#if SWIP.defines??]
 	[#list SWIP.defines as definition]	
+	  [#if definition.name="_HUSBH"]
+	    [#if usbhInUse == 1]
+/* Handle for USB Host */                       
+#define HOST_HANDLE ${definition.value}   	    
+	    [/#if]            
+      [/#if] 
       [#if definition.name=="_FS_TINY"]
 	      [#assign valueTiny = definition.value]
 	  [/#if]

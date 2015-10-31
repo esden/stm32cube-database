@@ -2,7 +2,6 @@
 /**
   ******************************************************************************
   * File Name          : ${name}.h
-  * Date               : ${date}
   * Description        : This file provides code for the configuration
   *                      of the ${name} instances.
   ******************************************************************************
@@ -52,6 +51,9 @@
 [#-- Global variables --]
 [#if IP.variables??]
 [#list IP.variables as variable]
+[#-- Tracker 276386 -- GetHandle Start --]
+[#--${variable.value}* MX_${variable.name?replace("h","")?upper_case}_GetHandle(void);--]
+[#-- Tracker 276386 -- GetHandle End --]
 extern ${variable.value} ${variable.name};
 [/#list]
 [/#if]

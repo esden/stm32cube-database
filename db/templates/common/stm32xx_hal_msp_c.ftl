@@ -2,7 +2,6 @@
 /**
   ******************************************************************************
   * File Name          : ${FamilyName?lower_case}xx_hal_msp.c
-  * Date               : ${date}
   * Description        : This file provides code for the MSP Initialization 
   *                      and de-Initialization codes.
   ******************************************************************************
@@ -543,10 +542,17 @@ void HAL_MspInit(void)
             [/#if]            
         [/#list]
         [/#if]    
-   
     [#if serviceType=="Init"] 
+        [#if !ipName?contains("I2C")] [#-- if not I2C --]
            [#if initService.clock??]
             [#if initService.clock!="none"]
+    [#if FamilyName=="STM32F1" && ipName=="RTC"]
+#t#tHAL_PWR_EnableBkUpAccess();
+
+#t#t/* Enable BKP CLK enable for backup registers */
+#t#t__HAL_RCC_BKP_CLK_ENABLE();                    
+
+                [/#if]
                 #t#t/* Peripheral clock enable */
                 [#list initService.clock?split(';') as clock]
                     [#if ipvar.clkCommonResource.entrySet()?contains(clock?trim)]#t#t${clock?trim?replace("__","")?replace("_ENABLE","")}_ENABLED++;
@@ -562,7 +568,7 @@ void HAL_MspInit(void)
                  #t#t/* Peripheral clock enable */
                  #t#t__${ipName}_CLK_ENABLE(); 
            [/#if]
-
+      [/#if] [#-- not I2C --]
    [#else] 
         [#if initService.clock??]
             [#if initService.clock!="none"]
@@ -586,6 +592,27 @@ void HAL_MspInit(void)
     
     [#if gpioExist]
 #t[@generateConfigCode ipName=ipName type=serviceType serviceName="gpio" instHandler=instHandler tabN=tabN/]
+[#-- if I2C clk_enable should be after GPIO Init Begin --]
+    [#if serviceType=="Init" && ipName?contains("I2C")] 
+           [#if initService.clock??]
+            [#if initService.clock!="none"]
+               #t#t/* Peripheral clock enable */
+                [#list initService.clock?split(';') as clock]
+                    [#if ipvar.clkCommonResource.entrySet()?contains(clock?trim)]#t#t${clock?trim?replace("__","")?replace("_ENABLE","")}_ENABLED++;
+                    #t#tif(${clock?trim?replace("__","")?replace("_ENABLE","")}_ENABLED==1){          
+                        #t#t#t${clock?trim}();
+                    [#if ipvar.clkCommonResource.entrySet()?contains(clock?trim)]#t#t}[/#if]  
+                    [#else]
+                        #t#t${clock?trim}();
+                    [/#if]        
+                [/#list]
+            [/#if]
+            [#else]
+                 #t#t/* Peripheral clock enable */
+                 #t#t__${ipName}_CLK_ENABLE(); 
+           [/#if]
+[/#if]
+[#-- if I2C clk_enable should be after GPIO Init End --]
 [/#if]
     [#if serviceType=="Init"] 
     [#if dmaExist]#n#t#t/* Peripheral DMA init*/
@@ -594,14 +621,12 @@ void HAL_MspInit(void)
     [/#if]
     [#if nvicExist]
         [#if initService.nvic??]
-#t/* System interrupt init*/
+#t/* Peripheral interrupt init*/
 [#if ipName?contains("USB")]
                 [#-- WorkAround for USB low power and remap macro--]
                 [#if USB_interruptRemapMacro??]
                   #t#t${USB_interruptRemapMacro};
                 [/#if]
-
-
                 [#list initService.nvic as initVector]
                   [#if !initVector.vector?contains("WKUP") && !initVector.vector?contains("WakeUp")]
                     #t#tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
@@ -617,12 +642,20 @@ void HAL_MspInit(void)
                 [#if lowPower == "yes"]
                     #t#tif(hpcd->Init.low_power_enable == 1)
                     #t#t{
-                    #t#t#t/* Enable EXTI Line 18 for USB wakeup */
+                    [#if ipName?contains("_FS")]
+                        [#if FamilyName=="STM32L4"]
+                            #t#t#t/* Enable EXTI Line 17 for USB wakeup */
+                        [#else]
+                            #t#t#t/* Enable EXTI Line 18 for USB wakeup */                            
+                        [/#if]
+                    [#else]
+                        #t#t#t/* Enable EXTI Line 20 for USB wakeup */
+                    [/#if]
                     [#if FamilyName=="STM32F3"||FamilyName=="STM32L1"]
                       #t#t#t__HAL_USB_EXTI_CLEAR_FLAG();
                       #t#t#t__HAL_USB_EXTI_SET_RISING_EDGE_TRIGGER();
                     [/#if]
-                    [#if FamilyName=="STM32F2"||FamilyName=="STM32F4"]
+                    [#if FamilyName=="STM32F2"||FamilyName=="STM32F4"||FamilyName=="STM32F7"]
                         [#if ipName?contains("_FS")]
                             #t#t#t__HAL_USB_FS_EXTI_CLEAR_FLAG();
                             #t#t#t__HAL_USB_FS_EXTI_SET_RISING_EGDE_TRIGGER();

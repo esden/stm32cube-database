@@ -148,9 +148,15 @@
     </RefParameter>
 	
     <!--diviseur de AHB /8 pour cortex sys timer-->
-    <RefParameter Visible="false" Comment="Cortex timer system Div" Name="TimSys_Div" Type="integer" DefaultValue="8" Max="8" Min="8"/>
+	 <RefParameter Visible="false" Comment="Cortex timer system Div" DefaultValue="SYSTICK_CLKSOURCE_HCLK" Name="TimSys_Div" Type="list">
+         <PossibleValue Comment="1" Value="SYSTICK_CLKSOURCE_HCLK" Semaphore="HCLKDiv1"/>
+		 <PossibleValue Comment="8" Value="SYSTICK_CLKSOURCE_HCLK_DIV8"/>
+    </RefParameter> 
    
-
+   <RefParameter Visible="false" Comment="Cortex_DivARG" DefaultValue="HAL_RCC_GetHCLKFreq()/1000" Name="Cortex_DivARG" Type="String">
+        <Condition Expression="HCLKDiv1" Diagnostic=""/>
+    </RefParameter>	
+    <RefParameter Visible="false" Comment="Cortex_DivARG" DefaultValue="HAL_RCC_GetHCLKFreq()/8000" Name="Cortex_DivARG" Type="String"/>
     <!--diviseur APB1 1..16-->
     <RefParameter Visible="false"  Comment="APB1 Clock Divider" DefaultValue="RCC_HCLK_DIV1" Name="APB1CLKDivider" Type="list">
         <PossibleValue Comment="1"  Value="RCC_HCLK_DIV1"/>
@@ -317,6 +323,9 @@
     <RefParameter Visible="false" Comment="HCLK"         Name="HCLKFreq_Value"   DefaultValue="8000000"    Type="double" Min="25000000" IP="USB_OTG_FS" Display="value/1000000" Unit="MHz">
     <Condition Diagnostic="HCLK and ETH constraint" Expression="ETHUsed_ForRCC"/>
     </RefParameter>
+	<RefParameter Visible="false" Comment="HCLK"         Name="HCLKFreq_Value"   DefaultValue="8000000"    Type="double" Min="14200000" IP="USB_OTG_FS" Display="value/1000000" Unit="MHz">
+    <Condition Diagnostic="HCLK and USB Constraint" Expression="USB_OTG_FSUsed_ForRCC"/>
+    </RefParameter>
 	<RefParameter Visible="false" Comment="HCLK"         Name="HCLKFreq_Value"   DefaultValue="8000000"    Type="double" Max="72000000" IP="USB_OTG_FS" Display="value/1000000" Unit="MHz"/>
     <!--RTC freq de la sortie-->
     <RefParameter Visible="false" Comment="RTC clock"    Name="RTCFreq_Value"               DefaultValue="40000"   Type="double" IP="RTC"  Display="value/1000" Unit="KHz" />
@@ -329,6 +338,7 @@
     <RefParameter Visible="false" Comment="USB ORG clock "          Name="USBFreq_Value"          DefaultValue="16000000" Max="48000000" Min="48000000"  Type="double"  Display="value/1000000" Unit="MHz"/>
 
     <RefParameter Visible="false" Comment="APB1 peripheral clocks"  Name="APB1Freq_Value"       DefaultValue="8000000"   Max="36000000"  Type="double" IP="CAN1,USART2,USART3,UART4,UART5,SPI2,I2S2,SPI3,I2S3,I2C2,I2C3,WWDG,DAC1,DAC2,CAN2" Display="value/1000000" Unit="MHz"/>
+	
     <RefParameter Visible="false" Comment="APB2 peripheral clocks"  Name="APB2Freq_Value"       DefaultValue="8000000"   Max="72000000"  Type="double" IP="USART1,SPI1,I2S1,ADC1,ADC2" Display="value/1000000" Unit="MHz"/>
     <RefParameter Visible="false" Comment="APB1 timers clocks"      Name="APB1TimFreq_Value"    DefaultValue="8000000"   Type="double" IP="TIMER7,TIMER6,TIMER2,TIMER3,TIMER4,TIMER5,TIMER12,TIMER13,TIMER14" Display="value/1000000" Unit="MHz"/>
     <RefParameter Visible="false" Comment="APB2 timers clocks"      Name="APB2TimFreq_Value"    DefaultValue="8000000"   Type="double" IP="TIMER1,TIMER15,TIMER16,TIMER17,TIMER8,TIMER9,TIMER10,TIMER11" Display="value/1000000" Unit="MHz"/>
@@ -565,7 +575,7 @@
 	
     <!--  PLL state control-->
     <RefParameter Visible="false" Comment="MainPLL Is Used" DefaultValue="1" Name="PLLUsed" Min="1" Type="integer">
-        <Condition Expression="( (SYSCLKSource=RCC_SYSCLKSOURCE_PLLCLK) | ((RCC_MCOSource=RCC_MCO1SOURCE_PLLCLK) &amp; MCOConfig)  )" Diagnostic=" "/>
+        <Condition Expression="( (SYSCLKSource=RCC_SYSCLKSOURCE_PLLCLK) | ((RCC_MCOSource=RCC_MCO1SOURCE_PLLCLK) &amp; MCOConfig) |USB_OTG_FSUsed_ForRCC  )" Diagnostic=" "/>
     </RefParameter>
     <RefParameter Visible="false" Comment="Main PLL is Used" DefaultValue="0" Name="PLLUsed" Min="0" Type="integer"/>
 	
@@ -876,12 +886,12 @@
     <RefMode Name="ClockTree">
         <ConfigForMode>RCC_OSCConfig</ConfigForMode>        
         <ConfigForMode>RCC_ClockConfig</ConfigForMode>        
-  
         <ConfigForMode>RCC_MCOConfig</ConfigForMode> 
         <ConfigForMode>RCC_CSS_Enable</ConfigForMode>
-        <ConfigForMode>RCC_AFIO_CLK_ENABLE</ConfigForMode>
+        <!--ConfigForMode>RCC_AFIO_CLK_ENABLE</ConfigForMode-->
 
-        
+         <ConfigForMode>RCC_interrupt_Time_SYSTICK_Config</ConfigForMode>
+		 <ConfigForMode>RCC_SYSTICK_CONFIG</ConfigForMode>
         <Parameter Name="PLLMUL"/>
         <Parameter Name="APB1TimCLKDivider"/>
         <Parameter Name="APB2TimCLKDivider"/>

@@ -59,13 +59,7 @@
     mission critical applications that require provable dependability.
 
     1 tab == 4 spaces!
-*/
-/**
-  ******************************************************************************
-  * File Name          : ${name}
-  * Date               : ${date}
-  ******************************************************************************
-  */#n
+*/#n
 
 #ifndef FREERTOS_CONFIG_H
 #define FREERTOS_CONFIG_H
@@ -76,7 +70,7 @@
 [#assign fileName = SWIP.fileName]   
 [#assign version = SWIP.version]   
 
-[#assign CMSIS_version = "100"]
+[#assign CMSIS_version = "1.00"]
 
 [#assign configUSE_TIMERS = "0"]
 [#assign configCHECK_FOR_STACK_OVERFLOW = "0"]
@@ -295,7 +289,7 @@
 #define configUSE_IDLE_HOOK                      ${valueUseIdleHook}
 #define configUSE_TICK_HOOK                      ${valueUseTickHook}
 #define configCPU_CLOCK_HZ                       ( ${valueCpuClock} )
-[#if CMSIS_version=="100"]
+[#if CMSIS_version=="1.00"]
 #define configTICK_RATE_HZ                       ((portTickType)${valueTickRate})
 [#else]
 #define configTICK_RATE_HZ                       ((TickType_t)${valueTickRate})

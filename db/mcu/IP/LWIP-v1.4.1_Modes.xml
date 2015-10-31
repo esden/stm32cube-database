@@ -9,13 +9,16 @@
     Version="v1.4.1_Cube">
     
     <About>LWIP: LightWeight TCP/IP</About>
-    <RefParameter Name="LWIP_DHCP" Comment="LWIP_DHCP (DHCP Module)" Type="list" Group="DHCP Options" DefaultValue="1" TabName="General" Mode="Basic" >
+    <RefParameter Name="LwIP Version" Comment="LwIP Version (Version of LwIP supported by CubeMX)" Type="string" Group="LwIP Version" DefaultValue="1.4.1" TabName="General" Mode="Basic" >
+        <Description>LwIP stack has an internal parameter defined in init.h providing its version: LWIP_VERSION.&lt;br&gt;Here, the LwIP Version is just displayed to highlight the LwIP version supported by CubeMX.&lt;br&gt;&lt;b&gt;Warning&lt;/b&gt;: This is not a configurable parameter since LWIP_VERSION is already defined in init.h.</Description>
+    </RefParameter>
+    <RefParameter Name="LWIP_DHCP" Comment="LWIP_DHCP (DHCP Module)" Type="list" Group="DHCP Option" DefaultValue="1" TabName="General" Mode="Basic" >
         <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: Use LWIP_DHCP requires LWIP_UDP=1." Expression="LWIP_UDP"/>
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
         <Description>When this parameter is enabled, DHCP (Dynamic Host Configuration Protocol) module is enabled.</Description>
     </RefParameter>
-    <RefParameter Name="LWIP_DHCP" Comment="LWIP_DHCP (DHCP Module)" Type="list" Group="DHCP Options" DefaultValue="0" TabName="General" Mode="Basic" >
+    <RefParameter Name="LWIP_DHCP" Comment="LWIP_DHCP (DHCP Module)" Type="list" Group="DHCP Option" DefaultValue="0" TabName="General" Mode="Basic" >
         <PossibleValue Comment="Disabled" Value="0"/>
         <Description>When this parameter is enabled, DHCP (Dynamic Host Configuration Protocol) module is enabled.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Use LWIP_DHCP requires LWIP_UDP=1.</Description>
     </RefParameter>
@@ -31,14 +34,14 @@
         <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: If DHCP is disabled, the Gateway address is mandatory." Expression="!LWIP_DHCP"/>
     </RefParameter>
     <RefParameter Name="GATEWAY_ADDRESS" Comment="GATEWAY_ADDRESS (Gateway Address)" Type="Array" Separator="." ArrayTypeElement="uint8_t;10" ArraySize="4" Group="IP Address Settings" DefaultValue="0.0.0.0" TabName="General" Mode="Basic" Visible="false"/>
-    <RefParameter Name="WITH_RTOS" Comment="WITH_RTOS (Use RTOS)" Type="list" Group="RTOS Settings" DefaultValue="0" TabName="General" Mode="Basic" Visible="true">
-        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: RTOS requires NO_SYS=0." Expression="!NO_SYS"/>
+    <RefParameter Name="WITH_RTOS" Comment="WITH_RTOS (Use FREERTOS ** CubeMX specific **)" Type="list" Group="RTOS Settings" DefaultValue="0" TabName="General" Mode="Basic" Visible="true">
+        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: WITH_RTOS is enabled means NO_SYS is enabled (set to 0) and FREERTOS is enabled." Expression="!NO_SYS"/>
         <PossibleValue Comment="Enabled" Value="1" Semaphore="S_NO_SYS"/>
-        <Description>This parameter is enabled as soon as RTOS is enabled in MiddleWares tree.</Description>
+        <Description>This parameter is enabled as soon as FREERTOS is enabled in MiddleWares tree.&lt;br&gt;&lt;b&gt;Warning&lt;/b&gt;: This parameter has been introduced by CubeMX.</Description>
     </RefParameter>
-    <RefParameter Name="WITH_RTOS" Comment="WITH_RTOS (Use RTOS)" Type="list" Group="RTOS Settings" DefaultValue="0" TabName="General" Mode="Basic" Visible="true">
+    <RefParameter Name="WITH_RTOS" Comment="WITH_RTOS (Use FREERTOS ** CubeMX specific **)" Type="list" Group="RTOS Settings" DefaultValue="0" TabName="General" Mode="Basic" Visible="true">
         <PossibleValue Comment="Disabled" Value="0"/>
-        <Description>This parameter is disabled as soon as RTOS is not enabled in MiddleWares tree.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: RTOS requires NO_SYS=0.</Description>
+        <Description>This parameter is disabled as soon as FREERTOS is disabled in MiddleWares tree.&lt;br&gt;&lt;b&gt;Warning&lt;/b&gt;: This parameter has been introduced by CubeMX.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: WITH_RTOS is disabled means NO_SYS is disabled (set to 1) and FREERTOS is disabled.</Description>
     </RefParameter>
     <RefParameter Name="SYS_LIGHTWEIGHT_PROT" Comment="SYS_LIGHTWEIGHT_PROT (Memory Functions Protection)" Type="list" Group="Platform Specific Locking" DefaultValue="0" TabName="All LwIP Options" Mode="Basic" >
         <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: SYS_LIGHTWEIGHT_PROT is used for inter task protection which works with an RTOS only when NO_SYS=0." Expression="!NO_SYS"/>
@@ -51,13 +54,13 @@
         <Description>This option can be enabled only when NO_SYS=0, if you want inter-task protection for certain critical regions during buffer allocation, deallocation and memory allocation and deallocation.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: This parameter is disable without RTOS (when NO_SYS=1)</Description>
     </RefParameter>
     <RefParameter Name="NO_SYS" Comment="NO_SYS (LwIP Facilities)" Type="list" Group="Platform Specific Locking" DefaultValue="0" TabName="All LwIP Options" Mode="Basic" Visible="true">
-        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: NO_SYS is set to 0 (Enabled) when FREERTOS Middleware is enabled. To set NO_SYS to 1 (Disabled), disable FREERTOS Middleware." Expression="S_NO_SYS &amp; S_FREERTOS"/>
-        <PossibleValue Comment="Enabled" Value="0"/>
-        <Description>This option is enabled (set to 0) when RTOS is used, and lwIP facilities like sequential APIs (LWIP_NETCONN, LWIP_SOCKET) can be enabled. Otherwise, a very minimal level of LwIP functionalities is provided.</Description>
+        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: Forced to Enabled (set to 0) by activating FREERTOS middleware. To set NO_SYS to 1 (Disabled), unset FREERTOS middleware." Expression="S_NO_SYS &amp; S_FREERTOS"/>
+        <PossibleValue Comment="LwIP Facilities Enabled" Value="0"/>
+        <Description>This parameter allows using lwIP facilities like sequential APIs (LWIP_NETCONN, LWIP_SOCKET)&lt;br&gt;otherwise a reduced set of LwIP functionalities is available.&lt;br&gt;&lt;b&gt;Warning&lt;/b&gt;: Take care about NO_SYS value: NO_SYS(Enabled)=0.</Description>
     </RefParameter>
     <RefParameter Name="NO_SYS" Comment="NO_SYS (LwIP Facilities)" Type="list" Group="Platform Specific Locking" DefaultValue="=1" TabName="All LwIP Options" Mode="Basic" Visible="true">
-        <PossibleValue Comment="Disabled" Value="1"/>
-        <Description>This parameter allow using lwIP facilities like sequential APIs.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: This option is disabled (set to 1) when FREERTOS Middleware is not used, and a very minimal level of LwIP functionalities is provided.</Description>
+        <PossibleValue Comment="LwIP Facilities Disabled" Value="1"/>
+        <Description>When forced to Disabled, this parameter prevents from using lwIP facilities like sequential APIs (LWIP_NETCONN, LWIP_SOCKET).&lt;br&gt;&lt;b&gt;Warning&lt;/b&gt;: Take care about NO_SYS value: NO_SYS(Disabled)=1.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Forced to Disabled (set to 1) when FREERTOS middleware is not used. To set NO_SYS to 0 (Enabled), enable FREERTOS middleware.</Description>
     </RefParameter>
     <RefParameter Name="NO_SYS_NO_TIMERS" Comment="NO_SYS_NO_TIMERS (Drop Support For sys_timeout)" Type="list" Group="Platform Specific Locking" DefaultValue="0" TabName="All LwIP Options" Mode="Basic" Visible="true">
         <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: Drop support for sys_timeout can be enabled only when NO_SYS=1" Expression="NO_SYS"/>
@@ -91,8 +94,8 @@
         <Description>This option is set as followed:&lt;br&gt;- Enabled: Use User C Pool Alloctor Functions (Use mem_malloc/mem_free instead of the lwip pool allocator, especially useful with MEM_LIBC_MALLOC but handle with care regarding execution speed and usage from interrupts!)&lt;br&gt;- Disabled: Use LwIP Internal Pool Allocator Memory Functions.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: There are several other parameters linked to this one:&lt;br&gt;MEMP_NUM_RAW_PCB, MEMP_NUM_UDP_PCB, MEMP_NUM_TCP_PCB, MEMP_NUM_TCP_SEG, MEMP_NUM_REASSDATA, MEMP_NUM_IGMP_GROUP, MEMP_NUM_SYS_TIMEOUT, MEMP_NUM_NETCONN, MEMP_NUM_TCPIP_MSG_API, ARP_QUEUEING, IP_REASS_MAX_PBUFS, LWIP_RAW, LWIP_IGMP, LWIP_UDP, LWIP_TCP, TCP_WND, TCP_SND_QUEUELEN, LWIP_NETCONN, LWIP_SOCKET</Description>
     </RefParameter>
     <RefParameter Name="MEM_ALIGNMENT" Comment="MEM_ALIGNMENT (Memory Byte Alignment of CPU)" Type="list" Unit="Byte(s)" Group="Memory Options" DefaultValue="4" TabName="All LwIP Options" Mode="Advanced" >
-        <PossibleValue Comment="4 Byte(s)" Value="4"/>
-        <PossibleValue Comment="2 Byte(s)" Value="2"/>
+        <PossibleValue Comment="4" Value="4"/>
+        <PossibleValue Comment="2" Value="2"/>
         <Description>This parameter should be set to the alignment of the CPU: 4 byte alignment or 2 byte alignment.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: PBUF_POOL_BUFSIZE must be greater than MEM_ALIGNMENT.</Description>
     </RefParameter>
     <RefParameter Name="MEM_SIZE" Comment="MEM_SIZE (Heap Memory Size)" Type="integer" Unit="Byte(s)" Group="Memory Options" DefaultValue="1600" TabName="All LwIP Options" Mode="Basic" Min="0" Max="2147483647" >
@@ -278,7 +281,7 @@
     <RefParameter Name="IP_FRAG_MAX_MTU" Comment="IP_FRAG_MAX_MTU (MAX MTU on any Interface for IP Fragmatation Buffer)" Type="Integer" Unit="Bytes(s)" Group="IP Options" DefaultValue="1500" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="2147483647" >
         <Description>When this parameter is enabled, it is assumed that max MTU on any interface for IP frag buffer (requires IP_FRAG_USES_STATIC_BUF=1).&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: IP_FRAG_MAX_MTU requires IP_FRAG_USES_STATIC_BUF enabled.</Description>
     </RefParameter>
-    <RefParameter Name="IP_DEFAULT_TTL" Comment="IP_DEFAULT_TTL (Time-To-Live Used by Transport Layers)" Type="Integer" Unit="Second(s)" Group="IP Options" DefaultValue="255" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="2147483647" >
+    <RefParameter Name="IP_DEFAULT_TTL" Comment="IP_DEFAULT_TTL (Time-To-Live Used by Transport Layers)" Type="Integer" Unit="Second(s)" Group="IP Options" DefaultValue="255" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="255" >
         <Description>Default value for Time-To-Live used by transport layers.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: IP_DEFAULT_TTL is used to set by default: ICMP_TTL, RAW_TTL, UDP_TTL and TCP_TTL.</Description>
     </RefParameter>
     <RefParameter Name="IP_SOF_BROADCAST" Comment="IP_SOF_BROADCAST (Broadcast Filter per Pcb on UDP and Raw Send Operations)" Type="list" Group="IP Options" DefaultValue="0" TabName="All LwIP Options" Mode="Advanced" >
@@ -311,7 +314,7 @@
         <PossibleValue Comment="Enabled" Value="1"/>
         <Description>This option enables ICMP (Internet Control Message Protocol) module inside the IP stack.Be careful, disable that make your product non-compliant to RFC1122.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: None.</Description>
     </RefParameter>
-    <RefParameter Name="ICMP_TTL" Comment="ICMP_TTL (Time-To-Live Used by ICMP Packets)" Type="Integer" Unit="Second(s)" Group="ICMP Options" DefaultValue="=IP_DEFAULT_TTL" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="2147483647" >
+    <RefParameter Name="ICMP_TTL" Comment="ICMP_TTL (Time-To-Live Used by ICMP Packets)" Type="Integer" Unit="Second(s)" Group="ICMP Options" DefaultValue="=IP_DEFAULT_TTL" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="255" >
         <Description>Default value for Time-To-Live used by ICMP packets.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: None.</Description>
     </RefParameter>
     <RefParameter Name="LWIP_BROADCAST_PING" Comment="LWIP_BROADCAST_PING (Respond to Broadcast Pings)" Type="list" Group="ICMP Options" DefaultValue="0" TabName="All LwIP Options" Mode="Advanced" >
@@ -334,16 +337,16 @@
         <PossibleValue Comment="Disabled" Value="0"/>
         <Description>If this parameter is enabled, the application layer to hook into the IP layer itself is enabled.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Use LWIP_RAW requires MEMP_NUM_RAW_PCB&gt;0 when MEMP_MEM_MALLOC is disabled.</Description>
     </RefParameter>
-    <RefParameter Name="RAW_TTL" Comment="RAW_TTL (Time-To-Live Used by Raw Packets)" Type="Integer" Unit="Second(s)" Group="Raw Options" DefaultValue="=IP_DEFAULT_TTL" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="2147483647" >
+    <RefParameter Name="RAW_TTL" Comment="RAW_TTL (Time-To-Live Used by Raw Packets)" Type="Integer" Unit="Second(s)" Group="Raw Options" DefaultValue="=IP_DEFAULT_TTL" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="255" >
         <Description>Default value for Time-To-Live used by Raw packets.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: None.</Description>
     </RefParameter>
-    <RefParameter Name="DHCP_DOES_ARP_CHECK" Comment="DHCP_DOES_ARP_CHECK (ARP Check on Offered Address)" Type="list" Group="DHCP Options" DefaultValue="1" TabName="All LwIP Options" Mode="Advanced" >
+    <RefParameter Name="DHCP_DOES_ARP_CHECK" Comment="DHCP_DOES_ARP_CHECK (ARP Check on Offered Address)" Type="list" Group="DHCP Option" DefaultValue="1" TabName="All LwIP Options" Mode="Advanced" >
         <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: Use DHCP_DOES_ARP_CHECK requires LWIP_DHCP and LWIP_ARP both enabled." Expression="(LWIP_DHCP &amp; LWIP_ARP)"/>
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
         <Description>When this parameter is enabled, an ARP check on the offered address is done.</Description>
     </RefParameter>
-    <RefParameter Name="DHCP_DOES_ARP_CHECK" Comment="DHCP_DOES_ARP_CHECK (ARP Check on Offered Address)" Type="list" Group="DHCP Options" DefaultValue="0" TabName="All LwIP Options" Mode="Advanced" >
+    <RefParameter Name="DHCP_DOES_ARP_CHECK" Comment="DHCP_DOES_ARP_CHECK (ARP Check on Offered Address)" Type="list" Group="DHCP Option" DefaultValue="0" TabName="All LwIP Options" Mode="Advanced" >
         <PossibleValue Comment="Disabled" Value="0"/>
         <Description>When this parameter is enabled, an ARP check on the offered address is done.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Use DHCP_DOES_ARP_CHECK requires LWIP_DHCP and LWIP_ARP both enabled.</Description>
     </RefParameter>
@@ -380,10 +383,10 @@
         <PossibleValue Comment="Disabled" Value="0"/>
         <Description>When this parameter is enabled, it turns on SNMP (Simple Network Management Protocol) module. UDP must be available for SNMP transport.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Use LWIP_SNMP requires LWIP_UDP enabled, SNMP_CONCURRENT_REQUESTS and SNMP_TRAP_DESTINATIONS both greater than 0.</Description>
     </RefParameter>
-    <RefParameter Name="SNMP_CONCURRENT_REQUESTS" Comment="SNMP_CONCURRENT_REQUESTS (Number of Concurrent Requests SNMP will Allow)" Type="Integer" Group="SNMP Options" DefaultValue="1" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="2147483647" >
+    <RefParameter Name="SNMP_CONCURRENT_REQUESTS" Comment="SNMP_CONCURRENT_REQUESTS (Number of Concurrent Requests SNMP will Allow)" Type="Integer" Group="SNMP Options" DefaultValue="1" TabName="All LwIP Options" Mode="Advanced" Min="=IF(LWIP_SNMP, 1, 0)" Max="2147483647" >
         <Description>Number of concurrent requests the module will allow. At least one request buffer is required. Does not have to be changed unless external MIBs answer request asynchronously.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: If you want to use SNMP, you have to define SNMP_CONCURRENT_REQUESTS&gt;=1.</Description>
     </RefParameter>
-    <RefParameter Name="SNMP_TRAP_DESTINATIONS" Comment="SNMP_TRAP_DESTINATIONS (Number of SNMP Trap Destinations)" Type="Integer" Group="SNMP Options" DefaultValue="1" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="2147483647" >
+    <RefParameter Name="SNMP_TRAP_DESTINATIONS" Comment="SNMP_TRAP_DESTINATIONS (Number of SNMP Trap Destinations)" Type="Integer" Group="SNMP Options" DefaultValue="1" TabName="All LwIP Options" Mode="Advanced" Min="=IF(LWIP_SNMP, 1, 0)" Max="2147483647" >
         <Description>Number of trap destinations. At least one trap destination is required.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: If you want to use SNMP, you have to define SNMP_TRAP_DESTINATIONS&gt;=1.</Description>
     </RefParameter>
     <RefParameter Name="SNMP_PRIVATE_MIB" Comment="SNMP_PRIVATE_MIB (SNMP Private MIB)" Type="list" Group="SNMP Options" DefaultValue="0" TabName="All LwIP Options" Mode="Advanced" >
@@ -477,7 +480,7 @@
         <PossibleValue Comment="Disabled" Value="0"/>
         <Description>When this parameter is enabled, it turns on UDP-Lite (Requires LWIP_UDP).&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Use LWIP_UDPLITE requires LWIP_UDP enabled.</Description>
     </RefParameter>
-    <RefParameter Name="UDP_TTL" Comment="UDP_TTL (Number of Time-To-Live Used by UDP Packets)" Type="Integer" Group="UDP Options" DefaultValue="=IP_DEFAULT_TTL" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="2147483647" >
+    <RefParameter Name="UDP_TTL" Comment="UDP_TTL (Number of Time-To-Live Used by UDP Packets)" Type="Integer" Group="UDP Options" DefaultValue="=IP_DEFAULT_TTL" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="255" >
         <Description>Default UDP Time-To-Live value.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: None.</Description>
     </RefParameter>
     <RefParameter Name="LWIP_NETBUF_RECVINFO" Comment="LWIP_NETBUF_RECVINFO (Append Destination and Port Addresses to every Netbuf)" Type="list" Group="UDP Options" DefaultValue="0" TabName="All LwIP Options" Mode="Advanced" >
@@ -498,7 +501,7 @@
         <PossibleValue Comment="Disabled" Value="0"/>
         <Description>When this parameter is enabled, it turns on TCP.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: If you want to use TCP:&lt;br&gt;- you have to define MEMP_NUM_TCP_PCB&gt;=1&lt;br&gt;- TCP_WND and TCP_SND_QUEUELEN must fit in an u16_t&lt;br&gt;- TCP_MAXRTX and TCP_SYNMAXRTX must less or equal to 12</Description>
     </RefParameter>
-    <RefParameter Name="TCP_TTL" Comment="TCP_TTL (Number of Time-To-Live Used by TCP Packets)" Type="Integer" Group="TCP Options" DefaultValue="=IP_DEFAULT_TTL" TabName="All LwIP Options" Mode="Basic" Min="0" Max="2147483647" >
+    <RefParameter Name="TCP_TTL" Comment="TCP_TTL (Number of Time-To-Live Used by TCP Packets)" Type="Integer" Group="TCP Options" DefaultValue="=IP_DEFAULT_TTL" TabName="All LwIP Options" Mode="Basic" Min="0" Max="255" >
         <Description>Default TCP Time-To-Live value.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: None.</Description>
     </RefParameter>
     <RefParameter Name="TCP_WND" Comment="TCP_WND (TCP Receive Window Maximum Size)" Type="Integer" Unit="Byte(s)" Group="TCP Options" DefaultValue="2144" TabName="All LwIP Options" Mode="Basic" Min="=IF(!LWIP_TCP, 0, 2*TCP_MSS)" Max="=IF(!LWIP_TCP, 1000000, IF(!MEMP_MEM_MALLOC, IF( (PBUF_POOL_SIZE*(PBUF_POOL_BUFSIZE-(PBUF_LINK_HLEN+20+20))) &lt; 65535, (PBUF_POOL_SIZE*(PBUF_POOL_BUFSIZE-(PBUF_LINK_HLEN+20+20))),65535), 65535))" >
@@ -554,12 +557,12 @@
     <RefParameter Name="TCP_DEFAULT_LISTEN_BACKLOG" Comment="TCP_DEFAULT_LISTEN_BACKLOG (Maximum Allowed Backlog for TCP Listen Netconns)" Type="integer" Unit="Byte(s)" Group="TCP Options" DefaultValue="255" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="=IF(LWIP_TCP &amp; TCP_LISTEN_BACKLOG, 255, 1000000)" >
         <Description>Maximum allowed backlog for TCP listen netconns. This backlog is used unless another is explicitly specified. 0xff is the maximum (u8_t).&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Link with LWIP_TCP and TCP_LISTEN_BACKLOG parameters: when LWIP_TCP and TCP_LISTEN_BACKLOG are enabled, TCP_DEFAULT_LISTEN_BACKLOG must less than 256.</Description>
     </RefParameter>
-    <RefParameter Name="TCP_OVERSIZE" Comment="TCP_OVERSIZE (Maximum Number of Bytes that tcp_write)" Type="list" Unit="Byte(s)" Group="TCP Options" DefaultValue="TCP_MSS" TabName="All LwIP Options" Mode="Advanced" >
+    <RefParameter Name="TCP_OVERSIZE" Comment="TCP_OVERSIZE (Maximum Number of Bytes that tcp_write)" Type="list" Group="TCP Options" DefaultValue="TCP_MSS" TabName="All LwIP Options" Mode="Advanced" >
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
         <PossibleValue Comment="128 Bytes" Value="128"/>
-        <PossibleValue Comment="TCP_MSS Byte(s)" Value="TCP_MSS"/>
-        <PossibleValue Comment="(TCP_MSS/4) Byte(s)" Value="(TCP_MSS/4)"/>
+        <PossibleValue Comment="TCP_MSS Bytes" Value="TCP_MSS"/>
+        <PossibleValue Comment="(TCP_MSS/4) Bytes" Value="(TCP_MSS/4)"/>
         <Description>Maximum number of bytes that tcp_write may allocate ahead of time in an attempt to create shorter pbuf chains for transmission. The meaningful range is 0 to TCP_MSS.&lt;br&gt;Some suggested values are:&lt;br&gt;- 0: Disable oversized allocation. Each tcp_write() allocates a new pbuf (old behaviour)&lt;br&gt;- 1: Allocate size-aligned pbufs with minimal excess. Use this if your scatter-gather DMA requires aligned fragments&lt;br&gt;- 128: Limit the pbuf/memory overhead to 20%&lt;br&gt;- TCP_MSS: Try to create unfragmented TCP packets&lt;br&gt;- TCP_MSS/4: Try to create 4 fragments or less per TCP packet.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: If TCP_OVERSIZE&gt;0 LWIP_NETIF_TX_SINGLE_PBUF can be used.</Description>
     </RefParameter>
     <RefParameter Name="LWIP_TCP_TIMESTAMPS" Comment="LWIP_TCP_TIMESTAMPS (TCP Iimestamp)" Type="list" Group="TCP Options" DefaultValue="0" TabName="All LwIP Options" Mode="Advanced" >
@@ -680,15 +683,15 @@
     <RefParameter Name="TCPIP_THREAD_NAME" Comment="TCPIP_THREAD_NAME (TCPIP Thread Name)" Type="StringRW" Group="Thread Options" DefaultValue="&quot;tcpip_thread&quot;" TabName="All LwIP Options" Mode="Basic" Visible="false">
         <Description>Name assigned to the main tcpip thread.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: TCPIP_THREAD_NAME is used only if NO_SYS=0.</Description>
     </RefParameter>
-    <RefParameter Name="TCPIP_THREAD_STACKSIZE" Comment="TCPIP_THREAD_STACKSIZE (TCPIP Thread Stack Size)" Type="Integer" Unit="Byte(s)" Group="Thread Options" DefaultValue="0" TabName="All LwIP Options" Mode="Basic" Min="0" Max="2147483647" >
-        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: TCPIP_THREAD_STACKSIZE is used only if NO_SYS=0." Expression="!NO_SYS"/>
-        <Description>Stack size used by the main tcpip thread. The stack size value itself is platform-dependent, but is passed to sys_thread_new() when the thread is created.</Description>
+    <RefParameter Name="TCPIP_THREAD_STACKSIZE" Comment="TCPIP_THREAD_STACKSIZE (TCPIP Thread Stack Size)" Type="Integer" Unit="Word(s)" Group="Thread Options" DefaultValue="1024" TabName="All LwIP Options" Mode="Basic" Min="=FREERTOS:configMINIMAL_STACK_SIZE" Max="=FREERTOS:configTOTAL_HEAP_SIZE/4" >
+        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: TCPIP_THREAD_STACKSIZE is used only if NO_SYS=0.&lt;br&gt;&lt;b&gt;Default Preset:&lt;/b&gt; This parameter has been set with a non zero value to avoid functional issue with FREERTOS.&lt;br&gt;Up to user to fine tune this parameter value considering all dependencies.&lt;br&gt;&lt;b&gt;Min value:&lt;/b&gt; The Min TCPIP Thread Stack Size value is the Min Stack Size of FREERTOS.&lt;br&gt;&lt;b&gt;Max value:&lt;/b&gt; The Max TCPIP Thread Stack Size value is the Total Heap Size of FREERTOS divided by 4." Expression="!NO_SYS"/>
+        <Description>Stack size used by the main tcpip thread (Word 32 bits). The stack size value itself is platform-dependent, but is passed to sys_thread_new() when the thread is created.</Description>
     </RefParameter>
     <RefParameter Name="TCPIP_THREAD_STACKSIZE" Comment="TCPIP_THREAD_STACKSIZE (TCPIP Thread Stack Size)" Type="Integer" Unit="Byte(s)" Group="Thread Options" DefaultValue="0" TabName="All LwIP Options" Mode="Basic" Min="0" Max="2147483647" Visible="false">
         <Description>Stack size used by the main tcpip thread. The stack size value itself is platform-dependent, but is passed to sys_thread_new() when the thread is created.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: TCPIP_THREAD_STACKSIZE is used only if NO_SYS=0.</Description>
     </RefParameter>
-    <RefParameter Name="TCPIP_THREAD_PRIO" Comment="TCPIP_THREAD_PRIO (TCPIP Thread Priority Level)" Type="Integer" Group="Thread Options" DefaultValue="1" TabName="All LwIP Options" Mode="Basic" Min="0" Max="2147483647" >
-        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: TCPIP_THREAD_PRIO is used only if NO_SYS=0." Expression="!NO_SYS"/>
+    <RefParameter Name="TCPIP_THREAD_PRIO" Comment="TCPIP_THREAD_PRIO (TCPIP Thread Priority Level)" Type="Integer" Group="Thread Options" DefaultValue="3" TabName="All LwIP Options" Mode="Basic" Min="0" Max="=FREERTOS:configMAX_PRIORITIES-1" >
+        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: TCPIP_THREAD_PRIO is used only if NO_SYS=0.&lt;br&gt;&lt;b&gt;Default Preset:&lt;/b&gt; The default value is aligned on FreeRTOS default Task Priority.&lt;br&gt;&lt;b&gt;Max value:&lt;/b&gt; The Max of TCPIP Thread Priority strictly less than the current FREERTOS MAX_PRIORITIES parameter." Expression="!NO_SYS"/>
         <Description>Priority assigned to the main tcpip thread. The priority value itself is platform-dependent, but is passed to sys_thread_new() when the thread is created.</Description>
     </RefParameter>
     <RefParameter Name="TCPIP_THREAD_PRIO" Comment="TCPIP_THREAD_PRIO (TCPIP Thread Priority Level)" Type="Integer" Group="Thread Options" DefaultValue="1" TabName="All LwIP Options" Mode="Basic" Min="0" Max="2147483647" Visible="false">
@@ -708,15 +711,15 @@
     <RefParameter Name="SLIPIF_THREAD_NAME" Comment="SLIPIF_THREAD_NAME (TCPIP SLIPIF Loop Thread Name)" Type="StringRW" Group="Thread Options" DefaultValue="&quot;slipif_loop&quot;" TabName="All LwIP Options" Mode="Advanced" Visible="false">
         <Description>Name assigned to the slipif_loop thread.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: SLIPIF_THREAD_NAME is used only if NO_SYS=0.</Description>
     </RefParameter>
-    <RefParameter Name="SLIPIF_THREAD_STACKSIZE" Comment="SLIPIF_THREAD_STACKSIZE (SLIPIF Thread Stack Size)" Type="Integer" Group="Thread Options" DefaultValue="0" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="2147483647" >
-        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: SLIPIF_THREAD_STACKSIZE is used only if NO_SYS=0." Expression="!NO_SYS"/>
+    <RefParameter Name="SLIPIF_THREAD_STACKSIZE" Comment="SLIPIF_THREAD_STACKSIZE (SLIPIF Thread Stack Size)" Type="Integer" Unit="Word(s)" Group="Thread Options" DefaultValue="1024" TabName="All LwIP Options" Mode="Advanced" Min="=IF(LWIP_HAVE_SLIPIF,FREERTOS:configMINIMAL_STACK_SIZE,0)" Max="=IF(LWIP_HAVE_SLIPIF,FREERTOS:configTOTAL_HEAP_SIZE/4,$RamSize*1024)" >
+        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: SLIPIF_THREAD_STACKSIZE is used only if NO_SYS=0.&lt;br&gt;&lt;b&gt;Default Preset:&lt;/b&gt; This parameter has been set with a non zero value to avoid functional issue with FREERTOS.&lt;br&gt;Up to user to fine tune this parameter value considering all dependencies.&lt;br&gt;&lt;b&gt;Min value:&lt;/b&gt; If LWIP_HAVE_SLIPIF is enabled, the Min SLIPIF Thread Stack Size value is the Min Stack Size of FREERTOS, otherwise it is zero.&lt;br&gt;&lt;b&gt;Max value:&lt;/b&gt; If LWIP_HAVE_SLIPIF is enabled, the Max SLIPIF Thread Stack Size value is the Total Heap Size of FREERTOS divided by 4, otherwise it is the RAM size multiplied by 1024.." Expression="!NO_SYS"/>
         <Description>Stack size used by the slipif_loop thread. The stack size value itself is platform-dependent, but is passed to sys_thread_new() when the thread is created.</Description>
     </RefParameter>
     <RefParameter Name="SLIPIF_THREAD_STACKSIZE" Comment="SLIPIF_THREAD_STACKSIZE (SLIPIF Thread Stack Size)" Type="Integer" Group="Thread Options" DefaultValue="0" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="2147483647" Visible="false">
         <Description>Stack size used by the slipif_loop thread. The stack size value itself is platform-dependent, but is passed to sys_thread_new() when the thread is created.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: SLIPIF_THREAD_STACKSIZE is used only if NO_SYS=0.</Description>
     </RefParameter>
-    <RefParameter Name="SLIPIF_THREAD_PRIO" Comment="SLIPIF_THREAD_PRIO (SLIPIF Thread Priority Level)" Type="Integer" Group="Thread Options" DefaultValue="1" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="2147483647" >
-        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: SLIPIF_THREAD_PRIO is used only if NO_SYS=0." Expression="!NO_SYS"/>
+    <RefParameter Name="SLIPIF_THREAD_PRIO" Comment="SLIPIF_THREAD_PRIO (SLIPIF Thread Priority Level)" Type="Integer" Group="Thread Options" DefaultValue="3" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="=IF(LWIP_HAVE_SLIPIF,FREERTOS:configMAX_PRIORITIES-1,254)" >
+        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: SLIPIF_THREAD_PRIO is used only if NO_SYS=0.&lt;br&gt;&lt;b&gt;Default Preset:&lt;/b&gt; The default value is aligned on FreeRTOS default Task Priority.&lt;br&gt;&lt;b&gt;Max value:&lt;/b&gt; If LWIP_HAVE_SLIPIF is enabled, the Max of SLIPIF Thread Priority strictly less than the current FREERTOS MAX_PRIORITIES parameter, otherwise it is 254." Expression="!NO_SYS"/>
         <Description>Priority assigned to the slipif_loop thread. The priority value itself is platform-dependent, but is passed to sys_thread_new() when the thread is created.</Description>
     </RefParameter>
     <RefParameter Name="SLIPIF_THREAD_PRIO" Comment="SLIPIF_THREAD_PRIO (SLIPIF Thread Priority Level)" Type="Integer" Group="Thread Options" DefaultValue="1" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="2147483647" Visible="false">
@@ -729,15 +732,15 @@
     <RefParameter Name="PPP_THREAD_NAME" Comment="PPP_THREAD_NAME (PPP Thread Name)" Type="StringRW" Group="Thread Options" DefaultValue="&quot;pppInputThread&quot;" TabName="All LwIP Options" Mode="Advanced" Visible="false">
         <Description>Name assigned to the pppInputThread.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: PPP_THREAD_NAME is used only if NO_SYS=0.</Description>
     </RefParameter>
-    <RefParameter Name="PPP_THREAD_STACKSIZE" Comment="PPP_THREAD_STACKSIZE (PPP Thread Stack Size)" Type="Integer" Group="Thread Options" DefaultValue="0" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="2147483647" >
-        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: PPP_THREAD_STACKSIZE is used only if NO_SYS=0." Expression="!NO_SYS"/>
+    <RefParameter Name="PPP_THREAD_STACKSIZE" Comment="PPP_THREAD_STACKSIZE (PPP Thread Stack Size)" Type="Integer" Unit="Word(s)" Group="Thread Options" DefaultValue="1024" TabName="All LwIP Options" Mode="Advanced" Min="=IF(PPP_SUPPORT,FREERTOS:configMINIMAL_STACK_SIZE,0)" Max="=IF(PPP_SUPPORT,FREERTOS:configTOTAL_HEAP_SIZE/4,$RamSize*1024)" >
+        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: PPP_THREAD_STACKSIZE is used only if NO_SYS=0.&lt;br&gt;&lt;b&gt;Default Preset:&lt;/b&gt; This parameter has been set with a non zero value to avoid functional issue with FREERTOS.&lt;br&gt;Up to user to fine tune this parameter value considering all dependencies.&lt;br&gt;&lt;b&gt;Min value:&lt;/b&gt; If PPP_SUPPORT is enabled, the Min PPP Thread Stack Size value is the Min Stack Size of FREERTOS, otherwise it is zero.&lt;br&gt;&lt;b&gt;Max value:&lt;/b&gt; If PPP_SUPPORT is enabled, the Max PPP Thread Stack Size value is the Total Heap Size of FREERTOS divided by 4, otherwise it is the RAM size multiplied by 1024." Expression="!NO_SYS"/>
         <Description>Stack size used by the pppInputThread. The stack size value itself is platform-dependent, but is passed to sys_thread_new() when the thread is created.</Description>
     </RefParameter>
     <RefParameter Name="PPP_THREAD_STACKSIZE" Comment="PPP_THREAD_STACKSIZE (PPP Thread Stack Size)" Type="Integer" Group="Thread Options" DefaultValue="0" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="2147483647" Visible="false">
         <Description>Stack size used by the pppInputThread. The stack size value itself is platform-dependent, but is passed to sys_thread_new() when the thread is created.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: PPP_THREAD_STACKSIZE is used only if NO_SYS=0.</Description>
     </RefParameter>
-    <RefParameter Name="PPP_THREAD_PRIO" Comment="PPP_THREAD_PRIO (PPP Thread Priority Level)" Type="Integer" Group="Thread Options" DefaultValue="1" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="2147483647" >
-        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: PPP_THREAD_PRIO is used only if NO_SYS=0." Expression="!NO_SYS"/>
+    <RefParameter Name="PPP_THREAD_PRIO" Comment="PPP_THREAD_PRIO (PPP Thread Priority Level)" Type="Integer" Group="Thread Options" DefaultValue="3" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="=IF(PPP_SUPPORT,FREERTOS:configMAX_PRIORITIES-1,254)" >
+        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: PPP_THREAD_PRIO is used only if NO_SYS=0.&lt;br&gt;&lt;b&gt;Default Preset:&lt;/b&gt; The default value is aligned on FreeRTOS default Task Priority.&lt;br&gt;&lt;b&gt;Max value:&lt;/b&gt; If PPP_SUPPORT is enabled, the Max of PPP Thread Priority strictly less than the current FREERTOS MAX_PRIORITIES parameter, otherwise it is 254." Expression="!NO_SYS"/>
         <Description>Priority assigned to the pppInputThread. The priority value itself is platform-dependent, but is passed to sys_thread_new() when the thread is created.</Description>
     </RefParameter>
     <RefParameter Name="PPP_THREAD_PRIO" Comment="PPP_THREAD_PRIO (PPP Thread Priority Level)" Type="Integer" Group="Thread Options" DefaultValue="1" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="2147483647" Visible="false">
@@ -750,15 +753,15 @@
     <RefParameter Name="DEFAULT_THREAD_NAME" Comment="DEFAULT_THREAD_NAME (Default LwIP Thread Name)" Type="StringRW" Group="Thread Options" DefaultValue="&quot;lwIP&quot;" TabName="All LwIP Options" Mode="Basic" Visible="false">
         <Description>Name assigned to any other lwIP thread.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: DEFAULT_THREAD_NAME is used only if NO_SYS=0.</Description>
     </RefParameter>
-    <RefParameter Name="DEFAULT_THREAD_STACKSIZE" Comment="DEFAULT_THREAD_STACKSIZE (Default LwIP Thread Stack Size)" Type="Integer" Group="Thread Options" DefaultValue="0" TabName="All LwIP Options" Mode="Basic" Min="0" Max="2147483647" >
-        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: DEFAULT_THREAD_STACKSIZE is used only if NO_SYS=0." Expression="!NO_SYS"/>
+    <RefParameter Name="DEFAULT_THREAD_STACKSIZE" Comment="DEFAULT_THREAD_STACKSIZE (Default LwIP Thread Stack Size)" Type="Integer" Unit="Word(s)" Group="Thread Options" DefaultValue="1024" TabName="All LwIP Options" Mode="Basic" Min="=FREERTOS:configMINIMAL_STACK_SIZE" Max="=FREERTOS:configTOTAL_HEAP_SIZE/4" >
+        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: DEFAULT_THREAD_STACKSIZE is used only if NO_SYS=0.&lt;br&gt;&lt;b&gt;Default Preset:&lt;/b&gt; This parameter has been set with a non zero value to avoid functional issue with FREERTOS.&lt;br&gt;Up to user to fine tune this parameter value considering all dependencies.&lt;br&gt;&lt;b&gt;Min value:&lt;/b&gt; The Min Default Thread Stack Size value is the Min Stack Size of FREERTOS.&lt;br&gt;&lt;b&gt;Max value:&lt;/b&gt; The Max Default Thread Stack Size value is the Total Heap Size of FREERTOS divided by 4." Expression="!NO_SYS"/>
         <Description>Stack size used by any other lwIP thread.&lt;br&gt;The stack size value itself is platform-dependent, but is passed to sys_thread_new() when the thread is created.</Description>
     </RefParameter>
     <RefParameter Name="DEFAULT_THREAD_STACKSIZE" Comment="DEFAULT_THREAD_STACKSIZE (Default LwIP Thread Stack Size)" Type="Integer" Group="Thread Options" DefaultValue="0" TabName="All LwIP Options" Mode="Basic" Min="0" Max="2147483647" Visible="false">
         <Description>Stack size used by any other lwIP thread.&lt;br&gt;The stack size value itself is platform-dependent, but is passed to sys_thread_new() when the thread is created.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: DEFAULT_THREAD_STACKSIZE is used only if NO_SYS=0.</Description>
     </RefParameter>
-    <RefParameter Name="DEFAULT_THREAD_PRIO" Comment="DEFAULT_THREAD_PRIO (Default LwIP Thread Priority Level)" Type="Integer" Group="Thread Options" DefaultValue="1" TabName="All LwIP Options" Mode="Basic" Min="0" Max="2147483647" >
-        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: DEFAULT_THREAD_PRIO is used only if NO_SYS=0." Expression="!NO_SYS"/>
+    <RefParameter Name="DEFAULT_THREAD_PRIO" Comment="DEFAULT_THREAD_PRIO (Default LwIP Thread Priority Level)" Type="Integer" Group="Thread Options" DefaultValue="3" TabName="All LwIP Options" Mode="Basic" Min="0" Max="=FREERTOS:configMAX_PRIORITIES-1" >
+        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: DEFAULT_THREAD_PRIO is used only if NO_SYS=0.&lt;br&gt;&lt;b&gt;Default Preset:&lt;/b&gt; The default value is aligned on FreeRTOS default Task Priority.&lt;br&gt;&lt;b&gt;Max value:&lt;/b&gt; The Max of Default Thread Priority strictly less than the current FREERTOS MAX_PRIORITIES parameter." Expression="!NO_SYS"/>
         <Description>Priority assigned to any other lwIP thread.&lt;br&gt;The priority value itself is platform-dependent, but is passed to sys_thread_new() when the thread is created.</Description>
     </RefParameter>
     <RefParameter Name="DEFAULT_THREAD_PRIO" Comment="DEFAULT_THREAD_PRIO (Default LwIP Thread Priority Level)" Type="Integer" Group="Thread Options" DefaultValue="1" TabName="All LwIP Options" Mode="Basic" Min="0" Max="2147483647" Visible="false">
@@ -875,125 +878,130 @@
         <PossibleValue Comment="Enabled" Value="1"/>
         <Description>Pass a copy of incoming broadcast/multicast packets to all local matches if SO_REUSEADDR is turned on.&lt;br&gt;&lt;b&gt;Warning&lt;/b&gt;: Adds a memcpy for every packet if passing to more than one pcb!&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: None.</Description>
     </RefParameter>
-    <RefParameter Name="LWIP_STATS" Comment="LWIP_STATS (Statictics Collection)" Type="list" Group="Statistics Options" DefaultValue="1" TabName="All LwIP Options" Mode="Basic" >
+    <RefParameter Name="LWIP_STATS" Comment="LWIP_STATS (Statictics Collection)" Type="list" Group="Statistics Options" DefaultValue="0" TabName="All LwIP Options" Mode="Basic" >
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
         <Description>Enable statistics collection in lwip_stats.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: This global option is linked to all other Statistics options.</Description>
     </RefParameter>
     <RefParameter Name="LWIP_STATS_DISPLAY" Comment="LWIP_STATS_DISPLAY (Compile in Statictics Ouput Functions)" Type="list" Group="Statistics Options" DefaultValue="0" TabName="All LwIP Options" Mode="Advanced" >
-        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: LWIP_STATS_DISPLAY requires LWIP_STATS disabled." Expression="(LWIP_STATS=0)"/>
+        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: LWIP_STATS_DISPLAY requires LWIP_STATS enabled." Expression="LWIP_STATS"/>
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
         <Description>Compile in the statistics output functions.</Description>
     </RefParameter>
     <RefParameter Name="LWIP_STATS_DISPLAY" Comment="LWIP_STATS_DISPLAY (Compile in Statictics Ouput Functions)" Type="list" Group="Statistics Options" DefaultValue="0" TabName="All LwIP Options" Mode="Advanced" >
         <PossibleValue Comment="Disabled" Value="0"/>
-        <Description>Compile in the statistics output functions.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: LWIP_STATS_DISPLAY requires LWIP_STATS disabled.</Description>
+        <Description>Compilation in the statistics output functions disabled.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: LWIP_STATS_DISPLAY requires LWIP_STATS enabled.</Description>
     </RefParameter>
     <RefParameter Name="LINK_STATS" Comment="LINK_STATS (Link Statistics)" Type="list" Group="Statistics Options" DefaultValue="1" TabName="All LwIP Options" Mode="Advanced" >
-        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: LINK_STATS requires LWIP_STATS disabled." Expression="(LWIP_STATS=0)"/>
+        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: LINK_STATS requires LWIP_STATS enabled." Expression="LWIP_STATS"/>
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
         <Description>Enable link stats.</Description>
     </RefParameter>
     <RefParameter Name="LINK_STATS" Comment="LINK_STATS (Link Statistics)" Type="list" Group="Statistics Options" DefaultValue="0" TabName="All LwIP Options" Mode="Advanced" >
         <PossibleValue Comment="Disabled" Value="0"/>
-        <Description>Disable link stats.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: LINK_STATS requires LWIP_STATS disabled.</Description>
+        <Description>Disable link stats.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: LINK_STATS requires LWIP_STATS enabled.</Description>
     </RefParameter>
     <RefParameter Name="ETHARP_STATS" Comment="ETHARP_STATS (Ethernet ARP Statistics)" Type="list" Group="Statistics Options" DefaultValue="=LWIP_ARP" TabName="All LwIP Options" Mode="Advanced" >
+        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: ETHARP_STATS requires LWIP_STATS and LWIP_ARP enabled." Expression="LWIP_STATS &amp; LWIP_ARP"/>
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
         <Description>Enable etharp stats.</Description>
     </RefParameter>
+    <RefParameter Name="ETHARP_STATS" Comment="ETHARP_STATS (Ethernet ARP Statistics)" Type="list" Group="Statistics Options" DefaultValue="0" TabName="All LwIP Options" Mode="Advanced" >
+        <PossibleValue Comment="Disabled" Value="0"/>
+        <Description>Disable etharp stats.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: ETHARP_STATS requires LWIP_STATS and LWIP_ARP enabled.</Description>
+    </RefParameter>
     <RefParameter Name="IP_STATS" Comment="IP_STATS (IP Statistics)" Type="list" Group="Statistics Options" DefaultValue="1" TabName="All LwIP Options" Mode="Advanced" >
-        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: IP_STATS requires LWIP_STATS disabled." Expression="(LWIP_STATS=0)"/>
+        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: IP_STATS requires LWIP_STATS enaabled." Expression="LWIP_STATS"/>
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
         <Description>Enable IP stats.</Description>
     </RefParameter>
     <RefParameter Name="IP_STATS" Comment="IP_STATS (IP Statistics)" Type="list" Group="Statistics Options" DefaultValue="0" TabName="All LwIP Options" Mode="Advanced" >
         <PossibleValue Comment="Disabled" Value="0"/>
-        <Description>Disable IP stats.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: IP_STATS requires LWIP_STATS disabled.</Description>
+        <Description>Disable IP stats.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: IP_STATS requires LWIP_STATS enabled.</Description>
     </RefParameter>
     <RefParameter Name="IPFRAG_STATS" Comment="IPFRAG_STATS (IP Fragmentation Statistics)" Type="list" Group="Statistics Options" DefaultValue="=IP_REASSEMBLY|IP_FRAG" TabName="All LwIP Options" Mode="Advanced" >
-        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: IPFRAG_STATS requires IP_REASSEMBLY or IP_FRAG enabled and LWIP_STATS disabled." Expression="(LWIP_STATS=0) &amp; (IP_REASSEMBLY|IP_FRAG)"/>
-        <PossibleValue Comment="Enabled" Value="1"/>
+        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: IPFRAG_STATS requires IP_REASSEMBLY or IP_FRAG enabled and LWIP_STATS enabled." Expression="LWIP_STATS &amp; (IP_REASSEMBLY|IP_FRAG)"/>
         <PossibleValue Comment="Disabled" Value="0"/>
+        <PossibleValue Comment="Enabled" Value="1"/>
         <Description>Enable IP fragmentation stats. Default is on if using either fragmentation or reassembly.</Description>
     </RefParameter>
     <RefParameter Name="IPFRAG_STATS" Comment="IPFRAG_STATS (IP Fragmentation Statistic)" Type="list" Group="Statistics Options" DefaultValue="0" TabName="All LwIP Options" Mode="Advanced" >
         <PossibleValue Comment="Disabled" Value="0"/>
-        <Description>Diasble IP fragmentation stats.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: IPFRAG_STATS requires IP_REASSEMBLY or IP_FRAG enabled and LWIP_STATS disabled.</Description>
+        <Description>Disable IP fragmentation stats.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: IPFRAG_STATS requires IP_REASSEMBLY or IP_FRAG enabled and LWIP_STATS enabled.</Description>
     </RefParameter>
     <RefParameter Name="ICMP_STATS" Comment="ICMP_STATS (ICMP Statistics)" Type="list" Group="Statistics Options" DefaultValue="1" TabName="All LwIP Options" Mode="Advanced" >
-        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: ICMP_STATS requires LWIP_STATS disabled." Expression="(LWIP_STATS=0)"/>
+        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: ICMP_STATS requires LWIP_STATS and LWIP_ICMP enabled." Expression="LWIP_STATS &amp; LWIP_ICMP"/>
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
         <Description>Enable ICMP stats.</Description>
     </RefParameter>
     <RefParameter Name="ICMP_STATS" Comment="ICMP_STATS (ICMP Statistics)" Type="list" Group="Statistics Options" DefaultValue="0" TabName="All LwIP Options" Mode="Advanced" >
         <PossibleValue Comment="Disabled" Value="0"/>
-        <Description>Disable ICMP stats.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: ICMP_STATS requires LWIP_STATS disabled.</Description>
+        <Description>Disable ICMP stats.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: ICMP_STATS requires LWIP_STATS and LWIP_ICMP enabled.</Description>
     </RefParameter>
     <RefParameter Name="IGMP_STATS" Comment="IGMP_STATS (IGMP Statistics)" Type="list" Group="Statistics Options" DefaultValue="=LWIP_IGMP" TabName="All LwIP Options" Mode="Advanced" >
-        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: IGMP_STATS requires LWIP_STATS disabled." Expression="(LWIP_STATS=0)"/>
+        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: IGMP_STATS requires LWIP_STATS and LWIP_IGMP enabled." Expression="LWIP_STATS &amp; LWIP_IGMP"/>
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
         <Description>Enable IGMP stats.</Description>
     </RefParameter>
     <RefParameter Name="IGMP_STATS" Comment="IGMP_STATS (IGMP Statistics)" Type="list" Group="Statistics Options" DefaultValue="0" TabName="All LwIP Options" Mode="Advanced" >
         <PossibleValue Comment="Disabled" Value="0"/>
-        <Description>Disable IGMP stats.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: IGMP_STATS requires LWIP_STATS disabled.</Description>
+        <Description>Disable IGMP stats.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: IGMP_STATS requires LWIP_STATS and LWIP_IGMP enabled.</Description>
     </RefParameter>
     <RefParameter Name="UDP_STATS" Comment="UDP_STATS (UDP Statistics)" Type="list" Group="Statistics Options" DefaultValue="=LWIP_UDP" TabName="All LwIP Options" Mode="Advanced" >
-        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: UDP_STATS requires LWIP_STATS disabled." Expression="(LWIP_STATS=0)"/>
+        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: UDP_STATS requires LWIP_STATS and LWIP_UDP enabled." Expression="LWIP_STATS &amp; LWIP_UDP"/>
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
         <Description>Enable UDP stats.</Description>
     </RefParameter>
     <RefParameter Name="UDP_STATS" Comment="UDP_STATS (UDP Statistics)" Type="list" Group="Statistics Options" DefaultValue="0" TabName="All LwIP Options" Mode="Advanced" >
         <PossibleValue Comment="Disabled" Value="0"/>
-        <Description>Disable UDP stats.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: UDP_STATS requires LWIP_STATS disabled.</Description>
+        <Description>Disable UDP stats.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: UDP_STATS requires LWIP_STATS and LWIP_UDP enabled.</Description>
     </RefParameter>
     <RefParameter Name="TCP_STATS" Comment="TCP_STATS (TCP Statistics)" Type="list" Group="Statistics Options" DefaultValue="=LWIP_TCP" TabName="All LwIP Options" Mode="Advanced" >
-        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: TCP_STATS requires LWIP_STATS disabled." Expression="(LWIP_STATS=0)"/>
+        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: TCP_STATS requires LWIP_STATS and LWIP_TCP enabled." Expression="LWIP_STATS &amp; LWIP_TCP"/>
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
         <Description>Enable TCP stats. Default is on if TCP enabled, otherwise off.</Description>
     </RefParameter>
     <RefParameter Name="TCP_STATS" Comment="TCP_STATS (TCP Statistics)" Type="list" Group="Statistics Options" DefaultValue="0" TabName="All LwIP Options" Mode="Advanced" >
         <PossibleValue Comment="Disabled" Value="0"/>
-        <Description>Disable TCP stats.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: TCP_STATS requires LWIP_STATS disabled.</Description>
+        <Description>Disable TCP stats.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: TCP_STATS requires LWIP_STATS and LWIP_TCP enabled.</Description>
     </RefParameter>
-    <RefParameter Name="MEM_STATS" Comment="MEM_STATS (Memory Statistics)" Type="list" Group="Statistics Options" DefaultValue="=(MEM_LIBC_MALLOC = 0) &amp; (MEM_USE_POOLS = 0)" TabName="All LwIP Options" Mode="Advanced" >
-        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: MEM_STATS requires LWIP_STATS disabled." Expression="(LWIP_STATS=0)"/>
+    <RefParameter Name="MEM_STATS" Comment="MEM_STATS (Memory Statistics)" Type="list" Group="Statistics Options" DefaultValue="=!MEM_LIBC_MALLOC &amp; !MEM_USE_POOLS" TabName="All LwIP Options" Mode="Advanced" >
+        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: MEM_STATS requires LWIP_STATS enabled and MEM_LIBC_MALLOC or MEM_USE_POOLS enabled." Expression="LWIP_STATS &amp; (MEM_LIBC_MALLOC|MEM_USE_POOLS)"/>
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
         <Description>Enable mem.c stats.</Description>
     </RefParameter>
     <RefParameter Name="MEM_STATS" Comment="MEM_STATS (Memory Statistics)" Type="list" Group="Statistics Options" DefaultValue="0" TabName="All LwIP Options" Mode="Advanced" >
         <PossibleValue Comment="Disabled" Value="0"/>
-        <Description>Disable Memory stats.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: MEM_STATS requires LWIP_STATS disabled.</Description>
+        <Description>Disable Memory stats.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: MEM_STATS requires LWIP_STATS enabled and MEM_LIBC_MALLOC or MEM_USE_POOLS enabled.</Description>
     </RefParameter>
-    <RefParameter Name="MEMP_STATS" Comment="MEMP_STATS (Memory Pool Statistics)" Type="list" Group="Statistics Options" DefaultValue="=(MEMP_MEM_MALLOC=0)" TabName="All LwIP Options" Mode="Advanced" >
-        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: MEMP_STATS requires LWIP_STATS disabled." Expression="(LWIP_STATS=0)"/>
+    <RefParameter Name="MEMP_STATS" Comment="MEMP_STATS (Memory Pool Statistics)" Type="list" Group="Statistics Options" DefaultValue="=!MEMP_MEM_MALLOC" TabName="All LwIP Options" Mode="Advanced" >
+        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: MEMP_STATS requires LWIP_STATS and MEM_LIBC_MALLOC enabled." Expression="LWIP_STATS &amp; MEM_LIBC_MALLOC"/>
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
         <Description>Enable memp.c pool stats.</Description>
     </RefParameter>
     <RefParameter Name="MEMP_STATS" Comment="MEMP_STATS (Memory Pool Statistics)" Type="list" Group="Statistics Options" DefaultValue="0" TabName="All LwIP Options" Mode="Advanced" >
         <PossibleValue Comment="Disabled" Value="0"/>
-        <Description>Disable Memory Pool stats.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: MEMP_STATS requires LWIP_STATS disabled.</Description>
+        <Description>Disable Memory Pool stats.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: MEMP_STATS requires LWIP_STATS and MEM_LIBC_MALLOC enabled.</Description>
     </RefParameter>
     <RefParameter Name="SYS_STATS" Comment="SYS_STATS (System Statistics)" Type="list" Group="Statistics Options" DefaultValue="=!NO_SYS" TabName="All LwIP Options" Mode="Advanced" >
-        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: SYS_STATS requires LWIP_STATS disabled." Expression="(LWIP_STATS=0)"/>
+        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: SYS_STATS requires LWIP_STATS enabled with FreeRTOS enabled (NO_SYS set to 0)." Expression="LWIP_STATS &amp; !NO_SYS"/>
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
         <Description>Enable system stats (sem and mbox counts, etc).</Description>
     </RefParameter>
     <RefParameter Name="SYS_STATS" Comment="SYS_STATS (System Statistics)" Type="list" Group="Statistics Options" DefaultValue="0" TabName="All LwIP Options" Mode="Advanced" >
         <PossibleValue Comment="Disabled" Value="0"/>
-        <Description>Disable System stats.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: SYS_STATS requires LWIP_STATS disabled.</Description>
+        <Description>Disable System stats.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: SYS_STATS requires LWIP_STATS enabled with FreeRTOS enabled (NO_SYS set to 0).</Description>
     </RefParameter>
     <RefParameter Name="PPP_SUPPORT" Comment="PPP_SUPPORT (PPP Module)" Type="list" Group="PPP Options" DefaultValue="0" TabName="All LwIP Options" Mode="Advanced" >
         <Condition Diagnostic="&lt;b&gt;Warning: up to user to take care!&lt;/b&gt;: Enable PPP requires user specific code not generated by STM32Cube MX. This is reserved for advanced users.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Use PPP_SUPPORT requires PPPOS_SUPPORT or PPPOE_SUPPORT turned on." Expression="PPPOS_SUPPORT|PPPOE_SUPPORT"/>
@@ -1117,40 +1125,80 @@
     <RefParameter Name="MAXSECRETLEN" Comment="MAXSECRETLEN (Maximum Length of Password)" Type="Integer" Unit="Byte(s)" Group="PPP Options" DefaultValue="256" TabName="All LwIP Options" Mode="Advanced" Min="0" Max="2147483647" >
         <Description>Maximum length of password or secret.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: None.</Description>
     </RefParameter>
-    <RefParameter Name="CHECKSUM_GEN_IP" Comment="CHECKSUM_GEN_IP (Generate Software Checksum for Outgoing IP Packets)" Type="list" Group="Checksum Options" DefaultValue="0" TabName="All LwIP Options" Mode="Basic" >
+    <RefParameter Name="CHECKSUM_BY_HARDWARE" Comment="CHECKSUM_BY_HARDWARE (Hardware Checksum ** CubeMX specific **)" Type="list" Group="Checksum Options" DefaultValue="0" TabName="All LwIP Options" Mode="Basic" >
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
-        <Description>Generate checksums in software for outgoing IP packets.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: None.</Description>
+        <Description>Enabling Hardware Checksum will disable software checksum parameters and&lt;br&gt;allow to compute and verify the IP, UDP, TCP and ICMP checksums by Hardware.&lt;br&gt;&lt;b&gt;Warning&lt;/b&gt;: This parameter introduced by CubeMX is not part of LwIP stack.</Description>
+    </RefParameter>
+    <RefParameter Name="CHECKSUM_GEN_IP" Comment="CHECKSUM_GEN_IP (Generate Software Checksum for Outgoing IP Packets)" Type="list" Group="Checksum Options" DefaultValue="0" TabName="All LwIP Options" Mode="Basic" >
+        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: Set CHECKSUM_GEN_IP requires CHECKSUM_BY_HARDWARE disabled." Expression="!CHECKSUM_BY_HARDWARE"/>
+        <PossibleValue Comment="Disabled" Value="0"/>
+        <PossibleValue Comment="Enabled" Value="1"/>
+        <Description>Generate checksums in software for outgoing IP packets.</Description>
+    </RefParameter>
+    <RefParameter Name="CHECKSUM_GEN_IP" Comment="CHECKSUM_GEN_IP (No Software Checksum Generation for Outgoing IP Packets)" Type="list" Group="Checksum Options" DefaultValue="0" TabName="All LwIP Options" Mode="Basic" >
+        <PossibleValue Comment="Disabled" Value="0"/>
+        <Description>Do not generate checksums in software for outgoing IP packets.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Set CHECKSUM_GEN_IP requires CHECKSUM_BY_HARDWARE disabled.</Description>
     </RefParameter>
     <RefParameter Name="CHECKSUM_GEN_UDP" Comment="CHECKSUM_GEN_UDP (Generate Software Checksum for Outgoing UDP Packets)" Type="list" Group="Checksum Options" DefaultValue="0" TabName="All LwIP Options" Mode="Basic" >
+        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: Set CHECKSUM_GEN_UDP requires CHECKSUM_BY_HARDWARE disabled." Expression="!CHECKSUM_BY_HARDWARE"/>
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
-        <Description>Generate checksums in software for outgoing UDP packets.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: None.</Description>
+        <Description>Generate checksums in software for outgoing UDP packets.</Description>
+    </RefParameter>
+    <RefParameter Name="CHECKSUM_GEN_UDP" Comment="CHECKSUM_GEN_UDP (No Software Checksum Generation for Outgoing UDP Packets)" Type="list" Group="Checksum Options" DefaultValue="0" TabName="All LwIP Options" Mode="Basic" >
+        <PossibleValue Comment="Disabled" Value="0"/>
+        <Description>Do not generate checksums in software for outgoing UDP packets.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Set CHECKSUM_GEN_UDP requires CHECKSUM_BY_HARDWARE disabled.</Description>
     </RefParameter>
     <RefParameter Name="CHECKSUM_GEN_TCP" Comment="CHECKSUM_GEN_TCP (Generate Software Checksum for Outgoing TCP Packets)" Type="list" Group="Checksum Options" DefaultValue="0" TabName="All LwIP Options" Mode="Basic" >
+        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: Set CHECKSUM_GEN_TCP requires CHECKSUM_BY_HARDWARE disabled." Expression="!CHECKSUM_BY_HARDWARE"/>
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
-        <Description>Generate checksums in software for outgoing TCP packets.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: None.</Description>
+        <Description>Generate checksums in software for outgoing TCP packets.</Description>
+    </RefParameter>
+    <RefParameter Name="CHECKSUM_GEN_TCP" Comment="CHECKSUM_GEN_TCP (No Software Checksum Generation for Outgoing TCP Packets)" Type="list" Group="Checksum Options" DefaultValue="0" TabName="All LwIP Options" Mode="Basic" >
+        <PossibleValue Comment="Disabled" Value="0"/>
+        <Description>Do not generate checksums in software for outgoing TCP packets.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Set CHECKSUM_GEN_TCP requires CHECKSUM_BY_HARDWARE disabled.</Description>
     </RefParameter>
     <RefParameter Name="CHECKSUM_GEN_ICMP" Comment="CHECKSUM_GEN_ICMP (Generate Software Checksum for Outgoing ICMP Packets)" Type="list" Group="Checksum Options" DefaultValue="0" TabName="All LwIP Options" Mode="Basic" >
+        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: Set CHECKSUM_GEN_ICMP requires CHECKSUM_BY_HARDWARE disabled." Expression="!CHECKSUM_BY_HARDWARE"/>
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
-        <Description>Generate checksums in software for outgoing ICMP packets.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: None.</Description>
+        <Description>Generate checksums in software for outgoing ICMP packets.</Description>
+    </RefParameter>
+    <RefParameter Name="CHECKSUM_GEN_ICMP" Comment="CHECKSUM_GEN_ICMP (No Software Checksum Generation for Outgoing ICMP Packets)" Type="list" Group="Checksum Options" DefaultValue="0" TabName="All LwIP Options" Mode="Basic" >
+        <PossibleValue Comment="Disabled" Value="0"/>
+        <Description>Do not generate checksums in software for outgoing ICMP packets.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Set CHECKSUM_GEN_ICMP requires CHECKSUM_BY_HARDWARE disabled.</Description>
     </RefParameter>
     <RefParameter Name="CHECKSUM_CHECK_IP" Comment="CHECKSUM_CHECK_IP (Generate Software Checksum for Incoming IP Packets)" Type="list" Group="Checksum Options" DefaultValue="0" TabName="All LwIP Options" Mode="Basic" >
+        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: Set CHECKSUM_CHECK_IP requires CHECKSUM_BY_HARDWARE disabled." Expression="!CHECKSUM_BY_HARDWARE"/>
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
-        <Description>Check checksums in software for Incoming IP packets.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: None.</Description>
+        <Description>Check checksums in software for Incoming IP packets.</Description>
+    </RefParameter>
+    <RefParameter Name="CHECKSUM_CHECK_IP" Comment="CHECKSUM_CHECK_IP (No Software Checksum Generation for Incoming IP Packets)" Type="list" Group="Checksum Options" DefaultValue="0" TabName="All LwIP Options" Mode="Basic" >
+        <PossibleValue Comment="Disabled" Value="0"/>
+        <Description>Do not generate checksums in software for Incoming IP packets.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Set CHECKSUM_CHECK_IP requires CHECKSUM_BY_HARDWARE disabled.</Description>
     </RefParameter>
     <RefParameter Name="CHECKSUM_CHECK_UDP" Comment="CHECKSUM_CHECK_UDP (Generate Software Checksum for Incoming UDP Packets)" Type="list" Group="Checksum Options" DefaultValue="0" TabName="All LwIP Options" Mode="Basic" >
+        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: Set CHECKSUM_CHECK_UDP requires CHECKSUM_BY_HARDWARE disabled." Expression="!CHECKSUM_BY_HARDWARE"/>
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
-        <Description>Check checksums in software for Incoming UDP packets.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: None.</Description>
+        <Description>Check checksums in software for Incoming UDP packets.</Description>
+    </RefParameter>
+    <RefParameter Name="CHECKSUM_CHECK_UDP" Comment="CHECKSUM_CHECK_UDP (No Software Checksum Generation for Incoming UDP Packets)" Type="list" Group="Checksum Options" DefaultValue="0" TabName="All LwIP Options" Mode="Basic" >
+        <PossibleValue Comment="Disabled" Value="0"/>
+        <Description>Do not generate checksums in software for Incoming UDP packets.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Set CHECKSUM_CHECK_UDP requires CHECKSUM_BY_HARDWARE disabled.</Description>
     </RefParameter>
     <RefParameter Name="CHECKSUM_CHECK_TCP" Comment="CHECKSUM_CHECK_TCP (Generate Software Checksum for Incoming TCP Packets)" Type="list" Group="Checksum Options" DefaultValue="0" TabName="All LwIP Options" Mode="Basic" >
+        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: Set CHECKSUM_CHECK_TCP requires CHECKSUM_BY_HARDWARE disabled." Expression="!CHECKSUM_BY_HARDWARE"/>
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
-        <Description>Check checksums in software for Incoming TCP packets.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: None.</Description>
+        <Description>Check checksums in software for Incoming TCP packets.</Description>
+    </RefParameter>
+    <RefParameter Name="CHECKSUM_CHECK_TCP" Comment="CHECKSUM_CHECK_TCP (No Software Checksum Generation for Incoming TCP Packets)" Type="list" Group="Checksum Options" DefaultValue="0" TabName="All LwIP Options" Mode="Basic" >
+        <PossibleValue Comment="Disabled" Value="0"/>
+        <Description>Do not generate checksums in software for Incoming TCP packets.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Set CHECKSUM_CHECK_TCP requires CHECKSUM_BY_HARDWARE disabled.</Description>
     </RefParameter>
     <RefParameter Name="LWIP_CHECKSUM_ON_COPY" Comment="LWIP_CHECKSUM_ON_COPY (Calculate Checksum on Copy to Pbufs)" Type="list" Group="Checksum Options" DefaultValue="0" TabName="All LwIP Options" Mode="Advanced" >
         <PossibleValue Comment="Disabled" Value="0"/>
@@ -1353,6 +1401,7 @@
 
     <RefMode Name="Enabled">
         <ConfigForMode>LWIP_Init</ConfigForMode>
+        <Parameter Name="LwIP Version"/>
         <Parameter Name="LWIP_DHCP"/>
         <Parameter Name="IP_ADDRESS"/>
         <Parameter Name="NETMASK_ADDRESS"/>
@@ -1566,6 +1615,7 @@
         <Parameter Name="PPP_MINMRU"/>
         <Parameter Name="MAXNAMELEN"/>
         <Parameter Name="MAXSECRETLEN"/>
+        <Parameter Name="CHECKSUM_BY_HARDWARE"/>
         <Parameter Name="CHECKSUM_GEN_IP"/>
         <Parameter Name="CHECKSUM_GEN_UDP"/>
         <Parameter Name="CHECKSUM_GEN_TCP"/>

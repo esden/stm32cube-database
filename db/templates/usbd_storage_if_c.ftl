@@ -2,9 +2,6 @@
 /**
   ******************************************************************************
   * @file           : usbd_storage_if.c
-  * @author         : MCD Application Team
-  * @version        : V1.1.0
-  * @date           : 19-March-2012
   * @brief          : Memory management layer
   ******************************************************************************
   * COPYRIGHT(c) ${year} STMicroelectronics

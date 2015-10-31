@@ -1,12 +1,9 @@
 [#ftl]
 /**
  ******************************************************************************
-  * @file    bsp_driver_sram.h
-  * @author  MCD Teams
-  * @version V1.0.0
-  * @date    ${date}
+  * @file    bsp_driver_sram.h (based on stm322xg_eval_sram.h)
   * @brief   This file contains the common defines and functions prototypes for  
-  *          the stm32f2xx_sram.c driver.
+  *          the bsp_driver_sram.c driver.
   ******************************************************************************
   *
   * COPYRIGHT(c) ${year} STMicroelectronics
@@ -44,13 +41,22 @@
  extern "C" {
 #endif 
 
-/* USER CODE BEGIN 0 */
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f2xx_hal.h"
 #include "stm32f2xx_hal_sram.h"
-#include "fatfs_handles.h"
+[#-- SWIPdatas is a list of SWIPconfigModel --]  
+[#list SWIPdatas as SWIP]  
+[#if SWIP.defines??]
+	[#list SWIP.defines as definition]	
+/*---------- Handle for SRAM -----------*/
+#define ${definition.name} #t#t ${definition.value} 
+[#if definition.description??]${definition.description} [/#if]
+	[/#list]
+[/#if]
 
+[/#list]
+/* USER CODE BEGIN 0 */
 /** 
   * @brief  SRAM status structure definition  
   */     
@@ -83,6 +89,9 @@ extern SRAM_HandleTypeDef _HSRAM;
 
 
 /* Exported functions --------------------------------------------------------*/   
+/** @defgroup stm322xg_eval_sram_Exported_Functions
+  * @{
+  */     
 uint8_t BSP_SRAM_Init(void);
 uint8_t BSP_SRAM_ReadData(uint32_t uwStartAddress, uint16_t *pData, uint32_t uwDataSize);
 uint8_t BSP_SRAM_ReadData_DMA(uint32_t uwStartAddress, uint16_t *pData, uint32_t uwDataSize);

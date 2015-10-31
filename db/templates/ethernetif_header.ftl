@@ -2,7 +2,6 @@
 /**
  ******************************************************************************
   * File Name          : ethernetif.h
-  * Date               : ${date}
   * Description        : This file provides initialization code for LWIP
   *                      middleWare.
   ******************************************************************************

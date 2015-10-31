@@ -2,9 +2,6 @@
 /**
  ******************************************************************************
   * @file    bsp_driver_sram.h
-  * @author  MCD Teams
-  * @version V1.0.0
-  * @date    ${date}
   * @brief   This file contains the common defines and functions prototypes for  
   *          the stm32l1xx_sram.c driver.
   ******************************************************************************
@@ -44,13 +41,22 @@
  extern "C" {
 #endif 
 
-/* USER CODE BEGIN 0 */
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32l1xx_hal.h"
 #include "stm32l1xx_hal_sram.h"
-#include "fatfs_handles.h"
+[#-- SWIPdatas is a list of SWIPconfigModel --]  
+[#list SWIPdatas as SWIP]  
+[#if SWIP.defines??]
+	[#list SWIP.defines as definition]	
+/*---------- Handle for SRAM -----------*/
+#define ${definition.name} #t#t ${definition.value} 
+[#if definition.description??]${definition.description} [/#if]
+	[/#list]
+[/#if]
 
+[/#list]
+/* USER CODE BEGIN 0 */
 /** 
   * @brief  SRAM status structure definition  
   */     

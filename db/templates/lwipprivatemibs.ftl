@@ -2,7 +2,6 @@
 /**
  ******************************************************************************
   * File Name          : private_mib.h
-  * Date               : ${date}
   * Description        : This file provides initialization code for LWIP
   *                      middleWare.
   ******************************************************************************

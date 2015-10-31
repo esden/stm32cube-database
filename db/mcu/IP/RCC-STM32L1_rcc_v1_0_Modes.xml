@@ -75,7 +75,15 @@
     </RefParameter>
 	
     <!--diviseur de AHB /8 pour cortex-->
-    <RefParameter Visible="false" Comment="Timer div" Name="TimPrescaler" Type="integer" DefaultValue="8" Max="8" Min="8"/>
+
+	<RefParameter Visible="false" Comment="Cortex Div" DefaultValue="SYSTICK_CLKSOURCE_HCLK" Name="TimPrescaler" Type="list">
+         <PossibleValue Comment="1" Value="SYSTICK_CLKSOURCE_HCLK" Semaphore="HCLKDiv1"/>
+		 <PossibleValue Comment="8" Value="SYSTICK_CLKSOURCE_HCLK_DIV8"/>
+   </RefParameter>
+      <RefParameter Visible="false" Comment="Cortex_DivARG" DefaultValue="HAL_RCC_GetHCLKFreq()/1000" Name="Cortex_DivARG" Type="String">
+        <Condition Expression="HCLKDiv1" Diagnostic=""/>
+    </RefParameter>	
+    <RefParameter Visible="false" Comment="Cortex_DivARG" DefaultValue="HAL_RCC_GetHCLKFreq()/8000" Name="Cortex_DivARG" Type="String"/>
 
     <!--diviseur AHB-->
     <RefParameter Comment="AHBCLK Divider" Visible="false" DefaultValue="RCC_SYSCLK_DIV1" Name="AHBCLKDivider" Type="list">
@@ -204,7 +212,7 @@
 	
     <!-- Clock Security System on HSE-->
     <RefParameter Visible="false" Name="EnbaleCSS" Comment="Clock Security System: available only when HSE is used directly or undirectly as System Clock" Type="list" DefaultValue="false">
-        <Condition Diagnostic="" Expression="(((PLLSource=RCC_PLLSOURCE_HSE) &amp;SYSCLKSource=RCC_SYSCLKSOURCE_PLLCLK )|(SYSCLKSource=RCC_SYSCLKSOURCE_HSE)) &amp; (HSEOscillator | HSEByPass)"/>
+        <Condition Diagnostic="" Expression="(((PLLSourceVirtual=RCC_PLLSOURCE_HSE) &amp;SYSCLKSource=RCC_SYSCLKSOURCE_PLLCLK )|(SYSCLKSource=RCC_SYSCLKSOURCE_HSE)) &amp; (HSEOscillator | HSEByPass)"/>
         <PossibleValue Value="true" Comment="Enabled" Semaphore="CSSEnabled"/>
         <PossibleValue Value="false" Comment="Disabled"/>
     </RefParameter>
@@ -419,7 +427,7 @@
         <PossibleValue Value="1" Comment="Enabled"/>
         <PossibleValue Value="0" Comment="Disabled"/>
     </RefParameter>
-    <RefParameter Name="PREFETCH_ENABLE" Comment="Prefetch Buffer" Type="list" DefaultValue="1" Group="System Parameters">
+    <RefParameter Name="PREFETCH_ENABLE" Comment="Prefetch Buffer" Type="list" DefaultValue="0" Group="System Parameters">
         <PossibleValue Value="1" Comment="Enabled"/>
         <PossibleValue Value="0" Comment="Disabled"/>
     </RefParameter>
@@ -949,8 +957,10 @@
         <ConfigForMode>RCC_MCO1Config</ConfigForMode>        
         <ConfigForMode>RCC_CSS_Enable</ConfigForMode>
         <ConfigForMode>RCC_CSS_EnableLSE</ConfigForMode>    
-        <ConfigForMode>SYSCFG_CLK_ENABLE</ConfigForMode>   <!-- added as a workAround to enable the SYSCFG clock : it should be managed internally by the HAL-->
-        <Parameter Name="OscillatorType"/>
+        <!--ConfigForMode>SYSCFG_CLK_ENABLE</ConfigForMode-->   <!-- added as a workAround to enable the SYSCFG clock : it should be managed internally by the HAL-->
+          <ConfigForMode>RCC_interrupt_Time_SYSTICK_Config</ConfigForMode>
+		  <ConfigForMode>RCC_SYSTICK_CONFIG</ConfigForMode>
+	   <Parameter Name="OscillatorType"/>
         <Parameter Name="LSIState"/>
         <Parameter Name="MSIClockRange"/>
         <Parameter Name="PLLState"/>

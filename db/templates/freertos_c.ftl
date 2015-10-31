@@ -2,7 +2,6 @@
 /**
   ******************************************************************************
   * File Name          : freertos.c
-  * Date               : ${date}
   * Description        : Code for freertos applications
   ******************************************************************************
   *
@@ -110,8 +109,22 @@ void MX_FREERTOS_Init(void);  /* (MISRA C 2004 rule 8.1) */
 #n/* USER CODE BEGIN FunctionPrototypes */
 #n   
 #n/* USER CODE END FunctionPrototypes */
-         
-/* Hook prototypes */
+
+[#list SWIPdatas as SWIP]
+    [#if SWIP.defines??]     
+	  [#list SWIP.defines as definition]
+	  	[#if definition.name=="configUSE_TICKLESS_IDLE"]
+	      [#if definition.value=="1"]
+#n/* Pre/Post sleep processing prototypes */
+void PreSleepProcessing(uint32_t *ulExpectedIdleTime);
+void PostSleepProcessing(uint32_t *ulExpectedIdleTime);
+          [/#if]
+        [/#if]             
+     [/#list]
+ [/#if]
+[/#list]	
+
+#n/* Hook prototypes */
 [#list SWIPdatas as SWIP]
     [#if SWIP.defines??]
      [#list SWIP.defines as definition]
@@ -247,6 +260,30 @@ void vApplicationMallocFailedHook(void)
 [/#list]
 [/#compress]
 
+[#list SWIPdatas as SWIP]
+    [#if SWIP.defines??]     
+	  [#list SWIP.defines as definition]
+	  	[#if definition.name=="configUSE_TICKLESS_IDLE"]
+	      [#if definition.value=="1"]
+#n
+/* USER CODE BEGIN PREPOSTSLEEP */
+void PreSleepProcessing(uint32_t *ulExpectedIdleTime)
+{
+/* place for user code */ 
+}
+
+void PostSleepProcessing(uint32_t *ulExpectedIdleTime)
+{
+/* place for user code */
+}
+/* USER CODE END PREPOSTSLEEP */
+#n
+          [/#if]
+        [/#if]             
+     [/#list]
+ [/#if]
+[/#list]	
+
 [#if inMain == 0]
 #n
 /* Init FreeRTOS */
@@ -259,7 +296,7 @@ void MX_FREERTOS_Init(void) {
 }
 [@common.optinclude name="Src/rtos_threads.tmp"/]
 [@common.optinclude name="Src/rtos_user_threads.tmp"/] 
-[/#if]   
+[/#if]  
 
 /* USER CODE BEGIN Application */
      

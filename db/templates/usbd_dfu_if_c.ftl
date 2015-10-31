@@ -2,9 +2,6 @@
 /**
   ******************************************************************************
   * @file           : usbd_dfu_if.c
-  * @author         : MCD Application Team
-  * @version        : V1.1.0
-  * @date           : 19-March-2012
   * @brief          :
   ******************************************************************************
   * COPYRIGHT(c) ${year} STMicroelectronics
@@ -36,6 +33,7 @@
 [#assign handleNameFS = ""]
 [#assign handleNameHS = ""]
 [#assign handleNameUSB_FS = ""]
+[#assign DFU_MEDIA = ""]
 [#list SWIPdatas as SWIP]  
 [#compress]
 [#-- Section2: Create global Variables for each middle ware instance --] 
@@ -49,9 +47,20 @@
 		[/#if]		
 	[/#list]
 [/#if]
+
+[#if SWIP.defines??]
+[#list SWIP.defines as definition]	
+[#assign value = definition.value]
+[#if definition.name="USBD_DFU_MEDIA"] 
+[#assign DFU_MEDIA = definition.value]
+[/#if]
+[/#list]
+[/#if]
+
 [#-- Global variables --]
 [/#compress]
 [/#list]
+
 
 /* Includes ------------------------------------------------------------------*/
 #include "usbd_dfu_if.h"
@@ -59,6 +68,7 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
+#define FLASH_DESC_STR      "${DFU_MEDIA}"
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
 /* USB handler declaration */
@@ -99,13 +109,14 @@ static uint8_t *MEM_If_Read_HS  (uint8_t *src, uint8_t *dest, uint32_t Len);
 static uint16_t MEM_If_DeInit_HS(void);
 static uint16_t MEM_If_GetStatus_HS (uint32_t Add, uint8_t Cmd, uint8_t *buffer);
 [/#if]
+
 #if defined ( __ICCARM__ ) /*!< IAR Compiler */
   #pragma data_alignment=4   
 #endif
 [#if handleNameFS == "FS" || handleNameUSB_FS == "FS"]
 __ALIGN_BEGIN USBD_DFU_MediaTypeDef USBD_DFU_fops_FS __ALIGN_END =
 {
-    (uint8_t *)"DFU MEDIA",
+   (uint8_t*)FLASH_DESC_STR,
     MEM_If_Init_FS,
     MEM_If_DeInit_FS,
     MEM_If_Erase_FS,
@@ -118,7 +129,7 @@ __ALIGN_BEGIN USBD_DFU_MediaTypeDef USBD_DFU_fops_FS __ALIGN_END =
 [#if handleNameHS == "HS"]
 __ALIGN_BEGIN USBD_DFU_MediaTypeDef USBD_DFU_fops_HS __ALIGN_END =
 {
-    (uint8_t *)"DFU MEDIA",
+    (uint8_t*)FLASH_DESC_STR,
     MEM_If_Init_HS,
     MEM_If_DeInit_HS,
     MEM_If_Erase_HS,

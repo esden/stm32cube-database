@@ -330,7 +330,7 @@
 	</RefMode>
 	
 	
-	<!-- Modes for COMP. Defined for Scorpio 128K (Medium Density or Category 1). Caution : COMP1 do not work with an ADC activated -->
+	<!-- Modes for COMP. Defined for Scorpio 128K (Medium Density or Category 1). Caution : COMP1 do not work with an ADC activated unless in Windows mode ( Bug 315353) -->
 	<ModeLogicOperator Name="OR">
 		<Mode Name="InputPlus" UserName="Input [+]">
 			<ModeLogicOperator Name="XOR">
@@ -339,18 +339,19 @@
 						<Signal Name="INP"/>
 					</SignalLogicalOp>
 					<Semaphore>$IpInstance_ExternalInputPlus</Semaphore>
+		                	<Condition Expression="(($IpNumber=1) &amp; !USE_ADC) | ($IpNumber=2)" Diagnostic="ADC must be disabled"/>
 				</Mode>
 				<Mode Name="WindowMode" UserName="Window Mode" RemoveCondition="($IpNumber=2)" >
 					<SignalLogicalOp Name="AND">
 						<Signal Name="VS_WindowMode"/>
 					</SignalLogicalOp>
-					<Semaphore>$IpInstance_WindowMode</Semaphore>
+					<Semaphore>$IpInstance_WindowsMode</Semaphore>
 					<Condition Expression="(($IpNumber=1) &amp; COMP2_ExternalInputPlus)" 
 								Diagnostic="Need to have an INP (External Input [+]) on next Comparator"/>
 				</Mode>
 			</ModeLogicOperator>
 			<Semaphore>$IpInstance_InputPlus</Semaphore>
-			<Condition Expression="(($IpNumber=1) &amp; !USE_ADC) | ($IpNumber=2)" Diagnostic="ADC must be disabled"/>
+
 		</Mode>
 				
 		<Mode Name="InputNeg" UserName="Input [-]" RemoveCondition="($IpNumber=1)">

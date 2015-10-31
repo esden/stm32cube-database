@@ -1,10 +1,7 @@
 [#ftl]
 /**
  ******************************************************************************
-  * @file    bsp_driver_sram.c (based on stmXXX_eval_sram.c: NOT YET AVAILABLE!)
-  * @author  MCD Teams
-  * @version V1.0.0
-  * @date    ${date}
+  * @file    bsp_driver_sram.c
   * @brief   This file includes a generic SRAM driver.
   ******************************************************************************
   *

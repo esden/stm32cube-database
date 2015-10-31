@@ -48,7 +48,7 @@
  
     <RefParameter Visible="false" Comment="PLL Source" DefaultValue="+PLLSourceVirtualString" Name="PLLSource" Type="list">
         <PossibleValue Comment="Pllsource Hsi" Value="RCC_PLLSOURCE_HSI" />
-        <PossibleValue Comment="Pllsource Hse" Value="RCC_PLLSOURCE_HSE"/>
+        <PossibleValue Comment="Pllsource Hse" Value="RCC_PLLSOURCE_HSE" />
     </RefParameter>
     <RefParameter Comment="PLLMUL" Visible="false" DefaultValue="RCC_PLLMUL_3" Name="PLLMUL" Type="list">
         <PossibleValue Comment="3" Value="RCC_PLLMUL_3"/>
@@ -116,6 +116,10 @@
     <RefParameter Visible="false" Comment="Clock Output" Name="RCC_MCO" DefaultValue="RCC_MCO2" Type="list">
         <Condition Diagnostic="" Expression="MCOConfig&amp;PA9_RCC_MCO|(SEM2RCC_MCO_REQUIRED_TIM21 &amp; TIM21 &amp; Semaphore_input_Channel1TIM21)"/>
         <PossibleValue Comment="Clock Output" Value="RCC_MCO2"/>
+    </RefParameter> 
+	<RefParameter Visible="false" Comment="Clock Output" Name="RCC_MCO" DefaultValue="RCC_MCO2" Type="list">
+        <Condition Diagnostic="" Expression="MCOConfig|(SEM2RCC_MCO_REQUIRED_TIM21 &amp; TIM21 &amp; Semaphore_input_Channel1TIM21)"/>
+        <PossibleValue Comment="Clock Output" Value="RCC_MCO1"/>
     </RefParameter>
     <RefParameter Visible="false" Comment="Clock Output" Name="RCC_MCO" DefaultValue="null" Type="list"/>
 	
@@ -207,11 +211,19 @@
         <PossibleValue Comment="8" Value="RCC_RTCCLKSOURCE_HSE_DIV8"/>
         <PossibleValue Comment="16" Value="RCC_RTCCLKSOURCE_HSE_DIV16"/>
     </RefParameter>
-    <RefParameter Visible="false" Comment="Timer div" Name="TimPrescaler" Type="integer" DefaultValue="8" Max="8" Min="8"/>
+  
+	<RefParameter Visible="false" Comment="Cortex Div" DefaultValue="SYSTICK_CLKSOURCE_HCLK" Name="TimPrescaler" Type="list">
+         <PossibleValue Comment="1" Value="SYSTICK_CLKSOURCE_HCLK" Semaphore="HCLKDiv1"/>
+		 <PossibleValue Comment="8" Value="SYSTICK_CLKSOURCE_HCLK_DIV8"/>
+   </RefParameter>
+   <RefParameter Visible="false" Comment="Cortex_DivARG" DefaultValue="HAL_RCC_GetHCLKFreq()/1000" Name="Cortex_DivARG" Type="String">
+        <Condition Expression="HCLKDiv1" Diagnostic=""/>
+    </RefParameter>	
+    <RefParameter Visible="false" Comment="Cortex_DivARG" DefaultValue="HAL_RCC_GetHCLKFreq()/8000" Name="Cortex_DivARG" Type="String"/>
     <RefParameter Visible="false" Comment="DIV2USB" Name="DIV2USB" Type="integer" DefaultValue="2" Max="2" Min="2"/>
 
     <RefParameter Visible="false" Name="EnbaleCSS" Comment="Clock Security System: available only when HSE is used directly or undirectly as System Clock" Type="list" DefaultValue="false">
-        <Condition Diagnostic="" Expression="(((PLLSource=RCC_PLLSOURCE_HSE) &amp;SYSCLKSource=RCC_SYSCLKSOURCE_PLLCLK )|(SYSCLKSource=RCC_SYSCLKSOURCE_HSE)) &amp; (HSEOscillator | HSEByPass)"/>
+        <Condition Diagnostic="" Expression="(((PLLSourceVirtual=RCC_PLLSOURCE_HSE) &amp;SYSCLKSource=RCC_SYSCLKSOURCE_PLLCLK )|(SYSCLKSource=RCC_SYSCLKSOURCE_HSE)) &amp; (HSEOscillator | HSEByPass)"/>
         <PossibleValue Value="true" Comment="Enabled" Semaphore="CSSEnabled"/>
         <PossibleValue Value="false" Comment="Disabled"/>
     </RefParameter>
@@ -245,9 +257,21 @@
 	 
 	 <RefParameter Visible="false" Comment="HSE OSC" Name="HSE_VALUE" DefaultValue="8000000" Max="32000000" Min="0" Type="double" Display="value/1000000" Unit="MHz"><!--HSE bypass and !PLL and !CSS-->
         <Condition Diagnostic="HSE in bypass Mode" Expression="HSEByPass  "/>
-    </RefParameter>    
-  
-    <RefParameter Visible="false" Comment="HSE OSC" Name="HSE_VALUE" DefaultValue="8000000" Max="24000000" Min="1000000" Type="double" Display="value/1000000" Unit="MHz"/><!--HSE in OSI mode-->
+    </RefParameter>
+    <RefParameter Visible="false" Comment="HSE OSC" Name="HSE_VALUE" DefaultValue="8000000" Max="8000000" Min="1000000" Type="double" Display="value/1000000" Unit="MHz"><!--HSE bypass and !PLL and !CSS-->
+        <Condition Diagnostic="HSE in bypass Mode" Expression="DIE447&amp;HSEscale &amp; HSEOscillator &amp; (PWR_Regulator_Voltage_Scale=PWR_REGULATOR_VOLTAGE_SCALE3) "/>
+    </RefParameter>
+
+	<RefParameter Visible="false" Comment="HSE OSC" Name="HSE_VALUE" DefaultValue="8000000" Max="16000000" Min="1000000" Type="double" Display="value/1000000" Unit="MHz"><!--HSE bypass and !PLL and !CSS-->
+        <Condition Diagnostic="HSE in bypass Mode" Expression="DIE447&amp;HSEscale &amp; HSEOscillator &amp; (PWR_Regulator_Voltage_Scale=PWR_REGULATOR_VOLTAGE_SCALE2) "/>
+    </RefParameter> 
+	 
+    <RefParameter Visible="false" Comment="HSE OSC" Name="HSE_VALUE" DefaultValue="8000000" Max="25000000" Min="1000000" Type="double" Display="value/1000000" Unit="MHz"><!--HSE in OSI mode-->
+	 <Condition Diagnostic="HSE in bypass Mode" Expression="DIE447"/>
+    </RefParameter>   
+	    <RefParameter Visible="false" Comment="HSE OSC" Name="HSE_VALUE" DefaultValue="8000000" Max="24000000" Min="1000000" Type="double" Display="value/1000000" Unit="MHz"/><!--HSE in OSI mode-->
+
+	
 	<!--MCO freq va  --> 
 	  		  <RefParameter Visible="false" Comment="MCO Output" Name="MCOPinFreq_Value" DefaultValue="2097000"  Type="double" Display="value/1000000" Unit="MHz"/>
     
@@ -288,10 +312,10 @@
     <RefParameter Visible="false" Comment="" Name="FCLKCortexFreq_ValueConstraintsText" DefaultValue="" Type="string" Display="value/1000000" Unit="MHz"/>
 
     <RefParameter Visible="false" Comment="FCLK Cortex clock" Name="FCLKCortexFreq_Value" DefaultValue="2097000" Type="double" Display="value/1000000" Unit="MHz"/>
-    <RefParameter Visible="false" Comment="APB1 peripheral clocks" Name="APB1Freq_Value" DefaultValue="2097000" Min="10000000" Max="32000000" Type="double" IP="DAC1,DAC2,WinWATCHDOG,CAN1,CAN2,I2C1,I2C2,I2C3,SPI3,SPI2,UART4,UART7,UART8,USART2,USART3,UART5,I2S2" Display="value/1000000" Unit="MHz">
+    <RefParameter Visible="false" Comment="APB1 peripheral clocks" Name="APB1Freq_Value" DefaultValue="2097000" Min="10000000" Max="32000000" Type="double" IP="USART4,USART5,DAC1,DAC2,WinWATCHDOG,CAN1,CAN2,I2C1,I2C2,I2C3,SPI3,SPI2,UART4,UART7,UART8,USART2,USART3,UART5,I2S2" Display="value/1000000" Unit="MHz">
         <Condition Diagnostic="USB" Expression="USBUsed_ForRCC"/>
     </RefParameter>  
-    <RefParameter Visible="false" Comment="APB1 peripheral clocks" Name="APB1Freq_Value" DefaultValue="2097000" Max="32000000" Type="double" IP="DAC1,DAC2,WinWATCHDOG,CAN1,CAN2,I2C1,I2C2,I2C3,SPI3,SPI2,UART4,UART7,UART8,USART2,USART3,UART5,I2S2" Display="value/1000000" Unit="MHz"/>
+    <RefParameter Visible="false" Comment="APB1 peripheral clocks" Name="APB1Freq_Value" DefaultValue="2097000" Max="32000000" Type="double" IP="USART4,USART5,DAC1,DAC2,WinWATCHDOG,CAN1,CAN2,I2C1,I2C2,I2C3,SPI3,SPI2,UART4,UART7,UART8,USART2,USART3,UART5,I2S2" Display="value/1000000" Unit="MHz"/>
     <RefParameter Visible="false" Comment="APB2 peripheral clocks" Name="APB2Freq_Value" DefaultValue="2097000" Max="32000000" Type="double" IP="USART1,ADC1,ADC2,ADC3,SPI1,SPI4,SPI5,SPI6,USART1,USART6,EXTI,SDIO,SAI1" Display="value/1000000" Unit="MHz"/>
     <RefParameter Visible="false" Comment="LPTIM1 clock" Name="LPTIMFreq_Value" DefaultValue="2097000"  Type="double"  Display="value/1000000" Unit="MHz" IP="LPTIM1"/>
     <RefParameter Visible="false" Comment="LPUART1 clock" Name="LPUARTFreq_Value" DefaultValue="2097000"  Type="double" Display="value/1000000" Unit="MHz" IP="LPUART1"/>
@@ -357,7 +381,7 @@
 
     </RefParameter>
     <RefParameter Name="PWR_Regulator_Voltage_Scale" Comment="Power Regulator Voltage Scale" Type="list" DefaultValue="PWR_REGULATOR_VOLTAGE_SCALE1" Group="Power Parameters">
-        <Condition Diagnostic="" Expression="(((HCLKFreq_Value &gt; 4000000)))"/>
+        <Condition Diagnostic="" Expression="(((HCLKFreq_Value &gt; 4200000)))"/>
         <PossibleValue Value="PWR_REGULATOR_VOLTAGE_SCALE2" Comment="Power Regulator Voltage Scale 2" Semaphore="scale2"/>
 		        <PossibleValue Value="PWR_REGULATOR_VOLTAGE_SCALE1" Comment="Power Regulator Voltage Scale 1" Semaphore="scale1"/>
 
@@ -393,7 +417,7 @@
         <PossibleValue Value="1" Comment="Enabled"/>
         <PossibleValue Value="0" Comment="Disabled"/>
     </RefParameter>
-    <RefParameter Name="PREFETCH_ENABLE" Comment="Prefetch Buffer" Type="list" DefaultValue="1" Group="System Parameters">
+    <RefParameter Name="PREFETCH_ENABLE" Comment="Prefetch Buffer" Type="list" DefaultValue="0" Group="System Parameters">
         <PossibleValue Value="1" Comment="Enabled"/>
         <PossibleValue Value="0" Comment="Disabled"/>
     </RefParameter>
@@ -1018,14 +1042,17 @@
 	
     <RefMode Name="ClockTree">
         <ConfigForMode>RCC_ConfigVoltageScaling</ConfigForMode>
+		  
         <ConfigForMode>RCC_OSCConfig</ConfigForMode>        
         <ConfigForMode>RCC_ClockConfig</ConfigForMode>        
         <ConfigForMode>RCC_MCO1Config</ConfigForMode>        
         <ConfigForMode>RCC_CSS_Enable</ConfigForMode>
         <ConfigForMode>RCC_CSS_EnableLSE</ConfigForMode>    
-        <ConfigForMode>SYSCFG_CLK_ENABLE</ConfigForMode>   <!-- added as a workAround to enable the SYSCFG clock : it should be managed internally by the HAL-->
+        <!--ConfigForMode>SYSCFG_CLK_ENABLE</ConfigForMode-->   <!-- added as a workAround to enable the SYSCFG clock : it should be managed internally by the HAL-->
         <ConfigForMode>CRS_CLK_ENABLE</ConfigForMode> 
-        <ConfigForMode>RCC_CRSConfig</ConfigForMode>        
+        <ConfigForMode>RCC_CRSConfig</ConfigForMode>    
+         <ConfigForMode>RCC_interrupt_Time_SYSTICK_Config</ConfigForMode>
+		 <ConfigForMode>RCC_SYSTICK_CONFIG</ConfigForMode>		
         <!--Parameter Name="OscillatorType"/-->
         <Parameter Name="HSI16State"/>
         <Parameter Name="HSIRCDiv"/>

@@ -21,7 +21,7 @@
         <Component Name="Middleware:FATFS:USBH"/>
         <Component Name="Middleware:FATFS:CODE_PAGE:$VIRTUAL_CODE_PAGE"/>
         <ConfigFile Name="FF_CONF"/>
-        <ConfigFile Name="FF_HANDLES"/> 
+        <!--  <ConfigFile Name="FF_HANDLES"/> --> 
         <ConfigFile Name="FATFS_INIT"/>
         <ConfigFile Name="FATFS_HEADER"/>
     </RefConfig>
@@ -30,7 +30,7 @@
         <Component Name="Middleware:FATFS:NAND"/>
         <Component Name="Middleware:FATFS:CODE_PAGE:$VIRTUAL_CODE_PAGE"/>
         <ConfigFile Name="FF_CONF"/>
-        <ConfigFile Name="FF_HANDLES"/> 
+        <!--  <ConfigFile Name="FF_HANDLES"/> -->
         <ConfigFile Name="FATFS_INIT"/>
         <ConfigFile Name="FATFS_HEADER"/>
     </RefConfig>
@@ -39,7 +39,7 @@
         <Component Name="Middleware:FATFS:SDRAM"/>
         <Component Name="Middleware:FATFS:CODE_PAGE:$VIRTUAL_CODE_PAGE"/>
         <ConfigFile Name="FF_CONF"/>
-        <ConfigFile Name="FF_HANDLES"/> 
+        <!--  <ConfigFile Name="FF_HANDLES"/> -->
         <ConfigFile Name="F4XX_SDRAM_C"/> 
         <ConfigFile Name="F4XX_SDRAM_H"/> 
         <ConfigFile Name="FATFS_INIT"/>
@@ -50,9 +50,9 @@
         <Component Name="Middleware:FATFS:SRAM"/>
         <Component Name="Middleware:FATFS:CODE_PAGE:$VIRTUAL_CODE_PAGE"/>
         <ConfigFile Name="FF_CONF"/>
-        <ConfigFile Name="FF_HANDLES"/> 
+        <!--  <ConfigFile Name="FF_HANDLES"/> -->
         <ConfigFile Name="F4XX_SRAM_C"/> 
-        <ConfigFile Name="F4XX_SRAM_H"/>
+        <ConfigFile Name="F4XX_SRAM_H"/> 
         <ConfigFile Name="FATFS_INIT"/> 
         <ConfigFile Name="FATFS_HEADER"/>
     </RefConfig>
@@ -157,6 +157,8 @@
         <Argument Name="_FS_FATFS_SDRAM" GenericType="simple" Comment="0:Disable or >=1:Enable"/> 
         <Argument Name="_FS_FATFS_SRAM" GenericType="simple" Comment="0:Disable or >=1:Enable"/> 
         <Argument Name="_FS_FATFS_USB" GenericType="simple" Comment="0:Disable or >=1:Enable"/> 
+        <!-- To get the right handle for USBH (FS or HS) -->
+        <Argument Name="_HUSBH" GenericType="simple" Comment=""/>
     </RefConfigFile> 
        
     <!-- Generate a driver file for SD that uses the right IP handle -->
@@ -177,9 +179,9 @@
     
     <!-- Generate a driver file for SDRAM that uses the right IP handle -->
     <RefConfigFile Name="F4XX_SDRAM_H" Description="H driver file for SDRAM" Template="fatfs_f4xxsdram_h.ftl">       
-        <File Name="bsp_driver_sdram.h" Category="header" Version="R0.1.0" Condition="all"/>                  
+        <File Name="bsp_driver_sdram.h" Category="header" Version="R0.1.0" Condition="all"/>      
+        <Argument Name="_HSDRAM" GenericType="simple" Comment=""/>            
     </RefConfigFile>
-    
     
     <!-- Generate a driver file for SD that uses the right IP handle -->
     <RefConfigFile Name="F4XX_SRAM_C" Description="C driver file for SRAM" Template="fatfs_f4xxsram_c.ftl">       
@@ -188,10 +190,11 @@
     
     <!-- Generate a driver file for SD that uses the right IP handle -->
     <RefConfigFile Name="F4XX_SRAM_H" Description="H driver file for SRAM" Template="fatfs_f4xxsram_h.ftl">       
-        <File Name="bsp_driver_sram.h" Category="header" Version="R0.1.0" Condition="all"/>                  
+        <File Name="bsp_driver_sram.h" Category="header" Version="R0.1.0" Condition="all"/>       
+        <Argument Name="_HSRAM" GenericType="simple" Comment=""/>           
     </RefConfigFile>
     
-    <!-- Generate a generic diskio C driver file  -->
+        <!-- Generate a generic diskio C driver file  -->
     <RefConfigFile Name="USER_DISKIO_C" Description="GENERIC C diskio driver file" Template="generic_diskio_c.ftl">       
         <File Name="user_diskio.c" Category="source" Version="R0.1.0" Condition="all"/>    
         <Argument Name="NEW_DISKIO_API" GenericType="simple" Comment=""/>                    
@@ -213,4 +216,25 @@
         <File Name="fatfs.h" Category="source" Version="R0.1.0" Condition="all"/>                    
     </RefConfigFile>
     
+    <RefBspComponent Name="Detect_SDIO" BspIpName="GPIO" BspModeName="Input">       
+        <File Name="fatfs_f4xxsd_h.ftl;bsp_driver_sd.h" Category="template"/>
+        <File Name="fatfs_bsp_sd_c.ftl;bsp_driver_sd.c" Category="template"/>
+    </RefBspComponent>
+    <!--
+    <RefBspComponent Name="Detect_SDIO" BspIpName="I2C" BspModeName="I2C">       
+        <File Name="fatfs_f4xxsd_h.ftl;bsp_driver_sd.h" Category="template"/>
+        <File Name="fatfs_bsp_sd_c.ftl;bsp_driver_sd.c" Category="template"/>
+    </RefBspComponent> 
+   
+    
+    <RefBspComponent Name="Detect_SDIO_Bis" BspIpName="GPIO" BspModeName="Input">       
+        <File Name="fatfs_f4xxsd_h.ftl;bsp_driver_sd.h" Category="template"/>
+        <File Name="fatfs_bsp_sd_c.ftl;bsp_driver_sd.c" Category="template"/>
+    </RefBspComponent> 
+    <RefBspComponent Name="Detect_SDIO_Third" BspIpName="I2C" BspModeName="I2C">       
+        <File Name="fatfs_f4xxsd_h.ftl;bsp_driver_sd.h" Category="template"/>
+        <File Name="fatfs_bsp_sd_c.ftl;bsp_driver_sd.c" Category="template"/>
+    </RefBspComponent>
+    -->
+
 </IP>

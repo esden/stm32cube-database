@@ -2,7 +2,6 @@
 /**
   ******************************************************************************
   * File Name          : ${name}
-  * Date               : ${date}
   * Description        : This file provides code for the configuration
   *                      of the ${name} instances.
   ******************************************************************************
