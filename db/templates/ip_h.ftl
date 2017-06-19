@@ -5,31 +5,7 @@
   * Description        : This file provides code for the configuration
   *                      of the ${name} instances.
   ******************************************************************************
-  *
-  * COPYRIGHT(c) ${year} STMicroelectronics
-  *
-  * Redistribution and use in source and binary forms, with or without modification,
-  * are permitted provided that the following conditions are met:
-  *   1. Redistributions of source code must retain the above copyright notice,
-  *      this list of conditions and the following disclaimer.
-  *   2. Redistributions in binary form must reproduce the above copyright notice,
-  *      this list of conditions and the following disclaimer in the documentation
-  *      and/or other materials provided with the distribution.
-  *   3. Neither the name of STMicroelectronics nor the names of its contributors
-  *      may be used to endorse or promote products derived from this software
-  *      without specific prior written permission.
-  *
-  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-  * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-  * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-  * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-  *
+[@common.optinclude name="Src/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
 /* Define to prevent recursive inclusion -------------------------------------*/
@@ -40,11 +16,21 @@
 #endif
 
 /* Includes ------------------------------------------------------------------*/
+[#compress]
+[#assign includesList = ""]
 [#if includes??]
-[#list includes as include]
+    [#list includes as include]
+        [#if !includesList?contains(include)]
 #include "${include}"
-[/#list]
+            [#assign includesList = includesList+" "+include]
+        [/#if]
+    [/#list]
 [/#if]
+[#if H7_ETH_NoLWIP?? &&HALCompliant??]
+#include "string.h"
+[/#if]
+[/#compress]
+
 #n
 /* USER CODE BEGIN Includes */
 
@@ -68,6 +54,7 @@ extern ${variable.value} ${variable.name};
 
 /* USER CODE END Private defines */
 #n
+extern void _Error_Handler(char *, int);
 [#-- extract hal mode list used by all instances of the ip --]
 [#assign halModeList= ""]
 
@@ -86,13 +73,28 @@ extern ${variable.value} ${variable.name};
 [/#list]
 [/#list]
 [#-- PostInit declaration --]
+[#assign postinitList = ""]
 [#list IPdatas as IP]  
 [#list IP.configModelList as instanceData]
 [#if instanceData.initServices??]
     [#if instanceData.initServices.gpioOut??]
         [#list instanceData.initCallBackInitMethodList as initCallBack]
             [#if initCallBack?contains("PostInit")]
-            #nvoid ${initCallBack}(${instanceData.halMode}_HandleTypeDef *h${instanceData.halMode?lower_case});
+            [#assign halMode = instanceData.halMode]
+                [#assign ipName = instanceData.ipName]
+                [#assign ipInstance = instanceData.instanceName]
+                [#if halMode!=ipName&&!ipName?contains("TIM")&&!ipName?contains("CEC")]
+                    [#if !postinitList?contains(initCallBack)]
+                    #nvoid ${initCallBack}(${instanceData.halMode}_HandleTypeDef *h${instanceData.halMode?lower_case});
+                    [#assign postinitList = postinitList+" "+initCallBack]
+                    [/#if]
+                [#else]
+                    [#if !postinitList?contains(initCallBack)]
+                    #nvoid ${initCallBack}([#if ipName?contains("TIM")&&!(ipName?contains("HRTIM")||ipName?contains("LPTIM"))]TIM_HandleTypeDef *htim[#else]${ipName}_HandleTypeDef *h${ipName?lower_case}[/#if]);
+                    [#assign postinitList = postinitList+" "+initCallBack]
+                     [/#if]
+                [/#if]
+                [#break] [#-- take only the first PostInit : case of timer--]
             [/#if]
         [/#list]
     [/#if]

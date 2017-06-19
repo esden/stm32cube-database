@@ -4,30 +4,7 @@
   * @file           : usbd_dfu_if.c
   * @brief          :
   ******************************************************************************
-  * COPYRIGHT(c) ${year} STMicroelectronics
-  *
-  * Redistribution and use in source and binary forms, with or without modification,
-  * are permitted provided that the following conditions are met:
-  * 1. Redistributions of source code must retain the above copyright notice,
-  * this list of conditions and the following disclaimer.
-  * 2. Redistributions in binary form must reproduce the above copyright notice,
-  * this list of conditions and the following disclaimer in the documentation
-  * and/or other materials provided with the distribution.
-  * 3. Neither the name of STMicroelectronics nor the names of its contributors
-  * may be used to endorse or promote products derived from this software
-  * without specific prior written permission.
-  *
-  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-  * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-  * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-  * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-  *
+[@common.optinclude name="Src/license.tmp"/][#--include License text --]
   ******************************************************************************
 */
 [#assign handleNameFS = ""]
@@ -78,7 +55,7 @@
 /** @defgroup USBD_DFU_Private_TypesDefinitions
   * @{
   */ 
-/* USER CODE BEGIN PRIVATE_TYPES  */
+/* USER CODE BEGIN PRIVATE_TYPES */
 /* USER CODE END PRIVATE_TYPES */ 
 /**
   * @}
@@ -89,7 +66,7 @@
   * @{
   */ 
 #define FLASH_DESC_STR      "${DFU_MEDIA}"  
-/* USER CODE BEGIN PRIVATE_DEFINES  */
+/* USER CODE BEGIN PRIVATE_DEFINES */
 /* USER CODE END PRIVATE_DEFINES */
   
 /**
@@ -100,7 +77,7 @@
 /** @defgroup USBD_DFU_Private_Macros
   * @{
   */ 
-/* USER CODE BEGIN PRIVATE_MACRO  */
+/* USER CODE BEGIN PRIVATE_MACRO */
 /* USER CODE END PRIVATE_MACRO */
 
 /**
@@ -110,18 +87,8 @@
 /** @defgroup USBD_AUDIO_IF_Private_Variables
   * @{
   */
-/* USB handler declaration */
-[#if handleNameFS == "FS" || handleNameUSB_FS == "FS"]
-/* Handle for USB Full Speed IP */
-#tUSBD_HandleTypeDef  *hUsbDevice_0;
-[/#if]
-
-[#if handleNameHS == "HS"]
-/* Handle for USB High Speed IP */
-#tUSBD_HandleTypeDef  *hUsbDevice_1;
-[/#if]
-/* USER CODE BEGIN PRIVATE_VARIABLES  */
-/* USER CODE END  PRIVATE_VARIABLES */
+/* USER CODE BEGIN PRIVATE_VARIABLES */
+/* USER CODE END PRIVATE_VARIABLES */
 
 /**
   * @}
@@ -136,8 +103,8 @@
 [#if handleNameHS == "HS"]
 #textern USBD_HandleTypeDef hUsbDeviceHS;  
 [/#if]
-/* USER CODE BEGIN EXPORTED_VARIABLES  */
-/* USER CODE END  EXPORTED_VARIABLES */
+/* USER CODE BEGIN EXPORTED_VARIABLES */
+/* USER CODE END EXPORTED_VARIABLES */
 
 /**
   * @}
@@ -164,7 +131,7 @@ static uint16_t MEM_If_DeInit_HS(void);
 static uint16_t MEM_If_GetStatus_HS (uint32_t Add, uint8_t Cmd, uint8_t *buffer);
 [/#if]
 /* USER CODE BEGIN PRIVATE_FUNCTIONS_DECLARATION */
-/* USER CODE END  PRIVATE_FUNCTIONS_DECLARATION */
+/* USER CODE END PRIVATE_FUNCTIONS_DECLARATION */
 
 /**
   * @}
@@ -294,7 +261,7 @@ uint16_t MEM_If_GetStatus_FS (uint32_t Add, uint8_t Cmd, uint8_t *buffer)
     break;
   }                             
   return  (USBD_OK);
-  /* USER CODE END 6 */  
+  /* USER CODE END 5 */  
 }
 [/#if]
 
@@ -307,9 +274,9 @@ uint16_t MEM_If_GetStatus_FS (uint32_t Add, uint8_t Cmd, uint8_t *buffer)
   */
 uint16_t MEM_If_Init_HS(void)
 { 
-  /* USER CODE BEGIN 7 */ 
+  /* USER CODE BEGIN 6 */ 
   return (USBD_OK);
-  /* USER CODE END 7 */ 
+  /* USER CODE END 6 */ 
 }
 
 /**
@@ -320,9 +287,9 @@ uint16_t MEM_If_Init_HS(void)
   */
 uint16_t MEM_If_DeInit_HS(void)
 { 
-  /* USER CODE BEGIN 8 */ 
+  /* USER CODE BEGIN 7 */ 
   return (USBD_OK);
-  /* USER CODE END 8 */ 
+  /* USER CODE END 7 */ 
 }
 
 /**
@@ -333,9 +300,9 @@ uint16_t MEM_If_DeInit_HS(void)
   */
 uint16_t MEM_If_Erase_HS(uint32_t Add)
 {
-  /* USER CODE BEGIN 9 */ 
+  /* USER CODE BEGIN 8 */ 
   return (USBD_OK);
-  /* USER CODE END 9 */ 
+  /* USER CODE END 8 */ 
 }
 
 /**
@@ -348,9 +315,9 @@ uint16_t MEM_If_Erase_HS(uint32_t Add)
   */
 uint16_t MEM_If_Write_HS(uint8_t *src, uint8_t *dest, uint32_t Len)
 {
-  /* USER CODE BEGIN 10 */ 
+  /* USER CODE BEGIN 9 */ 
   return (USBD_OK);
-  /* USER CODE END 10 */ 
+  /* USER CODE END 9 */ 
 }
 
 /**
@@ -364,9 +331,9 @@ uint16_t MEM_If_Write_HS(uint8_t *src, uint8_t *dest, uint32_t Len)
 uint8_t *MEM_If_Read_HS (uint8_t *src, uint8_t *dest, uint32_t Len)
 {
   /* Return a valid address to avoid HardFault */
-  /* USER CODE BEGIN 11 */ 
+  /* USER CODE BEGIN 10 */ 
   return (uint8_t*)(USBD_OK);
-  /* USER CODE END 11 */ 
+  /* USER CODE END 10 */ 
 }
 
 /**
@@ -379,7 +346,7 @@ uint8_t *MEM_If_Read_HS (uint8_t *src, uint8_t *dest, uint32_t Len)
   */
 uint16_t MEM_If_GetStatus_HS (uint32_t Add, uint8_t Cmd, uint8_t *buffer)
 {
-  /* USER CODE BEGIN 12 */ 
+  /* USER CODE BEGIN 11 */ 
   switch (Cmd)
   {
   case DFU_MEDIA_PROGRAM:
@@ -392,12 +359,12 @@ uint16_t MEM_If_GetStatus_HS (uint32_t Add, uint8_t Cmd, uint8_t *buffer)
     break;
   }                             
   return  (USBD_OK);
-  /* USER CODE END 12 */  
+  /* USER CODE END 11 */  
 }
 [/#if]
 
 /* USER CODE BEGIN PRIVATE_FUNCTIONS_IMPLEMENTATION */
-/* USER CODE END  PRIVATE_FUNCTIONS_IMPLEMENTATION */
+/* USER CODE END PRIVATE_FUNCTIONS_IMPLEMENTATION */
 
 /**
   * @}

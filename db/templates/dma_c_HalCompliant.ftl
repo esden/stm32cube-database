@@ -1,22 +1,40 @@
 [#ftl]
+[#assign ipName = "DMA"]
+[#if dmas?size > 0]
+  [#list dmas as dma]
+    [#assign ipName = dma]
+  [/#list]
+[/#if]
+[#assign LL_Driver = false]
+[#if driver??]
+  [#list driver as driverType]
+    [#if driverType=="LL"]
+      [#assign LL_Driver = true]
+    [/#if]
+  [/#list]
+[/#if]
 
 /** 
   * Enable DMA controller clock
-[#if variables?size > 0]
+[#if variables?? && variables?size > 0]
   * Configure DMA for memory to memory transfers
 [#list variables as variable]
   *   ${variable.name}
 [/#list]
 [/#if]
   */
-void MX_DMA_Init(void) 
+static void MX_${ipName}_Init(void) 
 {
 [#if isHalSupported=="true"]
   [#if clocks?size > 0]
   /* DMA controller clock enable */
   [/#if]
   [#list clocks as clockMacro]
+    [#if clockMacro?contains("(")]
+  ${clockMacro};
+    [#else]
   ${clockMacro}();
+    [/#if]
   [/#list]
 [/#if]
 [#list datas as configModel][#--go through all DMA requests--]
@@ -79,9 +97,29 @@ void MX_DMA_Init(void)
               [#assign args = args + ', ' + arg]
             [/#if]
           [/#list]
+  [#--${method.name}(${args});--]
+          [#if method.returnHAL=="false"]
+[#--${method.name}(${args});--]
   ${method.name}(${args});
         [#else]
+    [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
+  if (${method.name}(${args}) != HAL_OK)
+  {
+    _Error_Handler(__FILE__, __LINE__);
+  }
+        [/#if]#n  
+        [#else]
+  [#--${method.name}();--]
+        [#if method.returnHAL=="false"]
+[#--${method.name}(${args});--]
   ${method.name}();
+        [#else]
+    [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
+  if (${method.name}() != HAL_OK)
+  {
+    _Error_Handler(__FILE__, __LINE__);
+  }
+        [/#if]#n          
         [/#if][#--if method.arguments??--]
   	[/#if][#--if method.status=="OK"--]
   	[#if method.status=="KO"]
@@ -127,12 +165,34 @@ void MX_DMA_Init(void)
 [/#list][#--list datas as configModel--]
 [#compress]
 [#-- DMA interrupts --]
-[#if InitNvic??]#n#t/* DMA interrupt init */
-            [#list InitNvic as initVector]                                
-                #tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
-                #tHAL_NVIC_EnableIRQ(${initVector.vector});
-            [/#list]
+[#if InitNvic??]
+    [#assign codeInMspInit = false]
+    [#list InitNvic as initVector]
+      [#if initVector.codeInMspInit]
+       [#assign codeInMspInit = true]
+       [#break]
+      [/#if]
+    [/#list]
+    [#if codeInMspInit]
+      #n#t/* DMA interrupt init */
+      [#list InitNvic as initVector]
+        [#if initVector.codeInMspInit]
+          #t/* ${initVector.vector} interrupt configuration */
+          [#if initVector.usedDriver == "LL"]
+            [#if FamilyName=="STM32L0" || FamilyName=="STM32F0"]
+          #tNVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority});
+            [#else]
+          #tNVIC_SetPriority(${initVector.vector}, NVIC_EncodePriority(NVIC_GetPriorityGrouping(),${initVector.preemptionPriority}, ${initVector.subPriority}));
+            [/#if]
+          #tNVIC_EnableIRQ(${initVector.vector});
+          [#else]
+          #tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
+          #tHAL_NVIC_EnableIRQ(${initVector.vector});
+          [/#if]
         [/#if]
+      [/#list]
+    [/#if]
+[/#if]
 #n
 [/#compress]
 }

@@ -166,22 +166,26 @@
         </Element>
 		
         <!--USB-->
-        <Element id="PLL48Mult" type="multiplexor" refParameter="PLL48CLockSelection" orientation="LEFT" x="788" y="544" refEnable="USBEnable,SDMMCEnable">
+        <Element id="PLL48Mult" type="multiplexor" refParameter="PLL48CLockSelection" orientation="LEFT" x="788" y="544" refEnable="USBEnable,SDMMCEnable,RNGEnable">
             <Input  signalId="PLLQCLK"    from="PLLQ"    refValue="RCC_CLK48SOURCE_PLL"   />
             <Input  signalId="PLLSAIPCLK" from="PLLSAIP" refValue="RCC_CLK48SOURCE_PLLSAIP"/>          
             <Output signalId="PLL48CLK" to="USBoutput"/>
+            <Output signalId="PLL48CLK" to="RNGoutput"/>
             <Output signalId="PLL48CLK" to="SDMMCMult"/>
         </Element>
-        <Element id="USBoutput" type="activeOutput" refParameter="USBFreq_Value" x="935" y="555" refEnable="USBEnable">
+        <Element id="RNGoutput" type="activeOutput" refParameter="RNGFreq_Value" x="935" y="530" refEnable="RNGEnable">
             <Input signalId="PLL48CLK" from="PLL48Mult"/>
         </Element>
-        <Element id="LCDTFTKOutput" type="activeOutput" refParameter="LCDTFToutputFreq_Value" x="935" y="465" refEnable="LCDEnable">
+        <Element id="USBoutput" type="activeOutput" refParameter="USBFreq_Value" x="935" y="560" refEnable="USBEnable">
+            <Input signalId="PLL48CLK" from="PLL48Mult"/>
+        </Element>
+        <Element id="LCDTFTKOutput" type="activeOutput" refParameter="LCDTFToutputFreq_Value" x="935" y="460" refEnable="LCDEnable">
             <Condition Diagnostic="" Expression="LTDC_Exist"/>
             <Input signalId="PLLSAIRDivCLK" from="PLLSAIRDiv"/>
         </Element>
        
         <!--SPDIF-->
-        <Element id="SPDIFoutput" type="activeOutput" refParameter="SPDIFRXFreq_Value" x="935" y="500" refEnable="SPDIFEnable">
+        <Element id="SPDIFoutput" type="activeOutput" refParameter="SPDIFRXFreq_Value" x="935" y="495" refEnable="SPDIFEnable">
             <Input signalId="PLLI2SPCLK" from="PLLI2SP"/>
         </Element>
 				
@@ -460,12 +464,12 @@
                 <Output signalId="PLLCLK" to="MCO1Mult"/>
                 <Output signalId="PLLCLK" to="MCO2Mult"/>
             </Element>
-            <Element id="PLLQ" type="devisor" refParameter="PLLQ" x="577" y="513" refEnable="USBEnable,SDMMCEnable">
+            <Element id="PLLQ" type="devisor" refParameter="PLLQ" x="577" y="513" refEnable="USBEnable,SDMMCEnable,RNGEnable">
                 <Input signalId="VCOOutput" from="PLLN"/>
                 <Output signalId="PLLQCLK" to="PLL48Mult"/>
                 <Output signalId="PLLQCLK" to="PLLQoutput"/>
             </Element>
-            <Element id="PLLQoutput" type="output" refParameter="PLLQoutputFreq_Value" x="639" y="512" refEnable="USBEnable,SDMMCEnable">
+            <Element id="PLLQoutput" type="output" refParameter="PLLQoutputFreq_Value" x="639" y="512" refEnable="USBEnable,SDMMCEnable,RNGEnable">
                 <Input signalId="PLLQCLK" from="PLLQ"/>
             </Element>
         
@@ -478,12 +482,12 @@
                 <Output signalId="VCOSAIOutput" to="PLLSAIP"/>
                 <Output signalId="VCOSAIOutput" to="PLLSAIR"/> 
             </Element>
-            <Element id="PLLSAIP" type="devisor" refParameter="PLLSAIP" x="577" y="591" refEnable="USBEnable,SDMMCEnable">
+            <Element id="PLLSAIP" type="devisor" refParameter="PLLSAIP" x="577" y="591" refEnable="USBEnable,SDMMCEnable,RNGEnable">
                 <Input signalId="VCOSAIOutput" from="PLLSAIN"/>
                 <Output signalId="PLLSAIPCLK" to="PLLSAIoutput"/>
                 <Output signalId="PLLSAIPCLK" to="PLL48Mult"/>
             </Element>
-            <Element id="PLLSAIoutput" type="output" refParameter="PLLSAIoutputFreq_Value" x="639" y="589" refEnable="USBEnable,SDMMCEnable">
+            <Element id="PLLSAIoutput" type="output" refParameter="PLLSAIoutputFreq_Value" x="639" y="589" refEnable="USBEnable,SDMMCEnable,RNGEnable">
                 <Input signalId="PLLSAIPCLK" from="PLLSAIP"/>
             </Element>
             <Element id="PLLSAIQ" type="devisor" refParameter="PLLSAIQ" x="577" y="630" refEnable="SAI1Enable,SAI2Enable">
@@ -758,15 +762,16 @@
     <Label id="I2C4HSILabel"    type="signal"      text="SYSCLK"         posX="834" posY="1055" refEnable="I2C4Enable"/>
     <Label id="I2C4PCLK1Label"  type="signal"      text="HSI"            posX="834" posY="1090" refEnable="I2C4Enable"/>
     <!--clk48 mux-->
-    <Label id="clk48MUXLabel"    type="muxLabel"    text="CLK48 Clock Mux"  posX="745" posY="515" refEnable="USBEnable,SDMMCEnable"/>
+    <Label id="clk48MUXLabel"    type="muxLabel"    text="CLK48 Clock Mux"  posX="745" posY="515" refEnable="USBEnable,SDMMCEnable,RNGEnable"/>
     <Label id="clk48Output"      type="SpecialInfo" text="To USB (MHz)"     posX="993" posY="563" refEnable="USBEnable"/> 	
-    <Label id="clk48Output"      type="SpecialInfo" text="To SPIDFRX (MHz)" posX="993" posY="503" refEnable="SPDIFEnable"/> 	
-    <Label id="clk48Output"      type="SpecialInfo" text="To LCD-TFT (MHz)" posX="993" posY="470" refEnable="LCDEnable"> 	
+    <Label id="clk48Output"      type="SpecialInfo" text="To RNG (MHz)"     posX="993" posY="535" refEnable="RNGEnable"/> 	
+    <Label id="clk48Output"      type="SpecialInfo" text="To SPIDFRX (MHz)" posX="993" posY="498" refEnable="SPDIFEnable"/> 	
+    <Label id="clk48Output"      type="SpecialInfo" text="To LCD-TFT (MHz)" posX="993" posY="465" refEnable="LCDEnable"> 	
         <Condition Diagnostic="" Expression="LTDC_Exist"/>
     </Label>
 	
-    <Label id="clk48HSILabel"    type="signal"      text="PLLQ"             posX="738" posY="535" refEnable="USBEnable,SDMMCEnable"/>
-    <Label id="clk48PCLK1Label"  type="signal"      text="PLLSAIP"          posX="738" posY="570" refEnable="USBEnable,SDMMCEnable"/>
+    <Label id="clk48HSILabel"    type="signal"      text="PLLQ"             posX="738" posY="535" refEnable="USBEnable,SDMMCEnable,RNGEnable"/>
+    <Label id="clk48PCLK1Label"  type="signal"      text="PLLSAIP"          posX="738" posY="570" refEnable="USBEnable,SDMMCEnable,RNGEnable"/>
     <!--SDMMC mux-->
     <Label id="SDMMCMUXLabel"    type="muxLabel"    text="SDMMC Clock Mux"  posX="745" posY="650" refEnable="SDMMCEnable"/>
     <Label id="SDMMCOutput"      type="SpecialInfo" text="To SDMMC (MHz)"   posX="993" posY="703" refEnable="SDMMCEnable"/> 	

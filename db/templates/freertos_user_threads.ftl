@@ -15,23 +15,38 @@
           [#if index == 3]
             [#assign threadFunction = i]
           [/#if]
+          [#if index == 4]
+            [#assign generateFunction = i]
+          [/#if] 
+          [#if index == 5]
+            [#assign option = i]
+          [/#if]
           [#assign index = index + 1]
         [/#list]
         [#assign nbThreads = nbThreads + 1]
         [#if nbThreads == 1]
         [#else]
-        /* ${threadFunction} function */
-        void ${threadFunction}(void const * argument) 
-        {
-        #t/* USER CODE BEGIN ${threadFunction} */
-        #t/* Infinite loop */
-        #tfor(;;)
-        #t{
-        #t#tosDelay(1);
-        #t}        
-        #t/* USER CODE END ${threadFunction} */
-        }
-        #n
+         [#if generateFunction == "1"]
+          [#if option == "As external"]
+          [#else]
+           /* ${threadFunction} function */ 
+           [#if option == "As weak"]
+           __weak void ${threadFunction}(void const * argument) 
+           [#else]
+           void ${threadFunction}(void const * argument) 
+           [/#if]
+           {
+           #t/* USER CODE BEGIN ${threadFunction} */
+           #t/* Infinite loop */
+           #tfor(;;)
+           #t{
+           #t#tosDelay(1);
+           #t}        
+           #t/* USER CODE END ${threadFunction} */
+           }
+           #n
+          [/#if]
+         [/#if]
         [/#if]
       [/#if]
       
@@ -45,23 +60,31 @@
           [#if index == 3]
             [#assign generateCallback = i]
           [/#if] 
+          [#if index == 4]
+            [#assign option = i]
+          [/#if]
           [#assign index = index + 1]
         [/#list]
         [#assign nbCallbacks = nbCallbacks + 1]
         [#if generateCallback == "1"]
-        /* ${timerCallback} function */
-        void ${timerCallback}(void const * argument) 
-        {
-        #t/* USER CODE BEGIN ${timerCallback} */
-        #t        
-        #t/* USER CODE END ${timerCallback} */
-        }
-        #n
+         [#if option == "As external"]
+         [#else]
+         /* ${timerCallback} function */
+         [#if option == "As weak"]
+         __weak void ${timerCallback}(void const * argument) 
+         [#else]
+         void ${timerCallback}(void const * argument) 
+         [/#if]
+         {
+         #t/* USER CODE BEGIN ${timerCallback} */
+         #t        
+         #t/* USER CODE END ${timerCallback} */
+         }
+         #n
+         [/#if]
         [/#if]
       [/#if]   
-      
 	[/#list]
-	
   [/#if]
 [/#list]
 [/#compress]

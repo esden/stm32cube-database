@@ -7,7 +7,7 @@
     Version="STM32Cube_FW_F1_V1.1.0"
     RootFolder="Middlewares/Third_Party/LwIP/"
     IncludeFile="lwip/opt.h,lwip/mem.h,lwip/memp.h,netif/etharp.h,lwip/dhcp.h,lwip/netif.h,lwip/lwip_timers.h,ethernetif.h"
-    CodeTemplate="lwip_c.ftl;lwip_h.ftl">
+    CodeTemplate="lwip_c_f1.ftl;lwip_h.ftl">
 
     <RefConfig Name="LWIP_Init">
         <CallLibMethod Name="MX_LWIP_Init"/>
@@ -23,19 +23,21 @@
         <Argument Name="LWIP_DHCP" GenericType="simple" Context="global"/>
         <Argument Name="NO_SYS" GenericType="simple" Context="global"/>
         <Argument Name="LWIP_NETIF_LINK_CALLBACK" GenericType="simple" Context="global"/>
+        <Argument Name="NO_SYS_NO_TIMERS" GenericType="simple" Context="global"/>
         <Argument AddressOf="true" GenericType="simple" Name="gnetif" TypeName="netif" Context="global"/>
-        <Argument AddressOf="true" GenericType="simple" Name="ipaddr" TypeName="ip_addr" Context="global"/>
-        <Argument AddressOf="true" GenericType="simple" Name="netmask" TypeName="ip_addr" Context="global"/>
-        <Argument AddressOf="true" GenericType="simple" Name="gw" TypeName="ip_addr" Context="global"/>
+        <Argument AddressOf="true" GenericType="simple" Name="ipaddr" TypeName="ip_addr_t" Context="global"/>
+        <Argument AddressOf="true" GenericType="simple" Name="netmask" TypeName="ip_addr_t" Context="global"/>
+        <Argument AddressOf="true" GenericType="simple" Name="gw" TypeName="ip_addr_t" Context="global"/>
         <Argument AddressOf="true" GenericType="Array" Name="IP_ADDRESS" TypeName="uint8_t" Context="global" ArraySize="4"/>
         <Argument AddressOf="true" GenericType="Array" Name="NETMASK_ADDRESS" TypeName="uint8_t" Context="global" ArraySize="4"/>
         <Argument AddressOf="true" GenericType="Array" Name="GATEWAY_ADDRESS" TypeName="uint8_t" Context="global" ArraySize="4"/>
     </LibMethod>
 
-    <RefComponent Cclass="Middleware" Cgroup="LWIP" Cversion="1.4.1">
-        <File Name="system/*" Category="header"/>
-        <File Name="system/arch/*.h" Category="header"/>
-        <File Name="system/OS/*.c" Category="source" Condition="FreeRTOS"/>
+    <RefComponent Cclass="Middleware" Cgroup="LWIP" Cversion="v1.4.1">
+        <File Name="src/api/*.c" Category="source"/>
+        <File Name="src/core/*.c" Category="source"/>
+        <File Name="src/core/ipv4/*.c" Category="source"/>
+        <File Name="src/core/snmp/*.c" Category="source"/>
         <File Name="src/include/*" Category="header"/>
         <File Name="src/include/ipv4/*" Category="header"/>
         <File Name="src/include/ipv4/lwip/*.h" Category="header"/>
@@ -47,20 +49,20 @@
         <File Name="src/netif/ppp/*.c" Category="source"/>
         <File Name="src/netif/etharp.c" Category="source"/>
         <File Name="src/netif/slipif.c" Category="source"/>
-        <File Name="src/api/*.c" Category="source"/>
-        <File Name="src/core/*.c" Category="source"/>
-        <File Name="src/core/snmp/*.c" Category="source"/>
-        <File Name="src/core/ipv4/*.c" Category="source"/>
+        <File Name="system/*" Category="header"/>
+        <File Name="system/arch/*.h" Category="header"/>
+        <File Name="system/OS/*.c" Category="source" Condition="FreeRTOS"/>
         </RefComponent>
 
     <RefConfigFile Name="LwIP_Config" Description="Modification of LwIP stack default configuration done in opt.h file" Template="lwip_conf_f1.ftl">
-        <File Name="lwipopts.h" Category="header" Version="1.4.1" Condition="all"/>
+        <File Name="lwipopts.h" Category="header" Version="v1.4.1" Condition="all"/>
         <Argument Name="LwIP Version" GenericType="simple"/>
         <Argument Name="LWIP_DHCP" GenericType="simple"/>
         <Argument Name="IP_ADDRESS" GenericType="simple"/>
         <Argument Name="NETMASK_ADDRESS" GenericType="simple"/>
         <Argument Name="GATEWAY_ADDRESS" GenericType="simple"/>
         <Argument Name="WITH_RTOS" GenericType="simple"/>
+        <Argument Name="PHY" GenericType="simple"/>
         <Argument Name="SYS_LIGHTWEIGHT_PROT" GenericType="simple"/>
         <Argument Name="NO_SYS" GenericType="simple"/>
         <Argument Name="NO_SYS_NO_TIMERS" GenericType="simple"/>
@@ -142,6 +144,7 @@
         <Argument Name="SNMP_MAX_OCTET_STRING_LEN" GenericType="simple"/>
         <Argument Name="SNMP_MAX_TREE_DEPTH" GenericType="simple"/>
         <Argument Name="SNMP_MAX_VALUE_SIZE" GenericType="simple"/>
+        <Argument Name="MD5_SUPPORT" GenericType="simple"/>
         <Argument Name="LWIP_IGMP" GenericType="simple"/>
         <Argument Name="LWIP_DNS" GenericType="simple"/>
         <Argument Name="DNS_TABLE_SIZE" GenericType="simple"/>
@@ -225,19 +228,6 @@
         <Argument Name="RECV_BUFSIZE_DEFAULT" GenericType="simple"/>
         <Argument Name="SO_REUSE" GenericType="simple"/>
         <Argument Name="SO_REUSE_RXTOALL" GenericType="simple"/>
-        <Argument Name="LWIP_STATS" GenericType="simple"/>
-        <Argument Name="LWIP_STATS_DISPLAY" GenericType="simple"/>
-        <Argument Name="LINK_STATS" GenericType="simple"/>
-        <Argument Name="ETHARP_STATS" GenericType="simple"/>
-        <Argument Name="IP_STATS" GenericType="simple"/>
-        <Argument Name="IPFRAG_STATS" GenericType="simple"/>
-        <Argument Name="ICMP_STATS" GenericType="simple"/>
-        <Argument Name="IGMP_STATS" GenericType="simple"/>
-        <Argument Name="UDP_STATS" GenericType="simple"/>
-        <Argument Name="TCP_STATS" GenericType="simple"/>
-        <Argument Name="MEM_STATS" GenericType="simple"/>
-        <Argument Name="MEMP_STATS" GenericType="simple"/>
-        <Argument Name="SYS_STATS" GenericType="simple"/>
         <Argument Name="PPP_SUPPORT" GenericType="simple"/>
         <Argument Name="PPPOE_SUPPORT" GenericType="simple"/>
         <Argument Name="PPPOS_SUPPORT" GenericType="simple"/>
@@ -245,10 +235,9 @@
         <Argument Name="PAP_SUPPORT" GenericType="simple"/>
         <Argument Name="CHAP_SUPPORT" GenericType="simple"/>
         <Argument Name="MSCHAP_SUPPORT" GenericType="simple"/>
-        <Argument Name="CBCP_SUPPORT" GenericType="simple"/>
         <Argument Name="CCP_SUPPORT" GenericType="simple"/>
+        <Argument Name="CBCP_SUPPORT" GenericType="simple"/>
         <Argument Name="VJ_SUPPORT" GenericType="simple"/>
-        <Argument Name="MD5_SUPPORT" GenericType="simple"/>
         <Argument Name="FSM_DEFTIMEOUT" GenericType="simple"/>
         <Argument Name="FSM_DEFMAXTERMREQS" GenericType="simple"/>
         <Argument Name="FSM_DEFMAXCONFREQS" GenericType="simple"/>
@@ -269,6 +258,23 @@
         <Argument Name="PPP_MINMRU" GenericType="simple"/>
         <Argument Name="MAXNAMELEN" GenericType="simple"/>
         <Argument Name="MAXSECRETLEN" GenericType="simple"/>
+        <Argument Name="LWIP_DISABLE_TCP_SANITY_CHECKS" GenericType="simple"/>
+        <Argument Name="LWIP_DISABLE_MEMP_SANITY_CHECKS" GenericType="simple"/>
+        <Argument Name="LWIP_PERF" GenericType="simple"/>
+        <Argument Name="LWIP_STATS" GenericType="simple"/>
+        <Argument Name="LWIP_STATS_DISPLAY" GenericType="simple"/>
+        <Argument Name="LINK_STATS" GenericType="simple"/>
+        <Argument Name="ETHARP_STATS" GenericType="simple"/>
+        <Argument Name="IP_STATS" GenericType="simple"/>
+        <Argument Name="IPFRAG_STATS" GenericType="simple"/>
+        <Argument Name="ICMP_STATS" GenericType="simple"/>
+        <Argument Name="IGMP_STATS" GenericType="simple"/>
+        <Argument Name="UDP_STATS" GenericType="simple"/>
+        <Argument Name="TCP_STATS" GenericType="simple"/>
+        <Argument Name="MEM_STATS" GenericType="simple"/>
+        <Argument Name="MEMP_STATS" GenericType="simple"/>
+        <Argument Name="MEMP_STATS" GenericType="simple"/>
+        <Argument Name="SYS_STATS" GenericType="simple"/>
         <Argument Name="CHECKSUM_BY_HARDWARE" GenericType="simple"/>
         <Argument Name="CHECKSUM_GEN_IP" GenericType="simple"/>
         <Argument Name="CHECKSUM_GEN_UDP" GenericType="simple"/>
@@ -320,23 +326,25 @@
         </RefConfigFile>
 
     <RefConfigFile Name="NETIF_Config" Description="Ethernet Interface configuration (Source)" Template="ethernetif_f1.ftl">
-        <File Name="ethernetif.c" Category="header" Version="1.4.1" Condition="all"/>
+        <File Name="ethernetif.c" Category="header" Version="v1.4.1" Condition="all"/>
         <Argument Name="heth" GenericType="struct" AddressOf="true"  TypeName="ETH_HandleTypeDef" Context="global"/>
         <Argument Name="WITH_RTOS" GenericType="simple"/>
         <Argument Name="NO_SYS" GenericType="simple"/>
         <Argument Name="LWIP_NETIF_LINK_CALLBACK" GenericType="simple"/>
-    <Argument Name="LWIP_ARP" GenericType="simple"/>
+        <Argument Name="LWIP_ARP" GenericType="simple"/>
+        <Argument Name="PHY" GenericType="simple"/>
     </RefConfigFile>
     <RefConfigFile Name="Pools_Config" Description="Custom Memory Pools configuration" Template="lwippools.ftl">
-        <File Name="lwippools.h" Category="header" Version="1.4.1" Condition="all"/>
+        <File Name="lwippools.h" Category="header" Version="v1.4.1" Condition="all"/>
         <Argument Name="MEMP_USE_CUSTOM_POOLS" GenericType="simple"/>
     </RefConfigFile>
     <RefConfigFile Name="PrivateMib_Config" Description="SNMP Private MIB configuration" Template="lwipprivatemibs.ftl">
-        <File Name="private_mib.h" Category="header" Version="1.4.1" Condition="all"/>
+        <File Name="private_mib.h" Category="header" Version="v1.4.1" Condition="all"/>
         <Argument Name="SNMP_PRIVATE_MIB" GenericType="simple"/>
     </RefConfigFile>
     <RefConfigFile Name="NETIF_Config_Header" Description="Ethernet Interface configuration (Header)" Template="ethernetif_header.ftl">
-        <File Name="ethernetif.h" Category="header" Version="1.4.1" Condition="all"/>
+        <File Name="ethernetif.h" Category="header" Version="v1.4.1" Condition="all"/>
         <Argument Name="NO_SYS" GenericType="simple"/>
+        <Argument Name="LWIP_NETIF_LINK_CALLBACK" GenericType="simple"/>
         </RefConfigFile>
 </IP>

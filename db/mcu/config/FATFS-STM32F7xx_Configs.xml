@@ -10,7 +10,6 @@
         <Component Name="Middleware:FATFS:SDIO"/>
         <Component Name="Middleware:FATFS:CODE_PAGE:$VIRTUAL_CODE_PAGE"/>
         <ConfigFile Name="FF_CONF"/>  
-        <!--  <ConfigFile Name="FF_HANDLES"/> -->
         <ConfigFile Name="BSP_SD_C"/> 
         <ConfigFile Name="BSP_SD_H"/> 
         <ConfigFile Name="FATFS_INIT"/>
@@ -21,7 +20,6 @@
         <Component Name="Middleware:FATFS:USBH"/>
         <Component Name="Middleware:FATFS:CODE_PAGE:$VIRTUAL_CODE_PAGE"/>
         <ConfigFile Name="FF_CONF"/>
-        <!--  <ConfigFile Name="FF_HANDLES"/> --> 
         <ConfigFile Name="FATFS_INIT"/>
         <ConfigFile Name="FATFS_HEADER"/>
     </RefConfig>
@@ -30,7 +28,6 @@
         <Component Name="Middleware:FATFS:NAND"/>
         <Component Name="Middleware:FATFS:CODE_PAGE:$VIRTUAL_CODE_PAGE"/>
         <ConfigFile Name="FF_CONF"/>
-        <!--  <ConfigFile Name="FF_HANDLES"/> -->
         <ConfigFile Name="FATFS_INIT"/>
         <ConfigFile Name="FATFS_HEADER"/>
     </RefConfig>
@@ -39,7 +36,6 @@
         <Component Name="Middleware:FATFS:SDRAM"/>
         <Component Name="Middleware:FATFS:CODE_PAGE:$VIRTUAL_CODE_PAGE"/>
         <ConfigFile Name="FF_CONF"/>
-        <!--  <ConfigFile Name="FF_HANDLES"/> -->
         <ConfigFile Name="F7XX_SDRAM_C"/> 
         <ConfigFile Name="F7XX_SDRAM_H"/> 
         <ConfigFile Name="FATFS_INIT"/>
@@ -50,7 +46,6 @@
         <Component Name="Middleware:FATFS:SRAM"/>
         <Component Name="Middleware:FATFS:CODE_PAGE:$VIRTUAL_CODE_PAGE"/>
         <ConfigFile Name="FF_CONF"/>
-        <!--  <ConfigFile Name="FF_HANDLES"/> -->
         <ConfigFile Name="F7XX_SRAM_C"/> 
         <ConfigFile Name="F7XX_SRAM_H"/> 
         <ConfigFile Name="FATFS_INIT"/> 
@@ -110,14 +105,6 @@
         </SubComponent> -->
     </RefComponent>
            
-    <RefConfigFile Name="FF_HANDLES" Description="Header file for handles" Template="fatfs_handles.ftl">      
-        <File Name="fatfs_handles.h" Category="header" Version="R0.11" Condition="all"/>
-        <!-- <Argument Name="_HNAND" GenericType="simple" Comment=""/> -->
-        <Argument Name="_HSDRAM" GenericType="simple" Comment=""/>
-        <Argument Name="_HSRAM" GenericType="simple" Comment=""/>
-        <!--  <Argument Name="_HSD" GenericType="simple" Comment=""/>   -->
-        <Argument Name="_HUSBH" GenericType="simple" Comment=""/>
-    </RefConfigFile> 
     
     <!-- use specific template file "fatfs_conf.ftl" to generate header file containing #define -->
    
@@ -169,13 +156,16 @@
        
     <!-- Generate a driver file for SD that uses the right IP handle -->
     <RefConfigFile Name="BSP_SD_C" Description="C driver file for SD" Template="fatfs_bsp_sd_c_F7.ftl">       
-        <File Name="bsp_driver_sd.c" Category="source" Version="R0.11" Condition="all"/>                      
-        <Argument Name="SD_MODE" GenericType="simple" Comment="SD mode value"/>                     
+        <File Name="bsp_driver_sd.c" Category="source" Version="R0.11" Condition="all"/>   
+        <Argument Name="_HSD" GenericType="simple" Comment=""/>                    
+        <Argument Name="SDMMC1_MODE" GenericType="simple" Comment="SD mode value"/>      
+        <Argument Name="SDMMC2_MODE" GenericType="simple" Comment="SD mode value"/>                
     </RefConfigFile>
     
     <!-- Generate a driver file for SD that uses the right IP handle -->
     <RefConfigFile Name="BSP_SD_H" Description="H driver file for SD" Template="fatfs_f7xxsd_h.ftl">       
-        <File Name="bsp_driver_sd.h" Category="header" Version="R0.11" Condition="all"/>                 
+        <File Name="bsp_driver_sd.h" Category="header" Version="R0.11" Condition="all"/>  
+        <Argument Name="_HSD" GenericType="simple" Comment=""/>                 
     </RefConfigFile>
     
     <!-- Generate a driver file for SDRAM that uses the right IP handle -->
@@ -195,14 +185,14 @@
         <File Name="bsp_driver_sram.c" Category="source" Version="R0.11" Condition="all"/>                      
     </RefConfigFile>
     
-    <!-- Generate a driver file for SD that uses the right IP handle -->
+    <!-- Generate a driver file for SRAM that uses the right IP handle -->
     <RefConfigFile Name="F7XX_SRAM_H" Description="H driver file for SRAM" Template="fatfs_f7xxsram_h.ftl">       
         <File Name="bsp_driver_sram.h" Category="header" Version="R0.11" Condition="all"/>                  
         <Argument Name="_HSRAM" GenericType="simple" Comment=""/>           
     </RefConfigFile>
     
         <!-- Generate a generic diskio C driver file  -->
-    <RefConfigFile Name="USER_DISKIO_C" Description="GENERIC C diskio driver file" Template="generic_diskio_c.ftl">       
+    <RefConfigFile Name="USER_DISKIO_C" Description="GENERIC C diskio driver file" Template="fatfs_generic_diskio_c.ftl">       
         <File Name="user_diskio.c" Category="source" Version="R0.11" Condition="all"/>    
         <Argument Name="NEW_DISKIO_API" GenericType="simple" Comment=""/>                    
     </RefConfigFile>
@@ -217,6 +207,7 @@
     <RefConfigFile Name="FATFS_INIT" Description="FATFS Init code file" Template="fatfs_init.ftl">       
         <File Name="fatfs.c" Category="source" Version="R0.11" Condition="all"/>        
         <Argument Name="_FS_NORTC" GenericType="simple" Comment="0 or 1"/>                           <!-- New in R0.11 -->                  
+        <Argument Name="_MULTI_PARTITION" GenericType="simple" Comment="0 or 1"/>
     </RefConfigFile>
     
     <!-- Generate header for the init code file (fatfs.h) -->
@@ -224,8 +215,9 @@
         <File Name="fatfs.h" Category="source" Version="R0.11" Condition="all"/>                    
     </RefConfigFile>
     
-   <RefBspComponent Name="Detect_SDIO" BspIpName="GPIO" BspModeName="Input">       
-        <File Name="fatfs_f7xxsd_h.ftl;bsp_driver_sd.h" Category="template"/>
-        <File Name="fatfs_bsp_sd_c_F7.ftl;bsp_driver_sd.c" Category="template"/>
+    <!-- Code for BSP (SDMMC mode) -->
+    <RefBspComponent Name="Detect_SDIO" BspIpName="GPIO" BspModeName="Input">       
+        <File Name="fatfs_platform_h.ftl;fatfs_platform.h" Category="template"/>
+        <File Name="fatfs_platform_c.ftl;fatfs_platform.c" Category="template"/>
     </RefBspComponent>
 </IP>

@@ -135,9 +135,9 @@
 [#if writeConfigComments]
 [#if configModel.comments??] [#if nTab==3 ]#t[/#if]#t#t/**${configModel.comments?replace("#t","#t#t")} #n#t#t*/[/#if]
 [/#if]
-	[#list methodList as method][#assign args = ""]	      
-		[#if method.status=="OK"]
-             	[#if method.arguments??]
+  [#list methodList as method][#assign args = ""]       
+    [#if method.status=="OK"]
+              [#if method.arguments??]
                     [#list method.arguments as fargument][#compress]
                     [#if fargument.addressOf] [#assign adr = "&"][#else ][#assign adr = ""][/#if][/#compress] 
                     [#if fargument.genericType == "struct"]
@@ -159,7 +159,7 @@
                         [#-- [#assign arg = "" + adr + fargument.name] --]
                         [#if (!method.name?contains("Init")&&fargument.context=="global")]
                         [#else]
-                        [#list fargument.argument as argument]	
+                        [#list fargument.argument as argument]  
                             [#if argument.genericType != "struct"]
                                 [#if argument.mandatory]
                                 [#if argument.value??]
@@ -275,17 +275,36 @@
                     [/#if]
                     [#if args == "" && arg!=""][#assign args = args + arg ][#else][#if arg!=""][#assign args = args + ', ' + arg][/#if][/#if]
                     [/#list]
-                    [#if nTab==3 ]#t[/#if][#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n
-		[#else]
-                    [#if nTab==3 ]#t[/#if][#if nTab==2]#t#t[#else]#t[/#if]${method.name}();#n
-                [/#if]			
-		[/#if]
-		[#if method.status=="KO"]
-		#n [#if nTab==2]#t#t[#else]#t[/#if]//!!! ${method.name} is commented because some parameters are missing
-			[#if method.arguments??]			
-				[#list method.arguments as fargument]
-					[#if fargument.addressOf] [#assign adr = "&"][#else ] [#assign adr = ""][/#if]
-					[#if fargument.genericType == "struct"][#assign arg = "" + adr + fargument.name]
+                    [#--[#if nTab==3 ]#t[/#if][#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n--]
+                            [#if method.returnHAL=="false"]
+                                [#if nTab==3 ]#t[/#if][#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});
+                            [#else]
+                                [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
+                                [#if nTab==3 ]#t[/#if][#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}(${args}) != [#if method.returnHAL == "true"]HAL_OK[#else]${method.returnHAL}[/#if])
+                                [#if nTab==3 ]#t[/#if][#if nTab==2]#t#t[#else]#t[/#if]{
+                                [#if nTab==3 ]#t[/#if][#if nTab==2]#t#t[#else]#t[/#if]#t_Error_Handler(__FILE__, __LINE__);
+                                [#if nTab==3 ]#t[/#if][#if nTab==2]#t#t[#else]#t[/#if]}
+                            [/#if]#n                                    
+    [#else]
+                    [#--[#if nTab==3 ]#t[/#if][#if nTab==2]#t#t[#else]#t[/#if]${method.name}();#n--]
+                            [#if method.returnHAL=="false"]
+                                [#if nTab==3 ]#t[/#if][#if nTab==2]#t#t[#else]#t[/#if]${method.name}();
+                            [#else]
+                                [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
+                                [#if nTab==3 ]#t[/#if][#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}() != [#if method.returnHAL == "true"]HAL_OK[#else]${method.returnHAL}[/#if])
+                                [#if nTab==3 ]#t[/#if][#if nTab==2]#t#t[#else]#t[/#if]{
+                                [#if nTab==3 ]#t[/#if][#if nTab==2]#t#t[#else]#t[/#if]#t_Error_Handler(__FILE__, __LINE__);
+                                [#if nTab==3 ]#t[/#if][#if nTab==2]#t#t[#else]#t[/#if]}
+                            [/#if]#n
+
+                [/#if]      
+    [/#if]
+    [#if method.status=="KO"]
+    #n [#if nTab==2]#t#t[#else]#t[/#if]//!!! ${method.name} is commented because some parameters are missing
+      [#if method.arguments??]      
+        [#list method.arguments as fargument]
+          [#if fargument.addressOf] [#assign adr = "&"][#else ] [#assign adr = ""][/#if]
+          [#if fargument.genericType == "struct"][#assign arg = "" + adr + fargument.name]
                                         [#if fargument.context??]                   
                                             [#if fargument.context=="global"]
                                                 [#if configModel.ipName=="DMA"]
@@ -302,7 +321,7 @@
                         [#if instanceIndex??&&fargument.context=="global"][#assign arg = "" + adr + fargument.name + instanceIndex][#else][#assign arg = "" + adr + fargument.name][/#if]
                         [#if (!method.name?contains("Init")&&fargument.context=="global")]
                         [#else]
-                        [#list fargument.argument as argument]	
+                        [#list fargument.argument as argument]  
                                 [#if argument.genericType != "struct"]
                                 [#if argument.mandatory && argument.value??]
                                     [#if instanceIndex??&&fargument.context=="global"][#assign argValue=argument.value?replace("$Index",instanceIndex)][#else][#assign argValue=argument.value][/#if]
@@ -331,13 +350,22 @@
                                                 [#assign arg = "" + adr + fargument.value]                                                
                                             [/#if]
                                         [/#if]
-					[#if args == ""][#assign args = args + arg ]
-					[#else][#assign args = args + ', ' + arg]
+          [#if args == ""][#assign args = args + arg ]
+          [#else][#assign args = args + ', ' + arg]
                                         [/#if]
                                 [/#list]
                                 [#if nTab==2]#t#t[#else]#t[/#if]#t//${method.name}(${args});
                         [#else] [#-- if method without argument --]
-                               [#if nTab==2]#t#t[#else]#t[/#if]${method.name}()#n;
+                               [#--[#if nTab==2]#t#t[#else]#t[/#if]${method.name}()#n;--]
+                            [#if method.returnHAL=="false"]
+                                [#if nTab==3 ]#t[/#if][#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});
+                            [#else]
+                                [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
+                                [#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}(${args}) != [#if method.returnHAL == "true"]HAL_OK[#else]${method.returnHAL}[/#if])
+                                [#if nTab==2]#t#t[#else]#t[/#if]{
+                                [#if nTab==2]#t#t[#else]#t[/#if]#t_Error_Handler(__FILE__, __LINE__);
+                                [#if nTab==2]#t#t[#else]#t[/#if]}
+                            [/#if]#n                                
                         [/#if]
                 [/#if]
         [/#list]
@@ -452,7 +480,7 @@
             [/#if]
             [#else]
                  #t#t/* Peripheral clock enable */
-                 #t#t__${ipName}_CLK_ENABLE(); 
+                 #t#t__HAL_RCC_${ipName}_CLK_ENABLE(); 
            [/#if]
   [/#if] [#-- not I2C --]         
     [#else]           
@@ -464,8 +492,12 @@
                [/#list]
             [/#if]
          [#else]
+            [#if ipName?contains("WWDG") && (DIE=="DIE415" || DIE=="DIE435")]
+            [#-- Orca and LittleOrca window watchdog clock disable don't work --]
+            [#else]
                  #t#t/* Peripheral clock disable */
-                 #t#t__${ipName}_CLK_DISABLE();  
+                 #t#t__HAL_RCC_${ipName}_CLK_DISABLE();  
+            [/#if]
          [/#if]
     [/#if]
     [#if gpioExist]
@@ -490,7 +522,7 @@
             [/#if]
             [#else]
                  #t#t/* Peripheral clock enable */
-                 #t#t__${ipName}_CLK_ENABLE(); 
+                 #t#t__HAL_RCC_${ipName}_CLK_ENABLE(); 
            [/#if]
 [/#if]
 [#-- if I2C clk_enable should be after GPIO Init End --]
@@ -519,75 +551,54 @@
     [/#if]
     [#if nvicExist]
         [#if initService.nvic??&&initService.nvic?size>0]
-#n#t#t/* Peripheral interrupt init*/
- [#-- WorkAround for USB low power--]
+          [#assign codeInMspInit = false]
+          [#list initService.nvic as initVector]
+            [#if initVector.codeInMspInit]
+              [#assign codeInMspInit = true]
+              [#break]
+            [/#if]
+          [/#list]
+        [/#if]
+        [#if initService.nvic??&&initService.nvic?size>0]
+           [#if codeInMspInit || ipName?contains("USB")]
+           [#-- Always generate comment for USB: it is not worth the trouble to compute when it is really needed --]
+             #n#t#t/* Peripheral interrupt init */
+           [/#if]
+           [#-- WorkAround for USB low power--]
            [#if ipName?contains("USB")]
                 [#-- WorkAround for USB low power and remap macro--]
                 [#if USB_interruptRemapMacro??]
                   #t#t${USB_interruptRemapMacro};
                 [/#if]
                 [#list initService.nvic as initVector]
-                  [#if !initVector.vector?contains("WKUP") && !initVector.vector?contains("WakeUp")]
+                  [#if !initVector.vector?contains("WKUP") && !initVector.vector?contains("WakeUp") && initVector.codeInMspInit]
                     #t#tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
                     #t#tHAL_NVIC_EnableIRQ(${initVector.vector});
                   [/#if]
                 [/#list]
                 [#assign lowPower = "no"]
                 [#list initService.nvic as initVector]
-                   [#if (instHandler=="hpcd") && (initVector.vector?contains("WKUP") || initVector.vector?contains("WakeUp") || ((initVector.vector == "USB_IRQn"||(initVector.vector == "OTG_FS_IRQn")) && USB_INTERRUPT_WAKEUP??))]
+                   [#if (instHandler=="pcdHandle") && (initVector.vector?contains("WKUP") || initVector.vector?contains("WakeUp") || ((initVector.vector == "USB_IRQn"||(initVector.vector == "OTG_FS_IRQn")) && USB_INTERRUPT_WAKEUP??))]
                       [#assign lowPower = "yes"]
                    [/#if]
                 [/#list]
                 [#if lowPower == "yes"]
-                    #t#tif(hpcd->Init.low_power_enable == 1)
+                  [#assign codeInMspInit = false]
+                  [#assign wakeupVector = false]
+                  [#list initService.nvic as initVector]
+                      [#if initVector.vector?contains("WKUP") || initVector.vector?contains("WakeUp")]
+                          [#assign wakeupVector = true]
+                          [#if initVector.codeInMspInit]
+                            [#assign codeInMspInit = true]
+                            [#break]
+                          [/#if]
+                      [/#if]
+                  [/#list]
+                  [#-- Even if init code is in MX_NVIC_Init, if there is no specific USB wake-up interrupt, some code needs to be generated here --]
+                  [#if codeInMspInit || !wakeupVector]
+                    #t#tif(pcdHandle->Init.low_power_enable == 1)
                     #t#t{
-                    [#if ipName?contains("_FS")]
-                        [#if FamilyName=="STM32L4"]
-                            #t#t#t/* Enable EXTI Line 17 for USB wakeup */
-                        [#else]
-                            #t#t#t/* Enable EXTI Line 18 for USB wakeup */                            
-                        [/#if]
-                    [#else]
-                        [#if FamilyName=="STM32L0"]
-                            #t#t#t/* Enable EXTI Line 18 for USB wakeup */
-                        [#else]
-                            #t#t#t/* Enable EXTI Line 20 for USB wakeup */                            
-                        [/#if]
-                    [/#if]
-                    [#if FamilyName=="STM32F3"||FamilyName=="STM32L1"][#-- FamilyName=="STM32F3"|| to be added on V4.5 --]
-                      #t#t#t__HAL_USB_EXTI_CLEAR_FLAG();
-                      #t#t#t__HAL_USB_EXTI_SET_RISING_EDGE_TRIGGER();
-                    [/#if]
-                    [#if FamilyName=="STM32F2"||FamilyName=="STM32F4"||FamilyName=="STM32F7"]
-                        [#if ipName?contains("_FS")]
-                            #t#t#t__HAL_USB_FS_EXTI_CLEAR_FLAG();
-                            #t#t#t__HAL_USB_FS_EXTI_SET_RISING_EGDE_TRIGGER();
-                        [/#if]
-                        [#if ipName?contains("_HS")]
-                            #t#t#t__HAL_USB_HS_EXTI_CLEAR_FLAG();
-                            #t#t#t__HAL_USB_HS_EXTI_SET_RISING_EGDE_TRIGGER();
-                        [/#if]
-                      
-                    [/#if]
-                    [#if ipName?contains("_HS")]
-                        #t#t#t__HAL_USB_HS_EXTI_ENABLE_IT();
-                    [#elseif ipName?contains("OTG_FS")&&FamilyName=="STM32F1"]
-                        #t#t#t__HAL_USB_OTG_FS_WAKEUP_EXTI_CLEAR_FLAG();
-                        #t#t#t__HAL_USB_OTG_FS_WAKEUP_EXTI_ENABLE_RISING_EDGE();
-                        #t#t#t__HAL_USB_OTG_FS_WAKEUP_EXTI_ENABLE_IT();
-                    [#elseif ipName?contains("OTG_FS")&&FamilyName=="STM32L4"]
-                        #t#t#t__HAL_USB_OTG_FS_WAKEUP_EXTI_ENABLE_IT();
-                    [#elseif ipName?contains("_FS")]
-                        #t#t#t__HAL_USB_FS_EXTI_ENABLE_IT();                        
-                    [#else]
-                        [#if FamilyName=="STM32F1"] [#-- use new macro naming for F1--]
-                            #t#t#t__HAL_USB_WAKEUP_EXTI_CLEAR_FLAG();
-                            #t#t#t__HAL_USB_WAKEUP_EXTI_ENABLE_RISING_EDGE();
-                            #t#t#t__HAL_USB_WAKEUP_EXTI_ENABLE_IT();
-                        [#else]
-                            #t#t#t__HAL_USB_EXTI_ENABLE_IT(); 
-                        [/#if]
-                    [/#if]
+                    [@common.generateUsbWakeUpInterrupt ipName=ipName tabN=3/]
                     [#list initService.nvic as initVector]
                        [#if initVector.vector?contains("WKUP") || initVector.vector?contains("WakeUp")]
                            #t#t#tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
@@ -595,11 +606,14 @@
                        [/#if]
                     [/#list]
                     #t#t}
+                  [/#if]
                 [/#if]
             [#else]
-              [#list initService.nvic as initVector]            
+              [#list initService.nvic as initVector]
+                [#if initVector.codeInMspInit]
                   #t#tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
                   #t#tHAL_NVIC_EnableIRQ(${initVector.vector});
+                [/#if]
               [/#list]
             [/#if]
         [/#if]
@@ -671,15 +685,15 @@
 [#if (instanceList?size==1 && (name==instanceList.get(0)||name=="USB")) || instanceList?size>1]
 [#assign mode=entry.key?replace("_MspInit","")?replace("MspInit","")?replace("_BspInit","")?replace("HAL_","")]
 
-[#assign ipHandler = "h" + mode?lower_case]
+[#assign ipHandler = mode?lower_case+ "Handle"]
 
 
 [#-- #nvoid HAL_${mode}_MspInit(${mode}_HandleTypeDef* h${mode?lower_case}){--] 
 [#if name !="TIM"]
-#nvoid ${entry.key}(${mode}_HandleTypeDef* h${mode?lower_case})
+#nvoid ${entry.key}(${mode}_HandleTypeDef* ${mode?lower_case}Handle)
 {
 [#else]
-#nvoid ${entry.key}(${name}_HandleTypeDef* h${mode?lower_case})
+#nvoid ${entry.key}(${name}_HandleTypeDef* ${mode?lower_case}Handle)
 {
 [/#if]
 [#--Check if the Msp init will be empty start--] 
@@ -702,8 +716,8 @@
      [#assign dmaService=services.dma]   
     [#if dmaService?? && dmaService?size!=0]
     [#list dmaService as dmaRequest]
-        [#list dmaRequest.methods as method]	
-		[#if method.status=="OK" && method.arguments??]
+        [#list dmaRequest.methods as method]  
+    [#if method.status=="OK" && method.arguments??]
                     [#list method.arguments as fargument]
                         [#if fargument.genericType == "struct" && fargument.context??]
                             [#if fargument.context=="global"]
@@ -731,14 +745,14 @@
             [#-- no matches--]
             [#else]
 #t${variable.value} ${variable.name};
-                [#assign v = v + " "+ variable.name/]	
-            [/#if]	
+                [#assign v = v + " "+ variable.name/] 
+            [/#if]  
         [/#list]  
 [/#if]
 [/#list]
 [#-- --]
 [#if mspIsEmpty=="no"]
- #tif(h${mode?lower_case}->Instance==${words[0]?replace("I2S","SPI")})
+ #tif(${mode?lower_case}Handle->Instance==${words[0]?replace("I2S","SPI")})
 #t{
 [#if words?size > 1] [#-- Check if there is more than one ip instance--]        
 #t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspInit 0 */
@@ -752,7 +766,7 @@
     [#assign i = 0]
     [#list words as inst]
     [#if i>0]    
-    #telse if(h${mode?lower_case}->Instance==${words[i]?replace("I2S","SPI")}) [#-- if I2S instance should be SPI--]
+    #telse if(${mode?lower_case}Handle->Instance==${words[i]?replace("I2S","SPI")}) [#-- if I2S instance should be SPI--]
     #t{
 #t/* USER CODE BEGIN ${words[i]?replace("I2S","SPI")}_MspInit 0 */
 
@@ -794,7 +808,7 @@
 [#assign instanceList = entry.value]
 [#assign mode=entry.key?replace("_MspInit","")?replace("MspInit","")?replace("_BspInit","")?replace("HAL_","")]
 
-[#assign ipHandler = "h" + mode?lower_case]
+[#assign ipHandler = mode?lower_case+ "Handle"]
 [#--Check if the Msp init will be empty start--] 
     [#assign mspIsEmpty1="yes"] 
     [#list instanceList as inst]
@@ -808,17 +822,17 @@
     [/#list]
 [#-- Check if the Msp init will be empty end -- ]
 [#if  mode?contains("DFSDM") && DFSDM_var == "false"]
-int DFSDM_Init = 0;
+uint32_t DFSDM_Init = 0;
 [#assign DFSDM_var = "true"]
 [/#if]
 [#-- #nvoid HAL_${mode}_MspInit(${mode}_HandleTypeDef* h${mode?lower_case}){--] 
 [#if (mspIsEmpty1=="no")&&(!mode?contains("TIM")||mode?contains("LPTIM")||mode?contains("HRTIM"))]
-#nvoid ${entry.key?replace("MspInit","MspPostInit")}(${mode}_HandleTypeDef* h${mode?lower_case})
+#nvoid ${entry.key?replace("MspInit","MspPostInit")}(${mode}_HandleTypeDef* ${mode?lower_case}Handle)
 {
 #n
 [#else]
 [#if (mspIsEmpty1=="no")]
-#nvoid ${entry.key?replace("MspInit","MspPostInit")}(TIM_HandleTypeDef* h${mode?lower_case})
+#nvoid ${entry.key?replace("MspInit","MspPostInit")}(TIM_HandleTypeDef* ${mode?lower_case}Handle)
 {
 #n
 [/#if]
@@ -837,8 +851,8 @@ int DFSDM_Init = 0;
             [#-- no matches--]
             [#else]
 #t${variable.value} ${variable.name};
-                [#assign v = v + " "+ variable.name/]	
-            [/#if]	
+                [#assign v = v + " "+ variable.name/] 
+            [/#if]  
         [/#list]  
 [/#if]
 [/#list]
@@ -847,7 +861,7 @@ int DFSDM_Init = 0;
 [#if  words[0] == "DFSDM"]
 #tif(DFSDM_Init == 0)
 [#else]
- #tif(h${mode?lower_case}->Instance==${words[0]?replace("I2S","SPI")})
+ #tif(${mode?lower_case}Handle->Instance==${words[0]?replace("I2S","SPI")})
 [/#if]
 #t{
 [#if words?size > 1] [#-- Check if there is more than one ip instance--]    
@@ -862,7 +876,7 @@ int DFSDM_Init = 0;
     [#assign i = 0]
     [#list words as inst]
     [#if i>0]    
-    #telse if(h${mode?lower_case}->Instance==${words[i]?replace("I2S","SPI")})
+    #telse if(${mode?lower_case}Handle->Instance==${words[i]?replace("I2S","SPI")})
     #t{
 #t/* USER CODE BEGIN ${words[i]?replace("I2S","SPI")}_MspInit 0 */
 
@@ -905,12 +919,12 @@ int DFSDM_Init = 0;
 [#assign instanceList = entry.value]
 [#if (instanceList?size==1 && (name==instanceList.get(0)||name=="USB"))  || instanceList?size>1]
 [#assign mode=entry.key?replace("_MspDeInit","")?replace("MspDeInit","")?replace("_BspDeInit","")?replace("HAL_","")]
-[#assign ipHandler = "h" + mode?lower_case]
+[#assign ipHandler = mode?lower_case+ "Handle"]
 [#if name !="TIM"]
-#nvoid ${entry.key}(${mode}_HandleTypeDef* h${mode?lower_case})
+#nvoid ${entry.key}(${mode}_HandleTypeDef* ${mode?lower_case}Handle)
 {
 [#else]
-#nvoid ${entry.key}(${name}_HandleTypeDef* h${mode?lower_case})
+#nvoid ${entry.key}(${name}_HandleTypeDef* ${mode?lower_case}Handle)
 {
 [/#if]
 [#-- Search for static variables Start--]
@@ -918,7 +932,7 @@ int DFSDM_Init = 0;
 [#-- Search for static variables End--]
 [#assign words = instanceList]
 [#if mspIsEmpty=="no"]
-#tif(h${mode?lower_case}->Instance==${words[0]?replace("I2S","SPI")})
+#tif(${mode?lower_case}Handle->Instance==${words[0]?replace("I2S","SPI")})
 #t{
 [#if words?size > 1] [#-- Check if there is more than one ip instance--]
  [#assign deInitService = getDeInitServiceMode(words[0])]    
@@ -933,7 +947,7 @@ int DFSDM_Init = 0;
   [#assign i = 0]
     [#list words as inst]
         [#if i>0]
-#telse if(h${mode?lower_case}->Instance==${words[i]?replace("I2S","SPI")})
+#telse if(${mode?lower_case}Handle->Instance==${words[i]?replace("I2S","SPI")})
 #t{
 #t/* USER CODE BEGIN ${words[i]?replace("I2S","SPI")}_MspDeInit 0 */
 

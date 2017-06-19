@@ -1,0 +1,1820 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<IP DBVersion="V3.0" IPType="peripheral" Name="DFSDM" Version="dfsdm1_v1_0_4ch_Cube" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd" xmlns="http://mcd.rou.st.com/modules.php?name=mcu">
+
+
+	<!-- Description of IP. -->
+	<About>Digital Filter for delta-Sigma Modulators</About>
+
+<!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% OUTPUT CLOCK %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%-->
+    <RefParameter Comment="output Clock" DefaultValue="DISABLE"  Name="Activation_Ref" Type="list" TabName="Output Clock" Visible="false">
+        <Condition Diagnostic="" Expression="!(Semaphore_CKOUT_Mode_$IpInstance|Semaphore_Internal_Clock_$IpInstance)"/>
+        <Description>Output clock enable/disable </Description>
+        <PossibleValue Comment="Disable" Value="DISABLE" Semaphore="Semaphore_CKOUT_Disable_$IpInstance"/>
+        <PossibleValue Comment="Enable"  Value="ENABLE"/>
+    </RefParameter>
+    <RefParameter Comment="output Clock" DefaultValue="ENABLE"  Name="Activation_Ref" Type="list" TabName="Output Clock" Visible="false">
+        <Condition Diagnostic="" Expression="(Semaphore_CKOUT_Mode_$IpInstance|Semaphore_Internal_Clock_$IpInstance)"/>
+        <Description>Output clock enable </Description>
+        <PossibleValue Comment="Enable"  Value="ENABLE"/>
+    </RefParameter>
+    <RefParameter Comment="Activation" DefaultValue="0" Max="0" Min="0" Name="Activation" Type="integer">
+        <Description>Output clock disable </Description>
+        <Condition Diagnostic="" Expression="Semaphore_CKOUT_Disable_$IpInstance"/>
+    </RefParameter>
+    <RefParameter Comment="Activation" DefaultValue="1" Max="1" Min="1" Name="Activation" Type="integer">
+        <Description>Output clock enable </Description>
+        <Condition Diagnostic="" Expression="!Semaphore_CKOUT_Disable_$IpInstance"/>
+    </RefParameter>
+    <RefParameter Comment="Selection" DefaultValue="DFSDM_CHANNEL_OUTPUT_CLOCK_SYSTEM" Name="Selection" Type="list" TabName="Output Clock"  Group="Output Clock parameters">
+        <Condition Diagnostic="" Expression="(Semaphore_CKOUT_Mode_$IpInstance|Semaphore_Internal_Clock_$IpInstance)"/>
+        <Description>Output clock is system clock or audio clock.</Description>
+        <PossibleValue Comment="Source for ouput clock is system clock " Value="DFSDM_CHANNEL_OUTPUT_CLOCK_SYSTEM"/>
+        <PossibleValue Comment="Source for ouput clock is audio clock " Value="DFSDM_CHANNEL_OUTPUT_CLOCK_AUDIO" Semaphore="SEM2RCC_SAI1_CK_REQUIRED_$IpInstance"/>
+    </RefParameter>
+    <RefParameter Comment="Selection" DefaultValue="DFSDM_CHANNEL_OUTPUT_CLOCK_SYSTEM" Name="Selection" Type="list" TabName="Output Clock" Visible="false">
+        <Condition Diagnostic="" Expression="!(Semaphore_CKOUT_Mode_$IpInstance|Semaphore_Internal_Clock_$IpInstance)"/>
+        <Description>Output clock is system clock or audio clock.</Description>
+        <PossibleValue Comment="Source for ouput clock is system clock " Value="DFSDM_CHANNEL_OUTPUT_CLOCK_SYSTEM"/>
+    </RefParameter>
+    <RefParameter Comment="Divider" DefaultValue="2" Max="256" Min="2" Name="Divider" Type="integer" TabName="Output Clock" Group="Output Clock parameters">
+        <Condition Diagnostic="" Expression="(Semaphore_CKOUT_Mode_$IpInstance|Semaphore_Internal_Clock_$IpInstance)"/>
+        <Description>Output clock divider.</Description>
+    </RefParameter>
+    <RefParameter Comment="Divider" DefaultValue="2" Max="256" Min="2" Name="Divider" Type="integer" TabName="Output Clock" Visible="false">
+        <Condition Diagnostic="" Expression="!(Semaphore_CKOUT_Mode_$IpInstance|Semaphore_Internal_Clock_$IpInstance)"/>
+        <Description>Output clock divider.</Description>
+    </RefParameter>
+
+
+<!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Channel 0 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%-->
+    <RefParameter Comment="Multiplexer" DefaultValue="DFSDM_CHANNEL_EXTERNAL_INPUTS" Name="Multiplexer_CH0" Type="list" TabName="Channel 0">
+        <Description>Input is external serial inputs or internal register.</Description>
+        <PossibleValue Comment="Data are taken from external inputs " Value="DFSDM_CHANNEL_EXTERNAL_INPUTS"/>
+        <PossibleValue Comment="Data are taken from internal register " Value="DFSDM_CHANNEL_INTERNAL_REGISTER"/>
+    </RefParameter>
+    <RefParameter Comment="Multiplexer_External_CH0" DefaultValue="DFSDM_CHANNEL_EXTERNAL_INPUTS" Name="Multiplexer_external_CH0" Type="list" TabName="Channel 0" Visible="false">
+        <Description>Input is external serial inputs</Description>
+        <PossibleValue Comment="Data are taken from external inputs " Value="DFSDM_CHANNEL_EXTERNAL_INPUTS"/>
+    </RefParameter>
+    <RefParameter Comment="Multiplexer_Internal_CH0" DefaultValue="DFSDM_CHANNEL_INTERNAL_REGISTER" Name="Multiplexer_internal_CH0" Type="list" TabName="Channel 0" Visible="false">
+        <Description>Input is internal register</Description>
+        <PossibleValue Comment="Data are taken from internal register " Value="DFSDM_CHANNEL_INTERNAL_REGISTER"/>
+    </RefParameter>
+    <RefParameter Comment="Data Packing" DefaultValue="DFSDM_CHANNEL_STANDARD_MODE" Name="DataPacking_CH0" Type="list" TabName="Channel 0" Group="Channel 0 parameters">
+        <Description>Standard, interleaved or dual mode for internal register.</Description>
+        <Condition Diagnostic="" Expression="Semaphore_Parallel_Input_CH0_$IpInstance"/>
+        <PossibleValue Comment="Standard data packing mode " Value="DFSDM_CHANNEL_STANDARD_MODE" Semaphore="Semaphore_Packing_Standard_Mode_CH0_$IpInstance" />
+<!-- Dual mode is only for even channels 0 2 4 6-->
+        <PossibleValue Comment="Interleaved data packing mode " Value="DFSDM_CHANNEL_INTERLEAVED_MODE"/>
+        <PossibleValue Comment="Dual data packing mode " Value="DFSDM_CHANNEL_DUAL_MODE" Semaphore="Semaphore_Packing_Dual_Mode_CH0_$IpInstance" Condition="!(Semaphore_Packing_Standard_Mode_CH1_$IpInstance &amp; Semaphore_Parallel_Input_CH1_$IpInstance)" Diagnostic="Channel 1 must be in packing mode Standard" Action="Disable"/>
+    </RefParameter>
+    <RefParameter Comment="Data Packing" DefaultValue="DFSDM_CHANNEL_STANDARD_MODE" Name="DataPacking_CH0" Type="list" TabName="Channel 0" Visible="false">
+        <Description>Standard, interleaved or dual mode for internal register.</Description>
+        <Condition Diagnostic="" Expression="!Semaphore_Parallel_Input_CH0_$IpInstance"/>
+        <PossibleValue Comment="Standard data packing mode " Value="DFSDM_CHANNEL_STANDARD_MODE"/>
+    </RefParameter>
+    <RefParameter Comment="Pins" DefaultValue="DFSDM_CHANNEL_SAME_CHANNEL_PINS" Name="Pins_none_CH0" Type="list" TabName="Channel 0" Visible="false">
+        <Description>Input pins are taken from same or following channel.</Description>
+        <PossibleValue Comment="Input from pins on same channel " Value="DFSDM_CHANNEL_SAME_CHANNEL_PINS"/>
+        <PossibleValue Comment="Input from pins on following channel " Value="DFSDM_CHANNEL_FOLLOWING_CHANNEL_PINS"/>
+    </RefParameter>
+    <RefParameter Comment="Pins" DefaultValue="DFSDM_CHANNEL_SAME_CHANNEL_PINS" Name="Pins_same_CH0" Type="list" TabName="Channel 0" Visible="false">
+        <Description>Input pins are taken from same channel.</Description>
+        <PossibleValue Comment="Input from pins on same channel " Value="DFSDM_CHANNEL_SAME_CHANNEL_PINS"/>
+    </RefParameter>
+    <RefParameter Comment="Pins" DefaultValue="DFSDM_CHANNEL_FOLLOWING_CHANNEL_PINS" Name="Pins_next_CH0" Type="list" TabName="Channel 0" Visible="false">
+        <Description>Input pins are taken from following channel.</Description>
+        <PossibleValue Comment="Input from pins on following channel " Value="DFSDM_CHANNEL_FOLLOWING_CHANNEL_PINS"/>
+    </RefParameter>
+    <RefParameter Comment="Type" DefaultValue="DFSDM_CHANNEL_SPI_RISING" Name="Type_spi_CH0" Type="list" TabName="Channel 0" Group="Channel 0 parameters">
+        <Description>SPI modes.</Description>
+        <PossibleValue Comment="SPI with rising edge " Value="DFSDM_CHANNEL_SPI_RISING"/>
+        <PossibleValue Comment="SPI with falling edge " Value="DFSDM_CHANNEL_SPI_FALLING"/>
+    </RefParameter>
+    <RefParameter Comment="Type" DefaultValue="DFSDM_CHANNEL_SPI_RISING" Name="Type_manchester_CH0" Type="list" TabName="Channel 0" Group="Channel 0 parameters">
+        <Description>Manchester modes.</Description>
+        <PossibleValue Comment="Manchester with rising edge " Value="DFSDM_CHANNEL_MANCHESTER_RISING"/>
+        <PossibleValue Comment="Manchester with falling edge " Value="DFSDM_CHANNEL_MANCHESTER_FALLING"/>
+    </RefParameter>
+    <RefParameter Comment="Type" DefaultValue="DFSDM_CHANNEL_SPI_RISING" Name="Type_none_CH0" Type="list" TabName="Channel 0" Visible="false">
+        <Description>SPI default but null expected</Description>
+        <PossibleValue Comment="SPI with rising edge " Value="DFSDM_CHANNEL_SPI_RISING"/>
+    </RefParameter>
+    <RefParameter Comment="Spi Clock" DefaultValue="DFSDM_CHANNEL_SPI_CLOCK_EXTERNAL" Name="SpiClock_none_CH0" Type="list" TabName="Channel 0" Visible="false">
+        <Description>SPI clock select SHOULD BE null.</Description>
+        <PossibleValue Comment="External SPI clock " Value="DFSDM_CHANNEL_SPI_CLOCK_EXTERNAL"/>
+    </RefParameter>
+    <RefParameter Comment="Spi Clock" DefaultValue="DFSDM_CHANNEL_SPI_CLOCK_EXTERNAL" Name="SpiClock_external_CH0" Type="list" TabName="Channel 0" Visible="false">
+        <Description>SPI clock select (external with different sampling point).</Description>
+        <PossibleValue Comment="External SPI clock " Value="DFSDM_CHANNEL_SPI_CLOCK_EXTERNAL"/>
+    </RefParameter>
+    <RefParameter Comment="Spi Clock" DefaultValue="DFSDM_CHANNEL_SPI_CLOCK_INTERNAL" Name="SpiClock_internal_CH0" Type="list" TabName="Channel 0" Group="Channel 0 parameters">
+        <Description>SPI clock select (internal with different sampling point).</Description>
+        <PossibleValue Comment="Internal SPI clock " Value="DFSDM_CHANNEL_SPI_CLOCK_INTERNAL"/>
+        <PossibleValue Comment="Internal SPI clock divided by 2, falling edge " Value="DFSDM_CHANNEL_SPI_CLOCK_INTERNAL_DIV2_FALLING"/>
+        <PossibleValue Comment="Internal SPI clock divided by 2, rising edge " Value="DFSDM_CHANNEL_SPI_CLOCK_INTERNAL_DIV2_RISING"/>
+    </RefParameter>
+    <RefParameter Comment="Filter Order" DefaultValue="DFSDM_CHANNEL_FASTSINC_ORDER" Name="FilterOrder_CH0" Group="Analog watchdog parameters" Type="list" TabName="Channel 0" >
+        <Description>Analog watchdog sinc filter order.</Description>
+        <PossibleValue Comment="FastSinc filter type " Value="DFSDM_CHANNEL_FASTSINC_ORDER"/>
+        <PossibleValue Comment="Sinc 1 filter type " Value="DFSDM_CHANNEL_SINC1_ORDER"/>
+        <PossibleValue Comment="Sinc 2 filter type " Value="DFSDM_CHANNEL_SINC2_ORDER"/>
+        <PossibleValue Comment="Sinc 3 filter type " Value="DFSDM_CHANNEL_SINC3_ORDER"/>
+    </RefParameter>
+    <RefParameter Comment="Filter Order" DefaultValue="DFSDM_CHANNEL_FASTSINC_ORDER" Name="FilterOrder_none_CH0" Type="list" Group="Analog watchdog parameters" TabName="Channel 0" Visible="false">
+        <Description>Analog watchdog sinc filter order.SHOULD BE null</Description>
+        <PossibleValue Comment="FastSinc filter type " Value="DFSDM_CHANNEL_FASTSINC_ORDER"/>
+    </RefParameter>
+    <RefParameter Comment="Oversampling" DefaultValue="1" Max="32" Min="1" Name="Oversampling_CH0" Type="integer" Group="Analog watchdog parameters" TabName="Channel 0" >
+        <Description>Analog watchdog filter oversampling ratio.</Description>
+    </RefParameter>
+    <RefParameter Comment="Oversampling" DefaultValue="1" Max="1" Min="1" Name="Oversampling_none_CH0" Type="integer" Group="Analog watchdog parameters" TabName="Channel 0" Visible="false">
+        <Description>Analog watchdog filter oversampling ratio.SHOULD BE null</Description>
+    </RefParameter>
+    <RefParameter Comment="Offset" DefaultValue="0" Max="8388607" Min="-8388608" Name="Offset_CH0" Type="integer" TabName="Channel 0" Group="Channel 0 parameters">
+        <Description>DFSDM channel offset.</Description>
+    </RefParameter>
+    <RefParameter Comment="Offset" DefaultValue="0x00" Max="0x00" Min="0x00" Name="Offset_none_CH0" Type="integer" TabName="Channel 0" Visible="false">
+        <Description>DFSDM channel offset.SHOULD BE null</Description>
+    </RefParameter>
+    <RefParameter Comment="Right Bit Shift" DefaultValue="0x00" Max="0x1F" Min="0x00" Name="RightBitShift_CH0" Type="integer" TabName="Channel 0" Group="Channel 0 parameters">
+        <Description>DFSDM channel right bit shift.</Description>
+    </RefParameter>
+<!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Channel 1 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%-->
+    <RefParameter Comment="Multiplexer" DefaultValue="DFSDM_CHANNEL_EXTERNAL_INPUTS" Name="Multiplexer_CH1" Type="list" TabName="Channel 1">
+        <Description>Input is external serial inputs or internal register.</Description>
+        <PossibleValue Comment="Data are taken from external inputs " Value="DFSDM_CHANNEL_EXTERNAL_INPUTS"/>
+        <PossibleValue Comment="Data are taken from internal register " Value="DFSDM_CHANNEL_INTERNAL_REGISTER"/>
+    </RefParameter>
+    <RefParameter Comment="Multiplexer_External_CH1" DefaultValue="DFSDM_CHANNEL_EXTERNAL_INPUTS" Name="Multiplexer_external_CH1" Type="list" TabName="Channel 1" Visible="false">
+        <Description>Input is external serial inputs</Description>
+        <PossibleValue Comment="Data are taken from external inputs " Value="DFSDM_CHANNEL_EXTERNAL_INPUTS"/>
+    </RefParameter>
+    <RefParameter Comment="Multiplexer_Internal_CH1" DefaultValue="DFSDM_CHANNEL_INTERNAL_REGISTER" Name="Multiplexer_internal_CH1" Type="list" TabName="Channel 1" Visible="false">
+        <Description>Input is internal register</Description>
+        <PossibleValue Comment="Data are taken from internal register " Value="DFSDM_CHANNEL_INTERNAL_REGISTER"/>
+    </RefParameter>
+    <RefParameter Comment="Data Packing" DefaultValue="DFSDM_CHANNEL_STANDARD_MODE" Name="DataPacking_CH1" Type="list" TabName="Channel 1" Group="Channel 1 parameters">
+        <Description>Standard, interleaved or dual mode for internal register.</Description>
+        <Condition Diagnostic="" Expression="Semaphore_Parallel_Input_CH1_$IpInstance"/>
+        <PossibleValue Comment="Standard data packing mode " Value="DFSDM_CHANNEL_STANDARD_MODE" Semaphore="Semaphore_Packing_Standard_Mode_CH1_$IpInstance" />
+<!-- condition on interleaved only for odd channels 1 3 5 7-->
+        <PossibleValue Comment="Interleaved data packing mode " Value="DFSDM_CHANNEL_INTERLEAVED_MODE" Condition="(Semaphore_Packing_Dual_Mode_CH0_$IpInstance)" Diagnostic="Channel 0 is in dual mode packing and consequently, Channel 1 can only be set in standard  mode" Action="Disable"/>
+    </RefParameter>
+    <RefParameter Comment="Data Packing" DefaultValue="DFSDM_CHANNEL_STANDARD_MODE" Name="DataPacking_CH1" Type="list" TabName="Channel 1" Visible="false">
+        <Description>Standard, interleaved or dual mode for internal register.</Description>
+        <Condition Diagnostic="" Expression="!Semaphore_Parallel_Input_CH1_$IpInstance"/>
+        <PossibleValue Comment="Standard data packing mode " Value="DFSDM_CHANNEL_STANDARD_MODE"/>
+    </RefParameter>
+    <RefParameter Comment="Pins" DefaultValue="DFSDM_CHANNEL_SAME_CHANNEL_PINS" Name="Pins_none_CH1" Type="list" TabName="Channel 1" Visible="false">
+        <Description>Input pins are taken from same or following channel.</Description>
+        <PossibleValue Comment="Input from pins on same channel " Value="DFSDM_CHANNEL_SAME_CHANNEL_PINS"/>
+        <PossibleValue Comment="Input from pins on following channel " Value="DFSDM_CHANNEL_FOLLOWING_CHANNEL_PINS"/>
+    </RefParameter>
+    <RefParameter Comment="Pins" DefaultValue="DFSDM_CHANNEL_SAME_CHANNEL_PINS" Name="Pins_same_CH1" Type="list" TabName="Channel 1" Visible="false">
+        <Description>Input pins are taken from same channel.</Description>
+        <PossibleValue Comment="Input from pins on same channel " Value="DFSDM_CHANNEL_SAME_CHANNEL_PINS"/>
+    </RefParameter>
+    <RefParameter Comment="Pins" DefaultValue="DFSDM_CHANNEL_FOLLOWING_CHANNEL_PINS" Name="Pins_next_CH1" Type="list" TabName="Channel 1" Visible="false">
+        <Description>Input pins are taken from following channel.</Description>
+        <PossibleValue Comment="Input from pins on following channel " Value="DFSDM_CHANNEL_FOLLOWING_CHANNEL_PINS"/>
+    </RefParameter>
+    <RefParameter Comment="Type" DefaultValue="DFSDM_CHANNEL_SPI_RISING" Name="Type_spi_CH1" Type="list" TabName="Channel 1" Group="Channel 1 parameters">
+        <Description>SPI modes.</Description>
+        <PossibleValue Comment="SPI with rising edge " Value="DFSDM_CHANNEL_SPI_RISING"/>
+        <PossibleValue Comment="SPI with falling edge " Value="DFSDM_CHANNEL_SPI_FALLING"/>
+    </RefParameter>
+    <RefParameter Comment="Type" DefaultValue="DFSDM_CHANNEL_SPI_RISING" Name="Type_manchester_CH1" Type="list" TabName="Channel 1" Group="Channel 1 parameters">
+        <Description>Manchester modes.</Description>
+        <PossibleValue Comment="Manchester with rising edge " Value="DFSDM_CHANNEL_MANCHESTER_RISING"/>
+        <PossibleValue Comment="Manchester with falling edge " Value="DFSDM_CHANNEL_MANCHESTER_FALLING"/>
+    </RefParameter>
+    <RefParameter Comment="Type" DefaultValue="DFSDM_CHANNEL_SPI_RISING" Name="Type_none_CH1" Type="list" TabName="Channel 1" Visible="false">
+        <Description>SPI default but null expected</Description>
+        <PossibleValue Comment="SPI with rising edge " Value="DFSDM_CHANNEL_SPI_RISING"/>
+    </RefParameter>
+    <RefParameter Comment="Spi Clock" DefaultValue="DFSDM_CHANNEL_SPI_CLOCK_EXTERNAL" Name="SpiClock_none_CH1" Type="list" TabName="Channel 1" Visible="false">
+        <Description>SPI clock select SHOULD BE null.</Description>
+        <PossibleValue Comment="External SPI clock " Value="DFSDM_CHANNEL_SPI_CLOCK_EXTERNAL"/>
+    </RefParameter>
+    <RefParameter Comment="Spi Clock" DefaultValue="DFSDM_CHANNEL_SPI_CLOCK_EXTERNAL" Name="SpiClock_external_CH1" Type="list" TabName="Channel 1" Visible="false">
+        <Description>SPI clock select (external with different sampling point).</Description>
+        <PossibleValue Comment="External SPI clock " Value="DFSDM_CHANNEL_SPI_CLOCK_EXTERNAL"/>
+    </RefParameter>
+    <RefParameter Comment="Spi Clock" DefaultValue="DFSDM_CHANNEL_SPI_CLOCK_INTERNAL" Name="SpiClock_internal_CH1" Type="list" TabName="Channel 1" Group="Channel 1 parameters">
+        <Description>SPI clock select (internal with different sampling point).</Description>
+        <PossibleValue Comment="Internal SPI clock " Value="DFSDM_CHANNEL_SPI_CLOCK_INTERNAL"/>
+        <PossibleValue Comment="Internal SPI clock divided by 2, falling edge " Value="DFSDM_CHANNEL_SPI_CLOCK_INTERNAL_DIV2_FALLING"/>
+        <PossibleValue Comment="Internal SPI clock divided by 2, rising edge " Value="DFSDM_CHANNEL_SPI_CLOCK_INTERNAL_DIV2_RISING"/>
+    </RefParameter>
+    <RefParameter Comment="Filter Order" DefaultValue="DFSDM_CHANNEL_FASTSINC_ORDER" Name="FilterOrder_CH1" Group="Analog watchdog parameters" Type="list" TabName="Channel 1" >
+        <Description>Analog watchdog sinc filter order.</Description>
+        <PossibleValue Comment="FastSinc filter type " Value="DFSDM_CHANNEL_FASTSINC_ORDER"/>
+        <PossibleValue Comment="Sinc 1 filter type " Value="DFSDM_CHANNEL_SINC1_ORDER"/>
+        <PossibleValue Comment="Sinc 2 filter type " Value="DFSDM_CHANNEL_SINC2_ORDER"/>
+        <PossibleValue Comment="Sinc 3 filter type " Value="DFSDM_CHANNEL_SINC3_ORDER"/>
+    </RefParameter>
+    <RefParameter Comment="Filter Order" DefaultValue="DFSDM_CHANNEL_FASTSINC_ORDER" Name="FilterOrder_none_CH1" Type="list" Group="Analog watchdog parameters" TabName="Channel 1" Visible="false">
+        <Description>Analog watchdog sinc filter order.SHOULD BE null</Description>
+        <PossibleValue Comment="FastSinc filter type " Value="DFSDM_CHANNEL_FASTSINC_ORDER"/>
+    </RefParameter>
+    <RefParameter Comment="Oversampling" DefaultValue="1" Max="32" Min="1" Name="Oversampling_CH1" Type="integer" Group="Analog watchdog parameters" TabName="Channel 1" >
+        <Description>Analog watchdog filter oversampling ratio.</Description>
+    </RefParameter>
+    <RefParameter Comment="Oversampling" DefaultValue="1" Max="1" Min="1" Name="Oversampling_none_CH1" Type="integer" Group="Analog watchdog parameters" TabName="Channel 1" Visible="false">
+        <Description>Analog watchdog filter oversampling ratio.SHOULD BE null</Description>
+    </RefParameter>
+    <RefParameter Comment="Offset" DefaultValue="0" Max="8388607" Min="-8388608" Name="Offset_CH1" Type="integer" TabName="Channel 1" Group="Channel 1 parameters">
+        <Description>DFSDM channel offset.</Description>
+    </RefParameter>
+    <RefParameter Comment="Offset" DefaultValue="0x00" Max="0x00" Min="0x00" Name="Offset_none_CH1" Type="integer" TabName="Channel 1" Visible="false">
+        <Description>DFSDM channel offset.SHOULD BE null</Description>
+    </RefParameter>
+    <RefParameter Comment="Right Bit Shift" DefaultValue="0x00" Max="0x1F" Min="0x00" Name="RightBitShift_CH1" Type="integer" TabName="Channel 1" Group="Channel 1 parameters">
+        <Description>DFSDM channel right bit shift.</Description>
+    </RefParameter>
+<!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Channel 2 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%-->
+    <RefParameter Comment="Multiplexer" DefaultValue="DFSDM_CHANNEL_EXTERNAL_INPUTS" Name="Multiplexer_CH2" Type="list" TabName="Channel 2">
+        <Description>Input is external serial inputs or internal register.</Description>
+        <PossibleValue Comment="Data are taken from external inputs " Value="DFSDM_CHANNEL_EXTERNAL_INPUTS"/>
+        <PossibleValue Comment="Data are taken from internal register " Value="DFSDM_CHANNEL_INTERNAL_REGISTER"/>
+    </RefParameter>
+    <RefParameter Comment="Multiplexer_External_CH2" DefaultValue="DFSDM_CHANNEL_EXTERNAL_INPUTS" Name="Multiplexer_external_CH2" Type="list" TabName="Channel 2" Visible="false">
+        <Description>Input is external serial inputs</Description>
+        <PossibleValue Comment="Data are taken from external inputs " Value="DFSDM_CHANNEL_EXTERNAL_INPUTS"/>
+    </RefParameter>
+    <RefParameter Comment="Multiplexer_Internal_CH2" DefaultValue="DFSDM_CHANNEL_INTERNAL_REGISTER" Name="Multiplexer_internal_CH2" Type="list" TabName="Channel 2" Visible="false">
+        <Description>Input is internal register</Description>
+        <PossibleValue Comment="Data are taken from internal register " Value="DFSDM_CHANNEL_INTERNAL_REGISTER"/>
+    </RefParameter>
+    <RefParameter Comment="Data Packing" DefaultValue="DFSDM_CHANNEL_STANDARD_MODE" Name="DataPacking_CH2" Type="list" TabName="Channel 2" Group="Channel 2 parameters">
+        <Description>Standard, interleaved or dual mode for internal register.</Description>
+        <Condition Diagnostic="" Expression="Semaphore_Parallel_Input_CH2_$IpInstance"/>
+        <PossibleValue Comment="Standard data packing mode " Value="DFSDM_CHANNEL_STANDARD_MODE" Semaphore="Semaphore_Packing_Standard_Mode_CH2_$IpInstance" />
+<!-- Dual mode is only for even channels 0 2 4 6-->
+        <PossibleValue Comment="Interleaved data packing mode " Value="DFSDM_CHANNEL_INTERLEAVED_MODE"/>
+        <PossibleValue Comment="Dual data packing mode " Value="DFSDM_CHANNEL_DUAL_MODE" Semaphore="Semaphore_Packing_Dual_Mode_CH2_$IpInstance" Condition="!(Semaphore_Packing_Standard_Mode_CH3_$IpInstance &amp; Semaphore_Parallel_Input_CH3_$IpInstance)" Diagnostic="Channel 3 must be in packing mode Standard" Action="Disable"/>
+    </RefParameter>
+    <RefParameter Comment="Data Packing" DefaultValue="DFSDM_CHANNEL_STANDARD_MODE" Name="DataPacking_CH2" Type="list" TabName="Channel 2" Visible="false">
+        <Description>Standard, interleaved or dual mode for internal register.</Description>
+        <Condition Diagnostic="" Expression="!Semaphore_Parallel_Input_CH2_$IpInstance"/>
+        <PossibleValue Comment="Standard data packing mode " Value="DFSDM_CHANNEL_STANDARD_MODE"/>
+    </RefParameter>
+    <RefParameter Comment="Pins" DefaultValue="DFSDM_CHANNEL_SAME_CHANNEL_PINS" Name="Pins_none_CH2" Type="list" TabName="Channel 2" Visible="false">
+        <Description>Input pins are taken from same or following channel.</Description>
+        <PossibleValue Comment="Input from pins on same channel " Value="DFSDM_CHANNEL_SAME_CHANNEL_PINS"/>
+        <PossibleValue Comment="Input from pins on following channel " Value="DFSDM_CHANNEL_FOLLOWING_CHANNEL_PINS"/>
+    </RefParameter>
+    <RefParameter Comment="Pins" DefaultValue="DFSDM_CHANNEL_SAME_CHANNEL_PINS" Name="Pins_same_CH2" Type="list" TabName="Channel 2" Visible="false">
+        <Description>Input pins are taken from same channel.</Description>
+        <PossibleValue Comment="Input from pins on same channel " Value="DFSDM_CHANNEL_SAME_CHANNEL_PINS"/>
+    </RefParameter>
+    <RefParameter Comment="Pins" DefaultValue="DFSDM_CHANNEL_FOLLOWING_CHANNEL_PINS" Name="Pins_next_CH2" Type="list" TabName="Channel 2" Visible="false">
+        <Description>Input pins are taken from following channel.</Description>
+        <PossibleValue Comment="Input from pins on following channel " Value="DFSDM_CHANNEL_FOLLOWING_CHANNEL_PINS"/>
+    </RefParameter>
+    <RefParameter Comment="Type" DefaultValue="DFSDM_CHANNEL_SPI_RISING" Name="Type_spi_CH2" Type="list" TabName="Channel 2" Group="Channel 2 parameters">
+        <Description>SPI modes.</Description>
+        <PossibleValue Comment="SPI with rising edge " Value="DFSDM_CHANNEL_SPI_RISING"/>
+        <PossibleValue Comment="SPI with falling edge " Value="DFSDM_CHANNEL_SPI_FALLING"/>
+    </RefParameter>
+    <RefParameter Comment="Type" DefaultValue="DFSDM_CHANNEL_SPI_RISING" Name="Type_manchester_CH2" Type="list" TabName="Channel 2" Group="Channel 2 parameters">
+        <Description>Manchester modes.</Description>
+        <PossibleValue Comment="Manchester with rising edge " Value="DFSDM_CHANNEL_MANCHESTER_RISING"/>
+        <PossibleValue Comment="Manchester with falling edge " Value="DFSDM_CHANNEL_MANCHESTER_FALLING"/>
+    </RefParameter>
+    <RefParameter Comment="Type" DefaultValue="DFSDM_CHANNEL_SPI_RISING" Name="Type_none_CH2" Type="list" TabName="Channel 2" Visible="false">
+        <Description>SPI default but null expected</Description>
+        <PossibleValue Comment="SPI with rising edge " Value="DFSDM_CHANNEL_SPI_RISING"/>
+    </RefParameter>
+    <RefParameter Comment="Spi Clock" DefaultValue="DFSDM_CHANNEL_SPI_CLOCK_EXTERNAL" Name="SpiClock_none_CH2" Type="list" TabName="Channel 2" Visible="false">
+        <Description>SPI clock select SHOULD BE null.</Description>
+        <PossibleValue Comment="External SPI clock " Value="DFSDM_CHANNEL_SPI_CLOCK_EXTERNAL"/>
+    </RefParameter>
+    <RefParameter Comment="Spi Clock" DefaultValue="DFSDM_CHANNEL_SPI_CLOCK_EXTERNAL" Name="SpiClock_external_CH2" Type="list" TabName="Channel 2" Visible="false">
+        <Description>SPI clock select (external with different sampling point).</Description>
+        <PossibleValue Comment="External SPI clock " Value="DFSDM_CHANNEL_SPI_CLOCK_EXTERNAL"/>
+    </RefParameter>
+    <RefParameter Comment="Spi Clock" DefaultValue="DFSDM_CHANNEL_SPI_CLOCK_INTERNAL" Name="SpiClock_internal_CH2" Type="list" TabName="Channel 2" Group="Channel 2 parameters">
+        <Description>SPI clock select (internal with different sampling point).</Description>
+        <PossibleValue Comment="Internal SPI clock " Value="DFSDM_CHANNEL_SPI_CLOCK_INTERNAL"/>
+        <PossibleValue Comment="Internal SPI clock divided by 2, falling edge " Value="DFSDM_CHANNEL_SPI_CLOCK_INTERNAL_DIV2_FALLING"/>
+        <PossibleValue Comment="Internal SPI clock divided by 2, rising edge " Value="DFSDM_CHANNEL_SPI_CLOCK_INTERNAL_DIV2_RISING"/>
+    </RefParameter>
+    <RefParameter Comment="Filter Order" DefaultValue="DFSDM_CHANNEL_FASTSINC_ORDER" Name="FilterOrder_CH2" Group="Analog watchdog parameters" Type="list" TabName="Channel 2" >
+        <Description>Analog watchdog sinc filter order.</Description>
+        <PossibleValue Comment="FastSinc filter type " Value="DFSDM_CHANNEL_FASTSINC_ORDER"/>
+        <PossibleValue Comment="Sinc 1 filter type " Value="DFSDM_CHANNEL_SINC1_ORDER"/>
+        <PossibleValue Comment="Sinc 2 filter type " Value="DFSDM_CHANNEL_SINC2_ORDER"/>
+        <PossibleValue Comment="Sinc 3 filter type " Value="DFSDM_CHANNEL_SINC3_ORDER"/>
+    </RefParameter>
+    <RefParameter Comment="Filter Order" DefaultValue="DFSDM_CHANNEL_FASTSINC_ORDER" Name="FilterOrder_none_CH2" Type="list" Group="Analog watchdog parameters" TabName="Channel 2" Visible="false">
+        <Description>Analog watchdog sinc filter order.SHOULD BE null</Description>
+        <PossibleValue Comment="FastSinc filter type " Value="DFSDM_CHANNEL_FASTSINC_ORDER"/>
+    </RefParameter>
+    <RefParameter Comment="Oversampling" DefaultValue="1" Max="32" Min="1" Name="Oversampling_CH2" Type="integer" Group="Analog watchdog parameters" TabName="Channel 2" >
+        <Description>Analog watchdog filter oversampling ratio.</Description>
+    </RefParameter>
+    <RefParameter Comment="Oversampling" DefaultValue="1" Max="1" Min="1" Name="Oversampling_none_CH2" Type="integer" Group="Analog watchdog parameters" TabName="Channel 2" Visible="false">
+        <Description>Analog watchdog filter oversampling ratio.SHOULD BE null</Description>
+    </RefParameter>
+    <RefParameter Comment="Offset" DefaultValue="0" Max="8388607" Min="-8388608" Name="Offset_CH2" Type="integer" TabName="Channel 2" Group="Channel 2 parameters">
+        <Description>DFSDM channel offset.</Description>
+    </RefParameter>
+    <RefParameter Comment="Offset" DefaultValue="0x00" Max="0x00" Min="0x00" Name="Offset_none_CH2" Type="integer" TabName="Channel 2" Visible="false">
+        <Description>DFSDM channel offset.SHOULD BE null</Description>
+    </RefParameter>
+    <RefParameter Comment="Right Bit Shift" DefaultValue="0x00" Max="0x1F" Min="0x00" Name="RightBitShift_CH2" Type="integer" TabName="Channel 2" Group="Channel 2 parameters">
+        <Description>DFSDM channel right bit shift.</Description>
+    </RefParameter>
+<!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Channel 3 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%-->
+    <RefParameter Comment="Multiplexer" DefaultValue="DFSDM_CHANNEL_EXTERNAL_INPUTS" Name="Multiplexer_CH3" Type="list" TabName="Channel 3">
+        <Description>Input is external serial inputs or internal register.</Description>
+        <PossibleValue Comment="Data are taken from external inputs " Value="DFSDM_CHANNEL_EXTERNAL_INPUTS"/>
+        <PossibleValue Comment="Data are taken from internal register " Value="DFSDM_CHANNEL_INTERNAL_REGISTER"/>
+    </RefParameter>
+    <RefParameter Comment="Multiplexer_External_CH3" DefaultValue="DFSDM_CHANNEL_EXTERNAL_INPUTS" Name="Multiplexer_external_CH3" Type="list" TabName="Channel 3" Visible="false">
+        <Description>Input is external serial inputs</Description>
+        <PossibleValue Comment="Data are taken from external inputs " Value="DFSDM_CHANNEL_EXTERNAL_INPUTS"/>
+    </RefParameter>
+    <RefParameter Comment="Multiplexer_Internal_CH3" DefaultValue="DFSDM_CHANNEL_INTERNAL_REGISTER" Name="Multiplexer_internal_CH3" Type="list" TabName="Channel 3" Visible="false">
+        <Description>Input is internal register</Description>
+        <PossibleValue Comment="Data are taken from internal register " Value="DFSDM_CHANNEL_INTERNAL_REGISTER"/>
+    </RefParameter>
+    <RefParameter Comment="Data Packing" DefaultValue="DFSDM_CHANNEL_STANDARD_MODE" Name="DataPacking_CH3" Type="list" TabName="Channel 3" Group="Channel 3 parameters">
+        <Description>Standard, interleaved or dual mode for internal register.</Description>
+        <Condition Diagnostic="" Expression="Semaphore_Parallel_Input_CH3_$IpInstance"/>
+        <PossibleValue Comment="Standard data packing mode " Value="DFSDM_CHANNEL_STANDARD_MODE" Semaphore="Semaphore_Packing_Standard_Mode_CH3_$IpInstance" />
+<!-- condition on interleaved only for odd channels 1 3 5 7-->
+        <PossibleValue Comment="Interleaved data packing mode " Value="DFSDM_CHANNEL_INTERLEAVED_MODE" Condition="(Semaphore_Packing_Dual_Mode_CH2_$IpInstance)" Diagnostic="Channel 2 is in dual mode packing and consequently, Channel 3 can only be set in standard  mode" Action="Disable"/>
+    </RefParameter>
+    <RefParameter Comment="Data Packing" DefaultValue="DFSDM_CHANNEL_STANDARD_MODE" Name="DataPacking_CH3" Type="list" TabName="Channel 3" Visible="false">
+        <Description>Standard, interleaved or dual mode for internal register.</Description>
+        <Condition Diagnostic="" Expression="!Semaphore_Parallel_Input_CH3_$IpInstance"/>
+        <PossibleValue Comment="Standard data packing mode " Value="DFSDM_CHANNEL_STANDARD_MODE"/>
+    </RefParameter>
+    <RefParameter Comment="Pins" DefaultValue="DFSDM_CHANNEL_SAME_CHANNEL_PINS" Name="Pins_none_CH3" Type="list" TabName="Channel 3" Visible="false">
+        <Description>Input pins are taken from same or following channel.</Description>
+        <PossibleValue Comment="Input from pins on same channel " Value="DFSDM_CHANNEL_SAME_CHANNEL_PINS"/>
+        <PossibleValue Comment="Input from pins on following channel " Value="DFSDM_CHANNEL_FOLLOWING_CHANNEL_PINS"/>
+    </RefParameter>
+    <RefParameter Comment="Pins" DefaultValue="DFSDM_CHANNEL_SAME_CHANNEL_PINS" Name="Pins_same_CH3" Type="list" TabName="Channel 3" Visible="false">
+        <Description>Input pins are taken from same channel.</Description>
+        <PossibleValue Comment="Input from pins on same channel " Value="DFSDM_CHANNEL_SAME_CHANNEL_PINS"/>
+    </RefParameter>
+    <RefParameter Comment="Pins" DefaultValue="DFSDM_CHANNEL_FOLLOWING_CHANNEL_PINS" Name="Pins_next_CH3" Type="list" TabName="Channel 3" Visible="false">
+        <Description>Input pins are taken from following channel.</Description>
+        <PossibleValue Comment="Input from pins on following channel " Value="DFSDM_CHANNEL_FOLLOWING_CHANNEL_PINS"/>
+    </RefParameter>
+    <RefParameter Comment="Type" DefaultValue="DFSDM_CHANNEL_SPI_RISING" Name="Type_spi_CH3" Type="list" TabName="Channel 3" Group="Channel 3 parameters">
+        <Description>SPI modes.</Description>
+        <PossibleValue Comment="SPI with rising edge " Value="DFSDM_CHANNEL_SPI_RISING"/>
+        <PossibleValue Comment="SPI with falling edge " Value="DFSDM_CHANNEL_SPI_FALLING"/>
+    </RefParameter>
+    <RefParameter Comment="Type" DefaultValue="DFSDM_CHANNEL_SPI_RISING" Name="Type_manchester_CH3" Type="list" TabName="Channel 3" Group="Channel 3 parameters">
+        <Description>Manchester modes.</Description>
+        <PossibleValue Comment="Manchester with rising edge " Value="DFSDM_CHANNEL_MANCHESTER_RISING"/>
+        <PossibleValue Comment="Manchester with falling edge " Value="DFSDM_CHANNEL_MANCHESTER_FALLING"/>
+    </RefParameter>
+    <RefParameter Comment="Type" DefaultValue="DFSDM_CHANNEL_SPI_RISING" Name="Type_none_CH3" Type="list" TabName="Channel 3" Visible="false">
+        <Description>SPI default but null expected</Description>
+        <PossibleValue Comment="SPI with rising edge " Value="DFSDM_CHANNEL_SPI_RISING"/>
+    </RefParameter>
+    <RefParameter Comment="Spi Clock" DefaultValue="DFSDM_CHANNEL_SPI_CLOCK_EXTERNAL" Name="SpiClock_none_CH3" Type="list" TabName="Channel 3" Visible="false">
+        <Description>SPI clock select SHOULD BE null.</Description>
+        <PossibleValue Comment="External SPI clock " Value="DFSDM_CHANNEL_SPI_CLOCK_EXTERNAL"/>
+    </RefParameter>
+    <RefParameter Comment="Spi Clock" DefaultValue="DFSDM_CHANNEL_SPI_CLOCK_EXTERNAL" Name="SpiClock_external_CH3" Type="list" TabName="Channel 3" Visible="false">
+        <Description>SPI clock select (external with different sampling point).</Description>
+        <PossibleValue Comment="External SPI clock " Value="DFSDM_CHANNEL_SPI_CLOCK_EXTERNAL"/>
+    </RefParameter>
+    <RefParameter Comment="Spi Clock" DefaultValue="DFSDM_CHANNEL_SPI_CLOCK_INTERNAL" Name="SpiClock_internal_CH3" Type="list" TabName="Channel 3" Group="Channel 3 parameters">
+        <Description>SPI clock select (internal with different sampling point).</Description>
+        <PossibleValue Comment="Internal SPI clock " Value="DFSDM_CHANNEL_SPI_CLOCK_INTERNAL"/>
+        <PossibleValue Comment="Internal SPI clock divided by 2, falling edge " Value="DFSDM_CHANNEL_SPI_CLOCK_INTERNAL_DIV2_FALLING"/>
+        <PossibleValue Comment="Internal SPI clock divided by 2, rising edge " Value="DFSDM_CHANNEL_SPI_CLOCK_INTERNAL_DIV2_RISING"/>
+    </RefParameter>
+    <RefParameter Comment="Filter Order" DefaultValue="DFSDM_CHANNEL_FASTSINC_ORDER" Name="FilterOrder_CH3" Group="Analog watchdog parameters" Type="list" TabName="Channel 3" >
+        <Description>Analog watchdog sinc filter order.</Description>
+        <PossibleValue Comment="FastSinc filter type " Value="DFSDM_CHANNEL_FASTSINC_ORDER"/>
+        <PossibleValue Comment="Sinc 1 filter type " Value="DFSDM_CHANNEL_SINC1_ORDER"/>
+        <PossibleValue Comment="Sinc 2 filter type " Value="DFSDM_CHANNEL_SINC2_ORDER"/>
+        <PossibleValue Comment="Sinc 3 filter type " Value="DFSDM_CHANNEL_SINC3_ORDER"/>
+    </RefParameter>
+    <RefParameter Comment="Filter Order" DefaultValue="DFSDM_CHANNEL_FASTSINC_ORDER" Name="FilterOrder_none_CH3" Type="list" Group="Analog watchdog parameters" TabName="Channel 3" Visible="false">
+        <Description>Analog watchdog sinc filter order.SHOULD BE null</Description>
+        <PossibleValue Comment="FastSinc filter type " Value="DFSDM_CHANNEL_FASTSINC_ORDER"/>
+    </RefParameter>
+    <RefParameter Comment="Oversampling" DefaultValue="1" Max="32" Min="1" Name="Oversampling_CH3" Type="integer" Group="Analog watchdog parameters" TabName="Channel 3" >
+        <Description>Analog watchdog filter oversampling ratio.</Description>
+    </RefParameter>
+    <RefParameter Comment="Oversampling" DefaultValue="1" Max="1" Min="1" Name="Oversampling_none_CH3" Type="integer" Group="Analog watchdog parameters" TabName="Channel 3" Visible="false">
+        <Description>Analog watchdog filter oversampling ratio.SHOULD BE null</Description>
+    </RefParameter>
+    <RefParameter Comment="Offset" DefaultValue="0" Max="8388607" Min="-8388608" Name="Offset_CH3" Type="integer" TabName="Channel 3" Group="Channel 3 parameters">
+        <Description>DFSDM channel offset.</Description>
+    </RefParameter>
+    <RefParameter Comment="Offset" DefaultValue="0x00" Max="0x00" Min="0x00" Name="Offset_none_CH3" Type="integer" TabName="Channel 3" Visible="false">
+        <Description>DFSDM channel offset.SHOULD BE null</Description>
+    </RefParameter>
+    <RefParameter Comment="Right Bit Shift" DefaultValue="0x00" Max="0x1F" Min="0x00" Name="RightBitShift_CH3" Type="integer" TabName="Channel 3" Group="Channel 3 parameters">
+        <Description>DFSDM channel right bit shift.</Description>
+    </RefParameter>
+<!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Filter 0 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%-->
+<!-- trigger reg -->
+    <RefParameter Comment="Trigger to start regular conversion" DefaultValue="DFSDM_FILTER_SW_TRIGGER" Name="Trigger_reg_FIL0" Type="list" Group="regular channel selection" TabName="Filter 0">
+        <Description>Trigger used to start regular conversion: software or synchronous.</Description>
+<Condition Diagnostic="" Expression="!Semaphore_DFSDM_NoregChannel_FIL0_$IpInstance"/>
+        <PossibleValue Comment="Software trigger " Value="DFSDM_FILTER_SW_TRIGGER"/>
+    </RefParameter>
+    <RefParameter Comment="Trigger to start regular conversion" DefaultValue="null" Name="Trigger_reg_FIL0" Type="list" Group="regular channel selection" TabName="Filter 0" Visible="false">
+        <Description>Trigger used to start regular conversion: software or synchronous.</Description>
+<Condition Diagnostic="" Expression="!(!Semaphore_DFSDM_NoregChannel_FIL0_$IpInstance)"/>
+    </RefParameter>
+<!-- FastMode -->
+    <RefParameter Comment="Fast Mode" DefaultValue="DISABLE" Name="FastMode_reg_FIL0" Type="list" Group="regular channel selection" TabName="Filter 0">
+        <Description>Enable/disable fast mode for regular conversion </Description>
+<Condition Diagnostic="" Expression="!Semaphore_DFSDM_NoregChannel_FIL0_$IpInstance"/>
+        <PossibleValue Comment="Disable" Value="DISABLE"/>
+        <PossibleValue Comment="Enable" Value="ENABLE"/>
+    </RefParameter>
+    <RefParameter Comment="Fast Mode" DefaultValue="null" Name="FastMode_reg_FIL0" Type="list" Group="regular channel selection" TabName="Filter 0" Visible="false">
+        <Description>Enable/disable fast mode for regular conversion </Description>
+<Condition Diagnostic="" Expression="!(!Semaphore_DFSDM_NoregChannel_FIL0_$IpInstance)"/>
+    </RefParameter>
+<!-- DMA Mode reg-->
+    <RefParameter Comment="Dma Mode" DefaultValue="DISABLE" Name="DmaMode_reg_FIL0" Type="list" Group="regular channel selection" TabName="Filter 0">
+        <Description>Enable/disable DMA for regular conversion </Description>
+<Condition Diagnostic="" Expression="!Semaphore_DFSDM_NoregChannel_FIL0_$IpInstance"/>
+        <PossibleValue Comment="Disable" Value="DISABLE"/>
+        <PossibleValue Comment="Enable" Value="ENABLE" Semaphore="Semaphore_DFSDM2DMA_REG_FIL0_$IpInstance" Condition="!Semaphore_$IpInstance_Filter_FIL0_DMA_Request" Action="Disable" Diagnostic=" A DMA request must be active for the concerned DFSDM filter in the DMA configuration tab"/>
+    </RefParameter>
+    <RefParameter Comment="Dma Mode" DefaultValue="null" Name="DmaMode_reg_FIL0" Type="list" Group="regular channel selection" TabName="Filter 0" Visible="false">
+        <Description>Enable/disable DMA for regular conversion </Description>
+<Condition Diagnostic="" Expression="!(!Semaphore_DFSDM_NoregChannel_FIL0_$IpInstance)"/>
+    </RefParameter>
+<!-- Trigger_inj -->
+    <RefParameter Comment="Trigger to start injected conversion" DefaultValue="DFSDM_FILTER_SW_TRIGGER" Name="Trigger_inj_FIL0" Type="list" Group="injected channel selection" TabName="Filter 0">
+        <Description>Trigger used to start injected conversion: software, external or synchronous.</Description>
+<Condition Diagnostic="" Expression="!Semaphore_DFSDM_NoinjChannel0_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel1_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel2_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel3_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel4_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel5_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel6_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel7_FIL0_$IpInstance"/>
+        <PossibleValue Comment="Software trigger " Value="DFSDM_FILTER_SW_TRIGGER"/>
+        <PossibleValue Comment="External trigger" Value="DFSDM_FILTER_EXT_TRIGGER" Semaphore="Semaphore_ExternaltriggerSelected_FIL0_$IpInstance"/>
+    </RefParameter>
+    <RefParameter Comment="Trigger to start injected conversion" DefaultValue="null" Name="Trigger_inj_FIL0" Type="list" Group="injected channel selection" TabName="Filter 0" Visible="false">
+        <Description>Trigger used to start injected conversion: software, external or synchronous.</Description>
+<Condition Diagnostic="" Expression="!(!Semaphore_DFSDM_NoinjChannel0_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel1_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel2_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel3_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel4_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel5_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel6_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel7_FIL0_$IpInstance)"/>
+    </RefParameter>
+<!-- Scan Mode -->
+    <RefParameter Comment="Scan Mode" DefaultValue="DISABLE" Name="ScanMode_inj_FIL0" Type="list" Group="injected channel selection" TabName="Filter 0">
+        <Description>Enable/disable scanning mode for injected conversion </Description>
+<Condition Diagnostic="" Expression="!Semaphore_DFSDM_NoinjChannel0_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel1_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel2_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel3_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel4_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel5_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel6_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel7_FIL0_$IpInstance"/>
+        <PossibleValue Comment="Disable" Value="DISABLE"/>
+        <PossibleValue Comment="Enable" Value="ENABLE"/>
+    </RefParameter>
+    <RefParameter Comment="Scan Mode" DefaultValue="null" Name="ScanMode_inj_FIL0" Type="list" Group="injected channel selection" TabName="Filter 0" Visible="false">
+        <Description>Enable/disable scanning mode for injected conversion </Description>
+<Condition Diagnostic="" Expression="!(!Semaphore_DFSDM_NoinjChannel0_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel1_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel2_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel3_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel4_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel5_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel6_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel7_FIL0_$IpInstance)"/>
+    </RefParameter>
+<!-- DMA Mode inj -->
+    <RefParameter Comment="Dma Mode" DefaultValue="DISABLE" Name="DmaMode_inj_FIL0" Type="list" Group="injected channel selection" TabName="Filter 0">
+        <Description>Enable/disable DMA for injected conversion </Description>
+<Condition Diagnostic="" Expression="(!Semaphore_DFSDM_NoinjChannel0_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel1_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel2_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel3_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel4_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel5_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel6_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel7_FIL0_$IpInstance)"/>
+        <PossibleValue Comment="Disable" Value="DISABLE"/>
+        <PossibleValue Comment="Enable" Value="ENABLE" Semaphore="Semaphore_DFSDM2DMA_INJ_FIL0_$IpInstance" Condition="!Semaphore_$IpInstance_Filter_FIL0_DMA_Request" Action="Disable" Diagnostic="A DMA request must be active for the concerned DFSDM filter in the DMA configuration tab"/>
+    </RefParameter>
+    <RefParameter Comment="Dma Mode" DefaultValue="null" Name="DmaMode_inj_FIL0" Type="list" Group="injected channel selection" TabName="Filter 0" Visible="false">
+        <Description>Enable/disable DMA for injected conversion </Description>
+<Condition Diagnostic="" Expression="!(!Semaphore_DFSDM_NoinjChannel0_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel1_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel2_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel3_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel4_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel5_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel6_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel7_FIL0_$IpInstance)"/>
+    </RefParameter>
+<!-- trigger source inj -->
+    <RefParameter Comment="External Trigger Source" DefaultValue="DFSDM_FILTER_EXT_TRIG_TIM1_TRGO" Name="ExtTrigger_inj_FIL0" Type="list" Group="injected channel selection" TabName="Filter 0">
+        <Description>External trigger.</Description>
+        <Condition Diagnostic="" Expression="Semaphore_ExternaltriggerSelected_FIL0_$IpInstance &amp; (!Semaphore_DFSDM_NoinjChannel0_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel1_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel2_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel3_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel4_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel5_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel6_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel7_FIL0_$IpInstance)"/>
+        <PossibleValue Comment="TIM1_ TRGO" Value="DFSDM_FILTER_EXT_TRIG_TIM1_TRGO"/>
+        <PossibleValue Comment="TIM3_TRGO" Value="DFSDM_FILTER_EXT_TRIG_TIM3_TRGO"/>
+        <PossibleValue Comment="TIM8_TRGO" Value="DFSDM_FILTER_EXT_TRIG_TIM8_TRGO"/>
+        <PossibleValue Comment="TIM10_OC1" Value="DFSDM_FILTER_EXT_TRIG_TIM10_OC1"/>
+        <PossibleValue Comment="TIM4_TRGO" Value="DFSDM_FILTER_EXT_TRIG_TIM4_TRGO"/>
+        <PossibleValue Comment="TIM6_TRGO" Value="DFSDM_FILTER_EXT_TRIG_TIM6_TRGO"/>
+        <PossibleValue Comment="EXTI11 " Value="DFSDM_FILTER_EXT_TRIG_EXTI11" Condition="!(PA11_GPXTI11|PB11_GPXTI11|PC11_GPXTI11|PD11_GPXTI11|PE11_GPXTI11|PF11_GPXTI11|PG11_GPXTI11|PH11_GPXTI11|PI11_GPXTI11|PJ11_GPXTI11|PK11_GPXTI11|PL11_GPXTI11)" Diagnostic="EXTI11 must be enabled" Action="Disable"/>
+        <PossibleValue Comment="EXTI15" Value="DFSDM_FILTER_EXT_TRIG_EXTI15" Condition="!(PA15_GPXTI15|PB15_GPXTI15|PC15_GPXTI15|PD15_GPXTI15|PE15_GPXTI15|PF15_GPXTI15|PG15_GPXTI15|PH15_GPXTI15|PI15_GPXTI15|PJ15_GPXTI15|PK15_GPXTI15|PL15_GPXTI15)" Diagnostic="EXTI15 must be enabled" Action="Disable"/>
+    </RefParameter>
+    <RefParameter Comment="External Trigger Source" DefaultValue="DFSDM_FILTER_EXT_TRIG_TIM1_TRGO" Name="ExtTrigger_inj_FIL0" Type="list" Group="injected channel selection" TabName="Filter 0" Visible="false">
+        <Description>External trigger.</Description>
+        <Condition Diagnostic="" Expression="!Semaphore_ExternaltriggerSelected_FIL0_$IpInstance &amp;(!Semaphore_DFSDM_NoinjChannel0_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel1_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel2_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel3_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel4_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel5_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel6_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel7_FIL0_$IpInstance)"/>
+        <PossibleValue Comment="TIM1_TRGO" Value="DFSDM_FILTER_EXT_TRIG_TIM1_TRGO"/>
+    </RefParameter>
+    <RefParameter Comment="External Trigger Source" DefaultValue="null" Name="ExtTrigger_inj_FIL0" Type="list" Group="injected channel selection" TabName="Filter 0" Visible="false">
+        <Description>External trigger.</Description>
+        <Condition Diagnostic="" Expression="!(!Semaphore_DFSDM_NoinjChannel0_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel1_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel2_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel3_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel4_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel5_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel6_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel7_FIL0_$IpInstance)"/>
+    </RefParameter>
+<!-- ext trigger edge inj -->
+    <RefParameter Comment="Ext Trigger Edge" DefaultValue="DFSDM_FILTER_EXT_TRIG_RISING_EDGE" Name="ExtTriggerEdge_inj_FIL0" Type="list" Group="injected channel selection" TabName="Filter 0">
+        <Description>External trigger edge: rising, falling or both.</Description>
+        <Condition Diagnostic="" Expression="Semaphore_ExternaltriggerSelected_FIL0_$IpInstance &amp; (!Semaphore_DFSDM_NoinjChannel0_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel1_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel2_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel3_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel4_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel5_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel6_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel7_FIL0_$IpInstance)"/>
+        <PossibleValue Comment="External rising edge " Value="DFSDM_FILTER_EXT_TRIG_RISING_EDGE"/>
+        <PossibleValue Comment="External falling edge " Value="DFSDM_FILTER_EXT_TRIG_FALLING_EDGE"/>
+        <PossibleValue Comment="External rising and falling edges " Value="DFSDM_FILTER_EXT_TRIG_BOTH_EDGES"/>
+    </RefParameter>
+    <RefParameter Comment="Ext Trigger Edge" DefaultValue="DFSDM_FILTER_EXT_TRIG_RISING_EDGE" Name="ExtTriggerEdge_inj_FIL0" Type="list" Group="injected channel selection" TabName="Filter 0" Visible="false">
+        <Description>External trigger edge: rising, falling or both.</Description>
+        <Condition Diagnostic="" Expression="!Semaphore_ExternaltriggerSelected_FIL0_$IpInstance &amp; (!Semaphore_DFSDM_NoinjChannel0_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel1_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel2_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel3_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel4_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel5_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel6_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel7_FIL0_$IpInstance)"/>
+        <PossibleValue Comment="External rising edge " Value="DFSDM_FILTER_EXT_TRIG_RISING_EDGE"/>
+    </RefParameter>
+    <RefParameter Comment="Ext Trigger Edge" DefaultValue="null" Name="ExtTriggerEdge_inj_FIL0" Type="list" Group="injected channel selection" TabName="Filter 0" Visible="false">
+        <Description>External trigger edge: rising, falling or both.</Description>
+        <Condition Diagnostic="" Expression="!(!Semaphore_DFSDM_NoinjChannel0_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel1_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel2_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel3_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel4_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel5_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel6_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel7_FIL0_$IpInstance)"/>
+    </RefParameter>
+<!-- sinc order -->
+    <RefParameter Comment="Sinc Order" DefaultValue="DFSDM_FILTER_FASTSINC_ORDER" Name="SincOrder_FIL0" Type="list" Group="Filter parameters" TabName="Filter 0">
+        <Description>Sinc filter order.</Description>
+<Condition Diagnostic="" Expression="(!Semaphore_DFSDM_NoregChannel_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel0_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel1_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel2_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel3_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel4_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel5_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel6_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel7_FIL0_$IpInstance)"/>
+        <PossibleValue Comment="FastSinc filter type " Value="DFSDM_FILTER_FASTSINC_ORDER" Semaphore="Semaphore_FIL0_Order_0_to_3_$IpInstance"/>
+        <PossibleValue Comment="Sinc 1 filter type " Value="DFSDM_FILTER_SINC1_ORDER" Semaphore="Semaphore_FIL0_Order_0_to_3_$IpInstance"/>
+        <PossibleValue Comment="Sinc 2 filter type " Value="DFSDM_FILTER_SINC2_ORDER" Semaphore="Semaphore_FIL0_Order_0_to_3_$IpInstance"/>
+        <PossibleValue Comment="Sinc 3 filter type " Value="DFSDM_FILTER_SINC3_ORDER" Semaphore="Semaphore_FIL0_Order_0_to_3_$IpInstance"/>
+        <PossibleValue Comment="Sinc 4 filter type " Value="DFSDM_FILTER_SINC4_ORDER" Semaphore="Semaphore_FIL0_Order_4_$IpInstance"/>
+        <PossibleValue Comment="Sinc 5 filter type " Value="DFSDM_FILTER_SINC5_ORDER" Semaphore="Semaphore_FIL0_Order_5_$IpInstance"/>
+    </RefParameter>
+    <RefParameter Comment="Sinc Order" DefaultValue="null" Name="SincOrder_FIL0" Type="list" Group="Filter parameters" TabName="Filter 0" Visible="false">
+        <Description>Sinc filter order.</Description>
+<Condition Diagnostic="" Expression="!(!Semaphore_DFSDM_NoregChannel_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel0_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel1_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel2_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel3_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel4_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel5_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel6_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel7_FIL0_$IpInstance)"/>
+    </RefParameter>
+<!-- Fosr -->
+    <RefParameter Comment="Fosr" DefaultValue="1" Max="1024" Min="1" Name="Fosr_FIL0" Type="integer" Group="Filter parameters" TabName="Filter 0">
+        <Description>Filter oversampling ratio ( 1 means bypass).</Description>
+<Condition Diagnostic="" Expression="((!Semaphore_DFSDM_NoregChannel_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel0_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel1_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel2_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel3_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel4_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel5_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel6_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel7_FIL0_$IpInstance)&amp;Semaphore_FIL0_Order_0_to_3_$IpInstance)"/>
+    </RefParameter>
+    <RefParameter Comment="Fosr" DefaultValue="1" Max="215" Min="1" Name="Fosr_FIL0" Type="integer" Group="Filter parameters" TabName="Filter 0">
+        <Description>Filter oversampling ratio ( 1 means bypass).</Description>
+<Condition Diagnostic="" Expression="((!Semaphore_DFSDM_NoregChannel_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel0_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel1_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel2_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel3_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel4_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel5_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel6_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel7_FIL0_$IpInstance)&amp;Semaphore_FIL0_Order_4_$IpInstance)"/>
+    </RefParameter>
+    <RefParameter Comment="Fosr" DefaultValue="1" Max="73" Min="1" Name="Fosr_FIL0" Type="integer" Group="Filter parameters" TabName="Filter 0">
+        <Description>Filter oversampling ratio ( 1 means bypass).</Description>
+<Condition Diagnostic="" Expression="((!Semaphore_DFSDM_NoregChannel_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel0_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel1_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel2_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel3_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel4_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel5_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel6_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel7_FIL0_$IpInstance)&amp;Semaphore_FIL0_Order_5_$IpInstance)"/>
+    </RefParameter>
+    <RefParameter Comment="Fosr" DefaultValue="null" Max="1024" Min="1" Name="Fosr_FIL0" Type="integer" Group="Filter parameters" TabName="Filter 0" Visible="false">
+        <Description>Filter oversampling ratio ( 1 means bypass).</Description>
+<Condition Diagnostic="" Expression="!(!Semaphore_DFSDM_NoregChannel_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel0_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel1_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel2_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel3_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel4_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel5_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel6_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel7_FIL0_$IpInstance)"/>
+    </RefParameter>
+<!-- Iosr -->
+    <RefParameter Comment="Iosr" DefaultValue="1" Max="256" Min="1" Name="Iosr_FIL0" Type="integer" Group="Filter parameters" TabName="Filter 0">
+        <Description>Integrator oversampling ratio.</Description>
+<Condition Diagnostic="" Expression="(!Semaphore_DFSDM_NoregChannel_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel0_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel1_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel2_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel3_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel4_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel5_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel6_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel7_FIL0_$IpInstance)"/>
+    </RefParameter>
+    <RefParameter Comment="Iosr" DefaultValue="null" Max="256" Min="1" Name="Iosr_FIL0" Type="integer" Group="Filter parameters" TabName="Filter 0" Visible="false">
+        <Description>Integrator oversampling ratio.</Description>
+<Condition Diagnostic="" Expression="!(!Semaphore_DFSDM_NoregChannel_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel0_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel1_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel2_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel3_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel4_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel5_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel6_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel7_FIL0_$IpInstance)"/>
+    </RefParameter>
+<!-- hdma reg -->
+    <RefParameter Comment="Hdma Reg" DefaultValue="null" Max="0" Min="0" Name="hdmaReg_FIL0" Type="integer" Group="Filter parameters" TabName="Filter 0">
+        <Description>Pointer on DMA handler for regular conversions </Description>
+<Condition Diagnostic="" Expression="(!Semaphore_DFSDM_NoregChannel_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel0_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel1_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel2_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel3_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel4_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel5_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel6_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel7_FIL0_$IpInstance)"/>
+    </RefParameter>
+    <RefParameter Comment="Hdma Reg" DefaultValue="null" Max="0" Min="0" Name="hdmaReg_FIL0" Type="integer" Group="Filter parameters" TabName="Filter 0" Visible="false">
+        <Description>Pointer on DMA handler for regular conversions </Description>
+<Condition Diagnostic="" Expression="!(!Semaphore_DFSDM_NoregChannel_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel0_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel1_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel2_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel3_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel4_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel5_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel6_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel7_FIL0_$IpInstance)"/>
+    </RefParameter>
+<!-- hdma inj -->
+    <RefParameter Comment="Hdma Inj" DefaultValue="null" Max="0" Min="0" Name="hdmaInj_FIL0" Type="integer" Group="other ???" TabName="Filter 0">
+        <Description>Pointer on DMA handler for injected conversions </Description>
+<Condition Diagnostic="" Expression="(!Semaphore_DFSDM_NoregChannel_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel0_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel1_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel2_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel3_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel4_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel5_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel6_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel7_FIL0_$IpInstance)"/>
+    </RefParameter>
+    <RefParameter Comment="Hdma Inj" DefaultValue="null" Max="0" Min="0" Name="hdmaInj_FIL0" Type="integer" Group="other ???" TabName="Filter 0" Visible="false">
+        <Description>Pointer on DMA handler for injected conversions </Description>
+<Condition Diagnostic="" Expression="!(!Semaphore_DFSDM_NoregChannel_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel0_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel1_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel2_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel3_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel4_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel5_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel6_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel7_FIL0_$IpInstance)"/>
+    </RefParameter>
+<!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Filter 0: regularChannel configuration %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%-->
+    <RefParameter Comment="regular channel selection" DefaultValue="__NULL" Name="Filter_regChannel_FIL0" Type="list" Group="regular channel selection" TabName="Filter 0">
+        <Description>regular channel selection.</Description>
+        <PossibleValue Comment="- None -" Value="__NULL" Semaphore="Semaphore_DFSDM_NoregChannel_FIL0_$IpInstance"/>
+        <PossibleValue Comment="Channel 0" Value="DFSDM_CHANNEL_0" Condition="!(Semaphore_Channel_0_$IpInstance)" Diagnostic="channel 0 is disabled in Pinout tab" Action="Disable"/>
+        <PossibleValue Comment="Channel 1" Value="DFSDM_CHANNEL_1" Condition="!(Semaphore_Channel_1_$IpInstance)" Diagnostic="channel 1 is disable  in Pinout tab" Action="Disable"/>
+        <PossibleValue Comment="Channel 2" Value="DFSDM_CHANNEL_2" Condition="!(Semaphore_Channel_2_$IpInstance)" Diagnostic="channel 2 is disabled in Pinout tab" Action="Disable"/>
+        <PossibleValue Comment="Channel 3" Value="DFSDM_CHANNEL_3" Condition="!(Semaphore_Channel_3_$IpInstance)" Diagnostic="channel 3 is disabled in Pinout tab" Action="Disable"/>
+    </RefParameter>
+<!-- <RefParameter Comment="Continuous Mode" DefaultValue="0" Max="4294967295" Min="0" Name="Filter_regContinuousMode_FIL0" Type="integer" Group="regular channel selection" TabName="Filter 0"/>-->
+    <RefParameter Comment="Continuous Mode" DefaultValue="DFSDM_CONTINUOUS_CONV_ON" Name="Filter_regContinuousMode_FIL0" Type="list" Group="regular channel selection" TabName="Filter 0">
+        <Description>regular conversion continous/one shot mode. (Bit field RCONT in DFSDM_CR1 register)</Description>
+<Condition Diagnostic="" Expression="(!Semaphore_DFSDM_NoregChannel_FIL0_$IpInstance)"/>
+        <PossibleValue Comment="One Shot Mode" Value="DFSDM_CONTINUOUS_CONV_OFF"/>
+        <PossibleValue Comment="Continuous Mode" Value="DFSDM_CONTINUOUS_CONV_ON"/>
+    </RefParameter>
+    <RefParameter Comment="Continuous Mode" DefaultValue="null" Name="Filter_regContinuousMode_FIL0" Type="list" Group="regular channel selection" TabName="Filter 0" Visible="false">
+        <Description>regular conversion continous/one shot mode. (Bit field RCONT in DFSDM_CR1 register)</Description>
+<Condition Diagnostic="" Expression="!(!Semaphore_DFSDM_NoregChannel_FIL0_$IpInstance)"/>
+        <PossibleValue Comment="One Shot Mode" Value="DFSDM_CONTINUOUS_CONV_OFF"/>
+        <PossibleValue Comment="Continuous Mode" Value="DFSDM_CONTINUOUS_CONV_ON"/>
+    </RefParameter>
+<!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Filter 0: injectedChannel configuration %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%-->
+<!--
+    <RefParameter Comment="Channel" DefaultValue="/-Filter_injChannel0_FIL0+|Filter_injChannel1_FIL0+|Filter_injChannel2_FIL0+|Filter_injChannel3_FIL0+|Filter_injChannel4_FIL0+|Filter_injChannel5_FIL0+|Filter_injChannel6_FIL0+|Filter_injChannel7_FIL0/" Max="255" Min="0" Name="Filter_injChannel_FIL0" Type="integer" Group="injected channel selection" TabName="Filter 0"/>
+-->
+    <RefParameter Comment="Channel" DefaultValue="/-Filter_injChannel0_FIL0+|Filter_injChannel1_FIL0+|Filter_injChannel2_FIL0+|Filter_injChannel3_FIL0+|Filter_injChannel4_FIL0+|Filter_injChannel5_FIL0+|Filter_injChannel6_FIL0+|Filter_injChannel7_FIL0/__NULL\|//\|__NULL//" Name="Filter_injChannel_FIL0" Type="list" Group="injected channel selection" TabName="Filter 0"/>
+    <RefParameter Comment="Channel0 as injected channel" DefaultValue="__NULL" Name="Filter_injChannel0_FIL0" Type="list" Group="injected channel selection" TabName="Filter 0">
+        <Description>injected channel selection.</Description>
+        <PossibleValue Comment="Disable" Value="__NULL" Semaphore="Semaphore_DFSDM_NoinjChannel0_FIL0_$IpInstance"/>
+        <PossibleValue Comment="Enable" Value="DFSDM_CHANNEL_0" Condition="!(Semaphore_Channel_0_$IpInstance)" Diagnostic="channel 0 is disabled in Pinout tab" Action="Disable"/>
+    </RefParameter>
+    <RefParameter Comment="Channel1 as injected channel" DefaultValue="__NULL" Name="Filter_injChannel1_FIL0" Type="list" Group="injected channel selection" TabName="Filter 0">
+        <Description>injected channel selection.</Description>
+        <PossibleValue Comment="Disable" Value="__NULL" Semaphore="Semaphore_DFSDM_NoinjChannel1_FIL0_$IpInstance"/>
+        <PossibleValue Comment="Enable" Value="DFSDM_CHANNEL_1" Condition="!(Semaphore_Channel_1_$IpInstance)" Diagnostic="channel 1 is disabled in Pinout tab" Action="Disable"/>
+    </RefParameter>
+    <RefParameter Comment="Channel2 as injected channel" DefaultValue="__NULL" Name="Filter_injChannel2_FIL0" Type="list" Group="injected channel selection" TabName="Filter 0">
+        <Description>injected channel selection.</Description>
+        <PossibleValue Comment="Disable" Value="__NULL" Semaphore="Semaphore_DFSDM_NoinjChannel2_FIL0_$IpInstance"/>
+        <PossibleValue Comment="Enable" Value="DFSDM_CHANNEL_2" Condition="!(Semaphore_Channel_2_$IpInstance)" Diagnostic="channel 2 is disabled in Pinout tab" Action="Disable"/>
+    </RefParameter>
+    <RefParameter Comment="Channel3 as injected channel" DefaultValue="__NULL" Name="Filter_injChannel3_FIL0" Type="list" Group="injected channel selection" TabName="Filter 0">
+        <Description>injected channel selection.</Description>
+        <PossibleValue Comment="Disable" Value="__NULL" Semaphore="Semaphore_DFSDM_NoinjChannel3_FIL0_$IpInstance"/>
+        <PossibleValue Comment="Enable" Value="DFSDM_CHANNEL_3" Condition="!(Semaphore_Channel_3_$IpInstance)" Diagnostic="channel 3 is disabled in Pinout tab" Action="Disable"/>
+    </RefParameter>
+    <RefParameter Comment="Channel4 as injected channel" DefaultValue="__NULL" Name="Filter_injChannel4_FIL0" Type="list" Group="injected channel selection" TabName="Filter 0">
+        <Description>injected channel selection.</Description>
+        <PossibleValue Comment="Disable" Value="__NULL" Semaphore="Semaphore_DFSDM_NoinjChannel4_FIL0_$IpInstance"/>
+        <PossibleValue Comment="Enable" Value="DFSDM_CHANNEL_4" Condition="!(Semaphore_Channel_4_$IpInstance)" Diagnostic="channel 4 is disabled in Pinout tab" Action="Disable"/>
+    </RefParameter>
+    <RefParameter Comment="Channel5 as injected channel" DefaultValue="__NULL" Name="Filter_injChannel5_FIL0" Type="list" Group="injected channel selection" TabName="Filter 0">
+        <Description>injected channel selection.</Description>
+        <PossibleValue Comment="Disable" Value="__NULL" Semaphore="Semaphore_DFSDM_NoinjChannel5_FIL0_$IpInstance"/>
+        <PossibleValue Comment="Enable" Value="DFSDM_CHANNEL_5" Condition="!(Semaphore_Channel_5_$IpInstance)" Diagnostic="channel 5 is disabled in Pinout tab" Action="Disable"/>
+    </RefParameter>
+    <RefParameter Comment="Channel6 as injected channel" DefaultValue="__NULL" Name="Filter_injChannel6_FIL0" Type="list" Group="injected channel selection" TabName="Filter 0">
+        <Description>injected channel selection.</Description>
+        <PossibleValue Comment="Disable" Value="__NULL" Semaphore="Semaphore_DFSDM_NoinjChannel6_FIL0_$IpInstance"/>
+        <PossibleValue Comment="Enable" Value="DFSDM_CHANNEL_6" Condition="!(Semaphore_Channel_6_$IpInstance)" Diagnostic="channel 6 is disabled in Pinout tab" Action="Disable"/>
+    </RefParameter>
+    <RefParameter Comment="Channel7 as injected channel" DefaultValue="__NULL" Name="Filter_injChannel7_FIL0" Type="list" Group="injected channel selection" TabName="Filter 0">
+        <Description>injected channel selection.</Description>
+        <PossibleValue Comment="Disable" Value="__NULL" Semaphore="Semaphore_DFSDM_NoinjChannel7_FIL0_$IpInstance"/>
+        <PossibleValue Comment="Enable" Value="DFSDM_CHANNEL_7" Condition="!(Semaphore_Channel_7_$IpInstance)" Diagnostic="channel 7 is disabled in Pinout tab" Action="Disable"/>
+    </RefParameter>
+<!-- %%%%%%%%%%%%%%%%%%%%%% Filter 0: Semaphore creation for NVIC/DMA %%%%%%%%%%%%%%%%%%%%%%-->
+    <RefParameter Comment="" DefaultValue="Filter_FIL0_ENABLE" Name="Filter_ACTIVATED_FIL0" Type="list" Group="regular channel selection" TabName="Filter 0" Visible="false">
+        <Description>to indicate to NVIC or DMA that the filter is active</Description>
+<Condition Diagnostic="" Expression="(!Semaphore_DFSDM_NoregChannel_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel0_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel1_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel2_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel3_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel4_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel5_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel6_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel7_FIL0_$IpInstance)"/>
+        <PossibleValue Comment="Filter not activated" Value="Filter_FIL0_DISABLE"/>
+        <PossibleValue Comment="Filter activated" Value="Filter_FIL0_ENABLE" Semaphore="Semaphore_$IpInstance_Filter_FIL0_Enable"/>
+    </RefParameter>
+    <RefParameter Comment="" DefaultValue="Filter_FIL0_DISABLE" Name="Filter_ACTIVATED_FIL0" Type="list" Group="regular channel selection" TabName="Filter 0" Visible="false">
+        <Description>to indicate to NVIC or DMA that the filter is active</Description>
+<Condition Diagnostic="" Expression="!(!Semaphore_DFSDM_NoregChannel_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel0_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel1_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel2_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel3_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel4_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel5_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel6_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel7_FIL0_$IpInstance)"/>
+        <PossibleValue Comment="Filter not activated" Value="Filter_FIL0_DISABLE"/>
+        <PossibleValue Comment="Filter activated" Value="Filter_FIL0_ENABLE" Semaphore="Semaphore_$IpInstance_Filter_FIL0_Enable"/>
+    </RefParameter>
+<!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Filter 1 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%-->
+<!-- trigger reg -->
+    <RefParameter Comment="Trigger to start regular conversion" DefaultValue="DFSDM_FILTER_SW_TRIGGER" Name="Trigger_reg_FIL1" Type="list" Group="regular channel selection" TabName="Filter 1">
+        <Description>Trigger used to start regular conversion: software or synchronous.</Description>
+<Condition Diagnostic="" Expression="!Semaphore_DFSDM_NoregChannel_FIL1_$IpInstance"/>
+        <PossibleValue Comment="Software trigger " Value="DFSDM_FILTER_SW_TRIGGER"/>
+<!--NOT FOR FILTER 0 OR DFSDM0 the parameter must be visible only for filters 1,2 and 3-->
+        <PossibleValue Comment="Synchronous with DFSDM0 " Value="DFSDM_FILTER_SYNC_TRIGGER"/>
+    </RefParameter>
+    <RefParameter Comment="Trigger to start regular conversion" DefaultValue="null" Name="Trigger_reg_FIL1" Type="list" Group="regular channel selection" TabName="Filter 1" Visible="false">
+        <Description>Trigger used to start regular conversion: software or synchronous.</Description>
+<Condition Diagnostic="" Expression="!(!Semaphore_DFSDM_NoregChannel_FIL1_$IpInstance)"/>
+    </RefParameter>
+<!-- FastMode -->
+    <RefParameter Comment="Fast Mode" DefaultValue="DISABLE" Name="FastMode_reg_FIL1" Type="list" Group="regular channel selection" TabName="Filter 1">
+        <Description>Enable/disable fast mode for regular conversion </Description>
+<Condition Diagnostic="" Expression="!Semaphore_DFSDM_NoregChannel_FIL1_$IpInstance"/>
+        <PossibleValue Comment="Disable" Value="DISABLE"/>
+        <PossibleValue Comment="Enable" Value="ENABLE"/>
+    </RefParameter>
+    <RefParameter Comment="Fast Mode" DefaultValue="null" Name="FastMode_reg_FIL1" Type="list" Group="regular channel selection" TabName="Filter 1" Visible="false">
+        <Description>Enable/disable fast mode for regular conversion </Description>
+<Condition Diagnostic="" Expression="!(!Semaphore_DFSDM_NoregChannel_FIL1_$IpInstance)"/>
+    </RefParameter>
+<!-- DMA Mode reg-->
+    <RefParameter Comment="Dma Mode" DefaultValue="DISABLE" Name="DmaMode_reg_FIL1" Type="list" Group="regular channel selection" TabName="Filter 1">
+        <Description>Enable/disable DMA for regular conversion </Description>
+<Condition Diagnostic="" Expression="!Semaphore_DFSDM_NoregChannel_FIL1_$IpInstance"/>
+        <PossibleValue Comment="Disable" Value="DISABLE"/>
+        <PossibleValue Comment="Enable" Value="ENABLE" Semaphore="Semaphore_DFSDM2DMA_REG_FIL1_$IpInstance" Condition="!Semaphore_$IpInstance_Filter_FIL1_DMA_Request" Action="Disable" Diagnostic=" A DMA request must be active for the concerned DFSDM filter in the DMA configuration tab"/>
+    </RefParameter>
+    <RefParameter Comment="Dma Mode" DefaultValue="null" Name="DmaMode_reg_FIL1" Type="list" Group="regular channel selection" TabName="Filter 1" Visible="false">
+        <Description>Enable/disable DMA for regular conversion </Description>
+<Condition Diagnostic="" Expression="!(!Semaphore_DFSDM_NoregChannel_FIL1_$IpInstance)"/>
+    </RefParameter>
+<!-- Trigger_inj -->
+    <RefParameter Comment="Trigger to start injected conversion" DefaultValue="DFSDM_FILTER_SW_TRIGGER" Name="Trigger_inj_FIL1" Type="list" Group="injected channel selection" TabName="Filter 1">
+        <Description>Trigger used to start injected conversion: software, external or synchronous.</Description>
+<Condition Diagnostic="" Expression="!Semaphore_DFSDM_NoinjChannel0_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel1_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel2_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel3_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel4_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel5_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel6_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel7_FIL1_$IpInstance"/>
+        <PossibleValue Comment="Software trigger " Value="DFSDM_FILTER_SW_TRIGGER"/>
+       <PossibleValue Comment="Synchronous with DFSDM0 " Value="DFSDM_FILTER_SYNC_TRIGGER"/>
+        <PossibleValue Comment="External trigger" Value="DFSDM_FILTER_EXT_TRIGGER" Semaphore="Semaphore_ExternaltriggerSelected_FIL1_$IpInstance"/>
+    </RefParameter>
+    <RefParameter Comment="Trigger to start injected conversion" DefaultValue="null" Name="Trigger_inj_FIL1" Type="list" Group="injected channel selection" TabName="Filter 1" Visible="false">
+        <Description>Trigger used to start injected conversion: software, external or synchronous.</Description>
+<Condition Diagnostic="" Expression="!(!Semaphore_DFSDM_NoinjChannel0_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel1_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel2_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel3_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel4_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel5_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel6_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel7_FIL1_$IpInstance)"/>
+    </RefParameter>
+<!-- Scan Mode -->
+    <RefParameter Comment="Scan Mode" DefaultValue="DISABLE" Name="ScanMode_inj_FIL1" Type="list" Group="injected channel selection" TabName="Filter 1">
+        <Description>Enable/disable scanning mode for injected conversion </Description>
+<Condition Diagnostic="" Expression="!Semaphore_DFSDM_NoinjChannel0_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel1_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel2_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel3_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel4_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel5_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel6_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel7_FIL1_$IpInstance"/>
+        <PossibleValue Comment="Disable" Value="DISABLE"/>
+        <PossibleValue Comment="Enable" Value="ENABLE"/>
+    </RefParameter>
+    <RefParameter Comment="Scan Mode" DefaultValue="null" Name="ScanMode_inj_FIL1" Type="list" Group="injected channel selection" TabName="Filter 1" Visible="false">
+        <Description>Enable/disable scanning mode for injected conversion </Description>
+<Condition Diagnostic="" Expression="!(!Semaphore_DFSDM_NoinjChannel0_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel1_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel2_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel3_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel4_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel5_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel6_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel7_FIL1_$IpInstance)"/>
+    </RefParameter>
+<!-- DMA Mode inj -->
+    <RefParameter Comment="Dma Mode" DefaultValue="DISABLE" Name="DmaMode_inj_FIL1" Type="list" Group="injected channel selection" TabName="Filter 1">
+        <Description>Enable/disable DMA for injected conversion </Description>
+<Condition Diagnostic="" Expression="(!Semaphore_DFSDM_NoinjChannel0_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel1_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel2_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel3_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel4_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel5_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel6_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel7_FIL1_$IpInstance)"/>
+        <PossibleValue Comment="Disable" Value="DISABLE"/>
+        <PossibleValue Comment="Enable" Value="ENABLE" Semaphore="Semaphore_DFSDM2DMA_INJ_FIL1_$IpInstance" Condition="!Semaphore_$IpInstance_Filter_FIL1_DMA_Request" Action="Disable" Diagnostic="A DMA request must be active for the concerned DFSDM filter in the DMA configuration tab"/>
+    </RefParameter>
+    <RefParameter Comment="Dma Mode" DefaultValue="null" Name="DmaMode_inj_FIL1" Type="list" Group="injected channel selection" TabName="Filter 1" Visible="false">
+        <Description>Enable/disable DMA for injected conversion </Description>
+<Condition Diagnostic="" Expression="!(!Semaphore_DFSDM_NoinjChannel0_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel1_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel2_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel3_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel4_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel5_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel6_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel7_FIL1_$IpInstance)"/>
+    </RefParameter>
+<!-- trigger source inj -->
+    <RefParameter Comment="External Trigger Source" DefaultValue="DFSDM_FILTER_EXT_TRIG_TIM1_TRGO" Name="ExtTrigger_inj_FIL1" Type="list" Group="injected channel selection" TabName="Filter 1">
+        <Description>External trigger.</Description>
+        <Condition Diagnostic="" Expression="Semaphore_ExternaltriggerSelected_FIL1_$IpInstance &amp; (!Semaphore_DFSDM_NoinjChannel0_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel1_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel2_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel3_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel4_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel5_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel6_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel7_FIL1_$IpInstance)"/>
+        <PossibleValue Comment="TIM1_TRGO" Value="DFSDM_FILTER_EXT_TRIG_TIM1_TRGO"/>
+        <PossibleValue Comment="TIM3_TRGO" Value="DFSDM_FILTER_EXT_TRIG_TIM3_TRGO"/>
+        <PossibleValue Comment="TIM8_TRGO" Value="DFSDM_FILTER_EXT_TRIG_TIM8_TRGO"/>
+        <PossibleValue Comment="TIM10_OC1" Value="DFSDM_FILTER_EXT_TRIG_TIM10_OC1"/>
+        <PossibleValue Comment="TIM4_TRGO" Value="DFSDM_FILTER_EXT_TRIG_TIM4_TRGO"/>
+        <PossibleValue Comment="TIM6_TRGO" Value="DFSDM_FILTER_EXT_TRIG_TIM6_TRGO"/>
+        <PossibleValue Comment="EXTI11 " Value="DFSDM_FILTER_EXT_TRIG_EXTI11" Condition="!(PA11_GPXTI11|PB11_GPXTI11|PC11_GPXTI11|PD11_GPXTI11|PE11_GPXTI11|PF11_GPXTI11|PG11_GPXTI11|PH11_GPXTI11|PI11_GPXTI11|PJ11_GPXTI11|PK11_GPXTI11|PL11_GPXTI11)" Diagnostic="EXTI11 must be enabled" Action="Disable"/>
+        <PossibleValue Comment="EXTI15" Value="DFSDM_FILTER_EXT_TRIG_EXTI15" Condition="!(PA15_GPXTI15|PB15_GPXTI15|PC15_GPXTI15|PD15_GPXTI15|PE15_GPXTI15|PF15_GPXTI15|PG15_GPXTI15|PH15_GPXTI15|PI15_GPXTI15|PJ15_GPXTI15|PK15_GPXTI15|PL15_GPXTI15)" Diagnostic="EXTI15 must be enabled" Action="Disable"/>
+    </RefParameter>
+    <RefParameter Comment="External Trigger Source" DefaultValue="DFSDM_FILTER_EXT_TRIG_TIM1_TRGO" Name="ExtTrigger_inj_FIL1" Type="list" Group="injected channel selection" TabName="Filter 1" Visible="false">
+        <Description>External trigger.</Description>
+        <Condition Diagnostic="" Expression="!Semaphore_ExternaltriggerSelected_FIL1_$IpInstance &amp;(!Semaphore_DFSDM_NoinjChannel0_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel1_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel2_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel3_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel4_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel5_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel6_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel7_FIL1_$IpInstance)"/>
+        <PossibleValue Comment="TIM1_TRGO" Value="DFSDM_FILTER_EXT_TRIG_TIM1_TRGO"/>
+    </RefParameter>
+    <RefParameter Comment="External Trigger Source" DefaultValue="null" Name="ExtTrigger_inj_FIL1" Type="list" Group="injected channel selection" TabName="Filter 1" Visible="false">
+        <Description>External trigger.</Description>
+        <Condition Diagnostic="" Expression="!(!Semaphore_DFSDM_NoinjChannel0_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel1_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel2_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel3_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel4_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel5_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel6_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel7_FIL1_$IpInstance)"/>
+    </RefParameter>
+<!-- ext trigger edge inj -->
+    <RefParameter Comment="Ext Trigger Edge" DefaultValue="DFSDM_FILTER_EXT_TRIG_RISING_EDGE" Name="ExtTriggerEdge_inj_FIL1" Type="list" Group="injected channel selection" TabName="Filter 1">
+        <Description>External trigger edge: rising, falling or both.</Description>
+        <Condition Diagnostic="" Expression="Semaphore_ExternaltriggerSelected_FIL1_$IpInstance &amp; (!Semaphore_DFSDM_NoinjChannel0_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel1_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel2_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel3_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel4_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel5_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel6_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel7_FIL1_$IpInstance)"/>
+        <PossibleValue Comment="External rising edge " Value="DFSDM_FILTER_EXT_TRIG_RISING_EDGE"/>
+        <PossibleValue Comment="External falling edge " Value="DFSDM_FILTER_EXT_TRIG_FALLING_EDGE"/>
+        <PossibleValue Comment="External rising and falling edges " Value="DFSDM_FILTER_EXT_TRIG_BOTH_EDGES"/>
+    </RefParameter>
+    <RefParameter Comment="Ext Trigger Edge" DefaultValue="DFSDM_FILTER_EXT_TRIG_RISING_EDGE" Name="ExtTriggerEdge_inj_FIL1" Type="list" Group="injected channel selection" TabName="Filter 1" Visible="false">
+        <Description>External trigger edge: rising, falling or both.</Description>
+        <Condition Diagnostic="" Expression="!Semaphore_ExternaltriggerSelected_FIL1_$IpInstance &amp; (!Semaphore_DFSDM_NoinjChannel0_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel1_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel2_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel3_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel4_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel5_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel6_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel7_FIL1_$IpInstance)"/>
+        <PossibleValue Comment="External rising edge " Value="DFSDM_FILTER_EXT_TRIG_RISING_EDGE"/>
+    </RefParameter>
+    <RefParameter Comment="Ext Trigger Edge" DefaultValue="null" Name="ExtTriggerEdge_inj_FIL1" Type="list" Group="injected channel selection" TabName="Filter 1" Visible="false">
+        <Description>External trigger edge: rising, falling or both.</Description>
+        <Condition Diagnostic="" Expression="!(!Semaphore_DFSDM_NoinjChannel0_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel1_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel2_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel3_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel4_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel5_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel6_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel7_FIL1_$IpInstance)"/>
+    </RefParameter>
+<!-- sinc order -->
+    <RefParameter Comment="Sinc Order" DefaultValue="DFSDM_FILTER_FASTSINC_ORDER" Name="SincOrder_FIL1" Type="list" Group="Filter parameters" TabName="Filter 1">
+        <Description>Sinc filter order.</Description>
+<Condition Diagnostic="" Expression="(!Semaphore_DFSDM_NoregChannel_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel0_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel1_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel2_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel3_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel4_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel5_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel6_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel7_FIL1_$IpInstance)"/>
+        <PossibleValue Comment="FastSinc filter type " Value="DFSDM_FILTER_FASTSINC_ORDER" Semaphore="Semaphore_FIL1_Order_0_to_3_$IpInstance"/>
+        <PossibleValue Comment="Sinc 1 filter type " Value="DFSDM_FILTER_SINC1_ORDER" Semaphore="Semaphore_FIL1_Order_0_to_3_$IpInstance"/>
+        <PossibleValue Comment="Sinc 2 filter type " Value="DFSDM_FILTER_SINC2_ORDER" Semaphore="Semaphore_FIL1_Order_0_to_3_$IpInstance"/>
+        <PossibleValue Comment="Sinc 3 filter type " Value="DFSDM_FILTER_SINC3_ORDER" Semaphore="Semaphore_FIL1_Order_0_to_3_$IpInstance"/>
+        <PossibleValue Comment="Sinc 4 filter type " Value="DFSDM_FILTER_SINC4_ORDER" Semaphore="Semaphore_FIL1_Order_4_$IpInstance"/>
+        <PossibleValue Comment="Sinc 5 filter type " Value="DFSDM_FILTER_SINC5_ORDER" Semaphore="Semaphore_FIL1_Order_5_$IpInstance"/>
+    </RefParameter>
+    <RefParameter Comment="Sinc Order" DefaultValue="null" Name="SincOrder_FIL1" Type="list" Group="Filter parameters" TabName="Filter 1" Visible="false">
+        <Description>Sinc filter order.</Description>
+<Condition Diagnostic="" Expression="!(!Semaphore_DFSDM_NoregChannel_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel0_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel1_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel2_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel3_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel4_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel5_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel6_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel7_FIL1_$IpInstance)"/>
+    </RefParameter>
+<!-- Fosr -->
+    <RefParameter Comment="Fosr" DefaultValue="1" Max="1024" Min="1" Name="Fosr_FIL1" Type="integer" Group="Filter parameters" TabName="Filter 1">
+        <Description>Filter oversampling ratio ( 1 means bypass).</Description>
+<Condition Diagnostic="" Expression="((!Semaphore_DFSDM_NoregChannel_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel0_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel1_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel2_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel3_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel4_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel5_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel6_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel7_FIL1_$IpInstance)&amp;Semaphore_FIL1_Order_0_to_3_$IpInstance)"/>
+    </RefParameter>
+    <RefParameter Comment="Fosr" DefaultValue="1" Max="215" Min="1" Name="Fosr_FIL1" Type="integer" Group="Filter parameters" TabName="Filter 1">
+        <Description>Filter oversampling ratio ( 1 means bypass).</Description>
+<Condition Diagnostic="" Expression="((!Semaphore_DFSDM_NoregChannel_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel0_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel1_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel2_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel3_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel4_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel5_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel6_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel7_FIL1_$IpInstance)&amp;Semaphore_FIL1_Order_4_$IpInstance)"/>
+    </RefParameter>
+    <RefParameter Comment="Fosr" DefaultValue="1" Max="73" Min="1" Name="Fosr_FIL1" Type="integer" Group="Filter parameters" TabName="Filter 1">
+        <Description>Filter oversampling ratio ( 1 means bypass).</Description>
+<Condition Diagnostic="" Expression="((!Semaphore_DFSDM_NoregChannel_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel0_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel1_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel2_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel3_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel4_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel5_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel6_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel7_FIL1_$IpInstance)&amp;Semaphore_FIL1_Order_5_$IpInstance)"/>
+    </RefParameter>
+    <RefParameter Comment="Fosr" DefaultValue="null" Max="1024" Min="1" Name="Fosr_FIL1" Type="integer" Group="Filter parameters" TabName="Filter 1" Visible="false">
+        <Description>Filter oversampling ratio ( 1 means bypass).</Description>
+<Condition Diagnostic="" Expression="!(!Semaphore_DFSDM_NoregChannel_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel0_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel1_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel2_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel3_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel4_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel5_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel6_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel7_FIL1_$IpInstance)"/>
+    </RefParameter>
+<!-- Iosr -->
+    <RefParameter Comment="Iosr" DefaultValue="1" Max="256" Min="1" Name="Iosr_FIL1" Type="integer" Group="Filter parameters" TabName="Filter 1">
+        <Description>Integrator oversampling ratio.</Description>
+<Condition Diagnostic="" Expression="(!Semaphore_DFSDM_NoregChannel_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel0_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel1_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel2_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel3_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel4_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel5_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel6_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel7_FIL1_$IpInstance)"/>
+    </RefParameter>
+    <RefParameter Comment="Iosr" DefaultValue="null" Max="256" Min="1" Name="Iosr_FIL1" Type="integer" Group="Filter parameters" TabName="Filter 1" Visible="false">
+        <Description>Integrator oversampling ratio.</Description>
+<Condition Diagnostic="" Expression="!(!Semaphore_DFSDM_NoregChannel_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel0_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel1_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel2_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel3_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel4_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel5_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel6_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel7_FIL1_$IpInstance)"/>
+    </RefParameter>
+<!-- hdma reg -->
+    <RefParameter Comment="Hdma Reg" DefaultValue="null" Max="0" Min="0" Name="hdmaReg_FIL1" Type="integer" Group="Filter parameters" TabName="Filter 1">
+        <Description>Pointer on DMA handler for regular conversions </Description>
+<Condition Diagnostic="" Expression="(!Semaphore_DFSDM_NoregChannel_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel0_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel1_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel2_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel3_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel4_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel5_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel6_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel7_FIL1_$IpInstance)"/>
+    </RefParameter>
+    <RefParameter Comment="Hdma Reg" DefaultValue="null" Max="0" Min="0" Name="hdmaReg_FIL1" Type="integer" Group="Filter parameters" TabName="Filter 1" Visible="false">
+        <Description>Pointer on DMA handler for regular conversions </Description>
+<Condition Diagnostic="" Expression="!(!Semaphore_DFSDM_NoregChannel_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel0_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel1_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel2_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel3_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel4_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel5_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel6_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel7_FIL1_$IpInstance)"/>
+    </RefParameter>
+<!-- hdma inj -->
+    <RefParameter Comment="Hdma Inj" DefaultValue="null" Max="0" Min="0" Name="hdmaInj_FIL1" Type="integer" Group="other ???" TabName="Filter 1">
+        <Description>Pointer on DMA handler for injected conversions </Description>
+<Condition Diagnostic="" Expression="(!Semaphore_DFSDM_NoregChannel_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel0_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel1_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel2_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel3_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel4_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel5_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel6_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel7_FIL1_$IpInstance)"/>
+    </RefParameter>
+    <RefParameter Comment="Hdma Inj" DefaultValue="null" Max="0" Min="0" Name="hdmaInj_FIL1" Type="integer" Group="other ???" TabName="Filter 1" Visible="false">
+        <Description>Pointer on DMA handler for injected conversions </Description>
+<Condition Diagnostic="" Expression="!(!Semaphore_DFSDM_NoregChannel_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel0_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel1_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel2_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel3_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel4_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel5_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel6_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel7_FIL1_$IpInstance)"/>
+    </RefParameter>
+<!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Filter 1: regularChannel configuration %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%-->
+    <RefParameter Comment="regular channel selection" DefaultValue="__NULL" Name="Filter_regChannel_FIL1" Type="list" Group="regular channel selection" TabName="Filter 1">
+        <Description>regular channel selection.</Description>
+        <PossibleValue Comment="- None -" Value="__NULL" Semaphore="Semaphore_DFSDM_NoregChannel_FIL1_$IpInstance"/>
+        <PossibleValue Comment="Channel 0" Value="DFSDM_CHANNEL_0" Condition="!(Semaphore_Channel_0_$IpInstance)" Diagnostic="channel 0 is disabled in Pinout tab" Action="Disable"/>
+        <PossibleValue Comment="Channel 1" Value="DFSDM_CHANNEL_1" Condition="!(Semaphore_Channel_1_$IpInstance)" Diagnostic="channel 1 is disable  in Pinout tab" Action="Disable"/>
+        <PossibleValue Comment="Channel 2" Value="DFSDM_CHANNEL_2" Condition="!(Semaphore_Channel_2_$IpInstance)" Diagnostic="channel 2 is disabled in Pinout tab" Action="Disable"/>
+        <PossibleValue Comment="Channel 3" Value="DFSDM_CHANNEL_3" Condition="!(Semaphore_Channel_3_$IpInstance)" Diagnostic="channel 3 is disabled in Pinout tab" Action="Disable"/>
+    </RefParameter>
+<!-- <RefParameter Comment="Continuous Mode" DefaultValue="0" Max="4294967295" Min="0" Name="Filter_regContinuousMode_FIL1" Type="integer" Group="regular channel selection" TabName="Filter 1"/>-->
+    <RefParameter Comment="Continuous Mode" DefaultValue="DFSDM_CONTINUOUS_CONV_ON" Name="Filter_regContinuousMode_FIL1" Type="list" Group="regular channel selection" TabName="Filter 1">
+        <Description>regular conversion continous/one shot mode. (Bit field RCONT in DFSDM_CR1 register)</Description>
+<Condition Diagnostic="" Expression="(!Semaphore_DFSDM_NoregChannel_FIL1_$IpInstance)"/>
+        <PossibleValue Comment="One Shot Mode" Value="DFSDM_CONTINUOUS_CONV_OFF"/>
+        <PossibleValue Comment="Continuous Mode" Value="DFSDM_CONTINUOUS_CONV_ON"/>
+    </RefParameter>
+    <RefParameter Comment="Continuous Mode" DefaultValue="null" Name="Filter_regContinuousMode_FIL1" Type="list" Group="regular channel selection" TabName="Filter 1" Visible="false">
+        <Description>regular conversion continous/one shot mode. (Bit field RCONT in DFSDM_CR1 register)</Description>
+<Condition Diagnostic="" Expression="!(!Semaphore_DFSDM_NoregChannel_FIL1_$IpInstance)"/>
+        <PossibleValue Comment="One Shot Mode" Value="DFSDM_CONTINUOUS_CONV_OFF"/>
+        <PossibleValue Comment="Continuous Mode" Value="DFSDM_CONTINUOUS_CONV_ON"/>
+    </RefParameter>
+<!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Filter 1: injectedChannel configuration %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%-->
+<!--
+    <RefParameter Comment="Channel" DefaultValue="/-Filter_injChannel0_FIL1+|Filter_injChannel1_FIL1+|Filter_injChannel2_FIL1+|Filter_injChannel3_FIL1+|Filter_injChannel4_FIL1+|Filter_injChannel5_FIL1+|Filter_injChannel6_FIL1+|Filter_injChannel7_FIL1/" Max="255" Min="0" Name="Filter_injChannel_FIL1" Type="integer" Group="injected channel selection" TabName="Filter 1"/>
+-->
+    <RefParameter Comment="Channel" DefaultValue="/-Filter_injChannel0_FIL1+|Filter_injChannel1_FIL1+|Filter_injChannel2_FIL1+|Filter_injChannel3_FIL1+|Filter_injChannel4_FIL1+|Filter_injChannel5_FIL1+|Filter_injChannel6_FIL1+|Filter_injChannel7_FIL1/__NULL\|//\|__NULL//" Name="Filter_injChannel_FIL1" Type="list" Group="injected channel selection" TabName="Filter 1"/>
+    <RefParameter Comment="Channel0 as injected channel" DefaultValue="__NULL" Name="Filter_injChannel0_FIL1" Type="list" Group="injected channel selection" TabName="Filter 1">
+        <Description>injected channel selection.</Description>
+        <PossibleValue Comment="Disable" Value="__NULL" Semaphore="Semaphore_DFSDM_NoinjChannel0_FIL1_$IpInstance"/>
+        <PossibleValue Comment="Enable" Value="DFSDM_CHANNEL_0" Condition="!(Semaphore_Channel_0_$IpInstance)" Diagnostic="channel 0 is disabled in Pinout tab" Action="Disable"/>
+    </RefParameter>
+    <RefParameter Comment="Channel1 as injected channel" DefaultValue="__NULL" Name="Filter_injChannel1_FIL1" Type="list" Group="injected channel selection" TabName="Filter 1">
+        <Description>injected channel selection.</Description>
+        <PossibleValue Comment="Disable" Value="__NULL" Semaphore="Semaphore_DFSDM_NoinjChannel1_FIL1_$IpInstance"/>
+        <PossibleValue Comment="Enable" Value="DFSDM_CHANNEL_1" Condition="!(Semaphore_Channel_1_$IpInstance)" Diagnostic="channel 1 is disabled in Pinout tab" Action="Disable"/>
+    </RefParameter>
+    <RefParameter Comment="Channel2 as injected channel" DefaultValue="__NULL" Name="Filter_injChannel2_FIL1" Type="list" Group="injected channel selection" TabName="Filter 1">
+        <Description>injected channel selection.</Description>
+        <PossibleValue Comment="Disable" Value="__NULL" Semaphore="Semaphore_DFSDM_NoinjChannel2_FIL1_$IpInstance"/>
+        <PossibleValue Comment="Enable" Value="DFSDM_CHANNEL_2" Condition="!(Semaphore_Channel_2_$IpInstance)" Diagnostic="channel 2 is disabled in Pinout tab" Action="Disable"/>
+    </RefParameter>
+    <RefParameter Comment="Channel3 as injected channel" DefaultValue="__NULL" Name="Filter_injChannel3_FIL1" Type="list" Group="injected channel selection" TabName="Filter 1">
+        <Description>injected channel selection.</Description>
+        <PossibleValue Comment="Disable" Value="__NULL" Semaphore="Semaphore_DFSDM_NoinjChannel3_FIL1_$IpInstance"/>
+        <PossibleValue Comment="Enable" Value="DFSDM_CHANNEL_3" Condition="!(Semaphore_Channel_3_$IpInstance)" Diagnostic="channel 3 is disabled in Pinout tab" Action="Disable"/>
+    </RefParameter>
+    <RefParameter Comment="Channel4 as injected channel" DefaultValue="__NULL" Name="Filter_injChannel4_FIL1" Type="list" Group="injected channel selection" TabName="Filter 1">
+        <Description>injected channel selection.</Description>
+        <PossibleValue Comment="Disable" Value="__NULL" Semaphore="Semaphore_DFSDM_NoinjChannel4_FIL1_$IpInstance"/>
+        <PossibleValue Comment="Enable" Value="DFSDM_CHANNEL_4" Condition="!(Semaphore_Channel_4_$IpInstance)" Diagnostic="channel 4 is disabled in Pinout tab" Action="Disable"/>
+    </RefParameter>
+    <RefParameter Comment="Channel5 as injected channel" DefaultValue="__NULL" Name="Filter_injChannel5_FIL1" Type="list" Group="injected channel selection" TabName="Filter 1">
+        <Description>injected channel selection.</Description>
+        <PossibleValue Comment="Disable" Value="__NULL" Semaphore="Semaphore_DFSDM_NoinjChannel5_FIL1_$IpInstance"/>
+        <PossibleValue Comment="Enable" Value="DFSDM_CHANNEL_5" Condition="!(Semaphore_Channel_5_$IpInstance)" Diagnostic="channel 5 is disabled in Pinout tab" Action="Disable"/>
+    </RefParameter>
+    <RefParameter Comment="Channel6 as injected channel" DefaultValue="__NULL" Name="Filter_injChannel6_FIL1" Type="list" Group="injected channel selection" TabName="Filter 1">
+        <Description>injected channel selection.</Description>
+        <PossibleValue Comment="Disable" Value="__NULL" Semaphore="Semaphore_DFSDM_NoinjChannel6_FIL1_$IpInstance"/>
+        <PossibleValue Comment="Enable" Value="DFSDM_CHANNEL_6" Condition="!(Semaphore_Channel_6_$IpInstance)" Diagnostic="channel 6 is disabled in Pinout tab" Action="Disable"/>
+    </RefParameter>
+    <RefParameter Comment="Channel7 as injected channel" DefaultValue="__NULL" Name="Filter_injChannel7_FIL1" Type="list" Group="injected channel selection" TabName="Filter 1">
+        <Description>injected channel selection.</Description>
+        <PossibleValue Comment="Disable" Value="__NULL" Semaphore="Semaphore_DFSDM_NoinjChannel7_FIL1_$IpInstance"/>
+        <PossibleValue Comment="Enable" Value="DFSDM_CHANNEL_7" Condition="!(Semaphore_Channel_7_$IpInstance)" Diagnostic="channel 7 is disabled in Pinout tab" Action="Disable"/>
+    </RefParameter>
+<!-- %%%%%%%%%%%%%%%%%%%%%% Filter 1: Semaphore creation for NVIC/DMA %%%%%%%%%%%%%%%%%%%%%%-->
+    <RefParameter Comment="" DefaultValue="Filter_FIL1_ENABLE" Name="Filter_ACTIVATED_FIL1" Type="list" Group="regular channel selection" TabName="Filter 1" Visible="false">
+        <Description>to indicate to NVIC or DMA that the filter is active</Description>
+<Condition Diagnostic="" Expression="(!Semaphore_DFSDM_NoregChannel_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel0_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel1_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel2_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel3_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel4_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel5_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel6_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel7_FIL1_$IpInstance)"/>
+        <PossibleValue Comment="Filter not activated" Value="Filter_FIL1_DISABLE"/>
+        <PossibleValue Comment="Filter activated" Value="Filter_FIL1_ENABLE" Semaphore="Semaphore_$IpInstance_Filter_FIL1_Enable"/>
+    </RefParameter>
+    <RefParameter Comment="" DefaultValue="Filter_FIL1_DISABLE" Name="Filter_ACTIVATED_FIL1" Type="list" Group="regular channel selection" TabName="Filter 1" Visible="false">
+        <Description>to indicate to NVIC or DMA that the filter is active</Description>
+<Condition Diagnostic="" Expression="!(!Semaphore_DFSDM_NoregChannel_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel0_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel1_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel2_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel3_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel4_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel5_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel6_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel7_FIL1_$IpInstance)"/>
+        <PossibleValue Comment="Filter not activated" Value="Filter_FIL1_DISABLE"/>
+        <PossibleValue Comment="Filter activated" Value="Filter_FIL1_ENABLE" Semaphore="Semaphore_$IpInstance_Filter_FIL1_Enable"/>
+    </RefParameter>
+
+<!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Global filter ? %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%-->
+
+
+
+    <RefParameter Comment="P Data" DefaultValue="0" Max="0" Min="0" Name="pData" Type="integer"/>
+    <RefParameter Comment="Length" DefaultValue="0" Max="4294967295" Min="0" Name="Length" Type="integer"/>
+    <RefParameter Comment="Data Source" DefaultValue="DFSDM_FILTER_AWD_FILTER_DATA" Name="DataSource" Type="list">
+        <Description>Values from digital filter or from channel watchdog filter.</Description>
+        <PossibleValue Comment="From digital filter " Value="DFSDM_FILTER_AWD_FILTER_DATA"/>
+        <PossibleValue Comment="From analog watchdog channel " Value="DFSDM_FILTER_AWD_CHANNEL_DATA"/>
+    </RefParameter>
+    <RefParameter Comment="Channel" DefaultValue="DFSDM_CHANNEL_0" Name="Channel" Type="list">
+        <Description>Analog watchdog channel selection.</Description>
+        <PossibleValue Comment="Channel 0" Value="DFSDM_CHANNEL_0"/>
+        <PossibleValue Comment="Channel 1" Value="DFSDM_CHANNEL_1"/>
+        <PossibleValue Comment="Channel 2" Value="DFSDM_CHANNEL_2"/>
+        <PossibleValue Comment="Channel 3" Value="DFSDM_CHANNEL_3"/>
+    </RefParameter>
+    <RefParameter Comment="High Threshold" DefaultValue="0x0" Max="0x00FFFFFF" Min="0x0" Name="HighThreshold" Type="integer">
+        <Description>High threshold for the analog watchdog.</Description>
+    </RefParameter>
+    <RefParameter Comment="Low Threshold" DefaultValue="0x0" Max="0x00FFFFFF" Min="0x0" Name="LowThreshold" Type="integer">
+        <Description>Low threshold for the analog watchdog.</Description>
+    </RefParameter>
+    <RefParameter Comment="High Break Signal" DefaultValue="DFSDM_NO_BREAK_SIGNAL" Name="HighBreakSignal" Type="list">
+        <Description>Break signal assigned to analog watchdog high threshold event.</Description>
+        <PossibleValue Comment="No break signal " Value="DFSDM_NO_BREAK_SIGNAL"/>
+        <PossibleValue Comment="Break signal 0 " Value="DFSDM_BREAK_SIGNAL_0"/>
+        <PossibleValue Comment="Break signal 1 " Value="DFSDM_BREAK_SIGNAL_1"/>
+        <PossibleValue Comment="Break signal 2 " Value="DFSDM_BREAK_SIGNAL_2"/>
+        <PossibleValue Comment="Break signal 3 " Value="DFSDM_BREAK_SIGNAL_3"/>
+    </RefParameter>
+    <RefParameter Comment="Low Break Signal" DefaultValue="DFSDM_NO_BREAK_SIGNAL" Name="LowBreakSignal" Type="list">
+        <Description>Break signal assigned to analog watchdog low threshold event.</Description>
+        <PossibleValue Comment="No break signal " Value="DFSDM_NO_BREAK_SIGNAL"/>
+        <PossibleValue Comment="Break signal 0 " Value="DFSDM_BREAK_SIGNAL_0"/>
+        <PossibleValue Comment="Break signal 1 " Value="DFSDM_BREAK_SIGNAL_1"/>
+        <PossibleValue Comment="Break signal 2 " Value="DFSDM_BREAK_SIGNAL_2"/>
+        <PossibleValue Comment="Break signal 3 " Value="DFSDM_BREAK_SIGNAL_3"/>
+    </RefParameter>
+
+
+    <RefParameter Comment="External Trigger Source" DefaultValue="DFSDM_FILTER_EXT_TRIG_TIM1_TRGO" Name="ExtTrigger_inj" Type="list">
+        <Description>External trigger.</Description>
+        <PossibleValue Comment="TIM1_ TRGO For DFSDM 0, 1, 2 and 3 " Value="DFSDM_FILTER_EXT_TRIG_TIM1_TRGO"/>
+        <PossibleValue Comment="TIM1_TRGO2 For DFSDM 0, 1, 2 and 3 " Value="DFSDM_FILTER_EXT_TRIG_TIM1_TRGO2"/>
+        <PossibleValue Comment="TIM8_TRGO For DFSDM 0, 1, 2 and 3 " Value="DFSDM_FILTER_EXT_TRIG_TIM8_TRGO"/>
+        <PossibleValue Comment="TIM8_TRGO2 For DFSDM 0, 1 and 2 " Value="DFSDM_FILTER_EXT_TRIG_TIM8_TRGO2"/>
+        <PossibleValue Comment="TIM3_TRGO For DFSDM 3 " Value="DFSDM_FILTER_EXT_TRIG_TIM3_TRGO"/>
+        <PossibleValue Comment="TIM4_TRGO For DFSDM 0, 1 and 2 " Value="DFSDM_FILTER_EXT_TRIG_TIM4_TRGO"/>
+        <PossibleValue Comment="TIM16_OC1 For DFSDM 3 " Value="DFSDM_FILTER_EXT_TRIG_TIM16_OC1"/>
+        <PossibleValue Comment="TIM6_TRGO For DFSDM 0 and 1 " Value="DFSDM_FILTER_EXT_TRIG_TIM6_TRGO"/>
+        <PossibleValue Comment="TIM7_TRGO For DFSDM 2 and 3 " Value="DFSDM_FILTER_EXT_TRIG_TIM7_TRGO"/>
+        <PossibleValue Comment="EXTI11 For DFSDM 0, 1, 2 and 3 " Value="DFSDM_FILTER_EXT_TRIG_EXTI11"/>
+        <PossibleValue Comment="EXTI15 For DFSDM 0, 1, 2 and 3 " Value="DFSDM_FILTER_EXT_TRIG_EXTI15"/>
+    </RefParameter>
+
+<!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% ????????????? %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%-->
+
+
+    <RefParameter Comment="Threshold" DefaultValue="0" Max="4294967295" Min="0" Name="Threshold" Type="integer"/>
+    <RefParameter Comment="Break Signal" DefaultValue="0" Max="4294967295" Min="0" Name="BreakSignal" Type="integer"/>
+    <RefParameter Comment="Timeout" DefaultValue="0" Max="4294967295" Min="0" Name="Timeout" Type="integer"/>
+
+
+<!-- %%%%%%%%%%%%%%%%%%%%%%% just for filling handler structure. no more usage  %%%%%%%%%%%%%%%%%%%%%%%%%-->
+    <RefParameter Comment="Regular Cont Mode" DefaultValue="null" Max="4294967295" Min="0" Name="RegularContMode" Type="integer">
+        <Description>Regular conversion continuous mode </Description>
+    </RefParameter>
+    <RefParameter Comment="Regular Trigger" DefaultValue="null" Max="4294967295" Min="0" Name="RegularTrigger" Type="integer">
+        <Description>Trigger used for regular conversion </Description>
+    </RefParameter>
+    <RefParameter Comment="Injected Trigger" DefaultValue="null" Max="4294967295" Min="0" Name="InjectedTrigger" Type="integer">
+        <Description>Trigger used for injected conversion </Description>
+    </RefParameter>
+    <RefParameter Comment="Ext Trigger Edge" DefaultValue="null" Max="4294967295" Min="0" Name="ExtTriggerEdge" Type="integer">
+        <Description>Rising, falling or both edges selected </Description>
+    </RefParameter>
+    <RefParameter Comment="Injected Scan Mode" DefaultValue="null" Max="1" Min="0" Name="InjectedScanMode" Type="integer">
+        <Description>Injected scanning mode </Description>
+    </RefParameter>
+    <RefParameter Comment="Injected Channels Nbr" DefaultValue="null" Max="4294967295" Min="0" Name="InjectedChannelsNbr" Type="integer">
+        <Description>Number of channels in injected sequence </Description>
+    </RefParameter>
+    <RefParameter Comment="Inj Conv Remaining" DefaultValue="null" Max="4294967295" Min="0" Name="InjConvRemaining" Type="integer">
+        <Description>Injected conversions remaining </Description>
+    </RefParameter>
+    <RefParameter Comment="Error Code" DefaultValue="null" Max="4294967295" Min="0" Name="ErrorCode" Type="integer">
+        <Description>DFSDM filter error code </Description>
+    </RefParameter>
+
+<!-- %%%%%%%%%%%%%%%%%%%%%%% instance name for code generation  %%%%%%%%%%%%%%%%%%%%%%%%%-->
+    <RefParameter Comment="" DefaultValue="DFSDM1_Channel0"  Name="Instance_DFSDM1_CH0" Type="list">
+        <PossibleValue Comment="" Value="DFSDM1_Channel0"/>
+    </RefParameter>
+    <RefParameter Comment="" DefaultValue="DFSDM1_Channel1"  Name="Instance_DFSDM1_CH1" Type="list">
+        <PossibleValue Comment="" Value="DFSDM1_Channel1"/>
+    </RefParameter>
+    <RefParameter Comment="" DefaultValue="DFSDM1_Channel2"  Name="Instance_DFSDM1_CH2" Type="list">
+        <PossibleValue Comment="" Value="DFSDM1_Channel2"/>
+    </RefParameter>
+    <RefParameter Comment="" DefaultValue="DFSDM1_Channel3"  Name="Instance_DFSDM1_CH3" Type="list">
+        <PossibleValue Comment="" Value="DFSDM1_Channel3"/>
+    </RefParameter>
+    <RefParameter Comment="" DefaultValue="DFSDM1_Filter0"  Name="Instance_DFSDM1_FIL0" Type="list">
+        <PossibleValue Comment="" Value="DFSDM1_Filter0"/>
+    </RefParameter>
+    <RefParameter Comment="" DefaultValue="DFSDM1_Filter1"  Name="Instance_DFSDM1_FIL1" Type="list">
+        <PossibleValue Comment="" Value="DFSDM1_Filter1"/>
+    </RefParameter>
+
+    <RefParameter Comment="" DefaultValue="DFSDM2_Channel0"  Name="Instance_DFSDM2_CH0" Type="list">
+        <PossibleValue Comment="" Value="DFSDM2_Channel0"/>
+    </RefParameter>
+    <RefParameter Comment="" DefaultValue="DFSDM2_Channel1"  Name="Instance_DFSDM2_CH1" Type="list">
+        <PossibleValue Comment="" Value="DFSDM2_Channel1"/>
+    </RefParameter>
+    <RefParameter Comment="" DefaultValue="DFSDM2_Channel2"  Name="Instance_DFSDM2_CH2" Type="list">
+        <PossibleValue Comment="" Value="DFSDM2_Channel2"/>
+    </RefParameter>
+    <RefParameter Comment="" DefaultValue="DFSDM2_Channel3"  Name="Instance_DFSDM2_CH3" Type="list">
+        <PossibleValue Comment="" Value="DFSDM2_Channel3"/>
+    </RefParameter>
+    <RefParameter Comment="" DefaultValue="DFSDM2_Filter0"  Name="Instance_DFSDM2_FIL0" Type="list">
+        <PossibleValue Comment="" Value="DFSDM_Filter0"/>
+    </RefParameter>
+    <RefParameter Comment="" DefaultValue="DFSDM2_Filter1"  Name="Instance_DFSDM2_FIL1" Type="list">
+        <PossibleValue Comment="" Value="DFSDM2_Filter1"/>
+    </RefParameter>
+
+
+
+
+
+
+
+
+<!-- ///////////////////////////////////////////////////////////////////////////////////-->
+                              <!--   REF MODES  -->
+<!-- ///////////////////////////////// FILTERS /////////////////////////////////////////-->
+
+
+
+  <RefMode   BaseMode="Filter0_Settings" Name="Filter1_Settings_Parameters" Abstract="true">
+            <Parameter Name="Filter_regChannel_FIL1"             />
+            <Parameter Name="Filter_regContinuousMode_FIL1"      />
+            <Parameter Name="Trigger_reg_FIL1"                   />
+            <Parameter Name="FastMode_reg_FIL1"                  />
+            <Parameter Name="DmaMode_reg_FIL1"                   />
+            <Parameter Name="Filter_injChannel0_FIL1"            />
+            <Parameter Name="Filter_injChannel1_FIL1"            />
+            <Parameter Name="Filter_injChannel2_FIL1"            />
+            <Parameter Name="Filter_injChannel3_FIL1"            />
+            <Parameter Name="Trigger_inj_FIL1"                   />
+            <Parameter Name="ExtTrigger_inj_FIL1"                />
+            <Parameter Name="ExtTriggerEdge_inj_FIL1"            />
+            <Parameter Name="ScanMode_inj_FIL1"                  />
+            <Parameter Name="DmaMode_inj_FIL1"                   />
+            <Parameter Name="SincOrder_FIL1"                     />
+            <Parameter Name="Fosr_FIL1"                          />
+            <Parameter Name="Iosr_FIL1"                          />
+    </RefMode>
+    <RefMode   BaseMode="Filter1_Settings_Parameters" Name="Filter1_Settings" Abstract="true">
+<Condition Diagnostic="" Expression="(!Semaphore_DFSDM_NoregChannel_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel0_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel1_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel2_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel3_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel4_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel5_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel6_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel7_FIL1_$IpInstance)"/>
+        <ConfigForMode>Filter1_regConfig</ConfigForMode>
+        <ConfigForMode>Filter1_injConfig</ConfigForMode>
+        <ConfigForMode>Filter1_init</ConfigForMode>
+    </RefMode> 
+  <RefMode   BaseMode="Filter1_Settings_Parameters" Name="Filter1_Settings" Abstract="true">
+<Condition Diagnostic="" Expression="!(!Semaphore_DFSDM_NoregChannel_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel0_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel1_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel2_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel3_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel4_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel5_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel6_FIL1_$IpInstance|!Semaphore_DFSDM_NoinjChannel7_FIL1_$IpInstance)"/>
+    </RefMode>
+
+  <RefMode    Name="Filter0_Settings_Parameters" Abstract="true">
+            <Parameter Name="Filter_regChannel_FIL0"             />
+            <Parameter Name="Filter_regContinuousMode_FIL0"      />
+            <Parameter Name="Trigger_reg_FIL0"                   />
+            <Parameter Name="FastMode_reg_FIL0"                  />
+            <Parameter Name="DmaMode_reg_FIL0"                   />
+            <Parameter Name="Filter_injChannel0_FIL0"            />
+            <Parameter Name="Filter_injChannel1_FIL0"            />
+            <Parameter Name="Filter_injChannel2_FIL0"            />
+            <Parameter Name="Filter_injChannel3_FIL0"            />
+            <Parameter Name="Trigger_inj_FIL0"                   />
+            <Parameter Name="ExtTrigger_inj_FIL0"                />
+            <Parameter Name="ExtTriggerEdge_inj_FIL0"            />
+            <Parameter Name="ScanMode_inj_FIL0"                  />
+            <Parameter Name="DmaMode_inj_FIL0"                   />
+            <Parameter Name="SincOrder_FIL0"                     />
+            <Parameter Name="Fosr_FIL0"                          />
+            <Parameter Name="Iosr_FIL0"                          />
+    </RefMode> 
+
+    <RefMode   BaseMode="Filter0_Settings_Parameters" Name="Filter0_Settings" Abstract="true">
+<Condition Diagnostic="" Expression="(!Semaphore_DFSDM_NoregChannel_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel0_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel1_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel2_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel3_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel4_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel5_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel6_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel7_FIL0_$IpInstance)"/>
+        <ConfigForMode>Filter0_regConfig</ConfigForMode>
+        <ConfigForMode>Filter0_injConfig</ConfigForMode>
+        <ConfigForMode>Filter0_init</ConfigForMode>
+    </RefMode> 
+  <RefMode   BaseMode="Filter0_Settings_Parameters" Name="Filter0_Settings" Abstract="true">
+<Condition Diagnostic="" Expression="!(!Semaphore_DFSDM_NoregChannel_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel0_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel1_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel2_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel3_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel4_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel5_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel6_FIL0_$IpInstance|!Semaphore_DFSDM_NoinjChannel7_FIL0_$IpInstance)"/>
+    </RefMode> 
+
+
+<!-- %%%%%%%%%%%%%%%%%%%%%%%%% CH0 REFMODES %%%%%%%%%%%%%%%%%%%%%%%%%%%%%-->
+  <RefMode  BaseMode="Filter1_Settings" Name="Parallel_Input_ch0" Abstract="true">
+        <ConfigForMode>Channel_init_CH0_parallel</ConfigForMode>
+            <Parameter Name="Activation_Ref"                />
+            <Parameter Name="Selection"                     />
+            <Parameter Name="Divider"                       />
+            <Parameter Name="Multiplexer_internal_CH0"      />
+            <Parameter Name="DataPacking_CH0"               />
+            <Parameter Name="Pins_none_CH0"                 />
+            <Parameter Name="Type_none_CH0"                 />
+            <Parameter Name="SpiClock_none_CH0"             />
+            <Parameter Name="FilterOrder_none_CH0"          />
+            <Parameter Name="Oversampling_none_CH0"         />
+            <Parameter Name="Offset_none_CH0"               />
+            <Parameter Name="RightBitShift_CH0"             />
+    </RefMode>
+
+
+         <RefMode BaseMode ="Filter1_Settings" Name="PDM_SPI_input_from_ch0_and_external_clock" Abstract="true">
+        <ConfigForMode>Channel_init_CH0_spisame_extClk</ConfigForMode>
+            <Parameter Name="Activation_Ref"                />
+            <Parameter Name="Selection"                     />
+            <Parameter Name="Divider"                       />
+            <Parameter Name="Multiplexer_external_CH0"      />
+            <Parameter Name="DataPacking_CH0"               />
+            <Parameter Name="Pins_same_CH0"                 />
+            <Parameter Name="Type_spi_CH0"                  />
+            <Parameter Name="SpiClock_external_CH0"         />
+            <Parameter Name="FilterOrder_CH0"               />
+            <Parameter Name="Oversampling_CH0"              />
+            <Parameter Name="Offset_CH0"                    />
+            <Parameter Name="RightBitShift_CH0"             />
+    </RefMode>
+
+         <RefMode BaseMode ="Filter1_Settings" Name="PDM_SPI_input_from_ch0_and_internal_clock" Abstract="true">
+        <ConfigForMode>Channel_init_CH0_spisame_intClk</ConfigForMode>
+            <Parameter Name="Activation_Ref"                />
+            <Parameter Name="Selection"                     />
+            <Parameter Name="Divider"                       />
+            <Parameter Name="Multiplexer_external_CH0"      />
+            <Parameter Name="DataPacking_CH0"               />
+            <Parameter Name="Pins_same_CH0"                 />
+            <Parameter Name="Type_spi_CH0"                  />
+            <Parameter Name="SpiClock_internal_CH0"         />
+            <Parameter Name="FilterOrder_CH0"               />
+            <Parameter Name="Oversampling_CH0"              />
+            <Parameter Name="Offset_CH0"                    />
+            <Parameter Name="RightBitShift_CH0"             />
+    </RefMode>
+
+         <RefMode BaseMode ="Filter1_Settings" Name="Manchester_input_from_ch0" Abstract="true">
+        <ConfigForMode>Channel_init_CH0_mansame</ConfigForMode>
+            <Parameter Name="Activation_Ref"                />
+            <Parameter Name="Selection"                     />
+            <Parameter Name="Divider"                       />
+            <Parameter Name="Multiplexer_external_CH0"      />
+            <Parameter Name="DataPacking_CH0"               />
+            <Parameter Name="Pins_same_CH0"                 />
+            <Parameter Name="Type_manchester_CH0"           />
+            <Parameter Name="SpiClock_none_CH0"             />
+            <Parameter Name="FilterOrder_CH0"               />
+            <Parameter Name="Oversampling_CH0"              />
+            <Parameter Name="Offset_CH0"                    />
+            <Parameter Name="RightBitShift_CH0"             />
+    </RefMode>
+
+         <RefMode BaseMode ="Filter1_Settings" Name="PDM_SPI_input_from_ch01_and_external_clock" Abstract="true">
+        <ConfigForMode>Channel_init_CH0_spinext_extClk</ConfigForMode>
+            <Parameter Name="Activation_Ref"                />
+            <Parameter Name="Selection"                     />
+            <Parameter Name="Divider"                       />
+            <Parameter Name="Multiplexer_external_CH0"      />
+            <Parameter Name="DataPacking_CH0"               />
+            <Parameter Name="Pins_next_CH0"                 />
+            <Parameter Name="Type_spi_CH0"                  />
+            <Parameter Name="SpiClock_external_CH0"         />
+            <Parameter Name="FilterOrder_CH0"               />
+            <Parameter Name="Oversampling_CH0"              />
+            <Parameter Name="Offset_CH0"                    />
+            <Parameter Name="RightBitShift_CH0"             />
+    </RefMode>
+
+         <RefMode BaseMode ="Filter1_Settings" Name="PDM_SPI_Input_from_ch01_and_Internal_Clock" Abstract="true">
+        <ConfigForMode>Channel_init_CH0_spinext_intClk</ConfigForMode>
+            <Parameter Name="Activation_Ref"                />
+            <Parameter Name="Selection"                     />
+            <Parameter Name="Divider"                       />
+            <Parameter Name="Multiplexer_external_CH0"      />
+            <Parameter Name="DataPacking_CH0"               />
+            <Parameter Name="Pins_next_CH0"                 />
+            <Parameter Name="Type_spi_CH0"                  />
+            <Parameter Name="SpiClock_internal_CH0"         />
+            <Parameter Name="FilterOrder_CH0"               />
+            <Parameter Name="Oversampling_CH0"              />
+            <Parameter Name="Offset_CH0"                    />
+            <Parameter Name="RightBitShift_CH0"             />
+    </RefMode>
+
+         <RefMode BaseMode ="Filter1_Settings" Name="Manchester_input_from_ch01" Abstract="true">
+        <ConfigForMode>Channel_init_CH0_mannext</ConfigForMode>
+            <Parameter Name="Activation_Ref"                />
+            <Parameter Name="Selection"                     />
+            <Parameter Name="Divider"                       />
+            <Parameter Name="Multiplexer_external_CH0"      />
+            <Parameter Name="DataPacking_CH0"               />
+            <Parameter Name="Pins_next_CH0"                 />
+            <Parameter Name="Type_manchester_CH0"           />
+            <Parameter Name="SpiClock_none_CH0"             />
+            <Parameter Name="FilterOrder_CH0"               />
+            <Parameter Name="Oversampling_CH0"              />
+            <Parameter Name="Offset_CH0"                    />
+            <Parameter Name="RightBitShift_CH0"             />
+    </RefMode>
+
+<!-- %%%%%%%%%%%%%%%%%%%%%%%%% CH1 REFMODES %%%%%%%%%%%%%%%%%%%%%%%%%%%%%-->
+  <RefMode  BaseMode="Filter1_Settings" Name="Parallel_Input_ch1" Abstract="true">
+        <ConfigForMode>Channel_init_CH1_parallel</ConfigForMode>
+            <Parameter Name="Activation_Ref"                />
+            <Parameter Name="Selection"                     />
+            <Parameter Name="Divider"                       />
+            <Parameter Name="Multiplexer_internal_CH1"      />
+            <Parameter Name="DataPacking_CH1"               />
+            <Parameter Name="Pins_none_CH1"                 />
+            <Parameter Name="Type_none_CH1"                 />
+            <Parameter Name="SpiClock_none_CH1"             />
+            <Parameter Name="FilterOrder_none_CH1"          />
+            <Parameter Name="Oversampling_none_CH1"         />
+            <Parameter Name="Offset_none_CH1"               />
+            <Parameter Name="RightBitShift_CH1"             />
+    </RefMode>
+
+
+         <RefMode BaseMode ="Filter1_Settings" Name="PDM_SPI_input_from_ch1_and_external_clock" Abstract="true">
+        <ConfigForMode>Channel_init_CH1_spisame_extClk</ConfigForMode>
+            <Parameter Name="Activation_Ref"                />
+            <Parameter Name="Selection"                     />
+            <Parameter Name="Divider"                       />
+            <Parameter Name="Multiplexer_external_CH1"      />
+            <Parameter Name="DataPacking_CH1"               />
+            <Parameter Name="Pins_same_CH1"                 />
+            <Parameter Name="Type_spi_CH1"                  />
+            <Parameter Name="SpiClock_external_CH1"         />
+            <Parameter Name="FilterOrder_CH1"               />
+            <Parameter Name="Oversampling_CH1"              />
+            <Parameter Name="Offset_CH1"                    />
+            <Parameter Name="RightBitShift_CH1"             />
+    </RefMode>
+
+         <RefMode BaseMode ="Filter1_Settings" Name="PDM_SPI_input_from_ch1_and_internal_clock" Abstract="true">
+        <ConfigForMode>Channel_init_CH1_spisame_intClk</ConfigForMode>
+            <Parameter Name="Activation_Ref"                />
+            <Parameter Name="Selection"                     />
+            <Parameter Name="Divider"                       />
+            <Parameter Name="Multiplexer_external_CH1"      />
+            <Parameter Name="DataPacking_CH1"               />
+            <Parameter Name="Pins_same_CH1"                 />
+            <Parameter Name="Type_spi_CH1"                  />
+            <Parameter Name="SpiClock_internal_CH1"         />
+            <Parameter Name="FilterOrder_CH1"               />
+            <Parameter Name="Oversampling_CH1"              />
+            <Parameter Name="Offset_CH1"                    />
+            <Parameter Name="RightBitShift_CH1"             />
+    </RefMode>
+
+         <RefMode BaseMode ="Filter1_Settings" Name="Manchester_input_from_ch1" Abstract="true">
+        <ConfigForMode>Channel_init_CH1_mansame</ConfigForMode>
+            <Parameter Name="Activation_Ref"                />
+            <Parameter Name="Selection"                     />
+            <Parameter Name="Divider"                       />
+            <Parameter Name="Multiplexer_external_CH1"      />
+            <Parameter Name="DataPacking_CH1"               />
+            <Parameter Name="Pins_same_CH1"                 />
+            <Parameter Name="Type_manchester_CH1"           />
+            <Parameter Name="SpiClock_none_CH1"             />
+            <Parameter Name="FilterOrder_CH1"               />
+            <Parameter Name="Oversampling_CH1"              />
+            <Parameter Name="Offset_CH1"                    />
+            <Parameter Name="RightBitShift_CH1"             />
+    </RefMode>
+
+         <RefMode BaseMode ="Filter1_Settings" Name="PDM_SPI_input_from_ch12_and_external_clock" Abstract="true">
+        <ConfigForMode>Channel_init_CH1_spinext_extClk</ConfigForMode>
+            <Parameter Name="Activation_Ref"                />
+            <Parameter Name="Selection"                     />
+            <Parameter Name="Divider"                       />
+            <Parameter Name="Multiplexer_external_CH1"      />
+            <Parameter Name="DataPacking_CH1"               />
+            <Parameter Name="Pins_next_CH1"                 />
+            <Parameter Name="Type_spi_CH1"                  />
+            <Parameter Name="SpiClock_external_CH1"         />
+            <Parameter Name="FilterOrder_CH1"               />
+            <Parameter Name="Oversampling_CH1"              />
+            <Parameter Name="Offset_CH1"                    />
+            <Parameter Name="RightBitShift_CH1"             />
+    </RefMode>
+
+         <RefMode BaseMode ="Filter1_Settings" Name="PDM_SPI_Input_from_ch12_and_Internal_Clock" Abstract="true">
+        <ConfigForMode>Channel_init_CH1_spinext_intClk</ConfigForMode>
+            <Parameter Name="Activation_Ref"                />
+            <Parameter Name="Selection"                     />
+            <Parameter Name="Divider"                       />
+            <Parameter Name="Multiplexer_external_CH1"      />
+            <Parameter Name="DataPacking_CH1"               />
+            <Parameter Name="Pins_next_CH1"                 />
+            <Parameter Name="Type_spi_CH1"                  />
+            <Parameter Name="SpiClock_internal_CH1"         />
+            <Parameter Name="FilterOrder_CH1"               />
+            <Parameter Name="Oversampling_CH1"              />
+            <Parameter Name="Offset_CH1"                    />
+            <Parameter Name="RightBitShift_CH1"             />
+    </RefMode>
+
+         <RefMode BaseMode ="Filter1_Settings" Name="Manchester_input_from_ch12" Abstract="true">
+        <ConfigForMode>Channel_init_CH1_mannext</ConfigForMode>
+            <Parameter Name="Activation_Ref"                />
+            <Parameter Name="Selection"                     />
+            <Parameter Name="Divider"                       />
+            <Parameter Name="Multiplexer_external_CH1"      />
+            <Parameter Name="DataPacking_CH1"               />
+            <Parameter Name="Pins_next_CH1"                 />
+            <Parameter Name="Type_manchester_CH1"           />
+            <Parameter Name="SpiClock_none_CH1"             />
+            <Parameter Name="FilterOrder_CH1"               />
+            <Parameter Name="Oversampling_CH1"              />
+            <Parameter Name="Offset_CH1"                    />
+            <Parameter Name="RightBitShift_CH1"             />
+    </RefMode>
+
+<!-- %%%%%%%%%%%%%%%%%%%%%%%%% CH2 REFMODES %%%%%%%%%%%%%%%%%%%%%%%%%%%%%-->
+  <RefMode  BaseMode="Filter1_Settings" Name="Parallel_Input_ch2" Abstract="true">
+        <ConfigForMode>Channel_init_CH2_parallel</ConfigForMode>
+            <Parameter Name="Activation_Ref"                />
+            <Parameter Name="Selection"                     />
+            <Parameter Name="Divider"                       />
+            <Parameter Name="Multiplexer_internal_CH2"      />
+            <Parameter Name="DataPacking_CH2"               />
+            <Parameter Name="Pins_none_CH2"                 />
+            <Parameter Name="Type_none_CH2"                 />
+            <Parameter Name="SpiClock_none_CH2"             />
+            <Parameter Name="FilterOrder_none_CH2"          />
+            <Parameter Name="Oversampling_none_CH2"         />
+            <Parameter Name="Offset_none_CH2"               />
+            <Parameter Name="RightBitShift_CH2"             />
+    </RefMode>
+
+
+         <RefMode BaseMode ="Filter1_Settings" Name="PDM_SPI_input_from_ch2_and_external_clock" Abstract="true">
+        <ConfigForMode>Channel_init_CH2_spisame_extClk</ConfigForMode>
+            <Parameter Name="Activation_Ref"                />
+            <Parameter Name="Selection"                     />
+            <Parameter Name="Divider"                       />
+            <Parameter Name="Multiplexer_external_CH2"      />
+            <Parameter Name="DataPacking_CH2"               />
+            <Parameter Name="Pins_same_CH2"                 />
+            <Parameter Name="Type_spi_CH2"                  />
+            <Parameter Name="SpiClock_external_CH2"         />
+            <Parameter Name="FilterOrder_CH2"               />
+            <Parameter Name="Oversampling_CH2"              />
+            <Parameter Name="Offset_CH2"                    />
+            <Parameter Name="RightBitShift_CH2"             />
+    </RefMode>
+
+         <RefMode BaseMode ="Filter1_Settings" Name="PDM_SPI_input_from_ch2_and_internal_clock" Abstract="true">
+        <ConfigForMode>Channel_init_CH2_spisame_intClk</ConfigForMode>
+            <Parameter Name="Activation_Ref"                />
+            <Parameter Name="Selection"                     />
+            <Parameter Name="Divider"                       />
+            <Parameter Name="Multiplexer_external_CH2"      />
+            <Parameter Name="DataPacking_CH2"               />
+            <Parameter Name="Pins_same_CH2"                 />
+            <Parameter Name="Type_spi_CH2"                  />
+            <Parameter Name="SpiClock_internal_CH2"         />
+            <Parameter Name="FilterOrder_CH2"               />
+            <Parameter Name="Oversampling_CH2"              />
+            <Parameter Name="Offset_CH2"                    />
+            <Parameter Name="RightBitShift_CH2"             />
+    </RefMode>
+
+         <RefMode BaseMode ="Filter1_Settings" Name="Manchester_input_from_ch2" Abstract="true">
+        <ConfigForMode>Channel_init_CH2_mansame</ConfigForMode>
+            <Parameter Name="Activation_Ref"                />
+            <Parameter Name="Selection"                     />
+            <Parameter Name="Divider"                       />
+            <Parameter Name="Multiplexer_external_CH2"      />
+            <Parameter Name="DataPacking_CH2"               />
+            <Parameter Name="Pins_same_CH2"                 />
+            <Parameter Name="Type_manchester_CH2"           />
+            <Parameter Name="SpiClock_none_CH2"             />
+            <Parameter Name="FilterOrder_CH2"               />
+            <Parameter Name="Oversampling_CH2"              />
+            <Parameter Name="Offset_CH2"                    />
+            <Parameter Name="RightBitShift_CH2"             />
+    </RefMode>
+
+         <RefMode BaseMode ="Filter1_Settings" Name="PDM_SPI_input_from_ch23_and_external_clock" Abstract="true">
+        <ConfigForMode>Channel_init_CH2_spinext_extClk</ConfigForMode>
+            <Parameter Name="Activation_Ref"                />
+            <Parameter Name="Selection"                     />
+            <Parameter Name="Divider"                       />
+            <Parameter Name="Multiplexer_external_CH2"      />
+            <Parameter Name="DataPacking_CH2"               />
+            <Parameter Name="Pins_next_CH2"                 />
+            <Parameter Name="Type_spi_CH2"                  />
+            <Parameter Name="SpiClock_external_CH2"         />
+            <Parameter Name="FilterOrder_CH2"               />
+            <Parameter Name="Oversampling_CH2"              />
+            <Parameter Name="Offset_CH2"                    />
+            <Parameter Name="RightBitShift_CH2"             />
+    </RefMode>
+
+         <RefMode BaseMode ="Filter1_Settings" Name="PDM_SPI_Input_from_ch23_and_Internal_Clock" Abstract="true">
+        <ConfigForMode>Channel_init_CH2_spinext_intClk</ConfigForMode>
+            <Parameter Name="Activation_Ref"                />
+            <Parameter Name="Selection"                     />
+            <Parameter Name="Divider"                       />
+            <Parameter Name="Multiplexer_external_CH2"      />
+            <Parameter Name="DataPacking_CH2"               />
+            <Parameter Name="Pins_next_CH2"                 />
+            <Parameter Name="Type_spi_CH2"                  />
+            <Parameter Name="SpiClock_internal_CH2"         />
+            <Parameter Name="FilterOrder_CH2"               />
+            <Parameter Name="Oversampling_CH2"              />
+            <Parameter Name="Offset_CH2"                    />
+            <Parameter Name="RightBitShift_CH2"             />
+    </RefMode>
+
+         <RefMode BaseMode ="Filter1_Settings" Name="Manchester_input_from_ch23" Abstract="true">
+        <ConfigForMode>Channel_init_CH2_mannext</ConfigForMode>
+            <Parameter Name="Activation_Ref"                />
+            <Parameter Name="Selection"                     />
+            <Parameter Name="Divider"                       />
+            <Parameter Name="Multiplexer_external_CH2"      />
+            <Parameter Name="DataPacking_CH2"               />
+            <Parameter Name="Pins_next_CH2"                 />
+            <Parameter Name="Type_manchester_CH2"           />
+            <Parameter Name="SpiClock_none_CH2"             />
+            <Parameter Name="FilterOrder_CH2"               />
+            <Parameter Name="Oversampling_CH2"              />
+            <Parameter Name="Offset_CH2"                    />
+            <Parameter Name="RightBitShift_CH2"             />
+    </RefMode>
+
+<!-- %%%%%%%%%%%%%%%%%%%%%%%%% CH3 REFMODES %%%%%%%%%%%%%%%%%%%%%%%%%%%%%-->
+  <RefMode  BaseMode="Filter1_Settings" Name="Parallel_Input_ch3" Abstract="true">
+        <ConfigForMode>Channel_init_CH3_parallel</ConfigForMode>
+            <Parameter Name="Activation_Ref"                />
+            <Parameter Name="Selection"                     />
+            <Parameter Name="Divider"                       />
+            <Parameter Name="Multiplexer_internal_CH3"      />
+            <Parameter Name="DataPacking_CH3"               />
+            <Parameter Name="Pins_none_CH3"                 />
+            <Parameter Name="Type_none_CH3"                 />
+            <Parameter Name="SpiClock_none_CH3"             />
+            <Parameter Name="FilterOrder_none_CH3"          />
+            <Parameter Name="Oversampling_none_CH3"         />
+            <Parameter Name="Offset_none_CH3"               />
+            <Parameter Name="RightBitShift_CH3"             />
+    </RefMode>
+
+
+         <RefMode BaseMode ="Filter1_Settings" Name="PDM_SPI_input_from_ch3_and_external_clock" Abstract="true">
+        <ConfigForMode>Channel_init_CH3_spisame_extClk</ConfigForMode>
+            <Parameter Name="Activation_Ref"                />
+            <Parameter Name="Selection"                     />
+            <Parameter Name="Divider"                       />
+            <Parameter Name="Multiplexer_external_CH3"      />
+            <Parameter Name="DataPacking_CH3"               />
+            <Parameter Name="Pins_same_CH3"                 />
+            <Parameter Name="Type_spi_CH3"                  />
+            <Parameter Name="SpiClock_external_CH3"         />
+            <Parameter Name="FilterOrder_CH3"               />
+            <Parameter Name="Oversampling_CH3"              />
+            <Parameter Name="Offset_CH3"                    />
+            <Parameter Name="RightBitShift_CH3"             />
+    </RefMode>
+
+         <RefMode BaseMode ="Filter1_Settings" Name="PDM_SPI_input_from_ch3_and_internal_clock" Abstract="true">
+        <ConfigForMode>Channel_init_CH3_spisame_intClk</ConfigForMode>
+            <Parameter Name="Activation_Ref"                />
+            <Parameter Name="Selection"                     />
+            <Parameter Name="Divider"                       />
+            <Parameter Name="Multiplexer_external_CH3"      />
+            <Parameter Name="DataPacking_CH3"               />
+            <Parameter Name="Pins_same_CH3"                 />
+            <Parameter Name="Type_spi_CH3"                  />
+            <Parameter Name="SpiClock_internal_CH3"         />
+            <Parameter Name="FilterOrder_CH3"               />
+            <Parameter Name="Oversampling_CH3"              />
+            <Parameter Name="Offset_CH3"                    />
+            <Parameter Name="RightBitShift_CH3"             />
+    </RefMode>
+
+         <RefMode BaseMode ="Filter1_Settings" Name="Manchester_input_from_ch3" Abstract="true">
+        <ConfigForMode>Channel_init_CH3_mansame</ConfigForMode>
+            <Parameter Name="Activation_Ref"                />
+            <Parameter Name="Selection"                     />
+            <Parameter Name="Divider"                       />
+            <Parameter Name="Multiplexer_external_CH3"      />
+            <Parameter Name="DataPacking_CH3"               />
+            <Parameter Name="Pins_same_CH3"                 />
+            <Parameter Name="Type_manchester_CH3"           />
+            <Parameter Name="SpiClock_none_CH3"             />
+            <Parameter Name="FilterOrder_CH3"               />
+            <Parameter Name="Oversampling_CH3"              />
+            <Parameter Name="Offset_CH3"                    />
+            <Parameter Name="RightBitShift_CH3"             />
+    </RefMode>
+
+         <RefMode BaseMode ="Filter1_Settings" Name="PDM_SPI_input_from_ch30_and_external_clock" Abstract="true">
+        <ConfigForMode>Channel_init_CH3_spinext_extClk</ConfigForMode>
+            <Parameter Name="Activation_Ref"                />
+            <Parameter Name="Selection"                     />
+            <Parameter Name="Divider"                       />
+            <Parameter Name="Multiplexer_external_CH3"      />
+            <Parameter Name="DataPacking_CH3"               />
+            <Parameter Name="Pins_next_CH3"                 />
+            <Parameter Name="Type_spi_CH3"                  />
+            <Parameter Name="SpiClock_external_CH3"         />
+            <Parameter Name="FilterOrder_CH3"               />
+            <Parameter Name="Oversampling_CH3"              />
+            <Parameter Name="Offset_CH3"                    />
+            <Parameter Name="RightBitShift_CH3"             />
+    </RefMode>
+
+         <RefMode BaseMode ="Filter1_Settings" Name="PDM_SPI_Input_from_ch30_and_Internal_Clock" Abstract="true">
+        <ConfigForMode>Channel_init_CH3_spinext_intClk</ConfigForMode>
+            <Parameter Name="Activation_Ref"                />
+            <Parameter Name="Selection"                     />
+            <Parameter Name="Divider"                       />
+            <Parameter Name="Multiplexer_external_CH3"      />
+            <Parameter Name="DataPacking_CH3"               />
+            <Parameter Name="Pins_next_CH3"                 />
+            <Parameter Name="Type_spi_CH3"                  />
+            <Parameter Name="SpiClock_internal_CH3"         />
+            <Parameter Name="FilterOrder_CH3"               />
+            <Parameter Name="Oversampling_CH3"              />
+            <Parameter Name="Offset_CH3"                    />
+            <Parameter Name="RightBitShift_CH3"             />
+    </RefMode>
+
+         <RefMode BaseMode ="Filter1_Settings" Name="Manchester_input_from_ch30" Abstract="true">
+        <ConfigForMode>Channel_init_CH3_mannext</ConfigForMode>
+            <Parameter Name="Activation_Ref"                />
+            <Parameter Name="Selection"                     />
+            <Parameter Name="Divider"                       />
+            <Parameter Name="Multiplexer_external_CH3"      />
+            <Parameter Name="DataPacking_CH3"               />
+            <Parameter Name="Pins_next_CH3"                 />
+            <Parameter Name="Type_manchester_CH3"           />
+            <Parameter Name="SpiClock_none_CH3"             />
+            <Parameter Name="FilterOrder_CH3"               />
+            <Parameter Name="Oversampling_CH3"              />
+            <Parameter Name="Offset_CH3"                    />
+            <Parameter Name="RightBitShift_CH3"             />
+    </RefMode>
+
+<!-- ///////////////////////////////////////////////////////////////////////////////////-->
+<!--                                       MODES                                        -->
+<!-- ///////////////////////////////////////////////////////////////////////////////////-->
+	<ModeLogicOperator Name="OR">
+		<Mode Name="Channel 0">
+                        <Semaphore>Semaphore_Channel_Active_$IpInstance</Semaphore>
+                        <Semaphore>Semaphore_Channel_0_$IpInstance</Semaphore>
+                        <Semaphore>$IpInstanceUsed_ForRCC</Semaphore>
+			<ModeLogicOperator Name="XOR">
+				<Mode Name="mode">
+		                  	<ModeLogicOperator Name="XOR">
+			                	<Mode Name="Parallel_Input_ch0" UserName="Parallel input">
+                                                        <Semaphore>Semaphore_Parallel_Input_CH0_$IpInstance</Semaphore>
+			                     		<SignalLogicalOp Name="AND">
+			          		        	<Signal Name="VS_IN0"/>
+				              	        </SignalLogicalOp>
+			                      	</Mode>
+				                <Mode Name="PDM_SPI_input_from_ch0_and_external_clock" UserName="PDM/SPI input from ch0 and external clock">
+				                	<SignalLogicalOp Name="AND">
+					                 	<Signal Name="CKIN0"/>
+					                   	<Signal Name="DATIN0"/>
+				                  	</SignalLogicalOp>
+			                     	</Mode>
+			                       	<Mode Name="PDM_SPI_input_from_ch0_and_internal_clock" UserName="PDM/SPI input from ch0 and internal clock">
+                                                        <Semaphore>Semaphore_Internal_Clock_$IpInstance</Semaphore>
+				                	<SignalLogicalOp Name="AND">
+						                <Signal Name="DATIN0"/>
+					                	<Signal Name="CKOUT"/>
+				                     	</SignalLogicalOp>
+			                      	</Mode>
+			                       	<Mode Name="Manchester_input_from_ch0" UserName="Manchester input from ch0">
+				                	<SignalLogicalOp Name="AND">
+						                <Signal Name="DATIN0"/>
+				                     	</SignalLogicalOp>
+			                      	</Mode>
+			                 	<Mode Name="PDM_SPI_input_from_ch01_and_external_clock" UserName="PDM/SPI input from ch1 and external clock">
+				                	<SignalLogicalOp Name="AND">
+						                <Signal Name="CKIN1"/>
+					                	<Signal Name="DATIN1"/>
+				                	</SignalLogicalOp>
+			                       	</Mode>
+			                    	<Mode Name="PDM_SPI_Input_from_ch01_and_Internal_Clock" UserName="PDM/SPI Input from ch1 and Internal Clock">
+                                                        <Semaphore>Semaphore_Internal_Clock_$IpInstance</Semaphore>
+				                       	<SignalLogicalOp Name="AND">
+				                 		<Signal Name="DATIN1"/>
+					                	<Signal Name="CKOUT"/>
+			                     		</SignalLogicalOp>
+			                 	</Mode>
+			                    	<Mode Name="Manchester_input_from_ch01" UserName="Manchester input from ch1">
+				                       	<SignalLogicalOp Name="AND">
+				                 		<Signal Name="DATIN1"/>
+			                     		</SignalLogicalOp>
+			                 	</Mode>
+		                  	</ModeLogicOperator>
+				</Mode>
+			</ModeLogicOperator>
+		</Mode>
+		<Mode Name="Channel 1">
+                        <Semaphore>Semaphore_Channel_Active_$IpInstance</Semaphore>
+                        <Semaphore>Semaphore_Channel_1_$IpInstance</Semaphore>
+                        <Semaphore>$IpInstanceUsed_ForRCC</Semaphore>
+			<ModeLogicOperator Name="XOR">
+				<Mode Name="mode">
+		                  	<ModeLogicOperator Name="XOR">
+			                	<Mode Name="Parallel_Input_ch1" UserName="Parallel input">
+                                                        <Semaphore>Semaphore_Parallel_Input_CH1_$IpInstance</Semaphore>
+			                     		<SignalLogicalOp Name="AND">
+			          		        	<Signal Name="VS_IN1"/>
+				              	        </SignalLogicalOp>
+			                      	</Mode>
+				                <Mode Name="PDM_SPI_input_from_ch1_and_external_clock" UserName="PDM/SPI input from ch1 and external clock">
+				                	<SignalLogicalOp Name="AND">
+					                 	<Signal Name="CKIN1"/>
+					                   	<Signal Name="DATIN1"/>
+				                  	</SignalLogicalOp>
+			                     	</Mode>
+			                       	<Mode Name="PDM_SPI_input_from_ch1_and_internal_clock" UserName="PDM/SPI input from ch1 and internal clock">
+                                                        <Semaphore>Semaphore_Internal_Clock_$IpInstance</Semaphore>
+				                	<SignalLogicalOp Name="AND">
+						                <Signal Name="DATIN1"/>
+					                	<Signal Name="CKOUT"/>
+				                     	</SignalLogicalOp>
+			                      	</Mode>
+			                       	<Mode Name="Manchester_input_from_ch1" UserName="Manchester input from ch1">
+				                	<SignalLogicalOp Name="AND">
+						                <Signal Name="DATIN1"/>
+				                     	</SignalLogicalOp>
+			                      	</Mode>
+			                 	<Mode Name="PDM_SPI_input_from_ch12_and_external_clock" UserName="PDM/SPI input from ch2 and external clock">
+				                	<SignalLogicalOp Name="AND">
+						                <Signal Name="CKIN2"/>
+					                	<Signal Name="DATIN2"/>
+				                	</SignalLogicalOp>
+			                       	</Mode>
+			                    	<Mode Name="PDM_SPI_Input_from_ch12_and_Internal_Clock" UserName="PDM/SPI Input from ch2 and Internal Clock">
+                                                        <Semaphore>Semaphore_Internal_Clock_$IpInstance</Semaphore>
+				                       	<SignalLogicalOp Name="AND">
+				                 		<Signal Name="DATIN2"/>
+					                	<Signal Name="CKOUT"/>
+			                     		</SignalLogicalOp>
+			                 	</Mode>
+			                    	<Mode Name="Manchester_input_from_ch12" UserName="Manchester input from ch2">
+				                       	<SignalLogicalOp Name="AND">
+				                 		<Signal Name="DATIN2"/>
+			                     		</SignalLogicalOp>
+			                 	</Mode>
+		                  	</ModeLogicOperator>
+				</Mode>
+			</ModeLogicOperator>
+		</Mode>
+		<Mode Name="Channel 2">
+                        <Semaphore>Semaphore_Channel_Active_$IpInstance</Semaphore>
+                        <Semaphore>Semaphore_Channel_2_$IpInstance</Semaphore>
+                        <Semaphore>$IpInstanceUsed_ForRCC</Semaphore>
+			<ModeLogicOperator Name="XOR">
+				<Mode Name="mode">
+		                  	<ModeLogicOperator Name="XOR">
+			                	<Mode Name="Parallel_Input_ch2" UserName="Parallel input">
+                                                        <Semaphore>Semaphore_Parallel_Input_CH2_$IpInstance</Semaphore>
+			                     		<SignalLogicalOp Name="AND">
+			          		        	<Signal Name="VS_IN2"/>
+				              	        </SignalLogicalOp>
+			                      	</Mode>
+				                <Mode Name="PDM_SPI_input_from_ch2_and_external_clock" UserName="PDM/SPI input from ch2 and external clock">
+				                	<SignalLogicalOp Name="AND">
+					                 	<Signal Name="CKIN2"/>
+					                   	<Signal Name="DATIN2"/>
+				                  	</SignalLogicalOp>
+			                     	</Mode>
+			                       	<Mode Name="PDM_SPI_input_from_ch2_and_internal_clock" UserName="PDM/SPI input from ch2 and internal clock">
+                                                        <Semaphore>Semaphore_Internal_Clock_$IpInstance</Semaphore>
+				                	<SignalLogicalOp Name="AND">
+						                <Signal Name="DATIN2"/>
+					                	<Signal Name="CKOUT"/>
+				                     	</SignalLogicalOp>
+			                      	</Mode>
+			                       	<Mode Name="Manchester_input_from_ch2" UserName="Manchester input from ch2">
+				                	<SignalLogicalOp Name="AND">
+						                <Signal Name="DATIN2"/>
+				                     	</SignalLogicalOp>
+			                      	</Mode>
+			                 	<Mode Name="PDM_SPI_input_from_ch23_and_external_clock" UserName="PDM/SPI input from ch3 and external clock">
+				                	<SignalLogicalOp Name="AND">
+						                <Signal Name="CKIN3"/>
+					                	<Signal Name="DATIN3"/>
+				                	</SignalLogicalOp>
+			                       	</Mode>
+			                    	<Mode Name="PDM_SPI_Input_from_ch23_and_Internal_Clock" UserName="PDM/SPI Input from ch3 and Internal Clock">
+                                                        <Semaphore>Semaphore_Internal_Clock_$IpInstance</Semaphore>
+				                       	<SignalLogicalOp Name="AND">
+				                 		<Signal Name="DATIN3"/>
+					                	<Signal Name="CKOUT"/>
+			                     		</SignalLogicalOp>
+			                 	</Mode>
+			                    	<Mode Name="Manchester_input_from_ch23" UserName="Manchester input from ch3">
+				                       	<SignalLogicalOp Name="AND">
+				                 		<Signal Name="DATIN3"/>
+			                     		</SignalLogicalOp>
+			                 	</Mode>
+		                  	</ModeLogicOperator>
+				</Mode>
+			</ModeLogicOperator>
+		</Mode>
+		<Mode Name="Channel 3">
+                        <Semaphore>Semaphore_Channel_Active_$IpInstance</Semaphore>
+                        <Semaphore>Semaphore_Channel_3_$IpInstance</Semaphore>
+                        <Semaphore>$IpInstanceUsed_ForRCC</Semaphore>
+			<ModeLogicOperator Name="XOR">
+				<Mode Name="mode">
+		                  	<ModeLogicOperator Name="XOR">
+			                	<Mode Name="Parallel_Input_ch3" UserName="Parallel input">
+                                                        <Semaphore>Semaphore_Parallel_Input_CH3_$IpInstance</Semaphore>
+			                     		<SignalLogicalOp Name="AND">
+			          		        	<Signal Name="VS_IN3"/>
+				              	        </SignalLogicalOp>
+			                      	</Mode>
+				                <Mode Name="PDM_SPI_input_from_ch3_and_external_clock" UserName="PDM/SPI input from ch3 and external clock">
+				                	<SignalLogicalOp Name="AND">
+					                 	<Signal Name="CKIN3"/>
+					                   	<Signal Name="DATIN3"/>
+				                  	</SignalLogicalOp>
+			                     	</Mode>
+			                       	<Mode Name="PDM_SPI_input_from_ch3_and_internal_clock" UserName="PDM/SPI input from ch3 and internal clock">
+                                                        <Semaphore>Semaphore_Internal_Clock_$IpInstance</Semaphore>
+				                	<SignalLogicalOp Name="AND">
+						                <Signal Name="DATIN3"/>
+					                	<Signal Name="CKOUT"/>
+				                     	</SignalLogicalOp>
+			                      	</Mode>
+			                       	<Mode Name="Manchester_input_from_ch3" UserName="Manchester input from ch3">
+				                	<SignalLogicalOp Name="AND">
+						                <Signal Name="DATIN3"/>
+				                     	</SignalLogicalOp>
+			                      	</Mode>
+			                 	<Mode Name="PDM_SPI_input_from_ch30_and_external_clock" UserName="PDM/SPI input from ch0 and external clock">
+				                	<SignalLogicalOp Name="AND">
+						                <Signal Name="CKIN0"/>
+					                	<Signal Name="DATIN0"/>
+				                	</SignalLogicalOp>
+			                       	</Mode>
+			                    	<Mode Name="PDM_SPI_Input_from_ch30_and_Internal_Clock" UserName="PDM/SPI Input from ch0 and Internal Clock">
+                                                        <Semaphore>Semaphore_Internal_Clock_$IpInstance</Semaphore>
+				                       	<SignalLogicalOp Name="AND">
+				                 		<Signal Name="DATIN0"/>
+					                	<Signal Name="CKOUT"/>
+			                     		</SignalLogicalOp>
+			                 	</Mode>
+			                    	<Mode Name="Manchester_input_from_ch30" UserName="Manchester input from ch0">
+				                       	<SignalLogicalOp Name="AND">
+				                 		<Signal Name="DATIN0"/>
+			                     		</SignalLogicalOp>
+			                 	</Mode>
+		                  	</ModeLogicOperator>
+				</Mode>
+			</ModeLogicOperator>
+		</Mode>
+		<Mode Name="CKOUT">
+			<ModeLogicOperator Name="XOR">
+				<Mode Name="CKOUT">
+                                <Condition  Expression="Semaphore_Channel_Active_$IpInstance" Diagnostic="A channel must be enabled prior to use the external clock capability"/>
+                                        <Semaphore>Semaphore_CKOUT_Mode_$IpInstance</Semaphore>
+					<SignalLogicalOp Name="AND">
+						<Signal Name="CKOUT"/>
+					</SignalLogicalOp>
+				</Mode>
+			</ModeLogicOperator>
+		</Mode>
+	</ModeLogicOperator>
+
+<!-- %%%%%%%%%%%%%%%%%%   OUTTRO    %%%%%%%%%%%%%%%%%%%-->
+
+    <RefSignal IOMode="AlternateFunctionPushPull" Name="CKIN0" ShareableGroupName="S_CKIN0$IpInstance"/>
+    <RefSignal IOMode="AlternateFunctionPushPull" Name="CKIN1" ShareableGroupName="S_CKIN1$IpInstance"/>
+    <RefSignal IOMode="AlternateFunctionPushPull" Name="CKIN2" ShareableGroupName="S_CKIN2$IpInstance"/>
+    <RefSignal IOMode="AlternateFunctionPushPull" Name="CKIN3" ShareableGroupName="S_CKIN3$IpInstance"/>
+    <RefSignal IOMode="AlternateFunctionPushPull" Name="CKOUT" ShareableGroupName="S_CKOUT$IpInstance"/>
+    <RefSignal IOMode="AlternateFunctionPushPull" Name="DATIN0" ShareableGroupName="S_DATAIN0$IpInstance"/>
+    <RefSignal IOMode="AlternateFunctionPushPull" Name="DATIN1" ShareableGroupName="S_DATAIN1$IpInstance"/>
+    <RefSignal IOMode="AlternateFunctionPushPull" Name="DATIN2" ShareableGroupName="S_DATAIN2$IpInstance"/>
+    <RefSignal IOMode="AlternateFunctionPushPull" Name="DATIN3" ShareableGroupName="S_DATAIN3$IpInstance"/>
+
+    <RefSignal IOMode="AlternateFunctionPushPull" Name="VS_IN0" Virtual="true" ShareableGroupName="S_VirtualCH0$IpInstance"/>
+    <RefSignal IOMode="AlternateFunctionPushPull" Name="VS_IN1" Virtual="true" ShareableGroupName="S_VirtualCH1$IpInstance"/>
+    <RefSignal IOMode="AlternateFunctionPushPull" Name="VS_IN2" Virtual="true" ShareableGroupName="S_VirtualCH2$IpInstance"/>
+    <RefSignal IOMode="AlternateFunctionPushPull" Name="VS_IN3" Virtual="true" ShareableGroupName="S_VirtualCH3$IpInstance"/>
+
+</IP>

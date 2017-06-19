@@ -8,8 +8,9 @@
 	
     <RefParameter Visible="false" Comment="Oscillator Type" DefaultValue="+OscillatorTypeHSI+|OscillatorTypeLSI+|OscillatorTypeHSE+|OscillatorTypeLSE+|OscillatorTypeMSI" Name="OscillatorType" Type="list"/>
    
-   
-  
+     <RefParameter Name="HSE_Timout"   Comment="HSE Startup Timout Value (ms)" Type="integer" DefaultValue="100" Min="1"  Max="4294967295" Group="RCC Parameters"/>
+	 <RefParameter Name="LSE_Timout"   Comment="LSE Startup Timout Value (ms)" Type="integer" DefaultValue="5000" Min="1" Max="4294967295"  Group="RCC Parameters"/>
+	 
     <RefParameter Comment="HSI Calibration Value" DefaultValue="16" Max="31" Min="0" Name="HSICalibrationValue" Group="RCC Parameters" Type="integer">
         <Condition Diagnostic="HSI used" Expression="HSIUsed=1"/>
     </RefParameter>
@@ -276,12 +277,12 @@
     <RefParameter Visible="false" Comment="System clock" Name="SYSCLKFreq_VALUE" DefaultValue="2097000" Max="32000000" Type="double" Display="value/1000000" Unit="MHz"/>
 	
     <!--RTC freq value  --> 
-    <RefParameter Visible="false" Comment="RTC clock" Name="RTCFreq_Value" Type="double" DefaultValue="32000" IP="RTC" Max="1000000" Min="1000000" Display="value/1000" Unit="KHz" >
+    <RefParameter Visible="false" Comment="RTC clock" Name="RTCFreq_Value" Type="double" DefaultValue="32000" IP="RTC" Max="1000000" Min="0" Display="value/1000" Unit="KHz" >
         <Condition Diagnostic="RTC Has HSE as source" Expression="(!(RTCClockSelection=RCC_RTCCLKSOURCE_LSE)&amp;!(RTCClockSelection=RCC_RTCCLKSOURCE_LSI)&amp; (RTCEnable=true))"/>
     </RefParameter>
     <RefParameter Visible="false" Comment="RTC clock" Name="RTCFreq_Value" Type="double" IP="RTC" DefaultValue="37000" Display="value/1000" Unit="KHz" />
-    <RefParameter Visible="false" Comment="RTC Clock Source_HSEDiv" Name="RTCHSEDivFreq_Value" Max="1000000" Min="1000000" DefaultValue="12500000" Type="double" Display="value/1000000" Unit="MHz"/>
-    <RefParameter Visible="false" Comment="LCD clock" Name="LCDFreq_Value" Type="double" DefaultValue="37000" IP="LCD" Max="1000000" Min="1000000" Display="value/1000" Unit="KHz" >
+    <RefParameter Visible="false" Comment="RTC Clock Source_HSEDiv" Name="RTCHSEDivFreq_Value" Max="1000000" Min="0" DefaultValue="12500000" Type="double" Display="value/1000000" Unit="MHz"/>
+    <RefParameter Visible="false" Comment="LCD clock" Name="LCDFreq_Value" Type="double" DefaultValue="37000" IP="LCD" Max="1000000" Min="0" Display="value/1000" Unit="KHz" >
         <Condition Diagnostic="RTC Has HSE as source" Expression="(!(RTCClockSelection=RCC_RTCCLKSOURCE_LSE)&amp;!(RTCClockSelection=RCC_RTCCLKSOURCE_LSI)&amp; (LCDEnable=true))"/>
     </RefParameter>   
     <RefParameter Visible="false" Comment="LCD clock" Name="LCDFreq_Value" Type="double" IP="LCD" DefaultValue="37000" Display="value/1000" Unit="KHz" />
@@ -297,8 +298,12 @@
         <Condition Diagnostic="USB" Expression="USBUsed_ForRCC"/>
     </RefParameter>  
     <RefParameter Visible="false" Comment="APB1 peripheral clocks" Name="APB1Freq_Value" DefaultValue="2097000" Max="32000000" Type="double" IP="SPI3,UART5,UART4,COMP,DAC,PWR,USB,WWDG,SPI2,USART2,USART3,I2C1,I2C2,I2S3,I2S2" Display="value/1000000" Unit="MHz"/>
-    <RefParameter Visible="false" Comment="APB2 peripheral clocks" Name="APB2Freq_Value" DefaultValue="2097000" Max="32000000" Type="double" IP="SDIO,USART1,SPI1,ADC1,SYSCFG,I2S1" Display="value/1000000" Unit="MHz"/>
-    <RefParameter Visible="false" Comment="HCLK" Name="AHBFreq_Value" DefaultValue="2097000"  Type="double" Display="value/1000000" Unit="MHz"/>
+    <RefParameter Visible="false" Comment="APB2 peripheral clocks" Name="APB2Freq_Value" DefaultValue="2097000" Max="32000000" Type="double" IP="SDIO,USART1,SPI1,SYSCFG,I2S1" Display="value/1000000" Unit="MHz"/>
+   
+      <!--ADC frequency  --> 
+    <RefParameter Visible="false" Comment="ADC synchr"  Name="synchADCFreq_Value"  DefaultValue="=APB2Freq_Value" Type="double" Display="value/1000000" Unit="MHz" IP="ADC"/>
+    <RefParameter Visible="false" Comment="ADC asynchr" Name="asynchADCFreq_Value" DefaultValue="=ADCFreq_Value"  Type="double" Display="value/1000000"  Unit="MHz" IP="ADC"/>
+   <RefParameter Visible="false" Comment="HCLK" Name="AHBFreq_Value" DefaultValue="2097000"  Type="double" Display="value/1000000" Unit="MHz"/>
     <RefParameter Visible="false" Comment="HCLK" Name="HCLKFreq_Value" DefaultValue="2097000" Max="32000000"  Type="double" IP="DMA-2D,CAMERAITF" Display="value/1000000" Unit="MHz"/>
     <!--PLL freq value  --> 
     <RefParameter Visible="false" Comment="VCOInput" Name="VCOInputFreq_Value" DefaultValue="16000000" Min="2000000" Max="24000000" Type="double" Display="value/1000000" Unit="MHz">
@@ -334,24 +339,24 @@
     <!--anathor output freq value  --> 
     <RefParameter Visible="false" Comment="IWDG clock" Name="WatchDogFreq_Value" DefaultValue="37000" Type="double" IP="IWATCHDOG" Display="value/1000" Unit="KHz" />
     <RefParameter Visible="false" Comment="Cortex System Timer clock" Name="TimerFreq_Value" DefaultValue="2097000" Type="double" IP="Timer" Display="value/1000000" Unit="MHz"/>
-    <RefParameter Visible="false" Comment="FCLK Cortex clock" Name="FCLKCortexFreq_Value" DefaultValue="2097000" Max="32000000" Min="32000000" Type="double" Display="value/1000000" Unit="MHz">
+   <!--  <RefParameter Visible="false" Comment="FCLK Cortex clock" Name="FCLKCortexFreq_Value" DefaultValue="2097000" Max="32000000" Min="32000000" Type="double" Display="value/1000000" Unit="MHz">
         <Condition Diagnostic="FCLK must be 32 MHz or 24 MHz when USB is enabled" Expression="USBUsed_ForRCC &amp; !(AHBFreq_Value=32000000)&amp;!(AHBFreq_Value=24000000) "/>
     </RefParameter>
     <RefParameter Visible="false" Comment="" Name="FCLKCortexFreq_ValueConstraintsText" DefaultValue="'FCLK Cortex clock' frequency must be =32 MHz or =24 MHz when USB is enabled" Type="string" Display="value/1000000" Unit="MHz">
         <Condition Diagnostic="FCLK must be 32 MHz or 24 MHz when USB is enabled" Expression="USBUsed_ForRCC &amp; !(AHBFreq_Value=32000000)&amp;!(AHBFreq_Value=24000000) "/>
     </RefParameter>
     <RefParameter Visible="false" Comment="" Name="FCLKCortexFreq_ValueConstraintsText" DefaultValue="" Type="string" Display="value/1000000" Unit="MHz"/>
-
+-->
     <RefParameter Visible="false" Comment="FCLK Cortex clock" Name="FCLKCortexFreq_Value" DefaultValue="2097000" Type="double" Display="value/1000000" Unit="MHz"/>
 	
 	
 	
     <RefParameter Visible="false" Comment="PWR clock" Name="PWRFreq_Value" DefaultValue="2097000" Type="double" IP="PWR" Display="value/1000000" Unit="MHz"/>
-    <RefParameter Visible="false" Comment="USB clock" Name="USBOutput" DefaultValue="24000000" Max="48000000" Min="48000000" Type="double" Display="value/1000000" IP="USB,SDIO" Unit="MHz"/>
+    <RefParameter Visible="false" Comment="USB clock" Name="USBOutput" DefaultValue="24000000" Min="47880000" Max="48120000" Type="double" Display="value/1000000" IP="USB,SDIO" Unit="MHz"/>
     <RefParameter Visible="false" Comment="sdio clock" Name="SDIOoutput" DefaultValue="24000000"  Type="double" Display="value/1000000" IP="USB" Unit="MHz"/>
     <RefParameter Visible="false" Comment="APB1 timers clocks" Name="APB1TimFreq_Value" DefaultValue="2097000" Type="double" IP="TIMER6,TIMER7,,TIMER2,TIMER3,TIMER4,TIMER5" Display="value/1000000" Unit="MHz"/>
     <RefParameter Visible="false" Comment="APB2 timers clocks" Name="APB2TimFreq_Value" DefaultValue="2097000" Type="double" IP="TIMER9,TIMER10,TIMER11" Display="value/1000000" Unit="MHz"/>
-    <RefParameter Visible="false" Comment="ADC clock" Name="ADCFreq_Value" DefaultValue="16000000" Type="double" Display="value/1000000" Unit="MHz" IP="ADC"/>
+    <RefParameter Visible="false" Comment="ADC clock" Name="ADCFreq_Value" DefaultValue="16000000" Type="double" Display="value/1000000" Unit="MHz" />
 	
 
 		
@@ -735,30 +740,15 @@
 	
     <!--Clock Type-->
     <RefParameter Visible="false" Comment="Clock Type" DefaultValue="+ClockTypeHCLK+|ClockTypeSysClk+|ClockTypePCLK1+|ClockTypePCLK2" Name="ClockType" Type="list"/>
-    <RefParameter Visible="false" Comment="Clock Type SysClk" DefaultValue="RCC_CLOCKTYPE_SYSCLK" Name="ClockTypeSysClk" Type="list">
-        <Condition Diagnostic="SYSCLK not changed" Expression="FLASH_LATENCY1"/>
-        <PossibleValue Comment="Sysclk" Value="RCC_CLOCKTYPE_SYSCLK" Semaphore="SysClkToConfigure"/>
-    </RefParameter>
-    <RefParameter Visible="false" Comment="Clock Type SysClk" DefaultValue="" Name="ClockTypeSysClk" Type="list">
-        <Condition Diagnostic="SYSCLK not changed" Expression="SYSCLKSource=RCC_SYSCLKSOURCE_MSI"/>
-    </RefParameter>
+
     <RefParameter Visible="false" Comment="Clock Type SysClk" DefaultValue="RCC_CLOCKTYPE_SYSCLK" Name="ClockTypeSysClk" Type="list">
         <PossibleValue Comment="Sysclk" Value="RCC_CLOCKTYPE_SYSCLK" Semaphore="SysClkToConfigure"/>
-    </RefParameter>
-    <RefParameter Visible="false" Comment="Clock Type AHB" DefaultValue="" Name="ClockTypeHCLK" Type="list">
-        <Condition Diagnostic="AHB not changed" Expression="AHBCLKDivider=RCC_SYSCLK_DIV1"/>
     </RefParameter>
     <RefParameter Visible="false" Comment="Clock Type AHB" DefaultValue="RCC_CLOCKTYPE_HCLK" Name="ClockTypeHCLK" Type="list">
         <PossibleValue Comment="RCC_CLOCKTYPE_HCLK" Value="RCC_CLOCKTYPE_HCLK" Semaphore="HCLKtoConfigure"/>
-    </RefParameter>
-    <RefParameter Visible="false" Comment="Clock Type HCLK1" DefaultValue="" Name="ClockTypePCLK1" Type="list">
-        <Condition Diagnostic="HCLK1 not changed" Expression="APB1CLKDivider=RCC_HCLK_DIV1"/>
-    </RefParameter>
+		</RefParameter>
     <RefParameter Visible="false" Comment="Clock Type HCLK1" DefaultValue="RCC_CLOCKTYPE_PCLK1" Name="ClockTypePCLK1" Type="list">
         <PossibleValue Comment="PCLK1" Value="RCC_CLOCKTYPE_PCLK1" Semaphore="PCLK1toConfigure"/>
-    </RefParameter>
-    <RefParameter Visible="false" Comment="Clock Type HCLK2" DefaultValue="" Name="ClockTypePCLK2" Type="list">
-        <Condition Diagnostic="HCLK2 not changed" Expression="APB2CLKDivider=RCC_HCLK_DIV1"/>
     </RefParameter>
     <RefParameter Visible="false" Comment="Clock Type HCLK2" DefaultValue="RCC_CLOCKTYPE_PCLK2" Name="ClockTypePCLK2" Type="list">
         <PossibleValue Comment="PCLK2" Value="RCC_CLOCKTYPE_PCLK2" Semaphore="PCLK2toConfigure"/>
@@ -1035,6 +1025,8 @@
         <Parameter Name="HSICalibrationValue"/>
         <Parameter Name="MSICalibrationValue"/>
         <Parameter Name="PWR_Regulator_Voltage_Scale"/>
+		<Parameter Name="HSE_Timout"/>
+        <Parameter Name="LSE_Timout"/>
       
     </RefMode>
    

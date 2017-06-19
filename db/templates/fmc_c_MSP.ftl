@@ -258,9 +258,27 @@
             [/#if]
           [/#if]
         [/#list][#--list method.arguments as fargument--]
-        [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n
+        [#--[#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n--]
+                    [#if method.returnHAL=="false"]
+                        [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});
+                    [#else]
+                        [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
+                        [#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}(${args}) != HAL_OK)
+                        [#if nTab==2]#t#t[#else]#t[/#if]{
+                        [#if nTab==2]#t#t[#else]#t[/#if]#t_Error_Handler(__FILE__, __LINE__);
+                        [#if nTab==2]#t#t[#else]#t[/#if]}
+                    [/#if]#n                        
 		  [#else][#--if method.arguments??--]
-        [#if nTab==2]#t#t[#else]#t[/#if]${method.name}();
+        [#--[#if nTab==2]#t#t[#else]#t[/#if]${method.name}();--]
+                    [#if method.returnHAL=="false"]
+                        [#if nTab==2]#t#t[#else]#t[/#if]${method.name}();
+                    [#else]
+                        [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
+                        [#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}() != HAL_OK)
+                        [#if nTab==2]#t#t[#else]#t[/#if]{
+                        [#if nTab==2]#t#t[#else]#t[/#if]#t_Error_Handler(__FILE__, __LINE__);
+                        [#if nTab==2]#t#t[#else]#t[/#if]}
+                    [/#if]#n
       [/#if][#--if method.arguments??--]
     [/#if][#--if method.status=="OK"--]
     [#if method.status=="KO"]
@@ -326,7 +344,16 @@
         [/#list]
                                 [#if nTab==2]#t#t[#else]#t[/#if]#t//${method.name}(${args});
       [#else]
-                               [#if nTab==2]#t#t[#else]#t[/#if]${method.name}()#n;
+                              [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}()#n;--]
+                [#if method.returnHAL=="false"]
+                    [#if nTab==2]#t#t[#else]#t[/#if]${method.name}();
+                [#else]
+                    [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
+                    [#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}() != HAL_OK)
+                    [#if nTab==2]#t#t[#else]#t[/#if]{
+                    [#if nTab==2]#t#t[#else]#t[/#if]#t_Error_Handler(__FILE__, __LINE__);
+                    [#if nTab==2]#t#t[#else]#t[/#if]}
+                [/#if]#n
       [/#if]
     [/#if][#--if method.status=="KO"--]
   [/#list][#--list methodList as method--]
@@ -426,13 +453,13 @@
   [#if serviceType=="Init"] 
     [#if initService.clock??]
       [#list initService.clock?split(';') as clock]
-        #t#${clock}(); 
+        #t${clock}(); 
       [/#list]
     [#else]
-         #t__${ipName}_CLK_ENABLE();
+         #t__HAL_RCC_${ipName}_CLK_ENABLE();
     [/#if]
   [#else]           
-         #t__${ipName}_CLK_DISABLE();   
+         #t__HAL_RCC_${ipName}_CLK_DISABLE();   
   [/#if]
   [#if gpioExist]
 #t[@generateConfigCode ipName=ipName type=serviceType serviceName="gpio" instHandler=instHandler tabN=tabN/]
@@ -445,12 +472,12 @@
         [#if initService.nvic??]
             [#assign irqNum = 0]
             [#list initService.nvic as initVector]
+              [#if initVector.codeInMspInit]
                 [#assign irqNum = irqNum+1]
-                [#if irqNum==1]#t/* Peripheral interrupt Init */[/#if]
-                [#-- #t#t/* Sets the priority grouping field */ To be done later--]
-                [#-- #t#tHAL_NVIC_SetPriorityGrouping(${initVector.group});  To be done later--]
+                [#if irqNum==1]#t/* Peripheral interrupt init */[/#if]
                 #tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
                 #tHAL_NVIC_EnableIRQ(${initVector.vector});
+              [/#if]
             [/#list]
         [/#if]
     [/#if]
@@ -495,7 +522,7 @@
 
 [#-- Section2: Msp Init --]
 [#assign mspinitvar = ipvar.ipName + "_Initialized"]
-#nstatic int ${mspinitvar} = 0;
+#nstatic uint32_t ${mspinitvar} = 0;
 
 #nstatic void HAL_${ipvar.ipName}_MspInit(void){
 #t/* USER CODE BEGIN ${ipvar.ipName}_MspInit 0 */
@@ -599,7 +626,7 @@
 
 [#-- Section3: Msp DeInit --]
 [#assign mspdeinitvar = ipvar.ipName + "_DeInitialized"]
-#nstatic int ${mspdeinitvar} = 0;
+#nstatic uint32_t ${mspdeinitvar} = 0;
 
 #nstatic void HAL_${ipvar.ipName}_MspDeInit(void){
 #t/* USER CODE BEGIN ${ipvar.ipName}_MspDeInit 0 */

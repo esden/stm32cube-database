@@ -8,49 +8,63 @@
         <PossibleValue Comment="DAC_CHANNEL_1" Value="DAC_CHANNEL_1"/>
     </RefParameter>
     <RefParameter Comment="Channel" DefaultValue="DAC$Index" Name="Instance" Type="list" Group="DAC Out1 Settings" Visible="false"/>
-    
+ 
     <RefParameter Comment="Trigger" DefaultValue="DAC_TRIGGER_NONE" Name="DAC_Trigger" Type="list" Group="DAC Out1 Settings">
-        <Condition Diagnostic="" Expression="External_Trigger_$IpInstance"/>
+       <!-- <Condition Diagnostic="" Expression="External_Trigger_$IpInstance"/> -->
         <PossibleValue Comment="None " Value="DAC_TRIGGER_NONE"/>
         <PossibleValue Comment="Timer 2 Trigger Out event " Value="DAC_TRIGGER_T2_TRGO" Condition="!TIM2_Exist" Diagnostic="available only for Die432" Action="Remove"/>
-        <PossibleValue Comment="Timer 3 Trigger Out event " Value="DAC_TRIGGER_T3_TRGO" Semaphore="channel1TrigTim3$IpInstance" Condition="!TIM3_Exist" Diagnostic="available only for Die432" Action="Remove"/>
+        <PossibleValue Comment="Timer 3 Trigger Out event " Value="DAC_TRIGGER_T3_TRGO" Semaphore="channel1TrigTim3$IpInstance" Condition=" (!TIM3_Exist) | ( TIM3_Exist &amp; DAC_Trigger2=DAC_TRIGGER_T8_TRGO ) " Diagnostic="available only for Die432" Action="Remove"/>
         <PossibleValue Comment="Timer 4 Trigger Out event " Value="DAC_TRIGGER_T4_TRGO" Condition="!TIM4_Exist" Diagnostic="available only for Die432" Action="Remove"/>
         <PossibleValue Comment="Timer 5 Trigger Out event " Value="DAC_TRIGGER_T5_TRGO" Condition="!DIE432|!TIM5_Exist|!($IpNumber=1)" Diagnostic="available only for Die432" Action="Remove"/>
         <PossibleValue Comment="Timer 6 Trigger Out event " Value="DAC_TRIGGER_T6_TRGO" Condition="!TIM6_Exist" Diagnostic="available only for Die432" Action="Remove"/>
         <PossibleValue Comment="Timer 7 Trigger Out event " Value="DAC_TRIGGER_T7_TRGO" Condition="!TIM7_Exist" Diagnostic="available only for Die432" Action="Remove"/>
-        <PossibleValue Comment="Timer 8 Trigger Out event " Value="DAC_TRIGGER_T8_TRGO" Condition="!TIM8_Exist" Diagnostic="available only for Die432" Action="Remove"/>
-        <PossibleValue Comment="Timer 15 Trigger Out event " Value="DAC_TRIGGER_T15_TRGO" Condition="DIE432|!TIM15_Exist" Diagnostic="not available for Die432" Action="Remove"/>
+        <PossibleValue Comment="Timer 8 Trigger Out event " Value="DAC_TRIGGER_T8_TRGO" Condition=" (!TIM8_Exist) | ( TIM8_Exist &amp; DAC_Trigger2=DAC_TRIGGER_T3_TRGO ) " Diagnostic="available only for Die432" Action="Remove"/>
+        <PossibleValue Comment="Timer 15 Trigger Out event " Value="DAC_TRIGGER_T15_TRGO" Condition=" DIE432|!TIM15_Exist | (STM32F334 &amp; TIM15_Exist &amp; DAC_Trigger2=DAC_TRIGGER_HRTIM1_DACTRG1 )" Diagnostic="not available for Die432" Action="Remove"/>
         <PossibleValue Comment="Timer 18 Trigger Out event " Value="DAC_TRIGGER_T18_TRGO" Condition="!DIE432|!TIM18_Exist|!($IpNumber=2)" Diagnostic="available only for Die432" Action="Remove" />
-        <PossibleValue Comment="HRTIM1 DACTRG1 Trigger Out event " Value="DAC_TRIGGER_HRTIM1_DACTRG1" Semaphore="channel1TrigHRTim1$IpInstance" Condition="!DIE438|!HRTIM1_Exist|!($IpNumber=1)" Diagnostic="available only for Die438 and for channel1" Action="Remove" />
+        <PossibleValue Comment="HRTIM1 DACTRG1 Trigger Out event " Value="DAC_TRIGGER_HRTIM1_DACTRG1" Semaphore="channel1TrigHRTim1$IpInstance" Condition="!DIE438|!HRTIM1_Exist|!($IpNumber=1) |(STM32F334 &amp; HRTIM1_Exist &amp; DAC_Trigger2=DAC_TRIGGER_T15_TRGO )" Diagnostic="available only for Die438 and for channel1" Action="Remove" />
         <PossibleValue Comment="HRTIM1 DACTRG2 Trigger Out event " Value="DAC_TRIGGER_HRTIM1_DACTRG2" Semaphore="channel1TrigHRTim2$IpInstance"  Condition="!DIE438|!HRTIM1_Exist|!($IpNumber=1)" Diagnostic="available only for Die438 and for channel1" Action="Remove" />
-        <PossibleValue Comment="HRTIM1 DACTRG3 Trigger Out event " Value="DAC_TRIGGER_HRTIM1_DACTRG3" Semaphore="channel1TrigHRTim3$IpInstance"  Condition="!DIE438|!HRTIM1_Exist|!($IpNumber=2)" Diagnostic="available only for Die438" Action="Remove" />        <PossibleValue Comment="External line 9" Value="DAC_TRIGGER_EXT_IT9"/>
-         <PossibleValue Comment="Software trigger" Value="DAC_TRIGGER_SOFTWARE"/>
-    </RefParameter>    
-    <RefParameter Comment="Trigger" DefaultValue="DAC_TRIGGER_NONE" Name="DAC_Trigger" Type="list" Group="DAC Out1 Settings">
+        <PossibleValue Comment="HRTIM1 DACTRG3 Trigger Out event " Value="DAC_TRIGGER_HRTIM1_DACTRG3" Semaphore="channel1TrigHRTim3$IpInstance"  Condition="!DIE438|!HRTIM1_Exist|!($IpNumber=2)" Diagnostic="available only for Die438" Action="Remove" />       
+        <PossibleValue Comment="External line 9" Value="DAC_TRIGGER_EXT_IT9" Condition="!External_Trigger_$IpInstance" Action="Remove"/>
+        <PossibleValue Comment="Software trigger" Value="DAC_TRIGGER_SOFTWARE"/>
+    </RefParameter>  
+    
+
+    <!-- <RefParameter Comment="Trigger" DefaultValue="DAC_TRIGGER_NONE" Name="DAC_Trigger" Type="list" Group="DAC Out1 Settings">
         <PossibleValue Comment="None " Value="DAC_TRIGGER_NONE"/>
         <PossibleValue Comment="Timer 2 Trigger Out event " Value="DAC_TRIGGER_T2_TRGO" Condition="!TIM2_Exist" Diagnostic="available only for Die432" Action="Remove"/>
-        <PossibleValue Comment="Timer 3 Trigger Out event " Value="DAC_TRIGGER_T3_TRGO" Semaphore="channel1TrigTim3$IpInstance" Condition="!TIM3_Exist" Diagnostic="available only for Die432" Action="Remove"/>
+        <PossibleValue Comment="Timer 3 Trigger Out event " Value="DAC_TRIGGER_T3_TRGO" Semaphore="channel1TrigTim3$IpInstance" Condition=" (!TIM3_Exist) | ( TIM3_Exist &amp; DAC_Trigger2=DAC_TRIGGER_T8_TRGO ) " Diagnostic="available only for Die432" Action="Remove"/>
         <PossibleValue Comment="Timer 4 Trigger Out event " Value="DAC_TRIGGER_T4_TRGO" Condition="!TIM4_Exist" Diagnostic="available only for Die432" Action="Remove"/>
         <PossibleValue Comment="Timer 5 Trigger Out event " Value="DAC_TRIGGER_T5_TRGO" Condition="!DIE432|!TIM5_Exist|!($IpNumber=1)" Diagnostic="available only for Die432" Action="Remove"/>
         <PossibleValue Comment="Timer 6 Trigger Out event " Value="DAC_TRIGGER_T6_TRGO" Condition="!TIM6_Exist" Diagnostic="available only for Die432" Action="Remove"/>
         <PossibleValue Comment="Timer 7 Trigger Out event " Value="DAC_TRIGGER_T7_TRGO" Condition="!TIM7_Exist" Diagnostic="available only for Die432" Action="Remove"/>
-        <PossibleValue Comment="Timer 8 Trigger Out event " Value="DAC_TRIGGER_T8_TRGO" Condition="!TIM8_Exist" Diagnostic="available only for Die432" Action="Remove"/>
-        <PossibleValue Comment="Timer 15 Trigger Out event " Value="DAC_TRIGGER_T15_TRGO" Condition="DIE432|!TIM15_Exist" Diagnostic="not available for Die432" Action="Remove"/>
+        <PossibleValue Comment="Timer 8 Trigger Out event " Value="DAC_TRIGGER_T8_TRGO" Condition="(!TIM8_Exist) | ( TIM8_Exist &amp; DAC_Trigger2=DAC_TRIGGER_T3_TRGO ) " Diagnostic="available only for Die432" Action="Remove"/>
+        <PossibleValue Comment="Timer 15 Trigger Out event " Value="DAC_TRIGGER_T15_TRGO" Condition="DIE432|!TIM15_Exist " Diagnostic="not available for Die432" Action="Remove"/>
         <PossibleValue Comment="Timer 18 Trigger Out event " Value="DAC_TRIGGER_T18_TRGO" Condition="!DIE432|!TIM18_Exist|!($IpNumber=2)" Diagnostic="available only for Die432" Action="Remove" />
-        <PossibleValue Comment="HRTIM1 DACTRG1 Trigger Out event " Value="DAC_TRIGGER_HRTIM1_DACTRG1" Semaphore="channel1TrigHRTim1$IpInstance" Condition="!DIE438|!HRTIM1_Exist|!($IpNumber=1)" Diagnostic="available only for Die438 and for channel1" Action="Remove" />
+        <PossibleValue Comment="HRTIM1 DACTRG1 Trigger Out event " Value="DAC_TRIGGER_HRTIM1_DACTRG1" Semaphore="channel1TrigHRTim1$IpInstance" Condition="!DIE438|!HRTIM1_Exist|!($IpNumber=1) |(STM32F334 &amp; HRTIM1_Exist &amp; DAC_Trigger2=DAC_TRIGGER_T15_TRGO ) "  Diagnostic="available only for Die438 and for channel1" Action="Remove" />
         <PossibleValue Comment="HRTIM1 DACTRG2 Trigger Out event " Value="DAC_TRIGGER_HRTIM1_DACTRG2" Semaphore="channel1TrigHRTim2$IpInstance"  Condition="!DIE438|!HRTIM1_Exist|!($IpNumber=1)" Diagnostic="available only for Die438 and for channel1" Action="Remove" />
         <PossibleValue Comment="HRTIM1 DACTRG3 Trigger Out event " Value="DAC_TRIGGER_HRTIM1_DACTRG3" Semaphore="channel1TrigHRTim3$IpInstance"  Condition="!DIE438|!HRTIM1_Exist|!($IpNumber=2)" Diagnostic="available only for Die438" Action="Remove" />
         <PossibleValue Comment="Software trigger" Value="DAC_TRIGGER_SOFTWARE"/>
-    </RefParameter>
-    <RefParameter Comment="Output Buffer" DefaultValue="DAC_OUTPUTBUFFER_DISABLE" Name="DAC_OutputBuffer" Type="list" Group="DAC Out2 Settings">
-        <Condition Expression="($IpNumber=2)&amp;(DIE438)" Diagnostic="DAC2_OUT1 unbuffered for ST32F303x6/x8"/>
-        <PossibleValue Comment="Disable Output Buffer " Value="DAC_OUTPUTBUFFER_DISABLE"/>
-    </RefParameter>
-    <RefParameter Comment="Output Buffer" DefaultValue="DAC_OUTPUTBUFFER_ENABLE" Name="DAC_OutputBuffer" Type="list" Group="DAC Out1 Settings">
+    </RefParameter> -->
+   
+ <RefParameter Comment="Output Buffer" DefaultValue="DAC_OUTPUTBUFFER_ENABLE" Name="DAC_OutputBuffer" Type="list" Group="DAC Out1 Settings">
+     <Condition Expression="!DIE438 | (DIE438 &amp;($IpNumber=1))" Diagnostic="DAC2_OUT1 unbuffered for ST32F303x6/x8"/>
         <PossibleValue Comment="Enable" Value="DAC_OUTPUTBUFFER_ENABLE"/>
         <PossibleValue Comment="Disable" Value="DAC_OUTPUTBUFFER_DISABLE"/>
     </RefParameter>
-    <!-- DAC Trigger Remap channel1-->
+    <RefParameter Comment="Output Buffer" DefaultValue="null" Name="DAC_OutputBuffer" Type="list" Group="DAC Out1 Settings"  Visible="false"/>
+   
+   
+   <RefParameter Comment="Output 1 Switch" DefaultValue="DAC_OUTPUTSWITCH_ENABLE" Name="DAC_OutputSwitch" Type="list" Group="DAC Out1 Settings" Visible="false">
+     <Condition Expression="$IpInstance_Switch_OUT1_Enable" Diagnostic=""/>
+        <PossibleValue Comment="Output 1 Switch Enable" Value="DAC_OUTPUTSWITCH_ENABLE"/>
+    </RefParameter>
+    <RefParameter Comment="Output 1 Switch" DefaultValue="DAC_OUTPUTSWITCH_DISABLE" Name="DAC_OutputSwitch" Type="list" Group="DAC Out1 Settings" Visible="false">
+     <Condition Expression="$IpInstance_Switch_OUT1_Disable" Diagnostic=""/>
+        <PossibleValue Comment="Output 1 Switch Enable" Value="DAC_OUTPUTSWITCH_DISABLE"/>
+    </RefParameter>
+     <RefParameter Comment="Output 1 Switch" DefaultValue="null" Name="DAC_OutputSwitch" Type="list" Group="DAC Out1 Settings" Visible="false"/>
+
+<!-- DAC Trigger Remap channel1-->
     <RefParameter Name="TRIGGER_REMAP" Comment="" Type="list" DefaultValue="HAL_REMAPTRIGGER_DAC1_TRIG" Visible="false">
         <Condition Expression="channel1TrigTim3$IpInstance" Diagnostic=""/>
         <PossibleValue Value="HAL_REMAPTRIGGER_DAC1_TRIG" Comment="HAL_REMAPTRIGGER_DAC1_TRIG"/>
@@ -229,44 +243,44 @@
         <PossibleValue Comment="Unmask DAC channel LFSR bits[11:0] " Value="DAC_LFSRUNMASK_BITS11_0"/>
     </RefParameter>	
     <RefParameter Comment="Trigger " DefaultValue="DAC_TRIGGER_NONE" Name="DAC_Trigger2" Type="list" Group="DAC Out2 Settings">
-        <Condition Diagnostic="External Trigger" Expression="External_Trigger_$IpInstance"/>
+       <!--  <Condition Diagnostic="External Trigger" Expression="External_Trigger_$IpInstance"/> -->
         <PossibleValue Comment="None" Value="DAC_TRIGGER_NONE"/>
         <PossibleValue Comment="Timer 2 Trigger Out event " Value="DAC_TRIGGER_T2_TRGO" Condition="!TIM2_Exist" Diagnostic="available only for Die432" Action="Remove"/>
-        <PossibleValue Comment="Timer 3 Trigger Out event " Value="DAC_TRIGGER_T3_TRGO" Semaphore="channel2TrigTim3$IpInstance" Condition="!TIM3_Exist" Diagnostic="available only for Die432" Action="Remove"/>
+        <PossibleValue Comment="Timer 3 Trigger Out event " Value="DAC_TRIGGER_T3_TRGO" Semaphore="channel2TrigTim3$IpInstance" Condition=" (!TIM3_Exist) | (TIM3_Exist &amp; DAC_Trigger=DAC_TRIGGER_T8_TRGO)" Diagnostic="available only for Die432" Action="Remove"/>
         <PossibleValue Comment="Timer 4 Trigger Out event " Value="DAC_TRIGGER_T4_TRGO" Condition="!TIM4_Exist" Diagnostic="available only for Die432" Action="Remove"/>
         <PossibleValue Comment="Timer 5 Trigger Out event " Value="DAC_TRIGGER_T5_TRGO" Condition="!DIE432|!TIM5_Exist|!($IpNumber=1)" Diagnostic="available only for Die432" Action="Remove"/>
         <PossibleValue Comment="Timer 6 Trigger Out event " Value="DAC_TRIGGER_T6_TRGO" Condition="!TIM6_Exist" Diagnostic="available only for Die432" Action="Remove"/>
         <PossibleValue Comment="Timer 7 Trigger Out event " Value="DAC_TRIGGER_T7_TRGO" Condition="!TIM7_Exist" Diagnostic="available only for Die432" Action="Remove"/>
-        <PossibleValue Comment="Timer 8 Trigger Out event " Value="DAC_TRIGGER_T8_TRGO" Condition="!TIM8_Exist" Diagnostic="available only for Die432" Action="Remove"/>
-        <PossibleValue Comment="Timer 15 Trigger Out event " Value="DAC_TRIGGER_T15_TRGO" Condition="DIE432|!TIM15_Exist" Diagnostic="not available for Die432" Action="Remove"/>
+        <PossibleValue Comment="Timer 8 Trigger Out event " Value="DAC_TRIGGER_T8_TRGO" Condition=" (!TIM8_Exist) | (TIM8_Exist &amp; DAC_Trigger=DAC_TRIGGER_T3_TRGO )" Diagnostic="available only for Die432" Action="Remove"/>
+        <PossibleValue Comment="Timer 15 Trigger Out event " Value="DAC_TRIGGER_T15_TRGO" Condition="DIE432|!TIM15_Exist |(STM32F334 &amp; TIM15_Exist &amp; DAC_Trigger=DAC_TRIGGER_HRTIM1_DACTRG1 ) " Diagnostic="not available for Die432" Action="Remove"/>
         <PossibleValue Comment="Timer 18 Trigger Out event " Value="DAC_TRIGGER_T18_TRGO" Condition="!DIE432|!TIM18_Exist|!($IpNumber=2)" Diagnostic="available only for Die432" Action="Remove" />
-        <PossibleValue Comment="HRTIM1 DACTRG1 Trigger Out event " Value="DAC_TRIGGER_HRTIM1_DACTRG1" Semaphore="channel2TrigHRTim1$IpInstance" Condition="!DIE438|!HRTIM1_Exist|!($IpNumber=1)" Diagnostic="available only for Die438 and for channel1" Action="Remove" />
+        <PossibleValue Comment="HRTIM1 DACTRG1 Trigger Out event " Value="DAC_TRIGGER_HRTIM1_DACTRG1" Semaphore="channel2TrigHRTim1$IpInstance" Condition="!DIE438|!HRTIM1_Exist|!($IpNumber=1)| (STM32F334 &amp; HRTIM1_Exist &amp; DAC_Trigger=DAC_TRIGGER_T15_TRGO)" Diagnostic="available only for Die438 and for channel1" Action="Remove" />
         <PossibleValue Comment="HRTIM1 DACTRG2 Trigger Out event " Value="DAC_TRIGGER_HRTIM1_DACTRG2" Semaphore="channel2TrigHRTim2$IpInstance"  Condition="!DIE438|!HRTIM1_Exist|!($IpNumber=1)" Diagnostic="available only for Die438 and for channel1" Action="Remove" />
-        <PossibleValue Comment="External line 9" Value="DAC_TRIGGER_EXT_IT9"/>
+        <PossibleValue Comment="External line 9" Value="DAC_TRIGGER_EXT_IT9"  Condition="!External_Trigger_$IpInstance"  Action="Remove"/>
         <PossibleValue Comment="Software trigger " Value="DAC_TRIGGER_SOFTWARE"/>
     </RefParameter>
-    <RefParameter Comment="Trigger " DefaultValue="DAC_TRIGGER_NONE" Name="DAC_Trigger2" Type="list" Group="DAC Out2 Settings">
+   <!-- <RefParameter Comment="Trigger " DefaultValue="DAC_TRIGGER_NONE" Name="DAC_Trigger2" Type="list" Group="DAC Out2 Settings">
         <PossibleValue Comment="None" Value="DAC_TRIGGER_NONE"/>
         <PossibleValue Comment="Timer 2 Trigger Out event " Value="DAC_TRIGGER_T2_TRGO" Condition="!TIM2_Exist" Diagnostic="available only for Die432" Action="Remove"/>
-        <PossibleValue Comment="Timer 3 Trigger Out event " Value="DAC_TRIGGER_T3_TRGO" Semaphore="channel2TrigTim3$IpInstance" Condition="!TIM3_Exist" Diagnostic="available only for Die432" Action="Remove"/>
+        <PossibleValue Comment="Timer 3 Trigger Out event " Value="DAC_TRIGGER_T3_TRGO" Semaphore="channel2TrigTim3$IpInstance" Condition="(!TIM3_Exist) | (TIM3_Exist &amp; DAC_Trigger=DAC_TRIGGER_T8_TRGO)" Diagnostic="available only for Die432" Action="Remove"/>
         <PossibleValue Comment="Timer 4 Trigger Out event " Value="DAC_TRIGGER_T4_TRGO" Condition="!TIM4_Exist" Diagnostic="available only for Die432" Action="Remove"/>
         <PossibleValue Comment="Timer 5 Trigger Out event " Value="DAC_TRIGGER_T5_TRGO" Condition="!DIE432|!TIM5_Exist|!($IpNumber=1)" Diagnostic="available only for Die432" Action="Remove"/>
         <PossibleValue Comment="Timer 6 Trigger Out event " Value="DAC_TRIGGER_T6_TRGO" Condition="!TIM6_Exist" Diagnostic="available only for Die432" Action="Remove"/>
         <PossibleValue Comment="Timer 7 Trigger Out event " Value="DAC_TRIGGER_T7_TRGO" Condition="!TIM7_Exist" Diagnostic="available only for Die432" Action="Remove"/>
-        <PossibleValue Comment="Timer 8 Trigger Out event " Value="DAC_TRIGGER_T8_TRGO" Condition="!TIM8_Exist" Diagnostic="available only for Die432" Action="Remove"/>       
-        <PossibleValue Comment="Timer 15 Trigger Out event " Value="DAC_TRIGGER_T15_TRGO" Condition="DIE432|!TIM15_Exist" Diagnostic="not available for Die432" Action="Remove"/>
+        <PossibleValue Comment="Timer 8 Trigger Out event " Value="DAC_TRIGGER_T8_TRGO" Condition="(!TIM8_Exist) | (TIM8_Exist &amp; DAC_Trigger=DAC_TRIGGER_T3_TRGO )" Diagnostic="available only for Die432" Action="Remove"/>       
+        <PossibleValue Comment="Timer 15 Trigger Out event " Value="DAC_TRIGGER_T15_TRGO" Condition="DIE432|!TIM15_Exist |(STM32F334 &amp; TIM15_Exist &amp; DAC_Trigger=DAC_TRIGGER_HRTIM1_DACTRG1 ) " Diagnostic="not available for Die432" Action="Remove"/>
         <PossibleValue Comment="Timer 18 Trigger Out event " Value="DAC_TRIGGER_T18_TRGO" Condition="!DIE432|!TIM18_Exist|!($IpNumber=2)" Diagnostic="available only for Die432" Action="Remove" />
-        <PossibleValue Comment="HRTIM1 DACTRG1 Trigger Out event " Value="DAC_TRIGGER_HRTIM1_DACTRG1" Semaphore="channel2TrigHRTim1$IpInstance" Condition="!DIE438|!HRTIM1_Exist|!($IpNumber=1)" Diagnostic="available only for Die438 and for channel1" Action="Remove" />
+        <PossibleValue Comment="HRTIM1 DACTRG1 Trigger Out event " Value="DAC_TRIGGER_HRTIM1_DACTRG1" Semaphore="channel2TrigHRTim1$IpInstance" Condition="!DIE438|!HRTIM1_Exist|!($IpNumber=1) | (STM32F334 &amp; HRTIM1_Exist &amp; DAC_Trigger=DAC_TRIGGER_T15_TRGO)" Diagnostic="available only for Die438 and for channel1" Action="Remove" />
         <PossibleValue Comment="HRTIM1 DACTRG2 Trigger Out event " Value="DAC_TRIGGER_HRTIM1_DACTRG2" Semaphore="channel2TrigHRTim2$IpInstance"  Condition="!DIE438|!HRTIM1_Exist|!($IpNumber=1)" Diagnostic="available only for Die438 and for channel1" Action="Remove" />
         <PossibleValue Comment="Software trigger " Value="DAC_TRIGGER_SOFTWARE"/>
-    </RefParameter>
+    </RefParameter> -->
      
         <!-- DAC Trigger Remap channel2-->
     <RefParameter Name="TRIGGER_REMAP2" Comment="" Type="list" DefaultValue="HAL_REMAPTRIGGER_DAC1_TRIG" Visible="false">
         <Condition Expression="channel2TrigTim3$IpInstance" Diagnostic=""/>
         <PossibleValue Value="HAL_REMAPTRIGGER_DAC1_TRIG" Comment="HAL_REMAPTRIGGER_DAC1_TRIG"/>
     </RefParameter>
-       <RefParameter Name="TRIGGER_REMAP2" Comment="" Type="list" DefaultValue="HAL_REMAPTRIGGER_DAC1_TRIG3" Visible="false">
+    <RefParameter Name="TRIGGER_REMAP2" Comment="" Type="list" DefaultValue="HAL_REMAPTRIGGER_DAC1_TRIG3" Visible="false">
         <Condition Expression="channel2TrigHRTim1$IpInstance" Diagnostic=""/>
         <PossibleValue Value="HAL_REMAPTRIGGER_DAC1_TRIG3" Comment="HAL_REMAPTRIGGER_DAC1_TRIG3"/>
     </RefParameter>
@@ -278,31 +292,31 @@
         <PossibleValue Value="__NULL" Comment="_NULL"/>
     </RefParameter>
     
-    <RefParameter Comment="Output Buffer " DefaultValue="DAC_OUTPUTBUFFER_DISABLE" Name="DAC_OutputBuffer2" Type="list" Group="DAC Out2 Settings">
-        <Condition Expression="(DAC1_OUT2_Conf)&amp;(DIE438)" Diagnostic="DAC1_OUT2 unbuffered for ST32F303x6/x8"/>
-        <PossibleValue Comment="Disable Output Buffer " Value="DAC_OUTPUTBUFFER_DISABLE"/>
-    </RefParameter>
     <RefParameter Comment="Output Buffer " DefaultValue="DAC_OUTPUTBUFFER_ENABLE" Name="DAC_OutputBuffer2" Type="list" Group="DAC Out2 Settings">
+         <Condition Expression="!DIE438" Diagnostic=""/>
         <PossibleValue Comment="Enable" Value="DAC_OUTPUTBUFFER_ENABLE"/>
         <PossibleValue Comment="Disable" Value="DAC_OUTPUTBUFFER_DISABLE"/>
     </RefParameter>
-    <!-- -->
+     <RefParameter Comment="Output Buffer " DefaultValue="null" Name="DAC_OutputBuffer2" Type="list" Group="DAC Out2 Settings" Visible="false"/>
+    
+    <RefParameter Comment="Output 2 Switch" DefaultValue="DAC_OUTPUTSWITCH_ENABLE" Name="DAC_OutputSwitch2" Type="list" Group="DAC Out2 Settings" Visible="false">
+     <Condition Expression="$IpInstance_Switch_OUT2_Enable" Diagnostic=""/>
+        <PossibleValue Comment="Output 2 Switch Enable" Value="DAC_OUTPUTSWITCH_ENABLE"/>
+    </RefParameter>
+    <RefParameter Comment="Output 2 Switch" DefaultValue="DAC_OUTPUTSWITCH_DISABLE" Name="DAC_OutputSwitch2" Type="list" Group="DAC Out2 Settings" Visible="false">
+     <Condition Expression="$IpInstance_Switch_OUT2_Disable" Diagnostic=""/>
+        <PossibleValue Comment="Output 2 Switch Enable" Value="DAC_OUTPUTSWITCH_DISABLE"/>
+    </RefParameter>
+     <RefParameter Comment="Output 2 Switch" DefaultValue="null" Name="DAC_OutputSwitch2" Type="list" Group="DAC Out2 Settings" Visible="false"/>
+     
+<!-- For Piccolo -->
     <RefMode Name="DAC_OUT1" Comment="DAC Out1 Mode" Abstract="true">
-        <Condition Expression="($IpNumber=2)&amp;STM32F373" Diagnostic=""/> <!-- Noise and Triangle wave generation for DAC1 only-->
-        <ConfigForMode>DAC_ChannelConfig</ConfigForMode>
-        <ConfigForMode>DAC_Init</ConfigForMode>		
-        <Parameter Name="DAC_OutputBuffer"/>
-        <Parameter Name="DAC_Channel">
-            <PossibleValue>DAC_CHANNEL_1</PossibleValue>
-        </Parameter>		
-        <Parameter Name="DAC_Trigger"/>
-    </RefMode>
-    <RefMode Name="DAC_OUT1" Comment="DAC Out1 Mode" Abstract="true">
-        <Condition Expression="($IpNumber=2)&amp;(DIE438)" Diagnostic=""/> <!-- F302K6 F302K8 F302R6/R8 F302C6/C8: DAC2_OUT1 unbuffered -->
+        <Condition Expression="($IpNumber=2)&amp;DIE438" Diagnostic=""/> 
         <ConfigForMode>DAC_ChannelConfig</ConfigForMode>
         <ConfigForMode>DAC_Init</ConfigForMode>
         <ConfigForMode>DAC_TriangleWaveGenerate1</ConfigForMode>
         <ConfigForMode>DAC_NoiseWaveGenerate1</ConfigForMode>
+        <Parameter Name="DAC_OutputSwitch"/>
         <Parameter Name="DAC_Trigger"/>
         <Parameter Name="DAC_Channel">
             <PossibleValue>DAC_CHANNEL_1</PossibleValue>
@@ -311,6 +325,37 @@
         <Parameter Name="TriangleAmplitude"/>
         <Parameter Name="NoiseAmplitude"/>
     </RefMode>
+    <RefMode Name="Switch_Enable_OUT1" Comment="DAC Out1 Mode" Abstract="true">
+        <Condition Expression="($IpNumber=2)&amp;DIE438" Diagnostic=""/> 
+        <ConfigForMode>DAC_ChannelConfig</ConfigForMode>
+        <ConfigForMode>DAC_Init</ConfigForMode>
+        <ConfigForMode>DAC_TriangleWaveGenerate1</ConfigForMode>
+        <ConfigForMode>DAC_NoiseWaveGenerate1</ConfigForMode>
+        <Parameter Name="DAC_OutputSwitch"/>
+        <Parameter Name="DAC_Trigger"/>
+        <Parameter Name="DAC_Channel">
+            <PossibleValue>DAC_CHANNEL_1</PossibleValue>
+        </Parameter>
+        <Parameter Name="WaveGeneration"/>
+        <Parameter Name="TriangleAmplitude"/>
+        <Parameter Name="NoiseAmplitude"/>
+    </RefMode>
+     <RefMode Name="Switch_Disable_OUT1" Comment="DAC Out1 Mode" Abstract="true">
+        <Condition Expression="($IpNumber=2)&amp;DIE438" Diagnostic=""/>
+        <ConfigForMode>DAC_ChannelConfig</ConfigForMode>
+        <ConfigForMode>DAC_Init</ConfigForMode>
+        <ConfigForMode>DAC_TriangleWaveGenerate1</ConfigForMode>
+        <ConfigForMode>DAC_NoiseWaveGenerate1</ConfigForMode>
+        <Parameter Name="DAC_OutputSwitch"/>
+        <Parameter Name="DAC_Trigger"/>
+        <Parameter Name="DAC_Channel">
+            <PossibleValue>DAC_CHANNEL_1</PossibleValue>
+        </Parameter>
+        <Parameter Name="WaveGeneration"/>
+        <Parameter Name="TriangleAmplitude"/>
+        <Parameter Name="NoiseAmplitude"/>
+    </RefMode>
+<!-- For Others -->  
     <RefMode Name="DAC_OUT1" Comment="DAC Out1 Mode" Abstract="true">
         <ConfigForMode>DAC_ChannelConfig</ConfigForMode>
         <ConfigForMode>DAC_Init</ConfigForMode>
@@ -325,12 +370,14 @@
         <Parameter Name="TriangleAmplitude"/>
         <Parameter Name="NoiseAmplitude"/>
     </RefMode>
+<!-- For Piccolo -->
     <RefMode Name="DAC_OUT2" Comment="DAC Out2 Mode" Abstract="true">
-        <Condition Expression="(DAC1_OUT2_Conf)&amp;(DIE438)" Diagnostic=""/> <!-- F302K6 F302K8 F302R6/R8 F302C6/C8: DAC1_OUT2 unbuffered -->
+        <Condition Expression="DIE438" Diagnostic=""/> <!-- For Piccolo -->
         <ConfigForMode>DAC_ChannelConfig2</ConfigForMode>
         <ConfigForMode>DAC_Init</ConfigForMode>
         <ConfigForMode>DAC_TriangleWaveGenerate2</ConfigForMode>
-        <ConfigForMode>DAC_NoiseWaveGenerate2</ConfigForMode>		
+        <ConfigForMode>DAC_NoiseWaveGenerate2</ConfigForMode>	
+        <Parameter Name="DAC_OutputSwitch2"/>	
         <Parameter Name="DAC_Trigger2"/>
         <Parameter Name="DAC_Channel2">
             <PossibleValue>DAC_CHANNEL_2</PossibleValue>
@@ -339,7 +386,52 @@
         <Parameter Name="TriangleAmplitude2"/>
         <Parameter Name="NoiseAmplitude2"/>
     </RefMode>
+    <RefMode Name="Switch_Enable_OUT2" Comment="DAC Out2 Mode" Abstract="true">
+        <Condition Expression="DIE438" Diagnostic=""/> <!-- For Piccolo -->
+        <ConfigForMode>DAC_ChannelConfig2</ConfigForMode>
+        <ConfigForMode>DAC_Init</ConfigForMode>
+        <ConfigForMode>DAC_TriangleWaveGenerate2</ConfigForMode>
+        <ConfigForMode>DAC_NoiseWaveGenerate2</ConfigForMode>	
+        <Parameter Name="DAC_OutputSwitch2"/>	
+        <Parameter Name="DAC_Trigger2"/>
+        <Parameter Name="DAC_Channel2">
+            <PossibleValue>DAC_CHANNEL_2</PossibleValue>
+        </Parameter>
+        <Parameter Name="WaveGeneration2"/>
+        <Parameter Name="TriangleAmplitude2"/>
+        <Parameter Name="NoiseAmplitude2"/>
+    </RefMode>
+    <RefMode Name="Switch_Disable_OUT2" Comment="DAC Out2 Mode" Abstract="true">
+        <Condition Expression="DIE438" Diagnostic=""/> <!-- For Piccolo -->
+        <ConfigForMode>DAC_ChannelConfig2</ConfigForMode>
+        <ConfigForMode>DAC_Init</ConfigForMode>
+        <ConfigForMode>DAC_TriangleWaveGenerate2</ConfigForMode>
+        <ConfigForMode>DAC_NoiseWaveGenerate2</ConfigForMode>	
+        <Parameter Name="DAC_OutputSwitch2"/>	
+        <Parameter Name="DAC_Trigger2"/>
+        <Parameter Name="DAC_Channel2">
+            <PossibleValue>DAC_CHANNEL_2</PossibleValue>
+        </Parameter>
+        <Parameter Name="WaveGeneration2"/>
+        <Parameter Name="TriangleAmplitude2"/>
+        <Parameter Name="NoiseAmplitude2"/>
+    </RefMode>
+<!-- For Others -->  
     <RefMode Name="DAC_OUT2" Comment="DAC Out2 Mode" Abstract="true">
+        <ConfigForMode>DAC_ChannelConfig2</ConfigForMode>
+        <ConfigForMode>DAC_Init</ConfigForMode>
+        <ConfigForMode>DAC_TriangleWaveGenerate2</ConfigForMode>
+        <ConfigForMode>DAC_NoiseWaveGenerate2</ConfigForMode>		
+        <Parameter Name="DAC_OutputBuffer2"/>
+        <Parameter Name="DAC_Trigger2"/>
+        <Parameter Name="DAC_Channel2">
+            <PossibleValue>DAC_CHANNEL_2</PossibleValue>
+        </Parameter>
+        <Parameter Name="WaveGeneration2"/>
+        <Parameter Name="TriangleAmplitude2"/>
+        <Parameter Name="NoiseAmplitude2"/>
+    </RefMode>
+    <RefMode Name="Enable_DAC_OUT2" Comment="DAC Out2 Mode" Abstract="true">
         <ConfigForMode>DAC_ChannelConfig2</ConfigForMode>
         <ConfigForMode>DAC_Init</ConfigForMode>
         <ConfigForMode>DAC_TriangleWaveGenerate2</ConfigForMode>
@@ -360,9 +452,9 @@
            
     </RefMode>
     <ModeLogicOperator Name="OR">
-        <Mode Name="DAC_OUT1" UserName="OUT1 Configuration">
+        <Mode Name="DAC_OUT1" UserName="OUT1 Configuration" RemoveCondition= "($IpNumber=2)&amp;DIE438">
             <ModeLogicOperator Name="OR">
-                <Mode Name="DAC_OUT1">
+                <Mode Name="DAC_OUT1" UserName="OUT1 Configuration">
                     <SignalLogicalOp Name="AND">
                         <Signal Name="OUT1"/>
                     </SignalLogicalOp>
@@ -371,9 +463,28 @@
             </ModeLogicOperator>
             <!--<Condition Expression="DAC_Base" Diagnostic="Calendar should be activated"/>  -->
         </Mode>
-        <Mode Name="DAC_OUT2" UserName="OUT2 Configuration">
+        <Mode Name="DAC_OUT1" UserName="OUT1 Configuration" RemoveCondition= "!DIE438 | (($IpNumber=1)&amp;DIE438)">
             <ModeLogicOperator Name="XOR">
-                <Mode Name="DAC_OUT2">
+                <Mode Name="Switch_Enable_OUT1" UserName="DAC Output switch Enable">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="OUT1"/>
+                    </SignalLogicalOp>
+                    <Semaphore>$IpInstance_OUT1_Conf</Semaphore>
+                    <Semaphore>$IpInstance_Switch_OUT1_Enable</Semaphore>        
+                </Mode>
+                 <Mode Name="Switch_Disable_OUT1" UserName="DAC Output Switch Disable">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="Switcher_Out1"/>
+                    </SignalLogicalOp>
+                    <Semaphore>$IpInstance_OUT1_Conf</Semaphore>
+                    <Semaphore>$IpInstance_Switch_OUT1_Disable</Semaphore>
+                </Mode>
+            </ModeLogicOperator>
+            <!--<Condition Expression="DAC_Base" Diagnostic="Calendar should be activated"/>  -->
+        </Mode>      
+        <Mode Name="DAC_OUT2" UserName="OUT2 Configuration" RemoveCondition= "DIE438">
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="Enable_DAC_OUT2" UserName="OUT2 Configuration">
                     <SignalLogicalOp Name="AND">
                         <Signal Name="OUT2"/>
                     </SignalLogicalOp>
@@ -381,6 +492,25 @@
                 </Mode>
             </ModeLogicOperator>
             <!--<Condition Expression="DAC_Base" Diagnostic="Calendar should be activated"/>-->
+        </Mode>
+          <Mode Name="DAC_OUT2" UserName="OUT2 Configuration" RemoveCondition= "!DIE438 |(($IpNumber=2)&amp;DIE438)">
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="DAC_OUT2" UserName="DAC Output switch Enable">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="OUT2"/>
+                    </SignalLogicalOp>
+                    <Semaphore>$IpInstance_OUT2_Conf</Semaphore>
+                    <Semaphore>$IpInstance_Switch_OUT2_Enable</Semaphore>              
+                </Mode>
+                 <Mode Name="Switch_Disable_OUT2" UserName ="DAC Output Switch Disable">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="Switcher_Out2"/>
+                    </SignalLogicalOp>
+                    <Semaphore>$IpInstance_OUT2_Conf</Semaphore>
+                    <Semaphore>$IpInstance_Switch_OUT2_Disable</Semaphore>
+                </Mode>
+            </ModeLogicOperator>
+            <!--<Condition Expression="DAC_Base" Diagnostic="Calendar should be activated"/>  -->
         </Mode>
         <Mode Name="External-Trigger" UserName="External Trigger">
             <ModeLogicOperator Name="OR">
@@ -399,4 +529,6 @@
     <RefSignal IOMode="EXTI" Name="EXTI9" ShareableGroupName="GPXTI9" /> <!-- GPXTI is a keyword -->
     <RefSignal IOMode="Analog" Name="OUT1" ShareableGroupName="COMP_$IpInstance1_group"/>
     <RefSignal IOMode="Analog" Name="OUT2" ShareableGroupName="COMP_$IpInstance2_group"/>
+    <RefSignal IOMode="Analog" Name="Switcher_Out1" Virtual="true"/>
+    <RefSignal IOMode="Analog" Name="Switcher_Out2" Virtual="true"/>
 </IP>

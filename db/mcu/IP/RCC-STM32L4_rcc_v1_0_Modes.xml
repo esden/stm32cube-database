@@ -7,7 +7,8 @@
 	
 	
     <RefParameter Visible="false" Comment="Oscillator Type" DefaultValue="+OscillatorTypeHSI+|OscillatorTypeLSI+|OscillatorTypeHSE+|OscillatorTypeLSE+|OscillatorTypeMSI" Name="OscillatorType" Type="list"/>
-   
+     <RefParameter Name="HSE_Timout"   Comment="HSE Startup Timout Value (ms)" Type="integer" DefaultValue="100" Min="1"  Max="4294967295" Group="RCC Parameters"/>
+	 <RefParameter Name="LSE_Timout"   Comment="LSE Startup Timout Value (ms)" Type="integer" DefaultValue="5000" Min="1" Max="4294967295"  Group="RCC Parameters"/>
     <!--Les multiplicateurs-->
 
     <!--APB1 MUL for TIM-->
@@ -50,6 +51,39 @@
     <RefParameter Visible="false" Comment="RCC_RTC_Clock_Source_FROM_HSE" Name="RCC_RTC_Clock_Source_FROM_HSE" Type="integer" DefaultValue="32" Max="32" Min="32"/>
     <!--PLLM-->
     <RefParameter Visible="false" Comment="PLLM" DefaultValue="1" Max="8" Min="1" Name="PLLM" Type="integer"/>
+	
+	
+	    <RefParameter Visible="false" Comment="PLLMLL" DefaultValue="RCC_PLLM_DIV1" Name="PLLMLL" Type="list">
+		   <Condition Expression="PLLM=1" Diagnostic=""/>
+        <PossibleValue Comment="2" Value="RCC_PLLM_DIV1"/>
+         </RefParameter>
+	    <RefParameter Visible="false" Comment="PLLMLL" DefaultValue="RCC_PLLM_DIV2" Name="PLLMLL" Type="list">
+		   <Condition Expression="PLLM=2" Diagnostic=""/>
+        <PossibleValue Comment="2" Value="RCC_PLLM_DIV2"/>
+         </RefParameter>
+	    <RefParameter Visible="false" Comment="PLLMLL" DefaultValue="RCC_PLLM_DIV3" Name="PLLMLL" Type="list">
+		   <Condition Expression="PLLM=3" Diagnostic=""/>
+        <PossibleValue Comment="2" Value="RCC_PLLM_DIV3"/>
+         </RefParameter>
+	    <RefParameter Visible="false" Comment="PLLMLL" DefaultValue="RCC_PLLM_DIV4" Name="PLLMLL" Type="list">
+		   <Condition Expression="PLLM=4" Diagnostic=""/>
+        <PossibleValue Comment="2" Value="RCC_PLLM_DIV4"/>
+         </RefParameter>
+	  <RefParameter Visible="false" Comment="PLLMLL" DefaultValue="RCC_PLLM_DIV5" Name="PLLMLL" Type="list">
+		   <Condition Expression="PLLM=5" Diagnostic=""/>
+        <PossibleValue Comment="2" Value="RCC_PLLM_DIV5"/>
+         </RefParameter>
+	  <RefParameter Visible="false" Comment="PLLMLL" DefaultValue="RCC_PLLM_DIV6" Name="PLLMLL" Type="list">
+		   <Condition Expression="PLLM=6" Diagnostic=""/>
+        <PossibleValue Comment="2" Value="RCC_PLLM_DIV6"/>
+         </RefParameter>
+	  <RefParameter Visible="false" Comment="PLLMLL" DefaultValue="RCC_PLLM_DIV7" Name="PLLMLL" Type="list">
+		   <Condition Expression="PLLM=7" Diagnostic=""/>
+        <PossibleValue Comment="2" Value="RCC_PLLM_DIV7"/>
+         </RefParameter>
+	  <RefParameter Visible="false" Comment="PLLMLL" DefaultValue="RCC_PLLM_DIV8" Name="PLLMLL" Type="list">
+		     <PossibleValue Comment="2" Value="RCC_PLLM_DIV8"/>
+         </RefParameter>
     <!--PLLR-->
     <RefParameter Visible="false" Comment="PLLR" DefaultValue="RCC_PLLR_DIV2" Name="PLLR" Type="list">
         <PossibleValue Comment="2" Value="RCC_PLLR_DIV2"/>
@@ -304,9 +338,9 @@
         <PossibleValue Comment="HSI"   Value="RCC_SWPMI1CLKSOURCE_HSI"  Semaphore="SWPMISourceHSI"/>
     </RefParameter>
     <!--DFSDMCLockSelection-->
-    <RefParameter Visible="false"  Comment="DFSDM CLock Selection" DefaultValue="RCC_DFSDMCLKSOURCE_PCLK"    Name="DFSDMCLockSelection" Type="list" IP="DFSDM">
-        <PossibleValue Comment="PCLK1"        Value="RCC_DFSDMCLKSOURCE_PCLK"   Semaphore="DFSDMSourcePCLK"/>
-        <PossibleValue Comment="SysCLKOutput" Value="RCC_DFSDMCLKSOURCE_SYSCLK" Semaphore="DFSDMSourceSys"/>
+    <RefParameter Visible="false"  Comment="DFSDM CLock Selection" DefaultValue="RCC_DFSDM1CLKSOURCE_PCLK"    Name="DFSDMCLockSelection" Type="list" IP="DFSDM">
+        <PossibleValue Comment="PCLK1"        Value="RCC_DFSDM1CLKSOURCE_PCLK"   Semaphore="DFSDMSourcePCLK"/>
+        <PossibleValue Comment="SysCLKOutput" Value="RCC_DFSDM1CLKSOURCE_SYSCLK" Semaphore="DFSDMSourceSys"/>
     </RefParameter>
     <!--CK48CLockSelection-->
     <RefParameter Visible="false"  Comment="CK48 CLock Selection" DefaultValue="RCC_USBCLKSOURCE_PLLSAI1"    Name="CK48CLockSelection" Type="list" IP="USB_OTG_FS,RNG,SDMMC1">
@@ -446,18 +480,20 @@
 	<RefParameter Visible="false" Comment="MCO Output"     Name="MCO1PinFreq_Value" DefaultValue="4000000"   Type="double"  Display="value/1000000" Unit="MHz"/>
 	<RefParameter Visible="false" Comment="LSCO Output"     Name="LSCOPinFreq_Value" DefaultValue="4000000"   Type="double"  Display="value/1000000" Unit="MHz"/>
 
-	<RefParameter Visible="false" Comment="HCLK Clock"    Name="HCLKFreq_Value" DefaultValue="4000000" Max="80000000" Min="14200000" Type="double"  Display="value/1000000" Unit="MHz" IP="ADC1,ADC2,ADC3">
-        <Condition Diagnostic="USB activated" Expression="USB_OTG_FSUsed_ForRCC &amp; (USE_ADC1|USE_ADC2|USE_ADC3) &amp; (!ADC1UsedAsynchronousCLK_ForRCC|!ADC2UsedAsynchronousCLK_ForRCC|!ADC3UsedAsynchronousCLK_ForRCC)"/>
+	<RefParameter Visible="false" Comment="HCLK Clock"    Name="HCLKFreq_Value" DefaultValue="4000000" Max="80000000" Min="14200000" Type="double"  Display="value/1000000" Unit="MHz" >
+        <Condition Diagnostic="USB activated" Expression="USB_OTG_FSUsed_ForRCC &amp; (((USE_ADC1&amp;ADC1UsedAsynchronousCLK_ForRCC)|(USE_ADC2&amp;ADC2UsedAsynchronousCLK_ForRCC)|(USE_ADC3&amp;ADC3UsedAsynchronousCLK_ForRCC))) &amp; (!ADC1UsedAsynchronousCLK_ForRCC|!ADC2UsedAsynchronousCLK_ForRCC|!ADC3UsedAsynchronousCLK_ForRCC)"/>
     </RefParameter>
-	<RefParameter Visible="false" Comment="HCLK Clock"    Name="HCLKFreq_Value" DefaultValue="4000000" Type="double"  Display="value/1000000" Unit="MHz" IP="ADC1,ADC2,ADC3">
-        <Condition Diagnostic="USB activated" Expression="!USB_OTG_FSUsed_ForRCC &amp; (USE_ADC1|USE_ADC2|USE_ADC3) &amp; (!ADC1UsedAsynchronousCLK_ForRCC|!ADC2UsedAsynchronousCLK_ForRCC|!ADC3UsedAsynchronousCLK_ForRCC)"/>
+	<RefParameter Visible="false" Comment="HCLK Clock"    Name="HCLKFreq_Value" DefaultValue="4000000" Type="double"  Display="value/1000000" Unit="MHz" >
+        <Condition Diagnostic="USB activated" Expression="!USB_OTG_FSUsed_ForRCC &amp; (((USE_ADC1&amp;ADC1UsedAsynchronousCLK_ForRCC)|(USE_ADC2&amp;ADC2UsedAsynchronousCLK_ForRCC)|(USE_ADC3&amp;ADC3UsedAsynchronousCLK_ForRCC))) &amp; (!ADC1UsedAsynchronousCLK_ForRCC|!ADC2UsedAsynchronousCLK_ForRCC|!ADC3UsedAsynchronousCLK_ForRCC)"/>
     </RefParameter>
 	<RefParameter Visible="false" Comment="HCLK Clock"    Name="HCLKFreq_Value" DefaultValue="4000000" Max="80000000" Min="14200000" Type="double"  Display="value/1000000" Unit="MHz" >
         <Condition Diagnostic="USB activated" Expression="USB_OTG_FSUsed_ForRCC "/>
     </RefParameter>
 	<RefParameter Visible="false" Comment="HCLK clock"     Name="HCLKFreq_Value"    DefaultValue="4000000"   Type="double"  Display="value/1000000" Unit="MHz" Max="80000000" />
 	
-
+   <!--ADC frequency  --> 
+    <RefParameter Visible="false" Comment="ADC synchr"  Name="synchADCFreq_Value"  DefaultValue="=HCLKFreq_Value" Type="double" Display="value/1000000" Unit="MHz" IP="ADC1,ADC2,ADC3"/>
+    <RefParameter Visible="false" Comment="ADC asynchr" Name="asynchADCFreq_Value" DefaultValue="=ADCFreq_Value"  Type="double" Display="value/1000000"  Unit="MHz" IP="ADC1,ADC2,ADC3"/>
 	<!--IP Freq value-->
     <RefParameter Visible="false" Comment="SAI1 clock Source" Name="SAI1Freq_Value" DefaultValue="2285714"  Type="double" Display="value/1000000" Unit="MHz" IP="SAI1"/>
     <RefParameter Visible="false" Comment="SAI2 clock Source" Name="SAI2Freq_Value" DefaultValue="2285714"  Type="double" Display="value/1000000" Unit="MHz" IP="SAI2"/>
@@ -481,25 +517,25 @@
     </RefParameter> 
 	<RefParameter Visible="false" Comment="CK48 clock Source"   Name="USBFreq_Value"   DefaultValue="16000000" Min="47880000" Max="48120000"  Type="double" Display="value/1000000" Unit="MHz" IP="USB_OTG_FS"/>
     
-	<RefParameter Visible="false" Comment="CK48 clock Source"   Name="SDMMCFreq_Value" DefaultValue="16000000" Max="48000000"  Type="double" Display="value/1000000" Unit="MHz" IP="SDMMC1"/>
+	<RefParameter Visible="false" Comment="CK48 clock Source"   Name="SDMMCFreq_Value" DefaultValue="16000000" Max="50000000"  Type="double" Display="value/1000000" Unit="MHz" IP="SDMMC1"/>
     <RefParameter Visible="false" Comment="CK48 clock Source"   Name="RNGFreq_Value"   DefaultValue="16000000" Max="48000000" Type="double" Display="value/1000000" Unit="MHz" IP="RNG"/>
-    <RefParameter Visible="false" Comment="ADC clock Source"    Name="ADCFreq_Value" Min="1400000"   Max="26000000"  DefaultValue="16000000"  Type="double" Display="value/1000000" Unit="MHz" IP="ADC1,ADC2,ADC3">
+    <RefParameter Visible="false" Comment="ADC clock Source"    Name="ADCFreq_Value" Min="1400000"   Max="26000000"  DefaultValue="16000000"  Type="double" Display="value/1000000" Unit="MHz" >
      <Condition Diagnostic="HSE in bypass Mode" Expression="scale2"/>
     </RefParameter>  
-    <RefParameter Visible="false" Comment="ADC clock Source"    Name="ADCFreq_Value"  Min="1400000"   Max="80000000" DefaultValue="16000000"  Type="double" Display="value/1000000" Unit="MHz" IP="ADC1,ADC2,ADC3"/>
+    <RefParameter Visible="false" Comment="ADC clock Source"    Name="ADCFreq_Value"  Min="1400000"   Max="80000000" DefaultValue="16000000"  Type="double" Display="value/1000000" Unit="MHz" />
    
    
     
     <RefParameter Visible="false" Comment="SWPMI clock Source" Name="SWPMI1Freq_Value" DefaultValue="4000000"  Type="double" Display="value/1000000" Unit="MHz" IP="SWPMI1"/>
-    <RefParameter Visible="false" Comment="DFSDM clock Source" Name="DFSDMFreq_Value"  DefaultValue="4000000"  Type="double" Display="value/1000000" Unit="MHz" IP="DFSDM"/>
+    <RefParameter Visible="false" Comment="DFSDM clock Source" Name="DFSDMFreq_Value"  DefaultValue="4000000"  Type="double" Display="value/1000000" Unit="MHz" IP="DFSDM1"/>
 	
 	
 	
-    <RefParameter Visible="false" Comment="RTC Clock Source" Name="RTCFreq_Value" Type="double" DefaultValue="32000"  Max="1000000" Min="1000000" Display="value/1000" Unit="KHz" IP="RTC" >
+    <RefParameter Visible="false" Comment="RTC Clock Source" Name="RTCFreq_Value" Type="double" DefaultValue="32000"  Max="1000000" Min="0" Display="value/1000" Unit="KHz" IP="RTC" >
         <Condition Diagnostic="RTC Has HSE as source" Expression="(!(RTCClockSelection=RCC_RTCCLKSOURCE_LSE)&amp;!(RTCClockSelection=RCC_RTCCLKSOURCE_LSI)&amp; (RTCEnable=true))"/>
     </RefParameter>
     <RefParameter Visible="false" Comment="RTC Clock Source" Name="RTCFreq_Value" Type="double" DefaultValue="32000"                              Display="value/1000" Unit="KHz" IP="RTC"/>
-        <RefParameter Visible="false" Comment="LCD clock" Name="LCDFreq_Value" Type="double" DefaultValue="32000" IP="LCD" Max="1000000" Min="1000000" Display="value/1000" Unit="KHz" >
+        <RefParameter Visible="false" Comment="LCD clock" Name="LCDFreq_Value" Type="double" DefaultValue="32000" IP="LCD" Max="1000000" Min="0" Display="value/1000" Unit="KHz" >
         <Condition Diagnostic="RTC Has HSE as source" Expression="(!(RTCClockSelection=RCC_RTCCLKSOURCE_LSE)&amp;!(RTCClockSelection=RCC_RTCCLKSOURCE_LSI)&amp; (LCDEnable=true))"/>
     </RefParameter>   
     <RefParameter Visible="false" Comment="LCD clock" Name="LCDFreq_Value" Type="double" IP="LCD" DefaultValue="32000" Display="value/1000" Unit="KHz" />
@@ -507,7 +543,7 @@
 	<RefParameter Visible="false" Comment="APB2 Timer clock" Name="APB2TimFreq_Value" DefaultValue="4000000"  Type="double" Display="value/1000000" Unit="MHz" IP="TIMER1,TIMER8,TIMER15,TIMER16,TIMER17"/>
     <RefParameter Visible="false" Comment="APB1 Timer clock" Name="APB1TimFreq_Value" DefaultValue="4000000"  Type="double" Display="value/1000000" Unit="MHz" IP="TIMER2,TIMER3,TIMER4,TIMER5,TIMER6,TIMER7"/>
 
-    <RefParameter Visible="false" Comment="APB2 Peripheral Clock"    Name="APB2Freq_Value"    DefaultValue="4000000" Max="80000000" Type="double" Display="value/1000000" Unit="MHz" IP="SDIO,USART1,SPI1,I2S1,DFSDM"/>
+    <RefParameter Visible="false" Comment="APB2 Peripheral Clock"    Name="APB2Freq_Value"    DefaultValue="4000000" Max="80000000" Type="double" Display="value/1000000" Unit="MHz" IP="SDIO,USART1,SPI1,I2S1,DFSDM1"/>
     <RefParameter Visible="false" Comment="APB1 Peripheral Clock"    Name="APB1Freq_Value"    DefaultValue="4000000" Max="80000000" Type="double" Display="value/1000000" Unit="MHz" IP="USART2,USART3,UART4,UART5,SPI2,SPI3,I2S2,I2S3,I2C1,I2C2,I2C3,CAN1,WWDG,LCD,LPUART1,SWPMI1,LPTIM2,LPTIM2,DAC1,DAC2"/>
 		
     <RefParameter Visible="false" Comment="SAI1 Extern CLock" Name="EXTERNALSAI1_CLOCK_VALUE" DefaultValue="2097000"  Type="double" Display="value/1000000" Unit="MHz"/>
@@ -516,64 +552,64 @@
 	<!--PLLs Freq value-->
 	<!--PLLSAI2R output-->
 	<RefParameter Visible="false" Comment="PLLSAI2R" Name="PLLSAI2RoutputFreq_Value" DefaultValue="16000000" Min="8000000" Max="80000000"  Type="double" Display="value/1000000" Unit="MHz">
-	<Condition Expression="(ADCSourcePLLSAI2R &amp; (USE_ADC1|USE_ADC2|USE_ADC3)) &amp; scale1" Diagnostic=" "/>
+	<Condition Expression="(ADCSourcePLLSAI2R &amp; (((USE_ADC1&amp;ADC1UsedAsynchronousCLK_ForRCC)|(USE_ADC2&amp;ADC2UsedAsynchronousCLK_ForRCC)|(USE_ADC3&amp;ADC3UsedAsynchronousCLK_ForRCC)))) &amp; scale1" Diagnostic=" "/>
     </RefParameter>
 	<RefParameter Visible="false" Comment="PLLSAI2R" Name="PLLSAI2RoutputFreq_Value" DefaultValue="16000000" Min="8000000" Max="24000000"  Type="double" Display="value/1000000" Unit="MHz">
-	<Condition Expression="(ADCSourcePLLSAI2R &amp; (USE_ADC1|USE_ADC2|USE_ADC3)) &amp; scale2" Diagnostic=" "/>
+	<Condition Expression="(ADCSourcePLLSAI2R &amp; (((USE_ADC1&amp;ADC1UsedAsynchronousCLK_ForRCC)|(USE_ADC2&amp;ADC2UsedAsynchronousCLK_ForRCC)|(USE_ADC3&amp;ADC3UsedAsynchronousCLK_ForRCC)))) &amp; scale2" Diagnostic=" "/>
     </RefParameter>
 	<RefParameter Visible="false" Comment="PLLSAI2R" Name="PLLSAI2RoutputFreq_Value" DefaultValue="16000000"  Type="double" Display="value/1000000" Unit="MHz"/>
 	
 	<!--PLLSAI2P output-->
     <RefParameter Visible="false" Comment="PLLSAI2P" Name="PLLSAI2PoutputFreq_Value"  Min="2064000" Max="80000000" DefaultValue="4571429"   Type="double" Display="value/1000000" Unit="MHz">
-		<Condition Expression="((SAI1SourcePLLSAI2P&amp;(SAI1Used_ForRCC|SEM2RCC_SAI1_CK_REQUIRED_DFSDM))| (SAI2SourcePLLSAI2P&amp;SAI2Used_ForRCC)) &amp; scale1" Diagnostic=" "/>
+		<Condition Expression="((SAI1SourcePLLSAI2P&amp;(SAI1Used_ForRCC|SEM2RCC_SAI1_CK_REQUIRED_DFSDM1))| (SAI2SourcePLLSAI2P&amp;SAI2Used_ForRCC)) &amp; scale1" Diagnostic=" "/>
     </RefParameter>
     <RefParameter Visible="false" Comment="PLLSAI2P" Name="PLLSAI2PoutputFreq_Value"  Min="2064000" Max="24000000" DefaultValue="4571429"   Type="double" Display="value/1000000" Unit="MHz">
-		<Condition Expression="((SAI1SourcePLLSAI2P&amp;(SAI1Used_ForRCC|SEM2RCC_SAI1_CK_REQUIRED_DFSDM))| (SAI2SourcePLLSAI2P&amp;SAI2Used_ForRCC)) &amp; scale2" Diagnostic=" "/>
+		<Condition Expression="((SAI1SourcePLLSAI2P&amp;(SAI1Used_ForRCC|SEM2RCC_SAI1_CK_REQUIRED_DFSDM1))| (SAI2SourcePLLSAI2P&amp;SAI2Used_ForRCC)) &amp; scale2" Diagnostic=" "/>
     </RefParameter>
     <RefParameter Visible="false" Comment="PLLSAI2P" Name="PLLSAI2PoutputFreq_Value" DefaultValue="4571429"   Type="double" Display="value/1000000" Unit="MHz"/>
 	
 	<!--PLLSAI1R output-->
     <RefParameter Visible="false" Comment="PLLSAI1R" Name="PLLSAI1RoutputFreq_Value" DefaultValue="16000000" Min="8000000" Max="80000000"  Type="double" Display="value/1000000" Unit="MHz">
-		<Condition Expression="(ADCSourcePLLSAI1R &amp; (USE_ADC1|USE_ADC2|USE_ADC3)) &amp; scale1" Diagnostic=" "/>
+		<Condition Expression="(ADCSourcePLLSAI1R &amp; (((USE_ADC1&amp;ADC1UsedAsynchronousCLK_ForRCC)|(USE_ADC2&amp;ADC2UsedAsynchronousCLK_ForRCC)|(USE_ADC3&amp;ADC3UsedAsynchronousCLK_ForRCC)))) &amp; scale1" Diagnostic=" "/>
     </RefParameter>
     <RefParameter Visible="false" Comment="PLLSAI1R" Name="PLLSAI1RoutputFreq_Value" DefaultValue="16000000" Min="8000000" Max="24000000"  Type="double" Display="value/1000000" Unit="MHz">
-		<Condition Expression="(ADCSourcePLLSAI1R &amp; (USE_ADC1|USE_ADC2|USE_ADC3)) &amp; scale2" Diagnostic=" "/>
+		<Condition Expression="(ADCSourcePLLSAI1R &amp; (((USE_ADC1&amp;ADC1UsedAsynchronousCLK_ForRCC)|(USE_ADC2&amp;ADC2UsedAsynchronousCLK_ForRCC)|(USE_ADC3&amp;ADC3UsedAsynchronousCLK_ForRCC)))) &amp; scale2" Diagnostic=" "/>
     </RefParameter>
     <RefParameter Visible="false" Comment="PLLSAI1R" Name="PLLSAI1RoutputFreq_Value" DefaultValue="16000000"  Type="double" Display="value/1000000" Unit="MHz"/>
 	
 	<!--PLLSAI1Q output-->
     <RefParameter Visible="false" Comment="PLLSAI1Q" Name="PLLSAI1QoutputFreq_Value" Min="8000000" Max="80000000"  DefaultValue="16000000"  Type="double" Display="value/1000000" Unit="MHz">
-		<Condition Expression="((USB_OTG_FSUsed_ForRCC|USB_OTG_HSEmbeddedPHYUsed_ForRCC|RNGUsed_ForRCC|SDMMCUsed_ForRCC)&amp; CK48SourcePLLSAI1) &amp; scale1" Diagnostic=" "/>
+		<Condition Expression="((USB_OTG_FSUsed_ForRCC|USB_OTG_HSEmbeddedPHYUsed_ForRCC|RNGUsed_ForRCC|SDMMC1Used_ForRCC)&amp; CK48SourcePLLSAI1) &amp; scale1" Diagnostic=" "/>
     </RefParameter>
     <RefParameter Visible="false" Comment="PLLSAI1Q" Name="PLLSAI1QoutputFreq_Value" Min="8000000" Max="24000000"  DefaultValue="16000000"  Type="double" Display="value/1000000" Unit="MHz">
-		<Condition Expression="((USB_OTG_FSUsed_ForRCC|USB_OTG_HSEmbeddedPHYUsed_ForRCC|RNGUsed_ForRCC|SDMMCUsed_ForRCC)&amp; CK48SourcePLLSAI1) &amp; scale2" Diagnostic=" "/>
+		<Condition Expression="((USB_OTG_FSUsed_ForRCC|USB_OTG_HSEmbeddedPHYUsed_ForRCC|RNGUsed_ForRCC|SDMMC1Used_ForRCC)&amp; CK48SourcePLLSAI1) &amp; scale2" Diagnostic=" "/>
     </RefParameter>
     <RefParameter Visible="false" Comment="PLLSAI1Q" Name="PLLSAI1QoutputFreq_Value" DefaultValue="16000000"  Type="double" Display="value/1000000" Unit="MHz"/>
 	
 	<!--PLLSAI1P output-->
     <RefParameter Visible="false" Comment="PLLSAI1P" Name="PLLSAI1PoutputFreq_Value"  Min="2064000" Max="80000000" DefaultValue="4571429"    Type="double" Display="value/1000000" Unit="MHz">
-		<Condition Expression="((SAI1SourcePLLSAI1P&amp;(SAI1Used_ForRCC|SEM2RCC_SAI1_CK_REQUIRED_DFSDM))| (SAI2SourcePLLSAI1P&amp;SAI2Used_ForRCC)) &amp; scale1" Diagnostic=" "/>
+		<Condition Expression="((SAI1SourcePLLSAI1P&amp;(SAI1Used_ForRCC|SEM2RCC_SAI1_CK_REQUIRED_DFSDM1))| (SAI2SourcePLLSAI1P&amp;SAI2Used_ForRCC)) &amp; scale1" Diagnostic=" "/>
     </RefParameter>
     <RefParameter Visible="false" Comment="PLLSAI1P" Name="PLLSAI1PoutputFreq_Value"  Min="2064000" Max="24000000" DefaultValue="4571429"    Type="double" Display="value/1000000" Unit="MHz">
-		<Condition Expression="((SAI1SourcePLLSAI1P&amp;(SAI1Used_ForRCC|SEM2RCC_SAI1_CK_REQUIRED_DFSDM))| (SAI2SourcePLLSAI1P&amp;SAI2Used_ForRCC)) &amp; scale2" Diagnostic=" "/>
+		<Condition Expression="((SAI1SourcePLLSAI1P&amp;(SAI1Used_ForRCC|SEM2RCC_SAI1_CK_REQUIRED_DFSDM1))| (SAI2SourcePLLSAI1P&amp;SAI2Used_ForRCC)) &amp; scale2" Diagnostic=" "/>
     </RefParameter>
     <RefParameter Visible="false" Comment="PLLSAI1P" Name="PLLSAI1PoutputFreq_Value" DefaultValue="4571429"   Type="double" Display="value/1000000" Unit="MHz"/>
 	
 	<!--PLLQ output-->
     <RefParameter Visible="false" Comment="PLLQ"     Name="PLLQoutputFreq_Value" Min="8000000" Max="80000000"     DefaultValue="16000000"  Type="double" Display="value/1000000" Unit="MHz">
-		<Condition Expression="((USB_OTG_FSUsed_ForRCC|USB_OTG_HSEmbeddedPHYUsed_ForRCC|RNGUsed_ForRCC|SDMMCUsed_ForRCC)&amp; CK48SourcePLLCLK) &amp; scale1" Diagnostic=" "/>
+		<Condition Expression="((USB_OTG_FSUsed_ForRCC|USB_OTG_HSEmbeddedPHYUsed_ForRCC|RNGUsed_ForRCC|SDMMC1Used_ForRCC)&amp; CK48SourcePLLCLK) &amp; scale1" Diagnostic=" "/>
     </RefParameter>
     <RefParameter Visible="false" Comment="PLLQ"     Name="PLLQoutputFreq_Value" Min="8000000" Max="24000000"     DefaultValue="16000000"  Type="double" Display="value/1000000" Unit="MHz">
-		<Condition Expression="((USB_OTG_FSUsed_ForRCC|USB_OTG_HSEmbeddedPHYUsed_ForRCC|RNGUsed_ForRCC|SDMMCUsed_ForRCC)&amp; CK48SourcePLLCLK) &amp; scale2" Diagnostic=" "/>
+		<Condition Expression="((USB_OTG_FSUsed_ForRCC|USB_OTG_HSEmbeddedPHYUsed_ForRCC|RNGUsed_ForRCC|SDMMC1Used_ForRCC)&amp; CK48SourcePLLCLK) &amp; scale2" Diagnostic=" "/>
     </RefParameter>
     <RefParameter Visible="false" Comment="PLLQ"     Name="PLLQoutputFreq_Value"     DefaultValue="16000000"  Type="double" Display="value/1000000" Unit="MHz"/>
 	
 	<!--PLLP output-->
     <RefParameter Visible="false" Comment="PLLP"     Name="PLLPoutputFreq_Value" Min="2064000" Max="80000000"    DefaultValue="4571429"   Type="double" Display="value/1000000" Unit="MHz">
-		<Condition Expression="((SAI1SourcePLLP&amp;(SAI1Used_ForRCC|SEM2RCC_SAI1_CK_REQUIRED_DFSDM))| (SAI2SourcePLLP&amp;SAI2Used_ForRCC)) &amp; scale1" Diagnostic=" "/>
+		<Condition Expression="((SAI1SourcePLLP&amp;(SAI1Used_ForRCC|SEM2RCC_SAI1_CK_REQUIRED_DFSDM1))| (SAI2SourcePLLP&amp;SAI2Used_ForRCC)) &amp; scale1" Diagnostic=" "/>
     </RefParameter>
     <RefParameter Visible="false" Comment="PLLP"     Name="PLLPoutputFreq_Value" Min="2064000" Max="24000000"    DefaultValue="4571429"   Type="double" Display="value/1000000" Unit="MHz">
-		<Condition Expression="((SAI1SourcePLLP&amp;(SAI1Used_ForRCC|SEM2RCC_SAI1_CK_REQUIRED_DFSDM))| (SAI2SourcePLLP&amp;SAI2Used_ForRCC)) &amp; scale2" Diagnostic=" "/>
+		<Condition Expression="((SAI1SourcePLLP&amp;(SAI1Used_ForRCC|SEM2RCC_SAI1_CK_REQUIRED_DFSDM1))| (SAI2SourcePLLP&amp;SAI2Used_ForRCC)) &amp; scale2" Diagnostic=" "/>
     </RefParameter>
     <RefParameter Visible="false" Comment="PLLP"     Name="PLLPoutputFreq_Value"     DefaultValue="4571429"   Type="double" Display="value/1000000" Unit="MHz"/>
    
@@ -649,16 +685,53 @@
 	
 	
 	
+	  <!-- PLLSAI1UsedForCK48 used -->
+    <RefParameter Visible="false" Comment="Main PLLSAI1 Is Used" DefaultValue="1" Name="PLLSAI1UsedForCK48" Min="1" Max="1" Type="integer">
+        <Condition Expression="(CK48SourcePLLSAI1 &amp; (USB_OTG_FSUsed_ForRCC|USB_OTG_HSEmbeddedPHYUsed_ForRCC|RNGUsed_ForRCC|SDMMC1Used_ForRCC))" Diagnostic=" "/>
+    </RefParameter>
+	
+    <RefParameter Visible="false" Comment="Main PLL is Used" DefaultValue="0" Name="PLLSAI1UsedForCK48" Min="0" Max="0" Type="integer"/>
+	
+	  <!-- PLLSAI1UsedForSAI used -->
+    <RefParameter Visible="false" Comment="Main PLLSAI1 Is Used" DefaultValue="1" Name="PLLSAI1UsedForSAI" Min="1" Max="1" Type="integer">
+        <Condition Expression="((SAI1SourcePLLSAI1P&amp;(SAI1Used_ForRCC|SEM2RCC_SAI1_CK_REQUIRED_DFSDM1))| (SAI2SourcePLLSAI1P&amp;SAI2Used_ForRCC))" Diagnostic=" "/>
+    </RefParameter>
+	
+    <RefParameter Visible="false" Comment="Main PLL is Used" DefaultValue="0" Name="PLLSAI1UsedForSAI" Min="0" Max="0" Type="integer"/>
+	
+	  <!-- PLLSAI1UsedFOrADC used -->
+    <RefParameter Visible="false" Comment="Main PLLSAI1 Is Used" DefaultValue="1" Name="PLLSAI1UsedFOrADC" Min="1" Max="1" Type="integer">
+        <Condition Expression="(ADCSourcePLLSAI1R &amp;(((USE_ADC1&amp;ADC1UsedAsynchronousCLK_ForRCC)|(USE_ADC2&amp;ADC2UsedAsynchronousCLK_ForRCC)|(USE_ADC3&amp;ADC3UsedAsynchronousCLK_ForRCC))))" Diagnostic=" "/>
+    </RefParameter>
+	
+    <RefParameter Visible="false" Comment="Main PLL is Used" DefaultValue="0" Name="PLLSAI1UsedFOrADC" Min="0" Max="0" Type="integer"/>
+	
 	  <!-- PLLSAI1 used -->
     <RefParameter Visible="false" Comment="Main PLLSAI1 Is Used" DefaultValue="1" Name="PLLSAI1Used" Min="1" Max="1" Type="integer">
-        <Condition Expression="((SAI1SourcePLLSAI1P&amp;(SAI1Used_ForRCC|SEM2RCC_SAI1_CK_REQUIRED_DFSDM))| (SAI2SourcePLLSAI1P&amp;SAI2Used_ForRCC))|(ADCSourcePLLSAI1R &amp;(USE_ADC1|USE_ADC2|USE_ADC3))|(CK48SourcePLLSAI1 &amp; (USB_OTG_FSUsed_ForRCC|USB_OTG_HSEmbeddedPHYUsed_ForRCC|RNGUsed_ForRCC|SDMMCUsed_ForRCC))" Diagnostic=" "/>
+        <Condition Expression="((SAI1SourcePLLSAI1P&amp;(SAI1Used_ForRCC|SEM2RCC_SAI1_CK_REQUIRED_DFSDM1))| (SAI2SourcePLLSAI1P&amp;SAI2Used_ForRCC))|(ADCSourcePLLSAI1R &amp;(((USE_ADC1&amp;ADC1UsedAsynchronousCLK_ForRCC)|(USE_ADC2&amp;ADC2UsedAsynchronousCLK_ForRCC)|(USE_ADC3&amp;ADC3UsedAsynchronousCLK_ForRCC))))|(CK48SourcePLLSAI1 &amp; (USB_OTG_FSUsed_ForRCC|USB_OTG_HSEmbeddedPHYUsed_ForRCC|RNGUsed_ForRCC|SDMMC1Used_ForRCC))" Diagnostic=" "/>
     </RefParameter>
 	
     <RefParameter Visible="false" Comment="Main PLL is Used" DefaultValue="0" Name="PLLSAI1Used" Min="0" Max="0" Type="integer"/>
 	
+	  <!-- PLLSAI2UsedFOrSAI used -->
+    <RefParameter Visible="false" Comment="Main PLLSAI1 Is Used" DefaultValue="1" Name="PLLSAI2UsedFOrSAI" Min="1" Max="1" Type="integer">
+        <Condition Expression="((SAI1SourcePLLSAI2P&amp;(SAI1Used_ForRCC|SEM2RCC_SAI1_CK_REQUIRED_DFSDM1))| (SAI2SourcePLLSAI2P&amp;SAI2Used_ForRCC))" Diagnostic=" "/>
+    </RefParameter>
+	
+    <RefParameter Visible="false" Comment="Main PLL is Used" DefaultValue="0" Name="PLLSAI2UsedFOrSAI" Min="0" Max="0" Type="integer"/>
+	
+	
+	  <!-- PLLSAI2UsedForADC used -->
+    <RefParameter Visible="false" Comment="Main PLLSAI1 Is Used" DefaultValue="1" Name="PLLSAI2UsedForADC" Min="1" Max="1" Type="integer">
+        <Condition Expression="(ADCSourcePLLSAI2R &amp;(((USE_ADC1&amp;ADC1UsedAsynchronousCLK_ForRCC)|(USE_ADC2&amp;ADC2UsedAsynchronousCLK_ForRCC)|(USE_ADC3&amp;ADC3UsedAsynchronousCLK_ForRCC))))" Diagnostic=" "/>
+    </RefParameter>
+	
+    <RefParameter Visible="false" Comment="Main PLL is Used" DefaultValue="0" Name="PLLSAI2UsedForADC" Min="0" Max="0" Type="integer"/>
+	
+	
 	  <!-- PLLSAI2 used -->
     <RefParameter Visible="false" Comment="Main PLLSAI1 Is Used" DefaultValue="1" Name="PLLSAI2Used" Min="1" Max="1" Type="integer">
-        <Condition Expression="((SAI1SourcePLLSAI2P&amp;(SAI1Used_ForRCC|SEM2RCC_SAI1_CK_REQUIRED_DFSDM))| (SAI2SourcePLLSAI2P&amp;SAI2Used_ForRCC))|(ADCSourcePLLSAI2R &amp;(USE_ADC1|USE_ADC2|USE_ADC3))" Diagnostic=" "/>
+        <Condition Expression="((SAI1SourcePLLSAI2P&amp;(SAI1Used_ForRCC|SEM2RCC_SAI1_CK_REQUIRED_DFSDM1))| (SAI2SourcePLLSAI2P&amp;SAI2Used_ForRCC))|(ADCSourcePLLSAI2R &amp;(((USE_ADC1&amp;ADC1UsedAsynchronousCLK_ForRCC)|(USE_ADC2&amp;ADC2UsedAsynchronousCLK_ForRCC)|(USE_ADC3&amp;ADC3UsedAsynchronousCLK_ForRCC))))" Diagnostic=" "/>
     </RefParameter>
 	
     <RefParameter Visible="false" Comment="Main PLL is Used" DefaultValue="0" Name="PLLSAI2Used" Min="0" Max="0" Type="integer"/>
@@ -713,6 +786,13 @@
     </RefParameter>
 	
     <RefParameter Visible="false" Name="LCDEnable" Comment="LCD" Type="list" DefaultValue="false" IP="LCD">
+        <PossibleValue Value="false" Comment="false"/>
+    </RefParameter>
+	    <RefParameter Visible="false" Name="EnableLSELCD" Comment="EnableLSELCD" Type="list" DefaultValue="true" IP="LCD">
+        <Condition Expression="LCDUsed_ForRCC &amp; (LSEOscillator | LSEByPass)" Diagnostic="Disabled if RTC is used and LSE ON"/>
+        <PossibleValue Value="true" Comment="true"/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="EnableLSELCD" Comment="EnableLSELCD" Type="list" DefaultValue="false" IP="LCD">
         <PossibleValue Value="false" Comment="false"/>
     </RefParameter>
    
@@ -786,7 +866,7 @@
 	
     <!--SDMMC Enable-->
     <RefParameter Visible="false" Name="SDMMCEnable" Comment="SDMMC" Type="list" DefaultValue="true">
-        <Condition Expression="SDMMCUsed_ForRCC" Diagnostic="SDMMC is activated"/>
+        <Condition Expression="SDMMC1Used_ForRCC" Diagnostic="SDMMC is activated"/>
         <PossibleValue Value="true" Comment="true"/>
     </RefParameter>
 	
@@ -911,7 +991,7 @@
     </RefParameter>
     <!--SAI1 Enable-->
     <RefParameter Visible="false" Name="SAI1Enable" Comment="SAI1" Type="list" DefaultValue="true">
-        <Condition Expression="(SAI1Used_ForRCC|SEM2RCC_SAI1_CK_REQUIRED_DFSDM) " Diagnostic="SAI1 is activated"/>
+        <Condition Expression="(SAI1Used_ForRCC|SEM2RCC_SAI1_CK_REQUIRED_DFSDM1) " Diagnostic="SAI1 is activated"/>
         <PossibleValue Value="true" Comment="true"/>
     </RefParameter>
 	
@@ -954,7 +1034,7 @@
     </RefParameter>
     <!--DFSDM Enable-->
     <RefParameter Visible="false" Name="DFSDMEnable" Comment="DFSDM" Type="list" DefaultValue="true">
-        <Condition Expression="DFSDMUsed_ForRCC" Diagnostic="DFSDM is activated"/>
+        <Condition Expression="DFSDM1Used_ForRCC" Diagnostic="DFSDM is activated"/>
         <PossibleValue Value="true" Comment="true"/>
     </RefParameter>
 	
@@ -1014,10 +1094,16 @@
 	
     <!-- LSE used -->
     <RefParameter Visible="false" Comment="LSE Is Used" DefaultValue="1" Name="LSEUsed" Min="1" Type="integer">
-        <Condition Expression="MSIAutoCalibrationON|(LSCOSSourceLSE &amp; LSCOConfig)|(Semaphore_input_Channel1TIM16 &amp; TIM16 &amp; SEM2RCC_LSE_REQUIRED1_TIM16)|(SEM2RCC_LSE_REQUIRED_TIM2 &amp; Semaphore_TIM2_L4_ETR_REMAPTIM2 &amp; TIM2)|(Semaphore_input_Channel1_directTIM15 &amp; TIM15 &amp; SEM2RCC_LSE_REQUIRED1_TIM15)|(USART1SourceLSE &amp; USART1Used_ForRCC)|(USART2SourceLSE &amp; USART2Used_ForRCC)|(USART3SourceLSE &amp; USART3Used_ForRCC)|(UART4SourceLSE &amp; UART4Used_ForRCC)|(UART5SourceLSE &amp; UART5Used_ForRCC)|(LPUART1SourceLSE &amp; LPUARTUsed_ForRCC)|(LPTIM1SOURCELSE &amp; LPTIM1Used_ForRCC)|(LPTIM2SOURCELSE &amp; LPTIM2Used_ForRCC)|((RCC_MCO1Source=RCC_MCO1SOURCE_LSE)&amp; ((Semaphore_input_Channel1TIM17 &amp; TIM17 &amp; SEM2RCC_MCO_REQUIRED_TIM17)|MCOConfig))|((RTCClockSelection=RCC_RTCCLKSOURCE_LSE) &amp;(RTCUsed_ForRCC|LCDUsed_ForRCC) )" Diagnostic="LSE is used if "/>
+        <Condition Expression="(MSIAutoCalibrationON&amp;MSIUsed&amp;(LSEByPass|LSEOscillator))|(LSCOSSourceLSE &amp; LSCOConfig)|(Semaphore_input_Channel1TIM16 &amp; TIM16 &amp; SEM2RCC_LSE_REQUIRED1_TIM16)|(SEM2RCC_LSE_REQUIRED_TIM2 &amp; Semaphore_TIM2_L4_ETR_REMAPTIM2 &amp; TIM2)|(Semaphore_input_Channel1_directTIM15 &amp; TIM15 &amp; SEM2RCC_LSE_REQUIRED1_TIM15)|(USART1SourceLSE &amp; USART1Used_ForRCC)|(USART2SourceLSE &amp; USART2Used_ForRCC)|(USART3SourceLSE &amp; USART3Used_ForRCC)|(UART4SourceLSE &amp; UART4Used_ForRCC)|(UART5SourceLSE &amp; UART5Used_ForRCC)|(LPUART1SourceLSE &amp; LPUARTUsed_ForRCC)|(LPTIM1SOURCELSE &amp; LPTIM1Used_ForRCC)|(LPTIM2SOURCELSE &amp; LPTIM2Used_ForRCC)|((RCC_MCO1Source=RCC_MCO1SOURCE_LSE)&amp; ((Semaphore_input_Channel1TIM17 &amp; TIM17 &amp; SEM2RCC_MCO_REQUIRED_TIM17)|MCOConfig))|((RTCClockSelection=RCC_RTCCLKSOURCE_LSE) &amp;(RTCUsed_ForRCC|LCDUsed_ForRCC) )" Diagnostic="LSE is used if "/>
     </RefParameter>
 	
     <RefParameter Visible="false" Comment="LSE Is Used" DefaultValue="0" Name="LSEUsed" Min="0" Type="integer"/>
+    <!-- LSE used -->
+    <RefParameter Visible="false" Comment="LSE Is Used" DefaultValue="1" Name="LSEUsedLL" Min="1" Type="integer">
+        <Condition Expression="(LSCOSSourceLSE &amp; LSCOConfig)|(Semaphore_input_Channel1TIM16 &amp; TIM16 &amp; SEM2RCC_LSE_REQUIRED1_TIM16)|(SEM2RCC_LSE_REQUIRED_TIM2 &amp; Semaphore_TIM2_L4_ETR_REMAPTIM2 &amp; TIM2)|(Semaphore_input_Channel1_directTIM15 &amp; TIM15 &amp; SEM2RCC_LSE_REQUIRED1_TIM15)|(USART1SourceLSE &amp; USART1Used_ForRCC)|(USART2SourceLSE &amp; USART2Used_ForRCC)|(USART3SourceLSE &amp; USART3Used_ForRCC)|(UART4SourceLSE &amp; UART4Used_ForRCC)|(UART5SourceLSE &amp; UART5Used_ForRCC)|(LPUART1SourceLSE &amp; LPUARTUsed_ForRCC)|(LPTIM1SOURCELSE &amp; LPTIM1Used_ForRCC)|(LPTIM2SOURCELSE &amp; LPTIM2Used_ForRCC)|((RCC_MCO1Source=RCC_MCO1SOURCE_LSE)&amp; ((Semaphore_input_Channel1TIM17 &amp; TIM17 &amp; SEM2RCC_MCO_REQUIRED_TIM17)|MCOConfig))|((RTCClockSelection=RCC_RTCCLKSOURCE_LSE) &amp;(RTCUsed_ForRCC|LCDUsed_ForRCC) )" Diagnostic="LSE is used if "/>
+    </RefParameter>
+	
+    <RefParameter Visible="false" Comment="LSE Is Used" DefaultValue="0" Name="LSEUsedLL" Min="0" Type="integer"/>
 	
     <!-- LSE state used to codgen -->
     <RefParameter Visible="false" Comment="Lse State" DefaultValue="RCC_LSE_BYPASS" Name="LSEState" Type="list">
@@ -1095,9 +1181,30 @@
 	
 	
     <!-- Main PLL state control-->
+    <!-- PLLUsedForSys used -->
+    <RefParameter Visible="false" Comment="MainPLL Is Used" DefaultValue="1" Name="PLLUsedForSys" Min="1" Max="1" Type="integer">
+        <Condition Expression="(SysSourcePLL)|((RCC_MCO1Source=RCC_MCO1SOURCE_PLLCLK)&amp; ((Semaphore_input_Channel1TIM17 &amp; TIM17 &amp; SEM2RCC_MCO_REQUIRED_TIM17)|MCOConfig))" Diagnostic=" "/>
+    </RefParameter>
+	
+    <RefParameter Visible="false" Comment="Main PLL is Used" DefaultValue="0" Name="PLLUsedForSys" Min="0" Max="0" Type="integer"/>
+	
+    <!-- PLLUsedForSAI used -->
+    <RefParameter Visible="false" Comment="MainPLL Is Used" DefaultValue="1" Name="PLLUsedForSAI" Min="1" Max="1" Type="integer">
+        <Condition Expression="((SAI1SourcePLLP&amp;(SAI1Used_ForRCC|SEM2RCC_SAI1_CK_REQUIRED_DFSDM1))| (SAI2SourcePLLP&amp;SAI2Used_ForRCC))" Diagnostic=" "/>
+    </RefParameter>
+	
+    <RefParameter Visible="false" Comment="Main PLL is Used" DefaultValue="0" Name="PLLUsedForSAI" Min="0" Max="0" Type="integer"/>
+	
+    <!-- PLLUsedForCK48 used -->
+    <RefParameter Visible="false" Comment="MainPLL Is Used" DefaultValue="1" Name="PLLUsedForCK48" Min="1" Max="1" Type="integer">
+        <Condition Expression="(CK48SourcePLLCLK &amp; (USB_OTG_FSUsed_ForRCC|USB_OTG_HSEmbeddedPHYUsed_ForRCC|RNGUsed_ForRCC|SDMMC1Used_ForRCC))" Diagnostic=" "/>
+    </RefParameter>
+	
+    <RefParameter Visible="false" Comment="Main PLL is Used" DefaultValue="0" Name="PLLUsedForCK48" Min="0" Max="0" Type="integer"/>
+	
     <!-- PLL used -->
     <RefParameter Visible="false" Comment="MainPLL Is Used" DefaultValue="1" Name="PLLUsed" Min="1" Max="1" Type="integer">
-        <Condition Expression="((SAI1SourcePLLP&amp;(SAI1Used_ForRCC|SEM2RCC_SAI1_CK_REQUIRED_DFSDM))| (SAI2SourcePLLP&amp;SAI2Used_ForRCC))|(SysSourcePLL)|((RCC_MCO1Source=RCC_MCO1SOURCE_PLLCLK)&amp; ((Semaphore_input_Channel1TIM17 &amp; TIM17 &amp; SEM2RCC_MCO_REQUIRED_TIM17)|MCOConfig))|(CK48SourcePLLCLK &amp; (USB_OTG_FSUsed_ForRCC|USB_OTG_HSEmbeddedPHYUsed_ForRCC|RNGUsed_ForRCC|SDMMCUsed_ForRCC))" Diagnostic=" "/>
+        <Condition Expression="((SAI1SourcePLLP&amp;(SAI1Used_ForRCC|SEM2RCC_SAI1_CK_REQUIRED_DFSDM1))| (SAI2SourcePLLP&amp;SAI2Used_ForRCC))|(SysSourcePLL)|((RCC_MCO1Source=RCC_MCO1SOURCE_PLLCLK)&amp; ((Semaphore_input_Channel1TIM17 &amp; TIM17 &amp; SEM2RCC_MCO_REQUIRED_TIM17)|MCOConfig))|(CK48SourcePLLCLK &amp; (USB_OTG_FSUsed_ForRCC|USB_OTG_HSEmbeddedPHYUsed_ForRCC|RNGUsed_ForRCC|SDMMC1Used_ForRCC))" Diagnostic=" "/>
     </RefParameter>
 	
     <RefParameter Visible="false" Comment="Main PLL is Used" DefaultValue="0" Name="PLLUsed" Min="0" Max="0" Type="integer"/>
@@ -1124,7 +1231,7 @@
 	
     <!-- MSI used -->
     <RefParameter Visible="false" Comment="MSI Is Used" DefaultValue="1" Name="MSIUsed" Min="1" Type="integer">
-        <Condition Expression="(SEM2RCC_MSI_REQUIRED_TIM17 &amp; TIM17 &amp; Semaphore_input_Channel1TIM17)|(CK48SourceMSI &amp; (USB_OTG_FSUsed_ForRCC|USB_OTG_HSEmbeddedPHYUsed_ForRCC|RNGUsed_ForRCC|SDMMCUsed_ForRCC))|(SYSCLKSource=RCC_SYSCLKSOURCE_MSI)|((RCC_MCO1Source=RCC_MCO1SOURCE_MSI)&amp; ((Semaphore_input_Channel1TIM17 &amp; TIM17 &amp; SEM2RCC_MCO_REQUIRED_TIM17)|MCOConfig))|(PLLSourceMSI &amp; (PLLUsed=1|PLLSAI1Used=1|PLLSAI2Used=1) )" Diagnostic=""/>
+        <Condition Expression="(SEM2RCC_MSI_REQUIRED_TIM17 &amp; TIM17 &amp; Semaphore_input_Channel1TIM17)|(CK48SourceMSI &amp; (USB_OTG_FSUsed_ForRCC|USB_OTG_HSEmbeddedPHYUsed_ForRCC|RNGUsed_ForRCC|SDMMC1Used_ForRCC))|(SYSCLKSource=RCC_SYSCLKSOURCE_MSI)|((RCC_MCO1Source=RCC_MCO1SOURCE_MSI)&amp; ((Semaphore_input_Channel1TIM17 &amp; TIM17 &amp; SEM2RCC_MCO_REQUIRED_TIM17)|MCOConfig))|(PLLSourceMSI &amp; (PLLUsed=1|PLLSAI1Used=1|PLLSAI2Used=1) )" Diagnostic=""/>
     </RefParameter>
     <RefParameter Visible="false" Comment="MSI is Used" DefaultValue="0" Name="MSIUsed" Min="0" Type="integer"/>
 	
@@ -1160,7 +1267,7 @@
 	<!--params for code generation-->
     <!--params for IP codgen-->
     <RefParameter Visible="false" Comment="Periph Clock Selection" Name="PeriphClockSelectionARG" DefaultValue="+PeriphClockSelection" Type="list">
-        <Condition Expression="USE_ADC1|USE_ADC2|USE_ADC3|RTCUsed_ForRCC|LCDUsed_ForRCC|USART1Used_ForRCC|USART2Used_ForRCC|USART3Used_ForRCC|UART4Used_ForRCC|UART5Used_ForRCC|LPUARTUsed_ForRCC|LPTIM1Used_ForRCC|LPTIM2Used_ForRCC|(SAI1Used_ForRCC|SEM2RCC_SAI1_CK_REQUIRED_DFSDM)|SAI2Used_ForRCC|I2C1Used_ForRCC|I2C2Used_ForRCC|I2C3Used_ForRCC|SWPMI1Used_ForRCC|DFSDMUsed_ForRCC|USB_OTG_FSUsed_ForRCC|USB_OTG_HSEmbeddedPHYUsed_ForRCC|RNGUsed_ForRCC|SDMMCUsed_ForRCC" Diagnostic="clock used by RCC"/>
+        <Condition Expression="((USE_ADC1&amp;ADC1UsedAsynchronousCLK_ForRCC)|(USE_ADC2&amp;ADC2UsedAsynchronousCLK_ForRCC)|(USE_ADC3&amp;ADC3UsedAsynchronousCLK_ForRCC))|RTCUsed_ForRCC|LCDUsed_ForRCC|USART1Used_ForRCC|USART2Used_ForRCC|USART3Used_ForRCC|UART4Used_ForRCC|UART5Used_ForRCC|LPUARTUsed_ForRCC|LPTIM1Used_ForRCC|LPTIM2Used_ForRCC|(SAI1Used_ForRCC|SEM2RCC_SAI1_CK_REQUIRED_DFSDM1)|SAI2Used_ForRCC|I2C1Used_ForRCC|I2C2Used_ForRCC|I2C3Used_ForRCC|SWPMI1Used_ForRCC|DFSDM1Used_ForRCC|USB_OTG_FSUsed_ForRCC|USB_OTG_HSEmbeddedPHYUsed_ForRCC|RNGUsed_ForRCC|SDMMC1Used_ForRCC" Diagnostic="clock used by RCC"/>
     </RefParameter>
     <RefParameter Visible="false" Comment="Periph Clock Selection" Name="PeriphClockSelectionARG" DefaultValue="null" Type="list"/>
      
@@ -1177,7 +1284,7 @@
 	
 
     <RefParameter Visible="false" Name="RCC_PERIPHCLK_SDMMCVar" Comment="RCC_PERIPHCLK_SDMMCVar" Type="list" DefaultValue="RCC_PERIPHCLK_SDMMC1">
-        <Condition Expression="SDMMCUsed_ForRCC" Diagnostic="RTC Activated"/>
+        <Condition Expression="SDMMC1Used_ForRCC" Diagnostic="RTC Activated"/>
         <PossibleValue Comment="Periphclk RTC" Value="RCC_PERIPHCLK_SDMMC1"/>
     </RefParameter>
 	
@@ -1264,7 +1371,7 @@
 	
 	
 	 <RefParameter Visible="false" Name="RCC_PERIPHCLK_SAI1Var" Comment="RCC_PERIPHCLK_SAI1Var" Type="list" DefaultValue="RCC_PERIPHCLK_SAI1">
-        <Condition Expression="(SAI1Used_ForRCC|SEM2RCC_SAI1_CK_REQUIRED_DFSDM)" Diagnostic="SAI1 Activated"/>
+        <Condition Expression="(SAI1Used_ForRCC|SEM2RCC_SAI1_CK_REQUIRED_DFSDM1)" Diagnostic="SAI1 Activated"/>
         <PossibleValue Comment="Periphclk SAI1" Value="RCC_PERIPHCLK_SAI1"/>
     </RefParameter>
 	
@@ -1313,15 +1420,15 @@
 	
     <RefParameter Visible="false" Name="RCC_PERIPHCLK_SWPMIVar" Comment="RCC_PERIPHCLK_SWPMIVar" Type="list" DefaultValue=""/> 
 	
-	 <RefParameter Visible="false" Name="RCC_PERIPHCLK_DFSDMVar" Comment="RCC_PERIPHCLK_DFSDMVar" Type="list" DefaultValue="RCC_PERIPHCLK_DFSDM">
-        <Condition Expression="DFSDMUsed_ForRCC" Diagnostic="DFSDM Activated"/>
-        <PossibleValue Comment="Periphclk DFSDM" Value="RCC_PERIPHCLK_DFSDM"/>
+	 <RefParameter Visible="false" Name="RCC_PERIPHCLK_DFSDMVar" Comment="RCC_PERIPHCLK_DFSDMVar" Type="list" DefaultValue="RCC_PERIPHCLK_DFSDM1">
+        <Condition Expression="DFSDM1Used_ForRCC" Diagnostic="DFSDM Activated"/>
+        <PossibleValue Comment="Periphclk DFSDM1" Value="RCC_PERIPHCLK_DFSDM1"/>
     </RefParameter>
 	
     <RefParameter Visible="false" Name="RCC_PERIPHCLK_DFSDMVar" Comment="RCC_PERIPHCLK_DFSDMVar" Type="list" DefaultValue=""/> 
 	
 	 <RefParameter Visible="false" Name="RCC_PERIPHCLK_ADCVar" Comment="RCC_PERIPHCLK_ADCVar" Type="list" DefaultValue="RCC_PERIPHCLK_ADC">
-        <Condition Expression="USE_ADC1|USE_ADC2|USE_ADC3" Diagnostic="ADC Activated"/>
+        <Condition Expression="((USE_ADC1&amp;ADC1UsedAsynchronousCLK_ForRCC)|(USE_ADC2&amp;ADC2UsedAsynchronousCLK_ForRCC)|(USE_ADC3&amp;ADC3UsedAsynchronousCLK_ForRCC))" Diagnostic="ADC Activated"/>
         <PossibleValue Comment="Periphclk DFSDM" Value="RCC_PERIPHCLK_ADC"/>
     </RefParameter>
 	
@@ -1391,7 +1498,7 @@
     <RefParameter Visible="false" Name="LPTIM2lockSelectionARG" Comment="LPTIM2lockSelectionARG" Type="list" DefaultValue="null"/>
 	
     <RefParameter Visible="false" Name="SAI1lockSelectionARG" Comment="SAI1lockSelectionARG" Type="list" DefaultValue="+SAI1CLockSelection">
-        <Condition Expression="(SAI1Used_ForRCC|SEM2RCC_SAI1_CK_REQUIRED_DFSDM)" Diagnostic="SAI1 Activated"/>
+        <Condition Expression="(SAI1Used_ForRCC|SEM2RCC_SAI1_CK_REQUIRED_DFSDM1)" Diagnostic="SAI1 Activated"/>
     </RefParameter>
     <RefParameter Visible="false" Name="SAI1lockSelectionARG" Comment="SAI1lockSelectionARG" Type="list" DefaultValue="null"/>
 	
@@ -1409,7 +1516,7 @@
     <RefParameter Visible="false" Name="SWPMIlockSelectionARG" Comment="SWPMIlockSelectionARG" Type="list" DefaultValue="null"/>
 	
     <RefParameter Visible="false" Name="DFSDMlockSelectionARG" Comment="DFSDMlockSelectionARG" Type="list" DefaultValue="+DFSDMCLockSelection">
-        <Condition Expression="DFSDMUsed_ForRCC" Diagnostic="DFSDM Activated"/>
+        <Condition Expression="DFSDM1Used_ForRCC" Diagnostic="DFSDM Activated"/>
     </RefParameter>
     <RefParameter Visible="false" Name="DFSDMlockSelectionARG" Comment="DFSDMlockSelectionARG" Type="list" DefaultValue="null"/>
 	
@@ -1443,13 +1550,13 @@
     </RefParameter>
     <RefParameter Visible="false" Name="RNGClockSelectionARG" Comment="RNGClockSelectionARG" Type="list" DefaultValue="null"/>
     <RefParameter Visible="false" Name="SDMMCClockSelectionARG" Comment="SDMMCClockSelectionARG" Type="list" DefaultValue="+SDMMCCLockSelection">
-        <Condition Expression="SDMMCUsed_ForRCC" Diagnostic="LCD Activated"/>
+        <Condition Expression="SDMMC1Used_ForRCC" Diagnostic="LCD Activated"/>
     </RefParameter>
     <RefParameter Visible="false" Name="SDMMCClockSelectionARG" Comment="SDMMCClockSelectionARG" Type="list" DefaultValue="null"/>
 	
 	
     <RefParameter Visible="false" Name="ADCClockSelectionARG" Comment="ADCClockSelectionARG" Type="list" DefaultValue="+ADCCLockSelection">
-        <Condition Expression="USE_ADC1|USE_ADC2|USE_ADC3" Diagnostic="ADC Activated"/>
+        <Condition Expression="((USE_ADC1&amp;ADC1UsedAsynchronousCLK_ForRCC)|(USE_ADC2&amp;ADC2UsedAsynchronousCLK_ForRCC)|(USE_ADC3&amp;ADC3UsedAsynchronousCLK_ForRCC))" Diagnostic="ADC Activated"/>
     </RefParameter>
     <RefParameter Visible="false" Name="ADCClockSelectionARG" Comment="ADCClockSelectionARG" Type="list" DefaultValue="null"/>
 	
@@ -1506,18 +1613,46 @@
 	
 	
     <RefParameter Visible="false" Comment="PLLSourceARG" DefaultValue="+PLLSource" Name="PLLSourceARG" Type="list">
-        <Condition Diagnostic="PLL used" Expression="PLLUsed=1|PLLSAI1Used=1|PLLSAI2Used=1"/>
+        <Condition Diagnostic="PLL used" Expression="PLLUsed=1"/>
     </RefParameter>
 	
     <RefParameter Visible="false" Comment="PLLSourceARG" DefaultValue="null" Name="PLLSourceARG" Type="list"/>
 	
 	
 	
+    <RefParameter Visible="false" Comment="PLLSAI1SourceARG" DefaultValue="+PLLSource" Name="PLLSAI1SourceARG" Type="list">
+        <Condition Diagnostic="PLL used" Expression="PLLSAI1Used=1"/>
+    </RefParameter>
+	
+    <RefParameter Visible="false" Comment="PLLSAI1SourceARG" DefaultValue="null" Name="PLLSAI1SourceARG" Type="list"/>
+	
+	
+	
+    <RefParameter Visible="false" Comment="PLLSAI2SourceARG" DefaultValue="+PLLSource" Name="PLLSAI2SourceARG" Type="list">
+        <Condition Diagnostic="PLL used" Expression="PLLSAI2Used=1"/>
+    </RefParameter>
+	
+    <RefParameter Visible="false" Comment="PLLSAI2SourceARG" DefaultValue="null" Name="PLLSAI2SourceARG" Type="list"/>
+	
+	
+	
     <RefParameter Visible="false" Comment="PLLMARG" DefaultValue="+PLLM" Name="PLLMARG" Type="list">
-        <Condition Diagnostic="PLL used" Expression="PLLUsed=1|PLLSAI1Used=1|PLLSAI2Used=1"/>
+        <Condition Diagnostic="PLL used" Expression="PLLUsed=1"/>
     </RefParameter>
 	
     <RefParameter Visible="false" Comment="PLLMARG" DefaultValue="null" Name="PLLMARG" Type="list"/>
+	
+    <RefParameter Visible="false" Comment="PLLSAI1MARG" DefaultValue="+PLLM" Name="PLLSAI1MARG" Type="list">
+        <Condition Diagnostic="PLL used" Expression="PLLSAI1Used=1"/>
+    </RefParameter>
+	
+    <RefParameter Visible="false" Comment="PLLSAI1MARG" DefaultValue="null" Name="PLLSAI1MARG" Type="list"/>
+	
+    <RefParameter Visible="false" Comment="PLLSAI2MARG" DefaultValue="+PLLM" Name="PLLSAI2MARG" Type="list">
+        <Condition Diagnostic="PLL used" Expression="PLLSAI2Used=1"/>
+    </RefParameter>
+	
+    <RefParameter Visible="false" Comment="PLLSAI2MARG" DefaultValue="null" Name="PLLSAI2MARG" Type="list"/>
 	
 	
 	
@@ -1750,20 +1885,33 @@
         <PossibleValue Value="1" Comment="Enabled"/>
         <PossibleValue Value="0" Comment="Disabled"/>
     </RefParameter>
+	 <RefParameter Name="MSIAutoCalibration" Comment="MSI Auto Calibration" Type="list" DefaultValue="ENABLED" Group="RCC Parameters">
+        <Condition Expression="USB_OTG_FSUsed_ForRCC&amp;(CK48SourceMSI|(CK48SourcePLLCLK&amp;PLLSourceMSI)|(CK48SourcePLLSAI1&amp;PLLSourceMSI))&amp; (LSEOscillator | LSEByPass)" Diagnostic=""/>
+        <PossibleValue Value="ENABLED" Comment="Enabled" Semaphore="MSIAutoCalibrationON"/>
+    </RefParameter>
+	<RefParameter Name="MSIAutoCalibration" Comment="MSI Auto Calibration" Type="list" DefaultValue="ENABLED" Group="RCC Parameters">
+           <Condition Expression="(MSIUsed=1) &amp; (LSEOscillator | LSEByPass)" Diagnostic=""/>
+                <PossibleValue Value="DISABLED" Comment="Disabled"/>
+				<PossibleValue Value="ENABLED" Comment="Enabled" Semaphore="MSIAutoCalibrationON" Condition="LSEState=RCC_LSE_OFF" Diagnostic="Could be enabled only if LSE mode is activated in pinout Tab" Action="disable" />
+    </RefParameter>
 	
     <RefParameter Name="MSIAutoCalibration" Comment="MSI Auto Calibration" Type="list" DefaultValue="DISABLED" Group="RCC Parameters">
-        <Condition Expression="LSEState=RCC_LSE_OFF" Diagnostic=""/>
         <PossibleValue Value="DISABLED" Comment="Disabled"/>
-        <PossibleValue Value="ENABLED" Comment="Enabled" Semaphore="MSIAutoCalibrationON" Condition="LSEState=RCC_LSE_OFF" Diagnostic="Could be enabled only if LSE mode is activated in pinout Tab" Action="disable"/>
-    </RefParameter>
-    <RefParameter Name="MSIAutoCalibration" Comment="MSI Auto Calibration" Type="list" DefaultValue="ENABLED" Group="RCC Parameters">
-        <Condition Expression="CK48SourceMSI|(USB_OTG_FSUsed_ForRCC&amp;CK48SourcePLLCLK&amp;PLLSourceMSI)|(USB_OTG_FSUsed_ForRCC&amp;CK48SourcePLLSAI1&amp;PLLSourceMSI)" Diagnostic=""/>
+    </RefParameter>   
+		<!--
+
+	 <RefParameter Name="MSIAutoCalibration" Comment="MSI Auto Calibration" Type="list" DefaultValue="ENABLED" Group="RCC Parameters">
+        <Condition Expression="USB_OTG_FSUsed_ForRCC&amp;(CK48SourceMSI|(CK48SourcePLLCLK&amp;PLLSourceMSI)|(CK48SourcePLLSAI1&amp;PLLSourceMSI))&amp; (LSEOscillator | LSEByPass)" Diagnostic=""/>
         <PossibleValue Value="ENABLED" Comment="Enabled" Semaphore="MSIAutoCalibrationON"/>
     </RefParameter>
+	<RefParameter Name="MSIAutoCalibration" Comment="MSI Auto Calibration" Type="list" DefaultValue="ENABLED" Group="RCC Parameters">
+        <Condition Expression="USB_OTG_FSUsed_ForRCC&amp;(CK48SourceMSI|(CK48SourcePLLCLK&amp;PLLSourceMSI)|(CK48SourcePLLSAI1&amp;PLLSourceMSI))&amp; !(LSEOscillator | LSEByPass)" Diagnostic=""/>
+        <PossibleValue Value="ENABLED" Comment="Enabled" Semaphore="MSIAutoCalibrationON" Condition="LSEState=RCC_LSE_OFF" Diagnostic="Could be enabled only if LSE mode is activated in pinout Tab" Action="disable" />
+    </RefParameter>
+	
     <RefParameter Name="MSIAutoCalibration" Comment="MSI Auto Calibration" Type="list" DefaultValue="DISABLED" Group="RCC Parameters">
         <PossibleValue Value="DISABLED" Comment="Disabled"/>
-        <PossibleValue Value="ENABLED" Comment="Enabled" Semaphore="MSIAutoCalibrationON"/>
-    </RefParameter>   
+    </RefParameter> 	-->  
     
   <RefParameter Name="MSIAutoCalibrationArg" Comment="MSI Auto Calibration arg" Type="list" DefaultValue="true" Group="RCC Parameters" Visible="false">
       <Condition Expression="MSIAutoCalibrationON" Diagnostic=""/>
@@ -1777,7 +1925,7 @@
 
 	
 <RefParameter Visible="false" Comment="PLLSAI1 out clock " Name="PLLSAI1outclockARG" DefaultValue="+PLLSAI1outclock" Type="list">
-	        <Condition Expression="(SAI1SourcePLLSAI1P&amp;(SAI1Used_ForRCC))| (SAI2SourcePLLSAI1P&amp;SAI2Used_ForRCC)|(ADCSourcePLLSAI1R &amp;(USE_ADC1|USE_ADC2|USE_ADC3))|(CK48SourcePLLSAI1 &amp; (USB_OTG_FSUsed_ForRCC|USB_OTG_HSEmbeddedPHYUsed_ForRCC|RNGUsed_ForRCC|SDMMCUsed_ForRCC))" Diagnostic=" "/>
+	        <Condition Expression="(SAI1SourcePLLSAI1P&amp;(SAI1Used_ForRCC|SEM2RCC_SAI1_CK_REQUIRED_DFSDM1))| (SAI2SourcePLLSAI1P&amp;SAI2Used_ForRCC)|(ADCSourcePLLSAI1R &amp;(((USE_ADC1&amp;ADC1UsedAsynchronousCLK_ForRCC)|(USE_ADC2&amp;ADC2UsedAsynchronousCLK_ForRCC)|(USE_ADC3&amp;ADC3UsedAsynchronousCLK_ForRCC))))|(CK48SourcePLLSAI1 &amp; (USB_OTG_FSUsed_ForRCC|USB_OTG_HSEmbeddedPHYUsed_ForRCC|RNGUsed_ForRCC|SDMMC1Used_ForRCC))" Diagnostic=" "/>
     </RefParameter>
     <RefParameter Visible="false" Comment="PLLSAI1 out clock" Name="PLLSAI1outclockARG" DefaultValue="null" Type="list"/>
      
@@ -1786,14 +1934,14 @@
    
 
 	 <RefParameter Visible="false" Name="RCC_PLLSAI1_SAI1CLKVar" Comment="RCC_PLLSAI1_SAI1CLKVar" Type="list" DefaultValue="RCC_PLLSAI1_SAI1CLK">
-        <Condition Expression="(SAI1SourcePLLSAI1P&amp;(SAI1Used_ForRCC))| (SAI2SourcePLLSAI1P&amp;SAI2Used_ForRCC)" Diagnostic="DFSDM Activated"/>
+        <Condition Expression="(SAI1SourcePLLSAI1P&amp;(SAI1Used_ForRCC|SEM2RCC_SAI1_CK_REQUIRED_DFSDM1))| (SAI2SourcePLLSAI1P&amp;SAI2Used_ForRCC)" Diagnostic="DFSDM Activated"/>
         <PossibleValue Comment="Periphclk DFSDM" Value="RCC_PLLSAI1_SAI1CLK"/>
     </RefParameter>
 	
     <RefParameter Visible="false" Name="RCC_PLLSAI1_SAI1CLKVar" Comment="RCC_PLLSAI1_SAI1CLKVar" Type="list" DefaultValue=""/> 
 	
 	 <RefParameter Visible="false" Name="RCC_PLLSAI1_48M2CLKVar" Comment="RCC_PLLSAI1_48M2CLKVar" Type="list" DefaultValue="RCC_PLLSAI1_48M2CLK">
-        <Condition Expression="(CK48SourcePLLSAI1 &amp; (USB_OTG_FSUsed_ForRCC|USB_OTG_HSEmbeddedPHYUsed_ForRCC|RNGUsed_ForRCC|SDMMCUsed_ForRCC))" Diagnostic="DFSDM Activated"/>
+        <Condition Expression="(CK48SourcePLLSAI1 &amp; (USB_OTG_FSUsed_ForRCC|USB_OTG_HSEmbeddedPHYUsed_ForRCC|RNGUsed_ForRCC|SDMMC1Used_ForRCC))" Diagnostic="DFSDM Activated"/>
         <PossibleValue Comment="Periphclk DFSDM" Value="RCC_PLLSAI1_48M2CLK"/>
     </RefParameter>
 	
@@ -1802,7 +1950,7 @@
 	
 	
 	 <RefParameter Visible="false" Name="RCC_PLLSAI1_ADC1CLKVar" Comment="RCC_PLLSAI1_ADC1CLKVar" Type="list" DefaultValue="RCC_PLLSAI1_ADC1CLK">
-        <Condition Expression="(ADCSourcePLLSAI1R &amp;(USE_ADC1|USE_ADC2|USE_ADC3))" Diagnostic="DFSDM Activated"/>
+        <Condition Expression="(ADCSourcePLLSAI1R &amp;(((USE_ADC1&amp;ADC1UsedAsynchronousCLK_ForRCC)|(USE_ADC2&amp;ADC2UsedAsynchronousCLK_ForRCC)|(USE_ADC3&amp;ADC3UsedAsynchronousCLK_ForRCC))))" Diagnostic="DFSDM Activated"/>
         <PossibleValue Comment="Periphclk DFSDM" Value="RCC_PLLSAI1_ADC1CLK"/>
     </RefParameter>
 	
@@ -1822,7 +1970,7 @@
 
 	
 	 <RefParameter Visible="false" Name="RCC_PLLSAI2_ADC2CLKVar" Comment="RCC_PLLSAI2_ADC2CLKVar" Type="list" DefaultValue="RCC_PLLSAI2_ADC2CLK">
-        <Condition Expression="(ADCSourcePLLSAI2R &amp;(USE_ADC1|USE_ADC2|USE_ADC3))" Diagnostic="DFSDM Activated"/>
+        <Condition Expression="(ADCSourcePLLSAI2R &amp;(((USE_ADC1&amp;ADC1UsedAsynchronousCLK_ForRCC)|(USE_ADC2&amp;ADC2UsedAsynchronousCLK_ForRCC)|(USE_ADC3&amp;ADC3UsedAsynchronousCLK_ForRCC))))" Diagnostic="DFSDM Activated"/>
         <PossibleValue Comment="Periphclk DFSDM" Value="RCC_PLLSAI2_ADC2CLK"/>
     </RefParameter>
 	
@@ -1831,16 +1979,39 @@
 	
 	
 	 <RefParameter Visible="false" Name="RCC_PLLSAI2_SAI2CLKVar" Comment="RCC_PLLSAI2_SAI2CLKVar" Type="list" DefaultValue="RCC_PLLSAI2_SAI2CLK">
-        <Condition Expression="((SAI1SourcePLLSAI2P&amp;(SAI1Used_ForRCC|SEM2RCC_SAI1_CK_REQUIRED_DFSDM))| (SAI2SourcePLLSAI2P&amp;SAI2Used_ForRCC))" Diagnostic="DFSDM Activated"/>
+        <Condition Expression="((SAI1SourcePLLSAI2P&amp;(SAI1Used_ForRCC|SEM2RCC_SAI1_CK_REQUIRED_DFSDM1))| (SAI2SourcePLLSAI2P&amp;SAI2Used_ForRCC))" Diagnostic="DFSDM Activated"/>
         <PossibleValue Comment="Periphclk DFSDM" Value="RCC_PLLSAI2_SAI2CLK"/>
     </RefParameter>
 	
     <RefParameter Visible="false" Name="RCC_PLLSAI2_SAI2CLKVar" Comment="RCC_PLLSAI2_SAI2CLKVar" Type="list" DefaultValue=""/> 
 	
 	      
+    <RefParameter Visible="false" Name="PLLMARGForMacro" Comment="PLLMARGForMacro" Type="list" DefaultValue="+PLLM">
+        <Condition Diagnostic="PLLSAIP not used" Expression=" ((PLLSAI1Used=1|PLLSAI2Used=1) &amp; PLLState=RCC_PLL_OFF)"/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="PLLMARGForMacro" Comment="PLLMARGForMacro" Type="list" DefaultValue="null"/>
+	
+    <RefParameter Visible="false" Name="PLLSourceMARGForMacro" Comment="PLLSourceMARGForMacro" Type="list" DefaultValue="+PLLSource">
+        <Condition Diagnostic="PLLSAIP not used" Expression=" ((PLLSAI1Used=1|PLLSAI2Used=1) &amp; PLLState=RCC_PLL_OFF)"/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="PLLSourceMARGForMacro" Comment="PLLSourceMARGForMacro" Type="list" DefaultValue="null"/>
 
+	
+	<RefParameter  Name="LSE_Drive_Capability" Comment="LSE Drive Capability" Type="list" DefaultValue="false" Group="RCC Parameters">
+        <Condition Diagnostic="" Expression="LSEOscillator &amp; (LSEUsed=1)"/>
+        <PossibleValue Value="RCC_LSEDRIVE_LOW"        Comment="LSE oscillator low drive capability"  />
+        <PossibleValue Value="RCC_LSEDRIVE_MEDIUMLOW"  Comment="LSE oscillator medium low drive capability"/>
+        <PossibleValue Value="RCC_LSEDRIVE_MEDIUMHIGH" Comment="LSE oscillator medium high drive capability"/>
+        <PossibleValue Value="RCC_LSEDRIVE_HIGH"       Comment="LSE oscillator high drive capability"/>
+    </RefParameter>
+	<RefParameter Visible="false" Name="LSE_Drive_Capability" Comment="LSE Drive Capability" Type="list" DefaultValue="null" Group="RCC Parameters">
+    
+    </RefParameter>
     <RefMode Name="ClockTree">
-	  
+
+		 <!--  <ConfigForMode>RCC_PLL_PLLM_CONFIG</ConfigForMode>
+        <ConfigForMode>RCC_PLL_PLLSOURCE_CONFIG</ConfigForMode>--> 
+		<ConfigForMode>RCC_LSEDRIVE_CONFIG</ConfigForMode>
         <ConfigForMode>RCC_OSCConfig</ConfigForMode>        
         <ConfigForMode>RCC_ClockConfig</ConfigForMode>        
         <ConfigForMode>RCC_MCO1Config</ConfigForMode>        
@@ -1848,10 +2019,12 @@
         <ConfigForMode>RCC_CSS_Enable</ConfigForMode>
         <ConfigForMode>RCC_CSS_EnableLSE</ConfigForMode>    
         <!--ConfigForMode>SYSCFG_CLK_ENABLE</ConfigForMode--> 
+				 
         <ConfigForMode>RCC_ConfigVoltageScaling</ConfigForMode> 
 		 <ConfigForMode>RCC_interrupt_Time_SYSTICK_Config</ConfigForMode>
 		<ConfigForMode>RCC_SYSTICK_CONFIG</ConfigForMode>
 		<ConfigForMode>EnableMSIPLLMode</ConfigForMode>
+
         <Parameter Name="OscillatorType"/>
         <Parameter Name="APB1TimCLKDivider"/>
         <Parameter Name="APB2TimCLKDivider"/>
@@ -1953,6 +2126,9 @@
         <Parameter Name="MSICalibrationValue"/>
         <Parameter Name="PWR_Regulator_Voltage_Scale"/>
 	<Parameter Name="MSIAutoCalibration"/>
+	<Parameter Name="HSE_Timout"/>
+        <Parameter Name="LSE_Timout"/>
+		 <Parameter Name="LSE_Drive_Capability"/>
       
     </RefMode>
 

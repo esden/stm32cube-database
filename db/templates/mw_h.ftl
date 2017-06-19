@@ -1,24 +1,11 @@
 [#ftl]
 /**
   ******************************************************************************
-  * File Name          : ${name}.h
+  * File Name          : ${name?lower_case}.h
   * Description        : This file provides code for the configuration
-  *                      of the ${name} instances.
+  *                      of the ${name?lower_case} instances.
   ******************************************************************************
-  *
-  * COPYRIGHT ${year} STMicroelectronics
-  *
-  * Licensed under MCD-ST Liberty SW License Agreement V2, (the "License");
-  * You may not use this file except in compliance with the License.
-  * You may obtain a copy of the License at:
-  *
-  *        http://www.st.com/software_license_agreement_liberty_v2
-  *
-  * Unless required by applicable law or agreed to in writing, software 
-  * distributed under the License is distributed on an "AS IS" BASIS, 
-  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  * See the License for the specific language governing permissions and
-  * limitations under the License.
+[@common.optinclude name="Src/license.tmp"/][#--include License text --]
   ******************************************************************************
   */#n
 /* Define to prevent recursive inclusion -------------------------------------*/
@@ -28,6 +15,9 @@
  extern "C" {
 #endif
 
+[#-- 'UserCode sections' are indexed dynamically --]
+[#assign userCodeIdx = 0]
+
 /* Includes ------------------------------------------------------------------*/
 [#if includes??]
 [#list includes as include]
@@ -35,6 +25,11 @@
 [/#list]
 [/#if]
 
+/* USER CODE BEGIN ${userCodeIdx} */
+/* USER CODE END ${userCodeIdx} */
+[#assign userCodeIdx = userCodeIdx+1]
+
+/* Global variables ---------------------------------------------------------*/
 [#list IPdatas as IP]  
 [#assign ipvar = IP]
 [#-- Global variables --]
@@ -43,6 +38,11 @@
 extern ${variable.value} ${variable.name};
 	[/#list]
 [/#if]
+
+/* USER CODE BEGIN ${userCodeIdx} */
+/* USER CODE END ${userCodeIdx} */
+[#assign userCodeIdx = userCodeIdx+1]
+
 [#-- Global variables --]
 
 [#-- extract hal mode list used by all instances of the ip --]
@@ -73,6 +73,10 @@ void HAL_${mode}_BspDeInit(${mode}_HandleTypeDef* h${mode?lower_case});
 [/#list]
 
 [#--void ${ipName}_Init(void);--]
+
+/* USER CODE BEGIN ${userCodeIdx} */
+/* USER CODE END ${userCodeIdx} */
+[#assign userCodeIdx = userCodeIdx+1]
 
 #ifdef __cplusplus
 }

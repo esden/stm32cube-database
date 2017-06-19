@@ -262,9 +262,27 @@
             [/#if]
           [/#if]
         [/#list][#--list method.arguments as fargument--]
-        #n[#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n[#--add blank line before function call--]
+        #n[#--[#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n[#--add blank line before function call--]
+                    [#if method.returnHAL=="false"]
+                        [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});
+                    [#else]
+                        [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
+                        [#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}(${args}) != HAL_OK)
+                        [#if nTab==2]#t#t[#else]#t[/#if]{
+                        [#if nTab==2]#t#t[#else]#t[/#if]#t_Error_Handler(__FILE__, __LINE__);
+                        [#if nTab==2]#t#t[#else]#t[/#if]}
+                    [/#if]#n
 		  [#else][#--if method.arguments??--]
-        #n[#if nTab==2]#t#t[#else]#t[/#if]${method.name}();#n[#--add blank line before function call--]
+        #n[#--[#if nTab==2]#t#t[#else]#t[/#if]${method.name}();#n[#--add blank line before function call--]
+                        [#if method.returnHAL=="false"]
+                            [#if nTab==2]#t#t[#else]#t[/#if]${method.name}();
+                        [#else]
+                            [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
+                            [#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}() != HAL_OK)
+                            [#if nTab==2]#t#t[#else]#t[/#if]{
+                            [#if nTab==2]#t#t[#else]#t[/#if]#t_Error_Handler(__FILE__, __LINE__);
+                            [#if nTab==2]#t#t[#else]#t[/#if]}
+                        [/#if]#n
       [/#if][#--if method.arguments??--]
     [/#if][#--if method.status=="OK"--]
     [#if method.status=="KO"]
@@ -337,7 +355,16 @@
         [/#list]
         #n[#if nTab==2]#t#t[#else]#t[/#if]//${method.name}(${args});#n[#--add blank line before function call--]
       [#else]
-        #n[#if nTab==2]#t#t[#else]#t[/#if]${method.name}();#n[#--add blank line before function call--]
+        #n[#--[#if nTab==2]#t#t[#else]#t[/#if]${method.name}();#n[#--add blank line before function call--]
+            [#if method.returnHAL=="false"]
+                [#if nTab==2]#t#t[#else]#t[/#if]${method.name}();
+            [#else]
+                [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
+                [#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}() != HAL_OK)
+                [#if nTab==2]#t#t[#else]#t[/#if]{
+                [#if nTab==2]#t#t[#else]#t[/#if]#t_Error_Handler(__FILE__, __LINE__);
+                [#if nTab==2]#t#t[#else]#t[/#if]}
+            [/#if]#n
       [/#if]
     [/#if][#--if method.status=="KO"--]
   [/#list][#--list methodList as method--]
@@ -439,10 +466,10 @@
         #t#${clock}(); 
       [/#list]
     [#else]
-         #t__${ipName}_CLK_ENABLE();
+         #t__HAL_RCC_${ipName}_CLK_ENABLE();
     [/#if]
   [#else]           
-         #t__${ipName}_CLK_DISABLE();   
+         #t__HAL_RCC_${ipName}_CLK_DISABLE();   
   [/#if]
   [#if gpioExist]
 #t[@generateConfigCode ipName=ipName type=serviceType serviceName="gpio" instHandler=instHandler tabN=tabN/]
@@ -455,12 +482,12 @@
         [#if initService.nvic??]
             [#assign irqNum = 0]
             [#list initService.nvic as initVector]
+              [#if initVector.codeInMspInit]
                 [#assign irqNum = irqNum+1]
-                [#if irqNum==1]#t/* Peripheral interrupt Init */[/#if]
-                [#-- #t#t/* Sets the priority grouping field */ To be done later--]
-                [#-- #t#tHAL_NVIC_SetPriorityGrouping(${initVector.group});  To be done later--]
+                [#if irqNum==1]#t/* Peripheral interrupt init */[/#if]
                 #tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
                 #tHAL_NVIC_EnableIRQ(${initVector.vector});
+              [/#if]
             [/#list]
         [/#if]
     [/#if]
@@ -509,7 +536,7 @@
   [#assign halMode= instanceData.halMode]
 /* ${instName} initialization function */
   [#if ipvar.ipName=="FMC"||ipvar.ipName=="FSMC"]
-void MX_${instName}_Init(void)
+static void MX_${instName}_Init(void)
   [#else]
     [#if halMode!=name]void MX_${instName}_${halMode}_Init(void)[#else]void MX_${instName}_Init(void)[/#if]
   [/#if]

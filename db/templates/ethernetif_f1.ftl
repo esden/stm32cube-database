@@ -5,29 +5,7 @@
   * Description        : This file provides code for the configuration
   *                      of the ${name} MiddleWare.
   ******************************************************************************
-  * COPYRIGHT(c) ${year} STMicroelectronics
-  *
-  * Redistribution and use in source and binary forms, with or without modification,
-  * are permitted provided that the following conditions are met:
-  *   1. Redistributions of source code must retain the above copyright notice,
-  *      this list of conditions and the following disclaimer.
-  *   2. Redistributions in binary form must reproduce the above copyright notice,
-  *      this list of conditions and the following disclaimer in the documentation
-  *      and/or other materials provided with the distribution.
-  *   3. Neither the name of STMicroelectronics nor the names of its contributors
-  *      may be used to endorse or promote products derived from this software
-  *      without specific prior written permission.
-  *
-  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-  * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-  * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-  * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+[@common.optinclude name="Src/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
 [#-- SWIPdatas is a list of SWIPconfigModel --]
@@ -36,32 +14,40 @@
 [#assign with_rtos = 0]
 [#assign netif_callback = 0]
 [#assign lwip_arp = 0]
+[#assign lan8742a = 0]
+[#assign dp83848 = 0]
 [#if SWIP.defines??]
 	[#list SWIP.defines as definition] 		
 		[#if (definition.name == "WITH_RTOS")]
 			[#if definition.value == "1"]
 				[#assign with_rtos = 1]
-			[/#if] [#-- "1" --]
-		[/#if] [#-- WITH_RTOS --]
+			[/#if][#-- "1" --]
+		[/#if][#-- WITH_RTOS --]
 		[#if (definition.name == "NO_SYS")]
 			[#if definition.value == "0"]
 				[#assign with_rtos = 1]
 			[#else]
 				[#assign with_rtos = 0]
-			[/#if] [#-- "0" --]
-		[/#if] [#-- NO_SYS --]
+			[/#if][#-- "0" --]
+		[/#if][#-- NO_SYS --]
 		[#if (definition.name == "LWIP_NETIF_LINK_CALLBACK") && (definition.value == "1")]
 			[#assign netif_callback = 1] 
 		[/#if]
 		[#if (definition.name == "LWIP_ARP") && (definition.value == "1")]
             [#assign lwip_arp = 1] 
         [/#if]
+        [#if (definition.name == "PHY") && (definition.value == "LAN8742A_PHY_ADDRESS")]
+            [#assign lan8742a = 1]
+        [/#if]
+        [#if (definition.name == "PHY") && (definition.value == "DP83848_PHY_ADDRESS")]
+            [#assign dp83848 = 1]
+        [/#if]
 	[/#list]
-[/#if] [#-- SWIP.defines --]
+[/#if][#-- SWIP.defines --]
 [/#list][/#compress]
 
 /* Includes ------------------------------------------------------------------*/
-#include "stm32f1xx_hal.h"
+#include "${FamilyName?lower_case}xx_hal.h"
 #include "lwip/opt.h"
 [#compress]
 [#if with_rtos == 0]
@@ -76,7 +62,7 @@
 [#compress]
 [#if with_rtos == 1]
 #include "cmsis_os.h"
-[/#if] [#-- endif with_rtos --][/#compress]
+[/#if][#-- endif with_rtos --][/#compress]
 
 /* Within 'USER CODE' section, code will be kept by default at each generation */
 /* USER CODE BEGIN 0 */
@@ -88,10 +74,10 @@
 [#if with_rtos == 1]
 
 /* The time to block waiting for input. */
-#define TIME_WAITING_FOR_INPUT                 ( 100 )
+#define TIME_WAITING_FOR_INPUT                 ( portMAX_DELAY )
 /* Stack size of the interface thread */
 #define INTERFACE_THREAD_STACK_SIZE            ( 350 )
-[/#if] [#-- endif with_rtos --][/#compress]
+[/#if][#-- endif with_rtos --][/#compress]
 
 /* Network interface name */
 #define IFNAME0 's'
@@ -130,7 +116,7 @@ __ALIGN_BEGIN uint8_t Tx_Buff[ETH_TXBUFNB][ETH_TX_BUF_SIZE] __ALIGN_END; /* Ethe
 [#if with_rtos == 1]
 /* Semaphore to signal incoming packets */
 osSemaphoreId s_xSemaphore = NULL;
-[/#if] [#-- endif with_rtos --][/#compress]
+[/#if][#-- endif with_rtos --][/#compress]
 
 /* Global Ethernet handle*/
 ETH_HandleTypeDef heth;
@@ -153,7 +139,7 @@ void HAL_ETH_RxCpltCallback(ETH_HandleTypeDef *heth)
   osSemaphoreRelease(s_xSemaphore);
 }
 
-[/#if] [#-- endif with_rtos --]
+[/#if][#-- endif with_rtos --]
 
 /* USER CODE BEGIN 4 */
 
@@ -172,7 +158,9 @@ void HAL_ETH_RxCpltCallback(ETH_HandleTypeDef *heth)
  */
 static void low_level_init(struct netif *netif)
 { 
+[#if (dp83848 == 1) || (lan8742a ==1)]  
   uint32_t regvalue = 0;
+[/#if]
   HAL_StatusTypeDef hal_eth_init_status;
   
 /* Init ETH */
@@ -209,7 +197,7 @@ static void low_level_init(struct netif *netif)
   /* don't set NETIF_FLAG_ETHARP if this device is not an ethernet one */
   #if LWIP_ARP
     netif->flags |= NETIF_FLAG_BROADCAST | NETIF_FLAG_ETHARP;
-  # else 
+  #else 
     netif->flags |= NETIF_FLAG_BROADCAST;
   #endif /* LWIP_ARP */
   
@@ -221,10 +209,15 @@ static void low_level_init(struct netif *netif)
 /* create the task that handles the ETH_MAC */
   osThreadDef(EthIf, ethernetif_input, osPriorityRealtime, 0, INTERFACE_THREAD_STACK_SIZE);
   osThreadCreate (osThread(EthIf), netif);
-[/#if] [#-- endif with_rtos --]
+[/#if][#-- endif with_rtos --]
   /* Enable MAC and DMA transmission and reception */
   HAL_ETH_Start(&heth);
+
+/* USER CODE BEGIN PHY_PRE_CONFIG */ 
+    
+/* USER CODE END PHY_PRE_CONFIG */
   
+[#if dp83848 == 1]  
   /**** Configure PHY to generate an interrupt when Eth Link state changes ****/
   /* Read Register Configuration */
   HAL_ETH_ReadPHYRegister(&heth, PHY_MICR, &regvalue);
@@ -240,8 +233,30 @@ static void low_level_init(struct netif *netif)
   regvalue |= PHY_MISR_LINK_INT_EN;
     
   /* Enable Interrupt on change of link status */
-  HAL_ETH_WritePHYRegister(&heth, PHY_MISR, regvalue);   
+  HAL_ETH_WritePHYRegister(&heth, PHY_MISR, regvalue);
+[/#if][#-- endif dp83848 --]
+
+[#if lan8742a == 1]
+  /* Read Register Configuration */
+  HAL_ETH_ReadPHYRegister(&heth, PHY_ISFR, &regvalue);
+  regvalue |= (PHY_ISFR_INT4);
+
+  /* Enable Interrupt on change of link status */ 
+  HAL_ETH_WritePHYRegister(&heth, PHY_ISFR , regvalue );
+  
+  /* Read Register Configuration */
+  HAL_ETH_ReadPHYRegister(&heth, PHY_ISFR , &regvalue);
+[/#if][#-- endif lan8742a --]
+
+/* USER CODE BEGIN PHY_POST_CONFIG */ 
+    
+/* USER CODE END PHY_POST_CONFIG */
+
 #endif /* LWIP_ARP || LWIP_ETHERNET */
+
+/* USER CODE BEGIN LOW_LEVEL_INIT */ 
+    
+/* USER CODE END LOW_LEVEL_INIT */
 }
 
 /**
@@ -347,7 +362,7 @@ error:
 static struct pbuf * low_level_input(struct netif *netif)
 {
   struct pbuf *p = NULL;
-  struct pbuf *q;
+  struct pbuf *q = NULL;
   uint16_t len = 0;
   uint8_t *buffer;
   __IO ETH_DMADescTypeDef *dmarxdesc;
@@ -402,7 +417,8 @@ static struct pbuf * low_level_input(struct netif *netif)
       memcpy( (uint8_t*)((uint8_t*)q->payload + payloadoffset), (uint8_t*)((uint8_t*)buffer + bufferoffset), byteslefttocopy);
       bufferoffset = bufferoffset + byteslefttocopy;
     }
-    
+  }  
+  
     /* Release descriptors to DMA */
     /* Point to first descriptor */
     dmarxdesc = heth.RxFrameInfos.FSRxDesc;
@@ -414,8 +430,7 @@ static struct pbuf * low_level_input(struct netif *netif)
     }
     
     /* Clear Segment_Count */
-    heth.RxFrameInfos.SegCount =0;
-  }    
+    heth.RxFrameInfos.SegCount =0;  
   
   /* When Rx Buffer unavailable flag is set: clear it and resume reception */
   if ((heth.Instance->DMASR & ETH_DMASR_RBUS) != (uint32_t)RESET)  
@@ -441,11 +456,11 @@ static struct pbuf * low_level_input(struct netif *netif)
 void ethernetif_input( void const * argument ) 
 [#else]
 void ethernetif_input(struct netif *netif)
-[/#if] [#-- endif with_rtos --]
+[/#if][#-- endif with_rtos --]
 {
 [#if with_rtos == 0]
   err_t err;
-[/#if] [#-- endif with_rtos --]
+[/#if][#-- endif with_rtos --]
   struct pbuf *p;
 [#if with_rtos == 1]
   struct netif *netif = (struct netif *) argument;
@@ -482,7 +497,7 @@ void ethernetif_input(struct netif *netif)
     LWIP_DEBUGF(NETIF_DEBUG, ("ethernetif_input: IP input error\n"));
     pbuf_free(p);
     p = NULL;    
-[/#if] [#-- endif with_rtos --]
+[/#if][#-- endif with_rtos --]
   }
 }
 
@@ -576,69 +591,79 @@ u32_t sys_now(void)
 
 /* USER CODE END 6 */
 
-
+[#if netif_callback == 1]
+[#if with_rtos == 0]
+/**
+  * @brief  This function sets the netif link status.
+  * @note   This function should be included in the main loop to poll 
+  *         for the link status update  
+  * @param  netif: the network interface
+  * @retval None
+  */
+uint32_t EthernetLinkTimer=0; 
+  
+void ethernetif_set_link(struct netif *netif)
+[#else][#-- with_rtos (0) --]
 /**
   * @brief  This function sets the netif link status.
   * @param  netif: the network interface
   * @retval None
-  */
-[#if with_rtos == 0]  
-void ethernetif_set_link(struct netif *netif)
-[#else]
+  */  
 void ethernetif_set_link(void const *argument)
-[/#if]
+[/#if][#-- with_rtos (1) --]
 {
   uint32_t regvalue = 0;
-[#if with_rtos == 1]
+[#if (with_rtos == 1)]
   struct link_str *link_arg = (struct link_str *)argument;
   
   for(;;)
   {
-    if (osSemaphoreWait( link_arg->semaphore, 100)== osOK)
-    {
-      /* Read PHY_MISR*/
-      HAL_ETH_ReadPHYRegister(&heth, PHY_MISR, &regvalue);
-      
-      /* Check whether the link interrupt has occurred or not */
-      if((regvalue & PHY_LINK_INTERRUPT) != (uint16_t)RESET)
-      {
-        /* Read PHY_SR*/
-        HAL_ETH_ReadPHYRegister(&heth, PHY_SR, &regvalue);
-        
-        /* Check whether the link is up or down*/
-        if((regvalue & PHY_LINK_STATUS)!= (uint16_t)RESET)
-        {
-          netif_set_link_up(link_arg->netif);
-        }
-        else
-        {
-          netif_set_link_down(link_arg->netif);
-        }
-      }
-    }
-  }
-[#else]
-  /* Read PHY_MISR*/
-  HAL_ETH_ReadPHYRegister(&heth, PHY_MISR, &regvalue);
-  
-  /* Check whether the link interrupt has occurred or not */
-  if((regvalue & PHY_LINK_INTERRUPT) != (uint16_t)RESET)
-  {
-    /* Read PHY_SR*/
-    HAL_ETH_ReadPHYRegister(&heth, PHY_SR, &regvalue);
+    /* Read PHY_BSR*/
+    HAL_ETH_ReadPHYRegister(&heth, PHY_BSR, &regvalue);
     
-    /* Check whether the link is up or down*/
-    if((regvalue & PHY_LINK_STATUS)!= (uint16_t)RESET)
+    regvalue &= PHY_LINKED_STATUS;
+    
+    /* Check whether the netif link down and the PHY link is up */
+    if(!netif_is_link_up(link_arg->netif) && (regvalue))
     {
-      netif_set_link_up(netif);
+      /* network cable is connected */ 
+      netif_set_link_up(link_arg->netif);        
     }
-    else
+    else if(netif_is_link_up(link_arg->netif) && (!regvalue))
     {
+      /* network cable is dis-connected */
+      netif_set_link_down(link_arg->netif);
+    }
+    
+    /* Suspend thread for 200 ms */
+    osDelay(200);
+  }
+[#else][#-- with_rtos (1) --]
+  /* Ethernet Link every 200ms */
+  if (HAL_GetTick() - EthernetLinkTimer >= 200)
+  {
+    EthernetLinkTimer = HAL_GetTick(); 
+    
+    /* Read PHY_BSR*/
+    HAL_ETH_ReadPHYRegister(&heth, PHY_BSR, &regvalue);
+    
+    regvalue &= PHY_LINKED_STATUS;
+    
+    /* Check whether the netif link down and the PHY link is up */
+    if(!netif_is_link_up(netif) && (regvalue))
+    {
+      /* network cable is connected */ 
+      netif_set_link_up(netif);        
+    }
+    else if(netif_is_link_up(netif) && (!regvalue))
+    {
+      /* network cable is disconnected */
       netif_set_link_down(netif);
     }
   }
-[/#if]  
+[/#if][#-- with_rtos (0) --]
 }
+[/#if][#-- netif_callback (1) --]
 
 
 /* USER CODE BEGIN 7 */
@@ -655,7 +680,7 @@ void ethernetif_set_link(void const *argument)
   */
 void ethernetif_update_config(struct netif *netif)
 {
-  __IO uint32_t timeout = 0;
+  __IO uint32_t tickstart = 0;
   uint32_t regvalue = 0;
   
   if(netif_is_link_up(netif))
@@ -666,20 +691,21 @@ void ethernetif_update_config(struct netif *netif)
       /* Enable Auto-Negotiation */
       HAL_ETH_WritePHYRegister(&heth, PHY_BCR, PHY_AUTONEGOTIATION);
       
+      /* Get tick */
+      tickstart = HAL_GetTick();
+      
       /* Wait until the auto-negotiation will be completed */
       do
       {
-        timeout++;
         HAL_ETH_ReadPHYRegister(&heth, PHY_BSR, &regvalue);
-      } while (!(regvalue & PHY_AUTONEGO_COMPLETE) && (timeout < PHY_READ_TO));
-      
-      if(timeout == PHY_READ_TO)
-      {      
-        goto error;
-      }
-      
-      /* Reset Timeout counter */
-      timeout = 0;
+        
+        /* Check for the Timeout ( 1s ) */
+        if((HAL_GetTick() - tickstart ) > 1000)
+        {     
+          /* In case of timeout */ 
+          goto error;
+        }   
+      } while (((regvalue & PHY_AUTONEGO_COMPLETE) != PHY_AUTONEGO_COMPLETE));
       
       /* Read the result of the auto-negotiation */
       HAL_ETH_ReadPHYRegister(&heth, PHY_SR, &regvalue);

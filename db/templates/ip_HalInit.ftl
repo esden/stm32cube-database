@@ -135,8 +135,18 @@
 [#if writeConfigComments]
 [#-- [#if configModel.comments??] #t/**${configModel.comments} #n#t*/[/#if] --]
 [/#if]
-	[#list methodList as method][#assign args = ""]	      
-		[#if method.status=="OK"]
+	[#list methodList as method][#assign args = ""]	  
+            [#if method.hardCode??] [#-- Hard code --]              
+                ${method.hardCode.text} 
+            [#else]
+                [#if method.type == "Template"] [#-- Template code --]  
+                    [#list method.name?split("/") as n]
+                        [#assign tplName = n]
+                    [/#list]
+                    [@optinclude name="Src/${tplName?replace('ftl','tmp')}" /] 
+                [/#if]
+            [/#if]
+            [#if method.status=="OK" && method.type != "Template" && method.type != "HardCode"]                           		
              	[#if method.arguments??]
                     [#list method.arguments as fargument][#compress]
                     [#if fargument.addressOf] [#assign adr = "&"][#else ][#assign adr = ""][/#if][/#compress] 
@@ -267,7 +277,14 @@
                         [/#list][#-- list  fargument.argument as argument--]
                         [/#if]
                     [#else][#-- if struct --]
-                    [#assign arg = ""]
+                        [#assign arg = ""]
+                        [#if inst?contains("ETH")]
+                            #n
+                            #t/* USER CODE BEGIN MACADDRESS */
+                            #t#t
+                            #t/* USER CODE END MACADDRESS */
+                            #n
+                        [/#if]
                         [#if fargument.status=="OK" && fargument.value??]
                             [#assign argIndex = inst?replace(name,"")]  
                                             [#if argIndex??]
@@ -288,14 +305,31 @@
 				[#assign retval=argument.name]
 			[/#if]
 		    [/#list]
-
 		    [#if retval??&& retval!=""]
 			[#if nTab==2]#t#t[#else]#t[/#if]${retval} = ${method.name}(${args});
 		    [#else]
-			[#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n
+			[#--[#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n--]
+                            [#if method.returnHAL=="false"]
+                                [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});
+                            [#else]
+                                [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
+                                [#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}(${args}) != [#if method.returnHAL == "true"]HAL_OK[#else]${method.returnHAL}[/#if])
+                                [#if nTab==2]#t#t[#else]#t[/#if]{
+                                [#if nTab==2]#t#t[#else]#t[/#if]#t_Error_Handler(__FILE__, __LINE__);
+                                [#if nTab==2]#t#t[#else]#t[/#if]}
+                            [/#if]#n
 		    [/#if]
 		[#else]
-                    [#if nTab==2]#t#t[#else]#t[/#if]${method.name}();#n
+                    [#--[#if nTab==2]#t#t[#else]#t[/#if]${method.name}();#n""--]
+                            [#if method.returnHAL=="false"]
+                                [#if nTab==2]#t#t[#else]#t[/#if]${method.name}();
+                            [#else]
+                                [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
+                                [#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}() != [#if method.returnHAL == "true"]HAL_OK[#else]${method.returnHAL}[/#if])
+                                [#if nTab==2]#t#t[#else]#t[/#if]{
+                                [#if nTab==2]#t#t[#else]#t[/#if]#t_Error_Handler(__FILE__, __LINE__);
+                                [#if nTab==2]#t#t[#else]#t[/#if]}
+                            [/#if]#n
                 [/#if]			
 		[/#if]
 		[#if method.status=="KO"]
@@ -351,7 +385,16 @@
                                 [/#list]
                                 [#if nTab==2]#t#t[#else]#t[/#if]#t//${method.name}(${args});
                         [#else] [#-- if method without argument --]
-                               [#if nTab==2]#t#t[#else]#t[/#if]${method.name}()#n;
+                               [#--[#if nTab==2]#t#t[#else]#t[/#if]${method.name}()#n;--]
+                            [#if method.returnHAL=="false"]
+                                [#if nTab==2]#t#t[#else]#t[/#if]${method.name}();
+                            [#else]
+                                [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
+                                [#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}() != [#if method.returnHAL == "true"]HAL_OK[#else]${method.returnHAL}[/#if])
+                                [#if nTab==2]#t#t[#else]#t[/#if]{
+                                [#if nTab==2]#t#t[#else]#t[/#if]#t_Error_Handler(__FILE__, __LINE__);
+                                [#if nTab==2]#t#t[#else]#t[/#if]}
+                            [/#if]#n                                
                         [/#if]
                 [/#if]
         [/#list]
@@ -451,7 +494,7 @@
             [/#if]
             [#else]
                  #t#t/* Peripheral clock enable */
-                 #t#t__${ipName}_CLK_ENABLE(); 
+                 #t#t__HAL_RCC_${ipName}_CLK_ENABLE(); 
            [/#if]
     [#else]           
          [#if initService.clock??]
@@ -462,8 +505,12 @@
                [/#list]
             [/#if]
          [#else]
+            [#if ipName?contains("WWDG") && (DIE=="DIE415" || DIE=="DIE435")]
+            [#-- Orca and LittleOrca window watchdog clock disable don't work --]
+            [#else]
                  #t#t/* Peripheral clock disable */
-                 #t#t__${ipName}_CLK_DISABLE();  
+                 #t#t__HAL_RCC_${ipName}_CLK_DISABLE();  
+            [/#if]
          [/#if]   
     [/#if]
     [#if gpioExist]
@@ -475,12 +522,15 @@
 
     [/#if]
     [#if nvicExist]
-        [#if initService.nvic??&&initService.nvic?size>0]#n#t#t/* Peripheral interrupt init*/
+        [#if initService.nvic??&&initService.nvic?size>0]
+            [#assign irqNum = 0]
             [#list initService.nvic as initVector]
-                [#-- #t#t/* Sets the priority grouping field */ To be done later--]
-                [#-- #t#tHAL_NVIC_SetPriorityGrouping(${initVector.group});  To be done later--]
-                #t#tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.group}, ${initVector.preemptionPriority}, ${initVector.subPriority});
-                #t#tHAL_NVIC_EnableIRQ(${initVector.vector});
+                [#if initVector.codeInMspInit]
+                  [#assign irqNum = irqNum+1]
+                  [#if irqNum==1]#n#t#t/* Peripheral interrupt init*/[/#if]
+                  #t#tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
+                  #t#tHAL_NVIC_EnableIRQ(${initVector.vector});
+                [/#if]
             [/#list]
         [/#if]
     [/#if]
@@ -502,8 +552,7 @@
     [/#if] [#-- if DMA exist --]
 [#-- DeInit NVIC if DeInit --]
     [#if nvicExist&&service.nvic?size>0]#n#t#t/* Peripheral interrupt Deinit*/[#--#n#t#tHAL_NVIC_DisableIRQ([#if service.nvic.vector??]${service.nvic.vector}[/#if]);--]
-[#list service.nvic as initVector]                
-                #t#tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
+            [#list service.nvic as initVector]
                 #t#tHAL_NVIC_DisableIRQ(${initVector.vector});
             [/#list]
     [/#if]

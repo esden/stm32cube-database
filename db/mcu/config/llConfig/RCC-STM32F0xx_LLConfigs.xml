@@ -1,0 +1,534 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<IP xmlns="http://mcd.rou.st.com/modules.php?name=mcu" DBVersion="V4.0" Name="RCC" Version="STM32Cube_FW_F0_V1.5.0" IncludeFile="stm32f0xx_ll_crs.h;stm32f0xx_ll_rcc.h;stm32f0xx_ll_bus.h;stm32f0xx_ll_system.h;stm32f0xx_ll_exti.h;stm32f0xx_ll_cortex.h;stm32f0xx_ll_utils.h;stm32f0xx_ll_pwr.h;stm32f0xx_ll_dma.h" 
+    xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../../doc/V4/Development/Specifications/db/IP_Configs.xsd">
+
+    <RefConfig Name="RCC_OSCConfig">
+      
+        <!--flash latency configuration-->
+
+        <IFCondition Expression ="1=1">
+
+            <CallLibMethod Name="LL_FLASH_SetLatency">
+                <MethodArg Name="Latency" ParameterName="FLatency"/>
+            
+            </CallLibMethod>
+        </IFCondition>
+        <IFCondition Expression ="FLatency=FLASH_LATENCY_0">
+            <CallLibMethod Name="" Type="HardCode">
+                <HardCode Text="#n#tif(LL_FLASH_GetLatency() != LL_FLASH_LATENCY_0)#n#t{#n#tError_Handler();#t#n#t}"/>
+            </CallLibMethod>
+        </IFCondition>
+        <IFCondition Expression ="FLatency=FLASH_LATENCY_1">
+            <CallLibMethod Name="" Type="HardCode">
+                <HardCode Text="#n#tif(LL_FLASH_GetLatency() != LL_FLASH_LATENCY_1)#n#t{#n#tError_Handler();#t#n#t}"/>
+            </CallLibMethod>
+        </IFCondition>
+
+
+
+
+        <!--Clock source activation-->
+      
+
+        <IFCondition Expression ="HSEUsed=1 &amp; HSEByPass ">
+            <CallLibMethod Name="LL_RCC_HSE_EnableBypass" />
+        </IFCondition>
+     
+		
+        <IFCondition Expression ="HSEUsed=1">
+            <CallLibMethod Name="LL_RCC_HSE_Enable"/>
+   
+            <CallLibMethod Name="" Type="HardCode">
+                <HardCode Text="#n#t /* Wait till HSE is ready */#n#twhile(LL_RCC_HSE_IsReady() != 1)#n#t{#n#t#t#n#t}"/>
+            </CallLibMethod>
+        </IFCondition>   
+  
+		
+        <IFCondition Expression ="HSIUsed=1">
+            <CallLibMethod Name="LL_RCC_HSI_Enable"/>
+     
+            <CallLibMethod Name="" Type="HardCode">
+                <HardCode Text="#n#t /* Wait till HSI is ready */#n#twhile(LL_RCC_HSI_IsReady() != 1)#n#t{#n#t#t#n#t}"/>
+            </CallLibMethod>
+        </IFCondition>
+        <IFCondition Expression ="HSIUsed=1">
+            <CallLibMethod Name="LL_RCC_HSI_SetCalibTrimming">
+                <MethodArg Name="Value" ParameterName="HSICalibrationValue"/>
+            </CallLibMethod>
+        </IFCondition>		
+		
+        <IFCondition Expression ="HSI14Used=1">
+            <CallLibMethod Name="LL_RCC_HSI14_Enable"/>
+     
+            <CallLibMethod Name="" Type="HardCode">
+                <HardCode Text="#n#t /* Wait till HSI14 is ready */#n#twhile(LL_RCC_HSI14_IsReady() != 1)#n#t{#n#t#t#n#t}"/>
+            </CallLibMethod>
+        </IFCondition>
+        <IFCondition Expression ="HSI14Used=1">
+            <CallLibMethod Name="LL_RCC_HSI14_SetCalibTrimming">
+                <MethodArg Name="Value" ParameterName="HSI14CalibrationValue"/>
+            </CallLibMethod>
+        </IFCondition>
+		
+        <IFCondition Expression ="HSI48Used=1">
+            <CallLibMethod Name="LL_RCC_HSI48_Enable"/>
+
+            <CallLibMethod Name="" Type="HardCode">
+                <HardCode Text="#n#t /* Wait till HSI48 is ready */#n#twhile(LL_RCC_HSI48_IsReady() != 1)#n#t{#n#t#t#n#t}"/>
+            </CallLibMethod>
+        </IFCondition>
+		
+	
+	
+				
+        <IFCondition Expression ="LSIUsed=1">
+            <CallLibMethod Name="LL_RCC_LSI_Enable"/>
+
+            <CallLibMethod Name="" Type="HardCode">
+                <HardCode Text="#n#t /* Wait till LSI is ready */#n#twhile(LL_RCC_LSI_IsReady() != 1)#n#t{#n#t#t#n#t}"/>
+            </CallLibMethod>
+        </IFCondition>
+
+        <IFCondition Expression ="RTCUsed_ForRCC|(LSEUsed=1)">
+            <CallLibMethod Name="LL_PWR_EnableBkUpAccess">
+            </CallLibMethod>
+        </IFCondition> 	 
+		
+        <IFCondition Expression ="RTCUsed_ForRCC">
+            <CallLibMethod Name="LL_RCC_ForceBackupDomainReset">
+            </CallLibMethod>
+        </IFCondition>  
+		
+        <IFCondition Expression ="RTCUsed_ForRCC">
+            <CallLibMethod Name="LL_RCC_ReleaseBackupDomainReset">
+            </CallLibMethod>
+        </IFCondition>
+
+ 
+        <IFCondition Expression ="LSEUsed=1 &amp; LSEByPass">
+            <CallLibMethod Name="LL_RCC_LSE_EnableBypass"/>
+        </IFCondition>
+        <IFCondition Expression ="LSEOscillator &amp;(LSEUsed=1)">
+            <CallLibMethod Name="LL_RCC_LSE_SetDriveCapability">
+			 <MethodArg Name="LSEDrive" ParameterName="LSE_Drive_Capability"/>
+            </CallLibMethod>
+        
+        </IFCondition> 		
+        <IFCondition Expression ="LSEUsed=1">
+            <CallLibMethod Name="LL_RCC_LSE_Enable"/>
+         
+            <CallLibMethod Name="" Type="HardCode">
+                <HardCode Text="#n#t /* Wait till LSE is ready */#n#twhile(LL_RCC_LSE_IsReady() != 1)#n#t{#n#t#t#n#t}"/>
+            </CallLibMethod>
+        </IFCondition> 
+		        <IFCondition Expression ="RTCUsed_ForRCC|LCDUsed_ForRCC">
+            <CallLibMethod Name="LL_RCC_SetRTCClockSource">
+                <MethodArg Name="Source" ParameterName="RTCClockSelection"/>
+            </CallLibMethod>
+        </IFCondition>
+        <IFCondition Expression ="RTCUsed_ForRCC|LCDUsed_ForRCC">
+            <CallLibMethod Name="LL_RCC_EnableRTC"/>
+        </IFCondition>
+			
+
+		
+		        <!--CSS enable code gen-->
+        <IFCondition Expression ="CSSEnabled">
+            <CallLibMethod Name="LL_RCC_HSE_EnableCSS"/>
+        </IFCondition>
+		
+		
+        <!--PLL configuration-->
+		
+        <IFCondition Expression ="PLLUsed=1 &amp; (DIE448|DIE445|DIE442)">
+            <CallLibMethod Name="LL_RCC_PLL_ConfigDomain_SYS">
+                <MethodArg Name="Source" ParameterName="PLLSourceVirtual"/>
+                <MethodArg Name="PLLMul" ParameterName="PLLMUL"/>
+                <MethodArg Name="PLLDiv" ParameterName="PLLDivider"/>
+            </CallLibMethod>
+        </IFCondition>
+		
+        <IFCondition Expression ="PLLUsed=1 &amp; !(DIE448|DIE445|DIE442)">
+            <CallLibMethod Name="LL_RCC_PLL_ConfigDomain_SYS">
+                <MethodArg Name="Source" ParameterName="PLLSourceLL"/>
+                <MethodArg Name="PLLMul" ParameterName="PLLMUL"/>
+            </CallLibMethod>
+        </IFCondition>
+		
+		
+        <IFCondition Expression ="PLLUsed=1">
+            <CallLibMethod Name="LL_RCC_PLL_Enable"/>
+   
+            <CallLibMethod Name="" Type="HardCode">
+                <HardCode Text="#n#t /* Wait till PLL is ready */#n#twhile(LL_RCC_PLL_IsReady() != 1)#n#t{#n#t#t#n#t}"/>
+            </CallLibMethod>
+        </IFCondition>
+		
+		
+		
+        
+		
+        <IFCondition Expression ="1=1">
+
+            <CallLibMethod Name="LL_RCC_SetAHBPrescaler">
+                <MethodArg Name="Prescaler" ParameterName="AHBCLKDivider"/>
+            </CallLibMethod>
+        </IFCondition>
+
+     
+        <IFCondition Expression ="1=1">
+
+            <CallLibMethod Name="LL_RCC_SetAPB1Prescaler">
+                <MethodArg Name="Prescaler" ParameterName="APB1CLKDivider"/>
+            </CallLibMethod>
+        </IFCondition>
+
+     
+
+
+        <!--sys clock source + AHB/APB configuration-->
+        <IFCondition Expression ="1=1">
+
+            <CallLibMethod Name="LL_RCC_SetSysClkSource">
+                <MethodArg Name="Source" ParameterName="SYSCLKSource"/>
+            </CallLibMethod>
+        
+        
+        </IFCondition>
+        <IFCondition Expression ="SysSourcePLL">
+
+            <CallLibMethod Name="" Type="HardCode">
+                <HardCode Text="#n#t /* Wait till System clock is ready */#n#twhile(LL_RCC_GetSysClkSource() != LL_RCC_SYS_CLKSOURCE_STATUS_PLL)#n#t{#n#t#n#t}"/>
+            </CallLibMethod>
+        </IFCondition>
+        <IFCondition Expression ="SysSourceHSE">
+            <CallLibMethod Name="" Type="HardCode">
+                <HardCode Text="#n#t /* Wait till System clock is ready */#n#twhile(LL_RCC_GetSysClkSource() != LL_RCC_SYS_CLKSOURCE_STATUS_HSE)#n#t{#n#t#n#t}"/>
+            </CallLibMethod>
+        </IFCondition>
+        <IFCondition Expression ="SysSourceHSI">
+            <CallLibMethod Name="" Type="HardCode">
+                <HardCode Text="#n#t /* Wait till System clock is ready */#n#twhile(LL_RCC_GetSysClkSource() != LL_RCC_SYS_CLKSOURCE_STATUS_HSI)#n#t{#n#t#n#t}"/>
+            </CallLibMethod>
+        </IFCondition>
+        <IFCondition Expression ="SysSourceHSI48">
+            <CallLibMethod Name="" Type="HardCode">
+                <HardCode Text="#n#t /* Wait till System clock is ready */#n#twhile(LL_RCC_GetSysClkSource() != LL_RCC_SYS_CLKSOURCE_STATUS_HSI48)#n#t{#n#t#n#t}"/>
+            </CallLibMethod>
+        </IFCondition>
+
+
+        <!--system core frequency set,systick init,systick priority configuration-->
+
+        <IFCondition Expression ="1=1">
+
+            <CallLibMethod Name="LL_Init1msTick">
+                <MethodArg Name="HCLKFrequency" ParameterName="TimSysFreq_Value"/>
+            
+            </CallLibMethod>
+        </IFCondition>
+        <IFCondition Expression ="1=1">
+
+            <CallLibMethod Name="LL_SYSTICK_SetClkSource">
+                <MethodArg Name="Source" ParameterName="TimSys_Div"/>
+            
+            </CallLibMethod>
+        </IFCondition>
+
+
+        <IFCondition Expression ="1=1">
+
+            <CallLibMethod Name="LL_SetSystemCoreClock">
+                <MethodArg Name="HCLKFrequency" ParameterName="HCLKFreq_Value"/>
+            
+            </CallLibMethod>
+        </IFCondition>
+
+		
+        <!--peripheral clock source configuration -->
+        <IFCondition Expression ="channelSelectedADC&amp;ADCUsed_ForRCC">
+            <CallLibMethod Name="LL_RCC_HSI14_EnableADCControl">
+              
+            </CallLibMethod>
+        </IFCondition>     
+
+		<IFCondition Expression ="USART1Used_ForRCC">
+            <CallLibMethod Name="LL_RCC_SetUSARTClockSource">
+                <MethodArg Name="USARTxSource" ParameterName="Usart1ClockSelection"/>
+            </CallLibMethod>
+        </IFCondition>
+
+		
+        <IFCondition Expression ="USART2Used_ForRCC &amp;((DIE442 &amp;!STM32F0x0_Value_Line)|(DIE448 &amp;!STM32F0x0_Value_Line))">
+            <CallLibMethod Name="LL_RCC_SetUSARTClockSource">
+                <MethodArg Name="USARTxSource" ParameterName="Usart2ClockSelection"/>
+            </CallLibMethod>
+        </IFCondition>
+		
+        <IFCondition Expression ="USART3Used_ForRCC &amp; DIE442 &amp;!STM32F0x0_Value_Line">
+            <CallLibMethod Name="LL_RCC_SetUSARTClockSource">
+                <MethodArg Name="USARTxSource" ParameterName="Usart3ClockSelection"/>
+            </CallLibMethod>
+        </IFCondition>
+		
+
+		
+        <IFCondition Expression ="I2C1Used_ForRCC">
+            <CallLibMethod Name="LL_RCC_SetI2CClockSource">
+                <MethodArg Name="I2CxSource" ParameterName="I2c1ClockSelection"/>
+            </CallLibMethod>
+        </IFCondition>
+		
+		
+        <IFCondition Expression ="USBUsed_ForRCC">
+            <CallLibMethod Name="LL_RCC_SetUSBClockSource">
+                <MethodArg Name="USBxSource" ParameterName="USBClockSelectionARG"/>
+         
+            </CallLibMethod>
+        </IFCondition>
+		
+        <IFCondition Expression ="CECUsed_ForRCC">
+            <CallLibMethod Name="LL_RCC_SetCECClockSource">
+                <MethodArg Name="CECxSource" ParameterName="CECClockSelection"/>
+         
+            </CallLibMethod>
+        </IFCondition>
+		
+
+		
+        <!--MCO clock source -->
+        <IFCondition Expression ="(SEM2RCC_MCO_REQUIRED_TIM14 &amp; TIM14 &amp; Semaphore_input_Channel1TIM14)|MCOConfig">
+            <CallLibMethod Name="LL_RCC_ConfigMCO">
+                <MethodArg Name="MCOxPrescaler" ParameterName="RCC_MCODiv"/>
+                <MethodArg Name="MCOxSource" ParameterName="RCC_MCOSource"/>
+            </CallLibMethod>
+        </IFCondition>
+		
+	   
+   
+	    <!--CRS PARAM -->
+		    <IFCondition Expression ="EnableCRS">
+            <CallLibMethod Name="LL_APB1_GRP1_EnableClock">
+                <MethodArg Name="Periphs" ParameterName="PERIPH_CRSAEG"/>
+            </CallLibMethod>
+        </IFCondition>  
+		
+		    <IFCondition Expression ="EnableCRS">
+            <CallLibMethod Name="LL_APB1_GRP1_ForceReset">
+                <MethodArg Name="Periphs" ParameterName="PERIPH_CRSAEG"/>
+            </CallLibMethod>
+        </IFCondition>  
+		
+		    <IFCondition Expression ="EnableCRS">
+            <CallLibMethod Name="LL_APB1_GRP1_ReleaseReset">
+                <MethodArg Name="Periphs" ParameterName="PERIPH_CRSAEG"/>
+            </CallLibMethod>
+        </IFCondition>  
+		
+		
+        <IFCondition Expression ="EnableCRS">
+            <CallLibMethod Name="LL_CRS_SetSyncDivider">
+                <MethodArg Name="Divider" ParameterName="Prescaler"/>
+            </CallLibMethod>
+        </IFCondition>  
+		
+		<IFCondition Expression ="EnableCRS">
+            <CallLibMethod Name="LL_CRS_SetSyncPolarity">
+                <MethodArg Name="Divider" ParameterName="Polarity"/>
+            </CallLibMethod>
+        </IFCondition>
+
+		<IFCondition Expression ="EnableCRS">
+            <CallLibMethod Name="LL_CRS_SetSyncSignalSource">
+                <MethodArg Name="Source" ParameterName="Source"/>
+            </CallLibMethod>
+        </IFCondition>
+	
+		
+		<IFCondition Expression ="EnableCRS">
+            <CallLibMethod Name="LL_CRS_SetReloadCounter">
+                <MethodArg Name="Value" ParameterName="ReloadValueARGLL"/>
+            </CallLibMethod>
+        </IFCondition>
+		<IFCondition Expression ="EnableCRS">
+            <CallLibMethod Name="LL_CRS_SetFreqErrorLimit">
+                <MethodArg Name="Value" ParameterName="ErrorLimitValue"/>
+            </CallLibMethod>
+        </IFCondition>
+		<IFCondition Expression ="EnableCRS">
+            <CallLibMethod Name="LL_CRS_SetHSI48SmoothTrimming">
+                <MethodArg Name="Value" ParameterName="HSI48CalibrationValue"/>
+            </CallLibMethod>
+        </IFCondition>
+		
+	   
+    </RefConfig>
+
+    
+
+    <LibMethod Comment="" Name="LL_FLASH_SetLatency">
+        <Argument AddressOf="false" GenericType="simple" Name="FLatency"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_RCC_LSE_SetDriveCapability">
+        <Argument AddressOf="false" GenericType="simple" Name="LSEDrive"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_RCC_HSE_EnableCSS"/>
+          
+    <LibMethod Comment="" Name="LL_RCC_HSE_EnableBypass" />
+    
+    <LibMethod Comment="" Name="LL_RCC_HSE_Enable"/>
+
+    <LibMethod Comment="" Name="LL_RCC_HSI_Enable"/>
+    
+    <LibMethod Comment="" Name="LL_RCC_HSI48_Enable"/>
+  
+    <LibMethod Comment="" Name="LL_RCC_LSE_Enable"/>
+	
+    <LibMethod Comment="" Name="LL_RCC_LSE_EnableBypass"/>
+	
+    <LibMethod Comment="" Name="LL_RCC_LSE_EnableCSS"/>
+	
+    <LibMethod Comment="" Name="LL_RCC_LSI_Enable"/>	
+	
+    <LibMethod Comment="" Name="LL_RCC_HSI14_Enable"/>
+    <LibMethod Comment="" Name="LL_RCC_HSI14_EnableADCControl"/>
+	
+	
+
+    <LibMethod Comment="" Name="LL_RCC_HSI14_SetCalibTrimming">
+        <Argument AddressOf="false" GenericType="simple" Name="Value"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_RCC_HSI_SetCalibTrimming">
+        <Argument AddressOf="false" GenericType="simple" Name="Value"/>
+    </LibMethod>
+	
+
+	
+    <LibMethod Comment="" Name="LL_RCC_SetCECClockSource">
+        <Argument AddressOf="false" GenericType="simple" Name="CECxSource"/>
+    </LibMethod>    
+	
+	<LibMethod Comment="" Name="LL_RCC_SetSysClkSource">
+        <Argument AddressOf="false" GenericType="simple" Name="Source"/>
+    </LibMethod>
+	
+    <LibMethod Comment="" Name="LL_RCC_SetAHBPrescaler">
+        <Argument AddressOf="false" GenericType="simple" Name="Prescaler"/>
+    </LibMethod>
+	
+    <LibMethod Comment="" Name="LL_RCC_SetAPB1Prescaler">
+        <Argument AddressOf="false" GenericType="simple" Name="Prescaler"/>
+    </LibMethod>
+	
+
+	
+    <LibMethod Comment="" Name="LL_RCC_ConfigMCO">
+        <Argument AddressOf="false" GenericType="simple" Name="MCOxSource"/>
+        <Argument AddressOf="false" GenericType="simple" Name="MCOxPrescaler"/>
+    </LibMethod>
+	
+    <LibMethod Comment="" Name="LL_RCC_SetUSARTClockSource">
+        <Argument AddressOf="false" GenericType="simple" Name="USARTxSource"/>
+    </LibMethod>
+	
+
+	
+    <LibMethod Comment="" Name="LL_RCC_SetI2CClockSource">
+        <Argument AddressOf="false" GenericType="simple" Name="I2CxSource"/>
+    </LibMethod>
+	
+
+	
+
+	
+    <LibMethod Comment="" Name="LL_RCC_SetUSBClockSource">
+        <Argument AddressOf="false" GenericType="simple" Name="USBxSource"/>
+    </LibMethod>
+	
+   
+	
+    <LibMethod Comment="" Name="LL_RCC_SetRTCClockSource">
+        <Argument AddressOf="false" GenericType="simple" Name="Source"/>
+    </LibMethod>
+	
+    <LibMethod Comment="" Name="LL_RCC_EnableRTC"/>
+	
+    <LibMethod Comment="" Name="LL_PWR_EnableBkUpAccess"/>
+    <LibMethod Comment="" Name="LL_RCC_ForceBackupDomainReset"/>
+    <LibMethod Comment="" Name="LL_RCC_ReleaseBackupDomainReset"/>
+    <LibMethod Comment="" Name="LL_RCC_PLL_Enable"/>
+	
+    <LibMethod Comment="" Name="LL_RCC_PLL_ConfigDomain_SYS" >
+	
+        <Argument AddressOf="false" GenericType="simple" Name="Source"/>
+        <Argument AddressOf="false" GenericType="simple" Name="PLLMul"/>
+        <Argument AddressOf="false" GenericType="simple" Name="PLLDiv"/>
+        <Condition Diagnostic="APB1 timer clock" Expression="(DIE448|DIE445|DIE442)"/>
+    </LibMethod>
+	
+	 <LibMethod Comment="" Name="LL_RCC_PLL_ConfigDomain_SYS" >
+	
+        <Argument AddressOf="false" GenericType="simple" Name="Source"/>
+        <Argument AddressOf="false" GenericType="simple" Name="PLLMul"/>
+        <Condition Diagnostic="APB1 timer clock" Expression="!(DIE448|DIE445|DIE442)"/>
+    </LibMethod>
+
+
+	
+
+	
+
+	
+
+
+    <LibMethod Comment="" Name="LL_SetSystemCoreClock">
+        <Argument AddressOf="false" GenericType="simple" Name="HCLKFrequency"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_Init1msTick">
+        <Argument AddressOf="false" GenericType="simple" Name="HCLKFrequency"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_SYSTICK_SetClkSource">
+        <Argument AddressOf="false" GenericType="simple" Name="Source"/>
+    </LibMethod>
+	    <LibMethod Comment="" Name="LL_APB1_GRP1_EnableClock">
+        <Argument AddressOf="false" GenericType="simple" Name="Periphs"/>
+    </LibMethod>
+	    <LibMethod Comment="" Name="LL_APB1_GRP1_ForceReset">
+        <Argument AddressOf="false" GenericType="simple" Name="Periphs"/>
+    </LibMethod>
+	    <LibMethod Comment="" Name="LL_APB1_GRP1_ReleaseReset">
+        <Argument AddressOf="false" GenericType="simple" Name="Periphs"/>
+    </LibMethod>
+	    <LibMethod Comment="" Name="LL_CRS_SetSyncDivider">
+        <Argument AddressOf="false" GenericType="simple" Name="Divider"/>
+    </LibMethod>
+	    <LibMethod Comment="" Name="LL_CRS_SetSyncPolarity">
+        <Argument AddressOf="false" GenericType="simple" Name="Polarity"/>
+    </LibMethod>
+	    <LibMethod Comment="" Name="LL_CRS_SetSyncSignalSource">
+        <Argument AddressOf="false" GenericType="simple" Name="Source"/>
+    </LibMethod>
+	    <LibMethod Comment="" Name="LL_CRS_SetReloadCounter">
+        <Argument AddressOf="false" GenericType="simple" Name="Value"/>
+    </LibMethod>
+	    <LibMethod Comment="" Name="LL_CRS_SetFreqErrorLimit">
+        <Argument AddressOf="false" GenericType="simple" Name="Value"/>
+    </LibMethod>
+	    <LibMethod Comment="" Name="LL_CRS_SetHSI48SmoothTrimming">
+        <Argument AddressOf="false" GenericType="simple" Name="Value"/>
+    </LibMethod>
+    <RefComponent Cclass="HAL" Cgroup="RCC" Cversion="1.5.0">
+        <File Category="header" Name="Drivers/STM32F0xx_HAL_Driver/Inc/stm32f0xx_ll_bus.h"/>
+        <File Category="header" Name="Drivers/STM32F0xx_HAL_Driver/Inc/stm32f0xx_ll_cortex.h"/>
+        <File Category="header" Name="Drivers/STM32F0xx_HAL_Driver/Inc/stm32f0xx_ll_rcc.h"/>
+        <File Category="header" Name="Drivers/STM32F0xx_HAL_Driver/Inc/stm32f0xx_ll_crs.h"/>
+        <File Category="header" Name="Drivers/STM32F0xx_HAL_Driver/Inc/stm32f0xx_ll_system.h"/>
+        <File Category="header" Name="Drivers/STM32F0xx_HAL_Driver/Inc/stm32f0xx_ll_utils.h"/>
+        <File Category="header" Name="Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_utils.c"/> 
+		<File Category="header" Name="Drivers/STM32F0xx_HAL_Driver/Inc/stm32f0xx_ll_exti.h"/>
+        <File Category="header" Name="Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_exti.c"/>
+        <File Category="header" Name="Drivers/STM32F0xx_HAL_Driver/Inc/stm32f0xx_ll_pwr.h"/>
+        <File Category="header" Name="Drivers/STM32F0xx_HAL_Driver/Inc/stm32f0xx_ll_gpio.h"/>
+        <File Category="header" Name="Drivers/STM32F0xx_HAL_Driver/Inc/stm32f0xx_ll_dma.h"/>
+    </RefComponent>
+</IP>

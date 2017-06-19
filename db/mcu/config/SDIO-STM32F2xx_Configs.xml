@@ -1,24 +1,42 @@
 <?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
-<IP xmlns="http://mcd.rou.st.com/modules.php?name=mcu" DBVersion="V4.0" IncludeFile="stm32f2xx_hal.h" Name="SDIO" Version="STM32Cube_FW_F2_V1.1.0" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Configs.xsd">
+<IP xmlns="http://mcd.rou.st.com/modules.php?name=mcu" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" DBVersion="V4.0" IncludeFile="stm32f2xx_hal.h" Name="SDIO" Version="STM32Cube_FW_F2_V1.5.0" ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Configs.xsd">
     <RefConfig Name="SD_Init">
-        <CallLibMethod Name="HAL_SD_Init"/>
+        <CallLibMethod Name="HAL_SD_Init" ReturnHAL="HAL_OK"/>
         <ImplementCallBack Name="HAL_SD_MspInit"/>
         <ImplementCallBack Name="HAL_SD_MspDeInit"/>
+        <Component Name="HAL:SDIO:SD"/>
     </RefConfig>
     <RefConfig Name="SD_WideBus_Config">
-        <CallLibMethod Name="HAL_SD_WideBusOperation_Config"/>
+        <CallLibMethod Name="HAL_SD_ConfigWideBusOperation" ReturnHAL="false"/>
+        <Component Name="HAL:SDIO:SD"/>
+    </RefConfig>
+   <RefConfig Name="MMC_Init">
+        <CallLibMethod Name="HAL_MMC_Init"  ReturnHAL="HAL_OK"/>
+        <ImplementCallBack Name="HAL_MMC_MspInit"/>
+        <ImplementCallBack Name="HAL_MMC_MspDeInit"/>
+        <Component Name="HAL:SDIO:MMC"/>
+    </RefConfig>
+    <RefConfig Name="MMC_WideBus_Config">
+        <CallLibMethod Name="HAL_MMC_ConfigWideBusOperation" ReturnHAL="false"/>
+        <Component Name="HAL:SDIO:MMC"/>
     </RefConfig>
 
-    <RefComponent Cclass="HAL" Cgroup="SDIO" Cversion="1.1.0">
-        <File Category="header" Name="Drivers/STM32F2xx_HAL_Driver/Inc/stm32f2xx_hal_sd.h"/>
+    <RefComponent Cclass="HAL" Cgroup="SDIO" Cversion="1.5.0">
         <File Category="header" Name="Drivers/STM32F2xx_HAL_Driver/Inc/stm32f2xx_ll_sdmmc.h"/>
-        <File Category="source" Name="Drivers/STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_sd.c"/>
         <File Category="source" Name="Drivers/STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c"/>
+        <SubComponent Csub="SD" >
+            <File Category="header" Name="Drivers/STM32F2xx_HAL_Driver/Inc/stm32f2xx_hal_sd.h"/>
+            <File Category="source" Name="Drivers/STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_sd.c"/>
+        </SubComponent>
+        <SubComponent Csub="MMC" >
+            <File Category="header" Name="Drivers/STM32F2xx_HAL_Driver/Inc/stm32f2xx_hal_mmc.h"/>
+            <File Category="source" Name="Drivers/STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_mmc.c"/>
+       </SubComponent>        
     </RefComponent>
  
     <LibMethod Comment="" Name="HAL_SD_Init">
        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hsd" TypeName="SD_HandleTypeDef">
-            <Argument AddressOf="false" GenericType="enum" Name="Instance" TypeName="SD_TypeDef"/>
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="SD_TypeDef"/>
             <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="SD_InitTypeDef">
                 <Argument AddressOf="false" GenericType="simple" Name="ClockEdge"/>
                 <Argument AddressOf="false" GenericType="simple" Name="ClockBypass"/>
@@ -27,80 +45,25 @@
                 <Argument AddressOf="false" GenericType="simple" Name="HardwareFlowControl"/>
                 <Argument AddressOf="false" GenericType="simple" Name="ClockDiv"/>
             </Argument>
-            <Argument AddressOf="false" GenericType="simple" Name="Lock"/>
-            <Argument AddressOf="false" GenericType="simple" Name="CardType"/>
-            <Argument AddressOf="false" GenericType="simple" Name="RCA"/>
-            <Argument AddressOf="false" GenericType="simple" Name="CSD"/>
-            <Argument AddressOf="false" GenericType="simple" Name="CID"/>
-            <Argument AddressOf="false" GenericType="simple" Name="SdTransferCplt"/>
-            <Argument AddressOf="false" GenericType="simple" Name="SdTransferErr"/>
-            <Argument AddressOf="false" GenericType="simple" Name="DmaTransferCplt"/>
-            <Argument AddressOf="false" GenericType="simple" Name="SdOperation"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" TypeName="HAL_LockTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="pTxBuffPtr"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferSize"/>
+            <Argument AddressOf="false" GenericType="simple" Name="pRxBuffPtr"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferSize"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Context"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" TypeName="HAL_SD_StateTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode"/>
             <Argument AddressOf="true" GenericType="simple" Name="hdmarx" TypeName="DMA_HandleTypeDef"/>
             <Argument AddressOf="true" GenericType="simple" Name="hdmatx" TypeName="DMA_HandleTypeDef"/>
-        </Argument>
-        <Argument AddressOf="true" GenericType="struct" Name="SDCardInfo" TypeName="HAL_SD_CardInfoTypedef" Context="global" Optional="output">
-            <Argument AddressOf="false" GenericType="struct" Name="SD_csd" TypeName="HAL_SD_CSDTypedef">
-                <Argument AddressOf="false" GenericType="simple" Name="CSDStruct"/>
-                <Argument AddressOf="false" GenericType="simple" Name="SysSpecVersion"/>
-                <Argument AddressOf="false" GenericType="simple" Name="Reserved1"/>
-                <Argument AddressOf="false" GenericType="simple" Name="TAAC"/>
-                <Argument AddressOf="false" GenericType="simple" Name="NSAC"/>
-                <Argument AddressOf="false" GenericType="simple" Name="MaxBusClkFrec"/>
-                <Argument AddressOf="false" GenericType="simple" Name="CardComdClasses"/>
-                <Argument AddressOf="false" GenericType="simple" Name="RdBlockLen"/>
-                <Argument AddressOf="false" GenericType="simple" Name="PartBlockRead"/>
-                <Argument AddressOf="false" GenericType="simple" Name="WrBlockMisalign"/>
-                <Argument AddressOf="false" GenericType="simple" Name="RdBlockMisalign"/>
-                <Argument AddressOf="false" GenericType="simple" Name="DSRImpl"/>
-                <Argument AddressOf="false" GenericType="simple" Name="Reserved2"/>
-                <Argument AddressOf="false" GenericType="simple" Name="DeviceSize"/>
-                <Argument AddressOf="false" GenericType="simple" Name="MaxRdCurrentVDDMin"/>
-                <Argument AddressOf="false" GenericType="simple" Name="MaxRdCurrentVDDMax"/>
-                <Argument AddressOf="false" GenericType="simple" Name="MaxWrCurrentVDDMin"/>
-                <Argument AddressOf="false" GenericType="simple" Name="MaxWrCurrentVDDMax"/>
-                <Argument AddressOf="false" GenericType="simple" Name="DeviceSizeMul"/>
-                <Argument AddressOf="false" GenericType="simple" Name="EraseGrSize"/>
-                <Argument AddressOf="false" GenericType="simple" Name="EraseGrMul"/>
-                <Argument AddressOf="false" GenericType="simple" Name="WrProtectGrSize"/>
-                <Argument AddressOf="false" GenericType="simple" Name="WrProtectGrEnable"/>
-                <Argument AddressOf="false" GenericType="simple" Name="ManDeflECC"/>
-                <Argument AddressOf="false" GenericType="simple" Name="WrSpeedFact"/>
-                <Argument AddressOf="false" GenericType="simple" Name="MaxWrBlockLen"/>
-                <Argument AddressOf="false" GenericType="simple" Name="WriteBlockPaPartial"/>
-                <Argument AddressOf="false" GenericType="simple" Name="Reserved3"/>
-                <Argument AddressOf="false" GenericType="simple" Name="ContentProtectAppli"/>
-                <Argument AddressOf="false" GenericType="simple" Name="FileFormatGrouop"/>
-                <Argument AddressOf="false" GenericType="simple" Name="CopyFlag"/>
-                <Argument AddressOf="false" GenericType="simple" Name="PermWrProtect"/>
-                <Argument AddressOf="false" GenericType="simple" Name="TempWrProtect"/>
-                <Argument AddressOf="false" GenericType="simple" Name="FileFormat"/>
-                <Argument AddressOf="false" GenericType="simple" Name="ECC"/>
-                <Argument AddressOf="false" GenericType="simple" Name="CSD_CRC"/>
-                <Argument AddressOf="false" GenericType="simple" Name="Reserved4"/>
-            </Argument>
-            <Argument AddressOf="false" GenericType="struct" Name="SD_cid" TypeName="HAL_SD_CIDTypedef">
-                <Argument AddressOf="false" GenericType="simple" Name="ManufacturerID"/>
-                <Argument AddressOf="false" GenericType="simple" Name="OEM_AppliID"/>
-                <Argument AddressOf="false" GenericType="simple" Name="ProdName1"/>
-                <Argument AddressOf="false" GenericType="simple" Name="ProdName2"/>
-                <Argument AddressOf="false" GenericType="simple" Name="ProdRev"/>
-                <Argument AddressOf="false" GenericType="simple" Name="ProdSN"/>
-                <Argument AddressOf="false" GenericType="simple" Name="Reserved1"/>
-                <Argument AddressOf="false" GenericType="simple" Name="ManufactDate"/>
-                <Argument AddressOf="false" GenericType="simple" Name="CID_CRC"/>
-                <Argument AddressOf="false" GenericType="simple" Name="Reserved2"/>
-            </Argument>
-            <Argument AddressOf="false" GenericType="simple" Name="CardCapacity"/>
-            <Argument AddressOf="false" GenericType="simple" Name="CardBlockSize"/>
-            <Argument AddressOf="false" GenericType="simple" Name="RCA"/>
-            <Argument AddressOf="false" GenericType="simple" Name="CardType"/>
+            <Argument AddressOf="false" GenericType="simple" Name="SdCard" TypeName="HAL_SD_CardInfoTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="CSD"/>
+            <Argument AddressOf="true" GenericType="simple" Name="CID"/>
         </Argument>
     </LibMethod>
 
     <LibMethod Comment="" Name="HAL_SD_DeInit">
         <Argument AddressOf="true" Context="global" GenericType="struct" Name="hsd" TypeName="SD_HandleTypeDef">
-            <Argument AddressOf="false" GenericType="enum" Name="Instance" TypeName="SD_TypeDef"/>
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="SD_TypeDef"/>
             <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="SDIO_InitTypeDef">
                 <Argument AddressOf="false" GenericType="simple" Name="ClockEdge"/>
                 <Argument AddressOf="false" GenericType="simple" Name="ClockBypass"/>
@@ -109,23 +72,25 @@
                 <Argument AddressOf="false" GenericType="simple" Name="HardwareFlowControl"/>
                 <Argument AddressOf="false" GenericType="simple" Name="ClockDiv"/>
             </Argument>
-            <Argument AddressOf="false" GenericType="simple" Name="Lock"/>
-            <Argument AddressOf="false" GenericType="simple" Name="CardType"/>
-            <Argument AddressOf="false" GenericType="simple" Name="RCA"/>
-            <Argument AddressOf="false" GenericType="simple" Name="CSD"/>
-            <Argument AddressOf="false" GenericType="simple" Name="CID"/>
-            <Argument AddressOf="false" GenericType="simple" Name="SdTransferCplt"/>
-            <Argument AddressOf="false" GenericType="simple" Name="SdTransferErr"/>
-            <Argument AddressOf="false" GenericType="simple" Name="DmaTransferCplt"/>
-            <Argument AddressOf="false" GenericType="simple" Name="SdOperation"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" TypeName="HAL_LockTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="pTxBuffPtr"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferSize"/>
+            <Argument AddressOf="false" GenericType="simple" Name="pRxBuffPtr"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferSize"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Context"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" TypeName="HAL_SD_StateTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode"/>
             <Argument AddressOf="true" GenericType="simple" Name="hdmarx" TypeName="DMA_HandleTypeDef"/>
             <Argument AddressOf="true" GenericType="simple" Name="hdmatx" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="SdCard" TypeName="HAL_SD_CardInfoTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="CSD"/>
+            <Argument AddressOf="true" GenericType="simple" Name="CID"/>
         </Argument>
     </LibMethod>
 
     <LibMethod Comment="" Name="HAL_SD_MspInit">
         <Argument AddressOf="true" Context="global" GenericType="struct" Name="hsd" TypeName="SD_HandleTypeDef">
-            <Argument AddressOf="false" GenericType="enum" Name="Instance" TypeName="SD_TypeDef"/>
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="SD_TypeDef"/>
             <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="SDIO_InitTypeDef">
                 <Argument AddressOf="false" GenericType="simple" Name="ClockEdge"/>
                 <Argument AddressOf="false" GenericType="simple" Name="ClockBypass"/>
@@ -134,23 +99,25 @@
                 <Argument AddressOf="false" GenericType="simple" Name="HardwareFlowControl"/>
                 <Argument AddressOf="false" GenericType="simple" Name="ClockDiv"/>
             </Argument>
-            <Argument AddressOf="false" GenericType="simple" Name="Lock"/>
-            <Argument AddressOf="false" GenericType="simple" Name="CardType"/>
-            <Argument AddressOf="false" GenericType="simple" Name="RCA"/>
-            <Argument AddressOf="false" GenericType="simple" Name="CSD"/>
-            <Argument AddressOf="false" GenericType="simple" Name="CID"/>
-            <Argument AddressOf="false" GenericType="simple" Name="SdTransferCplt"/>
-            <Argument AddressOf="false" GenericType="simple" Name="SdTransferErr"/>
-            <Argument AddressOf="false" GenericType="simple" Name="DmaTransferCplt"/>
-            <Argument AddressOf="false" GenericType="simple" Name="SdOperation"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" TypeName="HAL_LockTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="pTxBuffPtr"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferSize"/>
+            <Argument AddressOf="false" GenericType="simple" Name="pRxBuffPtr"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferSize"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Context"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" TypeName="HAL_SD_StateTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode"/>
             <Argument AddressOf="true" GenericType="simple" Name="hdmarx" TypeName="DMA_HandleTypeDef"/>
             <Argument AddressOf="true" GenericType="simple" Name="hdmatx" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="SdCard" TypeName="HAL_SD_CardInfoTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="CSD"/>
+            <Argument AddressOf="true" GenericType="simple" Name="CID"/>
         </Argument>
     </LibMethod>
 
     <LibMethod Comment="" Name="HAL_SD_MspDeInit">
         <Argument AddressOf="true" Context="global" GenericType="struct" Name="hsd" TypeName="SD_HandleTypeDef">
-            <Argument AddressOf="false" GenericType="enum" Name="Instance" TypeName="SD_TypeDef"/>
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="SD_TypeDef"/>
             <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="SDIO_InitTypeDef">
                 <Argument AddressOf="false" GenericType="simple" Name="ClockEdge"/>
                 <Argument AddressOf="false" GenericType="simple" Name="ClockBypass"/>
@@ -159,23 +126,25 @@
                 <Argument AddressOf="false" GenericType="simple" Name="HardwareFlowControl"/>
                 <Argument AddressOf="false" GenericType="simple" Name="ClockDiv"/>
             </Argument>
-            <Argument AddressOf="false" GenericType="simple" Name="Lock"/>
-            <Argument AddressOf="false" GenericType="simple" Name="CardType"/>
-            <Argument AddressOf="false" GenericType="simple" Name="RCA"/>
-            <Argument AddressOf="false" GenericType="simple" Name="CSD"/>
-            <Argument AddressOf="false" GenericType="simple" Name="CID"/>
-            <Argument AddressOf="false" GenericType="simple" Name="SdTransferCplt"/>
-            <Argument AddressOf="false" GenericType="simple" Name="SdTransferErr"/>
-            <Argument AddressOf="false" GenericType="simple" Name="DmaTransferCplt"/>
-            <Argument AddressOf="false" GenericType="simple" Name="SdOperation"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" TypeName="HAL_LockTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="pTxBuffPtr"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferSize"/>
+            <Argument AddressOf="false" GenericType="simple" Name="pRxBuffPtr"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferSize"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Context"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" TypeName="HAL_SD_StateTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode"/>
             <Argument AddressOf="true" GenericType="simple" Name="hdmarx" TypeName="DMA_HandleTypeDef"/>
             <Argument AddressOf="true" GenericType="simple" Name="hdmatx" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="SdCard" TypeName="HAL_SD_CardInfoTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="CSD"/>
+            <Argument AddressOf="true" GenericType="simple" Name="CID"/>
         </Argument>
     </LibMethod>
 
-    <LibMethod Comment="" Name="HAL_SD_WideBusOperation_Config">
+    <LibMethod Comment="" Name="HAL_SD_ConfigWideBusOperation">
         <Argument AddressOf="true" Context="global" GenericType="struct" Name="hsd" TypeName="SD_HandleTypeDef">
-            <Argument AddressOf="false" GenericType="simple" Name="Instance" TypeName="SD_TypeDef"/>
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="SD_TypeDef"/>
             <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="SDIO_InitTypeDef">
                 <Argument AddressOf="false" GenericType="simple" Name="ClockEdge"/>
                 <Argument AddressOf="false" GenericType="simple" Name="ClockBypass"/>
@@ -184,17 +153,155 @@
                 <Argument AddressOf="false" GenericType="simple" Name="HardwareFlowControl"/>
                 <Argument AddressOf="false" GenericType="simple" Name="ClockDiv"/>
             </Argument>
-            <Argument AddressOf="false" GenericType="simple" Name="Lock"/>
-            <Argument AddressOf="false" GenericType="simple" Name="CardType"/>
-            <Argument AddressOf="false" GenericType="simple" Name="RCA"/>
-            <Argument AddressOf="false" GenericType="simple" Name="CSD"/>
-            <Argument AddressOf="false" GenericType="simple" Name="CID"/>
-            <Argument AddressOf="false" GenericType="simple" Name="SdTransferCplt"/>
-            <Argument AddressOf="false" GenericType="simple" Name="SdTransferErr"/>
-            <Argument AddressOf="false" GenericType="simple" Name="DmaTransferCplt"/>
-            <Argument AddressOf="false" GenericType="simple" Name="SdOperation"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" TypeName="HAL_LockTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="pTxBuffPtr"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferSize"/>
+            <Argument AddressOf="false" GenericType="simple" Name="pRxBuffPtr"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferSize"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Context"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" TypeName="HAL_SD_StateTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode"/>
             <Argument AddressOf="true" GenericType="simple" Name="hdmarx" TypeName="DMA_HandleTypeDef"/>
             <Argument AddressOf="true" GenericType="simple" Name="hdmatx" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="SdCard" TypeName="HAL_SD_CardInfoTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="CSD"/>
+            <Argument AddressOf="true" GenericType="simple" Name="CID"/>
+        </Argument>
+        <Argument AddressOf="false" GenericType="simple" Name="WideMode"/>
+    </LibMethod>
+
+    <LibMethod Comment="" Name="HAL_MMC_Init">
+       <Argument AddressOf="true" Context="global" GenericType="struct" Name="hmmc" TypeName="MMC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="MMC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="MMC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="ClockEdge"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockBypass"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPowerSave"/>
+                <Argument AddressOf="false" GenericType="simple" Name="BusWide"/>
+                <Argument AddressOf="false" GenericType="simple" Name="HardwareFlowControl"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockDiv"/>
+            </Argument>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" TypeName="HAL_LockTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="pTxBuffPtr"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferSize"/>
+            <Argument AddressOf="false" GenericType="simple" Name="pRxBuffPtr"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferSize"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Context"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" TypeName="HAL_MMC_StateTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="MmcCard" TypeName="HAL_MMC_CardInfoTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="CSD"/>
+            <Argument AddressOf="true" GenericType="simple" Name="CID"/>
+        </Argument>
+    </LibMethod>
+
+    <LibMethod Comment="" Name="HAL_MMC_DeInit">
+       <Argument AddressOf="true" Context="global" GenericType="struct" Name="hmmc" TypeName="MMC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="MMC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="MMC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="ClockEdge"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockBypass"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPowerSave"/>
+                <Argument AddressOf="false" GenericType="simple" Name="BusWide"/>
+                <Argument AddressOf="false" GenericType="simple" Name="HardwareFlowControl"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockDiv"/>
+            </Argument>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" TypeName="HAL_LockTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="pTxBuffPtr"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferSize"/>
+            <Argument AddressOf="false" GenericType="simple" Name="pRxBuffPtr"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferSize"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Context"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" TypeName="HAL_MMC_StateTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="MmcCard" TypeName="HAL_MMC_CardInfoTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="CSD"/>
+            <Argument AddressOf="true" GenericType="simple" Name="CID"/>
+        </Argument>
+    </LibMethod>
+
+    <LibMethod Comment="" Name="HAL_MMC_MspInit">
+       <Argument AddressOf="true" Context="global" GenericType="struct" Name="hmmc" TypeName="MMC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="MMC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="MMC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="ClockEdge"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockBypass"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPowerSave"/>
+                <Argument AddressOf="false" GenericType="simple" Name="BusWide"/>
+                <Argument AddressOf="false" GenericType="simple" Name="HardwareFlowControl"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockDiv"/>
+            </Argument>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" TypeName="HAL_LockTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="pTxBuffPtr"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferSize"/>
+            <Argument AddressOf="false" GenericType="simple" Name="pRxBuffPtr"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferSize"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Context"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" TypeName="HAL_MMC_StateTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="MmcCard" TypeName="HAL_MMC_CardInfoTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="CSD"/>
+            <Argument AddressOf="true" GenericType="simple" Name="CID"/>
+        </Argument>
+    </LibMethod>
+
+    <LibMethod Comment="" Name="HAL_MMC_MspDeInit">
+       <Argument AddressOf="true" Context="global" GenericType="struct" Name="hmmc" TypeName="MMC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="MMC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="MMC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="ClockEdge"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockBypass"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPowerSave"/>
+                <Argument AddressOf="false" GenericType="simple" Name="BusWide"/>
+                <Argument AddressOf="false" GenericType="simple" Name="HardwareFlowControl"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockDiv"/>
+            </Argument>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" TypeName="HAL_LockTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="pTxBuffPtr"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferSize"/>
+            <Argument AddressOf="false" GenericType="simple" Name="pRxBuffPtr"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferSize"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Context"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" TypeName="HAL_MMC_StateTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="MmcCard" TypeName="HAL_MMC_CardInfoTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="CSD"/>
+            <Argument AddressOf="true" GenericType="simple" Name="CID"/>
+        </Argument>
+    </LibMethod>
+
+    <LibMethod Comment="" Name="HAL_MMC_ConfigWideBusOperation">
+       <Argument AddressOf="true" Context="global" GenericType="struct" Name="hmmc" TypeName="MMC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="MMC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="MMC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="ClockEdge"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockBypass"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPowerSave"/>
+                <Argument AddressOf="false" GenericType="simple" Name="BusWide"/>
+                <Argument AddressOf="false" GenericType="simple" Name="HardwareFlowControl"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockDiv"/>
+            </Argument>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" TypeName="HAL_LockTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="pTxBuffPtr"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferSize"/>
+            <Argument AddressOf="false" GenericType="simple" Name="pRxBuffPtr"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferSize"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Context"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" TypeName="HAL_MMC_StateTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="MmcCard" TypeName="HAL_MMC_CardInfoTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="CSD"/>
+            <Argument AddressOf="true" GenericType="simple" Name="CID"/>
         </Argument>
         <Argument AddressOf="false" GenericType="simple" Name="WideMode"/>
     </LibMethod>

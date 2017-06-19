@@ -41,8 +41,7 @@
  extern "C" {
 #endif
 
-#include "mxconstants.h" [#-- for user defines --]
-
+#include "main.h"
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
 
@@ -52,12 +51,12 @@
   */
 
 #define HAL_MODULE_ENABLED  
-[#assign allModules = ["ADC", "COMP", "CRC", "CRYP", "DAC", "I2C", "I2S", "IRDA", "IWDG", "LCD", "NOR", "OPAMP", "PCD", "RTC", "SD", "SMARTCARD", "SPI", "SRAM", "TIM", "UART", "USART", "WWDG" ]]
+[#assign allModules = ["ADC", "AES", "COMP", "CRC", "CRYP", "DAC", "I2C", "I2S", "IRDA", "IWDG", "LCD", "NOR", "OPAMP", "PCD", "RTC", "SD", "SMARTCARD", "SPI", "SRAM", "TIM", "UART", "USART", "WWDG" ]]
   [#list allModules as module]
 	[#if isModuleUsed(module)]
-[#compress]#define HAL_${module}_MODULE_ENABLED[/#compress]
+[#compress]#define HAL_${module?replace("AES","CRYP")}_MODULE_ENABLED[/#compress]
 	[#else]
-//#define HAL_${module}_MODULE_ENABLED   
+/*#define HAL_${module?replace("AES","CRYP")}_MODULE_ENABLED   */
 	[/#if]	
   [/#list]
   [#function isModuleUsed moduleName]
@@ -88,7 +87,7 @@
 #endif /* HSE_VALUE */
 
 #if !defined  (HSE_STARTUP_TIMEOUT)
-  #define HSE_STARTUP_TIMEOUT    ((uint32_t)5000)   /*!< Time out for HSE start up, in ms */
+  #define HSE_STARTUP_TIMEOUT    ((uint32_t)[#if HSE_Timout??]${HSE_Timout}[#else]5000[/#if])   /*!< Time out for HSE start up, in ms */
 #endif /* HSE_STARTUP_TIMEOUT */
 
 /**
@@ -117,7 +116,7 @@
 
    
 #if !defined  (LSE_STARTUP_TIMEOUT)
-  #define LSE_STARTUP_TIMEOUT    ((uint32_t)5000)   /*!< Time out for LSE start up, in ms */
+  #define LSE_STARTUP_TIMEOUT    ((uint32_t)[#if LSE_Timout??]${LSE_Timout}[#else]5000[/#if])   /*!< Time out for LSE start up, in ms */
 #endif /* HSE_STARTUP_TIMEOUT */
 
    
@@ -271,11 +270,11 @@
   *         If expr is true, it returns no value.
   * @retval None
   */
-  #define assert_param(expr) ((expr) ? (void)0 : assert_failed((uint8_t *)__FILE__, __LINE__))
+  #define assert_param(expr) ((expr) ? (void)0U : assert_failed((uint8_t *)__FILE__, __LINE__))
 /* Exported functions ------------------------------------------------------- */
   void assert_failed(uint8_t* file, uint32_t line);
 #else
-  #define assert_param(expr) ((void)0)
+  #define assert_param(expr) ((void)0U)
 #endif /* USE_FULL_ASSERT */   
    
 #ifdef __cplusplus

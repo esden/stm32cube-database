@@ -106,7 +106,7 @@
 </RefParameter>
 
 
-<RefParameter Comment="Acknoledge Request after Each Transmission" DefaultValue="DSI_ACKNOWLEDGE_DISABLE" Name="AcknowledgeRequest" Type="list" TabName="Data and Clock Lanes" Group="Flow Control - Configuration">
+<RefParameter Comment="Acknowledge Request after Each Transmission" DefaultValue="DSI_ACKNOWLEDGE_DISABLE" Name="AcknowledgeRequest" Type="list" TabName="Data and Clock Lanes" Group="Flow Control - Configuration">
         <PossibleValue Comment="Disabled" Value="DSI_ACKNOWLEDGE_DISABLE"/>
         <PossibleValue Comment="Enabled" Value="DSI_ACKNOWLEDGE_ENABLE"/>
 </RefParameter>
@@ -426,7 +426,7 @@
 <RefParameter Comment="Number of Chuncks" DefaultValue="0" Name="NumberOfChunks" Type="integer" Min="0" Max="8191" TabName="Display Interface" Group="Video Mode Configuration" Visible="false">
  <Condition Diagnostic="" Expression="Semaphore_BURSTVIDEO$IpInstance"/> 
 </RefParameter>
-<RefParameter Comment="Null Packet Size" DefaultValue="0" Name="NullPacketSize" Type="integer"  Min="0" Max="8191"  TabName="Display Interface" Unit="Pixels" Group="Video Mode Configuration">
+<RefParameter Comment="Null Packet Size" DefaultValue="0" Name="NullPacketSize" Type="integer"  Min="0" Max="8191"  TabName="Display Interface" Unit="Bytes" Group="Video Mode Configuration">
  <Condition Diagnostic="" Expression="!Semaphore_BURSTVIDEO$IpInstance"/> 
        <Description>Each chunk is composed of Video Packet Size pixels followed by Null Packet Size in a way that LTDC interface input pixel ratio matches with the DSI output pixel ratio.
 &lt;br&gt;If Null Packet are allowed, the following equation has to be verified :
@@ -591,13 +591,13 @@
 </RefParameter>
 
 <RefParameter Comment="Data Enable Polarity (set in LTDC)" DefaultValue="DSI_DATA_ENABLE_ACTIVE_LOW" Name="DEPolarity" Type="string"  TabName="LTDC Interface" Group="Polarity of the Control Signals" Visible="true">
-<Condition Diagnostic="for the control signals, as the setting done in the LTDC IP has to be coherent with the setting done in the DSI, the setting can't be changed here. If it has to be changed, please change it in the LTDC IP." Expression="LTDC:DEPolarity = LTDC_DEPOLARITY_AL"/> 
+<Condition Diagnostic="for the control signals, as the setting done in the LTDC IP has to be coherent with the setting done in the DSI, the setting can't be changed here. If it has to be changed, please change it in the LTDC IP." Expression="LTDC:DEPolarity = LTDC_DEPOLARITY_AH"/> 
         <PossibleValue Comment="PIN is Active High" Value="DSI_DATA_ENABLE_ACTIVE_HIGH"/>
         <PossibleValue Comment="PIN is Active Low" Value="DSI_DATA_ENABLE_ACTIVE_LOW"/>
 </RefParameter>
 
 <RefParameter Comment="Data Enable Polarity (set in LTDC)" DefaultValue="DSI_DATA_ENABLE_ACTIVE_HIGH" Name="DEPolarity" Type="string"  TabName="LTDC Interface" Group="Polarity of the Control Signals" Visible="true">
-<Condition Diagnostic="for the control signals, as the setting done in the LTDC IP has to be coherent with the setting done in the DSI, the setting can't be changed here. If it has to be changed, please change it in the LTDC IP." Expression="LTDC:DEPolarity = LTDC_DEPOLARITY_AH"/> 
+<Condition Diagnostic="for the control signals, as the setting done in the LTDC IP has to be coherent with the setting done in the DSI, the setting can't be changed here. If it has to be changed, please change it in the LTDC IP." Expression="LTDC:DEPolarity = LTDC_DEPOLARITY_AL"/> 
         <PossibleValue Comment="PIN is Active High" Value="DSI_DATA_ENABLE_ACTIVE_HIGH"/>
         <PossibleValue Comment="PIN is Active Low" Value="DSI_DATA_ENABLE_ACTIVE_LOW"/>
 </RefParameter>
@@ -605,9 +605,16 @@
 <RefParameter Comment="Display ID" DefaultValue="0" Name="VirtualChannelID" Type="integer"  Min="0" Max="3" TabName="Display Interface" Group="Basic Settings">
 </RefParameter>
 <RefParameter Comment="Color Coding" DefaultValue="DSI_RGB565" Name="ColorCoding" Type="list"  TabName="Display Interface" Group="Basic Settings">
-        <PossibleValue Comment="16 bits" Value="DSI_RGB565"/>
-        <PossibleValue Comment="18 bits" Value="DSI_RGB666" Semaphore="Semaphore_EIGHTEENBITS$IpInstance"/>
-        <PossibleValue Comment="24 bits" Value="DSI_RGB888"/>
+ <Condition Diagnostic="" Expression="(Semaphore_LTDC_ConfiguredforDSI_16bits=1)"/>
+ <PossibleValue Comment="RGB565 (16 bits) - DSI mode" Value="DSI_RGB565"/>
+</RefParameter>
+<RefParameter Comment="Color Coding" DefaultValue="DSI_RGB666" Name="ColorCoding" Type="list"  TabName="Display Interface" Group="Basic Settings">
+ <Condition Diagnostic="" Expression="(Semaphore_LTDC_ConfiguredforDSI_18bits=1)"/>
+ <PossibleValue Comment="RGB666 (18 bits) - DSI mode" Value="DSI_RGB666" Semaphore="Semaphore_EIGHTEENBITS$IpInstance"/>
+</RefParameter>
+<RefParameter Comment="Color Coding" DefaultValue="DSI_RGB888" Name="ColorCoding" Type="list"  TabName="Display Interface" Group="Basic Settings">
+ <Condition Diagnostic="" Expression="(Semaphore_LTDC_ConfiguredforDSI_24bits=1)"/>
+ <PossibleValue Comment="RGB888 (24 bits) - DSI mode" Value="DSI_RGB565"/>
 </RefParameter>
 
 <!--<RefParameter Comment="Color Mode" DefaultValue="DSI_COLOR_MODE_FULL" Name="ColorMode" Type="list"  TabName="Display Interface" Group="Basic Settings">
@@ -826,10 +833,10 @@
         <PossibleValue Comment="Enable" Value="ENABLE" Semaphore="Semaphore_PHY_TCLK_POST_Enable$IpInstance"/>
 </RefParameter>
 
-<RefParameter Comment="      TCLK_POST Register Value" DefaultValue="200" Name="TimingPHY_TCLK_POST_Value" Type="int" TabName="PHY Timings" Min="0" Max="255" Group="Redefinition of PHY Timings" Mode="Advanced" Visible="false">
+<RefParameter Comment="      TCLK_POST Register Value" DefaultValue="200" Name="TimingPHY_TCLK_POST_Value" Type="integer" TabName="PHY Timings" Min="0" Max="255" Group="Redefinition of PHY Timings" Mode="Advanced" Visible="false">
  <Condition Diagnostic="" Expression="!Semaphore_PHY_TCLK_POST_Enable$IpInstance"/> 
 </RefParameter>
-<RefParameter Comment="      TCLK_POST Register Value" DefaultValue="200" Name="TimingPHY_TCLK_POST_Value" Type="int"  TabName="PHY Timings" Min="0" Max="255" Group="Redefinition of PHY Timings" Mode="Advanced" Visible="true">
+<RefParameter Comment="      TCLK_POST Register Value" DefaultValue="200" Name="TimingPHY_TCLK_POST_Value" Type="integer"  TabName="PHY Timings" Min="0" Max="255" Group="Redefinition of PHY Timings" Mode="Advanced" Visible="true">
        <Description>The default value set in this register defines the same timing as the hardware timing</Description>
  <Condition Diagnostic="" Expression="Semaphore_PHY_TCLK_POST_Enable$IpInstance"/> 
 </RefParameter>
@@ -850,10 +857,10 @@
         <PossibleValue Comment="Enable" Value="ENABLE" Semaphore="Semaphore_PHY_TLPX_CLK_Enable$IpInstance"/>
 </RefParameter>
 
-<RefParameter Comment="      TLPX_CLK Register Value" DefaultValue="100" Name="TimingPHY_TLPX_CLK_Value" Type="int" TabName="PHY Timings" Min="0" Max="255" Group="Redefinition of PHY Timings" Mode="Advanced" Visible="false">
+<RefParameter Comment="      TLPX_CLK Register Value" DefaultValue="100" Name="TimingPHY_TLPX_CLK_Value" Type="integer" TabName="PHY Timings" Min="0" Max="255" Group="Redefinition of PHY Timings" Mode="Advanced" Visible="false">
  <Condition Diagnostic="" Expression="!Semaphore_PHY_TLPX_CLK_Enable$IpInstance"/> 
 </RefParameter>
-<RefParameter Comment="      TLPX_CLK Register Value" DefaultValue="100" Name="TimingPHY_TLPX_CLK_Value" Type="int"  TabName="PHY Timings" Min="0" Max="255" Group="Redefinition of PHY Timings" Mode="Advanced" Visible="true">
+<RefParameter Comment="      TLPX_CLK Register Value" DefaultValue="100" Name="TimingPHY_TLPX_CLK_Value" Type="integer"  TabName="PHY Timings" Min="0" Max="255" Group="Redefinition of PHY Timings" Mode="Advanced" Visible="true">
        <Description>The default value set in this register defines the same timing as the hardware timing</Description>
  <Condition Diagnostic="" Expression="Semaphore_PHY_TLPX_CLK_Enable$IpInstance"/> 
 </RefParameter>
@@ -874,10 +881,10 @@
         <PossibleValue Comment="Enable" Value="ENABLE" Semaphore="Semaphore_PHY_THS_EXIT_Enable$IpInstance"/>
 </RefParameter>
 
-<RefParameter Comment="      THS_EXIT Register Value" DefaultValue="200" Name="TimingPHY_THS_EXIT_Value" Type="int" TabName="PHY Timings" Min="0" Max="255" Group="Redefinition of PHY Timings" Mode="Advanced" Visible="false">
+<RefParameter Comment="      THS_EXIT Register Value" DefaultValue="200" Name="TimingPHY_THS_EXIT_Value" Type="integer" TabName="PHY Timings" Min="0" Max="255" Group="Redefinition of PHY Timings" Mode="Advanced" Visible="false">
  <Condition Diagnostic="" Expression="!Semaphore_PHY_THS_EXIT_Enable$IpInstance"/> 
 </RefParameter>
-<RefParameter Comment="      THS_EXIT Register Value" DefaultValue="200" Name="TimingPHY_THS_EXIT_Value" Type="int"  TabName="PHY Timings" Min="0" Max="255" Group="Redefinition of PHY Timings" Mode="Advanced" Visible="true">
+<RefParameter Comment="      THS_EXIT Register Value" DefaultValue="200" Name="TimingPHY_THS_EXIT_Value" Type="integer"  TabName="PHY Timings" Min="0" Max="255" Group="Redefinition of PHY Timings" Mode="Advanced" Visible="true">
        <Description>The default value set in this register defines the same timing as the hardware timing</Description>
  <Condition Diagnostic="" Expression="Semaphore_PHY_THS_EXIT_Enable$IpInstance"/> 
 </RefParameter>
@@ -899,10 +906,10 @@
         <PossibleValue Comment="Enable" Value="ENABLE" Semaphore="Semaphore_PHY_TLPX_DATA_Enable$IpInstance"/>
 </RefParameter>
 
-<RefParameter Comment="      TLPX_DATA Register Value" DefaultValue="100" Name="TimingPHY_TLPX_DATA_Value" Type="int" TabName="PHY Timings" Min="0" Max="255" Group="Redefinition of PHY Timings" Mode="Advanced" Visible="false">
+<RefParameter Comment="      TLPX_DATA Register Value" DefaultValue="100" Name="TimingPHY_TLPX_DATA_Value" Type="integer" TabName="PHY Timings" Min="0" Max="255" Group="Redefinition of PHY Timings" Mode="Advanced" Visible="false">
  <Condition Diagnostic="" Expression="!Semaphore_PHY_TLPX_DATA_Enable$IpInstance"/> 
 </RefParameter>
-<RefParameter Comment="      TLPX_DATA Register Value" DefaultValue="100" Name="TimingPHY_TLPX_DATA_Value" Type="int"  TabName="PHY Timings" Min="0" Max="255" Group="Redefinition of PHY Timings" Mode="Advanced" Visible="true">
+<RefParameter Comment="      TLPX_DATA Register Value" DefaultValue="100" Name="TimingPHY_TLPX_DATA_Value" Type="integer"  TabName="PHY Timings" Min="0" Max="255" Group="Redefinition of PHY Timings" Mode="Advanced" Visible="true">
        <Description>The default value set in this register defines the same timing as the hardware timing</Description>
  <Condition Diagnostic="" Expression="Semaphore_PHY_TLPX_DATA_Enable$IpInstance"/> 
 </RefParameter>
@@ -924,10 +931,10 @@
         <PossibleValue Comment="Enable" Value="ENABLE" Semaphore="Semaphore_PHY_THS_ZERO_Enable$IpInstance"/>
 </RefParameter>
 
-<RefParameter Comment="      THS_ZERO Register Value" DefaultValue="175" Name="TimingPHY_THS_ZERO_Value" Type="int" TabName="PHY Timings" Min="0" Max="255" Group="Redefinition of PHY Timings" Mode="Advanced" Visible="false">
+<RefParameter Comment="      THS_ZERO Register Value" DefaultValue="175" Name="TimingPHY_THS_ZERO_Value" Type="integer" TabName="PHY Timings" Min="0" Max="255" Group="Redefinition of PHY Timings" Mode="Advanced" Visible="false">
  <Condition Diagnostic="" Expression="!Semaphore_PHY_THS_ZERO_Enable$IpInstance"/> 
 </RefParameter>
-<RefParameter Comment="      THS_ZERO Register Value" DefaultValue="175" Name="TimingPHY_THS_ZERO_Value" Type="int"  TabName="PHY Timings" Min="0" Max="255" Group="Redefinition of PHY Timings" Mode="Advanced" Visible="true">
+<RefParameter Comment="      THS_ZERO Register Value" DefaultValue="175" Name="TimingPHY_THS_ZERO_Value" Type="integer"  TabName="PHY Timings" Min="0" Max="255" Group="Redefinition of PHY Timings" Mode="Advanced" Visible="true">
        <Description>The default value set in this register defines the same timing as the hardware timing</Description>
  <Condition Diagnostic="" Expression="Semaphore_PHY_THS_ZERO_Enable$IpInstance"/> 
 </RefParameter>
@@ -948,10 +955,10 @@
         <PossibleValue Comment="Enable" Value="ENABLE" Semaphore="Semaphore_PHY_THS_TRAIL_Enable$IpInstance"/>
 </RefParameter>
 
-<RefParameter Comment="      THS_TRAIL Register Value" DefaultValue="140" Name="TimingPHY_THS_TRAIL_Value" Type="int" TabName="PHY Timings" Min="0" Max="255" Group="Redefinition of PHY Timings" Mode="Advanced" Visible="false">
+<RefParameter Comment="      THS_TRAIL Register Value" DefaultValue="140" Name="TimingPHY_THS_TRAIL_Value" Type="integer" TabName="PHY Timings" Min="0" Max="255" Group="Redefinition of PHY Timings" Mode="Advanced" Visible="false">
  <Condition Diagnostic="" Expression="!Semaphore_PHY_THS_TRAIL_Enable$IpInstance"/> 
 </RefParameter>
-<RefParameter Comment="      THS_TRAIL Register Value" DefaultValue="140" Name="TimingPHY_THS_TRAIL_Value" Type="int"  TabName="PHY Timings" Min="0" Max="255" Group="Redefinition of PHY Timings" Mode="Advanced" Visible="true">
+<RefParameter Comment="      THS_TRAIL Register Value" DefaultValue="140" Name="TimingPHY_THS_TRAIL_Value" Type="integer"  TabName="PHY Timings" Min="0" Max="255" Group="Redefinition of PHY Timings" Mode="Advanced" Visible="true">
        <Description>The default value set in this register defines the same timing as the hardware timing</Description>
  <Condition Diagnostic="" Expression="Semaphore_PHY_THS_TRAIL_Enable$IpInstance"/> 
 </RefParameter>
@@ -972,10 +979,10 @@
         <PossibleValue Comment="Enable" Value="ENABLE" Semaphore="Semaphore_PHY_THS_PREPARE_Enable$IpInstance"/>
 </RefParameter>
 
-<RefParameter Comment="      THS_PREPARE Register Value" DefaultValue="126" Name="TimingPHY_THS_PREPARE_Value" Type="int" TabName="PHY Timings" Min="0" Max="255" Group="Redefinition of PHY Timings" Mode="Advanced" Visible="false">
+<RefParameter Comment="      THS_PREPARE Register Value" DefaultValue="126" Name="TimingPHY_THS_PREPARE_Value" Type="integer" TabName="PHY Timings" Min="0" Max="255" Group="Redefinition of PHY Timings" Mode="Advanced" Visible="false">
  <Condition Diagnostic="" Expression="!Semaphore_PHY_THS_PREPARE_Enable$IpInstance"/> 
 </RefParameter>
-<RefParameter Comment="      THS_PREPARE Register Value" DefaultValue="126" Name="TimingPHY_THS_PREPARE_Value" Type="int"  TabName="PHY Timings" Min="0" Max="255" Group="Redefinition of PHY Timings" Mode="Advanced" Visible="true">
+<RefParameter Comment="      THS_PREPARE Register Value" DefaultValue="126" Name="TimingPHY_THS_PREPARE_Value" Type="integer"  TabName="PHY Timings" Min="0" Max="255" Group="Redefinition of PHY Timings" Mode="Advanced" Visible="true">
        <Description>The default value set in this register defines the same timing as the hardware timing</Description>
  <Condition Diagnostic="" Expression="Semaphore_PHY_THS_PREPARE_Enable$IpInstance"/> 
 </RefParameter>
@@ -995,10 +1002,10 @@
         <PossibleValue Comment="Enable" Value="ENABLE" Semaphore="Semaphore_PHY_TCLK_ZERO_Enable$IpInstance"/>
 </RefParameter>
 
-<RefParameter Comment="      TCLK_ZERO Register Value" DefaultValue="195" Name="TimingPHY_TCLK_ZERO_Value" Type="int" TabName="PHY Timings" Min="0" Max="255" Group="Redefinition of PHY Timings" Mode="Advanced" Visible="false">
+<RefParameter Comment="      TCLK_ZERO Register Value" DefaultValue="195" Name="TimingPHY_TCLK_ZERO_Value" Type="integer" TabName="PHY Timings" Min="0" Max="255" Group="Redefinition of PHY Timings" Mode="Advanced" Visible="false">
  <Condition Diagnostic="" Expression="!Semaphore_PHY_TCLK_ZERO_Enable$IpInstance"/> 
 </RefParameter>
-<RefParameter Comment="      TCLK_ZERO Register Value" DefaultValue="195" Name="TimingPHY_TCLK_ZERO_Value" Type="int"  TabName="PHY Timings" Min="0" Max="255" Group="Redefinition of PHY Timings" Mode="Advanced" Visible="true">
+<RefParameter Comment="      TCLK_ZERO Register Value" DefaultValue="195" Name="TimingPHY_TCLK_ZERO_Value" Type="integer"  TabName="PHY Timings" Min="0" Max="255" Group="Redefinition of PHY Timings" Mode="Advanced" Visible="true">
        <Description>The default value set in this register defines the same timing as the hardware timing</Description>
  <Condition Diagnostic="" Expression="Semaphore_PHY_TCLK_ZERO_Enable$IpInstance"/> 
 </RefParameter>
@@ -1019,10 +1026,10 @@
         <PossibleValue Comment="Enable" Value="ENABLE" Semaphore="Semaphore_PHY_TCLK_PREPARE_Enable$IpInstance"/>
 </RefParameter>
 
-<RefParameter Comment="      TCLK_PREPARE Register Value" DefaultValue="120" Name="TimingPHY_TCLK_PREPARE_Value" Type="int" TabName="PHY Timings" Min="0" Max="255" Group="Redefinition of PHY Timings" Mode="Advanced" Visible="false">
+<RefParameter Comment="      TCLK_PREPARE Register Value" DefaultValue="120" Name="TimingPHY_TCLK_PREPARE_Value" Type="integer" TabName="PHY Timings" Min="0" Max="255" Group="Redefinition of PHY Timings" Mode="Advanced" Visible="false">
  <Condition Diagnostic="" Expression="!Semaphore_PHY_TCLK_PREPARE_Enable$IpInstance"/> 
 </RefParameter>
-<RefParameter Comment="      TCLK_PREPARE Register Value" DefaultValue="120" Name="TimingPHY_TCLK_PREPARE_Value" Type="int"  TabName="PHY Timings" Min="0" Max="255" Group="Redefinition of PHY Timings" Mode="Advanced" Visible="true">
+<RefParameter Comment="      TCLK_PREPARE Register Value" DefaultValue="120" Name="TimingPHY_TCLK_PREPARE_Value" Type="integer"  TabName="PHY Timings" Min="0" Max="255" Group="Redefinition of PHY Timings" Mode="Advanced" Visible="true">
        <Description>The default value set in this register defines the same timing as the hardware timing</Description>
  <Condition Diagnostic="" Expression="Semaphore_PHY_TCLK_PREPARE_Enable$IpInstance"/> 
 </RefParameter>

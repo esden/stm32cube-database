@@ -5,7 +5,6 @@
     ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Configs.xsd"
     xmlns="http://mcd.rou.st.com/modules.php?name=mcu">
 
-<!-- MZA, Can we use the field comment to set the instance name (i.e. FATFS_SDIO, FSTAFS_USB )-->
     <RefConfig Name="FATFS_SDIO_Init" Comment="SD">          
         <Component Name="Middleware:FATFS:SDIO"/>
         <Component Name="Middleware:FATFS:CODE_PAGE:$VIRTUAL_CODE_PAGE"/>
@@ -44,7 +43,6 @@
         <Component Name="Middleware:FATFS:SRAM"/>
         <Component Name="Middleware:FATFS:CODE_PAGE:$VIRTUAL_CODE_PAGE"/>
         <ConfigFile Name="FF_CONF"/>
-        <!--  <ConfigFile Name="FF_HANDLES"/> --> 
         <ConfigFile Name="FATFS_INIT"/>
         <ConfigFile Name="FATFS_HEADER"/>
         <ConfigFile Name="L1XX_SRAM_C"/> 
@@ -146,7 +144,7 @@
     </RefConfigFile> 
        
     <!-- Generate a driver file for SD that uses the right IP handle -->
-    <RefConfigFile Name="BSP_SD_C" Description="C driver file for SD" Template="fatfs_bsp_sd_c.ftl">       
+    <RefConfigFile Name="BSP_SD_C" Description="C driver file for SD" Template="fatfs_bsp_sd_c_L1.ftl">       
         <File Name="bsp_driver_sd.c" Category="source" Version="R0.11" Condition="all"/>                      
         <Argument Name="SD_MODE" GenericType="simple" Comment="SD mode value"/>                
     </RefConfigFile>
@@ -168,7 +166,7 @@
     </RefConfigFile>
     
     <!-- Generate a generic diskio C driver file  -->
-    <RefConfigFile Name="USER_DISKIO_C" Description="GENERIC C diskio driver file" Template="generic_diskio_c.ftl">       
+    <RefConfigFile Name="USER_DISKIO_C" Description="GENERIC C diskio driver file" Template="fatfs_generic_diskio_c.ftl">       
         <File Name="user_diskio.c" Category="source" Version="R0.11" Condition="all"/>                      
         <Argument Name="NEW_DISKIO_API" GenericType="simple" Comment=""/>                                            
     </RefConfigFile>
@@ -182,6 +180,7 @@
     <RefConfigFile Name="FATFS_INIT" Description="FATFS Init code file" Template="fatfs_init.ftl">       
         <File Name="fatfs.c" Category="source" Version="R0.11" Condition="all"/>                    
         <Argument Name="_FS_NORTC" GenericType="simple" Comment="0 or 1"/>                           <!-- New in R0.11 -->                  
+        <Argument Name="_MULTI_PARTITION" GenericType="simple" Comment="0 or 1"/>
     </RefConfigFile>
     <!-- Generate header for the init code file (fatfs.h) -->
     <RefConfigFile Name="FATFS_HEADER" Description="FATFS header file" Template="fatfs_header.ftl">       
@@ -190,7 +189,7 @@
     
         <!-- Code for BSP (SDIO mode) -->
     <RefBspComponent Name="Detect_SDIO" BspIpName="GPIO" BspModeName="Input">       
-        <File Name="fatfs_l1xxsd_h.ftl;bsp_driver_sd.h" Category="template"/>
-        <File Name="fatfs_bsp_sd_c.ftl;bsp_driver_sd.c" Category="template"/>
+        <File Name="fatfs_platform_h.ftl;fatfs_platform.h" Category="template"/>
+        <File Name="fatfs_platform_c.ftl;fatfs_platform.c" Category="template"/>
     </RefBspComponent> 
 </IP>

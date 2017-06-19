@@ -3,9 +3,13 @@
 [#assign s = name]
 [#assign temp = s?replace(".","__")]
 [#assign inclusion_protection = temp?upper_case]
-/*---------------------------------------------------------------------------/
-/  FatFs - FAT file system module configuration file  R0.11 (C)ChaN, 2015
-/---------------------------------------------------------------------------*/
+/**
+  ******************************************************************************
+  *  FatFs - FAT file system module configuration file  R0.11 (C)ChaN, 2015
+  ******************************************************************************
+[@common.optinclude name="Src/license.tmp"/][#--include License text --]
+  ******************************************************************************
+  */
 
 #ifndef _FFCONF
 #define _FFCONF 32020	/* Revision ID */

@@ -6,30 +6,7 @@
  [#-- * @packageVersion  : ${fwVersion} --]
   * @brief           : This file implements the board support package for the USB host library
   ******************************************************************************
-  * COPYRIGHT(c) ${year} STMicroelectronics
-  *
-  * Redistribution and use in source and binary forms, with or without modification,
-  * are permitted provided that the following conditions are met:
-  * 1. Redistributions of source code must retain the above copyright notice,
-  * this list of conditions and the following disclaimer.
-  * 2. Redistributions in binary form must reproduce the above copyright notice,
-  * this list of conditions and the following disclaimer in the documentation
-  * and/or other materials provided with the distribution.
-  * 3. Neither the name of STMicroelectronics nor the names of its contributors
-  * may be used to endorse or promote products derived from this software
-  * without specific prior written permission.
-  *
-  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-  * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-  * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-  * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-  *
+[@common.optinclude name="Src/license.tmp"/][#--include License text --]
   ******************************************************************************
 */
 /* Includes ------------------------------------------------------------------*/
@@ -191,8 +168,29 @@ USBH_StatusTypeDef  USBH_LL_Init (USBH_HandleTypeDef *phost)
   */
 USBH_StatusTypeDef  USBH_LL_DeInit (USBH_HandleTypeDef *phost)
 {
-  HAL_HCD_DeInit(phost->pData);
-  return USBH_OK; 
+  HAL_StatusTypeDef hal_status = HAL_OK;
+  USBH_StatusTypeDef usb_status = USBH_OK;
+ 
+  hal_status = HAL_HCD_DeInit(phost->pData);
+  
+  switch (hal_status) {
+    case HAL_OK :
+      usb_status = USBH_OK;
+    break;
+    case HAL_ERROR :
+      usb_status = USBH_FAIL;
+    break;
+    case HAL_BUSY :
+      usb_status = USBH_BUSY;
+    break;
+    case HAL_TIMEOUT :
+      usb_status = USBH_FAIL;
+    break;
+    default :
+      usb_status = USBH_FAIL;
+    break;
+  }
+  return usb_status; 
 }
 
 /**
@@ -203,8 +201,29 @@ USBH_StatusTypeDef  USBH_LL_DeInit (USBH_HandleTypeDef *phost)
   */
 USBH_StatusTypeDef  USBH_LL_Start(USBH_HandleTypeDef *phost)
 {
-  HAL_HCD_Start(phost->pData);
-  return USBH_OK; 
+  HAL_StatusTypeDef hal_status = HAL_OK;
+  USBH_StatusTypeDef usb_status = USBH_OK;
+ 
+  hal_status = HAL_HCD_Start(phost->pData);
+  
+  switch (hal_status) {
+    case HAL_OK :
+      usb_status = USBH_OK;
+    break;
+    case HAL_ERROR :
+      usb_status = USBH_FAIL;
+    break;
+    case HAL_BUSY :
+      usb_status = USBH_BUSY;
+    break;
+    case HAL_TIMEOUT :
+      usb_status = USBH_FAIL;
+    break;
+    default :
+      usb_status = USBH_FAIL;
+    break;
+  }
+  return usb_status; 
 }
 
 /**
@@ -215,8 +234,29 @@ USBH_StatusTypeDef  USBH_LL_Start(USBH_HandleTypeDef *phost)
   */
 USBH_StatusTypeDef  USBH_LL_Stop (USBH_HandleTypeDef *phost)
 {
-  HAL_HCD_Stop(phost->pData);
-  return USBH_OK; 
+  HAL_StatusTypeDef hal_status = HAL_OK;
+  USBH_StatusTypeDef usb_status = USBH_OK;
+ 
+  hal_status = HAL_HCD_Stop(phost->pData);
+  
+  switch (hal_status) {
+    case HAL_OK :
+      usb_status = USBH_OK;
+    break;
+    case HAL_ERROR :
+      usb_status = USBH_FAIL;
+    break;
+    case HAL_BUSY :
+      usb_status = USBH_BUSY;
+    break;
+    case HAL_TIMEOUT :
+      usb_status = USBH_FAIL;
+    break;
+    default :
+      usb_status = USBH_FAIL;
+    break;
+  }
+  return usb_status;  
 }
 
 /**
@@ -258,8 +298,28 @@ USBH_SpeedTypeDef USBH_LL_GetSpeed  (USBH_HandleTypeDef *phost)
   */
 USBH_StatusTypeDef USBH_LL_ResetPort (USBH_HandleTypeDef *phost) 
 {
-  HAL_HCD_ResetPort(phost->pData);
-  return USBH_OK; 
+  HAL_StatusTypeDef hal_status = HAL_OK;
+  USBH_StatusTypeDef usb_status = USBH_OK;
+ 
+  hal_status = HAL_HCD_ResetPort(phost->pData);
+  switch (hal_status) {
+    case HAL_OK :
+      usb_status = USBH_OK;
+    break;
+    case HAL_ERROR :
+      usb_status = USBH_FAIL;
+    break;
+    case HAL_BUSY :
+      usb_status = USBH_BUSY;
+    break;
+    case HAL_TIMEOUT :
+      usb_status = USBH_FAIL;
+    break;
+    default :
+      usb_status = USBH_FAIL;
+    break;
+  }
+  return usb_status;  
 }
 
 /**
@@ -294,14 +354,34 @@ USBH_StatusTypeDef   USBH_LL_OpenPipe    (USBH_HandleTypeDef *phost,
                                       uint8_t ep_type,
                                       uint16_t mps)
 {
-  HAL_HCD_HC_Init(phost->pData,
-                  pipe_num,
-                  epnum,
-                  dev_address,
-                  speed,
-                  ep_type,
-                  mps);
-  return USBH_OK; 
+  HAL_StatusTypeDef hal_status = HAL_OK;
+  USBH_StatusTypeDef usb_status = USBH_OK;
+ 
+  hal_status = HAL_HCD_HC_Init(phost->pData,
+                               pipe_num,
+                               epnum,
+                               dev_address,
+                               speed,
+                               ep_type,
+                              mps);
+  switch (hal_status) {
+    case HAL_OK :
+      usb_status = USBH_OK;
+    break;
+    case HAL_ERROR :
+      usb_status = USBH_FAIL;
+    break;
+    case HAL_BUSY :
+      usb_status = USBH_BUSY;
+    break;
+    case HAL_TIMEOUT :
+      usb_status = USBH_FAIL;
+    break;
+    default :
+      usb_status = USBH_FAIL;
+    break;
+  }
+  return usb_status; 
 }
 
 /**
@@ -313,8 +393,28 @@ USBH_StatusTypeDef   USBH_LL_OpenPipe    (USBH_HandleTypeDef *phost,
   */
 USBH_StatusTypeDef   USBH_LL_ClosePipe   (USBH_HandleTypeDef *phost, uint8_t pipe)   
 {
-  HAL_HCD_HC_Halt(phost->pData, pipe);
-  return USBH_OK; 
+  HAL_StatusTypeDef hal_status = HAL_OK;
+  USBH_StatusTypeDef usb_status = USBH_OK;
+ 
+  hal_status = HAL_HCD_HC_Halt(phost->pData, pipe);
+  switch (hal_status) {
+    case HAL_OK :
+      usb_status = USBH_OK;
+    break;
+    case HAL_ERROR :
+      usb_status = USBH_FAIL;
+    break;
+    case HAL_BUSY :
+      usb_status = USBH_BUSY;
+    break;
+    case HAL_TIMEOUT :
+      usb_status = USBH_FAIL;
+    break;
+    default :
+      usb_status = USBH_FAIL;
+    break;
+  }
+  return usb_status;  
 }
 
 /**
@@ -355,15 +455,35 @@ USBH_StatusTypeDef   USBH_LL_SubmitURB  (USBH_HandleTypeDef *phost,
                                             uint16_t length,
                                             uint8_t do_ping ) 
 {
-  HAL_HCD_HC_SubmitRequest (phost->pData,
-                            pipe, 
-                            direction ,
-                            ep_type,  
-                            token, 
-                            pbuff, 
-                            length,
-                            do_ping);
-  return USBH_OK;   
+  HAL_StatusTypeDef hal_status = HAL_OK;
+  USBH_StatusTypeDef usb_status = USBH_OK;
+ 
+  hal_status = HAL_HCD_HC_SubmitRequest (phost->pData,
+                                         pipe, 
+                                         direction ,
+                                         ep_type,  
+                                         token, 
+                                         pbuff, 
+                                         length,
+                                         do_ping);
+  switch (hal_status) {
+    case HAL_OK :
+      usb_status = USBH_OK;
+    break;
+    case HAL_ERROR :
+      usb_status = USBH_FAIL;
+    break;
+    case HAL_BUSY :
+      usb_status = USBH_BUSY;
+    break;
+    case HAL_TIMEOUT :
+      usb_status = USBH_FAIL;
+    break;
+    default :
+      usb_status = USBH_FAIL;
+    break;
+  }
+  return usb_status;  
 }
 
 /**
@@ -429,7 +549,7 @@ USBH_StatusTypeDef  USBH_LL_DriverVBUS (USBH_HandleTypeDef *phost, uint8_t state
       /* ToDo: Add IOE driver control */	
       /* USER CODE BEGIN DRIVE_LOW_CHARGE_FOR_FS */
    
-      /* USER CODE END DRIVE_HIGH_CHARGE_FOR_FS */ 
+      /* USER CODE END DRIVE_LOW_CHARGE_FOR_FS */ 
     }
   }	
   [/#if] 
@@ -450,7 +570,7 @@ USBH_StatusTypeDef  USBH_LL_DriverVBUS (USBH_HandleTypeDef *phost, uint8_t state
       /* ToDo: Add IOE driver control */	
       /* USER CODE BEGIN DRIVE_LOW_CHARGE_FOR_HS */
 		
-      /* USER CODE BEGIN DRIVE_LOW_CHARGE_FOR_HS */    	 
+      /* USER CODE END DRIVE_LOW_CHARGE_FOR_HS */    	 
     }  
   }
   [/#if]       

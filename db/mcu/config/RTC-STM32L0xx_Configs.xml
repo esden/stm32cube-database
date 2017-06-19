@@ -1,8 +1,16 @@
 <?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
 <IP xmlns="http://mcd.rou.st.com/modules.php?name=mcu" DBVersion="V4.0" Name="RTC" Version="STM32Cube_FW_L0_V0.2.0" IncludeFile="stm32l0xx_hal.h" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Configs.xsd">
     
+    <RefConfig Comment="Initialize RTC Only" Name="RTC_Init_Only">
+		<CallLibMethod Name="HAL_RTC_Init"/>
+		<ImplementCallBack Name="HAL_RTC_MspInit"/>
+		<ImplementCallBack Name="HAL_RTC_MspDeInit"/>
+	</RefConfig>
 	<RefConfig Name="RTC_Init" Comment="Initialize RTC and set the Time and Date">
 		<CallLibMethod Name="HAL_RTC_Init" />
+		<CallLibMethod Name="HAL_RTCEx_BKUPRead" Type="HardCode" >
+            <HardCode Text="#tif(HAL_RTCEx_BKUPRead(&amp;hrtc, RTC_BKP_DR0) != 0x32F2){ "/>
+        </CallLibMethod>
 		<CallLibMethod Name="HAL_RTC_SetTime">
 			<MethodArg Name="sTime.Hours" ParameterName="HoursARG" />
 			<MethodArg Name="sTime.Minutes" ParameterName="MinutesARG" />
@@ -11,6 +19,9 @@
 		<CallLibMethod Name="HAL_RTC_SetDate">
 			<MethodArg Name="sDate.Date" ParameterName="DateARG" />
 			<MethodArg Name="sDate.Year" ParameterName="YearARG" />
+		</CallLibMethod>
+		<CallLibMethod Name="HAL_RTCEx_BKUPWrite" Type="HardCode" >                   
+			<HardCode Text="#t#tHAL_RTCEx_BKUPWrite(&amp;hrtc,RTC_BKP_DR0,0x32F2);#n#t}"/>
 		</CallLibMethod>
 		<ImplementCallBack Name="HAL_RTC_MspInit" />
 		<ImplementCallBack Name="HAL_RTC_MspDeInit" />
@@ -21,6 +32,7 @@
 			<MethodArg Name="sAlarm.AlarmTime.Hours" ParameterName="HoursARG_A" />
 			<MethodArg Name="sAlarm.AlarmTime.Minutes" ParameterName="MinutesARG_A" />
 			<MethodArg Name="sAlarm.AlarmTime.Seconds" ParameterName="SecondsARG_A" />
+			<MethodArg Name="sAlarm.AlarmTime.SubSeconds" ParameterName="SubSecondsARG_A" />
 			<MethodArg Name="AlarmDateWeekDay" ParameterName="AlarmDateWeekDayARG" />
 		</CallLibMethod>
 	</RefConfig>
@@ -29,6 +41,8 @@
 			<MethodArg Name="sAlarm.AlarmTime.Hours" ParameterName="HoursARG_A" />
 			<MethodArg Name="sAlarm.AlarmTime.Minutes" ParameterName="MinutesARG_A" />
 			<MethodArg Name="sAlarm.AlarmTime.Seconds" ParameterName="SecondsARG_A" />
+			<MethodArg Name="sAlarm.AlarmTime.SubSeconds" ParameterName="SubSecondsARG_A" />
+			<MethodArg Name="AlarmDateWeekDay" ParameterName="AlarmDateWeekDayARG" />
 		</CallLibMethod>
 	</RefConfig>
 	<!-- Alarm B -->
@@ -37,6 +51,7 @@
 			<MethodArg Name="sAlarm.AlarmTime.Hours" ParameterName="HoursARG_B" />
 			<MethodArg Name="sAlarm.AlarmTime.Minutes" ParameterName="MinutesARG_B" />
 			<MethodArg Name="sAlarm.AlarmTime.Seconds" ParameterName="SecondsARG_B" />
+			<MethodArg Name="sAlarm.AlarmTime.SubSeconds" ParameterName="SubSecondsARG_B" />
 			<MethodArg Name="AlarmMask" ParameterName="AlarmMask_B" />
 			<MethodArg Name="AlarmSubSecondMask" ParameterName="AlarmSubSecondMask_B" />
 			<MethodArg Name="AlarmDateWeekDaySel" ParameterName="AlarmDateWeekDaySel_B" />
@@ -50,6 +65,7 @@
 			<MethodArg Name="sAlarm.AlarmTime.Hours" ParameterName="HoursARG_B" />
 			<MethodArg Name="sAlarm.AlarmTime.Minutes" ParameterName="MinutesARG_B" />
 			<MethodArg Name="sAlarm.AlarmTime.Seconds" ParameterName="SecondsARG_B" />
+			<MethodArg Name="sAlarm.AlarmTime.SubSeconds" ParameterName="SubSecondsARG_B" />
 			<MethodArg Name="AlarmMask" ParameterName="AlarmMask_B" />
 			<MethodArg Name="AlarmSubSecondMask" ParameterName="AlarmSubSecondMask_B" />
 			<MethodArg Name="AlarmDateWeekDaySel" ParameterName="AlarmDateWeekDaySel_B" />
@@ -231,6 +247,7 @@
             <Argument AddressOf="false" GenericType="simple" Name="Hours" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="Minutes" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="Seconds" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="SubSeconds" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="TimeFormat" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="DayLightSaving" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="StoreOperation" OptimizationCondition="equal"/>
@@ -256,6 +273,7 @@
             <Argument AddressOf="false" GenericType="simple" Name="Hours" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="Minutes" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="Seconds" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="SubSeconds" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="TimeFormat" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="DayLightSaving" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="StoreOperation" OptimizationCondition="equal"/>
@@ -328,6 +346,7 @@
                 <Argument AddressOf="false" GenericType="simple" Name="Hours" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="Minutes" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="Seconds" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SubSeconds" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="TimeFormat" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="DayLightSaving" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="StoreOperation" OptimizationCondition="equal"/>
@@ -360,6 +379,7 @@
                 <Argument AddressOf="false" GenericType="simple" Name="Hours" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="Minutes" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="Seconds" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SubSeconds" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="TimeFormat" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="DayLightSaving" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="StoreOperation" OptimizationCondition="equal"/>
@@ -409,6 +429,7 @@
                 <Argument AddressOf="false" GenericType="simple" Name="Hours" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="Minutes" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="Seconds" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SubSeconds" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="TimeFormat" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="DayLightSaving" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="StoreOperation" OptimizationCondition="equal"/>
@@ -596,6 +617,7 @@
             <Argument AddressOf="false" GenericType="simple" Name="Hours" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="Minutes" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="Seconds" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="SubSeconds" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="TimeFormat" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="DayLightSaving" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="StoreOperation" OptimizationCondition="equal"/>
