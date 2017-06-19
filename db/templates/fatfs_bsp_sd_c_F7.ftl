@@ -1,291 +1,232 @@
 [#ftl]
 /**
  ******************************************************************************
-  * @file    bsp_driver_sd.c (based on stm324x9i_eval_sd.c)
+  * @file    bsp_driver_sd.c for F7 (based on stm32756g_eval_sd.c)
   * @brief   This file includes a generic uSD card driver.
   ******************************************************************************
-  *
-  * COPYRIGHT(c) ${year} STMicroelectronics
-  *
-  * Redistribution and use in source and binary forms, with or without modification,
-  * are permitted provided that the following conditions are met:
-  *   1. Redistributions of source code must retain the above copyright notice,
-  *      this list of conditions and the following disclaimer.
-  *   2. Redistributions in binary form must reproduce the above copyright notice,
-  *      this list of conditions and the following disclaimer in the documentation
-  *      and/or other materials provided with the distribution.
-  *   3. Neither the name of STMicroelectronics nor the names of its contributors
-  *      may be used to endorse or promote products derived from this software
-  *      without specific prior written permission.
-  *
-  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-  * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-  * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-  * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-  *
+[@common.optinclude name="Src/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
+[#assign handle="hsd1"]
+[#assign sdmmc1_bits=1]
+[#assign sdmmc2_bits=1]
+
 [#if SWIPdatas??]
 [#list SWIPdatas as SWIP]  
 [#if SWIP.defines??]
  [#list SWIP.defines as definition] 
-  [#if definition.name="SD_MODE"]                 
+  [#if definition.name="_HSD"]  
+   [#assign handle=definition.value]
+  [/#if]
+  [#if definition.name="SDMMC1_MODE"]
    [#if definition.value="1"]
-    [#assign bits=1]
+    [#assign sdmmc1_bits=1]
    [/#if]
    [#if definition.value="4"]
-#define BUS_4BITS 1
-    [#assign bits=4]
+    [#assign sdmmc1_bits=4]
    [/#if]
   [/#if]
+  [#if definition.name="SDMMC2_MODE"]
+   [#if definition.value="1"]
+    [#assign sdmmc2_bits=1]
+   [/#if]
+   [#if definition.value="4"]
+    [#assign sdmmc2_bits=4]
+   [/#if]
+  [/#if] 
  [/#list]
 [/#if]
 [/#list]
 [/#if]
+[#if handle = "hsd1"]
+ [#if sdmmc1_bits = 4]
+#define BUS_4BITS 1
+ [/#if]
+[/#if]
+[#if handle = "hsd2"]
+ [#if sdmmc2_bits = 4]
+#define BUS_4BITS 1
+ [/#if]
+[/#if]
+
+#ifdef OLD_API
+/* kept to avoid issue when migrating old projects. */
 /* USER CODE BEGIN 0 */
 
+/* USER CODE END 0 */
+#else
+/* USER CODE BEGIN FirstSection */
+/* can be used to modify / undefine following code or add new definitions */
+/* USER CODE END FirstSection */
 /* Includes ------------------------------------------------------------------*/
 #include "bsp_driver_sd.h"
 
 /* Extern variables ---------------------------------------------------------*/ 
   
-extern SD_HandleTypeDef hsd1;
-extern HAL_SD_CardInfoTypedef SDCardInfo1; 
+extern SD_HandleTypeDef _HSD; 
 
+/* USER CODE BEGIN BeforeInitSection */
+/* can be used to modify / undefine following code or add code */
+/* USER CODE END BeforeInitSection */
 /**
   * @brief  Initializes the SD card device.
-  * @param  None
   * @retval SD status
   */
 uint8_t BSP_SD_Init(void)
 {
-  uint8_t SD_state = MSD_OK;
+  uint8_t sd_state = MSD_OK;
   /* Check if the SD card is plugged in the slot */
   if (BSP_SD_IsDetected() != SD_PRESENT)
   {
-    return MSD_ERROR;
+    return MSD_ERROR_SD_NOT_PRESENT;
   }
-  SD_state = HAL_SD_Init(&hsd1, &SDCardInfo1);
+  /* HAL SD initialization */
+  sd_state = HAL_SD_Init(&_HSD);
 #ifdef BUS_4BITS
-  if (SD_state == MSD_OK)
+  /* Configure SD Bus width */
+  if (sd_state == MSD_OK)
   {
-    if (HAL_SD_WideBusOperation_Config(&hsd1, SDMMC_BUS_WIDE_4B) != SD_OK)
+    /* Enable wide operation */
+    if (HAL_SD_ConfigWideBusOperation(&_HSD, SDMMC_BUS_WIDE_4B) != HAL_OK)
     {
-      SD_state = MSD_ERROR;
-    }
-    else
-    {
-      SD_state = MSD_OK;
+      sd_state = MSD_ERROR;
     }
   }
 #endif
-  return SD_state;
+  return sd_state;
 }
-
+/* USER CODE BEGIN AfterInitSection */
+/* can be used to modify previous code / undefine following code / add code */
+/* USER CODE END AfterInitSection */
 
 /**
   * @brief  Configures Interrupt mode for SD detection pin.
-  * @param  None
   * @retval Returns 0 in success otherwise 1. 
   */
 uint8_t BSP_SD_ITConfig(void)
 {  
   /* TBI: add user code here depending on the hardware configuration used */
   
-  return 0;
+  return (uint8_t)0;
 }
 
-/** @brief  SD detect IT treatment
-  * @param  None
-  * @retval None
-  */
-void BSP_SD_DetectIT(void)
-{
-  /* TBI: add user code here depending on the hardware configuration used */
-}
 
-/** @brief  SD detect IT detection callback
-  * @param  None
-  * @retval None
-  */
-__weak void BSP_SD_DetectCallback(void)
-{
-  /* NOTE: This function Should not be modified, when the callback is needed,
-  the SD_DetectCallback could be implemented in the user file
-  */ 
-  
-}
-
+/* USER CODE BEGIN BeforeReadBlocksSection */
+/* can be used to modify previous code / undefine following code / add code */
+/* USER CODE END BeforeReadBlocksSection */
 /**
-  * @brief  Reads block(s) from a specified address in an SD card, in polling mode. 
+  * @brief  Reads block(s) from a specified address in an SD card, in polling mode.
   * @param  pData: Pointer to the buffer that will contain the data to transmit
-  * @param  ReadAddr: Address from where data is to be read  
-  * @param  BlockSize: SD card data block size, that should be 512
-  * @param  NumOfBlocks: Number of SD blocks to read 
+  * @param  ReadAddr: Address from where data is to be read
+  * @param  NumOfBlocks: Number of SD blocks to read
+  * @param  Timeout: Timeout for read operation
   * @retval SD status
   */
-uint8_t BSP_SD_ReadBlocks(uint32_t *pData, uint64_t ReadAddr, uint32_t BlockSize, uint32_t NumOfBlocks)
+uint8_t BSP_SD_ReadBlocks(uint32_t *pData, uint32_t ReadAddr, uint32_t NumOfBlocks, uint32_t Timeout)
 {
-  if(HAL_SD_ReadBlocks(&hsd1, pData, ReadAddr, BlockSize, NumOfBlocks) != SD_OK)  
+  uint8_t sd_state = MSD_OK;
+
+  if (HAL_SD_ReadBlocks(&_HSD, (uint8_t *)pData, ReadAddr, NumOfBlocks, Timeout) != HAL_OK)
   {
-    return MSD_ERROR;
+    sd_state = MSD_ERROR;
   }
-  else
-  {
-    return MSD_OK;
-  }
+
+  return sd_state;  
 }
 
+/* USER CODE BEGIN BeforeWriteBlocksSection */
+/* can be used to modify previous code / undefine following code / add code */
+/* USER CODE END BeforeWriteBlocksSection */
 /**
   * @brief  Writes block(s) to a specified address in an SD card, in polling mode. 
   * @param  pData: Pointer to the buffer that will contain the data to transmit
-  * @param  WriteAddr: Address from where data is to be written  
-  * @param  BlockSize: SD card data block size, that should be 512
+  * @param  WriteAddr: Address from where data is to be written
   * @param  NumOfBlocks: Number of SD blocks to write
+  * @param  Timeout: Timeout for write operation
   * @retval SD status
   */
-uint8_t BSP_SD_WriteBlocks(uint32_t *pData, uint64_t WriteAddr, uint32_t BlockSize, uint32_t NumOfBlocks)
+uint8_t BSP_SD_WriteBlocks(uint32_t *pData, uint32_t WriteAddr, uint32_t NumOfBlocks, uint32_t Timeout)
 {
-  if(HAL_SD_WriteBlocks(&hsd1, pData, WriteAddr, BlockSize, NumOfBlocks) != SD_OK)  
+  uint8_t sd_state = MSD_OK;
+
+  if (HAL_SD_WriteBlocks(&_HSD, (uint8_t *)pData, WriteAddr, NumOfBlocks, Timeout) != HAL_OK) 
   {
-    return MSD_ERROR;
+    sd_state = MSD_ERROR;
   }
-  else
-  {
-    return MSD_OK;
-  }
+
+  return sd_state;  
 }
 
+/* USER CODE BEGIN BeforeReadDMABlocksSection */
+/* can be used to modify previous code / undefine following code / add code */
+/* USER CODE END BeforeReadDMABlocksSection */
 /**
-  * @brief  Reads block(s) from a specified address in an SD card, in DMA mode. 
+  * @brief  Reads block(s) from a specified address in an SD card, in DMA mode.
   * @param  pData: Pointer to the buffer that will contain the data to transmit
-  * @param  ReadAddr: Address from where data is to be read  
-  * @param  BlockSize: SD card data block size, that should be 512
+  * @param  ReadAddr: Address from where data is to be read
   * @param  NumOfBlocks: Number of SD blocks to read 
   * @retval SD status
   */
-uint8_t BSP_SD_ReadBlocks_DMA(uint32_t *pData, uint64_t ReadAddr, uint32_t BlockSize, uint32_t NumOfBlocks)
+uint8_t BSP_SD_ReadBlocks_DMA(uint32_t *pData, uint32_t ReadAddr, uint32_t NumOfBlocks)
 {
-  uint8_t SD_state = MSD_OK;
+  uint8_t sd_state = MSD_OK;
   
   /* Read block(s) in DMA transfer mode */
-  if(HAL_SD_ReadBlocks_DMA(&hsd1, pData, ReadAddr, BlockSize, NumOfBlocks) != SD_OK)  
+  if (HAL_SD_ReadBlocks_DMA(&_HSD, (uint8_t *)pData, ReadAddr, NumOfBlocks) != HAL_OK)
   {
-    SD_state = MSD_ERROR;
-  }
-  else
-  {
-    SD_state = MSD_OK;
+    sd_state = MSD_ERROR;
   }
   
-  /* Wait until transfer is complete */
-  if(SD_state == MSD_OK)
-  {
-    if(HAL_SD_CheckReadOperation(&hsd1, (uint32_t)SD_DATATIMEOUT) != SD_OK)  
-    {
-      SD_state = MSD_ERROR;
-    }
-    else
-    {
-      SD_state = MSD_OK;
-    }
-  }
-  
-  return SD_state; 
+  return sd_state; 
 }
 
+/* USER CODE BEGIN BeforeWriteDMABlocksSection */
+/* can be used to modify previous code / undefine following code / add code */
+/* USER CODE END BeforeWriteDMABlocksSection */
 /**
-  * @brief  Writes block(s) to a specified address in an SD card, in DMA mode.  
+  * @brief  Writes block(s) to a specified address in an SD card, in DMA mode.
   * @param  pData: Pointer to the buffer that will contain the data to transmit
-  * @param  WriteAddr: Address from where data is to be written  
-  * @param  BlockSize: SD card data block size, that should be 512
+  * @param  WriteAddr: Address from where data is to be written
   * @param  NumOfBlocks: Number of SD blocks to write 
   * @retval SD status
   */
-uint8_t BSP_SD_WriteBlocks_DMA(uint32_t *pData, uint64_t WriteAddr, uint32_t BlockSize, uint32_t NumOfBlocks)
+uint8_t BSP_SD_WriteBlocks_DMA(uint32_t *pData, uint32_t WriteAddr, uint32_t NumOfBlocks)
 {
-  uint8_t SD_state = SD_OK;
+  uint8_t sd_state = MSD_OK;
   
   /* Write block(s) in DMA transfer mode */
-  if(HAL_SD_WriteBlocks_DMA(&hsd1, pData, WriteAddr, BlockSize, NumOfBlocks) != SD_OK)  
+  if (HAL_SD_WriteBlocks_DMA(&_HSD, (uint8_t *)pData, WriteAddr, NumOfBlocks) != HAL_OK)
   {
-    SD_state = MSD_ERROR;
-  }
-  else
-  {
-    SD_state = MSD_OK;
+    sd_state = MSD_ERROR;
   }
   
-  /* Wait until transfer is complete */
-  if(SD_state == MSD_OK)
-  {
-    if(HAL_SD_CheckWriteOperation(&hsd1, (uint32_t)SD_DATATIMEOUT) != SD_OK)  
-    {
-      SD_state = MSD_ERROR;
-    }
-    else
-    {
-      SD_state = MSD_OK;
-    }
-  }
-  
-  return SD_state; 
+  return sd_state; 
 }
 
+/* USER CODE BEGIN BeforeEraseSection */
+/* can be used to modify previous code / undefine following code / add code */
+/* USER CODE END BeforeEraseSection */
 /**
   * @brief  Erases the specified memory area of the given SD card. 
   * @param  StartAddr: Start byte address
   * @param  EndAddr: End byte address
   * @retval SD status
   */
-uint8_t BSP_SD_Erase(uint64_t StartAddr, uint64_t EndAddr)
+uint8_t BSP_SD_Erase(uint32_t StartAddr, uint32_t EndAddr)
 {
-  if(HAL_SD_Erase(&hsd1, StartAddr, EndAddr) != SD_OK)  
+  uint8_t sd_state = MSD_OK;
+
+  if (HAL_SD_Erase(&_HSD, StartAddr, EndAddr) != HAL_OK)  
   {
-    return MSD_ERROR;
+    sd_state = MSD_ERROR;
   }
-  else
-  {
-    return MSD_OK;
-  }
+
+  return sd_state; 
 }
 
-/**
-  * @brief  Handles SD card interrupt request.
-  * @param  None
-  * @retval None
-  */
-void BSP_SD_IRQHandler(void)
-{
-  HAL_SD_IRQHandler(&hsd1);
-}
-
-/**
-  * @brief  Handles SD DMA Tx transfer interrupt request.
-  * @param  None
-  * @retval None
-  */
-void BSP_SD_DMA_Tx_IRQHandler(void)
-{
-  HAL_DMA_IRQHandler(hsd1.hdmatx); 
-}
-
-/**
-  * @brief  Handles SD DMA Rx transfer interrupt request.
-  * @param  None
-  * @retval None
-  */
-void BSP_SD_DMA_Rx_IRQHandler(void)
-{
-  HAL_DMA_IRQHandler(hsd1.hdmarx);
-}
-
+/* USER CODE BEGIN BeforeGetCardStateSection */
+/* can be used to modify previous code / undefine following code / add code */
+/* USER CODE END BeforeGetCardStateSection */
 /**
   * @brief  Gets the current SD card data status.
   * @param  None
@@ -293,11 +234,10 @@ void BSP_SD_DMA_Rx_IRQHandler(void)
   *          This value can be one of the following values:
   *            @arg  SD_TRANSFER_OK: No data transfer is acting
   *            @arg  SD_TRANSFER_BUSY: Data transfer is acting
-  *            @arg  SD_TRANSFER_ERROR: Data transfer error 
   */
-HAL_SD_TransferStateTypedef BSP_SD_GetStatus(void)
+uint8_t BSP_SD_GetCardState(void)
 {
-  return(HAL_SD_GetStatus(&hsd1));
+  return ((HAL_SD_GetCardState(&_HSD) == HAL_SD_CARD_TRANSFER ) ? SD_TRANSFER_OK : SD_TRANSFER_BUSY);
 }
 
 /**
@@ -305,12 +245,12 @@ HAL_SD_TransferStateTypedef BSP_SD_GetStatus(void)
   * @param  CardInfo: Pointer to HAL_SD_CardInfoTypedef structure
   * @retval None 
   */
-void BSP_SD_GetCardInfo(HAL_SD_CardInfoTypedef* CardInfo)
+void BSP_SD_GetCardInfo(HAL_SD_CardInfoTypeDef *CardInfo)
 {
   /* Get SD card Information */
-  HAL_SD_Get_CardInfo(&hsd1, CardInfo);
+  HAL_SD_GetCardInfo(&_HSD, CardInfo);
 }
-/* USER CODE END 0 */
+#endif
 
 /**
  * @brief  Detects if SD card is correctly plugged in the memory slot or not.
@@ -322,20 +262,14 @@ uint8_t BSP_SD_IsDetected(void)
   __IO uint8_t status = SD_PRESENT;
 
   [#if Platform??]
-	[#if GPIO_IP??] 
-  /* Check SD card detect pin */
-  if (HAL_GPIO_ReadPin(SD_PORT,SD_PIN) == GPIO_PIN_RESET) {
+  if (BSP_PlatformIsDetected() == 0x0) 
+  {
     status = SD_NOT_PRESENT;
   }
-    [#else]
-  /* USER CODE BEGIN 1 */
-  /* user code can be inserted here */
-  /* USER CODE END 1 */    	
-	[/#if]
   [#else]
   /* USER CODE BEGIN 1 */
   /* user code can be inserted here */
-  /* USER CODE END 1 */    
+  /* USER CODE END 1 */    	
   [/#if]
 
   return status;

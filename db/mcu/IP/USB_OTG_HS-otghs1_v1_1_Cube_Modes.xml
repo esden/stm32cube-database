@@ -11,28 +11,28 @@
 	<!-- Generic RefParameters for USB High Speed Host & Device Modes -->
 	<RefParameter Name="Instance" DefaultValue="USB_OTG_HS" Comment="Instance" Type="" Visible="false"/>	
 	
-	<RefParameter Comment="Device endpoints number" DefaultValue="null" Name= "dev_endpoints" Type="List" Visible="false">
-		<Condition Expression="VirtualMode = Host_HS" Diagnostic=""/>
-		<PossibleValue Comment="11" Value="11"/>
+	<RefParameter Comment="Device endpoints number" DefaultValue="null" Name="dev_endpoints" Type="List" Group="" Visible="true">	
+		<Condition Expression="(VirtualMode = Host_HS) | (VirtualMode = Host_FS)" Diagnostic=""/>		
+	</RefParameter>	
+	<!-- Bug356587 -->	
+	<RefParameter Comment="Device endpoints number" DefaultValue="6" Name="dev_endpoints" Min="1" Max="6" Type="integer" Group="" Visible="false">
+		<Condition Expression="DIE411 | DIE413 | DIE419" Diagnostic=""/>		
+	</RefParameter>	
+	<RefParameter Comment="Device endpoints number" DefaultValue="8" Name="dev_endpoints" Min="1" Max="8" Type="integer" Group="" Visible="false">
+		<Condition Expression="DIE421" Diagnostic=""/>		
 	</RefParameter>
-	
-	<RefParameter Comment="Device endpoints number" DefaultValue="null" Name= "dev_endpoints" Type="List" Visible="false">
-		<Condition Expression="VirtualMode = Host_FS" Diagnostic=""/>
-		<PossibleValue Comment="11" Value="11"/>
+	<RefParameter Comment="Device endpoints number" DefaultValue="9" Name="dev_endpoints" Min="1" Max="9" Type="integer" Group="" Visible="false">
+		<Condition Expression="DIE451" Diagnostic=""/>		
 	</RefParameter>
-	
-	<RefParameter Comment="Device endpoints number" DefaultValue="11" Name= "dev_endpoints"  Min="1" Max="15" Type="integer" Visible="false">
-		<!--<PossibleValue Comment="11" Value="11"/>-->
+	<RefParameter Comment="Device endpoints number" DefaultValue="7" Name="dev_endpoints" Min="1" Max="7" Type="integer" Group="" Visible="false">				
 	</RefParameter>
-	
+
 	
 	<RefParameter Comment="Host Channels" DefaultValue="12" Name="Host_channels"  Min="1" Max="15" Type="integer" Visible="false">	
-		<Condition Expression="VirtualMode = Host_HS" Diagnostic=""/>
-		<!--<PossibleValue Comment="15" Value="15"/>-->
+		<Condition Expression="VirtualMode = Host_HS" Diagnostic=""/>		
 	</RefParameter>
 	<RefParameter Comment="Host Channels" DefaultValue="12" Name="Host_channels"  Min="1" Max="15" Type="integer"  Visible="false">	
-		<Condition Expression="VirtualMode = Host_FS" Diagnostic=""/>
-		<!--<PossibleValue Comment="15" Value="15"/>-->
+		<Condition Expression="VirtualMode = Host_FS" Diagnostic=""/>		
 	</RefParameter>
 	
 	<!-- Virtual Mode Parameter, to define RefParameter in function of RefMode -->
@@ -51,7 +51,7 @@
 		<PossibleValue Comment="Host Low Speed 1.5MBit/s" Value="HCD_SPEED_LOW"/>	
 	</RefParameter>
 	
-	<RefParameter Comment="Speed" DefaultValue="PCD_SPEED_HIGH" Name="speed" Type="List" >
+	<RefParameter Comment="Speed" DefaultValue="PCD_SPEED_HIGH" Name="DeviceSpeed" Type="List" >
 		<Condition Expression="VirtualMode = Device_HS" Diagnostic=""/>
 		<PossibleValue Comment="Device High Speed 480MBit/s" Value="PCD_SPEED_HIGH" />
 		<PossibleValue Comment="Device Full Speed 12MBit/s" Value="PCD_SPEED_FULL"/>
@@ -65,14 +65,14 @@
 		<!--<PossibleValue Comment="High Speed 480MBit/s" Value="HCD_SPEED_HIGH" />	-->	
 	</RefParameter>
 	
-	<RefParameter Comment="Speed" DefaultValue="PCD_SPEED_FULL" Name="speed" Type="List">
+	<RefParameter Comment="Speed" DefaultValue="PCD_SPEED_FULL" Name="DeviceSpeed" Type="List">
 		<Condition Expression="VirtualMode = Device_Only_FS" Diagnostic=""/>
 		<!--<PossibleValue Comment="Low Speed 1.5MBit/s" Value="PCD_SPEED_LOW" />-->
 		<PossibleValue Comment="Device Full Speed 12MBit/s" Value="PCD_SPEED_FULL"/>
 		<!--<PossibleValue Comment="High Speed 480MBit/s" Value="PCD_SPEED_HIGH" />-->
 	</RefParameter>
 	
-	<RefParameter Comment="Speed" DefaultValue="PCD_SPEED_FULL" Name="speed" Type="List">
+	<RefParameter Comment="Speed" DefaultValue="PCD_SPEED_FULL" Name="DeviceSpeed" Type="List">
 		<Condition Expression="VirtualMode = Device_DP_DM_FS" Diagnostic=""/>
 		<!--<PossibleValue Comment="Low Speed 1.5MBit/s" Value="PCD_SPEED_LOW" />-->
 		<PossibleValue Comment="Device Full Speed 12MBit/s" Value="PCD_SPEED_FULL"/>	
@@ -112,6 +112,11 @@
 		<PossibleValue Value="USB_OTG_EMBEDDED_PHY" Comment="Internal Phy"/>		
 	</RefParameter>
 	
+	<!-- Bug356385 -->
+	<RefParameter Comment="Signal start of frame " DefaultValue="ENABLE" Name="Sof_enable" Type="List" Group="">
+		<PossibleValue Value="ENABLE" Comment="Enabled"/>
+		<Condition Expression="USB_FS_SOF" Diagnostic=""/>		
+	</RefParameter>
 	<RefParameter Comment="Signal start of frame" DefaultValue="DISABLE" Name="Sof_enable" Type="List">
 		<PossibleValue Value="ENABLE" Comment="Enabled"/>
 		<PossibleValue Value="DISABLE" Comment="Disabled"/>		
@@ -164,7 +169,8 @@
 	</RefParameter>
 	
 	<RefParameter Comment="Use dedicated end point 1 interrupt" DefaultValue="DISABLE" Name="use_dedicated_ep1" Type="List" >
-		<!--<PossibleValue Value="ENABLE" Comment="Enabled"/>-->
+		<!--  Bug356454 -->
+		<PossibleValue Value="ENABLE" Comment="Enabled"/>
 		<PossibleValue Value="DISABLE" Comment="Disabled"/>		
 	</RefParameter>
 	
@@ -195,6 +201,7 @@
 		<Parameter Name="low_power_enable"/>
 		<Parameter Name="vbus_sensing_enable"/>	
 		<Parameter Name="use_external_vbus"/>
+		<Parameter Name="Sof_enable"/>	
 	</RefMode>
 	
 	<!-- USB High Speed in Device mode -->
@@ -203,7 +210,7 @@
 		<Parameter Name="VirtualMode">		
 			<PossibleValue>Device_HS</PossibleValue>
 		</Parameter>
-		<Parameter Name="speed"/>
+		<Parameter Name="DeviceSpeed"/>
 		<Parameter Name="dev_endpoints"/>
 		<Parameter Name="ep0_mps"/>		
 		<Parameter Name="dma_enable"/>
@@ -214,6 +221,7 @@
 		<Parameter Name="lpm_enable"></Parameter>
 		<Parameter Name="use_dedicated_ep1"/>
 		<Parameter Name="vbus_sensing_enable"/>	
+		<Parameter Name="Sof_enable"/>	
 	</RefMode>
 	
 	<!-- USB Full Speed in Host mode -->
@@ -229,7 +237,8 @@
 			<PossibleValue>USB_OTG_EMBEDDED_PHY</PossibleValue>
 		</Parameter>
 		<Parameter Name="low_power_enable"/>	
-		<Parameter Name="vbus_sensing_enable"/>			
+		<Parameter Name="vbus_sensing_enable"/>	
+		<Parameter Name="Sof_enable"/>		
 	</RefMode>
 	
 	<!-- USB Full Speed in Device mode -->
@@ -239,7 +248,7 @@
 			<PossibleValue>Device_Only_FS</PossibleValue>
 		</Parameter>
 		<Parameter Name="dev_endpoints"/>		
-		<Parameter Name="speed"/>
+		<Parameter Name="DeviceSpeed"/>
 		<Parameter Name="ep0_mps"/>
 		<Parameter Name="dma_enable"/>
 		<Parameter Name="phy_itface">
@@ -249,6 +258,7 @@
 		<Parameter Name="lpm_enable"></Parameter>
 		<Parameter Name="use_dedicated_ep1"/>	
 		<Parameter Name="vbus_sensing_enable"/>	
+		<Parameter Name="Sof_enable"/>
 	</RefMode>
 	
 	<RefMode Name="Device_DP_DM_FS" HalMode="PCD">
@@ -257,7 +267,7 @@
 			<PossibleValue>Device_DP_DM_FS</PossibleValue>
 		</Parameter>
 		<Parameter Name="dev_endpoints"/>
-		<Parameter Name="speed"/>
+		<Parameter Name="DeviceSpeed"/>
 		<Parameter Name="ep0_mps"/>		
 		<Parameter Name="dma_enable"/>
 		<Parameter Name="phy_itface">
@@ -267,13 +277,11 @@
 		<Parameter Name="lpm_enable"></Parameter>
 		<Parameter Name="use_dedicated_ep1"/>
 		<Parameter Name="vbus_sensing_enable"/>	
+		<Parameter Name="Sof_enable"/>
 	</RefMode>
 	
 	<!-- USB Full Speed in Device mode with SOF -->
-	<RefMode Name="Activate_SOF_FS" HalMode="">		
-		<Parameter Name="Sof_enable">
-			<PossibleValue>ENABLE</PossibleValue>
-		</Parameter>			
+	<RefMode Name="Activate_SOF_FS" HalMode="">							
 	</RefMode>
 	
 	<!-- tracker 233865 -->
@@ -351,7 +359,7 @@
 		</Mode>
 		<!-- ModeLogicOperator for FS -->
 		<!-- Tracker 232811 -->
-		<Mode Name="Internal Phy">			
+		<Mode Name="Internal FS Phy">			
 			<ModeLogicOperator Name="XOR">
 				<Mode Name="OTG/Dual-Role-Device-FS" UserName="OTG/Dual_Role_Device">
 					<SignalLogicalOp Name="AND">
@@ -400,6 +408,8 @@
 					</SignalLogicalOp>
 				</Mode>			
 			</ModeLogicOperator>
+			<!-- Bug356385 -->
+			<Semaphore>USB_FS_SOF</Semaphore>
 			<!-- Tracker 233898 -->
 			<!--<Condition Expression=" MW_USB_OTG_HS_MW_FS_DEVICE | MW_USB_OTG_HS_MW_FS_HOST | OTG_DUAL_ROL_DEVICE_HS_FS" Diagnostic="USB External or Internal Phy Mode must be selected first"/>-->
 			<!-- Tracker 325936 -->
@@ -409,7 +419,7 @@
 			<ModeLogicOperator Name="XOR">
 				<Mode Name="Activate_VBUS_FS" UserName="Activate-VBUS">
 					<SignalLogicalOp Name="AND">				
-						<Signal Name="VBUS"/>				
+						<Signal Name="VBUS"  IOMode="Input"/>				
 					</SignalLogicalOp>
 					<Semaphore>VBUS_SENSING_ON_HS</Semaphore>
 				</Mode>					

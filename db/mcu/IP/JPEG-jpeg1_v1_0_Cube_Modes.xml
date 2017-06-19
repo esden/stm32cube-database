@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<IP DBVersion="V4.0" IPType="peripheral" IpGroup="Multimedia" Name="JPEG" Version="jpeg1_v1_0_Cube" 
+	xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance"
+ 	ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd"
+ 	xmlns="http://mcd.rou.st.com/modules.php?name=mcu">
+
+
+  <About>JPEG encoder decoder</About>
+	
+	<!-- Generic RefParameters for JPEG --> 
+	<RefParameter Name="Instance" DefaultValue="JPEG" Comment="Instance" Type="" Visible="false"/>
+	
+	<RefParameter Name="JPEG_version" Comment="JPEG version" DefaultValue="jpeg1_v1_0" Type="String" Group="Version" TabName="Parameter Settings" Mode="Basic">
+	    <PossibleValue Comment="Current version of JPEG" Value="jpeg1_v1_0"/>
+	</RefParameter>
+	
+	<!-- RefParameters for JPEG - JPEG basic settings-->
+	<!-- 
+	<RefParameter Name="ColorSpace" Comment="ColorSpace" DefaultValue="gray_scale" Type="list" Group="JPEG basic settings" TabName="Parameter Settings" Mode="Basic">
+		<PossibleValue Comment="gray_scale" Value="gray_scale" Semaphore="sem_gray_scale"/>
+		<PossibleValue Comment="YCBCR" Value="YCBCR" Semaphore="sem_YCBCR" />
+		<PossibleValue Comment="RGB" Value="RGB" Semaphore="sem_RGB" />
+		<PossibleValue Comment="CMYK" Value="CMYK" Semaphore="sem_CMYK"/>
+		<Description>Image Color Space : gray_scale, YCBCR, RGB or CMYK </Description>
+	</RefParameter>
+	
+	<RefParameter Name="ChromaSubSampling" Comment="ChromaSubSampling" DefaultValue="4" Type="List" Group="JPEG basic settings" TabName="Parameter Settings" Mode="Basic">
+		<PossibleValue Comment="NA" Value="4"/>
+		<Condition Diagnostic="Force to NA if Color Space is gray_scale or RGB" Expression="(ColorSpace=gray_scale) | (ColorSpace=RGB)"/>
+		<Description>Chroma SubSampling is Non Applicable in case of in case of gray_scale or RGB Color Space. </Description>
+	</RefParameter>	
+	
+	<RefParameter Name="ChromaSubSampling" Comment="ChromaSubSampling" DefaultValue="1" Type="List" Group="JPEG basic settings" TabName="Parameter Settings" Mode="Basic">
+		<PossibleValue Comment="4:4:4" Value="0" />
+		<PossibleValue Comment="4:2:2" Value="1" />
+		<PossibleValue Comment="4:1:1" Value="2" />
+		<PossibleValue Comment="4:2:0" Value="3" />
+		<Description>Chroma SubSampling is Non Applicable in case of in case of gray_scale or RGB Color Space. </Description>
+	</RefParameter>	
+	
+	<RefParameter Name="ImageQuality" Comment="ImageQuality" DefaultValue="50" Max="100" Min="1"  Type="integer" Group="JPEG basic settings" TabName="Parameter Settings" Mode="Basic">
+	    <Description>Quality of the JPEG encoding from 1 to 100</Description>
+	</RefParameter>
+	-->
+	
+	<RefParameter Name="USE_JPEG_ENCODER" Comment="ENCODE" DefaultValue="1" Type="list" Group="JPEG Software options" TabName="Parameter Settings" Mode="Basic">
+	  <PossibleValue Comment="Enabled" Value="1"/>
+	  <PossibleValue Comment="Disabled" Value="0" Diagnostic="Warning: when ENCODE is Disabled DECODE has to be Enabled." Condition="USE_JPEG_DECODER = 0" Action="Error"/>
+	  <Description>This parameter specifies if Encode is acticated</Description>
+	</RefParameter>
+	
+	<RefParameter Name="USE_JPEG_DECODER" Comment="DECODE" DefaultValue="1" Type="list" Group="JPEG Software options" TabName="Parameter Settings" Mode="Basic">
+	  <PossibleValue Comment="Enabled" Value="1"/>
+	  <PossibleValue Comment="Disabled" Value="0" Diagnostic="Warning: when DECODE is Disabled ENCODE has to be Enabled." Condition="USE_JPEG_ENCODER = 0" Action="Error"/>
+	  <Description>This parameter specifies if Decode is acticated</Description>
+	</RefParameter>
+	
+	<RefParameter Name="JPEG_RGB_FORMAT" Comment="RGB_FORMAT" DefaultValue="JPEG_ARGB8888" Type="list" Group="JPEG Software options" TabName="Parameter Settings" Mode="Basic">
+	    <PossibleValue Comment="JPEG_ARGB8888" Value="JPEG_ARGB8888"/>
+		<PossibleValue Comment="JPEG_RGB888" Value="JPEG_RGB888"/>
+		<PossibleValue Comment="JPEG_RGB565" Value="JPEG_RGB565"/>
+		<Description>Default Value : JPEG_ARGB8888</Description>
+	</RefParameter>
+	<RefParameter Name="JPEG_SWAP_RG" Comment="JPEG_SWAP_RG" DefaultValue="0" Type="list" Group="JPEG Software options" TabName="Parameter Settings" Mode="Basic">
+	    <PossibleValue Comment="0" Value="0"/>
+		<PossibleValue Comment="1" Value="1"/>
+		<Description>Change color order to BGR, 
+		Default Value : 0</Description>
+	</RefParameter>
+	<!-- RefModes for JPEG -->
+	<RefMode Name="JPEG_Activate">
+		<ConfigForMode>Jpeg_Init</ConfigForMode>
+		<!-- Parameters for JPEG - Version-->
+		<Parameter Name="JPEG_version"/>
+		<!-- Parameters for JPEG - JPEG basic settings-->
+		<!--<Parameter Name="ColorSpace"/>
+		<Parameter Name="ChromaSubSampling"/>
+		<Parameter Name="ImageQuality"/>-->
+		<Parameter Name="USE_JPEG_ENCODER"/>
+		<Parameter Name="USE_JPEG_DECODER"/>
+		<Parameter Name="JPEG_RGB_FORMAT"/>
+		<Parameter Name="JPEG_SWAP_RG"/>
+	</RefMode>
+		
+	<!-- ModeLogicOperator for JPEG -->
+	<ModeLogicOperator Name="OR">
+		<Mode Name="JPEG_State" UserName="Activated">
+			<ModeLogicOperator Name="XOR">
+				<Mode Name="JPEG_Activate" UserName="Activated">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="VS_JPEG" />
+					</SignalLogicalOp>
+				</Mode>
+			</ModeLogicOperator>
+		</Mode>
+	</ModeLogicOperator>
+	
+	<!-- RefMode for JPEG Polling -->
+	<!-- <RefMode Name="Polling" HalMode="JPEG" >
+		<ConfigForMode>Jpeg_Init</ConfigForMode>
+	</RefMode>
+	-->
+	<!-- RefMode for JPEG Interrupt -->
+	<!-- <RefMode Name="Interrupt" HalMode="JPEG" >
+		<ConfigForMode>Jpeg_Init</ConfigForMode>
+	</RefMode>
+	-->
+	<!-- <RefMode Name="DMA_request" HalMode="JPEG" >
+		<ConfigForMode>Jpeg_Init</ConfigForMode>
+	</RefMode>
+	-->
+	
+	<!-- ModeLogicOperator for JPEG -->
+	<!-- <ModeLogicOperator Name="OR">
+		<Mode Name="Mode">
+			<ModeLogicOperator Name="XOR">
+				<Mode Name="Polling" UserName="Polling">
+					<SignalLogicalOp Name="AND">
+						<Signal IOMode="FiFoPolling" Name="FIFO_POLLING"/>
+					</SignalLogicalOp>
+				</Mode>
+				<Mode Name="Interrupt" UserName="Interrupt">
+					<SignalLogicalOp Name="AND">
+						<Signal IOMode="FiFoInterrupt" Name="FIFO_INTERRUPT"/>
+					</SignalLogicalOp>
+				</Mode>
+				<Mode Name="DMA_request" UserName="DMA_request">
+					<SignalLogicalOp Name="AND">
+						<Signal IOMode="FiFoDMARequest" Name="FIFO_DMA_REQUEST"/>
+					</SignalLogicalOp>
+				</Mode>
+			</ModeLogicOperator>
+		</Mode>
+	</ModeLogicOperator>
+	-->
+	<!-- RefSignal for JPEG -->
+	<RefSignal Name="VS_JPEG" Virtual="true"/>
+	<!--<RefSignal IOMode="FiFoPolling" Name="FIFO_POLLING" Virtual="true"/>
+	<RefSignal IOMode="FiFoInterrupt" Name="FIFO_INTERRUPT" Virtual="true"/>
+	<RefSignal IOMode="FiFoDMARequest" Name="FIFO_DMA_REQUEST" Virtual="true"/>
+	-->	
+	<!-- Clock Semaphore for this IP. -->
+	<Semaphore>JPEGUsed_ForRCC</Semaphore>
+	
+</IP>

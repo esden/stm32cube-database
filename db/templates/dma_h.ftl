@@ -5,50 +5,39 @@
   * Description        : This file contains all the function prototypes for
   *                      the dma.c file
   ******************************************************************************
-  *
-  * COPYRIGHT(c) ${year} STMicroelectronics
-  *
-  * Redistribution and use in source and binary forms, with or without modification,
-  * are permitted provided that the following conditions are met:
-  *   1. Redistributions of source code must retain the above copyright notice,
-  *      this list of conditions and the following disclaimer.
-  *   2. Redistributions in binary form must reproduce the above copyright notice,
-  *      this list of conditions and the following disclaimer in the documentation
-  *      and/or other materials provided with the distribution.
-  *   3. Neither the name of STMicroelectronics nor the names of its contributors
-  *      may be used to endorse or promote products derived from this software
-  *      without specific prior written permission.
-  *
-  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-  * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-  * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-  * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-  *
+[@common.optinclude name="Src/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
+[#assign ipName = "DMA"]
+[#if dmas?size > 0]
+  [#list dmas as dma]
+    [#assign ipName = dma]
+  [/#list]
+[/#if]
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __dma_H
-#define __dma_H
+#ifndef __${ipName?lower_case}_H
+#define __${ipName?lower_case}_H
 
 #ifdef __cplusplus
  extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
+[#assign includesList = ""]
 [#list includes as include]
+[#if !includesList?contains(include)]
 #include "${include}"
+[#assign includesList = includesList+" "+include]
+[/#if]
 [/#list]
 #n
 /* DMA memory to memory transfer handles -------------------------------------*/
+[#if variables?? && variables?size > 0]
 [#list variables as variable]
 extern ${variable.value} ${variable.name};
 [/#list]
+[/#if]
+extern void _Error_Handler(char*, int);
 #n
 /* USER CODE BEGIN Includes */
 
@@ -58,7 +47,7 @@ extern ${variable.value} ${variable.name};
 
 /* USER CODE END Private defines */
 #n
-void MX_DMA_Init(void);
+void MX_${ipName}_Init(void);
 [#compress]
 #n/* USER CODE BEGIN Prototypes */
 #n     
@@ -69,7 +58,7 @@ void MX_DMA_Init(void);
 }
 #endif
 
-#endif /* __dma_H */
+#endif /* __${ipName?lower_case}_H */
 
 /**
   * @}

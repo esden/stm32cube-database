@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<IP DBVersion="V4.0" IPType="peripheral" IpGroup="Connectivity" Name="SWPMI" Version="swp1_v1_0_1_Cube" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd" xmlns="http://mcd.rou.st.com/modules.php?name=mcu">
+    <!-- Note: this file will be used to cover Orca_1M (L471, L475, L476, L486) limitations of SWPMI in external mode not functional. -->	
+    
+    <!-- Generic RefParameters for USART/UART/IrDA/SmartCard Modes -->
+    <RefParameter Name="Instance" DefaultValue="SWPMI$Index" Comment="Instance" Type="" Visible="false"/>
+    
+      
+    <!-- HAL parameters -->
+    <RefParameter Comment="Voltage Class" DefaultValue="SWPMI_VOLTAGE_CLASS_C" Name="VoltageClass" Type="list" Group="Basic Parameters">
+        <Description>Specifies the SWP Voltage Class. Depends on RCC Vdd value that must be in a valid range, either [1.62 V to 1.98 V] or [2.70 V to 3.30 V] </Description>
+        <PossibleValue Comment="Class C" Value="SWPMI_VOLTAGE_CLASS_C" Condition="((RCC:VDD_VALUE) &gt; 1.98)" Action="Disable"
+            Diagnostic="Possible only if RCC Vdd is in the range [1.62 V to 1.98 V]."/>
+        <PossibleValue Comment="Class B" Value="SWPMI_VOLTAGE_CLASS_B" Condition="((RCC:VDD_VALUE) &lt; 2.70)" Action="Disable"
+            Diagnostic="Possible only if RCC Vdd is in the range [2.70 V to 3.30 V]."/>
+    </RefParameter>
+    
+    <RefParameter Comment="Bit Rate Prescaler" DefaultValue="=(RCC:$IpInstanceFreq_Value/(1000000*4)-1)" Max="= MIN((RCC:$IpInstanceFreq_Value%400000-1),63)" Min="=MAX((RCC:$IpInstanceFreq_Value/(2000000*4)-1),0)" Name="BitRate" Type="integer" Group="Basic Parameters">
+        <Description>Warning! This SWPMI Bitrate prescaler value must guarantee a programmed bit rate within the range from 100 kbit/s up to 2 Mbit/s</Description>             
+    </RefParameter>
+    
+    
+    <!-- non HAL but calculated parameter SWPMI1CLockSelection -->
+<!--    <RefParameter Comment="Fswpclk" DefaultValue="=RCC:RCC:$IpInstanceFreq_Value"  Name="Fswpclk" Type="integer" Visible="true" -->
+    <RefParameter Comment="SWPMI Clock frequency" DefaultValue="=RCC:$IpInstanceFreq_Value/1000"  Name="Fswpclk" Type="string" Unit="kHz" Group="Basic Parameters">
+        <Description> Frequency value in Hz output of multiplexer for clocking SWPMI core.</Description>
+    </RefParameter>   
+    <!--
+    <RefParameter Comment="Bit Rate Prescaler" DefaultValue="10" Max="63" Min="0" Name="BitRate" Type="integer" Group="Basic Parameters">
+    -->    
+    <RefParameter Comment="Bit Rate " DefaultValue="= Fswpclk / ((BitRate +1) *4)" Name="CalcBitRate" Type="string" Unit="kBits/s" Group="Basic Parameters">
+        <Description>Specifies the SWPMI Bitrate. Fswp = Fswpclk / ((BitRatePrescaler + 1) x 4). Must always be within the range from 100 kbit/s up to 2 Mbit/s </Description>
+
+    </RefParameter>
+    
+    <!-- HAL parameters -->
+    <RefParameter Comment="Transmission Buffering Mode" DefaultValue="SWPMI_TX_NO_SOFTWAREBUFFER" Name="TxBufferingMode" Type="list" Group="Basic Parameters">
+        <Description>Specifies the frame transmission buffering mode.</Description>
+        <PossibleValue Comment="No Software buffer" Value="SWPMI_TX_NO_SOFTWAREBUFFER" Condition="$IpInstance_DmaTransmit" Action="Disable"
+            Diagnostic="Possible only if no DMA channel configured for SWPMI Tx."/>
+        <PossibleValue Comment="Single Software buffer" Value="SWPMI_TX_SINGLE_SOFTWAREBUFFER" Condition="!$IpInstance_DmaTransmit" Action="Disable"
+            Diagnostic="Requires a DMA channel configured for SWPMI Tx." Semaphore="$IpInstance_TxSingle"/>
+        <PossibleValue Comment="Multi Software buffer" Value="SWPMI_TX_MULTI_SOFTWAREBUFFER"  Condition="!$IpInstance_DmaTransmit" Action="Disable"
+            Diagnostic="Requires a DMA channel configured for SWPMI Tx." Semaphore="$IpInstance_TxMulti"/>
+    </RefParameter>
+    
+    <RefParameter Comment="Reception Buffering Mode" DefaultValue="SWPMI_RX_NO_SOFTWAREBUFFER" Name="RxBufferingMode" Type="list" Group="Basic Parameters">
+        <Description>Specifies the frame reception buffering mode.</Description>
+        <PossibleValue Comment="No Software buffer" Value="SWPMI_RX_NO_SOFTWAREBUFFER" Condition="$IpInstance_DmaReceive" Action="Disable"
+            Diagnostic="Possible only if no DMA channel configured for SWPMI Rx."/>
+        <PossibleValue Comment="Single Software buffer" Value="SWPMI_RX_SINGLE_SOFTWAREBUFFER"  Condition="!$IpInstance_DmaReceive" Action="Disable"
+            Diagnostic="Requires a DMA channel configured for SWPMI Rx." Semaphore="$IpInstance_RxSingle"/>
+        <PossibleValue Comment="Multi Software buffer" Value="SWPMI_RX_MULTI_SOFTWAREBUFFER"  Condition="!$IpInstance_DmaReceive" Action="Disable"
+            Diagnostic="Requires a DMA channel configured for SWPMI Rx." Semaphore="$IpInstance_RxMulti"/>
+    </RefParameter>
+	
+    <RefMode Name="All" Abstract="true" >
+        <Parameter Name="VoltageClass"/>
+        <Parameter Name="BitRate"/>
+        <Parameter Name="Fswpclk"/>
+        <Parameter Name="CalcBitRate"/>
+        <Parameter Name="TxBufferingMode"/>
+        <Parameter Name="RxBufferingMode"/>	
+    </RefMode>
+    
+    <RefMode Name="fullDuplex" BaseMode="All">
+		<ConfigForMode>Swpmi_Init</ConfigForMode>	
+	</RefMode>
+    
+    <RefMode Name="externalTransceiver" BaseMode="All">			
+        <ConfigForMode>Swpmi_ExternalTransceiver_Init</ConfigForMode>
+    </RefMode>
+    
+    <RefMode Name="loopBack" BaseMode="All">
+        <ConfigForMode>Swpmi_Loopback_Init</ConfigForMode>
+    </RefMode>
+
+	<ModeLogicOperator Name="OR">
+		<Mode Name="Mode">
+			<ModeLogicOperator Name="XOR">
+			    <Mode Name="fullDuplex" UserName="Full-Duplex (normal mode)">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="IO"/>
+					</SignalLogicalOp>
+				</Mode>
+			    <Mode Name="externalTransceiver" UserName="Mode with external transceiver">
+				<Condition Diagnostic="This mode is not functional for this MCU. Please refer to this product errata sheet for details." Expression="Semaphore_Dummy"/> 	
+			        <SignalLogicalOp Name="AND">
+			            <Signal Name="TX"/>
+			            <Signal Name="RX"/>
+			            <Signal Name="SUSPEND"/>
+			        </SignalLogicalOp>
+			    </Mode>
+			    <Mode Name="loopBack" UserName="Loopback (test mode)">
+			        <SignalLogicalOp Name="AND">
+			            <Signal Name="VS_LOOPBACK" />
+			        </SignalLogicalOp>	        
+			    </Mode>
+			</ModeLogicOperator>
+		</Mode>
+	</ModeLogicOperator>
+    
+    <RefSignal IOMode="AlternateFunctionPushPull" Name="IO"/>
+    <RefSignal IOMode="AlternateFunctionPushPull" Name="TX"/>
+    <RefSignal IOMode="AlternateFunctionPushPull" Name="RX"/>
+    <RefSignal IOMode="AlternateFunctionPushPull" Name="SUSPEND"/>
+    <RefSignal Name="VS_LOOPBACK" Virtual="true"/>
+    <Semaphore>$IpInstanceUsed_ForRCC</Semaphore>
+</IP>
+    <!--Semaphore>Semaphore_Dummy</Semaphore--> <!-- Fix of 398082 and 395992  at IP level we are autorized to set one semaphore only -->

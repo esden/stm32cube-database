@@ -4,31 +4,7 @@
   * @file           : usbd_audio_if.c
   * @brief          : Generic media access Layer.
   ******************************************************************************
-  *
-  * COPYRIGHT(c) ${year} STMicroelectronics
-  *
-  * Redistribution and use in source and binary forms, with or without modification,
-  * are permitted provided that the following conditions are met:
-  * 1. Redistributions of source code must retain the above copyright notice,
-  * this list of conditions and the following disclaimer.
-  * 2. Redistributions in binary form must reproduce the above copyright notice,
-  * this list of conditions and the following disclaimer in the documentation
-  * and/or other materials provided with the distribution.
-  * 3. Neither the name of STMicroelectronics nor the names of its contributors
-  * may be used to endorse or promote products derived from this software
-  * without specific prior written permission.
-  *
-  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-  * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-  * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-  * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-  *
+[@common.optinclude name="Src/license.tmp"/][#--include License text --]
   ******************************************************************************
 */
 [#assign handleNameFS = ""]
@@ -69,7 +45,7 @@
 /** @defgroup USBD_AUDIO_Private_TypesDefinitions
   * @{
   */ 
-/* USER CODE BEGIN PRIVATE_TYPES  */
+/* USER CODE BEGIN PRIVATE_TYPES */
 /* USER CODE END PRIVATE_TYPES */ 
 /**
   * @}
@@ -79,7 +55,7 @@
 /** @defgroup USBD_AUDIO_Private_Defines
   * @{
   */ 
-/* USER CODE BEGIN PRIVATE_DEFINES  */
+/* USER CODE BEGIN PRIVATE_DEFINES */
 /* USER CODE END PRIVATE_DEFINES */
   
 /**
@@ -90,7 +66,7 @@
 /** @defgroup USBD_AUDIO_Private_Macros
   * @{
   */ 
-/* USER CODE BEGIN PRIVATE_MACRO  */
+/* USER CODE BEGIN PRIVATE_MACRO */
 /* USER CODE END PRIVATE_MACRO */
 
 /**
@@ -100,17 +76,8 @@
 /** @defgroup USBD_AUDIO_IF_Private_Variables
   * @{
   */
-/* USB handler declaration */
-/* Handle for USB Full Speed IP */
-[#if handleNameFS == "FS" || handleNameUSB_FS == "FS"]
-#tUSBD_HandleTypeDef  *hUsbDevice_0;
-[/#if]
-[#if handleNameHS == "HS"]
-/* Handle for USB High Speed IP */
-#tUSBD_HandleTypeDef  *hUsbDevice_1;
-[/#if]
-/* USER CODE BEGIN PRIVATE_VARIABLES  */
-/* USER CODE END  PRIVATE_VARIABLES */
+/* USER CODE BEGIN PRIVATE_VARIABLES */
+/* USER CODE END PRIVATE_VARIABLES */
 
 /**
   * @}
@@ -125,8 +92,8 @@
 [#if handleNameHS == "HS"]
 #textern USBD_HandleTypeDef hUsbDeviceHS;  
 [/#if]
-/* USER CODE BEGIN EXPORTED_VARIABLES  */
-/* USER CODE END  EXPORTED_VARIABLES */
+/* USER CODE BEGIN EXPORTED_VARIABLES */
+/* USER CODE END EXPORTED_VARIABLES */
 
 /**
   * @}
@@ -155,7 +122,7 @@ static int8_t  AUDIO_PeriodicTC_HS   (uint8_t cmd);
 static int8_t  AUDIO_GetState_HS     (void);
 [/#if]
 /* USER CODE BEGIN PRIVATE_FUNCTIONS_DECLARATION */
-/* USER CODE END  PRIVATE_FUNCTIONS_DECLARATION */
+/* USER CODE END PRIVATE_FUNCTIONS_DECLARATION */
 
 /**
   * @}
@@ -198,8 +165,7 @@ USBD_AUDIO_ItfTypeDef USBD_AUDIO_fops_HS =
   * @retval Result of the operation: USBD_OK if all operations are OK else USBD_FAIL
   */
 static int8_t AUDIO_Init_FS(uint32_t  AudioFreq, uint32_t Volume, uint32_t options)
-{
-  hUsbDevice_0 = &hUsbDeviceFS;
+{ 
   /* USER CODE BEGIN 0 */
   return (USBD_OK);
   /* USER CODE END 0 */
@@ -302,7 +268,7 @@ static int8_t AUDIO_GetState_FS (void)
 void TransferComplete_CallBack_FS(void)
 {
   /* USER CODE BEGIN 7 */ 
-  USBD_AUDIO_Sync(hUsbDevice_0, AUDIO_OFFSET_FULL);
+  USBD_AUDIO_Sync(&hUsbDeviceFS, AUDIO_OFFSET_FULL);
   /* USER CODE END 7 */
 }
 
@@ -314,7 +280,7 @@ void TransferComplete_CallBack_FS(void)
 void HalfTransfer_CallBack_FS(void)
 { 
   /* USER CODE BEGIN 8 */ 
-  USBD_AUDIO_Sync(hUsbDevice_0, AUDIO_OFFSET_HALF);
+  USBD_AUDIO_Sync(&hUsbDeviceFS, AUDIO_OFFSET_HALF);
   /* USER CODE END 8 */
 }
 [/#if]
@@ -328,8 +294,7 @@ void HalfTransfer_CallBack_FS(void)
   * @retval Result of the operation: USBD_OK if all operations are OK else USBD_FAIL
   */
 static int8_t AUDIO_Init_HS(uint32_t  AudioFreq, uint32_t Volume, uint32_t options)
-{
-  hUsbDevice_1 = &hUsbDeviceHS;
+{  
   /* USER CODE BEGIN 9 */ 
   return (USBD_OK);
   /* USER CODE END 9 */
@@ -431,7 +396,7 @@ static int8_t AUDIO_GetState_HS (void)
 void TransferComplete_CallBack_HS(void)
 {
   /* USER CODE BEGIN 16 */ 
-  USBD_AUDIO_Sync(hUsbDevice_1, AUDIO_OFFSET_FULL);
+  USBD_AUDIO_Sync(&hUsbDeviceHS, AUDIO_OFFSET_FULL);
   /* USER CODE END 16 */
 }
 
@@ -443,13 +408,13 @@ void TransferComplete_CallBack_HS(void)
 void HalfTransfer_CallBack_HS(void)
 { 
   /* USER CODE BEGIN 17 */ 
-  USBD_AUDIO_Sync(hUsbDevice_1, AUDIO_OFFSET_HALF);
+  USBD_AUDIO_Sync(&hUsbDeviceHS, AUDIO_OFFSET_HALF);
   /* USER CODE END 17 */
 }
 [/#if]
 
 /* USER CODE BEGIN PRIVATE_FUNCTIONS_IMPLEMENTATION */
-/* USER CODE END  PRIVATE_FUNCTIONS_IMPLEMENTATION */
+/* USER CODE END PRIVATE_FUNCTIONS_IMPLEMENTATION */
 
 /**
   * @}

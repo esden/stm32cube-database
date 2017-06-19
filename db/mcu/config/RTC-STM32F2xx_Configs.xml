@@ -1,8 +1,16 @@
 <?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
 <IP xmlns="http://mcd.rou.st.com/modules.php?name=mcu" DBVersion="V4.0" Name="RTC" Version="STM32Cube_FW_F2_V0.2.0" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Configs.xsd">
     
+    <RefConfig Comment="Initialize RTC Only" Name="RTC_Init_Only">
+		<CallLibMethod Name="HAL_RTC_Init"/>
+		<ImplementCallBack Name="HAL_RTC_MspInit"/>
+		<ImplementCallBack Name="HAL_RTC_MspDeInit"/>
+	</RefConfig>
 	<RefConfig Name="RTC_Init" Comment="Initialize RTC and set the Time and Date">
 		<CallLibMethod Name="HAL_RTC_Init"/>
+		<CallLibMethod Name="HAL_RTCEx_BKUPRead" Type="HardCode" >
+            <HardCode Text="#tif(HAL_RTCEx_BKUPRead(&amp;hrtc, RTC_BKP_DR0) != 0x32F2){ "/>
+        </CallLibMethod>
 		<CallLibMethod Name="HAL_RTC_SetTime">
 			<MethodArg Name="sTime.Hours" ParameterName="HoursARG" />
 			<MethodArg Name="sTime.Minutes" ParameterName="MinutesARG" />
@@ -11,6 +19,9 @@
 		<CallLibMethod Name="HAL_RTC_SetDate">
 			<MethodArg Name="sDate.Date" ParameterName="DateARG" />
 			<MethodArg Name="sDate.Year" ParameterName="YearARG" />
+		</CallLibMethod>
+		<CallLibMethod Name="HAL_RTCEx_BKUPWrite" Type="HardCode" >                   
+			<HardCode Text="#t#tHAL_RTCEx_BKUPWrite(&amp;hrtc,RTC_BKP_DR0,0x32F2);#n#t}"/>
 		</CallLibMethod>
 		<ImplementCallBack Name="HAL_RTC_MspInit"/>
 		<ImplementCallBack Name="HAL_RTC_MspDeInit"/>

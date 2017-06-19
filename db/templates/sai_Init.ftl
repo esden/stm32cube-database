@@ -195,10 +195,10 @@
                #t#t ${clock}(); 
             [/#list]
             [#else]
-         #t#t__${ipName}_CLK_ENABLE();
+         #t#t__HAL_RCC_${ipName}_CLK_ENABLE();
            [/#if]
     [#else]           
-        [#if (gpioExistA?? && !gpioExistB??)||(!gpioExistA?? && gpioExistB??)]#t#t/* Peripheral clock disable */ #n #t#t__${ipName}_CLK_DISABLE(); [#--  we should not disable the SAI clock if there are 2 blocks--] [/#if]
+        [#if (gpioExistA?? && !gpioExistB??)||(!gpioExistA?? && gpioExistB??)]#t#t/* Peripheral clock disable */ #n #t#t__HAL_RCC_${ipName}_CLK_DISABLE(); [#--  we should not disable the SAI clock if there are 2 blocks--] [/#if]
     [/#if]
     [#if gpioExistA??]
 #t#tif(hsai->Instance==SAI1_Block_A)
@@ -250,26 +250,26 @@
 #t#t}
 [/#if]
     [#if serviceType=="Init"]     
-        [#if nvicExist]#n#t#t/* Peripheral interrupt init*/
+        [#if nvicExist]
             [#if initService.nvic??]
+                [#assign irqNum = 0]
                 [#list initService.nvic as initVector]
-                    [#-- #t#t/* Sets the priority grouping field */ To be done later--]
-                    [#-- #t#tHAL_NVIC_SetPriorityGrouping(${initVector.group});  To be done later--]
-                    [#-- #t#tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.vector}, ${initVector.vector}, ${initVector.vector});--]
+                  [#if initVector.codeInMspInit]
+                    [#assign irqNum = irqNum+1]
+                    [#if irqNum==1]#n#t#t/* Peripheral interrupt init*/[/#if]
+                    #t#tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
                     #t#tHAL_NVIC_EnableIRQ(${initVector.vector});
+                  [/#if]
                 [/#list]
             [/#if]
         [/#if]
     [#else] [#-- else serviceType = DeInit --]
             [#if initService.nvic??]
                 [#list initService.nvic as initVector]
-                    [#-- #t#t/* Sets the priority grouping field */ To be done later--]
-                    [#-- #t#tHAL_NVIC_SetPriorityGrouping(${initVector.group});  To be done later--]
-                    [#-- #t#tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.vector}, ${initVector.vector}, ${initVector.vector});--]
                     #t#tHAL_NVIC_DisableIRQ(${initVector.vector});
                 [/#list]
             [/#if]
-       [/#if]
+    [/#if]
 [/#macro]
 [#-- End macro add service code --]
 

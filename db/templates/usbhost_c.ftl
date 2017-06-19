@@ -6,30 +6,7 @@
 [#--  * @packageVersion  : ${fwVersion} --]
   * @brief           :  This file implements the USB Host 
   ******************************************************************************
-  * COPYRIGHT(c) ${year} STMicroelectronics
-  *
-  * Redistribution and use in source and binary forms, with or without modification,
-  * are permitted provided that the following conditions are met:
-  * 1. Redistributions of source code must retain the above copyright notice,
-  * this list of conditions and the following disclaimer.
-  * 2. Redistributions in binary form must reproduce the above copyright notice,
-  * this list of conditions and the following disclaimer in the documentation
-  * and/or other materials provided with the distribution.
-  * 3. Neither the name of STMicroelectronics nor the names of its contributors
-  * may be used to endorse or promote products derived from this software
-  * without specific prior written permission.
-  *
-  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-  * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-  * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-  * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-  *
+[@common.optinclude name="Src/license.tmp"/][#--include License text --]
   ******************************************************************************
 */
 [#-- Create global variables --]
@@ -504,7 +481,7 @@ void MX_${name}_Init(void)
 /*
  * Background task
 */ 
-void MX_USB_HOST_Process() 
+void MX_USB_HOST_Process(void) 
 {
   /* USB Host Background task */
 [#list IPdatas as IP]  
@@ -520,21 +497,25 @@ void MX_USB_HOST_Process()
 }
 [/#if]
 /*
- * user callbak definition
+ * user callback definition
 */ 
 [#-- Section4: Create the USBH_UserProcess CallBack for each instance --] 
 [#list IPdatas as IP]
 [#if instanceNb == 1]
 	[#assign instName = ""]
+	[#assign userCode = "1"]
+	[#assign j = "${userCode}"]
 [#else]
 	[#assign instanceNbCallBack = 1]
 	[#assign instName= "1"]
+	[#assign userCode = "2"]
+	[#assign j = "${userCode}"]
 [/#if]	
 [#list IP.configModelList as instanceData]
 static void USBH_UserProcess${instName}  (USBH_HandleTypeDef *phost, uint8_t id)
 {
 
-  /* USER CODE BEGIN 2 */
+  /* USER CODE BEGIN CALL_BACK_${userCode} */
   switch(id)
   { 
   case HOST_USER_SELECT_CONFIGURATION:
@@ -555,10 +536,13 @@ static void USBH_UserProcess${instName}  (USBH_HandleTypeDef *phost, uint8_t id)
   default:
   break; 
   }
-  /* USER CODE END 2 */
+  /* USER CODE END CALL_BACK_${userCode} */
 }
 [#assign instanceNbCallBack = instanceNbCallBack + 1]
 [#assign instName= "${instanceNbCallBack}"]
+[#assign j = j + 1]
+[#assign userCode= "${j}"]
+	
 [/#list]
 [/#list]
 #n

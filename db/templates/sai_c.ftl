@@ -5,31 +5,7 @@
   * Description        : This file provides code for the configuration
   *                      of the ${name} instances.
   ******************************************************************************
-  *
-  * COPYRIGHT(c) ${year} STMicroelectronics
-  *
-  * Redistribution and use in source and binary forms, with or without modification,
-  * are permitted provided that the following conditions are met:
-  *   1. Redistributions of source code must retain the above copyright notice,
-  *      this list of conditions and the following disclaimer.
-  *   2. Redistributions in binary form must reproduce the above copyright notice,
-  *      this list of conditions and the following disclaimer in the documentation
-  *      and/or other materials provided with the distribution.
-  *   3. Neither the name of STMicroelectronics nor the names of its contributors
-  *      may be used to endorse or promote products derived from this software
-  *      without specific prior written permission.
-  *
-  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-  * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-  * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-  * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-  *
+[@common.optinclude name="Src/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
 [#list IPdatas as IP]  
@@ -263,13 +239,18 @@
                #t#t#t ${clock}(); 
             [/#list]
             [#else]
-         #t#t#t__${ipName}_CLK_ENABLE();
+         #t#t#t__HAL_RCC_${ipName}_CLK_ENABLE();
            [/#if]
-[#if nvicExist]
-            [#if initService.nvic??&&initService.nvic?size>0]#n#t#t/* Peripheral interrupt init*/
+        [#if nvicExist]
+            [#if initService.nvic??&&initService.nvic?size>0]
+                [#assign irqNum = 0]
                 [#list initService.nvic as initVector]
+                  [#if initVector.codeInMspInit]
+                    [#assign irqNum = irqNum+1]
+                    [#if irqNum==1]#n#t#t/* Peripheral interrupt init*/[/#if]
                     #t#tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
                     #t#tHAL_NVIC_EnableIRQ(${initVector.vector});
+                  [/#if]
                 [/#list]
             [/#if]
         [/#if]
@@ -279,7 +260,7 @@
 #t#t${ipName}_client --;
 #t#tif (${ipName}_client == 0)
 #t#t#t{       
-        #t#t#t/* Peripheral clock disable */ #n #t#t#t__${ipName}_CLK_DISABLE();
+        #t#t#t/* Peripheral clock disable */ #n #t#t#t__HAL_RCC_${ipName}_CLK_DISABLE();
 [#if initService.nvic??]
                 [#list initService.nvic as initVector]                   
                     #t#t#tHAL_NVIC_DisableIRQ(${initVector.vector});
@@ -329,13 +310,18 @@
                #t#t#t ${clock}(); 
             [/#list]
             [#else]
-         #t#t#t__${ipName}_CLK_ENABLE();
+         #t#t#t__HAL_RCC_${ipName}_CLK_ENABLE();
            [/#if]
-[#if nvicExist]
-            [#if initService.nvic??&&initService.nvic?size>0]#n#t#t#t/* Peripheral interrupt init*/
+        [#if nvicExist]
+            [#if initService.nvic??&&initService.nvic?size>0]
+                [#assign irqNum = 0]
                 [#list initService.nvic as initVector]
+                  [#if initVector.codeInMspInit]
+                    [#assign irqNum = irqNum+1]
+                    [#if irqNum==1]#n#t#t#t/* Peripheral interrupt init*/[/#if]
                     #t#t#tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
                     #t#t#tHAL_NVIC_EnableIRQ(${initVector.vector});
+                  [/#if]
                 [/#list]
             [/#if]
         [/#if]
@@ -345,7 +331,7 @@
 #t#t${ipName}_client --;
 #t#t#tif (${ipName}_client == 0)
 #t#t#t{  
-        #t#t#t/* Peripheral clock disable */#n#t#t#t__${ipName}_CLK_DISABLE(); 
+        #t#t#t/* Peripheral clock disable */#n#t#t#t__HAL_RCC_${ipName}_CLK_DISABLE(); 
 [#if initService.nvic??]
                 [#list initService.nvic as initVector]                   
                     #t#t#tHAL_NVIC_DisableIRQ(${initVector.vector});
@@ -441,7 +427,7 @@
 [#list ipvar.initCallBacks.entrySet() as entry]
 [#assign instanceList = entry.value]
 [#list instanceList as saiInst]
-int ${saiInst}_client =0;
+static uint32_t ${saiInst}_client =0;
 [/#list]
 [#assign mode=entry.key?replace("_MspInit","")?replace("_BspInit","")?replace("HAL_","")]
 

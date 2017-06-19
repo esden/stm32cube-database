@@ -41,8 +41,7 @@
  extern "C" {
 #endif
 
-#include "mxconstants.h" [#-- for user defines --]
-
+#include "main.h"
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
 
@@ -51,12 +50,12 @@
   * @brief This is the list of modules to be used in the HAL driver 
   */
 #define HAL_MODULE_ENABLED  
-  [#assign allModules = ["ADC", "CAN", "CEC", "COMP", "CRC", "CRYP", "TSC", "DAC","I2C","I2S","IWDG","LCD","LPTIM","RNG","RTC","SPI","TIM","UART","USART","IRDA","SMARTCARD","SMBUS","WWDG", "PCD"]]
+  [#assign allModules = ["ADC","AES","CAN","CEC","COMP","CRC","CRYP","TSC","DAC","I2S","IWDG","LCD","LPTIM","RNG","RTC","SPI","TIM","UART","USART","IRDA","SMARTCARD","SMBUS","WWDG","PCD"]]
   [#list allModules as module]
 	[#if isModuleUsed(module)]
-[#compress]#define HAL_${module}_MODULE_ENABLED[/#compress]
+[#compress]#define HAL_${module?replace("AES","CRYP")}_MODULE_ENABLED[/#compress]
 	[#else]
-//#define HAL_${module}_MODULE_ENABLED   
+/*#define HAL_${module?replace("AES","CRYP")}_MODULE_ENABLED   */
 	[/#if]	
   [/#list]
   [#function isModuleUsed moduleName]
@@ -75,6 +74,8 @@
 #define HAL_GPIO_MODULE_ENABLED
 #define HAL_PWR_MODULE_ENABLED
 #define HAL_RCC_MODULE_ENABLED
+#define HAL_I2C_MODULE_ENABLED
+
 
 /* ########################## HSE/HSI Values adaptation ##################### */
 /**
@@ -91,7 +92,7 @@
   *        Timeout value 
   */
 #if !defined  (HSE_STARTUP_TIMEOUT)
-  #define HSE_STARTUP_TIMEOUT    ((uint32_t)5000)   /*!< Time out for HSE start up, in ms */
+  #define HSE_STARTUP_TIMEOUT    ((uint32_t)[#if HSE_Timout??]${HSE_Timout}[#else]5000[/#if])   /*!< Time out for HSE start up, in ms */
 #endif /* HSE_STARTUP_TIMEOUT */
 
 /**
@@ -145,7 +146,7 @@
 #endif /* LSE_VALUE */     
 
 #if !defined  (LSE_STARTUP_TIMEOUT)
-  #define LSE_STARTUP_TIMEOUT    ((uint32_t)5000)   /*!< Time out for LSE start up, in ms */
+  #define LSE_STARTUP_TIMEOUT    ((uint32_t)[#if LSE_Timout??]${LSE_Timout}[#else]5000[/#if])   /*!< Time out for LSE start up, in ms */
 #endif /* LSE_STARTUP_TIMEOUT */
 
 /* Tip: To avoid modifying this file each time you need to use different HSE,
@@ -169,6 +170,15 @@
   *        HAL drivers code
   */
 [#if !fullAssert??]/*[/#if] #define USE_FULL_ASSERT   1 [#if !fullAssert??]*/[/#if]
+
+/* ################## SPI peripheral configuration ########################## */
+
+/* CRC FEATURE: Use to activate CRC feature inside HAL SPI Driver
+* Activated: CRC code is present inside driver
+* Deactivated: CRC code cleaned from driver
+*/
+
+#define USE_SPI_CRC                     [#if CRC_SPI??]${CRC_SPI}[#else]1U[/#if]
 
 /* Includes ------------------------------------------------------------------*/
 /**
@@ -289,11 +299,11 @@
   *         If expr is true, it returns no value.
   * @retval None
   */
-  #define assert_param(expr) ((expr) ? (void)0 : assert_failed((uint8_t *)__FILE__, __LINE__))
+  #define assert_param(expr) ((expr) ? (void)0U : assert_failed((uint8_t *)__FILE__, __LINE__))
 /* Exported functions ------------------------------------------------------- */
   void assert_failed(uint8_t* file, uint32_t line);
 #else
-  #define assert_param(expr) ((void)0)
+  #define assert_param(expr) ((void)0U)
 #endif /* USE_FULL_ASSERT */    
     
 #ifdef __cplusplus

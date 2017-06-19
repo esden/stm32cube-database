@@ -5,35 +5,17 @@
   * Description        : This file provides code for the configuration
   *                      of all the requested memory to memory DMA transfers.
   ******************************************************************************
-  *
-  * COPYRIGHT(c) ${year} STMicroelectronics
-  *
-  * Redistribution and use in source and binary forms, with or without modification,
-  * are permitted provided that the following conditions are met:
-  *   1. Redistributions of source code must retain the above copyright notice,
-  *      this list of conditions and the following disclaimer.
-  *   2. Redistributions in binary form must reproduce the above copyright notice,
-  *      this list of conditions and the following disclaimer in the documentation
-  *      and/or other materials provided with the distribution.
-  *   3. Neither the name of STMicroelectronics nor the names of its contributors
-  *      may be used to endorse or promote products derived from this software
-  *      without specific prior written permission.
-  *
-  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-  * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-  * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-  * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-  *
+[@common.optinclude name="Src/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
+[#assign ipName = "DMA"]
+[#if dmas?size > 0]
+  [#list dmas as dma]
+    [#assign ipName = dma]
+  [/#list]
+[/#if]
 /* Includes ------------------------------------------------------------------*/
-#include "dma.h"
+#include "${ipName?lower_case}.h"
 
 /* USER CODE BEGIN 0 */
 
@@ -46,35 +28,56 @@
 /* USER CODE BEGIN 1 */
 
 /* USER CODE END 1 */
-
+[#if variables?? && variables?size > 0]
 [#list variables as variable]
 ${variable.value} ${variable.name};
 [/#list]
-[#if variables?size > 0]
-
 [/#if]
+
+[#assign LL_Driver = false]
+[#if driver??]
+  [#list driver as driverType]
+    [#if driverType=="LL"]
+      [#assign LL_Driver = true]
+    [/#if]
+  [/#list]
+[/#if]
+
 /** 
   * Enable DMA controller clock
-[#if variables?size > 0]
+[#if datas?size > 0]
   * Configure DMA for memory to memory transfers
+[/#if]
+[#if variables?? && variables?size > 0]
 [#list variables as variable]
   *   ${variable.name}
 [/#list]
 [/#if]
   */
-void MX_DMA_Init(void) 
+void MX_${ipName}_Init(void) 
 {
+[#if LL_Driver]
+  /* Init with LL driver */
+[/#if]
 [#if isHalSupported=="true"]
   [#if clocks?size > 0]
   /* DMA controller clock enable */
   [/#if]
   [#list clocks as clockMacro]
+    [#if clockMacro?contains("(")]
+  ${clockMacro};
+    [#else]
   ${clockMacro}();
+    [/#if]
   [/#list]
 [/#if]
 [#list datas as configModel][#--go through all DMA requests--]
   [#assign instanceSuffix = "_" + configModel.instanceName?lower_case]
   [#if configModel.methods??][#-- if the DMA configuration contains a list of LibMethods--]
+  [#if LL_Driver]
+  #n
+  /* Configure DMA request ${configModel.instanceName} */
+  [/#if]
     [#list configModel.methods as method]
       [#assign args = ""]
       [#if method.name == "HAL_DMA_Init"]
@@ -132,9 +135,28 @@ void MX_DMA_Init(void)
               [#assign args = args + ', ' + arg]
             [/#if]
           [/#list]
+        [#if method.returnHAL=="false"]
+[#--${method.name}(${args});--]
   ${method.name}(${args});
         [#else]
+    [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
+  if (${method.name}(${args}) != HAL_OK)
+  {
+    _Error_Handler(__FILE__, __LINE__);
+  }
+        [/#if]#n  
+        [#else]
+  [#--${method.name}();--]
+[#if method.returnHAL=="false"]
+[#--${method.name}(${args});--]
   ${method.name}();
+        [#else]
+    [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
+  if (${method.name}() != HAL_OK)
+  {
+    _Error_Handler(__FILE__, __LINE__);
+  }
+        [/#if]#n          
         [/#if][#--if method.arguments??--]
   	[/#if][#--if method.status=="OK"--]
   	[#if method.status=="KO"]
@@ -180,12 +202,34 @@ void MX_DMA_Init(void)
 [/#list][#--list datas as configModel--]
 [#compress]
 [#-- DMA interrupts --]
-[#if InitNvic??]#n#t/* DMA interrupt init */
-            [#list InitNvic as initVector]                                
-                #tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
-                #tHAL_NVIC_EnableIRQ(${initVector.vector});
-            [/#list]
+[#if InitNvic??]
+    [#assign codeInMspInit = false]
+    [#list InitNvic as initVector]
+      [#if initVector.codeInMspInit]
+       [#assign codeInMspInit = true]
+       [#break]
+      [/#if]
+    [/#list]
+    [#if codeInMspInit]
+     #n#t/* DMA interrupt init */
+     [#list InitNvic as initVector]
+        [#if initVector.codeInMspInit]
+          #t/* ${initVector.vector} interrupt configuration */
+          [#if initVector.usedDriver == "LL"]
+            [#if FamilyName=="STM32L0" || FamilyName=="STM32F0"]
+          #tNVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority});
+            [#else]
+          #tNVIC_SetPriority(${initVector.vector}, NVIC_EncodePriority(NVIC_GetPriorityGrouping(),${initVector.preemptionPriority}, ${initVector.subPriority}));
+            [/#if]
+          #tNVIC_EnableIRQ(${initVector.vector});
+          [#else]
+          #tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
+          #tHAL_NVIC_EnableIRQ(${initVector.vector});
+          [/#if]
         [/#if]
+     [/#list]
+    [/#if]
+[/#if]
 #n
 [/#compress]
 }

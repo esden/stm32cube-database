@@ -5,31 +5,7 @@
   * Description        : This file provides code for the configuration
   *                      of the ${name} peripheral.
   ******************************************************************************
-  *
-  * COPYRIGHT(c) ${year} STMicroelectronics
-  *
-  * Redistribution and use in source and binary forms, with or without modification,
-  * are permitted provided that the following conditions are met:
-  *   1. Redistributions of source code must retain the above copyright notice,
-  *      this list of conditions and the following disclaimer.
-  *   2. Redistributions in binary form must reproduce the above copyright notice,
-  *      this list of conditions and the following disclaimer in the documentation
-  *      and/or other materials provided with the distribution.
-  *   3. Neither the name of STMicroelectronics nor the names of its contributors
-  *      may be used to endorse or promote products derived from this software
-  *      without specific prior written permission.
-  *
-  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-  * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-  * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-  * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-  *
+[@common.optinclude name="Src/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
 [#list IPdatas as IP]
@@ -322,9 +298,29 @@
             [/#if]
           [/#if]
         [/#list][#--list method.arguments as fargument--]
-        #n[#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n[#--add blank line before function call--]
+        [#-- #n[#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n[#--add blank line before function call--]
+                    #n
+                    [#if method.returnHAL=="false"]
+                        [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});
+                    [#else]
+                        [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
+                        [#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}(${args}) != [#if method.returnHAL == "true"]HAL_OK[#else]${method.returnHAL}[/#if])
+                        [#if nTab==2]#t#t[#else]#t[/#if]{
+                        [#if nTab==2]#t#t[#else]#t[/#if]#t_Error_Handler(__FILE__, __LINE__);
+                        [#if nTab==2]#t#t[#else]#t[/#if]}
+                    [/#if]#n 
 		  [#else][#--if method.arguments??--]
-        #n[#if nTab==2]#t#t[#else]#t[/#if]${method.name}();#n[#--add blank line before function call--]
+        #n
+[#--[#if nTab==2]#t#t[#else]#t[/#if]${method.name}();#n[#--add blank line before function call--]
+                    [#if method.returnHAL=="false"]
+                        [#if nTab==2]#t#t[#else]#t[/#if]${method.name}();
+                    [#else]
+                        [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
+                        [#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}() != [#if method.returnHAL == "true"]HAL_OK[#else]${method.returnHAL}[/#if])
+                        [#if nTab==2]#t#t[#else]#t[/#if]{
+                        [#if nTab==2]#t#t[#else]#t[/#if]#t_Error_Handler(__FILE__, __LINE__);
+                        [#if nTab==2]#t#t[#else]#t[/#if]}
+                    [/#if]#n 
       [/#if][#--if method.arguments??--]
     [/#if][#--if method.status=="OK"--]
     [#if method.status=="KO"]
@@ -397,7 +393,16 @@
         [/#list]
         #n[#if nTab==2]#t#t[#else]#t[/#if]//${method.name}(${args});#n[#--add blank line before function call--]
       [#else]
-        #n[#if nTab==2]#t#t[#else]#t[/#if]${method.name}();#n[#--add blank line before function call--]
+        [#if method.returnHAL=="false"]
+                        [#if nTab==2]#t#t[#else]#t[/#if]${method.name}();
+                    [#else]
+                        [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
+                        [#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}() != [#if method.returnHAL == "true"]HAL_OK[#else]${method.returnHAL}[/#if])
+                        [#if nTab==2]#t#t[#else]#t[/#if]{
+                        [#if nTab==2]#t#t[#else]#t[/#if]#t_Error_Handler(__FILE__, __LINE__);
+                        [#if nTab==2]#t#t[#else]#t[/#if]}
+                    [/#if]#n 
+        [#--#n[#if nTab==2]#t#t[#else]#t[/#if]${method.name}();#n[#--add blank line before function call--]
       [/#if]
     [/#if][#--if method.status=="KO"--]
   [/#list][#--list methodList as method--]
@@ -501,13 +506,13 @@
   [#if serviceType=="Init"] 
     [#if initService.clock??]
       [#list initService.clock?split(';') as clock]
-        #t#${clock}(); 
+        #t${clock}(); 
       [/#list]
     [#else]
-         #t__${ipName}_CLK_ENABLE();
+         #t__HAL_RCC_${ipName}_CLK_ENABLE();
     [/#if]
   [#else]           
-         #t__${ipName}_CLK_DISABLE();   
+         #t__HAL_RCC_${ipName}_CLK_DISABLE();   
   [/#if]
   [#if gpioExist]
 #t[@generateConfigCode ipName=ipName type=serviceType serviceName="gpio" instHandler=instHandler tabN=tabN/]
@@ -520,12 +525,12 @@
         [#if initService.nvic??]
             [#assign irqNum = 0]
             [#list initService.nvic as initVector]
+              [#if initVector.codeInMspInit]
                 [#assign irqNum = irqNum+1]
-                [#if irqNum==1]#t/* Peripheral interrupt Initt */[/#if]
-                [#-- #t#t/* Sets the priority grouping field */ To be done later--]
-                [#-- #t#tHAL_NVIC_SetPriorityGrouping(${initVector.group});  To be done later--]
+                [#if irqNum==1]#t/* Peripheral interrupt init */[/#if]
                 #tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
                 #tHAL_NVIC_EnableIRQ(${initVector.vector});
+              [/#if]
             [/#list]
         [/#if]
     [/#if]
@@ -605,7 +610,7 @@ void MX_${instName}_Init(void)
 
 [#-- Section2: Msp Init --]
 [#assign mspinitvar = ipvar.ipName + "_Initialized"]
-#nstatic int ${mspinitvar} = 0;
+#nstatic uint32_t ${mspinitvar} = 0;
 
 #nstatic void HAL_${ipvar.ipName}_MspInit(void){
 #t/* USER CODE BEGIN ${ipvar.ipName}_MspInit 0 */
@@ -627,7 +632,7 @@ void MX_${instName}_Init(void)
 #t#treturn;
 #t}
 #t${mspinitvar} = 1;
-[#assign ipHandler = "h" + ipvar.ipName?lower_case]
+[#assign ipHandler = ipvar.ipName?lower_case+ "Handle"]
 [@generateServiceCode ipName=ipvar.ipName serviceType="Init" modeName=ipvar.ipName instHandler=ipHandler tabN=1/]
 #t/* USER CODE BEGIN ${ipvar.ipName}_MspInit 1 */
 
@@ -646,7 +651,7 @@ void MX_${instName}_Init(void)
       [/#list]
     [/#if]
     [#assign ipHandler = "h" + mode?lower_case]
-#nvoid HAL_${mode}_MspInit(${mode}_HandleTypeDef* h${mode?lower_case}){
+#nvoid HAL_${mode}_MspInit(${mode}_HandleTypeDef* ${mode?lower_case}Handle){
 
     [#-- Search for static variables Start--]
     [#list instanceList?word_list as inst]
@@ -708,7 +713,7 @@ void MX_${instName}_Init(void)
 
 [#-- Section3: Msp DeInit --]
 [#assign mspdeinitvar = ipvar.ipName + "_DeInitialized"]
-#nstatic int ${mspdeinitvar} = 0;
+#nstatic uint32_t ${mspdeinitvar} = 0;
 
 #nstatic void HAL_${ipvar.ipName}_MspDeInit(void){
 #t/* USER CODE BEGIN ${ipvar.ipName}_MspDeInit 0 */
@@ -718,7 +723,7 @@ void MX_${instName}_Init(void)
 #t#treturn;
 #t}
 #t${mspdeinitvar} = 1;
-[#assign ipHandler = "h" + ipvar.ipName?lower_case]
+[#assign ipHandler = ipvar.ipName?lower_case+ "Handle"]
 [@generateServiceCode ipName=ipvar.ipName serviceType="DeInit" modeName=ipvar.ipName instHandler=ipHandler tabN=1/]
 #t/* USER CODE BEGIN ${ipvar.ipName}_MspDeInit 1 */
 
@@ -736,9 +741,9 @@ void MX_${instName}_Init(void)
         [/#if]
       [/#list]
     [/#if]
-    [#assign ipHandler = "h" + mode?lower_case]
+    [#assign ipHandler = mode?lower_case+ "Handle"]
 
-#nvoid HAL_${mode}_MspDeInit(${mode}_HandleTypeDef* h${mode?lower_case}){
+#nvoid HAL_${mode}_MspDeInit(${mode}_HandleTypeDef* ${mode?lower_case}Handle){
     [#-- Search for static variables Start--]
 
     [#-- Search for static variables End--]

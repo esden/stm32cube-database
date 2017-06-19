@@ -4,37 +4,14 @@
   * File Name          : freertos.c
   * Description        : Code for freertos applications
   ******************************************************************************
-  *
-  * COPYRIGHT(c) ${year} STMicroelectronics
-  *
-  * Redistribution and use in source and binary forms, with or without modification,
-  * are permitted provided that the following conditions are met:
-  *   1. Redistributions of source code must retain the above copyright notice,
-  *      this list of conditions and the following disclaimer.
-  *   2. Redistributions in binary form must reproduce the above copyright notice,
-  *      this list of conditions and the following disclaimer in the documentation
-  *      and/or other materials provided with the distribution.
-  *   3. Neither the name of STMicroelectronics nor the names of its contributors
-  *      may be used to endorse or promote products derived from this software
-  *      without specific prior written permission.
-  *
-  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-  * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-  * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-  * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-  *
+[@common.optinclude name="Src/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
 
 [#compress]
 [#assign inMain = 0]
 [#assign useNewHandle = 0]
+[#assign useTimers = 0]
 
 [#list SWIPdatas as SWIP]
     [#if SWIP.variables??]
@@ -54,6 +31,11 @@
 	        [#assign useNewHandle = 1]
           [/#if]   
 	    [/#if]
+	    [#if definition.name=="configUSE_TIMERS"]
+	      [#if definition.value=="1"]
+	        [#assign useTimers = 1]
+          [/#if]    
+	    [/#if]   
 	  [/#list]
     [/#if]
 [/#list]
@@ -119,7 +101,17 @@ void MX_FREERTOS_Init(void);  /* (MISRA C 2004 rule 8.1) */
 void PreSleepProcessing(uint32_t *ulExpectedIdleTime);
 void PostSleepProcessing(uint32_t *ulExpectedIdleTime);
           [/#if]
-        [/#if]             
+        [/#if] 
+	  	[#if definition.name=="MEMORY_ALLOCATION"]
+	      [#if definition.value!="0"]
+#n/* GetIdleTaskMemory prototype (linked to static allocation support) */
+void vApplicationGetIdleTaskMemory( StaticTask_t **ppxIdleTaskTCBBuffer, StackType_t **ppxIdleTaskStackBuffer, uint32_t *pulIdleTaskStackSize );
+            [#if useTimers==1]
+#n/* GetTimerTaskMemory prototype (linked to static allocation support) */
+void vApplicationGetTimerTaskMemory( StaticTask_t **ppxTimerTaskTCBBuffer, StackType_t **ppxTimerTaskStackBuffer, uint32_t *pulTimerTaskStackSize );            
+            [/#if]
+          [/#if]
+        [/#if]	                          
      [/#list]
  [/#if]
 [/#list]	
@@ -143,7 +135,12 @@ void vApplicationIdleHook(void);
           [#if definition.value=="1"]
 void vApplicationTickHook(void);       
           [/#if]
-        [/#if]      
+        [/#if]   
+        [#if definition.name=="configUSE_DAEMON_TASK_STARTUP_HOOK"]
+          [#if definition.value=="1"]
+void vApplicationDaemonTaskStartupHook(void);       
+          [/#if]    
+        [/#if]     
         [#if definition.name=="configCHECK_FOR_STACK_OVERFLOW"]
           [#if definition.value !="0"]
             [#if useNewHandle==0]
@@ -170,12 +167,12 @@ void vApplicationMallocFailedHook(void);
 #n
 /* USER CODE BEGIN 1 */
 /* Functions needed when configGENERATE_RUN_TIME_STATS is on */
-void configureTimerForRunTimeStats(void) 
+__weak void configureTimerForRunTimeStats(void) 
 {
 #n    
 }
 
-#nunsigned long getRunTimeCounterValue(void) 
+#n__weak unsigned long getRunTimeCounterValue(void) 
 {
     return 0;
 }  
@@ -187,7 +184,7 @@ void configureTimerForRunTimeStats(void)
 	      [#if definition.value=="1"]
 #n
 /* USER CODE BEGIN 2 */
-void vApplicationIdleHook( void ) 
+__weak void vApplicationIdleHook( void ) 
 {
 #t    /* vApplicationIdleHook() will only be called if configUSE_IDLE_HOOK is set
 #t    to 1 in FreeRTOSConfig.h.  It will be called on each iteration of the idle
@@ -206,7 +203,7 @@ void vApplicationIdleHook( void )
 	    [#if definition.name=="configUSE_TICK_HOOK"]
 	      [#if definition.value=="1"]
 #n/* USER CODE BEGIN 3 */
-void vApplicationTickHook( void ) 
+__weak void vApplicationTickHook( void ) 
 {
 #t    /* This function will be called by each tick interrupt if
 #t    configUSE_TICK_HOOK is set to 1 in FreeRTOSConfig.h.  User code can be
@@ -222,9 +219,9 @@ void vApplicationTickHook( void )
 	      [#if definition.value !="0"]
 #n/* USER CODE BEGIN 4 */
 [#if useNewHandle==0]
-void vApplicationStackOverflowHook(xTaskHandle xTask, signed char *pcTaskName)
+__weak void vApplicationStackOverflowHook(xTaskHandle xTask, signed char *pcTaskName)
 [#else]
-void vApplicationStackOverflowHook(TaskHandle_t xTask, signed char *pcTaskName)
+__weak void vApplicationStackOverflowHook(TaskHandle_t xTask, signed char *pcTaskName)
 [/#if]
 {
 #t    /* Run time stack overflow checking is performed if
@@ -238,7 +235,7 @@ void vApplicationStackOverflowHook(TaskHandle_t xTask, signed char *pcTaskName)
 	    [#if definition.name=="configUSE_MALLOC_FAILED_HOOK"]
 	      [#if definition.value=="1"]
 #n/* USER CODE BEGIN 5 */
-void vApplicationMallocFailedHook(void) 
+__weak void vApplicationMallocFailedHook(void) 
 {
 #t    /* vApplicationMallocFailedHook() will only be called if
 #t    configUSE_MALLOC_FAILED_HOOK is set to 1 in FreeRTOSConfig.h.  It is a hook
@@ -255,6 +252,16 @@ void vApplicationMallocFailedHook(void)
 	      [/#if]
 	    [/#if]
 	    
+	    [#if definition.name=="configUSE_DAEMON_TASK_STARTUP_HOOK"]
+	      [#if definition.value=="1"]
+#n/* USER CODE BEGIN DAEMON_TASK_STARTUP_HOOK */
+void vApplicationDaemonTaskStartupHook(void) 
+{
+}
+/* USER CODE END DAEMON_TASK_STARTUP_HOOK */	    
+	      [/#if]
+	    [/#if]
+	    
 	  [/#list]
 	 [/#if]
 [/#list]
@@ -267,19 +274,41 @@ void vApplicationMallocFailedHook(void)
 	      [#if definition.value=="1"]
 #n
 /* USER CODE BEGIN PREPOSTSLEEP */
-void PreSleepProcessing(uint32_t *ulExpectedIdleTime)
+__weak void PreSleepProcessing(uint32_t *ulExpectedIdleTime)
 {
 /* place for user code */ 
 }
 
-void PostSleepProcessing(uint32_t *ulExpectedIdleTime)
+__weak void PostSleepProcessing(uint32_t *ulExpectedIdleTime)
 {
 /* place for user code */
 }
 /* USER CODE END PREPOSTSLEEP */
 #n
           [/#if]
-        [/#if]             
+        [/#if]
+	  	[#if definition.name=="MEMORY_ALLOCATION"]
+	      [#if definition.value!="0"]
+#n
+/* USER CODE BEGIN GET_IDLE_TASK_MEMORY */    
+void vApplicationGetIdleTaskMemory( StaticTask_t **ppxIdleTaskTCBBuffer, StackType_t **ppxIdleTaskStackBuffer, uint32_t *pulIdleTaskStackSize )
+{
+/* place for user code */
+}                   
+/* USER CODE END GET_IDLE_TASK_MEMORY */
+#n
+            [#if useTimers==1]
+#n
+/* USER CODE BEGIN GET_TIMER_TASK_MEMORY */  
+void vApplicationGetTimerTaskMemory( StaticTask_t **ppxTimerTaskTCBBuffer, StackType_t **ppxTimerTaskStackBuffer, uint32_t *pulTimerTaskStackSize )  
+{
+/* place for user code */
+}                   
+/* USER CODE END GET_TIMER_TASK_MEMORY */
+#n
+            [/#if]
+          [/#if]
+        [/#if]                  
      [/#list]
  [/#if]
 [/#list]	

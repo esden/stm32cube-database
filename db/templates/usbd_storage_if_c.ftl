@@ -4,30 +4,7 @@
   * @file           : usbd_storage_if.c
   * @brief          : Memory management layer
   ******************************************************************************
-  * COPYRIGHT(c) ${year} STMicroelectronics
-  *
-  * Redistribution and use in source and binary forms, with or without modification,
-  * are permitted provided that the following conditions are met:
-  * 1. Redistributions of source code must retain the above copyright notice,
-  * this list of conditions and the following disclaimer.
-  * 2. Redistributions in binary form must reproduce the above copyright notice,
-  * this list of conditions and the following disclaimer in the documentation
-  * and/or other materials provided with the distribution.
-  * 3. Neither the name of STMicroelectronics nor the names of its contributors
-  * may be used to endorse or promote products derived from this software
-  * without specific prior written permission.
-  *
-  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-  * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-  * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-  * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-  *
+[@common.optinclude name="Src/license.tmp"/][#--include License text --]
   ******************************************************************************
 */
 [#assign handleNameFS = ""]
@@ -69,7 +46,7 @@
 /** @defgroup USBD_STORAGE_Private_TypesDefinitions
   * @{
   */ 
-/* USER CODE BEGIN PRIVATE_TYPES  */
+/* USER CODE BEGIN PRIVATE_TYPES */
 /* USER CODE END PRIVATE_TYPES */ 
 /**
   * @}
@@ -83,7 +60,7 @@
 #define STORAGE_BLK_NBR                  0x10000  
 #define STORAGE_BLK_SIZ                  0x200
 
-/* USER CODE BEGIN PRIVATE_DEFINES  */
+/* USER CODE BEGIN PRIVATE_DEFINES */
 /* USER CODE END PRIVATE_DEFINES */
   
 /**
@@ -94,7 +71,7 @@
 /** @defgroup USBD_STORAGE_Private_Macros
   * @{
   */ 
-/* USER CODE BEGIN PRIVATE_MACRO  */
+/* USER CODE BEGIN PRIVATE_MACRO */
 /* USER CODE END PRIVATE_MACRO */
 
 /**
@@ -104,13 +81,10 @@
 /** @defgroup USBD_STORAGE_IF_Private_Variables
   * @{
   */
-/* USB handler declaration */
-/* Handle for USB Full Speed IP */
 [#if handleNameFS == "FS" || handleNameUSB_FS == "FS"]
-#tUSBD_HandleTypeDef  *hUsbDevice_0;
 /* USER CODE BEGIN INQUIRY_DATA_FS */ 
 /* USB Mass storage Standard Inquiry Data */
-const int8_t  STORAGE_Inquirydata_FS[] = {//36
+const int8_t  STORAGE_Inquirydata_FS[] = {/* 36 */
   
   /* LUN 0 */
   0x00,		
@@ -130,11 +104,9 @@ const int8_t  STORAGE_Inquirydata_FS[] = {//36
 [/#if]
 
 [#if handleNameHS == "HS"]
-/* Handle for USB High Speed IP */
-#tUSBD_HandleTypeDef  *hUsbDevice_1;
 /* USER CODE BEGIN INQUIRY_DATA_HS */ 
 /* USB Mass storage Standard Inquiry Data */
-const int8_t  STORAGE_Inquirydata_HS[] = {//36
+const int8_t  STORAGE_Inquirydata_HS[] = {/* 36 */
   
   /* LUN 0 */
   0x00,		
@@ -152,8 +124,8 @@ const int8_t  STORAGE_Inquirydata_HS[] = {//36
 }; 
 /* USER CODE END INQUIRY_DATA_HS */ 
 [/#if]
-/* USER CODE BEGIN PRIVATE_VARIABLES  */
-/* USER CODE END  PRIVATE_VARIABLES */
+/* USER CODE BEGIN PRIVATE_VARIABLES */
+/* USER CODE END PRIVATE_VARIABLES */
 
 /**
   * @}
@@ -168,8 +140,8 @@ const int8_t  STORAGE_Inquirydata_HS[] = {//36
 [#if handleNameHS == "HS"]
 #textern USBD_HandleTypeDef hUsbDeviceHS;  
 [/#if]
-/* USER CODE BEGIN EXPORTED_VARIABLES  */
-/* USER CODE END  EXPORTED_VARIABLES */
+/* USER CODE BEGIN EXPORTED_VARIABLES */
+/* USER CODE END EXPORTED_VARIABLES */
 
 /**
   * @}
@@ -214,7 +186,7 @@ static int8_t STORAGE_Write_HS (uint8_t lun,
 static int8_t STORAGE_GetMaxLun_HS (void);
 [/#if]
 /* USER CODE BEGIN PRIVATE_FUNCTIONS_DECLARATION */
-/* USER CODE END  PRIVATE_FUNCTIONS_DECLARATION */
+/* USER CODE END PRIVATE_FUNCTIONS_DECLARATION */
 
 /**
   * @}
@@ -466,7 +438,7 @@ int8_t STORAGE_GetMaxLun_HS (void)
 [/#if]
 
 /* USER CODE BEGIN PRIVATE_FUNCTIONS_IMPLEMENTATION */
-/* USER CODE END  PRIVATE_FUNCTIONS_IMPLEMENTATION */
+/* USER CODE END PRIVATE_FUNCTIONS_IMPLEMENTATION */
 
 /**
   * @}

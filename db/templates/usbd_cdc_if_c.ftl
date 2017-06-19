@@ -4,30 +4,7 @@
   * @file           : usbd_cdc_if.c
   * @brief          :
   ******************************************************************************
-  * COPYRIGHT(c) ${year} STMicroelectronics
-  *
-  * Redistribution and use in source and binary forms, with or without modification,
-  * are permitted provided that the following conditions are met:
-  * 1. Redistributions of source code must retain the above copyright notice,
-  * this list of conditions and the following disclaimer.
-  * 2. Redistributions in binary form must reproduce the above copyright notice,
-  * this list of conditions and the following disclaimer in the documentation
-  * and/or other materials provided with the distribution.
-  * 3. Neither the name of STMicroelectronics nor the names of its contributors
-  * may be used to endorse or promote products derived from this software
-  * without specific prior written permission.
-  *
-  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-  * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-  * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-  * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-  *
+[@common.optinclude name="Src/license.tmp"/][#--include License text --]
   ******************************************************************************
 */
 [#assign handleNameFS = ""]
@@ -69,8 +46,8 @@
 /** @defgroup USBD_CDC_Private_TypesDefinitions
   * @{
   */ 
-/* USER CODE BEGIN PRIVATE TYPES  */
-/* USER CODE END PRIVATE TYPES */ 
+/* USER CODE BEGIN PRIVATE_TYPES */
+/* USER CODE END PRIVATE_TYPES */ 
 /**
   * @}
   */ 
@@ -79,12 +56,12 @@
 /** @defgroup USBD_CDC_Private_Defines
   * @{
   */ 
-/* USER CODE BEGIN PRIVATE DEFINES  */
+/* USER CODE BEGIN PRIVATE_DEFINES */
 /* Define size for the receive and transmit buffer over CDC */
 /* It's up to user to redefine and/or remove those define */
 #define APP_RX_DATA_SIZE  4
 #define APP_TX_DATA_SIZE  4
-/* USER CODE END PRIVATE DEFINES */
+/* USER CODE END PRIVATE_DEFINES */
 /**
   * @}
   */ 
@@ -93,7 +70,7 @@
 /** @defgroup USBD_CDC_Private_Macros
   * @{
   */ 
-/* USER CODE BEGIN PRIVATE_MACRO  */
+/* USER CODE BEGIN PRIVATE_MACRO */
 /* USER CODE END PRIVATE_MACRO */
 
 /**
@@ -123,18 +100,8 @@ uint8_t UserRxBufferHS[APP_RX_DATA_SIZE];
 uint8_t UserTxBufferHS[APP_TX_DATA_SIZE];
 [/#if]
 
-
-/* USB handler declaration */
-/* Handle for USB Full Speed IP */
-[#if handleNameFS == "FS" || handleNameUSB_FS == "FS"]
-#tUSBD_HandleTypeDef  *hUsbDevice_0;
-[/#if]
-[#if handleNameHS == "HS"]
-/* Handle for USB High Speed IP */
-#tUSBD_HandleTypeDef  *hUsbDevice_1;
-[/#if]
-/* USER CODE BEGIN PRIVATE_VARIABLES  */
-/* USER CODE END  PRIVATE VARIABLES */
+/* USER CODE BEGIN PRIVATE_VARIABLES */
+/* USER CODE END PRIVATE_VARIABLES */
 
 /**
   * @}
@@ -149,8 +116,8 @@ uint8_t UserTxBufferHS[APP_TX_DATA_SIZE];
 [#if handleNameHS == "HS"]
 #textern USBD_HandleTypeDef hUsbDeviceHS;  
 [/#if]
-/* USER CODE BEGIN EXPORTED_VARIABLES  */
-/* USER CODE END  EXPORTED_VARIABLES */
+/* USER CODE BEGIN EXPORTED_VARIABLES */
+/* USER CODE END EXPORTED_VARIABLES */
 
 /**
   * @}
@@ -173,7 +140,7 @@ static int8_t CDC_Control_HS  (uint8_t cmd, uint8_t* pbuf, uint16_t length);
 static int8_t CDC_Receive_HS  (uint8_t* pbuf, uint32_t *Len);
 [/#if]
 /* USER CODE BEGIN PRIVATE_FUNCTIONS_DECLARATION */
-/* USER CODE END  PRIVATE_FUNCTIONS_DECLARATION */
+/* USER CODE END PRIVATE_FUNCTIONS_DECLARATION */
 
 /**
   * @}
@@ -208,12 +175,11 @@ USBD_CDC_ItfTypeDef USBD_Interface_fops_HS =
   * @retval Result of the operation: USBD_OK if all operations are OK else USBD_FAIL
   */
 static int8_t CDC_Init_FS(void)
-{
-  hUsbDevice_0 = &hUsbDeviceFS;
+{ 
   /* USER CODE BEGIN 3 */ 
   /* Set Application Buffers */
-  USBD_CDC_SetTxBuffer(hUsbDevice_0, UserTxBufferFS, 0);
-  USBD_CDC_SetRxBuffer(hUsbDevice_0, UserRxBufferFS);
+  USBD_CDC_SetTxBuffer(&hUsbDeviceFS, UserTxBufferFS, 0);
+  USBD_CDC_SetRxBuffer(&hUsbDeviceFS, UserRxBufferFS);
   return (USBD_OK);
   /* USER CODE END 3 */ 
 }
@@ -324,6 +290,8 @@ static int8_t CDC_Control_FS  (uint8_t cmd, uint8_t* pbuf, uint16_t length)
 static int8_t CDC_Receive_FS (uint8_t* Buf, uint32_t *Len)
 {
   /* USER CODE BEGIN 6 */
+  USBD_CDC_SetRxBuffer(&hUsbDeviceFS, &Buf[0]);
+  USBD_CDC_ReceivePacket(&hUsbDeviceFS);
   return (USBD_OK);
   /* USER CODE END 6 */ 
 }
@@ -343,8 +311,12 @@ uint8_t CDC_Transmit_FS(uint8_t* Buf, uint16_t Len)
 {
   uint8_t result = USBD_OK;
   /* USER CODE BEGIN 7 */ 
-  USBD_CDC_SetTxBuffer(hUsbDevice_0, Buf, Len);   
-  result = USBD_CDC_TransmitPacket(hUsbDevice_0);
+  USBD_CDC_HandleTypeDef *hcdc = (USBD_CDC_HandleTypeDef*)hUsbDeviceFS.pClassData;
+  if (hcdc->TxState != 0){
+    return USBD_BUSY;
+  }
+  USBD_CDC_SetTxBuffer(&hUsbDeviceFS, Buf, Len);
+  result = USBD_CDC_TransmitPacket(&hUsbDeviceFS);
   /* USER CODE END 7 */ 
   return result;
 }
@@ -358,12 +330,11 @@ uint8_t CDC_Transmit_FS(uint8_t* Buf, uint16_t Len)
   * @retval Result of the operation: USBD_OK if all operations are OK else USBD_FAIL
   */
 static int8_t CDC_Init_HS(void)
-{
-  hUsbDevice_1 = &hUsbDeviceHS;
+{ 
   /* USER CODE BEGIN 8 */ 
   /* Set Application Buffers */
-  USBD_CDC_SetTxBuffer(hUsbDevice_1, UserTxBufferHS, 0);
-  USBD_CDC_SetRxBuffer(hUsbDevice_1, UserRxBufferHS);
+  USBD_CDC_SetTxBuffer(&hUsbDeviceHS, UserTxBufferHS, 0);
+  USBD_CDC_SetRxBuffer(&hUsbDeviceHS, UserRxBufferHS);
   return (USBD_OK);
   /* USER CODE END 8 */ 
 }
@@ -474,6 +445,8 @@ static int8_t CDC_Control_HS  (uint8_t cmd, uint8_t* pbuf, uint16_t length)
 static int8_t CDC_Receive_HS (uint8_t* Buf, uint32_t *Len)
 {
   /* USER CODE BEGIN 11 */ 
+  USBD_CDC_SetRxBuffer(&hUsbDeviceHS, &Buf[0]);
+  USBD_CDC_ReceivePacket(&hUsbDeviceHS);
   return (USBD_OK);
   /* USER CODE END 11 */ 
 }
@@ -492,15 +465,19 @@ uint8_t CDC_Transmit_HS(uint8_t* Buf, uint16_t Len)
 {
   uint8_t result = USBD_OK;
   /* USER CODE BEGIN 12 */ 
-  USBD_CDC_SetTxBuffer(hUsbDevice_1, Buf, Len);   
-  result = USBD_CDC_TransmitPacket(hUsbDevice_1);
+  USBD_CDC_HandleTypeDef *hcdc = (USBD_CDC_HandleTypeDef*)hUsbDeviceHS.pClassData;
+  if (hcdc->TxState != 0){
+    return USBD_BUSY;
+  }
+  USBD_CDC_SetTxBuffer(&hUsbDeviceHS, Buf, Len);
+  result = USBD_CDC_TransmitPacket(&hUsbDeviceHS);
   /* USER CODE END 12 */ 
   return result;
 }
 [/#if]
 
 /* USER CODE BEGIN PRIVATE_FUNCTIONS_IMPLEMENTATION */
-/* USER CODE END  PRIVATE_FUNCTIONS_IMPLEMENTATION */
+/* USER CODE END PRIVATE_FUNCTIONS_IMPLEMENTATION */
 
 /**
   * @}

@@ -13,8 +13,14 @@
 	<RefParameter Comment="Device endpoints number" DefaultValue="null" Name="dev_endpoints" Type="List" Group="" Visible="true">	
 		<Condition Expression="VirtualMode = Host_Only" Diagnostic=""/>		
 	</RefParameter>	
-	<RefParameter Comment="Device endpoints number" DefaultValue="7" Name="dev_endpoints" Min="1" Max="7" Type="integer" Group="" Visible="false">	
-		<!--<PossibleValue Comment="7" Value="7"/>-->
+	<!-- Bug356587 -->
+	<RefParameter Comment="Device endpoints number" DefaultValue="4" Name="dev_endpoints" Min="1" Max="4" Type="integer" Group="" Visible="false">
+		<Condition Expression="DIE411 | DIE419 | DIE413 | DIE423 | DIE431 | DIE433" Diagnostic=""/>		
+	</RefParameter>	
+	<RefParameter Comment="Device endpoints number" DefaultValue="6" Name="dev_endpoints" Min="1" Max="6" Type="integer" Group="" Visible="false">
+		<Condition Expression="DIE421 | DIE451" Diagnostic=""/>		
+	</RefParameter>	
+	<RefParameter Comment="Device endpoints number" DefaultValue="10" Name="dev_endpoints" Min="1" Max="10" Type="integer" Group="" Visible="false">				
 	</RefParameter>	
 	
 	<RefParameter Comment="Host Channels" DefaultValue="8" Name="Host_channels"  Min="1" Max="8" Type="integer" Group=""  Visible="false">	
@@ -43,13 +49,13 @@
 	</RefParameter>
 	
 	<!-- Device speed -->
-	<RefParameter Comment="Speed" DefaultValue="PCD_SPEED_FULL" Name="speed" Type="List" Group="">	
+	<RefParameter Comment="Speed" DefaultValue="PCD_SPEED_FULL" Name="DeviceSpeed" Type="List" Group="">	
 		<Condition Expression="VirtualMode = Device_DP_DM" Diagnostic=""/>
 		<PossibleValue Comment="Device Full Speed 12MBit/s" Value="PCD_SPEED_FULL"/>
 		<!--<PossibleValue Comment="Low Speed 1.5MBit/s" Value="PCD_SPEED_LOW"/> -->	
 	</RefParameter>
 	
-	<RefParameter Comment="Speed" DefaultValue="PCD_SPEED_FULL" Name="speed" Type="List" Group="">	
+	<RefParameter Comment="Speed" DefaultValue="PCD_SPEED_FULL" Name="DeviceSpeed" Type="List" Group="">	
 		<Condition Expression="VirtualMode = Device_Only" Diagnostic=""/>
 		<PossibleValue Comment="Device Full Speed 12MBit/s" Value="PCD_SPEED_FULL"/>
 		<!--<PossibleValue Comment="Low Speed 1.5MBit/s" Value="PCD_SPEED_LOW"/>-->
@@ -87,10 +93,16 @@
 		<PossibleValue Value="PCD_PHY_EMBEDDED" Comment="Internal Phy"/>		
 	</RefParameter>
 	
-	<RefParameter Comment="Signal start of frame " DefaultValue="DISABLE" Name="Sof_enable" Type="List" Group="">
+	<!-- Bug356385 -->	
+	<RefParameter Comment="Signal start of frame " DefaultValue="ENABLE" Name="Sof_enable" Type="List" Group="">
 		<PossibleValue Value="ENABLE" Comment="Enabled"/>
-		<PossibleValue Value="DISABLE" Comment="Disabled"/>		
+		<Condition Expression="USB_FS_SOF" Diagnostic=""/>		
 	</RefParameter>
+	<!-- Bug381221 -->
+	<RefParameter Comment="Signal start of frame " DefaultValue="DISABLE" Name="Sof_enable" Type="List" Group="" Visible="true">
+		<PossibleValue Value="ENABLE" Comment="Enabled"/>
+		<PossibleValue Value="DISABLE" Comment="Disabled"/>			
+	</RefParameter>	
 	
 	<!-- Add Link Power Management -->
 	<RefParameter Comment="Link Power Management" DefaultValue="DISABLE" Name="lpm_enable" Type="List" Group="" Visible="true">
@@ -157,6 +169,7 @@
 		<Parameter Name="phy_itface">
 			<PossibleValue>HCD_PHY_EMBEDDED</PossibleValue>
 		</Parameter>
+		<Parameter Name="Sof_enable"/>		
 		<!-- Tracker 307127 -->
 		<!--	
 		<Parameter Name="low_power_enable"/>	
@@ -171,7 +184,7 @@
 			<PossibleValue>Device_DP_DM</PossibleValue>
 		</Parameter>
 		<Parameter Name="dev_endpoints"/>		
-		<Parameter Name="speed"/>
+		<Parameter Name="DeviceSpeed"/>
 		<Parameter Name="ep0_mps"/>						
 		<Parameter Name="dma_enable"/>
 		<Parameter Name="phy_itface">
@@ -181,6 +194,8 @@
 		<Parameter Name="lpm_enable"/>
 		<!--<Parameter Name="use_dedicated_ep1"/>-->	
 		<Parameter Name="vbus_sensing_enable"/>	
+		<!-- Bug356385 -->
+		<Parameter Name="Sof_enable"/>			
 	</RefMode>
 	
 	<RefMode Name="Device_Only" HalMode="PCD">
@@ -189,7 +204,7 @@
 			<PossibleValue>Device_Only</PossibleValue>
 		</Parameter>
 		<Parameter Name="dev_endpoints"/>		
-		<Parameter Name="speed">
+		<Parameter Name="DeviceSpeed">
 			<PossibleValue>PCD_SPEED_FULL</PossibleValue>
 		</Parameter>
 		<Parameter Name="ep0_mps"/>						
@@ -201,13 +216,12 @@
 		<Parameter Name="lpm_enable"/>
 		<!--<Parameter Name="use_dedicated_ep1"/>-->
 		<Parameter Name="vbus_sensing_enable"/>	
+		<!-- Bug356385 -->
+		<Parameter Name="Sof_enable"/>			
 	</RefMode>
 	
 	<!-- USB Full Speed in Device mode with SOF -->
-	<RefMode Name="Activate_SOF_FS" HalMode="">		
-		<Parameter Name="Sof_enable">
-			<PossibleValue>ENABLE</PossibleValue>
-		</Parameter>			
+	<RefMode Name="Activate_SOF_FS" HalMode="">									
 	</RefMode>
 	
 	
@@ -275,6 +289,8 @@
 				</Mode>			
 			</ModeLogicOperator>
 			<Semaphore>USB_FS_HS</Semaphore>
+			<!-- Bug356385 -->
+			<Semaphore>USB_FS_SOF</Semaphore>
 			<!-- Tracker 233898 -->
 			<Condition Expression="MW_USB_OTG_FS_MW_DEVICE | MW_USB_OTG_FS_MW_HOST | OTG_DUAL_ROLE_DEVICE" Diagnostic="USB Mode must be selected first"/>			
 		</Mode>

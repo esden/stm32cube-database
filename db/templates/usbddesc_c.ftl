@@ -6,31 +6,7 @@
 [#--  * @packageVersion : ${fwVersion} --]
   * @brief          : This file implements the USB Device descriptors
   ******************************************************************************
-  *
-  * COPYRIGHT(c) ${year} STMicroelectronics
-  *
-  * Redistribution and use in source and binary forms, with or without modification,
-  * are permitted provided that the following conditions are met:
-  * 1. Redistributions of source code must retain the above copyright notice,
-  * this list of conditions and the following disclaimer.
-  * 2. Redistributions in binary form must reproduce the above copyright notice,
-  * this list of conditions and the following disclaimer in the documentation
-  * and/or other materials provided with the distribution.
-  * 3. Neither the name of STMicroelectronics nor the names of its contributors
-  * may be used to endorse or promote products derived from this software
-  * without specific prior written permission.
-  *
-  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-  * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-  * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-  * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-  *
+[@common.optinclude name="Src/license.tmp"/][#--include License text --]
   ******************************************************************************
 */
 
@@ -41,6 +17,8 @@
 [#assign HS = 0] 
 [#assign FS = 0] 
 [#assign instanceNb = 0] 
+[#assign CLASS_FS = ""]
+[#assign CLASS_HS = ""]
 
 /** @addtogroup STM32_USB_OTG_DEVICE_LIBRARY
   * @{
@@ -77,39 +55,16 @@
 	[#if definition.paramName == "PID_FS"]
 		[#assign FS = 1]
 	[/#if]
-[#if definition.type=="string"]
-	[#if definition.paramName == "SERIALNUMBER_STRING_FS"]
-/* USER CODE BEGIN SERIALNUMBER_STRING_FS */
+[#if definition.paramName == "CLASS_NAME_HS"]	
+	[#assign CLASS_HS = value]
+[#elseif definition.paramName == "CLASS_NAME_FS"]	
+	[#assign CLASS_FS = value]	
+[#elseif  definition.type=="string"]
+	[#assign instanceNb = instanceNb + 1]
 #define USBD_${definition.paramName} #t#t"${value}" 
-/* USER CODE END SERIALNUMBER_STRING_FS */
-		[#assign instanceNb = instanceNb + 1]
-	[#else]
-		[#if definition.paramName == "SERIALNUMBER_STRING_HS"]
-/* USER CODE BEGIN SERIALNUMBER_STRING_HS */
+[#elseif  definition.type=="stringRW"]
+	[#assign instanceNb = instanceNb + 1]
 #define USBD_${definition.paramName} #t#t"${value}" 
-/* USER CODE END SERIALNUMBER_STRING_HS */
-			[#assign instanceNb = instanceNb + 1]
-		[#else]
-#define USBD_${definition.paramName} #t#t"${value}" 
-		[/#if]
-	[/#if]	
-[/#if]
-[#if definition.type=="stringRW"]
-	[#if definition.paramName == "SERIALNUMBER_STRING_FS"]	
-/* USER CODE BEGIN SERIALNUMBER_STRING_FS */
-#define USBD_${definition.paramName} #t#t"${value}" 
-/* USER CODE END SERIALNUMBER_STRING_FS */
-		[#assign instanceNb = instanceNb + 1]
-	[#else]
-		[#if definition.paramName == "SERIALNUMBER_STRING_HS"]
-/* USER CODE BEGIN SERIALNUMBER_STRING_HS */
-#define USBD_${definition.paramName} #t#t"${value}" 
-/* USER CODE END SERIALNUMBER_STRING_HS */
-			[#assign instanceNb = instanceNb + 1]
-		[#else]
-#define USBD_${definition.paramName} #t#t"${value}" 
-		[/#if]
-	[/#if]
 [#else]
 #define USBD_${definition.paramName} #t#t${value}
 [/#if]	
@@ -123,6 +78,9 @@
 #define USB_SIZ_BOS_DESC            0x0C
 [/#if]
 
+/* USER CODE BEGIN 0 */
+
+/* USER CODE END 0*/
 /**
   * @}
   */ 
@@ -194,8 +152,13 @@ __ALIGN_BEGIN uint8_t USBD_FS_DeviceDesc[USB_LEN_DEV_DESC] __ALIGN_END =
     0x00,                       /* bcdUSB */  
 [/#if]
     0x02,
+[#if CLASS_FS == "CDC"]
+    0x02,                        /*bDeviceClass*/
+    0x02,                       /*bDeviceSubClass*/
+[#else]
     0x00,                       /*bDeviceClass*/
     0x00,                       /*bDeviceSubClass*/
+[/#if]	   
     0x00,                       /*bDeviceProtocol*/
     USB_MAX_EP0_SIZE,          /*bMaxPacketSize*/
     LOBYTE(USBD_VID),           /*idVendor*/
@@ -291,8 +254,13 @@ __ALIGN_BEGIN uint8_t USBD_HS_DeviceDesc[USB_LEN_DEV_DESC] __ALIGN_END =
 [/#if]
 
     0x02,
+ [#if CLASS_HS == "CDC"]
+    0x02,                        /*bDeviceClass*/
+    0x02,                       /*bDeviceSubClass*/
+[#else]
     0x00,                       /*bDeviceClass*/
     0x00,                       /*bDeviceSubClass*/
+[/#if]
     0x00,                       /*bDeviceProtocol*/
     USB_MAX_EP0_SIZE,          /*bMaxPacketSize*/
     LOBYTE(USBD_VID),           /*idVendor*/

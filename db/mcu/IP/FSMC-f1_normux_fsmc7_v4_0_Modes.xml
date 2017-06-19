@@ -11,7 +11,7 @@
     <!-- Begin Configuration RefParameters -->
     <!-- Begin NOR Flash 1 RefParameters -->
     <RefParameter Comment="NS Coherent Pinout" DefaultValue="MEMORY_NADV_KO" Name="NSCoherentPinout1" Type="list" TabName="NOR/PSRAM 1" Group="NOR/PSRAM control" Visible="false">
-        <Condition Expression="((Address1&amp;Data1)|NorPsramDataAddress1)&amp;(NorFlash1|MuxedNorFlash1)&amp;NorPsramClock1&amp;!AddressValid1" Diagnostic=""/>
+        <Condition Expression="((Address1&amp;Data1)|NorPsramDataAddress1)&amp;(NorFlash1|MuxedNorFlash1|Psram1|MuxedPsram1)&amp;NorPsramClock1&amp;!AddressValid1" Diagnostic=""/>
         <PossibleValue Comment="NADV KO" Value="MEMORY_NADV_KO"/>
     </RefParameter>
     <RefParameter Comment="NS Coherent Pinout" DefaultValue="MEMORY_PINOUT_OK" Name="NSCoherentPinout1" Type="list" TabName="NOR/PSRAM 1" Group="NOR/PSRAM control" Visible="false">
@@ -371,38 +371,40 @@
    <RefMode Name="NorPsramChipSelect3_1" Comment="NOR/PSRAM Chip Select 3" BaseMode="HAL_NOR_SRAM1_Init"/>
    <RefMode Name="NorPsramChipSelect4_1" Comment="NOR/PSRAM Chip Select 4" BaseMode="HAL_NOR_SRAM1_Init"/>
    <RefMode Name="Lcd1" Comment="Lcd Interface" BaseMode="HAL_SRAM1_Init" HalMode="SRAM"/>
+   <!-- Begin MUX_MEMORY RefModes -->
    <RefMode Name="MuxedNorFlash1" Comment="Muxed NOR Flash" BaseMode="HAL_NOR1_Init" HalMode="NOR"/>
    <RefMode Name="MuxedPsram1" Comment="Muxed Psram" BaseMode="HAL_SRAM1_Init" HalMode="SRAM"/>
+   <!-- End MUX_MEMORY RefModes -->
    <!-- End NOR Flash 1 RefModes -->
   <!-- Begin ModeLogicOperator -->
 
   <ModeLogicOperator Name="XOR">
     <!-- Begin Modes -->
     <!-- Begin NOR Flash 1 Modes -->
-    <Mode Name="NorFlash1" UserName="NOR Flash/PSRAM/SRAM/ROM 1">
+    <Mode Name="NorFlash1" UserName="NOR Flash/PSRAM/SRAM/ROM/LCD 1">
       <ModeLogicOperator Name="OR">
-        <Mode Name="NorPsramChipSelect1" UserName="Chip select">
+        <Mode Name="NorPsramChipSelect1" UserName="Chip Select">
           <ModeLogicOperator Name="XOR">
-            <Mode Name="NorPsramChipSelect1_1" UserName="NE1" ShrinkName="NE1 chip select">
+            <Mode Name="NorPsramChipSelect1_1" UserName="NE1" ShrinkName="NE1 Chip Select">
               <SignalLogicalOp Name="AND">
                 <Signal Name="NE1"/>
               </SignalLogicalOp>
               <Semaphore>NorPsramChipSelect1_1</Semaphore>
               <Semaphore>NE1NorPsramChipSelect</Semaphore>
             </Mode>
-            <Mode Name="NorPsramChipSelect2_1" UserName="NE2">
+            <Mode Name="NorPsramChipSelect2_1" UserName="NE2" ShrinkName="NE2 Chip Select">
               <SignalLogicalOp Name="AND">
                 <Signal Name="NE2"/>
               </SignalLogicalOp>
               <Semaphore>NorPsramChipSelect2_1</Semaphore>
             </Mode>
-            <Mode Name="NorPsramChipSelect3_1" UserName="NE3">
+            <Mode Name="NorPsramChipSelect3_1" UserName="NE3" ShrinkName="NE3 Chip Select">
               <SignalLogicalOp Name="AND">
                 <Signal Name="NE3"/>
               </SignalLogicalOp>
               <Semaphore>NorPsramChipSelect3_1</Semaphore>
             </Mode>
-            <Mode Name="NorPsramChipSelect4_1" UserName="NE4">
+            <Mode Name="NorPsramChipSelect4_1" UserName="NE4" ShrinkName="NE4 Chip Select">
               <SignalLogicalOp Name="AND">
                 <Signal Name="NE4"/>
               </SignalLogicalOp>
@@ -413,6 +415,11 @@
         </Mode>
         <Mode Name="MemoryType1" UserName="Memory type">
           <ModeLogicOperator Name="XOR">
+            <Mode Name="Fake1" UserName="Fake">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="FAKE"/>
+              </SignalLogicalOp>
+            </Mode>
             <Mode Name="Lcd1" UserName="LCD Interface">
               <SignalLogicalOp Name="AND">
                 <Signal Name="NOE"/>
@@ -420,6 +427,7 @@
               </SignalLogicalOp>
               <Semaphore>Lcd1</Semaphore>
             </Mode>
+            <!-- Begin MUX_MEMORY Modes -->
             <Mode Name="MuxedNorFlash1" UserName="Muxed NOR Flash">
               <SignalLogicalOp Name="AND">
                 <Signal Name="NOE"/>
@@ -429,18 +437,18 @@
             </Mode>
             <Mode Name="MuxedPsram1" UserName="Muxed PSRAM">
               <SignalLogicalOp Name="AND">
-                <Signal Name="NL"/>
                 <Signal Name="NOE"/>
                 <Signal Name="NWE"/>
               </SignalLogicalOp>
               <Semaphore>MuxedPsram1</Semaphore>
             </Mode>
+            <!-- End MUX_MEMORY Modes -->
           </ModeLogicOperator>
-          <Condition Expression="NorPsramChipSelect1" Diagnostic="Chip select disabled"/>
+          <Condition Expression="NorPsramChipSelect1" Diagnostic="Chip Select disabled"/>
         </Mode>
-        <Mode Name="OneBitAddress1" UserName="LCD register select">
+        <Mode Name="OneBitAddress1" UserName="LCD Register Select">
           <ModeLogicOperator Name="XOR">
-            <Mode Name="A0_1" UserName="A0">
+            <Mode Name="A0_1" UserName="A0" ShrinkName="A0 Register Select">
               <SignalLogicalOp Name="AND">
                 <Signal Name="A0"/>
               </SignalLogicalOp>
@@ -586,7 +594,7 @@
             <Signal Name="D7"/>
           </SignalLogicalOp>
           <ModeLogicOperator Name="XOR">
-            <Mode Name="8b-d1" UserName="8 bits">
+            <Mode Name="8b-d1" UserName="8 bits" ShrinkName="8-bit data">
               <Semaphore>_8_bit_data1</Semaphore>
             </Mode>
             <Mode Name="16b-d1" UserName="16 bits">
@@ -604,11 +612,12 @@
             </Mode>
           </ModeLogicOperator>
           <Semaphore>Data1</Semaphore>
-          <Condition Expression="OneBitAddress1" Diagnostic="LCD register select disabled"/>
+          <Condition Expression="OneBitAddress1" Diagnostic="LCD Register Select disabled"/>
         </Mode>
+        <!-- Begin MUX_ADDRESS Modes -->
         <Mode Name="NorPsramDataAddress1" UserName="Data/Address">
           <ModeLogicOperator Name="LIST">
-            <Mode Name="8b-da1" UserName="8 bits">
+            <Mode Name="8b-da1" UserName="8 bits" ShrinkName="8-bit data/address">
               <SignalLogicalOp Name="AND">
                 <Signal Name="DA0"/>
                 <Signal Name="DA1"/>
@@ -733,6 +742,8 @@
           <Semaphore>NorPsramDataAddress1</Semaphore>
           <Condition Expression="MuxedNorFlash1|MuxedPsram1" Diagnostic="Memory type should be multiplexed NOR Flash or multiplexed PSRAM"/>
         </Mode>
+        <!-- End MUX_ADDRESS Modes -->
+        <!-- Begin OTHER_MEMORY_FEATURE Modes -->
         <Mode Name="NorPsramClock1" UserName="Clock">
           <SignalLogicalOp Name="AND">
             <Signal Name="CLK"/>
@@ -763,22 +774,23 @@
             </Mode>
           </ModeLogicOperator>
           <Semaphore>AddressValid1</Semaphore>
-          <Condition Expression="NorFlash1|MuxedNorFlash1" Diagnostic="Optional only for asynchronous NOR Flash"/>
+          <Condition Expression="NorFlash1|MuxedNorFlash1|Psram1|MuxedPsram1" Diagnostic="Only for NOR Flash and PSRAM"/>
         </Mode>
         <Mode Name="NorPsramWait1" UserName="Wait">
           <SignalLogicalOp Name="AND">
             <Signal Name="NWAIT"/>
           </SignalLogicalOp>
           <ModeLogicOperator Name="XOR">
-            <Mode Name="AsynchronousWait1" UserName="Asynchronous">
+            <Mode Name="AsynchronousWait1" UserName="Asynchronous" ShrinkName="Asynchronous wait">
               <Semaphore>AsynchronousWaitMode1</Semaphore>
               <Condition Expression="!NorPsramClock1|((!BurstReadMode1|!BurstWriteMode1)&amp;(Psram1|MuxedPsram1))" Diagnostic="Only for asynchronous accesses"/>
             </Mode>
-            <Mode Name="SynchronousWait1" UserName="Synchronous">
+            <!-- No CLK pin on DIE461 WLCSP100 -->
+            <Mode Name="SynchronousWait1" UserName="Synchronous" RemoveCondition="DIE461&amp;WLCSP100">
               <Semaphore>SynchronousWaitMode1</Semaphore>
               <Condition Expression="NorPsramClock1" Diagnostic="Only for synchronous accesses"/>
             </Mode>
-            <Mode Name="AsynchronousSynchronousWait1" UserName="Asynchronous Synchronous">
+            <Mode Name="AsynchronousSynchronousWait1" UserName="Asynchronous Synchronous" RemoveCondition="DIE461&amp;WLCSP100">
               <Semaphore>AsynchronousWaitMode1</Semaphore>
               <Semaphore>SynchronousWaitMode1</Semaphore>
               <Condition Expression="NorPsramClock1&amp;(!BurstReadMode1|!BurstWriteMode1)&amp;(Psram1|MuxedPsram1)" Diagnostic="Only for PSRAM with either asynchronous read and synchronous write accesses or synchronous read and asynchronous write accesses"/>
@@ -799,6 +811,7 @@
           </ModeLogicOperator>
           <Condition Expression="((Psram1|Sram1)&amp;_16_bit_data1)|(MuxedPsram1&amp;(_16b_da1|_17b_da1|_18b_da1|_19b_da1|_20b_da1|_21b_da1|_22b_da1|_23b_da1|_24b_da1|_25b_da1|_26b_da1))" Diagnostic="Only for 16-bit PSRAM and SRAM"/>
         </Mode>
+        <!-- End OTHER_MEMORY_FEATURE Modes -->
       </ModeLogicOperator>
     </Mode>
     <!-- End NOR Flash 1 Modes -->
