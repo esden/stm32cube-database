@@ -1,5 +1,5 @@
 [#ftl]
-/**
+/**tttttttttt
   ******************************************************************************
   * File Name          : ${FamilyName?lower_case}xx_hal_msp.c
   * Description        : This file provides code for the MSP Initialization 
@@ -130,12 +130,15 @@ void HAL_MspInit(void)
 [#assign useNvic = false]
 [#-- extract hal mode list used by all instances of the ip --]
 [#assign halModeList= ""]
+
 [#list ipvar.instances.entrySet() as entry]
         [#if halModeList?contains(entry.value)]
         [#else]
             [#assign halModeList = halModeList + " " +entry.value]
         [/#if]
 [/#list]
+
+
 [#-- End extract hal mode list used by all instances of the ip --]
 [#-- Define includes --]
 [#list IP.configModelList as instanceData]
@@ -468,7 +471,9 @@ void HAL_MspInit(void)
     [#if service.gpio??][#assign gpioService = service.gpio][#else][#assign gpioService = ""][/#if]
 [/#if]
 [#if serviceName=="gpioOut"]
-    [#if service.gpioOut??][#assign gpioOutService = service.gpioOut][#else][#assign gpioOutService = ""][/#if]
+    [#if service.gpioOut??][#assign gpioOutService = service.gpioOut][#else][#assign gpioOutService = "empty"][/#if]
+[#else]
+[#assign gpioOutService = "empty"]
 [/#if]
 [#if serviceName=="dma" && service.dma??]
 [#assign dmaService = service.dma]
@@ -478,9 +483,11 @@ void HAL_MspInit(void)
  [#assign instanceIndex =""]
     [@generateConfigModelCode configModel=gpioService inst=ipName nTab=tabN index=""/]
 [/#if]
-[#if serviceName=="gpioOut"]
+[#if serviceName=="gpioOut" && service.gpioOut??]
  [#assign instanceIndex =""]
+[#if gpioOutService!="empty"]
     [@generateConfigModelCode configModel=gpioOutService inst=ipName nTab=tabN index=""/]
+[/#if]
 [/#if]
 [#if serviceName=="dma" && dmaService??]
 
@@ -628,8 +635,12 @@ void HAL_MspInit(void)
                [/#list]
             [/#if]
          [#else]
+            [#if ipName?contains("WWDG") && DIE=="DIE415"]
+            [#-- Orca window watchdog clock disable doesn't work --]
+            [#else]
                  #t#t/* Peripheral clock disable */
                  #t#t__${ipName}_CLK_DISABLE(); 
+            [/#if]
          [/#if]
     [/#if]
     
@@ -910,7 +921,7 @@ static int ${entry.value}=0;
 [#compress]
 [#assign DFSDM_var = "false"]
 [#list ipvar.initCallBacks.entrySet() as entry]
-[#assign instanceList = entry.value]
+[#assign instanceList = entry.value] 
 [#assign mode=entry.key?replace("_MspInit","")?replace("MspInit","")?replace("_BspInit","")?replace("HAL_","")]
 
 [#assign ipHandler = "h" + mode?lower_case]
@@ -1043,18 +1054,21 @@ int DFSDM_Init = 0;
 [#-- Section2-1: Msp Post Init --]
 [#if ipvar.initCallBacks??]
 [#compress]
+[#-- Get List of all IP instances to cerate the MspPostInit --]
 [#assign DFSDM_var = "false"]
-[#list ipvar.initCallBacks.entrySet() as entry]
-[#assign instanceList = entry.value]
-[#assign mode=entry.key?replace("_MspInit","")?replace("MspInit","")?replace("_BspInit","")?replace("HAL_","")]
+[#assign instanceMap = ipvar.instances]
 
+[#assign instanceList = ipvar.instanceListWithOutputs]
+
+[#--assign mode=entry.key?replace("_MspInit","")?replace("MspInit","")?replace("_BspInit","")?replace("HAL_","")--]
+[#assign mode=ipvar.ipName]
 [#assign ipHandler = "h" + mode?lower_case]
 [#--Check if the Msp init will be empty start--] 
     [#assign mspIsEmpty1="yes"] 
     [#list instanceList as inst]
      [#if getInitServiceMode(inst)??]
         [#assign services = getInitServiceMode(inst)]
-        [#if (services.gpioOut??)]
+        [#if services?? && services.gpioOut??]
             [#assign mspIsEmpty1="no"] 
             [#break]
         [/#if]
@@ -1067,13 +1081,14 @@ int DFSDM_Init = 0;
 [#assign DFSDM_var = "true"]
 [/#if]
 [#-- #nvoid HAL_${mode}_MspInit(${mode}_HandleTypeDef* h${mode?lower_case}){--] 
-[#if (mspIsEmpty1=="no")&&(!mode?contains("TIM")||mode?contains("LPTIM")||mode?contains("HRTIM"))]
-#nvoid ${entry.key?replace("MspInit","MspPostInit")}(${mode}_HandleTypeDef* h${mode?lower_case})
+[#if (mspIsEmpty1=="no")&&(mode!="TIM")]
+#nvoid HAL_${mode}_MspPostInit(${mode}_HandleTypeDef* h${mode?lower_case})
 {
 #n
 [#else]
-[#if (mspIsEmpty1=="no")]
-#nvoid ${entry.key?replace("MspInit","MspPostInit")}(TIM_HandleTypeDef* h${mode?lower_case})
+[#if (mspIsEmpty1=="no")&&(mode?contains("TIM"))]
+
+#nvoid HAL_TIM_MspPostInit(TIM_HandleTypeDef* h${mode?lower_case}) 
 {
 #n
 [/#if]
@@ -1146,7 +1161,7 @@ int DFSDM_Init = 0;
 #n}#n
 [/#if] [#-- mspIsEmpty1=="no" --]
 [#--break--] [#-- use the first msp--]
-[/#list]
+
 [/#compress]
 [/#if]
 [#-- Section2-1:End --]

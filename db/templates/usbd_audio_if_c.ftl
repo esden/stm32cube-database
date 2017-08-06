@@ -69,7 +69,7 @@
 /** @defgroup USBD_AUDIO_Private_TypesDefinitions
   * @{
   */ 
-/* USER CODE BEGIN PRIVATE_TYPES  */
+/* USER CODE BEGIN PRIVATE_TYPES */
 /* USER CODE END PRIVATE_TYPES */ 
 /**
   * @}
@@ -79,7 +79,7 @@
 /** @defgroup USBD_AUDIO_Private_Defines
   * @{
   */ 
-/* USER CODE BEGIN PRIVATE_DEFINES  */
+/* USER CODE BEGIN PRIVATE_DEFINES */
 /* USER CODE END PRIVATE_DEFINES */
   
 /**
@@ -90,7 +90,7 @@
 /** @defgroup USBD_AUDIO_Private_Macros
   * @{
   */ 
-/* USER CODE BEGIN PRIVATE_MACRO  */
+/* USER CODE BEGIN PRIVATE_MACRO */
 /* USER CODE END PRIVATE_MACRO */
 
 /**
@@ -109,8 +109,8 @@
 /* Handle for USB High Speed IP */
 #tUSBD_HandleTypeDef  *hUsbDevice_1;
 [/#if]
-/* USER CODE BEGIN PRIVATE_VARIABLES  */
-/* USER CODE END  PRIVATE_VARIABLES */
+/* USER CODE BEGIN PRIVATE_VARIABLES */
+/* USER CODE END PRIVATE_VARIABLES */
 
 /**
   * @}
@@ -125,8 +125,8 @@
 [#if handleNameHS == "HS"]
 #textern USBD_HandleTypeDef hUsbDeviceHS;  
 [/#if]
-/* USER CODE BEGIN EXPORTED_VARIABLES  */
-/* USER CODE END  EXPORTED_VARIABLES */
+/* USER CODE BEGIN EXPORTED_VARIABLES */
+/* USER CODE END EXPORTED_VARIABLES */
 
 /**
   * @}
@@ -155,7 +155,7 @@ static int8_t  AUDIO_PeriodicTC_HS   (uint8_t cmd);
 static int8_t  AUDIO_GetState_HS     (void);
 [/#if]
 /* USER CODE BEGIN PRIVATE_FUNCTIONS_DECLARATION */
-/* USER CODE END  PRIVATE_FUNCTIONS_DECLARATION */
+/* USER CODE END PRIVATE_FUNCTIONS_DECLARATION */
 
 /**
   * @}
@@ -449,7 +449,7 @@ void HalfTransfer_CallBack_HS(void)
 [/#if]
 
 /* USER CODE BEGIN PRIVATE_FUNCTIONS_IMPLEMENTATION */
-/* USER CODE END  PRIVATE_FUNCTIONS_IMPLEMENTATION */
+/* USER CODE END PRIVATE_FUNCTIONS_IMPLEMENTATION */
 
 /**
   * @}

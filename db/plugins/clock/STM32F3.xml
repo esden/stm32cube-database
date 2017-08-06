@@ -47,6 +47,13 @@
 	 <Background  imageName="with15timer" name="with15timer"  x="547" y="500">
         <Condition Diagnostic="" Expression="DIE439"/>
     </Background>
+		
+	<Background  imageName="STM32F3WithoutUsar2et3" name="STM32F3WithoutUsar2et3"  x="924" y="527">
+        <Condition Diagnostic="" Expression="DIE438 |DIE439"/>
+    </Background>
+	 <Background  imageName="STM32F3notLSEandUSART3" name="STM32F3notLSEandUSART3"  x="874" y="533">
+        <Condition Diagnostic="" Expression="(DIE438 |DIE439) &amp; (LQFP32|UFQFPN32)"/>
+    </Background> 
     
     
     <Tree id="ClockTree">
@@ -511,16 +518,19 @@
         </Element>
         <!-- USART2,3,4,5 input**SYSclock,PCLK1,HSI,LSE-->
         <Element id="USART2Mult" type="multiplexor" refParameter="Usart2ClockSelection" x="929" y="620" refEnable="USART2Enable">
-            <Input signalId="SYSCLKOUT" from="SysCLKOutput" refValue="RCC_USART2CLKSOURCE_SYSCLK" />
+              <Condition Diagnostic="" Expression="!(DIE438 |DIE439)"/>
+			  <Input signalId="SYSCLKOUT" from="SysCLKOutput" refValue="RCC_USART2CLKSOURCE_SYSCLK" />
             <Input signalId="HSI8" from="HSIRC" refValue="RCC_USART2CLKSOURCE_HSI" />
             <Input signalId="LSE" from="LSEOSC" refValue="RCC_USART2CLKSOURCE_LSE" />
             <Input signalId="PCLK1" from="APB1Prescaler" refValue="RCC_USART2CLKSOURCE_PCLK1" />
             <Output signalId="USART2CLK" to="USART2Output" />
         </Element>
         <Element id="USART2Output" type="activeOutput" refParameter="USART2Freq_Value" x="1102" y="650" refEnable="USART2Enable">
+		 <Condition Diagnostic="" Expression="!(DIE438 |DIE439)"/>
             <Input signalId="USART2CLK" from="USART2Mult" />
         </Element>
         <Element id="USART3Mult" type="multiplexor" refParameter="Usart3ClockSelection" x="1010" y="696" refEnable="USART3Enable">
+		 <Condition Diagnostic="" Expression="!(DIE438 |DIE439)"/>
             <Input signalId="SYSCLKOUT" from="SysCLKOutput" refValue="RCC_USART3CLKSOURCE_SYSCLK" />
             <Input signalId="HSI8" from="HSIRC" refValue="RCC_USART3CLKSOURCE_HSI" />
             <Input signalId="LSE" from="LSEOSC" refValue="RCC_USART3CLKSOURCE_LSE" />
@@ -528,6 +538,7 @@
             <Output signalId="USART3CLK" to="USART3Output" />
         </Element>
         <Element id="USART3Output" type="activeOutput" refParameter="USART3Freq_Value" x="1102" y="731" refEnable="USART3Enable">
+		 <Condition Diagnostic="" Expression="!(DIE438 |DIE439)"/>
             <Input signalId="USART3CLK" from="USART3Mult" />
         </Element>
         <Element id="UART4Mult" type="multiplexor" refParameter="Uart4ClockSelection" x="929" y="762" refEnable="UART4Enable">
@@ -780,29 +791,49 @@
     </Label>
 	
     <!--USART2 mux-->
-    <Label id="USART2MUXLabel" type="muxLabel" posX="875" posY="594" text="USART2 Clock Mux" refEnable="USART2Enable"/>
-    <Label id="USART2SYSCLKLabel" type="signal" text="SYSCLK" posX="883" posY="610" refEnable="USART2Enable"/>
+    <Label id="USART2MUXLabel" type="muxLabel" posX="875" posY="594" text="USART2 Clock Mux" refEnable="USART2Enable">
+	 <Condition Diagnostic="" Expression="!(DIE438 |DIE439)"/>
+	 </Label>
+    <Label id="USART2SYSCLKLabel" type="signal" text="SYSCLK" posX="883" posY="610" refEnable="USART2Enable">
+	 <Condition Diagnostic="" Expression="!(DIE438 |DIE439)"/>
+	 </Label>
     <Label id="USART2HSILabel" type="signal" text="HSI" posX="893" posY="634" refEnable="USART2Enable">
-        <Condition Diagnostic="" Expression="!LQFP32 &amp;!UFQFPN32&amp;!UQFN32"/>
+        <Condition Diagnostic="" Expression="!LQFP32 &amp;!UFQFPN32&amp;!UQFN32 &amp; !(DIE438 |DIE439)"/>
     </Label>
     <Label id="USART2HSILabel" type="signal" text="HSI" posX="893" posY="644" refEnable="USART2Enable">
-        <Condition Diagnostic="" Expression="LQFP32|UFQFPN32|UQFN32"/>
+        <Condition Diagnostic="" Expression="(LQFP32|UFQFPN32|UQFN32) &amp; !(DIE438 |DIE439)"/>
    
     </Label>
     <Label id="USART2LSELabel" type="signal" text="LSE" posX="893" posY="658" refEnable="USART2Enable">
-        <Condition Diagnostic="" Expression="!LQFP32&amp;!UFQFPN32&amp;!UQFN32"/>
+        <Condition Diagnostic="" Expression="!LQFP32&amp;!UFQFPN32&amp;!UQFN32 &amp; !(DIE438 |DIE439)"/>
     </Label>
-    <Label id="USART2PCLK1Label" type="signal" text="PCLK1" posX="888" posY="683" refEnable="USART2Enable"/>
+    <Label id="USART2PCLK1Label" type="signal" text="PCLK1" posX="888" posY="683" refEnable="USART2Enable">
+	 <Condition Diagnostic="" Expression="!(DIE438 |DIE439)"/>
+	 </Label>	
 
-    <Label id="USART2Output" type="SpecialInfo" posX="1163" posY="655" text="To USART2 (MHz)" refEnable="USART2Enable"/> 	
+    <Label id="USART2Output" type="SpecialInfo" posX="1163" posY="655" text="To USART2 (MHz)" refEnable="USART2Enable">
+	 <Condition Diagnostic="" Expression="!(DIE438 |DIE439)"/>
+	 </Label>	
     <!--USART3 mux-->
-    <Label id="USART3MUXLabel" type="muxLabel" posX="955" posY="665" text="USART3 Clock Mux" refEnable="USART3Enable"/>
-    <Label id="USART3SYSCLKLabel" type="signal" text="SYSCLK" posX="968" posY="684" refEnable="USART3Enable"/>
-    <Label id="USART3HSILabel" type="signal" text="HSI" posX="980" posY="710" refEnable="USART3Enable"/>
-    <Label id="USART3LSELabel" type="signal" text="LSE" posX="980" posY="735" refEnable="USART3Enable"/>
-    <Label id="USART3PCLK1Label" type="signal" text="PCLK1" posX="975" posY="759" refEnable="USART3Enable"/>
+    <Label id="USART3MUXLabel" type="muxLabel" posX="955" posY="665" text="USART3 Clock Mux" refEnable="USART3Enable">
+	 <Condition Diagnostic="" Expression="!(DIE438 |DIE439)"/>
+	 </Label>
+    <Label id="USART3SYSCLKLabel" type="signal" text="SYSCLK" posX="968" posY="684" refEnable="USART3Enable">
+	 <Condition Diagnostic="" Expression="!(DIE438 |DIE439)"/>
+	 </Label>
+    <Label id="USART3HSILabel" type="signal" text="HSI" posX="980" posY="710" refEnable="USART3Enable">
+	 <Condition Diagnostic="" Expression="!(DIE438 |DIE439)"/>
+	 </Label>
+    <Label id="USART3LSELabel" type="signal" text="LSE" posX="980" posY="735" refEnable="USART3Enable">
+	 <Condition Diagnostic="" Expression="!(DIE438 |DIE439)"/>
+	 </Label>
+    <Label id="USART3PCLK1Label" type="signal" text="PCLK1" posX="975" posY="759" refEnable="USART3Enable">
+	 <Condition Diagnostic="" Expression="!(DIE438 |DIE439)"/>
+	 </Label>
 
-    <Label id="USART3Output" type="SpecialInfo" posX="1163" posY="735" text="To USART3 (MHz)" refEnable="USART3Enable"/> 	
+    <Label id="USART3Output" type="SpecialInfo" posX="1163" posY="735" text="To USART3 (MHz)" refEnable="USART3Enable">
+	 <Condition Diagnostic="" Expression="!(DIE438 |DIE439)"/>
+	 </Label>	
     
     <!--UART1 mux-->
     <Label id="UART1MUXLabel" type="muxLabel" posX="880" posY="730" text="UART4 Clock Mux" refEnable="UART4Enable"/>

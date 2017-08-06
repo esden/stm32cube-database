@@ -464,8 +464,12 @@
                [/#list]
             [/#if]
          [#else]
+            [#if ipName?contains("WWDG") && DIE=="DIE415"]
+            [#-- Orca window watchdog clock disable doesn't work --]
+            [#else]
                  #t#t/* Peripheral clock disable */
                  #t#t__${ipName}_CLK_DISABLE();  
+            [/#if]
          [/#if]
     [/#if]
     [#if gpioExist]

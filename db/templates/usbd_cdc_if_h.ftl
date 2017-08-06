@@ -74,8 +74,8 @@
 /** @defgroup USBD_CDC_IF_Exported_Defines
   * @{
   */ 
-/* USER CODE BEGIN EXPORTED_DEFINES  */
-/* USER CODE END  EXPORTED_DEFINES */
+/* USER CODE BEGIN EXPORTED_DEFINES */
+/* USER CODE END EXPORTED_DEFINES */
 
 /**
   * @}
@@ -84,8 +84,8 @@
 /** @defgroup USBD_CDC_IF_Exported_Types
   * @{
   */  
-/* USER CODE BEGIN EXPORTED_TYPES  */
-/* USER CODE END  EXPORTED_TYPES */
+/* USER CODE BEGIN EXPORTED_TYPES */
+/* USER CODE END EXPORTED_TYPES */
 
 /**
   * @}
@@ -94,8 +94,8 @@
 /** @defgroup USBD_CDC_IF_Exported_Macros
   * @{
   */ 
-/* USER CODE BEGIN EXPORTED_MACRO  */
-/* USER CODE END  EXPORTED_MACRO */
+/* USER CODE BEGIN EXPORTED_MACRO */
+/* USER CODE END EXPORTED_MACRO */
 
 /**
   * @}
@@ -111,8 +111,8 @@ extern USBD_CDC_ItfTypeDef  USBD_Interface_fops_FS;
 extern USBD_CDC_ItfTypeDef  USBD_Interface_fops_HS;
 [/#if]
 
-/* USER CODE BEGIN EXPORTED_VARIABLES  */
-/* USER CODE END  EXPORTED_VARIABLES */
+/* USER CODE BEGIN EXPORTED_VARIABLES */
+/* USER CODE END EXPORTED_VARIABLES */
 
 /**
   * @}
@@ -132,8 +132,8 @@ uint8_t CDC_Transmit_FS(uint8_t* Buf, uint16_t Len);
 uint8_t CDC_Transmit_HS(uint8_t* Buf, uint16_t Len);
 [/#if]
 
-/* USER CODE BEGIN EXPORTED_FUNCTIONS  */
-/* USER CODE END  EXPORTED_FUNCTIONS */
+/* USER CODE BEGIN EXPORTED_FUNCTIONS */
+/* USER CODE END EXPORTED_FUNCTIONS */
 /**
   * @}
   */ 

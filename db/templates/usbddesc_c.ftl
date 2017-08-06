@@ -78,38 +78,12 @@
 		[#assign FS = 1]
 	[/#if]
 [#if definition.type=="string"]
-	[#if definition.paramName == "SERIALNUMBER_STRING_FS"]
-/* USER CODE BEGIN SERIALNUMBER_STRING_FS */
+	[#assign instanceNb = instanceNb + 1]
 #define USBD_${definition.paramName} #t#t"${value}" 
-/* USER CODE END SERIALNUMBER_STRING_FS */
-		[#assign instanceNb = instanceNb + 1]
-	[#else]
-		[#if definition.paramName == "SERIALNUMBER_STRING_HS"]
-/* USER CODE BEGIN SERIALNUMBER_STRING_HS */
-#define USBD_${definition.paramName} #t#t"${value}" 
-/* USER CODE END SERIALNUMBER_STRING_HS */
-			[#assign instanceNb = instanceNb + 1]
-		[#else]
-#define USBD_${definition.paramName} #t#t"${value}" 
-		[/#if]
-	[/#if]	
 [/#if]
 [#if definition.type=="stringRW"]
-	[#if definition.paramName == "SERIALNUMBER_STRING_FS"]	
-/* USER CODE BEGIN SERIALNUMBER_STRING_FS */
+	[#assign instanceNb = instanceNb + 1]
 #define USBD_${definition.paramName} #t#t"${value}" 
-/* USER CODE END SERIALNUMBER_STRING_FS */
-		[#assign instanceNb = instanceNb + 1]
-	[#else]
-		[#if definition.paramName == "SERIALNUMBER_STRING_HS"]
-/* USER CODE BEGIN SERIALNUMBER_STRING_HS */
-#define USBD_${definition.paramName} #t#t"${value}" 
-/* USER CODE END SERIALNUMBER_STRING_HS */
-			[#assign instanceNb = instanceNb + 1]
-		[#else]
-#define USBD_${definition.paramName} #t#t"${value}" 
-		[/#if]
-	[/#if]
 [#else]
 #define USBD_${definition.paramName} #t#t${value}
 [/#if]	
@@ -123,6 +97,9 @@
 #define USB_SIZ_BOS_DESC            0x0C
 [/#if]
 
+/* USER CODE BEGIN 0 */
+
+/* USER CODE END 0*/
 /**
   * @}
   */ 

@@ -37,19 +37,19 @@
 	</RefParameter>
 	
 	<RefParameter Comment="Data Size" DefaultValue="SPI_DATASIZE_4BIT" Name="DataSize" Type="list" Group="Basic Parameters">
-		<PossibleValue Comment="4 Bits" Value="SPI_DATASIZE_4BIT"/>
-		<PossibleValue Comment="5 Bits" Value="SPI_DATASIZE_5BIT"/>
-		<PossibleValue Comment="6 Bits" Value="SPI_DATASIZE_6BIT"/>
-		<PossibleValue Comment="7 Bits" Value="SPI_DATASIZE_7BIT"/>
-		<PossibleValue Comment="8 Bits" Value="SPI_DATASIZE_8BIT"/>
-		<PossibleValue Comment="9 Bits" Value="SPI_DATASIZE_9BIT"/>
-		<PossibleValue Comment="10 Bits" Value="SPI_DATASIZE_10BIT"/>
-		<PossibleValue Comment="11 Bits" Value="SPI_DATASIZE_11BIT"/>
-		<PossibleValue Comment="12 Bits" Value="SPI_DATASIZE_12BIT"/>
-		<PossibleValue Comment="13 Bits" Value="SPI_DATASIZE_13BIT"/>
-		<PossibleValue Comment="14 Bits" Value="SPI_DATASIZE_14BIT"/>
-		<PossibleValue Comment="15 Bits" Value="SPI_DATASIZE_15BIT"/>
-		<PossibleValue Comment="16 Bits" Value="SPI_DATASIZE_16BIT"/>
+		<PossibleValue Comment="4 Bits" Value="SPI_DATASIZE_4BIT" Semaphore="$IpInstance_DATASIZE_BYTE"/>
+		<PossibleValue Comment="5 Bits" Value="SPI_DATASIZE_5BIT" Semaphore="$IpInstance_DATASIZE_BYTE"/>
+		<PossibleValue Comment="6 Bits" Value="SPI_DATASIZE_6BIT" Semaphore="$IpInstance_DATASIZE_BYTE"/>
+		<PossibleValue Comment="7 Bits" Value="SPI_DATASIZE_7BIT" Semaphore="$IpInstance_DATASIZE_BYTE"/>
+		<PossibleValue Comment="8 Bits" Value="SPI_DATASIZE_8BIT" Semaphore="$IpInstance_DATASIZE_BYTE"/>
+		<PossibleValue Comment="9 Bits" Value="SPI_DATASIZE_9BIT" Semaphore="$IpInstance_DATASIZE_HALFWORD"/>
+		<PossibleValue Comment="10 Bits" Value="SPI_DATASIZE_10BIT" Semaphore="$IpInstance_DATASIZE_HALFWORD"/>
+		<PossibleValue Comment="11 Bits" Value="SPI_DATASIZE_11BIT" Semaphore="$IpInstance_DATASIZE_HALFWORD"/>
+		<PossibleValue Comment="12 Bits" Value="SPI_DATASIZE_12BIT" Semaphore="$IpInstance_DATASIZE_HALFWORD"/>
+		<PossibleValue Comment="13 Bits" Value="SPI_DATASIZE_13BIT" Semaphore="$IpInstance_DATASIZE_HALFWORD"/>
+		<PossibleValue Comment="14 Bits" Value="SPI_DATASIZE_14BIT" Semaphore="$IpInstance_DATASIZE_HALFWORD"/>
+		<PossibleValue Comment="15 Bits" Value="SPI_DATASIZE_15BIT" Semaphore="$IpInstance_DATASIZE_HALFWORD"/>
+		<PossibleValue Comment="16 Bits" Value="SPI_DATASIZE_16BIT" Semaphore="$IpInstance_DATASIZE_HALFWORD"/>
 	</RefParameter>
 	
 	<RefParameter Comment="First Bit" DefaultValue="SPI_FIRSTBIT_MSB" Name="FirstBit" Type="list" Group="Basic Parameters">
@@ -137,26 +137,29 @@
              <PossibleValue Comment="Disabled" Value="SPI_NSS_PULSE_DISABLED"/>
          </RefParameter>
 
-	<RefParameter Comment="NSS Signal Type" DefaultValue="SPI_NSS_SOFT" Name="NSS" Type="list" Group="Advanced Parameters">
-		<Condition Expression="VirtualNSS = VM_NSSSOFT" Diagnostic=""/>
-		<PossibleValue Comment="Software" Value="SPI_NSS_SOFT"/>
-	</RefParameter>
 	<RefParameter Comment="NSS Signal Type" DefaultValue="SPI_NSS_HARD_OUTPUT" Name="NSS" Type="list" Group="Advanced Parameters">
-		<Condition Expression="(VirtualNSS = VM_NSSHARD) &amp; (VirtualType = VM_MASTER) &amp; !(TIMode = SPI_TIMODE_ENABLED)" Diagnostic=""/>
+		<Condition Expression="$IpInstance_NSSHARD_Output" Diagnostic=""/>
 		<PossibleValue Comment="Output Hardware" Value="SPI_NSS_HARD_OUTPUT"/>
-		<PossibleValue Comment="Input Hardware" Value="SPI_NSS_HARD_INPUT"/>
 	</RefParameter>
 	<RefParameter Comment="NSS Signal Type" DefaultValue="SPI_NSS_HARD_INPUT" Name="NSS" Type="list" Group="Advanced Parameters">
-		<Condition Expression="(VirtualNSS = VM_NSSHARD) &amp; (VirtualType = VM_SLAVE) &amp; !(TIMode = SPI_TIMODE_ENABLED)" Diagnostic=""/>
+		<Condition Expression="$IpInstance_NSSHARD_Input" Diagnostic=""/>
 		<PossibleValue Comment="Input Hardware" Value="SPI_NSS_HARD_INPUT"/>
+	</RefParameter>
+        <RefParameter Comment="NSS Signal Type" DefaultValue="SPI_NSS_SOFT" Name="NSS" Type="list" Group="Advanced Parameters">
+		<PossibleValue Comment="Software" Value="SPI_NSS_SOFT"/>
 	</RefParameter>
 	<RefParameter Comment="NSS Signal Type" DefaultValue="SPI_NSS_SOFT" Name="NSS" Type="list" Group="Advanced Parameters" Visible="false">
             <PossibleValue Comment="Software" Value="SPI_NSS_SOFT"/>
-        </RefParameter>
+    </RefParameter>
 	
 	
 	<!-- RefModes for Hardware NSS -->
-	<RefMode Name="NSS_Signal_Hard" HalMode="SPI">
+	<RefMode Name="NSS_Signal_Hard_Input" HalMode="SPI">
+		<Parameter Name="VirtualNSS">
+			<PossibleValue>VM_NSSHARD</PossibleValue>
+		</Parameter>
+	</RefMode>
+        <RefMode Name="NSS_Signal_Hard_Output" HalMode="SPI">
 		<Parameter Name="VirtualNSS">
 			<PossibleValue>VM_NSSHARD</PossibleValue>
 		</Parameter>
@@ -490,11 +493,20 @@
 		</Mode>
 		
 		<Mode Name="NSS_Signal" UserName="Hardware NSS Signal">
-			<ModeLogicOperator Name="OR">
-				<Mode Name="NSS_Signal_Hard" UserName="Hardware">
+			<ModeLogicOperator Name="XOR">
+				<Mode Name="NSS_Signal_Hard_Input" UserName="Hardware NSS Input Signal">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="NSS" IOMode="Input"/>
+					</SignalLogicalOp>
+                    <Semaphore>$IpInstance_NSSHARD_Input</Semaphore>
+				</Mode>
+			
+				<Mode Name="NSS_Signal_Hard_Output" UserName="Hardware NSS Output Signal">
 					<SignalLogicalOp Name="AND">
 						<Signal Name="NSS"/>
 					</SignalLogicalOp>
+                    <Semaphore>$IpInstance_NSSHARD_Output</Semaphore>
+                    <Condition Expression="$IpInstance_Master" Diagnostic="$IpInstance must be in Master mode"/>
 				</Mode>
 			</ModeLogicOperator>
 			<Condition Expression="$IpInstance" Diagnostic="$IpInstance must be have a valid Mode"/>

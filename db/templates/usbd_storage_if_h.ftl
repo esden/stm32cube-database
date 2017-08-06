@@ -75,7 +75,7 @@
 /** @defgroup USBD_STORAGE_Exported_Defines
   * @{
   */ 
-/* USER CODE BEGIN EXPORTED_DEFINES  */
+/* USER CODE BEGIN EXPORTED_DEFINES */
 /* USER CODE END  EXPORTED_DEFINES */
 
 /**
@@ -86,7 +86,7 @@
 /** @defgroup USBD_STORAGE_Exported_Types
   * @{
   */  
-/* USER CODE BEGIN EXPORTED_TYPES  */
+/* USER CODE BEGIN EXPORTED_TYPES */
 /* USER CODE END  EXPORTED_TYPES */
 
 /**
@@ -98,7 +98,7 @@
 /** @defgroup USBD_STORAGE_Exported_Macros
   * @{
   */ 
-/* USER CODE BEGIN EXPORTED_MACRO  */
+/* USER CODE BEGIN EXPORTED_MACRO */
 /* USER CODE END  EXPORTED_MACRO */
 
 /**
@@ -115,7 +115,7 @@
 #textern USBD_StorageTypeDef  USBD_Storage_Interface_fops_HS;
 [/#if]
 
-/* USER CODE BEGIN EXPORTED_VARIABLES  */
+/* USER CODE BEGIN EXPORTED_VARIABLES */
 /* USER CODE END  EXPORTED_VARIABLES */
 
 /**
@@ -126,7 +126,7 @@
   * @{
   */ 
 
-/* USER CODE BEGIN EXPORTED_FUNCTIONS  */
+/* USER CODE BEGIN EXPORTED_FUNCTIONS */
 /* USER CODE END  EXPORTED_FUNCTIONS */
 /**
   * @}

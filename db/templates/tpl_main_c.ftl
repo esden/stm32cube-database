@@ -120,8 +120,10 @@ static void MPU_Config(void);
 [/#if]
 [#if HALCompliant??] 
  [#list voids as void]
-  [#if !void?contains("FREERTOS")&&!void?contains("FATFS")&& !void?contains("LWIP")&& !void?contains("USB_DEVICE")&& !void?contains("USB_HOST")&& !void?contains("CORTEX")]
-  static void ${""?right_pad(2)}${void}(void);
+  [#if !void.functionName?contains("FREERTOS")&&!void.functionName?contains("FATFS")&& !void.functionName?contains("LWIP")&& !void.functionName?contains("USB_DEVICE")&& !void.functionName?contains("USB_HOST")&& !void.functionName?contains("CORTEX")] 
+[#if !void.isNotGenerated]
+ static void ${""?right_pad(2)}${void.functionName}(void);
+  [/#if]
   [/#if]
  [/#list]
  [@common.optinclude name="Src/rtos_pfp.tmp"/]
@@ -132,19 +134,36 @@ static void MPU_Config(void);
 [/#if]
 [#-- PostInit declaration --]
 [#if Peripherals??]
+[#assign postinitList = ""]
 [#list Peripherals as Peripheral]
 [#if Peripheral??]
 [#list Peripheral as IP]
 [#list IP.configModelList as instanceData]
 [#if instanceData.initServices??]
-    [#if instanceData.initServices.gpioOut??]
+    [#if instanceData.initServices.gpioOut??] 
         [#list instanceData.initCallBackInitMethodList as initCallBack]
             [#if initCallBack?contains("PostInit")]
-            #nvoid ${initCallBack}(${instanceData.halMode}_HandleTypeDef *h${instanceData.halMode?lower_case});
+                [#assign halMode = instanceData.halMode]
+                [#assign ipName = instanceData.ipName]
+                [#assign ipInstance = instanceData.instanceName]
+                [#if halMode!=ipName&&!ipName?contains("TIM")&&!ipName?contains("CEC")]
+[#if !postinitList?contains(initCallBack)]
+                    #nvoid ${initCallBack}(${instanceData.halMode}_HandleTypeDef *h${instanceData.halMode?lower_case});
+                     [#assign postinitList = postinitList+" "+initCallBack]
+[/#if]
+                [#else]
+[#if !postinitList?contains(initCallBack)]
+                    #nvoid ${initCallBack}([#if ipName?contains("TIM")&&!(ipName?contains("HRTIM")||ipName?contains("LPTIM"))]TIM_HandleTypeDef *htim[#else]${ipName}_HandleTypeDef *h${ipName?lower_case}[/#if]);
+        [#assign postinitList = postinitList+" "+initCallBack]
+[/#if]
+                [/#if]
+                [#break] [#-- take only the first PostInit : case of timer--]
             [/#if]
+
         [/#list]
     [/#if]
 [/#if]
+
 [/#list]
 [/#list]
 [/#if]
@@ -193,8 +212,12 @@ int main(void)
 [/#if]
 #n#t/* Initialize all configured peripherals */
 [#list voids as void]
-[#if !void?contains("FREERTOS")&&!void?contains("CORTEX")]
-#t${void}();
+[#if !void.functionName?contains("FREERTOS")&&!void.functionName?contains("CORTEX")]
+[#if !void.isNotGenerated]
+[#if (FREERTOS?? && void.ipType=="peripheral") || !FREERTOS??]
+#t${void.functionName}();
+[/#if]
+[/#if]
 [/#if]
 [/#list]
 [/#compress]
@@ -308,7 +331,11 @@ void SystemClock_Config(void)
     [#if instanceData.initServices.gpioOut??]
         [#list instanceData.initCallBackInitMethodList as initCallBack]
             [#if initCallBack?contains("PostInit")]
-            #t${initCallBack}(&h${instanceData.halMode?lower_case}${instanceData.instIndex});
+                [#if  halMode!=ipName&&!ipName?contains("TIM")&&!ipName?contains("CEC")]
+                #t${initCallBack}(&h${instanceData.halMode?lower_case}${instanceData.instIndex});
+                [#else]
+                #t${initCallBack}([#if ipName?contains("TIM")&&!(ipName?contains("HRTIM")||ipName?contains("LPTIM"))]&htim[#else]&h${instanceData.realIpName?lower_case}[/#if]${instanceData.instIndex});
+                [/#if]
             [/#if]
         [/#list]
     [/#if]

@@ -2,7 +2,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Project>
 <ProjectName>${projectName}</ProjectName>
-<CMSIS>${CMSISPath}</CMSIS>  
+<CMSIS>${CMSISPath}</CMSIS>
+[#if ide=="EWARM" || ide=="MDK-ARM"]
+	<HAL_Driver>${HAL_Driver}</HAL_Driver>
+[/#if]
+
+
  [#-- list of toolchains to be generated: EWARM,MDK-ARM,TrueSTUDIO,RIDE: This tag can contain one or more than one toolchain: EWARM,MDK-ARM,TrueSTUDIO,RIDE --]
 <Toolchain>${ide}</Toolchain>
 [#if ide=="MDK-ARM"]
@@ -32,8 +37,11 @@
 
 <configs>
   <config>
-    <name>${Configuration} Configuration</name>				[#-- project configuration name. Ex: STM32F407_EVAL --]
+    <name>${Configuration}</name>				[#-- project configuration name. Ex: STM32F407_EVAL --]
     <device>${project.deviceId}</device>		 [#--  STM32 selected device. Ex: STM32F407ZE --]
+    <heapSize>${HeapSize}</heapSize>
+    <stackSize>${StackSize}</stackSize>
+    
     [#if ide=="EWARM" || ide=="MDK-ARM"]
     	<cpuclock>${cpuclock}</cpuclock>
     [/#if]
@@ -81,54 +89,69 @@
 	   <include>${halIncludePath}</include>
         [/#list]
     </Cincludes>
+    [#--
+    [#if ide=="SW4STM32"]
+    <sourceEntries>
+    	<sourceEntry>
+    		<name>${inc}</name>
+    	</sourceEntry>
+    	<sourceEntry>
+    		<name>${src}</name>
+    	</sourceEntry>
+    	<sourceEntry>
+    		<name>${HALDriver}</name>
+    	</sourceEntry>
+    </sourceEntries>
+    [/#if]
+    --]
   </config>
 </configs>
 [#-- project groups and files --]
-
-[#if atLeastOneMiddlewareIsUsed]
-  <group>
-  <name>Middlewares</name>
-	 [#list groups as group]
-	 	<group>
-	 		<name>${group.name!''}</name>
-	 		[#if group.sourceFilesNameList??]
-		 		[#list group.sourceFilesNameList as filesName]
-					<file>
-						<name>${filesName!''}</name>
-					</file>
-		        [/#list]
-		    [/#if]
-	    </group>
-	 [/#list]
-  </group> 
- [/#if]
- 
-   <group>
-    <name>Drivers</name> 
+[#--if ide != "SW4STM32"] --]
+	[#if atLeastOneMiddlewareIsUsed]
+	  <group>
+	  <name>Middlewares</name>
+		 [#list groups as group]
+		 	<group>
+		 		<name>${group.name!''}</name>
+		 		[#if group.sourceFilesNameList??]
+			 		[#list group.sourceFilesNameList as filesName]
+						<file>
+							<name>${filesName!''}</name>
+						</file>
+			        [/#list]
+			    [/#if]
+		    </group>
+		 [/#list]
+	  </group> 
+	 [/#if]
+	 
 	   <group>
-	 		<name>${HALGroup.name!''}</name>
-	 		[#if HALGroup.sourceFilesNameList??]
-		 		[#list HALGroup.sourceFilesNameList as filesName]
-					<file>
-						<name>${filesName!''}</name>
-					</file>
-		        [/#list]
-		     [/#if]
+	    <name>Drivers</name> 
+		   <group>
+		 		<name>${HALGroup.name!''}</name>
+		 		[#if HALGroup.sourceFilesNameList??]
+			 		[#list HALGroup.sourceFilesNameList as filesName]
+						<file>
+							<name>${filesName!''}</name>
+						</file>
+			        [/#list]
+			     [/#if]
+		    </group>
+	  </group>   
+	  
+	  <group>
+	  <name>Application</name>
+	    <group>
+	      <name>User</name>  
+	        [#list mxSourceFilesNameList as mxCFiles]
+	        <file>
+	         <name>${mxCFiles}</name>
+	        </file>
+	       [/#list]
 	    </group>
-  </group>   
-  
-  <group>
-  <name>Application</name>
-    <group>
-      <name>User</name>  
-        [#list mxSourceFilesNameList as mxCFiles]
-        <file>
-         <name>${mxCFiles}</name>
-        </file>
-       [/#list]
-    </group>
-  </group>
-  
+	  </group>
+ [#-- [/#if] --]
  [#-- 
   <group>
     <name>Drivers</name> 

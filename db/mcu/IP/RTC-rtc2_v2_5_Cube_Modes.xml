@@ -170,7 +170,11 @@
 	</RefParameter>
 	<RefParameter Comment="Seconds" DefaultValue="+Seconds_A" Name="SecondsARG_A" Type="string" Group="Alarm A" Visible="false"/>
 	
-	<RefParameter Comment="Sub Seconds" DefaultValue="0x0" Name="SubSeconds_A" Type="string" Group="Calendar Time" Visible="false"/>
+	<RefParameter Comment="Sub Seconds" DefaultValue="0" Max="59" Min="0" Name="SubSeconds_A" Type="decimal" Group="Alarm A"/>
+	<RefParameter Comment="Sub Seconds" DefaultValue="+0x+SubSeconds_A" Name="SubSecondsARG_A" Type="string" Group="Alarm A" Visible="false">
+		<Condition Diagnostic="" Expression="Format=FORMAT_BCD"/>
+	</RefParameter>
+	<RefParameter Comment="Sub Seconds" DefaultValue="+SubSeconds_A" Name="SubSecondsARG_A" Type="string" Group="Calendar Time" Visible="false"/>
 	
 	<RefParameter Comment="Alarm Mask" DefaultValue="RTC_ALARMMASK_NONE" Name="AlarmMask" Type="list" Group="Alarm A">
 		<PossibleValue Comment="Alarm Mask None" Value="RTC_ALARMMASK_NONE"/>
@@ -253,7 +257,11 @@
 	</RefParameter>
 	<RefParameter Comment="Seconds" DefaultValue="+Seconds_B" Name="SecondsARG_B" Type="string" Group="Alarm B" Visible="false"/>
 	
-	<RefParameter Comment="Sub Seconds" DefaultValue="0x0" Name="SubSeconds_B" Type="string" Group="Calendar Time" Visible="false"/>
+	<RefParameter Comment="Sub Seconds" DefaultValue="0" Max="59" Min="0" Name="SubSeconds_B" Type="decimal" Group="Alarm B"/>
+	<RefParameter Comment="Sub Seconds" DefaultValue="+0x+SubSeconds_B" Name="SubSecondsARG_B" Type="string" Group="Alarm B" Visible="false">
+		<Condition Diagnostic="" Expression="Format=FORMAT_BCD"/>
+	</RefParameter>
+	<RefParameter Comment="Sub Seconds" DefaultValue="+SubSeconds_B" Name="SubSecondsARG_B" Type="string" Group="Calendar Time" Visible="false"/>
 	
 	<RefParameter Comment="Alarm Mask " DefaultValue="RTC_ALARMMASK_NONE" Name="AlarmMask_B" Type="list" Group="Alarm B">
 		<PossibleValue Comment="Alarm Mask None" Value="RTC_ALARMMASK_NONE"/>
@@ -645,6 +653,8 @@
 	<!--#################################################################################################-->
 	<ModeLogicOperator Name="OR">
 		<Mode Name="Alarm A">
+                <Condition Expression="!SYS_$IpInstance" Diagnostic="RTC is already used for system time base"/>
+                    
 			<ModeLogicOperator Name="XOR">
 				<Mode Name="Alarm A" UserName="Internal Alarm A">
 					<SignalLogicalOp Name="AND">
@@ -662,6 +672,8 @@
 			<Semaphore>RTC_ALARM_INTERRUPT</Semaphore>
 		</Mode>
 		<Mode Name="Alarm B">
+                <Condition Expression="!SYS_$IpInstance" Diagnostic="RTC is already used for system time base"/>
+                    
 			<ModeLogicOperator Name="XOR">
 				<Mode Name="Alarm B" UserName="Internal Alarm B">
 					<SignalLogicalOp Name="AND">
@@ -679,6 +691,7 @@
 			<Semaphore>RTC_ALARM_INTERRUPT</Semaphore>
 		</Mode>
 		<Mode Name="WakeUp">
+                  <Condition Expression="!SYS_$IpInstance" Diagnostic="RTC is already used for system time base"/>
 			<ModeLogicOperator Name="XOR">
 				<Mode Name="WakeUp" UserName="Internal WakeUp">
 					<SignalLogicalOp Name="AND">
@@ -696,6 +709,8 @@
 			<Semaphore>RTC_WAKEUP_INTERRUPT</Semaphore>
 		</Mode>
 		<Mode Name="Timestamp">
+                <Condition Expression="!SYS_$IpInstance" Diagnostic="RTC is already used for system time base"/>
+                    
 			<ModeLogicOperator Name="XOR">
 				<Mode Name="Timestamp enabled - Input Enabled to TS" UserName="Timestamp Routed to AF1 device">
 					<SignalLogicalOp Name="AND">
@@ -706,6 +721,8 @@
 			<Semaphore>RTC_TIMESTAMP_INTERRUPT</Semaphore>
 		</Mode>
 		<Mode Name="Tamper 1">
+                <Condition Expression="!SYS_$IpInstance" Diagnostic="RTC is already used for system time base"/>
+                    
 			<ModeLogicOperator Name="XOR">
 				<Mode Name="Tamper 1 enabled - Input Enabled to TAMP1" UserName="Tamper1 Routed to AF1 device">
 					<SignalLogicalOp Name="AND">
@@ -716,6 +733,8 @@
 			<Semaphore>RTC_TAMPER_INTERRUPT</Semaphore>
 		</Mode>
 		<Mode Name="Tamper 2">
+                <Condition Expression="!SYS_$IpInstance" Diagnostic="RTC is already used for system time base"/>
+                    
 			<ModeLogicOperator Name="XOR">
 				<Mode Name="Tamper 2 enabled - Input Enabled to TAMP2" UserName="Tamper2 Routed to TAMP2">
 					<SignalLogicalOp Name="AND">
@@ -726,6 +745,8 @@
 			<Semaphore>RTC_TAMPER_INTERRUPT</Semaphore>
 		</Mode>
 		<Mode Name="Tamper 3">
+                <Condition Expression="!SYS_$IpInstance" Diagnostic="RTC is already used for system time base"/>
+                    
 			<ModeLogicOperator Name="XOR">
 				<Mode Name="Tamper 3 enabled - Input Enabled to TAMP3" UserName="Tamper3 Routed to TAMP3">
 					<SignalLogicalOp Name="AND">
@@ -736,6 +757,8 @@
 			<Semaphore>RTC_TAMPER_INTERRUPT</Semaphore>
 		</Mode>
 		<Mode Name="Calibration 512 Hz" RemoveCondition="DIE427 | DIE436 | DIE429 | DIE437">
+                <Condition Expression="!SYS_$IpInstance" Diagnostic="RTC is already used for system time base"/>
+                    
 			<ModeLogicOperator Name="XOR">
 				<Mode Name="Calibration_512Hz" UserName="Calibration 512Hz">
 					<SignalLogicalOp Name="AND">
@@ -745,6 +768,8 @@
 			</ModeLogicOperator>
 		</Mode>
 		<Mode Name="Calibration" RemoveCondition="DIE416">
+                <Condition Expression="!SYS_$IpInstance" Diagnostic="RTC is already used for system time base"/>
+                    
 			<ModeLogicOperator Name="XOR">
 				<Mode Name="Calibration_512Hz" UserName="Calibration 512Hz">
 					<SignalLogicalOp Name="AND">
@@ -760,6 +785,8 @@
 		</Mode>
 		
 		<Mode Name="Reference clock detection">
+                <Condition Expression="!SYS_$IpInstance" Diagnostic="RTC is already used for system time base"/>
+                    
 			<ModeLogicOperator Name="XOR">
 				<Mode Name="Reference_Clock_Detection_Activate">
 					<SignalLogicalOp Name="AND">

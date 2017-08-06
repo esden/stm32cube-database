@@ -69,8 +69,8 @@
 /** @defgroup USBD_CDC_Private_TypesDefinitions
   * @{
   */ 
-/* USER CODE BEGIN PRIVATE TYPES  */
-/* USER CODE END PRIVATE TYPES */ 
+/* USER CODE BEGIN PRIVATE_TYPES */
+/* USER CODE END PRIVATE_TYPES */ 
 /**
   * @}
   */ 
@@ -79,12 +79,12 @@
 /** @defgroup USBD_CDC_Private_Defines
   * @{
   */ 
-/* USER CODE BEGIN PRIVATE DEFINES  */
+/* USER CODE BEGIN PRIVATE_DEFINES */
 /* Define size for the receive and transmit buffer over CDC */
 /* It's up to user to redefine and/or remove those define */
 #define APP_RX_DATA_SIZE  4
 #define APP_TX_DATA_SIZE  4
-/* USER CODE END PRIVATE DEFINES */
+/* USER CODE END PRIVATE_DEFINES */
 /**
   * @}
   */ 
@@ -93,7 +93,7 @@
 /** @defgroup USBD_CDC_Private_Macros
   * @{
   */ 
-/* USER CODE BEGIN PRIVATE_MACRO  */
+/* USER CODE BEGIN PRIVATE_MACRO */
 /* USER CODE END PRIVATE_MACRO */
 
 /**
@@ -133,8 +133,8 @@ uint8_t UserTxBufferHS[APP_TX_DATA_SIZE];
 /* Handle for USB High Speed IP */
 #tUSBD_HandleTypeDef  *hUsbDevice_1;
 [/#if]
-/* USER CODE BEGIN PRIVATE_VARIABLES  */
-/* USER CODE END  PRIVATE VARIABLES */
+/* USER CODE BEGIN PRIVATE_VARIABLES */
+/* USER CODE END PRIVATE_VARIABLES */
 
 /**
   * @}
@@ -149,8 +149,8 @@ uint8_t UserTxBufferHS[APP_TX_DATA_SIZE];
 [#if handleNameHS == "HS"]
 #textern USBD_HandleTypeDef hUsbDeviceHS;  
 [/#if]
-/* USER CODE BEGIN EXPORTED_VARIABLES  */
-/* USER CODE END  EXPORTED_VARIABLES */
+/* USER CODE BEGIN EXPORTED_VARIABLES */
+/* USER CODE END EXPORTED_VARIABLES */
 
 /**
   * @}
@@ -173,7 +173,7 @@ static int8_t CDC_Control_HS  (uint8_t cmd, uint8_t* pbuf, uint16_t length);
 static int8_t CDC_Receive_HS  (uint8_t* pbuf, uint32_t *Len);
 [/#if]
 /* USER CODE BEGIN PRIVATE_FUNCTIONS_DECLARATION */
-/* USER CODE END  PRIVATE_FUNCTIONS_DECLARATION */
+/* USER CODE END PRIVATE_FUNCTIONS_DECLARATION */
 
 /**
   * @}
@@ -324,6 +324,8 @@ static int8_t CDC_Control_FS  (uint8_t cmd, uint8_t* pbuf, uint16_t length)
 static int8_t CDC_Receive_FS (uint8_t* Buf, uint32_t *Len)
 {
   /* USER CODE BEGIN 6 */
+  USBD_CDC_SetRxBuffer(hUsbDevice_0, &Buf[0]);
+  USBD_CDC_ReceivePacket(hUsbDevice_0);
   return (USBD_OK);
   /* USER CODE END 6 */ 
 }
@@ -343,8 +345,12 @@ uint8_t CDC_Transmit_FS(uint8_t* Buf, uint16_t Len)
 {
   uint8_t result = USBD_OK;
   /* USER CODE BEGIN 7 */ 
-  USBD_CDC_SetTxBuffer(hUsbDevice_0, Buf, Len);   
-  result = USBD_CDC_TransmitPacket(hUsbDevice_0);
+  USBD_CDC_SetTxBuffer(hUsbDevice_0, Buf, Len);     
+  while(result != USBD_OK);
+  do {
+    result = USBD_CDC_TransmitPacket(hUsbDevice_0);
+  }
+  while(result != USBD_OK);
   /* USER CODE END 7 */ 
   return result;
 }
@@ -474,6 +480,8 @@ static int8_t CDC_Control_HS  (uint8_t cmd, uint8_t* pbuf, uint16_t length)
 static int8_t CDC_Receive_HS (uint8_t* Buf, uint32_t *Len)
 {
   /* USER CODE BEGIN 11 */ 
+  USBD_CDC_SetRxBuffer(hUsbDevice_1, &Buf[0]);
+  USBD_CDC_ReceivePacket(hUsbDevice_1);
   return (USBD_OK);
   /* USER CODE END 11 */ 
 }
@@ -493,14 +501,18 @@ uint8_t CDC_Transmit_HS(uint8_t* Buf, uint16_t Len)
   uint8_t result = USBD_OK;
   /* USER CODE BEGIN 12 */ 
   USBD_CDC_SetTxBuffer(hUsbDevice_1, Buf, Len);   
-  result = USBD_CDC_TransmitPacket(hUsbDevice_1);
+  while(result != USBD_OK);
+  do {
+    result = USBD_CDC_TransmitPacket(hUsbDevice_1);
+  }
+  while(result != USBD_OK);
   /* USER CODE END 12 */ 
   return result;
 }
 [/#if]
 
 /* USER CODE BEGIN PRIVATE_FUNCTIONS_IMPLEMENTATION */
-/* USER CODE END  PRIVATE_FUNCTIONS_IMPLEMENTATION */
+/* USER CODE END PRIVATE_FUNCTIONS_IMPLEMENTATION */
 
 /**
   * @}

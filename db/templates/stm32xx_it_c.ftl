@@ -87,6 +87,11 @@ extern ${ipHandler.handlerType} ${ipHandler.handler};
   [/#list]
 [/#list]
 #n
+[#-- If Time Base Source is different to Systick--]
+[#if timeBaseSource?? && timeBaseSource!="SysTick"]
+extern ${timeBaseHandlerType} ${timeBaseHandler};
+#n
+[/#if]
 [/#compress]
 /******************************************************************************/
 /*            ${CortexName} Processor Interruption and Exception Handlers         */ 
@@ -179,7 +184,7 @@ void ${vector.irqHandler}(void)
 {
 #t/* USER CODE BEGIN ${vector.name} 0 */
 
-#n#t/* USER CODE END ${vector.name} 0 */
+#n#t/* USER CODE END ${vector.name} 0 */ 
 [#if vector.name=="RCC_IRQn" || vector.name=="RCC_CRS_IRQn"]
 [#elseif vector.ipName=="" || vector.irregular=="true"]
   #t${vector.halHandler}

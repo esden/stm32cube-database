@@ -369,7 +369,7 @@
     <RefParameter Visible="false" Comment="System clock" Name="SYSCLKFreq_VALUE" DefaultValue="8000000" Max="72000000"    Type="double" Display="value/1000000" Unit="MHz"/>
 
     <!--USB freq de l'output-->
-    <RefParameter Visible="false" Comment="USB"          Name="USBFreq_Value"    DefaultValue="8000000"  Max="48000000" Min="48000000"  Type="double" Display="value/1000000" Unit="MHz"/>
+    <RefParameter Visible="false" Comment="USB"          Name="USBFreq_Value"    DefaultValue="8000000"  Min="47880000" Max="48120000"  Type="double" Display="value/1000000" Unit="MHz"/>
     <!--AHB out freq-->
     <RefParameter Visible="false" Comment="HCLK"         Name="AHBFreq_Value"    DefaultValue="8000000"    Type="double" Display="value/1000000" Unit="MHz"/>
     <RefParameter Visible="false" Comment="HCLK"         Name="HCLKFreq_Value"   DefaultValue="8000000"    Type="double" Max="72000000" IP="DMA-2D,CAMERAITF,ADC2,ADC3,ADC4" Display="value/1000000" Unit="MHz"/>
@@ -928,14 +928,14 @@
 	
 	
     <RefParameter Visible="false" Name="RCC_PERIPHCLK_USART2Var" Comment="RCC_PERIPHCLK_USART2Var" Type="list" DefaultValue="RCC_PERIPHCLK_USART2">
-        <Condition Expression="USART2Used_ForRCC" Diagnostic="USART2 Activated"/>
+        <Condition Expression="USART2Used_ForRCC &amp; !(DIE438 |DIE439)" Diagnostic="USART2 Activated"/>
         <PossibleValue Comment="Periphclk Usart2" Value="RCC_PERIPHCLK_USART2"/>
     </RefParameter>
     <RefParameter Visible="false" Name="RCC_PERIPHCLK_USART2Var" Comment="RCC_PERIPHCLK_USART2Var" Type="list" DefaultValue=""/>
 	
 	
     <RefParameter Visible="false" Name="RCC_PERIPHCLK_USART3Var" Comment="RCC_PERIPHCLK_USART3Var" Type="list" DefaultValue="RCC_PERIPHCLK_USART3">
-        <Condition Expression="USART3Used_ForRCC" Diagnostic="USART3 Activated"/>
+        <Condition Expression="USART3Used_ForRCC &amp; !(DIE438 |DIE439)" Diagnostic="USART3 Activated"/>
         <PossibleValue Comment="Periphclk Usart3" Value="RCC_PERIPHCLK_USART3"/>
     </RefParameter>
     <RefParameter Visible="false" Name="RCC_PERIPHCLK_USART3Var" Comment="RCC_PERIPHCLK_USART3Var" Type="list" DefaultValue=""/>
@@ -1014,7 +1014,7 @@
 	
 	
     <RefParameter Visible="false" Name="RCC_PERIPHCLK_TIM8Var" Comment="RCC_PERIPHCLK_TIM8Var" Type="list" DefaultValue="RCC_PERIPHCLK_TIM8">
-        <Condition Expression="TIM8" Diagnostic="TIM8 Activated"/>
+        <Condition Expression="TIM8 &amp; TIM8_Exist" Diagnostic="TIM8 Activated"/>
         <PossibleValue Comment="Periphclk tim8" Value="RCC_PERIPHCLK_TIM8"/>
     </RefParameter>
     <RefParameter Visible="false" Name="RCC_PERIPHCLK_TIM8Var" Comment="RCC_PERIPHCLK_TIM8Var" Type="list" DefaultValue=""/>
@@ -1059,12 +1059,12 @@
     <RefParameter Visible="false" Name="Usart1ClockSelectionARG" Comment="Usart1ClockSelectionARG" Type="list" DefaultValue="null"/>
     
     <RefParameter Visible="false" Name="Usart2ClockSelectionARG" Comment="Usart2ClockSelectionARG" Type="list" DefaultValue="+Usart2ClockSelection">
-        <Condition Expression="USART2Used_ForRCC" Diagnostic="USART2 Activated"/>
+        <Condition Expression="USART2Used_ForRCC &amp; !(DIE438 |DIE439)" Diagnostic="USART2 Activated"/>
     </RefParameter>
     <RefParameter Visible="false" Name="Usart2ClockSelectionARG" Comment="Usart2ClockSelectionARG" Type="list" DefaultValue="null"/>
 	
     <RefParameter Visible="false" Name="Usart3ClockSelectionARG" Comment="Usart3ClockSelectionARG" Type="list" DefaultValue="+Usart3ClockSelection">
-        <Condition Expression="USART3Used_ForRCC" Diagnostic="USART3 Activated"/>
+        <Condition Expression="USART3Used_ForRCC &amp; !(DIE438 |DIE439)" Diagnostic="USART3 Activated"/>
     </RefParameter>
     <RefParameter Visible="false" Name="Usart3ClockSelectionARG" Comment="Usart3ClockSelectionARG" Type="list" DefaultValue="null"/>
     <RefParameter Visible="false" Name="Uart4ClockSelectionARG" Comment="Uart4ClockSelectionARG" Type="list" DefaultValue="+Uart4ClockSelection">
@@ -1110,7 +1110,7 @@
     <RefParameter Visible="false" Name="Tim1ClockSelectionARG" Comment="Tim1ClockSelectionARG" Type="list" DefaultValue="null"/>
 	
     <RefParameter Visible="false" Name="Tim8ClockSelectionARG" Comment="Tim8ClockSelectionARG" Type="list" DefaultValue="+TIM8Selection">
-        <Condition Expression="TIM8" Diagnostic="Tim1 Activated"/>
+        <Condition Expression="TIM8 &amp; TIM8_Exist" Diagnostic="Tim1 Activated"/>
     </RefParameter>
 	
     <RefParameter Visible="false" Name="Tim8ClockSelectionARG" Comment="Tim8ClockSelectionARG" Type="list" DefaultValue="null"/>
@@ -1240,30 +1240,15 @@
 	
     <!--Clock Type-->
     <RefParameter Visible="false" Comment="Clock Type" DefaultValue="+ClockTypeHCLK+|ClockTypeSysClk+|ClockTypePCLK1+|ClockTypePCLK2" Name="ClockType" Type="list"/>
-    <RefParameter Visible="false" Comment="Clock Type SysClk" DefaultValue="RCC_CLOCKTYPE_SYSCLK" Name="ClockTypeSysClk" Type="list">
-        <Condition Diagnostic="SYSCLK not changed" Expression="FLASH_LATENCY0"/>
-        <PossibleValue Comment="Sysclk" Value="RCC_CLOCKTYPE_SYSCLK" Semaphore="SysClkToConfigure"/>
-    </RefParameter>
-    <RefParameter Visible="false" Comment="Clock Type SysClk" DefaultValue="" Name="ClockTypeSysClk" Type="list">
-        <Condition Diagnostic="SYSCLK not changed" Expression="SYSCLKSource=RCC_SYSCLKSOURCE_MSI"/>
-    </RefParameter>
+
     <RefParameter Visible="false" Comment="Clock Type SysClk" DefaultValue="RCC_CLOCKTYPE_SYSCLK" Name="ClockTypeSysClk" Type="list">
         <PossibleValue Comment="Sysclk" Value="RCC_CLOCKTYPE_SYSCLK" Semaphore="SysClkToConfigure"/>
-    </RefParameter>
-    <RefParameter Visible="false" Comment="Clock Type AHB" DefaultValue="" Name="ClockTypeHCLK" Type="list">
-        <Condition Diagnostic="AHB not changed" Expression="AHBCLKDivider=RCC_SYSCLK_DIV1"/>
     </RefParameter>
     <RefParameter Visible="false" Comment="Clock Type AHB" DefaultValue="RCC_CLOCKTYPE_HCLK" Name="ClockTypeHCLK" Type="list">
         <PossibleValue Comment="RCC_CLOCKTYPE_HCLK" Value="RCC_CLOCKTYPE_HCLK" Semaphore="HCLKtoConfigure"/>
     </RefParameter>
-    <RefParameter Visible="false" Comment="Clock Type HCLK1" DefaultValue="" Name="ClockTypePCLK1" Type="list">
-        <Condition Diagnostic="HCLK1 not changed" Expression="APB1CLKDivider=RCC_HCLK_DIV1"/>
-    </RefParameter>
     <RefParameter Visible="false" Comment="Clock Type HCLK1" DefaultValue="RCC_CLOCKTYPE_PCLK1" Name="ClockTypePCLK1" Type="list">
         <PossibleValue Comment="PCLK1" Value="RCC_CLOCKTYPE_PCLK1" Semaphore="PCLK1toConfigure"/>
-    </RefParameter>
-    <RefParameter Visible="false" Comment="Clock Type HCLK2" DefaultValue="" Name="ClockTypePCLK2" Type="list">
-        <Condition Diagnostic="HCLK2 not changed" Expression="APB2CLKDivider=RCC_HCLK_DIV1"/>
     </RefParameter>
     <RefParameter Visible="false" Comment="Clock Type HCLK2" DefaultValue="RCC_CLOCKTYPE_PCLK2" Name="ClockTypePCLK2" Type="list">
         <PossibleValue Comment="PCLK2" Value="RCC_CLOCKTYPE_PCLK2" Semaphore="PCLK2toConfigure"/>

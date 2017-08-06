@@ -496,7 +496,9 @@
     [#if service.gpio??][#assign gpioService = service.gpio][#else][#assign gpioService = ""][/#if]
 [/#if]
 [#if serviceName=="gpioOut"]
-    [#if service.gpioOut??][#assign gpioOutService = service.gpioOut][#else][#assign gpioOutService = ""][/#if]
+    [#if service.gpioOut??][#assign gpioOutService = service.gpioOut][#else][#assign gpioOutService = "empty"][/#if]
+[#else]
+[#assign gpioOutService = "empty"]
 [/#if]
 [#if serviceName=="dma" && service.dma??]
 [#assign dmaService = service.dma]
@@ -508,7 +510,9 @@
 [/#if]
 [#if serviceName=="gpioOut"]
  [#assign instanceIndex =""]
+[#if gpioOutService!="empty"]
     [@generateConfigModelCode configModel=gpioOutService inst=ipName nTab=tabN index=""/]
+[/#if]
 [/#if]
 [#if serviceName=="dma" && dmaService??]
  [#assign instanceIndex =""]
@@ -665,8 +669,12 @@
                [/#list]
             [/#if]
          [#else]
+            [#if ipName?contains("WWDG") && DIE=="DIE415"]
+            [#-- Orca window watchdog clock disable doesn't work --]
+            [#else]
                  #t#t/* Peripheral clock disable */
                  #t#t__${ipName}_CLK_DISABLE();  
+            [/#if]
          [/#if]
     [/#if]
     [#if gpioExist]
@@ -904,9 +912,10 @@ ${variable.value} ${variable.name};
 [#-- MspPostInit callBack if neededfor output gpio config --]
 [#if instanceData.initServices??]
     [#if instanceData.initServices.gpioOut??]
+[#assign ipName = instanceData.ipName]
         [#list instanceData.initCallBackInitMethodList as initCallBack]
             [#if initCallBack?contains("PostInit")]
-            #t${initCallBack}(&h${instanceData.halMode?lower_case}${instanceData.instIndex});
+            #t${initCallBack}([#if ipName?contains("TIM")&&!(ipName?contains("HRTIM")||ipName?contains("LPTIM"))]&htim[#else]&h${instanceData.realIpName?lower_case}[/#if]${instanceData.instIndex});
             [/#if]
         [/#list]
     [/#if]
@@ -1058,13 +1067,14 @@ int DFSDM_Init = 0;
 [/#compress]
 [/#if]
 [#-- Section2:End --]
-[#-- Section2-1: Msp Post Init --]
+[#-- Section2-1: MspPost Init --]
 [#if ipvar.initCallBacks??]
 [#compress]
 [#assign DFSDM_var = "false"]
-[#list ipvar.initCallBacks.entrySet() as entry]
-[#assign instanceList = entry.value]
-[#assign mode=entry.key?replace("_MspInit","")?replace("MspInit","")?replace("_BspInit","")?replace("HAL_","")]
+[#assign instanceList = ipvar.instanceListWithOutputs]
+
+[#--assign mode=entry.key?replace("_MspInit","")?replace("MspInit","")?replace("_BspInit","")?replace("HAL_","")--]
+[#assign mode=ipvar.ipName]
 
 [#assign ipHandler = "h" + mode?lower_case]
 [#--Check if the Msp init will be empty start--] 
@@ -1085,13 +1095,13 @@ int DFSDM_Init = 0;
 [/#if]
 
 [#-- #nvoid HAL_${mode}_MspInit(${mode}_HandleTypeDef* h${mode?lower_case}){--] 
-[#if (mspIsEmpty1=="no")&&(!mode?contains("TIM")||mode?contains("LPTIM")||mode?contains("HRTIM"))]
-#nvoid ${entry.key?replace("MspInit","MspPostInit")}(${mode}_HandleTypeDef* h${mode?lower_case})
+[#if (mspIsEmpty1=="no")&&(mode!="TIM")]
+#nvoid HAL_${mode}_MspPostInit(${mode}_HandleTypeDef* h${mode?lower_case})
 {
 #n
 [#else]
 [#if (mspIsEmpty1=="no")]
-#nvoid ${entry.key?replace("MspInit","MspPostInit")}(TIM_HandleTypeDef* h${mode?lower_case})
+#nvoid HAL_${mode}_MspPostInit(TIM_HandleTypeDef* h${mode?lower_case})
 {
 #n
 [/#if]
@@ -1164,7 +1174,7 @@ int DFSDM_Init = 0;
 #n}#n
 [/#if] [#-- mspIsEmpty1=="no" --]
 [#--break--] [#-- use the first msp--]
-[/#list]
+
 [/#compress]
 [/#if]
 [#-- Section2-1:End --]

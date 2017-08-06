@@ -78,7 +78,7 @@
 /** @defgroup USBD_DFU_Private_TypesDefinitions
   * @{
   */ 
-/* USER CODE BEGIN PRIVATE_TYPES  */
+/* USER CODE BEGIN PRIVATE_TYPES */
 /* USER CODE END PRIVATE_TYPES */ 
 /**
   * @}
@@ -89,7 +89,7 @@
   * @{
   */ 
 #define FLASH_DESC_STR      "${DFU_MEDIA}"  
-/* USER CODE BEGIN PRIVATE_DEFINES  */
+/* USER CODE BEGIN PRIVATE_DEFINES */
 /* USER CODE END PRIVATE_DEFINES */
   
 /**
@@ -100,7 +100,7 @@
 /** @defgroup USBD_DFU_Private_Macros
   * @{
   */ 
-/* USER CODE BEGIN PRIVATE_MACRO  */
+/* USER CODE BEGIN PRIVATE_MACRO */
 /* USER CODE END PRIVATE_MACRO */
 
 /**
@@ -120,8 +120,8 @@
 /* Handle for USB High Speed IP */
 #tUSBD_HandleTypeDef  *hUsbDevice_1;
 [/#if]
-/* USER CODE BEGIN PRIVATE_VARIABLES  */
-/* USER CODE END  PRIVATE_VARIABLES */
+/* USER CODE BEGIN PRIVATE_VARIABLES */
+/* USER CODE END PRIVATE_VARIABLES */
 
 /**
   * @}
@@ -136,8 +136,8 @@
 [#if handleNameHS == "HS"]
 #textern USBD_HandleTypeDef hUsbDeviceHS;  
 [/#if]
-/* USER CODE BEGIN EXPORTED_VARIABLES  */
-/* USER CODE END  EXPORTED_VARIABLES */
+/* USER CODE BEGIN EXPORTED_VARIABLES */
+/* USER CODE END EXPORTED_VARIABLES */
 
 /**
   * @}
@@ -164,7 +164,7 @@ static uint16_t MEM_If_DeInit_HS(void);
 static uint16_t MEM_If_GetStatus_HS (uint32_t Add, uint8_t Cmd, uint8_t *buffer);
 [/#if]
 /* USER CODE BEGIN PRIVATE_FUNCTIONS_DECLARATION */
-/* USER CODE END  PRIVATE_FUNCTIONS_DECLARATION */
+/* USER CODE END PRIVATE_FUNCTIONS_DECLARATION */
 
 /**
   * @}
@@ -294,7 +294,7 @@ uint16_t MEM_If_GetStatus_FS (uint32_t Add, uint8_t Cmd, uint8_t *buffer)
     break;
   }                             
   return  (USBD_OK);
-  /* USER CODE END 6 */  
+  /* USER CODE END 5 */  
 }
 [/#if]
 
@@ -307,9 +307,9 @@ uint16_t MEM_If_GetStatus_FS (uint32_t Add, uint8_t Cmd, uint8_t *buffer)
   */
 uint16_t MEM_If_Init_HS(void)
 { 
-  /* USER CODE BEGIN 7 */ 
+  /* USER CODE BEGIN 6 */ 
   return (USBD_OK);
-  /* USER CODE END 7 */ 
+  /* USER CODE END 6 */ 
 }
 
 /**
@@ -320,9 +320,9 @@ uint16_t MEM_If_Init_HS(void)
   */
 uint16_t MEM_If_DeInit_HS(void)
 { 
-  /* USER CODE BEGIN 8 */ 
+  /* USER CODE BEGIN 7 */ 
   return (USBD_OK);
-  /* USER CODE END 8 */ 
+  /* USER CODE END 7 */ 
 }
 
 /**
@@ -333,9 +333,9 @@ uint16_t MEM_If_DeInit_HS(void)
   */
 uint16_t MEM_If_Erase_HS(uint32_t Add)
 {
-  /* USER CODE BEGIN 9 */ 
+  /* USER CODE BEGIN 8 */ 
   return (USBD_OK);
-  /* USER CODE END 9 */ 
+  /* USER CODE END 8 */ 
 }
 
 /**
@@ -348,9 +348,9 @@ uint16_t MEM_If_Erase_HS(uint32_t Add)
   */
 uint16_t MEM_If_Write_HS(uint8_t *src, uint8_t *dest, uint32_t Len)
 {
-  /* USER CODE BEGIN 10 */ 
+  /* USER CODE BEGIN 9 */ 
   return (USBD_OK);
-  /* USER CODE END 10 */ 
+  /* USER CODE END 9 */ 
 }
 
 /**
@@ -364,9 +364,9 @@ uint16_t MEM_If_Write_HS(uint8_t *src, uint8_t *dest, uint32_t Len)
 uint8_t *MEM_If_Read_HS (uint8_t *src, uint8_t *dest, uint32_t Len)
 {
   /* Return a valid address to avoid HardFault */
-  /* USER CODE BEGIN 11 */ 
+  /* USER CODE BEGIN 10 */ 
   return (uint8_t*)(USBD_OK);
-  /* USER CODE END 11 */ 
+  /* USER CODE END 10 */ 
 }
 
 /**
@@ -379,7 +379,7 @@ uint8_t *MEM_If_Read_HS (uint8_t *src, uint8_t *dest, uint32_t Len)
   */
 uint16_t MEM_If_GetStatus_HS (uint32_t Add, uint8_t Cmd, uint8_t *buffer)
 {
-  /* USER CODE BEGIN 12 */ 
+  /* USER CODE BEGIN 11 */ 
   switch (Cmd)
   {
   case DFU_MEDIA_PROGRAM:
@@ -392,12 +392,12 @@ uint16_t MEM_If_GetStatus_HS (uint32_t Add, uint8_t Cmd, uint8_t *buffer)
     break;
   }                             
   return  (USBD_OK);
-  /* USER CODE END 12 */  
+  /* USER CODE END 11 */  
 }
 [/#if]
 
 /* USER CODE BEGIN PRIVATE_FUNCTIONS_IMPLEMENTATION */
-/* USER CODE END  PRIVATE_FUNCTIONS_IMPLEMENTATION */
+/* USER CODE END PRIVATE_FUNCTIONS_IMPLEMENTATION */
 
 /**
   * @}

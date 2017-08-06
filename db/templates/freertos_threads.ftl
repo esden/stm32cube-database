@@ -3,6 +3,7 @@
 [#assign nbThreads = 0]
 [#assign defaultTaskFunction = "defaultName"]
 [#assign inMain = 0]
+[#assign defaultTaskOption = "Default"]
 
 [#list SWIPdatas as SWIP]
     [#if SWIP.variables??]
@@ -24,11 +25,15 @@
           [#if index == 3]
             [#assign threadFunction = i]
           [/#if]
+          [#if index == 5] 
+            [#assign option = i] 
+          [/#if]
           [#assign index = index + 1]
         [/#list]
         [#assign nbThreads = nbThreads + 1]
         [#if nbThreads == 1]
           [#assign defaultTaskFunction = threadFunction]
+          [#assign defaultTaskOption = option]
         [/#if]
       [/#if]
 	[/#list]
@@ -36,7 +41,11 @@
 [/#list]
 [#assign mw = "empty"]
 #n#n/* ${defaultTaskFunction} function */
+[#if defaultTaskOption == "Default"]
 void ${defaultTaskFunction}(void const * argument)
+[#else]
+__weak void ${defaultTaskFunction}(void const * argument)
+[/#if]
 {
 [#list SWIPdatas as SWIP]
   [#if SWIP.variables??]

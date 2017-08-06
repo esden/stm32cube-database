@@ -266,30 +266,49 @@
 			<Semaphore>USB_FS_HS</Semaphore>
 		</Mode>
 		
+		<!--
 		<Mode Name="Activate_VBUS">
 			<ModeLogicOperator Name="XOR">
 				<Mode Name="Activate_VBUS" UserName="VBUS">
 					<SignalLogicalOp Name="AND">				
-						<Signal Name="VBUS" IOMode="System"/>							
+						<Signal Name="VBUS" IOMode="AlternateFunctionPushPull"/>							
 					</SignalLogicalOp>					
 				</Mode>					
 			</ModeLogicOperator>
 			<Semaphore>VBUS_SENSING_ON</Semaphore>
-			<Semaphore>USB_FS_HS</Semaphore>
-			<!-- to keep compatibility with device mode -->
-			<!-- tracker 287417 -->
+			<Semaphore>USB_FS_HS</Semaphore>			
 			<Condition Expression="(MW_USB_OTG_FS_MW_DEVICE | OTG_DUAL_ROLE_DEVICE | MW_USB_OTG_FS_MW_HOST) &amp; (!VBUS_USED_FOR_BCD)" Diagnostic="USB Mode must be selected first"/> 			
 		</Mode>
 		<Mode Name="Activate_VBUS_BCD" UserName="VBUS (Charging Battery)">
 			<ModeLogicOperator Name="XOR">
 				<Mode Name="Activate_VBUS_BCD" UserName="VBUS (Charging Battery)">
-					<SignalLogicalOp Name="AND">											
-						<Signal Name="VBUS"  IOMode="EXTIRisingFalling"/>
+					<SignalLogicalOp Name="AND">				
+						<Signal Name="VBUS"  IOMode="EXTIRisingFalling"/>								
 					</SignalLogicalOp>
 				</Mode>			
 			</ModeLogicOperator>
 			<Semaphore>VBUS_USED_FOR_BCD</Semaphore>			
 			<Condition Expression="(MW_USB_OTG_FS_MW_DEVICE |OTG_DUAL_ROLE_DEVICE) &amp; (!VBUS_SENSING_ON)" Diagnostic="USB Device_Only Mode must be selected first"/>			
+		</Mode>
+		-->
+		<Mode Name="Activate_VBUS">
+			<ModeLogicOperator Name="XOR">
+				<Mode Name="Activate_VBUS" UserName="VBUS sensing">
+					<SignalLogicalOp Name="AND">				
+						<Signal Name="VBUS" IOMode="AlternateFunctionPushPull"/>							
+					</SignalLogicalOp>	
+					<Semaphore>VBUS_SENSING_ON</Semaphore>
+					<Semaphore>USB_FS_HS</Semaphore>	
+					<Condition Expression="(MW_USB_OTG_FS_MW_DEVICE | OTG_DUAL_ROLE_DEVICE | MW_USB_OTG_FS_MW_HOST)" Diagnostic="USB Mode must be selected first"/> 							
+				</Mode>	
+				<Mode Name="Activate_VBUS_BCD" UserName="BCD (Battery Charging Detection)">
+					<SignalLogicalOp Name="AND">				
+						<Signal Name="VBUS"  IOMode="EXTIRisingFalling"/>								
+					</SignalLogicalOp>
+					<Semaphore>VBUS_USED_FOR_BCD</Semaphore>
+					<Condition Expression="(MW_USB_OTG_FS_MW_DEVICE |OTG_DUAL_ROLE_DEVICE)" Diagnostic="USB Device_Only Mode must be selected first"/>		
+				</Mode>							
+			</ModeLogicOperator>								
 		</Mode>
 		
 		<Mode Name="Activate_SOF">
