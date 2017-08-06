@@ -26,11 +26,9 @@
 	</RefParameter>
 	
 	<RefParameter Comment="Host Channels" DefaultValue="null" Name="Host_channels" Type="List" Group=""  Visible="false">	
-		<Condition Expression="VirtualMode = Device_DP_DM" Diagnostic=""/>		
+		<Condition Expression="VirtualMode = Device_Only" Diagnostic=""/>		
 	</RefParameter>
-	<RefParameter Comment="Host Channels" DefaultValue="null" Name="Host_channels" Type="List" Group=""  Visible="false">	
-		<Condition Expression="VirtualMode = Device_DP_DM" Diagnostic=""/>		
-	</RefParameter>
+	
 	
 	<!-- Virtual Mode Parameter, to define RefParameter in function of RefMode -->
 	<RefParameter Comment="" DefaultValue="Host_Only" Name="VirtualMode" Type="list" Visible="false" Group="Basic Parameters" >
@@ -46,13 +44,13 @@
 	</RefParameter>
 	
 	<!-- Device speed -->
-	<RefParameter Comment="Speed" DefaultValue="PCD_SPEED_FULL" Name="speed" Type="List" Group="">	
+	<RefParameter Comment="Speed" DefaultValue="PCD_SPEED_FULL" Name="DeviceSpeed" Type="List" Group="">	
 		<Condition Expression="VirtualMode = Device_DP_DM" Diagnostic=""/>
 		<PossibleValue Comment="Full Speed 12MBit/s" Value="PCD_SPEED_FULL"/>
 		<!--<PossibleValue Comment="Low Speed 1.5MBit/s" Value="PCD_SPEED_LOW"/> -->	
 	</RefParameter>
 	
-	<RefParameter Comment="Speed" DefaultValue="PCD_SPEED_FULL" Name="speed" Type="List" Group="">	
+	<RefParameter Comment="Speed" DefaultValue="PCD_SPEED_FULL" Name="DeviceSpeed" Type="List" Group="">	
 		<Condition Expression="VirtualMode = Device_Only" Diagnostic=""/>
 		<PossibleValue Comment="Full Speed 12MBit/s" Value="PCD_SPEED_FULL"/>
 		<!--<PossibleValue Comment="Low Speed 1.5MBit/s" Value="PCD_SPEED_LOW"/>-->
@@ -90,16 +88,16 @@
 		<PossibleValue Value="PCD_PHY_EMBEDDED" Comment="Internal Phy"/>		
 	</RefParameter>
 	
-		<!-- Bug356385 -->
-	<RefParameter Comment="Signal start of frame " DefaultValue="DISABLE" Name="Sof_enable" Type="List" Group="" Visible="true">
-		<PossibleValue Value="ENABLE" Comment="Enabled"/>
-		<PossibleValue Value="DISABLE" Comment="Disabled"/>			
-		<Condition Expression="!USB_FS_SOF" Diagnostic=""/>
-	</RefParameter>	
+		<!-- Bug356385 -->	
 	<RefParameter Comment="Signal start of frame " DefaultValue="ENABLE" Name="Sof_enable" Type="List" Group="">
 		<PossibleValue Value="ENABLE" Comment="Enabled"/>
 		<Condition Expression="USB_FS_SOF" Diagnostic=""/>		
 	</RefParameter>
+	<!-- Bug381221 -->
+	<RefParameter Comment="Signal start of frame " DefaultValue="DISABLE" Name="Sof_enable" Type="List" Group="" Visible="true">
+		<PossibleValue Value="ENABLE" Comment="Enabled"/>
+		<PossibleValue Value="DISABLE" Comment="Disabled"/>					
+	</RefParameter>	
 	
 	<!-- Add Link Power Management -->
 	<RefParameter Comment="Link Power Management" DefaultValue="DISABLE" Name="lpm_enable" Type="List" Group="" Visible="true">
@@ -191,6 +189,7 @@
 		<Parameter Name="low_power_enable"/>	
 		<Parameter Name="vbus_sensing_enable"/>	
 		-->	
+		<Parameter Name="Sof_enable"/>	
 	</RefMode>
 	
 	<!-- USB Full Speed in Device mode -->	
@@ -200,7 +199,7 @@
 			<PossibleValue>Device_DP_DM</PossibleValue>
 		</Parameter>
 		<Parameter Name="dev_endpoints"/>		
-		<Parameter Name="speed"/>
+		<Parameter Name="DeviceSpeed"/>
 		<Parameter Name="ep0_mps"/>						
 		<Parameter Name="dma_enable"/>
 		<Parameter Name="phy_itface">
@@ -212,9 +211,7 @@
 		<!--<Parameter Name="use_dedicated_ep1"/>-->	
 		<Parameter Name="vbus_sensing_enable"/>	
 		<!-- Bug356385 -->
-		<Parameter Name="Sof_enable">
-			<Condition Expression="!USB_FS_SOF" Diagnostic=""/>
-		</Parameter>
+		<Parameter Name="Sof_enable"/>			
 	</RefMode>
 	
 	<RefMode Name="Device_Only" HalMode="PCD">
@@ -223,7 +220,7 @@
 			<PossibleValue>Device_Only</PossibleValue>
 		</Parameter>
 		<Parameter Name="dev_endpoints"/>		
-		<Parameter Name="speed"/>
+		<Parameter Name="DeviceSpeed"/>
 		<Parameter Name="ep0_mps"/>						
 		<Parameter Name="dma_enable"/>
 		<Parameter Name="phy_itface">
@@ -235,14 +232,11 @@
 		<!--<Parameter Name="use_dedicated_ep1"/>-->
 		<Parameter Name="vbus_sensing_enable"/>	
 		<!-- Bug356385 -->
-		<Parameter Name="Sof_enable">
-			<Condition Expression="!USB_FS_SOF" Diagnostic=""/>
-		</Parameter>
+		<Parameter Name="Sof_enable"/>			
 	</RefMode>
 	
 	<!-- USB Full Speed in Device mode with SOF -->
-	<RefMode Name="Activate_SOF_FS" HalMode="">		
-		<Parameter Name="Sof_enable"/>								
+	<RefMode Name="Activate_SOF_FS" HalMode="">										
 	</RefMode>
 	
 	

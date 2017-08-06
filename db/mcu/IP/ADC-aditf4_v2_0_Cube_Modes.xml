@@ -216,18 +216,9 @@
     <!-- RefMode of ADC_Regular_ConversionMode -->
     <RefMode Abstract="true" Comment="Regular Conversion Settings" Group="ADC_Regular_ConversionMode" Name="ADC_Regular_ConversionMode">
         <Parameter Name="SamplingTime"/>
-        <Parameter Name="ExternalTrigConvEdge"/>
         <Parameter Name="ExternalTrigConv"/>
+        <Parameter Name="ExternalTrigConvEdge"/>
     </RefMode>
-    
-    <!-- ExternalTrigConvEdge -->
-    <RefParameter Comment="External Trigger Conversion Edge" DefaultValue="ADC_EXTERNALTRIGCONVEDGE_NONE" Group="ADCgroup" Name="ExternalTrigConvEdge" Type="list">
-        <PossibleValue Comment="None" Value="ADC_EXTERNALTRIGCONVEDGE_NONE"/>
-        <PossibleValue Comment="Trigger detection on the rising edge" Value="ADC_EXTERNALTRIGCONVEDGE_RISING"/>
-        <PossibleValue Comment="Trigger detection on the falling edge" Value="ADC_EXTERNALTRIGCONVEDGE_FALLING"/>
-        <PossibleValue Comment="Trigger detection on the falling and rising edge" Value="ADC_EXTERNALTRIGCONVEDGE_RISINGFALLING"/>
-        <Description>Select the external trigger polarity and enable the trigger of a regular group: When an external trigger is selected for ADC regular conversion, only the rising edge of the signal can start the conversion.</Description>
-    </RefParameter>
 	    
 	    
     <!-- Possible Value of SamplingTime parameters  -->
@@ -244,14 +235,12 @@
     </RefParameter>
 	    
     <!-- ExternalTrigConv -->
-    <RefParameter Comment="External Trigger Conversion Source" DefaultValue="null" Group="ADCgroup" Name="ExternalTrigConv" Type="list" Visible="false">
-        <Condition Diagnostic="" Expression="ExternalTrigConvEdge=ADC_EXTERNALTRIGCONVEDGE_NONE"/>
-    </RefParameter>
     <RefParameter Comment="External Trigger Conversion Source" DefaultValue="ADC_EXTERNALTRIGCONV_EXT_IT11" Group="ADCgroup" Name="ExternalTrigConv" Type="list">
-        <Condition Diagnostic="EXTI Line11 is used for External-Trigger-for-Regular-conversion mode." Expression="!(ExternalTrigConvEdge=ADC_EXTERNALTRIGCONVEDGE_NONE)&amp;(RegularExternalTrigger)"/>
+        <Condition Diagnostic="EXTI Line11 is used for External-Trigger-for-Regular-conversion mode." Expression="(RegularExternalTrigger)"/>
         <PossibleValue Comment="EXTI Line11" Value="ADC_EXTERNALTRIGCONV_EXT_IT11"/>
     </RefParameter>
-    <RefParameter Comment="External Trigger Conversion Source" DefaultValue="ADC_EXTERNALTRIGCONV_T6_TRGO" Group="ADCgroup" Name="ExternalTrigConv" Type="list">
+    <RefParameter Comment="External Trigger Conversion Source" DefaultValue="ADC_SOFTWARE_START" Group="ADCgroup" Name="ExternalTrigConv" Type="list">
+        <PossibleValue Comment="Regular Conversion launched by software" Value="ADC_SOFTWARE_START"/>
         <PossibleValue Action="Remove" Comment="Timer 6 Trigger Out event" Condition="!TIM6_Exist" Diagnostic="" Value="ADC_EXTERNALTRIGCONV_T6_TRGO"/>
         <PossibleValue Action="Remove" Comment="Timer 21 Capture Compare 2 event" Condition="!TIM21_Exist" Diagnostic="" Value="ADC_EXTERNALTRIGCONV_T21_CC2"/>
         <PossibleValue Action="Remove" Comment="Timer 2 Trigger Out event" Condition="!TIM2_Exist" Diagnostic="" Value="ADC_EXTERNALTRIGCONV_T2_TRGO"/>
@@ -263,6 +252,19 @@
         <Description>Select the external event used to trigger the start of conversion of a regular group</Description>
     </RefParameter>
 
+   <!-- ExternalTrigConvEdge -->
+    <RefParameter Comment="External Trigger Conversion Edge" DefaultValue="ADC_EXTERNALTRIGCONVEDGE_NONE" Group="ADCgroup" Name="ExternalTrigConvEdge" Type="list">
+         <Condition Diagnostic="" Expression="ExternalTrigConv = ADC_SOFTWARE_START"/>
+        <PossibleValue Comment="None" Value="ADC_EXTERNALTRIGCONVEDGE_NONE"/>
+        <Description>Select the external trigger polarity and enable the trigger of a regular group: When an external trigger is selected for ADC regular conversion, only the rising edge of the signal can start the conversion.</Description>
+    </RefParameter>
+    
+    <RefParameter Comment="External Trigger Conversion Edge" DefaultValue="ADC_EXTERNALTRIGCONVEDGE_RISING" Group="ADCgroup" Name="ExternalTrigConvEdge" Type="list">
+        <PossibleValue Comment="Trigger detection on the rising edge" Value="ADC_EXTERNALTRIGCONVEDGE_RISING"/>
+        <PossibleValue Comment="Trigger detection on the falling edge" Value="ADC_EXTERNALTRIGCONVEDGE_FALLING"/>
+        <PossibleValue Comment="Trigger detection on the falling and rising edge" Value="ADC_EXTERNALTRIGCONVEDGE_RISINGFALLING"/>
+        <Description>Select the external trigger polarity and enable the trigger of a regular group: When an external trigger is selected for ADC regular conversion, only the rising edge of the signal can start the conversion.</Description>
+    </RefParameter>
 	    
     <!-- Possible Value of Channel parameter -->
     <RefParameter Comment="Channel" DefaultValue="" Group="ADCChannel" Name="Channel" Type="list" Visible="false">

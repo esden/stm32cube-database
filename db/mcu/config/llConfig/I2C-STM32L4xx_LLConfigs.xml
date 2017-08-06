@@ -2,16 +2,10 @@
 <IP xmlns="http://mcd.rou.st.com/modules.php?name=mcu" DBVersion="V4.0"  IncludeFile="stm32l4xx.h;stm32l4xx_ll_i2c.h" Name="I2C" Version="STM32Cube_FW_L4_V1.5.0"
     xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../../doc/V4/Development/Specifications/db/IP_Configs.xsd">
     <RefConfig Name="I2C"  Comment="I2C Initialization">
-        <CallLibMethod Name="LL_I2C_Enable">
-            <MethodArg  Name="I2Cx" ParameterName="Instance"/>
-        </CallLibMethod>
-  
         <CallLibMethod Name="LL_I2C_EnableAutoEndMode">
             <MethodArg Name="I2Cx" ParameterName="Instance" />
         </CallLibMethod>
-        <CallLibMethod  Name="LL_I2C_EnableOwnAddress1">
-            <MethodArg  Name="I2Cx" ParameterName="Instance"/>
-        </CallLibMethod>
+      
         <IFCondition Expression="($Index=1 )">
             <CallLibMethod Name="MODE_I2C" Type="HardCode">
                 <HardCode Text="#n#t LL_I2C_SetMode(I2C1, LL_I2C_MODE_I2C);"/>
@@ -39,6 +33,10 @@
             <MethodArg  Name="I2Cx" ParameterName="Instance" />
             <MethodArg  Name="OwnAddress1" ParameterName="OwnAddress1" />
             <MethodArg Name="OwnAddrSize" ParameterName="AddressingMode" />
+        </CallLibMethod>
+        
+          <CallLibMethod  Name="LL_I2C_EnableOwnAddress1">
+            <MethodArg  Name="I2Cx" ParameterName="Instance"/>
         </CallLibMethod>
         <IFCondition Expression="(DualAddressMode =I2C_DUALADDRESS_DISABLE )">
 
@@ -86,7 +84,25 @@
         <IFCondition Expression="(AddressingMode = I2C_ADDRESSINGMODE_10BIT )">
             <CallLibMethod  Name="LL_I2C_SetMasterAddressingMode">
                 <MethodArg Name="I2Cx" ParameterName="Instance" />
-            <MethodArg Name="AddressingMode" ParameterName="AddressingMode" />
+                <MethodArg Name="AddressingMode" ParameterName="AddressingMode" />
+            </CallLibMethod>
+        </IFCondition>
+         <IFCondition Expression=" (Analog_Filter=I2C_ANALOGFILTER_ENABLE )">
+
+            <CallLibMethod Name="LL_I2C_EnableAnalogFilter">
+                <MethodArg Name="I2Cx" ParameterName="Instance"/>		
+            </CallLibMethod>
+        </IFCondition>
+
+        <IFCondition Expression="(Analog_Filter=I2C_ANALOGFILTER_DISABLE)">
+            <CallLibMethod Name="LL_I2C_DisableAnalogFilter">
+                <MethodArg  Name="I2Cx" ParameterName="Instance"/>
+            </CallLibMethod>
+        </IFCondition>
+		
+        <IFCondition Expression="(1=1 )">
+            <CallLibMethod Name="LL_I2C_Enable">
+                <MethodArg  Name="I2Cx" ParameterName="Instance"/>
             </CallLibMethod>
         </IFCondition>
 
@@ -94,7 +110,7 @@
     <RefConfig Name="I2C_DeInit">
         <CallLibMethod Name="LL_I2C_DeInit"/>
     </RefConfig>
-    <RefConfig  Name="I2C_Analogue">
+   <!-- <RefConfig  Name="I2C_Analogue">
         <IFCondition Expression=" (Analog_Filter=I2C_ANALOGFILTER_ENABLE )">
 
             <CallLibMethod Name="LL_I2C_EnableAnalogFilter">
@@ -108,7 +124,7 @@
             </CallLibMethod>
         </IFCondition>
 		
-    </RefConfig>
+    </RefConfig>-->
     <RefConfig Comment="I2C Fast mode Plus enable" Name="FASTMODE_Config">
         <CallLibMethod Name="LL_SYSCFG_EnableFastModePlus" >
             <MethodArg Name="Parametre" ParameterName="FASTMODEPLUS"/>
@@ -117,10 +133,7 @@
     
     <!--SMBUS Config-->
     <RefConfig  Comment="SMBUS Configuration" Name="SMBus_init">
-        <CallLibMethod Name="LL_I2C_Enable">
-            <MethodArg  Name="I2Cx" ParameterName="Instance"/>
-        </CallLibMethod>
-    
+        
         <CallLibMethod  Name="LL_I2C_EnableAutoEndMode">
             <MethodArg Name="I2Cx" ParameterName="Instance" />
         </CallLibMethod>
@@ -134,18 +147,7 @@
             <MethodArg Name="OwnAddrSize" ParameterName="SMBusAddressingMode" />
         </CallLibMethod>
         
-        <IFCondition Expression=" (SMBusAnalogFilter=SMBUS_ANALOGFILTER_ENABLE )">
-
-            <CallLibMethod Name="LL_I2C_EnableAnalogFilter">
-                <MethodArg Name="I2Cx" ParameterName="Instance"/>		
-            </CallLibMethod>
-        </IFCondition>
-
-        <IFCondition Expression="(SMBusAnalogFilter=SMBUS_ANALOGFILTER_DISABLE)">
-            <CallLibMethod Name="LL_I2C_DisableAnalogFilter">
-                <MethodArg  Name="I2Cx" ParameterName="Instance"/>
-            </CallLibMethod>
-        </IFCondition>
+      
         <IFCondition Expression="(SMBusDualAddressMode =SMBUS_DUALADDRESS_DISABLE )">
 
             <CallLibMethod  Name="LL_I2C_DisableOwnAddress2">
@@ -209,18 +211,17 @@
             <MethodArg Name="ClockTimeout" ParameterName= "Timeout" />
         </CallLibMethod>
         
-         <IFCondition Expression="(SMBusAddressingMode = SMBUS_ADDRESSINGMODE_10BIT )">
+        <IFCondition Expression="(SMBusAddressingMode = SMBUS_ADDRESSINGMODE_10BIT )">
             <CallLibMethod  Name="LL_I2C_SetMasterAddressingMode">
                 <MethodArg Name="I2Cx" ParameterName="Instance" />
                 <MethodArg Name="AddressingMode" ParameterName="SMBusAddressingMode" />
             </CallLibMethod>
         </IFCondition>
         
-         <IFCondition Expression="(TIDLE=SMBUS_TIDLE_ENABLED)">
-
-             <CallLibMethod  Name="LL_I2C_IsActiveSMBusFlag_TIMEOUT">
-        <MethodArg Name="I2Cx" ParameterName="Instance" />
-    </CallLibMethod>  
+        <IFCondition Expression="(TIDLE=SMBUS_TIDLE_ENABLED)">
+            <CallLibMethod  Name="LL_I2C_IsActiveSMBusFlag_TIMEOUT">
+                <MethodArg Name="I2Cx" ParameterName="Instance" />
+            </CallLibMethod>  
         </IFCondition>
 
         <IFCondition Expression="(SMBusOwnAddress1 > 0 )">
@@ -228,17 +229,36 @@
                 <MethodArg  Name="I2Cx" ParameterName="Instance"/>
             </CallLibMethod>
         </IFCondition>
+        
+        <IFCondition Expression="(SMBusPacketErrorCheckMode =SMBUS_PEC_ENABLE) &amp; ((SMBusPeripheralMode = SMBUS_PERIPHERAL_MODE_SMBUS_SLAVE)|(SMBusPeripheralMode = SMBUS_PERIPHERAL_MODE_SMBUS_SLAVE_ARP))">
+     <CallLibMethod Name="LL_I2C_EnableSlaveByteControl">
+        <MethodArg Name="I2Cx" ParameterName="Instance" />
+    </CallLibMethod>
+       </IFCondition>
+         <IFCondition Expression=" (SMBusAnalogFilter=SMBUS_ANALOGFILTER_ENABLE )">
+            <CallLibMethod Name="LL_I2C_EnableAnalogFilter">
+                <MethodArg Name="I2Cx" ParameterName="Instance"/>		
+            </CallLibMethod>
+        </IFCondition>
+
+        <IFCondition Expression="(SMBusAnalogFilter=SMBUS_ANALOGFILTER_DISABLE)">
+            <CallLibMethod Name="LL_I2C_DisableAnalogFilter">
+                <MethodArg  Name="I2Cx" ParameterName="Instance"/>
+            </CallLibMethod>
+        </IFCondition>
+        <IFCondition Expression="(1=1 )">
+            <CallLibMethod Name="LL_I2C_Enable">
+                <MethodArg  Name="I2Cx" ParameterName="Instance"/>
+            </CallLibMethod>
+        </IFCondition>
 
     </RefConfig>
  
  
-    <RefConfig Comment="configuration Alert Mode" Name="SMBus_alert">
-         
+    <RefConfig Comment="configuration Alert Mode" Name="SMBus_alert">         
         <CallLibMethod Name="LL_I2C_EnableSMBusAlert">
             <MethodArg Name="I2Cx" ParameterName="Instance" />
-        </CallLibMethod>
-        
-                                        
+        </CallLibMethod>                                      
         <CallLibMethod  Name="LL_I2C_EnableIT_ERR">
             <MethodArg Name="I2Cx" ParameterName="Instance"/>
         </CallLibMethod>				

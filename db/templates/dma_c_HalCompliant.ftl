@@ -173,7 +173,11 @@ static void MX_DMA_Init(void)
         [#if initVector.codeInMspInit]
           #t/* ${initVector.vector} interrupt configuration */
           [#if initVector.usedDriver == "LL"]
+            [#if FamilyName=="STM32L0"]
+          #tNVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority});
+            [#else]
           #tNVIC_SetPriority(${initVector.vector}, NVIC_EncodePriority(NVIC_GetPriorityGrouping(),${initVector.preemptionPriority}, ${initVector.subPriority}));
+            [/#if]
           #tNVIC_EnableIRQ(${initVector.vector});
           [#else]
           #tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});

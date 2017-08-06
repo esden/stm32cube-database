@@ -1,0 +1,640 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Clock xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" savedConfig="false" xsi:noNamespaceSchemaLocation="file:///C:/Dev/CLOCK/MicroXplorer_s/MCU_Clock.xsd">
+    <Background  imageName="STM32F4withMCO2" name="STM32F4withMCO2"  x="111" y="974">
+        <Condition Diagnostic="" Expression="!UFQFPN48"/>
+    </Background> 
+    <Tree id="ClockTree">
+        <Element id="HSIRC" type="fixedSource" isKey="true" refParameter="HSI_VALUE" x="302" y="340">
+            <Output signalId="HSI" to="SysClkSource"/>
+            <Output signalId="HSI" to="PLLSource"/>
+            <Output signalId="HSI" to="MCO1Mult"/>
+            <Output signalId="HSI" to="FMPI2C1Mult"/>
+        </Element>
+        <Element id="HSEOSC" type="variedSource" x="200" y="475" refParameter="HSE_VALUE">
+            <Output signalId="HSE" to="SysClkSource"/>
+            <Output signalId="HSE" to="HSERTCDevisor"/>
+            <Output signalId="HSE" to="PLLSource"/>
+            <Output signalId="HSE" to="MCO1Mult"/>
+            <Output signalId="HSE" to="MCO2Mult"/>
+        </Element>
+        <Element id="LSIRC" type="fixedSource" refParameter="LSI_VALUE" x="302" y="275">
+            <Output signalId="LSI" to="IWDGOutput"/>
+            <Output signalId="LSI" to="RTCClkSource"/>
+        </Element>
+        <Element id="LSEOSC" type="variedSource" refParameter="LSE_VALUE" x="200" y="218">
+            <Output signalId="LSE" to="RTCClkSource"/>
+            <Output signalId="LSE" to="MCO1Mult"/>
+        </Element>
+        <Element id="I2S_CKIN" type="variedSource" x="200" y="680" refParameter="EXTERNAL_CLOCK_VALUE" refEnable="ExtClockEnable">
+            <Output signalId="I2SExtClock" to="I2S1Mult"/>
+            <Output signalId="I2SExtClock" to="I2S2Mult"/>
+            <Output signalId="I2SExtClock" to="PLLI2SSRC"/>
+            <Output signalId="I2SExtClock" to="SAI1AMult"/>
+            <Output signalId="I2SExtClock" to="SAI1BMult"/>
+        
+        </Element>
+        <Element id="RTCClkSource" type="multiplexor" refParameter="RCC_RTC_Clock_Source,RCC_RTC_Clock_SourceVirtual" x="529" y="189" refEnable="RTCEnable">
+            <Input signalId="HSE_RTC" from="HSERTCDevisor"/>
+            <Input signalId="LSE" from="LSEOSC" refValue="RCC_RTCCLKSOURCE_LSE"/>
+            <Input signalId="LSI" from="LSIRC" refValue="RCC_RTCCLKSOURCE_LSI"/>
+            <Output signalId="RTCCLK" to="RTCOutput"/>
+        </Element>
+        <Element id="RTCOutput" type="output" refParameter="RTCFreq_Value" x="586" y="219" refEnable="RTCEnable">
+            <Input signalId="RTCCLK" from="RTCClkSource"/>
+        </Element>
+        <Element id="IWDGOutput" type="output" refParameter="WatchDogFreq_Value" x="585" y="278" refEnable="IWDGEnable">
+            <Input signalId="LSI" from="LSIRC"/>
+        </Element>
+        <Element id="HSERTCDevisor" type="devisor" refParameter="RCC_RTC_Clock_Source_FROM_HSE" x="414" y="185" refEnable="EnableHSERTCDevisor">
+            <Input signalId="HSE" from="HSEOSC"/>
+            <Output to="RTCClkSource" signalId="HSE_RTC"/>
+        </Element>
+        <Element id="PLLSource" type="multiplexor" refParameter="PLLSourceVirtual" orientation="LEFT" x="390" y="443">
+            <Input signalId="HSI" from="HSIRC" refValue="RCC_PLLSOURCE_HSI"/>
+            <Input signalId="HSE" from="HSEOSC" refValue="RCC_PLLSOURCE_HSE"/>
+            <Output signalId="PLLSRC" to="PLLM"/>
+            <Output signalId="PLLSRC" to="PLLI2SSRC"/>
+            <Output signalId="PLLSRC" to="I2S1Mult"/>
+            <Output signalId="PLLSRC" to="I2S2Mult"/>
+            <Output signalId="PLLSRC" to="SAI1AMult"/>
+            <Output signalId="PLLSRC" to="SAI1BMult"/>
+        </Element>
+        <Element id="PLLM" type="devisor" refParameter="PLLM" x="431" y="460">
+            <Input signalId="PLLSRC" from="PLLSource"/>
+            <Output signalId="VCOInput" to="PLLN"/>
+        </Element>
+        <Element id="PLLI2SSRC" type="multiplexor" refParameter="PLLI2SSource" orientation="LEFT" x="390" y="575">
+            <Input signalId="PLLSRC" from="PLLSource" refValue="RCC_PLLI2SCLKSOURCE_PLLSRC"/>
+            <Input signalId="I2SExtClock" from="I2S_CKIN" refValue="RCC_PLLI2SCLKSOURCE_EXT"/>
+            <Output signalId="PLLI2SSRCCLK" to="PLLI2SM"/>
+			
+        </Element>
+        <Element id="PLLI2SM" type="devisor" refParameter="PLLI2SM" x="431" y="590">
+            <Input signalId="PLLI2SSRCCLK" from="PLLI2SSRC"/>
+            <Output signalId="VCOI2SInput" to="PLLI2SN"/>
+        </Element>
+        <Element id="SysClkSource" type="multiplexor" refParameter="SYSCLKSource" x="666" y="346">
+            <Input signalId="HSI" from="HSIRC" refValue="RCC_SYSCLKSOURCE_HSI"/>
+            <Input signalId="HSE" from="HSEOSC" refValue="RCC_SYSCLKSOURCE_HSE"/>
+            <Input signalId="PLLCLK" from="PLLP" refValue="RCC_SYSCLKSOURCE_PLLCLK"/>
+            <Output signalId="SYSCLKInput" to="SysCLKOutput"/>
+            <Output signalId="SYSCLKInput" to="MCO2Mult"/>
+        </Element>
+		
+		
+
+        <Element id="SysCLKOutput" type="output" refParameter="SYSCLKFreq_VALUE" x="706" y="379">
+            <Input signalId="SYSCLKInput" from="SysClkSource"/>
+            <Output signalId="SYSCLK" to="AHBPrescaler"/>
+            <Output signalId="SYSCLK" to="PWRCLKoutput"/>
+            <Output signalId="SYSCLK" to="SDIOMult"    />
+            <Output signalId="SYSCLK" to="FMPI2C1Mult" />
+            <Output signalId="SYSCLK" to="DFSDMMult" />
+        </Element>
+        <!--MCO Mux-->
+        <Element id="MCO1Mult" type="multiplexor" refParameter="RCC_MCO1Source" x="460" y="745" refEnable="MCO1OutPutEnable">
+            <Input signalId="LSE"    from="LSEOSC" refValue="RCC_MCO1SOURCE_LSE"   />
+            <Input signalId="HSE"    from="HSEOSC" refValue="RCC_MCO1SOURCE_HSE"   />
+            <Input signalId="HSI"    from="HSIRC"  refValue="RCC_MCO1SOURCE_HSI"   />
+            <Input signalId="PLLCLK" from="PLLP"   refValue="RCC_MCO1SOURCE_PLLCLK"/>
+            <Output signalId="MCO1DivInput" to="MCO1Div"/>
+        </Element>
+        <Element id="MCO1Div" type="devisor" refParameter="RCC_MCODiv1" x="383" y="781" refEnable="MCO1OutPutEnable">
+            <Input signalId="MCO1DivInput" from="MCO1Mult"/>
+            <Output signalId="MCO1DivOuput" to="MCO1Pin"/>
+        </Element>
+        <Element id="MCO1Pin" type="output" refParameter="MCO1PinFreq_Value" x="310" y="780" refEnable="MCO1OutPutEnable">
+            <Input signalId="MCO1DivOuput" from="MCO1Div"/>
+        </Element>
+        <Element id="MCO2Mult" type="multiplexor" refParameter="RCC_MCO2Source" x="460" y="893" refEnable="MCO2OutPutEnable">
+            <Input signalId="SYSCLKInput" from="SysClkSource" refValue="RCC_MCO2SOURCE_SYSCLK"   />
+            <Input signalId="PLLI2SRCLK"  from="PLLI2SR"      refValue="RCC_MCO2SOURCE_PLLI2SCLK"/>
+            <Input signalId="HSE"         from="HSEOSC"       refValue="RCC_MCO2SOURCE_HSE"      />
+            <Input signalId="PLLCLK"      from="PLLP"         refValue="RCC_MCO2SOURCE_PLLCLK"   />
+            <Output signalId="MCO2DivInput" to="MCO2Div"/>
+        </Element>
+        <Element id="MCO2Div" type="devisor" refParameter="RCC_MCODiv2" x="383" y="924" refEnable="MCO2OutPutEnable">
+            <Input signalId="MCO2DivInput" from="MCO2Mult"/>
+            <Output signalId="MCO2DivOuput" to="MCO2Pin"/>
+        </Element>
+				
+        <Element id="MCO2Pin" type="output" x="310" y="922" refParameter="MCO2PinFreq_Value" refEnable="MCO2OutPutEnable">
+            <Input signalId="MCO2DivOuput" from="MCO2Div"/>
+        </Element>	
+        <!--AHB, APB1 and APB2 main block-->
+        <Element id="AHBPrescaler" type="devisor" refParameter="AHBCLKDivider" x="799" y="381">
+            <Input signalId="SYSCLK" from="SysCLKOutput"/>
+            <Output signalId="HCLK" to="AHBOutput"/>
+        </Element>
+        <Element id="PWRCLKoutput" type="activeOutput" refParameter="PWRFreq_Value" x="1210" y="244">
+            <Input signalId="SYSCLK" from="SysCLKOutput"/>
+        </Element>
+        <Element id="AHBOutput" type="activeOutput" isKey="true" refParameter="HCLKFreq_Value" x="870" y="379">
+            <Input signalId="HCLK" from="AHBPrescaler"/>
+            <Output signalId="AHBCLK" to="CortexPrescaler"  />
+            <Output signalId="AHBCLK" to="HCLKOutput"       />
+            <Output signalId="AHBCLK" to="FCLKCortexOutput" />
+            <Output signalId="AHBCLK" to="APB1Prescaler"    />
+            <Output signalId="AHBCLK" to="APB2Prescaler"    />
+        </Element>
+        <Element id="HCLKOutput" type="activeOutput" refParameter="AHBFreq_Value" x="1210" y="278">
+            <Input signalId="AHBCLK" from="AHBOutput"/>
+        </Element>
+        <Element id="CortexPrescaler" type="devisor" refParameter="Cortex_Div" x="959" y="316">
+            <Input signalId="AHBCLK" from="AHBOutput"/>
+            <Output signalId="AHBCLK2" to="CortexSysOutput" />
+        </Element>
+        <Element id="CortexSysOutput" type="activeOutput" refParameter="CortexFreq_Value" x="1210" y="312">
+            <Input signalId="AHBCLK2" from="CortexPrescaler"/>
+        </Element>
+        <Element id="FCLKCortexOutput" type="activeOutput" refParameter="FCLKCortexFreq_Value" x="1210" y="344">
+            <Input signalId="AHBCLK" from="AHBOutput"/>
+        </Element>
+        <Element id="APB1Prescaler" type="devisor" refParameter="APB1CLKDivider" x="956" y="382">
+            <Input signalId="AHBCLK" from="AHBOutput"/>
+            <Output signalId="PCLK1" to="APB1Output" />
+            <Output signalId="PCLK1" to="TimPrescalerAPB1" />
+            <Output signalId="PCLK1" to="FMPI2C1Mult" />
+        </Element>		
+        <Element id="APB1Output" type="activeOutput" refParameter="APB1Freq_Value" x="1210" y="380">
+            <Input signalId="PCLK1" from="APB1Prescaler"/>
+        </Element>
+        <Element id="TimPrescalerAPB1" type="multiplicator" refParameter="APB1TimCLKDivider" x="1045" y="417">
+            <Input signalId="PCLK1" from="APB1Prescaler"/>
+            <Output signalId="TimCLK" to="TimPrescOut1"/>
+        </Element>
+        <Element id="TimPrescOut1" type="activeOutput" refParameter="APB1TimFreq_Value" x="1210" y="413">
+            <Input signalId="TimCLK" from="TimPrescalerAPB1"/>
+        </Element>
+        <Element id="APB2Prescaler" type="devisor" refParameter="APB2CLKDivider" x="956" y="450">
+            <Input signalId="AHBCLK" from="AHBOutput"/>
+            <Output signalId="PCLK2" to="APB2Output" />
+            <Output signalId="PCLK2" to="TimPrescalerAPB2" />
+            <Output signalId="PCLK2" to="DFSDMMult" />
+        </Element>
+        <Element id="APB2Output" type="activeOutput" refParameter="APB2Freq_Value" x="1210" y="450">
+            <Input signalId="PCLK2" from="APB2Prescaler"/>
+        </Element>
+        <Element id="TimPrescalerAPB2" type="multiplicator" refParameter="APB2TimCLKDivider" x="1045" y="485">
+            <Input signalId="PCLK2" from="APB2Prescaler"/>
+            <Output signalId="PeriphCLK" to="TimPrescOut2"/>
+        </Element>
+        <Element id="TimPrescOut2" type="activeOutput" refParameter="APB2TimFreq_Value" x="1210" y="483">
+            <Input signalId="PeriphCLK" from="TimPrescalerAPB2"/>
+        </Element>
+		
+     
+        <Element id="I2S1Mult" type="multiplexor" refParameter="I2S1CLockSelection" orientation="LEFT" x="767" y="549" refEnable="EnableI2S1,EnableDFSDMAudio,EnableDFSDM2Audio">
+        
+            <Input signalId="PLLRCLK"     from="PLLR"      refValue="RCC_I2SAPB1CLKSOURCE_PLLR"  />
+           
+            <Input signalId="PLLI2SRCLK"  from="PLLI2SR"   refValue="RCC_I2SAPB1CLKSOURCE_PLLI2S"/>
+            <Input signalId="I2SExtClock" from="I2S_CKIN"  refValue="RCC_I2SAPB1CLKSOURCE_EXT"   />
+            <Input signalId="PLLSRC"      from="PLLSource" refValue="RCC_I2SAPB1CLKSOURCE_PLLSRC"/>
+            <Output signalId="I2S1CLK" to="I2S1output"/>
+	    <Output signalId="I2S1CLK" to="DFSDMAudioMult"/>
+            <Output signalId="I2S1CLK" to="DFSDM2AudioMult"/>
+        </Element>
+        <Element id="I2S1output" type="activeOutput" refParameter="I2S1Freq_Value" x="1210" y="582"  refEnable="EnableI2S1">
+            <Input signalId="I2S1CLK" from="I2S1Mult"/>
+        </Element>
+        <Element id="I2S2Mult" type="multiplexor" refParameter="I2S2CLockSelection" orientation="LEFT" x="767" y="716" refEnable="EnableI2S2,EnableDFSDMAudio,EnableDFSDM2Audio">
+
+            <Input signalId="PLLRCLK"     from="PLLR"      refValue="RCC_I2SAPB2CLKSOURCE_PLLR"  />
+     
+            <Input signalId="PLLI2SRCLK"  from="PLLI2SR"   refValue="RCC_I2SAPB2CLKSOURCE_PLLI2S"/>
+            <Input signalId="I2SExtClock" from="I2S_CKIN"  refValue="RCC_I2SAPB2CLKSOURCE_EXT"   />
+            <Input signalId="PLLSRC"      from="PLLSource" refValue="RCC_I2SAPB2CLKSOURCE_PLLSRC"/>
+            <Output signalId="I2S2CLK" to="I2S2output"/>
+            <Output signalId="I2S2CLK" to="DFSDMAudioMult"/>
+            <Output signalId="I2S2CLK" to="DFSDM2AudioMult"/>
+        </Element>
+        <Element id="I2S2output" type="activeOutput" refParameter="I2S2Freq_Value" x="1210" y="745"  refEnable="EnableI2S2">
+            <Input signalId="I2S2CLK" from="I2S2Mult"/>
+        </Element>
+        <Element id="FMPI2C1Mult" type="multiplexor" refParameter="FMPI2C1Selection" orientation="LEFT" x="983" y="830" refEnable="EnableFMPI2C1">
+            <Input signalId="HSI"    from="HSIRC"         refValue="RCC_FMPI2C1CLKSOURCE_HSI"   />
+            <Input signalId="PCLK1"  from="APB1Prescaler" refValue="RCC_FMPI2C1CLKSOURCE_APB"   />
+            <Input signalId="SYSCLK" from="SysCLKOutput"  refValue="RCC_FMPI2C1CLKSOURCE_SYSCLK"/>
+           
+            <Output signalId="FMPI2C1Clk" to="FMPI2C1output"/>
+        </Element>
+        <Element id="FMPI2C1output" type="activeOutput" refParameter="FMPI2C1Freq_Value" x="1210" y="860" refEnable="EnableFMPI2C1">
+            <Input signalId="FMPI2C1Clk" from="FMPI2C1Mult"/>
+        </Element>
+        <Element id="DFSDMMult" type="multiplexor" refParameter="DFSDMSelection" orientation="LEFT" x="983" y="1130" refEnable="EnableDFSDM,EnableDFSDM2">
+          
+            <Input signalId="PCLK2"  from="APB2Prescaler" refValue="RCC_DFSDM1CLKSOURCE_APB2"   />
+            <Input signalId="SYSCLK" from="SysCLKOutput"  refValue="RCC_DFSDM1CLKSOURCE_SYSCLK"/>
+           
+            <Output signalId="DFSDMClk" to="DFSDMoutput"/>
+            <Output signalId="DFSDMClk" to="DFSDM2output"/>
+        </Element>
+        <Element id="DFSDMoutput" type="activeOutput" refParameter="DFSDMFreq_Value" x="1210" y="1144" refEnable="EnableDFSDM">
+            <Input signalId="DFSDMClk" from="DFSDMMult"/>
+        </Element>
+        <Element id="DFSDM2output" type="activeOutput" refParameter="DFSDM2Freq_Value" x="1210" y="1179" refEnable="EnableDFSDM2">
+            <Input signalId="DFSDMClk" from="DFSDMMult"/>
+        </Element>
+	
+        <Element id="USBMult" type="multiplexor" refParameter="USBCLockSelection" orientation="LEFT" x="981" y="513" refEnable="EnableUSB,EnableSDIO,RNGEnable">
+            <Input  signalId="PLLQCLK"    from="PLLQ"    refValue="RCC_CLK48CLKSOURCE_PLLQ"   />
+            <Input  signalId="PLLI2SQCLK" from="PLLI2SQ" refValue="RCC_CLK48CLKSOURCE_PLLI2SQ"/>
+          
+            <Output signalId="USBCLK" to="USBoutput"/>
+            <Output signalId="USBCLK" to="RNGoutput"/>
+            <Output signalId="USBCLK" to="SDIOMult"/>
+        </Element>
+        <Element id="USBoutput" type="activeOutput" refParameter="USBFreq_Value" x="1210" y="512" refEnable="EnableUSB">
+            <Input signalId="USBCLK" from="USBMult"/>
+        </Element> 
+		<Element id="RNGoutput" type="activeOutput" refParameter="RNGFreq_Value" x="1210" y="544" refEnable="RNGEnable">
+            <Input signalId="USBCLK" from="USBMult"/>
+        </Element>
+      
+        <Element id="SDIOMult" type="multiplexor" refParameter="SDIOCLockSelection" orientation="LEFT" x="1157" y="625" refEnable="EnableSDIO">
+            <Input signalId="SYSCLK" from="SysCLKOutput" refValue="RCC_SDIOCLKSOURCE_SYSCLK"/>
+            <Input signalId="USBCLK" from="USBMult"      refValue="RCC_SDIOCLKSOURCE_CLK48"  />
+            <Output signalId="SDIOCLK" to="SDIOoutput"/>
+        </Element>
+        <Element id="SDIOoutput" type="activeOutput" refParameter="SDIOFreq_Value" x="1210" y="640" refEnable="EnableSDIO">
+            <Input signalId="SDIOCLK" from="SDIOMult"/>
+        </Element>
+		
+	<Element id="DFSDMAudioMult" type="multiplexor" refParameter="DFSDMAudioSelection" orientation="LEFT" x="982" y="678" refEnable="EnableDFSDMAudio">
+          
+            <Input signalId="I2S1CLK"  from="I2S1Mult" refValue="RCC_DFSDM1AUDIOCLKSOURCE_I2SAPB1"   />
+            <Input signalId="I2S2CLK" from="I2S2Mult"  refValue="RCC_DFSDM1AUDIOCLKSOURCE_I2SAPB2"/>
+           
+            <Output signalId="DFSDMAudioClk" to="DFSDMAudiooutput"/>
+        </Element>
+        <Element id="DFSDMAudiooutput" type="activeOutput" refParameter="DFSDMAudioFreq_Value" x="1210" y="693" refEnable="EnableDFSDMAudio">
+            <Input signalId="DFSDMAudioClk" from="DFSDMAudioMult"/>
+        </Element>
+        
+        <Element id="DFSDM2AudioMult" type="multiplexor" refParameter="DFSDM2AudioSelection" orientation="LEFT" x="1157" y="790" refEnable="EnableDFSDM2Audio">
+          
+            <Input signalId="I2S1CLK"  from="I2S1Mult" refValue="RCC_DFSDM2AUDIOCLKSOURCE_I2SAPB1"   />
+            <Input signalId="I2S2CLK" from="I2S2Mult"  refValue="RCC_DFSDM2AUDIOCLKSOURCE_I2SAPB2"/>
+           
+            <Output signalId="DFSDM2AudioClk" to="DFSDM2Audiooutput"/>
+        </Element>
+        <Element id="DFSDM2Audiooutput" type="activeOutput" refParameter="DFSDM2AudioFreq_Value" x="1210" y="805" refEnable="EnableDFSDM2Audio">
+            <Input signalId="DFSDM2AudioClk" from="DFSDM2AudioMult"/>
+        </Element>
+        <!-- SAI1A-->
+        <Element id="SAI1AMult" type="multiplexor" refParameter="SAI1ACLockSourceSelection" orientation="LEFT" x="767" y="889" refEnable="EnableSAI1A">
+          
+            <Input signalId="PLLSRC"         from="PLLSource"  refValue="RCC_SAIACLKSOURCE_PLLSRC"/>
+            <Input signalId="PLLRCLKDIV"     from="SAI1APrescaler"     refValue="RCC_SAIACLKSOURCE_PLLR"   />
+            <Input signalId="PLLI2SRCLKDIV"  from="SAI1BPrescaler"  refValue="RCC_SAIACLKSOURCE_PLLI2SR"/>
+            <Input signalId="I2SExtClock"    from="I2S_CKIN" refValue="RCC_SAIACLKSOURCE_EXT"   />            
+           
+            <Output signalId="SAI1AClk" to="SAI1Aoutput"/>
+        </Element>
+        <Element id="SAI1Aoutput" type="activeOutput" refParameter="SAI1AFreq_Value" x="1210" y="923" refEnable="EnableSAI1A">
+            <Input signalId="SAI1AClk" from="SAI1AMult"/>
+        </Element>
+        <Element id="SAI1APrescaler" type="devisor" refParameter="SAI1ACLKDivider" x="607" y="910" refEnable="EnableSAI1A,EnableSAI1B">
+            <Input  signalId="PLLRCLK" from="PLLR"/>
+            <Output signalId="PLLRCLKDIV"   to="SAI1AMult"/>
+            <Output signalId="PLLRCLKDIV"   to="SAI1BMult"/>
+        </Element>
+
+        <!-- SAI1B-->
+        <Element id="SAI1BMult" type="multiplexor" refParameter="SAI1BCLockSourceSelection" orientation="LEFT" x="767" y="1049" refEnable="EnableSAI1B">
+          
+            <Input signalId="PLLSRC"         from="PLLSource"  refValue="RCC_SAIBCLKSOURCE_PLLSRC"/>
+            <Input signalId="PLLRCLKDIV"     from="SAI1APrescaler"     refValue="RCC_SAIBCLKSOURCE_PLLR"   />
+            <Input signalId="PLLI2SRCLKDIV"  from="SAI1BPrescaler"  refValue="RCC_SAIBCLKSOURCE_PLLI2SR"/>
+            <Input signalId="I2SExtClock"    from="I2S_CKIN" refValue="RCC_SAIBCLKSOURCE_EXT"   />            
+           
+            <Output signalId="SAI1BClk" to="SAI1Boutput"/>
+        </Element>
+        <Element id="SAI1Boutput" type="activeOutput" refParameter="SAI1BFreq_Value" x="1210" y="1079" refEnable="EnableSAI1B">
+            <Input signalId="SAI1BClk" from="SAI1BMult"/>
+        </Element>
+
+        <Element id="SAI1BPrescaler" type="devisor" refParameter="SAI1BCLKDivider" x="607" y="1091" refEnable="EnableSAI1A,EnableSAI1B">
+            <Input signalId="PLLI2SRCLK" from="PLLI2SR" />
+            <Output signalId="PLLI2SRCLKDIV" to="SAI1BMult"/>
+            <Output signalId="PLLI2SRCLKDIV" to="SAI1AMult"/>
+        </Element>
+        <!-- LPTimer -->
+        <Element id="LPTimerMult" type="multiplexor" refParameter="LPTimerCLockSelection" orientation="LEFT" x="1157" y="980" refEnable="EnableLPTimer">
+          
+            <Input signalId="PCLK1"      from="APB1Prescaler"  refValue="RCC_LPTIM1CLKSOURCE_PCLK"/>
+            <Input signalId="LSI"        from="LSIRC"     refValue="RCC_LPTIM1CLKSOURCE_LSI"   />
+            <Input signalId="HSI"        from="HSIRC"  refValue="RCC_LPTIM1CLKSOURCE_HSI"/>
+            <Input signalId="LSE"        from="LSEOSC" refValue="RCC_LPTIM1CLKSOURCE_LSE"   />            
+           
+            <Output signalId="LPTimerClk" to="LPTimeroutput"/>
+        </Element>
+        <Element id="LPTimeroutput" type="activeOutput" refParameter="LPTimerFreq_Value" x="1210" y="1014" refEnable="EnableLPTimer">
+            <Input signalId="LPTimerClk" from="LPTimerMult"/>
+        </Element>
+
+        <!--Main PLL-->
+        <Tree id="PLL">
+            <Element id="PLLN" type="multiplicator" refParameter="PLLN" x="498" y="460" >
+                <Input signalId="VCOInput" from="PLLM"/>
+                <Output signalId="VCOOutput" to="PLLQ"/>
+                <Output signalId="VCOOutput" to="PLLP"/>
+                <Output signalId="VCOOutput" to="PLLR"/>
+            </Element> 
+            <Element id="PLLP" type="devisor" refParameter="PLLP" x="566" y="460">
+                <Input signalId="VCOOutput" from="PLLN"/>
+                <Output signalId="PLLCLK" to="SysClkSource"/>
+                <Output signalId="PLLCLK" to="MCO1Mult"/>
+                <Output signalId="PLLCLK" to="MCO2Mult"/>
+            </Element>
+            <Element id="PLLQ" type="devisor" refParameter="PLLQ" x="566" y="499" refEnable="EnableUSB,EnableSDIO,RNGEnable,EnableSAI1A,EnableSAI1B">
+                <Input signalId="VCOOutput" from="PLLN"/>
+                <Output signalId="PLLQCLK" to="USBMult"/>
+                <Output signalId="PLLQCLK" to="PLLQoutput"/>
+                <Output signalId="PLLQCLK" to="SAI1APrescaler"/>
+                <Output signalId="PLLQCLK" to="SAI1BPrescaler"/>
+            </Element>
+            <Element id="PLLQoutput" type="output" refParameter="PLLQoutputFreq_Value" x="628" y="498" refEnable="EnableUSB,EnableSDIO,RNGEnable,EnableSAI1A,EnableSAI1B">
+                <Input signalId="PLLQCLK" from="PLLQ"/>
+				
+            </Element>
+			
+            <Element id="PLLR" type="devisor" refParameter="PLLR" x="566" y="532" refEnable="EnableI2S2,EnableI2S1,EnableDFSDMAudio,EnableDFSDM2Audio">
+                <Input signalId="VCOOutput" from="PLLN"/>
+           
+                <Output signalId="PLLRCLK" to="I2S1Mult"/>
+                <Output signalId="PLLRCLK" to="I2S2Mult"/>
+                <Output signalId="PLLRCLK" to="PLLRoutput"/>
+            
+            </Element>
+            <Element id="PLLRoutput" type="output" refParameter="PLLRoutputFreq_Value" x="628" y="531" refEnable="EnableI2S2,EnableI2S1,EnableDFSDMAudio,EnableDFSDM2Audio">
+                <Input signalId="PLLRCLK" from="PLLR"/>
+				
+            </Element>
+        </Tree>
+        <Tree id="PLLI2S">
+            <Element id="PLLI2SN" type="multiplicator" refParameter="PLLI2SN" x="500" y="591" >
+                <Input signalId="VCOI2SInput" from="PLLI2SM"/>
+                <Output signalId="VCOI2SOutput" to="PLLI2SQ"/>
+                <Output signalId="VCOI2SOutput" to="PLLI2SR"/>
+            </Element>
+		
+
+            <Element id="PLLI2SQ" type="devisor" refParameter="PLLI2SQ" x="566" y="591" refEnable="EnableUSB,EnableSDIO,RNGEnable">
+                <Input signalId="VCOI2SOutput" from="PLLI2SN"/>
+                <Output signalId="PLLI2SQCLK" to="USBMult"/>
+                <Output signalId="PLLI2SQCLK" to="PLLI2SQoutput"/>
+               
+            </Element>
+            <Element id="PLLI2SQoutput" type="output" refParameter="PLLI2SQoutputFreq_Value" x="630" y="590" refEnable="EnableUSB,EnableSDIO,RNGEnable">
+                <Input signalId="PLLI2SQCLK" from="PLLI2SQ"/>
+				
+            </Element>
+    
+            <Element id="PLLI2SR" type="devisor" refParameter="PLLI2SR" x="566" y="628" refEnable="EnableI2S2,EnableI2S1,MCO2OutPutEnable,EnableDFSDMAudio,EnableDFSDM2Audio,EnableSAI1A,EnableSAI1B">
+                <Input signalId="VCOI2SOutput" from="PLLI2SN"/>
+                <Output signalId="PLLI2SRCLK" to="I2S1Mult"/>
+                <Output signalId="PLLI2SRCLK" to="I2S2Mult"/>
+                <Output signalId="PLLI2SRCLK" to="MCO2Mult"/>
+                <Output signalId="PLLI2SRCLK" to="SAI1APrescaler"/>
+                <Output signalId="PLLI2SRCLK" to="SAI1BPrescaler"/>
+            </Element>
+			
+		
+			
+        </Tree>
+    </Tree>
+    <Signals>
+        <Signal id="HSI"/>
+        <Signal id="HSE"/>
+        <Signal id="LSI"/>
+        <Signal id="LSE"/>
+        <Signal id="I2SExtClock"/>
+        <Signal id="RTCCLK"/>
+        <Signal id="HSE_RTC"/>
+        <Signal id="PLLSRC"/>
+        <Signal id="VCOInput" refParameter="VCOInputFreq_Value"/>
+        <Signal id="PLLI2SSRCCLK"/>
+        <Signal id="DFSDM2AudioClk"/>
+        <Signal id="SAI1AClk"/>
+        <Signal id="SAI1BClk"/>
+        <Signal id="LPTimerClk"/>
+        <Signal id="SYSCLKInput"/>
+        <Signal id="SYSCLK"/>
+        <Signal id="MCO1DivInput"/>
+        <Signal id="MCO1DivOuput"/>
+        <Signal id="MCO2DivInput"/>
+        <Signal id="MCO2DivOuput"/>
+        <Signal id="PLLI2SRCLKDIV"/>
+        <Signal id="PLLRCLKDIV"/>
+        <Signal id="HCLK"/>
+        <Signal id="AHBCLK"/>
+        <Signal id="AHBCLK2"/>
+        <Signal id="PCLK1"/>
+        <Signal id="TimCLK"/>
+        <Signal id="PCLK2"/>
+        <Signal id="PeriphCLK"/>
+        <Signal id="DFSDMClk"/>
+        <Signal id="DFSDMAudioClk"/>
+        <Signal id="I2S1CLK"/>
+        <Signal id="I2S2CLK"/>
+        <Signal id="FMPI2C1Clk"/>
+        <Signal id="USBCLK"/>
+        <Signal id="SDIOCLK"/>
+        <Signal id="VCOOutput" refParameter="VCOOutputFreq_Value"/>
+        <Signal id="PLLCLK"       refParameter="PLLCLKFreq_Value"/>
+        <Signal id="PLLQCLK"      refParameter="PLLQCLKFreq_Value"/>
+        <Signal id="PLLRCLK"      refParameter="PLLRCLKFreq_Value"/>
+  
+        <Signal id="VCOI2SInput"   refParameter="VCOI2SInputFreq_Value"/>
+        <Signal id="VCOI2SOutput"  refParameter="VCOI2SOutputFreq_Value"/>
+        <Signal id="PLLI2SRCLK"    refParameter="PLLI2SRCLKFreq_Value"/>
+        <Signal id="PLLI2SQCLK"    refParameter="PLLI2SQCLKFreq_Value"/>
+   
+    </Signals>
+    <!--RTC labels-->
+    <Label id="RTCMuxLabel"       type="muxLabel"    text="RTC Clock Mux" posX="511" posY="159" refEnable="RTCEnable"/>
+    <Label id="RTCOutputLabel"    type="SpecialInfo" text="To RTC (KHz)"  posX="648" posY="224" refEnable="RTCEnable"/>
+    <Label id="LSEForRTCLabel"    type="signal"      text="LSE"     posX="500" posY="212" refEnable="EnableLSERTC"/>
+    <Label id="LSIForRTCLabel"    type="signal"      text="LSI"     posX="500" posY="246" refEnable="RTCEnable"/>
+    <Label id="HSEForRTCLabel"    type="signal"      text="HSE"     posX="385" posY="178" refEnable="EnableHSERTCDevisor"/>
+    <Label id="HSERTCForRTCLabel" type="signal"      text="HSE_RTC" posX="476" posY="178" refEnable="EnableHSERTCDevisor"/>
+    <!-- IWDG -->
+    <Label id="ToIWDGLabel" type="SpecialInfo" text="To IWDG (KHz)" posX="647" posY="285" refEnable="IWDGEnable"/>
+    <!-- source constraint label -->
+    <Label id="HSIRCLabel"    type="info"       posX="302" posY="327" text="HSI RC"/>
+    <Label id="HSIRCCstLabel" type="constraint" posX="302" posY="365" text="16 MHz"/>
+    <Label id="LSI_RCLabel"   type="Info"       posX="302" posY="263" text="LSI RC"/>
+    <Label id="LSI_RCcST"     type="constraint" posX="302" posY="302" text="32 KHz"/>
+    <!-- APB label -->
+    <Label id="APB1Presc" type="Info" posX="953" posY="367" text="APB1 Prescaler"/>
+    <Label id="APB2Presc" type="Info" posX="953" posY="435" text="APB2 Prescaler"/>
+	
+    <Label id="ABP1labelPCLK1" type="signal" text="PCLK1" posX="1040" posY="377" />
+    <Label id="ABP2labelPCLK2" type="signal" text="PCLK2" posX="1040" posY="445" />
+	
+    <Label id="HCLKLabel"         type="info" posX="870" posY="360" text="HCLK (MHz)"/>
+    <Label id="AHBPrescalerLabel" type="info" posX="798" posY="360" text="AHB Prescaler"/>
+	
+    <Label id="AHBMaxLimitConstraint"  type="dynamiConstraint" posX="870"  posY="403" text="100 MHz max"/>
+    <Label id="APB1MaxLimitConstraint" type="dynamiConstraint" posX="1033" posY="392" text="50 MHz max"/>
+    <Label id="APB2MaxLimitConstraint" type="dynamiConstraint" posX="1033" posY="462" text="100 MHz max"/>
+    <!-- freq value label -->
+    <Label id="Power" type="SpecialInfo" posX="1269" posY="250" text="To Power (MHz)"/>
+    <Label id="HCLK1" type="SpecialInfo" posX="1269" posY="283" text="HCLK to AHB bus, core, memory and DMA (MHz)"/>
+    <Label id="HCLK2" type="SpecialInfo" posX="1269" posY="317" text="To Cortex System timer (MHz)"/>
+    <Label id="HCLK3" type="SpecialInfo" posX="1269" posY="350" text="FCLK Cortex clock (MHz)"/>
+    <Label id="HCLK4" type="SpecialInfo" posX="1269" posY="384" text="APB1 peripheral clocks (MHz)"/>
+    <Label id="HCLK5" type="SpecialInfo" posX="1269" posY="417" text="APB1 Timer clocks (MHz)"/>
+    <Label id="HCLK6" type="SpecialInfo" posX="1269" posY="453" text="APB2 peripheral clocks (MHz)"/>
+    <Label id="HCLK7" type="SpecialInfo" posX="1269" posY="488" text="APB2 timer clocks (MHz)"/>
+	
+    <!--Main PLL labels-->
+    <Label id="PLLMLabel"       type="info" text="PLLM"     posX="440" posY="446"/>
+    <Label id="PLLNLabel"       type="info" text="*N"       posX="520" posY="483"/>
+    <Label id="PLLPLabel"       type="info" text="/P"       posX="575" posY="483"/>
+    <Label id="PLLQLabel"       type="info" text="/Q"       posX="575" posY="518"/>
+    <Label id="PLLRLabel"       type="info" text="/R"       posX="575" posY="551"/>
+    <Label id="PLLLabel"        type="info" text="PLL"      posX="510" posY="541"/>
+    <Label id="PLLPoutputLabel"  type="info" text="PLLQ"     posX="635" posY="483"/>
+    <Label id="PLLQoutputLabel"  type="info" text="PLLR"     posX="635" posY="520"/>
+
+    <!--Main PLLSAI labels-->
+    <Label id="PLLSAIMLabel"       type="info" text="PLLI2SM"     posX="440" posY="575"/>
+    <Label id="PLLSAINLabel"       type="info" text="*N"          posX="520" posY="610"/>
+    <Label id="PLLSAIQLabel"       type="info" text="/Q"          posX="575" posY="610"/>
+    <Label id="PLLSAIRLabel"       type="info" text="/R"          posX="575" posY="648"/>
+    <Label id="PLLSAILabel"        type="info" text="PLLI2S"      posX="501" posY="640"/>
+    <Label id="PLLI2SQoutputLabel" type="info" text="PLLI2SQ"     posX="635" posY="574"/>
+	
+    <!--sysclock labels-->
+    <Label id="SystemCLKMuxLabel" type="muxLabel" posX="632" posY="315" text="System Clock Mux"/>
+    <Label id="SystemHSILabel"    type="signal"   posX="642" posY="330" text="HSI"/>
+    <Label id="SystemHSELabel"    type="signal"   posX="642" posY="368" text="HSE" refEnable="EnableHSE"/>
+    <Label id="SystemPLLCLKLabel" type="signal"   posX="632" posY="408" text="PLLCLK"/>
+  
+    <Label id="SYSCLKLabel"       type="info"     posX="703" posY="360" text="SYSCLK (MHz)"/>
+    <!--PLL Source labels-->
+    <Label id="PLLSourcMuxLabel"    type="muxLabel" text="PLL Source Mux" posX="370" posY="416"/>
+    <Label id="PLLSourcMuxHSILabel" type="signal"   text="HSI"            posX="365" posY="435"/>
+    <Label id="PLLSourcMuxHSELabel" type="signal"   text="HSE"  		  posX="364" posY="472" refEnable="EnableHSE"/> 
+
+    <!--PLL Source labels-->
+    <Label id="PLLSourcMuxLabel"    type="muxLabel" text="PLLI2S Source Mux"  posX="370" posY="540"/>
+    <Label id="PLLSourcMuxHSILabel" type="signal"   text="HS_CK"             posX="338" posY="565"/>
+    <Label id="PLLSourcMuxHSELabel" type="signal"   text="I2S_CKIN"  		  posX="338" posY="600"  refEnable="ExtClockEnable"/>
+    <!--USB labels-->
+    <Label id="USBMuxLabel"    type="SpecialInfo" posX="907"   posY="484"  text="PLL48CLK Mux" refEnable="EnableUSB,EnableSDIO,RNGEnable"/>
+    <Label id="USBLabel"       type="SpecialInfo" posX="1269"  posY="516"  text="To USB (MHz)"  refEnable="EnableUSB"/>
+    <Label id="USBLabel"       type="SpecialInfo" posX="1269"  posY="550"  text="To RNG (MHz)"  refEnable="RNGEnable"/>
+    <Label id="USBMuxHSILabel" type="signal"      posX="927"   posY="500" text="PLLQ"   refEnable="EnableUSB,EnableSDIO,RNGEnable"/>
+    <Label id="USBMuxSYSLabel" type="signal"      posX="927"   posY="540" text="PLLI2SQ" refEnable="EnableUSB,EnableSDIO,RNGEnable"/>
+    <!--FMPI2C1 labels-->
+    <Label id="FMPI2C1MuxLabel"    type="SpecialInfo" posX="947"   posY="800" text="FMPI2C1 Clock Mux" refEnable="EnableFMPI2C1"/>
+    <Label id="FMPI2C1Label"       type="SpecialInfo" posX="1269"   posY="865" text="To FMPI2C1 (MHz)"  refEnable="EnableFMPI2C1"/>
+    <Label id="FMPI2C1MuxHSILabel" type="signal"      posX="942"   posY="822" text="HSI" refEnable="EnableFMPI2C1"/>
+    <Label id="FMPI2C1MuxSYSLabel" type="signal"      posX="942"   posY="857" text="PCLK1" refEnable="EnableFMPI2C1"/>
+    <Label id="FMPI2C1MuxSYSLabel" type="signal"      posX="942"   posY="892" text="Sysclk" refEnable="EnableFMPI2C1"/>
+	
+    <!--SDIO labels-->
+    <Label id="SDIOMuxLabel"    type="SpecialInfo" posX="1077"   posY="600" text="SDIO Clock Mux" refEnable="EnableSDIO"/>
+    <Label id="SDIOLabel"       type="SpecialInfo" posX="1269"   posY="645" text="To SDIO (MHz)"  refEnable="EnableSDIO"/>
+    <Label id="SDIOMuxHSILabel" type="signal"      posX="1107"   posY="615" text="Sysclk" refEnable="EnableSDIO"/>
+    <Label id="SDIOMuxSYSLabel" type="signal"      posX="1107"   posY="655" text="PLL48CLK" refEnable="EnableSDIO"/>  
+	<!--DFSDMAudio labels-->
+    <Label id="DFSDMAudioMuxLabel"    type="SpecialInfo" posX="907"   posY="638" text="DFSDM1 Audio Clock Mux" refEnable="EnableDFSDMAudio"/>
+    <Label id="DFSDMAudioLabel"       type="SpecialInfo" posX="1269"   posY="698" text="To DFSDM1 Audio (MHz)"  refEnable="EnableDFSDMAudio"/>
+    <Label id="DFSDMAudioMuxHSILabel" type="signal"      posX="907"   posY="668" text="I2S_APB1_CLK" refEnable="EnableDFSDMAudio"/>
+    <Label id="DFSDMAudioMuxSYSLabel" type="signal"      posX="907"   posY="708" text="I2S_APB2_CLK" refEnable="EnableDFSDMAudio"/>
+    	<!--DFSDMAudio2 labels-->
+    <Label id="DFSDM2AudioMuxLabel"    type="SpecialInfo" posX="1067"   posY="765" text="DFSDM2 Audio Clock Mux" refEnable="EnableDFSDM2Audio"/>
+    <Label id="DFSDM2AudioLabel"       type="SpecialInfo" posX="1269"   posY="811" text="To DFSDM2 Audio (MHz)"  refEnable="EnableDFSDM2Audio"/>
+    <Label id="DFSDM2AudioMuxHSILabel" type="signal"      posX="1080"   posY="781" text="I2S_APB1_CLK" refEnable="EnableDFSDM2Audio"/>
+    <Label id="DFSDM2AudioMuxSYSLabel" type="signal"      posX="1080"   posY="821" text="I2S_APB2_CLK" refEnable="EnableDFSDM2Audio"/>
+    
+    <!--SAI1A labels-->
+    <Label id="SAI1AMuxLabel"     type="SpecialInfo"  posX="725"   posY="855"  text="SAI1A Clock Mux" refEnable="EnableSAI1A"/>
+    <Label id="SAI1ALabel"        type="SpecialInfo"  posX="1269"  posY="929"  text="To SAI1A CLK (MHz)"  refEnable="EnableSAI1A"/>
+    <Label id="SAI1AMuxHSILabel"  type="signal"       posX="703"   posY="881" text="HS_CK"   refEnable="EnableSAI1A"/>
+    <Label id="SAI1AMuxSYSLabel" type="signal"        posX="703"   posY="906" text="PLLRDIV" refEnable="EnableSAI1A"/>
+    <Label id="SAI1AMuxSYSLabel" type="signal"        posX="703"   posY="929" text="PLLI2SRDIV" refEnable="EnableSAI1A"/>
+    <Label id="SAI1AMuxSYSLabel" type="signal"        posX="703"   posY="954" text="I2S_CKIN" refEnable="EnableSAI1A"/>
+    
+    <!--SAI1B labels-->
+    <Label id="SAI1BMuxLabel"     type="SpecialInfo"  posX="725"   posY="1007"  text="SAI1B Clock Mux" refEnable="EnableSAI1B"/>
+    <Label id="SAI1BLabel"        type="SpecialInfo"  posX="1269"  posY="1083"  text="To SAI1B CLK (MHz)"  refEnable="EnableSAI1B"/>
+    <Label id="SAI1BMuxHSILabel"  type="signal"       posX="703"   posY="1035" text="HS_CK"   refEnable="EnableSAI1B"/>
+    <Label id="SAI1BMuxSYSLabel" type="signal"        posX="703"   posY="1060" text="PLLRDIV" refEnable="EnableSAI1B"/>
+    <Label id="SAI1BMuxSYSLabel" type="signal"        posX="703"   posY="1083" text="PLLI2SRDIV" refEnable="EnableSAI1B"/>
+    <Label id="SAI1BMuxSYSLabel" type="signal"        posX="703"   posY="1108" text="I2S_CKIN" refEnable="EnableSAI1B"/>
+
+    <!--SAI1APrescaler/SAI1BPrescaler labels-->
+    <Label id="SAI1APrescalerLabel"     type="signal"  posX="560"  posY="900"  text="PLLR"     refEnable="EnableSAI1A"/>
+    <Label id="SAI1BPrescalerLabel"     type="signal"  posX="560"  posY="1078"  text="PLLI2SR"  refEnable="EnableSAI1A"/>
+
+    <!-- LPTimer labels-->
+    <Label id="LPTimerMuxLabel"     type="SpecialInfo"  posX="1087"   posY="953"  text="LPTimer Clock Mux"     refEnable="EnableLPTimer"/>
+    <Label id="LPTimerLabel"        type="SpecialInfo"  posX="1269"   posY="1018" text="To LPTimer CLK (MHz)"  refEnable="EnableLPTimer"/>
+    <Label id="LPTimerMuxHSILabel"  type="signal"       posX="1107"   posY="970"  text="PCLK1"                 refEnable="EnableLPTimer"/>
+    <Label id="LPTimerMuxSYSLabel"  type="signal"       posX="1107"   posY="996"  text="LSI"                   refEnable="EnableLPTimer"/>
+    <Label id="LPTimerMuxSYSLabel"  type="signal"       posX="1107"   posY="1018" text="HSI"                   refEnable="EnableLPTimer"/>
+    <Label id="LPTimerMuxSYSLabel"  type="signal"       posX="1107"   posY="1045" text="LSE"                   refEnable="EnableLPTimer"/>
+    <!--MCO1/2-->
+   
+	
+    <Label id="MCO1MuxLabel" type="muxLabel" text="MCO1 source Mux" posX="435" posY="710" refEnable="MCO1OutPutEnable"/>
+    <Label id="MCO1Label" type="info" text="(MHz) MCO1" posX="220" posY="785" refEnable="MCO1OutPutEnable"/>
+    <Label id="MCO1LSELabel" type="signal" text="LSE" posX="495" posY="740" refEnable="MCO1OutPutEnable"/>
+    <Label id="MCO1HSELabel" type="signal" text="HSE" posX="495" posY="765" refEnable="MCO1OutPutEnable"/>
+    <Label id="MCO1HSILabel" type="signal" text="HSI" posX="495" posY="790" refEnable="MCO1OutPutEnable"/>
+    <Label id="MCO1PLLLabel" type="signal" text="PLLCLK" posX="495" posY="816" refEnable="MCO1OutPutEnable"/>
+	
+    <Label id="MCO2Label" type="info" text="(MHz) MCO2" posX="220" posY="930" refEnable="MCO2OutPutEnable">
+        <Condition Diagnostic="" Expression="!UFQFPN48"/>
+    </Label>
+    <Label id="MCO2MuxLabel" type="muxLabel" text="MCO2 source Mux" posX="435" posY="858" refEnable="MCO2OutPutEnable">
+        <Condition Diagnostic="" Expression="!UFQFPN48"/>
+    </Label>
+    <Label id="MCO2SYSCLKLabel" type="signal" text="SYSCLK" posX="495" posY="880" refEnable="MCO2OutPutEnable">
+        <Condition Diagnostic="" Expression="!UFQFPN48"/>
+    </Label>
+    <Label id="MCO2PLLI2SLabel" type="signal" text="PLLI2SCLK" posX="495" posY="905" refEnable="MCO2OutPutEnable">
+        <Condition Diagnostic="" Expression="!UFQFPN48"/>
+    </Label>
+    <Label id="MCO2HSELabel" type="signal" text="HSE" posX="495" posY="930" refEnable="MCO2OutPutEnable">
+        <Condition Diagnostic="" Expression="!UFQFPN48"/>
+    </Label>
+    <Label id="MCO2PLLLabel" type="signal" text="PLLCLK" posX="495" posY="955" refEnable="MCO2OutPutEnable">
+        <Condition Diagnostic="" Expression="!UFQFPN48"/>
+    </Label>
+	
+    <!--I2S1 labels-->
+    <Label id="I2S1MuxLabel"     type="SpecialInfo"  posX="725"   posY="507"  text="I2S_APB1 Clock Mux" refEnable="EnableI2S1,EnableDFSDMAudio,EnableDFSDM2Audio"/>
+    <Label id="I2S1Label"        type="SpecialInfo"  posX="1269"  posY="583"  text="To I2S_APB1 CLK (MHz)"  refEnable="EnableI2S1,EnableDFSDMAudio,EnableDFSDM2Audio"/>
+    <Label id="I2S1MuxHSILabel"  type="signal"       posX="710"   posY="535" text="PLLR"   refEnable="EnableI2S1,EnableDFSDMAudio,EnableDFSDM2Audio"/>
+    <Label id="I2S1MuxSYSLabel" type="signal"        posX="710"   posY="560" text="PLLI2SR" refEnable="EnableI2S1,EnableDFSDMAudio,EnableDFSDM2Audio"/>
+    <Label id="I2S1MuxSYSLabel" type="signal"        posX="710"   posY="583" text="I2S_CKIN" refEnable="EnableI2S1,EnableDFSDMAudio,EnableDFSDM2Audio"/>
+    <Label id="I2S1MuxSYSLabel" type="signal"        posX="710"   posY="608" text="HS_CK" refEnable="EnableI2S1,EnableDFSDMAudio,EnableDFSDM2Audio"/>
+
+          
+    <!--I2S2 labels-->
+    <Label id="I2S2MuxLabel"     type="SpecialInfo"   posX="725"   posY="682"  text="I2S_APB2 Clock Mux" refEnable="EnableI2S2,EnableDFSDMAudio,EnableDFSDM2Audio"/>
+    <Label id="I2S2Label"        type="SpecialInfo"   posX="1269"  posY="748"  text="To I2S_APB2 CLK (MHz)"  refEnable="EnableI2S2,EnableDFSDMAudio,EnableDFSDM2Audio"/>
+    <Label id="I2S2MuxHSILabel"  type="signal"        posX="710"   posY="705"  text="PLLR"   refEnable="EnableI2S2,EnableDFSDMAudio,EnableDFSDM2Audio"/>
+    <Label id="I2S2MuxSYSLabel"  type="signal"        posX="710"   posY="730"  text="PLLI2SR" refEnable="EnableI2S2,EnableDFSDMAudio,EnableDFSDM2Audio"/>
+    <Label id="I2S2MuxSYSLabel"  type="signal"        posX="710"   posY="753"  text="I2S_CKIN" refEnable="EnableI2S2,EnableDFSDMAudio,EnableDFSDM2Audio"/>
+    <Label id="I2S2MuxSYSLabel"  type="signal"        posX="710"   posY="780"  text="HS_CK" refEnable="EnableI2S2,EnableDFSDMAudio,EnableDFSDM2Audio"/> 
+    <!--DFSDM labels-->
+    <Label id="DFSDMMuxLabel"    type="SpecialInfo" posX="947"   posY="1100"  text="DFSDM1 Clock Mux" refEnable="EnableDFSDM,EnableDFSDM2"/>
+    <Label id="DFSDMLabel"       type="SpecialInfo" posX="1269"  posY="1151"  text="To DFSDM1 (MHz)"  refEnable="EnableDFSDM"/>
+    <Label id="DFSDMLabel"       type="SpecialInfo" posX="1269"  posY="1181"  text="To DFSDM2 (MHz)"  refEnable="EnableDFSDM2"/>
+    <Label id="DFSDMMuxHSILabel" type="signal"      posX="935"   posY="1125" text="PCLK2"   refEnable="EnableDFSDM,EnableDFSDM2"/>
+    <Label id="DFSDMMuxSYSLabel" type="signal"      posX="935"   posY="1162" text="Sysclk" refEnable="EnableDFSDM,EnableDFSDM2"/>
+	
+    <BButton id="CSSEnable" text="CSS"  refParameter="EnbaleCSS" x="657" y="452" />
+</Clock>
+		
+		
+		
+		

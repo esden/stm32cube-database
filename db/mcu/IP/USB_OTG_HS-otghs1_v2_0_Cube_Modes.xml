@@ -12,7 +12,7 @@
 	<RefParameter Name="Instance" DefaultValue="USB_OTG_HS" Comment="Instance" Type="" Visible="false"/>	
 	
 	<RefParameter Comment="Device endpoints number" DefaultValue="null" Name="dev_endpoints" Type="List" Group="" Visible="true">	
-		<Condition Expression="VirtualMode = Host_Only" Diagnostic=""/>		
+		<Condition Expression="(VirtualMode = Host_HS) | (VirtualMode = Host_FS)" Diagnostic=""/>		
 	</RefParameter>	
 	<!-- Bug356587 -->		
 	<RefParameter Comment="Device endpoints number" DefaultValue="8" Name="dev_endpoints" Min="1" Max="8" Type="integer" Group="" Visible="false">
@@ -108,6 +108,11 @@
 		<PossibleValue Value="USB_OTG_EMBEDDED_PHY" Comment="Internal Phy"/>		
 	</RefParameter>
 	
+	<!-- Bug356385 -->
+	<RefParameter Comment="Signal start of frame " DefaultValue="ENABLE" Name="Sof_enable" Type="List" Group="">
+		<PossibleValue Value="ENABLE" Comment="Enabled"/>
+		<Condition Expression="USB_FS_SOF" Diagnostic=""/>		
+	</RefParameter>
 	<RefParameter Comment="Signal start of frame" DefaultValue="DISABLE" Name="Sof_enable" Type="List">
 		<PossibleValue Value="ENABLE" Comment="Enabled"/>
 		<PossibleValue Value="DISABLE" Comment="Disabled"/>		
@@ -192,6 +197,7 @@
 		<Parameter Name="low_power_enable"/>
 		<Parameter Name="vbus_sensing_enable"/>	
 		<Parameter Name="use_external_vbus"/>
+		<Parameter Name="Sof_enable"/>	
 	</RefMode>
 	
 	<!-- USB High Speed in Device mode -->
@@ -208,9 +214,10 @@
 			<PossibleValue>USB_OTG_ULPI_PHY</PossibleValue>
 		</Parameter>
 		<Parameter Name="low_power_enable"/>	
-		<Parameter Name="lpm_enable"></Parameter>
+		<Parameter Name="lpm_enable"/>
 		<Parameter Name="use_dedicated_ep1"/>
 		<Parameter Name="vbus_sensing_enable"/>	
+		<Parameter Name="Sof_enable"/>	
 	</RefMode>
 	
 	<!-- USB Full Speed in Host mode -->
@@ -226,7 +233,8 @@
 			<PossibleValue>USB_OTG_EMBEDDED_PHY</PossibleValue>
 		</Parameter>
 		<Parameter Name="low_power_enable"/>	
-		<Parameter Name="vbus_sensing_enable"/>			
+		<Parameter Name="vbus_sensing_enable"/>	
+		<Parameter Name="Sof_enable"/>			
 	</RefMode>
 	
 	<!-- USB Full Speed in Device mode -->
@@ -246,6 +254,7 @@
 		<Parameter Name="lpm_enable"></Parameter>
 		<Parameter Name="use_dedicated_ep1"/>	
 		<Parameter Name="vbus_sensing_enable"/>	
+		<Parameter Name="Sof_enable"/>	
 	</RefMode>
 	
 	<RefMode Name="Device_DP_DM_FS" HalMode="PCD">
@@ -264,13 +273,11 @@
 		<Parameter Name="lpm_enable"></Parameter>
 		<Parameter Name="use_dedicated_ep1"/>
 		<Parameter Name="vbus_sensing_enable"/>	
+		<Parameter Name="Sof_enable"/>	
 	</RefMode>
 	
 	<!-- USB Full Speed in Device mode with SOF -->
-	<RefMode Name="Activate_SOF_FS" HalMode="">		
-		<Parameter Name="Sof_enable">
-			<PossibleValue>ENABLE</PossibleValue>
-		</Parameter>			
+	<RefMode Name="Activate_SOF_FS" HalMode="">						
 	</RefMode>
 	
 	<!-- tracker 233865 -->
@@ -399,6 +406,8 @@
 					</SignalLogicalOp>
 				</Mode>			
 			</ModeLogicOperator>
+			<!-- Bug356385 -->
+			<Semaphore>USB_FS_SOF</Semaphore>
 			<!-- Tracker 233898 -->
 			<!--<Condition Expression=" MW_USB_OTG_HS_MW_FS_DEVICE | MW_USB_OTG_HS_MW_FS_HOST | OTG_DUAL_ROL_DEVICE_HS_FS" Diagnostic="USB External or Internal Phy Mode must be selected first"/>-->
 			<!-- Tracker 325936 -->

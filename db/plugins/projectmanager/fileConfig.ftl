@@ -6,7 +6,7 @@
 [#if ide=="EWARM" || ide=="MDK-ARM"]
 	<HAL_Driver>${HAL_Driver}</HAL_Driver>
 [/#if]
-
+<HAL_Driver>${HAL_Driver}</HAL_Driver>
 
  [#-- list of toolchains to be generated: EWARM,MDK-ARM,TrueSTUDIO,RIDE: This tag can contain one or more than one toolchain: EWARM,MDK-ARM,TrueSTUDIO,RIDE --]
 <Toolchain>${ide}</Toolchain>
@@ -165,6 +165,7 @@
 			       		[/#list]
 		   	  		[/#if]
 		    	</group>
+		    	
 	  		</group>
 	  		[#else]
     
@@ -220,6 +221,14 @@
 			        [/#list]
 			     [/#if]
 		    </group>
+		    <group>
+		    	<name>CMSIS</name>
+			 			[#list cmsisSourceFileNameList as filesName]
+							<file>
+								<name>${filesName}</name>
+							</file>
+			       		[/#list]
+		    	</group>
 	  </group>   
 	  
 	  <group>

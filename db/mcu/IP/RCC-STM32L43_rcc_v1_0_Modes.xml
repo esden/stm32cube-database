@@ -513,11 +513,11 @@
 	
 	
 	
-    <RefParameter Visible="false" Comment="RTC Clock Source" Name="RTCFreq_Value" Type="double" DefaultValue="32000"  Max="1000000" Min="1000000" Display="value/1000" Unit="KHz" IP="RTC" >
+    <RefParameter Visible="false" Comment="RTC Clock Source" Name="RTCFreq_Value" Type="double" DefaultValue="32000"  Max="1000000" Min="0" Display="value/1000" Unit="KHz" IP="RTC" >
         <Condition Diagnostic="RTC Has HSE as source" Expression="(!(RTCClockSelection=RCC_RTCCLKSOURCE_LSE)&amp;!(RTCClockSelection=RCC_RTCCLKSOURCE_LSI)&amp; (RTCEnable=true))"/>
     </RefParameter>
     <RefParameter Visible="false" Comment="RTC Clock Source" Name="RTCFreq_Value" Type="double" DefaultValue="32000"                              Display="value/1000" Unit="KHz" IP="RTC"/>
-    <RefParameter Visible="false" Comment="LCD clock" Name="LCDFreq_Value" Type="double" DefaultValue="32000" IP="LCD" Max="1000000" Min="1000000" Display="value/1000" Unit="KHz" >
+    <RefParameter Visible="false" Comment="LCD clock" Name="LCDFreq_Value" Type="double" DefaultValue="32000" IP="LCD" Max="1000000" Min="0" Display="value/1000" Unit="KHz" >
         <Condition Diagnostic="RTC Has HSE as source" Expression="(!(RTCClockSelection=RCC_RTCCLKSOURCE_LSE)&amp;!(RTCClockSelection=RCC_RTCCLKSOURCE_LSI)&amp; (LCDEnable=true))"/>
     </RefParameter>   
     <RefParameter Visible="false" Comment="LCD clock" Name="LCDFreq_Value" Type="double" IP="LCD" DefaultValue="32000" Display="value/1000" Unit="KHz" />
@@ -972,7 +972,7 @@
     <!-- LSE state control -->
     <!-- LSE osillator type -->
     <RefParameter Visible="false" Comment="Clock Type LSE" DefaultValue="" Name="OscillatorTypeLSE" Type="list">
-        <Condition Diagnostic="LSE Is OFF" Expression="LSEUsed=0"/>
+        <Condition Diagnostic="LSE Is OFF" Expression="LSEUsed=0"/> 
     </RefParameter>
 	
     <RefParameter Visible="false" Comment="Clock Type LSE" DefaultValue="RCC_OSCILLATORTYPE_LSE" Name="OscillatorTypeLSE" Type="list">
@@ -981,7 +981,7 @@
 	
     <!-- LSE used -->
     <RefParameter Visible="false" Comment="LSE Is Used" DefaultValue="1" Name="LSEUsed" Min="1" Type="integer">
-        <Condition Expression="(LSCOSSourceLSE &amp; LSCOConfig)|(MSIAutoCalibrationON&amp;MSIUsed&amp;(LSEByPass|LSEOscillator))|(Semaphore_input_Channel1TIM16 &amp; TIM16 &amp; SEM2RCC_LSE_REQUIRED1_TIM16)|(SEM2RCC_LSE_REQUIRED_TIM2 &amp; Semaphore_TIM2_L4_ETR_REMAPTIM2 &amp; TIM2)|(Semaphore_input_Channel1_directTIM15 &amp; TIM15 &amp; SEM2RCC_LSE_REQUIRED1_TIM15)|(USART1SourceLSE &amp; USART1Used_ForRCC)|(USART2SourceLSE &amp; USART2Used_ForRCC)|(USART3SourceLSE &amp; USART3Used_ForRCC)|(LPUART1SourceLSE &amp; LPUARTUsed_ForRCC)|(LPTIM1SOURCELSE &amp; LPTIM1Used_ForRCC)|(LPTIM2SOURCELSE &amp; LPTIM2Used_ForRCC)|((RCC_MCO1Source=RCC_MCO1SOURCE_LSE)&amp; ((Semaphore_input_Channel1TIM16 &amp; TIM16 &amp; SEM2RCC_MCO_REQUIRED_TIM16)|MCOConfig))|((RTCClockSelection=RCC_RTCCLKSOURCE_LSE) &amp;(RTCUsed_ForRCC|LCDUsed_ForRCC) )" Diagnostic="LSE is used if "/>
+        <Condition Expression="CRSActivatedSourceLSE|(LSCOSSourceLSE &amp; LSCOConfig)|(MSIAutoCalibrationON&amp;MSIUsed&amp;(LSEByPass|LSEOscillator))|(Semaphore_input_Channel1TIM16 &amp; TIM16 &amp; SEM2RCC_LSE_REQUIRED1_TIM16)|(SEM2RCC_LSE_REQUIRED_TIM2 &amp; Semaphore_TIM2_L4_ETR_REMAPTIM2 &amp; TIM2)|(Semaphore_input_Channel1_directTIM15 &amp; TIM15 &amp; SEM2RCC_LSE_REQUIRED1_TIM15)|(USART1SourceLSE &amp; USART1Used_ForRCC)|(USART2SourceLSE &amp; USART2Used_ForRCC)|(USART3SourceLSE &amp; USART3Used_ForRCC)|(LPUART1SourceLSE &amp; LPUARTUsed_ForRCC)|(LPTIM1SOURCELSE &amp; LPTIM1Used_ForRCC)|(LPTIM2SOURCELSE &amp; LPTIM2Used_ForRCC)|((RCC_MCO1Source=RCC_MCO1SOURCE_LSE)&amp; ((Semaphore_input_Channel1TIM16 &amp; TIM16 &amp; SEM2RCC_MCO_REQUIRED_TIM16)|MCOConfig))|((RTCClockSelection=RCC_RTCCLKSOURCE_LSE) &amp;(RTCUsed_ForRCC|LCDUsed_ForRCC) )" Diagnostic="LSE is used if "/>
     </RefParameter>
 	
     <RefParameter Visible="false" Comment="LSE Is Used" DefaultValue="0" Name="LSEUsed" Min="0" Type="integer"/>
@@ -1730,8 +1730,9 @@
         <PossibleValue Value="ENABLED" Comment="Enabled" Semaphore="MSIAutoCalibrationON"/>
     </RefParameter>
 	<RefParameter Name="MSIAutoCalibration" Comment="MSI Auto Calibration" Type="list" DefaultValue="ENABLED" Group="RCC Parameters">
-        <Condition Expression="USBUsed_ForRCC&amp;(CK48SourceMSI|(CK48SourcePLLCLK&amp;PLLSourceMSI)|(CK48SourcePLLSAI1&amp;PLLSourceMSI))&amp; !(LSEOscillator | LSEByPass)" Diagnostic=""/>
-        <PossibleValue Value="ENABLED" Comment="Enabled" Semaphore="MSIAutoCalibrationON" Condition="LSEState=RCC_LSE_OFF" Diagnostic="Could be enabled only if LSE mode is activated in pinout Tab" Action="disable" />
+           <Condition Expression="(MSIUsed=1) &amp; (LSEOscillator | LSEByPass)" Diagnostic=""/>
+                <PossibleValue Value="DISABLED" Comment="Disabled"/>
+				<PossibleValue Value="ENABLED" Comment="Enabled" Semaphore="MSIAutoCalibrationON" Condition="LSEState=RCC_LSE_OFF" Diagnostic="Could be enabled only if LSE mode is activated in pinout Tab" Action="disable" />
     </RefParameter>
 	
     <RefParameter Name="MSIAutoCalibration" Comment="MSI Auto Calibration" Type="list" DefaultValue="DISABLED" Group="RCC Parameters">
@@ -1786,6 +1787,13 @@
 	
 	
     <!-- CRS Params -->   
+	 <RefParameter Name="PERIPH_CRSAEG" Visible="false" Comment="CRS Synchro Reload Value" Type="list" DefaultValue="null" Group="CRS Parameters">
+        <Condition Expression="!CRSActivatedSourceGPIO &amp; !CRSActivatedSourceLSE &amp; !CRSActivatedSourceUSB" Diagnostic=""/>   
+
+    </RefParameter>
+	<RefParameter Name="PERIPH_CRSAEG" Visible="false" Comment="CRS Synchro Reload Value" Type="list" DefaultValue="LL_APB1_GRP1_PERIPH_CRS" Group="CRS Parameters">
+       
+    </RefParameter>
     <RefParameter Visible="false" Name="EnableCRS" Comment="" Type="list" DefaultValue="ture">
         <Condition Diagnostic="" Expression="CRSActivatedSourceGPIO|CRSActivatedSourceLSE|CRSActivatedSourceUSB"/>
         <PossibleValue Value="true" Comment="true"/>
@@ -1843,6 +1851,18 @@
         <PossibleValue Value="UserValue" Comment="User defined" Semaphore="UserDefinedReload"/>
         <PossibleValue Value="automatic" Comment="Automatic" Semaphore="AutomaticRelaod" />
     </RefParameter>
+	    
+    <RefParameter Name="ReloadValueLL" Visible="false" Comment="CRS Synchro Reload Value" Type="list" DefaultValue="null" Group="CRS Parameters">
+        <Condition Expression="!CRSActivatedSourceGPIO &amp; !CRSActivatedSourceLSE &amp; !CRSActivatedSourceUSB" Diagnostic=""/>   
+    </RefParameter>
+      
+        <RefParameter Name="ReloadValueLL" Visible="false" Comment="CRS Synchro Reload Value" Type="list" DefaultValue="__LL_CRS_CALC_CALCULATE_RELOADVALUE(48000000," Group="CRS Parameters">
+        <Condition Expression="AutomaticRelaod" Diagnostic=""/>   
+        <PossibleValue Value="__LL_CRS_CALC_CALCULATE_RELOADVALUE(48000000," Comment="__LL_CRS_CALC_CALCULATE_RELOADVALUE(48000000,"/>
+    </RefParameter>
+
+    <RefParameter Name="ReloadValueLL"  Comment="CRS Synchro Reload Value" Type="integer" DefaultValue="null" Min="0" Max="65535" Group="CRS Parameters"/>
+	
     <RefParameter Name="ReloadValue" Visible="false" Comment="CRS Synchro Reload Value" Type="list" DefaultValue="null" Group="CRS Parameters">
         <Condition Expression="!CRSActivatedSourceGPIO &amp; !CRSActivatedSourceLSE &amp; !CRSActivatedSourceUSB" Diagnostic=""/>   
     </RefParameter>
@@ -1863,10 +1883,24 @@
     </RefParameter>
     <RefParameter Name="ReloadValue"  Comment="CRS Synchro Reload Value" Type="integer" DefaultValue="null" Min="0" Max="65535" Group="CRS Parameters"/>
 	
-    <RefParameter Name="ReloadValueARG" Visible="false" Comment="CRS Synchro Reload Value" Type="list" DefaultValue="null" Group="CRS Parameters">
+	    <RefParameter Name="ReloadValueARGLL" Visible="false" Comment="CRS Synchro Reload Value" Type="list" DefaultValue="null" Group="CRS Parameters">
+        <Condition Expression="!CRSActivatedSourceGPIO &amp; !CRSActivatedSourceLSE &amp; !CRSActivatedSourceUSB" Diagnostic=""/>   
+
+    </RefParameter> 
+    <RefParameter Name="ReloadValueARGLL" Visible="false" Comment="CRS Synchro Reload Value" Type="list" DefaultValue="+ReloadValueLL+Fsync+)" Group="CRS Parameters">
+        <Condition Expression="AutomaticRelaod &amp; (CRSActivatedSourceGPIO|!CRSActivatedSourceLSE | !CRSActivatedSourceUSB)" Diagnostic=""/>   
+    </RefParameter>
+	    <RefParameter Name="ReloadValueARGLL" Visible="false" Comment="CRS Synchro Reload Value" Type="list" DefaultValue="+ReloadValue" Group="CRS Parameters">
+        <Condition Expression="DefaultReload|UserDefinedReload" Diagnostic=""/>   
+        
+    </RefParameter>  
+    <RefParameter Name="ReloadValueARGLL" Visible="false" Comment="CRS Synchro Reload Value" Type="list" DefaultValue="null" Group="CRS Parameters"/>
+
+	<RefParameter Name="ReloadValueARG" Visible="false" Comment="CRS Synchro Reload Value" Type="list" DefaultValue="null" Group="CRS Parameters">
         <Condition Expression="!CRSActivatedSourceGPIO &amp; !CRSActivatedSourceLSE &amp; !CRSActivatedSourceUSB" Diagnostic=""/>   
 
     </RefParameter>
+	
     
     <RefParameter Name="ReloadValueARG" Visible="false" Comment="CRS Synchro Reload Value" Type="list" DefaultValue="+ReloadValue+Fsync+)" Group="CRS Parameters">
         <Condition Expression="AutomaticRelaod" Diagnostic=""/>   

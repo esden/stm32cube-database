@@ -330,7 +330,11 @@ void SystemClock_Config(void)
             [#if rccUsedDriver == "HAL"]
                 #tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
             [#else]
+                [#if FamilyName=="STM32L0"]
+                #tNVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority});
+                [#else]
                 #tNVIC_SetPriority(${initVector.vector}, NVIC_EncodePriority(NVIC_GetPriorityGrouping(),${initVector.preemptionPriority}, ${initVector.subPriority}));
+                [/#if]
             [/#if]
             [#if initVector.systemHandler=="false"]
                 [#if rccUsedDriver == "HAL"]
@@ -366,7 +370,11 @@ static void MX_NVIC_Init(void)
     #t#tHAL_NVIC_SetPriority(${vector.vector}, ${vector.preemptionPriority}, ${vector.subPriority});
     #t#tHAL_NVIC_EnableIRQ(${vector.vector});
     [#else]
+      [#if FamilyName=="STM32L0"]
+    #t#tNVIC_SetPriority(${vector.vector}, ${vector.preemptionPriority});
+      [#else]
     #t#tNVIC_SetPriority(${vector.vector}, NVIC_EncodePriority(NVIC_GetPriorityGrouping(),${vector.preemptionPriority}, ${vector.subPriority}));
+      [/#if]
     #t#tNVIC_EnableIRQ(${vector.vector});
     [/#if]
     #t}
@@ -374,7 +382,11 @@ static void MX_NVIC_Init(void)
     [#if vector.usedDriver == "HAL"]
     #tHAL_NVIC_SetPriority(${vector.vector}, ${vector.preemptionPriority}, ${vector.subPriority});
     [#else]
+      [#if FamilyName=="STM32L0"]
+    #tNVIC_SetPriority(${vector.vector}, ${vector.preemptionPriority});
+      [#else]
     #tNVIC_SetPriority(${vector.vector}, NVIC_EncodePriority(NVIC_GetPriorityGrouping(),${vector.preemptionPriority}, ${vector.subPriority}));
+      [/#if]
     [/#if]
     [#if vector.systemHandler=="false"]
       [#if vector.usedDriver == "HAL"]

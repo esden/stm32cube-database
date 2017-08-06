@@ -146,12 +146,12 @@ void vApplicationMallocFailedHook(void);
 #n
 /* USER CODE BEGIN 1 */
 /* Functions needed when configGENERATE_RUN_TIME_STATS is on */
-void configureTimerForRunTimeStats(void) 
+__weak void configureTimerForRunTimeStats(void) 
 {
 #n    
 }
 
-#nunsigned long getRunTimeCounterValue(void) 
+#n__weak unsigned long getRunTimeCounterValue(void) 
 {
     return 0;
 }  
@@ -163,7 +163,7 @@ void configureTimerForRunTimeStats(void)
 	      [#if definition.value=="1"]
 #n
 /* USER CODE BEGIN 2 */
-void vApplicationIdleHook( void ) 
+__weak void vApplicationIdleHook( void ) 
 {
 #t    /* vApplicationIdleHook() will only be called if configUSE_IDLE_HOOK is set
 #t    to 1 in FreeRTOSConfig.h.  It will be called on each iteration of the idle
@@ -182,7 +182,7 @@ void vApplicationIdleHook( void )
 	    [#if definition.name=="configUSE_TICK_HOOK"]
 	      [#if definition.value=="1"]
 #n/* USER CODE BEGIN 3 */
-void vApplicationTickHook( void ) 
+__weak void vApplicationTickHook( void ) 
 {
 #t    /* This function will be called by each tick interrupt if
 #t    configUSE_TICK_HOOK is set to 1 in FreeRTOSConfig.h.  User code can be
@@ -198,9 +198,9 @@ void vApplicationTickHook( void )
 	      [#if definition.value !="0"]
 #n/* USER CODE BEGIN 4 */
 [#if useNewHandle==0]
-void vApplicationStackOverflowHook(xTaskHandle xTask, signed char *pcTaskName)
+__weak void vApplicationStackOverflowHook(xTaskHandle xTask, signed char *pcTaskName)
 [#else]
-void vApplicationStackOverflowHook(TaskHandle_t xTask, signed char *pcTaskName)
+__weak void vApplicationStackOverflowHook(TaskHandle_t xTask, signed char *pcTaskName)
 [/#if]
 {
 #t    /* Run time stack overflow checking is performed if
@@ -214,7 +214,7 @@ void vApplicationStackOverflowHook(TaskHandle_t xTask, signed char *pcTaskName)
 	    [#if definition.name=="configUSE_MALLOC_FAILED_HOOK"]
 	      [#if definition.value=="1"]
 #n/* USER CODE BEGIN 5 */
-void vApplicationMallocFailedHook(void) 
+__weak void vApplicationMallocFailedHook(void) 
 {
 #t    /* vApplicationMallocFailedHook() will only be called if
 #t    configUSE_MALLOC_FAILED_HOOK is set to 1 in FreeRTOSConfig.h.  It is a hook
@@ -243,12 +243,12 @@ void vApplicationMallocFailedHook(void)
 	      [#if definition.value=="1"]
 #n
 /* USER CODE BEGIN PREPOSTSLEEP */
-void PreSleepProcessing(uint32_t *ulExpectedIdleTime)
+__weak void PreSleepProcessing(uint32_t *ulExpectedIdleTime)
 {
 /* place for user code */ 
 }
 
-void PostSleepProcessing(uint32_t *ulExpectedIdleTime)
+__weak void PostSleepProcessing(uint32_t *ulExpectedIdleTime)
 {
 /* place for user code */
 }

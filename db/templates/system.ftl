@@ -44,7 +44,11 @@
     [/#if]
     [#if initVector.codeInMspInit]
     #t/* ${initVector.vector} interrupt configuration */
+        [#if NVICPriorityGroup??]
     #tNVIC_SetPriority(${initVector.vector}, NVIC_EncodePriority(NVIC_GetPriorityGrouping(),${initVector.preemptionPriority}, ${initVector.subPriority}));
+        [#else]
+    #tNVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority});
+        [/#if]
         [#if initVector.systemHandler=="false"]
     #tNVIC_EnableIRQ(${initVector.vector});
         [/#if]

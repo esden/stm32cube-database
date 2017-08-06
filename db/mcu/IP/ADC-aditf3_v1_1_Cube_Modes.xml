@@ -164,8 +164,8 @@
     <RefMode Abstract="true" Comment="Regular Conversion Settings" Group="ADC_Regular_ConversionMode" Name="ADC_Regular_ConversionMode">
         <Parameter Name="NbrOfConversionFlag"/>
         <Parameter Name="NbrOfConversion"/>
-        <Parameter Name="ExternalTrigConvEdge"/>
         <Parameter Name="ExternalTrigConv"/>
+        <Parameter Name="ExternalTrigConvEdge"/>
     </RefMode>
     
     <!-- Possible values of NbrOfConversionFlag parameter  !!!! what is the utility of this? !!!!-->
@@ -180,25 +180,14 @@
         <Description>Number of regular channels to be converted</Description>
     </RefParameter>
         
-    <!-- ExternalTrigConvEdgeChoice -->
-    <RefParameter Comment="External Trigger Conversion Edge" DefaultValue="ADC_EXTERNALTRIGCONVEDGE_NONE" Group="ADCgroup" Name="ExternalTrigConvEdge" Type="list">
-        <PossibleValue Comment="None" Value="ADC_EXTERNALTRIGCONVEDGE_NONE"/>
-        <PossibleValue Comment="Trigger detection on the rising edge" Value="ADC_EXTERNALTRIGCONVEDGE_RISING"/>
-        <PossibleValue Comment="Trigger detection on the falling edge" Value="ADC_EXTERNALTRIGCONVEDGE_FALLING"/>
-        <PossibleValue Comment="Trigger detection on the rising and falling edges" Value="ADC_EXTERNALTRIGCONVEDGE_RISINGFALLING"/>
-        <Description>Select the external trigger polarity and enable the trigger of a regular group.</Description>
-    </RefParameter>
 	    
     <!-- ExternalTrigConv -->
-    <RefParameter Comment="External Trigger Conversion Source" DefaultValue="ADC_SOFTWARE_START" Group="ADCgroup" Name="ExternalTrigConv" Type="list" Visible="false">
-        <Condition Diagnostic="When any trigger is set, source trigger must be set to Software trigger" Expression="ExternalTrigConvEdge=ADC_EXTERNALTRIGCONVEDGE_NONE"/>
-        <PossibleValue Comment="Software Trigger" Value="ADC_SOFTWARE_START"/>
-    </RefParameter>
     <RefParameter Comment="External Trigger Conversion Source" DefaultValue="ADC_EXTERNALTRIGCONV_EXT_IT11" Group="ADCgroup" Name="ExternalTrigConv" Type="list">
-        <Condition Diagnostic="EXTI Line11 is used for External-Trigger-for-Regular-conversion mode." Expression="!(ExternalTrigConvEdge=ADC_EXTERNALTRIGCONVEDGE_NONE)&amp;(RegularExternalTrigger$IpInstance)"/>
+        <Condition Diagnostic="EXTI Line11 is used for External-Trigger-for-Regular-conversion mode." Expression="(RegularExternalTrigger$IpInstance)"/>
         <PossibleValue Comment="EXTI Line11" Value="ADC_EXTERNALTRIGCONV_EXT_IT11"/>
     </RefParameter>
-    <RefParameter Comment="External Trigger Conversion Source" DefaultValue="ADC_EXTERNALTRIGCONV_T9_CC2" Group="ADCgroup" Name="ExternalTrigConv" Type="list">
+    <RefParameter Comment="External Trigger Conversion Source" DefaultValue="ADC_SOFTWARE_START" Group="ADCgroup" Name="ExternalTrigConv" Type="list">
+        <PossibleValue Comment="Regular Conversion launched by software" Value="ADC_SOFTWARE_START"/>
         <PossibleValue Action="Remove" Comment="Timer 2 Capture Compare 3 event" Condition="!TIM2_Exist" Diagnostic="" Value="ADC_EXTERNALTRIGCONV_T2_CC3"/>
         <PossibleValue Action="Remove" Comment="Timer 2 Capture Compare 2 event" Condition="!TIM2_Exist" Diagnostic="" Value="ADC_EXTERNALTRIGCONV_T2_CC2"/>
         <PossibleValue Action="Remove" Comment="Timer 2 Trigger Out event" Condition="!TIM2_Exist" Diagnostic="" Value="ADC_EXTERNALTRIGCONV_T2_TRGO"/>
@@ -210,8 +199,21 @@
         <PossibleValue Action="Remove" Comment="Timer 6 Trigger Out event" Condition="!TIM6_Exist" Diagnostic="" Value="ADC_EXTERNALTRIGCONV_T6_TRGO"/>
         <PossibleValue Action="Remove" Comment="Timer 9 Capture Compare 2 event" Condition="!TIM9_Exist" Diagnostic="" Value="ADC_EXTERNALTRIGCONV_T9_CC2"/>
         <PossibleValue Action="Remove" Comment="Timer 9 Trigger Out event" Condition="!TIM9_Exist" Diagnostic="" Value="ADC_EXTERNALTRIGCONV_T9_TRGO"/>
-        <PossibleValue Comment="Software Trigger" Value="ADC_SOFTWARE_START"/>
         <Description>Select the external event used to trigger the start of conversion of a regular group</Description>
+    </RefParameter>
+    
+    <!-- ExternalTrigConvEdgeChoice -->
+     <RefParameter Comment="External Trigger Conversion Edge" DefaultValue="ADC_EXTERNALTRIGCONVEDGE_NONE" Group="ADCgroup" Name="ExternalTrigConvEdge" Type="list">
+         <Condition Diagnostic="" Expression="(ExternalTrigConv = ADC_SOFTWARE_START)"/>
+        <PossibleValue Comment="None" Value="ADC_EXTERNALTRIGCONVEDGE_NONE"/>
+        <Description>Select the external trigger polarity and enable the trigger of a regular group.</Description>
+    </RefParameter>
+    
+    <RefParameter Comment="External Trigger Conversion Edge" DefaultValue="ADC_EXTERNALTRIGCONVEDGE_RISING" Group="ADCgroup" Name="ExternalTrigConvEdge" Type="list">
+        <PossibleValue Comment="Trigger detection on the rising edge" Value="ADC_EXTERNALTRIGCONVEDGE_RISING"/>
+        <PossibleValue Comment="Trigger detection on the falling edge" Value="ADC_EXTERNALTRIGCONVEDGE_FALLING"/>
+        <PossibleValue Comment="Trigger detection on the rising and falling edges" Value="ADC_EXTERNALTRIGCONVEDGE_RISINGFALLING"/>
+        <Description>Select the external trigger polarity and enable the trigger of a regular group.</Description>
     </RefParameter>
 	    
     <!-- Parameters of ChannelRegularConversio Mode -->    
@@ -295,8 +297,8 @@
     <!-- Parameters of  ADC_Injected_ConversionMode Mode -->
     <RefMode Abstract="true" Comment="Injected Conversion Settings" Group="ADC_Injected_ConversionMode" Name="ADC_Injected_ConversionMode">
         <Parameter Name="InjNumberOfConversion"/>
-        <Parameter Name="ExternalTrigInjecConvEdge"/>
         <Parameter Name="ExternalTrigInjecConv"/>
+        <Parameter Name="ExternalTrigInjecConvEdge"/>
         <Parameter Name="InjectedConvMode"/>
     </RefMode>
 		    
@@ -304,38 +306,23 @@
     <RefParameter Comment="Number Of Conversions" DefaultValue="0" Group="ADCgroup" Max="4" Min="0" Name="InjNumberOfConversion" Type="integer">
         <Description>Number of injected channels to be converted</Description>
     </RefParameter>
-		    
-    <!-- Possible Value of ExternalTrigInjecConvEdge parameter -->
-    <RefParameter Comment="External Trigger Conversion Edge" DefaultValue="null" Group="ADCgroup" Name="ExternalTrigInjecConvEdge" Type="list" Visible="false">
-        <Condition Diagnostic="In case of usage of channels on injected group, ADC frequency should be low than AHB clock frequency /4 for resolution 12 or 10 bits, AHB clock frequency /3 for resolution 8 bits, AHB clock frequency /2 for resolution 6 bits." Expression="(InjNumberOfConversion=0)"/>
-    </RefParameter>
-    <RefParameter Comment="External Trigger Conversion Edge" DefaultValue="ADC_EXTERNALTRIGINJECCONV_EDGE_NONE" Group="ADCgroup" Name="ExternalTrigInjecConvEdge" Type="list">
-        <Condition Diagnostic="" Expression="AutoInjected_$IpInstance"/>
-        <PossibleValue Comment="None" Value="ADC_EXTERNALTRIGINJECCONV_EDGE_NONE"/>
-        <Description>You cannot configure a trigger because the Auto Injected mode is selected.</Description>
-    </RefParameter>
-    <RefParameter Comment="External Trigger Conversion Edge" DefaultValue="ADC_EXTERNALTRIGINJECCONV_EDGE_NONE" Group="ADCgroup" Name="ExternalTrigInjecConvEdge" Type="list">
-        <PossibleValue Comment="None" Value="ADC_EXTERNALTRIGINJECCONV_EDGE_NONE"/>
-        <PossibleValue Comment="Trigger detection on the rising edge" Value="ADC_EXTERNALTRIGINJECCONV_EDGE_RISING"/>
-        <PossibleValue Comment="Trigger detection on the falling edge" Value="ADC_EXTERNALTRIGINJECCONV_EDGE_FALLING"/>
-        <PossibleValue Comment="Trigger detection on the rising and falling edges" Value="ADC_EXTERNALTRIGINJECCONV_EDGE_RISINGFALLING"/>
-        <Description>Select the external trigger polarity and enable the trigger of a regular group: When an external trigger is selected for ADC regular or injected conversion, only the rising edge of the signal can start the conversion.</Description>
-    </RefParameter>
 	        
     <!-- Possible Value of ExternalTrigInjecConv parameter -->
     <RefParameter Comment="External Trigger Source" DefaultValue="null" Group="ADCgroup" Name="ExternalTrigInjecConv" Type="list" Visible="false">
-        <Condition Diagnostic="" Expression="(InjNumberOfConversion=0)|(ExternalTrigInjecConvEdge=ADC_EXTERNALTRIGINJECCONV_EDGE_NONE)"/>
-    </RefParameter>
-    <RefParameter Comment="External Trigger Source" DefaultValue="ADC_INJECTED_SOFTWARE_START" Group="ADCgroup" Name="ExternalTrigInjecConv" Type="list" Visible="false">
-        <Condition Diagnostic="" Expression="(ExternalTrigInjecConvEdge=ADC_EXTERNALTRIGINJECCONV_EDGE_NONE)"/>
+        <Condition Diagnostic="" Expression="(InjNumberOfConversion=0)"/>
     </RefParameter>
     <RefParameter Comment="External Trigger Source" DefaultValue="ADC_EXTERNALTRIGINJECCONV_EXT_IT15" Group="ADCgroup" Name="ExternalTrigInjecConv" Type="list">
-        <Condition Diagnostic="" Expression="!(ExternalTrigInjecConvEdge=ADC_EXTERNALTRIGINJECCONV_EDGE_NONE)&amp;(InjectedExternalTrigger$IpInstance)&amp;(USE_ADC1|USE_ADC2)"/>
+        <Condition Diagnostic="" Expression="!(AutoInjected_$IpInstance) &amp;(InjectedExternalTrigger$IpInstance)"/>
         <PossibleValue Comment="EXTI line15" Value="ADC_EXTERNALTRIGINJECCONV_Ext_IT15"/>
         <Description>EXTI Line15 is used for External-Trigger-for-Injected-conversion mode</Description>
     </RefParameter>
+     <RefParameter Comment="External Trigger Source" DefaultValue="__NULL" Group="ADCgroup" Name="ExternalTrigInjecConv" Type="list" >
+		<Condition Diagnostic="" Expression="(AutoInjected_$IpInstance)"/>
+        <PossibleValue Comment="External Trigger on injected channels are disabled (Auto-injection mode selected)" Value="ADC_INJECTED_SOFTWARE_START"/>
+	</RefParameter>
 		    
-    <RefParameter Comment="External Trigger Source" DefaultValue="ADC_EXTERNALTRIGINJECCONV_T9_CC1" Group="ADCgroup" Name="ExternalTrigInjecConv" Type="list">
+    <RefParameter Comment="External Trigger Source" DefaultValue="ADC_INJECTED_SOFTWARE_START" Group="ADCgroup" Name="ExternalTrigInjecConv" Type="list">
+        <PossibleValue Comment="Injected Conversion launched by software" Value="ADC_INJECTED_SOFTWARE_START"/>
         <PossibleValue Action="Remove" Comment="Timer 2 Capture Compare 1 event" Condition="!TIM2_Exist" Diagnostic="" Value="ADC_EXTERNALTRIGINJECCONV_T2_CC1"/>
         <PossibleValue Action="Remove" Comment="Timer 2 Trigger Out event" Condition="!TIM2_Exist" Diagnostic="" Value="ADC_EXTERNALTRIGINJECCONV_T2_TRGO"/>
         <PossibleValue Action="Remove" Comment="Timer 3 Capture Compare 4 event" Condition="!TIM3_Exist" Diagnostic="" Value="ADC_EXTERNALTRIGINJECCONV_T3_CC4"/>
@@ -347,8 +334,23 @@
         <PossibleValue Action="Remove" Comment="Timer 9 Capture Compare 1 event" Condition="!TIM9_Exist" Diagnostic="" Value="ADC_EXTERNALTRIGINJECCONV_T9_CC1"/>
         <PossibleValue Action="Remove" Comment="Timer 9 Trigger Out event" Condition="!TIM9_Exist" Diagnostic="" Value="ADC_EXTERNALTRIGINJECCONV_T9_TRGO"/>
         <PossibleValue Action="Remove" Comment="Timer 10 Capture Compare 1 event" Condition="!TIM10_Exist" Diagnostic="" Value="ADC_EXTERNALTRIGINJECCONV_T10_CC1"/>
-        <PossibleValue Comment="Software Trigger" Value="ADC_INJECTED_SOFTWARE_START"/>
         <Description>Select the external event used to trigger the start of conversion of an injected group</Description>
+    </RefParameter>
+    
+      <!-- Possible Value of ExternalTrigInjecConvEdge parameter -->
+    <RefParameter Comment="External Trigger Conversion Edge" DefaultValue="null" Group="ADCgroup" Name="ExternalTrigInjecConvEdge" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="(InjNumberOfConversion=0)"/>
+    </RefParameter>
+    <RefParameter Comment="External Trigger Conversion Edge" DefaultValue="ADC_EXTERNALTRIGINJECCONV_EDGE_NONE" Group="ADCgroup" Name="ExternalTrigInjecConvEdge" Type="list">
+        <Condition Diagnostic="" Expression="(AutoInjected_$IpInstance) | (ExternalTrigInjecConv = ADC_INJECTED_SOFTWARE_START)"/>
+        <PossibleValue Comment="None" Value="ADC_EXTERNALTRIGINJECCONV_EDGE_NONE"/>
+        <Description>You cannot configure a trigger because the Auto Injected mode is selected.</Description>
+    </RefParameter>
+    <RefParameter Comment="External Trigger Conversion Edge" DefaultValue="ADC_EXTERNALTRIGINJECCONV_EDGE_RISING" Group="ADCgroup" Name="ExternalTrigInjecConvEdge" Type="list">
+        <PossibleValue Comment="Trigger detection on the rising edge" Value="ADC_EXTERNALTRIGINJECCONV_EDGE_RISING"/>
+        <PossibleValue Comment="Trigger detection on the falling edge" Value="ADC_EXTERNALTRIGINJECCONV_EDGE_FALLING"/>
+        <PossibleValue Comment="Trigger detection on the rising and falling edges" Value="ADC_EXTERNALTRIGINJECCONV_EDGE_RISINGFALLING"/>
+        <Description>Select the external trigger polarity and enable the trigger of a regular group: When an external trigger is selected for ADC regular or injected conversion, only the rising edge of the signal can start the conversion.</Description>
     </RefParameter>
 		    
     <!-- Possible Value of InjectedConvMode parameter -->

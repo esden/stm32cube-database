@@ -51,7 +51,7 @@
   */
 
 #define HAL_MODULE_ENABLED  
-[#assign allModules = ["ADC", "CAN", "COMP", "CRC", "CRYP", "DAC", "DFSDM", "FIREWALL", "HCD", "I2S", "IRDA", "IWDG", "LCD", "LPTIM", "NAND", "NOR", "OPAMP", "PCD", "QSPI","QUADSPI", "RNG", "RTC", "SAI", "SD", "SMBUS", "SMARTCARD", "SPI", "SRAM", "SWPMI", "TIM", "TSC", "UART", "USART", "WWDG" ]]
+[#assign allModules = ["ADC", "CAN", "COMP", "CRC", "CRYP", "DAC", "DCMI", "DFSDM", "FIREWALL", "HCD", "I2S", "IRDA", "IWDG", "LCD", "LPTIM", "NAND", "NOR", "OPAMP", "PCD","QUADSPI", "RNG", "RTC", "SAI", "SD", "SMBUS", "SMARTCARD", "SPI", "SRAM", "SWPMI", "TIM", "TSC", "UART", "USART", "WWDG" ]]
   [#list allModules as module]
 	[#if isModuleUsed(module)]
 [#compress]#define HAL_${module?replace("QUADSPI","QSPI")}_MODULE_ENABLED[/#compress]
@@ -230,6 +230,10 @@
 #ifdef HAL_DAC_MODULE_ENABLED
   #include "stm32l4xx_hal_dac.h"
 #endif /* HAL_DAC_MODULE_ENABLED */
+
+#ifdef HAL_DCMI_MODULE_ENABLED
+  #include "stm32l4xx_hal_dcmi.h"
+#endif /* HAL_DCMI_MODULE_ENABLED */
 
 #ifdef HAL_FIREWALL_MODULE_ENABLED
   #include "stm32l4xx_hal_firewall.h"

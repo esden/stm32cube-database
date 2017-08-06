@@ -1,9 +1,44 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
-<IP xmlns="http://mcd.rou.st.com/modules.php?name=mcu" DBVersion="V4.0" Name="RCC" Version="STM32Cube_FW_L4_V1.5.0" IncludeFile="stm32l4xx_ll_rcc.h;stm32l4xx_ll_bus.h;stm32l4xx_ll_system.h;stm32l4xx_ll_exti.h;stm32l4xx_ll_cortex.h;stm32l4xx_ll_utils.h;stm32l4xx_ll_pwr.h;stm32l4xx_ll_dma.h" 
+<IP xmlns="http://mcd.rou.st.com/modules.php?name=mcu" DBVersion="V4.0" Name="RCC" Version="STM32Cube_FW_L4_V1.5.0" IncludeFile="stm32l4xx_ll_crs.h;stm32l4xx_ll_rcc.h;stm32l4xx_ll_bus.h;stm32l4xx_ll_system.h;stm32l4xx_ll_exti.h;stm32l4xx_ll_cortex.h;stm32l4xx_ll_utils.h;stm32l4xx_ll_pwr.h;stm32l4xx_ll_dma.h" 
     xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../../doc/V4/Development/Specifications/db/IP_Configs.xsd">
 
     <RefConfig Name="RCC_OSCConfig">
       
+        <!--flash latency configuration-->
+
+        <IFCondition Expression ="1=1">
+
+            <CallLibMethod Name="LL_FLASH_SetLatency">
+                <MethodArg Name="Latency" ParameterName="FLatency"/>
+            
+            </CallLibMethod>
+        </IFCondition>
+        <IFCondition Expression ="FLatency=FLASH_LATENCY_0">
+            <CallLibMethod Name="" Type="HardCode">
+                <HardCode Text="#n#tif(LL_FLASH_GetLatency() != LL_FLASH_LATENCY_0)#n#t{#n#tError_Handler();#t#n#t}"/>
+            </CallLibMethod>
+        </IFCondition>
+        <IFCondition Expression ="FLatency=FLASH_LATENCY_1">
+            <CallLibMethod Name="" Type="HardCode">
+                <HardCode Text="#n#tif(LL_FLASH_GetLatency() != LL_FLASH_LATENCY_1)#n#t{#n#tError_Handler();#t#n#t}"/>
+            </CallLibMethod>
+        </IFCondition>
+        <IFCondition Expression ="FLatency=FLASH_LATENCY_2">
+            <CallLibMethod Name="" Type="HardCode">
+                <HardCode Text="#n#t if(LL_FLASH_GetLatency() != LL_FLASH_LATENCY_2)#n#t{#n#tError_Handler();#t#n#t}"/>
+            </CallLibMethod>
+        </IFCondition>
+        <IFCondition Expression ="FLatency=FLASH_LATENCY_3">
+            <CallLibMethod Name="" Type="HardCode">
+                <HardCode Text="#n#tif(LL_FLASH_GetLatency() != LL_FLASH_LATENCY_3)#n#t{#n#tError_Handler();#t#n#t}"/>
+            </CallLibMethod>
+        </IFCondition>
+        <IFCondition Expression ="FLatency=FLASH_LATENCY_4">
+            <CallLibMethod Name="" Type="HardCode">
+                <HardCode Text="#n#tif(LL_FLASH_GetLatency() != LL_FLASH_LATENCY_4)#n#t{#n#tError_Handler();#t#n#t}"/>
+            </CallLibMethod>
+        </IFCondition>
+
         <!--voltage scaling configuration-->
         <IFCondition Expression ="1=1">
 
@@ -299,40 +334,6 @@
                 <HardCode Text="#n#t /* Wait till PLLSAI2 is ready */#n#twhile(LL_RCC_PLLSAI2_IsReady() != 1)#n#t{#n#t#t#n#t}"/>
             </CallLibMethod>
         </IFCondition>
-        <!--flash latency configuration-->
-
-        <IFCondition Expression ="1=1">
-
-            <CallLibMethod Name="LL_FLASH_SetLatency">
-                <MethodArg Name="Latency" ParameterName="FLatency"/>
-            
-            </CallLibMethod>
-        </IFCondition>
-        <IFCondition Expression ="FLatency=FLASH_LATENCY_0">
-            <CallLibMethod Name="" Type="HardCode">
-                <HardCode Text="#n#tif(LL_FLASH_GetLatency() != LL_FLASH_LATENCY_0)#n#t{#n#tError_Handler();#t#n#t}"/>
-            </CallLibMethod>
-        </IFCondition>
-        <IFCondition Expression ="FLatency=FLASH_LATENCY_1">
-            <CallLibMethod Name="" Type="HardCode">
-                <HardCode Text="#n#tif(LL_FLASH_GetLatency() != LL_FLASH_LATENCY_1)#n#t{#n#tError_Handler();#t#n#t}"/>
-            </CallLibMethod>
-        </IFCondition>
-        <IFCondition Expression ="FLatency=FLASH_LATENCY_2">
-            <CallLibMethod Name="" Type="HardCode">
-                <HardCode Text="#n#t if(LL_FLASH_GetLatency() != LL_FLASH_LATENCY_2)#n#t{#n#tError_Handler();#t#n#t}"/>
-            </CallLibMethod>
-        </IFCondition>
-        <IFCondition Expression ="FLatency=FLASH_LATENCY_3">
-            <CallLibMethod Name="" Type="HardCode">
-                <HardCode Text="#n#tif(LL_FLASH_GetLatency() != LL_FLASH_LATENCY_3)#n#t{#n#tError_Handler();#t#n#t}"/>
-            </CallLibMethod>
-        </IFCondition>
-        <IFCondition Expression ="FLatency=FLASH_LATENCY_4">
-            <CallLibMethod Name="" Type="HardCode">
-                <HardCode Text="#n#tif(LL_FLASH_GetLatency() != LL_FLASH_LATENCY_4)#n#t{#n#tError_Handler();#t#n#t}"/>
-            </CallLibMethod>
-        </IFCondition>
 		
         <IFCondition Expression ="1=1">
 
@@ -475,6 +476,11 @@
                 <MethodArg Name="I2CxSource" ParameterName="I2C2CLockSelection"/>
             </CallLibMethod>
         </IFCondition>
+        <IFCondition Expression ="I2C4Used_ForRCC">
+            <CallLibMethod Name="LL_RCC_SetI2CClockSource">
+                <MethodArg Name="I2CxSource" ParameterName="I2C4CLockSelection"/>
+            </CallLibMethod>
+        </IFCondition>
 		
         <IFCondition Expression ="LPTIM2Used_ForRCC">
             <CallLibMethod Name="LL_RCC_SetLPTIMClockSource">
@@ -512,7 +518,7 @@
             </CallLibMethod>
         </IFCondition>
 		
-        <IFCondition Expression ="USB_OTG_FSUsed_ForRCC|USB_OTG_HSEmbeddedPHYUsed_ForRCC">
+        <IFCondition Expression ="USB_OTG_FSUsed_ForRCC|USB_OTG_HSEmbeddedPHYUsed_ForRCC|USBUsed_ForRCC">
             <CallLibMethod Name="LL_RCC_SetUSBClockSource">
                 <MethodArg Name="USBxSource" ParameterName="CK48CLockSelection"/>
                 <MethodArg Name="USBxSource" ParameterName="CK48CLockSelection"/>
@@ -547,6 +553,63 @@
             <CallLibMethod Name="LL_RCC_ConfigMCO">
                 <MethodArg Name="MCOxPrescaler" ParameterName="RCC_MCODiv"/>
                 <MethodArg Name="MCOxSource" ParameterName="RCC_MCO1Source"/>
+            </CallLibMethod>
+        </IFCondition>
+		
+	   
+   
+	    <!--CRS PARAM -->
+		    <IFCondition Expression ="EnableCRS">
+            <CallLibMethod Name="LL_APB1_GRP1_EnableClock">
+                <MethodArg Name="Periphs" ParameterName="PERIPH_CRSAEG"/>
+            </CallLibMethod>
+        </IFCondition>  
+		
+		    <IFCondition Expression ="EnableCRS">
+            <CallLibMethod Name="LL_APB1_GRP1_ForceReset">
+                <MethodArg Name="Periphs" ParameterName="PERIPH_CRSAEG"/>
+            </CallLibMethod>
+        </IFCondition>  
+		
+		    <IFCondition Expression ="EnableCRS">
+            <CallLibMethod Name="LL_APB1_GRP1_ReleaseReset">
+                <MethodArg Name="Periphs" ParameterName="PERIPH_CRSAEG"/>
+            </CallLibMethod>
+        </IFCondition>  
+		
+		
+        <IFCondition Expression ="EnableCRS">
+            <CallLibMethod Name="LL_CRS_SetSyncDivider">
+                <MethodArg Name="Divider" ParameterName="Prescaler"/>
+            </CallLibMethod>
+        </IFCondition>  
+		
+		<IFCondition Expression ="EnableCRS">
+            <CallLibMethod Name="LL_CRS_SetSyncPolarity">
+                <MethodArg Name="Divider" ParameterName="Polarity"/>
+            </CallLibMethod>
+        </IFCondition>
+
+		<IFCondition Expression ="EnableCRS">
+            <CallLibMethod Name="LL_CRS_SetSyncSignalSource">
+                <MethodArg Name="Source" ParameterName="Source"/>
+            </CallLibMethod>
+        </IFCondition>
+	
+		
+		<IFCondition Expression ="EnableCRS">
+            <CallLibMethod Name="LL_CRS_SetReloadCounter">
+                <MethodArg Name="Value" ParameterName="ReloadValueARGLL"/>
+            </CallLibMethod>
+        </IFCondition>
+		<IFCondition Expression ="EnableCRS">
+            <CallLibMethod Name="LL_CRS_SetFreqErrorLimit">
+                <MethodArg Name="Value" ParameterName="ErrorLimitValue"/>
+            </CallLibMethod>
+        </IFCondition>
+		<IFCondition Expression ="EnableCRS">
+            <CallLibMethod Name="LL_CRS_SetHSI48SmoothTrimming">
+                <MethodArg Name="Value" ParameterName="HSI48CalibrationValue"/>
             </CallLibMethod>
         </IFCondition>
 		
@@ -765,10 +828,38 @@
     <LibMethod Comment="" Name="LL_SYSTICK_SetClkSource">
         <Argument AddressOf="false" GenericType="simple" Name="Source"/>
     </LibMethod>
+	    <LibMethod Comment="" Name="LL_APB1_GRP1_EnableClock">
+        <Argument AddressOf="false" GenericType="simple" Name="Periphs"/>
+    </LibMethod>
+	    <LibMethod Comment="" Name="LL_APB1_GRP1_ForceReset">
+        <Argument AddressOf="false" GenericType="simple" Name="Periphs"/>
+    </LibMethod>
+	    <LibMethod Comment="" Name="LL_APB1_GRP1_ReleaseReset">
+        <Argument AddressOf="false" GenericType="simple" Name="Periphs"/>
+    </LibMethod>
+	    <LibMethod Comment="" Name="LL_CRS_SetSyncDivider">
+        <Argument AddressOf="false" GenericType="simple" Name="Divider"/>
+    </LibMethod>
+	    <LibMethod Comment="" Name="LL_CRS_SetSyncPolarity">
+        <Argument AddressOf="false" GenericType="simple" Name="Polarity"/>
+    </LibMethod>
+	    <LibMethod Comment="" Name="LL_CRS_SetSyncSignalSource">
+        <Argument AddressOf="false" GenericType="simple" Name="Source"/>
+    </LibMethod>
+	    <LibMethod Comment="" Name="LL_CRS_SetReloadCounter">
+        <Argument AddressOf="false" GenericType="simple" Name="Value"/>
+    </LibMethod>
+	    <LibMethod Comment="" Name="LL_CRS_SetFreqErrorLimit">
+        <Argument AddressOf="false" GenericType="simple" Name="Value"/>
+    </LibMethod>
+	    <LibMethod Comment="" Name="LL_CRS_SetHSI48SmoothTrimming">
+        <Argument AddressOf="false" GenericType="simple" Name="Value"/>
+    </LibMethod>
     <RefComponent Cclass="HAL" Cgroup="RCC" Cversion="1.5.0">
         <File Category="header" Name="Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_bus.h"/>
         <File Category="header" Name="Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_cortex.h"/>
         <File Category="header" Name="Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_rcc.h"/>
+        <File Category="header" Name="Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_crs.h"/>
         <File Category="header" Name="Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_system.h"/>
         <File Category="header" Name="Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_utils.h"/>
         <File Category="header" Name="Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_ll_utils.c"/> 

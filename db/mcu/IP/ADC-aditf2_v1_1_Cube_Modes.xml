@@ -54,37 +54,22 @@
     	<Condition Diagnostic="" Expression="DiscontinuousConvMode=DISABLE"/>
     </RefParameter>
 	<RefParameter Comment="Number Of Discontinuous Conversions" DefaultValue="1" Max="8" Min="1" Name="NbrOfDiscConversion" Type="integer"/>
-	<RefParameter Comment="External Trigger Conversion Edge" DefaultValue="null" Group="ADCgroup" Name="ExternalTrigConvEdge" Type="list" Visible="false">
-		<Condition Diagnostic="" Expression="($IpNumber=2)&amp;!(Mode=__NULL)&amp;!(TripleMode3)&amp;!(DualMode3)"/>
-	</RefParameter>
-	<!-- -->
-	<!--Regular External trigger should not be available for multiMode -->
-	<RefParameter Comment="External Trigger Conversion Edge" DefaultValue="null" Group="ADCgroup" Name="ExternalTrigConvEdge" Type="list" Visible="false">
-		<Condition Diagnostic="" Expression="($IpNumber=3)&amp;(TripleMode0|TripleMode1|TripleMode_Interl|TripleMode_REGSIMULT | TripleMode_REGSIMULT1)"/>
-	</RefParameter>
-	<RefParameter Comment="External Trigger Conversion Edge" DefaultValue="ADC_EXTERNALTRIGCONVEDGE_NONE" Group="ADCgroup" Name="ExternalTrigConvEdge" Type="list">
-		<PossibleValue Comment="None" Value="ADC_EXTERNALTRIGCONVEDGE_NONE"/>
-		<PossibleValue Comment="Trigger detection on the rising edge" Value="ADC_EXTERNALTRIGCONVEDGE_RISING"/>
-		<PossibleValue Comment="Trigger detection on the falling edge" Value="ADC_EXTERNALTRIGCONVEDGE_FALLING"/>
-		<PossibleValue Comment="Trigger detection on both the rising and falling edges" Value="ADC_EXTERNALTRIGCONVEDGE_RISINGFALLING"/>
-		<Description>Select the external trigger polarity and enable the trigger of a regular group</Description>
+	
+	
+	<RefParameter Comment="External Trigger Conversion Source" DefaultValue="null" Group="ADCgroup" Name="ExternalTrigConv" Type="list" Visible="false">
+		<Condition Diagnostic="" Expression="(($IpNumber=2)&amp;!(Mode=__NULL)&amp;!(TripleMode3)&amp;!(DualMode3))"/>
 	</RefParameter>
 	<RefParameter Comment="External Trigger Conversion Source" DefaultValue="null" Group="ADCgroup" Name="ExternalTrigConv" Type="list" Visible="false">
-		<Condition Diagnostic="" Expression="(ExternalTrigConvEdge=ADC_EXTERNALTRIGCONVEDGE_NONE)|(($IpNumber=2)&amp;!(Mode=__NULL)&amp;!(TripleMode3)&amp;!(DualMode3))"/>
-	</RefParameter>
-	<RefParameter Comment="External Trigger Conversion Source" DefaultValue="null" Group="ADCgroup" Name="ExternalTrigConv" Type="list" Visible="false">
-		<Condition Diagnostic="" Expression="(ExternalTrigConvEdge=ADC_EXTERNALTRIGCONVEDGE_NONE)|(($IpNumber=3)&amp;(TripleMode0|TripleMode1|TripleMode_Interl|TripleMode_REGSIMULT | TripleMode_REGSIMULT1))"/>
+		<Condition Diagnostic="" Expression="(($IpNumber=3)&amp;(TripleMode0|TripleMode1|TripleMode_Interl|TripleMode_REGSIMULT | TripleMode_REGSIMULT1))"/>
 	</RefParameter>
 	<RefParameter Comment="External Trigger Conversion Source" DefaultValue="ADC_EXTERNALTRIGCONV_Ext_IT11" Group="ADCgroup" Name="ExternalTrigConv" Type="list">
-		<Condition Diagnostic="EXTI Line11 is used for External-Trigger-for-Regular-conversion mode." Expression="!(ExternalTrigConvEdge=ADC_EXTERNALTRIGCONVEDGE_NONE)&amp;(RegularExternalTrigger$IpInstance) &amp; !(STM32F7)"/>
+		<Condition Diagnostic="EXTI Line11 is used for External-Trigger-for-Regular-conversion mode." Expression="(RegularExternalTrigger$IpInstance)"/>
 		<PossibleValue Comment="EXTI Line11" Value="ADC_EXTERNALTRIGCONV_Ext_IT11"/>
 	</RefParameter>
-	<RefParameter Comment="External Trigger Conversion Source" DefaultValue="ADC_EXTERNALTRIGCONV_Ext_IT11" Group="ADCgroup" Name="ExternalTrigConv" Type="list">
-		<Condition Diagnostic="EXTI Line11 is used for External-Trigger-for-Regular-conversion mode." Expression="!(ExternalTrigConvEdge=ADC_EXTERNALTRIGCONVEDGE_NONE)&amp;(RegularExternalTrigger$IpInstance)&amp; STM32F7"/>
-		<PossibleValue Comment="EXTI Line11" Value="ADC_EXTERNALTRIGCONV_EXT_IT11"/>
-	</RefParameter>
-	<RefParameter Comment="External Trigger Conversion Source" DefaultValue="ADC_EXTERNALTRIGCONV_T1_CC1" Group="ADCgroup" Name="ExternalTrigConv" Type="list">
+	
+	<RefParameter Comment="External Trigger Conversion Source" DefaultValue="ADC_SOFTWARE_START" Group="ADCgroup" Name="ExternalTrigConv" Type="list">
 	<Condition Diagnostic="" Expression="STM32F7"/>
+	    <PossibleValue  Comment ="Regular Conversion launched by software" Value="ADC_SOFTWARE_START"/>
 		<PossibleValue Action="Remove" Comment="Timer 1 Capture Compare 1 event" Condition="!TIM1_Exist" Diagnostic="" Value="ADC_EXTERNALTRIGCONV_T1_CC1"/>
 		<PossibleValue Action="Remove" Comment="Timer 1 Capture Compare 2 event" Condition="!TIM1_Exist" Diagnostic="" Value="ADC_EXTERNALTRIGCONV_T1_CC2"/>
 		<PossibleValue Action="Remove" Comment="Timer 1 Capture Compare 3 event" Condition="!TIM1_Exist" Diagnostic="" Value="ADC_EXTERNALTRIGCONV_T1_CC3"/>
@@ -92,16 +77,17 @@
 		<PossibleValue Action="Remove" Comment="Timer 5 Trigger Out event" Condition="!TIM5_Exist" Diagnostic="" Value="ADC_EXTERNALTRIGCONV_T5_TRGO"/>
 		<PossibleValue Action="Remove" Comment="Timer 4 Capture Compare 4 event" Condition="!TIM4_Exist" Diagnostic="" Value="ADC_EXTERNALTRIGCONV_T4_CC4"/>
 		<PossibleValue Action="Remove" Comment="Timer 3 Capture Compare 4 event" Condition="!TIM3_Exist" Diagnostic="" Value="ADC_EXTERNALTRIGCONV_T3_CC4"/>
-		<PossibleValue Action="Remove" Comment="Timer 8 Trigger Out event" Condition="!TIM8_Exist" Diagnostic="" Value="ADC_EXTERNALTRIGCONV_T8_TRGO"/>
-		<PossibleValue Action="Remove" Comment="Timer 8 Trigger 2 Out event" Condition="!TIM8_Exist" Diagnostic="" Value="ADC_EXTERNALTRIGCONV_T8_TRGO2"/>
+		<PossibleValue Action="Remove" Comment="Timer 8 Trigger Out event" Condition="!TIM8_Exist|DIE463" Diagnostic="" Value="ADC_EXTERNALTRIGCONV_T8_TRGO"/> <!--not available for DIE463-->
+		<PossibleValue Action="Remove" Comment="Timer 8 Trigger 2 Out event" Condition="!TIM8_Exist|DIE463" Diagnostic="" Value="ADC_EXTERNALTRIGCONV_T8_TRGO2"/>
 		<PossibleValue Action="Remove" Comment="Timer 1 Trigger Out event" Condition="!TIM1_Exist" Diagnostic="" Value="ADC_EXTERNALTRIGCONV_T1_TRGO"/>
 		<PossibleValue Action="Remove" Comment="Timer 1 Trigger 2 Out event" Condition="!TIM1_Exist" Diagnostic="" Value="ADC_EXTERNALTRIGCONV_T1_TRGO2"/>
 		<PossibleValue Action="Remove" Comment="Timer 2 Trigger Out event" Condition="!TIM2_Exist" Diagnostic="" Value="ADC_EXTERNALTRIGCONV_T2_TRGO"/>
 		<PossibleValue Action="Remove" Comment="Timer 4 Trigger Out event" Condition="!TIM4_Exist" Diagnostic="" Value="ADC_EXTERNALTRIGCONV_T4_TRGO"/>
-		<PossibleValue Action="Remove" Comment="Timer 6 Trigger Out event" Condition="!TIM6_Exist" Diagnostic="" Value="ADC_EXTERNALTRIGCONV_T6_TRGO"/>
+		<PossibleValue Action="Remove" Comment="Timer 6 Trigger Out event" Condition="!TIM6_Exist|DIE463" Diagnostic="" Value="ADC_EXTERNALTRIGCONV_T6_TRGO"/>
 		<Description>Select the external event used to trigger the start of conversion of a regular group</Description>
 	</RefParameter>
-	<RefParameter Comment="External Trigger Conversion Source" DefaultValue="ADC_EXTERNALTRIGCONV_T1_CC1" Group="ADCgroup" Name="ExternalTrigConv" Type="list">
+	<RefParameter Comment="External Trigger Conversion Source" DefaultValue="ADC_SOFTWARE_START" Group="ADCgroup" Name="ExternalTrigConv" Type="list">
+    	<PossibleValue  Comment ="Regular Conversion launched by software" Value="ADC_SOFTWARE_START"/>
 		<PossibleValue Action="Remove" Comment="Timer 1 Capture Compare 1 event" Condition="!TIM1_Exist" Diagnostic="" Value="ADC_EXTERNALTRIGCONV_T1_CC1"/>
 		<PossibleValue Action="Remove" Comment="Timer 1 Capture Compare 2 event" Condition="!TIM1_Exist" Diagnostic="" Value="ADC_EXTERNALTRIGCONV_T1_CC2"/>
 		<PossibleValue Action="Remove" Comment="Timer 1 Capture Compare 3 event" Condition="!TIM1_Exist" Diagnostic="" Value="ADC_EXTERNALTRIGCONV_T1_CC3"/>
@@ -115,10 +101,31 @@
 		<PossibleValue Action="Remove" Comment="Timer 5 Capture Compare 1 event" Condition="!TIM5_Exist" Diagnostic="" Value="ADC_EXTERNALTRIGCONV_T5_CC1"/>
 		<PossibleValue Action="Remove" Comment="Timer 5 Capture Compare 2 event" Condition="!TIM5_Exist" Diagnostic="" Value="ADC_EXTERNALTRIGCONV_T5_CC2"/>
 		<PossibleValue Action="Remove" Comment="Timer 5 Capture Compare 3 event" Condition="!TIM5_Exist" Diagnostic="" Value="ADC_EXTERNALTRIGCONV_T5_CC3"/>
-		<PossibleValue Action="Remove" Comment="Timer 8 Capture Compare 1 event" Condition="!TIM8_Exist" Diagnostic="" Value="ADC_EXTERNALTRIGCONV_T8_CC1"/>
-		<PossibleValue Action="Remove" Comment="Timer 8 Trigger Out event" Condition="!TIM8_Exist" Diagnostic="" Value="ADC_EXTERNALTRIGCONV_T8_TRGO"/>
+		<PossibleValue Action="Remove" Comment="Timer 8 Capture Compare 1 event" Condition="!TIM8_Exist|DIE463" Diagnostic="" Value="ADC_EXTERNALTRIGCONV_T8_CC1"/>
+		<PossibleValue Action="Remove" Comment="Timer 8 Trigger Out event" Condition="!TIM8_Exist|DIE463" Diagnostic="" Value="ADC_EXTERNALTRIGCONV_T8_TRGO"/>
 		<Description>Select the external event used to trigger the start of conversion of a regular group</Description>
 	</RefParameter>
+	
+	<RefParameter Comment="External Trigger Conversion Edge" DefaultValue="null" Group="ADCgroup" Name="ExternalTrigConvEdge" Type="list" Visible="false">
+		<Condition Diagnostic="" Expression="($IpNumber=2)&amp;!(Mode=__NULL)&amp;!(TripleMode3)&amp;!(DualMode3)"/>
+	</RefParameter>
+	<RefParameter Comment="External Trigger Conversion Edge" DefaultValue="null" Group="ADCgroup" Name="ExternalTrigConvEdge" Type="list" Visible="false">
+		<Condition Diagnostic="" Expression="($IpNumber=3)&amp;(TripleMode0|TripleMode1|TripleMode_Interl|TripleMode_REGSIMULT | TripleMode_REGSIMULT1)"/>
+	</RefParameter>
+	
+	<RefParameter Comment="External Trigger Conversion Edge" DefaultValue="ADC_EXTERNALTRIGCONVEDGE_NONE" Group="ADCgroup" Name="ExternalTrigConvEdge" Type="list">
+	<Condition Diagnostic="" Expression="ExternalTrigConv = ADC_SOFTWARE_START"/>
+		<PossibleValue Comment="None" Value="ADC_EXTERNALTRIGCONVEDGE_NONE"/>
+		<Description>Select the external trigger polarity and enable the trigger of a regular group</Description>
+	</RefParameter>
+	
+	<RefParameter Comment="External Trigger Conversion Edge" DefaultValue="ADC_EXTERNALTRIGCONVEDGE_RISING" Group="ADCgroup" Name="ExternalTrigConvEdge" Type="list">
+		<PossibleValue Comment="Trigger detection on the rising edge" Value="ADC_EXTERNALTRIGCONVEDGE_RISING"/>
+		<PossibleValue Comment="Trigger detection on the falling edge" Value="ADC_EXTERNALTRIGCONVEDGE_FALLING"/>
+		<PossibleValue Comment="Trigger detection on both the rising and falling edges" Value="ADC_EXTERNALTRIGCONVEDGE_RISINGFALLING"/>
+		<Description>Select the external trigger polarity and enable the trigger of a regular group</Description>
+	</RefParameter>
+	
 	<!-- DataAlign -->
 	<RefParameter Comment="Data Alignment" DefaultValue="ADC_DATAALIGN_RIGHT" Group="ADCgroup" Name="DataAlign" Type="list">
 		<PossibleValue Comment="Right alignment" Value="ADC_DATAALIGN_RIGHT"/>
@@ -275,32 +282,14 @@
 		<PossibleValue Comment="480 Cycles" Value="ADC_SAMPLETIME_480CYCLES"/>
 		<Description>Injected Channel x sampling time selection</Description>
 	</RefParameter>
-	<RefParameter Comment="External Trigger Edge" DefaultValue="null" Group="ADCgroup" Name="ExternalTrigInjecConvEdge" Type="list" Visible="false">
-		<Condition Diagnostic="" Expression="InjNumberOfConversion=0"/>
-	</RefParameter>
+	
+	
+	
 	<RefParameter Comment="Offset" DefaultValue="null" Group="ADCChannel" Max="2047" Min="0" Name="Offset" Type="integer">
 		<Description>Data offset for regular channel </Description>	
 	</RefParameter>
-	<RefParameter Comment="External Trigger Edge" DefaultValue="null" Group="ADCgroup" Name="ExternalTrigInjecConvEdge" Type="list" Visible="false">
-		<Condition Diagnostic="" Expression="($IpNumber=2)&amp;!(Mode=__NULL)"/>
-	</RefParameter>
-	<RefParameter Comment="External Trigger Edge" DefaultValue="null" Group="ADCgroup" Name="ExternalTrigInjecConvEdge" Type="list" Visible="false">
-		<Condition Diagnostic="" Expression="($IpNumber=3)&amp;(TripleMode|TripleMode_REGSIMULT|TripleMode0|TripleMode_REGSIMULT1| TripleMode1| TripleMode_REGSIMULT |TripleMode_Interl |TripleMode3)"/>
-	</RefParameter>
-	<RefParameter Comment="External Trigger Edge" DefaultValue="ADC_EXTERNALTRIGINJECCONVEDGE_NONE" Group="ADCgroup" Name="ExternalTrigInjecConvEdge" Type="list" Visible="true">
-		<Condition Diagnostic="" Expression="AutoInjected_$IpInstance &amp;!(InjNumberOfConversion=0)"/>
-		<PossibleValue Comment="None" Value="ADC_EXTERNALTRIGINJECCONVEDGE_NONE"/>
-	</RefParameter>
-	<RefParameter Comment="External Trigger Edge" DefaultValue="ADC_EXTERNALTRIGINJECCONVEDGE_NONE" Group="ADCgroup" Name="ExternalTrigInjecConvEdge" Type="list">
-		<PossibleValue Comment="None" Value="ADC_EXTERNALTRIGINJECCONVEDGE_NONE"/>
-		<PossibleValue Comment="Trigger detection on the rising edge" Value="ADC_EXTERNALTRIGINJECCONVEDGE_RISING"/>
-		<PossibleValue Comment="Trigger detection on the falling edge" Value="ADC_EXTERNALTRIGINJECCONVEDGE_FALLING"/>
-		<PossibleValue Comment="Trigger detection on both the rising and falling edges" Value="ADC_EXTERNALTRIGINJECCONVEDGE_RISINGFALLING"/>
-		<Description>Select the external trigger polarity and enable the trigger of a injected group</Description>
-	</RefParameter>
-	<RefParameter Comment="External Trigger Source" DefaultValue="null" Group="ADCgroup" Name="ExternalTrigInjecConv" Type="list" Visible="false">
-		<Condition Diagnostic="External Trigger mode is selected" Expression="(ExternalTrigInjecConvEdge=ADC_EXTERNALTRIGINJECCONVEDGE_NONE)"/>
-	</RefParameter>
+	
+	
 	<RefParameter Comment="External Trigger Source" DefaultValue="null" Group="ADCgroup" Name="ExternalTrigInjecConv" Type="list" Visible="false">
 		<Condition Diagnostic="External Trigger mode is selected" Expression="($IpNumber=2)&amp;!(Mode=__NULL)"/>
 	</RefParameter>
@@ -310,13 +299,18 @@
 	<RefParameter Comment="External Trigger Source" DefaultValue="null" Group="ADCgroup" Name="ExternalTrigInjecConv" Type="list" Visible="false">
 		<Condition Diagnostic="not available only for master instance" Expression="(InjNumberOfConversion=0)"/>
 	</RefParameter>
-	<RefParameter Comment="External Trigger Source" DefaultValue="ADC_EXTERNALTRIGINJECCONV_T1_CC4" Group="ADCgroup" Name="ExternalTrigInjecConv" Type="list">
-		<Condition Diagnostic="" Expression="!(ExternalTrigInjecConvEdge=ADC_EXTERNALTRIGINJECCONVEDGE_NONE)&amp;(InjectedExternalTrigger$IpInstance)&amp;!(STM32F7)"/>
+	<RefParameter Comment="External Trigger Source" DefaultValue="ADC_EXTERNALTRIGINJECCONV_EXT_IT15" Group="ADCgroup" Name="ExternalTrigInjecConv" Type="list">
+		<Condition Diagnostic="" Expression="!(AutoInjected_$IpInstance) &amp;(InjectedExternalTrigger$IpInstance)&amp;!(STM32F7)"/>
 		<PossibleValue Comment="EXTI line15" Value="ADC_EXTERNALTRIGINJECCONV_EXT_IT15"/>
 		<Description>EXTI Line15 is used for External-Trigger-for-Injected-conversion mode</Description>
 	</RefParameter>
-	<RefParameter Comment="External Trigger Source" DefaultValue="ADC_EXTERNALTRIGINJECCONV_T1_TRGO" Group="ADCgroup" Name="ExternalTrigInjecConv" Type="list">
+	<RefParameter Comment="External Trigger Source" DefaultValue="__NULL" Group="ADCgroup" Name="ExternalTrigInjecConv" Type="list" >
+		<Condition Diagnostic="" Expression="(AutoInjected_$IpInstance)"/>
+		<PossibleValue Comment="External Trigger on injected channels are disabled (Auto-injection mode selected)" Value="ADC_INJECTED_SOFTWARE_START"/>
+	</RefParameter>
+	<RefParameter Comment="External Trigger Source" DefaultValue="ADC_INJECTED_SOFTWARE_START" Group="ADCgroup" Name="ExternalTrigInjecConv" Type="list">
 		<Condition Diagnostic="" Expression="STM32F7"/>
+		<PossibleValue Comment="Injected Conversion launched by software" Value="ADC_INJECTED_SOFTWARE_START"/>
     	<PossibleValue Action="Remove" Comment="Timer 1 Trigger Out event" Condition="!TIM1_Exist" Diagnostic="" Value="ADC_EXTERNALTRIGINJECCONV_T1_TRGO"/>
 		<PossibleValue Action="Remove" Comment="Timer 1 Capture Compare 4 event" Condition="!TIM1_Exist" Diagnostic="" Value="ADC_EXTERNALTRIGINJECCONV_T1_CC4"/>
 		<PossibleValue Action="Remove" Comment="Timer 2 Trigger Out event" Condition="!TIM2_Exist" Diagnostic="" Value="ADC_EXTERNALTRIGINJECCONV_T2_TRGO"/>
@@ -325,15 +319,16 @@
 		<PossibleValue Action="Remove" Comment="Timer 4 Trigger Out event" Condition="!TIM4_Exist" Diagnostic="" Value="ADC_EXTERNALTRIGINJECCONV_T4_TRGO"/>
 		<PossibleValue Action="Remove" Comment="Timer 8 Capture Compare 4 event" Condition="!TIM8_Exist" Diagnostic="" Value="ADC_EXTERNALTRIGINJECCONV_T8_CC4"/>
 		<PossibleValue Action="Remove" Comment="Timer 1 Trigger 2 Out event" Condition="!TIM1_Exist" Diagnostic="" Value="ADC_EXTERNALTRIGINJECCONV_T1_TRGO2"/>
-		<PossibleValue Action="Remove" Comment="Timer 8 Trigger Out event" Condition="!TIM8_Exist" Diagnostic="" Value="ADC_EXTERNALTRIGINJECCONV_T8_TRGO"/>
-		<PossibleValue Action="Remove" Comment="Timer 8 Trigger 2 Out event" Condition="!TIM8_Exist" Diagnostic="" Value="ADC_EXTERNALTRIGINJECCONV_T8_TRGO2"/>
+		<PossibleValue Action="Remove" Comment="Timer 8 Trigger Out event" Condition="!TIM8_Exist|DIE463" Diagnostic="" Value="ADC_EXTERNALTRIGINJECCONV_T8_TRGO"/>
+		<PossibleValue Action="Remove" Comment="Timer 8 Trigger 2 Out event" Condition="!TIM8_Exist|DIE463" Diagnostic="" Value="ADC_EXTERNALTRIGINJECCONV_T8_TRGO2"/>
 		<PossibleValue Action="Remove" Comment="Timer 3 Capture Compare 3 event" Condition="!TIM3_Exist" Diagnostic="" Value="ADC_EXTERNALTRIGINJECCONV_T3_CC3"/>	
 		<PossibleValue Action="Remove" Comment="Timer 5 Trigger Out event" Condition="!TIM5_Exist" Diagnostic="" Value="ADC_EXTERNALTRIGINJECCONV_T5_TRGO"/>
 		<PossibleValue Action="Remove" Comment="Timer 3 Capture Compare 1 event" Condition="!TIM3_Exist" Diagnostic="" Value="ADC_EXTERNALTRIGINJECCONV_T3_CC1"/>
-		<PossibleValue Action="Remove" Comment="Timer 6 Trigger Out event" Condition="!TIM6_Exist" Diagnostic="" Value="ADC_EXTERNALTRIGINJECCONV_T6_TRGO"/>
+		<PossibleValue Action="Remove" Comment="Timer 6 Trigger Out event" Condition="!TIM6_Exist|DIE463" Diagnostic="" Value="ADC_EXTERNALTRIGINJECCONV_T6_TRGO"/>
 		<Description>Select the external event used to trigger the start of conversion of an injected group</Description>
 	</RefParameter>
-	<RefParameter Comment="External Trigger Source" DefaultValue="ADC_EXTERNALTRIGINJECCONV_T1_CC4" Group="ADCgroup" Name="ExternalTrigInjecConv" Type="list">
+	<RefParameter Comment="External Trigger Source" DefaultValue="ADC_INJECTED_SOFTWARE_START" Group="ADCgroup" Name="ExternalTrigInjecConv" Type="list">
+		<PossibleValue Comment="Injected Conversion launched by software" Value="ADC_INJECTED_SOFTWARE_START"/>
 		<PossibleValue Action="Remove" Comment="Timer 1 Capture Compare 4 event" Condition="!TIM1_Exist" Diagnostic="" Value="ADC_EXTERNALTRIGINJECCONV_T1_CC4"/>
 		<PossibleValue Action="Remove" Comment="Timer 1 Trigger Out event" Condition="!TIM1_Exist" Diagnostic="" Value="ADC_EXTERNALTRIGINJECCONV_T1_TRGO"/>
 		<PossibleValue Action="Remove" Comment="Timer 2 Capture Compare 1 event" Condition="!TIM2_Exist" Diagnostic="" Value="ADC_EXTERNALTRIGINJECCONV_T2_CC1"/>
@@ -346,11 +341,35 @@
 		<PossibleValue Action="Remove" Comment="Timer 4 Trigger Out event" Condition="!TIM4_Exist" Diagnostic="" Value="ADC_EXTERNALTRIGINJECCONV_T4_TRGO"/>
 		<PossibleValue Action="Remove" Comment="Timer 5 Capture Compare 4 event" Condition="!TIM5_Exist" Diagnostic="" Value="ADC_EXTERNALTRIGINJECCONV_T5_CC4"/>
 		<PossibleValue Action="Remove" Comment="Timer 5 Trigger Out event" Condition="!TIM5_Exist" Diagnostic="" Value="ADC_EXTERNALTRIGINJECCONV_T5_TRGO"/>
-		<PossibleValue Action="Remove" Comment="Timer 8 Capture Compare 2 event" Condition="!TIM8_Exist" Diagnostic="" Value="ADC_EXTERNALTRIGINJECCONV_T8_CC2"/>
-		<PossibleValue Action="Remove" Comment="Timer 8 Capture Compare 3 event" Condition="!TIM8_Exist" Diagnostic="" Value="ADC_EXTERNALTRIGINJECCONV_T8_CC3"/>
-		<PossibleValue Action="Remove" Comment="Timer 8 Capture Compare 4 event" Condition="!TIM8_Exist" Diagnostic="" Value="ADC_EXTERNALTRIGINJECCONV_T8_CC4"/>
+		<PossibleValue Action="Remove" Comment="Timer 8 Capture Compare 2 event" Condition="!TIM8_Exist|DIE463" Diagnostic="" Value="ADC_EXTERNALTRIGINJECCONV_T8_CC2"/>
+		<PossibleValue Action="Remove" Comment="Timer 8 Capture Compare 3 event" Condition="!TIM8_Exist|DIE463" Diagnostic="" Value="ADC_EXTERNALTRIGINJECCONV_T8_CC3"/>
+		<PossibleValue Action="Remove" Comment="Timer 8 Capture Compare 4 event" Condition="!TIM8_Exist|DIE463" Diagnostic="" Value="ADC_EXTERNALTRIGINJECCONV_T8_CC4"/>
 		<Description>Select the external event used to trigger the start of conversion of an injected group</Description>
 	</RefParameter>
+	
+	
+	<RefParameter Comment="External Trigger Edge" DefaultValue="null" Group="ADCgroup" Name="ExternalTrigInjecConvEdge" Type="list" Visible="false">
+		<Condition Diagnostic="" Expression="(InjNumberOfConversion = 0) | (($IpNumber=2)&amp;!(Mode=__NULL))"/>
+	</RefParameter>
+	<RefParameter Comment="External Trigger Edge" DefaultValue="null" Group="ADCgroup" Name="ExternalTrigInjecConvEdge" Type="list" Visible="false">
+		<Condition Diagnostic="" Expression="($IpNumber=3)&amp;(TripleMode|TripleMode_REGSIMULT|TripleMode0|TripleMode_REGSIMULT1| TripleMode1| TripleMode_REGSIMULT |TripleMode_Interl |TripleMode3)"/>
+	</RefParameter>
+	<RefParameter Comment="External Trigger Edge" DefaultValue="ADC_EXTERNALTRIGINJECCONVEDGE_NONE" Group="ADCgroup" Name="ExternalTrigInjecConvEdge" Type="list" Visible="true">
+		<Condition Diagnostic="" Expression="AutoInjected_$IpInstance &amp;!(InjNumberOfConversion=0)"/>
+		<PossibleValue Comment="None" Value="ADC_EXTERNALTRIGINJECCONVEDGE_NONE"/>
+	</RefParameter>
+	<RefParameter Comment="External Trigger Edge" DefaultValue="ADC_EXTERNALTRIGINJECCONVEDGE_NONE" Group="ADCgroup" Name="ExternalTrigInjecConvEdge" Type="list">
+	    <Condition Diagnostic="" Expression="ExternalTrigInjecConv = ADC_INJECTED_SOFTWARE_START"/>
+		<PossibleValue Comment="None" Value="ADC_EXTERNALTRIGINJECCONVEDGE_NONE"/>
+		<Description>Select the external trigger polarity and enable the trigger of a injected group</Description>
+	</RefParameter>
+	<RefParameter Comment="External Trigger Edge" DefaultValue="ADC_EXTERNALTRIGINJECCONVEDGE_RISING" Group="ADCgroup" Name="ExternalTrigInjecConvEdge" Type="list">
+		<PossibleValue Comment="Trigger detection on the rising edge" Value="ADC_EXTERNALTRIGINJECCONVEDGE_RISING"/>
+		<PossibleValue Comment="Trigger detection on the falling edge" Value="ADC_EXTERNALTRIGINJECCONVEDGE_FALLING"/>
+		<PossibleValue Comment="Trigger detection on both the rising and falling edges" Value="ADC_EXTERNALTRIGINJECCONVEDGE_RISINGFALLING"/>
+		<Description>Select the external trigger polarity and enable the trigger of a injected group</Description>
+	</RefParameter>
+	
 	
 	<RefParameter Comment="Mode" DefaultValue="__NULL" Group="ADCsgroup" Name="Mode" Type="list">
 		<Condition Diagnostic="All mode are available if ADC1, ADC2 and ADC3 are used" Expression="USE_ADC1&amp;USE_ADC2&amp;USE_ADC3&amp;(ADC1:InjNumberOfConversion=0)&amp;(ADC2:InjNumberOfConversion=0)&amp;(ADC3:InjNumberOfConversion=0)"/>
@@ -703,14 +722,14 @@
 	</RefMode>
 	<RefMode Abstract="true" Comment="Regular Conversion Settings" Group="ADC_Regular_ConversionMode" Name="ADC_Regular_ConversionMode">
 		<Parameter Name="NbrOfConversionFlag"/>
-		<Parameter Name="NbrOfConversion"/>
-		<Parameter Name="ExternalTrigConvEdge"/>
+		<Parameter Name="NbrOfConversion"/>	
 		<Parameter Name="ExternalTrigConv"/>
+		<Parameter Name="ExternalTrigConvEdge"/>
 	</RefMode>
 	<RefMode Abstract="true" Comment="Injected Conversion Settings" Group="ADC_Injected_ConversionMode" Name="ADC_Injected_ConversionMode">
 		<Parameter Name="InjNumberOfConversion"/>
-		<Parameter Name="ExternalTrigInjecConvEdge"/>
 		<Parameter Name="ExternalTrigInjecConv"/>
+		<Parameter Name="ExternalTrigInjecConvEdge"/>
 		<Parameter Name="InjectedConvMode"/>
 		<Parameter Name="AutoInjectedConv"/>
 		<Parameter Name="InjectedDiscontinuousConvMode"/>

@@ -193,8 +193,8 @@
  
    
     <RefParameter Comment="RTC Clock Selection" DefaultValue="+RTCClockSelectionVirtualString" IP="RTC,LCD" Name="RTCClockSelection" Type="list" Visible="false">
-        <PossibleValue Comment="Rtcclksource Lse" Value="RCC_RTCCLKSOURCE_LSE"/>
-        <PossibleValue Comment="Rtcclksource Lsi" Value="RCC_RTCCLKSOURCE_LSI"/>
+        <PossibleValue Comment="Rtcclksource Lse" Value="RCC_RTCCLKSOURCE_LSE" Semaphore="SEMAPHORE_LSE_SELECTED"/>
+        <PossibleValue Comment="Rtcclksource Lsi" Value="RCC_RTCCLKSOURCE_LSI" Semaphore="SEMAPHORE_LSI_SELECTED"/>
         <PossibleValue Comment="Rtcclksource Hse Div2" Value="RCC_RTCCLKSOURCE_HSE_DIV2"/>
         <PossibleValue Comment="Rtcclksource Hse Div4" Value="RCC_RTCCLKSOURCE_HSE_DIV4"/>
         <PossibleValue Comment="Rtcclksource Hse Div8" Value="RCC_RTCCLKSOURCE_HSE_DIV8"/>
@@ -297,11 +297,11 @@
     <RefParameter Comment="System clock" DefaultValue="2097000" Display="value/1000000" Max="32000000" Name="SYSCLKFreq_VALUE" Type="double" Unit="MHz" Visible="false"/>
     <RefParameter Comment="HCLK" DefaultValue="2097000" Display="value/1000000" Name="AHBFreq_Value" Type="double" Unit="MHz" Visible="false"/>
     <RefParameter Comment="HCLK" DefaultValue="2097000" Display="value/1000000" IP="DMA-2D,CAMERAITF" Max="32000000" Name="HCLKFreq_Value" Type="double" Unit="MHz" Visible="false"/>
-    <RefParameter Comment="RTC clock" DefaultValue="32000" Display="value/1000" IP="RTC" Max="1000000" Min="1000000" Name="RTCFreq_Value" Type="double" Unit="KHz" Visible="false">
+    <RefParameter Comment="RTC clock" DefaultValue="32000" Display="value/1000" IP="RTC" Max="1000000" Min="0" Name="RTCFreq_Value" Type="double" Unit="KHz" Visible="false">
         <Condition Diagnostic="RTC Has HSE as source" Expression="(!(RTCClockSelection=RCC_RTCCLKSOURCE_LSE)&amp;!(RTCClockSelection=RCC_RTCCLKSOURCE_LSI)&amp; (RTCEnable=true))"/>
     </RefParameter>
     <RefParameter Comment="RTC clock" DefaultValue="37000" Display="value/1000" IP="RTC" Name="RTCFreq_Value" Type="double" Unit="KHz" Visible="false"/>
-    <RefParameter Comment="RTC Clock Source_HSEDiv" DefaultValue="12500000" Display="value/1000000" Max="1000000" Min="1000000" Name="RTCHSEDivFreq_Value" Type="double" Unit="MHz" Visible="false"/>
+    <RefParameter Comment="RTC Clock Source_HSEDiv" DefaultValue="12500000" Display="value/1000000" Max="1000000" Min="0" Name="RTCHSEDivFreq_Value" Type="double" Unit="MHz" Visible="false"/>
     <RefParameter Comment="LCD clock" DefaultValue="32000" Display="value/1000" IP="LCD" Max="1000000" Min="1000000" Name="LCDFreq_Value" Type="double" Unit="KHz" Visible="false">
         <Condition Diagnostic="RTC Has HSE as source" Expression="(!(RTCClockSelection=RCC_RTCCLKSOURCE_LSE)&amp;!(RTCClockSelection=RCC_RTCCLKSOURCE_LSI)&amp; (LCDEnable=true))"/>
     </RefParameter>   
@@ -726,7 +726,7 @@
         <PossibleValue Comment="" Value=""/>
     </RefParameter>
     <RefParameter Comment="HSE used flag" DefaultValue="1" Max="1" Min="1" Name="HSEUsed" Type="integer" Visible="false">
-        <Condition Diagnostic="SYSCLK source OR PLL source OR RTC source OR MCO1 source OR MCO2 source" Expression="(SEM2RCC_HSE_REQUIRED_TIM21&amp; TIM21 &amp; Semaphore_input_Channel1TIM21)|((RTCUsed_ForRCC|LCDUsed_ForRCC)&amp;!((RTCClockSelection=RCC_RTCCLKSOURCE_LSE)|(RTCClockSelection=RCC_RTCCLKSOURCE_LSI)))|((PLLHSE) &amp; (PLLUsed=1))|(SYSCLKSource=RCC_SYSCLKSOURCE_HSE)|((RCC_MCOSource=RCC_MCO1SOURCE_HSE)&amp;((SEM2RCC_MCO_REQUIRED_TIM21 &amp; TIM21 &amp; Semaphore_input_Channel1TIM21)|MCOConfig))"/>
+        <Condition Diagnostic="SYSCLK source OR PLL source OR RTC source OR MCO1 source OR MCO2 source" Expression="(SEM2RCC_HSE_REQUIRED_TIM21&amp; TIM21 &amp; Semaphore_input_Channel1TIM21)|((RTCUsed_ForRCC|LCDUsed_ForRCC)&amp;!(SEMAPHORE_LSE_SELECTED | SEMAPHORE_LSI_SELECTED))|((PLLHSE) &amp; (PLLUsed=1))|(SYSCLKSource=RCC_SYSCLKSOURCE_HSE)|((RCC_MCOSource=RCC_MCO1SOURCE_HSE)&amp;((SEM2RCC_MCO_REQUIRED_TIM21 &amp; TIM21 &amp; Semaphore_input_Channel1TIM21)|MCOConfig))"/>
     </RefParameter>
     <RefParameter Comment="HSE Is Used" DefaultValue="0" Min="0" Name="HSEUsed" Type="integer" Visible="false"/>
     <RefParameter Comment="Hse State" DefaultValue="RCC_HSE_BYPASS" Name="HSEState" Type="list" Visible="false">
@@ -748,7 +748,7 @@
         <PossibleValue Comment="LSE" Value="RCC_OSCILLATORTYPE_LSE"/>
     </RefParameter>
     <RefParameter Comment="LSE Is Used" DefaultValue="1" Min="1" Name="LSEUsed" Type="integer" Visible="false">
-        <Condition Diagnostic="LSE is used if " Expression="((Semaphore_ClockSourceETRMode2TIM2|Semaphore_TriggerSourceETRTIM2|Semaphore_ETRasClearingSourceTIM2) &amp; TIM2 &amp; SEM2RCC_LSE_REQUIRED_TIM2)|((Semaphore_ClockSourceETRMode2TIM22|Semaphore_TriggerSourceETRTIM22|Semaphore_ETRasClearingSourceTIM22) &amp; TIM22 &amp; SEM2RCC_LSE_REQUIRED_TIM22)|((Semaphore_ClockSourceETRMode2TIM21|Semaphore_TriggerSourceETRTIM21|Semaphore_ETRasClearingSourceTIM21) &amp; TIM21 &amp; SEM2RCC_LSE_REQUIRED_TIM21)|(SEM2RCC_LSE_REQUIRED_TIM21 &amp; TIM21 &amp; Semaphore_input_Channel1TIM21)|(CRSActivatedSourceLSE |(USART1Used_ForRCC &amp;(Usart1ClockSelection=RCC_USART1CLKSOURCE_LSE))|(USART2Used_ForRCC &amp;(Usart2ClockSelection=RCC_USART2CLKSOURCE_LSE))|(LPTIMUsed_ForRCC &amp; LPTIMSOURCELSE)|(LPUARTUsed_ForRCC &amp; LPUART1SourceLSE)|(RCC_MCOSource=RCC_MCO1SOURCE_LSE)&amp; ((SEM2RCC_MCO_REQUIRED_TIM21 &amp; TIM21 &amp; Semaphore_input_Channel1TIM21)|MCOConfig))|((RTCClockSelection=RCC_RTCCLKSOURCE_LSE) &amp;(RTCUsed_ForRCC|LCDUsed_ForRCC) )"/>
+        <Condition Diagnostic="LSE is used if " Expression="((Semaphore_ClockSourceETRMode2TIM2|Semaphore_TriggerSourceETRTIM2|Semaphore_ETRasClearingSourceTIM2) &amp; TIM2 &amp; SEM2RCC_LSE_REQUIRED_TIM2)|((Semaphore_ClockSourceETRMode2TIM22|Semaphore_TriggerSourceETRTIM22|Semaphore_ETRasClearingSourceTIM22) &amp; TIM22 &amp; SEM2RCC_LSE_REQUIRED_TIM22)|((Semaphore_ClockSourceETRMode2TIM21|Semaphore_TriggerSourceETRTIM21|Semaphore_ETRasClearingSourceTIM21) &amp; TIM21 &amp; SEM2RCC_LSE_REQUIRED_TIM21)|(SEM2RCC_LSE_REQUIRED_TIM21 &amp; TIM21 &amp; Semaphore_input_Channel1TIM21)|(CRSActivatedSourceLSE |(USART1Used_ForRCC &amp;(Usart1ClockSelection=RCC_USART1CLKSOURCE_LSE))|(USART2Used_ForRCC &amp;(Usart2ClockSelection=RCC_USART2CLKSOURCE_LSE))|(LPTIMUsed_ForRCC &amp; LPTIMSOURCELSE)|(LPUARTUsed_ForRCC &amp; LPUART1SourceLSE)|(RCC_MCOSource=RCC_MCO1SOURCE_LSE)&amp; ((SEM2RCC_MCO_REQUIRED_TIM21 &amp; TIM21 &amp; Semaphore_input_Channel1TIM21)|MCOConfig))|(SEMAPHORE_LSE_SELECTED &amp;(RTCUsed_ForRCC|LCDUsed_ForRCC) )"/>
     </RefParameter>
     <RefParameter Comment="LSE Is Used" DefaultValue="0" Min="0" Name="LSEUsed" Type="integer" Visible="false"/>
     <RefParameter Comment="Lse State" DefaultValue="RCC_LSE_BYPASS" Name="LSEState" Type="list" Visible="false">
@@ -774,7 +774,7 @@
         <PossibleValue Comment="LSI" Value="RCC_OSCILLATORTYPE_LSI"/>
     </RefParameter>
     <RefParameter Comment="LSI used flag" DefaultValue="1" Max="1" Min="1" Name="LSIUsed" Type="integer" Visible="false">
-        <Condition Diagnostic="" Expression="(SEM2RCC_LSI_REQUIRED_TIM21 &amp; TIM21 &amp; Semaphore_input_Channel1TIM21)|((LPTIMUsed_ForRCC &amp; LPTIMSOURCELSI)|IWDGUsed_ForRCC|(USART1Used_ForRCC &amp;(Usart1ClockSelection=RCC_USART1CLKSOURCE_LSI))|((RTCClockSelection=RCC_RTCCLKSOURCE_LSI)&amp;(RTCUsed_ForRCC|LCDUsed_ForRCC))|((RCC_MCOSource=RCC_MCO1SOURCE_LSI)&amp;((SEM2RCC_MCO_REQUIRED_TIM21 &amp; TIM21 &amp; Semaphore_input_Channel1TIM21)|MCOConfig)))"/>
+        <Condition Diagnostic="" Expression="(SEM2RCC_LSI_REQUIRED_TIM21 &amp; TIM21 &amp; Semaphore_input_Channel1TIM21)|((LPTIMUsed_ForRCC &amp; LPTIMSOURCELSI)|IWDGUsed_ForRCC|(USART1Used_ForRCC &amp;(Usart1ClockSelection=RCC_USART1CLKSOURCE_LSI))|(SEMAPHORE_LSI_SELECTED &amp;(RTCUsed_ForRCC|LCDUsed_ForRCC))|((RCC_MCOSource=RCC_MCO1SOURCE_LSI)&amp;((SEM2RCC_MCO_REQUIRED_TIM21 &amp; TIM21 &amp; Semaphore_input_Channel1TIM21)|MCOConfig)))"/>
     </RefParameter>
     <RefParameter Comment="LSI used flag" DefaultValue="0" Max="0" Min="0" Name="LSIUsed" Type="integer" Visible="false"/>
     <RefParameter Comment="Lsi State" DefaultValue="RCC_LSI_OFF" Name="LSIState" Type="list" Visible="false">
