@@ -1,0 +1,295 @@
+﻿<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<IP xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance"
+	ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd"
+	xmlns="http://mcd.rou.st.com/modules.php?name=mcu"
+	DBVersion="V4.0"
+	IPType="middleware"
+	IpGroup="Middleware"
+	Name="LIBJPEG"
+	Version="v8.0.0_Cube">
+	<About>LIBJPEG: C library for reading and writing JPEG image files</About>
+	
+	<!-- RefParameters for LIBJPEG -->
+
+	<!-- RefParameters for LIBJPEG - Version-->
+	<RefParameter Name="LIBJPEG_version" Comment="LIBJPEG version" DefaultValue="8d" Type="String" Group="Version" TabName="Config parameters" Mode="Basic">
+	    <PossibleValue Comment="Current version of LibJPEG" Value="8d"/>
+	</RefParameter>
+	
+	<!-- File Manager types configuration -->
+	<RefParameter Name="LIBJPEG_FS_type" Comment="Data Stream management type" DefaultValue="FatFS" Type="list" Group="MW configuration" TabName="Config parameters" Mode="Basic">
+		<Condition Diagnostic="" Expression="S_FATFS_ENABLED &amp; (FATFS:_FS_READONLY=0)"/>
+		<PossibleValue Comment="FatFS" Value="FatFS" Semaphore="S_LIBJPEG_FSTYPE_FATFS"/>
+		<PossibleValue Comment="Stdio" Value="Stdio"/>
+		<PossibleValue Comment="None" Value="NoFS"/>
+		<Description>Default Value : FatFS&lt;br&gt;This parameter specifies the type of data manager used for compressed data storage (source and destination) when the "stream" data management Api is used :&lt;br&gt;-FatFS : FatFS File system&lt;br&gt;-Stdio : standard "stdio" stream manager&lt;br&gt;-None : No file system interfacing</Description>
+	</RefParameter>
+	<RefParameter Name="LIBJPEG_FS_type" Comment="Data Stream management type" DefaultValue="FatFS_Ronly" Type="list" Group="MW configuration" TabName="Config parameters" Mode="Basic">
+		<Condition Diagnostic="" Expression="S_FATFS_ENABLED &amp; (FATFS:_FS_READONLY=1)"/>
+		<PossibleValue Comment="FatFS Ronly" Value="FatFS_Ronly" Semaphore="S_LIBJPEG_FSTYPE_FATFS_RONLY"/>
+		<PossibleValue Comment="Stdio" Value="Stdio"/>
+		<PossibleValue Comment="None" Value="NoFS"/>
+		<Description>Default Value : "FatFS Ronly"&lt;br&gt;This parameter specifies the type of data manager used for compressed data storage (source and destination) when the "stream" data management Api is used :&lt;br&gt;-FatFS Ronly : FatFS File system - "Read Only" mode&lt;br&gt;-Stdio : standard "stdio" stream manager&lt;br&gt;-None : No file system interfacing</Description>
+	</RefParameter>
+	<RefParameter Name="LIBJPEG_FS_type" Comment="Data Stream management type" DefaultValue="Stdio" Type="list" Group="MW configuration" TabName="Config parameters" Mode="Basic">
+		<PossibleValue Comment="Stdio" Value="Stdio"/>
+		<PossibleValue Comment="None" Value="NoFS"/>
+		<Description>Default Value : Stdio&lt;br&gt;This parameter specifies the type of data manager used for compressed data storage (source and destination) when the "stream" data management Api is used :&lt;br&gt;-Stdio : standard "stdio" stream manager&lt;br&gt;-None : No file system interfacing</Description>
+	</RefParameter>
+
+
+	<!--For the moment LibJPEG is hard-linked with FATFS then the information is displayed in grey without no possibility to change value-->
+	<!--
+	<RefParameter Name="LIBJPEG_with_FATFS" Comment="FATFS" DefaultValue="Enabled" Type="String" Group="MW configuration" TabName="Config parameters" Mode="Basic">
+    <PossibleValue Comment="FATFS" Value="Enabled"/>
+    <Description>This parameter specifies the source and the destination of the compressed data :&lt;br&gt;-when this parameter is Enabled, FATFS is used as data source and destination module.&lt;br&gt;-when this parameter is Disabled, STDIO is used instead.&lt;br&gt;&lt;font color=&quot;red&quot;&gt;&lt;b&gt;Warning:&lt;/b&gt; in this version, only FATFS file system could be used.&lt;/font&gt;</Description>
+	</RefParameter>
+	-->
+
+
+	<!-- FREERTOS is displayed in grey when enabled-->
+		<RefParameter Name="FREERTOS" Comment="FREERTOS" DefaultValue="Enabled" Type="String" Group="MW configuration" TabName="Config parameters" Mode="Basic">
+		<Condition Diagnostic="" Expression="S_FREERTOS"/>
+		<PossibleValue Comment="FREERTOS Status" Value="Enabled"/>
+		<Description>This parameter indicates if FreeRtos is Disabled or Enabled :&lt;br&gt;-when FreeRtos is Disabled, the LibJpeg memory allocator is the C standard allocator (not configurable).&lt;br&gt;-when FreeRtos is Enabled, the LibJpeg memory allocator type can be configured in "General Settings" menu.</Description>
+	  </RefParameter>
+		<RefParameter Name="FREERTOS" Comment="FREERTOS" DefaultValue="Disabled" Type="String" Group="MW configuration" TabName="Config parameters" Mode="Basic">
+		<PossibleValue Comment="FREERTOS Status" Value="Disabled"/>
+		<Description>This parameter indicates if FreeRtos is Disabled or Enabled :&lt;br&gt;-when FreeRtos is Disabled, the LibJpeg memory allocator is the C standard allocator (not configurable).&lt;br&gt;-when FreeRtos is Enabled, the LibJpeg memory allocator type can be configured in "General Settings" menu.</Description>
+	  </RefParameter>
+	
+	<!-- FREERTOS : default is to use FreeRtos Api-->
+	<RefParameter Name="LIBJPEG_with_FREERTOS" Comment="Use FREERTOS Memory Allocator" DefaultValue="1" Type="list" Group="General Settings" TabName="Config parameters" Mode="Basic">
+	    <Condition Diagnostic="" Expression="S_FREERTOS"/>
+		<PossibleValue Comment="Enabled" Value="1"/>
+		<PossibleValue Comment="Disabled" Value="0"/>
+		<Description>FreeRtos is Enabled : this parameter allows to select FreeRtos Memory Allocator (value Enabled) or the C standard memory allocator (value Disabled) for LibJpeg memory allocations.</Description>
+	</RefParameter>
+	<RefParameter Name="LIBJPEG_with_FREERTOS" Comment="Use FREERTOS Memory Allocator" DefaultValue="0" Type="list" Group="General Settings" TabName="Config parameters" Visible="false" Mode="Basic">
+		<PossibleValue Comment="Disabled" Value="0"/>
+		<Description>FreeRtos is Disabled : LibJpeg memory allocator is the C standard memory allocator.</Description>
+	</RefParameter>
+
+	<!--RefParameter Name="LIBJPEG_with_USE_HEAP_MEM" Comment="Use LIBJPEG_with_USE_HEAP_MEM" DefaultValue="0" Type="list" Group="General Settings" TabName="Config parameters">
+		<PossibleValue Comment="Enabled" Value="1"/>
+		<PossibleValue Comment="Disabled" Value="0"/>
+		<Description>Define LibJPEG dependency with USE_HEAP_MEM when available. &lt;br&gt;If USE_HEAP_MEM: &lt;br&gt;  is defined: no memory back-storage is allowed (all allocations in RAM)&lt;br&gt; is not defined: memory back-storage allowed (like virtual memory support) – swap done using the FS defined by “FatFs support” parameter</Description>
+	</RefParameter-->
+
+	<!-- RefParameters for LIBJPEG - JPEG basic settings-->
+	<RefParameter Name="BITS_IN_JSAMPLE" Comment="BITS_IN_JSAMPLE" DefaultValue="8" Type="list" Group="JPEG basic settings" TabName="Config parameters" Mode="Advanced">
+	  <PossibleValue Comment="8 bits" Value="8"/>
+	  <PossibleValue Comment="12 bits" Value="12"/>
+	  <Description>Default Value : 8 bits &lt;br&gt; Define BITS_IN_JSAMPLE as either: &lt;br&gt;- 8 for 8-bit sample values (the usual setting) &lt;br&gt;- 12 for 12-bit sample values &lt;br&gt;Only 8 and 12 are legal data precisions for lossy JPEG according to the JPEG standard, and the IJG code does not support anything else.&lt;br&gt;&lt;font color=&quot;orange&quot;&gt;&lt;b&gt;Warning:&lt;/b&gt;&lt;br&gt;-when selecting 12 bits data precision (BITS_IN_JSAMPLE = 12), it is recommended to enable "ENTROPY_OPT_SUPPORTED" when encoder is used (cf "jmorecfg.h" for details).&lt;/font&gt;</Description>
+	</RefParameter>
+
+	<RefParameter Name="MAX_COMPONENTS" Comment="MAX_COMPONENTS" DefaultValue="10" Max="255" Min="1" Type="integer" Group="JPEG basic settings" TabName="Config parameters" Mode="Advanced">
+		<Description>Default Value : 10 &lt;br&gt; Define maximum number of components (color channels) allowed in JPEG image &lt;br&gt;To meet the letter of the JPEG spec, set this to 255.  However, darn few applications need more than 4 channels (maybe 5 for CMYK + alpha mask).  We recommend 10 as a reasonable compromise; use 4 if you are really short on memory.  (Each allowed component costs a hundred or so bytes of storage, whether actually used in an image or not.)</Description>
+	</RefParameter>
+	<RefParameter Name="JCOEF" Comment="JCOEF" DefaultValue="short" Type="list" Group="JPEG basic settings" TabName="Config parameters" Mode="Advanced">
+	    <PossibleValue Comment="short" Value="short"/>
+		<PossibleValue Comment="int" Value="int"/>
+		<Description>Default Value : short &lt;br&gt; Define representation of a DCT frequency coefficient. &lt;br&gt;This should be a signed value of at least 16 bits; "short" is usually OK. Again, we allocate large arrays of these, but you can change to int if you have memory to burn and "short" is really slow.</Description>
+	</RefParameter>
+
+	<!-- RefParameters for LIBJPEG - JPEG encoder and decoder common capabilities options-->
+	<RefParameter Name="DCT_ISLOW_SUPPORTED" Comment="DCT_ISLOW_SUPPORTED" DefaultValue="define" Type="list" Group="JPEG encoder and decoder common capabilities options" TabName="Config parameters" Mode="Advanced">
+	  <PossibleValue Comment="Enabled" Value="define"/>
+		<PossibleValue Comment="Disabled" Value="undef"/>
+		<Description>Default Value : Enabled &lt;br&gt; Slow but accurate integer algorithm</Description>
+	</RefParameter>
+		<RefParameter Name="DCT_IFAST_SUPPORTED" Comment="DCT_IFAST_SUPPORTED" DefaultValue="define" Type="list" Group="JPEG encoder and decoder common capabilities options" TabName="Config parameters" Mode="Advanced">
+	    <PossibleValue Comment="Enabled" Value="define"/>
+		<PossibleValue Comment="Disabled" Value="undef"/>
+		<Description>Default Value : Enabled &lt;br&gt; Faster, less accurate integer method</Description>
+	</RefParameter>
+		<RefParameter Name="DCT_FLOAT_SUPPORTED" Comment="DCT_FLOAT_SUPPORTED" DefaultValue="define" Type="list" Group="JPEG encoder and decoder common capabilities options" TabName="Config parameters" Mode="Advanced">
+	    <PossibleValue Comment="Enabled" Value="define"/>
+		<PossibleValue Comment="Disabled" Value="undef"/>
+		<Description>Default Value : Enabled &lt;br&gt; Floating-point: accurate, fast on fast HW</Description>
+	</RefParameter>
+
+	<!-- RefParameters for LIBJPEG - JPEG encoder options-->
+	<RefParameter Name="C_ARITH_CODING_SUPPORTED" Comment="C_ARITH_CODING_SUPPORTED" DefaultValue="define" Type="list" Group="JPEG encoder options" TabName="Config parameters" Mode="Advanced">
+	    <PossibleValue Comment="Enabled" Value="define"/>
+		<PossibleValue Comment="Disabled" Value="undef"/>
+		<Description>Default Value : Enabled &lt;br&gt; Arithmetic coding back end</Description>
+	</RefParameter>
+
+	<RefParameter Name="C_MULTISCAN_FILES_SUPPORTED" Comment="C_MULTISCAN_FILES_SUPPORTED" DefaultValue="define" Type="list" Group="JPEG encoder options" TabName="Config parameters" Mode="Advanced">
+	    <PossibleValue Comment="Enabled" Value="define"/>
+		<PossibleValue Comment="Disabled" Value="undef"/>
+		<Description>Default Value : Enabled &lt;br&gt; Multiple-scan JPEG files</Description>
+	</RefParameter>
+
+	<RefParameter Name="C_PROGRESSIVE_SUPPORTED" Comment="C_PROGRESSIVE_SUPPORTED" DefaultValue="define" Type="list" Group="JPEG encoder options" TabName="Config parameters" Mode="Advanced">
+		<Condition Diagnostic="" Expression="(C_MULTISCAN_FILES_SUPPORTED=define)"/>
+		<PossibleValue Comment="Enabled" Value="define"/>
+		<PossibleValue Comment="Disabled" Value="undef"/>
+		<Description>Default Value : Enabled &lt;br&gt; Progressive JPEG (Requires MULTISCAN)&lt;br&gt;&lt;b&gt;Warnings:&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;red&quot;&gt;-"Progressive encoding" requires to enable "C_MULTISCAN_FILES_SUPPORTED" (cf "jmorecfg.h" for details)&lt;br&gt;&lt;/font&gt;&lt;font color=&quot;orange&quot;&gt;-when "Progressive encoding" is enabled, it is recommended to enable "ENTROPY_OPT_SUPPORTED" (cf "jmorecfg.h" for details)&lt;/font&gt;</Description>
+	</RefParameter>
+	<RefParameter Name="C_PROGRESSIVE_SUPPORTED" Comment="C_PROGRESSIVE_SUPPORTED" DefaultValue="undef" Type="list" Group="JPEG encoder options" TabName="Config parameters" Mode="Advanced">
+		<PossibleValue Comment="Disabled" Value="undef"/>
+		<Description>Default Value : Enabled &lt;br&gt; Progressive JPEG (Requires MULTISCAN)&lt;br&gt;&lt;b&gt;Warnings:&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;red&quot;&gt;-"Progressive encoding" requires to enable "C_MULTISCAN_FILES_SUPPORTED" (cf "jmorecfg.h" for details)&lt;br&gt;&lt;/font&gt;&lt;font color=&quot;orange&quot;&gt;-when "Progressive encoding" is enabled, it is recommended to enable "ENTROPY_OPT_SUPPORTED" (cf "jmorecfg.h" for details)&lt;/font&gt;</Description>
+	</RefParameter>
+
+	<RefParameter Name="DCT_SCALING_SUPPORTED" Comment="DCT_SCALING_SUPPORTED" DefaultValue="define" Type="list" Group="JPEG encoder options" TabName="Config parameters" Mode="Advanced">
+		<Condition Diagnostic="" Expression="(DCT_ISLOW_SUPPORTED=define)"/>
+    <PossibleValue Comment="Enabled" Value="define"/>
+		<PossibleValue Comment="Disabled" Value="undef"/>
+		<Description>Default Value : Enabled &lt;br&gt; Input rescaling via DCT (Requires DCT_ISLOW)&lt;br&gt;&lt;font color=&quot;red&quot;&gt;&lt;b&gt;Warning:&lt;/b&gt;&lt;br&gt;"DCT scaling" requires to enable "DCT_ISLOW_SUPPORTED" (cf "jmorecfg.h" for details).&lt;/font&gt;</Description>
+	</RefParameter>
+	<RefParameter Name="DCT_SCALING_SUPPORTED" Comment="DCT_SCALING_SUPPORTED" DefaultValue="undef" Type="list" Group="JPEG encoder options" TabName="Config parameters" Mode="Advanced">
+		<PossibleValue Comment="Disabled" Value="undef"/>
+		<Description>Default Value : Enabled &lt;br&gt; Input rescaling via DCT (Requires DCT_ISLOW)&lt;br&gt;&lt;font color=&quot;red&quot;&gt;&lt;b&gt;Warning:&lt;/b&gt;&lt;br&gt;"DCT scaling" requires to enable "DCT_ISLOW_SUPPORTED" (cf "jmorecfg.h" for details).&lt;/font&gt;</Description>
+	</RefParameter>
+
+	<RefParameter Name="ENTROPY_OPT_SUPPORTED" Comment="ENTROPY_OPT_SUPPORTED" DefaultValue="define" Type="list" Group="JPEG encoder options" TabName="Config parameters" Mode="Advanced">
+		<PossibleValue Comment="Enabled" Value="define"/>
+		<PossibleValue Comment="Disabled" Value="undef"/>
+		<Description>Default Value : Enabled &lt;br&gt; Optimization of entropy coding parms&lt;br&gt;&lt;font color=&quot;orange&quot;&gt;&lt;b&gt;Warning:&lt;/b&gt;&lt;br&gt;-when "ENTROPY_OPT_SUPPORTED" is disabled it is recommended to set data precision to 8-bit (BITS_IN_JSAMPLE = 8) and to disable "C_PROGRESSIVE_SUPPORTED" - (cf "jmorecfg.h" for details).&lt;/font&gt;</Description>
+	</RefParameter>
+
+	<RefParameter Name="INPUT_SMOOTHING_SUPPORTED" Comment="INPUT_SMOOTHING_SUPPORTED" DefaultValue="define" Type="list" Group="JPEG encoder options" TabName="Config parameters" Mode="Advanced">
+    <PossibleValue Comment="Enabled" Value="define"/>
+		<PossibleValue Comment="Disabled" Value="undef"/>
+		<Description>Default Value : Enabled &lt;br&gt; Input image smoothing option&lt;br&gt;</Description>
+	</RefParameter>
+
+	<!-- RefParameters for LIBJPEG - JPEG decoder options-->
+	<RefParameter Name="D_ARITH_CODING_SUPPORTED" Comment="D_ARITH_CODING_SUPPORTED" DefaultValue="define" Type="list" Group="JPEG decoder options" TabName="Config parameters" Mode="Advanced">
+    <PossibleValue Comment="Enabled" Value="define"/>
+		<PossibleValue Comment="Disabled" Value="undef"/>
+		<Description>Default Value : Enabled &lt;br&gt; Arithmetic coding back end</Description>
+	</RefParameter>
+	<RefParameter Name="D_MULTISCAN_FILES_SUPPORTED" Comment="D_MULTISCAN_FILES_SUPPORTED" DefaultValue="define" Type="list" Group="JPEG decoder options" TabName="Config parameters" Mode="Advanced">
+    <PossibleValue Comment="Enabled" Value="define"/>
+		<PossibleValue Comment="Disabled" Value="undef"/>
+		<Description>Default Value : Enabled &lt;br&gt; Multiple-scan JPEG files</Description>
+	</RefParameter>
+
+	<RefParameter Name="D_PROGRESSIVE_SUPPORTED" Comment="D_PROGRESSIVE_SUPPORTED" DefaultValue="define" Type="list" Group="JPEG decoder options" TabName="Config parameters" Mode="Advanced">
+		<Condition Diagnostic="" Expression="(D_MULTISCAN_FILES_SUPPORTED=define)"/>
+    <PossibleValue Comment="Enabled" Value="define"/>
+		<PossibleValue Comment="Disabled" Value="undef"/>
+		<Description>Default Value : Enabled &lt;br&gt; Progressive JPEG (Requires MULTISCAN)&lt;br&gt;&lt;font color=&quot;red&quot;&gt;&lt;b&gt;Warning:&lt;/b&gt;&lt;br&gt;-"Progressive decoding" requires to enable "D_MULTISCAN_FILES_SUPPORTED" (cf "jmorecfg.h" for details).&lt;/font&gt;</Description>
+	</RefParameter>
+	<RefParameter Name="D_PROGRESSIVE_SUPPORTED" Comment="D_PROGRESSIVE_SUPPORTED" DefaultValue="undef" Type="list" Group="JPEG decoder options" TabName="Config parameters" Mode="Advanced">
+		<PossibleValue Comment="Disabled" Value="undef"/>
+		<Description>Default Value : Enabled &lt;br&gt; Progressive JPEG (Requires MULTISCAN)&lt;br&gt;&lt;font color=&quot;red&quot;&gt;&lt;b&gt;Warning:&lt;/b&gt;&lt;br&gt;-"Progressive decoding" requires to enable "D_MULTISCAN_FILES_SUPPORTED" (cf "jmorecfg.h" for details).&lt;/font&gt;</Description>
+	</RefParameter>
+
+	<RefParameter Name="IDCT_SCALING_SUPPORTED" Comment="IDCT_SCALING_SUPPORTED" DefaultValue="define" Type="list" Group="JPEG decoder options" TabName="Config parameters" Mode="Advanced">
+	    <PossibleValue Comment="Enabled" Value="define"/>
+		<PossibleValue Comment="Disabled" Value="undef"/>
+		<Description>Default Value : Enabled &lt;br&gt; Output rescaling via IDCT</Description>
+	</RefParameter>
+	<RefParameter Name="SAVE_MARKERS_SUPPORTED" Comment="SAVE_MARKERS_SUPPORTED" DefaultValue="define" Type="list" Group="JPEG decoder options" TabName="Config parameters" Mode="Advanced">
+	    <PossibleValue Comment="Enabled" Value="define"/>
+		<PossibleValue Comment="Disabled" Value="undef"/>
+		<Description>Default Value : Enabled &lt;br&gt; jpeg_save_markers() needed</Description>
+	</RefParameter>
+
+	<RefParameter Name="BLOCK_SMOOTHING_SUPPORTED" Comment="BLOCK_SMOOTHING_SUPPORTED" DefaultValue="define" Type="list" Group="JPEG decoder options" TabName="Config parameters" Mode="Advanced">
+		<Condition Diagnostic="" Expression="(D_PROGRESSIVE_SUPPORTED=define)"/>
+    <PossibleValue Comment="Enabled" Value="define"/>
+		<PossibleValue Comment="Disabled" Value="undef"/>
+		<Description>Default Value : Enabled &lt;br&gt; Block smoothing (Progressive only)&lt;br&gt;&lt;font color=&quot;red&quot;&gt;&lt;b&gt;Warning:&lt;/b&gt;&lt;br&gt;-"Block smoothing" requires to enable "D_PROGRESSIVE_SUPPORTED" (cf "jmorecfg.h" for details).&lt;/font&gt;</Description>
+	</RefParameter>
+	<RefParameter Name="BLOCK_SMOOTHING_SUPPORTED" Comment="BLOCK_SMOOTHING_SUPPORTED" DefaultValue="undef" Type="list" Group="JPEG decoder options" TabName="Config parameters" Mode="Advanced">
+		<PossibleValue Comment="Disabled" Value="undef"/>
+		<Description>Default Value : Enabled &lt;br&gt; Block smoothing (Progressive only)&lt;br&gt;&lt;font color=&quot;red&quot;&gt;&lt;b&gt;Warning:&lt;/b&gt;&lt;br&gt;-"Block smoothing" requires to enable "D_PROGRESSIVE_SUPPORTED" (cf "jmorecfg.h" for details).&lt;/font&gt;</Description>
+	</RefParameter>
+
+	<RefParameter Name="UPSAMPLE_SCALING_SUPPORTED" Comment="UPSAMPLE_SCALING_SUPPORTED" DefaultValue="undef" Type="list" Group="JPEG decoder options" TabName="Config parameters" Mode="Advanced">
+		<PossibleValue Comment="Enabled" Value="define"/>
+	    <PossibleValue Comment="Disabled" Value="undef"/>
+		<Description>Default Value : Disabled &lt;br&gt; Output rescaling at upsample stage</Description>
+	</RefParameter>
+	<RefParameter Name="UPSAMPLE_MERGING_SUPPORTED" Comment="UPSAMPLE_MERGING_SUPPORTED" DefaultValue="define" Type="list" Group="JPEG decoder options" TabName="Config parameters" Mode="Advanced">
+	    <PossibleValue Comment="Enabled" Value="define"/>
+		<PossibleValue Comment="Disabled" Value="undef"/>
+		<Description>Default Value : Enabled &lt;br&gt; Fast path for sloppy upsampling</Description>
+	</RefParameter>
+	<RefParameter Name="QUANT_1PASS_SUPPORTED" Comment="QUANT_1PASS_SUPPORTED" DefaultValue="define" Type="list" Group="JPEG decoder options" TabName="Config parameters" Mode="Advanced">
+	    <PossibleValue Comment="Enabled" Value="define"/>
+		<PossibleValue Comment="Disabled" Value="undef"/>
+		<Description>Default Value : Enabled &lt;br&gt; 1-pass color quantization</Description>
+	</RefParameter>
+	<RefParameter Name="QUANT_2PASS_SUPPORTED" Comment="QUANT_2PASS_SUPPORTED" DefaultValue="define" Type="list" Group="JPEG decoder options" TabName="Config parameters" Mode="Advanced">
+	    <PossibleValue Comment="Enabled" Value="define"/>
+		<PossibleValue Comment="Disabled" Value="undef"/>
+		<Description>Default Value : Enabled &lt;br&gt; 2-pass color quantization</Description>
+	</RefParameter>
+
+	<!-- RefParameters for LIBJPEG - RGB scanline format-->
+	<RefParameter Name="RGB_ORDERING" Comment="RGB_ORDERING" DefaultValue="RGB" Type="list" Group="RGB scanline format" TabName="Config parameters" Mode="Advanced">
+	    <PossibleValue Comment="RGB" Value="RGB"/>
+		<PossibleValue Comment="BGR" Value="BGR"/>
+		<Description>Default Value : RGB &lt;br&gt; Ordering of RGB data in scanlines passed to or from the application &lt;br&gt;Only R/G/B and B/G/R orders are possible &lt;br&gt;Refer to "LibJPEG/jquant2.c" for details</Description>
+	</RefParameter>
+		<RefParameter Name="RGB_PIXELSIZE" Comment="RGB_PIXELSIZE" DefaultValue="3" Max="4" Min="3" Type="integer" Group="RGB scanline format" TabName="Config parameters" Mode="Advanced">
+		<Description>Default Value : 3 &lt;br&gt; JSAMPLEs per RGB scanline element.&lt;br&gt;To deal with formats such as R,G,B,X one extra byte per pixel) by changing RGB_PIXELSIZE.  Note that changing the offsets will also change the order in which colormap data is organized.&lt;br&gt;RESTRICTIONS:&lt;br&gt;1. The sample applications cjpeg,djpeg do NOT support modified RGB formats.&lt;br&gt;2. The color quantizer modules will not behave desirably if RGB_PIXELSIZE is not 3 (they don't understand about dummy color components!).  So you can't use color quantization if you change that value.</Description>
+	</RefParameter>
+
+	<!-- RefMode for LIBJPEG -->
+	<RefMode Name="Enabled" Abstract="true">
+		<ConfigForMode>LIBJPEG_ENABLE_Init</ConfigForMode>
+		<!-- Parameters for LIBJPEG - Version-->
+		<Parameter Name="LIBJPEG_version"/>
+		<!-- Parameters for LIBJPEG - General settings-->
+		<Parameter Name="LIBJPEG_FS_type"/>
+		<Parameter Name="FREERTOS"/>
+		<Parameter Name="LIBJPEG_with_FREERTOS"/>
+		<!--Parameter Name="LIBJPEG_with_USE_HEAP_MEM"/-->
+		<!-- Parameters for LIBJPEG - JPEG basic settings-->
+		<Parameter Name="BITS_IN_JSAMPLE"/>
+		<Parameter Name="MAX_COMPONENTS"/>
+		<Parameter Name="JCOEF"/>
+		<!-- Parameters for LIBJPEG - JPEG encoder and decoder common capabilities options-->
+		<Parameter Name="DCT_ISLOW_SUPPORTED"/>
+		<Parameter Name="DCT_IFAST_SUPPORTED"/>
+		<Parameter Name="DCT_FLOAT_SUPPORTED"/>
+		<!-- Parameters for LIBJPEG - JPEG encoder options-->
+		<Parameter Name="C_ARITH_CODING_SUPPORTED"/>
+		<Parameter Name="C_MULTISCAN_FILES_SUPPORTED"/>
+		<Parameter Name="C_PROGRESSIVE_SUPPORTED"/>
+		<Parameter Name="DCT_SCALING_SUPPORTED"/>
+		<Parameter Name="ENTROPY_OPT_SUPPORTED"/>
+		<Parameter Name="INPUT_SMOOTHING_SUPPORTED"/>
+		<!-- Parameters for LIBJPEG - JPEG decoder options-->
+		<Parameter Name="D_ARITH_CODING_SUPPORTED"/>
+		<Parameter Name="D_MULTISCAN_FILES_SUPPORTED"/>
+		<Parameter Name="D_PROGRESSIVE_SUPPORTED"/>
+		<Parameter Name="IDCT_SCALING_SUPPORTED"/>
+		<Parameter Name="SAVE_MARKERS_SUPPORTED"/>
+		<Parameter Name="BLOCK_SMOOTHING_SUPPORTED"/>
+		<Parameter Name="UPSAMPLE_SCALING_SUPPORTED"/>
+		<Parameter Name="UPSAMPLE_MERGING_SUPPORTED"/>
+		<Parameter Name="QUANT_1PASS_SUPPORTED"/>
+		<Parameter Name="QUANT_2PASS_SUPPORTED"/>
+		<!-- Parameters for LIBJPEG - Ordering of RGB data-->
+		<Parameter Name="RGB_ORDERING"/>
+		<!-- Parameters for LIBJPEG - Format managements-->
+		<Parameter Name="RGB_PIXELSIZE"/>
+	</RefMode>
+
+	<!-- ModeLogicOperator for LIBJPEG -->
+
+	<ModeLogicOperator Name="OR">
+		<Mode Name="Enabled">
+			<ModeLogicOperator Name="XOR">
+				<Mode Name="Enabled">
+					<SignalLogicalOp Name="AND">
+						<Signal IOMode="" Name="VS_JPEGLIB"/>
+					</SignalLogicalOp>
+					<Semaphore>S_LIBJPEG</Semaphore>
+				</Mode>
+			</ModeLogicOperator>
+		</Mode>
+	</ModeLogicOperator>
+	
+	<!-- RefSignal for LIBJPEG -->
+	<RefSignal Name="VS_JPEGLIB" Virtual="true" />
+
+</IP>

@@ -545,7 +545,7 @@ USBH_StatusTypeDef  USBH_LL_DriverVBUS (USBH_HandleTypeDef *phost, uint8_t state
       /* ToDo: Add IOE driver control */	
       /* USER CODE BEGIN DRIVE_LOW_CHARGE_FOR_FS */
    
-      /* USER CODE END DRIVE_HIGH_CHARGE_FOR_FS */ 
+      /* USER CODE END DRIVE_LOW_CHARGE_FOR_FS */ 
     }
   }	
   [/#if] 
@@ -566,7 +566,7 @@ USBH_StatusTypeDef  USBH_LL_DriverVBUS (USBH_HandleTypeDef *phost, uint8_t state
       /* ToDo: Add IOE driver control */	
       /* USER CODE BEGIN DRIVE_LOW_CHARGE_FOR_HS */
 		
-      /* USER CODE BEGIN DRIVE_LOW_CHARGE_FOR_HS */    	 
+      /* USER CODE END DRIVE_LOW_CHARGE_FOR_HS */    	 
     }  
   }
   [/#if]       

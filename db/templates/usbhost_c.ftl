@@ -503,15 +503,19 @@ void MX_USB_HOST_Process(void)
 [#list IPdatas as IP]
 [#if instanceNb == 1]
 	[#assign instName = ""]
+	[#assign userCode = "1"]
+	[#assign j = "${userCode}"]
 [#else]
 	[#assign instanceNbCallBack = 1]
 	[#assign instName= "1"]
+	[#assign userCode = "2"]
+	[#assign j = "${userCode}"]
 [/#if]	
 [#list IP.configModelList as instanceData]
 static void USBH_UserProcess${instName}  (USBH_HandleTypeDef *phost, uint8_t id)
 {
 
-  /* USER CODE BEGIN 2 */
+  /* USER CODE BEGIN ${userCode} */
   switch(id)
   { 
   case HOST_USER_SELECT_CONFIGURATION:
@@ -532,10 +536,13 @@ static void USBH_UserProcess${instName}  (USBH_HandleTypeDef *phost, uint8_t id)
   default:
   break; 
   }
-  /* USER CODE END 2 */
+  /* USER CODE END ${userCode} */
 }
 [#assign instanceNbCallBack = instanceNbCallBack + 1]
 [#assign instName= "${instanceNbCallBack}"]
+[#assign j = j + 1]
+[#assign userCode= "${j}"]
+	
 [/#list]
 [/#list]
 #n

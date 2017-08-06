@@ -1098,6 +1098,12 @@
     </RefParameter>
 	
     <RefParameter Visible="false" Comment="LSE Is Used" DefaultValue="0" Name="LSEUsed" Min="0" Type="integer"/>
+    <!-- LSE used -->
+    <RefParameter Visible="false" Comment="LSE Is Used" DefaultValue="1" Name="LSEUsedLL" Min="1" Type="integer">
+        <Condition Expression="(LSCOSSourceLSE &amp; LSCOConfig)|(Semaphore_input_Channel1TIM16 &amp; TIM16 &amp; SEM2RCC_LSE_REQUIRED1_TIM16)|(SEM2RCC_LSE_REQUIRED_TIM2 &amp; Semaphore_TIM2_L4_ETR_REMAPTIM2 &amp; TIM2)|(Semaphore_input_Channel1_directTIM15 &amp; TIM15 &amp; SEM2RCC_LSE_REQUIRED1_TIM15)|(USART1SourceLSE &amp; USART1Used_ForRCC)|(USART2SourceLSE &amp; USART2Used_ForRCC)|(USART3SourceLSE &amp; USART3Used_ForRCC)|(UART4SourceLSE &amp; UART4Used_ForRCC)|(UART5SourceLSE &amp; UART5Used_ForRCC)|(LPUART1SourceLSE &amp; LPUARTUsed_ForRCC)|(LPTIM1SOURCELSE &amp; LPTIM1Used_ForRCC)|(LPTIM2SOURCELSE &amp; LPTIM2Used_ForRCC)|((RCC_MCO1Source=RCC_MCO1SOURCE_LSE)&amp; ((Semaphore_input_Channel1TIM17 &amp; TIM17 &amp; SEM2RCC_MCO_REQUIRED_TIM17)|MCOConfig))|((RTCClockSelection=RCC_RTCCLKSOURCE_LSE) &amp;(RTCUsed_ForRCC|LCDUsed_ForRCC) )" Diagnostic="LSE is used if "/>
+    </RefParameter>
+	
+    <RefParameter Visible="false" Comment="LSE Is Used" DefaultValue="0" Name="LSEUsedLL" Min="0" Type="integer"/>
 	
     <!-- LSE state used to codgen -->
     <RefParameter Visible="false" Comment="Lse State" DefaultValue="RCC_LSE_BYPASS" Name="LSEState" Type="list">
@@ -1919,7 +1925,7 @@
 
 	
 <RefParameter Visible="false" Comment="PLLSAI1 out clock " Name="PLLSAI1outclockARG" DefaultValue="+PLLSAI1outclock" Type="list">
-	        <Condition Expression="(SAI1SourcePLLSAI1P&amp;(SAI1Used_ForRCC))| (SAI2SourcePLLSAI1P&amp;SAI2Used_ForRCC)|(ADCSourcePLLSAI1R &amp;(((USE_ADC1&amp;ADC1UsedAsynchronousCLK_ForRCC)|(USE_ADC2&amp;ADC2UsedAsynchronousCLK_ForRCC)|(USE_ADC3&amp;ADC3UsedAsynchronousCLK_ForRCC))))|(CK48SourcePLLSAI1 &amp; (USB_OTG_FSUsed_ForRCC|USB_OTG_HSEmbeddedPHYUsed_ForRCC|RNGUsed_ForRCC|SDMMC1Used_ForRCC))" Diagnostic=" "/>
+	        <Condition Expression="(SAI1SourcePLLSAI1P&amp;(SAI1Used_ForRCC|SEM2RCC_SAI1_CK_REQUIRED_DFSDM1))| (SAI2SourcePLLSAI1P&amp;SAI2Used_ForRCC)|(ADCSourcePLLSAI1R &amp;(((USE_ADC1&amp;ADC1UsedAsynchronousCLK_ForRCC)|(USE_ADC2&amp;ADC2UsedAsynchronousCLK_ForRCC)|(USE_ADC3&amp;ADC3UsedAsynchronousCLK_ForRCC))))|(CK48SourcePLLSAI1 &amp; (USB_OTG_FSUsed_ForRCC|USB_OTG_HSEmbeddedPHYUsed_ForRCC|RNGUsed_ForRCC|SDMMC1Used_ForRCC))" Diagnostic=" "/>
     </RefParameter>
     <RefParameter Visible="false" Comment="PLLSAI1 out clock" Name="PLLSAI1outclockARG" DefaultValue="null" Type="list"/>
      
@@ -1928,7 +1934,7 @@
    
 
 	 <RefParameter Visible="false" Name="RCC_PLLSAI1_SAI1CLKVar" Comment="RCC_PLLSAI1_SAI1CLKVar" Type="list" DefaultValue="RCC_PLLSAI1_SAI1CLK">
-        <Condition Expression="(SAI1SourcePLLSAI1P&amp;(SAI1Used_ForRCC))| (SAI2SourcePLLSAI1P&amp;SAI2Used_ForRCC)" Diagnostic="DFSDM Activated"/>
+        <Condition Expression="(SAI1SourcePLLSAI1P&amp;(SAI1Used_ForRCC|SEM2RCC_SAI1_CK_REQUIRED_DFSDM1))| (SAI2SourcePLLSAI1P&amp;SAI2Used_ForRCC)" Diagnostic="DFSDM Activated"/>
         <PossibleValue Comment="Periphclk DFSDM" Value="RCC_PLLSAI1_SAI1CLK"/>
     </RefParameter>
 	
@@ -1990,6 +1996,17 @@
     </RefParameter>
     <RefParameter Visible="false" Name="PLLSourceMARGForMacro" Comment="PLLSourceMARGForMacro" Type="list" DefaultValue="null"/>
 
+	
+	<RefParameter  Name="LSE_Drive_Capability" Comment="LSE Drive Capability" Type="list" DefaultValue="false" Group="RCC Parameters">
+        <Condition Diagnostic="" Expression="LSEOscillator &amp; (LSEUsed=1)"/>
+        <PossibleValue Value="RCC_LSEDRIVE_LOW"        Comment="LSE oscillator low drive capability"  />
+        <PossibleValue Value="RCC_LSEDRIVE_MEDIUMLOW"  Comment="LSE oscillator medium low drive capability"/>
+        <PossibleValue Value="RCC_LSEDRIVE_MEDIUMHIGH" Comment="LSE oscillator medium high drive capability"/>
+        <PossibleValue Value="RCC_LSEDRIVE_HIGH"       Comment="LSE oscillator high drive capability"/>
+    </RefParameter>
+	<RefParameter Visible="false" Name="LSE_Drive_Capability" Comment="LSE Drive Capability" Type="list" DefaultValue="null" Group="RCC Parameters">
+    
+    </RefParameter>
     <RefMode Name="ClockTree">
 
 		 <!--  <ConfigForMode>RCC_PLL_PLLM_CONFIG</ConfigForMode>
@@ -2001,6 +2018,7 @@
         <ConfigForMode>RCC_CSS_Enable</ConfigForMode>
         <ConfigForMode>RCC_CSS_EnableLSE</ConfigForMode>    
         <!--ConfigForMode>SYSCFG_CLK_ENABLE</ConfigForMode--> 
+				 <ConfigForMode>RCC_LSEDRIVE_CONFIG</ConfigForMode>
         <ConfigForMode>RCC_ConfigVoltageScaling</ConfigForMode> 
 		 <ConfigForMode>RCC_interrupt_Time_SYSTICK_Config</ConfigForMode>
 		<ConfigForMode>RCC_SYSTICK_CONFIG</ConfigForMode>
@@ -2109,6 +2127,7 @@
 	<Parameter Name="MSIAutoCalibration"/>
 	<Parameter Name="HSE_Timout"/>
         <Parameter Name="LSE_Timout"/>
+		 <Parameter Name="LSE_Drive_Capability"/>
       
     </RefMode>
 

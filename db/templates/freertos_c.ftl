@@ -11,6 +11,7 @@
 [#compress]
 [#assign inMain = 0]
 [#assign useNewHandle = 0]
+[#assign useTimers = 0]
 
 [#list SWIPdatas as SWIP]
     [#if SWIP.variables??]
@@ -30,6 +31,11 @@
 	        [#assign useNewHandle = 1]
           [/#if]   
 	    [/#if]
+	    [#if definition.name=="configUSE_TIMERS"]
+	      [#if definition.value=="1"]
+	        [#assign useTimers = 1]
+          [/#if]    
+	    [/#if]   
 	  [/#list]
     [/#if]
 [/#list]
@@ -95,7 +101,17 @@ void MX_FREERTOS_Init(void);  /* (MISRA C 2004 rule 8.1) */
 void PreSleepProcessing(uint32_t *ulExpectedIdleTime);
 void PostSleepProcessing(uint32_t *ulExpectedIdleTime);
           [/#if]
-        [/#if]             
+        [/#if] 
+	  	[#if definition.name=="MEMORY_ALLOCATION"]
+	      [#if definition.value!="0"]
+#n/* GetIdleTaskMemory prototype (linked to static allocation support) */
+void vApplicationGetIdleTaskMemory( StaticTask_t **ppxIdleTaskTCBBuffer, StackType_t **ppxIdleTaskStackBuffer, uint32_t *pulIdleTaskStackSize );
+            [#if useTimers==1]
+#n/* GetTimerTaskMemory prototype (linked to static allocation support) */
+void vApplicationGetTimerTaskMemory( StaticTask_t **ppxTimerTaskTCBBuffer, StackType_t **ppxTimerTaskStackBuffer, uint32_t *pulTimerTaskStackSize );            
+            [/#if]
+          [/#if]
+        [/#if]	                          
      [/#list]
  [/#if]
 [/#list]	
@@ -119,7 +135,12 @@ void vApplicationIdleHook(void);
           [#if definition.value=="1"]
 void vApplicationTickHook(void);       
           [/#if]
-        [/#if]      
+        [/#if]   
+        [#if definition.name=="configUSE_DAEMON_TASK_STARTUP_HOOK"]
+          [#if definition.value=="1"]
+void vApplicationDaemonTaskStartupHook(void);       
+          [/#if]    
+        [/#if]     
         [#if definition.name=="configCHECK_FOR_STACK_OVERFLOW"]
           [#if definition.value !="0"]
             [#if useNewHandle==0]
@@ -231,6 +252,16 @@ __weak void vApplicationMallocFailedHook(void)
 	      [/#if]
 	    [/#if]
 	    
+	    [#if definition.name=="configUSE_DAEMON_TASK_STARTUP_HOOK"]
+	      [#if definition.value=="1"]
+#n/* USER CODE BEGIN DAEMON_TASK_STARTUP_HOOK */
+void vApplicationDaemonTaskStartupHook(void) 
+{
+}
+/* USER CODE END DAEMON_TASK_STARTUP_HOOK */	    
+	      [/#if]
+	    [/#if]
+	    
 	  [/#list]
 	 [/#if]
 [/#list]
@@ -255,7 +286,29 @@ __weak void PostSleepProcessing(uint32_t *ulExpectedIdleTime)
 /* USER CODE END PREPOSTSLEEP */
 #n
           [/#if]
-        [/#if]             
+        [/#if]
+	  	[#if definition.name=="MEMORY_ALLOCATION"]
+	      [#if definition.value!="0"]
+#n
+/* USER CODE BEGIN GET_IDLE_TASK_MEMORY */    
+void vApplicationGetIdleTaskMemory( StaticTask_t **ppxIdleTaskTCBBuffer, StackType_t **ppxIdleTaskStackBuffer, uint32_t *pulIdleTaskStackSize )
+{
+/* place for user code */
+}                   
+/* USER CODE END GET_IDLE_TASK_MEMORY */
+#n
+            [#if useTimers==1]
+#n
+/* USER CODE BEGIN GET_TIMER_TASK_MEMORY */  
+void vApplicationGetTimerTaskMemory( StaticTask_t **ppxTimerTaskTCBBuffer, StackType_t **ppxTimerTaskStackBuffer, uint32_t *pulTimerTaskStackSize )  
+{
+/* place for user code */
+}                   
+/* USER CODE END GET_TIMER_TASK_MEMORY */
+#n
+            [/#if]
+          [/#if]
+        [/#if]                  
      [/#list]
  [/#if]
 [/#list]	

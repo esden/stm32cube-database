@@ -59,7 +59,7 @@ extern ${variable.value} ${variable.name};
 [#-- Global variables --]
 
 [#-- Parameters always visible and dependent from RTOS (NO_SYS) >> avoid using default value --]
-[#assign rtosNoMaskList = ["NO_SYS", "LWIP_NETCONN", "LWIP_SOCKET", "WITH_RTOS", "LWIP_NETIF_LOOPBACK_MULTITHREADING"]]
+[#assign rtosNoMaskList = ["NO_SYS", "LWIP_NETCONN", "LWIP_SOCKET", "WITH_RTOS", "LWIP_NETIF_LOOPBACK_MULTITHREADING", "LWIP_TIMERS", "TCPIP_MBOX_SIZE", "DEFAULT_UDP_RECVMBOX_SIZE", "DEFAULT_TCP_RECVMBOX_SIZE", "DEFAULT_ACCEPTMBOX_SIZE"]]
 [#-- Parameters Visible only if RTOS AND with default values different for the same parameter >> avoid using default value  --]
 [#assign rtosMaskList = ["TCPIP_THREAD_STACKSIZE", "TCPIP_THREAD_PRIO", "SLIPIF_THREAD_STACKSIZE", "SLIPIF_THREAD_PRIO", "DEFAULT_THREAD_STACKSIZE", "DEFAULT_THREAD_PRIO",
                           "LWIP_COMPAT_SOCKETS", "LWIP_SOCKET_SET_ERRNO", "LWIP_POSIX_SOCKETS_IO_NAMES"]]
@@ -69,7 +69,9 @@ extern ${variable.value} ${variable.name};
 [#-- Special parameters LWIP_DNS_SECURE cannot consider default value (logical OR) >> avoid using default value --]
 [#-- Special parameters LWIP_DHCP is enabled in CubeMx (disabled in opt.h) >> avoid using default value --]
 [#-- Special parameters CHECKSUM_BY_HARDWARE should be excluded since it is generated in STM32CubeMX Specific Parameters section --]
-[#assign specialList = ["LWIP_DNS_SECURE", "LWIP_DHCP", "CHECKSUM_BY_HARDWARE"]]
+[#-- Special parameters RECV_BUFSIZE_DEFAULT is defined with 0xFFFFFFF (INT_MAX in opt.h) >> generate always with freertos --]
+[#-- Special parameters TCP_RCV_SCALE is not defined if LWIP_WND_SCALE is enabled (see opt.h) >> generate always --]
+[#assign specialList = ["LWIP_DNS_SECURE", "LWIP_DHCP", "CHECKSUM_BY_HARDWARE", "RECV_BUFSIZE_DEFAULT", "TCP_RCV_SCALE"]]
 
 [#-- Checksum parameters enabled (in opt.h) and disabled in CubeMx --]
 [#assign checksumList = ["CHECKSUM_GEN_IP", "CHECKSUM_GEN_UDP", "CHECKSUM_GEN_TCP", "CHECKSUM_GEN_ICMP", "CHECKSUM_GEN_ICMP6", "CHECKSUM_CHECK_IP", "CHECKSUM_CHECK_UDP", "CHECKSUM_CHECK_TCP", "CHECKSUM_CHECK_ICMP", "CHECKSUM_CHECK_ICMP6"]]
@@ -138,6 +140,7 @@ extern ${variable.value} ${variable.name};
         [#if definition.name == "CHECKSUM_BY_HARDWARE"] [#assign checksum_by_hw = definition.value] [/#if]
         [#if definition.name == "LWIP_IPV4"] [#assign lwip_ipv4 = definition.value] [/#if]
         [#if definition.name == "LWIP_SNMP"] [#assign lwip_snmp = definition.value] [/#if]
+        [#if definition.name == "LWIP_WND_SCALE"] [#assign lwip_wnd_scale = definition.value] [/#if]
 	[/#list]
 
 [#compress]
@@ -198,7 +201,31 @@ extern ${variable.value} ${variable.name};
 /*----- Value in opt.h for ${definition.name}: 0 -----*/
 #define ${definition.name}  ${definition.value}
 			[/#if]
-			[#if (definition.name=="MEM_ALIGNMENT")]
+			[#if (definition.name=="SYS_LIGHTWEIGHT_PROT") && (definition.value =="0")]
+/*----- Value in opt.h for ${definition.name}: 1 -----*/
+#define ${definition.name}  ${definition.value}
+			[/#if]	
+			[#if (definition.name=="LWIP_TIMERS") && (definition.value =="0")]
+/*----- Value in opt.h for ${definition.name}: 1 -----*/
+#define ${definition.name}  ${definition.value}
+			[/#if]
+			[#if (definition.name=="TCPIP_MBOX_SIZE") && (definition.value !="0")]
+/*----- Value in opt.h for ${definition.name}: 0 -----*/
+#define ${definition.name}  ${definition.value}
+			[/#if]	
+			[#if (definition.name=="DEFAULT_UDP_RECVMBOX_SIZE") && (definition.value !="0")]
+/*----- Value in opt.h for ${definition.name}: 0 -----*/
+#define ${definition.name}  ${definition.value}
+			[/#if]
+			[#if (definition.name=="DEFAULT_TCP_RECVMBOX_SIZE") && (definition.value !="0")]
+/*----- Value in opt.h for ${definition.name}: 0 -----*/
+#define ${definition.name}  ${definition.value}
+			[/#if]
+			[#if (definition.name=="DEFAULT_ACCEPTMBOX_SIZE") && (definition.value !="0")]
+/*----- Value in opt.h for ${definition.name}: 0 -----*/
+#define ${definition.name}  ${definition.value}
+			[/#if]									
+			[#if (definition.name=="MEM_ALIGNMENT") && (definition.value !="1")]
 /*----- Value in opt.h for ${definition.name}: 1 -----*/
 #define ${definition.name}  ${definition.value}
             [/#if]
@@ -267,7 +294,11 @@ extern ${variable.value} ${variable.name};
             [#if (definition.name=="TCP_WND_UPDATE_THRESHOLD") && (definition.value != "valueNotSetted") && (definition.value == "536")]
 /*----- Value in opt.h for ${definition.name}: LWIP_MIN(TCP_WND/4, TCP_MSS*4) -----*/
 #define ${definition.name}  ${definition.value}
-            [/#if]            
+            [/#if]
+            [#if (definition.name=="TCP_RCV_SCALE") && (lwip_wnd_scale == "1")]
+/*----- Value in opt.h for ${definition.name}: undefined if LWIP_WND_SCALE is defined -----*/
+#define ${definition.name}  ${definition.value}
+            [/#if]
             [#if (definition.name=="LWIP_NETIF_LOOPBACK_MULTITHREADING") && (definition.value != "valueNotSetted") && (((definition.value == "0") && (lwip_rtos == 1)) || ((definition.value == "1") && (lwip_rtos == 0)))]
 /*----- Value in opt.h for ${definition.name}: !NO_SYS -----*/
 #define ${definition.name}  ${definition.value}
@@ -320,6 +351,10 @@ extern ${variable.value} ${variable.name};
 /*----- Value in opt.h for ${definition.name}: LWIP_IPV6 -----*/
 #define ${definition.name}  ${definition.value}
             [/#if] 
+            [#if (definition.name=="RECV_BUFSIZE_DEFAULT") && (definition.value != "valueNotSetted") && (lwip_rtos == 1)] [#-- rtosMaskList Param visible if freertos --]
+/*----- Value in opt.h for ${definition.name}: INT_MAX -----*/
+#define ${definition.name}  ${definition.value}
+            [/#if]            
             [#if (definition.name=="TCPIP_THREAD_STACKSIZE") && (definition.value != "valueNotSetted") && (lwip_rtos == 1) && (definition.value != "0")] [#-- rtosMaskList Param visible if freertos --]
 /*----- Value in opt.h for ${definition.name}: 0 -----*/
 #define ${definition.name}  ${definition.value}
@@ -480,9 +515,6 @@ extern ${variable.value} ${variable.name};
 [/#compress]	
 [/#if] [#-- SWIP.defines?? --]
 [/#list] [#-- SWIPdatas --]
-/* Parameter(s) not set in STM32CubeMX LwIP Configuration GUI -*/
-/* LwIP Parameter(s) not in opt.h -----------------------------*/
-#define LWIP_PROVIDE_ERRNO  1
 
 /* USER CODE BEGIN 1 */
 

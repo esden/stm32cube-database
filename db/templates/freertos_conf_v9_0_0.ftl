@@ -75,7 +75,8 @@
 [#list SWIPdatas as SWIP]  
 [#assign instName = SWIP.ipName]   
 [#assign fileName = SWIP.fileName]   
-[#assign version = SWIP.version]   
+[#assign version = SWIP.version] 
+[#assign valueMemoryAllocation = "0"]  
 
 [#assign CMSIS_version = "1.00"]
 
@@ -108,6 +109,7 @@
 [#-- Since FreeRTOS v9.0 --] 
 [#assign configSUPPORT_STATIC_ALLOCATION = "0"]
 [#assign configSUPPORT_DYNAMIC_ALLOCATION = "1"]
+[#assign MEMORY_ALLOCATION = "0"]
 [#assign configUSE_DAEMON_TASK_STARTUP_HOOK = "0"]
 [#assign INCLUDE_vTaskPrioritySet = "0"]        [#-- In v9.0, has a default value, 0 (in FreeRTOS.h) --] 
 [#assign INCLUDE_uxTaskPriorityGet = "0"]       [#-- In v9.0, has a default value, 0 (in FreeRTOS.h) --] 
@@ -115,8 +117,8 @@
 [#assign INCLUDE_vTaskSuspend = "0"]            [#-- In v9.0, has a default value, 0 (in FreeRTOS.h) --]
 [#assign INCLUDE_vTaskDelayUntil = "0"]         [#-- In v9.0, has a default value, 0 (in FreeRTOS.h) --]
 [#assign INCLUDE_vTaskDelay = "0"]              [#-- In v9.0, has a default value, 0 (in FreeRTOS.h) --]
-[#assign INCLUDE_xTaskAbortDelay = "0"]         [#-- NEW In v9.0, has a default value, 0 (in FreeRTOS.h) --]
-[#assign INCLUDE_xTaskGetHandle = "0"]          [#-- NEW In v9.0, has a default value, 0 (in FreeRTOS.h) --]
+[#assign xTaskAbortDelay = "0"]                 [#-- NEW In v9.0, has a default value, 0 (in FreeRTOS.h) --]
+[#assign xTaskGetHandle = "0"]                  [#-- NEW In v9.0, has a default value, 0 (in FreeRTOS.h) --]
 
 [#if SWIP.defines??]
 	[#list SWIP.defines as definition]
@@ -289,9 +291,18 @@
 	  [#if definition.name=="configSUPPORT_DYNAMIC_ALLOCATION"]
 	      [#assign valueSupportDynamicAllocation = definition.value]
 	  [/#if]
+	  [#if definition.name=="MEMORY_ALLOCATION"]
+	      [#assign valueMemoryAllocation = definition.value]
+	  [/#if]
 	  [#if definition.name=="configUSE_DAEMON_TASK_STARTUP_HOOK"]
 	      [#assign configUSE_DAEMON_TASK_STARTUP_HOOK = definition.value]
 	  [/#if]
+	  [#if definition.name=="INCLUDE_xTaskAbortDelay"]
+	      [#assign xTaskAbortDelay = definition.value] 
+	  [/#if]
+	  [#if definition.name=="INCLUDE_xTaskGetHandle"]
+	      [#assign xTaskGetHandle = definition.value]
+	  [/#if]	  
 	[/#list]
 [/#if]
 [/#list]
@@ -314,7 +325,7 @@
 /* Ensure stdint is only used by the compiler, and not the assembler. */
 #if defined(__ICCARM__) || defined(__CC_ARM) || defined(__GNUC__)
     #include <stdint.h>
-    #include "mxconstants.h" [#-- for user defines --]
+    #include "main.h" [#-- for user defines --]
     extern uint32_t SystemCoreClock;
 [#if configGENERATE_RUN_TIME_STATS=="1"]
 /* USER CODE BEGIN 0 */   	      
@@ -325,8 +336,18 @@
 #endif
 
 #define configUSE_PREEMPTION                     ${valueUsePreemption}
-#define configSUPPORT_STATIC_ALLOCATION          ${valueSupportStaticAllocation}
-#define configSUPPORT_DYNAMIC_ALLOCATION         ${valueSupportDynamicAllocation}
+[#if valueMemoryAllocation == "0"]
+#define configSUPPORT_STATIC_ALLOCATION          0
+#define configSUPPORT_DYNAMIC_ALLOCATION         1
+[/#if]
+[#if valueMemoryAllocation == "1"]
+#define configSUPPORT_STATIC_ALLOCATION          1
+#define configSUPPORT_DYNAMIC_ALLOCATION         0
+[/#if]
+[#if valueMemoryAllocation == "2"]
+#define configSUPPORT_STATIC_ALLOCATION          1
+#define configSUPPORT_DYNAMIC_ALLOCATION         1
+[/#if]
 #define configUSE_IDLE_HOOK                      ${valueUseIdleHook}
 #define configUSE_TICK_HOOK                      ${valueUseTickHook}
 #define configCPU_CLOCK_HZ                       ( ${valueCpuClock} )
@@ -337,7 +358,9 @@
 [/#if]
 #define configMAX_PRIORITIES                     ( ${valueMaxPriorities} )
 #define configMINIMAL_STACK_SIZE                 ((uint16_t)${valueMinimalStackSize})
+[#if valueMemoryAllocation != "1"]
 #define configTOTAL_HEAP_SIZE                    ((size_t)${valueTotalHeapSize})
+[/#if]
 #define configMAX_TASK_NAME_LEN                  ( ${valueMaxTaskNameLen} )
 #define configUSE_TRACE_FACILITY                 ${valueUseTraceFacility}
 #define configUSE_16_BIT_TICKS                   ${valueUse16BitTicks}
@@ -407,7 +430,6 @@ to exclude the API function. */
 #define INCLUDE_vTaskDelayUntil             ${valueTaskDelayUntil}
 #define INCLUDE_vTaskDelay                  ${valueTaskDelay}
 #define INCLUDE_xTaskGetSchedulerState      ${valueGetSchedulerState}
-
 [#if xTaskResumeFromISR=="0"]
 #define INCLUDE_xTaskResumeFromISR          0
 [/#if]
@@ -434,6 +456,12 @@ to exclude the API function. */
 [/#if]
 [#if eTaskGetState=="1"]
 #define INCLUDE_eTaskGetState               1
+[/#if]
+[#if xTaskAbortDelay=="1"]
+#define INCLUDE_xTaskAbortDelay             1
+[/#if]
+[#if xTaskGetHandle=="1"]
+#define INCLUDE_xTaskGetHandle              1
 [/#if]
 
 /* Cortex-M specific definitions. */

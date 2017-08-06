@@ -62,11 +62,13 @@ void ethernetif_input( void const * argument );
 void ethernetif_input(struct netif *netif);
 [/#if] [#-- endif with_rtos --]
 
+[#if (netif_callback == 1)]
 [#if use_rtos == 1]
 void ethernetif_set_link(void const *argument);
 [#else]
 void ethernetif_set_link(struct netif *netif);
-[/#if]
+[/#if] [#-- endif with_rtos --]
+[/#if] [#-- endif netif_callback --]
 void ethernetif_update_config(struct netif *netif);
 void ethernetif_notify_conn_changed(struct netif *netif);
 

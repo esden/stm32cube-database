@@ -1,15 +1,19 @@
 [#ftl]
 /**
  ******************************************************************************
-  * File Name          : ${name}.c
+  * File Name          : ${name?lower_case}.c
   * Description        : This file provides code for the configuration
-  *                      of the ${name} instances.
+  *                      of the ${name?lower_case} instances.
   ******************************************************************************
 [@common.optinclude name="Src/license.tmp"/][#--include License text --]  
   ******************************************************************************
   */
+
+[#-- 'UserCode sections' are indexed dynamically --]
+[#assign userCodeIdx = 0]
+
 /* Includes ------------------------------------------------------------------*/
-#include "${name}.h"
+#include "${name?lower_case}.h"
 
 [#-- IPdatas is a list of IPconfigModel --]  
 [#list IPdatas as IP]  
@@ -50,6 +54,11 @@
 [#if useDma]
 #include "DMA.h"
 [/#if]
+
+/* USER CODE BEGIN ${userCodeIdx} */
+/* USER CODE END ${userCodeIdx} */
+[#assign userCodeIdx = userCodeIdx+1]
+
 [#-- End Define includes --]
 
 [#-- macro getLocalVariable of a config Start--]
@@ -330,8 +339,13 @@
 [#-- else there is no LibMethod to call--]
 [/#macro]
 [#-- End macro generateConfigModelCode --]
- 
+
 [#compress]
+
+#n/* USER CODE BEGIN ${userCodeIdx} */
+/* USER CODE END ${userCodeIdx} */
+[#assign userCodeIdx = userCodeIdx+1]
+
 [#-- Section1: Create CallBack function for each middle ware instance --]
 [#-- This section can be moded into mw_h.ftl --]
 [#list IP.configModelList as instanceData]
@@ -359,6 +373,7 @@
 	[/#list]
 [/#list]#n
 
+/* Global variables ---------------------------------------------------------*/
 [#-- Section2: Create global Variables for each middle ware instance --] 
 [#-- Global variables --]
 [#if IP.variables??]
@@ -370,10 +385,15 @@
 	[/#if]
 	[/#list]
 [/#if]
-[#-- Global variables --]#n
+
+[#-- Global variables --]
+
+#n/* USER CODE BEGIN ${userCodeIdx} */
+/* USER CODE END ${userCodeIdx} */
+[#assign userCodeIdx = userCodeIdx+1]
+#n
 
 [#-- Section3: Create the void <IpInstance>_init() function for each middle ware instance --] 
-
 [#list IP.configModelList as instanceData]
    [#assign instName = instanceData.instanceName]   
    [#assign halMode= instanceData.halMode]
@@ -382,6 +402,7 @@
         [#--[#if halMode!=instName]void ${halMode}_${instName}_Init(void)[#else]void MX_${instName}_Init(void)[/#if] --]
 void MX_${ipName}${instName}_Init(void)
 {
+
 	[#-- MZA je dois remplir la liste des configs, pour l'instant j'utilise la liste des methods --]
 	[#-- assign ipInstanceIndex = instName?replace(name,"")--]
 	[#assign args = ""]
@@ -395,14 +416,25 @@ void MX_${ipName}${instName}_Init(void)
 	[#list instanceData.configs as config]
         [@generateConfigModelCode configModel=config inst=instName  nTab=1/]
     [/#list]
-#n}
+
+#n
+    #t/* USER CODE BEGIN ${userCodeIdx} */
+    #t/* USER CODE END ${userCodeIdx} */
+[#assign userCodeIdx = userCodeIdx+1]
+
+#n}#n
 [/#list]
 [/#compress]
 [/#list]
+
+/* USER CODE BEGIN ${userCodeIdx} */
+/* USER CODE END ${userCodeIdx} */
+[#assign userCodeIdx = userCodeIdx+1]
+
 /**
   * @}
   */
-
+ 
 /**
   * @}
   */

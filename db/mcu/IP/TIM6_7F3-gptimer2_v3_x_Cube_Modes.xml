@@ -58,6 +58,10 @@
     <RefParameter Name="RepetitionCounter" Comment="Repetition Counter (RCR)" DefaultValue="null" Max="0" Min="0" Type="integer" Group="Counter Settings" Visible="false">
         <Condition Diagnostic="" Expression="!(($IpNumber=1)|($IpNumber=8)|($IpNumber=20)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17))"/>
     </RefParameter>
+    <RefParameter Name="AutoReloadPreload" Comment="auto-reload preload" DefaultValue="TIM_AUTORELOAD_PRELOAD_DISABLE" Type="list" Group="Counter Settings" >
+        <PossibleValue Value="TIM_AUTORELOAD_PRELOAD_DISABLE" Comment="Disable"/>
+        <PossibleValue Value="TIM_AUTORELOAD_PRELOAD_ENABLE" Comment="Enable" />
+    </RefParameter>
 <!-- ___________________________________________-->
         <!-- **********************************************************************-->
  <RefParameter Name="Channel" Comment="Channel" DefaultValue="TIM_CHANNEL_1" Type="list" Visible="false">
@@ -1407,6 +1411,25 @@
     <RefParameter Name="TIM8_ETR_ADC3_REMAP" Comment="ETR_ADC3 remap capabilities for TIM8" DefaultValue="null" Type="list" Group="ETR_ADC remap capabilities for TIM8">
             <Condition Diagnostic="" Expression="!ADC3_Exist" />
     </RefParameter>
+    <RefParameter Name="TIM20_ETR_ADC3_REMAP" Comment="ETR_ADC3 remap capabilities for TIM8" DefaultValue="TIM_TIM8_ADC3_NONE" Type="list" Group="ETR_ADC remap capabilities for TIM8">
+            <Condition Diagnostic="" Expression="ADC3_Exist" />
+            <PossibleValue Value="TIM_TIM20_ADC3_NONE" Comment="TIM20_ETR is not connected to any AWD"/>
+            <PossibleValue Value="TIM_TIM20_ADC3_AWD1" Comment="TIM20_ETR is connected to ADC3 AWD1"/>
+            <PossibleValue Value="TIM_TIM20_ADC3_AWD2" Comment="TIM20_ETR is connected to ADC3 AWD2"/>
+            <PossibleValue Value="TIM_TIM20_ADC3_AWD3" Comment="TIM20_ETR is connected to ADC3 AWD3"/>
+    </RefParameter>
+    <RefParameter Name="TIM20_ETR_ADC4_REMAP" Comment="ETR_ADC4 remap capabilities for TIM20" DefaultValue="TIM_TIM20_ADC4_NONE" Type="list" Group="ETR_ADC remap capabilities for TIM8">
+            <PossibleValue Value="TIM_TIM20_ADC4_NONE" Comment="TIM20_ETR is not connected to any AWD"/>
+            <PossibleValue Value="TIM_TIM20_ADC4_AWD1" Comment="TIM20_ETR is connected to ADC4 AWD1"/>
+            <PossibleValue Value="TIM_TIM20_ADC4_AWD2" Comment="TIM20_ETR is connected to ADC4 AWD2"/>
+            <PossibleValue Value="TIM_TIM20_ADC4_AWD3" Comment="TIM20_ETR is connected to ADC4 AWD3"/>
+    </RefParameter>
+    <RefParameter Name="TIM20_ETR_ADC3_REMAP" Comment="ETR_ADC3 remap capabilities for TIM20" DefaultValue="null" Type="list" Group="ETR_ADC remap capabilities for TIM20">
+            <Condition Diagnostic="" Expression="!ADC3_Exist" />
+    </RefParameter>
+ <RefParameter Name="TIM20_ETR_ADC4_REMAP" Comment="ETR_ADC4 remap capabilities for TIM20" DefaultValue="null" Type="list" Group="ETR_ADC remap capabilities for TIM20">
+            <Condition Diagnostic="" Expression="!ADC4_Exist" />
+    </RefParameter>
 <!--/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\-->
 <!--/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/ REF MODE \/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\-->
 <!--/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\-->
@@ -1421,6 +1444,7 @@
            <Parameter Name="Period" />
            <Parameter Name="ClockDivision" />
            <Parameter Name="RepetitionCounter" />
+           <Parameter Name="AutoReloadPreload" />
            <Parameter Name="TIM_MasterSlaveMode" />
            <Parameter Name="TIM_MasterOutputTrigger" />
            <Parameter Name="TIM_MasterOutputTrigger2" />
@@ -1444,6 +1468,7 @@
            <Parameter Name="Period" />
            <Parameter Name="ClockDivision" />
            <Parameter Name="RepetitionCounter" />
+           <Parameter Name="AutoReloadPreload" />
            <Parameter Name="TIM_MasterSlaveMode" />
            <Parameter Name="TIM_MasterOutputTrigger" />
            <Parameter Name="TIM_MasterOutputTrigger2" />
@@ -2619,44 +2644,63 @@
            <ConfigForMode>TIM_MasterConfigSynchronization</ConfigForMode>
            <ConfigForMode>TIM_ConfigBreakDeadTime</ConfigForMode>
     </RefMode>
-<RefMode BaseMode ="Counter_init" Name="ClockSourceETR_Mode2_ADC_Remap_TIM1" HalMode ="TIM_Base">
-           <Parameter Name="ClockPolarity" >
-                <PossibleValue>TIM_CLOCKPOLARITY_INVERTED</PossibleValue>
-                <PossibleValue>TIM_CLOCKPOLARITY_NONINVERTED</PossibleValue>
-           </Parameter>
-           <Parameter Name="ClockPrescaler" >
-                <PossibleValue>TIM_CLOCKPRESCALER_DIV1</PossibleValue>
-                <PossibleValue>TIM_CLOCKPRESCALER_DIV2</PossibleValue>
-                <PossibleValue>TIM_CLOCKPRESCALER_DIV4</PossibleValue>
-                <PossibleValue>TIM_CLOCKPRESCALER_DIV8</PossibleValue>
-           </Parameter>
+    <RefMode BaseMode ="Counter_init" Name="ClockSourceETR_Mode2_ADC_Remap_TIM1" HalMode ="TIM_Base">
+        <Parameter Name="ClockPolarity" >
+            <PossibleValue>TIM_CLOCKPOLARITY_INVERTED</PossibleValue>
+            <PossibleValue>TIM_CLOCKPOLARITY_NONINVERTED</PossibleValue>
+        </Parameter>
+        <Parameter Name="ClockPrescaler" >
+            <PossibleValue>TIM_CLOCKPRESCALER_DIV1</PossibleValue>
+            <PossibleValue>TIM_CLOCKPRESCALER_DIV2</PossibleValue>
+            <PossibleValue>TIM_CLOCKPRESCALER_DIV4</PossibleValue>
+            <PossibleValue>TIM_CLOCKPRESCALER_DIV8</PossibleValue>
+        </Parameter>
 <!-- <Parameter Name="ClockFilter" />-->
-           <ConfigForMode>ConfigClockSource</ConfigForMode>
-           <ConfigForMode>TIM_MasterConfigSynchronization</ConfigForMode>
-           <ConfigForMode>TIM_ConfigBreakDeadTime</ConfigForMode>
-           <ConfigForMode>RemapConfig_TIM1_ETR_ADC</ConfigForMode>
-           <Parameter Name="TIM1_ETR_ADC1_REMAP"/>
-           <Parameter Name="TIM1_ETR_ADC4_REMAP"/>
-    </RefMode>
-<RefMode BaseMode ="Counter_init" Name="ClockSourceETR_Mode2_ADC_Remap_TIM8" HalMode ="TIM_Base">
-           <Parameter Name="ClockPolarity" >
-                <PossibleValue>TIM_CLOCKPOLARITY_INVERTED</PossibleValue>
-                <PossibleValue>TIM_CLOCKPOLARITY_NONINVERTED</PossibleValue>
-           </Parameter>
-           <Parameter Name="ClockPrescaler" >
-                <PossibleValue>TIM_CLOCKPRESCALER_DIV1</PossibleValue>
-                <PossibleValue>TIM_CLOCKPRESCALER_DIV2</PossibleValue>
-                <PossibleValue>TIM_CLOCKPRESCALER_DIV4</PossibleValue>
-                <PossibleValue>TIM_CLOCKPRESCALER_DIV8</PossibleValue>
-           </Parameter>
+        <ConfigForMode>ConfigClockSource</ConfigForMode>
+        <ConfigForMode>TIM_MasterConfigSynchronization</ConfigForMode>
+        <ConfigForMode>TIM_ConfigBreakDeadTime</ConfigForMode>
+        <ConfigForMode>RemapConfig_TIM1_ETR_ADC</ConfigForMode>
+        <Parameter Name="TIM1_ETR_ADC1_REMAP"/>
+        <Parameter Name="TIM1_ETR_ADC4_REMAP"/>
+   </RefMode>
+    <RefMode BaseMode ="Counter_init" Name="ClockSourceETR_Mode2_ADC_Remap_TIM8" HalMode ="TIM_Base">
+        <Parameter Name="ClockPolarity" >
+            <PossibleValue>TIM_CLOCKPOLARITY_INVERTED</PossibleValue>
+            <PossibleValue>TIM_CLOCKPOLARITY_NONINVERTED</PossibleValue>
+        </Parameter>
+        <Parameter Name="ClockPrescaler" >
+   <PossibleValue>TIM_CLOCKPRESCALER_DIV1</PossibleValue>
+   <PossibleValue>TIM_CLOCKPRESCALER_DIV2</PossibleValue>
+   <PossibleValue>TIM_CLOCKPRESCALER_DIV4</PossibleValue>
+   <PossibleValue>TIM_CLOCKPRESCALER_DIV8</PossibleValue>
+     </Parameter>
 <!-- <Parameter Name="ClockFilter" />-->
-           <ConfigForMode>ConfigClockSource</ConfigForMode>
-           <ConfigForMode>TIM_MasterConfigSynchronization</ConfigForMode>
-           <ConfigForMode>TIM_ConfigBreakDeadTime</ConfigForMode>
-           <ConfigForMode>RemapConfig_TIM8_ETR_ADC</ConfigForMode>
-           <Parameter Name="TIM8_ETR_ADC2_REMAP"/>
-           <Parameter Name="TIM8_ETR_ADC3_REMAP"/>
-    </RefMode>
+     <ConfigForMode>ConfigClockSource</ConfigForMode>
+     <ConfigForMode>TIM_MasterConfigSynchronization</ConfigForMode>
+     <ConfigForMode>TIM_ConfigBreakDeadTime</ConfigForMode>
+     <ConfigForMode>RemapConfig_TIM8_ETR_ADC</ConfigForMode>
+     <Parameter Name="TIM8_ETR_ADC2_REMAP"/>
+     <Parameter Name="TIM8_ETR_ADC3_REMAP"/>
+   </RefMode>
+     <RefMode BaseMode ="Counter_init" Name="ClockSourceETR_Mode2_ADC_Remap_TIM20" HalMode ="TIM_Base">
+        <Parameter Name="ClockPolarity" >
+            <PossibleValue>TIM_CLOCKPOLARITY_INVERTED</PossibleValue>
+            <PossibleValue>TIM_CLOCKPOLARITY_NONINVERTED</PossibleValue>
+        </Parameter>
+        <Parameter Name="ClockPrescaler" >
+   <PossibleValue>TIM_CLOCKPRESCALER_DIV1</PossibleValue>
+   <PossibleValue>TIM_CLOCKPRESCALER_DIV2</PossibleValue>
+   <PossibleValue>TIM_CLOCKPRESCALER_DIV4</PossibleValue>
+   <PossibleValue>TIM_CLOCKPRESCALER_DIV8</PossibleValue>
+     </Parameter>
+<!-- <Parameter Name="ClockFilter" />-->
+     <ConfigForMode>ConfigClockSource</ConfigForMode>
+     <ConfigForMode>TIM_MasterConfigSynchronization</ConfigForMode>
+     <ConfigForMode>TIM_ConfigBreakDeadTime</ConfigForMode>
+     <ConfigForMode>RemapConfig_TIM20_ETR_ADC</ConfigForMode>
+     <Parameter Name="TIM20_ETR_ADC3_REMAP"/>
+     <Parameter Name="TIM20_ETR_ADC4_REMAP"/>
+   </RefMode>
          <RefMode BaseMode ="Counter_init" Name="ITR0" HalMode ="TIM_Base">
            <ConfigForMode>ConfigClockSource</ConfigForMode>
            <ConfigForMode>TIM_MasterConfigSynchronization</ConfigForMode>
@@ -2807,6 +2851,19 @@
            <Parameter Name="TIM8_ETR_ADC2_REMAP"/>
            <Parameter Name="TIM8_ETR_ADC3_REMAP"/>
     </RefMode>
+ <RefMode BaseMode ="Counter_init" Name="TriggerSource_ETR_ADC_Remap_TIM20" HalMode ="TIM_Base">
+           <ConfigForMode>ConfigClockSource</ConfigForMode>
+           <ConfigForMode>SlaveConfigSynchronization</ConfigForMode>
+               <Parameter Name="Slave_TriggerPolarity" />
+               <Parameter Name="Slave_TriggerPrescaler" />
+               <Parameter Name="Slave_TriggerFilter" />
+               <Parameter Name="TIM_SlaveMode" />
+           <ConfigForMode>TIM_MasterConfigSynchronization</ConfigForMode>
+           <ConfigForMode>TIM_ConfigBreakDeadTime</ConfigForMode>
+           <ConfigForMode>RemapConfig_TIM20_ETR_ADC</ConfigForMode>
+           <Parameter Name="TIM20_ETR_ADC3_REMAP"/>
+           <Parameter Name="TIM20_ETR_ADC4_REMAP"/>
+    </RefMode>
          <RefMode BaseMode ="Counter_init" Name="TriggerSource_TI1FP1" HalMode ="TIM_Base">
            <ConfigForMode>ConfigClockSource</ConfigForMode>
            <ConfigForMode>SlaveConfigSynchronization</ConfigForMode>
@@ -2828,16 +2885,21 @@
            <ConfigForMode>TIM_ConfigBreakDeadTime</ConfigForMode>
     </RefMode>
 <!--********************* RefMode for Clearing OCxref via ETR *******************************-->
-         <RefMode BaseMode ="Empty" Name="ETR_as_clearing_source_through_ADC_remap_TIM1" HalMode ="">
-            <ConfigForMode>RemapConfig_TIM1_ETR_ADC</ConfigForMode>
+    <RefMode BaseMode ="Empty" Name="ETR_as_clearing_source_through_ADC_remap_TIM1" HalMode ="">
+           <ConfigForMode>RemapConfig_TIM1_ETR_ADC</ConfigForMode>
            <Parameter Name="TIM1_ETR_ADC1_REMAP" />
            <Parameter Name="TIM1_ETR_ADC4_REMAP" />
-    </RefMode>
-         <RefMode BaseMode ="Empty" Name="ETR_as_clearing_source_through_ADC_remap_TIM8" HalMode ="">
+   </RefMode>
+    <RefMode BaseMode ="Empty" Name="ETR_as_clearing_source_through_ADC_remap_TIM8" HalMode ="">
             <ConfigForMode>RemapConfig_TIM8_ETR_ADC</ConfigForMode>
            <Parameter Name="TIM8_ETR_ADC2_REMAP" />
            <Parameter Name="TIM8_ETR_ADC3_REMAP" />
-    </RefMode>
+   </RefMode>
+ <RefMode BaseMode ="Empty" Name="ETR_as_clearing_source_through_ADC_remap_TIM20" HalMode ="">
+            <ConfigForMode>RemapConfig_TIM20_ETR_ADC</ConfigForMode>
+           <Parameter Name="TIM20_ETR_ADC3_REMAP" />
+           <Parameter Name="TIM20_ETR_ADC4_REMAP" />
+   </RefMode>
 <!--********************* RefMode for XOR Gate Activation *******************************-->
          <RefMode BaseMode ="Empty" Name="XOR_enable" HalMode ="">
             <ConfigForMode>ConfigTI1Input</ConfigForMode>
@@ -2941,16 +3003,24 @@
 <!--TEST--> <Condition Expression=" (!Semaphore_ETRasClearingSource$IpInstance) &amp; (!Semaphore_ClockSourceETRMode1$IpInstance) &amp; (!Semaphore_ClockSourceETRMode2$IpInstance)&amp;!(Semaphore_input_Channel_TRC$IpInstance)&amp;(Semaphore_SMC_Trigger$IpInstance|Semaphore_SMC_Clock$IpInstance|Semaphore_SMC_Gated$IpInstance|Semaphore_SMC_Reset$IpInstance|Semaphore_SMC_CombinedResetTrigger$IpInstance)&amp;!(($IpNumber=2)&amp;(Semaphore_CH1pinUsed$IpInstance))" Diagnostic="An active Slave Mode should be selected first . This option might become unavailable if (1)ETR is already used as a clearing source (2)ETR is already used as a Clock Source, or (3)if an input capture from TRC is already selected (4) specifically for TIM2 if CH1 IO is already used" />
     </Mode>
     <Mode Name="TriggerSource_ETR_ADC_Remap_TIM1" UserName="ETR1 through ADC Remap" RemoveCondition="!($IpNumber=1)">
-                                        <Semaphore>Semaphore_TriggerSourceETR$IpInstance</Semaphore>
-                                        <Semaphore>Semaphore_ETRpinUsed$IpInstance</Semaphore>
+                    <Semaphore>Semaphore_TriggerSourceETR$IpInstance</Semaphore>
+                    <Semaphore>Semaphore_ETRpinUsed$IpInstance</Semaphore>
      <SignalLogicalOp Name="AND">
       <Signal Name="VS_NoETR"/>
      </SignalLogicalOp>
 <!--TEST--> <Condition Expression=" (!Semaphore_ETRasClearingSource$IpInstance) &amp; (!Semaphore_ClockSourceETRMode1$IpInstance) &amp; (!Semaphore_ClockSourceETRMode2$IpInstance)&amp;!(Semaphore_input_Channel_TRC$IpInstance)&amp;(Semaphore_SMC_Trigger$IpInstance|Semaphore_SMC_Clock$IpInstance|Semaphore_SMC_Gated$IpInstance|Semaphore_SMC_Reset$IpInstance|Semaphore_SMC_CombinedResetTrigger$IpInstance)" Diagnostic="An active Slave Mode should be selected first . This option might become unavailable if (1)ETR is already used as a clearing source (2)ETR is already used as a Clock Source, or (3)if an input capture from TRC is already selected" />
     </Mode>
     <Mode Name="TriggerSource_ETR_ADC_Remap_TIM8" UserName="ETR1 through ADC Remap" RemoveCondition="!($IpNumber=8)">
-                                        <Semaphore>Semaphore_TriggerSourceETR$IpInstance</Semaphore>
-                                        <Semaphore>Semaphore_ETRpinUsed$IpInstance</Semaphore>
+                    <Semaphore>Semaphore_TriggerSourceETR$IpInstance</Semaphore>
+                    <Semaphore>Semaphore_ETRpinUsed$IpInstance</Semaphore>
+     <SignalLogicalOp Name="AND">
+      <Signal Name="VS_NoETR"/>
+     </SignalLogicalOp>
+<!--TEST--> <Condition Expression=" (!Semaphore_ETRasClearingSource$IpInstance) &amp; (!Semaphore_ClockSourceETRMode1$IpInstance) &amp; (!Semaphore_ClockSourceETRMode2$IpInstance)&amp;!(Semaphore_input_Channel_TRC$IpInstance)&amp;(Semaphore_SMC_Trigger$IpInstance|Semaphore_SMC_Clock$IpInstance|Semaphore_SMC_Gated$IpInstance|Semaphore_SMC_Reset$IpInstance|Semaphore_SMC_CombinedResetTrigger$IpInstance)" Diagnostic="An active Slave Mode should be selected first . This option might become unavailable if (1)ETR is already used as a clearing source (2)ETR is already used as a Clock Source, or (3)if an input capture from TRC is already selected" />
+    </Mode>
+    <Mode Name="TriggerSource_ETR_ADC_Remap_TIM20" UserName="ETR1 through ADC Remap" RemoveCondition="!($IpNumber=20)">
+                    <Semaphore>Semaphore_TriggerSourceETR$IpInstance</Semaphore>
+                    <Semaphore>Semaphore_ETRpinUsed$IpInstance</Semaphore>
      <SignalLogicalOp Name="AND">
       <Signal Name="VS_NoETR"/>
      </SignalLogicalOp>
@@ -3005,21 +3075,29 @@
      </SignalLogicalOp>
     </Mode>
     <Mode Name="ClockSourceETR_Mode2_ADC_Remap_TIM1" UserName="ETR2 through ADC Remap" RemoveCondition="!($IpNumber=1)">
-                                        <Semaphore>Semaphore_ClockSourceETRMode2$IpInstance</Semaphore>
-                                        <Semaphore>Semaphore_ETRpinUsed$IpInstance</Semaphore>
-                                        <Condition Expression="!(Semaphore_Encoder_Interface$IpInstance|Semaphore_SMC_Clock$IpInstance) &amp; (!Semaphore_ETRasClearingSource$IpInstance) &amp; (!Semaphore_TriggerSourceETR$IpInstance)&amp;!(($IpNumber=2)&amp;(Semaphore_CH1pinUsed$IpInstance))" Diagnostic="Cannot be used (1) while Encoder mode is selected,(2) in External Clock mode,(3) while ETR is aready used as clearing source or as Trigger Source, (4) specifically for TIM2 if CH1 IO is already used"/>
-     <SignalLogicalOp Name="AND">
-      <Signal Name="VS_NoETR"/>
-     </SignalLogicalOp>
-    </Mode>
+        <Semaphore>Semaphore_ClockSourceETRMode2$IpInstance</Semaphore>
+        <Semaphore>Semaphore_ETRpinUsed$IpInstance</Semaphore>
+        <Condition Expression="!(Semaphore_Encoder_Interface$IpInstance|Semaphore_SMC_Clock$IpInstance) &amp; (!Semaphore_ETRasClearingSource$IpInstance) &amp; (!Semaphore_TriggerSourceETR$IpInstance)&amp;!(($IpNumber=2)&amp;(Semaphore_CH1pinUsed$IpInstance))" Diagnostic="Cannot be used (1) while Encoder mode is selected,(2) in External Clock mode,(3) while ETR is aready used as clearing source or as Trigger Source, (4) specifically for TIM2 if CH1 IO is already used"/>
+  <SignalLogicalOp Name="AND">
+   <Signal Name="VS_NoETR"/>
+  </SignalLogicalOp>
+ </Mode>
     <Mode Name="ClockSourceETR_Mode2_ADC_Remap_TIM8" UserName="ETR2 through ADC Remap" RemoveCondition="!($IpNumber=8)">
-                                        <Semaphore>Semaphore_ClockSourceETRMode2$IpInstance</Semaphore>
-                                        <Semaphore>Semaphore_ETRpinUsed$IpInstance</Semaphore>
-                                        <Condition Expression="!(Semaphore_Encoder_Interface$IpInstance|Semaphore_SMC_Clock$IpInstance) &amp; (!Semaphore_ETRasClearingSource$IpInstance) &amp; (!Semaphore_TriggerSourceETR$IpInstance)&amp;!(($IpNumber=2)&amp;(Semaphore_CH1pinUsed$IpInstance))" Diagnostic="Cannot be used (1) while Encoder mode is selected,(2) in External Clock mode,(3) while ETR is aready used as clearing source or as Trigger Source, (4) specifically for TIM2 if CH1 IO is already used"/>
-     <SignalLogicalOp Name="AND">
-      <Signal Name="VS_NoETR"/>
-     </SignalLogicalOp>
-    </Mode>
+        <Semaphore>Semaphore_ClockSourceETRMode2$IpInstance</Semaphore>
+         <Semaphore>Semaphore_ETRpinUsed$IpInstance</Semaphore>
+        <Condition Expression="!(Semaphore_Encoder_Interface$IpInstance|Semaphore_SMC_Clock$IpInstance) &amp; (!Semaphore_ETRasClearingSource$IpInstance) &amp; (!Semaphore_TriggerSourceETR$IpInstance)&amp;!(($IpNumber=2)&amp;(Semaphore_CH1pinUsed$IpInstance))" Diagnostic="Cannot be used (1) while Encoder mode is selected,(2) in External Clock mode,(3) while ETR is aready used as clearing source or as Trigger Source, (4) specifically for TIM2 if CH1 IO is already used"/>
+  <SignalLogicalOp Name="AND">
+   <Signal Name="VS_NoETR"/>
+  </SignalLogicalOp>
+ </Mode>
+ <Mode Name="ClockSourceETR_Mode2_ADC_Remap_TIM20" UserName="ETR2 through ADC Remap" RemoveCondition="!($IpNumber=20)">
+        <Semaphore>Semaphore_ClockSourceETRMode2$IpInstance</Semaphore>
+         <Semaphore>Semaphore_ETRpinUsed$IpInstance</Semaphore>
+        <Condition Expression="!(Semaphore_Encoder_Interface$IpInstance|Semaphore_SMC_Clock$IpInstance) &amp; (!Semaphore_ETRasClearingSource$IpInstance) &amp; (!Semaphore_TriggerSourceETR$IpInstance)&amp;!(($IpNumber=2)&amp;(Semaphore_CH1pinUsed$IpInstance))" Diagnostic="Cannot be used (1) while Encoder mode is selected,(2) in External Clock mode,(3) while ETR is aready used as clearing source or as Trigger Source, (4) specifically for TIM2 if CH1 IO is already used"/>
+  <SignalLogicalOp Name="AND">
+   <Signal Name="VS_NoETR"/>
+  </SignalLogicalOp>
+ </Mode>
                         </ModeLogicOperator>
 <!--Fin sfo-->
                    </Mode>
@@ -3854,17 +3932,25 @@
      </SignalLogicalOp>
     </Mode>
     <Mode Name="ETR_as_clearing_source_through_ADC_remap_TIM1" UserName="ETR through ADC remap" RemoveCondition="!($IpNumber=1)">
-                                        <Semaphore>Semaphore_ETRasClearingSource$IpInstance</Semaphore>
-                                        <Semaphore>Semaphore_ETRpinUsed$IpInstance</Semaphore>
-                                        <Condition Diagnostic="activated only when a channel is configured in output and not all in forced_output Not available if ETR is used as Clock Source or Trigger Source" Expression="Semaphore_clearable$IpInstance &amp; (!Semaphore_TriggerSourceETR$IpInstance) &amp; (!Semaphore_ClockSourceETRMode1$IpInstance) &amp; (!Semaphore_ClockSourceETRMode2$IpInstance)&amp;!(($IpNumber=2)&amp;(Semaphore_CH1pinUsed$IpInstance))" />
+                    <Semaphore>Semaphore_ETRasClearingSource$IpInstance</Semaphore>
+                    <Semaphore>Semaphore_ETRpinUsed$IpInstance</Semaphore>
+                    <Condition Diagnostic="activated only when a channel is configured in output and not all in forced_output Not available if ETR is used as Clock Source or Trigger Source" Expression="Semaphore_clearable$IpInstance &amp; (!Semaphore_TriggerSourceETR$IpInstance) &amp; (!Semaphore_ClockSourceETRMode1$IpInstance) &amp; (!Semaphore_ClockSourceETRMode2$IpInstance)&amp;!(($IpNumber=2)&amp;(Semaphore_CH1pinUsed$IpInstance))" />
      <SignalLogicalOp Name="AND">
       <Signal Name="VS_NoETR"/>
      </SignalLogicalOp>
     </Mode>
     <Mode Name="ETR_as_clearing_source_through_ADC_remap_TIM8" UserName="ETR through ADC remap" RemoveCondition="!($IpNumber=8)">
-                                        <Semaphore>Semaphore_ETRasClearingSource$IpInstance</Semaphore>
-                                        <Semaphore>Semaphore_ETRpinUsed$IpInstance</Semaphore>
-                                        <Condition Diagnostic="activated only when a channel is configured in output and not all in forced_output Not available if ETR is used as Clock Source or Trigger Source" Expression="Semaphore_clearable$IpInstance &amp; (!Semaphore_TriggerSourceETR$IpInstance) &amp; (!Semaphore_ClockSourceETRMode1$IpInstance) &amp; (!Semaphore_ClockSourceETRMode2$IpInstance)&amp;!(($IpNumber=2)&amp;(Semaphore_CH1pinUsed$IpInstance))" />
+                    <Semaphore>Semaphore_ETRasClearingSource$IpInstance</Semaphore>
+                    <Semaphore>Semaphore_ETRpinUsed$IpInstance</Semaphore>
+                    <Condition Diagnostic="activated only when a channel is configured in output and not all in forced_output Not available if ETR is used as Clock Source or Trigger Source" Expression="Semaphore_clearable$IpInstance &amp; (!Semaphore_TriggerSourceETR$IpInstance) &amp; (!Semaphore_ClockSourceETRMode1$IpInstance) &amp; (!Semaphore_ClockSourceETRMode2$IpInstance)&amp;!(($IpNumber=2)&amp;(Semaphore_CH1pinUsed$IpInstance))" />
+     <SignalLogicalOp Name="AND">
+      <Signal Name="VS_NoETR"/>
+     </SignalLogicalOp>
+    </Mode>
+    <Mode Name="ETR_as_clearing_source_through_ADC_remap_TIM20" UserName="ETR through ADC remap" RemoveCondition="!($IpNumber=20)">
+                    <Semaphore>Semaphore_ETRasClearingSource$IpInstance</Semaphore>
+                    <Semaphore>Semaphore_ETRpinUsed$IpInstance</Semaphore>
+                    <Condition Diagnostic="activated only when a channel is configured in output and not all in forced_output Not available if ETR is used as Clock Source or Trigger Source" Expression="Semaphore_clearable$IpInstance &amp; (!Semaphore_TriggerSourceETR$IpInstance) &amp; (!Semaphore_ClockSourceETRMode1$IpInstance) &amp; (!Semaphore_ClockSourceETRMode2$IpInstance)&amp;!(($IpNumber=2)&amp;(Semaphore_CH1pinUsed$IpInstance))" />
      <SignalLogicalOp Name="AND">
       <Signal Name="VS_NoETR"/>
      </SignalLogicalOp>

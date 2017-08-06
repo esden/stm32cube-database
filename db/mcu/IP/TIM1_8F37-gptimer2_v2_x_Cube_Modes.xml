@@ -54,6 +54,10 @@
     <RefParameter Name="RepetitionCounter" Comment="Repetition Counter (RCR)" DefaultValue="null" Max="0" Min="0" Type="integer" Group="Counter Settings" Visible="false">
         <Condition Diagnostic="" Expression="!(($IpNumber=1)|($IpNumber=8)|($IpNumber=20)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17))"/>
     </RefParameter>
+    <RefParameter Name="AutoReloadPreload" Comment="auto-reload preload" DefaultValue="TIM_AUTORELOAD_PRELOAD_DISABLE" Type="list" Group="Counter Settings" >
+        <PossibleValue Value="TIM_AUTORELOAD_PRELOAD_DISABLE" Comment="Disable"/>
+        <PossibleValue Value="TIM_AUTORELOAD_PRELOAD_ENABLE" Comment="Enable" />
+    </RefParameter>
 <!-- ___________________________________________-->
         <!-- **********************************************************************-->
  <RefParameter Name="Channel" Comment="Channel" DefaultValue="TIM_CHANNEL_1" Type="list" Visible="false">
@@ -1125,12 +1129,15 @@
             <PossibleValue Value="TIM_TIM14_MCO" Comment="TIM14 Channel 1 is connected to MCO clock" Semaphore="SEM2RCC_MCO_REQUIRED_$IpInstance"/>
     </RefParameter>
 <!-- for TIM2 of F37 family -->
+<!-- removed in refman RM0313 Jun 21-->
+<!--
     <RefParameter Name="TIM2_ITR1_REMAP" Comment="ITR1 remap capabilities for TIM2" DefaultValue="__NULL" Type="list" Group="ITR1 remap capabilities for TIM2">
             <PossibleValue Value="__NULL" Comment="TIM2 ITR1 input is connected to TIM8 TRGO"/>
             <PossibleValue Value="TIM_TIM2_ETH_PTP" Comment="TIM2 ITR1 input is connected to PTP trigger output"/>
             <PossibleValue Value="TIM_TIM2_USBFS_SOF" Comment="TIM2 ITR1 input is connected to USB FS SOF"/>
             <PossibleValue Value="TIM_TIM2_USBHS_SOF" Comment="TIM2 ITR1 input is connected to USB HS SOF"/>
     </RefParameter>
+-->
 <!--/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\-->
 <!--/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/ REF MODE \/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\-->
 <!--/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\-->
@@ -1144,6 +1151,7 @@
            <Parameter Name="Period" />
            <Parameter Name="ClockDivision" />
            <Parameter Name="RepetitionCounter" />
+           <Parameter Name="AutoReloadPreload" />
            <Parameter Name="TIM_MasterSlaveMode" />
            <Parameter Name="TIM_MasterOutputTrigger" />
            <Parameter Name="BreakState" />
@@ -1154,9 +1162,6 @@
            <Parameter Name="LockLevel" />
            <Parameter Name="DeadTime" />
            <Parameter Name="ClockFilter" />
-           <Parameter Name="TIM2_ITR1_REMAP">
-               <Condition Diagnostic="" Expression="(($IpNumber=2) &amp;Semaphore_TriggerSourceITR1$IpInstance)"/>
-          </Parameter>
   </RefMode>
 <!-- ***********************************************************************************-->
          <RefMode Name="TRGO_use" HalMode ="TIM" Group="TRGO configuration">
@@ -2298,7 +2303,6 @@
                <Parameter Name="TIM_SlaveMode" />
            <ConfigForMode>TIM_MasterConfigSynchronization</ConfigForMode>
            <ConfigForMode>TIM_ConfigBreakDeadTime</ConfigForMode>
-           <ConfigForMode>RemapConfig_TIM2_ITR1</ConfigForMode>
     </RefMode>
          <RefMode BaseMode ="Counter_init" Name="TriggerSource_ITR2" HalMode ="TIM_Base">
            <ConfigForMode>ConfigClockSource</ConfigForMode>

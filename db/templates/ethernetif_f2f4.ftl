@@ -362,7 +362,7 @@ error:
 static struct pbuf * low_level_input(struct netif *netif)
 {
   struct pbuf *p = NULL;
-  struct pbuf *q;
+  struct pbuf *q = NULL;
   uint16_t len = 0;
   uint8_t *buffer;
   __IO ETH_DMADescTypeDef *dmarxdesc;

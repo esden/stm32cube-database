@@ -109,6 +109,10 @@
     </RefParameter>
     <RefParameter Comment="APB2 Timer Clock Divider" DefaultValue="2" Max="2" Min="2" Name="APB2TimCLKDivider" Type="integer" Visible="false"/>
 	
+    <RefParameter Comment="Clock Output" DefaultValue="RCC_MCO3" Name="RCC_MCO" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="MCOConfig&amp;PB13_RCC_MCO|(SEM2RCC_MCO_REQUIRED_TIM21 &amp; TIM21 &amp; Semaphore_input_Channel1TIM21)"/>
+        <PossibleValue Comment="Clock Output" Value="RCC_MCO3"/>
+    </RefParameter>
     <RefParameter Comment="Clock Output" DefaultValue="RCC_MCO1" Name="RCC_MCO" Type="list" Visible="false">
         <Condition Diagnostic="" Expression="MCOConfig&amp;PA8_RCC_MCO|(SEM2RCC_MCO_REQUIRED_TIM21 &amp; TIM21 &amp; Semaphore_input_Channel1TIM21)"/>
         <PossibleValue Comment="Clock Output" Value="RCC_MCO1"/>
@@ -1047,8 +1051,16 @@
         <Condition Diagnostic="" Expression="PCLK2toConfigure"/>
     </RefParameter>
     <RefParameter Comment="APB2CLKDividerARG" DefaultValue="null" Name="APB2CLKDividerARG" Type="list" Visible="false"/>
-     
-	
+<RefParameter  Name="LSE_Drive_Capability" Comment="LSE Drive Capability" Type="list" DefaultValue="false" Group="RCC Parameters">
+        <Condition Diagnostic="" Expression="LSEOscillator &amp; (LSEUsed=1)"/>
+        <PossibleValue Value="RCC_LSEDRIVE_LOW"        Comment="LSE oscillator low drive capability"  />
+        <PossibleValue Value="RCC_LSEDRIVE_MEDIUMLOW"  Comment="LSE oscillator medium low drive capability"/>
+        <PossibleValue Value="RCC_LSEDRIVE_MEDIUMHIGH" Comment="LSE oscillator medium high drive capability"/>
+        <PossibleValue Value="RCC_LSEDRIVE_HIGH"       Comment="LSE oscillator high drive capability"/>
+    </RefParameter>
+	<RefParameter Visible="false" Name="LSE_Drive_Capability" Comment="LSE Drive Capability" Type="list" DefaultValue="null" Group="RCC Parameters">
+    
+    </RefParameter>
     <RefMode Name="ClockTree">
         <ConfigForMode>RCC_ConfigVoltageScaling</ConfigForMode>
 		  
@@ -1057,6 +1069,7 @@
         <ConfigForMode>RCC_MCO1Config</ConfigForMode>        
         <ConfigForMode>RCC_CSS_Enable</ConfigForMode>
         <ConfigForMode>RCC_CSS_EnableLSE</ConfigForMode>    
+				 <ConfigForMode>RCC_LSEDRIVE_CONFIG</ConfigForMode>
         <!--ConfigForMode>SYSCFG_CLK_ENABLE</ConfigForMode-->   <!-- added as a workAround to enable the SYSCFG clock : it should be managed internally by the HAL-->
         <ConfigForMode>CRS_CLK_ENABLE</ConfigForMode> 
         <ConfigForMode>RCC_CRSConfig</ConfigForMode>    
@@ -1219,6 +1232,7 @@
         <Parameter Name="HSI48CalibrationValue"/>
 		<Parameter Name="HSE_Timout"/>
         <Parameter Name="LSE_Timout"/>
+		 <Parameter Name="LSE_Drive_Capability"/>
     </RefMode>
    
    

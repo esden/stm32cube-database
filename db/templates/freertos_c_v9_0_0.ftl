@@ -102,8 +102,8 @@ void PreSleepProcessing(uint32_t *ulExpectedIdleTime);
 void PostSleepProcessing(uint32_t *ulExpectedIdleTime);
           [/#if]
         [/#if] 
-	  	[#if definition.name=="configSUPPORT_STATIC_ALLOCATION"]
-	      [#if definition.value=="1"]
+	  	[#if definition.name=="MEMORY_ALLOCATION"]
+	      [#if definition.value!="0"]
 #n/* GetIdleTaskMemory prototype (linked to static allocation support) */
 void vApplicationGetIdleTaskMemory( StaticTask_t **ppxIdleTaskTCBBuffer, StackType_t **ppxIdleTaskStackBuffer, uint32_t *pulIdleTaskStackSize );
             [#if useTimers==1]
@@ -167,12 +167,12 @@ void vApplicationMallocFailedHook(void);
 #n
 /* USER CODE BEGIN 1 */
 /* Functions needed when configGENERATE_RUN_TIME_STATS is on */
-void configureTimerForRunTimeStats(void) 
+__weak void configureTimerForRunTimeStats(void) 
 {
 #n    
 }
 
-#nunsigned long getRunTimeCounterValue(void) 
+#n__weak unsigned long getRunTimeCounterValue(void) 
 {
     return 0;
 }  
@@ -184,7 +184,7 @@ void configureTimerForRunTimeStats(void)
 	      [#if definition.value=="1"]
 #n
 /* USER CODE BEGIN 2 */
-void vApplicationIdleHook( void ) 
+__weak void vApplicationIdleHook( void ) 
 {
 #t    /* vApplicationIdleHook() will only be called if configUSE_IDLE_HOOK is set
 #t    to 1 in FreeRTOSConfig.h.  It will be called on each iteration of the idle
@@ -203,7 +203,7 @@ void vApplicationIdleHook( void )
 	    [#if definition.name=="configUSE_TICK_HOOK"]
 	      [#if definition.value=="1"]
 #n/* USER CODE BEGIN 3 */
-void vApplicationTickHook( void ) 
+__weak void vApplicationTickHook( void ) 
 {
 #t    /* This function will be called by each tick interrupt if
 #t    configUSE_TICK_HOOK is set to 1 in FreeRTOSConfig.h.  User code can be
@@ -219,9 +219,9 @@ void vApplicationTickHook( void )
 	      [#if definition.value !="0"]
 #n/* USER CODE BEGIN 4 */
 [#if useNewHandle==0]
-void vApplicationStackOverflowHook(xTaskHandle xTask, signed char *pcTaskName)
+__weak void vApplicationStackOverflowHook(xTaskHandle xTask, signed char *pcTaskName)
 [#else]
-void vApplicationStackOverflowHook(TaskHandle_t xTask, signed char *pcTaskName)
+__weak void vApplicationStackOverflowHook(TaskHandle_t xTask, signed char *pcTaskName)
 [/#if]
 {
 #t    /* Run time stack overflow checking is performed if
@@ -235,7 +235,7 @@ void vApplicationStackOverflowHook(TaskHandle_t xTask, signed char *pcTaskName)
 	    [#if definition.name=="configUSE_MALLOC_FAILED_HOOK"]
 	      [#if definition.value=="1"]
 #n/* USER CODE BEGIN 5 */
-void vApplicationMallocFailedHook(void) 
+__weak void vApplicationMallocFailedHook(void) 
 {
 #t    /* vApplicationMallocFailedHook() will only be called if
 #t    configUSE_MALLOC_FAILED_HOOK is set to 1 in FreeRTOSConfig.h.  It is a hook
@@ -274,12 +274,12 @@ void vApplicationDaemonTaskStartupHook(void)
 	      [#if definition.value=="1"]
 #n
 /* USER CODE BEGIN PREPOSTSLEEP */
-void PreSleepProcessing(uint32_t *ulExpectedIdleTime)
+__weak void PreSleepProcessing(uint32_t *ulExpectedIdleTime)
 {
 /* place for user code */ 
 }
 
-void PostSleepProcessing(uint32_t *ulExpectedIdleTime)
+__weak void PostSleepProcessing(uint32_t *ulExpectedIdleTime)
 {
 /* place for user code */
 }
@@ -287,22 +287,34 @@ void PostSleepProcessing(uint32_t *ulExpectedIdleTime)
 #n
           [/#if]
         [/#if]
-	  	[#if definition.name=="configSUPPORT_STATIC_ALLOCATION"]
-	      [#if definition.value=="1"]
+	  	[#if definition.name=="MEMORY_ALLOCATION"]
+	      [#if definition.value!="0"]
 #n
-/* USER CODE BEGIN GET_IDLE_TASK_MEMORY */    
+/* USER CODE BEGIN GET_IDLE_TASK_MEMORY */
+static StaticTask_t xIdleTaskTCBBuffer;
+static StackType_t xIdleStack[configMINIMAL_STACK_SIZE];
+  
 void vApplicationGetIdleTaskMemory( StaticTask_t **ppxIdleTaskTCBBuffer, StackType_t **ppxIdleTaskStackBuffer, uint32_t *pulIdleTaskStackSize )
 {
-/* place for user code */
+  *ppxIdleTaskTCBBuffer = &xIdleTaskTCBBuffer;
+  *ppxIdleTaskStackBuffer = &xIdleStack[0];
+  *pulIdleTaskStackSize = configMINIMAL_STACK_SIZE;
+  /* place for user code */
 }                   
 /* USER CODE END GET_IDLE_TASK_MEMORY */
 #n
             [#if useTimers==1]
 #n
-/* USER CODE BEGIN GET_TIMER_TASK_MEMORY */  
+/* USER CODE BEGIN GET_TIMER_TASK_MEMORY */
+static StaticTask_t xTimerTaskTCBBuffer;
+static StackType_t xTimerStack[configTIMER_TASK_STACK_DEPTH];
+  
 void vApplicationGetTimerTaskMemory( StaticTask_t **ppxTimerTaskTCBBuffer, StackType_t **ppxTimerTaskStackBuffer, uint32_t *pulTimerTaskStackSize )  
 {
-/* place for user code */
+  *ppxTimerTaskTCBBuffer = &xTimerTaskTCBBuffer;
+  *ppxTimerTaskStackBuffer = &xTimerStack[0];
+  *pulTimerTaskStackSize = configTIMER_TASK_STACK_DEPTH;
+  /* place for user code */
 }                   
 /* USER CODE END GET_TIMER_TASK_MEMORY */
 #n

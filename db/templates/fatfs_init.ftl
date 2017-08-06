@@ -13,20 +13,20 @@
 [@common.optinclude name="Src/fatfs_vars.tmp"/]
 
 [#list SWIPdatas as SWIP]  
-[#if SWIP.defines??]
-[#list SWIP.defines as definition]
-[#if definition.name="_MULTI_PARTITION"]                      
-[#if definition.value="1"]
+	[#if SWIP.defines??]
+		[#list SWIP.defines as definition]
+			[#if definition.name="_MULTI_PARTITION"]                      
+				[#if definition.value="1"]
 /* USER CODE BEGIN VolToPart */
 /* Volume - Partition resolution table should be user defined in case of Multiple partition */
 /* When multi-partition feature is enabled (1), each logical drive number is bound to arbitrary physical drive and partition
 listed in the VolToPart[] */
 PARTITION VolToPart[];
 /* USER CODE END VolToPart */  
-[/#if] 
-[/#if]
-[/#list]
-[/#if]
+				[/#if] 
+			[/#if]
+		[/#list]
+	[/#if]
 [/#list]
 
 /* USER CODE BEGIN Variables */
@@ -43,10 +43,10 @@ void MX_FATFS_Init(void)
 }
 
 [#list SWIPdatas as SWIP]  
-[#if SWIP.defines??]
-[#list SWIP.defines as definition]
-[#if definition.name="_FS_NORTC"]                           
-[#if definition.value="0"]
+	[#if SWIP.defines??]
+		[#list SWIP.defines as definition]
+			[#if definition.name="_FS_NORTC"]                           
+				[#if definition.value="0"]
 /**
   * @brief  Gets Time from RTC 
   * @param  None
@@ -58,10 +58,10 @@ DWORD get_fattime(void)
   return 0;
 #t/* USER CODE END get_fattime */  
 }
-[/#if] 
-[/#if]
-[/#list]
-[/#if]
+				[/#if] 
+			[/#if]
+		[/#list]
+	[/#if]
 [/#list]
 
 /* USER CODE BEGIN Application */

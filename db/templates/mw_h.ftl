@@ -1,9 +1,9 @@
 [#ftl]
 /**
   ******************************************************************************
-  * File Name          : ${name}.h
+  * File Name          : ${name?lower_case}.h
   * Description        : This file provides code for the configuration
-  *                      of the ${name} instances.
+  *                      of the ${name?lower_case} instances.
   ******************************************************************************
 [@common.optinclude name="Src/license.tmp"/][#--include License text --]
   ******************************************************************************
@@ -15,6 +15,9 @@
  extern "C" {
 #endif
 
+[#-- 'UserCode sections' are indexed dynamically --]
+[#assign userCodeIdx = 0]
+
 /* Includes ------------------------------------------------------------------*/
 [#if includes??]
 [#list includes as include]
@@ -22,6 +25,11 @@
 [/#list]
 [/#if]
 
+/* USER CODE BEGIN ${userCodeIdx} */
+/* USER CODE END ${userCodeIdx} */
+[#assign userCodeIdx = userCodeIdx+1]
+
+/* Global variables ---------------------------------------------------------*/
 [#list IPdatas as IP]  
 [#assign ipvar = IP]
 [#-- Global variables --]
@@ -30,6 +38,11 @@
 extern ${variable.value} ${variable.name};
 	[/#list]
 [/#if]
+
+/* USER CODE BEGIN ${userCodeIdx} */
+/* USER CODE END ${userCodeIdx} */
+[#assign userCodeIdx = userCodeIdx+1]
+
 [#-- Global variables --]
 
 [#-- extract hal mode list used by all instances of the ip --]
@@ -60,6 +73,10 @@ void HAL_${mode}_BspDeInit(${mode}_HandleTypeDef* h${mode?lower_case});
 [/#list]
 
 [#--void ${ipName}_Init(void);--]
+
+/* USER CODE BEGIN ${userCodeIdx} */
+/* USER CODE END ${userCodeIdx} */
+[#assign userCodeIdx = userCodeIdx+1]
 
 #ifdef __cplusplus
 }

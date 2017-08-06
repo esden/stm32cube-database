@@ -44,6 +44,7 @@
 
 [#assign noUsbWakeUpInterruptHalHandler = missingUsbWakeUpInterruptHalHandler()]
 [#if noUsbWakeUpInterruptHalHandler]
+  [#assign requireSystemClockConfig = false]
   [#list nvic as vector]
     [#assign requireSystemClockConfig = usbWakeUpVector(vector.name)]
     [#if requireSystemClockConfig]

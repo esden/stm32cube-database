@@ -51,7 +51,7 @@
   */
 #define HAL_MODULE_ENABLED  
 
-  [#assign allModules = ["ADC","CAN","CEC","CRC","CRYP","DAC","DCMI","DMA2D","ETH","NAND","NOR","SRAM","SDRAM","HASH","I2S","IWDG","LPTIM","LTDC","QUADSPI","RNG","RTC","SAI","SD","SPDIFRX","SPI","TIM","UART","USART","IRDA","SMARTCARD","WWDG","PCD","HCD", "DFSDM", "DSI","JPEG", "MDIOS"]]
+  [#assign allModules = ["ADC","CAN","CEC","CRC","CRYP","DAC","DCMI","DMA2D","ETH","NAND","NOR","SRAM","SDRAM","HASH","I2S","IWDG","LPTIM","LTDC","QUADSPI","RNG","RTC","SAI","SD","MMC","SPDIFRX","SPI","TIM","UART","USART","IRDA","SMARTCARD","WWDG","PCD","HCD", "DFSDM", "DSI","JPEG", "MDIOS", "SMBUS", "MMC"]]
   [#list allModules as module]
 	[#if isModuleUsed(module)]
 [#compress]#define HAL_${module?replace("QUADSPI","QSPI")}_MODULE_ENABLED[/#compress]
@@ -359,6 +359,10 @@
  #include "stm32f7xx_hal_sd.h"
 #endif /* HAL_SD_MODULE_ENABLED */
 
+#ifdef HAL_MMC_MODULE_ENABLED
+ #include "stm32f7xx_hal_mmc.h"
+#endif /* HAL_MMC_MODULE_ENABLED */
+
 #ifdef HAL_SPDIFRX_MODULE_ENABLED
  #include "stm32f7xx_hal_spdifrx.h"
 #endif /* HAL_SPDIFRX_MODULE_ENABLED */
@@ -414,6 +418,15 @@
 #ifdef HAL_MDIOS_MODULE_ENABLED
  #include "stm32f7xx_hal_mdios.h"
 #endif /* HAL_MDIOS_MODULE_ENABLED */   
+
+#ifdef HAL_SMBUS_MODULE_ENABLED
+ #include "stm32f7xx_hal_smbus.h"
+#endif /* HAL_SMBUS_MODULE_ENABLED */
+
+#ifdef HAL_MMC_MODULE_ENABLED
+ #include "stm32f7xx_hal_mmc.h"
+#endif /* HAL_MMC_MODULE_ENABLED */
+
 /* Exported macro ------------------------------------------------------------*/
 #ifdef  USE_FULL_ASSERT
 /**
