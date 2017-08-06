@@ -26,7 +26,9 @@
         [/#if]
     [/#list]
 [/#if]
-
+[#if H7_ETH_NoLWIP?? &&HALCompliant??]
+#include "string.h"
+[/#if]
 [/#compress]
 
 #n
@@ -52,7 +54,7 @@ extern ${variable.value} ${variable.name};
 
 /* USER CODE END Private defines */
 #n
-extern void Error_Handler(void);
+extern void _Error_Handler(char *, int);
 [#-- extract hal mode list used by all instances of the ip --]
 [#assign halModeList= ""]
 

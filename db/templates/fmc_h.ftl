@@ -34,7 +34,7 @@
 extern ${variable.value} ${variable.name};
 [/#list]
 [/#if]
-extern void Error_Handler(void);
+extern void _Error_Handler(char *, int);
 [#-- Global variables --]
 
 [#-- extract hal mode list used by all instances of the ip --]

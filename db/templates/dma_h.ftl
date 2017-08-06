@@ -8,9 +8,15 @@
 [@common.optinclude name="Src/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
+[#assign ipName = "DMA"]
+[#if dmas?size > 0]
+  [#list dmas as dma]
+    [#assign ipName = dma]
+  [/#list]
+[/#if]
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __dma_H
-#define __dma_H
+#ifndef __${ipName?lower_case}_H
+#define __${ipName?lower_case}_H
 
 #ifdef __cplusplus
  extern "C" {
@@ -31,7 +37,7 @@
 extern ${variable.value} ${variable.name};
 [/#list]
 [/#if]
-extern void Error_Handler(void);
+extern void _Error_Handler(char*, int);
 #n
 /* USER CODE BEGIN Includes */
 
@@ -41,7 +47,7 @@ extern void Error_Handler(void);
 
 /* USER CODE END Private defines */
 #n
-void MX_DMA_Init(void);
+void MX_${ipName}_Init(void);
 [#compress]
 #n/* USER CODE BEGIN Prototypes */
 #n     
@@ -52,7 +58,7 @@ void MX_DMA_Init(void);
 }
 #endif
 
-#endif /* __dma_H */
+#endif /* __${ipName?lower_case}_H */
 
 /**
   * @}

@@ -70,8 +70,8 @@
 [#if with_rtos == 0]
 uint32_t DHCPfineTimer = 0;
 uint32_t DHCPcoarseTimer = 0;
-[/#if] [#-- endif with_rtos --]
-[/#if] [#-- endif lwip_dhcp --][/#compress] 
+[/#if][#-- endif with_rtos --]
+[/#if][#-- endif lwip_dhcp --][/#compress] 
 [#-- IPdatas is a list of IPconfigModel --]  
 [#list IPdatas as IP]  
 [#assign ipvar = IP] 
@@ -88,7 +88,7 @@ uint32_t DHCPcoarseTimer = 0;
 			[#list method.arguments as argument][#-- list method.arguments --]		
 				[#if (argument.genericType == "struct")][#-- if struct --]		 		
 					[#if argument.context??][#-- if argument.context?? --]
-						[#if argument.context!="global"] [#-- if global --]					
+						[#if argument.context!="global"][#-- if global --]					
 							[#assign varName= " "+argument.name]  					               
 							[#assign ll= listOfLocalVariables?split(" ")]
 							[#assign exist=false]					
@@ -107,18 +107,18 @@ uint32_t DHCPcoarseTimer = 0;
 					[/#if][#-- if argument.context?? --]
 			
 					[#-- Array type --] 	
-					[#list argument.argument as subArg] [#-- list subArg --]				
-					[#if subArg.genericType=="Array"] [#-- if genericType == "Array" --]					
+					[#list argument.argument as subArg][#-- list subArg --]				
+					[#if subArg.genericType=="Array"][#-- if genericType == "Array" --]					
 						#t${subArg.typeName} ${subArg.name}[${subArg.arraySize}]; 
-					[/#if] [#-- if genericType == "Array" --]
+					[/#if][#-- if genericType == "Array" --]
 					[#if subArg.genericType =="struct"]
-						[#list subArg.argument as subArg1] [#-- list subArg1 --]
-							[#if subArg1.genericType=="Array"] [#-- if genericType == "Array" --]						
+						[#list subArg.argument as subArg1][#-- list subArg1 --]
+							[#if subArg1.genericType=="Array"][#-- if genericType == "Array" --]						
 								#t ${subArg1.typeName} ${subArg1.name}[${subArg1.arraySize}] ; 
-							[/#if] [#-- if genericType == "Array" --]
+							[/#if][#-- if genericType == "Array" --]
 						[/#list]
 					[/#if]
-				[/#list] [#-- list subArg --]
+				[/#list][#-- list subArg --]
 				[/#if][#-- if struct --]
 			
 			
@@ -149,7 +149,7 @@ uint32_t DHCPcoarseTimer = 0;
 
 [#-- macro generateConfigModelCode --]
 [#macro generateConfigModelCode configModel inst nTab]
-[#if configModel.methods??] [#-- if the pin configuration contains a list of LibMethods--]
+[#if configModel.methods??][#-- if the pin configuration contains a list of LibMethods--]
     [#assign methodList = configModel.methods]
 [#else] 
 	[#assign methodList = configModel.libMethod]
@@ -198,7 +198,7 @@ uint32_t DHCPcoarseTimer = 0;
 						[/#if]
 						[#-- [#assign arg = "" + adr + fargument.name] --]
 						[#--if (!method.name?contains("Init")&&fargument.context=="global")--]
-						[#if (fargument.init=="false")] [#-- MZA add the field init for Argument object, if init is false the intialization of this argument is not done --]				
+						[#if (fargument.init=="false")][#-- MZA add the field init for Argument object, if init is false the intialization of this argument is not done --]				
 							[#-- do Nothing --]
 						[#else]
 							[#list fargument.argument as argument]									
@@ -224,7 +224,7 @@ uint32_t DHCPcoarseTimer = 0;
 												[#assign i = i+1]
 											[/#list]
                                         [#assign argValue="&"+argument.name]
-										[/#if] [#-- if genericType=Array --]
+										[/#if][#-- if genericType=Array --]
 										[#if nTab==2]#t#t[#else]#t[/#if][#--[#if instanceIndex??&&fargument.context=="global"]${fargument.name}${instanceIndex}[#else]${fargument.name}[/#if].${argument.name} = ${argValue};--]
 										[#else]	
 											[#if argument.genericType=="fpointer"] 											
@@ -252,14 +252,14 @@ uint32_t DHCPcoarseTimer = 0;
 												[#assign i = i+1]
 											[/#list]
 											[#assign argValue="&"+argument1.name+"[0]"]
-										[/#if] [#-- if genericType=Array --]
+										[/#if][#-- if genericType=Array --]
 									[#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"]${fargument.name}${instanceIndex}[#else]${fargument.name}[/#if].${argument.name}.${argument1.name} = ${argValue};
 									[/#if]
 								[/#list]
 								[/#if]
 							[/#list][#-- list  fargument.argument as argument--]
 						[/#if]	
-					[#elseif fargument.genericType == "simple"] [#-- MZA if argument is simple we pass the name of the argument and not the value --]
+					[#elseif fargument.genericType == "simple"][#-- MZA if argument is simple we pass the name of the argument and not the value --]
 						[#if fargument.context=="global"]
 							[#assign arg = "" + adr + fargument.name + myInst]
 						[#else]
@@ -273,7 +273,7 @@ uint32_t DHCPcoarseTimer = 0;
 					[#else]
 						[#assign args = args + ', ' + arg]
 					[/#if]
-				[#else] [#-- here we have an Argument as Return Value --]					
+				[#else][#-- here we have an Argument as Return Value --]					
 					[#if fargument.context=="global"] [#assign return = fargument.name + myInst + " = "]
 					[#else] [#assign return = fargument.name + " = "]
 					[/#if]
@@ -420,17 +420,17 @@ void MX_LWIP_Init(void)
   [#--- Generation of IP @ initialization ex. IP_ADDRESS[0] = 000; ---]
   [@generateConfigModelCode configModel=config inst=instName  nTab=1/]
   [/#list]
-[/#if] [#-- endif lwip_dhcp --] 
+[/#if][#-- endif lwip_dhcp --] 
 [/#list]
 [/#compress]
 [/#list]
 [#if with_rtos == 0]
   /* Initilialize the LwIP stack */
   lwip_init();
-[/#if] [#-- endif with_rtos --]
+[/#if][#-- endif with_rtos --]
 [#if with_rtos == 1]
   tcpip_init( NULL, NULL );	
-[/#if] [#-- endif with_rtos --]
+[/#if][#-- endif with_rtos --]
 [#if lwip_dhcp == 1] 
   ipaddr.addr = 0;
   netmask.addr = 0;
@@ -439,16 +439,16 @@ void MX_LWIP_Init(void)
   IP4_ADDR(&ipaddr, IP_ADDRESS[0], IP_ADDRESS[1], IP_ADDRESS[2], IP_ADDRESS[3]);
   IP4_ADDR(&netmask, NETMASK_ADDRESS[0], NETMASK_ADDRESS[1] , NETMASK_ADDRESS[2], NETMASK_ADDRESS[3]);
   IP4_ADDR(&gw, GATEWAY_ADDRESS[0], GATEWAY_ADDRESS[1], GATEWAY_ADDRESS[2], GATEWAY_ADDRESS[3]);  
-[/#if] [#-- endif lwip_dhcp --] 
+[/#if][#-- endif lwip_dhcp --] 
 
   /* add the network interface */
 [#if with_rtos == 0]
   netif_add(&gnetif, &ipaddr, &netmask, &gw, NULL, &ethernetif_init, &ethernet_input);
 [#else]
   netif_add(&gnetif, &ipaddr, &netmask, &gw, NULL, &ethernetif_init, &tcpip_input);
-[/#if] [#-- endif with_rtos --]
+[/#if][#-- endif with_rtos --]
  
-  /*  Registers the default network interface */
+  /* Registers the default network interface */
   netif_set_default(&gnetif);
 
   if (netif_is_link_up(&gnetif))
@@ -459,14 +459,14 @@ void MX_LWIP_Init(void)
   else
   {
     /* When the netif link is down this function must be called */
-       netif_set_down(&gnetif);
+    netif_set_down(&gnetif);
   }  
   
 [#if (netif_callback == 1) && (with_rtos == 1)]
   /* Set the link callback function, this function is called on change of link status*/
   netif_set_link_callback(&gnetif, ethernetif_update_config);
   
-   /* create a binary semaphore used for informing ethernetif of frame reception */
+  /* create a binary semaphore used for informing ethernetif of frame reception */
   osSemaphoreDef(Netif_SEM);
   Netif_LinkSemaphore = osSemaphoreCreate(osSemaphore(Netif_SEM) , 1 );
   
@@ -480,7 +480,7 @@ void MX_LWIP_Init(void)
 
 [#if lwip_dhcp == 1]
 dhcp_start(&gnetif);
-[/#if] [#-- endif lwip_dhcp --] 
+[/#if][#-- endif lwip_dhcp --] 
 
 #n/* USER CODE BEGIN 3 */
 

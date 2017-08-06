@@ -14,6 +14,9 @@
 [#if isHalSupported?? && isHALUsed?? ]
 #include "${FamilyName?lower_case}xx_hal.h"
 [/#if]
+[#if H7_ETH_NoLWIP?? &&HALCompliant??]
+#include "string.h"
+[/#if]
 [#-- move includes to main.h --]
 [@common.optinclude name="Src/rtos_inc.tmp"/][#--include freertos includes --]
 [#-- if !HALCompliant??--][#-- if HALCompliant Begin --]
@@ -51,6 +54,34 @@ extern PCD_HandleTypeDef ${handleName};
   [/#if]
 [/#if]
 /* Private variables ---------------------------------------------------------*/
+[#-- WorkAround for Ticket 30863 --]
+[#if H7_ETH_NoLWIP?? &&HALCompliant??]
+#if defined ( __ICCARM__ ) /*!< IAR Compiler */
+
+#pragma location=[#if RxDescAddress??]${RxDescAddress}[#else]0x30040000[/#if]
+ETH_DMADescTypeDef  DMARxDscrTab[ETH_RX_DESC_CNT]; /* Ethernet Rx DMA Descriptors */
+#pragma location=[#if TxDescAddress??]${TxDescAddress}[#else]0x30040060[/#if]
+ETH_DMADescTypeDef  DMATxDscrTab[ETH_TX_DESC_CNT]; /* Ethernet Tx DMA Descriptors */
+#pragma location=[#if RxBuffAddress??]${RxBuffAddress}[#else]0x30040200[/#if]
+uint8_t Rx_Buff[ETH_RX_DESC_CNT][ETH_MAX_PACKET_SIZE]; /* Ethernet Receive Buffers */
+
+#elif defined ( __CC_ARM )  /* MDK ARM Compiler */
+
+__attribute__((at([#if RxDescAddress??]${RxDescAddress}[#else]0x30040000[/#if]))) ETH_DMADescTypeDef  DMARxDscrTab[ETH_RX_DESC_CNT]; /* Ethernet Rx DMA Descriptors */
+__attribute__((at([#if TxDescAddress??]${TxDescAddress}[#else]0x30040060[/#if]))) ETH_DMADescTypeDef  DMATxDscrTab[ETH_TX_DESC_CNT]; /* Ethernet Tx DMA Descriptors */
+__attribute__((at([#if RxBuffAddress??]${RxBuffAddress}[#else]0x30040200[/#if]))) uint8_t Rx_Buff[ETH_RX_DESC_CNT][ETH_MAX_PACKET_SIZE]; /* Ethernet Receive Buffer */
+
+#elif defined ( __GNUC__ ) /* GNU Compiler */ 
+
+ETH_DMADescTypeDef DMARxDscrTab[ETH_RX_DESC_CNT] __attribute__((section(".RxDecripSection"))); /* Ethernet Rx DMA Descriptors */
+ETH_DMADescTypeDef DMATxDscrTab[ETH_TX_DESC_CNT] __attribute__((section(".TxDecripSection")));   /* Ethernet Tx DMA Descriptors */
+uint8_t Rx_Buff[ETH_RX_DESC_CNT][ETH_MAX_PACKET_SIZE] __attribute__((section(".RxArraySection"))); /* Ethernet Receive Buffers */
+
+#endif
+
+ETH_TxPacketConfig TxConfig; 
+[/#if]
+[#-- End workaround for Ticket 30863 --]
 [#-- If HAL compliant generate Global variable : Peripherals handler -Begin --]
 [#if HALCompliant??][#-- if HALCompliant Begin --]
 [#compress]
@@ -76,10 +107,17 @@ ${dHandle};
     [/#list]
 [/#compress]
     [#compress]
+    [#-- BDMA global variables --]
+    [#-- ADD BDMA Code Begin--]
+    [@common.optinclude name="Src/BDMA_GV.tmp"/]
+    [#-- ADD BDMA Code End--]
     [#-- DMA global variables --]
     [#-- ADD DMA Code Begin--]
-    [@common.optinclude name="Src/DMA_GV.tmp"/]
+    [@common.optinclude name="Src/dma_GV.tmp"/]
     [#-- ADD DMA Code End--]
+    [#-- ADD MDMA Code Begin--]
+    [@common.optinclude name="Src/MDMA_GV.tmp"/]
+    [#-- ADD MDMA Code End--]
     [#-- FMCGlobal variables --]
     [#-- Add FMC Code Begin--]
     [@common.optinclude name="Src/mx_fmc_GV.tmp"/]
@@ -123,7 +161,6 @@ ${dHandle};
 static void LL_Init(void);
 [/#if]
 void SystemClock_Config(void); [#-- remove static --]
-void Error_Handler(void);
 [/#if]
 [#if mpuControl??] [#-- if MPU config is enabled --]
 static void MPU_Config(void); 
@@ -230,9 +267,19 @@ int main(void)
 [#else]
 #tLL_Init();
 [/#if]
+#n
+#t/* USER CODE BEGIN Init */
+
+#n#t/* USER CODE END Init */
+#n
 #n#t/* Configure the system clock */
 #tSystemClock_Config();
 [/#if]
+#n
+#t/* USER CODE BEGIN SysInit */
+
+#n#t/* USER CODE END SysInit */
+#n
 #n#t/* Initialize all configured peripherals */
 [#list voids as void]
 [#if void.functionName?? && !void.functionName?contains("FREERTOS")&&!void.functionName?contains("CORTEX")&& !void.functionName?contains("SystemClock_Config")&&void.functionName!="Init"]
@@ -330,7 +377,7 @@ void SystemClock_Config(void)
             [#if rccUsedDriver == "HAL"]
                 #tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
             [#else]
-                [#if FamilyName=="STM32L0"]
+                [#if FamilyName=="STM32L0" || FamilyName=="STM32F0"]
                 #tNVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority});
                 [#else]
                 #tNVIC_SetPriority(${initVector.vector}, NVIC_EncodePriority(NVIC_GetPriorityGrouping(),${initVector.preemptionPriority}, ${initVector.subPriority}));
@@ -370,7 +417,7 @@ static void MX_NVIC_Init(void)
     #t#tHAL_NVIC_SetPriority(${vector.vector}, ${vector.preemptionPriority}, ${vector.subPriority});
     #t#tHAL_NVIC_EnableIRQ(${vector.vector});
     [#else]
-      [#if FamilyName=="STM32L0"]
+      [#if FamilyName=="STM32L0" || FamilyName=="STM32F0"]
     #t#tNVIC_SetPriority(${vector.vector}, ${vector.preemptionPriority});
       [#else]
     #t#tNVIC_SetPriority(${vector.vector}, NVIC_EncodePriority(NVIC_GetPriorityGrouping(),${vector.preemptionPriority}, ${vector.subPriority}));
@@ -382,7 +429,7 @@ static void MX_NVIC_Init(void)
     [#if vector.usedDriver == "HAL"]
     #tHAL_NVIC_SetPriority(${vector.vector}, ${vector.preemptionPriority}, ${vector.subPriority});
     [#else]
-      [#if FamilyName=="STM32L0"]
+      [#if FamilyName=="STM32L0" || FamilyName=="STM32F0"]
     #tNVIC_SetPriority(${vector.vector}, ${vector.preemptionPriority});
       [#else]
     #tNVIC_SetPriority(${vector.vector}, NVIC_EncodePriority(NVIC_GetPriorityGrouping(),${vector.preemptionPriority}, ${vector.subPriority}));
@@ -502,13 +549,15 @@ static void MX_NVIC_Init(void)
 [/#compress]
 [/#list][/#if]
 [/#list]
+[@common.optinclude name="Src/bdma.tmp"/][#-- ADD BDMA Code--]
 [@common.optinclude name="Src/dma.tmp"/][#-- ADD DMA Code--]
+[@common.optinclude name="Src/mdma.tmp"/][#-- ADD MDMA Code--]
 [@common.optinclude name="Src/mx_fmc_HC.tmp"/][#-- FMC Init --]
 [@common.optinclude name="Src/gpio.tmp"/][#-- ADD GPIO Code--]
 [/#if] [#-- if HALCompliant End --]
 #n
 [#-- FSMC Init --]
-[@common.optinclude name="Src/mx_FSMC_HC.tmp"/]
+[@common.optinclude name="Src/mx_fsmc_HC.tmp"/]
 #n
 /* USER CODE BEGIN 4 */
 
@@ -553,14 +602,14 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   * @param  None
   * @retval None
   */
-void Error_Handler(void)
+void _Error_Handler(char * file, int line)
 {
-#t/* USER CODE BEGIN Error_Handler */
+#t/* USER CODE BEGIN Error_Handler_Debug */
 #t/* User can add his own implementation to report the HAL error return state */
 #twhile(1) 
 #t{
 #t}
-#t/* USER CODE END Error_Handler */ 
+#t/* USER CODE END Error_Handler_Debug */ 
 }
 #n
 [#compress] 

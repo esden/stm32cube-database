@@ -21,15 +21,15 @@
 		[#if (definition.name == "WITH_RTOS")]
 			[#if definition.value == "1"]
 				[#assign with_rtos = 1]
-			[/#if] [#-- "1" --]
-		[/#if] [#-- WITH_RTOS --]
+			[/#if][#-- "1" --]
+		[/#if][#-- WITH_RTOS --]
 		[#if (definition.name == "NO_SYS")]
 			[#if definition.value == "0"]
 				[#assign with_rtos = 1]
 			[#else]
 				[#assign with_rtos = 0]
-			[/#if] [#-- "0" --]
-		[/#if] [#-- NO_SYS --]
+			[/#if][#-- "0" --]
+		[/#if][#-- NO_SYS --]
 		[#if (definition.name == "LWIP_NETIF_LINK_CALLBACK") && (definition.value == "1")]
 			[#assign netif_callback = 1] 
 		[/#if]
@@ -43,7 +43,7 @@
             [#assign dp83848 = 1]
         [/#if]
 	[/#list]
-[/#if] [#-- SWIP.defines --]
+[/#if][#-- SWIP.defines --]
 [/#list][/#compress]
 
 /* Includes ------------------------------------------------------------------*/
@@ -62,7 +62,7 @@
 [#compress]
 [#if with_rtos == 1]
 #include "cmsis_os.h"
-[/#if] [#-- endif with_rtos --][/#compress]
+[/#if][#-- endif with_rtos --][/#compress]
 
 /* Within 'USER CODE' section, code will be kept by default at each generation */
 /* USER CODE BEGIN 0 */
@@ -77,7 +77,7 @@
 #define TIME_WAITING_FOR_INPUT                 ( portMAX_DELAY )
 /* Stack size of the interface thread */
 #define INTERFACE_THREAD_STACK_SIZE            ( 350 )
-[/#if] [#-- endif with_rtos --][/#compress]
+[/#if][#-- endif with_rtos --][/#compress]
 
 /* Network interface name */
 #define IFNAME0 's'
@@ -116,7 +116,7 @@ __ALIGN_BEGIN uint8_t Tx_Buff[ETH_TXBUFNB][ETH_TX_BUF_SIZE] __ALIGN_END; /* Ethe
 [#if with_rtos == 1]
 /* Semaphore to signal incoming packets */
 osSemaphoreId s_xSemaphore = NULL;
-[/#if] [#-- endif with_rtos --][/#compress]
+[/#if][#-- endif with_rtos --][/#compress]
 
 /* Global Ethernet handle*/
 ETH_HandleTypeDef heth;
@@ -139,7 +139,7 @@ void HAL_ETH_RxCpltCallback(ETH_HandleTypeDef *heth)
   osSemaphoreRelease(s_xSemaphore);
 }
 
-[/#if] [#-- endif with_rtos --]
+[/#if][#-- endif with_rtos --]
 
 /* USER CODE BEGIN 4 */
 
@@ -209,7 +209,7 @@ static void low_level_init(struct netif *netif)
 /* create the task that handles the ETH_MAC */
   osThreadDef(EthIf, ethernetif_input, osPriorityRealtime, 0, INTERFACE_THREAD_STACK_SIZE);
   osThreadCreate (osThread(EthIf), netif);
-[/#if] [#-- endif with_rtos --]
+[/#if][#-- endif with_rtos --]
   /* Enable MAC and DMA transmission and reception */
   HAL_ETH_Start(&heth);
 
@@ -234,7 +234,7 @@ static void low_level_init(struct netif *netif)
     
   /* Enable Interrupt on change of link status */
   HAL_ETH_WritePHYRegister(&heth, PHY_MISR, regvalue);
-[/#if] [#-- endif dp83848 --]
+[/#if][#-- endif dp83848 --]
 
 [#if lan8742a == 1]
   /* Read Register Configuration */
@@ -246,7 +246,7 @@ static void low_level_init(struct netif *netif)
   
   /* Read Register Configuration */
   HAL_ETH_ReadPHYRegister(&heth, PHY_ISFR , &regvalue);
-[/#if] [#-- endif lan8742a --]
+[/#if][#-- endif lan8742a --]
 
 /* USER CODE BEGIN PHY_POST_CONFIG */ 
     
@@ -362,7 +362,7 @@ error:
 static struct pbuf * low_level_input(struct netif *netif)
 {
   struct pbuf *p = NULL;
-  struct pbuf *q;
+  struct pbuf *q = NULL;
   uint16_t len = 0;
   uint8_t *buffer;
   __IO ETH_DMADescTypeDef *dmarxdesc;
@@ -456,11 +456,11 @@ static struct pbuf * low_level_input(struct netif *netif)
 void ethernetif_input( void const * argument ) 
 [#else]
 void ethernetif_input(struct netif *netif)
-[/#if] [#-- endif with_rtos --]
+[/#if][#-- endif with_rtos --]
 {
 [#if with_rtos == 0]
   err_t err;
-[/#if] [#-- endif with_rtos --]
+[/#if][#-- endif with_rtos --]
   struct pbuf *p;
 [#if with_rtos == 1]
   struct netif *netif = (struct netif *) argument;
@@ -497,7 +497,7 @@ void ethernetif_input(struct netif *netif)
     LWIP_DEBUGF(NETIF_DEBUG, ("ethernetif_input: IP input error\n"));
     pbuf_free(p);
     p = NULL;    
-[/#if] [#-- endif with_rtos --]
+[/#if][#-- endif with_rtos --]
   }
 }
 
@@ -591,18 +591,26 @@ u32_t sys_now(void)
 
 /* USER CODE END 6 */
 
-
+[#if netif_callback == 1]
+[#if with_rtos == 0]
+/**
+  * @brief  This function sets the netif link status.
+  * @note   This function should be included in the main loop to poll 
+  *         for the link status update  
+  * @param  netif: the network interface
+  * @retval None
+  */
+uint32_t EthernetLinkTimer=0; 
+  
+void ethernetif_set_link(struct netif *netif)
+[#else][#-- with_rtos (0) --]
 /**
   * @brief  This function sets the netif link status.
   * @param  netif: the network interface
   * @retval None
-  */
-[#if netif_callback == 1]  
-[#if with_rtos == 0]  
-void ethernetif_set_link(struct netif *netif)
-[#else] [#-- with_rtos (0) --]
+  */  
 void ethernetif_set_link(void const *argument)
-[/#if] [#-- with_rtos (1) --]
+[/#if][#-- with_rtos (1) --]
 {
   uint32_t regvalue = 0;
 [#if (with_rtos == 1)]
@@ -610,52 +618,52 @@ void ethernetif_set_link(void const *argument)
   
   for(;;)
   {
-    if (osSemaphoreWait( link_arg->semaphore, 100)== osOK)
-    {
-      /* Read PHY_MISR*/
-      HAL_ETH_ReadPHYRegister(&heth, PHY_MISR, &regvalue);
-      
-      /* Check whether the link interrupt has occurred or not */
-      if((regvalue & PHY_LINK_INTERRUPT) != (uint16_t)RESET)
-      {
-        /* Read PHY_SR*/
-        HAL_ETH_ReadPHYRegister(&heth, PHY_SR, &regvalue);
-        
-        /* Check whether the link is up or down*/
-        if((regvalue & PHY_LINK_STATUS)!= (uint16_t)RESET)
-        {
-          netif_set_link_up(link_arg->netif);
-        }
-        else
-        {
-          netif_set_link_down(link_arg->netif);
-        }
-      }
-    }
-  }
-[#else] [#-- with_rtos (1) --]
-  /* Read PHY_MISR*/
-  HAL_ETH_ReadPHYRegister(&heth, PHY_MISR, &regvalue);
-  
-  /* Check whether the link interrupt has occurred or not */
-  if((regvalue & PHY_LINK_INTERRUPT) != (uint16_t)RESET)
-  {
-    /* Read PHY_SR*/
-    HAL_ETH_ReadPHYRegister(&heth, PHY_SR, &regvalue);
+    /* Read PHY_BSR*/
+    HAL_ETH_ReadPHYRegister(&heth, PHY_BSR, &regvalue);
     
-    /* Check whether the link is up or down*/
-    if((regvalue & PHY_LINK_STATUS)!= (uint16_t)RESET)
+    regvalue &= PHY_LINKED_STATUS;
+    
+    /* Check whether the netif link down and the PHY link is up */
+    if(!netif_is_link_up(link_arg->netif) && (regvalue))
     {
-      netif_set_link_up(netif);
+      /* network cable is connected */ 
+      netif_set_link_up(link_arg->netif);        
     }
-    else
+    else if(netif_is_link_up(link_arg->netif) && (!regvalue))
     {
+      /* network cable is dis-connected */
+      netif_set_link_down(link_arg->netif);
+    }
+    
+    /* Suspend thread for 200 ms */
+    osDelay(200);
+  }
+[#else][#-- with_rtos (1) --]
+  /* Ethernet Link every 200ms */
+  if (HAL_GetTick() - EthernetLinkTimer >= 200)
+  {
+    EthernetLinkTimer = HAL_GetTick(); 
+    
+    /* Read PHY_BSR*/
+    HAL_ETH_ReadPHYRegister(&heth, PHY_BSR, &regvalue);
+    
+    regvalue &= PHY_LINKED_STATUS;
+    
+    /* Check whether the netif link down and the PHY link is up */
+    if(!netif_is_link_up(netif) && (regvalue))
+    {
+      /* network cable is connected */ 
+      netif_set_link_up(netif);        
+    }
+    else if(netif_is_link_up(netif) && (!regvalue))
+    {
+      /* network cable is disconnected */
       netif_set_link_down(netif);
     }
   }
-[/#if] [#-- with_rtos (0) --]
+[/#if][#-- with_rtos (0) --]
 }
-[/#if] [#-- netif_callback (1) --]
+[/#if][#-- netif_callback (1) --]
 
 
 /* USER CODE BEGIN 7 */

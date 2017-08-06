@@ -11,4 +11,4 @@ ${variable.value} ${variable.name};
 [/#if]
 [#-- Global variables --]
 [/#list]
-void Error_Handler(void);
+void _Error_Handler(char * file, int line);

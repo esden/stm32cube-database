@@ -88,6 +88,8 @@
 [#assign configUSE_RECURSIVE_MUTEXES = "0"]
 [#assign configUSE_COUNTING_SEMAPHORES = "0"]
 [#assign configGENERATE_RUN_TIME_STATS = "0"]
+[#assign configUSE_TRACE_FACILITY = "0"]
+[#assign configUSE_STATS_FORMATTING_FUNCTIONS = "0"]
 [#assign configIDLE_SHOULD_YIELD = "1"]
 
 [#assign xTaskResumeFromISR = "1"]
@@ -152,9 +154,6 @@
 	  [#if definition.name=="configMAX_TASK_NAME_LEN"]
 	      [#assign valueMaxTaskNameLen = definition.value]
 	  [/#if]
-	  [#if definition.name=="configUSE_TRACE_FACILITY"]
-	      [#assign valueUseTraceFacility = definition.value]
-	  [/#if]	
 	  [#if definition.name=="configUSE_16_BIT_TICKS"]
 	      [#assign valueUse16BitTicks = definition.value]
 	  [/#if]	
@@ -184,6 +183,12 @@
 	  [/#if]
 	  [#if definition.name=="configGENERATE_RUN_TIME_STATS"]
 	      [#assign configGENERATE_RUN_TIME_STATS = definition.value]
+	  [/#if]
+	  [#if definition.name=="configUSE_TRACE_FACILITY"]
+	      [#assign configUSE_TRACE_FACILITY = definition.value]
+	  [/#if]
+	  [#if definition.name=="configUSE_STATS_FORMATTING_FUNCTIONS"]
+	      [#assign configUSE_STATS_FORMATTING_FUNCTIONS = definition.value]
 	  [/#if]
 	  [#if definition.name=="configUSE_CO_ROUTINES"]
 	      [#assign valueUseCoRoutines = definition.value]
@@ -362,7 +367,15 @@
 #define configTOTAL_HEAP_SIZE                    ((size_t)${valueTotalHeapSize})
 [/#if]
 #define configMAX_TASK_NAME_LEN                  ( ${valueMaxTaskNameLen} )
-#define configUSE_TRACE_FACILITY                 ${valueUseTraceFacility}
+[#if configGENERATE_RUN_TIME_STATS=="1"]
+#define configGENERATE_RUN_TIME_STATS            1
+[/#if]
+[#if configUSE_TRACE_FACILITY=="1"]
+#define configUSE_TRACE_FACILITY                 1
+[/#if]
+[#if configUSE_STATS_FORMATTING_FUNCTIONS=="1"]
+#define configUSE_STATS_FORMATTING_FUNCTIONS     1
+[/#if]
 #define configUSE_16_BIT_TICKS                   ${valueUse16BitTicks}
 [#if configIDLE_SHOULD_YIELD=="0"]
 #define configIDLE_SHOULD_YIELD                  0
@@ -388,9 +401,6 @@
 [/#if]
 [#if configUSE_COUNTING_SEMAPHORES=="1"]
 #define configUSE_COUNTING_SEMAPHORES            1
-[/#if]
-[#if configGENERATE_RUN_TIME_STATS=="1"]
-#define configGENERATE_RUN_TIME_STATS            1
 [/#if]
 [#if configUSE_ALTERNATIVE_API=="1"]
 #define configUSE_ALTERNATIVE_API                1   /* Deprecated! */

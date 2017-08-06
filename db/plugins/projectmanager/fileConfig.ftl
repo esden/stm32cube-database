@@ -20,9 +20,6 @@
 <Project>
 <ProjectName>${projectName}</ProjectName>
 <CMSIS>${CMSISPath}</CMSIS>
-[#if ide=="EWARM" || ide=="MDK-ARM"]
-	<HAL_Driver>${HAL_Driver}</HAL_Driver>
-[/#if]
 <HAL_Driver>${HAL_Driver}</HAL_Driver>
 
  [#-- list of toolchains to be generated: EWARM,MDK-ARM,TrueSTUDIO,RIDE: This tag can contain one or more than one toolchain: EWARM,MDK-ARM,TrueSTUDIO,RIDE --]
@@ -83,6 +80,8 @@
 	   		[#if ide=="EWARM" ]
 		   		<include>$PROJ_DIR$\${RelativePath}Inc</include>
 	   		[#elseif ide=="MDK-ARM" ]
+	   			<include>${RelativePath}Inc</include>
+   			[#elseif ide=="Makefile" ]
 	   			<include>${RelativePath}Inc</include>
 		    [#else]
 		   		<include></include>
@@ -163,6 +162,29 @@
 	 [/#if]
     		<group>
 	    		<name>Drivers</name> 
+				 [#if atLeastOneBspComponentIsUsed]
+				 <group>					
+					[#if bspComponentGroups??]						
+						[#list bspComponentGroups as grp]
+							<name>${grp.name!''}</name>
+							[#if grp.subGroups??]
+								[#list grp.subGroups as subGrp]	
+								<group>
+								<name>${subGrp.name!''}</name>
+								[#if subGrp.sourceFilesNameList??]
+									[#list subGrp.sourceFilesNameList as filesName]
+										<file>
+											<name>${filesName!''}</name>
+										</file>
+									[/#list]
+								[/#if]
+								</group>
+								[/#list]	
+							[/#if]
+						[/#list]
+					[/#if]						
+				 </group>
+				 [/#if]
 		 		<group>
 		 			<name>${HALGroup.name!''}</name>
 	 				[#if HALGroup.sourceFilesNameList??]
@@ -221,6 +243,29 @@
 [/#list]
 	   <group>
 	    <name>Drivers</name> 
+			[#if atLeastOneBspComponentIsUsed]
+				 <group>					
+					[#if bspComponentGroups??]						
+						[#list bspComponentGroups as grp]
+							<name>${grp.name!''}</name>
+							[#if grp.subGroups??]
+								[#list grp.subGroups as subGrp]	
+								<group>
+								<name>${subGrp.name!''}</name>
+								[#if subGrp.sourceFilesNameList??]
+									[#list subGrp.sourceFilesNameList as filesName]
+										<file>
+											<name>${filesName!''}</name>
+										</file>
+									[/#list]
+								[/#if]
+								</group>
+								[/#list]	
+							[/#if]
+						[/#list]
+					[/#if]						
+				 </group>
+			[/#if]
 		   <group>
 		 		<name>${HALGroup.name!''}</name>
 		 		[#if HALGroup.sourceFilesNameList??]

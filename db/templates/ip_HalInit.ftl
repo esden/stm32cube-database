@@ -135,8 +135,18 @@
 [#if writeConfigComments]
 [#-- [#if configModel.comments??] #t/**${configModel.comments} #n#t*/[/#if] --]
 [/#if]
-	[#list methodList as method][#assign args = ""]	      
-		[#if method.status=="OK"]
+	[#list methodList as method][#assign args = ""]	  
+            [#if method.hardCode??] [#-- Hard code --]              
+                ${method.hardCode.text} 
+            [#else]
+                [#if method.type == "Template"] [#-- Template code --]  
+                    [#list method.name?split("/") as n]
+                        [#assign tplName = n]
+                    [/#list]
+                    [@optinclude name="Src/${tplName?replace('ftl','tmp')}" /] 
+                [/#if]
+            [/#if]
+            [#if method.status=="OK" && method.type != "Template" && method.type != "HardCode"]                           		
              	[#if method.arguments??]
                     [#list method.arguments as fargument][#compress]
                     [#if fargument.addressOf] [#assign adr = "&"][#else ][#assign adr = ""][/#if][/#compress] 
@@ -295,7 +305,6 @@
 				[#assign retval=argument.name]
 			[/#if]
 		    [/#list]
-
 		    [#if retval??&& retval!=""]
 			[#if nTab==2]#t#t[#else]#t[/#if]${retval} = ${method.name}(${args});
 		    [#else]
@@ -306,7 +315,7 @@
                                 [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
                                 [#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}(${args}) != [#if method.returnHAL == "true"]HAL_OK[#else]${method.returnHAL}[/#if])
                                 [#if nTab==2]#t#t[#else]#t[/#if]{
-                                [#if nTab==2]#t#t[#else]#t[/#if]#tError_Handler();
+                                [#if nTab==2]#t#t[#else]#t[/#if]#t_Error_Handler(__FILE__, __LINE__);
                                 [#if nTab==2]#t#t[#else]#t[/#if]}
                             [/#if]#n
 		    [/#if]
@@ -318,7 +327,7 @@
                                 [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
                                 [#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}() != [#if method.returnHAL == "true"]HAL_OK[#else]${method.returnHAL}[/#if])
                                 [#if nTab==2]#t#t[#else]#t[/#if]{
-                                [#if nTab==2]#t#t[#else]#t[/#if]#tError_Handler();
+                                [#if nTab==2]#t#t[#else]#t[/#if]#t_Error_Handler(__FILE__, __LINE__);
                                 [#if nTab==2]#t#t[#else]#t[/#if]}
                             [/#if]#n
                 [/#if]			
@@ -383,7 +392,7 @@
                                 [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
                                 [#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}() != [#if method.returnHAL == "true"]HAL_OK[#else]${method.returnHAL}[/#if])
                                 [#if nTab==2]#t#t[#else]#t[/#if]{
-                                [#if nTab==2]#t#t[#else]#t[/#if]#tError_Handler();
+                                [#if nTab==2]#t#t[#else]#t[/#if]#t_Error_Handler(__FILE__, __LINE__);
                                 [#if nTab==2]#t#t[#else]#t[/#if]}
                             [/#if]#n                                
                         [/#if]

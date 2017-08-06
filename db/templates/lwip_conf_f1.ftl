@@ -46,7 +46,7 @@
 [#list includes as include]
 #include "${include}"
 [/#list]
-[/#if] [#-- includes?? --]
+[/#if][#-- includes?? --]
 
 
 [#-- Global variables --]
@@ -54,7 +54,7 @@
 	[#list SWIP.variables as variable]
 extern ${variable.value} ${variable.name};
 	[/#list]
-[/#if] [#-- SWIP.variables?? --]
+[/#if][#-- SWIP.variables?? --]
 [#-- Global variables --]
 
 [#-- Parameters always visible and dependent from RTOS (NO_SYS) >> avoid using default value --]
@@ -184,7 +184,7 @@ extern ${variable.value} ${variable.name};
 		[#else]
 		    [#-- Case1 where default value equals user value but #define generation is forced since the setting is different than in opt.h--]
 		    [#-- Case2 where param1 = param2 by default, user change param2 and modify after param1 to keep default value => generate it in this case --]
-			[#if (definition.name=="LWIP_ETHERNET")] [#-- LWIP_ETHERNET is systematically generated since LWIP cannot be enabled wo ETH --]
+			[#if (definition.name=="LWIP_ETHERNET")][#-- LWIP_ETHERNET is systematically generated since LWIP cannot be enabled wo ETH --]
 /*----- Value in opt.h for ${definition.name}: LWIP_ARP || PPPOE_SUPPORT -*/
 #define ${definition.name}  ${definition.value}
             [/#if]
@@ -234,7 +234,7 @@ extern ${variable.value} ${variable.name};
 /*----- Value in opt.h for ${definition.name}: IP_DEFAULT_TTL -----*/
 #define ${definition.name}  ${definition.value}
             [/#if]
-            [#if (definition.name=="LWIP_DNS_SECURE") && (definition.value != "valueNotSetted")] [#-- Generate always this param --]
+            [#if (definition.name=="LWIP_DNS_SECURE") && (definition.value != "valueNotSetted")][#-- Generate always this param --]
 /*----- Value in opt.h for ${definition.name}: (LWIP_DNS_SECURE_RAND_XID | LWIP_DNS_SECURE_NO_MULTIPLE_OUTSTANDING | LWIP_DNS_SECURE_RAND_SRC_PORT) -*/
 #define ${definition.name}  ${definition.value}
             [/#if]
@@ -282,15 +282,15 @@ extern ${variable.value} ${variable.name};
 /*----- Value in opt.h for ${definition.name}: PPP_SUPPORT -----*/
 #define ${definition.name}  ${definition.value}
             [/#if]
-            [#if (definition.name=="LWIP_PPP_API") && (definition.value != "valueNotSetted") && (definition.value == "0") && (ppp_support == "1") && (lwip_rtos == 1)] [#-- Parameters with default value changing on certain condition --]
+            [#if (definition.name=="LWIP_PPP_API") && (definition.value != "valueNotSetted") && (definition.value == "0") && (ppp_support == "1") && (lwip_rtos == 1)][#-- Parameters with default value changing on certain condition --]
 /*----- Value in opt.h for ${definition.name}: (PPP_SUPPORT && !NO_SYS) -----*/
 #define ${definition.name}  ${definition.value}
             [/#if]             
-            [#if (definition.name=="PPP_IPV4_SUPPORT") && (definition.value != "valueNotSetted") && (definition.value != lwip_ipv4)] [#-- Parameter with default value changing on certain condition --]
+            [#if (definition.name=="PPP_IPV4_SUPPORT") && (definition.value != "valueNotSetted") && (definition.value != lwip_ipv4)][#-- Parameter with default value changing on certain condition --]
 /*----- Value in opt.h for ${definition.name}: LWIP_IPV4 -----*/ 
 #define ${definition.name}  ${definition.value}
             [/#if]
-            [#if (definition.name=="PPP_IPV6_SUPPORT") && (definition.value != "valueNotSetted") && (definition.value != lwip_ipv6)] [#-- Parameter with default value changing on certain condition --]
+            [#if (definition.name=="PPP_IPV6_SUPPORT") && (definition.value != "valueNotSetted") && (definition.value != lwip_ipv6)][#-- Parameter with default value changing on certain condition --]
 /*----- Value in opt.h for ${definition.name}: LWIP_IPV6 -----*/ 
 #define ${definition.name}  ${definition.value}
             [/#if]            
@@ -318,47 +318,47 @@ extern ${variable.value} ${variable.name};
 /*----- Value in opt.h for ${definition.name}: LWIP_IPV6 -----*/
 #define ${definition.name}  ${definition.value}
             [/#if] 
-            [#if (definition.name=="TCPIP_THREAD_STACKSIZE") && (definition.value != "valueNotSetted") && (lwip_rtos == 1) && (definition.value != "0")] [#-- rtosMaskList Param visible if freertos --]
+            [#if (definition.name=="TCPIP_THREAD_STACKSIZE") && (definition.value != "valueNotSetted") && (lwip_rtos == 1) && (definition.value != "0")][#-- rtosMaskList Param visible if freertos --]
 /*----- Value in opt.h for ${definition.name}: 0 -----*/
 #define ${definition.name}  ${definition.value}
             [/#if]
-            [#if (definition.name=="TCPIP_THREAD_PRIO")  && (definition.value != "valueNotSetted") && (definition.value != "1") && (lwip_rtos == 1)] [#-- rtosMaskList Param visible if freertos --]
+            [#if (definition.name=="TCPIP_THREAD_PRIO")  && (definition.value != "valueNotSetted") && (definition.value != "1") && (lwip_rtos == 1)][#-- rtosMaskList Param visible if freertos --]
 /*----- Value in opt.h for ${definition.name}: 1 -----*/
 #define ${definition.name}  ${definition.value}
             [/#if]                 
-            [#if (definition.name=="SLIPIF_THREAD_STACKSIZE") && (definition.value != "valueNotSetted") && (lwip_rtos == 1) && (definition.value != "0")] [#-- rtosMaskList Param visible if freertos, with default value changing on certain condition --]
+            [#if (definition.name=="SLIPIF_THREAD_STACKSIZE") && (definition.value != "valueNotSetted") && (lwip_rtos == 1) && (definition.value != "0")][#-- rtosMaskList Param visible if freertos, with default value changing on certain condition --]
 /*----- Value in opt.h for ${definition.name}: 0 -----*/
 #define ${definition.name}  ${definition.value}
             [/#if]
-            [#if (definition.name=="SLIPIF_THREAD_PRIO") && (definition.value != "valueNotSetted") && (lwip_rtos == 1) && (definition.value != "1")] [#-- rtosMaskList Param visible if freertos, with default value changing on certain condition --]
+            [#if (definition.name=="SLIPIF_THREAD_PRIO") && (definition.value != "valueNotSetted") && (lwip_rtos == 1) && (definition.value != "1")][#-- rtosMaskList Param visible if freertos, with default value changing on certain condition --]
 /*----- Value in opt.h for ${definition.name}: 1 -----*/
 #define ${definition.name}  ${definition.value}
             [/#if]
-            [#if (definition.name=="DEFAULT_THREAD_STACKSIZE") && (definition.value != "valueNotSetted") && (lwip_rtos == 1) && (definition.value != "0")] [#-- rtosMaskList Param visible if freertos --]
+            [#if (definition.name=="DEFAULT_THREAD_STACKSIZE") && (definition.value != "valueNotSetted") && (lwip_rtos == 1) && (definition.value != "0")][#-- rtosMaskList Param visible if freertos --]
 /*----- Value in opt.h for ${definition.name}: 0 -----*/
 #define ${definition.name}  ${definition.value}
             [/#if]             
-            [#if (definition.name=="DEFAULT_THREAD_PRIO") && (definition.value != "valueNotSetted") && (lwip_rtos == 1) && (definition.value != "1")] [#-- rtosMaskList Param visible if freertos, with default value changing on certain condition --]
+            [#if (definition.name=="DEFAULT_THREAD_PRIO") && (definition.value != "valueNotSetted") && (lwip_rtos == 1) && (definition.value != "1")][#-- rtosMaskList Param visible if freertos, with default value changing on certain condition --]
 /*----- Value in opt.h for ${definition.name}: 1 -----*/
 #define ${definition.name}  ${definition.value}
             [/#if]
-            [#if (definition.name=="LWIP_SOCKET_SET_ERRNO") && (definition.value != "valueNotSetted") && (lwip_rtos == 1) && (definition.value != "1")] [#-- rtosMaskList Param visible if freertos, with default value changing on certain condition --]
+            [#if (definition.name=="LWIP_SOCKET_SET_ERRNO") && (definition.value != "valueNotSetted") && (lwip_rtos == 1) && (definition.value != "1")][#-- rtosMaskList Param visible if freertos, with default value changing on certain condition --]
 /*----- Value in opt.h for ${definition.name}: 1 -----*/
 #define ${definition.name}  ${definition.value}
             [/#if]
-            [#if (definition.name=="LWIP_POSIX_SOCKETS_IO_NAMES") && (definition.value != "valueNotSetted") && (lwip_rtos == 1) && (definition.value != "1")] [#-- rtosMaskList Param visible if freertos, with default value changing on certain condition --]
+            [#if (definition.name=="LWIP_POSIX_SOCKETS_IO_NAMES") && (definition.value != "valueNotSetted") && (lwip_rtos == 1) && (definition.value != "1")][#-- rtosMaskList Param visible if freertos, with default value changing on certain condition --]
 /*----- Value in opt.h for ${definition.name}: 1 -----*/
 #define ${definition.name}  ${definition.value}
             [/#if]
-            [#if (definition.name=="LWIP_COMPAT_SOCKETS") && (definition.value != "valueNotSetted") && (lwip_rtos == 1) && (definition.value != "1")] [#-- rtosMaskList Param visible if freertos, with default value changing on certain condition --]        
+            [#if (definition.name=="LWIP_COMPAT_SOCKETS") && (definition.value != "valueNotSetted") && (lwip_rtos == 1) && (definition.value != "1")][#-- rtosMaskList Param visible if freertos, with default value changing on certain condition --]        
 /*----- Value in opt.h for ${definition.name}: 1 -----*/
 #define ${definition.name}  ${definition.value}
             [/#if]
-            [#if (definition.name=="LWIP_STATS") && (definition.value != "valueNotSetted") && (definition.value == "0")] [#-- Case1: Parameter with default value in MX different than in opt.h--]
+            [#if (definition.name=="LWIP_STATS") && (definition.value != "valueNotSetted") && (definition.value == "0")][#-- Case1: Parameter with default value in MX different than in opt.h--]
 /*----- Value in opt.h for ${definition.name}: 1 -----*/
 #define ${definition.name}  ${definition.value}
             [/#if]
-            [#if lwip_stats == "1"] [#-- Parameters with default value changing on certain condition --]
+            [#if lwip_stats == "1"][#-- Parameters with default value changing on certain condition --]
                 [#if (definition.name=="LINK_STATS") && (definition.value != "valueNotSetted") && (definition.value == "0")]
 /*----- Value in opt.h for ${definition.name}: 0 or 1 -*/
 #define ${definition.name}   ${definition.value}
@@ -423,7 +423,7 @@ extern ${variable.value} ${variable.name};
 /*----- Value in opt.h for ${definition.name}: 0 or LWIP_IPV6 -----*/
 #define ${definition.name}  ${definition.value}
                 [/#if]
-            [/#if] [#-- End STAT* parameters --] 
+            [/#if][#-- End STAT* parameters --] 
             [#if (definition.name=="CHECKSUM_GEN_IP") && (definition.value != "valueNotSetted") && (definition.value == "0")]
 /*----- Value in opt.h for ${definition.name}: 1 -----*/
 #define ${definition.name}  ${definition.value}
@@ -464,12 +464,13 @@ extern ${variable.value} ${variable.name};
 /*----- Value in opt.h for ${definition.name}: 1 -----*/
 #define ${definition.name}   ${definition.value}
             [/#if]      
-		[/#if] [#-- definition.defaultValue --]
-	[/#list] [#-- SWIP.defines line 108 --]
+		[/#if][#-- definition.defaultValue --]
+	[/#list][#-- SWIP.defines line 108 --]
 /*-----------------------------------------------------------------------------*/
-[/#compress]	
-[/#if] [#-- SWIP.defines?? --]
-[/#list] [#-- SWIPdatas --]
+[/#compress]
+[/#if][#-- SWIP.defines?? --]
+[/#list][#-- SWIPdatas --]
+
 /* Parameter(s) not set in STM32CubeMX LwIP Configuration GUI -*/
 /* LwIP Parameter(s) not in opt.h -----------------------------*/
 #define LWIP_PROVIDE_ERRNO  1

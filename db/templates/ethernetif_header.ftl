@@ -28,7 +28,7 @@
 	[/#list]
 [/#if]
 [/#list]
-
+[#assign series = FamilyName?lower_case]
 
 #ifndef __ETHERNETIF_H__
 #define __ETHERNETIF_H__
@@ -38,15 +38,15 @@
 [#if use_rtos == 1]
 #include "cmsis_os.h"
 
-[#if (netif_callback == 1)]
+[#if (netif_callback == 1) && (series != "stm32h7")]
 /* Exported types ------------------------------------------------------------*/
 /* Structure that include link thread parameters */
 struct link_str {
   struct netif *netif;
   osSemaphoreId semaphore;
 };
-[/#if] [#-- netif_callback --]
-[/#if] [#-- use_rtos --]
+[/#if][#-- netif_callback --]
+[/#if][#-- use_rtos --]
 
 /* Within 'USER CODE' section, code will be kept by default at each generation */
 /* USER CODE BEGIN 0 */
@@ -57,20 +57,32 @@ struct link_str {
 err_t ethernetif_init(struct netif *netif);
 
 [#if use_rtos == 1]
-void ethernetif_input( void const * argument ); 
+void ethernetif_input( void const * argument );
 [#else]
 void ethernetif_input(struct netif *netif);
-[/#if] [#-- endif with_rtos --]
-
+[/#if][#-- endif with_rtos --]
+[#if series != "stm32h7"]
 [#if (netif_callback == 1)]
 [#if use_rtos == 1]
 void ethernetif_set_link(void const *argument);
 [#else]
 void ethernetif_set_link(struct netif *netif);
-[/#if] [#-- endif with_rtos --]
-[/#if] [#-- endif netif_callback --]
+[/#if][#-- endif with_rtos --]
+[/#if][#-- endif netif_callback --]
+[/#if][#-- endif series --]
+[#if series == "stm32h7"]
+[#if (netif_callback == 1)]
+[#if use_rtos == 1]
+void ethernet_link_thread(void const * argument );
+[#else]
+void ethernet_link_check_state(struct netif *netif);
+[/#if][#-- endif with_rtos --]
+[/#if][#-- endif netif_callback --]
+[#else]
 void ethernetif_update_config(struct netif *netif);
 void ethernetif_notify_conn_changed(struct netif *netif);
+[/#if]
+
 
 
 /* USER CODE BEGIN 1 */

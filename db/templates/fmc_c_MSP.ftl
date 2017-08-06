@@ -265,7 +265,7 @@
                         [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
                         [#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}(${args}) != HAL_OK)
                         [#if nTab==2]#t#t[#else]#t[/#if]{
-                        [#if nTab==2]#t#t[#else]#t[/#if]#tError_Handler();
+                        [#if nTab==2]#t#t[#else]#t[/#if]#t_Error_Handler(__FILE__, __LINE__);
                         [#if nTab==2]#t#t[#else]#t[/#if]}
                     [/#if]#n                        
 		  [#else][#--if method.arguments??--]
@@ -276,7 +276,7 @@
                         [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
                         [#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}() != HAL_OK)
                         [#if nTab==2]#t#t[#else]#t[/#if]{
-                        [#if nTab==2]#t#t[#else]#t[/#if]#tError_Handler();
+                        [#if nTab==2]#t#t[#else]#t[/#if]#t_Error_Handler(__FILE__, __LINE__);
                         [#if nTab==2]#t#t[#else]#t[/#if]}
                     [/#if]#n
       [/#if][#--if method.arguments??--]
@@ -351,7 +351,7 @@
                     [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
                     [#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}() != HAL_OK)
                     [#if nTab==2]#t#t[#else]#t[/#if]{
-                    [#if nTab==2]#t#t[#else]#t[/#if]#tError_Handler();
+                    [#if nTab==2]#t#t[#else]#t[/#if]#t_Error_Handler(__FILE__, __LINE__);
                     [#if nTab==2]#t#t[#else]#t[/#if]}
                 [/#if]#n
       [/#if]

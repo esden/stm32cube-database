@@ -50,6 +50,27 @@
     <RefParameter Name="PHY" Comment="PHY (Phy RMII)" Type="string" Group="RTOS Settings" DefaultValue="+ETH:PHY_Name_RMII" TabName="General Settings" Mode="Basic" Visible="false">
         <Description>PHY RMII parameter.</Description>
     </RefParameter>
+    <RefParameter Name="TX_DESCRIPTOR_ADDRESS" Comment="TX_DESCRIPTOR_ADDRESS (First Tx Descriptor Address)" Type="string" Group="RTOS Settings" DefaultValue="+ETH:TxDescAddress" TabName="General Settings" Mode="Basic" Visible="false">
+        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: STM32H7." Expression="STM32H7"/>
+        <Description>First Tx Descriptor Address.</Description>
+    </RefParameter>
+    <RefParameter Name="TX_DESCRIPTOR_ADDRESS" Comment="TX_DESCRIPTOR_ADDRESS (First Tx Descriptor Address)" Type="string" Group="RTOS Settings" DefaultValue="null" TabName="General Settings" Mode="Basic" Visible="false">
+        <Description>First Tx Descriptor Address.</Description>
+    </RefParameter>
+    <RefParameter Name="RX_DESCRIPTOR_ADDRESS" Comment="RX_DESCRIPTOR_ADDRESS (First Rx Descriptor Address)" Type="string" Group="RTOS Settings" DefaultValue="+ETH:RxDescAddress" TabName="General Settings" Mode="Basic" Visible="false">
+        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: STM32H7." Expression="STM32H7"/>
+        <Description>First Rx Descriptor Address.</Description>
+    </RefParameter>
+    <RefParameter Name="RX_DESCRIPTOR_ADDRESS" Comment="RX_DESCRIPTOR_ADDRESS (First Rx Descriptor Address)" Type="string" Group="RTOS Settings" DefaultValue="null" TabName="General Settings" Mode="Basic" Visible="false">
+        <Description>First Rx Descriptor Address.</Description>
+    </RefParameter>
+    <RefParameter Name="RX_BUFFER_ADDRESS" Comment="RX_BUFFER_ADDRESS (Rx Buffer Address)" Type="string" Group="RTOS Settings" DefaultValue="+ETH:RxBuffAddress" TabName="General Settings" Mode="Basic" Visible="false">
+        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: STM32H7." Expression="STM32H7"/>
+        <Description>Rx Buffer Address.</Description>
+    </RefParameter>
+    <RefParameter Name="RX_BUFFER_ADDRESS" Comment="RX_BUFFER_ADDRESS (Rx Buffer Address)" Type="string" Group="RTOS Settings" DefaultValue="null" TabName="General Settings" Mode="Basic" Visible="false">
+        <Description>Rx Buffer Address.</Description>
+    </RefParameter>
     <RefParameter Name="NO_SYS" Comment="NO_SYS (OS Awarness)" Type="list" Group="Infrastructure - OS Awarness Option" DefaultValue="0" TabName="Key Options" Mode="Basic" Visible="true">
         <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: Forced to Enabled (set to 0) by activating FREERTOS middleware. To set NO_SYS to 1 (Disabled), unset FREERTOS middleware." Expression="S_NO_SYS &amp; S_FREERTOS"/>
         <PossibleValue Comment="OS Used" Value="0"/>
@@ -110,6 +131,14 @@
     <RefParameter Name="ipaddr" Comment="ipaddr (IP Address)" Type="integer" Group="Global" DefaultValue="0" Min="0" Max="1" Visible="false"/>
     <RefParameter Name="netmask" Comment="netmask (Netmask IP Address)" Type="integer" Group="Global" DefaultValue="0" Min="0" Max="1" Visible="false"/>
     <RefParameter Name="gw" Comment="gw (Gateway Address)" Type="integer" Group="Global" DefaultValue="0" Min="0" Max="1" Visible="false"/>
+    <RefParameter Name="PHY Driver" Comment="PHY Driver" Type="string" Group="Platform Settings" DefaultValue="Disable/LAN8742" TabName="General Settings" Mode="Basic" Visible="true">
+        <Condition Diagnostic="" Expression="STM32H7"/>
+        <PossibleValue Comment="Disable/LAN8742" Value="Disable/LAN8742"/>
+        <Description>&lt;font color=&quot;red&quot;&gt;Platform Settings &lt;b&gt;PHY Driver&lt;/b&gt; must be configured from the LwIP '&lt;b&gt;Platform Settings&lt;/b&gt;' top right tab.&lt;/font&gt;&lt;br&gt;PHY Driver can be set either to Disabled or to LAN8742:&lt;br&gt;- &lt;b&gt;Disable&lt;/b&gt;: BSP PHY Driver components provided by ST are not used and up to user to implement his own driver with same architecture and constraints than LAN8742 ; ST specification will be published soon to explain how user can develop his own BSP driver component.&lt;br&gt;- &lt;b&gt;LAN8742&lt;/b&gt;: LAN8742 BSP PHY Driver component is used and STM32CubeMX copies lan8742.c/.h files from ST Firmware Package to the user's project Drivers/BSP/Components directory.&lt;/ul&gt;&lt;br&gt;&lt;i&gt;Note&lt;/i&gt;: BSP components files cannot be updated or they will be overwritten at each project generation.</Description>
+    </RefParameter>
+    <RefParameter Name="PHY Driver" Comment="PHY Driver" Type="string" Group="Platform Settings" DefaultValue="Disable/LAN8742" TabName="General Settings" Mode="Basic" Visible="false">
+        <Description>&lt;font color=&quot;red&quot;&gt;Platform Settings must be configured from 'Platform Settings' LwIP top right tab.&lt;/font&gt;&lt;br&gt;Disable: BSP PHY Driver components provided by ST are not used.&lt;br&gt;LAN8742: LAN8742 BSP PHY Driver component from ST Firmware Package is used.&lt;br&gt;&lt;b&gt;Note&lt;/b&gt;: LAN8742 files are located in project location within Drivers\BSP\Components folder. These BSP components files cannot be updated or they will be overwritten at each project generation.</Description>
+    </RefParameter>
     <RefParameter Name="MEM_LIBC_MALLOC" Comment="MEM_LIBC_MALLOC (User Memory Library)" Type="list" Group="Infrastructure - Heap and Memory Pools Options" DefaultValue="0" TabName="Key Options" Mode="Advanced" >
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1" Semaphore="S_MEM_USE_POOLS"/>
@@ -217,6 +246,15 @@
     </RefParameter>
     <RefParameter Name="MEMP_NUM_NETIFAPI_MSG" Comment="MEMP_NUM_NETIFAPI_MSG (Number of Concurrent Active Netif Calls)" Type="integer" Group="Infrastructure - Internal Memory Pool Sizes" DefaultValue="=MEMP_NUM_TCPIP_MSG_API" TabName="Key Options" Mode="Advanced" Min="0" Max="2147483647" >
         <Description>Number of concurrently active calls to netifapi functions.</Description>
+    </RefParameter>
+    <RefParameter Name="LWIP_SUPPORT_CUSTOM_PBUF" Comment="LWIP_SUPPORT_CUSTOM_PBUF (Custom Pbuf)" Type="list" Group="Pbuf Options" DefaultValue="0" TabName="Key Options" Mode="Advanced" Visible="true">
+        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: STM32H7." Expression="STM32H7"/>
+        <PossibleValue Comment="Enabled" Value="1"/>
+        <Description>Custom Pbuf parameter.</Description>
+    </RefParameter>
+    <RefParameter Name="LWIP_SUPPORT_CUSTOM_PBUF" Comment="LWIP_SUPPORT_CUSTOM_PBUF (Custom Pbuf)" Type="list" Group="Pbuf Options" DefaultValue="null" TabName="Key Options" Mode="Advanced" Visible="false">
+        <PossibleValue Comment="Disabled" Value="0"/>
+        <Description>Custom Pbuf parameter.</Description>
     </RefParameter>
     <RefParameter Name="PBUF_POOL_SIZE" Comment="PBUF_POOL_SIZE (Number of Buffers in the Pbuf Pool)" Type="integer" Group="Pbuf Options" DefaultValue="16" TabName="Key Options" Mode="Basic" Min="=IP_REASS_MAX_PBUFS+1" Max="2147483647" >
         <Description>Number of buffers in the pbuf pool.</Description>
@@ -1027,7 +1065,7 @@
         <PossibleValue Comment="Disabled" Value="0"/>
         <Description>This paarmeter enables SO_LINGER processing.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Enable LWIP_SO_LINGER option requires RTOS enabled (NO_SYS=0).</Description>
     </RefParameter>
-    <RefParameter Name="RECV_BUFSIZE_DEFAULT" Comment="RECV_BUFSIZE_DEFAULT (SO_RCVBUF Size Value)" Type="Integer" Group="Thread Safe APIs - Socket Options" DefaultValue="0xFFFFFFF" TabName="Key Options" Mode="Advanced" Min="0" Max="2147483647" >
+    <RefParameter Name="RECV_BUFSIZE_DEFAULT" Comment="RECV_BUFSIZE_DEFAULT (SO_RCVBUF Size Value)" Type="Integer" Group="Thread Safe APIs - Socket Options" DefaultValue="2000000000" TabName="Key Options" Mode="Advanced" Min="0" Max="2147483647" >
         <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: Enable RECV_BUFSIZE_DEFAULT option requires RTOS enabled (NO_SYS=0)." Expression="!NO_SYS"/>
         <Description>If LWIP_SO_RCVBUF is used, this is the default value for recv_bufsize.</Description>
     </RefParameter>
@@ -1749,7 +1787,7 @@
         <PossibleValue Comment="Enabled" Value="1"/>
         <Description>Set this to 0 to not send the SSI tag (default is on, so the tag will be sent in the HTML page.</Description>
     </RefParameter>
-    <RefParameter Name="LWIP_HTTPD_SSI_INCLUDE_TAG" Comment="LWIP_HTTPD_SSI_INCLUDE_TAG ()" Type="list" Group="HTTPD Options" DefaultValue="null" TabName="HTTPD" Mode="Advanced" Visible="false">
+    <RefParameter Name="LWIP_HTTPD_SSI_INCLUDE_TAG" Comment="LWIP_HTTPD_SSI_INCLUDE_TAG" Type="list" Group="HTTPD Options" DefaultValue="null" TabName="HTTPD" Mode="Advanced" Visible="false">
         <Description>Set this to 0 to not send the SSI tag (default is on, so the tag will be sent in the HTML page.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: LWIP_HTTPD_SSI_INCLUDE_TAG requires LWIP_HTTPD enabled.</Description>
     </RefParameter>
     <RefParameter Name="LWIP_HTTPD_ABORT_ON_CLOSE_MEM_ERROR" Comment="LWIP_HTTPD_ABORT_ON_CLOSE_MEM_ERROR (Call TCP Abort on TCP Close with Memory Error)" Type="list" Group="HTTPD Options" DefaultValue="0" TabName="HTTPD" Mode="Advanced" >
@@ -1758,7 +1796,7 @@
         <PossibleValue Comment="Enabled" Value="1"/>
         <Description>Set this to 1 to call tcp_abort when tcp_close fails with memory error.&lt;br&gt;This can be used to prevent consuming all memory in situations where the HTTP server has low priority compared to other communication.</Description>
     </RefParameter>
-    <RefParameter Name="LWIP_HTTPD_ABORT_ON_CLOSE_MEM_ERROR" Comment="LWIP_HTTPD_ABORT_ON_CLOSE_MEM_ERROR ()" Type="list" Group="HTTPD Options" DefaultValue="null" TabName="HTTPD" Mode="Advanced" Visible="false">
+    <RefParameter Name="LWIP_HTTPD_ABORT_ON_CLOSE_MEM_ERROR" Comment="LWIP_HTTPD_ABORT_ON_CLOSE_MEM_ERROR" Type="list" Group="HTTPD Options" DefaultValue="null" TabName="HTTPD" Mode="Advanced" Visible="false">
         <Description>Set this to 1 to call tcp_abort when tcp_close fails with memory error.&lt;br&gt;This can be used to prevent consuming all memory in situations where the HTTP server has low priority compared to other communication.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: LWIP_HTTPD_ABORT_ON_CLOSE_MEM_ERROR requires LWIP_HTTPD enabled.</Description>
     </RefParameter>
     <RefParameter Name="LWIP_HTTPD_KILL_OLD_ON_CONNECTIONS_EXCEEDED" Comment="LWIP_HTTPD_KILL_OLD_ON_CONNECTIONS_EXCEEDED (Kill Old Connections)" Type="list" Group="HTTPD Options" DefaultValue="0" TabName="HTTPD" Mode="Advanced" >
@@ -2420,118 +2458,109 @@
         <PossibleValue Comment="Enabled" Value="1"/>
         <Description>Checksum generation/check can be enabled/disabled per netif.&lt;br&gt;ATTENTION: if enabled, the CHECKSUM_GEN_* and CHECKSUM_CHECK_* defines must be enabled!</Description>
     </RefParameter>
-    <RefParameter Name="LWIP_CHECKSUM_CTRL_PER_NETIF" Comment="LWIP_CHECKSUM_CTRL_PER_NETIF (No Software Checksum Generation for Outgoing IP Packets)" Type="list" Group="Infrastructure - Checksum Options" DefaultValue="0" TabName="Checksum" Mode="Basic" >
+    <RefParameter Name="LWIP_CHECKSUM_CTRL_PER_NETIF" Comment="LWIP_CHECKSUM_CTRL_PER_NETIF (Generate/Check Checksum per Netif)" Type="list" Group="Infrastructure - Checksum Options" DefaultValue="0" TabName="Checksum" Mode="Basic" >
         <PossibleValue Comment="Disabled" Value="0"/>
         <Description>Checksum generation/check can be enabled/disabled per netif.&lt;br&gt;ATTENTION: if enabled, the CHECKSUM_GEN_* and CHECKSUM_CHECK_* defines must be enabled!&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Set LWIP_CHECKSUM_CTRL_PER_NETIF requires CHECKSUM_BY_HARDWARE disabled.</Description>
     </RefParameter>
-    <RefParameter Name="CHECKSUM_GEN_IP" Comment="CHECKSUM_GEN_IP (Generate Software Checksum for Outgoing IP Packets)" Type="list" Group="Infrastructure - Checksum Options" DefaultValue="0" TabName="Checksum" Mode="Basic" >
-        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: Set CHECKSUM_GEN_IP requires CHECKSUM_BY_HARDWARE disabled." Expression="!CHECKSUM_BY_HARDWARE &amp; !LWIP_CHECKSUM_CTRL_PER_NETIF"/>
+    <RefParameter Name="CHECKSUM_GEN_IP" Comment="CHECKSUM_GEN_IP (Generate Software Checksum for Outgoing IP Packets)" Type="list" Group="Infrastructure - Checksum Options" DefaultValue="1" TabName="Checksum" Mode="Basic" >
+        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: Set CHECKSUM_GEN_IP requires CHECKSUM_BY_HARDWARE disabled. CHECKSUM_GEN_IP is enabled if LWIP_CHECKSUM_CTRL_PER_NETIF is enabled." Expression="!CHECKSUM_BY_HARDWARE &amp; LWIP_CHECKSUM_CTRL_PER_NETIF"/>
+        <PossibleValue Comment="Enabled" Value="1"/>
+        <Description>Generate checksums in software for outgoing IP packets.</Description>
+    </RefParameter>
+    <RefParameter Name="CHECKSUM_GEN_IP" Comment="CHECKSUM_GEN_IP (Generate Software Checksum for Outgoing IP Packets)" Type="list" Group="Infrastructure - Checksum Options" DefaultValue="=IF(CHECKSUM_BY_HARDWARE,0,IF(LWIP_CHECKSUM_CTRL_PER_NETIF,1,0))" TabName="Checksum" Mode="Basic" >
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
-        <Description>Generate checksums in software for outgoing IP packets. CHECKSUM_GEN_IP is enabled if LWIP_CHECKSUM_CTRL_PER_NETIF is enabled.</Description>
+        <Description>Generate checksums in software for outgoing IP packets.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Set CHECKSUM_GEN_IP requires CHECKSUM_BY_HARDWARE disabled. CHECKSUM_GEN_IP is enabled if LWIP_CHECKSUM_CTRL_PER_NETIF is enabled.</Description>
     </RefParameter>
-    <RefParameter Name="CHECKSUM_GEN_IP" Comment="CHECKSUM_GEN_IP (No Software Checksum Generation for Outgoing IP Packets)" Type="list" Group="Infrastructure - Checksum Options" DefaultValue="=IF(CHECKSUM_BY_HARDWARE,0,IF(LWIP_CHECKSUM_CTRL_PER_NETIF,1,0))" TabName="Checksum" Mode="Basic" >
+    <RefParameter Name="CHECKSUM_GEN_UDP" Comment="CHECKSUM_GEN_UDP (Generate Software Checksum for Outgoing UDP Packets)" Type="list" Group="Infrastructure - Checksum Options" DefaultValue="1" TabName="Checksum" Mode="Basic" >
+        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: Set CHECKSUM_GEN_UDP requires CHECKSUM_BY_HARDWARE disabled. CHECKSUM_GEN_UDP is enabled if LWIP_CHECKSUM_CTRL_PER_NETIF is enabled." Expression="!CHECKSUM_BY_HARDWARE &amp; LWIP_CHECKSUM_CTRL_PER_NETIF"/>
+        <PossibleValue Comment="Enabled" Value="1"/>
+        <Description>Generate checksums in software for outgoing UDP packets.</Description>
+    </RefParameter>
+    <RefParameter Name="CHECKSUM_GEN_UDP" Comment="CHECKSUM_GEN_UDP (Generate Software Checksum for Outgoing UDP Packets)" Type="list" Group="Infrastructure - Checksum Options" DefaultValue="=IF(CHECKSUM_BY_HARDWARE,0,IF(LWIP_CHECKSUM_CTRL_PER_NETIF,1,0))" TabName="Checksum" Mode="Basic" >
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
-        <Description>Do not generate checksums in software for outgoing IP packets. CHECKSUM_GEN_IP is enabled if LWIP_CHECKSUM_CTRL_PER_NETIF is enabled.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Set CHECKSUM_GEN_IP requires CHECKSUM_BY_HARDWARE disabled.</Description>
+        <Description>Generate checksums in software for outgoing UDP packets.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Set CHECKSUM_GEN_UDP requires CHECKSUM_BY_HARDWARE disabled. CHECKSUM_GEN_UDP is enabled if LWIP_CHECKSUM_CTRL_PER_NETIF is enabled.</Description>
     </RefParameter>
-    <RefParameter Name="CHECKSUM_GEN_UDP" Comment="CHECKSUM_GEN_UDP (Generate Software Checksum for Outgoing UDP Packets)" Type="list" Group="Infrastructure - Checksum Options" DefaultValue="0" TabName="Checksum" Mode="Basic" >
-        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: Set CHECKSUM_GEN_UDP requires CHECKSUM_BY_HARDWARE disabled." Expression="!CHECKSUM_BY_HARDWARE &amp; !LWIP_CHECKSUM_CTRL_PER_NETIF"/>
+    <RefParameter Name="CHECKSUM_GEN_TCP" Comment="CHECKSUM_GEN_TCP (Generate Software Checksum for Outgoing TCP Packets)" Type="list" Group="Infrastructure - Checksum Options" DefaultValue="1" TabName="Checksum" Mode="Basic" >
+        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: Set CHECKSUM_GEN_TCP requires CHECKSUM_BY_HARDWARE disabled. CHECKSUM_GEN_TCP is enabled if LWIP_CHECKSUM_CTRL_PER_NETIF is enabled." Expression="!CHECKSUM_BY_HARDWARE &amp; LWIP_CHECKSUM_CTRL_PER_NETIF"/>
+        <PossibleValue Comment="Enabled" Value="1"/>
+        <Description>Generate checksums in software for outgoing TCP packets.</Description>
+    </RefParameter>
+    <RefParameter Name="CHECKSUM_GEN_TCP" Comment="CHECKSUM_GEN_TCP (Generate Software Checksum for Outgoing TCP Packets)" Type="list" Group="Infrastructure - Checksum Options" DefaultValue="=IF(CHECKSUM_BY_HARDWARE,0,IF(LWIP_CHECKSUM_CTRL_PER_NETIF,1,0))" TabName="Checksum" Mode="Basic" >
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
-        <Description>Generate checksums in software for outgoing UDP packets. CHECKSUM_GEN_UDP is enabled if LWIP_CHECKSUM_CTRL_PER_NETIF is enabled.</Description>
+        <Description>Generate checksums in software for outgoing TCP packets.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Set CHECKSUM_GEN_TCP requires CHECKSUM_BY_HARDWARE disabled. CHECKSUM_GEN_TCP is enabled if LWIP_CHECKSUM_CTRL_PER_NETIF is enabled.</Description>
     </RefParameter>
-    <RefParameter Name="CHECKSUM_GEN_UDP" Comment="CHECKSUM_GEN_UDP (No Software Checksum Generation for Outgoing UDP Packets)" Type="list" Group="Infrastructure - Checksum Options" DefaultValue="=IF(CHECKSUM_BY_HARDWARE,0,IF(LWIP_CHECKSUM_CTRL_PER_NETIF,1,0))" TabName="Checksum" Mode="Basic" >
+    <RefParameter Name="CHECKSUM_GEN_ICMP" Comment="CHECKSUM_GEN_ICMP (Generate Software Checksum for Outgoing ICMP Packets)" Type="list" Group="Infrastructure - Checksum Options" DefaultValue="1" TabName="Checksum" Mode="Basic" >
+        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: Set CHECKSUM_GEN_ICMP requires CHECKSUM_BY_HARDWARE disabled. CHECKSUM_GEN_ICMP is enabled if LWIP_CHECKSUM_CTRL_PER_NETIF is enabled." Expression="!CHECKSUM_BY_HARDWARE &amp; LWIP_CHECKSUM_CTRL_PER_NETIF"/>
+        <PossibleValue Comment="Enabled" Value="1"/>
+        <Description>Generate checksums in software for outgoing ICMP packets.</Description>
+    </RefParameter>
+    <RefParameter Name="CHECKSUM_GEN_ICMP" Comment="CHECKSUM_GEN_ICMP (Generate Software Checksum for Outgoing ICMP Packets)" Type="list" Group="Infrastructure - Checksum Options" DefaultValue="=IF(CHECKSUM_BY_HARDWARE,0,IF(LWIP_CHECKSUM_CTRL_PER_NETIF,1,0))" TabName="Checksum" Mode="Basic" >
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
-        <Description>Do not generate checksums in software for outgoing UDP packets. CHECKSUM_GEN_UDP is enabled if LWIP_CHECKSUM_CTRL_PER_NETIF is enabled.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Set CHECKSUM_GEN_UDP requires CHECKSUM_BY_HARDWARE disabled.</Description>
+        <Description>Generate checksums in software for outgoing ICMP packets.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Set CHECKSUM_GEN_ICMP requires CHECKSUM_BY_HARDWARE disabled. CHECKSUM_GEN_ICMP is enabled if LWIP_CHECKSUM_CTRL_PER_NETIF is enabled.</Description>
     </RefParameter>
-    <RefParameter Name="CHECKSUM_GEN_TCP" Comment="CHECKSUM_GEN_TCP (Generate Software Checksum for Outgoing TCP Packets)" Type="list" Group="Infrastructure - Checksum Options" DefaultValue="0" TabName="Checksum" Mode="Basic" >
-        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: Set CHECKSUM_GEN_TCP requires CHECKSUM_BY_HARDWARE disabled." Expression="!CHECKSUM_BY_HARDWARE &amp; !LWIP_CHECKSUM_CTRL_PER_NETIF"/>
+    <RefParameter Name="CHECKSUM_GEN_ICMP6" Comment="CHECKSUM_GEN_ICMP6 (Generate Software Checksum for Outgoing ICMP6 Packets)" Type="list" Group="Infrastructure - Checksum Options" DefaultValue="1" TabName="Checksum" Mode="Basic" >
+        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: Set CHECKSUM_GEN_ICMP6 requires CHECKSUM_BY_HARDWARE disabled. CHECKSUM_GEN_ICMP6 is enabled if LWIP_CHECKSUM_CTRL_PER_NETIF is enabled." Expression="!CHECKSUM_BY_HARDWARE &amp; LWIP_CHECKSUM_CTRL_PER_NETIF"/>
+        <PossibleValue Comment="Enabled" Value="1"/>
+        <Description>Generate checksums in software for outgoing ICMP6 packets.</Description>
+    </RefParameter>
+    <RefParameter Name="CHECKSUM_GEN_ICMP6" Comment="CHECKSUM_GEN_ICMP6 (Generate Software Checksum for Outgoing ICMP6 Packets)" Type="list" Group="Infrastructure - Checksum Options" DefaultValue="=IF(CHECKSUM_BY_HARDWARE,0,IF(LWIP_CHECKSUM_CTRL_PER_NETIF,1,0))" TabName="Checksum" Mode="Basic" >
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
-        <Description>Generate checksums in software for outgoing TCP packets. CHECKSUM_GEN_TCP is enabled if LWIP_CHECKSUM_CTRL_PER_NETIF is enabled.</Description>
+        <Description>Generate checksums in software for outgoing ICMP6 packets.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Set CHECKSUM_GEN_ICMP6 requires CHECKSUM_BY_HARDWARE disabled. CHECKSUM_GEN_ICMP6 is enabled if LWIP_CHECKSUM_CTRL_PER_NETIF is enabled.</Description>
     </RefParameter>
-    <RefParameter Name="CHECKSUM_GEN_TCP" Comment="CHECKSUM_GEN_TCP (No Software Checksum Generation for Outgoing TCP Packets)" Type="list" Group="Infrastructure - Checksum Options" DefaultValue="=IF(CHECKSUM_BY_HARDWARE,0,IF(LWIP_CHECKSUM_CTRL_PER_NETIF,1,0))" TabName="Checksum" Mode="Basic" >
+    <RefParameter Name="CHECKSUM_CHECK_IP" Comment="CHECKSUM_CHECK_IP (Generate Software Checksum for Incoming IP Packets)" Type="list" Group="Infrastructure - Checksum Options" DefaultValue="1" TabName="Checksum" Mode="Basic" >
+        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: Set CHECKSUM_CHECK_IP requires CHECKSUM_BY_HARDWARE disabled. CHECKSUM_CHECK_IP is enabled if LWIP_CHECKSUM_CTRL_PER_NETIF is enabled." Expression="!CHECKSUM_BY_HARDWARE &amp; LWIP_CHECKSUM_CTRL_PER_NETIF"/>
+        <PossibleValue Comment="Enabled" Value="1"/>
+        <Description>Check checksums in software for Incoming IP packets.</Description>
+    </RefParameter>
+    <RefParameter Name="CHECKSUM_CHECK_IP" Comment="CHECKSUM_CHECK_IP (Generate Software Checksum for Incoming IP Packets)" Type="list" Group="Infrastructure - Checksum Options" DefaultValue="=IF(CHECKSUM_BY_HARDWARE,0,IF(LWIP_CHECKSUM_CTRL_PER_NETIF,1,0))" TabName="Checksum" Mode="Basic" >
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
-        <Description>Do not generate checksums in software for outgoing TCP packets. CHECKSUM_GEN_TCP is enabled if LWIP_CHECKSUM_CTRL_PER_NETIF is enabled.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Set CHECKSUM_GEN_TCP requires CHECKSUM_BY_HARDWARE disabled.</Description>
+        <Description>Check checksums in software for Incoming IP packets.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Set CHECKSUM_CHECK_IP requires CHECKSUM_BY_HARDWARE disabled. CHECKSUM_CHECK_IP is enabled if LWIP_CHECKSUM_CTRL_PER_NETIF is enabled.</Description>
     </RefParameter>
-    <RefParameter Name="CHECKSUM_GEN_ICMP" Comment="CHECKSUM_GEN_ICMP (Generate Software Checksum for Outgoing ICMP Packets)" Type="list" Group="Infrastructure - Checksum Options" DefaultValue="0" TabName="Checksum" Mode="Basic" >
-        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: Set CHECKSUM_GEN_ICMP requires CHECKSUM_BY_HARDWARE disabled." Expression="!CHECKSUM_BY_HARDWARE &amp; !LWIP_CHECKSUM_CTRL_PER_NETIF"/>
+    <RefParameter Name="CHECKSUM_CHECK_UDP" Comment="CHECKSUM_CHECK_UDP (Generate Software Checksum for Incoming UDP Packets)" Type="list" Group="Infrastructure - Checksum Options" DefaultValue="1" TabName="Checksum" Mode="Basic" >
+        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: Set CHECKSUM_CHECK_UDP requires CHECKSUM_BY_HARDWARE disabled. CHECKSUM_CHECK_UDP is enabled if LWIP_CHECKSUM_CTRL_PER_NETIF is enabled." Expression="!CHECKSUM_BY_HARDWARE &amp; LWIP_CHECKSUM_CTRL_PER_NETIF"/>
+        <PossibleValue Comment="Enabled" Value="1"/>
+        <Description>Check checksums in software for Incoming UDP packets.</Description>
+    </RefParameter>
+    <RefParameter Name="CHECKSUM_CHECK_UDP" Comment="CHECKSUM_CHECK_UDP (Generate Software Checksum for Incoming UDP Packets)" Type="list" Group="Infrastructure - Checksum Options" DefaultValue="=IF(CHECKSUM_BY_HARDWARE,0,IF(LWIP_CHECKSUM_CTRL_PER_NETIF,1,0))" TabName="Checksum" Mode="Basic" >
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
-        <Description>Generate checksums in software for outgoing ICMP packets. CHECKSUM_GEN_ICMP is enabled if LWIP_CHECKSUM_CTRL_PER_NETIF is enabled.</Description>
+        <Description>Check checksums in software for Incoming UDP packets.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Set CHECKSUM_CHECK_UDP requires CHECKSUM_BY_HARDWARE disabled. CHECKSUM_CHECK_UDP is enabled if LWIP_CHECKSUM_CTRL_PER_NETIF is enabled.</Description>
     </RefParameter>
-    <RefParameter Name="CHECKSUM_GEN_ICMP" Comment="CHECKSUM_GEN_ICMP (No Software Checksum Generation for Outgoing ICMP Packets)" Type="list" Group="Infrastructure - Checksum Options" DefaultValue="=IF(CHECKSUM_BY_HARDWARE,0,IF(LWIP_CHECKSUM_CTRL_PER_NETIF,1,0))" TabName="Checksum" Mode="Basic" >
-        <PossibleValue Comment="Disabled" Value="0"/>
-        <Description>Do not generate checksums in software for outgoing ICMP packets. CHECKSUM_GEN_ICMP is enabled if LWIP_CHECKSUM_CTRL_PER_NETIF is enabled.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Set CHECKSUM_GEN_ICMP requires CHECKSUM_BY_HARDWARE disabled.</Description>
+    <RefParameter Name="CHECKSUM_CHECK_TCP" Comment="CHECKSUM_CHECK_TCP (Generate Software Checksum for Incoming TCP Packets)" Type="list" Group="Infrastructure - Checksum Options" DefaultValue="1" TabName="Checksum" Mode="Basic" >
+        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: Set CHECKSUM_CHECK_TCP requires CHECKSUM_BY_HARDWARE disabled. CHECKSUM_CHECK_TCP is enabled if LWIP_CHECKSUM_CTRL_PER_NETIF is enabled." Expression="!CHECKSUM_BY_HARDWARE &amp; LWIP_CHECKSUM_CTRL_PER_NETIF"/>
+        <PossibleValue Comment="Enabled" Value="1"/>
+        <Description>Check checksums in software for Incoming TCP packets.</Description>
     </RefParameter>
-    <RefParameter Name="CHECKSUM_GEN_ICMP6" Comment="CHECKSUM_GEN_ICMP6 (Generate Software Checksum for Outgoing ICMP6 Packets)" Type="list" Group="Infrastructure - Checksum Options" DefaultValue="0" TabName="Checksum" Mode="Basic" >
-        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: Set CHECKSUM_GEN_ICMP6 requires CHECKSUM_BY_HARDWARE disabled." Expression="!CHECKSUM_BY_HARDWARE &amp; !LWIP_CHECKSUM_CTRL_PER_NETIF"/>
+    <RefParameter Name="CHECKSUM_CHECK_TCP" Comment="CHECKSUM_CHECK_TCP (Generate Software Checksum for Incoming TCP Packets)" Type="list" Group="Infrastructure - Checksum Options" DefaultValue="=IF(CHECKSUM_BY_HARDWARE,0,IF(LWIP_CHECKSUM_CTRL_PER_NETIF,1,0))" TabName="Checksum" Mode="Basic" >
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
-        <Description>Generate checksums in software for outgoing ICMP6 packets. CHECKSUM_GEN_ICMP6 is enabled if LWIP_CHECKSUM_CTRL_PER_NETIF is enabled.</Description>
+        <Description>Check checksums in software for Incoming TCP packets.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Set CHECKSUM_CHECK_TCP requires CHECKSUM_BY_HARDWARE disabled. CHECKSUM_CHECK_TCP is enabled if LWIP_CHECKSUM_CTRL_PER_NETIF is enabled.</Description>
     </RefParameter>
-    <RefParameter Name="CHECKSUM_GEN_ICMP6" Comment="CHECKSUM_GEN_ICMP6 (No Software Checksum Generation for Outgoing ICMP6 Packets)" Type="list" Group="Infrastructure - Checksum Options" DefaultValue="=IF(CHECKSUM_BY_HARDWARE,0,IF(LWIP_CHECKSUM_CTRL_PER_NETIF,1,0))" TabName="Checksum" Mode="Basic" >
+    <RefParameter Name="CHECKSUM_CHECK_ICMP" Comment="CHECKSUM_CHECK_ICMP (Generate Software Checksum for Incoming ICMP Packets)" Type="list" Group="Infrastructure - Checksum Options" DefaultValue="1" TabName="Checksum" Mode="Basic" >
+        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: Set CHECKSUM_CHECK_ICMP requires CHECKSUM_BY_HARDWARE disabled. CHECKSUM_CHECK_ICMP is enabled if LWIP_CHECKSUM_CTRL_PER_NETIF is enabled." Expression="!CHECKSUM_BY_HARDWARE &amp; LWIP_CHECKSUM_CTRL_PER_NETIF"/>
+        <PossibleValue Comment="Enabled" Value="1"/>
+        <Description>Check checksums in software for Incoming ICMP packets.</Description>
+    </RefParameter>
+    <RefParameter Name="CHECKSUM_CHECK_ICMP" Comment="CHECKSUM_CHECK_ICMP (Generate Software Checksum for Incoming ICMP Packets)" Type="list" Group="Infrastructure - Checksum Options" DefaultValue="=IF(CHECKSUM_BY_HARDWARE,0,IF(LWIP_CHECKSUM_CTRL_PER_NETIF,1,0))" TabName="Checksum" Mode="Basic" >
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
-        <Description>Do not generate checksums in software for outgoing ICMP6 packets. CHECKSUM_GEN_ICMP6 is enabled if LWIP_CHECKSUM_CTRL_PER_NETIF is enabled.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Set CHECKSUM_GEN_ICMP6 requires CHECKSUM_BY_HARDWARE disabled.</Description>
+        <Description>Check checksums in software for Incoming ICMP packets.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Set CHECKSUM_CHECK_ICMP requires CHECKSUM_BY_HARDWARE disabled. CHECKSUM_CHECK_ICMP is enabled if LWIP_CHECKSUM_CTRL_PER_NETIF is enabled.</Description>
     </RefParameter>
-    <RefParameter Name="CHECKSUM_CHECK_IP" Comment="CHECKSUM_CHECK_IP (Generate Software Checksum for Incoming IP Packets)" Type="list" Group="Infrastructure - Checksum Options" DefaultValue="0" TabName="Checksum" Mode="Basic" >
-        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: Set CHECKSUM_CHECK_IP requires CHECKSUM_BY_HARDWARE disabled." Expression="!CHECKSUM_BY_HARDWARE &amp; !LWIP_CHECKSUM_CTRL_PER_NETIF"/>
+    <RefParameter Name="CHECKSUM_CHECK_ICMP6" Comment="CHECKSUM_CHECK_ICMP6 (Generate Software Checksum for Incoming ICMP6 Packets)" Type="list" Group="Infrastructure - Checksum Options" DefaultValue="1" TabName="Checksum" Mode="Basic" >
+        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: Set CHECKSUM_CHECK_ICMP6 requires CHECKSUM_BY_HARDWARE disabled. CHECKSUM_CHECK_ICMP6 is enabled if LWIP_CHECKSUM_CTRL_PER_NETIF is enabled." Expression="!CHECKSUM_BY_HARDWARE &amp; LWIP_CHECKSUM_CTRL_PER_NETIF"/>
+        <PossibleValue Comment="Enabled" Value="1"/>
+        <Description>Check checksums in software for Incoming ICMP6 packets.</Description>
+    </RefParameter>
+    <RefParameter Name="CHECKSUM_CHECK_ICMP6" Comment="CHECKSUM_CHECK_ICMP6 (Generate Software Checksum for Incoming ICMP6 Packets)" Type="list" Group="Infrastructure - Checksum Options" DefaultValue="=IF(CHECKSUM_BY_HARDWARE,0,IF(LWIP_CHECKSUM_CTRL_PER_NETIF,1,0))" TabName="Checksum" Mode="Basic" >
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
-        <Description>Check checksums in software for Incoming IP packets. CHECKSUM_CHECK_IP is enabled if LWIP_CHECKSUM_CTRL_PER_NETIF is enabled.</Description>
-    </RefParameter>
-    <RefParameter Name="CHECKSUM_CHECK_IP" Comment="CHECKSUM_CHECK_IP (No Software Checksum Generation for Incoming IP Packets)" Type="list" Group="Infrastructure - Checksum Options" DefaultValue="=IF(CHECKSUM_BY_HARDWARE,0,IF(LWIP_CHECKSUM_CTRL_PER_NETIF,1,0))" TabName="Checksum" Mode="Basic" >
-        <PossibleValue Comment="Disabled" Value="0"/>
-        <PossibleValue Comment="Enabled" Value="1"/>
-        <Description>Do not generate checksums in software for Incoming IP packets. CHECKSUM_CHECK_IP is enabled if LWIP_CHECKSUM_CTRL_PER_NETIF is enabled.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Set CHECKSUM_CHECK_IP requires CHECKSUM_BY_HARDWARE disabled.</Description>
-    </RefParameter>
-    <RefParameter Name="CHECKSUM_CHECK_UDP" Comment="CHECKSUM_CHECK_UDP (Generate Software Checksum for Incoming UDP Packets)" Type="list" Group="Infrastructure - Checksum Options" DefaultValue="0" TabName="Checksum" Mode="Basic" >
-        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: Set CHECKSUM_CHECK_UDP requires CHECKSUM_BY_HARDWARE disabled." Expression="!CHECKSUM_BY_HARDWARE &amp; !LWIP_CHECKSUM_CTRL_PER_NETIF"/>
-        <PossibleValue Comment="Disabled" Value="0"/>
-        <PossibleValue Comment="Enabled" Value="1"/>
-        <Description>Check checksums in software for Incoming UDP packets. CHECKSUM_CHECK_UDP is enabled if LWIP_CHECKSUM_CTRL_PER_NETIF is enabled.</Description>
-    </RefParameter>
-    <RefParameter Name="CHECKSUM_CHECK_UDP" Comment="CHECKSUM_CHECK_UDP (No Software Checksum Generation for Incoming UDP Packets)" Type="list" Group="Infrastructure - Checksum Options" DefaultValue="=IF(CHECKSUM_BY_HARDWARE,0,IF(LWIP_CHECKSUM_CTRL_PER_NETIF,1,0))" TabName="Checksum" Mode="Basic" >
-        <PossibleValue Comment="Disabled" Value="0"/>
-        <PossibleValue Comment="Enabled" Value="1"/>
-        <Description>Do not generate checksums in software for Incoming UDP packets. CHECKSUM_CHECK_UDP is enabled if LWIP_CHECKSUM_CTRL_PER_NETIF is enabled.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Set CHECKSUM_CHECK_UDP requires CHECKSUM_BY_HARDWARE disabled.</Description>
-    </RefParameter>
-    <RefParameter Name="CHECKSUM_CHECK_TCP" Comment="CHECKSUM_CHECK_TCP (Generate Software Checksum for Incoming TCP Packets)" Type="list" Group="Infrastructure - Checksum Options" DefaultValue="0" TabName="Checksum" Mode="Basic" >
-        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: Set CHECKSUM_CHECK_TCP requires CHECKSUM_BY_HARDWARE disabled." Expression="!CHECKSUM_BY_HARDWARE &amp; !LWIP_CHECKSUM_CTRL_PER_NETIF"/>
-        <PossibleValue Comment="Disabled" Value="0"/>
-        <PossibleValue Comment="Enabled" Value="1"/>
-        <Description>Check checksums in software for Incoming TCP packets. CHECKSUM_CHECK_TCP is enabled if LWIP_CHECKSUM_CTRL_PER_NETIF is enabled.</Description>
-    </RefParameter>
-    <RefParameter Name="CHECKSUM_CHECK_TCP" Comment="CHECKSUM_CHECK_TCP (No Software Checksum Generation for Incoming TCP Packets)" Type="list" Group="Infrastructure - Checksum Options" DefaultValue="=IF(CHECKSUM_BY_HARDWARE,0,IF(LWIP_CHECKSUM_CTRL_PER_NETIF,1,0))" TabName="Checksum" Mode="Basic" >
-        <PossibleValue Comment="Disabled" Value="0"/>
-        <PossibleValue Comment="Enabled" Value="1"/>
-        <Description>Do not generate checksums in software for Incoming TCP packets. CHECKSUM_CHECK_TCP is enabled if LWIP_CHECKSUM_CTRL_PER_NETIF is enabled.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Set CHECKSUM_CHECK_TCP requires CHECKSUM_BY_HARDWARE disabled.</Description>
-    </RefParameter>
-    <RefParameter Name="CHECKSUM_CHECK_ICMP" Comment="CHECKSUM_CHECK_ICMP (Generate Software Checksum for Incoming ICMP Packets)" Type="list" Group="Infrastructure - Checksum Options" DefaultValue="0" TabName="Checksum" Mode="Basic" >
-        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: Set CHECKSUM_CHECK_ICMP requires CHECKSUM_BY_HARDWARE disabled." Expression="!CHECKSUM_BY_HARDWARE &amp; !LWIP_CHECKSUM_CTRL_PER_NETIF"/>
-        <PossibleValue Comment="Disabled" Value="0"/>
-        <PossibleValue Comment="Enabled" Value="1"/>
-        <Description>Check checksums in software for Incoming ICMP packets. CHECKSUM_CHECK_ICMP is enabled if LWIP_CHECKSUM_CTRL_PER_NETIF is enabled.</Description>
-    </RefParameter>
-    <RefParameter Name="CHECKSUM_CHECK_ICMP" Comment="CHECKSUM_CHECK_ICMP (No Software Checksum Generation for Incoming ICMP Packets)" Type="list" Group="Infrastructure - Checksum Options" DefaultValue="=IF(CHECKSUM_BY_HARDWARE,0,IF(LWIP_CHECKSUM_CTRL_PER_NETIF,1,0))" TabName="Checksum" Mode="Basic" >
-        <PossibleValue Comment="Disabled" Value="0"/>
-        <PossibleValue Comment="Enabled" Value="1"/>
-        <Description>Do not generate checksums in software for Incoming ICMP packets. CHECKSUM_CHECK_ICMP is enabled if LWIP_CHECKSUM_CTRL_PER_NETIF is enabled.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Set CHECKSUM_CHECK_ICMP requires CHECKSUM_BY_HARDWARE disabled.</Description>
-    </RefParameter>
-    <RefParameter Name="CHECKSUM_CHECK_ICMP6" Comment="CHECKSUM_CHECK_ICMP6 (Generate Software Checksum for Incoming ICMP6 Packets)" Type="list" Group="Infrastructure - Checksum Options" DefaultValue="0" TabName="Checksum" Mode="Basic" >
-        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: Set CHECKSUM_CHECK_ICMP6 requires CHECKSUM_BY_HARDWARE disabled." Expression="!CHECKSUM_BY_HARDWARE &amp; !LWIP_CHECKSUM_CTRL_PER_NETIF"/>
-        <PossibleValue Comment="Disabled" Value="0"/>
-        <PossibleValue Comment="Enabled" Value="1"/>
-        <Description>Check checksums in software for Incoming ICMP6 packets. CHECKSUM_CHECK_ICMP6 is enabled if LWIP_CHECKSUM_CTRL_PER_NETIF is enabled.</Description>
-    </RefParameter>
-    <RefParameter Name="CHECKSUM_CHECK_ICMP6" Comment="CHECKSUM_CHECK_ICMP6 (No Software Checksum Generation for Incoming ICMP6 Packets)" Type="list" Group="Infrastructure - Checksum Options" DefaultValue="=IF(CHECKSUM_BY_HARDWARE,0,IF(LWIP_CHECKSUM_CTRL_PER_NETIF,1,0))" TabName="Checksum" Mode="Basic" >
-        <PossibleValue Comment="Disabled" Value="0"/>
-        <PossibleValue Comment="Enabled" Value="1"/>
-        <Description>Do not generate checksums in software for Incoming ICMP6 packets. CHECKSUM_CHECK_ICMP6 is enabled if LWIP_CHECKSUM_CTRL_PER_NETIF is enabled.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Set CHECKSUM_CHECK_ICMP6 requires CHECKSUM_BY_HARDWARE disabled.</Description>
+        <Description>Check checksums in software for Incoming ICMP6 packets.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Set CHECKSUM_CHECK_ICMP6 requires CHECKSUM_BY_HARDWARE disabled. CHECKSUM_CHECK_ICMP6 is enabled if LWIP_CHECKSUM_CTRL_PER_NETIF is enabled.</Description>
     </RefParameter>
     <RefParameter Name="LWIP_CHECKSUM_ON_COPY" Comment="LWIP_CHECKSUM_ON_COPY (Calculate Checksum on Copy to Pbufs)" Type="list" Group="Infrastructure - Checksum Options" DefaultValue="0" TabName="Checksum" Mode="Advanced" >
         <PossibleValue Comment="Disabled" Value="0"/>
@@ -2770,6 +2799,9 @@
         <Parameter Name="GATEWAY_ADDRESS"/>
         <Parameter Name="WITH_RTOS"/>
         <Parameter Name="PHY"/>
+        <Parameter Name="TX_DESCRIPTOR_ADDRESS"/>
+        <Parameter Name="RX_DESCRIPTOR_ADDRESS"/>
+        <Parameter Name="RX_BUFFER_ADDRESS"/>
         <Parameter Name="NO_SYS"/>
         <Parameter Name="LWIP_TIMERS"/>
         <Parameter Name="LWIP_TIMERS_CUSTOM"/>
@@ -2784,6 +2816,7 @@
         <Parameter Name="ipaddr"/>
         <Parameter Name="netmask"/>
         <Parameter Name="gw"/>
+        <Parameter Name="PHY Driver"/>
         <Parameter Name="MEM_LIBC_MALLOC"/>
         <Parameter Name="MEMP_MEM_MALLOC"/>
         <Parameter Name="MEM_ALIGNMENT"/>
@@ -2813,6 +2846,7 @@
         <Parameter Name="MEMP_NUM_DNS_API_MSG"/>
         <Parameter Name="MEMP_NUM_SOCKET_SETGETSOCKOPT_DATA"/>
         <Parameter Name="MEMP_NUM_NETIFAPI_MSG"/>
+        <Parameter Name="LWIP_SUPPORT_CUSTOM_PBUF"/>
         <Parameter Name="PBUF_POOL_SIZE"/>
         <Parameter Name="PBUF_LINK_HLEN"/>
         <Parameter Name="PBUF_LINK_ENCAPSULATION_HLEN"/>
@@ -3209,6 +3243,7 @@
         <Parameter Name="MDNS_DEBUG"/>
         <Parameter Name="TFTP_DEBUG"/>
         <Parameter Name="LWIP_PROVIDE_ERRNO"/>
+        <BspDependency Name="Driver_PHY" Comment="&lt;html&gt;PHY Driver can be set either to Disabled or to LAN8742:&lt;br&gt;&lt;b&gt;Disable&lt;/b&gt;:&lt;br&gt;- BSP PHY Driver components provided by ST are not used and up to user to implement&lt;br&gt; his own driver with same architecture and constraints than LAN8742&lt;br&gt; - ST specification will be published soon to explain how user can develop his own&lt;br&gt; BSP driver component.&lt;br&gt;&lt;b&gt;LAN8742&lt;/b&gt;:&lt;br&gt;- LAN8742 BSP PHY Driver component is used and STM32CubeMX copies lan8742.c/.h files&lt;br&gt; from ST Firmware Package to the user's project Drivers/BSP/Components directory.&lt;/ul&gt;&lt;br&gt;&lt;i&gt;Note&lt;/i&gt;: BSP files cannot be updated or they will be overwritten at each project generation.&lt;/html&gt;" BspIpName="" BspModeName="" Api="ComponentDriver" Component="LAN8742"/>
     </RefMode>
     <ModeLogicOperator Name="OR">
         <Mode Name="Enabled">

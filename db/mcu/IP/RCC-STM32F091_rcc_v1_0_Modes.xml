@@ -119,10 +119,10 @@
     </RefParameter>
     <!-- SYS clock MUX-->
     <RefParameter Comment="SYSCLK Source" DefaultValue="RCC_SYSCLKSOURCE_HSI" Name="SYSCLKSource" Type="list" Visible="false">
-        <PossibleValue Comment="Sysclksource Hsi" Value="RCC_SYSCLKSOURCE_HSI"/>
-        <PossibleValue Comment="Sysclksource Hsi" Value="RCC_SYSCLKSOURCE_HSI48"/>
-        <PossibleValue Comment="Sysclksource Hse" Value="RCC_SYSCLKSOURCE_HSE"/>
-        <PossibleValue Comment="Sysclksource Pllclk" Value="RCC_SYSCLKSOURCE_PLLCLK"/>
+        <PossibleValue Comment="Sysclksource Hsi" Value="RCC_SYSCLKSOURCE_HSI"       Semaphore="SysSourceHSI"/>
+        <PossibleValue Comment="Sysclksource Hsi" Value="RCC_SYSCLKSOURCE_HSI48"     Semaphore="SysSourceHSI48"/>
+        <PossibleValue Comment="Sysclksource Hse" Value="RCC_SYSCLKSOURCE_HSE"       Semaphore="SysSourceHSE"/>
+        <PossibleValue Comment="Sysclksource Pllclk" Value="RCC_SYSCLKSOURCE_PLLCLK" Semaphore="SysSourcePLL"/>
     </RefParameter>
 	
     <!-- RTC  MUX-->
@@ -924,6 +924,29 @@
         <PossibleValue Comment="User defined" Semaphore="UserDefinedReload" Value="UserValue"/>
         <PossibleValue Comment="Automatic" Semaphore="AutomaticRelaod" Value="automatic"/>
     </RefParameter>
+	    <RefParameter Name="ReloadValueLL" Visible="false" Comment="CRS Synchro Reload Value" Type="list" DefaultValue="null" Group="CRS Parameters">
+        <Condition Expression="!CRSActivatedSourceGPIO &amp; !CRSActivatedSourceLSE &amp; !CRSActivatedSourceUSB" Diagnostic=""/>   
+    </RefParameter>
+      
+        <RefParameter Name="ReloadValueLL" Visible="false" Comment="CRS Synchro Reload Value" Type="list" DefaultValue="__LL_CRS_CALC_CALCULATE_RELOADVALUE(48000000," Group="CRS Parameters">
+        <Condition Expression="AutomaticRelaod" Diagnostic=""/>   
+        <PossibleValue Value="__LL_CRS_CALC_CALCULATE_RELOADVALUE(48000000," Comment="__LL_CRS_CALC_CALCULATE_RELOADVALUE(48000000,"/>
+    </RefParameter>
+
+    <RefParameter Name="ReloadValueLL"  Comment="CRS Synchro Reload Value" Type="integer" DefaultValue="null" Min="0" Max="65535" Group="CRS Parameters"/>
+		    <RefParameter Name="ReloadValueARGLL" Visible="false" Comment="CRS Synchro Reload Value" Type="list" DefaultValue="null" Group="CRS Parameters">
+        <Condition Expression="!CRSActivatedSourceGPIO &amp; !CRSActivatedSourceLSE &amp; !CRSActivatedSourceUSB" Diagnostic=""/>   
+
+    </RefParameter> 
+    <RefParameter Name="ReloadValueARGLL" Visible="false" Comment="CRS Synchro Reload Value" Type="list" DefaultValue="+ReloadValueLL+Fsync+)" Group="CRS Parameters">
+        <Condition Expression="AutomaticRelaod &amp; (CRSActivatedSourceGPIO|!CRSActivatedSourceLSE | !CRSActivatedSourceUSB)" Diagnostic=""/>   
+    </RefParameter>
+	    <RefParameter Name="ReloadValueARGLL" Visible="false" Comment="CRS Synchro Reload Value" Type="list" DefaultValue="+ReloadValue" Group="CRS Parameters">
+        <Condition Expression="DefaultReload|UserDefinedReload" Diagnostic=""/>   
+        
+    </RefParameter>  
+    <RefParameter Name="ReloadValueARGLL" Visible="false" Comment="CRS Synchro Reload Value" Type="list" DefaultValue="null" Group="CRS Parameters"/>
+	
     <RefParameter Comment="CRS Synchro Reload Value" DefaultValue="null" Group="CRS Parameters" Name="ReloadValue" Type="list" Visible="false">
         <Condition Diagnostic="" Expression="!CRSActivatedSourceGPIO &amp; !CRSActivatedSourceLSE "/>   
     </RefParameter>
@@ -1011,13 +1034,14 @@
     
     </RefParameter>
     <RefMode Name="ClockTree">
+	    <ConfigForMode>RCC_LSEDRIVE_CONFIG</ConfigForMode>
         <ConfigForMode>RCC_OSCConfig</ConfigForMode>        
         <ConfigForMode>RCC_ClockConfig</ConfigForMode>        
         <ConfigForMode>RCC_MCOConfig</ConfigForMode> 
         <ConfigForMode>RCC_CSS_Enable</ConfigForMode>
         <ConfigForMode>CRS_CLK_ENABLE</ConfigForMode> 
         <ConfigForMode>RCC_CRSConfig</ConfigForMode> 
-     		 <ConfigForMode>RCC_LSEDRIVE_CONFIG</ConfigForMode>
+     		 
         <!--ConfigForMode>SYSCFG_CLK_ENABLE</ConfigForMode-->   <!-- added as a workAround to enable the SYSCFG clock : it should be managed internally by the HAL-->
          <ConfigForMode>RCC_interrupt_Time_SYSTICK_Config</ConfigForMode>
 		 <ConfigForMode>RCC_SYSTICK_CONFIG</ConfigForMode>

@@ -1,4 +1,10 @@
 [#ftl]
+[#assign ipName = "DMA"]
+[#if dmas?size > 0]
+  [#list dmas as dma]
+    [#assign ipName = dma]
+  [/#list]
+[/#if]
 [#assign LL_Driver = false]
 [#if driver??]
   [#list driver as driverType]
@@ -17,7 +23,7 @@
 [/#list]
 [/#if]
   */
-static void MX_DMA_Init(void) 
+static void MX_${ipName}_Init(void) 
 {
 [#if isHalSupported=="true"]
   [#if clocks?size > 0]
@@ -99,7 +105,7 @@ static void MX_DMA_Init(void)
     [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
   if (${method.name}(${args}) != HAL_OK)
   {
-    Error_Handler();
+    _Error_Handler(__FILE__, __LINE__);
   }
         [/#if]#n  
         [#else]
@@ -111,7 +117,7 @@ static void MX_DMA_Init(void)
     [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
   if (${method.name}() != HAL_OK)
   {
-    Error_Handler();
+    _Error_Handler(__FILE__, __LINE__);
   }
         [/#if]#n          
         [/#if][#--if method.arguments??--]
@@ -173,7 +179,7 @@ static void MX_DMA_Init(void)
         [#if initVector.codeInMspInit]
           #t/* ${initVector.vector} interrupt configuration */
           [#if initVector.usedDriver == "LL"]
-            [#if FamilyName=="STM32L0"]
+            [#if FamilyName=="STM32L0" || FamilyName=="STM32F0"]
           #tNVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority});
             [#else]
           #tNVIC_SetPriority(${initVector.vector}, NVIC_EncodePriority(NVIC_GetPriorityGrouping(),${initVector.preemptionPriority}, ${initVector.subPriority}));

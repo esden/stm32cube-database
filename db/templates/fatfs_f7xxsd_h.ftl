@@ -72,8 +72,13 @@
 
 #define SD_DATATIMEOUT           ((uint32_t)100000000)
 
+#ifdef OLD_API
+/* kept to avoid issue when migrating old projects. */
 /* USER CODE BEGIN 0 */
 
+/* USER CODE END 0 */ 
+#else
+/* USER CODE BEGIN BSP_H_CODE */
 /* DMA definitions for SD DMA transfer */
 /*
 #define __DMAx_TxRx_CLK_ENABLE            __HAL_RCC_DMA2_CLK_ENABLE
@@ -101,8 +106,8 @@ uint8_t BSP_SD_Erase(uint32_t StartAddr, uint32_t EndAddr);
 uint8_t BSP_SD_GetCardState(void);
 void    BSP_SD_GetCardInfo(BSP_SD_CardInfo *CardInfo);
 uint8_t BSP_SD_IsDetected(void);
-
-/* USER CODE END 0 */ 
+/* USER CODE END BSP_H_CODE */
+#endif
    
 #ifdef __cplusplus
 }

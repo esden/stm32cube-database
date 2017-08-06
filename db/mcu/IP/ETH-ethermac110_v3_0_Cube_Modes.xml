@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<IP DBVersion="V4.0" IPType="peripheral" Name="ETH" Version="ethermac110_v3_0_Cube" 
+	xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" 
+	ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd" 
+	xmlns="http://mcd.rou.st.com/modules.php?name=mcu">
+  <About>ETH: Ethernet MAC interface</About>
+	<!-- Generic RefParameters for ETH MII/RMII Modes -->
+	<!-- Generic RefParameters for ETH MII/RMII Modes Extracted from HAL Library with LibExtractor-->
+	<RefParameter Name="hal_eth_init_status" DefaultValue="1" Comment="" Type="" Visible="false"/>
+	<RefParameter Name="Instance" DefaultValue="ETH" Comment="Instance" Type="" Visible="false"/>
+	
+	<RefParameter Comment="Warning" DefaultValue="The ETH can work only when RAM is pointing at 0x24000000"  Name="Warning" Group="General : Ethernet Configuration" Type="string"/>
+	<RefParameter Comment="Note" DefaultValue="PHY Driver must be configured from the LwIP 'Platform Settings' top right tab"  Name="Note" Group="General : Ethernet Configuration" Type="string"/>
+	<!-- ST MicroElectronics prefixe Adress -->
+	<RefParameter Comment="Ethernet MAC Address" ArraySize="6" ArrayTypeElement="uint8_t;16" Name="MACAddr" Type="Array" Separator=":" Group="General : Ethernet Configuration" DefaultValue="00:80:E1:00:00:00"/>
+
+	<RefParameter Comment="Rx Descriptor Length" DefaultValue="4" Max="256" Min="0" Type="integer" Name="ETH_RX_DESC_CNT" Group="General : Ethernet Configuration"/>
+	<RefParameter Comment="First Rx Descriptor Address" DefaultValue="0x30040000" Max="0xFFFFFFFF" Min="0x0" Type="hex" Name="RxDescAddress" Group="General : Ethernet Configuration">
+	<Description>The Fisrt Tx Description address must be only in the D2 SRAM and AXI SRAM.These areas must not be cacheable.</Description>
+	</RefParameter>
+    <RefParameter Name="TxDesc" Comment="Tx Desc" Type="string" Group="General : Ethernet  Configuration" DefaultValue="DMATxDscrTab"  Visible="false"/>
+
+	<RefParameter Comment="Tx Descriptor Length" DefaultValue="4" Max="256" Min="0" Type="integer" Name="ETH_TX_DESC_CNT" Group="General : Ethernet Configuration"/>
+	<RefParameter Comment="First Tx Descriptor Address" DefaultValue="0x30040060" Max="0xFFFFFFFF" Min="=RxDescAddress+ETH_RX_DESC_CNT*24" Type="hex" Name="TxDescAddress" Group="General : Ethernet Configuration">
+	<Description>The First Rx Descriptor address must be only in the D2 SRAM and AXI SRAM. These areas must not be cacheable.</Description>
+	</RefParameter>
+	 <RefParameter Name="RxDesc" Comment="Rx Desc" Type="string" Group="General : Ethernet  Configuration" DefaultValue="DMARxDscrTab"  Visible="false"/>
+	<RefParameter Comment="Rx Buffers Address" DefaultValue="0x30040200" Max="0xFFFFFFFF" Min="=TxDescAddress+ETH_TX_DESC_CNT*24"  Type="hex" Name="RxBuffAddress" Group="General : Ethernet Configuration">
+	<Description>The Fisrt Tx Description address must be only in the D2 SRAM and AXI SRAM.</Description>
+	</RefParameter>
+	<RefParameter Comment="Rx Buffers Length" DefaultValue="1524" Max="1528" Min="0" Type="integer" Name="RxBuffLen" Group="General : Ethernet Configuration">
+	<Description>To ensure the zero caopy capabilities, a received frame can't be divided into more than one buffer greater than the Rx Buffers Length. That is why we recommend to set this parameter to Ethernet Maximum Transfert Unit(MTU).</Description>
+	</RefParameter>
+	
+	<RefParameter Comment="Media Interface" DefaultValue="HAL_ETH_MII_MODE" Name="MediaInterface" Type="list" Group="General : Ethernet  Configuration" Visible="false">
+		<PossibleValue Value="HAL_ETH_MII_MODE" Comment=""/>
+		<PossibleValue Value="HAL_ETH_RMII_MODE" Comment=""/>
+	</RefParameter>
+	
+	 
+	
+	<!-- RefMode for ETH -->
+	<RefMode Name="MII" HalMode="ETH">
+		<ConfigForMode>Init</ConfigForMode>   
+		<Parameter Name="Warning"/>
+		<Parameter Name="Note"/>
+		<Parameter Name="MACAddr"/>
+		<Parameter Name="ETH_TX_DESC_CNT"/>
+		<Parameter Name="TxDescAddress"/>
+		<Parameter Name="TxDesc"/>
+		<Parameter Name="ETH_RX_DESC_CNT"/>
+		<Parameter Name="RxDescAddress"/>
+		 <Parameter Name="RxDesc"/> 
+		<Parameter Name="RxBuffAddress"/>
+        <Parameter Name="RxBuffLen"/>
+		<Parameter Name="MediaInterface">
+			<PossibleValue>HAL_ETH_MII_MODE</PossibleValue>
+		</Parameter>
+		<Parameter Name="Instance"/>
+	</RefMode>
+	
+	
+	<!--
+	<RefMode Name="MII_PTP_Synchro" HalMode="ETH">
+		<ConfigForMode>Init</ConfigForMode>   
+		<Parameter Name="AutoNegotiation"/>
+		<Parameter Name="Speed"/>
+		<Parameter Name="DuplexMode"/> 
+		<Parameter Name="MACAddr"/>
+		<Parameter Name="RxMode"/>
+		<Parameter Name="ChecksumMode"/>		
+		<Parameter Name="PhyAddress"/>
+		<Parameter Name="MediaInterface">
+			<PossibleValue>ETH_MEDIA_INTERFACE_MII</PossibleValue>
+		</Parameter>
+		<Parameter Name="Instance"/>
+	</RefMode>
+	-->
+	<RefMode Name="RMII" HalMode="ETH">
+		<ConfigForMode>Init</ConfigForMode>   
+		<Parameter Name="Warning"/>
+		<Parameter Name="Note"/>
+		<Parameter Name="MACAddr"/>
+		<Parameter Name="ETH_TX_DESC_CNT"/>
+		<Parameter Name="TxDescAddress"/>
+		<Parameter Name="TxDesc"/>
+		<Parameter Name="ETH_RX_DESC_CNT"/>
+		<Parameter Name="RxDescAddress"/>
+		 <Parameter Name="RxDesc"/>
+		<Parameter Name="RxBuffAddress"/>
+        <Parameter Name="RxBuffLen"/>
+		<Parameter Name="MediaInterface">
+			<PossibleValue>HAL_ETH_RMII_MODE</PossibleValue>
+		</Parameter>
+		<Parameter Name="Instance"/>
+	</RefMode>
+	<!--
+	<RefMode Name="RMII_PTP_Synchro" HalMode="ETH">
+		<ConfigForMode>Init</ConfigForMode>   
+		<Parameter Name="AutoNegotiation"/>
+		<Parameter Name="Speed"/>
+		<Parameter Name="DuplexMode"/> 
+		<Parameter Name="MACAddr"/>
+		<Parameter Name="RxMode"/>
+		<Parameter Name="ChecksumMode"/> 
+		<Parameter Name="PhyAddress"/>
+		<Parameter Name="MediaInterface">
+			<PossibleValue>ETH_MEDIA_INTERFACE_RMII</PossibleValue>
+		</Parameter>
+		<Parameter Name="Instance"/>
+	</RefMode>
+	-->
+	<ModeLogicOperator Name="OR">
+		<Mode Name="Mode">
+			<ModeLogicOperator Name="XOR">
+				<Mode Name="MII">				
+					<SignalLogicalOp Name="AND">
+						<Signal Name="COL"/>
+						<Signal Name="CRS"/>
+						<Signal Name="MDC"/>
+						<Signal Name="MDIO"/>
+						<Signal Name="RXD0"/>
+						<Signal Name="RXD1"/>
+						<Signal Name="RXD2"/>
+						<Signal Name="RXD3"/>
+						<Signal Name="RX_CLK"/>
+						<Signal Name="RX_DV"/>		
+						<Signal Name="TXD0"/>
+						<Signal Name="TXD1"/>
+						<Signal Name="TXD2"/>
+						<Signal Name="TXD3"/>
+						<Signal Name="TX_CLK"/>
+						<Signal Name="TX_EN"/>
+					</SignalLogicalOp>
+					<Semaphore>MII</Semaphore>	
+					<Semaphore>MW_ETH_MW</Semaphore>
+				</Mode>
+				<Mode Name="MII_PTP_Synchro">				
+					<SignalLogicalOp Name="AND">
+						<Signal Name="COL"/>
+						<Signal Name="CRS"/>
+						<Signal Name="MDC"/>
+						<Signal Name="MDIO"/>
+						<Signal Name="PPS_OUT"/>
+						<Signal Name="RXD0"/>
+						<Signal Name="RXD1"/>
+						<Signal Name="RXD2"/>
+						<Signal Name="RXD3"/>
+						<Signal Name="RX_CLK"/>
+						<Signal Name="RX_DV"/>
+						<Signal Name="TXD0"/>
+						<Signal Name="TXD1"/>
+						<Signal Name="TXD2"/>
+						<Signal Name="TXD3"/>
+						<Signal Name="TX_CLK"/>
+						<Signal Name="TX_EN"/>
+					</SignalLogicalOp>
+					<!--<Semaphore>MII_PTP_Synchro</Semaphore>-->
+					<Semaphore>MII</Semaphore>	
+					<Semaphore>MW_ETH_MW</Semaphore>
+					<Condition Expression="(Semaphore_ETH_TriggerSourceITR1TIM2)&amp;(Semaphore_ETH_ControllerModeTIM2)" Diagnostic="Only active when TIM2 has an enabled Slave Mode with ITR1 as trigger source"/>
+
+				</Mode>	
+				<Mode Name="RMII">				
+					<SignalLogicalOp Name="AND">
+						<Signal Name="CRS_DV"/>
+						<Signal Name="MDC"/>
+						<Signal Name="MDIO"/>
+						<Signal Name="REF_CLK"/>
+						<Signal Name="RXD0"/>
+						<Signal Name="RXD1"/>
+						<Signal Name="TXD0"/>
+						<Signal Name="TXD1"/>
+						<Signal Name="TX_EN"/>
+					</SignalLogicalOp>
+					<!--<Semaphore>RMII</Semaphore>-->
+					<Semaphore>MW_ETH_MW</Semaphore>
+				</Mode>
+				<Mode Name="RMII_PTP_Synchro">				
+					<SignalLogicalOp Name="AND">
+						<Signal Name="CRS_DV"/>
+						<Signal Name="MDC"/>
+						<Signal Name="MDIO"/>
+						<Signal Name="PPS_OUT"/>
+						<Signal Name="REF_CLK"/>
+						<Signal Name="RXD0"/>
+						<Signal Name="RXD1"/>
+						<Signal Name="TXD0"/>
+						<Signal Name="TXD1"/>
+						<Signal Name="TX_EN"/>
+					</SignalLogicalOp>
+					<!--<Semaphore>RMII_PTP_Synchro</Semaphore>-->
+					<Semaphore>MW_ETH_MW</Semaphore>
+					<Condition Expression="(Semaphore_ETH_TriggerSourceITR1TIM2)&amp;(Semaphore_ETH_ControllerModeTIM2)" Diagnostic="Only active when TIM2 has an enabled Slave Mode with ITR1 as trigger source"/>
+			
+				</Mode>
+				<Mode Name="GMII">				
+					<SignalLogicalOp Name="AND">
+						<Signal Name="CLK125"/>
+						<Signal Name="COL"/>
+						<Signal Name="CRS"/>
+						<Signal Name="GTX_CLK"/>
+						<Signal Name="RXD0"/>
+						<Signal Name="RXD1"/>
+						<Signal Name="RXD2"/>
+						<Signal Name="RXD3"/>
+						<Signal Name="RXD4"/>
+						<Signal Name="RXD5"/>
+						<Signal Name="RXD6"/>
+						<Signal Name="RXD7"/>
+						<Signal Name="RX_CLK"/>
+						<Signal Name="RX_CTL"/>
+						<Signal Name="RX_DV"/>
+						<Signal Name="TXD0"/>
+						<Signal Name="TXD1"/>
+						<Signal Name="TXD2"/>
+						<Signal Name="TXD3"/>
+						<Signal Name="TXD4"/>
+						<Signal Name="TXD5"/>
+						<Signal Name="TXD6"/>
+						<Signal Name="TXD7"/>
+						<Signal Name="TX_CLK"/>
+						<Signal Name="TX_CTL"/>
+						<Signal Name="TX_EN"/>
+						<Signal Name="TX_ER"/>
+					</SignalLogicalOp>
+					<!--<Semaphore>RMII</Semaphore>-->
+					<Semaphore>MW_ETH_MW</Semaphore>
+				</Mode>
+			</ModeLogicOperator>
+			<Semaphore>ETHUsed_ForRCC</Semaphore>
+		</Mode>
+		<Mode Name="Activate Rx Err signal">	
+            <ModeLogicOperator Name="XOR">	
+                <Mode Name="Activate Rx Err signal">			
+					<SignalLogicalOp Name="AND">
+						<Signal Name="RX_ER"/>
+					</SignalLogicalOp>
+				</Mode>
+		    </ModeLogicOperator>
+					<Condition Expression="MII" Diagnostic="Active only with an MII Mode"/>		
+	    </Mode>
+	</ModeLogicOperator>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="COL"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="CRS"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="CRS_DV"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="MDC"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="MDIO"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="PPS_OUT"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="CLK125"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="RXD0"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="RXD1"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="RXD2"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="RXD3"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="RXD4"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="RXD5"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="RXD6"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="RXD7"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="RX_CLK"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="RX_CTL"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="REF_CLK"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="RX_DV"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="RX_ER"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="TXD0"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="TXD1"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="TXD2"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="TXD3"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="TXD4"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="TXD5"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="TXD6"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="TXD7"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="TX_CLK"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="TX_CTL"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="GTX_CLK"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="TX_EN"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="TX_ER"/>
+</IP>

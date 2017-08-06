@@ -171,7 +171,11 @@ void MX_${data.ipName}_GPIO_Init(void)
                 #tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
                 #tHAL_NVIC_EnableIRQ(${initVector.vector});#n
 [#else]
+    [#if NVICPriorityGroup??]
                 #tNVIC_SetPriority(${initVector.vector}, NVIC_EncodePriority(NVIC_GetPriorityGrouping(),${initVector.preemptionPriority}, ${initVector.subPriority}));
+    [#else]
+                #tNVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority});
+    [/#if]
                 #tNVIC_EnableIRQ(${initVector.vector});
 [/#if]
         [/#if]

@@ -48,7 +48,8 @@
 		<PossibleValue Comment="Host Low Speed 1.5MBit/s" Value="HCD_SPEED_LOW"/>	
 	</RefParameter>
 	
-	<RefParameter Comment="Speed" DefaultValue="PCD_SPEED_HIGH" Name="speed" Type="List" >
+	<!-- Ticket 33385 -->
+	<RefParameter Comment="Speed" DefaultValue="PCD_SPEED_HIGH" Name="DeviceSpeed" Type="List" >
 		<Condition Expression="VirtualMode = Device_HS" Diagnostic=""/>
 		<PossibleValue Comment="Device High Speed 480MBit/s" Value="PCD_SPEED_HIGH" />
 		<PossibleValue Comment="Device Full Speed 12MBit/s" Value="PCD_SPEED_FULL"/>
@@ -62,14 +63,14 @@
 		<!--<PossibleValue Comment="High Speed 480MBit/s" Value="HCD_SPEED_HIGH" />	-->	
 	</RefParameter>
 	
-	<RefParameter Comment="Speed" DefaultValue="PCD_SPEED_FULL" Name="speed" Type="List">
+	<RefParameter Comment="Speed" DefaultValue="PCD_SPEED_FULL" Name="DeviceSpeed" Type="List">
 		<Condition Expression="VirtualMode = Device_Only_FS" Diagnostic=""/>
 		<!--<PossibleValue Comment="Low Speed 1.5MBit/s" Value="PCD_SPEED_LOW" />-->
 		<PossibleValue Comment="Device Full Speed 12MBit/s" Value="PCD_SPEED_FULL"/>
 		<!--<PossibleValue Comment="High Speed 480MBit/s" Value="PCD_SPEED_HIGH" />-->
 	</RefParameter>
 	
-	<RefParameter Comment="Speed" DefaultValue="PCD_SPEED_FULL" Name="speed" Type="List">
+	<RefParameter Comment="Speed" DefaultValue="PCD_SPEED_FULL" Name="DeviceSpeed" Type="List">
 		<Condition Expression="VirtualMode = Device_DP_DM_FS" Diagnostic=""/>
 		<!--<PossibleValue Comment="Low Speed 1.5MBit/s" Value="PCD_SPEED_LOW" />-->
 		<PossibleValue Comment="Device Full Speed 12MBit/s" Value="PCD_SPEED_FULL"/>	
@@ -141,11 +142,23 @@
 		<PossibleValue Value="DISABLE" Comment="Disabled"/>		
 	</RefParameter>
 	
-	<RefParameter Comment="VBUS sensing" DefaultValue="DISABLE" Name="vbus_sensing_enable" Type="List">
-		<!--<Condition Expression="(VBUS_SENSING_ON_HS) &amp; ((VirtualMode = Device_HS) | (VirtualMode = Device_Only_FS)) " Diagnostic=""/>-->
-		<Condition Expression="((VirtualMode = Device_HS) | (VirtualMode = Device_Only_FS)) " Diagnostic=""/>	
-		
-		<!--<Condition Expression="VBUS_SENSING_ON_HS" Diagnostic=""/> -->	
+	<!-- Add Battery charging functionality for Shark (STM32H7)-->
+	<RefParameter Comment="Battery charging" DefaultValue="ENABLE" Name="battery_charging_enable" Type="List">		
+		<Condition Expression="VBUS_USED_FOR_BCD &amp; DIE450" Diagnostic=""/>
+		<PossibleValue Value="ENABLE" Comment="Enabled"/>		
+	</RefParameter>
+	<RefParameter Comment="Battery charging" DefaultValue="ENABLE" Name="battery_charging_enable" Type="List">	
+		<Condition Expression="VBUS_SENSING_ON &amp; DIE450" Diagnostic=""/>
+		<PossibleValue Value="ENABLE" Comment="Enabled"/>
+		<PossibleValue Value="DISABLE" Comment="Disabled"/>	
+	</RefParameter>	
+	<RefParameter Comment="Battery charging" DefaultValue="null" Name="battery_charging_enable" Visible="false" Type="List">			
+		<PossibleValue Value="ENABLE" Comment="Enabled"/>
+		<PossibleValue Value="DISABLE" Comment="Disabled"/>	
+	</RefParameter>
+	
+	<RefParameter Comment="VBUS sensing" DefaultValue="DISABLE" Name="vbus_sensing_enable" Type="List">		
+		<Condition Expression="((VirtualMode = Device_HS) | (VirtualMode = Device_Only_FS)) " Diagnostic=""/>					
 		<PossibleValue Value="ENABLE" Comment="Enabled"/>
 		<PossibleValue Value="DISABLE" Comment="Disabled"/>	
 	</RefParameter>
@@ -207,7 +220,7 @@
 		<Parameter Name="VirtualMode">		
 			<PossibleValue>Device_HS</PossibleValue>
 		</Parameter>
-		<Parameter Name="speed"/>
+		<Parameter Name="DeviceSpeed"/>
 		<Parameter Name="dev_endpoints"/>
 		<Parameter Name="ep0_mps"/>		
 		<Parameter Name="dma_enable"/>
@@ -245,7 +258,7 @@
 			<PossibleValue>Device_Only_FS</PossibleValue>
 		</Parameter>
 		<Parameter Name="dev_endpoints"/>		
-		<Parameter Name="speed"/>
+		<Parameter Name="DeviceSpeed"/>
 		<Parameter Name="ep0_mps"/>
 		<Parameter Name="dma_enable"/>
 		<Parameter Name="phy_itface">
@@ -253,7 +266,9 @@
 		</Parameter>
 		<Parameter Name="low_power_enable"/>
 		<Parameter Name="lpm_enable"></Parameter>
-		<Parameter Name="use_dedicated_ep1"/>	
+		<Parameter Name="use_dedicated_ep1"/>
+		<!-- Bug 33389 -->
+		<Parameter Name="battery_charging_enable"/>
 		<Parameter Name="vbus_sensing_enable"/>	
 		<Parameter Name="Sof_enable"/>	
 	</RefMode>
@@ -264,7 +279,7 @@
 			<PossibleValue>Device_DP_DM_FS</PossibleValue>
 		</Parameter>
 		<Parameter Name="dev_endpoints"/>
-		<Parameter Name="speed"/>
+		<Parameter Name="DeviceSpeed"/>
 		<Parameter Name="ep0_mps"/>		
 		<Parameter Name="dma_enable"/>
 		<Parameter Name="phy_itface">
@@ -291,6 +306,8 @@
 			<PossibleValue>ENABLE</PossibleValue>
 		</Parameter>
 		-->		
+	</RefMode>
+	<RefMode Name="Activate_VBUS_BCD" HalMode="">					
 	</RefMode>
 	
 	<!-- ModeLogicOperator for HS/FS -->
@@ -421,12 +438,19 @@
 						<Signal Name="VBUS"  IOMode="Input"/>				
 					</SignalLogicalOp>
 					<Semaphore>VBUS_SENSING_ON_HS</Semaphore>
-				</Mode>					
-			</ModeLogicOperator>
-			<!-- to keep compatibility with device mode -->
-			<Condition Expression="MW_USB_OTG_HS_MW_FS_DEVICE | MW_USB_OTG_HS_MW_FS_HOST | OTG_DUAL_ROL_DEVICE_HS_FS" Diagnostic="USB Internal Phy Mode must be selected first"/>	
-			<!--<Condition Expression="MW_USB_OTG_HS_MW_FS_DEVICE | OTG_DUAL_ROL_DEVICE_HS_FS" Diagnostic="USB Internal Phy Mode must be selected first"/>	-->
-			<!--<Condition Expression="USB_OTG_HS_FS_HOST" Diagnostic=""/> -->
+					<!-- Ticket 33389 -->
+					<!-- to keep compatibility with device mode -->
+					<Condition Expression="MW_USB_OTG_HS_MW_FS_DEVICE | MW_USB_OTG_HS_MW_FS_HOST | OTG_DUAL_ROL_DEVICE_HS_FS" Diagnostic="USB Internal Phy Mode must be selected first"/>	
+				</Mode>	
+				<!-- Thicket 33380, The STM32H7 support the mode BCD -->
+				<Mode Name="Activate_VBUS_BCD" UserName="BCD (Battery Charging Detection)" RemoveCondition="!DIE450">
+					<SignalLogicalOp Name="AND">				
+						<Signal Name="VBUS"  IOMode="EXTIRisingFalling"/>								
+					</SignalLogicalOp>
+					<Semaphore>VBUS_USED_FOR_BCD</Semaphore>
+					<Condition Expression="(MW_USB_OTG_HS_MW_FS_DEVICE | MW_USB_OTG_HS_MW_FS_HOST |OTG_DUAL_ROLE_DEVICE)" Diagnostic="USB Device_Only Mode must be selected first"/>		
+				</Mode>	
+			</ModeLogicOperator>							
 		</Mode>	
 	</ModeLogicOperator>		
 	<RefSignal IOMode="AlternateFunctionPushPull" Name="DM"/>

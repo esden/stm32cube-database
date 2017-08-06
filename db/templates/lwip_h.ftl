@@ -76,6 +76,8 @@ void HAL_${mode}_BspDeInit(${mode}_HandleTypeDef* h${mode?lower_case});
 
 [#--void ${ipName}_Init(void);--]
 
+#if WITH_RTOS
+#else
 /* USER CODE BEGIN 1 */
 /* Function defined in lwip.c to:
  *   - Read a received packet from the Ethernet buffers 
@@ -85,6 +87,7 @@ void HAL_${mode}_BspDeInit(${mode}_HandleTypeDef* h${mode?lower_case});
 void MX_LWIP_Process(void);
 
 /* USER CODE END 1 */
+#endif /* WITH_RTOS */
 
 #ifdef __cplusplus
 }

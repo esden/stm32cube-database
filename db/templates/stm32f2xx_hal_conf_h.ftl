@@ -51,7 +51,7 @@
   */
   
 #define HAL_MODULE_ENABLED  
-[#assign allModules = ["ADC", "AES", "CAN", "CRC", "CRYP", "DAC", "DCMI", "ETH", "NAND", "NOR", "PCCARD", "SRAM", "HASH", "I2C", "I2S", "IWDG", "RNG", "RTC", "SD", "SPI", "TIM", "UART", "USART", "IRDA", "SMARTCARD", "WWDG", "PCD", "HCD"]]
+[#assign allModules = ["ADC", "AES", "CAN", "CRC", "CRYP", "DAC", "DCMI", "ETH", "NAND", "NOR", "PCCARD", "SRAM", "HASH", "I2C", "I2S", "IWDG", "RNG", "RTC", "SD", "MMC", "SPI", "TIM", "UART", "USART", "IRDA", "SMARTCARD", "WWDG", "PCD", "HCD"]]
   [#list allModules as module]
 	[#if isModuleUsed(module)]
 [#compress]#define HAL_${module?replace("AES","CRYP")}_MODULE_ENABLED[/#compress]
@@ -333,6 +333,10 @@
 #ifdef HAL_SD_MODULE_ENABLED
  #include "stm32f2xx_hal_sd.h"
 #endif /* HAL_SD_MODULE_ENABLED */
+
+#ifdef HAL_MMC_MODULE_ENABLED
+ #include "stm32f2xx_hal_mmc.h"
+#endif /* HAL_MMC_MODULE_ENABLED */
 
 #ifdef HAL_SPI_MODULE_ENABLED
  #include "stm32f2xx_hal_spi.h"

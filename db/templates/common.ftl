@@ -33,7 +33,7 @@
                     [#if fargument.genericType == "struct"]
                         [#if fargument.context??]
                             [#if fargument.context=="global"]
-                                [#if configModel.ipName=="DMA"]
+                                [#if configModel.ipName=="DMA" || configModel.ipName=="BDMA"]
                                     [#assign instanceIndex = "_"+ configModel.dmaRequestName?lower_case]
                                 [#else]
                                    [#-- [#assign instanceIndex = inst?replace(name,"")]--]
@@ -192,7 +192,7 @@
                             [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
                             [#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}(${args}) != [#if method.returnHAL == "true"]HAL_OK[#else]${method.returnHAL}[/#if])
                             [#if nTab==2]#t#t[#else]#t[/#if]{
-                            [#if nTab==2]#t#t[#else]#t[/#if]#tError_Handler();
+                            [#if nTab==2]#t#t[#else]#t[/#if]#t_Error_Handler(__FILE__, __LINE__);
                             [#if nTab==2]#t#t[#else]#t[/#if]}
                         [/#if]#n
             [#-- [/#if] --]
@@ -204,7 +204,7 @@
                             [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
                             [#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}() != [#if method.returnHAL == "true"]HAL_OK[#else]${method.returnHAL}[/#if])
                             [#if nTab==2]#t#t[#else]#t[/#if]{
-                            [#if nTab==2]#t#t[#else]#t[/#if]#tError_Handler();
+                            [#if nTab==2]#t#t[#else]#t[/#if]#t_Error_Handler(__FILE__, __LINE__);
                             [#if nTab==2]#t#t[#else]#t[/#if]}
                         [/#if]#n
                 [/#if]			
@@ -217,7 +217,7 @@
                     [#if fargument.genericType == "struct"][#assign arg = "" + adr + fargument.name]
                                         [#if fargument.context??]                   
                                             [#if fargument.context=="global"]
-                                                [#if configModel.ipName=="DMA"]
+                                                [#if configModel.ipName=="DMA" || configModel.ipName=="BDMA"]
                                                 [#assign instanceIndex = "_"+ configModel.dmaRequestName?lower_case]
                                                 [#else]
                                                 [#assign instanceIndex = inst?replace(name,"")]
@@ -264,7 +264,7 @@
                                 [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
                                 [#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}() != [#if method.returnHAL == "true"]HAL_OK[#else]${method.returnHAL}[/#if])
                                 [#if nTab==2]#t#t[#else]#t[/#if]{
-                                [#if nTab==2]#t#t[#else]#t[/#if]#tError_Handler();
+                                [#if nTab==2]#t#t[#else]#t[/#if]#t_Error_Handler(__FILE__, __LINE__);
                                 [#if nTab==2]#t#t[#else]#t[/#if]}
                             [/#if]#n
                         [/#if]
@@ -403,7 +403,7 @@
                     [#if fargument.genericType == "struct" && fargument.argumentReference == "RefParameter"]
                         [#if fargument.context??]
                             [#if fargument.context=="global"]
-                                [#if config.ipName=="DMA"]
+                                [#if config.ipName=="DMA" || config.ipName=="BDMA"]
                                     [#assign instanceIndex = "_"+ config.dmaRequestName?lower_case]
                                 [#else]
                                    [#-- [#assign instanceIndex = instRef?replace(name,"")]--]
@@ -646,7 +646,7 @@
             [#if !listofCalledMethod?contains(methodName) && method.optimizale??]
                 [#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}(${args}) != [#if method.returnHAL == "true"]HAL_OK[#else]${method.returnHAL}[/#if])
                 [#if nTab==2]#t#t[#else]#t[/#if]{
-                [#if nTab==2]#t#t[#else]#t[/#if]#tError_Handler();
+                [#if nTab==2]#t#t[#else]#t[/#if]#t_Error_Handler(__FILE__, __LINE__);
                 [#if nTab==2]#t#t[#else]#t[/#if]}
                 [#if method.optimizale??&&method.optimizale==true]
                 [#assign listofCalledMethod = listofCalledMethod + ", "+ methodName]
@@ -664,7 +664,7 @@
                             [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
                             [#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}() != [#if method.returnHAL == "true"]HAL_OK[#else]${method.returnHAL}[/#if])
                             [#if nTab==2]#t#t[#else]#t[/#if]{
-                            [#if nTab==2]#t#t[#else]#t[/#if]#tError_Handler();
+                            [#if nTab==2]#t#t[#else]#t[/#if]#t_Error_Handler(__FILE__, __LINE__);
                             [#if nTab==2]#t#t[#else]#t[/#if]}
                         [/#if]#n                  
                     [/#if]
@@ -678,7 +678,7 @@
                     [#if fargument.genericType == "struct"][#assign arg = "" + adr + fargument.name]
                                         [#if fargument.context??]                   
                                             [#if fargument.context=="global"]
-                                                [#if config.ipName=="DMA"]
+                                                [#if config.ipName=="DMA" || config.ipName=="BDMA"]
                                                 [#assign instanceIndex = "_"+ config.dmaRequestName?lower_case]
                                                 [#else]
                                                [#if name??] [#assign instanceIndex = inst?replace(name,"")][/#if]
@@ -734,7 +734,7 @@
                                 [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
                                 [#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}() != [#if method.returnHAL == "true"]HAL_OK[#else]${method.returnHAL}[/#if])
                                 [#if nTab==2]#t#t[#else]#t[/#if]{
-                                [#if nTab==2]#t#t[#else]#t[/#if]#tError_Handler();
+                                [#if nTab==2]#t#t[#else]#t[/#if]#t_Error_Handler(__FILE__, __LINE__);
                                 [#if nTab==2]#t#t[#else]#t[/#if]}
                             [/#if]#n
                                [#--[#if nTab==2]#t#t[#else]#t[/#if]${method.name}();--]
@@ -927,7 +927,7 @@ ${bufferType} ${bufferName}[${bufferSize}];
                     [#if fargument.genericType == "struct"]
                         [#if fargument.context??]
                             [#if fargument.context=="global"]
-                                [#if configModel.ipName=="DMA"]
+                                [#if configModel.ipName=="DMA" || configModel.ipName=="BDMA"]
                                     [#assign instanceIndex = "_"+ configModel.dmaRequestName?lower_case]
                                 [#else]
                                    [#-- [#assign instanceIndex = inst?replace(name,"")]--]
@@ -1090,7 +1090,7 @@ ${bufferType} ${bufferName}[${bufferSize}];
                             [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
                             [#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}(${args}) != [#if method.returnHAL == "true"]HAL_OK[#else]${method.returnHAL}[/#if])
                             [#if nTab==2]#t#t[#else]#t[/#if]{
-                            [#if nTab==2]#t#t[#else]#t[/#if]#tError_Handler();
+                            [#if nTab==2]#t#t[#else]#t[/#if]#t_Error_Handler(__FILE__, __LINE__);
                             [#if nTab==2]#t#t[#else]#t[/#if]}
                         [/#if]#n
             [#-- [/#if] --]
@@ -1102,7 +1102,7 @@ ${bufferType} ${bufferName}[${bufferSize}];
                             [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
                             [#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}() != [#if method.returnHAL == "true"]HAL_OK[#else]${method.returnHAL}[/#if])
                             [#if nTab==2]#t#t[#else]#t[/#if]{
-                            [#if nTab==2]#t#t[#else]#t[/#if]#tError_Handler();
+                            [#if nTab==2]#t#t[#else]#t[/#if]#t_Error_Handler(__FILE__, __LINE__);
                             [#if nTab==2]#t#t[#else]#t[/#if]}
                         [/#if]#n
                 [/#if]			
@@ -1115,7 +1115,7 @@ ${bufferType} ${bufferName}[${bufferSize}];
                     [#if fargument.genericType == "struct"][#assign arg = "" + adr + fargument.name]
                                         [#if fargument.context??]                   
                                             [#if fargument.context=="global"]
-                                                [#if configModel.ipName=="DMA"]
+                                                [#if configModel.ipName=="DMA" || configModel.ipName=="BDMA"]
                                                 [#assign instanceIndex = "_"+ configModel.dmaRequestName?lower_case]
                                                 [#else]
                                                 [#assign instanceIndex = inst?replace(name,"")]
@@ -1162,7 +1162,7 @@ ${bufferType} ${bufferName}[${bufferSize}];
                                 [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
                                 [#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}() != [#if method.returnHAL == "true"]HAL_OK[#else]${method.returnHAL}[/#if])
                                 [#if nTab==2]#t#t[#else]#t[/#if]{
-                                [#if nTab==2]#t#t[#else]#t[/#if]#tError_Handler();
+                                [#if nTab==2]#t#t[#else]#t[/#if]#t_Error_Handler(__FILE__, __LINE__);
                                 [#if nTab==2]#t#t[#else]#t[/#if]}
                             [/#if]#n
                         [/#if]
@@ -1186,7 +1186,7 @@ ${bufferType} ${bufferName}[${bufferSize}];
                     [#if fargument.genericType == "struct"]{
                         [#if fargument.context??]
                             [#if fargument.context=="global"]
-                                [#if config.ipName=="DMA"]
+                                [#if config.ipName=="DMA" || config.ipName=="BDMA"]
                                     [#local instanceIndex = "_"+ config.dmaRequestName?lower_case]
                                 [#else]
                                    [#-- [#local instanceIndex = instRef?replace(name,"")]--]
@@ -1425,7 +1425,7 @@ ${bufferType} ${bufferName}[${bufferSize}];
                     [#if fargument.genericType == "struct"][#local arg = "" + adr + fargument.name]
                                         [#if fargument.context??]                   
                                             [#if fargument.context=="global"]
-                                                [#if config.ipName=="DMA"]
+                                                [#if config.ipName=="DMA" || config.ipName=="BDMA"]
                                                 [#local instanceIndex = "_"+ config.dmaRequestName?lower_case]
                                                 [#else]
                                                [#if name??] [#local instanceIndex = instRef?replace(name,"")][/#if]
@@ -1587,7 +1587,7 @@ ${bufferType} ${bufferName}[${bufferSize}];
     [/#if]
 [#-- if I2C clk_enable should be after GPIO Init End --]    
 [#if serviceType=="Init"] 
-    [#if dmaExist]#n[#if tabN == 2]#t[/#if]#t/* Peripheral DMA init*/
+    [#if dmaExist]#n[#if tabN == 2]#t[/#if]#t/* ${ipName} DMA Init */
 [#-- DMA Configuration --]
 #t[@generateConfigCode ipName=ipName type=serviceType serviceName="dma" instHandler=instHandler tabN=tabN IPData1=IPData/]
     [/#if]
@@ -1621,7 +1621,7 @@ ${bufferType} ${bufferName}[${bufferSize}];
         [#if IPData.initServices.nvic??&&IPData.initServices.nvic?size>0]
            [#if codeInMspInit || ipName?contains("USB")]
            [#-- Always generate comment for USB: it is not worth the trouble to compute when it is really needed --]
-#n[#if tabN == 2]#t[/#if]#t/* Peripheral interrupt init */
+#n[#if tabN == 2]#t[/#if]#t/* ${ipName} interrupt Init */
            [/#if]
            [#if ipName?contains("USB")]
                 [#-- WorkAround for USB low power and remap macro--]
@@ -1673,7 +1673,11 @@ ${bufferType} ${bufferName}[${bufferSize}];
 #t#tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
 #t#tHAL_NVIC_EnableIRQ(${initVector.vector});
                     [#else]
+                        [#if FamilyName=="STM32L0" || FamilyName=="STM32F0"]
+#tNVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority});
+                        [#else]
 #tNVIC_SetPriority(${initVector.vector}, NVIC_EncodePriority(NVIC_GetPriorityGrouping(),${initVector.preemptionPriority}, ${initVector.subPriority}));
+                        [/#if]
 #tNVIC_EnableIRQ(${initVector.vector});
                     [/#if]
                 [/#if]
@@ -1707,7 +1711,7 @@ ${bufferType} ${bufferName}[${bufferSize}];
 #t#t}
 [/#if]
 [#-- bug 322189 DeInit End--]
-    [#if dmaExist]#n#t#t/* Peripheral DMA DeInit*/    
+    [#if dmaExist]#n#t#t/* ${ipName} DMA DeInit */
  [#assign dmaservice =service.dma]
  [#if dmaservice??]
     [#list dmaservice as dmaconfig]
@@ -1729,7 +1733,7 @@ ${bufferType} ${bufferName}[${bufferSize}];
 [/#if]    
     [/#if] [#-- if DMA exist --]
 [#-- DeInit NVIC if DeInit --]
-    [#if service??&&service.nvic??&&nvicExist&&service.nvic?size>0]#n#t#t/* Peripheral interrupt Deinit*/[#--#n#t#tHAL_NVIC_DisableIRQ([#if service.nvic.vector??]${service.nvic.vector}[/#if]);--]
+    [#if service??&&service.nvic??&&nvicExist&&service.nvic?size>0]#n#t#t/* ${ipName} interrupt DeInit */[#--#n#t#tHAL_NVIC_DisableIRQ([#if service.nvic.vector??]${service.nvic.vector}[/#if]);--]
 [#list service.nvic as initVector]                
                [#if initVector.shared=="false"]             
 #t#tHAL_NVIC_DisableIRQ(${initVector.vector});#n
@@ -1915,6 +1919,7 @@ ${bufferType} ${bufferName}[${bufferSize}];
         [#else]
             [#assign dmaCurrentRequest = dmaconfig.dmaRequestName?lower_case]
         [/#if]
+#t/* ${dmaCurrentRequest?upper_case} Init */
 [#--workAround DFSDM--]
  [#assign ind="" ]
 [#if dmaCurrentRequest?contains("dfsdm")]
