@@ -107,7 +107,7 @@
 [#if handleNameFS == "FS" || handleNameUSB_FS == "FS"]
 /* USER CODE BEGIN INQUIRY_DATA_FS */ 
 /* USB Mass storage Standard Inquiry Data */
-const int8_t  STORAGE_Inquirydata_FS[] = {//36
+const int8_t  STORAGE_Inquirydata_FS[] = {/* 36 */
   
   /* LUN 0 */
   0x00,		
@@ -129,7 +129,7 @@ const int8_t  STORAGE_Inquirydata_FS[] = {//36
 [#if handleNameHS == "HS"]
 /* USER CODE BEGIN INQUIRY_DATA_HS */ 
 /* USB Mass storage Standard Inquiry Data */
-const int8_t  STORAGE_Inquirydata_HS[] = {//36
+const int8_t  STORAGE_Inquirydata_HS[] = {/* 36 */
   
   /* LUN 0 */
   0x00,		

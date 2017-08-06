@@ -548,7 +548,7 @@ void  USBD_LL_Delay (uint32_t Delay)
 void *USBD_static_malloc(uint32_t size)
 {
 [#if className == "AUDIO"]
-  //static uint8_t mem[sizeof(USBD_AUDIO_HandleTypeDef)];
+  /* static uint8_t mem[sizeof(USBD_AUDIO_HandleTypeDef)]; */
   /* USER CODE BEGIN 4 */ 
   /**
   * To compute the request size you must use the formula:
@@ -562,25 +562,25 @@ void *USBD_static_malloc(uint32_t size)
   /* USER CODE END 4 */
 [/#if]  
 [#if className == "DFU"]
-  static uint32_t mem[(sizeof(USBD_DFU_HandleTypeDef)/4)+1];//On 32-bit boundary
+  static uint32_t mem[(sizeof(USBD_DFU_HandleTypeDef)/4)+1];/* On 32-bit boundary */
 [/#if]  
 [#if className == "HID"]
-  static uint32_t mem[(sizeof(USBD_HID_HandleTypeDef)/4)+1];//On 32-bit boundary
+  static uint32_t mem[(sizeof(USBD_HID_HandleTypeDef)/4)+1];/* On 32-bit boundary */
 [/#if]  
 [#if className == "MSC"]
-  static uint32_t mem[(sizeof(USBD_MSC_BOT_HandleTypeDef)/4)+1];//On 32-bit boundary
+  static uint32_t mem[(sizeof(USBD_MSC_BOT_HandleTypeDef)/4)+1];/* On 32-bit boundary */
 [/#if]  
 [#if className == "CDC"]
-  static uint32_t mem[(sizeof(USBD_CDC_HandleTypeDef)/4)+1];//On 32-bit boundary
+  static uint32_t mem[(sizeof(USBD_CDC_HandleTypeDef)/4)+1];/* On 32-bit boundary */
 [/#if]  
 [#if className == "CUSTOMHID"]
-  static uint32_t mem[(sizeof(USBD_CUSTOM_HID_HandleTypeDef)/4+1)];//On 32-bit boundary
+  static uint32_t mem[(sizeof(USBD_CUSTOM_HID_HandleTypeDef)/4+1)];/* On 32-bit boundary */
 [/#if]   
 [#if className == "CCID"]
-  static uint32_t mem[(sizeof(USBD_CCID_HandleTypeDef)/4)+1];//On 32-bit boundary
+  static uint32_t mem[(sizeof(USBD_CCID_HandleTypeDef)/4)+1];/* On 32-bit boundary */
 [/#if]  
 [#if className == "MTP"]
-  static uint32_t mem[(sizeof(USBD_MTP_HandleTypeDef)/4)+1];//On 32-bit boundary
+  static uint32_t mem[(sizeof(USBD_MTP_HandleTypeDef)/4)+1];/* On 32-bit boundary */
 [/#if]
   return mem;
 }

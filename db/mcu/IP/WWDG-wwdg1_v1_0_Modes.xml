@@ -1,15 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <IP DBVersion="V3.0" IPType="service" Name="WWDG" Version="wwdg1_v1_0" IpGroup="System" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../db/IP_Modes_V3_0.xsd" xmlns="http://mcd.rou.st.com/modules.php?name=mcu">
+
     <About>WWDG: Window WatchDog</About>
 
     <RefParameter Comment="WWDG instance" DefaultValue="WWDG" Name="Instance" Type="list" Visible="false"/>
-
-    <RefMode Name="WWDG_Activate" HalMode ="WWDG">
-	      <ConfigForMode>WWDG_Init</ConfigForMode>
-        <Parameter Name="Prescaler"  Group="Watchdog Clocking"/>
-        <Parameter Name="Window"     Group="Watchdog Clocking"/>
-        <Parameter Name="Counter"    Group="Watchdog Clocking"/>
-    </RefMode>
 
     <RefParameter Name="Prescaler" Comment="WWDG counter clock prescaler" DefaultValue="WWDG_PRESCALER_1" Type="list" Group="Watchdog Clocking">
         <PossibleValue Value="WWDG_PRESCALER_1" Comment="1"/>
@@ -19,22 +13,46 @@
         <Description>The resulting value is equal to (PCLK1/4096)/(Prescaler value) for example (PCLK1/4096)/8</Description>
     </RefParameter>
 
-    <RefParameter Name="Window" Comment="WWDG window value" DefaultValue="64" Max="127" Min="64" Type="integer" Group="Watchdog Clocking"/>
+    <RefParameter Name="Window" Comment="WWDG window value" DefaultValue="64" Max="127" Min="64" Type="integer" Group="Watchdog Clocking">
+        <Description>Specifies the WWDG window value to be compared to the downcounter.</Description>
+    </RefParameter>
 
     <RefParameter Name="Counter" Comment="WWDG free-running downcounter value" DefaultValue="64" Max="127" Min="=Window" Type="integer" Group="Watchdog Clocking"/>
 
+    <RefParameter Comment="EWI Mode" DefaultValue="WWDG_EWI_DISABLE" Name="EWIMode" Type="list" Group="Watchdog Interrupt">
+        <Description>Specifies if WWDG early wake-up interrupt is enabled or not.</Description>
+        <PossibleValue Comment="Disable" Value="WWDG_EWI_DISABLE"/>
+        <PossibleValue Comment="Enable" Value="WWDG_EWI_ENABLE"/>
+    </RefParameter>
+
+    <RefMode Name="WWDG_Activate" HalMode ="WWDG">
+        <Condition Diagnostic="" Expression="STM32F2|STM32F3|STM32F4|STM32F7|STM32L1|STM32L4"/>
+        <ConfigForMode>WWDG_Init</ConfigForMode>
+        <Parameter Name="Prescaler"/>
+        <Parameter Name="Window"/>
+        <Parameter Name="Counter"/>
+        <Parameter Name="EWIMode"/>
+    </RefMode>
+
+    <RefMode Name="WWDG_Activate" HalMode ="WWDG">
+        <ConfigForMode>WWDG_Init</ConfigForMode>
+        <Parameter Name="Prescaler"/>
+        <Parameter Name="Window"/>
+        <Parameter Name="Counter"/>
+    </RefMode>
+
     <!-- ModeLogicOperator for WWDG -->
-  	<ModeLogicOperator Name="OR">
-  		<Mode Name="WWDG_State" UserName="Activated">
-  			<ModeLogicOperator Name="XOR">
-  				<Mode Name="WWDG_Activate" UserName="Activated">
-  					<SignalLogicalOp Name="AND">
-  						<Signal Name="VS_WWDG" />
-  					</SignalLogicalOp>
-  				</Mode>
-  			</ModeLogicOperator>
-  		</Mode>
-  	</ModeLogicOperator>
+    <ModeLogicOperator Name="OR">
+      <Mode Name="WWDG_State" UserName="Activated">
+        <ModeLogicOperator Name="XOR">
+          <Mode Name="WWDG_Activate" UserName="Activated">
+            <SignalLogicalOp Name="AND">
+              <Signal Name="VS_WWDG" />
+            </SignalLogicalOp>
+          </Mode>
+        </ModeLogicOperator>
+      </Mode>
+    </ModeLogicOperator>
 
     <!-- RefSignal for WWDG -->
     <RefSignal Name="VS_WWDG" Virtual="true"/>

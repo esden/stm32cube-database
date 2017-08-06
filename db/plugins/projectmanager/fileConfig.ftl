@@ -10,7 +10,7 @@
 
  [#-- list of toolchains to be generated: EWARM,MDK-ARM,TrueSTUDIO,RIDE: This tag can contain one or more than one toolchain: EWARM,MDK-ARM,TrueSTUDIO,RIDE --]
 <Toolchain>${ide}</Toolchain>
-[#if ide=="MDK-ARM"]
+[#if ide=="EWARM" || ide=="MDK-ARM"]
 	<Toolversion>${Toolversion}</Toolversion>
 [/#if]
 <Version>${version}</Version>

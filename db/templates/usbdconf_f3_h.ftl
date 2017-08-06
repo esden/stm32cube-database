@@ -190,8 +190,8 @@ void USBD_static_free(void *p);
 #ifdef __cplusplus
 }
 #endif
-  
-#endif //__USBD_CONF__H__
+
+#endif /*__USBD_CONF__H__*/
 
 
 /**

@@ -154,7 +154,7 @@ void HAL_ResumeTick(void)
   __HAL_TIM_ENABLE_IT(&h${instance?lower_case}, TIM_IT_UPDATE);
 }
 
-/**
+[#--/**
   * @brief  Period elapsed callback in non blocking mode
   * @note   This function is called  when ${instance} interrupt took place, inside
   * HAL_TIM_IRQHandler(). It makes a direct call to HAL_IncTick() to increment
@@ -166,6 +166,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
   HAL_IncTick();
 }
+--]
 
 [#--/**
   * @brief  This function handles TIM interrupt request.

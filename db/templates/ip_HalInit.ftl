@@ -267,7 +267,14 @@
                         [/#list][#-- list  fargument.argument as argument--]
                         [/#if]
                     [#else][#-- if struct --]
-                    [#assign arg = ""]
+                        [#assign arg = ""]
+                        [#if inst?contains("ETH")]
+                            #n
+                            #t/* USER CODE BEGIN MACADDRESS */
+                            #t#t
+                            #t/* USER CODE END MACADDRESS */
+                            #n
+                        [/#if]
                         [#if fargument.status=="OK" && fargument.value??]
                             [#assign argIndex = inst?replace(name,"")]  
                                             [#if argIndex??]

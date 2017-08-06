@@ -574,19 +574,26 @@
 				[#assign retval=argument.name]
 			[/#if]
 		    [/#list]
-[#if S_FATFS_SDIO?? && (inst=="SDIO" || inst?starts_with("SDMMC"))] [#-- if HAL_SD_Init  and SDIO is used with FATFS--]
-[#else]		    
-[#--[#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n--]
-        [#if method.returnHAL=="false"]
-        [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});
-        [#else]
-            [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
-            [#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}(${args}) != [#if method.returnHAL == "true"]HAL_OK[#else]${method.returnHAL}[/#if])
-            [#if nTab==2]#t#t[#else]#t[/#if]{
-            [#if nTab==2]#t#t[#else]#t[/#if]#tError_Handler();
-            [#if nTab==2]#t#t[#else]#t[/#if]}
-        [/#if]#n
-[/#if]
+            [#if S_FATFS_SDIO?? && (inst=="SDIO" || inst?starts_with("SDMMC"))] [#-- if HAL_SD_Init  and SDIO is used with FATFS--]
+            [#else]
+                [#if inst?contains("ETH")]
+                    #n
+                    #t/* USER CODE BEGIN MACADDRESS */
+                    #t#t
+                    #t/* USER CODE END MACADDRESS */
+                    #n
+                [/#if]
+                [#--[#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n--]
+                [#if method.returnHAL=="false"]
+                    [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});
+                [#else]
+                    [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
+                    [#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}(${args}) != [#if method.returnHAL == "true"]HAL_OK[#else]${method.returnHAL}[/#if])
+                    [#if nTab==2]#t#t[#else]#t[/#if]{
+                    [#if nTab==2]#t#t[#else]#t[/#if]#tError_Handler();
+                    [#if nTab==2]#t#t[#else]#t[/#if]}
+                [/#if]#n
+            [/#if]
 		    		
             [#else]
                     [#if S_FATFS_SDIO?? && (inst=="SDIO" || inst?starts_with("SDMMC"))] [#-- if HAL_SD_Init  and SDIO is used with FATFS--][#else]

@@ -195,7 +195,7 @@ extern ${variable.value} ${variable.name};
 }
 #endif
 
-#endif //__USBD_CONF__H__
+#endif /* __USBD_CONF__H__ */
 
 
 /**

@@ -110,10 +110,16 @@
                                              in voltage and temperature.*/
 /**
   * @brief External Low Speed oscillator (LSE) value.
+
   */
 #if !defined  (LSE_VALUE)
- #define LSE_VALUE  ((uint32_t)32768)    /*!< Value of the External Low Speed oscillator in Hz */
+  #define LSE_VALUE    ((uint32_t)[#if lse_value??]${lse_value}[#else]32768[/#if]U) /*!< Value of the External oscillator in Hz*/
 #endif /* LSE_VALUE */
+
+   
+#if !defined  (LSE_STARTUP_TIMEOUT)
+  #define LSE_STARTUP_TIMEOUT    ((uint32_t)[#if LSE_Timout??]${LSE_Timout}[#else]5000[/#if])   /*!< Time out for LSE start up, in ms */
+#endif /* HSE_STARTUP_TIMEOUT */
 
 /**
   * @brief External clock source for I2S peripheral
