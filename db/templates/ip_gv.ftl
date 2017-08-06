@@ -11,3 +11,4 @@ ${variable.value} ${variable.name};
 [/#if]
 [#-- Global variables --]
 [/#list]
+void Error_Handler(void);

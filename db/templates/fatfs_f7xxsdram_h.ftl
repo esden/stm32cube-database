@@ -5,9 +5,8 @@
   * @brief   This file contains the common defines and functions prototypes for  
   *          the bsp_driver_sdram.c driver.
   ******************************************************************************
-  * @attention
   *
-  * <h2><center>&copy; COPYRIGHT(c) 2015 STMicroelectronics</center></h2>
+  * COPYRIGHT(c) ${year} STMicroelectronics
   *
   * Redistribution and use in source and binary forms, with or without modification,
   * are permitted provided that the following conditions are met:
@@ -72,12 +71,12 @@
 
 /* #define SDRAM_MEMORY_WIDTH            FMC_SDRAM_MEM_BUS_WIDTH_8  */
 /* #define SDRAM_MEMORY_WIDTH            FMC_SDRAM_MEM_BUS_WIDTH_16 */
-// #define SDRAM_MEMORY_WIDTH               FMC_SDRAM_MEM_BUS_WIDTH_32
+/* #define SDRAM_MEMORY_WIDTH            FMC_SDRAM_MEM_BUS_WIDTH_32 */
 
-//#define SDCLOCK_PERIOD                   FMC_SDRAM_CLOCK_PERIOD_2
+/* #define SDCLOCK_PERIOD                FMC_SDRAM_CLOCK_PERIOD_2 */
 /* #define SDCLOCK_PERIOD                FMC_SDRAM_CLOCK_PERIOD_3 */   
 
-//#define REFRESH_COUNT                    ((uint32_t)0x0603)   /* SDRAM refresh counter (100Mhz SD clock) */
+/* #define REFRESH_COUNT                ((uint32_t)0x0603) */      /* SDRAM refresh counter (100Mhz SD clock) */
    
 #define SDRAM_TIMEOUT     ((uint32_t)0xFFFF) 
 
@@ -104,20 +103,21 @@
 #define SDRAM_MODEREG_CAS_LATENCY_2              ((uint16_t)0x0020)
 #define SDRAM_MODEREG_CAS_LATENCY_3              ((uint16_t)0x0030)
 #define SDRAM_MODEREG_OPERATING_MODE_STANDARD    ((uint16_t)0x0000)
+#define SDRAM_MODEREG_WRITEBURST_MODE_PROGRAMMED ((uint16_t)0x0000)
+#define SDRAM_MODEREG_WRITEBURST_MODE_SINGLE     ((uint16_t)0x0200)
 */
-#define SDRAM_MODEREG_WRITEBURST_MODE_PROGRAMMED ((uint16_t)0x0000) 
-#define SDRAM_MODEREG_WRITEBURST_MODE_SINGLE     ((uint16_t)0x0200)  
 
 extern SDRAM_HandleTypeDef _HSDRAM;
 
-/* Exported functions --------------------------------------------------------*/   
+/** @defgroup STM32756G_EVAL_SDRAM_Exported_Functions
+  * @{
+  */  
 uint8_t BSP_SDRAM_Init(void);
 uint8_t BSP_SDRAM_ReadData(uint32_t uwStartAddress, uint32_t *pData, uint32_t uwDataSize);
 uint8_t BSP_SDRAM_ReadData_DMA(uint32_t uwStartAddress, uint32_t *pData, uint32_t uwDataSize);
 uint8_t BSP_SDRAM_WriteData(uint32_t uwStartAddress, uint32_t *pData, uint32_t uwDataSize);
 uint8_t BSP_SDRAM_WriteData_DMA(uint32_t uwStartAddress, uint32_t *pData, uint32_t uwDataSize);
 uint8_t BSP_SDRAM_Sendcmd(FMC_SDRAM_CommandTypeDef *SdramCmd);
-void BSP_SDRAM_DMA_IRQHandler(void);  
 
 /* USER CODE END 0 */
    

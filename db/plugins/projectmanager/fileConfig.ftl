@@ -103,6 +103,17 @@
 		    	<sourceEntry>
 		    		<name>${src}</name>
 		    	</sourceEntry>
+		    	<sourceEntry>
+		    		<name>${HALDriver}</name>
+		    	</sourceEntry>
+		    	<sourceEntry>
+		    		<name>Application</name>
+		    	</sourceEntry>
+		    	[#if atLeastOneMiddlewareIsUsed]
+		    		<sourceEntry>
+		    			<name>Middlewares</name>
+		    		</sourceEntry>
+		    	 [/#if]
 		    </sourceEntries>
                 
         [#if atLeastOneMiddlewareIsUsed]
@@ -148,9 +159,14 @@
 		    	<sourceEntry>
 		    		<name>${src}</name>
 		    	</sourceEntry>
-		    	<!--sourceEntry>
+		    	<sourceEntry>
 		    		<name>${HALDriver}</name>
-		    	</sourceEntry-->
+		    	</sourceEntry>
+		    	[#if atLeastOneMiddlewareIsUsed]
+		    		<sourceEntry>
+		    			<name>Middlewares</name>
+		    		</sourceEntry>
+		    	 [/#if]
 		    </sourceEntries>
     	[/#if]
     [/#if]

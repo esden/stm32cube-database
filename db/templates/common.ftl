@@ -30,6 +30,9 @@
                                 [#else]
                                    [#-- [#assign instanceIndex = inst?replace(name,"")]--]
                                    [#if index??][#assign instanceIndex = index][#else][#if name??][#assign instanceIndex = inst?replace(name,"")][/#if][/#if]
+                                   [#if configModel.ipName=="DFSDM"]
+                                        [#assign instanceIndex = ""]
+                                   [/#if]
                                 [/#if]
                             [/#if]
                         [/#if]                     
@@ -166,10 +169,28 @@
 		    [#--[#if retval??&& retval!=""]
 			[#if nTab==2]#t#t[#else]#t[/#if]${retval} = ${method.name}(${args});--]
 		    [#-- else --]
-			[#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n
+                    [#-- Check on HAL_OK --]
+                        [#if method.returnHAL=="false"]
+			[#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});
+                        [#else]
+                            [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
+                            [#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}(${args}) != [#if method.returnHAL == "true"]HAL_OK[#else]${method.returnHAL}[/#if])
+                            [#if nTab==2]#t#t[#else]#t[/#if]{
+                            [#if nTab==2]#t#t[#else]#t[/#if]#tError_Handler();
+                            [#if nTab==2]#t#t[#else]#t[/#if]}
+                        [/#if]#n
 		    [#-- [/#if] --]
 		[#else]
-                    [#if nTab==2]#t#t[#else]#t[/#if]${method.name}();#n
+                    [#--[#if nTab==2]#t#t[#else]#t[/#if]${method.name}();#n --]
+                        [#if method.returnHAL=="false"]
+			[#if nTab==2]#t#t[#else]#t[/#if]${method.name}();
+                        [#else]
+                            [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
+                            [#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}() != [#if method.returnHAL == "true"]HAL_OK[#else]${method.returnHAL}[/#if])
+                            [#if nTab==2]#t#t[#else]#t[/#if]{
+                            [#if nTab==2]#t#t[#else]#t[/#if]#tError_Handler();
+                            [#if nTab==2]#t#t[#else]#t[/#if]}
+                        [/#if]#n
                 [/#if]			
 		[/#if]
 		[#if method.status=="KO"]
@@ -184,6 +205,9 @@
                                                 [#assign instanceIndex = "_"+ configModel.dmaRequestName?lower_case]
                                                 [#else]
                                                 [#assign instanceIndex = inst?replace(name,"")]
+                                                [#if configModel.ipName=="DFSDM"]
+                                                    [#assign instanceIndex = ""]
+                                                [/#if]
                                                 [/#if]
                                             [/#if]
                                         [/#if]              
@@ -217,7 +241,16 @@
                                 [/#list]
                                 [#if nTab==2]#t#t[#else]#t[/#if]#t//${method.name}(${args});
                         [#else] [#-- if method without argument --]
-                               [#if nTab==2]#t#t[#else]#t[/#if]${method.name}()#n;
+                               [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}()#n; --]
+                            [#if method.returnHAL=="false"]
+                                [#if nTab==2]#t#t[#else]#t[/#if]${method.name}();
+                            [#else]
+                                [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
+                                [#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}() != [#if method.returnHAL == "true"]HAL_OK[#else]${method.returnHAL}[/#if])
+                                [#if nTab==2]#t#t[#else]#t[/#if]{
+                                [#if nTab==2]#t#t[#else]#t[/#if]#tError_Handler();
+                                [#if nTab==2]#t#t[#else]#t[/#if]}
+                            [/#if]#n
                         [/#if]
                 [/#if]
         [/#list]
@@ -339,6 +372,9 @@
                                 [#else]
                                    [#-- [#assign instanceIndex = inst?replace(name,"")]--]
                                    [#if index??][#assign instanceIndex = index][#else][#if name??][#assign instanceIndex = inst?replace(name,"")][/#if][/#if]
+                                                [#if configModel.ipName=="DFSDM"]
+                                                    [#assign instanceIndex = ""]
+                                                [/#if]
                                 [/#if]
                             [/#if]
                         [/#if]                     
@@ -539,11 +575,32 @@
 			[/#if]
 		    [/#list]
 [#if S_FATFS_SDIO?? && (inst=="SDIO" || inst?starts_with("SDMMC"))] [#-- if HAL_SD_Init  and SDIO is used with FATFS--]
-[#else]		    [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n
+[#else]		    
+[#--[#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n--]
+        [#if method.returnHAL=="false"]
+        [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});
+        [#else]
+            [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
+            [#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}(${args}) != [#if method.returnHAL == "true"]HAL_OK[#else]${method.returnHAL}[/#if])
+            [#if nTab==2]#t#t[#else]#t[/#if]{
+            [#if nTab==2]#t#t[#else]#t[/#if]#tError_Handler();
+            [#if nTab==2]#t#t[#else]#t[/#if]}
+        [/#if]#n
 [/#if]
 		    		
             [#else]
-                    [#if S_FATFS_SDIO?? && (inst=="SDIO" || inst?starts_with("SDMMC"))] [#-- if HAL_SD_Init  and SDIO is used with FATFS--][#else][#if nTab==2]#t#t[#else]#t[/#if]${method.name}();#n[/#if]
+                    [#if S_FATFS_SDIO?? && (inst=="SDIO" || inst?starts_with("SDMMC"))] [#-- if HAL_SD_Init  and SDIO is used with FATFS--][#else]
+                        [#--[#if nTab==2]#t#t[#else]#t[/#if]${method.name}();#n--]
+                        [#if method.returnHAL=="false"]
+			[#if nTab==2]#t#t[#else]#t[/#if]${method.name}();
+                        [#else]
+                            [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
+                            [#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}() != [#if method.returnHAL == "true"]HAL_OK[#else]${method.returnHAL}[/#if])
+                            [#if nTab==2]#t#t[#else]#t[/#if]{
+                            [#if nTab==2]#t#t[#else]#t[/#if]#tError_Handler();
+                            [#if nTab==2]#t#t[#else]#t[/#if]}
+                        [/#if]#n                  
+                    [/#if]
                 [/#if]			
 		[/#if]
 		[#if method.status=="KO"]
@@ -558,6 +615,9 @@
                                                 [#assign instanceIndex = "_"+ config.dmaRequestName?lower_case]
                                                 [#else]
                                                [#if name??] [#assign instanceIndex = inst?replace(name,"")][/#if]
+                                                [#if configModel.ipName=="DFSDM"]
+                                                    [#assign instanceIndex = ""]
+                                                [/#if]                
                                                 [/#if]
                                             [/#if]
                                         [/#if]              
@@ -599,7 +659,16 @@
                                 [/#list]
                                 [#if nTab==2]#t#t[#else]#t[/#if]#t//${method.name}(${args});
                         [#else] [#-- if method without argument --]
-                               [#if nTab==2]#t#t[#else]#t[/#if]${method.name}();
+                            [#if method.returnHAL=="false"]
+                            [#if nTab==2]#t#t[#else]#t[/#if]${method.name}();
+                            [#else]
+                                [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
+                                [#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}() != [#if method.returnHAL == "true"]HAL_OK[#else]${method.returnHAL}[/#if])
+                                [#if nTab==2]#t#t[#else]#t[/#if]{
+                                [#if nTab==2]#t#t[#else]#t[/#if]#tError_Handler();
+                                [#if nTab==2]#t#t[#else]#t[/#if]}
+                            [/#if]#n
+                               [#--[#if nTab==2]#t#t[#else]#t[/#if]${method.name}();--]
 #n
                         [/#if]
                 [/#if]
@@ -719,3 +788,44 @@
     [/#if]
 [/#macro]
 [#-- End macro generate USB wake-up interrupt code --]
+
+[#macro generateCecRxBuffer configModelList methodName argumentName bufferType bufferSize]
+  [#list configModelList as configModel]
+    [#if configModel.isMWUsed=="false"]
+      [#if configModel.ipName?contains("CEC")]
+        [#if configModel.methods??] [#-- if the pin configuration contains a list of LibMethods--]
+          [#assign methodList = configModel.methods]
+        [#else]
+          [#assign methodList = configModel.libMethod]
+        [/#if]
+        [#list methodList as method]
+          [#if method.name==methodName]
+            [#if method.status=="OK"]
+              [#if method.arguments??]
+                [#list method.arguments as fargument]
+                  [#if fargument.genericType=="struct"][#-- hcec --]
+                    [#list fargument.argument as argument]
+                      [#if argument.genericType=="struct"][#-- Init --]
+                        [#assign bufferName = ""]
+                        [#list argument.argument as argument2]
+                          [#if argument2.name==argumentName]
+                            [#if argument2.value?? && argument2.value!="__NULL"]
+                              [#assign bufferName = argument2.value]
+                            [/#if]
+                          [/#if]
+                        [/#list]
+                        [#if bufferName!="" && bufferSize!="" && bufferType!=""]
+${bufferType} ${bufferName}[${bufferSize}];
+                        [/#if]
+                      [/#if]
+                    [/#list]
+                  [/#if]
+                [/#list]
+              [/#if]
+            [/#if]
+          [/#if]
+        [/#list]
+      [/#if]
+    [/#if]
+  [/#list]
+[/#macro]

@@ -4,9 +4,8 @@
   * @file    bsp_driver_sdram.c (based on stm32469i_eval_sdram.c)
   * @brief   This file includes a generic SDRAM driver.
   ******************************************************************************
-  * @attention
   *
-  * <h2><center>&copy; COPYRIGHT(c) 2015 STMicroelectronics</center></h2>
+  * COPYRIGHT(c) ${year} STMicroelectronics
   *
   * Redistribution and use in source and binary forms, with or without modification,
   * are permitted provided that the following conditions are met:
@@ -37,18 +36,15 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "bsp_driver_sdram.h"
-   
-/** @defgroup STM32F4XX_Private_Functions
-  * @{
-  */ 
-   
+  
 /**
   * @brief  Initializes the SDRAM device 
   * @retval SDRAM status
   */
 uint8_t BSP_SDRAM_Init(void)
 {
-  static uint8_t sdramstatus = SDRAM_ERROR;
+  uint8_t sdramstatus = SDRAM_OK;
+  
   /* place for custom code */
   
   return sdramstatus;
@@ -63,14 +59,14 @@ uint8_t BSP_SDRAM_Init(void)
   */
 uint8_t BSP_SDRAM_ReadData(uint32_t uwStartAddress, uint32_t *pData, uint32_t uwDataSize)
 { 
+  uint8_t sdramstatus = SDRAM_OK;
+  
   if(HAL_SDRAM_Read_32b(&_HSDRAM, (uint32_t *)uwStartAddress, pData, uwDataSize) != HAL_OK)
   {
-    return SDRAM_ERROR;
+    sdramstatus = SDRAM_ERROR;
   }
-  else
-  {
-    return SDRAM_OK;
-  }
+
+  return sdramstatus;
 }
 
 /**
@@ -82,14 +78,14 @@ uint8_t BSP_SDRAM_ReadData(uint32_t uwStartAddress, uint32_t *pData, uint32_t uw
   */
 uint8_t BSP_SDRAM_ReadData_DMA(uint32_t uwStartAddress, uint32_t *pData, uint32_t uwDataSize)
 { 
+  uint8_t sdramstatus = SDRAM_OK;
+  
   if(HAL_SDRAM_Read_DMA(&_HSDRAM, (uint32_t *)uwStartAddress, pData, uwDataSize) != HAL_OK)
   {
-    return SDRAM_ERROR;
+    sdramstatus = SDRAM_ERROR;
   }
-  else
-  {
-    return SDRAM_OK;
-  }   
+   
+  return sdramstatus;
 }
 
 /**
@@ -101,14 +97,14 @@ uint8_t BSP_SDRAM_ReadData_DMA(uint32_t uwStartAddress, uint32_t *pData, uint32_
   */
 uint8_t BSP_SDRAM_WriteData(uint32_t uwStartAddress, uint32_t *pData, uint32_t uwDataSize)
 { 
+  uint8_t sdramstatus = SDRAM_OK;
+  
   if(HAL_SDRAM_Write_32b(&_HSDRAM, (uint32_t *)uwStartAddress, pData, uwDataSize) != HAL_OK)
   {
-    return SDRAM_ERROR;
+    sdramstatus = SDRAM_ERROR;
   }
-  else
-  {
-    return SDRAM_OK;
-  }
+
+  return sdramstatus;
 }
 
 /**
@@ -120,14 +116,14 @@ uint8_t BSP_SDRAM_WriteData(uint32_t uwStartAddress, uint32_t *pData, uint32_t u
   */
 uint8_t BSP_SDRAM_WriteData_DMA(uint32_t uwStartAddress, uint32_t *pData, uint32_t uwDataSize)
 { 
+  uint8_t sdramstatus = SDRAM_OK;
+  
   if(HAL_SDRAM_Write_DMA(&_HSDRAM, (uint32_t *)uwStartAddress, pData, uwDataSize) != HAL_OK)
   {
-    return SDRAM_ERROR;
+    sdramstatus = SDRAM_ERROR;
   }
-  else
-  {
-    return SDRAM_OK;
-  } 
+
+  return sdramstatus;
 }
 
 /**
@@ -137,14 +133,14 @@ uint8_t BSP_SDRAM_WriteData_DMA(uint32_t uwStartAddress, uint32_t *pData, uint32
   */
 uint8_t BSP_SDRAM_Sendcmd(FMC_SDRAM_CommandTypeDef *SdramCmd)
 { 
+  uint8_t sdramstatus = SDRAM_OK;
+  
   if(HAL_SDRAM_SendCommand(&_HSDRAM, SdramCmd, SDRAM_TIMEOUT) != HAL_OK)
   {
-    return SDRAM_ERROR;
+    sdramstatus = SDRAM_ERROR;
   }
-  else
-  {
-    return SDRAM_OK;
-  }
+
+  return sdramstatus;
 }
 
 /**

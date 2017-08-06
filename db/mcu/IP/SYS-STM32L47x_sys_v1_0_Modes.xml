@@ -199,13 +199,13 @@
     <RefParameter Comment="Trimming Value" DefaultValue="null" Max="63" Min="0" Name="TrimmingValue" Type="integer" Visible="false"/>
 
 
-	<RefMode Name="PVD_ext" Group="Programmable_Voltage_Detector_Settings">
+	<RefMode Name="Mode_PVD_Ext" Group="Programmable_Voltage_Detector_Settings">
 		<ConfigForMode>PVDConfig</ConfigForMode>
 		<ConfigForMode>PVDEnable</ConfigForMode>
 		<Parameter Name="PVDLevel" />
 		<Parameter Name="Mode" />
 	</RefMode>
-	<RefMode Name="PVD_int"  Group="Programmable_Voltage_Detector_Settings">
+	<RefMode Name="Mode_PVD_Int"  Group="Programmable_Voltage_Detector_Settings">
 		<ConfigForMode>PVDConfig</ConfigForMode>
 		<ConfigForMode>PVDEnable</ConfigForMode>
 		<Parameter Name="PVDLevel" />
@@ -245,7 +245,14 @@
 	<ModeLogicOperator Name="OR">
 		<Mode Name="Debug">
 			<ModeLogicOperator Name="XOR">
-				<Mode Name="JTAG(4-pin)" UserName="JTAG (4 pins)">
+				<Mode Name="Serial_Wire" UserName="Serial Wire">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="JTCK-SWCLK" />
+						<Signal Name="JTMS-SWDIO" />
+					</SignalLogicalOp>
+					<Semaphore>SWD</Semaphore>
+				</Mode>
+				<Mode Name="JTAG_4_pins" UserName="JTAG (4 pins)">
 					<SignalLogicalOp Name="AND">
 						<Signal Name="JTCK-SWCLK" />
 						<Signal Name="JTDI" />
@@ -255,7 +262,7 @@
 					<Semaphore>JTAG</Semaphore>
 				</Mode>
 
-				<Mode Name="JTAG(5-pin)" UserName="JTAG (5 pins)">
+				<Mode Name="JTAG_5_pins" UserName="JTAG (5 pins)">
 					<SignalLogicalOp Name="AND">
 						<Signal Name="JTCK-SWCLK" />
 						<Signal Name="JTDI" />
@@ -266,15 +273,8 @@
 					<Semaphore>JTAG</Semaphore>
 				</Mode>
 
-				<Mode Name="Serial-Wire" UserName="Serial Wire Debug (SWD)">
-					<SignalLogicalOp Name="AND">
-						<Signal Name="JTCK-SWCLK" />
-						<Signal Name="JTMS-SWDIO" />
-					</SignalLogicalOp>
-					<Semaphore>SWD</Semaphore>
-				</Mode>
 
-				<Mode Name="Trace-Asynchronous_SW" UserName="SWD and Asynchronous Trace">
+				<Mode Name="Trace_Asynchronous_SW" UserName="Trace Asynchronous Sw">
 					<SignalLogicalOp Name="AND">
 						<Signal Name="JTMS-SWDIO" />
 						<Signal Name="JTCK-SWCLK" />
@@ -283,7 +283,7 @@
 					<Semaphore>SWD</Semaphore>
 				</Mode>
 
-				<Mode Name="Trace-Synchro(1bit)_JTAG" UserName="JTAG and Synchronous Trace (1 bit)">
+				<Mode Name="Trace_Synchro_1bit_JTAG" UserName="JTAG with Trace Synchro(1 bit)">
 					<SignalLogicalOp Name="AND">
 						<Signal Name="JTMS-SWDIO" />
 						<Signal Name="JTCK-SWCLK" />
@@ -295,7 +295,7 @@
 					<Semaphore>JTAG</Semaphore>
 				</Mode>
 
-				<Mode Name="Trace-Synchro(2bits)_JTAG" UserName="JTAG and Synchronous Trace (2 bits)">
+				<Mode Name="Trace_Synchro_2bits_JTAG" UserName="JTAG with Trace Synchro(2 bits)">
 					<SignalLogicalOp Name="AND">
 						<Signal Name="JTMS-SWDIO" />
 						<Signal Name="JTCK-SWCLK" />
@@ -308,7 +308,7 @@
 					<Semaphore>JTAG</Semaphore>
 				</Mode>
 
-				<Mode Name="Trace-Synchro(4bits)_JTAG" UserName="JTAG and Synchronous Trace (4 bits)">
+				<Mode Name="Trace_Synchro_4bits_JTAG" UserName="JTAG with Trace Synchro(4 bits)">
 					<SignalLogicalOp Name="AND">
 						<Signal Name="JTMS-SWDIO" />
 						<Signal Name="JTCK-SWCLK" />
@@ -323,7 +323,7 @@
 					<Semaphore>JTAG</Semaphore>
 				</Mode>
 
-				<Mode Name="Trace-Synchro(1bit)_SW" UserName="SWD and Synchronous Trace (1 bit)">
+				<Mode Name="Trace_Synchro_1bit_SW" UserName="Trace Synchro Sw (1 bit)">
 					<SignalLogicalOp Name="AND">
 						<Signal Name="JTMS-SWDIO" />
 						<Signal Name="JTCK-SWCLK" />
@@ -333,7 +333,7 @@
 					<Semaphore>SWD</Semaphore>
 				</Mode>
 
-				<Mode Name="Trace-Synchro(2bit)_SW" UserName="SWD and Synchronous Trace (2 bits)">
+				<Mode Name="Trace_Synchro_2bits_SW" UserName="Trace Synchro Sw (2 bits)">
 					<SignalLogicalOp Name="AND">
 						<Signal Name="JTMS-SWDIO" />
 						<Signal Name="JTCK-SWCLK" />
@@ -344,7 +344,7 @@
 					<Semaphore>SWD</Semaphore>
 				</Mode>
 
-				<Mode Name="Trace-Synchro(4bit)_SW" UserName="SWD and Synchronous Trace (4 bits)">
+				<Mode Name="Trace_Synchro_4bits_SW" UserName="Trace Synchro Sw (4 bits)">
 					<SignalLogicalOp Name="AND">
 						<Signal Name="JTMS-SWDIO" />
 						<Signal Name="JTCK-SWCLK" />
@@ -359,45 +359,45 @@
 			</ModeLogicOperator>
 		</Mode>
 
-		<Mode Name="SYS-WakeUp1" UserName="System Wake-Up 1">
+		<Mode Name="SYS_WakeUp0" UserName="System Wake-Up 1">
 			<ModeLogicOperator Name="OR">
-				<Mode Name="SYS-WakeUp1">
+				<Mode Name="SYS_WakeUp0">
 					<SignalLogicalOp Name="AND">
 						<Signal Name="WKUP1" />
 					</SignalLogicalOp>
 				</Mode>
 			</ModeLogicOperator>
 		</Mode>
-		<Mode Name="SYS-WakeUp2" UserName="System Wake-Up 2">
+		<Mode Name="SYS_WakeUp1" UserName="System Wake-Up 2">
 			<ModeLogicOperator Name="OR">
-				<Mode Name="SYS-WakeUp2">
+				<Mode Name="SYS_WakeUp1">
 					<SignalLogicalOp Name="AND">
 						<Signal Name="WKUP2" />
 					</SignalLogicalOp>
 				</Mode>
 			</ModeLogicOperator>
 		</Mode>
-		<Mode Name="SYS-WakeUp3" UserName="System Wake-Up 3">
+		<Mode Name="SYS_WakeUp2" UserName="System Wake-Up 3">
 			<ModeLogicOperator Name="OR">
-				<Mode Name="SYS-WakeUp3">
+				<Mode Name="SYS_WakeUp2">
 					<SignalLogicalOp Name="AND">
 						<Signal Name="WKUP3" />
 					</SignalLogicalOp>
 				</Mode>
 			</ModeLogicOperator>
 		</Mode>
-		<Mode Name="SYS-WakeUp4" UserName="System Wake-Up 4">
+		<Mode Name="SYS_WakeUp3" UserName="System Wake-Up 4">
 			<ModeLogicOperator Name="OR">
-				<Mode Name="SYS-WakeUp4">
+				<Mode Name="SYS_WakeUp3">
 					<SignalLogicalOp Name="AND">
 						<Signal Name="WKUP4" />
 					</SignalLogicalOp>
 				</Mode>
 			</ModeLogicOperator>
 		</Mode>
-		<Mode Name="SYS-WakeUp5" UserName="System Wake-Up 5">
+		<Mode Name="SYS_WakeUp4" UserName="System Wake-Up 5">
 			<ModeLogicOperator Name="OR">
-				<Mode Name="SYS-WakeUp5">
+				<Mode Name="SYS_WakeUp4">
 					<SignalLogicalOp Name="AND">
 						<Signal Name="WKUP5" />
 					</SignalLogicalOp>
@@ -406,7 +406,7 @@
 		</Mode>
 		<Mode Name="PowerVD" UserName="Power Voltage Detector In">
 			<ModeLogicOperator Name="XOR">
-				<Mode Name="PVD_ext"
+				<Mode Name="Mode_PVD_Ext"
 					UserName="Power Voltage Detector In (External input analog voltage)">
 					<SignalLogicalOp Name="AND">
 						<Signal Name="PVD_IN" />
@@ -415,7 +415,7 @@
 					<Semaphore>PVD_INTERRUPT</Semaphore>
 
 				</Mode>
-				<Mode Name="PVD_int"
+				<Mode Name="Mode_PVD_Int"
 					UserName="Power Voltage Detector In (Internal analog voltage)">
 					<SignalLogicalOp Name="AND">
 						<Signal Name="V_PVD_IN" />

@@ -4,9 +4,8 @@
   * @file    bsp_driver_sdram.c (based on stm32756g_eval_sdram.c)
   * @brief   This file includes a generic SDRAM driver.
   ******************************************************************************
-  * @attention
   *
-  * <h2><center>&copy; COPYRIGHT(c) 2015 STMicroelectronics</center></h2>
+  * COPYRIGHT(c) ${year} STMicroelectronics
   *
   * Redistribution and use in source and binary forms, with or without modification,
   * are permitted provided that the following conditions are met:
@@ -37,19 +36,15 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "bsp_driver_sdram.h"
-   
-/** @defgroup STM32F7XX_Private_Functions
-  * @{
-  */ 
-   
+  
 /**
   * @brief  Initializes the SDRAM device 
-  * @param  None
   * @retval SDRAM status
   */
 uint8_t BSP_SDRAM_Init(void)
-{ 
-  static uint8_t sdramstatus = SDRAM_ERROR;
+{
+  uint8_t sdramstatus = SDRAM_OK;
+  
   /* place for custom code */
   
   return sdramstatus;
@@ -58,20 +53,20 @@ uint8_t BSP_SDRAM_Init(void)
 /**
   * @brief  Reads an mount of data from the SDRAM memory in polling mode. 
   * @param  uwStartAddress: Read start address
-  * @param  pData: Pointer to data to be read  
+  * @param  pData: Pointer to data to be read
   * @param  uwDataSize: Size of read data from the memory
   * @retval SDRAM status
   */
 uint8_t BSP_SDRAM_ReadData(uint32_t uwStartAddress, uint32_t* pData, uint32_t uwDataSize)
 { 
+  uint8_t sdramstatus = SDRAM_OK;
+  
   if(HAL_SDRAM_Read_32b(&_HSDRAM, (uint32_t *)uwStartAddress, pData, uwDataSize) != HAL_OK)
   {
-    return SDRAM_ERROR;
+    sdramstatus = SDRAM_ERROR;
   }
-  else
-  {
-    return SDRAM_OK;
-  }
+
+  return sdramstatus;
 }
 
 /**
@@ -81,16 +76,16 @@ uint8_t BSP_SDRAM_ReadData(uint32_t uwStartAddress, uint32_t* pData, uint32_t uw
   * @param  uwDataSize: Size of read data from the memory
   * @retval SDRAM status
   */
-uint8_t BSP_SDRAM_ReadData_DMA(uint32_t uwStartAddress, uint32_t* pData, uint32_t uwDataSize)
+uint8_t BSP_SDRAM_ReadData_DMA(uint32_t uwStartAddress, uint32_t *pData, uint32_t uwDataSize)
 { 
+  uint8_t sdramstatus = SDRAM_OK;
+  
   if(HAL_SDRAM_Read_DMA(&_HSDRAM, (uint32_t *)uwStartAddress, pData, uwDataSize) != HAL_OK)
   {
-    return SDRAM_ERROR;
+    sdramstatus = SDRAM_ERROR;
   }
-  else
-  {
-    return SDRAM_OK;
-  }   
+   
+  return sdramstatus;
 }
 
 /**
@@ -100,16 +95,16 @@ uint8_t BSP_SDRAM_ReadData_DMA(uint32_t uwStartAddress, uint32_t* pData, uint32_
   * @param  uwDataSize: Size of written data from the memory
   * @retval SDRAM status
   */
-uint8_t BSP_SDRAM_WriteData(uint32_t uwStartAddress, uint32_t* pData, uint32_t uwDataSize) 
+uint8_t BSP_SDRAM_WriteData(uint32_t uwStartAddress, uint32_t *pData, uint32_t uwDataSize)
 { 
+  uint8_t sdramstatus = SDRAM_OK;
+  
   if(HAL_SDRAM_Write_32b(&_HSDRAM, (uint32_t *)uwStartAddress, pData, uwDataSize) != HAL_OK)
   {
-    return SDRAM_ERROR;
+    sdramstatus = SDRAM_ERROR;
   }
-  else
-  {
-    return SDRAM_OK;
-  }
+
+  return sdramstatus;
 }
 
 /**
@@ -119,43 +114,33 @@ uint8_t BSP_SDRAM_WriteData(uint32_t uwStartAddress, uint32_t* pData, uint32_t u
   * @param  uwDataSize: Size of written data from the memory
   * @retval SDRAM status
   */
-uint8_t BSP_SDRAM_WriteData_DMA(uint32_t uwStartAddress, uint32_t* pData, uint32_t uwDataSize) 
+uint8_t BSP_SDRAM_WriteData_DMA(uint32_t uwStartAddress, uint32_t *pData, uint32_t uwDataSize)
 { 
+  uint8_t sdramstatus = SDRAM_OK;
+  
   if(HAL_SDRAM_Write_DMA(&_HSDRAM, (uint32_t *)uwStartAddress, pData, uwDataSize) != HAL_OK)
   {
-    return SDRAM_ERROR;
+    sdramstatus = SDRAM_ERROR;
   }
-  else
-  {
-    return SDRAM_OK;
-  } 
+
+  return sdramstatus;
 }
 
 /**
   * @brief  Sends command to the SDRAM bank.
   * @param  SdramCmd: Pointer to SDRAM command structure 
-  * @retval HAL status
+  * @retval SDRAM status
   */  
 uint8_t BSP_SDRAM_Sendcmd(FMC_SDRAM_CommandTypeDef *SdramCmd)
 { 
+  uint8_t sdramstatus = SDRAM_OK;
+  
   if(HAL_SDRAM_SendCommand(&_HSDRAM, SdramCmd, SDRAM_TIMEOUT) != HAL_OK)
   {
-    return SDRAM_ERROR;
+    sdramstatus = SDRAM_ERROR;
   }
-  else
-  {
-    return SDRAM_OK;
-  }
-}
 
-/**
-  * @brief  Handles SDRAM DMA transfer interrupt request.
-  * @param  None
-  * @retval None
-  */
-void BSP_SDRAM_DMA_IRQHandler(void)
-{
-  HAL_DMA_IRQHandler(_HSDRAM.hdma); 
+  return sdramstatus;
 }
 
 /* USER CODE END 0 */

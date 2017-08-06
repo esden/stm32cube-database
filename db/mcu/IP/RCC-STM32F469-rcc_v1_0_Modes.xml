@@ -2,7 +2,9 @@
 <IP xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://mcd.rou.st.com/modules.php?name=mcu" DBVersion="V4.0" Name="RCC" Version="STM32F469-rcc_v1_0" IPType="peripheral" 	ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd">
     <About>RCC: Reset and Clock Control</About>
     <RefParameter Visible="false" Comment="Oscillator Type" DefaultValue="+OscillatorTypeHSI+|OscillatorTypeLSI+|OscillatorTypeHSE+|OscillatorTypeLSE" Name="OscillatorType" Type="list"/>
-    <!--Les multiplicateurs-->
+      <RefParameter Name="HSE_Timout"   Comment="HSE Startup Timout Value (ms)" Type="integer" DefaultValue="100" Min="1"  Max="4294967295" Group="RCC Parameters"/>
+	 <RefParameter Name="LSE_Timout"   Comment="LSE Startup Timout Value (ms)" Type="integer" DefaultValue="5000" Min="1" Max="4294967295"  Group="RCC Parameters"/>
+	 <!--Les multiplicateurs-->
     
     <!--PLL MUL-->
     <RefParameter Visible="false" Comment="PLLN" DefaultValue="192" Max="432" Min="50" Name="PLLN" Type="integer"/>
@@ -207,14 +209,14 @@
     </RefParameter>	
   	
     <!-- USB Clock Selection-->
-    <RefParameter Visible="false" Comment="USB Clock Selection" DefaultValue="RCC_CK48CLKSOURCE_PLLQ" Name="USBCLockSelection" Type="list" IP="USB,SDIO">
-        <PossibleValue Comment="USB PLLSAIP Devisor" Value="RCC_CK48CLKSOURCE_PLLSAIP" Semaphore="USBSourceisPLLSAIP"/>
-        <PossibleValue Comment="USB PLLQ Devisor"    Value="RCC_CK48CLKSOURCE_PLLQ"    Semaphore="USBSourceisPLLQ"/>
+    <RefParameter Visible="false" Comment="USB Clock Selection" DefaultValue="RCC_CLK48CLKSOURCE_PLLQ" Name="USBCLockSelection" Type="list" IP="USB,SDIO">
+        <PossibleValue Comment="USB PLLSAIP Devisor" Value="RCC_CLK48CLKSOURCE_PLLSAIP" Semaphore="USBSourceisPLLSAIP"/>
+        <PossibleValue Comment="USB PLLQ Devisor"    Value="RCC_CLK48CLKSOURCE_PLLQ"    Semaphore="USBSourceisPLLQ"/>
     </RefParameter>
 	
     <!-- SDIO Clock Selection-->
     <RefParameter Visible="false" Comment="SDIO CLock Selection" DefaultValue="RCC_SDIOCLKSOURCE_CK48" Name="SDIOCLockSelection" Type="list" IP="SDIO">
-        <PossibleValue Comment="SDIO clock48 source" Value="RCC_SDIOCLKSOURCE_CK48"   Semaphore="SDIOSourceIsClock48"/>
+        <PossibleValue Comment="SDIO clock48 source" Value="RCC_SDIOCLKSOURCE_CLK48"   Semaphore="SDIOSourceIsClock48"/>
         <PossibleValue Comment="SDIO sysclock"       Value="RCC_SDIOCLKSOURCE_SYSCLK" Semaphore="SDIOSourceIsSysclk"/>
     </RefParameter>
 	
@@ -752,7 +754,7 @@
         <PossibleValue Comment="HSE" Value="RCC_OSCILLATORTYPE_HSE"/>
     </RefParameter>
     <RefParameter Visible="false" Comment="HSE used flag" DefaultValue="1" Name="HSEUsed" Type="integer" Min="1" Max="1">
-        <Condition Expression="((HSEByPass|HSEOscillator)&amp;(SEM2RCC_HSE_REQUIRED_TIM11 &amp; TIM11 &amp; Semaphore_input_Channel1TIM11))|(RTCUsed_ForRCC&amp;!((RCC_RTC_Clock_Source=RCC_RTCCLKSOURCE_LSE)|(RCC_RTC_Clock_Source=RCC_RTCCLKSOURCE_LSI)))|((PLLSource=RCC_PLLSOURCE_HSE) &amp; (PLLUsed=1|SysSourceIsPLLclk|((SAIASourceIsPLLR|SAIASourceIsPLLI2S|SAIASourceIsPLLSAI)&amp;SAIAUsed_ForRCC)|((SAIBSourceIsPLLR|SAIBSourceIsPLLI2S|SAIBSourceIsEXT|SAIBSourceIsPLLSAI)&amp;SAIBUsed_ForRCC)|((I2SSourceIsPllR|I2SSourceIsPLLI2S|I2SSourceIsPllsrc)&amp;I2SUsed_ForRCC)))|(SYSCLKSource=RCC_SYSCLKSOURCE_HSE)|((RCC_MCO1Source=RCC_MCO1SOURCE_HSE)&amp;(MCO1Config))|(((RCC_MCO2Source=RCC_MCO2SOURCE_HSE)|(MCOSourceIsPLLI2S &amp;(PLLSource=RCC_PLLSOURCE_HSE)))&amp;(MCO2Config))" Diagnostic="SYSCLK source OR PLL source OR RTC source OR MCO1 source OR MCO2 source"/>
+        <Condition Expression="DSIUsed_ForRCC|((HSEByPass|HSEOscillator)&amp;(SEM2RCC_HSE_REQUIRED_TIM11 &amp; TIM11 &amp; Semaphore_input_Channel1TIM11))|(RTCUsed_ForRCC&amp;!((RCC_RTC_Clock_Source=RCC_RTCCLKSOURCE_LSE)|(RCC_RTC_Clock_Source=RCC_RTCCLKSOURCE_LSI)))|((PLLSource=RCC_PLLSOURCE_HSE) &amp; (PLLUsed=1|SysSourceIsPLLclk|((SAIASourceIsPLLR|SAIASourceIsPLLI2S|SAIASourceIsPLLSAI)&amp;SAIAUsed_ForRCC)|((SAIBSourceIsPLLR|SAIBSourceIsPLLI2S|SAIBSourceIsEXT|SAIBSourceIsPLLSAI)&amp;SAIBUsed_ForRCC)|((I2SSourceIsPllR|I2SSourceIsPLLI2S|I2SSourceIsPllsrc)&amp;I2SUsed_ForRCC)))|(SYSCLKSource=RCC_SYSCLKSOURCE_HSE)|((RCC_MCO1Source=RCC_MCO1SOURCE_HSE)&amp;(MCO1Config))|(((RCC_MCO2Source=RCC_MCO2SOURCE_HSE)|(MCOSourceIsPLLI2S &amp;(PLLSource=RCC_PLLSOURCE_HSE)))&amp;(MCO2Config))" Diagnostic="SYSCLK source OR PLL source OR RTC source OR MCO1 source OR MCO2 source"/>
     </RefParameter>
     <RefParameter Visible="false" Comment="HSE Is Used" DefaultValue="0" Name="HSEUsed" Min="0" Type="integer"/>
     <RefParameter Visible="false" Comment="Hse State" DefaultValue="RCC_HSE_BYPASS" Name="HSEState" Type="list">
@@ -912,9 +914,9 @@
     </RefParameter>
     <RefParameter Visible="false" Name="RCC_PERIPHCLK_TIMVar" Comment="RCC_PERIPHCLK_TIMVar" Type="list" DefaultValue=""/>
 	
-    <RefParameter Visible="false" Name="RCC_PERIPHCLK_CK48Var" Comment="RCC_PERIPHCLK_CK48Var" Type="list" DefaultValue="RCC_PERIPHCLK_CK48">
+    <RefParameter Visible="false" Name="RCC_PERIPHCLK_CK48Var" Comment="RCC_PERIPHCLK_CK48Var" Type="list" DefaultValue="RCC_PERIPHCLK_CLK48">
         <Condition Expression="USB_OTG_HSEmbeddedPHYUsed_ForRCC|USB_OTG_FSUsed_ForRCC|(SDIOUsed_ForRCC &amp; SDIOSourceIsClock48)" Diagnostic="Timer Prescaler Activated"/>
-        <PossibleValue Value="RCC_PERIPHCLK_CK48" Comment="RCC_PERIPHCLK_CK48"/>
+        <PossibleValue Value="RCC_PERIPHCLK_CLK48" Comment="RCC_PERIPHCLK_CLK48"/>
     </RefParameter>
     <RefParameter Visible="false" Name="RCC_PERIPHCLK_CK48Var" Comment="RCC_PERIPHCLK_CK48Var" Type="list" DefaultValue=""/>
 	
@@ -1487,6 +1489,8 @@
         <Parameter Name="RCC_TIM_PRescaler_Selection"/>
         <Parameter Name="PWR_Regulator_Voltage_Scale"/>
         <Parameter Name="PWREXT_OverDrive"/>
+		<Parameter Name="HSE_Timout"/>
+        <Parameter Name="LSE_Timout"/>
     </RefMode>
     <ModeLogicOperator Name="OR">
         <!-- Modes for Oscillators & Clocks -->

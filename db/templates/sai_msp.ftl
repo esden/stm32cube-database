@@ -370,7 +370,7 @@
 [#list ipvar.initCallBacks.entrySet() as entry]
 [#assign instanceList = entry.value]
 [#list instanceList as saiInst]
-int ${saiInst}_client =0;
+static uint32_t ${saiInst}_client =0;
 [/#list]
 [#assign mode=entry.key?replace("_MspInit","")?replace("_BspInit","")?replace("HAL_","")]
 

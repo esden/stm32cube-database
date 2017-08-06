@@ -100,15 +100,6 @@
 /** @defgroup USBD_AUDIO_IF_Private_Variables
   * @{
   */
-/* USB handler declaration */
-/* Handle for USB Full Speed IP */
-[#if handleNameFS == "FS" || handleNameUSB_FS == "FS"]
-#tUSBD_HandleTypeDef  *hUsbDevice_0;
-[/#if]
-[#if handleNameHS == "HS"]
-/* Handle for USB High Speed IP */
-#tUSBD_HandleTypeDef  *hUsbDevice_1;
-[/#if]
 /* USER CODE BEGIN PRIVATE_VARIABLES */
 /* USER CODE END PRIVATE_VARIABLES */
 
@@ -198,8 +189,7 @@ USBD_AUDIO_ItfTypeDef USBD_AUDIO_fops_HS =
   * @retval Result of the operation: USBD_OK if all operations are OK else USBD_FAIL
   */
 static int8_t AUDIO_Init_FS(uint32_t  AudioFreq, uint32_t Volume, uint32_t options)
-{
-  hUsbDevice_0 = &hUsbDeviceFS;
+{ 
   /* USER CODE BEGIN 0 */
   return (USBD_OK);
   /* USER CODE END 0 */
@@ -302,7 +292,7 @@ static int8_t AUDIO_GetState_FS (void)
 void TransferComplete_CallBack_FS(void)
 {
   /* USER CODE BEGIN 7 */ 
-  USBD_AUDIO_Sync(hUsbDevice_0, AUDIO_OFFSET_FULL);
+  USBD_AUDIO_Sync(&hUsbDeviceFS, AUDIO_OFFSET_FULL);
   /* USER CODE END 7 */
 }
 
@@ -314,7 +304,7 @@ void TransferComplete_CallBack_FS(void)
 void HalfTransfer_CallBack_FS(void)
 { 
   /* USER CODE BEGIN 8 */ 
-  USBD_AUDIO_Sync(hUsbDevice_0, AUDIO_OFFSET_HALF);
+  USBD_AUDIO_Sync(&hUsbDeviceFS, AUDIO_OFFSET_HALF);
   /* USER CODE END 8 */
 }
 [/#if]
@@ -328,8 +318,7 @@ void HalfTransfer_CallBack_FS(void)
   * @retval Result of the operation: USBD_OK if all operations are OK else USBD_FAIL
   */
 static int8_t AUDIO_Init_HS(uint32_t  AudioFreq, uint32_t Volume, uint32_t options)
-{
-  hUsbDevice_1 = &hUsbDeviceHS;
+{  
   /* USER CODE BEGIN 9 */ 
   return (USBD_OK);
   /* USER CODE END 9 */
@@ -431,7 +420,7 @@ static int8_t AUDIO_GetState_HS (void)
 void TransferComplete_CallBack_HS(void)
 {
   /* USER CODE BEGIN 16 */ 
-  USBD_AUDIO_Sync(hUsbDevice_1, AUDIO_OFFSET_FULL);
+  USBD_AUDIO_Sync(&hUsbDeviceHS, AUDIO_OFFSET_FULL);
   /* USER CODE END 16 */
 }
 
@@ -443,7 +432,7 @@ void TransferComplete_CallBack_HS(void)
 void HalfTransfer_CallBack_HS(void)
 { 
   /* USER CODE BEGIN 17 */ 
-  USBD_AUDIO_Sync(hUsbDevice_1, AUDIO_OFFSET_HALF);
+  USBD_AUDIO_Sync(&hUsbDeviceHS, AUDIO_OFFSET_HALF);
   /* USER CODE END 17 */
 }
 [/#if]

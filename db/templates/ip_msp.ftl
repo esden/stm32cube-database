@@ -275,9 +275,28 @@
                     [/#if]
                     [#if args == "" && arg!=""][#assign args = args + arg ][#else][#if arg!=""][#assign args = args + ', ' + arg][/#if][/#if]
                     [/#list]
-                    [#if nTab==3 ]#t[/#if][#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n
+                    [#--[#if nTab==3 ]#t[/#if][#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n--]
+                            [#if method.returnHAL=="false"]
+                                [#if nTab==3 ]#t[/#if][#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});
+                            [#else]
+                                [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
+                                [#if nTab==3 ]#t[/#if][#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}(${args}) != [#if method.returnHAL == "true"]HAL_OK[#else]${method.returnHAL}[/#if])
+                                [#if nTab==3 ]#t[/#if][#if nTab==2]#t#t[#else]#t[/#if]{
+                                [#if nTab==3 ]#t[/#if][#if nTab==2]#t#t[#else]#t[/#if]#tError_Handler();
+                                [#if nTab==3 ]#t[/#if][#if nTab==2]#t#t[#else]#t[/#if]}
+                            [/#if]#n                                    
 		[#else]
-                    [#if nTab==3 ]#t[/#if][#if nTab==2]#t#t[#else]#t[/#if]${method.name}();#n
+                    [#--[#if nTab==3 ]#t[/#if][#if nTab==2]#t#t[#else]#t[/#if]${method.name}();#n--]
+                            [#if method.returnHAL=="false"]
+                                [#if nTab==3 ]#t[/#if][#if nTab==2]#t#t[#else]#t[/#if]${method.name}();
+                            [#else]
+                                [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
+                                [#if nTab==3 ]#t[/#if][#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}() != [#if method.returnHAL == "true"]HAL_OK[#else]${method.returnHAL}[/#if])
+                                [#if nTab==3 ]#t[/#if][#if nTab==2]#t#t[#else]#t[/#if]{
+                                [#if nTab==3 ]#t[/#if][#if nTab==2]#t#t[#else]#t[/#if]#tError_Handler();
+                                [#if nTab==3 ]#t[/#if][#if nTab==2]#t#t[#else]#t[/#if]}
+                            [/#if]#n
+
                 [/#if]			
 		[/#if]
 		[#if method.status=="KO"]
@@ -337,7 +356,16 @@
                                 [/#list]
                                 [#if nTab==2]#t#t[#else]#t[/#if]#t//${method.name}(${args});
                         [#else] [#-- if method without argument --]
-                               [#if nTab==2]#t#t[#else]#t[/#if]${method.name}()#n;
+                               [#--[#if nTab==2]#t#t[#else]#t[/#if]${method.name}()#n;--]
+                            [#if method.returnHAL=="false"]
+                                [#if nTab==3 ]#t[/#if][#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});
+                            [#else]
+                                [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
+                                [#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}(${args}) != [#if method.returnHAL == "true"]HAL_OK[#else]${method.returnHAL}[/#if])
+                                [#if nTab==2]#t#t[#else]#t[/#if]{
+                                [#if nTab==2]#t#t[#else]#t[/#if]#tError_Handler();
+                                [#if nTab==2]#t#t[#else]#t[/#if]}
+                            [/#if]#n                                
                         [/#if]
                 [/#if]
         [/#list]
@@ -657,15 +685,15 @@
 [#if (instanceList?size==1 && (name==instanceList.get(0)||name=="USB")) || instanceList?size>1]
 [#assign mode=entry.key?replace("_MspInit","")?replace("MspInit","")?replace("_BspInit","")?replace("HAL_","")]
 
-[#assign ipHandler = "h" + mode?lower_case]
+[#assign ipHandler = mode?lower_case+ "Handle"]
 
 
 [#-- #nvoid HAL_${mode}_MspInit(${mode}_HandleTypeDef* h${mode?lower_case}){--] 
 [#if name !="TIM"]
-#nvoid ${entry.key}(${mode}_HandleTypeDef* h${mode?lower_case})
+#nvoid ${entry.key}(${mode}_HandleTypeDef* ${mode?lower_case}Handle)
 {
 [#else]
-#nvoid ${entry.key}(${name}_HandleTypeDef* h${mode?lower_case})
+#nvoid ${entry.key}(${name}_HandleTypeDef* ${mode?lower_case}Handle)
 {
 [/#if]
 [#--Check if the Msp init will be empty start--] 
@@ -724,7 +752,7 @@
 [/#list]
 [#-- --]
 [#if mspIsEmpty=="no"]
- #tif(h${mode?lower_case}->Instance==${words[0]?replace("I2S","SPI")})
+ #tif(${mode?lower_case}Handle->Instance==${words[0]?replace("I2S","SPI")})
 #t{
 [#if words?size > 1] [#-- Check if there is more than one ip instance--]        
 #t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspInit 0 */
@@ -738,7 +766,7 @@
     [#assign i = 0]
     [#list words as inst]
     [#if i>0]    
-    #telse if(h${mode?lower_case}->Instance==${words[i]?replace("I2S","SPI")}) [#-- if I2S instance should be SPI--]
+    #telse if(${mode?lower_case}Handle->Instance==${words[i]?replace("I2S","SPI")}) [#-- if I2S instance should be SPI--]
     #t{
 #t/* USER CODE BEGIN ${words[i]?replace("I2S","SPI")}_MspInit 0 */
 
@@ -780,7 +808,7 @@
 [#assign instanceList = entry.value]
 [#assign mode=entry.key?replace("_MspInit","")?replace("MspInit","")?replace("_BspInit","")?replace("HAL_","")]
 
-[#assign ipHandler = "h" + mode?lower_case]
+[#assign ipHandler = mode?lower_case+ "Handle"]
 [#--Check if the Msp init will be empty start--] 
     [#assign mspIsEmpty1="yes"] 
     [#list instanceList as inst]
@@ -794,17 +822,17 @@
     [/#list]
 [#-- Check if the Msp init will be empty end -- ]
 [#if  mode?contains("DFSDM") && DFSDM_var == "false"]
-int DFSDM_Init = 0;
+uint32_t DFSDM_Init = 0;
 [#assign DFSDM_var = "true"]
 [/#if]
 [#-- #nvoid HAL_${mode}_MspInit(${mode}_HandleTypeDef* h${mode?lower_case}){--] 
 [#if (mspIsEmpty1=="no")&&(!mode?contains("TIM")||mode?contains("LPTIM")||mode?contains("HRTIM"))]
-#nvoid ${entry.key?replace("MspInit","MspPostInit")}(${mode}_HandleTypeDef* h${mode?lower_case})
+#nvoid ${entry.key?replace("MspInit","MspPostInit")}(${mode}_HandleTypeDef* ${mode?lower_case}Handle)
 {
 #n
 [#else]
 [#if (mspIsEmpty1=="no")]
-#nvoid ${entry.key?replace("MspInit","MspPostInit")}(TIM_HandleTypeDef* h${mode?lower_case})
+#nvoid ${entry.key?replace("MspInit","MspPostInit")}(TIM_HandleTypeDef* ${mode?lower_case}Handle)
 {
 #n
 [/#if]
@@ -833,7 +861,7 @@ int DFSDM_Init = 0;
 [#if  words[0] == "DFSDM"]
 #tif(DFSDM_Init == 0)
 [#else]
- #tif(h${mode?lower_case}->Instance==${words[0]?replace("I2S","SPI")})
+ #tif(${mode?lower_case}Handle->Instance==${words[0]?replace("I2S","SPI")})
 [/#if]
 #t{
 [#if words?size > 1] [#-- Check if there is more than one ip instance--]    
@@ -848,7 +876,7 @@ int DFSDM_Init = 0;
     [#assign i = 0]
     [#list words as inst]
     [#if i>0]    
-    #telse if(h${mode?lower_case}->Instance==${words[i]?replace("I2S","SPI")})
+    #telse if(${mode?lower_case}Handle->Instance==${words[i]?replace("I2S","SPI")})
     #t{
 #t/* USER CODE BEGIN ${words[i]?replace("I2S","SPI")}_MspInit 0 */
 
@@ -891,12 +919,12 @@ int DFSDM_Init = 0;
 [#assign instanceList = entry.value]
 [#if (instanceList?size==1 && (name==instanceList.get(0)||name=="USB"))  || instanceList?size>1]
 [#assign mode=entry.key?replace("_MspDeInit","")?replace("MspDeInit","")?replace("_BspDeInit","")?replace("HAL_","")]
-[#assign ipHandler = "h" + mode?lower_case]
+[#assign ipHandler = mode?lower_case+ "Handle"]
 [#if name !="TIM"]
-#nvoid ${entry.key}(${mode}_HandleTypeDef* h${mode?lower_case})
+#nvoid ${entry.key}(${mode}_HandleTypeDef* ${mode?lower_case}Handle)
 {
 [#else]
-#nvoid ${entry.key}(${name}_HandleTypeDef* h${mode?lower_case})
+#nvoid ${entry.key}(${name}_HandleTypeDef* ${mode?lower_case}Handle)
 {
 [/#if]
 [#-- Search for static variables Start--]
@@ -904,7 +932,7 @@ int DFSDM_Init = 0;
 [#-- Search for static variables End--]
 [#assign words = instanceList]
 [#if mspIsEmpty=="no"]
-#tif(h${mode?lower_case}->Instance==${words[0]?replace("I2S","SPI")})
+#tif(${mode?lower_case}Handle->Instance==${words[0]?replace("I2S","SPI")})
 #t{
 [#if words?size > 1] [#-- Check if there is more than one ip instance--]
  [#assign deInitService = getDeInitServiceMode(words[0])]    
@@ -919,7 +947,7 @@ int DFSDM_Init = 0;
   [#assign i = 0]
     [#list words as inst]
         [#if i>0]
-#telse if(h${mode?lower_case}->Instance==${words[i]?replace("I2S","SPI")})
+#telse if(${mode?lower_case}Handle->Instance==${words[i]?replace("I2S","SPI")})
 #t{
 #t/* USER CODE BEGIN ${words[i]?replace("I2S","SPI")}_MspDeInit 0 */
 

@@ -13,8 +13,11 @@
 	<RefParameter Comment="Device endpoints number" DefaultValue="null" Name="dev_endpoints" Type="List" Group="" Visible="true">	
 		<Condition Expression="VirtualMode = Host_Only" Diagnostic=""/>		
 	</RefParameter>	
-	<RefParameter Comment="Device endpoints number" DefaultValue="7" Name="dev_endpoints" Min="1" Max="7" Type="integer" Group="" Visible="false">	
-		<!--<PossibleValue Comment="7" Value="7"/>-->
+	<!-- Bug356587 -->
+	<RefParameter Comment="Device endpoints number" DefaultValue="4" Name="dev_endpoints" Min="1" Max="4" Type="integer" Group="" Visible="false">
+		<Condition Expression="DIE418" Diagnostic=""/>		
+	</RefParameter>	
+	<RefParameter Comment="Device endpoints number" DefaultValue="7" Name="dev_endpoints" Min="1" Max="7" Type="integer" Group="" Visible="false">				
 	</RefParameter>	
 	
 	<RefParameter Comment="Host Channels" DefaultValue="8" Name="Host_channels"  Min="1" Max="8" Type="integer" Group=""  Visible="false">	
@@ -89,6 +92,11 @@
 	<RefParameter Comment="Signal start of frame " DefaultValue="DISABLE" Name="Sof_enable" Type="List" Group="">
 		<PossibleValue Value="ENABLE" Comment="Enabled"/>
 		<PossibleValue Value="DISABLE" Comment="Disabled"/>		
+	</RefParameter>
+	<!-- Bug356385 -->
+	<RefParameter Comment="Signal start of frame " DefaultValue="ENABLE" Name="Sof_enable" Type="List" Group="">
+		<PossibleValue Value="ENABLE" Comment="Enabled"/>
+		<Condition Expression="USB_FS_SOF" Diagnostic=""/>		
 	</RefParameter>
 	
 	<RefParameter Comment="Low power" DefaultValue="null" Name="low_power_enable" Type="List" Group="" Visible="false">
@@ -263,6 +271,8 @@
 				</Mode>			
 			</ModeLogicOperator>
 			<Semaphore>USB_FS_HS</Semaphore>
+			<!-- Bug356385 -->
+			<Semaphore>USB_FS_SOF</Semaphore>
 			<!-- Tracker 233898 -->
 			<Condition Expression="MW_USB_OTG_FS_MW_DEVICE | MW_USB_OTG_FS_MW_HOST | OTG_DUAL_ROLE_DEVICE" Diagnostic="USB Mode must be selected first"/>			
 		</Mode>

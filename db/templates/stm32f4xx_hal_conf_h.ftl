@@ -57,7 +57,7 @@
 	[#if isModuleUsed(module)]
 [#compress]#define HAL_${module?replace("QUADSPI","QSPI")}_MODULE_ENABLED[/#compress]
 	[#else]
-//#define HAL_${module?replace("QUADSPI","QSPI")}_MODULE_ENABLED   
+/* #define HAL_${module?replace("QUADSPI","QSPI")}_MODULE_ENABLED   */
 	[/#if]	
   [/#list]
   [#function isModuleUsed moduleName]
@@ -88,7 +88,7 @@
 #endif /* HSE_VALUE */
 
 #if !defined  (HSE_STARTUP_TIMEOUT)
-  #define HSE_STARTUP_TIMEOUT    ((uint32_t)100U)   /*!< Time out for HSE start up, in ms */
+  #define HSE_STARTUP_TIMEOUT    ((uint32_t)[#if HSE_Timout??]${HSE_Timout}[#else]5000[/#if]U)   /*!< Time out for HSE start up, in ms */
 #endif /* HSE_STARTUP_TIMEOUT */
 
 /**
@@ -116,7 +116,7 @@
 #endif /* LSE_VALUE */
 
 #if !defined  (LSE_STARTUP_TIMEOUT)
-  #define LSE_STARTUP_TIMEOUT    ((uint32_t)5000U)   /*!< Time out for LSE start up, in ms */
+  #define LSE_STARTUP_TIMEOUT    ((uint32_t)[#if LSE_Timout??]${LSE_Timout}[#else]5000[/#if]U)   /*!< Time out for LSE start up, in ms */
 #endif /* LSE_STARTUP_TIMEOUT */
 
 /**
@@ -170,8 +170,8 @@
 
 /* Section 2: PHY configuration section */
 
-/* DP83848 PHY Address*/ 
-#define DP83848_PHY_ADDRESS             0x01U
+/* [#if PHY_Name??]${PHY_Name}[#else]DP83848_PHY_ADDRESS[/#if] Address*/ 
+#define [#if PHY_Name??]${PHY_Name}[#else]DP83848_PHY_ADDRESS[/#if]           [#if PHY_Value??]0x${PHY_Value}U[#else]0x01U[/#if]
 /* PHY Reset delay these values are based on a 1 ms Systick interrupt*/ 
 #define PHY_RESET_DELAY                 ((uint32_t)[#if PHY_RESET_DELAY??]${PHY_RESET_DELAY}[#else]0x000000FF[/#if]U)
 /* PHY Configuration delay */
@@ -211,7 +211,7 @@
 #define PHY_DUPLEX_STATUS               ((uint16_t)[#if PHY_DUPLEX_STATUS??]${PHY_DUPLEX_STATUS}[#else]0x0004[/#if]U)  /*!< PHY Duplex mask                                 */
 
 #define PHY_MICR_INT_EN                 ((uint16_t)[#if PHY_MICR_INT_EN??]${PHY_MICR_INT_EN}[#else]0x0002[/#if]U)  /*!< PHY Enable interrupts                           */
-#define PHY_MICR_INT_OE                 ((uint16_t)[#if PHY_MICR_INT_EN??]${PHY_MICR_INT_EN}[#else]0x0001[/#if]U)  /*!< PHY Enable output interrupt events              */
+#define PHY_MICR_INT_OE                 ((uint16_t)[#if PHY_MICR_INT_OE??]${PHY_MICR_INT_OE}[#else]0x0001[/#if]U)  /*!< PHY Enable output interrupt events              */
 
 #define PHY_MISR_LINK_INT_EN            ((uint16_t)[#if PHY_MISR_LINK_INT_EN??]${PHY_MISR_LINK_INT_EN}[#else]0x0020[/#if]U)  /*!< Enable Interrupt on change of link status       */
 #define PHY_LINK_INTERRUPT              ((uint16_t)[#if PHY_LINK_INTERRUPT??]${PHY_LINK_INTERRUPT}[#else]0x2000[/#if]U)  /*!< PHY link status interrupt mask                  */
@@ -397,6 +397,10 @@
 #ifdef HAL_SPDIFRX_MODULE_ENABLED
  #include "stm32f4xx_hal_spdifrx.h"
 #endif /* HAL_SPDIFRX_MODULE_ENABLED */
+
+#ifdef HAL_DFSDM_MODULE_ENABLED
+ #include "stm32f4xx_hal_dfsdm.h"
+#endif /* HAL_DFSDM_MODULE_ENABLED */
 
 #ifdef HAL_LPTIM_MODULE_ENABLED
  #include "stm32f4xx_hal_lptim.h"

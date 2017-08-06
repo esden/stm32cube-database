@@ -292,10 +292,28 @@
 		    [#if retval??&& retval!=""]
 			[#if nTab==2]#t#t[#else]#t[/#if]${retval} = ${method.name}(${args});
 		    [#else]
-			[#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n
+			[#--[#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n--]
+                            [#if method.returnHAL=="false"]
+                                [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});
+                            [#else]
+                                [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
+                                [#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}(${args}) != [#if method.returnHAL == "true"]HAL_OK[#else]${method.returnHAL}[/#if])
+                                [#if nTab==2]#t#t[#else]#t[/#if]{
+                                [#if nTab==2]#t#t[#else]#t[/#if]#tError_Handler();
+                                [#if nTab==2]#t#t[#else]#t[/#if]}
+                            [/#if]#n
 		    [/#if]
 		[#else]
-                    [#if nTab==2]#t#t[#else]#t[/#if]${method.name}();#n
+                    [#--[#if nTab==2]#t#t[#else]#t[/#if]${method.name}();#n""--]
+                            [#if method.returnHAL=="false"]
+                                [#if nTab==2]#t#t[#else]#t[/#if]${method.name}();
+                            [#else]
+                                [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
+                                [#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}() != [#if method.returnHAL == "true"]HAL_OK[#else]${method.returnHAL}[/#if])
+                                [#if nTab==2]#t#t[#else]#t[/#if]{
+                                [#if nTab==2]#t#t[#else]#t[/#if]#tError_Handler();
+                                [#if nTab==2]#t#t[#else]#t[/#if]}
+                            [/#if]#n
                 [/#if]			
 		[/#if]
 		[#if method.status=="KO"]
@@ -351,7 +369,16 @@
                                 [/#list]
                                 [#if nTab==2]#t#t[#else]#t[/#if]#t//${method.name}(${args});
                         [#else] [#-- if method without argument --]
-                               [#if nTab==2]#t#t[#else]#t[/#if]${method.name}()#n;
+                               [#--[#if nTab==2]#t#t[#else]#t[/#if]${method.name}()#n;--]
+                            [#if method.returnHAL=="false"]
+                                [#if nTab==2]#t#t[#else]#t[/#if]${method.name}();
+                            [#else]
+                                [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
+                                [#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}() != [#if method.returnHAL == "true"]HAL_OK[#else]${method.returnHAL}[/#if])
+                                [#if nTab==2]#t#t[#else]#t[/#if]{
+                                [#if nTab==2]#t#t[#else]#t[/#if]#tError_Handler();
+                                [#if nTab==2]#t#t[#else]#t[/#if]}
+                            [/#if]#n                                
                         [/#if]
                 [/#if]
         [/#list]

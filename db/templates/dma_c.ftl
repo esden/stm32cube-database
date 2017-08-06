@@ -132,9 +132,28 @@ void MX_DMA_Init(void)
               [#assign args = args + ', ' + arg]
             [/#if]
           [/#list]
+        [#if method.returnHAL=="false"]
+[#--${method.name}(${args});--]
   ${method.name}(${args});
         [#else]
+    [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
+  if (${method.name}(${args}) != HAL_OK)
+  {
+    Error_Handler();
+  }
+        [/#if]#n  
+        [#else]
+  [#--${method.name}();--]
+[#if method.returnHAL=="false"]
+[#--${method.name}(${args});--]
   ${method.name}();
+        [#else]
+    [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
+  if (${method.name}() != HAL_OK)
+  {
+    Error_Handler();
+  }
+        [/#if]#n          
         [/#if][#--if method.arguments??--]
   	[/#if][#--if method.status=="OK"--]
   	[#if method.status=="KO"]

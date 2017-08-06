@@ -56,7 +56,7 @@
 	[#if isModuleUsed(module)]
 [#compress]#define HAL_${module}_MODULE_ENABLED[/#compress]
 	[#else]
-//#define HAL_${module}_MODULE_ENABLED   
+/*#define HAL_${module}_MODULE_ENABLED   */
 	[/#if]	
   [/#list]
   [#function isModuleUsed moduleName]
@@ -88,7 +88,7 @@
 #endif /* HSE_VALUE */
 
 #if !defined  (HSE_STARTUP_TIMEOUT)
-  #define HSE_STARTUP_TIMEOUT    ((uint32_t)100)   /*!< Time out for HSE start up, in ms */
+  #define HSE_STARTUP_TIMEOUT    ((uint32_t)[#if HSE_Timout??]${HSE_Timout}[#else]5000[/#if])   /*!< Time out for HSE start up, in ms */
 #endif /* HSE_STARTUP_TIMEOUT */
 
 /**
@@ -110,8 +110,8 @@
 
    
 #if !defined  (LSE_STARTUP_TIMEOUT)
-  #define LSE_STARTUP_TIMEOUT    ((uint32_t)5000)   /*!< Time out for LSE start up, in ms */
-#endif /* HSE_STARTUP_TIMEOUT */
+  #define LSE_STARTUP_TIMEOUT    ((uint32_t)[#if LSE_Timout??]${LSE_Timout}[#else]5000[/#if])   /*!< Time out for LSE start up, in ms */
+#endif /* LSE_STARTUP_TIMEOUT */
 
    
 /* Tip: To avoid modifying this file each time you need to use different HSE,
@@ -154,8 +154,8 @@
 
 /* Section 2: PHY configuration section */
 
-/* DP83848 PHY Address*/ 
-#define DP83848_PHY_ADDRESS             0x01
+/* [#if PHY_Name??]${PHY_Name}[#else]DP83848_PHY_ADDRESS[/#if] Address*/ 
+#define [#if PHY_Name??]${PHY_Name}[#else]DP83848_PHY_ADDRESS[/#if]           [#if PHY_Value??]0x${PHY_Value}U[#else]0x01U[/#if]
 /* PHY Reset delay these values are based on a 1 ms Systick interrupt*/ 
 #define PHY_RESET_DELAY                 ((uint32_t)[#if PHY_RESET_DELAY??]${PHY_RESET_DELAY}[#else]0x000000FF[/#if])
 /* PHY Configuration delay */
@@ -195,7 +195,7 @@
 #define PHY_DUPLEX_STATUS               ((uint16_t)[#if PHY_DUPLEX_STATUS??]${PHY_DUPLEX_STATUS}[#else]0x0004[/#if])  /*!< PHY Duplex mask                                 */
 
 #define PHY_MICR_INT_EN                 ((uint16_t)[#if PHY_MICR_INT_EN??]${PHY_MICR_INT_EN}[#else]0x0002[/#if])  /*!< PHY Enable interrupts                           */
-#define PHY_MICR_INT_OE                 ((uint16_t)[#if PHY_MICR_INT_EN??]${PHY_MICR_INT_EN}[#else]0x0001[/#if])  /*!< PHY Enable output interrupt events              */
+#define PHY_MICR_INT_OE                 ((uint16_t)[#if PHY_MICR_INT_OE??]${PHY_MICR_INT_OE}[#else]0x0001[/#if])  /*!< PHY Enable output interrupt events              */
 
 #define PHY_MISR_LINK_INT_EN            ((uint16_t)[#if PHY_MISR_LINK_INT_EN??]${PHY_MISR_LINK_INT_EN}[#else]0x0020[/#if])  /*!< Enable Interrupt on change of link status       */
 #define PHY_LINK_INTERRUPT              ((uint16_t)[#if PHY_LINK_INTERRUPT??]${PHY_LINK_INTERRUPT}[#else]0x2000[/#if])  /*!< PHY link status interrupt mask                  */

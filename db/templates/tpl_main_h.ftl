@@ -31,7 +31,10 @@
   *
   ******************************************************************************
   */
-/* Includes ------------------------------------------------------------------*/
+/* Define to prevent recursive inclusion -------------------------------------*/
+#ifndef __MXCONSTANT_H
+#define __MXCONSTANT_H
+  /* Includes ------------------------------------------------------------------*/
 
 #n
 /* USER CODE BEGIN Includes */
@@ -64,4 +67,5 @@
 #t* @}
 */ 
 #n
+#endif /* __MXCONSTANT_H */
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

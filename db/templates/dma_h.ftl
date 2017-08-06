@@ -49,6 +49,7 @@
 [#list variables as variable]
 extern ${variable.value} ${variable.name};
 [/#list]
+extern void Error_Handler(void);
 #n
 /* USER CODE BEGIN Includes */
 

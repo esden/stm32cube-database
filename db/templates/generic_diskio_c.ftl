@@ -60,14 +60,14 @@ static volatile DSTATUS Stat = STA_NOINIT;
 
 /* Private function prototypes -----------------------------------------------*/
 [#if NEW_DISKIO_API=="2"]         [#-- Aligned with R0.11 --]  
-DSTATUS USER_initialize (BYTE);
-DSTATUS USER_status (BYTE);
-DRESULT USER_read (BYTE, BYTE*, DWORD, UINT);
+DSTATUS USER_initialize (BYTE pdrv);
+DSTATUS USER_status (BYTE pdrv);
+DRESULT USER_read (BYTE pdrv, BYTE *buff, DWORD sector, UINT count);
 #if _USE_WRITE == 1
-  DRESULT USER_write (BYTE, const BYTE*, DWORD, UINT);  
+  DRESULT USER_write (BYTE pdrv, const BYTE *buff, DWORD sector, UINT count);  
 #endif /* _USE_WRITE == 1 */
 #if _USE_IOCTL == 1
-  DRESULT USER_ioctl (BYTE, BYTE, void*);  
+  DRESULT USER_ioctl (BYTE pdrv, BYTE cmd, void *buff);
 #endif /* _USE_IOCTL == 1 */
 [/#if]
 
@@ -131,8 +131,7 @@ DSTATUS USER_initialize(void)
   Stat = STA_NOINIT;
   
   /* USER CODE HERE */
-  
-  Stat &= ~STA_NOINIT;
+
   return Stat;
 }
 
@@ -157,7 +156,7 @@ DSTATUS USER_status(void)
 {
   Stat = STA_NOINIT;
   
-  Stat &= ~STA_NOINIT;
+  /* USER CODE HERE */
 
   return Stat;
 }

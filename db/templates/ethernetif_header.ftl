@@ -34,6 +34,7 @@
 [#-- SWIPdatas is a list of SWIPconfigModel --]
 [#list SWIPdatas as SWIP]
 [#assign use_rtos = 0]
+[#assign netif_callback = 0]
 [#if SWIP.defines??]
 	[#list SWIP.defines as definition]	 	
 		[#if (definition.name == "NO_SYS")]
@@ -41,9 +42,15 @@
 				[#assign use_rtos = 1]
 			[/#if]
 		[/#if]
+		[#if (definition.name == "LWIP_NETIF_LINK_CALLBACK")]
+            [#if definition.value == "1"]
+                [#assign netif_callback = 1]
+            [/#if]
+        [/#if]
 	[/#list]
 [/#if]
 [/#list]
+
 
 #ifndef __ETHERNETIF_H__
 #define __ETHERNETIF_H__
@@ -53,13 +60,15 @@
 [#if use_rtos == 1]
 #include "cmsis_os.h"
 
+[#if (netif_callback == 1)]
 /* Exported types ------------------------------------------------------------*/
 /* Structure that include link thread parameters */
 struct link_str {
   struct netif *netif;
   osSemaphoreId semaphore;
 };
-[/#if]
+[/#if] [#-- netif_callback --]
+[/#if] [#-- use_rtos --]
 
 /* Within 'USER CODE' section, code will be kept by default at each generation */
 /* USER CODE BEGIN 0 */

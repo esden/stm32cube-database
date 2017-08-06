@@ -185,6 +185,9 @@ extern ${variable.value} ${variable.name};
   * @}
   */ 
 
+#ifdef __cplusplus
+}
+#endif 
 
 #endif //__USBH_CONF__H__
 

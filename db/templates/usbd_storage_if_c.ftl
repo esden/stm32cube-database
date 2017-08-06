@@ -104,10 +104,7 @@
 /** @defgroup USBD_STORAGE_IF_Private_Variables
   * @{
   */
-/* USB handler declaration */
-/* Handle for USB Full Speed IP */
 [#if handleNameFS == "FS" || handleNameUSB_FS == "FS"]
-#tUSBD_HandleTypeDef  *hUsbDevice_0;
 /* USER CODE BEGIN INQUIRY_DATA_FS */ 
 /* USB Mass storage Standard Inquiry Data */
 const int8_t  STORAGE_Inquirydata_FS[] = {//36
@@ -130,8 +127,6 @@ const int8_t  STORAGE_Inquirydata_FS[] = {//36
 [/#if]
 
 [#if handleNameHS == "HS"]
-/* Handle for USB High Speed IP */
-#tUSBD_HandleTypeDef  *hUsbDevice_1;
 /* USER CODE BEGIN INQUIRY_DATA_HS */ 
 /* USB Mass storage Standard Inquiry Data */
 const int8_t  STORAGE_Inquirydata_HS[] = {//36

@@ -58,6 +58,7 @@
 extern ${variable.value} ${variable.name};
 [/#list]
 [/#if]
+extern void Error_Handler(void);
 [#-- Global variables --]
 
 [#-- extract hal mode list used by all instances of the ip --]
@@ -106,6 +107,7 @@ void HAL_${mode}_MspDeInit(${mode}_HandleTypeDef* h${mode?lower_case});
 /* USER CODE END Prototypes */
 #n
 [/#compress]
+
 #ifdef __cplusplus
 }
 #endif

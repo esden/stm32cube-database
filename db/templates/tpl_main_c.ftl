@@ -115,7 +115,18 @@ ${dHandle};
     [#-- ADD RTOS Code End--]
     [/#compress]
 [/#if][#-- if HALCompliant End --] 
-
+[#if HALCompliant??]
+  [#-- CEC array --]
+  [#compress]
+  [#list Peripherals as Peripheral]
+    [#if Peripheral??]
+      [#list Peripheral as IP]
+[@common.generateCecRxBuffer configModelList=IP.configModelList methodName="HAL_CEC_Init" argumentName="RxBuffer" bufferType="uint8_t" bufferSize="16"/]
+      [/#list]
+    [/#if]
+  [/#list]
+  [/#compress]
+[/#if]
     [#-- Global variables --]
 [#-- If HAL compliant generate Global variable : Peripherals handler -End --]
 #n#n
@@ -129,6 +140,7 @@ ${dHandle};
 [#if clockConfig??]
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void); [#-- remove static --]
+void Error_Handler(void);
 [/#if]
 [#if mpuControl??] [#-- if MPU config is enabled --]
 static void MPU_Config(void); 
@@ -144,14 +156,14 @@ static void MPU_Config(void);
  [#list voids as void]
   [#if !void.functionName?contains("FREERTOS")&&!void.functionName?contains("FATFS")&& !void.functionName?contains("LWIP")&& !void.functionName?contains("USB_DEVICE")&& !void.functionName?contains("USB_HOST")&& !void.functionName?contains("CORTEX")] 
 [#if !void.isNotGenerated]
- static void ${""?right_pad(2)}${void.functionName}(void);
+static void ${""?right_pad(2)}${void.functionName}(void);
   [/#if]
   [/#if]
  [/#list]
  [@common.optinclude name="Src/rtos_pfp.tmp"/]
 [/#if]
 [#if vectors??]
-void MX_NVIC_Init(void);
+static void MX_NVIC_Init(void);
 [/#if]
 [/#compress]
 [#if USB_HOST?? && !FREERTOS??]
@@ -336,7 +348,7 @@ void SystemClock_Config(void)
 [#if vectors??]
 #n/** NVIC Configuration
  */
-void MX_NVIC_Init(void)
+static void MX_NVIC_Init(void)
 {
 [#list vectors as vector]
   #t/* ${vector.vector} interrupt configuration */
@@ -395,7 +407,7 @@ void MX_NVIC_Init(void)
 
         [#assign halMode= instanceData.halMode]
         /* ${instName} init function */
-        [#if halMode!=ipName&&!ipName?contains("TIM")&&!ipName?contains("CEC")]void MX_${instName}_${halMode}_Init(void)[#else]void MX_${instName}_Init(void)[/#if]
+        [#if halMode!=ipName&&!ipName?contains("TIM")&&!ipName?contains("CEC")]static void MX_${instName}_${halMode}_Init(void)[#else]static void MX_${instName}_Init(void)[/#if]
 {
 #n
         [#-- assign ipInstanceIndex = instName?replace(name,"")--]
@@ -451,8 +463,22 @@ void MX_NVIC_Init(void)
 [@common.optinclude name="Src/cortex.tmp"/]
 [/#if]
 
-[#compress] 
+/**
+  * @brief  This function is executed in case of error occurrence.
+  * @param  None
+  * @retval None
+  */
+void Error_Handler(void)
+{
+#t/* USER CODE BEGIN Error_Handler */
+#t/* User can add his own implementation to report the HAL error return state */
+#twhile(1) 
+#t{
+#t}
+#t/* USER CODE END Error_Handler */ 
+}
 #n
+[#compress] 
 #ifdef  USE_FULL_ASSERT
 #n
 /**

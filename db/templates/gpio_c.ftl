@@ -141,7 +141,7 @@ void MX_${data.ipName}_GPIO_Init(void)
                         [#assign arg = "" + adr + fargument.value]
                     [/#if]
                     [#if args == ""][#assign args = args + arg ][#else][#assign args = args + ', ' + arg][/#if]
-                    [/#list]
+                    [/#list]                              
 #t${method.name}(${args});
 
 		[#else]

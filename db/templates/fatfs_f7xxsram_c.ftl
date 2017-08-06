@@ -1,12 +1,11 @@
 [#ftl]
 /**
  ******************************************************************************
-  * @file    bsp_driver_sram.c (based on STM32756g_eval_sram.c)
+  * @file    bsp_driver_sram.c (based on stm32756g_eval_sram.c)
   * @brief   This file includes a generic SRAM driver.
   ******************************************************************************
-  * @attention
   *
-  * <h2><center>&copy; COPYRIGHT(c) 2015 STMicroelectronics</center></h2>
+  * COPYRIGHT(c) ${year} STMicroelectronics
   *
   * Redistribution and use in source and binary forms, with or without modification,
   * are permitted provided that the following conditions are met:
@@ -40,14 +39,13 @@
   
 /**
   * @brief  Initializes the SRAM device.
-  * @param  None
   * @retval SRAM status
   */
 uint8_t BSP_SRAM_Init(void)
 { 
-  static uint8_t sramstatus = SRAM_ERROR;
+  uint8_t sramstatus = SRAM_OK;
   
-  /* place for custom code */
+  /* place for user code */
   
   return sramstatus;
 }
@@ -61,14 +59,14 @@ uint8_t BSP_SRAM_Init(void)
   */
 uint8_t BSP_SRAM_ReadData(uint32_t uwStartAddress, uint16_t *pData, uint32_t uwDataSize)
 { 
+  uint8_t sramstatus = SRAM_OK;
+
   if(HAL_SRAM_Read_16b(&_HSRAM, (uint32_t *)uwStartAddress, pData, uwDataSize) != HAL_OK)
   {
-    return SRAM_ERROR;
+    sramstatus = SRAM_ERROR;
   }
-  else
-  {
-    return SRAM_OK;
-  }
+
+  return sramstatus;
 }
 
 /**
@@ -80,14 +78,14 @@ uint8_t BSP_SRAM_ReadData(uint32_t uwStartAddress, uint16_t *pData, uint32_t uwD
   */
 uint8_t BSP_SRAM_ReadData_DMA(uint32_t uwStartAddress, uint16_t *pData, uint32_t uwDataSize)
 {
+  uint8_t sramstatus = SRAM_OK;
+  
   if(HAL_SRAM_Read_DMA(&_HSRAM, (uint32_t *)uwStartAddress, (uint32_t *)pData, uwDataSize) != HAL_OK)
   {
-    return SRAM_ERROR;
+    sramstatus = SRAM_ERROR;
   }
-  else
-  {
-    return SRAM_OK;
-  }
+
+  return sramstatus;
 }
 
 /**
@@ -98,15 +96,15 @@ uint8_t BSP_SRAM_ReadData_DMA(uint32_t uwStartAddress, uint16_t *pData, uint32_t
   * @retval SRAM status
   */
 uint8_t BSP_SRAM_WriteData(uint32_t uwStartAddress, uint16_t *pData, uint32_t uwDataSize) 
-{ 
+{
+  uint8_t sramstatus = SRAM_OK;
+  
   if(HAL_SRAM_Write_16b(&_HSRAM, (uint32_t *)uwStartAddress, pData, uwDataSize) != HAL_OK)
   {
-    return SRAM_ERROR;
+    sramstatus = SRAM_ERROR;
   }
-  else
-  {
-    return SRAM_OK;
-  }
+
+  return sramstatus;
 }
 
 /**
@@ -118,24 +116,14 @@ uint8_t BSP_SRAM_WriteData(uint32_t uwStartAddress, uint16_t *pData, uint32_t uw
   */
 uint8_t BSP_SRAM_WriteData_DMA(uint32_t uwStartAddress, uint16_t *pData, uint32_t uwDataSize) 
 {
+  uint8_t sramstatus = SRAM_OK;
+  
   if(HAL_SRAM_Write_DMA(&_HSRAM, (uint32_t *)uwStartAddress, (uint32_t *)pData, uwDataSize) != HAL_OK)
   {
-    return SRAM_ERROR;
+    sramstatus = SRAM_ERROR;
   }
-  else
-  {
-    return SRAM_OK;
-  } 
-}
 
-/**
-  * @brief  Handles SRAM DMA transfer interrupt request.
-  * @param  None
-  * @retval None
-  */
-void BSP_SRAM_DMA_IRQHandler(void)
-{
-  HAL_DMA_IRQHandler(_HSRAM.hdma); 
+  return sramstatus;
 }
 
 /* USER CODE END 0 */

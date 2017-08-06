@@ -504,7 +504,7 @@ void MX_${name}_Init(void)
 /*
  * Background task
 */ 
-void MX_USB_HOST_Process() 
+void MX_USB_HOST_Process(void) 
 {
   /* USB Host Background task */
 [#list IPdatas as IP]  

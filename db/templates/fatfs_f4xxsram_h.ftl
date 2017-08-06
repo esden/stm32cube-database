@@ -5,9 +5,8 @@
   * @brief   This file contains the common defines and functions prototypes for  
   *          the bsp_driver_sram.c driver.
   ******************************************************************************
-  * @attention
   *
-  * <h2><center>&copy; COPYRIGHT(c) 2015 STMicroelectronics</center></h2>
+  * COPYRIGHT(c) ${year} STMicroelectronics
   *
   * Redistribution and use in source and binary forms, with or without modification,
   * are permitted provided that the following conditions are met:
@@ -92,7 +91,10 @@
 extern SRAM_HandleTypeDef _HSRAM;
 
 
-/* Exported functions --------------------------------------------------------*/   
+
+/** @addtogroup STM32469I-EVAL_SRAM_Exported_Functions
+  * @{
+  */
 uint8_t BSP_SRAM_Init(void);
 uint8_t BSP_SRAM_ReadData(uint32_t uwStartAddress, uint16_t *pData, uint32_t uwDataSize);
 uint8_t BSP_SRAM_ReadData_DMA(uint32_t uwStartAddress, uint16_t *pData, uint32_t uwDataSize);

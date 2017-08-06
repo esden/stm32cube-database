@@ -61,11 +61,12 @@
 /** @defgroup STM3210E_EVAL_SRAM_Exported_Constants Exported_Constants
   * @{
   */
+  
 /** 
   * @brief  SRAM status structure definition  
   */     
-#define   SRAM_OK         0x00
-#define   SRAM_ERROR      0x01
+#define   SRAM_OK         ((uint8_t)0x00)
+#define   SRAM_ERROR      ((uint8_t)0x01)
 
 #define SRAM_DEVICE_ADDR  ((uint32_t)0x68000000)
 #define SRAM_DEVICE_SIZE  ((uint32_t)0x200000)  /* SRAM device size in MBytes */  
@@ -78,7 +79,7 @@
   
 #define SRAM_WRITEBURST    FSMC_WRITE_BURST_DISABLE  
 /* #define SRAM_WRITEBURST   FSMC_WRITE_BURST_ENABLE */
-
+ 
 /* DMA definitions for SRAM DMA transfer */
 #define __SRAM_DMAx_CLK_ENABLE            __HAL_RCC_DMA2_CLK_ENABLE
 #define SRAM_DMAx_STREAM                  DMA2_Channel1  
@@ -88,7 +89,7 @@
 extern SRAM_HandleTypeDef _HSRAM;
 
 
-/* Exported functions --------------------------------------------------------*/   
+/* Exported functions --------------------------------------------------------*/
 /** @addtogroup STM3210E_EVAL_SRAM_Exported_Functions
   * @{
   */    

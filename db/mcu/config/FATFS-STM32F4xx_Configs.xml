@@ -5,12 +5,10 @@
     ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Configs.xsd"
     xmlns="http://mcd.rou.st.com/modules.php?name=mcu">
 
-<!-- MZA, Can we use the field comment to set the instance name (i.e. FATFS_SDIO, FSTAFS_USB )-->
     <RefConfig Name="FATFS_SDIO_Init" Comment="SD">          
         <Component Name="Middleware:FATFS:SDIO"/>
         <Component Name="Middleware:FATFS:CODE_PAGE:$VIRTUAL_CODE_PAGE"/>
         <ConfigFile Name="FF_CONF"/>  
-        <!--  <ConfigFile Name="FF_HANDLES"/> -->
         <ConfigFile Name="BSP_SD_C"/> 
         <ConfigFile Name="BSP_SD_H"/> 
         <ConfigFile Name="FATFS_INIT"/>
@@ -21,7 +19,6 @@
         <Component Name="Middleware:FATFS:USBH"/>
         <Component Name="Middleware:FATFS:CODE_PAGE:$VIRTUAL_CODE_PAGE"/>
         <ConfigFile Name="FF_CONF"/>
-        <!--  <ConfigFile Name="FF_HANDLES"/> --> 
         <ConfigFile Name="FATFS_INIT"/>
         <ConfigFile Name="FATFS_HEADER"/>
     </RefConfig>
@@ -30,7 +27,6 @@
         <Component Name="Middleware:FATFS:NAND"/>
         <Component Name="Middleware:FATFS:CODE_PAGE:$VIRTUAL_CODE_PAGE"/>
         <ConfigFile Name="FF_CONF"/>
-        <!--  <ConfigFile Name="FF_HANDLES"/> -->
         <ConfigFile Name="FATFS_INIT"/>
         <ConfigFile Name="FATFS_HEADER"/>
     </RefConfig>
@@ -39,7 +35,6 @@
         <Component Name="Middleware:FATFS:SDRAM"/>
         <Component Name="Middleware:FATFS:CODE_PAGE:$VIRTUAL_CODE_PAGE"/>
         <ConfigFile Name="FF_CONF"/>
-        <!--  <ConfigFile Name="FF_HANDLES"/> -->
         <ConfigFile Name="F4XX_SDRAM_C"/> 
         <ConfigFile Name="F4XX_SDRAM_H"/> 
         <ConfigFile Name="FATFS_INIT"/>
@@ -50,7 +45,6 @@
         <Component Name="Middleware:FATFS:SRAM"/>
         <Component Name="Middleware:FATFS:CODE_PAGE:$VIRTUAL_CODE_PAGE"/>
         <ConfigFile Name="FF_CONF"/>
-        <!--  <ConfigFile Name="FF_HANDLES"/> -->
         <ConfigFile Name="F4XX_SRAM_C"/> 
         <ConfigFile Name="F4XX_SRAM_H"/> 
         <ConfigFile Name="FATFS_INIT"/> 
@@ -110,14 +104,6 @@
         </SubComponent> -->
     </RefComponent>
            
-    <RefConfigFile Name="FF_HANDLES" Description="Header file for handles" Template="fatfs_handles.ftl">      
-        <File Name="fatfs_handles.h" Category="header" Version="R0.11" Condition="all"/>
-        <!-- <Argument Name="_HNAND" GenericType="simple" Comment=""/> -->
-        <Argument Name="_HSDRAM" GenericType="simple" Comment=""/>
-        <Argument Name="_HSRAM" GenericType="simple" Comment=""/>
-        <!--  <Argument Name="_HSD" GenericType="simple" Comment=""/>   -->
-        <Argument Name="_HUSBH" GenericType="simple" Comment=""/>
-    </RefConfigFile> 
     
     <!-- use specific template file "fatfs_conf.ftl" to generate header file containing #define -->
    
@@ -168,7 +154,7 @@
     </RefConfigFile> 
        
     <!-- Generate a driver file for SD that uses the right IP handle -->
-    <RefConfigFile Name="BSP_SD_C" Description="C driver file for SD" Template="fatfs_bsp_sd_c.ftl">       
+    <RefConfigFile Name="BSP_SD_C" Description="C driver file for SD" Template="fatfs_bsp_sd_c_F4.ftl">       
         <File Name="bsp_driver_sd.c" Category="source" Version="R0.11" Condition="all"/>                      
         <Argument Name="SD_MODE" GenericType="simple" Comment="SD mode value"/>                     
     </RefConfigFile>
@@ -194,7 +180,7 @@
         <File Name="bsp_driver_sram.c" Category="source" Version="R0.11" Condition="all"/>                      
     </RefConfigFile>
     
-    <!-- Generate a driver file for SD that uses the right IP handle -->
+    <!-- Generate a driver file for SRAM that uses the right IP handle -->
     <RefConfigFile Name="F4XX_SRAM_H" Description="H driver file for SRAM" Template="fatfs_f4xxsram_h.ftl">       
         <File Name="bsp_driver_sram.h" Category="header" Version="R0.11" Condition="all"/>                  
         <Argument Name="_HSRAM" GenericType="simple" Comment=""/>           
@@ -224,24 +210,25 @@
         <File Name="fatfs.h" Category="source" Version="R0.11" Condition="all"/>                    
     </RefConfigFile>
     
+    <!-- Code for BSP (SDIO mode) -->
     <RefBspComponent Name="Detect_SDIO" BspIpName="GPIO" BspModeName="Input">       
-        <File Name="fatfs_f4xxsd_h.ftl;bsp_driver_sd.h" Category="template"/>
-        <File Name="fatfs_bsp_sd_c.ftl;bsp_driver_sd.c" Category="template"/>
+        <File Name="fatfs_platform_h.ftl;fatfs_platform.h" Category="template"/>
+        <File Name="fatfs_platform_c.ftl;fatfs_platform.c" Category="template"/>
     </RefBspComponent>
     <!--
     <RefBspComponent Name="Detect_SDIO" BspIpName="I2C" BspModeName="I2C">       
         <File Name="fatfs_f4xxsd_h.ftl;bsp_driver_sd.h" Category="template"/>
-        <File Name="fatfs_bsp_sd_c.ftl;bsp_driver_sd.c" Category="template"/>
+        <File Name="fatfs_bsp_sd_c_F4.ftl;bsp_driver_sd.c" Category="template"/>
     </RefBspComponent> 
    
     
     <RefBspComponent Name="Detect_SDIO_Bis" BspIpName="GPIO" BspModeName="Input">       
         <File Name="fatfs_f4xxsd_h.ftl;bsp_driver_sd.h" Category="template"/>
-        <File Name="fatfs_bsp_sd_c.ftl;bsp_driver_sd.c" Category="template"/>
+        <File Name="fatfs_bsp_sd_c_F4.ftl;bsp_driver_sd.c" Category="template"/>
     </RefBspComponent> 
     <RefBspComponent Name="Detect_SDIO_Third" BspIpName="I2C" BspModeName="I2C">       
         <File Name="fatfs_f4xxsd_h.ftl;bsp_driver_sd.h" Category="template"/>
-        <File Name="fatfs_bsp_sd_c.ftl;bsp_driver_sd.c" Category="template"/>
+        <File Name="fatfs_bsp_sd_c_F4.ftl;bsp_driver_sd.c" Category="template"/>
     </RefBspComponent>
     -->
 

@@ -262,9 +262,27 @@
             [/#if]
           [/#if]
         [/#list][#--list method.arguments as fargument--]
-        #n[#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n[#--add blank line before function call--]
+        #n[#--[#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n[#--add blank line before function call--]
+                    [#if method.returnHAL=="false"]
+                        [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});
+                    [#else]
+                        [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
+                        [#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}(${args}) != HAL_OK)
+                        [#if nTab==2]#t#t[#else]#t[/#if]{
+                        [#if nTab==2]#t#t[#else]#t[/#if]#tError_Handler();
+                        [#if nTab==2]#t#t[#else]#t[/#if]}
+                    [/#if]#n
 		  [#else][#--if method.arguments??--]
-        #n[#if nTab==2]#t#t[#else]#t[/#if]${method.name}();#n[#--add blank line before function call--]
+        #n[#--[#if nTab==2]#t#t[#else]#t[/#if]${method.name}();#n[#--add blank line before function call--]
+                        [#if method.returnHAL=="false"]
+                            [#if nTab==2]#t#t[#else]#t[/#if]${method.name}();
+                        [#else]
+                            [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
+                            [#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}() != HAL_OK)
+                            [#if nTab==2]#t#t[#else]#t[/#if]{
+                            [#if nTab==2]#t#t[#else]#t[/#if]#tError_Handler();
+                            [#if nTab==2]#t#t[#else]#t[/#if]}
+                        [/#if]#n
       [/#if][#--if method.arguments??--]
     [/#if][#--if method.status=="OK"--]
     [#if method.status=="KO"]
@@ -337,7 +355,16 @@
         [/#list]
         #n[#if nTab==2]#t#t[#else]#t[/#if]//${method.name}(${args});#n[#--add blank line before function call--]
       [#else]
-        #n[#if nTab==2]#t#t[#else]#t[/#if]${method.name}();#n[#--add blank line before function call--]
+        #n[#--[#if nTab==2]#t#t[#else]#t[/#if]${method.name}();#n[#--add blank line before function call--]
+            [#if method.returnHAL=="false"]
+                [#if nTab==2]#t#t[#else]#t[/#if]${method.name}();
+            [#else]
+                [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
+                [#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}() != HAL_OK)
+                [#if nTab==2]#t#t[#else]#t[/#if]{
+                [#if nTab==2]#t#t[#else]#t[/#if]#tError_Handler();
+                [#if nTab==2]#t#t[#else]#t[/#if]}
+            [/#if]#n
       [/#if]
     [/#if][#--if method.status=="KO"--]
   [/#list][#--list methodList as method--]
@@ -509,7 +536,7 @@
   [#assign halMode= instanceData.halMode]
 /* ${instName} initialization function */
   [#if ipvar.ipName=="FMC"||ipvar.ipName=="FSMC"]
-void MX_${instName}_Init(void)
+static void MX_${instName}_Init(void)
   [#else]
     [#if halMode!=name]void MX_${instName}_${halMode}_Init(void)[#else]void MX_${instName}_Init(void)[/#if]
   [/#if]

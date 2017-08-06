@@ -79,7 +79,7 @@ void SystemClock_Config(void);
 [#list handlers as handler]
   [#list handler.entrySet() as entry]
     [#list entry.value as ipHandler]
-        [#if ipHandler.useNvic && !(handleList?contains("(" + ipHandler.handler + ")"))]
+        [#if ipHandler.useNvic && !(handleList?contains("(" + ipHandler.handler + ")")) && ipHandler.handlerType!="DFSDM_Channel_HandleTypeDef"]
 extern ${ipHandler.handlerType} ${ipHandler.handler};
         [/#if]
         [#assign handleList = handleList + "(" + ipHandler.handler + ")"]
@@ -108,7 +108,9 @@ void ${vector.irqHandler}(void)
 #t/* USER CODE BEGIN ${vector.name} 0 */
 
 #n#t/* USER CODE END ${vector.name} 0 */
+[#if vector.halHandler != "NONE"]
       #t${vector.halHandler}
+[/#if]
 #t/* USER CODE BEGIN ${vector.name} 1 */
 
 #n#t/* USER CODE END ${vector.name} 1 */
@@ -184,19 +186,19 @@ void ${vector.irqHandler}(void)
 {
 #t/* USER CODE BEGIN ${vector.name} 0 */
 
-#n#t/* USER CODE END ${vector.name} 0 */ 
-[#if vector.name=="RCC_IRQn" || vector.name=="RCC_CRS_IRQn"]
+#n#t/* USER CODE END ${vector.name} 0 */
+
+[#if vector.halHandler == "NONE"]
 [#elseif vector.ipName=="" || vector.irregular=="true"]
   #t${vector.halHandler}
 [#elseif vector.name=="FMC_IRQn" || vector.name=="FSMC_IRQn" || vector.name=="HASH_RNG_IRQn" || vector.name=="SDIO_IRQn" || vector.name=="TIM6_DAC_IRQn"]
   #t${vector.halHandler}
-[#elseif vector.halHandler != "" && vector.halHandler != "NONE"]
-  [#if vector.ipHandle != ""]
-    #t${vector.halHandler}(&${vector.ipHandle});
-  [#else]
-    #t${vector.halHandler}();
-  [/#if]
+[#elseif vector.ipHandle != ""]
+  #t${vector.halHandler}(&${vector.ipHandle});
+[#else]
+  #t${vector.halHandler}();
 [/#if]
+
 #t/* USER CODE BEGIN ${vector.name} 1 */
 
 #n#t/* USER CODE END ${vector.name} 1 */

@@ -7,7 +7,7 @@
 #n/** ${data.comments}
 */
 [/#if]
-void MX_GPIO_Init(void) 
+static void MX_GPIO_Init(void) 
 {
 #n
         [#assign v = ""]
@@ -31,7 +31,7 @@ void MX_GPIO_Init(void)
 #n/** ${data.comments}
 */
 [/#if]
-void MX_${data.ipName}_GPIO_Init(void) 
+static void MX_${data.ipName}_GPIO_Init(void) 
 {
 #n
         [#assign v = ""]

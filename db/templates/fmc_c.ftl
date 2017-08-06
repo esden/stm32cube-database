@@ -322,9 +322,29 @@
             [/#if]
           [/#if]
         [/#list][#--list method.arguments as fargument--]
-        #n[#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n[#--add blank line before function call--]
+        [#-- #n[#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n[#--add blank line before function call--]
+                    #n
+                    [#if method.returnHAL=="false"]
+                        [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});
+                    [#else]
+                        [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
+                        [#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}(${args}) != [#if method.returnHAL == "true"]HAL_OK[#else]${method.returnHAL}[/#if])
+                        [#if nTab==2]#t#t[#else]#t[/#if]{
+                        [#if nTab==2]#t#t[#else]#t[/#if]#tError_Handler();
+                        [#if nTab==2]#t#t[#else]#t[/#if]}
+                    [/#if]#n 
 		  [#else][#--if method.arguments??--]
-        #n[#if nTab==2]#t#t[#else]#t[/#if]${method.name}();#n[#--add blank line before function call--]
+        #n
+[#--[#if nTab==2]#t#t[#else]#t[/#if]${method.name}();#n[#--add blank line before function call--]
+                    [#if method.returnHAL=="false"]
+                        [#if nTab==2]#t#t[#else]#t[/#if]${method.name}();
+                    [#else]
+                        [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
+                        [#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}() != [#if method.returnHAL == "true"]HAL_OK[#else]${method.returnHAL}[/#if])
+                        [#if nTab==2]#t#t[#else]#t[/#if]{
+                        [#if nTab==2]#t#t[#else]#t[/#if]#tError_Handler();
+                        [#if nTab==2]#t#t[#else]#t[/#if]}
+                    [/#if]#n 
       [/#if][#--if method.arguments??--]
     [/#if][#--if method.status=="OK"--]
     [#if method.status=="KO"]
@@ -397,7 +417,16 @@
         [/#list]
         #n[#if nTab==2]#t#t[#else]#t[/#if]//${method.name}(${args});#n[#--add blank line before function call--]
       [#else]
-        #n[#if nTab==2]#t#t[#else]#t[/#if]${method.name}();#n[#--add blank line before function call--]
+        [#if method.returnHAL=="false"]
+                        [#if nTab==2]#t#t[#else]#t[/#if]${method.name}();
+                    [#else]
+                        [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
+                        [#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}() != [#if method.returnHAL == "true"]HAL_OK[#else]${method.returnHAL}[/#if])
+                        [#if nTab==2]#t#t[#else]#t[/#if]{
+                        [#if nTab==2]#t#t[#else]#t[/#if]#tError_Handler();
+                        [#if nTab==2]#t#t[#else]#t[/#if]}
+                    [/#if]#n 
+        [#--#n[#if nTab==2]#t#t[#else]#t[/#if]${method.name}();#n[#--add blank line before function call--]
       [/#if]
     [/#if][#--if method.status=="KO"--]
   [/#list][#--list methodList as method--]
@@ -605,7 +634,7 @@ void MX_${instName}_Init(void)
 
 [#-- Section2: Msp Init --]
 [#assign mspinitvar = ipvar.ipName + "_Initialized"]
-#nstatic int ${mspinitvar} = 0;
+#nstatic uint32_t ${mspinitvar} = 0;
 
 #nstatic void HAL_${ipvar.ipName}_MspInit(void){
 #t/* USER CODE BEGIN ${ipvar.ipName}_MspInit 0 */
@@ -627,7 +656,7 @@ void MX_${instName}_Init(void)
 #t#treturn;
 #t}
 #t${mspinitvar} = 1;
-[#assign ipHandler = "h" + ipvar.ipName?lower_case]
+[#assign ipHandler = ipvar.ipName?lower_case+ "Handle"]
 [@generateServiceCode ipName=ipvar.ipName serviceType="Init" modeName=ipvar.ipName instHandler=ipHandler tabN=1/]
 #t/* USER CODE BEGIN ${ipvar.ipName}_MspInit 1 */
 
@@ -646,7 +675,7 @@ void MX_${instName}_Init(void)
       [/#list]
     [/#if]
     [#assign ipHandler = "h" + mode?lower_case]
-#nvoid HAL_${mode}_MspInit(${mode}_HandleTypeDef* h${mode?lower_case}){
+#nvoid HAL_${mode}_MspInit(${mode}_HandleTypeDef* ${mode?lower_case}Handle){
 
     [#-- Search for static variables Start--]
     [#list instanceList?word_list as inst]
@@ -708,7 +737,7 @@ void MX_${instName}_Init(void)
 
 [#-- Section3: Msp DeInit --]
 [#assign mspdeinitvar = ipvar.ipName + "_DeInitialized"]
-#nstatic int ${mspdeinitvar} = 0;
+#nstatic uint32_t ${mspdeinitvar} = 0;
 
 #nstatic void HAL_${ipvar.ipName}_MspDeInit(void){
 #t/* USER CODE BEGIN ${ipvar.ipName}_MspDeInit 0 */
@@ -718,7 +747,7 @@ void MX_${instName}_Init(void)
 #t#treturn;
 #t}
 #t${mspdeinitvar} = 1;
-[#assign ipHandler = "h" + ipvar.ipName?lower_case]
+[#assign ipHandler = ipvar.ipName?lower_case+ "Handle"]
 [@generateServiceCode ipName=ipvar.ipName serviceType="DeInit" modeName=ipvar.ipName instHandler=ipHandler tabN=1/]
 #t/* USER CODE BEGIN ${ipvar.ipName}_MspDeInit 1 */
 
@@ -736,9 +765,9 @@ void MX_${instName}_Init(void)
         [/#if]
       [/#list]
     [/#if]
-    [#assign ipHandler = "h" + mode?lower_case]
+    [#assign ipHandler = mode?lower_case+ "Handle"]
 
-#nvoid HAL_${mode}_MspDeInit(${mode}_HandleTypeDef* h${mode?lower_case}){
+#nvoid HAL_${mode}_MspDeInit(${mode}_HandleTypeDef* ${mode?lower_case}Handle){
     [#-- Search for static variables Start--]
 
     [#-- Search for static variables End--]

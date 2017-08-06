@@ -5,9 +5,8 @@
   * @brief   This file contains the common defines and functions prototypes for  
   *          the bsp_driver_sram.c driver.
   ******************************************************************************
-  * @attention
   *
-  * <h2><center>&copy; COPYRIGHT(c) 2015 STMicroelectronics</center></h2>
+  * COPYRIGHT(c) ${year} STMicroelectronics
   *
   * Redistribution and use in source and binary forms, with or without modification,
   * are permitted provided that the following conditions are met:
@@ -91,7 +90,7 @@
 #define SRAM_DMAx_CHANNEL                 DMA_CHANNEL_0
 #define SRAM_DMAx_STREAM                  DMA2_Stream4  
 #define SRAM_DMAx_IRQn                    DMA2_Stream4_IRQn
-#define SRAM_DMAx_IRQHandler              DMA2_Stream4_IRQHandler  
+#define BSP_SRAM_DMA_IRQHandler           DMA2_Stream4_IRQHandler  
 
 extern SRAM_HandleTypeDef _HSRAM;
 
@@ -102,7 +101,6 @@ uint8_t BSP_SRAM_ReadData(uint32_t uwStartAddress, uint16_t *pData, uint32_t uwD
 uint8_t BSP_SRAM_ReadData_DMA(uint32_t uwStartAddress, uint16_t *pData, uint32_t uwDataSize);
 uint8_t BSP_SRAM_WriteData(uint32_t uwStartAddress, uint16_t *pData, uint32_t uwDataSize);
 uint8_t BSP_SRAM_WriteData_DMA(uint32_t uwStartAddress, uint16_t *pData, uint32_t uwDataSize);
-void BSP_SRAM_DMA_IRQHandler(void);
 
 /* USER CODE END 0 */
    

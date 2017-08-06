@@ -43,6 +43,9 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f1xx_hal.h"
+[#if Platform??]
+#include "fatfs_platform.h"
+[/#if]
 
 /* Exported constants --------------------------------------------------------*/ 
 
@@ -56,29 +59,23 @@
 /** 
   * @brief  SD status structure definition  
   */     
-#define   MSD_OK         0x00
-#define   MSD_ERROR      0x01
+#define   MSD_OK                        ((uint8_t)0x00)
+#define   MSD_ERROR                     ((uint8_t)0x01)
 
 /* Exported constants --------------------------------------------------------*/
   
 /** @defgroup STM3210E_EVAL_SD_Exported_Constants Exported_Constants
   * @{
   */
-[#if Platform??]
-	[#if GPIO_IP??] 
-#define SD_PIN                   ${IpInstance}
-#define SD_PORT                  ${IpName}
-	[/#if]
-[/#if]
+#define SD_PRESENT               ((uint8_t)0x01)
+#define SD_NOT_PRESENT           ((uint8_t)0x00)
+#define SD_DATATIMEOUT           ((uint32_t)100000000)
 
 /* USER CODE BEGIN 0 */
 
 #define __SD_DETECT_GPIO_CLK_ENABLE()    __HAL_RCC_GPIOF_CLK_ENABLE()
 #define SD_DETECT_IRQn                   EXTI15_10_IRQn
-#define SD_DATATIMEOUT           ((uint32_t)100000000)
 
-#define SD_PRESENT               ((uint8_t)0x01)
-#define SD_NOT_PRESENT           ((uint8_t)0x00)
   
 /* DMA definitions for SD DMA transfer */
 /*

@@ -4,9 +4,8 @@
   * @file    bsp_driver_sram.c (based on stm32469i_eval_sram.c)
   * @brief   This file includes a generic SRAM driver.
   ******************************************************************************
-  * @attention
   *
-  * <h2><center>&copy; COPYRIGHT(c) 2015 STMicroelectronics</center></h2>
+  * COPYRIGHT(c) ${year} STMicroelectronics
   *
   * Redistribution and use in source and binary forms, with or without modification,
   * are permitted provided that the following conditions are met:
@@ -44,86 +43,87 @@
   */
 uint8_t BSP_SRAM_Init(void)
 { 
-  static uint8_t sramstatus = SRAM_ERROR;
+  uint8_t sramstatus = SRAM_OK;
   
-  /* place for custom code */
+  /* place for user code */
+  
   return sramstatus;
 }
 
 /**
   * @brief  Reads an amount of data from the SRAM device in polling mode.
-  * @param  uwStartAddress: Read start address
+  * @param  uwStartAddress : Read start address
   * @param  pData: Pointer to data to be read
   * @param  uwDataSize: Size of read data from the memory
-  * @retval SRAM status : SRAM_OK or SRAM_ERROR.
+  * @retval SRAM status
   */
 uint8_t BSP_SRAM_ReadData(uint32_t uwStartAddress, uint16_t *pData, uint32_t uwDataSize)
 { 
+  uint8_t sramstatus = SRAM_OK;
+
   if(HAL_SRAM_Read_16b(&_HSRAM, (uint32_t *)uwStartAddress, pData, uwDataSize) != HAL_OK)
   {
-    return SRAM_ERROR;
+    sramstatus = SRAM_ERROR;
   }
-  else
-  {
-    return SRAM_OK;
-  }
+
+  return sramstatus;
 }
 
 /**
   * @brief  Reads an amount of data from the SRAM device in DMA mode.
-  * @param  uwStartAddress: Read start address
+  * @param  uwStartAddress : Read start address
   * @param  pData: Pointer to data to be read
-  * @param  uwDataSize: Size of read data from the memory
-  * @retval SRAM status : SRAM_OK or SRAM_ERROR.
+  * @param  uwDataSize: Size of read data from the memory   
+  * @retval SRAM status
   */
 uint8_t BSP_SRAM_ReadData_DMA(uint32_t uwStartAddress, uint16_t *pData, uint32_t uwDataSize)
 {
+  uint8_t sramstatus = SRAM_OK;
+  
   if(HAL_SRAM_Read_DMA(&_HSRAM, (uint32_t *)uwStartAddress, (uint32_t *)pData, uwDataSize) != HAL_OK)
   {
-    return SRAM_ERROR;
+    sramstatus = SRAM_ERROR;
   }
-  else
-  {
-    return SRAM_OK;
-  }
+
+  return sramstatus;
 }
 
 /**
   * @brief  Writes an amount of data from the SRAM device in polling mode.
   * @param  uwStartAddress: Write start address
   * @param  pData: Pointer to data to be written
-  * @param  uwDataSize: Size of written data from the memory
-  * @retval SRAM status : SRAM_OK or SRAM_ERROR.
+  * @param  uwDataSize: Size of written data from the memory   
+  * @retval SRAM status
   */
 uint8_t BSP_SRAM_WriteData(uint32_t uwStartAddress, uint16_t *pData, uint32_t uwDataSize) 
-{ 
+{
+  uint8_t sramstatus = SRAM_OK;
+  
   if(HAL_SRAM_Write_16b(&_HSRAM, (uint32_t *)uwStartAddress, pData, uwDataSize) != HAL_OK)
   {
-    return SRAM_ERROR;
+    sramstatus = SRAM_ERROR;
   }
-  else
-  {
-    return SRAM_OK;
-  }
+
+  return sramstatus;
 }
 
 /**
   * @brief  Writes an amount of data from the SRAM device in DMA mode.
   * @param  uwStartAddress: Write start address
   * @param  pData: Pointer to data to be written
-  * @param  uwDataSize: Size of written data from the memory
-  * @retval SRAM status : SRAM_OK or SRAM_ERROR.
+  * @param  uwDataSize: Size of written data from the memory   
+  * @retval SRAM status
   */
 uint8_t BSP_SRAM_WriteData_DMA(uint32_t uwStartAddress, uint16_t *pData, uint32_t uwDataSize) 
 {
+  uint8_t sramstatus = SRAM_OK;
+  
   if(HAL_SRAM_Write_DMA(&_HSRAM, (uint32_t *)uwStartAddress, (uint32_t *)pData, uwDataSize) != HAL_OK)
   {
-    return SRAM_ERROR;
+    sramstatus = SRAM_ERROR;
   }
-  else
-  {
-    return SRAM_OK;
-  } 
+
+  return sramstatus;
 }
 
 /**

@@ -90,24 +90,53 @@
 	</RefParameter>	
   
     <RefParameter Name="SD_MODE" Comment="SD MODE" DefaultValue="4" Type="integer" Visible="false">
-	    <Condition Diagnostic="SDIO 4 bits" Expression="SD_Card &amp; Bus4Bits"/>
+	    <Condition Diagnostic="SDIO 4 bits" Expression="SDIO_SD_Card &amp; SDIO_Bus4Bits"/>
 	</RefParameter>	
   	<RefParameter Name="SD_MODE" Comment="SD MODE" DefaultValue="1" Type="integer" Visible="false">
-	    <Condition Diagnostic="SDIO 1 bit" Expression="SD_Card &amp; Bus1Bit"/>
+	    <Condition Diagnostic="SDIO 1 bit" Expression="SDIO_SD_Card &amp; SDIO_Bus1Bit"/>
 	</RefParameter>
 	<RefParameter Name="SD_MODE" Comment="SD MODE" DefaultValue="null" Type="integer" Visible="false"/>
+	
+    <RefParameter Name="SDMMC1_MODE" Comment="SD MODE" DefaultValue="4" Type="integer" Visible="false">
+	    <Condition Diagnostic="SDIO 4 bits" Expression="SDMMC1_SD_Card &amp; SDMMC1_Bus4Bits"/>
+	</RefParameter>	
+  	<RefParameter Name="SDMMC1_MODE" Comment="SD MODE" DefaultValue="1" Type="integer" Visible="false">
+	    <Condition Diagnostic="SDIO 1 bit" Expression="SDMMC1_SD_Card &amp; SDMMC1_Bus1Bit"/>
+	</RefParameter>
+	<RefParameter Name="SDMMC1_MODE" Comment="SD MODE" DefaultValue="null" Type="integer" Visible="false"/>
+
+    <RefParameter Name="SDMMC2_MODE" Comment="SD MODE" DefaultValue="4" Type="integer" Visible="false">
+	    <Condition Diagnostic="SDIO 4 bits" Expression="SDMMC2_SD_Card &amp; SDMMC2_Bus4Bits"/>
+	</RefParameter>	
+  	<RefParameter Name="SDMMC2_MODE" Comment="SD MODE" DefaultValue="1" Type="integer" Visible="false">
+	    <Condition Diagnostic="SDIO 1 bit" Expression="SDMMC2_SD_Card &amp; SDMMC2_Bus1Bit"/>
+	</RefParameter>
+	<RefParameter Name="SDMMC2_MODE" Comment="SD MODE" DefaultValue="null" Type="integer" Visible="false"/>
+
 	
 	<RefParameter Name="Instance" DefaultValue="FATFS" Comment="Instance" Type="" Visible="false"/>
 
 	<!-- #322733 -->
-	<RefParameter Name="_HSD" Comment="SDMMC instance" DefaultValue="hsd" Type="list" Group="SDIO/SDMMC" TabName="IPs instances">
-	    <Condition Diagnostic="SDMMC available and selected" Expression="(SD_Card | SD_Card_4) &amp; (STM32L4 | STM32F7)"/>
-		<PossibleValue Comment="SDMMC1" Value="hsd"/>
+	<RefParameter Name="_HSD" Comment="SDMMC instance" DefaultValue="hsd1" Type="list" Group="SDIO/SDMMC" TabName="IPs instances">
+	    <!-- <Condition Diagnostic="2 SDMMC available and selected" Expression="(SD_Card | SD_Card_4) &amp; (SDMMC1Used_ForRCC &amp; SDMMC2Used_ForRCC)"/>\  -->
+	    <Condition Diagnostic="2 SDMMC available and selected" Expression="SDMMC1_SD_Card &amp; SDMMC2_SD_Card"/>    
+		<PossibleValue Comment="SDMMC1" Value="hsd1"/>
+		<PossibleValue Comment="SDMMC2" Value="hsd2"/>
+	</RefParameter>
+	
+	<RefParameter Name="_HSD" Comment="SDMMC instance" DefaultValue="hsd1" Type="list" Group="SDIO/SDMMC" TabName="IPs instances">
+	    <Condition Diagnostic="SDMMC1 available and selected" Expression="SDMMC1_SD_Card"/>
+		<PossibleValue Comment="SDMMC1" Value="hsd1"/>
+	</RefParameter>
+	
+	<RefParameter Name="_HSD" Comment="SDMMC instance" DefaultValue="hsd2" Type="list" Group="SDIO/SDMMC" TabName="IPs instances">
+	    <Condition Diagnostic="SDMMC2 available and selected" Expression="SDMMC2_SD_Card"/>
+		<PossibleValue Comment="SDMMC2" Value="hsd2"/>
 	</RefParameter>
 	
 	<RefParameter Name="_HSD" Comment="SDIO instance" DefaultValue="hsd" Type="list" Group="SDIO/SDMMC" TabName="IPs instances">
-	    <Condition Diagnostic="SDIO available and selected" Expression="SD_Card | SD_Card_4"/>
-		<PossibleValue Comment="SDIO1" Value="hsd"/>
+	    <Condition Diagnostic="SDIO available and selected" Expression="SDIO_SD_Card"/>
+		<PossibleValue Comment="SDIO" Value="hsd"/>
 	</RefParameter>
 	
 	<RefParameter Name="_HSD" Comment="SDIO/SDMMC instance" DefaultValue="null" Type="list" Group="SDIO/SDMMC" TabName="IPs instances">
@@ -989,7 +1018,7 @@
 					<Semaphore>S_FATFS_SRAM</Semaphore>
 				</Mode>
 			   </ModeLogicOperator>
-			<Condition Expression="Sram1|Sram2|Sram3|Sram4|Psram1|Psram2|Psram3|Psram4|MuxedPsram1|MuxedPsram2|MuxedPsram3|MuxedPsram4|Lcd1|Lcd2|Lcd3|Lcd4" Diagnostic="Active only with at least one SRAM IP configured"/>
+			<Condition Expression="Sram1|Sram2|Sram3|Sram4|Psram1|Psram2|Psram3|Psram4|MuxedPsram1|MuxedPsram2|MuxedPsram3|MuxedPsram4|Lcd1|Lcd2|Lcd3|Lcd4" Diagnostic="Active only with at least one SRAM ; PSRAM or Muxed PSRAM IP configured"/>
 		</Mode>
 
 		<Mode Name="SDIO" UserName="SD Card" RemoveCondition="!SDIO:$modeexist_SD_1_bit &amp; !SDMMC:$modeexist_SD_1_bit &amp; !SDMMC1:$modeexist_SD_1_bit">
@@ -1001,7 +1030,7 @@
 					<Semaphore>S_FATFS_SDIO</Semaphore>
 				</Mode>
 			</ModeLogicOperator>
-			<Condition Expression="SD_Card|SD_Card_4" Diagnostic="Active only with SDIO/SDMMC IP configured in a SD mode"/>
+			<Condition Expression="SDIO_SD_Card|SDMMC1_SD_Card|SDMMC2_SD_Card" Diagnostic="Active only with SDIO/SDMMC IP configured in a SD mode"/>
 		</Mode>
 							  	
 		<Mode Name="USB" UserName="USB Disk" RemoveCondition="!USB_HOST:$modeexist_MSC_HS &amp; !USB_HOST:$modeexist_MSC_FS">

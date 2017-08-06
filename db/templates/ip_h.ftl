@@ -68,6 +68,7 @@ extern ${variable.value} ${variable.name};
 
 /* USER CODE END Private defines */
 #n
+extern void Error_Handler(void);
 [#-- extract hal mode list used by all instances of the ip --]
 [#assign halModeList= ""]
 

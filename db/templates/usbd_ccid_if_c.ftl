@@ -98,16 +98,6 @@
 /** @defgroup USBD_CCID_IF_Private_Variables
   * @{
   */
-/* USB handler declaration */
-/* Handle for USB Full Speed IP */
-[#if handleNameFS == "FS" || handleNameUSB_FS == "FS"]
-#tUSBD_HandleTypeDef  *hUsbDevice_0;
-[/#if]
-
-[#if handleNameHS == "HS"]
-/* Handle for USB High Speed IP */
-#tUSBD_HandleTypeDef  *hUsbDevice_1;
-[/#if]
 /* USER CODE BEGIN PRIVATE_VARIABLES */
 /* USER CODE END PRIVATE_VARIABLES */
 

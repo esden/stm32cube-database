@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="ISO-8859-1" standalone="no"?><IP xmlns="http://mcd.rou.st.com/modules.php?name=mcu" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" DBVersion="V3.0" IPType="peripheral" Name="RCC" Version="STM32F303E_rcc_v1_0" ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd">
     <About>RCC: Reset and Clock Control</About>
     <RefParameter Comment="Oscillator Type" DefaultValue="+OscillatorTypeHSI+|OscillatorTypeLSI+|OscillatorTypeHSE+|OscillatorTypeLSE" Name="OscillatorType" Type="list" Visible="false"/>
-    
+         <RefParameter Name="HSE_Timout"   Comment="HSE Startup Timout Value (ms)" Type="integer" DefaultValue="100" Min="1"  Max="4294967295" Group="RCC Parameters"/>
+	 <RefParameter Name="LSE_Timout"   Comment="LSE Startup Timout Value (ms)" Type="integer" DefaultValue="5000" Min="1" Max="4294967295"  Group="RCC Parameters"/>
     <!--Les multiplicateurs-->
     <!--PLL MUL-->
     <RefParameter Comment="PLL Mul" DefaultValue="RCC_PLL_MUL2" Name="PLLMUL" Type="list" Visible="false">
@@ -22,10 +23,10 @@
         <PossibleValue Comment="16" Value="RCC_PLL_MUL16"/>
     </RefParameter>
     <!--APB1 MUL for TIM-->
-    <RefParameter Comment="APB1 Timer Clock Divider" DefaultValue="1" Max="1" Min="1" Name="APB1TimCLKDivider" Type="integer" Visible="false">
+    <RefParameter Comment="APB1 Timer Clock Divider" DefaultValue="1" Max="1" Min="1" Name="APB1TIM" Type="integer" Visible="false">
         <Condition Diagnostic="APB1 timer clock" Expression="APB1CLKDivider=RCC_HCLK_DIV1"/>
     </RefParameter>
-    <RefParameter Comment="APB1 Timer Clock Divider" DefaultValue="2" Max="2" Min="2" Name="APB1TimCLKDivider" Type="integer" Visible="false"/>
+    <RefParameter Comment="APB1 Timer Clock Divider" DefaultValue="2" Max="2" Min="2" Name="APB1TIM" Type="integer" Visible="false"/>
     <!--APB2 MUL for TIM-->
     <RefParameter Comment="APB2 Timer Clock Divider" DefaultValue="1" Max="1" Min="1" Name="APB2TimCLKDivider" Type="integer" Visible="false">
         <Condition Diagnostic="APB1 timer clock" Expression="APB2CLKDivider=RCC_HCLK_DIV1"/>
@@ -422,7 +423,7 @@
     <RefParameter Comment="" DefaultValue="AHB or APB1 prescaler must be divided by 1 or 2 cumulatively" Display="value/1000000" Name="APB1Freq_ValueConstraintsText" Type="string" Unit="MHz" Visible="false">
         <Condition Diagnostic="USB" Expression="USBUsed_ForRCC &amp; ((TIM2SourcePLL &amp;TIM2)|(TIM34SourcePLL &amp;(TIM3|TIM4))) &amp; ((SYSCLKFreq_VALUE/2) &gt; 10000000) "/>
     </RefParameter>	
-    <RefParameter Comment="APB1 peripheral clocks" DefaultValue="8000000" Display="value/1000000" IP="SPI3,SPI2,USART2,USART3,UART4,UART5,I2S3,I2S2,I2C1,I2C2,I2C3,USB,CAN,DAC1,DAC2,WWDG,PWR" Max="=SYSCLKFreq_VALUE" Min="=SYSCLKFreq_VALUE/2" Name="APB1Freq_Value" Type="double" Unit="MHz" Visible="false">
+    <RefParameter Comment="APB1 peripheral clocks" DefaultValue="8000000" Display="value/1000000" IP="SPI3,SPI2,USART2,USART3,UART4,UART5,I2S3,I2S2,I2C1,I2C2,I2C3,USB,CAN,DAC1,DAC2,WWDG,PWR" Max="36000000" Min="=SYSCLKFreq_VALUE/2" Name="APB1Freq_Value" Type="double" Unit="MHz" Visible="false">
         <Condition Diagnostic="USB" Expression="!USBUsed_ForRCC &amp; ((TIM2SourcePLL &amp;TIM2)|(TIM34SourcePLL &amp;(TIM3|TIM4))) "/>
     </RefParameter>
     <RefParameter Comment="" DefaultValue="AHB or APB1 prescaler must be divided by 1 or 2 cumulatively" Display="value/1000000" Name="APB1Freq_ValueConstraintsText" Type="string" Unit="MHz" Visible="false">
@@ -1367,7 +1368,7 @@
          <ConfigForMode>RCC_interrupt_Time_SYSTICK_Config</ConfigForMode>
 		 <ConfigForMode>RCC_SYSTICK_CONFIG</ConfigForMode>
         <Parameter Name="PLLMUL"/>
-        <Parameter Name="APB1TimCLKDivider"/>
+        <Parameter Name="APB1TIM"/>
         <Parameter Name="APB2TimCLKDivider"/>
         <Parameter Name="TIMMUL"/>
         <Parameter Name="HSIRCDiv"/>
@@ -1533,6 +1534,8 @@
         <Parameter Name="PREFETCH_ENABLE"/>
         <Parameter Name="FLatency"/>
         <Parameter Name="HSICalibrationValue"/>
+		<Parameter Name="HSE_Timout"/>
+        <Parameter Name="LSE_Timout"/>
     </RefMode>
     <ModeLogicOperator Name="OR">
         <!-- Modes for Oscillators & Clocks -->

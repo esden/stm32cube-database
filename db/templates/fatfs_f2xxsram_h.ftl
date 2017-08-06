@@ -60,20 +60,18 @@
 /** 
   * @brief  SRAM status structure definition  
   */     
-#define   SRAM_OK         0x00
-#define   SRAM_ERROR      0x01
+#define   SRAM_OK         ((uint8_t)0x00)
+#define   SRAM_ERROR      ((uint8_t)0x01)
 
-/** @defgroup stm322xg_eval_sram_Exported_Constants
-  * @{
-  */  
+   
 #define SRAM_DEVICE_ADDR  ((uint32_t)0x64000000)
 #define SRAM_DEVICE_SIZE  ((uint32_t)0x200000)  /* SRAM device size in MBytes */  
   
-/* #define SRAM_MEMORY_WIDTH    FSMC_NORSRAM_MEM_BUS_WIDTH_8  */
+/* #define SRAM_MEMORY_WIDTH    FSMC_NORSRAM_MEM_BUS_WIDTH_8 */
 #define SRAM_MEMORY_WIDTH    FSMC_NORSRAM_MEM_BUS_WIDTH_16
 
 #define SRAM_BURSTACCESS    FSMC_BURST_ACCESS_MODE_DISABLE  
-/* #define SRAM_BURSTACCESS    FSMC_BURST_ACCESS_MODE_ENABLE*/
+/* #define SRAM_BURSTACCESS    FSMC_BURST_ACCESS_MODE_ENABLE */
   
 #define SRAM_WRITEBURST    FSMC_WRITE_BURST_DISABLE  
 /* #define SRAM_WRITEBURST   FSMC_WRITE_BURST_ENABLE */
@@ -88,8 +86,8 @@
 extern SRAM_HandleTypeDef _HSRAM;
 
 
-/* Exported functions --------------------------------------------------------*/   
-/** @defgroup stm322xg_eval_sram_Exported_Functions
+
+/** @defgroup STM322xG_EVAL_SRAM_Exported_Functions
   * @{
   */     
 uint8_t BSP_SRAM_Init(void);

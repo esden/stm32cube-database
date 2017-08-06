@@ -228,8 +228,8 @@
                    [#assign prefixList = dmaCurrentRequest?split("_")] 
             [#assign ind=""]
 [#if dmaCurrentRequest?contains("dfsdm")]
-    [#assign ind=dmaconfig.dmaRequestName?replace("DFSDM","") ]
-[#-- #tif(${instHandler}->Instance == DFSDM_Filter${ind}){ --]
+    [#assign ind=dmaconfig.dmaRequestName?substring(dmaconfig.dmaRequestName?length-1)]
+[#-- #tif(${instHandler}->Instance == ${ipName}_Filter${ind}){ --]
 [/#if]
                    [#list prefixList as p][#assign prefix= p][/#list]
                         [#assign ipdmahandler1 = "hdma" + prefix]
@@ -413,9 +413,27 @@
                     [/#if]
                     [#if args == "" && arg!=""][#assign args = args + arg ][#else][#if arg!=""][#assign args = args + ', ' + arg][/#if][/#if]
                     [/#list]
-                    [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n
+                    [#--[#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n--]
+                            [#if method.returnHAL=="false"]
+                                [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});
+                            [#else]
+                                [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
+                                [#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}(${args}) != [#if method.returnHAL == "true"]HAL_OK[#else]${method.returnHAL}[/#if])
+                                [#if nTab==2]#t#t[#else]#t[/#if]{
+                                [#if nTab==2]#t#t[#else]#t[/#if]#tError_Handler();
+                                [#if nTab==2]#t#t[#else]#t[/#if]}
+                            [/#if]#n                                    
 		[#else]
-                    [#if nTab==2]#t#t[#else]#t[/#if]${method.name}();#n
+                    [#--[#if nTab==2]#t#t[#else]#t[/#if]${method.name}();#n--]
+                            [#if method.returnHAL=="false"]
+                                [#if nTab==2]#t#t[#else]#t[/#if]${method.name}();
+                            [#else]
+                                [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
+                                [#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}() != [#if method.returnHAL == "true"]HAL_OK[#else]${method.returnHAL}[/#if])
+                                [#if nTab==2]#t#t[#else]#t[/#if]{
+                                [#if nTab==2]#t#t[#else]#t[/#if]#tError_Handler();
+                                [#if nTab==2]#t#t[#else]#t[/#if]}
+                            [/#if]#n                            
                 [/#if]			
 		[/#if]
 		[#if method.status=="KO"]
@@ -475,7 +493,16 @@
                                 [/#list]
                                 [#if nTab==2]#t#t[#else]#t[/#if]#t//${method.name}(${args});
                         [#else] [#-- if method without argument --]
-                               [#if nTab==2]#t#t[#else]#t[/#if]${method.name}()#n;
+                               [#--[#if nTab==2]#t#t[#else]#t[/#if]${method.name}()#n;--]
+                            [#if method.returnHAL=="false"]
+                                [#if nTab==2]#t#t[#else]#t[/#if]${method.name}();
+                            [#else]
+                                [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
+                                [#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}() != [#if method.returnHAL == "true"]HAL_OK[#else]${method.returnHAL}[/#if])
+                                [#if nTab==2]#t#t[#else]#t[/#if]{
+                                [#if nTab==2]#t#t[#else]#t[/#if]#tError_Handler();
+                                [#if nTab==2]#t#t[#else]#t[/#if]}
+                            [/#if]#n                                
                         [/#if]
                 [/#if]
         [/#list]
@@ -525,8 +552,8 @@
 [#--workAround DFSDM--]
  [#assign ind="" ]
 [#if dmaCurrentRequest?contains("dfsdm")]
-    [#assign ind=dmaconfig.dmaRequestName?replace("DFSDM","") ]
-#tif(${instHandler}->Instance == DFSDM_Filter${ind}){
+    [#assign ind=dmaconfig.dmaRequestName?substring(dmaconfig.dmaRequestName?length-1)]
+#tif(${instHandler}->Instance == ${ipName}_Filter${ind}){
 [/#if]
      [@generateConfigModelCode configModel=dmaconfig inst=ipName  nTab=tabN index=""/]
         [#assign prefixList = dmaCurrentRequest?split("_")]
@@ -875,6 +902,8 @@ ${variable.value} ${variable.name};
     [/#if]
 [/#list]
 [/#if]
+[#-- CEC array --]
+[@common.generateCecRxBuffer configModelList=IP.configModelList methodName="HAL_CEC_Init" argumentName="RxBuffer" bufferType="uint8_t" bufferSize="16"/]
 [#-- Global variables --]#n
 [#list IP.configModelList as instanceData]
 [#if instanceData.isMWUsed=="false"]
@@ -915,7 +944,7 @@ ${variable.value} ${variable.name};
 #n
 [#if ipvar.clkCommonResource??]
     [#list ipvar.clkCommonResource.entrySet() as entry]
-static int ${entry.value}=0;
+static uint32_t ${entry.value}=0;
     [/#list]
 [/#if]
 [#-- Section2: Msp Init --]
@@ -929,15 +958,19 @@ static int ${entry.value}=0;
 [#assign ipHandler = "h" + mode?lower_case]
 
 [#if  mode?contains("DFSDM") && DFSDM_var == "false"]
-int DFSDM_Init = 0;
+[#assign n = 1]
+    [#list instanceList as dfsdmInst]
+        static uint32_t DFSDM${n}_Init = 0;
+        [#assign n = n + 1]
+    [/#list]
 [#assign DFSDM_var = "true"]
 [/#if]
 [#-- #nvoid HAL_${mode}_MspInit(${mode}_HandleTypeDef* h${mode?lower_case}){--] 
 [#if name !="TIM"]
-#nvoid ${entry.key}(${mode}_HandleTypeDef* h${mode?lower_case})
+#nvoid ${entry.key}(${mode}_HandleTypeDef* ${mode?lower_case}Handle)
 {#n
 [#else]
-#nvoid ${entry.key}(${name}_HandleTypeDef* h${mode?lower_case})
+#nvoid ${entry.key}(${name}_HandleTypeDef* ${mode?lower_case}Handle)
 {
 #n
 [/#if]
@@ -996,17 +1029,17 @@ int DFSDM_Init = 0;
 [/#list]
 [#-- --]
 [#if mspIsEmpty=="no"]
-[#if  words[0] == "DFSDM"]
-#tif(DFSDM_Init == 0)
+[#if  words[0]?contains("DFSDM")]
+#tif(${words[0]}_Init == 0)
 [#else]
- #tif(h${mode?lower_case}->Instance==${words[0]?replace("I2S","SPI")})
+ #tif(${mode?lower_case}Handle->Instance==${words[0]?replace("I2S","SPI")})
 [/#if]
 #t{
 [#if words?size > 1] [#-- Check if there is more than one ip instance--]        
 #t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspInit 0 */
 
 #n#t/* USER CODE END ${words[0]?replace("I2S","SPI")}_MspInit 0 */
-        [@generateServiceCode ipName=words[0] serviceType="Init" modeName=mode instHandler=ipHandler tabN=2/] 
+        [@generateServiceCode ipName=words[0] serviceType="Init" modeName=mode instHandler=mode?lower_case+"Handle" tabN=2/] 
 #t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspInit 1 */
 
 #n#t/* USER CODE END ${words[0]?replace("I2S","SPI")}_MspInit 1 */
@@ -1014,12 +1047,12 @@ int DFSDM_Init = 0;
     [#assign i = 0]
     [#list words as inst]
     [#if i>0]    
-    #telse if(h${mode?lower_case}->Instance==${words[i]?replace("I2S","SPI")}) [#-- if I2S instance should be SPI--]
+    #telse if(${mode?lower_case}Handle->Instance==${words[i]?replace("I2S","SPI")}) [#-- if I2S instance should be SPI--]
     #t{
 #t/* USER CODE BEGIN ${words[i]?replace("I2S","SPI")}_MspInit 0 */
 
 #n#t/* USER CODE END ${words[i]?replace("I2S","SPI")}_MspInit 0 */
-        [@generateServiceCode ipName=words[i] serviceType="Init" modeName=mode instHandler=ipHandler tabN=2/] 
+        [@generateServiceCode ipName=words[i] serviceType="Init" modeName=mode instHandler=mode?lower_case+"Handle" tabN=2/] 
 #t/* USER CODE BEGIN ${words[i]?replace("I2S","SPI")}_MspInit 1 */
 
 #n#t/* USER CODE END ${words[i]?replace("I2S","SPI")}_MspInit 1 */
@@ -1032,7 +1065,7 @@ int DFSDM_Init = 0;
 #t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspInit 0 */
 
 #n#t/* USER CODE END ${words[0]?replace("I2S","SPI")}_MspInit 0 */
-    [@generateServiceCode ipName=words[0] serviceType="Init" modeName=mode instHandler=ipHandler tabN=2/] 
+    [@generateServiceCode ipName=words[0] serviceType="Init" modeName=mode instHandler=mode?lower_case+"Handle" tabN=2/] 
 #t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspInit 1 */
 
 #n#t/* USER CODE END ${words[0]?replace("I2S","SPI")}_MspInit 1 */
@@ -1040,9 +1073,9 @@ int DFSDM_Init = 0;
 #t}
 [/#if]
 [/#if] [#-- inist not empty --]
-[#if  words[0] == "DFSDM"]
-#tDFSDM_Init++;
-[@generateServiceCodeDFSDM ipName=words[0] serviceType="Init" modeName=mode instHandler=ipHandler tabN=2/]
+[#if  words[0]?contains("DFSDM")]
+#t${words[0]}_Init++;
+[@generateServiceCodeDFSDM ipName=words[0] serviceType="Init" modeName=mode instHandler=mode?lower_case+"Handle" tabN=2/]
 [/#if]
 }
 [#--break--] [#-- use the first msp--]
@@ -1073,18 +1106,18 @@ int DFSDM_Init = 0;
     [/#list]
 [#-- Check if the Msp init will be empty end -- ]
 [#if  mode?contains("DFSDM") && DFSDM_var == "false"]
-int DFSDM_Init = 0;
+uint32_t DFSDM1_Init = 0;
 [#assign DFSDM_var = "true"]
 [/#if]
 
 [#-- #nvoid HAL_${mode}_MspInit(${mode}_HandleTypeDef* h${mode?lower_case}){--] 
 [#if (mspIsEmpty1=="no")&&(mode!="TIM")]
-#nvoid HAL_${mode}_MspPostInit(${mode}_HandleTypeDef* h${mode?lower_case})
+#nvoid HAL_${mode}_MspPostInit(${mode}_HandleTypeDef* ${mode?lower_case}Handle)
 {
 #n
 [#else]
 [#if (mspIsEmpty1=="no")]
-#nvoid HAL_${mode}_MspPostInit(TIM_HandleTypeDef* h${mode?lower_case})
+#nvoid HAL_${mode}_MspPostInit(TIM_HandleTypeDef* ${mode?lower_case}Handle)
 {
 #n
 [/#if]
@@ -1109,17 +1142,17 @@ int DFSDM_Init = 0;
 [/#list]
 [#-- --]
 [#if mspIsEmpty1=="no"]
-[#if  words[0] == "DFSDM"]
-#tif(DFSDM_Init == 0)
+[#if  words[0]?contains("DFSDM")]
+#tif(${words[0]}_Init == 0)
 [#else]
- #tif(h${mode?lower_case}->Instance==${words[0]?replace("I2S","SPI")})
+ #tif(${mode?lower_case}Handle->Instance==${words[0]?replace("I2S","SPI")})
 [/#if]
 #t{
 [#if words?size > 1] [#-- Check if there is more than one ip instance--]    
 #t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspPostInit 0 */
 
 #n#t/* USER CODE END ${words[0]?replace("I2S","SPI")}_MspPostInit 0 */    
-        [@generateConfigCode ipName=words[0] type="Init" serviceName="gpioOut" instHandler=ipHandler tabN=2/]  
+        [@generateConfigCode ipName=words[0] type="Init" serviceName="gpioOut" instHandler=mode?lower_case+"Handle" tabN=2/]  
 #t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspPostInit 1 */
 
 #n#t/* USER CODE END ${words[0]?replace("I2S","SPI")}_MspPostInit 1 */   
@@ -1127,12 +1160,12 @@ int DFSDM_Init = 0;
     [#assign i = 0]
     [#list words as inst]
     [#if i>0]    
-    #telse if(h${mode?lower_case}->Instance==${words[i]?replace("I2S","SPI")})
+    #telse if(${mode?lower_case}Handle->Instance==${words[i]?replace("I2S","SPI")})
     #t{
 #t/* USER CODE BEGIN ${words[i]?replace("I2S","SPI")}_MspPostInit 0 */
 
 #n#t/* USER CODE END ${words[i]?replace("I2S","SPI")}_MspPostInit 0 */
-       #t[@generateConfigCode ipName=words[i] type="Init" serviceName="gpioOut" instHandler=ipHandler tabN=2/] 
+       #t[@generateConfigCode ipName=words[i] type="Init" serviceName="gpioOut" instHandler=mode?lower_case+"Handle" tabN=2/] 
 #t/* USER CODE BEGIN ${words[i]?replace("I2S","SPI")}_MspPostInit 1 */
 
 #n#t/* USER CODE END ${words[i]?replace("I2S","SPI")}_MspPostInit 1 */    
@@ -1145,7 +1178,7 @@ int DFSDM_Init = 0;
 #t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspPostInit 0 */
 
 #n#t/* USER CODE END ${words[0]?replace("I2S","SPI")}_MspPostInit 0 */
-    #t[@generateConfigCode ipName=words[0] type="Init" serviceName="gpioOut" instHandler=ipHandler tabN=2/]
+    #t[@generateConfigCode ipName=words[0] type="Init" serviceName="gpioOut" instHandler=mode?lower_case+"Handle" tabN=2/]
     
 #t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspPostInit 1 */
 
@@ -1170,20 +1203,20 @@ int DFSDM_Init = 0;
 [#assign mode=entry.key?replace("_MspDeInit","")?replace("MspDeInit","")?replace("_BspDeInit","")?replace("HAL_","")]
 [#assign ipHandler = "h" + mode?lower_case]
 [#if name !="TIM"]
-#nvoid ${entry.key}(${mode}_HandleTypeDef* h${mode?lower_case})
+#nvoid ${entry.key}(${mode}_HandleTypeDef* ${mode?lower_case}Handle)
 {#n
 [#else]
-#nvoid ${entry.key}(${name}_HandleTypeDef* h${mode?lower_case})
+#nvoid ${entry.key}(${name}_HandleTypeDef* ${mode?lower_case}Handle)
 {#n
 [/#if]
 #n
 [#if mspIsEmpty=="no"]
 [#assign words = instanceList]
-[#if words[0] == "DFSDM"]
-#tDFSDM_Init-- ;
-#tif(DFSDM_Init == 0)
+[#if words[0]?contains("DFSDM")]
+#t${words[0]}_Init-- ;
+#tif(${words[0]}_Init == 0)
 [#else]
-#tif(h${mode?lower_case}->Instance==${words[0]?replace("I2S","SPI")})
+#tif(${mode?lower_case}Handle->Instance==${words[0]?replace("I2S","SPI")})
 [/#if]
 #t{
 [#if words?size > 1] [#-- Check if there is more than one ip instance--]
@@ -1191,7 +1224,7 @@ int DFSDM_Init = 0;
 #t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspDeInit 0 */
 
 #n#t/* USER CODE END ${words[0]?replace("I2S","SPI")}_MspDeInit 0 */
-[@generateServiceCode ipName=words[0] serviceType="DeInit" modeName=mode instHandler=ipHandler tabN=2/]
+[@generateServiceCode ipName=words[0] serviceType="DeInit" modeName=mode instHandler=mode?lower_case+"Handle" tabN=2/]
 #t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspDeInit 1 */
 
 #n#t/* USER CODE END ${words[0]?replace("I2S","SPI")}_MspDeInit 1 */
@@ -1200,12 +1233,12 @@ int DFSDM_Init = 0;
   [#assign i = 0]
     [#list words as inst]
         [#if i>0]
-#telse if(h${mode?lower_case}->Instance==${words[i]?replace("I2S","SPI")})
+#telse if(${mode?lower_case}Handle->Instance==${words[i]?replace("I2S","SPI")})
 #t{
 #t/* USER CODE BEGIN ${words[i]?replace("I2S","SPI")}_MspDeInit 0 */
 
 #n#t/* USER CODE END ${words[i]?replace("I2S","SPI")}_MspDeInit 0 */    
-[@generateServiceCode ipName=words[i] serviceType="DeInit" modeName=mode instHandler=ipHandler tabN=2/] 
+[@generateServiceCode ipName=words[i] serviceType="DeInit" modeName=mode instHandler=mode?lower_case+"Handle" tabN=2/] 
 #t/* USER CODE BEGIN ${words[i]?replace("I2S","SPI")}_MspDeInit 1 */
 
 #n#t/* USER CODE END ${words[i]?replace("I2S","SPI")}_MspDeInit 1 */
@@ -1219,10 +1252,10 @@ int DFSDM_Init = 0;
 #t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspDeInit 0 */
 
 #n#t/* USER CODE END ${words[0]?replace("I2S","SPI")}_MspDeInit 0 */
-[@generateServiceCode ipName=words[0] serviceType="DeInit" modeName=mode instHandler=ipHandler tabN=2/] 
+[@generateServiceCode ipName=words[0] serviceType="DeInit" modeName=mode instHandler=mode?lower_case+"Handle" tabN=2/] 
 #t}
-[#if words[0] == "DFSDM"]
-[@generateServiceCodeDFSDM ipName=words[0] serviceType="DeInit" modeName=mode instHandler=ipHandler tabN=2/]
+[#if words[0]?contains("DFSDM")]
+[@generateServiceCodeDFSDM ipName=words[0] serviceType="DeInit" modeName=mode instHandler=mode?lower_case+"Handle" tabN=2/]
 [/#if]
 #t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspDeInit 1 */
 
