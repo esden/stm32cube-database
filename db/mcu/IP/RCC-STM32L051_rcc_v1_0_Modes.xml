@@ -291,7 +291,7 @@
     <RefParameter Visible="false" Comment="LSI Source" Name="LSI_VALUE" DefaultValue="37000" Max="37000" Min="37000" Type="double" Display="value/1000" Unit="KHz"/>
     <RefParameter Visible="false" Comment="MSI Source" Name="MSI_VALUE" DefaultValue="2097000" Type="double" Display="value/1000" Unit="KHz"/>
     <RefParameter Visible="false" Comment="System clock" Name="SYSCLKFreq_VALUE" DefaultValue="2097000" Max="32000000" Min="=RTCFreq_Value" Type="double" Display="value/1000000" Unit="MHz">
-        <Condition Diagnostic="LSE In crystal Mode" Expression="RTCUsed_ForRCC|LCDUsed_ForRCC"/>
+        <Condition Diagnostic="LSE In crystal Mode" Expression="(RTCUsed_ForRCC|LCDUsed_ForRCC) &amp; (RTCUsed_ForRCC &gt; 32000000)"/>
     </RefParameter>
     
     <RefParameter Visible="false" Comment="System clock" Name="SYSCLKFreq_VALUE" DefaultValue="2097000" Max="32000000" Type="double" Display="value/1000000" Unit="MHz"/>
@@ -318,23 +318,24 @@
     <RefParameter Visible="false" Comment="" Name="FCLKCortexFreq_ValueConstraintsText" DefaultValue="" Type="string" Display="value/1000000" Unit="MHz"/>
 
     <RefParameter Visible="false" Comment="FCLK Cortex clock" Name="FCLKCortexFreq_Value" DefaultValue="2097000" Type="double" Display="value/1000000" Unit="MHz"/>
+	<RefParameter Visible="false" Comment="I2C1 clock" Name="I2C1Freq_Value" DefaultValue="2097000"  Type="double"  Display="value/1000000" Unit="MHz" IP="I2C1"/>
+    <RefParameter Visible="false" Comment="I2C3 clock" Name="I2C3Freq_Value" DefaultValue="2097000"  Type="double"  Display="value/1000000" Unit="MHz" IP="I2C3"/>
     <RefParameter Visible="false" Comment="APB1 peripheral clocks" Name="APB1Freq_Value" DefaultValue="2097000" Min="10000000" Max="32000000" Type="double" IP="USART4,USART5,DAC1,DAC2,WinWATCHDOG,CAN1,CAN2,I2C1,I2C2,I2C3,SPI3,SPI2,UART4,UART7,UART8,USART2,USART3,UART5,I2S2" Display="value/1000000" Unit="MHz">
         <Condition Diagnostic="USB" Expression="USBUsed_ForRCC"/>
     </RefParameter>  
     <RefParameter Visible="false" Comment="APB1 peripheral clocks" Name="APB1Freq_Value" DefaultValue="2097000" Max="32000000" Type="double" IP="USART4,USART5,DAC1,DAC2,WinWATCHDOG,CAN1,CAN2,I2C1,I2C2,I2C3,SPI3,SPI2,UART4,UART7,UART8,USART2,USART3,UART5,I2S2" Display="value/1000000" Unit="MHz"/>
-    <RefParameter Visible="false" Comment="APB2 peripheral clocks" Name="APB2Freq_Value" DefaultValue="2097000" Max="32000000" Type="double" IP="USART1,ADC1,ADC2,ADC3,SPI1,SPI4,SPI5,SPI6,USART1,USART6,EXTI,SDIO,SAI1" Display="value/1000000" Unit="MHz"/>
+    <RefParameter Visible="false" Comment="APB2 peripheral clocks" Name="APB2Freq_Value" DefaultValue="2097000" Max="32000000" Type="double" IP="USART1,SPI1,SPI4,SPI5,SPI6,USART1,USART6,EXTI,SDIO,SAI1" Display="value/1000000" Unit="MHz"/>
     <RefParameter Visible="false" Comment="LPTIM1 clock" Name="LPTIMFreq_Value" DefaultValue="2097000"  Type="double"  Display="value/1000000" Unit="MHz" IP="LPTIM1"/>
     <RefParameter Visible="false" Comment="LPUART1 clock" Name="LPUARTFreq_Value" DefaultValue="2097000"  Type="double" Display="value/1000000" Unit="MHz" IP="LPUART1"/>
     <RefParameter Visible="false" Comment="USART2 clock" Name="USART2Freq_Value" DefaultValue="2097000" Type="double"  Display="value/1000000" Unit="MHz" IP="USART2"/>
     <RefParameter Visible="false" Comment="USART1 clock" Name="USART1Freq_Value" DefaultValue="2097000"  Type="double" Display="value/1000000" Unit="MHz" IP="USART1"/>
-    <RefParameter Visible="false" Comment="I2C1 clock" Name="I2C1Freq_Value" DefaultValue="2097000"  Type="double"  Display="value/1000000" Unit="MHz" IP="I2C1"/>
-    <RefParameter Visible="false" Comment="I2C3 clock" Name="I2C3Freq_Value" DefaultValue="2097000"  Type="double"  Display="value/1000000" Unit="MHz" IP="I2C3"/>
+
     <RefParameter Visible="false" Comment="USB clock" Name="48USBFreq_Value" DefaultValue="24000000" Max="48000000" Min="48000000" Type="double" Display="value/1000000" IP="USB" Unit="MHz"/>
     <RefParameter Visible="false" Comment="APB1 timers clocks" Name="APB1TimFreq_Value" DefaultValue="16000000" Type="double" IP="TIMER2,TIMER6,LPTIM1" Display="value/1000000" Unit="MHz"/>
     <RefParameter Visible="false" Comment="APB2 timers clocks" Name="APB2TimFreq_Value" DefaultValue="16000000" Type="double" IP="TIMER21,TIMER22" Display="value/1000000" Unit="MHz"/>
 	
     <RefParameter Visible="false" Comment="RNG clock" Name="48RNGFreq_Value" DefaultValue="24000000" Max="48000000" Type="double" Display="value/1000000" Unit="MHz" IP="RNG"/>
-    <RefParameter Visible="false" Comment="ADC clock" Name="ADCFreq_Value" DefaultValue="16000000" Type="double" Display="value/1000000" Unit="MHz" IP="ADC"/>
+    <RefParameter Visible="false" Comment="ADC clock" Name="ADCFreq_Value" DefaultValue="16000000" Type="double" Display="value/1000000" Unit="MHz" />
     <RefParameter Visible="false" Comment="VCOInput" Name="VCOInputFreq_Value" DefaultValue="16000000" Min="2000000" Max="24000000" Type="double" Display="value/1000000" Unit="MHz">
         <Condition Diagnostic="USB uses PLL as Clock Source" Expression="PLLUsed=1"/>
     </RefParameter>
@@ -369,7 +370,9 @@
         <Condition Diagnostic="USB uses PLL as Clock Source" Expression="(PLLUsed=1)&amp; ((PWR_Regulator_Voltage_Scale=PWR_REGULATOR_VOLTAGE_SCALE3))"/>
     </RefParameter>
     <RefParameter Visible="false" Comment="PLL clock" Name="PLLCLKFreq_Value" DefaultValue="24000000"  Type="double" Min="2000000" Display="value/1000000" Unit="MHz"/>
-  
+     <!--ADC frequency  --> 
+    <RefParameter Visible="false" Comment="ADC synchr"  Name="synchADCFreq_Value"  DefaultValue="=APB2Freq_Value" Type="double" Display="value/1000000" Unit="MHz" IP="ADC"/>
+    <RefParameter Visible="false" Comment="ADC asynchr" Name="asynchADCFreq_Value" DefaultValue="=ADCFreq_Value"  Type="double" Display="value/1000000"  Unit="MHz" IP="ADC"/>
 
 
     <RefParameter Name="VDD_VALUE" Comment="VDD voltage (V)" DefaultValue="3.3" Max="3.6" Min="1.71" Type="double" Unit="V" Group="System Parameters">
@@ -403,16 +406,18 @@
     </RefParameter>
   
     <RefParameter Name="FLatency" Comment="Flash Latency(WS)" Type="uniqueElementList" DefaultValue="FLASH_LATENCY_0" Group="System Parameters">
-        <Condition Diagnostic="" Expression="((HCLKFreq_Value &gt; 0) &amp; ((HCLKFreq_Value &lt; 2000000)|((HCLKFreq_Value =2000000))))|
-		((HCLKFreq_Value &gt; 4000000) &amp;((HCLKFreq_Value &lt; 8000000)|((HCLKFreq_Value =8000000))))|
-		(((HCLKFreq_Value &lt; 16000000)|((HCLKFreq_Value =16000000)))&amp;(scale1|scale11))" />
+        <Condition Diagnostic="" Expression="
+		(((HCLKFreq_Value &gt; 0) &amp; ((HCLKFreq_Value &lt;  4200000)|((HCLKFreq_Value =4200000))))&amp; (scale3))|
+		(((HCLKFreq_Value &gt; 0) &amp; ((HCLKFreq_Value &lt;  8000000)|((HCLKFreq_Value =8000000))))&amp; (scale2))|
+		(((HCLKFreq_Value &gt; 0) &amp; ((HCLKFreq_Value &lt; 16000000)|((HCLKFreq_Value =16000000))))&amp; (scale1|scale11))" />
         <PossibleValue Value="FLASH_LATENCY_0" Comment="0 WS (1 CPU cycle)"/>
 
     </RefParameter>
     <RefParameter Name="FLatency" Comment="Flash Latency(WS)" Type="uniqueElementList" DefaultValue="FLASH_LATENCY_1" Group="System Parameters">
-        <Condition Diagnostic="" Expression="((HCLKFreq_Value &gt; 2000000) &amp; ((HCLKFreq_Value &lt; 4000000)|((HCLKFreq_Value =4000000))))|
-		(((HCLKFreq_Value &lt; 16000000)|((HCLKFreq_Value =16000000)))&amp;(scale2))|
-                ((HCLKFreq_Value &gt; 16000000) &amp; ((HCLKFreq_Value &lt; 32000000)|((HCLKFreq_Value =32000000))))" />
+           <Condition Diagnostic="" Expression="
+		(((HCLKFreq_Value &gt; 8000000) &amp; ((HCLKFreq_Value &lt;  16000000)|((HCLKFreq_Value =16000000))))&amp; (scale2))|
+		(((HCLKFreq_Value &gt; 16000000) &amp; ((HCLKFreq_Value &lt;  32000000)|((HCLKFreq_Value =32000000))))&amp; (scale1|scale11))
+" />
         <PossibleValue Value="FLASH_LATENCY_1" Comment="1 WS (2 CPU cycle)" Semaphore="FLASH_LATENCY1"/>
     </RefParameter>
 
@@ -421,8 +426,8 @@
         <PossibleValue Value="FLASH_LATENCY_1" Comment="1 WS (2 CPU cycle)" Semaphore="FLASH_LATENCY1"/>
     </RefParameter>
     <RefParameter Name="INSTRUCTION_CACHE_ENABLE" Comment="Preread" Type="list" DefaultValue="1" Group="System Parameters">
-        <PossibleValue Value="1" Comment="Disabled"/>
-        <PossibleValue Value="0" Comment="Enabled"/>
+        <PossibleValue Value="0" Comment="Disabled"/>
+        <PossibleValue Value="1" Comment="Enabled"/>
     </RefParameter>
     <RefParameter Name="PREFETCH_ENABLE" Comment="Prefetch" Type="list" DefaultValue="0" Group="System Parameters">
         <PossibleValue Value="1" Comment="Enabled"/>
@@ -1256,10 +1261,23 @@
                 </Mode>
             </ModeLogicOperator>
         </Mode>
-		      <Mode Name="OSC" UserName="High Speed Clock (HSE)">
+		      <Mode Name="OSC" UserName="High Speed Clock (HSE)" RemoveCondition="!DIE457">
             <ModeLogicOperator Name="XOR">
-                <Mode Name="HSE-External-Clock-Source" UserName="BYPASS Clock Source">
-				 <Condition Expression="DIE425 &amp; !LQFP48" Diagnostic=""/>
+                <Mode Name="HSE-External-Clock-Source-for-TinyNemo" UserName="BYPASS Clock Source">
+				
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="CK_IN"/>
+                        <!--Signal Name="OSC_OUT"/-->
+                    </SignalLogicalOp>
+                    <Semaphore>HSEByPass</Semaphore>
+                </Mode>
+           
+            </ModeLogicOperator>
+        </Mode>
+		     <Mode Name="OSC" UserName="High Speed Clock (HSE)" RemoveCondition="!(DIE425 &amp; !LQFP48)">
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="HSE-External-Clock-Source-for-LittleNemo" UserName="BYPASS Clock Source">
+			
                     <SignalLogicalOp Name="AND">
                         <Signal Name="CK_IN"/>
                         <!--Signal Name="OSC_OUT"/-->

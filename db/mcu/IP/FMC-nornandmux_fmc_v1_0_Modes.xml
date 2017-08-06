@@ -375,7 +375,7 @@
         <PossibleValue Comment="NAND bank 2" Value="FMC_NAND_BANK2"/>
         <PossibleValue Comment="NAND bank 3" Value="FMC_NAND_BANK3"/>
     </RefParameter>
-    <!-- FSMC_PCRx PWID -->
+    <!-- FMC_PCRx PWID -->
     <RefParameter Comment="Data size" DefaultValue="FMC_NAND_PCC_MEM_BUS_WIDTH_8" Name="NandMemoryDataWidth1" Type="list" TabName="NAND 1" Group="NAND control" Visible="false">
         <Condition Expression="_8b_dmux1|_9b_dmux1|_10b_dmux1|_11b_dmux1|_12b_dmux1|_13b_dmux1|_14b_dmux1|_15b_dmux1" Diagnostic=""/>
         <PossibleValue Comment="8 bits" Value="FMC_NAND_PCC_MEM_BUS_WIDTH_8"/>
@@ -402,6 +402,22 @@
         <PossibleValue Comment="2048 bytes" Value="FMC_NAND_ECC_PAGE_SIZE_2048BYTE"/>
         <PossibleValue Comment="4096 bytes" Value="FMC_NAND_ECC_PAGE_SIZE_4096BYTE"/>
         <PossibleValue Comment="8192 bytes" Value="FMC_NAND_ECC_PAGE_SIZE_8192BYTE"/>
+    </RefParameter>
+    <!-- NAND characteristic information structure -->
+    <RefParameter Comment="Page size" DefaultValue="0" Max="4294967295" Min="0" Name="NandPageSize1" Type="integer" TabName="NAND 1" Group="NAND characteristic information">
+        <Description>NAND memory page size expressed in kilobytes (without spare area).</Description>
+    </RefParameter>
+    <RefParameter Comment="Spare area size" DefaultValue="0" Max="4294967295" Min="0" Name="NandSpareAreaSize1" Type="integer" TabName="NAND 1" Group="NAND characteristic information">
+        <Description>NAND memory spare area size expressed in kilobytes.</Description>
+    </RefParameter>
+    <RefParameter Comment="Block size" DefaultValue="0" Max="4294967295" Min="0" Name="NandBlockSize1" Type="integer" TabName="NAND 1" Group="NAND characteristic information">
+        <Description>NAND memory block size expressed in number of pages.</Description>
+    </RefParameter>
+    <RefParameter Comment="Block number" DefaultValue="0" Max="4294967295" Min="0" Name="NandBlockNbr1" Type="integer" TabName="NAND 1" Group="NAND characteristic information">
+        <Description>NAND memory number of blocks.</Description>
+    </RefParameter>
+    <RefParameter Comment="Zone size" DefaultValue="0" Max="4294967295" Min="0" Name="NandZoneSize1" Type="integer" TabName="NAND 1" Group="NAND characteristic information">
+        <Description>NAND memory zone size expressed in number of blocks.</Description>
     </RefParameter>
     <!-- End NAND Flash only 1 RefParameters -->
     <!-- Begin Compact Flash RefParameters -->
@@ -490,8 +506,10 @@
    <RefMode Name="NorPsramChipSelect3_1" Comment="NOR/PSRAM Chip Select 3" BaseMode="HAL_NOR_SRAM1_Init"/>
    <RefMode Name="NorPsramChipSelect4_1" Comment="NOR/PSRAM Chip Select 4" BaseMode="HAL_NOR_SRAM1_Init"/>
    <RefMode Name="Lcd1" Comment="Lcd Interface" BaseMode="HAL_SRAM1_Init" HalMode="SRAM"/>
+   <!-- Begin MUX_MEMORY RefModes -->
    <RefMode Name="MuxedNorFlash1" Comment="Muxed NOR Flash" BaseMode="HAL_NOR1_Init" HalMode="NOR"/>
    <RefMode Name="MuxedPsram1" Comment="Muxed Psram" BaseMode="HAL_SRAM1_Init" HalMode="SRAM"/>
+   <!-- End MUX_MEMORY RefModes -->
    <!-- End NOR Flash 1 RefModes -->
    <!-- Begin NAND Flash 1 RefModes -->
 
@@ -515,6 +533,11 @@
       <Parameter Name="AttributeSpaceWaitSetupTime1"/>
       <Parameter Name="AttributeSpaceHoldSetupTime1"/>
       <Parameter Name="AttributeSpaceHiZSetupTime1"/>
+      <Parameter Name="NandPageSize1"/>
+      <Parameter Name="NandSpareAreaSize1"/>
+      <Parameter Name="NandBlockSize1"/>
+      <Parameter Name="NandBlockNbr1"/>
+      <Parameter Name="NandZoneSize1"/>
       <Parameter Name="NandCoherentPinout1"/>
    </RefMode>
    <RefMode Name="NandChipSelect2_1" Comment="NAND Flash" BaseMode="HAL_NAND1_Init" HalMode="NAND">
@@ -533,30 +556,30 @@
   <ModeLogicOperator Name="XOR">
     <!-- Begin Modes -->
     <!-- Begin NOR Flash 1 Modes -->
-    <Mode Name="NorFlash1" UserName="NOR Flash/PSRAM/SRAM/ROM 1">
+    <Mode Name="NorFlash1" UserName="NOR Flash/PSRAM/SRAM/ROM/LCD 1">
       <ModeLogicOperator Name="OR">
-        <Mode Name="NorPsramChipSelect1" UserName="Chip select">
+        <Mode Name="NorPsramChipSelect1" UserName="Chip Select">
           <ModeLogicOperator Name="XOR">
-            <Mode Name="NorPsramChipSelect1_1" UserName="NE1" ShrinkName="NE1 chip select">
+            <Mode Name="NorPsramChipSelect1_1" UserName="NE1" ShrinkName="NE1 Chip Select">
               <SignalLogicalOp Name="AND">
                 <Signal Name="NE1"/>
               </SignalLogicalOp>
               <Semaphore>NorPsramChipSelect1_1</Semaphore>
               <Semaphore>NE1NorPsramChipSelect</Semaphore>
             </Mode>
-            <Mode Name="NorPsramChipSelect2_1" UserName="NE2">
+            <Mode Name="NorPsramChipSelect2_1" UserName="NE2" ShrinkName="NE2 Chip Select">
               <SignalLogicalOp Name="AND">
                 <Signal Name="NE2"/>
               </SignalLogicalOp>
               <Semaphore>NorPsramChipSelect2_1</Semaphore>
             </Mode>
-            <Mode Name="NorPsramChipSelect3_1" UserName="NE3">
+            <Mode Name="NorPsramChipSelect3_1" UserName="NE3" ShrinkName="NE3 Chip Select">
               <SignalLogicalOp Name="AND">
                 <Signal Name="NE3"/>
               </SignalLogicalOp>
               <Semaphore>NorPsramChipSelect3_1</Semaphore>
             </Mode>
-            <Mode Name="NorPsramChipSelect4_1" UserName="NE4">
+            <Mode Name="NorPsramChipSelect4_1" UserName="NE4" ShrinkName="NE4 Chip Select">
               <SignalLogicalOp Name="AND">
                 <Signal Name="NE4"/>
               </SignalLogicalOp>
@@ -567,6 +590,11 @@
         </Mode>
         <Mode Name="MemoryType1" UserName="Memory type">
           <ModeLogicOperator Name="XOR">
+            <Mode Name="Fake1" UserName="Fake">
+              <SignalLogicalOp Name="AND">
+                <Signal Name="FAKE"/>
+              </SignalLogicalOp>
+            </Mode>
             <Mode Name="Lcd1" UserName="LCD Interface">
               <SignalLogicalOp Name="AND">
                 <Signal Name="NOE"/>
@@ -574,6 +602,7 @@
               </SignalLogicalOp>
               <Semaphore>Lcd1</Semaphore>
             </Mode>
+            <!-- Begin MUX_MEMORY Modes -->
             <Mode Name="MuxedNorFlash1" UserName="Muxed NOR Flash">
               <SignalLogicalOp Name="AND">
                 <Signal Name="NOE"/>
@@ -589,12 +618,13 @@
               </SignalLogicalOp>
               <Semaphore>MuxedPsram1</Semaphore>
             </Mode>
+            <!-- End MUX_MEMORY Modes -->
           </ModeLogicOperator>
-          <Condition Expression="NorPsramChipSelect1" Diagnostic="Chip select disabled"/>
+          <Condition Expression="NorPsramChipSelect1" Diagnostic="Chip Select disabled"/>
         </Mode>
-        <Mode Name="OneBitAddress1" UserName="LCD register select">
+        <Mode Name="OneBitAddress1" UserName="LCD Register Select">
           <ModeLogicOperator Name="XOR">
-            <Mode Name="A0_1" UserName="A0">
+            <Mode Name="A0_1" UserName="A0" ShrinkName="A0 Register Select">
               <SignalLogicalOp Name="AND">
                 <Signal Name="A0"/>
               </SignalLogicalOp>
@@ -740,7 +770,7 @@
             <Signal Name="D7"/>
           </SignalLogicalOp>
           <ModeLogicOperator Name="XOR">
-            <Mode Name="8b-d1" UserName="8 bits">
+            <Mode Name="8b-d1" UserName="8 bits" ShrinkName="8-bit data">
               <Semaphore>_8_bit_data1</Semaphore>
             </Mode>
             <Mode Name="16b-d1" UserName="16 bits">
@@ -758,8 +788,9 @@
             </Mode>
           </ModeLogicOperator>
           <Semaphore>Data1</Semaphore>
-          <Condition Expression="OneBitAddress1" Diagnostic="LCD register select disabled"/>
+          <Condition Expression="OneBitAddress1" Diagnostic="LCD Register Select disabled"/>
         </Mode>
+        <!-- Begin MUX_ADDRESS Modes -->
         <Mode Name="NorPsramDataAddress1" UserName="Data/Address">
           <ModeLogicOperator Name="LIST">
             <Mode Name="8b-da1" UserName="8 bits">
@@ -887,6 +918,8 @@
           <Semaphore>NorPsramDataAddress1</Semaphore>
           <Condition Expression="MuxedNorFlash1|MuxedPsram1" Diagnostic="Memory type should be multiplexed NOR Flash or multiplexed PSRAM"/>
         </Mode>
+        <!-- End MUX_ADDRESS Modes -->
+        <!-- Begin OTHER_MEMORY_FEATURE Modes -->
         <Mode Name="NorPsramClock1" UserName="Clock">
           <SignalLogicalOp Name="AND">
             <Signal Name="CLK"/>
@@ -953,15 +986,16 @@
           </ModeLogicOperator>
           <Condition Expression="((Psram1|Sram1)&amp;_16_bit_data1)|(MuxedPsram1&amp;(_16b_da1|_17b_da1|_18b_da1|_19b_da1|_20b_da1|_21b_da1|_22b_da1|_23b_da1|_24b_da1|_25b_da1|_26b_da1))" Diagnostic="Only for 16-bit PSRAM and SRAM"/>
         </Mode>
+        <!-- End OTHER_MEMORY_FEATURE Modes -->
       </ModeLogicOperator>
     </Mode>
     <!-- End NOR Flash 1 Modes -->
     <!-- Begin NAND Flash 1 Modes -->
     <Mode Name="NandFlash1" UserName="NAND Flash 1">
       <ModeLogicOperator Name="XOR">
-        <Mode Name="NandChipSelect1" UserName="Chip select">
+        <Mode Name="NandChipSelect1" UserName="Chip Select">
           <ModeLogicOperator Name="XOR">
-            <Mode Name="NandChipSelect2_1" UserName="NCE2" ShrinkName="NCE2 chip select">
+            <Mode Name="NandChipSelect2_1" UserName="NCE2" ShrinkName="NCE2 Chip Select">
               <SignalLogicalOp Name="AND">
                 <Signal Name="NCE2"/>
               </SignalLogicalOp>
@@ -1045,7 +1079,7 @@
             </Mode>
           </ModeLogicOperator>
           <Semaphore>NandDataAddressMux1</Semaphore>
-          <Condition Expression="NandFlash1" Diagnostic="Chip select disabled"/>
+          <Condition Expression="NandFlash1" Diagnostic="Chip Select disabled"/>
         </Mode>
         <Mode Name="NandReadyOrBusy1" UserName="Ready or busy">
           <ModeLogicOperator Name="XOR">
@@ -1058,13 +1092,13 @@
               <SignalLogicalOp Name="AND">
                 <Signal Name="INT2"/>
               </SignalLogicalOp>
-              <Condition Expression="NandChipSelect2_1" Diagnostic="Use NCE2 chip select"/>
+              <Condition Expression="NandChipSelect2_1" Diagnostic="Use NCE2 Chip Select"/>
             </Mode>
             <Mode Name="Interrupt31" UserName="INT3">
               <SignalLogicalOp Name="AND">
                 <Signal Name="INT3"/>
               </SignalLogicalOp>
-              <Condition Expression="NandChipSelect3_1" Diagnostic="Use NCE3 chip select"/>
+              <Condition Expression="NandChipSelect3_1" Diagnostic="Use NCE3 Chip Select"/>
             </Mode>
           </ModeLogicOperator>
           <Semaphore>NandPccWait1</Semaphore>

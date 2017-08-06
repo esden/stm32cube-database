@@ -46,10 +46,21 @@
 	
 
 	<RefParameter Comment="Window Mode" DefaultValue="COMP_WINDOWMODE_DISABLED" Name="WindowMode" Type="list" Group="Pinout Parameters" Visible="false">
+		<Condition Expression="($IpNumber=1)&amp;! Semaphore_COMP2_WindowmodeEN" Diagnostic=""/>
 		<PossibleValue Comment="Disabled" Value="COMP_WINDOWMODE_DISABLED"/>
 		<PossibleValue Comment="Enabled" Value="COMP_WINDOWMODE_ENABLED"/>
 	</RefParameter>
-	
+	<RefParameter Comment="Window Mode" DefaultValue="COMP_WINDOWMODE_ENABLED" Name="WindowMode" Type="list" Group="Pinout Parameters" Visible="false">
+		<Condition Expression="($IpNumber=1)&amp; Semaphore_COMP2_WindowmodeEN" Diagnostic=""/>
+		<PossibleValue Comment="Disabled" Value="COMP_WINDOWMODE_DISABLED"/>
+		<PossibleValue Comment="Enabled" Value="COMP_WINDOWMODE_ENABLED"/>
+	</RefParameter>
+
+		<RefParameter Comment="Window Mode" DefaultValue="COMP_WINDOWMODE_DISABLED" Name="WindowMode" Type="list" Group="Pinout Parameters" Visible="false">
+		<Condition Expression="($IpNumber=2)" Diagnostic=""/>
+		<PossibleValue Comment="Disabled" Value="COMP_WINDOWMODE_DISABLED"/>
+		<PossibleValue Comment="Enabled" Value="COMP_WINDOWMODE_ENABLED" Semaphore="Semaphore_COMP2_WindowmodeEN"/>
+	</RefParameter>
 	
 	<!-- Basic Parameters -->
 	<RefParameter Comment="Speed / Power Mode" DefaultValue="COMP_MODE_HIGHSPEED" Name="Mode" Type="list" Group="Basic Parameters">
@@ -221,12 +232,12 @@
 					<Semaphore>$IpInstance_SwitchDAC1</Semaphore>
 					<Condition Expression="(DAC1_OUT1_Conf)" Diagnostic="Need to have 'DAC1 Out 1' activated"/>
 				</Mode>
-				<Mode Name="WindowMode" UserName="Window Mode" RemoveCondition="($IpNumber=2)" >
+				<Mode Name="WindowMode" UserName="Window Mode" RemoveCondition="($IpNumber=1)" >
 					<SignalLogicalOp Name="AND">
 						<Signal Name="VS_WindowMode"/>
 					</SignalLogicalOp>
-					<Condition Expression="(($IpNumber=1) &amp; COMP2_ExternalInputPlus)" 
-								Diagnostic="Need to have an INP (External Input [+]) on next Comparator"/>
+					<Condition Expression="(($IpNumber=2) &amp; COMP1_ExternalInputPlus)" 
+								Diagnostic="Need to have an INP (External Input [+]) on previous Comparator"/>
 				</Mode>
 			</ModeLogicOperator>
 			<Semaphore>$IpInstance_InputPlus</Semaphore>

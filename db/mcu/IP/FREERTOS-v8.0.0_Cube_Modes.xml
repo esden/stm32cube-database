@@ -18,9 +18,13 @@
 	    <PossibleValue Comment="New version of CMSIS" Value="1.02" Semaphore="S_FREERTOS_V8"/>
 	    <Condition Diagnostic="Version available for F1" Expression="STM32F1"/>
 	</RefParameter>
-		<RefParameter Name="CMSIS_version" Comment="CMSIS-RTOS version" DefaultValue="1.02" Type="String" Group="Versions" TabName="Config parameters">
+	<RefParameter Name="CMSIS_version" Comment="CMSIS-RTOS version" DefaultValue="1.02" Type="String" Group="Versions" TabName="Config parameters">
 	    <PossibleValue Comment="New version of CMSIS" Value="1.02" Semaphore="S_FREERTOS_V8"/>
 	    <Condition Diagnostic="Version available for F2" Expression="STM32F2"/>
+	</RefParameter>
+	<RefParameter Name="CMSIS_version" Comment="CMSIS-RTOS version" DefaultValue="1.02" Type="String" Group="Versions" TabName="Config parameters">
+	    <PossibleValue Comment="New version of CMSIS" Value="1.02" Semaphore="S_FREERTOS_V8"/>
+	    <Condition Diagnostic="Version available for F3" Expression="STM32F3"/>
 	</RefParameter>
 	<RefParameter Name="CMSIS_version" Comment="CMSIS-RTOS version" DefaultValue="1.02" Type="String" Group="Versions" TabName="Config parameters">
 	    <PossibleValue Comment="New version of CMSIS" Value="1.02" Semaphore="S_FREERTOS_V8"/>
@@ -58,8 +62,8 @@
 	    <PossibleValue Comment="New version of FreeRTOS" Value="8.2.1" Semaphore="S_VERSION_8_2_1"/>
         <Condition Diagnostic="Version available for F2" Expression="STM32F2"/>
 	</RefParameter>		
-	<RefParameter Name="FREERTOS_version" Comment="FreeRTOS version" DefaultValue="7.6.0" Type="String" Group="Versions" TabName="Config parameters">
-		<PossibleValue Comment="Oldest version of FreeRTOS" Value="7.6.0" Semaphore="S_VERSION_7_6_0"/>
+	<RefParameter Name="FREERTOS_version" Comment="FreeRTOS version" DefaultValue="8.2.1" Type="String" Group="Versions" TabName="Config parameters">
+		<PossibleValue Comment="New version of FreeRTOS" Value="8.2.1" Semaphore="S_VERSION_8_2_1"/>
         <Condition Diagnostic="Version available for F3" Expression="STM32F3"/>
 	</RefParameter>
 	<RefParameter Name="FREERTOS_version" Comment="FreeRTOS version" DefaultValue="8.2.1" Type="String" Group="Versions" TabName="Config parameters">
@@ -87,7 +91,7 @@
 	</RefParameter>
 
 	<RefParameter Name="RAM_SIZE" Comment="RAM_SIZE" DefaultValue="=$RamSize" Type="integer" Visible="false"/>
-	<RefParameter Name="MAX_RAM_SIZE" Comment="MAX RAM SIZE" DefaultValue="4096" Type="integer" Visible="false">
+	<RefParameter Name="MAX_RAM_SIZE" Comment="MAX RAM SIZE" DefaultValue="2048" Type="integer" Visible="false">
 	    <Condition Diagnostic="Security belt when ramSize fetched is null" Expression="RAM_SIZE=0"/>
 	</RefParameter>
 	<RefParameter Name="MAX_RAM_SIZE" Comment="MAX RAM SIZE" DefaultValue="=1024*RAM_SIZE" Type="integer" Visible="false">
@@ -141,6 +145,10 @@
 	</RefParameter>
 	
 	
+	<RefParameter Name="configMINIMAL_STACK_SIZE" Comment="MINIMAL_STACK_SIZE" DefaultValue="64" Unit="Words" Max="=configTOTAL_HEAP_SIZE/4" Min="64"  Type="integer" Group="Kernel settings" TabName="Config parameters">
+		<Condition Diagnostic="Default value set to 64 for a target with only 2K RAM " Expression="MAX_RAM_SIZE=2048"/>
+	    <Description>Sets the size of the stack allocated to the idle task. The value is specified in words, not bytes. &lt;br&gt; &lt;b&gt;Warning: &lt;/b&gt; &lt;br&gt;The value chosen by the user should take into account the number of threads, the total heap size and the system stack size. If the totality of used stack size is higher than the total heap size, FreeRTOS will not be able to create and manage the tasks.&lt;br&gt;For information: max value = configTOTAL_HEAP_SIZE/4 </Description>
+	</RefParameter>
     <RefParameter Name="configMINIMAL_STACK_SIZE" Comment="MINIMAL_STACK_SIZE" DefaultValue="96" Unit="Words" Max="=configTOTAL_HEAP_SIZE/4" Min="64"  Type="integer" Group="Kernel settings" TabName="Config parameters">
 		<Condition Diagnostic="Default value set to 96 for a target with only 4K RAM " Expression="MAX_RAM_SIZE=4096"/>
 	    <Description>Sets the size of the stack allocated to the idle task. The value is specified in words, not bytes. &lt;br&gt; &lt;b&gt;Warning: &lt;/b&gt; &lt;br&gt;The value chosen by the user should take into account the number of threads, the total heap size and the system stack size. If the totality of used stack size is higher than the total heap size, FreeRTOS will not be able to create and manage the tasks.&lt;br&gt;For information: max value = configTOTAL_HEAP_SIZE/4 </Description>
@@ -205,6 +213,10 @@
 	    <Description>The total amount of RAM available to the RTOS kernel. &lt;br&gt;TOTAL_HEAP_SIZE setting has no effect unless heap_1.c, heap_2.c or heap_4.c are being used by the application (see &lt;b&gt;Memory Management scheme&lt;/b&gt; parameter for more information). &lt;br&gt; &lt;b&gt;Warning: &lt;/b&gt; &lt;br&gt;The value chosen by the user should take into account the application consumption of RAM otherwise it will lead to link issues!</Description>
 	</RefParameter>
 	-->
+	<RefParameter Name="configTOTAL_HEAP_SIZE" Comment="TOTAL_HEAP_SIZE" DefaultValue="1024" Unit="Bytes" Type="integer" Max="=1024*$RamSize" Min="=configMINIMAL_STACK_SIZE*4" Group="Kernel settings" TabName="Config parameters">
+	    <Condition Diagnostic="Values for an MCU with 2K of RAM" Expression="MAX_RAM_SIZE=2048"/>
+	    <Description>The total amount of RAM available to the RTOS kernel. &lt;br&gt;TOTAL_HEAP_SIZE setting has no effect unless heap_1.c, heap_2.c or heap_4.c are being used by the application (see &lt;b&gt;Memory Management scheme&lt;/b&gt; parameter for more information). &lt;br&gt; &lt;b&gt;Warning: &lt;/b&gt; &lt;br&gt;The value chosen by the user should take into account the application consumption of RAM otherwise it will lead to link issues!&lt;br&gt;For information: min value = configMINIMAL_STACK_SIZE*4</Description>
+	</RefParameter>
 	<RefParameter Name="configTOTAL_HEAP_SIZE" Comment="TOTAL_HEAP_SIZE" DefaultValue="2048" Unit="Bytes" Type="integer" Max="=1024*$RamSize" Min="=configMINIMAL_STACK_SIZE*4" Group="Kernel settings" TabName="Config parameters">
 	    <Condition Diagnostic="Values for an MCU with 4K of RAM" Expression="MAX_RAM_SIZE=4096"/>
 	    <Description>The total amount of RAM available to the RTOS kernel. &lt;br&gt;TOTAL_HEAP_SIZE setting has no effect unless heap_1.c, heap_2.c or heap_4.c are being used by the application (see &lt;b&gt;Memory Management scheme&lt;/b&gt; parameter for more information). &lt;br&gt; &lt;b&gt;Warning: &lt;/b&gt; &lt;br&gt;The value chosen by the user should take into account the application consumption of RAM otherwise it will lead to link issues!&lt;br&gt;For information: min value = configMINIMAL_STACK_SIZE*4</Description>

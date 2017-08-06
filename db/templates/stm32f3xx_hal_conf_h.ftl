@@ -91,7 +91,7 @@
   *        Timeout value 
   */
 #if !defined  (HSE_STARTUP_TIMEOUT)
-  #define HSE_STARTUP_TIMEOUT    ((uint32_t)5000)   /*!< Time out for HSE start up, in ms */
+  #define HSE_STARTUP_TIMEOUT    ((uint32_t)100)   /*!< Time out for HSE start up, in ms */
 #endif /* HSE_STARTUP_TIMEOUT */
 
 /**
@@ -120,11 +120,19 @@
                                              The real value may vary depending on the variations
                                              in voltage and temperature.  */
 /**
-  * @brief External Low Speed oscillator (LSI) value.
+  * @brief External Low Speed oscillator (LSE) value.
   */
 #if !defined  (LSE_VALUE)
  #define LSE_VALUE  ((uint32_t)[#if lse_value??]${lse_value}[#else]32768[/#if])    /*!< Value of the External Low Speed oscillator in Hz */
 #endif /* LSE_VALUE */     
+
+/**
+  * @brief Time out for LSE start up value in ms.
+  */
+#if !defined  (LSE_STARTUP_TIMEOUT)
+  #define LSE_STARTUP_TIMEOUT    ((uint32_t)5000)   /*!< Time out for LSE start up, in ms */
+#endif /* LSE_STARTUP_TIMEOUT */
+
 
 /**
   * @brief External clock source for I2S peripheral

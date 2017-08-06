@@ -20,6 +20,9 @@
 	    <Condition Diagnostic="New version available for F2" Expression="STM32F2"/> 
 	</RefParameter>
 	<RefParameter Name="NEW_DISKIO_API" Comment="NEW_DISKIO_API" DefaultValue="2" Type="integer" Visible="false">
+	    <Condition Diagnostic="New version available for F3" Expression="STM32F3"/> 
+	</RefParameter>
+	<RefParameter Name="NEW_DISKIO_API" Comment="NEW_DISKIO_API" DefaultValue="2" Type="integer" Visible="false">
 	    <Condition Diagnostic="New version available for F4" Expression="STM32F4"/> 
 	</RefParameter>
 	<RefParameter Name="NEW_DISKIO_API" Comment="NEW_DISKIO_API" DefaultValue="2" Type="integer" Visible="false">
@@ -49,8 +52,8 @@
 	    <PossibleValue Comment="New version of FatFS" Value="R0.11"/>
 	    <Condition Diagnostic="Version available for F2" Expression="STM32F2"/>	
 	</RefParameter>
-	<RefParameter Name="FATFS_version" Comment="FATFS version" DefaultValue="R0.10" Type="String" Group="Version" TabName="Set Defines">
-		<PossibleValue Comment="Previous version of FatFS" Value="R0.10" />
+	<RefParameter Name="FATFS_version" Comment="FATFS version" DefaultValue="R0.11" Type="String" Group="Version" TabName="Set Defines">
+		<PossibleValue Comment="New version of FatFS" Value="R0.11" />
 	    <Condition Diagnostic="Version available for F3" Expression="STM32F3"/>	
 	</RefParameter>
 	<RefParameter Name="FATFS_version" Comment="FATFS version" DefaultValue="R0.11" Type="String" Group="Version" TabName="Set Defines">
@@ -490,15 +493,15 @@
 	    <Description>The USE_LFN option switches the LFN feature.&lt;br&gt;- 0: Disable LFN feature. MAX_LFN has no effect.&lt;br&gt;- 1: Enable LFN with static working buffer on the BSS. Always NOT reentrant.&lt;br&gt;- 2: Enable LFN with dynamic working buffer on the STACK.&lt;br&gt;- 3: Enable LFN with dynamic working buffer on the HEAP.&lt;br&gt;To enable LFN feature, Unicode handling functions ff_convert() and ff_wtoupper() function must be added to the project.&lt;br&gt;The LFN working buffer occupies (MAX_LFN + 1) * 2 bytes. When use stack for the working buffer, take care on stack overflow. &lt;br&gt;When use heap memory for the working buffer, memory management functions, ff_memalloc() and ff_memfree(), must be added to the project.&lt;br&gt;&lt;b&gt;Dependencies&lt;/b&gt;: &lt;br&gt;1) USE_LFN = 0 (Disabled) not possible : it requires LFN_UNICODE != 1 (Unicode) &lt;br&gt;2) USE_LFN = 1 (Enabled with static working buffer on the BSS) not possible : it requires FS_REENTRANT = 0 (Disabled).</Description>
 	</RefParameter>
 	
-	<RefParameter Name="_USE_LFN" Comment="USE_LFN (Use Long Filename)" DefaultValue="3" Type="list" Group="Locale and Namespace Parameters" TabName="Set Defines">
+	<RefParameter Name="_USE_LFN" Comment="USE_LFN (Use Long Filename)" DefaultValue="0" Type="list" Group="Locale and Namespace Parameters" TabName="Set Defines">
 	    <Condition Diagnostic="" Expression="(_LFN_UNICODE = 0) &amp; (!S_FS_REENTRANT_0)"/>
 		<PossibleValue Comment="Disabled" Value="0"/>
 		<PossibleValue Comment="Enabled with dynamic working buffer on the STACK" Value="2"/>
 		<PossibleValue Comment="Enabled with dynamic working buffer on the HEAP" Value="3"/>
 		<Description>The USE_LFN option switches the LFN feature.&lt;br&gt;- 0: Disable LFN feature. MAX_LFN has no effect.&lt;br&gt;- 1: Enable LFN with static working buffer on the BSS. Always NOT reentrant.&lt;br&gt;- 2: Enable LFN with dynamic working buffer on the STACK.&lt;br&gt;- 3: Enable LFN with dynamic working buffer on the HEAP.&lt;br&gt;To enable LFN feature, Unicode handling functions ff_convert() and ff_wtoupper() function must be added to the project.&lt;br&gt;The LFN working buffer occupies (MAX_LFN + 1) * 2 bytes. When use stack for the working buffer, take care on stack overflow. &lt;br&gt;When use heap memory for the working buffer, memory management functions, ff_memalloc() and ff_memfree(), must be added to the project.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: &lt;br&gt;USE_LFN = 1 not possible: it requires FS_REENTRANT = 0 (Disabled).</Description>
-	</RefParameter>   
+	</RefParameter>
 	
-	<RefParameter Name="_USE_LFN" Comment="USE_LFN (Use Long Filename)" DefaultValue="3" Type="list" Group="Locale and Namespace Parameters" TabName="Set Defines">
+	<RefParameter Name="_USE_LFN" Comment="USE_LFN (Use Long Filename)" DefaultValue="0" Type="list" Group="Locale and Namespace Parameters" TabName="Set Defines">
 		<PossibleValue Comment="Disabled" Value="0"/>
 		<PossibleValue Comment="Enabled with static working buffer on the BSS" Value="1" Semaphore="S_USE_LFN_1"/>
 		<PossibleValue Comment="Enabled with dynamic working buffer on the STACK" Value="2"/>
@@ -769,8 +772,16 @@
 	</RefParameter>
 	<RefParameter Name="_NORTC_MON" Comment="      NORTC_MON (Month for timestamp)" DefaultValue="6" Type="uniqueElementList" Group="System Parameters" TabName="Set Defines" Visible="false">
 		<Description>When FS_NORTC is enabled, month part of the timestamps used by Fatfs. </Description>
-	</RefParameter>		
-
+	</RefParameter>
+	
+	<RefParameter Name="_NORTC_MDAY" Comment="      NORTC_MDAY (Day for timestamp)" DefaultValue="4" Max="30" Min="1" Type="integer" Group="System Parameters" TabName="Set Defines">
+		<Condition Diagnostic="Available in CubeMx since R0.11 version" Expression="(NEW_DISKIO_API = 2) &amp; (_FS_NORTC = 1) &amp; (_NORTC_MON = 4 | _NORTC_MON = 6 | _NORTC_MON = 9 | _NORTC_MON = 11)"/>
+		<Description>As FS_NORTC is enabled, it is the day part of the timestamps used by Fatfs. </Description>
+	</RefParameter>
+	<RefParameter Name="_NORTC_MDAY" Comment="      NORTC_MDAY (Day for timestamp)" DefaultValue="4" Max="28" Min="1" Type="integer" Group="System Parameters" TabName="Set Defines">
+		<Condition Diagnostic="Available in CubeMx since R0.11 version" Expression="(NEW_DISKIO_API = 2) &amp; (_FS_NORTC = 1) &amp; (_NORTC_MON = 2)"/>
+		<Description>As FS_NORTC is enabled, it is the day part of the timestamps used by Fatfs. </Description>
+	</RefParameter>
 	<RefParameter Name="_NORTC_MDAY" Comment="      NORTC_MDAY (Day for timestamp)" DefaultValue="4" Max="31" Min="1" Type="integer" Group="System Parameters" TabName="Set Defines">
 		<Condition Diagnostic="Available in CubeMx since R0.11 version" Expression="(NEW_DISKIO_API = 2) &amp; (_FS_NORTC = 1)"/>
 		<Description>As FS_NORTC is enabled, it is the day part of the timestamps used by Fatfs. </Description>

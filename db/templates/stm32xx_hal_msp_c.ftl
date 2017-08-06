@@ -83,12 +83,27 @@ void HAL_MspInit(void)
 
 [#-- configure system interrupts (RCC, systick, ...) --]
 [#if systemVectors??]
-#t/* System interrupt init*/
+[#assign systemHandlers = false]
+[#assign firstSystemInterrupt = true]
+[#assign firstPeripheralInterrupt = true]
 [#list systemVectors as initVector] 
+[#if initVector.systemHandler=="true"]
+[#assign systemHandlers = true]
+[#if firstSystemInterrupt]
+[#assign firstSystemInterrupt = false]
+#t/* System interrupt init*/
+[/#if]
+[#elseif firstPeripheralInterrupt]
+[#assign firstPeripheralInterrupt = false]
+[#if systemHandlers]
+#n
+[/#if]
+#t/* Peripheral interrupt init*/
+[/#if]
 #t/* ${initVector.vector} interrupt configuration */
 #tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
 [#if initVector.systemHandler=="false"]
-  #tHAL_NVIC_EnableIRQ(${initVector.vector});#n
+  #tHAL_NVIC_EnableIRQ(${initVector.vector});
 [/#if]
             [/#list]
 [/#if]

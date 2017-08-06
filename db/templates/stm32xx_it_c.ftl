@@ -75,10 +75,6 @@ void SystemClock_Config(void);
 
 [#compress]
 /* External variables --------------------------------------------------------*/
-[#if FREERTOS??] [#-- If FreeRtos is used --]
-extern void xPortSysTickHandler(void);
-[/#if]
-
 [#assign handleList = ""]
 [#list handlers as handler]
   [#list handler.entrySet() as entry]

@@ -41,7 +41,10 @@
     	<board>${boardName}</board>
     [/#if]
     [#--optional part--]
-    <debugprobe>${DebugMode}</debugprobe>
+    <usedDebug>${usedDebug}</usedDebug>
+    [#if usedDebug == "true"]
+    	<debugprobe>${DebugMode}</debugprobe>
+	[/#if]
     [#-- <optimization>${project.compilerOptimization}</optimization> --]
     <optimization></optimization>
     <icfloc>${icfloc}</icfloc>

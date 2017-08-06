@@ -54,6 +54,10 @@
 		<Condition Expression="(PB7_COMP2_INP &amp; ($IpNumber=2))" Diagnostic=""/>
 		<PossibleValue Comment="I/O5 (PB7)" Value="COMP_NONINVERTINGINPUT_IO5"/>
 	</RefParameter>
+	<RefParameter Comment="Non Inverting Input" DefaultValue="COMP_NONINVERTINGINPUT_IO5" Name="NonInvertingInput" Type="list" Group="Pinout Parameters" Visible="false">
+		<Condition Expression="(PA7_COMP2_INP &amp; ($IpNumber=2))" Diagnostic=""/>
+		<PossibleValue Comment="I/O6 (PA7)" Value="COMP_NONINVERTINGINPUT_IO6"/>
+	</RefParameter>
 	<RefParameter Comment="Non Inverting Input" DefaultValue="COMP_NONINVERTINGINPUT_IO1" Name="NonInvertingInput" Type="list" Group="Pinout Parameters" Visible="false">
 		<PossibleValue Comment="I/O1 (PA3)" Value="COMP_NONINVERTINGINPUT_IO1"/>
 	</RefParameter>
@@ -100,13 +104,22 @@
 
 	<!-- InputPlus is the default Mode -->
 	<RefMode Name="InputPlus_BaseMode" Abstract="true">
+                <Condition Diagnostic="" Expression="!Semaphore_VrefNeededByComparators"/>
 		<ConfigForMode>Comp_Init</ConfigForMode>
 		<Parameter Name="Mode"/>
 		<Parameter Name="TriggerMode"/>
 		<Parameter Name="OutputPol"/>
 		<Parameter Name="LPTIMConnection"/>
 	</RefMode>
-	
+        <RefMode Name="InputPlus_BaseMode" Abstract="true">
+                <Condition Diagnostic="" Expression="Semaphore_VrefNeededByComparators"/>
+		<ConfigForMode>Comp_Init</ConfigForMode>
+		<Parameter Name="Mode"/>
+		<Parameter Name="TriggerMode"/>
+		<Parameter Name="OutputPol"/>
+		<Parameter Name="LPTIMConnection"/>
+		<ConfigForMode>COMPEx_EnableVREFINT</ConfigForMode>
+	</RefMode>
 	
 	<!-- 'Non-Inverting Input' RefModes list -->
 	<RefMode Name="INP" BaseMode="InputPlus_BaseMode">
@@ -203,21 +216,25 @@
 					<SignalLogicalOp Name="AND">
 						<Signal Name="VS_VREFINT"/>
 					</SignalLogicalOp>
+		    	                <Semaphore>Semaphore_VrefNeededByComparators</Semaphore>
 				</Mode>
 				<Mode Name="VREFINT_34" UserName="3/4 Internal VRef" RemoveCondition="($IpNumber=1)">
 					<SignalLogicalOp Name="AND">
 						<Signal Name="VS_VREFINT34"/>
 					</SignalLogicalOp>
+		    	                <Semaphore>Semaphore_VrefNeededByComparators</Semaphore>
 				</Mode>
 				<Mode Name="VREFINT_12" UserName="1/2 Internal VRef" RemoveCondition="($IpNumber=1)">
 					<SignalLogicalOp Name="AND">
 						<Signal Name="VS_VREFINT12"/>
 					</SignalLogicalOp>
+		    	                <Semaphore>Semaphore_VrefNeededByComparators</Semaphore>
 				</Mode>
 				<Mode Name="VREFINT_14" UserName="1/4 Internal VRef" RemoveCondition="($IpNumber=1)">
 					<SignalLogicalOp Name="AND">
 						<Signal Name="VS_VREFINT14"/>
 					</SignalLogicalOp>
+		    	                <Semaphore>Semaphore_VrefNeededByComparators</Semaphore>
 				</Mode>
 			</ModeLogicOperator>
 			<Condition Expression="$IpInstance_InputPlus" Diagnostic="Need to have an INP (External Input [+]) activated"/>
