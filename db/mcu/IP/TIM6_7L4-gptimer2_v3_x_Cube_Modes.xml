@@ -1569,6 +1569,10 @@
             <PossibleValue Value="TIM_TIM1_ETR_ADC3_AWD2" Comment="TIM1_ETR is connected to ADC3 AWD2"/>
             <PossibleValue Value="TIM_TIM1_ETR_ADC3_AWD3" Comment="TIM1_ETR is connected to ADC3 AWD3"/>
     </RefParameter>
+    <RefParameter Name="TIM1_ETR_ADC3_REMAP" Comment="ETR_ADC3 remap capabilities for TIM1" DefaultValue="TIM_TIM1_ETR_ADC3_NONE" Type="list" Group="ETR remap capabilities for TIM1">
+            <Condition Diagnostic="" Expression="!ADC3_Exist" />
+            <PossibleValue Value="TIM_TIM1_ETR_ADC3_NONE" Comment="TIM1_ETR is not connected to any ADC3 AWD"/>
+    </RefParameter>
 <!-- for TIM1 field 3 -->
     <RefParameter Name="TIM1_TI1_REMAP" Comment="TI1 remap capabilities for TIM1" DefaultValue="TIM_TIM1_TI1_COMP1" Type="list" Group="T1 remap capabilities for TIM1">
            <Condition Diagnostic="" Expression="Semaphore_TIM1_L4_TI1_REMAPTIM1"/>
@@ -1587,8 +1591,13 @@
 <!-- for TIM2 of L4 family -->
 <!-- for TIM2 field 1 -->
     <RefParameter Name="TIM2_ITR1_REMAP" Comment="ITR1 remap capabilities for TIM2" DefaultValue="__NULL" Type="list" Group="ITR1 remap capabilities for TIM2">
+           <Condition Diagnostic="" Expression="!DIE435"/>
             <PossibleValue Value="__NULL" Comment="TIM2 ITR1 input is connected to TIM8 TRGOA"/>
             <PossibleValue Value="TIM_TIM2_ITR1_OTG_FS_SOF" Comment="TIM2 ITR1 input is connected to OTG FS SOF"/>
+    </RefParameter>
+    <RefParameter Name="TIM2_ITR1_REMAP" Comment="ITR1 remap capabilities for TIM2" DefaultValue="TIM_TIM2_ITR1_USB_SOF" Type="list" Group="ITR1 remap capabilities for TIM2">
+           <Condition Diagnostic="TIM8 does not exist so no remap to TIM8_trgo" Expression="DIE435"/>
+            <PossibleValue Value="TIM_TIM2_ITR1_USB_SOF" Comment="TIM2 ITR1 input is connected to USB SOF"/>
     </RefParameter>
 <!-- for TIM2 field 2 -->
     <RefParameter Name="TIM2_ETR_REMAP" Comment="ETR remap capabilities for TIM2" DefaultValue="TIM_TIM2_ETR_LSE" Type="list" Group="ETR remap capabilities for TIM2">
@@ -1718,7 +1727,7 @@
 <!-- TIM17 FIN UTILITE a VOIR -->
 <!-- for TIM1 Global RefParam -->
     <RefParameter Name="TIM1_GLOBAL_REMAP" Comment="TIM1 global" DefaultValue="/-TIM1_ETR_ADC1_REMAP+|TIM1_ETR_ADC3_REMAP+|TIM1_TI1_REMAP+|TIM1_ETR_COMP_REMAP/TIM_TIM1_ETR_ADC1_NONE\|//TIM_TIM1_ETR_ADC3_NONE\|//TIM_TIM1_TI1_GPIO\|//\|__NULL//" Type="list" Group="rien">
-      <!-- <Condition Diagnostic="" Expression="Semaphore_TI1_TIM10L1RemapTIM10 &amp; Semaphore_TIM10_ETR_Remap_TGOTIM10"/>-->
+         <!-- <Condition Diagnostic="" Expression="Semaphore_TI1_TIM10L1RemapTIM10 &amp; Semaphore_TIM10_ETR_Remap_TGOTIM10"/>-->
     </RefParameter>
 <!-- for TIM2 Global RefParam -->
     <RefParameter Name="TIM2_GLOBAL_REMAP" Comment="TIM2 global" DefaultValue="/-TIM2_ITR1_REMAP+|TIM2_ETR_REMAP+|TIM2_TI4_REMAP/__NULL\|//\|TIM_TIM2_TI4_GPIO//" Type="list" Group="rien">
@@ -3267,6 +3276,19 @@
            <ConfigForMode>TIM_ConfigBreakInput</ConfigForMode>
     </RefMode>
          <RefMode BaseMode ="Counter_init" Name="TriggerSource_ITR1" HalMode ="TIM_Base">
+           <Condition Diagnostic="" Expression="!($IpNumber=2)"/>
+           <ConfigForMode>ConfigClockSource</ConfigForMode>
+           <ConfigForMode>SlaveConfigSynchronization</ConfigForMode>
+               <Parameter Name="Slave_TriggerPolarity" />
+               <Parameter Name="Slave_TriggerPrescaler" />
+               <Parameter Name="Slave_TriggerFilter" />
+               <Parameter Name="TIM_SlaveMode" />
+           <ConfigForMode>TIM_MasterConfigSynchronization</ConfigForMode>
+           <ConfigForMode>TIM_ConfigBreakDeadTime</ConfigForMode>
+           <ConfigForMode>TIM_ConfigBreakInput</ConfigForMode>
+    </RefMode>
+         <RefMode BaseMode ="Counter_init" Name="TriggerSource_ITR1" HalMode ="TIM_Base">
+           <Condition Diagnostic="" Expression="($IpNumber=2)"/>
            <ConfigForMode>ConfigClockSource</ConfigForMode>
            <ConfigForMode>SlaveConfigSynchronization</ConfigForMode>
                <Parameter Name="Slave_TriggerPolarity" />

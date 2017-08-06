@@ -1,5 +1,5 @@
 [#ftl]
-/**tttttttttt
+/**
   ******************************************************************************
   * File Name          : ${FamilyName?lower_case}xx_hal_msp.c
   * Description        : This file provides code for the MSP Initialization 
@@ -100,12 +100,14 @@ void HAL_MspInit(void)
 [/#if]
 #t/* Peripheral interrupt init*/
 [/#if]
-#t/* ${initVector.vector} interrupt configuration */
-#tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
-[#if initVector.systemHandler=="false"]
-  #tHAL_NVIC_EnableIRQ(${initVector.vector});
+[#if initVector.codeInMspInit]
+    #t/* ${initVector.vector} interrupt configuration */
+    #tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
+    [#if initVector.systemHandler=="false"]
+      #tHAL_NVIC_EnableIRQ(${initVector.vector});
+    [/#if]
 [/#if]
-            [/#list]
+[/#list]
 [/#if]
 #n
 [#-- Sys configuration --]
@@ -616,7 +618,7 @@ void HAL_MspInit(void)
             [/#if]
             [#else]
                  #t#t/* Peripheral clock enable */
-                 #t#t__${ipName}_CLK_ENABLE(); 
+                 #t#t__HAL_RCC_${ipName}_CLK_ENABLE(); 
            [/#if]
       [/#if] [#-- not I2C --]
    [#else] 
@@ -635,11 +637,11 @@ void HAL_MspInit(void)
                [/#list]
             [/#if]
          [#else]
-            [#if ipName?contains("WWDG") && DIE=="DIE415"]
-            [#-- Orca window watchdog clock disable doesn't work --]
+            [#if ipName?contains("WWDG") && (DIE=="DIE415" || DIE=="DIE435")]
+            [#-- Orca and LittleOrca window watchdog clock disable don't work --]
             [#else]
                  #t#t/* Peripheral clock disable */
-                 #t#t__${ipName}_CLK_DISABLE(); 
+                 #t#t__HAL_RCC_${ipName}_CLK_DISABLE(); 
             [/#if]
          [/#if]
     [/#if]
@@ -664,7 +666,7 @@ void HAL_MspInit(void)
             [/#if]
             [#else]
                  #t#t/* Peripheral clock enable */
-                 #t#t__${ipName}_CLK_ENABLE(); 
+                 #t#t__HAL_RCC_${ipName}_CLK_ENABLE(); 
            [/#if]
 [/#if]
 [#-- if I2C clk_enable should be after GPIO Init End --]
@@ -693,14 +695,24 @@ void HAL_MspInit(void)
     [/#if]
     [#if nvicExist]
         [#if initService.nvic??]
-#t/* Peripheral interrupt init*/
-[#if ipName?contains("USB")]
+            [#assign codeInMspInit = false]
+            [#list initService.nvic as initVector]
+                [#if initVector.codeInMspInit]
+                    [#assign codeInMspInit = true]
+                    [#break]
+                [/#if]
+            [/#list]
+            [#if codeInMspInit || ipName?contains("USB")]
+            [#-- Always generate comment for USB: it is not worth the trouble to compute when it is really needed --]
+              #t#t/* Peripheral interrupt init */
+            [/#if]
+            [#if ipName?contains("USB")]
                 [#-- WorkAround for USB low power and remap macro--]
                 [#if USB_interruptRemapMacro??]
                   #t#t${USB_interruptRemapMacro};
                 [/#if]
                 [#list initService.nvic as initVector]
-                  [#if !initVector.vector?contains("WKUP") && !initVector.vector?contains("WakeUp")]
+                  [#if !initVector.vector?contains("WKUP") && !initVector.vector?contains("WakeUp") && initVector.codeInMspInit]
                     #t#tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
                     #t#tHAL_NVIC_EnableIRQ(${initVector.vector});
                   [/#if]
@@ -712,8 +724,23 @@ void HAL_MspInit(void)
                    [/#if]
                 [/#list]
                 [#if lowPower == "yes"]
+                  [#assign codeInMspInit = false]
+                  [#assign wakeupVector = false]
+                  [#list initService.nvic as initVector]
+                      [#if initVector.vector?contains("WKUP") || initVector.vector?contains("WakeUp")]
+                          [#assign wakeupVector = true]
+                          [#if initVector.codeInMspInit]
+                            [#assign codeInMspInit = true]
+                            [#break]
+                          [/#if]
+                      [/#if]
+                  [/#list]
+                  [#-- Even if init code is in MX_NVIC_Init, if there is no specific USB wake-up interrupt, some code needs to be generated here --]
+                  [#if codeInMspInit || !wakeupVector]
                     #t#tif(hpcd->Init.low_power_enable == 1)
                     #t#t{
+                    [@common.generateUsbWakeUpInterrupt ipName=ipName tabN=3/]
+[#--
                     [#if ipName?contains("_FS")]
                         [#if FamilyName=="STM32L4"]
                         #t#t#t/* Enable EXTI Line 17 for USB wakeup */
@@ -728,22 +755,22 @@ void HAL_MspInit(void)
                         [/#if]
                     [/#if]
                     [#if FamilyName=="STM32F3"||FamilyName=="STM32L1"]
-                      #t#t#t__HAL_USB_EXTI_CLEAR_FLAG();
-                      #t#t#t__HAL_USB_EXTI_SET_RISING_EDGE_TRIGGER();
+                      #t#t#t__HAL_USB_WAKEUP_EXTI_CLEAR_FLAG();
+                      #t#t#t__HAL_USB_WAKEUP_EXTI_ENABLE_RISING_EDGE();
                     [/#if]
                     [#if FamilyName=="STM32F2"||FamilyName=="STM32F4"||FamilyName=="STM32F7"]
                         [#if ipName?contains("_FS")]
-                            #t#t#t__HAL_USB_FS_EXTI_CLEAR_FLAG();
-                            #t#t#t__HAL_USB_FS_EXTI_SET_RISING_EGDE_TRIGGER();
+                            #t#t#t__HAL_USB_OTG_FS_WAKEUP_EXTI_CLEAR_FLAG();
+                            #t#t#t__HAL_USB_OTG_FS_WAKEUP_EXTI_ENABLE_RISING_EDGE();
                         [/#if]
                         [#if ipName?contains("_HS")]
-                            #t#t#t__HAL_USB_HS_EXTI_CLEAR_FLAG();
-                            #t#t#t__HAL_USB_HS_EXTI_SET_RISING_EGDE_TRIGGER();
+                            #t#t#t__HAL_USB_OTG_HS_WAKEUP_EXTI_CLEAR_FLAG();
+                            #t#t#t__HAL_USB_OTG_HS_WAKEUP_EXTI_ENABLE_RISING_EDGE();
                         [/#if]
                       
                     [/#if]
                     [#if ipName?contains("_HS")]
-                        #t#t#t__HAL_USB_HS_EXTI_ENABLE_IT();
+                        #t#t#t__HAL_USB_OTG_HS_WAKEUP_EXTI_ENABLE_IT();
                     [#elseif ipName?contains("OTG_FS")&&(FamilyName=="STM32F1")]
                         #t#t#t__HAL_USB_OTG_FS_WAKEUP_EXTI_CLEAR_FLAG();
                         #t#t#t__HAL_USB_OTG_FS_WAKEUP_EXTI_ENABLE_RISING_EDGE();
@@ -751,16 +778,17 @@ void HAL_MspInit(void)
                     [#elseif ipName?contains("OTG_FS")&&(FamilyName=="STM32L4")]                        
                         #t#t#t__HAL_USB_OTG_FS_WAKEUP_EXTI_ENABLE_IT();
                     [#elseif ipName?contains("_FS")]                        
-                        #t#t#t__HAL_USB_FS_EXTI_ENABLE_IT();                        
+                        #t#t#t__HAL_USB_OTG_FS_WAKEUP_EXTI_ENABLE_IT();                        
                     [#else]
-                        [#if FamilyName=="STM32F1"] [#-- use new macro naming for F1--]
+                        [#if FamilyName=="STM32F1"]
                             #t#t#t__HAL_USB_WAKEUP_EXTI_CLEAR_FLAG();
                             #t#t#t__HAL_USB_WAKEUP_EXTI_ENABLE_RISING_EDGE();
                             #t#t#t__HAL_USB_WAKEUP_EXTI_ENABLE_IT();
                         [#else]
-                            #t#t#t__HAL_USB_EXTI_ENABLE_IT(); 
+                            #t#t#t__HAL_USB_WAKEUP_EXTI_ENABLE_IT(); 
                         [/#if]
                     [/#if]
+--]
                     [#list initService.nvic as initVector]
                        [#if initVector.vector?contains("WKUP") || initVector.vector?contains("WakeUp")]
                            #t#t#tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
@@ -768,11 +796,14 @@ void HAL_MspInit(void)
                        [/#if]
                     [/#list]
                     #t#t}
+                  [/#if]
                 [/#if]
             [#else]
-              [#list initService.nvic as initVector]            
+              [#list initService.nvic as initVector]
+                [#if initVector.codeInMspInit]
                   #t#tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
                   #t#tHAL_NVIC_EnableIRQ(${initVector.vector});
+                [/#if]
               [/#list]
             [/#if]
         [/#if]

@@ -1,0 +1,1726 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><IP xmlns="http://mcd.rou.st.com/modules.php?name=mcu" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" DBVersion="V4.0" IPType="peripheral" IpGroup="Multimedia" Name="SAI" Version="sai1_v1_2_Cube" ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd">
+	<About>SAI: Serial Audio interface</About>
+	
+	<!-- Generic RefParameters for SAI --> 
+	<RefParameter Comment="Instance" DefaultValue="SAI$Index" Name="Instance" Type="" Visible="false"/>
+	
+	<!-- Virtual Parameters when we are in BasicMode -->
+	<RefParameter Comment="InitProtocol" DefaultValue="Disable" Name="InitProtocol" Type="list" Visible="false">
+		<PossibleValue Comment="Enable" Value="Enable"/>
+		<PossibleValue Comment="Disable" Value="Disable"/>
+	</RefParameter>
+	
+	<!-- Basic Parameters for SAI -->
+	<RefParameter Comment="Basic Parameters" DefaultValue="" Group="Basic Parameters" Name="BasicParameter" Type="subtitle"/>
+	<RefParameter Comment="" DefaultValue="VM_NO_PROTOCOL" Group="Basic Parameters" Name="VirtualProtocol" Type="list" Visible="false">
+		<PossibleValue Comment="" Value="VM_NO_PROTOCOL"/>
+		<PossibleValue Comment="" Value="VM_BASIC_PROTOCOL"/>
+		<PossibleValue Comment="" Value="VM_EXPERT_PROTOCOL"/>		
+	</RefParameter>
+	
+	<RefParameter Comment="" DefaultValue="VM_MASTER" Group="Basic Parameters" Name="VirtualMode" Type="list" Visible="false">
+		<PossibleValue Comment="" Value="VM_MASTER"/>
+		<PossibleValue Comment="" Value="VM_SLAVE"/>
+		<PossibleValue Comment="" Value="VM_SPDIF"/>		
+	</RefParameter>
+		
+	<RefParameter Comment="    Protocol" DefaultValue="SAI_SPDIF_PROTOCOL" Group="Basic Parameters" Name="Protocol" Type="list">
+		<Condition Diagnostic="" Expression="(VirtualMode=VM_SPDIF) &amp; !(InitProtocol=Enable)"/>				
+		<PossibleValue Comment="SPDIF" Value="SAI_SPDIF_PROTOCOL"/>			
+	</RefParameter>	
+	<RefParameter Comment="    Protocol" DefaultValue="SAI_FREE_PROTOCOL" Group="Basic Parameters" Name="Protocol" Type="list" Visible="false">
+		<Condition Diagnostic="" Expression="(InitProtocol=Enable)"/>									
+	</RefParameter>	
+	
+	<RefParameter Comment="    Protocol" DefaultValue="SAI_FREE_PROTOCOL" Group="Basic Parameters" Name="Protocol" Type="list">		
+		<PossibleValue Comment="Free" Value="SAI_FREE_PROTOCOL"/>
+		<PossibleValue Comment="AC 97" Value="SAI_AC97_PROTOCOL"/>					
+	</RefParameter>		
+	
+	<RefParameter Comment="    Audio Mode" DefaultValue="SAI_MODEMASTER_TX" Group="Basic Parameters" Name="AudioMode" Type="list">
+		<Condition Diagnostic="" Expression="(VirtualMode=VM_MASTER) &amp; !(Protocol=SAI_SPDIF_PROTOCOL)"/>
+		<PossibleValue Comment="Master Transmit" Value="SAI_MODEMASTER_TX"/>
+		<PossibleValue Comment="Master Receive" Value="SAI_MODEMASTER_RX"/>
+	</RefParameter>
+	<RefParameter Comment="    Audio Mode" DefaultValue="SAI_MODESLAVE_RX" Group="Basic Parameters" Name="AudioMode" Type="list">
+		<Condition Diagnostic="" Expression="(VirtualMode=VM_SLAVE) &amp; !(Protocol=SAI_SPDIF_PROTOCOL)"/>
+		<PossibleValue Comment="Slave Transmit" Value="SAI_MODESLAVE_TX"/>
+		<PossibleValue Comment="Slave Receive" Value="SAI_MODESLAVE_RX"/>
+	</RefParameter>
+	<RefParameter Comment="    Audio Mode" DefaultValue="SAI_MODEMASTER_TX" Group="Basic Parameters" Name="AudioMode" Type="list" Visible="true">
+		<Condition Diagnostic="" Expression="Protocol=SAI_SPDIF_PROTOCOL"/>
+		<PossibleValue Comment="Master Transmit" Value="SAI_MODEMASTER_TX"/>		
+	</RefParameter>
+	
+	<RefParameter Comment="    Output Mode" DefaultValue="SAI_STEREOMODE" Group="Basic Parameters" Name="MonoStereoMode" Type="list">
+		<Condition Diagnostic="" Expression="SlotNumber=2"/>	
+		<PossibleValue Comment="Stereo" Value="SAI_STEREOMODE"/>
+		<PossibleValue Comment="Mono" Value="SAI_MONOMODE"/>
+		<!-- Tracker 307567 -->
+		<Description>Set the number of slot at 2 when you want to enable the mono mode </Description>		
+	</RefParameter>
+	<RefParameter Comment="    Output Mode" DefaultValue="SAI_STEREOMODE" Group="Basic Parameters" Name="MonoStereoMode" Type="list">
+		<PossibleValue Comment="Stereo" Value="SAI_STEREOMODE"/>		
+		<Description>Set the number of slot at 2 when you want to enable the mono mode </Description>		
+	</RefParameter>
+	
+	<RefParameter Comment="    Companding Mode" DefaultValue="SAI_NOCOMPANDING" Group="Basic Parameters" Name="CompandingMode" Type="list">
+		<Condition Diagnostic="" Expression="((!(Protocol=SAI_AC97_PROTOCOL)) &amp; (!(Protocol=SAI_SPDIF_PROTOCOL)))"/>	
+		<PossibleValue Comment="No companding mode" Value="SAI_NOCOMPANDING"/>
+		<PossibleValue Comment="Companding mode u law (one's complement)" Value="SAI_ULAW_1CPL_COMPANDING"/>
+		<PossibleValue Comment="Companding mode A law (one's complement)" Value="SAI_ALAW_1CPL_COMPANDING"/>
+		<PossibleValue Comment="Companding mode u law (two's complement)" Value="SAI_ULAW_2CPL_COMPANDING"/>
+		<PossibleValue Comment="Companding mode A law (two's complement)" Value="SAI_ALAW_2CPL_COMPANDING"/>
+	</RefParameter>
+	
+	<RefParameter Comment="    Companding Mode" DefaultValue="SAI_NOCOMPANDING" Group="Basic Parameters" Name="CompandingMode" Type="list" Visible="true"> 
+		<Condition Diagnostic="Companding mode set to no companding" Expression="((Protocol=SAI_AC97_PROTOCOL) | (Protocol=SAI_SPDIF_PROTOCOL)) "/>
+		<PossibleValue Comment="No companding mode" Value="SAI_NOCOMPANDING"/>		
+	</RefParameter>
+	<RefParameter Comment="    Companding Mode" DefaultValue="SAI_NOCOMPANDING" Group="Basic Parameters" Name="CompandingMode" Type="list" Visible="false"/> 		
+	
+	
+	<RefParameter Comment="    SAI SD Line Output Mode" DefaultValue="null" Group="Basic Parameters" Name="TriState" Type="list" Visible="false">
+		<Condition Diagnostic="" Expression="(Protocol=SAI_SPDIF_PROTOCOL) | (AudioMode=SAI_MODEMASTER_RX)"/>
+	</RefParameter>
+	
+	<RefParameter Comment="    SAI SD Line Output Mode" DefaultValue="SAI_OUTPUT_NOTRELEASED" Group="Basic Parameters" Name="TriState" Type="list">
+		<PossibleValue Comment="Driven" Value="SAI_OUTPUT_NOTRELEASED"/>
+		<PossibleValue Comment="Tri-Sate" Value="SAI_OUTPUT_RELEASED"/>
+	</RefParameter>
+	
+	<RefParameter Comment="    Data Size" DefaultValue="SAI_DATASIZE_16" Group="Basic Parameters" Name="DataSize" Type="list">
+		<Condition Diagnostic="" Expression="Protocol=SAI_AC97_PROTOCOL"/>
+		<PossibleValue Comment="16 Bits" Value="SAI_DATASIZE_16"/>
+		<PossibleValue Comment="20 Bits" Value="SAI_DATASIZE_20"/>
+	</RefParameter>	
+	<RefParameter Comment="    Data Size" DefaultValue="null" Group="Basic Parameters" Name="DataSize" Type="list" Visible="false">
+		<Condition Diagnostic="" Expression="(Protocol=SAI_SPDIF_PROTOCOL) |(InitProtocol=Enable)"/>		
+	</RefParameter>	
+	<RefParameter Comment="    Data Size" DefaultValue="SAI_DATASIZE_8" Group="Basic Parameters" Name="DataSize" Type="list" Visible="false">
+		<Condition Diagnostic="" Expression="(CompandingMode=SAI_ULAW_1CPL_COMPANDING) |(CompandingMode=SAI_ALAW_1CPL_COMPANDING) | (CompandingMode=SAI_ULAW_2CPL_COMPANDING) | (CompandingMode=SAI_ALAW_2CPL_COMPANDING)"/>		
+	</RefParameter>	
+	<RefParameter Comment="    Data Size" DefaultValue="SAI_DATASIZE_24" Group="Basic Parameters" Name="DataSize" Type="list">	
+		<PossibleValue Comment="8 Bits" Value="SAI_DATASIZE_8"/>
+		<PossibleValue Comment="10 Bits" Value="SAI_DATASIZE_10"/>
+		<PossibleValue Comment="16 Bits" Value="SAI_DATASIZE_16"/>
+		<PossibleValue Comment="20 Bits" Value="SAI_DATASIZE_20"/>
+		<PossibleValue Comment="24 Bits" Value="SAI_DATASIZE_24"/>
+		<PossibleValue Comment="32 Bits" Value="SAI_DATASIZE_32"/>
+		<!--
+		<PossibleValue Comment="16 Bits" Value="SAI_PROTOCOL_DATASIZE_16BIT"/>
+		<PossibleValue Comment="16 Bits Extended" Value="SAI_PROTOCOL_DATASIZE_16BITEXTENDED"/>
+		<PossibleValue Comment="24 Bits" Value="SAI_PROTOCOL_DATASIZE_24BIT"/>	
+		<PossibleValue Comment="32 Bits" Value="SAI_PROTOCOL_DATASIZE_32BIT"/>	
+		-->
+	</RefParameter>
+	
+	<RefParameter Comment="    First Bit" DefaultValue="null" Group="Basic Parameters" Name="FirstBit" Type="integer" Visible="false">
+		<Condition Diagnostic="" Expression="(Protocol=SAI_AC97_PROTOCOL) | (Protocol=SAI_SPDIF_PROTOCOL) | (VirtualProtocol=VM_BASIC_PROTOCOL)|(InitProtocol=Enable)"/>
+	</RefParameter>
+	<RefParameter Comment="    First Bit" DefaultValue="SAI_FIRSTBIT_MSB" Group="Basic Parameters" Name="FirstBit" Type="list">
+		<PossibleValue Comment="MSB First" Value="SAI_FIRSTBIT_MSB"/>
+		<PossibleValue Comment="LSB First" Value="SAI_FIRSTBIT_LSB"/>
+	</RefParameter>
+	
+	<!-- Basic (I2S/PCM) Parameters for SAI  -->
+	<RefParameter Comment="Protocol Parameters" DefaultValue="" Group="Protocol Parameters" Name="BasicMode" Type="subtitle"/>
+	<RefParameter Comment="    Protocol" DefaultValue="SAI_I2S_STANDARD" Group="Protocol Parameters" Name="BasicProtocol" Type="list">
+		<Condition Diagnostic="" Expression="(InitProtocol=Enable)"/>
+		<PossibleValue Comment="I2S Standard" Value="SAI_I2S_STANDARD"/>
+		<PossibleValue Comment="I2S Msb Justified" Value="SAI_I2S_MSBJUSTIFIED"/>
+		<PossibleValue Comment="I2S Lsb Jusitified" Value="SAI_I2S_LSBJUSTIFIED"/>
+		<PossibleValue Comment="I2S PCM (Pulse Code modulation) Long" Value="SAI_PCM_LONG"/>
+		<PossibleValue Comment="I2S PCM (Pulse Code modulation) Standard" Value="SAI_PCM_SHORT"/>		
+	</RefParameter>
+	<RefParameter Comment="    Data Size" DefaultValue="SAI_PROTOCOL_DATASIZE_16BIT" Group="Protocol Parameters" Name="BasicDataSize" Type="list">
+		<Condition Diagnostic="" Expression="(BasicProtocol=SAI_I2S_STANDARD | BasicProtocol=SAI_I2S_MSBJUSTIFIED | BasicProtocol=SAI_I2S_LSBJUSTIFIED) &amp; (CompandingMode=SAI_NOCOMPANDING)"/>
+		<PossibleValue Comment="16 Bits" Value="SAI_PROTOCOL_DATASIZE_16BIT"/>
+		<PossibleValue Comment="16 Bits Extended" Value="SAI_PROTOCOL_DATASIZE_16BITEXTENDED"/>
+		<PossibleValue Comment="24 Bits" Value="SAI_PROTOCOL_DATASIZE_24BIT"/>	
+		<PossibleValue Comment="32 Bits" Value="SAI_PROTOCOL_DATASIZE_32BIT"/>	
+	</RefParameter>	
+	<RefParameter Comment="    Data Size" DefaultValue="SAI_PROTOCOL_DATASIZE_16BIT" Group="Protocol Parameters" Name="BasicDataSize" Type="list">
+		<Condition Diagnostic="" Expression="BasicProtocol=SAI_PCM_LONG | BasicProtocol=SAI_PCM_SHORT"/>
+		<PossibleValue Comment="16 Bits" Value="SAI_PROTOCOL_DATASIZE_16BIT"/>
+		<PossibleValue Comment="16 Bits Extended" Value="SAI_PROTOCOL_DATASIZE_16BITEXTENDED"/>		
+		<PossibleValue Comment="32 Bits" Value="SAI_PROTOCOL_DATASIZE_32BIT"/>	
+	</RefParameter>	
+	<RefParameter Comment="    Data Size" DefaultValue="SAI_DATASIZE_8" Group="Basic Parameters" Name="BasicDataSize" Type="list" Visible="false">
+		<Condition Diagnostic="" Expression="(CompandingMode=SAI_ULAW_1CPL_COMPANDING) |(CompandingMode=SAI_ALAW_1CPL_COMPANDING) | (CompandingMode=SAI_ULAW_2CPL_COMPANDING) | (CompandingMode=SAI_ALAW_2CPL_COMPANDING)"/>		
+	</RefParameter>
+	<RefParameter Comment="    Number of Slots (only Even Values)" DefaultValue="2" Group="Protocol Parameters" Max="16" Min="2" Name="BasicSlotNumber" Type="integer">
+		<Condition Diagnostic="" Expression="(BasicProtocol=SAI_I2S_STANDARD) | (BasicProtocol=SAI_I2S_MSBJUSTIFIED) | (BasicProtocol=SAI_I2S_LSBJUSTIFIED)"/>
+	</RefParameter>
+	<RefParameter Comment="    Number of Slots" DefaultValue="1" Group="Protocol Parameters" Max="16" Min="1" Name="BasicSlotNumber" Type="integer">
+		<Condition Diagnostic="" Expression="(BasicProtocol=SAI_PCM_LONG) | (BasicProtocol=SAI_PCM_SHORT)"/>
+	</RefParameter>
+	
+	<!-- Advanced Parameters for SAI  -->
+	<RefParameter Comment="Advanced Parameters" DefaultValue="" Group="Advanced Parameters" Name="AdvancedParameter" Type="subtitle"/>
+	
+	<RefParameter Comment="    Fifo Threshold" DefaultValue="SAI_FIFOTHRESHOLD_EMPTY" Group="Advanced Parameters" Name="FIFOThreshold" Type="list">
+		<PossibleValue Comment="Empty" Value="SAI_FIFOTHRESHOLD_EMPTY"/>
+		<PossibleValue Comment="One Quarter Full" Value="SAI_FIFOTHRESHOLD_1QF"/>
+		<PossibleValue Comment="Half Full" Value="SAI_FIFOTHRESHOLD_HF"/>
+		<PossibleValue Comment="Three Quarters Full" Value="SAI_FIFOTHRESHOLD_3QF"/>
+		<PossibleValue Comment="Full" Value="SAI_FIFOTHRESHOLD_FULL"/>
+	</RefParameter>
+		
+	<RefParameter Comment="    Output Drive" DefaultValue="SAI_OUTPUTDRIVE_DISABLE" Group="Advanced Parameters" Name="OutputDrive" Type="list">
+		<PossibleValue Comment="Disabled" Value="SAI_OUTPUTDRIVE_DISABLE"/>
+		<PossibleValue Comment="Enabled" Value="SAI_OUTPUTDRIVE_ENABLE"/>
+	</RefParameter>
+	
+	<RefParameter Comment="    Synchronization External" DefaultValue="SAI_SYNCEXT_DISABLE" Group="Advanced Parameters" Name="SynchroExt" Type="list">
+		<PossibleValue Comment="Disabled" Value="SAI_SYNCEXT_DISABLE"/>
+		<PossibleValue Comment="Input enabled" Value="SAI_SYNCEXT_OUTBLOCKA_ENABLE"/>
+		<PossibleValue Comment="Output SAI A enabled" Value="SAI_SYNCEXT_OUTBLOCKA_ENABLE"/>
+		<PossibleValue Comment="Output SAI B enabled" Value="SAI_SYNCEXT_OUTBLOCKB_ENABLE"/>
+	</RefParameter>
+	
+	<RefParameter Comment="    Synchronization" DefaultValue="SAI_ASYNCHRONOUS" Group="Advanced Parameters" Name="Synchro" Type="list" Visible="false">
+		<PossibleValue Comment="Asynchronous" Value="SAI_ASYNCHRONOUS"/>
+		<PossibleValue Comment="Synchronous" Value="SAI_SYNCHRONOUS"/>
+	</RefParameter>	
+
+
+	
+
+	<!-- Frame Parameters for SAI  -->
+	<RefParameter Comment="Frame Parameters" DefaultValue="" Group="Data Frame Parameters" Name="FrameParameter" Type="subtitle" Visible="false">
+		<Condition Diagnostic="" Expression="(Protocol=SAI_AC97_PROTOCOL) |(Protocol=SAI_SPDIF_PROTOCOL)"/>
+	</RefParameter>
+	<RefParameter Comment="Frame Parameters" DefaultValue="" Group="Data Frame Parameters" Name="FrameParameter" Type="subtitle"/>
+	
+	<RefParameter Comment="    Frame Length" DefaultValue="null" Group="Data Frame Parameters" Name="FrameLength" Type="integer" Visible="false">
+		<Condition Diagnostic="" Expression="(Protocol=SAI_AC97_PROTOCOL) |(Protocol=SAI_SPDIF_PROTOCOL) | (InitProtocol=Enable)"/>
+	</RefParameter>
+	<RefParameter Comment="    Frame Length" DefaultValue="8" Group="Data Frame Parameters" Name="FrameLength" Type="list">
+		<!-- Trakcer 307539 -->
+		<!--<Condition Expression="(MClockEnable=SAI_MASTERCLOCK_ENABLE) &amp; (NoDivider=SAI_MASTERDIVIDER_ENABLED)" Diagnostic=""/>-->
+		<Condition Diagnostic="" Expression="(VirtualMode=VM_MASTER) &amp; (NoDivider=SAI_MASTERDIVIDER_ENABLE)"/>
+		<PossibleValue Comment="8 bits" Value="8"/>
+		<PossibleValue Comment="16 bits" Value="16"/>
+		<PossibleValue Comment="32 bits" Value="32"/>
+		<PossibleValue Comment="64 bits" Value="64"/>
+		<PossibleValue Comment="128 bits" Value="128"/>
+		<PossibleValue Comment="256 bits" Value="256"/>
+	</RefParameter>
+	<RefParameter Comment="    Frame Length (only Even Values)" DefaultValue="24" Group="Data Frame Parameters" Max="256" Min="8" Name="FrameLength" Type="integer" Unit="bits"/>
+	
+	<RefParameter Comment="    Frame Synchro Active Level Length" DefaultValue="null" Group="Data Frame Parameters" Name="ActiveFrameLength" Type="integer" Visible="false">
+		<Condition Diagnostic="" Expression="(Protocol=SAI_AC97_PROTOCOL) |(Protocol=SAI_SPDIF_PROTOCOL)|(InitProtocol=Enable)"/>
+	</RefParameter>
+	<RefParameter Comment="    Frame Synchro Active Level Length" DefaultValue="1" Group="Data Frame Parameters" Max="128" Min="1" Name="ActiveFrameLength" Type="integer"/>
+		
+	<RefParameter Comment="    Frame Synchro Definition" DefaultValue="null" Group="Data Frame Parameters" Name="FSDefinition" Type="integer" Visible="false">
+		<Condition Diagnostic="" Expression="(Protocol=SAI_AC97_PROTOCOL) |(Protocol=SAI_SPDIF_PROTOCOL)|(InitProtocol=Enable)"/>
+	</RefParameter>
+	<RefParameter Comment="    Frame Synchro Definition" DefaultValue="SAI_FS_STARTFRAME" Group="Data Frame Parameters" Name="FSDefinition" Type="list">
+		<PossibleValue Comment="Start Frame" Value="SAI_FS_STARTFRAME"/>
+		<PossibleValue Comment="Channel Identification" Value="SAI_FS_CHANNEL_IDENTIFICATION"/>
+	</RefParameter>
+	
+	<RefParameter Comment="    Frame Synchro Polarity" DefaultValue="null" Group="Data Frame Parameters" Name="FSPolarity" Type="intger" Visible="false">
+		<Condition Diagnostic="" Expression="(Protocol=SAI_AC97_PROTOCOL) |(Protocol=SAI_SPDIF_PROTOCOL)|(InitProtocol=Enable)"/>
+	</RefParameter>	 
+	<RefParameter Comment="    Frame Synchro Polarity" DefaultValue="SAI_FS_ACTIVE_LOW" Group="Data Frame Parameters" Name="FSPolarity" Type="list">
+		<PossibleValue Comment="Active Low" Value="SAI_FS_ACTIVE_LOW"/>
+		<PossibleValue Comment="Active High" Value="SAI_FS_ACTIVE_HIGH"/>
+	</RefParameter>
+
+	<RefParameter Comment="    Frame Synchro Offset" DefaultValue="null" Group="Data Frame Parameters" Name="FSOffset" Type="integer" Visible="false">
+		<Condition Diagnostic="" Expression="(Protocol=SAI_AC97_PROTOCOL) |(Protocol=SAI_SPDIF_PROTOCOL)|(InitProtocol=Enable)"/>
+	</RefParameter>
+	<RefParameter Comment="    Frame Synchro Offset" DefaultValue="SAI_FS_FIRSTBIT" Group="Data Frame Parameters" Name="FSOffset" Type="list">
+		<PossibleValue Comment="First Bit" Value="SAI_FS_FIRSTBIT"/>
+		<PossibleValue Comment="Before First Bit" Value="SAI_FS_BEFOREFIRSTBIT"/>
+	</RefParameter>
+	
+	
+	<!-- Block Slot Parameters for SAI  -->
+	<RefParameter Comment="Slot Parameters" DefaultValue="" Group="Block Slot Parameters" Name="SlotParameter" Type="subtitle" Visible="false">
+		<Condition Diagnostic="" Expression="(Protocol=SAI_AC97_PROTOCOL) |(Protocol=SAI_SPDIF_PROTOCOL)"/>
+	</RefParameter>
+	<RefParameter Comment="Slot Parameters" DefaultValue="" Group="Block Slot Parameters" Name="SlotParameter" Type="subtitle"/>
+	
+	<RefParameter Comment="    First Bit Offset" DefaultValue="null" Group="Block Slot Parameters" Name="FirstBitOffset" Type="integer" Visible="false">
+		<Condition Diagnostic="" Expression="(Protocol=SAI_AC97_PROTOCOL) |(Protocol=SAI_SPDIF_PROTOCOL) |(InitProtocol=Enable)"/>
+	</RefParameter>
+	<RefParameter Comment="    First Bit Offset" DefaultValue="0" Group="Block Slot Parameters" Max="24" Min="0" Name="FirstBitOffset" Type="integer"/>
+	
+	<RefParameter Comment="    Slot Size" DefaultValue="null" Group="Block Slot Parameters" Name="SlotSize" Type="integer" Visible="false">
+		<Condition Diagnostic="" Expression="(Protocol=SAI_AC97_PROTOCOL) |(Protocol=SAI_SPDIF_PROTOCOL) |(InitProtocol=Enable)"/>
+	</RefParameter>
+	<RefParameter Comment="    Slot Size" DefaultValue="SAI_SLOTSIZE_DATASIZE" Group="Block Slot Parameters" Name="SlotSize" Type="list">
+		<PossibleValue Comment="DataSize" Value="SAI_SLOTSIZE_DATASIZE"/>
+		<PossibleValue Comment="16 Bits" Value="SAI_SLOTSIZE_16B"/>
+		<PossibleValue Comment="32 Bits" Value="SAI_SLOTSIZE_32B"/>
+	</RefParameter>
+
+	<RefParameter Comment="    Number of Slots" DefaultValue="null" Group="Block Slot Parameters" Name="SlotNumber" Type="integer" Visible="false">
+		<Condition Diagnostic="" Expression="(Protocol=SAI_AC97_PROTOCOL) |(Protocol=SAI_SPDIF_PROTOCOL) |(InitProtocol=Enable)"/>
+	</RefParameter>
+	<RefParameter Comment="    Number of Slots (only Even Values)" DefaultValue="2" Group="Block Slot Parameters" Max="2" Min="2" Name="SlotNumber" Type="integer">
+		<Condition Diagnostic="" Expression="(MonoStereoMode=SAI_MONOMODE)"/>
+	</RefParameter>
+	<RefParameter Comment="    Number of Slots (only Even Values)" DefaultValue="2" Group="Block Slot Parameters" Max="16" Min="2" Name="SlotNumber" Type="integer">
+		<Condition Diagnostic="" Expression="(FSDefinition=SAI_FS_CHANNEL_IDENTIFICATION)"/>
+	</RefParameter>
+	<RefParameter Comment="    Number of Slots" DefaultValue="1" Group="Block Slot Parameters" Max="16" Min="1" Name="SlotNumber" Type="integer"/>
+	
+	
+	
+	<RefParameter Comment="    Slot Active" DefaultValue="null" Group="Block Slot Parameters" Name="SlotActive" Type="string" Visible="false">
+		<Condition Diagnostic="" Expression="(Protocol=SAI_AC97_PROTOCOL) |(Protocol=SAI_SPDIF_PROTOCOL) |(InitProtocol=Enable)"/>
+	</RefParameter>
+	<RefParameter Comment="    Slot Active Final Value" DefaultValue="0x00000000" Group="Block Slot Parameters" Max="4294901760" Min="0" Name="SlotActive" Type="string"/>
+	
+	<RefParameter Comment="    Slot Active" DefaultValue="null" Group="Block Slot Parameters" Name="VirtualSlotActive" Type="integer" Visible="false">
+		<Condition Diagnostic="" Expression="(Protocol=SAI_AC97_PROTOCOL) |(Protocol=SAI_SPDIF_PROTOCOL)"/>
+	</RefParameter>
+	<!-- Tracker 307667 -->
+	<RefParameter Comment="    Slot Active" DefaultValue="SAI_SLOT_MONOSETTING" Group="Block Slot Parameters" Name="VirtualSlotActive" Type="list" Visible="true">
+		<Condition Diagnostic="" Expression="MonoStereoMode=SAI_MONOMODE"/>
+		<PossibleValue Comment="Use Slot 0 and 1 only" Value="SAI_SLOT_MONOSETTING"/>
+	</RefParameter>
+	<RefParameter Comment="    Slot Active" DefaultValue="SAI_SLOT_NOTACTIVE" Group="Block Slot Parameters" Name="VirtualSlotActive" Type="list">
+		<PossibleValue Comment="Neither" Value="SAI_SLOT_NOTACTIVE"/>
+		<PossibleValue Comment="User Setting" Value="SAI_SLOT_USERSETTING"/>
+		<PossibleValue Comment="All" Value="SAI_SLOTACTIVE_ALL"/>
+	</RefParameter>
+	
+	<RefParameter Comment="        Slot 0 Active" DefaultValue="0" Group="Block Slot Parameters" Name="VirtualSlotActive0" Type="boolean">
+		<Condition Diagnostic="" Expression="!((Protocol=SAI_AC97_PROTOCOL) |(Protocol=SAI_SPDIF_PROTOCOL)) &amp; (VirtualSlotActive=SAI_SLOT_USERSETTING)"/>
+	</RefParameter>
+	<RefParameter Comment="" DefaultValue="0" Group="Block Slot Parameters" Name="VirtualSlotActive0" Type="boolean" Visible="false"/>
+		
+	<RefParameter Comment="        Slot 1 Active" DefaultValue="0" Group="Block Slot Parameters" Name="VirtualSlotActive1" Type="boolean">
+		<Condition Diagnostic="" Expression="!((Protocol=SAI_AC97_PROTOCOL) |(Protocol=SAI_SPDIF_PROTOCOL)) &amp; (VirtualSlotActive=SAI_SLOT_USERSETTING) &amp; (SlotNumber &gt; 1)"/>
+	</RefParameter>
+	<RefParameter Comment="" DefaultValue="0" Group="Block Slot Parameters" Name="VirtualSlotActive1" Type="boolean" Visible="false"/>
+	
+	<RefParameter Comment="        Slot 2 Active" DefaultValue="0" Group="Block Slot Parameters" Name="VirtualSlotActive2" Type="boolean">
+		<Condition Diagnostic="" Expression="!((Protocol=SAI_AC97_PROTOCOL) |(Protocol=SAI_SPDIF_PROTOCOL)) &amp; (VirtualSlotActive=SAI_SLOT_USERSETTING) &amp; (SlotNumber &gt; 2)"/>
+	</RefParameter>
+	<RefParameter Comment="" DefaultValue="0" Group="Block Slot Parameters" Name="VirtualSlotActive2" Type="boolean" Visible="false"/>
+	
+	<RefParameter Comment="        Slot 3 Active" DefaultValue="0" Group="Block Slot Parameters" Name="VirtualSlotActive3" Type="boolean">
+		<Condition Diagnostic="" Expression="!((Protocol=SAI_AC97_PROTOCOL) |(Protocol=SAI_SPDIF_PROTOCOL)) &amp; (VirtualSlotActive=SAI_SLOT_USERSETTING) &amp; (SlotNumber &gt; 3)"/>
+	</RefParameter>
+	<RefParameter Comment="" DefaultValue="0" Group="Block Slot Parameters" Name="VirtualSlotActive3" Type="boolean" Visible="false"/>
+	
+	<RefParameter Comment="        Slot 4 Active" DefaultValue="0" Group="Block Slot Parameters" Name="VirtualSlotActive4" Type="boolean">
+		<Condition Diagnostic="" Expression="!((Protocol=SAI_AC97_PROTOCOL) |(Protocol=SAI_SPDIF_PROTOCOL)) &amp; (VirtualSlotActive=SAI_SLOT_USERSETTING) &amp; (SlotNumber &gt; 4)"/>
+	</RefParameter>
+	<RefParameter Comment="" DefaultValue="0" Group="Block Slot Parameters" Name="VirtualSlotActive4" Type="boolean" Visible="false"/>
+	
+	<RefParameter Comment="        Slot 5 Active" DefaultValue="0" Group="Block Slot Parameters" Name="VirtualSlotActive5" Type="boolean">
+		<Condition Diagnostic="" Expression="!((Protocol=SAI_AC97_PROTOCOL) |(Protocol=SAI_SPDIF_PROTOCOL)) &amp; (VirtualSlotActive=SAI_SLOT_USERSETTING) &amp; (SlotNumber &gt; 5)"/>
+	</RefParameter>
+	<RefParameter Comment="" DefaultValue="0" Group="Block Slot Parameters" Name="VirtualSlotActive5" Type="boolean" Visible="false"/>
+	
+	<RefParameter Comment="        Slot 6 Active" DefaultValue="0" Group="Block Slot Parameters" Name="VirtualSlotActive6" Type="boolean">
+		<Condition Diagnostic="" Expression="!((Protocol=SAI_AC97_PROTOCOL) |(Protocol=SAI_SPDIF_PROTOCOL)) &amp; (VirtualSlotActive=SAI_SLOT_USERSETTING) &amp; (SlotNumber &gt; 6)"/>
+	</RefParameter>
+	<RefParameter Comment="" DefaultValue="0" Group="Block Slot Parameters" Name="VirtualSlotActive6" Type="boolean" Visible="false"/>
+	
+	<RefParameter Comment="        Slot 7 Active" DefaultValue="0" Group="Block Slot Parameters" Name="VirtualSlotActive7" Type="boolean">
+		<Condition Diagnostic="" Expression="!((Protocol=SAI_AC97_PROTOCOL) |(Protocol=SAI_SPDIF_PROTOCOL)) &amp; (VirtualSlotActive=SAI_SLOT_USERSETTING) &amp; (SlotNumber &gt; 7)"/>
+	</RefParameter>
+	<RefParameter Comment="" DefaultValue="0" Group="Block Slot Parameters" Name="VirtualSlotActive7" Type="boolean" Visible="false"/>
+	
+	<RefParameter Comment="        Slot 8 Active" DefaultValue="0" Group="Block Slot Parameters" Name="VirtualSlotActive8" Type="boolean">
+		<Condition Diagnostic="" Expression="!((Protocol=SAI_AC97_PROTOCOL) |(Protocol=SAI_SPDIF_PROTOCOL)) &amp; (VirtualSlotActive=SAI_SLOT_USERSETTING) &amp; (SlotNumber &gt; 8)"/>
+	</RefParameter>
+	<RefParameter Comment="" DefaultValue="0" Group="Block Slot Parameters" Name="VirtualSlotActive8" Type="boolean" Visible="false"/>
+	
+	<RefParameter Comment="        Slot 9 Active" DefaultValue="0" Group="Block Slot Parameters" Name="VirtualSlotActive9" Type="boolean">
+		<Condition Diagnostic="" Expression="!((Protocol=SAI_AC97_PROTOCOL) |(Protocol=SAI_SPDIF_PROTOCOL)) &amp; (VirtualSlotActive=SAI_SLOT_USERSETTING) &amp; (SlotNumber &gt; 9)"/>
+	</RefParameter>
+	<RefParameter Comment="" DefaultValue="0" Group="Block Slot Parameters" Name="VirtualSlotActive9" Type="boolean" Visible="false"/>
+	
+	<RefParameter Comment="        Slot 10 Active" DefaultValue="0" Group="Block Slot Parameters" Name="VirtualSlotActive10" Type="boolean">
+		<Condition Diagnostic="" Expression="!((Protocol=SAI_AC97_PROTOCOL) |(Protocol=SAI_SPDIF_PROTOCOL)) &amp; (VirtualSlotActive=SAI_SLOT_USERSETTING) &amp; (SlotNumber &gt; 10)"/>
+	</RefParameter>
+	<RefParameter Comment="" DefaultValue="0" Group="Block Slot Parameters" Name="VirtualSlotActive10" Type="boolean" Visible="false"/>
+	
+	<RefParameter Comment="        Slot 11 Active" DefaultValue="0" Group="Block Slot Parameters" Name="VirtualSlotActive11" Type="boolean">
+		<Condition Diagnostic="" Expression="!((Protocol=SAI_AC97_PROTOCOL) |(Protocol=SAI_SPDIF_PROTOCOL)) &amp; (VirtualSlotActive=SAI_SLOT_USERSETTING) &amp; (SlotNumber &gt; 11)"/>
+	</RefParameter>
+	<RefParameter Comment="" DefaultValue="0" Group="Block Slot Parameters" Name="VirtualSlotActive11" Type="boolean" Visible="false"/>
+	
+	<RefParameter Comment="        Slot 12 Active" DefaultValue="0" Group="Block Slot Parameters" Name="VirtualSlotActive12" Type="boolean">
+		<Condition Diagnostic="" Expression="!((Protocol=SAI_AC97_PROTOCOL) |(Protocol=SAI_SPDIF_PROTOCOL)) &amp; (VirtualSlotActive=SAI_SLOT_USERSETTING) &amp; (SlotNumber &gt; 12)"/>
+	</RefParameter>
+	<RefParameter Comment="" DefaultValue="0" Group="Block Slot Parameters" Name="VirtualSlotActive12" Type="boolean" Visible="false"/>
+	
+	<RefParameter Comment="        Slot 13 Active" DefaultValue="0" Group="Block Slot Parameters" Name="VirtualSlotActive13" Type="boolean">
+		<Condition Diagnostic="" Expression="!((Protocol=SAI_AC97_PROTOCOL) |(Protocol=SAI_SPDIF_PROTOCOL)) &amp; (VirtualSlotActive=SAI_SLOT_USERSETTING) &amp; (SlotNumber &gt; 13)"/>
+	</RefParameter>
+	<RefParameter Comment="" DefaultValue="0" Group="Block Slot Parameters" Name="VirtualSlotActive13" Type="boolean" Visible="false"/>
+	
+	<RefParameter Comment="        Slot 14 Active" DefaultValue="0" Group="Block Slot Parameters" Name="VirtualSlotActive14" Type="boolean">
+		<Condition Diagnostic="" Expression="!((Protocol=SAI_AC97_PROTOCOL) |(Protocol=SAI_SPDIF_PROTOCOL)) &amp; (VirtualSlotActive=SAI_SLOT_USERSETTING) &amp; (SlotNumber &gt; 14)"/>
+	</RefParameter>
+	<RefParameter Comment="" DefaultValue="0" Group="Block Slot Parameters" Name="VirtualSlotActive14" Type="boolean" Visible="false"/>
+
+	<RefParameter Comment="        Slot 15 Active" DefaultValue="0" Group="Block Slot Parameters" Name="VirtualSlotActive15" Type="boolean">
+		<Condition Diagnostic="" Expression="!((Protocol=SAI_AC97_PROTOCOL) |(Protocol=SAI_SPDIF_PROTOCOL)) &amp; (VirtualSlotActive=SAI_SLOT_USERSETTING) &amp; (SlotNumber &gt; 15)"/>
+	</RefParameter>
+	<RefParameter Comment="" DefaultValue="0" Group="Block Slot Parameters" Name="VirtualSlotActive15" Type="boolean" Visible="false"/>
+	
+	
+	<!-- Clock Parameters for SAI  -->
+	<RefParameter Comment="Clock Parameters" DefaultValue="" Group="Clock Parameters" Name="ClockParameter" Type="subtitle"/>
+	
+	<RefParameter Comment="    Clock Source" DefaultValue="SAI_CLKSOURCE_PLLSAI" Group="Clock Parameters" Name="ClockSource" Type="list">
+		<Condition Diagnostic="" Expression="(VirtualMode=VM_MASTER) &amp; (!STM32F446) &amp; (!STM32F7) &amp; (!STM32L4)"/>
+		<PossibleValue Comment="SAI PLL Clock" Value="SAI_CLKSOURCE_PLLSAI"/>
+		<PossibleValue Comment="I2S PLL Clock" Value="SAI_CLKSOURCE_PLLI2S"/>
+		<PossibleValue Comment="External Audio Clock" Value="SAI_CLKSOURCE_EXT"/>
+	</RefParameter>
+	<RefParameter Comment="    Clock Source" DefaultValue="SAI_CLKSOURCE_NA" Group="Clock Parameters" Name="ClockSource" Type="list" Visible="false">
+		<Condition Diagnostic="" Expression="(VirtualMode=VM_MASTER) &amp; (STM32L4xx)"/>
+		<PossibleValue Comment="Not Available for STM32L4 series" Value="SAI_CLKSOURCE_NA"/>	
+	</RefParameter>	
+	<RefParameter Comment="    Clock Source" DefaultValue="SAI_CLKSOURCE_NA" Group="Clock Parameters" Name="ClockSource" Type="list" Visible="false">
+		<Condition Diagnostic="" Expression="(VirtualMode=VM_MASTER) &amp; (STM32F446)"/>
+		<PossibleValue Comment="Not Available for STM32F446" Value="SAI_CLKSOURCE_NA"/>	
+	</RefParameter>
+	<RefParameter Comment="    Clock Source" DefaultValue="null" Group="Clock Parameters" Name="ClockSource" Type="integer" Visible="false"/>
+	
+	<RefParameter Comment="    Master Clock Divider" DefaultValue="SAI_MASTERDIVIDER_ENABLE" Group="Clock Parameters" Name="NoDivider" Type="list">
+		<Condition Diagnostic="" Expression="((VirtualMode=VM_MASTER) &amp; !((Protocol=SAI_AC97_PROTOCOL)))"/>
+		<PossibleValue Comment="Enabled" Value="SAI_MASTERDIVIDER_ENABLE"/>
+		<PossibleValue Comment="Disabled" Value="SAI_MASTERDIVIDER_DISABLE"/>
+	</RefParameter>
+	<RefParameter Comment="    Master Clock Divider" DefaultValue="null" Group="Clock Parameters" Name="NoDivider" Type="integer" Visible="false"/>
+	
+	<RefParameter Comment="    Audio Frequency" DefaultValue="SAI_AUDIO_FREQUENCY_192K" Group="Clock Parameters" Name="AudioFrequency" Type="list">
+		<Condition Diagnostic="" Expression="(((VirtualMode=VM_MASTER) &amp; (NoDivider=SAI_MASTERDIVIDER_ENABLE)) &amp; !((Protocol=SAI_AC97_PROTOCOL) | (Protocol=SAI_SPDIF_PROTOCOL)))"/>		
+		<PossibleValue Comment="192 KHz" Value="SAI_AUDIO_FREQUENCY_192K"/>
+		<PossibleValue Comment="96 KHz" Value="SAI_AUDIO_FREQUENCY_96K"/>
+		<PossibleValue Comment="48 KHz" Value="SAI_AUDIO_FREQUENCY_48K"/>
+		<PossibleValue Comment="44.1 KHz" Value="SAI_AUDIO_FREQUENCY_44K"/>
+		<PossibleValue Comment="32 KHz" Value="SAI_AUDIO_FREQUENCY_32K"/>
+		<PossibleValue Comment="22.05 KHz" Value="SAI_AUDIO_FREQUENCY_22K"/>
+		<PossibleValue Comment="16 KHz" Value="SAI_AUDIO_FREQUENCY_16K"/>
+		<PossibleValue Comment="11.025 KHz" Value="SAI_AUDIO_FREQUENCY_11K"/>
+		<PossibleValue Comment="8 KHz" Value="SAI_AUDIO_FREQUENCY_8K"/>
+		<PossibleValue Comment="User set Master Clock Divider value" Value="SAI_AUDIO_FREQUENCY_MCKDIV"/>
+	</RefParameter>
+	<RefParameter Comment="    Audio Frequency" DefaultValue="SAI_AUDIO_FREQUENCY_48K" Group="Clock Parameters" Name="AudioFrequency" Type="list">
+		<Condition Diagnostic="set the PLL SAI at 12.288Mhz (48Khz * 256)" Expression="(Protocol=SAI_AC97_PROTOCOL)"/>				
+		<PossibleValue Comment="48 KHz" Value="SAI_AUDIO_FREQUENCY_48K"/>		
+	</RefParameter>
+	<RefParameter Comment="    Audio Frequency" DefaultValue="SAI_AUDIO_FREQUENCY_48K" Group="Clock Parameters" Name="AudioFrequency" Type="list">
+		<Condition Diagnostic="set the PLL SAI at AudioFrequency (FS) * 64" Expression="(Protocol=SAI_SPDIF_PROTOCOL)"/>				
+		<PossibleValue Comment="192 KHz" Value="SAI_AUDIO_FREQUENCY_192K"/>
+		<PossibleValue Comment="96 KHz" Value="SAI_AUDIO_FREQUENCY_96K"/>
+		<PossibleValue Comment="48 KHz" Value="SAI_AUDIO_FREQUENCY_48K"/>
+		<PossibleValue Comment="44.1 KHz" Value="SAI_AUDIO_FREQUENCY_44K"/>
+		<PossibleValue Comment="32 KHz" Value="SAI_AUDIO_FREQUENCY_32K"/>
+		<PossibleValue Comment="22.05 KHz" Value="SAI_AUDIO_FREQUENCY_22K"/>
+		<PossibleValue Comment="16 KHz" Value="SAI_AUDIO_FREQUENCY_16K"/>
+		<PossibleValue Comment="11.025 KHz" Value="SAI_AUDIO_FREQUENCY_11K"/>
+		<PossibleValue Comment="8 KHz" Value="SAI_AUDIO_FREQUENCY_8K"/>		
+	</RefParameter>
+	<RefParameter Comment="    Audio Frequency" DefaultValue="null" Group="Clock Parameters" Name="AudioFrequency" Type="list" Visible="false"/>
+
+
+	<!-- Virtual Value for MasterClock Output -->
+	<RefParameter Comment="    Master Clock Output" DefaultValue="SAI_MASTERCLOCK_DISABLE" Group="Clock Parameters" Name="MClockEnable" Type="list" Visible="false">
+		<Condition Diagnostic="" Expression="VirtualMode=VM_MASTER"/>
+		<PossibleValue Comment="Master Clock Disable" Value="SAI_MASTERCLOCK_DISABLE"/>
+		<PossibleValue Comment="Master Clock Enable" Value="SAI_MASTERCLOCK_ENABLE"/>
+	</RefParameter>
+	<RefParameter Comment="    Master Clock Output" DefaultValue="SAI_MASTERCLOCK_DISABLE" Group="Clock Parameters" Name="MClockEnable" Type="list" Visible="false">
+		<PossibleValue Comment="Master Clock Disable" Value="SAI_MASTERCLOCK_DISABLE"/>
+	</RefParameter>
+	
+	<!-- Calculated Value for Audio Frequency -->
+	<!-- tracker 315167 -->
+	<RefParameter Comment="    Real Audio Frequency" DefaultValue="0" Group="Clock Parameters" Max="1000000" Min="0" Name="RealAudioFreq" Type="string" Visible="true">		
+		<Condition Diagnostic="" Expression="(Protocol=SAI_AC97_PROTOCOL)"/>
+	</RefParameter>	
+	<RefParameter Comment="    Real Audio Frequency" DefaultValue="0" Group="Clock Parameters" Max="1000000" Min="0" Name="RealAudioFreq" Type="string">
+		<Condition Diagnostic="Real Audio Frequency with current SAI clock (SAI clock / 64)" Expression="(Protocol=SAI_SPDIF_PROTOCOL)"/>
+	</RefParameter>		
+	
+	
+	<RefParameter Comment="    Real Audio Frequency" DefaultValue="0" Group="Clock Parameters" Max="1000000" Min="0" Name="RealAudioFreq" Type="string"/>		
+	
+	<!-- tracker 315167 -->
+	<RefParameter Comment="    Error between Selected" DefaultValue="0" Group="Clock Parameters" Max="100" Min="0" Name="ErrorAudioFreq" Type="string" Visible="true">
+		<Condition Diagnostic="" Expression="(Protocol=SAI_AC97_PROTOCOL)"/>
+	</RefParameter>
+	<RefParameter Comment="    Error between Selected" DefaultValue="0" Group="Clock Parameters" Max="100" Min="0" Name="ErrorAudioFreq" Type="string" Visible="false">
+		<Condition Diagnostic="" Expression="(Protocol=SAI_SPDIF_PROTOCOL)"/>
+	</RefParameter>
+	<RefParameter Comment="    Error between Selected" DefaultValue="0" Group="Clock Parameters" Max="100" Min="0" Name="ErrorAudioFreq" Type="string" Visible="false">
+		<Condition Diagnostic="" Expression="(AudioFrequency=SAI_AUDIO_FREQUENCY_MCKDIV) | (NoDivider=SAI_MASTERDIVIDER_DISABLE)"/>
+	</RefParameter>
+	<RefParameter Comment="    Error between Selected" DefaultValue="0" Group="Clock Parameters" Max="100" Min="0" Name="ErrorAudioFreq" Type="string" Visible="true">		
+	</RefParameter>
+	
+	<RefParameter Comment="    Clock Strobing" DefaultValue="null" Group="Clock Parameters" Name="ClockStrobing" Type="list" Visible="false">
+		<Condition Diagnostic="" Expression="(Protocol=SAI_SPDIF_PROTOCOL) | (VirtualProtocol=VM_BASIC_PROTOCOL) |(InitProtocol=Enable)"/>
+	</RefParameter>
+	<RefParameter Comment="    Clock Strobing" DefaultValue="SAI_CLOCKSTROBING_FALLINGEDGE" Group="Clock Parameters" Name="ClockStrobing" Type="list">
+		<PossibleValue Comment="Falling Edge" Value="SAI_CLOCKSTROBING_FALLINGEDGE"/>
+		<PossibleValue Comment="Rising Edge" Value="SAI_CLOCKSTROBING_RISINGEDGE"/>
+	</RefParameter>
+
+	<RefParameter Comment="    Master Clock Divider" DefaultValue="0" Group="Clock Parameters" Max="15" Min="0" Name="Mckdiv" Type="integer">
+		<Condition Diagnostic="Master Clock frequency is equal to SAI Clock frequency" Expression="(AudioFrequency=SAI_AUDIO_FREQUENCY_MCKDIV) &amp; (NoDivider=SAI_MASTERDIVIDER_ENABLE)"/>
+	</RefParameter>
+	<RefParameter Comment="    Master Clock Divider" DefaultValue="null" Group="Clock Parameters" Max="15" Min="0" Name="Mckdiv" Type="integer" Visible="false">		
+	</RefParameter>
+	
+	
+	
+	
+	<!-- RefModes 'Master Expert Mode' for SAI_A -->
+	<RefMode Comment="SAI A Master" Group="SAI A" Name="SAI_A_Master">
+		<ConfigForMode>SaiA_Init</ConfigForMode>
+		<Parameter Name="Instance">
+			<PossibleValue>SAI$Index_Block_A</PossibleValue>
+		</Parameter>
+		<Parameter Name="VirtualMode">
+			<PossibleValue>VM_MASTER</PossibleValue>
+		</Parameter>		
+		<Parameter Name="Synchro">
+			<PossibleValue>SAI_ASYNCHRONOUS</PossibleValue>
+		</Parameter>
+		<Parameter Name="MClockEnable">
+			<PossibleValue>SAI_MASTERCLOCK_DISABLE</PossibleValue>
+		</Parameter>
+		<!-- Basic Parameters -->	
+		<Parameter Name="BasicParameter"/>
+		<Parameter Name="Protocol"/>			
+		<Parameter Name="AudioMode"/>
+		<Parameter Name="FrameLength"/>
+		<Parameter Name="DataSize"/>
+		<Parameter Name="SlotSize"/>
+		<Parameter Name="MonoStereoMode"/>
+		<Parameter Name="CompandingMode"/>
+		<Parameter Name="TriState"/>			
+		<!-- DataFrame Parameters -->
+		<Parameter Name="FrameParameter"/>
+		<Parameter Name="FirstBit"/>
+		<Parameter Name="ActiveFrameLength"/>
+		<Parameter Name="FSDefinition"/>
+		<Parameter Name="FSPolarity"/>
+		<Parameter Name="FSOffset"/>
+		<!-- Block Slot Parameters -->
+		<Parameter Name="SlotParameter"/>
+		<Parameter Name="FirstBitOffset"/>
+		<Parameter Name="SlotNumber"/>
+		<Parameter Name="SlotActive"/>
+		<Parameter Name="VirtualSlotActive"/>
+		<Parameter Name="VirtualSlotActive0"/>
+		<Parameter Name="VirtualSlotActive1"/>
+		<Parameter Name="VirtualSlotActive2"/>
+		<Parameter Name="VirtualSlotActive3"/>
+		<Parameter Name="VirtualSlotActive4"/>
+		<Parameter Name="VirtualSlotActive5"/>
+		<Parameter Name="VirtualSlotActive6"/>
+		<Parameter Name="VirtualSlotActive7"/>
+		<Parameter Name="VirtualSlotActive8"/>
+		<Parameter Name="VirtualSlotActive9"/>
+		<Parameter Name="VirtualSlotActive10"/>
+		<Parameter Name="VirtualSlotActive11"/>
+		<Parameter Name="VirtualSlotActive12"/>
+		<Parameter Name="VirtualSlotActive13"/>
+		<Parameter Name="VirtualSlotActive14"/>
+		<Parameter Name="VirtualSlotActive15"/>
+		<!-- Clock Parameters -->
+		<Parameter Name="ClockParameter"/>
+		<!--Not used by STM32L4 -->
+		<Parameter Name="ClockSource"/>		
+		<Parameter Name="NoDivider"/>
+		<Parameter Name="AudioFrequency"/>
+		<Parameter Name="RealAudioFreq"/>
+		<Parameter Name="ErrorAudioFreq"/>
+		<Parameter Name="ClockStrobing"/>
+		<Parameter Name="Mckdiv"/>
+		<!-- Advanced Parameters -->
+		<Parameter Name="AdvancedParameter"/>
+		<Parameter Name="FIFOThreshold"/>
+		<Parameter Name="OutputDrive"/>
+		<Parameter Name="SynchroExt"/>	
+		<Condition Diagnostic="" Expression="!$IpInstance_SAIA_INIT_PROTOCOL"/>
+	</RefMode>
+	<!-- RefModes 'Master Basic Mode' for SAI_A -->
+	<RefMode Comment="SAI A Master" Group="SAI A" Name="SAI_A_Master">
+		<ConfigForMode>SaiA_InitProtocol</ConfigForMode>
+		<Parameter Name="Instance">
+			<PossibleValue>SAI$Index_Block_A</PossibleValue>
+		</Parameter>
+		<Parameter Name="VirtualMode">
+			<PossibleValue>VM_MASTER</PossibleValue>
+		</Parameter>		
+		<Parameter Name="Synchro">
+			<PossibleValue>SAI_ASYNCHRONOUS</PossibleValue>
+		</Parameter>
+		<Parameter Name="MClockEnable">
+			<PossibleValue>SAI_MASTERCLOCK_DISABLE</PossibleValue>
+		</Parameter>
+		<!-- Basic Parameters -->
+		<Parameter Name="BasicParameter"/>				
+		<Parameter Name="AudioMode"/>						
+		<Parameter Name="MonoStereoMode"/>
+		<Parameter Name="CompandingMode"/>
+		<Parameter Name="TriState"/>		
+		<!-- Basic Mode Parameters -->
+		<Parameter Name="BasicMode"/>	
+		<Parameter Name="BasicProtocol"/>
+		<Parameter Name="BasicDataSize"/>
+		<Parameter Name="BasicSlotNumber"/>	
+		<!-- Clock Parameters -->
+		<Parameter Name="ClockParameter"/>
+		<!--Not used by STM32L4 -->
+		<Parameter Name="ClockSource"/>		
+		<Parameter Name="NoDivider"/>
+		<Parameter Name="AudioFrequency"/>
+		<Parameter Name="RealAudioFreq"/>
+		<Parameter Name="ErrorAudioFreq"/>		
+		<Parameter Name="Mckdiv"/>
+		<!-- Advanced Parameters -->
+		<Parameter Name="AdvancedParameter"/>
+		<Parameter Name="FIFOThreshold"/>
+		<Parameter Name="OutputDrive"/>
+		<Parameter Name="SynchroExt"/>		
+		<Parameter Name="InitProtocol">
+			<PossibleValue>Enable</PossibleValue>
+		</Parameter>	
+		<Condition Diagnostic="" Expression="$IpInstance_SAIA_INIT_PROTOCOL"/>
+	</RefMode>	
+	
+	<!-- RefModes 'Master witch clock Expert Mode' for SAI_A -->
+	<RefMode Comment="SAI A Master with clock" Group="SAI A" Name="SAI_A_MasterWithClock">		
+		<!-- Selected Mode Fixed Parameters -->
+		<ConfigForMode>SaiA_Init</ConfigForMode>
+		<Parameter Name="Instance">
+			<PossibleValue>SAI$Index_Block_A</PossibleValue>
+		</Parameter>
+		<Parameter Name="VirtualMode">
+			<PossibleValue>VM_MASTER</PossibleValue>
+		</Parameter>
+		<Parameter Name="Synchro">
+			<PossibleValue>SAI_ASYNCHRONOUS</PossibleValue>
+		</Parameter>
+		<Parameter Name="MClockEnable">
+			<PossibleValue>SAI_MASTERCLOCK_ENABLE</PossibleValue>
+		</Parameter>
+		<!-- Basic Parameters -->	
+		<Parameter Name="BasicParameter"/>	
+		<Parameter Name="Protocol"/>		
+		<Parameter Name="AudioMode"/>
+		<Parameter Name="FrameLength"/>
+		<Parameter Name="DataSize"/>
+		<Parameter Name="SlotSize"/>
+		<Parameter Name="MonoStereoMode"/>
+		<Parameter Name="CompandingMode"/>
+		<Parameter Name="TriState"/>			
+		<!-- DataFrame Parameters -->
+		<Parameter Name="FrameParameter"/>
+		<Parameter Name="FirstBit"/>
+		<Parameter Name="ActiveFrameLength"/>
+		<Parameter Name="FSDefinition"/>
+		<Parameter Name="FSPolarity"/>
+		<Parameter Name="FSOffset"/>
+		<!-- Block Slot Parameters -->
+		<Parameter Name="SlotParameter"/>
+		<Parameter Name="FirstBitOffset"/>
+		<Parameter Name="SlotNumber"/>
+		<Parameter Name="SlotActive"/>
+		<Parameter Name="VirtualSlotActive"/>
+		<Parameter Name="VirtualSlotActive0"/>
+		<Parameter Name="VirtualSlotActive1"/>
+		<Parameter Name="VirtualSlotActive2"/>
+		<Parameter Name="VirtualSlotActive3"/>
+		<Parameter Name="VirtualSlotActive4"/>
+		<Parameter Name="VirtualSlotActive5"/>
+		<Parameter Name="VirtualSlotActive6"/>
+		<Parameter Name="VirtualSlotActive7"/>
+		<Parameter Name="VirtualSlotActive8"/>
+		<Parameter Name="VirtualSlotActive9"/>
+		<Parameter Name="VirtualSlotActive10"/>
+		<Parameter Name="VirtualSlotActive11"/>
+		<Parameter Name="VirtualSlotActive12"/>
+		<Parameter Name="VirtualSlotActive13"/>
+		<Parameter Name="VirtualSlotActive14"/>
+		<Parameter Name="VirtualSlotActive15"/>
+		<!-- Clock Parameters -->
+		<Parameter Name="ClockParameter"/>
+		<!--Not used by STM32L4 -->
+		<Parameter Name="ClockSource"/>		
+		<Parameter Name="NoDivider"/>
+		<Parameter Name="AudioFrequency"/>
+		<Parameter Name="RealAudioFreq"/>
+		<Parameter Name="ErrorAudioFreq"/>
+		<Parameter Name="ClockStrobing"/>
+		<Parameter Name="Mckdiv"/>
+		<!-- Advanced Parameters -->
+		<Parameter Name="AdvancedParameter"/>
+		<Parameter Name="FIFOThreshold"/>
+		<Parameter Name="OutputDrive"/>
+		<Parameter Name="SynchroExt"/>	
+		<Condition Diagnostic="" Expression="!$IpInstance_SAIA_INIT_PROTOCOL"/>		
+	</RefMode>
+	
+	<!-- RefModes 'Master witch clock Basic Mode' for SAI_A -->
+	<RefMode Comment="SAI A Master with clock" Group="SAI A" Name="SAI_A_MasterWithClock">		
+		<ConfigForMode>SaiA_InitProtocol</ConfigForMode>
+		<!-- Selected Mode Fixed Parameters -->
+		<Parameter Name="Instance">
+			<PossibleValue>SAI$Index_Block_A</PossibleValue>
+		</Parameter>
+		<Parameter Name="VirtualMode">
+			<PossibleValue>VM_MASTER</PossibleValue>
+		</Parameter>
+		<Parameter Name="Synchro">
+			<PossibleValue>SAI_ASYNCHRONOUS</PossibleValue>
+		</Parameter>
+		<Parameter Name="MClockEnable">
+			<PossibleValue>SAI_MASTERCLOCK_ENABLE</PossibleValue>
+		</Parameter>
+		<!-- Basic Parameters -->
+		<Parameter Name="BasicParameter"/>			
+		<Parameter Name="AudioMode"/>						
+		<Parameter Name="MonoStereoMode"/>
+		<Parameter Name="CompandingMode"/>
+		<Parameter Name="TriState"/>		
+		<!-- Basic Mode Parameters -->
+		<Parameter Name="BasicMode"/>	
+		<Parameter Name="BasicProtocol"/>
+		<Parameter Name="BasicDataSize"/>
+		<Parameter Name="BasicSlotNumber"/>	
+		<!-- Clock Parameters -->
+		<Parameter Name="ClockParameter"/>
+		<!--Not used by STM32L4 -->
+		<Parameter Name="ClockSource"/>		
+		<Parameter Name="NoDivider"/>
+		<Parameter Name="AudioFrequency"/>
+		<Parameter Name="RealAudioFreq"/>
+		<Parameter Name="ErrorAudioFreq"/>		
+		<Parameter Name="Mckdiv"/>
+		<!-- Advanced Parameters -->
+		<Parameter Name="AdvancedParameter"/>
+		<Parameter Name="FIFOThreshold"/>
+		<Parameter Name="OutputDrive"/>
+		<Parameter Name="SynchroExt"/>
+        <Parameter Name="InitProtocol">
+			<PossibleValue>Enable</PossibleValue>
+		</Parameter>		
+		<Condition Diagnostic="" Expression="$IpInstance_SAIA_INIT_PROTOCOL"/>
+	</RefMode>
+	
+	<!-- RefModes 'Slave Asynchronous Expert Mode' for SAI_A -->
+	<RefMode Comment="SAI A Asynchronus slave" Group="SAI A" Name="SAI_A_AsyncSlave">
+		<ConfigForMode>SaiA_Init</ConfigForMode>
+		<!-- Selected Mode Fixed Parameters -->
+		<Parameter Name="Instance">
+			<PossibleValue>SAI$Index_Block_A</PossibleValue>
+		</Parameter>
+		<Parameter Name="VirtualMode">
+			<PossibleValue>VM_SLAVE</PossibleValue>
+		</Parameter>	
+		<Parameter Name="Synchro">
+			<PossibleValue>SAI_ASYNCHRONOUS</PossibleValue>
+		</Parameter>
+		<!-- Basic Parameters -->	
+		<Parameter Name="BasicParameter"/>
+		<Parameter Name="Protocol"/>				
+		<Parameter Name="AudioMode"/>
+		<Parameter Name="FrameLength"/>
+		<Parameter Name="DataSize"/>
+		<Parameter Name="SlotSize"/>
+		<Parameter Name="MonoStereoMode"/>
+		<Parameter Name="CompandingMode"/>
+		<Parameter Name="TriState"/>				
+		<!-- DataFrame Parameters -->
+		<Parameter Name="FrameParameter"/>
+		<Parameter Name="FirstBit"/>
+		<Parameter Name="ActiveFrameLength"/>
+		<Parameter Name="FSDefinition"/>
+		<Parameter Name="FSPolarity"/>
+		<Parameter Name="FSOffset"/>
+		<!-- Block Slot Parameters -->
+		<Parameter Name="SlotParameter"/>
+		<Parameter Name="FirstBitOffset"/>
+		<Parameter Name="SlotNumber"/>
+		<Parameter Name="SlotActive"/>
+		<Parameter Name="VirtualSlotActive"/>
+		<Parameter Name="VirtualSlotActive0"/>
+		<Parameter Name="VirtualSlotActive1"/>
+		<Parameter Name="VirtualSlotActive2"/>
+		<Parameter Name="VirtualSlotActive3"/>
+		<Parameter Name="VirtualSlotActive4"/>
+		<Parameter Name="VirtualSlotActive5"/>
+		<Parameter Name="VirtualSlotActive6"/>
+		<Parameter Name="VirtualSlotActive7"/>
+		<Parameter Name="VirtualSlotActive8"/>
+		<Parameter Name="VirtualSlotActive9"/>
+		<Parameter Name="VirtualSlotActive10"/>
+		<Parameter Name="VirtualSlotActive11"/>
+		<Parameter Name="VirtualSlotActive12"/>
+		<Parameter Name="VirtualSlotActive13"/>
+		<Parameter Name="VirtualSlotActive14"/>
+		<Parameter Name="VirtualSlotActive15"/>
+		<!-- Clock Parameters -->
+		<Parameter Name="ClockParameter"/>
+		<!--Not used by STM32L4 -->
+		<Parameter Name="ClockSource"/>		
+		<Parameter Name="NoDivider"/>
+		<Parameter Name="AudioFrequency"/>
+		<!--<Parameter Name="RealAudioFreq"/>
+		<Parameter Name="ErrorAudioFreq"/>-->
+		<Parameter Name="ClockStrobing"/>
+		<Parameter Name="Mckdiv"/>
+		<!-- Advanced Parameters -->
+		<Parameter Name="AdvancedParameter"/>
+		<Parameter Name="FIFOThreshold"/>
+		<Parameter Name="OutputDrive"/>
+		<Parameter Name="SynchroExt"/>	
+		<Condition Diagnostic="" Expression="!$IpInstance_SAIA_INIT_PROTOCOL"/>		
+	</RefMode>	
+	<!-- RefModes 'Slave Asynchronous Basic Mode' for SAI_A -->
+	<RefMode Comment="SAI A Asynchronus slave" Group="SAI A" Name="SAI_A_AsyncSlave">
+		<ConfigForMode>SaiA_InitProtocol</ConfigForMode>
+		<!-- Selected Mode Fixed Parameters -->
+		<Parameter Name="Instance">
+			<PossibleValue>SAI$Index_Block_A</PossibleValue>
+		</Parameter>
+		<Parameter Name="VirtualMode">
+			<PossibleValue>VM_SLAVE</PossibleValue>
+		</Parameter>	
+		<Parameter Name="Synchro">
+			<PossibleValue>SAI_ASYNCHRONOUS</PossibleValue>
+		</Parameter>
+		<!-- Basic Parameters -->
+		<Parameter Name="BasicParameter"/>			
+		<Parameter Name="AudioMode"/>						
+		<Parameter Name="MonoStereoMode"/>
+		<Parameter Name="CompandingMode"/>
+		<Parameter Name="TriState"/>		
+		<!-- Basic Mode Parameters -->
+		<Parameter Name="BasicMode"/>	
+		<Parameter Name="BasicProtocol"/>
+		<Parameter Name="BasicDataSize"/>
+		<Parameter Name="BasicSlotNumber"/>	
+		<!-- Clock Parameters -->
+		<Parameter Name="ClockParameter"/>
+		<!--Not used by STM32L4 -->
+		<Parameter Name="ClockSource"/>		
+		<Parameter Name="NoDivider"/>
+		<Parameter Name="AudioFrequency"/>
+		<!--<Parameter Name="RealAudioFreq"/>
+		<Parameter Name="ErrorAudioFreq"/>-->		
+		<Parameter Name="Mckdiv"/>
+		<!-- Advanced Parameters -->
+		<Parameter Name="AdvancedParameter"/>
+		<Parameter Name="FIFOThreshold"/>
+		<Parameter Name="OutputDrive"/>
+		<Parameter Name="SynchroExt"/>	
+        <Parameter Name="InitProtocol">
+			<PossibleValue>Enable</PossibleValue>
+		</Parameter>	
+		<Condition Diagnostic="" Expression="$IpInstance_SAIA_INIT_PROTOCOL"/>
+	</RefMode>
+	
+	<!-- RefModes 'Slave Synchronous Expert Mode' for SAI_A -->
+	<RefMode Comment="SAI A Synchronus slave" Group="SAI A" Name="SAI_A_SyncSlave">
+		<ConfigForMode>SaiA_Init</ConfigForMode>
+		<!-- Selected Mode Fixed Parameters -->
+		<Parameter Name="Instance">
+			<PossibleValue>SAI$Index_Block_A</PossibleValue>
+		</Parameter>
+		<Parameter Name="VirtualMode">
+			<PossibleValue>VM_SLAVE</PossibleValue>
+		</Parameter>		
+		<Parameter Name="Synchro">
+			<PossibleValue>SAI_SYNCHRONOUS</PossibleValue>
+		</Parameter>
+		<!-- Basic Parameters -->	
+		<Parameter Name="BasicParameter"/>
+		<Parameter Name="Protocol"/>	
+		<Parameter Name="AudioMode"/>
+		<Parameter Name="FrameLength"/>
+		<Parameter Name="DataSize"/>
+		<Parameter Name="SlotSize"/>
+		<Parameter Name="MonoStereoMode"/>
+		<Parameter Name="CompandingMode"/>
+		<Parameter Name="TriState"/>			
+		<!-- DataFrame Parameters -->
+		<Parameter Name="FrameParameter"/>
+		<Parameter Name="FirstBit"/>
+		<Parameter Name="ActiveFrameLength"/>
+		<Parameter Name="FSDefinition"/>
+		<Parameter Name="FSPolarity"/>
+		<Parameter Name="FSOffset"/>
+		<!-- Block Slot Parameters -->
+		<Parameter Name="SlotParameter"/>
+		<Parameter Name="FirstBitOffset"/>
+		<Parameter Name="SlotNumber"/>
+		<Parameter Name="SlotActive"/>
+		<Parameter Name="VirtualSlotActive"/>
+		<Parameter Name="VirtualSlotActive0"/>
+		<Parameter Name="VirtualSlotActive1"/>
+		<Parameter Name="VirtualSlotActive2"/>
+		<Parameter Name="VirtualSlotActive3"/>
+		<Parameter Name="VirtualSlotActive4"/>
+		<Parameter Name="VirtualSlotActive5"/>
+		<Parameter Name="VirtualSlotActive6"/>
+		<Parameter Name="VirtualSlotActive7"/>
+		<Parameter Name="VirtualSlotActive8"/>
+		<Parameter Name="VirtualSlotActive9"/>
+		<Parameter Name="VirtualSlotActive10"/>
+		<Parameter Name="VirtualSlotActive11"/>
+		<Parameter Name="VirtualSlotActive12"/>
+		<Parameter Name="VirtualSlotActive13"/>
+		<Parameter Name="VirtualSlotActive14"/>
+		<Parameter Name="VirtualSlotActive15"/>
+		<!-- Clock Parameters -->
+		<Parameter Name="ClockParameter"/>
+		<!--Not used by STM32L4 -->
+		<Parameter Name="ClockSource"/>		
+		<Parameter Name="NoDivider"/>
+		<Parameter Name="AudioFrequency"/>
+		<!--<Parameter Name="RealAudioFreq"/>
+		<Parameter Name="ErrorAudioFreq"/>-->
+		<Parameter Name="ClockStrobing"/>
+		<Parameter Name="Mckdiv"/>
+		<!-- Advanced Parameters -->
+		<Parameter Name="AdvancedParameter"/>
+		<Parameter Name="FIFOThreshold"/>
+		<Parameter Name="OutputDrive"/>
+		<Parameter Name="SynchroExt"/>	
+		<Condition Diagnostic="" Expression="!$IpInstance_SAIA_INIT_PROTOCOL"/>		
+	</RefMode>
+	<!-- RefModes 'Slave Asynchronous Basic Mode' for SAI_A -->
+	<RefMode Comment="SAI A Synchronus slave" Group="SAI A" Name="SAI_A_SyncSlave">
+		<ConfigForMode>SaiA_InitProtocol</ConfigForMode>
+		<!-- Selected Mode Fixed Parameters -->
+		<Parameter Name="Instance">
+			<PossibleValue>SAI$Index_Block_A</PossibleValue>
+		</Parameter>
+		<Parameter Name="VirtualMode">
+			<PossibleValue>VM_SLAVE</PossibleValue>
+		</Parameter>		
+		<Parameter Name="Synchro">
+			<PossibleValue>SAI_SYNCHRONOUS</PossibleValue>
+		</Parameter>
+		<!-- Basic Parameters -->
+		<Parameter Name="BasicParameter"/>			
+		<Parameter Name="AudioMode"/>						
+		<Parameter Name="MonoStereoMode"/>
+		<Parameter Name="CompandingMode"/>
+		<Parameter Name="TriState"/>		
+		<!-- Basic Mode Parameters -->
+		<Parameter Name="BasicMode"/>	
+		<Parameter Name="BasicProtocol"/>
+		<Parameter Name="BasicDataSize"/>
+		<Parameter Name="BasicSlotNumber"/>	
+		<!-- Clock Parameters -->
+		<Parameter Name="ClockParameter"/>
+		<!--Not used by STM32L4 -->
+		<Parameter Name="ClockSource"/>		
+		<Parameter Name="NoDivider"/>
+		<Parameter Name="AudioFrequency"/>
+		<!--<Parameter Name="RealAudioFreq"/>
+		<Parameter Name="ErrorAudioFreq"/>-->		
+		<Parameter Name="Mckdiv"/>
+		<!-- Advanced Parameters -->
+		<Parameter Name="AdvancedParameter"/>
+		<Parameter Name="FIFOThreshold"/>
+		<Parameter Name="OutputDrive"/>
+		<Parameter Name="SynchroExt"/>		
+        <Parameter Name="InitProtocol">
+			<PossibleValue>Enable</PossibleValue>
+		</Parameter>
+		<Condition Diagnostic="" Expression="$IpInstance_SAIA_INIT_PROTOCOL"/>
+	</RefMode>
+	
+	<!-- RefModes 'SPDIF Expert Mode' for SAI_A -->
+	<RefMode Comment="SAI A SPDIF" Group="SAI A" Name="SAI_A_SPDIF">
+		<ConfigForMode>SaiA_Init</ConfigForMode>
+		<!-- Selected Mode Fixed Parameters -->
+		<Parameter Name="Instance">
+			<PossibleValue>SAI$Index_Block_A</PossibleValue>
+		</Parameter>
+		<Parameter Name="VirtualMode">
+			<PossibleValue>VM_SPDIF</PossibleValue>
+		</Parameter>	
+		<Parameter Name="Synchro">
+			<PossibleValue>SAI_ASYNCHRONOUS</PossibleValue>
+		</Parameter>
+		<!-- Basic Parameters -->	
+		<Parameter Name="BasicParameter"/>
+		<Parameter Name="Protocol">
+			<PossibleValue>SAI_SPDIF_PROTOCOL</PossibleValue>
+		</Parameter>						
+		<Parameter Name="AudioMode"/>
+		<Parameter Name="FrameLength"/>
+		<Parameter Name="DataSize"/>
+		<Parameter Name="SlotSize"/>
+		<Parameter Name="MonoStereoMode"/>
+		<Parameter Name="CompandingMode"/>
+		<Parameter Name="TriState"/>				
+		<!-- DataFrame Parameters -->
+		<Parameter Name="FrameParameter"/>
+		<Parameter Name="FirstBit"/>
+		<Parameter Name="ActiveFrameLength"/>
+		<Parameter Name="FSDefinition"/>
+		<Parameter Name="FSPolarity"/>
+		<Parameter Name="FSOffset"/>
+		<!-- Block Slot Parameters -->
+		<Parameter Name="SlotParameter"/>
+		<Parameter Name="FirstBitOffset"/>
+		<Parameter Name="SlotNumber"/>
+		<Parameter Name="SlotActive"/>
+		<Parameter Name="VirtualSlotActive"/>
+		<Parameter Name="VirtualSlotActive0"/>
+		<Parameter Name="VirtualSlotActive1"/>
+		<Parameter Name="VirtualSlotActive2"/>
+		<Parameter Name="VirtualSlotActive3"/>
+		<Parameter Name="VirtualSlotActive4"/>
+		<Parameter Name="VirtualSlotActive5"/>
+		<Parameter Name="VirtualSlotActive6"/>
+		<Parameter Name="VirtualSlotActive7"/>
+		<Parameter Name="VirtualSlotActive8"/>
+		<Parameter Name="VirtualSlotActive9"/>
+		<Parameter Name="VirtualSlotActive10"/>
+		<Parameter Name="VirtualSlotActive11"/>
+		<Parameter Name="VirtualSlotActive12"/>
+		<Parameter Name="VirtualSlotActive13"/>
+		<Parameter Name="VirtualSlotActive14"/>
+		<Parameter Name="VirtualSlotActive15"/>
+		<!-- Clock Parameters -->
+		<Parameter Name="ClockParameter"/>
+		<!--Not used by STM32L4 -->
+		<Parameter Name="ClockSource"/>		
+		<Parameter Name="NoDivider"/>
+		<Parameter Name="AudioFrequency"/>
+		<Parameter Name="RealAudioFreq"/>
+		<Parameter Name="ErrorAudioFreq"/>
+		<Parameter Name="ClockStrobing"/>
+		<Parameter Name="Mckdiv"/>
+		<!-- Advanced Parameters -->
+		<Parameter Name="AdvancedParameter"/>
+		<Parameter Name="FIFOThreshold"/>
+		<Parameter Name="OutputDrive"/>
+		<Parameter Name="SynchroExt"/>	
+		<Condition Diagnostic="" Expression="!$IpInstance_SAIA_INIT_PROTOCOL"/>		
+	</RefMode>
+	<RefMode Comment="Basic protocol" Group="SAI A" Name="SAI_A_BASIC">			
+		<Parameter Name="VirtualProtocol">
+			<PossibleValue>VM_BASIC_PROTOCOL</PossibleValue>
+		</Parameter>		
+	</RefMode>	
+	
+	<!-- RefModes 'Master Expert Mode' for SAI_B -->
+	<RefMode Comment="SAI B Master" Group="SAI B" Name="SAI_B_Master">
+		<ConfigForMode>SaiB_Init</ConfigForMode>
+		<Parameter Name="Instance">
+			<PossibleValue>SAI$Index_Block_B</PossibleValue>
+		</Parameter>
+		<Parameter Name="VirtualMode">
+			<PossibleValue>VM_MASTER</PossibleValue>
+		</Parameter>		
+		<Parameter Name="Synchro">
+			<PossibleValue>SAI_ASYNCHRONOUS</PossibleValue>
+		</Parameter>
+		<Parameter Name="MClockEnable">
+			<PossibleValue>SAI_MASTERCLOCK_DISABLE</PossibleValue>
+		</Parameter>
+		<!-- Basic Parameters -->	
+		<Parameter Name="BasicParameter"/>
+		<Parameter Name="Protocol"/>				
+		<Parameter Name="AudioMode"/>
+		<Parameter Name="FrameLength"/>
+		<Parameter Name="DataSize"/>
+		<Parameter Name="SlotSize"/>
+		<Parameter Name="MonoStereoMode"/>
+		<Parameter Name="CompandingMode"/>
+		<Parameter Name="TriState"/>			
+		<!-- DataFrame Parameters -->
+		<Parameter Name="FrameParameter"/>
+		<Parameter Name="FirstBit"/>
+		<Parameter Name="ActiveFrameLength"/>
+		<Parameter Name="FSDefinition"/>
+		<Parameter Name="FSPolarity"/>
+		<Parameter Name="FSOffset"/>
+		<!-- Block Slot Parameters -->
+		<Parameter Name="SlotParameter"/>
+		<Parameter Name="FirstBitOffset"/>
+		<Parameter Name="SlotNumber"/>
+		<Parameter Name="SlotActive"/>
+		<Parameter Name="VirtualSlotActive"/>
+		<Parameter Name="VirtualSlotActive0"/>
+		<Parameter Name="VirtualSlotActive1"/>
+		<Parameter Name="VirtualSlotActive2"/>
+		<Parameter Name="VirtualSlotActive3"/>
+		<Parameter Name="VirtualSlotActive4"/>
+		<Parameter Name="VirtualSlotActive5"/>
+		<Parameter Name="VirtualSlotActive6"/>
+		<Parameter Name="VirtualSlotActive7"/>
+		<Parameter Name="VirtualSlotActive8"/>
+		<Parameter Name="VirtualSlotActive9"/>
+		<Parameter Name="VirtualSlotActive10"/>
+		<Parameter Name="VirtualSlotActive11"/>
+		<Parameter Name="VirtualSlotActive12"/>
+		<Parameter Name="VirtualSlotActive13"/>
+		<Parameter Name="VirtualSlotActive14"/>
+		<Parameter Name="VirtualSlotActive15"/>
+		<!-- Clock Parameters -->
+		<Parameter Name="ClockParameter"/>
+		<!--Not used by STM32L4 -->
+		<Parameter Name="ClockSource"/>		
+		<Parameter Name="NoDivider"/>
+		<Parameter Name="AudioFrequency"/>
+		<Parameter Name="RealAudioFreq"/>
+		<Parameter Name="ErrorAudioFreq"/>
+		<Parameter Name="ClockStrobing"/>
+		<Parameter Name="Mckdiv"/>
+		<!-- Advanced Parameters -->
+		<Parameter Name="AdvancedParameter"/>
+		<Parameter Name="FIFOThreshold"/>
+		<Parameter Name="OutputDrive"/>
+		<Parameter Name="SynchroExt"/>	
+		<Condition Diagnostic="" Expression="!$IpInstance_SAIB_INIT_PROTOCOL"/>
+	</RefMode>
+	<!-- RefModes 'Master Basic Mode' for SAI_B -->
+	<RefMode Comment="SAI B Master" Group="SAI B" Name="SAI_B_Master">
+		<ConfigForMode>SaiB_InitProtocol</ConfigForMode>
+		<Parameter Name="Instance">
+			<PossibleValue>SAI$Index_Block_B</PossibleValue>
+		</Parameter>
+		<Parameter Name="VirtualMode">
+			<PossibleValue>VM_MASTER</PossibleValue>
+		</Parameter>		
+		<Parameter Name="Synchro">
+			<PossibleValue>SAI_ASYNCHRONOUS</PossibleValue>
+		</Parameter>
+		<Parameter Name="MClockEnable">
+			<PossibleValue>SAI_MASTERCLOCK_DISABLE</PossibleValue>
+		</Parameter>
+		<!-- Basic Parameters -->
+		<Parameter Name="BasicParameter"/>			
+		<Parameter Name="AudioMode"/>						
+		<Parameter Name="MonoStereoMode"/>
+		<Parameter Name="CompandingMode"/>
+		<Parameter Name="TriState"/>		
+		<!-- Basic Mode Parameters -->
+		<Parameter Name="BasicMode"/>	
+		<Parameter Name="BasicProtocol"/>
+		<Parameter Name="BasicDataSize"/>
+		<Parameter Name="BasicSlotNumber"/>	
+		<!-- Clock Parameters -->
+		<Parameter Name="ClockParameter"/>
+		<!--Not used by STM32L4 -->
+		<Parameter Name="ClockSource"/>		
+		<Parameter Name="NoDivider"/>
+		<Parameter Name="AudioFrequency"/>
+		<Parameter Name="RealAudioFreq"/>
+		<Parameter Name="ErrorAudioFreq"/>		
+		<Parameter Name="Mckdiv"/>
+		<!-- Advanced Parameters -->
+		<Parameter Name="AdvancedParameter"/>
+		<Parameter Name="FIFOThreshold"/>
+		<Parameter Name="OutputDrive"/>
+		<Parameter Name="SynchroExt"/>	        
+        <Parameter Name="InitProtocol">
+			<PossibleValue>Enable</PossibleValue>
+		</Parameter>
+		<Condition Diagnostic="" Expression="$IpInstance_SAIB_INIT_PROTOCOL"/>
+	</RefMode>
+	
+	<!-- RefModes 'Master witch clock Expert Mode' for SAI_B -->
+	<RefMode Comment="SAI B Master with clock" Group="SAI B" Name="SAI_B_MasterWithClock">	
+		<ConfigForMode>SaiB_Init</ConfigForMode>
+		<!-- Selected Mode Fixed Parameters -->
+		<Parameter Name="Instance">
+			<PossibleValue>SAI$Index_Block_B</PossibleValue>
+		</Parameter>
+		<Parameter Name="VirtualMode">
+			<PossibleValue>VM_MASTER</PossibleValue>
+		</Parameter>
+		<Parameter Name="Synchro">
+			<PossibleValue>SAI_ASYNCHRONOUS</PossibleValue>
+		</Parameter>
+		<Parameter Name="MClockEnable">
+			<PossibleValue>SAI_MASTERCLOCK_ENABLE</PossibleValue>
+		</Parameter>
+		<!-- Basic Parameters -->	
+		<Parameter Name="BasicParameter"/>
+		<Parameter Name="Protocol"/>				
+		<Parameter Name="AudioMode"/>
+		<Parameter Name="FrameLength"/>
+		<Parameter Name="DataSize"/>
+		<Parameter Name="SlotSize"/>
+		<Parameter Name="MonoStereoMode"/>
+		<Parameter Name="CompandingMode"/>
+		<Parameter Name="TriState"/>			
+		<!-- DataFrame Parameters -->
+		<Parameter Name="FrameParameter"/>
+		<Parameter Name="FirstBit"/>
+		<Parameter Name="ActiveFrameLength"/>
+		<Parameter Name="FSDefinition"/>
+		<Parameter Name="FSPolarity"/>
+		<Parameter Name="FSOffset"/>
+		<!-- Block Slot Parameters -->
+		<Parameter Name="SlotParameter"/>
+		<Parameter Name="FirstBitOffset"/>
+		<Parameter Name="SlotNumber"/>
+		<Parameter Name="SlotActive"/>
+		<Parameter Name="VirtualSlotActive"/>
+		<Parameter Name="VirtualSlotActive0"/>
+		<Parameter Name="VirtualSlotActive1"/>
+		<Parameter Name="VirtualSlotActive2"/>
+		<Parameter Name="VirtualSlotActive3"/>
+		<Parameter Name="VirtualSlotActive4"/>
+		<Parameter Name="VirtualSlotActive5"/>
+		<Parameter Name="VirtualSlotActive6"/>
+		<Parameter Name="VirtualSlotActive7"/>
+		<Parameter Name="VirtualSlotActive8"/>
+		<Parameter Name="VirtualSlotActive9"/>
+		<Parameter Name="VirtualSlotActive10"/>
+		<Parameter Name="VirtualSlotActive11"/>
+		<Parameter Name="VirtualSlotActive12"/>
+		<Parameter Name="VirtualSlotActive13"/>
+		<Parameter Name="VirtualSlotActive14"/>
+		<Parameter Name="VirtualSlotActive15"/>
+		<!-- Clock Parameters -->
+		<Parameter Name="ClockParameter"/>
+		<!--Not used by STM32L4 -->
+		<Parameter Name="ClockSource"/>		
+		<Parameter Name="NoDivider"/>
+		<Parameter Name="AudioFrequency"/>
+		<Parameter Name="RealAudioFreq"/>
+		<Parameter Name="ErrorAudioFreq"/>
+		<Parameter Name="ClockStrobing"/>
+		<Parameter Name="Mckdiv"/>
+		<!-- Advanced Parameters -->
+		<Parameter Name="AdvancedParameter"/>
+		<Parameter Name="FIFOThreshold"/>
+		<Parameter Name="OutputDrive"/>
+		<Parameter Name="SynchroExt"/>	
+		<Condition Diagnostic="" Expression="!$IpInstance_SAIB_INIT_PROTOCOL"/>
+	</RefMode>
+	<!-- RefModes 'Master witch clock Basic Mode' for SAI_B -->
+	<RefMode Comment="SAI B Master with clock" Group="SAI B" Name="SAI_B_MasterWithClock">	
+		<ConfigForMode>SaiB_InitProtocol</ConfigForMode>
+		<!-- Selected Mode Fixed Parameters -->
+		<Parameter Name="Instance">
+			<PossibleValue>SAI$Index_Block_B</PossibleValue>
+		</Parameter>
+		<Parameter Name="VirtualMode">
+			<PossibleValue>VM_MASTER</PossibleValue>
+		</Parameter>
+		<Parameter Name="Synchro">
+			<PossibleValue>SAI_ASYNCHRONOUS</PossibleValue>
+		</Parameter>
+		<Parameter Name="MClockEnable">
+			<PossibleValue>SAI_MASTERCLOCK_ENABLE</PossibleValue>
+		</Parameter>
+		<!-- Basic Parameters -->
+		<Parameter Name="BasicParameter"/>			
+		<Parameter Name="AudioMode"/>						
+		<Parameter Name="MonoStereoMode"/>
+		<Parameter Name="CompandingMode"/>
+		<Parameter Name="TriState"/>		
+		<!-- Basic Mode Parameters -->
+		<Parameter Name="BasicMode"/>	
+		<Parameter Name="BasicProtocol"/>
+		<Parameter Name="BasicDataSize"/>
+		<Parameter Name="BasicSlotNumber"/>	
+		<!-- Clock Parameters -->
+		<Parameter Name="ClockParameter"/>
+		<!--Not used by STM32L4 -->
+		<Parameter Name="ClockSource"/>		
+		<Parameter Name="NoDivider"/>
+		<Parameter Name="AudioFrequency"/>
+		<Parameter Name="RealAudioFreq"/>
+		<Parameter Name="ErrorAudioFreq"/>		
+		<Parameter Name="Mckdiv"/>
+		<!-- Advanced Parameters -->
+		<Parameter Name="AdvancedParameter"/>
+		<Parameter Name="FIFOThreshold"/>
+		<Parameter Name="OutputDrive"/>
+		<Parameter Name="SynchroExt"/>	
+		<Parameter Name="InitProtocol">
+			<PossibleValue>Enable</PossibleValue>
+		</Parameter>
+		<Condition Diagnostic="" Expression="$IpInstance_SAIB_INIT_PROTOCOL"/>
+	</RefMode>
+	
+	<!-- RefModes 'Slave Asynchronous Expert Mode' for SAI_B -->
+	<RefMode Comment="SAI B Asynchronus slave" Group="SAI B" Name="SAI_B_AsyncSlave">
+		<ConfigForMode>SaiB_Init</ConfigForMode>		
+		<!-- Selected Mode Fixed Parameters -->
+		<Parameter Name="Instance">
+			<PossibleValue>SAI$Index_Block_B</PossibleValue>
+		</Parameter>
+		<Parameter Name="VirtualMode">
+			<PossibleValue>VM_SLAVE</PossibleValue>
+		</Parameter>	
+		<Parameter Name="Synchro">
+			<PossibleValue>SAI_ASYNCHRONOUS</PossibleValue>
+		</Parameter>
+		<!-- Basic Parameters -->	
+		<Parameter Name="BasicParameter"/>
+		<Parameter Name="Protocol"/>					
+		<Parameter Name="AudioMode"/>
+		<Parameter Name="FrameLength"/>
+		<Parameter Name="DataSize"/>
+		<Parameter Name="SlotSize"/>
+		<Parameter Name="MonoStereoMode"/>
+		<Parameter Name="CompandingMode"/>
+		<Parameter Name="TriState"/>		
+		<!-- DataFrame Parameters -->
+		<Parameter Name="FrameParameter"/>
+		<Parameter Name="FirstBit"/>
+		<Parameter Name="ActiveFrameLength"/>
+		<Parameter Name="FSDefinition"/>
+		<Parameter Name="FSPolarity"/>
+		<Parameter Name="FSOffset"/>
+		<!-- Block Slot Parameters -->
+		<Parameter Name="SlotParameter"/>
+		<Parameter Name="FirstBitOffset"/>
+		<Parameter Name="SlotNumber"/>
+		<Parameter Name="SlotActive"/>
+		<Parameter Name="VirtualSlotActive"/>
+		<Parameter Name="VirtualSlotActive0"/>
+		<Parameter Name="VirtualSlotActive1"/>
+		<Parameter Name="VirtualSlotActive2"/>
+		<Parameter Name="VirtualSlotActive3"/>
+		<Parameter Name="VirtualSlotActive4"/>
+		<Parameter Name="VirtualSlotActive5"/>
+		<Parameter Name="VirtualSlotActive6"/>
+		<Parameter Name="VirtualSlotActive7"/>
+		<Parameter Name="VirtualSlotActive8"/>
+		<Parameter Name="VirtualSlotActive9"/>
+		<Parameter Name="VirtualSlotActive10"/>
+		<Parameter Name="VirtualSlotActive11"/>
+		<Parameter Name="VirtualSlotActive12"/>
+		<Parameter Name="VirtualSlotActive13"/>
+		<Parameter Name="VirtualSlotActive14"/>
+		<Parameter Name="VirtualSlotActive15"/>
+		<!-- Clock Parameters -->
+		<Parameter Name="ClockParameter"/>
+		<!--Not used by STM32L4 -->
+		<Parameter Name="ClockSource"/>		
+		<Parameter Name="NoDivider"/>
+		<Parameter Name="AudioFrequency"/>
+		<Parameter Name="RealAudioFreq"/>
+		<Parameter Name="ErrorAudioFreq"/>
+		<Parameter Name="ClockStrobing"/>
+		<Parameter Name="Mckdiv"/>
+		<!-- Advanced Parameters -->
+		<Parameter Name="AdvancedParameter"/>
+		<Parameter Name="FIFOThreshold"/>
+		<Parameter Name="OutputDrive"/>
+		<Parameter Name="SynchroExt"/>	
+		<Condition Diagnostic="" Expression="!$IpInstance_SAIB_INIT_PROTOCOL"/>
+	</RefMode>
+	<!-- RefModes 'Slave Asynchronous Basic Mode' for SAI_B -->
+	<RefMode Comment="SAI B Asynchronus slave" Group="SAI B" Name="SAI_B_AsyncSlave">		
+		<ConfigForMode>SaiB_InitProtocol</ConfigForMode>
+		<!-- Selected Mode Fixed Parameters -->
+		<Parameter Name="Instance">
+			<PossibleValue>SAI$Index_Block_B</PossibleValue>
+		</Parameter>
+		<Parameter Name="VirtualMode">
+			<PossibleValue>VM_SLAVE</PossibleValue>
+		</Parameter>	
+		<Parameter Name="Synchro">
+			<PossibleValue>SAI_ASYNCHRONOUS</PossibleValue>
+		</Parameter>
+		<!-- Basic Parameters -->
+		<Parameter Name="BasicParameter"/>			
+		<Parameter Name="AudioMode"/>						
+		<Parameter Name="MonoStereoMode"/>
+		<Parameter Name="CompandingMode"/>
+		<Parameter Name="TriState"/>		
+		<!-- Basic Mode Parameters -->
+		<Parameter Name="BasicMode"/>	
+		<Parameter Name="BasicProtocol"/>
+		<Parameter Name="BasicDataSize"/>
+		<Parameter Name="BasicSlotNumber"/>	
+		<!-- Clock Parameters -->
+		<Parameter Name="ClockParameter"/>
+		<!--Not used by STM32L4 -->
+		<Parameter Name="ClockSource"/>		
+		<Parameter Name="NoDivider"/>
+		<Parameter Name="AudioFrequency"/>
+		<Parameter Name="RealAudioFreq"/>
+		<Parameter Name="ErrorAudioFreq"/>		
+		<Parameter Name="Mckdiv"/>
+		<!-- Advanced Parameters -->
+		<Parameter Name="AdvancedParameter"/>
+		<Parameter Name="FIFOThreshold"/>
+		<Parameter Name="OutputDrive"/>
+		<Parameter Name="SynchroExt"/>	
+		<Parameter Name="InitProtocol">
+			<PossibleValue>Enable</PossibleValue>
+		</Parameter>
+		<Condition Diagnostic="" Expression="$IpInstance_SAIB_INIT_PROTOCOL"/>
+	</RefMode>
+	
+	<!-- RefModes 'Slave Synchronous Expert Mode' for SAI_B -->
+	<RefMode Comment="SAI B Synchronus slave" Group="SAI B" Name="SAI_B_SyncSlave">	
+		<ConfigForMode>SaiB_Init</ConfigForMode>
+		<!-- Selected Mode Fixed Parameters -->
+		<Parameter Name="Instance">
+			<PossibleValue>SAI$Index_Block_B</PossibleValue>
+		</Parameter>
+		<Parameter Name="VirtualMode">
+			<PossibleValue>VM_SLAVE</PossibleValue>
+		</Parameter>		
+		<Parameter Name="Synchro">
+			<PossibleValue>SAI_SYNCHRONOUS</PossibleValue>
+		</Parameter>
+		<!-- Basic Parameters -->	
+		<Parameter Name="BasicParameter"/>
+		<Parameter Name="Protocol"/>						
+		<Parameter Name="AudioMode"/>
+		<Parameter Name="FrameLength"/>
+		<Parameter Name="DataSize"/>
+		<Parameter Name="SlotSize"/>
+		<Parameter Name="MonoStereoMode"/>
+		<Parameter Name="CompandingMode"/>
+		<Parameter Name="TriState"/>			
+		<!-- DataFrame Parameters -->
+		<Parameter Name="FrameParameter"/>
+		<Parameter Name="FirstBit"/>
+		<Parameter Name="ActiveFrameLength"/>
+		<Parameter Name="FSDefinition"/>
+		<Parameter Name="FSPolarity"/>
+		<Parameter Name="FSOffset"/>
+		<!-- Block Slot Parameters -->
+		<Parameter Name="SlotParameter"/>
+		<Parameter Name="FirstBitOffset"/>
+		<Parameter Name="SlotNumber"/>
+		<Parameter Name="SlotActive"/>
+		<Parameter Name="VirtualSlotActive"/>
+		<Parameter Name="VirtualSlotActive0"/>
+		<Parameter Name="VirtualSlotActive1"/>
+		<Parameter Name="VirtualSlotActive2"/>
+		<Parameter Name="VirtualSlotActive3"/>
+		<Parameter Name="VirtualSlotActive4"/>
+		<Parameter Name="VirtualSlotActive5"/>
+		<Parameter Name="VirtualSlotActive6"/>
+		<Parameter Name="VirtualSlotActive7"/>
+		<Parameter Name="VirtualSlotActive8"/>
+		<Parameter Name="VirtualSlotActive9"/>
+		<Parameter Name="VirtualSlotActive10"/>
+		<Parameter Name="VirtualSlotActive11"/>
+		<Parameter Name="VirtualSlotActive12"/>
+		<Parameter Name="VirtualSlotActive13"/>
+		<Parameter Name="VirtualSlotActive14"/>
+		<Parameter Name="VirtualSlotActive15"/>
+		<!-- Clock Parameters -->
+		<Parameter Name="ClockParameter"/>
+		<!--Not used by STM32L4 -->
+		<Parameter Name="ClockSource"/>		
+		<Parameter Name="NoDivider"/>
+		<Parameter Name="AudioFrequency"/>
+		<Parameter Name="RealAudioFreq"/>
+		<Parameter Name="ErrorAudioFreq"/>
+		<Parameter Name="ClockStrobing"/>
+		<Parameter Name="Mckdiv"/>
+		<!-- Advanced Parameters -->
+		<Parameter Name="AdvancedParameter"/>
+		<Parameter Name="FIFOThreshold"/>
+		<Parameter Name="OutputDrive"/>
+		<Parameter Name="SynchroExt"/>	
+		<Condition Diagnostic="" Expression="!$IpInstance_SAIB_INIT_PROTOCOL"/>
+	</RefMode>
+	<!-- RefModes 'Slave Asynchronous Basic Mode' for SAI_B -->
+	<RefMode Comment="SAI B Synchronus slave" Group="SAI B" Name="SAI_B_SyncSlave">	
+		<ConfigForMode>SaiB_InitProtocol</ConfigForMode>
+		<!-- Selected Mode Fixed Parameters -->
+		<Parameter Name="Instance">
+			<PossibleValue>SAI$Index_Block_B</PossibleValue>
+		</Parameter>
+		<Parameter Name="VirtualMode">
+			<PossibleValue>VM_SLAVE</PossibleValue>
+		</Parameter>		
+		<Parameter Name="Synchro">
+			<PossibleValue>SAI_SYNCHRONOUS</PossibleValue>
+		</Parameter>
+		<!-- Basic Parameters -->
+		<Parameter Name="BasicParameter"/>			
+		<Parameter Name="AudioMode"/>						
+		<Parameter Name="MonoStereoMode"/>
+		<Parameter Name="CompandingMode"/>
+		<Parameter Name="TriState"/>		
+		<!-- Basic Mode Parameters -->
+		<Parameter Name="BasicMode"/>	
+		<Parameter Name="BasicProtocol"/>
+		<Parameter Name="BasicDataSize"/>
+		<Parameter Name="BasicSlotNumber"/>	
+		<!-- Clock Parameters -->
+		<Parameter Name="ClockParameter"/>
+		<!--Not used by STM32L4 -->
+		<Parameter Name="ClockSource"/>
+		<Parameter Name="NoDivider"/>
+		<Parameter Name="AudioFrequency"/>
+		<Parameter Name="RealAudioFreq"/>
+		<Parameter Name="ErrorAudioFreq"/>		
+		<Parameter Name="Mckdiv"/>
+		<!-- Advanced Parameters -->
+		<Parameter Name="AdvancedParameter"/>
+		<Parameter Name="FIFOThreshold"/>
+		<Parameter Name="OutputDrive"/>
+		<Parameter Name="SynchroExt"/>	
+		<Parameter Name="InitProtocol">
+			<PossibleValue>Enable</PossibleValue>
+		</Parameter>
+		<Condition Diagnostic="" Expression="$IpInstance_SAIB_INIT_PROTOCOL"/>
+	</RefMode>
+	
+	<!-- RefModes 'SPDIF Expert Mode' for SAI_B -->
+	<RefMode Comment="SAI B SDIF" Group="SAI B" Name="SAI_B_SPDIF">
+		<ConfigForMode>SaiB_Init</ConfigForMode>
+		<!-- Selected Mode Fixed Parameters -->
+		<Parameter Name="Instance">
+			<PossibleValue>SAI$Index_Block_B</PossibleValue>
+		</Parameter>
+		<Parameter Name="VirtualMode">
+			<PossibleValue>VM_SPDIF</PossibleValue>
+		</Parameter>	
+		<Parameter Name="Synchro">
+			<PossibleValue>SAI_ASYNCHRONOUS</PossibleValue>
+		</Parameter>
+		<!-- Basic Parameters -->	
+		<Parameter Name="BasicParameter"/>
+		<Parameter Name="Protocol">
+			<PossibleValue>SAI_SPDIF_PROTOCOL</PossibleValue>
+		</Parameter>										
+		<Parameter Name="AudioMode"/>
+		<Parameter Name="FrameLength"/>
+		<Parameter Name="DataSize"/>
+		<Parameter Name="SlotSize"/>
+		<Parameter Name="MonoStereoMode"/>
+		<Parameter Name="CompandingMode"/>
+		<Parameter Name="TriState"/>			
+		<!-- DataFrame Parameters -->
+		<Parameter Name="FrameParameter"/>
+		<Parameter Name="FirstBit"/>
+		<Parameter Name="ActiveFrameLength"/>
+		<Parameter Name="FSDefinition"/>
+		<Parameter Name="FSPolarity"/>
+		<Parameter Name="FSOffset"/>
+		<!-- Block Slot Parameters -->
+		<Parameter Name="SlotParameter"/>
+		<Parameter Name="FirstBitOffset"/>
+		<Parameter Name="SlotNumber"/>
+		<Parameter Name="SlotActive"/>
+		<Parameter Name="VirtualSlotActive"/>
+		<Parameter Name="VirtualSlotActive0"/>
+		<Parameter Name="VirtualSlotActive1"/>
+		<Parameter Name="VirtualSlotActive2"/>
+		<Parameter Name="VirtualSlotActive3"/>
+		<Parameter Name="VirtualSlotActive4"/>
+		<Parameter Name="VirtualSlotActive5"/>
+		<Parameter Name="VirtualSlotActive6"/>
+		<Parameter Name="VirtualSlotActive7"/>
+		<Parameter Name="VirtualSlotActive8"/>
+		<Parameter Name="VirtualSlotActive9"/>
+		<Parameter Name="VirtualSlotActive10"/>
+		<Parameter Name="VirtualSlotActive11"/>
+		<Parameter Name="VirtualSlotActive12"/>
+		<Parameter Name="VirtualSlotActive13"/>
+		<Parameter Name="VirtualSlotActive14"/>
+		<Parameter Name="VirtualSlotActive15"/>
+		<!-- Clock Parameters -->
+		<Parameter Name="ClockParameter"/>
+		<!--Not used by STM32L4 -->
+		<Parameter Name="ClockSource"/>
+		<Parameter Name="NoDivider"/>
+		<Parameter Name="AudioFrequency"/>
+		<Parameter Name="RealAudioFreq"/>
+		<Parameter Name="ErrorAudioFreq"/>
+		<Parameter Name="ClockStrobing"/>
+		<Parameter Name="Mckdiv"/>
+		<!-- Advanced Parameters -->
+		<Parameter Name="AdvancedParameter"/>
+		<Parameter Name="FIFOThreshold"/>
+		<Parameter Name="OutputDrive"/>
+		<Parameter Name="SynchroExt"/>	
+		<Condition Diagnostic="" Expression="!$IpInstance_SAIB_INIT_PROTOCOL"/>
+	</RefMode>
+	
+					
+	<RefMode Comment="Basic protocol" Group="SAI B" Name="SAI_B_BASIC">			
+		<Parameter Name="VirtualProtocol">
+			<PossibleValue>VM_BASIC_PROTOCOL</PossibleValue>
+		</Parameter>		
+	</RefMode>	
+		
+	<!-- ModeLogicOperator for SAI -->
+	<ModeLogicOperator Name="XOR">
+		<Mode Name="SAI_A" UserName="SAI A">
+			<ModeLogicOperator Name="OR">			
+				<Mode Name="SAI_A" UserName="Mode">
+					<ModeLogicOperator Name="XOR">
+						<Mode Name="SAI_A_Master" UserName="Master">							
+							<SignalLogicalOp Name="AND">
+								<Signal Name="SD_A"/>
+								<Signal Name="SCK_A"/>
+								<Signal Name="FS_A"/>
+							</SignalLogicalOp>
+							<Semaphore>$IpInstance_SAIA_Master</Semaphore>							
+						</Mode>						
+						<Mode Name="SAI_A_MasterWithClock" UserName="Master with Master Clock Out">
+							<SignalLogicalOp Name="AND">
+								<Signal Name="SD_A"/>
+								<Signal Name="SCK_A"/>
+								<Signal Name="FS_A"/>
+								<Signal Name="MCLK_A"/>
+							</SignalLogicalOp>
+							<Semaphore>$IpInstance_SAIA_Master</Semaphore>							
+						</Mode>
+						<Mode Name="SAI_A_AsyncSlave" UserName="Asynchronous Slave">
+							<SignalLogicalOp Name="AND">
+								<Signal Name="SD_A"/>
+								<Signal Name="SCK_A"/>
+								<Signal Name="FS_A"/>
+							</SignalLogicalOp>
+							<Semaphore>$IpInstance_SAIA_AsyncSlave</Semaphore>
+							<!--<Condition Expression="!$IpInstance_SAIA_SPDIF" Diagnostic=""/>-->
+						</Mode>						
+						<Mode Name="SAI_A_SyncSlave" RemoveCondition="((!$ModeExist_SAI_B_Master) &amp; (!$ModeExist_SAI_B_MasterWithClock) &amp; (!$ModeExist_SAI_B_AsyncSlave))" ShrinkName="SAI_A in Synchronous Slave Mode" UserName="Synchronous Slave"> 
+							<SignalLogicalOp Name="AND">
+								<Signal Name="SD_A"/>
+							</SignalLogicalOp>
+							<!--<Condition Expression="($IpInstance_SAIB_Master | $IpInstance_SAIB_AsyncSlave) &amp; (!$IpInstance_SAIA_SPDIF)" Diagnostic="Need to have SAI_B on 'Master' or 'Asynchronous Slave' Mode"/>-->
+							<Condition Diagnostic="Need to have SAI_B on 'Master' or 'Asynchronous Slave' Mode" Expression="($IpInstance_SAIB_Master | $IpInstance_SAIB_AsyncSlave)"/>
+						</Mode>							
+						<Mode Name="SAI_A_SPDIF" UserName="SPDIF TX Transmitter (IEC60958)">
+							<SignalLogicalOp Name="AND">
+								<Signal Name="SD_A"/>						
+							</SignalLogicalOp>	
+							<Semaphore>$IpInstance_SAIA_SPDIF</Semaphore>
+						</Mode>						
+					</ModeLogicOperator>
+					<Semaphore>$IpInstance_SAIA_Mode</Semaphore>
+					<Semaphore>SAIAUsed_ForRCC</Semaphore>
+					<Semaphore>$IpInstanceUsed_ForRCC</Semaphore>
+					<Semaphore>$IpInstance_SAIAUsed_ForDMA</Semaphore>
+				</Mode>				
+				<Mode Name="Protocol" UserName="I2S/PCM Protocol">
+					<ModeLogicOperator Name="XOR">
+						<Mode Name="SAI_A_BASIC" UserName="Basic">
+							<SignalLogicalOp Name="AND">
+								<Signal Name="VP_$IpInstance_SAIA_SAI_BASIC"/>							
+							</SignalLogicalOp>	
+							<Semaphore>$IpInstance_SAIA_INIT_PROTOCOL</Semaphore>	
+							<Condition Diagnostic="Need to have a mode selected" Expression="($IpInstance_SAIA_Mode) &amp; (!$IpInstance_SAIA_SPDIF)"/>						
+						</Mode>							
+					</ModeLogicOperator>					
+				</Mode>								
+			</ModeLogicOperator>
+		</Mode>
+		
+		<Mode Name="SAI_B" UserName="SAI B">
+			<ModeLogicOperator Name="OR">			
+				<Mode Name="SAI_B" UserName="Mode">
+					<ModeLogicOperator Name="XOR">
+						<Mode Name="SAI_B_Master" UserName="Master">							
+							<SignalLogicalOp Name="AND">
+								<Signal Name="SD_B"/>
+								<Signal Name="SCK_B"/>
+								<Signal Name="FS_B"/>
+							</SignalLogicalOp>
+							<Semaphore>$IpInstance_SAIB_Master</Semaphore>							
+						</Mode>						
+						<Mode Name="SAI_B_MasterWithClock" UserName="Master with Master Clock Out">
+							<SignalLogicalOp Name="AND">
+								<Signal Name="SD_B"/>
+								<Signal Name="SCK_B"/>
+								<Signal Name="FS_B"/>
+								<Signal Name="MCLK_B"/>
+							</SignalLogicalOp>
+							<Semaphore>$IpInstance_SAIB_Master</Semaphore>							
+						</Mode>
+						<Mode Name="SAI_B_AsyncSlave" UserName="Asynchronous Slave">
+							<SignalLogicalOp Name="AND">
+								<Signal Name="SD_B"/>
+								<Signal Name="SCK_B"/>
+								<Signal Name="FS_B"/>
+							</SignalLogicalOp>
+							<Semaphore>$IpInstance_SAIB_AsyncSlave</Semaphore>
+							<!--<Condition Expression="!$IpInstance_SAIB_SPDIF" Diagnostic=""/>-->
+						</Mode>						
+						<Mode Name="SAI_B_SyncSlave" RemoveCondition="((!$ModeExist_SAI_A_Master) &amp; (!$ModeExist_SAI_A_MasterWithClock) &amp; (!$ModeExist_SAI_A_AsyncSlave))" ShrinkName="SAI_B in Synchronous Slave Mode" UserName="Synchronous Slave"> 
+							<SignalLogicalOp Name="AND">
+								<Signal Name="SD_B"/>
+							</SignalLogicalOp>
+							<!--<Condition Expression="($IpInstance_SAIA_Master | $IpInstance_SAIA_AsyncSlave) &amp; (!$IpInstance_SAIB_SPDIF)" Diagnostic="Need to have SAI_A on 'Master' or 'Asynchronous Slave' Mode"/>-->
+							<Condition Diagnostic="Need to have SAI_A on 'Master' or 'Asynchronous Slave' Mode" Expression="($IpInstance_SAIA_Master | $IpInstance_SAIA_AsyncSlave)"/>
+						</Mode>							
+						<Mode Name="SAI_B_SPDIF" UserName="SPDIF TX Transmitter (IEC60958)">
+							<SignalLogicalOp Name="AND">
+								<Signal Name="SD_B"/>						
+							</SignalLogicalOp>	
+							<Semaphore>$IpInstance_SAIB_SPDIF</Semaphore>
+						</Mode>						
+					</ModeLogicOperator>
+					<Semaphore>$IpInstance_SAIB_Mode</Semaphore>
+					<Semaphore>SAIBUsed_ForRCC</Semaphore>
+					<Semaphore>$IpInstanceUsed_ForRCC</Semaphore>
+					<Semaphore>$IpInstance_SAIBUsed_ForDMA</Semaphore>
+				</Mode>							
+				<Mode Name="Protocol" RemoveCondition="((!$ModeExist_SAI_B_Master) &amp; (!$ModeExist_SAI_B_MasterWithClock) &amp; (!$ModeExist_SAI_B_AsyncSlave) &amp; (!$ModeExist_SAI_B_SyncSlave) &amp; (!$ModeExist_SAI_B_SPDIF))" UserName="I2S/PCM Protocol"> 
+					<ModeLogicOperator Name="XOR">
+						<Mode Name="SAI_B_BASIC" UserName="Basic">
+							<SignalLogicalOp Name="AND">
+								<Signal Name="VP_$IpInstance_SAIB_SAI_BASIC"/>							
+							</SignalLogicalOp>	
+							<Semaphore>$IpInstance_SAIB_INIT_PROTOCOL</Semaphore>	
+							<Condition Diagnostic="Need to have a mode selected" Expression="($IpInstance_SAIB_Mode) &amp; (!$IpInstance_SAIB_SPDIF)"/>						
+						</Mode>						
+					</ModeLogicOperator>										
+				</Mode>								
+			</ModeLogicOperator>
+		</Mode>
+	</ModeLogicOperator>
+	
+	
+	<!-- RefSignal for SAI -->
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="SD_A"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="SCK_A"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="FS_A"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="MCLK_A"/>
+	
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="SD_B"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="SCK_B"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="FS_B"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="MCLK_B"/>
+	
+	<RefSignal Name="VP_$IpInstance_SAIA_SAI_BASIC" Virtual="true"/>
+	<RefSignal Name="VP_$IpInstance_SAIA_SAI_EXPERT" Virtual="true"/>
+	<RefSignal Name="VP_$IpInstance_SAIA_SAI_FREE" Virtual="true"/>
+	<RefSignal Name="VP_$IpInstance_SAIA_SAI_I2S_STANDARD" Virtual="true"/>
+	<RefSignal Name="VP_$IpInstance_SAIA_SAI_I2S_MSBJUSTIFIED" Virtual="true"/>
+	<RefSignal Name="VP_$IpInstance_SAIA_SAI_I2S_LSBJUSTIFIED" Virtual="true"/>
+	<RefSignal Name="VP_$IpInstance_SAIA_SAI_PCM_LONG" Virtual="true"/>
+	<RefSignal Name="VP_$IpInstance_SAIA_SAI_PCM_SHORT" Virtual="true"/>
+	
+	
+	<RefSignal Name="VP_$IpInstance_SAIB_SAI_BASIC" Virtual="true"/>
+	<RefSignal Name="VP_$IpInstance_SAIB_SAI_EXPERT" Virtual="true"/>
+	<RefSignal Name="VP_$IpInstance_SAIB_SAI_FREE" Virtual="true"/>
+	<RefSignal Name="VP_$IpInstance_SAIB_SAI_I2S_STANDARD" Virtual="true"/>
+	<RefSignal Name="VP_$IpInstance_SAIB_SAI_I2S_MSBJUSTIFIED" Virtual="true"/>
+	<RefSignal Name="VP_$IpInstance_SAIB_SAI_I2S_LSBJUSTIFIED" Virtual="true"/>
+	<RefSignal Name="VP_$IpInstance_SAIB_SAI_PCM_LONG" Virtual="true"/>
+	<RefSignal Name="VP_$IpInstance_SAIB_SAI_PCM_SHORT" Virtual="true"/>
+	
+</IP>

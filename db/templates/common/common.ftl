@@ -538,12 +538,12 @@
 				[#assign retval=argument.name]
 			[/#if]
 		    [/#list]
-[#if S_FATFS_SDIO?? && inst=="SDIO"] [#-- if HAL_SD_Init  and SDIO is used with FATFS--]
+[#if S_FATFS_SDIO?? && (inst=="SDIO" || inst?starts_with("SDMMC"))] [#-- if HAL_SD_Init  and SDIO is used with FATFS--]
 [#else]		    [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n
 [/#if]
 		    		
             [#else]
-                    [#if S_FATFS_SDIO?? && inst=="SDIO"] [#-- if HAL_SD_Init  and SDIO is used with FATFS--][#else][#if nTab==2]#t#t[#else]#t[/#if]${method.name}();#n[/#if]
+                    [#if S_FATFS_SDIO?? && (inst=="SDIO" || inst?starts_with("SDMMC"))] [#-- if HAL_SD_Init  and SDIO is used with FATFS--][#else][#if nTab==2]#t#t[#else]#t[/#if]${method.name}();#n[/#if]
                 [/#if]			
 		[/#if]
 		[#if method.status=="KO"]
@@ -668,3 +668,54 @@
 [/#list]
 [/#macro]
 [#-- macro getLocalVariableList of a config End--]
+
+[#-- macro generate USB wake-up interrupt code --]
+[#macro generateUsbWakeUpInterrupt ipName tabN]
+    [#if ipName?contains("_FS")]
+        [#if FamilyName=="STM32L4"]
+            [#if tabN==2]#t#t[#else]#t#t#t[/#if]/* Enable EXTI Line 17 for USB wakeup */
+        [#else]
+            [#if tabN==2]#t#t[#else]#t#t#t[/#if]/* Enable EXTI Line 18 for USB wakeup */
+        [/#if]
+    [#else]
+        [#if FamilyName=="STM32L0"]
+            [#if tabN==2]#t#t[#else]#t#t#t[/#if]/* Enable EXTI Line 18 for USB wakeup */
+        [#else]
+            [#if tabN==2]#t#t[#else]#t#t#t[/#if]/* Enable EXTI Line 20 for USB wakeup */
+        [/#if]
+    [/#if]
+    [#if FamilyName=="STM32F3"||FamilyName=="STM32L1"]
+      [#if tabN==2]#t#t[#else]#t#t#t[/#if]__HAL_USB_WAKEUP_EXTI_CLEAR_FLAG();
+      [#if tabN==2]#t#t[#else]#t#t#t[/#if]__HAL_USB_WAKEUP_EXTI_ENABLE_RISING_EDGE();
+    [/#if]
+    [#if FamilyName=="STM32F2"||FamilyName=="STM32F4"||FamilyName=="STM32F7"]
+        [#if ipName?contains("_FS")]
+            [#if tabN==2]#t#t[#else]#t#t#t[/#if]__HAL_USB_OTG_FS_WAKEUP_EXTI_CLEAR_FLAG();
+            [#if tabN==2]#t#t[#else]#t#t#t[/#if]__HAL_USB_OTG_FS_WAKEUP_EXTI_ENABLE_RISING_EDGE();
+        [/#if]
+        [#if ipName?contains("_HS")]
+            [#if tabN==2]#t#t[#else]#t#t#t[/#if]__HAL_USB_OTG_HS_WAKEUP_EXTI_CLEAR_FLAG();
+            [#if tabN==2]#t#t[#else]#t#t#t[/#if]__HAL_USB_OTG_HS_WAKEUP_EXTI_ENABLE_RISING_EDGE();
+        [/#if]
+    [/#if]
+    [#if ipName?contains("_HS")]
+        [#if tabN==2]#t#t[#else]#t#t#t[/#if]__HAL_USB_OTG_HS_WAKEUP_EXTI_ENABLE_IT();
+    [#elseif ipName?contains("OTG_FS")&&FamilyName=="STM32F1"]
+        [#if tabN==2]#t#t[#else]#t#t#t[/#if]__HAL_USB_OTG_FS_WAKEUP_EXTI_CLEAR_FLAG();
+        [#if tabN==2]#t#t[#else]#t#t#t[/#if]__HAL_USB_OTG_FS_WAKEUP_EXTI_ENABLE_RISING_EDGE();
+        [#if tabN==2]#t#t[#else]#t#t#t[/#if]__HAL_USB_OTG_FS_WAKEUP_EXTI_ENABLE_IT();
+    [#elseif ipName?contains("OTG_FS")&&FamilyName=="STM32L4"]
+        [#if tabN==2]#t#t[#else]#t#t#t[/#if]__HAL_USB_OTG_FS_WAKEUP_EXTI_ENABLE_IT();
+    [#elseif ipName?contains("_FS")]
+              [#if tabN==2]#t#t[#else]#t#t#t[/#if]__HAL_USB_OTG_FS_WAKEUP_EXTI_ENABLE_IT();
+    [#else]
+        [#if FamilyName=="STM32F1"]
+            [#if tabN==2]#t#t[#else]#t#t#t[/#if]__HAL_USB_WAKEUP_EXTI_CLEAR_FLAG();
+            [#if tabN==2]#t#t[#else]#t#t#t[/#if]__HAL_USB_WAKEUP_EXTI_ENABLE_RISING_EDGE();
+            [#if tabN==2]#t#t[#else]#t#t#t[/#if]__HAL_USB_WAKEUP_EXTI_ENABLE_IT();
+        [#else]
+            [#if tabN==2]#t#t[#else]#t#t#t[/#if]__HAL_USB_WAKEUP_EXTI_ENABLE_IT();
+        [/#if]
+    [/#if]
+[/#macro]
+[#-- End macro generate USB wake-up interrupt code --]

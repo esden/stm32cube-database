@@ -501,13 +501,13 @@
   [#if serviceType=="Init"] 
     [#if initService.clock??]
       [#list initService.clock?split(';') as clock]
-        #t#${clock}(); 
+        #t${clock}(); 
       [/#list]
     [#else]
-         #t__${ipName}_CLK_ENABLE();
+         #t__HAL_RCC_${ipName}_CLK_ENABLE();
     [/#if]
   [#else]           
-         #t__${ipName}_CLK_DISABLE();   
+         #t__HAL_RCC_${ipName}_CLK_DISABLE();   
   [/#if]
   [#if gpioExist]
 #t[@generateConfigCode ipName=ipName type=serviceType serviceName="gpio" instHandler=instHandler tabN=tabN/]
@@ -520,12 +520,12 @@
         [#if initService.nvic??]
             [#assign irqNum = 0]
             [#list initService.nvic as initVector]
+              [#if initVector.codeInMspInit]
                 [#assign irqNum = irqNum+1]
-                [#if irqNum==1]#t/* Peripheral interrupt Initt */[/#if]
-                [#-- #t#t/* Sets the priority grouping field */ To be done later--]
-                [#-- #t#tHAL_NVIC_SetPriorityGrouping(${initVector.group});  To be done later--]
+                [#if irqNum==1]#t/* Peripheral interrupt init */[/#if]
                 #tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
                 #tHAL_NVIC_EnableIRQ(${initVector.vector});
+              [/#if]
             [/#list]
         [/#if]
     [/#if]

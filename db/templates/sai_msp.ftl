@@ -230,13 +230,18 @@
                #t#t#t ${clock}(); 
             [/#list]
             [#else]
-         #t#t#t__${ipName}_CLK_ENABLE();
+         #t#t#t__HAL_RCC_${ipName}_CLK_ENABLE();
            [/#if]
-[#if nvicExist]
-            [#if initService.nvic??&&initService.nvic?size>0]#n#t#t/* Peripheral interrupt init*/
+        [#if nvicExist]
+            [#if initService.nvic??&&initService.nvic?size>0]
+                [#assign irqNum = 0]
                 [#list initService.nvic as initVector]
+                  [#if initVector.codeInMspInit]
+                    [#assign irqNum = irqNum+1]
+                    [#if irqNum==1]#n#t#t/* Peripheral interrupt init*/[/#if]
                     #t#tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
                     #t#tHAL_NVIC_EnableIRQ(${initVector.vector});
+                  [/#if]
                 [/#list]
             [/#if]
         [/#if]
@@ -246,7 +251,7 @@
 #t#t${ipName}_client --;
 #t#tif (${ipName}_client == 0)
 #t#t#t{       
-        #t#t#t/* Peripheral clock disable */ #n #t#t#t__${ipName}_CLK_DISABLE();
+        #t#t#t/* Peripheral clock disable */ #n #t#t#t__HAL_RCC_${ipName}_CLK_DISABLE();
 [#if initService.nvic??]
                 [#list initService.nvic as initVector]                   
                     #t#t#tHAL_NVIC_DisableIRQ(${initVector.vector});
@@ -296,13 +301,18 @@
                #t#t#t ${clock}(); 
             [/#list]
             [#else]
-         #t#t#t__${ipName}_CLK_ENABLE();
+         #t#t#t__HAL_RCC_${ipName}_CLK_ENABLE();
            [/#if]
-[#if nvicExist]
-            [#if initService.nvic??&&initService.nvic?size>0]#n#t#t#t/* Peripheral interrupt init*/
+        [#if nvicExist]
+            [#if initService.nvic??&&initService.nvic?size>0]
+                [#assign irqNum = 0]
                 [#list initService.nvic as initVector]
+                  [#if initVector.codeInMspInit]
+                    [#assign irqNum = irqNum+1]
+                    [#if irqNum==1]#n#t#t#t/* Peripheral interrupt init*/[/#if]
                     #t#t#tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
                     #t#t#tHAL_NVIC_EnableIRQ(${initVector.vector});
+                  [/#if]
                 [/#list]
             [/#if]
         [/#if]
@@ -312,7 +322,7 @@
 #t#t${ipName}_client --;
 #t#t#tif (${ipName}_client == 0)
 #t#t#t{  
-        #t#t#t/* Peripheral clock disable */#n#t#t#t__${ipName}_CLK_DISABLE(); 
+        #t#t#t/* Peripheral clock disable */#n#t#t#t__HAL_RCC_${ipName}_CLK_DISABLE(); 
 [#if initService.nvic??]
                 [#list initService.nvic as initVector]                   
                     #t#t#tHAL_NVIC_DisableIRQ(${initVector.vector});

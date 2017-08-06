@@ -32,6 +32,7 @@
   ******************************************************************************
   */
 [#compress]
+[#assign usb_device = false]
 /* Includes ------------------------------------------------------------------*/
 [#if isHalSupported??]
 #include "${FamilyName?lower_case}xx_hal.h"
@@ -42,6 +43,9 @@
 [#if !ip?contains("FREERTOS") && !ip?contains("NVIC")&& !ip?contains("CORTEX")]
 #include "${ip?lower_case}.h"
 [/#if]
+[#if ip?contains("USB_DEVICE")]
+[#assign usb_device = true]
+[/#if]
 [/#list]
 [#-- /#if --]
 [/#compress]
@@ -50,6 +54,24 @@
 
 /* USER CODE END Includes */
 #n
+[#if usb_device]
+  [#if vectors??]
+    [#assign wakeupInterrupt = false]
+    [#list vectors as vector]
+      [#if (vector.vector?contains("OTG_FS") || vector.vector?contains("OTG_HS") || vector.vector?contains("USB")) && (vector.vector?contains("WKUP") || vector.vector?contains("WakeUp"))]
+        [#if !wakeupInterrupt]
+/* External variables --------------------------------------------------------*/
+        [/#if]
+        [#assign wakeupInterrupt = true]
+        [#assign handleName = getHandleName(vector.vector)]
+extern PCD_HandleTypeDef ${handleName};
+      [/#if]
+    [/#list]
+    [#if wakeupInterrupt]
+#n
+    [/#if]
+  [/#if]
+[/#if]
 /* Private variables ---------------------------------------------------------*/
 [#-- If HAL compliant generate Global variable : Peripherals handler -Begin --]
 [#if HALCompliant??][#-- if HALCompliant Begin --]
@@ -127,6 +149,9 @@ static void MPU_Config(void);
   [/#if]
  [/#list]
  [@common.optinclude name="Src/rtos_pfp.tmp"/]
+[/#if]
+[#if vectors??]
+void MX_NVIC_Init(void);
 [/#if]
 [/#compress]
 [#if USB_HOST?? && !FREERTOS??]
@@ -220,6 +245,11 @@ int main(void)
 [/#if]
 [/#if]
 [/#list]
+[#if vectors??]
+#n
+#t/* Initialize interrupts */
+#tMX_NVIC_Init();
+[/#if]
 [/#compress]
 #n
 #t/* USER CODE BEGIN 2 */
@@ -288,7 +318,7 @@ void SystemClock_Config(void)
 [#-- configure systick interrupts  --]
 [#if systemVectors??]
 [#list systemVectors as initVector] 
-[#if initVector.vector=="SysTick_IRQn"]
+[#if initVector.vector=="SysTick_IRQn" && initVector.codeInMspInit]
 #t/* ${initVector.vector} interrupt configuration */
 #tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
 [#if initVector.systemHandler=="false"]
@@ -301,6 +331,57 @@ void SystemClock_Config(void)
 #n
 
 [/#compress]
+
+[#compress]
+[#if vectors??]
+#n/** NVIC Configuration
+ */
+void MX_NVIC_Init(void)
+{
+[#list vectors as vector]
+  #t/* ${vector.vector} interrupt configuration */
+  [#if (vector.vector?contains("OTG_FS") || vector.vector?contains("OTG_HS") || vector.vector?contains("USB")) && (vector.vector?contains("WKUP") || vector.vector?contains("WakeUp"))]
+    [#assign handleName = getHandleName(vector.vector)]
+    [#assign ipName = getIpName(vector.vector)]
+    #tif (${handleName}.Init.low_power_enable == 1)
+    #t{
+    [@common.generateUsbWakeUpInterrupt ipName=ipName tabN=2/]
+    #t#tHAL_NVIC_SetPriority(${vector.vector}, ${vector.preemptionPriority}, ${vector.subPriority});
+    #t#tHAL_NVIC_EnableIRQ(${vector.vector});
+    #t}
+  [#else]
+    #tHAL_NVIC_SetPriority(${vector.vector}, ${vector.preemptionPriority}, ${vector.subPriority});
+    [#if vector.systemHandler=="false"]
+      #tHAL_NVIC_EnableIRQ(${vector.vector});
+    [/#if]
+  [/#if]
+[/#list]
+}
+#n
+[/#if]
+[/#compress]
+
+[#function getIpName(vectorName)]
+    [#if vectorName?starts_with("OTG_FS")]
+        [#return "USB_OTG_FS"]
+    [#elseif vectorName?starts_with("OTG_HS")]
+        [#return "USB_OTG_HS"]
+    [#elseif vectorName?starts_with("USB")]
+        [#return "USB"]
+    [/#if]
+    [#return ""]
+[/#function]
+
+[#function getHandleName(vectorName)]
+    [#if vectorName?starts_with("OTG_FS")]
+        [#return "hpcd_USB_OTG_FS"]
+    [#elseif vectorName?starts_with("OTG_HS")]
+        [#return "hpcd_USB_OTG_HS"]
+    [#elseif vectorName?starts_with("USB")]
+        [#return "hpcd_USB_FS"]
+    [/#if]
+    [#return ""]
+[/#function]
 
 [#if HALCompliant??][#-- if HALCompliant Begin --]
 #n[#list Peripherals as Peripheral][#if Peripheral??]

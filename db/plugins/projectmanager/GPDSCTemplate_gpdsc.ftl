@@ -49,14 +49,16 @@
   </requirements>
   <create>
     <project>
-      [#if  family?upper_case == "STM32F7"]
+      <options>
+        [#if  family?upper_case == "STM32F7"]
        
-      [/#if]
-      <stack size="${stackSize}"/> 
-      <heap size="${heapSize}"/>
-      [#if debugProtocol=="swd" || debugProtocol=="jtag"]
-      <debugProbe name="ST-Link" protocol="${debugProtocol}"/>
-      [/#if]
+        [/#if]
+        <stack size="${stackSize}"/> 
+        <heap size="${heapSize}"/>
+        [#if debugProtocol=="swd" || debugProtocol=="jtag"]
+        <debugProbe name="ST-Link" protocol="${debugProtocol}"/>
+        [/#if]
+      </options> 
     </project>
   </create>
   <generators>

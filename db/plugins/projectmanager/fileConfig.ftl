@@ -89,28 +89,78 @@
 	   <include>${halIncludePath}</include>
         [/#list]
     </Cincludes>
-    [#--
-    [#if ide=="SW4STM32"]
-    <sourceEntries>
-    	<sourceEntry>
-    		<name>${inc}</name>
-    	</sourceEntry>
-    	<sourceEntry>
-    		<name>${src}</name>
-    	</sourceEntry>
-    	<sourceEntry>
-    		<name>${HALDriver}</name>
-    	</sourceEntry>
-    </sourceEntries>
+      </config>
+    </configs> 
+    <underRoot>${underRoot}</underRoot>
+
+    [#if underRoot == "true"]
+    	<copyAsReference>${copyAsReference}</copyAsReference>
+    	[#if copyAsReference == "true"]
+		    <sourceEntries>
+		    	<sourceEntry>
+		    		<name>${inc}</name>
+		    	</sourceEntry>
+		    	<sourceEntry>
+		    		<name>${src}</name>
+		    	</sourceEntry>
+		    </sourceEntries>
+                
+        [#if atLeastOneMiddlewareIsUsed]
+	  <group>
+	  	<name>Middlewares</name>
+		 [#list groups as group]
+		 	<group>
+		 		<name>${group.name!''}</name>
+		 		[#if group.sourceFilesNameList??]
+			 		[#list group.sourceFilesNameList as filesName]
+						<file>
+							<name>${filesName!''}</name>
+						</file>
+			        [/#list]
+			    [/#if]
+		    </group>
+		 [/#list]
+	  </group> 
+	 [/#if]
+        
+        
+        
+        
+    		<group>
+	    		<name>Drivers</name> 
+		 		<group>
+		 			<name>${HALGroup.name!''}</name>
+	 				[#if HALGroup.sourceFilesNameList??]
+			 			[#list HALGroup.sourceFilesNameList as filesName]
+							<file>
+								<name>${filesName!''}</name>
+							</file>
+			       		[/#list]
+		   	  		[/#if]
+		    	</group>
+	  		</group>
+	  		[#else]
+    
+	  		<sourceEntries>
+		    	<sourceEntry>
+		    		<name>${inc}</name>
+		    	</sourceEntry>
+		    	<sourceEntry>
+		    		<name>${src}</name>
+		    	</sourceEntry>
+		    	<!--sourceEntry>
+		    		<name>${HALDriver}</name>
+		    	</sourceEntry-->
+		    </sourceEntries>
+    	[/#if]
     [/#if]
-    --]
-  </config>
-</configs>
+
 [#-- project groups and files --]
-[#--if ide != "SW4STM32"] --]
+[#if underRoot == "false"]
+
 	[#if atLeastOneMiddlewareIsUsed]
 	  <group>
-	  <name>Middlewares</name>
+	  	<name>Middlewares</name>
 		 [#list groups as group]
 		 	<group>
 		 		<name>${group.name!''}</name>
@@ -151,55 +201,6 @@
 	       [/#list]
 	    </group>
 	  </group>
- [#-- [/#if] --]
- [#-- 
-  <group>
-    <name>Drivers</name> 
-	    <group>
-	      <name>STM32F4xx_HAL_Driver</name>
-	        [#list halSourceFilesNameList as halCFiles]
-	       <file>
-	        <name>${halCFiles}</name>
-	      </file>
-	        [/#list]
-	    </group>
-  </group>   
+ [/#if]  
 
-	 <group>
-	      <name>Middelwares</name>  
-		  <group>  
-		   	<name>FreeRTOS</name>
-		    <file>
-	        <name>${RelativePath}Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c</name>
-	      </file>
-	       <file>
-	        <name>${RelativePath}Middlewares/Third_Party/FreeRTOS/Source/portable/IAR/ARM_CM4F/port.c</name>
-	      </file>
-	       <file>
-	        <name>${RelativePath}Middlewares/Third_Party/FreeRTOS/Source/portable/IAR/ARM_CM4F/portasm.s</name>
-	      </file>
-	       <file>
-	        <name>${RelativePath}Middlewares/Third_Party/FreeRTOS/Source/croutine.c</name>
-	      </file>
-	       <file>
-	        <name>${RelativePath}Middlewares/Third_Party/FreeRTOS/Source/list.c</name>
-	      </file>
-	       <file>
-	        <name>${RelativePath}Middlewares/Third_Party/FreeRTOS/Source/queue.c</name>
-	      </file>
-	       <file>
-	        <name>${RelativePath}Middlewares/Third_Party/FreeRTOS/Source/tasks.c</name>
-	      </file>
-	       <file>
-	        <name>${RelativePath}Middlewares/Third_Party/FreeRTOS/Source/timers.c</name>
-	      </file>
-	       <file>
-	        <name>${RelativePath}Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.c</name>
-	      </file>
-	    </group>
-	    <group>  
-	   		 <name>LwIP</name>
-	    </group>
-	 </group>
- --]	   
 </Project>

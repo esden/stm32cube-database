@@ -273,9 +273,9 @@ USBD_StatusTypeDef  USBD_LL_Init (USBD_HandleTypeDef *pdev)
 #thpcd_USB_OTG_FS.pData = pdev;
 #tpdev->pData = &hpcd_USB_OTG_FS; 
 #t[#include "Src/usb_otg_fs_HalInit.tmp"]
-#tHAL_PCD_SetRxFiFo(&hpcd_USB_OTG_FS, 0x80);
-#tHAL_PCD_SetTxFiFo(&hpcd_USB_OTG_FS, 0, 0x40);
-#tHAL_PCD_SetTxFiFo(&hpcd_USB_OTG_FS, 1, 0x80);
+#tHAL_PCDEx_SetRxFiFo(&hpcd_USB_OTG_FS, 0x80);
+#tHAL_PCDEx_SetTxFiFo(&hpcd_USB_OTG_FS, 0, 0x40);
+#tHAL_PCDEx_SetTxFiFo(&hpcd_USB_OTG_FS, 1, 0x80);
 #t}
 [/#if]
 [#if handleNameHS == "HS"]
@@ -284,9 +284,9 @@ USBD_StatusTypeDef  USBD_LL_Init (USBD_HandleTypeDef *pdev)
 #thpcd_USB_OTG_HS.pData = pdev;
 #tpdev->pData = &hpcd_USB_OTG_HS;
 [#include "Src/usb_otg_hs_HalInit.tmp"]
-#tHAL_PCD_SetRxFiFo(&hpcd_USB_OTG_HS, 0x200);
-#tHAL_PCD_SetTxFiFo(&hpcd_USB_OTG_HS, 0, 0x80);
-#tHAL_PCD_SetTxFiFo(&hpcd_USB_OTG_HS, 1, 0x174);
+#tHAL_PCDEx_SetRxFiFo(&hpcd_USB_OTG_HS, 0x200);
+#tHAL_PCDEx_SetTxFiFo(&hpcd_USB_OTG_HS, 0, 0x80);
+#tHAL_PCDEx_SetTxFiFo(&hpcd_USB_OTG_HS, 1, 0x174);
 #t}
 [/#if]
 [#if handleNameUSB_FS == "FS"]

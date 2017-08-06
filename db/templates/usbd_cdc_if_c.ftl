@@ -345,12 +345,12 @@ uint8_t CDC_Transmit_FS(uint8_t* Buf, uint16_t Len)
 {
   uint8_t result = USBD_OK;
   /* USER CODE BEGIN 7 */ 
-  USBD_CDC_SetTxBuffer(hUsbDevice_0, Buf, Len);     
-  while(result != USBD_OK);
-  do {
-    result = USBD_CDC_TransmitPacket(hUsbDevice_0);
+  USBD_CDC_HandleTypeDef *hcdc = (USBD_CDC_HandleTypeDef*)hUsbDevice_0->pClassData;
+  if (hcdc->TxState != 0){
+    return USBD_BUSY;
   }
-  while(result != USBD_OK);
+  USBD_CDC_SetTxBuffer(hUsbDevice_0, Buf, Len);
+  result = USBD_CDC_TransmitPacket(hUsbDevice_0);
   /* USER CODE END 7 */ 
   return result;
 }
@@ -500,12 +500,12 @@ uint8_t CDC_Transmit_HS(uint8_t* Buf, uint16_t Len)
 {
   uint8_t result = USBD_OK;
   /* USER CODE BEGIN 12 */ 
-  USBD_CDC_SetTxBuffer(hUsbDevice_1, Buf, Len);   
-  while(result != USBD_OK);
-  do {
-    result = USBD_CDC_TransmitPacket(hUsbDevice_1);
+  USBD_CDC_HandleTypeDef *hcdc = (USBD_CDC_HandleTypeDef*)hUsbDevice_1->pClassData;
+  if (hcdc->TxState != 0){
+    return USBD_BUSY;
   }
-  while(result != USBD_OK);
+  USBD_CDC_SetTxBuffer(hUsbDevice_1, Buf, Len);
+  result = USBD_CDC_TransmitPacket(hUsbDevice_1);
   /* USER CODE END 12 */ 
   return result;
 }

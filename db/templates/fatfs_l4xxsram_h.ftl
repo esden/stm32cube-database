@@ -80,7 +80,7 @@
 /* #define SRAM_WRITEBURST   FSMC_WRITE_BURST_ENABLE */
 
 /* DMA definitions for SRAM DMA transfer */
-#define __SRAM_DMAx_CLK_ENABLE            __DMA2_CLK_ENABLE
+#define __SRAM_DMAx_CLK_ENABLE            __HAL_RCC_DMA2_CLK_ENABLE
 #define SRAM_DMAx_CHANNEL                 DMA_CHANNEL_0
 #define SRAM_DMAx_STREAM                  DMA2_Stream0  
 #define SRAM_DMAx_IRQn                    DMA2_Stream0_IRQn

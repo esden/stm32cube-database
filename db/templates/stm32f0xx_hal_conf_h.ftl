@@ -51,7 +51,7 @@
   * @brief This is the list of modules to be used in the HAL driver 
   */
 #define HAL_MODULE_ENABLED  
-  [#assign allModules = ["ADC", "CAN", "CEC", "COMP", "CRC", "CRYP", "TSC", "DAC","I2C","I2S","IWDG","LCD","LPTIM","RNG","RTC","SPI","TIM","UART","USART","IRDA","SMARTCARD","SMBUS","WWDG", "PCD"]]
+  [#assign allModules = ["ADC", "CAN", "CEC", "COMP", "CRC", "CRYP", "TSC", "DAC","I2S","IWDG","LCD","LPTIM","RNG","RTC","SPI","TIM","UART","USART","IRDA","SMARTCARD","SMBUS","WWDG", "PCD"]]
   [#list allModules as module]
 	[#if isModuleUsed(module)]
 [#compress]#define HAL_${module}_MODULE_ENABLED[/#compress]
@@ -75,6 +75,8 @@
 #define HAL_GPIO_MODULE_ENABLED
 #define HAL_PWR_MODULE_ENABLED
 #define HAL_RCC_MODULE_ENABLED
+#define HAL_I2C_MODULE_ENABLED
+
 
 /* ########################## HSE/HSI Values adaptation ##################### */
 /**

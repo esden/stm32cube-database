@@ -178,12 +178,17 @@ void MX_${data.ipName}_GPIO_Init(void)
                 [/#if]
 
         [/#list]
-[#if InitNvic??&&InitNvic?size>0][#compress]
-#n#t/* EXTI interrupt init*/
+[#if InitNvic??&&InitNvic?size>0]
+[#compress]
+[#assign irqNum = 0]
 [#list InitNvic as initVector]
+        [#if initVector.codeInMspInit]
+                [#assign irqNum = irqNum+1]
+                [#if irqNum==1]#n#t/* EXTI interrupt init*/[/#if]
                 #tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
                 #tHAL_NVIC_EnableIRQ(${initVector.vector});#n
-            [/#list]
+        [/#if]
+[/#list]
 [/#compress]
 [/#if]
 #n

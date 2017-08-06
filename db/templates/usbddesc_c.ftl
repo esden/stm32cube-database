@@ -41,6 +41,8 @@
 [#assign HS = 0] 
 [#assign FS = 0] 
 [#assign instanceNb = 0] 
+[#assign CLASS_FS = ""]
+[#assign CLASS_HS = ""]
 
 /** @addtogroup STM32_USB_OTG_DEVICE_LIBRARY
   * @{
@@ -77,11 +79,14 @@
 	[#if definition.paramName == "PID_FS"]
 		[#assign FS = 1]
 	[/#if]
-[#if definition.type=="string"]
+[#if definition.paramName == "CLASS_NAME_HS"]	
+	[#assign CLASS_HS = value]
+[#elseif definition.paramName == "CLASS_NAME_FS"]	
+	[#assign CLASS_FS = value]	
+[#elseif  definition.type=="string"]
 	[#assign instanceNb = instanceNb + 1]
 #define USBD_${definition.paramName} #t#t"${value}" 
-[/#if]
-[#if definition.type=="stringRW"]
+[#elseif  definition.type=="stringRW"]
 	[#assign instanceNb = instanceNb + 1]
 #define USBD_${definition.paramName} #t#t"${value}" 
 [#else]
@@ -171,8 +176,13 @@ __ALIGN_BEGIN uint8_t USBD_FS_DeviceDesc[USB_LEN_DEV_DESC] __ALIGN_END =
     0x00,                       /* bcdUSB */  
 [/#if]
     0x02,
+[#if CLASS_FS == "CDC"]
+    0x02,                        /*bDeviceClass*/
+    0x02,                       /*bDeviceSubClass*/
+[#else]
     0x00,                       /*bDeviceClass*/
     0x00,                       /*bDeviceSubClass*/
+[/#if]	   
     0x00,                       /*bDeviceProtocol*/
     USB_MAX_EP0_SIZE,          /*bMaxPacketSize*/
     LOBYTE(USBD_VID),           /*idVendor*/
@@ -268,8 +278,13 @@ __ALIGN_BEGIN uint8_t USBD_HS_DeviceDesc[USB_LEN_DEV_DESC] __ALIGN_END =
 [/#if]
 
     0x02,
+ [#if CLASS_HS == "CDC"]
+    0x02,                        /*bDeviceClass*/
+    0x02,                       /*bDeviceSubClass*/
+[#else]
     0x00,                       /*bDeviceClass*/
     0x00,                       /*bDeviceSubClass*/
+[/#if]
     0x00,                       /*bDeviceProtocol*/
     USB_MAX_EP0_SIZE,          /*bMaxPacketSize*/
     LOBYTE(USBD_VID),           /*idVendor*/

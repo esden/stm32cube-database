@@ -99,7 +99,7 @@ extern ${timeBaseHandlerType} ${timeBaseHandler};
 
 [#compress]
 [#list nvic as vector]
-[#if vector.systemHandler]
+[#if vector.systemHandler && vector.irqHandlerGenerated]
 /**
   * @brief  This function handles ${vector.comment}.  
   */
@@ -127,19 +127,19 @@ void ${vector.irqHandler}(void)
   [/#if]
   [#if FamilyName=="STM32F2" || FamilyName=="STM32F4"]
     [#if vectorName=="OTG_FS_WKUP_IRQn"]
-      __HAL_USB_FS_EXTI_CLEAR_FLAG();
+      __HAL_USB_OTG_FS_WAKEUP_EXTI_CLEAR_FLAG();
     [#elseif vectorName=="OTG_HS_WKUP_IRQn"]
-      __HAL_USB_HS_EXTI_CLEAR_FLAG();
+      __HAL_USB_OTG_HS_WAKEUP_EXTI_CLEAR_FLAG();
     [/#if]
   [/#if]
   [#if FamilyName=="STM32F3"]
     [#if vectorName=="USBWakeUp_IRQn" || vectorName=="USBWakeUp_RMP_IRQn"]
-      __HAL_USB_EXTI_CLEAR_FLAG();
+      __HAL_USB_WAKEUP_EXTI_CLEAR_FLAG();
     [/#if]
   [/#if]
   [#if FamilyName=="STM32L1"]
     [#if vectorName=="USB_FS_WKUP_IRQn"]
-      __HAL_USB_EXTI_CLEAR_FLAG();
+      __HAL_USB_WAKEUP_EXTI_CLEAR_FLAG();
     [/#if]
   [/#if]
 [/#macro]
@@ -176,7 +176,7 @@ void ${vector.irqHandler}(void)
 
 [#list nvic as vector]
 
-[#if vector.systemHandler==false]
+[#if !vector.systemHandler && vector.irqHandlerGenerated]
 /**
   * @brief  This function handles ${vector.comment}.  
   */

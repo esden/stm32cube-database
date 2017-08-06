@@ -52,7 +52,7 @@
   */
   
 #define HAL_MODULE_ENABLED  
-  [#assign allModules = ["ADC", "CAN", "CEC", "NAND", "NOR", "PCCARD", "SRAM", "HRTIM", "OPAMP", "SDADC", "TSC", "COMP","CRC","CRYP","DAC","I2C","I2S","IWDG","LCD","LPTIM","RNG","RTC","SPI","TIM","UART","USART","IRDA","SMARTCARD","SMBUS","WWDG", "PCD"]]
+  [#assign allModules = ["ADC", "CAN", "CEC", "NAND", "NOR", "PCCARD", "SRAM", "HRTIM", "OPAMP", "SDADC", "TSC", "COMP","CRC","CRYP","DAC","I2S","IWDG","LCD","LPTIM","RNG","RTC","SPI","TIM","UART","USART","IRDA","SMARTCARD","SMBUS","WWDG", "PCD"]]
   [#list allModules as module]
 	[#if isModuleUsed(module)]
 [#compress]#define HAL_${module}_MODULE_ENABLED[/#compress]
@@ -76,6 +76,7 @@
 #define HAL_FLASH_MODULE_ENABLED
 #define HAL_PWR_MODULE_ENABLED
 #define HAL_CORTEX_MODULE_ENABLED
+#define HAL_I2C_MODULE_ENABLED
 /* ########################## HSE/HSI Values adaptation ##################### */
 /**
   * @brief Adjust the value of External High Speed oscillator (HSE) used in your application.

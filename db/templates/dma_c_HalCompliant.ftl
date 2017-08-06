@@ -127,12 +127,25 @@ void MX_DMA_Init(void)
 [/#list][#--list datas as configModel--]
 [#compress]
 [#-- DMA interrupts --]
-[#if InitNvic??]#n#t/* DMA interrupt init */
-            [#list InitNvic as initVector]                                
-                #tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
-                #tHAL_NVIC_EnableIRQ(${initVector.vector});
-            [/#list]
+[#if InitNvic??]
+    [#assign codeInMspInit = false]
+    [#list InitNvic as initVector]
+      [#if initVector.codeInMspInit]
+       [#assign codeInMspInit = true]
+       [#break]
+      [/#if]
+    [/#list]
+    [#if codeInMspInit]
+      #n#t/* DMA interrupt init */
+      [#list InitNvic as initVector]
+        [#if initVector.codeInMspInit]
+          #t/* ${initVector.vector} interrupt configuration */
+          #tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
+          #tHAL_NVIC_EnableIRQ(${initVector.vector});
         [/#if]
+      [/#list]
+    [/#if]
+[/#if]
 #n
 [/#compress]
 }
