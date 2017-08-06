@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<IP xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance"
+    ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd"
+    xmlns="http://mcd.rou.st.com/modules.php?name=mcu"
+    DBVersion="V4.0"
+    IPType="peripheral"
+    IpGroup="Security"
+    Name="CRYP"
+    Version="cryp1_v2_0_Cube">
+
+    <RefParameter Name="DataEncryptionTypesList" Comment="Data encryption type" DefaultValue="TDESECB" Type="list" Group="Algorithm">
+        <Description>AES/TDES Data encryption types list</Description>
+        <PossibleValue Value="TDESECB" Comment="TDES ECB" Semaphore="Semaphore_CRYP_Coding_TDESECB"/>
+        <PossibleValue Value="TDESCBC" Comment="TDES CBC" Semaphore="Semaphore_CRYP_Coding_TDESCBC"/>
+        <PossibleValue Value="DESECB" Comment="DES ECB" Semaphore="Semaphore_CRYP_Coding_DESECB"/>
+        <PossibleValue Value="DESCBC" Comment="DES CBC" Semaphore="Semaphore_CRYP_Coding_DESCBC"/>
+        <PossibleValue Value="AESECB" Comment="AES ECB" Semaphore="Semaphore_CRYP_Coding_AESECB"/>
+        <PossibleValue Value="AESCBC" Comment="AES CBC" Semaphore="Semaphore_CRYP_Coding_AESCBC"/>
+        <PossibleValue Value="AESCTR" Comment="AES CTR" Semaphore="Semaphore_CRYP_Coding_AESCTR"/>
+        <PossibleValue Value="AESGCM" Comment="AES GCM" Semaphore="Semaphore_CRYP_Coding_AESGCM"/>
+        <PossibleValue Value="AESCCM" Comment="AES CCM" Semaphore="Semaphore_CRYP_Coding_AESCCM"/>
+    </RefParameter>
+
+    <RefParameter Name="DataType" Comment="Data type" DefaultValue="CRYP_DATATYPE_32B" Type="list" Group="Parameters">
+        <Description>AES/TDES data type selection: 32-bit data, 16-bit data, 8-bit data or 1-bit string.&lt;br&gt;This parameter can be a value of @ref CRYP_Data_Type.&lt;br&gt;Possible values are:&lt;br&gt; CRYP_DATATYPE_32B&lt;br&gt; CRYP_DATATYPE_16B&lt;br&gt; CRYP_DATATYPE_8B&lt;br&gt; CRYP_DATATYPE_1B</Description>
+        <PossibleValue Comment="32b" Value="CRYP_DATATYPE_32B"/>
+        <PossibleValue Comment="16b" Value="CRYP_DATATYPE_16B"/>
+        <PossibleValue Comment="8b" Value="CRYP_DATATYPE_8B"/>
+        <PossibleValue Comment="1b" Value="CRYP_DATATYPE_1B"/>
+    </RefParameter>
+
+    <RefParameter Name="KeySize" Comment="Key size" DefaultValue="CRYP_KEYSIZE_128B" Type="list" Group="Parameters">
+        <Condition Diagnostic="" Expression="((Semaphore_CRYP_Coding_AESGCM)|(Semaphore_CRYP_Coding_AESCCM)|(Semaphore_CRYP_Coding_AESCBC)|(Semaphore_CRYP_Coding_AESECB)|(Semaphore_CRYP_Coding_AESCTR))"/>
+        <Description>Used only in AES mode: 128, 192 or 256 bit key length.&lt;br&gt;This parameter can be a value of @ref CRYP_Key_Size.&lt;br&gt;Possible values are:&lt;br&gt; CRYP_KEYSIZE_128B&lt;br&gt; CRYP_KEYSIZE_192B&lt;br&gt; CRYP_KEYSIZE_256B</Description>
+        <PossibleValue Comment="128b" Value="CRYP_KEYSIZE_128B" Semaphore="Semaphore_CRYP_KEYSIZE_128B"/>
+        <PossibleValue Comment="192b" Value="CRYP_KEYSIZE_192B" Semaphore="Semaphore_CRYP_KEYSIZE_192B"/>
+        <PossibleValue Comment="256b" Value="CRYP_KEYSIZE_256B" Semaphore="Semaphore_CRYP_KEYSIZE_256B"/>
+    </RefParameter>
+    <RefParameter Name="KeySize" Comment="Key size" DefaultValue="null" Type="list" Group="Parameters" Visible="false">
+        <Description>Fixed value for TDES and DES modes: 24 and 8 bytes</Description>
+    </RefParameter>
+    
+    <RefParameter Name="pKey" Comment="Encryption/Decryption key" ArraySize="16" ArrayTypeElement="uint8_t;16" Type="Array" Separator=" " Group="Parameters" DefaultValue="00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00">
+        <Condition Diagnostic="" Expression="(Semaphore_CRYP_KEYSIZE_128B)"/>
+        <Description>pKey is the key used for Encryption/Decryption</Description>
+    </RefParameter>
+    <RefParameter Name="pKey" Comment="Encryption/Decryption key" ArraySize="24" ArrayTypeElement="uint8_t;16" Type="Array" Separator=" " Group="Parameters" DefaultValue="00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00">
+        <Condition Diagnostic="" Expression="(Semaphore_CRYP_KEYSIZE_192B)|(Semaphore_CRYP_Coding_TDESECB)|(Semaphore_CRYP_Coding_TDESCBC)"/>
+        <Description>pKey is the key used for Encryption/Decryption</Description>
+    </RefParameter>
+    <RefParameter Name="pKey" Comment="Encryption/Decryption key" ArraySize="32" ArrayTypeElement="uint8_t;16" Type="Array" Separator=" " Group="Parameters" DefaultValue="00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00">
+        <Condition Diagnostic="" Expression="(Semaphore_CRYP_KEYSIZE_256B)"/>
+        <Description>pKey is the key used for Encryption/Decryption</Description>
+    </RefParameter>
+    <RefParameter Name="pKey" Comment="Encryption/Decryption key" ArraySize="8" ArrayTypeElement="uint8_t;16" Type="Array" Separator=" " Group="Parameters" DefaultValue="00 00 00 00 00 00 00 00">
+        <Description>pKey is the key used for Encryption/Decryption</Description>
+    </RefParameter>
+    
+    <RefParameter Name="pInitVect" Comment="Initialization vector" ArraySize="16" ArrayTypeElement="uint8_t;16" Type="Array" Separator=" " Group="Parameters" DefaultValue="00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00">
+        <Condition Diagnostic="" Expression="((Semaphore_CRYP_Coding_AESCBC)|(Semaphore_CRYP_Coding_AESCTR)|(Semaphore_CRYP_Coding_AESGCM))"/>
+        <Description>Initialization vector (IV) is an arbitrary number that can be used along with a secret key for data encryption.&lt;br&gt;It is used also as initialization counter in CTR mode</Description>
+    </RefParameter>
+    <RefParameter Name="pInitVect" Comment="Initialization vector" ArraySize="8" ArrayTypeElement="uint8_t;16" Type="Array" Separator=" " Group="Parameters" DefaultValue="00 00 00 00 00 00 00 00">
+        <Condition Diagnostic="" Expression="((Semaphore_CRYP_Coding_TDESCBC)|(Semaphore_CRYP_Coding_DESCBC))"/>
+        <Description>Initialization vector (IV) is an arbitrary number that can be used along with a secret key for data encryption.&lt;br&gt;It is used also as initialization counter in CTR mode</Description>
+    </RefParameter>
+    <RefParameter Name="pInitVect" Comment="Initialization vector" ArraySize="7" ArrayTypeElement="uint8_t;16" Type="Array" Separator=" " Group="Parameters" DefaultValue="00 00 00 00 00 00 00">
+        <Condition Diagnostic="" Expression="(Semaphore_CRYP_Coding_AESCCM)&amp;(Semaphore_CRYP_Coding_IVSize_7)"/>
+        <Description>Initialization vector (IV) is an arbitrary number that can be used along with a secret key for data encryption.&lt;br&gt;It is used also as initialization counter in CTR mode</Description>
+    </RefParameter>
+    <RefParameter Name="pInitVect" Comment="Initialization vector" ArraySize="8" ArrayTypeElement="uint8_t;16" Type="Array" Separator=" " Group="Parameters" DefaultValue="00 00 00 00 00 00 00 00">
+        <Condition Diagnostic="" Expression="(Semaphore_CRYP_Coding_AESCCM)&amp;(Semaphore_CRYP_Coding_IVSize_8)"/>
+        <Description>Initialization vector (IV) is an arbitrary number that can be used along with a secret key for data encryption.&lt;br&gt;It is used also as initialization counter in CTR mode</Description>
+    </RefParameter>
+    <RefParameter Name="pInitVect" Comment="Initialization vector" ArraySize="9" ArrayTypeElement="uint8_t;16" Type="Array" Separator=" " Group="Parameters" DefaultValue="00 00 00 00 00 00 00 00 00">
+        <Condition Diagnostic="" Expression="(Semaphore_CRYP_Coding_AESCCM)&amp;(Semaphore_CRYP_Coding_IVSize_9)"/>
+        <Description>Initialization vector (IV) is an arbitrary number that can be used along with a secret key for data encryption.&lt;br&gt;It is used also as initialization counter in CTR mode</Description>
+    </RefParameter>
+    <RefParameter Name="pInitVect" Comment="Initialization vector" ArraySize="10" ArrayTypeElement="uint8_t;16" Type="Array" Separator=" " Group="Parameters" DefaultValue="00 00 00 00 00 00 00 00 00 00">
+        <Condition Diagnostic="" Expression="(Semaphore_CRYP_Coding_AESCCM)&amp;(Semaphore_CRYP_Coding_IVSize_10)"/>
+        <Description>Initialization vector (IV) is an arbitrary number that can be used along with a secret key for data encryption.&lt;br&gt;It is used also as initialization counter in CTR mode</Description>
+    </RefParameter>
+    <RefParameter Name="pInitVect" Comment="Initialization vector" ArraySize="11" ArrayTypeElement="uint8_t;16" Type="Array" Separator=" " Group="Parameters" DefaultValue="00 00 00 00 00 00 00 00 00 00 00">
+        <Condition Diagnostic="" Expression="(Semaphore_CRYP_Coding_AESCCM)&amp;(Semaphore_CRYP_Coding_IVSize_11)"/>
+        <Description>Initialization vector (IV) is an arbitrary number that can be used along with a secret key for data encryption.&lt;br&gt;It is used also as initialization counter in CTR mode</Description>
+    </RefParameter>
+    <RefParameter Name="pInitVect" Comment="Initialization vector" ArraySize="12" ArrayTypeElement="uint8_t;16" Type="Array" Separator=" " Group="Parameters" DefaultValue="00 00 00 00 00 00 00 00 00 00 00 00">
+        <Condition Diagnostic="" Expression="(Semaphore_CRYP_Coding_AESCCM)&amp;(Semaphore_CRYP_Coding_IVSize_12)"/>
+        <Description>Initialization vector (IV) is an arbitrary number that can be used along with a secret key for data encryption.&lt;br&gt;It is used also as initialization counter in CTR mode</Description>
+    </RefParameter>
+    <RefParameter Name="pInitVect" Comment="Initialization vector" ArraySize="13" ArrayTypeElement="uint8_t;16" Type="Array" Separator=" " Group="Parameters" DefaultValue="00 00 00 00 00 00 00 00 00 00 00 00 00">
+        <Condition Diagnostic="" Expression="(Semaphore_CRYP_Coding_AESCCM)&amp;(Semaphore_CRYP_Coding_IVSize_13)"/>
+        <Description>Initialization vector (IV) is an arbitrary number that can be used along with a secret key for data encryption.&lt;br&gt;It is used also as initialization counter in CTR mode</Description>
+    </RefParameter>
+    <RefParameter Name="pInitVect" Comment="Initialization vector" Type="list" Group="Parameters" DefaultValue="null" Visible="false">
+        <Description>Not used</Description>
+    </RefParameter>
+
+    <RefParameter Name="IVSize" Comment="Initialization vector Size" DefaultValue="64" Type="list" Group="Parameters">
+        <Condition Diagnostic="" Expression="(Semaphore_CRYP_Coding_AESCCM)"/>
+        <Description>Size of initialization vector</Description>
+        <PossibleValue Comment="7B" Value="56" Semaphore="Semaphore_CRYP_Coding_IVSize_7"/>
+        <PossibleValue Comment="8B" Value="64" Semaphore="Semaphore_CRYP_Coding_IVSize_8"/>
+        <PossibleValue Comment="9B" Value="72" Semaphore="Semaphore_CRYP_Coding_IVSize_9"/>
+        <PossibleValue Comment="10B" Value="80" Semaphore="Semaphore_CRYP_Coding_IVSize_10"/>
+        <PossibleValue Comment="11B" Value="88" Semaphore="Semaphore_CRYP_Coding_IVSize_11"/>
+        <PossibleValue Comment="12B" Value="96" Semaphore="Semaphore_CRYP_Coding_IVSize_12"/>
+        <PossibleValue Comment="13B" Value="104" Semaphore="Semaphore_CRYP_Coding_IVSize_13"/>
+    </RefParameter>
+    <RefParameter Name="IVSize" Comment="Initialization vector Size" DefaultValue="null" Type="list" Group="Parameters" Visible="false">
+        <Description>Not used.</Description>
+    </RefParameter>
+
+    <RefParameter Name="TagSize" Comment="Tag size" DefaultValue="8" Type="List" Group="Parameters">
+        <Condition Diagnostic="" Expression="(Semaphore_CRYP_Coding_AESCCM)"/>
+        <Description>Size of returned authentication TAG created by AES CCM Encrypt(Decrypt)Finish functions.&lt;br&gt; According to NIST Special Publication 800-38C (Recommendation for Block Cipher Modes of Operation: The CCM Mode for Authentication and Confidentiality), size less than 8 shall not be used without a careful analysis of the risks of accepting inauthentic data as authentic.</Description>
+        <PossibleValue Comment="4" Value="4"/>
+        <PossibleValue Comment="6" Value="6"/>
+        <PossibleValue Comment="8" Value="8"/>
+        <PossibleValue Comment="10" Value="10"/>
+        <PossibleValue Comment="12" Value="12"/>
+        <PossibleValue Comment="14" Value="14"/>
+        <PossibleValue Comment="16" Value="16"/>
+    </RefParameter>
+    <RefParameter Name="TagSize" Comment="Tag size" DefaultValue="null" Type="list" Group="Parameters" Visible="false">
+        <Description>Not used.</Description>
+    </RefParameter>
+    
+    <RefParameter Name="Header" Comment="Header" ArraySize="64" ArrayTypeElement="uint8_t;16" Type="Array" Separator=" " Group="Parameters" DefaultValue="00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00">
+        <Condition Diagnostic="" Expression="((Semaphore_CRYP_Coding_AESCCM) | (Semaphore_CRYP_Coding_AESGCM)) &amp; (HeaderSize=64)"/>    
+        <Description>The header (also known as additional authentication data) is used in GCM and CCM modes as first part of the message and precede the payload</Description>
+    </RefParameter>
+    <RefParameter Name="Header" Comment="Header" ArraySize="48" ArrayTypeElement="uint8_t;16" Type="Array" Separator=" " Group="Parameters" DefaultValue="00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00">
+        <Condition Diagnostic="" Expression="((Semaphore_CRYP_Coding_AESCCM) | (Semaphore_CRYP_Coding_AESGCM)) &amp; HeaderSize=48"/>    
+        <Description>The header (also known as additional authentication data) is used in GCM and CCM modes as first part of the message and precede the payload</Description>
+    </RefParameter>
+    <RefParameter Name="Header" Comment="Header" ArraySize="32" ArrayTypeElement="uint8_t;16" Type="Array" Separator=" " Group="Parameters" DefaultValue="00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00">
+        <Condition Diagnostic="" Expression="((Semaphore_CRYP_Coding_AESCCM) | (Semaphore_CRYP_Coding_AESGCM)) &amp; HeaderSize=32"/>    
+        <Description>The header (also known as additional authentication data) is used in GCM and CCM modes as first part of the message and precede the payload</Description>
+    </RefParameter>
+    <RefParameter Name="Header" Comment="Header" ArraySize="16" ArrayTypeElement="uint8_t;16" Type="Array" Separator=" " Group="Parameters" DefaultValue="00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00">
+        <Condition Diagnostic="" Expression="((Semaphore_CRYP_Coding_AESCCM) | (Semaphore_CRYP_Coding_AESGCM)) &amp; HeaderSize=16"/>
+        <Description>The header (also known as additional authentication data) is used in GCM and CCM modes as first part of the message and precede the payload</Description>
+    </RefParameter>
+    <RefParameter Name="Header" Comment="Header" Type="list" Group="Parameters" DefaultValue="null" Visible="false">
+        <Description>Not used.</Description>
+    </RefParameter>
+
+    <RefParameter Name="HeaderSize" Comment="Header size" DefaultValue="16" Type="List" Group="Parameters">
+        <Condition Diagnostic="" Expression="(Semaphore_CRYP_Coding_AESGCM)|(Semaphore_CRYP_Coding_AESCCM)"/>
+        <Description>Header size in bytes</Description>
+        <PossibleValue Comment="64B" Value="64"/>
+        <PossibleValue Comment="48B" Value="48"/>
+        <PossibleValue Comment="32B" Value="32"/>
+        <PossibleValue Comment="16B" Value="16"/>
+    </RefParameter>
+    <RefParameter Name="HeaderSize" Comment="Header size" Type="list" Group="Parameters" DefaultValue="null" Visible="false">
+        <Description>Not used</Description>
+    </RefParameter>
+
+    <RefParameter Name="pScratch" Comment="Scratch buffer address" Type="list" Group="Parameters" DefaultValue="null" Visible="false">
+        <Condition Diagnostic="" Expression="((Semaphore_CRYP_Coding_AESGCM)|(Semaphore_CRYP_Coding_AESCBC)|(Semaphore_CRYP_Coding_AESECB)|(Semaphore_CRYP_Coding_AESCTR)|(Semaphore_CRYP_Coding_DESECB)|(Semaphore_CRYP_Coding_DESCBC)|(Semaphore_CRYP_Coding_TDESECB)|(Semaphore_CRYP_Coding_TDESCBC))"/>
+        <Description>Scratch buffer used to append the header.</Description>
+    </RefParameter>
+    <RefParameter Name="pScratch" Comment="Scratch buffer address" ArraySize="85" ArrayTypeElement="uint8_t;16" Type="Array" Separator=" " Group="Parameters" Visible="false" DefaultValue="00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00">
+        <Condition Diagnostic="" Expression="(Semaphore_CRYP_Coding_AESCCM) &amp; (HeaderSize=64)"/>
+        <Description>Scratch buffer used to append the header.</Description>
+    </RefParameter>
+    <RefParameter Name="pScratch" Comment="Scratch buffer address" ArraySize="69" ArrayTypeElement="uint8_t;16" Type="Array" Separator=" " Group="Parameters" Visible="false" DefaultValue="00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00">
+        <Condition Diagnostic="" Expression="(Semaphore_CRYP_Coding_AESCCM) &amp; (HeaderSize=48)"/>
+        <Description>Scratch buffer used to append the header.</Description>
+    </RefParameter>
+    <RefParameter Name="pScratch" Comment="Scratch buffer address" ArraySize="53" ArrayTypeElement="uint8_t;16" Type="Array" Separator=" " Group="Parameters" Visible="false" DefaultValue="00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00">
+        <Condition Diagnostic="" Expression="(Semaphore_CRYP_Coding_AESCCM) &amp; (HeaderSize=32)"/>
+        <Description>Scratch buffer used to append the header.</Description>
+    </RefParameter>
+    <RefParameter Name="pScratch" Comment="Scratch buffer address" ArraySize="37" ArrayTypeElement="uint8_t;16" Type="Array" Separator=" " Group="Parameters" Visible="false" DefaultValue="00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00">
+        <Condition Diagnostic="" Expression="(Semaphore_CRYP_Coding_AESCCM) &amp; (HeaderSize=16)"/>
+        <Description>Scratch buffer used to append the header.</Description>
+    </RefParameter>
+
+    <RefMode Name="CRYP_Activate" HalMode ="CRYP">
+        <ConfigForMode>CRYP_Init</ConfigForMode>
+        <Parameter Name="DataEncryptionTypesList"/>
+        <Parameter Name="DataType"/>
+        <Parameter Name="KeySize"/>
+        <Parameter Name="pKey"/>
+        <Parameter Name="IVSize"/>
+        <Parameter Name="pInitVect"/>
+        <Parameter Name="TagSize"/>
+        <Parameter Name="HeaderSize"/>
+        <Parameter Name="Header"/>
+        <Parameter Name="pScratch"/>
+    </RefMode>
+
+    <ModeLogicOperator Name="OR">
+          <Mode Name="CRYP_State" UserName="Activated">
+              <ModeLogicOperator Name="XOR">
+                  <Mode Name="CRYP_Activate" UserName="Activated">
+                      <SignalLogicalOp Name="AND">
+                          <Signal Name="VS_CRYP" />
+                      </SignalLogicalOp>
+                  </Mode>
+              </ModeLogicOperator>
+          </Mode>
+      </ModeLogicOperator>
+    
+    <!-- RefSignal for CRYP -->
+    <RefSignal Name="VS_CRYP" Virtual="true"/>
+
+</IP>

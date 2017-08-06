@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<IP xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="http://mcd.rou.st.com/modules.php?name=mcu"
+    ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd"
+    DBVersion="V4.0"
+    IPType="peripheral"
+    IpGroup="Security"
+    Name="HASH"
+    Version="hash1_v2_0_Cube">
+
+    <RefParameter Name="SecureHashAlgorithmType" Comment="Secure hash algorithm type" DefaultValue="SHA1" Type="list" Group="Algorithm">
+        <Description>Secure hash algorithm type.&lt;br&gt;Default setting is SHA1</Description>
+        <PossibleValue Value="SHA1" Comment="SHA1" Semaphore="Semaphore_HASH_Algo_SHA1"/>
+        <PossibleValue Value="MD5" Comment="MD5" Semaphore="Semaphore_HASH_Algo_MD5"/>
+        <PossibleValue Value="SHA224" Comment="SHA224" Semaphore="Semaphore_HASH_Algo_SHA224"/>
+        <PossibleValue Value="SHA256" Comment="SHA256" Semaphore="Semaphore_HASH_Algo_SHA256"/>
+        <PossibleValue Value="HMAC SHA1" Comment="HMAC SHA1" Semaphore="Semaphore_HASH_Algo_HMACSHA1"/>
+        <PossibleValue Value="HMAC MD5" Comment="HMAC MD5" Semaphore="Semaphore_HASH_Algo_HMACMD5"/>
+        <PossibleValue Value="HMAC SHA224" Comment="HMAC SHA224" Semaphore="Semaphore_HASH_Algo_HMACSHA224"/>
+        <PossibleValue Value="HMAC SHA256" Comment="HMAC SHA256" Semaphore="Semaphore_HASH_Algo_HMACSHA256"/>
+    </RefParameter>
+
+    <RefParameter Name="DataType" Comment="Hash data type in bit" DefaultValue="HASH_DATATYPE_32B" Type="list" Group="Parameters">
+        <Description>32-bit data, 16-bit data, 8-bit data or 1-bit string.&lt;br&gt;This parameter can be a value of @ref HASH_Data_Type.&lt;br&gt;Default setting is 32-bit(HASH_DATATYPE_32B)</Description>
+        <PossibleValue Value="HASH_DATATYPE_32B" Comment="32"/>
+        <PossibleValue Value="HASH_DATATYPE_16B" Comment="16"/>
+        <PossibleValue Value="HASH_DATATYPE_8B" Comment="8"/>
+        <PossibleValue Value="HASH_DATATYPE_1B" Comment="1"/>
+    </RefParameter>
+
+    <RefParameter Name="pKeyInputType" Comment="pKey input type" Type="list" DefaultValue="HEXA" Group="Parameters">
+        <Description>User can choose between HEXA or ASCII for pKey input type </Description>
+        <PossibleValue Value="ASCII" Comment="ASCII" Semaphore="Semaphore_pKeyInputType_ASCII"/>
+        <PossibleValue Value="HEXA" Comment="HEXA" Semaphore="Semaphore_pKeyInputType_HEXA"/>
+    </RefParameter>
+
+    <RefParameter Name="pKeyInput" Comment="pKey user input" Type="StringRW" DefaultValue="0" Group="Parameters" >
+        <Description>Used only in HMAC operation. Will be used to generate Encryption/Decryption key in right format.</Description>
+        <Condition Diagnostic="" Expression="((Semaphore_HASH_Algo_HMACSHA1)|(Semaphore_HASH_Algo_HMACMD5)|(Semaphore_HASH_Algo_HMACSHA224)|(Semaphore_HASH_Algo_HMACSHA256))&amp;(Semaphore_pKeyInputType_ASCII)"/>
+    </RefParameter>
+    <RefParameter Name="pKeyInput" Comment="pKey user input" Type="StringRW" DefaultValue="00" Group="Parameters" >
+        <Description>Used only in HMAC operation. Will be used to generate Encryption/Decryption key in right format.&lt;br&gt;Because of Hexadecimal format an odd number of caracters is required (ex: 000102030405060708090A0B0C0D0E0F10)</Description>
+        <Condition Diagnostic="" Expression="((Semaphore_HASH_Algo_HMACSHA1)|(Semaphore_HASH_Algo_HMACMD5)|(Semaphore_HASH_Algo_HMACSHA224)|(Semaphore_HASH_Algo_HMACSHA256))&amp;(Semaphore_pKeyInputType_HEXA)"/>
+    </RefParameter>
+    <RefParameter Name="pKeyInput" Comment="pKey user input" Type="StringRW" Group="Parameters" DefaultValue="null" Visible="false">
+        <Description>Used only in HMAC operation.</Description>
+    </RefParameter>
+
+    <RefParameter Name="KeySize" Comment="pkey size" DefaultValue="0" Max="4294967295" Min="0" Type="integer" Group="Parameters" Visible="false">
+        <Condition Diagnostic="" Expression="((Semaphore_HASH_Algo_HMACSHA1)|(Semaphore_HASH_Algo_HMACMD5)|(Semaphore_HASH_Algo_HMACSHA224)|(Semaphore_HASH_Algo_HMACSHA256))"/>
+        <Description>Used only in HMAC operation.</Description>
+    </RefParameter>
+    <RefParameter Name="KeySize" Comment="pkey size" Type="list" Group="Parameters" DefaultValue="null" Visible="false">
+        <Description>Used only in HMAC operation.</Description>
+    </RefParameter>
+
+    <RefParameter Name="pKey" Comment="pkey formatted in hexadecimal format" ArraySize="1" ArrayTypeElement="uint8_t;16" Type="Array" Separator=" " Group="Parameters" DefaultValue="00" Visible="false">
+        <Description>Used only in HMAC operation.</Description>
+        <Condition Diagnostic="" Expression="((Semaphore_HASH_Algo_HMACSHA1)|(Semaphore_HASH_Algo_HMACMD5)|(Semaphore_HASH_Algo_HMACSHA224)|(Semaphore_HASH_Algo_HMACSHA256))"/>
+    </RefParameter>
+    <RefParameter Name="pKey" Comment="pkey formatted in hexadecimal format" Type="List" Group="Parameters" DefaultValue="null" Visible="false">
+        <Description>Used only in HMAC operation.</Description>
+    </RefParameter>
+
+
+    <RefMode Name="HASH_Activate" HalMode ="HASH">
+        <ConfigForMode>HASH_Init</ConfigForMode>
+        <Parameter Name="SecureHashAlgorithmType"/>
+        <Parameter Name="DataType"/>
+        <Parameter Name="pKeyInputType"/>
+        <Parameter Name="pKeyInput"/>
+        <Parameter Name="KeySize"/>
+        <Parameter Name="pKey"/>
+    </RefMode>
+
+    <ModeLogicOperator Name="OR">
+        <Mode Name="HASH_State" UserName="Activated">
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="HASH_Activate" UserName="Activated">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="VS_HASH" />
+                    </SignalLogicalOp>
+                </Mode>
+            </ModeLogicOperator>
+        </Mode>
+    </ModeLogicOperator>
+
+    <!-- RefSignal for HASH -->
+    <RefSignal Name="VS_HASH" Virtual="true"/>
+        
+</IP>

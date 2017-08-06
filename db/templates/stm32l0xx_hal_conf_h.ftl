@@ -49,13 +49,14 @@
 /**
   * @brief This is the list of modules to be used in the HAL driver 
   */
+
 #define HAL_MODULE_ENABLED  
-  [#assign allModules = ["ADC","COMP","CRC","CRYP","DAC", "FIREWALL", "I2S","IWDG","LCD","LPTIM","RNG","RTC","SPI","TIM", "TSC","UART","USART","IRDA","SMARTCARD","SMBUS","WWDG", "PCD"]]
+  [#assign allModules = ["ADC", "AES","COMP","CRC","CRYP","DAC", "FIREWALL", "I2S","IWDG","LCD","LPTIM","RNG","RTC","SPI","TIM", "TSC","UART","USART","IRDA","SMARTCARD","SMBUS","WWDG", "PCD"]]
   [#list allModules as module]
 	[#if isModuleUsed(module)]
-[#compress]#define HAL_${module}_MODULE_ENABLED[/#compress]
+[#compress]#define HAL_${module?replace("AES","CRYP")}_MODULE_ENABLED[/#compress]
 	[#else]
-/*#define HAL_${module}_MODULE_ENABLED   */
+/*#define HAL_${module?replace("AES","CRYP")}_MODULE_ENABLED   */
 	[/#if]	
   [/#list]
   [#function isModuleUsed moduleName]

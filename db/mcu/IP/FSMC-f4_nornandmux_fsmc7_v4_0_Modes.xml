@@ -14,7 +14,7 @@
     <!-- Begin Configuration RefParameters -->
     <!-- Begin NOR Flash 1 RefParameters -->
     <RefParameter Comment="NS Coherent Pinout" DefaultValue="MEMORY_NADV_KO" Name="NSCoherentPinout1" Type="list" TabName="NOR/PSRAM 1" Group="NOR/PSRAM control" Visible="false">
-        <Condition Expression="((Address1&amp;Data1)|NorPsramDataAddress1)&amp;(NorFlash1|MuxedNorFlash1)&amp;NorPsramClock1&amp;!AddressValid1" Diagnostic=""/>
+        <Condition Expression="((Address1&amp;Data1)|NorPsramDataAddress1)&amp;(NorFlash1|MuxedNorFlash1|Psram1|MuxedPsram1)&amp;NorPsramClock1&amp;!AddressValid1" Diagnostic=""/>
         <PossibleValue Comment="NADV KO" Value="MEMORY_NADV_KO"/>
     </RefParameter>
     <RefParameter Comment="NS Coherent Pinout" DefaultValue="MEMORY_PINOUT_OK" Name="NSCoherentPinout1" Type="list" TabName="NOR/PSRAM 1" Group="NOR/PSRAM control" Visible="false">
@@ -393,8 +393,16 @@
     <RefParameter Comment="Block number" DefaultValue="0" Max="4294967295" Min="0" Name="NandBlockNbr1" Type="integer" TabName="NAND 1" Group="NAND characteristic information">
         <Description>NAND memory number of blocks.</Description>
     </RefParameter>
-    <RefParameter Comment="Zone size" DefaultValue="0" Max="4294967295" Min="0" Name="NandZoneSize1" Type="integer" TabName="NAND 1" Group="NAND characteristic information">
-        <Description>NAND memory zone size expressed in number of blocks.</Description>
+    <RefParameter Comment="Plane number" DefaultValue="0" Max="4294967295" Min="0" Name="NandPlaneNbr1" Type="integer" TabName="NAND 1" Group="NAND characteristic information">
+        <Description>NAND memory number of planes.</Description>
+    </RefParameter>
+    <RefParameter Comment="Plane size" DefaultValue="0" Max="4294967295" Min="0" Name="NandPlaneSize1" Type="integer" TabName="NAND 1" Group="NAND characteristic information">
+        <Description>NAND memory plane size measured in number of blocks.</Description>
+    </RefParameter>
+    <RefParameter Comment="Extra command enable" DefaultValue="DISABLE" Name="NandExtraCommandEnable1" Type="list" TabName="NAND 1" Group="NAND characteristic information">
+        <Description>NAND extra command needed for page reading mode. This parameter is mandatory for some NAND memories. Please check the read mode sequence in the NAND device datasheet.</Description>
+        <PossibleValue Comment="Disabled" Value="DISABLE"/>
+        <PossibleValue Comment="Enabled" Value="ENABLE"/>
     </RefParameter>
     <!-- End NAND Flash only 1 RefParameters -->
     <!-- Begin Compact Flash RefParameters -->
@@ -514,7 +522,9 @@
       <Parameter Name="NandSpareAreaSize1"/>
       <Parameter Name="NandBlockSize1"/>
       <Parameter Name="NandBlockNbr1"/>
-      <Parameter Name="NandZoneSize1"/>
+      <Parameter Name="NandPlaneNbr1"/>
+      <Parameter Name="NandPlaneSize1"/>
+      <Parameter Name="NandExtraCommandEnable1"/>
       <Parameter Name="NandCoherentPinout1"/>
    </RefMode>
    <RefMode Name="NandChipSelect2_1" Comment="NAND Flash" BaseMode="HAL_NAND1_Init" HalMode="NAND">
@@ -589,7 +599,6 @@
             </Mode>
             <Mode Name="MuxedPsram1" UserName="Muxed PSRAM">
               <SignalLogicalOp Name="AND">
-                <Signal Name="NL"/>
                 <Signal Name="NOE"/>
                 <Signal Name="NWE"/>
               </SignalLogicalOp>
@@ -927,22 +936,23 @@
             </Mode>
           </ModeLogicOperator>
           <Semaphore>AddressValid1</Semaphore>
-          <Condition Expression="NorFlash1|MuxedNorFlash1" Diagnostic="Optional only for asynchronous NOR Flash"/>
+          <Condition Expression="NorFlash1|MuxedNorFlash1|Psram1|MuxedPsram1" Diagnostic="Only for NOR Flash and PSRAM"/>
         </Mode>
         <Mode Name="NorPsramWait1" UserName="Wait">
           <SignalLogicalOp Name="AND">
             <Signal Name="NWAIT"/>
           </SignalLogicalOp>
           <ModeLogicOperator Name="XOR">
-            <Mode Name="AsynchronousWait1" UserName="Asynchronous">
+            <Mode Name="AsynchronousWait1" UserName="Asynchronous" ShrinkName="Asynchronous wait">
               <Semaphore>AsynchronousWaitMode1</Semaphore>
               <Condition Expression="!NorPsramClock1|((!BurstReadMode1|!BurstWriteMode1)&amp;(Psram1|MuxedPsram1))" Diagnostic="Only for asynchronous accesses"/>
             </Mode>
-            <Mode Name="SynchronousWait1" UserName="Synchronous">
+            <!-- No CLK pin on DIE461 WLCSP100 -->
+            <Mode Name="SynchronousWait1" UserName="Synchronous" RemoveCondition="DIE461&amp;WLCSP100">
               <Semaphore>SynchronousWaitMode1</Semaphore>
               <Condition Expression="NorPsramClock1" Diagnostic="Only for synchronous accesses"/>
             </Mode>
-            <Mode Name="AsynchronousSynchronousWait1" UserName="Asynchronous Synchronous">
+            <Mode Name="AsynchronousSynchronousWait1" UserName="Asynchronous Synchronous" RemoveCondition="DIE461&amp;WLCSP100">
               <Semaphore>AsynchronousWaitMode1</Semaphore>
               <Semaphore>SynchronousWaitMode1</Semaphore>
               <Condition Expression="NorPsramClock1&amp;(!BurstReadMode1|!BurstWriteMode1)&amp;(Psram1|MuxedPsram1)" Diagnostic="Only for PSRAM with either asynchronous read and synchronous write accesses or synchronous read and asynchronous write accesses"/>

@@ -7,7 +7,7 @@
 		[#assign instName = instanceData.instanceName]   
 		[#assign halMode= instanceData.halMode]
 		[#assign ipName = instanceData.ipName]
-		#t/*## FatFS: Link the ${instName} driver ###########################*/
-		#tret${instName} = FATFS_LinkDriver(&${instName}_Driver, ${instName}_Path);
+#t/*## FatFS: Link the ${instName} driver ###########################*/
+#tret${instName} = FATFS_LinkDriver(&${instName}_Driver, ${instName}_Path);
 	[/#list]
 [/#list]

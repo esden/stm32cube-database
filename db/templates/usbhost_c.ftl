@@ -497,7 +497,7 @@ void MX_USB_HOST_Process(void)
 }
 [/#if]
 /*
- * user callbak definition
+ * user callback definition
 */ 
 [#-- Section4: Create the USBH_UserProcess CallBack for each instance --] 
 [#list IPdatas as IP]
@@ -515,7 +515,7 @@ void MX_USB_HOST_Process(void)
 static void USBH_UserProcess${instName}  (USBH_HandleTypeDef *phost, uint8_t id)
 {
 
-  /* USER CODE BEGIN ${userCode} */
+  /* USER CODE BEGIN CALL_BACK_${userCode} */
   switch(id)
   { 
   case HOST_USER_SELECT_CONFIGURATION:
@@ -536,7 +536,7 @@ static void USBH_UserProcess${instName}  (USBH_HandleTypeDef *phost, uint8_t id)
   default:
   break; 
   }
-  /* USER CODE END ${userCode} */
+  /* USER CODE END CALL_BACK_${userCode} */
 }
 [#assign instanceNbCallBack = instanceNbCallBack + 1]
 [#assign instName= "${instanceNbCallBack}"]

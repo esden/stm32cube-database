@@ -1026,25 +1026,44 @@
         <PossibleValue Value="ENABLE" Comment="enable"/>
     </RefParameter>
 <!--END correction Bug 318788 -->
-    <RefParameter Name="ClearInputSource" Comment="Clear Input Source" DefaultValue="TIM_CLEARINPUTSOURCE_NONE" Type="list" Group="Clear Input" Visible="false">
-        <Condition Diagnostic="Clear function not active" Expression="!(Semaphore_ETRasClearingSource$IpInstance)"/>
-        <PossibleValue Value="TIM_CLEARINPUTSOURCE_NONE" Comment="Disable"/>
+<!-- present OCREFCLR only for devices with a COMP -->
+    <RefParameter Name="ClearInputSource" Comment="Clear Input Source" DefaultValue="TIM_CLEARINPUTSOURCE_ETR" Type="list" Group="Clear Input" Visible="true">
+        <Condition Diagnostic="ETR selected as clearing source" Expression="(Semaphore_ETRasClearingSource$IpInstance)"/>
+        <PossibleValue Value="TIM_CLEARINPUTSOURCE_ETR" Comment="Input Source ETR"/>
     </RefParameter>
-    <RefParameter Name="ClearInputSource" Comment="Clear Input Source" DefaultValue="TIM_CLEARINPUTSOURCE_ETR" Type="list" Group="Clear Input" Visible="false">
-        <Condition Diagnostic="Clear function active" Expression="Semaphore_ETRasClearingSource$IpInstance"/>
-        <PossibleValue Value="TIM_CLEARINPUTSOURCE_ETR" Comment="Enable"/>
+    <RefParameter Name="ClearInputSource" Comment="Clear Input Source" DefaultValue="TIM_CLEARINPUTSOURCE_NONE" Type="list" Group="Clear Input" Visible="true">
+        <Condition Diagnostic="Clear function active but ETR not selected" Expression="!Semaphore_ETRasClearingSource$IpInstance &amp;(COMP1_Exist |COMP2_Exist)"/>
+        <PossibleValue Value="TIM_CLEARINPUTSOURCE_NONE" Comment="Disable" Semaphore="Semaphore_ClearingDisable$IpInstance"/>
+        <PossibleValue Value="TIM_CLEARINPUTSOURCE_ETR" Comment="Input Source ETR" Semaphore="Semaphore_ETRasClearingfromconfigSource$IpInstance" Condition="!Semaphore_ETRasClearingSource$IpInstance" Diagnostic="ETR must be selected as a clearing source in the pinout view to validate this option" Action="Disable"/>
+        <PossibleValue Value="TIM_CLEARINPUTSOURCE_OCREFCLR" Comment="Input Source OCREFCLR"/>
+    </RefParameter>
+ <RefParameter Name="ClearInputSource" Comment="Clear Input Source" DefaultValue="TIM_CLEARINPUTSOURCE_NONE" Type="list" Group="Clear Input" Visible="false">
+        <Condition Diagnostic="Clear function active but ETR not selected" Expression="!Semaphore_ETRasClearingSource$IpInstance &amp;!(COMP1_Exist |COMP2_Exist)"/>
+        <PossibleValue Value="TIM_CLEARINPUTSOURCE_NONE" Comment="Disable" Semaphore="Semaphore_ClearingDisable$IpInstance"/>
     </RefParameter>
     <RefParameter Name="ClearInputPolarity" Comment="Clear Input Polarity" DefaultValue="TIM_CLEARINPUTPOLARITY_NONINVERTED" Type="list" Group="Clear Input">
+  <Condition Diagnostic="ETR selected as clearing source" Expression="(Semaphore_ETRasClearingfromconfigSource$IpInstance | Semaphore_ETRasClearingSource$IpInstance)"/>
         <PossibleValue Value="TIM_CLEARINPUTPOLARITY_NONINVERTED" Comment="Non inverted"/>
         <PossibleValue Value="TIM_CLEARINPUTPOLARITY_INVERTED" Comment="Inverted"/>
     </RefParameter>
     <RefParameter Name="ClearInputPrescaler" Comment="Clear Input Prescaler" DefaultValue="TIM_CLEARINPUTPRESCALER_DIV1" Type="list" Group="Clear Input">
+  <Condition Diagnostic="ETR selected as clearing source" Expression="(Semaphore_ETRasClearingfromconfigSource$IpInstance | Semaphore_ETRasClearingSource$IpInstance)"/>
         <PossibleValue Value="TIM_CLEARINPUTPRESCALER_DIV1" Comment="No division"/>
         <PossibleValue Value="TIM_CLEARINPUTPRESCALER_DIV2" Comment="Division by 2"/>
         <PossibleValue Value="TIM_CLEARINPUTPRESCALER_DIV4" Comment="Division by 4"/>
         <PossibleValue Value="TIM_CLEARINPUTPRESCALER_DIV8" Comment="Division by 8"/>
     </RefParameter>
     <RefParameter Name="ClearInputFilter" Comment="Clear Input Filter" DefaultValue="0" Max="15" Min="0" Type="integer" Group="Clear Input">
+  <Condition Diagnostic="ETR selected as clearing source" Expression="(Semaphore_ETRasClearingfromconfigSource$IpInstance | Semaphore_ETRasClearingSource$IpInstance)"/>
+    </RefParameter>
+  <RefParameter Name="ClearInputPolarity" Comment="Clear Input Polarity" DefaultValue="null" Type="list" Group="Clear Input" Visible="false" >
+  <Condition Diagnostic="ETR selected as clearing source" Expression="!(Semaphore_ETRasClearingfromconfigSource$IpInstance | Semaphore_ETRasClearingSource$IpInstance)"/>
+    </RefParameter>
+    <RefParameter Name="ClearInputPrescaler" Comment="Clear Input Prescaler" DefaultValue="null" Type="list" Group="Clear Input" Visible="false">
+  <Condition Diagnostic="ETR selected as clearing source" Expression="!(Semaphore_ETRasClearingfromconfigSource$IpInstance | Semaphore_ETRasClearingSource$IpInstance)"/>
+    </RefParameter>
+    <RefParameter Name="ClearInputFilter" Comment="Clear Input Filter" DefaultValue="null" Max="0" Min="0" Type="integer" Group="Clear Input" Visible="false">
+  <Condition Diagnostic="ETR selected as clearing source" Expression="!(Semaphore_ETRasClearingfromconfigSource$IpInstance | Semaphore_ETRasClearingSource$IpInstance)"/>
     </RefParameter>
 <!-- ClearChannelx only present if channelx is configured as output-->
 <!-- Clear Channel ONE ref parameters-->
@@ -1056,12 +1075,12 @@
         <Condition Diagnostic="" Expression="!Semaphore_ClearChannel1_TIM_CHANNEL_1_$IpInstance" />
     </RefParameter>
     <RefParameter Name="ClearChannel1" Comment="Clear Channel 1" DefaultValue="" Type="list" Group="Clear Input" Visible="true">
-        <Condition Diagnostic="" Expression="(Semaphore_output_Channel1$IpInstance &amp; (!Semaphore_forced_output_Channel1$IpInstance))" />
+        <Condition Diagnostic="" Expression="(Semaphore_output_Channel1$IpInstance &amp; (!Semaphore_forced_output_Channel1$IpInstance) &amp; (!Semaphore_ClearingDisable$IpInstance))"/>
         <PossibleValue Value="" Comment="Disable"/>
         <PossibleValue Value="TIM_CHANNEL_1" Semaphore="Semaphore_ClearChannel1_TIM_CHANNEL_1_$IpInstance" Comment="Enable"/>
     </RefParameter>
     <RefParameter Name="ClearChannel1" Comment="Clear Channel 1" DefaultValue="" Type="list" Group="Clear Input" Visible="false">
-        <Condition Diagnostic="" Expression="!(Semaphore_output_Channel1$IpInstance  &amp; (!Semaphore_forced_output_Channel1$IpInstance))" />
+            <Condition Diagnostic="" Expression="!(Semaphore_output_Channel1$IpInstance  &amp; (!Semaphore_forced_output_Channel1$IpInstance) &amp; (!Semaphore_ClearingDisable$IpInstance))" />
         <PossibleValue Value="" Comment="Disable"/>
     </RefParameter>
 <!-- Clear Channel TWO ref parameters-->
@@ -1073,12 +1092,12 @@
           <Condition Diagnostic="" Expression="!Semaphore_ClearChannel2_TIM_CHANNEL_2_$IpInstance" />
       </RefParameter>
       <RefParameter Name="ClearChannel2" Comment="Clear Channel 2" DefaultValue="" Type="list" Group="Clear Input" Visible="true">
-            <Condition Diagnostic="" Expression="(Semaphore_output_Channel2$IpInstance &amp; (!Semaphore_forced_output_Channel2$IpInstance))" />
+                  <Condition Diagnostic="" Expression="(Semaphore_output_Channel2$IpInstance &amp; (!Semaphore_forced_output_Channel2$IpInstance) &amp; (!Semaphore_ClearingDisable$IpInstance))" />
             <PossibleValue Value="" Comment="Disable"/>
             <PossibleValue Value="TIM_CHANNEL_2" Semaphore="Semaphore_ClearChannel2_TIM_CHANNEL_2_$IpInstance" Comment="Enable"/>
       </RefParameter>
       <RefParameter Name="ClearChannel2" Comment="Clear Channel 2" DefaultValue="" Type="list" Group="Clear Input" Visible="false">
-            <Condition Diagnostic="" Expression="!(Semaphore_output_Channel2$IpInstance &amp; (!Semaphore_forced_output_Channel2$IpInstance))" />
+            <Condition Diagnostic="" Expression="!(Semaphore_output_Channel2$IpInstance &amp; (!Semaphore_forced_output_Channel2$IpInstance) &amp; (!Semaphore_ClearingDisable$IpInstance))" />
             <PossibleValue Value="" Comment="Disable"/>
             <PossibleValue Value="TIM_CHANNEL_2" Comment="Enable"/>
       </RefParameter>
@@ -1091,12 +1110,12 @@
             <Condition Diagnostic="" Expression="!Semaphore_ClearChannel3_TIM_CHANNEL_3_$IpInstance" />
         </RefParameter>
       <RefParameter Name="ClearChannel3" Comment="Clear Channel 3" DefaultValue="" Type="list" Group="Clear Input" Visible="true">
-            <Condition Diagnostic="" Expression="(Semaphore_output_Channel3$IpInstance &amp; (!Semaphore_forced_output_Channel3$IpInstance))" />
+            <Condition Diagnostic="" Expression="(Semaphore_output_Channel3$IpInstance &amp; (!Semaphore_forced_output_Channel3$IpInstance) &amp; (!Semaphore_ClearingDisable$IpInstance))" />
             <PossibleValue Value="" Comment="Disable"/>
             <PossibleValue Value="TIM_CHANNEL_3" Semaphore="Semaphore_ClearChannel3_TIM_CHANNEL_3_$IpInstance" Comment="Enable"/>
         </RefParameter>
       <RefParameter Name="ClearChannel3" Comment="Clear Channel 3" DefaultValue="" Type="list" Group="Clear Input" Visible="false">
-            <Condition Diagnostic="" Expression="!(Semaphore_output_Channel3$IpInstance &amp; (!Semaphore_forced_output_Channel3$IpInstance))" />
+            <Condition Diagnostic="" Expression="!(Semaphore_output_Channel3$IpInstance &amp; (!Semaphore_forced_output_Channel3$IpInstance) &amp; (!Semaphore_ClearingDisable$IpInstance))" />
             <PossibleValue Value="" Comment="Disable"/>
             <PossibleValue Value="TIM_CHANNEL_3" Comment="Enable"/>
         </RefParameter>
@@ -1109,12 +1128,12 @@
             <Condition Diagnostic="" Expression="!Semaphore_ClearChannel4_TIM_CHANNEL_4_$IpInstance" />
         </RefParameter>
       <RefParameter Name="ClearChannel4" Comment="Clear Channel 4" DefaultValue="" Type="list" Group="Clear Input" Visible="true">
-            <Condition Diagnostic="" Expression="(Semaphore_output_Channel4$IpInstance &amp; (!Semaphore_forced_output_Channel4$IpInstance))" />
+            <Condition Diagnostic="" Expression="(Semaphore_output_Channel4$IpInstance &amp; (!Semaphore_forced_output_Channel4$IpInstance) &amp; (!Semaphore_ClearingDisable$IpInstance))" />
             <PossibleValue Value="" Comment="Disable"/>
             <PossibleValue Value="TIM_CHANNEL_4" Semaphore="Semaphore_ClearChannel4_TIM_CHANNEL_4_$IpInstance" Comment="Enable"/>
         </RefParameter>
       <RefParameter Name="ClearChannel4" Comment="Clear Channel 4" DefaultValue="" Type="list" Group="Clear Input" Visible="false">
-            <Condition Diagnostic="" Expression="!(Semaphore_output_Channel4$IpInstance &amp; (!Semaphore_forced_output_Channel4$IpInstance))" />
+            <Condition Diagnostic="" Expression="!(Semaphore_output_Channel4$IpInstance &amp; (!Semaphore_forced_output_Channel4$IpInstance) &amp; (!Semaphore_ClearingDisable$IpInstance))" />
             <PossibleValue Value="" Comment="Disable"/>
             <PossibleValue Value="TIM_CHANNEL_4" Comment="Enable"/>
         </RefParameter>
@@ -1142,6 +1161,7 @@
   </RefMode>
 <!-- ***********************************************************************************-->
          <RefMode Name="Counter_init" HalMode ="TIM" Abstract="true">
+           <Condition Diagnostic="" Expression="!(Semaphore_clearable$IpInstance &amp;!(($IpNumber=14)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17)))"/>
            <Parameter Name="Prescaler" />
            <Parameter Name="CounterMode" />
            <Parameter Name="Period" />
@@ -1159,6 +1179,39 @@
            <Parameter Name="DeadTime" />
            <Parameter Name="ClockFilter" />
   </RefMode>
+ <RefMode Name="Counter_init" HalMode ="TIM" Abstract="true">
+           <Condition Diagnostic="" Expression="Semaphore_clearable$IpInstance &amp;!(($IpNumber=14)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17))"/>
+           <Parameter Name="Prescaler" />
+           <Parameter Name="CounterMode" />
+           <Parameter Name="Period" />
+           <Parameter Name="ClockDivision" />
+           <Parameter Name="RepetitionCounter" />
+           <Parameter Name="AutoReloadPreload" />
+           <Parameter Name="TIM_MasterSlaveMode" />
+           <Parameter Name="TIM_MasterOutputTrigger" />
+        <!-- TIM_MasterOutputTrigger2 Not for F0 devices -->
+           <Parameter Name="BreakState" />
+           <Parameter Name="BreakPolarity" />
+           <Parameter Name="AutomaticOutput" />
+           <Parameter Name="OffStateRunMode" />
+           <Parameter Name="OffStateIDLEMode" />
+           <Parameter Name="LockLevel" />
+           <Parameter Name="DeadTime" />
+           <Parameter Name="ClockFilter" />
+           <ConfigForMode>ConfigOCrefClear1</ConfigForMode>
+           <ConfigForMode>ConfigOCrefClear2</ConfigForMode>
+           <ConfigForMode>ConfigOCrefClear3</ConfigForMode>
+           <ConfigForMode>ConfigOCrefClear4</ConfigForMode>
+           <Parameter Name="ClearInputState" />
+           <Parameter Name="ClearInputSource" />
+           <Parameter Name="ClearInputPolarity" />
+           <Parameter Name="ClearInputPrescaler" />
+           <Parameter Name="ClearInputFilter" />
+           <Parameter Name="ClearChannel1" />
+           <Parameter Name="ClearChannel2" />
+           <Parameter Name="ClearChannel3" />
+           <Parameter Name="ClearChannel4" />
+  </RefMode>
 <!-- ***********************************************************************************-->
          <RefMode Name="TRGO_use" HalMode ="TIM" Group="TRGO configuration">
         <Parameter Name="TIM_MasterOutputTrigger" />
@@ -1171,6 +1224,8 @@
            <ConfigForMode>TIM_ConfigBreakDeadTime</ConfigForMode>
     </RefMode>
 <!-- ***********************************************************************************-->
+<RefMode BaseMode ="Input_Capture1_from_TI1" Name="Input_Capture1_from_TI1_TIM1_COMP"/>
+<RefMode BaseMode ="Input_Capture1_from_TI1" Name="Input_Capture1_from_TI1_TIM3_COMP"/>
          <RefMode BaseMode ="Counter_init" Name="Input_Capture1_from_TI1" HalMode ="TIM_IC" Group="Input Capture Channel 1">
            <ConfigForMode>TIM_MasterConfigSynchronization</ConfigForMode>
            <ConfigForMode>TIM_ConfigBreakDeadTime</ConfigForMode>
@@ -1326,6 +1381,7 @@
            <Parameter Name="ICPrescaler" />
            <Parameter Name="ICFilter_TRC_TI3" />
          </RefMode>
+         <RefMode BaseMode ="Input_Capture4_from_TI4" Name="Input_Capture4_from_TI4_TIM2_COMP"/>
          <RefMode BaseMode ="Counter_init" Name="Input_Capture4_from_TI4" HalMode ="TIM_IC" Group="Input Capture Channel 4">
            <ConfigForMode>TIM_MasterConfigSynchronization</ConfigForMode>
            <ConfigForMode>TIM_ConfigBreakDeadTime</ConfigForMode>
@@ -2361,18 +2417,6 @@
            <ConfigForMode>TIM_ConfigBreakDeadTime</ConfigForMode>
     </RefMode>
 <!--********************* RefMode for Clearing OCxref via ETR *******************************-->
-         <RefMode BaseMode ="Empty" Name="ETR-as-clearing-source" HalMode ="">
-            <ConfigForMode>ConfigOCrefClear</ConfigForMode>
-           <Parameter Name="ClearInputState" />
-           <Parameter Name="ClearInputSource" />
-           <Parameter Name="ClearInputPolarity" />
-           <Parameter Name="ClearInputPrescaler" />
-           <Parameter Name="ClearInputFilter" />
-           <Parameter Name="ClearChannel1" />
-           <Parameter Name="ClearChannel2" />
-           <Parameter Name="ClearChannel3" />
-           <Parameter Name="ClearChannel4" />
-    </RefMode>
 <!--********************* RefMode for XOR Gate Activation *******************************-->
          <RefMode BaseMode ="Empty" Name="XOR_enable" HalMode ="">
             <ConfigForMode>ConfigTI1Input</ConfigForMode>
@@ -2538,6 +2582,24 @@
                                         <Semaphore>Semaphore_input_Channel1_direct$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_CH1pinUsed$IpInstance</Semaphore>
 <!-- peut etre retire -->
+                                        <Condition Diagnostic="(1) Channel1 is already used as input for the Slave mode controller, (2)Specifically for TIM2 , ETR IO is already used" Expression="((Semaphore_SMC_Reset$IpInstance|Semaphore_SMC_CombinedResetTrigger$IpInstance)|!(Semaphore_ClockTriggerSourceOnTI1$IpInstance))&amp;!(($IpNumber=2)&amp;(Semaphore_ETRpinUsed$IpInstance))"/>
+     <SignalLogicalOp Name="AND">
+      <Signal Name="VS_NoInput1"/>
+     </SignalLogicalOp>
+    </Mode>
+    <Mode Name="Input_Capture1_from_TI1_TIM1_COMP" UserName="Input Capture direct from COMPx" RemoveCondition="!(($IpNumber=1)&amp;(COMP1_Exist | COMP2_Exist ))">
+                                        <Semaphore>Semaphore_input_Channel1$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_input_Channel1_direct$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_CH1pinUsed$IpInstance</Semaphore>
+                                        <Condition Diagnostic="(1) Channel1 is already used as input for the Slave mode controller, (2)Specifically for TIM2 , ETR IO is already used" Expression="((Semaphore_SMC_Reset$IpInstance|Semaphore_SMC_CombinedResetTrigger$IpInstance)|!(Semaphore_ClockTriggerSourceOnTI1$IpInstance))&amp;!(($IpNumber=2)&amp;(Semaphore_ETRpinUsed$IpInstance))"/>
+     <SignalLogicalOp Name="AND">
+      <Signal Name="VS_NoInput1"/>
+     </SignalLogicalOp>
+    </Mode>
+    <Mode Name="Input_Capture1_from_TI1_TIM3_COMP" UserName="Input Capture direct from COMPx" RemoveCondition="!(($IpNumber=3)&amp;(COMP1_Exist | COMP2_Exist ))">
+                                        <Semaphore>Semaphore_input_Channel1$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_input_Channel1_direct$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_CH1pinUsed$IpInstance</Semaphore>
                                         <Condition Diagnostic="(1) Channel1 is already used as input for the Slave mode controller, (2)Specifically for TIM2 , ETR IO is already used" Expression="((Semaphore_SMC_Reset$IpInstance|Semaphore_SMC_CombinedResetTrigger$IpInstance)|!(Semaphore_ClockTriggerSourceOnTI1$IpInstance))&amp;!(($IpNumber=2)&amp;(Semaphore_ETRpinUsed$IpInstance))"/>
      <SignalLogicalOp Name="AND">
       <Signal Name="VS_NoInput1"/>
@@ -3131,6 +3193,14 @@
       <Signal Name="CH4" Direction="Input"/>
      </SignalLogicalOp>
     </Mode>
+ <Mode Name="Input_Capture4_from_TI4_TIM2_COMP" UserName="Input Capture direct from COMPx" RemoveCondition="!(($IpNumber=2)&amp;(COMP1_Exist | COMP2_Exist ))">
+        <Semaphore>Semaphore_input_Channel4$IpInstance</Semaphore>
+        <Semaphore>Semaphore_input_Channel4_direct$IpInstance</Semaphore>
+        <Semaphore>Semaphore_CH4pinUsed$IpInstance</Semaphore>
+  <SignalLogicalOp Name="AND">
+   <Signal Name="VS_NoInput4"/>
+  </SignalLogicalOp>
+ </Mode>
     <Mode Name="Input_Capture4_from_TI3" UserName="Input Capture indirect mode">
                                         <Semaphore>Semaphore_input_Channel4$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_input_Channel4_indirect$IpInstance</Semaphore>

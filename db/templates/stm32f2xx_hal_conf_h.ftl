@@ -49,13 +49,14 @@
 /**
   * @brief This is the list of modules to be used in the HAL driver 
   */
+  
 #define HAL_MODULE_ENABLED  
-[#assign allModules = ["ADC", "CAN", "CRC", "CRYP", "DAC", "DCMI", "ETH", "NAND", "NOR", "PCCARD", "SRAM", "HASH", "I2C", "I2S", "IWDG", "RNG", "RTC", "SD", "SPI", "TIM", "UART", "USART", "IRDA", "SMARTCARD", "WWDG", "PCD", "HCD"]]
+[#assign allModules = ["ADC", "AES", "CAN", "CRC", "CRYP", "DAC", "DCMI", "ETH", "NAND", "NOR", "PCCARD", "SRAM", "HASH", "I2C", "I2S", "IWDG", "RNG", "RTC", "SD", "SPI", "TIM", "UART", "USART", "IRDA", "SMARTCARD", "WWDG", "PCD", "HCD"]]
   [#list allModules as module]
 	[#if isModuleUsed(module)]
-[#compress]#define HAL_${module}_MODULE_ENABLED[/#compress]
+[#compress]#define HAL_${module?replace("AES","CRYP")}_MODULE_ENABLED[/#compress]
 	[#else]
-/*#define HAL_${module}_MODULE_ENABLED   */
+/*#define HAL_${module?replace("AES","CRYP")}_MODULE_ENABLED   */
 	[/#if]	
   [/#list]
   [#function isModuleUsed moduleName]
@@ -224,6 +225,14 @@
 #define PHY_ISFR_INT4                   ((uint16_t)[#if PHY_ISFR_INT4??]${PHY_ISFR_INT4}[#if PHY_ISFR_INT4?matches("(0x[0-9]*[a-f]*[A-F]*)|([0-9]*)")]U[/#if][#else]0x0010U[/#if])  /*!< PHY Link down inturrupt       */  
 [/#if]
 
+/* ################## SPI peripheral configuration ########################## */
+
+/* CRC FEATURE: Use to activate CRC feature inside HAL SPI Driver
+* Activated: CRC code is present inside driver
+* Deactivated: CRC code cleaned from driver
+*/
+
+#define USE_SPI_CRC                     [#if CRC_SPI??]${CRC_SPI}[#else]1U[/#if]
 /* Includes ------------------------------------------------------------------*/
 /**
   * @brief Include module's header file 

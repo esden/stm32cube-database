@@ -1,0 +1,2993 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
+<IP xmlns="http://mcd.rou.st.com/modules.php?name=mcu" DBVersion="V4.0" Name="HRTIM" IncludeFile="stm32f3xx_ll_hrtim.h"  Version="STM32Cube_FW_F3_V1.6.0" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Configs.xsd">
+
+
+    <RefConfig Name="HRTIM_DLLCalibrationStart">
+        <IFCondition Expression="(CalibrationRate_nonIT=HRTIM_SINGLE_CALIBRATION)&amp;(Semaphore_HRTIMER_DLLSimpleCalibration$IpInstance)">
+       <CallLibMethod Name="LL_HRTIM_StartDLLCalibration">
+            <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+       </CallLibMethod>
+       </IFCondition>
+       <IFCondition Expression="!(CalibrationRate_nonIT=HRTIM_SINGLE_CALIBRATION) &amp; (Semaphore_HRTIMER_DLLSimpleCalibration$IpInstance)">
+       <CallLibMethod Name="LL_HRTIM_ConfigDLLCalibration">
+            <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+            <MethodArg Name="Mode"   FValue="LL_HRTIM_DLLCALIBRATION_MODE_CONTINUOUS"/>
+            <MethodArg Name="Period" ParameterName="CalibrationRate_nonIT"/>
+       </CallLibMethod>
+       </IFCondition>
+       <IFCondition Expression="Semaphore_HRTIMER_DLLSimpleCalibration$IpInstance">
+       <CallLibMethod Name="" Type="HardCode">
+            <HardCode Text="#n#t/* Poll for DLL end of calibration */#n#if (USE_TIMEOUT == 1)"/>
+       </CallLibMethod>
+       <CallLibMethod Name="templates/ll_hrtim.ftl" Type="Template"/>
+       <CallLibMethod Name="" Type="HardCode">
+            <HardCode Text="#endif#t/*USE_TIMEOUT*/#n#n#twhile(LL_HRTIM_IsActiveFlag_DLLRDY(HRTIM1) == RESET){#n#if (USE_TIMEOUT == 1)#n#t#tif (LL_SYSTICK_IsActiveCounterFlag())#t/* Check Systick counter flag to decrement the time-out value */#n#t#t{#n#t#t#t#tif(Timeout-- == 0)#n#t#t#t#t{#n#t#t#t#t#tError_Handler();#t/* error management */#n#t#t#t#t}#n#t#t}#n#endif#t/* USE_TIMEOUT */#n#t}#n#n"/>
+       </CallLibMethod>
+
+       </IFCondition>
+    </RefConfig>
+
+    <RefConfig Name="HRTIM_DLLCalibrationStart_IT">
+       <IFCondition Expression="(Semaphore_HRTIMER_DLLITCalibration$IpInstance)">
+       <CallLibMethod Name="LL_HRTIM_EnableIT_DLLRDY">
+            <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+       </CallLibMethod>
+       </IFCondition>
+
+       <IFCondition Expression="(CalibrationRate_IT=HRTIM_SINGLE_CALIBRATION) &amp; (Semaphore_HRTIMER_DLLITCalibration$IpInstance) ">
+       <CallLibMethod Name="LL_HRTIM_ConfigDLLCalibration">
+            <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+            <MethodArg Name="Mode"   FValue="LL_HRTIM_DLLCALIBRATION_MODE_SINGLESHOT"/>
+            <MethodArg Name="Period" FValue="LL_HRTIM_DLLCALIBRATION_RATE_7300"/>
+       </CallLibMethod>
+       </IFCondition>
+       <IFCondition Expression="!(CalibrationRate_IT=HRTIM_SINGLE_CALIBRATION) &amp; (Semaphore_HRTIMER_DLLITCalibration$IpInstance)">
+       <CallLibMethod Name="LL_HRTIM_ConfigDLLCalibration">
+            <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+            <MethodArg Name="Mode"   FValue="LL_HRTIM_DLLCALIBRATION_MODE_CONTINUOUS"/>
+            <MethodArg Name="Period" ParameterName="CalibrationRate_IT"/>
+       </CallLibMethod>
+       </IFCondition>
+    </RefConfig>
+
+
+
+   <RefConfig Name="HRTIM_PollForDLLCalibration">
+    </RefConfig>
+
+  
+     <RefConfig Name="HRTIM_Init">
+       <IFCondition Expression="!((SyncOptions &amp; HRTIM_SYNCOPTION_MASTER)= RESET)">
+          <CallLibMethod Name="LL_HRTIM_SetSyncOutSrc">
+            <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+            <MethodArg Name="SyncOutSrc" ParameterName="SyncOutputSource"/>
+          </CallLibMethod>
+          <CallLibMethod Name="LL_HRTIM_SetSyncOutConfig">
+            <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+            <MethodArg Name="SyncOutConfig" ParameterName="SyncOutputPolarity"/>
+          </CallLibMethod>
+       </IFCondition>
+
+       <IFCondition Expression="!((SyncOptions &amp; HRTIM_SYNCOPTION_SLAVE)= RESET)">
+          <CallLibMethod Name="LL_HRTIM_SetSyncInSrc">
+            <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+            <MethodArg Name="SyncInSrc" ParameterName="SyncInputSource"/>
+          </CallLibMethod>
+       </IFCondition>
+    
+     </RefConfig>
+
+     <RefConfig Name="TimeBaseConfig_TA">
+
+         <CallLibMethod Name="LL_HRTIM_TIM_SetPrescaler">
+          <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+          <MethodArg Name="Timer" FValue="LL_HRTIM_TIMER_A"/>   
+          <MethodArg Name="Prescaler" ParameterName="PrescalerRatio_TA"/>   
+         </CallLibMethod>
+
+         <CallLibMethod Name="LL_HRTIM_TIM_SetCounterMode">
+          <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+          <MethodArg Name="Timer" FValue="LL_HRTIM_TIMER_A"/>   
+          <MethodArg Name="Mode" ParameterName="ModeTimeBase"/>         
+         </CallLibMethod>
+
+         <CallLibMethod Name="LL_HRTIM_TIM_SetPeriod">
+          <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+          <MethodArg Name="Timer" FValue="LL_HRTIM_TIMER_A"/>   
+          <MethodArg Name="Period" ParameterName="Periode_TA"/>         
+         </CallLibMethod>
+
+         <CallLibMethod Name="LL_HRTIM_TIM_SetRepetition">
+          <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+          <MethodArg Name="Timer" FValue="LL_HRTIM_TIMER_A"/>   
+          <MethodArg Name="Repetition" ParameterName="RepetitionCounter"/>   
+         </CallLibMethod>
+
+    </RefConfig>
+
+
+     <RefConfig Name="TimeBaseConfig_TB">
+
+         <CallLibMethod Name="LL_HRTIM_TIM_SetPrescaler">
+          <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+          <MethodArg Name="Timer" FValue="LL_HRTIM_TIMER_B"/>   
+          <MethodArg Name="Prescaler" ParameterName="PrescalerRatio_TB"/>   
+         </CallLibMethod>
+
+         <CallLibMethod Name="LL_HRTIM_TIM_SetCounterMode">
+          <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+          <MethodArg Name="Timer" FValue="LL_HRTIM_TIMER_B"/>   
+          <MethodArg Name="Mode" ParameterName="ModeTimeBase"/>         
+         </CallLibMethod>
+
+         <CallLibMethod Name="LL_HRTIM_TIM_SetPeriod">
+          <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+          <MethodArg Name="Timer" FValue="LL_HRTIM_TIMER_B"/>   
+          <MethodArg Name="Period" ParameterName="Periode_TB"/>         
+         </CallLibMethod>
+
+         <CallLibMethod Name="LL_HRTIM_TIM_SetRepetition">
+          <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+          <MethodArg Name="Timer" FValue="LL_HRTIM_TIMER_B"/>   
+          <MethodArg Name="Repetition" ParameterName="RepetitionCounter"/>   
+         </CallLibMethod>
+
+    </RefConfig>
+
+
+     <RefConfig Name="TimeBaseConfig_TC">
+
+         <CallLibMethod Name="LL_HRTIM_TIM_SetPrescaler">
+          <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+          <MethodArg Name="Timer" FValue="LL_HRTIM_TIMER_C"/>   
+          <MethodArg Name="Prescaler" ParameterName="PrescalerRatio_TC"/>   
+         </CallLibMethod>
+
+         <CallLibMethod Name="LL_HRTIM_TIM_SetCounterMode">
+          <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+          <MethodArg Name="Timer" FValue="LL_HRTIM_TIMER_C"/>   
+          <MethodArg Name="Mode" ParameterName="ModeTimeBase"/>         
+         </CallLibMethod>
+
+         <CallLibMethod Name="LL_HRTIM_TIM_SetPeriod">
+          <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+          <MethodArg Name="Timer" FValue="LL_HRTIM_TIMER_C"/>   
+          <MethodArg Name="Period" ParameterName="Periode_TC"/>         
+         </CallLibMethod>
+
+         <CallLibMethod Name="LL_HRTIM_TIM_SetRepetition">
+          <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+          <MethodArg Name="Timer" FValue="LL_HRTIM_TIMER_C"/>   
+          <MethodArg Name="Repetition" ParameterName="RepetitionCounter"/>   
+         </CallLibMethod>
+
+    </RefConfig>
+
+
+     <RefConfig Name="TimeBaseConfig_TD">
+
+         <CallLibMethod Name="LL_HRTIM_TIM_SetPrescaler">
+          <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+          <MethodArg Name="Timer" FValue="LL_HRTIM_TIMER_D"/>   
+          <MethodArg Name="Prescaler" ParameterName="PrescalerRatio_TD"/>   
+         </CallLibMethod>
+
+         <CallLibMethod Name="LL_HRTIM_TIM_SetCounterMode">
+          <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+          <MethodArg Name="Timer" FValue="LL_HRTIM_TIMER_D"/>   
+          <MethodArg Name="Mode" ParameterName="ModeTimeBase"/>         
+         </CallLibMethod>
+
+         <CallLibMethod Name="LL_HRTIM_TIM_SetPeriod">
+          <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+          <MethodArg Name="Timer" FValue="LL_HRTIM_TIMER_D"/>   
+          <MethodArg Name="Period" ParameterName="Periode_TD"/>         
+         </CallLibMethod>
+
+         <CallLibMethod Name="LL_HRTIM_TIM_SetRepetition">
+          <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+          <MethodArg Name="Timer" FValue="LL_HRTIM_TIMER_D"/>   
+          <MethodArg Name="Repetition" ParameterName="RepetitionCounter"/>   
+         </CallLibMethod>
+
+    </RefConfig>
+
+
+
+     <RefConfig Name="TimeBaseConfig_TE">
+
+         <CallLibMethod Name="LL_HRTIM_TIM_SetPrescaler">
+          <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+          <MethodArg Name="Timer" FValue="LL_HRTIM_TIMER_E"/>   
+          <MethodArg Name="Prescaler" ParameterName="PrescalerRatio_TE"/>   
+         </CallLibMethod>
+
+         <CallLibMethod Name="LL_HRTIM_TIM_SetCounterMode">
+          <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+          <MethodArg Name="Timer" FValue="LL_HRTIM_TIMER_E"/>   
+          <MethodArg Name="Mode" ParameterName="ModeTimeBase"/>         
+         </CallLibMethod>
+
+         <CallLibMethod Name="LL_HRTIM_TIM_SetPeriod">
+          <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+          <MethodArg Name="Timer" FValue="LL_HRTIM_TIMER_E"/>   
+          <MethodArg Name="Period" ParameterName="Periode_TE"/>         
+         </CallLibMethod>
+
+         <CallLibMethod Name="LL_HRTIM_TIM_SetRepetition">
+          <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+          <MethodArg Name="Timer" FValue="LL_HRTIM_TIMER_E"/>   
+          <MethodArg Name="Repetition" ParameterName="RepetitionCounter"/>   
+         </CallLibMethod>
+
+    </RefConfig>
+
+     <RefConfig Name="TimeBaseConfig_MASTER">
+
+         <CallLibMethod Name="LL_HRTIM_TIM_SetPrescaler">
+          <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+          <MethodArg Name="Timer" FValue="LL_HRTIM_TIMER_MASTER"/>   
+          <MethodArg Name="Prescaler" ParameterName="PrescalerRatio_MASTER"/>   
+         </CallLibMethod>
+
+         <CallLibMethod Name="LL_HRTIM_TIM_SetCounterMode">
+          <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+          <MethodArg Name="Timer" FValue="LL_HRTIM_TIMER_MASTER"/>   
+          <MethodArg Name="Mode" ParameterName="ModeTimeBase"/>         
+         </CallLibMethod>
+
+         <CallLibMethod Name="LL_HRTIM_TIM_SetPeriod">
+          <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+          <MethodArg Name="Timer" FValue="LL_HRTIM_TIMER_MASTER"/>   
+          <MethodArg Name="Period" ParameterName="Periode_MASTER"/>         
+         </CallLibMethod>
+
+         <CallLibMethod Name="LL_HRTIM_TIM_SetRepetition">
+          <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+          <MethodArg Name="Timer" FValue="LL_HRTIM_TIMER_MASTER"/>   
+          <MethodArg Name="Repetition" ParameterName="RepetitionCounter"/>   
+         </CallLibMethod>
+
+    </RefConfig>
+
+
+
+
+    <RefConfig Name="WaveformTimerConfig_Master">
+
+     <IFCondition Expression="HalfModeEnable=HRTIM_HALFMODE_ENABLED">
+       <CallLibMethod Name="LL_HRTIM_TIM_EnableHalfMode">
+        <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+        <MethodArg Name="Timer" FValue="LL_HRTIM_TIMER_MASTER"/>   
+       </CallLibMethod>
+     </IFCondition>
+     <IFCondition Expression="HalfModeEnable=HRTIM_HALFMODE_DISABLED">
+       <CallLibMethod Name="LL_HRTIM_TIM_DisableHalfMode">
+        <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+        <MethodArg Name="Timer" FValue="LL_HRTIM_TIMER_MASTER"/>   
+       </CallLibMethod>
+     </IFCondition>
+
+     <IFCondition Expression="StartOnSync=HRTIM_SYNCSTART_ENABLED">
+       <CallLibMethod Name="LL_HRTIM_TIM_EnableStartOnSync">
+        <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+        <MethodArg Name="Timer" FValue="LL_HRTIM_TIMER_MASTER"/>   
+       </CallLibMethod>
+     </IFCondition>
+     <IFCondition Expression="StartOnSync=HRTIM_SYNCSTART_DISABLED">
+       <CallLibMethod Name="LL_HRTIM_TIM_DisableStartOnSync">
+        <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+        <MethodArg Name="Timer" FValue="LL_HRTIM_TIMER_MASTER"/>   
+       </CallLibMethod>
+     </IFCondition>
+
+
+
+     <IFCondition Expression="ResetOnSync=HRTIM_SYNCRESET_ENABLED">
+       <CallLibMethod Name="LL_HRTIM_TIM_EnableResetOnSync">
+        <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+        <MethodArg Name="Timer" FValue="LL_HRTIM_TIMER_MASTER"/>   
+       </CallLibMethod>
+     </IFCondition>
+     <IFCondition Expression="ResetOnSync=HRTIM_SYNCRESET_DISABLED">
+       <CallLibMethod Name="LL_HRTIM_TIM_DisableResetOnSync">
+        <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+        <MethodArg Name="Timer" FValue="LL_HRTIM_TIMER_MASTER"/>   
+       </CallLibMethod>
+     </IFCondition>
+
+     <IFCondition Expression="1=1">
+     <CallLibMethod Name="LL_HRTIM_TIM_SetDACTrig">
+        <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+        <MethodArg Name="Timer" FValue="LL_HRTIM_TIMER_MASTER"/>   
+        <MethodArg Name="DACTrig" ParameterName="DACSynchro"/>   
+     </CallLibMethod>
+     </IFCondition>
+
+     <IFCondition Expression="PreloadEnable=HRTIM_PRELOAD_ENABLED">
+       <CallLibMethod Name="LL_HRTIM_TIM_EnablePreload">
+        <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+        <MethodArg Name="Timer" FValue="LL_HRTIM_TIMER_MASTER"/>   
+       </CallLibMethod>
+     </IFCondition>
+     <IFCondition Expression="PreloadEnable=HRTIM_PRELOAD_DISABLED">
+       <CallLibMethod Name="LL_HRTIM_TIM_DisablePreload">
+        <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+        <MethodArg Name="Timer" FValue="LL_HRTIM_TIMER_MASTER"/>   
+       </CallLibMethod>
+     </IFCondition>
+
+
+     <IFCondition Expression="1=1">
+     <CallLibMethod Name="LL_HRTIM_TIM_SetUpdateGating">
+        <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+        <MethodArg Name="Timer" FValue="LL_HRTIM_TIMER_MASTER"/>   
+        <MethodArg Name="UpdateGating" ParameterName="UpdateGating"/>
+     </CallLibMethod>
+
+     <CallLibMethod Name="LL_HRTIM_TIM_SetUpdateTrig">
+        <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+        <MethodArg Name="Timer" FValue="LL_HRTIM_TIMER_MASTER"/>   
+        <MethodArg Name="UpdateTrig" ParameterName="RepetitionUpdate"/>
+     </CallLibMethod>
+
+     <CallLibMethod Name="LL_HRTIM_TIM_SetBurstModeOption">
+        <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+        <MethodArg Name="Timer" FValue="LL_HRTIM_TIMER_MASTER"/>   
+        <MethodArg Name="BurtsModeOption" ParameterName="BurstMode"/>
+     </CallLibMethod>
+
+
+
+     <CallLibMethod Name="LL_HRTIM_ForceUpdate">
+        <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+        <MethodArg Name="Timers" FValue="LL_HRTIM_TIMER_MASTER"/>   
+     </CallLibMethod>
+     </IFCondition>
+
+    </RefConfig>
+
+
+    <RefConfig Name="WaveformTimerConfig">
+
+  <!-- to uncomment when it works better as it has to be reset befor configured
+        <CallLibMethod Name="LL_HRTIM_TIM_SetUpdateGating">
+        <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+        <MethodArg Name="Timer"  ParameterName="TimerIdx"/>   
+        <MethodArg Name="UpdateGating" FValue="LL_HRTIM_UPDATEGATING_INDEPENDENT"/>
+       </CallLibMethod>-->
+
+      <IFCondition Expression="HalfModeEnable=HRTIM_HALFMODE_ENABLED">
+       <CallLibMethod Name="LL_HRTIM_TIM_EnableHalfMode">
+        <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+        <MethodArg Name="Timer" ParameterName="TimerIdx"/>   
+       </CallLibMethod>
+      </IFCondition>
+      <IFCondition Expression="HalfModeEnable=HRTIM_HALFMODE_DISABLED">
+       <CallLibMethod Name="LL_HRTIM_TIM_DisableHalfMode">
+        <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+        <MethodArg Name="Timer" ParameterName="TimerIdx"/>   
+       </CallLibMethod>
+      </IFCondition>
+
+     <IFCondition Expression="StartOnSync=HRTIM_SYNCSTART_ENABLED">
+       <CallLibMethod Name="LL_HRTIM_TIM_EnableStartOnSync">
+        <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+        <MethodArg Name="Timer" ParameterName="TimerIdx"/>   
+       </CallLibMethod>
+     </IFCondition>
+     <IFCondition Expression="StartOnSync=HRTIM_SYNCSTART_DISABLED">
+       <CallLibMethod Name="LL_HRTIM_TIM_DisableStartOnSync">
+        <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+        <MethodArg Name="Timer" ParameterName="TimerIdx"/>   
+       </CallLibMethod>
+     </IFCondition>
+
+
+     <IFCondition Expression="ResetOnSync=HRTIM_SYNCRESET_ENABLED">
+       <CallLibMethod Name="LL_HRTIM_TIM_EnableResetOnSync">
+        <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+        <MethodArg Name="Timer" ParameterName="TimerIdx"/>   
+       </CallLibMethod>
+     </IFCondition>
+     <IFCondition Expression="ResetOnSync=HRTIM_SYNCRESET_DISABLED">
+       <CallLibMethod Name="LL_HRTIM_TIM_DisableResetOnSync">
+        <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+        <MethodArg Name="Timer" ParameterName="TimerIdx"/>   
+       </CallLibMethod>
+     </IFCondition>
+
+     <CallLibMethod Name="LL_HRTIM_TIM_SetDACTrig">
+        <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+        <MethodArg Name="Timer" ParameterName="TimerIdx"/>   
+        <MethodArg Name="DACTrig" ParameterName="DACSynchro"/>   
+     </CallLibMethod>
+
+     <IFCondition Expression="PreloadEnable=HRTIM_PRELOAD_ENABLED">
+       <CallLibMethod Name="LL_HRTIM_TIM_EnablePreload">
+        <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+        <MethodArg Name="Timer" ParameterName="TimerIdx"/>   
+       </CallLibMethod>
+     </IFCondition>
+     <IFCondition Expression="PreloadEnable=HRTIM_PRELOAD_DISABLED">
+       <CallLibMethod Name="LL_HRTIM_TIM_DisablePreload">
+        <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+        <MethodArg Name="Timer" ParameterName="TimerIdx"/>   
+       </CallLibMethod>
+     </IFCondition>
+
+
+
+     <IFCondition Expression="1=1">
+     <CallLibMethod Name="LL_HRTIM_TIM_SetUpdateGating">
+        <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+        <MethodArg Name="Timer" ParameterName="TimerIdx"/>   
+        <MethodArg Name="UpdateGating" ParameterName="UpdateGating"/>
+     </CallLibMethod>
+     </IFCondition>
+
+<!-- a ajouter en paramètre RepetitionUpdate et ResetUpdate en faisant un OR avec le paramètre deja present -->
+     <IFCondition Expression="ResetUpdate=HRTIM_TIMUPDATEONRESET_ENABLED">
+     <CallLibMethod Name="LL_HRTIM_TIM_SetUpdateTrig">
+        <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+        <MethodArg Name="Timer" ParameterName="TimerIdx"/>   
+        <MethodArg Name="UpdateTrig" ParameterName="ORingUpdateTrigger|RepetitionUpdate|ResetUpdate"/>
+     </CallLibMethod>
+     </IFCondition>
+     <IFCondition Expression="!(ResetUpdate=HRTIM_TIMUPDATEONRESET_ENABLED)">
+       <CallLibMethod Name="LL_HRTIM_TIM_SetUpdateTrig">
+        <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+        <MethodArg Name="Timer" ParameterName="TimerIdx"/>   
+        <MethodArg Name="UpdateTrig" ParameterName="ORingUpdateTrigger|RepetitionUpdate"/>
+       </CallLibMethod>
+     </IFCondition>
+
+
+     <IFCondition Expression="1=1">
+    <CallLibMethod Name="LL_HRTIM_TIM_SetResetTrig">
+        <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+        <MethodArg Name="Timer" ParameterName="TimerIdx"/>   
+        <MethodArg Name="ResetTrig" ParameterName="ORingResetTrigger"/>
+     </CallLibMethod>
+     </IFCondition>
+
+
+
+
+
+     <IFCondition Expression="PushPull=HRTIM_TIMPUSHPULLMODE_ENABLED">
+       <CallLibMethod Name="LL_HRTIM_TIM_EnablePushPullMode">
+        <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+        <MethodArg Name="Timer" ParameterName="TimerIdx"/>   
+       </CallLibMethod>
+     </IFCondition>
+     <IFCondition Expression="PushPull=HRTIM_TIMPUSHPULLMODE_DISABLED">
+       <CallLibMethod Name="LL_HRTIM_TIM_DisablePushPullMode">
+        <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+        <MethodArg Name="Timer" ParameterName="TimerIdx"/>   
+       </CallLibMethod>
+     </IFCondition>
+
+     <IFCondition Expression="DeadTimeInsertion=HRTIM_TIMDEADTIMEINSERTION_ENABLED">
+       <CallLibMethod Name="LL_HRTIM_TIM_EnableDeadTime">
+        <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+        <MethodArg Name="Timer" ParameterName="TimerIdx"/>   
+       </CallLibMethod>
+     </IFCondition>
+     <IFCondition Expression="DeadTimeInsertion=HRTIM_TIMDEADTIMEINSERTION_DISABLED">
+       <CallLibMethod Name="LL_HRTIM_TIM_DisableDeadTime">
+        <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+        <MethodArg Name="Timer" ParameterName="TimerIdx"/>   
+       </CallLibMethod>
+     </IFCondition>
+
+    <IFCondition Expression="((!(DelayedProtectionMode=HRTIM_TIMER_A_B_C_DELAYEDPROTECTION_BALANCED_EEV6) &amp; !(DelayedProtectionMode=HRTIM_TIMER_A_B_C_DELAYEDPROTECTION_BALANCED_EEV7)) | (PushPull = HRTIM_TIMPUSHPULLMODE_ENABLED)) &amp; !(DelayedProtectionMode=HRTIM_TIMER_A_B_C_DELAYEDPROTECTION_DISABLED) &amp; !(DelayedProtectionMode=HRTIM_TIMER_D_E_DELAYEDPROTECTION_DISABLED)">
+       <CallLibMethod Name="LL_HRTIM_TIM_SetDLYPRTMode">
+          <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+          <MethodArg Name="Timer" ParameterName="TimerIdx"/>   
+          <MethodArg Name="DLYPRTMode" ParameterName="DelayedProtectionMode"/>
+       </CallLibMethod>
+       <CallLibMethod Name="LL_HRTIM_TIM_EnableDLYPRT">
+          <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+          <MethodArg Name="Timer" ParameterName="TimerIdx"/>   
+       </CallLibMethod>
+      </IFCondition>
+
+
+
+     <IFCondition Expression="!(ORingFaultEnable=HRTIM_TIMFAULTENABLE_NONE)">
+       <CallLibMethod Name="LL_HRTIM_TIM_EnableFault">
+        <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+        <MethodArg Name="Timer" ParameterName="TimerIdx"/>   
+        <MethodArg Name="Faults" ParameterName="ORingFaultEnable"/>
+       </CallLibMethod>
+     </IFCondition>
+
+     <IFCondition Expression="FaultLock=HRTIM_TIMFAULTLOCK_READONLY">
+       <CallLibMethod Name="LL_HRTIM_TIM_LockFault">
+        <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+        <MethodArg Name="Timer" ParameterName="TimerIdx"/>   
+       </CallLibMethod>
+     </IFCondition>
+<!-- unlock to be added when method exists  -->
+
+<IFCondition Expression="1=1">
+      <CallLibMethod Name="LL_HRTIM_TIM_SetBurstModeOption">
+        <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+        <MethodArg Name="Timer" ParameterName="TimerIdx"/>   
+        <MethodArg Name="BurtsModeOption" ParameterName="BurstMode"/>
+     </CallLibMethod>
+
+
+
+     <CallLibMethod Name="LL_HRTIM_ForceUpdate">
+        <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+        <MethodArg Name="Timers" ParameterName="TimerIdx"/>   
+     </CallLibMethod>
+     </IFCondition>
+    </RefConfig>
+
+ 
+   
+    <RefConfig Name="WaveformCaptureConfig1">
+     <CallLibMethod Name="LL_HRTIM_TIM_SetCaptureTrig">
+        <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+        <MethodArg Name="Timer" ParameterName="TimerIdx"/>   
+        <MethodArg Name="CaptureUnit" ParameterName="CaptureUnit1"/>
+        <MethodArg Name="CaptureTrig" ParameterName="ORingTriggerCapture1"/>
+    </CallLibMethod>
+      </RefConfig>
+
+
+   <RefConfig Name="WaveformCaptureConfig2">
+     <CallLibMethod Name="LL_HRTIM_TIM_SetCaptureTrig">
+        <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+        <MethodArg Name="Timer" ParameterName="TimerIdx"/>   
+        <MethodArg Name="CaptureUnit" ParameterName="CaptureUnit2"/>
+        <MethodArg Name="CaptureTrig" ParameterName="ORingTriggerCapture2"/>
+    </CallLibMethod>
+  </RefConfig>
+
+   
+
+    <RefConfig Name="WaveformCompareConfig1">
+     <IFCondition Expression="!(CompareUnit1=__NULL)">
+     <CallLibMethod Name="LL_HRTIM_TIM_SetCompare1">
+        <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+        <MethodArg Name="Timer" ParameterName="TimerIdx"/>   
+        <MethodArg Name="CompareValue" ParameterName="CompareValue1"/>
+     </CallLibMethod>
+     </IFCondition>
+    </RefConfig>
+
+    <RefConfig Name="WaveformCompareConfig2">
+     <IFCondition Expression="!(CompareUnit2=__NULL)">
+       <CallLibMethod Name="LL_HRTIM_TIM_SetCompare2">
+        <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+        <MethodArg Name="Timer" ParameterName="TimerIdx"/>   
+        <MethodArg Name="CompareValue" ParameterName="CompareValue2"/>
+       </CallLibMethod>
+       <CallLibMethod Name="LL_HRTIM_TIM_SetCompareMode">
+        <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+        <MethodArg Name="Timer" ParameterName="TimerIdx"/>   
+        <MethodArg Name="CompareUnit" ParameterName="CompareUnit2"/>
+        <MethodArg Name="Mode" ParameterName="AutoDelayedMode2"/>
+       </CallLibMethod>
+     </IFCondition>
+     <IFCondition Expression="(AutoDelayedMode2=HRTIM_AUTODELAYEDMODE_AUTODELAYED_TIMEOUTCMP1) &amp; !(CompareUnit2=__NULL) ">
+        <CallLibMethod Name="LL_HRTIM_TIM_SetCompare1">
+          <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+          <MethodArg Name="Timer" ParameterName="TimerIdx"/>   
+          <MethodArg Name="CompareValue" ParameterName="AutoDelayedTimeout2"/>
+        </CallLibMethod>
+      </IFCondition>
+
+       <IFCondition Expression=" (AutoDelayedMode2=HRTIM_AUTODELAYEDMODE_AUTODELAYED_TIMEOUTCMP3) &amp;  !(CompareUnit2=__NULL)">
+       <CallLibMethod Name="LL_HRTIM_TIM_SetCompare3">
+          <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+          <MethodArg Name="Timer" ParameterName="TimerIdx"/>   
+          <MethodArg Name="CompareValue" ParameterName="AutoDelayedTimeout2"/>
+       </CallLibMethod>
+       </IFCondition>
+   </RefConfig>
+
+    <RefConfig Name="WaveformCompareConfig2_Master">
+       <IFCondition Expression="!(CompareUnit2=__NULL)">
+     <CallLibMethod Name="LL_HRTIM_TIM_SetCompare2">
+        <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+        <MethodArg Name="Timer" ParameterName="TimerIdx"/>   
+        <MethodArg Name="CompareValue" ParameterName="CompareValue2"/>
+      </CallLibMethod>
+       </IFCondition>
+    </RefConfig>
+
+
+    <RefConfig Name="WaveformCompareConfig3">
+       <IFCondition Expression="!(CompareUnit3=__NULL)">
+     <CallLibMethod Name="LL_HRTIM_TIM_SetCompare3">
+        <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+        <MethodArg Name="Timer" ParameterName="TimerIdx"/>   
+         <MethodArg Name="CompareValue" ParameterName="CompareValue3"/>
+     </CallLibMethod>
+       </IFCondition>
+    </RefConfig>
+
+
+    <RefConfig Name="WaveformCompareConfig4">
+       <IFCondition Expression="!(CompareUnit4=__NULL)">
+        <CallLibMethod Name="LL_HRTIM_TIM_SetCompare4">
+        <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+        <MethodArg Name="Timer" ParameterName="TimerIdx"/>   
+        <MethodArg Name="CompareValue" ParameterName="CompareValue4"/>
+       </CallLibMethod>
+       <CallLibMethod Name="LL_HRTIM_TIM_SetCompareMode">
+        <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+        <MethodArg Name="Timer" ParameterName="TimerIdx"/>   
+        <MethodArg Name="CompareUnit" ParameterName="CompareUnit4"/>
+        <MethodArg Name="Mode" ParameterName="AutoDelayedMode4"/>
+       </CallLibMethod>
+       </IFCondition>
+       <IFCondition Expression=" (AutoDelayedMode4=HRTIM_AUTODELAYEDMODE_AUTODELAYED_TIMEOUTCMP1) &amp; !(CompareUnit4=__NULL)">
+        <CallLibMethod Name="LL_HRTIM_TIM_SetCompare1">
+          <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+          <MethodArg Name="Timer" ParameterName="TimerIdx"/>   
+          <MethodArg Name="CompareValue" ParameterName="AutoDelayedTimeout4"/>
+        </CallLibMethod>
+       </IFCondition>
+       <IFCondition Expression=" (AutoDelayedMode4=HRTIM_AUTODELAYEDMODE_AUTODELAYED_TIMEOUTCMP3) &amp; !(CompareUnit4=__NULL)">
+       <CallLibMethod Name="LL_HRTIM_TIM_SetCompare3">
+          <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+          <MethodArg Name="Timer" ParameterName="TimerIdx"/>   
+          <MethodArg Name="CompareValue" ParameterName="AutoDelayedTimeout4"/>
+       </CallLibMethod>
+       </IFCondition>
+    </RefConfig>
+
+
+    <RefConfig Name="WaveformCompareConfig4_Master">
+       <IFCondition Expression="!(CompareUnit4=__NULL)">
+      <CallLibMethod Name="LL_HRTIM_TIM_SetCompare4">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Timer" ParameterName="TimerIdx"/>   
+         <MethodArg Name="CompareValue" ParameterName="CompareValue4"/>
+     </CallLibMethod>
+       </IFCondition>
+    </RefConfig>
+
+   <RefConfig Name="EventPrescalerConfig">
+         <CallLibMethod Name="LL_HRTIM_EE_SetPrescaler">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Prescaler" ParameterName="EventPrescaler"/>
+        </CallLibMethod>
+   </RefConfig>
+
+
+<!--     <CallLibMethod Name="HAL_HRTIM_EventConfig">
+
+
+         <MethodArg Name="Filter" ParameterName="Filter_EEV1"/>
+  </CallLibMethod>-->
+
+  <RefConfig Name="EventConfig_EEV1">
+     <CallLibMethod Name="LL_HRTIM_EE_SetSrc">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Event" ParameterName="Event_EEV1"/>
+         <MethodArg Name="Src" ParameterName="Source_EEV1"/>
+     </CallLibMethod>
+     <CallLibMethod Name="LL_HRTIM_EE_SetPolarity">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Event" ParameterName="Event_EEV1"/>
+         <MethodArg Name="Polarity" ParameterName="Polarity_EEV1"/>
+     </CallLibMethod>
+     <CallLibMethod Name="LL_HRTIM_EE_SetSensitivity">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Event" ParameterName="Event_EEV1"/>
+         <MethodArg Name="Sensitivity" ParameterName="Sensitivity_EEV1"/>
+     </CallLibMethod>
+     <CallLibMethod Name="LL_HRTIM_EE_SetFastMode">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Event" ParameterName="Event_EEV1"/>
+         <MethodArg Name="FastMode" ParameterName="FastMode_EEV1"/>
+     </CallLibMethod>
+  </RefConfig>
+
+
+
+
+  <RefConfig Name="EventConfig_EEV2">
+     <CallLibMethod Name="LL_HRTIM_EE_SetSrc">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Event" ParameterName="Event_EEV2"/>
+         <MethodArg Name="Src" ParameterName="Source_EEV2"/>
+     </CallLibMethod>
+     <CallLibMethod Name="LL_HRTIM_EE_SetPolarity">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Event" ParameterName="Event_EEV2"/>
+         <MethodArg Name="Polarity" ParameterName="Polarity_EEV2"/>
+     </CallLibMethod>
+     <CallLibMethod Name="LL_HRTIM_EE_SetSensitivity">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Event" ParameterName="Event_EEV2"/>
+         <MethodArg Name="Sensitivity" ParameterName="Sensitivity_EEV2"/>
+     </CallLibMethod>
+     <CallLibMethod Name="LL_HRTIM_EE_SetFastMode">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Event" ParameterName="Event_EEV2"/>
+         <MethodArg Name="FastMode" ParameterName="FastMode_EEV2"/>
+     </CallLibMethod>
+
+
+  </RefConfig>
+  <RefConfig Name="EventConfig_EEV3">
+     <CallLibMethod Name="LL_HRTIM_EE_SetSrc">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Event" ParameterName="Event_EEV3"/>
+         <MethodArg Name="Src" ParameterName="Source_EEV3"/>
+     </CallLibMethod>
+     <CallLibMethod Name="LL_HRTIM_EE_SetPolarity">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Event" ParameterName="Event_EEV3"/>
+         <MethodArg Name="Polarity" ParameterName="Polarity_EEV3"/>
+     </CallLibMethod>
+     <CallLibMethod Name="LL_HRTIM_EE_SetSensitivity">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Event" ParameterName="Event_EEV3"/>
+         <MethodArg Name="Sensitivity" ParameterName="Sensitivity_EEV3"/>
+     </CallLibMethod>
+     <CallLibMethod Name="LL_HRTIM_EE_SetFastMode">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Event" ParameterName="Event_EEV3"/>
+         <MethodArg Name="FastMode" ParameterName="FastMode_EEV3"/>
+     </CallLibMethod>
+
+
+  </RefConfig>
+  <RefConfig Name="EventConfig_EEV4">
+     <CallLibMethod Name="LL_HRTIM_EE_SetSrc">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Event" ParameterName="Event_EEV4"/>
+         <MethodArg Name="Src" ParameterName="Source_EEV4"/>
+     </CallLibMethod>
+     <CallLibMethod Name="LL_HRTIM_EE_SetPolarity">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Event" ParameterName="Event_EEV4"/>
+         <MethodArg Name="Polarity" ParameterName="Polarity_EEV4"/>
+     </CallLibMethod>
+     <CallLibMethod Name="LL_HRTIM_EE_SetSensitivity">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Event" ParameterName="Event_EEV4"/>
+         <MethodArg Name="Sensitivity" ParameterName="Sensitivity_EEV4"/>
+     </CallLibMethod>
+     <CallLibMethod Name="LL_HRTIM_EE_SetFastMode">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Event" ParameterName="Event_EEV4"/>
+         <MethodArg Name="FastMode" ParameterName="FastMode_EEV4"/>
+     </CallLibMethod>
+
+  </RefConfig>
+  <RefConfig Name="EventConfig_EEV5">
+     <CallLibMethod Name="LL_HRTIM_EE_SetSrc">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Event" ParameterName="Event_EEV5"/>
+         <MethodArg Name="Src" ParameterName="Source_EEV5"/>
+     </CallLibMethod>
+     <CallLibMethod Name="LL_HRTIM_EE_SetPolarity">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Event" ParameterName="Event_EEV5"/>
+         <MethodArg Name="Polarity" ParameterName="Polarity_EEV5"/>
+     </CallLibMethod>
+     <CallLibMethod Name="LL_HRTIM_EE_SetSensitivity">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Event" ParameterName="Event_EEV5"/>
+         <MethodArg Name="Sensitivity" ParameterName="Sensitivity_EEV5"/>
+     </CallLibMethod>
+     <CallLibMethod Name="LL_HRTIM_EE_SetFastMode">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Event" ParameterName="Event_EEV5"/>
+         <MethodArg Name="FastMode" ParameterName="FastMode_EEV5"/>
+     </CallLibMethod>
+
+
+
+  </RefConfig>
+  <RefConfig Name="EventConfig_EEV6">
+     <CallLibMethod Name="LL_HRTIM_EE_SetSrc">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Event" ParameterName="Event_EEV6"/>
+         <MethodArg Name="Src" ParameterName="Source_EEV6"/>
+     </CallLibMethod>
+     <CallLibMethod Name="LL_HRTIM_EE_SetPolarity">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Event" ParameterName="Event_EEV6"/>
+         <MethodArg Name="Polarity" ParameterName="Polarity_EEV6"/>
+     </CallLibMethod>
+     <CallLibMethod Name="LL_HRTIM_EE_SetSensitivity">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Event" ParameterName="Event_EEV6"/>
+         <MethodArg Name="Sensitivity" ParameterName="Sensitivity_EEV6"/>
+     </CallLibMethod>
+     <CallLibMethod Name="LL_HRTIM_EE_SetFastMode">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Event" ParameterName="Event_EEV6"/>
+         <MethodArg Name="FastMode" ParameterName="FastMode_EEV6"/>
+     </CallLibMethod>
+     <CallLibMethod Name="LL_HRTIM_EE_SetFilter">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Event" ParameterName="Event_EEV6"/>
+         <MethodArg Name="Filter" ParameterName="Filter_EEV6"/>
+     </CallLibMethod>
+
+
+  </RefConfig>
+  <RefConfig Name="EventConfig_EEV7">
+     <CallLibMethod Name="LL_HRTIM_EE_SetSrc">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Event" ParameterName="Event_EEV7"/>
+         <MethodArg Name="Src" ParameterName="Source_EEV7"/>
+     </CallLibMethod>
+     <CallLibMethod Name="LL_HRTIM_EE_SetPolarity">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Event" ParameterName="Event_EEV7"/>
+         <MethodArg Name="Polarity" ParameterName="Polarity_EEV7"/>
+     </CallLibMethod>
+     <CallLibMethod Name="LL_HRTIM_EE_SetSensitivity">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Event" ParameterName="Event_EEV7"/>
+         <MethodArg Name="Sensitivity" ParameterName="Sensitivity_EEV7"/>
+     </CallLibMethod>
+
+     <CallLibMethod Name="LL_HRTIM_EE_SetFastMode">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Event" ParameterName="Event_EEV7"/>
+         <MethodArg Name="FastMode" ParameterName="FastMode_EEV7"/>
+     </CallLibMethod>
+     <CallLibMethod Name="LL_HRTIM_EE_SetFilter">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Event" ParameterName="Event_EEV7"/>
+         <MethodArg Name="Filter" ParameterName="Filter_EEV7"/>
+     </CallLibMethod>
+
+
+  </RefConfig>
+  <RefConfig Name="EventConfig_EEV8">
+     <CallLibMethod Name="LL_HRTIM_EE_SetSrc">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Event" ParameterName="Event_EEV8"/>
+         <MethodArg Name="Src" ParameterName="Source_EEV8"/>
+     </CallLibMethod>
+     <CallLibMethod Name="LL_HRTIM_EE_SetPolarity">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Event" ParameterName="Event_EEV8"/>
+         <MethodArg Name="Polarity" ParameterName="Polarity_EEV8"/>
+     </CallLibMethod>
+
+     <CallLibMethod Name="LL_HRTIM_EE_SetSensitivity">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Event" ParameterName="Event_EEV8"/>
+         <MethodArg Name="Sensitivity" ParameterName="Sensitivity_EEV8"/>
+     </CallLibMethod>
+     <CallLibMethod Name="LL_HRTIM_EE_SetFastMode">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Event" ParameterName="Event_EEV8"/>
+         <MethodArg Name="FastMode" ParameterName="FastMode_EEV8"/>
+     </CallLibMethod>
+
+     <CallLibMethod Name="LL_HRTIM_EE_SetFilter">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Event" ParameterName="Event_EEV8"/>
+         <MethodArg Name="Filter" ParameterName="Filter_EEV8"/>
+     </CallLibMethod>
+
+
+  </RefConfig>
+  <RefConfig Name="EventConfig_EEV9">
+     <CallLibMethod Name="LL_HRTIM_EE_SetSrc">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Event" ParameterName="Event_EEV9"/>
+         <MethodArg Name="Src" ParameterName="Source_EEV9"/>
+     </CallLibMethod>
+     <CallLibMethod Name="LL_HRTIM_EE_SetPolarity">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Event" ParameterName="Event_EEV9"/>
+         <MethodArg Name="Polarity" ParameterName="Polarity_EEV9"/>
+     </CallLibMethod>
+     <CallLibMethod Name="LL_HRTIM_EE_SetSensitivity">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Event" ParameterName="Event_EEV9"/>
+         <MethodArg Name="Sensitivity" ParameterName="Sensitivity_EEV9"/>
+     </CallLibMethod>
+     <CallLibMethod Name="LL_HRTIM_EE_SetFastMode">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Event" ParameterName="Event_EEV9"/>
+         <MethodArg Name="FastMode" ParameterName="FastMode_EEV9"/>
+     </CallLibMethod>
+
+     <CallLibMethod Name="LL_HRTIM_EE_SetFilter">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Event" ParameterName="Event_EEV9"/>
+         <MethodArg Name="Filter" ParameterName="Filter_EEV9"/>
+     </CallLibMethod>
+
+
+  </RefConfig>
+  <RefConfig Name="EventConfig_EEV10">
+     <CallLibMethod Name="LL_HRTIM_EE_SetSrc">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Event" ParameterName="Event_EEV10"/>
+         <MethodArg Name="Src" ParameterName="Source_EEV10"/>
+     </CallLibMethod>
+     <CallLibMethod Name="LL_HRTIM_EE_SetPolarity">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Event" ParameterName="Event_EEV10"/>
+         <MethodArg Name="Polarity" ParameterName="Polarity_EEV10"/>
+     </CallLibMethod>
+     <CallLibMethod Name="LL_HRTIM_EE_SetSensitivity">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Event" ParameterName="Event_EEV10"/>
+         <MethodArg Name="Sensitivity" ParameterName="Sensitivity_EEV10"/>
+     </CallLibMethod>
+     <CallLibMethod Name="LL_HRTIM_EE_SetFastMode">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Event" ParameterName="Event_EEV10"/>
+         <MethodArg Name="FastMode" ParameterName="FastMode_EEV10"/>
+     </CallLibMethod>
+     <CallLibMethod Name="LL_HRTIM_EE_SetFilter">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Event" ParameterName="Event_EEV10"/>
+         <MethodArg Name="Filter" ParameterName="Filter_EEV10"/>
+     </CallLibMethod>
+
+  </RefConfig>
+
+
+
+ <LibMethod Comment="" Name="LL_HRTIM_TIM_SetEventFilter">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Event" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Filter" OptimizationCondition="equal"/>
+    </LibMethod>
+
+    <LibMethod Comment="" Name="LL_HRTIM_TIM_SetEventLatchStatus">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Event" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="LatchStatus" OptimizationCondition="equal"/>
+    </LibMethod>
+
+
+  <RefConfig Name="TimerEventFilteringConfig1">
+    <CallLibMethod Name="LL_HRTIM_TIM_SetEventFilter">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Timer" ParameterName="TimerIdx"/>   
+         <MethodArg Name="Event" ParameterName="Event1"/>  
+         <MethodArg Name="Filter" ParameterName="Filter1"/>
+    </CallLibMethod>
+    <CallLibMethod Name="LL_HRTIM_TIM_SetEventLatchStatus">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Timer" ParameterName="TimerIdx"/>   
+         <MethodArg Name="Event" ParameterName="Event1"/>  
+         <MethodArg Name="LatchStatus" ParameterName="Latch1"/>
+    </CallLibMethod>
+  </RefConfig>
+
+ <RefConfig Name="TimerEventFilteringConfig2">
+    <CallLibMethod Name="LL_HRTIM_TIM_SetEventFilter">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Timer" ParameterName="TimerIdx"/>   
+         <MethodArg Name="Event" ParameterName="Event2"/>  
+         <MethodArg Name="Filter" ParameterName="Filter2"/>
+    </CallLibMethod>
+    <CallLibMethod Name="LL_HRTIM_TIM_SetEventLatchStatus">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Timer" ParameterName="TimerIdx"/>   
+         <MethodArg Name="Event" ParameterName="Event2"/>  
+         <MethodArg Name="LatchStatus" ParameterName="Latch2"/>
+    </CallLibMethod>
+  </RefConfig>
+
+ <RefConfig Name="TimerEventFilteringConfig3">
+    <CallLibMethod Name="LL_HRTIM_TIM_SetEventFilter">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Timer" ParameterName="TimerIdx"/>   
+         <MethodArg Name="Event" ParameterName="Event3"/>  
+         <MethodArg Name="Filter" ParameterName="Filter3"/>
+    </CallLibMethod>
+    <CallLibMethod Name="LL_HRTIM_TIM_SetEventLatchStatus">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Timer" ParameterName="TimerIdx"/>   
+         <MethodArg Name="Event" ParameterName="Event3"/>  
+         <MethodArg Name="LatchStatus" ParameterName="Latch3"/>
+    </CallLibMethod>
+  </RefConfig>
+
+ <RefConfig Name="TimerEventFilteringConfig4">
+    <CallLibMethod Name="LL_HRTIM_TIM_SetEventFilter">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Timer" ParameterName="TimerIdx"/>   
+         <MethodArg Name="Event" ParameterName="Event4"/>  
+         <MethodArg Name="Filter" ParameterName="Filter4"/>
+    </CallLibMethod>
+    <CallLibMethod Name="LL_HRTIM_TIM_SetEventLatchStatus">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Timer" ParameterName="TimerIdx"/>   
+         <MethodArg Name="Event" ParameterName="Event4"/>  
+         <MethodArg Name="LatchStatus" ParameterName="Latch4"/>
+    </CallLibMethod>
+  </RefConfig>
+
+ <RefConfig Name="TimerEventFilteringConfig5">
+    <CallLibMethod Name="LL_HRTIM_TIM_SetEventFilter">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Timer" ParameterName="TimerIdx"/>   
+         <MethodArg Name="Event" ParameterName="Event5"/>  
+         <MethodArg Name="Filter" ParameterName="Filter5"/>
+    </CallLibMethod>
+    <CallLibMethod Name="LL_HRTIM_TIM_SetEventLatchStatus">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Timer" ParameterName="TimerIdx"/>   
+         <MethodArg Name="Event" ParameterName="Event5"/>  
+         <MethodArg Name="LatchStatus" ParameterName="Latch5"/>
+    </CallLibMethod>
+  </RefConfig>
+
+ <RefConfig Name="TimerEventFilteringConfig6">
+    <CallLibMethod Name="LL_HRTIM_TIM_SetEventFilter">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Timer" ParameterName="TimerIdx"/>   
+         <MethodArg Name="Event" ParameterName="Event6"/>  
+         <MethodArg Name="Filter" ParameterName="Filter6"/>
+    </CallLibMethod>
+    <CallLibMethod Name="LL_HRTIM_TIM_SetEventLatchStatus">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Timer" ParameterName="TimerIdx"/>   
+         <MethodArg Name="Event" ParameterName="Event6"/>  
+         <MethodArg Name="LatchStatus" ParameterName="Latch6"/>
+    </CallLibMethod>
+  </RefConfig>
+
+ <RefConfig Name="TimerEventFilteringConfig7">
+    <CallLibMethod Name="LL_HRTIM_TIM_SetEventFilter">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Timer" ParameterName="TimerIdx"/>   
+         <MethodArg Name="Event" ParameterName="Event7"/>  
+         <MethodArg Name="Filter" ParameterName="Filter7"/>
+    </CallLibMethod>
+    <CallLibMethod Name="LL_HRTIM_TIM_SetEventLatchStatus">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Timer" ParameterName="TimerIdx"/>   
+         <MethodArg Name="Event" ParameterName="Event7"/>  
+         <MethodArg Name="LatchStatus" ParameterName="Latch7"/>
+    </CallLibMethod>
+  </RefConfig>
+
+ <RefConfig Name="TimerEventFilteringConfig8">
+    <CallLibMethod Name="LL_HRTIM_TIM_SetEventFilter">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Timer" ParameterName="TimerIdx"/>   
+         <MethodArg Name="Event" ParameterName="Event8"/>  
+         <MethodArg Name="Filter" ParameterName="Filter8"/>
+    </CallLibMethod>
+    <CallLibMethod Name="LL_HRTIM_TIM_SetEventLatchStatus">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Timer" ParameterName="TimerIdx"/>   
+         <MethodArg Name="Event" ParameterName="Event8"/>  
+         <MethodArg Name="LatchStatus" ParameterName="Latch8"/>
+    </CallLibMethod>
+  </RefConfig>
+
+ <RefConfig Name="TimerEventFilteringConfig9">
+    <CallLibMethod Name="LL_HRTIM_TIM_SetEventFilter">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Timer" ParameterName="TimerIdx"/>   
+         <MethodArg Name="Event" ParameterName="Event9"/>  
+         <MethodArg Name="Filter" ParameterName="Filter9"/>
+    </CallLibMethod>
+    <CallLibMethod Name="LL_HRTIM_TIM_SetEventLatchStatus">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Timer" ParameterName="TimerIdx"/>   
+         <MethodArg Name="Event" ParameterName="Event9"/>  
+         <MethodArg Name="LatchStatus" ParameterName="Latch9"/>
+    </CallLibMethod>
+  </RefConfig>
+
+ <RefConfig Name="TimerEventFilteringConfig10">
+    <CallLibMethod Name="LL_HRTIM_TIM_SetEventFilter">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Timer" ParameterName="TimerIdx"/>   
+         <MethodArg Name="Event" ParameterName="Event10"/>  
+         <MethodArg Name="Filter" ParameterName="Filter10"/>
+    </CallLibMethod>
+    <CallLibMethod Name="LL_HRTIM_TIM_SetEventLatchStatus">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Timer" ParameterName="TimerIdx"/>   
+         <MethodArg Name="Event" ParameterName="Event10"/>  
+         <MethodArg Name="LatchStatus" ParameterName="Latch10"/>
+    </CallLibMethod>
+  </RefConfig>
+
+
+  <RefConfig Name="FaultPrescalerConfig">
+     <CallLibMethod Name="LL_HRTIM_FLT_SetPrescaler">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Prescaler" ParameterName="PrescalerFault"/>
+     </CallLibMethod>
+  </RefConfig>
+
+
+
+  <RefConfig Name="FaultConfig_Line1">
+    <CallLibMethod Name="LL_HRTIM_FLT_SetSrc">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Fault" ParameterName="Fault_Line1"/>
+         <MethodArg Name="Src" ParameterName="Source_FaultLine1"/>
+    </CallLibMethod>
+    <CallLibMethod Name="LL_HRTIM_FLT_SetPolarity">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Fault" ParameterName="Fault_Line1"/>
+         <MethodArg Name="Polarity" ParameterName="Polarity_FaultLine1"/>
+    </CallLibMethod>
+     <CallLibMethod Name="LL_HRTIM_FLT_SetFilter">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Fault" ParameterName="Fault_Line1"/>
+         <MethodArg Name="Filter" ParameterName="Filter_FaultLine1"/>
+    </CallLibMethod>
+     <IFCondition Expression="Lock_FaultLine1=HRTIM_FAULTLOCK_READONLY">
+    <CallLibMethod Name="LL_HRTIM_FLT_Lock">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Fault" ParameterName="Fault_Line1"/>
+    </CallLibMethod>
+     </IFCondition>
+ </RefConfig>
+
+  <RefConfig Name="FaultModeCtl_Line1">
+     <IFCondition Expression="Enable_FaultLine1=HRTIM_FAULTMODECTL_ENABLED">
+     <CallLibMethod Name="LL_HRTIM_FLT_Enable">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Fault" ParameterName="Fault_Line1"/>
+       </CallLibMethod>
+     </IFCondition>
+    <IFCondition Expression="!(Enable_FaultLine1=HRTIM_FAULTMODECTL_ENABLED)">
+     <CallLibMethod Name="LL_HRTIM_FLT_Disable">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Fault" ParameterName="Fault_Line1"/>
+       </CallLibMethod>
+     </IFCondition>
+  </RefConfig>
+
+  <RefConfig Name="FaultConfig_Line2">
+    <CallLibMethod Name="LL_HRTIM_FLT_SetSrc">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Fault" ParameterName="Fault_Line2"/>
+         <MethodArg Name="Src" ParameterName="Source_FaultLine2"/>
+    </CallLibMethod>
+    <CallLibMethod Name="LL_HRTIM_FLT_SetPolarity">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Fault" ParameterName="Fault_Line2"/>
+         <MethodArg Name="Polarity" ParameterName="Polarity_FaultLine2"/>
+    </CallLibMethod>
+     <CallLibMethod Name="LL_HRTIM_FLT_SetFilter">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Fault" ParameterName="Fault_Line2"/>
+         <MethodArg Name="Filter" ParameterName="Filter_FaultLine2"/>
+    </CallLibMethod>
+     <IFCondition Expression="Lock_FaultLine2=HRTIM_FAULTLOCK_READONLY">
+    <CallLibMethod Name="LL_HRTIM_FLT_Lock">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Fault" ParameterName="Fault_Line2"/>
+    </CallLibMethod>
+     </IFCondition>
+ </RefConfig>
+
+  <RefConfig Name="FaultModeCtl_Line2">
+     <IFCondition Expression="Enable_FaultLine2=HRTIM_FAULTMODECTL_ENABLED">
+     <CallLibMethod Name="LL_HRTIM_FLT_Enable">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Fault" ParameterName="Fault_Line2"/>
+       </CallLibMethod>
+     </IFCondition>
+    <IFCondition Expression="!(Enable_FaultLine2=HRTIM_FAULTMODECTL_ENABLED)">
+     <CallLibMethod Name="LL_HRTIM_FLT_Disable">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Fault" ParameterName="Fault_Line2"/>
+       </CallLibMethod>
+     </IFCondition>
+  </RefConfig>
+
+
+
+  <RefConfig Name="FaultConfig_Line3">
+    <CallLibMethod Name="LL_HRTIM_FLT_SetSrc">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Fault" ParameterName="Fault_Line3"/>
+         <MethodArg Name="Src" ParameterName="Source_FaultLine3"/>
+    </CallLibMethod>
+    <CallLibMethod Name="LL_HRTIM_FLT_SetPolarity">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Fault" ParameterName="Fault_Line3"/>
+         <MethodArg Name="Polarity" ParameterName="Polarity_FaultLine3"/>
+    </CallLibMethod>
+     <CallLibMethod Name="LL_HRTIM_FLT_SetFilter">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Fault" ParameterName="Fault_Line3"/>
+         <MethodArg Name="Filter" ParameterName="Filter_FaultLine3"/>
+    </CallLibMethod>
+     <IFCondition Expression="Lock_FaultLine3=HRTIM_FAULTLOCK_READONLY">
+    <CallLibMethod Name="LL_HRTIM_FLT_Lock">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Fault" ParameterName="Fault_Line3"/>
+    </CallLibMethod>
+     </IFCondition>
+ </RefConfig>
+
+  <RefConfig Name="FaultModeCtl_Line3">
+     <IFCondition Expression="Enable_FaultLine3=HRTIM_FAULTMODECTL_ENABLED">
+     <CallLibMethod Name="LL_HRTIM_FLT_Enable">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Fault" ParameterName="Fault_Line3"/>
+       </CallLibMethod>
+     </IFCondition>
+    <IFCondition Expression="!(Enable_FaultLine3=HRTIM_FAULTMODECTL_ENABLED)">
+     <CallLibMethod Name="LL_HRTIM_FLT_Disable">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Fault" ParameterName="Fault_Line3"/>
+       </CallLibMethod>
+     </IFCondition>
+  </RefConfig>
+
+
+  <RefConfig Name="FaultConfig_Line4">
+    <CallLibMethod Name="LL_HRTIM_FLT_SetSrc">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Fault" ParameterName="Fault_Line4"/>
+         <MethodArg Name="Src" ParameterName="Source_FaultLine4"/>
+    </CallLibMethod>
+    <CallLibMethod Name="LL_HRTIM_FLT_SetPolarity">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Fault" ParameterName="Fault_Line4"/>
+         <MethodArg Name="Polarity" ParameterName="Polarity_FaultLine4"/>
+    </CallLibMethod>
+     <CallLibMethod Name="LL_HRTIM_FLT_SetFilter">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Fault" ParameterName="Fault_Line4"/>
+         <MethodArg Name="Filter" ParameterName="Filter_FaultLine4"/>
+    </CallLibMethod>
+     <IFCondition Expression="Lock_FaultLine4=HRTIM_FAULTLOCK_READONLY">
+    <CallLibMethod Name="LL_HRTIM_FLT_Lock">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Fault" ParameterName="Fault_Line4"/>
+    </CallLibMethod>
+     </IFCondition>
+ </RefConfig>
+
+  <RefConfig Name="FaultModeCtl_Line4">
+     <IFCondition Expression="Enable_FaultLine4=HRTIM_FAULTMODECTL_ENABLED">
+     <CallLibMethod Name="LL_HRTIM_FLT_Enable">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Fault" ParameterName="Fault_Line4"/>
+       </CallLibMethod>
+     </IFCondition>
+    <IFCondition Expression="!(Enable_FaultLine4=HRTIM_FAULTMODECTL_ENABLED)">
+     <CallLibMethod Name="LL_HRTIM_FLT_Disable">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Fault" ParameterName="Fault_Line4"/>
+       </CallLibMethod>
+     </IFCondition>
+  </RefConfig>
+
+
+  <RefConfig Name="FaultConfig_Line5">
+    <CallLibMethod Name="LL_HRTIM_FLT_SetSrc">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Fault" ParameterName="Fault_Line5"/>
+         <MethodArg Name="Src" ParameterName="Source_FaultLine5"/>
+    </CallLibMethod>
+    <CallLibMethod Name="LL_HRTIM_FLT_SetPolarity">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Fault" ParameterName="Fault_Line5"/>
+         <MethodArg Name="Polarity" ParameterName="Polarity_FaultLine5"/>
+    </CallLibMethod>
+     <CallLibMethod Name="LL_HRTIM_FLT_SetFilter">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Fault" ParameterName="Fault_Line5"/>
+         <MethodArg Name="Filter" ParameterName="Filter_FaultLine5"/>
+    </CallLibMethod>
+     <IFCondition Expression="Lock_FaultLine5=HRTIM_FAULTLOCK_READONLY">
+    <CallLibMethod Name="LL_HRTIM_FLT_Lock">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Fault" ParameterName="Fault_Line5"/>
+    </CallLibMethod>
+     </IFCondition>
+ </RefConfig>
+
+  <RefConfig Name="FaultModeCtl_Line5">
+     <IFCondition Expression="Enable_FaultLine5=HRTIM_FAULTMODECTL_ENABLED">
+     <CallLibMethod Name="LL_HRTIM_FLT_Enable">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Fault" ParameterName="Fault_Line5"/>
+       </CallLibMethod>
+     </IFCondition>
+    <IFCondition Expression="!(Enable_FaultLine5=HRTIM_FAULTMODECTL_ENABLED)">
+     <CallLibMethod Name="LL_HRTIM_FLT_Disable">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+         <MethodArg Name="Fault" ParameterName="Fault_Line5"/>
+       </CallLibMethod>
+     </IFCondition>
+  </RefConfig>
+
+
+   <RefConfig Name="ADCTriggerConfig_ADC_Trigger1">
+     <CallLibMethod Name="LL_HRTIM_ConfigADCTrig">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+        <MethodArg Name="ADCTrig" ParameterName="ADCTrigger_Id1"/>
+        <MethodArg Name="Update" ParameterName="ORingUpdateSource_ADCTrigger1"/>
+        <MethodArg Name="Src" ParameterName="ORingADCTrigger1"/>
+     </CallLibMethod>
+   </RefConfig>
+
+
+   <RefConfig Name="ADCTriggerConfig_ADC_Trigger2">
+    <CallLibMethod Name="LL_HRTIM_ConfigADCTrig">
+        <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+        <MethodArg Name="ADCTrig" ParameterName="ADCTrigger_Id2"/>
+        <MethodArg Name="Update" ParameterName="ORingUpdateSource_ADCTrigger2"/>
+        <MethodArg Name="Src" ParameterName="ORingADCTrigger2"/>
+    </CallLibMethod>
+   </RefConfig>
+
+<RefConfig Name="ADCTriggerConfig_ADC_Trigger3">
+     <CallLibMethod Name="LL_HRTIM_ConfigADCTrig">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+        <MethodArg Name="ADCTrig" ParameterName="ADCTrigger_Id3"/>
+        <MethodArg Name="Update" ParameterName="ORingUpdateSource_ADCTrigger3"/>
+        <MethodArg Name="Src" ParameterName="ORingADCTrigger3"/>
+</CallLibMethod>
+</RefConfig>
+
+<RefConfig Name="ADCTriggerConfig_ADC_Trigger4">
+     <CallLibMethod Name="LL_HRTIM_ConfigADCTrig">
+         <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+        <MethodArg Name="ADCTrig" ParameterName="ADCTrigger_Id4"/>
+        <MethodArg Name="Update" ParameterName="ORingUpdateSource_ADCTrigger4"/>
+        <MethodArg Name="Src" ParameterName="ORingADCTrigger4"/>
+</CallLibMethod>
+</RefConfig>
+
+
+  
+ <RefConfig Name="BurstModeCtl">
+      <IFCondition Expression="Enable=HRTIM_BURSTMODECTL_ENABLED">
+        <CallLibMethod Name="LL_HRTIM_BM_Enable">
+           <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+        </CallLibMethod>
+        </IFCondition>
+      <IFCondition Expression="!(Enable=HRTIM_BURSTMODECTL_ENABLED)">
+        <CallLibMethod Name="LL_HRTIM_BM_Disable">
+           <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+        </CallLibMethod>
+        </IFCondition>
+ </RefConfig>
+
+
+ <RefConfig Name="BurstModeConfig">
+        <CallLibMethod Name="LL_HRTIM_BM_SetMode">
+           <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+            <MethodArg Name="Mode" ParameterName="Mode"/>
+        </CallLibMethod>
+        <CallLibMethod Name="LL_HRTIM_BM_SetClockSrc">
+           <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+            <MethodArg Name="ClockSrc" ParameterName="ClockSource"/>
+        </CallLibMethod>
+        <CallLibMethod Name="LL_HRTIM_BM_SetTrig">
+           <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+            <MethodArg Name="Trig" ParameterName="ORingBURSTMODETrigger"/>
+        </CallLibMethod>
+        <CallLibMethod Name="LL_HRTIM_BM_SetPeriod">
+           <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+            <MethodArg Name="Period" ParameterName="BURSTMODEPeriod"/>
+        </CallLibMethod>
+        <IFCondition Expression="BurstPreloadEnable=HRIM_BURSTMODEPRELOAD_ENABLED">
+        <CallLibMethod Name="LL_HRTIM_BM_EnablePreload">
+           <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+        </CallLibMethod>
+        </IFCondition>
+        <IFCondition Expression="!(BurstPreloadEnable=HRIM_BURSTMODEPRELOAD_ENABLED)">
+        <CallLibMethod Name="LL_HRTIM_BM_DisablePreload">
+           <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+        </CallLibMethod>
+        </IFCondition>
+        <CallLibMethod Name="LL_HRTIM_BM_SetPrescaler">
+            <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+            <MethodArg Name="Prescaler" ParameterName="PrescalerBurst"/>
+        </CallLibMethod>
+        <CallLibMethod Name="LL_HRTIM_BM_SetCompare">
+            <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+            <MethodArg Name="CompareValue" ParameterName="IdleDuration"/>
+        </CallLibMethod>
+
+ </RefConfig>
+
+
+<RefConfig Name="BurstDMAConfig">
+<CallLibMethod Name="LL_HRTIM_TIM_ConfigBurstDMA">
+       <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+       <MethodArg Name="Timer" ParameterName="BurstDMAconfig"/>
+       <MethodArg Name="Registers" ParameterName="ORingRegistersToUpdate"/>
+</CallLibMethod>
+</RefConfig>
+
+   <RefConfig Name="BurstDMAConfig_Master">
+    <CallLibMethod Name="LL_HRTIM_TIM_ConfigBurstDMA">
+       <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+       <MethodArg Name="Timer" ParameterName="BurstDMAconfig"/>
+       <MethodArg Name="Registers" ParameterName="ORingRegistersToUpdateMaster"/>
+    </CallLibMethod>
+   </RefConfig>
+
+
+
+
+
+  
+
+
+   <RefConfig Name="WaveformOutputConfig1">
+     <CallLibMethod Name="LL_HRTIM_OUT_SetPolarity">
+            <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+            <MethodArg Name="Output" ParameterName="Output1"/>
+            <MethodArg Name="Polarity" ParameterName="Polarity1"/>
+     </CallLibMethod>
+     <CallLibMethod Name="LL_HRTIM_OUT_SetOutputSetSrc">
+            <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+            <MethodArg Name="Output" ParameterName="Output1"/>
+            <MethodArg Name="SetSrc" ParameterName="ORingSetOutput1"/>
+     </CallLibMethod>
+     <CallLibMethod Name="LL_HRTIM_OUT_SetOutputResetSrc">
+            <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+            <MethodArg Name="Output" ParameterName="Output1"/>
+            <MethodArg Name="ResetSrc" ParameterName="ORingResetOutput1"/>
+     </CallLibMethod>
+     <CallLibMethod Name="LL_HRTIM_OUT_SetIdleMode">
+            <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+            <MethodArg Name="Output" ParameterName="Output1"/>
+            <MethodArg Name="IdleMode" ParameterName="IdleMode1"/>
+     </CallLibMethod>
+     <CallLibMethod Name="LL_HRTIM_OUT_SetIdleLevel">
+            <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+            <MethodArg Name="Output" ParameterName="Output1"/>
+            <MethodArg Name="IdleLevel" ParameterName="IdleLevel1"/>
+     </CallLibMethod>
+     <CallLibMethod Name="LL_HRTIM_OUT_SetFaultState">
+            <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+            <MethodArg Name="Output" ParameterName="Output1"/>
+            <MethodArg Name="FaultState" ParameterName="FaultLevel1"/>
+     </CallLibMethod>
+     <CallLibMethod Name="LL_HRTIM_OUT_SetChopperMode">
+            <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+            <MethodArg Name="Output" ParameterName="Output1"/>
+            <MethodArg Name="ChopperMode" ParameterName="ChopperModeEnable1"/>
+     </CallLibMethod>
+
+
+    <IFCondition Expression="(IdleLevel1=HRTIM_OUTPUTIDLELEVEL_ACTIVE) &amp; (RisingSign=HRTIM_TIMDEADTIME_RISINGSIGN_POSITIVE) &amp; (FallingSign=HRTIM_TIMDEADTIME_FALLINGSIGN_POSITIVE)">
+     <CallLibMethod Name="LL_HRTIM_OUT_SetBMEntryMode">
+            <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+            <MethodArg Name="Output" ParameterName="Output1"/>
+            <MethodArg Name="BMEntryMode" ParameterName="BurstModeEntryDelayed1"/>
+     </CallLibMethod>
+    </IFCondition>
+
+</RefConfig>
+
+
+ <RefConfig Name="WaveformOutputConfig2">
+     <CallLibMethod Name="LL_HRTIM_OUT_SetPolarity">
+            <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+            <MethodArg Name="Output" ParameterName="Output2"/>
+            <MethodArg Name="Polarity" ParameterName="Polarity2"/>
+     </CallLibMethod>
+     <CallLibMethod Name="LL_HRTIM_OUT_SetOutputSetSrc">
+            <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+            <MethodArg Name="Output" ParameterName="Output2"/>
+            <MethodArg Name="SetSrc" ParameterName="ORingSetOutput2"/>
+     </CallLibMethod>
+     <CallLibMethod Name="LL_HRTIM_OUT_SetOutputResetSrc">
+            <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+            <MethodArg Name="Output" ParameterName="Output2"/>
+            <MethodArg Name="ResetSrc" ParameterName="ORingResetOutput2"/>
+     </CallLibMethod>
+     <CallLibMethod Name="LL_HRTIM_OUT_SetIdleMode">
+            <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+            <MethodArg Name="Output" ParameterName="Output2"/>
+            <MethodArg Name="IdleMode" ParameterName="IdleMode2"/>
+     </CallLibMethod>
+     <CallLibMethod Name="LL_HRTIM_OUT_SetIdleLevel">
+            <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+            <MethodArg Name="Output" ParameterName="Output2"/>
+            <MethodArg Name="IdleLevel" ParameterName="IdleLevel2"/>
+     </CallLibMethod>
+     <CallLibMethod Name="LL_HRTIM_OUT_SetFaultState">
+            <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+            <MethodArg Name="Output" ParameterName="Output2"/>
+            <MethodArg Name="FaultState" ParameterName="FaultLevel2"/>
+     </CallLibMethod>
+     <CallLibMethod Name="LL_HRTIM_OUT_SetChopperMode">
+            <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+            <MethodArg Name="Output" ParameterName="Output2"/>
+            <MethodArg Name="ChopperMode" ParameterName="ChopperModeEnable2"/>
+     </CallLibMethod>
+
+
+    <IFCondition Expression="(IdleLevel2=HRTIM_OUTPUTIDLELEVEL_ACTIVE) &amp; (RisingSign=HRTIM_TIMDEADTIME_RISINGSIGN_POSITIVE) &amp; (FallingSign=HRTIM_TIMDEADTIME_FALLINGSIGN_POSITIVE)">
+     <CallLibMethod Name="LL_HRTIM_OUT_SetBMEntryMode">
+            <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+            <MethodArg Name="Output" ParameterName="Output2"/>
+            <MethodArg Name="BMEntryMode" ParameterName="BurstModeEntryDelayed2"/>
+     </CallLibMethod>
+    </IFCondition>
+</RefConfig>
+
+ 
+  <RefConfig Name="DeadTimeConfig">
+     <CallLibMethod Name="LL_HRTIM_DT_SetPrescaler">
+        <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+        <MethodArg Name="Timer" ParameterName="Deadtimeconfig"/>
+        <MethodArg Name="Prescaler" ParameterName="PrescalerDead"/>
+    </CallLibMethod>
+     <CallLibMethod Name="LL_HRTIM_DT_SetRisingValue">
+        <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+        <MethodArg Name="Timer" ParameterName="Deadtimeconfig"/>
+        <MethodArg Name="RisingValue" ParameterName="RisingValue"/>
+    </CallLibMethod>
+     <CallLibMethod Name="LL_HRTIM_DT_SetRisingSign">
+        <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+        <MethodArg Name="Timer" ParameterName="Deadtimeconfig"/>
+        <MethodArg Name="RisingSign" ParameterName="RisingSign"/>
+    </CallLibMethod>
+    <CallLibMethod Name="LL_HRTIM_DT_SetFallingValue">
+        <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+        <MethodArg Name="Timer" ParameterName="Deadtimeconfig"/>
+        <MethodArg Name="FallingValue" ParameterName="FallingValue"/>
+    </CallLibMethod>
+    <CallLibMethod Name="LL_HRTIM_DT_SetFallingSign">
+        <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+        <MethodArg Name="Timer" ParameterName="Deadtimeconfig"/>
+        <MethodArg Name="FallingSign" ParameterName="FallingSign"/>
+    </CallLibMethod>
+
+
+    <IFCondition Expression="!(RisingLock=HRTIM_TIMDEADTIME_RISINGLOCK_WRITE)">
+    <CallLibMethod Name="LL_HRTIM_DT_LockRising">
+        <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+        <MethodArg Name="Timer" ParameterName="Deadtimeconfig"/>
+    </CallLibMethod>
+    </IFCondition>
+    <IFCondition Expression="!(RisingSignLock=HRTIM_TIMDEADTIME_RISINGSIGNLOCK_WRITE)">
+    <CallLibMethod Name="LL_HRTIM_DT_LockRisingSign">
+        <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+        <MethodArg Name="Timer" ParameterName="Deadtimeconfig"/>
+    </CallLibMethod>
+    </IFCondition>
+    <IFCondition Expression="!(FallingLock=HRTIM_TIMDEADTIME_FALLINGLOCK_WRITE)">
+    <CallLibMethod Name="LL_HRTIM_DT_LockFalling">
+        <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+        <MethodArg Name="Timer" ParameterName="Deadtimeconfig"/>
+    </CallLibMethod>
+    </IFCondition>
+    <IFCondition Expression="!(FallingSignLock=HRTIM_TIMDEADTIME_FALLINGSIGNLOCK_WRITE)">
+    <CallLibMethod Name="LL_HRTIM_DT_LockFallingSign">
+        <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+        <MethodArg Name="Timer" ParameterName="Deadtimeconfig"/>
+    </CallLibMethod>
+    </IFCondition>
+
+   </RefConfig>
+
+
+   <RefConfig Name="ChopperModeConfig">
+     <CallLibMethod Name="LL_HRTIM_CHP_SetPrescaler">
+        <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+        <MethodArg Name="Timer" ParameterName="ChopperModeconfig"/>
+        <MethodArg Name="Prescaler" ParameterName="CarrierFreq"/>
+     </CallLibMethod>
+     <CallLibMethod Name="LL_HRTIM_CHP_SetDutyCycle">
+        <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+        <MethodArg Name="Timer" ParameterName="ChopperModeconfig"/>
+        <MethodArg Name="DutyCycle" ParameterName="DutyCycle"/>
+     </CallLibMethod>
+     <CallLibMethod Name="LL_HRTIM_CHP_SetPulseWidth">
+        <MethodArg Name="HRTIMx" ParameterName="Instance"/>
+        <MethodArg Name="Timer" ParameterName="ChopperModeconfig"/>
+        <MethodArg Name="PulseWidth" ParameterName="StartPulse"/>
+     </CallLibMethod>
+   </RefConfig>
+
+
+
+
+
+
+
+    <LibMethod Comment="" Name="LL_HRTIM_BM_Config">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Configuration" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_BM_SetMode">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_BM_GetMode">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_BM_SetClockSrc">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="ClockSrc" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_BM_GetClockSrc">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_BM_SetPrescaler">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Prescaler" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_BM_GetPrescaler">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_BM_EnablePreload">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_BM_DisablePreload">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_BM_IsEnabledPreload">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_BM_SetTrig">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Trig" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_BM_GetTrig">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_BM_SetCompare">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="CompareValue" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_BM_GetCompare">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_BM_SetPeriod">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Period" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_BM_GetPeriod">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_BM_Enable">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_BM_Disable">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_BM_IsEnabled">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_BM_Start">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_BM_Stop">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_BM_GetStatus">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_CHP_Config">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Configuration" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_CHP_SetPrescaler">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Prescaler" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_CHP_GetPrescaler">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_CHP_SetDutyCycle">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="DutyCycle" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_CHP_GetDutyCycle">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_CHP_SetPulseWidth">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="PulseWidth" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_CHP_GetPulseWidth">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_DT_Config">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Configuration" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_DT_SetPrescaler">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Prescaler" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_DT_GetPrescaler">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_DT_SetRisingValue">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="RisingValue" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_DT_GetRisingValue">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_DT_SetRisingSign">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="RisingSign" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_DT_GetRisingSign">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_DT_SetFallingValue">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="FallingValue" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_DT_GetFallingValue">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_DT_SetFallingSign">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="FallingSign" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_DT_GetFallingSign">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_DT_LockRising">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_DT_LockRisingSign">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_DT_LockFalling">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_DT_LockFallingSign">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_EnableDMAReq_SYNC">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_DisableDMAReq_SYNC">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_IsEnabledDMAReq_SYNC">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_EnableDMAReq_UPDATE">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_DisableDMAReq_UPDATE">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_IsEnabledDMAReq_UPDATE">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_EnableDMAReq_REP">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_DisableDMAReq_REP">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_IsEnabledDMAReq_REP">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_EnableDMAReq_CMP1">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_DisableDMAReq_CMP1">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_IsEnabledDMAReq_CMP1">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_EnableDMAReq_CMP2">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_DisableDMAReq_CMP2">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_IsEnabledDMAReq_CMP2">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_EnableDMAReq_CMP3">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_DisableDMAReq_CMP3">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_IsEnabledDMAReq_CMP3">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_EnableDMAReq_CMP4">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_DisableDMAReq_CMP4">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_IsEnabledDMAReq_CMP4">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_EnableDMAReq_CPT1">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_DisableDMAReq_CPT1">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_IsEnabledDMAReq_CPT1">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_EnableDMAReq_CPT2">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_DisableDMAReq_CPT2">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_IsEnabledDMAReq_CPT2">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_EnableDMAReq_SET1">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_DisableDMAReq_SET1">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_IsEnabledDMAReq_SET1">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_EnableDMAReq_RST1">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_DisableDMAReq_RST1">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_IsEnabledDMAReq_RST1">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_EnableDMAReq_SET2">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_DisableDMAReq_SET2">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_IsEnabledDMAReq_SET2">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_EnableDMAReq_RST2">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_DisableDMAReq_RST2">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_IsEnabledDMAReq_RST2">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_EnableDMAReq_RST">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_DisableDMAReq_RST">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_IsEnabledDMAReq_RST">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_EnableDMAReq_DLYPRT">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_DisableDMAReq_DLYPRT">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_IsEnabledDMAReq_DLYPRT">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_EE_Config">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Event" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Configuration" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_EE_SetSrc">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Event" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Src" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_EE_GetSrc">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Event" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_EE_SetPolarity">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Event" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Polarity" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_EE_GetPolarity">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Event" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_EE_SetSensitivity">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Event" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Sensitivity" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_EE_GetSensitivity">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Event" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_EE_SetFastMode">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Event" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="FastMode" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_EE_GetFastMode">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Event" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_EE_SetFilter">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Event" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Filter" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_EE_GetFilter">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Event" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_EE_SetPrescaler">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Prescaler" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_EE_GetPrescaler">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_FLT_Config">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Fault" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Configuration" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_FLT_SetSrc">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Fault" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Src" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_FLT_GetSrc">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Fault" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_FLT_SetPolarity">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Fault" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Polarity" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_FLT_GetPolarity">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Fault" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_FLT_SetFilter">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Fault" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Filter" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_FLT_GetFilter">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Fault" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_FLT_SetPrescaler">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Prescaler" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_FLT_GetPrescaler">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_FLT_Lock">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Fault" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_FLT_Enable">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Fault" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_FLT_Disable">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Fault" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_FLT_IsEnabled">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Fault" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_ClearFlag_FLT1">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_IsActiveFlag_FLT1">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_ClearFlag_FLT2">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_IsActiveFlag_FLT2">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_ClearFlag_FLT3">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_IsActiveFlag_FLT3">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_ClearFlag_FLT4">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_IsActiveFlag_FLT4">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_ClearFlag_FLT5">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_IsActiveFlag_FLT5">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_ClearFlag_SYSFLT">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_IsActiveFlag_SYSFLT">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_ClearFlag_DLLRDY">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_IsActiveFlag_DLLRDY">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_ClearFlag_BMPER">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_IsActiveFlag_BMPER">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_ClearFlag_SYNC">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_IsActiveFlag_SYNC">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_ClearFlag_UPDATE">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_IsActiveFlag_UPDATE">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_ClearFlag_REP">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_IsActiveFlag_REP">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_ClearFlag_CMP1">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_IsActiveFlag_CMP1">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_ClearFlag_CMP2">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_IsActiveFlag_CMP2">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_ClearFlag_CMP3">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_IsActiveFlag_CMP3">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_ClearFlag_CMP4">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_IsActiveFlag_CMP4">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_ClearFlag_CPT1">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_IsActiveFlag_CPT1">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_ClearFlag_CPT2">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_IsActiveFlag_CPT2">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_ClearFlag_SET1">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_IsActiveFlag_SET1">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_ClearFlag_RST1">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_IsActiveFlag_RST1">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_ClearFlag_SET2">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_IsActiveFlag_SET2">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_ClearFlag_RST2">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_IsActiveFlag_RST2">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_ClearFlag_RST">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_IsActiveFlag_RST">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_ClearFlag_DLYPRT">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_IsActiveFlag_DLYPRT">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_SetSyncInSrc">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="SyncInSrc" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_GetSyncInSrc">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_ConfigSyncOut">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Config" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Src" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_SetSyncOutConfig">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="SyncOutConfig" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_GetSyncOutConfig">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_SetSyncOutSrc">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="SyncOutSrc" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_GetSyncOutSrc">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_SuspendUpdate">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timers" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_ResumeUpdate">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timers" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_ForceUpdate">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timers" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_CounterReset">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timers" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_EnableOutput">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Outputs" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_DisableOutput">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Outputs" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_IsEnabledOutput">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Output" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_IsDisabledOutput">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Output" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_ConfigADCTrig">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="ADCTrig" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Update" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Src" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_SetADCTrigUpdate">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="ADCTrig" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Update" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_GetADCTrigUpdate">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="ADCTrig" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_SetADCTrigSrc">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="ADCTrig" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Src" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_GetADCTrigSrc">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="ADCTrig" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_ConfigDLLCalibration">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Period" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_StartDLLCalibration">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_TIM_CounterEnable">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timers" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_TIM_CounterDisable">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timers" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_TIM_IsCounterEnabled">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_TIM_SetPrescaler">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Prescaler" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_TIM_GetPrescaler">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_TIM_SetCounterMode">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_TIM_GetCounterMode">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_TIM_EnableHalfMode">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_TIM_DisableHalfMode">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_TIM_IsEnabledHalfMode">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_TIM_EnableStartOnSync">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_TIM_DisableStartOnSync">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_TIM_IsEnabledStartOnSync">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_TIM_EnableResetOnSync">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_TIM_DisableResetOnSync">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_TIM_IsEnabledResetOnSync">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_TIM_SetDACTrig">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="DACTrig" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_TIM_GetDACTrig">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_TIM_EnablePreload">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_TIM_DisablePreload">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_TIM_IsEnabledPreload">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_TIM_SetUpdateTrig">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="UpdateTrig" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_TIM_GetUpdateTrig">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_TIM_SetUpdateGating">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="UpdateGating" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_TIM_GetUpdateGating">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_TIM_EnablePushPullMode">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_TIM_DisablePushPullMode">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_TIM_IsEnabledPushPullMode">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_TIM_SetCompareMode">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="CompareUnit" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_TIM_GetCompareMode">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="CompareUnit" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_TIM_SetCounter">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Counter" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_TIM_GetCounter">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_TIM_SetPeriod">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Period" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_TIM_GetPeriod">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_TIM_SetRepetition">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Repetition" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_TIM_GetRepetition">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_TIM_SetCompare1">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="CompareValue" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_TIM_GetCompare1">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_TIM_SetCompare2">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="CompareValue" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_TIM_GetCompare2">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_TIM_SetCompare3">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="CompareValue" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_TIM_GetCompare3">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_TIM_SetCompare4">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="CompareValue" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_TIM_GetCompare4">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_TIM_SetResetTrig">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="ResetTrig" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_TIM_GetResetTrig">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_TIM_GetCapture1">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_TIM_GetCapture2">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_TIM_SetCaptureTrig">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="CaptureUnit" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="CaptureTrig" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_TIM_GetCaptureTrig">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="CaptureUnit" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_TIM_EnableDeadTime">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_TIM_DisableDeadTime">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_TIM_IsEnabledDeadTime">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_TIM_SetDLYPRTMode">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="DLYPRTMode" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_TIM_GetDLYPRTMode">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_TIM_EnableDLYPRT">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_TIM_DisableDLYPRT">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_TIM_IsEnabledDLYPRT">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_TIM_EnableFault">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Faults" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_TIM_DisableFault">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Faults" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_TIM_IsEnabledFault">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Fault" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_TIM_LockFault">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_TIM_SetBurstModeOption">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="BurtsModeOption" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_TIM_GetBurstModeOption">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_TIM_ConfigBurstDMA">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Registers" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_TIM_GetCurrentPushPullStatus">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_TIM_GetIdlePushPullStatus">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_TIM_SetEventFilter">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Event" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Filter" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_TIM_GetEventFilter">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Event" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_TIM_SetEventLatchStatus">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Event" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="LatchStatus" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_TIM_GetEventLatchStatus">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Event" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_DeInit">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_EnableIT_FLT1">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_DisableIT_FLT1">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_IsEnabledIT_FLT1">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_EnableIT_FLT2">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_DisableIT_FLT2">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_IsEnabledIT_FLT2">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_EnableIT_FLT3">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_DisableIT_FLT3">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_IsEnabledIT_FLT3">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_EnableIT_FLT4">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_DisableIT_FLT4">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_IsEnabledIT_FLT4">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_EnableIT_FLT5">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_DisableIT_FLT5">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_IsEnabledIT_FLT5">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_EnableIT_SYSFLT">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_DisableIT_SYSFLT">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_IsEnabledIT_SYSFLT">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_EnableIT_DLLRDY">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_DisableIT_DLLRDY">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_IsEnabledIT_DLLRDY">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_EnableIT_BMPER">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_DisableIT_BMPER">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_IsEnabledIT_BMPER">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_EnableIT_SYNC">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_DisableIT_SYNC">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_IsEnabledIT_SYNC">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_EnableIT_UPDATE">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_DisableIT_UPDATE">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_IsEnabledIT_UPDATE">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_EnableIT_REP">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_DisableIT_REP">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_IsEnabledIT_REP">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_EnableIT_CMP1">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_DisableIT_CMP1">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_IsEnabledIT_CMP1">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_EnableIT_CMP2">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_DisableIT_CMP2">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_IsEnabledIT_CMP2">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_EnableIT_CMP3">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_DisableIT_CMP3">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_IsEnabledIT_CMP3">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_EnableIT_CMP4">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_DisableIT_CMP4">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_IsEnabledIT_CMP4">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_EnableIT_CPT1">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_DisableIT_CPT1">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_IsEnabledIT_CPT1">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_EnableIT_CPT2">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_DisableIT_CPT2">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_IsEnabledIT_CPT2">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_EnableIT_SET1">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_DisableIT_SET1">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_IsEnabledIT_SET1">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_EnableIT_RST1">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_DisableIT_RST1">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_IsEnabledIT_RST1">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_EnableIT_SET2">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_DisableIT_SET2">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_IsEnabledIT_SET2">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_EnableIT_RST2">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_DisableIT_RST2">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_IsEnabledIT_RST2">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_EnableIT_RST">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_DisableIT_RST">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_IsEnabledIT_RST">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_EnableIT_DLYPRT">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_DisableIT_DLYPRT">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_IsEnabledIT_DLYPRT">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timer" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_OUT_SetOutputSetSrc">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Output" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="SetSrc" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_OUT_GetOutputSetSrc">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Output" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_OUT_SetOutputResetSrc">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Output" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="ResetSrc" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_OUT_GetOutputResetSrc">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Output" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_OUT_Config">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Output" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Configuration" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_OUT_SetPolarity">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Output" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Polarity" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_OUT_GetPolarity">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Output" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_OUT_SetIdleMode">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Output" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="IdleMode" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_OUT_GetIdleMode">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Output" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_OUT_SetIdleLevel">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Output" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="IdleLevel" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_OUT_GetIdleLevel">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Output" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_OUT_SetFaultState">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Output" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="FaultState" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_OUT_GetFaultState">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Output" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_OUT_SetChopperMode">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Output" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="ChopperMode" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_OUT_GetChopperMode">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Output" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_OUT_SetBMEntryMode">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Output" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="BMEntryMode" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_OUT_GetBMEntryMode">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Output" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_OUT_GetDLYPRTOutStatus">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Output" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_OUT_ForceLevel">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Output" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="OutputLevel" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_OUT_GetLevel">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Output" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_HRTIM_DeInit">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="HRTIMx" TypeName="HRTIM_TypeDef"/>
+    </LibMethod>
+    <RefComponent Cclass="LL" Cgroup="HRTIM" Cversion="1.6.0">
+        <File Category="header" Name="Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_ll_hrtim.h"/>
+        <File Category="source" Name="Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_ll_hrtim.c"/>
+        <File Category="header" Name="Drivers/STM32L0xx_HAL_Driver/Inc/stm32f3xx_ll_cortex.h"/>
+        <File Category="source" Name="Drivers/STM32L0xx_HAL_Driver/Src/stm32f3xx_ll_cortex.c"/>
+    </RefComponent>
+</IP>

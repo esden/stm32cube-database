@@ -51,12 +51,12 @@
   */
   
 #define HAL_MODULE_ENABLED  
-  [#assign allModules = ["ADC", "CAN", "CEC", "NAND", "NOR", "PCCARD", "SRAM", "HRTIM", "OPAMP", "SDADC", "TSC", "COMP","CRC","CRYP","DAC","I2S","IWDG","LCD","LPTIM","RNG","RTC","SPI","TIM","UART","USART","IRDA","SMARTCARD","SMBUS","WWDG", "PCD"]]
+  [#assign allModules = ["ADC", "AES", "CAN", "CEC", "NAND", "NOR", "PCCARD", "SRAM", "HRTIM", "OPAMP", "SDADC", "TSC", "COMP","CRC","CRYP","DAC","I2S","IWDG","LCD","LPTIM","RNG","RTC","SPI","TIM","UART","USART","IRDA","SMARTCARD","SMBUS","WWDG", "PCD"]]
   [#list allModules as module]
 	[#if isModuleUsed(module)]
-[#compress]#define HAL_${module}_MODULE_ENABLED[/#compress]
+[#compress]#define HAL_${module?replace("AES","CRYP")}_MODULE_ENABLED[/#compress]
 	[#else]
-/*#define HAL_${module}_MODULE_ENABLED   */
+/*#define HAL_${module?replace("AES","CRYP")}_MODULE_ENABLED   */
 	[/#if]	
   [/#list]
   [#function isModuleUsed moduleName]
@@ -167,6 +167,15 @@
   *        HAL drivers code
   */
 [#if !fullAssert??]/*[/#if] #define USE_FULL_ASSERT    1 [#if !fullAssert??]*/[/#if]
+
+/* ################## SPI peripheral configuration ########################## */
+
+/* CRC FEATURE: Use to activate CRC feature inside HAL SPI Driver
+* Activated: CRC code is present inside driver
+* Deactivated: CRC code cleaned from driver
+*/
+
+#define USE_SPI_CRC                     [#if CRC_SPI??]${CRC_SPI}[#else]1U[/#if]
 
 /* Includes ------------------------------------------------------------------*/
 /**
@@ -315,11 +324,11 @@
   *         If expr is true, it returns no value.
   * @retval None
   */
-  #define assert_param(expr) ((expr) ? (void)0 : assert_failed((uint8_t *)__FILE__, __LINE__))
+  #define assert_param(expr) ((expr) ? (void)0U : assert_failed((uint8_t *)__FILE__, __LINE__))
 /* Exported functions ------------------------------------------------------- */
   void assert_failed(uint8_t* file, uint32_t line);
 #else
-  #define assert_param(expr) ((void)0)
+  #define assert_param(expr) ((void)0U)
 #endif /* USE_FULL_ASSERT */    
     
 #ifdef __cplusplus

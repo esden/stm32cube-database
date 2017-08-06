@@ -21,7 +21,7 @@
     <!-- Begin Configuration RefParameters -->
     <!-- Begin NOR Flash 1 RefParameters -->
     <RefParameter Comment="NS Coherent Pinout" DefaultValue="MEMORY_NADV_KO" Name="NSCoherentPinout1" Type="list" TabName="NOR/PSRAM 1" Group="NOR/PSRAM control" Visible="false">
-        <Condition Expression="((Address1&amp;Data1)|NorPsramDataAddress1)&amp;(NorFlash1|MuxedNorFlash1)&amp;NorPsramClock1&amp;!AddressValid1" Diagnostic=""/>
+        <Condition Expression="((Address1&amp;Data1)|NorPsramDataAddress1)&amp;(NorFlash1|MuxedNorFlash1|Psram1|MuxedPsram1)&amp;NorPsramClock1&amp;!AddressValid1" Diagnostic=""/>
         <PossibleValue Comment="NADV KO" Value="MEMORY_NADV_KO"/>
     </RefParameter>
     <RefParameter Comment="NS Coherent Pinout" DefaultValue="MEMORY_PINOUT_OK" Name="NSCoherentPinout1" Type="list" TabName="NOR/PSRAM 1" Group="NOR/PSRAM control" Visible="false">
@@ -583,7 +583,6 @@
             </Mode>
             <Mode Name="MuxedPsram1" UserName="Muxed PSRAM">
               <SignalLogicalOp Name="AND">
-                <Signal Name="NL"/>
                 <Signal Name="NOE"/>
                 <Signal Name="NWE"/>
               </SignalLogicalOp>
@@ -922,22 +921,23 @@
           </ModeLogicOperator>
           <Semaphore>AddressValid1</Semaphore>
           <Semaphore>FSMC_AddressValid</Semaphore>
-          <Condition Expression="NorFlash1|MuxedNorFlash1" Diagnostic="Optional only for asynchronous NOR Flash"/>
+          <Condition Expression="NorFlash1|MuxedNorFlash1|Psram1|MuxedPsram1" Diagnostic="Only for NOR Flash and PSRAM"/>
         </Mode>
         <Mode Name="NorPsramWait1" UserName="Wait">
           <SignalLogicalOp Name="AND">
             <Signal Name="NWAIT"/>
           </SignalLogicalOp>
           <ModeLogicOperator Name="XOR">
-            <Mode Name="AsynchronousWait1" UserName="Asynchronous">
+            <Mode Name="AsynchronousWait1" UserName="Asynchronous" ShrinkName="Asynchronous wait">
               <Semaphore>AsynchronousWaitMode1</Semaphore>
               <Condition Expression="!NorPsramClock1|((!BurstReadMode1|!BurstWriteMode1)&amp;(Psram1|MuxedPsram1))" Diagnostic="Only for asynchronous accesses"/>
             </Mode>
-            <Mode Name="SynchronousWait1" UserName="Synchronous">
+            <!-- No CLK pin on DIE461 WLCSP100 -->
+            <Mode Name="SynchronousWait1" UserName="Synchronous" RemoveCondition="DIE461&amp;WLCSP100">
               <Semaphore>SynchronousWaitMode1</Semaphore>
               <Condition Expression="NorPsramClock1" Diagnostic="Only for synchronous accesses"/>
             </Mode>
-            <Mode Name="AsynchronousSynchronousWait1" UserName="Asynchronous Synchronous">
+            <Mode Name="AsynchronousSynchronousWait1" UserName="Asynchronous Synchronous" RemoveCondition="DIE461&amp;WLCSP100">
               <Semaphore>AsynchronousWaitMode1</Semaphore>
               <Semaphore>SynchronousWaitMode1</Semaphore>
               <Condition Expression="NorPsramClock1&amp;(!BurstReadMode1|!BurstWriteMode1)&amp;(Psram1|MuxedPsram1)" Diagnostic="Only for PSRAM with either asynchronous read and synchronous write accesses or synchronous read and asynchronous write accesses"/>

@@ -36,8 +36,8 @@
             <PossibleValue Comment="Dual interleaved mode only" Semaphore="DualMode_Interl_$IpInstance" Value="ADC_DUALMODE_INTERL"/>
             <PossibleValue Comment="Dual alternate trigger mode only" Semaphore="DualMode3_$IpInstance" Value="ADC_DUALMODE_ALTERTRIG"/>
         </RefParameter>
-        <RefParameter Comment="Mode" DefaultValue="__NULL" Group="ADCs_Common_Settings" Name="Mode" Type="list">
-            <PossibleValue Comment="Independent mode" Value="__NULL"/>
+        <RefParameter Comment="Mode" DefaultValue="ADC_MODE_INDEPENDENT" Group="ADCs_Common_Settings" Name="Mode" Type="list">
+            <PossibleValue Comment="Independent mode" Value="ADC_MODE_INDEPENDENT"/>
             <Description>Multi ADC mode selection: Configures the ADC to operate in independent or multi mode</Description>
         </RefParameter>
 	    
@@ -231,35 +231,31 @@
             </RefParameter>
                 
             <!-- Possible values of ContinuousConvMode parameter -->
-            <RefParameter Comment="Continuous Conversion Mode" DefaultValue="DISABLE" Group="ADCgroup" Name="ContinuousConvMode" Type="list">
-                <Condition Diagnostic="Continuous and Discontinuous modes could not be used at the same time" Expression="DiscontinuousConvMode=ENABLE"/>
-                <PossibleValue Comment="Disabled" Value="DISABLE"/>
-            </RefParameter>
-            <RefParameter Comment="Continuous Conversion Mode" DefaultValue="ENABLE" Group="ADCgroup" Name="ContinuousConvMode" Type="list">
-	    	<Condition Diagnostic="The slave must have the same value of the master" Expression="($IpNumber=2) &amp; USE_ADC2 &amp; USE_ADC1 &amp; (ADC1:ContinuousConvMode=ENABLE)"/>
+       <RefParameter Comment="Continuous Conversion Mode" DefaultValue="ENABLE" Group="ADCgroup" Name="ContinuousConvMode" Type="list">
+			<Condition Diagnostic="The slave must have the same value of the master" Expression="($IpNumber=2) &amp; USE_ADC2 &amp; USE_ADC1 &amp; (ADC1:ContinuousConvMode=ENABLE) &amp; !(Mode=ADC_MODE_INDEPENDENT)"/>
 	        <PossibleValue Comment="Enabled" Semaphore="ContinuousMode_$IpInstance" Value="ENABLE"/>
 	         <Description>Enable or Disable the Continuous Conversion Mode</Description>
 	    </RefParameter>
 	    <RefParameter Comment="Continuous Conversion Mode" DefaultValue="DISABLE" Group="ADCgroup" Name="ContinuousConvMode" Type="list">
-	    	<Condition Diagnostic="The slave must have the same value of the master" Expression="($IpNumber=2) &amp; USE_ADC2 &amp; USE_ADC1 &amp; (ADC1:ContinuousConvMode=DISABLE)"/>
+			<Condition Diagnostic="The slave must have the same value of the master" Expression="($IpNumber=2) &amp; USE_ADC2 &amp; USE_ADC1 &amp; (ADC1:ContinuousConvMode=DISABLE) &amp; !(Mode=ADC_MODE_INDEPENDENT)"/>
 	        <PossibleValue Comment="Disabled" Value="DISABLE"/>
 	         <Description>Enable or Disable the Continuous Conversion Mode</Description>
 	    </RefParameter>
 	    <RefParameter Comment="Continuous Conversion Mode" DefaultValue="ENABLE" Group="ADCgroup" Name="ContinuousConvMode" Type="list">
-	    	<Condition Diagnostic="The slave must have the same value of the master" Expression="($IpNumber=4) &amp; USE_ADC3 &amp; USE_ADC4 &amp; (ADC3:ContinuousConvMode=ENABLE)"/>
+			<Condition Diagnostic="The slave must have the same value of the master" Expression="($IpNumber=4) &amp; USE_ADC3 &amp; USE_ADC4 &amp; (ADC3:ContinuousConvMode=ENABLE) &amp; !(Mode=ADC_MODE_INDEPENDENT)"/>
 	        <PossibleValue Comment="Enabled" Semaphore="ContinuousMode_$IpInstance" Value="ENABLE"/>
 	         <Description>Enable or Disable the Continuous Conversion Mode</Description>
 	    </RefParameter>
 	    <RefParameter Comment="Continuous Conversion Mode" DefaultValue="DISABLE" Group="ADCgroup" Name="ContinuousConvMode" Type="list">
-	    	<Condition Diagnostic="The slave must have the same value of the master" Expression="($IpNumber=4) &amp; USE_ADC3 &amp; USE_ADC4 &amp; (ADC3:ContinuousConvMode=DISABLE)"/>
+			<Condition Diagnostic="The slave must have the same value of the master" Expression="($IpNumber=4) &amp; USE_ADC3 &amp; USE_ADC4 &amp; (ADC3:ContinuousConvMode=DISABLE) &amp; !(Mode=ADC_MODE_INDEPENDENT)"/>
 	        <PossibleValue Comment="Disabled" Value="DISABLE"/>
 	         <Description>Enable or Disable the Continuous Conversion Mode</Description>
 	    </RefParameter>
-	    <RefParameter Comment="Continuous Conversion Mode" DefaultValue="DISABLE" Group="ADCgroup" Name="ContinuousConvMode" Type="list">
-	        <PossibleValue Comment="Disabled" Value="DISABLE"/>
-	        <PossibleValue Comment="Enabled" Semaphore="ContinuousMode_$IpInstance" Value="ENABLE"/>
+       <RefParameter Comment="Continuous Conversion Mode" DefaultValue="DISABLE" Group="ADCgroup" Name="ContinuousConvMode" Type="list">
+            <PossibleValue Comment="Disabled" Value="DISABLE"/>
+            <PossibleValue Action="Disable" Comment="Enabled" Condition="DiscontinuousConvMode = ENABLE" Diagnostic="Continuous and Discontinuous modes could not be used at the same time" Value="ENABLE"/>
 	        <Description>Enable or Disable the Continuous Conversion Mode</Description>
-	    </RefParameter>
+       </RefParameter>
 	    
         <!-- Possible values of DiscontinuousConvMode parameter -->
       <RefParameter Comment="Discontinuous Conversion Mode" DefaultValue="DISABLE" Group="ADCgroup" Name="DiscontinuousConvMode" Type="list">
@@ -332,7 +328,7 @@
 
         <!-- ExternalTrigConv -->
         <RefParameter Comment="External Trigger Conversion Source" DefaultValue="null" Group="ADCgroup" Name="ExternalTrigConv" Type="list" Visible="false">
-	        <Condition Diagnostic="" Expression="(EnableRegularConversion=DISABLE) | ((($IpNumber=2) | ($IpNumber=4))  &amp; !(Mode=__NULL))"/>
+	        <Condition Diagnostic="" Expression="(EnableRegularConversion=DISABLE) | ((($IpNumber=2) | ($IpNumber=4))  &amp; !(Mode=ADC_MODE_INDEPENDENT))"/>
 	    </RefParameter>
 	    <RefParameter Comment="External Trigger Conversion Source" DefaultValue="ADC_EXTERNALTRIGCONV_EXT_IT11" Group="ADCgroup" Name="ExternalTrigConv" Type="list">
 	        <Condition Diagnostic="EXTI Line11 is used for External-Trigger-for-Regular-conversion mode." Expression="(RegularExternalTrigger_$IpInstance)&amp;(USE_ADC1|USE_ADC2|USE_ADC)"/>
@@ -407,7 +403,7 @@
 	     
 	       <!-- ExternalTrigConvEdge -->
         <RefParameter Comment="External Trigger Conversion Edge" DefaultValue="null" Group="ADCgroup" Name="ExternalTrigConvEdge" Type="list" Visible="false">
-            <Condition Diagnostic="" Expression="(EnableRegularConversion=DISABLE) | ((($IpNumber=2) | ($IpNumber=4))  &amp; !(Mode=__NULL))"/>
+            <Condition Diagnostic="" Expression="(EnableRegularConversion=DISABLE) | ((($IpNumber=2) | ($IpNumber=4))  &amp; !(Mode=ADC_MODE_INDEPENDENT))"/>
         </RefParameter>
         
          <RefParameter Comment="External Trigger Conversion Edge" DefaultValue="ADC_EXTERNALTRIGCONVEDGE_NONE" Group="ADCgroup" Name="ExternalTrigConvEdge" Type="list">
@@ -1473,6 +1469,11 @@
             <PossibleValue>ADC_CHANNEL_2</PossibleValue>
         </Parameter>
     </RefMode>
+    <RefMode Comment="" Name="IN2-OPAMP-Differential">
+        <Parameter Name="Channel">
+            <PossibleValue>ADC_CHANNEL_2</PossibleValue>
+        </Parameter>
+    </RefMode>
     <RefMode Comment="" Name="IN3-Differential">
         <Parameter Name="Channel">
             <PossibleValue>ADC_CHANNEL_3</PossibleValue>
@@ -1504,6 +1505,11 @@
         </Parameter>
     </RefMode>
     <RefMode Comment="" Name="IN9-Differential">
+        <Parameter Name="Channel">
+            <PossibleValue>ADC_CHANNEL_9</PossibleValue>
+        </Parameter>
+    </RefMode>
+    <RefMode Comment="" Name="IN9-OPAMP2-Differential">
         <Parameter Name="Channel">
             <PossibleValue>ADC_CHANNEL_9</PossibleValue>
         </Parameter>
@@ -1761,7 +1767,7 @@
                     <Semaphore>IN2DiffUsed_$IpInstance</Semaphore>
                     <Condition Diagnostic="IN3 is mapped to OPAMP1, OPAMP2, APAMP4 Output OR Channel3 is already used" Expression="!(OPAMP1_OUTPUT_SELECTED_AS_ADC_INPUT|OPAMP2_OUTPUT_SELECTED_AS_ADC_INPUT|OPAMP4_OUTPUT_SELECTED_AS_ADC_INPUT|IN3Used_$IpInstance)"/>
                 </Mode>
-                <Mode Name="IN2-Differential" RemoveCondition="!($IpNumber=1) | !OPAMP1_Exist" UserName="IN2 Differential with OPAMP1 Output">
+                <Mode Name="IN2-OPAMP-Differential" RemoveCondition="!($IpNumber=1) | !OPAMP1_Exist" UserName="IN2 Differential with OPAMP1 Output"> <!--IN2-OPMAP-Diferential-->
                     <SignalLogicalOp Name="AND">
                         <Signal Name="IN2"/>
                         <Signal Name="OPAMP_OUT1"/>
@@ -1769,7 +1775,7 @@
                     <Semaphore>IN2Used_$IpInstance</Semaphore>
                     <Condition Diagnostic="Available only if OPAMP1 is used" Expression="OPAMP1_OUTPUT_SELECTED_AS_ADC_INPUT"/>
                 </Mode>
-                <Mode Name="IN2-Differential" RemoveCondition="!($IpNumber=2) | !OPAMP2_Exist" UserName="IN2 Differential with OPAMP2 Output">
+                <Mode Name="IN2-OPAMP-Differential" RemoveCondition="!($IpNumber=2) | !OPAMP2_Exist" UserName="IN2 Differential with OPAMP2 Output"> <!--IN2-OPMAP-Diferential-->
                     <SignalLogicalOp Name="AND">
                         <Signal Name="IN2"/>
                         <Signal Name="OPAMP_OUT2"/>
@@ -1777,7 +1783,7 @@
                     <Semaphore>IN2Used_$IpInstance</Semaphore>
                     <Condition Diagnostic="Available only if OPAMP2 is used" Expression="OPAMP2_OUTPUT_SELECTED_AS_ADC_INPUT"/>
                 </Mode>
-                <Mode Name="IN2-Differential" RemoveCondition="!($IpNumber=4) | !OPAMP4_Exist" UserName="IN2 Differential with OPAMP4 Output">
+                <Mode Name="IN2-OPAMP-Differential" RemoveCondition="!($IpNumber=4) | !OPAMP4_Exist" UserName="IN2 Differential with OPAMP4 Output"> <!--IN2-OPMAP-Diferential-->
                     <SignalLogicalOp Name="AND">
                         <Signal Name="IN2"/>
                         <Signal Name="OPAMP_OUT4"/>
@@ -1817,7 +1823,7 @@
                 <Mode Name="IN-OPAMP1-Differential" RemoveCondition="!($IpNumber=1) | !OPAMP1_Exist" UserName="OPAMP1 Output Differential">
                     <SignalLogicalOp Name="AND">
                         <Signal Name="OPAMP_OUT1"/>
-                        <Signal Name="IN4"/>
+                        <Signal Name="IN4"/> 
                     </SignalLogicalOp>
                     <Semaphore>IN3Used_$IpInstance</Semaphore>
                     <Semaphore>IN3DiffUsed_$IpInstance</Semaphore>
@@ -1977,7 +1983,7 @@
                     <Semaphore>IN9DiffUsed_$IpInstance</Semaphore>
                     <Condition Diagnostic="IN9 is mapped to OPAMP2 Output OR Channel10 is already used with IN8-Differential mode" Expression="!OPAMP2_OUTPUT_SELECTED_AS_ADC_INPUT &amp; !IN10Used_$IpInstance"/>
                 </Mode>
-                <Mode Name="IN9-Differential" RemoveCondition="(!($IpNumber=1) &amp; !OPAMP2_Exist) | !DIE439" UserName="IN9 Differential with OPAMP2 Output">
+                <Mode Name="IN9-OPAMP2-Differential" RemoveCondition="(!($IpNumber=1) &amp; !OPAMP2_Exist) | !DIE439" UserName="IN9 Differential with OPAMP2 Output">
                     <SignalLogicalOp Name="AND">
                         <Signal Name="IN9"/>
                         <Signal Name="OPAMP_OUT2"/>

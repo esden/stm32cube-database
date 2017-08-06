@@ -135,9 +135,9 @@
 [#if writeConfigComments]
 [#if configModel.comments??] [#if nTab==3 ]#t[/#if]#t#t/**${configModel.comments?replace("#t","#t#t")} #n#t#t*/[/#if]
 [/#if]
-	[#list methodList as method][#assign args = ""]	      
-		[#if method.status=="OK"]
-             	[#if method.arguments??]
+  [#list methodList as method][#assign args = ""]       
+    [#if method.status=="OK"]
+              [#if method.arguments??]
                     [#list method.arguments as fargument][#compress]
                     [#if fargument.addressOf] [#assign adr = "&"][#else ][#assign adr = ""][/#if][/#compress] 
                     [#if fargument.genericType == "struct"]
@@ -159,7 +159,7 @@
                         [#-- [#assign arg = "" + adr + fargument.name] --]
                         [#if (!method.name?contains("Init")&&fargument.context=="global")]
                         [#else]
-                        [#list fargument.argument as argument]	
+                        [#list fargument.argument as argument]  
                             [#if argument.genericType != "struct"]
                                 [#if argument.mandatory]
                                 [#if argument.value??]
@@ -285,7 +285,7 @@
                                 [#if nTab==3 ]#t[/#if][#if nTab==2]#t#t[#else]#t[/#if]#tError_Handler();
                                 [#if nTab==3 ]#t[/#if][#if nTab==2]#t#t[#else]#t[/#if]}
                             [/#if]#n                                    
-		[#else]
+    [#else]
                     [#--[#if nTab==3 ]#t[/#if][#if nTab==2]#t#t[#else]#t[/#if]${method.name}();#n--]
                             [#if method.returnHAL=="false"]
                                 [#if nTab==3 ]#t[/#if][#if nTab==2]#t#t[#else]#t[/#if]${method.name}();
@@ -297,14 +297,14 @@
                                 [#if nTab==3 ]#t[/#if][#if nTab==2]#t#t[#else]#t[/#if]}
                             [/#if]#n
 
-                [/#if]			
-		[/#if]
-		[#if method.status=="KO"]
-		#n [#if nTab==2]#t#t[#else]#t[/#if]//!!! ${method.name} is commented because some parameters are missing
-			[#if method.arguments??]			
-				[#list method.arguments as fargument]
-					[#if fargument.addressOf] [#assign adr = "&"][#else ] [#assign adr = ""][/#if]
-					[#if fargument.genericType == "struct"][#assign arg = "" + adr + fargument.name]
+                [/#if]      
+    [/#if]
+    [#if method.status=="KO"]
+    #n [#if nTab==2]#t#t[#else]#t[/#if]//!!! ${method.name} is commented because some parameters are missing
+      [#if method.arguments??]      
+        [#list method.arguments as fargument]
+          [#if fargument.addressOf] [#assign adr = "&"][#else ] [#assign adr = ""][/#if]
+          [#if fargument.genericType == "struct"][#assign arg = "" + adr + fargument.name]
                                         [#if fargument.context??]                   
                                             [#if fargument.context=="global"]
                                                 [#if configModel.ipName=="DMA"]
@@ -321,7 +321,7 @@
                         [#if instanceIndex??&&fargument.context=="global"][#assign arg = "" + adr + fargument.name + instanceIndex][#else][#assign arg = "" + adr + fargument.name][/#if]
                         [#if (!method.name?contains("Init")&&fargument.context=="global")]
                         [#else]
-                        [#list fargument.argument as argument]	
+                        [#list fargument.argument as argument]  
                                 [#if argument.genericType != "struct"]
                                 [#if argument.mandatory && argument.value??]
                                     [#if instanceIndex??&&fargument.context=="global"][#assign argValue=argument.value?replace("$Index",instanceIndex)][#else][#assign argValue=argument.value][/#if]
@@ -350,8 +350,8 @@
                                                 [#assign arg = "" + adr + fargument.value]                                                
                                             [/#if]
                                         [/#if]
-					[#if args == ""][#assign args = args + arg ]
-					[#else][#assign args = args + ', ' + arg]
+          [#if args == ""][#assign args = args + arg ]
+          [#else][#assign args = args + ', ' + arg]
                                         [/#if]
                                 [/#list]
                                 [#if nTab==2]#t#t[#else]#t[/#if]#t//${method.name}(${args});
@@ -716,8 +716,8 @@
      [#assign dmaService=services.dma]   
     [#if dmaService?? && dmaService?size!=0]
     [#list dmaService as dmaRequest]
-        [#list dmaRequest.methods as method]	
-		[#if method.status=="OK" && method.arguments??]
+        [#list dmaRequest.methods as method]  
+    [#if method.status=="OK" && method.arguments??]
                     [#list method.arguments as fargument]
                         [#if fargument.genericType == "struct" && fargument.context??]
                             [#if fargument.context=="global"]
@@ -745,8 +745,8 @@
             [#-- no matches--]
             [#else]
 #t${variable.value} ${variable.name};
-                [#assign v = v + " "+ variable.name/]	
-            [/#if]	
+                [#assign v = v + " "+ variable.name/] 
+            [/#if]  
         [/#list]  
 [/#if]
 [/#list]
@@ -851,8 +851,8 @@ uint32_t DFSDM_Init = 0;
             [#-- no matches--]
             [#else]
 #t${variable.value} ${variable.name};
-                [#assign v = v + " "+ variable.name/]	
-            [/#if]	
+                [#assign v = v + " "+ variable.name/] 
+            [/#if]  
         [/#list]  
 [/#if]
 [/#list]

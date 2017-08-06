@@ -19,15 +19,15 @@
         [#if nTab == 2]#t[/#if][#if nTab == 2]#t/**${configModel.comments?replace("#t","#t#t")} #n#t#t*/[#else]#t/**${configModel.comments?replace("#t","#t")} #n#t*/[/#if]
     [/#if]
 [/#if]
-	[#list methodList as method][#assign args = ""]	      
+    [#list methodList as method][#assign args = ""]	      
                 [#if method.hardCode??] [#-- Hard code --]
                     ${method.hardCode}
 
                 [/#if]
-		[#if method.status=="OK"&&method.type!="HardCode"]
+        [#if method.status=="OK"&&method.type!="HardCode"]
 [#if method.comment??]
 [/#if]
-             	[#if method.arguments??]
+                [#if method.arguments??]
                     [#list method.arguments as fargument][#compress]
                     [#if fargument.addressOf] [#assign adr = "&"][#else ][#assign adr = ""][/#if][/#compress] 
                     [#if fargument.genericType == "struct"]
@@ -99,9 +99,9 @@
                                 [#if argument2.mandatory]
                                     [#if argument2.value?? && argument2.value!="__NULL"]
                                     [#if instanceIndex??&&fargument.context=="global"][#assign argValue=argument2.value?replace("$Index",instanceIndex)][#else][#assign argValue=argument2.value][/#if]
-                                    [#if argument2.genericType=="Array"][#-- if genericType=Array --] 
+                                    [#if argument2.genericType=="Array"][#-- if genericType=Array --]
                                         [#if argument2.arraySeparator?? && argument2.arraySeparator!=""]
-                                            [#assign valList = argument2.value?split(argument2.arraySeparator)]     
+                                        [#assign valList = argument2.value?split(argument2.arraySeparator)]     
                                         [#else]
                                             [#assign valList = argument2.value?split(":")]
                                         [/#if]    
@@ -164,7 +164,7 @@
                                             [#if argIndex??]
                                                 [#assign argValue=fargument.value?replace("$Index",argIndex)]
                                                 [#if fargument.returnValue!="true"]
-                                                	[#assign arg = "" + adr + argValue]
+                                                    [#assign arg = "" + adr + argValue]
                                                 [/#if]
                                             [#else]
                                                 [#if fargument.returnValue!="true"]
@@ -176,18 +176,18 @@
                     [#if args == "" && arg!=""][#assign args = args + arg ][#else][#if arg!=""][#assign args = args + ', ' + arg][/#if][/#if]
                     [/#list]
                     [#assign retval=""]
-		    [#list method.arguments as argument]
-			[#if argument.returnValue=="true"]
-				[#assign retval=argument.name]
-			[/#if]
-		    [/#list]
+            [#list method.arguments as argument]
+            [#if argument.returnValue=="true"]
+                [#assign retval=argument.name]
+            [/#if]
+            [/#list]
 
-		    [#--[#if retval??&& retval!=""]
-			[#if nTab==2]#t#t[#else]#t[/#if]${retval} = ${method.name}(${args});--]
-		    [#-- else --]
+            [#--[#if retval??&& retval!=""]
+            [#if nTab==2]#t#t[#else]#t[/#if]${retval} = ${method.name}(${args});--]
+            [#-- else --]
                     [#-- Check on HAL_OK --]
                         [#if method.returnHAL=="false"]
-			[#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});
+            [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});
                         [#else]
                             [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
                             [#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}(${args}) != [#if method.returnHAL == "true"]HAL_OK[#else]${method.returnHAL}[/#if])
@@ -195,11 +195,11 @@
                             [#if nTab==2]#t#t[#else]#t[/#if]#tError_Handler();
                             [#if nTab==2]#t#t[#else]#t[/#if]}
                         [/#if]#n
-		    [#-- [/#if] --]
-		[#else]
+            [#-- [/#if] --]
+        [#else]
                     [#--[#if nTab==2]#t#t[#else]#t[/#if]${method.name}();#n --]
                         [#if method.returnHAL=="false"]
-			[#if nTab==2]#t#t[#else]#t[/#if]${method.name}();
+            [#if nTab==2]#t#t[#else]#t[/#if]${method.name}();
                         [#else]
                             [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
                             [#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}() != [#if method.returnHAL == "true"]HAL_OK[#else]${method.returnHAL}[/#if])
@@ -208,13 +208,13 @@
                             [#if nTab==2]#t#t[#else]#t[/#if]}
                         [/#if]#n
                 [/#if]			
-		[/#if]
-		[#if method.status=="KO"]
-		#n [#if nTab==2]#t#t[#else]#t[/#if]//!!! ${method.name} is commented because some parameters are missing
-			[#if method.arguments??]			
-				[#list method.arguments as fargument]
-					[#if fargument.addressOf] [#assign adr = "&"][#else ] [#assign adr = ""][/#if]
-					[#if fargument.genericType == "struct"][#assign arg = "" + adr + fargument.name]
+        [/#if]
+        [#if method.status=="KO"]
+        #n [#if nTab==2]#t#t[#else]#t[/#if]//!!! ${method.name} is commented because some parameters are missing
+            [#if method.arguments??]			
+                [#list method.arguments as fargument]
+                    [#if fargument.addressOf] [#assign adr = "&"][#else ] [#assign adr = ""][/#if]
+                    [#if fargument.genericType == "struct"][#assign arg = "" + adr + fargument.name]
                                         [#if fargument.context??]                   
                                             [#if fargument.context=="global"]
                                                 [#if configModel.ipName=="DMA"]
@@ -251,8 +251,8 @@
                             [/#list]
 [/#if]
                                       [/#if][#-- if argument != struct --]
-					[#if args == ""][#assign args = args + arg ]
-					[#else][#assign args = args + ', ' + arg]
+                    [#if args == ""][#assign args = args + arg ]
+                    [#else][#assign args = args + ', ' + arg]
                                         [/#if]
                                 [/#list]
                                 [#if nTab==2]#t#t[#else]#t[/#if]#t//${method.name}(${args});
@@ -315,7 +315,9 @@
                 [#if subArg.genericType =="struct"]
                     [#list subArg.argument as subArg1] [#-- list subArg1 --]
                         [#if subArg1.genericType=="Array"] [#-- if genericType == "Array" --]
-                           #t ${subArg1.typeName} ${subArg1.name}[${subArg1.arraySize}] ; 
+                           [#if subArg1.value?? && subArg1.value!="__NULL"]
+                                #t ${subArg1.typeName} ${subArg1.name}[${subArg1.arraySize}] ; 
+                            [/#if]
                         [/#if] [#-- if genericType == "Array" --]
                     [/#list]
                 [/#if]
@@ -376,7 +378,7 @@
 [#if config.comments?? && config.comments!=""] #t#t/**${config.comments?replace("#t","#t#t")} #n#t#t*/[/#if]
 [/#if]
 [/#if]
-	[#list methodList as method][#assign args = ""]	 
+    [#list methodList as method][#assign args = ""]	 
             [#if method.hardCode??] [#-- Hard code --]              
                 ${method.hardCode.text} 
             [#else]
@@ -388,7 +390,7 @@
                 [/#if]
             [/#if]
             [#if method.status=="OK" && method.type != "Template" && method.type != "HardCode"]
-             	[#if method.arguments??]
+                [#if method.arguments??]
                     [#list method.arguments as fargument][#compress]
 [#if fargument.refMethod??] [#-- CallLibMethod for Argument value --]
     [#assign argumentValue=""]
@@ -502,7 +504,7 @@
                                     [#if instanceIndex??&&fargument.context=="global"][#assign argValue=argument2.value?replace("$Index",instanceIndex)][#else][#assign argValue=argument2.value][/#if]
                                     [#if argument2.genericType=="Array"][#-- if genericType=Array --]
                                         [#if argument2.arraySeparator?? && argument2.arraySeparator!=""]
-                                            [#assign valList = argument2.value?split(argument2.arraySeparator)]     
+                                        [#assign valList = argument2.value?split(argument2.arraySeparator)]     
                                         [#else]
                                             [#assign valList = argument2.value?split(":")]
                                         [/#if]
@@ -553,7 +555,7 @@
                                         [#else]
                                             [#assign valList = argument3.value?split(":")]
                                         [/#if]
-                                        [#assign i = 0]                                  
+                                            [#assign i = 0]                                  
                                         [#list valList as val] 
                                             [#if argument3.base == "10"]
                                                 #t${argument3.name}[${i}] = ${val};
@@ -598,7 +600,7 @@
                                             [#if argIndex??] 
                                                 [#assign argValue=fargument.value?replace("$Index",argIndex)]
                                                 [#if fargument.returnValue!="true"]
-                                                	[#assign arg = "" + adr + argValue]
+                                                    [#assign arg = "" + adr + argValue]
                                                 [/#if]
                                             [#else]
                                                 [#if fargument.returnValue!="true"]
@@ -613,11 +615,11 @@
                     [#if args == "" && arg!=""][#assign args = args + arg ][#else][#if arg!=""][#assign args = args + ', ' + arg][/#if][/#if]
                     [/#list]
                     [#assign retval=""]
-		    [#list method.arguments as argument]
-			[#if argument.returnValue=="true"]
-				[#assign retval=argument.name]
-			[/#if]
-		    [/#list]
+            [#list method.arguments as argument]
+            [#if argument.returnValue=="true"]
+                [#assign retval=argument.name]
+            [/#if]
+            [/#list]
 [#if S_FATFS_SDIO?? && (inst=="SDIO" || inst?starts_with("SDMMC"))] [#-- if HAL_SD_Init  and SDIO is used with FATFS--]
 [#else]		    
                 [#if inst?contains("ETH")]
@@ -652,12 +654,12 @@
             [/#if]
         [/#if]#n
 [/#if]
-		    		
+                    
             [#else]
                     [#if S_FATFS_SDIO?? && (inst=="SDIO" || inst?starts_with("SDMMC"))] [#-- if HAL_SD_Init  and SDIO is used with FATFS--][#else]
                         [#--[#if nTab==2]#t#t[#else]#t[/#if]${method.name}();#n--]
                         [#if method.returnHAL=="false"]
-			[#if nTab==2]#t#t[#else]#t[/#if]${method.name}();
+            [#if nTab==2]#t#t[#else]#t[/#if]${method.name}();
                         [#else]
                             [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
                             [#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}() != [#if method.returnHAL == "true"]HAL_OK[#else]${method.returnHAL}[/#if])
@@ -667,13 +669,13 @@
                         [/#if]#n                  
                     [/#if]
                 [/#if]			
-		[/#if]
-		[#if method.status=="KO"]
-		#n [#if nTab==2]#t#t[#else]#t[/#if]//!!! ${method.name} is commented because some parameters are missing
-			[#if method.arguments??]			
-				[#list method.arguments as fargument]
-					[#if fargument.addressOf] [#assign adr = "&"][#else ] [#assign adr = ""][/#if]
-					[#if fargument.genericType == "struct"][#assign arg = "" + adr + fargument.name]
+        [/#if]
+        [#if method.status=="KO"]
+        #n [#if nTab==2]#t#t[#else]#t[/#if]//!!! ${method.name} is commented because some parameters are missing
+            [#if method.arguments??]			
+                [#list method.arguments as fargument]
+                    [#if fargument.addressOf] [#assign adr = "&"][#else ] [#assign adr = ""][/#if]
+                    [#if fargument.genericType == "struct"][#assign arg = "" + adr + fargument.name]
                                         [#if fargument.context??]                   
                                             [#if fargument.context=="global"]
                                                 [#if config.ipName=="DMA"]
@@ -720,8 +722,8 @@
                                                 [#assign arg = "" + adr + fargument.value]                                                
                                             [/#if]
                                         [/#if]
-					[#if args == ""][#assign args = args + arg ]
-					[#else][#assign args = args + ', ' + arg]
+                    [#if args == ""][#assign args = args + arg ]
+                    [#else][#assign args = args + ', ' + arg]
                                         [/#if]
                                 [/#list]
                                 [#if nTab==2]#t#t[#else]#t[/#if]#t//${method.name}(${args});
@@ -786,7 +788,9 @@
                 [#if subArg.genericType =="struct"]
                     [#list subArg.argument as subArg1] [#-- list subArg1 --]
                         [#if subArg1.genericType=="Array"] [#-- if genericType == "Array" --]
-                           #t ${subArg1.typeName} ${subArg1.name}[${subArg1.arraySize}] ; 
+                            [#if subArg1.value?? && subArg1.value!="__NULL"]
+                                #t ${subArg1.typeName} ${subArg1.name}[${subArg1.arraySize}] ;
+                            [/#if]
                         [/#if] [#-- if genericType == "Array" --]
                     [/#list]
                 [/#if]
@@ -915,9 +919,9 @@ ${bufferType} ${bufferName}[${bufferSize}];
 [#if writeConfigComments]
 [#if configModel.comments??] #t#t/**${configModel.comments?replace("#t","#t#t")} #n#t#t*/[/#if]
 [/#if]
-	[#list methodList as method][#assign args = ""]	      
-		[#if method.status=="OK"]
-             	[#if method.arguments??]
+    [#list methodList as method][#assign args = ""]	      
+        [#if method.status=="OK"]
+                [#if method.arguments??]
                     [#list method.arguments as fargument][#compress]
                     [#if fargument.addressOf] [#assign adr = "&"][#else ][#assign adr = ""][/#if][/#compress] 
                     [#if fargument.genericType == "struct"]
@@ -995,7 +999,7 @@ ${bufferType} ${bufferName}[${bufferSize}];
                                     [#if instanceIndex??&&fargument.context=="global"][#assign argValue=argument2.value?replace("$Index",instanceIndex)][#else][#assign argValue=argument2.value][/#if]
                                     [#if argument2.genericType=="Array"][#-- if genericType=Array --] 
                                         [#if argument2.arraySeparator?? && argument2.arraySeparator!=""]
-                                            [#assign valList = argument2.value?split(argument2.arraySeparator)]     
+                                        [#assign valList = argument2.value?split(argument2.arraySeparator)]     
                                         [#else]
                                             [#assign valList = argument2.value?split(":")]
                                         [/#if]     
@@ -1058,7 +1062,7 @@ ${bufferType} ${bufferName}[${bufferSize}];
                                             [#if argIndex??]
                                                 [#assign argValue=fargument.value?replace("$Index",argIndex)]
                                                 [#if fargument.returnValue!="true"]
-                                                	[#assign arg = "" + adr + argValue]
+                                                    [#assign arg = "" + adr + argValue]
                                                 [/#if]
                                             [#else]
                                                 [#if fargument.returnValue!="true"]
@@ -1070,18 +1074,18 @@ ${bufferType} ${bufferName}[${bufferSize}];
                     [#if args == "" && arg!=""][#assign args = args + arg ][#else][#if arg!=""][#assign args = args + ', ' + arg][/#if][/#if]
                     [/#list]
                     [#assign retval=""]
-		    [#list method.arguments as argument]
-			[#if argument.returnValue=="true"]
-				[#assign retval=argument.name]
-			[/#if]
-		    [/#list]
+            [#list method.arguments as argument]
+            [#if argument.returnValue=="true"]
+                [#assign retval=argument.name]
+            [/#if]
+            [/#list]
 
-		    [#--[#if retval??&& retval!=""]
-			[#if nTab==2]#t#t[#else]#t[/#if]${retval} = ${method.name}(${args});--]
-		    [#-- else --]
+            [#--[#if retval??&& retval!=""]
+            [#if nTab==2]#t#t[#else]#t[/#if]${retval} = ${method.name}(${args});--]
+            [#-- else --]
                     [#-- Check on HAL_OK --]
                         [#if method.returnHAL=="false"] [#-- update for LL test --]
-			[#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});
+            [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});
                         [#else]
                             [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
                             [#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}(${args}) != [#if method.returnHAL == "true"]HAL_OK[#else]${method.returnHAL}[/#if])
@@ -1089,11 +1093,11 @@ ${bufferType} ${bufferName}[${bufferSize}];
                             [#if nTab==2]#t#t[#else]#t[/#if]#tError_Handler();
                             [#if nTab==2]#t#t[#else]#t[/#if]}
                         [/#if]#n
-		    [#-- [/#if] --]
-		[#else]
+            [#-- [/#if] --]
+        [#else]
                     [#--[#if nTab==2]#t#t[#else]#t[/#if]${method.name}();#n --]
                         [#if method.returnHAL=="false"][#-- update for LL test --]
-			[#if nTab==2]#t#t[#else]#t[/#if]${method.name}();
+            [#if nTab==2]#t#t[#else]#t[/#if]${method.name}();
                         [#else]
                             [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
                             [#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}() != [#if method.returnHAL == "true"]HAL_OK[#else]${method.returnHAL}[/#if])
@@ -1102,13 +1106,13 @@ ${bufferType} ${bufferName}[${bufferSize}];
                             [#if nTab==2]#t#t[#else]#t[/#if]}
                         [/#if]#n
                 [/#if]			
-		[/#if]
-		[#if method.status=="KO"]
+        [/#if]
+        [#if method.status=="KO"]
 #n [#if nTab==2]#t#t[#else]#t[/#if]//!!! ${method.name} is commented because some parameters are missing
-			[#if method.arguments??]			
-				[#list method.arguments as fargument]
-					[#if fargument.addressOf] [#assign adr = "&"][#else ] [#assign adr = ""][/#if]
-					[#if fargument.genericType == "struct"][#assign arg = "" + adr + fargument.name]
+            [#if method.arguments??]			
+                [#list method.arguments as fargument]
+                    [#if fargument.addressOf] [#assign adr = "&"][#else ] [#assign adr = ""][/#if]
+                    [#if fargument.genericType == "struct"][#assign arg = "" + adr + fargument.name]
                                         [#if fargument.context??]                   
                                             [#if fargument.context=="global"]
                                                 [#if configModel.ipName=="DMA"]
@@ -1145,8 +1149,8 @@ ${bufferType} ${bufferName}[${bufferSize}];
                             [/#list]
 [/#if]
                                       [/#if][#-- if argument != struct --]
-					[#if args == ""][#assign args = args + arg ]
-					[#else][#assign args = args + ', ' + arg]
+                    [#if args == ""][#assign args = args + arg ]
+                    [#else][#assign args = args + ', ' + arg]
                                         [/#if]
                                 [/#list]
                                 [#if nTab==2]#t#t[#else]#t[/#if]#t//${method.name}(${args});
@@ -1175,8 +1179,8 @@ ${bufferType} ${bufferName}[${bufferSize}];
 [#macro callLibMethod CLmethod configModelRef instRef nTabRef indexRef argumentValue]
 [#if CLmethod??]
 [#--assign CLmethod = argumentRef.refMethod--]
-		[#if CLmethod.status=="OK"]
-             	[#if CLmethod.arguments??]
+        [#if CLmethod.status=="OK"]
+                [#if CLmethod.arguments??]
                     [#list CLmethod.arguments as fargument][#compress]
                     [#if fargument.addressOf] [#local adr = "&"][#else ][#local adr = ""][/#if][/#compress] 
                     [#if fargument.genericType == "struct"]{
@@ -1287,7 +1291,7 @@ ${bufferType} ${bufferName}[${bufferSize}];
                                     [#if instanceIndex??&&fargument.context=="global"][#local argValue=argument2.value?replace("$Index",instanceIndex)][#else][#local argValue=argument2.value][/#if]
                                     [#if argument2.genericType=="Array"][#-- if genericType=Array --]
                                         [#if argument2.arraySeparator?? && argument2.arraySeparator!=""]
-                                            [#local valList = argument2.value?split(argument2.arraySeparator)]     
+                                        [#local valList = argument2.value?split(argument2.arraySeparator)]     
                                         [#else]
                                             [#local valList = argument2.value?split(":")]
                                         [/#if]
@@ -1383,7 +1387,7 @@ ${bufferType} ${bufferName}[${bufferSize}];
                                             [#if argIndex??] 
                                                 [#local argValue=fargument.value?replace("$Index",argIndex)]
                                                 [#if fargument.returnValue!="true"]
-                                                	[#local arg = "" + adr + argValue]
+                                                    [#local arg = "" + adr + argValue]
                                                 [/#if]
                                             [#else]
                                                 [#if fargument.returnValue!="true"]
@@ -1396,11 +1400,11 @@ ${bufferType} ${bufferName}[${bufferSize}];
                     [#if args == "" && arg!=""][#local args = args + arg ][#else][#if arg!=""][#local args = args + ', ' + arg][/#if][/#if]
                     [/#list]
                     [#local retval=""]
-		    [#list CLmethod.arguments as argument]
-			[#if argument.returnValue=="true"]
-				[#local retval=argument.name]
-			[/#if]
-		    [/#list]
+            [#list CLmethod.arguments as argument]
+            [#if argument.returnValue=="true"]
+                [#local retval=argument.name]
+            [/#if]
+            [/#list]
 [#if S_FATFS_SDIO?? && (instRef=="SDIO" || instRef?starts_with("SDMMC"))] [#-- if HAL_SD_Init  and SDIO is used with FATFS--]
 [#else]		    
 [#--[#if nTab==2]#t#t[#else]#t[/#if]${CLmethod.name}(${args});#n--]
@@ -1412,13 +1416,13 @@ ${bufferType} ${bufferName}[${bufferSize}];
 [#assign argumentValue = CLmethod.name+"()"]
         [#-- delete call method--]
         [/#if]			
-		[/#if]
-		[#if CLmethod.status=="KO"]
+        [/#if]
+        [#if CLmethod.status=="KO"]
 #n [#if nTabRef==2]#t#t[#else]#t[/#if]//!!! ${CLmethod.name} is commented because some parameters are missing
-			[#if CLmethod.arguments??]	
-				[#list CLmethod.arguments as fargument]
-					[#if fargument.addressOf] [#local adr = "&"][#else ] [#local adr = ""][/#if]
-					[#if fargument.genericType == "struct"][#local arg = "" + adr + fargument.name]
+            [#if CLmethod.arguments??]	
+                [#list CLmethod.arguments as fargument]
+                    [#if fargument.addressOf] [#local adr = "&"][#else ] [#local adr = ""][/#if]
+                    [#if fargument.genericType == "struct"][#local arg = "" + adr + fargument.name]
                                         [#if fargument.context??]                   
                                             [#if fargument.context=="global"]
                                                 [#if config.ipName=="DMA"]
@@ -1465,8 +1469,8 @@ ${bufferType} ${bufferName}[${bufferSize}];
                                                 [#local arg = "" + adr + fargument.value]                                                
                                             [/#if]
                                         [/#if]
-					[#if args == ""][#local args = args + arg ]
-					[#else][#local args = args + ', ' + arg]
+                    [#if args == ""][#local args = args + arg ]
+                    [#else][#local args = args + ', ' + arg]
                                         [/#if]
                                 [/#list]
                                 [#if nTabRef==2]#t#t[#else]#t[/#if]#t//${CLmethod.name}(${args});[#local argumentValue = CLmethod.name+"}("+args+")"]
@@ -1655,7 +1659,7 @@ ${bufferType} ${bufferName}[${bufferSize}];
                     [@common.generateUsbWakeUpInterrupt ipName=ipName tabN=3/]
                     [#list IPData.initServices.nvic as initVector]
                        [#if initVector.vector?contains("WKUP") || initVector.vector?contains("WakeUp")]
-#t#t#tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
+#t#t#tHAL_NVIC_SetPriority(${initVector.vector}, NVIC_EncodePriority(NVIC_GetPriorityGrouping(),${initVector.preemptionPriority}, ${initVector.subPriority}));
 #t#t#tHAL_NVIC_EnableIRQ(${initVector.vector});
                        [/#if]
                     [/#list]
@@ -1669,11 +1673,7 @@ ${bufferType} ${bufferName}[${bufferSize}];
 #t#tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
 #t#tHAL_NVIC_EnableIRQ(${initVector.vector});
                     [#else]
-                        [#if FamilyName=="STM32L0"]
-#tNVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority});
-                        [#else]
 #tNVIC_SetPriority(${initVector.vector}, NVIC_EncodePriority(NVIC_GetPriorityGrouping(),${initVector.preemptionPriority}, ${initVector.subPriority}));
-                        [/#if]
 #tNVIC_EnableIRQ(${initVector.vector});
                     [/#if]
                 [/#if]

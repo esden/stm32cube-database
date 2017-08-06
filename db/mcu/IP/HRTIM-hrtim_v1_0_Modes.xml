@@ -1174,8 +1174,8 @@
         <PossibleValue Comment="External event is active on Rising and Falling edges " Value="HRTIM_EVENTSENSITIVITY_BOTHEDGES"/>
 </RefParameter>
 <RefParameter Comment="Event Fast Mode" DefaultValue="HRTIM_EVENTFASTMODE_DISABLE" Name="FastMode_EEV" Type="list" TabName="External Event Configuration" >
-        <PossibleValue Comment="External Event is acting asynchronously on outputs (low latency mode) " Value="HRTIM_EVENTFASTMODE_DISABLE"/>
-        <PossibleValue Comment="External Event is re-synchronized by the HRTIM logic before acting on outputs " Value="HRTIM_EVENTFASTMODE_ENABLE"/>
+        <PossibleValue Comment="External Event is re-synchronized by the HRTIM logic before acting on outputs" Value="HRTIM_EVENTFASTMODE_DISABLE"/>
+        <PossibleValue Comment="External Event is acting asynchronously on outputs (low latency mode)" Value="HRTIM_EVENTFASTMODE_ENABLE"/>
 </RefParameter>
 <RefParameter Comment="Event Filter" DefaultValue="HRTIM_EVENTFILTER_NONE" Name="Filter_EEV" Type="list" TabName="External Event Configuration" > 
         <PossibleValue Comment="Filter disabled " Value="HRTIM_EVENTFILTER_NONE"/>
@@ -3728,7 +3728,7 @@
 
 <RefParameter Comment="Reset Update" DefaultValue="HRTIM_TIMUPDATEONRESET_DISABLED" Name="ResetUpdate" Type="list"   Group="Timing Unit">
         <PossibleValue Comment="Update by Timer reset / roll-over disabled " Value="HRTIM_TIMUPDATEONRESET_DISABLED"/>
-        <PossibleValue Comment="Update by Timer reset / roll-over enabled " Value="HRTIM_TIMUPDATEONRESET_ENABLED" Condition="!Semaphore_TA_Enable$IpInstance" Diagnostic="Timer A must be configured" Action="Disable"/>
+        <PossibleValue Comment="Update by Timer reset / roll-over enabled " Value="HRTIM_TIMUPDATEONRESET_ENABLED"/>
 </RefParameter>
 
 <!--  a combination of ... to be conditionned depends on timer A, B, ... enabling depends on configuration of COMP register-->
@@ -6914,7 +6914,7 @@
            <ConfigForMode>WaveformCompareConfig1</ConfigForMode>
          <Parameter Name="CompareUnit1" RefParameter="CompareUnit1"> 
               <PossibleValue>__NULL</PossibleValue>  
-              <PossibleValue Semaphore="Semaphore_TE_CompareUnit1$IpInstance">HRTIM_COMPAREUNIT_1</PossibleValue>  
+              <PossibleValue Semaphore="Semaphore_TE_CompareUnit1$IpInstance" Condition="Semaphore_TE_AUTODELAYED2COMP1$IpInstance | Semaphore_TE_AUTODELAYED4COMP1$IpInstance " Action="Disable" Diagnostic="Compare value is no more configuratble due to autodelayed mode set on Compare Unit 2/4 ">HRTIM_COMPAREUNIT_1</PossibleValue> 
          </Parameter>
          <Parameter Name="CompareValue1" RefParameter="CompareValue_TE" Group="Compare Unit 1">
              <Condition Diagnostic="Compare Unit 1 config  must be enabled" Expression="Semaphore_TE_CompareUnit1$IpInstance &amp; !Semaphore_TE_HALFMODE$IpInstance"/>  
@@ -6931,8 +6931,8 @@
              <Condition Diagnostic="Compare Unit 2 config  must be enabled" Expression="Semaphore_TE_CompareUnit2$IpInstance"/>  
              <PossibleValue>HRTIM_AUTODELAYEDMODE_REGULAR</PossibleValue>
              <PossibleValue>HRTIM_AUTODELAYEDMODE_AUTODELAYED_NOTIMEOUT</PossibleValue>
-             <PossibleValue Semaphore="Semaphore_TE_AUTODELAYED2COMP1$IpInstance" Condition="!Semaphore_TE_CompareUnit1$IpInstance" Diagnostic="Compare Unit1 must be configured" Action="Disable">HRTIM_AUTODELAYEDMODE_AUTODELAYED_TIMEOUTCMP1</PossibleValue>
-             <PossibleValue  Semaphore="Semaphore_TE_AUTODELAYED2COMP3$IpInstance" Condition="!Semaphore_TE_CompareUnit3$IpInstance" Diagnostic="Compare Unit3 must be configured" Action="Disable">HRTIM_AUTODELAYEDMODE_AUTODELAYED_TIMEOUTCMP3</PossibleValue>
+             <PossibleValue Semaphore="Semaphore_TE_AUTODELAYED2COMP1$IpInstance" Condition="Semaphore_TE_AUTODELAYED4COMP1$IpInstance" Diagnostic="this mode is already used by Compare Unit 4" Action="Disable">HRTIM_AUTODELAYEDMODE_AUTODELAYED_TIMEOUTCMP1</PossibleValue>
+             <PossibleValue Semaphore="Semaphore_TE_AUTODELAYED2COMP3$IpInstance" Condition="Semaphore_TE_AUTODELAYED4COMP3$IpInstance" Diagnostic="this mode is already used by Compare Unit 4" Action="Disable">HRTIM_AUTODELAYEDMODE_AUTODELAYED_TIMEOUTCMP3</PossibleValue>
            </Parameter>
          <Parameter Name="AutoDelayedTimeout2" RefParameter="AutoDelayedTimeout_ref" Group="Compare Unit 2">
              <Condition Diagnostic="Compare Unit 2 config  must be enabled" Expression="Semaphore_TE_CompareUnit2$IpInstance &amp; (Semaphore_TE_AUTODELAYED2COMP1$IpInstance |Semaphore_TE_AUTODELAYED2COMP3$IpInstance)"/>  
@@ -6940,7 +6940,7 @@
          <ConfigForMode>WaveformCompareConfig3</ConfigForMode>
          <Parameter Name="CompareUnit3" RefParameter="CompareUnit3">
               <PossibleValue>__NULL</PossibleValue>  
-              <PossibleValue Semaphore="Semaphore_TE_CompareUnit3$IpInstance">HRTIM_COMPAREUNIT_3</PossibleValue>  
+              <PossibleValue Semaphore="Semaphore_TE_CompareUnit3$IpInstance" Condition="Semaphore_TE_AUTODELAYED2COMP3$IpInstance | Semaphore_TE_AUTODELAYED4COMP3$IpInstance " Action="Disable" Diagnostic="Compare value is no more configurable due to autodelayed mode set on Compare Unit 2/4 ">HRTIM_COMPAREUNIT_3</PossibleValue>  
          </Parameter>
          <Parameter Name="CompareValue3" RefParameter="CompareValue_TE" Group="Compare Unit 3">
              <Condition Diagnostic="Compare Unit 3 config  must be enabled" Expression="Semaphore_TE_CompareUnit3$IpInstance"/>  
@@ -6957,8 +6957,8 @@
              <Condition Diagnostic="Compare Unit 4 config  must be enabled" Expression="Semaphore_TE_CompareUnit4$IpInstance"/>  
              <PossibleValue>HRTIM_AUTODELAYEDMODE_REGULAR</PossibleValue>
              <PossibleValue>HRTIM_AUTODELAYEDMODE_AUTODELAYED_NOTIMEOUT</PossibleValue>
-             <PossibleValue Semaphore="Semaphore_TE_AUTODELAYED4COMP1$IpInstance" Condition="!Semaphore_TE_CompareUnit1$IpInstance" Diagnostic="Compare Unit1 must be configured" Action="Disable">HRTIM_AUTODELAYEDMODE_AUTODELAYED_TIMEOUTCMP1</PossibleValue>
-             <PossibleValue Semaphore="Semaphore_TE_AUTODELAYED4COMP3$IpInstance" Condition="!Semaphore_TE_CompareUnit3$IpInstance" Diagnostic="Compare Unit3 must be configured" Action="Disable">HRTIM_AUTODELAYEDMODE_AUTODELAYED_TIMEOUTCMP3</PossibleValue>
+             <PossibleValue Semaphore="Semaphore_TE_AUTODELAYED4COMP1$IpInstance" Condition="Semaphore_TE_AUTODELAYED2COMP1$IpInstance" Diagnostic="this mode is already used by Compare Unit 2" Action="Disable">HRTIM_AUTODELAYEDMODE_AUTODELAYED_TIMEOUTCMP1</PossibleValue>
+             <PossibleValue Semaphore="Semaphore_TE_AUTODELAYED4COMP3$IpInstance" Condition="Semaphore_TE_AUTODELAYED2COMP3$IpInstance" Diagnostic="this mode is already used by Compare Unit 2" Action="Disable">HRTIM_AUTODELAYEDMODE_AUTODELAYED_TIMEOUTCMP3</PossibleValue>
 
            </Parameter>
          <Parameter Name="AutoDelayedTimeout4" RefParameter="AutoDelayedTimeout_ref" Group="Compare Unit 4">
@@ -7697,7 +7697,7 @@
            <ConfigForMode>WaveformCompareConfig1</ConfigForMode>
          <Parameter Name="CompareUnit1" RefParameter="CompareUnit1"> 
               <PossibleValue>__NULL</PossibleValue>  
-              <PossibleValue Semaphore="Semaphore_TD_CompareUnit1$IpInstance">HRTIM_COMPAREUNIT_1</PossibleValue>  
+              <PossibleValue Semaphore="Semaphore_TD_CompareUnit1$IpInstance" Condition="Semaphore_TD_AUTODELAYED2COMP1$IpInstance | Semaphore_TD_AUTODELAYED4COMP1$IpInstance " Action="Disable" Diagnostic="Compare value is no more configuratble due to autodelayed mode set on Compare Unit 2/4 ">HRTIM_COMPAREUNIT_1</PossibleValue>  
          </Parameter>
          <Parameter Name="CompareValue1" RefParameter="CompareValue_TD" Group="Compare Unit 1">
              <Condition Diagnostic="Compare Unit 1 config  must be enabled" Expression="Semaphore_TD_CompareUnit1$IpInstance &amp; !Semaphore_TD_HALFMODE$IpInstance"/>  
@@ -7714,8 +7714,8 @@
              <Condition Diagnostic="Compare Unit 2 config  must be enabled" Expression="Semaphore_TD_CompareUnit2$IpInstance"/>  
              <PossibleValue>HRTIM_AUTODELAYEDMODE_REGULAR</PossibleValue>
              <PossibleValue>HRTIM_AUTODELAYEDMODE_AUTODELAYED_NOTIMEOUT</PossibleValue>
-             <PossibleValue Semaphore="Semaphore_TD_AUTODELAYED2COMP1$IpInstance" Condition="!Semaphore_TD_CompareUnit1$IpInstance" Diagnostic="Compare Unit1 must be configured" Action="Disable">HRTIM_AUTODELAYEDMODE_AUTODELAYED_TIMEOUTCMP1</PossibleValue>
-             <PossibleValue Semaphore="Semaphore_TD_AUTODELAYED2COMP3$IpInstance" Condition="!Semaphore_TD_CompareUnit3$IpInstance" Diagnostic="Compare Unit3 must be configured" Action="Disable">HRTIM_AUTODELAYEDMODE_AUTODELAYED_TIMEOUTCMP3</PossibleValue>
+             <PossibleValue Semaphore="Semaphore_TD_AUTODELAYED2COMP1$IpInstance" Condition="Semaphore_TD_AUTODELAYED4COMP1$IpInstance" Diagnostic="this mode is already used by Compare Unit 4" Action="Disable">HRTIM_AUTODELAYEDMODE_AUTODELAYED_TIMEOUTCMP1</PossibleValue>
+             <PossibleValue Semaphore="Semaphore_TD_AUTODELAYED2COMP3$IpInstance" Condition="Semaphore_TD_AUTODELAYED4COMP3$IpInstance" Diagnostic="this mode is already used by Compare Unit 4" Action="Disable">HRTIM_AUTODELAYEDMODE_AUTODELAYED_TIMEOUTCMP3</PossibleValue>
            </Parameter>
          <Parameter Name="AutoDelayedTimeout2" RefParameter="AutoDelayedTimeout_ref" Group="Compare Unit 2">
              <Condition Diagnostic="Compare Unit 2 config  must be enabled" Expression="Semaphore_TD_CompareUnit2$IpInstance &amp; (Semaphore_TD_AUTODELAYED2COMP1$IpInstance |Semaphore_TD_AUTODELAYED2COMP3$IpInstance)"/>  
@@ -7723,7 +7723,7 @@
          <ConfigForMode>WaveformCompareConfig3</ConfigForMode>
          <Parameter Name="CompareUnit3" RefParameter="CompareUnit3">
               <PossibleValue>__NULL</PossibleValue>  
-              <PossibleValue Semaphore="Semaphore_TD_CompareUnit3$IpInstance">HRTIM_COMPAREUNIT_3</PossibleValue>  
+              <PossibleValue Semaphore="Semaphore_TD_CompareUnit3$IpInstance" Condition="Semaphore_TD_AUTODELAYED2COMP3$IpInstance | Semaphore_TD_AUTODELAYED4COMP3$IpInstance " Action="Disable" Diagnostic="Compare value is no more configurable due to autodelayed mode set on Compare Unit 2/4 ">HRTIM_COMPAREUNIT_3</PossibleValue>  
          </Parameter>
          <Parameter Name="CompareValue3" RefParameter="CompareValue_TD" Group="Compare Unit 3">
              <Condition Diagnostic="Compare Unit 3 config  must be enabled" Expression="Semaphore_TD_CompareUnit3$IpInstance"/>  
@@ -7740,8 +7740,8 @@
              <Condition Diagnostic="Compare Unit 4 config  must be enabled" Expression="Semaphore_TD_CompareUnit4$IpInstance"/>  
              <PossibleValue>HRTIM_AUTODELAYEDMODE_REGULAR</PossibleValue>
              <PossibleValue>HRTIM_AUTODELAYEDMODE_AUTODELAYED_NOTIMEOUT</PossibleValue>
-             <PossibleValue Semaphore="Semaphore_TD_AUTODELAYED4COMP1$IpInstance" Condition="!Semaphore_TD_CompareUnit1$IpInstance" Diagnostic="Compare Unit1 must be configured" Action="Disable">HRTIM_AUTODELAYEDMODE_AUTODELAYED_TIMEOUTCMP1</PossibleValue>
-             <PossibleValue Semaphore="Semaphore_TD_AUTODELAYED4COMP3$IpInstance" Condition="!Semaphore_TD_CompareUnit3$IpInstance" Diagnostic="Compare Unit3 must be configured" Action="Disable">HRTIM_AUTODELAYEDMODE_AUTODELAYED_TIMEOUTCMP3</PossibleValue>
+             <PossibleValue Semaphore="Semaphore_TD_AUTODELAYED4COMP1$IpInstance" Condition="Semaphore_TD_AUTODELAYED2COMP1$IpInstance" Diagnostic="this mode is already used by Compare Unit 2" Action="Disable">HRTIM_AUTODELAYEDMODE_AUTODELAYED_TIMEOUTCMP1</PossibleValue>
+             <PossibleValue Semaphore="Semaphore_TD_AUTODELAYED4COMP3$IpInstance" Condition="Semaphore_TD_AUTODELAYED2COMP3$IpInstance" Diagnostic="this mode is already used by Compare Unit 2" Action="Disable">HRTIM_AUTODELAYEDMODE_AUTODELAYED_TIMEOUTCMP3</PossibleValue>
            </Parameter>
          <Parameter Name="AutoDelayedTimeout4" RefParameter="AutoDelayedTimeout_ref" Group="Compare Unit 4">
              <Condition Diagnostic="Compare Unit 4 config  must be enabled" Expression="Semaphore_TD_CompareUnit4$IpInstance &amp; (Semaphore_TD_AUTODELAYED4COMP1$IpInstance |Semaphore_TD_AUTODELAYED4COMP3$IpInstance)"/>  
@@ -8481,7 +8481,7 @@
            <ConfigForMode>WaveformCompareConfig1</ConfigForMode>
          <Parameter Name="CompareUnit1" RefParameter="CompareUnit1"> 
               <PossibleValue>__NULL</PossibleValue>  
-              <PossibleValue Semaphore="Semaphore_TC_CompareUnit1$IpInstance">HRTIM_COMPAREUNIT_1</PossibleValue>  
+              <PossibleValue Semaphore="Semaphore_TC_CompareUnit1$IpInstance" Condition="Semaphore_TC_AUTODELAYED2COMP1$IpInstance | Semaphore_TC_AUTODELAYED4COMP1$IpInstance " Action="Disable" Diagnostic="Compare value is no more configuratble due to autodelayed mode set on Compare Unit 2/4 ">HRTIM_COMPAREUNIT_1</PossibleValue>  
          </Parameter>
          <Parameter Name="CompareValue1" RefParameter="CompareValue_TC" Group="Compare Unit 1">
              <Condition Diagnostic="Compare Unit 1 config  must be enabled" Expression="Semaphore_TC_CompareUnit1$IpInstance &amp; !Semaphore_TC_HALFMODE$IpInstance"/>  
@@ -8498,8 +8498,8 @@
              <Condition Diagnostic="Compare Unit 2 config  must be enabled" Expression="Semaphore_TC_CompareUnit2$IpInstance"/>  
              <PossibleValue>HRTIM_AUTODELAYEDMODE_REGULAR</PossibleValue>
              <PossibleValue>HRTIM_AUTODELAYEDMODE_AUTODELAYED_NOTIMEOUT</PossibleValue>
-             <PossibleValue Semaphore="Semaphore_TC_AUTODELAYED2COMP1$IpInstance" Condition="!Semaphore_TC_CompareUnit1$IpInstance" Diagnostic="Compare Unit1 must be configured" Action="Disable">HRTIM_AUTODELAYEDMODE_AUTODELAYED_TIMEOUTCMP1</PossibleValue>
-             <PossibleValue Semaphore="Semaphore_TC_AUTODELAYED2COMP3$IpInstance" Condition="!Semaphore_TC_CompareUnit3$IpInstance" Diagnostic="Compare Unit3 must be configured" Action="Disable">HRTIM_AUTODELAYEDMODE_AUTODELAYED_TIMEOUTCMP3</PossibleValue>
+             <PossibleValue Semaphore="Semaphore_TC_AUTODELAYED2COMP1$IpInstance" Condition="Semaphore_TC_AUTODELAYED4COMP1$IpInstance" Diagnostic="this mode is already used by Compare Unit 4" Action="Disable">HRTIM_AUTODELAYEDMODE_AUTODELAYED_TIMEOUTCMP1</PossibleValue>
+             <PossibleValue Semaphore="Semaphore_TC_AUTODELAYED2COMP3$IpInstance" Condition="Semaphore_TC_AUTODELAYED4COMP3$IpInstance" Diagnostic="this mode is already used by Compare Unit 4" Action="Disable">HRTIM_AUTODELAYEDMODE_AUTODELAYED_TIMEOUTCMP3</PossibleValue>
 
            </Parameter>
          <Parameter Name="AutoDelayedTimeout2" RefParameter="AutoDelayedTimeout_ref" Group="Compare Unit 2">
@@ -8508,7 +8508,7 @@
          <ConfigForMode>WaveformCompareConfig3</ConfigForMode>
          <Parameter Name="CompareUnit3" RefParameter="CompareUnit3">
               <PossibleValue>__NULL</PossibleValue>  
-              <PossibleValue Semaphore="Semaphore_TC_CompareUnit3$IpInstance">HRTIM_COMPAREUNIT_3</PossibleValue>  
+              <PossibleValue Semaphore="Semaphore_TC_CompareUnit3$IpInstance" Condition="Semaphore_TC_AUTODELAYED2COMP3$IpInstance | Semaphore_TC_AUTODELAYED4COMP3$IpInstance " Action="Disable" Diagnostic="Compare value is no more configurable due to autodelayed mode set on Compare Unit 2/4 ">HRTIM_COMPAREUNIT_3</PossibleValue>  
          </Parameter>
          <Parameter Name="CompareValue3" RefParameter="CompareValue_TC" Group="Compare Unit 3">
              <Condition Diagnostic="Compare Unit 3 config  must be enabled" Expression="Semaphore_TC_CompareUnit3$IpInstance"/>  
@@ -8525,8 +8525,8 @@
              <Condition Diagnostic="Compare Unit 4 config  must be enabled" Expression="Semaphore_TC_CompareUnit4$IpInstance"/>  
              <PossibleValue>HRTIM_AUTODELAYEDMODE_REGULAR</PossibleValue>
              <PossibleValue>HRTIM_AUTODELAYEDMODE_AUTODELAYED_NOTIMEOUT</PossibleValue>
-             <PossibleValue Semaphore="Semaphore_TC_AUTODELAYED4COMP1$IpInstance" Condition="!Semaphore_TC_CompareUnit1$IpInstance" Diagnostic="Compare Unit1 must be configured"  Action="Disable">HRTIM_AUTODELAYEDMODE_AUTODELAYED_TIMEOUTCMP1</PossibleValue>
-             <PossibleValue Semaphore="Semaphore_TC_AUTODELAYED4COMP3$IpInstance"  Condition="!Semaphore_TC_CompareUnit3$IpInstance" Diagnostic="Compare Unit3 must be configured" Action="Disable">HRTIM_AUTODELAYEDMODE_AUTODELAYED_TIMEOUTCMP3</PossibleValue>
+             <PossibleValue Semaphore="Semaphore_TC_AUTODELAYED4COMP1$IpInstance" Condition="Semaphore_TC_AUTODELAYED2COMP1$IpInstance" Diagnostic="this mode is already used by Compare Unit 2" Action="Disable">HRTIM_AUTODELAYEDMODE_AUTODELAYED_TIMEOUTCMP1</PossibleValue>
+             <PossibleValue Semaphore="Semaphore_TC_AUTODELAYED4COMP3$IpInstance"  Condition="Semaphore_TC_AUTODELAYED2COMP3$IpInstance" Diagnostic="this mode is already used by Compare Unit 2" Action="Disable" >HRTIM_AUTODELAYEDMODE_AUTODELAYED_TIMEOUTCMP3</PossibleValue>
            </Parameter>
          <Parameter Name="AutoDelayedTimeout4" RefParameter="AutoDelayedTimeout_ref" Group="Compare Unit 4">
              <Condition Diagnostic="Compare Unit 4 config  must be enabled" Expression="Semaphore_TC_CompareUnit4$IpInstance &amp; (Semaphore_TC_AUTODELAYED4COMP1$IpInstance |Semaphore_TC_AUTODELAYED4COMP3$IpInstance)"/>  
@@ -9268,7 +9268,7 @@
            <ConfigForMode>WaveformCompareConfig1</ConfigForMode>
          <Parameter Name="CompareUnit1" RefParameter="CompareUnit1"> 
               <PossibleValue>__NULL</PossibleValue>  
-              <PossibleValue Semaphore="Semaphore_TB_CompareUnit1$IpInstance">HRTIM_COMPAREUNIT_1</PossibleValue>  
+              <PossibleValue Semaphore="Semaphore_TB_CompareUnit1$IpInstance" Condition="Semaphore_TB_AUTODELAYED2COMP1$IpInstance | Semaphore_TB_AUTODELAYED4COMP1$IpInstance " Action="Disable" Diagnostic="Compare value is no more configuratble due to autodelayed mode set on Compare Unit 2/4 ">HRTIM_COMPAREUNIT_1</PossibleValue>  
          </Parameter>
          <Parameter Name="CompareValue1" RefParameter="CompareValue_TB" Group="Compare Unit 1">
              <Condition Diagnostic="Compare Unit 1 config  must be enabled" Expression="Semaphore_TB_CompareUnit1$IpInstance &amp; !Semaphore_TB_HALFMODE$IpInstance"/>  
@@ -9285,8 +9285,8 @@
              <Condition Diagnostic="Compare Unit 2 config  must be enabled" Expression="Semaphore_TB_CompareUnit2$IpInstance"/>  
              <PossibleValue>HRTIM_AUTODELAYEDMODE_REGULAR</PossibleValue>
              <PossibleValue>HRTIM_AUTODELAYEDMODE_AUTODELAYED_NOTIMEOUT</PossibleValue>
-             <PossibleValue Semaphore="Semaphore_TB_AUTODELAYED2COMP1$IpInstance" Condition="!Semaphore_TB_CompareUnit1$IpInstance" Diagnostic="Compare Unit1 must be configured" Action="Disable">HRTIM_AUTODELAYEDMODE_AUTODELAYED_TIMEOUTCMP1</PossibleValue>
-             <PossibleValue Semaphore="Semaphore_TB_AUTODELAYED2COMP3$IpInstance" Condition="!Semaphore_TB_CompareUnit3$IpInstance" Diagnostic="Compare Unit3 must be configured" Action="Disable">HRTIM_AUTODELAYEDMODE_AUTODELAYED_TIMEOUTCMP3</PossibleValue>
+             <PossibleValue Semaphore="Semaphore_TB_AUTODELAYED2COMP1$IpInstance" Condition="Semaphore_TB_AUTODELAYED4COMP1$IpInstance" Diagnostic="this mode is already used by Compare Unit 4" Action="Disable">HRTIM_AUTODELAYEDMODE_AUTODELAYED_TIMEOUTCMP1</PossibleValue>
+             <PossibleValue Semaphore="Semaphore_TB_AUTODELAYED2COMP3$IpInstance" Condition="Semaphore_TB_AUTODELAYED4COMP3$IpInstance" Diagnostic="this mode is already used by Compare Unit 4" Action="Disable">HRTIM_AUTODELAYEDMODE_AUTODELAYED_TIMEOUTCMP3</PossibleValue>
 
            </Parameter>
          <Parameter Name="AutoDelayedTimeout2" RefParameter="AutoDelayedTimeout_ref" Group="Compare Unit 2">
@@ -9295,7 +9295,7 @@
          <ConfigForMode>WaveformCompareConfig3</ConfigForMode>
          <Parameter Name="CompareUnit3" RefParameter="CompareUnit3">
               <PossibleValue>__NULL</PossibleValue>  
-              <PossibleValue Semaphore="Semaphore_TB_CompareUnit3$IpInstance">HRTIM_COMPAREUNIT_3</PossibleValue>  
+              <PossibleValue Semaphore="Semaphore_TB_CompareUnit3$IpInstance" Condition="Semaphore_TB_AUTODELAYED2COMP3$IpInstance | Semaphore_TB_AUTODELAYED4COMP3$IpInstance " Action="Disable" Diagnostic="Compare value is no more configurable due to autodelayed mode set on Compare Unit 2/4 ">HRTIM_COMPAREUNIT_3</PossibleValue>  
          </Parameter>
          <Parameter Name="CompareValue3" RefParameter="CompareValue_TB" Group="Compare Unit 3">
              <Condition Diagnostic="Compare Unit 3 config  must be enabled" Expression="Semaphore_TB_CompareUnit3$IpInstance"/>  
@@ -9312,8 +9312,8 @@
              <Condition Diagnostic="Compare Unit 4 config  must be enabled" Expression="Semaphore_TB_CompareUnit4$IpInstance"/>  
              <PossibleValue>HRTIM_AUTODELAYEDMODE_REGULAR</PossibleValue>
              <PossibleValue>HRTIM_AUTODELAYEDMODE_AUTODELAYED_NOTIMEOUT</PossibleValue>
-             <PossibleValue Semaphore="Semaphore_TB_AUTODELAYED4COMP1$IpInstance" Condition="!Semaphore_TB_CompareUnit1$IpInstance" Diagnostic="Compare Unit1 must be configured" Action="Disable">HRTIM_AUTODELAYEDMODE_AUTODELAYED_TIMEOUTCMP1</PossibleValue>
-             <PossibleValue Semaphore="Semaphore_TB_AUTODELAYED4COMP3$IpInstance" Condition="!Semaphore_TB_CompareUnit3$IpInstance" Diagnostic="Compare Unit3 must be configured" Action="Disable">HRTIM_AUTODELAYEDMODE_AUTODELAYED_TIMEOUTCMP3</PossibleValue>
+             <PossibleValue Semaphore="Semaphore_TB_AUTODELAYED4COMP1$IpInstance" Condition="Semaphore_TB_AUTODELAYED2COMP1$IpInstance" Diagnostic="this mode is already used by Compare Unit 2" Action="Disable">HRTIM_AUTODELAYEDMODE_AUTODELAYED_TIMEOUTCMP1</PossibleValue>
+             <PossibleValue Semaphore="Semaphore_TB_AUTODELAYED4COMP3$IpInstance" Condition="Semaphore_TB_AUTODELAYED2COMP3$IpInstance" Diagnostic="this mode is already used by Compare Unit 2" Action="Disable">HRTIM_AUTODELAYEDMODE_AUTODELAYED_TIMEOUTCMP3</PossibleValue>
            </Parameter>
          <Parameter Name="AutoDelayedTimeout4" RefParameter="AutoDelayedTimeout_ref" Group="Compare Unit 4">
              <Condition Diagnostic="Compare Unit 4 config  must be enabled" Expression="Semaphore_TB_CompareUnit4$IpInstance &amp; (Semaphore_TB_AUTODELAYED4COMP1$IpInstance |Semaphore_TB_AUTODELAYED4COMP3$IpInstance)"/>  
@@ -10053,7 +10053,7 @@
            <ConfigForMode>WaveformCompareConfig1</ConfigForMode>
          <Parameter Name="CompareUnit1" RefParameter="CompareUnit1"> 
               <PossibleValue>__NULL</PossibleValue>  
-              <PossibleValue Semaphore="Semaphore_TA_CompareUnit1$IpInstance">HRTIM_COMPAREUNIT_1</PossibleValue>  
+              <PossibleValue Semaphore="Semaphore_TA_CompareUnit1$IpInstance" Condition="Semaphore_TA_AUTODELAYED2COMP1$IpInstance | Semaphore_TA_AUTODELAYED4COMP1$IpInstance " Action="Disable" Diagnostic="Compare value is no more configuratble due to autodelayed mode set on Compare Unit 2/4 ">HRTIM_COMPAREUNIT_1</PossibleValue>  
          </Parameter>
          <Parameter Name="CompareValue1" RefParameter="CompareValue_TA" Group="Compare Unit 1">
              <Condition Diagnostic="Compare Unit 1 config  must be enabled" Expression="Semaphore_TA_CompareUnit1$IpInstance &amp; !Semaphore_TA_HALFMODE$IpInstance"/>  
@@ -10070,8 +10070,8 @@
              <Condition Diagnostic="Compare Unit 2 config  must be enabled" Expression="Semaphore_TA_CompareUnit2$IpInstance"/>  
              <PossibleValue>HRTIM_AUTODELAYEDMODE_REGULAR</PossibleValue>
              <PossibleValue>HRTIM_AUTODELAYEDMODE_AUTODELAYED_NOTIMEOUT</PossibleValue>
-             <PossibleValue Semaphore="Semaphore_TA_AUTODELAYED2COMP1$IpInstance" Condition="!Semaphore_TA_CompareUnit1$IpInstance" Diagnostic="Compare Unit1 must be configured" Action="Disable">HRTIM_AUTODELAYEDMODE_AUTODELAYED_TIMEOUTCMP1</PossibleValue>
-             <PossibleValue Semaphore="Semaphore_TA_AUTODELAYED2COMP3$IpInstance" Condition="!Semaphore_TA_CompareUnit3$IpInstance" Diagnostic="Compare Unit3 must be configured" Action="Disable">HRTIM_AUTODELAYEDMODE_AUTODELAYED_TIMEOUTCMP3</PossibleValue>
+             <PossibleValue Semaphore="Semaphore_TA_AUTODELAYED2COMP1$IpInstance" Condition="Semaphore_TA_AUTODELAYED4COMP1$IpInstance" Diagnostic="this mode is already used by Compare Unit 4" Action="Disable">HRTIM_AUTODELAYEDMODE_AUTODELAYED_TIMEOUTCMP1</PossibleValue>
+             <PossibleValue Semaphore="Semaphore_TA_AUTODELAYED2COMP3$IpInstance" Condition="Semaphore_TA_AUTODELAYED4COMP3$IpInstance" Diagnostic="this mode is already used by Compare Unit 4" Action="Disable">HRTIM_AUTODELAYEDMODE_AUTODELAYED_TIMEOUTCMP3</PossibleValue>
 
            </Parameter>
          <Parameter Name="AutoDelayedTimeout2" RefParameter="AutoDelayedTimeout_ref" Group="Compare Unit 2">
@@ -10080,7 +10080,7 @@
          <ConfigForMode>WaveformCompareConfig3</ConfigForMode>
          <Parameter Name="CompareUnit3" RefParameter="CompareUnit3">
               <PossibleValue>__NULL</PossibleValue>  
-              <PossibleValue Semaphore="Semaphore_TA_CompareUnit3$IpInstance">HRTIM_COMPAREUNIT_3</PossibleValue>  
+              <PossibleValue Semaphore="Semaphore_TA_CompareUnit3$IpInstance" Condition="Semaphore_TA_AUTODELAYED2COMP3$IpInstance | Semaphore_TA_AUTODELAYED4COMP3$IpInstance " Action="Disable" Diagnostic="Compare value is no more configurable due to autodelayed mode set on Compare Unit 2/4 ">HRTIM_COMPAREUNIT_3</PossibleValue>  
          </Parameter>
          <Parameter Name="CompareValue3" RefParameter="CompareValue_TA" Group="Compare Unit 3">
              <Condition Diagnostic="Compare Unit 3 config  must be enabled" Expression="Semaphore_TA_CompareUnit3$IpInstance"/>  
@@ -10097,8 +10097,8 @@
              <Condition Diagnostic="Compare Unit 4 config  must be enabled" Expression="Semaphore_TA_CompareUnit4$IpInstance"/>  
              <PossibleValue>HRTIM_AUTODELAYEDMODE_REGULAR</PossibleValue>
              <PossibleValue>HRTIM_AUTODELAYEDMODE_AUTODELAYED_NOTIMEOUT</PossibleValue>
-             <PossibleValue Semaphore="Semaphore_TA_AUTODELAYED4COMP1$IpInstance" Condition="!Semaphore_TA_CompareUnit1$IpInstance" Diagnostic="Compare Unit1 must be configured" Action="Disable">HRTIM_AUTODELAYEDMODE_AUTODELAYED_TIMEOUTCMP1</PossibleValue>
-             <PossibleValue Semaphore="Semaphore_TA_AUTODELAYED4COMP3$IpInstance" Condition="!Semaphore_TA_CompareUnit3$IpInstance" Diagnostic="Compare Unit3 must be configured" Action="Disable">HRTIM_AUTODELAYEDMODE_AUTODELAYED_TIMEOUTCMP3</PossibleValue>
+             <PossibleValue Semaphore="Semaphore_TA_AUTODELAYED4COMP1$IpInstance" Condition="Semaphore_TA_AUTODELAYED2COMP1$IpInstance" Diagnostic="this mode is already used by Compare Unit 2" Action="Disable">HRTIM_AUTODELAYEDMODE_AUTODELAYED_TIMEOUTCMP1</PossibleValue>
+             <PossibleValue Semaphore="Semaphore_TA_AUTODELAYED4COMP3$IpInstance" Condition="Semaphore_TA_AUTODELAYED2COMP3$IpInstance" Diagnostic="this mode is already used by Compare Unit 2" Action="Disable">HRTIM_AUTODELAYEDMODE_AUTODELAYED_TIMEOUTCMP3</PossibleValue>
 
            </Parameter>
          <Parameter Name="AutoDelayedTimeout4" RefParameter="AutoDelayedTimeout_ref" Group="Compare Unit 4">
@@ -13943,6 +13943,38 @@
 <!-- BEGIN REFMODE DIRECT ACCESS TO MODE TWO OUTPUTS -->
 <RefMode BaseMode ="TIMB_Waveform_Common_Config" Name="Output_TB1TB2" TabName="Timer B">
          <Condition Diagnostic="" Expression="Semaphore_TB_Waveform$IpInstance"/>
+         <ConfigForMode>DeadTimeConfig</ConfigForMode>
+         <Parameter Name="Deadtimeconfig">
+             <PossibleValue Condition="Semaphore_TB_DeadTimeEnable$IpInstance" Diagnostic="dead time has been enabled" Action="Disable" >__NULL</PossibleValue>  
+             <PossibleValue Semaphore="Semaphore_HRTIMER_TB_DeadTime$IpInstance">HRTIM_TIMERINDEX_TIMER_B</PossibleValue>  
+         </Parameter>
+         <Parameter Name="PrescalerDead">
+              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TB_DeadTime$IpInstance"/> 
+          </Parameter>
+         <Parameter Name="RisingValue">
+              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TB_DeadTime$IpInstance"/> 
+          </Parameter>
+         <Parameter Name="RisingSign">
+              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TB_DeadTime$IpInstance"/> 
+          </Parameter>
+         <Parameter Name="RisingLock">
+              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TB_DeadTime$IpInstance"/> 
+          </Parameter>
+         <Parameter Name="RisingSignLock">
+              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TB_DeadTime$IpInstance"/> 
+          </Parameter>
+         <Parameter Name="FallingValue">
+              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TB_DeadTime$IpInstance"/> 
+          </Parameter>
+         <Parameter Name="FallingSign">
+              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TB_DeadTime$IpInstance"/> 
+          </Parameter>
+         <Parameter Name="FallingLock">
+              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TB_DeadTime$IpInstance"/> 
+          </Parameter>
+         <Parameter Name="FallingSignLock">
+              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TB_DeadTime$IpInstance"/> 
+          </Parameter>
          <ConfigForMode>WaveformOutputConfig1</ConfigForMode>
          <Parameter Name="Output1">
               <PossibleValue>HRTIM_OUTPUT_TB1</PossibleValue>  
@@ -14367,38 +14399,7 @@
          <Parameter Name="ChopperModeEnable2" RefParameter="ChopperModeEnable"  Group="Output 2 Configuration">
          </Parameter>
          <Parameter Name="BurstModeEntryDelayed2" RefParameter="BurstModeEntryDelayed"  Group="Output 2 Configuration"/>
-         <ConfigForMode>DeadTimeConfig</ConfigForMode>
-         <Parameter Name="Deadtimeconfig">
-             <PossibleValue Condition="Semaphore_TB_DeadTimeEnable$IpInstance" Diagnostic="dead time has been enabled" Action="Disable" >__NULL</PossibleValue>  
-             <PossibleValue Semaphore="Semaphore_HRTIMER_TB_DeadTime$IpInstance">HRTIM_TIMERINDEX_TIMER_B</PossibleValue>  
-         </Parameter>
-         <Parameter Name="PrescalerDead">
-              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TB_DeadTime$IpInstance"/> 
-          </Parameter>
-         <Parameter Name="RisingValue">
-              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TB_DeadTime$IpInstance"/> 
-          </Parameter>
-         <Parameter Name="RisingSign">
-              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TB_DeadTime$IpInstance"/> 
-          </Parameter>
-         <Parameter Name="RisingLock">
-              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TB_DeadTime$IpInstance"/> 
-          </Parameter>
-         <Parameter Name="RisingSignLock">
-              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TB_DeadTime$IpInstance"/> 
-          </Parameter>
-         <Parameter Name="FallingValue">
-              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TB_DeadTime$IpInstance"/> 
-          </Parameter>
-         <Parameter Name="FallingSign">
-              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TB_DeadTime$IpInstance"/> 
-          </Parameter>
-         <Parameter Name="FallingLock">
-              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TB_DeadTime$IpInstance"/> 
-          </Parameter>
-         <Parameter Name="FallingSignLock">
-              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TB_DeadTime$IpInstance"/> 
-          </Parameter>
+
 <ConfigForMode>ChopperModeConfig</ConfigForMode>
          <Parameter Name="ChopperModeconfig">
              <PossibleValue>__NULL</PossibleValue>  
@@ -14418,6 +14419,39 @@
 
 <RefMode BaseMode ="TIMA_Waveform_Common_Config" Name="Output_TA1TA2" TabName="Timer A">
          <Condition Diagnostic="" Expression="Semaphore_TA_Waveform$IpInstance"/>
+ <ConfigForMode>DeadTimeConfig</ConfigForMode>
+         <Parameter Name="Deadtimeconfig">
+             <PossibleValue  Condition="Semaphore_TA_DeadTimeEnable$IpInstance" >__NULL</PossibleValue>  
+             <PossibleValue Semaphore="Semaphore_HRTIMER_TA_DeadTime$IpInstance">HRTIM_TIMERINDEX_TIMER_A</PossibleValue>  
+         </Parameter>
+         <Parameter Name="PrescalerDead">
+              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TA_DeadTime$IpInstance"/> 
+          </Parameter>
+         <Parameter Name="RisingValue">
+              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TA_DeadTime$IpInstance"/> 
+          </Parameter>
+         <Parameter Name="RisingSign">
+              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TA_DeadTime$IpInstance"/> 
+          </Parameter>
+         <Parameter Name="RisingLock">
+              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TA_DeadTime$IpInstance"/> 
+          </Parameter>
+         <Parameter Name="RisingSignLock">
+              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TA_DeadTime$IpInstance"/> 
+          </Parameter>
+         <Parameter Name="FallingValue">
+              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TA_DeadTime$IpInstance"/> 
+          </Parameter>
+         <Parameter Name="FallingSign">
+              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TA_DeadTime$IpInstance"/> 
+          </Parameter>
+         <Parameter Name="FallingLock">
+              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TA_DeadTime$IpInstance"/> 
+          </Parameter>
+         <Parameter Name="FallingSignLock">
+              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TA_DeadTime$IpInstance"/> 
+          </Parameter>
+
          <ConfigForMode>WaveformOutputConfig1</ConfigForMode>
          <Parameter Name="Output1">
               <PossibleValue>HRTIM_OUTPUT_TA1</PossibleValue>  
@@ -14842,38 +14876,6 @@
          <Parameter Name="ChopperModeEnable2" RefParameter="ChopperModeEnable"  Group="Output 2 Configuration">
          </Parameter>
          <Parameter Name="BurstModeEntryDelayed2" RefParameter="BurstModeEntryDelayed"  Group="Output 2 Configuration"/>
- <ConfigForMode>DeadTimeConfig</ConfigForMode>
-         <Parameter Name="Deadtimeconfig">
-             <PossibleValue  Condition="Semaphore_TA_DeadTimeEnable$IpInstance" >__NULL</PossibleValue>  
-             <PossibleValue Semaphore="Semaphore_HRTIMER_TA_DeadTime$IpInstance">HRTIM_TIMERINDEX_TIMER_A</PossibleValue>  
-         </Parameter>
-         <Parameter Name="PrescalerDead">
-              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TA_DeadTime$IpInstance"/> 
-          </Parameter>
-         <Parameter Name="RisingValue">
-              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TA_DeadTime$IpInstance"/> 
-          </Parameter>
-         <Parameter Name="RisingSign">
-              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TA_DeadTime$IpInstance"/> 
-          </Parameter>
-         <Parameter Name="RisingLock">
-              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TA_DeadTime$IpInstance"/> 
-          </Parameter>
-         <Parameter Name="RisingSignLock">
-              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TA_DeadTime$IpInstance"/> 
-          </Parameter>
-         <Parameter Name="FallingValue">
-              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TA_DeadTime$IpInstance"/> 
-          </Parameter>
-         <Parameter Name="FallingSign">
-              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TA_DeadTime$IpInstance"/> 
-          </Parameter>
-         <Parameter Name="FallingLock">
-              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TA_DeadTime$IpInstance"/> 
-          </Parameter>
-         <Parameter Name="FallingSignLock">
-              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TA_DeadTime$IpInstance"/> 
-          </Parameter>
 
         <ConfigForMode>ChopperModeConfig</ConfigForMode>
          <Parameter Name="ChopperModeconfig">
@@ -14894,6 +14896,39 @@
 
 <RefMode BaseMode ="TIMC_Waveform_Common_Config" Name="Output_TC1TC2" TabName="Timer C">
          <Condition Diagnostic="" Expression="Semaphore_TC_Waveform$IpInstance"/>
+         <ConfigForMode>DeadTimeConfig</ConfigForMode>
+         <Parameter Name="Deadtimeconfig">
+             <PossibleValue  Condition="Semaphore_TC_DeadTimeEnable$IpInstance" >__NULL</PossibleValue>  
+             <PossibleValue Semaphore="Semaphore_HRTIMER_TC_DeadTime$IpInstance">HRTIM_TIMERINDEX_TIMER_C</PossibleValue>  
+         </Parameter>
+         <Parameter Name="PrescalerDead">
+              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TC_DeadTime$IpInstance"/> 
+          </Parameter>
+         <Parameter Name="RisingValue">
+              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TC_DeadTime$IpInstance"/> 
+          </Parameter>
+         <Parameter Name="RisingSign">
+              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TC_DeadTime$IpInstance"/> 
+          </Parameter>
+         <Parameter Name="RisingLock">
+              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TC_DeadTime$IpInstance"/> 
+          </Parameter>
+         <Parameter Name="RisingSignLock">
+              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TC_DeadTime$IpInstance"/> 
+          </Parameter>
+         <Parameter Name="FallingValue">
+              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TC_DeadTime$IpInstance"/> 
+          </Parameter>
+         <Parameter Name="FallingSign">
+              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TC_DeadTime$IpInstance"/> 
+          </Parameter>
+         <Parameter Name="FallingLock">
+              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TC_DeadTime$IpInstance"/> 
+          </Parameter>
+         <Parameter Name="FallingSignLock">
+              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TC_DeadTime$IpInstance"/> 
+          </Parameter>
+
          <ConfigForMode>WaveformOutputConfig1</ConfigForMode>
          <Parameter Name="Output1">
               <PossibleValue>HRTIM_OUTPUT_TC1</PossibleValue>  
@@ -15318,38 +15353,6 @@
          <Parameter Name="ChopperModeEnable2" RefParameter="ChopperModeEnable"  Group="Output 2 Configuration">
          </Parameter>
          <Parameter Name="BurstModeEntryDelayed2" RefParameter="BurstModeEntryDelayed"  Group="Output 2 Configuration"/>
-         <ConfigForMode>DeadTimeConfig</ConfigForMode>
-         <Parameter Name="Deadtimeconfig">
-             <PossibleValue  Condition="Semaphore_TC_DeadTimeEnable$IpInstance" >__NULL</PossibleValue>  
-             <PossibleValue Semaphore="Semaphore_HRTIMER_TC_DeadTime$IpInstance">HRTIM_TIMERINDEX_TIMER_C</PossibleValue>  
-         </Parameter>
-         <Parameter Name="PrescalerDead">
-              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TC_DeadTime$IpInstance"/> 
-          </Parameter>
-         <Parameter Name="RisingValue">
-              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TC_DeadTime$IpInstance"/> 
-          </Parameter>
-         <Parameter Name="RisingSign">
-              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TC_DeadTime$IpInstance"/> 
-          </Parameter>
-         <Parameter Name="RisingLock">
-              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TC_DeadTime$IpInstance"/> 
-          </Parameter>
-         <Parameter Name="RisingSignLock">
-              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TC_DeadTime$IpInstance"/> 
-          </Parameter>
-         <Parameter Name="FallingValue">
-              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TC_DeadTime$IpInstance"/> 
-          </Parameter>
-         <Parameter Name="FallingSign">
-              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TC_DeadTime$IpInstance"/> 
-          </Parameter>
-         <Parameter Name="FallingLock">
-              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TC_DeadTime$IpInstance"/> 
-          </Parameter>
-         <Parameter Name="FallingSignLock">
-              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TC_DeadTime$IpInstance"/> 
-          </Parameter>
 
 <ConfigForMode>ChopperModeConfig</ConfigForMode>
          <Parameter Name="ChopperModeconfig">
@@ -15370,6 +15373,39 @@
 
 <RefMode BaseMode ="TIMD_Waveform_Common_Config" Name="Output_TD1TD2" TabName="Timer D">
          <Condition Diagnostic="" Expression="Semaphore_TD_Waveform$IpInstance"/>
+         <ConfigForMode>DeadTimeConfig</ConfigForMode>
+         <Parameter Name="Deadtimeconfig">
+             <PossibleValue  Condition="Semaphore_TD_DeadTimeEnable$IpInstance" >__NULL</PossibleValue>  
+             <PossibleValue Semaphore="Semaphore_HRTIMER_TD_DeadTime$IpInstance">HRTIM_TIMERINDEX_TIMER_D</PossibleValue>  
+         </Parameter>
+         <Parameter Name="PrescalerDead">
+              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TD_DeadTime$IpInstance"/> 
+          </Parameter>
+         <Parameter Name="RisingValue">
+              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TD_DeadTime$IpInstance"/> 
+          </Parameter>
+         <Parameter Name="RisingSign">
+              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TD_DeadTime$IpInstance"/> 
+          </Parameter>
+         <Parameter Name="RisingLock">
+              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TD_DeadTime$IpInstance"/> 
+          </Parameter>
+         <Parameter Name="RisingSignLock">
+              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TD_DeadTime$IpInstance"/> 
+          </Parameter>
+         <Parameter Name="FallingValue">
+              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TD_DeadTime$IpInstance"/> 
+          </Parameter>
+         <Parameter Name="FallingSign">
+              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TD_DeadTime$IpInstance"/> 
+          </Parameter>
+         <Parameter Name="FallingLock">
+              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TD_DeadTime$IpInstance"/> 
+          </Parameter>
+         <Parameter Name="FallingSignLock">
+              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TD_DeadTime$IpInstance"/> 
+          </Parameter>
+
          <ConfigForMode>WaveformOutputConfig1</ConfigForMode>
          <Parameter Name="Output1">
               <PossibleValue>HRTIM_OUTPUT_TD1</PossibleValue>  
@@ -15794,38 +15830,6 @@
          <Parameter Name="ChopperModeEnable2" RefParameter="ChopperModeEnable"  Group="Output 2 Configuration">
          </Parameter>
          <Parameter Name="BurstModeEntryDelayed2" RefParameter="BurstModeEntryDelayed"  Group="Output 2 Configuration"/>
-         <ConfigForMode>DeadTimeConfig</ConfigForMode>
-         <Parameter Name="Deadtimeconfig">
-             <PossibleValue  Condition="Semaphore_TD_DeadTimeEnable$IpInstance" >__NULL</PossibleValue>  
-             <PossibleValue Semaphore="Semaphore_HRTIMER_TD_DeadTime$IpInstance">HRTIM_TIMERINDEX_TIMER_D</PossibleValue>  
-         </Parameter>
-         <Parameter Name="PrescalerDead">
-              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TD_DeadTime$IpInstance"/> 
-          </Parameter>
-         <Parameter Name="RisingValue">
-              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TD_DeadTime$IpInstance"/> 
-          </Parameter>
-         <Parameter Name="RisingSign">
-              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TD_DeadTime$IpInstance"/> 
-          </Parameter>
-         <Parameter Name="RisingLock">
-              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TD_DeadTime$IpInstance"/> 
-          </Parameter>
-         <Parameter Name="RisingSignLock">
-              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TD_DeadTime$IpInstance"/> 
-          </Parameter>
-         <Parameter Name="FallingValue">
-              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TD_DeadTime$IpInstance"/> 
-          </Parameter>
-         <Parameter Name="FallingSign">
-              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TD_DeadTime$IpInstance"/> 
-          </Parameter>
-         <Parameter Name="FallingLock">
-              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TD_DeadTime$IpInstance"/> 
-          </Parameter>
-         <Parameter Name="FallingSignLock">
-              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TD_DeadTime$IpInstance"/> 
-          </Parameter>
 
  <ConfigForMode>ChopperModeConfig</ConfigForMode>
          <Parameter Name="ChopperModeconfig">
@@ -15845,6 +15849,38 @@
 
 <RefMode BaseMode ="TIME_Waveform_Common_Config" Name="Output_TE1TE2" TabName="Timer E">
          <Condition Diagnostic="" Expression="Semaphore_TE_Waveform$IpInstance"/>
+         <ConfigForMode>DeadTimeConfig</ConfigForMode>
+         <Parameter Name="Deadtimeconfig">
+             <PossibleValue  Condition="Semaphore_TE_DeadTimeEnable$IpInstance" >__NULL</PossibleValue>  
+             <PossibleValue Semaphore="Semaphore_HRTIMER_TE_DeadTime$IpInstance">HRTIM_TIMERINDEX_TIMER_E</PossibleValue>  
+         </Parameter>
+         <Parameter Name="PrescalerDead">
+              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TE_DeadTime$IpInstance"/> 
+          </Parameter>
+         <Parameter Name="RisingValue">
+              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TE_DeadTime$IpInstance"/> 
+          </Parameter>
+         <Parameter Name="RisingSign">
+              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TE_DeadTime$IpInstance"/> 
+          </Parameter>
+         <Parameter Name="RisingLock">
+              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TE_DeadTime$IpInstance"/> 
+          </Parameter>
+         <Parameter Name="RisingSignLock">
+              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TE_DeadTime$IpInstance"/> 
+          </Parameter>
+         <Parameter Name="FallingValue">
+              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TE_DeadTime$IpInstance"/> 
+          </Parameter>
+         <Parameter Name="FallingSign">
+              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TE_DeadTime$IpInstance"/> 
+          </Parameter>
+         <Parameter Name="FallingLock">
+              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TE_DeadTime$IpInstance"/> 
+          </Parameter>
+         <Parameter Name="FallingSignLock">
+              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TE_DeadTime$IpInstance"/> 
+          </Parameter>
          <ConfigForMode>WaveformOutputConfig1</ConfigForMode>
          <Parameter Name="Output1">
               <PossibleValue>HRTIM_OUTPUT_TE1</PossibleValue>  
@@ -16269,38 +16305,7 @@
          <Parameter Name="ChopperModeEnable2" RefParameter="ChopperModeEnable"  Group="Output 2 Configuration">
          </Parameter>
          <Parameter Name="BurstModeEntryDelayed2" RefParameter="BurstModeEntryDelayed"  Group="Output 2 Configuration"/>
-         <ConfigForMode>DeadTimeConfig</ConfigForMode>
-         <Parameter Name="Deadtimeconfig">
-             <PossibleValue  Condition="Semaphore_TE_DeadTimeEnable$IpInstance" >__NULL</PossibleValue>  
-             <PossibleValue Semaphore="Semaphore_HRTIMER_TE_DeadTime$IpInstance">HRTIM_TIMERINDEX_TIMER_E</PossibleValue>  
-         </Parameter>
-         <Parameter Name="PrescalerDead">
-              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TE_DeadTime$IpInstance"/> 
-          </Parameter>
-         <Parameter Name="RisingValue">
-              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TE_DeadTime$IpInstance"/> 
-          </Parameter>
-         <Parameter Name="RisingSign">
-              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TE_DeadTime$IpInstance"/> 
-          </Parameter>
-         <Parameter Name="RisingLock">
-              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TE_DeadTime$IpInstance"/> 
-          </Parameter>
-         <Parameter Name="RisingSignLock">
-              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TE_DeadTime$IpInstance"/> 
-          </Parameter>
-         <Parameter Name="FallingValue">
-              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TE_DeadTime$IpInstance"/> 
-          </Parameter>
-         <Parameter Name="FallingSign">
-              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TE_DeadTime$IpInstance"/> 
-          </Parameter>
-         <Parameter Name="FallingLock">
-              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TE_DeadTime$IpInstance"/> 
-          </Parameter>
-         <Parameter Name="FallingSignLock">
-              <Condition Diagnostic="Dead Time configuration  must be enabled" Expression="Semaphore_HRTIMER_TE_DeadTime$IpInstance"/> 
-          </Parameter>
+
  <ConfigForMode>ChopperModeConfig</ConfigForMode>
          <Parameter Name="ChopperModeconfig">
              <PossibleValue>__NULL</PossibleValue>  

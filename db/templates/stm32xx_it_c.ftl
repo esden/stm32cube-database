@@ -194,7 +194,7 @@ void ${vector.irqHandler}(void)
 [#if vector.halHandler == "NONE"]
 [#elseif vector.ipName=="" || vector.irregular=="true"]
   #t${vector.halHandler}
-[#elseif vector.name=="FMC_IRQn" || vector.name=="FSMC_IRQn" || vector.name=="HASH_RNG_IRQn" || vector.name=="SDIO_IRQn" || vector.name=="TIM6_DAC_IRQn"]
+[#elseif vector.name=="FMC_IRQn" || vector.name=="FSMC_IRQn" || vector.name=="HASH_RNG_IRQn" || vector.name=="TIM6_DAC_IRQn"]
   #t${vector.halHandler}
 [#elseif vector.ipHandle != "" && vector.halUsed]
   #t${vector.halHandler}(&${vector.ipHandle});

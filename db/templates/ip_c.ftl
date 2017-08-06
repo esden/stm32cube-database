@@ -1040,16 +1040,20 @@ static uint32_t ${entry.value}=0;
 [#-- --]
 [#if mspIsEmpty=="no"]
     [#if  words[0]?contains("DFSDM")]
-[#assign word0 = words[0]]  
+        [#assign word0 = words[0]]  
         [#if DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || FamilyName == "STM32L4"]
             #tif(${words[0]}_Init == 0)             
         [#else]
             #tif([#if word0.contains("DFSDM1")&& mode=="DFSDM_Channel"](IS_DFSDM1_CHANNEL_INSTANCE(${mode?lower_case}Handle->Instance))&&[/#if][#if word0.contains("DFSDM2")&& mode=="DFSDM_Channel"]!(IS_DFSDM1_CHANNEL_INSTANCE(${mode?lower_case}Handle->Instance))&&[/#if][#if word0.contains("DFSDM1")&& mode=="DFSDM_Filter"](IS_DFSDM1_FILTER_INSTANCE(${mode?lower_case}Handle->Instance))&&[/#if][#if word0.contains("DFSDM2")&& mode=="DFSDM_Filter"]!(IS_DFSDM1_FILTER_INSTANCE(${mode?lower_case}Handle->Instance))&&[/#if](${words[0]}_Init == 0)) 
         [/#if]
+        #t{
    [#else]
+        [#if ipvar.instanceNbre > 1] [#-- IF number of IP instances greater than 0--]
         #tif(${mode?lower_case}Handle->Instance==${words[0]?replace("I2S","SPI")})
+        #t{
+        [/#if]
     [/#if]
-#t{
+
 [#if words?size > 1] [#-- Check if there is more than one ip instance--]        
 #t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspInit 0 */
 
@@ -1064,7 +1068,8 @@ static uint32_t ${entry.value}=0;
 [#if  words[0]?contains("DFSDM")]
 #t${words[0]}_Init++;
 [/#if]
-    #t} 
+#t} 
+
     [#assign i = 0]
     [#list words as inst]
     [#if i>0] 
@@ -1106,7 +1111,9 @@ static uint32_t ${entry.value}=0;
 #t${words[0]}_Init++;
 [/#if]
     [/#if]
+[#if ipvar.instanceNbre > 1 || words[0]?contains("DFSDM")] [#-- IF number of IP instances greater than 0--]
 #t}
+[/#if]
 [/#if]
 [/#if] [#-- inist not empty --]
 [#list words as inst] [#-- DMA code for DFSDM --]
@@ -1197,10 +1204,14 @@ uint32_t DFSDM1_Init = 0;
     [#else]
         #tif([#if word0.contains("DFSDM1")&& mode=="DFSDM_Channel"](IS_DFSDM1_CHANNEL_INSTANCE(${mode?lower_case}Handle->Instance))&&[/#if][#if word0.contains("DFSDM2")&& mode=="DFSDM_Channel"]!(IS_DFSDM1_CHANNEL_INSTANCE(${mode?lower_case}Handle->Instance))&&[/#if][#if word0.contains("DFSDM1")&& mode=="DFSDM_Filter"](IS_DFSDM1_FILTER_INSTANCE(${mode?lower_case}Handle->Instance))&&[/#if][#if word0.contains("DFSDM2")&& mode=="DFSDM_Filter"]!(IS_DFSDM1_FILTER_INSTANCE(${mode?lower_case}Handle->Instance))&&[/#if](${words[0]}_Init == 0))
     [/#if]
+        #t{
 [#else]
- #tif(${mode?lower_case}Handle->Instance==${words[0]?replace("I2S","SPI")})
+    [#if ipvar.instanceNbre >  1 ] [#-- IF number of IP instances greater than 0--]
+        #tif(${mode?lower_case}Handle->Instance==${words[0]?replace("I2S","SPI")})
+        #t{
+    [/#if]
 [/#if]
-#t{
+
 [#if words?size > 1] [#-- Check if there is more than one ip instance--]    
 #t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspPostInit 0 */
 
@@ -1228,16 +1239,18 @@ uint32_t DFSDM1_Init = 0;
     [/#list]
 [#else]
     [#if words[0]??]
-#t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspPostInit 0 */
+    #t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspPostInit 0 */
 
-#n#t/* USER CODE END ${words[0]?replace("I2S","SPI")}_MspPostInit 0 */
-    #t[@generateConfigCode ipName=words[0] type="Init" serviceName="gpioOut" instHandler=mode?lower_case+"Handle" tabN=2/]
-    
-#t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspPostInit 1 */
+    #n#t/* USER CODE END ${words[0]?replace("I2S","SPI")}_MspPostInit 0 */
+        #t[@generateConfigCode ipName=words[0] type="Init" serviceName="gpioOut" instHandler=mode?lower_case+"Handle" tabN=2/]
 
-#n#t/* USER CODE END ${words[0]?replace("I2S","SPI")}_MspPostInit 1 */
-[/#if]
-#t}
+    #t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspPostInit 1 */
+
+    #n#t/* USER CODE END ${words[0]?replace("I2S","SPI")}_MspPostInit 1 */
+    [/#if]
+    [#if ipvar.instanceNbre >  1 || words[0]?contains("DFSDM")] [#-- IF number of IP instances greater than 0--]    
+        #t}
+    [/#if]
 [/#if]
 
 #n}#n
@@ -1280,14 +1293,14 @@ uint32_t DFSDM1_Init = 0;
     [#else]
         
     [/#if]
+    #t#t{
 [#else]
-#tif(${mode?lower_case}Handle->Instance==${words[0]?replace("I2S","SPI")})
+        [#if ipvar.instanceNbre >  1 ] [#-- IF number of IP instances greater than 0--]
+            #tif(${mode?lower_case}Handle->Instance==${words[0]?replace("I2S","SPI")})
+            #t{
+        [/#if]
 [/#if]
-[#if words[0]?contains("DFSDM")]
-#t#t{
-[#else]
-#t{
-[/#if]
+
 [#if words?size > 1] [#-- Check if there is more than one ip instance--]
  [#assign deInitService = getDeInitServiceMode(words[0])]    
 #t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspDeInit 0 */
@@ -1349,7 +1362,9 @@ uint32_t DFSDM1_Init = 0;
 [#if words[0]?contains("DFSDM")]
 [@generateServiceCodeDFSDM ipName=words[0] serviceType="DeInit" modeName=mode instHandler=mode?lower_case+"Handle" tabN=2/]
 [/#if]
+[#if ipvar.instanceNbre >  1 || words[0]?contains("DFSDM")] [#-- IF number of IP instances greater than 0--]
 #t}
+[/#if]
 #t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspDeInit 1 */
 
 #n#t/* USER CODE END ${words[0]?replace("I2S","SPI")}_MspDeInit 1 */

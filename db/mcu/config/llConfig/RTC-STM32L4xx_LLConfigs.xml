@@ -2,11 +2,27 @@
 <IP xmlns="http://mcd.rou.st.com/modules.php?name=mcu" DBVersion="V4.0" Name="RTC" Version="STM32Cube_FW_L4_V1.7.0RC2" IncludeFile="stm32l4xx_ll_rtc.h" 
                 xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../../doc/V4/Development/Specifications/db/IP_Configs.xsd">
     
+    <RefConfig Name="RTC_Init_Only" Comment="Initialize RTC and set the Time and Date">
+		<CallLibMethod Name="LL_RTC_Init">
+			<MethodArg Name="RTCx" ParameterName="Instance"/>
+			<MethodArg Name="HourFormat" ParameterName="HourFormat"/>
+			<MethodArg Name="AsynchPrescaler" ParameterName="AsynchPrediv"/>
+			<MethodArg Name="SynchPrescaler" ParameterName="SynchPrediv"/>
+		</CallLibMethod>
+		
+	</RefConfig>
 	<RefConfig Name="RTC_Init" Comment="Initialize RTC and set the Time and Date">
 		<CallLibMethod Name="LL_RTC_Init">
 			<MethodArg Name="RTCx" ParameterName="Instance"/>
 			<MethodArg Name="HourFormat" ParameterName="HourFormat"/>
+			<MethodArg Name="AsynchPrescaler" ParameterName="AsynchPrediv"/>
+			<MethodArg Name="SynchPrescaler" ParameterName="SynchPrediv"/>
 		</CallLibMethod>
+		
+		<CallLibMethod Name="LL_RTC_BAK_GetRegister" Type="HardCode" >
+            <HardCode Text="#tif(LL_RTC_BAK_GetRegister(RTC, LL_RTC_BKP_DR0) != 0x32F2){#n#t "/>
+        </CallLibMethod>
+		
 		<CallLibMethod Name="LL_RTC_TIME_Init">
 			<MethodArg Name="RTCx" ParameterName="Instance"/>
 			<MethodArg Name="RTC_Format" ParameterName="Format" />
@@ -22,6 +38,10 @@
 			<MethodArg Name="Date" ParameterName="Date" />
 			<MethodArg Name="Month" ParameterName="Month" />
 			<MethodArg Name="Year" ParameterName="Year" />
+		</CallLibMethod>
+		
+		<CallLibMethod Name="LL_RTC_BAK_SetRegister" Type="HardCode" >                   
+			<HardCode Text="#t#tLL_RTC_BAK_SetRegister(RTC,LL_RTC_BKP_DR0,0x32F2);#n#t}"/>
 		</CallLibMethod>
 	</RefConfig>
 	<!-- Alarm A -->
@@ -415,11 +435,11 @@
     <LibMethod Comment="" Name="LL_RTC_DisableRefClock">
         <Argument AddressOf="false" GenericType="baseaddress" Name="RTCx" TypeName="RTC_TypeDef"/>
     </LibMethod>
-    <LibMethod Comment="" Name="LL_RTC_SetAsynchPrescaler">
+    <LibMethod Comment="" Name="LL_RTC_SetAsynchPrescaler" Optimizable="true">
         <Argument AddressOf="false" GenericType="baseaddress" Name="RTCx" TypeName="RTC_TypeDef"/>
         <Argument AddressOf="false" GenericType="simple" Name="AsynchPrescaler" OptimizationCondition="equal"/>
     </LibMethod>
-    <LibMethod Comment="" Name="LL_RTC_SetSynchPrescaler">
+    <LibMethod Comment="" Name="LL_RTC_SetSynchPrescaler" Optimizable="true">
         <Argument AddressOf="false" GenericType="baseaddress" Name="RTCx" TypeName="RTC_TypeDef"/>
         <Argument AddressOf="false" GenericType="simple" Name="SynchPrescaler" OptimizationCondition="equal"/>
     </LibMethod>
@@ -536,7 +556,7 @@
     <LibMethod Comment="" Name="LL_RTC_DeInit">
         <Argument AddressOf="false" GenericType="baseaddress" Name="RTCx" TypeName="RTC_TypeDef"/>
     </LibMethod>
-    <LibMethod Comment="" Name="LL_RTC_Init">
+    <LibMethod Comment="" Name="LL_RTC_Init" Optimizable="true">
         <Argument AddressOf="false" GenericType="baseaddress" Name="RTCx" TypeName="RTC_TypeDef"/>
         <Argument AddressOf="true" GenericType="struct" Name="RTC_InitStruct" TypeName="LL_RTC_InitTypeDef">
             <Argument AddressOf="false" GenericType="simple" Name="HourFormat" OptimizationCondition="equal"/>
@@ -544,14 +564,14 @@
             <Argument AddressOf="false" GenericType="simple" Name="SynchPrescaler" OptimizationCondition="equal"/>
         </Argument>
     </LibMethod>
-    <LibMethod Comment="" Name="LL_RTC_StructInit">
+    <LibMethod Comment="" Name="LL_RTC_StructInit" Optimizable="true">
         <Argument AddressOf="true" GenericType="struct" Name="RTC_InitStruct" TypeName="LL_RTC_InitTypeDef">
             <Argument AddressOf="false" GenericType="simple" Name="HourFormat" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="AsynchPrescaler" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="SynchPrescaler" OptimizationCondition="equal"/>
         </Argument>
     </LibMethod>
-    <LibMethod Comment="" Name="LL_RTC_TIME_Init">
+    <LibMethod Comment="" Name="LL_RTC_TIME_Init" Optimizable="true">
         <Argument AddressOf="false" GenericType="baseaddress" Name="RTCx" TypeName="RTC_TypeDef"/>
         <Argument AddressOf="false" GenericType="simple" Name="RTC_Format" OptimizationCondition="equal"/>
         <Argument AddressOf="true" GenericType="struct" Name="RTC_TimeStruct" TypeName="LL_RTC_TimeTypeDef">
@@ -561,7 +581,7 @@
             <Argument AddressOf="false" GenericType="simple" Name="Seconds" OptimizationCondition="equal"/>
         </Argument>
     </LibMethod>
-    <LibMethod Comment="" Name="LL_RTC_TIME_StructInit">
+    <LibMethod Comment="" Name="LL_RTC_TIME_StructInit" Optimizable="true">
         <Argument AddressOf="true" GenericType="struct" Name="RTC_TimeStruct" TypeName="LL_RTC_TimeTypeDef">
             <Argument AddressOf="false" GenericType="simple" Name="TimeFormat" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="Hours" OptimizationCondition="equal"/>
@@ -569,7 +589,7 @@
             <Argument AddressOf="false" GenericType="simple" Name="Seconds" OptimizationCondition="equal"/>
         </Argument>
     </LibMethod>
-    <LibMethod Comment="" Name="LL_RTC_DATE_Init">
+    <LibMethod Comment="" Name="LL_RTC_DATE_Init" Optimizable="true">
         <Argument AddressOf="false" GenericType="baseaddress" Name="RTCx" TypeName="RTC_TypeDef"/>
         <Argument AddressOf="false" GenericType="simple" Name="RTC_Format" OptimizationCondition="equal"/>
         <Argument AddressOf="true" GenericType="struct" Name="RTC_DateStruct" TypeName="LL_RTC_DateTypeDef">
@@ -579,7 +599,7 @@
             <Argument AddressOf="false" GenericType="simple" Name="Year" OptimizationCondition="equal"/>
         </Argument>
     </LibMethod>
-    <LibMethod Comment="" Name="LL_RTC_DATE_StructInit">
+    <LibMethod Comment="" Name="LL_RTC_DATE_StructInit" Optimizable="true">
         <Argument AddressOf="true" GenericType="struct" Name="RTC_DateStruct" TypeName="LL_RTC_DateTypeDef">
             <Argument AddressOf="false" GenericType="simple" Name="WeekDay" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="Month" OptimizationCondition="equal"/>
@@ -587,7 +607,7 @@
             <Argument AddressOf="false" GenericType="simple" Name="Year" OptimizationCondition="equal"/>
         </Argument>
     </LibMethod>
-    <LibMethod Comment="" Name="LL_RTC_ALMA_Init">
+    <LibMethod Comment="" Name="LL_RTC_ALMA_Init" Optimizable="true">
         <Argument AddressOf="false" GenericType="baseaddress" Name="RTCx" TypeName="RTC_TypeDef"/>
         <Argument AddressOf="false" GenericType="simple" Name="RTC_Format" OptimizationCondition="equal"/>
         <Argument AddressOf="true" GenericType="struct" Name="RTC_AlarmStruct" TypeName="LL_RTC_AlarmTypeDef">
@@ -597,7 +617,7 @@
             <Argument AddressOf="false" GenericType="simple" Name="AlarmDateWeekDay" OptimizationCondition="equal"/>
         </Argument>
     </LibMethod>
-    <LibMethod Comment="" Name="LL_RTC_ALMB_Init">
+    <LibMethod Comment="" Name="LL_RTC_ALMB_Init" Optimizable="true">
         <Argument AddressOf="false" GenericType="baseaddress" Name="RTCx" TypeName="RTC_TypeDef"/>
         <Argument AddressOf="false" GenericType="simple" Name="RTC_Format" OptimizationCondition="equal"/>
         <Argument AddressOf="true" GenericType="struct" Name="RTC_AlarmStruct" TypeName="LL_RTC_AlarmTypeDef">
@@ -607,7 +627,7 @@
             <Argument AddressOf="false" GenericType="simple" Name="AlarmDateWeekDay" OptimizationCondition="equal"/>
         </Argument>
     </LibMethod>
-    <LibMethod Comment="" Name="LL_RTC_ALMA_StructInit">
+    <LibMethod Comment="" Name="LL_RTC_ALMA_StructInit" Optimizable="true">
         <Argument AddressOf="true" GenericType="struct" Name="RTC_AlarmStruct" TypeName="LL_RTC_AlarmTypeDef">
             <Argument AddressOf="false" GenericType="simple" Name="AlarmTime" OptimizationCondition="equal" TypeName="LL_RTC_TimeTypeDef"/>
             <Argument AddressOf="false" GenericType="simple" Name="AlarmMask" OptimizationCondition="equal"/>
@@ -615,7 +635,7 @@
             <Argument AddressOf="false" GenericType="simple" Name="AlarmDateWeekDay" OptimizationCondition="equal"/>
         </Argument>
     </LibMethod>
-    <LibMethod Comment="" Name="LL_RTC_ALMB_StructInit">
+    <LibMethod Comment="" Name="LL_RTC_ALMB_StructInit" Optimizable="true">
         <Argument AddressOf="true" GenericType="struct" Name="RTC_AlarmStruct" TypeName="LL_RTC_AlarmTypeDef">
             <Argument AddressOf="false" GenericType="simple" Name="AlarmTime" OptimizationCondition="equal" TypeName="LL_RTC_TimeTypeDef"/>
             <Argument AddressOf="false" GenericType="simple" Name="AlarmMask" OptimizationCondition="equal"/>
@@ -807,9 +827,17 @@
     <LibMethod Comment="" Name="LL_RTC_TS_GetDate">
         <Argument AddressOf="false" GenericType="baseaddress" Name="RTCx" TypeName="RTC_TypeDef"/>
     </LibMethod>
-    <LibMethod Comment="" Name="LL_RTC_TS_GetSubSecond">
+    
+   <LibMethod Comment="" Name="LL_RTC_BAK_GetRegister">
         <Argument AddressOf="false" GenericType="baseaddress" Name="RTCx" TypeName="RTC_TypeDef"/>
+        <Argument AddressOf="false" GenericType="Simple" Name="BackupRegister"/>
     </LibMethod>
+     <LibMethod Comment="" Name="LL_RTC_BAK_SetRegister">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="RTCx" TypeName="RTC_TypeDef"/>
+        <Argument AddressOf="false" GenericType="Simple" Name="BackupRegister"/>
+        <Argument AddressOf="false" GenericType="Simple" Name="Data"/>
+    </LibMethod>
+
     <RefComponent Cclass="LL" Cgroup="RTC" Cversion="1.7.0RC2">
         <File Category="header" Name="Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_rtc.h"/>
         <File Category="source" Name="Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_ll_rtc.c"/>

@@ -686,7 +686,7 @@ uint32_t USBD_LL_GetRxDataSize  (USBD_HandleTypeDef *pdev, uint8_t  ep_addr)
 {
   return HAL_PCD_EP_GetRxCount((PCD_HandleTypeDef*) pdev->pData, ep_addr);
 }
-[#if family?contains("STM32F7") || family?contains("STM32F4")  || family?contains("STM32L4xx") ]	
+[#if family?contains("STM32F7") || family?contains("STM32F4")  || family?contains("STM32L4xx") || family?contains("STM32H7xx") ]	
 #if (USBD_LPM_ENABLED == 1)
 /**
   * @brief  HAL_PCDEx_LPM_Callback : Send LPM message to user layer
