@@ -33,7 +33,9 @@
   */
 [#compress]
 /* Includes ------------------------------------------------------------------*/
+[#if isHalSupported?? && isHALUsed??]
 #include "${FamilyName?lower_case}xx_hal.h"
+[/#if]
 #include "${FamilyName?lower_case}xx.h"
 #include "${FamilyName?lower_case}xx_it.h"
 [#if FREERTOS??] [#-- If FreeRtos is used --]
@@ -193,9 +195,9 @@ void ${vector.irqHandler}(void)
   #t${vector.halHandler}
 [#elseif vector.name=="FMC_IRQn" || vector.name=="FSMC_IRQn" || vector.name=="HASH_RNG_IRQn" || vector.name=="SDIO_IRQn" || vector.name=="TIM6_DAC_IRQn"]
   #t${vector.halHandler}
-[#elseif vector.ipHandle != ""]
+[#elseif vector.ipHandle != "" && vector.halUsed]
   #t${vector.halHandler}(&${vector.ipHandle});
-[#else]
+[#elseif vector.halUsed]
   #t${vector.halHandler}();
 [/#if]
 

@@ -1,8 +1,16 @@
 [#ftl]
+[#assign LL_Driver = false]
+[#if driver??]
+  [#list driver as driverType]
+    [#if driverType=="LL"]
+      [#assign LL_Driver = true]
+    [/#if]
+  [/#list]
+[/#if]
 
 /** 
   * Enable DMA controller clock
-[#if variables?size > 0]
+[#if variables?? && variables?size > 0]
   * Configure DMA for memory to memory transfers
 [#list variables as variable]
   *   ${variable.name}
@@ -16,7 +24,11 @@ static void MX_DMA_Init(void)
   /* DMA controller clock enable */
   [/#if]
   [#list clocks as clockMacro]
+    [#if clockMacro?contains("(")]
+  ${clockMacro};
+    [#else]
   ${clockMacro}();
+    [/#if]
   [/#list]
 [/#if]
 [#list datas as configModel][#--go through all DMA requests--]
@@ -160,8 +172,13 @@ static void MX_DMA_Init(void)
       [#list InitNvic as initVector]
         [#if initVector.codeInMspInit]
           #t/* ${initVector.vector} interrupt configuration */
+          [#if initVector.usedDriver == "LL"]
+          #tNVIC_SetPriority(${initVector.vector}, NVIC_EncodePriority(NVIC_GetPriorityGrouping(),${initVector.preemptionPriority}, ${initVector.subPriority}));
+          #tNVIC_EnableIRQ(${initVector.vector});
+          [#else]
           #tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
           #tHAL_NVIC_EnableIRQ(${initVector.vector});
+          [/#if]
         [/#if]
       [/#list]
     [/#if]

@@ -5,29 +5,7 @@
   * Description        : This file provides code for the configuration
   *                      of the ${name} MiddleWare.
   ******************************************************************************
-  * COPYRIGHT(c) ${year} STMicroelectronics
-  *
-  * Redistribution and use in source and binary forms, with or without modification,
-  * are permitted provided that the following conditions are met:
-  *   1. Redistributions of source code must retain the above copyright notice,
-  *      this list of conditions and the following disclaimer.
-  *   2. Redistributions in binary form must reproduce the above copyright notice,
-  *      this list of conditions and the following disclaimer in the documentation
-  *      and/or other materials provided with the distribution.
-  *   3. Neither the name of STMicroelectronics nor the names of its contributors
-  *      may be used to endorse or promote products derived from this software
-  *      without specific prior written permission.
-  *
-  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-  * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-  * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-  * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+[@common.optinclude name="Src/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
 [#-- SWIPdatas is a list of SWIPconfigModel --]
@@ -36,8 +14,10 @@
 [#assign with_rtos = 0]
 [#assign netif_callback = 0]
 [#assign lwip_arp = 0]
+[#assign lan8742a = 0]
+[#assign dp83848 = 0]
 [#if SWIP.defines??]
-	[#list SWIP.defines as definition] 		
+	[#list SWIP.defines as definition] 	
 		[#if (definition.name == "WITH_RTOS")]
 			[#if definition.value == "1"]
 				[#assign with_rtos = 1]
@@ -55,6 +35,12 @@
 		[/#if]
 		[#if (definition.name == "LWIP_ARP") && (definition.value == "1")]
             [#assign lwip_arp = 1] 
+        [/#if]
+        [#if (definition.name == "PHY") && (definition.value == "LAN8742A_PHY_ADDRESS")]
+            [#assign lan8742a = 1]
+        [/#if]
+        [#if (definition.name == "PHY") && (definition.value == "DP83848_PHY_ADDRESS")]
+            [#assign dp83848 = 1]
         [/#if]
 	[/#list]
 [/#if] [#-- SWIP.defines --]
@@ -173,7 +159,9 @@ void HAL_ETH_RxCpltCallback(ETH_HandleTypeDef *heth)
  */
 static void low_level_init(struct netif *netif)
 { 
+[#if (dp83848 == 1) || (lan8742a ==1)]  
   uint32_t regvalue = 0;
+[/#if]
   HAL_StatusTypeDef hal_eth_init_status;
   
 /* Init ETH */
@@ -225,7 +213,12 @@ static void low_level_init(struct netif *netif)
 [/#if] [#-- endif with_rtos --]
   /* Enable MAC and DMA transmission and reception */
   HAL_ETH_Start(&heth);
+
+/* USER CODE BEGIN PHY_PRE_CONFIG */ 
+    
+/* USER CODE END PHY_PRE_CONFIG */
   
+[#if dp83848 == 1]  
   /**** Configure PHY to generate an interrupt when Eth Link state changes ****/
   /* Read Register Configuration */
   HAL_ETH_ReadPHYRegister(&heth, PHY_MICR, &regvalue);
@@ -241,8 +234,29 @@ static void low_level_init(struct netif *netif)
   regvalue |= PHY_MISR_LINK_INT_EN;
     
   /* Enable Interrupt on change of link status */
-  HAL_ETH_WritePHYRegister(&heth, PHY_MISR, regvalue);   
+  HAL_ETH_WritePHYRegister(&heth, PHY_MISR, regvalue);
+[/#if] [#-- endif dp83848 --]
+[#if lan8742a == 1]
+  /* Read Register Configuration */
+  HAL_ETH_ReadPHYRegister(&heth, PHY_ISFR, &regvalue);
+  regvalue |= (PHY_ISFR_INT4);
+
+  /* Enable Interrupt on change of link status */ 
+  HAL_ETH_WritePHYRegister(&heth, PHY_ISFR , regvalue );
+  
+  /* Read Register Configuration */
+  HAL_ETH_ReadPHYRegister(&heth, PHY_ISFR , &regvalue);
+[/#if] [#-- endif lan8742a --]
+
+/* USER CODE BEGIN PHY_POST_CONFIG */ 
+    
+/* USER CODE END PHY_POST_CONFIG */
+
 #endif /* LWIP_ARP || LWIP_ETHERNET */
+
+/* USER CODE BEGIN LOW_LEVEL_INIT */ 
+    
+/* USER CODE END LOW_LEVEL_INIT */
 }
 
 /**

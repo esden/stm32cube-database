@@ -21,10 +21,16 @@ static void MX_GPIO_Init(void)
         [/#list]
 [#if isHalSupported=="true"]
     [#if clock?size >0 ]#n#t/* GPIO Ports Clock Enable */[/#if]
-            [#list clock as clockMacro]
-    [#if clockMacro!=""] #t${clockMacro}(); [/#if]
-            [/#list] 
-    [/#if]
+    [#list clock as clockMacro]
+        [#if clockMacro!=""] 
+            [#if clockMacro?contains("(")]
+                #t${clockMacro};
+            [#else]
+                #t${clockMacro}();
+            [/#if]
+        [/#if]
+    [/#list] 
+[/#if]
 
 [#else] [#-- peripheral gpio init function --]
 [#if data.comments??]
@@ -137,8 +143,13 @@ static void MX_${data.ipName}_GPIO_Init(void)
         [#if initVector.codeInMspInit]
                 [#assign irqNum = irqNum+1]
                 [#if irqNum==1]#n#t/* EXTI interrupt init*/[/#if]
+[#if usedDriver == "HAL"]
                 #tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
                 #tHAL_NVIC_EnableIRQ(${initVector.vector});#n
+[#else]
+                #tNVIC_SetPriority(${initVector.vector}, NVIC_EncodePriority(NVIC_GetPriorityGrouping(),${initVector.preemptionPriority}, ${initVector.subPriority}));
+                #tNVIC_EnableIRQ(${initVector.vector});
+[/#if]
         [/#if]
 [/#list]
 [/#compress]

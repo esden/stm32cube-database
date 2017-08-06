@@ -6,7 +6,7 @@
     IPType="middleware"
     IpGroup="Middleware"
     Name="LWIP"
-    Version="v1.5.0_RC0_20160211">
+    Version="v1.5.0_RC0_20160211_Cube">
     
     <About>LWIP: LightWeight TCP/IP</About>
     <RefParameter Name="LwIP Version" Comment="LwIP Version (Version of LwIP supported by CubeMX ** CubeMX specific **)" Type="string" Group="LwIP Version" DefaultValue="1.5.0_RC0_20160211" TabName="General Settings" Mode="Basic" >
@@ -42,6 +42,13 @@
     <RefParameter Name="WITH_RTOS" Comment="WITH_RTOS (Use FREERTOS ** CubeMX specific **)" Type="list" Group="RTOS Settings" DefaultValue="0" TabName="General Settings" Mode="Basic" Visible="true">
         <PossibleValue Comment="Disabled" Value="0"/>
         <Description>This parameter is disabled as soon as FREERTOS is disabled in MiddleWares tree.&lt;br&gt;&lt;b&gt;Warning&lt;/b&gt;: This parameter has been introduced by CubeMX.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: WITH_RTOS is disabled means NO_SYS is disabled (set to 1) and FREERTOS is disabled.</Description>
+    </RefParameter>
+    <RefParameter Name="PHY" Comment="PHY (Phy MII)" Type="string" Group="RTOS Settings" DefaultValue="+ETH:PHY_Name_MII" TabName="General Settings" Mode="Basic" Visible="false">
+        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: MII." Expression="MII"/>
+        <Description>PHY MII parameter.</Description>
+    </RefParameter>
+    <RefParameter Name="PHY" Comment="PHY (Phy RMII)" Type="string" Group="RTOS Settings" DefaultValue="+ETH:PHY_Name_RMII" TabName="General Settings" Mode="Basic" Visible="false">
+        <Description>PHY RMII parameter.</Description>
     </RefParameter>
     <RefParameter Name="SYS_LIGHTWEIGHT_PROT" Comment="SYS_LIGHTWEIGHT_PROT (Memory Functions Protection)" Type="list" Group="Platform Specific Locking" DefaultValue="0" TabName="Key Options" Mode="Basic" >
         <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: SYS_LIGHTWEIGHT_PROT is used for inter task protection which works with an RTOS only when NO_SYS=0." Expression="!NO_SYS"/>
@@ -1593,9 +1600,9 @@
     <RefParameter Name="HTTPD_POLL_INTERVAL" Comment="HTTPD_POLL_INTERVAL (HTTP Pool delay)" Type="Integer" Group="HTTPD Options" DefaultValue="null" TabName="HTTPD" Mode="Advanced" Visible="false">
         <Description>The poll delay is X*500ms.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: HTTPD_POLL_INTERVAL requires LWIP_HTTPD enabled.</Description>
     </RefParameter>
-    <RefParameter Name="HTTPD_TCP_PRIO" Comment="HTTPD_TCP_PRIO (HTTP TCP Priority)" Type="Integer" Group="HTTPD Options" DefaultValue="1" TabName="HTTPD" Mode="Advanced" Min="0" Max="255" >
+    <RefParameter Name="HTTPD_TCP_PRIO" Comment="HTTPD_TCP_PRIO (HTTP TCP Priority)" Type="Integer" Group="HTTPD Options" DefaultValue="1" TabName="HTTPD" Mode="Advanced" Min="1" Max="255" >
         <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: HTTPD_TCP_PRIO requires LWIP_HTTPD enabled." Expression="LWIP_HTTPD"/>
-        <Description>Priority for tcp pcbs created by HTTPD (very low by default). Lower priorities get killed first when running out of memory.</Description>
+        <Description>Priority for tcp pcbs created by HTTPD (very low by default). Minimum value is 1 (TCP_PRIO_MIN). Lower priorities get killed first when running out of memory.</Description>
     </RefParameter>
     <RefParameter Name="HTTPD_TCP_PRIO" Comment="HTTPD_TCP_PRIO (HTTP TCP Priority)" Type="Integer" Group="HTTPD Options" DefaultValue="null" TabName="HTTPD" Mode="Advanced" Visible="false">
         <Description>Priority for tcp pcbs created by HTTPD (very low by default). Lower priorities get killed first when running out of memory.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: HTTPD_TCP_PRIO requires LWIP_HTTPD enabled.</Description>
@@ -1820,7 +1827,7 @@
     <RefParameter Name="SNMP_THREAD_PRIO" Comment="SNMP_THREAD_PRIO (SNMP Worker Thread Priority)" Type="Integer" Group="SNMP Options" DefaultValue="null" TabName="SNMP" Mode="Advanced" Visible="false">
         <Description>SNMP worker thread priority.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: SNMP_THREAD_PRIO requires LWIP_SNMP and SNMP_USE_NETCONN enabled.</Description>
     </RefParameter>
-    <RefParameter Name="SNMP_TRAP_DESTINATIONS" Comment="SNMP_TRAP_DESTINATIONS (Number of Trap Destinations)" Type="Integer" Group="SNMP Options" DefaultValue="1" TabName="SNMP" Mode="Advanced" Min="0" Max="2147483647" >
+    <RefParameter Name="SNMP_TRAP_DESTINATIONS" Comment="SNMP_TRAP_DESTINATIONS (Number of Trap Destinations)" Type="Integer" Group="SNMP Options" DefaultValue="1" TabName="SNMP" Mode="Advanced" Min="1" Max="2147483647" >
         <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: SNMP_TRAP_DESTINATIONS requires LWIP_SNMP enabled." Expression="LWIP_SNMP"/>
         <Description>Number of trap destinations. At least one trap destination is required.</Description>
     </RefParameter>
@@ -1911,13 +1918,14 @@
         <Description>Enable debugging for SNMP MIBs.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: SNMP_MIB_DEBUG requires LWIP_SNMP enabled.</Description>
     </RefParameter>
     <RefParameter Name="SNMP_LWIP_MIB2" Comment="SNMP_LWIP_MIB2 (MIB2 Implementation of LWIP SNMP)" Type="list" Group="SNMP Options" DefaultValue="=LWIP_SNMP" TabName="SNMP" Mode="Advanced" >
-        <Condition Diagnostic="&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: SNMP_LWIP_MIB2 requires LWIP_SNMP enabled. When SNMP_LWIP_MIB2 is enabled, LWIP_STATS and MIB2_STATS are both enabled." Expression="LWIP_SNMP"/>
+        <Condition Diagnostic="&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: SNMP_LWIP_MIB2 requires LWIP_SNMP, LWIP_STATS and MIB2_STATS enabled." Expression="LWIP_SNMP &amp; LWIP_STATS &amp; MIB2_STATS"/>
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
         <Description>Indicates if the MIB2 implementation of LWIP SNMP stack is used.</Description>
     </RefParameter>
-    <RefParameter Name="SNMP_LWIP_MIB2" Comment="SNMP_LWIP_MIB2 (MIB2 Implementation of LWIP SNMP)" Type="list" Group="SNMP Options" DefaultValue="null" TabName="SNMP" Mode="Advanced" Visible="false">
-        <Description>Indicates if the MIB2 implementation of LWIP SNMP stack is used.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: SNMP_LWIP_MIB2 requires LWIP_SNMP enabled. When SNMP_LWIP_MIB2 is enabled, LWIP_STATS and MIB2_STATS are both enabled.</Description>
+    <RefParameter Name="SNMP_LWIP_MIB2" Comment="SNMP_LWIP_MIB2 (MIB2 Implementation of LWIP SNMP)" Type="list" Group="SNMP Options" DefaultValue="0" TabName="SNMP" Mode="Advanced" Visible="true">
+        <PossibleValue Comment="Disabled" Value="0"/>
+        <Description>Disable MIB2 implementation of LWIP SNMP stack.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: SNMP_LWIP_MIB2 requires LWIP_SNMP, LWIP_STATS and MIB2_STATS enabled.</Description>
     </RefParameter>
     <RefParameter Name="SNMP_LWIP_MIB2_SYSDESC" Comment="SNMP_LWIP_MIB2_SYSDESC (MIB2 SysDesc Value)" Type="StringRW" Group="SNMP Options" DefaultValue="&quot;lwIP&quot;" TabName="SNMP" Mode="Advanced" >
         <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: SNMP_LWIP_MIB2_SYSDESC requires LWIP_SNMP enabled." Expression="LWIP_SNMP"/>
@@ -2261,16 +2269,15 @@
         <PossibleValue Comment="Disabled" Value="0"/>
         <Description>Disable Neighbor discovery for IPv6 stats.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: ND6_STATS requires LWIP_STATS enabled and is set by default with LWIP_IPV6.</Description>
     </RefParameter>
-    <RefParameter Name="MIB2_STATS" Comment="MIB2_STATS (SNMP MIB2 Statistics)" Type="list" Group="Statistics Options" DefaultValue="0" TabName="Statistics" Mode="Advanced" >
-        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: MIB2_STATS requires LWIP_STATS enabled. MIB2_STATS is enabled if SNMP_LWIP_MIB2 is enabled." Expression="LWIP_STATS &amp; IF(LWIP_SNMP &amp; !SNMP_LWIP_MIB2, 1,IF(LWIP_SNMP &amp; SNMP_LWIP_MIB2,0,1))"/>
+    <RefParameter Name="MIB2_STATS" Comment="MIB2_STATS (SNMP MIB2 Statistics)" Type="list" Group="Statistics Options" DefaultValue="=SNMP_LWIP_MIB2" TabName="Statistics" Mode="Advanced" >
+        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: MIB2_STATS requires LWIP_STATS enabled. MIB2_STATS is set by default with SNMP_LWIP_MIB2." Expression="LWIP_STATS"/>
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
-        <Description>Enable SNMP MIB2 stats.</Description>
+        <Description>Enable or Disable SNMP MIB2 statistics.</Description>
     </RefParameter>
-    <RefParameter Name="MIB2_STATS" Comment="MIB2_STATS (SNMP MIB2 Statistics)" Type="uniqueElementList" Group="Statistics Options" DefaultValue="=IF(!LWIP_STATS &amp; !SNMP_LWIP_MIB2,0,IF(SNMP_LWIP_MIB2,1,0))" TabName="Statistics" Mode="Advanced" >
+    <RefParameter Name="MIB2_STATS" Comment="MIB2_STATS (SNMP MIB2 Statistics)" Type="list" Group="Statistics Options" DefaultValue="0" TabName="Statistics" Mode="Advanced" >
         <PossibleValue Comment="Disabled" Value="0"/>
-        <PossibleValue Comment="Enabled" Value="1"/>
-        <Description>Disable SNMP MIB2 stats.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: MIB2_STATS requires LWIP_STATS enabled. MIB2_STATS is enabled if SNMP_LWIP_MIB2 is enabled.</Description>
+        <Description>Disable SNMP MIB2 statistics.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: MIB2_STATS requires LWIP_STATS enabled, otherwise MIB2_STATS is disabled.</Description>
     </RefParameter>
     <RefParameter Name="CHECKSUM_BY_HARDWARE" Comment="CHECKSUM_BY_HARDWARE (Hardware Checksum ** CubeMX specific **)" Type="list" Group="Checksum Options" DefaultValue="0" TabName="Checksum" Mode="Basic" >
         <PossibleValue Comment="Disabled" Value="0"/>
@@ -2647,6 +2654,7 @@
         <Parameter Name="NETMASK_ADDRESS"/>
         <Parameter Name="GATEWAY_ADDRESS"/>
         <Parameter Name="WITH_RTOS"/>
+        <Parameter Name="PHY"/>
         <Parameter Name="SYS_LIGHTWEIGHT_PROT"/>
         <Parameter Name="NO_SYS"/>
         <Parameter Name="NO_SYS_NO_TIMERS"/>

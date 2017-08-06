@@ -57,8 +57,9 @@
     <optimization></optimization>
     <icfloc>${icfloc}</icfloc>
     <Adefines>
-       <define></define>
-    </Adefines>
+        <define></define>
+    </Adefines>   
+
     <UsedFreeRTOS>${usedfreeRTOS}</UsedFreeRTOS>
     <Aincludes>
     	[#if usedfreeRTOS=="true"]
@@ -73,12 +74,27 @@
 	    	<include></include>
     	[/#if]
     </Aincludes>
-	<Cdefines>
-	   [#list CdefinesList as define]
-       <define>${define}</define>
+    <Cdefines>
+	[#list CdefinesList as define]
+        <define>${define}</define>
         [/#list]
 	   [#-- <define>__weak=__attribute__((weak))</define> --]
     </Cdefines>
+    [#-- defines to remove --]
+    <definestoremove>
+        <Adefines>
+            <define></define>
+        </Adefines>
+        <Cdefines>
+            [#if isHALUsed == "false"]
+            <define>USE_HAL_DRIVER</define>
+            [/#if]
+            [#if isLLUsed == "false"]
+            <define>USE_FULL_LL_DRIVER</define>
+            [/#if]
+        </Cdefines>         
+    </definestoremove>
+    
     [#-- End of optional part--]
 	<Cincludes>
 	 [#-- required includes for all generated projects --]

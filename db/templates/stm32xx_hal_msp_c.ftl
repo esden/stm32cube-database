@@ -5,31 +5,7 @@
   * Description        : This file provides code for the MSP Initialization 
   *                      and de-Initialization codes.
   ******************************************************************************
-  *
-  * COPYRIGHT(c) ${year} STMicroelectronics
-  *
-  * Redistribution and use in source and binary forms, with or without modification,
-  * are permitted provided that the following conditions are met:
-  *   1. Redistributions of source code must retain the above copyright notice,
-  *      this list of conditions and the following disclaimer.
-  *   2. Redistributions in binary form must reproduce the above copyright notice,
-  *      this list of conditions and the following disclaimer in the documentation
-  *      and/or other materials provided with the distribution.
-  *   3. Neither the name of STMicroelectronics nor the names of its contributors
-  *      may be used to endorse or promote products derived from this software
-  *      without specific prior written permission.
-  *
-  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-  * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-  * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-  * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-  *
+[@common.optinclude name="Src/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
 /* Includes ------------------------------------------------------------------*/
@@ -52,7 +28,7 @@ extern void Error_Handler(void);
 /* USER CODE BEGIN 0 */
 
 /* USER CODE END 0 */
-
+[#if isHALUsed??]
 /**
 #t* Initializes the Global MSP.
 #t*/
@@ -72,7 +48,7 @@ void HAL_MspInit(void)
 #n
 [#if clock??]
     [#list clock as clk]
-[#if clk!=""]#t${clk}();[/#if]
+        [#if clk!=""]#t${clk}();[/#if]
     [/#list]
 [/#if]
 #n
@@ -124,7 +100,7 @@ void HAL_MspInit(void)
 [/#compress]
 
 }
-
+[/#if]
 [#list IPdatas as IP]  
 [#assign ipvar = IP]
 [#assign useGpio = false]
@@ -156,6 +132,9 @@ void HAL_MspInit(void)
     [/#if]
   [/#if]
 [/#list]
+
+[#-- *************************************** --]
+
 [#-- Function getInitServiceMode --]
 [#function getInitServiceMode(ipname1)]
     [#-- assign initServicesList = {"test0":"test1"}--]
@@ -171,6 +150,9 @@ void HAL_MspInit(void)
    [#return initServicesList]
 [/#function]
 [#-- End Function getInitServiceMode --]
+
+[#-- *************************************** --]
+
 [#-- Function getDeInitServiceMode --]
 [#function getDeInitServiceMode(ipname2)]
     [#-- assign initServicesList = {"test0":"test1"}--]
@@ -186,6 +168,24 @@ void HAL_MspInit(void)
    [#return deInitServicesList]
 [/#function]
 [#-- End Function getDeInitServiceMode --]
+
+[#-- *************************************** --]
+
+[#-- Function getInstUsedDriver --]
+[#function getInstUsedDriver(ipname1)]
+    [#assign local_driver = "HAL"]
+    [#list ipvar.configModelList as instanceData]
+        [#if instanceData.halInstanceName==ipname1]
+            [#assign local_driver = instanceData.usedDriver]
+            [#return local_driver]
+        [/#if]
+    [/#list]
+   [#return local_driver]
+[/#function]
+[#-- End Function getInstUsedDriver --]
+
+[#-- *************************************** --]
+
 [#-- macro getLocalVariable of a config Start--]
 [#macro getLocalVariable configModel1 listOfLocalVariables resultList]
     [#if configModel1.methods??] 
@@ -234,6 +234,9 @@ void HAL_MspInit(void)
     [/#list][#-- list methodList1 --]
 [/#macro]
 [#-- macro getLocalVariable of a config End--]
+
+[#-- *************************************** --]
+
 [#-- macro generateConfigModelCode --]
 [#macro generateConfigModelCode configModel inst nTab index]
 [#if configModel.methods??] [#-- if the pin configuration contains a list of LibMethods--]
@@ -489,6 +492,8 @@ void HAL_MspInit(void)
 [/#macro]
 [#-- End macro generateConfigModelCode --]
 
+[#-- *************************************** --]
+
 [#-- macro generateConfigCode --]
 [#macro generateConfigCode ipName type serviceName instHandler tabN]
 [#if type=="Init"]
@@ -575,6 +580,9 @@ void HAL_MspInit(void)
 [/#if]
 [/#macro]
 [#-- End macro generateConfigCode --]
+
+[#-- *************************************** --]
+
 [#-- function: getHalMode(ipInstanceName) --]
 [#function getHalMode ipname]
     [#list ipvar.instances.entrySet() as entry]
@@ -597,6 +605,8 @@ void HAL_MspInit(void)
     [#return result]   
 [/#function]
 [#-- End function: getDmaHandler(currentipname) --]
+
+[#-- *************************************** --]
 
 [#-- macro generate service code for MspInit/MspDeInit Start--]
 [#macro generateServiceCode ipName serviceType modeName instHandler tabN]
@@ -901,6 +911,9 @@ void HAL_MspInit(void)
     [/#if]
 [/#macro]
 [#-- End macro add service code --]
+
+[#-- *************************************** --]
+
 [#--------------DMA DFSDM--]
 [#-- macro generate service code for MspInit/MspDeInit Start--]
 [#macro generateServiceCodeDFSDM ipName serviceType modeName instHandler tabN]
@@ -1018,42 +1031,42 @@ static uint32_t ${entry.value}=0;
 [#-- Search for static variables Start--]
 [#list instanceList as inst]
 
-     [#if getInitServiceMode(inst)??][#assign services = getInitServiceMode(inst)][/#if]
-[#if services?? && services.dma??]
-     [#assign dmaService=services.dma]   
-    [#if dmaService?? && dmaService?size!=0]
-    [#list dmaService as dmaRequest]
-        [#list dmaRequest.methods as method]	
-		[#if method.status=="OK" && method.arguments??]
-                    [#list method.arguments as fargument]
-                        [#if fargument.genericType == "struct" && fargument.context??]
-                            [#if fargument.context=="global"]
+    [#if getInitServiceMode(inst)??][#assign services = getInitServiceMode(inst)][/#if]
+        [#if services?? && services.dma??]
+            [#assign dmaService=services.dma]   
+            [#if dmaService?? && dmaService?size!=0]
+                [#list dmaService as dmaRequest]
+                    [#list dmaRequest.methods as method]	
+                        [#if method.status=="OK" && method.arguments??]
+                            [#list method.arguments as fargument]
+                                [#if fargument.genericType == "struct" && fargument.context??]
+                                    [#if fargument.context=="global"]
 [#-- #tstatic ${fargument.typeName} ${fargument.name}_${dmaRequest.instanceName?lower_case}; should be global--]
-                            [/#if]
+                                    [/#if]
+                                [/#if]
+                            [/#list]
                         [/#if]
                     [/#list]
-                [/#if]
-         [/#list]
-     [/#list] [#-- list dmaService as dmaRequest --]
+                [/#list] [#-- list dmaService as dmaRequest --]
      [/#if]   [#-- if dmaService?? && dmaService.size!=0 --]
-[/#if]
+[/#if] [#-- End if initCallBack --]
 [/#list]
 [#assign words = instanceList]
 [#-- declare Variable GPIO_InitTypeDef once --]
        [#assign v = ""]
 [#assign mspExist="false"]
 [#list words as inst] [#-- loop on ip instances datas --] 
- [#assign services = getInitServiceMode(inst)]
- [#if services.gpio??][#assign service=services.gpio]
-        [#list service.variables as variable] [#-- variables declaration --]
-            [#if v?contains(variable.name)]
-            [#-- no matches--]
-            [#else]
-#t${variable.value} ${variable.name};
-                [#assign v = v + " "+ variable.name/]	
-            [/#if]	
-        [/#list]  
-[/#if]
+    [#assign services = getInitServiceMode(inst)]
+    [#if services.gpio??][#assign service=services.gpio]
+           [#list service.variables as variable] [#-- variables declaration --]
+               [#if v?contains(variable.name)]
+               [#-- no matches--]
+               [#else]
+   #t${variable.value} ${variable.name};
+                   [#assign v = v + " "+ variable.name/]	
+               [/#if]	
+           [/#list]  
+    [/#if]
 [/#list]
 [#-- --]
 [#if mspIsEmpty=="no"]
@@ -1132,14 +1145,14 @@ static uint32_t ${entry.value}=0;
     [#list instanceList as inst]
      [#if getInitServiceMode(inst)??]
         [#assign services = getInitServiceMode(inst)]
-        [#if services?? && services.gpioOut??]
+        [#assign driverFlg = getInstUsedDriver(inst)]
+        [#if services?? && services.gpioOut?? && driverFlg == "HAL"]
             [#assign mspIsEmpty1="no"] 
             [#break]
         [/#if]
      [/#if]
     [/#list]
 [#-- Check if the Msp init will be empty end -- ]
-
 [#if  mode?contains("DFSDM") && DFSDM_var == "false"]
 uint32_t DFSDM_Init = 0;
 [#assign DFSDM_var = "true"]
@@ -1159,12 +1172,13 @@ uint32_t DFSDM_Init = 0;
 [/#if]
 
 [#assign words = instanceList]
+[#if mspIsEmpty1=="no"]
 [#-- declare Variable GPIO_InitTypeDef once --]
-       [#assign v = ""]
+[#assign v = ""]
 [#assign mspExist="false"]
 [#list words as inst] [#-- loop on ip instances datas --] 
- [#assign services = getInitServiceMode(inst)]
- [#if services.gpioOut??][#assign service=services.gpioOut]
+    [#assign services = getInitServiceMode(inst)]
+    [#if services.gpioOut??][#assign service=services.gpioOut]
         [#list service.variables as variable] [#-- variables declaration --]
             [#if v?contains(variable.name)]
             [#-- no matches--]
@@ -1176,7 +1190,7 @@ uint32_t DFSDM_Init = 0;
 [/#if]
 [/#list]
 [#-- --]
-[#if mspIsEmpty1=="no"]
+
 [#if  words[0]?contains("DFSDM")]
 #tif(${words[0]}_Init == 0)
 [#else]

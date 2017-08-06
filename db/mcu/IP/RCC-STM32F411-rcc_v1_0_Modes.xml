@@ -37,7 +37,7 @@
 		<PossibleValue Comment="HSE" Value="RCC_OSCILLATORTYPE_HSE"/>
 	</RefParameter>
 	<RefParameter Visible="false" Comment="HSE used flag" DefaultValue="1" Name="HSEUsed" Type="integer" Min="1" Max="1">
-		<Condition Expression="(((HSEByPass|HSEOscillator)&amp;SEM2RCC_HSE_REQUIRED_TIM11 &amp; TIM11 &amp; Semaphore_input_Channel1TIM11))|(RTCUsed_ForRCC&amp;!((RCC_RTC_Clock_Source=RCC_RTCCLKSOURCE_LSE)|(RCC_RTC_Clock_Source=RCC_RTCCLKSOURCE_LSI)))|((PLLSource=RCC_PLLSOURCE_HSE) &amp; (PLLUsed=1))|(SYSCLKSource=RCC_SYSCLKSOURCE_HSE)|((RCC_MCO1Source=RCC_MCO1SOURCE_HSE)&amp;(MCO1Config))|((RCC_MCO2Source=RCC_MCO2SOURCE_HSE)&amp;(MCO2Config))" Diagnostic="SYSCLK source OR PLL source OR RTC source OR MCO1 source OR MCO2 source"/>
+		<Condition Expression="(((HSEByPass|HSEOscillator)&amp;SEM2RCC_HSE_REQUIRED_TIM11 &amp; TIM11 &amp; Semaphore_input_Channel1TIM11))|(RTCUsed_ForRCC&amp;!((RCC_RTC_Clock_Source=RCC_RTCCLKSOURCE_LSE)|(RCC_RTC_Clock_Source=RCC_RTCCLKSOURCE_LSI)))|((PLLSource=RCC_PLLSOURCE_HSE) &amp; (PLLUsed=1))|(SYSCLKSource=RCC_SYSCLKSOURCE_HSE)|((RCC_MCO1Source=RCC_MCO1SOURCE_HSE)&amp;(MCO1Config))|((RCC_MCO2Source=RCC_MCO2SOURCE_HSE)|(RCC_MCO2Source=RCC_MCO2SOURCE_PLLI2SCLK &amp;((PLLSource=RCC_PLLSOURCE_HSE))) &amp;(MCO2Config))" Diagnostic="SYSCLK source OR PLL source OR RTC source OR MCO1 source OR MCO2 source"/>
 	</RefParameter>
 	<RefParameter Visible="false" Comment="HSE Is Used" DefaultValue="0" Name="HSEUsed" Min="0" Type="integer"/>
 	<RefParameter Visible="false" Comment="Hse State" DefaultValue="RCC_HSE_BYPASS" Name="HSEState" Type="list">
@@ -190,21 +190,28 @@
 		<PossibleValue Comment="8" Value="RCC_HCLK_DIV8"/>
 		<PossibleValue Comment="16" Value="RCC_HCLK_DIV16"/>
 	</RefParameter>
-	 <RefParameter Visible="false" Comment="APB1 Timer Clock Divider" DefaultValue="1" Name="APB1TimCLKDivider" Type="integer" Max="1" Min="1">
+    <!--APB1 MUL for TIM-->
+    <RefParameter Visible="false" Comment="APB1 Timer Clock Divider" DefaultValue="1" Name="APB1TimCLKDivider" Type="integer" Max="1" Min="1">
         <Condition Diagnostic="" Expression="((APB1CLKDivider=RCC_HCLK_DIV1)&amp;(RCC_TIM_PRescaler_Selection=RCC_TIMPRES_DESACTIVATED))"/>
     </RefParameter>
     <RefParameter Visible="false" Comment="APB1 Timer Clock Divider" DefaultValue="2" Name="APB1TimCLKDivider" Type="integer" Max="2" Min="2">
         <Condition Diagnostic="" Expression="(RCC_TIM_PRescaler_Selection=RCC_TIMPRES_DESACTIVATED)"/>
     </RefParameter>
     <RefParameter Visible="false" Comment="APB1 Timer Clock Divider" DefaultValue="1" Name="APB1TimCLKDivider" Type="integer" Max="1" Min="1">
-        <Condition Diagnostic="" Expression="(APB1CLKDivider=RCC_HCLK_DIV1|APB1CLKDivider=RCC_HCLK_DIV2)&amp;(RCC_TIM_PRescaler_Selection=RCC_TIMPRES_ACTIVATED)"/>
+        <Condition Diagnostic="" Expression="(APB1CLKDivider=RCC_HCLK_DIV1)&amp;(RCC_TIM_PRescaler_Selection=RCC_TIMPRES_ACTIVATED)"/>
+    </RefParameter>
+    <RefParameter Visible="false" Comment="APB1 Timer Clock Divider" DefaultValue="2" Name="APB1TimCLKDivider" Type="integer" Max="2" Min="2">
+        <Condition Diagnostic="" Expression="(APB1CLKDivider=RCC_HCLK_DIV2)&amp;(RCC_TIM_PRescaler_Selection=RCC_TIMPRES_ACTIVATED)"/>
+    </RefParameter>
+    <RefParameter Visible="false" Comment="APB1 Timer Clock Divider" DefaultValue="4" Name="APB1TimCLKDivider" Type="integer" Max="4" Min="4">
+        <Condition Diagnostic="" Expression="(APB1CLKDivider=RCC_HCLK_DIV4)&amp;(RCC_TIM_PRescaler_Selection=RCC_TIMPRES_ACTIVATED)"/>
     </RefParameter>
     <RefParameter Visible="false" Comment="APB1 Timer Clock Divider" DefaultValue="4" Name="APB1TimCLKDivider" Type="integer" Max="4" Min="4">
         <Condition Diagnostic="" Expression="(RCC_TIM_PRescaler_Selection=RCC_TIMPRES_ACTIVATED)"/>
     </RefParameter>
     <RefParameter Visible="false" Comment="APB1 Timer Clock Divider" DefaultValue="2" Name="APB1TimCLKDivider" Type="integer" Max="2" Min="2"/>
 	
-    <!--APB2 MUL for TIM-->
+    <!--APB1 MUL for TIM-->
     <RefParameter Visible="false" Comment="APB2 Timer Clock Divider" DefaultValue="1" Name="APB2TimCLKDivider" Type="integer" Max="1" Min="1">
 <Condition Diagnostic="" Expression="((APB2CLKDivider=RCC_HCLK_DIV1)&amp;(RCC_TIM_PRescaler_Selection=RCC_TIMPRES_DESACTIVATED))"/>  
   </RefParameter>
@@ -212,16 +219,20 @@
         <Condition Diagnostic="" Expression="(RCC_TIM_PRescaler_Selection=RCC_TIMPRES_DESACTIVATED)"/>
     </RefParameter>
     <RefParameter Visible="false" Comment="APB2 Timer Clock Divider" DefaultValue="1" Name="APB2TimCLKDivider" Type="integer" Max="1" Min="1">
-        <Condition Diagnostic="" Expression="(APB2CLKDivider=RCC_HCLK_DIV1|APB2CLKDivider=RCC_HCLK_DIV2)&amp;(RCC_TIM_PRescaler_Selection=RCC_TIMPRES_ACTIVATED)"/>
+        <Condition Diagnostic="" Expression="(APB2CLKDivider=RCC_HCLK_DIV1)&amp;(RCC_TIM_PRescaler_Selection=RCC_TIMPRES_ACTIVATED)"/>
+    </RefParameter>
+    <RefParameter Visible="false" Comment="APB2 Timer Clock Divider" DefaultValue="2" Name="APB2TimCLKDivider" Type="integer" Max="2" Min="2">
+        <Condition Diagnostic="" Expression="(APB2CLKDivider=RCC_HCLK_DIV2)&amp;(RCC_TIM_PRescaler_Selection=RCC_TIMPRES_ACTIVATED)"/>
+    </RefParameter>
+    <RefParameter Visible="false" Comment="APB2 Timer Clock Divider" DefaultValue="4" Name="APB2TimCLKDivider" Type="integer" Max="4" Min="4">
+        <Condition Diagnostic="" Expression="(APB2CLKDivider=RCC_HCLK_DIV4)&amp;(RCC_TIM_PRescaler_Selection=RCC_TIMPRES_ACTIVATED)"/>
     </RefParameter>
     <RefParameter Visible="false" Comment="APB2 Timer Clock Divider" DefaultValue="4" Name="APB2TimCLKDivider" Type="integer" Max="4" Min="4">
         <Condition Diagnostic="" Expression="(RCC_TIM_PRescaler_Selection=RCC_TIMPRES_ACTIVATED)"/>
     </RefParameter>
     <RefParameter Visible="false" Comment="APB2 Timer Clock Divider" DefaultValue="2" Name="APB2TimCLKDivider" Type="integer" Max="2" Min="2"/>
-	   <RefParameter Name="RCC_TIM_PRescaler_Selection" Comment="TIM Prescaler Selection" Type="list" DefaultValue="RCC_TIMPRES_DESACTIVATED" Group="RCC Parameters">
-        <PossibleValue Value="RCC_TIMPRES_ACTIVATED" Comment="Enabled" Semaphore="TimPrescalerEnabled"/>
-        <PossibleValue Value="RCC_TIMPRES_DESACTIVATED" Comment="Disabled"/>
-    </RefParameter>
+	
+
 	<RefParameter Visible="false" Comment="APB2 Clock Divider" DefaultValue="RCC_HCLK_DIV1" Name="APB2CLKDivider" Type="list">
 		<PossibleValue Comment="1" Value="RCC_HCLK_DIV1"/>
 		<PossibleValue Comment="2" Value="RCC_HCLK_DIV2"/>
@@ -248,7 +259,7 @@
 	</RefParameter>
 	<RefParameter Visible="false" Comment="MCO2 Clock Source" DefaultValue="RCC_MCO2SOURCE_SYSCLK" Name="RCC_MCO2Source" Type="list">
 		<PossibleValue Comment="MCO1SRC SYSCLK" Value="RCC_MCO2SOURCE_SYSCLK"/>
-		<PossibleValue Comment="MCO1SRC PLLI2SCLK" Value="RCC_MCO2SOURCE_PLLI2SCLK"/>
+		<PossibleValue Comment="MCO1SRC PLLI2SCLK" Value="RCC_MCO2SOURCE_PLLI2SCLK" />
 		<PossibleValue Comment="MCO1SRC HSE" Value="RCC_MCO2SOURCE_HSE"/>
 		<PossibleValue Comment="MCO1SRC PLLCLK" Value="RCC_MCO2SOURCE_PLLCLK"/>
 	</RefParameter>
@@ -555,9 +566,9 @@
 <!--params for Code Generation for IPs -->
 	<RefParameter Visible="false" Comment="Periph Clock Selection" Name="PeriphClockSelection" DefaultValue="+RCC_PERIPHCLK_TIMVar+|RCC_PERIPHCLK_PLLI2SVar+|RCC_PERIPHCLK_I2SVar+|RCC_PERIPHCLK_RTCVar" Type="list"/>
 
-    <RefParameter Visible="false" Name="RCC_PERIPHCLK_PLLI2SVar" Comment="RCC_PERIPHCLK_PLLI2SVar" Type="list" DefaultValue="RCC_PERIPHCLK_PLLI2S">
+    <RefParameter Visible="false" Name="RCC_PERIPHCLK_PLLI2SVar" Comment="RCC_PERIPHCLK_PLLI2SVar" Type="list" DefaultValue="RCC_PERIPHCLK_I2S">
         <Condition Expression="((RCC_MCO2Source=RCC_MCO2SOURCE_PLLI2SCLK)&amp; MCO2Config)" Diagnostic="I2S Activated and source is PLLI2S"/>
-        <PossibleValue Value="RCC_PERIPHCLK_PLLI2S" Comment="RCC_PERIPHCLK_PLLI2S"/>
+        <PossibleValue Value="RCC_PERIPHCLK_I2S" Comment="RCC_PERIPHCLK_I2S"/>
     </RefParameter>
     <RefParameter Visible="false" Name="RCC_PERIPHCLK_PLLI2SVar" Comment="RCC_PERIPHCLK_PLLI2SVar" Type="list" DefaultValue=""/>
 
@@ -984,6 +995,11 @@
     </RefParameter>
     <RefParameter Visible="false" Name="PLLSourceMARGForMacro" Comment="PLLSourceMARGForMacro" Type="list" DefaultValue="null"/>
     
+
+	<RefParameter Name="RCC_TIM_PRescaler_Selection" Comment="TIM Prescaler Selection" Type="list" DefaultValue="RCC_TIMPRES_DESACTIVATED" Group="RCC Parameters">
+        <PossibleValue Value="RCC_TIMPRES_ACTIVATED" Comment="Enabled" Semaphore="TimPrescalerEnabled"/>
+        <PossibleValue Value="RCC_TIMPRES_DESACTIVATED" Comment="Disabled"/>
+    </RefParameter>
     
     <RefMode Name="ClockTree">
 	    <ConfigForMode>RCC_PLL_PLLM_CONFIG</ConfigForMode>

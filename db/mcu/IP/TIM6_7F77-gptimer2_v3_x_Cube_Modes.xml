@@ -1081,9 +1081,11 @@
         <PossibleValue Value="TIM_MASTERSLAVEMODE_DISABLE" Comment="Disable (no sync between this TIM (Master) and its Slaves"/>
         <PossibleValue Value="TIM_MASTERSLAVEMODE_ENABLE" Comment="Enable (sync between this TIM (Master) and its Slaves (through TRGO))"/>
     </RefParameter>
-    <RefParameter Name="TIM_MasterSlaveMode" Comment="Master/Slave Mode  " DefaultValue="null" Type="list" Group="Trigger Output (TRGO) Parameters" Visible="false">
+    <RefParameter Name="TIM_MasterSlaveMode" Comment="Master/Slave Mode  " DefaultValue="TIM_MASTERSLAVEMODE_DISABLE" Type="list" Group="Trigger Output (TRGO) Parameters" Visible="false">
         <Condition Diagnostic="" Expression="!(($IpNumber=6)|($IpNumber=7)|($IpNumber=18)|($IpNumber=9)|($IpNumber=12)|($IpNumber=10)|($IpNumber=11)|($IpNumber=13)|($IpNumber=14)|($IpNumber=16)|($IpNumber=17)) &amp; Semaphore_Xored_Inputs_Hall_Sensor_Interface$IpInstance"/>
-    </RefParameter>
+  <PossibleValue Value="TIM_MASTERSLAVEMODE_DISABLE" Comment="Disable (no sync between this TIM (Master) and its Slaves"/>
+  <!-- Parameter must be generated to avoid structure corruption -->
+ </RefParameter>
     <RefParameter Name="TIM_MasterSlaveMode" Comment="Master/Slave Mode  " DefaultValue="null" Type="list" Group="Trigger Output (TRGO) Parameters" Visible="false">
         <Condition Diagnostic="" Expression="(($IpNumber=9)|($IpNumber=12)|($IpNumber=10)|($IpNumber=11)|($IpNumber=13)|($IpNumber=14)|($IpNumber=16)|($IpNumber=17))"/>
 <!-- <PossibleValue Value="TIM_MASTERSLAVEMODE_DISABLE" Comment="Disable (no sync between this TIM (Master) and its Slaves"/>-->
@@ -1113,8 +1115,12 @@
         <Condition Diagnostic="" Expression="( ( (($IpNumber=1)&amp;Semaphore_OSSR_TIM_1_8_TIM1)|(($IpNumber=8)&amp;Semaphore_OSSR_TIM_1_8_TIM8)|(($IpNumber=20)&amp;Semaphore_OSSR_TIM_1_8_TIM20)|(($IpNumber=15)&amp;Semaphore_OSSR_TIM_15_16_17_TIM15)|(($IpNumber=16)&amp;Semaphore_OSSR_TIM_15_16_17_TIM16)|(($IpNumber=17)&amp;Semaphore_OSSR_TIM_15_16_17_TIM17) )&amp; Semaphore_output_Channel$IpInstance )&amp;Semaphore_Activate_Break_Input2$IpInstance"/>
         <PossibleValue Value="TIM_OSSR_ENABLE" Comment="Enable"/>
     </RefParameter>
+    <RefParameter Name="OffStateRunMode" Comment="Off State Selection for Run Mode (OSSR)  " DefaultValue="TIM_OSSR_DISABLE" Type="list" Group="Break And Dead Time management - Output Configuration" Visible="false">
+        <Condition Diagnostic="" Expression="( (($IpNumber=1)&amp;!Semaphore_OSSR_TIM_1_8_TIM1)|(($IpNumber=8)&amp;!Semaphore_OSSR_TIM_1_8_TIM8)|(($IpNumber=20)&amp;!Semaphore_OSSR_TIM_1_8_TIM20)|(($IpNumber=15)&amp;!Semaphore_OSSR_TIM_15_16_17_TIM15)|(($IpNumber=16)&amp;!Semaphore_OSSR_TIM_15_16_17_TIM16)|(($IpNumber=17)&amp;!Semaphore_OSSR_TIM_15_16_17_TIM17) )&amp; Semaphore_output_Channel$IpInstance "/>
+        <PossibleValue Value="TIM_OSSR_DISABLE" Comment="Disable"/>
+    </RefParameter>
     <RefParameter Name="OffStateRunMode" Comment="Off State Selection for Run Mode (OSSR)  " DefaultValue="null" Type="list" Group="Break And Dead Time management - Output Configuration" Visible="false">
-        <Condition Diagnostic="" Expression="!( ( (($IpNumber=1)&amp;Semaphore_OSSR_TIM_1_8_TIM1)|(($IpNumber=8)&amp;Semaphore_OSSR_TIM_1_8_TIM8)|(($IpNumber=20)&amp;Semaphore_OSSR_TIM_1_8_TIM20)|(($IpNumber=15)&amp;Semaphore_OSSR_TIM_15_16_17_TIM15)|(($IpNumber=16)&amp;Semaphore_OSSR_TIM_15_16_17_TIM16)|(($IpNumber=17)&amp;Semaphore_OSSR_TIM_15_16_17_TIM17) )&amp; Semaphore_output_Channel$IpInstance )"/>
+        <Condition Diagnostic="" Expression="!(($IpNumber=1)|($IpNumber=8)|($IpNumber=20)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17))| !Semaphore_output_Channel$IpInstance "/>
     </RefParameter>
     <RefParameter Name="OffStateIDLEMode" Comment="Off State Selection for Idle Mode (OSSI)  " DefaultValue="TIM_OSSI_DISABLE" Type="list" Group="Break And Dead Time management - Output Configuration" >
     <Condition Diagnostic="" Expression="( ( ($IpNumber=1)|($IpNumber=8)|($IpNumber=20)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17) )&amp; Semaphore_output_Channel$IpInstance )&amp;!Semaphore_Activate_Break_Input2$IpInstance"/>
@@ -1564,7 +1570,7 @@
 <!-- for TIM2 of F7 family -->
     <RefParameter Name="TIM2_ITR1_REMAP" Comment="ITR1 remap capabilities for TIM2" DefaultValue="__NULL" Type="list" Group="ITR1 remap capabilities for TIM2">
             <PossibleValue Value="__NULL" Comment="TIM2 ITR1 input is connected to TIM8 TRGO"/>
-            <PossibleValue Value="TIM_TIM2_ETH_PTP" Comment="TIM2 ITR1 input is connected to PTP trigger output"/>
+            <PossibleValue Value="TIM_TIM2_ETH_PTP" Comment="TIM2 ITR1 input is connected to PTP trigger output" Condition="!ETH_Exist" Action="remove"/>
             <PossibleValue Value="TIM_TIM2_USBFS_SOF" Comment="TIM2 ITR1 input is connected to USB FS SOF"/>
             <PossibleValue Value="TIM_TIM2_USBHS_SOF" Comment="TIM2 ITR1 input is connected to USB HS SOF"/>
     </RefParameter>
@@ -1576,7 +1582,13 @@
     </RefParameter>
 <!-- for TIM11 of F7 family -->
     <RefParameter Name="TIM11_TI1_REMAP" Comment="TI1 remap capabilities for TIM11" DefaultValue="TIM_TIM11_MCO1" Type="list" Group="TI1 remap capabilities for TIM11">
+  <Condition Diagnostic="" Expression="!DIE452"/>
             <PossibleValue Value="TIM_TIM11_SPDIFRX" Comment="TIM11 Channel 1 is connected to SPDIFRX Frame synchronous signal" Semaphore="SEM2RCC_SPDIF_clock_REQUIRED_$IpInstance" Condition="!SPDIFRXUsed_ForRCC" Action="Disable" Diagnostic="SPDIFRX IP must be active to enable this remap"/>
+            <PossibleValue Value="TIM_TIM11_HSE" Comment="TIM11 Channel 1 is connected to HSE" Semaphore="SEM2RCC_HSE_REQUIRED_$IpInstance" Condition="!(HSEOscillator|HSEByPass)" Action="Disable" Diagnostic="HSE Oscillator must be activated in the RCC IP (Pinout view)"/>
+            <PossibleValue Value="TIM_TIM11_MCO1" Comment="TIM11 Channel 1 is connected to MCO1" Semaphore="SEM2RCC_MCO1_REQUIRED_$IpInstance"/>
+    </RefParameter>
+  <RefParameter Name="TIM11_TI1_REMAP" Comment="TI1 remap capabilities for TIM11" DefaultValue="TIM_TIM11_MCO1" Type="list" Group="TI1 remap capabilities for TIM11">
+        <Condition Diagnostic="" Expression="DIE452"/>
             <PossibleValue Value="TIM_TIM11_HSE" Comment="TIM11 Channel 1 is connected to HSE" Semaphore="SEM2RCC_HSE_REQUIRED_$IpInstance" Condition="!(HSEOscillator|HSEByPass)" Action="Disable" Diagnostic="HSE Oscillator must be activated in the RCC IP (Pinout view)"/>
             <PossibleValue Value="TIM_TIM11_MCO1" Comment="TIM11 Channel 1 is connected to MCO1" Semaphore="SEM2RCC_MCO1_REQUIRED_$IpInstance"/>
     </RefParameter>

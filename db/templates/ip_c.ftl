@@ -5,31 +5,7 @@
   * Description        : This file provides code for the configuration
   *                      of the ${name} instances.
   ******************************************************************************
-  *
-  * COPYRIGHT(c) ${year} STMicroelectronics
-  *
-  * Redistribution and use in source and binary forms, with or without modification,
-  * are permitted provided that the following conditions are met:
-  *   1. Redistributions of source code must retain the above copyright notice,
-  *      this list of conditions and the following disclaimer.
-  *   2. Redistributions in binary form must reproduce the above copyright notice,
-  *      this list of conditions and the following disclaimer in the documentation
-  *      and/or other materials provided with the distribution.
-  *   3. Neither the name of STMicroelectronics nor the names of its contributors
-  *      may be used to endorse or promote products derived from this software
-  *      without specific prior written permission.
-  *
-  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-  * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-  * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-  * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-  *
+[@common.optinclude name="Src/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
 
@@ -777,7 +753,7 @@
                 [/#list]
                 [#assign lowPower = "no"]
                 [#list initService.nvic as initVector]
-                   [#if (instHandler=="hpcd") && (initVector.vector?contains("WKUP") || initVector.vector?contains("WakeUp") || (((initVector.vector == "USB_IRQn")||(initVector.vector == "OTG_FS_IRQn")) && USB_INTERRUPT_WAKEUP??))]
+                   [#if (instHandler=="pcdHandle") && (initVector.vector?contains("WKUP") || initVector.vector?contains("WakeUp") || (((initVector.vector == "USB_IRQn")||(initVector.vector == "OTG_FS_IRQn")) && USB_INTERRUPT_WAKEUP??))]
                       [#assign lowPower = "yes"]
                    [/#if]
                 [/#list]
@@ -795,7 +771,7 @@
                   [/#list]
                   [#-- Even if init code is in MX_NVIC_Init, if there is no specific USB wake-up interrupt, some code needs to be generated here --]
                   [#if codeInMspInit || !wakeupVector]
-                    #t#tif(hpcd->Init.low_power_enable == 1)
+                    #t#tif(pcdHandle->Init.low_power_enable == 1)
                     #t#t{
                     [@common.generateUsbWakeUpInterrupt ipName=ipName tabN=3/]
                     [#list initService.nvic as initVector]
@@ -918,18 +894,52 @@ ${variable.value} ${variable.name};
         [#assign resultList =""] 	
 [@common.getLocalVariableList instanceData=instanceData/]      
 #n      
+[#-- if used Driver is LL --]
+[#if instanceData.usedDriver?? && instanceData.usedDriver!="HAL"][#--Check if LL driver is used. instanceData:ConfigModel --]
+    [#-- varaible declaration --]
+    [#assign v = ""]
+    [#if instanceData.initServices?? && instanceData.initServices.gpio?? ]
+        [#assign service=instanceData.initServices.gpio]
+           [#list service.variables as variable] [#-- variables declaration --]
+               [#if v?contains(variable.name)]
+               [#-- no matches--]
+               [#else]
+   #t${variable.value} ${variable.name};
+                   [#assign v = v + " "+ variable.name/]	
+               [/#if]	
+           [/#list]  
+    [/#if]
+    [#-- if used with LL and MspPost init is required using gpioOut service --]
+    [#if instanceData.initServices?? && instanceData.initServices.gpioOut?? ]
+           [#assign service=instanceData.initServices.gpioOut]
+           [#list service.variables as variable] [#-- variables declaration --]
+               [#if v?contains(variable.name)]
+               [#-- no matches--]
+               [#else]
+   #t${variable.value} ${variable.name};
+                   [#assign v = v + " "+ variable.name/]	
+               [/#if]	
+           [/#list]  
+    [/#if]
+    [#-- Generate service code --]
+    [@common.generateServiceCode ipName=instName serviceType="Init" modeName="mode" instHandler=instName tabN=1 IPData=instanceData/] 
+[/#if]
         [#--list instanceData.configs as config--]
             [#if instanceData.instIndex??][@common.generateConfigModelListCode configModel=instanceData inst=instName  nTab=1 index=instanceData.instIndex/][#else][@common.generateConfigModelListCode configModel=instanceData inst=instName  nTab=1 index=""/][/#if]
         [#--/#list--]
-[#-- MspPostInit callBack if neededfor output gpio config --]
+[#-- MspPostInit callBack if needed for output gpio config --]
 [#if instanceData.initServices??]
     [#if instanceData.initServices.gpioOut??]
-[#assign ipName = instanceData.ipName]
-        [#list instanceData.initCallBackInitMethodList as initCallBack]
-            [#if initCallBack?contains("PostInit")]
-            #t${initCallBack}([#if ipName?contains("TIM")&&!(ipName?contains("HRTIM")||ipName?contains("LPTIM"))]&htim[#else]&h${instanceData.realIpName?lower_case}[/#if]${instanceData.instIndex});
-            [/#if]
-        [/#list]
+        [#if instanceData.usedDriver?? && instanceData.usedDriver=="HAL"]
+            [#assign ipName = instanceData.ipName]
+            [#list instanceData.initCallBackInitMethodList as initCallBack]
+                [#if initCallBack?contains("PostInit")]
+                #t${initCallBack}([#if ipName?contains("TIM")&&!(ipName?contains("HRTIM")||ipName?contains("LPTIM"))]&htim[#else]&h${instanceData.realIpName?lower_case}[/#if]${instanceData.instIndex});
+                [/#if]
+            [/#list]
+        [#else][#-- Else if LL is used gpio code should be generated --]
+            [@generateConfigCode ipName=instName type="Init" serviceName="gpioOut" instHandler="Tim"?lower_case+"Handle" tabN=1/]  
+        [/#if]
     [/#if]
 [/#if]
 [#-- MspPostInit End --]
@@ -1029,11 +1039,11 @@ static uint32_t ${entry.value}=0;
 [/#list]
 [#-- --]
 [#if mspIsEmpty=="no"]
-[#if  words[0]?contains("DFSDM")]
-#tif(${words[0]}_Init == 0)
-[#else]
- #tif(${mode?lower_case}Handle->Instance==${words[0]?replace("I2S","SPI")})
-[/#if]
+    [#if  words[0]?contains("DFSDM")]
+        #tif(${words[0]}_Init == 0)
+    [#else]
+        #tif(${mode?lower_case}Handle->Instance==${words[0]?replace("I2S","SPI")})
+    [/#if]
 #t{
 [#if words?size > 1] [#-- Check if there is more than one ip instance--]        
 #t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspInit 0 */
@@ -1091,14 +1101,23 @@ static uint32_t ${entry.value}=0;
 
 [#--assign mode=entry.key?replace("_MspInit","")?replace("MspInit","")?replace("_BspInit","")?replace("HAL_","")--]
 [#assign mode=ipvar.ipName]
-
+[#assign usedDriverFlag = "HAL"]
+[#list ipvar.configModelList as instanceData]
+    [#if instanceData.usedDriver?? && instanceData.usedDriver == "LL"]
+        [#assign usedDriverFlag = "LL"]     
+        [#break]
+    [#else]
+        [#break]
+    [/#if]
+    
+[/#list]
 [#assign ipHandler = "h" + mode?lower_case]
 [#--Check if the Msp init will be empty start--] 
     [#assign mspIsEmpty1="yes"] 
     [#list instanceList as inst]
      [#if getInitServiceMode(inst)??]
         [#assign services = getInitServiceMode(inst)]
-        [#if (services.gpioOut??)]
+        [#if (services.gpioOut??)&& usedDriverFlag == "HAL"]
             [#assign mspIsEmpty1="no"] 
             [#break]
         [/#if]
@@ -1112,34 +1131,36 @@ uint32_t DFSDM1_Init = 0;
 
 [#-- #nvoid HAL_${mode}_MspInit(${mode}_HandleTypeDef* h${mode?lower_case}){--] 
 [#if (mspIsEmpty1=="no")&&(mode!="TIM")]
-#nvoid HAL_${mode}_MspPostInit(${mode}_HandleTypeDef* ${mode?lower_case}Handle)
-{
-#n
+    #n#nvoid HAL_${mode}_MspPostInit(${mode}_HandleTypeDef* ${mode?lower_case}Handle)
+    {
+    #n
 [#else]
-[#if (mspIsEmpty1=="no")]
-#nvoid HAL_${mode}_MspPostInit(TIM_HandleTypeDef* ${mode?lower_case}Handle)
-{
-#n
-[/#if]
+    [#if (mspIsEmpty1=="no")]
+        #nvoid HAL_${mode}_MspPostInit(TIM_HandleTypeDef* ${mode?lower_case}Handle)
+        {
+        #n
+    [/#if]
 [/#if]
 
 [#assign words = instanceList]
-[#-- declare Variable GPIO_InitTypeDef once --]
-       [#assign v = ""]
-[#assign mspExist="false"]
-[#list words as inst] [#-- loop on ip instances datas --] 
- [#assign services = getInitServiceMode(inst)]
- [#if services.gpioOut??][#assign service=services.gpioOut]
-        [#list service.variables as variable] [#-- variables declaration --]
-            [#if v?contains(variable.name)]
-            [#-- no matches--]
-            [#else]
-#t${variable.value} ${variable.name};
-                [#assign v = v + " "+ variable.name/]	
-            [/#if]	
-        [/#list]  
+[#if (mspIsEmpty1=="no")]
+    [#-- declare Variable GPIO_InitTypeDef once --]
+           [#assign v = ""]
+    [#assign mspExist="false"]
+    [#list words as inst] [#-- loop on ip instances datas --] 
+        [#assign services = getInitServiceMode(inst)]
+        [#if services.gpioOut??][#assign service=services.gpioOut]
+               [#list service.variables as variable] [#-- variables declaration --]
+                   [#if v?contains(variable.name)]
+                   [#-- no matches--]
+                   [#else]
+       #t${variable.value} ${variable.name};
+                       [#assign v = v + " "+ variable.name/]	
+                   [/#if]	
+               [/#list]  
+       [/#if]
+    [/#list]
 [/#if]
-[/#list]
 [#-- --]
 [#if mspIsEmpty1=="no"]
 [#if  words[0]?contains("DFSDM")]

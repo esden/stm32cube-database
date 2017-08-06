@@ -72,9 +72,38 @@
 	</RefParameter>
 	
 	<!-- MZA Add PHY #define value -->
-	<RefParameter  Comment="PHY Address Name" DefaultValue="DP83848_PHY_ADDRESS" Name="PHY_Name"   Type="stringRW"  TabName="Advanced Parameters" Group="External PHY Configuration" Visible="true"/>	
-    <RefParameter Comment="PHY Address Value" Name="PHY_Value"  DefaultValue="=PhyAddress" Type="string" TabName="Advanced Parameters" Group="External PHY Configuration" Visible="true"/>
-	<RefParameter Comment="PHY Reset delay these values are based on a 1 ms Systick interrupt" DefaultValue="0x000000FF" Name="PHY_RESET_DELAY"  Min="0x00000000" Max="0xFFFFFFFF"  Type="hex"  TabName="Advanced Parameters" Group="External PHY Configuration" Visible="true"/>		
+	<RefParameter  Comment="PHY" DefaultValue="LAN8742A_PHY_ADDRESS" Name="PHY_Name_RMII" Type="list" TabName="Advanced Parameters" Group="External PHY Configuration" Visible="true">
+		<PossibleValue Value="LAN8742A_PHY_ADDRESS" Comment="LAN8742A_PHY_ADDRESS"/>
+        <PossibleValue Value="userPHY" Comment="user PHY"/>
+        </RefParameter>
+            <RefParameter  Comment="PHY" DefaultValue="DP83848_PHY_ADDRESS" Name="PHY_Name_MII" Type="list" TabName="Advanced Parameters" Group="External PHY Configuration" Visible="true">
+                    <PossibleValue Value="DP83848_PHY_ADDRESS" Comment="DP83848_PHY_ADDRESS"/>
+            <PossibleValue Value="userPHY" Comment="user PHY"/>
+        </RefParameter>
+        <RefParameter Comment="PHY name" DefaultValue="user PHY Name" Name="PHY_User_Name" Type="stringRW" TabName="Advanced Parameters" Group="External PHY Configuration" Visible="true">
+            <Condition Diagnostic="PHY User Name - should be set with a string and should not be blank" Expression="PHY_Name_RMII=userPHY|PHY_Name_MII=userPHY"/>
+            <PossibleValue Value="PHY_USER_NAME" Comment="PHY User name"/>
+            <Description> PHY name </Description>
+        </RefParameter>
+        <RefParameter Comment="PHY name" DefaultValue="null" Name="PHY_User_Name" Type="stringRW" TabName="Advanced Parameters" Group="External PHY Configuration" Visible="false"/>
+           
+        <RefParameter Comment="PHY name  arg" DefaultValue="+PHY_User_Name+PHY_NameString" Name="PHY_Name" Type="string" TabName="Advanced Parameters" Group="External PHY Configuration" Visible="false">
+            <Condition Diagnostic="" Expression="PHY_Name_RMII=userPHY|PHY_Name_MII=userPHY"/>
+            <Description> PHY name </Description>
+        </RefParameter>
+        <RefParameter Comment="PHY name  arg" DefaultValue="+PHY_Name_MII" Name="PHY_Name" Type="string" TabName="Advanced Parameters" Group="External PHY Configuration" Visible="false">
+            <Condition Diagnostic="" Expression="MII"/>
+            <Description> PHY name </Description>
+        </RefParameter>
+        <RefParameter Comment="PHY name arg" DefaultValue="+PHY_Name_RMII" Name="PHY_Name" Type="string" TabName="Advanced Parameters" Group="External PHY Configuration" Visible="false">
+            <Description> PHY name </Description>
+        </RefParameter>
+        <RefParameter Comment="static string" DefaultValue="_PHY_ADDRESS" Name="PHY_NameString" Type="string" TabName="Advanced Parameters" Group="External PHY Configuration" Visible="false">
+            <Description> PHY name </Description>
+        </RefParameter>
+   
+	<RefParameter Comment="PHY Address Value"  Name="PHY_Value"  DefaultValue="=PhyAddress"  Type="string"  TabName="Advanced Parameters" Group="External PHY Configuration" Visible="true"/>
+	<RefParameter Comment="PHY Reset delay these values are based on a 1 ms Systick interrupt" DefaultValue="0x000000FF" Name="PHY_RESET_DELAY"  Min="0x00000000" Max="0xFFFFFFFF"  Type="hex"  TabName="Advanced Parameters" Group="External PHY Configuration" Visible="true"/>
 	<RefParameter Comment="PHY Configuration delay " DefaultValue="0x00000FFF" Name="PHY_CONFIG_DELAY"  Min="0x0000" Max="0xFFFFFFFF"  Type="hex" TabName="Advanced Parameters" Group="External PHY Configuration" Visible="true"/>		
 	<RefParameter Comment="PHY Read TimeOut" DefaultValue="0x0000FFFF" Name="PHY_READ_TO"  Min="0x0000" Max="0xFFFFFFFF"  Type="hex" TabName="Advanced Parameters" Group="External PHY Configuration" Visible="true"/>		
 	<RefParameter Comment="PHY Write TimeOut" DefaultValue="0x0000FFFF" Name="PHY_WRITE_TO"  Min="0x0000" Max="0xFFFFFFFF"  Type="hex" TabName="Advanced Parameters"  Group="External PHY Configuration" Visible="true"/>		
@@ -93,16 +122,68 @@
 	<RefParameter Comment="Auto-Negotiation process completed" DefaultValue="0x0020" Name="PHY_AUTONEGO_COMPLETE"  Min="0x0000" Max="0xFFFF"  Type="hex" TabName="Advanced Parameters" Group="Common : External PHY Configuration" Visible="true"/>		
 	<RefParameter Comment="Valid link established" DefaultValue="0x0004" Name="PHY_LINKED_STATUS"  Min="0x0000" Max="0xFFFF"  Type="hex" TabName="Advanced Parameters" Group="Common : External PHY Configuration" Visible="true"/>		
 	<RefParameter Comment="Jabber condition detected" DefaultValue="0x0002" Name="PHY_JABBER_DETECTION"  Min="0x0000" Max="0xFFFF"  Type="hex" TabName="Advanced Parameters" Group="Common : External PHY Configuration" Visible="true"/>		
-	<RefParameter Comment="PHY status register Offset" DefaultValue="0x10" Name="PHY_SR"  Min="0x0000" Max="0xFFFF"  Type="hex" TabName="Advanced Parameters" Group="Extended : External PHY Configuration" Visible="true"/>		
-	<RefParameter Comment="MII Interrupt Control Register" DefaultValue="0x11" Name="PHY_MICR"  Min="0x0000" Max="0xFFFF"  Type="hex" TabName="Advanced Parameters" Group="Extended : External PHY Configuration" Visible="true"/>		
-	<RefParameter Comment="MII Interrupt Status and Misc. Control Register" DefaultValue="0x12" Name="PHY_MISR"  Min="0x0000" Max="0xFFFF"  Type="hex" TabName="Advanced Parameters" Group="Extended : External PHY Configuration" Visible="true"/>		
-	<RefParameter Comment="PHY Link mask" DefaultValue="0x0001" Name="PHY_LINK_STATUS"  Min="0x0000" Max="0xFFFF"  Type="hex" TabName="Advanced Parameters" Group="Extended : External PHY Configuration" Visible="true"/>		
-	<RefParameter Comment="PHY Speed mask" DefaultValue="0x0002" Name="PHY_SPEED_STATUS"  Min="0x0000" Max="0xFFFF"  Type="hex" TabName="Advanced Parameters" Group="Extended : External PHY Configuration" Visible="true"/>		
-	<RefParameter Comment="PHY Duplex mask " DefaultValue="0x0004" Name="PHY_DUPLEX_STATUS"  Min="0x0000" Max="0xFFFF"  Type="hex" TabName="Advanced Parameters" Group="Extended : External PHY Configuration" Visible="true"/>		
-	<RefParameter Comment="PHY Enable interrupts" DefaultValue="0x0002" Name="PHY_MICR_INT_EN"  Min="0x0000" Max="0xFFFF"  Type="hex" TabName="Advanced Parameters" Group="Extended : External PHY Configuration" Visible="true"/>		
-	<RefParameter Comment="PHY Enable output interrupt events" DefaultValue="0x0001" Name="PHY_MICR_INT_OE"  Min="0x0000" Max="0xFFFF"  Type="hex"  TabName="Advanced Parameters" Group="Extended : External PHY Configuration" Visible="true"/>		
-	<RefParameter Comment="Enable Interrupt on change of link status" DefaultValue="0x0020" Name="PHY_MISR_LINK_INT_EN"  Min="0x0000" Max="0xFFFF"  Type="hex" TabName="Advanced Parameters" Group="Extended : External PHY Configuration" Visible="true"/>		
-	<RefParameter Comment="HY link status interrupt mask" DefaultValue="0x2000" Name="PHY_LINK_INTERRUPT"  Min="0x0000" Max="0xFFFF"  Type="hex" TabName="Advanced Parameters" Group="Extended : External PHY Configuration" Visible="true"/>		
+
+	<RefParameter Comment="PHY special control/status register Offset" DefaultValue="0x10" Name="PHY_SR"  Min="0x0000" Max="0xFFFF"  Type="hex" TabName="Advanced Parameters" Group="Extended : External PHY Configuration" Visible="true">
+        <Condition Diagnostic="PHY_User_status_register_offset" Expression="PHY_Name_MII=DP83848_PHY_ADDRESS|PHY_Name_RMII=LAN8742A_PHY_ADDRESS|PHY_Name_MII=userPHY|PHY_Name_RMII=userPHY"/>
+        <Description> PHY name </Description>
+    </RefParameter>
+	<RefParameter Comment="PHY special control/status register Offset" DefaultValue="0x10" Name="PHY_SR"  Min="0x0000" Max="0xFFFF"  Type="hex" TabName="Advanced Parameters" Group="Extended : External PHY Configuration" Visible="false"/>
+	<RefParameter Comment="MII Interrupt Control Register" DefaultValue="0x11" Name="PHY_MICR"  Min="0x0000" Max="0xFFFF"  Type="hex" TabName="Advanced Parameters" Group="Extended : External PHY Configuration" Visible="true">
+		<Condition Diagnostic="PHY_User_MII_Interrupt_Control_Register" Expression="PHY_Name_MII=DP83848_PHY_ADDRESS"/>
+        <Description> PHY name </Description>
+    </RefParameter>
+    <RefParameter Comment="MII Interrupt Control Register" DefaultValue="0x11" Name="PHY_MICR"  Min="0x0000" Max="0xFFFF"  Type="hex" TabName="Advanced Parameters" Group="Extended : External PHY Configuration" Visible="false"/>
+
+	<RefParameter Comment="MII Interrupt Status and Misc. Control Register" DefaultValue="0x12" Name="PHY_MISR"  Min="0x0000" Max="0xFFFF"  Type="hex" TabName="Advanced Parameters" Group="Extended : External PHY Configuration" Visible="true">
+        <Condition Diagnostic="PHY_User_MII_Interrupt_Status" Expression="PHY_Name_MII=DP83848_PHY_ADDRESS"/>
+        <Description> PHY name </Description>
+    </RefParameter>
+	<RefParameter Comment="MII Interrupt Status and Misc. Control Register" DefaultValue="0x12" Name="PHY_MISR"  Min="0x0000" Max="0xFFFF"  Type="hex" TabName="Advanced Parameters" Group="Extended : External PHY Configuration" Visible="false"/>
+	<RefParameter Comment="PHY Link mask" DefaultValue="0x0001" Name="PHY_LINK_STATUS"  Min="0x0000" Max="0xFFFF"  Type="hex" TabName="Advanced Parameters" Group="Extended : External PHY Configuration" Visible="true">
+        <Condition Diagnostic="PHY_User_Link_Mask" Expression="PHY_Name_MII=DP83848_PHY_ADDRESS"/>
+        <Description> PHY name </Description>
+    </RefParameter>
+	<RefParameter Comment="PHY Link mask" DefaultValue="0x0001" Name="PHY_LINK_STATUS"  Min="0x0000" Max="0xFFFF"  Type="hex" TabName="Advanced Parameters" Group="Extended : External PHY Configuration" Visible="false"/>
+	<RefParameter Comment="PHY Speed mask" DefaultValue="0x0002" Name="PHY_SPEED_STATUS"  Min="0x0000" Max="0xFFFF"  Type="hex" TabName="Advanced Parameters" Group="Extended : External PHY Configuration" Visible="true">
+        <Condition Diagnostic="PHY_User_speed_mask" Expression="PHY_Name_MII=DP83848_PHY_ADDRESS|PHY_Name_RMII=LAN8742A_PHY_ADDRESS|PHY_Name_MII=userPHY|PHY_Name_RMII=userPHY"/>
+        <Description> PHY name </Description>
+    </RefParameter>
+	<RefParameter Comment="PHY Speed mask" DefaultValue="0x0002" Name="PHY_SPEED_STATUS"  Min="0x0000" Max="0xFFFF"  Type="hex" TabName="Advanced Parameters" Group="Extended : External PHY Configuration" Visible="false"/>
+	<RefParameter Comment="PHY Duplex mask " DefaultValue="0x0004" Name="PHY_DUPLEX_STATUS"  Min="0x0000" Max="0xFFFF"  Type="hex" TabName="Advanced Parameters" Group="Extended : External PHY Configuration" Visible="true">
+        <Condition Diagnostic="PHY_User_Duplex_mask" Expression="PHY_Name_MII=DP83848_PHY_ADDRESS|PHY_Name_RMII=LAN8742A_PHY_ADDRESS|PHY_Name_MII=userPHY|PHY_Name_RMII=userPHY"/>
+        <Description> PHY name </Description>
+    </RefParameter>
+	<RefParameter Comment="PHY Duplex mask " DefaultValue="0x0004" Name="PHY_DUPLEX_STATUS"  Min="0x0000" Max="0xFFFF"  Type="hex" TabName="Advanced Parameters" Group="Extended : External PHY Configuration" Visible="false"/>
+	<RefParameter Comment="PHY Enable interrupts" DefaultValue="0x0002" Name="PHY_MICR_INT_EN"  Min="0x0000" Max="0xFFFF"  Type="hex" TabName="Advanced Parameters" Group="Extended : External PHY Configuration" Visible="true">
+        <Condition Diagnostic="PHY_User_enable_interrupts" Expression="PHY_Name_MII=DP83848_PHY_ADDRESS"/>
+        <Description> PHY name </Description>
+    </RefParameter>
+	<RefParameter Comment="PHY Enable interrupts" DefaultValue="0x0002" Name="PHY_MICR_INT_EN"  Min="0x0000" Max="0xFFFF"  Type="hex" TabName="Advanced Parameters" Group="Extended : External PHY Configuration" Visible="false"/>
+	<RefParameter Comment="PHY Enable output interrupt events" DefaultValue="0x0001" Name="PHY_MICR_INT_OE"  Min="0x0000" Max="0xFFFF"  Type="hex"  TabName="Advanced Parameters" Group="Extended : External PHY Configuration" Visible="true">
+        <Condition Diagnostic="PHY_User_enable_output_interrupt_events" Expression="PHY_Name_MII=DP83848_PHY_ADDRESS"/>
+        <Description> PHY name </Description>
+    </RefParameter>
+	<RefParameter Comment="PHY Enable output interrupt events" DefaultValue="0x0001" Name="PHY_MICR_INT_OE"  Min="0x0000" Max="0xFFFF"  Type="hex"  TabName="Advanced Parameters" Group="Extended : External PHY Configuration" Visible="false"/>
+	<RefParameter Comment="Enable Interrupt on change of link status" DefaultValue="0x0020" Name="PHY_MISR_LINK_INT_EN"  Min="0x0000" Max="0xFFFF"  Type="hex" TabName="Advanced Parameters" Group="Extended : External PHY Configuration" Visible="true">
+        <Condition Diagnostic="PHY_User_enable_interrupt_on_change_of_link_status" Expression="PHY_Name_MII=DP83848_PHY_ADDRESS"/>
+        <Description> PHY name </Description>
+    </RefParameter>
+	<RefParameter Comment="Enable Interrupt on change of link status" DefaultValue="0x0020" Name="PHY_MISR_LINK_INT_EN"  Min="0x0000" Max="0xFFFF"  Type="hex" TabName="Advanced Parameters" Group="Extended : External PHY Configuration" Visible="false"/>
+	<RefParameter Comment="PHY link status interrupt mask" DefaultValue="0x2000" Name="PHY_LINK_INTERRUPT"  Min="0x0000" Max="0xFFFF"  Type="hex" TabName="Advanced Parameters" Group="Extended : External PHY Configuration" Visible="true">
+        <Condition Diagnostic="PHY_User_HY_link_status_interrupt_mask" Expression="PHY_Name_MII=DP83848_PHY_ADDRESS"/>
+        <Description> PHY name </Description>
+    </RefParameter>
+    <RefParameter Comment="PHY link status interrupt mask" DefaultValue="0x2000" Name="PHY_LINK_INTERRUPT"  Min="0x0000" Max="0xFFFF"  Type="hex" TabName="Advanced Parameters" Group="Extended : External PHY Configuration" Visible="false"/>
+    <RefParameter Comment="PHY Interrupt Source Flag register Offset" DefaultValue="0x000B" Name="PHY_ISFR"  Min="0x0000" Max="0xFFFF"  Type="hex" TabName="Advanced Parameters" Group="Extended : External PHY Configuration" Visible="true">
+        <Condition Diagnostic="PHY_User_Source_Flag_Register" Expression="PHY_Name_RMII=LAN8742A_PHY_ADDRESS"/>
+        <Description> PHY name </Description>
+    </RefParameter>
+    <RefParameter Comment="PHY Interrupt Source Flag register Offset" DefaultValue="0x000B" Name="PHY_ISFR"  Min="0x0000" Max="0xFFFF"  Type="hex" TabName="Advanced Parameters" Group="Extended : External PHY Configuration" Visible="false"/>
+    <RefParameter Comment="PHY Link down inturrupt" DefaultValue="0x000B" Name="PHY_ISFR_INT4"  Min="0x0000" Max="0xFFFF"  Type="hex" TabName="Advanced Parameters" Group="Extended : External PHY Configuration" Visible="true">
+        <Condition Diagnostic="PHY_User_HY_link_status_interrupt_mask" Expression="PHY_Name_RMII=LAN8742A_PHY_ADDRESS"/>
+        <Description> PHY name </Description>
+    </RefParameter>
+	<RefParameter Comment="PHY Link down inturrupt" DefaultValue="0x000B" Name="PHY_ISFR_INT4"  Min="0x0000" Max="0xFFFF"  Type="hex" TabName="Advanced Parameters" Group="Extended : External PHY Configuration" Visible="false"/>
 	
 
 	<!-- RefMode for ETH -->
@@ -118,8 +199,10 @@
 		<Parameter Name="MediaInterface">
 			<PossibleValue>ETH_MEDIA_INTERFACE_MII</PossibleValue>
 		</Parameter>
-		<Parameter Name="PHY_Name"/>
+		<Parameter Name="PHY_Name_MII"/>
+                <Parameter Name="PHY_Name"/>
 		<Parameter Name="PHY_Value"/>
+		<Parameter Name="PHY_User_Name"/>
 		<Parameter Name="PHY_RESET_DELAY"/>
 		<Parameter Name="PHY_CONFIG_DELAY"/>
 		<Parameter Name="PHY_READ_TO"/>
@@ -149,6 +232,8 @@
 		<Parameter Name="PHY_MICR_INT_OE"/>
 		<Parameter Name="PHY_MISR_LINK_INT_EN"/>
 		<Parameter Name="PHY_LINK_INTERRUPT"/>
+<!-- 		<Parameter Name="PHY_ISFR"/> -->
+<!-- 		<Parameter Name="PHY_ISFR_INT4"/> -->
 		
 		<Parameter Name="Instance"/>
 	</RefMode>
@@ -164,8 +249,10 @@
 		<Parameter Name="MediaInterface">
 			<PossibleValue>ETH_MEDIA_INTERFACE_MII</PossibleValue>
 		</Parameter>
-		<Parameter Name="PHY_Name"/>
+		<Parameter Name="PHY_Name_MII"/>
+                <Parameter Name="PHY_Name"/>
 		<Parameter Name="PHY_Value"/>
+		<Parameter Name="PHY_User_Name"/>
 		<Parameter Name="PHY_RESET_DELAY"/>
 		<Parameter Name="PHY_CONFIG_DELAY"/>
 		<Parameter Name="PHY_READ_TO"/>
@@ -195,6 +282,8 @@
 		<Parameter Name="PHY_MICR_INT_OE"/>
 		<Parameter Name="PHY_MISR_LINK_INT_EN"/>
 		<Parameter Name="PHY_LINK_INTERRUPT"/>
+<!-- 		<Parameter Name="PHY_ISFR"/> -->
+<!-- 		<Parameter Name="PHY_ISFR_INT4"/> -->
 		<Parameter Name="Instance"/>
 	</RefMode>
 	<RefMode Name="MII Full Duplex Only" HalMode="ETH">
@@ -209,8 +298,10 @@
 		<Parameter Name="MediaInterface">
 			<PossibleValue>ETH_MEDIA_INTERFACE_MII</PossibleValue>
 		</Parameter>
-		<Parameter Name="PHY_Name"/>
+		<Parameter Name="PHY_Name_MII"/>
+                <Parameter Name="PHY_Name"/>
 		<Parameter Name="PHY_Value"/>
+		<Parameter Name="PHY_User_Name"/>
 		<Parameter Name="PHY_RESET_DELAY"/>
 		<Parameter Name="PHY_CONFIG_DELAY"/>
 		<Parameter Name="PHY_READ_TO"/>
@@ -240,6 +331,8 @@
 		<Parameter Name="PHY_MICR_INT_OE"/>
 		<Parameter Name="PHY_MISR_LINK_INT_EN"/>
 		<Parameter Name="PHY_LINK_INTERRUPT"/>
+<!-- 		<Parameter Name="PHY_ISFR"/> -->
+<!-- 		<Parameter Name="PHY_ISFR_INT4"/> -->
 		<Parameter Name="Instance"/>
 	</RefMode>
 	<!--
@@ -270,8 +363,10 @@
 		<Parameter Name="MediaInterface">
 			<PossibleValue>ETH_MEDIA_INTERFACE_RMII</PossibleValue>
 		</Parameter>
-		<Parameter Name="PHY_Name"/>
+		<Parameter Name="PHY_Name_RMII"/>
+                <Parameter Name="PHY_Name"/>
 		<Parameter Name="PHY_Value"/>
+		<Parameter Name="PHY_User_Name"/>
 		<Parameter Name="PHY_RESET_DELAY"/>
 		<Parameter Name="PHY_CONFIG_DELAY"/>
 		<Parameter Name="PHY_READ_TO"/>
@@ -292,15 +387,17 @@
 		<Parameter Name="PHY_LINKED_STATUS"/>
 		<Parameter Name="PHY_JABBER_DETECTION"/>
 		<Parameter Name="PHY_SR"/>
-		<Parameter Name="PHY_MICR"/>
-		<Parameter Name="PHY_MISR"/>
-		<Parameter Name="PHY_LINK_STATUS"/>
+<!-- 		<Parameter Name="PHY_MICR"/> -->
+<!-- 		<Parameter Name="PHY_MISR"/> -->
+<!-- 		<Parameter Name="PHY_LINK_STATUS"/> -->
 		<Parameter Name="PHY_SPEED_STATUS"/>
 		<Parameter Name="PHY_DUPLEX_STATUS"/>
-		<Parameter Name="PHY_MICR_INT_EN"/>
-		<Parameter Name="PHY_MICR_INT_OE"/>
-		<Parameter Name="PHY_MISR_LINK_INT_EN"/>
-		<Parameter Name="PHY_LINK_INTERRUPT"/>
+<!-- 		<Parameter Name="PHY_MICR_INT_EN"/> -->
+<!-- 		<Parameter Name="PHY_MICR_INT_OE"/> -->
+<!-- 		<Parameter Name="PHY_MISR_LINK_INT_EN"/> -->
+<!-- 		<Parameter Name="PHY_LINK_INTERRUPT"/> -->
+		<Parameter Name="PHY_ISFR"/>
+		<Parameter Name="PHY_ISFR_INT4"/>
 		<Parameter Name="Instance"/>
 	</RefMode>
 	<!--

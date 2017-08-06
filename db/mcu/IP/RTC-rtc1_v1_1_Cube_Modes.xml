@@ -161,6 +161,33 @@
         <RefMode Name="RTC_SetSecond" HalMode="RTC" Abstract="true">
         </RefMode> Revert modif done in bug #303011 -->
 	<!-- RefMode for intern -->
+	<RefMode Abstract="true" HalMode="RTC" Name="RTC_Enabled">
+		<ConfigForMode>RTC_Init_Only</ConfigForMode>
+		<!-- Basic Parameters -->
+		<Parameter Name="Format"/>
+		<Parameter Name="AutoPrediv"/>
+		<Parameter Name="AsynchPrediv"/>
+		<Parameter Name="OutPut"/>
+	</RefMode>
+	
+	<RefMode Abstract="true" HalMode="RTC" Name="RTC_Calendar">
+		<ConfigForMode>RTC_Init</ConfigForMode>
+		<!-- Basic Parameters -->
+		<Parameter Name="AutoPrediv"/>
+		<Parameter Name="AsynchPrediv"/>
+		<Parameter Name="OutPut"/>
+		<!-- Calendar Settings -->
+		<Parameter Name="Format"/>
+		<Parameter Name="Hours"/>
+		<Parameter Name="Minutes"/>
+		<Parameter Name="Seconds"/>
+		<!-- Parameter Name="SubSeconds"/-->
+		<Parameter Name="WeekDay"/>
+		<Parameter Name="Month"/>
+		<Parameter Name="Date"/>
+		<Parameter Name="Year"/>
+	</RefMode>
+	
 	<RefMode Abstract="true" HalMode="RTC" Name="RTC_Init_And_Calender_Settings"> 
 		<ConfigForMode>RTC_Init</ConfigForMode>
 		<!-- Basic Parameters -->
@@ -179,20 +206,12 @@
 	</RefMode>
 	
 	<RefMode Abstract="true" HalMode="RTC" Name="Tamper_basic">
-		<ConfigForMode>RTC_Init</ConfigForMode>
+		<ConfigForMode>RTC_Init_Only</ConfigForMode>
 		<!-- Basic Parameters -->
 		<Parameter Name="AutoPrediv"/>
 		<Parameter Name="AsynchPrediv"/>
 		<Parameter Name="OutPut"/>
 		<!-- Calendar Settings -->
-		<Parameter Name="Format"/>
-		<Parameter Name="Hours"/>
-		<Parameter Name="Minutes"/>
-		<Parameter Name="Seconds"/>
-		<Parameter Name="WeekDay"/>
-		<Parameter Name="Month"/>
-		<Parameter Name="Date"/>
-		<Parameter Name="Year"/>
 	</RefMode>	
 	
 	<RefMode Abstract="true" HalMode="RTC" Name="Date">
@@ -257,8 +276,30 @@
 	<!--##################################################################################################-->
 	
 	<ModeLogicOperator Name="OR">
+	
+		<Mode Name="Activate Clock Source">
+			<ModeLogicOperator Name="XOR">
+				<Mode Name="RTC_Enabled" UserName="Activate Clock Source">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="VS_RTC_Activate"/>
+					</SignalLogicalOp>
+					<Semaphore>RTC_ENABLED</Semaphore>
+				</Mode>
+			</ModeLogicOperator>
+		</Mode>
+		
+		<Mode Name="Activate Calendar">
+			<Condition Diagnostic="RTC is already used for system time base" Expression="!SYS_$IpInstance &amp; RTC_ENABLED"/>
+			<ModeLogicOperator Name="XOR">
+				<Mode Name="RTC_Calendar" UserName="Activate Calendar">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="VS_RTC_Calendar"/>
+					</SignalLogicalOp>
+				</Mode>
+			</ModeLogicOperator>
+		</Mode>
             <Mode Name="RTC OUT">
-                <Condition Diagnostic="RTC is already used for system time base" Expression="!SYS_$IpInstance"/>
+                <Condition Diagnostic="RTC is already used for system time base" Expression="!SYS_$IpInstance &amp; RTC_ENABLED"/>
                 <ModeLogicOperator Name="XOR">			
                     <Mode Name="RTC_OUT_NO" UserName="No RTC Output">
                         <SignalLogicalOp Name="AND">
@@ -277,7 +318,7 @@
             </Mode>
 		
 		<Mode Name="Tamper">
-                        <Condition Diagnostic="RTC is already used for system time base" Expression="!SYS_$IpInstance"/>
+                        <Condition Diagnostic="RTC is already used for system time base" Expression="!SYS_$IpInstance &amp; RTC_ENABLED"/>
 			<ModeLogicOperator Name="XOR">
 				<Mode Name="Tamper" UserName="Tamper Output">
 					<SignalLogicalOp Name="AND">
@@ -295,6 +336,8 @@
 	<RefSignal IOMode="System" Name="TAMPER"/>
 	<RefSignal IOMode="System" Name="OUT"/>
 	<!-- Virtual RefSignals-->
+	<RefSignal Name="VS_RTC_Activate" Virtual="true"/>
+	<RefSignal Name="VS_RTC_Calendar" Virtual="true"/>
 	<RefSignal Name="No_RTC_Output" Virtual="true"/>
 	<RefSignal Name="VS_RTC_Alarm_A_Intern" Virtual="true"/>
 	<Semaphore>RTCUsed_ForRCC</Semaphore>

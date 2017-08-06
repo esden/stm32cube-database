@@ -41,8 +41,7 @@
  extern "C" {
 #endif
 
-#include "mxconstants.h" [#-- for user defines --]
-
+#include "main.h"
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
 
@@ -185,21 +184,28 @@
 #define PHY_JABBER_DETECTION            ((uint16_t)[#if PHY_JABBER_DETECTION??]${PHY_JABBER_DETECTION}[#else]0x0002[/#if])  /*!< Jabber condition detected            */
   
 /* Section 4: Extended PHY Registers */
-
-#define PHY_SR                          ((uint16_t)[#if PHY_SR??]${PHY_SR}[#else]0x10[/#if])    /*!< PHY status register Offset                      */
-#define PHY_MICR                        ((uint16_t)[#if PHY_MICR??]${PHY_MICR}[#else]0x11[/#if])    /*!< MII Interrupt Control Register                  */
-#define PHY_MISR                        ((uint16_t)[#if PHY_MISR??]${PHY_MISR}[#else]0x12[/#if])    /*!< MII Interrupt Status and Misc. Control Register */
- 
-#define PHY_LINK_STATUS                 ((uint16_t)[#if PHY_LINK_STATUS??]${PHY_LINK_STATUS}[#else]0x0001[/#if])  /*!< PHY Link mask                                   */
-#define PHY_SPEED_STATUS                ((uint16_t)[#if PHY_SPEED_STATUS??]${PHY_SPEED_STATUS}[#else]0x0002[/#if])  /*!< PHY Speed mask                                  */
-#define PHY_DUPLEX_STATUS               ((uint16_t)[#if PHY_DUPLEX_STATUS??]${PHY_DUPLEX_STATUS}[#else]0x0004[/#if])  /*!< PHY Duplex mask                                 */
-
-#define PHY_MICR_INT_EN                 ((uint16_t)[#if PHY_MICR_INT_EN??]${PHY_MICR_INT_EN}[#else]0x0002[/#if])  /*!< PHY Enable interrupts                           */
-#define PHY_MICR_INT_OE                 ((uint16_t)[#if PHY_MICR_INT_OE??]${PHY_MICR_INT_OE}[#else]0x0001[/#if])  /*!< PHY Enable output interrupt events              */
-
-#define PHY_MISR_LINK_INT_EN            ((uint16_t)[#if PHY_MISR_LINK_INT_EN??]${PHY_MISR_LINK_INT_EN}[#else]0x0020[/#if])  /*!< Enable Interrupt on change of link status       */
-#define PHY_LINK_INTERRUPT              ((uint16_t)[#if PHY_LINK_INTERRUPT??]${PHY_LINK_INTERRUPT}[#else]0x2000[/#if])  /*!< PHY link status interrupt mask                  */
-
+[#--Common define--]
+#define PHY_SR                          ((uint16_t)[#if PHY_SR??]${PHY_SR}[#else]0x10[/#if]U)    /*!< PHY status register Offset                      */
+[#if PHY_Name?? && (PHY_Name=="DP83848_PHY_ADDRESS"||PHY_Name=="DP83848")] 
+#define PHY_MICR                        ((uint16_t)[#if PHY_MICR??]${PHY_MICR}[#else]0x11[/#if]U)    /*!< MII Interrupt Control Register                  */
+#define PHY_MISR                        ((uint16_t)[#if PHY_MISR??]${PHY_MISR}[#else]0x12[/#if]U)    /*!< MII Interrupt Status and Misc. Control Register */
+#n#define PHY_LINK_STATUS                 ((uint16_t)[#if PHY_LINK_STATUS??]${PHY_LINK_STATUS}[#else]0x0001[/#if]U)  /*!< PHY Link mask                                   */
+[#else]
+#n
+[/#if]
+[#--Common define--]
+#define PHY_SPEED_STATUS                ((uint16_t)[#if PHY_SPEED_STATUS??]${PHY_SPEED_STATUS}[#else]0x0002[/#if]U)  /*!< PHY Speed mask                                  */
+#define PHY_DUPLEX_STATUS               ((uint16_t)[#if PHY_DUPLEX_STATUS??]${PHY_DUPLEX_STATUS}[#else]0x0004[/#if]U)  /*!< PHY Duplex mask                                 */
+[#if PHY_Name?? && (PHY_Name=="DP83848_PHY_ADDRESS"||PHY_Name=="DP83848")]
+#n#define PHY_MICR_INT_EN                 ((uint16_t)[#if PHY_MICR_INT_EN??]${PHY_MICR_INT_EN}[#else]0x0002[/#if]U)  /*!< PHY Enable interrupts                           */
+#define PHY_MICR_INT_OE                 ((uint16_t)[#if PHY_MICR_INT_OE??]${PHY_MICR_INT_OE}[#else]0x0001[/#if]U)  /*!< PHY Enable output interrupt events              */
+#n#define PHY_MISR_LINK_INT_EN            ((uint16_t)[#if PHY_MISR_LINK_INT_EN??]${PHY_MISR_LINK_INT_EN}[#else]0x0020[/#if]U)  /*!< Enable Interrupt on change of link status       */
+#define PHY_LINK_INTERRUPT              ((uint16_t)[#if PHY_LINK_INTERRUPT??]${PHY_LINK_INTERRUPT}[#else]0x2000[/#if]U)  /*!< PHY link status interrupt mask                  */
+[/#if]
+[#if PHY_Name?? && (PHY_Name=="LAN8742A_PHY_ADDRESS")]
+#n#define PHY_ISFR                        ((uint16_t)[#if PHY_ISFR??]${PHY_ISFR}[#else]0x1D[/#if]U)    /*!< PHY Interrupt Source Flag register Offset   */
+#define PHY_ISFR_INT4                   ((uint16_t)[#if PHY_ISFR_INT4??]${PHY_ISFR_INT4}[#else]0x0010[/#if]U)  /*!< PHY Link down inturrupt       */  
+[/#if]
 
 
 /* Includes ------------------------------------------------------------------*/

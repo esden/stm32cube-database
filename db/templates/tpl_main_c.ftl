@@ -4,39 +4,17 @@
   * File Name          : main.c
   * Description        : Main program body
   ******************************************************************************
-  *
-  * COPYRIGHT(c) ${year} STMicroelectronics
-  *
-  * Redistribution and use in source and binary forms, with or without modification,
-  * are permitted provided that the following conditions are met:
-  *   1. Redistributions of source code must retain the above copyright notice,
-  *      this list of conditions and the following disclaimer.
-  *   2. Redistributions in binary form must reproduce the above copyright notice,
-  *      this list of conditions and the following disclaimer in the documentation
-  *      and/or other materials provided with the distribution.
-  *   3. Neither the name of STMicroelectronics nor the names of its contributors
-  *      may be used to endorse or promote products derived from this software
-  *      without specific prior written permission.
-  *
-  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-  * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-  * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-  * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-  *
+[@common.optinclude name="Src/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
 [#compress]
 [#assign usb_device = false]
 /* Includes ------------------------------------------------------------------*/
-[#if isHalSupported??]
+#include "main.h"
+[#if isHalSupported?? && isHALUsed?? ]
 #include "${FamilyName?lower_case}xx_hal.h"
 [/#if]
+[#-- move includes to main.h --]
 [@common.optinclude name="Src/rtos_inc.tmp"/][#--include freertos includes --]
 [#-- if !HALCompliant??--][#-- if HALCompliant Begin --]
 [#list ips as ip]
@@ -139,6 +117,11 @@ ${dHandle};
 [#compress]
 [#if clockConfig??]
 /* Private function prototypes -----------------------------------------------*/
+[#if isHALUsed??]
+[#-- Use HAL_MspInit--]
+[#else]
+static void LL_Init(void);
+[/#if]
 void SystemClock_Config(void); [#-- remove static --]
 void Error_Handler(void);
 [/#if]
@@ -152,9 +135,9 @@ static void MPU_Config(void);
  void MX_FREERTOS_Init(void); 
  [/#if]
 [/#if]
-[#if HALCompliant??] 
+[#if HALCompliant??]
  [#list voids as void]
-  [#if !void.functionName?contains("FREERTOS")&&!void.functionName?contains("FATFS")&& !void.functionName?contains("LWIP")&& !void.functionName?contains("USB_DEVICE")&& !void.functionName?contains("USB_HOST")&& !void.functionName?contains("CORTEX")] 
+  [#if !void.functionName?contains("FREERTOS")&&void.functionName!="Init"&&!void.functionName?contains("FATFS")&& !void.functionName?contains("LWIP")&& !void.functionName?contains("USB_DEVICE")&& !void.functionName?contains("USB_HOST")&& !void.functionName?contains("CORTEX")&& !void.functionName?contains("SystemClock_Config")] 
 [#if !void.isNotGenerated]
 static void ${""?right_pad(2)}${void.functionName}(void);
   [/#if]
@@ -171,40 +154,39 @@ static void MX_NVIC_Init(void);
 [/#if]
 [#-- PostInit declaration --]
 [#if Peripherals??]
-[#assign postinitList = ""]
-[#list Peripherals as Peripheral]
-[#if Peripheral??]
-[#list Peripheral as IP]
-[#list IP.configModelList as instanceData]
-[#if instanceData.initServices??]
-    [#if instanceData.initServices.gpioOut??] 
-        [#list instanceData.initCallBackInitMethodList as initCallBack]
-            [#if initCallBack?contains("PostInit")]
-                [#assign halMode = instanceData.halMode]
-                [#assign ipName = instanceData.ipName]
-                [#assign ipInstance = instanceData.instanceName]
-                [#if halMode!=ipName&&!ipName?contains("TIM")&&!ipName?contains("CEC")]
-[#if !postinitList?contains(initCallBack)]
-                    #nvoid ${initCallBack}(${instanceData.halMode}_HandleTypeDef *h${instanceData.halMode?lower_case});
-                     [#assign postinitList = postinitList+" "+initCallBack]
-[/#if]
-                [#else]
-[#if !postinitList?contains(initCallBack)]
-                    #nvoid ${initCallBack}([#if ipName?contains("TIM")&&!(ipName?contains("HRTIM")||ipName?contains("LPTIM"))]TIM_HandleTypeDef *htim[#else]${ipName}_HandleTypeDef *h${ipName?lower_case}[/#if]);
-        [#assign postinitList = postinitList+" "+initCallBack]
-[/#if]
+    [#assign postinitList = ""]
+    [#list Peripherals as Peripheral]
+        [#if Peripheral??]
+            [#list Peripheral as IP]
+                [#list IP.configModelList as instanceData]
+                [#if instanceData.initServices??]
+                    [#if instanceData.initServices.gpioOut??] 
+                        [#list instanceData.initCallBackInitMethodList as initCallBack]
+                            [#if initCallBack?contains("PostInit")]
+                                [#assign halMode = instanceData.halMode]
+                                [#assign ipName = instanceData.ipName]
+                                [#assign ipInstance = instanceData.instanceName]
+                                [#if halMode!=ipName&&!ipName?contains("TIM")&&!ipName?contains("CEC")]
+                                    [#if !postinitList?contains(initCallBack)]
+                                        #nvoid ${initCallBack}(${instanceData.halMode}_HandleTypeDef *h${instanceData.halMode?lower_case});
+                                        [#assign postinitList = postinitList+" "+initCallBack]
+                                    [/#if]
+                                [#else]
+                                    [#if !postinitList?contains(initCallBack)]
+                                    #nvoid ${initCallBack}([#if ipName?contains("TIM")&&!(ipName?contains("HRTIM")||ipName?contains("LPTIM"))]TIM_HandleTypeDef *htim[#else]${ipName}_HandleTypeDef *h${ipName?lower_case}[/#if]);
+                                    [#assign postinitList = postinitList+" "+initCallBack]
+                                    [/#if]
+                                [/#if]
+                                [#break] [#-- take only the first PostInit : case of timer--]
+                            [/#if]
+                        [/#list]
+                    [/#if]
                 [/#if]
-                [#break] [#-- take only the first PostInit : case of timer--]
-            [/#if]
 
-        [/#list]
-    [/#if]
-[/#if]
-
-[/#list]
-[/#list]
-[/#if]
-[/#list]
+                [/#list]
+            [/#list]
+        [/#if]
+    [/#list]
 [/#if]
 
 [#-- PostInit declaration : End --]
@@ -243,13 +225,17 @@ int main(void)
 #t/* MCU Configuration----------------------------------------------------------*/
 [#if clockConfig??]
 #n#t/* Reset of all peripherals, Initializes the Flash interface and the Systick. */
+[#if isHALUsed??]
 #tHAL_Init();
+[#else]
+#tLL_Init();
+[/#if]
 #n#t/* Configure the system clock */
 #tSystemClock_Config();
 [/#if]
 #n#t/* Initialize all configured peripherals */
 [#list voids as void]
-[#if !void.functionName?contains("FREERTOS")&&!void.functionName?contains("CORTEX")]
+[#if !void.functionName?contains("FREERTOS")&&!void.functionName?contains("CORTEX")&& !void.functionName?contains("SystemClock_Config")&&void.functionName!="Init"]
 [#if !void.isNotGenerated]
 [#if (FREERTOS?? && void.ipType=="peripheral") || !FREERTOS??]
 #t${void.functionName}();
@@ -299,9 +285,18 @@ int main(void)
 
 #n
 [#-- if --]
-
-
 }
+
+[#if isHALUsed??]
+[#-- Use HAL_MspInit--]
+[#else]
+    [#if clockConfig??]
+static void LL_Init(void)
+{
+#t[@common.optinclude name="Src/system.tmp"/] [#-- if LL include system.tmp --]
+}
+    [/#if]
+[/#if]
 [#compress]
 [#if clockConfig??]
 #n/** System Clock Configuration
@@ -324,20 +319,29 @@ void SystemClock_Config(void)
 [#if clockConfig??] 
 [#list clockConfig as configModel] [#--list0--]
     [#--list configModel.configs as config--] [#--list1--]
-   [#compress] [@common.generateConfigModelCode configModel=configModel inst=clockInst  nTab=1 index=""/][/#compress]#n
+   [#compress] [@common.generateConfigModelListCode configModel=configModel inst=clockInst  nTab=1 index=""/][/#compress]#n
     [#--/#list--]
 [/#list][/#if]
 [#-- configure systick interrupts  --]
 [#if systemVectors??]
-[#list systemVectors as initVector] 
-[#if initVector.vector=="SysTick_IRQn" && initVector.codeInMspInit]
-#t/* ${initVector.vector} interrupt configuration */
-#tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
-[#if initVector.systemHandler=="false"]
-  #tHAL_NVIC_EnableIRQ(${initVector.vector});#n
-[/#if]
-[/#if]
-[/#list]
+    [#list systemVectors as initVector] 
+        [#if initVector.vector=="SysTick_IRQn" && initVector.codeInMspInit]
+            #t/* ${initVector.vector} interrupt configuration */
+            [#if rccUsedDriver == "HAL"]
+                #tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
+            [#else]
+                #tNVIC_SetPriority(${initVector.vector}, NVIC_EncodePriority(NVIC_GetPriorityGrouping(),${initVector.preemptionPriority}, ${initVector.subPriority}));
+            [/#if]
+            [#if initVector.systemHandler=="false"]
+                [#if rccUsedDriver == "HAL"]
+                    #tHAL_NVIC_EnableIRQ(${initVector.vector});#n
+                [#else]
+                    #tNVIC_EnableIRQ(${initVector.vector});#n
+                [/#if]
+                    
+            [/#if]
+        [/#if]
+    [/#list]
 [/#if]
 }[/#if]
 #n
@@ -358,13 +362,26 @@ static void MX_NVIC_Init(void)
     #tif (${handleName}.Init.low_power_enable == 1)
     #t{
     [@common.generateUsbWakeUpInterrupt ipName=ipName tabN=2/]
+    [#if vector.usedDriver == "HAL"]
     #t#tHAL_NVIC_SetPriority(${vector.vector}, ${vector.preemptionPriority}, ${vector.subPriority});
     #t#tHAL_NVIC_EnableIRQ(${vector.vector});
+    [#else]
+    #t#tNVIC_SetPriority(${vector.vector}, NVIC_EncodePriority(NVIC_GetPriorityGrouping(),${vector.preemptionPriority}, ${vector.subPriority}));
+    #t#tNVIC_EnableIRQ(${vector.vector});
+    [/#if]
     #t}
   [#else]
+    [#if vector.usedDriver == "HAL"]
     #tHAL_NVIC_SetPriority(${vector.vector}, ${vector.preemptionPriority}, ${vector.subPriority});
+    [#else]
+    #tNVIC_SetPriority(${vector.vector}, NVIC_EncodePriority(NVIC_GetPriorityGrouping(),${vector.preemptionPriority}, ${vector.subPriority}));
+    [/#if]
     [#if vector.systemHandler=="false"]
+      [#if vector.usedDriver == "HAL"]
       #tHAL_NVIC_EnableIRQ(${vector.vector});
+      [#else]
+      #tNVIC_EnableIRQ(${vector.vector});
+      [/#if]
     [/#if]
   [/#if]
 [/#list]
@@ -418,21 +435,54 @@ static void MX_NVIC_Init(void)
             [@common.getLocalVariableList instanceData=instanceData/]            
         [#--/#list--]#n
         [#--list instanceData.configs as config--]
-            [#if instanceData.instIndex??][@common.generateConfigModelListCode configModel=instanceData inst=instName  nTab=1 index=instanceData.instIndex/][#else][@common.generateConfigModelListCode configModel=instanceData inst=instName  nTab=1 index=""/][/#if]
-        [#--/#list--]
+[#--debug instance name = ${instName}--]
+[#if instanceData.usedDriver?? && instanceData.usedDriver!="HAL"][#--Check if LL driver is used. instanceData:ConfigModel --]
+    [#-- varaible declaration --]
+    [#assign v = ""]
+    [#if instanceData.initServices?? && instanceData.initServices.gpio??]
+        [#assign service=instanceData.initServices.gpio]
+           [#list service.variables as variable] [#-- variables declaration --]
+               [#if v?contains(variable.name)]
+               [#-- no matches--]
+               [#else]
+   #t${variable.value} ${variable.name};
+                   [#assign v = v + " "+ variable.name/]	
+               [/#if]	
+           [/#list]  
+    [/#if]
+    [#-- if used with LL and MspPost init is required using gpioOut service --]
+    [#if instanceData.initServices?? && instanceData.initServices.gpioOut?? ]
+           [#assign service=instanceData.initServices.gpioOut]
+           [#list service.variables as variable] [#-- variables declaration --]
+               [#if v?contains(variable.name)]
+               [#-- no matches--]
+               [#else]
+   #t${variable.value} ${variable.name};
+                   [#assign v = v + " "+ variable.name/]	
+               [/#if]	
+           [/#list]  
+    [/#if]
+    [#-- Generate service code --]
+    #n[@common.generateServiceCode ipName=instName serviceType="Init" modeName="mode" instHandler=instName tabN=1 IPData=instanceData/] 
+[/#if]
+[#if instanceData.instIndex??][@common.generateConfigModelListCode configModel=instanceData inst=instName  nTab=1 index=instanceData.instIndex/][#else][@common.generateConfigModelListCode configModel=instanceData inst=instName  nTab=1 index=""/][/#if]
+
+[#-- MspPostInit callBack if needed for output gpio config --]
 [#if instanceData.initServices??]
     [#if instanceData.initServices.gpioOut??]
-        [#list instanceData.initCallBackInitMethodList as initCallBack]
-            [#if initCallBack?contains("PostInit")]
-                [#if  halMode!=ipName&&!ipName?contains("TIM")&&!ipName?contains("CEC")]
-                #t${initCallBack}(&h${instanceData.halMode?lower_case}${instanceData.instIndex});
-                [#else]
+        [#if instanceData.usedDriver?? && instanceData.usedDriver=="HAL"]
+            [#assign ipName = instanceData.ipName]
+            [#list instanceData.initCallBackInitMethodList as initCallBack]
+                [#if initCallBack?contains("PostInit")]
                 #t${initCallBack}([#if ipName?contains("TIM")&&!(ipName?contains("HRTIM")||ipName?contains("LPTIM"))]&htim[#else]&h${instanceData.realIpName?lower_case}[/#if]${instanceData.instIndex});
                 [/#if]
-            [/#if]
-        [/#list]
+            [/#list]
+        [#else][#-- Else if LL is used gpio code should be generated --]
+            [@common.generateConfigCode ipName=instName type="Init" serviceName="gpioOut" instHandler="Tim"?lower_case+"Handle" tabN=1 IPData1=instanceData/]  
+        [/#if]
     [/#if]
 [/#if]
+[#-- MspPostInit End --]
 
 #n}#n
 [/#if]

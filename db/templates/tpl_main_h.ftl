@@ -1,42 +1,91 @@
 [#ftl]
+[#list configs as dt]
+[#assign data = dt]
+[#assign peripheralParams =dt.peripheralParams]
+[#assign peripheralGPIOParams =dt.peripheralGPIOParams]
+[#assign peripheralDMAParams =dt.peripheralDMAParams]
+[#assign peripheralNVICParams =dt.peripheralNVICParams]
+[#assign HSE_timout ="0000"]
+[#list peripheralParams.get("RCC").entrySet() as paramEntry]
+[#if paramEntry.value??  && paramEntry.key=="HSE_Timout"][#assign HSE_timout = paramEntry.value][/#if]
+[#if paramEntry.value??  && paramEntry.key=="LSE_Timout"][#assign LSE_Timout = paramEntry.value][/#if]
+[/#list]
+[/#list]
 /**
   ******************************************************************************
-  * File Name          : mxconstants.h
+  * File Name          : main.h
   * Description        : This file contains the common defines of the application
   ******************************************************************************
-  *
-  * COPYRIGHT(c) ${year} STMicroelectronics
-  *
-  * Redistribution and use in source and binary forms, with or without modification,
-  * are permitted provided that the following conditions are met:
-  *   1. Redistributions of source code must retain the above copyright notice,
-  *      this list of conditions and the following disclaimer.
-  *   2. Redistributions in binary form must reproduce the above copyright notice,
-  *      this list of conditions and the following disclaimer in the documentation
-  *      and/or other materials provided with the distribution.
-  *   3. Neither the name of STMicroelectronics nor the names of its contributors
-  *      may be used to endorse or promote products derived from this software
-  *      without specific prior written permission.
-  *
-  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-  * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-  * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-  * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-  *
+[@common.optinclude name="Src/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __MXCONSTANT_H
-#define __MXCONSTANT_H
+#ifndef __MAIN_H
+#define __MAIN_H
   /* Includes ------------------------------------------------------------------*/
-
+[#compress]
+[#--include "mxconstants.h"--]
+[#assign includesList = ""]
+[#if LLincludes??] [#-- Include LL headers --]
+    [#list LLincludes as inc]
+        [#if !includesList?contains(inc)]
+#include "${inc}"
+            [#assign includesList = includesList+" "+inc]
+        [/#if]
+    [/#list]
+[/#if]
 #n
+[#--Include common LL driver --]
+[#if isLLUsed??] [#-- Include LL headers --]
+    [#-- Include common LL driver that should be always included--]
+    [#-- include "${FamilyName?lower_case}xx_ll_bus.h" --]
+    [#if !includesList?contains(FamilyName?lower_case+"xx_ll_bus.h")]
+    #include "${FamilyName?lower_case}xx_ll_bus.h"
+        [#assign includesList = includesList+" "+FamilyName?lower_case+"xx_ll_bus.h"]
+    [/#if]
+    [#-- include "${FamilyName?lower_case}xx_ll_cortex.h" --]
+    [#if !includesList?contains(FamilyName?lower_case+"xx_ll_cortex.h")]
+    #include "${FamilyName?lower_case}xx_ll_cortex.h"
+        [#assign includesList = includesList+" "+FamilyName?lower_case+"xx_ll_cortex.h"]
+    [/#if]
+    [#-- include "${FamilyName?lower_case}xx_ll_rcc.h" --]
+    [#if !includesList?contains(FamilyName?lower_case+"xx_ll_rcc.h")]
+    #include "${FamilyName?lower_case}xx_ll_rcc.h"
+        [#assign includesList = includesList+" "+FamilyName?lower_case+"xx_ll_rcc.h"]
+    [/#if]
+    [#-- include "${FamilyName?lower_case}xx_ll_system.h" --]
+    [#if !includesList?contains(FamilyName?lower_case+"xx_ll_system.h")]
+    #include "${FamilyName?lower_case}xx_ll_system.h"
+        [#assign includesList = includesList+" "+FamilyName?lower_case+"xx_ll_system.h"]
+    [/#if]
+    [#-- include "${FamilyName?lower_case}xx_ll_utils.h" --]
+    [#if !includesList?contains(FamilyName?lower_case+"xx_ll_utils.h")]
+    #include "${FamilyName?lower_case}xx_ll_utils.h"
+        [#assign includesList = includesList+" "+FamilyName?lower_case+"xx_ll_utils.h"]
+    [/#if]
+    [#-- include "${FamilyName?lower_case}xx_ll_gpio.h" --]
+    [#if !includesList?contains(FamilyName?lower_case+"xx_ll_gpio.h")]
+    #include "${FamilyName?lower_case}xx_ll_gpio.h"
+        [#assign includesList = includesList+" "+FamilyName?lower_case+"xx_ll_gpio.h"]
+    [/#if]
+    [#-- include "${FamilyName?lower_case}xx_ll_exti.h" --]
+    [#if !includesList?contains(FamilyName?lower_case+"xx_ll_exti.h")]
+    #include "${FamilyName?lower_case}xx_ll_exti.h"
+        [#assign includesList = includesList+" "+FamilyName?lower_case+"xx_ll_exti.h"]
+    [/#if]
+    [#-- include "${FamilyName?lower_case}xx_ll_pwr.h"     --]
+    [#if !includesList?contains(FamilyName?lower_case+"xx_ll_pwr.h")]
+    #include "${FamilyName?lower_case}xx_ll_pwr.h"
+        [#assign includesList = includesList+" "+FamilyName?lower_case+"xx_ll_pwr.h"]
+    [/#if]
+    [#if !includesList?contains(FamilyName?lower_case+"xx_ll_dma.h")]
+    #include "${FamilyName?lower_case}xx_ll_dma.h"
+        [#assign includesList = includesList+" "+FamilyName?lower_case+"xx_ll_dma.h"]
+    [/#if]
+[/#if]
+[/#compress]
+#n
+
 /* USER CODE BEGIN Includes */
 
 /* USER CODE END Includes */
@@ -55,6 +104,21 @@
 #define ${define.key} ${define.value}
 [/#list]
 [/#if]
+[#if isHALUsed??]
+[#else]
+#ifndef NVIC_PRIORITYGROUP_0
+#define NVIC_PRIORITYGROUP_0         ((uint32_t)0x00000007) /*!< 0 bit  for pre-emption priority,
+                                                                 4 bits for subpriority */
+#define NVIC_PRIORITYGROUP_1         ((uint32_t)0x00000006) /*!< 1 bit  for pre-emption priority,
+                                                                 3 bits for subpriority */
+#define NVIC_PRIORITYGROUP_2         ((uint32_t)0x00000005) /*!< 2 bits for pre-emption priority,
+                                                                 2 bits for subpriority */
+#define NVIC_PRIORITYGROUP_3         ((uint32_t)0x00000004) /*!< 3 bits for pre-emption priority,
+                                                                 1 bit  for subpriority */
+#define NVIC_PRIORITYGROUP_4         ((uint32_t)0x00000003) /*!< 4 bits for pre-emption priority,
+                                                                 0 bit  for subpriority */
+#endif
+[/#if]
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
@@ -67,5 +131,5 @@
 #t* @}
 */ 
 #n
-#endif /* __MXCONSTANT_H */
+#endif /* __MAIN_H */
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
