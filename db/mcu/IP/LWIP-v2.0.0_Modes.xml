@@ -43,6 +43,70 @@
         <PossibleValue Comment="Disabled" Value="0"/>
         <Description>This parameter is disabled as soon as FREERTOS is disabled in MiddleWares tree.&lt;br&gt;&lt;b&gt;Warning&lt;/b&gt;: This parameter has been introduced by CubeMX.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: WITH_RTOS is disabled means NO_SYS is disabled (set to 1) and FREERTOS is disabled.</Description>
     </RefParameter>
+    <RefParameter Name="PHY Driver" Comment="PHY Driver" Type="string" Group="Platform Settings" DefaultValue="Disable/LAN8742" TabName="General Settings" Mode="Basic" Visible="true">
+        <Condition Diagnostic="" Expression="STM32H7"/>
+        <PossibleValue Comment="Disable/LAN8742" Value="Disable/LAN8742"/>
+        <Description>&lt;font color=&quot;red&quot;&gt;Platform Settings &lt;b&gt;PHY Driver&lt;/b&gt; must be configured from the LwIP '&lt;b&gt;Platform Settings&lt;/b&gt;' top right tab.&lt;/font&gt;&lt;br&gt;PHY Driver can be set either to Disabled or to LAN8742:&lt;br&gt;- &lt;b&gt;Disable&lt;/b&gt;: BSP PHY Driver components provided by ST are not used and up to user to implement his own driver with same architecture and constraints than LAN8742 ; ST specification will be published soon to explain how user can develop his own BSP driver component.&lt;br&gt;- &lt;b&gt;LAN8742&lt;/b&gt;: LAN8742 BSP PHY Driver component is used and STM32CubeMX copies lan8742.c/.h files from ST Firmware Package to the user's project Drivers/BSP/Components directory.&lt;/ul&gt;&lt;br&gt;&lt;i&gt;Note&lt;/i&gt;: BSP components files cannot be updated or they will be overwritten at each project generation.</Description>
+    </RefParameter>
+    <RefParameter Name="PHY Driver" Comment="PHY Driver" Type="string" Group="Platform Settings" DefaultValue="Disable/LAN8742" TabName="General Settings" Mode="Basic" Visible="false">
+        <Description>&lt;font color=&quot;red&quot;&gt;Platform Settings must be configured from 'Platform Settings' LwIP top right tab.&lt;/font&gt;&lt;br&gt;Disable: BSP PHY Driver components provided by ST are not used.&lt;br&gt;LAN8742: LAN8742 BSP PHY Driver component from ST Firmware Package is used.&lt;br&gt;&lt;b&gt;Note&lt;/b&gt;: LAN8742 files are located in project location within Drivers\BSP\Components folder. These BSP components files cannot be updated or they will be overwritten at each project generation.</Description>
+    </RefParameter>
+    <RefParameter Name="LWIP_ICMP" Comment="LWIP_ICMP (ICMP Module Activation)" Type="list" Group="Protocols Options" DefaultValue="1" TabName="General Settings" Mode="Basic" >
+        <PossibleValue Comment="Disabled" Value="0"/>
+        <PossibleValue Comment="Enabled" Value="1"/>
+        <Description>This option enables ICMP (Internet Control Message Protocol) module inside the IP stack.Be careful, disable that make your product non-compliant to RFC1122.&lt;br&gt; - "Debug" tab.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: None.&lt;br&gt;&lt;b&gt;Note&lt;/b&gt;: For more options on ICMP, please check in:&lt;br&gt; - "Key Options" tab within "ICMP/IGMP Options"&lt;br&gt; - "Statistics" tab&lt;br&gt; - "Checksum" tab</Description>
+    </RefParameter>
+    <RefParameter Name="LWIP_IGMP" Comment="LWIP_IGMP (IGMP Module)" Type="list" Group="Protocols Options" DefaultValue="0" TabName="General Settings" Mode="Basic" >
+        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: When MEMP_MEM_MALLOC is disabled, use LWIP_IGMP requires LWIP_MULTICAST_TX_OPTIONS and LWIP_IPV4 enabled and also MEMP_NUM_IGMP_GROUP&gt;1." Expression="IF(!MEMP_MEM_MALLOC,LWIP_MULTICAST_TX_OPTIONS &amp; LWIP_IPV4 &amp; (MEMP_NUM_IGMP_GROUP&gt;1),1)"/>
+        <PossibleValue Comment="Disabled" Value="0"/>
+        <PossibleValue Comment="Enabled" Value="1"/>
+        <Description>When this parameter is enabled, it turns on IGMP (Internet Group Management Protocol) module.&lt;br&gt;&lt;b&gt;Warning&lt;/b&gt;: When using IGMP or IPv6, LWIP_RAND() needs to be defined to a random-function returning an u32_t random value (in arch/cc.h).&lt;br&gt;Therefore, LWIP_RAND() has been added in cc.h (in \system\arch).&lt;br&gt;&lt;b&gt;Note&lt;/b&gt;: For more options on IGMP, please check in:&lt;br&gt; - "Key Options" tab within "ICMP/IGMP", "Internal Memory Pool Sizes" and "LOOPIF" Options&lt;br&gt; - "Statistics" tab&lt;br&gt; - "Debug" tab.</Description>
+    </RefParameter>
+    <RefParameter Name="LWIP_IGMP" Comment="LWIP_IGMP (IGMP Module)" Type="list" Group="Protocols Options" DefaultValue="0" TabName="General Settings" Mode="Basic" >
+        <PossibleValue Comment="Disabled" Value="0"/>
+        <Description>When this parameter is enabled, it turns on IGMP (Internet Group Management Protocol) module.&lt;br&gt;&lt;b&gt;Warning&lt;/b&gt;: When using IGMP or IPv6, LWIP_RAND() needs to be defined to a random-function returning an u32_t random value.&lt;br&gt;Therefore, LWIP_RAND() has been added in cc.h (in \system\arch).&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: When MEMP_MEM_MALLOC is disabled, use LWIP_IGMP requires LWIP_MULTICAST_TX_OPTIONS and LWIP_IPV4 enabled and also MEMP_NUM_IGMP_GROUP&gt;1.&lt;br&gt;&lt;b&gt;Note&lt;/b&gt;: For more options on IGMP, please check in:&lt;br&gt; - "Key Options" tab within "ICMP/IGMP", "Internal Memory Pool Sizes" and "LOOPIF" Options&lt;br&gt; - "Statistics" tab&lt;br&gt; - "Debug" tab.</Description>
+    </RefParameter>
+    <RefParameter Name="LWIP_DNS" Comment="LWIP_DNS (DNS Module)" Type="list" Group="Protocols Options" DefaultValue="0" TabName="General Settings" Mode="Basic" >
+        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: Use LWIP_DNS requires LWIP_UDP enabled." Expression="LWIP_UDP"/>
+        <PossibleValue Comment="Disabled" Value="0"/>
+        <PossibleValue Comment="Enabled" Value="1"/>
+        <Description>When this parameter is enabled, it turns on DNS (Domain Name Server) module. UDP must be available for DNS transport.&lt;br&gt;&lt;b&gt;Note&lt;/b&gt;: For more options on DNS, please check in:&lt;br&gt; - "Key Options" tab within "DNS" and "Internal Memory Pool Sizes" Options&lt;br&gt; - "Debug" tab.</Description>
+    </RefParameter>
+    <RefParameter Name="LWIP_DNS" Comment="LWIP_DNS (DNS Module)" Type="list" Group="Protocols Options" DefaultValue="0" TabName="General Settings" Mode="Basic" >
+        <PossibleValue Comment="Disabled" Value="0"/>
+        <Description>When this parameter is enabled, it turns on DNS (Domain Name Server) module. UDP must be available for DNS transport.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Use LWIP_DNS requires LWIP_UDP enabled.&lt;br&gt;&lt;b&gt;Note&lt;/b&gt;: For more options on DNS, please check in:&lt;br&gt; - "Key Options" tab within "DNS" and "Internal Memory Pool Sizes" Options&lt;br&gt; - "Debug" tab.</Description>
+    </RefParameter>
+    <RefParameter Name="LWIP_UDP" Comment="LWIP_UDP (UDP Module)" Type="list" Group="Protocols Options" DefaultValue="1" TabName="General Settings" Mode="Basic" >
+        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: Use LWIP_UDP requires MEMP_NUM_UDP_PCB&gt;0 when MEMP_MEM_MALLOC is disabled." Expression="IF(!MEMP_MEM_MALLOC, MEMP_NUM_UDP_PCB &gt; 0, 1)"/>
+        <PossibleValue Comment="Disabled" Value="0"/>
+        <PossibleValue Comment="Enabled" Value="1"/>
+        <Description>When this parameter is enabled, it turns on UDP (User Datagram Protocol).&lt;br&gt;&lt;b&gt;Note&lt;/b&gt;: For more options on UDP, please check in:&lt;br&gt; - "Key Options" tab within "UDP", "IP" and "Thread" Options&lt;br&gt; - "Statistics" tab&lt;br&gt; - "Checksum" tab&lt;br&gt; - "Debug" tab.</Description>
+    </RefParameter>
+    <RefParameter Name="LWIP_UDP" Comment="LWIP_UDP (UDP Module)" Type="list" Group="Protocols Options" DefaultValue="0" TabName="General Settings" Mode="Basic" >
+        <PossibleValue Comment="Disabled" Value="0"/>
+        <Description>When this parameter is enabled, it turns on UDP (User Datagram Protocol).&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Use LWIP_UDP requires MEMP_NUM_UDP_PCB&gt;0 when MEMP_MEM_MALLOC is disabled.&lt;br&gt;&lt;b&gt;Note&lt;/b&gt;: For more options on UDP, please check in:&lt;br&gt; - "Key Options" tab within "UDP", "IP" and "Thread" Options&lt;br&gt; - "Statistics" tab&lt;br&gt; - "Checksum" tab&lt;br&gt; - "Debug" tab.</Description>
+    </RefParameter>
+    <RefParameter Name="MEMP_NUM_UDP_PCB" Comment="MEMP_NUM_UDP_PCB (Number of UDP Connections)" Type="integer" Group="Protocols Options" DefaultValue="4" TabName="General Settings" Mode="Basic" Min="=IF(!MEMP_MEM_MALLOC &amp; LWIP_UDP, 1, 0)" Max="2147483647" >
+        <Description>Number of UDP protocol control blocks. One per active UDP connection (requires the LWIP_UDP option enabled).&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Use MEMP_NUM_UDP_PCB requires MEMP_MEM_MALLOC disabled and LWIP_UDP enabled, it is mandatory to have MEMP_NUM_UDP_PCB&gt;0.&lt;br&gt;&lt;b&gt;Note&lt;/b&gt;: For more memory options, see in "Key Options" tab within "Internal Memory Pool Sizes" Options.</Description>
+    </RefParameter>
+    <RefParameter Name="LWIP_TCP" Comment="LWIP_TCP (TCP Module)" Type="list" Group="Protocols Options" DefaultValue="1" TabName="General Settings" Mode="Basic" >
+        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: If you want to use TCP:&lt;br&gt;- you have to define MEMP_NUM_TCP_PCB&gt;=1 when MEMP_MEM_MALLOC is disabled&lt;br&gt;- TCP_SND_QUEUELEN must fit in an u16_t and must be greater than 1&lt;br&gt;- If LWIP_WND_SCALE is enabled, TCP_WND and must fit in an u32_t and must be greater than 1&lt;br&gt;- If LWIP_WND_SCALE is disabled, TCP_WND and must fit in an u16_t and must be greater than 1&lt;br&gt;- TCP_MAXRTX and TCP_SYNMAXRTX must be less or equal to 12." Expression="IF(!MEMP_MEM_MALLOC, MEMP_NUM_TCP_PCB &gt; 0, 1) &amp; IF(LWIP_WND_SCALE,TCP_WND &lt;= 4294967295,TCP_WND &lt;= 65535) &amp; (TCP_SND_QUEUELEN &lt;= 65535) &amp; (TCP_SND_QUEUELEN &gt; 1) &amp; (TCP_MAXRTX &lt; 13) &amp; (TCP_SYNMAXRTX &lt; 13)"/>
+        <PossibleValue Comment="Disabled" Value="0"/>
+        <PossibleValue Comment="Enabled" Value="1"/>
+        <Description>When this parameter is enabled, it turns on TCP.&lt;br&gt;&lt;b&gt;Note&lt;/b&gt;: For more TCP options, see in:&lt;br&gt; - "Key Options" tab within "TCP", "IP", "Internal Memory Pool Sizes", "Thread" and "Sequential Layer" Options&lt;br&gt; - "Perf/Checks" tab&lt;br&gt; - "Statistics" tab&lt;br&gt; - "Checksum" tab&lt;br&gt; - "Debug" tab.</Description>
+    </RefParameter>
+    <RefParameter Name="LWIP_TCP" Comment="LWIP_TCP (TCP Module)" Type="list" Group="Protocols Options" DefaultValue="0" TabName="General Settings" Mode="Basic" >
+        <PossibleValue Comment="Disabled" Value="0"/>
+        <Description>When this parameter is enabled, it turns on TCP.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: If you want to use TCP:&lt;br&gt;- you have to define MEMP_NUM_TCP_PCB&gt;=1 when MEMP_MEM_MALLOC is disabled&lt;br&gt;- TCP_SND_QUEUELEN must fit in an u16_t and must be greater than 1&lt;br&gt;- If LWIP_WND_SCALE is enabled, TCP_WND and must fit in an u32_t and must be greater than 1&lt;br&gt;- If LWIP_WND_SCALE is disabled, TCP_WND and must fit in an u16_t and must be greater than 1&lt;br&gt;- TCP_MAXRTX and TCP_SYNMAXRTX must be less or equal to 12.&lt;br&gt;&lt;b&gt;Note&lt;/b&gt;: For more TCP options, see in:&lt;br&gt; - "Key Options" tab within "TCP", "IP", "Internal Memory Pool Sizes", "Thread" and "Sequential Layer" Options&lt;br&gt; - "Perf/Checks" tab&lt;br&gt; - "Statistics" tab&lt;br&gt; - "Checksum" tab&lt;br&gt; - "Debug" tab.</Description>
+    </RefParameter>
+    <RefParameter Name="MEMP_NUM_TCP_PCB" Comment="MEMP_NUM_TCP_PCB (Number of TCP Connections)" Type="integer" Group="Protocols Options" DefaultValue="5" TabName="General Settings" Mode="Basic" Min="=IF(!MEMP_MEM_MALLOC &amp; LWIP_TCP, 1, 0)" Max="2147483647" >
+        <Description>Number of simultatenously active TCP connections (requires the LWIP_TCP option enabled).&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Use MEMP_NUM_TCP_PCB requires MEMP_MEM_MALLOC disabled and LWIP_TCP enabled, it is mandatory to have MEMP_NUM_TCP_PCB&gt;0.&lt;br&gt;&lt;b&gt;Note&lt;/b&gt;: For more memory options, see in "Key Options" tab within "Internal Memory Pool Sizes" Options.</Description>
+    </RefParameter>
+    <RefParameter Name="heth" Comment="heth (Ethernet Handle)" Type="integer" Group="Global" DefaultValue="0" Min="0" Max="1" Visible="false"/>
+    <RefParameter Name="gnetif" Comment="gnetif (Network Interface)" Type="integer" Group="Global" DefaultValue="0" Min="0" Max="1" Visible="false"/>
+    <RefParameter Name="ipaddr" Comment="ipaddr (IP Address)" Type="integer" Group="Global" DefaultValue="0" Min="0" Max="1" Visible="false"/>
+    <RefParameter Name="netmask" Comment="netmask (Netmask IP Address)" Type="integer" Group="Global" DefaultValue="0" Min="0" Max="1" Visible="false"/>
+    <RefParameter Name="gw" Comment="gw (Gateway Address)" Type="integer" Group="Global" DefaultValue="0" Min="0" Max="1" Visible="false"/>
     <RefParameter Name="PHY" Comment="PHY (Phy MII)" Type="string" Group="RTOS Settings" DefaultValue="+ETH:PHY_Name_MII" TabName="General Settings" Mode="Basic" Visible="false">
         <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: MII." Expression="MII"/>
         <Description>PHY MII parameter.</Description>
@@ -126,19 +190,6 @@
         <PossibleValue Comment="Disabled" Value="0"/>
         <Description>This option can be enabled only when NO_SYS=0, if you want inter-task protection (and task-vs-interrupt protection) for certain critical regions during buffer allocation, deallocation and memory allocation and deallocation.&lt;br&gt;&lt;b&gt;Warning&lt;/b&gt;: This is required when using lwIP from more than one context! If you disable this, you must be sure what you are doing!&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: This parameter is disable without RTOS (when NO_SYS=1)</Description>
     </RefParameter>
-    <RefParameter Name="heth" Comment="heth (Ethernet Handle)" Type="integer" Group="Global" DefaultValue="0" Min="0" Max="1" Visible="false"/>
-    <RefParameter Name="gnetif" Comment="gnetif (Network Interface)" Type="integer" Group="Global" DefaultValue="0" Min="0" Max="1" Visible="false"/>
-    <RefParameter Name="ipaddr" Comment="ipaddr (IP Address)" Type="integer" Group="Global" DefaultValue="0" Min="0" Max="1" Visible="false"/>
-    <RefParameter Name="netmask" Comment="netmask (Netmask IP Address)" Type="integer" Group="Global" DefaultValue="0" Min="0" Max="1" Visible="false"/>
-    <RefParameter Name="gw" Comment="gw (Gateway Address)" Type="integer" Group="Global" DefaultValue="0" Min="0" Max="1" Visible="false"/>
-    <RefParameter Name="PHY Driver" Comment="PHY Driver" Type="string" Group="Platform Settings" DefaultValue="Disable/LAN8742" TabName="General Settings" Mode="Basic" Visible="true">
-        <Condition Diagnostic="" Expression="STM32H7"/>
-        <PossibleValue Comment="Disable/LAN8742" Value="Disable/LAN8742"/>
-        <Description>&lt;font color=&quot;red&quot;&gt;Platform Settings &lt;b&gt;PHY Driver&lt;/b&gt; must be configured from the LwIP '&lt;b&gt;Platform Settings&lt;/b&gt;' top right tab.&lt;/font&gt;&lt;br&gt;PHY Driver can be set either to Disabled or to LAN8742:&lt;br&gt;- &lt;b&gt;Disable&lt;/b&gt;: BSP PHY Driver components provided by ST are not used and up to user to implement his own driver with same architecture and constraints than LAN8742 ; ST specification will be published soon to explain how user can develop his own BSP driver component.&lt;br&gt;- &lt;b&gt;LAN8742&lt;/b&gt;: LAN8742 BSP PHY Driver component is used and STM32CubeMX copies lan8742.c/.h files from ST Firmware Package to the user's project Drivers/BSP/Components directory.&lt;/ul&gt;&lt;br&gt;&lt;i&gt;Note&lt;/i&gt;: BSP components files cannot be updated or they will be overwritten at each project generation.</Description>
-    </RefParameter>
-    <RefParameter Name="PHY Driver" Comment="PHY Driver" Type="string" Group="Platform Settings" DefaultValue="Disable/LAN8742" TabName="General Settings" Mode="Basic" Visible="false">
-        <Description>&lt;font color=&quot;red&quot;&gt;Platform Settings must be configured from 'Platform Settings' LwIP top right tab.&lt;/font&gt;&lt;br&gt;Disable: BSP PHY Driver components provided by ST are not used.&lt;br&gt;LAN8742: LAN8742 BSP PHY Driver component from ST Firmware Package is used.&lt;br&gt;&lt;b&gt;Note&lt;/b&gt;: LAN8742 files are located in project location within Drivers\BSP\Components folder. These BSP components files cannot be updated or they will be overwritten at each project generation.</Description>
-    </RefParameter>
     <RefParameter Name="MEM_LIBC_MALLOC" Comment="MEM_LIBC_MALLOC (User Memory Library)" Type="list" Group="Infrastructure - Heap and Memory Pools Options" DefaultValue="0" TabName="Key Options" Mode="Advanced" >
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1" Semaphore="S_MEM_USE_POOLS"/>
@@ -180,9 +231,9 @@
         <PossibleValue Comment="Enabled" Value="1"/>
         <Description>When this option is enabled, if one malloc-pool is empty, the next bigger pool is tried.&lt;br&gt;&lt;b&gt;Warning&lt;/b&gt;: Enabling this parameter might waste memory but it can make a system more reliable.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: None.</Description>
     </RefParameter>
-    <RefParameter Name="MEMP_USE_CUSTOM_POOLS" Comment="MEMP_USE_CUSTOM_POOLS (Define Additionnal Pools)" Type="list" Group="Infrastructure - Heap and Memory Pools Options" DefaultValue="0" TabName="Key Options" Mode="Advanced" >
+    <RefParameter Name="MEMP_USE_CUSTOM_POOLS" Comment="MEMP_USE_CUSTOM_POOLS (Define Additional Pools)" Type="list" Group="Infrastructure - Heap and Memory Pools Options" DefaultValue="0" TabName="Key Options" Mode="Advanced" >
         <PossibleValue Comment="Disabled" Value="0"/>
-        <PossibleValue Comment="Enabled" Value="1"/>
+        <PossibleValue Comment="Enabled" Value="1" Semaphore="S_MEMP_USE_CUSTOM_POOLS"/>
         <Description>Enable this options to include a user file lwippools.h that defines additional pools beyond the standard ones required by lwIP.&lt;br&gt;&lt;b&gt;Warning&lt;/b&gt;: If you set this to 1, you must have lwippools.h in your include path somewhere and you must define your pools within lwippools.h.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: If MEMP_USE_CUSTOM_POOLS=0, MEM_USE_POOLS will be disabled and if MEMP_USE_CUSTOM_POOLS=1, MEM_USE_POOLS can be enabled.</Description>
     </RefParameter>
     <RefParameter Name="LWIP_ALLOW_MEM_FREE_FROM_OTHER_CONTEXT" Comment="LWIP_ALLOW_MEM_FREE_FROM_OTHER_CONTEXT (Allow Memory Free From Other Context)" Type="list" Group="Infrastructure - Heap and Memory Pools Options" DefaultValue="0" TabName="Key Options" Mode="Advanced" >
@@ -352,23 +403,20 @@
         <Description>When this parameter is enabled, incoming fragmented IP packets are reassembled. Note that this option does not affect outgoing packet sizes, which can be controlled via IP_FRAG.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: IP_REASSEMBLY is disabled when LWIP_IPV4 is disabled.&lt;br&gt;There are also some dependencies with MEMP_NUM_REASSDATA, IP_REASS_MAX_PBUFS, MEMP_NUM_SYS_TIMEOUT.</Description>
     </RefParameter>
     <RefParameter Name="IP_FRAG" Comment="IP_FRAG (IP Packets Fragmentation)" Type="list" Group="IPv4 Options" DefaultValue="1" TabName="Key Options" Mode="Advanced" >
-        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: IP_FRAG must be disabled when LWIP_IPV4 is disabled.&lt;br&gt;There is also some dependencies with IP_FRAG_USES_STATIC_BUF and LWIP_NETIF_TX_SINGLE_PBUF." Expression="LWIP_IPV4"/>
+        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: IP_FRAG must be disabled when LWIP_IPV4 is disabled.&lt;br&gt;There is also some dependencies with LWIP_NETIF_TX_SINGLE_PBUF." Expression="LWIP_IPV4"/>
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
         <Description>When this parameter is enabled, outgoing IP packets are fragmented if their size exceeds MTU. Note that this option does not affect incoming packet sizes, which can be controlled via IP_REASSEMBLY.</Description>
     </RefParameter>
     <RefParameter Name="IP_FRAG" Comment="IP_FRAG (IP Packets Fragmentation)" Type="list" Group="IPv4 Options" DefaultValue="0" TabName="Key Options" Mode="Advanced" >
         <PossibleValue Comment="Disabled" Value="0"/>
-        <Description>When this parameter is enabled, outgoing IP packets are fragmented if their size exceeds MTU. Note that this option does not affect incoming packet sizes, which can be controlled via IP_REASSEMBLY.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: IP_FRAG must be disabled when LWIP_IPV4 is disabled.&lt;br&gt;There is also some dependencies with IP_FRAG_USES_STATIC_BUF and LWIP_NETIF_TX_SINGLE_PBUF.</Description>
+        <Description>When this parameter is enabled, outgoing IP packets are fragmented if their size exceeds MTU. Note that this option does not affect incoming packet sizes, which can be controlled via IP_REASSEMBLY.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: IP_FRAG must be disabled when LWIP_IPV4 is disabled.&lt;br&gt;There is also some dependencies with LWIP_NETIF_TX_SINGLE_PBUF.</Description>
     </RefParameter>
     <RefParameter Name="IP_REASS_MAXAGE" Comment="IP_REASS_MAXAGE (IP Packets Fragmentation if Size exceeds MTU)" Type="integer" Unit="Second(s)" Group="IPv4 Options" DefaultValue="3" TabName="Key Options" Mode="Advanced" Min="0" Max="2147483647" >
         <Description>Maximum time (in multiples of IP_TMR_INTERVAL - so seconds, normally) a fragmented IP packet waits for all fragments to arrive. If not all fragments arrived in this time, the whole packet is discarded.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: None.</Description>
     </RefParameter>
     <RefParameter Name="IP_REASS_MAX_PBUFS" Comment="IP_REASS_MAX_PBUFS (Maximum of Pbufs waiting to Be Reassembled)" Type="integer" Group="IPv4 Options" DefaultValue="10" TabName="Key Options" Mode="Advanced" Min="=IF(MEMP_MEM_MALLOC &amp; IP_REASSEMBLY, MEMP_NUM_REASSDATA, 0)" Max="=PBUF_POOL_SIZE-1" >
         <Description>Total maximum amount of pbufs waiting to be reassembled. Since the received pbufs are enqueued, be sure to configure PBUF_POOL_SIZE &gt; IP_REASS_MAX_PBUFS so that the stack is still able to receive packets even if the maximum amount of fragments is enqueued for reassembly!.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Use IP_REASSEMBLY requires IP_REASS_MAX_PBUFS&gt;=MEMP_NUM_REASSDATA when MEMP_MEM_MALLOC is enabled.</Description>
-    </RefParameter>
-    <RefParameter Name="IP_FRAG_MAX_MTU" Comment="IP_FRAG_MAX_MTU (MAX MTU on any Interface for IP Fragmatation Buffer)" Type="Integer" Unit="Bytes(s)" Group="IPv4 Options" DefaultValue="null" TabName="Key Options" Mode="Advanced" Min="0" Max="2147483647" Visible="false">
-        <Description>When this parameter is enabled, it is assumed that max MTU on any interface for IP frag buffer.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Use IP_FRAG_MAX_MTU requires IP_FRAG_USES_STATIC_BUF enabled.</Description>
     </RefParameter>
     <RefParameter Name="IP_DEFAULT_TTL" Comment="IP_DEFAULT_TTL (Time-To-Live Used by Transport Layers)" Type="Integer" Unit="Node(s)" Group="IPv4 Options" DefaultValue="255" TabName="Key Options" Mode="Advanced" Min="0" Max="255" >
         <Description>Default value for Time-To-Live used by transport layers.&lt;br&gt;This tells how long the packets may live on the network before they are dropped. Each time the packet passes a router, firewall, computer, i.e a node, the TTL is decremented with one step.&lt;br&gt;Setting the TTL to 255 would be considered rude since this would make a packet live an extremely long time on the internet.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: IP_DEFAULT_TTL is used to set by default: ICMP_TTL, RAW_TTL, UDP_TTL and TCP_TTL.</Description>
@@ -397,11 +445,6 @@
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
         <Description>Set this parameter randomizes the local port for the first local TCP/UDP pcb (default=0). This can prevent creating predictable port numbers after booting a device.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: None.</Description>
-    </RefParameter>
-    <RefParameter Name="LWIP_ICMP" Comment="LWIP_ICMP (ICMP Module Activation)" Type="list" Group="Protocols Options" DefaultValue="1" TabName="General Settings" Mode="Basic" >
-        <PossibleValue Comment="Disabled" Value="0"/>
-        <PossibleValue Comment="Enabled" Value="1"/>
-        <Description>This option enables ICMP (Internet Control Message Protocol) module inside the IP stack.Be careful, disable that make your product non-compliant to RFC1122.&lt;br&gt; - "Debug" tab.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: None.&lt;br&gt;&lt;b&gt;Note&lt;/b&gt;: For more options on ICMP, please check in:&lt;br&gt; - "Key Options" tab within "ICMP/IGMP Options"&lt;br&gt; - "Statistics" tab&lt;br&gt; - "Checksum" tab</Description>
     </RefParameter>
     <RefParameter Name="ICMP_TTL" Comment="ICMP_TTL (Time-To-Live Used by ICMP Packets)" Type="Integer" Unit="Node(s)" Group="IPv4 - ICMP Options" DefaultValue="=IP_DEFAULT_TTL" TabName="Key Options" Mode="Advanced" Min="0" Max="255" >
         <Description>Default value for Time-To-Live used by ICMP packets.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: None.</Description>
@@ -500,26 +543,6 @@
         <PossibleValue Comment="Enabled" Value="1"/>
         <Description>When this parameter is enabled, this turn on SNMP MIB2 callbacks.&lt;br&gt;Turn this on to get callbacks needed to implement MIB2.&lt;br&gt;Usually MIB2_STATS should be enabled, too.&lt;br&gt;Please read the snmp_agent.txt before turning on.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: None.</Description>
     </RefParameter>
-    <RefParameter Name="LWIP_IGMP" Comment="LWIP_IGMP (IGMP Module)" Type="list" Group="Protocols Options" DefaultValue="0" TabName="General Settings" Mode="Basic" >
-        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: When MEMP_MEM_MALLOC is disabled, use LWIP_IGMP requires LWIP_MULTICAST_TX_OPTIONS and LWIP_IPV4 enabled and also MEMP_NUM_IGMP_GROUP&gt;1." Expression="IF(!MEMP_MEM_MALLOC,LWIP_MULTICAST_TX_OPTIONS &amp; LWIP_IPV4 &amp; (MEMP_NUM_IGMP_GROUP&gt;1),1)"/>
-        <PossibleValue Comment="Disabled" Value="0"/>
-        <PossibleValue Comment="Enabled" Value="1"/>
-        <Description>When this parameter is enabled, it turns on IGMP (Internet Group Management Protocol) module.&lt;br&gt;&lt;b&gt;Warning&lt;/b&gt;: When using IGMP or IPv6, LWIP_RAND() needs to be defined to a random-function returning an u32_t random value (in arch/cc.h).&lt;br&gt;Therefore, LWIP_RAND() has been added in cc.h (in \system\arch).&lt;br&gt;&lt;b&gt;Note&lt;/b&gt;: For more options on IGMP, please check in:&lt;br&gt; - "Key Options" tab within "ICMP/IGMP", "Internal Memory Pool Sizes" and "LOOPIF" Options&lt;br&gt; - "Statistics" tab&lt;br&gt; - "Debug" tab.</Description>
-    </RefParameter>
-    <RefParameter Name="LWIP_IGMP" Comment="LWIP_IGMP (IGMP Module)" Type="list" Group="Protocols Options" DefaultValue="0" TabName="General Settings" Mode="Basic" >
-        <PossibleValue Comment="Disabled" Value="0"/>
-        <Description>When this parameter is enabled, it turns on IGMP (Internet Group Management Protocol) module.&lt;br&gt;&lt;b&gt;Warning&lt;/b&gt;: When using IGMP or IPv6, LWIP_RAND() needs to be defined to a random-function returning an u32_t random value.&lt;br&gt;Therefore, LWIP_RAND() has been added in cc.h (in \system\arch).&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: When MEMP_MEM_MALLOC is disabled, use LWIP_IGMP requires LWIP_MULTICAST_TX_OPTIONS and LWIP_IPV4 enabled and also MEMP_NUM_IGMP_GROUP&gt;1.&lt;br&gt;&lt;b&gt;Note&lt;/b&gt;: For more options on IGMP, please check in:&lt;br&gt; - "Key Options" tab within "ICMP/IGMP", "Internal Memory Pool Sizes" and "LOOPIF" Options&lt;br&gt; - "Statistics" tab&lt;br&gt; - "Debug" tab.</Description>
-    </RefParameter>
-    <RefParameter Name="LWIP_DNS" Comment="LWIP_DNS (DNS Module)" Type="list" Group="Protocols Options" DefaultValue="0" TabName="General Settings" Mode="Basic" >
-        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: Use LWIP_DNS requires LWIP_UDP enabled." Expression="LWIP_UDP"/>
-        <PossibleValue Comment="Disabled" Value="0"/>
-        <PossibleValue Comment="Enabled" Value="1"/>
-        <Description>When this parameter is enabled, it turns on DNS (Domain Name Server) module. UDP must be available for DNS transport.&lt;br&gt;&lt;b&gt;Note&lt;/b&gt;: For more options on DNS, please check in:&lt;br&gt; - "Key Options" tab within "DNS" and "Internal Memory Pool Sizes" Options&lt;br&gt; - "Debug" tab.</Description>
-    </RefParameter>
-    <RefParameter Name="LWIP_DNS" Comment="LWIP_DNS (DNS Module)" Type="list" Group="Protocols Options" DefaultValue="0" TabName="General Settings" Mode="Basic" >
-        <PossibleValue Comment="Disabled" Value="0"/>
-        <Description>When this parameter is enabled, it turns on DNS (Domain Name Server) module. UDP must be available for DNS transport.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Use LWIP_DNS requires LWIP_UDP enabled.&lt;br&gt;&lt;b&gt;Note&lt;/b&gt;: For more options on DNS, please check in:&lt;br&gt; - "Key Options" tab within "DNS" and "Internal Memory Pool Sizes" Options&lt;br&gt; - "Debug" tab.</Description>
-    </RefParameter>
     <RefParameter Name="DNS_TABLE_SIZE" Comment="DNS_TABLE_SIZE (DNS Maximum Number of Entries)" Type="Integer" Group="Callback - DNS Options" DefaultValue="4" TabName="Key Options" Mode="Advanced" Min="0" Max="2147483647" >
         <Description>DNS maximum number of entries to maintain locally.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: None.</Description>
     </RefParameter>
@@ -567,16 +590,6 @@
         <PossibleValue Comment="Enabled" Value="1"/>
         <Description>If this is turned on, the local host-list can be dynamically changed at runtime.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Use DNS_LOCAL_HOSTLIST requires DNS_LOCAL_HOSTLIST_INIT or DNS_LOCAL_HOSTLIST_IS_DYNAMIC defined.</Description>
     </RefParameter>
-    <RefParameter Name="LWIP_UDP" Comment="LWIP_UDP (UDP Module)" Type="list" Group="Protocols Options" DefaultValue="1" TabName="General Settings" Mode="Basic" >
-        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: Use LWIP_UDP requires MEMP_NUM_UDP_PCB&gt;0 when MEMP_MEM_MALLOC is disabled." Expression="IF(!MEMP_MEM_MALLOC, MEMP_NUM_UDP_PCB &gt; 0, 1)"/>
-        <PossibleValue Comment="Disabled" Value="0"/>
-        <PossibleValue Comment="Enabled" Value="1"/>
-        <Description>When this parameter is enabled, it turns on UDP (User Datagram Protocol).&lt;br&gt;&lt;b&gt;Note&lt;/b&gt;: For more options on UDP, please check in:&lt;br&gt; - "Key Options" tab within "UDP", "IP" and "Thread" Options&lt;br&gt; - "Statistics" tab&lt;br&gt; - "Checksum" tab&lt;br&gt; - "Debug" tab.</Description>
-    </RefParameter>
-    <RefParameter Name="LWIP_UDP" Comment="LWIP_UDP (UDP Module)" Type="list" Group="Protocols Options" DefaultValue="0" TabName="General Settings" Mode="Basic" >
-        <PossibleValue Comment="Disabled" Value="0"/>
-        <Description>When this parameter is enabled, it turns on UDP (User Datagram Protocol).&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Use LWIP_UDP requires MEMP_NUM_UDP_PCB&gt;0 when MEMP_MEM_MALLOC is disabled.&lt;br&gt;&lt;b&gt;Note&lt;/b&gt;: For more options on UDP, please check in:&lt;br&gt; - "Key Options" tab within "UDP", "IP" and "Thread" Options&lt;br&gt; - "Statistics" tab&lt;br&gt; - "Checksum" tab&lt;br&gt; - "Debug" tab.</Description>
-    </RefParameter>
     <RefParameter Name="LWIP_UDPLITE" Comment="LWIP_UDPLITE (UDP-Lite Module)" Type="list" Group="Callback - UDP Options" DefaultValue="0" TabName="Key Options" Mode="Advanced" >
         <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: Use LWIP_UDPLITE requires LWIP_UDP enabled." Expression="LWIP_UDP"/>
         <PossibleValue Comment="Disabled" Value="0"/>
@@ -594,19 +607,6 @@
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
         <Description>Append destination addr and port to every netbuf.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: None.</Description>
-    </RefParameter>
-    <RefParameter Name="MEMP_NUM_UDP_PCB" Comment="MEMP_NUM_UDP_PCB (Number of UDP Connections)" Type="integer" Group="Protocols Options" DefaultValue="4" TabName="General Settings" Mode="Basic" Min="=IF(!MEMP_MEM_MALLOC &amp; LWIP_UDP, 1, 0)" Max="2147483647" >
-        <Description>Number of UDP protocol control blocks. One per active UDP connection (requires the LWIP_UDP option enabled).&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Use MEMP_NUM_UDP_PCB requires MEMP_MEM_MALLOC disabled and LWIP_UDP enabled, it is mandatory to have MEMP_NUM_UDP_PCB&gt;0.&lt;br&gt;&lt;b&gt;Note&lt;/b&gt;: For more memory options, see in "Key Options" tab within "Internal Memory Pool Sizes" Options.</Description>
-    </RefParameter>
-    <RefParameter Name="LWIP_TCP" Comment="LWIP_TCP (TCP Module)" Type="list" Group="Protocols Options" DefaultValue="1" TabName="General Settings" Mode="Basic" >
-        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: If you want to use TCP:&lt;br&gt;- you have to define MEMP_NUM_TCP_PCB&gt;=1 when MEMP_MEM_MALLOC is disabled&lt;br&gt;- TCP_SND_QUEUELEN must fit in an u16_t and must be greater than 1&lt;br&gt;- If LWIP_WND_SCALE is enabled, TCP_WND and must fit in an u32_t and must be greater than 1&lt;br&gt;- If LWIP_WND_SCALE is disabled, TCP_WND and must fit in an u16_t and must be greater than 1&lt;br&gt;- TCP_MAXRTX and TCP_SYNMAXRTX must be less or equal to 12." Expression="IF(!MEMP_MEM_MALLOC, MEMP_NUM_TCP_PCB &gt; 0, 1) &amp; IF(LWIP_WND_SCALE,TCP_WND &lt;= 4294967295,TCP_WND &lt;= 65535) &amp; (TCP_SND_QUEUELEN &lt;= 65535) &amp; (TCP_SND_QUEUELEN &gt; 1) &amp; (TCP_MAXRTX &lt; 13) &amp; (TCP_SYNMAXRTX &lt; 13)"/>
-        <PossibleValue Comment="Disabled" Value="0"/>
-        <PossibleValue Comment="Enabled" Value="1"/>
-        <Description>When this parameter is enabled, it turns on TCP.&lt;br&gt;&lt;b&gt;Note&lt;/b&gt;: For more TCP options, see in:&lt;br&gt; - "Key Options" tab within "TCP", "IP", "Internal Memory Pool Sizes", "Thread" and "Sequential Layer" Options&lt;br&gt; - "Perf/Checks" tab&lt;br&gt; - "Statistics" tab&lt;br&gt; - "Checksum" tab&lt;br&gt; - "Debug" tab.</Description>
-    </RefParameter>
-    <RefParameter Name="LWIP_TCP" Comment="LWIP_TCP (TCP Module)" Type="list" Group="Protocols Options" DefaultValue="0" TabName="General Settings" Mode="Basic" >
-        <PossibleValue Comment="Disabled" Value="0"/>
-        <Description>When this parameter is enabled, it turns on TCP.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: If you want to use TCP:&lt;br&gt;- you have to define MEMP_NUM_TCP_PCB&gt;=1 when MEMP_MEM_MALLOC is disabled&lt;br&gt;- TCP_SND_QUEUELEN must fit in an u16_t and must be greater than 1&lt;br&gt;- If LWIP_WND_SCALE is enabled, TCP_WND and must fit in an u32_t and must be greater than 1&lt;br&gt;- If LWIP_WND_SCALE is disabled, TCP_WND and must fit in an u16_t and must be greater than 1&lt;br&gt;- TCP_MAXRTX and TCP_SYNMAXRTX must be less or equal to 12.&lt;br&gt;&lt;b&gt;Note&lt;/b&gt;: For more TCP options, see in:&lt;br&gt; - "Key Options" tab within "TCP", "IP", "Internal Memory Pool Sizes", "Thread" and "Sequential Layer" Options&lt;br&gt; - "Perf/Checks" tab&lt;br&gt; - "Statistics" tab&lt;br&gt; - "Checksum" tab&lt;br&gt; - "Debug" tab.</Description>
     </RefParameter>
     <RefParameter Name="TCP_TTL" Comment="TCP_TTL (Number of Time-To-Live Used by TCP Packets)" Type="Integer" Unit="Node(s)" Group="Callback - TCP Options" DefaultValue="=IP_DEFAULT_TTL" TabName="Key Options" Mode="Basic" Min="0" Max="255" >
         <Description>Default TCP Time-To-Live value.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: None.</Description>
@@ -707,9 +707,6 @@
     </RefParameter>
     <RefParameter Name="TCP_RCV_SCALE" Comment="TCP_RCV_SCALE (Receive Scaling Factor Support)" Type="Integer" Group="Callback - TCP Options" DefaultValue="0" TabName="Key Options" Mode="Advanced" Min="0" Max="=IF(LWIP_WND_SCALE &amp; LWIP_TCP,14,2147483647)" >
         <Description>Set TCP_RCV_SCALE to the desired scaling factor, shift count in the range of 0..14.&lt;br&gt;When LWIP_WND_SCALE is enabled but TCP_RCV_SCALE is 0, we can use a large send window while having a small receive window only.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: If LWIP_TCP and LWIP_WND_SCALE are enabled, maximum valid window scale value is 14.</Description>
-    </RefParameter>
-    <RefParameter Name="MEMP_NUM_TCP_PCB" Comment="MEMP_NUM_TCP_PCB (Number of TCP Connections)" Type="integer" Group="Protocols Options" DefaultValue="5" TabName="General Settings" Mode="Basic" Min="=IF(!MEMP_MEM_MALLOC &amp; LWIP_TCP, 1, 0)" Max="2147483647" >
-        <Description>Number of simultatenously active TCP connections (requires the LWIP_TCP option enabled).&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Use MEMP_NUM_TCP_PCB requires MEMP_MEM_MALLOC disabled and LWIP_TCP enabled, it is mandatory to have MEMP_NUM_TCP_PCB&gt;0.&lt;br&gt;&lt;b&gt;Note&lt;/b&gt;: For more memory options, see in "Key Options" tab within "Internal Memory Pool Sizes" Options.</Description>
     </RefParameter>
     <RefParameter Name="LWIP_NETIF_HOSTNAME" Comment="LWIP_NETIF_HOSTNAME (NETIF Hostname)" Type="list" Group="Network Interfaces Options" DefaultValue="0" TabName="Key Options" Mode="Advanced" >
         <PossibleValue Comment="Disabled" Value="0"/>
@@ -904,24 +901,6 @@
         <PossibleValue Comment="Disabled" Value="0"/>
         <Description>Enable tcpip_timeout/tcpip_untimeout to create timers running in tcpip_thread from another thread.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Enable LWIP_TCPIP_TIMEOUT requires RTOS enabled (NO_SYS=0).</Description>
     </RefParameter>
-    <RefParameter Name="LWIP_SOCKET" Comment="LWIP_SOCKET (Socket API)" Type="list" Group="Thread Safe APIs - Socket Options" DefaultValue="1" TabName="Key Options" Mode="Basic" >
-        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: Use Socket API requires LWIP_NETCONN enabled, NO_SYS=0, MEMP_NUM_NETCONN&gt;0, MEMP_NUM_TCPIP_MSG_API&gt;0 when MEMP_MEM_MALLOC is disabled." Expression="!NO_SYS &amp; LWIP_NETCONN &amp; (MEMP_NUM_NETCONN &gt; 0) &amp; IF(!MEMP_MEM_MALLOC, MEMP_NUM_TCPIP_MSG_API &gt; 0, 1)"/>
-        <PossibleValue Comment="Disabled" Value="0"/>
-        <PossibleValue Comment="Enabled" Value="1"/>
-        <Description>When this parameter is enabled, Socket API is enabled (require to use sockets.c)</Description>
-    </RefParameter>
-    <RefParameter Name="LWIP_NETCONN_SEM_PER_THREAD" Comment="LWIP_NETCONN_SEM_PER_THREAD (Netconn uses One Semaphore per Thread)" Type="list" Group="Thread Safe APIs - Netconn Options" DefaultValue="0" TabName="Key Options" Mode="Advanced" >
-        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: Enable LWIP_NETCONN_SEM_PER_THREAD requires RTOS enabled (NO_SYS=0)." Expression="!NO_SYS"/>
-        <PossibleValue Comment="Disabled" Value="0"/>
-        <PossibleValue Comment="Enabled" Value="1"/>
-        <Description>Enable this parameter to use one (thread-local) semaphore per thread calling socket/netconn functions instead of allocating one semaphore per netconn (and per select etc.)&lt;br&gt;ATTENTION: a thread-local semaphore for API calls is needed:&lt;br&gt; - LWIP_NETCONN_THREAD_SEM_GET() returning a sys_sem_t&lt;br&gt; - LWIP_NETCONN_THREAD_SEM_ALLOC() creating the semaphore&lt;br&gt; - LWIP_NETCONN_THREAD_SEM_FREE() freeing the semaphore&lt;br&gt;The latter 2 can be invoked up by calling netconn_thread_init()/netconn_thread_cleanup().&lt;br&gt;Ports may call these for threads created with sys_thread_new().&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: None.</Description>
-    </RefParameter>
-    <RefParameter Name="LWIP_SOCKET" Comment="LWIP_SOCKET (Socket API)" Type="list" Group="Thread Safe APIs - Socket Options" DefaultValue="1" TabName="Key Options" Mode="Basic" >
-        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: Use Socket API requires LWIP_NETCONN enabled, NO_SYS=0, MEMP_NUM_NETCONN&gt;0, MEMP_NUM_TCPIP_MSG_API&gt;0 when MEMP_MEM_MALLOC is disabled." Expression="!NO_SYS &amp; LWIP_NETCONN &amp; (MEMP_NUM_NETCONN &gt; 0) &amp; IF(!MEMP_MEM_MALLOC, MEMP_NUM_TCPIP_MSG_API &gt; 0, 1)"/>
-        <PossibleValue Comment="Disabled" Value="0"/>
-        <PossibleValue Comment="Enabled" Value="1"/>
-        <Description>When this parameter is enabled, Socket API is enabled (require to use sockets.c)</Description>
-    </RefParameter>
     <RefParameter Name="LWIP_NETCONN_SEM_PER_THREAD" Comment="LWIP_NETCONN_SEM_PER_THREAD (Netconn uses One Semaphore per Thread)" Type="list" Group="Thread Safe APIs - Netconn Options" DefaultValue="0" TabName="Key Options" Mode="Advanced" >
         <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: Enable LWIP_NETCONN_SEM_PER_THREAD requires RTOS enabled (NO_SYS=0)." Expression="!NO_SYS"/>
         <PossibleValue Comment="Disabled" Value="0"/>
@@ -932,48 +911,29 @@
         <PossibleValue Comment="Disabled" Value="0"/>
         <Description>Enable this parameter to use one (thread-local) semaphore per thread calling socket/netconn functions instead of allocating one semaphore per netconn (and per select etc.)&lt;br&gt;ATTENTION: a thread-local semaphore for API calls is needed:&lt;br&gt; - LWIP_NETCONN_THREAD_SEM_GET() returning a sys_sem_t&lt;br&gt; - LWIP_NETCONN_THREAD_SEM_ALLOC() creating the semaphore&lt;br&gt; - LWIP_NETCONN_THREAD_SEM_FREE() freeing the semaphore&lt;br&gt;The latter 2 can be invoked up by calling netconn_thread_init()/netconn_thread_cleanup().&lt;br&gt;Ports may call these for threads created with sys_thread_new().&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Enable LWIP_NETCONN_SEM_PER_THREAD requires RTOS enabled (NO_SYS=0).</Description>
     </RefParameter>
-    <RefParameter Name="LWIP_SOCKET" Comment="LWIP_SOCKET (Socket API)" Type="list" Group="Thread Safe APIs - Socket Options" DefaultValue="0" TabName="Key Options" Mode="Basic" >
-        <PossibleValue Comment="Disabled" Value="0"/>
-        <Description>When this parameter is enabled, Socket API is enabled (require to use sockets.c).&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Use Socket API requires LWIP_NETCONN enabled, NO_SYS=0, MEMP_NUM_NETCONN&gt;0, MEMP_NUM_TCPIP_MSG_API&gt;0 when MEMP_MEM_MALLOC is disabled.</Description>
-    </RefParameter>
-    <RefParameter Name="LWIP_NETCONN_SEM_PER_THREAD" Comment="LWIP_NETCONN_SEM_PER_THREAD (Netconn uses One Semaphore per Thread)" Type="list" Group="Thread Safe APIs - Netconn Options" DefaultValue="0" TabName="Key Options" Mode="Advanced" Visible="false">
-        <PossibleValue Comment="Disabled" Value="0"/>
-        <Description>Enable this parameter to use one (thread-local) semaphore per thread calling socket/netconn functions instead of allocating one semaphore per netconn (and per select etc.)&lt;br&gt;ATTENTION: a thread-local semaphore for API calls is needed:&lt;br&gt; - LWIP_NETCONN_THREAD_SEM_GET() returning a sys_sem_t&lt;br&gt; - LWIP_NETCONN_THREAD_SEM_ALLOC() creating the semaphore&lt;br&gt; - LWIP_NETCONN_THREAD_SEM_FREE() freeing the semaphore&lt;br&gt;The latter 2 can be invoked up by calling netconn_thread_init()/netconn_thread_cleanup().&lt;br&gt;Ports may call these for threads created with sys_thread_new().&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Enable LWIP_NETCONN_SEM_PER_THREAD requires RTOS enabled (NO_SYS=0).</Description>
-    </RefParameter>
-    <RefParameter Name="LWIP_SOCKET" Comment="LWIP_SOCKET (Socket API)" Type="list" Group="Thread Safe APIs - Socket Options" DefaultValue="0" TabName="Key Options" Mode="Basic" >
-        <PossibleValue Comment="Disabled" Value="0"/>
-        <Description>When this parameter is enabled, Socket API is enabled (require to use sockets.c).&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Use Socket API requires LWIP_NETCONN enabled, NO_SYS=0, MEMP_NUM_NETCONN&gt;0, MEMP_NUM_TCPIP_MSG_API&gt;0 when MEMP_MEM_MALLOC is disabled.</Description>
-    </RefParameter>
     <RefParameter Name="LWIP_NETCONN_FULLDUPLEX" Comment="LWIP_NETCONN_FULLDUPLEX (Netconn in Full Duplex)" Type="list" Group="Thread Safe APIs - Netconn Options" DefaultValue="0" TabName="Key Options" Mode="Advanced" >
         <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: Enable LWIP_NETCONN_FULLDUPLEX requires RTOS enabled (NO_SYS=0)." Expression="!NO_SYS"/>
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
         <Description>This parameter enables code that allows reading from one thread, writing from a 2nd thread and closing from a 3rd thread at the same time.&lt;br&gt;ATTENTION: This is currently really alpha! Some requirements:&lt;br&gt; - LWIP_NETCONN_SEM_PER_THREAD==1 is required to use one socket/netconn from multiple threads at once&lt;br&gt; - sys_mbox_free() has to unblock receive tasks waiting on recvmbox/acceptmbox and prevent a task pending on this during/after deletion.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: None.</Description>
     </RefParameter>
-    <RefParameter Name="LWIP_COMPAT_SOCKETS" Comment="LWIP_COMPAT_SOCKETS (BSD-style Socket Functions Names)" Type="Integer" Group="Thread Safe APIs - Socket Options" DefaultValue="1" TabName="Key Options" Mode="Basic" Min="0" Max="2" >
-        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: Use LWIP_COMPAT_SOCKETS option requires RTOS enabled (NO_SYS=0)." Expression="!NO_SYS"/>
-        <Description>LWIP_COMPAT_SOCKETS==1: Enable BSD-style sockets functions names through defines.&lt;br&gt;LWIP_COMPAT_SOCKETS==2: Same as ==1 but correctly named functions are created.&lt;br&gt;While this helps code completion, it might conflict with existing libraries (only used if you use sockets.c).</Description>
-    </RefParameter>
-    <RefParameter Name="LWIP_NETCONN_FULLDUPLEX" Comment="LWIP_NETCONN_FULLDUPLEX (Netconn in Full Duplex)" Type="list" Group="Thread Safe APIs - Netconn Options" DefaultValue="0" TabName="Key Options" Mode="Advanced" >
-        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: Enable LWIP_NETCONN_FULLDUPLEX requires RTOS enabled (NO_SYS=0)." Expression="!NO_SYS"/>
-        <PossibleValue Comment="Disabled" Value="0"/>
-        <PossibleValue Comment="Enabled" Value="1"/>
-        <Description>This parameter enables code that allows reading from one thread, writing from a 2nd thread and closing from a 3rd thread at the same time.&lt;br&gt;ATTENTION: This is currently really alpha! Some requirements:&lt;br&gt; - LWIP_NETCONN_SEM_PER_THREAD==1 is required to use one socket/netconn from multiple threads at once&lt;br&gt; - sys_mbox_free() has to unblock receive tasks waiting on recvmbox/acceptmbox and prevent a task pending on this during/after deletion.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: None.</Description>
-    </RefParameter>
-    <RefParameter Name="LWIP_COMPAT_SOCKETS" Comment="LWIP_COMPAT_SOCKETS (BSD-style Socket Functions Names)" Type="Integer" Group="Thread Safe APIs - Socket Options" DefaultValue="1" TabName="Key Options" Mode="Basic" Min="0" Max="2" >
-        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: Use LWIP_COMPAT_SOCKETS option requires RTOS enabled (NO_SYS=0)." Expression="!NO_SYS"/>
-        <Description>LWIP_COMPAT_SOCKETS==1: Enable BSD-style sockets functions names through defines.&lt;br&gt;LWIP_COMPAT_SOCKETS==2: Same as ==1 but correctly named functions are created.&lt;br&gt;While this helps code completion, it might conflict with existing libraries (only used if you use sockets.c).</Description>
-    </RefParameter>
     <RefParameter Name="LWIP_NETCONN_FULLDUPLEX" Comment="LWIP_NETCONN_FULLDUPLEX (Netconn in Full Duplex)" Type="list" Group="Thread Safe APIs - Netconn Options" DefaultValue="0" TabName="Key Options" Mode="Advanced" Visible="false">
         <PossibleValue Comment="Disabled" Value="0"/>
         <Description>This parameter enables code that allows reading from one thread, writing from a 2nd thread and closing from a 3rd thread at the same time.&lt;br&gt;ATTENTION: This is currently really alpha! Some requirements:&lt;br&gt; - LWIP_NETCONN_SEM_PER_THREAD==1 is required to use one socket/netconn from multiple threads at once&lt;br&gt; - sys_mbox_free() has to unblock receive tasks waiting on recvmbox/acceptmbox and prevent a task pending on this during/after deletion.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Enable LWIP_NETCONN_FULLDUPLEX requires RTOS enabled (NO_SYS=0).</Description>
     </RefParameter>
-    <RefParameter Name="LWIP_COMPAT_SOCKETS" Comment="LWIP_COMPAT_SOCKETS (BSD-style Socket Functions Names)" Type="Integer" Group="Thread Safe APIs - Socket Options" DefaultValue="0" TabName="Key Options" Mode="Basic" Visible="false">
-        <Description>When this parameter is enabled, Socket API is enabled (require to use sockets.c).&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Use LWIP_COMPAT_SOCKETS option requires RTOS enabled (NO_SYS=0).</Description>
-    </RefParameter>
-    <RefParameter Name="LWIP_NETCONN_FULLDUPLEX" Comment="LWIP_NETCONN_FULLDUPLEX (Netconn in Full Duplex)" Type="list" Group="Thread Safe APIs - Netconn Options" DefaultValue="0" TabName="Key Options" Mode="Advanced" Visible="false">
+    <RefParameter Name="LWIP_SOCKET" Comment="LWIP_SOCKET (Socket API)" Type="list" Group="Thread Safe APIs - Socket Options" DefaultValue="1" TabName="Key Options" Mode="Basic" >
+        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: Use Socket API requires LWIP_NETCONN enabled, NO_SYS=0, MEMP_NUM_NETCONN&gt;0, MEMP_NUM_TCPIP_MSG_API&gt;0 when MEMP_MEM_MALLOC is disabled." Expression="!NO_SYS &amp; LWIP_NETCONN &amp; (MEMP_NUM_NETCONN &gt; 0) &amp; IF(!MEMP_MEM_MALLOC, MEMP_NUM_TCPIP_MSG_API &gt; 0, 1)"/>
         <PossibleValue Comment="Disabled" Value="0"/>
-        <Description>This parameter enables code that allows reading from one thread, writing from a 2nd thread and closing from a 3rd thread at the same time.&lt;br&gt;ATTENTION: This is currently really alpha! Some requirements:&lt;br&gt; - LWIP_NETCONN_SEM_PER_THREAD==1 is required to use one socket/netconn from multiple threads at once&lt;br&gt; - sys_mbox_free() has to unblock receive tasks waiting on recvmbox/acceptmbox and prevent a task pending on this during/after deletion.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Enable LWIP_NETCONN_FULLDUPLEX requires RTOS enabled (NO_SYS=0).</Description>
+        <PossibleValue Comment="Enabled" Value="1" Semaphore="S_LWIP_SOCKET"/>
+        <Description>When this parameter is enabled, Socket API is enabled (require to use sockets.c)</Description>
+    </RefParameter>
+    <RefParameter Name="LWIP_SOCKET" Comment="LWIP_SOCKET (Socket API)" Type="list" Group="Thread Safe APIs - Socket Options" DefaultValue="0" TabName="Key Options" Mode="Basic" >
+        <PossibleValue Comment="Disabled" Value="0"/>
+        <Description>When this parameter is enabled, Socket API is enabled (require to use sockets.c).&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Use Socket API requires LWIP_NETCONN enabled, NO_SYS=0, MEMP_NUM_NETCONN&gt;0, MEMP_NUM_TCPIP_MSG_API&gt;0 when MEMP_MEM_MALLOC is disabled.</Description>
+    </RefParameter>
+    <RefParameter Name="LWIP_COMPAT_SOCKETS" Comment="LWIP_COMPAT_SOCKETS (BSD-style Socket Functions Names)" Type="Integer" Group="Thread Safe APIs - Socket Options" DefaultValue="1" TabName="Key Options" Mode="Basic" Min="0" Max="2" >
+        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: Use LWIP_COMPAT_SOCKETS option requires RTOS enabled (NO_SYS=0)." Expression="!NO_SYS"/>
+        <Description>LWIP_COMPAT_SOCKETS==1: Enable BSD-style sockets functions names through defines.&lt;br&gt;LWIP_COMPAT_SOCKETS==2: Same as ==1 but correctly named functions are created.&lt;br&gt;While this helps code completion, it might conflict with existing libraries (only used if you use sockets.c).</Description>
     </RefParameter>
     <RefParameter Name="LWIP_COMPAT_SOCKETS" Comment="LWIP_COMPAT_SOCKETS (BSD-style Socket Functions Names)" Type="Integer" Group="Thread Safe APIs - Socket Options" DefaultValue="0" TabName="Key Options" Mode="Basic" Visible="false">
         <Description>When this parameter is enabled, Socket API is enabled (require to use sockets.c).&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Use LWIP_COMPAT_SOCKETS option requires RTOS enabled (NO_SYS=0).</Description>
@@ -2367,16 +2327,6 @@
         <PossibleValue Comment="Disabled" Value="0"/>
         <Description>Disable Memory Pool stats.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: MEMP_STATS requires LWIP_STATS enabled and is set by default with !MEMP_MEM_MALLOC.</Description>
     </RefParameter>
-    <RefParameter Name="MEMP_STATS" Comment="MEMP_STATS (Memory Pool Statistics)" Type="list" Group="Debug - Statistics Options" DefaultValue="=!MEMP_MEM_MALLOC" TabName="Statistics" Mode="Advanced" >
-        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: MEMP_STATS requires LWIP_STATS enabled and is set by default with !MEMP_MEM_MALLOC." Expression="LWIP_STATS &amp; !MEMP_MEM_MALLOC"/>
-        <PossibleValue Comment="Disabled" Value="0"/>
-        <PossibleValue Comment="Enabled" Value="1"/>
-        <Description>Enable memp.c pool stats.</Description>
-    </RefParameter>
-    <RefParameter Name="MEMP_STATS" Comment="MEMP_STATS (Memory Pool Statistics)" Type="list" Group="Debug - Statistics Options" DefaultValue="0" TabName="Statistics" Mode="Advanced" >
-        <PossibleValue Comment="Disabled" Value="0"/>
-        <Description>Disable Memory Pool stats.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: MEMP_STATS requires LWIP_STATS enabled and is set by default with !MEMP_MEM_MALLOC.</Description>
-    </RefParameter>
     <RefParameter Name="SYS_STATS" Comment="SYS_STATS (System Statistics)" Type="list" Group="Debug - Statistics Options" DefaultValue="=!NO_SYS" TabName="Statistics" Mode="Advanced" >
         <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: SYS_STATS requires LWIP_STATS enabled and is set by default with !NO_SYS." Expression="LWIP_STATS &amp; !NO_SYS"/>
         <PossibleValue Comment="Disabled" Value="0"/>
@@ -2798,6 +2748,19 @@
         <Parameter Name="NETMASK_ADDRESS"/>
         <Parameter Name="GATEWAY_ADDRESS"/>
         <Parameter Name="WITH_RTOS"/>
+        <Parameter Name="PHY Driver"/>
+        <Parameter Name="LWIP_ICMP"/>
+        <Parameter Name="LWIP_IGMP"/>
+        <Parameter Name="LWIP_DNS"/>
+        <Parameter Name="LWIP_UDP"/>
+        <Parameter Name="MEMP_NUM_UDP_PCB"/>
+        <Parameter Name="LWIP_TCP"/>
+        <Parameter Name="MEMP_NUM_TCP_PCB"/>
+        <Parameter Name="heth"/>
+        <Parameter Name="gnetif"/>
+        <Parameter Name="ipaddr"/>
+        <Parameter Name="netmask"/>
+        <Parameter Name="gw"/>
         <Parameter Name="PHY"/>
         <Parameter Name="TX_DESCRIPTOR_ADDRESS"/>
         <Parameter Name="RX_DESCRIPTOR_ADDRESS"/>
@@ -2811,12 +2774,6 @@
         <Parameter Name="LWIP_TCPIP_CORE_LOCKING"/>
         <Parameter Name="LWIP_TCPIP_CORE_LOCKING_INPUT"/>
         <Parameter Name="SYS_LIGHTWEIGHT_PROT"/>
-        <Parameter Name="heth"/>
-        <Parameter Name="gnetif"/>
-        <Parameter Name="ipaddr"/>
-        <Parameter Name="netmask"/>
-        <Parameter Name="gw"/>
-        <Parameter Name="PHY Driver"/>
         <Parameter Name="MEM_LIBC_MALLOC"/>
         <Parameter Name="MEMP_MEM_MALLOC"/>
         <Parameter Name="MEM_ALIGNMENT"/>
@@ -2875,7 +2832,6 @@
         <Parameter Name="IP_SOF_BROADCAST_RECV"/>
         <Parameter Name="IP_FORWARD_ALLOW_TX_ON_RX_NETIF"/>
         <Parameter Name="LWIP_RANDOMIZE_INITIAL_LOCAL_PORTS"/>
-        <Parameter Name="LWIP_ICMP"/>
         <Parameter Name="ICMP_TTL"/>
         <Parameter Name="LWIP_BROADCAST_PING"/>
         <Parameter Name="LWIP_MULTICAST_PING"/>
@@ -2891,8 +2847,6 @@
         <Parameter Name="LWIP_DHCP_AUTOIP_COOP"/>
         <Parameter Name="LWIP_DHCP_AUTOIP_COOP_TRIES"/>
         <Parameter Name="LWIP_MIB2_CALLBACKS"/>
-        <Parameter Name="LWIP_IGMP"/>
-        <Parameter Name="LWIP_DNS"/>
         <Parameter Name="DNS_TABLE_SIZE"/>
         <Parameter Name="DNS_MAX_NAME_LENGTH"/>
         <Parameter Name="DNS_MAX_SERVERS"/>
@@ -2903,12 +2857,9 @@
         <Parameter Name="LWIP_DNS_SECURE_RAND_SRC_PORT"/>
         <Parameter Name="DNS_LOCAL_HOSTLIST"/>
         <Parameter Name="DNS_LOCAL_HOSTLIST_IS_DYNAMIC"/>
-        <Parameter Name="LWIP_UDP"/>
         <Parameter Name="LWIP_UDPLITE"/>
         <Parameter Name="UDP_TTL"/>
         <Parameter Name="LWIP_NETBUF_RECVINFO"/>
-        <Parameter Name="MEMP_NUM_UDP_PCB"/>
-        <Parameter Name="LWIP_TCP"/>
         <Parameter Name="TCP_TTL"/>
         <Parameter Name="TCP_WND"/>
         <Parameter Name="TCP_MAXRTX"/>
@@ -2931,7 +2882,6 @@
         <Parameter Name="LWIP_CALLBACK_API"/>
         <Parameter Name="LWIP_WND_SCALE"/>
         <Parameter Name="TCP_RCV_SCALE"/>
-        <Parameter Name="MEMP_NUM_TCP_PCB"/>
         <Parameter Name="LWIP_NETIF_HOSTNAME"/>
         <Parameter Name="LWIP_NETIF_API"/>
         <Parameter Name="LWIP_NETIF_STATUS_CALLBACK"/>
@@ -2961,13 +2911,9 @@
         <Parameter Name="DEFAULT_ACCEPTMBOX_SIZE"/>
         <Parameter Name="LWIP_NETCONN"/>
         <Parameter Name="LWIP_TCPIP_TIMEOUT"/>
-        <Parameter Name="LWIP_SOCKET"/>
-        <Parameter Name="LWIP_NETCONN_SEM_PER_THREAD"/>
-        <Parameter Name="LWIP_SOCKET"/>
         <Parameter Name="LWIP_NETCONN_SEM_PER_THREAD"/>
         <Parameter Name="LWIP_NETCONN_FULLDUPLEX"/>
-        <Parameter Name="LWIP_COMPAT_SOCKETS"/>
-        <Parameter Name="LWIP_NETCONN_FULLDUPLEX"/>
+        <Parameter Name="LWIP_SOCKET"/>
         <Parameter Name="LWIP_COMPAT_SOCKETS"/>
         <Parameter Name="LWIP_SOCKET_SET_ERRNO"/>
         <Parameter Name="LWIP_POSIX_SOCKETS_IO_NAMES"/>
@@ -3176,7 +3122,6 @@
         <Parameter Name="UDP_STATS"/>
         <Parameter Name="TCP_STATS"/>
         <Parameter Name="MEM_STATS"/>
-        <Parameter Name="MEMP_STATS"/>
         <Parameter Name="MEMP_STATS"/>
         <Parameter Name="SYS_STATS"/>
         <Parameter Name="IP6_STATS"/>

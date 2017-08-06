@@ -9,6 +9,14 @@
   ******************************************************************************
   */
 
+[#function list_contains string_list element]
+  [#list string_list?split(" ") as string_element]
+    [#if string_element == element]
+      [#return true]
+    [/#if]
+  [/#list]
+  [#return false]
+[/#function]
 [#list IPdatas as IP]  
 [#assign ipvar = IP]
 /* Includes ------------------------------------------------------------------*/
@@ -721,7 +729,7 @@ ETH_TxPacketConfig TxConfig;
                         #t#t/* Enable BKP CLK enable for backup registers */
                         #t#t__HAL_RCC_BKP_CLK_ENABLE();                    
                     [/#if]
-                        #t#t/* Peripheral clock enable */ 
+                        #t#t/* ${ipName} clock enable */
                     [#list initService.clock?split(';') as clock]    
                         [#if ipvar.clkCommonResource.entrySet()?contains(clock?trim)]#t#t${clock?trim?replace("__","")?replace("_ENABLE","")}_ENABLED++;
                             #t#tif(${clock?trim?replace("__","")?replace("_ENABLE","")}_ENABLED==1){          
@@ -733,7 +741,7 @@ ETH_TxPacketConfig TxConfig;
                     [/#list]
                 [/#if]
             [#else]
-                #t#t/* Peripheral clock enable */
+                #t#t/* ${ipName} clock enable */
                 #t#t__HAL_RCC_${ipName}_CLK_ENABLE(); 
             [/#if]
         [/#if] [#-- if not I2C --]
@@ -776,7 +784,7 @@ ETH_TxPacketConfig TxConfig;
     [#if serviceType=="Init" && (ipName?contains("I2C")||ipName?contains("USB"))] 
            [#if initService.clock??]
             [#if initService.clock!="none"]
-               #t#t/* Peripheral clock enable */
+               #t#t/* ${ipName} clock enable */
                 [#list initService.clock?split(';') as clock]
                     [#if ipvar.clkCommonResource.entrySet()?contains(clock?trim)]#t#t${clock?trim?replace("__","")?replace("_ENABLE","")}_ENABLED++;
                     #t#tif(${clock?trim?replace("__","")?replace("_ENABLE","")}_ENABLED==1){          
@@ -788,7 +796,7 @@ ETH_TxPacketConfig TxConfig;
                 [/#list]
             [/#if]
             [#else]
-                 #t#t/* Peripheral clock enable */
+                 #t#t/* ${ipName} clock enable */
                  #t#t__HAL_RCC_${ipName}_CLK_ENABLE(); 
            [/#if]
 [/#if]
@@ -1126,6 +1134,28 @@ static uint32_t ${entry.value}=0;
         [/#list]  
 [/#if]
 [/#list]
+[#-- add local variables for HAL_DMAEx_ConfigMuxSync --]
+[#if entry.key != "HAL_DFSDM_ChannelMspInit"]
+  [#assign local_dma_variables = ""]
+  [#list words as inst] [#-- loop on ip instance data --]
+    [#assign services = getInitServiceMode(inst)]
+    [#if services.dma??]
+      [#assign dmaService = services.dma]
+      [#list dmaService as dmaconfig]
+        [#list dmaconfig.methods as method]
+          [#list method.arguments as func_argument]
+            [#if func_argument.genericType == "struct" && func_argument.context != "global"]
+              [#if !list_contains(local_dma_variables, func_argument.name)]
+                [#assign local_dma_variables = local_dma_variables + " " + func_argument.name]
+#t${func_argument.typeName} ${func_argument.name};
+              [/#if]
+            [/#if]
+          [/#list]
+        [/#list]
+      [/#list]
+    [/#if]
+  [/#list]
+[/#if]
 [#-- --]
 [#if mspIsEmpty=="no"]
     [#if  words[0]?contains("DFSDM")]

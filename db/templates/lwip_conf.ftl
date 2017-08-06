@@ -1,4 +1,5 @@
 [#ftl]
+
 /**
   ******************************************************************************
   * File Name          : ${name}
@@ -58,17 +59,20 @@ extern ${variable.value} ${variable.name};
 [#-- Global variables --]
 
 [#-- Parameters always visible and dependent from RTOS (NO_SYS) >> avoid using default value --]
-[#assign rtosNoMaskList = ["NO_SYS", "LWIP_NETCONN", "LWIP_SOCKET", "WITH_RTOS", "LWIP_NETIF_LOOPBACK_MULTITHREADING"]]
+[#assign rtosNoMaskList = ["NO_SYS", "LWIP_NETCONN", "LWIP_SOCKET", "WITH_RTOS", "LWIP_NETIF_LOOPBACK_MULTITHREADING", "LWIP_TIMERS", "TCPIP_MBOX_SIZE", "DEFAULT_UDP_RECVMBOX_SIZE", "DEFAULT_TCP_RECVMBOX_SIZE", "DEFAULT_ACCEPTMBOX_SIZE", "LWIP_TIMEVAL_PRIVATE"]]
 [#-- Parameters Visible only if RTOS AND with default values different for the same parameter >> avoid using default value  --]
 [#assign rtosMaskList = ["TCPIP_THREAD_STACKSIZE", "TCPIP_THREAD_PRIO", "SLIPIF_THREAD_STACKSIZE", "SLIPIF_THREAD_PRIO", "DEFAULT_THREAD_STACKSIZE", "DEFAULT_THREAD_PRIO",
                           "LWIP_COMPAT_SOCKETS", "LWIP_SOCKET_SET_ERRNO", "LWIP_POSIX_SOCKETS_IO_NAMES"]]
 [#-- STATS Parameters are disabled in CubeMx (enable in opt.h) >> avoid using default value --]
 [#assign statList = ["LINK_STATS", "ETHARP_STATS", "IP_STATS", "IPFRAG_STATS", "ICMP_STATS", "IGMP_STATS", "UDP_STATS", "TCP_STATS", "MEM_STATS", "MEMP_STATS", "SYS_STATS", 
-                             "IP6_STATS", "ICMP6_STATS", "IP6_FRAG_STATS", "MLD6_STATS"]]
+                             "IP6_STATS", "ICMP6_STATS", "IP6_FRAG_STATS", "MLD6_STATS", "MIB2_STATS"]]
 [#-- Special parameters LWIP_DNS_SECURE cannot consider default value (logical OR) >> avoid using default value --]
 [#-- Special parameters LWIP_DHCP is enabled in CubeMx (disabled in opt.h) >> avoid using default value --]
 [#-- Special parameters CHECKSUM_BY_HARDWARE should be excluded since it is generated in STM32CubeMX Specific Parameters section --]
-[#assign specialList = ["LWIP_DNS_SECURE", "LWIP_DHCP", "CHECKSUM_BY_HARDWARE"]]
+[#-- Special parameters RECV_BUFSIZE_DEFAULT is defined with 0xFFFFFFF (INT_MAX in opt.h) >> generate always with freertos --]
+[#-- Special parameters TCP_RCV_SCALE is not defined if LWIP_WND_SCALE is enabled (see opt.h) >> generate always --]
+[#-- Special parameters LWIP_SUPPORT_CUSTOM_PBUF (for H7) >> generate only for h7 --]
+[#assign specialList = ["LWIP_DNS_SECURE", "LWIP_DHCP", "CHECKSUM_BY_HARDWARE", "RECV_BUFSIZE_DEFAULT", "TCP_RCV_SCALE", "LWIP_SUPPORT_CUSTOM_PBUF"]]
 
 [#-- Checksum parameters enabled (in opt.h) and disabled in CubeMx --]
 [#assign checksumList = ["CHECKSUM_GEN_IP", "CHECKSUM_GEN_UDP", "CHECKSUM_GEN_TCP", "CHECKSUM_GEN_ICMP", "CHECKSUM_GEN_ICMP6", "CHECKSUM_CHECK_IP", "CHECKSUM_CHECK_UDP", "CHECKSUM_CHECK_TCP", "CHECKSUM_CHECK_ICMP", "CHECKSUM_CHECK_ICMP6"]]
@@ -76,6 +80,8 @@ extern ${variable.value} ${variable.name};
 [#-- CubeMx internal parameters --]
 [#assign nonStdList = ["PHY", "NETMASK_ADDRESS", "GATEWAY_ADDRESS", "IP_ADDRESS", "heth", "gnetif", "ipaddr", "netmask", "gw"]]
 
+[#-- internal use only --]
+[#assign series = FamilyName?lower_case]
 
 [#-- Function to test if a parameter belong to a list of parameters --]
 [#function isParamInList paramName paramList]
@@ -135,7 +141,10 @@ extern ${variable.value} ${variable.name};
         [#if definition.name == "LWIP_IPV6_REASS"] [#assign lwip_ipv6_reass = definition.value] [/#if]
         [#if definition.name == "LWIP_IPV6_MLD"] [#assign lwip_ipv6_mld = definition.value] [/#if]
         [#if definition.name == "CHECKSUM_BY_HARDWARE"] [#assign checksum_by_hw = definition.value] [/#if]
-        [#if definition.name == "LWIP_IPV4"] [#assign lwip_ipv4 = definition.value] [/#if]      
+        [#if definition.name == "LWIP_IPV4"] [#assign lwip_ipv4 = definition.value] [/#if]
+        [#if definition.name == "LWIP_SNMP"] [#assign lwip_snmp = definition.value] [/#if]
+        [#if definition.name == "LWIP_WND_SCALE"] [#assign lwip_wnd_scale = definition.value] [/#if]
+        [#if definition.name == "LWIP_SOCKET"] [#assign lwip_socket = definition.value] [/#if]
 	[/#list]
 
 [#compress]
@@ -171,6 +180,7 @@ extern ${variable.value} ${variable.name};
 /* LWIP_SO_RCVBUF is enabled => this requires INT_MAX definition in limits.h --*/
 #include "limits.h"
 [/#if]
+ 
 
 /* LwIP Stack Parameters (modified compared to initialization value in opt.h) -*/
 /* Parameters set in STM32CubeMX LwIP Configuration GUI -*/
@@ -196,12 +206,36 @@ extern ${variable.value} ${variable.name};
 /*----- Value in opt.h for ${definition.name}: 0 -----*/
 #define ${definition.name}  ${definition.value}
 			[/#if]
-			[#if (definition.name=="MEM_ALIGNMENT")]
+			[#if (definition.name=="SYS_LIGHTWEIGHT_PROT") && (definition.value =="0")]
+/*----- Value in opt.h for ${definition.name}: 1 -----*/
+#define ${definition.name}  ${definition.value}
+			[/#if]	
+			[#if (definition.name=="LWIP_TIMERS") && (definition.value =="0")]
+/*----- Value in opt.h for ${definition.name}: 1 -----*/
+#define ${definition.name}  ${definition.value}
+			[/#if]
+			[#if (definition.name=="TCPIP_MBOX_SIZE") && (definition.value !="0")]
+/*----- Value in opt.h for ${definition.name}: 0 -----*/
+#define ${definition.name}  ${definition.value}
+			[/#if]	
+			[#if (definition.name=="DEFAULT_UDP_RECVMBOX_SIZE") && (definition.value !="0")]
+/*----- Value in opt.h for ${definition.name}: 0 -----*/
+#define ${definition.name}  ${definition.value}
+			[/#if]
+			[#if (definition.name=="DEFAULT_TCP_RECVMBOX_SIZE") && (definition.value !="0")]
+/*----- Value in opt.h for ${definition.name}: 0 -----*/
+#define ${definition.name}  ${definition.value}
+			[/#if]
+			[#if (definition.name=="DEFAULT_ACCEPTMBOX_SIZE") && (definition.value !="0")]
+/*----- Value in opt.h for ${definition.name}: 0 -----*/
+#define ${definition.name}  ${definition.value}
+			[/#if]									
+			[#if (definition.name=="MEM_ALIGNMENT") && (definition.value !="1")]
 /*----- Value in opt.h for ${definition.name}: 1 -----*/
 #define ${definition.name}  ${definition.value}
             [/#if]
             [#if (definition.name=="MEMP_NUM_SYS_TIMEOUT") && (definition.value != "valueNotSetted") && (definition.value == "5")]
-/*----- Value in opt.h for ${definition.name}: (LWIP_TCP + IP_REASSEMBLY + LWIP_ARP + (2*LWIP_DHCP) + LWIP_AUTOIP + LWIP_IGMP + LWIP_DNS + PPP_SUPPORT) -*/
+/*----- Value in opt.h for ${definition.name}: (LWIP_TCP + IP_REASSEMBLY + LWIP_ARP + (2*LWIP_DHCP) + LWIP_AUTOIP + LWIP_IGMP + LWIP_DNS + (PPP_SUPPORT*6*MEMP_NUM_PPP_PCB) + (LWIP_IPV6 ? (1 + LWIP_IPV6_REASS + LWIP_IPV6_MLD) : 0)) -*/
 #define ${definition.name}  ${definition.value}
             [/#if]
             [#if (definition.name=="MEMP_NUM_PPPOS_INTERFACES") && (definition.value != "valueNotSetted") && (definition.value != memp_num_ppp_pcb)]
@@ -225,7 +259,7 @@ extern ${variable.value} ${variable.name};
             [#if (definition.name=="LWIP_SOCKET") && (definition.value != "valueNotSetted") && (definition.value !="1")]
 /*----- Value in opt.h for ${definition.name}: 1 -----*/
 #define ${definition.name}  ${definition.value}
-            [/#if]
+            [/#if]          
             [#if (definition.name=="LWIP_MULTICAST_TX_OPTIONS") && (definition.value != "valueNotSetted") && (definition.value != lwip_igmp)]
 /*----- Value in opt.h for ${definition.name}: LWIP_IGMP -----*/
 #define ${definition.name}  ${definition.value}
@@ -265,7 +299,11 @@ extern ${variable.value} ${variable.name};
             [#if (definition.name=="TCP_WND_UPDATE_THRESHOLD") && (definition.value != "valueNotSetted") && (definition.value == "536")]
 /*----- Value in opt.h for ${definition.name}: LWIP_MIN(TCP_WND/4, TCP_MSS*4) -----*/
 #define ${definition.name}  ${definition.value}
-            [/#if]            
+            [/#if]
+            [#if (definition.name=="TCP_RCV_SCALE") && (lwip_wnd_scale == "1")]
+/*----- Value in opt.h for ${definition.name}: undefined if LWIP_WND_SCALE is defined -----*/
+#define ${definition.name}  ${definition.value}
+            [/#if]
             [#if (definition.name=="LWIP_NETIF_LOOPBACK_MULTITHREADING") && (definition.value != "valueNotSetted") && (((definition.value == "0") && (lwip_rtos == 1)) || ((definition.value == "1") && (lwip_rtos == 0)))]
 /*----- Value in opt.h for ${definition.name}: !NO_SYS -----*/
 #define ${definition.name}  ${definition.value}
@@ -318,6 +356,10 @@ extern ${variable.value} ${variable.name};
 /*----- Value in opt.h for ${definition.name}: LWIP_IPV6 -----*/
 #define ${definition.name}  ${definition.value}
             [/#if] 
+            [#if (definition.name=="RECV_BUFSIZE_DEFAULT") && (definition.value != "valueNotSetted")][#-- rtosMaskList Param visible if freertos --]
+/*----- Value in opt.h for ${definition.name}: INT_MAX -----*/
+#define ${definition.name}  ${definition.value}
+            [/#if]            
             [#if (definition.name=="TCPIP_THREAD_STACKSIZE") && (definition.value != "valueNotSetted") && (lwip_rtos == 1) && (definition.value != "0")][#-- rtosMaskList Param visible if freertos --]
 /*----- Value in opt.h for ${definition.name}: 0 -----*/
 #define ${definition.name}  ${definition.value}
@@ -358,6 +400,10 @@ extern ${variable.value} ${variable.name};
 /*----- Value in opt.h for ${definition.name}: 1 -----*/
 #define ${definition.name}  ${definition.value}
             [/#if]
+            [#if (definition.name=="SNMP_LWIP_MIB2") && (definition.value != "valueNotSetted") && (definition.value == "0") && (lwip_snmp == "1")][#-- Case2 --]
+/*----- Value in snmp_opts.h for ${definition.name}: 0 -----*/
+#define ${definition.name}  ${definition.value}
+            [/#if]                          
             [#if lwip_stats == "1"][#-- Parameters with default value changing on certain condition --]
                 [#if (definition.name=="LINK_STATS") && (definition.value != "valueNotSetted") && (definition.value == "0")]
 /*----- Value in opt.h for ${definition.name}: 0 or 1 -*/
@@ -422,7 +468,11 @@ extern ${variable.value} ${variable.name};
                 [#if (definition.name=="ND6_STATS") && (definition.value != "valueNotSetted") && (definition.value == "0") && (lwip_ipv6 == "1")]
 /*----- Value in opt.h for ${definition.name}: 0 or LWIP_IPV6 -----*/
 #define ${definition.name}  ${definition.value}
-                [/#if]
+                [/#if]      
+                [#if (definition.name=="MIB2_STATS") && (definition.value != "valueNotSetted")]
+/*----- Value in opt.h for ${definition.name}: 0 or SNMP_LWIP_MIB2 -----*/
+#define ${definition.name}  ${definition.value}
+            [/#if]
             [/#if][#-- End STAT* parameters --] 
             [#if (definition.name=="CHECKSUM_GEN_IP") && (definition.value != "valueNotSetted") && (definition.value == "0")]
 /*----- Value in opt.h for ${definition.name}: 1 -----*/
@@ -463,17 +513,19 @@ extern ${variable.value} ${variable.name};
             [#if (definition.name=="CHECKSUM_CHECK_ICMP6") && (definition.value != "valueNotSetted") && (definition.value == "0")]
 /*----- Value in opt.h for ${definition.name}: 1 -----*/
 #define ${definition.name}   ${definition.value}
-            [/#if]      
+            [/#if]
+            [#if series == "stm32h7"]
+                [#if (definition.name=="LWIP_SUPPORT_CUSTOM_PBUF") && (definition.value != "valueNotSetted") && (definition.value == "1")]
+/*----- Value supported for H7 devices: 1 -----*/
+#define ${definition.name}   ${definition.value}
+            	[/#if]
+            [/#if]
 		[/#if][#-- definition.defaultValue --]
 	[/#list][#-- SWIP.defines line 108 --]
 /*-----------------------------------------------------------------------------*/
-[/#compress]
+[/#compress]	
 [/#if][#-- SWIP.defines?? --]
 [/#list][#-- SWIPdatas --]
-
-/* Parameter(s) not set in STM32CubeMX LwIP Configuration GUI -*/
-/* LwIP Parameter(s) not in opt.h -----------------------------*/
-#define LWIP_PROVIDE_ERRNO  1
 
 /* USER CODE BEGIN 1 */
 

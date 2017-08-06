@@ -518,7 +518,7 @@ void ethernetif_input(struct netif *netif)
  * @param netif the lwip network interface structure for this ethernetif
  * @return ERR_OK if ...
  */
-static err_t low_level_output_arp_off(struct netif *netif, struct pbuf *q, ip_addr_t *ipaddr)
+static err_t low_level_output_arp_off(struct netif *netif, struct pbuf *q, const ip4_addr_t *ipaddr)
 {  
   err_t errval;
   errval = ERR_OK;

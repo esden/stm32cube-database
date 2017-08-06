@@ -8,6 +8,14 @@
 [@common.optinclude name="Src/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
+[#function list_contains string_list element]
+  [#list string_list?split(" ") as string_element]
+    [#if string_element == element]
+      [#return true]
+    [/#if]
+  [/#list]
+  [#return false]
+[/#function]
 [#list IPdatas as IP]  
 [#assign ipvar = IP]
 /* Includes ------------------------------------------------------------------*/
@@ -231,7 +239,7 @@
 [#if gpioExistA]   
  #t#tif(hsai->Instance==${ipName}_Block_A)  
 #t#t{    
-    [#if serviceType=="Init"]  #t#t/* Peripheral clock enable */
+    [#if serviceType=="Init"]  #t#t/* ${ipName} clock enable */
 #t#tif (${ipName}_client == 0)
 #t#t{
            [#if initService.clock??]
@@ -302,7 +310,7 @@
 [#if gpioExistB]
 #t#tif(hsai->Instance==${ipName}_Block_B)
 #t#t{
-    [#if serviceType=="Init"]  #t#t#t/* Peripheral clock enable */
+    [#if serviceType=="Init"]  #t#t#t/* ${ipName} clock enable */
 #t#t#tif (${ipName}_client == 0)
 #t#t#t{
            [#if initService.clock??]
@@ -508,6 +516,41 @@ static uint32_t ${saiInst}_client =0;
         [/#list]  
 [/#if]
 [/#if]
+[/#list]
+[#-- add local variables for HAL_DMAEx_ConfigMuxSync --]
+[#assign local_dma_variables = ""]
+[#list words as inst] [#-- loop on ip instance data --]
+  [#assign services = getInitServiceMode(inst)]
+  [#if services.dmaA??]
+    [#assign dmaService = services.dmaA]
+    [#list dmaService as dmaconfig]
+      [#list dmaconfig.methods as method]
+        [#list method.arguments as func_argument]
+          [#if func_argument.genericType == "struct" && func_argument.context != "global"]
+            [#if !list_contains(local_dma_variables, func_argument.name)]
+              [#assign local_dma_variables = local_dma_variables + " " + func_argument.name]
+#t${func_argument.typeName} ${func_argument.name};
+            [/#if]
+          [/#if]
+        [/#list]
+      [/#list]
+    [/#list]
+  [/#if]
+  [#if services.dmaB??]
+    [#assign dmaService = services.dmaB]
+    [#list dmaService as dmaconfig]
+      [#list dmaconfig.methods as method]
+        [#list method.arguments as func_argument]
+          [#if func_argument.genericType == "struct" && func_argument.context != "global"]
+            [#if !list_contains(local_dma_variables, func_argument.name)]
+              [#assign local_dma_variables = local_dma_variables + " " + func_argument.name]
+#t${func_argument.typeName} ${func_argument.name};
+            [/#if]
+          [/#if]
+        [/#list]
+      [/#list]
+    [/#list]
+  [/#if]
 [/#list]
 [#-- --]
 [#list words as sai]

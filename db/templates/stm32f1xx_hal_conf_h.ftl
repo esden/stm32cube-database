@@ -51,7 +51,7 @@
   */
   
 #define HAL_MODULE_ENABLED  
-  [#assign allModules = ["ADC","AES","CAN","CEC","CORTEX","CRC","DAC","DMA","ETH","FLASH","GPIO","I2C","I2S","IRDA","IWDG","NOR","NAND","PCCARD","PCD","HCD","PWR","RCC","RTC","SD","SDRAM","SMARTCARD","SPI","SRAM","TIM","UART","USART","WWDG"]]
+  [#assign allModules = ["ADC","AES","CAN","CEC","CORTEX","CRC","DAC","DMA","ETH","FLASH","GPIO","I2C","I2S","IRDA","IWDG","NOR","NAND","PCCARD","PCD","HCD","PWR","RCC","RTC","SD","MMC","SDRAM","SMARTCARD","SPI","SRAM","TIM","UART","USART","WWDG"]]
   [#list allModules as module]
 	[#if isModuleUsed(module)]
 [#compress]#define HAL_${module?replace("AES","CRYP")}_MODULE_ENABLED[/#compress]
@@ -101,6 +101,15 @@
 #endif /* HSI_VALUE */
 
 /**
+  * @brief Internal Low Speed oscillator (LSI) value.
+  */
+#if !defined  (LSI_VALUE) 
+ #define LSI_VALUE               40000U    /*!< LSI Typical Value in Hz */
+#endif /* LSI_VALUE */                     /*!< Value of the Internal Low Speed oscillator in Hz
+                                                The real value may vary depending on the variations
+                                                in voltage and temperature. */
+
+/**
   * @brief External Low Speed oscillator (LSE) value.
   *        This value is used by the UART, RTC HAL module to compute the system frequency
   */
@@ -108,12 +117,12 @@
   #define LSE_VALUE    ((uint32_t)[#if lse_value??]${lse_value}[#else]32768[/#if]) /*!< Value of the External oscillator in Hz*/
 #endif /* LSE_VALUE */
 
-   
+
 #if !defined  (LSE_STARTUP_TIMEOUT)
   #define LSE_STARTUP_TIMEOUT    ((uint32_t)[#if LSE_Timout??]${LSE_Timout}[#else]5000[/#if])   /*!< Time out for LSE start up, in ms */
 #endif /* LSE_STARTUP_TIMEOUT */
 
-   
+
 /* Tip: To avoid modifying this file each time you need to use different HSE,
    ===  you can define the HSE value in your toolchain compiler preprocessor. */
 
@@ -293,6 +302,10 @@
 #ifdef HAL_SD_MODULE_ENABLED
  #include "stm32f1xx_hal_sd.h"
 #endif /* HAL_SD_MODULE_ENABLED */  
+
+#ifdef HAL_MMC_MODULE_ENABLED
+ #include "stm32f1xx_hal_mmc.h"
+#endif /* HAL_MMC_MODULE_ENABLED */
 
 #ifdef HAL_NAND_MODULE_ENABLED
  #include "stm32f1xx_hal_nand.h"

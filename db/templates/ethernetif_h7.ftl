@@ -160,7 +160,7 @@ __attribute__((at(${rx_buffer_address}))) uint8_t Rx_Buff[ETH_RX_DESC_CNT][ETH_M
 
 ETH_DMADescTypeDef DMARxDscrTab[ETH_RX_DESC_CNT] __attribute__((section(".RxDecripSection"))); /* Ethernet Rx DMA Descriptors */
 ETH_DMADescTypeDef DMATxDscrTab[ETH_TX_DESC_CNT] __attribute__((section(".TxDecripSection")));   /* Ethernet Tx DMA Descriptors */
-uint8_t Rx_Buff[ETH_RX_DESC_CNT][ETH_MAX_PACKET_SIZE] __attribute__attribute__((section(".RxArraySection"))); /* Ethernet Receive Buffers */
+uint8_t Rx_Buff[ETH_RX_DESC_CNT][ETH_MAX_PACKET_SIZE] __attribute__((section(".RxArraySection"))); /* Ethernet Receive Buffers */
 
 #endif
 
@@ -530,7 +530,7 @@ void ethernetif_input(struct netif *netif)
  * @param netif the lwip network interface structure for this ethernetif
  * @return ERR_OK if ...
  */
-static err_t low_level_output_arp_off(struct netif *netif, struct pbuf *q, ip_addr_t *ipaddr)
+static err_t low_level_output_arp_off(struct netif *netif, struct pbuf *q, const ip4_addr_t *ipaddr)
 {  
   err_t errval;
   errval = ERR_OK;
@@ -807,8 +807,8 @@ void ethernet_link_check_state(struct netif *netif)
 [/#if][#-- endif bsp --]  
 }
 [/#if][#-- endif netif_callback --]
-/* USER CODE BEGIN 7 */
+/* USER CODE BEGIN 8 */
 
-/* USER CODE END 7 */
+/* USER CODE END 8 */
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
 

@@ -8,6 +8,14 @@
 [@common.optinclude name="Src/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
+[#function list_contains string_list element]
+  [#list string_list?split(" ") as string_element]
+    [#if string_element == element]
+      [#return true]
+    [/#if]
+  [/#list]
+  [#return false]
+[/#function]
 [#assign ipName = "DMA"]
 [#if dmas?size > 0]
   [#list dmas as dma]
@@ -43,12 +51,22 @@ ${variable.value} ${variable.name};
   [/#list]
 [/#if]
 
+[#assign hasLocalVariables = false]
+[#list datas as configModel]
+  [#list configModel.methods as method]
+    [#list method.arguments as func_argument]
+      [#if func_argument.genericType == "struct" && func_argument.context != "global"]
+        [#assign hasLocalVariables = true]
+        [#break]
+      [/#if]
+    [/#list]
+  [/#list]
+[/#list]
+
 /** 
   * Enable DMA controller clock
-[#if datas?size > 0]
-  * Configure DMA for memory to memory transfers
-[/#if]
 [#if variables?? && variables?size > 0]
+  * Configure DMA for memory to memory transfers
 [#list variables as variable]
   *   ${variable.name}
 [/#list]
@@ -56,6 +74,23 @@ ${variable.value} ${variable.name};
   */
 void MX_${ipName}_Init(void) 
 {
+[#if hasLocalVariables]
+  /* Local variables */
+  [#assign local_variables = ""]
+  [#list datas as configModel]
+    [#list configModel.methods as method]
+      [#list method.arguments as func_argument]
+        [#if func_argument.genericType == "struct" && func_argument.context != "global"]
+          [#if !list_contains(local_variables, func_argument.name)]
+            [#assign local_variables = local_variables + " " + func_argument.name]
+  ${func_argument.typeName} ${func_argument.name};
+          [/#if]
+        [/#if]
+      [/#list]
+    [/#list]
+  [/#list]
+#n
+[/#if]
 [#if LL_Driver]
   /* Init with LL driver */
 [/#if]
@@ -72,10 +107,10 @@ void MX_${ipName}_Init(void)
   [/#list]
 [/#if]
 [#list datas as configModel][#--go through all DMA requests--]
-  [#assign instanceSuffix = "_" + configModel.instanceName?lower_case]
+  [#assign struct_variables = ""]
   [#if configModel.methods??][#-- if the DMA configuration contains a list of LibMethods--]
   [#if LL_Driver]
-  #n
+#n
   /* Configure DMA request ${configModel.instanceName} */
   [/#if]
     [#list configModel.methods as method]
@@ -85,17 +120,16 @@ void MX_${ipName}_Init(void)
         [#assign stream = ""]
         [#list method.arguments as func_argument]
           [#if func_argument.genericType == "struct"]
-            [#assign request = func_argument.name]
+            [#assign request = func_argument.name + "_" + configModel.instanceName?lower_case]
             [#list func_argument.argument as argument]
               [#if argument.name == "Instance"]
                 [#assign stream = argument.value]
               [/#if]
             [/#list]
           [/#if]
-          [#assign request = request + instanceSuffix]
         [/#list]
       [/#if]
-
+#n
       [#if method.status=="OK"][#-- all parameters have a value --]
         [#if method.name == "HAL_DMA_Init"]
   /* Configure DMA request ${request} on ${stream} */
@@ -103,29 +137,46 @@ void MX_${ipName}_Init(void)
           [#if method.comment??]
   /* ${method.comment} */
           [/#if]
-        [/#if]      
+        [/#if]
         [#if method.arguments??]
+          [#assign argument_number = 0]
           [#list method.arguments as func_argument]
+            [#assign argument_number = argument_number + 1]
+            [#assign func_argument_name = func_argument.name]
+            [#if argument_number == 1]
+              [#assign func_argument_name = func_argument_name + "_" + configModel.instanceName?lower_case]
+            [/#if]
             [#if func_argument.addressOf]
               [#assign addr = "&"]
             [#else]
               [#assign addr = ""]
             [/#if]
+            [#assign struct_argument_already_found = false]
             [#if func_argument.genericType == "struct"]
-              [#assign arg = "" + addr + request]
-              [#list func_argument.argument as argument1]
-                [#if argument1.genericType != "struct"]
-                  [#if argument1.mandatory && argument1.value??]
-  ${request}.${argument1.name} = ${argument1.value};
-                  [/#if]
-                [#else]
-                  [#list argument1.argument as argument2]
-                    [#if argument2.mandatory && argument2.value??]
-  ${request}.${argument1.name}.${argument2.name} = ${argument2.value};
-                    [/#if]
-                  [/#list]
+              [#if struct_variables == ""]
+                [#assign struct_variables = func_argument.name]
+              [#else]
+                [#assign struct_argument_already_found = list_contains(struct_variables, func_argument.name)]
+                [#if !struct_argument_already_found]
+                  [#assign struct_variables = struct_variables + " " + func_argument.name]
                 [/#if]
-              [/#list]
+              [/#if]
+              [#assign arg = "" + addr + func_argument_name]
+              [#if !struct_argument_already_found]
+                [#list func_argument.argument as argument1]
+                  [#if argument1.genericType != "struct"]
+                    [#if argument1.mandatory && argument1.value??]
+  ${func_argument_name}.${argument1.name} = ${argument1.value};
+                    [/#if]
+                  [#else]
+                    [#list argument1.argument as argument2]
+                      [#if argument2.mandatory && argument2.value??]
+  ${func_argument_name}.${argument1.name}.${argument2.name} = ${argument2.value};
+                      [/#if]
+                    [/#list]
+                  [/#if]
+                [/#list]
+              [/#if]
             [#else]
               [#assign arg = "" + addr + func_argument.value]
             [/#if][#-- if func_argument.genericType == "struct"--]
@@ -135,50 +186,56 @@ void MX_${ipName}_Init(void)
               [#assign args = args + ', ' + arg]
             [/#if]
           [/#list]
-        [#if method.returnHAL=="false"]
+          [#if method.returnHAL=="false"]
 [#--${method.name}(${args});--]
   ${method.name}(${args});
-        [#else]
+          [#else]
     [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
   if (${method.name}(${args}) != HAL_OK)
   {
     _Error_Handler(__FILE__, __LINE__);
   }
-        [/#if]#n  
+          [/#if]
         [#else]
   [#--${method.name}();--]
-[#if method.returnHAL=="false"]
+          [#if method.returnHAL=="false"]
 [#--${method.name}(${args});--]
   ${method.name}();
-        [#else]
+          [#else]
     [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
   if (${method.name}() != HAL_OK)
   {
     _Error_Handler(__FILE__, __LINE__);
   }
-        [/#if]#n          
+          [/#if]
         [/#if][#--if method.arguments??--]
   	[/#if][#--if method.status=="OK"--]
   	[#if method.status=="KO"]
   //!!! ${method.name} is commented because some parameters are missing
-        [#if method.arguments??]			
+        [#if method.arguments??]
+          [#assign argument_number = 0]
           [#list method.arguments as func_argument]
+            [#assign argument_number = argument_number + 1]
+            [#assign func_argument_name = func_argument.name]
+            [#if argument_number == 1]
+              [#assign func_argument_name = func_argument_name + "_" + configModel.instanceName?lower_case]
+            [/#if]
             [#if func_argument.addressOf]
               [#assign addr = "&"]
             [#else]
               [#assign addr = ""]
             [/#if]
             [#if func_argument.genericType == "struct"]
-              [#assign arg = "" + addr + request]
+              [#assign arg = "" + addr + func_argument_name]
               [#list func_argument.argument as argument1]
                 [#if argument1.genericType != "struct"]
                   [#if argument1.mandatory && argument1.value??]
-  //${request}.${argument1.name} = ${argument1.value};
+  //${func_argument_name}.${argument1.name} = ${argument1.value};
                   [/#if]
                 [#else]
                   [#list argument1.argument as argument2]
                     [#if argument2.mandatory && argument2.value??]
-  //${request}.${argument1.name}.${argument2.name} = ${argument2.value};
+  //${func_argument_name}.${argument1.name}.${argument2.name} = ${argument2.value};
                     [/#if]
                   [/#list]
                 [/#if]

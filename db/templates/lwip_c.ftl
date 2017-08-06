@@ -13,9 +13,13 @@
 [#--- Generation with_rtos = 0 or 1 ---]
 [#macro DHCP_RTOS_Settings configModel]
 	[#assign lwip_dhcp = 0]
+	[#assign keil = 1]
 	[#assign with_rtos = 0]
 	[#assign netif_callback = 0]
-	[#assign no_sys_no_timers = 0]
+	[#assign lwip_timers = 0]
+	[#assign lwip_ipv4 = 0]
+	[#assign lwip_ipv6 = 0]
+	[#assign lwip_ipv6_autoconfig = 0]
 	[#assign methodList = configModel.libMethod]
 	[#list methodList as method]
 		[#list method.arguments as argument]
@@ -28,14 +32,23 @@
 			[#if (argument.name == "LWIP_NETIF_LINK_CALLBACK") && (argument.value == "1")]
 				[#assign netif_callback = 1]
 			[/#if]
-			[#if (argument.name == "NO_SYS_NO_TIMERS") && (argument.value == "1")]
-                [#assign no_sys_no_timers = 1]
-            [/#if]  			
+			[#if (argument.name == "LWIP_TIMERS") && (argument.value == "1")]
+                [#assign lwip_timers = 1]
+            [/#if]
+            [#if (argument.name == "LWIP_IPV4") && (argument.value == "1")]
+                [#assign lwip_ipv4 = 1]
+            [/#if]
+            [#if (argument.name == "LWIP_IPV6") && (argument.value == "1")]
+                [#assign lwip_ipv6 = 1]
+            [/#if]
+            [#if (argument.name == "LWIP_IPV6_AUTOCONFIG") && (argument.value == "1")]
+                [#assign lwip_ipv6_autoconfig = 1]
+            [/#if]
 		[/#list]
 	[/#list]
 [/#macro]
 
-
+[#assign series = FamilyName?lower_case]
 
 [#--- Macro END ---]
 
@@ -55,19 +68,31 @@
 #include "lwip.h"
 #include "lwip/init.h"
 #include "lwip/netif.h"
-[#if (netif_callback == 1) && (with_rtos == 1)]
+[#if keil == 1]
+#if defined ( __CC_ARM )  /* MDK ARM Compiler */
+#include "lwip/sio.h"
+#endif /* MDK ARM Compiler */
+[/#if][#-- endif keil --]
+[#if netif_callback == 1] 
 #include "ethernetif.h"
-[/#if]
+[/#if][#-- endif netif_callback --]
 
 /* USER CODE BEGIN 0 */
 
 /* USER CODE END 0 */
-
+/* Private function prototypes -----------------------------------------------*/
+[#if (series == "stm32h7") && (netif_callback == 1) ]
+static void ethernet_link_status_updated(struct netif *netif);
+[#if with_rtos == 0]
+static void Ethernet_Link_Periodic_Handle(struct netif *netif);
+[/#if][#-- endif with_rtos --]
+[/#if][#-- endif series && netif_callback --] 
 /* ETH Variables initialization ----------------------------------------------*/
 [#include "Src/eth_vars.tmp"]
 
 [#compress][#if lwip_dhcp == 1]
 [#if with_rtos == 0]
+/* DHCP Variables initialization ---------------------------------------------*/
 uint32_t DHCPfineTimer = 0;
 uint32_t DHCPcoarseTimer = 0;
 [/#if][#-- endif with_rtos --]
@@ -156,10 +181,10 @@ uint32_t DHCPcoarseTimer = 0;
 [/#if]	
 [#local myInst=inst]
 	[#list methodList as method]
-		[#assign args = ""]	
+		[#assign args = ""]
 		[#if method.callBackMethod=="false"]	
 		[#if (method.status=="OK") || (method.status=="OK")]			
-            [#if method.arguments??]			
+            [#if method.arguments??]		
                 [#list method.arguments as fargument]
 				[#if fargument.returnValue=="false"]								
 					[#assign return = ""]
@@ -358,12 +383,18 @@ uint32_t DHCPcoarseTimer = 0;
 /* USER CODE BEGIN 1 */
 
 /* USER CODE END 1 */
-[#if (netif_callback == 1) && (with_rtos == 1)]
+[#if series != "stm32h7"]
+  [#if (netif_callback == 1) && (with_rtos == 1)]
 /* Semaphore to signal Ethernet Link state update */
 osSemaphoreId Netif_LinkSemaphore = NULL;
 /* Ethernet link thread Argument */
 struct link_str link_arg;
-[/#if]
+  [/#if][#-- endif netif_callback && with_rtos --]
+[#else][#-- else series --]
+[#if (netif_callback == 1) && (with_rtos == 0)]
+uint32_t EthernetLinkTimer;
+[/#if][#-- endif netif_callback && !with_rtos --]
+[/#if][#-- endif series --]
 
 [#compress]
 [#-- Section2: Create global Variables for each middle ware instance --] 
@@ -372,11 +403,13 @@ struct link_str link_arg;
 /* Variables Initialization */
 [#if IP.variables??]
 	[#list IP.variables as variable]
-	[#if variable.generiqueType=="Array" && lwip_dhcp==0]	
+	[#if (variable.generiqueType=="Array") && (lwip_dhcp == 0) && (lwip_ipv4 == 1)]	
 		${variable.value} ${variable.name}[${variable.arraySize}];
 	[#else]
 		[#if (variable.name == "ipaddr") || (variable.name == "netmask") || (variable.name == "gw")]
+		     [#if lwip_ipv4 == 1]
 			${variable.value} ${variable.name};
+			 [/#if]
 		[#else]
 		    [#if variable.name == "gnetif"]
                 struct ${variable.value} ${variable.name};
@@ -387,6 +420,9 @@ struct link_str link_arg;
 		[/#if]
 	[/#if]
 	[/#list]
+[/#if]
+[#if (lwip_ipv6 == 1)]
+ip6_addr_t ip6addr;
 [/#if]
 
 [#-- Global variables --]
@@ -402,8 +438,10 @@ struct link_str link_arg;
    [#assign halMode= instanceData.halMode]
    [#assign ipName = instanceData.ipName]
    
-#n   
-/* ${instName} init function */				        
+#n
+/**   
+#t* LwIP initialization function 
+#t*/				        
 void MX_LWIP_Init(void)
 {
   [#-- MZA je dois remplir la liste des configs, pour l'instant j'utilise la liste des methods --]
@@ -415,82 +453,161 @@ void MX_LWIP_Init(void)
     [@getLocalVariable configModel1=config listOfLocalVariables=listOfLocalVariables resultList=resultList/]	
     [#assign listOfLocalVariables =resultList]
   [/#list]
-[#if lwip_dhcp == 0]
+[#if (lwip_dhcp == 0) && (lwip_ipv4 == 1)]
   [#list instanceData.configs as config]
   [#--- Generation of IP @ initialization ex. IP_ADDRESS[0] = 000; ---]
+#t/* IP addresses initialization */
   [@generateConfigModelCode configModel=config inst=instName  nTab=1/]
   [/#list]
 [/#if][#-- endif lwip_dhcp --] 
 [/#list]
 [/#compress]
 [/#list]
+
+[#compress]
 [#if with_rtos == 0]
-  /* Initilialize the LwIP stack */
-  lwip_init();
+#t/* Initilialize the LwIP stack without RTOS */
+#tlwip_init();
 [/#if][#-- endif with_rtos --]
 [#if with_rtos == 1]
-  tcpip_init( NULL, NULL );	
+#t/* Initilialize the LwIP stack with RTOS */
+#ttcpip_init( NULL, NULL );	
 [/#if][#-- endif with_rtos --]
-[#if lwip_dhcp == 1] 
-  ipaddr.addr = 0;
-  netmask.addr = 0;
-  gw.addr = 0;
+#n
+[/#compress]
+[#compress]
+[#if ((lwip_dhcp == 1) && (lwip_ipv4 == 1))]
+#t/* IP addresses initialization with DHCP (IPv4) */
+#tipaddr.addr = 0;
+#tnetmask.addr = 0;
+#tgw.addr = 0;
 [#else]	
-  IP4_ADDR(&ipaddr, IP_ADDRESS[0], IP_ADDRESS[1], IP_ADDRESS[2], IP_ADDRESS[3]);
-  IP4_ADDR(&netmask, NETMASK_ADDRESS[0], NETMASK_ADDRESS[1] , NETMASK_ADDRESS[2], NETMASK_ADDRESS[3]);
-  IP4_ADDR(&gw, GATEWAY_ADDRESS[0], GATEWAY_ADDRESS[1], GATEWAY_ADDRESS[2], GATEWAY_ADDRESS[3]);  
-[/#if][#-- endif lwip_dhcp --] 
-
-  /* add the network interface */
+[#if (lwip_ipv4 == 1)]
+#t/* IP addresses initialization without DHCP (IPv4) */
+#tIP4_ADDR(&ipaddr, IP_ADDRESS[0], IP_ADDRESS[1], IP_ADDRESS[2], IP_ADDRESS[3]);
+#tIP4_ADDR(&netmask, NETMASK_ADDRESS[0], NETMASK_ADDRESS[1] , NETMASK_ADDRESS[2], NETMASK_ADDRESS[3]);
+#tIP4_ADDR(&gw, GATEWAY_ADDRESS[0], GATEWAY_ADDRESS[1], GATEWAY_ADDRESS[2], GATEWAY_ADDRESS[3]);
+[/#if][#-- endif lwip_ipv4 --]     
+[/#if][#-- endif lwip_dhcp && lwip_ipv4 --]
+#n
+[/#compress]
+[#compress]
 [#if with_rtos == 0]
-  netif_add(&gnetif, &ipaddr, &netmask, &gw, NULL, &ethernetif_init, &ethernet_input);
-[#else]
-  netif_add(&gnetif, &ipaddr, &netmask, &gw, NULL, &ethernetif_init, &tcpip_input);
+[#if lwip_ipv4 == 1]
+#t/* add the network interface (IPv4/IPv6) without RTOS */
+#tnetif_add(&gnetif, &ipaddr, &netmask, &gw, NULL, &ethernetif_init, &ethernet_input);
+[#else][#-- case lwip_ipv4 == 0 --]
+[#if lwip_ipv6 == 1]
+#t/* add the network interface (IPv6) without RTOS */
+#tnetif_add(&gnetif, NULL, &ethernetif_init, &ethernet_input);
+[/#if][#-- endif lwip_ipv6 --]
+[/#if][#-- endif lwip_ipv4 --]
+[#else][#-- case with_rtos == 1 --]
+[#if lwip_ipv4 == 1]
+#t/* add the network interface (IPv4/IPv6) with RTOS */
+#tnetif_add(&gnetif, &ipaddr, &netmask, &gw, NULL, &ethernetif_init, &tcpip_input);
+[#else][#-- case lwip_ipv4 == 0 --]
+[#if lwip_ipv6 == 1]
+#t/* add the network interface (IPv6) with RTOS */
+#tnetif_add(&gnetif, NULL, &ethernetif_init, &tcpip_input);
+[/#if][#-- endif lwip_ipv6 --]
+[/#if][#-- endif lwip_ipv4 --]
 [/#if][#-- endif with_rtos --]
- 
-  /* Registers the default network interface */
-  netif_set_default(&gnetif);
-
-  if (netif_is_link_up(&gnetif))
-  {
-    /* When the netif is fully configured this function must be called */
-    netif_set_up(&gnetif);
-  }
-  else
-  {
-    /* When the netif link is down this function must be called */
-    netif_set_down(&gnetif);
-  }  
-  
-[#if (netif_callback == 1) && (with_rtos == 1)]
-  /* Set the link callback function, this function is called on change of link status*/
-  netif_set_link_callback(&gnetif, ethernetif_update_config);
-  
-  /* create a binary semaphore used for informing ethernetif of frame reception */
-  osSemaphoreDef(Netif_SEM);
-  Netif_LinkSemaphore = osSemaphoreCreate(osSemaphore(Netif_SEM) , 1 );
-  
-  link_arg.netif = &gnetif;
-  link_arg.semaphore = Netif_LinkSemaphore;
-  /* Create the Ethernet link handler thread */
-  osThreadDef(LinkThr, ethernetif_set_link, osPriorityNormal, 0, configMINIMAL_STACK_SIZE * 2);
-  osThreadCreate (osThread(LinkThr), &link_arg);
-[/#if]
-
-
-[#if lwip_dhcp == 1]
-dhcp_start(&gnetif);
-[/#if][#-- endif lwip_dhcp --] 
-
+[#if lwip_ipv6 == 1]
+#n
+#t/* Create IPv6 local address */
+#tnetif_create_ip6_linklocal_address(&gnetif, 0);
+#tnetif_ip6_addr_set_state(&gnetif, 0, IP6_ADDR_VALID);
+[#if lwip_ipv6_autoconfig == 1]
+#tgnetif.ip6_autoconfig_enabled = 1;
+[/#if][#-- endif lwip_ipv6_autoconfig --]
+[/#if][#-- endif lwip_ipv6 --]
+#n 
+#t/*  Registers the default network interface */
+#tnetif_set_default(&gnetif);
+#n
+#tif (netif_is_link_up(&gnetif))
+#t{
+#t#t/* When the netif is fully configured this function must be called */
+#t#tnetif_set_up(&gnetif);
+#t}
+#telse
+#t{
+#t#t/* When the netif link is down this function must be called */
+#t#tnetif_set_down(&gnetif);
+#t}  
+#n  
+[#if (netif_callback == 1) ] [#-- No RTOS needed --]
+#t/* Set the link callback function, this function is called on change of link status*/
+[#if series != "stm32h7"]
+#tnetif_set_link_callback(&gnetif, ethernetif_update_config);
+[#else][#-- case series == "stm32h7" --]
+#tnetif_set_link_callback(&gnetif, ethernet_link_status_updated);
+[/#if][#-- endif series --]
+#n 
+[#if (series != "stm32h7") && (with_rtos == 1)]
+#t/* create a binary semaphore used for informing ethernetif of frame reception */
+#tosSemaphoreDef(Netif_SEM);
+#tNetif_LinkSemaphore = osSemaphoreCreate(osSemaphore(Netif_SEM) , 1 );
+#n  
+#tlink_arg.netif = &gnetif;
+#tlink_arg.semaphore = Netif_LinkSemaphore;
+#t/* Create the Ethernet link handler thread */
+#tosThreadDef(LinkThr, ethernetif_set_link, osPriorityNormal, 0, configMINIMAL_STACK_SIZE * 2);
+#tosThreadCreate (osThread(LinkThr), &link_arg);
+[#else][#-- case series == "stm32h7" --] 
+#t/* Create the Ethernet link handler thread */
+[#if with_rtos == 1]
+#tosThreadDef(EthLink, ethernet_link_thread, osPriorityNormal, 0, configMINIMAL_STACK_SIZE *2); 
+#tosThreadCreate (osThread(EthLink), &gnetif);
+[/#if][#-- endif with_rtos --]
+[/#if][#-- endif series --]
+[/#if][#-- endif netif_callback --]
+#n
+[#if (lwip_dhcp == 1) && (lwip_ipv4 == 1)]
+#t/* Start DHCP negotiation for a network interface (IPv4) */
+#tdhcp_start(&gnetif);
+[/#if][#-- endif lwip_dhcp && lwip_ipv4 --]
+#n
 #n/* USER CODE BEGIN 3 */
-
+#n
 /* USER CODE END 3 */
 }
-
-
+[/#compress]
+#n
+#ifdef USE_OBSOLETE_USER_CODE_SECTION_4
+/* Kept to help code migration. (See new 4_1, 4_2... sections) */
+/* Avoid to use this user section which will become obsolete. */
 /* USER CODE BEGIN 4 */
+/* USER CODE END 4 */
+#endif
 
-[#if (with_rtos == 0) && (no_sys_no_timers == 0)]
+#n
+[#if series == "stm32h7"]
+[#if (with_rtos == 0) && (netif_callback == 1)] 
+/**
+  * @brief  Ethernet Link periodic check
+  * @param  netif 
+  * @retval None
+  */
+static void Ethernet_Link_Periodic_Handle(struct netif *netif)
+{
+/* USER CODE BEGIN 4_3 */
+/* USER CODE END 4_3 */
+
+  /* Ethernet Link every 100ms */
+  if (HAL_GetTick() - EthernetLinkTimer >= 100)
+  {
+    EthernetLinkTimer = HAL_GetTick();
+    ethernet_link_check_state(netif);
+  }
+/* USER CODE BEGIN 4_4 */
+/* USER CODE END 4_4 */
+}
+[/#if][#-- endif !with_rtos && netif_callback --]
+[/#if][#-- endif series --]
+
+[#if with_rtos == 0]
 /**
  * ----------------------------------------------------------------------
  * Function given to help user to continue LwIP Initialization
@@ -499,19 +616,127 @@ dhcp_start(&gnetif);
  *-----------------------------------------------------------------------
  * Read a received packet from the Ethernet buffers 
  * Send it to the lwIP stack for handling
- * Handle timeouts if NO_SYS_NO_TIMERS not set and without RTOS
+ * Handle timeouts if LWIP_TIMERS is set and without RTOS
+ * Handle the llink status if LWIP_NETIF_LINK_CALLBACK is set and without RTOS 
  */
 void MX_LWIP_Process(void)
 {
+/* USER CODE BEGIN 4_1 */
+/* USER CODE END 4_1 */
   ethernetif_input(&gnetif);
-       
+  
+/* USER CODE BEGIN 4_2 */
+/* USER CODE END 4_2 */  
+[#if lwip_timers == 1]       
   /* Handle timeouts */
-  #if !NO_SYS_NO_TIMERS && NO_SYS
-    sys_check_timeouts();
-  #endif
-    
+  sys_check_timeouts();
+[/#if][#-- endif lwip_timers --]
+
+[#if (series == "stm32h7") && (netif_callback == 1)]  
+  Ethernet_Link_Periodic_Handle(&gnetif);
+[/#if][#-- endif series && netif_callback --] 
+
+/* USER CODE BEGIN 4_3 */
+/* USER CODE END 4_3 */
 }
-[/#if]
-/* USER CODE END 4 */
+[/#if][#-- endif with_rtos --]
+
+
+[#if (netif_callback == 1) && (series == "stm32h7")]
+/**
+  * @brief  Notify the User about the network interface config status 
+  * @param  netif: the network interface
+  * @retval None
+  */
+static void ethernet_link_status_updated(struct netif *netif) 
+{
+  if (netif_is_up(netif))
+  {
+/* USER CODE BEGIN 5 */
+/* USER CODE END 5 */
+  }
+  else /* netif is down */
+  {  
+/* USER CODE BEGIN 6 */
+/* USER CODE END 6 */
+  } 
+}
+[/#if][#-- endif netif_callback && series --]
+
+[#if keil == 1]
+#if defined ( __CC_ARM )  /* MDK ARM Compiler */
+/**
+ * Opens a serial device for communication.
+ *
+ * @param devnum device number
+ * @return handle to serial device if successful, NULL otherwise
+ */
+sio_fd_t sio_open(u8_t devnum)
+{
+  sio_fd_t sd;
+
+/* USER CODE BEGIN 7 */
+  sd = 0; // dummy code
+/* USER CODE END 7 */
+	
+  return sd;
+}
+
+/**
+ * Sends a single character to the serial device.
+ *
+ * @param c character to send
+ * @param fd serial device handle
+ *
+ * @note This function will block until the character can be sent.
+ */
+void sio_send(u8_t c, sio_fd_t fd)
+{
+/* USER CODE BEGIN 8 */
+/* USER CODE END 8 */
+}
+
+/**
+ * Reads from the serial device.
+ *
+ * @param fd serial device handle
+ * @param data pointer to data buffer for receiving
+ * @param len maximum length (in bytes) of data to receive
+ * @return number of bytes actually received - may be 0 if aborted by sio_read_abort
+ *
+ * @note This function will block until data can be received. The blocking
+ * can be cancelled by calling sio_read_abort().
+ */
+u32_t sio_read(sio_fd_t fd, u8_t *data, u32_t len)
+{
+  u32_t recved_bytes;
+
+/* USER CODE BEGIN 9 */
+  recved_bytes = 0; // dummy code
+/* USER CODE END 9 */	
+  return recved_bytes;
+}
+
+/**
+ * Tries to read from the serial device. Same as sio_read but returns
+ * immediately if no data is available and never blocks.
+ *
+ * @param fd serial device handle
+ * @param data pointer to data buffer for receiving
+ * @param len maximum length (in bytes) of data to receive
+ * @return number of bytes actually received
+ */
+u32_t sio_tryread(sio_fd_t fd, u8_t *data, u32_t len)
+{
+  u32_t recved_bytes;
+
+/* USER CODE BEGIN 10 */
+  recved_bytes = 0; // dummy code
+/* USER CODE END 10 */	
+  return recved_bytes;
+}
+[/#if][#-- endif keil --]
+#endif /* MDK ARM Compiler */
+
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

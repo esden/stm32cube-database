@@ -76,8 +76,7 @@ void HAL_${mode}_BspDeInit(${mode}_HandleTypeDef* h${mode?lower_case});
 
 [#--void ${ipName}_Init(void);--]
 
-#if WITH_RTOS
-#else
+#if !WITH_RTOS
 /* USER CODE BEGIN 1 */
 /* Function defined in lwip.c to:
  *   - Read a received packet from the Ethernet buffers 

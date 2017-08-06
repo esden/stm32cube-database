@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?><IP xmlns="http://mcd.rou.st.com/modules.php?name=mcu" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" DBVersion="V3.0" IPType="peripheral" Name="ADC" Version="aditf3_v1_1_Cube" ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../db/IP_Modes_V3_0.xsd">
 	
-	<RefParameter Comment="Master List" DefaultValue="" Name="MasterList" Type="list" Visible="false"/>
+    <RefParameter Comment="Master List" DefaultValue="" Name="MasterList" Type="list" Visible="false"/>
     <!-- ADC_Settings parameters -->    
     <RefMode Comment="ADCx Settings" Group="ADC_Settings" Name="ADC_Settings">
         <ConfigForMode>ADC_RegularConfig</ConfigForMode>
@@ -22,9 +22,9 @@
     <!-- ADC Instance parameter needed in ADC_HandleTypeDef structure in the HAL -->
     <RefParameter Comment="ADC instance" DefaultValue="ADC1" Group="ADCgroup" Name="Instance" Type="list" Visible="false"/>
        		
-	<RefParameter Comment="Fadc Constraint" DefaultValue="4000000" Max="4000000" Min="480000" Name="FadcConstraint" Type="double" Visible="false">
-	<Condition Diagnostic="" Expression="(RCC:PWR_Regulator_Voltage_Scale = PWR_REGULATOR_VOLTAGE_SCALE3)"/>
-	</RefParameter>
+    <RefParameter Comment="Fadc Constraint" DefaultValue="4000000" Max="4000000" Min="480000" Name="FadcConstraint" Type="double" Visible="false">
+        <Condition Diagnostic="" Expression="(RCC:PWR_Regulator_Voltage_Scale = PWR_REGULATOR_VOLTAGE_SCALE3)"/>
+    </RefParameter>
     <RefParameter Comment="Fadc Constraint" DefaultValue="16000000" Max="16000000" Min="480000" Name="FadcConstraint" Type="double" Visible="false"/>
 	
     <!-- Possible value of Prescaler parameter -->
@@ -41,12 +41,36 @@
         <PossibleValue Comment="Bank A" Value="ADC_CHANNELS_BANK_A"/>
         <Description>Selected the channels bank used to select channel sources in Regular and Injected conversion.</Description>
     </RefParameter>
+    <RefParameter Comment="Bank to use" DefaultValue="ADC_CHANNELS_BANK_A" Group="ADCgroup" Name="ChannelsBank" Type="list">
+        <Condition Diagnostic="" Expression="$IpInstance_bankAChannelUsed &amp; !$IpInstance_bankBChannelUsed"/>       
+        <PossibleValue Comment="Bank A" Value="ADC_CHANNELS_BANK_A"/>
+        <Description>Selected the channels bank used to select channel sources in Regular and Injected conversion.</Description>
+    </RefParameter>
+    
+     <RefParameter Comment="Bank to use" DefaultValue="ADC_CHANNELS_BANK_B" Group="ADCgroup" Name="ChannelsBank" Type="list">
+        <Condition Diagnostic="" Expression="!$IpInstance_bankAChannelUsed &amp; $IpInstance_bankBChannelUsed"/>       
+        <PossibleValue Comment="Bank B" Value="ADC_CHANNELS_BANK_B"/>
+        <Description>Selected the channels bank used to select channel sources in Regular and Injected conversion.</Description>
+    </RefParameter>
     
     <RefParameter Comment="Bank to use" DefaultValue="ADC_CHANNELS_BANK_A" Group="ADCgroup" Name="ChannelsBank" Type="list">
+        <Condition Diagnostic="" Expression=" $IpInstance_bankAChannelUsed &amp; $IpInstance_bankBChannelUsed"/>       
+         <PossibleValue Comment="Bank A" Value="ADC_CHANNELS_BANK_A"/>       
+        <PossibleValue Comment="Bank B" Value="ADC_CHANNELS_BANK_B"/>
+        <Description>Selected the channels bank used to select channel sources in Regular and Injected conversion.</Description>
+    </RefParameter>
+    
+      <RefParameter Comment="Bank to use" DefaultValue="null" Group="ADCgroup" Name="ChannelsBank" Type="list" >
+        <Condition Diagnostic="" Expression=" !$IpInstance_bankAChannelUsed &amp; !$IpInstance_bankBChannelUsed"/>       
+         <PossibleValue Comment="none" Value="__NULL"/>       
+       
+        <Description>Selected the channels bank used to select channel sources in Regular and Injected conversion.</Description>
+    </RefParameter>
+    <!-- <RefParameter Comment="Bank to use" DefaultValue="ADC_CHANNELS_BANK_A" Group="ADCgroup" Name="ChannelsBank" Type="list">
         <PossibleValue Action="Disable" Comment="Bank A" Condition="!$IpInstance_bankAChannelUsed" Diagnostic="Available only if you select one channel from BankA (IN0...) from pinout view" Value="ADC_CHANNELS_BANK_A"/>
         <PossibleValue Action="Disable" Comment="Bank B" Condition="!$IpInstance_bankBChannelUsed" Diagnostic="Available only if you select one channel from BankB (IN0b...) from pinout view" Value="ADC_CHANNELS_BANK_B"/>
         <Description>Selected the channels bank used to select channel sources in Regular and Injected conversion.</Description>
-    </RefParameter>
+    </RefParameter> -->
     <RefParameter Comment="Bank to use" DefaultValue="ADC_CHANNELS_BANK_A" Group="ADCgroup" Name="ChannelsBank" Type="list">
         <PossibleValue Comment="Bank A" Value="ADC_CHANNELS_BANK_A"/>
         <PossibleValue Comment="Bank B" Value="ADC_CHANNELS_BANK_B"/>
@@ -203,8 +227,8 @@
     </RefParameter>
     
     <!-- ExternalTrigConvEdgeChoice -->
-     <RefParameter Comment="External Trigger Conversion Edge" DefaultValue="ADC_EXTERNALTRIGCONVEDGE_NONE" Group="ADCgroup" Name="ExternalTrigConvEdge" Type="list">
-         <Condition Diagnostic="" Expression="(ExternalTrigConv = ADC_SOFTWARE_START)"/>
+    <RefParameter Comment="External Trigger Conversion Edge" DefaultValue="ADC_EXTERNALTRIGCONVEDGE_NONE" Group="ADCgroup" Name="ExternalTrigConvEdge" Type="list">
+        <Condition Diagnostic="" Expression="(ExternalTrigConv = ADC_SOFTWARE_START)"/>
         <PossibleValue Comment="None" Value="ADC_EXTERNALTRIGCONVEDGE_NONE"/>
         <Description>Select the external trigger polarity and enable the trigger of a regular group.</Description>
     </RefParameter>
@@ -313,13 +337,13 @@
     </RefParameter>
     <RefParameter Comment="External Trigger Source" DefaultValue="ADC_EXTERNALTRIGINJECCONV_EXT_IT15" Group="ADCgroup" Name="ExternalTrigInjecConv" Type="list">
         <Condition Diagnostic="" Expression="!(AutoInjected_$IpInstance) &amp;(InjectedExternalTrigger$IpInstance)"/>
-        <PossibleValue Comment="EXTI line15" Value="ADC_EXTERNALTRIGINJECCONV_Ext_IT15"/>
+        <PossibleValue Comment="EXTI line15" Value="ADC_EXTERNALTRIGINJECCONV_EXT_IT15"/>
         <Description>EXTI Line15 is used for External-Trigger-for-Injected-conversion mode</Description>
     </RefParameter>
-     <RefParameter Comment="External Trigger Source" DefaultValue="__NULL" Group="ADCgroup" Name="ExternalTrigInjecConv" Type="list" >
-		<Condition Diagnostic="" Expression="(AutoInjected_$IpInstance)"/>
+    <RefParameter Comment="External Trigger Source" DefaultValue="__NULL" Group="ADCgroup" Name="ExternalTrigInjecConv" Type="list" >
+        <Condition Diagnostic="" Expression="(AutoInjected_$IpInstance)"/>
         <PossibleValue Comment="External Trigger on injected channels are disabled (Auto-injection mode selected)" Value="ADC_INJECTED_SOFTWARE_START"/>
-	</RefParameter>
+    </RefParameter>
 		    
     <RefParameter Comment="External Trigger Source" DefaultValue="ADC_INJECTED_SOFTWARE_START" Group="ADCgroup" Name="ExternalTrigInjecConv" Type="list">
         <PossibleValue Comment="Injected Conversion launched by software" Value="ADC_INJECTED_SOFTWARE_START"/>
@@ -337,7 +361,7 @@
         <Description>Select the external event used to trigger the start of conversion of an injected group</Description>
     </RefParameter>
     
-      <!-- Possible Value of ExternalTrigInjecConvEdge parameter -->
+    <!-- Possible Value of ExternalTrigInjecConvEdge parameter -->
     <RefParameter Comment="External Trigger Conversion Edge" DefaultValue="null" Group="ADCgroup" Name="ExternalTrigInjecConvEdge" Type="list" Visible="false">
         <Condition Diagnostic="" Expression="(InjNumberOfConversion=0)"/>
     </RefParameter>
@@ -461,7 +485,8 @@
     <RefParameter Comment="Injected Offset" DefaultValue="0" Group="ADCgroup" Max="4095" Min="0" Name="InjectedOffset" Type="integer">
         <Description>Data offset for Injected channel </Description>
     </RefParameter>
-	    
+    
+    
     <!-- WatchDog parameters -->
     <RefMode Comment="" Group="WatchDog" Name="WatchDog">
         <ConfigForMode>ADC_AnalogWDGConfig</ConfigForMode>
