@@ -1,17 +1,19 @@
 [#ftl]
 /**
   ******************************************************************************
-  * @file           : ${name}
+  * @file           : ${name?lower_case}.h
   * @version        : ${version}
 [#--  * @packageVersion : ${fwVersion} --]
-  * @brief          : Header for usb_device file.
+  * @brief          : Header for usb_device.c file.
   ******************************************************************************
 [@common.optinclude name="Src/license.tmp"/][#--include License text --]
   ******************************************************************************
-*/
+  */
+
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __${name?lower_case}_H
-#define __${name?lower_case}_H
+#ifndef __${name?upper_case}__H__
+#define __${name?upper_case}__H__
+
 #ifdef __cplusplus
  extern "C" {
 #endif
@@ -23,15 +25,39 @@
 [/#list]
 [/#if]
 
-[#list IPdatas as IP]  
+/* USER CODE BEGIN INCLUDE */
+
+/* USER CODE END INCLUDE */
+
+/** @addtogroup USBD_OTG_DRIVER
+  * @{
+  */
+
+/** @defgroup USBD_DEVICE USBD_DEVICE
+  * @brief Device file for Usb otg low level driver.
+  * @{
+  */
+
+/** @defgroup USBD_DEVICE_Exported_Variables USBD_DEVICE_Exported_Variables
+  * @brief Public variables.
+  * @{
+  */
+
+
+[#list IPdatas as IP]
 [#assign ipvar = IP]
 [#-- Global variables --]
 [#if IP.variables??]
 	[#list IP.variables as variable]
+/** USB device core handle. */
 extern ${variable.value} ${variable.name};
 	[/#list]
 [/#if]
 [#-- Global variables --]
+
+/**
+  * @}
+  */
 
 [#-- extract hal mode list used by all instances of the ip --]
 [#assign halModeList= ""]
@@ -43,24 +69,38 @@ extern ${variable.value} ${variable.name};
         [/#if]
 [/#list]
 
-/* USB_Device init function */	
+
+
+/** @defgroup USBD_DEVICE_Exported_FunctionsPrototype USBD_DEVICE_Exported_FunctionsPrototype
+  * @brief Declaration of public functions for Usb device.
+  * @{
+  */
+
+/** USB Device initialization function. */
 [#--[#if instMode!=instName]void ${instMode}_${instName}_Init(void);[#else]void MX_${instName}_Init(void);[/#if]--]
 void MX_USB_DEVICE_Init(void);
 
 [/#list]
 
+/**
+  * @}
+  */
+
+
+/**
+  * @}
+  */
+
+
+/**
+  * @}
+  */
+
 
 #ifdef __cplusplus
 }
 #endif
-#endif /*__${name?lower_case}_H */
 
-/**
-  * @}
-  */
-
-/**
-  * @}
-  */
+#endif /* __${name?upper_case}__H__ */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

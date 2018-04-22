@@ -51,6 +51,46 @@
 [/#list]
 
 /**
+ * \def MBEDTLS_NO_UDBL_DIVISION
+ *
+ * The platform lacks support for double-width integer division (64-bit
+ * division on a 32-bit platform, 128-bit division on a 64-bit platform).
+ *
+ * Used in:
+ *      include/mbedtls/bignum.h
+ *      library/bignum.c
+ *
+ * The bignum code uses double-width division to speed up some operations.
+ * Double-width division is often implemented in software that needs to
+ * be linked with the program. The presence of a double-width integer
+ * type is usually detected automatically through preprocessor macros,
+ * but the automatic detection cannot know whether the code needs to
+ * and can be linked with an implementation of division for that type.
+ * By default division is assumed to be usable if the type is present.
+ * Uncomment this option to prevent the use of double-width division.
+ *
+ * Note that division for the native integer type is always required.
+ * Furthermore, a 64-bit type is always required even on a 32-bit
+ * platform, but it need not support multiplication or division. In some
+ * cases it is also desirable to disable some double-width operations. For
+ * example, if double-width division is implemented in software, disabling
+ * it can reduce code size in some embedded targets.
+ */
+[#list SWIPdatas as SWIP]
+	[#if SWIP.defines??]
+		[#list SWIP.defines as definition]
+			[#if definition.name="MBEDTLS_NO_UDBL_DIVISION"]
+				[#if definition.value="0"]
+					[#lt]//#define MBEDTLS_NO_UDBL_DIVISION
+				[#else]
+					[#lt]#define MBEDTLS_NO_UDBL_DIVISION
+				[/#if]
+			[/#if]
+		[/#list]
+	[/#if]
+[/#list]
+
+/**
  * \def MBEDTLS_HAVE_SSE2
  *
  * CPU supports SSE2 instruction set.
@@ -285,6 +325,19 @@
 					[#lt]//#define MBEDTLS_PLATFORM_NV_SEED_ALT
 				[#else]
 					[#lt]#define MBEDTLS_PLATFORM_NV_SEED_ALT
+				[/#if]
+			[/#if]
+		[/#list]
+	[/#if]
+[/#list]
+[#list SWIPdatas as SWIP]
+	[#if SWIP.defines??]
+		[#list SWIP.defines as definition]
+			[#if definition.name="MBEDTLS_PLATFORM_SETUP_TEARDOWN_ALT"]
+				[#if definition.value="0"]
+					[#lt]//#define MBEDTLS_PLATFORM_SETUP_TEARDOWN_ALT
+				[#else]
+					[#lt]#define MBEDTLS_PLATFORM_SETUP_TEARDOWN_ALT
 				[/#if]
 			[/#if]
 		[/#list]
@@ -565,6 +618,28 @@
 		[/#list]
 	[/#if]
 [/#list]
+/*
+ * When replacing the elliptic curve module, pleace consider, that it is
+ * implemented with two .c files:
+ *      - ecp.c
+ *      - ecp_curves.c
+ * You can replace them very much like all the other MBEDTLS__MODULE_NAME__ALT
+ * macros as described above. The only difference is that you have to make sure
+ * that you provide functionality for both .c files.
+ */
+[#list SWIPdatas as SWIP]
+	[#if SWIP.defines??]
+		[#list SWIP.defines as definition]
+			[#if definition.name="MBEDTLS_ECP_ALT"]
+				[#if definition.value="0"]
+					[#lt]//#define MBEDTLS_ECP_ALT
+				[#else]
+					[#lt]#define MBEDTLS_ECP_ALT
+				[/#if]
+			[/#if]
+		[/#list]
+	[/#if]
+[/#list]
 
 /**
  * \def MBEDTLS_MD2_PROCESS_ALT
@@ -766,6 +841,166 @@
 					[#lt]//#define MBEDTLS_AES_DECRYPT_ALT
 				[#else]
 					[#lt]#define MBEDTLS_AES_DECRYPT_ALT
+				[/#if]
+			[/#if]
+		[/#list]
+	[/#if]
+[/#list]
+
+/**
+ * \def MBEDTLS_ECP_INTERNAL_ALT
+ *
+ * Expose a part of the internal interface of the Elliptic Curve Point module.
+ *
+ * MBEDTLS_ECP__FUNCTION_NAME__ALT: Uncomment a macro to let mbed TLS use your
+ * alternative core implementation of elliptic curve arithmetic. Keep in mind
+ * that function prototypes should remain the same.
+ *
+ * This partially replaces one function. The header file from mbed TLS is still
+ * used, in contrast to the MBEDTLS_ECP_ALT flag. The original implementation
+ * is still present and it is used for group structures not supported by the
+ * alternative.
+ *
+ * Any of these options become available by defining MBEDTLS_ECP_INTERNAL_ALT
+ * and implementing the following functions:
+ *      unsigned char mbedtls_internal_ecp_grp_capable(
+ *          const mbedtls_ecp_group *grp )
+ *      int  mbedtls_internal_ecp_init( const mbedtls_ecp_group *grp )
+ *      void mbedtls_internal_ecp_deinit( const mbedtls_ecp_group *grp )
+ * The mbedtls_internal_ecp_grp_capable function should return 1 if the
+ * replacement functions implement arithmetic for the given group and 0
+ * otherwise.
+ * The functions mbedtls_internal_ecp_init and mbedtls_internal_ecp_deinit are
+ * called before and after each point operation and provide an opportunity to
+ * implement optimized set up and tear down instructions.
+ *
+ * Example: In case you uncomment MBEDTLS_ECP_INTERNAL_ALT and
+ * MBEDTLS_ECP_DOUBLE_JAC_ALT, mbed TLS will still provide the ecp_double_jac
+ * function, but will use your mbedtls_internal_ecp_double_jac if the group is
+ * supported (your mbedtls_internal_ecp_grp_capable function returns 1 when
+ * receives it as an argument). If the group is not supported then the original
+ * implementation is used. The other functions and the definition of
+ * mbedtls_ecp_group and mbedtls_ecp_point will not change, so your
+ * implementation of mbedtls_internal_ecp_double_jac and
+ * mbedtls_internal_ecp_grp_capable must be compatible with this definition.
+ *
+ * Uncomment a macro to enable alternate implementation of the corresponding
+ * function.
+ */
+/* Required for all the functions in this section */
+[#list SWIPdatas as SWIP]
+	[#if SWIP.defines??]
+		[#list SWIP.defines as definition]
+			[#if definition.name="MBEDTLS_ECP_INTERNAL_ALT"]
+				[#if definition.value="0"]
+					[#lt]//#define MBEDTLS_ECP_INTERNAL_ALT
+				[#else]
+					[#lt]#define MBEDTLS_ECP_INTERNAL_ALT
+				[/#if]
+			[/#if]
+		[/#list]
+	[/#if]
+[/#list]
+/* Support for Weierstrass curves with Jacobi representation */
+[#list SWIPdatas as SWIP]
+	[#if SWIP.defines??]
+		[#list SWIP.defines as definition]
+			[#if definition.name="MBEDTLS_ECP_RANDOMIZE_JAC_ALT"]
+				[#if definition.value="0"]
+					[#lt]//#define MBEDTLS_ECP_RANDOMIZE_JAC_ALT
+				[#else]
+					[#lt]#define MBEDTLS_ECP_RANDOMIZE_JAC_ALT
+				[/#if]
+			[/#if]
+		[/#list]
+	[/#if]
+[/#list]
+[#list SWIPdatas as SWIP]
+	[#if SWIP.defines??]
+		[#list SWIP.defines as definition]
+			[#if definition.name="MBEDTLS_ECP_ADD_MIXED_ALT"]
+				[#if definition.value="0"]
+					[#lt]//#define MBEDTLS_ECP_ADD_MIXED_ALT
+				[#else]
+					[#lt]#define MBEDTLS_ECP_ADD_MIXED_ALT
+				[/#if]
+			[/#if]
+		[/#list]
+	[/#if]
+[/#list]
+[#list SWIPdatas as SWIP]
+	[#if SWIP.defines??]
+		[#list SWIP.defines as definition]
+			[#if definition.name="MBEDTLS_ECP_DOUBLE_JAC_ALT"]
+				[#if definition.value="0"]
+					[#lt]//#define MBEDTLS_ECP_DOUBLE_JAC_ALT
+				[#else]
+					[#lt]#define MBEDTLS_ECP_DOUBLE_JAC_ALT
+				[/#if]
+			[/#if]
+		[/#list]
+	[/#if]
+[/#list]
+[#list SWIPdatas as SWIP]
+	[#if SWIP.defines??]
+		[#list SWIP.defines as definition]
+			[#if definition.name="MBEDTLS_ECP_NORMALIZE_JAC_MANY_ALT"]
+				[#if definition.value="0"]
+					[#lt]//#define MBEDTLS_ECP_NORMALIZE_JAC_MANY_ALT
+				[#else]
+					[#lt]#define MBEDTLS_ECP_NORMALIZE_JAC_MANY_ALT
+				[/#if]
+			[/#if]
+		[/#list]
+	[/#if]
+[/#list]
+[#list SWIPdatas as SWIP]
+	[#if SWIP.defines??]
+		[#list SWIP.defines as definition]
+			[#if definition.name="MBEDTLS_ECP_NORMALIZE_JAC_ALT"]
+				[#if definition.value="0"]
+					[#lt]//#define MBEDTLS_ECP_NORMALIZE_JAC_ALT
+				[#else]
+					[#lt]#define MBEDTLS_ECP_NORMALIZE_JAC_ALT
+				[/#if]
+			[/#if]
+		[/#list]
+	[/#if]
+[/#list]/* Support for curves with Montgomery arithmetic */
+[#list SWIPdatas as SWIP]
+	[#if SWIP.defines??]
+		[#list SWIP.defines as definition]
+			[#if definition.name="MBEDTLS_ECP_DOUBLE_ADD_MXZ_ALT"]
+				[#if definition.value="0"]
+					[#lt]//#define MBEDTLS_ECP_DOUBLE_ADD_MXZ_ALT
+				[#else]
+					[#lt]#define MBEDTLS_ECP_DOUBLE_ADD_MXZ_ALT
+				[/#if]
+			[/#if]
+		[/#list]
+	[/#if]
+[/#list]
+[#list SWIPdatas as SWIP]
+	[#if SWIP.defines??]
+		[#list SWIP.defines as definition]
+			[#if definition.name="MBEDTLS_ECP_RANDOMIZE_MXZ_ALT"]
+				[#if definition.value="0"]
+					[#lt]//#define MBEDTLS_ECP_RANDOMIZE_MXZ_ALT
+				[#else]
+					[#lt]#define MBEDTLS_ECP_RANDOMIZE_MXZ_ALT
+				[/#if]
+			[/#if]
+		[/#list]
+	[/#if]
+[/#list]
+[#list SWIPdatas as SWIP]
+	[#if SWIP.defines??]
+		[#list SWIP.defines as definition]
+			[#if definition.name="MBEDTLS_ECP_NORMALIZE_MXZ_ALT"]
+				[#if definition.value="0"]
+					[#lt]//#define MBEDTLS_ECP_NORMALIZE_MXZ_ALT
+				[#else]
+					[#lt]#define MBEDTLS_ECP_NORMALIZE_MXZ_ALT
 				[/#if]
 			[/#if]
 		[/#list]
@@ -5705,6 +5940,50 @@
 				[/#list]			
 			[/#if]
 		[/#list]
+	[/#if]
+[/#list]
+
+/**
+ * Allow SHA-1 in the default TLS configuration for certificate signing.
+ * Without this build-time option, SHA-1 support must be activated explicitly
+ * through mbedtls_ssl_conf_cert_profile. Turning on this option is not
+ * recommended because of it is possible to generte SHA-1 collisions, however
+ * this may be safe for legacy infrastructure where additional controls apply.
+ */
+[#list SWIPdatas as SWIP]
+	[#if SWIP.defines??]
+        [#list SWIP.defines as definition]
+            [#if definition.name="MBEDTLS_TLS_DEFAULT_ALLOW_SHA1_IN_CERTIFICATES"]
+                [#if definition.value="0"]
+                    [#lt]//#define MBEDTLS_TLS_DEFAULT_ALLOW_SHA1_IN_CERTIFICATES
+                [#else]
+                    [#lt]#define MBEDTLS_TLS_DEFAULT_ALLOW_SHA1_IN_CERTIFICATES
+                [/#if]
+            [/#if]
+        [/#list]
+	[/#if]
+[/#list]
+
+/**
+ * Allow SHA-1 in the default TLS configuration for TLS 1.2 handshake
+ * signature and ciphersuite selection. Without this build-time option, SHA-1
+ * support must be activated explicitly through mbedtls_ssl_conf_sig_hashes.
+ * The use of SHA-1 in TLS <= 1.1 and in HMAC-SHA-1 is always allowed by
+ * default. At the time of writing, there is no practical attack on the use
+ * of SHA-1 in handshake signatures, hence this option is turned on by default
+ * for compatibility with existing peers.
+ */
+[#list SWIPdatas as SWIP]
+	[#if SWIP.defines??]
+        [#list SWIP.defines as definition]
+            [#if definition.name="MBEDTLS_TLS_DEFAULT_ALLOW_SHA1_IN_KEY_EXCHANGE"]
+                [#if definition.value="0"]
+                    [#lt]//#define MBEDTLS_TLS_DEFAULT_ALLOW_SHA1_IN_KEY_EXCHANGE
+                [#else]
+                    [#lt]#define MBEDTLS_TLS_DEFAULT_ALLOW_SHA1_IN_KEY_EXCHANGE
+                [/#if]
+            [/#if]
+        [/#list]
 	[/#if]
 [/#list]
 

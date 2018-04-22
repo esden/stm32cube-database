@@ -727,10 +727,16 @@ ETH_TxPacketConfig TxConfig;
         [#if !ipName?contains("I2C")&& !ipName?contains("USB")] [#-- if not I2C --]
             [#if initService.clock??]
                 [#if initService.clock!="none"]
-                    [#if FamilyName=="STM32F1" && ipName=="RTC"]
+                    [#if FamilyName=="STM32F1" && ipName=="RTC"]debuggg ${usedDriverFlag}
+                        [#if usedDriverFlag?? && !usedDriverFlag?contains("LL")]
                         #t#tHAL_PWR_EnableBkUpAccess();
                         #t#t/* Enable BKP CLK enable for backup registers */
-                        #t#t__HAL_RCC_BKP_CLK_ENABLE();                    
+                        #t#t__HAL_RCC_BKP_CLK_ENABLE();    
+                        [#else]
+                        #t#tLL_PWR_EnableBkUpAccess();
+                        #t#t/* Enable BKP CLK enable for backup registers */
+                        #t#tLL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_BKP);
+                        [/#if]
                     [/#if]
                         #t#t/* ${ipName} clock enable */
                     [#list initService.clock?split(';') as clock]    

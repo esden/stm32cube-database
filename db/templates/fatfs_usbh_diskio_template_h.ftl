@@ -16,9 +16,9 @@
 /**
   ******************************************************************************
 [#if use_dma = 1]
-  * @file    usbh_diskio.h (based on usbh_diskio_dma_template.h)
+  * @file    usbh_diskio.h (based on usbh_diskio_dma_template.h v2.0.2)
 [#else]
-  * @file    usbh_diskio.h (based on usbh_diskio_template.h)
+  * @file    usbh_diskio.h (based on usbh_diskio_template.h v2.0.2)
 [/#if]
   * @brief   Header for usbh_diskio.c module
   ******************************************************************************

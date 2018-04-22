@@ -58,10 +58,10 @@ extern ${variable.value} ${variable.name};
 [#list IP.configModelList as instanceData]
         [#assign instName = instanceData.instanceName]
         [#assign instMode= instanceData.halMode]
-		[#assign ipName = instanceData.ipName]
-/* ${ipName} init function */	
+        [#assign ipName = instanceData.ipName]
+/* ${ipName}${instName} init function */
 [#--[#if instMode!=instName]void ${instMode}_${instName}_Init(void);[#else]void MX_${instName}_Init(void);[/#if]--]
-void MX_${ipName}_Init(void);
+void MX_${ipName}${instName}_Init(void);
 [/#list]
 [#list halModeList?split(" ") as mode]
 [#if mode !=""]
@@ -72,7 +72,7 @@ void HAL_${mode}_BspDeInit(${mode}_HandleTypeDef* h${mode?lower_case});
 
 [/#list]
 
-[#--void ${ipName}_Init(void);--]
+[#--void ${ipName}${instName}_Init(void);--]
 
 /* USER CODE BEGIN ${userCodeIdx} */
 /* USER CODE END ${userCodeIdx} */

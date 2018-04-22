@@ -13,16 +13,19 @@
 [/#list]
 /**
   ******************************************************************************
-  * File Name          : main.hpp
-  * Description        : This file contains the common defines of the application
+  * @file           : main.h
+  * @brief          : Header for main.c file.
+  *                   This file contains the common defines of the application.
   ******************************************************************************
 [@common.optinclude name="Src/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
+
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __MAIN_H
-#define __MAIN_H
-  /* Includes ------------------------------------------------------------------*/
+#ifndef __MAIN_H__
+#define __MAIN_H__
+
+/* Includes ------------------------------------------------------------------*/
 [#compress]
 [#--include "mxconstants.h"--]
 [#assign includesList = ""]
@@ -86,7 +89,6 @@
 [/#compress]
 #n
 
-/* Includes ------------------------------------------------------------------*/
 [#compress]
 [#if GRAPHICS??]
 [#if USE_OTM??]
@@ -124,6 +126,7 @@
     [/#if]
 [/#if]
 [/#compress]
+
 /* USER CODE BEGIN Includes */
 
 /* USER CODE END Includes */
@@ -174,7 +177,7 @@ void ${""?right_pad(2)}${void.functionName}(void);
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
-#n
+
 #ifdef __cplusplus
  extern "C" {
 #endif
@@ -184,14 +187,7 @@ void _Error_Handler(char *, int);
 #ifdef __cplusplus
 }
 #endif
-#n
-/**
-#t* @}
-#t*/ 
-#n
-/**
-#t* @}
-*/ 
-#n
-#endif /* __MAIN_H */
+
+#endif /* __MAIN_H__ */
+
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

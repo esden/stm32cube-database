@@ -1,21 +1,23 @@
 [#ftl]
 /**
   ******************************************************************************
-  * @file           : ${name}  
+  * @file           : ${name?lower_case}.c
   * @version        : ${version}
 [#--  * @packageVersion : ${fwVersion} --]
-  * @brief          : This file implements the USB Device 
+  * @brief          : This file implements the USB Device
   ******************************************************************************
 [@common.optinclude name="Src/license.tmp"/][#--include License text --]
   ******************************************************************************
-*/
-[#assign includeDone = 0] 
-[#assign includeClassAudio = 0] 
+  */
+
+[#-- Create global variables --]
+[#assign includeDone = 0]
+[#assign includeClassAudio = 0]
 [#assign includeClassCcid = 0]
-[#assign includeClassCdc = 0] 
-[#assign includeClassDfu = 0] 
-[#assign includeClassHid = 0] 
-[#assign includeClassMsc = 0] 
+[#assign includeClassCdc = 0]
+[#assign includeClassDfu = 0]
+[#assign includeClassHid = 0]
+[#assign includeClassMsc = 0]
 [#assign includeClassMtp = 0]
 [#assign includeClassCustomHid = 0]
 
@@ -24,11 +26,11 @@
 [#assign instanceNbFunction = 0]
 
 /* Includes ------------------------------------------------------------------*/
-[#-- IPdatas is a list of IPconfigModel --] 
+[#-- IPdatas is a list of IPconfigModel --]
 
 [#compress]
-[#list IPdatas as IP]  
-[#assign ipvar = IP] 
+[#list IPdatas as IP]
+[#assign ipvar = IP]
 [#list IP.configModelList as instanceData]
         [#if includeDone == 0]
         [#assign includeDone = 1]
@@ -36,7 +38,7 @@
 #include "usbd_core.h"
 #include "usbd_desc.h"
         [/#if]
-[#assign className = instanceData.instanceName?lower_case] 
+[#assign className = instanceData.instanceName?lower_case]
 
 [#if instanceData.instanceName == "ALL_CLASSES"]
 
@@ -45,44 +47,44 @@
 #include "usbd_audio.h"
 #include "usbd_audio_if.h"
         [/#if]
-        
-        [#if includeClassCcid == 0] 
-        [#assign includeClassCcid = 1] 
-#include "usbd_ccid.h" 
+
+        [#if includeClassCcid == 0]
+        [#assign includeClassCcid = 1]
+#include "usbd_ccid.h"
 #include "usbd_ccid_if.h"
         [/#if]
-        
+
         [#if includeClassCdc == 0]
-        [#assign includeClassCdc = 1] 
-#include "usbd_cdc.h" 
+        [#assign includeClassCdc = 1]
+#include "usbd_cdc.h"
 #include "usbd_cdc_if.h"
         [/#if]
-        
-        [#if includeClassHid == 0] 
-        [#assign includeClassHid = 1] 
-#include "usbd_hid.h" 
+
+        [#if includeClassHid == 0]
+        [#assign includeClassHid = 1]
+#include "usbd_hid.h"
         [/#if]
-        
-        [#if includeClassDfu == 0] 
-        [#assign includeClassDfu = 1] 
-#include "usbd_dfu.h" 
+
+        [#if includeClassDfu == 0]
+        [#assign includeClassDfu = 1]
+#include "usbd_dfu.h"
 #include "usbd_dfu_if.h"
         [/#if]
-        
+
         [#if includeClassMsc == 0]
-        [#assign includeClassMsc = 1] 
+        [#assign includeClassMsc = 1]
 #include "usbd_msc.h"
 #include "usbd_storage_if.h"
         [/#if]
-        
+
         [#if includeClassMtp == 0]
-        [#assign includeClassMtp = 1] 
+        [#assign includeClassMtp = 1]
 #include "usbd_mtp.h"
         [/#if]
-        
+
         [#if className == "customhid"]
                 [#if includeClassCustomHid == 0]
-                [#assign includeClassCustomHid = 1] 
+                [#assign includeClassCustomHid = 1]
 #include "usbd_customhid.h"
 #include "usbd_custom_hid_if.h"
                 [/#if]
@@ -91,54 +93,54 @@
 
         [#if className == "audio"]
                 [#if includeClassAudio == 0]
-                [#assign includeClassAudio = 1] 
+                [#assign includeClassAudio = 1]
 #include "usbd_audio.h"
 #include "usbd_audio_if.h"
                 [/#if]
         [/#if]
-        
+
         [#if className == "ccid"]
-                [#if includeClassCcid == 0] 
-                [#assign includeClassCcid = 1] 
-#include "usbd_ccid.h" 
+                [#if includeClassCcid == 0]
+                [#assign includeClassCcid = 1]
+#include "usbd_ccid.h"
 #include "usbd_ccid_if.h"
         [/#if]
         [/#if]
-        
+
         [#if className == "cdc"]
                 [#if includeClassCdc == 0]
-                [#assign includeClassCdc = 1] 
+                [#assign includeClassCdc = 1]
 #include "usbd_cdc.h"
 #include "usbd_cdc_if.h"
                 [/#if]
         [/#if]
-        
+
         [#if className == "hid"]
                 [#if includeClassHid == 0]
-                [#assign includeClassHid = 1] 
+                [#assign includeClassHid = 1]
 #include "usbd_hid.h"
                 [/#if]
         [/#if]
 
         [#if className == "customhid"]
                 [#if includeClassCustomHid == 0]
-                [#assign includeClassCustomHid = 1] 
+                [#assign includeClassCustomHid = 1]
 #include "usbd_customhid.h"
 #include "usbd_custom_hid_if.h"
                 [/#if]
         [/#if]
-        
+
         [#if className == "dfu"]
                 [#if includeClassDfu == 0]
-                [#assign includeClassDfu = 1] 
+                [#assign includeClassDfu = 1]
 #include "usbd_dfu.h"
 #include "usbd_dfu_if.h"
                 [/#if]
         [/#if]
-        
+
         [#if className == "msc"]
                 [#if includeClassMsc == 0]
-                [#assign includeClassMsc = 1] 
+                [#assign includeClassMsc = 1]
 #include "usbd_msc.h"
 #include "usbd_storage_if.h"
                 [/#if]
@@ -146,12 +148,12 @@
 
         [#if className == "mtp"]
                 [#if includeClassMtp == 0]
-                [#assign includeClassMtp = 1] 
+                [#assign includeClassMtp = 1]
 #include "usbd_mtp.h"
                 [/#if]
         [/#if]
-        
-         
+
+
 [/#list]
 [/#list]
 [/#compress]
@@ -166,7 +168,7 @@
 [#macro generateConfigModelCode configModel inst nTab]
 [#if configModel.methods??] [#-- if the pin configuration contains a list of LibMethods--]
     [#assign methodList = configModel.methods]
-[#else] 
+[#else]
         [#assign methodList = configModel.libMethod]
 [/#if]
 [#local myInst=inst]
@@ -180,16 +182,16 @@
                                 [#if fargument.returnValue=="false"]
                                         [#assign return = ""]
                                         [#compress]
-                                        [#if fargument.addressOf] 
+                                        [#if fargument.addressOf]
                                                 [#assign adr = "&"]
                                         [#else ]
                                                 [#assign adr = ""]
                                         [/#if]
                                         [/#compress]
                                         [#if fargument.genericType == "Array"]
-                                                [#assign valList = fargument.value?split(fargument.arraySeparator)]     
-                        [#assign i = 0]                                  
-                                                [#list valList as val] 
+                                                [#assign valList = fargument.value?split(fargument.arraySeparator)]
+                        [#assign i = 0]
+                                                [#list valList as val]
                                                         #t${fargument.name}[${i}] = ${val};
                                                         [#assign i = i+1]
                                                 [/#list]
@@ -204,7 +206,7 @@
                                                                         [#assign instanceIndex = inst?replace(name,"")]
                                                                 [/#if]
                                                         [/#if]
-                                                [/#if]                     
+                                                [/#if]
                                                 [#if instanceIndex??&&fargument.context=="global"]
                                                         [#assign arg = "" + adr + fargument.name + instanceIndex]
                                                 [#else]
@@ -212,35 +214,35 @@
                                                 [/#if]
                                                 [#-- [#assign arg = "" + adr + fargument.name] --]
                                                 [#--if (!method.name?contains("Init")&&fargument.context=="global")--]
-                                                [#if (fargument.init=="false")] [#-- MZA add the field init for Argument object, if init is false the intialization of this argument is not done --]                                
+                                                [#if (fargument.init=="false")] [#-- MZA add the field init for Argument object, if init is false the intialization of this argument is not done --]
                                                         [#-- do Nothing --]
                                                 [#else]
-                                                        [#list fargument.argument as argument]                                                                        
+                                                        [#list fargument.argument as argument]
                                                                 [#compress]
-                                                                        [#if argument.addressOf] 
+                                                                        [#if argument.addressOf]
                                                                                 [#assign AdrMza = ""]
                                                                         [#else]
                                                                                 [#assign AdrMza = ""]
                                                                         [/#if]
-                                                                [/#compress]                                                                
+                                                                [/#compress]
                                                                 [#if argument.genericType != "struct"]        tata
-                                                                        [#if argument.mandatory]                                                                
+                                                                        [#if argument.mandatory]
                                                                                 [#if instanceIndex??&&fargument.context=="global"]
                                                                                         [#assign argValue=argument.value?replace("$Index",instanceIndex)]
                                                                                 [#else]
                                                                                         [#assign argValue=argument.value]
                                                                                 [/#if]
                                                                                 [#if argument.genericType=="Array"][#-- if genericType=Array --]
-                                                                                        [#assign valList = argument.value?split(argument.arraySeparator)]     
-                                                                                        [#assign i = 0]                                  
-                                                                                        [#list valList as val] 
-                                                                                                #t${argument.name}[${i}] = ${val};                                                                                                
+                                                                                        [#assign valList = argument.value?split(argument.arraySeparator)]
+                                                                                        [#assign i = 0]
+                                                                                        [#list valList as val]
+                                                                                                #t${argument.name}[${i}] = ${val};
                                                                                                 [#assign i = i+1]
                                                                                         [/#list]
                                                                                 [/#if] [#-- if genericType=Array --]
                                                                                 [#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"]${fargument.name}${instanceIndex}[#else]${fargument.name}[/#if].${argument.name} = ${argValue};
-                                                                                [#else]        
-                                                                                        [#if argument.genericType=="fpointer"]                                                                                         
+                                                                                [#else]
+                                                                                        [#if argument.genericType=="fpointer"]
                                                                                                 [#local Function = inst + "_" + argument.name]
                                                 [#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"]${fargument.name}${instanceIndex}[#else]${fargument.name}[/#if].${argument.name} = ${AdrMza}${Function};
                                                                                         [#else]
@@ -248,19 +250,19 @@
                                                                                                         [#local Function = argument.value]
                                                                                                         [#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"]${fargument.name}${instanceIndex}[#else]${fargument.name}[/#if].${argument.name} = ${AdrMza}${Function};
                                                 [/#if]
-                                                                                        [/#if]                                                                        
+                                                                                        [/#if]
                                                                                 [#--[#if argument.name=="Instance"]--]
                                                                                         [#-- [#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"]${fargument.name}${instanceIndex}[#else]${fargument.name}[/#if].${argument.name} = ${AdrMza}${Function};--]
                                                                                 [#--[/#if]--]
-                                                                        [/#if]                                
+                                                                        [/#if]
                                                                 [#else]
-                                                                [#list argument.argument as argument1]                                                                  
+                                                                [#list argument.argument as argument1]
                                                                         [#if argument1.mandatory]
                                                                                 [#if instanceIndex??&&fargument.context=="global"][#assign argValue=argument1.value?replace("$Index",instanceIndex)][#else][#assign argValue=argument1.value][/#if]
-                                                                                [#if argument1.genericType=="Array"][#-- if genericType=Array --] 
-                                                                                        [#assign valList = argument1.value?split(":")]     
-                                                                                        [#assign i = 0]                                  
-                                                                                        [#list valList as val] 
+                                                                                [#if argument1.genericType=="Array"][#-- if genericType=Array --]
+                                                                                        [#assign valList = argument1.value?split(":")]
+                                                                                        [#assign i = 0]
+                                                                                        [#list valList as val]
                                                                                                 #t${argument1.name}[${i}] = ${val};
                                                                                                 [#assign i = i+1]
                                                                                         [/#list]
@@ -271,14 +273,14 @@
                                                                 [/#list]
                                                                 [/#if]
                                                         [/#list][#-- list  fargument.argument as argument--]
-                                                [/#if]        
+                                                [/#if]
                                         [#elseif fargument.genericType == "simple"] [#-- MZA if argument is simple we pass the name of the argument and not the value --]
                                                 [#if fargument.context=="global"]
                                                         [#assign arg = "" + adr + fargument.name + myInst]
                                                 [#else]
                                                         [#--[#assign arg = "" + adr + fargument.name]--]
                                                         [#assign arg = "" + adr + fargument.value]
-                                                [/#if]        
+                                                [/#if]
                                         [#else][#-- if struct --]
                                                 [#assign arg = "" + adr + fargument.value]
                                         [/#if]
@@ -287,30 +289,30 @@
                                         [#else]
                                                 [#assign args = args + ', ' + arg]
                                         [/#if]
-                                [#else] [#-- here we have an Argument as Return Value --]                                        
+                                [#else] [#-- here we have an Argument as Return Value --]
                                         [#if fargument.context=="global"] [#assign return = fargument.name + myInst + " = "]
                                         [#else] [#assign return = fargument.name + " = "]
                                         [/#if]
                                 [/#if]
-                                
+
                 [/#list]
                                 [#if nTab==2]#t#t[#else]#t[/#if]${return}${method.name}(${args});#n
                                 [#else]
                     [#if nTab==2]#t#t[#else]#t[/#if]${return}${method.name}();
-                                [/#if]                        
+                                [/#if]
                 [/#if]
                 [#if method.status=="KO"]
                 #n [#if nTab==2]#t#t[#else]#t[/#if]//!!! ${method.name} is commented because some parameters are missing
-                [#if method.arguments??]                        [#-- here we comment all variables intialization --]
+                [#if method.arguments??]                        [#-- here we comment all variables initialization --]
                                 [#list method.arguments as fargument]
-                                        [#if fargument.addressOf] 
+                                        [#if fargument.addressOf]
                                                 [#assign adr = "&"]
-                                        [#else ] 
+                                        [#else ]
                                                 [#assign adr = ""]
                                         [/#if]
                                         [#if fargument.genericType == "struct"]
                                                 [#assign arg = "" + adr + fargument.name]
-                        [#if fargument.context??]                   
+                        [#if fargument.context??]
                                                         [#if fargument.context=="global"]
                                                                 [#if configModel.ipName=="DMA"]
                                                                         [#assign instanceIndex = "_"+ configModel.instanceName?lower_case]
@@ -318,7 +320,7 @@
                                                                         [#assign instanceIndex = inst?replace(name,"")]
                                                                 [/#if]
                                                         [/#if]
-                                                [/#if]              
+                                                [/#if]
                         [#if instanceIndex??&&fargument.context=="global"]
                                                         [#assign arg = "" + adr + fargument.name + instanceIndex]
                                                 [#else]
@@ -326,7 +328,7 @@
                                                 [/#if]
                         [#if (!method.name?contains("Init")&&fargument.context=="global")]
                         [#else]
-                        [#list fargument.argument as argument]        
+                        [#list fargument.argument as argument]
                                 [#if argument.genericType != "struct"]
                                                                         [#if argument.mandatory]
                                                                                 [#if instanceIndex??&&fargument.context=="global"][#assign argValue=argument.value?replace("$Index",instanceIndex)][#else][#assign argValue=argument.value][/#if]
@@ -334,7 +336,7 @@
                                  [#else]
                                     [#if argument.name=="Instance"]
                                         [#if nTab==2]#t#t[#else]#t[/#if]//[#if instanceIndex??&&fargument.context=="global"]${fargument.name}${instanceIndex}[#else]${fargument.name}[/#if].${argument.name} = ${inst};
-                                    [/#if]                                
+                                    [/#if]
                                 [/#if]
                                                                 [#else]
                                                                 [#list argument.argument as argument1]
@@ -360,7 +362,7 @@
             [#if nTab==2]#t#t[#else]#t[/#if]${method.name}()#n;
                         [/#if]
         [/#if]
-[/#if]                
+[/#if]
     [/#list]
 
 [#assign instanceIndex = ""]
@@ -369,37 +371,69 @@
 [#-- End macro generateConfigModelCode --]
 #n
 
-[#-- Section2: Create global Variables for each middle ware instance --] 
+/* USER CODE BEGIN Includes */
+
+/* USER CODE END Includes */
+
+/* USER CODE BEGIN PV */
+/* Private variables ---------------------------------------------------------*/
+
+/* USER CODE END PV */
+
+/* USER CODE BEGIN PFP */
+/* Private function prototypes -----------------------------------------------*/
+
+/* USER CODE END PFP */
+
+
+[#-- Section2: Create global Variables for each middle ware instance --]
 [#-- Global variables --]
-/* USB Device Core handle declaration */
+/* USB Device Core handle declaration. */
 [#compress]
-[#list IPdatas as IP]  
+[#list IPdatas as IP]
 [#assign ipvar = IP]
 [#if IP.variables??]
         [#list IP.variables as variable]
                 [#if variable.value?contains("Handle")]
-                ${variable.value} ${variable.name};        
-                [#assign instanceNb = instanceNb + 1]                
-                [/#if]                
+                ${variable.value} ${variable.name};
+                [#assign instanceNb = instanceNb + 1]
+                [/#if]
         [/#list]
 [/#if]
 [/#list]
 [/#compress]
 [#-- Global variables --]
+#n
+/*
+ * -- Insert your variables declaration here --
+ */
+/* USER CODE BEGIN 0 */
 
+/* USER CODE END 0 */
 
+#n
+/*
+ * -- Insert your external function declaration here --
+ */
+/* USER CODE BEGIN 1 */
+
+/* USER CODE END 1 */
 #n#n
-/* init function */                                        
+
+/**
+  * Init USB device Library, add supported class and start the library
+  * @retval None
+  */
 void MX_${name}_Init(void)
 {
 [#compress]
-[#-- Section3: Create the void mx_<IpInstance>_init() function for each middle ware instance --] 
+[#-- Section3: Create the void mx_<IpInstance>_init() function for each middle ware instance --]
 [#list IPdatas as IP]
 [#if instanceNb == 1]
         [#assign instName = ""]
 [#else]
         [#assign instName= "1"]
-[/#if]        
+[/#if]
 [#--[#assign instName = instance]--]
 [#assign ipvar = IP]
 [#list IP.configModelList as instanceData]
@@ -421,7 +455,7 @@ void MX_${name}_Init(void)
 #t/* USER CODE END ${ipName}_Init_PreTreatment */
 #t
 
-    #t/* Init Device Library,Add Supported Class and Start the library*/
+        #t/* Init Device Library, add supported class and start the library. */
         [#list instanceData.configs as config]
         [@generateConfigModelCode configModel=config inst=instName  nTab=1/]
     [/#list]
@@ -435,6 +469,7 @@ void MX_${name}_Init(void)
 #t
 #t/* USER CODE END ${ipName}_Init_PostTreatment */
 }
+
 /**
   * @}
   */

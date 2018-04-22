@@ -152,7 +152,7 @@
             [#assign queueElementType = i]
           [/#if]
           [#if index == 3]
-            [#assign queueThreadId = i]
+            [#assign queueIsIntegerType = i]
           [/#if]
           [#if index == 4]
             [#assign queueAllocation = i]
@@ -168,7 +168,11 @@
         [#if queueName != "0"]
            osMessageQId ${queueName}Handle;
           [#if queueControlBlock != "NULL"]
+           [#if queueIsIntegerType = "0"]
            uint8_t ${queueBuffer}[ ${queueSize} * sizeof( ${queueElementType} ) ];
+           [#else]
+           uint8_t ${queueBuffer}[ ${queueSize} * ${queueElementType} ];
+           [/#if]
            osStaticMessageQDef_t ${queueControlBlock};
           [/#if]
         [/#if]  

@@ -6,13 +6,13 @@
 [/#if]
 /**
   ******************************************************************************
-  * File Name          : main.c
-  * Description        : Main program body
+  * @file           : main.c
+  * @brief          : Main program body
   ******************************************************************************
 [@common.optinclude name=coreDir+"Src/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
-
+[#assign staticVoids =""]
 [#compress]
 [#assign usb_device = false]
 /* Includes ------------------------------------------------------------------*/
@@ -108,7 +108,7 @@ ETH_TxPacketConfig TxConfig;
 [#compress]
     [#list Peripherals as Peripheral]
         [#if Peripheral??]                
-            [#list Peripheral as periph]
+        [#list Peripheral as periph]
                 [#-- Global variables --]
                 [#if periph.variables??]
                     [#list periph.variables as variable]
@@ -130,14 +130,14 @@ ${dHandle};
     [#compress]
     [#-- BDMA global variables --]
     [#-- ADD BDMA Code Begin--]
-    [@common.optinclude name=coreDir+"Src/BDMA_GV.tmp"/]
+    [@common.optinclude name=coreDir+"Src/bdma_GV.tmp"/]
     [#-- ADD BDMA Code End--]
     [#-- DMA global variables --]
     [#-- ADD DMA Code Begin--]
     [@common.optinclude name=coreDir+"Src/dma_GV.tmp"/]
     [#-- ADD DMA Code End--]
     [#-- ADD MDMA Code Begin--]
-    [@common.optinclude name=coreDir+"Src/MDMA_GV.tmp"/]
+    [@common.optinclude name=coreDir+"Src/mdma_GV.tmp"/]
     [#-- ADD MDMA Code End--]
     [#-- FMCGlobal variables --]
     [#-- Add FMC Code Begin--]
@@ -151,7 +151,7 @@ ${dHandle};
     [@common.optinclude name=coreDir+"Src/rtos_vars.tmp"/]   
     [#-- ADD RTOS Code End--]
     [/#compress]
-[/#if][#-- if HALCompliant End --] 
+[/#if][#-- if HALCompliant End --]
 [#if HALCompliant??]
   [#-- CEC array --]
   [#compress]
@@ -195,9 +195,14 @@ static void MPU_Config(void);
 [/#if]
 [#if HALCompliant??]
  [#list voids as void]
-  [#if !void.functionName?contains("FREERTOS")&&void.functionName!="Init"&&!void.functionName?contains("FATFS")&& !void.functionName?contains("LWIP")&& !void.functionName?contains("MBEDTLS")&& !void.functionName?contains("USB_DEVICE")&& !void.functionName?contains("USB_HOST")&& !void.functionName?contains("CORTEX")&& !void.functionName?contains("SystemClock_Config")&& !void.functionName?contains("LIBJPEG")] 
-[#if !void.isNotGenerated&&!void.functionName?contains("GRAPHICS")]
-static void ${""?right_pad(2)}${void.functionName}(void);
+  [#if !void.ipType?contains("thirdparty")&&!void.functionName?contains("FREERTOS")&&void.functionName!="Init"&&!void.functionName?contains("FATFS")&& !void.functionName?contains("LWIP")&& !void.functionName?contains("MBEDTLS")&& !void.functionName?contains("USB_DEVICE")&& !void.functionName?contains("USB_HOST")&& !void.functionName?contains("CORTEX")&& !void.functionName?contains("SystemClock_Config")&& !void.functionName?contains("LIBJPEG")&& !void.functionName?contains("PDM2PCM")&& !void.functionName?contains("TOUCHSENSING")&& !void.functionName?contains("MotorControl")]
+[#if !void.functionName?contains("GRAPHICS")]
+    [#if void.isStatic]
+    static void ${""?right_pad(2)}${void.functionName}(void);
+    [#assign staticVoids =staticVoids + " "+ '${void.functionName}']
+    [#else]
+    void ${""?right_pad(2)}${void.functionName}(void);
+    [/#if]
   [/#if]
   [#if !void.isNotGenerated&&void.functionName?contains("GRAPHICS")]
 extern void ${""?right_pad(2)}${void.functionName}(void);
@@ -257,19 +262,23 @@ static void MX_NVIC_Init(void);
 /* Private function prototypes -----------------------------------------------*/
 
 /* USER CODE END PFP */
-#n
-#n
+
+
 /* USER CODE BEGIN 0 */
 
 /* USER CODE END 0 */
-#n
+
+/**
+  * @brief  The application entry point.
+  *
+  * @retval None
+  */
 int main(void)
 {
-#n
-#t/* USER CODE BEGIN 1 */
+  /* USER CODE BEGIN 1 */
 
-#t/* USER CODE END 1 */
-#n
+  /* USER CODE END 1 */
+
 [#compress]
 [#if mpuControl??] [#-- if MPU config is enabled --]
 #t/* MPU Configuration----------------------------------------------------------*/
@@ -307,7 +316,7 @@ int main(void)
 #n
 #n#t/* Initialize all configured peripherals */
 [#list voids as void]
-[#if void.functionName?? && !void.functionName?contains("FREERTOS")&&!void.functionName?contains("CORTEX")&& !void.functionName?contains("SystemClock_Config")&&void.functionName!="Init"]
+[#if void.functionName?? && !void.functionName?contains("FREERTOS")&&!void.functionName?contains("CORTEX")&& !void.functionName?contains("SystemClock_Config")&&void.functionName!="Init" && !void.functionName?contains("Process")]
 [#if !void.isNotGenerated]
 [#if ((FREERTOS?? && void.ipType=="peripheral") || !FREERTOS??) && void.functionName!="GRAPHICS_Init"]
 #t${void.functionName}();
@@ -321,11 +330,11 @@ int main(void)
 #tMX_NVIC_Init();
 [/#if]
 [/#compress]
-#n
-#t/* USER CODE BEGIN 2 */
 
-#t/* USER CODE END 2 */
-#n
+  /* USER CODE BEGIN 2 */
+
+  /* USER CODE END 2 */
+
 [#if FREERTOS??] [#-- If FreeRtos is used --]
     [#if GRAPHICS??]
 #t/* Initialise the graphical stack engine */
@@ -345,7 +354,7 @@ int main(void)
 [#-- if !FREERTOS?? --] 
 #n
 [#if GRAPHICS?? && !FREERTOS??]
-/* Initialise the graphical stack engine */
+  /* Initialise the graphical stack engine */
   GRAPHICS_Init();
   
   /* Graphic application */  
@@ -358,11 +367,17 @@ int main(void)
 #t/* USER CODE BEGIN WHILE */
 #twhile (1)
 #t{
+#n
 #t/* USER CODE END WHILE */
 [#if USB_HOST?? && !FREERTOS??]
 #t#tMX_USB_HOST_Process();
 [/#if]
 #n
+[#list voids as void]
+[#if void.functionName?? && void.functionName?contains("Process")]
+#t${void.functionName}();
+[/#if]
+[/#list]
 #t/* USER CODE BEGIN 3 */
 
 #t}
@@ -384,8 +399,10 @@ static void LL_Init(void)
 [/#if]
 [#compress]
 [#if clockConfig??]
-#n/** System Clock Configuration
- */
+#n/**
+#t* @brief System Clock Configuration
+#t* @retval None
+#t*/
 void SystemClock_Config(void)
 {
 #n
@@ -439,8 +456,10 @@ void SystemClock_Config(void)
 
 [#compress]
 [#if vectors??]
-#n/** NVIC Configuration
- */
+#n/**
+#t* @brief NVIC Configuration.
+#t* @retval None
+#t*/
 static void MX_NVIC_Init(void)
 {
 [#list vectors as vector]
@@ -520,9 +539,10 @@ static void MX_NVIC_Init(void)
      [#assign instName = instanceData.instanceName]
 
         [#assign halMode= instanceData.halMode]
-        /* ${instName} init function */
-        [#if halMode!=ipName&&!ipName?contains("TIM")&&!ipName?contains("CEC")]static void MX_${instName}_${halMode}_Init(void)[#else]static void MX_${instName}_Init(void)[/#if]
-{
+        /* ${instName} init function */ 
+       
+            [#if halMode!=ipName&&!ipName?contains("TIM")&&!ipName?contains("CEC")][#if staticVoids?contains('MX_${instName}_${halMode}_Init')]static[/#if] void MX_${instName}_${halMode}_Init(void)[#else][#if staticVoids?contains('MX_${instName}_Init')]static[/#if] void MX_${instName}_Init(void)[/#if]
+            {       
 #n
         [#-- assign ipInstanceIndex = instName?replace(name,"")--]
         [#assign args = ""]
@@ -566,6 +586,12 @@ static void MX_NVIC_Init(void)
 #t/* ${instName}   parameter configuration*/
 [/#if]
 [#if instanceData.instIndex??][@common.generateConfigModelListCode configModel=instanceData inst=instName  nTab=1 index=instanceData.instIndex/][#else][@common.generateConfigModelListCode configModel=instanceData inst=instName  nTab=1 index=""/][/#if]
+
+[#list ips as ip]
+[#if ip?contains("PDM2PCM")]
+#t__HAL_CRC_DR_RESET(&h${instName?lower_case});
+[/#if]
+[/#list]
 
 [#-- MspPostInit callBack if needed for output gpio config --]
 [#if instanceData.initServices??]
@@ -627,61 +653,58 @@ static void MX_NVIC_Init(void)
   */
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
-/* USER CODE BEGIN Callback 0 */
+  /* USER CODE BEGIN Callback 0 */
 
-/* USER CODE END Callback 0 */
+  /* USER CODE END Callback 0 */
   if (htim->Instance == ${timeBaseSource}) {
     HAL_IncTick();
   }
-/* USER CODE BEGIN Callback 1 */
+  /* USER CODE BEGIN Callback 1 */
 
-/* USER CODE END Callback 1 */
+  /* USER CODE END Callback 1 */
 }
 [/#if]
-#n
+
 /**
   * @brief  This function is executed in case of error occurrence.
-  * @param  None
+  * @param  file: The file name as string.
+  * @param  line: The line in file as a number.
   * @retval None
   */
-void _Error_Handler(char * file, int line)
+void _Error_Handler(char *file, int line)
 {
-#t/* USER CODE BEGIN Error_Handler_Debug */
-#t/* User can add his own implementation to report the HAL error return state */
-#twhile(1) 
-#t{
-#t}
-#t/* USER CODE END Error_Handler_Debug */ 
+  /* USER CODE BEGIN Error_Handler_Debug */
+  /* User can add his own implementation to report the HAL error return state */
+  while(1)
+  {
+  }
+  /* USER CODE END Error_Handler_Debug */
 }
-#n
-[#compress] 
+
+
 #ifdef  USE_FULL_ASSERT
-#n
 /**
-#t  * @brief  Reports the name of the source file and the source line number
-#t  *         where the assert_param error has occurred.
-#t  * @param  file: pointer to the source file name
-#t  * @param  line: assert_param error line source number
-#t  * @retval None
-#t  */
+  * @brief  Reports the name of the source file and the source line number
+  *         where the assert_param error has occurred.
+  * @param  file: pointer to the source file name
+  * @param  line: assert_param error line source number
+  * @retval None
+  */
 void assert_failed(uint8_t* file, uint32_t line)
 { 
-#t/* USER CODE BEGIN 6 */
-#t/* User can add his own implementation to report the file name and line number,
-#t#tex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
-#t/* USER CODE END 6 */
-#n
+  /* USER CODE BEGIN 6 */
+  /* User can add his own implementation to report the file name and line number,
+     tex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
+  /* USER CODE END 6 */
 }
-#n
-#endif
-[/#compress]
-#n
+#endif /* USE_FULL_ASSERT */
+
 /**
-#t* @}
-#t*/ 
-#n
+  * @}
+  */
+
 /**
-#t* @}
-*/ 
-#n
+  * @}
+  */
+
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

@@ -110,6 +110,24 @@ __weak void ${defaultTaskFunction}(void const * argument)
   GRAPHICS_MainTask();
 [/#if]
 #n
+[#list SWIPdatas as SWIP]
+  [#if SWIP.variables??]
+	[#list SWIP.variables as variable]
+	  [#if variable.name=="ThirdPartyInUse"]
+	  [#assign s = variable.valueList]
+	  [#assign index = 0] 
+        [#list s as i] 
+          [#if index == 0]
+            [#assign mw = i]
+          [/#if]
+          [#assign index = index + 1]
+        [/#list]
+#t/* init code for ${mw?replace("TP_","")?replace("_Init","")} */
+#tTP_${mw}_Init();#n
+	  [/#if]
+    [/#list]
+  [/#if]
+[/#list]
 [#if inMain == 1]
 #t/* USER CODE BEGIN 5 */
 [#else]

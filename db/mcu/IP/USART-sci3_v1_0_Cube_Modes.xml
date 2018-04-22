@@ -219,10 +219,12 @@
         <Condition Diagnostic="" Expression="$IpInstance_PARITY_ODD &amp; VirtualMode=VM_IRDA"/>
     </RefParameter>
     <RefParameter Comment="Parity" DefaultValue="SMARTCARD_PARITY_EVEN" Group="Basic Parameters" Name="SmartCardParity" Type="list">
-        <Condition Diagnostic="" Expression="$IpInstance_PARITY_EVEN &amp; VirtualMode=VM_SMARTCARD"/>
+        <Condition Diagnostic="" Expression="(Parity = PARITY_EVEN) &amp; VirtualMode = VM_SMARTCARD"/>
+        <PossibleValue Comment="Even" Value="SMARTCARD_PARITY_EVEN"/>
     </RefParameter>
     <RefParameter Comment="Parity" DefaultValue="SMARTCARD_PARITY_ODD" Group="Basic Parameters" Name="SmartCardParity" Type="list">
-        <Condition Diagnostic="" Expression="$IpInstance_PARITY_ODD &amp; VirtualMode=VM_SMARTCARD"/>
+        <Condition Diagnostic="" Expression="(Parity = PARITY_ODD) &amp; VirtualMode = VM_SMARTCARD"/>
+        <PossibleValue Comment="Odd" Value="SMARTCARD_PARITY_ODD"/>
     </RefParameter>
     <RefParameter Comment="Parity" DefaultValue="UART_PARITY_NONE" Group="Basic Parameters" Name="UartParity" Type="list">
         <Condition Diagnostic="" Expression="$IpInstance_PARITY_NONE"/>
@@ -1192,8 +1194,8 @@
             <ModeLogicOperator Name="XOR">
                 <Mode Name="Asynchronous">
                     <SignalLogicalOp Name="AND">
-                        <Signal IOMode="AlternateFunctionPushPullPULLUP" Name="RX"/>
-                        <Signal IOMode="AlternateFunctionPushPullPULLUP" Name="TX"/>
+                        <Signal Name="RX"/>
+                        <Signal Name="TX"/>
                     </SignalLogicalOp>
                     <Semaphore>$IpInstance_Asynchronous</Semaphore>
                     <Semaphore>Asynchronous</Semaphore>
@@ -1207,13 +1209,13 @@
                 </Mode>
                 <Mode Name="Half_duplex(single_wire_mode)" UserName="Single Wire (Half-Duplex)">
                     <SignalLogicalOp Name="AND">
-                        <Signal IOMode="AlternateFunctionOpenDrain" Name="TX"/>
+                        <Signal IOMode="AlternateFunctionOpenDrainAndPushPullDefaultOD" Name="TX"/>
                     </SignalLogicalOp>
                 </Mode>
                 <Mode Name="Multiprocessor_communication" UserName="Multiprocessor Communication">
                     <SignalLogicalOp Name="AND">
-                        <Signal Name="RX"/>
-                        <Signal Name="TX"/>
+                        <Signal IOMode="AlternateFunctionOpenDrainAndPushPullDefaultOD" Name="RX"/>
+                        <Signal IOMode="AlternateFunctionOpenDrainAndPushPullDefaultOD" Name="TX"/>
                     </SignalLogicalOp>
                 </Mode>
                 <Mode Name="IrDA" RemoveCondition="($IpNumber=4)|($IpNumber=5)|($IpNumber=6)|($IpNumber=7)|($IpNumber=8)|STM32F030CCTx|STM32F030RCTx">
@@ -1230,12 +1232,12 @@
                 </Mode>
                 <Mode Name="SmartCard" RemoveCondition="($IpNumber=4)|($IpNumber=5)|($IpNumber=6)|($IpNumber=7)|($IpNumber=8)|STM32F030CCTx|STM32F030RCTx">
                     <SignalLogicalOp Name="AND">
-                        <Signal IOMode="AlternateFunctionOpenDrain" Name="TX"/>
+                        <Signal IOMode="AlternateFunctionOpenDrainAndPushPullDefaultOD" Name="TX"/>
                     </SignalLogicalOp>
                 </Mode>
                 <Mode Name="SmartCard_With_Clock" RemoveCondition="($IpNumber=4)|($IpNumber=5)|($IpNumber=6)|($IpNumber=7)|($IpNumber=8)|STM32F030CCTx|STM32F030RCTx" UserName="SmartCard with Card Clock">
                     <SignalLogicalOp Name="AND">
-                        <Signal IOMode="AlternateFunctionOpenDrain" Name="TX"/>
+                        <Signal IOMode="AlternateFunctionOpenDrainAndPushPullDefaultOD" Name="TX"/>
                         <Signal Name="CK"/>
                     </SignalLogicalOp>
                 </Mode>
@@ -1303,7 +1305,7 @@
     <RefSignal IOMode="AlternateFunctionPushPull" Name="CTS"/>
     <RefSignal IOMode="AlternateFunctionPushPull" Name="RTS"/>
     <RefSignal IOMode="AlternateFunctionPushPull" Name="DE"/>
-    <RefSignal IOMode="AlternateFunctionPushPullUp" Name="RX"/>
-    <RefSignal IOMode="AlternateFunctionPushPullUp" Name="TX"/>
+    <RefSignal IOMode="AlternateFunctionOpenDrainAndPushPullDefaultPP" Name="RX"/>
+    <RefSignal IOMode="AlternateFunctionOpenDrainAndPushPullDefaultPP" Name="TX"/>
     <Semaphore>$IpInstanceUsed_ForRCC</Semaphore>
 </IP>

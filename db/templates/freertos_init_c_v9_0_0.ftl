@@ -13,6 +13,7 @@
 [#assign semaphoreAllocation = "Dynamic"]
 [#assign queueAllocation = "Dynamic"]
 [#assign timerAllocation = "Dynamic"]
+[#assign queueThreadId = "NULL"]
 
 [#list SWIPdatas as SWIP]
   [#if SWIP.variables??]
@@ -311,7 +312,7 @@
             [#assign queueElementType = i]
           [/#if]
           [#if index == 3]
-            [#assign queueThreadId = i]
+            [#assign queueIsIntegerType = i]
           [/#if]
           [#if index == 4]
             [#assign queueAllocation = i]

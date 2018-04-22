@@ -1,28 +1,30 @@
+
 /**
   ******************************************************************************
   * @file           : usbd_ccid_if.h
-  * @brief          : header file for the usbd_ccid_if file
+[#--  * @packageVersion : ${fwVersion} --]
+  * @brief          : Header for usbd_ccid_if.c file.
   ******************************************************************************
 [@common.optinclude name="Src/license.tmp"/][#--include License text --]
   ******************************************************************************
-*/ 
+  */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
+#ifndef __USBD_CCID_IF_H__
+#define __USBD_CCID_IF_H__
 
-#ifndef __USBD_CCID_IF_H_
-#define __USBD_CCID_IF_H_
 [#assign handleNameFS = ""]
 [#assign handleNameUSB_FS = ""]
 [#assign handleNameHS = ""]
-[#list SWIPdatas as SWIP]  
+[#list SWIPdatas as SWIP]
 [#compress]
 [#-- Section2: Create global Variables for each middle ware instance --] 
 [#-- Global variables --]
 [#if SWIP.variables??]
-	[#list SWIP.variables as variable]	
-		[#-- extern ${variable.type} --][#if variable.value??][#--${variable.value};--]				
+	[#list SWIP.variables as variable]
+		[#-- extern ${variable.type} --][#if variable.value??][#--${variable.value};--]
 		[#if variable.value?contains("OTG_FS")][#assign handleNameFS = "FS"][/#if]
-		[#if variable.value?contains("USB_FS")][#assign handleNameUSB_FS = "FS"][/#if]				
+		[#if variable.value?contains("USB_FS")][#assign handleNameUSB_FS = "FS"][/#if]
 		[#if variable.value?contains("OTG_HS")][#assign handleNameHS = "HS"][/#if]
 		[/#if]		
 	[/#list]
@@ -37,22 +39,26 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "usbd_ccid.h"
+
 /* USER CODE BEGIN INCLUDE */
 /* USER CODE END INCLUDE */
 
 /** @addtogroup STM32_USB_OTG_DEVICE_LIBRARY
+  * @brief For Usb device.
   * @{
   */
   
-/** @defgroup USBD_CCID_IF
+/** @defgroup USBD_CCID_IF USBD_CCID_IF
   * @brief header 
   * @{
   */ 
 
-/** @defgroup USBD_CCID_IF_Exported_Defines
+/** @defgroup USBD_CCID_IF_Exported_Defines USBD_CCID_IF_Exported_Defines
+  * @brief Defines.
   * @{
   */ 
 /* USER CODE BEGIN EXPORTED_DEFINES */
+
 /* USER CODE END EXPORTED_DEFINES */
 
 /**
@@ -60,60 +66,79 @@
   */ 
 
 
-/** @defgroup USBD_CCID_IF_Exported_Types
+/** @defgroup USBD_CCID_IF_Exported_Types USBD_CCID_IF_Exported_Types
+  * @brief Types.
   * @{
   */  
 /* USER CODE BEGIN EXPORTED_TYPES */
+
 /* USER CODE END EXPORTED_TYPES */
 
 /**
   * @}
-  */ 
+  */
 
-
-
-/** @defgroup USBD_CCID_IF_Exported_Macros
+/** @defgroup USBD_CCID_IF_Exported_Macros USBD_CCID_IF_Exported_Macros
+  * @brief Aliases.
   * @{
-  */ 
+  */
+
 /* USER CODE BEGIN EXPORTED_MACRO */
+
 /* USER CODE END EXPORTED_MACRO */
 
 /**
   * @}
-  */ 
+  */
 
-/** @defgroup USBD_CCID_IF_Exported_Variables
+/** @defgroup USBD_CCID_IF_Exported_Variables USBD_CCID_IF_Exported_Variables
+  * @brief Public variables.
   * @{
-  */ 
+  */
+
 [#if handleNameFS == "FS" || handleNameUSB_FS == "FS"]
-#textern USBD_CCID_ItfTypeDef  USBD_CCID_fops_FS;
+/** CCID Interface callback. */
+extern USBD_CCID_ItfTypeDef USBD_CCID_fops_FS;
 [/#if]
-[#if handleNameHS == "HS"]  
-#textern USBD_CCID_ItfTypeDef  USBD_CCID_fops_HS;
+[#if handleNameHS == "HS"]
+/** CCID Interface callback. */
+extern USBD_CCID_ItfTypeDef USBD_CCID_fops_HS;
 [/#if]
 
 /* USER CODE BEGIN EXPORTED_VARIABLES */
+
 /* USER CODE END EXPORTED_VARIABLES */
 
 /**
   * @}
-  */ 
+  */
 
-/** @defgroup USBD_CCID_IF_Exported_FunctionsPrototype
+
+/** @defgroup USBD_CCID_IF_Exported_FunctionsPrototype USBD_CCID_IF_Exported_FunctionsPrototype
+  * @brief Public functions declaration.
   * @{
-  */ 
+  */
+
 /* USER CODE BEGIN EXPORTED_FUNCTIONS */
+
 /* USER CODE END EXPORTED_FUNCTIONS */
 
 /**
   * @}
-  */ 
-  
+  */
+
+/**
+  * @}
+  */
+
+/**
+  * @}
+  */
+
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* __USBD_CCID_IF_H_ */
-
+#endif /* __USBD_CCID_IF_H__ */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

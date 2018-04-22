@@ -19,6 +19,7 @@
 [/#macro]
 <Project>
 <ProjectName>${projectName}</ProjectName>
+<ProjectNature>C</ProjectNature> [#-- Cpp --]
 <CMSIS>${CMSISPath}</CMSIS>
 <HAL_Driver>${HAL_Driver}</HAL_Driver>
 
@@ -30,11 +31,11 @@
 <Version>${version}</Version>
 
 <filestoremove>
-	<file>
-		[#list SourceFilesToRemove as SourceFile]
-	   		<name>${SourceFile}</name>
-        [/#list]
-	</file>
+    <file>
+[#list SourceFilesToRemove as SourceFile]
+    <name>${SourceFile}</name>
+[/#list]
+    </file>
 </filestoremove>
 
 <inctoremove>
@@ -66,7 +67,7 @@
     <usedDebug>${usedDebug}</usedDebug>
     [#if usedDebug == "true"]
     	<debugprobe>${DebugMode}</debugprobe>
-	[/#if]
+    [/#if]
     [#-- <optimization>${project.compilerOptimization}</optimization> --]
     <optimization>${optimization}</optimization>
     <icfloc>${icfloc}</icfloc>
@@ -83,10 +84,10 @@
 	   			<include>${RelativePath}Inc</include>
    			[#elseif ide=="Makefile" ]
 	   			<include>${RelativePath}Inc</include>
-		    [#else]
+                        [#else]
 		   		<include></include>
-		    [/#if]
-	    [#else]
+                        [/#if]
+	[#else]
 
 
 	    	<include></include>
@@ -142,11 +143,17 @@
                 <sourceEntry>
                         <name>${HALDriver}</name>
                 </sourceEntry>
-                [#if atLeastOneMiddlewareIsUsed]
+            [#if atLeastOneMiddlewareIsUsed]
                         <sourceEntry>
                                 <name>Middlewares</name>
                         </sourceEntry>
-                 [/#if]
+            [/#if]
+			[#-- MZA Bug41441 --]			
+			[#if atLeastOneCmsisPackIsUsed]
+                        <sourceEntry>
+                                <name>Packs</name>
+                        </sourceEntry>
+            [/#if]
             </sourceEntries>
             [#if atLeastOneMiddlewareIsUsed]
                 <group>
@@ -160,16 +167,16 @@
 						<file>
 							<name>${filesName!''}</name>
 						</file>
-			        [/#list]
-			    [/#if]
+                		        [/#list]
+                                [/#if]
                         </group>
                     [/#if]
 		 [/#list]
                 </group> 
             [/#if]
-    		<group>
-	    		<name>Drivers</name> 
-				 [#if atLeastOneBspComponentIsUsed]
+    	<group>
+            <name>Drivers</name> 
+            [#if atLeastOneBspComponentIsUsed]
 				 <group>					
 					[#if bspComponentGroups??]						
 						[#list bspComponentGroups as grp]
@@ -191,18 +198,26 @@
 						[/#list]
 					[/#if]						
 				 </group>
-				 [/#if]
-		 		<group>
-		 			<name>${HALGroup.name!''}</name>
-	 				[#if HALGroup.sourceFilesNameList??]
-			 			[#list HALGroup.sourceFilesNameList as filesName]
+            [/#if]
+                <group>
+                        <name>${HALGroup.name!''}</name>
+                        [#if HALGroup.sourceFilesNameList??]
+                            [#list HALGroup.sourceFilesNameList as filesName]
+                                    <file>
+                                            <name>${filesName!''}</name>
+                                    </file>
+                            [/#list]
+                        [/#if]
+		</group> 
+            <group>
+		    	<name>CMSIS</name>
+			 			[#list cmsisSourceFileNameList as filesName]
 							<file>
-								<name>${filesName!''}</name>
+								<name>${filesName}</name>
 							</file>
 			       		[/#list]
-		   	  		[/#if]
 		    	</group>
-	  		</group>
+	</group>
 	[#else]
 	  		<sourceEntries>
 		    	<sourceEntry>
@@ -219,7 +234,37 @@
 		    			<name>Middlewares</name>
 		    		</sourceEntry>
 		    	 [/#if]
+				 [#-- MZA Bug41441 --]			
+				[#if atLeastOneCmsisPackIsUsed]
+                    <sourceEntry>
+                        <name>Packs</name>
+                    </sourceEntry>
+				[/#if]
 		    </sourceEntries>
+        [#-- add lib path --]        
+        [#if atLeastOneMiddlewareIsUsed]
+                <group>
+	  	<name>Middlewares</name>
+		 [#list groups as group]
+                    [#if group.name!="App" && group.name!="Target" ] 
+		 	<group>
+		 		<name>${group.name!''}</name>
+		 		[#if group.sourceFilesNameList??]
+			 		[#list group.sourceFilesNameList as filesName]
+                                        [#if filesName?ends_with(".a")||filesName?ends_with(".lib")]
+						<file>
+							<name>${filesName!''}</name>
+						</file>
+                                        [/#if]
+                		        [/#list]
+                                [/#if]
+                        </group>
+                    [/#if]
+		 [/#list]
+                </group> 
+            [/#if]
+    	
+        [#-- end lib path --]
     	[/#if]
 		[#list externalGroups as grp]
                 [@getGroups groupArg=grp/]
@@ -228,6 +273,12 @@
 
 [#-- project groups and files --]
 [#if underRoot == "false"]
+[#-- project groups and files --]
+[#--
+ private String m_sGroup = null;
+    private List<String> m_sSubGroup = null;
+    private List<String> m_sSourceFilesNameList;
+--]
     [#if atLeastOneMiddlewareIsUsed]
       <group>
         <name>Middlewares</name>  
@@ -240,6 +291,20 @@
                                             <file>
                                                     <name>${filesName!''}</name>
                                             </file>
+			        [/#list]
+			    [/#if]
+			[#if group.subGroups??]
+		 		[#list group.subGroups as sgroup]
+					[#if sgroup.sourceFilesNameList??]
+					<group>
+						<name>${sgroup.name!''}</name>
+							[#list sgroup.sourceFilesNameList as filesName]
+								<file>
+									<name>${filesName!''}</name>
+								</file>
+                            [/#list]
+                    [/#if]
+					</group>
                             [/#list]
                         [/#if]
                 </group>
@@ -340,31 +405,7 @@
     [/#if]
 
 [#-- App Group Case of Graphics--]
-[#list ApplicationGroups as grp]
-        [#--[#if group.name=="App"]
-            <group>
-                <name>${group.name!''}</name>
-                [#if group.sourceFilesNameList??]
-                    [#list group.sourceFilesNameList as filesName]
-                                <file>
-                                    <name>${filesName!''}</name>
-                                </file>
-                    [/#list]
-                [/#if]
-            </group>
-        [/#if]
-        [#if group.name=="Target"]
-            <group>
-                <name>${group.name!''}</name>
-                [#if group.sourceFilesNameList??]
-                    [#list group.sourceFilesNameList as filesName]
-                                <file>
-                                    <name>${filesName!''}</name>
-                                </file>
-                    [/#list]
-                [/#if]
-            </group>
-        [/#if]--]
+[#list ApplicationGroups as grp]        
                <group>
         <name>${grp.name!''}</name>
             [#if grp.subGroups??]

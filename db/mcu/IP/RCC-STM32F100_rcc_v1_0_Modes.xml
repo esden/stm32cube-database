@@ -61,7 +61,13 @@
         <PossibleValue Comment="15" Value="RCC_HSE_PREDIV_DIV15"/>
         <PossibleValue Comment="16" Value="RCC_HSE_PREDIV_DIV16"/>
     </RefParameter>
-	
+    
+    <RefParameter Visible="false" Name="PLLSourceLL" Comment="PLLSourceLL" Type="list" DefaultValue="+HSEDivPLL">
+        <Condition Expression="((PLLSource=RCC_PLLSOURCE_HSE) &amp; (PLLUsed=1)) " Diagnostic="PLLSource LL"/>        
+    </RefParameter>
+
+    <RefParameter Visible="false" Name="PLLSourceLL" Comment="PLLSourceLL" Type="list" DefaultValue="RCC_PLLSOURCE_HSI_DIV2"/>
+
     <!--diviseur HSE pour RTC-->
     <RefParameter Visible="false" Comment="HSE RTC Divider" Name="RCC_RTC_Clock_Source_FROM_HSE" Type="integer" DefaultValue="128" Max="128" Min="128"/>
   
@@ -147,6 +153,19 @@
         <PossibleValue Comment="Rtcclksource Hse Div32" Value="RCC_RTCCLKSOURCE_HSE_DIV128"/>
        
     </RefParameter>
+    
+    <RefParameter Visible="false" Comment="RTC Clock Source"  DefaultValue="RCC_RTCCLKSOURCE_LSE" Name="RCC_RTC_Clock_SourceLL" Type="list" IP="RTC">
+        <Condition Expression="RTCClockSelection=RCC_RTCCLKSOURCE_LSE" Diagnostic=""/>
+        <PossibleValue Comment="LSE" Value="RCC_RTCCLKSOURCE_LSE"/>
+    </RefParameter>
+    <RefParameter Visible="false" Comment="RTC Clock Source"  DefaultValue="RCC_RTCCLKSOURCE_LSI" Name="RCC_RTC_Clock_SourceLL" Type="list" IP="RTC">
+        <Condition Expression="RTCClockSelection=RCC_RTCCLKSOURCE_LSI" Diagnostic=""/>
+        <PossibleValue Comment="LSI" Value="RCC_RTCCLKSOURCE_LSI"/>
+    </RefParameter>
+    <RefParameter Visible="false" Comment="RTC Clock Source"  DefaultValue="RCC_RTCCLKSOURCE_HSE" Name="RCC_RTC_Clock_SourceLL" Type="list" IP="RTC">
+        <PossibleValue Comment="HSE" Value="RCC_RTCCLKSOURCE_HSE"/>
+    </RefParameter>
+
     <!-- MCO MUX-->
     <RefParameter Visible="false" Comment="MCO Clock Source" DefaultValue="RCC_MCO1SOURCE_SYSCLK" Name="RCC_MCOSource" Type="list">
         <PossibleValue Comment="MCO1SRC SYSCLK" Value="RCC_MCO1SOURCE_SYSCLK"/>
@@ -436,7 +455,7 @@
 	
     <!--  PLL state control-->
     <RefParameter Visible="false" Comment="MainPLL Is Used" DefaultValue="1" Name="PLLUsed" Min="1" Type="integer">
-        <Condition Expression="( (SYSCLKSource=RCC_SYSCLKSOURCE_PLLCLK) | ((RCC_MCOSource=RCC_MCO1SOURCE_PLLCLK) &amp; MCOConfig)  )" Diagnostic=" "/>
+        <Condition Expression="( (SYSCLKSource=RCC_SYSCLKSOURCE_PLLCLK) | ((RCC_MCOSource=RCC_MCO1SOURCE_PLLCLK) &amp; MCOConfig))" Diagnostic=" "/>
     </RefParameter>
     <RefParameter Visible="false" Comment="Main PLL is Used" DefaultValue="0" Name="PLLUsed" Min="0" Type="integer"/>
 	
@@ -617,7 +636,13 @@
         <PossibleValue Comment="1" Value="RCC_MCODIV_1"/>
 
     </RefParameter>
-    
+
+    <!-- PLLUsedForSys used -->
+    <RefParameter Visible="false" Comment="MainPLL Is Used" DefaultValue="1" Name="PLLUsedForSys" Min="1" Max="1" Type="integer">
+        <Condition Expression="((SYSCLKSource=RCC_SYSCLKSOURCE_PLLCLK) | ((RCC_MCOSource=RCC_MCO1SOURCE_PLLCLK) &amp; MCOConfig))" Diagnostic=" "/>
+    </RefParameter>
+
+    <RefParameter Visible="false" Comment="Main PLL is Used" DefaultValue="0" Name="PLLUsedForSys" Min="0" Max="0" Type="integer"/>    
     
     <RefMode Name="ClockTree">
         <ConfigForMode>RCC_OSCConfig</ConfigForMode>        

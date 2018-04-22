@@ -382,7 +382,10 @@
 [#macro generateConfigModelListCode configModel inst nTab index]
 [#assign listofDeclaration = ""]
 [#assign listofCalledMethod = ""]
+[#assign bz36245=false]
+[#assign bz36245_BKPSet=false]
 [#list configModel.configs as config]
+[#assign bz36245=false]
 [#if config.methods??] [#-- if the pin configuration contains a list of LibMethods--]
     [#assign methodList = config.methods]
 [#else] [#assign methodList = config.libMethod]
@@ -434,14 +437,14 @@
                                                 [/#if]
                                 [/#if]
                             [/#if]
-                        [/#if]                     
+                        [/#if]
                         [#if instanceIndex??&&fargument.context=="global"][#if fargument.status!="NULL"][#assign arg = "" + adr + fargument.name + instanceIndex][#else][#assign arg = "NULL"][/#if][#else][#if  fargument.status!="NULL"][#assign arg = "" + adr + fargument.name][#else][#assign arg = "NULL"][/#if][/#if]
                         [#-- [#assign arg = "" + adr + fargument.name] --]
                         [#if ((!method.name?contains("Init")&&fargument.context=="global")||(fargument.optional=="output"))]
                         [#else]
                             [#assign index1 =1] [#-- index of argument struct level1 --]
                         [#list fargument.argument as argument]	
-                             
+
                             [#if argument.genericType != "struct"]
                                 [#if argument.mandatory]
                                 [#if argument.value?? && argument.value!="__NULL"]
@@ -450,10 +453,23 @@
                                     [#else]
                                         [#assign argValue=argument.value]
                                     [/#if][#-- if global --]
+                                    [#-- Bz40086 - Begin tweak of the value in case of ADC --]
+                                    [#if (config.name == "ADC_RegularChannelConfig" || config.name == "ADC_InjectedChannelConfig") && (FamilyName!="STM32F0" && FamilyName!="STM32L0" && FamilyName!="STM32F2" && FamilyName!="STM32F4")]
+                                        [#list argument?keys as k]
+                                            [#if k == "name"]
+                                                [#if argument[k] == "Rank"]
+                                                    [#assign argValue="ADC_REGULAR_RANK_"+argument.value]
+                                                [#elseif argument[k] == "InjectedRank"]
+                                                    [#assign argValue="ADC_INJECTED_RANK_"+argument.value]
+                                                [/#if]
+                                            [/#if]
+                                        [/#list]
+                                    [/#if]                                   
+                                    [#-- Bz40086 End tweak of the value in case of ADC --]
                                     [#if argument.genericType=="Array" && argument.context!="globalConst"][#-- if genericType=Array --]
                                     [#assign valList = argument.value?split(argument.arraySeparator)]     
                                             [#assign i = 0]                                  
-                                        [#list valList as val] 
+                                        [#list valList as val]
                                             [#if argument.base == "10"]
                                                 #t${argument.name}[${i}] = ${val};
                                             [#else]
@@ -471,7 +487,7 @@
                                         [#assign indicator = varName+"."+argument.name+" = "+argValue+" "]
                                         [#assign indicatorName = varName+"."+argument.name]
                                         [#if !listofDeclaration?contains(indicator)][#-- if not repeted --]  
-                                            [#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"][#assign varName=fargument.name +"." +instanceIndex]${fargument.name}${instanceIndex}[#else][#assign varName=fargument.name]${fargument.name}[/#if].${argument.name} = ${argValue};                                        
+                                            [#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"][#assign varName=fargument.name +"." +instanceIndex]${fargument.name}${instanceIndex}[#else][#assign varName=fargument.name]${fargument.name}[/#if].${argument.name} = ${argValue};
                                             [#assign listofDeclaration = listofDeclaration?replace(indicatorName+" =","")]
                                             [#assign listofDeclaration = listofDeclaration +", "+ varName+"."+argument.name+" = "+argValue+" "]                                                                                 
                                         [/#if]
@@ -502,7 +518,21 @@
                                                             [#if index1 == fargument.argument?size]
                                                                 #n
                                                             [/#if]
-                                                  
+                                                            [#if configModel.ipName=="RTC" && config.name=="RTC_Init_Only" && Line!="STM32F0x0 Value Line"]
+                                                                [#list configModel.configs as bz36245config]
+                                                                    [#if bz36245config.name=="RTC_Init"]
+                                                                        [#assign bz36245=true]
+                                                                    [/#if]
+                                                                [/#list]
+                                                            [/#if]
+                                                            [#if bz36245]
+                                                                [#if FamilyName=="STM32F1"]
+                                                                    #tif(HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR1) != 0x32F2){
+                                                                [#else]
+                                                                    if(HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR0) != 0x32F2){
+                                                                [/#if]
+                                                                [#assign bz36245_BKPSet=true]
+                                                            [/#if]
                                                    [/#if]
                                                 [/#if]
                                           [#else]
@@ -521,7 +551,7 @@
                             [#else]
                             [#assign index2=0]
                             [#list argument.argument as argument2]
-[#if argument2.genericType!="struct"] 
+[#if argument2.genericType!="struct"]
                                 [#if argument2.value?? && argument2.value!="__NULL"][#assign argValue=argument2.value][#else] [#assign argValue=""][/#if]
                                 [#if argument2.mandatory]
                                     [#if argument2.value?? && argument2.value!="__NULL"]
@@ -559,6 +589,18 @@
                                                     [/#if]
                                     [/#if]
                                [#else] [#-- !argument.mandatory --]
+                                    [#if argument2.status=="WARNING"]
+                                        [#if argument2.name=="ShieldIOs"]
+                                            [#assign argValue ="0"]
+                                            [#assign indicator = varName+"."+argument.name+"."+argument2.name+" = "+argValue+" "]
+                                            [#if !listofDeclaration?contains(indicator)]  [#-- if not repeted --]
+                                                [#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"]${fargument.name}${instanceIndex}[#else]${fargument.name}[/#if].${argument.name}.${argument2.name} = ${argValue};                                    
+                                                [#if index2 == argument.argument?size]
+                                                        #n [#-- add space line at the end of argument setting --]
+                                                [/#if]
+                                            [/#if]
+                                        [/#if]
+                                    [/#if]
                                     [#if argument2.status=="KO"]
                                         [#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"]//${fargument.name}${instanceIndex}[#else]${fargument.name}[/#if].${argument.name}.${argument2.name} = ${argValue};
                                     [/#if]
@@ -777,6 +819,17 @@
 [#-- assign instanceIndex = "" --]
  [#-- else there is no LibMethod to call--]
 [/#list]
+[#if bz36245_BKPSet]
+    [#if FamilyName=="STM32F1"]
+            #t#tHAL_RTCEx_BKUPWrite(&hrtc,RTC_BKP_DR1,0x32F2);
+        #t}
+    [#else]
+            #t#tHAL_RTCEx_BKUPWrite(&hrtc,RTC_BKP_DR0,0x32F2);
+        #t}
+    [/#if]
+[#else]
+[/#if]
+
 [/#macro]
 [#-- End macro generateConfigModelListCode --]
 
@@ -1572,9 +1625,15 @@ ${bufferType} ${bufferName}[${bufferSize}];
             [#if IPData.initServices.clock??]
                 [#if IPData.initServices.clock!="none"]
                     [#if FamilyName=="STM32F1" && ipName=="RTC"]
-#t#tHAL_PWR_EnableBkUpAccess();
-#t#t/* Enable BKP CLK enable for backup registers */
-#t#t__HAL_RCC_BKP_CLK_ENABLE();                    
+[#if usedDriverFlag?? && !usedDriverFlag?contains("LL")]
+                        #t#tHAL_PWR_EnableBkUpAccess();
+                        #t#t/* Enable BKP CLK enable for backup registers */
+                        #t#t__HAL_RCC_BKP_CLK_ENABLE();    
+                        [#else]
+                        #t#tLL_PWR_EnableBkUpAccess();
+                        #t#t/* Enable BKP CLK enable for backup registers */
+                        #t#tLL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_BKP);
+                        [/#if]                   
                     [/#if]
 [#if tabN == 2]#t[/#if]#t/* Peripheral clock enable */ 
                     [#list IPData.initServices.clock?split(';') as clock]    

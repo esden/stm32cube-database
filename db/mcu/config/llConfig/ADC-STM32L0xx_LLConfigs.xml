@@ -4,14 +4,29 @@
 
 
     <RefConfig Name="ADC_RegularConfig" Comment="Common config">
-		
+        
+        <IFCondition Expression="(ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV1) | (ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV2) |(ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV4) ">
+        <CallLibMethod Name="LL_ADC_Init">
+            <MethodArg Name="ADCx" ParameterName="Instance" />
+            <MethodArg Name="Clock" ParameterName="ClockPrescaler" />
+            <MethodArg Name="Resolution" ParameterName="Resolution" />
+            <MethodArg Name="DataAlignment" ParameterName="DataAlign" />
+            <MethodArg Name="LowPowerMode" ParameterName="LowPowerAutoWait,LowPowerAutoPowerOff" />
+        </CallLibMethod>
+        </IFCondition>
+             
+             
+             <IFCondition Expression="!(ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV1) &amp; !(ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV2)  &amp; !(ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV4) ">
         <CallLibMethod Name="LL_ADC_Init">
             <MethodArg Name="ADCx" ParameterName="Instance" />
             <MethodArg Name="Resolution" ParameterName="Resolution" />
             <MethodArg Name="DataAlignment" ParameterName="DataAlign" />
             <MethodArg Name="LowPowerMode" ParameterName="LowPowerAutoWait,LowPowerAutoPowerOff" />
         </CallLibMethod>
-        <CallLibMethod Name="LL_ADC_REG_Init">
+            
+         </IFCondition>
+      
+          <CallLibMethod Name="LL_ADC_REG_Init">
             <MethodArg Name="ADCx" ParameterName="Instance" />
             <MethodArg Name="TriggerSource" ParameterName="ExternalTrigConv" />
             <MethodArg Name="SequencerDiscont" ParameterName="DiscontinuousConvMode" />
@@ -19,12 +34,22 @@
             <MethodArg Name="DMATransfer" ParameterName="DMAContinuousRequests" />
             <MethodArg Name="Overrun" ParameterName="Overrun" />
         </CallLibMethod>
-        
-        <CallLibMethod Name="LL_ADC_SetClock">
+          <IFCondition Expression="!(ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV1) &amp; !(ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV2)  &amp; !(ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV4) ">
+              <CallLibMethod Name="LL_ADC_SetClock">
             <MethodArg Name="ADCx" ParameterName="Instance" />
-            <MethodArg Name="ClockSource" ParameterName="ClockPrescaler" />
-            
+            <MethodArg Name="Clock" ParameterName="ClockPrescaler" />
         </CallLibMethod>
+         
+         <CallLibMethod Name="LL_ADC_SetCommonClock">
+            <MethodArg Name="ADCxy_COMMON">
+                <CallLibMethod Name="__LL_ADC_COMMON_INSTANCE">
+                    <MethodArg Name="ADCx" ParameterName="Instance" />
+                </CallLibMethod>
+            </MethodArg>
+            <MethodArg Name="CommonClock" ParameterName="CommonClock" />
+        </CallLibMethod>
+         </IFCondition>
+       
         <IFCondition Expression="!(ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE)">
             <CallLibMethod Name="LL_ADC_REG_SetTriggerEdge">
                 <MethodArg Name="ADCx" ParameterName="Instance" />
@@ -84,7 +109,7 @@
 
     <RefConfig Name="ADC_RegularChannelConfig" Comment="Configure Regular Channel">
             
-        <CallLibMethod Name="LL_ADC_REG_SetSequencerChannels">
+        <CallLibMethod Name="LL_ADC_REG_SetSequencerChAdd">
             <MethodArg Name="ADCx" ParameterName="Instance" />
             <MethodArg Name="Channel" ParameterName="Channel" />
         </CallLibMethod>
@@ -164,7 +189,7 @@
     <LibMethod Comment="" Name="LL_ADC_SetClock">
         <Argument AddressOf="false" GenericType="baseaddress" Name="ADCx"
                           TypeName="ADC_TypeDef" />
-        <Argument AddressOf="false" GenericType="simple" Name="ClockSource"
+        <Argument AddressOf="false" GenericType="simple" Name="Clock"
                           OptimizationCondition="equal" />
     </LibMethod>
     <LibMethod Comment="" Name="LL_ADC_REG_SetTriggerEdge">
@@ -218,6 +243,12 @@
         <Argument AddressOf="false" GenericType="simple" Name="Resolution"
                           OptimizationCondition="equal" />
     </LibMethod>
+    <LibMethod Comment="" Name="LL_ADC_SetCommonClock">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="ADCxy_COMMON"
+                          TypeName="ADC_Common_TypeDef" />
+        <Argument AddressOf="false" GenericType="simple" Name="CommonClock"
+                          OptimizationCondition="equal" />
+    </LibMethod>
     <LibMethod Comment="" Name="LL_ADC_EnableIT_EOC">
         <Argument AddressOf="false" GenericType="baseaddress" Name="ADCx"
                           TypeName="ADC_TypeDef" />
@@ -235,7 +266,7 @@
         <Argument AddressOf="false" GenericType="baseaddress" Name="ADCx"
                           TypeName="ADC_TypeDef" />
     </LibMethod>
-    <LibMethod Comment="" Name="LL_ADC_REG_SetSequencerChannels">
+    <LibMethod Comment="" Name="LL_ADC_REG_SetSequencerChAdd">
         <Argument AddressOf="false" GenericType="baseaddress" Name="ADCx"
                           TypeName="ADC_TypeDef" />
         <Argument AddressOf="false" GenericType="simple" Name="Channel"

@@ -1,12 +1,13 @@
 [#ftl]
 /**
   ******************************************************************************
-  * @file    sdram_diskio.h (based on sdram_diskio_template.h)
+  * @file    sdram_diskio.h (based on sdram_diskio_template.h v2.0.2)
   * @brief   Header for sdram_diskio.c module
   ******************************************************************************
 [@common.optinclude name="Src/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
+
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __SDRAM_DISKIO_H
 #define __SDRAM_DISKIO_H
@@ -29,3 +30,4 @@ extern const Diskio_drvTypeDef  SDRAMDISK_Driver;
 #endif /* __SDRAM_DISKIO_H */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
+

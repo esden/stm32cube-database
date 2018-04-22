@@ -25,7 +25,7 @@
 		<PossibleValue Comment="R0.11" Value="11" />
     </RefParameter>
     <!-- In case we want to support multi-versions on a single series, could be like that:
-    <RefParameter Name="FATFS_version" Comment="FATFS version" DefaultValue="11" Type="list" Group="Version" TabName="Set Defines">
+    <RefParameter Name="FATFS_version" Comment="FATFS version" DefaultValue="12" Type="list" Group="Version" TabName="Set Defines">
         <PossibleValue Comment="R0.11" Value="11"/>
         <PossibleValue Comment="R0.12c" Value="12"/>
         <PossibleValue Comment="R0.13" Value="13"/>
@@ -269,16 +269,16 @@
 
     <!-- New from R12 -->
     <RefParameter Name="USE_DMA_CODE_SD" Comment="Use dma template" DefaultValue="1" Type="list" Group="SDIO/SDMMC" TabName="IPs instances">
-        <Condition Diagnostic="Must be enabled with FreeRTOS" Expression="(FATFS_version &gt; 11) &amp; S_FATFS_SDIO &amp; S_FREERTOS"/>
+        <Condition Diagnostic="Forced to enabled with FreeRTOS" Expression="(FATFS_version &gt; 11) &amp; S_FATFS_SDIO &amp; S_FREERTOS"/>
         <PossibleValue Comment="Enabled" Value="1"/>
-        <Description>When enabled, generate code using DMA.&lt;br&gt;DMA always enabled to ensure sync and notification mechanism under control by FreeRTOS.</Description>
+        <Description>When enabled, generate code based on sd_diskio_dma_rtos_template.* files. Please ensure that the DMA controller to be used is properly configured.&lt;br&gt;Note: DMA choice forced to enabled to ensure sync and notification mechanism under FreeRTOS control.</Description>
     </RefParameter>
 
     <RefParameter Name="USE_DMA_CODE_SD" Comment="Use dma template" DefaultValue="1" Type="list" Group="SDIO/SDMMC" TabName="IPs instances">
         <Condition Diagnostic="Choice possible when FreeRTOS is disabled." Expression="(FATFS_version &gt; 11) &amp; S_FATFS_SDIO"/>
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
-        <Description>When enabled, generate code using DMA (recommended choice). </Description>
+        <Description>When enabled, generate code based on sd_diskio_dma_template.* files (recommended choice). Please ensure that the DMA controller to be used is properly configured.&lt;br&gt;When disabled, generate code based on sd_diskio_template.* files</Description>
     </RefParameter>
 
 	<RefParameter Name="USE_DMA_CODE_SD" Comment="Use dma template" DefaultValue="0" Type="list" Group="SDIO/SDMMC" TabName="IPs instances" Visible="false"> 
@@ -288,11 +288,13 @@
     <RefParameter Name="USE_DMA_CODE_USBH" Comment="Use dma template" DefaultValue="1" Type="list" Group="USBH" TabName="IPs instances">
         <Condition Diagnostic="Forced to enabled (internal DMA IP being enabled)" Expression="(FATFS_version &gt; 11) &amp; S_FATFS_USB &amp; (HS_DMA_ENABLED|FS_DMA_ENABLED)"/>
         <PossibleValue Comment="Enabled" Value="1"/>
+        <Description>Generate code based on usbh_diskio_dma_template.* files.</Description>
     </RefParameter>
 
     <RefParameter Name="USE_DMA_CODE_USBH" Comment="Use dma template" DefaultValue="0" Type="list" Group="USBH" TabName="IPs instances">
         <Condition Diagnostic="Forced to disabled (internal DMA IP being disabled)" Expression="(FATFS_version &gt; 11) &amp; S_FATFS_USB"/>
         <PossibleValue Comment="Disabled" Value="0"/>
+        <Description>Generate code based on usbh_diskio_template.* files.</Description>
     </RefParameter>
 
 	<RefParameter Name="USE_DMA_CODE_USBH" Comment="Use dma template" DefaultValue="0" Type="list" Group="USBH" TabName="IPs instances" Visible="false"> 

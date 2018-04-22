@@ -2,11 +2,13 @@
 /**
   ******************************************************************************
   * @file           : usbh_platform.c
-  * @brief          : source file for the usbh_platform file
+
+  * @brief          : This file implements the USB platform
   ******************************************************************************
 [@common.optinclude name="Src/license.tmp"/][#--include License text --]
   ******************************************************************************
-*/
+  */
+
 [#-- BspIpDatas is a list of SWIPconfigModel --]  
 [#assign instNameFS = ""]
 [#assign instNameHS = ""]
@@ -62,8 +64,13 @@
 [/#if]
 [/#list]
 
-
+/* Includes ------------------------------------------------------------------*/
 #include "usbh_platform.h"
+
+/* USER CODE BEGIN INCLUDE */
+
+/* USER CODE END INCLUDE */
+
 [#if instNameFS == "FS"]
 [#if IpNameFS?contains("GPIO")]
 [#else]
@@ -83,14 +90,13 @@ extern ${IpNameHS}_HandleTypeDef h${IpInstanceHS?lower_case};
 
 [#if IpNameFS != ""]
 /**
-  * @brief  MX_DriverVBUS 
-  *         Drive VBUS.
+  * @brief  Drive VBUS.
   * @param  state : VBUS state
   *          This parameter can be one of the these values:
-  *           0 : VBUS Active 
-  *           1 : VBUS Inactive
+  *           - 0 : VBUS Active
+  *           - 1 : VBUS Inactive
   */
-void MX_DriverVbusFS( uint8_t state) 
+void MX_DriverVbusFS(uint8_t state)
 { 
 [#if IpNameFS?contains("GPIO")]
   uint8_t data = state; 
@@ -114,20 +120,20 @@ void MX_DriverVbusFS( uint8_t state)
   [/#if]   
   [#if IpNameFS?contains("I2C")]
   uint8_t Component_Addr = ${I2CAddrFS} << 1;    
-  /* USER CODE BEGIN PREPARE_I2C_DATA_VBUS_FS */    
+  /* USER CODE BEGIN PREPARE_I2C_DATA_VBUS_FS */
   uint8_t data = state;
-  /* USER CODE END PREPARE_I2C_DATA_VBUS_FS */  
+  /* USER CODE END PREPARE_I2C_DATA_VBUS_FS */
   uint8_t data_tmp = 0;
   status = HAL_${IpNameFS}_Mem_Read(&h${IpInstanceFS?lower_case}, Component_Addr, (uint16_t)Component_Reg, ${IpNameFS}_MEMADD_SIZE_8BIT, &data_tmp, 1, 100);
   data |= data_tmp;
   status = HAL_${IpNameFS}_Mem_Write(&h${IpInstanceFS?lower_case},Component_Addr,(uint16_t)Component_Reg, ${IpNameFS}_MEMADD_SIZE_8BIT,&data, 1, 100);
-  /* USER CODE BEGIN CHECK_STATUS_VBUS_FS */   
+  /* USER CODE BEGIN CHECK_STATUS_VBUS_FS */
   /* Check the communication status */
   if(status != HAL_OK)
   {
   
   }
-  /* USER CODE END CHECK_STATUS_VBUS_FS */  
+  /* USER CODE END CHECK_STATUS_VBUS_FS */
   [/#if]
 [/#if]
 }
@@ -135,14 +141,13 @@ void MX_DriverVbusFS( uint8_t state)
 
 [#if IpNameHS != ""]
 /**
-  * @brief  MX_DriverVbusHS
-  *         Drive VBUS.
+  * @brief  Drive VBUS.
   * @param  state : VBUS state
   *          This parameter can be one of the these values:
-  *           0 : VBUS Active 
-  *           1 : VBUS Inactive
+  *          - 0 : VBUS Active
+  *          - 1 : VBUS Inactive
   */
-void MX_DriverVbusHS( uint8_t state) 
+void MX_DriverVbusHS(uint8_t state)
 { 
 [#if IpNameHS?contains("GPIO")]
   uint8_t data = state; 
@@ -173,14 +178,16 @@ void MX_DriverVbusHS( uint8_t state)
   status = HAL_${IpNameHS}_Mem_Read(&h${IpInstanceHS?lower_case}, Component_Addr, (uint16_t)Component_Reg, ${IpNameHS}_MEMADD_SIZE_8BIT, &data_tmp, 1, 100); 
   data |= data_tmp;
   status = HAL_${IpNameHS}_Mem_Write(&h${IpInstanceHS?lower_case},Component_Addr,(uint16_t)Component_Reg, ${IpNameHS}_MEMADD_SIZE_8BIT,&data, 1, 100);  
-  /* USER CODE BEGIN CHECK_STATUS_VBUS_HS */   
+  /* USER CODE BEGIN CHECK_STATUS_VBUS_HS */
   /* Check the communication status */
   if(status != HAL_OK)
   {
   
   }
-   /* USER CODE END CHECK_STATUS_VBUS_HS */  
+  /* USER CODE END CHECK_STATUS_VBUS_HS */
   [/#if]
 [/#if]
 }
 [/#if]
+
+/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

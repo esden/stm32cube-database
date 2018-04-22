@@ -23,12 +23,12 @@
   ******************************************************************************
 [#if use_dma = 1]
  [#if use_rtos = 1]
-  * @file    sd_diskio.h (based on sd_diskio_dma_rtos_template.h v2.0.1)
+  * @file    sd_diskio.h (based on sd_diskio_dma_rtos_template.h v2.0.2)
  [#else]
-  * @file    sd_diskio.h (based on sd_diskio_dma_template.h v2.0.1)
+  * @file    sd_diskio.h (based on sd_diskio_dma_template.h v2.0.2)
  [/#if]
 [#else]
-  * @file    sd_diskio.h (based on sd_diskio_template.h v2.0.1)
+  * @file    sd_diskio.h (based on sd_diskio_template.h v2.0.2)
 [/#if]
   * @brief   Header for sd_diskio.c module
   ******************************************************************************

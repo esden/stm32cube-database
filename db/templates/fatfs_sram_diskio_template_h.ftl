@@ -1,7 +1,7 @@
 [#ftl]
 /**
   ******************************************************************************
-  * @file    sram_diskio.h (based on sram_diskio_template.h)
+  * @file    sram_diskio.h (based on sram_diskio_template.h v2.0.2)
   * @brief   Header for sram_diskio.c module
   ******************************************************************************
 [@common.optinclude name="Src/license.tmp"/][#--include License text --]
