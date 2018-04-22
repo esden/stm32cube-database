@@ -13,7 +13,7 @@
 [/#list]
 /**
   ******************************************************************************
-  * File Name          : main.h
+  * File Name          : main.hpp
   * Description        : This file contains the common defines of the application
   ******************************************************************************
 [@common.optinclude name="Src/license.tmp"/][#--include License text --]
@@ -86,6 +86,44 @@
 [/#compress]
 #n
 
+/* Includes ------------------------------------------------------------------*/
+[#compress]
+[#if GRAPHICS??]
+[#if USE_OTM??]
+    #include "otm8009a.h"
+[/#if]
+    #include "${FamilyName?lower_case}xx_hal.h"
+    [#if USE_STemWin_STACK??]
+        #include "GUI.h"        
+        [#if USE_ILI??]
+            #include "ili9341.h"
+        [/#if]
+        #include "HW_Init.h"
+        [#if Display_Interface_FMC??]
+            #include "WM.h"
+        [/#if]
+        #include "GUI_App.h"
+        #include "STemWin_wrapper.h"
+    [/#if]
+    [#if USE_Embedded_Wizard_STACK??]
+        #include "xprintf.h"
+        #include "tlsf.h"
+        #include "ewrte.h"
+        #include "ewgfx.h"
+        #include "ewextgfx.h"
+        #include "ewgfxdefs.h"
+        #include "Core.h"
+        #include "Graphics.h"
+
+        [#-- #include "ew_bsp_system.h"
+        #include "ew_bsp_clock.h"
+        #include "ew_bsp_event.h"
+        #include "ew_bsp_display.h"
+        #include "ew_bsp_touch.h"
+        #include "ew_bsp_serial.h" --]
+    [/#if]
+[/#if]
+[/#compress]
 /* USER CODE BEGIN Includes */
 
 /* USER CODE END Includes */
@@ -119,21 +157,33 @@
                                                                  0 bit  for subpriority */
 #endif
 
+[/#if]
+
+[#list voids as void]
+  [#if void.bspUsed?? && void.bspUsed]
+void ${""?right_pad(2)}${void.functionName}(void);
+  [/#if]
+[/#list] 
 /* ########################## Assert Selection ############################## */
 /**
   * @brief Uncomment the line below to expanse the "assert_param" macro in the 
   *        HAL drivers code
   */
-[#if !fullAssert??]/*[/#if] #define USE_FULL_ASSERT    1 [#if !fullAssert??]*/[/#if]
-[/#if]
+[#if !fullAssert??]/*[/#if] #define USE_FULL_ASSERT    1U [#if !fullAssert??]*/[/#if]
 
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
 #n
+#ifdef __cplusplus
+ extern "C" {
+#endif
 void _Error_Handler(char *, int);
 
 #define Error_Handler() _Error_Handler(__FILE__, __LINE__)
+#ifdef __cplusplus
+}
+#endif
 #n
 /**
 #t* @}

@@ -535,12 +535,15 @@
   [#assign instName = instanceData.instanceName]
   [#assign halMode= instanceData.halMode]
 /* ${instName} initialization function */
-  [#if ipvar.ipName=="FMC"||ipvar.ipName=="FSMC"]
+[#if instanceData.isMWUsed=="false"]  
+[#if ipvar.ipName=="FMC"||ipvar.ipName=="FSMC"]
+
 static void MX_${instName}_Init(void)
   [#else]
     [#if halMode!=name]void MX_${instName}_${halMode}_Init(void)[#else]void MX_${instName}_Init(void)[/#if]
   [/#if]
 {
+[/#if]
   [#assign args = ""]
   [#assign listOfLocalVariables=""]
   [#assign resultList=""]
@@ -552,7 +555,9 @@ static void MX_${instName}_Init(void)
   [#list instanceData.configs as config]
     [@generateConfigModelCode configModel=config inst=instName nTab=1/]
   [/#list]
+[#if instanceData.isMWUsed=="false"]  
 }
+[/#if]
 [/#list]
 [/#compress]
 [/#list]

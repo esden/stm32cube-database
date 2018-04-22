@@ -16,7 +16,7 @@
 
 #ifdef MBEDTLS_ENTROPY_HARDWARE_ALT
 
-#include "main.h"
+#include "${main_h}"
 #include "string.h"
 #include "${FamilyName?lower_case}xx_hal.h"
 #include "mbedtls/entropy_poll.h"

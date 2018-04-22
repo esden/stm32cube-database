@@ -41,7 +41,7 @@
  extern "C" {
 #endif
 
-#include "main.h"
+#include "${main_h}"
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
 
@@ -149,7 +149,7 @@
   * @brief Uncomment the line below to expanse the "assert_param" macro in the 
   *        HAL drivers code
   */
-[#if !fullAssert??]/*[/#if] #define USE_FULL_ASSERT    1 [#if !fullAssert??]*/[/#if]
+[#if !fullAssert??]/*[/#if] #define USE_FULL_ASSERT    1U [#if !fullAssert??]*/[/#if]
 
 /* ################## Ethernet peripheral configuration ##################### */
 

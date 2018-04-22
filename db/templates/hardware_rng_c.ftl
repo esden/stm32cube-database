@@ -53,12 +53,12 @@
 
 #ifdef MBEDTLS_ENTROPY_HARDWARE_ALT
 
-#include "main.h"
+#include "${main_h}"
 #include "string.h"
 #include "${FamilyName?lower_case}xx_hal.h"
 #include "mbedtls/entropy_poll.h"
 
-extern RNG_HandleTypeDef RngHandle;
+extern RNG_HandleTypeDef hrng;
 
 int mbedtls_hardware_poll( void *Data, unsigned char *Output, size_t Len, size_t *oLen )
 {
@@ -67,7 +67,7 @@ int mbedtls_hardware_poll( void *Data, unsigned char *Output, size_t Len, size_t
 		
   for (index = 0; index < Len/4; index++)
   {
-    if (HAL_RNG_GenerateRandomNumber(&RngHandle, &randomValue) == HAL_OK)
+    if (HAL_RNG_GenerateRandomNumber(&hrng, &randomValue) == HAL_OK)
     {
       *oLen += 4;
       memset(&(Output[index * 4]), (int)randomValue, 4);

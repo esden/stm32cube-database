@@ -1060,7 +1060,18 @@
         </RefParameter>
 	
         <RefParameter Visible="false" Comment="Main PLL is Used" DefaultValue="0" Name="PLLUsedForSys" Min="0" Max="0" Type="integer"/>
-        
+
+        <!-- PLLSAIUsedFor48 used -->
+        <RefParameter Visible="false" Comment="PLL SAI Used For 48" DefaultValue="1" Name="PLLSAIUsedFor48" Min="1" Max="1" Type="integer">
+            <Condition Expression="(USBSourceisPLLSAIP &amp; (USB_OTG_HSEmbeddedPHYUsed_ForRCC|RNGUsed_ForRCC|USB_OTG_FSUsed_ForRCC|(SDIOUsed_ForRCC &amp; SDIOSourceIsClock48)))" Diagnostic=" "/>
+        </RefParameter>
+	
+        <RefParameter Visible="false" Comment="PLL SAI Used For 48" DefaultValue="0" Name="PLLSAIUsedFor48" Min="0" Max="0" Type="integer"/> 
+        <!-- CK48UsedForSDIO used -->
+        <RefParameter Visible="false" Comment="CK48 Used For SDIO" DefaultValue="1" Name="CK48UsedForSDIO" Min="1" Max="1" Type="integer">
+            <Condition Expression="(SDIOUsed_ForRCC &amp; SDIOSourceIsClock48)" Diagnostic=" "/>
+        </RefParameter>
+        <RefParameter Visible="false" Comment="CK48 Used For SDIO" DefaultValue="0" Name="CK48UsedForSDIO" Min="0" Max="0" Type="integer"/>        
         <!-- PLLUsedForCK48 used -->
         <RefParameter Visible="false" Comment="MainPLL Is Used" DefaultValue="1" Name="PLLUsedForCK48" Min="1" Max="1" Type="integer">
             <Condition Expression="USBSourceisPLLQ &amp; (USB_OTG_HSEmbeddedPHYUsed_ForRCC|RNGUsed_ForRCC|USB_OTG_FSUsed_ForRCC|(SDIOUsed_ForRCC &amp; SDIOSourceIsClock48))" Diagnostic=" "/>
@@ -1103,7 +1114,7 @@
     </RefParameter>
     <RefParameter Visible="false" Comment="Periph Clock Selection" Name="PeriphClockSelectionARG" DefaultValue="null" Type="list"/>
 	
-    <RefParameter Visible="false" Comment="Periph Clock Selection" Name="PeriphClockSelection" DefaultValue="+RCC_PERIPHCLK_PLLI2SVar+|RCC_PERIPHCLK_I2SVar+|RCC_PERIPHCLK_SAIAVar+|RCC_PERIPHCLK_SAIBVar+|RCC_PERIPHCLK_TIMVar+|RCC_PERIPHCLK_RTCVar+|RCC_PERIPHCLK_SDIOVar+|RCC_PERIPHCLK_CK48Var+" Type="list"/>
+    <RefParameter Visible="false" Comment="Periph Clock Selection" Name="PeriphClockSelection" DefaultValue="+RCC_PERIPHCLK_PLLI2SVar+|RCC_PERIPHCLK_I2SVar+|RCC_PERIPHCLK_SAIAVar+|RCC_PERIPHCLK_SAIBVar+|RCC_PERIPHCLK_TIMVar+|RCC_PERIPHCLK_RTCVar+|RCC_PERIPHCLK_SDIOVar+|RCC_PERIPHCLK_CK48Var+|RCC_PERIPHCLK_LTDCVar" Type="list"/>
 
 	
 	
@@ -1127,7 +1138,13 @@
         <PossibleValue Value="RCC_PERIPHCLK_I2S" Comment="RCC_PERIPHCLK_I2S"/>
     </RefParameter>
     <RefParameter Visible="false" Name="RCC_PERIPHCLK_I2SVar" Comment="RCC_PERIPHCLK_I2SVar" Type="list" DefaultValue=""/>	
-	
+
+    
+    <RefParameter Visible="false" Name="RCC_PERIPHCLK_LTDCVar" Comment="RCC_PERIPHCLK_LTDCVar" Type="list" DefaultValue="RCC_PERIPHCLK_LTDC">
+        <Condition Expression="LTDCUsed_ForRCC" Diagnostic="LTDC Activated"/>
+        <PossibleValue Value="RCC_PERIPHCLK_LTDC" Comment="RCC_PERIPHCLK_LTDC"/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="RCC_PERIPHCLK_LTDCVar" Comment="RCC_PERIPHCLK_LTDCVar" Type="list" DefaultValue=""/>	
 	
     <RefParameter Visible="false" Name="RCC_PERIPHCLK_SAIAVar" Comment="RCC_PERIPHCLK_SAIAVar" Type="list" DefaultValue="RCC_PERIPHCLK_SAI_PLLSAI">
         <Condition Expression="SAIAUsed_ForRCC &amp; SAIASourceIsPLLSAI" Diagnostic="SAI Activated and source is PLLSAI"/>
@@ -1285,7 +1302,7 @@
     </RefParameter>
     <RefParameter Visible="false" Comment="PLLStateARG" DefaultValue="RCC_PLL_NONE" Name="PLLStateARG" Type="list"/>
     <RefParameter Visible="false" Comment="PLLSourceARG" DefaultValue="+PLLSource" Name="PLLSourceARG" Type="list">
-        <Condition Expression="PLLUsed=1|SysSourceIsPLLclk|(DSISourceisPLLR &amp; DSIUsed_ForRCC)|(USBSourceisPLLQ &amp; (USB_OTG_FSUsed_ForRCC|USB_OTG_HSEmbeddedPHYUsed_ForRCC|(SDIOSourceIsClock48 &amp; SDIOUsed_ForRCC)))" Diagnostic=""/>
+        <Condition Expression="PLLSAIUsed=1|PLLI2SUsed=1|PLLUsed=1|SysSourceIsPLLclk|(DSISourceisPLLR &amp; DSIUsed_ForRCC)|(USBSourceisPLLQ &amp; (USB_OTG_FSUsed_ForRCC|USB_OTG_HSEmbeddedPHYUsed_ForRCC|(SDIOSourceIsClock48 &amp; SDIOUsed_ForRCC)))" Diagnostic=""/>
     </RefParameter>
     <RefParameter Visible="false" Comment="PLLSourceARG" DefaultValue="null" Name="PLLSourceARG" Type="list"/>
     <RefParameter Visible="false" Comment="PLLMARG" DefaultValue="+PLLM" Name="PLLMARG" Type="list">
@@ -1400,7 +1417,7 @@
 	<RefParameter Name="VDD_VALUE" Comment="VDD voltage (V)" DefaultValue="3.3" Max="3.6" Min="1.7" Type="double" Unit="V" Group="System Parameters">
     
     
-    </RefParameter>	
+    </RefParameter>
     <RefParameter Name="FLatency" Comment="Flash Latency(WS)" Type="uniqueElementList" DefaultValue="FLASH_LATENCY_0" Group="System Parameters">
         <Condition Diagnostic="" Expression="
 		((((VDD_VALUE &gt; 2.7)|(VDD_VALUE = 2.7)) &amp; ((VDD_VALUE &lt; 3.6)|(VDD_VALUE =3.6))) &amp;  ((HCLKFreq_Value &gt; 0) &amp; ((HCLKFreq_Value &lt; 30000000)|(HCLKFreq_Value =30000000))))|
@@ -1545,7 +1562,7 @@
     </RefParameter>
     <RefParameter Visible="false" Name="PLLSourceMARGForMacro" Comment="PLLSourceMARGForMacro" Type="list" DefaultValue="null"/>
 	
-    
+    <RefParameter Visible="false" Comment="Overdrive enable" DefaultValue="1" Name="OverDriveEnable" Type="integer" Min="1" Max="1"/>
     <RefMode Name="ClockTree">
 	    <ConfigForMode>RCC_PLL_PLLM_CONFIG</ConfigForMode>
         <ConfigForMode>RCC_PLL_PLLSOURCE_CONFIG</ConfigForMode>

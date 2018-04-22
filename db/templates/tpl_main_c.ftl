@@ -1,34 +1,50 @@
 [#ftl]
+[#if GRAPHICS??]
+[#assign coreDir="Core/"]
+[#else]
+[#assign coreDir=""]
+[/#if]
 /**
   ******************************************************************************
   * File Name          : main.c
   * Description        : Main program body
   ******************************************************************************
-[@common.optinclude name="Src/license.tmp"/][#--include License text --]
+[@common.optinclude name=coreDir+"Src/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
+
 [#compress]
 [#assign usb_device = false]
 /* Includes ------------------------------------------------------------------*/
-#include "main.h"
+#include "${main_h}"
 [#if isHalSupported?? && isHALUsed?? ]
 #include "${FamilyName?lower_case}xx_hal.h"
 [/#if]
 [#if H7_ETH_NoLWIP?? &&HALCompliant??]
 #include "string.h"
 [/#if]
-
 [#-- IF GFXMMU is used and all is generated in the main and the Lut is configured--]
 [#if GFXMMUisUsed?? && HALCompliant??]
-[@common.optincludeFile path="Inc" name="gfxmmu_lut.h"/]
+[@common.optincludeFile path=coreDir+"Inc" name="gfxmmu_lut.h"/]
 [/#if]
 [#-- move includes to main.h --]
-[@common.optinclude name="Src/rtos_inc.tmp"/][#--include freertos includes --]
+[@common.optinclude name=coreDir+"Src/rtos_inc.tmp"/][#--include freertos includes --]
 [#-- if !HALCompliant??--][#-- if HALCompliant Begin --]
+[#assign LWIPUSed = "false"]
+[#assign MBEDTLSUSed = "false"]
 [#list ips as ip]
-[#if !ip?contains("FREERTOS") && !ip?contains("NVIC")&& !ip?contains("CORTEX")]
-#include "${ip?lower_case}.h"
+[#if ip?contains("LWIP")]
+[#assign LWIPUSed = "true"]
 [/#if]
+[#if ip=="MBEDTLS"]
+[#assign MBEDTLSUSed = "true"]
+[/#if]
+[/#list]
+[#list ips as ip]
+[#if !ip?contains("FREERTOS") && !ip?contains("NVIC")&& !ip?contains("CORTEX")&& !ip?contains("GRAPHICS")]
+[#if !ip?contains("LWIP") || (ip?contains("LWIP") && (MBEDTLSUSed=="false"))]
+#include "${ip?lower_case}.h"
+[/#if][/#if]
 [#if ip?contains("USB_DEVICE")]
 [#assign usb_device = true]
 [/#if]
@@ -114,25 +130,25 @@ ${dHandle};
     [#compress]
     [#-- BDMA global variables --]
     [#-- ADD BDMA Code Begin--]
-    [@common.optinclude name="Src/BDMA_GV.tmp"/]
+    [@common.optinclude name=coreDir+"Src/BDMA_GV.tmp"/]
     [#-- ADD BDMA Code End--]
     [#-- DMA global variables --]
     [#-- ADD DMA Code Begin--]
-    [@common.optinclude name="Src/dma_GV.tmp"/]
+    [@common.optinclude name=coreDir+"Src/dma_GV.tmp"/]
     [#-- ADD DMA Code End--]
     [#-- ADD MDMA Code Begin--]
-    [@common.optinclude name="Src/MDMA_GV.tmp"/]
+    [@common.optinclude name=coreDir+"Src/MDMA_GV.tmp"/]
     [#-- ADD MDMA Code End--]
     [#-- FMCGlobal variables --]
     [#-- Add FMC Code Begin--]
-    [@common.optinclude name="Src/mx_fmc_GV.tmp"/]
+    [@common.optinclude name=coreDir+"Src/mx_fmc_GV.tmp"/]
     [#--ADD FMC Code End--]
     [#-- Add FSMC Code Begin--]
-    [@common.optinclude name="Src/mx_fsmc_GV.tmp"/]
+    [@common.optinclude name=coreDir+"Src/mx_fsmc_GV.tmp"/]
     [#--ADD FSMC Code End--] 
     [#-- RTOS variables --]
     [#-- ADD RTOS Code Begin--]
-    [@common.optinclude name="Src/rtos_vars.tmp"/]   
+    [@common.optinclude name=coreDir+"Src/rtos_vars.tmp"/]   
     [#-- ADD RTOS Code End--]
     [/#compress]
 [/#if][#-- if HALCompliant End --] 
@@ -180,12 +196,16 @@ static void MPU_Config(void);
 [#if HALCompliant??]
  [#list voids as void]
   [#if !void.functionName?contains("FREERTOS")&&void.functionName!="Init"&&!void.functionName?contains("FATFS")&& !void.functionName?contains("LWIP")&& !void.functionName?contains("MBEDTLS")&& !void.functionName?contains("USB_DEVICE")&& !void.functionName?contains("USB_HOST")&& !void.functionName?contains("CORTEX")&& !void.functionName?contains("SystemClock_Config")&& !void.functionName?contains("LIBJPEG")] 
-[#if !void.isNotGenerated]
+[#if !void.isNotGenerated&&!void.functionName?contains("GRAPHICS")]
 static void ${""?right_pad(2)}${void.functionName}(void);
+  [/#if]
+  [#if !void.isNotGenerated&&void.functionName?contains("GRAPHICS")]
+extern void ${""?right_pad(2)}${void.functionName}(void);
+extern void GRAPHICS_MainTask(void);
   [/#if]
   [/#if]
  [/#list]
- [@common.optinclude name="Src/rtos_pfp.tmp"/]
+ [@common.optinclude name=coreDir+"Src/rtos_pfp.tmp"/]
 [/#if]
 [#if vectors??]
 static void MX_NVIC_Init(void);
@@ -289,7 +309,7 @@ int main(void)
 [#list voids as void]
 [#if void.functionName?? && !void.functionName?contains("FREERTOS")&&!void.functionName?contains("CORTEX")&& !void.functionName?contains("SystemClock_Config")&&void.functionName!="Init"]
 [#if !void.isNotGenerated]
-[#if (FREERTOS?? && void.ipType=="peripheral") || !FREERTOS??]
+[#if ((FREERTOS?? && void.ipType=="peripheral") || !FREERTOS??) && void.functionName!="GRAPHICS_Init"]
 #t${void.functionName}();
 [/#if]
 [/#if]
@@ -307,20 +327,33 @@ int main(void)
 #t/* USER CODE END 2 */
 #n
 [#if FREERTOS??] [#-- If FreeRtos is used --]
+    [#if GRAPHICS??]
+#t/* Initialise the graphical stack engine */
+#tGRAPHICS_Init();#n      
+      [/#if]
   [#if HALCompliant??]
-  [@common.optinclude name="Src/rtos_HalInit.tmp"/] [#-- include generated tmp file22 Augst 2014 --]
+  [@common.optinclude name=coreDir+"Src/rtos_HalInit.tmp"/] [#-- include generated tmp file22 Augst 2014 --]
   [#else]
   /* Call init function for freertos objects (in freertos.c) */
   MX_FREERTOS_Init();
   [/#if]
 
-  [@common.optinclude name="Src/rtos_start.tmp"/] [#-- include generated tmp file 13 Nov 2014 --] 
+  [@common.optinclude name=coreDir+"Src/rtos_start.tmp"/] [#-- include generated tmp file 13 Nov 2014 --] 
   /* We should never get here as control is now taken by the scheduler */
 [/#if]
 
 [#-- if !FREERTOS?? --] 
 #n
-
+[#if GRAPHICS?? && !FREERTOS??]
+/* Initialise the graphical stack engine */
+  GRAPHICS_Init();
+  
+  /* Graphic application */  
+  GRAPHICS_MainTask();
+    
+  /* Infinite loop */
+  for(;;);
+[#else]
 #t/* Infinite loop */
 #t/* USER CODE BEGIN WHILE */
 #twhile (1)
@@ -334,7 +367,7 @@ int main(void)
 
 #t}
 #t/* USER CODE END 3 */
-
+[/#if]
 #n
 [#-- if --]
 }
@@ -345,7 +378,7 @@ int main(void)
     [#if clockConfig??]
 static void LL_Init(void)
 {
-#t[@common.optinclude name="Src/system.tmp"/] [#-- if LL include system.tmp --]
+#t[@common.optinclude name=coreDir+"Src/system.tmp"/] [#-- if LL include system.tmp --]
 }
     [/#if]
 [/#if]
@@ -557,15 +590,16 @@ static void MX_NVIC_Init(void)
 [/#compress]
 [/#list][/#if]
 [/#list]
-[@common.optinclude name="Src/bdma.tmp"/][#-- ADD BDMA Code--]
-[@common.optinclude name="Src/dma.tmp"/][#-- ADD DMA Code--]
-[@common.optinclude name="Src/mdma.tmp"/][#-- ADD MDMA Code--]
-[@common.optinclude name="Src/mx_fmc_HC.tmp"/][#-- FMC Init --]
-[@common.optinclude name="Src/gpio.tmp"/][#-- ADD GPIO Code--]
+
+[@common.optinclude name=coreDir+"Src/bdma.tmp"/][#-- ADD BDMA Code--]
+[@common.optinclude name=coreDir+"Src/dma.tmp"/][#-- ADD DMA Code--]
+[@common.optinclude name=coreDir+"Src/mdma.tmp"/][#-- ADD MDMA Code--]
+[@common.optinclude name=coreDir+"Src/mx_fmc_HC.tmp"/][#-- FMC Init --]
+[@common.optinclude name=coreDir+"Src/gpio.tmp"/][#-- ADD GPIO Code--]
 [/#if] [#-- if HALCompliant End --]
 #n
 [#-- FSMC Init --]
-[@common.optinclude name="Src/mx_fsmc_HC.tmp"/]
+[@common.optinclude name=coreDir+"Src/mx_fsmc_HC.tmp"/]
 #n
 /* USER CODE BEGIN 4 */
 
@@ -573,13 +607,13 @@ static void MX_NVIC_Init(void)
 #n
 
 [#if HALCompliant??] [#-- If FreeRtos is used --]
-[@common.optinclude name="Src/rtos_threads.tmp"/]
-[@common.optinclude name="Src/rtos_user_threads.tmp"/] 
+[@common.optinclude name=coreDir+"Src/rtos_threads.tmp"/]
+[@common.optinclude name=coreDir+"Src/rtos_user_threads.tmp"/] 
 [/#if] [#-- If FreeRtos is used --]
 
 [#if mpuControl??] [#-- if MPU config is enabled --]
 /* MPU Configuration */
-[@common.optinclude name="Src/cortex.tmp"/]
+[@common.optinclude name=coreDir+"Src/cortex.tmp"/]
 [/#if]
 [#-- For Tim timebase --]
 [#if timeBaseSource?? && timeBaseSource.contains("TIM")]

@@ -4,7 +4,7 @@
 [#list SWIPdatas as SWIP]  
 [#if SWIP.defines??]
  [#list SWIP.defines as definition] 
-  [#if definition.name="USE_DMA_CODE"]
+  [#if definition.name="USE_DMA_CODE_USBH"]
    [#if definition.value="1"]
     [#assign use_dma=1]
    [/#if]

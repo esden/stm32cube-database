@@ -77,7 +77,7 @@
 	
 	
     <RefParameter Comment="DMA2D ALPHA Inversion" DefaultValue="DMA2D_REGULAR_ALPHA" Name="AlphaInvertedForeground" Type="list" Group="Foreground layer Configuration">
-        <Condition Expression="!R2M_semaphore" Diagnostic=""/>
+        <Condition Expression="(DIE461|DIE451|DIE470)&amp;!R2M_semaphore" Diagnostic=""/>
 
         <PossibleValue Comment="Regular Alpha"   Value="DMA2D_REGULAR_ALPHA"/>
         <PossibleValue Comment="Inverted Alpha"  Value="DMA2D_INVERTED_ALPHA"/>
@@ -87,7 +87,7 @@
     <RefParameter Visible="false" Comment="DMA2D ALPHA Inversion" DefaultValue="null" Name="AlphaInvertedForeground" Type="list" Group="Foreground layer Configuration">
     </RefParameter>
     <RefParameter Comment="DMA2D Red and Blue swap" DefaultValue="DMA2D_RB_REGULAR" Name="RedBlueSwapForeground" Type="list" Group="Foreground layer Configuration">
-        <Condition Expression="!R2M_semaphore" Diagnostic=""/>
+        <Condition Expression="(DIE461|DIE451|DIE470)&amp;!R2M_semaphore" Diagnostic=""/>
 
         <PossibleValue Comment="Regular mode (RGB or ARGB)"   Value="DMA2D_RB_REGULAR"/>
         <PossibleValue Comment="Swap mode (BGR or ABGR)"      Value="DMA2D_RB_SWAP"/>
@@ -154,7 +154,7 @@
     </RefParameter>
 	
     <RefParameter Comment="DMA2D ALPHA Inversion" DefaultValue="DMA2D_REGULAR_ALPHA" Name="AlphaInvertedBackground" Type="list" Group="Background layer Configuration">
-        <Condition Expression=" M2M_BLEND_semaphore" Diagnostic=""/>
+        <Condition Expression=" M2M_BLEND_semaphore &amp; !STM32F4" Diagnostic=""/>
 
         <PossibleValue Comment="Regular Alpha"   Value="DMA2D_REGULAR_ALPHA"/>
         <PossibleValue Comment="Inverted Alpha"  Value="DMA2D_INVERTED_ALPHA"/>
@@ -164,7 +164,7 @@
     <RefParameter Visible="false" Comment="DMA2D ALPHA Inversion" DefaultValue="null" Name="AlphaInvertedBackground" Type="list" Group="Background layer Configuration">
     </RefParameter>
     <RefParameter  Comment="DMA2D Red and Blue swap" DefaultValue="DMA2D_RB_REGULAR" Name="RedBlueSwapBackground" Type="list" Group="Background layer Configuration">
-        <Condition Expression="M2M_BLEND_semaphore" Diagnostic=""/>
+        <Condition Expression="M2M_BLEND_semaphore &amp; !STM32F4" Diagnostic=""/>
 
         <PossibleValue Comment="Regular mode (RGB or ARGB)"   Value="DMA2D_RB_REGULAR"/>
         <PossibleValue Comment="Swap mode (BGR or ABGR)"      Value="DMA2D_RB_SWAP"/>
@@ -206,6 +206,7 @@
 	
     <RefParameter Comment="Output Offset"    DefaultValue="0" Max="16383" Min="0" Name="OutputOffset" Type="integer" Group="Basic Parameters"/>
 	
+	   
 	    <RefParameter Comment="DMA2D Bytes Swap" DefaultValue="DMA2D_BYTES_REGULAR" Name="BytesSwap" Type="list" Group="Basic Parameters">
         <Condition Expression="(DIE470)" Diagnostic=""/>
 
@@ -213,6 +214,7 @@
         <PossibleValue Comment="Bytes are swapped two by two in output FIFO"  Value="DMA2D_BYTES_SWAP"/>
      
     </RefParameter>
+	 <RefParameter Comment="DMA2D Bytes Swap" DefaultValue="null" Name="BytesSwap" Type="list" Group="Basic Parameters" Visible="false"/>
 	
 	    <RefParameter Comment="DMA2D Line Offset Mode" DefaultValue="DMA2D_BYTES_REGULAR" Name="LineOffsetMode" Type="list" Group="Basic Parameters">
         <Condition Expression="(DIE470)" Diagnostic=""/>
@@ -221,6 +223,8 @@
         <PossibleValue Comment="Line offsets expressed in bytes"         Value="DMA2D_LOM_BYTES"/>
      
     </RefParameter>
+		    <RefParameter Comment="DMA2D Line Offset Mode" DefaultValue="null" Name="LineOffsetMode" Type="list" Group="Basic Parameters" Visible="false"/>
+
 	
     <RefParameter Comment="Output Offsetsdv" DefaultValue="1" Max="1" Min="1" Name="LayerIdxForeground" Type="integer"  Visible="false" Group="Basic Parameters">
         <Condition Expression="!R2M_semaphore" Diagnostic=""/>
@@ -274,11 +278,15 @@
                     <SignalLogicalOp Name="AND">
                         <Signal Name="VS_DMA2D" />
                     </SignalLogicalOp>
-                </Mode>
+                </Mode>  
             </ModeLogicOperator>
+             <Semaphore>MW_DMA2D_MW</Semaphore>
         </Mode>
     </ModeLogicOperator>
 	
     <!-- RefSignal for DMA2D -->
     <RefSignal Name="VS_DMA2D" Virtual="true"/>
+
+    <!-- Semaphore for DMA2D -->
+    <Semaphore>DMA2D_activated</Semaphore>
 </IP>

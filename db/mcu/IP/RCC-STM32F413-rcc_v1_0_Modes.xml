@@ -475,6 +475,16 @@
         <PossibleValue Comment="PLLI2SSource Ext" Value="RCC_PLLI2SCLKSOURCE_EXT" Semaphore="PLLSourceI2SEXT"/>
     </RefParameter>
     
+    <RefParameter Visible="false" Comment="PLLMLL" DefaultValue="RCC_PLLSOURCE_HSI" Name="PLLI2SSourceLL" Type="list">
+        <Condition Expression="PLLI2SSource=RCC_PLLI2SCLKSOURCE_PLLSRC &amp; PLLSource=RCC_PLLSOURCE_HSI" Diagnostic=""/>
+        <PossibleValue Comment="RCC PLLSOURCE HSI" Value="RCC_PLLSOURCE_HSI"/>
+    </RefParameter>
+    <RefParameter Visible="false" Comment="PLLMLL" DefaultValue="RCC_PLLSOURCE_HSE" Name="PLLI2SSourceLL" Type="list">
+        <Condition Expression="PLLI2SSource=RCC_PLLI2SCLKSOURCE_PLLSRC &amp; PLLSource=RCC_PLLSOURCE_HSE" Diagnostic=""/>
+        <PossibleValue Comment="RCC PLLSOURCE HSE" Value="RCC_PLLSOURCE_HSE"/>
+    </RefParameter>
+    <RefParameter Visible="false" Comment="PLLMLL" DefaultValue="RCC_PLLI2SSOURCE_PIN" Name="PLLI2SSourceLL" Type="list"/>
+
     <!-- SysClock Clock Selection-->
     <RefParameter Visible="false" Comment="SysClock Source" DefaultValue="RCC_SYSCLKSOURCE_HSI" Name="SYSCLKSource" Type="list">
         <PossibleValue Comment="SysClock HSI"     Value="RCC_SYSCLKSOURCE_HSI"     Semaphore="SysSourceIsHSI"/>
@@ -1057,7 +1067,13 @@
             <Condition Expression="(SDIOUsed_ForRCC &amp; SDIOSourceIsClock48)" Diagnostic=" "/>
         </RefParameter>
 	
-        <RefParameter Visible="false" Comment="CK48 Used For SDIO" DefaultValue="0" Name="CK48UsedForSDIO" Min="0" Max="0" Type="integer"/>      
+        <RefParameter Visible="false" Comment="CK48 Used For SDIO" DefaultValue="0" Name="CK48UsedForSDIO" Min="0" Max="0" Type="integer"/> 
+        <!-- I2SForDFSDMAudio used -->
+        <RefParameter Visible="false" Comment="I2S used For DFSDMAudio" DefaultValue="1" Name="I2SForDFSDMAudio" Min="1" Max="1" Type="integer">
+            <Condition Expression="(DFSDM1Used_ForRCC &amp; SEM2RCC_SAI1_CK_REQUIRED_DFSDM1  &amp; DFSDMADSourceI2S1) | (DFSDM1Used_ForRCC &amp; SEM2RCC_SAI1_CK_REQUIRED_DFSDM1  &amp; DFSDMADSourceI2S2)" Diagnostic=" "/>
+        </RefParameter>
+	
+        <RefParameter Visible="false" Comment="Main PLL is Used" DefaultValue="0" Name="I2SForDFSDMAudio" Min="0" Max="0" Type="integer"/>    
         <!-- PLLUsedForCK48 used -->
         <RefParameter Visible="false" Comment="MainPLL Is Used" DefaultValue="1" Name="PLLUsedForCK48" Min="1" Max="1" Type="integer">
             <Condition Expression=" ((USBSourceisPLLQ&amp; (USB_OTG_FSUsed_ForRCC|USB_OTG_HSEmbeddedPHYUsed_ForRCC|RNGUsed_ForRCC|(SDIOSourceIsClock48 &amp; SDIOUsed_ForRCC))))" Diagnostic=" "/>
@@ -1077,6 +1093,20 @@
         </RefParameter>
 	
         <RefParameter Visible="false" Comment="Main PLL is Used" DefaultValue="0" Name="PLLI2SUsedFor48" Min="0" Max="0" Type="integer"/>
+
+        <!-- I2S1ForDFSDMAudio used -->
+        <RefParameter Visible="false" Comment="I2S1 used For DFSDMAudio" DefaultValue="1" Name="I2S1ForDFSDMAudio" Min="1" Max="1" Type="integer">
+            <Condition Expression="(DFSDM1Used_ForRCC &amp; SEM2RCC_SAI1_CK_REQUIRED_DFSDM1  &amp; DFSDMADSourceI2S1) | (DFSDM2Used_ForRCC &amp; SEM2RCC_SAI1_CK_REQUIRED_DFSDM2 &amp; DFSDM2ADSourceI2S1)" Diagnostic=" "/>
+        </RefParameter>
+	
+        <RefParameter Visible="false" Comment="Main PLL is Used" DefaultValue="0" Name="I2S1ForDFSDMAudio" Min="0" Max="0" Type="integer"/>
+        
+        <!-- I2S2ForDFSDMAudio used -->
+        <RefParameter Visible="false" Comment="I2S2 used For DFSDMAudio" DefaultValue="1" Name="I2S2ForDFSDMAudio" Min="1" Max="1" Type="integer">
+            <Condition Expression="(DFSDM1Used_ForRCC &amp; SEM2RCC_SAI1_CK_REQUIRED_DFSDM1  &amp; DFSDMADSourceI2S2) | (DFSDM2Used_ForRCC &amp; SEM2RCC_SAI1_CK_REQUIRED_DFSDM2 &amp; DFSDM2ADSourceI2S2)" Diagnostic=" "/>
+        </RefParameter>
+	
+        <RefParameter Visible="false" Comment="Main PLL is Used" DefaultValue="0" Name="I2S2ForDFSDMAudio" Min="0" Max="0" Type="integer"/>
         
         <!-- PLLDIVRUsedForSAI used -->
         <RefParameter Visible="false" Comment="PLL DIVR Used For SAI" DefaultValue="1" Name="PLLDIVRUsedForSAI" Min="1" Max="1" Type="integer">
@@ -1585,7 +1615,6 @@
 <Condition Diagnostic="PLLSAIP not used" Expression=" ((PLLI2SUsed=1  &amp; PLLState=RCC_PLL_OFF &amp; !PLLSourceI2SEXT)|(I2S1SourceIsPllsrc&amp;(I2S2Used_ForRCC|I2S3Used_ForRCC))|SAI1ASourceIsPllsrc &amp; (SAI1Used_ForRCC &amp; SAIAUsed_ForRCC)|SAI1BSourceIsPllsrc &amp; (SAI1Used_ForRCC &amp; SAIBUsed_ForRCC)|(I2S2SourceIsPllsrc&amp;(I2S1Used_ForRCC|I2S4Used_ForRCC|I2S5Used_ForRCC)))"/>	    </RefParameter>
     <RefParameter Visible="false" Name="PLLSourceMARGForMacro" Comment="PLLSourceMARGForMacro" Type="list" DefaultValue="null"/>
 	
-    
     <RefMode Name="ClockTree">
         <ConfigForMode>RCC_PLL_PLLSOURCE_CONFIG</ConfigForMode>
         <ConfigForMode>RCC_ConfigVoltageScaling</ConfigForMode>

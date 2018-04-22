@@ -58,11 +58,11 @@ extern ${variable.value} ${variable.name};
 [/#if][#-- SWIP.variables?? --]
 [#-- Global variables --]
 
-[#-- Parameters always visible and dependent from RTOS (NO_SYS) >> avoid using default value --]
-[#assign rtosNoMaskList = ["NO_SYS", "LWIP_NETCONN", "LWIP_SOCKET", "WITH_RTOS", "LWIP_NETIF_LOOPBACK_MULTITHREADING", "LWIP_TIMERS", "TCPIP_MBOX_SIZE", "DEFAULT_UDP_RECVMBOX_SIZE", "DEFAULT_TCP_RECVMBOX_SIZE", "DEFAULT_ACCEPTMBOX_SIZE", "LWIP_TIMEVAL_PRIVATE"]]
-[#-- Parameters Visible only if RTOS AND with default values different for the same parameter >> avoid using default value  --]
-[#assign rtosMaskList = ["TCPIP_THREAD_STACKSIZE", "TCPIP_THREAD_PRIO", "SLIPIF_THREAD_STACKSIZE", "SLIPIF_THREAD_PRIO", "DEFAULT_THREAD_STACKSIZE", "DEFAULT_THREAD_PRIO",
-                          "LWIP_COMPAT_SOCKETS", "LWIP_SOCKET_SET_ERRNO", "LWIP_POSIX_SOCKETS_IO_NAMES"]]
+[#-- Parameters visible with/wo RTOS with default value changing with/wo RTOS => avoid using default value --]
+[#assign rtosNoMaskList = ["NO_SYS", "LWIP_NETCONN", "LWIP_SOCKET", "WITH_RTOS", "LWIP_NETIF_LOOPBACK_MULTITHREADING"]]
+[#-- Parameters visible only if RTOS with default values changing >> avoid using default value --]
+[#assign rtosMaskList = ["WITH_MBEDTLS", "TCPIP_MBOX_SIZE", "DEFAULT_UDP_RECVMBOX_SIZE", "DEFAULT_TCP_RECVMBOX_SIZE", "DEFAULT_ACCEPTMBOX_SIZE", "TCPIP_THREAD_STACKSIZE", "TCPIP_THREAD_PRIO", "SLIPIF_THREAD_STACKSIZE", "SLIPIF_THREAD_PRIO", "DEFAULT_THREAD_STACKSIZE", "DEFAULT_THREAD_PRIO",
+                          "LWIP_SOCKET_SET_ERRNO", "LWIP_COMPAT_SOCKETS", "LWIP_POSIX_SOCKETS_IO_NAMES"]]
 [#-- STATS Parameters are disabled in CubeMx (enable in opt.h) >> avoid using default value --]
 [#assign statList = ["LINK_STATS", "ETHARP_STATS", "IP_STATS", "IPFRAG_STATS", "ICMP_STATS", "IGMP_STATS", "UDP_STATS", "TCP_STATS", "MEM_STATS", "MEMP_STATS", "SYS_STATS", 
                              "IP6_STATS", "ICMP6_STATS", "IP6_FRAG_STATS", "MLD6_STATS", "MIB2_STATS"]]
@@ -98,6 +98,7 @@ extern ${variable.value} ${variable.name};
 [#assign instName = SWIP.ipName]
 [#assign fileName = SWIP.fileName]
 [#assign version = SWIP.version]
+[#assign lwip_mbed = 0]
 	
 [#if SWIP.defines??]
 	[#list SWIP.defines as definition]
@@ -108,7 +109,12 @@ extern ${variable.value} ${variable.name};
 			[#else]	
 			    [#assign lwip_rtos = 0] 
 			[/#if]
-		[/#if]	 
+		[/#if]
+		[#if definition.name == "LWIP_USE_EXTERNAL_MBEDTLS"] 
+			[#if definition.value == "1"] 
+			    [#assign lwip_mbed = 1]
+			[/#if]
+		[/#if]		
 		[#if definition.name == "LWIP_STATS"] [#assign lwip_stats = definition.value] [/#if]
 		[#if definition.name == "LWIP_SO_RCVBUF"] [#assign lwip_so_rcvbuf = definition.value] [/#if]
 		[#if definition.name == "MEMP_NUM_TCPIP_MSG_API"] [#assign memp_num_tcpip_msg_api = definition.value] [/#if]
@@ -161,6 +167,12 @@ extern ${variable.value} ${variable.name};
 #define ${definition.name}   0
            [/#if]
        [/#if]
+       [#if definition.name == "WITH_MBEDTLS"]
+           [#if lwip_mbed == 1]
+/*----- ${definition.name} enabled (Since MBEDTLS and FREERTOS are set) -----*/
+#define ${definition.name}   1
+           [/#if]
+       [/#if]       
        [#if definition.name == "CHECKSUM_BY_HARDWARE"]
            [#if checksum_by_hw == "1"]
 /*----- ${definition.name} enabled -----*/
@@ -209,26 +221,6 @@ extern ${variable.value} ${variable.name};
 			[#if (definition.name=="SYS_LIGHTWEIGHT_PROT") && (definition.value =="0")]
 /*----- Value in opt.h for ${definition.name}: 1 -----*/
 #define ${definition.name}  ${definition.value}
-			[/#if]	
-			[#if (definition.name=="LWIP_TIMERS") && (definition.value =="0")]
-/*----- Value in opt.h for ${definition.name}: 1 -----*/
-#define ${definition.name}  ${definition.value}
-			[/#if]
-			[#if (definition.name=="TCPIP_MBOX_SIZE") && (definition.value !="0")]
-/*----- Value in opt.h for ${definition.name}: 0 -----*/
-#define ${definition.name}  ${definition.value}
-			[/#if]	
-			[#if (definition.name=="DEFAULT_UDP_RECVMBOX_SIZE") && (definition.value !="0")]
-/*----- Value in opt.h for ${definition.name}: 0 -----*/
-#define ${definition.name}  ${definition.value}
-			[/#if]
-			[#if (definition.name=="DEFAULT_TCP_RECVMBOX_SIZE") && (definition.value !="0")]
-/*----- Value in opt.h for ${definition.name}: 0 -----*/
-#define ${definition.name}  ${definition.value}
-			[/#if]
-			[#if (definition.name=="DEFAULT_ACCEPTMBOX_SIZE") && (definition.value !="0")]
-/*----- Value in opt.h for ${definition.name}: 0 -----*/
-#define ${definition.name}  ${definition.value}
 			[/#if]									
 			[#if (definition.name=="MEM_ALIGNMENT") && (definition.value !="1")]
 /*----- Value in opt.h for ${definition.name}: 1 -----*/
@@ -270,6 +262,14 @@ extern ${variable.value} ${variable.name};
             [/#if]
             [#if (definition.name=="LWIP_DNS_SECURE") && (definition.value != "valueNotSetted")][#-- Generate always this param --]
 /*----- Value in opt.h for ${definition.name}: (LWIP_DNS_SECURE_RAND_XID | LWIP_DNS_SECURE_NO_MULTIPLE_OUTSTANDING | LWIP_DNS_SECURE_RAND_SRC_PORT) -*/
+#define ${definition.name}  ${definition.value}
+            [/#if]
+            [#if (definition.name=="LWIP_DNS") && (definition.value != "valueNotSetted") && (lwip_rtos == 1) && (definition.value != "0")][#-- Param visible if freertos, with default value changing on certain condition --]
+/*----- Value in opt.h for ${definition.name}: 0 -----*/
+#define ${definition.name}  ${definition.value}
+            [/#if]
+            [#if (definition.name=="LWIP_USE_EXTERNAL_MBEDTLS") && (definition.value != "valueNotSetted") && (lwip_rtos == 1) && (definition.value != "0")][#-- Param visible if freertos, with default value changing on certain condition --]
+/*----- Value in opt.h for ${definition.name}: 0 -----*/
 #define ${definition.name}  ${definition.value}
             [/#if]
             [#if (definition.name=="TCP_WND") && (definition.value != "valueNotSetted") && (definition.value == "2144") && (tcp_mss != "536")]
@@ -355,16 +355,32 @@ extern ${variable.value} ${variable.name};
             [#if (definition.name=="LWIP_IPV6_AUTOCONFIG") && (definition.value != "valueNotSetted") && (definition.value != lwip_ipv6)]
 /*----- Value in opt.h for ${definition.name}: LWIP_IPV6 -----*/
 #define ${definition.name}  ${definition.value}
-            [/#if] 
+            [/#if]
+			[#if (definition.name=="DEFAULT_UDP_RECVMBOX_SIZE") && (definition.value != "valueNotSetted") && (lwip_rtos == 1) && (definition.value !="0")][#-- rtosMaskList Param visible if freertos --]
+/*----- Value in opt.h for ${definition.name}: 0 -----*/
+#define ${definition.name}  ${definition.value}
+			[/#if]
+			[#if (definition.name=="DEFAULT_TCP_RECVMBOX_SIZE") && (definition.value != "valueNotSetted") && (lwip_rtos == 1) && (definition.value !="0")][#-- rtosMaskList Param visible if freertos --]
+/*----- Value in opt.h for ${definition.name}: 0 -----*/
+#define ${definition.name}  ${definition.value}
+			[/#if]
+			[#if (definition.name=="DEFAULT_ACCEPTMBOX_SIZE") && (definition.value != "valueNotSetted") && (lwip_rtos == 1) && (definition.value !="0")][#-- rtosMaskList Param visible if freertos --]
+/*----- Value in opt.h for ${definition.name}: 0 -----*/
+#define ${definition.name}  ${definition.value}
+			[/#if]	             
             [#if (definition.name=="RECV_BUFSIZE_DEFAULT") && (definition.value != "valueNotSetted")][#-- rtosMaskList Param visible if freertos --]
 /*----- Value in opt.h for ${definition.name}: INT_MAX -----*/
 #define ${definition.name}  ${definition.value}
-            [/#if]            
+            [/#if]
+			[#if (definition.name=="TCPIP_MBOX_SIZE") && (definition.value != "valueNotSetted") && (lwip_rtos == 1) && (definition.value !="0")][#-- rtosMaskList Param visible if freertos --]
+/*----- Value in opt.h for ${definition.name}: 0 -----*/
+#define ${definition.name}  ${definition.value}
+			[/#if]
             [#if (definition.name=="TCPIP_THREAD_STACKSIZE") && (definition.value != "valueNotSetted") && (lwip_rtos == 1) && (definition.value != "0")][#-- rtosMaskList Param visible if freertos --]
 /*----- Value in opt.h for ${definition.name}: 0 -----*/
 #define ${definition.name}  ${definition.value}
             [/#if]
-            [#if (definition.name=="TCPIP_THREAD_PRIO")  && (definition.value != "valueNotSetted") && (definition.value != "1") && (lwip_rtos == 1)][#-- rtosMaskList Param visible if freertos --]
+            [#if (definition.name=="TCPIP_THREAD_PRIO")  && (definition.value != "valueNotSetted") && (lwip_rtos == 1) && (definition.value != "1")][#-- rtosMaskList Param visible if freertos --]
 /*----- Value in opt.h for ${definition.name}: 1 -----*/
 #define ${definition.name}  ${definition.value}
             [/#if]                 
@@ -388,11 +404,11 @@ extern ${variable.value} ${variable.name};
 /*----- Value in opt.h for ${definition.name}: 1 -----*/
 #define ${definition.name}  ${definition.value}
             [/#if]
-            [#if (definition.name=="LWIP_POSIX_SOCKETS_IO_NAMES") && (definition.value != "valueNotSetted") && (lwip_rtos == 1) && (definition.value != "1")][#-- rtosMaskList Param visible if freertos, with default value changing on certain condition --]
+            [#if (definition.name=="LWIP_COMPAT_SOCKETS") && (definition.value != "valueNotSetted") && (lwip_rtos == 1) && (definition.value != "1")][#-- rtosMaskList Param visible if freertos, with default value changing on certain condition --]        
 /*----- Value in opt.h for ${definition.name}: 1 -----*/
 #define ${definition.name}  ${definition.value}
-            [/#if]
-            [#if (definition.name=="LWIP_COMPAT_SOCKETS") && (definition.value != "valueNotSetted") && (lwip_rtos == 1) && (definition.value != "1")][#-- rtosMaskList Param visible if freertos, with default value changing on certain condition --]        
+            [/#if]            
+            [#if (definition.name=="LWIP_POSIX_SOCKETS_IO_NAMES") && (definition.value != "valueNotSetted") && (lwip_rtos == 1) && (definition.value != "1")][#-- rtosMaskList Param visible if freertos, with default value changing on certain condition --]
 /*----- Value in opt.h for ${definition.name}: 1 -----*/
 #define ${definition.name}  ${definition.value}
             [/#if]

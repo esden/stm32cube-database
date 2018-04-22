@@ -14,17 +14,20 @@
         <PossibleValue Value="WWDG_PRESCALER_32" Comment="32"/>
         <PossibleValue Value="WWDG_PRESCALER_64" Comment="64"/>
         <PossibleValue Value="WWDG_PRESCALER_128" Comment="128"/>
-        <Description>The resulting value is equal to (PCLK/4096)/(Prescaler value) for example (PCLK/4096)/8</Description>
+        <Description>The resulting value of the clock is equal to (PCLK/4096)/prescaler for example (PCLK/4096)/8.</Description>
     </RefParameter>
 
     <RefParameter Name="Window" Comment="WWDG window value" DefaultValue="64" Max="127" Min="64" Type="integer" Group="Watchdog Clocking">
-        <Description>Specifies the WWDG window value to be compared to the downcounter.</Description>
+        <Description>Specifies the WWDG window value to be compared to the downcounter. If the software reloads the counter while the counter is greater than the
+value stored in the window register, then a reset is generated.</Description>
     </RefParameter>
 
-    <RefParameter Name="Counter" Comment="WWDG free-running downcounter value" DefaultValue="64" Max="127" Min="=Window" Type="integer" Group="Watchdog Clocking"/>
+    <RefParameter Name="Counter" Comment="WWDG free-running downcounter value" DefaultValue="64" Max="127" Min="=#Window" Type="integer" Group="Watchdog Clocking">
+        <Description>Specifies the WWDG counter value.&lt;br&gt;It is decremented every (4096 x 2**WDGTB) PCLK cycles.&lt;br&gt;A reset is produced when it is decremented from 0x40 to 0x3F (T6 becomes cleared).</Description>
+    </RefParameter>
 
-    <RefParameter Comment="EWI Mode" DefaultValue="WWDG_EWI_DISABLE" Name="EWIMode" Type="list" Group="Watchdog Interrupt">
-        <Description>Specifies if WWDG early wake-up interrupt is enabled or not.</Description>
+    <RefParameter Comment="Early wakeup interrupt" DefaultValue="WWDG_EWI_DISABLE" Name="EWIMode" Type="list" Group="Watchdog Interrupt">
+        <Description>When set, an interrupt occurs whenever the counter reaches the value 0x40. This interrupt is only cleared by hardware after a reset.</Description>
         <PossibleValue Comment="Disable" Value="WWDG_EWI_DISABLE"/>
         <PossibleValue Comment="Enable" Value="WWDG_EWI_ENABLE"/>
     </RefParameter>

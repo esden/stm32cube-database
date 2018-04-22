@@ -95,6 +95,14 @@ extern ${ipHandler.handlerType} ${ipHandler.handler};
 extern ${timeBaseHandlerType} ${timeBaseHandler};
 #n
 [/#if]
+[#if USE_Embedded_Wizard_STACK??]
+extern void GRAPHICS_IncTick(void);
+#n
+[/#if]
+[#if !FREERTOS?? && (USE_STemWin_STACK??||USE_Touch_GFX_STACK??)]
+extern void GRAPHICS_IncTick(void);
+#n
+[/#if]
 [/#compress]
 /******************************************************************************/
 /*            ${CortexName} Processor Interruption and Exception Handlers         */ 

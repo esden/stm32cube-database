@@ -249,6 +249,16 @@
         <PossibleValue Comment="PLLI2SSource Hsi" Value="RCC_PLLI2SCLKSOURCE_PLLSRC" Semaphore="PLLSourceI2SPLL"/>
         <PossibleValue Comment="PLLI2SSource Hse" Value="RCC_PLLI2SCLKSOURCE_EXT" Semaphore="PLLSourceI2SEXT"/>
     </RefParameter>
+    
+    <RefParameter Visible="false" Comment="PLLMLL" DefaultValue="RCC_PLLSOURCE_HSI" Name="PLLI2SSourceLL" Type="list">
+        <Condition Expression="PLLI2SSource=RCC_PLLI2SCLKSOURCE_PLLSRC &amp; PLLSource=RCC_PLLSOURCE_HSI" Diagnostic=""/>
+        <PossibleValue Comment="RCC PLLSOURCE HSI" Value="RCC_PLLSOURCE_HSI"/>
+    </RefParameter>
+    <RefParameter Visible="false" Comment="PLLMLL" DefaultValue="RCC_PLLSOURCE_HSE" Name="PLLI2SSourceLL" Type="list">
+        <Condition Expression="PLLI2SSource=RCC_PLLI2SCLKSOURCE_PLLSRC &amp; PLLSource=RCC_PLLSOURCE_HSE" Diagnostic=""/>
+        <PossibleValue Comment="RCC PLLSOURCE HSE" Value="RCC_PLLSOURCE_HSE"/>
+    </RefParameter>
+    <RefParameter Visible="false" Comment="PLLMLL" DefaultValue="RCC_PLLI2SSOURCE_PIN" Name="PLLI2SSourceLL" Type="list"/>
 
     <!-- SysClock Clock Selection-->
     <RefParameter Visible="false" Comment="SysClock Source" DefaultValue="RCC_SYSCLKSOURCE_HSI" Name="SYSCLKSource" Type="list">
@@ -797,7 +807,28 @@
         </RefParameter>
         <RefParameter Visible="false" Comment="Main PLL is Used" DefaultValue="0" Name="PLLUsedForCK48" Min="0" Max="0" Type="integer"/>
         
-<!-- PLLI2SUsedForI2S used -->
+        <!-- PLLI2SUsedForI2S used -->
+        <RefParameter Visible="false" Comment="MainPLL Is Used" DefaultValue="1" Name="PLLI2SUsedFor48" Min="1" Max="1" Type="integer">
+            <Condition Expression="(((USB_OTG_FSUsed_ForRCC|USB_OTG_HSEmbeddedPHYUsed_ForRCC|RNGUsed_ForRCC|(SDIOSourceIsClock48&amp;SDIOUsed_ForRCC))&amp; USBSourceisPLLI2SQ))" Diagnostic=" "/>
+        </RefParameter>
+	
+        <RefParameter Visible="false" Comment="Main PLL is Used" DefaultValue="0" Name="PLLI2SUsedFor48" Min="0" Max="0" Type="integer"/>
+        
+        <!-- I2S1ForDFSDMAudio used -->
+        <RefParameter Visible="false" Comment="I2S1 used For DFSDMAudio" DefaultValue="1" Name="I2S1ForDFSDMAudio" Min="1" Max="1" Type="integer">
+            <Condition Expression="(DFSDM1Used_ForRCC &amp; SEM2RCC_SAI1_CK_REQUIRED_DFSDM1  &amp; DFSDMADSourceI2S1)" Diagnostic=" "/>
+        </RefParameter>
+	
+        <RefParameter Visible="false" Comment="Main PLL is Used" DefaultValue="0" Name="I2S1ForDFSDMAudio" Min="0" Max="0" Type="integer"/>
+        
+        <!-- I2S2ForDFSDMAudio used -->
+        <RefParameter Visible="false" Comment="I2S2 used For DFSDMAudio" DefaultValue="1" Name="I2S2ForDFSDMAudio" Min="1" Max="1" Type="integer">
+            <Condition Expression="(DFSDM1Used_ForRCC &amp; SEM2RCC_SAI1_CK_REQUIRED_DFSDM1  &amp; DFSDMADSourceI2S2)" Diagnostic=" "/>
+        </RefParameter>
+	
+        <RefParameter Visible="false" Comment="Main PLL is Used" DefaultValue="0" Name="I2S2ForDFSDMAudio" Min="0" Max="0" Type="integer"/>
+        
+        <!-- PLLI2SUsedForI2S used -->
         <RefParameter Visible="false" Comment="MainPLL Is Used" DefaultValue="1" Name="PLLI2SUsedForI2S" Min="1" Max="1" Type="integer">
             <Condition Expression="(((USB_OTG_FSUsed_ForRCC|USB_OTG_HSEmbeddedPHYUsed_ForRCC|RNGUsed_ForRCC|(SDIOSourceIsClock48&amp;SDIOUsed_ForRCC))&amp; USBSourceisPLLI2SQ)) | ((DFSDM1Used_ForRCC &amp; SEM2RCC_SAI1_CK_REQUIRED_DFSDM1  &amp; DFSDMADSourceI2S1 &amp; I2S1SourceIsPLLI2SR) | (DFSDM1Used_ForRCC &amp; SEM2RCC_SAI1_CK_REQUIRED_DFSDM1  &amp; DFSDMADSourceI2S2 &amp; I2S2SourceIsPLLI2SR)  |(I2S1SourceIsPLLI2SR &amp; (I2S2Used_ForRCC|I2S3Used_ForRCC)) | (I2S2SourceIsPLLI2SR &amp; (I2S1Used_ForRCC|I2S4Used_ForRCC|I2S5Used_ForRCC)) |((MCOSourceIsPLLI2SP &amp;(MCO2Config))))" Diagnostic=" "/>
         </RefParameter>
@@ -806,7 +837,7 @@
         
 <!-- PLLUsedForI2S used -->
         <RefParameter Visible="false" Comment="MainPLL Is Used" DefaultValue="1" Name="PLLUsedForI2S" Min="1" Max="1" Type="integer">
-            <Condition Expression="((USBSourceisPLLI2SQ&amp; (USB_OTG_FSUsed_ForRCC|USB_OTG_HSEmbeddedPHYUsed_ForRCC|RNGUsed_ForRCC|(SDIOSourceIsClock48 &amp; SDIOUsed_ForRCC)))) | (DFSDM1Used_ForRCC &amp; SEM2RCC_SAI1_CK_REQUIRED_DFSDM1  &amp; DFSDMADSourceI2S1 &amp; I2S1SourceIsPllR) | (DFSDM1Used_ForRCC &amp; SEM2RCC_SAI1_CK_REQUIRED_DFSDM1  &amp; DFSDMADSourceI2S2 &amp; I2S2SourceIsPllR)  |(I2S1SourceIsPllR &amp; (I2S2Used_ForRCC|I2S3Used_ForRCC)) | (I2S2SourceIsPllR &amp; (I2S1Used_ForRCC|I2S4Used_ForRCC|I2S5Used_ForRCC))" Diagnostic=" "/>
+            <Condition Expression="(DFSDM1Used_ForRCC &amp; SEM2RCC_SAI1_CK_REQUIRED_DFSDM1  &amp; DFSDMADSourceI2S1 &amp; I2S1SourceIsPllR) | (DFSDM1Used_ForRCC &amp; SEM2RCC_SAI1_CK_REQUIRED_DFSDM1  &amp; DFSDMADSourceI2S2 &amp; I2S2SourceIsPllR)  |(I2S1SourceIsPllR &amp; (I2S2Used_ForRCC|I2S3Used_ForRCC)) | (I2S2SourceIsPllR &amp; (I2S1Used_ForRCC|I2S4Used_ForRCC|I2S5Used_ForRCC))" Diagnostic=" "/>
         </RefParameter>
 	
         <RefParameter Visible="false" Comment="Main PLL is Used" DefaultValue="0" Name="PLLUsedForI2S" Min="0" Max="0" Type="integer"/>
@@ -1222,8 +1253,7 @@
     <RefParameter Visible="false" Name="PLLSourceMARGForMacro" Comment="PLLSourceMARGForMacro" Type="list" DefaultValue="+PLLSource">
 <Condition Diagnostic="PLLSAIP not used" Expression=" ((PLLI2SUsed=1  &amp; PLLState=RCC_PLL_OFF &amp; !PLLSourceI2SEXT)|(I2S1SourceIsPllsrc&amp;(I2S2Used_ForRCC|I2S3Used_ForRCC))|(I2S2SourceIsPllsrc&amp;(I2S1Used_ForRCC|I2S4Used_ForRCC|I2S5Used_ForRCC)))"/>	    </RefParameter>
     <RefParameter Visible="false" Name="PLLSourceMARGForMacro" Comment="PLLSourceMARGForMacro" Type="list" DefaultValue="null"/>
-	
-    
+	<RefParameter Visible="false" Comment="Overdrive enable" DefaultValue="0" Name="OverDriveEnable" Type="integer" Min="1" Max="1"/>
     <RefMode Name="ClockTree">
         <ConfigForMode>RCC_PLL_PLLM_CONFIG</ConfigForMode>
         <ConfigForMode>RCC_DFSDM_AUDIO_CONFIG</ConfigForMode>

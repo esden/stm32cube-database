@@ -87,6 +87,8 @@
 		   		<include></include>
 		    [/#if]
 	    [#else]
+
+
 	    	<include></include>
     	[/#if]
     </Aincludes>
@@ -113,12 +115,15 @@
     [#-- End of optional part--]
 	<Cincludes>
 	 [#-- required includes for all generated projects --]
-	 <include>${RelativePath}Inc</include>
-     [#-- <include>${CMSISPath}\Device\ST\${family}\Include</include>
-     <include>${CMSISPath}\Include</include> --]
-	   [#list halIncludePaths as halIncludePath]
+        [#list mxIncludePaths as halIncludePath]
 	   <include>${halIncludePath}</include>
         [/#list]
+     [#-- <include>${CMSISPath}\Device\ST\${family}\Include</include>
+     <include>${CMSISPath}\Include</include> --]
+	[#list halIncludePaths as halIncludePath]
+	   <include>${halIncludePath}</include>
+        [/#list]
+
     </Cincludes>
       </config>
     </configs> 
@@ -127,26 +132,27 @@
     [#if underRoot == "true"]
     	<copyAsReference>${copyAsReference}</copyAsReference>
     	[#if copyAsReference == "true"]
-		    <sourceEntries>
-		    	<sourceEntry>
-		    		<name>${inc}</name>
-		    	</sourceEntry>
-		    	<sourceEntry>
-		    		<name>${src}</name>
-		    	</sourceEntry>
-		    	<sourceEntry>
-		    		<name>${HALDriver}</name>
-		    	</sourceEntry>
-		    	[#if atLeastOneMiddlewareIsUsed]
-		    		<sourceEntry>
-		    			<name>Middlewares</name>
-		    		</sourceEntry>
-		    	 [/#if]
-		    </sourceEntries>
-        [#if atLeastOneMiddlewareIsUsed]
-	  <group>
+            <sourceEntries>
+                <sourceEntry>
+                        <name>${inc}</name>
+                </sourceEntry>
+                <sourceEntry>
+                        <name>${src}</name>
+                </sourceEntry>
+                <sourceEntry>
+                        <name>${HALDriver}</name>
+                </sourceEntry>
+                [#if atLeastOneMiddlewareIsUsed]
+                        <sourceEntry>
+                                <name>Middlewares</name>
+                        </sourceEntry>
+                 [/#if]
+            </sourceEntries>
+            [#if atLeastOneMiddlewareIsUsed]
+                <group>
 	  	<name>Middlewares</name>
 		 [#list groups as group]
+                    [#if group.name!="App" && group.name!="Target"]
 		 	<group>
 		 		<name>${group.name!''}</name>
 		 		[#if group.sourceFilesNameList??]
@@ -156,10 +162,11 @@
 						</file>
 			        [/#list]
 			    [/#if]
-		    </group>
+                        </group>
+                    [/#if]
 		 [/#list]
-	  </group> 
-	 [/#if]
+                </group> 
+            [/#if]
     		<group>
 	    		<name>Drivers</name> 
 				 [#if atLeastOneBspComponentIsUsed]
@@ -196,7 +203,7 @@
 		   	  		[/#if]
 		    	</group>
 	  		</group>
-	  		[#else]
+	[#else]
 	  		<sourceEntries>
 		    	<sourceEntry>
 		    		<name>${inc}</name>
@@ -221,26 +228,28 @@
 
 [#-- project groups and files --]
 [#if underRoot == "false"]
-	[#if atLeastOneMiddlewareIsUsed]
-	  <group>
-            <name>Middlewares</name>  
-            [#list groups as group]
-		 	<group>
-		 		<name>${group.name!''}</name>
-		 		[#if group.sourceFilesNameList??]
-			 		[#list group.sourceFilesNameList as filesName]
-						<file>
-							<name>${filesName!''}</name>
-						</file>
-			        [/#list]
-			    [/#if]
-		    </group>
-		 [/#list]
-	  </group> 
-	 [/#if]
-[#list externalGroups as grp]
-                [@getGroups groupArg=grp/]
-[/#list]
+    [#if atLeastOneMiddlewareIsUsed]
+      <group>
+        <name>Middlewares</name>  
+        [#list groups as group]
+            [#if group.name!="App" && group.name!="Target"]
+                    <group>
+                            <name>${group.name!''}</name>
+                            [#if group.sourceFilesNameList??]
+                                    [#list group.sourceFilesNameList as filesName]
+                                            <file>
+                                                    <name>${filesName!''}</name>
+                                            </file>
+                            [/#list]
+                        [/#if]
+                </group>
+            [/#if]
+             [/#list]
+      </group> 
+    [/#if]
+    [#list externalGroups as grp]
+        [@getGroups groupArg=grp/]
+    [/#list]
 	   <group>
 	    <name>Drivers</name> 
 			[#if atLeastOneBspComponentIsUsed]
@@ -301,12 +310,81 @@
 	  <name>Application</name>
 	    <group>
 	      <name>User</name>  
+                [#if mxSourceDir == "Core/Src"]
+                                <group>
+                                    <name>Core</name>  
+                [/#if]
 	        [#list mxSourceFilesNameList as mxCFiles]
-	        <file>
-	         <name>${mxCFiles}</name>
-	        </file>
+                [#if mxCFiles?contains("Src")]
+                                <file>
+                                 <name>${mxCFiles}</name>
+                                </file>
+                [/#if]
+
 	       [/#list]
-	    </group>
-	  </group>
- [/#if]  
+                [#if mxSourceDir == "Core/Src"]
+                                </group>                  
+                [/#if]
+
+[#-- Other source groups --]  
+    [#if USE_Touch_GFX_STACK??]
+    <group>
+        <name>TouchGFX</name>         
+                <group>
+                    <name>gui</name>
+                </group>
+                <group>
+                    <name>generated</name>
+                </group>
+    </group> 
+    [/#if]
+
+[#-- App Group Case of Graphics--]
+[#list ApplicationGroups as grp]
+        [#--[#if group.name=="App"]
+            <group>
+                <name>${group.name!''}</name>
+                [#if group.sourceFilesNameList??]
+                    [#list group.sourceFilesNameList as filesName]
+                                <file>
+                                    <name>${filesName!''}</name>
+                                </file>
+                    [/#list]
+                [/#if]
+            </group>
+        [/#if]
+        [#if group.name=="Target"]
+            <group>
+                <name>${group.name!''}</name>
+                [#if group.sourceFilesNameList??]
+                    [#list group.sourceFilesNameList as filesName]
+                                <file>
+                                    <name>${filesName!''}</name>
+                                </file>
+                    [/#list]
+                [/#if]
+            </group>
+        [/#if]--]
+               <group>
+        <name>${grp.name!''}</name>
+            [#if grp.subGroups??]
+                    [#list grp.subGroups as subGrp]	
+                    <group>
+                    <name>${subGrp.name!''}</name>
+                    [#if subGrp.sourceFilesNameList??]
+                            [#list subGrp.sourceFilesNameList as filesName]
+                                    <file>
+                                            <name>${filesName!''}</name>
+                                    </file>
+                            [/#list]
+                    [/#if]
+                    </group>
+                    [/#list]	
+            [/#if]
+        </group>
+    [/#list]
+
+</group> 
+  </group>
+[/#if]
 </Project>

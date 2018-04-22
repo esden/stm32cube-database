@@ -581,9 +581,16 @@
             [#assign listOfLocalVariables =resultList]
 
         [/#list]
+[#if instName!="DSIHOST"]
         [#list instanceData.configs as config]
+                
             [#if instanceData.instIndex??][@generateConfigModelCode configModel=config inst=instName  nTab=1 index=instanceData.instIndex/][#else][@generateConfigModelCode configModel=config inst=instName  nTab=1 index=""/][/#if]
         [/#list]
+
+                [#else]
+            [#if instanceData.instIndex??][@common.generateConfigModelListCode configModel=instanceData inst=instName  nTab=1 index=instanceData.instIndex/][#else][@common.generateConfigModelListCode configModel=instanceData inst=instName  nTab=1 index=""/][/#if]
+                [/#if]
+
 #n[#-- } --]
 [/#if]
   

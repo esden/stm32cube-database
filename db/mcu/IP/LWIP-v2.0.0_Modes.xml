@@ -10,7 +10,7 @@
     
     <About>LWIP: LightWeight TCP/IP</About>
     <RefParameter Name="LwIP Version" Comment="LwIP Version (Version of LwIP supported by CubeMX ** CubeMX specific **)" Type="string" Group="LwIP Version" DefaultValue="2.0.0" TabName="General Settings" Mode="Basic" >
-        <Description>&lt;font color=&quot;red&quot;&gt;LwIP version supported by CubeMX is the &lt;b&gt;O&lt;/b&gt;fficial &lt;b&gt;R&lt;/b&gt;elease &lt;b&gt;2.0.0&lt;/b&gt; dated &lt;b&gt;Nov 10, 2016.&lt;/b&gt;&lt;/font&gt;&lt;br&gt;LwIP stack has an internal parameter defined in init.h providing its version: LWIP_VERSION.&lt;br&gt;Here, the LwIP Version is just displayed to highlight the LwIP version supported by CubeMX.&lt;br&gt;&lt;b&gt;Warning&lt;/b&gt;: This parameter has been introduced by CubeMX and is not configurable, LWIP_VERSION being already defined in init.h.</Description>
+        <Description>&lt;font color=&quot;blue&quot;&gt;LwIP version supported by CubeMX is the &lt;b&gt;O&lt;/b&gt;fficial &lt;b&gt;R&lt;/b&gt;elease &lt;b&gt;2.0.0&lt;/b&gt; dated &lt;b&gt;Nov 10, 2016.&lt;/b&gt;&lt;/font&gt;&lt;br&gt;LwIP stack has an internal parameter defined in init.h providing its version: LWIP_VERSION.&lt;br&gt;Here, the LwIP Version is just displayed to highlight the LwIP version supported by CubeMX.&lt;br&gt;&lt;b&gt;Warning&lt;/b&gt;: This parameter has been introduced by CubeMX and is not configurable, LWIP_VERSION being already defined in init.h.</Description>
     </RefParameter>
     <RefParameter Name="LWIP_DHCP" Comment="LWIP_DHCP (DHCP Module)" Type="list" Group="IPv4 - DHCP Option" DefaultValue="1" TabName="General Settings" Mode="Basic" >
         <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: Use LWIP_DHCP requires both LWIP_UDP and LWIP_IPV4 enabled." Expression="LWIP_UDP &amp; LWIP_IPV4"/>
@@ -34,14 +34,23 @@
         <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: If DHCP is disabled, the Gateway address is mandatory." Expression="!LWIP_DHCP"/>
     </RefParameter>
     <RefParameter Name="GATEWAY_ADDRESS" Comment="GATEWAY_ADDRESS (Gateway Address)" Type="Array" Separator="." ArrayTypeElement="uint8_t;10" ArraySize="4" Group="IP Address Settings" DefaultValue="0.0.0.0" TabName="General Settings" Mode="Basic" Visible="false"/>
-    <RefParameter Name="WITH_RTOS" Comment="WITH_RTOS (Use FREERTOS ** CubeMX specific **)" Type="list" Group="RTOS Settings" DefaultValue="0" TabName="General Settings" Mode="Basic" Visible="true">
+    <RefParameter Name="WITH_RTOS" Comment="WITH_RTOS (Use FREERTOS ** CubeMX specific **)" Type="uniqueElementList" Group="RTOS Dependency" DefaultValue="0" TabName="General Settings" Mode="Basic" Visible="true">
         <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: WITH_RTOS is enabled means NO_SYS is enabled (set to 0) and FREERTOS is enabled." Expression="!NO_SYS"/>
         <PossibleValue Comment="Enabled" Value="1" Semaphore="S_NO_SYS"/>
         <Description>This parameter is enabled as soon as FREERTOS is enabled in MiddleWares tree.&lt;br&gt;&lt;b&gt;Warning&lt;/b&gt;: This parameter has been introduced by CubeMX.</Description>
     </RefParameter>
-    <RefParameter Name="WITH_RTOS" Comment="WITH_RTOS (Use FREERTOS ** CubeMX specific **)" Type="list" Group="RTOS Settings" DefaultValue="0" TabName="General Settings" Mode="Basic" Visible="true">
+    <RefParameter Name="WITH_RTOS" Comment="WITH_RTOS (Use FREERTOS ** CubeMX specific **)" Type="uniqueElementList" Group="RTOS Dependency" DefaultValue="0" TabName="General Settings" Mode="Basic" Visible="true">
         <PossibleValue Comment="Disabled" Value="0"/>
         <Description>This parameter is disabled as soon as FREERTOS is disabled in MiddleWares tree.&lt;br&gt;&lt;b&gt;Warning&lt;/b&gt;: This parameter has been introduced by CubeMX.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: WITH_RTOS is disabled means NO_SYS is disabled (set to 1) and FREERTOS is disabled.</Description>
+    </RefParameter>
+    <RefParameter Name="WITH_MBEDTLS" Comment="WITH_MBEDTLS (Use MBEDTLS ** CubeMX specific **)" Type="uniqueElementList" Group="MBEDTLS Dependency" DefaultValue="0" TabName="General Settings" Mode="Basic" Visible="true">
+        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: WITH_MBEDTLS is enabled means FREERTOS and MBEDTLS are both enabled, and LWIP_USE_EXTERNAL_MBEDTLS is forced to Enabled in Key Options/PolarSSL Options.&lt;br&gt;&lt;font color=&quot;red&quot;&gt;&lt;b&gt;Limitation&lt;/b&gt;: LwIP with MBEDTLS but without FREERTOS is not yet supported by CubeMX.&lt;/font&gt;" Expression="S_MBEDTLS"/>
+        <PossibleValue Comment="Enabled" Value="1"/>
+        <Description>&lt;b&gt;Warning&lt;/b&gt;: This parameter has been introduced by CubeMX.&lt;br&gt;This parameter is enabled as soon as MBEDTLS and FREERTOS are enabled in MiddleWares tree.&lt;br&gt;Consequently:&lt;font color=&quot;blue&quot;&gt;&lt;br&gt;- MX_LWIP_Init() function is generated within mbedtls_net_init() function in net_cockets.c file&lt;br&gt;- Up to user to call mbedtls_net_init() function in MBEDTLS initialization step&lt;br&gt;- LWIP_DNS value is forced to Enabled&lt;br&gt;- LWIP_UDP value is forced to Enabled&lt;br&gt;- LWIP_USE_EXTERNAL_MBEDTLS value is forced to Enabled&lt;br&gt;- LWIP_INCLUDED_POLARSSL_ARC4 value is forced to Disabled (excluding arc4.c/arc4.h files from lwip stack)&lt;br&gt;- LWIP_INCLUDED_POLARSSL_DES value is forced to Disabled (excluding des.c/des.h files from lwip stack)&lt;br&gt;- LWIP_INCLUDED_POLARSSL_MD4 is forced to Disabled (excluding md4.c/md4.h files from lwip stack)&lt;br&gt;- LWIP_INCLUDED_POLARSSL_MD5 is forced to Disabled (excluding md5.c/md5.h files from lwip stack)&lt;br&gt;- LWIP_INCLUDED_POLARSSL_SHA1 is forced to Disabled (excluding sha1.c/sha1.h files from lwip stack)&lt;br&gt;- ecp.c/ecp.h ppp files are excluded from lwip stack also.&lt;/font&gt;</Description>
+    </RefParameter>
+    <RefParameter Name="WITH_MBEDTLS" Comment="WITH_MBEDTLS (Use FREERTOS ** CubeMX specific **)" Type="uniqueElementList" Group="MBEDTLS Dependency" DefaultValue="0" TabName="General Settings" Mode="Basic" Visible="false">
+        <PossibleValue Comment="Disabled" Value="0"/>
+        <Description>This parameter is enabled as soon as MBEDTLS is enabled in MiddleWares tree.&lt;br&gt;&lt;b&gt;Warning&lt;/b&gt;: This parameter has been introduced by CubeMX.</Description>
     </RefParameter>
     <RefParameter Name="PHY Driver" Comment="PHY Driver" Type="string" Group="Platform Settings" DefaultValue="Choose/LAN8742" TabName="General Settings" Mode="Basic" Visible="true">
         <Condition Diagnostic="" Expression="STM32H7"/>
@@ -67,24 +76,34 @@
         <Description>When this parameter is enabled, it turns on IGMP (Internet Group Management Protocol) module.&lt;br&gt;&lt;b&gt;Warning&lt;/b&gt;: When using IGMP or IPv6, LWIP_RAND() needs to be defined to a random-function returning an u32_t random value.&lt;br&gt;Therefore, LWIP_RAND() has been added in cc.h (in \system\arch).&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: When MEMP_MEM_MALLOC is disabled, use LWIP_IGMP requires LWIP_MULTICAST_TX_OPTIONS and LWIP_IPV4 enabled and also MEMP_NUM_IGMP_GROUP&gt;1.&lt;br&gt;&lt;b&gt;Note&lt;/b&gt;: For more options on IGMP, please check in:&lt;br&gt; - "Key Options" tab within "ICMP/IGMP", "Internal Memory Pool Sizes" and "LOOPIF" Options&lt;br&gt; - "Statistics" tab&lt;br&gt; - "Debug" tab.</Description>
     </RefParameter>
     <RefParameter Name="LWIP_DNS" Comment="LWIP_DNS (DNS Module)" Type="list" Group="Protocols Options" DefaultValue="0" TabName="General Settings" Mode="Basic" >
-        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: Use LWIP_DNS requires LWIP_UDP enabled." Expression="LWIP_UDP"/>
+        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: Use LWIP_DNS requires LWIP_UDP enabled." Expression="LWIP_UDP &amp; !S_MBEDTLS"/>
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
         <Description>When this parameter is enabled, it turns on DNS (Domain Name Server) module. UDP must be available for DNS transport.&lt;br&gt;&lt;b&gt;Note&lt;/b&gt;: For more options on DNS, please check in:&lt;br&gt; - "Key Options" tab within "DNS" and "Internal Memory Pool Sizes" Options&lt;br&gt; - "Debug" tab.</Description>
     </RefParameter>
     <RefParameter Name="LWIP_DNS" Comment="LWIP_DNS (DNS Module)" Type="list" Group="Protocols Options" DefaultValue="0" TabName="General Settings" Mode="Basic" >
+        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: LWIP_DNS is enabled when MBEDTLS is enabled. Use LWIP_DNS requires LWIP_UDP enabled." Expression="!S_MBEDTLS"/>
         <PossibleValue Comment="Disabled" Value="0"/>
-        <Description>When this parameter is enabled, it turns on DNS (Domain Name Server) module. UDP must be available for DNS transport.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Use LWIP_DNS requires LWIP_UDP enabled.&lt;br&gt;&lt;b&gt;Note&lt;/b&gt;: For more options on DNS, please check in:&lt;br&gt; - "Key Options" tab within "DNS" and "Internal Memory Pool Sizes" Options&lt;br&gt; - "Debug" tab.</Description>
+        <Description>When this parameter is enabled, it turns on DNS (Domain Name Server) module. UDP must be available for DNS transport.&lt;br&gt;&lt;b&gt;Note&lt;/b&gt;: For more options on DNS, please check in:&lt;br&gt; - "Key Options" tab within "DNS" and "Internal Memory Pool Sizes" Options&lt;br&gt; - "Debug" tab.</Description>
+    </RefParameter>
+    <RefParameter Name="LWIP_DNS" Comment="LWIP_DNS (DNS Module)" Type="list" Group="Protocols Options" DefaultValue="1" TabName="General Settings" Mode="Basic" >
+        <PossibleValue Comment="Enabled" Value="1"/>
+        <Description>When this parameter is enabled, it turns on DNS (Domain Name Server) module. UDP must be available for DNS transport.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: LWIP_DNS is enabled when MBEDTLS is enabled.</Description>
     </RefParameter>
     <RefParameter Name="LWIP_UDP" Comment="LWIP_UDP (UDP Module)" Type="list" Group="Protocols Options" DefaultValue="1" TabName="General Settings" Mode="Basic" >
-        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: Use LWIP_UDP requires MEMP_NUM_UDP_PCB&gt;0 when MEMP_MEM_MALLOC is disabled." Expression="IF(!MEMP_MEM_MALLOC, MEMP_NUM_UDP_PCB &gt; 0, 1)"/>
+        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: Use LWIP_UDP requires MEMP_NUM_UDP_PCB&gt;0 when MEMP_MEM_MALLOC is disabled." Expression="IF(!MEMP_MEM_MALLOC, MEMP_NUM_UDP_PCB &gt; 0, 1) &amp; !S_MBEDTLS"/>
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
         <Description>When this parameter is enabled, it turns on UDP (User Datagram Protocol).&lt;br&gt;&lt;b&gt;Note&lt;/b&gt;: For more options on UDP, please check in:&lt;br&gt; - "Key Options" tab within "UDP", "IP" and "Thread" Options&lt;br&gt; - "Statistics" tab&lt;br&gt; - "Checksum" tab&lt;br&gt; - "Debug" tab.</Description>
     </RefParameter>
     <RefParameter Name="LWIP_UDP" Comment="LWIP_UDP (UDP Module)" Type="list" Group="Protocols Options" DefaultValue="0" TabName="General Settings" Mode="Basic" >
+        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: LWIP_UDP is enabled when MBEDTLS is enabled. Use LWIP_UDP requires MEMP_NUM_UDP_PCB&gt;0 when MEMP_MEM_MALLOC is disabled." Expression="!S_MBEDTLS"/>
         <PossibleValue Comment="Disabled" Value="0"/>
-        <Description>When this parameter is enabled, it turns on UDP (User Datagram Protocol).&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Use LWIP_UDP requires MEMP_NUM_UDP_PCB&gt;0 when MEMP_MEM_MALLOC is disabled.&lt;br&gt;&lt;b&gt;Note&lt;/b&gt;: For more options on UDP, please check in:&lt;br&gt; - "Key Options" tab within "UDP", "IP" and "Thread" Options&lt;br&gt; - "Statistics" tab&lt;br&gt; - "Checksum" tab&lt;br&gt; - "Debug" tab.</Description>
+        <Description>When this parameter is disabled, it turns off UDP (User Datagram Protocol).&lt;br&gt;&lt;b&gt;Note&lt;/b&gt;: For more options on UDP, please check in:&lt;br&gt; - "Key Options" tab within "UDP", "IP" and "Thread" Options&lt;br&gt; - "Statistics" tab&lt;br&gt; - "Checksum" tab&lt;br&gt; - "Debug" tab.</Description>
+    </RefParameter>
+    <RefParameter Name="LWIP_UDP" Comment="LWIP_UDP (UDP Module)" Type="list" Group="Protocols Options" DefaultValue="1" TabName="General Settings" Mode="Basic" >
+        <PossibleValue Comment="Enabled" Value="1"/>
+        <Description>This parameter turns on UDP (User Datagram Protocol).&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: LWIP_UDP is enabled when MBEDTLS is enabled.</Description>
     </RefParameter>
     <RefParameter Name="MEMP_NUM_UDP_PCB" Comment="MEMP_NUM_UDP_PCB (Number of UDP Connections)" Type="integer" Group="Protocols Options" DefaultValue="4" TabName="General Settings" Mode="Basic" Min="=IF(!MEMP_MEM_MALLOC &amp; LWIP_UDP, 1, 0)" Max="2147483647" >
         <Description>Number of UDP protocol control blocks. One per active UDP connection (requires the LWIP_UDP option enabled).&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Use MEMP_NUM_UDP_PCB requires MEMP_MEM_MALLOC disabled and LWIP_UDP enabled, it is mandatory to have MEMP_NUM_UDP_PCB&gt;0.&lt;br&gt;&lt;b&gt;Note&lt;/b&gt;: For more memory options, see in "Key Options" tab within "Internal Memory Pool Sizes" Options.</Description>
@@ -1075,59 +1094,89 @@
         <Description>Enable this option to use external PolarSSL library.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: None.</Description>
     </RefParameter>
     <RefParameter Name="LWIP_USE_EXTERNAL_MBEDTLS" Comment="LWIP_USE_EXTERNAL_MBEDTLS (Use external mbed TLS library)" Type="list" Group="PolarSSL Options" DefaultValue="0" TabName="Key Options" Mode="Advanced" >
+        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: This parameter is enabled when MBEDTLS is enabled." Expression="!S_MBEDTLS"/>
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
         <Description>Enable this option to use mbed TLS library.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: None.</Description>
     </RefParameter>
+    <RefParameter Name="LWIP_USE_EXTERNAL_MBEDTLS" Comment="LWIP_USE_EXTERNAL_MBEDTLS (Use external mbed TLS library)" Type="list" Group="PolarSSL Options" DefaultValue="1" TabName="Key Options" Mode="Advanced" >
+        <PossibleValue Comment="Enabled" Value="1"/>
+        <Description>This option when using MBEDTLS Middleware.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: This parameter is enabled asa MBEDTLS is enabled.</Description>
+    </RefParameter>
     <RefParameter Name="LWIP_INCLUDED_POLARSSL_MD5" Comment="LWIP_INCLUDED_POLARSSL_MD5 (LwIP internal PolarSSL for MD5)" Type="list" Group="PolarSSL Options" DefaultValue="1" TabName="Key Options" Mode="Advanced" >
-        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: CHAP (CHAP_SUPPORT), EAP (EAP_SUPPORT), L2TP(PPPOL2TP_AUTH_SUPPORT) AUTH and MD5 Random (PPP_MD5_RANDM) require MD5 support (LWIP_INCLUDED_POLARSSL_MD5 enabled)." Expression="CHAP_SUPPORT|EAP_SUPPORT|PPPOL2TP_AUTH_SUPPORT|PPP_MD5_RANDM"/>
+        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: CHAP (CHAP_SUPPORT), EAP (EAP_SUPPORT), L2TP(PPPOL2TP_AUTH_SUPPORT) AUTH and MD5 Random (PPP_MD5_RANDM) require MD5 support (LWIP_INCLUDED_POLARSSL_MD5 enabled)." Expression="!S_MBEDTLS &amp; (CHAP_SUPPORT|EAP_SUPPORT|PPPOL2TP_AUTH_SUPPORT|PPP_MD5_RANDM)"/>
         <PossibleValue Comment="Enabled" Value="1"/>
         <Description>This parameter enabled allows to use lwIP internal PolarSSL for MD5.</Description>
     </RefParameter>
     <RefParameter Name="LWIP_INCLUDED_POLARSSL_MD5" Comment="LWIP_INCLUDED_POLARSSL_MD5 (LwIP internal PolarSSL for MD5)" Type="list" Group="PolarSSL Options" DefaultValue="0" TabName="Key Options" Mode="Advanced" >
+        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: CHAP (CHAP_SUPPORT), EAP (EAP_SUPPORT), L2TP(PPPOL2TP_AUTH_SUPPORT) AUTH and MD5 Random (PPP_MD5_RANDM) require MD5 support (LWIP_INCLUDED_POLARSSL_MD5 enabled)." Expression="!S_MBEDTLS"/>
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
         <Description>Enable this parameter to use lwIP internal PolarSSL for MD5.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: CHAP (CHAP_SUPPORT), EAP (EAP_SUPPORT), L2TP(PPPOL2TP_AUTH_SUPPORT) AUTH and MD5 Random (PPP_MD5_RANDM) require MD5 support (LWIP_INCLUDED_POLARSSL_MD5 enabled).</Description>
     </RefParameter>
+    <RefParameter Name="LWIP_INCLUDED_POLARSSL_MD5" Comment="LWIP_INCLUDED_POLARSSL_MD5 (LwIP internal PolarSSL for MD5)" Type="list" Group="PolarSSL Options" DefaultValue="0" TabName="Key Options" Mode="Advanced" >
+        <PossibleValue Comment="Disabled" Value="0"/>
+        <Description>This parameter allows to use lwIP internal PolarSSL for MD5.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: This parameter is disabled when MBEDTLS Middleware is enabled.</Description>
+    </RefParameter>
     <RefParameter Name="LWIP_INCLUDED_POLARSSL_MD4" Comment="LWIP_INCLUDED_POLARSSL_MD4 (LwIP internal PolarSSL for MD4)" Type="list" Group="PolarSSL Options" DefaultValue="1" TabName="Key Options" Mode="Advanced" >
-        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: MSCHAP (MSCHAP_SUPPORT) requires MD4 support (LWIP_INCLUDED_POLARSSL_MD4 enabled)." Expression="MSCHAP_SUPPORT"/>
+        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: MSCHAP (MSCHAP_SUPPORT) requires MD4 support (LWIP_INCLUDED_POLARSSL_MD4 enabled)." Expression="!S_MBEDTLS &amp; MSCHAP_SUPPORT"/>
         <PossibleValue Comment="Enabled" Value="1"/>
         <Description>This parameter enabled allows to use lwIP internal PolarSSL for MD4.</Description>
     </RefParameter>
     <RefParameter Name="LWIP_INCLUDED_POLARSSL_MD4" Comment="LWIP_INCLUDED_POLARSSL_MD4 (LwIP internal PolarSSL for MD4)" Type="list" Group="PolarSSL Options" DefaultValue="0" TabName="Key Options" Mode="Advanced" >
+        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: MSCHAP (MSCHAP_SUPPORT) requires MD4 support (LWIP_INCLUDED_POLARSSL_MD4 enabled)." Expression="!S_MBEDTLS"/>
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
         <Description>Enable this parameter to use lwIP internal PolarSSL for MD4.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: MSCHAP (MSCHAP_SUPPORT) requires MD4 support (LWIP_INCLUDED_POLARSSL_MD4 enabled).</Description>
     </RefParameter>
+    <RefParameter Name="LWIP_INCLUDED_POLARSSL_MD4" Comment="LWIP_INCLUDED_POLARSSL_MD4 (LwIP internal PolarSSL for MD4)" Type="list" Group="PolarSSL Options" DefaultValue="0" TabName="Key Options" Mode="Advanced" >
+        <PossibleValue Comment="Disabled" Value="0"/>
+        <Description>This parameter allows to use lwIP internal PolarSSL for MD4.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: This parameter is disabled when MBEDTLS Middleware is enabled.</Description>
+    </RefParameter>
     <RefParameter Name="LWIP_INCLUDED_POLARSSL_SHA1" Comment="LWIP_INCLUDED_POLARSSL_SHA1 (LwIP internal PolarSSL for SHA1)" Type="list" Group="PolarSSL Options" DefaultValue="1" TabName="Key Options" Mode="Advanced" >
-        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: MSCHAP (MSCHAP_SUPPORT) requires SHA1 support (LWIP_INCLUDED_POLARSSL_SHA1 enabled)." Expression="MSCHAP_SUPPORT"/>
+        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: MSCHAP (MSCHAP_SUPPORT) requires SHA1 support (LWIP_INCLUDED_POLARSSL_SHA1 enabled)." Expression="!S_MBEDTLS &amp; MSCHAP_SUPPORT"/>
         <PossibleValue Comment="Enabled" Value="1"/>
         <Description>This parameter enabled allows to use lwIP internal PolarSSL for SHA1.</Description>
     </RefParameter>
     <RefParameter Name="LWIP_INCLUDED_POLARSSL_SHA1" Comment="LWIP_INCLUDED_POLARSSL_SHA1 (LwIP internal PolarSSL for SHA1)" Type="list" Group="PolarSSL Options" DefaultValue="0" TabName="Key Options" Mode="Advanced" >
+        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: MSCHAP (MSCHAP_SUPPORT) requires SHA1 support (LWIP_INCLUDED_POLARSSL_SHA1 enabled)." Expression="!S_MBEDTLS"/>
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
         <Description>Enable this parameter to use lwIP internal PolarSSL for SHA1.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: MSCHAP (MSCHAP_SUPPORT) requires SHA1 support (LWIP_INCLUDED_POLARSSL_SHA1 enabled).</Description>
     </RefParameter>
+    <RefParameter Name="LWIP_INCLUDED_POLARSSL_SHA1" Comment="LWIP_INCLUDED_POLARSSL_SHA1 (LwIP internal PolarSSL for SHA1)" Type="list" Group="PolarSSL Options" DefaultValue="0" TabName="Key Options" Mode="Advanced" >
+        <PossibleValue Comment="Disabled" Value="0"/>
+        <Description>This parameter allows to use lwIP internal PolarSSL for SHA1.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: This parameter is disabled when MBEDTLS Middleware is enabled.</Description>
+    </RefParameter>
     <RefParameter Name="LWIP_INCLUDED_POLARSSL_DES" Comment="LWIP_INCLUDED_POLARSSL_DES (LwIP internal PolarSSL for DES)" Type="list" Group="PolarSSL Options" DefaultValue="1" TabName="Key Options" Mode="Advanced" >
-        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: MSCHAP (MSCHAP_SUPPORT) requires DES support (LWIP_INCLUDED_POLARSSL_DES enabled)." Expression="MSCHAP_SUPPORT"/>
+        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: MSCHAP (MSCHAP_SUPPORT) requires DES support (LWIP_INCLUDED_POLARSSL_DES enabled)." Expression="!S_MBEDTLS &amp; MSCHAP_SUPPORT"/>
         <PossibleValue Comment="Enabled" Value="1"/>
         <Description>This parameter enabled allows to use lwIP internal PolarSSL for DES.</Description>
     </RefParameter>
     <RefParameter Name="LWIP_INCLUDED_POLARSSL_DES" Comment="LWIP_INCLUDED_POLARSSL_DES (LwIP internal PolarSSL for DES)" Type="list" Group="PolarSSL Options" DefaultValue="0" TabName="Key Options" Mode="Advanced" >
+        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: MSCHAP (MSCHAP_SUPPORT) requires SHA1 support (LWIP_INCLUDED_POLARSSL_SHA1 enabled)." Expression="!S_MBEDTLS"/>
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
         <Description>Enable this parameter to use lwIP internal PolarSSL for DES.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: MSCHAP (MSCHAP_SUPPORT) requires DES support (LWIP_INCLUDED_POLARSSL_DES enabld).</Description>
     </RefParameter>
+    <RefParameter Name="LWIP_INCLUDED_POLARSSL_DES" Comment="LWIP_INCLUDED_POLARSSL_DES (LwIP internal PolarSSL for DES)" Type="list" Group="PolarSSL Options" DefaultValue="0" TabName="Key Options" Mode="Advanced" >
+        <PossibleValue Comment="Disabled" Value="0"/>
+        <Description>This parameter allows to use lwIP internal PolarSSL for DES.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: This parameter is disabled when MBEDTLS Middleware is enabled.</Description>
+    </RefParameter>
     <RefParameter Name="LWIP_INCLUDED_POLARSSL_ARC4" Comment="LWIP_INCLUDED_POLARSSL_ARC4 (LwIP internal PolarSSL for ARC4)" Type="list" Group="PolarSSL Options" DefaultValue="1" TabName="Key Options" Mode="Advanced" >
-        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: MSCHAP (MSCHAP_SUPPORT) and MPPE (MPPE_SUPPORT) require ARC4 support (LWIP_INCLUDED_POLARSSL_ARC4 enabled)." Expression="MSCHAP_SUPPORT &amp; MPPE_SUPPORT"/>
+        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: MSCHAP (MSCHAP_SUPPORT) and MPPE (MPPE_SUPPORT) require ARC4 support (LWIP_INCLUDED_POLARSSL_ARC4 enabled)." Expression="!S_MBEDTLS &amp; MSCHAP_SUPPORT &amp; MPPE_SUPPORT"/>
         <PossibleValue Comment="Enabled" Value="1"/>
         <Description>This parameter enabled allows to use lwIP internal PolarSSL for ARC4.</Description>
     </RefParameter>
     <RefParameter Name="LWIP_INCLUDED_POLARSSL_ARC4" Comment="LWIP_INCLUDED_POLARSSL_ARC4 (LwIP internal PolarSSL for ARC4)" Type="list" Group="PolarSSL Options" DefaultValue="0" TabName="Key Options" Mode="Advanced" >
+        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: MSCHAP (MSCHAP_SUPPORT) and MPPE (MPPE_SUPPORT) require ARC4 support (LWIP_INCLUDED_POLARSSL_ARC4 enabled)." Expression="!S_MBEDTLS"/>
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
         <Description>Enable this parameter to use lwIP internal PolarSSL for ARC4.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: MSCHAP (MSCHAP_SUPPORT) requires ARC4 support (LWIP_INCLUDED_POLARSSL_ARC4 enabled).</Description>
+    </RefParameter>
+    <RefParameter Name="LWIP_INCLUDED_POLARSSL_ARC4" Comment="LWIP_INCLUDED_POLARSSL_ARC4 (LwIP internal PolarSSL for ARC4)" Type="list" Group="PolarSSL Options" DefaultValue="0" TabName="Key Options" Mode="Advanced" >
+        <PossibleValue Comment="Disabled" Value="0"/>
+        <Description>This parameter allows to use lwIP internal PolarSSL for ARC4.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: This parameter is disabled when MBEDTLS Middleware is enabled.</Description>
     </RefParameter>
     <RefParameter Name="PPP_SUPPORT" Comment="PPP_SUPPORT (PPP Module)" Type="list" Group="PPP Options" DefaultValue="0" TabName="PPP" Mode="Basic" >
         <Condition Diagnostic="&lt;b&gt;Warning: up to user to take care!&lt;/b&gt;: Enable PPP requires user specific code not generated by STM32Cube MX. This is reserved for advanced users.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Use PPP_SUPPORT requires at least PPPOS_SUPPORT, PPPOE_SUPPORT or PPPOL2TP_SUPPORT turned on.&lt;br&gt;PPP_SUPPORT needs also PPP_IPV4_SUPPORT and/or PPP_IPV6_SUPPORT turned on." Expression="(PPPOS_SUPPORT|PPPOE_SUPPORT|PPPOL2TP_SUPPORT) &amp; (PPP_IPV4_SUPPORT|PPP_IPV6_SUPPORT)"/>
@@ -2748,6 +2797,7 @@
         <Parameter Name="NETMASK_ADDRESS"/>
         <Parameter Name="GATEWAY_ADDRESS"/>
         <Parameter Name="WITH_RTOS"/>
+        <Parameter Name="WITH_MBEDTLS"/>
         <Parameter Name="PHY Driver"/>
         <Parameter Name="LWIP_ICMP"/>
         <Parameter Name="LWIP_IGMP"/>
@@ -3200,7 +3250,7 @@
                     <Semaphore>S_LWIP</Semaphore>
                 </Mode>
             </ModeLogicOperator>
-            <Condition Expression="MW_ETH_MW" Diagnostic="Active only with ETH IP configured"/>
+            <Condition Expression="IF(MW_ETH_MW, IF(!S_MBEDTLS | (S_MBEDTLS &amp; S_FREERTOS),1,0),0)" Diagnostic="Active only if: ETH IP configured / FREERTOS is enabled when MBEDTLS is enabled."/>
         </Mode>
     </ModeLogicOperator>
 <RefSignal Name="VS_Enabled" Virtual="true"/>

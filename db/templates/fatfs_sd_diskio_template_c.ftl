@@ -1,4 +1,5 @@
 [#ftl]
+[#assign familyName=FamilyName?lower_case]
 [#assign use_dma=0]
 [#assign use_rtos=0]
 [#if SWIPdatas??]
@@ -129,7 +130,8 @@ static DSTATUS SD_CheckStatus(BYTE lun)
   */
 DSTATUS SD_initialize(BYTE lun)
 {
-[#if use_rtos = 1]
+[#if familyName="stm32h7"]  [#-- special code for H7... --]
+ [#if use_rtos = 1]
   SD_CheckStatus(lun);
 
   if(Stat != STA_NOINIT)
@@ -140,7 +142,10 @@ DSTATUS SD_initialize(BYTE lun)
   }
 
   return Stat;
-[#else]
+ [#else]
+ return SD_CheckStatus(lun);
+ [/#if]
+[#else]  
   return SD_CheckStatus(lun);
 [/#if]
 }

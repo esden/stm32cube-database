@@ -94,6 +94,7 @@
         <PossibleValue Comment="Low Power Transmission" Value="DSI_LP_DLW_ENABLE"/>
 </RefParameter>
 
+
 <RefParameter Comment="Maximum Read Packet Size Command" DefaultValue="DSI_LP_MRDP_DISABLE" Name="LPMaxReadPacket" Type="list" TabName="Commands" Group="Transmission Mode for Commands:">
         <PossibleValue Comment="High Speed Transmission" Value="DSI_LP_MRDP_DISABLE"/>
         <PossibleValue Comment="Low Power Transmission" Value="DSI_LP_MRDP_ENABLE"/>
@@ -595,13 +596,15 @@
         <PossibleValue Comment="PIN is Active Low" Value="DSI_VSYNC_ACTIVE_LOW"/>
 </RefParameter>
 
-<RefParameter Comment="Data Enable Polarity (set in LTDC)" DefaultValue="DSI_DATA_ENABLE_ACTIVE_LOW" Name="DEPolarity" Type="string"  TabName="LTDC Interface" Group="Polarity of the Control Signals" Visible="true">
+
+
+<RefParameter Comment="Data Enable Polarity (set in LTDC)" DefaultValue="DSI_DATA_ENABLE_ACTIVE_HIGH" Name="DEPolarity" Type="string"  TabName="LTDC Interface" Group="Polarity of the Control Signals" Visible="true">
 <Condition Diagnostic="for the control signals, as the setting done in the LTDC IP has to be coherent with the setting done in the DSI, the setting can't be changed here. If it has to be changed, please change it in the LTDC IP." Expression="LTDC:DEPolarity = LTDC_DEPOLARITY_AL"/> 
         <PossibleValue Comment="PIN is Active High" Value="DSI_DATA_ENABLE_ACTIVE_HIGH"/>
         <PossibleValue Comment="PIN is Active Low" Value="DSI_DATA_ENABLE_ACTIVE_LOW"/>
 </RefParameter>
 
-<RefParameter Comment="Data Enable Polarity (set in LTDC)" DefaultValue="DSI_DATA_ENABLE_ACTIVE_HIGH" Name="DEPolarity" Type="string"  TabName="LTDC Interface" Group="Polarity of the Control Signals" Visible="true">
+<RefParameter Comment="Data Enable Polarity (set in LTDC)" DefaultValue="DSI_DATA_ENABLE_ACTIVE_LOW" Name="DEPolarity" Type="string"  TabName="LTDC Interface" Group="Polarity of the Control Signals" Visible="true">
 <Condition Diagnostic="for the control signals, as the setting done in the LTDC IP has to be coherent with the setting done in the DSI, the setting can't be changed here. If it has to be changed, please change it in the LTDC IP." Expression="LTDC:DEPolarity = LTDC_DEPOLARITY_AH"/> 
         <PossibleValue Comment="PIN is Active High" Value="DSI_DATA_ENABLE_ACTIVE_HIGH"/>
         <PossibleValue Comment="PIN is Active Low" Value="DSI_DATA_ENABLE_ACTIVE_LOW"/>
@@ -687,6 +690,15 @@
 <RefParameter Comment="The Refresh of the Display Frame Buffer is Triggered" DefaultValue="DSI_AR_ENABLE" Name="AutomaticRefresh" Type="list"  TabName="Display Interface" Group="Specific Command Mode Settings">
        <PossibleValue Comment="manually by Enabling the LTDC" Value="DSI_AR_DISABLE"/>
        <PossibleValue Comment="on a Tearing Effect Event"  Value="DSI_AR_ENABLE" Semaphore="Semaphore_TE$IpInstance"/>
+</RefParameter>
+
+<RefParameter Comment="The DSI is halting the LTDC synchronously" DefaultValue="DSI_VSYNC_FALLING" Name="VSyncPol" Type="list"  TabName="LTDC Interface" Group="Interface">
+       <Condition Diagnostic="DSI is configured in command mode" Expression="LTDC:VSPolarity = LTDC_VSPOLARITY_AL"/> 
+       <PossibleValue Comment="On a Falling Edge of VSYNC" Value="DSI_VSYNC_FALLING"/>
+</RefParameter>
+<RefParameter Comment="The DSI is halting the LTDC synchronously" DefaultValue="DSI_VSYNC_RISING" Name="VSyncPol" Type="list"  TabName="LTDC Interface" Group="Interface">
+       <Condition Diagnostic="DSI is configured in command mode" Expression="LTDC:VSPolarity = LTDC_VSPOLARITY_AH"/> 
+       <PossibleValue Comment="On a Rising Edge of VSYNC" Value="DSI_VSYNC_RISING"/>
 </RefParameter>
 
 <RefParameter Comment="The DSI is halting the LTDC synchronously" DefaultValue="DSI_VSYNC_FALLING" Name="VSyncPol" Type="list"  TabName="LTDC Interface" Group="Interface">
@@ -1460,6 +1472,7 @@
   				<Mode Name="DSIHost_Video" UserName="Video Mode">
                                         <Semaphore>DSIUsed_ForRCC</Semaphore>
                                         <Semaphore>Semaphore_MODEVIDEO$IpInstance</Semaphore>
+                                       
   					<SignalLogicalOp Name="AND">
   						<Signal Name="CKP" />
   						<Signal Name="CKN" />
@@ -1485,6 +1498,7 @@
                                 <Mode Name="DSIHost_Adapted" UserName="Adapted Command Mode">
                                         <Semaphore>DSIUsed_ForRCC</Semaphore>
                                         <Semaphore>Semaphore_MODEADAPTED$IpInstance</Semaphore>
+                                     
   					<SignalLogicalOp Name="AND">
   						<Signal Name="CKP" />
   						<Signal Name="CKN" />
@@ -1512,6 +1526,7 @@
 	                        <Mode Name="DSIHost_Adapted_TE" UserName="Adapted Command Mode with TE Pin">
                                         <Semaphore>DSIUsed_ForRCC</Semaphore>
                                         <Semaphore>Semaphore_MODEADAPTEDTE$IpInstance</Semaphore>
+                                        <Semaphore>MW_DSIHOST_MW</Semaphore>
   					<SignalLogicalOp Name="AND">
   						<Signal Name="CKP" />
   						<Signal Name="CKN" />
@@ -1563,6 +1578,7 @@
                                 </Mode>			
   			
                          </ModeLogicOperator>
+                           <Semaphore>$IpInstance</Semaphore>
   		</Mode>
   	</ModeLogicOperator>
 

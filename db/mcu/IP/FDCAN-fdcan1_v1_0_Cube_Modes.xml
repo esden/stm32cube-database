@@ -10,10 +10,16 @@
    
     <RefParameter Comment="Frame Format" DefaultValue="FDCAN_FRAME_CLASSIC" Name="FrameFormat" Type="list" Group="Basic Parameters">
         <Description>Specifies the FDCAN frame format.</Description>
+        <Condition Diagnostic="" Expression="FDCAN_Master_$IpInstance|FDCAN_Slave_$IpInstance"/>
         <PossibleValue Comment="Classic mode " Value="FDCAN_FRAME_CLASSIC"/>
+    </RefParameter>
+    <RefParameter Comment="Frame Format" DefaultValue="FDCAN_FRAME_FD_NO_BRS" Name="FrameFormat" Type="list" Group="Basic Parameters">
+        <Description>Specifies the FDCAN frame format.</Description>
+        <Condition Diagnostic="" Expression="FDCAN_FLEXIBLE_DATARATE_$IpInstance"/>
         <PossibleValue Comment="FD mode without BitRate Switshing " Value="FDCAN_FRAME_FD_NO_BRS"/>
         <PossibleValue Comment="FD mode with BitRate Switshing " Value="FDCAN_FRAME_FD_BRS"/>
     </RefParameter>
+
     <RefParameter Comment="Mode" DefaultValue="FDCAN_MODE_NORMAL" Name="Mode" Type="list" Group="Basic Parameters">
         <Description>Specifies the FDCAN operating mode.</Description>
         <PossibleValue Comment="Normal mode " Value="FDCAN_MODE_NORMAL"/>
@@ -365,7 +371,7 @@
     <RefParameter Comment="Message Ram Offset" DefaultValue="0" Max="2560" Min="0" Name="MessageRAMOffset" Type="integer" Group="Basic Parameters">		
         <Description>Specifies the message RAM start address.</Description>		
     </RefParameter>
-    <RefParameter Comment="Operation Mode" DefaultValue="FDCAN_EVENT_DRIVEN_COMMUNICATION" Name="OperationMode" Type="list" Group="Basic Parameters">		
+    <RefParameter Comment="Operation Mode" DefaultValue="FDCAN_EVENT_DRIVEN_COMMUNICATION" Name="OperationMode" Type="list" Group="Basic Parameters" Visible="false" >		
         <Description>Specifies the FDCAN Operation Mode.</Description>		
         <PossibleValue Comment="Event-driven FDCAN communication " Value="FDCAN_EVENT_DRIVEN_COMMUNICATION"/>		
         <PossibleValue Comment="Time triggered communication, level 1 " Value="FDCAN_TT_COMMUNICATION_LEVEL1"/>		
@@ -669,12 +675,12 @@
         <PossibleValue Comment="Disable" Value="DISABLE"/>
         <PossibleValue Comment="Enable" Value="ENABLE"/>
     </RefParameter>
-<RefParameter Comment="Gap Enable" DefaultValue="FDCAN_STRICTLY_TT_OPERATION" Name="GapEnable" Type="list" Group="TT Pararams">		
+    <RefParameter Comment="Gap Enable" DefaultValue="FDCAN_STRICTLY_TT_OPERATION" Name="GapEnable" Type="list" Group="TT Pararams">		
         <Description>Specifies the FDCAN TT Operation.</Description>		
         <PossibleValue Comment="Strictly time-triggered operation " Value="FDCAN_STRICTLY_TT_OPERATION"/>		
         <PossibleValue Comment="External event-synchronized time-triggered operation " Value="FDCAN_EXT_EVENT_SYNC_TT_OPERATION"/>		
     </RefParameter>	
-       <RefParameter Comment="Basic Cycles Nbr" DefaultValue="FDCAN_TT_1_BASIC_CYCLE_PER_MARTIX" Name="BasicCyclesNbr" Type="list" Group="TT Pararams">		
+    <RefParameter Comment="Basic Cycles Nbr" DefaultValue="FDCAN_TT_1_BASIC_CYCLE_PER_MARTIX" Name="BasicCyclesNbr" Type="list" Group="TT Pararams">		
         <Description>Specifies the nubmer of basic cycles in the system matrix.</Description>		
         <PossibleValue Comment="1 Basic Cycle per Matrix " Value="FDCAN_TT_1_BASIC_CYCLE_PER_MARTIX"/>		
         <PossibleValue Comment="2 Basic Cycles per Matrix " Value="FDCAN_TT_2_BASIC_CYCLES_PER_MARTIX"/>		
@@ -690,9 +696,9 @@
         <PossibleValue Comment="Sync pulse at start of basic cycle " Value="FDCAN_TT_SYNC_PULSE_AT_START_OF_BASIC_CYCLE"/>		
         <PossibleValue Comment="Sync pulse at start of matrix " Value="FDCAN_TT_SYNC_PULSE_AT_START_OF_MATRIX"/>		
     </RefParameter>	
-    <!-- RefMode for 'Master' FDCAN Mode -->
 
-    <RefMode Name="Master" BaseMode="canBasic">
+    <!-- RefMode for 'Master' FDCAN Mode -->
+    <RefMode Name="FDCANMaster" BaseMode="canBasic">
         <ConfigForMode>Can_Init</ConfigForMode>
         <Parameter Name="Instance"/>
         <Parameter Name="OperationMode"/>
@@ -701,7 +707,7 @@
         <Parameter Name="AutoRetransmission"/>
         <Parameter Name="TxDelayCompensation"/>
         <Parameter Name="TransmitPause"/>
-                <Parameter Name="Init_ProtocolException"/>
+        <Parameter Name="Init_ProtocolException"/>
 
         <Parameter Name="NominalPrescaler"/>
         <Parameter Name="NominalSyncJumpWidth"/>
@@ -736,12 +742,10 @@
         <Parameter Name="TTMemorySA"/>
         <Parameter Name="ErrorCode"/>
         <Parameter Name="EndAddress"/>
-
-
     </RefMode>
 	
     <!-- For the Moment, only one Filter can be Parameter (90% of use cases). -->
-    <RefMode Name="Slave" BaseMode="canBasic">
+    <RefMode Name="FDCANSlave" BaseMode="canBasic">
         <ConfigForMode>Can_Init</ConfigForMode>
         <Parameter Name="Instance"/>
         <Parameter Name="OperationMode"/>
@@ -789,7 +793,7 @@
           
     </RefMode>
 		
-    <RefMode Name="FullDuplex" BaseMode="canBasic">
+    <RefMode Name="FDCANFD" BaseMode="canBasic">
         <ConfigForMode>Can_Init</ConfigForMode>
         <Parameter Name="Instance"/>
         <Parameter Name="OperationMode"/>
@@ -834,46 +838,64 @@
         <Parameter Name="TTMemorySA"/>
         <Parameter Name="ErrorCode"/>
         <Parameter Name="EndAddress"/>
-
-          
     </RefMode>
-        
-      	
-	
-	
+
     <!-- Modes for CAN. Suppose Silent and/or Loopback Modes are Debug, and need Tx/Rx on Board -->
     <ModeLogicOperator Name="OR">
         <Mode Name="Mode" UserName="Mode">
             <ModeLogicOperator Name="XOR">
-                <Mode Name="Master" UserName="Master"  ShrinkName="Master Mode" RemoveCondition="$IpNumber=2" >
+                <Mode Name="FDCANMaster" UserName="Classic" ShrinkName="Master Mode" RemoveCondition="$IpNumber=2" >
                     <SignalLogicalOp Name="AND">
                         <Signal Name="RX"/>
                         <Signal Name="TX"/>
                     </SignalLogicalOp>
                     <Condition Expression="$IpNumber=1" Diagnostic="Master active only on CAN1"/>
-				
+                    <Semaphore>FDCAN_Master_$IpInstance</Semaphore>
                 </Mode>
-				
-                <Mode Name="Slave" UserName="Slave" ShrinkName="Slave Mode" RemoveCondition="$IpNumber=1" >
+                <Mode Name="FDCANSlave" UserName="Classic" ShrinkName="Slave Mode" RemoveCondition="$IpNumber=1" >
                     <SignalLogicalOp Name="AND">
                         <Signal Name="RX"/>
                         <Signal Name="TX"/>
                     </SignalLogicalOp>
                     <Condition Expression="$IpNumber=2" Diagnostic="Slave active only on CAN2"/>
+                    <Semaphore>FDCAN_Slave_$IpInstance</Semaphore>
                 </Mode>
-                <Mode Name="FullDuplex" UserName="Full Duplex">
+                <Mode Name="FDCANFD" UserName="FD">
                     <SignalLogicalOp Name="AND">
-                        <Signal Name="RXFD"/>
+                        <Signal Name="RX"/>
+                        <Signal Name="TX"/>
+                    </SignalLogicalOp>
+                    <Semaphore>FDCAN_FLEXIBLE_DATARATE_$IpInstance</Semaphore>
+                </Mode>
+            </ModeLogicOperator>
+            <Semaphore>USB_OR_CAN</Semaphore>
+        </Mode>
+        <Mode Name="Enable_FDCAN_TXFD">
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="Enable_FDCAN_TXFD" UserName="Enable FDCAN_TXFD">
+                    <SignalLogicalOp Name="AND">
                         <Signal Name="TXFD"/>
                     </SignalLogicalOp>
                 </Mode>
             </ModeLogicOperator>
-            <Semaphore>USB_OR_CAN</Semaphore>
+            <Condition Expression="FDCAN_FLEXIBLE_DATARATE_$IpInstance" Diagnostic="Activable only in FD Mode"/>
+        </Mode>
+        <Mode Name="Enable_FDCAN_RXFD">
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="Enable_FDCAN_RXFD" UserName="Enable FDCAN_RXFD">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="RXFD"/>
+                    </SignalLogicalOp>
+                </Mode>
+            </ModeLogicOperator>
+            <Condition Expression="FDCAN_FLEXIBLE_DATARATE_$IpInstance" Diagnostic="Activable only in FD Mode"/>
         </Mode>
     </ModeLogicOperator>
 		
     <!-- RefSignal for CAN -->
     <RefSignal IOMode="AlternateFunctionPushPull" Name="RX"/>
     <RefSignal IOMode="AlternateFunctionPushPull" Name="TX"/>
+    <RefSignal IOMode="AlternateFunctionPushPull" Name="RXFD"/>
+    <RefSignal IOMode="AlternateFunctionPushPull" Name="TXFD"/>
     <Semaphore>$IpInstanceUsed_ForRCC</Semaphore>
 </IP>

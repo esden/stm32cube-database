@@ -1273,9 +1273,14 @@
 <!-- *******************************REMAP Functions*********************************-->
 <!-- for TIM16 of F3 family -->
     <RefParameter Name="TIM16_TI1_REMAP" Comment="TI1 remap capabilities for TIM16" DefaultValue="TIM_TIM16_MCO" Type="list" Group="TI1 remap capabilities for TIM16">
+ <Condition Diagnostic="" Expression="Semaphore_remapTI1_TIM16" />
             <PossibleValue Value="TIM_TIM16_RTC" Comment="TIM16 Channel 1 is connected to RTC clock" Semaphore="SEM2RCC_RTC_clock_REQUIRED_$IpInstance" Condition="!RTCUsed_ForRCC" Action="Disable" Diagnostic="RTC IP must be active to enable this remap"/>
             <PossibleValue Value="TIM_TIM16_HSE" Comment="TIM16 Channel 1 is connected to HSE/32" Semaphore="SEM2RCC_HSE_REQUIRED_$IpInstance" Condition="!(HSEOscillator|HSEByPass)" Action="Disable" Diagnostic="HSE Oscillator must be activated in the RCC IP (Pinout view)"/>
             <PossibleValue Value="TIM_TIM16_MCO" Comment="TIM16 Channel 1 is connected to MCO clock" Semaphore="SEM2RCC_MCO_REQUIRED_$IpInstance"/>
+    </RefParameter>
+    <RefParameter Name="TIM16_TI1_REMAP" Comment="TI1 remap capabilities for TIM16" DefaultValue="__NULL" Type="list" Group="TI1 remap capabilities for TIM16" Visible="false">
+        <Condition Diagnostic="" Expression="!Semaphore_remapTI1_TIM16" />
+            <PossibleValue Value="__NULL" Comment="RTC IP must be active to enable this remap" Diagnostic="default value __NULL if remap TIM16_TI1 is not active"/>
     </RefParameter>
     <RefParameter Name="TIM16_NONE_REMAP" Comment="remap2 capabilities for TIM16" DefaultValue="TIM_TIM16_NONE" Type="list" Group="TI1 remap capabilities for TIM16" Visible="false">
             <PossibleValue Value="TIM_TIM16_NONE" Comment="TIM_TIM16_NONE"/>
@@ -3020,6 +3025,7 @@
                                         <Semaphore>Semaphore_input_Channel1$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_input_Channel1_direct$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_CH1pinUsed$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_remapTI1_$IpInstance</Semaphore>
 <!-- peut etre retire -->
                                         <Condition Diagnostic="(1) Channel1 is already used as input for the Slave mode controller, (2)Specifically for TIM2 , ETR IO is already used" Expression="((Semaphore_SMC_Reset$IpInstance|Semaphore_SMC_CombinedResetTrigger$IpInstance)|!(Semaphore_ClockTriggerSourceOnTI1$IpInstance))&amp;!(($IpNumber=2)&amp;(Semaphore_ETRpinUsed$IpInstance))"/>
                     <SignalLogicalOp Name="AND">

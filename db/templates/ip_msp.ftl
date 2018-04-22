@@ -1,5 +1,4 @@
 [#ftl]
-
 [#list IPdatas as IP]  
 [#assign ipvar = IP]
 [#assign useGpio = false]
@@ -682,7 +681,7 @@
 [#compress]
 [#list ipvar.initCallBacks.entrySet() as entry] 
 [#assign instanceList = entry.value] 
-[#if (instanceList?size==1 && (name==instanceList.get(0)||name=="USB")) || instanceList?size>1]
+[#if (instanceList?size==1 && (name==instanceList.get(0)||name=="USB")|| (name=="DSIHOST" && instanceList.get(0)=="DSI")) || instanceList?size>1]
 [#assign mode=entry.key?replace("_MspInit","")?replace("MspInit","")?replace("_BspInit","")?replace("HAL_","")]
 
 [#assign ipHandler = mode?lower_case+ "Handle"]
@@ -917,7 +916,7 @@ uint32_t DFSDM_Init = 0;
 [#compress]
 [#list ipvar.deInitCallBacks.entrySet() as entry]
 [#assign instanceList = entry.value]
-[#if (instanceList?size==1 && (name==instanceList.get(0)||name=="USB"))  || instanceList?size>1]
+[#if (instanceList?size==1 && (name==instanceList.get(0)||name=="USB"|| (name=="DSIHOST" && instanceList.get(0)=="DSI")))  || instanceList?size>1]
 [#assign mode=entry.key?replace("_MspDeInit","")?replace("MspDeInit","")?replace("_BspDeInit","")?replace("HAL_","")]
 [#assign ipHandler = mode?lower_case+ "Handle"]
 [#if name !="TIM"]
