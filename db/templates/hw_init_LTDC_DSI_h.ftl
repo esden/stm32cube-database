@@ -1,15 +1,13 @@
 [#ftl]
-/**
+  /**
   ******************************************************************************
-  * @file    HW_init.c
+  * @file    HW_init.h
   * @author  MCD Application Team
-  * @version V1.2.0
-  * @date    24-F�vrier-2017
-  * @brief   This file implements the configuration for the GUI library
+  * @brief   Header for HW_Init.c module
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; Copyright (c) 2016 STMicroelectronics International N.V. 
+  * <h2><center>&copy; Copyright (c) 2018 STMicroelectronics International N.V. 
   * All rights reserved.</center></h2>
   *
   * Redistribution and use in source and binary forms, with or without 
@@ -83,14 +81,14 @@ void MX_LCD_Init(void);
 void MX_DMA2D_Init(void);
 [/#if]
 void MX_FMC_Init(void);
-[#elseif definition.name = "USE_Embedded_Wizard"]
-[#if definition.value != "0" ]
 void MX_SDRAM_InitEx(void);
-[/#if]
 void MX_DSI_Init(void);
-[#elseif definition.name = "Use_QuadSPI_MM" ]
-[#if definition.value != "0" ]
-uint8_t BSP_QSPI_EnableMemoryMappedMode(void);
+[#assign objectConstructor = "freemarker.template.utility.ObjectConstructor"?new()]
+
+ [#assign file = objectConstructor("java.io.File",workspace+"/"+"ST-EmbeddedWizard/Ew_QUADSPI_tmp.c")]
+  [#assign exist = file.exists()]
+  [#if exist]
+/* uint8_t QSPI_EnableMemoryMappedMode(void); */
 [/#if]
 
 [/#if]

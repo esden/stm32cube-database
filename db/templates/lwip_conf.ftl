@@ -6,7 +6,7 @@
   * Description        : This file overrides LwIP stack default configuration
   *                      done in opt.h file.
   ******************************************************************************
-[@common.optinclude name="Src/license.tmp"/][#--include License text --]
+[@common.optinclude name=sourceDir+"Src/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
  

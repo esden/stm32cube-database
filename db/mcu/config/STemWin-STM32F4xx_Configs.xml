@@ -14,7 +14,7 @@
         <Component Name="Middleware:STemWin"/>
         <Component Name="Middleware:STemWin:OS:$FREERTOS"/>
         <Component Name="Middleware:STemWin:Lib:$OPTIM_OS_use"/> 
-        <Component Name="HAL::ILI:$Use_ili9341"/>
+        <Component Name="HAL::ILI:$Use_ili9341_Check"/>
         <Component Name="HAL::OTM:$USE_OTM8009A"/> 
         <Component Name="Generated::App:$Use_App"/>
         <ConfigFile Name="GUI_CONF_H"/> 	
@@ -134,15 +134,15 @@
         </SubComponent> 
     </RefComponent>     
     <!-- GUIConf.h -->
-    <RefConfigFile Name="GUI_CONF_H" Description="Header file for GUI configuration" Template="GUIConf_h.ftl">      
-        <File Name="Target/GUIConf.h" Category="header" Version="" Condition="Display_Interface_LTDC_DSIHOST | Display_Interface_LTDC_FMC"/>
+    <RefConfigFile Name="GUI_CONF_H" Description="Header file for GUI configuration" Template="GUIConf_fmc_h.ftl">      
+        <File Name="Target/GUIConf.h" Category="header" Version="" Condition="Display_Interface_FMC"/>
           <Argument Name="GUI_NUM_LAYERS" GenericType="simple" Comment="Maximum number of available layers"/>
         <Argument Name="FREERTOS" GenericType="simple" Comment=""/>
         <Argument Name="GUI_DefaultFont" GenericType="simple" Comment="Default Font"/>
                        
     </RefConfigFile>
     <RefConfigFile Name="GUI_CONF_H" Description="" Template="GUIConf_h.ftl">      
-        <File Name="Target/GUIConf.h" Category="header" Version="" Condition="all"/>
+        <File Name="Target/GUIConf.h" Category="header" Version="" Condition="Display_Interface_LTDC_DSIHOST | Display_Interface_LTDC_FMC"/>
         <Argument Name="GUI_NUM_LAYERS" GenericType="simple" Comment="Maximum number of available layers"/>
         <Argument Name="FREERTOS" GenericType="simple" Comment=""/>
         <Argument Name="GUI_DefaultFont" GenericType="simple" Comment=""/>
@@ -161,26 +161,27 @@
            <Argument Name="DMA2D_Graphics" GenericType="simple" Comment=""/>
              <Argument Name="USE_Embedded_Wizard" GenericType="simple" Comment=""/> 
            
-             <Argument Name="Use_QuadSPI_MM" GenericType="simple" Comment=""/> 
+            
     </RefConfigFile> 
    
-    <RefConfigFile Name="HW_Init_LTDC_FMC_H" Description="" Template="hw_init_LTDC_FMC_h.ftl">      
+   <RefConfigFile Name="HW_Init_LTDC_FMC_H" Description="" Template="hw_init_LTDC_FMC_h.ftl">      
         <File Name="Target/HW_Init.h" Category="header" Version="" Condition="Display_Interface_LTDC_FMC"/>
+         <Argument Name="Use_ili9341_Check" GenericType="simple" Comment=""/>
         <Argument Name="DMA2D_Graphics" GenericType="simple" Comment=""/> 
-        <Argument Name="Use_ili9341" GenericType="simple" Comment=""/>
-         <Argument Name="Use_SDRAM" GenericType="simple" Comment=""/> 
-          <Argument Name="GUI_NUM_LAYERS" GenericType="simple" Comment="Maximum number of available layers"/>
-    </RefConfigFile> 
+        <Argument Name="USE_Embedded_Wizard" GenericType="simple" Comment=""/> 
+         
+       
+  
+    </RefConfigFile>
   
     <RefConfigFile Name="HW_Init_LTDC_FMC_C" Description="" Template="hw_init_LTDC_FMC_c.ftl">      
         <File Name="Target/HW_Init.c" Category="source" Version="" Condition="Display_Interface_LTDC_FMC "/>  
         <Argument Name="USE_Embedded_Wizard" GenericType="simple" Comment=""/>
-    
-        <Argument Name="Use_QuadSPI_MM" GenericType="simple" Comment=""/> 
+        <Argument Name="USE_STTouchGFX" GenericType="simple" Comment=""/> 
+        <Argument Name="Use_ili9341_Check" GenericType="simple" Comment=""/>
         <Argument Name="DMA2D_Graphics" GenericType="simple" Comment=""/> 
-       
-         <Argument Name="Use_SDRAM" GenericType="simple" Comment="Default Font"/> 
-          <Argument Name="RefreshCount_SDRAM" GenericType="simple" Comment=""/> 
+        <Argument Name="Use_SDRAM" GenericType="simple" Comment="Default Font"/> 
+        <Argument Name="RefreshCount_SDRAM_Param" GenericType="simple" Comment=""/> 
         <Argument Name="GUI_NUM_LAYERS" GenericType="simple" Comment=""/>
         
     </RefConfigFile> 
@@ -206,14 +207,15 @@
     <RefConfigFile Name="HW_Init_LTDC_DSI_C" Description="" Template="hw_init_LTDC_DSI_c.ftl">      
         <File Name="Target/HW_Init.c" Category="source" Version="" Condition="Display_Interface_LTDC_DSIHOST"/> 
          <Argument Name="USE_Embedded_Wizard" GenericType="simple" Comment=""/> 
-    
-         <Argument Name="Use_QuadSPI_MM" GenericType="simple" Comment=""/> 
+         <Argument Name="USE_STTouchGFX" GenericType="simple" Comment=""/> 
          <Argument Name="DMA2D_Graphics" GenericType="simple" Comment=""/> 
          <Argument Name="Use_SDRAM" GenericType="simple" Comment=""/> 
-          <Argument Name="RefreshCount_SDRAM" GenericType="simple" Comment=""/> 
+         <Argument Name="RefreshCount_SDRAM_Param" GenericType="simple" Comment=""/> 
          <Argument Name="GUI_NUM_LAYERS" GenericType="simple" Comment="Maximum number of available layers"/>   
          <Argument Name="OTM8009A_Orientation" GenericType="simple" Comment=""/>         
     </RefConfigFile> 
+    
+    
     <!-- wrapper -->
     <RefConfigFile Name="STemwin_wrapper_LTDC_DSI_C" Description="" Template="stemwin_wrapper_LTDC_DSI_c.ftl">
              
@@ -228,14 +230,13 @@
         <Argument Name="LIN_Display_Driver_Layer0" GenericType="simple" Comment=""/>
         <Argument Name="LIN_Display_Driver_Layer1" GenericType="simple" Comment=""/>
         <Argument Name="LIN_Color_Conversion_Layer1" GenericType="simple" Comment=""/>
-        <Argument Name="LIN_OrientationMirror_Layer0" GenericType="simple" Comment=""/>
-        <Argument Name="LIN_OrientationSwap_Layer0" GenericType="simple" Comment=""/>
+        <!-- <Argument Name="LIN_OrientationMirror_Layer0" GenericType="simple" Comment=""/>
+        <Argument Name="LIN_OrientationSwap_Layer0" GenericType="simple" Comment=""/> -->
         <Argument Name="Frame_Buffer_StartAddress_Layer0_DPI_DSI" GenericType="simple" Comment=""/>
         <Argument Name="Frame_Buffer_StartAddress_Layer1_DPI_DSI" GenericType="simple" Comment=""/>
-        <Argument Name="RefreshCount_SDRAM" GenericType="simple" Comment=""/> 
-        <Argument Name="Use_SDRAM" GenericType="simple" Comment=""/> 
-           <Argument Name="OTM8009A_Orientation" GenericType="simple" Comment=""/> 
         <Argument Name="DMA2D_Graphics" GenericType="simple" Comment=""/> 
+        <Argument Name="OTM8009A_Orientation" GenericType="simple" Comment=""/> 
+     
       
       
          
@@ -257,7 +258,7 @@
     </RefConfigFile> 
     
     
-    <!-- wrapper -->
+    <!-- wrapper 
     <RefConfigFile Name="stemwin_wrapper_LTDC_FMC_STM32F429II_C" Description="" Template="stemwin_wrapper_LTDC_FMC_STM32F429II_c.ftl">
              
         <File Name="Target/STemwin_wrapper.c" Category="source" Version="" Condition=" (Display_Interface_LTDC_FMC) &amp; (Use_ili9341) "/>  
@@ -275,32 +276,30 @@
         <Argument Name="LIN_OrientationSwap_Layer0" GenericType="simple" Comment=""/>
         <Argument Name="Frame_Buffer_StartAddress_Layer0_DPI_DSI" GenericType="simple" Comment=""/>
         <Argument Name="Frame_Buffer_StartAddress_Layer1_DPI_DSI" GenericType="simple" Comment=""/>
-        <Argument Name="RefreshCount_SDRAM" GenericType="simple" Comment=""/> 
-          <Argument Name="Use_SDRAM" GenericType="simple" Comment=""/> 
-        <Argument Name="DMA2D_Graphics" GenericType="simple" Comment=""/> 
-      
-        
-    </RefConfigFile> 
+        <Argument Name="DMA2D_Graphics" GenericType="simple" Comment=""/>  
+    </RefConfigFile> -->
+    
+    
+    
     <RefConfigFile Name="STemwin_wrapper_LTDC_FMC_C" Description="" Template="stemwin_wrapper_LTDC_FMC_c.ftl">
              
-        <File Name="Target/STemwin_wrapper.c" Category="source" Version="" Condition="Display_Interface_LTDC_FMC &amp; (Use_ili9341 = 0) "/>  
+        <!-- <File Name="Target/STemwin_wrapper.c" Category="source" Version="" Condition="Display_Interface_LTDC_FMC &amp; (Use_ili9341 = 0) "/>   -->
+        <File Name="Target/STemwin_wrapper.c" Category="source" Version="" Condition="Display_Interface_LTDC_FMC"/>  
          <Argument Name="GUI_NUM_LAYERS" GenericType="simple" Comment="Maximum number of available layers"/>
         <Argument Name="Xsize_PHYS" GenericType="simple" Comment=""/>
         <Argument Name="Ysize_PHYS" GenericType="simple" Comment=""/>
         <Argument Name="Num_MultBuffers" GenericType="simple" Comment=""/>
         <Argument Name="Num_VScreens" GenericType="simple" Comment=""/>
-      
         <Argument Name="LIN_Color_Conversion_Layer0" GenericType="simple" Comment=""/>
         <Argument Name="LIN_Display_Driver_Layer0" GenericType="simple" Comment=""/>
         <Argument Name="LIN_Display_Driver_Layer1" GenericType="simple" Comment=""/>
         <Argument Name="LIN_Color_Conversion_Layer1" GenericType="simple" Comment=""/>
-        <Argument Name="LIN_OrientationMirror_Layer0" GenericType="simple" Comment=""/>
-        <Argument Name="LIN_OrientationSwap_Layer0" GenericType="simple" Comment=""/>
+       <!--  <Argument Name="LIN_OrientationMirror_Layer0" GenericType="simple" Comment=""/>
+        <Argument Name="LIN_OrientationSwap_Layer0" GenericType="simple" Comment=""/> -->
         <Argument Name="Frame_Buffer_StartAddress_Layer0_DPI_DSI" GenericType="simple" Comment=""/>
         <Argument Name="Frame_Buffer_StartAddress_Layer1_DPI_DSI" GenericType="simple" Comment=""/>
-        <Argument Name="RefreshCount_SDRAM" GenericType="simple" Comment=""/> 
-          <Argument Name="Use_SDRAM" GenericType="simple" Comment=""/> 
         <Argument Name="DMA2D_Graphics" GenericType="simple" Comment=""/> 
+        <Argument Name="Use_ili9341" GenericType="simple" Comment=""/> 
        
       
         

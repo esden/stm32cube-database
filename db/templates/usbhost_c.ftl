@@ -6,7 +6,7 @@
 [#--  * @packageVersion  : ${fwVersion} --]
   * @brief           : This file implements the USB Host
   ******************************************************************************
-[@common.optinclude name="Src/license.tmp"/][#--include License text --]
+[@common.optinclude name=sourceDir+"Src/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
 

@@ -6,7 +6,7 @@
 [#--  * @packageVersion : ${fwVersion} --]
   * @brief          : Header for usbd_desc.c file.
   ******************************************************************************
-[@common.optinclude name="Src/license.tmp"/][#--include License text --]
+[@common.optinclude name=sourceDir+"Src/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
 

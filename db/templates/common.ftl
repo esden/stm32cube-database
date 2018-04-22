@@ -410,7 +410,7 @@
                     [#list method.name?split("/") as n]
                         [#assign tplName = n]
                     [/#list]
-                    [@optinclude name="Src/${tplName?replace('ftl','tmp')}" /] 
+                    [@optinclude name=sourceDir+"Src/${tplName?replace('ftl','tmp')}" /] 
                 [/#if]
             [/#if]
             [#if method.status=="OK" && method.type != "Template" && method.type != "HardCode"]

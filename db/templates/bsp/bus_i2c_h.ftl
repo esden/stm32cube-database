@@ -4,7 +4,7 @@
   * @file           : bus_i2c.h
   * @brief          : header file for the BSP BUS IO driver over I2C
   ******************************************************************************
-[@common.optinclude name="Src/license.tmp"/][#--include License text --]
+[@common.optinclude name=sourceDir+"Src/license.tmp"/][#--include License text --]
   ******************************************************************************
 */
 [#assign IpInstance = ""]

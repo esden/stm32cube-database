@@ -6,7 +6,7 @@
                     on LwIP API see the file "mbedTLS/library/net_socket_template.c"
                     for the standard implmentation
   ******************************************************************************
-[@common.optinclude name="Src/license.tmp"/][#--include License text --]
+[@common.optinclude name=sourceDir+"Src/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
 

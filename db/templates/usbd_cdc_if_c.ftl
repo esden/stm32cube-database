@@ -6,7 +6,7 @@
 [#--  * @packageVersion : ${fwVersion} --]
   * @brief          : Usb device for Virtual Com Port.
   ******************************************************************************
-[@common.optinclude name="Src/license.tmp"/][#--include License text --]
+[@common.optinclude name=sourceDir+"Src/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
 

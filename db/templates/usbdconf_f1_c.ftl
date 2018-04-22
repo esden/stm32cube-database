@@ -6,7 +6,7 @@
 [#--  * @packageVersion : ${fwVersion} --]
   * @brief          : This file implements the board support package for the USB device library
   ******************************************************************************
-[@common.optinclude name="Src/license.tmp"/][#--include License text --]
+[@common.optinclude name=sourceDir+"Src/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
 
@@ -87,13 +87,13 @@
 /* USER CODE END PV */
 
 [#if handleNameFS == "FS"]
-[#include "Src/usb_otg_fs_vars.tmp"]
+[#include sourceDir+"Src/usb_otg_fs_vars.tmp"]
 [/#if]
 [#if handleNameUSB_FS = "FS"]
-[#include "Src/usb_vars.tmp"]
+[#include sourceDir+"Src/usb_vars.tmp"]
 [/#if]
 [#if handleNameHS == "HS"]
-[#include "Src/usb_otg_hs_vars.tmp"]
+[#include sourceDir+"Src/usb_otg_hs_vars.tmp"]
 [/#if]
 
 /* USER CODE BEGIN 0 */
@@ -120,21 +120,21 @@ void HAL_PCDEx_SetConnectionState(PCD_HandleTypeDef *hpcd, uint8_t state);
 [#if handleNameFS == "FS"]
 [#if includeMspDone == 0]
 [#assign includeMspDone = 1]
-[#include "Src/usb_otg_fs_Msp.tmp"]
+[#include sourceDir+"Src/usb_otg_fs_Msp.tmp"]
 [/#if]
 [/#if]
 
 [#if handleNameHS == "HS"]
 [#if includeMspDone == 0]
 [#assign includeMspDone = 1]
-[#include "Src/usb_otg_hs_Msp.tmp"]
+[#include sourceDir+"Src/usb_otg_hs_Msp.tmp"]
 [/#if]
 [/#if]
 
 [#if handleNameUSB_FS == "FS"]
 [#if includeMspDone == 0]
 [#assign includeMspDone = 1]
-[#include "Src/usb_Msp.tmp"]
+[#include sourceDir+"Src/usb_Msp.tmp"]
 [/#if]
 [/#if]
 
@@ -307,7 +307,7 @@ USBD_StatusTypeDef USBD_LL_Init(USBD_HandleTypeDef *pdev)
 #t/* Link the driver to the stack. */
 #thpcd_USB_OTG_FS.pData = pdev;
 #tpdev->pData = &hpcd_USB_OTG_FS;
-#t[#include "Src/usb_otg_fs_HalInit.tmp"]
+#t[#include sourceDir+"Src/usb_otg_fs_HalInit.tmp"]
 #tHAL_PCDEx_SetRxFiFo(&hpcd_USB_OTG_FS, 0x80);
 #tHAL_PCDEx_SetTxFiFo(&hpcd_USB_OTG_FS, 0, 0x40);
 #tHAL_PCDEx_SetTxFiFo(&hpcd_USB_OTG_FS, 1, 0x80);
@@ -318,7 +318,7 @@ USBD_StatusTypeDef USBD_LL_Init(USBD_HandleTypeDef *pdev)
 #t/* Link the driver to the stack. */
 #thpcd_USB_OTG_HS.pData = pdev;
 #tpdev->pData = &hpcd_USB_OTG_HS;
-[#include "Src/usb_otg_hs_HalInit.tmp"]
+[#include sourceDir+"Src/usb_otg_hs_HalInit.tmp"]
 #tHAL_PCDEx_SetRxFiFo(&hpcd_USB_OTG_HS, 0x200);
 #tHAL_PCDEx_SetTxFiFo(&hpcd_USB_OTG_HS, 0, 0x80);
 #tHAL_PCDEx_SetTxFiFo(&hpcd_USB_OTG_HS, 1, 0x174);
@@ -328,7 +328,7 @@ USBD_StatusTypeDef USBD_LL_Init(USBD_HandleTypeDef *pdev)
 #t/* Link the driver to the stack. */
 #thpcd_USB_FS.pData = pdev;
 #tpdev->pData = &hpcd_USB_FS;
-[#include "Src/usb_HalInit.tmp"]
+[#include sourceDir+"Src/usb_HalInit.tmp"]
 #tHAL_PCDEx_PMAConfig((PCD_HandleTypeDef*)pdev->pData , 0x00 , PCD_SNG_BUF, 0x18);
 #tHAL_PCDEx_PMAConfig((PCD_HandleTypeDef*)pdev->pData , 0x80 , PCD_SNG_BUF, 0x58);
 [#if className == "MSC"]

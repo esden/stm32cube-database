@@ -5,7 +5,7 @@
   * Description        : This file provides code for the configuration
   *                      of the ${name} instances.
   ******************************************************************************
-[@common.optinclude name="Src/license.tmp"/][#--include License text --]
+[@common.optinclude name=sourceDir+"Src/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
 
@@ -727,7 +727,7 @@ ETH_TxPacketConfig TxConfig;
         [#if !ipName?contains("I2C")&& !ipName?contains("USB")] [#-- if not I2C --]
             [#if initService.clock??]
                 [#if initService.clock!="none"]
-                    [#if FamilyName=="STM32F1" && ipName=="RTC"]debuggg ${usedDriverFlag}
+                    [#if FamilyName=="STM32F1" && ipName=="RTC"]
                         [#if usedDriverFlag?? && !usedDriverFlag?contains("LL")]
                         #t#tHAL_PWR_EnableBkUpAccess();
                         #t#t/* Enable BKP CLK enable for backup registers */

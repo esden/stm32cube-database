@@ -3,6 +3,8 @@
 [#-- BspIpDatas is a list of SWIPconfigModel --] 
 
 [#assign IpName = ""]
+[#assign spihandler = "hspi"]
+[#assign spiExist = "0"]
 [#if BspIpDatas??]
 [#assign i = 0]
 [#list BspIpDatas  as BSPIP]
@@ -28,7 +30,10 @@
 
  [#assign i = i + 1]
 [/#if]
+
 [#if IpInstance?contains("SPI")]
+[#assign spiExist = "1"]
+extern void MX_${IpInstance}_Init(void);
 extern SPI_HandleTypeDef  ${IpInstance?replace("SPI","hspi")};
 [#assign spihandler = IpInstance?replace("SPI","hspi")]
 [#assign spiIndex = IpInstance?replace("SPI","")]
@@ -40,9 +45,10 @@ extern SPI_HandleTypeDef  ${IpInstance?replace("SPI","hspi")};
  [/#list]
 [/#if]
 
+
+
+[#if spiExist == "1" && type0?? &&  type1?? && type2?? ]
 /* In case of use of STM32429-DISCO board */
-
-
 [#if type0??]
 #n
 /* Chip Select macro definition */
@@ -62,9 +68,7 @@ extern SPI_HandleTypeDef  ${IpInstance?replace("SPI","hspi")};
 #define LCD_${type2}_HIGH()      HAL_GPIO_WritePin(${port2}, ${pin2}, GPIO_PIN_SET)
 [/#if]
 
-[#if type0??]
-[#if type1??]
-[#if type2??]
+
 /**
   * @brief  SPIx error treatment function.
   */
@@ -74,7 +78,11 @@ static void SPIx_Error(void)
   HAL_SPI_DeInit(&${spihandler});
   
   /* Re- Initialize the SPI communication BUS */
-  MX_SPI${spiIndex}_Init();
+  [#if spiIndex??]
+   MX_SPI${spiIndex}_Init();
+  [#else]
+   //MX_SPIx_Init();
+   [/#if]
 }
 
 /**
@@ -120,19 +128,22 @@ static void SPIx_Write(uint16_t Value)
 /**
   * @brief  Configures the LCD_SPI interface.
   */
-void LCD_IO_Init(void)
+__weak void LCD_IO_Init(void)
 {
    /* Set or Reset the control line */
     LCD_CS_LOW();
     LCD_CS_HIGH();
-    
+    [#if spiIndex??]
     MX_SPI${spiIndex}_Init();
+    [#else]
+     //MX_SPIx_Init();
+    [/#if]
 }
 
 /**
   * @brief  Writes register address.
   */
-void LCD_IO_WriteReg(uint8_t Reg) 
+__weak void LCD_IO_WriteReg(uint8_t Reg) 
 {
   /* Reset WRX to send command */
   LCD_WRX_LOW();
@@ -148,7 +159,7 @@ void LCD_IO_WriteReg(uint8_t Reg)
   * @brief  Writes register value.
   */
 
-void LCD_IO_WriteData(uint16_t RegValue) 
+__weak void LCD_IO_WriteData(uint16_t RegValue) 
 {
   /* Set WRX to send data */
   LCD_WRX_HIGH();
@@ -168,7 +179,7 @@ void LCD_IO_WriteData(uint16_t RegValue)
   * @retval Content of the register value
   */
 
-uint32_t LCD_IO_ReadData(uint16_t RegValue, uint8_t ReadSize) 
+__weak uint32_t LCD_IO_ReadData(uint16_t RegValue, uint8_t ReadSize) 
 {
   uint32_t readvalue = 0;
 
@@ -190,6 +201,55 @@ uint32_t LCD_IO_ReadData(uint16_t RegValue, uint8_t ReadSize)
   
   return readvalue;
 }
+
+[#else]
+/**
+  * @brief  Configures the LCD_SPI interface.
+  */
+__weak void LCD_IO_Init(void)
+{
+   /* USER CODE BEGIN LCD_IO_Init */
+
+   /* USER CODE END LCD_IO_Init */
+}
+
+/**
+  * @brief  Writes register address.
+  */
+__weak void LCD_IO_WriteReg(uint8_t Reg) 
+{
+   /* USER CODE BEGIN LCD_IO_WriteReg */
+
+   /* USER CODE END LCD_IO_WriteReg */
+}
+/**
+  * @brief  Writes register value.
+  */
+
+__weak void LCD_IO_WriteData(uint16_t RegValue) 
+{
+   /* USER CODE BEGIN LCD_IO_WriteData */
+
+   /* USER CODE END LCD_IO_WriteData */
+}
+
+/**
+  * @brief  Reads register value.
+  * @param  RegValue Address of the register to read
+  * @param  ReadSize Number of bytes to read
+  * @retval Content of the register value
+  */
+
+__weak uint32_t LCD_IO_ReadData(uint16_t RegValue, uint8_t ReadSize) 
+{
+   /* USER CODE BEGIN LCD_IO_ReadData */
+
+   /* USER CODE END LCD_IO_ReadData */
+  
+  return 0;
+}
+
 [/#if]
-[/#if]
-[/#if]
+
+
+

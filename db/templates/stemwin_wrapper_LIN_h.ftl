@@ -1,15 +1,13 @@
 [#ftl]
-/**
+  /**
   ******************************************************************************
   * @file    STemWin_wrapper.h
   * @author  MCD Application Team
-  * @version V0.0.1
-  * @date    02-Mars-2017
-  * @brief   This file implements the configuration for the GUI library
+  * @brief   Header for STemWin_wrapper.c module
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; Copyright (c) 2016 STMicroelectronics International N.V. 
+  * <h2><center>&copy; Copyright (c) 2018 STMicroelectronics International N.V. 
   * All rights reserved.</center></h2>
   *
   * Redistribution and use in source and binary forms, with or without 
@@ -53,8 +51,6 @@
 #ifndef STEMWIN_WRAPPER_H
 #define STEMWIN_WRAPPER_H
 
-
-
 /* Exported types ------------------------------------------------------------*/
 typedef struct
 {
@@ -68,8 +64,9 @@ typedef struct
 }
 LCD_LayerPropTypedef;
 
-
+void GRAPHICS_HW_Init(void);
 void GRAPHICS_Init(void);
+void GRAPHICS_IncTick(void);
 
 #endif /* STEMWIN_WRAPPER_H */
 

@@ -4,7 +4,7 @@
   * File Name          : ${name}.h
   * Description        : Touch-Sensing user configuration.
   ******************************************************************************
-[@common.optinclude name="Src/license.tmp"/][#--include License text --]
+[@common.optinclude name=sourceDir+"Src/license.tmp"/][#--include License text --]
   ******************************************************************************
 */
 /* Define to prevent recursive inclusion -------------------------------------*/

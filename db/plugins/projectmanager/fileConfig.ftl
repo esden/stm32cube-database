@@ -19,10 +19,9 @@
 [/#macro]
 <Project>
 <ProjectName>${projectName}</ProjectName>
-<ProjectNature>C</ProjectNature> [#-- Cpp --]
+<ProjectNature>${ProjectNature}</ProjectNature> [#-- Cpp --]
 <CMSIS>${CMSISPath}</CMSIS>
 <HAL_Driver>${HAL_Driver}</HAL_Driver>
-
  [#-- list of toolchains to be generated: EWARM,MDK-ARM,TrueSTUDIO,RIDE: This tag can contain one or more than one toolchain: EWARM,MDK-ARM,TrueSTUDIO,RIDE --]
 <Toolchain>${ide}</Toolchain>
 [#if ide=="EWARM" || ide=="MDK-ARM"]
@@ -33,7 +32,9 @@
 <filestoremove>
     <file>
 [#list SourceFilesToRemove as SourceFile]
+        [#if SourceFile!="null"]
     <name>${SourceFile}</name>
+    [/#if]
 [/#list]
     </file>
 </filestoremove>
@@ -133,99 +134,20 @@
     [#if underRoot == "true"]
     	<copyAsReference>${copyAsReference}</copyAsReference>
     	[#if copyAsReference == "true"]
-            <sourceEntries>
+            <sourceEntries>               
                 <sourceEntry>
                         <name>${inc}</name>
                 </sourceEntry>
+                [#if src??]
                 <sourceEntry>
                         <name>${src}</name>
                 </sourceEntry>
-                <sourceEntry>
-                        <name>${HALDriver}</name>
-                </sourceEntry>
-            [#if atLeastOneMiddlewareIsUsed]
+                [/#if]
+                [#if GFXSource??]
                         <sourceEntry>
-                                <name>Middlewares</name>
-                        </sourceEntry>
-            [/#if]
-			[#-- MZA Bug41441 --]			
-			[#if atLeastOneCmsisPackIsUsed]
-                        <sourceEntry>
-                                <name>Packs</name>
-                        </sourceEntry>
-            [/#if]
-            </sourceEntries>
-            [#if atLeastOneMiddlewareIsUsed]
-                <group>
-	  	<name>Middlewares</name>
-		 [#list groups as group]
-                    [#if group.name!="App" && group.name!="Target"]
-		 	<group>
-		 		<name>${group.name!''}</name>
-		 		[#if group.sourceFilesNameList??]
-			 		[#list group.sourceFilesNameList as filesName]
-						<file>
-							<name>${filesName!''}</name>
-						</file>
-                		        [/#list]
-                                [/#if]
-                        </group>
-                    [/#if]
-		 [/#list]
-                </group> 
-            [/#if]
-    	<group>
-            <name>Drivers</name> 
-            [#if atLeastOneBspComponentIsUsed]
-				 <group>					
-					[#if bspComponentGroups??]						
-						[#list bspComponentGroups as grp]
-							<name>${grp.name!''}</name>
-							[#if grp.subGroups??]
-								[#list grp.subGroups as subGrp]	
-								<group>
-								<name>${subGrp.name!''}</name>
-								[#if subGrp.sourceFilesNameList??]
-									[#list subGrp.sourceFilesNameList as filesName]
-										<file>
-											<name>${filesName!''}</name>
-										</file>
-									[/#list]
-								[/#if]
-								</group>
-								[/#list]	
-							[/#if]
-						[/#list]
-					[/#if]						
-				 </group>
-            [/#if]
-                <group>
-                        <name>${HALGroup.name!''}</name>
-                        [#if HALGroup.sourceFilesNameList??]
-                            [#list HALGroup.sourceFilesNameList as filesName]
-                                    <file>
-                                            <name>${filesName!''}</name>
-                                    </file>
-                            [/#list]
+                                <name>${GFXSource}</name>
+                        </sourceEntry>                
                         [/#if]
-		</group> 
-            <group>
-		    	<name>CMSIS</name>
-			 			[#list cmsisSourceFileNameList as filesName]
-							<file>
-								<name>${filesName}</name>
-							</file>
-			       		[/#list]
-		    	</group>
-	</group>
-	[#else]
-	  		<sourceEntries>
-		    	<sourceEntry>
-		    		<name>${inc}</name>
-		    	</sourceEntry>
-		    	<sourceEntry>
-		    		<name>${src}</name>
-		    	</sourceEntry>
 		    	<sourceEntry>
 		    		<name>${HALDriver}</name>
 		    	</sourceEntry>
@@ -240,50 +162,12 @@
                         <name>Packs</name>
                     </sourceEntry>
 				[/#if]
-		    </sourceEntries>
-        [#-- add lib path --]        
+            </sourceEntries>
         [#if atLeastOneMiddlewareIsUsed]
-                <group>
-	  	<name>Middlewares</name>
-		 [#list groups as group]
-                    [#if group.name!="App" && group.name!="Target" ] 
-		 	<group>
-		 		<name>${group.name!''}</name>
-		 		[#if group.sourceFilesNameList??]
-			 		[#list group.sourceFilesNameList as filesName]
-                                        [#if filesName?ends_with(".a")||filesName?ends_with(".lib")]
-						<file>
-							<name>${filesName!''}</name>
-						</file>
-                                        [/#if]
-                		        [/#list]
-                                [/#if]
-                        </group>
-                    [/#if]
-		 [/#list]
-                </group> 
-            [/#if]
-    	
-        [#-- end lib path --]
-    	[/#if]
-		[#list externalGroups as grp]
-                [@getGroups groupArg=grp/]
-		[/#list]
-    [/#if]
-
-[#-- project groups and files --]
-[#if underRoot == "false"]
-[#-- project groups and files --]
-[#--
- private String m_sGroup = null;
-    private List<String> m_sSubGroup = null;
-    private List<String> m_sSourceFilesNameList;
---]
-    [#if atLeastOneMiddlewareIsUsed]
       <group>
         <name>Middlewares</name>  
         [#list groups as group]
-            [#if group.name!="App" && group.name!="Target"]
+            [#if group.name!="App" && group.name!="Target" && group.name!="target"]
                     <group>
                             <name>${group.name!''}</name>
                             [#if group.sourceFilesNameList??]
@@ -318,27 +202,207 @@
 	   <group>
 	    <name>Drivers</name> 
 			[#if atLeastOneBspComponentIsUsed]
-				 <group>					
-					[#if bspComponentGroups??]						
-						[#list bspComponentGroups as grp]
-							<name>${grp.name!''}</name>
-							[#if grp.subGroups??]
-								[#list grp.subGroups as subGrp]	
-								<group>
-								<name>${subGrp.name!''}</name>
-								[#if subGrp.sourceFilesNameList??]
-									[#list subGrp.sourceFilesNameList as filesName]
-										<file>
-											<name>${filesName!''}</name>
-										</file>
-									[/#list]
-								[/#if]
-								</group>
-								[/#list]	
-							[/#if]
-						[/#list]
-					[/#if]						
-				 </group>
+                            <group>					
+                                   [#if bspComponentGroups??]						
+                                           [#list bspComponentGroups as grp]
+                                                   <name>${grp.name!''}</name>
+                                                   [#if grp.subGroups??]
+                                                           [#list grp.subGroups as subGrp]	
+                                                           <group>
+                                                           <name>${subGrp.name!''}</name>
+                                                           [#if subGrp.sourceFilesNameList??]
+                                                                   [#list subGrp.sourceFilesNameList as filesName]
+                                                                           <file>
+                                                                                   <name>${filesName!''}</name>
+                                                                           </file>
+                                                                   [/#list]
+                                                           [/#if]
+                                                           </group>
+                                                           [/#list]	
+                                                   [/#if]
+                                           [/#list]
+                                   [/#if]						
+                            </group>
+			[/#if]
+		   <group>
+		 		<name>${HALGroup.name!''}</name>
+		 		[#if HALGroup.sourceFilesNameList??]
+			 		[#list HALGroup.sourceFilesNameList as filesName]
+						<file>
+							<name>${filesName!''}</name>
+						</file>
+			        [/#list]
+			     [/#if]
+		    </group>		    
+	  </group>   
+        [#if UtilitiesGroup??]
+	<group>
+            <name>${UtilitiesGroup.name!''}</name>
+                     [#if UtilitiesGroup.sourceFilesNameList??]
+                         [#list UtilitiesGroup.sourceFilesNameList as filesName]
+                             <file>
+                                 <name>${filesName!''}</name>
+                             </file>
+                         [/#list]
+                     [/#if]
+         </group>
+        [/#if]
+            [#list externalGroups as grp]
+                [@getGroups groupArg=grp/]
+            [/#list]
+	[#else] [#-- Copy All/Needed option --]
+	  		<sourceEntries>
+		    	<sourceEntry>
+		    		<name>${inc}</name>
+		    	</sourceEntry>
+		    	[#if src??]
+                <sourceEntry>
+                        <name>${src}</name>
+                </sourceEntry>
+                [/#if]
+                        [#if GFXSource??]
+                        <sourceEntry>
+                                <name>${GFXSource}</name>
+                        </sourceEntry>                
+                        [/#if]
+		    	<sourceEntry>
+		    		<name>${HALDriver}</name>
+		    	</sourceEntry>
+		    	[#if atLeastOneMiddlewareIsUsed]
+		    		<sourceEntry>
+		    			<name>Middlewares</name>
+		    		</sourceEntry>
+		    	 [/#if]
+				 [#-- MZA Bug41441 --]			
+				[#if atLeastOneCmsisPackIsUsed]
+                    <sourceEntry>
+                        <name>Packs</name>
+                    </sourceEntry>
+				[/#if]
+		    </sourceEntries>
+        [#-- add lib path --]        
+[#if atLeastOneMiddlewareIsUsed]
+  [#assign libExist = "0"]
+      [#list groups as group]
+          [#if group.name!="App" && group.name!="Target" ] 
+              [#if group.sourceFilesNameList??]
+                  [#list group.sourceFilesNameList as filesName]
+                      [#if filesName?ends_with(".a")||filesName?ends_with(".lib")]
+                          [#assign libExist = "1"]
+                          [#break]
+                      [/#if]
+                  [/#list]
+              [/#if]
+          [/#if]
+       [/#list]
+          [#if libExist=="1"]
+          <group>
+          <name>Middlewares</name>
+           [#list groups as group]
+              [#if group.name!="App" && group.name!="Target" ] 
+
+                          [#if group.sourceFilesNameList?? && group.sourceFilesNameList?size>0]
+                                [#assign containLib = "0"]
+                                [#list group.sourceFilesNameList as filesName]
+                                  [#if filesName?ends_with(".a")||filesName?ends_with(".lib")]
+                                    [#assign containLib = "1"]
+                                    [#break]
+                                  [/#if]
+                                  [/#list]
+                            [#if containLib=="1"]
+                              <group>
+                                  <name>${group.name!''}</name>
+                                          [#list group.sourceFilesNameList as filesName]
+                                          [#if filesName?ends_with(".a")||filesName?ends_with(".lib")]
+                                  <file>
+                                          <name>${filesName!''}</name>
+                                  </file>
+                                          [/#if]
+                                          [/#list]
+                              </group>
+                            [/#if]
+                          [/#if]
+
+              [/#if]
+           [/#list]
+          </group> 
+          [/#if]
+[/#if]
+[#-- end lib path --]
+    	[/#if]
+		[#--list externalGroups as grp]
+                [@getGroups groupArg=grp/]
+		[/#list--]
+    [/#if]
+
+[#-- project groups and files --]
+[#if underRoot == "false"]
+[#-- project groups and files --]
+[#--
+ private String m_sGroup = null;
+    private List<String> m_sSubGroup = null;
+    private List<String> m_sSourceFilesNameList;
+--]
+    [#if atLeastOneMiddlewareIsUsed]
+      <group>
+        <name>Middlewares</name>  
+        [#list groups as group]
+            [#if group.name!="App" && group.name!="Target" && group.name!="target"]
+                    <group>
+                            <name>${group.name!''}</name>
+                            [#if group.sourceFilesNameList??]
+                                    [#list group.sourceFilesNameList as filesName]
+                                            <file>
+                                                    <name>${filesName!''}</name>
+                                            </file>
+			        [/#list]
+			    [/#if]
+			[#if group.subGroups??]
+		 		[#list group.subGroups as sgroup]
+					[#if sgroup.sourceFilesNameList??]
+					<group>
+						<name>${sgroup.name!''}</name>
+							[#list sgroup.sourceFilesNameList as filesName]
+								<file>
+									<name>${filesName!''}</name>
+								</file>
+                            [/#list]
+                    [/#if]
+					</group>
+                            [/#list]
+                        [/#if]
+                </group>
+            [/#if]
+             [/#list]
+      </group> 
+    [/#if]
+    [#list externalGroups as grp]
+        [@getGroups groupArg=grp/]
+    [/#list]
+	   <group>
+	    <name>Drivers</name> 
+			[#if atLeastOneBspComponentIsUsed]
+                            <group>					
+                                   [#if bspComponentGroups??]						
+                                           [#list bspComponentGroups as grp]
+                                                   <name>${grp.name!''}</name>
+                                                   [#if grp.subGroups??]
+                                                           [#list grp.subGroups as subGrp]	
+                                                           <group>
+                                                           <name>${subGrp.name!''}</name>
+                                                           [#if subGrp.sourceFilesNameList??]
+                                                                   [#list subGrp.sourceFilesNameList as filesName]
+                                                                           <file>
+                                                                                   <name>${filesName!''}</name>
+                                                                           </file>
+                                                                   [/#list]
+                                                           [/#if]
+                                                           </group>
+                                                           [/#list]	
+                                                   [/#if]
+                                           [/#list]
+                                   [/#if]						
+                            </group>
 			[/#if]
 		   <group>
 		 		<name>${HALGroup.name!''}</name>
@@ -394,7 +458,7 @@
 [#-- Other source groups --]  
     [#if USE_Touch_GFX_STACK??]
     <group>
-        <name>TouchGFX</name>         
+        <name>ST-TouchGFX</name>         
                 <group>
                     <name>gui</name>
                 </group>
@@ -406,7 +470,7 @@
 
 [#-- App Group Case of Graphics--]
 [#list ApplicationGroups as grp]        
-               <group>
+    <group>
         <name>${grp.name!''}</name>
             [#if grp.subGroups??]
                     [#list grp.subGroups as subGrp]	
@@ -422,8 +486,8 @@
                     </group>
                     [/#list]	
             [/#if]
-        </group>
-    [/#list]
+    </group>
+[/#list]
 
 </group> 
   </group>

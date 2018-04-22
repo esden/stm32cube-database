@@ -5,7 +5,7 @@
   * Description        : This file contains all the function prototypes for
   *                      the mdma.c file
   ******************************************************************************
-[@common.optinclude name="Src/license.tmp"/][#--include License text --]
+[@common.optinclude name=sourceDir+"Src/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
 [#assign ipName = "MDMA"]

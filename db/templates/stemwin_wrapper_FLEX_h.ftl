@@ -1,14 +1,13 @@
-/**
+[#ftl]
+  /**
   ******************************************************************************
   * @file    STemWin_wrapper.h 
   * @author  MCD Application Team
-  * @version V1.0.0RC1
-  * @date    19-June-2017
   * @brief   Header for STemWin_wrapper.c module
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; Copyright (c) 2016 STMicroelectronics International N.V. 
+  * <h2><center>&copy; Copyright (c) 2018 STMicroelectronics International N.V. 
   * All rights reserved.</center></h2>
   *
   * Redistribution and use in source and binary forms, with or without 
@@ -49,7 +48,9 @@
 #ifndef STEMWIN_WRAPPER_H
 #define STEMWIN_WRAPPER_H
 
+void GRAPHICS_HW_Init(void);
 void GRAPHICS_Init(void);
+void GRAPHICS_IncTick(void);
 
 #endif /* STEMWIN_WRAPPER_H */
 

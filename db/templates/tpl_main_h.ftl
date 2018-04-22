@@ -17,7 +17,7 @@
   * @brief          : Header for main.c file.
   *                   This file contains the common defines of the application.
   ******************************************************************************
-[@common.optinclude name="Src/license.tmp"/][#--include License text --]
+[@common.optinclude name=sourceDir+"Src/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
 
@@ -91,9 +91,9 @@
 
 [#compress]
 [#if GRAPHICS??]
-[#if USE_OTM??]
-    #include "otm8009a.h"
-[/#if]
+    [#if USE_OTM??]
+        #include "otm8009a.h"
+    [/#if]
     #include "${FamilyName?lower_case}xx_hal.h"
     [#if USE_STemWin_STACK??]
         #include "GUI.h"        
@@ -116,7 +116,7 @@
         #include "ewgfxdefs.h"
         #include "Core.h"
         #include "Graphics.h"
-
+        #include "tara_wrapper.h"
         [#-- #include "ew_bsp_system.h"
         #include "ew_bsp_clock.h"
         #include "ew_bsp_event.h"
@@ -124,8 +124,13 @@
         #include "ew_bsp_touch.h"
         #include "ew_bsp_serial.h" --]
     [/#if]
+    [#if USE_Touch_GFX_STACK??]
+       #include "HW_Init.hpp"
+    [/#if]
+   
 [/#if]
 [/#compress]
+
 
 /* USER CODE BEGIN Includes */
 

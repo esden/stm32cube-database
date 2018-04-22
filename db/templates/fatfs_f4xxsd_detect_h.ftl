@@ -4,7 +4,7 @@
   * @file           : fatfs_f4xxsd_detect.h
   * @brief          : header file for the SD card detection
   ******************************************************************************
-[@common.optinclude name="Src/license.tmp"/][#--include License text --]
+[@common.optinclude name=sourceDir+"Src/license.tmp"/][#--include License text --]
   ******************************************************************************
 */
 /* Define to prevent recursive inclusion -------------------------------------*/

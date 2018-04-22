@@ -5,7 +5,7 @@
   * Description        : This file provides code for the configuration
   *                      of the ${name} peripheral.
   ******************************************************************************
-[@common.optinclude name="Src/license.tmp"/][#--include License text --]
+[@common.optinclude name=sourceDir+"Src/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
 /* Define to prevent recursive inclusion -------------------------------------*/

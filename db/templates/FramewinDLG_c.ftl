@@ -18,6 +18,7 @@
 *                                                                    *
 **********************************************************************
 */
+
 [#list parameters as params]
 [#assign Xsize = params.EA_1_in_file1_param1]
 [#assign Ysize = params.EA_1_in_file1_param2]

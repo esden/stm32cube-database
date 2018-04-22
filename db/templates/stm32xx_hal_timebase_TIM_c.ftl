@@ -4,7 +4,7 @@
   * @file    ${FamilyName?lower_case}xx_hal_timebase_TIM.c 
   * @brief   HAL time base based on the hardware TIM.
   ******************************************************************************
-[@common.optinclude name="Src/license.tmp"/][#--include License text --]
+[@common.optinclude name=sourceDir+"Src/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
 

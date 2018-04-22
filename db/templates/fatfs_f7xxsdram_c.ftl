@@ -4,7 +4,7 @@
   * @file    bsp_driver_sdram.c (based on stm32756g_eval_sdram.c)
   * @brief   This file includes a generic SDRAM driver.
   ******************************************************************************
-[@common.optinclude name="Src/license.tmp"/][#--include License text --]
+[@common.optinclude name=sourceDir+"Src/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
 

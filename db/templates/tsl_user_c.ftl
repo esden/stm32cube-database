@@ -5,7 +5,7 @@
   * Description        : User configuration file for TOUCHSENSING
   *                      middleWare.
   ******************************************************************************
-[@common.optinclude name="Src/license.tmp"/][#--include License text --]
+[@common.optinclude name=sourceDir+"Src/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
  [#assign channelnbr = 0]
@@ -1465,6 +1465,9 @@ tsl_user_status_t tsl_user_Exec(void)
   /* Configure and start bank acquisition */
   if (!config_done)
   {
+/* USER CODE BEGIN not config_done start*/
+
+/* USER CODE END not config_done start*/
     TSL_acq_BankConfig(idx_bank);
     TSL_acq_BankStartAcq();
     config_done = 1;
@@ -1476,6 +1479,9 @@ tsl_user_status_t tsl_user_Exec(void)
   /* Check end of acquisition (polling mode) and read result */
   if (TSL_acq_BankWaitEOC() == TSL_STATUS_OK)
   {
+/* USER CODE BEGIN end of acquisition start*/
+
+/* USER CODE END end of acquisition start*/
     STMSTUDIO_LOCK;
     TSL_acq_BankGetResult(idx_bank, 0, 0);
     STMSTUDIO_UNLOCK;
@@ -1491,6 +1497,9 @@ tsl_user_status_t tsl_user_Exec(void)
   */
   if (idx_bank > TSLPRM_TOTAL_BANKS-1)
   {
+/* USER CODE BEGIN before reset*/
+
+/* USER CODE END before reset*/
     /* Reset flags for next banks acquisition */
     idx_bank = 0;
     config_done = 0;

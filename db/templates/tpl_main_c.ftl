@@ -4,6 +4,8 @@
 [#else]
 [#assign coreDir=""]
 [/#if]
+[#assign coreDir=sourceDir]
+
 /**
   ******************************************************************************
   * @file           : main.c
@@ -51,6 +53,10 @@
 [/#list]
 [#-- /#if --]
 [/#compress]
+
+[#if USE_Touch_GFX_STACK??]
+       [#--include "BoardConfiguration.hpp"--]
+[/#if]
 #n
 /* USER CODE BEGIN Includes */
 
@@ -194,23 +200,33 @@ static void MPU_Config(void);
  [/#if]
 [/#if]
 [#if HALCompliant??]
- [#list voids as void]
-  [#if !void.ipType?contains("thirdparty")&&!void.functionName?contains("FREERTOS")&&void.functionName!="Init"&&!void.functionName?contains("FATFS")&& !void.functionName?contains("LWIP")&& !void.functionName?contains("MBEDTLS")&& !void.functionName?contains("USB_DEVICE")&& !void.functionName?contains("USB_HOST")&& !void.functionName?contains("CORTEX")&& !void.functionName?contains("SystemClock_Config")&& !void.functionName?contains("LIBJPEG")&& !void.functionName?contains("PDM2PCM")&& !void.functionName?contains("TOUCHSENSING")&& !void.functionName?contains("MotorControl")]
-[#if !void.functionName?contains("GRAPHICS")]
-    [#if void.isStatic]
-    static void ${""?right_pad(2)}${void.functionName}(void);
-    [#assign staticVoids =staticVoids + " "+ '${void.functionName}']
-    [#else]
-    void ${""?right_pad(2)}${void.functionName}(void);
-    [/#if]
-  [/#if]
-  [#if !void.isNotGenerated&&void.functionName?contains("GRAPHICS")]
-extern void ${""?right_pad(2)}${void.functionName}(void);
-extern void GRAPHICS_MainTask(void);
-  [/#if]
-  [/#if]
- [/#list]
+    [#list voids as void]
+        [#if !void.ipType?contains("thirdparty")&&!void.functionName?contains("FREERTOS")&&void.functionName!="Init"&&!void.functionName?contains("FATFS")&& !void.functionName?contains("LWIP")&& !void.functionName?contains("MBEDTLS")&& !void.functionName?contains("USB_DEVICE")&& !void.functionName?contains("USB_HOST")&& !void.functionName?contains("CORTEX")&& !void.functionName?contains("SystemClock_Config")&& !void.functionName?contains("LIBJPEG")&& !void.functionName?contains("PDM2PCM")&& !void.functionName?contains("TOUCHSENSING")&& !void.functionName?contains("MotorControl")]
+            [#if !void.functionName?contains("GRAPHICS")]
+                [#if void.isStatic]
+                    static void ${""?right_pad(2)}${void.functionName}(void);
+                    [#assign staticVoids =staticVoids + " "+ '${void.functionName}']
+                [#else]
+                    void ${""?right_pad(2)}${void.functionName}(void);
+                [/#if]
+            [/#if]
+            
+            [#if !void.isNotGenerated&&void.functionName?contains("GRAPHICS")]
+          extern void GRAPHICS_HW_Init(void);
+          extern void ${""?right_pad(2)}${void.functionName}(void);
+          extern void GRAPHICS_MainTask(void);
+            [/#if]
+        [/#if]
+    [/#list]
  [@common.optinclude name=coreDir+"Src/rtos_pfp.tmp"/]
+[#else]
+    [#list voids as void]
+        [#if void.isNotGenerated?? && !void.isNotGenerated&&void.functionName?contains("GRAPHICS")]
+   extern void GRAPHICS_HW_Init(void);
+   extern void ${""?right_pad(2)}${void.functionName}(void);
+   extern void GRAPHICS_MainTask(void);
+        [/#if]
+    [/#list]
 [/#if]
 [#if vectors??]
 static void MX_NVIC_Init(void);
@@ -337,6 +353,9 @@ int main(void)
 
 [#if FREERTOS??] [#-- If FreeRtos is used --]
     [#if GRAPHICS??]
+/* Initialise the graphical hardware */
+  GRAPHICS_HW_Init();
+#n
 #t/* Initialise the graphical stack engine */
 #tGRAPHICS_Init();#n      
       [/#if]
@@ -354,6 +373,12 @@ int main(void)
 [#-- if !FREERTOS?? --] 
 #n
 [#if GRAPHICS?? && !FREERTOS??]
+
+/* Initialise the graphical hardware */
+  GRAPHICS_HW_Init();
+
+
+
   /* Initialise the graphical stack engine */
   GRAPHICS_Init();
   

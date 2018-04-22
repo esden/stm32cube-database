@@ -4,7 +4,7 @@
   * File Name          : freertos.c
   * Description        : Code for freertos applications
   ******************************************************************************
-[@common.optinclude name="Src/license.tmp"/][#--include License text --]
+[@common.optinclude name=sourceDir+"Src/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
 
@@ -46,7 +46,7 @@
 [/#compress]
 
 [#if inMain == 0]
-[@common.optinclude name="Src/rtos_inc.tmp"/][#--include freertos includes --]
+[@common.optinclude name=sourceDir+"Src/rtos_inc.tmp"/][#--include freertos includes --]
 [/#if]
 
 /* USER CODE BEGIN Includes */     
@@ -56,7 +56,7 @@
 [#compress]
 /* Variables -----------------------------------------------------------------*/
 [#if inMain == 0]
-[@common.optinclude name="Src/rtos_vars.tmp"/]
+[@common.optinclude name=sourceDir+"Src/rtos_vars.tmp"/]
 [/#if]
 #n/* USER CODE BEGIN Variables */
 #n
@@ -64,7 +64,7 @@
 #n     
 /* Function prototypes -------------------------------------------------------*/
 [#if inMain == 0]
-[@common.optinclude name="Src/rtos_pfp.tmp"/]
+[@common.optinclude name=sourceDir+"Src/rtos_pfp.tmp"/]
 #n
  [#list SWIPdatas as SWIP]
   [#if SWIP.variables??]
@@ -333,10 +333,10 @@ void MX_FREERTOS_Init(void) {
 #t/* USER CODE BEGIN Init */
 #t     
 #t/* USER CODE END Init */
-[@common.optinclude name="Src/rtos_HalInit.tmp"/]
+[@common.optinclude name=sourceDir+"Src/rtos_HalInit.tmp"/]
 }
-[@common.optinclude name="Src/rtos_threads.tmp"/]
-[@common.optinclude name="Src/rtos_user_threads.tmp"/] 
+[@common.optinclude name=sourceDir+"Src/rtos_threads.tmp"/]
+[@common.optinclude name=sourceDir+"Src/rtos_user_threads.tmp"/] 
 [/#if]  
 
 /* USER CODE BEGIN Application */

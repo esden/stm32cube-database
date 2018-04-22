@@ -4,7 +4,7 @@
   * @file    bsp_driver_sd.c for F7 (based on stm32756g_eval_sd.c)
   * @brief   This file includes a generic uSD card driver.
   ******************************************************************************
-[@common.optinclude name="Src/license.tmp"/][#--include License text --]
+[@common.optinclude name=sourceDir+"Src/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
 [#assign handle="hsd1"]

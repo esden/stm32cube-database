@@ -4,7 +4,7 @@
   * File Name       : mbedtls_config.h
   * Description     : the mbedtls custom config header file.
   ******************************************************************************
- [@common.optinclude name="Src/license.tmp"/][#--include License text --]
+ [@common.optinclude name=sourceDir+"Src/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
 

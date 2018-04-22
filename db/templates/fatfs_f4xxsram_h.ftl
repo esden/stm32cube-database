@@ -5,7 +5,7 @@
   * @brief   This file contains the common defines and functions prototypes for  
   *          the bsp_driver_sram.c driver.
   ******************************************************************************  
-[@common.optinclude name="Src/license.tmp"/][#--include License text --]
+[@common.optinclude name=sourceDir+"Src/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
   

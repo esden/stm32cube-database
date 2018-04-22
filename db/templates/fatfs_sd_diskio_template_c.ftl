@@ -33,7 +33,7 @@
 [/#if]
   * @brief   SD Disk I/O driver
   ******************************************************************************
-[@common.optinclude name="Src/license.tmp"/][#--include License text --]
+[@common.optinclude name=sourceDir+"Src/license.tmp"/][#--include License text --]
   ******************************************************************************
   */ 
 /* USER CODE BEGIN firstSection */

@@ -6,7 +6,7 @@
 [#--  * @packageVersion : ${fwVersion} --]
   * @brief          : Header for usbd_audio_if.c file.
   ******************************************************************************
-[@common.optinclude name="Src/license.tmp"/][#--include License text --]
+[@common.optinclude name=sourceDir+"Src/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
 

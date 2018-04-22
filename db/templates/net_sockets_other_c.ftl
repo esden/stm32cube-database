@@ -4,7 +4,7 @@
   * File Name       : ${name}.h
   * Description     : TCP/IP or UDP/IP networking empty functions
   ******************************************************************************
-[@common.optinclude name="Src/license.tmp"/][#--include License text --]
+[@common.optinclude name=sourceDir+"Src/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
 

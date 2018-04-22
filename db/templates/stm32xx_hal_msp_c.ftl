@@ -5,7 +5,7 @@
   * Description        : This file provides code for the MSP Initialization 
   *                      and de-Initialization codes.
   ******************************************************************************
-[@common.optinclude name="Src/license.tmp"/][#--include License text --]
+[@common.optinclude name=sourceDir+"Src/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
 /* Includes ------------------------------------------------------------------*/
@@ -1492,13 +1492,13 @@ uint32_t DFSDM_Init = 0;
 [/#list]
 #n
 [#-- FMC MSP --]
-[@common.optinclude name="Src/mx_FMC_MSP.tmp"/]
+[@common.optinclude name=sourceDir+"Src/mx_FMC_MSP.tmp"/]
 
 [#-- FSMC MSP --]
-[@common.optinclude name="Src/mx_FSMC_MSP.tmp"/]
+[@common.optinclude name=sourceDir+"Src/mx_FSMC_MSP.tmp"/]
 
 [#-- SAI MSP --]
-[@common.optinclude name="Src/sai_msp.tmp"/]
+[@common.optinclude name=sourceDir+"Src/sai_msp.tmp"/]
 
 /* USER CODE BEGIN 1 */
 

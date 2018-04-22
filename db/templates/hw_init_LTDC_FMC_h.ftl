@@ -1,15 +1,13 @@
 [#ftl]
-/**
+  /**
   ******************************************************************************
   * @file    HW_Init.h 
   * @author  MCD Application Team
-  * @version V1.0.0RC1
-  * @date    19-June-2017
   * @brief   Header for HW_Init.c module
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; Copyright (c) 2016 STMicroelectronics International N.V. 
+  * <h2><center>&copy; Copyright (c) 2018 STMicroelectronics International N.V. 
   * All rights reserved.</center></h2>
   *
   * Redistribution and use in source and binary forms, with or without 
@@ -50,14 +48,7 @@
 #ifndef __HW_INIT_H
 #define __HW_INIT_H
 
-/* Includes ------------------------------------------------------------------*/
-#include "${main_h}"
-
-
-/* Exported types ------------------------------------------------------------*/
-/* Exported constants --------------------------------------------------------*/
-void MX_LCD_Init(void);
-
+[#assign Use_ili9341 ="0"] 
 [#-- SWIPdatas is a list of SWIPconfigModel --]  
 [#list SWIPdatas as SWIP]  
 [#-- Global variables --]
@@ -69,23 +60,41 @@ extern ${variable.value} ${variable.name};
 [#if SWIP.defines??]
 	[#list SWIP.defines as definition]	
 	[#-- IF to take care of the specific formatting of each argument of this file  --]
-        [#if definition.name = "DMA2D_Graphics" ]
+[#-- ELSE IF --]
+[#if definition.name = "Use_ili9341_Check"]
+         [#if definition.value == "1" ]
+[#assign Use_ili9341 ="1"] 
+[/#if]
+/* Includes ------------------------------------------------------------------*/
+#include "${main_h}"
+[#if Use_ili9341?? && Use_ili9341=="1"]
+#include "ili9341.h"
+[/#if]
+
+/* Exported types ------------------------------------------------------------*/
+/* Exported constants --------------------------------------------------------*/
+
+
+      
+void MX_FMC_Init(void);
+void MX_SDRAM_InitEx(void);
+void MX_LCD_Init(void);
+  [#elseif definition.name = "DMA2D_Graphics" ]
          [#if definition.value != "0" ] 
              [#assign dma2d ="1"] 
 void MX_DMA2D_Init(void);
+[/#if]
+[#assign objectConstructor = "freemarker.template.utility.ObjectConstructor"?new()]
+ [#assign file = objectConstructor("java.io.File",workspace+"/"+"ST-EmbeddedWizard/Ew_QUADSPI_tmp.c")]
+  [#assign exist = file.exists()]
+  [#if exist]
+/* uint8_t QSPI_EnableMemoryMappedMode(void); */
+[/#if]
+[/#if]
+[/#list]
+[/#if]
+[/#list]
 
-[/#if]
-void MX_FMC_Init(void);
-[#-- ELSE IF --]
-[#elseif definition.name = "Use_ili9341"]
-         [#if definition.value != "0" ]
-         
-void MX_SPI_Init(void);
-[/#if]
-[/#if]
-[/#list]
-[/#if]
-[/#list]
 #endif /* __HW_INIT_H */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

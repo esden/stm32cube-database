@@ -5,7 +5,7 @@
   * Description        : This file provides code for the configuration
   *                      of all used GPIO pins.
   ******************************************************************************
-[@common.optinclude name="Src/license.tmp"/][#--include License text --]
+[@common.optinclude name=sourceDir+"Src/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
 

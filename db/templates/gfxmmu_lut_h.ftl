@@ -4,7 +4,7 @@
   * File Name          : gfxmmu_lut.h
   * Description        : header file for GFX MMU Configuration Table 
   ******************************************************************************
-[@common.optinclude name="Src/license.tmp"/][#--include License text --]
+[@common.optinclude name=sourceDir+"Src/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
 /* Define to prevent recursive inclusion -------------------------------------*/

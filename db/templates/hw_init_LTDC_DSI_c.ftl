@@ -1,15 +1,14 @@
 [#ftl]
-/**
+[#assign coreDir=sourceDir]
+  /**
   ******************************************************************************
   * @file    HW_Init.c
   * @author  MCD Application Team
-  * @version V1.0.0RC1
-  * @date    19-June-2017
   * @brief   This file implements the hardware configuration for the GUI library
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; Copyright (c) 2016 STMicroelectronics International N.V. 
+  * <h2><center>&copy; Copyright (c) 2018 STMicroelectronics International N.V. 
   * All rights reserved.</center></h2>
   *
   * Redistribution and use in source and binary forms, with or without 
@@ -57,6 +56,9 @@
 * @{
 */
 LTDC_HandleTypeDef            hltdc; 
+[#assign  UseQuadSPI ="0"]
+[#assign USE_EmbeddedWizard="0"]
+[#assign USE_STTouchGFX="0"]
 [#-- SWIPdatas is a list of SWIPconfigModel --]  
 [#list SWIPdatas as SWIP]  
 [#-- Global variables --]
@@ -65,8 +67,7 @@ LTDC_HandleTypeDef            hltdc;
 extern ${variable.value} ${variable.name};
 	[/#list]
 [/#if]
-[#assign USE_EmbeddedWizard="0"]
-[#assign Use_QuadSPI_MM="0"]
+
 [#if SWIP.defines??]
 	[#list SWIP.defines as definition]	
 	[#-- IF to take care of the specific formatting of each argument of this file  --]
@@ -74,18 +75,16 @@ extern ${variable.value} ${variable.name};
 [#if definition.value != "0" ]
 [#assign USE_EmbeddedWizard="1"]
 [/#if]
-
-[#elseif definition.name = "Use_QuadSPI_MM" ]
+[#elseif definition.name = "USE_STTouchGFX"]
 [#if definition.value != "0" ]
-[#assign Use_QuadSPI_MM="1"]
+[#assign USE_STTouchGFX="1"]
 [/#if]
 [#elseif definition.name = "DMA2D_Graphics" ]
-[#if definition.value != "0" ]
+[#if definition.value != "0"  ]
 [#assign dma2dvalue="1"] 
 DMA2D_HandleTypeDef           hdma2d;
 [/#if]
 DSI_HandleTypeDef             hdsi;
-
 [#assign UseSDRAM="0"]
 [#-- ELSE IF --]
 [#elseif definition.name = "Use_SDRAM"]
@@ -106,20 +105,20 @@ DSI_HandleTypeDef             hdsi;
 [/#if]
 [#if definition.value == "SDRAM2_BANK1" | definition.value == "SDRAM2_BANK2"]
                      [#assign  hsdramvalue="hsdram2"]
-
-            [/#if]
+[/#if]
 [/#if]
 [#if USE_EmbeddedWizard?? && USE_EmbeddedWizard =="1"] 
 LTDC_LayerCfgTypeDef          pLayerCfg;
 [/#if] 
- [#if Use_QuadSPI_MM?? && Use_QuadSPI_MM =="1"] 
-[@common.optinclude name="EmbeddedWizard/Ew_QUADSPI_tmp.c"/] 
-[/#if] 
-[@common.optinclude name="Core/Src/fmc_vars.tmp"/] 
 
+[@common.optinclude name="ST-EmbeddedWizard/Ew_QUADSPI_tmp.c"/] 
+
+[@common.optinclude name=coreDir+"Src/fmc_vars.tmp"/] 
 [#-- ELSE IF --]
-[#elseif definition.name = "RefreshCount_SDRAM"]
-[#if definition.value != "0" && USE_EmbeddedWizard?? && USE_EmbeddedWizard =="1" ]
+[#elseif definition.name = "RefreshCount_SDRAM_Param"]
+[#if definition.value != "0" ]
+static FMC_SDRAM_CommandTypeDef Command;
+
 #define REFRESH_COUNT   #t#t ${definition.value}
 
 #define SDRAM_TIMEOUT                            ((uint32_t)0xFFFF)
@@ -134,19 +133,29 @@ LTDC_LayerCfgTypeDef          pLayerCfg;
 #define SDRAM_MODEREG_OPERATING_MODE_STANDARD    ((uint16_t)0x0000)
 #define SDRAM_MODEREG_WRITEBURST_MODE_PROGRAMMED ((uint16_t)0x0000) 
 #define SDRAM_MODEREG_WRITEBURST_MODE_SINGLE     ((uint16_t)0x0200) 
-
-extern FMC_SDRAM_TimingTypeDef SdramTiming;
-static FMC_SDRAM_CommandTypeDef Command;
 [/#if]
 
-[#if Use_QuadSPI_MM?? && Use_QuadSPI_MM =="1"] 
+ [#assign objectConstructor = "freemarker.template.utility.ObjectConstructor"?new()]
+ 
+ [#assign file1 = objectConstructor("java.io.File",workspace+"/"+"ST-EmbeddedWizard/Ew_QUADSPI_tmp.c")]
+ [#assign file2 = objectConstructor("java.io.File",workspace+"/"+"ST-TouchGFX/Ew_QUADSPI_tmp.c")]
+ 
+  [#if file1.exists() | file2.exists()]
+  [#assign  UseQuadSPI ="1"]
+
 /* QSPI Error codes */
-#define QSPI_OK            ((uint8_t)0x00)
-#define QSPI_ERROR         ((uint8_t)0x01)
+/*    #define QSPI_OK            ((uint8_t)0x00) 
+    #define QSPI_ERROR         ((uint8_t)0x01)
+*/
 [/#if]
+
+
 
 
 [#if dma2dvalue?? && dma2dvalue=="1" ]
+
+
+
 /**
   * @brief  Initialize the DMA2D.
   * @param  None
@@ -155,7 +164,7 @@ static FMC_SDRAM_CommandTypeDef Command;
 void MX_DMA2D_Init(void) 
 {
    /* Configure the DMA2D default mode */ 
- [@common.optinclude name="Core/Src/dma2d_HalInit.tmp"/] 
+ [@common.optinclude name=coreDir+"Src/dma2d_HalInit.tmp"/] 
 }
 [/#if]
 /**
@@ -178,7 +187,7 @@ void MX_LCD_Init(void)
 /* De-Initialize LTDC */
   HAL_LTDC_DeInit(&hltdc);
 /* Configure LTDC */
- [@common.optinclude name="Core/Src/ltdc_HalInit.tmp"/] 
+ [@common.optinclude name=coreDir+"Src/ltdc_HalInit.tmp"/] 
 }
 
  
@@ -188,10 +197,10 @@ void MX_LCD_Init(void)
   */ 
 void MX_FMC_Init(void) 
 {  
- [@common.optinclude name="Core/Src/fmc_HalInit.tmp"/] 
+ [@common.optinclude name=coreDir+"Src/fmc_HalInit.tmp"/] 
 }
 [/#if]
-[#if  UseSDRAM?? && UseSDRAM!="0" && USE_EmbeddedWizard?? && USE_EmbeddedWizard =="1" ]
+[#if  UseSDRAM?? && UseSDRAM!="0" ]
 /**
   * @brief  Programs the SDRAM device.
   * @retval None
@@ -256,16 +265,16 @@ void MX_SDRAM_InitEx(void)
 /* DSI init function */
 void MX_DSI_Init(void)
 {
-  static DSI_PHY_TimerTypeDef      PhyTimings;
-  static DSI_HOST_TimeoutTypeDef   HostTimeouts;
-  static DSI_CmdCfgTypeDef         CmdCfg;
-  static DSI_LPCmdTypeDef          LPCmd;
-  static DSI_PLLInitTypeDef        PLLInit;
+  DSI_PHY_TimerTypeDef      PhyTimings;
+  DSI_HOST_TimeoutTypeDef   HostTimeouts;
+  DSI_CmdCfgTypeDef         CmdCfg;
+  DSI_LPCmdTypeDef          LPCmd;
+  DSI_PLLInitTypeDef        PLLInit;
   
 /* Base address of DSI Host/Wrapper registers to be set before calling De-Init */
 
  
-[@common.optinclude name="Core/Src/dsihost_HalInit.tmp"/]  
+[@common.optinclude name=coreDir+"Src/dsihost_HalInit.tmp"/]  
  
  /* Start DSI */
   HAL_DSI_Start(&(hdsi));
@@ -308,62 +317,82 @@ void MX_DSI_Init(void)
   LPCmd.LPDcsLongWrite        = DSI_LP_DLW_DISABLE;
   HAL_DSI_ConfigCommand(&hdsi, &LPCmd);
 
-  HAL_DSI_ConfigFlowControl(&hdsi, DSI_FLOW_CONTROL_BTA);
-
   /* Refresh the display */
   HAL_DSI_Refresh(&hdsi);
     
   }
+[#if USE_EmbeddedWizard?? && USE_EmbeddedWizard =="1"] 
 
- [#assign objectConstructor = "freemarker.template.utility.ObjectConstructor"?new()]
+/**
+  * @brief  DCS or Generic short/long write command
+  * @param  NbParams: Number of parameters. It indicates the write command mode:
+  *                 If inferior to 2, a long write command is performed else short.
+  * @param  pParams: Pointer to parameter values table.
+  * @retval HAL status
+  */
+void DSI_IO_WriteCmd(uint32_t NbrParams, uint8_t *pParams)
+{
+  if(NbrParams <= 1)
+  {
+    HAL_DSI_ShortWrite(&hdsi, 0, DSI_DCS_SHORT_PKT_WRITE_P1, pParams[0], pParams[1]); 
+  }
+  else
+  {
+    HAL_DSI_LongWrite(&hdsi,  0, DSI_DCS_LONG_PKT_WRITE, NbrParams, pParams[NbrParams], pParams); 
+  } 
+}
+[/#if]
 
- [#assign file = objectConstructor("java.io.File",workspace+"/"+"EmbeddedWizard/Ew_QUADSPI_tmp.c")]
-  [#assign exist = file.exists()]
-  [#if exist]
- [#if Use_QuadSPI_MM?? && Use_QuadSPI_MM =="1"] 
+  [#if UseQuadSPI?? &&  UseQuadSPI =="1"]
 /**
   * @brief  Configure the QSPI in memory-mapped mode
   * @retval QSPI memory status
   */
-uint8_t BSP_QSPI_EnableMemoryMappedMode(void)
+
+/* USER CODE BEGIN Configure_QSPI */
+
+/* uint8_t QSPI_EnableMemoryMappedMode(void)
 {
+
   QSPI_CommandTypeDef      s_command;
   QSPI_MemoryMappedTypeDef s_mem_mapped_cfg;
 
-  /* Configure the command for the read instruction */
+  // Configure the command for the read instruction 
   s_command.InstructionMode   = QSPI_INSTRUCTION_4_LINES;
-  s_command.Instruction       = QPI_READ_4_BYTE_ADDR_CMD;
+  s_command.Instruction       = 0xEC;
   s_command.AddressMode       = QSPI_ADDRESS_4_LINES;
   s_command.AddressSize       = QSPI_ADDRESS_32_BITS;
   s_command.AlternateByteMode = QSPI_ALTERNATE_BYTES_NONE;
   s_command.DataMode          = QSPI_DATA_4_LINES;
-  s_command.DummyCycles       = MX25L512_DUMMY_CYCLES_READ_QUAD_IO;
+  s_command.DummyCycles       = 10;
   s_command.DdrMode           = QSPI_DDR_MODE_DISABLE;
   s_command.DdrHoldHalfCycle  = QSPI_DDR_HHC_ANALOG_DELAY;
   s_command.SIOOMode          = QSPI_SIOO_INST_EVERY_CMD;
   
-  /* Configure the memory mapped mode */
+  // Configure the memory mapped mode 
   s_mem_mapped_cfg.TimeOutActivation = QSPI_TIMEOUT_COUNTER_DISABLE;
   s_mem_mapped_cfg.TimeOutPeriod     = 0;
   
   if (HAL_QSPI_MemoryMapped(&hqspi, &s_command, &s_mem_mapped_cfg) != HAL_OK)
   {
     return QSPI_ERROR;
-  }
-
+  }   
   return QSPI_OK;
-}
-[/#if]
+}*/
+
+/* USER CODE END Configure_QSPI */
+
+
  [/#if]
 
   /*  MSPInit/deInit Implementation */
-[@common.optinclude name="Core/Src/ltdc_MSP.tmp"/] 
-[@common.optinclude name="Core/Src/dsihost_MSP.tmp"/] 
+[@common.optinclude name=coreDir+"Src/ltdc_MSP.tmp"/] 
+[@common.optinclude name=coreDir+"Src/dsihost_MSP.tmp"/] 
 [#if dma2dvalue?? && dma2dvalue=="1"]
-[@common.optinclude name="Core/Src/dma2d_MSP.tmp"/] 
+[@common.optinclude name=coreDir+"Src/dma2d_MSP.tmp"/] 
 [/#if]
 [#if   UseSDRAM?? && UseSDRAM!="0"    ]
-[@common.optinclude name="Core/Src/fmc_MSP.tmp"/] 
+[@common.optinclude name=coreDir+"Src/fmc_MSP.tmp"/] 
 [/#if]
 
 [/#if]

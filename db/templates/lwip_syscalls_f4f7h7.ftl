@@ -6,7 +6,7 @@
   *                      namespace go here. Files in the C namespace (ie those
   *                      that do not start with an underscore) go in .c.
   ******************************************************************************
-[@common.optinclude name="Src/license.tmp"/][#--include License text --]
+[@common.optinclude name=sourceDir+"Src/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
   

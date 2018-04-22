@@ -4,7 +4,7 @@
   * @file    user_diskio.c
   * @brief   This file includes a diskio driver skeleton to be completed by the user.
   ******************************************************************************
-[@common.optinclude name="Src/license.tmp"/][#--include License text --]
+[@common.optinclude name=sourceDir+"Src/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
 

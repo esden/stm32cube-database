@@ -13,7 +13,7 @@
  [/#if]
   * @brief   This file includes a generic uSD card driver.
   ******************************************************************************
-[@common.optinclude name="Src/license.tmp"/][#--include License text --]
+[@common.optinclude name=sourceDir+"Src/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
 [#if SWIPdatas??]

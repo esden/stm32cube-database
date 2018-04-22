@@ -1,15 +1,14 @@
 [#ftl]
-/**
+[#assign coreDir=sourceDir]
+  /**
   ******************************************************************************
   * @file    HW_Init.c
   * @author  MCD Application Team
-  * @version V1.0.0RC1
-  * @date    19-June-2017
-  * @brief   
+  * @brief   This file implements the hardware configuration for the GUI library  
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; Copyright © 2017 STMicroelectronics International N.V. 
+  * <h2><center>&copy; Copyright © 2018 STMicroelectronics International N.V. 
   * All rights reserved.</center></h2>
   *
   * Redistribution and use in source and binary forms, with or without 
@@ -66,7 +65,7 @@ extern ${variable.value} ${variable.name};
     [#list SWIP.defines as definition]	
 	[#-- IF to take care of the specific formatting of each argument of this file  --]
         [#if definition.name = "HSRAM" ]
-[@common.optinclude name="Core/Src/fmc_vars.tmp"/] 
+[@common.optinclude name=coreDir+"Src/fmc_vars.tmp"/] 
         [/#if]
     [/#list]
 [/#if]
@@ -80,11 +79,11 @@ extern ${variable.value} ${variable.name};
   */ 
 void MX_FMC_Init(void) 
 {  
- [@common.optinclude name="Core/Src/fmc_HalInit.tmp"/] 
+ [@common.optinclude name=coreDir+"Src/fmc_HalInit.tmp"/] 
 }
 
 /*  MSPInit/deInit Implementation */
-[@common.optinclude name="Core/Src/fmc_MSP.tmp"/] 
+[@common.optinclude name=coreDir+"Src/fmc_MSP.tmp"/] 
 
 /**
 * @}

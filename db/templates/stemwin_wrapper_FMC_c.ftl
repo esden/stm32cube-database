@@ -1,15 +1,13 @@
 [#ftl]
-/**
+  /**
   ******************************************************************************
   * @file    STemWin_wrapper.c
   * @author  MCD Application Team
-  * @version V1.0.0RC1
-  * @date    19-June-2017
-  * @brief   
+  * @brief   This file implements the configuration for the GUI library
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; Copyright © 2017 STMicroelectronics International N.V. 
+  * <h2><center>&copy; Copyright © 2018 STMicroelectronics International N.V. 
   * All rights reserved.</center></h2>
   *
   * Redistribution and use in source and binary forms, with or without 
@@ -45,10 +43,9 @@
   *
   ******************************************************************************
   */
-//#include "GUI.h"
+
 #include "GUIDRV_FlexColor.h"
 #include "STemWin_wrapper.h"
-//#include "st7789h2/st7789h2.h"
 
 /*********************************************************************
 *
@@ -78,7 +75,7 @@ extern ${variable.value} ${variable.name};
 [#elseif definition.name = "Ysize_PHYS"]
 #define YSIZE_PHYS  #t#t ${definition.value} 
 
-
+extern volatile GUI_TIMER_TIME OS_TimeMS;
 /*********************************************************************
 *
 *       Configuration checking
@@ -215,6 +212,10 @@ void LCD_X_Config(void)
 [#elseif definition.name = "FLEX_Orientation"]
   Config.Orientation = ${definition.value};
     
+ #if (NUM_BUFFERS > 1)
+      GUI_MULTIBUF_ConfigEx(0, NUM_BUFFERS);
+  #endif
+
   GUIDRV_FlexColor_Config(pDevice, &Config);
   //
   // Set controller and operation mode
@@ -268,7 +269,6 @@ int LCD_X_DisplayDriver(unsigned LayerIndex, unsigned Cmd, void * pData) {
   switch (Cmd) {
   case LCD_X_INITCONTROLLER: {
    
-    MX_FMC_Init();
     /* Component Initialization */
     LCDController_Init(); 
     
@@ -312,14 +312,29 @@ static uint16_t FMC_BANK_ReadData(void)
   return FMC_BANK->RAM;
 }
 
+
+void GRAPHICS_IncTick(void){
+  
+    OS_TimeMS++;
+} 
+
+void GRAPHICS_HW_Init(void)
+{ 
+  MX_FMC_Init();  
+}
+
 void GRAPHICS_Init(void)
 { 
  
   /* Initialize the GUI */
   GUI_Init();
-  
+   
   /* Activate the use of memory device feature */
-  WM_SetCreateFlags(WM_CF_MEMDEV);
+     /* USER CODE BEGIN memory_device */
+
+       //WM_SetCreateFlags(WM_CF_MEMDEV);
+
+     /* USER CODE END memory_device */
 }
 
 /**
@@ -332,7 +347,11 @@ static void LCDController_Init(void)
 /* special hardware initialization may be needed before controller iniialization */
 
 /* Initialize LCD controller */
-  //component_init();
+    /* USER CODE BEGIN LCD_controller */
+
+         //component_init();
+
+    /* USER CODE END LCD_controller */
 
 }
   
