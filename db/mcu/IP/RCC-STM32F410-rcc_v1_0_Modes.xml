@@ -61,7 +61,8 @@
         <PossibleValue Comment="FMPI2C1 Hsi"       Value="RCC_FMPI2C1CLKSOURCE_HSI"/>
         <PossibleValue Comment="FMPI2C1 PCLK1"     Value="RCC_FMPI2C1CLKSOURCE_APB"/>
     </RefParameter>
-	    <RefParameter Visible="false" Comment="Clock Source for I2S" DefaultValue="I2S_CLOCK_PLL" Name="I2SClockSource" Type="list" IP="I2S1,I2S2,I2S3,I2S4,I2S5">
+    
+    <RefParameter Visible="false" Comment="Clock Source for I2S" DefaultValue="I2S_CLOCK_PLL" Name="I2SClockSource" Type="list" IP="I2S1,I2S2,I2S3,I2S4,I2S5">
         <PossibleValue Comment="Clk Source Pll" Value="RCC_I2SAPBCLKSOURCE_PLLR" Semaphore="I2SSourceIsPll"/>
         <PossibleValue Comment="Clk Source Pll" Value="RCC_I2SAPBCLKSOURCE_PLLSRC" Semaphore="I2SSourceIsPllSRC"/>
         <PossibleValue Comment="Clk Source  Ext" Value="RCC_I2SAPBCLKSOURCE_EXT"/>
@@ -262,6 +263,17 @@
         <PossibleValue Comment="30" Value="RCC_RTCCLKSOURCE_HSE_DIV30"/>
         <PossibleValue Comment="31" Value="RCC_RTCCLKSOURCE_HSE_DIV31"/>
     </RefParameter>
+        <RefParameter Visible="false" Comment="RTC Clock Source"  DefaultValue="RCC_RTCCLKSOURCE_LSE" Name="RCC_RTC_Clock_SourceLL" Type="list" IP="RTC">
+        <Condition Expression="RCC_RTC_Clock_Source=RCC_RTCCLKSOURCE_LSE" Diagnostic=""/>
+        <PossibleValue Comment="LSE" Value="RCC_RTCCLKSOURCE_LSE"/>
+    </RefParameter>
+    <RefParameter Visible="false" Comment="RTC Clock Source"  DefaultValue="RCC_RTCCLKSOURCE_LSI" Name="RCC_RTC_Clock_SourceLL" Type="list" IP="RTC">
+        <Condition Expression="RCC_RTC_Clock_Source=RCC_RTCCLKSOURCE_LSI" Diagnostic=""/>
+        <PossibleValue Comment="LSI" Value="RCC_RTCCLKSOURCE_LSI"/>
+    </RefParameter>
+    <RefParameter Visible="false" Comment="RTC Clock Source"  DefaultValue="RCC_RTCCLKSOURCE_HSE" Name="RCC_RTC_Clock_SourceLL" Type="list" IP="RTC">
+        <PossibleValue Comment="HSE" Value="RCC_RTCCLKSOURCE_HSE"/>
+    </RefParameter>
     <RefParameter Visible="false" Comment="RTC Clock Source_HSEDiv" DefaultValue="RCC_RTCCLKSOURCE_HSE_DIV2" Name="RCC_RTC_Clock_Source_FROM_HSE" Type="list" IP="RTC">
         <PossibleValue Comment="2" Value="RCC_RTCCLKSOURCE_HSE_DIV2"/>
         <PossibleValue Comment="3" Value="RCC_RTCCLKSOURCE_HSE_DIV3"/>
@@ -373,6 +385,28 @@
     <RefParameter Visible="false" Comment="VCOOutput" Name="VCOOutputFreq_Value" DefaultValue="192000000" Min="100000000" Max="432000000" Type="double" Display="value/1000000" Unit="MHz">
         <Condition Diagnostic="PLL not used" Expression="PLLUsed=1"/>
     </RefParameter>
+
+<!-- PLLUsedForSys used -->
+        <RefParameter Visible="false" Comment="MainPLL Is Used" DefaultValue="1" Name="PLLUsedForSys" Min="1" Max="1" Type="integer">
+            <Condition Expression="(SYSCLKSource=RCC_SYSCLKSOURCE_PLLCLK)|((RCC_MCO1Source=RCC_MCO1SOURCE_PLLCLK)&amp;(MCO1Config))|((RCC_MCO2Source=RCC_MCO2SOURCE_PLLCLK)&amp;(MCO2Config))" Diagnostic=" "/>
+        </RefParameter>
+	
+        <RefParameter Visible="false" Comment="Main PLL is Used" DefaultValue="0" Name="PLLUsedForSys" Min="0" Max="0" Type="integer"/>
+        
+        <!-- PLLUsedForCK48 used -->
+        <RefParameter Visible="false" Comment="MainPLL Is Used" DefaultValue="1" Name="PLLUsedForCK48" Min="1" Max="1" Type="integer">
+            <Condition Expression="(RNGUsed_ForRCC)" Diagnostic=" "/>
+        </RefParameter>
+	
+        <RefParameter Visible="false" Comment="Main PLL is Used" DefaultValue="0" Name="PLLUsedForCK48" Min="0" Max="0" Type="integer"/>
+        
+        <!-- PLLUsedForI2S used -->
+        <RefParameter Visible="false" Comment="MainPLL Is Used" DefaultValue="1" Name="PLLUsedForI2S" Min="1" Max="1" Type="integer">
+            <Condition Expression="((I2SSourceIsPll &amp; I2SUsed_ForRCC) |((MCOSourceIsPLLI2SP &amp;(MCO2Config))))" Diagnostic=" "/>
+        </RefParameter>
+	
+        <RefParameter Visible="false" Comment="Main PLL is Used" DefaultValue="0" Name="PLLUsedForI2S" Min="0" Max="0" Type="integer"/>
+
     <RefParameter Visible="false" Comment="VCOOutput" Name="VCOOutputFreq_Value" DefaultValue="192000000"  Type="double" Display="value/1000000" Unit="MHz"/>
     <RefParameter Visible="false" Comment="VCOOutput" Name="VCOQOutputFreq_Value" DefaultValue="192000000"  Max="75000000" Type="double" Display="value/1000000" Unit="MHz">
         <Condition Diagnostic="PLL not used" Expression="RNGUsed_ForRCC"/>

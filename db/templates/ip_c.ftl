@@ -103,6 +103,9 @@
 [#-- static ${variable.value} ${variable.name}; --]
 [/#list]
 [/#if]
+[#if GFXMMUisUsed?? && name=="GFXMMU"]
+[@common.optincludeFile path="Inc" name="gfxmmu_lut.h"/]
+[/#if]
 [#-- WorkAround for Ticket 30863 --]
 [#if name=="ETH" && H7_ETH_NoLWIP??]
 #if defined ( __ICCARM__ ) /*!< IAR Compiler */

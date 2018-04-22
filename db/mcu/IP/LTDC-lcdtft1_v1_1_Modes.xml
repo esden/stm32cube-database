@@ -116,27 +116,20 @@
 	
 	<RefParameter Comment="Layer 0 - Pixel Format" DefaultValue="LTDC_PIXEL_FORMAT_ARGB8888" Name="PixelFormat_L0" Type="list" Group="Pixel Parameters" TabName="Layer Settings">
         <Description>Specifies the pixel format.</Description>
-        <PossibleValue Comment="ARGB8888" Value="LTDC_PIXEL_FORMAT_ARGB8888"/>
-        <PossibleValue Comment="RGB888" Value="LTDC_PIXEL_FORMAT_RGB888"/>
-        <PossibleValue Comment="RGB565" Value="LTDC_PIXEL_FORMAT_RGB565"/>
-        <PossibleValue Comment="ARGB1555" Value="LTDC_PIXEL_FORMAT_ARGB1555"/>
-        <PossibleValue Comment="ARGB4444" Value="LTDC_PIXEL_FORMAT_ARGB4444"/>
-        <PossibleValue Comment="L8" Value="LTDC_PIXEL_FORMAT_L8"/>
-        <PossibleValue Comment="AL44" Value="LTDC_PIXEL_FORMAT_AL44"/>
-        <PossibleValue Comment="AL88" Value="LTDC_PIXEL_FORMAT_AL88"/>
+        <PossibleValue Comment="ARGB8888" Value="LTDC_PIXEL_FORMAT_ARGB8888" />
+        <PossibleValue Comment="RGB888" Value="LTDC_PIXEL_FORMAT_RGB888" Semaphore="Semaphore_LTDC_UsedFor_GFXMMU"
+			Condition="Semaphore_GFXMMU_256BLOCKS"
+			Diagnostic="RGB888 format not available when GFXMMU used in 256 blocks mode"
+		/>
+        <PossibleValue Comment="RGB565" Value="LTDC_PIXEL_FORMAT_RGB565" />
+        <PossibleValue Comment="ARGB1555" Value="LTDC_PIXEL_FORMAT_ARGB1555" />
+        <PossibleValue Comment="ARGB4444" Value="LTDC_PIXEL_FORMAT_ARGB4444" />
+        <PossibleValue Comment="L8" Value="LTDC_PIXEL_FORMAT_L8" />
+        <PossibleValue Comment="AL44" Value="LTDC_PIXEL_FORMAT_AL44" />
+        <PossibleValue Comment="AL88" Value="LTDC_PIXEL_FORMAT_AL88" />
     </RefParameter>
 	
-	<!-- Layer 0 Pixel Format for RGB666 and RGB565-->
 	
-	<RefParameter Comment="Layer 0 - Pixel Format" DefaultValue="LTDC_PIXEL_FORMAT_RGB565" Name="PixelFormat_L0_not888" Type="list" Group="Pixel Parameters" TabName="Layer Settings">
-		<Description>Specifies the pixel format.</Description>
-		<PossibleValue Comment="RGB565" Value="LTDC_PIXEL_FORMAT_RGB565"/>
-		<PossibleValue Comment="ARGB1555" Value="LTDC_PIXEL_FORMAT_ARGB1555"/>
-		<PossibleValue Comment="ARGB4444" Value="LTDC_PIXEL_FORMAT_ARGB4444"/>
-		<PossibleValue Comment="L8" Value="LTDC_PIXEL_FORMAT_L8"/>
-		<PossibleValue Comment="AL44" Value="LTDC_PIXEL_FORMAT_AL44"/>
-		<PossibleValue Comment="AL88" Value="LTDC_PIXEL_FORMAT_AL88"/>
-	</RefParameter>
 	
 	
 	<!-- Layer 0 Blending  -->
@@ -165,17 +158,99 @@
     </RefParameter>
 	
 	<!-- Layer 0 - Frame Buffer RefParameters for LTDC -->
-	
+
 	<RefParameter Comment="Layer 0 - Color Frame Buffer Start Adress" DefaultValue="0" Max="4294967295" Min="0" Name="FBStartAdress_L0" Type="integer" Group="Frame Buffer" TabName="Layer Settings">
         <Description>Configures the color frame buffer address </Description>
+		<Condition Expression="(!Semaphore_GFXMMU_used_forLTDC)" Diagnostic=""/>
+    </RefParameter> 
+	<RefParameter Comment="Layer 0 - Color Frame Buffer Start Adress" DefaultValue="GFXMMU_VIRTUAL_BUFFER0_BASE" Name="FBStartAdress_L0" Type="list" Group="Frame Buffer" TabName="Layer Settings">
+        <Description>Configures the color frame buffer address </Description>
+		<Condition Expression="(Semaphore_GFXMMU_used_forLTDC)" Diagnostic=""/>
+		<PossibleValue Comment="GFXMMU_VIRTUAL_BUFFER0_BASE" Value="GFXMMU_VIRTUAL_BUFFER0_BASE"/>
+		<PossibleValue Comment="GFXMMU_VIRTUAL_BUFFER1_BASE" Value="GFXMMU_VIRTUAL_BUFFER1_BASE"/>
+		<PossibleValue Comment="GFXMMU_VIRTUAL_BUFFER2_BASE" Value="GFXMMU_VIRTUAL_BUFFER2_BASE"/>
+		<PossibleValue Comment="GFXMMU_VIRTUAL_BUFFER3_BASE" Value="GFXMMU_VIRTUAL_BUFFER3_BASE"/>
     </RefParameter>
+	
+	<!-- Color Frame Buffer Line Length  w/ max value set to the pitch value when GFXMMU used -->
+	
 	<RefParameter Comment="Layer 0 - Color Frame Buffer Line Length (Image Width)" DefaultValue="0" Max="8191" Min="0" Name="ImageWidth_L0" Type="integer" Group="Frame Buffer" TabName="Layer Settings">
         <Description>Configures the color frame buffer line length.</Description>
+		<Condition Expression="(!Semaphore_GFXMMU_used_forLTDC)" Diagnostic=""/>
+    </RefParameter> 
+	<RefParameter Comment="Layer 0 - Color Frame Buffer Line Length (Image Width)" DefaultValue="0" Max="=Pitch_L0" Min="0" Name="ImageWidth_L0" Type="integer" Group="Frame Buffer" TabName="Layer Settings">
+        <Description>Configures the color frame buffer line length.</Description>
+		<Condition Expression="(Semaphore_GFXMMU_used_forLTDC)" Diagnostic=""/>
     </RefParameter>
+	
+	<!-- Color Frame Buffer Number of Lines  -->
+	
 	<RefParameter Comment="Layer 0 - Color Frame Buffer Number of Lines (Image Height)" DefaultValue="0" Max="2047" Min="0" Name="ImageHeight_L0" Type="integer" Group="Frame Buffer" TabName="Layer Settings">
         <Description>Specifies the number of line in frame buffer.</Description>
     </RefParameter>
 	
+	<!-- Layer 0 Line Pitch - no GFXMMU used -->
+	<!--
+	<RefParameter Comment="Layer 0 - Color Frame Line Pitch" DefaultValue="=ImageWidth_L0" Name="Pitch_L0" Type="string" Group="Frame Buffer" TabName="Layer Settings">
+        <Description>Specifies in pixel the line pitch (maximum number of line in frame buffer).</Description>
+		<Condition Expression="(Layers = 1)&amp;(!GFXMMU_used_forLTDC)" Diagnostic=""/>
+    </RefParameter>
+	-->
+	
+	<!-- Layer 0 Line Pitch - GFXMMU used in 192 blocks mode -->
+	<RefParameter Comment="Layer 0 - Color Frame Line Pitch" DefaultValue="0" Name="Pitch_L0" Type="string" Group="Frame Buffer" TabName="Layer Settings">
+        <Description>Specifies in pixel the line pitch (maximum number of line in frame buffer).</Description>
+		<PossibleValue Comment="768" Value="768" Action="Disable"/>
+		<Condition Expression="(Semaphore_GFXMMU_used_forLTDC)&amp;(Semaphore_GFXMMU_192BLOCKS)&amp;((PixelFormat_L0 = LTDC_PIXEL_FORMAT_ARGB8888))" Diagnostic=""/>
+    </RefParameter>
+	<RefParameter Comment="Layer 0 - Color Frame Line Pitch" DefaultValue="0" Name="Pitch_L0" Type="string" Group="Frame Buffer" TabName="Layer Settings">
+        <Description>Specifies in pixel the line pitch (maximum number of line in frame buffer).</Description>
+		<PossibleValue Comment="1024" Value="1024" Action="Disable"/>
+		<Condition Expression="(Semaphore_GFXMMU_used_forLTDC)&amp;(Semaphore_GFXMMU_192BLOCKS)&amp;((PixelFormat_L0 = LTDC_PIXEL_FORMAT_RGB888))" Diagnostic=""/>
+    </RefParameter>
+	
+	<RefParameter Comment="Layer 0 - Color Frame Line Pitch" DefaultValue="0" Name="Pitch_L0" Type="string" Group="Frame Buffer" TabName="Layer Settings">
+        <Description>Specifies in pixel the line pitch (maximum number of line in frame buffer).</Description>
+		<PossibleValue Comment="1536" Value="1536" Action="Disable"/>
+		<Condition Expression="(Semaphore_GFXMMU_used_forLTDC)&amp;(GFXMMU_192BLOCKS)&amp;((PixelFormat_L0 = LTDC_PIXEL_FORMAT_RGB565)|(PixelFormat_L0 = LTDC_PIXEL_FORMAT_ARGB1555)|(PixelFormat_L0 = LTDC_PIXEL_FORMAT_ARGB4444)|(PixelFormat_L0 = LTDC_PIXEL_FORMAT_AL88))" Diagnostic=""/>
+    </RefParameter>
+	<RefParameter Comment="Layer 0 - Color Frame Line Pitch" DefaultValue="0" Name="Pitch_L0" Type="string" Group="Frame Buffer" TabName="Layer Settings">
+        <Description>Specifies in pixel the line pitch (maximum number of line in frame buffer).</Description>
+		<PossibleValue Comment="3072" Value="3072" Action="Disable"/>
+		<Condition Expression="(Semaphore_GFXMMU_used_forLTDC)&amp;(GFXMMU_192BLOCKS)&amp;((PixelFormat_L0 = LTDC_PIXEL_FORMAT_L8)|(PixelFormat_L0 = LTDC_PIXEL_FORMAT_AL44))" Diagnostic=""/>
+    </RefParameter>
+	
+	<!-- Layer 0 Line Pitch - GFXMMU used in 256 blocks mode -->
+	
+	<RefParameter Comment="Layer 0 - Color Frame Line Pitch" DefaultValue="0" Name="Pitch_L0" Type="string" Group="Frame Buffer" TabName="Layer Settings">
+        <Description>Specifies in pixel the line pitch (maximum number of line in frame buffer).</Description>
+		<PossibleValue Comment="1024" Value="1024" Action="Disable"/>
+		<Condition Expression="(Semaphore_GFXMMU_used_forLTDC)&amp;(GFXMMU_256BLOCKS)&amp;((PixelFormat_L0 = LTDC_PIXEL_FORMAT_ARGB8888))" Diagnostic=""/>
+    </RefParameter> 	
+	<RefParameter Comment="Layer 0 - Color Frame Line Pitch" DefaultValue="0" Name="Pitch_L0" Type="string" Group="Frame Buffer" TabName="Layer Settings">
+        <Description>Specifies in pixel the line pitch (maximum number of line in frame buffer).</Description>
+		<PossibleValue Comment="2048" Value="2048" Action="Disable"/>
+		<Condition Expression="(Semaphore_GFXMMU_used_forLTDC)&amp;(GFXMMU_256BLOCKS)&amp;((PixelFormat_L0 = LTDC_PIXEL_FORMAT_RGB565)|(PixelFormat_L0 = LTDC_PIXEL_FORMAT_ARGB1555)|(PixelFormat_L0 = LTDC_PIXEL_FORMAT_ARGB4444)|(PixelFormat_L0 = LTDC_PIXEL_FORMAT_AL88))" Diagnostic=""/>
+    </RefParameter>
+	<RefParameter Comment="Layer 0 - Color Frame Line Pitch" DefaultValue="0" Name="Pitch_L0" Type="string" Group="Frame Buffer" TabName="Layer Settings">
+        <Description>Specifies in pixel the line pitch (maximum number of line in frame buffer).</Description>
+		<PossibleValue Comment="4096" Value="4096" Action="Disable"/>
+		<Condition Expression="(Semaphore_GFXMMU_used_forLTDC)&amp;(GFXMMU_256BLOCKS)&amp;((PixelFormat_L0 = LTDC_PIXEL_FORMAT_L8)|(PixelFormat_L0 = LTDC_PIXEL_FORMAT_AL44))" Diagnostic=""/>
+    </RefParameter>
+	
+	<!-- RGB888 not available for 256 blocks] -->
+	<!--
+	<RefParameter Comment="Layer 0 - Line Pitch" DefaultValue="0" Name="Pitch_L0" Type="string" Group="Frame Buffer" TabName="Layer Settings">
+        <Description>Specifies in pixel the line pitch (maximum number of line in frame buffer).</Description>
+		<PossibleValue Comment="2048" Value="2048" Action="Disable"/>
+		<Condition Expression="(Layers = 1)&amp;(GFXMMU_used_forLTDC)&amp;(GFXMMU_256BLOCKS)&amp;((RGB565)|(ARGB555)|(ARGB)|(AL88))" Diagnostic=""/>
+    </RefParameter>
+	<RefParameter Comment="Layer 0 - Line Pitch" DefaultValue="0" Name="Pitch_L0" Type="string" Group="Frame Buffer" TabName="Layer Settings">
+        <Description>Specifies in pixel the line pitch (maximum number of line in frame buffer).</Description>
+		<PossibleValue Comment="4096" Value="4096" Action="Disable"/>
+		<Condition Expression="(Layers = 1)&amp;(GFXMMU_used_forLTDC)&amp;(GFXMMU_256BLOCKS)&amp;((L8)|(AL44))" Diagnostic=""/>
+    </RefParameter>
+-->
 	<!-- *************** END OF LAYER 0 SETTINGS *************** -->
     
 	<!-- *************** START OF LAYER 1 SETTINGS *************** -->
@@ -220,7 +295,7 @@
 		<Description>Specifies the pixel format.</Description>
 		<Condition Expression="(Layers = 1)" Diagnostic=""/>
 		<PossibleValue Comment="ARGB8888" Value="LTDC_PIXEL_FORMAT_ARGB8888"/>
-		<PossibleValue Comment="RGB888" Value="LTDC_PIXEL_FORMAT_RGB888"/>
+		<PossibleValue Comment="RGB888" Value="LTDC_PIXEL_FORMAT_RGB888" Semaphore="Semaphore_LTDC_UsedFor_GFXMMU"/>
 		<PossibleValue Comment="RGB565" Value="LTDC_PIXEL_FORMAT_RGB565"/>
 		<PossibleValue Comment="ARGB1555" Value="LTDC_PIXEL_FORMAT_ARGB1555"/>
 		<PossibleValue Comment="ARGB4444" Value="LTDC_PIXEL_FORMAT_ARGB4444"/>
@@ -229,7 +304,7 @@
 		<PossibleValue Comment="AL88" Value="LTDC_PIXEL_FORMAT_AL88"/>
 	</RefParameter>
 	
-	<!-- Layer 1 Pixel Format for RGB666 and RGB565 -->
+	<!-- Layer 1 Pixel Format for RGB666 and RGB565 : was a bug...
 	
 	<RefParameter Comment="Layer 1 - Pixel Format" DefaultValue="LTDC_PIXEL_FORMAT_RGB565" Name="PixelFormat_L1_not888" Type="list" Group="Pixel Parameters" TabName="Layer Settings">
 		<Description>Specifies the pixel format.</Description>
@@ -241,7 +316,7 @@
 		<PossibleValue Comment="AL44" Value="LTDC_PIXEL_FORMAT_AL44"/>
 		<PossibleValue Comment="AL88" Value="LTDC_PIXEL_FORMAT_AL88"/>
 	</RefParameter>
-	
+	-->
 	
 	<!-- Layer 1 Blending  -->
 	
@@ -276,17 +351,87 @@
 	
 	<RefParameter Comment="Layer 1 - Color Frame Buffer Start Adress" DefaultValue="0" Max="4294967295" Min="0" Name="FBStartAdress_L1" Type="integer" Group="Frame Buffer" TabName="Layer Settings">
 		<Description>Configures the color frame buffer address </Description>
-		<Condition Expression="(Layers = 1)" Diagnostic=""/>
-	</RefParameter>
+		<Condition Expression="(Layers = 1)&amp;(!Semaphore_GFXMMU_used_forLTDC)" Diagnostic=""/>
+    </RefParameter>
+	<RefParameter Comment="Layer 1 - Color Frame Buffer Start Adress" DefaultValue="GFXMMU_VIRTUAL_BUFFER0_BASE" Name="FBStartAdress_L1" Type="list" Group="Frame Buffer" TabName="Layer Settings">
+        <Description>Configures the color frame buffer address </Description>
+		<Condition Expression="(Layers = 1)&amp;(Semaphore_GFXMMU_used_forLTDC)" Diagnostic=""/>
+		<PossibleValue Comment="GFXMMU_VIRTUAL_BUFFER0_BASE" Value="GFXMMU_VIRTUAL_BUFFER0_BASE"/>
+		<PossibleValue Comment="GFXMMU_VIRTUAL_BUFFER1_BASE" Value="GFXMMU_VIRTUAL_BUFFER1_BASE"/>
+		<PossibleValue Comment="GFXMMU_VIRTUAL_BUFFER2_BASE" Value="GFXMMU_VIRTUAL_BUFFER2_BASE"/>
+		<PossibleValue Comment="GFXMMU_VIRTUAL_BUFFER3_BASE" Value="GFXMMU_VIRTUAL_BUFFER3_BASE"/>
+    </RefParameter>
+	<!-- replaced w/ next statement. to be confirmed
+	
 	<RefParameter Comment="Layer 1 - Color Frame Buffer Line Length (Image Width)" DefaultValue="0" Max="8191" Min="0" Name="ImageWidth_L1" Type="integer" Group="Frame Buffer" TabName="Layer Settings">
 		<Description>Configures the color frame buffer line length.</Description>
 		<Condition Expression="(Layers = 1)" Diagnostic=""/>
 	</RefParameter>
+	-->
+	<!-- max value is set to the pitch value -->
+	<RefParameter Comment="Layer 1 - Color Frame Buffer Line Length (Image Width)" DefaultValue="0" Max="8191" Min="0" Name="ImageWidth_L1" Type="integer" Group="Frame Buffer" TabName="Layer Settings">
+        <Description>Configures the color frame buffer line length.</Description>
+		<Condition Expression="(Layers = 1)&amp;(!Semaphore_GFXMMU_used_forLTDC)" Diagnostic=""/>
+    </RefParameter> 
+	<RefParameter Comment="Layer 1 - Color Frame Buffer Line Length (Image Width)" DefaultValue="0" Max="=Pitch_L1" Min="0" Name="ImageWidth_L1" Type="integer" Group="Frame Buffer" TabName="Layer Settings">
+        <Description>Configures the color frame buffer line length.</Description>
+		<Condition Expression="(Layers = 1)&amp;(Semaphore_GFXMMU_used_forLTDC)" Diagnostic=""/>
+    </RefParameter>
+	
 	<RefParameter Comment="Layer 1 - Color Frame Buffer Number of Lines (Image Height)" DefaultValue="0" Max="2047" Min="0" Name="ImageHeight_L1" Type="integer" Group="Frame Buffer" TabName="Layer Settings">
 		<Description>Specifies the number of line in frame buffer.</Description>
 		<Condition Expression="(Layers = 1)" Diagnostic=""/>
 	</RefParameter>
 	
+	<!-- Layer 1 Line Pitch - GXMMU not used -->
+	<!--
+	<RefParameter Comment="Layer 1 - Color Frame Line Pitch" DefaultValue="=ImageWidth_L1" Name="Pitch_L1" Type="string" Group="Frame Buffer" TabName="Layer Settings">
+        <Description>Specifies in pixel the line pitch (maximum number of line in frame buffer).</Description>
+		<Condition Expression="(Layers = 1)&amp;(!GFXMMU_used_forLTDC)" Diagnostic=""/>
+    </RefParameter>
+	-->
+	
+	<!-- Layer 1 Line Pitch - GFXMMU used in 192 blocks mode -->
+	
+	<RefParameter Comment="Layer 1 - Color Frame Line Pitch" DefaultValue="0" Name="Pitch_L1" Type="string" Group="Frame Buffer" TabName="Layer Settings">
+        <Description>Specifies in pixel the line pitch (maximum number of line in frame buffer).</Description>
+		<PossibleValue Comment="768" Value="768" Action="Disable"/>
+		<Condition Expression="(Layers = 1)&amp;(Semaphore_GFXMMU_used_forLTDC)&amp;(Semaphore_GFXMMU_192BLOCKS)&amp;((PixelFormat_L1 = LTDC_PIXEL_FORMAT_ARGB8888))" Diagnostic=""/>
+    </RefParameter>
+	<RefParameter Comment="Layer 1 - Color Frame Line Pitch" DefaultValue="0" Name="Pitch_L1" Type="string" Group="Frame Buffer" TabName="Layer Settings">
+        <Description>Specifies in pixel the line pitch (maximum number of line in frame buffer).</Description>
+		<PossibleValue Comment="1024" Value="1024" Action="Disable"/>
+		<Condition Expression="(Layers = 1)&amp;(Semaphore_GFXMMU_used_forLTDC)&amp;(Semaphore_GFXMMU_192BLOCKS)&amp;((PixelFormat_L1 = LTDC_PIXEL_FORMAT_RGB888))" Diagnostic=""/>
+    </RefParameter>
+	<RefParameter Comment="Layer 1 - Color Frame Line Pitch" DefaultValue="0" Name="Pitch_L1" Type="string" Group="Frame Buffer" TabName="Layer Settings">
+        <Description>Specifies in pixel the line pitch (maximum number of line in frame buffer).</Description>
+		<PossibleValue Comment="1536" Value="1536" Action="Disable"/>
+		<Condition Expression="(Layers = 1)&amp;(Semaphore_GFXMMU_used_forLTDC)&amp;(Semaphore_GFXMMU_192BLOCKS)&amp;((PixelFormat_L1 = LTDC_PIXEL_FORMAT_RGB565)|(PixelFormat_L1 = LTDC_PIXEL_FORMAT_ARGB1555)|(PixelFormat_L1 = LTDC_PIXEL_FORMAT_ARGB4444)|(PixelFormat_L1 = LTDC_PIXEL_FORMAT_AL88))" Diagnostic=""/>
+    </RefParameter>
+	<RefParameter Comment="Layer 1 - Color Frame Line Pitch" DefaultValue="0" Name="Pitch_L1" Type="string" Group="Frame Buffer" TabName="Layer Settings">
+        <Description>Specifies in pixel the line pitch (maximum number of line in frame buffer).</Description>
+		<PossibleValue Comment="3072" Value="3072" Action="Disable"/>
+		<Condition Expression="(Layers = 1)&amp;(Semaphore_GFXMMU_used_forLTDC)&amp;(Semaphore_GFXMMU_192BLOCKS)&amp;((PixelFormat_L1 = LTDC_PIXEL_FORMAT_L8)|(PixelFormat_L1 = LTDC_PIXEL_FORMAT_AL44))" Diagnostic=""/>
+    </RefParameter>
+	
+	<!-- Layer 1 Line Pitch - GFXMMU used in 256 blocks mode -->
+	
+	<RefParameter Comment="Layer 1 - Color Frame Line Pitch" DefaultValue="0" Name="Pitch_L1" Type="string" Group="Frame Buffer" TabName="Layer Settings">
+        <Description>Specifies in pixel the line pitch (maximum number of line in frame buffer).</Description>
+		<PossibleValue Comment="1024" Value="1024" Action="Disable"/>
+		<Condition Expression="(Layers = 1)&amp;(Semaphore_GFXMMU_used_forLTDC)&amp;(Semaphore_GFXMMU_256BLOCKS)&amp;((PixelFormat_L1 = LTDC_PIXEL_FORMAT_ARGB8888))" Diagnostic=""/>
+    </RefParameter> 	
+	<RefParameter Comment="Layer 1 - Color Frame Line Pitch" DefaultValue="0" Name="Pitch_L1" Type="string" Group="Frame Buffer" TabName="Layer Settings">
+        <Description>Specifies in pixel the line pitch (maximum number of line in frame buffer).</Description>
+		<PossibleValue Comment="2048" Value="2048" Action="Disable"/>
+		<Condition Expression="(Layers = 1)&amp;(Semaphore_GFXMMU_used_forLTDC)&amp;(Semaphore_GFXMMU_256BLOCKS)&amp;((PixelFormat_L1 = LTDC_PIXEL_FORMAT_RGB565)|(PixelFormat_L1 = LTDC_PIXEL_FORMAT_ARGB1555)|(PixelFormat_L1 = LTDC_PIXEL_FORMAT_ARGB4444)|(PixelFormat_L1 = LTDC_PIXEL_FORMAT_AL88))" Diagnostic=""/>
+    </RefParameter>
+	<RefParameter Comment="Layer 1 - Color Frame Line Pitch" DefaultValue="0" Name="Pitch_L1" Type="string" Group="Frame Buffer" TabName="Layer Settings">
+        <Description>Specifies in pixel the line pitch (maximum number of line in frame buffer).</Description>
+		<PossibleValue Comment="4096" Value="4096" Action="Disable"/>
+		<Condition Expression="(Layers = 1)&amp;(Semaphore_GFXMMU_used_forLTDC)&amp;(Semaphore_GFXMMU_256BLOCKS)&amp;((PixelFormat_L1 = LTDC_PIXEL_FORMAT_L8)|(PixelFormat_L1 = LTDC_PIXEL_FORMAT_AL44))" Diagnostic=""/>
+    </RefParameter>
+
 	<!-- ***************  END OF LAYER 1 SETTINGS *************** -->
 	
 	
@@ -295,6 +440,9 @@
 		<ConfigForMode>Ltdc_Init</ConfigForMode>
 		<ConfigForMode>LTDC_ConfigLayer0</ConfigForMode>
 		<ConfigForMode>LTDC_ConfigLayer1</ConfigForMode>
+		<ConfigForMode>LTDC_setPitch_Layer0</ConfigForMode>
+		<ConfigForMode>LTDC_setPitch_Layer1</ConfigForMode>
+		
 		
 		<!-- Width Synchronization RefParameters for LTDC -->
 		<Parameter Name="HSync"/>
@@ -347,6 +495,7 @@
 		<Parameter Name="FBStartAdress_L0" />
 		<Parameter Name="ImageWidth_L0" />
 		<Parameter Name="ImageHeight_L0" />
+		<Parameter Name="Pitch_L0" />
 		
 		<Parameter Name="Blue_L0" />
 		<Parameter Name="Green_L0" />
@@ -370,6 +519,7 @@
 		<Parameter Name="FBStartAdress_L1" />
 		<Parameter Name="ImageWidth_L1" />
 		<Parameter Name="ImageHeight_L1" />
+		<Parameter Name="Pitch_L1" />
 		
 		<Parameter Name="Blue_L1" />
 		<Parameter Name="Green_L1" />
@@ -382,6 +532,8 @@
 		<ConfigForMode>Ltdc_Init</ConfigForMode>
 		<ConfigForMode>LTDC_ConfigLayer0</ConfigForMode>
 		<ConfigForMode>LTDC_ConfigLayer1</ConfigForMode>
+		<ConfigForMode>LTDC_setPitch_Layer0</ConfigForMode>
+		<ConfigForMode>LTDC_setPitch_Layer1</ConfigForMode>
 		<!-- LTDC init parameters -->
 
 		<!-- Width Synchronization RefParameters for LTDC -->
@@ -435,6 +587,7 @@
 		<Parameter Name="FBStartAdress_L0" />
 		<Parameter Name="ImageWidth_L0" />
 		<Parameter Name="ImageHeight_L0" />
+		<Parameter Name="Pitch_L0" />
 		
 		<Parameter Name="Blue_L0" />
 		<Parameter Name="Green_L0" />
@@ -459,6 +612,7 @@
 		<Parameter Name="FBStartAdress_L1" />
 		<Parameter Name="ImageWidth_L1" />
 		<Parameter Name="ImageHeight_L1" />
+		<Parameter Name="Pitch_L1" />
 		
 		<Parameter Name="Blue_L1" />
 		<Parameter Name="Green_L1" />
@@ -474,6 +628,8 @@
 		<ConfigForMode>LTDC_ConfigLayer1_not888</ConfigForMode> -->
 		<ConfigForMode>LTDC_ConfigLayer0</ConfigForMode>
 		<ConfigForMode>LTDC_ConfigLayer1</ConfigForMode>
+		<ConfigForMode>LTDC_setPitch_Layer0</ConfigForMode>
+		<ConfigForMode>LTDC_setPitch_Layer1</ConfigForMode>
 		
 		<!-- Width Synchronization RefParameters for LTDC -->
 		<Parameter Name="HSync"/>
@@ -525,6 +681,7 @@
 		<Parameter Name="FBStartAdress_L0" />
 		<Parameter Name="ImageWidth_L0" />
 		<Parameter Name="ImageHeight_L0" />
+		<Parameter Name="Pitch_L0" />
 		
 		<Parameter Name="Blue_L0" />
 		<Parameter Name="Green_L0" />
@@ -551,6 +708,7 @@
 		<Parameter Name="FBStartAdress_L1" />
 		<Parameter Name="ImageWidth_L1" />
 		<Parameter Name="ImageHeight_L1" />
+		<Parameter Name="Pitch_L1" />
 		
 		<Parameter Name="Blue_L1" />
 		<Parameter Name="Green_L1" />
@@ -563,7 +721,7 @@
 	<ModeLogicOperator Name="OR">
 		<Mode Name="Display" UserName="Display Type">
 			<ModeLogicOperator Name="XOR">
-				<Mode Name="RGB888" UserName="RGB888 (24 bits) - DSI mode" RemoveCondition="!DSIHOST:$modeexist_DSIHost_Video">
+				<Mode Name="RGB888" UserName="RGB888 (24 bits) - DSI mode" RemoveCondition="!(DSIHOST:$modeexist_DSIHost_Video|DSIHOST:$modeexist_DSIHost_Video2|DSIHOST:$modeexist_DSIHost_Standalone_onelane)">
 					<SignalLogicalOp Name="AND">
 						<Signal Name="DSIMode" />
 					</SignalLogicalOp>
@@ -605,7 +763,7 @@
 						<Signal Name="DE" />
 					</SignalLogicalOp>
 				</Mode>
-				<Mode Name="RGB666" UserName="RGB666 (18 bits) - DSI mode" RemoveCondition="!DSIHOST:$modeexist_DSIHost_Video">
+				<Mode Name="RGB666" UserName="RGB666 (18 bits) - DSI mode" RemoveCondition="!(DSIHOST:$modeexist_DSIHost_Video|DSIHOST:$modeexist_DSIHost_Video2|DSIHOST:$modeexist_DSIHost_Standalone_onelane)">
 					<SignalLogicalOp Name="AND">
 						<Signal Name="DSIMode" />
 					</SignalLogicalOp>
@@ -641,7 +799,7 @@
 						<Signal Name="DE" />
 					</SignalLogicalOp>
 				</Mode>
-				<Mode Name="RGB565" UserName="RGB565 (16 bits) - DSI mode" RemoveCondition="!DSIHOST:$modeexist_DSIHost_Video">
+				<Mode Name="RGB565" UserName="RGB565 (16 bits) - DSI mode" RemoveCondition="!(DSIHOST:$modeexist_DSIHost_Video|DSIHOST:$modeexist_DSIHost_Video2|DSIHOST:$modeexist_DSIHost_Standalone_onelane)">
 					<SignalLogicalOp Name="AND">
 						<Signal Name="DSIMode" />
 					</SignalLogicalOp>

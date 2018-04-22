@@ -111,13 +111,13 @@
     <!-- Background layer Configuration for DMA2D --> 
 	
     <RefParameter Comment="Input Offset" DefaultValue="0" Max="16383" Min="0" Name="InputOffsetBackground" Type="integer" Group="Background layer Configuration">
-        <Condition Expression="M2M_BLEND_semaphore" Diagnostic=""/>
+        <Condition Expression="M2M_BLEND_semaphore|FG_M2M_semaphore|BG_M2M_semaphore" Diagnostic=""/>
     </RefParameter>
     <RefParameter Visible="false" Comment="Input Offset" DefaultValue="null"  Name="InputOffsetBackground" Type="list" Group="Background layer Configuration">
     </RefParameter>
 	
     <RefParameter Comment="DMA2D Input Color Mode" DefaultValue="DMA2D_INPUT_ARGB8888" Name="InputColorModeBackground" Type="list" Group="Background layer Configuration">
-        <Condition Expression="M2M_BLEND_semaphore" Diagnostic=""/>
+        <Condition Expression="M2M_BLEND_semaphore|FG_M2M_semaphore|BG_M2M_semaphore" Diagnostic=""/>
         <PossibleValue Comment="ARGB8888 " Value="DMA2D_INPUT_ARGB8888"/>
         <PossibleValue Comment="RGB888 "   Value="DMA2D_INPUT_RGB888"/>
         <PossibleValue Comment="RGB565 "   Value="DMA2D_INPUT_RGB565"/>
@@ -135,7 +135,7 @@
     </RefParameter>
 	
     <RefParameter Comment="DMA2D ALPHA MODE" DefaultValue="DMA2D_NO_MODIF_ALPHA" Name="AlphaModeBackground" Type="list" Group="Background layer Configuration">
-        <Condition Expression="M2M_BLEND_semaphore" Diagnostic=""/>
+        <Condition Expression="M2M_BLEND_semaphore|FG_M2M_semaphore|BG_M2M_semaphore" Diagnostic=""/>
 
         <PossibleValue Comment="No modification of the alpha channel value" Value="DMA2D_NO_MODIF_ALPHA"/>
         <PossibleValue Comment="Replace original alpha channel"             Value="DMA2D_REPLACE_ALPHA"/>
@@ -145,10 +145,10 @@
       
     </RefParameter>
     <RefParameter Comment="Input Alpha" DefaultValue="0" Max="4294967295" Min="0" Name="InputAlphaBackground" Type="integer"   Group="Background layer Configuration">
-        <Condition Expression="M2M_BLEND_semaphore &amp; (A4_mode_Background|A8_mode_Background)" Diagnostic=""/>
+        <Condition Expression="M2M_BLEND_semaphore|FG_M2M_semaphore|BG_M2M_semaphore &amp; (A4_mode_Background|A8_mode_Background)" Diagnostic=""/>
     </RefParameter>
     <RefParameter Comment="Input Alpha" DefaultValue="0" Max="255" Min="0" Name="InputAlphaBackground" Type="integer"   Group="Background layer Configuration">
-        <Condition Expression="M2M_BLEND_semaphore " Diagnostic=""/>
+        <Condition Expression="M2M_BLEND_semaphore|FG_M2M_semaphore|BG_M2M_semaphore " Diagnostic=""/>
     </RefParameter>
     <RefParameter Visible="false" Comment="Input Alpha" DefaultValue="null"  Name="InputAlphaBackground" Type="list"   Group="Background layer Configuration">
     </RefParameter>
@@ -170,17 +170,31 @@
         <PossibleValue Comment="Swap mode (BGR or ABGR)"      Value="DMA2D_RB_SWAP"/>
      
     </RefParameter>
+	 <RefParameter Visible="false" Comment="DMA2D Red and Blue swap" DefaultValue="null" Name="RedBlueSwapBackground" Type="list" Group="Background layer Configuration">
+    </RefParameter>
+	
 	
 
 
 	
     <!-- Configuration  DMA2D --> 
     <RefParameter Comment="Transfer Mode" DefaultValue="DMA2D_M2M" Name="Mode" Type="list" Group="Basic Parameters">
+	<Condition Expression="DIE470" Diagnostic=""/>
         <PossibleValue Comment="Memory to Memory"                                Value="DMA2D_M2M"       Semaphore="M2M_semaphore"/>
         <PossibleValue Comment="Memory to Memory with 'Pixel Format Conversion'" Value="DMA2D_M2M_PFC"   Semaphore="M2M_PFC_semaphore"/>
         <PossibleValue Comment="Memory to Memory with Blending"                  Value="DMA2D_M2M_BLEND" Semaphore="M2M_BLEND_semaphore"/>
         <PossibleValue Comment="Register to Memory"                              Value="DMA2D_R2M"       Semaphore="R2M_semaphore"/>
-    </RefParameter>
+        <PossibleValue Comment="memory to memory with blending transfer mode and fixed color FG"                              Value="DMA2D_M2M_BLEND_FG"       Semaphore="FG_M2M_semaphore"/>
+        <PossibleValue Comment="memory to memory with blending transfer mode and fixed color BG"                              Value="DMA2D_M2M_BLEND_BG"       Semaphore="BG_M2M_semaphore"/>
+    </RefParameter>   
+	
+    <RefParameter Comment="Transfer Mode" DefaultValue="DMA2D_M2M" Name="Mode" Type="list" Group="Basic Parameters">
+
+        <PossibleValue Comment="Memory to Memory"                                Value="DMA2D_M2M"       Semaphore="M2M_semaphore"/>
+        <PossibleValue Comment="Memory to Memory with 'Pixel Format Conversion'" Value="DMA2D_M2M_PFC"   Semaphore="M2M_PFC_semaphore"/>
+        <PossibleValue Comment="Memory to Memory with Blending"                  Value="DMA2D_M2M_BLEND" Semaphore="M2M_BLEND_semaphore"/>
+        <PossibleValue Comment="Register to Memory"                              Value="DMA2D_R2M"       Semaphore="R2M_semaphore"/>
+         </RefParameter>
 	
     <RefParameter Comment="Color Mode" DefaultValue="DMA2D_OUTPUT_ARGB8888" Name="ColorMode" Type="list" Group="Basic Parameters">
         <PossibleValue Comment="ARGB8888" Value="DMA2D_OUTPUT_ARGB8888" Semaphore="ARGB8888"/>
@@ -192,13 +206,29 @@
 	
     <RefParameter Comment="Output Offset"    DefaultValue="0" Max="16383" Min="0" Name="OutputOffset" Type="integer" Group="Basic Parameters"/>
 	
+	    <RefParameter Comment="DMA2D Bytes Swap" DefaultValue="DMA2D_BYTES_REGULAR" Name="BytesSwap" Type="list" Group="Basic Parameters">
+        <Condition Expression="(DIE470)" Diagnostic=""/>
+
+        <PossibleValue Comment="Bytes in regular order in output FIFO"        Value="DMA2D_BYTES_REGULAR"/>
+        <PossibleValue Comment="Bytes are swapped two by two in output FIFO"  Value="DMA2D_BYTES_SWAP"/>
+     
+    </RefParameter>
+	
+	    <RefParameter Comment="DMA2D Line Offset Mode" DefaultValue="DMA2D_BYTES_REGULAR" Name="LineOffsetMode" Type="list" Group="Basic Parameters">
+        <Condition Expression="(DIE470)" Diagnostic=""/>
+
+        <PossibleValue Comment="Line offsets expressed in pixels"        Value="DMA2D_LOM_PIXELS"/>
+        <PossibleValue Comment="Line offsets expressed in bytes"         Value="DMA2D_LOM_BYTES"/>
+     
+    </RefParameter>
+	
     <RefParameter Comment="Output Offsetsdv" DefaultValue="1" Max="1" Min="1" Name="LayerIdxForeground" Type="integer"  Visible="false" Group="Basic Parameters">
         <Condition Expression="!R2M_semaphore" Diagnostic=""/>
     </RefParameter>
     <RefParameter Comment="Output Offsetsdv" DefaultValue="null"  Name="LayerIdxForeground" Type="list"  Visible="false" Group="Basic Parameters">
     </RefParameter>
     <RefParameter Comment="Output Offsetsdv" DefaultValue="0" Max="0" Min="0" Name="LayerIdxBackground" Type="integer" Visible="false" Group="Basic Parameters">
-        <Condition Expression="M2M_BLEND_semaphore" Diagnostic=""/>
+        <Condition Expression="M2M_BLEND_semaphore|FG_M2M_semaphore|BG_M2M_semaphore" Diagnostic=""/>
     </RefParameter>
 	
     <RefParameter Comment="Output Offsetsdv" DefaultValue="null"  Name="LayerIdxBackground" Type="list" Visible="false" Group="Basic Parameters">
@@ -216,6 +246,8 @@
         <Parameter Name="Mode"></Parameter>
         <Parameter Name="ColorMode"></Parameter>
         <Parameter Name="OutputOffset"></Parameter>
+        <Parameter Name="BytesSwap"></Parameter>
+        <Parameter Name="LineOffsetMode"></Parameter>
         <Parameter Name="InputColorModeForeground"></Parameter>
         <Parameter Name="AlphaModeForeground"></Parameter>
         <Parameter Name="InputAlphaForeground"></Parameter>

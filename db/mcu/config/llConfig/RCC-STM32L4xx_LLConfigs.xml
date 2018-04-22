@@ -38,6 +38,11 @@
                 <HardCode Text="#n#tif(LL_FLASH_GetLatency() != LL_FLASH_LATENCY_4)#n#t{#n#tError_Handler();#t#n#t}"/>
             </CallLibMethod>
         </IFCondition>
+        <IFCondition Expression ="FLatency=FLASH_LATENCY_5">
+            <CallLibMethod Name="" Type="HardCode">
+                <HardCode Text="#n#tif(LL_FLASH_GetLatency() != LL_FLASH_LATENCY_5)#n#t{#n#tError_Handler();#t#n#t}"/>
+            </CallLibMethod>
+        </IFCondition>
 
         <!--voltage scaling configuration-->
         <IFCondition Expression ="1=1">
@@ -45,6 +50,10 @@
             <CallLibMethod Name="LL_PWR_SetRegulVoltageScaling">
                 <MethodArg Name="VoltageScaling" ParameterName="PWR_Regulator_Voltage_Scale"/>
             
+            </CallLibMethod>
+        </IFCondition>
+        <IFCondition Expression ="PWR_Regulator_Voltage_Scale=PWR_REGULATOR_VOLTAGE_SCALE1_BOOST">
+            <CallLibMethod Name="LL_PWR_EnableRange1BoostMode">
             </CallLibMethod>
         </IFCondition>
 
@@ -157,7 +166,7 @@
         <IFCondition Expression ="LSEUsed=1 &amp; LSEByPass">
             <CallLibMethod Name="LL_RCC_LSE_EnableBypass"/>
         </IFCondition>
-		<IFCondition Expression ="LSEOscillator &amp;(LSEUsedLL=1)">
+		<IFCondition Expression ="LSEOscillator &amp;(LSEUsed=1)">
             <CallLibMethod Name="LL_RCC_LSE_SetDriveCapability">
 			 <MethodArg Name="LSEDrive" ParameterName="LSE_Drive_Capability"/>
             </CallLibMethod>
@@ -223,7 +232,7 @@
                 <MethodArg Name="PLLQ" ParameterName="PLLQ"/>
             </CallLibMethod>
         </IFCondition>
-		
+
         <!--PLL activation-->
 
         <IFCondition Expression ="PLLUsedForCK48=1">
@@ -252,7 +261,7 @@
         <!--PLLSAI1 configuration-->
 
 		
-        <IFCondition Expression ="PLLSAI1UsedForCK48=1">
+        <IFCondition Expression ="(PLLSAI1UsedForCK48=1) &amp; !DIE470">
             <CallLibMethod Name="LL_RCC_PLLSAI1_ConfigDomain_48M">
                 <MethodArg Name="Source" ParameterName="PLLSource"/>
                 <MethodArg Name="PLLM" ParameterName="PLLMLL"/>
@@ -260,8 +269,17 @@
                 <MethodArg Name="PLLSAI1Q" ParameterName="PLLSAI1Q"/>
             </CallLibMethod>
         </IFCondition>
+
+        <IFCondition Expression ="(PLLSAI1UsedForCK48=1) &amp; DIE470">
+            <CallLibMethod Name="LL_RCC_PLLSAI1_ConfigDomain_48M">
+                <MethodArg Name="Source" ParameterName="PLLSource"/>
+                <MethodArg Name="PLLM" ParameterName="PLLSAI1MLL"/>
+                <MethodArg Name="PLLSAI1N" ParameterName="PLLSAI1N"/>
+                <MethodArg Name="PLLSAI1Q" ParameterName="PLLSAI1Q"/>
+            </CallLibMethod>
+        </IFCondition>
 		
-        <IFCondition Expression ="PLLSAI1UsedForSAI=1">
+        <IFCondition Expression ="(PLLSAI1UsedForSAI=1) &amp; !DIE470">
             <CallLibMethod Name="LL_RCC_PLLSAI1_ConfigDomain_SAI">
                 <MethodArg Name="Source" ParameterName="PLLSource"/>
                 <MethodArg Name="PLLM" ParameterName="PLLMLL"/>
@@ -269,11 +287,29 @@
                 <MethodArg Name="PLLSAI1P" ParameterName="PLLSAI1P"/>
             </CallLibMethod>
         </IFCondition>
+
+        <IFCondition Expression ="(PLLSAI1UsedForSAI=1) &amp; DIE470">
+            <CallLibMethod Name="LL_RCC_PLLSAI1_ConfigDomain_SAI">
+                <MethodArg Name="Source" ParameterName="PLLSource"/>
+                <MethodArg Name="PLLM" ParameterName="PLLSAI1MLL"/>
+                <MethodArg Name="PLLSAI1N" ParameterName="PLLSAI1N"/>
+                <MethodArg Name="PLLSAI1P" ParameterName="PLLSAI1P"/>
+            </CallLibMethod>
+        </IFCondition>
 		
-        <IFCondition Expression ="PLLSAI1UsedFOrADC=1">
+        <IFCondition Expression ="(PLLSAI1UsedFOrADC=1) &amp; !DIE470">
             <CallLibMethod Name="LL_RCC_PLLSAI1_ConfigDomain_ADC">
                 <MethodArg Name="Source" ParameterName="PLLSource"/>
                 <MethodArg Name="PLLM" ParameterName="PLLMLL"/>
+                <MethodArg Name="PLLSAI1N" ParameterName="PLLSAI1N"/>
+                <MethodArg Name="PLLSAI1R" ParameterName="PLLSAI1R"/>
+            </CallLibMethod>
+        </IFCondition>
+        
+        <IFCondition Expression ="(PLLSAI1UsedFOrADC=1) &amp; DIE470">
+            <CallLibMethod Name="LL_RCC_PLLSAI1_ConfigDomain_ADC">
+                <MethodArg Name="Source" ParameterName="PLLSource"/>
+                <MethodArg Name="PLLM" ParameterName="PLLSAI1MLL"/>
                 <MethodArg Name="PLLSAI1N" ParameterName="PLLSAI1N"/>
                 <MethodArg Name="PLLSAI1R" ParameterName="PLLSAI1R"/>
             </CallLibMethod>
@@ -306,7 +342,16 @@
 		
         <!--PLLSAI2 configuration-->
 		
-        <IFCondition Expression ="PLLSAI2UsedFOrSAI=1">
+        <IFCondition Expression ="(PLLSAI2UsedFOrSAI=1) &amp; DIE470">
+            <CallLibMethod Name="LL_RCC_PLLSAI2_ConfigDomain_SAI">
+                <MethodArg Name="Source" ParameterName="PLLSource"/>
+                <MethodArg Name="PLLM" ParameterName="PLLSAI2MLL"/>
+                <MethodArg Name="PLLSAI2N" ParameterName="PLLSAI2N"/>
+                <MethodArg Name="PLLSAI2P" ParameterName="PLLSAI2P"/>
+            </CallLibMethod>
+        </IFCondition>
+
+        <IFCondition Expression ="(PLLSAI2UsedFOrSAI=1) &amp; !DIE470">
             <CallLibMethod Name="LL_RCC_PLLSAI2_ConfigDomain_SAI">
                 <MethodArg Name="Source" ParameterName="PLLSource"/>
                 <MethodArg Name="PLLM" ParameterName="PLLMLL"/>
@@ -323,8 +368,35 @@
                 <MethodArg Name="PLLSAI2R" ParameterName="PLLSAI2R"/>
             </CallLibMethod>
         </IFCondition>
+
+        <IFCondition Expression ="PLLSAI2UsedFOrDSI=1">
+            <CallLibMethod Name="LL_RCC_PLLSAI2_ConfigDomain_DSI">
+                <MethodArg Name="Source" ParameterName="PLLSource"/>
+                <MethodArg Name="PLLM" ParameterName="PLLSAI2MLL"/>
+                <MethodArg Name="PLLSAI2N" ParameterName="PLLSAI2N"/>
+                <MethodArg Name="PLLSAI2Q" ParameterName="PLLSAI2Q"/>
+            </CallLibMethod>
+        </IFCondition>
+
+        <IFCondition Expression ="PLLSAI2UsedFOrLTDC=1">
+            <CallLibMethod Name="LL_RCC_PLLSAI2_ConfigDomain_LTDC">
+                <MethodArg Name="Source" ParameterName="PLLSource"/>
+                <MethodArg Name="PLLM" ParameterName="PLLSAI2MLL"/>
+                <MethodArg Name="PLLSAI2N" ParameterName="PLLSAI2N"/>
+                <MethodArg Name="PLLSAI2R" ParameterName="PLLSAI2R"/>
+                <MethodArg Name="PLLSAI2RDIV" ParameterName="LtdcClockSelection"/>
+            </CallLibMethod>
+        </IFCondition>
 		
         <!--PLLSAI2 activation-->
+
+        <IFCondition Expression ="PLLSAI2UsedFOrDSI=1">
+            <CallLibMethod Name="LL_RCC_PLLSAI2_EnableDomain_DSI"/>
+        </IFCondition>
+
+        <IFCondition Expression ="PLLSAI2UsedFOrLTDC=1">
+            <CallLibMethod Name="LL_RCC_PLLSAI2_EnableDomain_LTDC"/>
+        </IFCondition>
 
         <IFCondition Expression ="PLLSAI2UsedFOrSAI=1">
             <CallLibMethod Name="LL_RCC_PLLSAI2_EnableDomain_SAI"/>
@@ -343,31 +415,13 @@
                 <HardCode Text="#n#t /* Wait till PLLSAI2 is ready */#n#twhile(LL_RCC_PLLSAI2_IsReady() != 1)#n#t{#n#t#t#n#t}"/>
             </CallLibMethod>
         </IFCondition>
-		
-        <IFCondition Expression ="1=1">
+		 <!--sys clock source + AHB/APB configuration-->
+		        <IFCondition Expression ="HCLKsup80=1 &amp; DIE470" >
 
-            <CallLibMethod Name="LL_RCC_SetAHBPrescaler">
-                <MethodArg Name="Prescaler" ParameterName="AHBCLKDivider"/>
+            <CallLibMethod Name="" Type="HardCode">
+                <HardCode Text="#n#t   /* Intermediate AHB prescaler 2 when target frequency clock is higher than 80 MHz */#n#t LL_RCC_SetAHBPrescaler(LL_RCC_SYSCLK_DIV_2);#n#t"/>
             </CallLibMethod>
         </IFCondition>
-
-     
-        <IFCondition Expression ="1=1">
-
-            <CallLibMethod Name="LL_RCC_SetAPB1Prescaler">
-                <MethodArg Name="Prescaler" ParameterName="APB1CLKDivider"/>
-            </CallLibMethod>
-        </IFCondition>
-
-     
-        <IFCondition Expression ="1=1">
-
-            <CallLibMethod Name="LL_RCC_SetAPB2Prescaler">
-                <MethodArg Name="Prescaler" ParameterName="APB2CLKDivider"/>
-            </CallLibMethod>
-        </IFCondition>
-
-        <!--sys clock source + AHB/APB configuration-->
         <IFCondition Expression ="1=1">
 
             <CallLibMethod Name="LL_RCC_SetSysClkSource">
@@ -397,6 +451,44 @@
                 <HardCode Text="#n#t /* Wait till System clock is ready */#n#twhile(LL_RCC_GetSysClkSource() != LL_RCC_SYS_CLKSOURCE_STATUS_MSI)#n#t{#n#t#n#t}"/>
             </CallLibMethod>
         </IFCondition>
+		
+		
+		<IFCondition Expression ="HCLKsup80=1 &amp; DIE470">
+            <CallLibMethod Name="" Type="HardCode">
+                <HardCode Text="#n#t/* Insure 1µs transition state at intermediate medium speed clock based on DWT*/#n#tCoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;#n#t"/>
+            </CallLibMethod>
+        </IFCondition>
+				<IFCondition Expression ="HCLKsup80=1 &amp; DIE470">
+            <CallLibMethod Name="" Type="HardCode">
+                <HardCode Text="#n#tDWT-&gt;CTRL |= DWT_CTRL_CYCCNTENA_Msk;#n#tDWT-&gt;CYCCNT = 0;#n#twhile(DWT->CYCCNT &lt; 100);#n#t"/>
+            </CallLibMethod>
+ </IFCondition>
+		
+        <IFCondition Expression ="1=1">
+
+            <CallLibMethod Name="LL_RCC_SetAHBPrescaler">
+                <MethodArg Name="Prescaler" ParameterName="AHBCLKDivider"/>
+            </CallLibMethod>
+        </IFCondition>
+
+     
+        <IFCondition Expression ="1=1">
+
+            <CallLibMethod Name="LL_RCC_SetAPB1Prescaler">
+                <MethodArg Name="Prescaler" ParameterName="APB1CLKDivider"/>
+            </CallLibMethod>
+        </IFCondition>
+
+     
+        <IFCondition Expression ="1=1">
+
+            <CallLibMethod Name="LL_RCC_SetAPB2Prescaler">
+                <MethodArg Name="Prescaler" ParameterName="APB2CLKDivider"/>
+            </CallLibMethod>
+        </IFCondition>
+
+       
+		
 
         <!--system core frequency set,systick init,systick priority configuration-->
 
@@ -520,8 +612,14 @@
                 <MethodArg Name="SDMMCxSource" ParameterName="SDMMCCLockSelection"/>
             </CallLibMethod>
         </IFCondition>
+        
+        <IFCondition Expression ="SDMMC1Used_ForRCC">
+            <CallLibMethod Name="LL_RCC_SetSDMMCClockSource">
+                <MethodArg Name="SDMMCxSource" ParameterName="SDMMCClockSelection"/>
+            </CallLibMethod>
+        </IFCondition>
 		
-        <IFCondition Expression ="RNGUsed_ForRCC">
+        <IFCondition Expression ="RNGUsed_ForRCC | (SDMMC1Used_ForRCC &amp; SDMMC1SourceIsClock48 &amp; DIE470)">
             <CallLibMethod Name="LL_RCC_SetRNGClockSource">
                 <MethodArg Name="RNGxSource" ParameterName="RNGCLockSelection"/>
             </CallLibMethod>
@@ -555,8 +653,25 @@
 	
 		
    
+        <IFCondition Expression ="DSIUsed_ForRCC">
+            <CallLibMethod Name="LL_RCC_SetDSIClockSource">
+                <MethodArg Name="DSIxSource" ParameterName="DSICLockSelection"/>
+            </CallLibMethod>
+        </IFCondition>
  
-		
+        <IFCondition Expression ="DFSDM1Used_ForRCC &amp; SEM2RCC_SAI1_CK_REQUIRED_DFSDM1">
+            <CallLibMethod Name="LL_RCC_SetDFSDMAudioClockSource">
+                <MethodArg Name="DFSDMAudioxSource" ParameterName="DFSDMAudioCLockSelection"/>
+            </CallLibMethod>
+        </IFCondition>	
+
+        <IFCondition Expression ="OCTOSPI1Used_ForRCC|OCTOSPI2Used_ForRCC">
+            <CallLibMethod Name="LL_RCC_SetOCTOSPIClockSource">
+                <MethodArg Name="OCTOSPIxSource" ParameterName="OCTOSPIMCLockSelection"/>
+            </CallLibMethod>
+        </IFCondition>
+
+
         <!--MCO clock source -->
         <IFCondition Expression ="((Semaphore_input_Channel1TIM17 &amp; TIM17 &amp; SEM2RCC_MCO_REQUIRED_TIM17)|MCOConfig)">
             <CallLibMethod Name="LL_RCC_ConfigMCO">
@@ -723,6 +838,30 @@
     <LibMethod Comment="" Name="LL_RCC_SetSDMMCClockSource">
         <Argument AddressOf="false" GenericType="simple" Name="SDMMCxSource"/>
     </LibMethod>
+
+    <LibMethod Comment="" Name="LL_RCC_SetOCTOSPIClockSource">
+        <Argument AddressOf="false" GenericType="simple" Name="OCTOSPIxSource"/>
+    </LibMethod>
+
+    <LibMethod Comment="" Name="LL_RCC_SetDFSDMAudioClockSource">
+        <Argument AddressOf="false" GenericType="simple" Name="DFSDMAudioxSource"/>
+    </LibMethod>
+
+    <LibMethod Comment="" Name="LL_RCC_SetDSIClockSource">
+        <Argument AddressOf="false" GenericType="simple" Name="DSIxSource"/>
+    </LibMethod>
+    
+    <LibMethod Comment="" Name="LL_RCC_PLLSAI2_EnableDomain_LTDC"/>
+    <LibMethod Comment="" Name="LL_RCC_PLLSAI2_EnableDomain_DSI"/>
+    <LibMethod Comment="" Name="LL_PWR_EnableRange1BoostMode"/>
+
+    <LibMethod Comment="" Name="LL_RCC_PLLSAI2_ConfigDomain_LTDC">
+        <Argument AddressOf="false" GenericType="simple" Name="Source"/>
+        <Argument AddressOf="false" GenericType="simple" Name="PLLM"/>
+        <Argument AddressOf="false" GenericType="simple" Name="PLLSAI2N"/>
+        <Argument AddressOf="false" GenericType="simple" Name="PLLSAI2R"/>
+        <Argument AddressOf="false" GenericType="simple" Name="PLLSAI2RDIV"/>
+    </LibMethod>
 	
     <LibMethod Comment="" Name="LL_RCC_SetRNGClockSource">
         <Argument AddressOf="false" GenericType="simple" Name="RNGxSource"/>
@@ -826,6 +965,13 @@
         <Argument AddressOf="false" GenericType="simple" Name="PLLSAI2N"/>
         <Argument AddressOf="false" GenericType="simple" Name="PLLSAI2R"/>
     </LibMethod>
+
+    <LibMethod Comment="" Name="LL_RCC_PLLSAI2_ConfigDomain_DSI">
+        <Argument AddressOf="false" GenericType="simple" Name="Source"/>
+        <Argument AddressOf="false" GenericType="simple" Name="PLLM"/>
+        <Argument AddressOf="false" GenericType="simple" Name="PLLSAI2N"/>
+        <Argument AddressOf="false" GenericType="simple" Name="PLLSAI2R"/>
+    </LibMethod>
 	
     <LibMethod Comment="" Name="LL_RCC_PLLSAI2_EnableDomain_SAI"/>
 	
@@ -880,5 +1026,6 @@
         <File Category="header" Name="Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_pwr.h"/>
         <File Category="header" Name="Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_gpio.h"/>
         <File Category="header" Name="Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_dma.h"/>
+        <File Category="header" Name="Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_dmamux.h"/>
     </RefComponent>
 </IP>

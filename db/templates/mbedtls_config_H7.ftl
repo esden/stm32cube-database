@@ -1,31 +1,44 @@
 [#ftl]
-/**
- * \file config.h
- *
- * \brief Configuration options (set of defines)
- *
- *  This set of compile-time options may be used to enable
- *  or disable features selectively, and reduce the global
- *  memory footprint.
- *
- *  Copyright (C) 2006-2015, ARM Limited, All Rights Reserved
- *  SPDX-License-Identifier: Apache-2.0
- *
- *  Licensed under the Apache License, Version 2.0 (the "License"); you may
- *  not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- *  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- *
- *  This file is part of mbed TLS (https://tls.mbed.org)
- */
-
+/** 
+  *
+  *  Portions COPYRIGHT 2017 STMicroelectronics
+  *  Copyright (C) 2006-2015, ARM Limited, All Rights Reserved
+  *
+  ******************************************************************************
+  * @file    mbedTLS/SSL_Client/Inc/mbedtls_config.h
+  * @author  MCD Application Team
+  * @version V1.0.0RC3
+  * @date    17-April-2017
+  * @brief   the mbedtls custom config header file.
+  ******************************************************************************
+  * @attention
+  *
+  * <h2><center>&copy; COPYRIGHT(c) 2017 STMicroelectronics</center></h2>
+  *
+  * Redistribution and use in source and binary forms, with or without modification,
+  * are permitted provided that the following conditions are met:
+  *   1. Redistributions of source code must retain the above copyright notice,
+  *      this list of conditions and the following disclaimer.
+  *   2. Redistributions in binary form must reproduce the above copyright notice,
+  *      this list of conditions and the following disclaimer in the documentation
+  *      and/or other materials provided with the distribution.
+  *   3. Neither the name of STMicroelectronics nor the names of its contributors
+  *      may be used to endorse or promote products derived from this software
+  *      without specific prior written permission.
+  *
+  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+  * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+  * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+  * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  *
+  ******************************************************************************
+  */ 
 #ifndef MBEDTLS_CONFIG_H
 #define MBEDTLS_CONFIG_H
 
@@ -213,7 +226,7 @@
  * MBEDTLS_PLATFORM_XXX_ALT: Uncomment a macro to let mbed TLS support the
  * function in the platform abstraction layer.
  *
- * Example: In case you uncomment MBEDTLS_PLATFORM_PRINTF_ALT, mbed TLS will
+ * application: In case you uncomment MBEDTLS_PLATFORM_PRINTF_ALT, mbed TLS will
  * provide a function "mbedtls_platform_set_printf()" that allows you to set an
  * alternative printf function pointer.
  *
@@ -406,7 +419,7 @@
  * This replaces the whole module. If you only want to replace one of the
  * functions, use one of the MBEDTLS__FUNCTION_NAME__ALT flags.
  *
- * Example: In case you uncomment MBEDTLS_AES_ALT, mbed TLS will no longer
+ * application: In case you uncomment MBEDTLS_AES_ALT, mbed TLS will no longer
  * provide the "struct mbedtls_aes_context" definition and omit the base function
  * declarations and implementations. "aes_alt.h" will be included from
  * "aes.h" to include the new function definitions.
@@ -594,7 +607,7 @@
  * This replaces only one function. The header file from mbed TLS is still
  * used, in contrast to the MBEDTLS__MODULE_NAME__ALT flags.
  *
- * Example: In case you uncomment MBEDTLS_SHA256_PROCESS_ALT, mbed TLS will
+ * application: In case you uncomment MBEDTLS_SHA256_PROCESS_ALT, mbed TLS will
  * no longer provide the mbedtls_sha1_process() function, but it will still provide
  * the other function (using your mbedtls_sha1_process() function) and the definition
  * of mbedtls_sha1_context, so your implementation of mbedtls_sha1_process must be compatible
@@ -795,7 +808,7 @@
  *
  * Enables testing and use of mbed TLS without any configured entropy sources.
  * This permits use of the library on platforms before an entropy source has
- * been integrated (see for example the MBEDTLS_ENTROPY_HARDWARE_ALT or the
+ * been integrated (see for application the MBEDTLS_ENTROPY_HARDWARE_ALT or the
  * MBEDTLS_ENTROPY_NV_SEED switches).
  *
  * WARNING! This switch MUST be disabled in production builds, and is suitable
@@ -805,6 +818,7 @@
  * Requires MBEDTLS_ENTROPY_C, MBEDTLS_NO_DEFAULT_ENTROPY_SOURCES
  *
  */
+ 
 [#list SWIPdatas as SWIP]
 	[#if SWIP.defines??]
 		[#list SWIP.defines as definition]
@@ -1851,7 +1865,6 @@
 		[/#list]
 	[/#if]
 [/#list]
-
 /**
  * \def MBEDTLS_ENTROPY_FORCE_SHA256
  *
@@ -2645,7 +2658,7 @@
  * Client-side, provides full support for session tickets (maintainance of a
  * session store remains the responsibility of the application, though).
  * Server-side, you also need to provide callbacks for writing and parsing
- * tickets, including authenticated encryption and key management. Example
+ * tickets, including authenticated encryption and key management. application
  * callbacks are provided by MBEDTLS_SSL_TICKET_C.
  *
  * Comment this macro to disable support for SSL session tickets
@@ -2926,7 +2939,7 @@
  * If set, the SSL/TLS module uses ZLIB to support compression and
  * decompression of packet data.
  *
- * \warning TLS-level compression MAY REDUCE SECURITY! See for example the
+ * \warning TLS-level compression MAY REDUCE SECURITY! See for application the
  * CRIME attack. Before enabling this option, you should examine with care if
  * CRIME or similar exploits may be a applicable to your use case.
  *
@@ -5670,7 +5683,7 @@
  * Use this to save a few hundred bytes of ROM (default ordering of all
  * available ciphersuites) and a few to a few hundred bytes of RAM.
  *
- * The value below is only an example, not the default.
+ * The value below is only an application, not the default.
  */
 [#list SWIPdatas as SWIP]
 	[#if SWIP.defines??]
@@ -5729,10 +5742,27 @@
 /* \} name SECTION: Customisation configuration options */
 
 /* Target and application specific configurations */
-//#define YOTTA_CFG_MBEDTLS_TARGET_CONFIG_FILE "mbedtls/target_config.h"
+
+[#list SWIPdatas as SWIP]
+	[#if SWIP.defines??]
+		[#list SWIP.defines as enableFlag]
+			[#if enableFlag.name="YOTTA_CFG_MBEDTLS_TARGET_CONFIG_FILE_ENABLE"]
+				[#list SWIP.defines as definition]
+					[#if definition.name="YOTTA_CFG_MBEDTLS_TARGET_CONFIG_FILE"]
+						[#if enableFlag.value="0"]
+							[#lt]//#define YOTTA_CFG_MBEDTLS_TARGET_CONFIG_FILE "mbedtls/target_config.h"
+						[#else]
+							[#lt]#define YOTTA_CFG_MBEDTLS_TARGET_CONFIG_FILE "mbedtls/target_config.h"
+						[/#if]
+					[/#if]
+				[/#list]
+			[/#if]
+		[/#list]
+	[/#if]
+[/#list]
 
 #if defined(TARGET_LIKE_MBED) && defined(YOTTA_CFG_MBEDTLS_TARGET_CONFIG_FILE)
-#include YOTTA_CFG_MBEDTLS_TARGET_CONFIG_FILE
+    #include YOTTA_CFG_MBEDTLS_TARGET_CONFIG_FILE
 #endif
 
 /*
@@ -5743,11 +5773,11 @@
  * - without yotta is looks weird to have a YOTTA prefix.
  */
 #if defined(YOTTA_CFG_MBEDTLS_USER_CONFIG_FILE)
-#include YOTTA_CFG_MBEDTLS_USER_CONFIG_FILE
+    #include YOTTA_CFG_MBEDTLS_USER_CONFIG_FILE
 #elif defined(MBEDTLS_USER_CONFIG_FILE)
-#include MBEDTLS_USER_CONFIG_FILE
+    #include MBEDTLS_USER_CONFIG_FILE
 #endif
 
-#include "check_config.h"
+#include "mbedtls/check_config.h"
 
 #endif /* MBEDTLS_CONFIG_H */

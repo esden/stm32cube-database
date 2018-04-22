@@ -10,11 +10,12 @@
 [#assign handle="hsd1"]
 [#assign sdmmc1_bits=1]
 [#assign sdmmc2_bits=1]
+[#assign bits=1]
 
 [#if SWIPdatas??]
 [#list SWIPdatas as SWIP]  
 [#if SWIP.defines??]
- [#list SWIP.defines as definition] 
+ [#list SWIP.defines as definition]
   [#if definition.name="_HSD"]  
    [#assign handle=definition.value]
   [/#if]
@@ -40,12 +41,12 @@
 [/#if]
 [#if handle = "hsd1"]
  [#if sdmmc1_bits = 4]
-#define BUS_4BITS 1
+  [#assign bits=4]
  [/#if]
 [/#if]
 [#if handle = "hsd2"]
  [#if sdmmc2_bits = 4]
-#define BUS_4BITS 1
+  [#assign bits=4]
  [/#if]
 [/#if]
 
@@ -63,7 +64,7 @@
 
 /* Extern variables ---------------------------------------------------------*/ 
   
-extern SD_HandleTypeDef _HSD; 
+extern SD_HandleTypeDef ${handle};
 
 /* USER CODE BEGIN BeforeInitSection */
 /* can be used to modify / undefine following code or add code */
@@ -81,18 +82,19 @@ uint8_t BSP_SD_Init(void)
     return MSD_ERROR_SD_NOT_PRESENT;
   }
   /* HAL SD initialization */
-  sd_state = HAL_SD_Init(&_HSD);
-#ifdef BUS_4BITS
-  /* Configure SD Bus width */
+  sd_state = HAL_SD_Init(&${handle});
+[#if bits=4]
+  /* Configure SD Bus width (4 bits mode selected) */
   if (sd_state == MSD_OK)
   {
     /* Enable wide operation */
-    if (HAL_SD_ConfigWideBusOperation(&_HSD, SDMMC_BUS_WIDE_4B) != HAL_OK)
+    if (HAL_SD_ConfigWideBusOperation(&${handle}, SDMMC_BUS_WIDE_4B) != HAL_OK)
     {
       sd_state = MSD_ERROR;
     }
   }
-#endif
+[/#if]
+
   return sd_state;
 }
 /* USER CODE BEGIN AfterInitSection */
@@ -126,7 +128,7 @@ uint8_t BSP_SD_ReadBlocks(uint32_t *pData, uint32_t ReadAddr, uint32_t NumOfBloc
 {
   uint8_t sd_state = MSD_OK;
 
-  if (HAL_SD_ReadBlocks(&_HSD, (uint8_t *)pData, ReadAddr, NumOfBlocks, Timeout) != HAL_OK)
+  if (HAL_SD_ReadBlocks(&${handle}, (uint8_t *)pData, ReadAddr, NumOfBlocks, Timeout) != HAL_OK)
   {
     sd_state = MSD_ERROR;
   }
@@ -149,7 +151,7 @@ uint8_t BSP_SD_WriteBlocks(uint32_t *pData, uint32_t WriteAddr, uint32_t NumOfBl
 {
   uint8_t sd_state = MSD_OK;
 
-  if (HAL_SD_WriteBlocks(&_HSD, (uint8_t *)pData, WriteAddr, NumOfBlocks, Timeout) != HAL_OK) 
+  if (HAL_SD_WriteBlocks(&${handle}, (uint8_t *)pData, WriteAddr, NumOfBlocks, Timeout) != HAL_OK) 
   {
     sd_state = MSD_ERROR;
   }
@@ -172,7 +174,7 @@ uint8_t BSP_SD_ReadBlocks_DMA(uint32_t *pData, uint32_t ReadAddr, uint32_t NumOf
   uint8_t sd_state = MSD_OK;
   
   /* Read block(s) in DMA transfer mode */
-  if (HAL_SD_ReadBlocks_DMA(&_HSD, (uint8_t *)pData, ReadAddr, NumOfBlocks) != HAL_OK)
+  if (HAL_SD_ReadBlocks_DMA(&${handle}, (uint8_t *)pData, ReadAddr, NumOfBlocks) != HAL_OK)
   {
     sd_state = MSD_ERROR;
   }
@@ -195,7 +197,7 @@ uint8_t BSP_SD_WriteBlocks_DMA(uint32_t *pData, uint32_t WriteAddr, uint32_t Num
   uint8_t sd_state = MSD_OK;
   
   /* Write block(s) in DMA transfer mode */
-  if (HAL_SD_WriteBlocks_DMA(&_HSD, (uint8_t *)pData, WriteAddr, NumOfBlocks) != HAL_OK)
+  if (HAL_SD_WriteBlocks_DMA(&${handle}, (uint8_t *)pData, WriteAddr, NumOfBlocks) != HAL_OK)
   {
     sd_state = MSD_ERROR;
   }
@@ -216,7 +218,7 @@ uint8_t BSP_SD_Erase(uint32_t StartAddr, uint32_t EndAddr)
 {
   uint8_t sd_state = MSD_OK;
 
-  if (HAL_SD_Erase(&_HSD, StartAddr, EndAddr) != HAL_OK)  
+  if (HAL_SD_Erase(&${handle}, StartAddr, EndAddr) != HAL_OK)  
   {
     sd_state = MSD_ERROR;
   }
@@ -237,7 +239,7 @@ uint8_t BSP_SD_Erase(uint32_t StartAddr, uint32_t EndAddr)
   */
 uint8_t BSP_SD_GetCardState(void)
 {
-  return ((HAL_SD_GetCardState(&_HSD) == HAL_SD_CARD_TRANSFER ) ? SD_TRANSFER_OK : SD_TRANSFER_BUSY);
+  return ((HAL_SD_GetCardState(&${handle}) == HAL_SD_CARD_TRANSFER ) ? SD_TRANSFER_OK : SD_TRANSFER_BUSY);
 }
 
 /**
@@ -248,7 +250,7 @@ uint8_t BSP_SD_GetCardState(void)
 void BSP_SD_GetCardInfo(HAL_SD_CardInfoTypeDef *CardInfo)
 {
   /* Get SD card Information */
-  HAL_SD_GetCardInfo(&_HSD, CardInfo);
+  HAL_SD_GetCardInfo(&${handle}, CardInfo);
 }
 #endif
 

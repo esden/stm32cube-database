@@ -8,10 +8,24 @@
   ******************************************************************************
   */
 
+[#-- SWIPdatas is a list of SWIPconfigModel --]  
+[#list SWIPdatas as SWIP]  
+[#if SWIP.defines??]
+ [#list SWIP.defines as definition]
+  [#if definition.name=="_HSDRAM"]
+   [#assign sdramHandle = definition.value]
+  [/#if]
+ [/#list]
+[/#if]
+[/#list] 
+
 /* USER CODE BEGIN 0 */
 
 /* Includes ------------------------------------------------------------------*/
 #include "bsp_driver_sdram.h"
+
+/* Extern variables ----------------------------------------------------------*/
+extern SDRAM_HandleTypeDef ${sdramHandle};
   
 /**
   * @brief  Initializes the SDRAM device 
@@ -37,7 +51,7 @@ uint8_t BSP_SDRAM_ReadData(uint32_t uwStartAddress, uint32_t *pData, uint32_t uw
 { 
   uint8_t sdramstatus = SDRAM_OK;
   
-  if(HAL_SDRAM_Read_32b(&_HSDRAM, (uint32_t *)uwStartAddress, pData, uwDataSize) != HAL_OK)
+  if(HAL_SDRAM_Read_32b(&${sdramHandle}, (uint32_t *)uwStartAddress, pData, uwDataSize) != HAL_OK)
   {
     sdramstatus = SDRAM_ERROR;
   }
@@ -56,7 +70,7 @@ uint8_t BSP_SDRAM_ReadData_DMA(uint32_t uwStartAddress, uint32_t *pData, uint32_
 { 
   uint8_t sdramstatus = SDRAM_OK;
   
-  if(HAL_SDRAM_Read_DMA(&_HSDRAM, (uint32_t *)uwStartAddress, pData, uwDataSize) != HAL_OK)
+  if(HAL_SDRAM_Read_DMA(&${sdramHandle}, (uint32_t *)uwStartAddress, pData, uwDataSize) != HAL_OK)
   {
     sdramstatus = SDRAM_ERROR;
   }
@@ -75,7 +89,7 @@ uint8_t BSP_SDRAM_WriteData(uint32_t uwStartAddress, uint32_t *pData, uint32_t u
 { 
   uint8_t sdramstatus = SDRAM_OK;
   
-  if(HAL_SDRAM_Write_32b(&_HSDRAM, (uint32_t *)uwStartAddress, pData, uwDataSize) != HAL_OK)
+  if(HAL_SDRAM_Write_32b(&${sdramHandle}, (uint32_t *)uwStartAddress, pData, uwDataSize) != HAL_OK)
   {
     sdramstatus = SDRAM_ERROR;
   }
@@ -94,7 +108,7 @@ uint8_t BSP_SDRAM_WriteData_DMA(uint32_t uwStartAddress, uint32_t *pData, uint32
 { 
   uint8_t sdramstatus = SDRAM_OK;
   
-  if(HAL_SDRAM_Write_DMA(&_HSDRAM, (uint32_t *)uwStartAddress, pData, uwDataSize) != HAL_OK)
+  if(HAL_SDRAM_Write_DMA(&${sdramHandle}, (uint32_t *)uwStartAddress, pData, uwDataSize) != HAL_OK)
   {
     sdramstatus = SDRAM_ERROR;
   }
@@ -105,13 +119,13 @@ uint8_t BSP_SDRAM_WriteData_DMA(uint32_t uwStartAddress, uint32_t *pData, uint32
 /**
   * @brief  Sends command to the SDRAM bank.
   * @param  SdramCmd: Pointer to SDRAM command structure
-  * @retval HAL status : SDRAM_OK or SDRAM_ERROR.
+  * @retval SDRAM status : SDRAM_OK or SDRAM_ERROR.
   */
 uint8_t BSP_SDRAM_Sendcmd(FMC_SDRAM_CommandTypeDef *SdramCmd)
 { 
   uint8_t sdramstatus = SDRAM_OK;
   
-  if(HAL_SDRAM_SendCommand(&_HSDRAM, SdramCmd, SDRAM_TIMEOUT) != HAL_OK)
+  if(HAL_SDRAM_SendCommand(&${sdramHandle}, SdramCmd, SDRAM_TIMEOUT) != HAL_OK)
   {
     sdramstatus = SDRAM_ERROR;
   }
@@ -124,7 +138,7 @@ uint8_t BSP_SDRAM_Sendcmd(FMC_SDRAM_CommandTypeDef *SdramCmd)
   */
 void BSP_SDRAM_DMA_IRQHandler(void)
 {
-  HAL_DMA_IRQHandler(_HSDRAM.hdma); 
+  HAL_DMA_IRQHandler(${sdramHandle}.hdma); 
 }
 
 /* USER CODE END 0 */

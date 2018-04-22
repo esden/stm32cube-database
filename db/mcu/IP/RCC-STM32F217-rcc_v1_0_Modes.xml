@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
-<IP xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://mcd.rou.st.com/modules.php?name=mcu" DBVersion="V4.0" Name="RCC" Version="rcc_v1_0" IPType="peripheral" ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu file:///C:/Dev_Build8/MicroXplorer/doc/V4/Development/Specifications/db/IP_Modes.xsd">
+<IP xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://mcd.rou.st.com/modules.php?name=mcu" DBVersion="V4.0" Name="RCC" Version="rcc_v1_0" IPType="peripheral" ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd">
 	<About>RCC: Reset and Clock Control</About>
 	<RefParameter Visible="false" Comment="Oscillator Type" DefaultValue="+OscillatorTypeHSI+|OscillatorTypeLSI+|OscillatorTypeHSE+|OscillatorTypeLSE" Name="OscillatorType" Type="list"/>
 
@@ -38,7 +38,7 @@
 		<PossibleValue Comment="HSE" Value="RCC_OSCILLATORTYPE_HSE"/>
 	</RefParameter>
 	<RefParameter Visible="false" Comment="HSE used flag" DefaultValue="1" Name="HSEUsed" Type="integer" Min="1" Max="1">
-		<Condition Expression="((HSEByPass|HSEOscillator)&amp;(SEM2RCC_HSE_REQUIRED_TIM11 &amp; TIM11 &amp; Semaphore_input_Channel1TIM11))|(RTCUsed_ForRCC&amp;!((RCC_RTC_Clock_Source=RCC_RTCCLKSOURCE_LSE)|(RCC_RTC_Clock_Source=RCC_RTCCLKSOURCE_LSI)))|(PLLSource=RCC_PLLSOURCE_HSE)|(SYSCLKSource=RCC_SYSCLKSOURCE_HSE)|((RCC_MCO1Source=RCC_MCO1SOURCE_HSE)&amp;(MCO1Config))|((RCC_MCO2Source=RCC_MCO2SOURCE_HSE)&amp;(MCO2Config))" Diagnostic="SYSCLK source OR PLL source OR RTC source OR MCO1 source OR MCO2 source"/>
+		<Condition Expression="((HSEByPass|HSEOscillator)&amp;(SEM2RCC_HSE_REQUIRED_TIM11 &amp; TIM11 &amp; Semaphore_input_Channel1TIM11))|(RTCUsed_ForRCC&amp;!((RCC_RTC_Clock_Source=RCC_RTCCLKSOURCE_LSE)|(RCC_RTC_Clock_Source=RCC_RTCCLKSOURCE_LSI)))|((PLLSourceVirtual=RCC_PLLSOURCE_HSE) &amp; ((PLLUsed=1) | (((RCC_MCO2Source=RCC_MCO2SOURCE_PLLI2SCLK)&amp; MCO2Config) &amp; I2SSourceIsPll) | (I2SSourceIsPll &amp; I2SUsed_ForRCC)))|(SYSCLKSource=RCC_SYSCLKSOURCE_HSE)|((RCC_MCO1Source=RCC_MCO1SOURCE_HSE)&amp;(MCO1Config))|((RCC_MCO2Source=RCC_MCO2SOURCE_HSE)&amp;(MCO2Config))" Diagnostic="SYSCLK source OR PLL source OR RTC source OR MCO1 source OR MCO2 source"/>
 	</RefParameter>
 	<RefParameter Visible="false" Comment="HSE Is Used" DefaultValue="0" Name="HSEUsed" Min="0" Type="integer"/>
 	<RefParameter Visible="false" Comment="Hse State" DefaultValue="RCC_HSE_BYPASS" Name="HSEState" Type="list">
@@ -84,7 +84,7 @@
 		<PossibleValue Comment="HSI" Value="RCC_OSCILLATORTYPE_HSI"/>
 	</RefParameter>
 	<RefParameter Visible="false" Comment="HSI Is Used" DefaultValue="1" Name="HSIUsed" Min="1" Type="integer">
-		<Condition Expression="((PLLSource=RCC_PLLSOURCE_HSI)|(SYSCLKSource=RCC_SYSCLKSOURCE_HSI)|((RCC_MCO1Source=RCC_MCO1SOURCE_HSI)&amp;(MCO1Config)))" Diagnostic="LSE is used if "/>
+		<Condition Expression="(((PLLSourceVirtual=RCC_PLLSOURCE_HSI) &amp; ((PLLUsed=1) | (((RCC_MCO2Source=RCC_MCO2SOURCE_PLLI2SCLK)&amp; MCO2Config) &amp; I2SSourceIsPll) | (I2SSourceIsPll &amp; I2SUsed_ForRCC)))|(SYSCLKSource=RCC_SYSCLKSOURCE_HSI)|((RCC_MCO1Source=RCC_MCO1SOURCE_HSI)&amp;(MCO1Config)))" Diagnostic="LSE is used if "/>
 	</RefParameter>
 	<RefParameter Visible="false" Comment="HSI is Used" DefaultValue="0" Name="HSIUsed" Min="0" Type="integer"/>
 	<RefParameter Visible="false" Comment="Hsi State" DefaultValue="RCC_HSI_OFF" Name="HSIState" Type="list">
@@ -96,9 +96,31 @@
 	</RefParameter>
 	<!-- Main PLL state control-->
 	<RefParameter Visible="false" Comment="MainPLL Is Used" DefaultValue="1" Name="PLLUsed" Min="1" Type="integer">
-		<Condition Expression="(SYSCLKSource=RCC_SYSCLKSOURCE_PLLCLK)|((RCC_MCO1Source=RCC_MCO1SOURCE_PLLCLK)&amp;(MCO1Config))|((RCC_MCO2Source=RCC_MCO2SOURCE_PLLCLK)&amp;(MCO2Config))|USB_OTG_FSUsed_ForRCC|SDIOUsed_ForRCC|RNGUsed_ForRCC" Diagnostic="LSE is used if "/>
+		<Condition Expression="(SYSCLKSource=RCC_SYSCLKSOURCE_PLLCLK)|((RCC_MCO1Source=RCC_MCO1SOURCE_PLLCLK)&amp;(MCO1Config))|((RCC_MCO2Source=RCC_MCO2SOURCE_PLLCLK)&amp;(MCO2Config))|USB_OTG_HSEmbeddedPHYUsed_ForRCC|USB_OTG_FSUsed_ForRCC|SDIOUsed_ForRCC|RNGUsed_ForRCC" Diagnostic="LSE is used if "/>
 	</RefParameter>
 	<RefParameter Visible="false" Comment="Main PLL is Used" DefaultValue="0" Name="PLLUsed" Min="0" Type="integer"/>
+
+        <!-- PLLUsedForSys used -->
+        <RefParameter Visible="false" Comment="MainPLL Is Used" DefaultValue="1" Name="PLLUsedForSys" Min="1" Max="1" Type="integer">
+            <Condition Expression="(SYSCLKSource=RCC_SYSCLKSOURCE_PLLCLK)|((RCC_MCO1Source=RCC_MCO1SOURCE_PLLCLK)&amp;(MCO1Config))|((RCC_MCO2Source=RCC_MCO2SOURCE_PLLCLK)&amp;(MCO2Config))" Diagnostic=" "/>
+        </RefParameter>
+	
+        <RefParameter Visible="false" Comment="Main PLL is Used" DefaultValue="0" Name="PLLUsedForSys" Min="0" Max="0" Type="integer"/>
+        
+        <!-- PLLUsedForCK48 used -->
+        <RefParameter Visible="false" Comment="MainPLL Is Used" DefaultValue="1" Name="PLLUsedForCK48" Min="1" Max="1" Type="integer">
+            <Condition Expression="(USB_OTG_FSUsed_ForRCC|USB_OTG_HSEmbeddedPHYUsed_ForRCC|SDIOUsed_ForRCC|RNGUsed_ForRCC)" Diagnostic=" "/>
+        </RefParameter>
+	
+        <RefParameter Visible="false" Comment="Main PLL is Used" DefaultValue="0" Name="PLLUsedForCK48" Min="0" Max="0" Type="integer"/>
+        
+      <!-- PLLUsedForCK48 used -->
+        <RefParameter Visible="false" Comment="MainPLL Is Used" DefaultValue="1" Name="PLLUsedForI2S" Min="1" Max="1" Type="integer">
+            <Condition Expression="(((RCC_MCO2Source=RCC_MCO2SOURCE_PLLI2SCLK)&amp; MCO2Config) | (I2SSourceIsPll &amp; I2SUsed_ForRCC))" Diagnostic=" "/>
+        </RefParameter>
+	
+        <RefParameter Visible="false" Comment="Main PLL is Used" DefaultValue="0" Name="PLLUsedForI2S" Min="0" Max="0" Type="integer"/>
+
 	<RefParameter Visible="false" Comment="Pll State" DefaultValue="RCC_PLL_OFF" Name="PLLState" Type="list">
 		<Condition Expression="PLLUsed=0" Diagnostic=""/>
 		<PossibleValue Comment="Pll Off" Value="RCC_PLL_OFF"/>
@@ -125,10 +147,10 @@
         <PossibleValue Comment="" Value="FLASH_LATENCY_15"/>
     </RefParameter> -->
 
-    <RefParameter Visible="false" Comment="PLL Source" DefaultValue="RCC_PLLSOURCE_HSE" Name="PLLSourceVirtual" Type="list">
+    <!--RefParameter Visible="false" Comment="PLL Source" DefaultValue="RCC_PLLSOURCE_HSE" Name="PLLSourceVirtual" Type="list">
         <Condition Diagnostic="PLL Mux should have HSE as input" Expression="((USB_OTG_FSUsed_ForRCC|USB_OTG_HSEmbeddedPHYUsed_ForRCC)) "/>
         <PossibleValue Comment="Pllsource Hse" Value="RCC_PLLSOURCE_HSE"/>
-    </RefParameter>
+    </RefParameter-->
     <RefParameter Visible="false" Comment="PLL Source" DefaultValue="RCC_PLLSOURCE_HSI" Name="PLLSourceVirtual" Type="list">
         <PossibleValue Comment="Pllsource Hsi" Value="RCC_PLLSOURCE_HSI"/>
         <PossibleValue Comment="Pllsource Hse" Value="RCC_PLLSOURCE_HSE"/>
@@ -140,6 +162,255 @@
         <PossibleValue Comment="Pllsource Hse" Value="RCC_PLLSOURCE_HSE"/>
     </RefParameter>
 	<RefParameter Visible="false" Comment="PLLM" DefaultValue="16" Max="63" Min="2" Name="PLLM" Type="integer"/>
+<!--PLLMM-->
+    <RefParameter Visible="false" Comment="PLLM" DefaultValue="1" Max="8" Min="2" Name="PLLM" Type="integer"/>
+		    
+	    <RefParameter Visible="false" Comment="PLLMLL" DefaultValue="RCC_PLLM_DIV2" Name="PLLMLL" Type="list">
+		   <Condition Expression="PLLM=2" Diagnostic=""/>
+        <PossibleValue Comment="2" Value="RCC_PLLM_DIV2"/>
+         </RefParameter>
+	    <RefParameter Visible="false" Comment="PLLMLL" DefaultValue="RCC_PLLM_DIV3" Name="PLLMLL" Type="list">
+		   <Condition Expression="PLLM=3" Diagnostic=""/>
+        <PossibleValue Comment="3" Value="RCC_PLLM_DIV3"/>
+         </RefParameter>
+	    <RefParameter Visible="false" Comment="PLLMLL" DefaultValue="RCC_PLLM_DIV4" Name="PLLMLL" Type="list">
+		   <Condition Expression="PLLM=4" Diagnostic=""/>
+        <PossibleValue Comment="4" Value="RCC_PLLM_DIV4"/>
+         </RefParameter>
+	  <RefParameter Visible="false" Comment="PLLMLL" DefaultValue="RCC_PLLM_DIV5" Name="PLLMLL" Type="list">
+		   <Condition Expression="PLLM=5" Diagnostic=""/>
+        <PossibleValue Comment="5" Value="RCC_PLLM_DIV5"/>
+         </RefParameter>
+	  <RefParameter Visible="false" Comment="PLLMLL" DefaultValue="RCC_PLLM_DIV6" Name="PLLMLL" Type="list">
+		   <Condition Expression="PLLM=6" Diagnostic=""/>
+        <PossibleValue Comment="6" Value="RCC_PLLM_DIV6"/>
+         </RefParameter>
+	  <RefParameter Visible="false" Comment="PLLMLL" DefaultValue="RCC_PLLM_DIV7" Name="PLLMLL" Type="list">
+		   <Condition Expression="PLLM=7" Diagnostic=""/>
+        <PossibleValue Comment="7" Value="RCC_PLLM_DIV7"/>
+         </RefParameter>
+	  <RefParameter Visible="false" Comment="PLLMLL" DefaultValue="RCC_PLLM_DIV8" Name="PLLMLL" Type="list">
+              <Condition Expression="PLLM=8" Diagnostic=""/>
+		     <PossibleValue Comment="8" Value="RCC_PLLM_DIV8"/>
+         </RefParameter>
+<RefParameter Visible="false" Comment="PLLMLL" DefaultValue="RCC_PLLM_DIV9" Name="PLLMLL" Type="list">
+    <Condition Expression="PLLM=9" Diagnostic=""/>
+	<PossibleValue Comment="9" Value="RCC_PLLM_DIV9"/>
+</RefParameter>
+<RefParameter Visible="false" Comment="PLLMLL" DefaultValue="RCC_PLLM_DIV10" Name="PLLMLL" Type="list">
+    <Condition Expression="PLLM=10" Diagnostic=""/>
+	<PossibleValue Comment="10" Value="RCC_PLLM_DIV10"/>
+</RefParameter>
+<RefParameter Visible="false" Comment="PLLMLL" DefaultValue="RCC_PLLM_DIV11" Name="PLLMLL" Type="list">
+    <Condition Expression="PLLM=11" Diagnostic=""/>
+	<PossibleValue Comment="11" Value="RCC_PLLM_DIV11"/>
+</RefParameter>
+<RefParameter Visible="false" Comment="PLLMLL" DefaultValue="RCC_PLLM_DIV12" Name="PLLMLL" Type="list">
+    <Condition Expression="PLLM=12" Diagnostic=""/>
+	<PossibleValue Comment="12" Value="RCC_PLLM_DIV12"/>
+</RefParameter>
+<RefParameter Visible="false" Comment="PLLMLL" DefaultValue="RCC_PLLM_DIV13" Name="PLLMLL" Type="list">
+    <Condition Expression="PLLM=13" Diagnostic=""/>
+	<PossibleValue Comment="13" Value="RCC_PLLM_DIV13"/>
+</RefParameter>
+<RefParameter Visible="false" Comment="PLLMLL" DefaultValue="RCC_PLLM_DIV14" Name="PLLMLL" Type="list">
+    <Condition Expression="PLLM=14" Diagnostic=""/>
+	<PossibleValue Comment="14" Value="RCC_PLLM_DIV14"/>
+</RefParameter>
+<RefParameter Visible="false" Comment="PLLMLL" DefaultValue="RCC_PLLM_DIV15" Name="PLLMLL" Type="list">
+    <Condition Expression="PLLM=15" Diagnostic=""/>
+	<PossibleValue Comment="15" Value="RCC_PLLM_DIV15"/>
+</RefParameter>
+<RefParameter Visible="false" Comment="PLLMLL" DefaultValue="RCC_PLLM_DIV16" Name="PLLMLL" Type="list">
+    <Condition Expression="PLLM=16" Diagnostic=""/>
+	<PossibleValue Comment="16" Value="RCC_PLLM_DIV16"/>
+</RefParameter>
+<RefParameter Visible="false" Comment="PLLMLL" DefaultValue="RCC_PLLM_DIV17" Name="PLLMLL" Type="list">
+    <Condition Expression="PLLM=17" Diagnostic=""/>
+	<PossibleValue Comment="17" Value="RCC_PLLM_DIV17"/>
+</RefParameter>
+<RefParameter Visible="false" Comment="PLLMLL" DefaultValue="RCC_PLLM_DIV18" Name="PLLMLL" Type="list">
+    <Condition Expression="PLLM=18" Diagnostic=""/>
+	<PossibleValue Comment="18" Value="RCC_PLLM_DIV18"/>
+</RefParameter>
+<RefParameter Visible="false" Comment="PLLMLL" DefaultValue="RCC_PLLM_DIV19" Name="PLLMLL" Type="list">
+    <Condition Expression="PLLM=19" Diagnostic=""/>
+	<PossibleValue Comment="19" Value="RCC_PLLM_DIV19"/>
+</RefParameter>
+<RefParameter Visible="false" Comment="PLLMLL" DefaultValue="RCC_PLLM_DIV20" Name="PLLMLL" Type="list">
+    <Condition Expression="PLLM=20" Diagnostic=""/>
+	<PossibleValue Comment="20" Value="RCC_PLLM_DIV20"/>
+</RefParameter>
+<RefParameter Visible="false" Comment="PLLMLL" DefaultValue="RCC_PLLM_DIV21" Name="PLLMLL" Type="list">
+    <Condition Expression="PLLM=21" Diagnostic=""/>
+	<PossibleValue Comment="21" Value="RCC_PLLM_DIV21"/>
+</RefParameter>
+<RefParameter Visible="false" Comment="PLLMLL" DefaultValue="RCC_PLLM_DIV22" Name="PLLMLL" Type="list">
+    <Condition Expression="PLLM=22" Diagnostic=""/>
+	<PossibleValue Comment="22" Value="RCC_PLLM_DIV22"/>
+</RefParameter>
+<RefParameter Visible="false" Comment="PLLMLL" DefaultValue="RCC_PLLM_DIV23" Name="PLLMLL" Type="list">
+    <Condition Expression="PLLM=23" Diagnostic=""/>
+	<PossibleValue Comment="23" Value="RCC_PLLM_DIV23"/>
+</RefParameter>
+<RefParameter Visible="false" Comment="PLLMLL" DefaultValue="RCC_PLLM_DIV24" Name="PLLMLL" Type="list">
+    <Condition Expression="PLLM=24" Diagnostic=""/>
+	<PossibleValue Comment="24" Value="RCC_PLLM_DIV24"/>
+</RefParameter>
+<RefParameter Visible="false" Comment="PLLMLL" DefaultValue="RCC_PLLM_DIV25" Name="PLLMLL" Type="list">
+    <Condition Expression="PLLM=25" Diagnostic=""/>
+	<PossibleValue Comment="25" Value="RCC_PLLM_DIV25"/>
+</RefParameter>
+<RefParameter Visible="false" Comment="PLLMLL" DefaultValue="RCC_PLLM_DIV26" Name="PLLMLL" Type="list">
+    <Condition Expression="PLLM=26" Diagnostic=""/>
+	<PossibleValue Comment="26" Value="RCC_PLLM_DIV26"/>
+</RefParameter>
+<RefParameter Visible="false" Comment="PLLMLL" DefaultValue="RCC_PLLM_DIV27" Name="PLLMLL" Type="list">
+    <Condition Expression="PLLM=27" Diagnostic=""/>
+	<PossibleValue Comment="27" Value="RCC_PLLM_DIV27"/>
+</RefParameter>
+<RefParameter Visible="false" Comment="PLLMLL" DefaultValue="RCC_PLLM_DIV28" Name="PLLMLL" Type="list">
+    <Condition Expression="PLLM=28" Diagnostic=""/>
+	<PossibleValue Comment="28" Value="RCC_PLLM_DIV28"/>
+</RefParameter>
+<RefParameter Visible="false" Comment="PLLMLL" DefaultValue="RCC_PLLM_DIV29" Name="PLLMLL" Type="list">
+    <Condition Expression="PLLM=29" Diagnostic=""/>
+	<PossibleValue Comment="29" Value="RCC_PLLM_DIV29"/>
+</RefParameter>
+<RefParameter Visible="false" Comment="PLLMLL" DefaultValue="RCC_PLLM_DIV30" Name="PLLMLL" Type="list">
+    <Condition Expression="PLLM=30" Diagnostic=""/>
+	<PossibleValue Comment="30" Value="RCC_PLLM_DIV30"/>
+</RefParameter>
+<RefParameter Visible="false" Comment="PLLMLL" DefaultValue="RCC_PLLM_DIV31" Name="PLLMLL" Type="list">
+    <Condition Expression="PLLM=31" Diagnostic=""/>
+	<PossibleValue Comment="31" Value="RCC_PLLM_DIV31"/>
+</RefParameter>
+<RefParameter Visible="false" Comment="PLLMLL" DefaultValue="RCC_PLLM_DIV32" Name="PLLMLL" Type="list">
+    <Condition Expression="PLLM=32" Diagnostic=""/>
+	<PossibleValue Comment="32" Value="RCC_PLLM_DIV32"/>
+</RefParameter>
+<RefParameter Visible="false" Comment="PLLMLL" DefaultValue="RCC_PLLM_DIV33" Name="PLLMLL" Type="list">
+    <Condition Expression="PLLM=33" Diagnostic=""/>
+	<PossibleValue Comment="33" Value="RCC_PLLM_DIV33"/>
+</RefParameter>
+<RefParameter Visible="false" Comment="PLLMLL" DefaultValue="RCC_PLLM_DIV34" Name="PLLMLL" Type="list">
+    <Condition Expression="PLLM=34" Diagnostic=""/>
+	<PossibleValue Comment="34" Value="RCC_PLLM_DIV34"/>
+</RefParameter>
+<RefParameter Visible="false" Comment="PLLMLL" DefaultValue="RCC_PLLM_DIV35" Name="PLLMLL" Type="list">
+    <Condition Expression="PLLM=35" Diagnostic=""/>
+	<PossibleValue Comment="35" Value="RCC_PLLM_DIV35"/>
+</RefParameter>
+<RefParameter Visible="false" Comment="PLLMLL" DefaultValue="RCC_PLLM_DIV36" Name="PLLMLL" Type="list">
+    <Condition Expression="PLLM=36" Diagnostic=""/>
+	<PossibleValue Comment="36" Value="RCC_PLLM_DIV36"/>
+</RefParameter>
+<RefParameter Visible="false" Comment="PLLMLL" DefaultValue="RCC_PLLM_DIV37" Name="PLLMLL" Type="list">
+    <Condition Expression="PLLM=37" Diagnostic=""/>
+	<PossibleValue Comment="37" Value="RCC_PLLM_DIV37"/>
+</RefParameter>
+<RefParameter Visible="false" Comment="PLLMLL" DefaultValue="RCC_PLLM_DIV38" Name="PLLMLL" Type="list">
+    <Condition Expression="PLLM=38" Diagnostic=""/>
+	<PossibleValue Comment="38" Value="RCC_PLLM_DIV38"/>
+</RefParameter>
+<RefParameter Visible="false" Comment="PLLMLL" DefaultValue="RCC_PLLM_DIV39" Name="PLLMLL" Type="list">
+    <Condition Expression="PLLM=39" Diagnostic=""/>
+	<PossibleValue Comment="39" Value="RCC_PLLM_DIV39"/>
+</RefParameter>
+<RefParameter Visible="false" Comment="PLLMLL" DefaultValue="RCC_PLLM_DIV40" Name="PLLMLL" Type="list">
+    <Condition Expression="PLLM=40" Diagnostic=""/>
+	<PossibleValue Comment="40" Value="RCC_PLLM_DIV40"/>
+</RefParameter>
+<RefParameter Visible="false" Comment="PLLMLL" DefaultValue="RCC_PLLM_DIV41" Name="PLLMLL" Type="list">
+    <Condition Expression="PLLM=41" Diagnostic=""/>
+	<PossibleValue Comment="41" Value="RCC_PLLM_DIV41"/>
+</RefParameter>
+<RefParameter Visible="false" Comment="PLLMLL" DefaultValue="RCC_PLLM_DIV42" Name="PLLMLL" Type="list">
+    <Condition Expression="PLLM=42" Diagnostic=""/>
+	<PossibleValue Comment="42" Value="RCC_PLLM_DIV42"/>
+</RefParameter>
+<RefParameter Visible="false" Comment="PLLMLL" DefaultValue="RCC_PLLM_DIV43" Name="PLLMLL" Type="list">
+    <Condition Expression="PLLM=43" Diagnostic=""/>
+	<PossibleValue Comment="43" Value="RCC_PLLM_DIV43"/>
+</RefParameter>
+<RefParameter Visible="false" Comment="PLLMLL" DefaultValue="RCC_PLLM_DIV44" Name="PLLMLL" Type="list">
+    <Condition Expression="PLLM=44" Diagnostic=""/>
+	<PossibleValue Comment="44" Value="RCC_PLLM_DIV44"/>
+</RefParameter>
+<RefParameter Visible="false" Comment="PLLMLL" DefaultValue="RCC_PLLM_DIV45" Name="PLLMLL" Type="list">
+    <Condition Expression="PLLM=45" Diagnostic=""/>
+	<PossibleValue Comment="45" Value="RCC_PLLM_DIV45"/>
+</RefParameter>
+<RefParameter Visible="false" Comment="PLLMLL" DefaultValue="RCC_PLLM_DIV46" Name="PLLMLL" Type="list">
+    <Condition Expression="PLLM=46" Diagnostic=""/>
+	<PossibleValue Comment="46" Value="RCC_PLLM_DIV46"/>
+</RefParameter>
+<RefParameter Visible="false" Comment="PLLMLL" DefaultValue="RCC_PLLM_DIV47" Name="PLLMLL" Type="list">
+    <Condition Expression="PLLM=47" Diagnostic=""/>
+	<PossibleValue Comment="47" Value="RCC_PLLM_DIV47"/>
+</RefParameter>
+<RefParameter Visible="false" Comment="PLLMLL" DefaultValue="RCC_PLLM_DIV48" Name="PLLMLL" Type="list">
+    <Condition Expression="PLLM=48" Diagnostic=""/>
+	<PossibleValue Comment="48" Value="RCC_PLLM_DIV48"/>
+</RefParameter>
+<RefParameter Visible="false" Comment="PLLMLL" DefaultValue="RCC_PLLM_DIV49" Name="PLLMLL" Type="list">
+    <Condition Expression="PLLM=49" Diagnostic=""/>
+	<PossibleValue Comment="49" Value="RCC_PLLM_DIV49"/>
+</RefParameter>
+<RefParameter Visible="false" Comment="PLLMLL" DefaultValue="RCC_PLLM_DIV50" Name="PLLMLL" Type="list">
+    <Condition Expression="PLLM=50" Diagnostic=""/>
+	<PossibleValue Comment="50" Value="RCC_PLLM_DIV50"/>
+</RefParameter>
+<RefParameter Visible="false" Comment="PLLMLL" DefaultValue="RCC_PLLM_DIV51" Name="PLLMLL" Type="list">
+    <Condition Expression="PLLM=51" Diagnostic=""/>
+	<PossibleValue Comment="51" Value="RCC_PLLM_DIV51"/>
+</RefParameter>
+<RefParameter Visible="false" Comment="PLLMLL" DefaultValue="RCC_PLLM_DIV52" Name="PLLMLL" Type="list">
+    <Condition Expression="PLLM=52" Diagnostic=""/>
+	<PossibleValue Comment="52" Value="RCC_PLLM_DIV52"/>
+</RefParameter>
+<RefParameter Visible="false" Comment="PLLMLL" DefaultValue="RCC_PLLM_DIV53" Name="PLLMLL" Type="list">
+    <Condition Expression="PLLM=53" Diagnostic=""/>
+	<PossibleValue Comment="53" Value="RCC_PLLM_DIV53"/>
+</RefParameter>
+<RefParameter Visible="false" Comment="PLLMLL" DefaultValue="RCC_PLLM_DIV54" Name="PLLMLL" Type="list">
+    <Condition Expression="PLLM=54" Diagnostic=""/>
+	<PossibleValue Comment="54" Value="RCC_PLLM_DIV54"/>
+</RefParameter>
+<RefParameter Visible="false" Comment="PLLMLL" DefaultValue="RCC_PLLM_DIV55" Name="PLLMLL" Type="list">
+    <Condition Expression="PLLM=55" Diagnostic=""/>
+	<PossibleValue Comment="55" Value="RCC_PLLM_DIV55"/>
+</RefParameter>
+<RefParameter Visible="false" Comment="PLLMLL" DefaultValue="RCC_PLLM_DIV56" Name="PLLMLL" Type="list">
+    <Condition Expression="PLLM=56" Diagnostic=""/>
+	<PossibleValue Comment="56" Value="RCC_PLLM_DIV56"/>
+</RefParameter>
+<RefParameter Visible="false" Comment="PLLMLL" DefaultValue="RCC_PLLM_DIV57" Name="PLLMLL" Type="list">
+    <Condition Expression="PLLM=57" Diagnostic=""/>
+	<PossibleValue Comment="57" Value="RCC_PLLM_DIV57"/>
+</RefParameter>
+<RefParameter Visible="false" Comment="PLLMLL" DefaultValue="RCC_PLLM_DIV58" Name="PLLMLL" Type="list">
+    <Condition Expression="PLLM=58" Diagnostic=""/>
+	<PossibleValue Comment="58" Value="RCC_PLLM_DIV58"/>
+</RefParameter>
+<RefParameter Visible="false" Comment="PLLMLL" DefaultValue="RCC_PLLM_DIV59" Name="PLLMLL" Type="list">
+    <Condition Expression="PLLM=59" Diagnostic=""/>
+	<PossibleValue Comment="59" Value="RCC_PLLM_DIV59"/>
+</RefParameter>
+<RefParameter Visible="false" Comment="PLLMLL" DefaultValue="RCC_PLLM_DIV60" Name="PLLMLL" Type="list">
+    <Condition Expression="PLLM=60" Diagnostic=""/>
+	<PossibleValue Comment="60" Value="RCC_PLLM_DIV60"/>
+</RefParameter>
+<RefParameter Visible="false" Comment="PLLMLL" DefaultValue="RCC_PLLM_DIV61" Name="PLLMLL" Type="list">
+    <Condition Expression="PLLM=61" Diagnostic=""/>
+	<PossibleValue Comment="61" Value="RCC_PLLM_DIV61"/>
+</RefParameter><RefParameter Visible="false" Comment="PLLMLL" DefaultValue="RCC_PLLM_DIV62" Name="PLLMLL" Type="list">
+    <Condition Expression="PLLM=62" Diagnostic=""/>
+	<PossibleValue Comment="62" Value="RCC_PLLM_DIV62"/>
+</RefParameter>
+<RefParameter Visible="false" Comment="PLLMLL" DefaultValue="RCC_PLLM_DIV63" Name="PLLMLL" Type="list">
+	<PossibleValue Comment="63" Value="RCC_PLLM_DIV63"/>
+</RefParameter>
 	<RefParameter Visible="false" Comment="PLLN" DefaultValue="192" Max="432" Min="192" Name="PLLN" Type="integer"/>
 	<RefParameter Visible="false" Comment="PLLP" DefaultValue="RCC_PLLP_DIV2" Name="PLLP" Type="list">
 		<PossibleValue Comment="2" Value="RCC_PLLP_DIV2"/>
@@ -342,6 +613,17 @@
         <PossibleValue Comment="29" Value="RCC_RTCCLKSOURCE_HSE_DIV29"/>
         <PossibleValue Comment="30" Value="RCC_RTCCLKSOURCE_HSE_DIV30"/>
         <PossibleValue Comment="31" Value="RCC_RTCCLKSOURCE_HSE_DIV31"/>
+    </RefParameter>
+    <RefParameter Visible="false" Comment="RTC Clock Source"  DefaultValue="RCC_RTCCLKSOURCE_LSE" Name="RCC_RTC_Clock_SourceLL" Type="list" IP="RTC">
+        <Condition Expression="RCC_RTC_Clock_Source=RCC_RTCCLKSOURCE_LSE" Diagnostic=""/>
+        <PossibleValue Comment="LSE" Value="RCC_RTCCLKSOURCE_LSE"/>
+    </RefParameter>
+    <RefParameter Visible="false" Comment="RTC Clock Source"  DefaultValue="RCC_RTCCLKSOURCE_LSI" Name="RCC_RTC_Clock_SourceLL" Type="list" IP="RTC">
+        <Condition Expression="RCC_RTC_Clock_Source=RCC_RTCCLKSOURCE_LSI" Diagnostic=""/>
+        <PossibleValue Comment="LSI" Value="RCC_RTCCLKSOURCE_LSI"/>
+    </RefParameter>
+    <RefParameter Visible="false" Comment="RTC Clock Source"  DefaultValue="RCC_RTCCLKSOURCE_HSE" Name="RCC_RTC_Clock_SourceLL" Type="list" IP="RTC">
+        <PossibleValue Comment="HSE" Value="RCC_RTCCLKSOURCE_HSE"/>
     </RefParameter>
 	<RefParameter Visible="false" Comment="RTC Clock Source_HSEDiv" DefaultValue="RCC_RTCCLKSOURCE_HSE_DIV2" Name="RCC_RTC_Clock_Source_FROM_HSE" Type="list" IP="RTC">
 		<PossibleValue Comment="2" Value="RCC_RTCCLKSOURCE_HSE_DIV2"/>
@@ -824,7 +1106,7 @@
   
     <RefParameter Comment="HSI Calibration Value" DefaultValue="16" Min="0" Max="31" Name="HSICalibrationValue" Type="integer" Group="RCC Parameters"/>
     <RefParameter Visible="false" Name="EnbaleCSS" Comment="Clock Security System: available only when HSE is used directly or undirectly as System Clock" Type="list" DefaultValue="false">
-        <Condition Diagnostic="" Expression="((PLLSource=RCC_PLLSOURCE_HSE) &amp;(SYSCLKSource=RCC_SYSCLKSOURCE_PLLCLK ))|(SYSCLKSource=RCC_SYSCLKSOURCE_HSE)"/>
+        <Condition Diagnostic="" Expression="((PLLSourceVirtual=RCC_PLLSOURCE_HSE) &amp;(SYSCLKSource=RCC_SYSCLKSOURCE_PLLCLK ))|(SYSCLKSource=RCC_SYSCLKSOURCE_HSE)"/>
         <PossibleValue Value="true" Comment="Enabled" Semaphore="CSSEnabled"/>
         <PossibleValue Value="false" Comment="Disabled"/>
     </RefParameter>

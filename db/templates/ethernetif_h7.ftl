@@ -3,7 +3,7 @@
   ******************************************************************************
   * File Name          : ethernetif.c
   * Description        : This file provides code for the configuration
-  *                      of the ${name} MiddleWare.
+  *                      of the ethernetif.c MiddleWare.
   ******************************************************************************
 [@common.optinclude name="Src/license.tmp"/][#--include License text --]
   ******************************************************************************
@@ -66,11 +66,11 @@
 [#list BspComponent.variables as variables]
 		[#if variables.name?contains("BspComponent")]
 			[#assign BspComponent = variables.value]
-			[#if (variables.value == "Disable")]			
+			[#if (variables.value == "Choose")]			
 				[#assign bsp = 0]
 			[#else]
 				[#assign bsp = 1]
-			[/#if][#-- end "Disable" --]
+			[/#if][#-- end "Choose" --]
 		[/#if][#-- end "BspComponent" --]
 [/#list]
 [/#if][#-- end "BspComponent.variables??" --]

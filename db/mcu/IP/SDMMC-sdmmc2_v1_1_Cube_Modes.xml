@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<IP DBVersion="V3.0" IPType="peripheral" Name="SDMMC" Version="sdmmc2_v1_1_Cube" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd" xmlns="http://mcd.rou.st.com/modules.php?name=mcu">
+  <About>SDMMC: Secure Digital Input/Output interface</About>
+
+  <!-- Generic RefParameters for SDMMC -->
+  <RefParameter Comment="SDMMC instance" DefaultValue="SDMMC$Index" Name="Instance" Type="list" Visible="false"/>
+
+  <RefParameter Name="ClockEdge" Comment="Clock transition on which the bit capture is made" DefaultValue="SDMMC_CLOCK_EDGE_RISING" Type="list" Group="SDMMC parameters" Visible="false">
+      <Condition Diagnostic="SD Card" Expression="$IpInstance_SD_Card"/>
+      <PossibleValue Value="SDMMC_CLOCK_EDGE_RISING" Comment="Rising transition"/>
+  </RefParameter>
+  <RefParameter Name="ClockEdge" Comment="Clock transition on which the bit capture is made" DefaultValue="SDMMC_CLOCK_EDGE_RISING" Type="list" Group="SDMMC parameters">
+      <PossibleValue Value="SDMMC_CLOCK_EDGE_RISING" Comment="Rising transition"/>
+      <PossibleValue Value="SDMMC_CLOCK_EDGE_FALLING" Comment="Falling transition"/>
+  </RefParameter>
+
+  <RefParameter Name="ClockPowerSave" Comment="SDMMC Clock output enable or disable when the bus is idle" DefaultValue="SDMMC_CLOCK_POWER_SAVE_DISABLE" Type="list" Group="SDMMC parameters" Visible="false">
+      <Condition Diagnostic="SD Card" Expression="$IpInstance_SD_Card"/>
+      <PossibleValue Value="SDMMC_CLOCK_POWER_SAVE_DISABLE" Comment="Disable the power save for the clock"/>
+  </RefParameter>
+  <RefParameter Name="ClockPowerSave" Comment="SDMMC Clock output enable when the bus is idle" DefaultValue="SDMMC_CLOCK_POWER_SAVE_DISABLE" Type="list" Group="SDMMC parameters">
+      <PossibleValue Value="SDMMC_CLOCK_POWER_SAVE_DISABLE" Comment="Disable the power save for the clock"/>
+      <PossibleValue Value="SDMMC_CLOCK_POWER_SAVE_ENABLE" Comment="Enable the power save for the clock"/>
+  </RefParameter>
+
+  <RefParameter Name="BusWide" Comment="Wide bus mode" Type="list" Visible="false">
+      <Condition Diagnostic="Bus Width 8 Bits" Expression="$IpInstance_Bus8Bits"/>
+      <PossibleValue Value="SDMMC_BUS_WIDE_8B" Comment="Bus wide 8-bit data"/>
+  </RefParameter>
+  <RefParameter Name="BusWide" Comment="Wide bus mode" Type="list" Visible="false">
+      <Condition Diagnostic="Bus Width 4 Bits" Expression="$IpInstance_Bus4Bits"/>
+      <PossibleValue Value="SDMMC_BUS_WIDE_4B" Comment="Bus wide 4-bit data"/>
+  </RefParameter>
+  <RefParameter Name="BusWide" Comment="Wide bus mode" Type="list" Visible="false">
+      <Condition Diagnostic="Bus Width 1 Bit" Expression="$IpInstance_Bus1Bit"/>
+      <PossibleValue Value="SDMMC_BUS_WIDE_1B" Comment="Bus wide 1-bit data"/>
+  </RefParameter>
+  <RefParameter Name="BusWide" Comment="Wide bus mode" Type="list" Visible="false">
+      <PossibleValue Value="SDMMC_BUS_WIDE_1B" Comment="Bus wide 1-bit data"/>
+  </RefParameter>
+
+  <RefParameter Name="HardwareFlowControl" Comment="SDMMC hardware flow control" DefaultValue="SDMMC_HARDWARE_FLOW_CONTROL_DISABLE" Type="list"  Group="SDMMC parameters" Visible="false">
+      <Condition Diagnostic="SD Card" Expression="$IpInstance_SD_Card"/>
+      <PossibleValue Value="SDMMC_HARDWARE_FLOW_CONTROL_DISABLE" Comment="The hardware control flow is disabled"/>
+  </RefParameter>
+  <RefParameter Name="HardwareFlowControl" Comment="SDMMC hardware flow control" DefaultValue="SDMMC_HARDWARE_FLOW_CONTROL_DISABLE" Type="list"  Group="SDMMC parameters">
+      <PossibleValue Value="SDMMC_HARDWARE_FLOW_CONTROL_DISABLE" Comment="The hardware control flow is disabled"/>
+      <PossibleValue Value="SDMMC_HARDWARE_FLOW_CONTROL_ENABLE" Comment="The hardware control flow is enabled"/>
+  </RefParameter>
+
+  <RefParameter Name="ClockDiv" Comment="SDMMCCLK clock divide factor" DefaultValue="0" Max="255" Min="0" Type="integer" Group="SDMMC parameters">
+    <Description>SDMMC_CK = SDMMCCLK / [CLKDIV + 2]. The output clock frequency can vary between 187 KHz and 24 MHz. It is advised to keep the default ClockDiv value (0) to have a maximum SDMMC_CK frequency of 24 MHz.</Description>
+  </RefParameter>
+
+  <RefParameter Name="Transceiver" Comment="Specifies whether external transceiver is enabled or disabled" DefaultValue="SDMMC_TRANSCEIVER_ENABLE" Type="list" Group="SDMMC parameters" Visible="false">
+    <Condition Diagnostic="SD Card" Expression="$IpInstance_voltage_converter"/>
+    <PossibleValue Value="SDMMC_TRANSCEIVER_ENABLE" Comment="The external transceiver is enabled"/>
+  </RefParameter>
+  <RefParameter Name="Transceiver" Comment="Specifies whether external transceiver is enabled or disabled" DefaultValue="SDMMC_TRANSCEIVER_DISABLE" Type="list" Group="SDMMC parameters" Visible="false">
+    <Condition Diagnostic="SD Card" Expression="!$IpInstance_voltage_converter"/>
+    <PossibleValue Value="SDMMC_TRANSCEIVER_DISABLE" Comment="The external transceiver is disabled"/>
+  </RefParameter>
+  <RefParameter Name="Transceiver" Comment="Specifies whether external transceiver is enabled or disabled" DefaultValue="SDMMC_TRANSCEIVER_DISABLE" Type="list" Group="SDMMC parameters">
+    <PossibleValue Value="SDMMC_TRANSCEIVER_DISABLE" Comment="The external transceiver is disabled"/>
+    <PossibleValue Value="SDMMC_TRANSCEIVER_ENABLE" Comment="The external transceiver is enabled"/>
+  </RefParameter>
+
+  <!-- RefMode for SD-1-bit -->
+  <RefMode Name="SD_1_bit" Comment="SD 1 bit" HalMode="SD">
+      <ConfigForMode>SD_Init</ConfigForMode>
+      <Parameter Name="ClockEdge"/>
+      <Parameter Name="ClockPowerSave"/>
+      <Parameter Name="BusWide"/>
+      <Parameter Name="HardwareFlowControl"/>
+      <Parameter Name="ClockDiv"/>
+      <Parameter Name="Transceiver"/>
+  </RefMode>
+
+  <RefMode Name="SD_1_bit_auto_dir_voltage_converter" Comment="SD 1 bit with auto dir voltage converter" HalMode="SD">
+      <ConfigForMode>SD_Init</ConfigForMode>
+      <Parameter Name="ClockEdge"/>
+      <Parameter Name="ClockPowerSave"/>
+      <Parameter Name="BusWide"/>
+      <Parameter Name="HardwareFlowControl"/>
+      <Parameter Name="ClockDiv"/>
+      <Parameter Name="Transceiver"/>
+  </RefMode>
+
+  <RefMode Name="SD_1_bit_dir_voltage_converter" Comment="SD 1 bit with dir voltage converter" HalMode="SD">
+      <ConfigForMode>SD_Init</ConfigForMode>
+      <Parameter Name="ClockEdge"/>
+      <Parameter Name="ClockPowerSave"/>
+      <Parameter Name="BusWide"/>
+      <Parameter Name="HardwareFlowControl"/>
+      <Parameter Name="ClockDiv"/>
+      <Parameter Name="Transceiver"/>
+  </RefMode>
+
+  <!-- RefMode for SD-4-bits-Wide-bus -->
+  <RefMode Name="SD_4_bits_Wide_bus" Comment="SD 4 bits Wide bus" HalMode="SD">
+      <ConfigForMode>SD_Init</ConfigForMode>
+      <Parameter Name="ClockEdge"/>
+      <Parameter Name="ClockPowerSave"/>
+      <Parameter Name="BusWide"/>
+      <Parameter Name="HardwareFlowControl"/>
+      <Parameter Name="ClockDiv"/>
+      <Parameter Name="Transceiver"/>
+  </RefMode>
+
+  <RefMode Name="SD_4_bits_Wide_bus_auto_dir_voltage_converter" Comment="SD 4 bits Wide bus with auto dir voltage converter" HalMode="SD">
+      <ConfigForMode>SD_Init</ConfigForMode>
+      <Parameter Name="ClockEdge"/>
+      <Parameter Name="ClockPowerSave"/>
+      <Parameter Name="BusWide"/>
+      <Parameter Name="HardwareFlowControl"/>
+      <Parameter Name="ClockDiv"/>
+      <Parameter Name="Transceiver"/>
+  </RefMode>
+
+  <RefMode Name="SD_4_bits_Wide_bus_dir_voltage_converter" Comment="SD 4 bits Wide bus with dir voltage converter" HalMode="SD">
+      <ConfigForMode>SD_Init</ConfigForMode>
+      <Parameter Name="ClockEdge"/>
+      <Parameter Name="ClockPowerSave"/>
+      <Parameter Name="BusWide"/>
+      <Parameter Name="HardwareFlowControl"/>
+      <Parameter Name="ClockDiv"/>
+      <Parameter Name="Transceiver"/>
+  </RefMode>
+
+  <RefMode Name="mmc_1_bit" Comment="MMC 1 bit" HalMode="MMC">
+      <Condition Diagnostic="" Expression="STM32H7"/>
+      <ConfigForMode>MMC_Init</ConfigForMode>
+      <Parameter Name="ClockEdge"/>
+      <Parameter Name="ClockPowerSave"/>
+      <Parameter Name="BusWide"/>
+      <Parameter Name="HardwareFlowControl"/>
+      <Parameter Name="ClockDiv"/>
+  </RefMode>
+
+  <RefMode Name="mmc_4_bits_Wide_bus" Comment="MMC 4 bits" HalMode="MMC">
+      <Condition Diagnostic="" Expression="STM32H7"/>
+      <ConfigForMode>MMC_Init</ConfigForMode>
+      <ConfigForMode>MMC_WideBus_Config</ConfigForMode>
+      <Parameter Name="ClockEdge"/>
+      <Parameter Name="ClockPowerSave"/>
+      <Parameter Name="BusWide"/>
+      <Parameter Name="HardwareFlowControl"/>
+      <Parameter Name="ClockDiv"/>
+  </RefMode>
+
+  <RefMode Name="mmc_8_bits_Wide_bus" Comment="MMC 8 bits" HalMode="MMC">
+      <Condition Diagnostic="" Expression="STM32H7"/>
+      <ConfigForMode>MMC_Init</ConfigForMode>
+      <ConfigForMode>MMC_WideBus_Config</ConfigForMode>
+      <Parameter Name="ClockEdge"/>
+      <Parameter Name="ClockPowerSave"/>
+      <Parameter Name="BusWide"/>
+      <Parameter Name="HardwareFlowControl"/>
+      <Parameter Name="ClockDiv"/>
+  </RefMode>
+
+  <ModeLogicOperator Name="OR">
+    <Mode Name="Mode">
+      <ModeLogicOperator Name="XOR">
+        <Mode Name="SD_1_bit" UserName="SD 1 bit">
+          <Semaphore>$IpInstance_SD_Card</Semaphore>
+          <Semaphore>$IpInstance_Bus1Bit</Semaphore>
+          <SignalLogicalOp Name="AND">
+            <Signal Name="CK"/>
+            <Signal Name="CMD"/>
+            <Signal Name="D0"/>
+          </SignalLogicalOp>
+        </Mode>
+        <Mode Name="SD_1_bit_auto_dir_voltage_converter" UserName="SD 1 bit with auto dir voltage converter">
+          <Semaphore>$IpInstance_SD_Card</Semaphore>
+          <Semaphore>$IpInstance_Bus1Bit</Semaphore>
+          <Semaphore>$IpInstance_voltage_converter</Semaphore>
+          <SignalLogicalOp Name="AND">
+            <Signal Name="CK"/>
+            <Signal Name="CKIN"/>
+            <Signal Name="CMD"/>
+            <Signal Name="D0"/>
+          </SignalLogicalOp>
+        </Mode>
+        <Mode Name="SD_1_bit_dir_voltage_converter" UserName="SD 1 bit with dir voltage converter">
+          <Semaphore>$IpInstance_SD_Card</Semaphore>
+          <Semaphore>$IpInstance_Bus1Bit</Semaphore>
+          <Semaphore>$IpInstance_voltage_converter</Semaphore>
+          <SignalLogicalOp Name="AND">
+            <Signal Name="CK"/>
+            <Signal Name="CKIN"/>
+            <Signal Name="CMD"/>
+            <Signal Name="CDIR"/>
+            <Signal Name="D0"/>
+            <Signal Name="D0DIR"/>
+          </SignalLogicalOp>
+        </Mode>
+        <Mode Name="SD_4_bits_Wide_bus" UserName="SD 4 bits Wide bus">
+          <Semaphore>$IpInstance_SD_Card</Semaphore>
+          <Semaphore>$IpInstance_Bus4Bits</Semaphore>
+          <SignalLogicalOp Name="AND">
+            <Signal Name="CK"/>
+            <Signal Name="CMD"/>
+            <Signal Name="D0"/>
+            <Signal Name="D1"/>
+            <Signal Name="D2"/>
+            <Signal Name="D3"/>
+          </SignalLogicalOp>
+        </Mode>
+        <Mode Name="SD_4_bits_Wide_bus_auto_dir_voltage_converter" UserName="SD 4 bits Wide bus with auto dir voltage converter">
+          <Semaphore>$IpInstance_SD_Card</Semaphore>
+          <Semaphore>$IpInstance_Bus4Bits</Semaphore>
+          <Semaphore>$IpInstance_voltage_converter</Semaphore>
+          <SignalLogicalOp Name="AND">
+            <Signal Name="CK"/>
+            <Signal Name="CKIN"/>
+            <Signal Name="CMD"/>
+            <Signal Name="D0"/>
+            <Signal Name="D1"/>
+            <Signal Name="D2"/>
+            <Signal Name="D3"/>
+          </SignalLogicalOp>
+        </Mode>
+        <Mode Name="SD_4_bits_Wide_bus_dir_voltage_converter" UserName="SD 4 bits Wide bus with dir voltage converter">
+          <Semaphore>$IpInstance_SD_Card</Semaphore>
+          <Semaphore>$IpInstance_Bus4Bits</Semaphore>
+          <Semaphore>$IpInstance_voltage_converter</Semaphore>
+          <SignalLogicalOp Name="AND">
+            <Signal Name="CK"/>
+            <Signal Name="CKIN"/>
+            <Signal Name="CMD"/>
+            <Signal Name="CDIR"/>
+            <Signal Name="D0"/>
+            <Signal Name="D0DIR"/>
+            <Signal Name="D1"/>
+            <Signal Name="D2"/>
+            <Signal Name="D3"/>
+            <Signal Name="D123DIR"/>
+          </SignalLogicalOp>
+        </Mode>
+        <Mode Name="mmc_1_bit" UserName="MMC 1 bit">
+          <Semaphore>$IpInstance_Bus1Bit</Semaphore>
+          <SignalLogicalOp Name="AND">
+            <Signal Name="CK"/>
+            <Signal Name="CMD"/>
+            <Signal Name="D0"/>
+          </SignalLogicalOp>
+        </Mode>
+        <Mode Name="mmc_4_bits_Wide_bus"  UserName="MMC 4 bits Wide bus">
+          <Semaphore>$IpInstance_Bus4Bits</Semaphore>
+          <SignalLogicalOp Name="AND">
+            <Signal Name="CK"/>
+            <Signal Name="CMD"/>
+            <Signal Name="D0"/>
+            <Signal Name="D1"/>
+            <Signal Name="D2"/>
+            <Signal Name="D3"/>
+          </SignalLogicalOp>
+        </Mode>
+        <Mode Name="mmc_8_bits_Wide_bus"   UserName="MMC 8 bits Wide bus">
+          <Semaphore>$IpInstance_Bus8Bits</Semaphore>
+          <SignalLogicalOp Name="AND">
+            <Signal Name="CK"/>
+            <Signal Name="CMD"/>
+            <Signal Name="D0"/>
+            <Signal Name="D1"/>
+            <Signal Name="D2"/>
+            <Signal Name="D3"/>
+            <Signal Name="D4"/>
+            <Signal Name="D5"/>
+            <Signal Name="D6"/>
+            <Signal Name="D7"/>
+          </SignalLogicalOp>
+        </Mode>
+      </ModeLogicOperator>
+    </Mode>
+  </ModeLogicOperator>
+  <RefSignal IOMode="AlternateFunctionPushPullHighSpeedDefault" Name="CK"/>
+  <RefSignal IOMode="AlternateFunctionPushPullHighSpeedDefault" Name="CMD"/>
+  <RefSignal IOMode="AlternateFunctionPushPullHighSpeedDefault" Name="D0"/>
+  <RefSignal IOMode="AlternateFunctionPushPullHighSpeedDefault" Name="D1"/>
+  <RefSignal IOMode="AlternateFunctionPushPullHighSpeedDefault" Name="D2"/>
+  <RefSignal IOMode="AlternateFunctionPushPullHighSpeedDefault" Name="D3"/>
+  <RefSignal IOMode="AlternateFunctionPushPullHighSpeedDefault" Name="D4"/>
+  <RefSignal IOMode="AlternateFunctionPushPullHighSpeedDefault" Name="D5"/>
+  <RefSignal IOMode="AlternateFunctionPushPullHighSpeedDefault" Name="D6"/>
+  <RefSignal IOMode="AlternateFunctionPushPullHighSpeedDefault" Name="D7"/>
+  <RefSignal IOMode="AlternateFunctionPushPullHighSpeedDefault" Name="CKIN"/>
+  <RefSignal IOMode="AlternateFunctionPushPullHighSpeedDefault" Name="CDIR"/>
+  <RefSignal IOMode="AlternateFunctionPushPullHighSpeedDefault" Name="D0DIR"/>
+  <RefSignal IOMode="AlternateFunctionPushPullHighSpeedDefault" Name="D123DIR"/>
+  <!-- SDMMCUsed_ForRCC could be removed but keep it as it is used by some families  -->
+  <Semaphore>SDMMCUsed_ForRCC</Semaphore>
+  <Semaphore>$IpInstanceUsed_ForRCC</Semaphore>
+</IP>

@@ -370,6 +370,15 @@
   [/#if]
 [/#macro]
 
+[#macro optincludeFile path name]
+  [#assign objectConstructor = "freemarker.template.utility.ObjectConstructor"?new()]
+  [#assign file = objectConstructor("java.io.File",workspace+"/"+path+"/"+name)]
+  [#assign exist = file.exists()]
+  [#if exist]
+    #include "${name}"
+  [/#if]
+[/#macro]
+
 [#macro generateConfigModelListCode configModel inst nTab index]
 [#assign listofDeclaration = ""]
 [#assign listofCalledMethod = ""]
@@ -1703,7 +1712,7 @@ ${bufferType} ${bufferName}[${bufferSize}];
                     [@common.generateUsbWakeUpInterrupt ipName=ipName tabN=3/]
                     [#list IPData.initServices.nvic as initVector]
                        [#if initVector.vector?contains("WKUP") || initVector.vector?contains("WakeUp")]
-#t#t#tHAL_NVIC_SetPriority(${initVector.vector}, NVIC_EncodePriority(NVIC_GetPriorityGrouping(),${initVector.preemptionPriority}, ${initVector.subPriority}));
+#t#t#tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
 #t#t#tHAL_NVIC_EnableIRQ(${initVector.vector});
                        [/#if]
                     [/#list]

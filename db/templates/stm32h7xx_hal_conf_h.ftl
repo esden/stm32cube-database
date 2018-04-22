@@ -54,7 +54,7 @@
   */
 #define HAL_MODULE_ENABLED  
 
-  [#assign allModules = ["ADC","FDCAN","CEC", "COMP", "CRC","CRYP","DAC","DCMI","DMA2D","ETH","NAND","NOR","SRAM","SDRAM","HASH", "HRTIM", "HSEMA", "JPEG", "OPAMP", "I2S", "SMBUS","IWDG","LPTIM","LTDC","QUADSPI","RNG","RTC","SAI","SD","MMC","SPDIFRX","SPI", "SWPMI","TIM","UART","USART","IRDA","SMARTCARD","WWDG","PCD","HCD", "DFSDM", "DSI","JPEG", "MDIOS"]]
+  [#assign allModules = ["ADC","FDCAN","CEC", "COMP", "CRC","CRYP","DAC","DCMI","DMA2D","ETH","NAND","NOR","SRAM","SDRAM","HASH", "HRTIM", "HSEM", "JPEG", "OPAMP", "I2S", "SMBUS","IWDG","LPTIM","LTDC","QUADSPI","RNG","RTC","SAI","SD","MMC","SPDIFRX","SPI", "SWPMI","TIM","UART","USART","IRDA","SMARTCARD","WWDG","PCD","HCD", "DFSDM", "DSI","JPEG", "MDIOS"]]
   [#list allModules as module]
 	[#if isModuleUsed(module)]
 [#compress]#define HAL_${module?replace("QUADSPI","QSPI")}_MODULE_ENABLED[/#compress]
@@ -80,7 +80,7 @@
 #define HAL_PWR_MODULE_ENABLED
 #define HAL_I2C_MODULE_ENABLED
 #define HAL_CORTEX_MODULE_ENABLED
-
+#define HAL_HSEM_MODULE_ENABLED
 
 /* ########################## Oscillator Values adaptation ####################*/
 /**
@@ -245,9 +245,9 @@
   #include "stm32h7xx_hal_hrtim.h"
 #endif /* HAL_HRTIM_MODULE_ENABLED */
 
-#ifdef HAL_HSEMA_MODULE_ENABLED
-  #include "stm32h7xx_hal_hsema.h"
-#endif /* HAL_HSEMA_MODULE_ENABLED */
+#ifdef HAL_HSEM_MODULE_ENABLED
+  #include "stm32h7xx_hal_hsem.h"
+#endif /* HAL_HSEM_MODULE_ENABLED */
 
 #ifdef HAL_SRAM_MODULE_ENABLED
   #include "stm32h7xx_hal_sram.h"

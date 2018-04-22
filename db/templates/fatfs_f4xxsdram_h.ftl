@@ -10,29 +10,16 @@
   */
   
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __STM32F4XX_SDRAM_H
-#define __STM32F4XX_SDRAM_H
+#ifndef __${FamilyName}_SDRAM_H
+#define __${FamilyName}_SDRAM_H
 
 #ifdef __cplusplus
  extern "C" {
 #endif 
 
 /* Includes ------------------------------------------------------------------*/
-#include "stm32f4xx_hal.h"
-#include "stm32f4xx_hal_sdram.h"
-
-[#-- SWIPdatas is a list of SWIPconfigModel --]  
-[#list SWIPdatas as SWIP]  
-
-[#if SWIP.defines??]
-	[#list SWIP.defines as definition]	
-/*---------- Handle for SDRAM -----------*/
-#define ${definition.name} #t#t ${definition.value} 
-[#if definition.description??]${definition.description} [/#if]
-	[/#list]
-[/#if]
-
-[/#list]
+#include "${FamilyName?lower_case}xx_hal.h"
+#include "${FamilyName?lower_case}xx_hal_sdram.h"
 
 /* USER CODE BEGIN 0 */
 
@@ -42,19 +29,16 @@
 #define   SDRAM_OK         ((uint8_t)0x00)
 #define   SDRAM_ERROR      ((uint8_t)0x01)
 
-/** @defgroup STM32469I-EVAL_SDRAM_Exported_Constants STM32469I EVAL SDRAM Exported Constants
-  * @{
-  */
-#define SDRAM_DEVICE_ADDR  ((uint32_t)0xC0000000)
+/* Exported constants --------------------------------------------------------*/ 
 
- /* SDRAM device size in MBytes */
- #define SDRAM_DEVICE_SIZE  ((uint32_t)0x800000)
+#define SDRAM_DEVICE_ADDR  ((uint32_t)0xC0000000)
+#define SDRAM_DEVICE_SIZE  ((uint32_t)0x800000)  /* SDRAM device size in MBytes */
 
 /* #define SDRAM_MEMORY_WIDTH FMC_SDRAM_MEM_BUS_WIDTH_32 */
 /* #define SDCLOCK_PERIOD     FMC_SDRAM_CLOCK_PERIOD_2 */
 
-/* SDRAM refresh counter (90 MHz SD clock) */
-/* #define REFRESH_COUNT       ((uint32_t)0x0569) */
+
+/* #define REFRESH_COUNT       ((uint32_t)0x0569) */      /* SDRAM refresh counter (90 MHz SD clock) */
 #define  SDRAM_TIMEOUT      ((uint32_t)0xFFFF)
 
 /* DMA definitions for SDRAM DMA transfer */
@@ -67,7 +51,6 @@
 #define SDRAM_DMAx_IRQHandler DMA2_Stream0_IRQHandler
 */
    
-
 /**
   * @brief  FMC SDRAM Mode definition register defines
   */
@@ -85,8 +68,6 @@
 #define SDRAM_MODEREG_WRITEBURST_MODE_SINGLE     ((uint16_t)0x0200)
 */
 
-extern SDRAM_HandleTypeDef _HSDRAM;
-
 /* Exported functions --------------------------------------------------------*/   
 uint8_t BSP_SDRAM_Init(void);
 uint8_t BSP_SDRAM_ReadData(uint32_t uwStartAddress, uint32_t *pData, uint32_t uwDataSize);
@@ -102,6 +83,6 @@ void    BSP_SDRAM_DMA_IRQHandler(void);
 }
 #endif
 
-#endif /* __STM32F4XX_SDRAM_H */
+#endif /* __${FamilyName}_SDRAM_H */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

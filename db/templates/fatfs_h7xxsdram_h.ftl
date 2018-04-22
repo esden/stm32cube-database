@@ -10,27 +10,17 @@
   */
   
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __STM32H7XX_SDRAM_H
-#define __STM32H7XX_SDRAM_H
+#ifndef __${FamilyName}_SDRAM_H
+#define __${FamilyName}_SDRAM_H
 
 #ifdef __cplusplus
  extern "C" {
 #endif 
 
-
 /* Includes ------------------------------------------------------------------*/
-#include "stm32h7xx_hal.h"
-#include "stm32h7xx_hal_sdram.h"
-[#-- SWIPdatas is a list of SWIPconfigModel --]  
-[#list SWIPdatas as SWIP]  
-[#if SWIP.defines??]
-	[#list SWIP.defines as definition]	
-/*---------- Handle for SDRAM -----------*/
-#define ${definition.name} #t#t ${definition.value} 
-[#if definition.description??]${definition.description} [/#if]
-	[/#list]
-[/#if]
-[/#list]
+#include "${FamilyName?lower_case}xx_hal.h"
+#include "${FamilyName?lower_case}xx_hal_sdram.h"
+
 /* USER CODE BEGIN 0 */
 
 /** 
@@ -39,9 +29,8 @@
 #define   SDRAM_OK         ((uint8_t)0x00)
 #define   SDRAM_ERROR      ((uint8_t)0x01)
 
-/** @defgroup STM32H743I_EVAL_SDRAM_Exported_Constants
-  * @{
-  */ 
+/* Exported constants --------------------------------------------------------*/ 
+
 #define SDRAM_DEVICE_ADDR  ((uint32_t)0xD0000000)
 #define SDRAM_DEVICE_SIZE  ((uint32_t)0x2000000)  /* SDRAM device size in MBytes */
 
@@ -77,15 +66,11 @@
 #define SDRAM_MODEREG_CAS_LATENCY_2              ((uint16_t)0x0020)
 #define SDRAM_MODEREG_CAS_LATENCY_3              ((uint16_t)0x0030)
 #define SDRAM_MODEREG_OPERATING_MODE_STANDARD    ((uint16_t)0x0000)
-#define SDRAM_MODEREG_WRITEBURST_MODE_PROGRAMMED ((uint16_t)0x0000) 
-#define SDRAM_MODEREG_WRITEBURST_MODE_SINGLE     ((uint16_t)0x0200) 
+#define SDRAM_MODEREG_WRITEBURST_MODE_PROGRAMMED ((uint16_t)0x0000)
+#define SDRAM_MODEREG_WRITEBURST_MODE_SINGLE     ((uint16_t)0x0200)
 */
 
-extern SDRAM_HandleTypeDef _HSDRAM;
-
-/** @defgroup STM32H743I_EVAL_SDRAM_Exported_Functions
-  * @{
-  */  
+/* Exported functions --------------------------------------------------------*/   
 uint8_t BSP_SDRAM_Init(void);
 uint8_t BSP_SDRAM_ReadData(uint32_t uwStartAddress, uint32_t *pData, uint32_t uwDataSize);
 uint8_t BSP_SDRAM_ReadData_DMA(uint32_t uwStartAddress, uint32_t *pData, uint32_t uwDataSize);
@@ -99,6 +84,6 @@ uint8_t BSP_SDRAM_Sendcmd(FMC_SDRAM_CommandTypeDef *SdramCmd);
 }
 #endif
 
-#endif /* __STM32H7XX_SDRAM_H */
+#endif /* __${FamilyName}_SDRAM_H */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

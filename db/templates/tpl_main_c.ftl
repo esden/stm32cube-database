@@ -17,6 +17,11 @@
 [#if H7_ETH_NoLWIP?? &&HALCompliant??]
 #include "string.h"
 [/#if]
+
+[#-- IF GFXMMU is used and all is generated in the main and the Lut is configured--]
+[#if GFXMMUisUsed?? && HALCompliant??]
+[@common.optincludeFile path="Inc" name="gfxmmu_lut.h"/]
+[/#if]
 [#-- move includes to main.h --]
 [@common.optinclude name="Src/rtos_inc.tmp"/][#--include freertos includes --]
 [#-- if !HALCompliant??--][#-- if HALCompliant Begin --]
@@ -523,6 +528,9 @@ static void MX_NVIC_Init(void)
     [/#if]
     [#-- Generate service code --]
     #n[@common.generateServiceCode ipName=instName serviceType="Init" modeName="mode" instHandler=instName tabN=1 IPData=instanceData/] 
+[/#if]
+[#if ipName?contains("SPI")]
+#t/* ${instName}   parameter configuration*/
 [/#if]
 [#if instanceData.instIndex??][@common.generateConfigModelListCode configModel=instanceData inst=instName  nTab=1 index=instanceData.instIndex/][#else][@common.generateConfigModelListCode configModel=instanceData inst=instName  nTab=1 index=""/][/#if]
 

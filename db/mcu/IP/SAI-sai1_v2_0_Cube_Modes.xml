@@ -178,8 +178,8 @@
 	</RefParameter>
 	
 	<RefParameter Comment="    Synchronization External" DefaultValue="SAI_SYNCEXT_DISABLE" Group="Advanced Parameters" Name="SynchroExt" Type="list">
-		<PossibleValue Comment="Disabled" Value="SAI_SYNCEXT_DISABLE"/>
-		<PossibleValue Comment="Input enabled" Value="SAI_SYNCEXT_OUTBLOCKA_ENABLE"/>
+		<PossibleValue Comment="Disabled (No synchronization output signals)" Value="SAI_SYNCEXT_DISABLE"/>
+		<!--<PossibleValue Comment="Input enabled" Value="SAI_SYNCEXT_OUTBLOCKA_ENABLE"/>-->
 		<PossibleValue Comment="Output SAI A enabled" Value="SAI_SYNCEXT_OUTBLOCKA_ENABLE"/>
 		<PossibleValue Comment="Output SAI B enabled" Value="SAI_SYNCEXT_OUTBLOCKB_ENABLE"/>
 	</RefParameter>
@@ -434,6 +434,13 @@
 	</RefParameter>
 	<RefParameter Comment="    Master Clock Divider" DefaultValue="null" Group="Clock Parameters" Name="NoDivider" Type="integer" Visible="false" NoCheckOpt="false"/>
 	
+	<RefParameter Comment="    Master Clock Over Sampling" DefaultValue="SAI_MCK_OVERSAMPLING_DISABLE" Group="Clock Parameters" Name="MckOverSampling" Type="list">
+		<Condition Diagnostic="" Expression="((VirtualMode=VM_MASTER) &amp; !((Protocol=SAI_AC97_PROTOCOL)) &amp;DIE470)"/>
+		<PossibleValue Comment="Enabled" Value="SAI_MCK_OVERSAMPLING_ENABLE"/>
+		<PossibleValue Comment="Disabled" Value="SAI_MCK_OVERSAMPLING_DISABLE"/>
+	</RefParameter>
+	<RefParameter Comment="    Master Clock Over Sampling" DefaultValue="null" Group="Clock Parameters" Name="MckOverSampling" Type="integer" Visible="false" NoCheckOpt="false"/>
+	
 	<RefParameter Comment="    Audio Frequency" DefaultValue="SAI_AUDIO_FREQUENCY_192K" Group="Clock Parameters" Name="AudioFrequency" Type="list">
 		<Condition Diagnostic="" Expression="(((VirtualMode=VM_MASTER) &amp; (NoDivider=SAI_MASTERDIVIDER_ENABLE)) &amp; !((Protocol=SAI_AC97_PROTOCOL) | (Protocol=SAI_SPDIF_PROTOCOL)))"/>		
 		<PossibleValue Comment="192 KHz" Value="SAI_AUDIO_FREQUENCY_192K"/>
@@ -509,6 +516,9 @@
 		<PossibleValue Comment="Rising Edge" Value="SAI_CLOCKSTROBING_RISINGEDGE"/>
 	</RefParameter>
 
+	<RefParameter Comment="    Master Clock Divider" DefaultValue="0" Group="Clock Parameters" Max="63" Min="0" Name="Mckdiv" Type="integer" NoCheckOpt="false">
+		<Condition Diagnostic="Master Clock frequency is equal to SAI Clock frequency" Expression="(AudioFrequency=SAI_AUDIO_FREQUENCY_MCKDIV) &amp; (NoDivider=SAI_MASTERDIVIDER_ENABLE) &amp; (DIE470)"/>
+	</RefParameter>
 	<RefParameter Comment="    Master Clock Divider" DefaultValue="0" Group="Clock Parameters" Max="15" Min="0" Name="Mckdiv" Type="integer" NoCheckOpt="false">
 		<Condition Diagnostic="Master Clock frequency is equal to SAI Clock frequency" Expression="(AudioFrequency=SAI_AUDIO_FREQUENCY_MCKDIV) &amp; (NoDivider=SAI_MASTERDIVIDER_ENABLE)"/>
 	</RefParameter>
@@ -582,6 +592,8 @@
 		<Parameter Name="FIFOThreshold"/>
 		<Parameter Name="OutputDrive"/>
 		<Parameter Name="SynchroExt"/>	
+		<!-- Bug35768 -->
+		<Parameter Name="MckOverSampling"/>
 		<Condition Diagnostic="" Expression="!$IpInstance_SAIA_INIT_PROTOCOL"/>
 	</RefMode>
 	<!-- RefModes 'Master Basic Mode' for SAI_A -->
@@ -620,7 +632,9 @@
 		<!-- Advanced Parameters -->		
 		<Parameter Name="FIFOThreshold"/>
 		<Parameter Name="OutputDrive"/>
-		<Parameter Name="SynchroExt"/>		
+		<Parameter Name="SynchroExt"/>
+		<!-- Bug35768 -->
+		<Parameter Name="MckOverSampling"/>		
 		<Parameter Name="InitProtocol">
 			<PossibleValue>Enable</PossibleValue>
 		</Parameter>	
@@ -692,6 +706,8 @@
 		<Parameter Name="FIFOThreshold"/>
 		<Parameter Name="OutputDrive"/>
 		<Parameter Name="SynchroExt"/>	
+		<!-- Bug35768 -->
+		<Parameter Name="MckOverSampling"/>
 		<Condition Diagnostic="" Expression="!$IpInstance_SAIA_INIT_PROTOCOL"/>		
 	</RefMode>
 	
@@ -733,6 +749,8 @@
 		<Parameter Name="FIFOThreshold"/>
 		<Parameter Name="OutputDrive"/>
 		<Parameter Name="SynchroExt"/>
+		<!-- Bug35768 -->
+		<Parameter Name="MckOverSampling"/>
         <Parameter Name="InitProtocol">
 			<PossibleValue>Enable</PossibleValue>
 		</Parameter>		
@@ -801,6 +819,8 @@
 		<Parameter Name="FIFOThreshold"/>
 		<Parameter Name="OutputDrive"/>
 		<Parameter Name="SynchroExt"/>	
+		<!-- Bug35768 -->
+		<Parameter Name="MckOverSampling"/>
 		<Condition Diagnostic="" Expression="!$IpInstance_SAIA_INIT_PROTOCOL"/>		
 	</RefMode>	
 	<!-- RefModes 'Slave Asynchronous Basic Mode' for SAI_A -->
@@ -838,6 +858,8 @@
 		<Parameter Name="FIFOThreshold"/>
 		<Parameter Name="OutputDrive"/>
 		<Parameter Name="SynchroExt"/>	
+		<!-- Bug35768 -->
+		<Parameter Name="MckOverSampling"/>
         <Parameter Name="InitProtocol">
 			<PossibleValue>Enable</PossibleValue>
 		</Parameter>	
@@ -906,6 +928,8 @@
 		<Parameter Name="FIFOThreshold"/>
 		<Parameter Name="OutputDrive"/>
 		<Parameter Name="SynchroExt"/>	
+		<!-- Bug35768 -->
+		<Parameter Name="MckOverSampling"/>
 		<Condition Diagnostic="" Expression="!$IpInstance_SAIA_INIT_PROTOCOL"/>		
 	</RefMode>
 	<!-- RefModes 'Slave Asynchronous Basic Mode' for SAI_A -->
@@ -942,7 +966,9 @@
 		<!-- Advanced Parameters -->		
 		<Parameter Name="FIFOThreshold"/>
 		<Parameter Name="OutputDrive"/>
-		<Parameter Name="SynchroExt"/>		
+		<Parameter Name="SynchroExt"/>	
+		<!-- Bug35768 -->
+		<Parameter Name="MckOverSampling"/>
         <Parameter Name="InitProtocol">
 			<PossibleValue>Enable</PossibleValue>
 		</Parameter>
@@ -1012,7 +1038,11 @@
 		<!-- Advanced Parameters -->	
 		<Parameter Name="FIFOThreshold"/>
 		<Parameter Name="OutputDrive"/>
-		<Parameter Name="SynchroExt"/>	
+		<!-- Bug35882
+		<Parameter Name="SynchroExt"/>
+		-->
+		<!-- Bug35768 -->
+		<Parameter Name="MckOverSampling"/>
 		<Condition Diagnostic="" Expression="!$IpInstance_SAIA_INIT_PROTOCOL"/>		
 	</RefMode>
 	<RefMode Comment="Basic protocol" Group="SAI A" Name="SAI_A_BASIC">			
@@ -1085,6 +1115,8 @@
 		<Parameter Name="FIFOThreshold"/>
 		<Parameter Name="OutputDrive"/>
 		<Parameter Name="SynchroExt"/>	
+		<!-- Bug35768 -->
+		<Parameter Name="MckOverSampling"/>
 		<Condition Diagnostic="" Expression="!$IpInstance_SAIB_INIT_PROTOCOL"/>
 	</RefMode>
 	<!-- RefModes 'Master Basic Mode' for SAI_B -->
@@ -1123,7 +1155,9 @@
 		<!-- Advanced Parameters -->		
 		<Parameter Name="FIFOThreshold"/>
 		<Parameter Name="OutputDrive"/>
-		<Parameter Name="SynchroExt"/>	        
+		<Parameter Name="SynchroExt"/>	
+		<!-- Bug35768 -->
+		<Parameter Name="MckOverSampling"/>
         <Parameter Name="InitProtocol">
 			<PossibleValue>Enable</PossibleValue>
 		</Parameter>
@@ -1195,6 +1229,8 @@
 		<Parameter Name="FIFOThreshold"/>
 		<Parameter Name="OutputDrive"/>
 		<Parameter Name="SynchroExt"/>	
+		<!-- Bug35768 -->
+		<Parameter Name="MckOverSampling"/>
 		<Condition Diagnostic="" Expression="!$IpInstance_SAIB_INIT_PROTOCOL"/>
 	</RefMode>
 	<!-- RefModes 'Master witch clock Basic Mode' for SAI_B -->
@@ -1235,6 +1271,8 @@
 		<Parameter Name="FIFOThreshold"/>
 		<Parameter Name="OutputDrive"/>
 		<Parameter Name="SynchroExt"/>	
+		<!-- Bug35768 -->
+		<Parameter Name="MckOverSampling"/>
 		<Parameter Name="InitProtocol">
 			<PossibleValue>Enable</PossibleValue>
 		</Parameter>
@@ -1303,6 +1341,8 @@
 		<Parameter Name="FIFOThreshold"/>
 		<Parameter Name="OutputDrive"/>
 		<Parameter Name="SynchroExt"/>	
+		<!-- Bug35768 -->
+		<Parameter Name="MckOverSampling"/>
 		<Condition Diagnostic="" Expression="!$IpInstance_SAIB_INIT_PROTOCOL"/>
 	</RefMode>
 	<!-- RefModes 'Slave Asynchronous Basic Mode' for SAI_B -->
@@ -1340,6 +1380,8 @@
 		<Parameter Name="FIFOThreshold"/>
 		<Parameter Name="OutputDrive"/>
 		<Parameter Name="SynchroExt"/>	
+		<!-- Bug35768 -->
+		<Parameter Name="MckOverSampling"/>
 		<Parameter Name="InitProtocol">
 			<PossibleValue>Enable</PossibleValue>
 		</Parameter>
@@ -1408,6 +1450,8 @@
 		<Parameter Name="FIFOThreshold"/>
 		<Parameter Name="OutputDrive"/>
 		<Parameter Name="SynchroExt"/>	
+		<!-- Bug35768 -->
+		<Parameter Name="MckOverSampling"/>
 		<Condition Diagnostic="" Expression="!$IpInstance_SAIB_INIT_PROTOCOL"/>
 	</RefMode>
 	<!-- RefModes 'Slave Asynchronous Basic Mode' for SAI_B -->
@@ -1445,6 +1489,8 @@
 		<Parameter Name="FIFOThreshold"/>
 		<Parameter Name="OutputDrive"/>
 		<Parameter Name="SynchroExt"/>	
+		<!-- Bug35768 -->
+		<Parameter Name="MckOverSampling"/>
 		<Parameter Name="InitProtocol">
 			<PossibleValue>Enable</PossibleValue>
 		</Parameter>
@@ -1514,7 +1560,11 @@
 		<!-- Advanced Parameters -->		
 		<Parameter Name="FIFOThreshold"/>
 		<Parameter Name="OutputDrive"/>
-		<Parameter Name="SynchroExt"/>	
+		<!-- Bug35882
+		<Parameter Name="SynchroExt"/>
+		-->
+		<!-- Bug35768 -->
+		<Parameter Name="MckOverSampling"/>
 		<Condition Diagnostic="" Expression="!$IpInstance_SAIB_INIT_PROTOCOL"/>
 	</RefMode>
 					
@@ -1592,6 +1642,8 @@
 		<Parameter Name="FIFOThreshold"/>
 		<Parameter Name="OutputDrive"/>
 		<Parameter Name="SynchroExt"/>	
+		<!-- Bug35768 -->
+		<Parameter Name="MckOverSampling"/>
 		<!-- Pdm Parameters -->		
 		<Parameter Name="Activation">
 			<PossibleValue>ENABLE</PossibleValue>

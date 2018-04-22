@@ -10,47 +10,26 @@
   */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __STM32F7XX_SD_H
-#define __STM32F7XX_SD_H
+#ifndef __${FamilyName}_SD_H
+#define __${FamilyName}_SD_H
 
 #ifdef __cplusplus
  extern "C" {
 #endif 
 
 /* Includes ------------------------------------------------------------------*/
-#include "stm32f7xx_hal.h"
+#include "${FamilyName?lower_case}xx_hal.h"
 [#if Platform??]
 #include "fatfs_platform.h"
 [/#if]
 
-[#-- SWIPdatas is a list of SWIPconfigModel --]  
-[#list SWIPdatas as SWIP]  
-
-[#if SWIP.defines??]
-	[#list SWIP.defines as definition]	
-/*---------- Defines for SDMMC -----------*/
-#define ${definition.name} #t#t ${definition.value} 
-[#if definition.description??]${definition.description} [/#if]
-[#if definition.value == "hsd1"]
-#define _SD_CARD_INFO SDCardInfo1
-[#else]
-#define _SD_CARD_INFO SDCardInfo2
-[/#if]
-	[/#list]
-[/#if]
-
-
-[/#list]
-
-/* Exported constants --------------------------------------------------------*/ 
-
+/* Exported types --------------------------------------------------------*/ 
 /** 
   * @brief SD Card information structure 
   */
-#ifndef BSP_SD_CardInfo
-  #define BSP_SD_CardInfo HAL_SD_CardInfoTypeDef
-#endif
+#define BSP_SD_CardInfo HAL_SD_CardInfoTypeDef
 
+/* Exported constants --------------------------------------------------------*/ 
 /**
   * @brief  SD status structure definition  
   */     
@@ -64,12 +43,8 @@
 #define   SD_TRANSFER_OK                ((uint8_t)0x00)
 #define   SD_TRANSFER_BUSY              ((uint8_t)0x01)
 
-/** @defgroup STM32756G_EVAL_SD_Exported_Constants
-  * @{
-  */ 
 #define SD_PRESENT               ((uint8_t)0x01)
 #define SD_NOT_PRESENT           ((uint8_t)0x00)
-
 #define SD_DATATIMEOUT           ((uint32_t)100000000)
 
 #ifdef OLD_API
@@ -79,19 +54,6 @@
 /* USER CODE END 0 */ 
 #else
 /* USER CODE BEGIN BSP_H_CODE */
-/* DMA definitions for SD DMA transfer */
-/*
-#define __DMAx_TxRx_CLK_ENABLE            __HAL_RCC_DMA2_CLK_ENABLE
-#define SD_DMAx_Tx_CHANNEL                DMA_CHANNEL_4
-#define SD_DMAx_Rx_CHANNEL                DMA_CHANNEL_4
-#define SD_DMAx_Tx_STREAM                 DMA2_Stream6  
-#define SD_DMAx_Rx_STREAM                 DMA2_Stream3  
-#define SD_DMAx_Tx_IRQn                   DMA2_Stream6_IRQn
-#define SD_DMAx_Rx_IRQn                   DMA2_Stream3_IRQn
-#define SD_DMAx_Tx_IRQHandler             DMA2_Stream6_IRQHandler   
-#define SD_DMAx_Rx_IRQHandler             DMA2_Stream3_IRQHandler 
-#define SD_DetectIRQHandler()             HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_8)
-*/
 
 /* Exported functions --------------------------------------------------------*/   
 uint8_t BSP_SD_Init(void);
@@ -113,6 +75,6 @@ uint8_t BSP_SD_IsDetected(void);
 }
 #endif
 
-#endif /* __STM32F7XX_SD_H */
+#endif /* __${FamilyName}_SD_H */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

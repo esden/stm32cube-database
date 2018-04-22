@@ -23,7 +23,11 @@
 [@common.getLocalVariableList instanceData=instanceData/]      
 #n      
 #t/* Disables the MPU */
+[#if LL_Used?? && LL_Used=="true"]
+#tLL_MPU_Disable();
+[#else]
 #tHAL_MPU_Disable();
+[/#if]
     [#if instanceData.instIndex??]
         [@common.generateConfigModelListCode configModel=instanceData inst=instName  nTab=1 index=instanceData.instIndex/]
     [#else]
@@ -32,7 +36,11 @@
         
 [/#if]
 #t/* Enables the MPU */
+[#if LL_Used?? && LL_Used=="true"]
+#tLL_MPU_Enable(${mpuControl});
+[#else]
 #tHAL_MPU_Enable(${mpuControl});
+[/#if]
 #n}
 [/#list]
 

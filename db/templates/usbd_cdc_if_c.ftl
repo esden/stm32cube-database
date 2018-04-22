@@ -25,8 +25,24 @@
 [/#if]
 [#-- Global variables --]
 [/#compress]
-[/#list]
 
+[#assign RX_DATA_SIZE = 4]
+[#assign TX_DATA_SIZE = 4]
+[#compress]
+[#if SWIP.defines??]
+	[#list SWIP.defines as definition]	
+	[#assign value = definition.value]		
+    [#if definition.name="APP_RX_DATA_SIZE"]  	
+[#assign RX_DATA_SIZE = definition.value] 
+    [/#if]	
+	[#if definition.name="APP_TX_DATA_SIZE"]  	
+[#assign TX_DATA_SIZE = definition.value] 
+    [/#if]	
+	[/#list]
+[/#if]
+[/#compress]
+
+[/#list]
 
 /* Includes ------------------------------------------------------------------*/
 #include "usbd_cdc_if.h"
@@ -59,8 +75,8 @@
 /* USER CODE BEGIN PRIVATE_DEFINES */
 /* Define size for the receive and transmit buffer over CDC */
 /* It's up to user to redefine and/or remove those define */
-#define APP_RX_DATA_SIZE  4
-#define APP_TX_DATA_SIZE  4
+#define APP_RX_DATA_SIZE  ${RX_DATA_SIZE}
+#define APP_TX_DATA_SIZE  ${TX_DATA_SIZE}
 /* USER CODE END PRIVATE_DEFINES */
 /**
   * @}
