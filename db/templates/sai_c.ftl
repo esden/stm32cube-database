@@ -54,7 +54,7 @@
 #include "gpio.h"
 [/#if]
 [#if useDma]
-#include "DMA.h"
+#include "dma.h"
 [/#if]
 [#-- End Define includes --]
 

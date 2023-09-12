@@ -6,12 +6,15 @@
 [#list SWIPdatas as SWIP]
   [#if SWIP.variables??]
   
-	[#list SWIP.variables as variable]
+    [#list SWIP.variables as variable]
 	  
-	  [#if variable.name=="Threads"]
+    [#if variable.name=="Threads"]
 	  [#assign s = variable.valueList]
 	    [#assign index = 0]
         [#list s as i]
+          [#if index == 0]
+            [#assign threadName = i]
+          [/#if]        
           [#if index == 3]
             [#assign threadFunction = i]
           [/#if]
@@ -29,7 +32,14 @@
          [#if generateFunction == "1"]
           [#if option == "As external"]
           [#else]
-           /* ${threadFunction} function */ 
+           [#-- /* ${threadFunction} function */ --]
+           /* USER CODE BEGIN Header_${threadFunction} */
+           /**
+             * @brief  Function implementing the ${threadName} thread.
+             * @param  argument: Not used 
+             * @retval None
+             */ 
+           /* USER CODE END Header_${threadFunction} */
            [#if option == "As weak"]
            __weak void ${threadFunction}(void const * argument) 
            [#else]

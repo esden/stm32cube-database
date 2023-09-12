@@ -145,7 +145,7 @@
 #define  VDD_VALUE                    ((uint32_t)[#if vdd_value??]${vdd_value}[#else]3300[/#if]U) /*!< Value of VDD in mv */
 #define  TICK_INT_PRIORITY            ((uint32_t)[#if TICK_INT_PRIORITY??]${TICK_INT_PRIORITY}[#else]0x0F[/#if]U) /*!< tick interrupt priority */
 #define  USE_RTOS                     [#if advancedSettings?? && advancedSettings.USE_RTOS??]${advancedSettings.USE_RTOS}[#else]0[/#if]U
-
+#define  USE_SD_TRANSCEIVER           1U               /*!< use uSD Transceiver */
 /* ########################## Assert Selection ############################## */
 /**
   * @brief Uncomment the line below to expanse the "assert_param" macro in the 

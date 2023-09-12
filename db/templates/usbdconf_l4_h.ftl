@@ -1,7 +1,10 @@
 [#ftl]
+[#assign s = name]
+[#assign titi = s?replace("Target/","")]
+[#assign toto = titi?replace(".","__")]
 /**
   ******************************************************************************
-  * @file           : ${name}
+  * @file           : ${titi}
   * @version        : ${version}
 [#--  * @packageVersion : ${fwVersion} --]
   * @brief          : Header for usbd_conf.c file.
@@ -10,8 +13,7 @@
   ******************************************************************************
   */
 
-[#assign s = name]
-[#assign toto = s?replace(".","__")]
+
 [#assign inclusion_protection = toto?upper_case]
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __${inclusion_protection}__

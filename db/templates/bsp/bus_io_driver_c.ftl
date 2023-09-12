@@ -42,7 +42,7 @@
 [#-- extern SPI_HandleTypeDef hbus${SpiIpInstance?lower_case};						--]
 					[#elseif !SpiIpInstanceList?contains(bsp.solution)]
 						[#assign SpiIpInstance = bsp.solution]
-						[#assign SpiIpInstanceList = SpiIpInstanceList + ", " + bsp.solution]
+						[#assign SpiIpInstanceList = SpiIpInstanceList + "," + bsp.solution]
 [#-- extern SPI_HandleTypeDef hbus${SpiIpInstance?lower_case};--]
 					[/#if]
 				[#break]
@@ -53,7 +53,7 @@
 [#-- extern I2C_HandleTypeDef hbus${I2CIpInstance?lower_case};	--]										
 					[#elseif !I2CIpInstanceList?contains(bsp.solution)]
 						[#assign I2CIpInstance = bsp.solution]
-						[#assign I2CIpInstanceList = I2CIpInstanceList + ", " + bsp.solution]
+						[#assign I2CIpInstanceList = I2CIpInstanceList + "," + bsp.solution]
 [#-- extern I2C_HandleTypeDef hbus${I2CIpInstance?lower_case}; --]
 					[/#if]
 				[#break]  
@@ -88,7 +88,7 @@
 __weak HAL_StatusTypeDef MX_${SpiIpInstance}_Init(SPI_HandleTypeDef* hspi);
 					[#elseif !SpiIpInstanceList?contains(bsp.solution)]
 						[#assign SpiIpInstance = bsp.solution]
-						[#assign SpiIpInstanceList = SpiIpInstanceList + ", " + bsp.solution]
+						[#assign SpiIpInstanceList = SpiIpInstanceList + "," + bsp.solution]
 [#-- A.T MX_PPPx_Init prototype updated after reveiw with Maher --]
 __weak HAL_StatusTypeDef MX_${SpiIpInstance}_Init(SPI_HandleTypeDef* hspi);
 					[/#if]
@@ -101,7 +101,7 @@ __weak HAL_StatusTypeDef MX_${SpiIpInstance}_Init(SPI_HandleTypeDef* hspi);
 __weak HAL_StatusTypeDef MX_${I2CIpInstance}_Init(I2C_HandleTypeDef* hi2c);											
 					[#elseif !I2CIpInstanceList?contains(bsp.solution)]
 						[#assign I2CIpInstance = bsp.solution]
-						[#assign I2CIpInstanceList = I2CIpInstanceList + ", " + bsp.solution]
+						[#assign I2CIpInstanceList = I2CIpInstanceList + "," + bsp.solution]
 [#-- A.T MX_PPPx_Init prototype updated after reveiw with Maher --]
 __weak HAL_StatusTypeDef MX_${I2CIpInstance}_Init(I2C_HandleTypeDef* hi2c);
 					[/#if]
@@ -150,7 +150,7 @@ __weak HAL_StatusTypeDef MX_${I2CIpInstance}_Init(I2C_HandleTypeDef* hi2c);
 SPI_HandleTypeDef hbus${SpiIpInstance?lower_case};						
 					[#elseif !SpiIpInstanceList?contains(bsp.solution)]
 						[#assign SpiIpInstance = bsp.solution]
-						[#assign SpiIpInstanceList = SpiIpInstanceList + ", " + bsp.solution]
+						[#assign SpiIpInstanceList = SpiIpInstanceList + "," + bsp.solution]
 [#-- extern : A.T removed after reveiw with Maher --]
 SPI_HandleTypeDef hbus${SpiIpInstance?lower_case};
 					[/#if]
@@ -163,7 +163,7 @@ SPI_HandleTypeDef hbus${SpiIpInstance?lower_case};
 I2C_HandleTypeDef hbus${I2CIpInstance?lower_case};											
 					[#elseif !I2CIpInstanceList?contains(bsp.solution)]
 						[#assign I2CIpInstance = bsp.solution]
-						[#assign I2CIpInstanceList = I2CIpInstanceList + ", " + bsp.solution]
+						[#assign I2CIpInstanceList = I2CIpInstanceList + "," + bsp.solution]
 [#-- extern : A.T removed after reveiw with Maher --]
 I2C_HandleTypeDef hbus${I2CIpInstance?lower_case};
 					[/#if]
@@ -200,7 +200,7 @@ static uint32_t Is${SpiIpInstance}MspCbValid = 0;
 #endif /* USE_HAL_SPI_REGISTER_CALLBACKS */			
 					[#elseif !SpiIpInstanceList?contains(bsp.solution)]
 						[#assign SpiIpInstance = bsp.solution]
-						[#assign SpiIpInstanceList = SpiIpInstanceList + ", " + bsp.solution]
+						[#assign SpiIpInstanceList = SpiIpInstanceList + "," + bsp.solution]
 #if (USE_HAL_SPI_REGISTER_CALLBACKS == 1)
 static uint32_t Is${SpiIpInstance}MspCbValid = 0;	
 #endif /* USE_HAL_SPI_REGISTER_CALLBACKS */
@@ -215,7 +215,7 @@ static uint32_t Is${I2CIpInstance}MspCbValid = 0;
 #endif /* USE_HAL_I2C_REGISTER_CALLBACKS */				
 					[#elseif !I2CIpInstanceList?contains(bsp.solution)]
 						[#assign I2CIpInstance = bsp.solution]
-						[#assign I2CIpInstanceList = I2CIpInstanceList + ", " + bsp.solution]
+						[#assign I2CIpInstanceList = I2CIpInstanceList + "," + bsp.solution]
 #if (USE_HAL_I2C_REGISTER_CALLBACKS == 1)
 static uint32_t Is${I2CIpInstance}MspCbValid = 0;											
 #endif /* USE_HAL_I2C_REGISTER_CALLBACKS */
@@ -237,16 +237,55 @@ static uint32_t Is${I2CIpInstance}MspCbValid = 0;
   * @{
   */  
 
-[#-- A.T/ Include SPIx_MspInit() --]
-[#if SpiIpInstance != ""]
+[#assign IpName = ""]
+[#assign SpiIpInstance = ""]
+[#assign SpiIpInstanceList = ""]
+[#assign I2CIpInstance = ""]
+[#assign I2CIpInstanceList = ""]
+[#assign I2C = ""]
+[#assign I2CInstance = ""]
+[#assign SPI = ""]
+[#assign SPIInstance = ""]
+[#assign SPIDone = ""]
+[#list BspIpDatas as SWIP] 
+	[#if SWIP.bsp??]
+		[#list SWIP.bsp as bsp]
+			[#assign IpName = bsp.bspIpName]			
+			[#if IpName??]
+				[#switch IpName]
+					[#case "SPI"]					
+					[#if SpiIpInstanceList == ""]
+						[#assign SpiIpInstance = bsp.solution]
+                        [#assign SpiIpInstanceList = bsp.solution]
 static void ${SpiIpInstance}_MspInit(SPI_HandleTypeDef* spiHandle); 
 static void ${SpiIpInstance}_MspDeInit(SPI_HandleTypeDef* spiHandle);
-[/#if]
-[#-- A.T/ Include I2Cx_MspInit() --]
-[#if I2CIpInstance != ""]
+					[#elseif !SpiIpInstanceList?contains(bsp.solution)]
+						[#assign SpiIpInstance = bsp.solution]
+						[#assign SpiIpInstanceList = SpiIpInstanceList + "," + bsp.solution]
+static void ${SpiIpInstance}_MspInit(SPI_HandleTypeDef* spiHandle); 
+static void ${SpiIpInstance}_MspDeInit(SPI_HandleTypeDef* spiHandle);
+					[/#if]
+				[#break]
+				[#case "I2C"]
+					[#if I2CIpInstanceList == ""]
+						[#assign I2CIpInstance = bsp.solution]
+						[#assign I2CIpInstanceList = bsp.solution]
 static void ${I2CIpInstance}_MspInit(I2C_HandleTypeDef* i2cHandle); 
 static void ${I2CIpInstance}_MspDeInit(I2C_HandleTypeDef* i2cHandle);
-[/#if]
+					[#elseif !I2CIpInstanceList?contains(bsp.solution)]
+						[#assign I2CIpInstance = bsp.solution]
+						[#assign I2CIpInstanceList = I2CIpInstanceList + "," + bsp.solution]
+static void ${I2CIpInstance}_MspInit(I2C_HandleTypeDef* i2cHandle); 
+static void ${I2CIpInstance}_MspDeInit(I2C_HandleTypeDef* i2cHandle);
+					[/#if]
+				[#break]  
+				[#default]
+					...
+				[/#switch]
+			[/#if]			
+		[/#list]
+	[/#if]
+[/#list]
 
 /**
   * @}
@@ -283,7 +322,7 @@ static void ${I2CIpInstance}_MspDeInit(I2C_HandleTypeDef* i2cHandle);
 						[@generateBspSPI_Driver SpiIpInstance/]						
 					[#elseif !SpiIpInstanceList?contains(bsp.solution)]
 						[#assign SpiIpInstance = bsp.solution]
-						[#assign SpiIpInstanceList = SpiIpInstanceList + ", " + bsp.solution]
+						[#assign SpiIpInstanceList = SpiIpInstanceList + "," + bsp.solution]
 						[@generateBspSPI_Driver SpiIpInstance/]
 					[/#if]
 				[#break]
@@ -295,7 +334,7 @@ static void ${I2CIpInstance}_MspDeInit(I2C_HandleTypeDef* i2cHandle);
 						[@generateBspI2C_Driver I2CIpInstance/]						
 					[#elseif !I2CIpInstanceList?contains(bsp.solution)]
 						[#assign I2CIpInstance = bsp.solution]
-						[#assign I2CIpInstanceList = I2CIpInstanceList + ", " + bsp.solution]
+						[#assign I2CIpInstanceList = I2CIpInstanceList + "," + bsp.solution]
 						[@generateBspI2C_Driver I2CIpInstance/]
 					[/#if]
 				[#break]  
@@ -330,7 +369,7 @@ static void ${I2CIpInstance}_MspDeInit(I2C_HandleTypeDef* i2cHandle);
 						[@registerMspSpiCallBack IpName SpiIpInstance SpiIpInstance/]						
 					[#elseif !SpiIpInstanceList?contains(bsp.solution)]
 						[#assign SpiIpInstance = bsp.solution]
-						[#assign SpiIpInstanceList = SpiIpInstanceList + ", " + bsp.solution]
+						[#assign SpiIpInstanceList = SpiIpInstanceList + "," + bsp.solution]
 						[@registerMspSpiCallBack IpName SpiIpInstance SpiIpInstance/]
 					[/#if]
 				[#break]
@@ -341,7 +380,7 @@ static void ${I2CIpInstance}_MspDeInit(I2C_HandleTypeDef* i2cHandle);
 						[@registerMspI2CCallBack IpName I2CIpInstance I2CIpInstance/]						
 					[#elseif !I2CIpInstanceList?contains(bsp.solution)]
 						[#assign I2CIpInstance = bsp.solution]
-						[#assign I2CIpInstanceList = I2CIpInstanceList + ", " + bsp.solution]
+						[#assign I2CIpInstanceList = I2CIpInstanceList + "," + bsp.solution]
 						[@registerMspI2CCallBack IpName I2CIpInstance I2CIpInstance/]
 					[/#if]
 				[#break]  
@@ -389,10 +428,13 @@ int32_t BSP_${IpInstance}_Init(void) {
     {
       ret = BSP_ERROR_BUS_FAILURE;
     }
+	[#if FamilyName.contains("STM32L1")]
+	[#else]
     else if(HAL_I2CEx_ConfigAnalogFilter(&hbus${IpInstance?lower_case}, I2C_ANALOGFILTER_ENABLE) != HAL_OK) 
     {
       ret = BSP_ERROR_BUS_FAILURE;
     }
+	[/#if]
     else
     {
       ret = BSP_ERROR_NONE;
@@ -708,7 +750,7 @@ int32_t BSP_GetTick(void) {
 int32_t BSP_${IpInstance}_RegisterDefaultMspCallbacks (void)
 {
 
-  __HAL_${IpName}_RESET_HANDLE_STATE(&hbus${IpHandle?lower_case}});
+  __HAL_${IpName}_RESET_HANDLE_STATE(&hbus${IpHandle?lower_case});
   
   /* Register MspInit Callback */
   if (HAL_${IpName}_RegisterCallback(&hbus${IpHandle?lower_case}, HAL_${IpName}_MSPINIT_CB_ID, ${IpInstance}_MspInit)  != HAL_OK)

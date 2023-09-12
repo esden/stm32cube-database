@@ -1,17 +1,17 @@
 [#ftl]
+[#assign s = name]
+[#assign titi = s?replace("App/","")]
+[#assign toto = titi?replace(".","__")]
 /**
   ******************************************************************************
-  * @file           : ${name}
+  * @file           : ${titi}
   * @version        : ${version}
 [#--  * @packageVersion : ${fwVersion} --]
-  * @brief          : Header for usbd_desc.c file.
+  * @brief          : Header for usbd_conf.c file.
   ******************************************************************************
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
-
-[#assign s = name]
-[#assign toto = s?replace(".","__")]
 [#assign inclusion_protection = toto?upper_case]
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __${inclusion_protection}__

@@ -10,9 +10,10 @@
   ******************************************************************************
   */
  
-[#assign s = name]
-[#assign s_new = s?replace(".","__")]
-[#assign inclusion_protection = s_new?upper_case]
+[#assign s_ori = name]
+[#assign s1 = s_ori?replace(".","__")]
+[#assign s2 = s1?replace("Target/","")]
+[#assign inclusion_protection = s2?upper_case]
 /* Define to prevent recursive inclusion --------------------------------------*/
 #ifndef __${inclusion_protection}__
 #define __${inclusion_protection}__
@@ -554,6 +555,6 @@ extern ${variable.value} ${variable.name};
 #ifdef __cplusplus
 }
 #endif
-#endif /*__${inclusion_protection}_H */
+#endif /*__${inclusion_protection}__ */
 
 /************************* (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

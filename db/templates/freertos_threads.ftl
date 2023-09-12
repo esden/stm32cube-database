@@ -22,6 +22,9 @@
 	  [#assign s = variable.valueList]
 	    [#assign index = 0]
         [#list s as i]
+          [#if index == 0]
+            [#assign threadName = i]
+          [/#if]   
           [#if index == 3]
             [#assign threadFunction = i]
           [/#if]
@@ -34,13 +37,21 @@
         [#if nbThreads == 1]
           [#assign defaultTaskFunction = threadFunction]
           [#assign defaultTaskOption = option]
+          [#assign defaultTaskName = threadName]
         [/#if]
       [/#if]
 	[/#list]
   [/#if]
 [/#list]
 [#assign mw = "empty"]
-#n#n/* ${defaultTaskFunction} function */
+#n#n
+/* USER CODE BEGIN Header_${defaultTaskFunction} */
+/**
+  * @brief  Function implementing the ${defaultTaskName} thread.
+  * @param  argument: Not used 
+  * @retval None
+  */
+/* USER CODE END Header_${defaultTaskFunction} */
 [#if defaultTaskOption == "Default"]
 void ${defaultTaskFunction}(void const * argument)
 [#else]
@@ -122,8 +133,9 @@ __weak void ${defaultTaskFunction}(void const * argument)
           [/#if]
           [#assign index = index + 1]
         [/#list]
-#t/* init code for ${mw?replace("TP_","")?replace("_Init","")} */
-#tTP_${mw}_Init();#n
+		
+#t/* init code for ${mw?replace("MX_","")?replace("_Init","")} */
+#tMX_${mw}_Init();#n
 	  [/#if]
     [/#list]
   [/#if]

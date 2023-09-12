@@ -289,6 +289,7 @@ static void MX_NVIC_Init(void);
   *
   * @retval None
   */
+[#if noMain?? && noMain=="false"]
 int main(void)
 {
   /* USER CODE BEGIN 1 */
@@ -312,18 +313,22 @@ int main(void)
 #t/* MCU Configuration----------------------------------------------------------*/
 [#if clockConfig??]
 #n#t/* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-[#if isHALUsed??]
+    [#if isHALUsed??]
 #tHAL_Init();
-[#else]
-#tLL_Init();
-[/#if]
+    [#else]
+    #tLL_Init();
+    [/#if]
 #n
 #t/* USER CODE BEGIN Init */
 
 #n#t/* USER CODE END Init */
 #n
-#n#t/* Configure the system clock */
-#tSystemClock_Config();
+[#list voids as void]
+    [#if void.functionName?? && void.functionName?contains("SystemClock_Config") && !void.isNotGenerated]
+    #n#t/* Configure the system clock */
+    #tSystemClock_Config();
+    [/#if]
+[/#list]
 [/#if]
 #n
 #t/* USER CODE BEGIN SysInit */
@@ -399,7 +404,7 @@ int main(void)
 [/#if]
 #n
 [#list voids as void]
-[#if void.functionName?? && void.functionName?contains("Process")]
+[#if void.functionName?? && void.functionName?contains("Process") && !FREERTOS??]
 #t${void.functionName}();
 [/#if]
 [/#list]
@@ -411,7 +416,7 @@ int main(void)
 #n
 [#-- if --]
 }
-
+[/#if]
 [#if isHALUsed??]
 [#-- Use HAL_MspInit--]
 [#else]

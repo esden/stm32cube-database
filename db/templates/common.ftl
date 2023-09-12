@@ -739,35 +739,12 @@
                 [#if nTab==2]#t#t[#else]#t[/#if]{
                 [#if nTab==2]#t#t[#else]#t[/#if]#t_Error_Handler(__FILE__, __LINE__);
 
-				[#if inst=="RTC"]
-                [#assign cmp0 = cmp0 +1]
-                [/#if]
+				
 
                 [#if nTab==2]#t#t[#else]#t[/#if]}
                 [#if method.optimizale??&&method.optimizale==true]
                 [#assign listofCalledMethod = listofCalledMethod + ", "+ methodName]
                 [/#if]
-
-
-           [#if inst=="RTC"]
-
-
- #t/* USER CODE BEGIN RTC_Init ${cmp0  } */
-#n
- #t/* USER CODE END RTC_Init ${cmp0 } */
-           [/#if]
-
-
-
-
-
-
-
-
-
-
-
-
 
 
             [/#if]
@@ -1924,7 +1901,39 @@ ${bufferType} ${bufferName}[${bufferSize}];
    [#return initServicesList]
 [/#function]
 [#-- End Function getInitServiceMode --]
+[#-- --]
+[#macro getMspPostInit()]
+    [#assign postinitList = ""]
+    [#list IPdatas as IP]  
+    [#list IP.configModelList as instanceData]
+    [#if instanceData.initServices??]
+        [#if instanceData.initServices.gpioOut??]
+            [#list instanceData.initCallBackInitMethodList as initCallBack]
+                [#if initCallBack?contains("PostInit")]
+                [#assign halMode = instanceData.halMode]
+                    [#assign ipName = instanceData.ipName]
+                    [#assign ipInstance = instanceData.instanceName]
+                    [#if halMode!=ipName&&!ipName?contains("TIM")&&!ipName?contains("CEC")]
+                        [#if !postinitList?contains(initCallBack)]
+                        #nvoid ${initCallBack}(${instanceData.halMode}_HandleTypeDef *h${instanceData.halMode?lower_case});
+                        [#assign postinitList = postinitList+" "+initCallBack]
+                        [/#if]
+                    [#else]
+                        [#if !postinitList?contains(initCallBack)]
+                        #nvoid ${initCallBack}([#if ipName?contains("TIM")&&!(ipName?contains("HRTIM")||ipName?contains("LPTIM"))]TIM_HandleTypeDef *htim[#else]${ipName}_HandleTypeDef *h${ipName?lower_case}[/#if]);
+                        [#assign postinitList = postinitList+" "+initCallBack]
+                         [/#if]
+                    [/#if]
+                    [#break] [#-- take only the first PostInit : case of timer--]
+                [/#if]
+            [/#list]
+        [/#if]
+    [/#if]
+    [/#list]
+    [/#list]
+[/#macro]
 
+[#-- --]
 [#-- Function getDeInitServiceMode --]
 [#function getDeInitServiceMode(ipname2, IPData)] [#--IPData = IPConfigModel --]
     [#-- assign initServicesList = {"test0":"test1"}--]

@@ -273,8 +273,9 @@
         <PossibleValue Comment="Enabled" Value="1"/>
         <Description>When enabled, generate code based on sd_diskio_dma_rtos_template.* files. Please ensure that the DMA controller to be used is properly configured.&lt;br&gt;Note: DMA choice forced to enabled to ensure sync and notification mechanism under FreeRTOS control.</Description>
     </RefParameter>
-
-    <RefParameter Name="USE_DMA_CODE_SD" Comment="Use dma template" DefaultValue="1" Type="list" Group="SDIO/SDMMC" TabName="IPs instances">
+    
+    <!-- Ticket 51476 - [FatFS-SD Card-DMA] Disable dma template use by default (when FreeRTOS is disabled) -->
+    <RefParameter Name="USE_DMA_CODE_SD" Comment="Use dma template" DefaultValue="0" Type="list" Group="SDIO/SDMMC" TabName="IPs instances">
         <Condition Diagnostic="Choice possible when FreeRTOS is disabled." Expression="(FATFS_version &gt; 11) &amp; S_FATFS_SDIO"/>
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
@@ -949,9 +950,17 @@
     </RefParameter>
 
     <RefParameter Name="_FS_EXFAT" Comment="FS_EXFAT (Support of exFAT file system)" DefaultValue="0" Type="list" Group="System Parameters" TabName="Set Defines">
-        <Condition Diagnostic="Available in CubeMx since R0.12 version" Expression="FATFS_version &gt; 11"/>
+        <Condition Diagnostic="Available in CubeMx since R0.12 version" Expression="(FATFS_version &gt; 11) &amp; (!_USE_LFN=0)" />
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
+        <Description>This option switches support of exFAT file system. (0:Disabled or 1:Enabled).&lt;br&gt;
+                     When enable exFAT, also LFN needs to be enabled. (_USE_LFN >= 1).&lt;br&gt;
+                     Note that enabling exFAT discards C89 compatibility.                           
+        </Description>
+    </RefParameter>
+    <RefParameter Name="_FS_EXFAT" Comment="FS_EXFAT (Support of exFAT file system)" DefaultValue="0" Type="list" Group="System Parameters" TabName="Set Defines">
+        <Condition Diagnostic="Forced to disabled as _USE_LFN equals to 0 (Disabled)" Expression="FATFS_version &gt; 11"/>
+        <PossibleValue Comment="Disabled" Value="0"/>
         <Description>This option switches support of exFAT file system. (0:Disabled or 1:Enabled).&lt;br&gt;
                      When enable exFAT, also LFN needs to be enabled. (_USE_LFN >= 1).&lt;br&gt;
                      Note that enabling exFAT discards C89 compatibility.                           

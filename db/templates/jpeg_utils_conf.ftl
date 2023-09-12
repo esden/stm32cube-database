@@ -23,7 +23,7 @@
 #include "stm32f7xx_hal_jpeg.h"
 
 
-#elif defined (STM32H743xx)|| (STM32H753xx) || || (STM32H750xx)
+#elif defined (STM32H743xx)|| (STM32H753xx) || (STM32H750xx)
 #include "stm32h7xx_hal.h"
 #include "stm32h7xx_hal_jpeg.h"
 #endif

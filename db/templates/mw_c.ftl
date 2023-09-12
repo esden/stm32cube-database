@@ -52,7 +52,7 @@
 #include "gpio.h"
 [/#if]
 [#if useDma]
-#include "DMA.h"
+#include "dma.h"
 [/#if]
 
 /* USER CODE BEGIN ${userCodeIdx} */

@@ -51,6 +51,7 @@
 #ifndef STEMWIN_WRAPPER_H
 #define STEMWIN_WRAPPER_H
 [#assign freeRTOS="0"] 
+[#assign dma2dvalue="0"] 
 [#-- SWIPdatas is a list of SWIPconfigModel --]  
 [#list SWIPdatas as SWIP]
 [#-- Global variables --]
@@ -67,6 +68,10 @@ extern ${variable.value} ${variable.name};
 [#if definition.name = "FREERTOS" ]
 [#if definition.value == "1" ]
 [#assign freeRTOS="1"] 
+[/#if]
+[#elseif definition.name = "DMA2D_Graphics" ]
+[#if definition.value != "0"  ]
+[#assign dma2dvalue="1"] 
 [/#if]
 [/#if]
 [/#list]
@@ -89,6 +94,9 @@ void GRAPHICS_HW_Init(void);
 void GRAPHICS_Init(void);
 [#if  freeRTOS=="0"]
 void GRAPHICS_IncTick(void);
+[/#if]
+[#if  dma2dvalue=="1"]
+void DMA2D_Init(void);
 [/#if]
 #endif /* STEMWIN_WRAPPER_H */
 

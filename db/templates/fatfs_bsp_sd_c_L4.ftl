@@ -224,18 +224,6 @@ uint8_t BSP_SD_Erase(uint32_t StartAddr, uint32_t EndAddr)
   return sd_state; 
 }
 
-/* USER CODE BEGIN BeforeHandlersSection */
-/* can be used to modify previous code / undefine following code / add code */
-/* USER CODE END BeforeHandlersSection */
-/**
-  * @brief  Handles SD card interrupt request.
-  * @retval None
-  */
-void BSP_SD_IRQHandler(void)
-{
-  HAL_SD_IRQHandler(&${handle});
-}
-
 /* USER CODE BEGIN BeforeGetCardStateSection */
 /* can be used to modify previous code / undefine following code / add code */
 /* USER CODE END BeforeGetCardStateSection */

@@ -201,27 +201,27 @@
     </RefParameter>
     
     <!-- possible value of DataAlign parameter -->
-    <RefParameter Comment="Data Alignment" DefaultValue="ADC_DATAALIGN_RIGHT" Group="ADCgroup" Name="DataAlign" Type="list">
+    <!--RefParameter Comment="Data Alignment" DefaultValue="ADC_DATAALIGN_RIGHT" Group="ADCgroup" Name="DataAlign" Type="list">
         <Condition Diagnostic="" Expression="EnableRegularConversion=ENABLE &amp; InjNumberOfConversion &gt; 0 &amp; Regular_OversamplingMode_Enabled_$IpInstance &amp; Injected_OversamplingMode_Enabled_$IpInstance"/>
         <PossibleValue Comment="Right alignment" Value="ADC_DATAALIGN_RIGHT"/>
         <PossibleValue Action="Disable" Comment="Left alignment" Condition="Regular_OversamplingMode_Enabled_$IpInstance &amp; Injected_OversamplingMode_Enabled_$IpInstance" Diagnostic="The alignment mode is not available in both Regular and Injected coversion: working with oversampling the data are always provided right-aligned" Value="ADC_DATAALIGN_LEFT"/>
         <Description>Select the alignment of the data stored after conversion.</Description>
-    </RefParameter>
-    <RefParameter Comment="Data Alignment" DefaultValue="ADC_DATAALIGN_RIGHT" Group="ADCgroup" Name="DataAlign" Type="list">
+    </RefParameter-->
+    <!--RefParameter Comment="Data Alignment2" DefaultValue="ADC_DATAALIGN_RIGHT" Group="ADCgroup" Name="DataAlign" Type="list">
         <Condition Diagnostic="" Expression="EnableRegularConversion=ENABLE &amp; InjNumberOfConversion &gt; 0 &amp; Regular_OversamplingMode_Enabled_$IpInstance"/>
         <PossibleValue Comment="Right alignment" Value="ADC_DATAALIGN_RIGHT"/>
         <PossibleValue Comment="Left alignment" Value="ADC_DATAALIGN_LEFT"/>
         <Description>The alignment mode is available only on for Injected conversion. &lt;br/&gt; Regular conversion working with oversampling: the data are always provided right-aligned.</Description>
     </RefParameter>
-    <RefParameter Comment="Data Alignment" DefaultValue="ADC_DATAALIGN_RIGHT" Group="ADCgroup" Name="DataAlign" Type="list">
+    <RefParameter Comment="Data Alignment3" DefaultValue="ADC_DATAALIGN_RIGHT" Group="ADCgroup" Name="DataAlign" Type="list">
         <Condition Diagnostic="" Expression="EnableRegularConversion=ENABLE &amp; InjNumberOfConversion &gt; 0 &amp; Injected_OversamplingMode_Enabled_$IpInstance"/>
         <PossibleValue Comment="Right alignment" Value="ADC_DATAALIGN_RIGHT"/>
         <PossibleValue Comment="Left alignment" Value="ADC_DATAALIGN_LEFT"/>
         <Description>The alignment mode is available only on for Regular conversion. &lt;br/&gt; Injected conversion working with oversampling: the data are always provided right-aligned.</Description>
-    </RefParameter>
+    </RefParameter-->
     
     <RefParameter Comment="Data Alignment" DefaultValue="ADC_DATAALIGN_RIGHT" Group="ADCgroup" Name="DataAlign" Type="list">
-        <Condition Diagnostic="" Expression="((InjNumberOfConversion &gt; 0) &amp; Injected_OversamplingMode_Enabled_$IpInstance) | ((EnableRegularConversion=ENABLE) &amp; Regular_OversamplingMode_Enabled_$IpInstance)"/>
+        <Condition Diagnostic="The alignment mode is available only on for Injected conversion. &lt;br/&gt; Regular conversion working with oversampling: the data are always provided right-aligned." Expression="((InjNumberOfConversion &gt; 0) &amp; Injected_OversamplingMode_Enabled_$IpInstance) | ((EnableRegularConversion=ENABLE) &amp; Regular_OversamplingMode_Enabled_$IpInstance)"/>
         <PossibleValue Comment="Right alignment" Value="ADC_DATAALIGN_RIGHT"/>
         <PossibleValue Action="Disable" Comment="Left alignment" Condition="Injected_OversamplingMode_Enabled_$IpInstance | Regular_OversamplingMode_Enabled_$IpInstance" Diagnostic="The alignment mode is not available when working with oversampling: the data are always provided right-aligned" Value="ADC_DATAALIGN_LEFT"/>
         <Description>Select the alignment of the data stored after conversion.</Description>
@@ -236,7 +236,7 @@
     <!-- ScanconvMode -->
     <RefParameter Comment="Scan Conversion Mode" DefaultValue="ENABLE" Group="ADCgroup" Name="ScanConvMode" Type="list">
         <Condition Diagnostic="" Expression="(NbrOfConversion&gt;1&amp;EnableRegularConversion=ENABLE)|(InjNumberOfConversion&gt;1&amp;EnableInjectedConversion=ENABLE)"/>
-        <PossibleValue Comment="Enabled" Value="ADC_SCAN_ENABLE"/>
+        <PossibleValue Comment="Enabled" Value="ADC_SCAN_ENABLE" Semaphore="ScanConvMode_$IpInstance"/>
         <Description>Enable or Disable the Scan Conversion Mode</Description>
     </RefParameter>
     <RefParameter Comment="Scan Conversion Mode" DefaultValue="DISABLE" Group="ADCgroup" Name="ScanConvMode" Type="list">
@@ -259,9 +259,14 @@
     </RefParameter>
     <RefParameter Comment="Continuous Conversion Mode" DefaultValue="DISABLE" Group="ADCgroup" Name="ContinuousConvMode" Type="list">
         <PossibleValue Comment="Disabled" Value="DISABLE"/>
-        <PossibleValue Action="Disable" Comment="Enabled" Condition="DiscontinuousConvMode = ENABLE" Diagnostic="Continuous and Discontinuous modes could not be used at the same time" Value="ENABLE"/>          
+        <PossibleValue Action="Disable" Comment="Enabled" Semaphore="ContinuousMode_$IpInstance" Condition="DiscontinuousConvMode = ENABLE" Diagnostic="Continuous and Discontinuous modes could not be used at the same time" Value="ENABLE"/>          
     </RefParameter>
     <!-- Possible values of DiscontinuousConvMode parameter -->
+     <RefParameter Comment="Discontinuous Conversion Mode" DefaultValue="DISABLE" Group="ADCgroup" Name="DiscontinuousConvMode" Type="list">
+         <Condition Diagnostic="Discontinuous mode is used only if sequencer(parameter 'ScanConvMode') is enabled. " Expression="!ScanConvMode_$IpInstance"/>
+         <PossibleValue Comment="Disabled" Value="DISABLE"/>
+        <Description>Discontinuous Conversion Mode</Description>
+    </RefParameter>
 		
     <RefParameter Comment="Discontinuous Conversion Mode" DefaultValue="DISABLE" Group="ADCgroup" Name="DiscontinuousConvMode" Type="list">
         <PossibleValue Comment="Disabled" Value="DISABLE"/>
@@ -270,18 +275,90 @@
     </RefParameter>
   		
     <!-- Possible values of NbrOfDiscConversion parameter -->
-    <RefParameter Comment="Number Of Discontinuous Conversions" DefaultValue="1" Max="1" Min="1" Name="NbrOfDiscConversion" Type="integer" Visible="false">
+    <RefParameter Comment="Number Of Discontinuous Conversions" DefaultValue="null" Max="1" Min="1" Name="NbrOfDiscConversion" Type="integer" Visible="false">
         <Condition Diagnostic="" Expression="DiscontinuousConvMode=DISABLE"/>
     </RefParameter>
     <RefParameter Comment="Number Of Discontinuous Conversions" DefaultValue="1" Group="ADCgroup" Max="8" Min="1" Name="NbrOfDiscConversion" Type="integer"/>
 		
     <!-- Possible values of DMAContinuousRequests parameter -->
-    <RefParameter Comment="DMA Continuous Requests" DefaultValue="DISABLE" Group="ADCgroup" Name="DMAContinuousRequests" Type="list">
+    
+       <RefParameter Comment="DMA Continuous Requests" DefaultValue="DISABLE" Group="ADCgroup" Name="DMAContinuousRequests" Type="list">
+           <Condition Diagnostic="" Expression="DMARequest_ADC1 &amp; $IpNumber=1"/>
         <PossibleValue Comment="Disabled" Value="DISABLE"/>
         <PossibleValue Comment="Enabled" Value="ENABLE"/>
         <Description>Enable/Disable DMA Continuous Requests</Description>
     </RefParameter>
-	
+    
+     <RefParameter Comment="DMA Continuous Requests" DefaultValue="DISABLE" Group="ADCgroup" Name="DMAContinuousRequests" Type="list">
+           <Condition Diagnostic="" Expression="DMARequest_ADC2 &amp; $IpNumber=2"/>
+        <PossibleValue Comment="Disabled" Value="DISABLE"/>
+        <PossibleValue Comment="Enabled" Value="ENABLE"/>
+        <Description>Enable/Disable DMA Continuous Requests</Description>
+    </RefParameter>
+   
+    
+     <RefParameter Comment="DMA Continuous Requests" DefaultValue="DISABLE" Group="ADCgroup" Name="DMAContinuousRequests" Type="list">
+           <Condition Diagnostic="" Expression="DMARequest_ADC3 &amp; $IpNumber=3"/>
+        <PossibleValue Comment="Disabled" Value="DISABLE"/>
+        <PossibleValue Comment="Enabled" Value="ENABLE"/>
+        <Description>Enable/Disable DMA Continuous Requests</Description>
+    </RefParameter>
+    
+    <RefParameter Comment="DMA Continuous Requests" DefaultValue="DISABLE" Group="ADCgroup" Name="DMAContinuousRequests" Type="list">
+        <PossibleValue Comment="Disabled" Value="DISABLE"/>
+        <!--PossibleValue Comment="Enabled" Value="ENABLE" /-->      
+        <Description>DMA continuous requests are enabled if a DMA request is configured in DMA Settings Tab.</Description>
+    </RefParameter>
+	 <RefParameter Comment="DMA Continuous Requests" DefaultValue="LIMITED" Group="ADCgroup" Name="DMAContinuousRequestsForConfigFile" Type="list" Visible="false">
+         <Condition Diagnostic="" Expression="$IpNumber=1 &amp; DMARequest_ADC1 &amp; DMAContinuousRequests=DISABLE"/>
+        <PossibleValue Comment="limited" Value="LIMITED"/>
+        <Description>Enable/Disable DMA Continuous Requests</Description>
+    </RefParameter>
+    <RefParameter Comment="DMA Continuous Requests" DefaultValue="UNLIMITED" Group="ADCgroup" Name="DMAContinuousRequestsForConfigFile" Type="list" Visible="false">
+         <Condition Diagnostic="" Expression="$IpNumber=1 &amp; DMARequest_ADC1 &amp; DMAContinuousRequests=ENABLE"/>
+        <PossibleValue Comment="unlimited" Value="UNLIMITED"/>
+        <Description>Enable/Disable DMA Continuous Requests</Description>
+    </RefParameter>
+    <!--RefParameter Comment="DMA Continuous Requests" DefaultValue="NONE" Group="ADCgroup" Name="DMAContinuousRequestsForConfigFile" Type="list" Visible="false">
+         <Condition Diagnostic="" Expression="$IpNumber=1 &amp; !DMARequest_ADC1 &amp; DMAContinuousRequests=DISABLE"/>
+        <PossibleValue Comment="none" Value="NONE"/>
+        <Description>Enable/Disable DMA Continuous Requests</Description>
+    </RefParameter-->
+    <RefParameter Comment="DMA Continuous Requests" DefaultValue="LIMITED" Group="ADCgroup" Name="DMAContinuousRequestsForConfigFile" Type="list" Visible="false">
+         <Condition Diagnostic="" Expression="$IpNumber=2 &amp; DMARequest_ADC2 &amp; DMAContinuousRequests=DISABLE"/>
+        <PossibleValue Comment="limited" Value="LIMITED"/>
+        <Description>Enable/Disable DMA Continuous Requests</Description>
+    </RefParameter>
+    <RefParameter Comment="DMA Continuous Requests" DefaultValue="UNLIMITED" Group="ADCgroup" Name="DMAContinuousRequestsForConfigFile" Type="list" Visible="false">
+         <Condition Diagnostic="" Expression="$IpNumber=2 &amp; DMARequest_ADC2 &amp; DMAContinuousRequests=ENABLE"/>
+        <PossibleValue Comment="unlimited" Value="UNLIMITED"/>
+        <Description>Enable/Disable DMA Continuous Requests</Description>
+    </RefParameter>
+    <!--RefParameter Comment="DMA Continuous Requests" DefaultValue="NONE" Group="ADCgroup" Name="DMAContinuousRequestsForConfigFile" Type="list" Visible="false">
+         <Condition Diagnostic="" Expression="$IpNumber=2 &amp; !DMARequest_ADC2 &amp; DMAContinuousRequests=DISABLE"/>
+        <PossibleValue Comment="none" Value="NONE"/>
+        <Description>Enable/Disable DMA Continuous Requests</Description>
+    </RefParameter-->
+    
+     <RefParameter Comment="DMA Continuous Requests" DefaultValue="LIMITED" Group="ADCgroup" Name="DMAContinuousRequestsForConfigFile" Type="list" Visible="false">
+         <Condition Diagnostic="" Expression="$IpNumber=3 &amp; DMARequest_ADC3 &amp; DMAContinuousRequests=DISABLE"/>
+        <PossibleValue Comment="limited" Value="LIMITED"/>
+        <Description>Enable/Disable DMA Continuous Requests</Description>
+    </RefParameter>
+    <RefParameter Comment="DMA Continuous Requests" DefaultValue="UNLIMITED" Group="ADCgroup" Name="DMAContinuousRequestsForConfigFile" Type="list" Visible="false">
+         <Condition Diagnostic="" Expression="$IpNumber=3 &amp; DMARequest_ADC3 &amp; DMAContinuousRequests=ENABLE"/>
+        <PossibleValue Comment="unlimited" Value="UNLIMITED"/>
+        <Description>Enable/Disable DMA Continuous Requests</Description>
+    </RefParameter>
+    <!--RefParameter Comment="DMA Continuous Requests" DefaultValue="NONE" Group="ADCgroup" Name="DMAContinuousRequestsForConfigFile" Type="list" Visible="false">
+         <Condition Diagnostic="" Expression="$IpNumber=3 &amp; !DMARequest_ADC3 &amp; DMAContinuousRequests=DISABLE"/>
+        <PossibleValue Comment="none" Value="NONE"/>
+        <Description>Enable/Disable DMA Continuous Requests</Description>
+    </RefParameter-->
+    <RefParameter Comment="DMA Continuous Requests" DefaultValue="NONE" Group="ADCgroup" Name="DMAContinuousRequestsForConfigFile" Type="list" Visible="false">
+        <PossibleValue Comment="none" Value="NONE"/>
+        <Description>Enable/Disable DMA Continuous Requests</Description>
+    </RefParameter>
     <!-- Possible values of EOCSelection parameter -->
     <RefParameter Comment="End Of Conversion Selection" DefaultValue="ADC_EOC_SINGLE_CONV" Group="ADCgroup" Name="EOCSelection" Type="list">
         <PossibleValue Comment="End of single conversion" Value="ADC_EOC_SINGLE_CONV"/>
@@ -741,7 +818,7 @@
      
     <RefParameter Comment="Injected Conversion Mode" DefaultValue="None" Group="ADCgroup" Name="InjectedConvMode" Type="list">
         <PossibleValue Comment="None" Value="None"/>
-        <PossibleValue Comment="Discontinuous Mode" Semaphore="InjectedDiscontinuous_$IpInstance" Value="Discontinuous"/>
+        <PossibleValue Comment="Discontinuous Mode" Semaphore="InjectedDiscontinuous_$IpInstance" Value="Discontinuous" Action="Disable" Condition="!(ScanConvMode_$IpInstance) | (ContinuousMode_$IpInstance)" Diagnostic="Discontinuous mode is used only if sequencer is enabled (parameter 'ScanConvMode').Discontinuous mode can be enabled only if continuous mode is disabled." />
         <PossibleValue Action="Disable" Comment="Auto Injected Mode" Condition="DiscontinuousConvMode = ENABLE" Diagnostic="It is not possible to use both auto-injected mode and discontinuous mode simultaneously" Semaphore="AutoInjected_$IpInstance" Value="AutoInjected"/>
         <Description>Injected Conversion Mode selection</Description>
     </RefParameter>
@@ -1564,6 +1641,7 @@
         <Parameter Name="DiscontinuousConvMode"/>
         <Parameter Name="NbrOfDiscConversion"/>
         <Parameter Name="DMAContinuousRequests"/>
+        <Parameter Name="DMAContinuousRequestsForConfigFile"/>
         <Parameter Name="EOCSelection"/>
         <Parameter Name="Overrun"/>
         <Parameter Name="LowPowerAutoWait"/>

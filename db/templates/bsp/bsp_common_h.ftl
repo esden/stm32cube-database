@@ -7,7 +7,62 @@
 [@common.optinclude name=mxTmpFolder+ "/license.tmp"/][#--include License text --]
   ******************************************************************************
 */
-  
+[#assign IpInstance = ""]
+[#assign IpName = ""]
+[#assign IrqNumber = ""]
+[#assign ExtiLine = ""]
+
+[#assign useLED = false]
+[#assign LED2_PORT = ""]
+[#assign LED2_PIN = ""]
+
+[#assign useBUTTON = false]
+[#assign BUTTON_PORT = ""]
+[#assign BUTTON_PIN = ""]
+[#assign BUTTON_IRQn = ""]
+[#assign BUTTON_EXTI = ""]
+
+[#assign useUSART = false]
+[#assign UsartInstance = ""]
+[#assign UART_PORT = ""]
+[#assign UART_PIN = ""]
+ 
+[#list BspIpDatas as SWIP] 
+    [#if SWIP.variables??]
+        [#list SWIP.variables as variables]
+            [#if variables.name?contains("IpInstance")]
+                [#assign IpInstance = variables.value]
+            [/#if]
+            [#if variables.name?contains("IpName")]
+                [#assign IpName = variables.value]
+            [/#if]	
+            [#if variables.name?contains("GPIO_INT_NUM")]
+                [#assign IrqNumber = variables.value]
+            [/#if]
+            [#if variables.name?contains("EXTI_LINE_NUMBER")]
+                [#assign ExtiLine = variables.value]
+            [/#if]			
+            [#if variables.value?contains("BSP LED")]
+                [#assign LED2_PORT = IpName]
+                [#assign LED2_PIN = IpInstance]	
+				[#assign useLED = true]				
+            [/#if]
+            [#if variables.value?contains("BSP BUTTON")]
+                [#assign BUTTON_PORT = IpName]
+                [#assign BUTTON_PIN = IpInstance]
+                [#assign BUTTON_IRQn = IrqNumber]
+                [#assign BUTTON_EXTI = ExtiLine]
+				[#assign useBUTTON = true]	
+            [/#if]
+            [#if variables.value?contains("BSP USART")]
+                [#assign UsartInstance = IpInstance]
+				[#assign UART_PORT = IpInstance]
+				[#assign useUSART = true]
+            [/#if]
+        [/#list]
+    [/#if]
+[/#list] 
+ 
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __${BoardName?upper_case}_H
 #define __${BoardName?upper_case}_H
@@ -18,6 +73,7 @@
 
 /* Includes ------------------------------------------------------------------*/ 
 #include "${FamilyName?lower_case}xx_hal.h"
+#include <stdio.h>
 
 /** @addtogroup BSP
  * @{
@@ -56,7 +112,7 @@ typedef enum
 {
   COM1 = 0U,
 } COM_TypeDef;
-
+[#if useUSART]
 #if (USE_HAL_UART_REGISTER_CALLBACKS == 1)
 typedef struct
 {
@@ -64,57 +120,8 @@ typedef struct
   pUART_CallbackTypeDef  pMspUartDeInitCb;
 } BSP_UART_Cb_t;
 #endif /* (USE_HAL_UART_REGISTER_CALLBACKS == 1) */
+[/#if]
 
-[#assign LED2_PORT = ""]
-[#assign LED2_PIN = ""]
-
-[#assign IpInstance = ""]
-[#assign IpName = ""]
-[#assign IrqNumber = ""]
-[#assign ExtiLine = ""]
-
-[#assign BUTTON_PORT = ""]
-[#assign BUTTON_PIN = ""]
-[#assign BUTTON_IRQn = ""]
-[#assign BUTTON_EXTI = ""]
-
-[#assign UsartInstance = ""]
-[#assign UART_PORT = ""]
-[#assign UART_PIN = ""]
-
-
-[#list BspIpDatas as SWIP] 
-    [#if SWIP.variables??]
-        [#list SWIP.variables as variables]
-            [#if variables.name?contains("IpInstance")]
-                [#assign IpInstance = variables.value]
-            [/#if]
-            [#if variables.name?contains("IpName")]
-                [#assign IpName = variables.value]
-            [/#if]	
-            [#if variables.name?contains("GPIO_INT_NUM")]
-                [#assign IrqNumber = variables.value]
-            [/#if]
-            [#if variables.name?contains("EXTI_LINE_NUMBER")]
-                [#assign ExtiLine = variables.value]
-            [/#if]			
-            [#if variables.value?contains("BSP LED")]
-                [#assign LED2_PORT = IpName]
-                [#assign LED2_PIN = IpInstance]				
-            [/#if]
-            [#if variables.value?contains("BSP BUTTON")]
-                [#assign BUTTON_PORT = IpName]
-                [#assign BUTTON_PIN = IpInstance]
-                [#assign BUTTON_IRQn = IrqNumber]
-                [#assign BUTTON_EXTI = ExtiLine]
-            [/#if]
-            [#if variables.value?contains("BSP USART")]
-                [#assign UsartInstance = IpInstance]
-				[#assign UART_PORT = IpInstance]
-            [/#if]
-        [/#list]
-    [/#if]
-[/#list] 
 /**
  * @}
  */ 
@@ -139,6 +146,7 @@ typedef struct
 #define BSP_ERROR_MSP_FAILURE            -10  
 #define BSP_ERROR_FEATURE_NOT_SUPPORTED  -11
 
+[#if useLED]
 /** @defgroup ${BoardName?upper_case}_LOW_LEVEL_LED ${BoardName?upper_case} LOW LEVEL LED
  * @{
  */  
@@ -148,10 +156,12 @@ typedef struct
 #define LED2_GPIO_CLK_ENABLE()            __HAL_RCC_${LED2_PORT}_CLK_ENABLE()
 #define LED2_GPIO_CLK_DISABLE()           __HAL_RCC_${LED2_PORT}_CLK_DISABLE()  
 #define LED2_GPIO_PIN                     ${LED2_PIN}
+[/#if]
 /**
  * @}
  */ 
-  
+
+[#if useBUTTON] 
 /** @defgroup ${BoardName?upper_case}_LOW_LEVEL_BUTTON ${BoardName?upper_case} LOW LEVEL BUTTON
  * @{
  */ 
@@ -174,31 +184,21 @@ typedef struct
 /**
  * @}
  */ 
+[/#if]
 
 /** @defgroup ${BoardName?upper_case}_LOW_LEVEL_COM ${BoardName?upper_case} LOW LEVEL COM
  * @{
  */
+[#if useUSART]
 /**
  * @brief Definition for COM portx, connected to ${UsartInstance}
  */
 #define COMn                             1U 
 #define COM1_UART                        ${UsartInstance}
-#define COM1_CLK_ENABLE()                __HAL_RCC_${UsartInstance}_CLK_ENABLE()
-#define COM1_CLK_DISABLE()               __HAL_RCC_${UsartInstance}_CLK_DISABLE()
-
-#define COM1_TX_PIN                      USART_TX_Pin
-#define COM1_TX_GPIO_PORT                USART_TX_GPIO_Port
-#define COM1_TX_GPIO_CLK_ENABLE()        __HAL_RCC_GPIOA_CLK_ENABLE()
-#define COM1_TX_GPIO_CLK_DISABLE()       __HAL_RCC_GPIOA_CLK_DISABLE()
-//#define COM1_TX_AF                       GPIO_AF7_${UsartInstance}
-
-#define COM1_RX_PIN                      USART_RX_Pin
-#define COM1_RX_GPIO_PORT                USART_RX_GPIO_Port
-#define COM1_RX_GPIO_CLK_ENABLE()        __HAL_RCC_GPIOA_CLK_ENABLE()
-#define COM1_RX_GPIO_CLK_DISABLE()       __HAL_RCC_GPIOA_CLK_DISABLE()
-//#define COM1_RX_AF                       GPIO_AF7_${UsartInstance}
 
 #define COM_POLL_TIMEOUT                 1000
+
+#define USE_COM_LOG                      1U
 
 #define UartHandle h${UsartInstance?lower_case?replace("usart", "uart")}
 
@@ -232,6 +232,7 @@ typedef struct
   COM_ParityTypeDef    Parity;               
   COM_HwFlowCtlTypeDef HwFlowCtl;                           
 } COM_InitTypeDef;
+[/#if]
 /**
  * @}
  */
@@ -241,18 +242,24 @@ typedef struct
  */ 
 /* Exported Functions --------------------------------------------------------*/
 int32_t  BSP_GetVersion(void);  
+[#if useLED]
 int32_t  BSP_LED_Init(Led_TypeDef Led);
 int32_t  BSP_LED_DeInit(Led_TypeDef Led);
 int32_t  BSP_LED_On(Led_TypeDef Led);
 int32_t  BSP_LED_Off(Led_TypeDef Led);
 int32_t  BSP_LED_Toggle(Led_TypeDef Led);
 int32_t  BSP_LED_GetState(Led_TypeDef Led);
+[/#if]
+[#if useBUTTON]
 int32_t  BSP_PB_Init(Button_TypeDef Button, ButtonMode_TypeDef ButtonMode);
 int32_t  BSP_PB_DeInit(Button_TypeDef Button);
 int32_t  BSP_PB_GetState(Button_TypeDef Button);
 void     BSP_PB_Callback(Button_TypeDef Button);
-int32_t  BSP_COM_Init(COM_TypeDef COM, COM_InitTypeDef *COM_Init);
+[/#if]
+[#if useUSART]
+int32_t  BSP_COM_Init(COM_TypeDef COM);
 int32_t  BSP_COM_DeInit(COM_TypeDef COM);
+
 #if (USE_COM_LOG == 1)
 int32_t  BSP_COM_SelectLogPort(COM_TypeDef COM);
 #endif
@@ -261,7 +268,7 @@ int32_t  BSP_COM_SelectLogPort(COM_TypeDef COM);
 int32_t BSP_${UsartInstance}_RegisterDefaultMspCallbacks(void);
 int32_t BSP_${UsartInstance}_RegisterMspCallbacks(BSP_UART_Cb_t *Callback);
 #endif /* USE_HAL_UART_REGISTER_CALLBACKS */
-//HAL_StatusTypeDef MX_${UsartInstance}_UART_Init(UART_HandleTypeDef *huart, COM_InitTypeDef *COM_Init);
+[/#if]
 
 /**
  * @}

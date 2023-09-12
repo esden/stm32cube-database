@@ -32,7 +32,7 @@
 [#if useGpio]
 [/#if]
 [#if useDma]
-[#-- include "DMA.h" --]
+[#-- include "dma.h" --]
 [/#if]
 [#-- End Define includes --]
 
@@ -574,7 +574,7 @@
 /* ${instName} init function */ [#-- added for periph used by BSP --]
 [#assign InstIndex = instanceData.instIndex]
 #n
-        [#if halMode!=instanceData.realIpName&&!instanceData.ipName?contains("TIM")&&!instanceData.ipName?contains("CEC")]#__weak HAL_StatusTypeDef MX_${instName}_${halMode}_Init(${instanceData.instancehandler?replace(InstIndex,"")})[#elseif instName?contains("I2C")&&InstIndex=="2"]__weak HAL_StatusTypeDef MX_${instName}_Init(${instanceData.realIpName}_HandleTypeDef* h${instanceData.realIpName?lower_case})[#else]__weak HAL_StatusTypeDef MX_${instName}_Init(${instanceData.instancehandler?replace(InstIndex,"")})[/#if][#-- added for periph used by BSP --]
+        [#if halMode!=instanceData.realIpName&&!instanceData.ipName?contains("TIM")&&!instanceData.ipName?contains("CEC")]__weak HAL_StatusTypeDef MX_${instName}_${halMode}_Init(${instanceData.instancehandler?replace(InstIndex,"")})[#elseif instName?contains("I2C")&&InstIndex=="2"]__weak HAL_StatusTypeDef MX_${instName}_Init(${instanceData.realIpName}_HandleTypeDef* h${instanceData.realIpName?lower_case})[#else]__weak HAL_StatusTypeDef MX_${instName}_Init(${instanceData.instancehandler?replace(InstIndex,"")})[/#if][#-- added for periph used by BSP --]
 {[#-- added for periph used by BSP --]
 #tHAL_StatusTypeDef ret = HAL_OK;
 [/#if]

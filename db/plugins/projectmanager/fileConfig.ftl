@@ -72,9 +72,7 @@
     [#-- <optimization>${project.compilerOptimization}</optimization> --]
     <optimization>${optimization}</optimization>
     <icfloc>${icfloc}</icfloc>
-    <Adefines>
-        <define></define>
-    </Adefines>   
+     
 
     <UsedFreeRTOS>${usedfreeRTOS}</UsedFreeRTOS>
     <Aincludes>
@@ -94,16 +92,31 @@
 	    	<include></include>
     	[/#if]
     </Aincludes>
+    <Adefines>
+        [#list AdefinesList as define]
+        <define>${define}</define>
+        [/#list]
+    </Adefines>  
     <Cdefines>
 	[#list CdefinesList as define]
         <define>${define}</define>
         [/#list]
 	   [#-- <define>__weak=__attribute__((weak))</define> --]
     </Cdefines>
+    <Ldefines>
+	[#list LdefinesList as define]
+        <define>${define}</define>
+        [/#list]
+	   [#-- <define>__weak=__attribute__((weak))</define> --]
+    </Ldefines>
     [#-- defines to remove --]
     <definestoremove>
         <Adefines>
-            <define></define>
+        [#if aDefineToRemove??]
+            [#list aDefineToRemove as defineToRemove]
+            <define>${defineToRemove}</define>
+            [/#list]
+        [/#if]
         </Adefines>
         <Cdefines>
         [#if cDefineToRemove??]
@@ -111,7 +124,14 @@
             <define>${defineToRemove}</define>
         [/#list]
         [/#if]
-        </Cdefines>         
+        </Cdefines> 
+        <Ldefines>
+        [#if lDefineToRemove??]
+            [#list lDefineToRemove as defineToRemove]
+            <define>${defineToRemove}</define>
+            [/#list]
+        [/#if]
+        </Ldefines> 
     </definestoremove>
     
     [#-- End of optional part--]
@@ -456,7 +476,7 @@
 	  <name>Application</name>
 	    <group>
 	      <name>User</name>  
-                [#if mxSourceDir == "Core/Src"]
+                [#if mxSourceDir?replace("\\","/") == "Core/Src"]
                                 <group>
                                     <name>Core</name>  
                 [/#if]
@@ -468,7 +488,7 @@
                 [/#if]
 
 	       [/#list]
-                [#if mxSourceDir == "Core/Src"]
+                [#if mxSourceDir?replace("\\","/") == "Core/Src"]
                                 </group>                  
                 [/#if]
 

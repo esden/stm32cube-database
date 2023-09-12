@@ -1,0 +1,402 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<IP xmlns="http://mcd.rou.st.com/modules.php?name=mcu" DBVersion="V4.0" Name="LPTIM" Version="STM32Cube_FW_L4_V1.13.0RC2" IncludeFile="stm32l4xx_ll_lptim.h" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Config.xsd">
+	<!--
+	    <RefConfig Name="lptim_Initialization">
+        <CallLibMethod Name="HAL_LPTIM_Init">
+            <MethodArg Name="hlptim.Init.Clock.Source" ParameterName="ClockSource"/>
+            <MethodArg Name="hlptim.Init.Clock.Prescaler" ParameterName="ClockPrescaler"/>
+            <MethodArg Name="hlptim.Init.UltraLowPowerClock.Polarity" ParameterName="ULPClockPolarity"/>
+            <MethodArg Name="hlptim.Init.UltraLowPowerClock.SampleTime" ParameterName="ULPClockSampleTime"/>
+            <MethodArg Name="hlptim.Init.Trigger.Source" ParameterName="TriggerSource"/>
+            <MethodArg Name="hlptim.Init.Trigger.ActiveEdge" ParameterName="TriggerActiveEdge"/>
+            <MethodArg Name="hlptim.Init.Trigger.SampleTime" ParameterName="TriggerSampleTime"/>
+            <MethodArg Name="hlptim.Init.OutputPolarity" ParameterName="OutputPolarity"/>
+            <MethodArg Name="hlptim.Init.UpdateMode" ParameterName="UpdateMode"/>
+            <MethodArg Name="hlptim.Init.CounterSource" ParameterName="CounterSource"/>
+            <MethodArg Name="hlptim.Init.Input1Source" ParameterName="Input1Source"/>
+            <MethodArg Name="hlptim.Init.Input2Source" ParameterName="Input2Source"/>
+        </CallLibMethod>
+        <ImplementCallBack Name="HAL_LPTIM_MspInit"/>
+        <ImplementCallBack Name="HAL_LPTIM_MspDeInit"/>
+    </RefConfig>
+	-->
+	<RefConfig Name="lptim_Initialization">
+	
+	    <CallLibMethod Name="LL_LPTIM_SetClockSource">
+			<MethodArg Name="LPTIMx" 			ParameterName="Instance"/>
+			<MethodArg Name="ClockSource"		ParameterName="ClockSource"/>
+		</CallLibMethod>
+		
+	    <CallLibMethod Name="LL_LPTIM_SetPrescaler">
+			<MethodArg Name="LPTIMx" 			ParameterName="Instance"/>
+			<MethodArg Name="Prescaler" 		ParameterName="ClockPrescaler"/>
+		</CallLibMethod>		
+
+	    <CallLibMethod Name="LL_LPTIM_SetPolarity">
+			<MethodArg Name="LPTIMx" 			ParameterName="Instance"/>
+			<MethodArg Name="Polarity" 			ParameterName="OutputPolarity"/>
+		</CallLibMethod>
+
+	    <CallLibMethod Name="LL_LPTIM_SetUpdateMode">
+			<MethodArg Name="LPTIMx" 			ParameterName="Instance"/>
+			<MethodArg Name="UpdateMode" 		ParameterName="UpdateMode"/>
+		</CallLibMethod>		
+
+	    <CallLibMethod Name="LL_LPTIM_SetCounterMode">
+			<MethodArg Name="LPTIMx" 			ParameterName="Instance"/>
+			<MethodArg Name="CounterMode" 		ParameterName="CounterSource"/>
+		</CallLibMethod>	
+
+		 <IFCondition Expression="(ClockSource=LPTIM_CLOCKSOURCE_ULPTIM)">
+			<CallLibMethod Name="LL_LPTIM_ConfigClock">
+				<MethodArg Name="LPTIMx" 		ParameterName="Instance"/>
+				<MethodArg Name="ClockFilter" 	ParameterName="ULPClockSampleTime"/>
+				<MethodArg Name="ClockPolarity" ParameterName="ULPClockPolarity"/>				
+			</CallLibMethod>
+		</IFCondition>
+		
+		 <IFCondition Expression="(TriggerSource=LPTIM_TRIGSOURCE_SOFTWARE)">
+			<CallLibMethod Name="LL_LPTIM_TrigSw">
+				<MethodArg Name="LPTIMx" 		ParameterName="Instance"/>
+			</CallLibMethod>
+		</IFCondition>
+		
+        <IFCondition  Expression="!(TriggerSource=LPTIM_TRIGSOURCE_SOFTWARE)">
+			<CallLibMethod Name="LL_LPTIM_ConfigTrigger">
+				<MethodArg Name="LPTIMx"  		ParameterName="Instance"/>
+				<MethodArg Name="Source" 		ParameterName="TriggerSource"/>
+				<MethodArg Name="Filter" 		ParameterName="TriggerSampleTime"/>	
+				<MethodArg Name="Polarity" 		ParameterName="TriggerActiveEdge"/>
+			</CallLibMethod>
+		</IFCondition>
+		
+		<IFCondition Expression="($IpNumber=1)">
+			<CallLibMethod Name="LL_LPTIM_SetInput1Src">
+				<MethodArg Name="LPTIMx" 		ParameterName="Instance"/>
+				<MethodArg Name="Src" 			ParameterName="Input1Source"/>
+			</CallLibMethod>
+			<CallLibMethod Name="LL_LPTIM_SetInput2Src">
+				<MethodArg Name="LPTIMx" 		ParameterName="Instance"/>
+				<MethodArg Name="Src" 			ParameterName="Input2Source"/>
+			</CallLibMethod>		
+		</IFCondition>
+		
+		<IFCondition  Expression="!($IpNumber=1)">
+			<CallLibMethod Name="LL_LPTIM_SetInput1Src">
+				<MethodArg Name="LPTIMx" 		ParameterName="Instance"/>
+				<MethodArg Name="Src" 			ParameterName="Input1Source"/>
+			</CallLibMethod>				
+		</IFCondition>
+    </RefConfig>
+	
+<!--
+    <RefConfig Name="Base_DeInit">
+        <CallLibMethod Name="HAL_LPTIM_DeInit"/>
+    </RefConfig>
+-->	
+    <LibMethod Comment="" Name="LL_LPTIM_SetClockSource">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="ClockSource" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_GetClockSource">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_ConfigClock">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="ClockFilter" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="ClockPolarity" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_GetClockPolarity">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_GetClockFilter">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_SetEncoderMode">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="EncoderMode" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_GetEncoderMode">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_EnableEncoderMode">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_DisableEncoderMode">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_IsEnabledEncoderMode">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_ClearFLAG_CMPM">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_IsActiveFlag_CMPM">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_ClearFLAG_ARRM">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_IsActiveFlag_ARRM">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_ClearFlag_EXTTRIG">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_IsActiveFlag_EXTTRIG">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_ClearFlag_CMPOK">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_IsActiveFlag_CMPOK">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_ClearFlag_ARROK">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_IsActiveFlag_ARROK">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_ClearFlag_UP">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_IsActiveFlag_UP">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_ClearFlag_DOWN">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_IsActiveFlag_DOWN">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_ClearFlag_REPOK">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_IsActiveFlag_REPOK">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_ClearFlag_UE">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_IsActiveFlag_UE">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_DeInit">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_StructInit">
+        <Argument AddressOf="true" GenericType="struct" Name="LPTIM_InitStruct" TypeName="LL_LPTIM_InitTypeDef">
+            <Argument AddressOf="false" GenericType="simple" Name="ClockSource" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Prescaler" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Waveform" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Polarity" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_Init">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+        <Argument AddressOf="true" GenericType="struct" Name="LPTIM_InitStruct" TypeName="LL_LPTIM_InitTypeDef">
+            <Argument AddressOf="false" GenericType="simple" Name="ClockSource" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Prescaler" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Waveform" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Polarity" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_EnableIT_CMPM">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_DisableIT_CMPM">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_IsEnabledIT_CMPM">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_EnableIT_ARRM">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_DisableIT_ARRM">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_IsEnabledIT_ARRM">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_EnableIT_EXTTRIG">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_DisableIT_EXTTRIG">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_IsEnabledIT_EXTTRIG">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_EnableIT_CMPOK">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_DisableIT_CMPOK">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_IsEnabledIT_CMPOK">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_EnableIT_ARROK">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_DisableIT_ARROK">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_IsEnabledIT_ARROK">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_EnableIT_UP">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_DisableIT_UP">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_IsEnabledIT_UP">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_EnableIT_DOWN">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_DisableIT_DOWN">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_IsEnabledIT_DOWN">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_EnableIT_REPOK">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_DisableIT_REPOK">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_IsEnabledIT_REPOK">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_EnableIT_UE">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_DisableIT_UE">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_IsEnabledIT_UE">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_Enable">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_Disable">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_IsEnabled">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_StartCounter">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="OperatingMode" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_SetUpdateMode">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="UpdateMode" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_GetUpdateMode">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_SetAutoReload">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="AutoReload" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_GetAutoReload">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_SetRepetition">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Repetition" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_GetRepetition">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_SetCompare">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="CompareValue" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_GetCompare">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_GetCounter">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_SetCounterMode">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="CounterMode" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_GetCounterMode">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_ConfigOutput">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Waveform" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Polarity" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_SetWaveform">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Waveform" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_GetWaveform">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_SetPolarity">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Polarity" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_GetPolarity">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_SetPrescaler">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Prescaler" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_GetPrescaler">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_SetInput1Src">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Src" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_SetInput2Src">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Src" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_EnableTimeout">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_DisableTimeout">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_IsEnabledTimeout">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_TrigSw">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_ConfigTrigger">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Source" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Filter" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Polarity" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_GetTriggerSource">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_GetTriggerFilter">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_LPTIM_GetTriggerPolarity">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="LPTIMx" TypeName="LPTIM_TypeDef"/>
+    </LibMethod>
+    <RefComponent Cclass="LL" Cgroup="LPTIM" Cversion="1.13.0RC2">
+        <File Category="header" Condition="" Name="Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_lptim.h" Version="" attr="" select="" src=""/>
+        <File Category="source" Condition="" Name="Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_ll_lptim.c" Version="" attr="" select="" src=""/>
+    </RefComponent>
+</IP>

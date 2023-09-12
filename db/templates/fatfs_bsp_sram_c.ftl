@@ -154,17 +154,19 @@ uint8_t BSP_SRAM_WriteData_DMA(uint32_t uwStartAddress, uint16_t *pData, uint32_
   return sramstatus;
 }
 
+[#if familyName!="stm32f7" && familyName!="stm32h7"] [#-- 2018-07-31 : aligned on bsp drivers files in FW pack --]
 /**
   * @brief  Handles SRAM DMA transfer interrupt request.
   */
 void BSP_SRAM_DMA_IRQHandler(void)
 {
-  HAL_DMA_IRQHandler(${sramHandle}.hdma); 
+  HAL_DMA_IRQHandler(${sramHandle}.hdma);
 }
 
 /* USER CODE BEGIN AdditionalCode */
 /* user code can be inserted here */
 /* USER CODE END AdditionalCode */
+[/#if]
 
 #endif
 

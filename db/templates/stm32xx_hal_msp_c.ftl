@@ -10,7 +10,6 @@
   */
 /* Includes ------------------------------------------------------------------*/
 #include "${FamilyName?lower_case}xx_hal.h"
-
 [#function list_contains string_list element]
   [#list string_list?split(" ") as string_element]
     [#if string_element == element]
@@ -37,6 +36,8 @@ extern void _Error_Handler(char *, int);
 
 /* USER CODE END 0 */
 [#if isHALUsed??]
+[#-- PostInit declaration --]         
+[@common.getMspPostInit/]
 /**
 #t* Initializes the Global MSP.
 #t*/

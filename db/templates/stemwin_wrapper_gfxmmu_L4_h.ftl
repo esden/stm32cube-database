@@ -53,6 +53,7 @@
 [#assign I2C_Exist ="0"]
 [#assign MFX_value ="0"]
 [#assign freeRTOS="0"] 
+[#assign dma2dvalue="0"] 
 [#-- SWIPdatas is a list of SWIPconfigModel --]  
 [#list SWIPdatas as SWIP]
 [#-- Global variables --]
@@ -75,6 +76,10 @@ extern ${variable.value} ${variable.name};
 [#elseif definition.name = "FREERTOS" ]
 [#if definition.value == "1" ]
 [#assign freeRTOS="1"] 
+[/#if]
+[#elseif definition.name = "DMA2D_Graphics" ]
+[#if definition.value != "0"  ]
+[#assign dma2dvalue="1"] 
 [/#if]
 [/#if]
 [/#list]
@@ -134,11 +139,16 @@ typedef struct
 }
 LCD_LayerPropTypedef;
 
+void LCD_RefreshRequestedByApplicatyion( void );
+void DSI_IO_WriteCmd(uint32_t NbrParams, uint8_t *pParams) ;
 void LCD_WaitForDisplayCompletion( void );
 void GRAPHICS_HW_Init(void);
 void GRAPHICS_Init(void);
 [#if  freeRTOS=="0"]
 void GRAPHICS_IncTick(void);
+[/#if]
+[#if  dma2dvalue=="1"]
+void DMA2D_Init(void);
 [/#if]
 
 #endif /* STEMWIN_WRAPPER_H */
