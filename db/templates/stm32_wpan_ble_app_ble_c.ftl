@@ -735,30 +735,22 @@ void APP_BLE_Init( void )
 [#if  (BT_SIG_BEACON = 1)]
   if (CFG_BEACON_TYPE & CFG_EDDYSTONE_UID_BEACON_TYPE)
   {
-#if(CFG_DEBUG_APP_TRACE != 0)
     APP_DBG_MSG("Eddystone UID beacon advertize\n");
-#endif
     EddystoneUID_Process();
   }
   else if (CFG_BEACON_TYPE & CFG_EDDYSTONE_URL_BEACON_TYPE)
   {
-#if(CFG_DEBUG_APP_TRACE != 0)
     APP_DBG_MSG("Eddystone URL beacon advertize\n");
-#endif
     EddystoneURL_Process();
   }
   else if (CFG_BEACON_TYPE & CFG_EDDYSTONE_TLM_BEACON_TYPE)
   {
-#if(CFG_DEBUG_APP_TRACE != 0)
     APP_DBG_MSG("Eddystone TLM beacon advertize\n");
-#endif
     EddystoneTLM_Process();
   }
   else if (CFG_BEACON_TYPE & CFG_IBEACON)
   {
-#if(CFG_DEBUG_APP_TRACE != 0)
     APP_DBG_MSG("Ibeacon advertize\n");
-#endif
     IBeacon_Process();
   }
 [/#if]   
@@ -814,6 +806,7 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification( void *pckt )
   uint8_t TX_PHY, RX_PHY;
   tBleStatus ret = BLE_STATUS_INVALID_PARAMS;
 [/#if]
+
   event_pckt = (hci_event_pckt*) ((hci_uart_pckt *) pckt)->data;
 
   switch (event_pckt->evt)
@@ -828,9 +821,7 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification( void *pckt )
       {
         BleApplicationContext.BleApplicationContext_legacy.connectionHandle = 0;
         BleApplicationContext.Device_Connection_Status = APP_BLE_IDLE;
-#if(CFG_DEBUG_APP_TRACE != 0)
         APP_DBG_MSG("\r\n\r** DISCONNECTION EVENT WITH CLIENT \n");
-#endif        
       }
 
       /* restart advertising */
@@ -864,9 +855,7 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification( void *pckt )
       {
 [#if (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_HEART_RATE_SENSOR = 1) ||(CUSTOM_P2P_SERVER = 1)]
         case EVT_LE_CONN_UPDATE_COMPLETE: 
-#if(CFG_DEBUG_APP_TRACE != 0)
           APP_DBG_MSG("\r\n\r** CONNECTION UPDATE EVENT WITH CLIENT \n");
-#endif
           /* USER CODE BEGIN EVT_LE_CONN_UPDATE_COMPLETE */
 
           /* USER CODE END EVT_LE_CONN_UPDATE_COMPLETE */
@@ -874,47 +863,33 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification( void *pckt )
 [/#if]
 [#if (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_HEART_RATE_SENSOR = 1) ||(CUSTOM_P2P_SERVER = 1)]
         case EVT_LE_PHY_UPDATE_COMPLETE:
-#if(CFG_DEBUG_APP_TRACE != 0)
           APP_DBG_MSG("EVT_UPDATE_PHY_COMPLETE \n");
-#endif
           evt_le_phy_update_complete = (hci_le_phy_update_complete_event_rp0*)meta_evt->data;
           if (evt_le_phy_update_complete->Status == 0)
           {
-#if(CFG_DEBUG_APP_TRACE != 0)
             APP_DBG_MSG("EVT_UPDATE_PHY_COMPLETE, status ok \n");
-#endif
           }
           else
           {
-#if(CFG_DEBUG_APP_TRACE != 0)
             APP_DBG_MSG("EVT_UPDATE_PHY_COMPLETE, status nok \n");
-#endif
           }
           ret = hci_le_read_phy(BleApplicationContext.BleApplicationContext_legacy.connectionHandle,&TX_PHY,&RX_PHY);
           if (ret == BLE_STATUS_SUCCESS)
           {
-#if(CFG_DEBUG_APP_TRACE != 0)
             APP_DBG_MSG("Read_PHY success \n");
-#endif
            
             if ((TX_PHY == TX_2M) && (RX_PHY == RX_2M))
             {
-#if(CFG_DEBUG_APP_TRACE != 0)
               APP_DBG_MSG("PHY Param  TX= %d, RX= %d \n", TX_PHY, RX_PHY);
-#endif
             }
             else
             {
-#if(CFG_DEBUG_APP_TRACE != 0)
               APP_DBG_MSG("PHY Param  TX= %d, RX= %d \n", TX_PHY, RX_PHY);
-#endif
             } 
           }
           else
           {
-#if(CFG_DEBUG_APP_TRACE != 0)
             APP_DBG_MSG("Read conf not succeess \n");
-#endif
           }
           /* USER CODE BEGIN EVT_LE_PHY_UPDATE_COMPLETE */
 
@@ -933,10 +908,8 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification( void *pckt )
           
           HW_TS_Stop(BleApplicationContext.Advertising_mgr_timer_Id);
 
-#if(CFG_DEBUG_APP_TRACE != 0)
           APP_DBG_MSG("EVT_LE_CONN_COMPLETE for connection handle 0x%x\n",
           connection_complete_event->Connection_Handle);
-#endif
             if (BleApplicationContext.Device_Connection_Status == APP_BLE_LP_CONNECTING)
             {
               /* Connection as client */
@@ -1000,9 +973,7 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification( void *pckt )
 [/#if]
         case EVT_BLUE_GAP_PROCEDURE_COMPLETE:
 [#if (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_HEART_RATE_SENSOR = 1) ||(CUSTOM_P2P_SERVER = 1)]
-#if(CFG_DEBUG_APP_TRACE != 0)
         APP_DBG_MSG("\r\n\r** EVT_BLUE_GAP_PROCEDURE_COMPLETE \n");
-#endif
 [/#if]
         /* USER CODE BEGIN EVT_BLUE_GAP_PROCEDURE_COMPLETE */
 
@@ -1239,8 +1210,8 @@ static void Ble_Tl_Init( void )
                                          BleApplicationContext.BleApplicationContext_legacy.bleSecurityParam.encryptionKeySizeMax,
                                          BleApplicationContext.BleApplicationContext_legacy.bleSecurityParam.Use_Fixed_Pin,
                                          BleApplicationContext.BleApplicationContext_legacy.bleSecurityParam.Fixed_Pin,
-0
-  );
+                                         0
+                                        );
 
   /**
    * Initialize whitelist
@@ -1316,10 +1287,7 @@ static void Adv_Request(APP_BLE_ConnStatus_t New_Status)
      */
     HW_TS_Stop(BleApplicationContext.Advertising_mgr_timer_Id);
 
-#if(CFG_DEBUG_APP_TRACE != 0)
-    APP_DBG_MSG("First index in %d state \n",
-    BleApplicationContext.Device_Connection_Status);
-#endif
+    APP_DBG_MSG("First index in %d state \n", BleApplicationContext.Device_Connection_Status);
     if ((New_Status == APP_BLE_LP_ADV)
         && ((BleApplicationContext.Device_Connection_Status == APP_BLE_FAST_ADV)
             || (BleApplicationContext.Device_Connection_Status == APP_BLE_LP_ADV)))
@@ -1328,16 +1296,12 @@ static void Adv_Request(APP_BLE_ConnStatus_t New_Status)
       ret = aci_gap_set_non_discoverable();
       if (ret == BLE_STATUS_SUCCESS)
       {
-#if(CFG_DEBUG_APP_TRACE != 0)
         APP_DBG_MSG("Successfully Stopped Advertising \n");
-#endif
-        }
+      }
       else
       {
-#if(CFG_DEBUG_APP_TRACE != 0)
         APP_DBG_MSG("Stop Advertising Failed , result: %d \n", ret);
-#endif
-        }
+      }
     }
 
     BleApplicationContext.Device_Connection_Status = New_Status;
@@ -1363,32 +1327,24 @@ static void Adv_Request(APP_BLE_ConnStatus_t New_Status)
     {
       if (New_Status == APP_BLE_FAST_ADV)
       {
-#if(CFG_DEBUG_APP_TRACE != 0)
         APP_DBG_MSG("Successfully Start Fast Advertising \n" );
-#endif
         /* Start Timer to STOP ADV - TIMEOUT */
         HW_TS_Start(BleApplicationContext.Advertising_mgr_timer_Id, INITIAL_ADV_TIMEOUT);
       }
       else
       {
-#if(CFG_DEBUG_APP_TRACE != 0)
         APP_DBG_MSG("Successfully Start Low Power Advertising \n");
-#endif
-        }
+      }
     }
     else
     {
       if (New_Status == APP_BLE_FAST_ADV)
       {
-#if(CFG_DEBUG_APP_TRACE != 0)
         APP_DBG_MSG("Start Fast Advertising Failed , result: %d \n", ret);
-#endif
       }
       else
       {
-#if(CFG_DEBUG_APP_TRACE != 0)
         APP_DBG_MSG("Start Low Power Advertising Failed , result: %d \n", ret);
-#endif
       }
     }
 
@@ -1537,15 +1493,11 @@ static void Adv_Cancel( void )
     BleApplicationContext.Device_Connection_Status = APP_BLE_IDLE;
     if (result == BLE_STATUS_SUCCESS)
     {
-#if(CFG_DEBUG_APP_TRACE != 0)
       APP_DBG_MSG("  \r\n\r");APP_DBG_MSG("** STOP ADVERTISING **  \r\n\r");
-#endif
     }
     else
     {
-#if(CFG_DEBUG_APP_TRACE != 0)
       APP_DBG_MSG("** STOP ADVERTISING **  Failed \r\n\r");
-#endif
     }
 
   }
@@ -1596,15 +1548,11 @@ void BLE_SVC_L2CAP_Conn_Update(uint16_t Connection_Handle)
                                                        slave_latency, timeout_multiplier);
     if( result == BLE_STATUS_SUCCESS )
     {
-#if(CFG_DEBUG_APP_TRACE != 0)
       APP_DBG_MSG("BLE_SVC_L2CAP_Conn_Update(), Successfully \r\n\r");
-#endif
     }
     else
     {
-#if(CFG_DEBUG_APP_TRACE != 0)
       APP_DBG_MSG("BLE_SVC_L2CAP_Conn_Update(), Failed \r\n\r");
-#endif
     }
   }
 /* USER CODE BEGIN BLE_SVC_L2CAP_Conn_Update_2 */
@@ -1702,7 +1650,7 @@ static void BLE_StatusNot( HCI_TL_CmdStatus_t status )
        * This is to prevent a new command is sent while one is already pending
        */
       task_id_list = (1 << CFG_LAST_TASK_ID_WITH_HCICMD) - 1;
-      UTIL_SEQ_ResumeTask(task_id_list);    
+      UTIL_SEQ_ResumeTask(task_id_list);
 
 [#else]
       osMutexRelease( MtxHciId );

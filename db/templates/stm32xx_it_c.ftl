@@ -18,7 +18,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "${main_h}"
 #include "${FamilyName?lower_case}xx_it.h"
-[#if FREERTOS??] [#-- If FreeRtos is used --]
+[#if FREERTOS?? && (Secure == "false" || Secure == "-1")] [#-- If FreeRtos is used --]
 [#-- [@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_inc.tmp"/] --] [#--include freertos includes --]
 [#-- cf BZ 64089 --]
 #include "FreeRTOS.h"
@@ -95,13 +95,16 @@ void SystemClock_Config(void);
 /* External variables --------------------------------------------------------*/
 [#compress]
 [#assign handleList = ""]
-[#list handlers as handler] [#-- handlers is a list of ipHandlers (hashmap)  --]
+[#list handlers as handler] [#-- handlers is a list of ipHandlers (hashmap)  --] 
   [#list handler.entrySet() as entry]  [#-- handler is a set of handles --]
-    [#list entry.value as ipHandler]  [#-- entry.value is a list of IpHandler --]
+    [#list entry.value as ipHandler]  [#-- entry.value is a list of IpHandler --] 
         [#if ipHandler.useNvic && ipHandler.declareExtenalVariable && !(handleList?contains("(" + ipHandler.handler + ")")) && ipHandler.handlerType!="DFSDM_Channel_HandleTypeDef"]
+[#if !context?? || (context?? && context==ipHandler.contextName)]
 extern ${ipHandler.handlerType} ${ipHandler.handler};
+[#assign handleList = handleList + "(" + ipHandler.handler + ")"]
+[/#if]
         [/#if]
-        [#assign handleList = handleList + "(" + ipHandler.handler + ")"]
+        
     [/#list]
   [/#list]
 [/#list]

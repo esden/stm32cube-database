@@ -49,7 +49,16 @@
 [/#list]
 [/#if]
   */
+[#list voids as void]
+    [#assign fctname = "MX_"+ipName+"_Init"]
+        [#if void.functionName == fctname]
+            [#if void.isStatic]
 static void MX_${ipName}_Init(void) 
+            [#else]
+void MX_${ipName}_Init(void) 
+            [/#if]
+        [/#if]
+[/#list]
 {
 
 [#if RESMGR_UTILITY??]

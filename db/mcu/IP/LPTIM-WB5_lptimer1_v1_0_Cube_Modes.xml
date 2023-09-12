@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<IP xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://mcd.rou.st.com/modules.php?name=mcu" DBVersion="V4.0" Name="LPTIM" Version="WB5x_lptimer1_v1_1_Cube" IPType="peripheral" ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd">
+<IP xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://mcd.rou.st.com/modules.php?name=mcu" DBVersion="V4.0" Name="LPTIM" Version="WB5_lptimer1_v1_0_Cube" IPType="peripheral" ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd">
   <About>LPTIM: Low Power Timer</About>
     <RefParameter Comment="Clock Source" DefaultValue="LPTIM_CLOCKSOURCE_APBCLOCK_LPOSC" Name="ClockSource" Type="list" Visible="false">
         <Condition Diagnostic="Internal Clock Selected" Expression="Semaphore_CounterInternalClk$IpInstance|Semaphore_CounterExternalClk_synchro$IpInstance|Semaphore_Encoder$IpInstance"/>
@@ -60,8 +60,8 @@
         <PossibleValue Comment="RTC TAMP1 Input Detection" Value="LPTIM_TRIGSOURCE_3"/>
         <PossibleValue Comment="RTC TAMP2 Input Detection" Value="LPTIM_TRIGSOURCE_4"/>
         <PossibleValue Comment="RTC TAMP3 Input Detection" Value="LPTIM_TRIGSOURCE_5"/>
-        <PossibleValue Comment="COMP1 OUT" Value="LPTIM_TRIGSOURCE_6"/>
-        <PossibleValue Comment="COMP2 OUT" Value="LPTIM_TRIGSOURCE_7"/>
+        <PossibleValue Comment="COMP1 OUT" Value="LPTIM_TRIGSOURCE_6" Condition="!COMP1_Exist" Action="Remove"/>
+        <PossibleValue Comment="COMP2 OUT" Value="LPTIM_TRIGSOURCE_7" Condition="!COMP2_Exist" Action="Remove"/>
     </RefParameter>
     <RefParameter Comment="Trigger Source" DefaultValue="LPTIM_TRIGSOURCE_0" Name="TriggerSource" Type="list" Group="Trigger">
         <Condition Diagnostic="External trigger is selected" Expression="Semaphore_ETR$IpInstance &amp;($IpNumber=2)"/>
@@ -72,8 +72,8 @@
         <PossibleValue Comment="RTC TAMP1 Input Detection" Value="LPTIM_TRIGSOURCE_3"/>
         <PossibleValue Comment="RTC TAMP2 Input Detection" Value="LPTIM_TRIGSOURCE_4"/>
         <PossibleValue Comment="RTC TAMP3 Input Detection" Value="LPTIM_TRIGSOURCE_5"/>
-        <PossibleValue Comment="COMP1 OUT" Value="LPTIM_TRIGSOURCE_6"/>
-        <PossibleValue Comment="COMP2 OUT" Value="LPTIM_TRIGSOURCE_7"/>
+        <PossibleValue Comment="COMP1 OUT" Value="LPTIM_TRIGSOURCE_6" Condition="!COMP1_Exist" Action="Remove"/>
+        <PossibleValue Comment="COMP2 OUT" Value="LPTIM_TRIGSOURCE_7" Condition="!COMP2_Exist" Action="Remove"/>
     </RefParameter>
     <RefParameter Comment="Trigger Source" DefaultValue="LPTIM_TRIGSOURCE_SOFTWARE" Name="TriggerSource" Type="list" Group="Trigger">
         <Condition Diagnostic="External trigger is not selected" Expression="!Semaphore_ETR$IpInstance"/>
@@ -83,8 +83,8 @@
         <PossibleValue Comment="RTC TAMP1 Input Detection" Value="LPTIM_TRIGSOURCE_3"/>
         <PossibleValue Comment="RTC TAMP2 Input Detection" Value="LPTIM_TRIGSOURCE_4"/>
         <PossibleValue Comment="RTC TAMP3 Input Detection" Value="LPTIM_TRIGSOURCE_5"/>
-        <PossibleValue Comment="COMP1 OUT" Value="LPTIM_TRIGSOURCE_6"/>
-        <PossibleValue Comment="COMP2 OUT" Value="LPTIM_TRIGSOURCE_7"/>
+        <PossibleValue Comment="COMP1 OUT" Value="LPTIM_TRIGSOURCE_6" Condition="!COMP1_Exist" Action="Remove"/>
+        <PossibleValue Comment="COMP2 OUT" Value="LPTIM_TRIGSOURCE_7" Condition="!COMP2_Exist" Action="Remove"/>
     </RefParameter>
     <RefParameter Comment="Active Edge" DefaultValue="LPTIM_ACTIVEEDGE_RISING" Name="TriggerActiveEdge" Type="list" Group="Trigger">
         <Condition Diagnostic="External trigger is selected" Expression="!Semaphore_SWTrigger_$IpInstance"/><!--pour tous les extriggers-->
@@ -259,7 +259,7 @@
       <Signal Name="IN1"/>
      </SignalLogicalOp>
     </Mode>
-                                <Mode Name="Counts_external_clock_with_synchro_01_occur2" UserName="Counts external Clock events from COMP1 with internal synchronization">
+                                <Mode Name="Counts_external_clock_with_synchro_01_occur2" UserName="Counts external Clock events from COMP1 with internal synchronization" RemoveCondition="!COMP1_Exist">
                                         <Semaphore>Semaphore_CounterExternalClk_synchro$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_Input1_comp1$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_Input2_gpio$IpInstance</Semaphore>
@@ -267,7 +267,7 @@
                                                 <Signal Name="VS_COMP1_LPTIM"/>
                                         </SignalLogicalOp>
                                 </Mode>
-                                <Mode Name="Counts_external_clock_with_synchro_01_occur3" UserName="Counts external Clock events from COMP2 with internal synchronization" RemoveCondition="!($IpNumber=2)">
+                                <Mode Name="Counts_external_clock_with_synchro_01_occur3" UserName="Counts external Clock events from COMP2 with internal synchronization" RemoveCondition="!($IpNumber=2) | !COMP2_Exist">
                                         <Semaphore>Semaphore_CounterExternalClk_synchro$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_Input1_comp2$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_Input2_gpio$IpInstance</Semaphore>
@@ -275,7 +275,7 @@
                                                 <Signal Name="VS_COMP2_LPTIM"/>
                                         </SignalLogicalOp>
                                 </Mode>
-                                <Mode Name="Counts_external_clock_with_synchro_01_occur4" UserName="Counts external Clock events from COMP1 OR COMP2 with internal synchronization" RemoveCondition="!($IpNumber=2)">
+                                <Mode Name="Counts_external_clock_with_synchro_01_occur4" UserName="Counts external Clock events from COMP1 OR COMP2 with internal synchronization" RemoveCondition="!($IpNumber=2) | !COMP2_Exist | !COMP1_Exist">
                                         <Semaphore>Semaphore_CounterExternalClk_synchro$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_Input1_comp1comp2$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_Input2_gpio$IpInstance</Semaphore>
@@ -292,7 +292,7 @@
       <Signal Name="IN1"/>
      </SignalLogicalOp>
     </Mode>
-                                <Mode Name="Counts_external_clock_standalone_1X_occur2" UserName="Standalone : counts external Clock events from COMP1">
+                                <Mode Name="Counts_external_clock_standalone_1X_occur2" UserName="Standalone : counts external Clock events from COMP1" RemoveCondition="!COMP1_Exist">
                                         <Condition Diagnostic="COMP1 link to LPTIM must be disabled in COMP1 settings" Expression="!Semaphore_COMP1_LPTIM_enabled"/>
                                         <Semaphore>Semaphore_CounterExternalClk_standalone$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_Input1_comp1$IpInstance</Semaphore>
@@ -301,7 +301,7 @@
                                                 <Signal Name="VS_COMP1_LPTIM"/>
                                         </SignalLogicalOp>
                                 </Mode>
-                                <Mode Name="Counts_external_clock_standalone_1X_occur3" UserName="Standalone : counts external Clock events from COMP2" RemoveCondition="!($IpNumber=2)">
+                                <Mode Name="Counts_external_clock_standalone_1X_occur3" UserName="Standalone : counts external Clock events from COMP2" RemoveCondition="!($IpNumber=2) | !COMP2_Exist">
                                         <Condition Diagnostic="COMP1 link to LPTIM must be disabled in COMP1 settings" Expression="!Semaphore_COMP1_LPTIM_enabled"/>
                                         <Semaphore>Semaphore_CounterExternalClk_standalone$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_Input1_comp2$IpInstance</Semaphore>
@@ -310,7 +310,7 @@
                                                 <Signal Name="VS_COMP2_LPTIM"/>
                                         </SignalLogicalOp>
                                 </Mode>
-                                <Mode Name="Counts_external_clock_standalone_1X_occur4" UserName="Standalone : counts external Clock events from COMP1 OR COMP2" RemoveCondition="!($IpNumber=2)">
+                                <Mode Name="Counts_external_clock_standalone_1X_occur4" UserName="Standalone : counts external Clock events from COMP1 OR COMP2" RemoveCondition="!($IpNumber=2) | !COMP1_Exist | !COMP2_Exist">
                                         <Condition Diagnostic="COMP1 link to LPTIM must be disabled in COMP1 settings" Expression="!Semaphore_COMP1_LPTIM_enabled"/>
                                         <Semaphore>Semaphore_CounterExternalClk_standalone$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_Input1_comp1comp2$IpInstance</Semaphore>
@@ -328,7 +328,7 @@
                                                 <Signal Name="IN2"/>
                                         </SignalLogicalOp>
                                 </Mode>
-                                <Mode Name="Encoder_mode_occur2" UserName="Encoder mode from COMP1 and IN2" RemoveCondition="!($IpNumber=1)">
+                                <Mode Name="Encoder_mode_occur2" UserName="Encoder mode from COMP1 and IN2" RemoveCondition="!($IpNumber=1) | !COMP1_Exist">
                                         <Semaphore>Semaphore_Encoder$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_Input1_comp1$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_Input2_gpio$IpInstance</Semaphore>
@@ -337,7 +337,7 @@
                                                 <Signal Name="IN2"/>
                                         </SignalLogicalOp>
                                 </Mode>
-                                <Mode Name="Encoder_mode_occur3" UserName="Encoder mode from IN1 and COMP2" RemoveCondition="!($IpNumber=1)">
+                                <Mode Name="Encoder_mode_occur3" UserName="Encoder mode from IN1 and COMP2" RemoveCondition="!($IpNumber=1) | !COMP2_Exist">
                                         <Semaphore>Semaphore_Encoder$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_Input1_gpio$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_Input2_comp2$IpInstance</Semaphore>
@@ -346,7 +346,7 @@
                                                 <Signal Name="VS_COMP2_LPTIM"/>
                                         </SignalLogicalOp>
                                 </Mode>
-                                <Mode Name="Encoder_mode_occur4" UserName="Encoder mode from COMP1 and COMP2" RemoveCondition="!($IpNumber=1)">
+                                <Mode Name="Encoder_mode_occur4" UserName="Encoder mode from COMP1 and COMP2" RemoveCondition="!($IpNumber=1) | !COMP1_Exist | !COMP2_Exist">
                                         <Semaphore>Semaphore_Encoder$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_Input1_comp1$IpInstance</Semaphore>
                                         <Semaphore>Semaphore_Input2_comp2$IpInstance</Semaphore>

@@ -1,10 +1,20 @@
 [#ftl]
 /**
   ******************************************************************************
-  * @file           : openamp.c
-  * @brief          : Code for openamp applications
+  * @file   openamp.c
+  * @author  MCD Application Team
+  * @brief  Code for openamp applications
   ******************************************************************************
-  [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
+  * @attention
+  *
+  * <h2><center>&copy; Copyright (c) 2019 STMicroelectronics. 
+  * All rights reserved.</center></h2>
+  *
+  * This software component is licensed by ST under BSD 3-Clause license,
+  * the "License"; You may not use this file except in compliance with the 
+  * License. You may obtain a copy of the License at:
+  *                       opensource.org/licenses/BSD-3-Clause
+  *
   ******************************************************************************
   */
 
@@ -77,7 +87,7 @@ static int OPENAMP_shmem_init(int RPMsgRole)
   }
 
   metal_io_init(&device->regions[1], rsc_table,
-               (metal_phys_addr_t *)rsc_table, rsc_size, -1, 0, NULL);
+               (metal_phys_addr_t *)rsc_table, rsc_size, -1U, 0, NULL);
 
   rsc_io = metal_device_io_region(device, 1);
   if (rsc_io == NULL) {

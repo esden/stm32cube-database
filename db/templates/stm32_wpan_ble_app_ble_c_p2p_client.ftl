@@ -404,9 +404,7 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification( void *pckt )
               /* USER CODE BEGIN GAP_GENERAL_DISCOVERY_PROC */
 
               /* USER CODE END GAP_GENERAL_DISCOVERY_PROC */
-#if(CFG_DEBUG_APP_TRACE != 0)
             APP_DBG_MSG("-- GAP GENERAL DISCOVERY PROCEDURE_COMPLETED\n");
-#endif
             /*if a device found, connect to it, device 1 being chosen first if both found*/
             if (BleApplicationContext.DeviceServerFound == 0x01 && BleApplicationContext.Device_Connection_Status != APP_BLE_CONNECTED_CLIENT)
             {
@@ -477,9 +475,7 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification( void *pckt )
           {
             BleApplicationContext.BleApplicationContext_legacy.connectionHandle = 0;
             BleApplicationContext.Device_Connection_Status = APP_BLE_IDLE;
-#if(CFG_DEBUG_APP_TRACE != 0)
             APP_DBG_MSG("\r\n\r** DISCONNECTION EVENT WITH SERVER \n");
-#endif
             handleNotification.P2P_Evt_Opcode = PEER_DISCON_HANDLE_EVT;
             handleNotification.ConnectionHandle = BleApplicationContext.BleApplicationContext_legacy.connectionHandle;
             P2PC_APP_Notification(&handleNotification);
@@ -511,9 +507,7 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification( void *pckt )
           BleApplicationContext.Device_Connection_Status = APP_BLE_CONNECTED_CLIENT;
 
           /* CONNECTION WITH CLIENT */
-#if(CFG_DEBUG_APP_TRACE != 0)
           APP_DBG_MSG("\r\n\r** CONNECTION EVENT WITH SERVER \n");
-#endif
           handleNotification.P2P_Evt_Opcode = PEER_CONN_HANDLE_EVT;
           handleNotification.ConnectionHandle = BleApplicationContext.BleApplicationContext_legacy.connectionHandle;
           P2PC_APP_Notification(&handleNotification);
@@ -521,16 +515,12 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification( void *pckt )
           result = aci_gatt_disc_all_primary_services(BleApplicationContext.BleApplicationContext_legacy.connectionHandle);
           if (result == BLE_STATUS_SUCCESS)
           {
-#if(CFG_DEBUG_APP_TRACE != 0)
             APP_DBG_MSG("\r\n\r** GATT SERVICES & CHARACTERISTICS DISCOVERY  \n");
             APP_DBG_MSG("* GATT :  Start Searching Primary Services \r\n\r");
-#endif
           }
           else
           {
-#if(CFG_DEBUG_APP_TRACE != 0)
             APP_DBG_MSG("BLE_CTRL_App_Notification(), All services discovery Failed \r\n\r");
-#endif
           }
 
           break; /* HCI_EVT_LE_CONN_COMPLETE */
@@ -580,15 +570,11 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification( void *pckt )
                 /* USER CODE END AD_TYPE_MANUFACTURER_SPECIFIC_DATA */
                   if (adlength >= 7 && adv_report_data[k + 2] == 0x01)
                   { /* ST VERSION ID 01 */
-#if(CFG_DEBUG_APP_TRACE != 0)
                     APP_DBG_MSG("--- ST MANUFACTURER ID --- \n");
-#endif
                     switch (adv_report_data[k + 3])
                     {   /* Demo ID */
                     case CFG_DEV_ID_P2P_SERVER1: /* End Device 1 */
-#if(CFG_DEBUG_APP_TRACE != 0)
                         APP_DBG_MSG("-- SERVER DETECTED -- VIA MAN ID\n");
-#endif
                         BleApplicationContext.DeviceServerFound = 0x01;
                         SERVER_REMOTE_BDADDR[0] = le_advertising_event->Advertising_Report[0].Address[0];
                         SERVER_REMOTE_BDADDR[1] = le_advertising_event->Advertising_Report[0].Address[1];
@@ -819,18 +805,14 @@ static void Scan_Request( void )
     /* USER CODE BEGIN BLE_SCAN_SUCCESS */
 
     /* USER CODE END BLE_SCAN_SUCCESS */
-#if(CFG_DEBUG_APP_TRACE != 0)
       APP_DBG_MSG(" \r\n\r** START GENERAL DISCOVERY (SCAN) **  \r\n\r");
-#endif
     }
     else
     {
     /* USER CODE BEGIN BLE_SCAN_FAILED */
 
     /* USER CODE END BLE_SCAN_FAILED */
-#if(CFG_DEBUG_APP_TRACE != 0)
       APP_DBG_MSG("-- BLE_App_Start_Limited_Disc_Req, Failed \r\n\r");
-#endif
     }
   }
   /* USER CODE BEGIN Scan_Request_2 */
@@ -845,9 +827,7 @@ static void Connect_Request( void )
 
   /* USER CODE END Connect_Request_1 */
   tBleStatus result;
-#if(CFG_DEBUG_APP_TRACE != 0)
   APP_DBG_MSG("\r\n\r** CREATE CONNECTION TO SERVER **  \r\n\r");
-#endif
 
   if (BleApplicationContext.Device_Connection_Status != APP_BLE_CONNECTED_CLIENT)
   {

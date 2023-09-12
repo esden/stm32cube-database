@@ -2106,7 +2106,7 @@
         <Description>Describe here shortly the application</Description>
     </RefParameter>
 
-   <RefParameter Name="EA_3_version" Comment="Version" DefaultValue="V4.10.0" Type="string" Group="External application info" TabName="EA_3_TouchGFX">
+    <RefParameter Name="EA_3_version" Comment="Minimum Supported Version" DefaultValue="V4.10.0" Type="string" Group="External application info" TabName="EA_3_TouchGFX">
         <Condition  Diagnostic="" Expression="USE_Touch_GFX_STACK$context"/>
         <Description>External application version</Description>
     </RefParameter> 
@@ -2621,7 +2621,11 @@
                         <Signal IOMode="" Name="VS-STemWin"/>
                     </SignalLogicalOp>																
                     <Semaphore>USE_STemWin_STACK$context</Semaphore>
-                    <Condition Expression="(MW_DMA2D_MW|!MW_DMA2D_MW)&amp; CRC &amp;  (  (  (MW_LTDC_MW) | (MW_LTDC_MW &amp; MW_DSIHOST_MW  &amp;  MW_GFXMMU_MW)   )       |((MW_FMC_MW) &amp; (Lcd1|Lcd2|Lcd3|Lcd4)))" Diagnostic="STemWin is active only when CRC IP and (FMC SRAM IP configured with memory type in LCD interface mode) or ( LTDC IP or (LTDC IP (DSI mode) and DSIHOST IP (TE mode))) are configured"/> 
+                    <!-- MW_LTDC_MW means LTDC IP activated -->
+                    <!-- MW_FMC_MW means FMC IP activated with SDRAM1 or SDRAM2 then replaced by SDRAM1|SDRAM2 semaphore-->
+                    <!-- Lcd1(234) means FMC IP activated with LCD Interface -->
+                    <!-- Psram1(234) means FMC IP activated with LCD Interface -->
+                    <Condition Expression="CRC &amp;  MW_LTDC_MW  &amp;  ( Lcd1|Lcd2|Lcd3|Lcd4  )" Diagnostic="STemWin is active only when CRC IP, LTDC IP and FMC IP (FMC SRAM with memory type in LCD interface mode) are activated"/> 
                 </Mode>
                 
                 <Mode Name="TouchGFX" UserName="TouchGFX">			
@@ -2629,7 +2633,7 @@
                         <Signal IOMode="" Name="VS-Touch-GFX"/>
                     </SignalLogicalOp>
                     <Semaphore>USE_Touch_GFX_STACK$context</Semaphore>	
-                    <Condition Expression="((MW_LTDC_MW &amp; MW_DSIHOST_MW )| (MW_LTDC_MW) ) &amp; CRC &amp; (S_FREERTOS$context) &amp; (SdramChipSelect2|SdramChipSelect1) &amp; (MW_DMA2D_MW) &amp; (  (TIM1 &amp; TIM1_Exist) | (TIM2 &amp; TIM2_Exist) | (TIM3 &amp; TIM3_Exist)  | (TIM4 &amp; TIM4_Exist) | (TIM5 &amp; TIM5_Exist)  |  (TIM6 &amp; TIM6_Exist) |   (TIM7 &amp; TIM7_Exist) |  (TIM8 &amp; TIM8_Exist)  |  (TIM9 &amp; TIM9_Exist)   | (TIM10 &amp; TIM10_Exist)  | (TIM11 &amp; TIM11_Exist)  | (TIM12 &amp; TIM12_Exist)  |  (TIM13 &amp; TIM13_Exist)  |  (TIM14 &amp; TIM14_Exist)   |  (TIM15 &amp; TIM15_Exist) |  (TIM16 &amp; TIM16_Exist)   |   (TIM17 &amp; TIM17_Exist) |  (TIM18 &amp; TIM18_Exist) |     (TIM19 &amp; TIM19_Exist)  | (TIM20 &amp; TIM20_Exist) | (TIM21 &amp; TIM21_Exist) | (TIM22 &amp; TIM22_Exist) | (TIM23 &amp; TIM23_Exist)   )" Diagnostic="TouchGFX is active only when FreeRTOS ,DMA2D IP , CRC IP , FMC SDRAM IP , TIM IP and (LTDC IP or LTDC IP (DSI mode) and DSIHOST IP (TE mode)) are configured"/> 															                          
+                    <Condition Expression="(MW_LTDC_MW) &amp; CRC &amp; (S_FREERTOS$context) &amp; (SDRAM1|SDRAM2) &amp; (MW_DMA2D_MW) &amp; (  (TIM1 &amp; TIM1_Exist) | (TIM2 &amp; TIM2_Exist) | (TIM3 &amp; TIM3_Exist)  | (TIM4 &amp; TIM4_Exist) | (TIM5 &amp; TIM5_Exist)  |  (TIM6 &amp; TIM6_Exist) |   (TIM7 &amp; TIM7_Exist) |  (TIM8 &amp; TIM8_Exist)  |  (TIM9 &amp; TIM9_Exist)   | (TIM10 &amp; TIM10_Exist)  | (TIM11 &amp; TIM11_Exist)  | (TIM12 &amp; TIM12_Exist)  |  (TIM13 &amp; TIM13_Exist)  |  (TIM14 &amp; TIM14_Exist)   |  (TIM15 &amp; TIM15_Exist) |  (TIM16 &amp; TIM16_Exist)   |   (TIM17 &amp; TIM17_Exist) |  (TIM18 &amp; TIM18_Exist) |     (TIM19 &amp; TIM19_Exist)  | (TIM20 &amp; TIM20_Exist) | (TIM21 &amp; TIM21_Exist) | (TIM22 &amp; TIM22_Exist) | (TIM23 &amp; TIM23_Exist)   )" Diagnostic="TouchGFX is active only when FreeRTOS ,DMA2D IP , CRC IP , FMC SDRAM IP , TIM IP and (LTDC IP or LTDC IP (DSI mode) and DSIHOST IP (TE mode)) are configured"/> 															                          
                 </Mode>
             </ModeLogicOperator>
             <Semaphore>$IpInstance</Semaphore>

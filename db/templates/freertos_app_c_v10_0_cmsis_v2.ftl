@@ -105,8 +105,11 @@ void xPortSysTickHandler( void );
             [/#if]
             [#assign index = index + 1]
           [/#list]
-          [#if mw!="USBPD" && mw!="TRACER_EMB" && mw!="OPENAMP" && mw!="RESMGR_UTILITY"]
+          [#if mw!="USBPD" && mw!="TRACER_EMB" && mw!="OPENAMP" && mw!="RESMGR_UTILITY" && mw!="GRAPHICS"]
 extern void MX_${mw}_Init(void);
+          [/#if]
+          [#if mw="GRAPHICS"]   [#-- BZ 72682 --]
+extern void GRAPHICS_MainTask(void);          
           [/#if]
         [/#if]
       [/#list]

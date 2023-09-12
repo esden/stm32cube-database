@@ -44,7 +44,7 @@
 		<Condition Expression="(VirtualMode = Ext_Phy_Host) | (VirtualMode = Ext_Phy_Device)" Diagnostic=""/>		
 	</RefParameter>	
 	<RefParameter Comment="Physical interface" DefaultValue="USB_OTG_HS_EMBEDDED_PHY" Name="phy_itface" Type="List">		
-		<Condition Expression="(STM32F7x3) &amp; ((VirtualMode = Int_Phy_Host) | (VirtualMode = Int_Phy_Device))" Diagnostic=""/>		
+		<Condition Expression="(STM32F7x3 | STM32F730I8Kx | STM32F730Z8Tx) &amp; ((VirtualMode = Int_Phy_Host) | (VirtualMode = Int_Phy_Device))" Diagnostic=""/>		
 		<PossibleValue Value="USB_OTG_HS_EMBEDDED_PHY" Comment="Internal Phy"/>	
 	</RefParameter>	
 	<RefParameter Comment="Physical interface" DefaultValue="USB_OTG_EMBEDDED_PHY" Name="phy_itface" Type="List">		
@@ -61,7 +61,7 @@
 		<PossibleValue Comment="Low Speed 1.5MBit/s" Value="USB_OTG_SPEED_LOW" />
 	</RefParameter>	
 	<RefParameter Comment="Speed" DefaultValue="USB_OTG_SPEED_HIGH" Name="speed" Type="List">	
-		<Condition Expression="(STM32F7x3) &amp; ((VirtualMode = Int_Phy_Host) | (VirtualMode = Int_Phy_Device))" Diagnostic=""/>		
+		<Condition Expression="(STM32F7x3 | STM32F730I8Kx | STM32F730Z8Tx) &amp; ((VirtualMode = Int_Phy_Host) | (VirtualMode = Int_Phy_Device))" Diagnostic=""/>		
 		<PossibleValue Comment="High Speed 480MBit/s" Value="USB_OTG_SPEED_HIGH" />
 		<PossibleValue Comment="Host Full Speed 12MBit/s" Value="USB_OTG_SPEED_HIGH_IN_FULL"/>	
 		<PossibleValue Comment="Low Speed 1.5MBit/s" Value="USB_OTG_SPEED_LOW" />
@@ -242,8 +242,9 @@
 	
 	<!-- ModeLogicOperator for HS/FS -->
 	<ModeLogicOperator Name="OR">	
-		<!-- ModeLogicOperator for HS -->		
-		<Mode Name="External_Phy" UserName="External_Phy" RemoveCondition="STM32F7x3">
+		<!-- ModeLogicOperator for HS -->	
+		<!-- Bug 69190 remove condition for STM32F723 -->
+		<Mode Name="External_Phy" UserName="External_Phy" RemoveCondition="STM32F7x3 | STM32F730I8Kx | STM32F730Z8Tx">
 			<ModeLogicOperator Name="XOR">
 				<Mode Name="Ext_Phy_OTG/Dual-Role-Device" UserName="OTG/Dual_Role_Device">
 					<SignalLogicalOp Name="AND">							
@@ -303,7 +304,7 @@
 		</Mode>
 		<!-- ModeLogicOperator for FS -->
 		<!-- Tracker 232811 -->
-		<Mode Name="Internal Phy" RemoveCondition="STM32F7x3">			
+		<Mode Name="Internal Phy FS" RemoveCondition="STM32F7x3 | STM32F730I8Kx | STM32F730Z8Tx">			
 			<ModeLogicOperator Name="XOR">
 				<Mode Name="Int_Phy_OTG/Dual-Role-Device" UserName="OTG/Dual_Role_Device">
 					<SignalLogicalOp Name="AND">
@@ -340,7 +341,7 @@
 			<Semaphore>USB_OTG_HSEmbeddedPHYUsed_ForRCC</Semaphore>
 			<Condition Expression="!$IpInstanceHS" Diagnostic=""/>			
 		</Mode>	
-		<Mode Name="Internal Phy">			
+		<Mode Name="Internal Phy HS">			
 			<ModeLogicOperator Name="XOR">
 				<Mode Name="Int_Phy_OTG/Dual-Role-Device" UserName="OTG/Dual_Role_Device">
 					<SignalLogicalOp Name="AND">

@@ -1,12 +1,13 @@
 [#ftl]
+[#compress]
 <?xml version="1.0" encoding="UTF-8"?>
 [#macro getGroups groupArg]
 [#assign grouplibExist = "0"]
-<group>
+<group> 
     <name>${groupArg.name}</name>
-    [#if  multiConfigurationProject?? && groupArg.excludedFrom!=""]
-    <excluded>
-        <configuration>${Configuration}_C${groupArg.excludedFrom?replace("Config","C")}</configuration>
+    [#if  multiConfigurationProject?? && groupArg.excludedFrom!=""  && TrustZone=="0"]
+        <excluded>
+            <configuration>${Configuration}_C${groupArg.excludedFrom?replace("Config","C")}</configuration>
         </excluded>
         [/#if]
 
@@ -16,12 +17,12 @@
                 [#assign grouplibExist = "1"]
                 [#break]
             [#else]
-            [#if underRoot != "true"]
-    <file>
-        <name>${filesName!''}</name>                    
+                [#if underRoot != "true" || filesName?starts_with("..") || copyAsReference == "true"]
+        <file>
+            <name>${filesName!''}</name>                    
         </file>
+                [/#if]
             [/#if]
-    [/#if]
         [/#list]
         [#if grouplibExist=="1"]
             [#list groupArg.sourceFilesNameList as filesName]
@@ -40,41 +41,371 @@
     [/#if]
     </group>
 [/#macro]
-<Project>
-    <FileVersion>${FileVersion}</FileVersion> [#-- add file version for UC30 --]
-
-
-    <ProjectPath>${ProjectPath}</ProjectPath> [#-- added to give project path --]
-
-    <ProjectName>${projectName}</ProjectName> [#-- modified to give only the project name without path --]
-
-    [#-- <ProjectNature>${ProjectNature}</ProjectNature> --][#-- Cpp --]
-    <ProjectNature>${ProjectNature}</ProjectNature> [#-- Cpp --]
-[#if staticLibraryProject??]<StaticLibraryProject>true</StaticLibraryProject> [#-- Static Library Project --][/#if]
-    <HAL_Driver>${HAL_Driver}</HAL_Driver>[#-- modified to give only the hal driver path --]
-    <CMSIS>${CMSISPath}</CMSIS> [#-- modified to give only the relatif path to cmsis folder --]
-
- [#-- list of toolchains to be generated: EWARM,MDK-ARM,TrueSTUDIO,RIDE: This tag can contain one or more than one toolchain: EWARM,MDK-ARM,TrueSTUDIO,RIDE --]
+<ScratchFile FileVersion="${FileVersion}">
+<FileVersion>${FileVersion}</FileVersion> [#-- add file version for UC30 --]
+<Workspace>
+<WorkspaceType>${WorkspaceType}</WorkspaceType>
+<WorkspacePath>${WorkspacePath}</WorkspacePath>
+<underRoot>${underRoot}</underRoot>
+<TrustZone>${TrustZone}</TrustZone>
+<HAL_Driver>${HAL_Driver}</HAL_Driver>[#-- modified to give only the hal driver path --]
+<CMSIS>${CMSISPath}</CMSIS> [#-- modified to give only the relatif path to cmsis folder --]
+[#-- list of toolchains to be generated: EWARM,MDK-ARM,TrueSTUDIO,RIDE: This tag can contain one or more than one toolchain: EWARM,MDK-ARM,TrueSTUDIO,RIDE --]
 
     <Toolchain>${ide}</Toolchain>
 [#if ide=="EWARM" || ide=="MDK-ARM"]
     <Toolversion>${Toolversion}</Toolversion>
 [/#if]
-    <Version>${version}</Version>
+[#if staticLibraryProject??]<StaticLibraryProject>true</StaticLibraryProject> [#-- Static Library Project --][/#if]
 
+    [#--<Version>${version}</Version>--]
+<IocFile>${projectName}.ioc</IocFile>
+[#if TrustZone=="0"]
+[@generateProject prjSecure="-1"/]
+[#else]
+[#--[#list ProjectConfigs?keys as configName]--]
+[@generateProject  prjSecure="1"/]
+[@generateProject  prjSecure="0"/]
+
+[#--[/#list]--]
+[/#if]
+</Workspace>
+</ScratchFile>
+[/#compress]
+
+[#-- Marco generateConfig --]
+[#macro generateConfig multiConfig elem]
+[#if multiConfig == "true"]
+    [#if elem??]
+        [#list elem?keys as dataKey]
+            [#if dataKey=="mxIncludePaths"]
+               [#assign mxIncludePaths =  elem[dataKey]]
+            [/#if]
+            [#if dataKey=="halIncludePaths"]
+               [#assign halIncludePaths =  elem[dataKey]]
+            [/#if]
+            [#if dataKey=="cpuCore" || dataKey=="cpucore"]
+               [#assign cpuCore =  elem[dataKey]]            
+            [/#if]
+            [#if dataKey=="CdefinesList"]
+               [#assign CdefinesList =  elem[dataKey]]
+            [/#if]
+            [#if dataKey=="linkerExtraLibList"]
+               [#assign linkerExtraLibList =  elem[dataKey]]
+            [/#if]
+            [#if dataKey=="bootmode"]
+               [#assign bootmode =  elem[dataKey]]
+            [/#if]
+            [#if dataKey=="Secure"]
+               [#assign Secure =  elem[dataKey]]
+            [/#if]
+            [#if dataKey=="mxIncDir"]
+               [#assign mxIncDir =  elem[dataKey]]
+            [/#if]
+            [#if dataKey=="mainSourceRepo"]
+                [#assign mainSourceRepo =  elem[dataKey]]
+            [/#if]
+            [#if dataKey=="sourceStructure"]
+               [#assign sourceStructure =  elem[dataKey]]
+            [/#if]
+            [#if dataKey=="LinkerFile"]
+               [#assign LinkerFile =  elem[dataKey]]
+            [/#if]
+        [/#list]   
+    [/#if]
+[/#if]
+<config>
+    <name>${Configuration}[#if (multiConfig == "true")][#if Secure!="-1"][#if Secure=="1"]_S[#else]_NS[/#if][#else]_${cpuCore?replace("ARM Cortex-", "C")}[/#if][#else][/#if]</name>	 [#-- project configuration name. Ex: STM32F407_EVAL --]
+<mainSourceRepo>[#if mainSourceRepo??]${mainSourceRepo}[/#if]</mainSourceRepo>   
+<sourceStructure>[#if sourceStructure??]${sourceStructure}[/#if]</sourceStructure>
+ <device>${project.deviceId}</device>		 [#--  STM32 selected device. Ex: STM32F407ZE --]
+    [#if IdeMode?? || ide=="STM32CubeIDE" || family=="STM32MP1xx"]
+    <cpucore>${cpuCore}</cpucore>    
+    [#else]
+    <cpucore>[#if (multiConfig == "true") && TrustZone=="0"]${cpuCore?replace("ARM Cortex-", "C")}[#else][/#if]</cpucore>
+    [/#if]
+    <fpu>${fpu}</fpu>  [#--add FPU for UC30 --]
+    [#if !IdeMode?? && (multiConfig == "true")]
+    <bootmode>${bootmode}</bootmode>  [#-- for boot mode could be equals to SRAM or FLASH --]
+    [/#if]
+     [#if TrustZone == "1" && prj_ctx=="1"]
+    <ExePath>${ExePath}</ExePath>
+    [/#if]
+
+    <memories>  [#-- add MemoriesList for UC30 --] 
+    [#list memoriesList as memory]
+        <memory ${memory} />
+    [/#list]
+        </memories>
+    <startup>${startup}</startup> [#-- add relatif startup path needed for UC30 --]     
+<LinkSettings>
+        [#list LinkerFile as linker]
+	<LinkerFile>${linker}</LinkerFile>
+        [/#list]
+	[#if !IdeMode??]
+        <icfloc>${icfloc}</icfloc>
+        [/#if]
+	<LinkAdditionalLibs>
+[#if TrustZone == "1" && prj_ctx=="0"]
+	<lib>${LinkAdditionalLibs}</lib>
+[/#if]
+	</LinkAdditionalLibs>
+[#if TrustZone == "1" && prj_ctx=="1"]
+	<TrustZoneLibName>${TrustZoneLibName}</TrustZoneLibName>
+[/#if]
+</LinkSettings>
+    <heapSize>${HeapSize}</heapSize>
+    <stackSize>${StackSize}</stackSize>
+
+    [#if ide=="EWARM" || ide=="MDK-ARM"]
+    <cpuclock>${cpuclock}</cpuclock>
+    [/#if]
+    [#if boardName != ""]
+    <board>${boardName}</board>
+    [/#if]
+
+    [#--optional part--]
+    [#if usedDebug == "true"]
+    <debugprobe>${DebugMode}</debugprobe>
+    [/#if]
+    [#-- <optimization>${project.compilerOptimization}</optimization> --]
+    <optimization>${optimization}</optimization>
+
+
+    <Aincludes>
+        [#if usedfreeRTOS=="true" || (multiConfig == "true" && cpuCore=="ARM Cortex-M4" && usedfreeRTOS_M4?? && usedfreeRTOS_M4=="true")|| (multiConfig == "true" && cpuCore=="ARM Cortex-M7" && usedfreeRTOS_M7?? && usedfreeRTOS_M7=="true")]
+	   		[#if ide=="EWARM" ]
+        <include>$PROJ_DIR$\${RelativePath}[#if mxIncDir??]${mxIncDir}[#else]Inc[/#if]</include>
+	   		[#elseif ide=="MDK-ARM" ]
+        <include>${RelativePath}[#if mxIncDir??]${mxIncDir}[#else]Inc[/#if]</include>
+   			[#elseif ide=="Makefile" ]
+        <include>${RelativePath}[#if mxIncDir??]${mxIncDir}[#else]Inc[/#if]</include>
+                        [#else]
+        <include></include>
+                        [/#if]
+		[#else]
+        <include></include>
+    	[/#if]
+
+        </Aincludes>
+    <Adefines>
+        [#list AdefinesList as define]
+        <define>${define}</define>
+        [/#list]
+        </Adefines>  
+    <Cdefines>
+        [#assign deflist =""]
+	[#list CdefinesList as define]
+        [#if !deflist?contains(define)]
+        <define>${define}</define>
+            [#assign deflist = deflist + " - " + define]
+        [/#if]
+        [/#list]
+	   [#-- <define>__weak=__attribute__((weak))</define> --]
+        </Cdefines>
+    <Ldefines>
+	[#list LdefinesList as define]
+        <define>${define}</define>
+        [/#list]
+	   [#-- <define>__weak=__attribute__((weak))</define> --]
+        </Ldefines>
+        <Cincludes>
+	 [#-- required includes for all generated projects --]
+        [#list mxIncludePaths as mxIncludePath]
+        <include>${mxIncludePath}</include>
+        [/#list]     
+	[#list halIncludePaths as halIncludePath]
+        <include>${halIncludePath}</include>
+        [/#list]
+        </Cincludes>
+
+    [#-- defines to remove --]
+    <definestoremove>
+        <Adefines>
+        [#if aDefineToRemove??]
+            [#list aDefineToRemove as defineToRemove]
+            <define>${defineToRemove}</define>
+            [/#list]
+        [/#if]
+            </Adefines>
+        <Cdefines>
+        [#if cDefineToRemove??]
+            [#assign def = ""]
+            [#list cDefineToRemove as defineToRemove]
+                [#if !def?contains(defineToRemove)]
+                    <define>${defineToRemove}</define>
+                    [#assign def = def + " - " +  defineToRemove]
+                [/#if]
+            [/#list]
+        [/#if]
+            </Cdefines> 
+        <Ldefines>
+        [#if lDefineToRemove??]
+            [#list lDefineToRemove as defineToRemove]
+            <define>${defineToRemove}</define>
+            [/#list]
+        [/#if]
+            </Ldefines> 
+        </definestoremove>
+
+    <inctoremove>
+        <Aincludes>
+            <include></include>
+            </Aincludes>
+        <Cincludes>
+    [#list IncludePathsToRemove as IncludePath]
+            <include>${IncludePath}</include>
+    [/#list]
+            </Cincludes>
+        </inctoremove>
+   
+    [#-- End of optional part--]
+    
+    [#-- Linker Extra Lib --]
+    [#if linkerExtraLibList??]
+    <LinkAdditionalLibs>
+        [#list linkerExtraLibList as extraLib]
+        <lib>${extraLib}</lib>
+        [/#list] 
+        </LinkAdditionalLibs>
+    [/#if]
+    </config>
+[/#macro]
+
+[#-- Marco generateProject --]
+[#macro generateProject prjSecure]
+
+[#list ProjectConfigs?keys as configName]
+[#assign elem = ProjectConfigs[configName]]
+[#if prjSecure=="-1"]
+[#assign selectedConfig =  configName]
+[/#if]
+[#assign ConfigSecure = "-2"]
+[#if elem??]
+    [#list elem?keys as dataKey]
+        [#if dataKey=="Secure"]
+           [#assign ConfigSecure =  elem[dataKey]]
+        [/#if]
+        [#if dataKey=="cmsisSourceFileNameList"]
+               [#assign cmsisSourceFileNameList =  elem[dataKey]]            
+        [/#if]   
+    [#if TrustZone=="1" && dataKey=="SourceFilesToRemove"]
+        [#assign SourceFilesToRemove =  elem[dataKey]]
+    [/#if]
+    [/#list]
+    [#if prjSecure == ConfigSecure && TrustZone=="1"]
+        [#assign selectedConfig =  configName]
+
+        [#list elem?keys as dataKey]
+            [#if dataKey=="ApplicationGroups"]
+               [#assign ApplicationGroups =  elem[dataKey]]
+            [/#if]       
+            [#if dataKey=="bspComponentGroups"]
+               [#assign bspComponentGroups =  elem[dataKey]]
+            [/#if] 
+            [#if dataKey=="atLeastOneBspComponentIsUsed"]
+               [#assign atLeastOneBspComponentIsUsed =  elem[dataKey]]
+            [/#if] 
+            [#--if dataKey=="atLeastOneMiddlewareIsUsed"]
+               [#assign atLeastOneMiddlewareIsUsed =  elem[dataKey]]
+            [/#if--] 
+            [#--if dataKey=="MiddlewareList"]
+               [#assign MiddlewareList =  elem[dataKey]]
+            [/#if--] 
+            [#if dataKey=="externalGroups"]
+               [#assign externalGroups =  elem[dataKey]]
+            [/#if]
+            [#if dataKey=="atLeastOneCmsisPackIsUsed"]
+               [#assign atLeastOneCmsisPackIsUsed =  elem[dataKey]]
+            [/#if]
+            [#if dataKey=="externalGroups"]
+               [#assign externalGroups =  elem[dataKey]]
+            [/#if]
+            [#if dataKey=="ResMgr_Utility"]
+               [#assign ResMgr_Utility =  elem[dataKey]]
+            [/#if]
+            [#if dataKey=="ThirdPartyPackList"]
+               [#assign ThirdPartyPackList =  elem[dataKey]]
+            [/#if]
+            [#if dataKey=="UtilitiesGroup"]
+               [#assign UtilitiesGroup =  elem[dataKey]]
+            [/#if]
+            [#if dataKey=="cmsisSourceFileNameList"]
+               [#assign cmsisSourceFileNameList =  elem[dataKey]]               
+            [/#if]
+            [#if dataKey=="ExePath"]
+               [#assign ExePath =  elem[dataKey]]
+            [/#if]
+[#if dataKey=="LinkAdditionalLibs"]
+               [#assign LinkAdditionalLibs =  elem[dataKey]]
+            [/#if]
+[#if dataKey=="TrustZoneLibName"]
+               [#assign TrustZoneLibName =  elem[dataKey]]
+            [/#if]
+[#if dataKey=="prj_ctx"]
+               [#assign prj_ctx =  elem[dataKey]]
+            [/#if]
+        [/#list]
+        [#break]
+    [/#if]
+[/#if]
+
+[/#list]
+<Project>    
+[#-- <ProjectPath>${ProjectPath}</ProjectPath>  --][#-- added to give project path --]
+    <ProjectName>${projectName}[#if TrustZone=="1"][#if prjSecure=="1"]_S[#else]_NS[/#if][/#if]</ProjectName> [#-- modified to give only the project name without path --]
+    <ProjectNature>${ProjectNature}</ProjectNature> [#-- Cpp --]
+ [#if TrustZone == "1"]     
+<Secure>${prjSecure}</Secure>
+[#else]
+<Secure/>
+ [/#if]
+    
+  <filestoremove>
+        
+[#assign listFTR = " "]
+[#list SourceFilesToRemove as SourceFile]
+        [#if SourceFile!="null" && !listFTR?contains(SourceFile)]
+<file>
+            <name>${SourceFile}</name>
+ </file>
+[#assign listFTR = listFTR +" "+ SourceFile]
+    [/#if]
+[/#list]
+           
+        </filestoremove>
+[#if underRoot == "true"]
+<sourceEntriesToRemove>
+    <sourceEntry>
+[#-- [#list SourceEntryToRemove as SourceEntry]--]
+        [#-- [#if SourceEntry!="null"]--]
+ [#-- [/#if]--]
+[#-- [/#list]--]
+</sourceEntry>
+</sourceEntriesToRemove>
+[/#if]
     <configs>
 [#if ProjectConfigs?size > 1]
 [#list ProjectConfigs?keys as configName]
+[#assign elemConfig = ProjectConfigs[configName] ]
+        [#list elemConfig?keys as dataKey]
+            [#if dataKey=="Secure"]
+               [#assign Secure =  elemConfig[dataKey]]
+            [/#if]
+        [/#list]
+[#if prjSecure=Secure]
 [@generateConfig multiConfig="true" elem=ProjectConfigs[configName]/]
+[/#if]
 [/#list]
 [#else]
 [@generateConfig multiConfig="false" elem=""/]
 [/#if]
         </configs> 
 
-    <underRoot>${underRoot}</underRoot>
+   [#--  <underRoot>${underRoot}</underRoot>--]
+<copyAsReference>${copyAsReference}</copyAsReference>
 [#if underRoot == "true"]
-    <copyAsReference>${copyAsReference}</copyAsReference>
+    
     [#if copyAsReference == "true"]
     <sourceEntries>
         [#if src??]
@@ -83,36 +414,38 @@
             <name>${src}</name>
         </sourceEntry>
             [#else]
-            [#list ProjectConfigs?keys as configName]
-                [#assign elem = ProjectConfigs[configName]]
-                [#list elem?keys as dataKey]
-                    [#if dataKey=="inc"]
-                       [#--<sourceEntry>
-                        <name>${elem[dataKey]}</name>
-                        </sourceEntry> --]
+                [#list ProjectConfigs?keys as configName]
+                    [#assign elem = ProjectConfigs[configName]]
+                    [#if (TrustZone == "0") || (TrustZone == "1" && configName==selectedConfig)]                   
+                        [#list elem?keys as dataKey]
+                            [#if dataKey=="inc"]
+                               [#--<sourceEntry>
+                                <name>${elem[dataKey]}</name>
+                                </sourceEntry> --]
+                            [/#if]
+                            [#if dataKey=="src"]
+                            <sourceEntry>
+                            <name>${elem[dataKey]}</name>
+                            [#if elem[dataKey]?starts_with("CM4")]
+                            <excluded>
+                                <configuration>${Configuration}_CM7</configuration>
+                            </excluded>
+                            [/#if]
+                            [#if elem[dataKey]?starts_with("CM7")]
+                            <excluded>
+                                <configuration>${Configuration}_CM4</configuration>
+                            </excluded>
+                            [/#if]
+                            </sourceEntry> 
+                            [/#if]                    
+                            [#if dataKey=="GFXSource"]
+                            <sourceEntry>
+                            <name>${elem[dataKey]}</name>
+                            </sourceEntry>            
+                            [/#if]                    
+                        [/#list] 
                     [/#if]
-                    [#if dataKey=="src"]
-                <sourceEntry>
-                    <name>${elem[dataKey]}</name>toto
-                    [#if elem[dataKey] == "CM4"]
-                    <excluded>
-                        <configuration>${Configuration}_CM7</configuration>
-                    </excluded>
-                    [/#if]
-                    [#if elem[dataKey] == "CM7"]
-                    <excluded>
-                        <configuration>${Configuration}_CM4</configuration>
-                    </excluded>
-                    [/#if]
-                </sourceEntry> 
-                    [/#if]                    
-                    [#if dataKey=="GFXSource"]
-        <sourceEntry>
-            <name>${elem[dataKey]}</name>
-            </sourceEntry>            
-                    [/#if]                    
-                [/#list] 
-            [/#list]
+                [/#list]
             [/#if]
         [/#if]
         [#if GFXSource??]
@@ -128,22 +461,47 @@
         <sourceEntry>
 	<name>${HALDriver}</name>
     	</sourceEntry>
-    	[#if atLeastOneMiddlewareIsUsed]                        
-            <sourceEntry>
-            <name>Middlewares</name>
-            </sourceEntry>
+    	[#if atLeastOneMiddlewareIsUsed]   
+        <sourceEntry>
+                    <name>Middlewares</name>
+                    </sourceEntry>
             [#list MiddlewareList as Middleware]
-                <sourceEntry>
-                <name>${Middleware}</name>
-                </sourceEntry>
-            [/#list]
+            [#if TrustZone == "0"]
+                    <sourceEntry>
+                    <name>${Middleware}</name>
+                [#if multiConfigurationProject?? && family!="STM32MP1xx"]
+                    [#if Middleware?starts_with("CM4")]
+                        <excluded>
+                            <configuration>${Configuration}_CM7</configuration>
+                        </excluded>
+                    [/#if]
+                    [#if Middleware?starts_with("CM7")]
+                        <excluded>
+                            <configuration>${Configuration}_CM4</configuration>
+                        </excluded>
+                    [/#if]
+                [/#if]
+                    </sourceEntry>
+            [#else] [#-- trustzone == 1 --]
+                [#if Middleware?starts_with("Secure") && prjSecure=="1"]
+                    <sourceEntry>
+                            <name>${Middleware}</name>
+                    </sourceEntry>
+                [/#if]
+                [#if Middleware?starts_with("NonSecure") && prjSecure=="0"]
+                    <sourceEntry>
+                            <name>${Middleware}</name>
+                    </sourceEntry>
+                [/#if]
+            [/#if]
+        [/#list]
         [/#if]
 	[#-- MZA Bug41441 --]			
-	[#if atLeastOneCmsisPackIsUsed]
+	[#--if atLeastOneCmsisPackIsUsed]
             <sourceEntry>
             <name>Packs</name>
             </sourceEntry>
-	[/#if]
+	[/#if--]
         [#if ResMgr_Utility??]
             <sourceEntry>
                 <name>Utilities</name>
@@ -157,8 +515,10 @@
             </sourceEntry>
             [/#list]
         [/#if]
-        </sourceEntries>
+                </sourceEntries>
+<Groups>
         [#if atLeastOneMiddlewareIsUsed]
+
     <group>
         <name>Middlewares</name>  
             [#list groups as group]
@@ -167,18 +527,27 @@
             <name>${group.name!''}</name>
                     [#if group.sourceFilesNameList??]
                         [#list group.sourceFilesNameList as filesName]
+                            [#-- selectedConfig --]
+                            [#assign removeFromConfig = "0"]
+                            [#if multiConfigurationProject?? && ConfigsAndFiles??  && TrustZone=="1"]
+                                [#if !ConfigsAndFiles[selectedConfig]?seq_contains(filesName?replace("/","\\"))]
+                                                [#assign removeFromConfig = "1"]
+                                [/#if]
+                            [/#if]
+[#if removeFromConfig == "0"]
             <file>
                 <name>${filesName!''}</name>
 [#if multiConfigurationProject?? && ConfigsAndFiles??]
     [#list ConfigsAndFiles?keys as configKey]
-[#if !ConfigsAndFiles[configKey]?seq_contains(filesName?replace("/","\\"))]
+[#if !ConfigsAndFiles[configKey]?seq_contains(filesName?replace("/","\\")) && TrustZone=="0"]
                 <excluded>
-                    <configuration>${Configuration}_${configKey?replace("ARM Cortex-", "C")}</configuration>
+                    <configuration>${Configuration}_${configKey?replace("CortexM", "CM")}</configuration>
                     </excluded>
 [/#if]
 [/#list]
 [/#if]
                 </file>
+[/#if]
                         [/#list]
                     [/#if]
                     [#if group.subGroups??]
@@ -187,18 +556,27 @@
             <group>
                 <name>${sgroup.name!''}</name>
                                 [#list sgroup.sourceFilesNameList as filesName]
+[#-- selectedConfig --]
+[#assign removeFromConfig = "0"]
+[#if multiConfigurationProject?? && ConfigsAndFiles?? && TrustZone=="1"]
+[#if !ConfigsAndFiles[selectedConfig]?seq_contains(filesName?replace("/","\\"))]
+                [#assign removeFromConfig = "1"]
+[/#if]
+[/#if]
+[#if removeFromConfig == "0"]
                 <file>
-                    <name>${filesName!''}</name
+                    <name>${filesName!''}</name>
 [#if  multiConfigurationProject?? && ConfigsAndFiles??]
     [#list ConfigsAndFiles?keys as configKey]
-[#if !ConfigsAndFiles[configKey]?seq_contains(filesName?replace("/","\\"))]
+[#if !ConfigsAndFiles[configKey]?seq_contains(filesName?replace("/","\\")) && TrustZone=="0"]
                     <excluded>
-                        <configuration>${Configuration}_${configKey?replace("ARM Cortex-", "C")}</configuration>
+                        <configuration>${Configuration}_${configKey?replace("CortexM", "CM")}</configuration>
                         </excluded>
 [/#if]
 [/#list]
 [/#if]
                     </file>
+[/#if]
                                 [/#list]
                             [/#if]
                 </group>
@@ -209,7 +587,7 @@
             [/#list]
         </group> 
         [/#if]
-        [#list externalGroups as grp]
+        [#list externalGroups as grp] 
             [@getGroups groupArg=grp/]
         [/#list]
     <group>
@@ -239,13 +617,35 @@
         [/#if]
         <group>
             <name>${HALGroup.name!''}</name>
-	[#if HALGroup.sourceFilesNameList??]
-            [#list HALGroup.sourceFilesNameList as filesName]
+	   [#if HALGroup.sourceFilesNameList??]
+        [#list HALGroup.sourceFilesNameList as filesName]
+[#-- selectedConfig --]
+[#assign removeFromConfig = "0"]
+[#assign excludeFromConfig = "0"]
+[#if multiConfigurationProject?? && ConfigsAndFiles?? && TrustZone=="1"]
+[#if !ConfigsAndFiles[selectedConfig]?seq_contains(filesName?replace("/","\\"))]
+                [#assign removeFromConfig = "1"]
+[/#if]
+[/#if]
+[#if removeFromConfig == "0"]
             <file>
                 <name>${filesName!''}</name>
+[#if  multiConfigurationProject?? && ConfigsAndFiles??]
+    [#list ConfigsAndFiles?keys as configKey]
+[#if !ConfigsAndFiles[configKey]?seq_contains(filesName?replace("/","\\"))  && TrustZone=="0"]
+
+                <excluded>
+                    <configuration>${Configuration}_${configKey?replace("CortexM", "CM")}</configuration>
+                    </excluded>
+[/#if]
+[/#list]
+[/#if]
+
+
                 </file>
-            [/#list]
-	[/#if]
+[/#if]
+        [/#list]
+    [/#if]
             </group>		    
         </group>   
         [#if UtilitiesGroup??]
@@ -253,18 +653,27 @@
         <name>${UtilitiesGroup.name!''}</name>
             [#if UtilitiesGroup.sourceFilesNameList??]
                 [#list UtilitiesGroup.sourceFilesNameList as filesName]
+[#-- selectedConfig --]
+[#assign removeFromConfig = "0"]
+[#if multiConfigurationProject?? && ConfigsAndFiles?? && TrustZone=="1"]
+[#if !ConfigsAndFiles[selectedConfig]?seq_contains(filesName?replace("/","\\"))]
+                [#assign removeFromConfig = "1"]
+[/#if]
+[/#if]
+[#if removeFromConfig == "0"]
         <file>
             <name>${filesName!''}</name>
                     [#if ConfigsAndFiles??]
 [#list ConfigsAndFiles?keys as configKey]
-[#if  multiConfigurationProject?? && !ConfigsAndFiles[configKey]?seq_contains(filesName?replace("/","\\"))]
+[#if  multiConfigurationProject?? && !ConfigsAndFiles[configKey]?seq_contains(filesName?replace("/","\\")) && TrustZone=="0"]
             <excluded>
-                <configuration>${Configuration}_${configKey?replace("ARM Cortex-", "C")}</configuration>
+                <configuration>${Configuration}_${configKey?replace("CortexM", "CM")}</configuration>
                 </excluded>
 [/#if]
 [/#list]
 [/#if]
             </file>
+[/#if]
                 [/#list]
             [/#if]
         </group>
@@ -272,6 +681,8 @@
         [#list externalGroups as grp]
             [@getGroups groupArg=grp/]
         [/#list]
+ 
+</Groups>
     [#else] [#-- Copy All/Needed option --]
     <sourceEntries>
         [#--<sourceEntry>
@@ -282,9 +693,11 @@
             <sourceEntry>
             <name>${src}</name>
             </sourceEntry>
+
             [#else]
             [#list ProjectConfigs?keys as configName]
                 [#assign elem = ProjectConfigs[configName]]
+                [#if (TrustZone == "0") || (TrustZone == "1" && configName==selectedConfig)]
                 [#list elem?keys as dataKey]
                     [#if dataKey=="inc"]
                        [#--<sourceEntry>
@@ -292,26 +705,27 @@
                         </sourceEntry> --]
                     [/#if]
                     [#if dataKey=="src"]
-            <sourceEntry>
-            <name>${elem[dataKey]}</name>
-                    [#if elem[dataKey] == "CM4"]
+                    <sourceEntry>
+                    <name>${elem[dataKey]}</name>
+                    [#if elem[dataKey]?starts_with("CM4")]
                     <excluded>
                         <configuration>${Configuration}_CM7</configuration>
                     </excluded>
                     [/#if]
-                    [#if elem[dataKey] == "CM7"]
+                    [#if elem[dataKey]?starts_with("CM7")]
                     <excluded>
                         <configuration>${Configuration}_CM4</configuration>
                     </excluded>
                     [/#if]
-            </sourceEntry> 
+                    </sourceEntry> 
                     [/#if]                    
                     [#if dataKey=="GFXSource"]
-        <sourceEntry>
-            <name>${elem[dataKey]}</name>
-            </sourceEntry>            
+                    <sourceEntry>
+                        <name>${elem[dataKey]}</name>
+                    </sourceEntry>            
                     [/#if]                    
                 [/#list] 
+                [/#if] 
             [/#list]
             [/#if]
         [/#if]
@@ -327,14 +741,44 @@
          [/#if]
         <sourceEntry>
             <name>${HALDriver}</name>
-           </sourceEntry>        
+        </sourceEntry>        
 	[#if atLeastOneMiddlewareIsUsed]   
         [#-- ************************* --]
-        [#if  multiConfigurationProject?? && usedMWPerCore??]    
-            <sourceEntry>
-                   <name>Middlewares</name>   
-                        [#list usedMWPerCore?keys as mwcore]
-                        [#assign usedMw =  usedMWPerCore[mwcore]]
+       
+        [#if  multiConfigurationProject?? && usedMWPerCore??  && TrustZone=="0"]    
+                <sourceEntry>
+                    <name>Middlewares</name>                        
+                        [#list usedMWandRootFolder?keys as middName]
+                        [#assign exclude = true]
+                           
+                        [#assign MwRoot =  usedMWandRootFolder[middName]] 
+                        <file>
+                            <name>${MwRoot?replace("Middlewares/","")}</name>                        
+                            [#list usedMWPerCore?keys as mwcore]
+                                [#assign usedMw =  usedMWPerCore[mwcore]]   
+                                [#assign used = false] 
+                                [#if usedMw??]  
+                                    [#list usedMw as m]
+                                        [#if m==middName]
+                                           [#assign used = true]
+                                        [/#if]
+                                    [/#list]
+                                [/#if] 
+                                [#if used==false]
+                            <excluded>
+                                <configuration>${Configuration}_${mwcore?replace("CortexM", "CM")}</configuration>
+                            </excluded>
+                                [/#if]                     
+                            [/#list]  
+                        </file>
+                        [/#list]          
+                </sourceEntry>
+        [#else]
+        [#if  TrustZone=="1"]    
+              <sourceEntry>
+                    <name>Middlewares</name> 
+                        [#--list usedMWPerCore?keys as mwcore--]
+                        [#assign usedMw =  usedMWPerCore[selectedConfig]]
                         [#list usedMWandRootFolder?keys as middName]
                         [#assign exclude = true]
                         [#assign used = false] 
@@ -345,30 +789,54 @@
                                                 [/#if]
                                             [/#list]
                                         [/#if]      
-                           [#if used==false]
+                           [#if used==true]
                                 [#assign MwRoot =  usedMWandRootFolder[middName]] 
-                <file>
-                   <name>${MwRoot?replace("Middlewares/","")}</name>                
-        <excluded>
-            <configuration>${Configuration}_${mwcore?replace("ARM Cortex-", "C")}</configuration>
-        </excluded>
-               </file>
-                                            [/#if]                                
+                
+                    <file>
+                        <name>${MwRoot?replace("Middlewares/","")}</name>                
+                    </file>
+                                            [/#if]   
+                             
                                     [/#list]  
-                                                     
-                    [/#list]  
-        </sourceEntry>
+              </sourceEntry>                                       
+                    [#--[/#list] --]         
         [#else]
-         <sourceEntry>
+            <sourceEntry>
             <name>Middlewares</name>
             </sourceEntry>
-            [#list MiddlewareList as Middleware]
-                <sourceEntry>
-                <name>${Middleware}</name>
-                </sourceEntry>
-            [/#list]   
-       [/#if]
-    
+            
+        [/#if]       
+        [/#if]
+        [#list MiddlewareList as Middleware] 
+            [#if TrustZone == "0"]
+                    <sourceEntry>
+                    <name>${Middleware}</name>
+                [#if multiConfigurationProject?? && family!="STM32MP1xx"]
+                    [#if Middleware?starts_with("CM4")]
+                        <excluded>
+                            <configuration>${Configuration}_CM7</configuration>
+                        </excluded>
+                    [/#if]
+                    [#if Middleware?starts_with("CM7")]
+                        <excluded>
+                            <configuration>${Configuration}_CM4</configuration>
+                        </excluded>
+                    [/#if]
+                [/#if]
+                    </sourceEntry>
+            [#else] [#-- trustzone == 1 --]
+                [#if Middleware?starts_with("Secure") && prjSecure=="1"]
+                    <sourceEntry>
+                            <name>${Middleware}</name>
+                    </sourceEntry>
+                [/#if]
+                [#if Middleware?starts_with("NonSecure") && prjSecure=="0"]
+                    <sourceEntry>
+                            <name>${Middleware}</name>
+                    </sourceEntry>
+                [/#if]
+            [/#if]
+        [/#list]
         [#-- ************************* --]
 	[/#if]
         [#if ThirdPartyPackList??]
@@ -387,15 +855,11 @@
         [#if ResMgr_Utility??]
         <sourceEntry>
             <name>Utilities</name>
-        </sourceEntry>
+            </sourceEntry>
         [/#if]
-        [#if UtilitiesGroup??]
-        <sourceEntry>
-            <name>${UtilitiesGroup.name!''}</name>
-        </sourceEntry>
-    [/#if]
         </sourceEntries>
-        [#-- add lib path --]        
+[#-- add lib path --]   
+<Groups>
         [#if atLeastOneMiddlewareIsUsed]
             [#assign libExist = "0"]
             [#list groups as group]
@@ -479,33 +943,86 @@
         </group> 
             [/#if]
         [/#if]
-    [#list externalGroups as grp]
-        [@getGroups groupArg=grp/]
-    [/#list]
+        [#list externalGroups as grp]
+            [@getGroups groupArg=grp/]
+        [/#list]
         [#-- end lib path --]
+    </Groups>
     [/#if]
+
 [/#if] [#-- End if under root --]
 
 [#-- project groups and files --]
 [#if underRoot == "false"]
+<Groups>
 [#-- project groups and files --]
     [#if atLeastOneMiddlewareIsUsed]
+[#assign isMWUsed = "false"]
+[#list groups as group]
+[#-- search atleastoneMW used --]                 
+                [#if multiConfigurationProject?? && usedMWPerCore??]                    
+                    [#--list usedMWPerCore?keys as mwcore--]
+                        [#assign exclude = true]
+                        [#assign usedMw =  usedMWPerCore[selectedConfig]]  
+                        [#if usedMw?? && usedMw?size>0]  
+
+                            [#assign isMWUsed = "true"]
+
+                        [/#if]                                
+                    [#--[/#list] --]
+                [/#if]
+[/#list]
+[#-- End search excluded groups --]
+[#if isMWUsed == "true" || TrustZone=="0"]
     <group>
         <name>Middlewares</name> 
-        [#assign grpList =""]
+        [#assign grpList = []]
         [#list groups as group]
-         [#if !grpList?contains(group.name)]
-                        [#assign grpList =grpList + " - " + group.name]   
+[#-- search excluded groups --] 
+                [#assign excludedGroup = "false"]
+                [#if multiConfigurationProject?? && usedMWPerCore?? && TrustZone=="0"]                    
+                                        [#assign exclude = true]
+                                        [#assign usedMw =  usedMWPerCore[selectedConfig]]
+                                        [#if usedMw??]  
+                                            [#list usedMw as mw][#assign n = group.name]
+                                                [#assign used = false]
+                                                [#assign mwName= mw?replace("_M7","")?replace("_M4","")]
+                                                [#if (n?lower_case=="stemwin" || n?lower_case=="touchgfx") && mwName=="GRAPHICS"]
+                                                    [#assign used = true]
+                                                [/#if]
+                                                [#if n?starts_with("USB_DEVICE") && mwName?starts_with("USB_DEVICE")]
+                                                    [#assign used = true]
+                                                [/#if]
+                                                [#if n?starts_with("USB_Host") && mwName?starts_with("USB_HOST")]
+                                                    [#assign used = true]
+                                                [/#if]
+                                                [#if n?starts_with("PDMFilter") && mwName?starts_with("PDM2PCM")]
+                                                    [#assign used = true]
+                                                [/#if]                                                
+                                                [#if (mw?lower_case == n?lower_case) || used]
+                                                [#assign exclude = false] 
+                                                [/#if]
+                                            [/#list]
+                                        [/#if]      
+                                        [#if TrustZone=="1" && exclude] 
+                                            [#assign excludedGroup = "true"]
+                                        [/#if]                                
+                                    
+                                [/#if]
+[#-- End search excluded groups --]
+                    [#if !grpList?seq_contains(group.name) && excludedGroup=="false"]
+
+            [#assign grpList = grpList + [group.name]]
             [#if group.name!="App" && group.name!="Target" && group.name!="target"]
         <group>
             <name>${group.name!''}</name>[#assign nnnnn = group.name]
             [#-- ************************* --]
-           [#if  multiConfigurationProject?? && usedMWPerCore??]                    
+           [#if  multiConfigurationProject?? && usedMWPerCore?? && TrustZone=="0"]                    
                     [#list usedMWPerCore?keys as mwcore]
                         [#assign exclude = true]
                         [#assign used = false]
                         [#assign usedMw =  usedMWPerCore[mwcore]]
-                        [#if usedMw??]  
+                        [#if usedMw??] 
                             [#list usedMw as mw][#assign n = group.name]
                                 [#assign used = false]
                                 [#assign mwName= mw?replace("_M7","")?replace("_M7","")]
@@ -527,27 +1044,36 @@
                             [/#list]
                         [/#if]  
     
-                        [#if exclude] 
+                        [#if exclude && TrustZone=="0"]
             <excluded>
-                <configuration>${Configuration}_${mwcore?replace("ARM Cortex-", "C")}</configuration>
+                <configuration>${Configuration}_${mwcore?replace("CortexM", "CM")}</configuration>
             </excluded>
-                        [/#if]                                
+                        [/#if]                       
                     [/#list]  
                 [/#if]
                 [#if group.sourceFilesNameList??]
                     [#list group.sourceFilesNameList as filesName]
+[#-- selectedConfig --]
+[#assign removeFromConfig = "0"]
+[#if multiConfigurationProject?? && ConfigsAndFiles?? && TrustZone=="1"]
+[#if !ConfigsAndFiles[selectedConfig]?seq_contains(filesName?replace("/","\\"))]
+                [#assign removeFromConfig = "1"]
+[/#if]
+[/#if]
+[#if removeFromConfig == "0"]
             <file>
                 <name>${filesName!''}</name>
 [#if  multiConfigurationProject?? && ConfigsAndFiles??]
     [#list ConfigsAndFiles?keys as configKey]
-[#if !ConfigsAndFiles[configKey]?seq_contains(filesName?replace("/","\\"))]
+[#if !ConfigsAndFiles[configKey]?seq_contains(filesName?replace("/","\\")) && TrustZone=="0"]
                     <excluded>
-                        <configuration>${Configuration}_${configKey?replace("ARM Cortex-", "C")}</configuration>
+                        <configuration>${Configuration}_${configKey?replace("CortexM", "CM")}</configuration>
                         </excluded>
 [/#if]
 [/#list]
 [/#if]
                 </file>
+[/#if]
 		    [/#list]
 		[/#if]
 		[#if group.subGroups??]
@@ -556,18 +1082,27 @@
             <group>
                 <name>${sgroup.name!''}</name>
 			    [#list sgroup.sourceFilesNameList as filesName]
+[#-- selectedConfig --]
+[#assign removeFromConfig = "0"]
+[#if multiConfigurationProject?? && ConfigsAndFiles?? && TrustZone=="1"]
+[#if !ConfigsAndFiles[selectedConfig]?seq_contains(filesName?replace("/","\\"))]
+                [#assign removeFromConfig = "1"]
+[/#if]
+[/#if]
+[#if removeFromConfig == "0"]
                 <file>
                     <name>${filesName!''}</name>
 [#if  multiConfigurationProject?? && ConfigsAndFiles??]
     [#list ConfigsAndFiles?keys as configKey]
 [#if !ConfigsAndFiles[configKey]?seq_contains(filesName?replace("/","\\"))]
                     <excluded>
-                        <configuration>${Configuration}_${configKey?replace("ARM Cortex-", "C")}</configuration>
+                        <configuration>${Configuration}_${configKey?replace("CortexM", "CM")}</configuration>
                         </excluded>
 [/#if]
 [/#list]
 [/#if]
                     </file>
+[/#if]
                             [/#list]
                         [/#if]
                 </group>
@@ -579,8 +1114,10 @@
         [/#if]
         [/#list]
         </group> 
+[/#if]
     [/#if]
     [#list externalGroups as grp]
+
         [@getGroups groupArg=grp/]
     [/#list]
     <group>
@@ -612,13 +1149,21 @@
             <name>${HALGroup.name!''}</name>
     [#if HALGroup.sourceFilesNameList??]
         [#list HALGroup.sourceFilesNameList as filesName]
+[#-- selectedConfig --]
+[#assign removeFromConfig = "0"]
+[#if multiConfigurationProject?? && ConfigsAndFiles?? && TrustZone=="1"]
+[#if !ConfigsAndFiles[selectedConfig]?seq_contains(filesName?replace("/","\\"))]
+                [#assign removeFromConfig = "1"]
+[/#if]
+[/#if]
+[#if removeFromConfig == "0"]
             <file>
                 <name>${filesName!''}</name>
 [#if  multiConfigurationProject?? && ConfigsAndFiles??]
     [#list ConfigsAndFiles?keys as configKey]
-[#if !ConfigsAndFiles[configKey]?seq_contains(filesName?replace("/","\\"))]
+[#if !ConfigsAndFiles[configKey]?seq_contains(filesName?replace("/","\\"))  && TrustZone=="0"]
                 <excluded>
-                    <configuration>${Configuration}_${configKey?replace("ARM Cortex-", "C")}</configuration>
+                    <configuration>${Configuration}_${configKey?replace("CortexM", "CM")}</configuration>
                     </excluded>
 [/#if]
 [/#list]
@@ -626,15 +1171,21 @@
 
 
                 </file>
+[/#if]
         [/#list]
     [/#if]
             </group>
         <group>
             <name>CMSIS</name>
+[#assign cmsisFilesAdded = ""]
     [#list cmsisSourceFileNameList as filesName]
-            <file>
-                <name>${filesName?replace("\\","/")}</name>
-                </file>
+        [#if !cmsisFilesAdded?contains(filesName?replace("\\","/"))]
+                <file>
+                            <name>${filesName?replace("\\","/")}</name>
+                            </file>
+            
+            [#assign cmsisFilesAdded = cmsisFilesAdded + " - " + filesName?replace("\\","/")]
+        [/#if]
     [/#list]
             </group>
         </group>   
@@ -643,18 +1194,27 @@
         <name>${UtilitiesGroup.name!''}</name>
         [#if UtilitiesGroup.sourceFilesNameList??]
             [#list UtilitiesGroup.sourceFilesNameList as filesName]
+[#-- selectedConfig --]
+[#assign removeFromConfig = "0"]
+[#if multiConfigurationProject?? && ConfigsAndFiles??  && TrustZone=="1"]
+[#if !ConfigsAndFiles[selectedConfig]?seq_contains(filesName?replace("/","\\"))]
+                [#assign removeFromConfig = "1"]
+[/#if]
+[/#if]
+[#if removeFromConfig == "0"]
         <file>
             <name>${filesName!''}</name>
                                    [#if ConfigsAndFiles??]
 [#list ConfigsAndFiles?keys as configKey]
-[#if  multiConfigurationProject?? && !ConfigsAndFiles[configKey]?seq_contains(filesName?replace("/","\\"))]
+[#if  multiConfigurationProject?? && !ConfigsAndFiles[configKey]?seq_contains(filesName?replace("/","\\"))  && TrustZone=="0"]
             <excluded>
-                <configuration>${Configuration}_${configKey?replace("ARM Cortex-", "C")}</configuration>
+                <configuration>${Configuration}_${configKey?replace("CortexM", "CM")}</configuration>
                 </excluded>
 [/#if]
 [/#list]
 [/#if]
             </file>
+[/#if]
             [/#list]
         [/#if]
         </group>
@@ -663,7 +1223,7 @@
         <name>Application</name>
         <group>
             <name>User</name>
-    [#if !multiConfigurationProject??] [#-- if not a multi config project --]
+    [#if !multiConfigurationProject?? && family!="STM32MP1xx"] [#-- if not a multi config project --] 
         [#if mxSourceDir?replace("\\","/") == "Core/Src"]
             <group>
                 <name>Core</name>  
@@ -680,7 +1240,7 @@
         [/#if]
     [/#if]
 [#-- Other source groups --]  
-    [#if USE_Touch_GFX_STACK?? && ide!="MDK-ARM"]
+    [#if USE_Touch_GFX_STACK?? && ide!="MDK-ARM" && ide!="STM32CubeIDE"]
             <group>
                 <name>TouchGFX</name>         
                 <group>
@@ -693,7 +1253,7 @@
                     </group>
                 </group> 
     [/#if]
-    [#if USE_Touch_GFX_STACK_M4?? && ide!="MDK-ARM"]
+    [#--if USE_Touch_GFX_STACK_M4?? && ide!="MDK-ARM"]
             <group>
                 <name>CM4</name> 
                 <excluded>
@@ -711,7 +1271,7 @@
                         </group>
                     </group> 
                 </group>
-    [/#if]
+    [/#if--]
      [#if USE_Touch_GFX_STACK_M7?? && ide!="MDK-ARM"]
             <group>
                 <name>CM7</name> 
@@ -733,16 +1293,16 @@
     [/#if]
 
 [#-- App Group Case of Graphics--]
-    [#list ApplicationGroups as grp]        
-    [#if grp.name!="Remoteproc"]
-        [@getGroups groupArg=grp/]
+    [#list ApplicationGroups as grp]
+    [#if grp.name!="Remoteproc"] 
+[@getGroups groupArg=grp/]
     [/#if]
     [/#list]
             </group> 
 [#list ApplicationGroups as grp] 
     [#if grp.name=="Remoteproc"]
         <group>
-            <name>${grp.name!''}</name>
+            <name>${grp.name!''}</name> 
         [#if grp.sourceFilesNameList??]
             [#list grp.sourceFilesNameList as filesName]
             <file>
@@ -768,176 +1328,7 @@
     [/#if]
 [/#list] 
         </group>
+</Groups>
 [/#if]
-
-    </Project>
-
-[#macro generateConfig multiConfig elem]
-[#if multiConfig == "true"]
-    [#if elem??]
-        [#list elem?keys as dataKey]
-            [#if dataKey=="mxIncludePaths"]
-               [#assign mxIncludePaths =  elem[dataKey]]
-            [/#if]
-            [#if dataKey=="halIncludePaths"]
-               [#assign halIncludePaths =  elem[dataKey]]
-            [/#if]
-            [#if dataKey=="cpuCore" || dataKey=="cpucore"]
-               [#assign cpuCore =  elem[dataKey]]            
-            [/#if]
-            [#if dataKey=="CdefinesList"]
-               [#assign CdefinesList =  elem[dataKey]]
-            [/#if]
-            [#if dataKey=="linkerExtraLibList"]
-               [#assign linkerExtraLibList =  elem[dataKey]]
-            [/#if]
-            [#if dataKey=="bootmode"]
-               [#assign bootmode =  elem[dataKey]]
-            [/#if]
-            [#if dataKey=="mxIncDir"]
-               [#assign mxIncDir =  elem[dataKey]]
-            [/#if]
-        [/#list]   
-    [/#if]
-[/#if]
-<config>
-    <name>${Configuration}[#if (multiConfig == "true")]_${cpuCore?replace("ARM Cortex-", "C")}[#else][/#if]</name>	 [#-- project configuration name. Ex: STM32F407_EVAL --]
-    <device>${project.deviceId}</device>		 [#--  STM32 selected device. Ex: STM32F407ZE --]
-    [#if IdeMode?? || ide=="STM32CubeIDE"]
-    <cpucore>${cpuCore}</cpucore>    
-    [#else]
-    <cpucore>[#if (multiConfig == "true")]${cpuCore?replace("ARM Cortex-", "C")}[#else][/#if]</cpucore>
-    [/#if]
-    <fpu>${fpu}</fpu>  [#--add FPU for UC30 --]
-    [#if !IdeMode?? && (multiConfig == "true")]
-    <bootmode>${bootmode}</bootmode>  <!-- for boot mode could be equals to SRAM or FLASH -->
-    [/#if]
-    <memories>  [#-- add MemoriesList for UC30 --] 
-    [#list memoriesList as memory]
-        <memory ${memory} />
-    [/#list]
-        </memories>
-    <startup>${startup}</startup> [#-- add relatif startup path needed for UC30 --]     
-
-    <heapSize>${HeapSize}</heapSize>
-    <stackSize>${StackSize}</stackSize>
-
-    [#if ide=="EWARM" || ide=="MDK-ARM"]
-    <cpuclock>${cpuclock}</cpuclock>
-    [/#if]
-    [#if boardName != ""]
-    <board>${boardName}</board>
-    [/#if]
-
-    [#--optional part--]
-    [#if usedDebug == "true"]
-    <debugprobe>${DebugMode}</debugprobe>
-    [/#if]
-    [#-- <optimization>${project.compilerOptimization}</optimization> --]
-    <optimization>${optimization}</optimization>
-[#if !IdeMode??]
-    <icfloc>${icfloc}</icfloc>
-[/#if]
-
-    <Aincludes>
-        [#if usedfreeRTOS=="true" || (multiConfig == "true" && cpuCore=="ARM Cortex-M4" && usedfreeRTOS_M4?? && usedfreeRTOS_M4=="true")|| (multiConfig == "true" && cpuCore=="ARM Cortex-M7" && usedfreeRTOS_M7?? && usedfreeRTOS_M7=="true")]
-	   		[#if ide=="EWARM" ]
-        <include>$PROJ_DIR$\${RelativePath}[#if mxIncDir??]${mxIncDir}[#else]Inc[/#if]</include>
-	   		[#elseif ide=="MDK-ARM" ]
-        <include>${RelativePath}[#if mxIncDir??]${mxIncDir}[#else]Inc[/#if]</include>
-   			[#elseif ide=="Makefile" ]
-        <include>${RelativePath}[#if mxIncDir??]${mxIncDir}[#else]Inc[/#if]</include>
-                        [#else]
-        <include></include>
-                        [/#if]
-		[#else]
-        <include></include>
-    	[/#if]
-
-        </Aincludes>
-    <Adefines>
-        [#list AdefinesList as define]
-        <define>${define}</define>
-        [/#list]
-        </Adefines>  
-    <Cdefines>
-        [#assign deflist =""]
-	[#list CdefinesList as define]
-        [#if !deflist?contains(define)]
-        <define>${define}</define>
-            [#assign deflist = deflist + " - "]
-        [/#if]
-        [/#list]
-	   [#-- <define>__weak=__attribute__((weak))</define> --]
-        </Cdefines>
-    <Ldefines>
-	[#list LdefinesList as define]
-        <define>${define}</define>
-        [/#list]
-	   [#-- <define>__weak=__attribute__((weak))</define> --]
-        </Ldefines>
-    [#-- defines to remove --]
-    <definestoremove>
-        <Adefines>
-        [#if aDefineToRemove??]
-            [#list aDefineToRemove as defineToRemove]
-            <define>${defineToRemove}</define>
-            [/#list]
-        [/#if]
-            </Adefines>
-        <Cdefines>
-        [#if cDefineToRemove??]
-        [#list cDefineToRemove as defineToRemove]
-            <define>${defineToRemove}</define>
-        [/#list]
-        [/#if]
-            </Cdefines> 
-        <Ldefines>
-        [#if lDefineToRemove??]
-            [#list lDefineToRemove as defineToRemove]
-            <define>${defineToRemove}</define>
-            [/#list]
-        [/#if]
-            </Ldefines> 
-        </definestoremove>
-
-    <inctoremove>
-        <Aincludes>
-            <include></include>
-            </Aincludes>
-        <Cincludes>
-    [#list IncludePathsToRemove as IncludePath]
-            <include>${IncludePath}</include>
-    [/#list]
-            </Cincludes>
-        </inctoremove>
-    <filestoremove>
-        <file>
-[#list SourceFilesToRemove as SourceFile]
-        [#if SourceFile!="null"]
-            <name>${SourceFile}</name>
-    [/#if]
-[/#list]
-            </file>
-        </filestoremove>
-    [#-- End of optional part--]
-    <Cincludes>
-	 [#-- required includes for all generated projects --]
-        [#list mxIncludePaths as mxIncludePath]
-        <include>${mxIncludePath}</include>
-        [/#list]     
-	[#list halIncludePaths as halIncludePath]
-        <include>${halIncludePath}</include>
-        [/#list]
-
-        </Cincludes>
-    [#-- Linker Extra Lib --]
-    [#if linkerExtraLibList??]
-    <LinkAdditionalLibs>
-        [#list linkerExtraLibList as extraLib]
-        <lib>${extraLib}</lib>
-        [/#list] 
-        </LinkAdditionalLibs>
-    [/#if]
-    </config>
+</Project>
 [/#macro]

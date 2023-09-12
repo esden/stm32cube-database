@@ -441,6 +441,32 @@
 [/#function]
 [#-- End function: getDmaHandler(currentipname) --]
 
+[#function getLocalVariableCLK configModel1]
+[#if configModel1.methods??] 
+    [#assign methodList1 = configModel1.methods]
+[#else]
+    [#assign methodList1 = configModel1.libMethod]
+[/#if]
+[#assign clkVariables = ""]
+    [#list methodList1 as method][#-- list methodList1 --]
+        [#list method.arguments as argument][#-- list method.arguments --]
+            [#if argument.genericType == "struct"]
+                [#if argument.context??]
+                    [#if argument.context!="global"&&argument.status!="WARNING"&&argument.status!="NULL"] [#-- if !global --]
+                        [#if clkVariables==""]
+                            [#assign clkVariables = argument.typeName + " "+ argument.name]
+                        [#else]
+                            [#assign clkVariables = clkVariables+"/"+ argument.typeName + " "+ argument.name]
+                        [/#if]
+                    [/#if]
+                [/#if]
+            [/#if]
+        [/#list][#-- list method.arguments --]
+    [/#list][#-- list methodList1 --]
+[#return clkVariables]
+[/#function]
+[#-- Function getLocalVariableCLK of a config End--]
+
 [#-- macro generate service code for MspInit/MspDeInit Start--]
 [#macro generateServiceCode ipName serviceType modeName instHandler tabN]
     [#if serviceType=="Init"]
@@ -765,12 +791,62 @@ void ${entry.key}(${mode}_HandleTypeDef* ${mode?lower_case}Handle)
 [/#list]
 [#-- --]
 [#if mspIsEmpty=="no"]
+[#if IP.ipName==ipvar.ipName]
+    [#assign listOfLocalVariables = ""]
+    [#assign  resultList  = ""]
+    [#list IP.configModelList as instanceData]
+    [#assign  halMode  = getHalMode(IP.ipName)]
+        [#if instanceData.initServices?? && halMode==instanceData.halMode]
+            [#if instanceData.initServices.pclockConfig??]
+                [#list instanceData.initServices.pclockConfig.configs as config] [#--list1--]
+                    [#assign listOfLocalVariables = getLocalVariableCLK(config)]
+[#if listOfLocalVariables !="" ]
+                    [#if resultList == ""]
+                        [#list  listOfLocalVariables?split("/") as variable]
+                            #t${variable} = {0};
+                            [#if resultList == ""]
+                                [#assign resultList = variable]
+                            [#else]
+                                [#assign resultList = resultList + ":"+ variable]
+                            [/#if]
+                        [/#list]
+                    [#else]
+                        [#list  listOfLocalVariables?split(":") as variable]                
+                            [#assign  dup  = ""]
+                            [#list  resultList?split(":") as v]
+                                [#if v == variable]
+                                    [#assign  dup  = "yes"]
+                                [/#if]
+                            [/#list]
+                            [#if dup != "yes"]
+                                #t${variable} = {0};
+                                [#assign resultList = resultList + ":"+ variable]
+                            [/#if]
+                        [/#list]
+                    [/#if]
+[/#if]
+                [/#list]
+            [/#if]
+        [/#if]
+    [/#list]
+[/#if]
  #tif(${mode?lower_case}Handle->Instance==${words[0]?replace("I2S","SPI")})
 #t{
 [#if words?size > 1] [#-- Check if there is more than one ip instance--]        
 #t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspInit 0 */
 
 #n#t/* USER CODE END ${words[0]?replace("I2S","SPI")}_MspInit 0 */
+[#list IP.configModelList as instanceData]
+[#if instanceData.initServices??]
+    [#if instanceData.initServices.pclockConfig??]
+[#assign   pclockConfig=instanceData.initServices.pclockConfig] [#--list0--]
+[#if pclockConfig.ipName?replace("USB_DEVICE","USB")?replace("USB_Device","USB")==words[0]]
+[@common.generateConfigModelListCode configModel=pclockConfig inst=words[0]  nTab=2 index=""/]#n
+[/#if]
+#n
+    [/#if]
+[/#if]
+[/#list]
         [@generateServiceCode ipName=words[0] serviceType="Init" modeName=mode instHandler=ipHandler tabN=2/] 
 #t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspInit 1 */
 
@@ -784,6 +860,17 @@ void ${entry.key}(${mode}_HandleTypeDef* ${mode?lower_case}Handle)
 #t/* USER CODE BEGIN ${words[i]?replace("I2S","SPI")}_MspInit 0 */
 
 #n#t/* USER CODE END ${words[i]?replace("I2S","SPI")}_MspInit 0 */
+[#list IP.configModelList as instanceData]
+[#if instanceData.initServices??]
+    [#if instanceData.initServices.pclockConfig??]
+[#assign   pclockConfig=instanceData.initServices.pclockConfig] [#--list0--]
+[#if pclockConfig.ipName?replace("USB_DEVICE","USB")?replace("USB_Device","USB")==words[i]]
+[@common.generateConfigModelListCode configModel=pclockConfig inst=words[i]  nTab=2 index=""/]#n
+[/#if]
+#n
+    [/#if]
+[/#if]
+[/#list]
         [@generateServiceCode ipName=words[i] serviceType="Init" modeName=mode instHandler=ipHandler tabN=2/] 
 #t/* USER CODE BEGIN ${words[i]?replace("I2S","SPI")}_MspInit 1 */
 
@@ -797,6 +884,17 @@ void ${entry.key}(${mode}_HandleTypeDef* ${mode?lower_case}Handle)
 #t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspInit 0 */
 
 #n#t/* USER CODE END ${words[0]?replace("I2S","SPI")}_MspInit 0 */
+[#list IP.configModelList as instanceData]
+[#if instanceData.initServices??]
+    [#if instanceData.initServices.pclockConfig??]
+[#assign   pclockConfig=instanceData.initServices.pclockConfig] [#--list0--]
+[#if pclockConfig.ipName?replace("USB_DEVICE","USB")?replace("USB_Device","USB")==words[0]]
+[@common.generateConfigModelListCode configModel=pclockConfig inst=words[0]  nTab=2 index=""/]#n
+[/#if]
+#n
+    [/#if]
+[/#if]
+[/#list]
     [@generateServiceCode ipName=words[0] serviceType="Init" modeName=mode instHandler=ipHandler tabN=2/] 
 #t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspInit 1 */
 
@@ -880,7 +978,18 @@ uint32_t DFSDM_Init = 0;
 [#if words?size > 1] [#-- Check if there is more than one ip instance--]    
 #t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspInit 0 */
 
-#n#t/* USER CODE END ${words[0]?replace("I2S","SPI")}_MspInit 0 */    
+#n#t/* USER CODE END ${words[0]?replace("I2S","SPI")}_MspInit 0 */
+[#list IP.configModelList as instanceData]
+[#if instanceData.initServices??]
+    [#if instanceData.initServices.pclockConfig??]
+[#assign   pclockConfig=instanceData.initServices.pclockConfig] [#--list0--]
+[#if pclockConfig.ipName?replace("USB_DEVICE","USB")?replace("USB_Device","USB")==words[0]]
+[@common.generateConfigModelListCode configModel=pclockConfig inst=words[0]  nTab=2 index=""/]#n
+[/#if]
+#n
+    [/#if]
+[/#if]
+[/#list] 
         [@generateConfigCode ipName=words[0] type="Init" serviceName="gpioOut" instHandler=ipHandler tabN=2/]  
 #t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspInit 1 */
 
@@ -894,6 +1003,17 @@ uint32_t DFSDM_Init = 0;
 #t/* USER CODE BEGIN ${words[i]?replace("I2S","SPI")}_MspInit 0 */
 
 #n#t/* USER CODE END ${words[i]?replace("I2S","SPI")}_MspInit 0 */
+[#list IP.configModelList as instanceData]
+[#if instanceData.initServices??]
+    [#if instanceData.initServices.pclockConfig??]
+[#assign   pclockConfig=instanceData.initServices.pclockConfig] [#--list0--]
+[#if pclockConfig.ipName?replace("USB_DEVICE","USB")?replace("USB_Device","USB")==words[i]]
+[@common.generateConfigModelListCode configModel=pclockConfig inst=words[i]  nTab=2 index=""/]#n
+[/#if]
+#n
+    [/#if]
+[/#if]
+[/#list]
        #t[@generateConfigCode ipName=words[i] type="Init" serviceName="gpioOut" instHandler=ipHandler tabN=2/] 
 #t/* USER CODE BEGIN ${words[i]?replace("I2S","SPI")}_MspInit 1 */
 
@@ -907,6 +1027,17 @@ uint32_t DFSDM_Init = 0;
 #t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspInit 0 */
 
 #n#t/* USER CODE END ${words[0]?replace("I2S","SPI")}_MspInit 0 */
+[#list IP.configModelList as instanceData]
+[#if instanceData.initServices??]
+    [#if instanceData.initServices.pclockConfig??]
+[#assign   pclockConfig=instanceData.initServices.pclockConfig] [#--list0--]
+[#if pclockConfig.ipName?replace("USB_DEVICE","USB")?replace("USB_Device","USB")==words[0]]
+[@common.generateConfigModelListCode configModel=pclockConfig inst=words[0]  nTab=2 index=""/]#n
+[/#if]
+#n
+    [/#if]
+[/#if]
+[/#list]
     #t[@generateConfigCode ipName=words[0] type="Init" serviceName="gpioOut" instHandler=ipHandler tabN=2/]
     
 #t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspInit 1 */

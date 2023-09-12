@@ -12,7 +12,6 @@
 /* USER CODE END Header */
 
 [#assign USBPD_TCPM_MODULE_ENABLED = false]
-[#assign RTOS = false]
 
 [#-- SWIPdatas is a list of SWIPconfigModel --]
 [#list SWIPdatas as SWIP]
@@ -20,9 +19,6 @@
         [#list SWIP.defines as definition]
             [#if definition.name == "USBPD_TCPM_MODULE_ENABLED"]
                 [#assign USBPD_TCPM_MODULE_ENABLED = true]
-            [/#if]
-            [#if definition.name == "RTOS"]
-                [#assign RTOS = true]
             [/#if]
         [/#list]
     [/#if]
@@ -45,7 +41,7 @@ extern "C" {
 /* USER CODE END typedef */
 
 /* Exported define -----------------------------------------------------------*/
-[#if RTOS]
+[#if FREERTOS??]
 [#if USBPD_TCPM_MODULE_ENABLED]
 #define TCPM_ALARMBOX_MESSAGES_MAX      (2U * USBPD_PORT_COUNT)
 [/#if]

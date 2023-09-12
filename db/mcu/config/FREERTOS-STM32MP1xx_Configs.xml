@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
 <IP xmlns="http://mcd.rou.st.com/modules.php?name=mcu" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" CodeTemplate="" DBVersion="V4.0" IncludeFile="cmsis_os.h" Name="FREERTOS" RootFolder="Middlewares/Third_Party/FreeRTOS/" Version="STM32Cube_FW_F4_V1.15.0" ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Configs.xsd">
 
-    <RefConfig Comment="" Name="FREERTOS_ENABLE_Init">       
-        <CallLibMethod Name="osKernelStart" ReturnHAL="false"/>                 
+    <RefConfig Comment="" Name="FREERTOS_ENABLE_Init">
+        <CallLibMethod Name="osKernelStart" ReturnHAL="false"/>
         <Component Name="Middleware:FREERTOS:HEAP:$HEAP_NUMBER"/>
         <ConfigFile Name="CONFIG"/>
         <ConfigFile Name="HOOKS"/>
@@ -13,6 +13,7 @@
         <ConfigFile Name="DEFAULT_THREAD"/>
         <ConfigFile Name="USER_THREADS"/>
         <ConfigFile Name="RTOS_START"/>
+        <ConfigFile Name="HEAP_USER"/>	
     </RefConfig>
     
     <RefConfig Comment="" Name="FREERTOS_CMSIS_V2_ENABLE_Init">  
@@ -27,6 +28,7 @@
         <ConfigFile Name="DEFAULT_THREAD_V2"/>
         <ConfigFile Name="USER_THREADS_V2"/>
         <ConfigFile Name="RTOS_START"/>
+        <ConfigFile Name="HEAP_USER"/>	
     </RefConfig>
     
     <RefConfig Comment="" Name="FREERTOS_NATIVE_ENABLE_Init">       
@@ -41,6 +43,7 @@
         <ConfigFile Name="DEFAULT_THREAD_NATIVE"/>
         <ConfigFile Name="USER_THREADS_NATIVE"/>
         <ConfigFile Name="RTOS_START_NATIVE"/>
+        <ConfigFile Name="HEAP_USER"/>	
     </RefConfig>
        
     <LibMethod Comment="Start scheduler" Name="osKernelStart">
@@ -128,8 +131,11 @@
             <File Category="source" Name="Source/portable/GCC/ARM_CM4_MPU/port.c" Condition="S_FREERTOS_WITH_MPU"/>
             <File Category="header" Name="Source/portable/GCC/ARM_CM4_MPU/portmacro.h" Condition="S_FREERTOS_WITH_MPU"/>
         </SubComponent> 
-
     </RefComponent>
+    
+    <RefConfigFile Description="Heap for user choice" Name="HEAP_USER" Template="freertos_heap_user.ftl">
+        <File Category="source" Name="heap_user.c" Version="10.0.1" Condition="S_HEAP_USER"/>
+    </RefConfigFile>
     
     <RefConfigFile Description="Header file for #include" Name="INC" Template="freertos_inc.ftl">
         <File Category="source" Condition="all" Name="rtos_inc.tmp" Version="10.0.1"/>
@@ -265,6 +271,9 @@
         
          <!--  New for FreeRTOS 10.0.0 -->
          <Argument Comment="" GenericType="simple" Name="configRECORD_STACK_HIGH_ADDRESS"/>
+         
+         <!-- NEWLIB -->
+         <Argument Comment="" GenericType="simple" Name="configUSE_NEWLIB_REENTRANT"/>
 
     </RefConfigFile>
 
@@ -419,6 +428,9 @@
          
          <!--  For CMSIS V2 -->
          <Argument Comment="" GenericType="simple" Name="HEAP_NUMBER"/>
+         
+         <!-- NEWLIB -->
+         <Argument Comment="" GenericType="simple" Name="configUSE_NEWLIB_REENTRANT"/>
 
     </RefConfigFile>
 

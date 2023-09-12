@@ -11,6 +11,62 @@
   */
 /* USER CODE END Header */
 
+[#assign nbPorts = "1"]
+
+[#-- SWIPdatas is a list of SWIPconfigModel --]
+[#list SWIPdatas as SWIP]
+    [#if SWIP.defines??]
+        [#list SWIP.defines as definition]
+            [#if definition.name=="USBPD_NbPorts"]
+                [#assign nbPorts = definition.value]
+            [/#if]
+            [#if definition.name=="PE_SpecRevision_P0"]
+                [#assign valuePE_SpecRevision_P0 = definition.value]
+            [/#if]
+            [#if definition.name=="VDM_ModalOperation_P0"]
+                [#assign valueVDM_ModalOperation_P0 = definition.value]
+            [/#if]
+            [#if definition.name=="VDM_bcdDevice_SOP_P0"]
+                [#assign valueVDM_bcdDevice_SOP_P0 = definition.value]
+            [/#if]
+            [#if definition.name=="VDM_USBHostSupport_P0"]
+                [#assign valueVDM_USBHostSupport_P0 = definition.value]
+            [/#if]
+            [#if definition.name=="VDM_USBDeviceSupport_P0"]
+                [#assign valueVDM_USBDeviceSupport_P0 = definition.value]
+            [/#if]
+            [#if definition.name=="VDM_ProductTypeUFPorCP_P0"]
+                [#assign valueVDM_ProductTypeUFPorCP_P0 = definition.value]
+            [/#if]
+            [#if definition.name=="VDM_ProductTypeDFP_P0"]
+                [#assign valueVDM_ProductTypeDFP_P0 = definition.value]
+            [/#if]
+            [#if nbPorts=="2"]
+                [#if definition.name=="PE_SpecRevision_P1"]
+                    [#assign valuePE_SpecRevision_P1 = definition.value]
+                [/#if]
+                [#if definition.name=="VDM_ModalOperation_P1"]
+                    [#assign valueVDM_ModalOperation_P1 = definition.value]
+                [/#if]
+                [#if definition.name=="VDM_bcdDevice_SOP_P1"]
+                    [#assign valueVDM_bcdDevice_SOP_P1= definition.value]
+                [/#if]
+                [#if definition.name=="VDM_USBHostSupport_P1"]
+                    [#assign valueVDM_USBHostSupport_P1 = definition.value]
+                [/#if]
+                [#if definition.name=="VDM_USBDeviceSupport_P1"]
+                    [#assign valueVDM_USBDeviceSupport_P1 = definition.value]
+                [/#if]
+                [#if definition.name=="VDM_ProductTypeUFPorCP_P1"]
+                    [#assign valueVDM_ProductTypeUFPorCP_P1 = definition.value]
+                [/#if]
+                [#if definition.name=="VDM_ProductTypeDFP_P1"]
+                    [#assign valueVDM_ProductTypeDFP_P1 = definition.value]
+                [/#if]
+            [/#if]
+        [/#list]
+    [/#if]
+[/#list]
 /* Includes ------------------------------------------------------------------*/
 #include "usbpd_core.h"
 #include "usbpd_dpm_conf.h"
@@ -67,6 +123,41 @@ static USBPD_StatusTypeDef USBPD_VDM_ReceiveUVDM(uint8_t PortNum, USBPD_UVDMHead
 /* USER CODE END Private_prototypes */
 
 /* Private variables ---------------------------------------------------------*/
+[#if GUI_INTERFACE??]
+[#else]
+USBPD_VDM_SettingsTypeDef DPM_VDM_Settings[USBPD_PORT_COUNT] =
+{
+  {
+    .VDM_XID_SOP                = USBPD_XID,    /*!< A decimal number assigned by USB-IF before certification */
+    .VDM_USB_VID_SOP            = USBPD_VID,    /*!< A decimal number assigned by USB-IF before certification */
+    .VDM_PID_SOP                = USBPD_PID,    /*!< A unique number assigned by the Vendor ID holder identifying the product. */
+    .VDM_ModalOperation         = ${valueVDM_ModalOperation_P0}, /*!< Product support Modes based on @ref USBPD_ModalOp_TypeDef */
+    .VDM_bcdDevice_SOP          = ${valueVDM_bcdDevice_SOP_P0},        /*!< A unique number assigned by the Vendor ID holder containing identity information relevant to the release version of the product. */
+    .VDM_USBHostSupport         = ${valueVDM_USBHostSupport_P0}, /*!< Indicates whether the UUT is capable of enumerating USB Host */
+    .VDM_USBDeviceSupport       = ${valueVDM_USBDeviceSupport_P0}, /*!< Indicates whether the UUT is capable of enumerating USB Devices */
+    .VDM_ProductTypeUFPorCP     = ${valueVDM_ProductTypeUFPorCP_P0}, /*!< Product type UFP or CablePlug of the UUT based on @ref USBPD_ProductType_TypeDef */
+[#if valuePE_SpecRevision_P0=="2"]
+    .VDM_ProductTypeDFP         = ${valueVDM_ProductTypeDFP_P0}, /*!< Product type DFP of the UUT based on @ref USBPD_ProductType_TypeDef */
+[/#if]
+[#if nbPorts=="2"]
+  },
+  {
+    .VDM_XID_SOP                = USBPD_XID,    /* A decimal number assigned by USB-IF before certification */
+    .VDM_USB_VID_SOP            = USBPD_VID,    /* A decimal number assigned by USB-IF before certification */
+    .VDM_PID_SOP                = USBPD_PID,    /*!< A unique number assigned by the Vendor ID holder identifying the product. */
+    .VDM_ModalOperation         = ${valueVDM_ModalOperation_P1}, /*!< Product support Modes based on @ref USBPD_ModalOp_TypeDef */
+    .VDM_bcdDevice_SOP          = ${valueVDM_bcdDevice_SOP_P1},        /*!< A unique number assigned by the Vendor ID holder containing identity information relevant to the release version of the product. */
+    .VDM_USBHostSupport         = ${valueVDM_USBHostSupport_P1}, /*!< Indicates whether the UUT is capable of enumerating USB Host */
+    .VDM_USBDeviceSupport       = ${valueVDM_USBDeviceSupport_P1}, /*!< Indicates whether the UUT is capable of enumerating USB Devices */
+    .VDM_ProductTypeUFPorCP     = ${valueVDM_ProductTypeUFPorCP_P1}, /*!< Product type UFP or CablePlug of the UUT based on @ref USBPD_ProductType_TypeDef */
+[#if valuePE_SpecRevision_P1=="2"]
+    .VDM_ProductTypeDFP         = ${valueVDM_ProductTypeDFP_P1}, /*!< Product type DFP of the UUT based on @ref USBPD_ProductType_TypeDef */
+[/#if]
+[/#if]
+  }
+};
+[/#if]
+
 /* USER CODE BEGIN Private_variables */
 const USBPD_VDM_Callbacks vdmCallbacks =
 {

@@ -24,6 +24,7 @@
 [#assign includeGenericBspForSRAM = 0]
 [#assign includeBspForUSBH = 0]
 [#assign customBSPSRAM = 0]    [#-- on G4, not need to include bsp_driver_sram.h when custom BSP is chosen --]
+[#assign customBSPSD = 0]  [#-- on L5, not need to include bsp_driver_sd.h when a board is chosen 9will use the BSP of the board --]
 [#assign cmsisrtosInUse = 0]
 
 #include "main.h"
@@ -58,6 +59,11 @@
 [#assign customBSPSRAM = 1]
 [/#if]
 [/#if]
+[#if definition.name="SD_BSP_CODE"]
+[#if definition.value="1"]                [#-- can occur on L5 --] 
+[#assign customBSPSD = 1]
+[/#if]
+[/#if]
 [#if definition.name="_FS_REENTRANT"]
 [#if definition.value="1"]
 [#assign cmsisrtosInUse = 1]    [#-- Should change with FreeRTOS Native mode when it comes --] 
@@ -67,7 +73,9 @@
 [/#if]
 
 [#if includeGenericBspForSD == 1]
+[#if customBSPSD == 0]
 #include "bsp_driver_sd.h"
+[/#if]
 [/#if]
 [#if includeGenericBspForSDRAM == 1]
 #include "bsp_driver_sdram.h"

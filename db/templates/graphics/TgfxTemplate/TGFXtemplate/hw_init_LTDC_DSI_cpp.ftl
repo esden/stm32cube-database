@@ -273,11 +273,11 @@ void MX_SDRAM_InitEx(void)
 /* DSI init function */
 void MX_DSI_Init(void)
 {
-  static DSI_PHY_TimerTypeDef      PhyTimings;
-  static DSI_HOST_TimeoutTypeDef   HostTimeouts;
-  static DSI_CmdCfgTypeDef         CmdCfg;
-  static DSI_LPCmdTypeDef          LPCmd;
-  static DSI_PLLInitTypeDef        PLLInit;
+  DSI_PHY_TimerTypeDef      PhyTimings;
+  DSI_HOST_TimeoutTypeDef   HostTimeouts;
+  DSI_CmdCfgTypeDef         CmdCfg;
+  DSI_LPCmdTypeDef          LPCmd;
+  DSI_PLLInitTypeDef        PLLInit;
   
 /* Base address of DSI Host/Wrapper registers to be set before calling De-Init */
 

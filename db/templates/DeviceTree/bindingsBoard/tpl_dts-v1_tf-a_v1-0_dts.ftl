@@ -13,6 +13,10 @@
  * Author: STM32CubeMX code generation for STMicroelectronics.
  */
 
+/* For more information on Device Tree configuration, please refer to
+ * https://wiki.st.com/stm32mpu/wiki/Category:Device_tree_configuration
+ */
+
 /dts-v1/;
 #include <dt-bindings/clock/stm32mp1-clksrc.h>
 [#if mx_ddrConfigs["general"]?? && mx_ddrConfigs["general"]["isConfigured"]?? && mx_ddrConfigs["general"]["isConfigured"]=="true" ]

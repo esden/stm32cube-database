@@ -26,8 +26,10 @@
 	  
 	  
     <!--PLLN-->
-    <RefParameter Visible="false" Comment="PLLN" DefaultValue="8" Max="86" Min="8" Name="PLLN" Type="integer"/>
-	
+    <RefParameter Visible="false" Comment="PLLN" DefaultValue="8" Max="127" Min="6" Name="PLLN" Type="integer">
+        <Condition Diagnostic="" Expression="STM32WBx0_Value_Line"/>
+    </RefParameter>
+    <RefParameter Visible="false" Comment="PLLN" DefaultValue="8" Max="86" Min="8" Name="PLLN" Type="integer"/>	
     <!--PLLSAI1N-->
     <RefParameter Visible="false" Comment="PLLSAI1N" DefaultValue="8" Max="86" Min="4" Name="PLLSAI1N" Type="integer"/>
    
@@ -333,7 +335,7 @@
     <!--Les multiplexeur-->
     <!--PLLSourceVirtual-->
     <RefParameter Visible="false" Comment="PLL Source" DefaultValue="RCC_PLLSOURCE_MSI" Name="PLLSourceVirtual" Type="list">
-        <Condition Diagnostic="PLL Mux should have HSE as input" Expression="(USBUsed_ForRCC &amp; (CK48SourcePLLCLK| CK48SourcePLLSAI1)) "/>
+        <Condition Diagnostic="PLL Mux should have HSE or MSI as input" Expression="(USBUsed_ForRCC &amp; (CK48SourcePLLCLK| CK48SourcePLLSAI1)) "/>
         <PossibleValue Comment="Pllsource Hse" Value="RCC_PLLSOURCE_HSE"/>
         <PossibleValue Comment="Pllsource MSI" Value="RCC_PLLSOURCE_MSI" />
     </RefParameter>
@@ -509,16 +511,27 @@
     </RefParameter>
 
     <!--ADCCLockSelection-->
+    <RefParameter Visible="false"  Comment="ADC CLock Selection" DefaultValue="RCC_ADCCLKSOURCE_SYSCLK"    Name="ADCCLockSelection" Type="list" IP="ADC1,ADC2,ADC3">
+        <Condition Diagnostic="" Expression="STM32WBx0_Value_Line"/>
+        <PossibleValue Comment="PLL"          Value="RCC_ADCCLKSOURCE_PLL"     Semaphore="ADCSourcePLL"/>
+        <PossibleValue Comment="SysCLKOutput" Value="RCC_ADCCLKSOURCE_SYSCLK"  Semaphore="ADCSourceSys"/>
+    </RefParameter>
     <RefParameter Visible="false"  Comment="ADC CLock Selection" DefaultValue="RCC_ADCCLKSOURCE_PLLSAI1"    Name="ADCCLockSelection" Type="list" IP="ADC1,ADC2,ADC3">
+        <Condition Diagnostic="" Expression="!STM32WBx0_Value_Line"/>
         <PossibleValue Comment="PLLSAI1R"     Value="RCC_ADCCLKSOURCE_PLLSAI1" Semaphore="ADCSourcePLLSAI1R"/>
         <PossibleValue Comment="PLL"          Value="RCC_ADCCLKSOURCE_PLL"     Semaphore="ADCSourcePLL"/>
         <PossibleValue Comment="SysCLKOutput" Value="RCC_ADCCLKSOURCE_SYSCLK"  Semaphore="ADCSourceSys"/>
     </RefParameter>
-  
-    
 
     <!--CK48CLockSelection-->
+    <RefParameter Visible="false"  Comment="CK48 CLock Selection" DefaultValue="RCC_USBCLKSOURCE_HSI48"    Name="CK48CLockSelection" Type="list" IP="USB,RNG,SDMMC1">
+        <Condition Diagnostic="" Expression="STM32WBx0_Value_Line"/>
+        <PossibleValue Comment="PLLCLK"   Value="RCC_USBCLKSOURCE_PLL"     Semaphore="CK48SourcePLLCLK"/>
+        <PossibleValue Comment="MSI"      Value="RCC_USBCLKSOURCE_MSI"     Semaphore="CK48SourceMSI"/>
+        <PossibleValue Comment="MSI"      Value="RCC_USBCLKSOURCE_HSI48"   Semaphore="CK48SourceHSI48"/>
+    </RefParameter>
     <RefParameter Visible="false"  Comment="CK48 CLock Selection" DefaultValue="RCC_USBCLKSOURCE_PLLSAI1"    Name="CK48CLockSelection" Type="list" IP="USB,RNG,SDMMC1">
+        <Condition Diagnostic="" Expression="!STM32WBx0_Value_Line"/>
         <PossibleValue Comment="PLLSAI1P" Value="RCC_USBCLKSOURCE_PLLSAI1" Semaphore="CK48SourcePLLSAI1"/>
         <PossibleValue Comment="PLLCLK"   Value="RCC_USBCLKSOURCE_PLL"     Semaphore="CK48SourcePLLCLK"/>
         <PossibleValue Comment="MSI"      Value="RCC_USBCLKSOURCE_MSI"     Semaphore="CK48SourceMSI"/>
@@ -781,6 +794,9 @@
    
     <!--Divisor constraint-->
     <!--VCOInput output ==> PLLM frequency range -->
+    <RefParameter Visible="false" Comment="VCOInput"     Name="VCOInputFreq_Value" Min="2660000" Max="16000000"     DefaultValue="4000000"   Type="double" Display="value/1000000" Unit="MHz">
+        <Condition Expression="(PLLUsed=1|PLLSAI1Used=1) &amp; STM32WBx0_Value_Line" Diagnostic=""/>
+    </RefParameter>
     <RefParameter Visible="false" Comment="VCOInput"     Name="VCOInputFreq_Value" Min="4000000" Max="16000000"     DefaultValue="4000000"   Type="double" Display="value/1000000" Unit="MHz">
         <Condition Expression="(PLLUsed=1|PLLSAI1Used=1) " Diagnostic=" PLLUsed=1|PLLSAI1Used=1"/>
     </RefParameter>
@@ -1432,9 +1448,10 @@
    
 
     <RefParameter Visible="false" Name="RCC_PERIPHCLK_SMPSVar" Comment="RCC_PERIPHCLK_SMPSVar" Type="list" DefaultValue="RCC_PERIPHCLK_SMPS">
- 
+        <Condition Diagnostic="" Expression="!STM32WBx0_Value_Line"/> 
         <PossibleValue Comment="RCC_PERIPHCLK_SMPS" Value="RCC_PERIPHCLK_SMPS"/>
     </RefParameter>
+    <RefParameter Visible="false" Name="RCC_PERIPHCLK_SMPSVar" Comment="RCC_PERIPHCLK_SMPSVar" Type="list" DefaultValue=""/>
 	
   
 
@@ -1558,7 +1575,7 @@
     <RefParameter Visible="false" Name="RFWKPClockSelectionARG" Comment="RFWKPClockSelectionARG" Type="list" DefaultValue="null"/>
     
     <RefParameter Visible="false" Name="SMPSDivARG" Comment="SMPSDivARG" Type="list" DefaultValue="null">
-        <Condition Expression="CodegenConfigPeriph=false | SMPSDiv=null" Diagnostic=""/>
+        <Condition Expression="CodegenConfigPeriph=false | SMPSDiv=null | STM32WBx0_Value_Line" Diagnostic=""/>
     </RefParameter>
 	
     <RefParameter Visible="false" Name="SMPSDivARG" Comment="SMPSDivARG" Type="list" DefaultValue="+SMPSDiv">
@@ -1567,7 +1584,7 @@
     
 
     <RefParameter Visible="false" Name="SMPSClockSelectionARG" Comment="SMPSClockSelectionARG" Type="list" DefaultValue="null">
-        <Condition Expression="CodegenConfigPeriph=false" Diagnostic=" "/>
+        <Condition Expression="CodegenConfigPeriph=false | STM32WBx0_Value_Line" Diagnostic=" "/>
     </RefParameter>
 
     <RefParameter Visible="false" Name="SMPSClockSelectionARG" Comment="SMPSClockSelectionARG" Type="list" DefaultValue="+SMPSCLockSelection"/>
@@ -1938,20 +1955,21 @@
     <RefParameter Name="VDD_VALUE" Comment="VDD voltage (V)" DefaultValue="3.3" Max="3.6" Min="1.65" Type="double" Unit="V" Group="System Parameters"/>
 	
 	
-	<!--Power Regulator Voltage Scale--> 
+	<!--Power Regulator Voltage Scale-->
+    <RefParameter Visible="false" Comment="PWR_Regulator_Voltage_Scale" DefaultValue="" Name="PWR_Regulator_Voltage_Scale" Type="list">
+        <Condition Expression="STM32WBx0_Value_Line" Diagnostic=""/>
+    </RefParameter>
     <RefParameter Name="PWR_Regulator_Voltage_Scale" Comment="Power Regulator Voltage Scale" Type="list" DefaultValue="PWR_REGULATOR_VOLTAGE_SCALE1" Group="Power Parameters">
-        <Condition Diagnostic="" Expression="((HCLKFreq_Value &lt; 16000000)|HCLKFreq_Value = 16000000)"/>
+        <Condition Diagnostic="" Expression="((HCLKFreq_Value &lt; 16000000)|HCLKFreq_Value = 16000000) &amp; !STM32WBx0_Value_Line"/>
         <PossibleValue Value="PWR_REGULATOR_VOLTAGE_SCALE2" Comment="Power Regulator Voltage Scale 2" Semaphore="scale2"/>
         <PossibleValue Value="PWR_REGULATOR_VOLTAGE_SCALE1" Comment="Power Regulator Voltage Scale 1" Semaphore="scale1"/>
-    </RefParameter>
-
-   
+    </RefParameter>   
     <RefParameter Name="PWR_Regulator_Voltage_Scale" Comment="Power Regulator Voltage Scale" Type="list" DefaultValue="PWR_REGULATOR_VOLTAGE_SCALE1" Group="Power Parameters">
         <PossibleValue Value="PWR_REGULATOR_VOLTAGE_SCALE1" Comment="Power Regulator Voltage Scale 1" Semaphore="scale1"/>
     </RefParameter>
     
     <RefParameter Visible="false" Comment="PWR_Regulator_Voltage_ScaleARG" DefaultValue="+PWR_Regulator_Voltage_Scale" Name="PWR_Regulator_Voltage_ScaleARG" Type="list">
-        <Condition Expression="(CodegenConfigPeriph=true)" Diagnostic=""/>
+        <Condition Expression="(CodegenConfigPeriph=true) &amp; !STM32WBx0_Value_Line" Diagnostic=""/>
     </RefParameter>
     <RefParameter Visible="false" Comment="PWR_Regulator_Voltage_ScaleARG" DefaultValue="null" Name="PWR_Regulator_Voltage_ScaleARG" Type="list"/>
 
@@ -1981,9 +1999,6 @@
         <Condition Diagnostic="" Expression="(scale1 &amp; ((HCLK3Freq_Value &lt; 64000000)|(HCLK3Freq_Value= 64000000 )))" />
         <PossibleValue Value="FLASH_LATENCY_3" Comment="3 WS (4 CPU cycle)"/>
     </RefParameter>
-	
-
-	
 
     <RefParameter Name="FLatency" Comment="Flash Latency(WS)" Type="uniqueElementList" DefaultValue="FLASH_LATENCY_3" Group="System Parameters">
    
@@ -2512,7 +2527,7 @@
         </Mode>
    
       
-        <Mode Name="Audio_ClockInSAI1" UserName="SAI1 Extern CLock">
+        <Mode Name="Audio_ClockInSAI1" UserName="SAI1 Extern CLock" RemoveCondition="STM32WBx0_Value_Line">
             <ModeLogicOperator Name="OR">
                 <Mode Name="Audio_ClockInSAI1">
                     <SignalLogicalOp Name="AND">
@@ -2523,7 +2538,7 @@
             </ModeLogicOperator>
         </Mode> 
          
-        <Mode Name="USB_CRS" UserName="CRS SYNC" >
+        <Mode Name="USB_CRS" UserName="CRS SYNC" RemoveCondition="STM32WBx0_Value_Line">
             <ModeLogicOperator Name="XOR">
                 <Mode Name="CRS SYNC Source GPIO">
                     <SignalLogicalOp Name="AND">
@@ -2552,7 +2567,7 @@
     </ModeLogicOperator>
     <RefSignal IOMode="AlternateFunctionPushPull" Name="MCO"/>
     <RefSignal IOMode="System" Name="CK_IN"/>
-    <RefSignal IOMode="Analog" Name="LSCO"/>
+    <RefSignal IOMode="AlternateFunctionPushPull" Name="LSCO"/>
     <RefSignal IOMode="System" Name="OSC32_IN"/>
     <RefSignal IOMode="System" Name="OSC32_OUT"/>
     <RefSignal IOMode="System" Name="OSC_IN"/>

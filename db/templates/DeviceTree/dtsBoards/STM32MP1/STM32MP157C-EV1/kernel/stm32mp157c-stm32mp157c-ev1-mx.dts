@@ -10,10 +10,8 @@
 #include "stm32mp157caa-pinctrl.dtsi"
 
 /* USER CODE BEGIN includes */
-#include <dt-bindings/gpio/gpio.h>
 #include <dt-bindings/mfd/st,stpmic1.h>
 #include <dt-bindings/input/input.h>
-#include <dt-bindings/gpio/gpio.h>
 #include <dt-bindings/soc/stm32-hdp.h>
 /* USER CODE END includes */
 
@@ -483,7 +481,7 @@
 		compatible = "raydium,rm68200";
 		reg = <0>;
 		reset-gpios = <&gpiof 15 GPIO_ACTIVE_LOW>;
-		power-supply = <&v1v8>;
+		power-supply = <&v3v3>;
 		backlight = <&panel_backlight>;
 		status = "okay";
 
@@ -507,7 +505,7 @@
 	pinctrl-names = "default", "sleep";
 
 	/* USER CODE BEGIN ethernet0 */
-	phy-mode = "rgmii";
+	phy-mode = "rgmii-id";
 	max-speed = <1000>;
 	phy-handle = <&phy0>;
 
@@ -616,14 +614,12 @@
 
 	ov5640: camera@3c {
 		compatible = "ovti,ov5640";
-		pinctrl-names = "default";
-		pinctrl-0 = <&ov5640_pins>;
 		reg = <0x3c>;
 		clocks = <&clk_ext_camera>;
 		clock-names = "xclk";
 		DOVDD-supply = <&v2v8>;
-		powerdown-gpios = <&stmfx_pinctrl 18 GPIO_ACTIVE_HIGH>;
-		reset-gpios = <&stmfx_pinctrl 19 GPIO_ACTIVE_LOW>;
+		powerdown-gpios = <&stmfx_pinctrl 18 (GPIO_ACTIVE_HIGH | GPIO_PUSH_PULL)>;
+		reset-gpios = <&stmfx_pinctrl 19 (GPIO_ACTIVE_LOW | GPIO_PUSH_PULL)>;
 		rotation = <180>;
 		status = "okay";
 
@@ -659,20 +655,12 @@
 
 			hog_pins: hog {
 				pins = "gpio14";
-				drive-push-pull;
 				bias-pull-down;
 			};
 
 			joystick_pins: joystick {
 				pins = "gpio0", "gpio1", "gpio2", "gpio3", "gpio4";
-				drive-push-pull;
 				bias-pull-down;
-			};
-
-			ov5640_pins: camera {
-				pins = "agpio2", "agpio3"; /* stmfx pins 18 & 19 */
-				drive-push-pull;
-				output-low;
 			};
 		};
 	};
@@ -900,6 +888,7 @@
 	interrupt-parent = <&exti>;
 	interrupts = <68 1>;
 	interrupt-names = "wdg";
+	wakeup-source;
 	/* USER CODE END m4_rproc */
 	recovery;
 	status = "okay";
@@ -907,7 +896,10 @@
 
 &pwr {
 	/* USER CODE BEGIN pwr */
-	pwr-supply = <&vdd>;
+	pwr-regulators{
+	  vdd_3v3_usbfs-supply = <&vdd_usb>;
+	  vdd-supply = <&vdd>;
+	};
 	/* USER CODE END pwr */
 };
 

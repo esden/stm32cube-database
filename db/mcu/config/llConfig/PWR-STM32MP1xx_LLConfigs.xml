@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
+<IP xmlns="http://mcd.rou.st.com/modules.php?name=mcu" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance"
+	DBVersion="V4.0" Name="PWR" Version="STM32Cube_FW_MP1_V1.0.1" IncludeFile="stm32mp1xx_ll_pwr.h"
+	ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../../doc/V4/Development/Specifications/db/IP_Configs.xsd">
+
+
+<!-- PVD Configuration -->
+  <RefConfig Comment="PVD Configuration" Name="PVDConfig">
+    <CallLibMethod Name="LL_PWR_SetPVDLevel"  ReturnHAL="false">
+      <MethodArg Name="PVDLevel" ParameterName="PVDLevel" />
+    </CallLibMethod>
+      
+    <IFCondition Expression="!(Mode = PWR_PVD_MODE_NORMAL)">
+      <CallLibMethod Name="INITSTRUCT" Type="HardCode">
+         <HardCode Text="#n#t/* Configure EXTI line 16 */#n#tLL_EXTI_InitTypeDef exti_initstruct;#n#texti_initstruct.Line_0_31 = LL_EXTI_LINE_16;#n#texti_initstruct.Line_32_63 = LL_EXTI_LINE_NONE;#n#texti_initstruct.LineCommand = ENABLE;"/>
+      </CallLibMethod>
+    </IFCondition>    
+      
+    <IFCondition Expression="(Mode = PWR_PVD_MODE_IT_RISING) | (Mode = PWR_PVD_MODE_IT_FALLING) | (Mode = PWR_PVD_MODE_IT_RISING_FALLING)">
+      <CallLibMethod Name="MODE_IT" Type="HardCode">
+        <HardCode Text="#n#texti_initstruct.Mode = LL_EXTI_MODE_IT;"/>
+      </CallLibMethod>
+    </IFCondition>
+      
+    <IFCondition Expression="(Mode = PWR_PVD_MODE_EVENT_RISING) | (Mode = PWR_PVD_MODE_EVENT_FALLING) | (Mode = PWR_PVD_MODE_EVENT_RISING_FALLING)">
+      <CallLibMethod Name="MODE_EVENT" Type="HardCode">
+        <HardCode Text="#n#texti_initstruct.Mode = LL_EXTI_MODE_EVENT;"/>
+      </CallLibMethod>
+    </IFCondition>
+          
+    <IFCondition Expression="(Mode = PWR_PVD_MODE_IT_RISING) | (Mode = PWR_PVD_MODE_EVENT_RISING)">
+      <CallLibMethod Name="TRIGGER_RISING" Type="HardCode">
+       <HardCode Text="#n#texti_initstruct.Trigger = LL_EXTI_TRIGGER_RISING;"/>
+      </CallLibMethod>
+    </IFCondition>
+      
+    <IFCondition Expression="(Mode = PWR_PVD_MODE_IT_FALLING) | (Mode = PWR_PVD_MODE_EVENT_FALLING)">
+      <CallLibMethod Name="TRIGGER_FALLING" Type="HardCode">
+       <HardCode Text="#n#texti_initstruct.Trigger = LL_EXTI_TRIGGER_FALLING;"/>
+      </CallLibMethod>
+    </IFCondition>
+      
+    <IFCondition Expression="(Mode = PWR_PVD_MODE_IT_RISING_FALLING) | (Mode = PWR_PVD_MODE_EVENT_RISING_FALLING)">
+      <CallLibMethod Name="TRIGGER_RISING_FALLING" Type="HardCode">
+       <HardCode Text="#n#texti_initstruct.Trigger = LL_EXTI_TRIGGER_RISING_FALLING;"/>
+      </CallLibMethod>
+    </IFCondition>
+         
+    <IFCondition Expression="!(Mode = PWR_PVD_MODE_NORMAL)">
+      <CallLibMethod Name="EXTI_INIT" Type="HardCode">
+         <HardCode Text="#n#tLL_EXTI_Init( &amp;exti_initstruct);"/>
+      </CallLibMethod>
+    </IFCondition>
+    
+  </RefConfig>
+  
+  <RefConfig Comment="Enable the PVD Output" Name="PVDEnable">
+		<CallLibMethod Name="LL_PWR_EnablePVD" ReturnHAL="false"/>
+  </RefConfig>
+
+
+	
+	<LibMethod Comment="Enable Power Voltage Detector" Name="LL_PWR_EnablePVD" />
+	<LibMethod Comment="Disable Power Voltage Detector" Name="LL_PWR_DisablePVD" />
+
+	<LibMethod Comment="Configure the voltage threshold detected by the Power Voltage Detector" Name="LL_PWR_SetPVDLevel">
+		<Argument AddressOf="false" GenericType="simple" Name="PVDLevel" OptimizationCondition="equal" />
+	</LibMethod>
+	
+<RefComponent Cclass="LL" Cgroup="DAC" Cversion="1.5.0">
+        <File Category="header" Name="Drivers/STM32MP1xx_HAL_Driver/Inc/stm32mp1xx_ll_pwr.h"/>
+        <File Category="source" Name="Drivers/STM32MP1xx_HAL_Driver/Src/stm32mp1xx_ll_pwr.c"/>
+        
+    </RefComponent>
+</IP>

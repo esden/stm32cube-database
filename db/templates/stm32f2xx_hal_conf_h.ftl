@@ -35,7 +35,7 @@
   */
   
 #define HAL_MODULE_ENABLED  
-[#assign allModules = ["ADC", "AES", "CAN", "CAN_LEGACY", "CRC", "CRYP", "DAC", "DCMI", "ETH", "NAND", "NOR", "PCCARD", "SRAM", "HASH", "I2C", "I2S", "IWDG", "RNG", "RTC", "SD", "MMC", "SPI", "TIM", "UART", "USART", "IRDA", "SMARTCARD", "WWDG", "PCD", "HCD", "EXTI"]]
+[#assign allModules = ["ADC", "AES", "CAN", "CAN_LEGACY", "CRC", "CRYP", "DAC", "DCMI", "ETH", "NAND", "NOR", "PCCARD", "SRAM", "HASH", "I2C", "I2S", "IWDG", "RNG", "RTC", "SD", "MMC", "SPI", "TIM", "UART", "USART", "IRDA", "SMARTCARD", "WWDG", "PCD", "HCD"]]
   [#list allModules as module]
 	[#if isModuleUsed(module)]
 [#compress]#define HAL_${module?replace("AES","CRYP")}_MODULE_ENABLED[/#compress]

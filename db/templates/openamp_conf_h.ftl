@@ -1,13 +1,22 @@
 [#ftl]
 /**
   ******************************************************************************
-  * @file           : openamp_conf.h
-  * @brief          : Configuration file for OpenAMP MW
+  * @file    openamp_conf.h
+  * @author  MCD Application Team
+  * @brief   Configuration file for OpenAMP MW
   ******************************************************************************
-  [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
+  * @attention
+  *
+  * <h2><center>&copy; Copyright (c) 2019 STMicroelectronics. 
+  * All rights reserved.</center></h2>
+  *
+  * This software component is licensed by ST under BSD 3-Clause license,
+  * the "License"; You may not use this file except in compliance with the 
+  * License. You may obtain a copy of the License at:
+  *                       opensource.org/licenses/BSD-3-Clause
+  *
   ******************************************************************************
   */
-
 
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __OPENAMP_CONF__H__
@@ -19,10 +28,10 @@
 
 /* Includes ------------------------------------------------------------------*/
 #if defined (__LOG_TRACE_IO_) || defined(__LOG_UART_IO_)
-#include "log.h"
+#include "openamp_log.h"
 #endif
 
-/* ########################## Mailbox Interface Selection ############################## */
+ /* ########################## Mailbox Interface Selection ############################## */
  /**
    * @brief This is the list of Mailbox interface  to be used in the OpenAMP MW
    *        Please note that not all interfaces are supported by a STM32 device
@@ -30,7 +39,7 @@
 #define MAILBOX_IPCC_IF_ENABLED
 //#define MAILBOX_HSEM_IF_ENABLED
 
-/* Includes ------------------------------------------------------------------*/
+ /* Includes ------------------------------------------------------------------*/
  /**
    * @brief Include Maibox interface  header file
    */
@@ -48,7 +57,7 @@
    * @brief This is the list of modules to be used in the OpenAMP Virtual driver module
    *        Please note that virtual driver are not supported on all stm32 families
    */
-#define VIRTUAL_UART_MODULE_ENABLED
+//#define VIRTUAL_UART_MODULE_ENABLED
 //#define VIRTUAL_I2C_MODULE_ENABLED
 
 
@@ -94,12 +103,64 @@
   * @{
   */
 
-extern int __OPENAMP_region_start__[];   /* defined by linker script */
-extern int __OPENAMP_region_end__[];  /* defined by linker script */
- 
+
+#if defined (__ICCARM__)
+/*
+ * For IAR, the .icf file should contain the following lines:
+ * define symbol __OPENAMP_region_start__ = BASE_ADDRESS; (0x38000400 for example)
+ * define symbol __OPENAMP_region_size__   = MEM_SIZE; (0xB000 as example)
+ *
+ * export symbol __OPENAMP_region_start__;
+ * export symbol __OPENAMP_region_size__;
+ */
+extern const uint32_t  __OPENAMP_region_start__;
+extern const uint8_t  __OPENAMP_region_size__;
+#define SHM_START_ADDRESS       ((metal_phys_addr_t)&__OPENAMP_region_start__)
+#define SHM_SIZE        ((size_t)&__OPENAMP_region_size__)
+
+#elif defined(__CC_ARM)
+/*
+ * For MDK-ARM, the scatter file .sct should contain the following line:
+ * LR_IROM1 ....  {
+ *  ...
+ *   __OpenAMP_SHMEM__ 0x38000400  EMPTY 0x0000B000 {} ; Shared Memory area used by OpenAMP
+ *  }
+ *
+ */
+extern unsigned int Image$$__OpenAMP_SHMEM__$$Base;
+extern unsigned int Image$$__OpenAMP_SHMEM__$$ZI$$Length;
+#define SHM_START_ADDRESS (unsigned int)&Image$$__OpenAMP_SHMEM__$$Base
+#define SHM_SIZE          ((size_t)&Image$$__OpenAMP_SHMEM__$$ZI$$Length)
+
+#else
+/*
+ * for GCC add the following content to the .ld file:
+ * MEMORY
+ * {
+ * ...
+ * OPEN_AMP_SHMEM (xrw) : ORIGIN = 0x38000400, LENGTH = 63K
+ * }
+ * __OPENAMP_region_start__  = ORIGIN(OPEN_AMP_SHMEM);
+ * __OPENAMP_region_end__ = ORIGIN(OPEN_AMP_SHMEM) + LENGTH(OPEN_AMP_SHMEM);
+ *
+ * using the LENGTH(OPEN_AMP_SHMEM) to set the SHM_SIZE lead to a crash thus we
+ * use the start and end address.
+ */
+
+extern int __OPENAMP_region_start__[];  /* defined by linker script */
+extern int __OPENAMP_region_end__[];    /* defined by linker script */
 
 #define SHM_START_ADDRESS       ((metal_phys_addr_t)__OPENAMP_region_start__)
-#define SHM_SIZE                (size_t)((void *)__OPENAMP_region_end__-(void *) __OPENAMP_region_start__)
+#define SHM_SIZE                (size_t)((void *)__OPENAMP_region_end__ - (void *) __OPENAMP_region_start__)
+
+#endif
+#if defined STM32MP157Cxx
+#define VRING_RX_ADDRESS        -1        /* allocated by Master processor: CA7 */
+#define VRING_TX_ADDRESS        -1        /* allocated by Master processor: CA7 */
+#define VRING_BUFF_ADDRESS      -1        /* allocated by Master processor: CA7 */
+#define VRING_ALIGNMENT         16        /* fixed to match with linux constraint */
+#define VRING_NUM_BUFFS         16		  /* number of rpmsg buffer */
+#else
 
 [#list SWIPdatas as SWIP]  
 	[#if SWIP.defines??]
@@ -119,6 +180,13 @@ extern int __OPENAMP_region_end__[];  /* defined by linker script */
                         [#if definition.name="VRING_NUM_BUFFS"]
                         [#lt]#define VRING_NUM_BUFFS      ${definition.value}             /* number of rpmsg buffer */
 			[/#if]
+		[/#list]
+	[/#if]
+[/#list]
+#endif
+[#list SWIPdatas as SWIP]  
+	[#if SWIP.defines??]
+		[#list SWIP.defines as definition]
                         [#if definition.name="NUM_RESOURCE_ENTRIES"]
 /* Fixed parameter */
                         [#lt]#define NUM_RESOURCE_ENTRIES ${definition.value}
@@ -193,9 +261,11 @@ extern int __OPENAMP_region_end__[];  /* defined by linker script */
 /**
   * @}
   */
+
 #ifdef __cplusplus
 }
 #endif
 
 #endif /* __OPENAMP_CONF__H__ */
+
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

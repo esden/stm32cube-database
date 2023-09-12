@@ -33,7 +33,7 @@
   * @brief This is the list of modules to be used in the HAL driver 
   */
 #define HAL_MODULE_ENABLED  
-  [#assign allModules = ["ADC", "CEC", "CRC", "CRYP", "DAC", "DCMI", "DSI", "DFSDM", "ETH", "FDCAN", "HASH", "HCD", "HSEM", "I2C", "I2S", "IPCC", "IWDG", "LPTIM", "LTDC", "NAND", "NOR", "PCD", "QUADSPI", "RNG", "SAI",  "SD", "MMC",  "RTC",  "SMBUS",  "SPDIFRX",  "SPI",  "SRAM",  "TAMP",  "TIM",  "TMPSENS",  "UART",  "USART", "SMARTCARD",  "WWDG" , "EXTI"]]
+  [#assign allModules = ["ADC", "CEC", "CRC", "CRYP", "DAC", "DCMI", "DSI", "DFSDM", "DTS", "ETH", "FDCAN", "HASH", "HCD", "HSEM", "I2C", "I2S", "IPCC", "IWDG", "LPTIM", "LTDC", "NAND", "NOR", "PCD", "QUADSPI", "RNG", "SAI",  "SD", "MMC",  "RTC",  "SMBUS",  "SPDIFRX",  "SPI",  "SRAM",  "TAMP",  "TIM",  "UART",  "USART", "SMARTCARD",  "WWDG"]]
   [#list allModules as module]
 	[#if isModuleUsed(module)]
 [#compress]#define HAL_${module?replace("QUADSPI","QSPI")?replace("AES","CRYP")?replace("OCTOSPI","OSPI")}_MODULE_ENABLED[/#compress]
@@ -52,6 +52,7 @@
 	[#return used]
   [/#function]
 #define HAL_GPIO_MODULE_ENABLED
+#define HAL_EXTI_MODULE_ENABLED
 #define HAL_DMA_MODULE_ENABLED
 #define HAL_MDMA_MODULE_ENABLED
 #define HAL_RCC_MODULE_ENABLED
@@ -337,10 +338,6 @@
 #ifdef HAL_TIM_MODULE_ENABLED
  #include "stm32mp1xx_hal_tim.h"
 #endif /* HAL_TIM_MODULE_ENABLED */
-
-#ifdef HAL_TMPSENS_MODULE_ENABLED
- #include "stm32mp1xx_hal_tmpsens.h"
-#endif /* HAL_TMPSENS_MODULE_ENABLED */
 
 #ifdef HAL_UART_MODULE_ENABLED
  #include "stm32mp1xx_hal_uart.h"

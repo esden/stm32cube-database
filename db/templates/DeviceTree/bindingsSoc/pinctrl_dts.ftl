@@ -106,7 +106,7 @@ ${T1}/* USER CODE END pinctrl_z */
 [#macro pinctrlPrint dtPinCtrlDataModel ipInstanceList bankZ]
 	[#list ipInstanceList as node][#-- For each pinCtrl node --]
 [#compress]
-		[#assign nodeLower = (node?lower_case) ]
+		[#assign nodeLower = (node?lower_case)?replace("/", "_")][#--(extranode) replace pinctrlConfigName delimiter if existing--]
 		[#assign device = nodeLower?split("_")[0]]
 
 		[#if srvcmx_getBootloadersEnabledDevicesList()?seq_contains(device) && kernelDt]

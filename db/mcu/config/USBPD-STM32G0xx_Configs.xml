@@ -10,10 +10,7 @@
     Version="STM32Cube_FW_G0_v1.3.0">
 
     <RefConfig Name="USBPD_Init">
-        <!-- CallLibMethod Name="USBPDStackInit"/--> <!-- (used by USB) w/ method arguments -->
-        <!-- CallLibMethod Name="USBPD_DPM_Init"/-->
-        <!-- CallLibMethod Name="USBPD_HW_IF_GlobalHwInit"/-->
-        <!--ImplementCallBack Name=""-->
+
         <Component Name="Middleware:USBPD_Core"/>
         <ConfigFile Name="USBPD_DPM_CONF"/>
         <ConfigFile Name="USBPD_DPM_USER_H"/>
@@ -33,11 +30,13 @@
 
         <Defines Name="USBPD_PORT_COUNT" Value="$USBPD_NbPorts"/>
         <Defines Name="USBPDCORE_LIB_PD3_FULL" Value=""/>
-        <Defines Name="_RTOS" Value=""/>
+        <Defines Name="_RTOS" Value="" Condition="S_FREERTOS"/>
         <Defines Name="_DRP" Value="" Condition="DualRoleUCPD1 | DualRoleUCPD2 | (SourceUCPD1 &amp; SinkUCPD2) | (SourceUCPD2 &amp; SinkUCPD1)"/>
         <Defines Name="_SRC" Value="" Condition="(SourceUCPD1 &amp; !(SinkUCPD2 | DualRoleUCPD2)) | (SourceUCPD2 &amp; !(SinkUCPD1 | DualRoleUCPD1))"/>
         <Defines Name="_SNK" Value="" Condition="(SinkUCPD1 &amp; !(SourceUCPD2 | DualRoleUCPD2)) | (SinkUCPD2 &amp; !(SourceUCPD1 | DualRoleUCPD1))"/>
         <Defines Name="_TRACE" Value="" Condition="USBPD_TRACEREMB"/>
+        <Defines Name="_GUI_INTERFACE" Value="" Condition="GUI_INTERFACE"/>
+
     </RefConfig>
 
     <RefComponent Cclass="Middleware" Cgroup="USBPD_Core" Cversion="2.6.0">
@@ -53,6 +52,7 @@
         <File Category="library" Condition="IAR7;(SIiTideIiEWARM | SIiTideIiEWARMOoV7)" Name="Core/lib/USBPDCORE_PD3_FULL_CM0PLUS_wc16.a" Version=""/>
         <File Category="library" Condition="GCC;SIiTcompilerIiGCC" Name="Core/lib/USBPDCORE_PD3_FULL_CM0PLUS_wc32.a" Version=""/>
         <File Category="library" Condition="IAR8;SIiTideIiEWARMOoV8" Name="Core/lib/USBPDCORE_PD3_FULL_CM0PLUS_wc32.a" Version=""/>
+        <File Category="library" Condition="IAR8;SIiTideIiEWARMOoV8Gg32" Name="Core/lib/USBPDCORE_PD3_FULL_CM0PLUS_wc32.a" Version=""/>
         <File Category="library" Condition="KEIL6;SIiTideIiMDKAaARMOoV6" Name="Core/lib/USBPDCORE_PD3_FULL_CM0PLUS_wc32.a" Version=""/>
         <File Category="library" Condition="KEIL5;SIiTideIiMDKAaARMOoV5" Name="Core/lib/USBPDCORE_PD3_FULL_CM0PLUS_Keil.lib" Version=""/>
 
@@ -99,6 +99,8 @@
         <Argument Name="PE_SpecRevision_P0" GenericType="simple" Comment="Port 0 Specification revision value"/>
         <Argument Name="PE_DefaultRole_P0" GenericType="simple" Comment="Port 0 Default port role"/>
         <Argument Name="PE_RoleSwap_P0" GenericType="simple" Comment="Port 0 Port role swap"/>
+        <Argument Name="PE_DataSwap_P0" GenericType="simple" Comment="Port 0 Data Swap support"/>
+        <Argument Name="PE_VconnSwap_P0" GenericType="simple" Comment="Port 0 Vconn Swap support"/>
         <Argument Name="PE_VDMSupport_P0" GenericType="simple" Comment="Port 0 Vendor defined messages"/>
         <Argument Name="PE_RespondsToDiscovSOP_P0" GenericType="simple" Comment="Port 0 Can respond successfully to a Discover Identity"/>
         <Argument Name="PE_AttemptsDiscovSOP_P0" GenericType="simple" Comment="Port 0 Can send a Discover Identits"/>
@@ -120,6 +122,7 @@
         <Argument Name="Is_SecurityRequest_Supported_P0" GenericType="simple" Comment="Port 0 Security Response message"/>
         <Argument Name="Is_FirmUpdateRequest_Supported_P0" GenericType="simple" Comment="Port 0 Firmware update Response message"/>
         <Argument Name="Is_SnkCapaExt_Supported_P0" GenericType="simple" Comment="Port 0 Sink Capabilities Extended message"/>
+       <!-- <Argument Name="Is_GetBattery_Supported_P0" GenericType="simple" Comment="Port 0 Get Battery Capability and Status messages"/>-->  
         <Argument Name="CAD_SRCToggleTime_P0" GenericType="simple" Comment="Port 0 CAD source toggle time"/>
         <Argument Name="CAD_SNKToggleTime_P0" GenericType="simple" Comment="Port 0 CAD sink toggle time"/>
         <!-- Instance 1 -->
@@ -131,6 +134,8 @@
         <Argument Name="PE_SpecRevision_P1" GenericType="simple" Comment="Port 1 Specification revision value"/>
         <Argument Name="PE_DefaultRole_P1" GenericType="simple" Comment="Port 1 Default port role"/>
         <Argument Name="PE_RoleSwap_P1" GenericType="simple" Comment="Port 1 Port role swap"/>
+        <Argument Name="PE_DataSwap_P1" GenericType="simple" Comment="Port 1 Data Swap support"/>
+        <Argument Name="PE_VconnSwap_P1" GenericType="simple" Comment="Port 1 Vconn Swap support"/>
         <Argument Name="PE_VDMSupport_P1" GenericType="simple" Comment="Port 1 Vendor defined messages"/>
         <Argument Name="PE_RespondsToDiscovSOP_P1" GenericType="simple" Comment="Port 1 Can respond successfully to a Discover Identity"/>
         <Argument Name="PE_AttemptsDiscovSOP_P1" GenericType="simple" Comment="Port 1 Can send a Discover Identits"/>
@@ -152,12 +157,15 @@
         <Argument Name="Is_SecurityRequest_Supported_P1" GenericType="simple" Comment="Port 1 Security Response message"/>
         <Argument Name="Is_FirmUpdateRequest_Supported_P1" GenericType="simple" Comment="Port 1 Firmware update Response message"/>
         <Argument Name="Is_SnkCapaExt_Supported_P1" GenericType="simple" Comment="Port 1 Sink Capabilities Extended message"/>
+        <!--  <Argument Name="Is_GetBattery_Supported_P1" GenericType="simple" Comment="Port 1 Get Battery Capability and Status messages"/>-->
         <Argument Name="CAD_SRCToggleTime_P1" GenericType="simple" Comment="Port 1 CAD source toggle time"/>
         <Argument Name="CAD_SNKToggleTime_P1" GenericType="simple" Comment="Port 1 CAD sink toggle time"/>
     </RefConfigFile>
 
     <RefConfigFile Description="Definitions for the header file usbpd_dpm_user.h" Name="USBPD_DPM_USER_H" Template="usbpd_dpm_user_h.ftl">
         <File Name="usbpd_dpm_user.h" Category="header" Condition="all" Version="2.6.0"/>
+        <Argument Name="DRP" GenericType="simple" Comment=""/>
+        <Argument Name="SNK" GenericType="simple" Comment=""/>
     </RefConfigFile>
     <RefConfigFile Description="Definitions for the header file usbpd_dpm_user.c" Name="USBPD_DPM_USER_C" Template="usbpd_dpm_user_c.ftl">
         <File Name="usbpd_dpm_user.c" Category="source" Condition="all" Version="2.6.0"/>
@@ -172,6 +180,10 @@
 
     <RefConfigFile Description="Definitions for the header file usbpd_pdo_defs.h" Name="USBPD_PDO_DEFS" Template="usbpd_pdo_defs.ftl">
         <File Name="usbpd_pdo_defs.h" Category="header" Condition="all" Version="2.6.0"/>
+        <Argument Name="PORT0_NB_SOURCEPDO" GenericType="simple" Comment="Number of Source PDOs for port 0"/>
+        <Argument Name="PORT0_NB_SINKPDO" GenericType="simple" Comment="Number of Sink PDOs for port 0"/>
+        <Argument Name="PORT1_NB_SOURCEPDO" GenericType="simple" Comment="Number of Source PDOs for port 1"/>
+        <Argument Name="PORT1_NB_SINKPDO" GenericType="simple" Comment="Number of Sink PDOs for port 1"/>
         <Argument Name="USBPD_NbPorts" GenericType="simple" Comment="The number of the USBPD ports"/>
         <Argument Name="PORT0_SOURCE_PDO1" GenericType="simple" Comment="Source PDO 1 for port 0"/>
         <Argument Name="PORT0_SOURCE_PDO2" GenericType="simple" Comment="Source PDO 2 for port 0"/>
@@ -203,34 +215,48 @@
         <Argument Name="PORT1_SINK_PDO7" GenericType="simple" Comment="Sink PDO 7 for port 1"/>
     </RefConfigFile>
 
-    <RefConfigFile Description="Definitions for the header file usbpd_pwr_if.h" Name="USBPD_PWR_IF_H" Template="usbpd_pwr_if_h.ftl">
+    <RefConfigFile Description="Definitions for the header file usbpd_pwr_if.h" Name="USBPD_PWR_IF_H" Template="usbpd_pwr_if_h_g0_g4.ftl">
         <File Name="usbpd_pwr_if.h" Category="header" Condition="all" Version="2.6.0"/>
         <!--Argument Name="" GenericType="simple" Comment=""/-->
     </RefConfigFile>
 
-    <RefConfigFile Description="Definitions for the file usbpd_pwr_if.c" Name="USBPD_PWR_IF_C" Template="usbpd_pwr_if_c.ftl">
+    <RefConfigFile Description="Definitions for the file usbpd_pwr_if.c" Name="USBPD_PWR_IF_C" Template="usbpd_pwr_if_c_g0_g4.ftl">
         <File Name="usbpd_pwr_if.c" Category="source" Condition="all" Version="2.6.0"/>
-        <!--Argument Name="" GenericType="simple" Comment=""/-->
+        <Argument Name="USBPD_NbPorts" GenericType="simple" Comment="The number of the USBPD ports"/>
+        <Argument Name="DRP" GenericType="simple" Comment=""/>
+        <Argument Name="SRC" GenericType="simple" Comment=""/>
+        <Argument Name="SNK" GenericType="simple" Comment=""/>
     </RefConfigFile>
 
     <RefConfigFile Description="Definitions for the header file usbpd_vdm_user.h" Name="USBPD_VDM_USER_H" Template="usbpd_vdm_user_h.ftl">
         <File Name="usbpd_vdm_user.h" Category="header" Condition="all" Version="2.6.0"/>
-        <!--Argument Name="" GenericType="simple" Comment=""/-->
     </RefConfigFile>
 
     <RefConfigFile Description="Definitions for the  file usbpd_vdm_user.c" Name="USBPD_VDM_USER_C" Template="usbpd_vdm_user_c.ftl">
         <File Name="usbpd_vdm_user.c" Category="header" Condition="all" Version="2.6.0"/>
-        <!--Argument Name="" GenericType="simple" Comment=""/-->
+        <Argument Name="USBPD_NbPorts" GenericType="simple" Comment="The number of the USBPD ports"/>
+        <Argument Name="PE_SpecRevision_P0" GenericType="simple" Comment="Port 0 PD Specification"/>
+        <Argument Name="VDM_ModalOperation_P0" GenericType="simple" Comment="Port 0 VDM"/>
+        <Argument Name="VDM_bcdDevice_SOP_P0" GenericType="simple" Comment="Port 0 VDM"/>
+        <Argument Name="VDM_USBHostSupport_P0" GenericType="simple" Comment="Port 0 VDM"/>
+        <Argument Name="VDM_USBDeviceSupport_P0" GenericType="simple" Comment="Port 0 VDM"/>
+        <Argument Name="VDM_ProductTypeUFPorCP_P0" GenericType="simple" Comment="Port 0 VDM"/>
+        <Argument Name="VDM_ProductTypeDFP_P0" GenericType="simple" Comment="Port 0 VDM"/>
+        <Argument Name="PE_SpecRevision_P1" GenericType="simple" Comment="Port 1 PD Specification"/>
+        <Argument Name="VDM_ModalOperation_P1" GenericType="simple" Comment="Port 1 VDM"/>
+        <Argument Name="VDM_bcdDevice_SOP_P1" GenericType="simple" Comment="Port 1 VDM"/>
+        <Argument Name="VDM_USBHostSupport_P1" GenericType="simple" Comment="Port 1 VDM"/>
+        <Argument Name="VDM_USBDeviceSupport_P1" GenericType="simple" Comment="Port 1 VDM"/>
+        <Argument Name="VDM_ProductTypeUFPorCP_P1" GenericType="simple" Comment="Port 1 VDM"/>
+        <Argument Name="VDM_ProductTypeDFP_P1" GenericType="simple" Comment="Port 1 VDM"/>
     </RefConfigFile>
 
     <RefConfigFile Description="Definitions for the header file usbpd_dpm_core.h" Name="USBPD_DPM_CORE_H" Template="usbpd_dpm_core_h.ftl">
         <File Name="usbpd_dpm_core.h" Category="header" Condition="all" Version="2.6.0"/>
-        <Argument Name="RTOS" GenericType="simple" Comment=""/>
     </RefConfigFile>
 
     <RefConfigFile Description="Definitions for the header file usbpd_dpm_core.c" Name="USBPD_DPM_CORE_C" Template="usbpd_dpm_core_c.ftl">
         <File Name="usbpd_dpm_core.c" Category="source" Condition="all" Version="2.6.0"/>
-        <Argument Name="RTOS" GenericType="simple" Comment=""/>
         <Argument Name="USBPD_REV30_SUPPORT" GenericType="simple" Comment=""/>
         <Argument Name="DRP" GenericType="simple" Comment=""/>
         <Argument Name="SRC" GenericType="simple" Comment=""/>

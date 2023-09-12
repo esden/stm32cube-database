@@ -104,7 +104,7 @@
         [#list config.peripheralParams?keys as PeripheralParams]
             [#if PeripheralParams=="USB"]            
                 [#assign values = config.peripheralParams[PeripheralParams]][#-- values is a hash list --]
-                [#if values["lpm_enable"]=="ENABLE"]                                	
+                [#if values["lpm_enable"]=="ENABLE"]                                                	
 					[#assign useLPM=true]			 
                 [/#if]
             [/#if]
@@ -223,6 +223,8 @@ __ALIGN_BEGIN uint8_t USBD_${CLASS_FS}_DeviceDesc[USB_LEN_DEV_DESC] __ALIGN_END 
 #else
   0x00,                       /*bcdUSB */
 #endif /* (USBD_LPM_ENABLED == 1) */
+[#elseif useLPM=false]
+  0x00,                       /*bcdUSB */
 [/#if]
 [#else]
   0x00,                       /*bcdUSB */

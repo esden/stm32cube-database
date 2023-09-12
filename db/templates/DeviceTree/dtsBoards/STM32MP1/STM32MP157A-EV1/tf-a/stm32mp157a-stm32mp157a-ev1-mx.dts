@@ -44,6 +44,18 @@
 	/* USER CODE END root */
 };
 
+/* Security specific */
+&bsec{
+
+	/* USER CODE BEGIN bsec */
+	board_id: board_id@ec {
+		reg = <0xec 0x4>;
+		status = "okay";
+		secure-status = "okay";
+	};
+	/* USER CODE END bsec */
+};
+
 &clk_hse {
 	st,digbypass;
 	/* USER CODE BEGIN clk_hse */
@@ -101,6 +113,11 @@
 				regulator-always-on;
 				regulator-initial-mode = <0>;
 				regulator-over-current-protection;
+
+				lplv-stop{
+				  regulator-on-in-suspend;
+				  regulator-suspend-microvolt = <900000>;
+				};
 				lp-stop {
 					regulator-on-in-suspend;
 					regulator-suspend-microvolt = <1200000>;
@@ -120,6 +137,11 @@
 				regulator-always-on;
 				regulator-initial-mode = <0>;
 				regulator-over-current-protection;
+
+				lplv-stop{
+				  regulator-on-in-suspend;
+				  regulator-suspend-microvolt = <1350000>;
+				};
 				lp-stop {
 					regulator-suspend-microvolt = <1350000>;
 					regulator-on-in-suspend;
@@ -141,6 +163,11 @@
 				st,mask-reset;
 				regulator-initial-mode = <0>;
 				regulator-over-current-protection;
+
+				lplv-stop{
+				  regulator-on-in-suspend;
+				  regulator-suspend-microvolt = <3300000>;
+				};
 				lp-stop {
 					regulator-suspend-microvolt = <3300000>;
 					regulator-on-in-suspend;
@@ -206,6 +233,10 @@
 				regulator-max-microvolt = <750000>;
 				regulator-always-on;
 				regulator-over-current-protection;
+
+				lplv-stop{
+				  regulator-off-in-suspend;
+				};
 				lp-stop {
 					regulator-off-in-suspend;
 				};
@@ -258,6 +289,10 @@
 				regulator-name = "vref_ddr";
 				regulator-always-on;
 				regulator-over-current-protection;
+
+				lplv-stop{
+				  regulator-on-in-suspend;
+				};
 				lp-stop {
 					regulator-on-in-suspend;
 				};
@@ -470,13 +505,17 @@
 
 &pwr {
 	/* USER CODE BEGIN pwr */
-	pwr-supply = <&vdd>;
 	system_suspend_supported_soc_modes = <
 		STM32_PM_CSLEEP_RUN
 		STM32_PM_CSTOP_ALLOW_LP_STOP
+		STM32_PM_CSTOP_ALLOW_LPLV_STOP
 		STM32_PM_CSTOP_ALLOW_STANDBY_DDR_SR
 	>;
 	system_off_soc_mode = <STM32_PM_CSTOP_ALLOW_STANDBY_DDR_OFF>;
+
+	pwr-regulators {
+		vdd-supply = <&vdd>;
+	};
 	/* USER CODE END pwr */
 };
 

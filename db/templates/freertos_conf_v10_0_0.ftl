@@ -86,6 +86,8 @@
 [#assign configRECORD_STACK_HIGH_ADDRESS = "0"]
 [#-- For BLE --] 
 [#assign configOVERRIDE_DEFAULT_TICK_CONFIGURATION = "0"]
+[#-- For NEWLIB --]
+[#assign configUSE_NEWLIB_REENTRANT = "0"]
 
   [#if SWIP.defines??]
     [#list SWIP.defines as definition]
@@ -281,6 +283,10 @@
       [#if definition.name=="configOVERRIDE_DEFAULT_TICK_CONFIGURATION"]
           [#assign configOVERRIDE_DEFAULT_TICK_CONFIGURATION = definition.value]
       [/#if]
+      [#-- NEWLIB --]
+      [#if definition.name=="configUSE_NEWLIB_REENTRANT"]
+          [#assign configUSE_NEWLIB_REENTRANT = definition.value]
+      [/#if]    
     [/#list]
   [/#if]
 
@@ -361,8 +367,8 @@
 [#if configUSE_TRACE_FACILITY=="1"]
 #define configUSE_TRACE_FACILITY                 1
 [/#if]
-[#if configUSE_STATS_FORMATTING_FUNCTIONS=="1"]
-#define configUSE_STATS_FORMATTING_FUNCTIONS     1
+[#if configUSE_STATS_FORMATTING_FUNCTIONS != "0"]
+#define configUSE_STATS_FORMATTING_FUNCTIONS     ${configUSE_STATS_FORMATTING_FUNCTIONS}
 [/#if]
 #define configUSE_16_BIT_TICKS                   ${valueUse16BitTicks}
 [#if configIDLE_SHOULD_YIELD=="0"]
@@ -425,6 +431,10 @@
 #define configTIMER_TASK_PRIORITY                ( ${valueTimerTaskPriority} )
 #define configTIMER_QUEUE_LENGTH                 ${valueTimerQueueLength}
 #define configTIMER_TASK_STACK_DEPTH             ${valueTimerTaskStackDepth}
+[/#if]
+
+[#if configUSE_NEWLIB_REENTRANT=="1"]
+#define configUSE_NEWLIB_REENTRANT          1
 [/#if]
 
 /* Set the following definitions to 1 to include the API function, or zero
@@ -512,10 +522,38 @@ standard names. */
 
 /* IMPORTANT: This define is commented when used with STM32Cube firmware, when the timebase source is SysTick,
               to prevent overwriting SysTick_Handler defined within STM32Cube HAL */
-[#if timeBaseSource?? && timeBaseSource!="SysTick"]
+[#-- for dual core, need to check the right timebase (for others, keep previous check --]
+[#if (familyName=="stm32h7")] 
+ [#assign timeBaseTreated = "0"]
+ [#if cpucore!="" && cpucore?replace("ARM_CORTEX_","")=="M4"]
+  [#if timeBaseSource_M4?? && timeBaseSource_M4!="SysTick"]
 #define xPortSysTickHandler SysTick_Handler
-[#else]
+  [#else]
 /* #define xPortSysTickHandler SysTick_Handler */
+  [/#if]
+  [#assign timeBaseTreated = "1"]
+ [/#if]
+ [#if cpucore!="" &&cpucore?replace("ARM_CORTEX_","")=="M7"]
+  [#if timeBaseSource_M7?? && timeBaseSource_M7!="SysTick"]
+#define xPortSysTickHandler SysTick_Handler
+  [#else]
+/* #define xPortSysTickHandler SysTick_Handler */
+  [/#if]
+  [#assign timeBaseTreated = "1"]
+ [/#if]
+ [#if timeBaseTreated = "0"] [#-- not yet treated (on h7 single-core mcus) --]
+  [#if timeBaseSource?? && timeBaseSource!="SysTick"]
+#define xPortSysTickHandler SysTick_Handler
+  [#else]
+/* #define xPortSysTickHandler SysTick_Handler */
+  [/#if]
+ [/#if]
+[#else] [#-- not a h7 (test for mcu with no context: to be checkedand confirmed on L5!) --]
+ [#if timeBaseSource?? && timeBaseSource!="SysTick"]
+#define xPortSysTickHandler SysTick_Handler
+ [#else]
+/* #define xPortSysTickHandler SysTick_Handler */
+ [/#if]
 [/#if]
 
 [#if USE_Touch_GFX_STACK??]

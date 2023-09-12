@@ -69,23 +69,23 @@
     <RefParameter Name="USBPD_DMA_Request" Comment="USBPD request UCPD IPs DMA" Group="USBPD needs" Type="string" DefaultValue="enabled" />
 
     <!-- RefParameters for usbpd_dpm_conf.h -->
-    <RefParameter Name="USBPD_NbPorts" Comment="Number of USBPD ports" Type="list" Group="Manufacturer Parameters" TabName="DPM Core Parameters" DefaultValue="2" Visible="false">
+    <RefParameter Name="USBPD_NbPorts" Comment="Number of USBPD ports" Type="list" Group="USB IF and Manufacturer ID" TabName="DPM Core Parameters" DefaultValue="2" Visible="false">
         <PossibleValue Value="2" Comment="2"/>
         <Condition Expression="(USBPD_P1U1|USBPD_P1U2)" Diagnostic="Both instances of UCPD must be active"/>
     </RefParameter>
-    <RefParameter Name="USBPD_NbPorts" Comment="Number of USBPD ports" Type="list" Group="Manufacturer Parameters" TabName="DPM Core Parameters" DefaultValue="1" Visible="false">
+    <RefParameter Name="USBPD_NbPorts" Comment="Number of USBPD ports" Type="list" Group="USB IF and Manufacturer ID" TabName="DPM Core Parameters" DefaultValue="1" Visible="false">
         <PossibleValue Value="1" Comment="1"/>
     </RefParameter>
-    <RefParameter Name="USBPD_VID" Comment="Vendor ID" Type="stringRW" Group="Manufacturer Parameters" TabName="DPM Core Parameters" DefaultValue="0x0483">
+    <RefParameter Name="USBPD_VID" Comment="Vendor ID" Type="stringRW" Group="USB IF and Manufacturer ID" TabName="DPM Core Parameters" DefaultValue="0x0483">
         <Description>
             The Vendor ID is assigned by the USB Implementers Forum.&lt;br&gt;
             The Vendor ID for STMicroelectronics is 0x0483.
         </Description>
     </RefParameter>
-    <RefParameter Name="USBPD_PID" Comment="Product ID" Type="stringRW" Group="Manufacturer Parameters" TabName="DPM Core Parameters" DefaultValue="0x0002">
+    <RefParameter Name="USBPD_PID" Comment="Product ID" Type="stringRW" Group="USB IF and Manufacturer ID" TabName="DPM Core Parameters" DefaultValue="0x0002">
         <Description>The Product ID is assigned by the USB Implementers Forum.</Description>
     </RefParameter>
-    <RefParameter Name="USBPD_XID" Comment="XID" Type="stringRW" Group="Manufacturer Parameters" TabName="DPM Core Parameters" DefaultValue="0xF0000003">
+    <RefParameter Name="USBPD_XID" Comment="XID" Type="stringRW" Group="USB IF and Manufacturer ID" TabName="DPM Core Parameters" DefaultValue="0xF0000003">
         <Description>Outward facing identifier used to determine certification status of a PD product.</Description>
     </RefParameter>
 
@@ -156,6 +156,14 @@
     <RefParameter Name="PE_RoleSwap_P0" Comment="Port role swap" Type="list" Group="Port 0 Parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE">
         <PossibleValue Value="USBPD_FALSE" Comment="Not supported" Condition="((DualRoleUCPD1 &amp; USBPD_P0U1)|(DualRoleUCPD2 &amp; USBPD_P0U2))" Diagnostic="The UCPD instance has been configured as dual role"/>
         <PossibleValue Value="USBPD_TRUE" Comment="Supported" Condition="((((SinkUCPD1|SourceUCPD1) &amp; USBPD_P0U1))|((SinkUCPD2|SourceUCPD2) &amp; USBPD_P0U2))" Diagnostic="The UCPD instance has not been configured as dual role"/>
+    </RefParameter>
+    <RefParameter Name="PE_DataSwap_P0" Comment="Data role swap" Type="list" Group="Port 0 Parameters" TabName="User Port 0 Parameters" DefaultValue="USBPD_FALSE">
+        <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
+        <PossibleValue Value="USBPD_TRUE" Comment="Supported"/>
+    </RefParameter>
+    <RefParameter Name="PE_VconnSwap_P0" Comment="VCONN swap" Type="list" Group="Port 0 Parameters" TabName="User Port 0 Parameters" DefaultValue="USBPD_FALSE">
+        <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
+        <PossibleValue Value="USBPD_TRUE" Comment="Supported"/>
     </RefParameter>
     <RefParameter Name="PE_VDMSupport_P0" Comment="Vendor defined messages" Type="list" Group="Port 0 Parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE">
         <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
@@ -278,6 +286,65 @@
     <RefParameter Name="Is_SnkCapaExt_Supported_P0" Comment="Sink Capabilities Extended message" Type="list" Group="PD Revision 3.0 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE" Visible="false">
         <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
     </RefParameter>
+    <!--<RefParameter Name="Is_GetBattery_Supported_P0" Comment="Get Battery Capabitity and Status messages" Type="list" Group="PD Revision 3.0 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE">
+        <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
+        <PossibleValue Value="USBPD_TRUE" Comment="Supported"/>
+        <Condition Diagnostic="Only available if the specification revision value is set to 3.0" Expression="PE_SpecRevision_P0=USBPD_SPECIFICATION_REV3"/>
+    </RefParameter>
+    <RefParameter Name="Is_GetBattery_Supported_P0" Comment="Get Battery Capabitity and Status messages" Type="list" Group="PD Revision 3.0 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE" Visible="false">
+        <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
+    </RefParameter>-->
+
+    <RefParameter Name="VDM_ModalOperation_P0" Comment="Product support Modes" Type="list" Group="Vendor Defined Message parameters" TabName="Stack Port 0 Parameters" DefaultValue="MODAL_OPERATION_SUPPORTED">
+        <PossibleValue Value="MODAL_OPERATION_NONSUPP" Comment="Not supported"/>
+        <PossibleValue Value="MODAL_OPERATION_SUPPORTED" Comment="Supported"/>
+        <Condition Diagnostic="Only available if VDMs are supported" Expression="PE_VDMSupport_P0=USBPD_TRUE"/>
+    </RefParameter>
+    <RefParameter Name="VDM_ModalOperation_P0" Comment="Product support Modes" Type="list" Group="Vendor Defined Message parameters" TabName="Stack Port 0 Parameters" DefaultValue="MODAL_OPERATION_NONSUPP" Visible="false">
+        <PossibleValue Value="MODAL_OPERATION_NONSUPP" Comment="Not supported"/>
+    </RefParameter>
+    <RefParameter Name="VDM_bcdDevice_SOP_P0" Comment="Vendor ID assigned product release version" Type="stringRW" Group="Vendor Defined Message parameters" TabName="Stack Port 0 Parameters" DefaultValue="0xAAAA">
+        <Condition Diagnostic="Only available if VDMs are supported" Expression="PE_VDMSupport_P0=USBPD_TRUE"/>
+    </RefParameter>
+    <RefParameter Name="VDM_bcdDevice_SOP_P0" Comment="Vendor ID assigned product release version" Type="stringRW" Group="Vendor Defined Message parameters" TabName="Stack Port 0 Parameters" DefaultValue="0xAAAA" Visible="false"/>
+    <RefParameter Name="VDM_USBHostSupport_P0" Comment="USB Host enumerating" Type="list" Group="Vendor Defined Message parameters" TabName="Stack Port 0 Parameters" DefaultValue="USB_NOTCAPABLE">
+        <PossibleValue Value="USB_NOTCAPABLE" Comment="Not capable"/>
+        <PossibleValue Value="USB_CAPABLE" Comment="Capable"/>
+        <Condition Diagnostic="Only available if VDMs are supported" Expression="PE_VDMSupport_P0=USBPD_TRUE"/>
+    </RefParameter>
+    <RefParameter Name="VDM_USBHostSupport_P0" Comment="USB Host enumerating" Type="list" Group="Vendor Defined Message parameters" TabName="Stack Port 0 Parameters" DefaultValue="USB_NOTCAPABLE" Visible="false">
+        <PossibleValue Value="USB_NOTCAPABLE" Comment="Not capable"/>
+    </RefParameter>
+    <RefParameter Name="VDM_USBDeviceSupport_P0" Comment="USB Device enumerating" Type="list" Group="Vendor Defined Message parameters" TabName="Stack Port 0 Parameters" DefaultValue="USB_NOTCAPABLE">
+        <PossibleValue Value="USB_NOTCAPABLE" Comment="Not capable"/>
+        <PossibleValue Value="USB_CAPABLE" Comment="Capable"/>
+        <Condition Diagnostic="Only available if VDMs are supported" Expression="PE_VDMSupport_P0=USBPD_TRUE"/>
+    </RefParameter>
+    <RefParameter Name="VDM_USBDeviceSupport_P0" Comment="USB Device enumerating" Type="list" Group="Vendor Defined Message parameters" TabName="Stack Port 0 Parameters" DefaultValue="USB_NOTCAPABLE" Visible="false">
+        <PossibleValue Value="USB_NOTCAPABLE" Comment="Not capable"/>
+    </RefParameter>
+    <RefParameter Name="VDM_ProductTypeUFPorCP_P0" Comment="UFP or CP product type" Type="list" Group="Vendor Defined Message parameters" TabName="Stack Port 0 Parameters" DefaultValue="PRODUCT_TYPE_UNDEFINED">
+        <PossibleValue Value="PRODUCT_TYPE_UNDEFINED" Comment="Undefined"/>
+        <PossibleValue Value="PRODUCT_TYPE_HUB" Comment="PDUSB Hub (UFP)"/>
+        <PossibleValue Value="PRODUCT_TYPE_PERIPHERAL" Comment="PDUSB Host (UFP)"/>
+        <PossibleValue Value="PRODUCT_TYPE_PASSIVE_CABLE" Comment="Passive Cable (Cable Plug)"/>
+        <PossibleValue Value="PRODUCT_TYPE_ACTIVE_CABLE" Comment="Active Cable (Cable Plug)"/>
+        <PossibleValue Value="PRODUCT_TYPE_AMA" Comment="Alternate Mode Adapter (AMA) (UFP)"/>
+        <Condition Diagnostic="Only available if VDMs are supported" Expression="PE_VDMSupport_P0=USBPD_TRUE"/>
+    </RefParameter>
+    <RefParameter Name="VDM_ProductTypeUFPorCP_P0" Comment="UFP or CP product type" Type="list" Group="Vendor Defined Message parameters" TabName="Stack Port 0 Parameters" DefaultValue="PRODUCT_TYPE_UNDEFINED" Visible="false">
+        <PossibleValue Value="PRODUCT_TYPE_UNDEFINED" Comment="Undefined"/>
+    </RefParameter>
+    <RefParameter Name="VDM_ProductTypeDFP_P0" Comment="DFP product type" Type="list" Group="Vendor Defined Message parameters" TabName="Stack Port 0 Parameters" DefaultValue="PRODUCT_TYPE_UNDEFINED">
+        <PossibleValue Value="PRODUCT_TYPE_UNDEFINED" Comment="Undefined"/>
+        <PossibleValue Value="PRODUCT_TYPE_HOST" Comment="PDUSB Host (DFP)" Condition="!(PE_SpecRevision_P0=USBPD_SPECIFICATION_REV3)"/>
+        <PossibleValue Value="PRODUCT_TYPE_POWER_BRICK" Comment="Power Brick (DFP)" Condition="!(PE_SpecRevision_P0=USBPD_SPECIFICATION_REV3)"/>
+        <PossibleValue Value="PRODUCT_TYPE_AMC" Comment="Alternate Mode Controller (AMC) (DFP)" Condition="!(PE_SpecRevision_P0=USBPD_SPECIFICATION_REV3)"/>
+        <Condition Diagnostic="Only available if VDMs are supported" Expression="PE_VDMSupport_P0=USBPD_TRUE"/>
+    </RefParameter>
+    <RefParameter Name="VDM_ProductTypeDFP_P0" Comment="DFP product type" Type="list" Group="Vendor Defined Message parameters" TabName="Stack Port 0 Parameters" DefaultValue="PRODUCT_TYPE_UNDEFINED" Visible="false">
+        <PossibleValue Value="PRODUCT_TYPE_UNDEFINED" Comment="Undefined"/>
+    </RefParameter>
 
     <RefParameter Name="CAD_RoleToggle_P0" Comment="CAD role toggle" Type="list" Group="Cable Detection Parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE">
         <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
@@ -364,6 +431,14 @@
     <RefParameter Name="PE_RoleSwap_P1" Comment="Port role swap" Type="list" Group="Port 1 Parameters" TabName="Stack Port 1 Parameters" DefaultValue="USBPD_FALSE">
         <PossibleValue Value="USBPD_FALSE" Comment="Not supported" Condition="((DualRoleUCPD1 &amp; USBPD_P1U1)|(DualRoleUCPD2 &amp; USBPD_P1U2))" Diagnostic="The UCPD instance has been configured as dual role"/>
         <PossibleValue Value="USBPD_TRUE" Comment="Supported" Condition="((((SinkUCPD1|SourceUCPD1) &amp; USBPD_P1U1))|((SinkUCPD2|SourceUCPD2) &amp; USBPD_P1U2))" Diagnostic="The UCPD instance has not been configured as dual role"/>
+    </RefParameter>
+    <RefParameter Name="PE_DataSwap_P1" Comment="Data role swap" Type="list" Group="Port 1 Parameters" TabName="User Port 1 Parameters" DefaultValue="USBPD_FALSE">
+        <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
+        <PossibleValue Value="USBPD_TRUE" Comment="Supported"/>
+    </RefParameter>
+    <RefParameter Name="PE_VconnSwap_P1" Comment="VCONN swap" Type="list" Group="Port 1 Parameters" TabName="User Port 1 Parameters" DefaultValue="USBPD_FALSE">
+        <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
+        <PossibleValue Value="USBPD_TRUE" Comment="Supported"/>
     </RefParameter>
     <RefParameter Name="PE_VDMSupport_P1" Comment="Vendor defined messages" Type="list" Group="Port 1 Parameters" TabName="Stack Port 1 Parameters" DefaultValue="USBPD_FALSE">
         <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
@@ -486,16 +561,15 @@
     <RefParameter Name="Is_SnkCapaExt_Supported_P1" Comment="Sink Capabilities Extended message" Type="list" Group="PD Revision 3.0 specific parameters" TabName="Stack Port 1 Parameters" DefaultValue="USBPD_FALSE" Visible="false">
         <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
     </RefParameter>
+    <!--<RefParameter Name="Is_GetBattery_Supported_P1" Comment="Get Battery Capabitity and Status messages" Type="list" Group="PD Revision 3.0 specific parameters" TabName="Stack Port 1 Parameters" DefaultValue="USBPD_FALSE">
+        <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
+        <PossibleValue Value="USBPD_TRUE" Comment="Supported"/>
+        <Condition Diagnostic="Only available if the specification revision value is set to 3.0" Expression="PE_SpecRevision_P1=USBPD_SPECIFICATION_REV3"/>
+    </RefParameter>
+    <RefParameter Name="Is_GetBattery_Supported_P1" Comment="Get Battery Capabitity and Status messages" Type="list" Group="PD Revision 3.0 specific parameters" TabName="Stack Port 1 Parameters" DefaultValue="USBPD_FALSE" Visible="false">
+        <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
+    </RefParameter>-->
 
-    <RefParameter Name="VDM_XID_SOP_P1" Comment="USB-IF assigned XID" Type="stringRW" Group="Vendor Defined Message parameters" TabName="Stack Port 1 Parameters" DefaultValue="0x0000AAAA">
-        <Condition Diagnostic="Only available if VDMs are supported" Expression="PE_VDMSupport_P1=USBPD_TRUE"/>
-    </RefParameter>
-    <RefParameter Name="VDM_XID_SOP_P1" Comment="USB-IF assigned XID" Type="stringRW" Group="Vendor Defined Message parameters" TabName="Stack Port 1 Parameters" DefaultValue="0x0000AAAA" Visible="false"/>
-    <!-- VDM_USB_VID_SOP -->
-    <RefParameter Name="VDM_PID_SOP_P1" Comment="Vendor ID assigned PID" Type="stringRW" Group="Vendor Defined Message parameters" TabName="Stack Port 1 Parameters" DefaultValue="0xAAAA">
-        <Condition Diagnostic="Only available if VDMs are supported" Expression="PE_VDMSupport_P1=USBPD_TRUE"/>
-    </RefParameter>
-    <RefParameter Name="VDM_PID_SOP_P1" Comment="Vendor ID assigned PID" Type="stringRW" Group="Vendor Defined Message parameters" TabName="Stack Port 1 Parameters" DefaultValue="0xAAAA" Visible="false"/>
     <RefParameter Name="VDM_ModalOperation_P1" Comment="Product support Modes" Type="list" Group="Vendor Defined Message parameters" TabName="Stack Port 1 Parameters" DefaultValue="MODAL_OPERATION_SUPPORTED">
         <PossibleValue Value="MODAL_OPERATION_NONSUPP" Comment="Not supported"/>
         <PossibleValue Value="MODAL_OPERATION_SUPPORTED" Comment="Supported"/>
@@ -546,7 +620,6 @@
     <RefParameter Name="VDM_ProductTypeDFP_P1" Comment="DFP product type" Type="list" Group="Vendor Defined Message parameters" TabName="Stack Port 1 Parameters" DefaultValue="PRODUCT_TYPE_UNDEFINED" Visible="false">
         <PossibleValue Value="PRODUCT_TYPE_UNDEFINED" Comment="Undefined"/>
     </RefParameter>
-    <!-- RefParameter Name="PE_Svid_P1" Comment="VDM SVID" Type="" Group="Port 1 Parameters" TabName="Stack Port 1 Parameters" DefaultValue="0xFF00"/ -->
 
     <RefParameter Name="CAD_RoleToggle_P1" Comment="CAD role toggle" Type="list" Group="Cable Detection Parameters" TabName="Stack Port 1 Parameters" DefaultValue="USBPD_FALSE">
         <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
@@ -588,11 +661,11 @@
     <RefParameter Name="CAD_SNKToggleTime_P1" Comment="CAD sink toggle time" Type="integer" Group="Cable Detection Parameters" TabName="Stack Port 1 Parameters" DefaultValue="0" Unit="ms" Visible="false"/>
 
     <!-- RefParameters for usbpd_pdo_defs.h -->
-    <RefParameter Name="PORT0_NB_SOURCEPDO" Comment="Number of Source PDOs for port 0" Type="integer" TabName="PDO General Definitions" Min="0" Max="7" DefaultValue="0">
+    <RefParameter Name="PORT0_NB_SOURCEPDO" Comment="Number of Source PDOs for port 0" Type="integer" TabName="PDO General Definitions" Min="1" Max="7" DefaultValue="1">
         <Condition Diagnostic="" Expression="(USBPD_P0U1 &amp; (SourceUCPD1|DualRoleUCPD1)) | (USBPD_P0U2 &amp; (SourceUCPD2|DualRoleUCPD2))"/>
     </RefParameter>
     <RefParameter Name="PORT0_NB_SOURCEPDO" Comment="Number of Source PDOs for port 0" Type="integer" TabName="PDO General Definitions" Min="0" Max="0" DefaultValue="0" Visible="false" />
-    <RefParameter Name="PORT0_SOURCE_PDO1" Type="hex" Comment="port 0 Source PDO 1" TabName="PDO General Definitions" Min="0x00000000" Max="0xFFFFFFFF" DefaultValue="0x00000000">
+    <RefParameter Name="PORT0_SOURCE_PDO1" Type="hex" Comment="port 0 Source PDO 1" TabName="PDO General Definitions" Min="0x00000000" Max="0xFFFFFFFF" DefaultValue="0x2201912C">
         <Condition Diagnostic="define more PDOs" Expression="PORT0_NB_SOURCEPDO &gt; 0"/>
     </RefParameter>
     <RefParameter Name="PORT0_SOURCE_PDO1" Type="hex" Comment="port 0 Source PDO 1" TabName="PDO General Definitions" Min="0x00000000" Max="0x00000000" DefaultValue="0x00000000" Visible="false"/>
@@ -621,11 +694,11 @@
     </RefParameter>
     <RefParameter Name="PORT0_SOURCE_PDO7" Type="hex" Comment="port 0 Source PDO 7" TabName="PDO General Definitions" Min="0x00000000" Max="0x00000000" DefaultValue="0x00000000" Visible="false"/>
 
-    <RefParameter Name="PORT0_NB_SINKPDO" Comment="Number of Sink PDOs for port 0" Type="integer" TabName="PDO General Definitions" Min="0" Max="7" DefaultValue="0">
+    <RefParameter Name="PORT0_NB_SINKPDO" Comment="Number of Sink PDOs for port 0" Type="integer" TabName="PDO General Definitions" Min="1" Max="7" DefaultValue="1">
         <Condition Diagnostic="" Expression="(USBPD_P0U1 &amp; (SinkUCPD1|DualRoleUCPD1)) | (USBPD_P0U2 &amp; (SinkUCPD2|DualRoleUCPD2))"/>
     </RefParameter>
     <RefParameter Name="PORT0_NB_SINKPDO" Comment="Number of Sink PDOs for port 0" Type="integer" TabName="PDO General Definitions" Min="0" Max="0" DefaultValue="0" Visible="false" />
-    <RefParameter Name="PORT0_SINK_PDO1" Type="hex" Comment="port 0 Sink PDO 1" TabName="PDO General Definitions" Min="0x00000000" Max="0xFFFFFFFF" DefaultValue="0x00000000">
+    <RefParameter Name="PORT0_SINK_PDO1" Type="hex" Comment="port 0 Sink PDO 1" TabName="PDO General Definitions" Min="0x00000000" Max="0xFFFFFFFF" DefaultValue="0x26019096">
         <Condition Diagnostic="define more PDOs" Expression="PORT0_NB_SINKPDO &gt; 0"/>
     </RefParameter>
     <RefParameter Name="PORT0_SINK_PDO1" Type="hex" Comment="port 0 Sink PDO 1" TabName="PDO General Definitions" Min="0x00000000" Max="0x00000000" DefaultValue="0x00000000" Visible="false"/>
@@ -654,11 +727,11 @@
     </RefParameter>
     <RefParameter Name="PORT0_SINK_PDO7" Type="hex" Comment="port 0 Sink PDO 7" TabName="PDO General Definitions" Min="0x00000000" Max="0x00000000" DefaultValue="0x00000000" Visible="false"/>
 
-    <RefParameter Name="PORT1_NB_SOURCEPDO" Comment="Number of Source PDOs for port 1" Type="integer" TabName="PDO General Definitions" Min="0" Max="7" DefaultValue="0">
+    <RefParameter Name="PORT1_NB_SOURCEPDO" Comment="Number of Source PDOs for port 1" Type="integer" TabName="PDO General Definitions" Min="1" Max="7" DefaultValue="1">
         <Condition Diagnostic="" Expression="(USBPD_P1U1 &amp; (SourceUCPD1|DualRoleUCPD1)) | (USBPD_P1U2 &amp; (SourceUCPD2|DualRoleUCPD2))"/>
     </RefParameter>
     <RefParameter Name="PORT1_NB_SOURCEPDO" Comment="Number of Source PDOs for port 1" Type="integer" TabName="PDO General Definitions" Min="0" Max="0" DefaultValue="0" Visible="false" />
-    <RefParameter Name="PORT1_SOURCE_PDO1" Type="hex" Comment="port 1 Source PDO 1" TabName="PDO General Definitions" Min="0x00000000" Max="0xFFFFFFFF" DefaultValue="0x00000000">
+    <RefParameter Name="PORT1_SOURCE_PDO1" Type="hex" Comment="port 1 Source PDO 1" TabName="PDO General Definitions" Min="0x00000000" Max="0xFFFFFFFF" DefaultValue="0x2201912C">
         <Condition Diagnostic="define more PDOs" Expression="PORT1_NB_SOURCEPDO &gt; 0"/>
     </RefParameter>
     <RefParameter Name="PORT1_SOURCE_PDO1" Type="hex" Comment="port 1 Source PDO 1" TabName="PDO General Definitions" Min="0x00000000" Max="0x00000000" DefaultValue="0x00000000" Visible="false"/>
@@ -687,11 +760,11 @@
     </RefParameter>
     <RefParameter Name="PORT1_SOURCE_PDO7" Type="hex" Comment="port 1 Source PDO 7" TabName="PDO General Definitions" Min="0x00000000" Max="0x00000000" DefaultValue="0x00000000" Visible="false"/>
 
-    <RefParameter Name="PORT1_NB_SINKPDO" Comment="Number of Sink PDOs for port 1" Type="integer" TabName="PDO General Definitions" Min="0" Max="7" DefaultValue="0">
+    <RefParameter Name="PORT1_NB_SINKPDO" Comment="Number of Sink PDOs for port 1" Type="integer" TabName="PDO General Definitions" Min="1" Max="7" DefaultValue="1">
         <Condition Diagnostic="" Expression="(USBPD_P1U1 &amp; (SinkUCPD1|DualRoleUCPD1)) | (USBPD_P1U2 &amp; (SinkUCPD2|DualRoleUCPD2))"/>
     </RefParameter>
     <RefParameter Name="PORT1_NB_SINKPDO" Comment="Number of Sink PDOs for port 1" Type="integer" TabName="PDO General Definitions" Min="0" Max="0" DefaultValue="0" Visible="false" />
-    <RefParameter Name="PORT1_SINK_PDO1" Type="hex" Comment="port 1 Sink PDO 1" TabName="PDO General Definitions" Min="0x00000000" Max="0xFFFFFFFF" DefaultValue="0x00000000">
+    <RefParameter Name="PORT1_SINK_PDO1" Type="hex" Comment="port 1 Sink PDO 1" TabName="PDO General Definitions" Min="0x00000000" Max="0xFFFFFFFF" DefaultValue="0x26019096">
         <Condition Diagnostic="define more PDOs" Expression="PORT1_NB_SINKPDO &gt; 0"/>
     </RefParameter>
     <RefParameter Name="PORT1_SINK_PDO1" Type="hex" Comment="port 1 Sink PDO 1" TabName="PDO General Definitions" Min="0x00000000" Max="0x00000000" DefaultValue="0x00000000" Visible="false"/>
@@ -1230,6 +1303,8 @@
         <Parameter Name="PE_SpecRevision_P0"/>
         <Parameter Name="PE_DefaultRole_P0"/>
         <Parameter Name="PE_RoleSwap_P0"/>
+        <Parameter Name="PE_DataSwap_P0"/>
+        <Parameter Name="PE_VconnSwap_P0"/>
         <Parameter Name="PE_VDMSupport_P0"/>
         <Parameter Name="PE_RespondsToDiscovSOP_P0"/>
         <Parameter Name="PE_AttemptsDiscovSOP_P0"/>
@@ -1247,6 +1322,13 @@
         <Parameter Name="Is_SecurityRequest_Supported_P0"/>
         <Parameter Name="Is_FirmUpdateRequest_Supported_P0"/>
         <Parameter Name="Is_SnkCapaExt_Supported_P0"/>
+        <!--<Parameter Name="Is_GetBattery_Supported_P0"/>-->
+        <Parameter Name="VDM_ModalOperation_P0"/>
+        <Parameter Name="VDM_bcdDevice_SOP_P0"/>
+        <Parameter Name="VDM_USBHostSupport_P0"/>
+        <Parameter Name="VDM_USBDeviceSupport_P0"/>
+        <Parameter Name="VDM_ProductTypeUFPorCP_P0"/>
+        <Parameter Name="VDM_ProductTypeDFP_P0"/>
         <Parameter Name="CAD_RoleToggle_P0"/>
         <Parameter Name="CAD_DefaultResistor_P0"/>
         <Parameter Name="CAD_TryFeature_P0"/>
@@ -1265,6 +1347,8 @@
         <Parameter Name="PE_SpecRevision_P1"/>
         <Parameter Name="PE_DefaultRole_P1"/>
         <Parameter Name="PE_RoleSwap_P1"/>
+        <Parameter Name="PE_DataSwap_P1"/>
+        <Parameter Name="PE_VconnSwap_P1"/>
         <Parameter Name="PE_VDMSupport_P1"/>
         <Parameter Name="PE_RespondsToDiscovSOP_P1"/>
         <Parameter Name="PE_AttemptsDiscovSOP_P1"/>
@@ -1281,16 +1365,14 @@
         <Parameter Name="Is_GetCountryInfo_Supported_P1"/>
         <Parameter Name="Is_SecurityRequest_Supported_P1"/>
         <Parameter Name="Is_FirmUpdateRequest_Supported_P1"/>
-        <Parameter Name="Is_SnkCapaExt_Supported_P0"/>
-        <Parameter Name="VDM_XID_SOP_P1"/>
-        <Parameter Name="VDM_PID_SOP_P1"/>
+        <Parameter Name="Is_SnkCapaExt_Supported_P1"/>
+        <!--<Parameter Name="Is_GetBattery_Supported_P1"/>-->
         <Parameter Name="VDM_ModalOperation_P1"/>
         <Parameter Name="VDM_bcdDevice_SOP_P1"/>
         <Parameter Name="VDM_USBHostSupport_P1"/>
         <Parameter Name="VDM_USBDeviceSupport_P1"/>
         <Parameter Name="VDM_ProductTypeUFPorCP_P1"/>
         <Parameter Name="VDM_ProductTypeDFP_P1"/>
-        <!-- Parameter Name="PE_Svid_P1"/ -->
         <Parameter Name="CAD_RoleToggle_P1"/>
         <Parameter Name="CAD_DefaultResistor_P1"/>
         <Parameter Name="CAD_TryFeature_P1"/>
@@ -1301,7 +1383,7 @@
 
     <!-- ModeLogicOperator for USBPD -->
     <ModeLogicOperator Name="OR">
-        <Mode Name="StackConfig" UserName="Stack Configuration" RemoveDisable="false">
+        <Mode Name="StackConfig" UserName="Stack Configuration">
             <ModeLogicOperator Name="XOR">
                 <Mode Name="USBPD_P0" UserName="Port 0: UCPD1">
                     <SignalLogicalOp Name="AND">
@@ -1536,7 +1618,7 @@
         </Mode>
 
     </ModeLogicOperator>
-    <Condition Expression="(UCPD_Used &amp; S_FREERTOS &amp; !S_CMSIS_RTOS_V2)" Diagnostic="FREERTOS and at least one instance of UCPD must be activated - CMSIS RTOS V2 is not compatible"/>
+    <Condition Expression="(UCPD_Used &amp; S_FREERTOS &amp; !S_CMSIS_RTOS_V2)" Diagnostic="FREERTOS and at least one instance of UCPD must be activated"/>
 
     <!-- RefSignal for USBPD -->
     <RefSignal Name="VS_USBPD1" Virtual="true"/>

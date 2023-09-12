@@ -13,6 +13,10 @@
  * Author: STM32CubeMX code generation for STMicroelectronics.
  */
 
+/* For more information on Device Tree configuration, please refer to
+ * https://wiki.st.com/stm32mpu/wiki/Category:Device_tree_configuration
+ */
+
 /dts-v1/;
 [#if mx_socRPNSuperset?has_content]
 #include "${mx_socRPNSuperset}.dtsi"

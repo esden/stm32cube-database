@@ -184,12 +184,12 @@ __weak HAL_StatusTypeDef MX_${UsartIpInstance}_UART_Init(UART_HandleTypeDef* hua
 						[#assign UsartIpInstance = bsp.solution]
 						[#assign UsartIpInstanceList = bsp.solution]
 [#-- A.T MX_PPPx_Init prototype updated after reveiw with Maher --]
-__weak HAL_StatusTypeDef MX_${UsartIpInstance}_Init(UART_HandleTypeDef* huart);								
+__weak HAL_StatusTypeDef MX_${UsartIpInstance}_UART_Init(UART_HandleTypeDef* huart);								
 					[#elseif !UsartIpInstanceList?contains(bsp.solution)]
 						[#assign UsartIpInstance = bsp.solution]
 						[#assign UsartIpInstanceList = UsartIpInstanceList + "," + bsp.solution]
 [#-- A.T MX_PPPx_Init prototype updated after reveiw with Maher --]
-__weak HAL_StatusTypeDef MX_${UsartIpInstance}_Init(UART_HandleTypeDef* huart);
+__weak HAL_StatusTypeDef MX_${UsartIpInstance}_UART_Init(UART_HandleTypeDef* huart);
 					[/#if]
 				[#break] 				
 				[/#switch]
@@ -645,8 +645,8 @@ static uint32_t Compute_SCLL_SCLH (uint32_t clock_src_freq, uint32_t I2C_speed);
 					[#if UsartIpInstanceList == ""]
 						[#assign UsartIpInstance = bsp.solution]
 						[#assign UsartIpInstanceList = bsp.solution]
-static void ${UsartIpInstance}_MspInit(I2C_HandleTypeDef* huart); 
-static void ${UsartIpInstance}_MspDeInit(I2C_HandleTypeDef* huart);
+static void ${UsartIpInstance}_MspInit(UART_HandleTypeDef* huart); 
+static void ${UsartIpInstance}_MspDeInit(UART_HandleTypeDef* huart);
 					[#elseif !UsartIpInstanceList?contains(bsp.solution)]
 						[#assign UsartIpInstance = bsp.solution]
 						[#assign UsartIpInstanceList = UsartIpInstanceList + "," + bsp.solution]
@@ -833,6 +833,17 @@ static void ${UsartIpInstance}_MspDeInit(UART_HandleTypeDef* huart);
 						[#assign I2CIpInstance = bsp.solution]
 						[#assign I2CIpInstanceList = I2CIpInstanceList + "," + bsp.solution]
 						[@registerMspI2CCallBack IpName I2CIpInstance I2CIpInstance/]
+					[/#if]
+				[#break]
+                                [#case "UART"]
+					[#if UsartIpInstanceList == ""]
+						[#assign UsartIpInstance = bsp.solution]
+						[#assign UsartIpInstanceList = bsp.solution]
+						[@registerMspUSARTCallBack IpName UsartIpInstance UsartIpInstance/]						
+					[#elseif !UsartIpInstanceList?contains(bsp.solution)]
+						[#assign UsartIpInstance = bsp.solution]
+						[#assign UsartIpInstanceList = UsartIpInstanceList + "," + bsp.solution]
+						[@registerMspUSARTCallBack IpName UsartIpInstance UsartIpInstance/]
 					[/#if]
 				[#break]  
 				[#case "USART"]
@@ -1525,16 +1536,16 @@ int32_t BSP_${IpInstance}_RegisterMspCallbacks (BSP_${IpName}_Cb_t *Callbacks)
 int32_t BSP_${IpInstance}_RegisterDefaultMspCallbacks (void)
 {
 
-  __HAL_${IpName?replace("S","")}_RESET_HANDLE_STATE(&h${IpHandle?lower_case?replace("s","")});
+  __HAL_${IpName?replace("S","")?replace("LP","")}_RESET_HANDLE_STATE(&h${IpHandle?lower_case?replace("s","")});
   
   /* Register MspInit Callback */
-  if (HAL_${IpName?replace("S","")}_RegisterCallback(&h${IpHandle?lower_case?replace("s","")}, HAL_${IpName?replace("S","")}_MSPINIT_CB_ID, ${IpInstance}_MspInit)  != HAL_OK)
+  if (HAL_${IpName?replace("S","")?replace("LP","")}_RegisterCallback(&h${IpHandle?lower_case?replace("s","")}, HAL_${IpName?replace("S","")?replace("LP","")}_MSPINIT_CB_ID, ${IpInstance}_MspInit)  != HAL_OK)
   {
     return BSP_ERROR_PERIPH_FAILURE;
   }
   
   /* Register MspDeInit Callback */
-  if (HAL_${IpName?replace("S","")}_RegisterCallback(&h${IpHandle?lower_case?replace("s","")}, HAL_${IpName?replace("S","")}_MSPDEINIT_CB_ID, ${IpInstance}_MspDeInit) != HAL_OK)
+  if (HAL_${IpName?replace("S","")?replace("LP","")}_RegisterCallback(&h${IpHandle?lower_case?replace("s","")}, HAL_${IpName?replace("S","")?replace("LP","")}_MSPDEINIT_CB_ID, ${IpInstance}_MspDeInit) != HAL_OK)
   {
     return BSP_ERROR_PERIPH_FAILURE;
   }
@@ -1548,19 +1559,19 @@ int32_t BSP_${IpInstance}_RegisterDefaultMspCallbacks (void)
   * @param Callbacks     pointer to ${IpInstance} MspInit/MspDeInit callback functions
   * @retval BSP status
   */
-int32_t BSP_${IpInstance}_RegisterMspCallbacks (BSP_${IpName?replace("S","")}_Cb_t *Callbacks)
+int32_t BSP_${IpInstance}_RegisterMspCallbacks (BSP_${IpName?replace("S","")?replace("LP","")}_Cb_t *Callbacks)
 {
   /* Prevent unused argument(s) compilation warning */
-  __HAL_${IpName?replace("S","")}_RESET_HANDLE_STATE(&h${IpHandle?lower_case?replace("s","")});  
+  __HAL_${IpName?replace("S","")?replace("LP","")}_RESET_HANDLE_STATE(&h${IpHandle?lower_case?replace("s","")});  
  
    /* Register MspInit Callback */
-  if (HAL_${IpName?replace("S","")}_RegisterCallback(&h${IpHandle?lower_case?replace("s","")}, HAL_${IpName?replace("S","")}_MSPINIT_CB_ID, Callbacks->pMspInitCb)  != HAL_OK)
+  if (HAL_${IpName?replace("S","")?replace("LP","")}_RegisterCallback(&h${IpHandle?lower_case?replace("s","")}, HAL_${IpName?replace("S","")?replace("LP","")}_MSPINIT_CB_ID, Callbacks->pMspInitCb)  != HAL_OK)
   {
     return BSP_ERROR_PERIPH_FAILURE;
   }
   
   /* Register MspDeInit Callback */
-  if (HAL_${IpName?replace("S","")}_RegisterCallback(&h${IpHandle?lower_case?replace("s","")}, HAL_${IpName?replace("S","")}_MSPDEINIT_CB_ID, Callbacks->pMspDeInitCb) != HAL_OK)
+  if (HAL_${IpName?replace("S","")?replace("LP","")}_RegisterCallback(&h${IpHandle?lower_case?replace("s","")}, HAL_${IpName?replace("S","")?replace("LP","")}_MSPDEINIT_CB_ID, Callbacks->pMspDeInitCb) != HAL_OK)
   {
     return BSP_ERROR_PERIPH_FAILURE;
   }

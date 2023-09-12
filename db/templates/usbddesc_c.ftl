@@ -154,11 +154,11 @@ uint8_t * USBD_FS_ProductStrDescriptor(USBD_SpeedTypeDef speed, uint16_t *length
 uint8_t * USBD_FS_SerialStrDescriptor(USBD_SpeedTypeDef speed, uint16_t *length);
 uint8_t * USBD_FS_ConfigStrDescriptor(USBD_SpeedTypeDef speed, uint16_t *length);
 uint8_t * USBD_FS_InterfaceStrDescriptor(USBD_SpeedTypeDef speed, uint16_t *length);
-
+[#-- Ticket 66338 
 #ifdef USBD_SUPPORT_USER_STRING_DESC
 uint8_t * USBD_FS_USRStringDesc(USBD_SpeedTypeDef speed, uint8_t idx, uint16_t *length);
 #endif /* USBD_SUPPORT_USER_STRING_DESC */
-
+[--]
 [#if family?contains("STM32F7") || family?contains("STM32F4") || family?contains("STM32L4") ]
 #if (USBD_LPM_ENABLED == 1)
 uint8_t * USBD_FS_USR_BOSDescriptor(USBD_SpeedTypeDef speed, uint16_t *length);
@@ -277,10 +277,11 @@ uint8_t * USBD_HS_ProductStrDescriptor(USBD_SpeedTypeDef speed, uint16_t *length
 uint8_t * USBD_HS_SerialStrDescriptor(USBD_SpeedTypeDef speed, uint16_t *length);
 uint8_t * USBD_HS_ConfigStrDescriptor(USBD_SpeedTypeDef speed, uint16_t *length);
 uint8_t * USBD_HS_InterfaceStrDescriptor(USBD_SpeedTypeDef speed, uint16_t *length);
-
+[#-- Ticket 66338 
 #ifdef USBD_SUPPORT_USER_STRING_DESC
 uint8_t * USBD_HS_USRStringDesc(USBD_SpeedTypeDef speed, uint8_t idx, uint16_t *length);
 #endif /* USBD_SUPPORT_USER_STRING_DESC */
+[--]
 
 [#if family?contains("STM32F7") || family?contains("STM32F4") || family?contains("STM32L4") ]
 #if (USBD_LPM_ENABLED == 1)

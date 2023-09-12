@@ -13,6 +13,7 @@
         <ConfigFile Name="DEFAULT_THREAD"/>
         <ConfigFile Name="USER_THREADS"/>
         <ConfigFile Name="RTOS_START"/>
+        <ConfigFile Name="HEAP_USER"/>	
     </RefConfig>
     
     <RefConfig Comment="" Name="FREERTOS_CMSIS_V2_ENABLE_Init">  
@@ -27,6 +28,7 @@
         <ConfigFile Name="DEFAULT_THREAD_V2"/>
         <ConfigFile Name="USER_THREADS_V2"/>
         <ConfigFile Name="RTOS_START"/>
+        <ConfigFile Name="HEAP_USER"/>	
     </RefConfig>
     
     <RefConfig Comment="" Name="FREERTOS_NATIVE_ENABLE_Init">       
@@ -41,6 +43,7 @@
         <ConfigFile Name="DEFAULT_THREAD_NATIVE"/>
         <ConfigFile Name="USER_THREADS_NATIVE"/>
         <ConfigFile Name="RTOS_START_NATIVE"/>
+        <ConfigFile Name="HEAP_USER"/>	
     </RefConfig>
        
     <LibMethod Comment="Start scheduler" Name="osKernelStart">
@@ -129,6 +132,10 @@
             <File Category="header" Name="Source/portable/GCC/ARM_CM4_MPU/portmacro.h" Condition="S_FREERTOS_WITH_MPU"/>
         </SubComponent> 
     </RefComponent>
+    
+    <RefConfigFile Description="Heap for user choice" Name="HEAP_USER" Template="freertos_heap_user.ftl">
+        <File Category="source" Name="heap_user.c" Version="10.0.1" Condition="S_HEAP_USER"/>
+    </RefConfigFile>
     
     <RefConfigFile Description="Header file for #include" Name="INC" Template="freertos_inc.ftl">
         <File Category="source" Condition="all" Name="rtos_inc.tmp" Version="10.0.1"/>
@@ -262,11 +269,14 @@
         <Argument Comment="" GenericType="simple" Name="INCLUDE_xTaskAbortDelay"/>
         <Argument Comment="" GenericType="simple" Name="INCLUDE_xTaskGetHandle"/>
         
-         <!--  New for FreeRTOS 10.0.0 -->
-         <Argument Comment="" GenericType="simple" Name="configRECORD_STACK_HIGH_ADDRESS"/>
-         
-          <!--  New for BLE -->
-          <Argument Comment="" GenericType="simple" Name="configOVERRIDE_DEFAULT_TICK_CONFIGURATION"/>
+        <!--  New for FreeRTOS 10.0.0 -->
+        <Argument Comment="" GenericType="simple" Name="configRECORD_STACK_HIGH_ADDRESS"/>
+
+        <!-- NEWLIB -->
+        <Argument Comment="" GenericType="simple" Name="configUSE_NEWLIB_REENTRANT"/>
+        
+        <!--  New for BLE -->
+        <Argument Comment="" GenericType="simple" Name="configOVERRIDE_DEFAULT_TICK_CONFIGURATION"/>
     </RefConfigFile>
 
     <!-- Putting it at the end of the file (as the last one to deal with) allows to include all tmp files previously generated in app_freertos.c -->
@@ -420,9 +430,12 @@
          
          <!--  For CMSIS V2 -->
          <Argument Comment="" GenericType="simple" Name="HEAP_NUMBER"/>
+	 
+         <!-- NEWLIB -->
+         <Argument Comment="" GenericType="simple" Name="configUSE_NEWLIB_REENTRANT"/>
          
          <!--  New for BLE -->
-          <Argument Comment="" GenericType="simple" Name="configOVERRIDE_DEFAULT_TICK_CONFIGURATION"/>
+         <Argument Comment="" GenericType="simple" Name="configOVERRIDE_DEFAULT_TICK_CONFIGURATION"/>
     </RefConfigFile>
 
     <!-- Putting it at the end of the file (as the last one to deal with) allows to include all tmp files previously generated in freertos.c -->

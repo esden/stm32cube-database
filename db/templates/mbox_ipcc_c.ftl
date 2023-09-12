@@ -1,11 +1,21 @@
 [#ftl]
 /**
   ******************************************************************************
-  * @file           : mbox_ipcc.c
-  * @brief          : This file provides code for the configuration
-  *                   of the mailbox_ipcc_if.c MiddleWare.
+  * @file    mbox_ipcc.c
+  * @author  MCD Application Team
+  * @brief   This file provides code for the configuration
+  *                      of the mailbox_ipcc_if.c MiddleWare.
   ******************************************************************************
-  [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
+  * @attention
+  *
+  * <h2><center>&copy; Copyright (c) 2019 STMicroelectronics. 
+  * All rights reserved.</center></h2>
+  *
+  * This software component is licensed by ST under BSD 3-Clause license,
+  * the "License"; You may not use this file except in compliance with the 
+  * License. You may obtain a copy of the License at:
+  *                       opensource.org/licenses/BSD-3-Clause
+  *
   ******************************************************************************
   */
 
@@ -80,7 +90,7 @@ void IPCC_channel2_callback(IPCC_HandleTypeDef * hipcc, uint32_t ChannelIndex, I
 int MAILBOX_Init(void)
 {
 
- if (HAL_IPCC_ActivateNotification(&hipcc, IPCC_CHANNEL_1, IPCC_CHANNEL_DIR_RX,
+  if (HAL_IPCC_ActivateNotification(&hipcc, IPCC_CHANNEL_1, IPCC_CHANNEL_DIR_RX,
           IPCC_channel1_callback) != HAL_OK) {
 	  OPENAMP_log_err("%s: ch_1 RX fail\n", __func__);
     return -1;
@@ -123,6 +133,7 @@ int MAILBOX_Poll(struct virtio_device *vdev)
 
   return -1;
 }
+
 
 /**
   * @brief  Callback function called by OpenAMP MW to notify message processing

@@ -21,10 +21,11 @@
 [#assign SRC = false]
 [#assign SNK = false]
 [#assign DRP = false]
+[#assign BATT_FEATURE = false]
 [#-- SWIPdatas is a list of SWIPconfigModel --]  
 [#list SWIPdatas as SWIP]
-	[#if SWIP.defines??]
-    	[#list SWIP.defines as definition]
+    [#if SWIP.defines??]
+        [#list SWIP.defines as definition]
             [#if definition.name == "SRC" && definition.value == "true"]
                 [#assign SRC = true]
             [/#if]
@@ -72,6 +73,12 @@
             [/#if]
             [#if definition.name=="PE_RoleSwap_P0"]
                 [#assign valuePE_RoleSwap_P0 = definition.value]
+            [/#if]
+            [#if definition.name=="PE_VconnSwap_P0"]
+                [#assign valuePE_VconnSwap_P0 = definition.value]
+            [/#if]
+            [#if definition.name=="PE_DataSwap_P0"]
+                [#assign valuePE_DataSwap_P0 = definition.value]
             [/#if]
             [#if definition.name=="PE_VDMSupport_P0"]
                 [#assign valuePE_VDMSupport_P0 = definition.value]
@@ -139,6 +146,10 @@
             [#if definition.name=="Is_SnkCapaExt_Supported_P0"]
                 [#assign valueIs_SnkCapaExt_Supported_P0 = definition.value]
             [/#if]
+            [#if definition.name=="Is_GetBattery_Supported_P0"]
+                [#assign valueIs_GetBattery_Supported_P0 = definition.value]
+                [#assign BATT_FEATURE = true]
+            [/#if]
             [#if definition.name=="CAD_SRCToggleTime_P0"]
                 [#assign valueCAD_SRCToggleTime_P0 = definition.value]
             [/#if]
@@ -172,6 +183,12 @@
                 [/#if]
                 [#if definition.name=="PE_RoleSwap_P1"]
                     [#assign valuePE_RoleSwap_P1 = definition.value]
+                [/#if]
+                [#if definition.name=="PE_VconnSwap_P1"]
+                    [#assign valuePE_VconnSwap_P1 = definition.value]
+                [/#if]
+                [#if definition.name=="PE_DataSwap_P1"]
+                    [#assign valuePE_DataSwap_P1 = definition.value]
                 [/#if]
                 [#if definition.name=="PE_VDMSupport_P1"]
                     [#assign valuePE_VDMSupport_P1 = definition.value]
@@ -239,6 +256,9 @@
                 [#if definition.name=="Is_SnkCapaExt_Supported_P1"]
                     [#assign valueIs_SnkCapaExt_Supported_P1 = definition.value]
                 [/#if]
+                [#if definition.name=="Is_GetBattery_Supported_P1"]
+                    [#assign valueIs_GetBattery_Supported_P1 = definition.value]
+                [/#if]
                 [#if definition.name=="CAD_SRCToggleTime_P1"]
                     [#assign valueCAD_SRCToggleTime_P1 = definition.value]
                 [/#if]
@@ -285,6 +305,11 @@
 /* Private variables ---------------------------------------------------------*/
 #ifndef __USBPD_DPM_CORE_C
 extern USBPD_SettingsTypeDef            DPM_Settings[USBPD_PORT_COUNT];
+[#if GUI_INTERFACE??]
+[#else]
+extern USBPD_IdSettingsTypeDef          DPM_ID_Settings[USBPD_PORT_COUNT];
+extern USBPD_USER_SettingsTypeDef       DPM_USER_Settings[USBPD_PORT_COUNT];
+[/#if]
 #else /* __USBPD_DPM_CORE_C */
 USBPD_SettingsTypeDef       DPM_Settings[USBPD_PORT_COUNT] =
 {
@@ -322,6 +347,9 @@ USBPD_SettingsTypeDef       DPM_Settings[USBPD_PORT_COUNT] =
       .Is_SecurityRequest_Supported     = ${valueIs_SecurityRequest_Supported_P0},  /*!< Security_Response message supported or not by DPM */
       .Is_FirmUpdateRequest_Supported   = ${valueIs_FirmUpdateRequest_Supported_P0},  /*!< Firmware update response message supported by PE */
       .Is_SnkCapaExt_Supported          = ${valueIs_SnkCapaExt_Supported_P0},  /*!< Sink_Capabilities_Extended message supported by PE */
+[#if BATT_FEATURE]
+      .Is_GetBattery_Supported          = ${valueIs_GetBattery_Supported_P0},  /*!< Get Battery Capabitity and Status messages supported by PE */
+[/#if]
     },
 
     .CAD_SRCToggleTime = ${valueCAD_SRCToggleTime_P0},                    /* uint8_t CAD_SRCToggleTime; */
@@ -363,6 +391,9 @@ USBPD_SettingsTypeDef       DPM_Settings[USBPD_PORT_COUNT] =
       .Is_SecurityRequest_Supported     = ${valueIs_SecurityRequest_Supported_P1},  /*!< Security_Response message supported or not by DPM */
       .Is_FirmUpdateRequest_Supported   = ${valueIs_FirmUpdateRequest_Supported_P1},  /*!< Firmware update response message supported by PE */
       .Is_SnkCapaExt_Supported          = ${valueIs_SnkCapaExt_Supported_P1},  /*!< Sink_Capabilities_Extended message supported by PE */
+[#if BATT_FEATURE]
+      .Is_GetBattery_Supported          = ${valueIs_GetBattery_Supported_P1},  /*!< Get Battery Capabitity and Status messages supported by PE */
+[/#if]
     },
 
     .CAD_SRCToggleTime = ${valueCAD_SRCToggleTime_P1},                    /* uint8_t CAD_SRCToggleTime; */
@@ -371,6 +402,55 @@ USBPD_SettingsTypeDef       DPM_Settings[USBPD_PORT_COUNT] =
 [/#if]
   }
 };
+
+[#if GUI_INTERFACE??]
+[#else]
+USBPD_IdSettingsTypeDef          DPM_ID_Settings[USBPD_PORT_COUNT] =
+{
+  {
+    .XID = USBPD_XID,     /*!< Value provided by the USB-IF assigned to the product   */
+    .VID = USBPD_VID,     /*!< Vendor ID (assigned by the USB-IF)                     */
+    .PID = USBPD_PID,     /*!< Product ID (assigned by the manufacturer)              */
+  },
+[#if nbPorts=="2"]
+#if USBPD_PORT_COUNT >= 2
+  {
+    .XID = USBPD_XID,     /*!< Value provided by the USB-IF assigned to the product   */
+    .VID = USBPD_VID,     /*!< Vendor ID (assigned by the USB-IF)                     */
+    .PID = USBPD_PID,     /*!< Product ID (assigned by the manufacturer)              */
+  }
+#endif /* USBPD_PORT_COUNT >= 2 */
+[/#if]
+};
+
+USBPD_USER_SettingsTypeDef       DPM_USER_Settings[USBPD_PORT_COUNT] =
+{
+  {
+    .PE_DataSwap = ${valuePE_DataSwap_P0},                  /* support data swap                                       */
+    .PE_VconnSwap = ${valuePE_VconnSwap_P0},                 /* support VCONN swap                                  */
+    .DPM_ManuInfoPort =                      /*!< Manufacturer information used for the port            */
+    {
+      .VID = USBPD_VID,                      /*!< Vendor ID (assigned by the USB-IF)        */
+      .PID = USBPD_PID,                      /*!< Product ID (assigned by the manufacturer) */
+      .ManuString = "STMicroelectronics",    /*!< Vendor defined byte array                 */
+    },
+  },
+[#if nbPorts=="2"]
+#if USBPD_PORT_COUNT >= 2
+  {
+    .PE_DataSwap = ${valuePE_DataSwap_P1},                  /* support data swap                                       */
+    .PE_VconnSwap = ${valuePE_VconnSwap_P0},                /* support VCONN swap                                  */
+    .DPM_ManuInfoPort =                      /*!< Manufacturer information used for the port            */
+    {
+      .VID = USBPD_VID,                      /*!< Vendor ID (assigned by the USB-IF)        */
+      .PID = USBPD_PID,                      /*!< Product ID (assigned by the manufacturer) */
+      .ManuString = "STMicroelectronics",    /*!< Vendor defined byte array                 */
+    },
+  }
+#endif /* USBPD_PORT_COUNT >= 2 */
+[/#if]
+};
+[/#if]
 
 #endif
 

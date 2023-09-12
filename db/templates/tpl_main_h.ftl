@@ -31,6 +31,16 @@
 extern "C" {
 #endif
 
+[#if TZEN=="1" && Secure=="true"]
+#if defined ( __ICCARM__ )
+#  define CMSE_NS_CALL  __cmse_nonsecure_call
+#  define CMSE_NS_ENTRY __cmse_nonsecure_entry
+#else
+#  define CMSE_NS_CALL  __attribute((cmse_nonsecure_call))
+#  define CMSE_NS_ENTRY __attribute((cmse_nonsecure_entry))
+#endif
+#n
+[/#if]
 /* Includes ------------------------------------------------------------------*/
 [#if isHALUsed??]
 #include "${FamilyName?lower_case}xx_hal.h"
@@ -63,7 +73,9 @@ extern "C" {
 #n
 
 [#-- /#if --]
-
+[#if TZEN=="1" && Secure=="false"]
+#include "secure_nsc.h"    /* For export Non-secure callable APIs */
+[/#if]
 [#--Include common LL driver --]
 [#if isLLUsed??] [#-- Include LL headers --]
     [#-- Include common LL driver that should be always included--]
@@ -73,7 +85,7 @@ extern "C" {
         [#assign includesList = includesList+" "+FamilyName?lower_case+"xx_ll_bus.h"]
     [/#if]
     [#-- include "${FamilyName?lower_case}xx_ll_cortex.h" --]
-    [#if !includesList?contains(FamilyName?lower_case+"xx_ll_cortex.h")]
+    [#if !includesList?contains(FamilyName?lower_case+"xx_ll_cortex.h") && FamilyName!="STM32MP1"]
     #include "${FamilyName?lower_case}xx_ll_cortex.h"
         [#assign includesList = includesList+" "+FamilyName?lower_case+"xx_ll_cortex.h"]
     [/#if]
@@ -189,6 +201,18 @@ extern "C" {
 /* USER CODE END Includes */
 #n
 /* Exported types ------------------------------------------------------------*/
+[#if TZEN=="1" && Secure=="true"]
+/* Function pointer declaration in non-secure*/
+#if defined ( __ICCARM__ )
+typedef void (CMSE_NS_CALL *funcptr)(void);
+#else
+typedef void CMSE_NS_CALL (*funcptr)(void);
+#endif
+
+/* typedef for non-secure callback functions */
+typedef funcptr funcptr_NS;
+#n
+[/#if]
 /* USER CODE BEGIN ET */
 
 /* USER CODE END ET */

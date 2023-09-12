@@ -585,6 +585,7 @@ void shci_notify_asynch_evt(void* pdata)
 }[/#if]
 [/#if]
 [#if (FREERTOS_STATUS = 0)]
+
 /**
   * @brief  This function is called by the scheduler each time an event
   *         is pending.

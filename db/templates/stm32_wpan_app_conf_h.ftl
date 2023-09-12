@@ -114,6 +114,7 @@
 
 #include "hw.h"
 #include "hw_conf.h"
+#include "hw_if.h"
 
 /******************************************************************************
  * Application Config
@@ -253,6 +254,9 @@
 */
 #define CFG_BLE_ERK     {0xfe,0xdc,0xba,0x09,0x87,0x65,0x43,0x21,0xfe,0xdc,0xba,0x09,0x87,0x65,0x43,0x21}
 
+/* USER CODE BEGIN Generic_Parameters */
+
+/* USER CODE END Generic_Parameters */
 [/#if]
 
 /**< specific parameters */
@@ -986,7 +990,7 @@ typedef enum
     [#if SWIP.defines??]
         [#list SWIP.defines as definition]
             [#if definition.name="CFG_DEBUG_TRACE_LIGHT"]
-                [#lt]#define ${definition.name}    ${definition.value}
+                [#lt]#define ${definition.name}     ${definition.value}
             [/#if]
         [/#list]
     [/#if]
@@ -995,7 +999,7 @@ typedef enum
     [#if SWIP.defines??]
         [#list SWIP.defines as definition]
             [#if definition.name="CFG_DEBUG_TRACE_FULL"]
-                [#lt]#define ${definition.name}    ${definition.value}
+                [#lt]#define ${definition.name}      ${definition.value}
             [/#if]
         [/#list]
     [/#if]
@@ -1270,8 +1274,6 @@ typedef enum
 #define CFG_HCI_USER_EVT_PROCESS_PRIORITY     osPriorityNone
 #define CFG_HCI_USER_EVT_PROCESS_STACk_SIZE   (128 * 2)
 
-[/#if]
-/* USER CODE BEGIN FreeRTOS_Defines */
 #define CFG_ADV_UPDATE_PROCESS_NAME           "ADV_UPDATE_PROCESS"
 #define CFG_ADV_UPDATE_PROCESS_ATTR_BITS      (0)
 #define CFG_ADV_UPDATE_PROCESS_CB_MEM         (0)
@@ -1280,7 +1282,6 @@ typedef enum
 #define CFG_ADV_UPDATE_PROCESS_PRIORITY       osPriorityNone
 #define CFG_ADV_UPDATE_PROCESS_STACk_SIZE     (128 * 6)
 
-
 #define CFG_HRS_PROCESS_NAME                  "HRS_PROCESS"
 #define CFG_HRS_PROCESS_ATTR_BITS             (0)
 #define CFG_HRS_PROCESS_CB_MEM                (0)
@@ -1288,6 +1289,9 @@ typedef enum
 #define CFG_HRS_PROCESS_STACK_MEM             (0)
 #define CFG_HRS_PROCESS_PRIORITY              osPriorityNone
 #define CFG_HRS_PROCESS_STACk_SIZE            (128 * 5)
+[/#if]
+/* USER CODE BEGIN FreeRTOS_Defines */
+
 /* USER CODE END FreeRTOS_Defines */
 [/#if]
 /******************************************************************************

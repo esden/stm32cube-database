@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
+<IP xmlns="http://mcd.rou.st.com/modules.php?name=mcu" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance"
+	DBVersion="V4.0" Name="VREFBUF" Version="STM32Cube_FW_L5_V0.7.0RC1" IncludeFile="stm32l5xx_ll_system.h,stm32l5xx_ll_exti.h,stm32l5xx_ll_pwr.h"
+	ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../../doc/V4/Development/Specifications/db/IP_Configs.xsd">
+
+<!-- VREFBUF Configuration -->
+	<RefConfig Comment="Enable the Internal Voltage Reference buffer" Name="VREFBUFMODEConfigEnable">
+		<CallLibMethod Name="LL_VREFBUF_Enable" ReturnHAL="false" />
+	</RefConfig>
+
+	<RefConfig Comment="Disable the Internal Voltage Reference buffer" Name="VREFBUFMODEConfigDisable">
+		<CallLibMethod Name="LL_VREFBUF_Disable" ReturnHAL="false" />
+	</RefConfig>
+
+	<RefConfig Comment="Configure the internal voltage reference buffer high impedance mode" Name="HighImpedanceModeConfig">
+		<IFCondition Expression="(HighImpedanceMode = SYSCFG_VREFBUF_HIGH_IMPEDANCE_ENABLE)">
+			<CallLibMethod Name="LL_VREFBUF_EnableHIZ" ReturnHAL="false"/>
+		</IFCondition>
+
+		<IFCondition Expression="(HighImpedanceMode = SYSCFG_VREFBUF_HIGH_IMPEDANCE_DISABLE)">
+			<CallLibMethod Name="LL_VREFBUF_DisableHIZ" ReturnHAL="false"/>
+		</IFCondition>
+	</RefConfig>
+	
+	<RefConfig Comment="Tune the Internal Voltage Reference buffer" Name="TrimmingValueConfig">
+		<CallLibMethod Name="LL_VREFBUF_SetTrimming" ReturnHAL="false">
+			<MethodArg Name="Value" ParameterName="TrimmingValue" />
+		</CallLibMethod>
+	</RefConfig>
+
+	<RefConfig Comment="Configure the internal voltage reference buffer voltage scale" Name="InternalVoltageReferenceScaleConfig">
+		<CallLibMethod Name="LL_VREFBUF_SetVoltageScaling" ReturnHAL="false" >
+		  <MethodArg Name="Scale" ParameterName="VoltageScaling" />
+		</CallLibMethod>
+	</RefConfig>
+
+
+<!-- PVD Configuration -->
+  <RefConfig Comment="PVD Configuration" Name="PVDConfig">
+    <CallLibMethod Name="LL_PWR_SetPVDLevel"  ReturnHAL="false">
+      <MethodArg Name="PVDLevel" ParameterName="PVDLevel" />
+    </CallLibMethod>
+      
+    <IFCondition Expression="!(Mode = PWR_PVD_MODE_NORMAL)">
+      <CallLibMethod Name="INITSTRUCT" Type="HardCode">
+         <HardCode Text="#n#t/* Configure EXTI line 16 */#n#tLL_EXTI_InitTypeDef exti_initstruct;#n#texti_initstruct.Line_0_31 = LL_EXTI_LINE_16;#n#texti_initstruct.Line_32_63 = LL_EXTI_LINE_NONE;#n#texti_initstruct.LineCommand = ENABLE;"/>
+      </CallLibMethod>
+    </IFCondition>    
+      
+    <IFCondition Expression="(Mode = PWR_PVD_MODE_IT_RISING) | (Mode = PWR_PVD_MODE_IT_FALLING) | (Mode = PWR_PVD_MODE_IT_RISING_FALLING)">
+      <CallLibMethod Name="MODE_IT" Type="HardCode">
+        <HardCode Text="#n#texti_initstruct.Mode = LL_EXTI_MODE_IT;"/>
+      </CallLibMethod>
+    </IFCondition>
+      
+    <IFCondition Expression="(Mode = PWR_PVD_MODE_EVENT_RISING) | (Mode = PWR_PVD_MODE_EVENT_FALLING) | (Mode = PWR_PVD_MODE_EVENT_RISING_FALLING)">
+      <CallLibMethod Name="MODE_EVENT" Type="HardCode">
+        <HardCode Text="#n#texti_initstruct.Mode = LL_EXTI_MODE_EVENT;"/>
+      </CallLibMethod>
+    </IFCondition>
+          
+    <IFCondition Expression="(Mode = PWR_PVD_MODE_IT_RISING) | (Mode = PWR_PVD_MODE_EVENT_RISING)">
+      <CallLibMethod Name="TRIGGER_RISING" Type="HardCode">
+       <HardCode Text="#n#texti_initstruct.Trigger = LL_EXTI_TRIGGER_RISING;"/>
+      </CallLibMethod>
+    </IFCondition>
+      
+    <IFCondition Expression="(Mode = PWR_PVD_MODE_IT_FALLING) | (Mode = PWR_PVD_MODE_EVENT_FALLING)">
+      <CallLibMethod Name="TRIGGER_FALLING" Type="HardCode">
+       <HardCode Text="#n#texti_initstruct.Trigger = LL_EXTI_TRIGGER_FALLING;"/>
+      </CallLibMethod>
+    </IFCondition>
+      
+    <IFCondition Expression="(Mode = PWR_PVD_MODE_IT_RISING_FALLING) | (Mode = PWR_PVD_MODE_EVENT_RISING_FALLING)">
+      <CallLibMethod Name="TRIGGER_RISING_FALLING" Type="HardCode">
+       <HardCode Text="#n#texti_initstruct.Trigger = LL_EXTI_TRIGGER_RISING_FALLING;"/>
+      </CallLibMethod>
+    </IFCondition>
+         
+    <IFCondition Expression="!(Mode = PWR_PVD_MODE_NORMAL)">
+      <CallLibMethod Name="EXTI_INIT" Type="HardCode">
+         <HardCode Text="#n#tLL_EXTI_Init( &amp;exti_initstruct);"/>
+      </CallLibMethod>
+    </IFCondition>
+    
+  </RefConfig>
+  
+  <RefConfig Comment="Enable the PVD Output" Name="PVDEnable">
+		<CallLibMethod Name="LL_PWR_EnablePVD" ReturnHAL="false"/>
+  </RefConfig>
+
+	<LibMethod Comment="Enable Internal voltage reference" Name="LL_VREFBUF_Enable" />
+	<LibMethod Comment="Disable Internal voltage reference" Name="LL_VREFBUF_Disable" />
+
+	<LibMethod Comment="Enable high impedance (VREF+pin is high impedance)" Name="LL_VREFBUF_EnableHIZ" />
+	<LibMethod Comment="Disable high impedance (VREF+pin is internally connected to the voltage reference buffer output)" Name="LL_VREFBUF_DisableHIZ" />
+
+	<LibMethod Comment="Set the Voltage reference scale" Name="LL_VREFBUF_SetVoltageScaling">
+		<Argument AddressOf="false" GenericType="simple" Name="Scale" OptimizationCondition="equal" />
+	</LibMethod>
+
+	<LibMethod Comment="Set the trimming code for VREFBUF calibration (Tune the internal reference buffer voltage)" Name="LL_VREFBUF_SetTrimming">
+		<Argument AddressOf="false" GenericType="simple" Name="Value" OptimizationCondition="equal" />
+	</LibMethod>
+
+	<LibMethod Comment="Enable Power Voltage Detector" Name="LL_PWR_EnablePVD" />
+	<LibMethod Comment="Disable Power Voltage Detector" Name="LL_PWR_DisablePVD" />
+
+	<LibMethod Comment="Configure the voltage threshold detected by the Power Voltage Detector" Name="LL_PWR_SetPVDLevel">
+		<Argument AddressOf="false" GenericType="simple" Name="PVDLevel" OptimizationCondition="equal" />
+	</LibMethod>
+	
+
+	
+	
+<RefComponent Cclass="LL" Cgroup="DAC" Cversion="1.5.0">
+        
+        <File Category="header" Name="Drivers/STM32L5xx_HAL_Driver/Inc/stm32l5xx_ll_system.h"/>
+        <File Category="header" Name="Drivers/STM32L5xx_HAL_Driver/Inc/stm32l5xx_ll_exti.h"/>
+        <File Category="source" Name="Drivers/STM32L5xx_HAL_Driver/Src/stm32l5xx_ll_exti.c"/>
+         <File Category="header" Name="Drivers/STM32L5xx_HAL_Driver/Inc/stm32l5xx_ll_pwr.h"/>
+        <File Category="source" Name="Drivers/STM32L5xx_HAL_Driver/Src/stm32l5xx_ll_pwr.c"/>
+    </RefComponent>
+</IP>

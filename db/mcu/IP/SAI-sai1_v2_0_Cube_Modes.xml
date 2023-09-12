@@ -302,11 +302,41 @@
 		<PossibleValue Value="ENABLE" Comment="ENABLE"/>
 		<Description>Enable/Disable PDM interface.</Description>
 	</RefParameter>	
-	<RefParameter Comment="Mic Pairs Nbr" DefaultValue="0" Max="4" Min="0" Group="Pdm Parameters" Name="MicPairsNbr" Type="integer" Visible="false">
+	
+	<RefParameter Comment="Mic Pairs Nbr" DefaultValue="1" Max="1" Min="1" Group="Pdm Parameters" Name="MicPairsNbr" Type="integer" Visible="true">
+		<Condition Expression="!(SEM_MIC_2 | SEM_MIC_3)" Diagnostic=""/>
+		<Description>Specifies the number of microphone pairs used.</Description>
+	</RefParameter>
+	<RefParameter Comment="Mic Pairs Nbr" DefaultValue="2" Max="2" Min="2" Group="Pdm Parameters" Name="MicPairsNbr" Type="integer" Visible="true">
+		<Condition Expression="SEM_MIC_2 &amp; !SEM_MIC_3" Diagnostic=""/>
+		<Description>Specifies the number of microphone pairs used.</Description>
+	</RefParameter>
+	<RefParameter Comment="Mic Pairs Nbr" DefaultValue="3" Max="3" Min="3" Group="Pdm Parameters" Name="MicPairsNbr" Type="integer" Visible="true">
+		<Condition Expression="SEM_MIC_3 &amp; !SEM_MIC_2" Diagnostic=""/>
+		<Description>Specifies the number of microphone pairs used.</Description>
+	</RefParameter>
+	<RefParameter Comment="Mic Pairs Nbr" DefaultValue="0" Max="4" Min="0" Group="Pdm Parameters" Name="MicPairsNbr" Type="integer" Visible="true">
 		<Description>Specifies the number of microphone pairs used.</Description>
 	</RefParameter>
 	
-	<RefParameter Comment="Clock Enable" DefaultValue="SAI_PDM_CLOCK1_ENABLE" Group="Pdm Parameters" Name="ClockEnable" Type="list" Visible="false">
+	<RefParameter Comment="Clock Enable" DefaultValue="SAI_PDM_CLOCK1_ENABLE" Group="Pdm Parameters" Name="ClockEnable" Type="list" Visible="true">
+		<Description>Specifies which clock must be enabled.</Description>
+		<PossibleValue Comment="Pdm Clock1 Enable" Value="SAI_PDM_CLOCK1_ENABLE"/>
+		<Condition Expression="(SEM_CK1 &amp; !SEM_CK1_CK2)" Diagnostic="CK1 only"/>
+	</RefParameter>
+	<RefParameter Comment="Clock Enable" DefaultValue="SAI_PDM_CLOCK2_ENABLE" Group="Pdm Parameters" Name="ClockEnable" Type="list" Visible="true">
+		<Description>Specifies which clock must be enabled.</Description>
+		<PossibleValue Comment="Pdm Clock2 Enable" Value="SAI_PDM_CLOCK2_ENABLE"/>
+		<Condition Expression="(SEM_CK2 &amp; !SEM_CK1_CK2)" Diagnostic="CK2 only"/>
+	</RefParameter>
+	<RefParameter Comment="Clock Enable" DefaultValue="SAI_PDM_CLOCK1_ENABLE | SAI_PDM_CLOCK2_ENABLE" Group="Pdm Parameters" Name="ClockEnable" Type="list" Visible="true">
+		<Description>Specifies which clock must be enabled.</Description>
+		<PossibleValue Comment="Pdm Clock1 and Clock2 Enable" Value="SAI_PDM_CLOCK1_ENABLE | SAI_PDM_CLOCK2_ENABLE"/>
+		<Condition Expression="(SEM_CK1_CK2)" Diagnostic=" CK1 and CK2 "/>
+	</RefParameter>
+	
+	
+	<RefParameter Comment="Clock Enable" DefaultValue="SAI_PDM_CLOCK1_ENABLE" Group="Pdm Parameters" Name="ClockEnable" Type="list" Visible="true">
 		<Description>Specifies which clock must be enabled.</Description>
 		<PossibleValue Comment="Pdm Clock1 Enable" Value="SAI_PDM_CLOCK1_ENABLE"/>
 		<PossibleValue Comment="Pdm Clock2 Enable" Value="SAI_PDM_CLOCK2_ENABLE"/>
@@ -335,7 +365,7 @@
 		<PossibleValue Comment="128 bits" Value="128"/>
 		<PossibleValue Comment="256 bits" Value="256"/>
 	</RefParameter>
-	<RefParameter Comment="    Frame Length (only Even Values)" DefaultValue="24" Group="Data Frame Parameters" Max="256" Min="8" Name="FrameLength" Type="integer" Unit="bits" NoCheckOpt="false"/>
+	<RefParameter Comment="    Frame Length (only Even Values)" DefaultValue="8" Group="Data Frame Parameters" Max="256" Min="8" Name="FrameLength" Type="integer" Unit="bits" NoCheckOpt="false"/>
 	
 	<RefParameter Comment="    Frame Synchro Active Level Length" DefaultValue="null" Group="Data Frame Parameters" Name="ActiveFrameLength" Type="integer" Visible="false" NoCheckOpt="false">
 		<Condition Diagnostic="" Expression="(Protocol=SAI_AC97_PROTOCOL) |(Protocol=SAI_SPDIF_PROTOCOL)|(InitProtocol=Enable)"/>
@@ -1688,7 +1718,7 @@
 	</RefMode>	
 	
 	<!-- RefModes 'SAI A PDM base Mode' for SAI_B -->
-	<RefMode Comment="SAI A PDM Init" Group="SAI A" Name="HAL_PDM_Init" Abstract="true">
+	<RefMode Comment="SAI A PDM Init" Group="SAI A" Name="HAL_PDM_Init">
 		<ConfigForMode>SaiA_Init</ConfigForMode>
 		<Parameter Name="Instance">
 			<PossibleValue>SAI$Index_Block_A</PossibleValue>
@@ -1697,7 +1727,9 @@
 			<PossibleValue>VM_MASTER</PossibleValue>
 		</Parameter>	
 		<Parameter Name="Synchro_A"/>
-			
+		
+		<Parameter Name="MicPairsNbr"/>			
+		<Parameter Name="ClockEnable"/>	
 		
 		<Parameter Name="MClockEnable">
 			<PossibleValue>SAI_MASTERCLOCK_DISABLE</PossibleValue>
@@ -1761,46 +1793,32 @@
 		<Parameter Name="Activation">
 			<PossibleValue>ENABLE</PossibleValue>
 		</Parameter>							
-		<Parameter Name="ClockEnable"/>
+		
 		<Condition Diagnostic="" Expression="!$IpInstance_SAIA_INIT_PROTOCOL"/>
 	</RefMode>
 	
 	<!-- RefModes 'PDM Mode' for SAI_A -->
-	<RefMode Comment="Pulse Density Modulation" Group="SAI A" Name="PDM_Master_Mode" BaseMode="HAL_PDM_Init">			
+	<RefMode Comment="Pulse Density Modulation" Group="SAI A" Name="PDM_Master_Mode_CK1" BaseMode="HAL_PDM_Init">			
 		<Parameter Name="VirtualProtocol">
 			<PossibleValue>VM_PDM_PROTOCOL</PossibleValue>
 		</Parameter>		
-	</RefMode>	
-	<RefMode Comment="1-2 MicroPhones" Group="SAI A" Name="1_2_MicroPhones">					
-		<Parameter Name="MicPairsNbr">
-			<PossibleValue>1</PossibleValue>
-		</Parameter>
 	</RefMode>
-	<RefMode Comment="3-4 MicroPhones" Group="SAI A" Name="3_4_MicroPhones">						
-		<Parameter Name="MicPairsNbr">
-			<PossibleValue>2</PossibleValue>
-		</Parameter>
+	<RefMode Comment="Pulse Density Modulation" Group="SAI A" Name="PDM_Master_Mode_CK2" BaseMode="HAL_PDM_Init">			
+		<Parameter Name="VirtualProtocol">
+			<PossibleValue>VM_PDM_PROTOCOL</PossibleValue>
+		</Parameter>		
 	</RefMode>
-	<RefMode Comment="5-6 MicroPhones" Group="SAI A" Name="5_6_MicroPhones">						
-		<Parameter Name="MicPairsNbr">
-			<PossibleValue>3</PossibleValue>
-		</Parameter>
-	</RefMode>
-	<RefMode Comment="CK1" Group="SAI A" Name="CK1">					
-		<Parameter Name="ClockEnable">
-			<PossibleValue>SAI_PDM_CLOCK1_ENABLE</PossibleValue>
-		</Parameter>
-	</RefMode>
-	<RefMode Comment="CK2" Group="SAI A" Name="CK2">						
-		<Parameter Name="ClockEnable">
-			<PossibleValue>SAI_PDM_CLOCK2_ENABLE</PossibleValue>
-		</Parameter>
-	</RefMode>
-	<RefMode Comment="CK1_CK2" Group="SAI A" Name="CK1_CK2">						
-		<Parameter Name="ClockEnable">
-			<PossibleValue>SAI_PDM_CLOCK1_ENABLE | SAI_PDM_CLOCK2_ENABLE</PossibleValue>
-		</Parameter>
-	</RefMode>
+	
+	
+	<!-- RefModes 'number of MicroPhones' for SAI_A -->	
+	<RefMode Comment="3-4 MicroPhones" Group="SAI A" Name="3_4_MicroPhones"/>									
+	<RefMode Comment="5-6 MicroPhones" Group="SAI A" Name="5_6_MicroPhones"/>								
+	
+	<!-- RefModes 'MicroPhones Clock Selection' for SAI_A -->	
+	<RefMode Comment="CK1" Group="SAI A" Name="CK1"/>								
+	<RefMode Comment="CK2" Group="SAI A" Name="CK2"/>																
+	
+	
 	
 	<RefMode Comment="SynchroExternal"  Name="SynchroExternal">						
 		<Parameter Name="SynchroExt">			
@@ -1821,7 +1839,7 @@
 							</SignalLogicalOp>
 							<Semaphore>$IpInstance_SAIA_Master</Semaphore>	
 							<Semaphore>SAIA_Master</Semaphore>	
-							<Semaphore>SAI_Master$context</Semaphore>	
+							<Semaphore>SAI_Master</Semaphore>	
 						</Mode>						
 						<Mode Name="SAI_A_MasterWithClock" UserName="Master with Master Clock Out">
 							<SignalLogicalOp Name="AND">
@@ -1832,7 +1850,7 @@
 							</SignalLogicalOp>
 							<Semaphore>$IpInstance_SAIA_Master</Semaphore>	
 							<Semaphore>SAIA_Master</Semaphore>
-							<Semaphore>SAI_Master$context</Semaphore>
+							<Semaphore>SAI_Master</Semaphore>
 						</Mode>
 						<Mode Name="SAI_A_AsyncSlave" UserName="Asynchronous Slave">
 							<SignalLogicalOp Name="AND">
@@ -1843,12 +1861,12 @@
 							<Semaphore>$IpInstance_SAIA_AsyncSlave</Semaphore>
 							<Semaphore>$IpInstance_SAIA_Slave</Semaphore>
 							<Semaphore>SAIA_Slave</Semaphore>
-							<Semaphore>SAI_AsyncSlave$context</Semaphore>
+							<Semaphore>SAI_AsyncSlave</Semaphore>
 							<!--<Condition Expression="!$IpInstance_SAIA_SPDIF" Diagnostic=""/>-->
 						</Mode>						
 						<!-- Ticket 63505 -->
 						<!--<Mode Name="SAI_A_SyncSlave" RemoveCondition="((!$ModeExist_SAI_B_Master) &amp; (!$ModeExist_SAI_B_MasterWithClock) &amp; (!$ModeExist_SAI_B_AsyncSlave))" ShrinkName="SAI_A in Synchronous Slave Mode" UserName="Synchronous Slave">--> 
-							<Mode Name="SAI_A_SyncSlave" RemoveCondition="" ShrinkName="SAI_A in Synchronous Slave Mode" UserName="Synchronous Slave"> 								
+						<Mode Name="SAI_A_SyncSlave" ShrinkName="SAI_A in Synchronous Slave Mode" UserName="Synchronous Slave"> 								
 							<SignalLogicalOp Name="AND">
 								<Signal Name="SD_A"/>
 							</SignalLogicalOp>
@@ -1858,20 +1876,34 @@
 							<!--<Condition Expression="($IpInstance_SAIB_Master | $IpInstance_SAIB_AsyncSlave) &amp; (!$IpInstance_SAIA_SPDIF)" Diagnostic="Need to have SAI_B on 'Master' or 'Asynchronous Slave' Mode"/>-->
 							<!--<Condition Diagnostic="Need to have SAI_B on 'Master' or 'Asynchronous Slave' Mode" Expression="($IpInstance_SAIB_Master | $IpInstance_SAIB_AsyncSlave)"/>-->
 							<!-- Ticket 60119 -->
-							<Condition Diagnostic="Need to have one SAI on 'Master' or 'Asynchronous Slave' Mode"  Expression="(SAI_Master$context | SAI_AsyncSlave$context)"/>
+							<Condition Diagnostic="Need to have one SAI on 'Master' or 'Asynchronous Slave' Mode"  Expression="(SAI_Master | SAI_AsyncSlave)"/>
 						</Mode>							
 						<Mode Name="SAI_A_SPDIF" UserName="SPDIF TX Transmitter (IEC60958)">
 							<SignalLogicalOp Name="AND">
-								<Signal Name="SD_A"/>						
+								<Signal Name="SD_A"/>									
 							</SignalLogicalOp>	
 							<Semaphore>$IpInstance_SAIA_SPDIF</Semaphore>
-						</Mode>						
-						<Mode Name="PDM_Master_Mode" UserName="Pulse Density Modulation" RemoveCondition="($IpNumber=2) | ($IpNumber=3)">
-							<SignalLogicalOp Name="AND">
-								<Signal Name="VP_$IpInstance_SAIA_SAI_CK"/>																	
+						</Mode>	
+						<!-- 69799 ThePDM must be activate if we have at least D1 and CK1 or CK2 avaialble -->
+						<Mode Name="PDM_Master_Mode_CK1" UserName="Pulse Density Modulation using MicroPhones pairs (1-2) and CK1 as clock"  RemoveCondition="($IpNumber=2) | ($IpNumber=3)">
+							<SignalLogicalOp Name="AND">																
+								<Signal Name="D1"/>	
+								<Signal Name="CK1"/>								
+							</SignalLogicalOp>
+							<Semaphore>$IpInstance_PDM_CK1</Semaphore>
+							<Semaphore>$IpInstance_PDM</Semaphore>
+							<Semaphore>SEM_CK1</Semaphore>
+						</Mode>
+						<!-- 69799 ThePDM must be activate if we have at least D1 and CK1 or CK2 avaialble -->	
+						<Mode Name="PDM_Master_Mode_CK2" UserName="Pulse Density Modulation using MicroPhones pairs (1-2) and CK2 as clock"  RemoveCondition="($IpNumber=2) | ($IpNumber=3)">
+							<SignalLogicalOp Name="AND">																	
+								<Signal Name="D1"/>	
+								<Signal Name="CK2"/>
 							</SignalLogicalOp>
 							<Semaphore>$IpInstance_PDM</Semaphore>
-						</Mode>				
+							<Semaphore>$IpInstance_PDM_CK2</Semaphore>
+							<Semaphore>SEM_CK2</Semaphore>
+						</Mode>
 					</ModeLogicOperator>
 					<Semaphore>$IpInstance_SAIA_Mode</Semaphore>
 					<Semaphore>SAIAUsed_ForRCC</Semaphore>
@@ -1891,46 +1923,37 @@
 					</ModeLogicOperator>					
 				</Mode>					
 				<Mode Name="NumberOfMicroPhones" UserName="Number Of MicroPhones">
-					<ModeLogicOperator Name="XOR">
-						<Mode Name="1_2_MicroPhones" UserName="1-2 MicroPhones">
-							<SignalLogicalOp Name="AND">								
-								<Signal Name="D1"/>									
-							</SignalLogicalOp>
-						</Mode>						
-						<Mode Name="3_4_MicroPhones" UserName="3-4 MicroPhones">
-							<SignalLogicalOp Name="AND">								
-								<Signal Name="D1"/>		
+					<ModeLogicOperator Name="XOR">												
+						<Mode Name="3_4_MicroPhones" UserName="Add MicroPhones pairs (3-4)">
+							<SignalLogicalOp Name="AND">																		
 								<Signal Name="D2"/>															
-							</SignalLogicalOp>
+							</SignalLogicalOp>	
+							<Semaphore>SEM_MIC_2</Semaphore>
 						</Mode>						
-						<Mode Name="5_6_MicroPhones" UserName="5-6 MicroPhones">
-							<SignalLogicalOp Name="AND">								
-								<Signal Name="D1"/>		
+						<Mode Name="5_6_MicroPhones" UserName="Add MicroPhones paris (5-6)">
+							<SignalLogicalOp Name="AND">																
 								<Signal Name="D2"/>	
 								<Signal Name="D3"/>															
-							</SignalLogicalOp>
+							</SignalLogicalOp>	
+							<Semaphore>SEM_MIC_3</Semaphore>
 						</Mode>						
 					</ModeLogicOperator>
 					<Condition Expression="$IpInstance_PDM" Diagnostic="Pulse Density Modulation mode disabled"/>
 				</Mode>
-				<Mode Name="Clock_Selection" UserName="Clock Selection">
-					<ModeLogicOperator Name="XOR">
-						<Mode Name="CK1" UserName="CK1">
+				<Mode Name="Clock_Selection" UserName="Add Clock">
+					<ModeLogicOperator Name="XOR">							
+						<Mode Name="CK1" UserName="CK1" RemoveCondition="$IpInstance_PDM_CK1">
 							<SignalLogicalOp Name="AND">								
 								<Signal Name="CK1"/>									
 							</SignalLogicalOp>
-						</Mode>																				
-						<Mode Name="CK2" UserName="CK2">											
+							<Semaphore>SEM_CK1_CK2</Semaphore>							
+						</Mode>							
+						<Mode Name="CK2" UserName="CK2" RemoveCondition="$IpInstance_PDM_CK2">											
 							<SignalLogicalOp Name="AND">								
 								<Signal Name="CK2"/>									
 							</SignalLogicalOp>
-						</Mode>		
-						<Mode Name="CK1_CK2" UserName="CK1 and CK2">											
-							<SignalLogicalOp Name="AND">
-								<Signal Name="CK1"/>									
-								<Signal Name="CK2"/>									
-							</SignalLogicalOp>
-						</Mode>
+							<Semaphore>SEM_CK1_CK2</Semaphore>								
+						</Mode>						
 					</ModeLogicOperator>	
 					<Condition Expression="$IpInstance_PDM" Diagnostic="Pulse Density Modulation mode disabled"/>							
 				</Mode>
@@ -1951,7 +1974,7 @@
 							</SignalLogicalOp>
 							<Semaphore>$IpInstance_SAIB_Master</Semaphore>	
 							<Semaphore>SAIB_Master</Semaphore>	
-							<Semaphore>SAI_Master$context</Semaphore>	
+							<Semaphore>SAI_Master</Semaphore>	
 						</Mode>						
 						<Mode Name="SAI_B_MasterWithClock" UserName="Master with Master Clock Out">
 							<SignalLogicalOp Name="AND">
@@ -1962,7 +1985,7 @@
 							</SignalLogicalOp>
 							<Semaphore>$IpInstance_SAIB_Master</Semaphore>	
 							<Semaphore>SAIB_Master</Semaphore>	
-							<Semaphore>SAI_Master$context</Semaphore>
+							<Semaphore>SAI_Master</Semaphore>
 						</Mode>
 						<Mode Name="SAI_B_AsyncSlave" UserName="Asynchronous Slave">
 							<SignalLogicalOp Name="AND">
@@ -1977,7 +2000,7 @@
 						</Mode>						
 						<!-- ticket 63505 -->
 						<!--<Mode Name="SAI_B_SyncSlave" RemoveCondition="((!$ModeExist_SAI_A_Master) &amp; (!$ModeExist_SAI_A_MasterWithClock) &amp; (!$ModeExist_SAI_A_AsyncSlave))" ShrinkName="SAI_B in Synchronous Slave Mode" UserName="Synchronous Slave">--> 
-						<Mode Name="SAI_B_SyncSlave" RemoveCondition="" ShrinkName="SAI_B in Synchronous Slave Mode" UserName="Synchronous Slave"> 								
+						<Mode Name="SAI_B_SyncSlave" ShrinkName="SAI_B in Synchronous Slave Mode" UserName="Synchronous Slave"> 								
 							<SignalLogicalOp Name="AND">
 								<Signal Name="SD_B"/>
 							</SignalLogicalOp>
@@ -1986,7 +2009,7 @@
 							<!--<Condition Expression="($IpInstance_SAIA_Master | $IpInstance_SAIA_AsyncSlave) &amp; (!$IpInstance_SAIB_SPDIF)" Diagnostic="Need to have SAI_A on 'Master' or 'Asynchronous Slave' Mode"/>-->
 							<!--<Condition Diagnostic="Need to have SAI_A on 'Master' or 'Asynchronous Slave' Mode" Expression="($IpInstance_SAIA_Master | $IpInstance_SAIA_AsyncSlave)"/>-->
 							<!-- Ticket 60119 -->
-							<Condition Diagnostic="Need to have one SAI on 'Master' or 'Asynchronous Slave' Mode" Expression="(SAI_Master$context | SAI_AsyncSlave$context)"/>
+							<Condition Diagnostic="Need to have one SAI on 'Master' or 'Asynchronous Slave' Mode" Expression="(SAI_Master | SAI_AsyncSlave)"/>
 						</Mode>							
 						<Mode Name="SAI_B_SPDIF" UserName="SPDIF TX Transmitter (IEC60958)">
 							<SignalLogicalOp Name="AND">
@@ -2062,8 +2085,7 @@
 	<RefSignal Name="VP_$IpInstance_SAIA_SAI_I2S_MSBJUSTIFIED" Virtual="true"/>
 	<RefSignal Name="VP_$IpInstance_SAIA_SAI_I2S_LSBJUSTIFIED" Virtual="true"/>
 	<RefSignal Name="VP_$IpInstance_SAIA_SAI_PCM_LONG" Virtual="true"/>
-	<RefSignal Name="VP_$IpInstance_SAIA_SAI_PCM_SHORT" Virtual="true"/>
-	<RefSignal Name="VP_$IpInstance_SAIA_SAI_CK" Virtual="true"/>
+	<RefSignal Name="VP_$IpInstance_SAIA_SAI_PCM_SHORT" Virtual="true"/>	
 	
 	<RefSignal Name="VP_$IpInstance_SAIB_SAI_BASIC" Virtual="true"/>
 	<RefSignal Name="VP_$IpInstance_SAIB_SAI_EXPERT" Virtual="true"/>

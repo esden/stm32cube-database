@@ -112,7 +112,9 @@ static void APP_THREAD_CheckWirelessFirmwareInfo(void);
 static void APP_THREAD_DeviceConfig(void);
 static void APP_THREAD_StateNotif(uint32_t NotifFlags, void *pContext);
 static void APP_THREAD_TraceError(const char * pMess, uint32_t ErrCode);
+#if (CFG_FULL_LOW_POWER == 0)
 static void Send_CLI_To_M0(void);
+#endif /* (CFG_FULL_LOW_POWER == 0) */
 static void Send_CLI_Ack_For_OT(void);
 static void HostTxCb( void );
 static void Wait_Getting_Ack_From_M0(void);
@@ -127,13 +129,18 @@ extern void MX_USART1_UART_Init(void);
 #if (CFG_USB_INTERFACE_ENABLE != 0)
 static uint32_t ProcessCmdString(uint8_t* buf , uint32_t len);
 #else
+#if (CFG_FULL_LOW_POWER == 0)
 static void RxCpltCallback(void);
-#endif
+#endif /* (CFG_FULL_LOW_POWER == 0) */
+#endif /* (CFG_USB_INTERFACE_ENABLE != 0) */
+
 
 [#if FREERTOS_STATUS = 1 ]
 /* FreeRTos wrapper functions */
 static void APP_THREAD_FreeRTOSProcessMsgM0ToM4Task(void *argument);
+#if (CFG_FULL_LOW_POWER == 0)
 static void APP_THREAD_FreeRTOSSendCLIToM0Task(void *argument);
+#endif /* (CFG_FULL_LOW_POWER == 0) */
 
  [/#if]
 /* USER CODE BEGIN PFP */
@@ -146,10 +153,15 @@ static uint8_t TmpString[C_SIZE_CMD_STRING];
 static uint8_t VcpRxBuffer[sizeof(TL_CmdSerial_t)];        /* Received Data over USB are stored in this buffer */
 static uint8_t VcpTxBuffer[sizeof(TL_EvtPacket_t) + 254U]; /* Transmit buffer over USB */
 #else
+#if (CFG_FULL_LOW_POWER == 0)
 static uint8_t aRxBuffer[C_SIZE_CMD_STRING];
+#endif /* (CFG_FULL_LOW_POWER == 0) */
 #endif /* (CFG_USB_INTERFACE_ENABLE != 0) */
 
+
+#if (CFG_FULL_LOW_POWER == 0)
 static uint8_t CommandString[C_SIZE_CMD_STRING];
+#endif /* (CFG_FULL_LOW_POWER == 0) */
 static __IO uint16_t indexReceiveChar = 0;
 static __IO uint16_t CptReceiveCmdFromUser = 0;
 
@@ -167,7 +179,9 @@ PLACE_IN_SECTION("MB_MEM2") ALIGN(4) static TL_CmdPacket_t ThreadCliCmdBuffer;
 
 [#if FREERTOS_STATUS = 1 ]
 static osThreadId_t OsTaskMsgM0ToM4Id;      /* Task managing the M0 to M4 messaging        */
+#if (CFG_FULL_LOW_POWER == 0)
 static osThreadId_t OsTaskCliId;            /* Task used to manage CLI comamnd             */
+#endif /* (CFG_FULL_LOW_POWER == 0) */
 
 [/#if]
 /* USER CODE BEGIN PV */
@@ -237,9 +251,9 @@ void APP_THREAD_Init( void )
 [/#if]
   APP_THREAD_DeviceConfig();
 
- /* USER CODE BEGIN APP_THREAD_INIT_2 */
+  /* USER CODE BEGIN APP_THREAD_INIT_2 */
 
- /* USER CODE END APP_THREAD_INIT_2 */
+  /* USER CODE END APP_THREAD_INIT_2 */
 }
 
 /**
@@ -262,7 +276,7 @@ void APP_THREAD_Error(uint32_t ErrId, uint32_t ErrCode)
     APP_THREAD_TraceError("ERROR : ERR_THREAD_SET_STATE_CB ",ErrCode);
     break;
 [#if (THREAD_APPLICATION != "FTD_CLI")]
-   case ERR_THREAD_SET_CHANNEL :
+  case ERR_THREAD_SET_CHANNEL :
     APP_THREAD_TraceError("ERROR : ERR_THREAD_SET_CHANNEL ",ErrCode);
     break;
   case ERR_THREAD_SET_PANID :
@@ -287,7 +301,7 @@ void APP_THREAD_Error(uint32_t ErrId, uint32_t ErrCode)
   default :
     APP_THREAD_TraceError("ERROR Unknown ", 0);
     break;
-    }
+  }
 }
 
 /*************************************************************
@@ -486,6 +500,7 @@ static void APP_THREAD_FreeRTOSProcessMsgM0ToM4Task(void *argument)
   }
 }
 
+#if (CFG_FULL_LOW_POWER == 0)
 static void APP_THREAD_FreeRTOSSendCLIToM0Task(void *argument)
 {
   UNUSED(argument);
@@ -501,6 +516,7 @@ static void APP_THREAD_FreeRTOSSendCLIToM0Task(void *argument)
     /* USER END END APP_THREAD_FREERTOS_SEND_CLI_TO_M0_2 */
   }
 }
+#endif /* (CFG_FULL_LOW_POWER == 0) */
 
 /* USER CODE BEGIN FREERTOS_WRAPPER_FUNCTIONS */
 
@@ -599,7 +615,7 @@ void TL_THREAD_NotReceived( TL_EvtPacket_t * Notbuffer )
 void Pre_OtCmdProcessing(void)
 {
 [#if FREERTOS_STATUS = 0 ]
-    UTIL_SEQ_WaitEvt(EVENT_SYNCHRO_BYPASS_IDLE);
+  UTIL_SEQ_WaitEvt(EVENT_SYNCHRO_BYPASS_IDLE);
 [#else]
 
 [/#if]
@@ -614,12 +630,12 @@ void Pre_OtCmdProcessing(void)
 static void Wait_Getting_Ack_From_M0(void)
 {
 [#if FREERTOS_STATUS = 0 ]
-    UTIL_SEQ_WaitEvt(EVENT_ACK_FROM_M0_EVT);
+  UTIL_SEQ_WaitEvt(EVENT_ACK_FROM_M0_EVT);
 [#else]
-    while (FlagReceiveAckFromM0 == 0)
-   {
-   }
-   FlagReceiveAckFromM0 = 0;
+  while (FlagReceiveAckFromM0 == 0)
+  {
+  }
+  FlagReceiveAckFromM0 = 0;
 [/#if] 
 }
 
@@ -633,9 +649,9 @@ static void Wait_Getting_Ack_From_M0(void)
 static void Receive_Ack_From_M0(void)
 {
 [#if FREERTOS_STATUS = 0 ]
-    UTIL_SEQ_SetEvt(EVENT_ACK_FROM_M0_EVT);
+  UTIL_SEQ_SetEvt(EVENT_ACK_FROM_M0_EVT);
 [#else]
-    FlagReceiveAckFromM0 = 1;
+  FlagReceiveAckFromM0 = 1;
 [/#if]
 }
 
@@ -657,6 +673,7 @@ static void Receive_Notification_From_M0(void)
 
 #if (CFG_USB_INTERFACE_ENABLE != 0)
 #else
+#if (CFG_FULL_LOW_POWER == 0)
 static void RxCpltCallback(void)
 {
   /* Filling buffer and wait for '\r' char */
@@ -679,7 +696,9 @@ static void RxCpltCallback(void)
   /* Once a character has been sent, put back the device in reception mode */
   HW_UART_Receive_IT(CFG_CLI_UART, aRxBuffer, 1U, RxCpltCallback);
 }
+#endif /* (CFG_FULL_LOW_POWER == 0) */
 #endif /* (CFG_USB_INTERFACE_ENABLE != 0) */
+
 
 #if (CFG_USB_INTERFACE_ENABLE != 0)
 /**
@@ -725,6 +744,7 @@ static uint32_t  ProcessCmdString( uint8_t* buf , uint32_t len )
 }
 #endif/* (CFG_USB_INTERFACE_ENABLE != 0) */
 
+#if (CFG_FULL_LOW_POWER == 0)
 /**
  * @brief Process sends receive CLI command to M0.
  * @param  None
@@ -744,6 +764,7 @@ static void Send_CLI_To_M0(void)
 
   TL_CLI_SendCmd();
 }
+#endif /* (CFG_FULL_LOW_POWER == 0) */
 
 /**
  * @brief Send notification for CLI TL Channel.
@@ -764,14 +785,17 @@ static void Send_CLI_Ack_For_OT(void)
  */
 void APP_THREAD_Init_UART_CLI(void)
 {
+#if (CFG_FULL_LOW_POWER == 0)
 [#if FREERTOS_STATUS = 0 ]
   UTIL_SEQ_RegTask( 1<<CFG_TASK_SEND_CLI_TO_M0, UTIL_SEQ_RFU,Send_CLI_To_M0);
 [#else]
   OsTaskCliId = osThreadNew(APP_THREAD_FreeRTOSSendCLIToM0Task, NULL,&ThreadCliProcess_attr);
-
 [/#if]
-  #if (CFG_USB_INTERFACE_ENABLE != 0)
-  #else
+#endif /* (CFG_FULL_LOW_POWER == 0) */
+
+#if (CFG_USB_INTERFACE_ENABLE != 0)
+#else
+#if (CFG_FULL_LOW_POWER == 0)
 [#if CFG_CLI_UART = "hw_lpuart1" ]
   MX_LPUART1_UART_Init();
 [/#if]
@@ -779,6 +803,7 @@ void APP_THREAD_Init_UART_CLI(void)
   MX_USART1_UART_Init();
 [/#if]
   HW_UART_Receive_IT(CFG_CLI_UART, aRxBuffer, 1, RxCpltCallback);
+#endif /* (CFG_FULL_LOW_POWER == 0) */
 #endif /* (CFG_USB_INTERFACE_ENABLE != 0) */
 }
 

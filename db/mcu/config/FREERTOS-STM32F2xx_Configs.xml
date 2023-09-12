@@ -13,6 +13,7 @@
         <ConfigFile Name="DEFAULT_THREAD"/>
         <ConfigFile Name="USER_THREADS"/>
         <ConfigFile Name="RTOS_START"/>
+        <ConfigFile Name="HEAP_USER"/>	
     </RefConfig>
     
     <RefConfig Comment="" Name="FREERTOS_CMSIS_V2_ENABLE_Init">  
@@ -27,6 +28,7 @@
         <ConfigFile Name="DEFAULT_THREAD_V2"/>
         <ConfigFile Name="USER_THREADS_V2"/>
         <ConfigFile Name="RTOS_START"/>
+        <ConfigFile Name="HEAP_USER"/>	
     </RefConfig>
     
     <RefConfig Comment="" Name="FREERTOS_NATIVE_ENABLE_Init">       
@@ -41,6 +43,7 @@
         <ConfigFile Name="DEFAULT_THREAD_NATIVE"/>
         <ConfigFile Name="USER_THREADS_NATIVE"/>
         <ConfigFile Name="RTOS_START_NATIVE"/>
+        <ConfigFile Name="HEAP_USER"/>	
     </RefConfig>
        
     <LibMethod Comment="Start scheduler" Name="osKernelStart">
@@ -120,7 +123,11 @@
             <File Category="header" Name="Source/portable/GCC/ARM_CM3/portmacro.h"/>
         </SubComponent> 
     </RefComponent>
-
+    
+    <RefConfigFile Description="Heap for user choice" Name="HEAP_USER" Template="freertos_heap_user.ftl">
+        <File Category="source" Name="heap_user.c" Version="10.0.1" Condition="S_HEAP_USER"/>
+    </RefConfigFile>
+    
     <RefConfigFile Description="Header file for #include" Name="INC" Template="freertos_inc.ftl">
         <File Category="source" Condition="all" Name="rtos_inc.tmp" Version="10.0.1"/>
     </RefConfigFile>
@@ -255,6 +262,9 @@
         
          <!--  New for FreeRTOS 10.0.0 -->
          <Argument Comment="" GenericType="simple" Name="configRECORD_STACK_HIGH_ADDRESS"/>
+         
+         <!-- NEWLIB -->
+         <Argument Comment="" GenericType="simple" Name="configUSE_NEWLIB_REENTRANT"/>
 
     </RefConfigFile>
 
@@ -409,6 +419,9 @@
          
          <!--  For CMSIS V2 -->
          <Argument Comment="" GenericType="simple" Name="HEAP_NUMBER"/>
+         
+         <!-- NEWLIB -->
+         <Argument Comment="" GenericType="simple" Name="configUSE_NEWLIB_REENTRANT"/>
 
     </RefConfigFile>
 
@@ -438,7 +451,7 @@
         <File Category="source" Condition="all" Name="rtos_inc.tmp" Version="10.0.1"/>
     </RefConfigFile>
 
-    <RefConfigFile Description="Variable declarations for FreeRTOS" Name="VARS_NATIVE" Template="freertos_vars_native_f4.ftl">
+    <RefConfigFile Description="Variable declarations for FreeRTOS" Name="VARS_NATIVE" Template="freertos_vars_native.ftl">  <!-- maybe a custom ftl for F2? -->
         <File Category="source" Condition="all" Name="rtos_vars.tmp" Version="10.0.1"/>
         <Argument Comment="User threads" GenericType="rtos_list" Name="Threads"/>
         <Argument Comment="User queues" GenericType="rtos_list" Name="Queues"/>

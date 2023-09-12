@@ -13,7 +13,16 @@
 #t* @param  None
 #t* @retval None
 #t*/
+[#list voids as void]
+    [#assign fctname = "MX_GPIO_Init"]
+        [#if void.functionName == fctname]
+            [#if void.isStatic]
 static void MX_GPIO_Init(void) 
+            [#else]
+void MX_GPIO_Init(void) 
+            [/#if]
+        [/#if]
+[/#list] 
 {
 
 [#if RESMGR_UTILITY??]
@@ -21,7 +30,7 @@ static void MX_GPIO_Init(void)
 [/#if]
 
         [#assign v = ""]
-[#if data.ipName=="gpio" && FamilyName!="STM32MP1"][#-- Actualy we don't need to generate code for gpio modes not associated to any peripheral --]
+[#if data.ipName=="gpio"][#-- Actualy we don't need to generate code for gpio modes not associated to any peripheral --]
         [#list data.variables as variable]				
             [#if v?contains(variable.name)]
             [#-- no matches--]
@@ -65,7 +74,7 @@ static void MX_${data.ipName}_GPIO_Init(void)
 [/#if]
 
 [#if data.methods??] [#-- if the pin configuration contains a list of LibMethods--]
-[#if data.ipName=="gpio" && FamilyName!="STM32MP1"][#-- Actualy we don't need to generate code for gpio modes not associated to any peripheral --]
+[#if data.ipName=="gpio"][#-- Actualy we don't need to generate code for gpio modes not associated to any peripheral --]
 
 	[#list data.methods as method][#assign args = ""]	
 		[#if method.status=="OK"]	

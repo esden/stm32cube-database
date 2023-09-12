@@ -2,7 +2,7 @@
 /* USER CODE BEGIN Header */
 /**
  ******************************************************************************
-  * File Name          : ${name}.c
+  * File Name          : ${name}
   * Description        : User configuration file for TOUCHSENSING
   *                      middleWare.
   ******************************************************************************
@@ -10,6 +10,17 @@
   ******************************************************************************
   */
 /* USER CODE END Header */
+
+[#--
+[#list SWIPdatas as SWIP]  
+    [#if SWIP.defines??]
+        [#list SWIP.defines as define]
+            define.name : ${define.name}
+            define.value : ${define.value}
+            [/#list]
+    [/#if]
+[/#list]
+--]
 [#assign channelnbr = 0]
 [#list SWIPdatas as SWIP]  
     [#if SWIP.defines??]
@@ -46,6 +57,21 @@
             [#if define.name == "TSLPRM_TOTAL_LINROTS_B"]
                 [#assign  total_linrots_b = define.value]
             [/#if]
+
+            [#if define.name == "TSLPRM_TOTAL_LINS"]
+                [#assign  total_lins = define.value]
+            [/#if]
+            [#if define.name == "TSLPRM_TOTAL_LINS_B"]
+                [#assign  total_lins_b = define.value]
+            [/#if]
+
+            [#if define.name == "TSLPRM_TOTAL_ROTS"]
+                [#assign  total_rots = define.value]
+            [/#if]
+            [#if define.name == "TSLPRM_TOTAL_ROTS_B"]
+                [#assign  total_rots_b = define.value]
+            [/#if]
+
             [#if define.name == "TSLPRM_TOTAL_CHANNELS"]
                 [#assign total_channels = define.value]
             [/#if]
@@ -214,11 +240,7 @@
             [#if define.name == "TSLPRM_USE_6CH_ROT_M_B_NBR"]
                 [#assign total_6ch_linrots_rot_M_B_NBR = define.value]
             [/#if]
-[#--
-            define.name : ${define.name}
-            define.value : ${define.value}
---]
-            [/#list]
+        [/#list]
     [/#if]
 [/#list]
 
@@ -228,6 +250,12 @@
 [#assign total_all_linrots_nb = total_linrots?number + total_linrots_b?number ]
 [#assign total_linrots_nb = total_linrots?number ]
 [#assign total_linrots_b_nb = total_linrots_b?number ]
+
+[#assign total_lins_nb = total_lins?number ]
+[#assign total_lins_b_nb = total_lins_b?number ]
+[#assign total_rots_nb = total_rots?number ]
+[#assign total_rots_b_nb = total_rots_b?number ]
+
 [#assign total_touchkeys_nb = total_touchkeys?number ]
 [#assign total_touchkeys_b_nb = total_touchkeys_b?number ]
 [#assign total_objects_nb = total_objects?number ]
@@ -556,6 +584,7 @@ CONST TSL_LinRotMethods_T MyLinRots_Methods =
     [#lt]CONST uint16_t MyLinRotB${i}_DeltaCoeff[3] = {0x0100, 0x0100, 0x0100};
     [/#list]
 [/#if]
+    [#assign index0 = total_touchkeys_nb + total_touchkeys_b_nb]
 
 [#if total_linrots_nb != 0]
     [#assign index1 = 0]
@@ -588,7 +617,8 @@ CONST TSL_LinRotMethods_T MyLinRots_Methods =
                                     [#lt]   TSL_POSCORR_3CH_LIN_M1,
                                     [#lt]   MyLinRots_StateMachine,
                                     [#lt]   &MyLinRots_Methods
-                                    [#lt]   }[#if index2 != (total_objects_nb - 1)],[/#if]
+                                    [#lt]   }[#if index0 != (total_objects_nb - total_linrots_b_nb - 1)],[/#if]
+                                    [#assign index0 = (index0 +1)]
                                     [#assign index1 = (index1 +3)]
                                     [#assign index2 = (index2 +1)]
                                 [/#list]
@@ -611,7 +641,8 @@ CONST TSL_LinRotMethods_T MyLinRots_Methods =
                                     [#lt]   TSL_POSCORR_3CH_LIN_M2,
                                     [#lt]   MyLinRots_StateMachine,
                                     [#lt]   &MyLinRots_Methods
-                                    [#lt]   }[#if index2 != (total_objects_nb - 1)],[/#if]
+                                    [#lt]   }[#if index0 != (total_objects_nb - total_linrots_b_nb - 1)],[/#if]
+                                    [#assign index0 = (index0 +1)]
                                     [#assign index1 = (index1 +3)]
                                     [#assign index2 = (index2 +1)]
                                 [/#list]
@@ -634,7 +665,8 @@ CONST TSL_LinRotMethods_T MyLinRots_Methods =
                                     [#lt]   TSL_POSCORR_3CH_LIN_H,
                                     [#lt]   MyLinRots_StateMachine,
                                     [#lt]   &MyLinRots_Methods
-                                    [#lt]   }[#if index2 != (total_objects_nb - 1)],[/#if]
+                                    [#lt]   }[#if index0 != (total_objects_nb - total_linrots_b_nb - 1)],[/#if]
+                                    [#assign index0 = (index0 +1)]
                                     [#assign index1 = (index1 +3)]
                                     [#assign index2 = (index2 +1)]
                                 [/#list]
@@ -657,7 +689,8 @@ CONST TSL_LinRotMethods_T MyLinRots_Methods =
                                     [#lt]   0,
                                     [#lt]   MyLinRots_StateMachine,
                                     [#lt]   &MyLinRots_Methods
-                                    [#lt]   }[#if index2 != (total_objects_nb - 1)],[/#if]
+                                    [#lt]   }[#if index0 != (total_objects_nb - total_linrots_b_nb - 1)],[/#if]
+                                    [#assign index0 = (index0 +1)]
                                     [#assign index1 = (index1 +3)]
                                     [#assign index2 = (index2 +1)]
                                 [/#list]
@@ -680,7 +713,8 @@ CONST TSL_LinRotMethods_T MyLinRots_Methods =
                                     [#lt]   TSL_POSCORR_4CH_LIN_M1,
                                     [#lt]   MyLinRots_StateMachine,
                                     [#lt]   &MyLinRots_Methods
-                                    [#lt]   }[#if index2 != (total_objects_nb - 1)],[/#if]
+                                    [#lt]   }[#if index0 != (total_objects_nb - total_linrots_b_nb - 1)],[/#if]
+                                    [#assign index0 = (index0 +1)]
                                     [#assign index1 = (index1 +4)]
                                     [#assign index2 = (index2 +1)]
                                 [/#list]
@@ -703,7 +737,8 @@ CONST TSL_LinRotMethods_T MyLinRots_Methods =
                                     [#lt]   TSL_POSCORR_4CH_LIN_M2,
                                     [#lt]   MyLinRots_StateMachine,
                                     [#lt]   &MyLinRots_Methods
-                                    [#lt]   }[#if index2 != (total_objects_nb - 1)],[/#if]
+                                    [#lt]   }[#if index0 != (total_objects_nb - total_linrots_b_nb - 1)],[/#if]
+                                    [#assign index0 = (index0 +1)]
                                     [#assign index1 = (index1 +4)]
                                     [#assign index2 = (index2 +1)]
                                 [/#list]
@@ -726,7 +761,8 @@ CONST TSL_LinRotMethods_T MyLinRots_Methods =
                                     [#lt]   TSL_POSCORR_4CH_LIN_H,
                                     [#lt]   MyLinRots_StateMachine,
                                     [#lt]   &MyLinRots_Methods
-                                    [#lt]   }[#if index2 != (total_objects_nb - 1)],[/#if]
+                                    [#lt]   }[#if index0 != (total_objects_nb - total_linrots_b_nb - 1)],[/#if]
+                                    [#assign index0 = (index0 +1)]
                                     [#assign index1 = (index1 +4)]
                                     [#assign index2 = (index2 +1)]
                                 [/#list]
@@ -749,7 +785,8 @@ CONST TSL_LinRotMethods_T MyLinRots_Methods =
                                     [#lt]   0,
                                     [#lt]   MyLinRots_StateMachine,
                                     [#lt]   &MyLinRots_Methods
-                                    [#lt]   }[#if index2 != (total_objects_nb - 1)],[/#if]
+                                    [#lt]   }[#if index0 != (total_objects_nb - total_linrots_b_nb - 1)],[/#if]
+                                    [#assign index0 = (index0 +1)]
                                     [#assign index1 = (index1 +4)]
                                     [#assign index2 = (index2 +1)]
                                 [/#list]
@@ -772,7 +809,8 @@ CONST TSL_LinRotMethods_T MyLinRots_Methods =
                                     [#lt]   TSL_POSCORR_5CH_LIN_M1,
                                     [#lt]   MyLinRots_StateMachine,
                                     [#lt]   &MyLinRots_Methods
-                                    [#lt]   }[#if index2 != (total_objects_nb - 1)],[/#if]
+                                    [#lt]   }[#if index0 != (total_objects_nb - total_linrots_b_nb - 1)],[/#if]
+                                    [#assign index0 = (index0 +1)]
                                     [#assign index1 = (index1 +5)]
                                     [#assign index2 = (index2 +1)]
                                 [/#list]
@@ -795,7 +833,8 @@ CONST TSL_LinRotMethods_T MyLinRots_Methods =
                                     [#lt]   TSL_POSCORR_5CH_LIN_M2,
                                     [#lt]   MyLinRots_StateMachine,
                                     [#lt]   &MyLinRots_Methods
-                                    [#lt]   }[#if index2 != (total_objects_nb - 1)],[/#if]
+                                    [#lt]   }[#if index0 != (total_objects_nb - total_linrots_b_nb - 1)],[/#if]
+                                    [#assign index0 = (index0 +1)]
                                     [#assign index1 = (index1 +5)]
                                     [#assign index2 = (index2 +1)]
                                 [/#list]
@@ -818,7 +857,8 @@ CONST TSL_LinRotMethods_T MyLinRots_Methods =
                                     [#lt]   TSL_POSCORR_5CH_LIN_H,
                                     [#lt]   MyLinRots_StateMachine,
                                     [#lt]   &MyLinRots_Methods
-                                    [#lt]   }[#if index2 != (total_objects_nb - 1)],[/#if]
+                                    [#lt]   }[#if index0 != (total_objects_nb - total_linrots_b_nb - 1)],[/#if]
+                                    [#assign index0 = (index0 +1)]
                                     [#assign index1 = (index1 +5)]
                                     [#assign index2 = (index2 +1)]
                                 [/#list]
@@ -841,7 +881,8 @@ CONST TSL_LinRotMethods_T MyLinRots_Methods =
                                     [#lt]   0,
                                     [#lt]   MyLinRots_StateMachine,
                                     [#lt]   &MyLinRots_Methods
-                                    [#lt]   }[#if index2 != (total_objects_nb - 1)],[/#if]
+                                    [#lt]   }[#if index0 != (total_objects_nb - total_linrots_b_nb - 1)],[/#if]
+                                    [#assign index0 = (index0 +1)]
                                     [#assign index1 = (index1 +5)]
                                     [#assign index2 = (index2 +1)]
                                 [/#list]
@@ -864,7 +905,8 @@ CONST TSL_LinRotMethods_T MyLinRots_Methods =
                                     [#lt]   0,
                                     [#lt]   MyLinRots_StateMachine,
                                     [#lt]   &MyLinRots_Methods
-                                    [#lt]   }[#if index2 != (total_objects_nb - 1)],[/#if]
+                                    [#lt]   }[#if index0 != (total_objects_nb - total_linrots_b_nb - 1)],[/#if]
+                                    [#assign index0 = (index0 +1)]
                                     [#assign index1 = (index1 +5)]
                                     [#assign index2 = (index2 +1)]
                                 [/#list]
@@ -887,7 +929,8 @@ CONST TSL_LinRotMethods_T MyLinRots_Methods =
                                     [#lt]   TSL_POSCORR_6CH_LIN_M1,
                                     [#lt]   MyLinRots_StateMachine,
                                     [#lt]   &MyLinRots_Methods
-                                    [#lt]   }[#if index2 != (total_objects_nb - 1)],[/#if]
+                                    [#lt]   }[#if index0 != (total_objects_nb - total_linrots_b_nb - 1)],[/#if]
+                                    [#assign index0 = (index0 +1)]
                                     [#assign index1 = (index1 +6)]
                                     [#assign index2 = (index2 +1)]
                                 [/#list]
@@ -910,7 +953,8 @@ CONST TSL_LinRotMethods_T MyLinRots_Methods =
                                     [#lt]   TSL_POSCORR_6CH_LIN_M2,
                                     [#lt]   MyLinRots_StateMachine,
                                     [#lt]   &MyLinRots_Methods
-                                    [#lt]   }[#if index2 != (total_objects_nb - 1)],[/#if]
+                                    [#lt]   }[#if index0 != (total_objects_nb - total_linrots_b_nb - 1)],[/#if]
+                                    [#assign index0 = (index0 +1)]
                                     [#assign index1 = (index1 +6)]
                                     [#assign index2 = (index2 +1)]
                                 [/#list]
@@ -933,7 +977,8 @@ CONST TSL_LinRotMethods_T MyLinRots_Methods =
                                     [#lt]   TSL_POSCORR_6CH_LIN_H,
                                     [#lt]   MyLinRots_StateMachine,
                                     [#lt]   &MyLinRots_Methods
-                                    [#lt]   }[#if index2 != (total_objects_nb - 1)],[/#if]
+                                    [#lt]   }[#if index0 != (total_objects_nb - total_linrots_b_nb - 1)],[/#if]
+                                    [#assign index0 = (index0 +1)]
                                     [#assign index1 = (index1 +6)]
                                     [#assign index2 = (index2 +1)]
                                 [/#list]
@@ -956,7 +1001,8 @@ CONST TSL_LinRotMethods_T MyLinRots_Methods =
                                     [#lt]   0,
                                     [#lt]   MyLinRots_StateMachine,
                                     [#lt]   &MyLinRots_Methods
-                                    [#lt]   }[#if index2 != (total_objects_nb - 1)],[/#if]
+                                    [#lt]   }[#if index0 != (total_objects_nb - total_linrots_b_nb - 1)],[/#if]
+                                    [#assign index0 = (index0 +1)]
                                     [#assign index1 = (index1 +6)]
                                     [#assign index2 = (index2 +1)]
                                 [/#list]
@@ -970,6 +1016,7 @@ CONST TSL_LinRotMethods_T MyLinRots_Methods =
     [/#if]
     [#if total_linrots_b_nb != 0]
         [#assign index3 = 0]
+        [#assign index4 = 0]
     [#else]
         [#assign index1 = 0]
         [#assign index2 = 0]
@@ -984,7 +1031,7 @@ CONST TSL_LinRotMethods_T MyLinRots_Methods =
                         [#if define.value = "1"]
                             [#if (total_3ch_linrots_lin_M1_B_NBR_nb != 0)]
                                 [#list 0..(total_3ch_linrots_lin_M1_B_NBR_nb -1) as i]
-                                    [#lt]   /* LinRotB sensor ${index2} = S${(index2 + 1)} */
+                                    [#lt]   /* LinRotB sensor ${index4} = S${(index4 + 1)} */
                                     [#lt]   {
                                     [#lt]   &MyLinRots_Data[${index2}],
                                     [#lt]   &MyLinRots_Param[${index2}],
@@ -993,11 +1040,13 @@ CONST TSL_LinRotMethods_T MyLinRots_Methods =
                                     [#lt]   MyLinRotB${index3}_DeltaCoeff,
                                     [#lt]   (TSL_tsignPosition_T *)TSL_POSOFF_3CH_LIN_M1,
                                     [#lt]   TSL_SCTCOMP_3CH_LIN_M1,
-                                    [#lt]   TSL_POSCORR_3CH_LIN_M1,
-                                    [#lt]   }[#if index2 != (total_objects_nb - 1)],[/#if]
+                                    [#lt]   TSL_POSCORR_3CH_LIN_M1
+                                    [#lt]   }[#if index0 != (total_objects_nb - 1)],[/#if]
+                                    [#assign index0 = (index0 +1)]
                                     [#assign index1 = (index1 +3)]
                                     [#assign index2 = (index2 +1)]
                                     [#assign index3 = (index3 +1)]
+                                    [#assign index4 = (index4 +1)]
                                 [/#list]
                             [/#if]
                         [/#if]
@@ -1006,7 +1055,7 @@ CONST TSL_LinRotMethods_T MyLinRots_Methods =
                         [#if define.value = "1"]
                             [#if (total_3ch_linrots_lin_M2_B_NBR_nb != 0)]
                                 [#list 0..(total_3ch_linrots_lin_M2_B_NBR_nb -1) as i]
-                                    [#lt]   /* LinRotB sensor ${index2} = S${(index2 + 1)} */
+                                    [#lt]   /* LinRotB sensor ${index4} = S${(index4 + 1)} */
                                     [#lt]   {
                                     [#lt]   &MyLinRots_Data[${index2}],
                                     [#lt]   &MyLinRots_Param[${index2}],
@@ -1015,11 +1064,13 @@ CONST TSL_LinRotMethods_T MyLinRots_Methods =
                                     [#lt]   MyLinRotB${index3}_DeltaCoeff,
                                     [#lt]   (TSL_tsignPosition_T *)TSL_POSOFF_3CH_LIN_M2,
                                     [#lt]   TSL_SCTCOMP_3CH_LIN_M2,
-                                    [#lt]   TSL_POSCORR_3CH_LIN_M2,
-                                    [#lt]   }[#if index2 != (total_objects_nb - 1)],[/#if]
+                                    [#lt]   TSL_POSCORR_3CH_LIN_M2
+                                    [#lt]   }[#if index0 != (total_objects_nb - 1)],[/#if]
+                                    [#assign index0 = (index0 +1)]
                                     [#assign index1 = (index1 +3)]
                                     [#assign index2 = (index2 +1)]
                                     [#assign index3 = (index3 +1)]
+                                    [#assign index4 = (index4 +1)]
                                 [/#list]
                             [/#if]
                         [/#if]
@@ -1028,7 +1079,7 @@ CONST TSL_LinRotMethods_T MyLinRots_Methods =
                         [#if define.value = "1"]
                             [#if (total_3ch_linrots_lin_H_B_NBR_nb != 0)]
                                 [#list 0..(total_3ch_linrots_lin_H_B_NBR_nb -1) as i]
-                                    [#lt]   /* LinRotB sensor ${index2} = S${(index2 + 1)} */
+                                    [#lt]   /* LinRotB sensor ${index4} = S${(index4 + 1)} */
                                     [#lt]   {
                                     [#lt]   &MyLinRots_Data[${index2}],
                                     [#lt]   &MyLinRots_Param[${index2}],
@@ -1037,11 +1088,13 @@ CONST TSL_LinRotMethods_T MyLinRots_Methods =
                                     [#lt]   MyLinRotB${index3}_DeltaCoeff,
                                     [#lt]   (TSL_tsignPosition_T *)TSL_POSOFF_3CH_LIN_H,
                                     [#lt]   TSL_SCTCOMP_3CH_LIN_H,
-                                    [#lt]   TSL_POSCORR_3CH_LIN_H,
-                                    [#lt]   }[#if index2 != (total_objects_nb - 1)],[/#if]
+                                    [#lt]   TSL_POSCORR_3CH_LIN_H
+                                    [#lt]   }[#if index0 != (total_objects_nb - 1)],[/#if]
+                                    [#assign index0 = (index0 +1)]
                                     [#assign index1 = (index1 +3)]
                                     [#assign index2 = (index2 +1)]
                                     [#assign index3 = (index3 +1)]
+                                    [#assign index4 = (index4 +1)]
                                 [/#list]
                             [/#if]
                         [/#if]
@@ -1050,7 +1103,7 @@ CONST TSL_LinRotMethods_T MyLinRots_Methods =
                         [#if define.value = "1"]
                             [#if (total_3ch_linrots_rot_M_B_NBR_nb != 0)]
                                 [#list 0..(total_3ch_linrots_rot_M_B_NBR_nb -1) as i]
-                                    [#lt]   /* LinRotB sensor ${index2} = S${(index2 + 1)} */
+                                    [#lt]   /* LinRotB sensor ${index4} = S${(index4 + 1)} */
                                     [#lt]   {
                                     [#lt]   &MyLinRots_Data[${index2}],
                                     [#lt]   &MyLinRots_Param[${index2}],
@@ -1059,11 +1112,13 @@ CONST TSL_LinRotMethods_T MyLinRots_Methods =
                                     [#lt]   MyLinRotB${index3}_DeltaCoeff,
                                     [#lt]   (TSL_tsignPosition_T *)TSL_POSOFF_3CH_ROT_M,
                                     [#lt]   TSL_SCTCOMP_3CH_ROT_M,
-                                    [#lt]   0,
-                                    [#lt]   }[#if index2 != (total_objects_nb - 1)],[/#if]
+                                    [#lt]   0
+                                    [#lt]   }[#if index0 != (total_objects_nb - 1)],[/#if]
+                                    [#assign index0 = (index0 +1)]
                                     [#assign index1 = (index1 +3)]
                                     [#assign index2 = (index2 +1)]
                                     [#assign index3 = (index3 +1)]
+                                    [#assign index4 = (index4 +1)]
                                 [/#list]
                             [/#if]
                         [/#if]
@@ -1072,7 +1127,7 @@ CONST TSL_LinRotMethods_T MyLinRots_Methods =
                         [#if define.value = "1"]
                             [#if (total_4ch_linrots_lin_M1_B_NBR_nb != 0)]
                                 [#list 0..(total_4ch_linrots_lin_M1_B_NBR_nb -1) as i]
-                                    [#lt]   /* LinRotB sensor ${index2} = S${(index2 + 1)} */
+                                    [#lt]   /* LinRotB sensor ${index4} = S${(index4 + 1)} */
                                     [#lt]   {
                                     [#lt]   &MyLinRots_Data[${index2}],
                                     [#lt]   &MyLinRots_Param[${index2}],
@@ -1081,11 +1136,13 @@ CONST TSL_LinRotMethods_T MyLinRots_Methods =
                                     [#lt]   MyLinRotB${index3}_DeltaCoeff,
                                     [#lt]   (TSL_tsignPosition_T *)TSL_POSOFF_4CH_LIN_M1,
                                     [#lt]   TSL_SCTCOMP_4CH_LIN_M1,
-                                    [#lt]   TSL_POSCORR_4CH_LIN_M1,
-                                    [#lt]   }[#if index2 != (total_objects_nb - 1)],[/#if]
+                                    [#lt]   TSL_POSCORR_4CH_LIN_M1
+                                    [#lt]   }[#if index0 != (total_objects_nb - 1)],[/#if]
+                                    [#assign index0 = (index0 +1)]
                                     [#assign index1 = (index1 +4)]
                                     [#assign index2 = (index2 +1)]
                                     [#assign index3 = (index3 +1)]
+                                    [#assign index4 = (index4 +1)]
                                 [/#list]
                             [/#if]
                         [/#if]
@@ -1094,7 +1151,7 @@ CONST TSL_LinRotMethods_T MyLinRots_Methods =
                         [#if define.value = "1"]
                             [#if (total_4ch_linrots_lin_M2_B_NBR_nb != 0)]
                                 [#list 0..(total_4ch_linrots_lin_M2_B_NBR_nb -1) as i]
-                                    [#lt]   /* LinRotB sensor ${index2} = S${(index2 + 1)} */
+                                    [#lt]   /* LinRotB sensor ${index4} = S${(index4 + 1)} */
                                     [#lt]   {
                                     [#lt]   &MyLinRots_Data[${index2}],
                                     [#lt]   &MyLinRots_Param[${index2}],
@@ -1103,11 +1160,13 @@ CONST TSL_LinRotMethods_T MyLinRots_Methods =
                                     [#lt]   MyLinRotB${index3}_DeltaCoeff,
                                     [#lt]   (TSL_tsignPosition_T *)TSL_POSOFF_4CH_LIN_M2,
                                     [#lt]   TSL_SCTCOMP_4CH_LIN_M2,
-                                    [#lt]   TSL_POSCORR_4CH_LIN_M2,
-                                    [#lt]   }[#if index2 != (total_objects_nb - 1)],[/#if]
+                                    [#lt]   TSL_POSCORR_4CH_LIN_M2
+                                    [#lt]   }[#if index0 != (total_objects_nb - 1)],[/#if]
+                                    [#assign index0 = (index0 +1)]
                                     [#assign index1 = (index1 +4)]
                                     [#assign index2 = (index2 +1)]
                                     [#assign index3 = (index3 +1)]
+                                    [#assign index4 = (index4 +1)]
                                 [/#list]
                             [/#if]
                         [/#if]
@@ -1116,7 +1175,7 @@ CONST TSL_LinRotMethods_T MyLinRots_Methods =
                         [#if define.value = "1"]
                             [#if (total_4ch_linrots_lin_H_B_NBR_nb != 0)]
                                 [#list 0..(total_4ch_linrots_lin_H_B_NBR_nb -1) as i]
-                                    [#lt]   /* LinRotB sensor ${index2} = S${(index2 + 1)} */
+                                    [#lt]   /* LinRotB sensor ${index4} = S${(index4 + 1)} */
                                     [#lt]   {
                                     [#lt]   &MyLinRots_Data[${index2}],
                                     [#lt]   &MyLinRots_Param[${index2}],
@@ -1125,11 +1184,13 @@ CONST TSL_LinRotMethods_T MyLinRots_Methods =
                                     [#lt]   MyLinRotB${index3}_DeltaCoeff,
                                     [#lt]   (TSL_tsignPosition_T *)TSL_POSOFF_4CH_LIN_H,
                                     [#lt]   TSL_SCTCOMP_4CH_LIN_H,
-                                    [#lt]   TSL_POSCORR_4CH_LIN_H,
-                                    [#lt]   }[#if index2 != (total_objects_nb - 1)],[/#if]
+                                    [#lt]   TSL_POSCORR_4CH_LIN_H
+                                    [#lt]   }[#if index0 != (total_objects_nb - 1)],[/#if]
+                                    [#assign index0 = (index0 +1)]
                                     [#assign index1 = (index1 +4)]
                                     [#assign index2 = (index2 +1)]
                                     [#assign index3 = (index3 +1)]
+                                    [#assign index4 = (index4 +1)]
                                 [/#list]
                             [/#if]
                         [/#if]
@@ -1138,7 +1199,7 @@ CONST TSL_LinRotMethods_T MyLinRots_Methods =
                         [#if define.value = "1"]
                             [#if (total_4ch_linrots_rot_M_B_NBR_nb != 0)]
                                 [#list 0..(total_4ch_linrots_rot_M_B_NBR_nb -1) as i]
-                                    [#lt]   /* LinRotB sensor ${index2} = S${(index2 + 1)} */
+                                    [#lt]   /* LinRotB sensor ${index4} = S${(index4 + 1)} */
                                     [#lt]   {
                                     [#lt]   &MyLinRots_Data[${index2}],
                                     [#lt]   &MyLinRots_Param[${index2}],
@@ -1147,11 +1208,13 @@ CONST TSL_LinRotMethods_T MyLinRots_Methods =
                                     [#lt]   MyLinRotB${index3}_DeltaCoeff,
                                     [#lt]   (TSL_tsignPosition_T *)TSL_POSOFF_4CH_ROT_M,
                                     [#lt]   TSL_SCTCOMP_4CH_ROT_M,
-                                    [#lt]   0,
-                                    [#lt]   }[#if index2 != (total_objects_nb - 1)],[/#if]
+                                    [#lt]   0
+                                    [#lt]   }[#if index0 != (total_objects_nb - 1)],[/#if]
+                                    [#assign index0 = (index0 +1)]
                                     [#assign index1 = (index1 +4)]
                                     [#assign index2 = (index2 +1)]
                                     [#assign index3 = (index3 +1)]
+                                    [#assign index4 = (index4 +1)]
                                 [/#list]
                             [/#if]
                         [/#if]
@@ -1160,7 +1223,7 @@ CONST TSL_LinRotMethods_T MyLinRots_Methods =
                         [#if define.value = "1"]
                             [#if (total_5ch_linrots_lin_M1_B_NBR_nb != 0)]
                                 [#list 0..(total_5ch_linrots_lin_M1_B_NBR_nb -1) as i]
-                                    [#lt]   /* LinRotB sensor ${index2} = S${(index2 + 1)} */
+                                    [#lt]   /* LinRotB sensor ${index4} = S${(index4 + 1)} */
                                     [#lt]   {
                                     [#lt]   &MyLinRots_Data[${index2}],
                                     [#lt]   &MyLinRots_Param[${index2}],
@@ -1169,11 +1232,13 @@ CONST TSL_LinRotMethods_T MyLinRots_Methods =
                                     [#lt]   MyLinRotB${index3}_DeltaCoeff,
                                     [#lt]   (TSL_tsignPosition_T *)TSL_POSOFF_5CH_LIN_M1,
                                     [#lt]   TSL_SCTCOMP_5CH_LIN_M1,
-                                    [#lt]   TSL_POSCORR_5CH_LIN_M1,
-                                    [#lt]   }[#if index2 != (total_objects_nb - 1)],[/#if]
+                                    [#lt]   TSL_POSCORR_5CH_LIN_M1
+                                    [#lt]   }[#if index0 != (total_objects_nb - 1)],[/#if]
+                                    [#assign index0 = (index0 +1)]
                                     [#assign index1 = (index1 +5)]
                                     [#assign index2 = (index2 +1)]
                                     [#assign index3 = (index3 +1)]
+                                    [#assign index4 = (index4 +1)]
                                 [/#list]
                             [/#if]
                         [/#if]
@@ -1182,7 +1247,7 @@ CONST TSL_LinRotMethods_T MyLinRots_Methods =
                         [#if define.value = "1"]
                             [#if (total_5ch_linrots_lin_M2_B_NBR_nb != 0)]
                                 [#list 0..(total_5ch_linrots_lin_M2_B_NBR_nb -1) as i]
-                                    [#lt]   /* LinRotB sensor ${index2} = S${(index2 + 1)} */
+                                    [#lt]   /* LinRotB sensor ${index4} = S${(index4 + 1)} */
                                     [#lt]   {
                                     [#lt]   &MyLinRots_Data[${index2}],
                                     [#lt]   &MyLinRots_Param[${index2}],
@@ -1191,11 +1256,13 @@ CONST TSL_LinRotMethods_T MyLinRots_Methods =
                                     [#lt]   MyLinRotB${index3}_DeltaCoeff,
                                     [#lt]   (TSL_tsignPosition_T *)TSL_POSOFF_5CH_LIN_M2,
                                     [#lt]   TSL_SCTCOMP_5CH_LIN_M2,
-                                    [#lt]   TSL_POSCORR_5CH_LIN_M2,
-                                    [#lt]   }[#if index2 != (total_objects_nb - 1)],[/#if]
+                                    [#lt]   TSL_POSCORR_5CH_LIN_M2
+                                    [#lt]   }[#if index0 != (total_objects_nb - 1)],[/#if]
+                                    [#assign index0 = (index0 +1)]
                                     [#assign index1 = (index1 +5)]
                                     [#assign index2 = (index2 +1)]
                                     [#assign index3 = (index3 +1)]
+                                    [#assign index4 = (index4 +1)]
                                 [/#list]
                             [/#if]
                         [/#if]
@@ -1204,7 +1271,7 @@ CONST TSL_LinRotMethods_T MyLinRots_Methods =
                         [#if define.value = "1"]
                             [#if (total_5ch_linrots_lin_H_B_NBR_nb != 0)]
                                 [#list 0..(total_5ch_linrots_lin_H_B_NBR_nb -1) as i]
-                                    [#lt]   /* LinRotB sensor ${index2} = S${(index2 + 1)} */
+                                    [#lt]   /* LinRotB sensor ${index4} = S${(index4 + 1)} */
                                     [#lt]   {
                                     [#lt]   &MyLinRots_Data[${index2}],
                                     [#lt]   &MyLinRots_Param[${index2}],
@@ -1213,11 +1280,13 @@ CONST TSL_LinRotMethods_T MyLinRots_Methods =
                                     [#lt]   MyLinRotB${index3}_DeltaCoeff,
                                     [#lt]   (TSL_tsignPosition_T *)TSL_POSOFF_5CH_LIN_H,
                                     [#lt]   TSL_SCTCOMP_5CH_LIN_H,
-                                    [#lt]   TSL_POSCORR_5CH_LIN_H,
-                                    [#lt]   }[#if index2 != (total_objects_nb - 1)],[/#if]
+                                    [#lt]   TSL_POSCORR_5CH_LIN_H
+                                    [#lt]   }[#if index0 != (total_objects_nb - 1)],[/#if]
+                                    [#assign index0 = (index0 +1)]
                                     [#assign index1 = (index1 +5)]
                                     [#assign index2 = (index2 +1)]
                                     [#assign index3 = (index3 +1)]
+                                    [#assign index4 = (index4 +1)]
                                 [/#list]
                             [/#if]
                         [/#if]
@@ -1226,7 +1295,7 @@ CONST TSL_LinRotMethods_T MyLinRots_Methods =
                         [#if define.value = "1"]
                             [#if (total_5ch_linrots_rot_M_B_NBR_nb != 0)]
                                 [#list 0..(total_5ch_linrots_rot_M_B_NBR_nb -1) as i]
-                                    [#lt]   /* LinRotB sensor ${index2} = S${(index2 + 1)} */
+                                    [#lt]   /* LinRotB sensor ${index4} = S${(index4 + 1)} */
                                     [#lt]   {
                                     [#lt]   &MyLinRots_Data[${index2}],
                                     [#lt]   &MyLinRots_Param[${index2}],
@@ -1235,11 +1304,13 @@ CONST TSL_LinRotMethods_T MyLinRots_Methods =
                                     [#lt]   MyLinRotB${index3}_DeltaCoeff,
                                     [#lt]   (TSL_tsignPosition_T *)TSL_POSOFF_5CH_ROT_M,
                                     [#lt]   TSL_SCTCOMP_5CH_ROT_M,
-                                    [#lt]   0,
-                                    [#lt]   }[#if index2 != (total_objects_nb - 1)],[/#if]
+                                    [#lt]   0
+                                    [#lt]   }[#if index0 != (total_objects_nb - 1)],[/#if]
+                                    [#assign index0 = (index0 +1)]
                                     [#assign index1 = (index1 +5)]
                                     [#assign index2 = (index2 +1)]
                                     [#assign index3 = (index3 +1)]
+                                    [#assign index4 = (index4 +1)]
                                 [/#list]
                             [/#if]
                         [/#if]
@@ -1248,7 +1319,7 @@ CONST TSL_LinRotMethods_T MyLinRots_Methods =
                         [#if define.value = "1"]
                             [#if (total_5ch_linrots_rot_D_B_NBR_nb != 0)]
                                 [#list 0..(total_5ch_linrots_rot_D_B_NBR_nb -1) as i]
-                                    [#lt]   /* LinRotB sensor ${index2} = S${(index2 + 1)} */
+                                    [#lt]   /* LinRotB sensor ${index4} = S${(index4 + 1)} */
                                     [#lt]   {
                                     [#lt]   &MyLinRots_Data[${index2}],
                                     [#lt]   &MyLinRots_Param[${index2}],
@@ -1257,11 +1328,13 @@ CONST TSL_LinRotMethods_T MyLinRots_Methods =
                                     [#lt]   MyLinRotB${index3}_DeltaCoeff,
                                     [#lt]   (TSL_tsignPosition_T *)TSL_POSOFF_5CH_ROT_D,
                                     [#lt]   TSL_SCTCOMP_5CH_ROT_M,
-                                    [#lt]   0,
-                                    [#lt]   }[#if index2 != (total_objects_nb - 1)],[/#if]
+                                    [#lt]   0
+                                    [#lt]   }[#if index0 != (total_objects_nb - 1)],[/#if]
+                                    [#assign index0 = (index0 +1)]
                                     [#assign index1 = (index1 +5)]
                                     [#assign index2 = (index2 +1)]
                                     [#assign index3 = (index3 +1)]
+                                    [#assign index4 = (index4 +1)]
                                 [/#list]
                             [/#if]
                         [/#if]
@@ -1270,7 +1343,7 @@ CONST TSL_LinRotMethods_T MyLinRots_Methods =
                         [#if define.value = "1"]
                             [#if (total_6ch_linrots_lin_M1_B_NBR_nb != 0)]
                                 [#list 0..(total_6ch_linrots_lin_M1_B_NBR_nb -1) as i]
-                                    [#lt]   /* LinRotB sensor ${index2} = S${(index2 + 1)} */
+                                    [#lt]   /* LinRotB sensor ${index4} = S${(index4 + 1)} */
                                     [#lt]   {
                                     [#lt]   &MyLinRots_Data[${index2}],
                                     [#lt]   &MyLinRots_Param[${index2}],
@@ -1279,11 +1352,13 @@ CONST TSL_LinRotMethods_T MyLinRots_Methods =
                                     [#lt]   MyLinRotB${index3}_DeltaCoeff,
                                     [#lt]   (TSL_tsignPosition_T *)TSL_POSOFF_6CH_LIN_M1,
                                     [#lt]   TSL_SCTCOMP_6CH_LIN_M1,
-                                    [#lt]   TSL_POSCORR_6CH_LIN_M1,
-                                    [#lt]   }[#if index2 != (total_objects_nb - 1)],[/#if]
+                                    [#lt]   TSL_POSCORR_6CH_LIN_M1
+                                    [#lt]   }[#if index0 != (total_objects_nb - 1)],[/#if]
+                                    [#assign index0 = (index0 +1)]
                                     [#assign index1 = (index1 +6)]
                                     [#assign index2 = (index2 +1)]
                                     [#assign index3 = (index3 +1)]
+                                    [#assign index4 = (index4 +1)]
                                 [/#list]
                             [/#if]
                         [/#if]
@@ -1292,7 +1367,7 @@ CONST TSL_LinRotMethods_T MyLinRots_Methods =
                         [#if define.value = "1"]
                             [#if (total_6ch_linrots_lin_M2_B_NBR_nb != 0)]
                                 [#list 0..(total_6ch_linrots_lin_M2_B_NBR_nb -1) as i]
-                                    [#lt]   /* LinRotB sensor ${index2} = S${(index2 + 1)} */
+                                    [#lt]   /* LinRotB sensor ${index4} = S${(index4 + 1)} */
                                     [#lt]   {
                                     [#lt]   &MyLinRots_Data[${index2}],
                                     [#lt]   &MyLinRots_Param[${index2}],
@@ -1301,11 +1376,13 @@ CONST TSL_LinRotMethods_T MyLinRots_Methods =
                                     [#lt]   MyLinRotB${index3}_DeltaCoeff,
                                     [#lt]   (TSL_tsignPosition_T *)TSL_POSOFF_6CH_LIN_M2,
                                     [#lt]   TSL_SCTCOMP_6CH_LIN_M2,
-                                    [#lt]   TSL_POSCORR_6CH_LIN_M2,
-                                    [#lt]   }[#if index2 != (total_objects_nb - 1)],[/#if]
+                                    [#lt]   TSL_POSCORR_6CH_LIN_M2
+                                    [#lt]   }[#if index0 != (total_objects_nb - 1)],[/#if]
+                                    [#assign index0 = (index0 +1)]
                                     [#assign index1 = (index1 +6)]
                                     [#assign index2 = (index2 +1)]
                                     [#assign index3 = (index3 +1)]
+                                    [#assign index4 = (index4 +1)]
                                 [/#list]
                             [/#if]
                         [/#if]
@@ -1314,7 +1391,7 @@ CONST TSL_LinRotMethods_T MyLinRots_Methods =
                         [#if define.value = "1"]
                             [#if (total_6ch_linrots_lin_H_B_NBR_nb != 0)]
                                 [#list 0..(total_6ch_linrots_lin_H_B_NBR_nb -1) as i]
-                                    [#lt]   /* LinRotB sensor ${index2} = S${(index2 + 1)} */
+                                    [#lt]   /* LinRotB sensor ${index4} = S${(index4 + 1)} */
                                     [#lt]   {
                                     [#lt]   &MyLinRots_Data[${index2}],
                                     [#lt]   &MyLinRots_Param[${index2}],
@@ -1323,11 +1400,13 @@ CONST TSL_LinRotMethods_T MyLinRots_Methods =
                                     [#lt]   MyLinRotB${index3}_DeltaCoeff,
                                     [#lt]   (TSL_tsignPosition_T *)TSL_POSOFF_6CH_LIN_H,
                                     [#lt]   TSL_SCTCOMP_6CH_LIN_H,
-                                    [#lt]   TSL_POSCORR_6CH_LIN_H,
-                                    [#lt]   }[#if index2 != (total_objects_nb - 1)],[/#if]
+                                    [#lt]   TSL_POSCORR_6CH_LIN_H
+                                    [#lt]   }[#if index0 != (total_objects_nb - 1)],[/#if]
+                                    [#assign index0 = (index0 +1)]
                                     [#assign index1 = (index1 +6)]
                                     [#assign index2 = (index2 +1)]
                                     [#assign index3 = (index3 +1)]
+                                    [#assign index4 = (index4 +1)]
                                 [/#list]
                             [/#if]
                         [/#if]
@@ -1336,7 +1415,7 @@ CONST TSL_LinRotMethods_T MyLinRots_Methods =
                         [#if define.value = "1"]
                             [#if (total_6ch_linrots_rot_M_B_NBR_nb != 0)]
                                 [#list 0..(total_6ch_linrots_rot_M_B_NBR_nb -1) as i]
-                                    [#lt]   /* LinRotB sensor ${index2} = S${(index2 + 1)} */
+                                    [#lt]   /* LinRotB sensor ${index4} = S${(index4 + 1)} */
                                     [#lt]   {
                                     [#lt]   &MyLinRots_Data[${index2}],
                                     [#lt]   &MyLinRots_Param[${index2}],
@@ -1345,11 +1424,13 @@ CONST TSL_LinRotMethods_T MyLinRots_Methods =
                                     [#lt]   MyLinRotB${index3}_DeltaCoeff,
                                     [#lt]   (TSL_tsignPosition_T *)TSL_POSOFF_6CH_ROT_M,
                                     [#lt]   TSL_SCTCOMP_6CH_ROT_M,
-                                    [#lt]   0,
-                                    [#lt]   }[#if index2 != (total_objects_nb - 1)],[/#if]
+                                    [#lt]   0
+                                    [#lt]   }[#if index0 != (total_objects_nb - 1)],[/#if]
+                                    [#assign index0 = (index0 +1)]
                                     [#assign index1 = (index1 +6)]
                                     [#assign index2 = (index2 +1)]
                                     [#assign index3 = (index3 +1)]
+                                    [#assign index4 = (index4 +1)]
                                 [/#list]
                             [/#if]
                         [/#if]
@@ -1375,7 +1456,8 @@ CONST TSL_Object_T MyObjects[TSLPRM_TOTAL_OBJECTS] =
 [#-- ************************************************************************************************** --]
 [#-- list of objects  1 per key, 1 per linear/rot --]
 [#-- if touchkey --]
-  { TSL_OBJ_TOUCHKEY, (TSL_TouchKey_T *)&MyTKeys[${i}] }[#if i!=(total_channels_nb-1)],[/#if]
+  { TSL_OBJ_TOUCHKEY, (TSL_TouchKey_T *)&MyTKeys[${i}] }[#if i!=(total_objects_nb - 1)],[/#if]
+        [#assign index1 = index1 +1]
     [/#list]
 [/#if]
 [#if total_touchkeys_b_nb != 0]
@@ -1383,24 +1465,45 @@ CONST TSL_Object_T MyObjects[TSLPRM_TOTAL_OBJECTS] =
 [#-- ************************************************************************************************** --]
 [#-- list of objects  1 per key, 1 per linear/rot --]
 [#-- if touchkey --]
-  { TSL_OBJ_TOUCHKEYB, (TSL_TouchKeyB_T *)&MyTKeysB[${i}] }[#if i!=(total_channels_nb-1)],[/#if]
+  { TSL_OBJ_TOUCHKEYB, (TSL_TouchKeyB_T *)&MyTKeysB[${i}] }[#if i!=(total_objects_nb - 1)],[/#if]
+        [#assign index1 = index1 +1]
     [/#list]
 [/#if]
+[#-- ************************************************************************************************** --]
 [#if total_linrots_nb != 0]
-    [#list 0..(total_linrots_nb -1) as i]
-[#-- if linrot --]
-  { TSL_OBJ_LINEAR, (TSL_LinRot_T *)&MyLinRots[${i}] }[#if index1!=(total_objects_nb-1)],[/#if]
-[#-- ************************************************************************************************** --]
+[#-- if linrots --]
+[#if total_lins_nb != 0]
+[#-- if lins --]
+    [#list 0..(total_lins_nb -1) as i]
+  { TSL_OBJ_LINEAR, (TSL_LinRot_T *)&MyLinRots[${i}] }[#if index1!=(total_objects_nb - 1)],[/#if]
         [#assign index1 = index1 +1]
     [/#list]
 [/#if]
-[#if total_linrots_b_nb != 0]
-    [#list 0..(total_linrots_b_nb -1) as i]
-[#-- if linrot --]
-  { TSL_OBJ_LINEARB, (TSL_LinRotB_T *)&MyLinRotsB[${i}] }[#if index1!=(total_objects_nb-1)],[/#if]
-[#-- ************************************************************************************************** --]
+[#if total_rots_nb != 0]
+[#-- if rots --]
+    [#list total_lins_nb..(total_linrots_nb - 1) as i]
+  { TSL_OBJ_ROTARY, (TSL_LinRot_T *)&MyLinRots[${i}] }[#if index1!=(total_objects_nb - 1)],[/#if]
         [#assign index1 = index1 +1]
     [/#list]
+[/#if]
+[/#if]
+[#-- ************************************************************************************************** --]
+[#if total_linrots_b_nb != 0]
+[#-- if linsrot_b --]
+[#if total_lins_b_nb != 0]
+[#-- if lins_b --]
+    [#list 0..(total_lins_b_nb -1) as i]
+  { TSL_OBJ_LINEARB, (TSL_LinRotB_T *)&MyLinRotsB[${i}] }[#if index1!=(total_objects_nb - 1)],[/#if]
+        [#assign index1 = index1 +1]
+    [/#list]
+[/#if]
+[#if total_rots_b_nb != 0]
+[#-- if rots_b --]
+    [#list total_lins_b_nb..(total_linrots_b_nb- 1) as i]
+  { TSL_OBJ_ROTARYB, (TSL_LinRotB_T *)&MyLinRotsB[${i}] }[#if index1!=(total_objects_nb - 1)],[/#if]
+        [#assign index1 = index1 +1]
+    [/#list]
+[/#if]
 [/#if]
 };
 

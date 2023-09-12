@@ -550,6 +550,33 @@
 #t#treturn;
 #t}
 #t${mspinitvar} = 1;
+
+[#assign listOfLocalVariables =""]
+    [#assign resultList =""]
+[#list ipvar.configModelList as instanceData]
+[#if instanceData.initServices??]
+    [#if instanceData.initServices.pclockConfig??]
+        [#assign   pclockConfig=instanceData.initServices.pclockConfig] [#--list0--]
+        [#list pclockConfig.configs as config] [#--list1--]
+            [@common.getLocalVariable configModel1=config listOfLocalVariables=listOfLocalVariables resultList=resultList/]
+            [#assign listOfLocalVariables =resultList]
+        [/#list]
+    [/#if]
+[/#if]
+[/#list]
+#n
+[#assign clockInst=""]
+[#assign nTab=1]
+
+[#list ipvar.configModelList as instanceData]
+[#if instanceData.initServices??]
+    [#if instanceData.initServices.pclockConfig??]
+[#assign   pclockConfig=instanceData.initServices.pclockConfig] [#--list0--]
+[@common.generateConfigModelListCode configModel=pclockConfig inst=""  nTab=2 index=""/]#n
+#n
+    [/#if]
+[/#if]
+[/#list]
 [#assign ipHandler = "h" + ipvar.ipName?lower_case]
 
 [@generateServiceCode ipName=ipvar.ipName serviceType="Init" modeName=ipvar.ipName instHandler=ipHandler tabN=1/]

@@ -93,6 +93,7 @@
   * @param  Instance Type-C port identifier
   *         This parameter can be take one of the following values:
   *         @arg @ref USBPD_PWR_TYPE_C_PORT_1
+  *         @arg @ref USBPD_PWR_TYPE_C_PORT_2
   * @retval BSP status
   */
 int32_t BSP_USBPD_PWR_Init(uint32_t Instance)
@@ -114,6 +115,7 @@ int32_t BSP_USBPD_PWR_Init(uint32_t Instance)
   * @param  Instance Type-C port identifier
   *         This parameter can be take one of the following values:
   *         @arg @ref USBPD_PWR_TYPE_C_PORT_1
+  *         @arg @ref USBPD_PWR_TYPE_C_PORT_2
   * @retval BSP status
   */
 int32_t BSP_USBPD_PWR_Deinit(uint32_t Instance)
@@ -136,6 +138,7 @@ int32_t BSP_USBPD_PWR_Deinit(uint32_t Instance)
   * @param  Instance Type-C port identifier
   *         This parameter can be take one of the following values:
   *         @arg @ref USBPD_PWR_TYPE_C_PORT_1
+  *         @arg @ref USBPD_PWR_TYPE_C_PORT_2
   * @retval BSP status
   */
 int32_t BSP_USBPD_PWR_VBUSInit(uint32_t Instance)
@@ -158,6 +161,7 @@ int32_t BSP_USBPD_PWR_VBUSInit(uint32_t Instance)
   * @param  Instance Type-C port identifier
   *         This parameter can be take one of the following values:
   *         @arg @ref USBPD_PWR_TYPE_C_PORT_1
+  *         @arg @ref USBPD_PWR_TYPE_C_PORT_2
   * @retval BSP status
   */
 int32_t BSP_USBPD_PWR_VBUSDeInit(uint32_t Instance)
@@ -333,6 +337,7 @@ int32_t BSP_USBPD_PWR_VBUSSetVoltage_APDO(uint32_t Instance,
   * @param  Instance Type-C port identifier
   *         This parameter can be take one of the following values:
   *         @arg @ref USBPD_PWR_TYPE_C_PORT_1
+  *         @arg @ref USBPD_PWR_TYPE_C_PORT_2
   * @param  pVoltage Pointer on measured voltage level (in mV)
   * @retval BSP status
   */
@@ -357,6 +362,7 @@ int32_t BSP_USBPD_PWR_VBUSGetVoltage(uint32_t Instance, uint32_t *pVoltage)
   * @param  Instance Type-C port identifier
   *         This parameter can be take one of the following values:
   *         @arg @ref USBPD_PWR_TYPE_C_PORT_1
+  *         @arg @ref USBPD_PWR_TYPE_C_PORT_2
   * @param  pCurrent Pointer on measured current level (in mA)
   * @retval BSP status
   */
@@ -384,6 +390,7 @@ int32_t BSP_USBPD_PWR_VBUSGetCurrent(uint32_t Instance, int32_t *pCurrent)
   * @param  Instance Type-C port identifier
   *         This parameter can be take one of the following values:
   *         @arg @ref USBPD_PWR_TYPE_C_PORT_1
+  *         @arg @ref USBPD_PWR_TYPE_C_PORT_2
   * @param  CCPinId Type-C CC pin identifier
   *         This parameter can be take one of the following values:
   *         @arg @ref USBPD_PWR_TYPE_C_CC1
@@ -410,6 +417,7 @@ int32_t BSP_USBPD_PWR_VCONNInit(uint32_t Instance,
   * @param  Instance Type-C port identifier
   *         This parameter can be take one of the following values:
   *         @arg @ref USBPD_PWR_TYPE_C_PORT_1
+  *         @arg @ref USBPD_PWR_TYPE_C_PORT_2
   * @param  CCPinId Type-C CC pin identifier
   *         This parameter can be take one of the following values:
   *         @arg @ref USBPD_PWR_TYPE_C_CC1
@@ -436,6 +444,7 @@ int32_t BSP_USBPD_PWR_VCONNDeInit(uint32_t Instance,
   * @param  Instance Type-C port identifier
   *         This parameter can be take one of the following values:
   *         @arg @ref USBPD_PWR_TYPE_C_PORT_1
+  *         @arg @ref USBPD_PWR_TYPE_C_PORT_2
   * @param  CCPinId Type-C CC pin identifier
   *         This parameter can be take one of the following values:
   *         @arg @ref USBPD_PWR_TYPE_C_CC1
@@ -462,6 +471,7 @@ int32_t BSP_USBPD_PWR_VCONNOn(uint32_t Instance,
   * @param  Instance Type-C port identifier
   *         This parameter can be take one of the following values:
   *         @arg @ref USBPD_PWR_TYPE_C_PORT_1
+  *         @arg @ref USBPD_PWR_TYPE_C_PORT_2
   * @param  CCPinId CC pin identifier
   *         This parameter can be take one of the following values:
   *         @arg @ref USBPD_PWR_TYPE_C_CC1
@@ -519,6 +529,7 @@ int32_t BSP_USBPD_PWR_VCONNIsOn(uint32_t Instance,
   * @param  Instance Type-C port identifier
   *         This parameter can be take one of the following values:
   *         @arg @ref USBPD_PWR_TYPE_C_PORT_1
+  *         @arg @ref USBPD_PWR_TYPE_C_PORT_2
   * @param  VoltageThreshold VBUS disconnection voltage threshold (in mV)
   * @retval BSP status
   */
@@ -546,6 +557,7 @@ int32_t BSP_USBPD_PWR_SetVBUSDisconnectionThreshold(uint32_t Instance,
   * @param  Instance Type-C port identifier
   *         This parameter can be take one of the following values:
   *         @arg @ref USBPD_PWR_TYPE_C_PORT_1
+  *         @arg @ref USBPD_PWR_TYPE_C_PORT_2
   * @param  pfnVBUSDetectCallback callback function pointer
   * @retval BSP status
   */

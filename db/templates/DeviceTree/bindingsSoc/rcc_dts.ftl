@@ -100,12 +100,17 @@
 			[/#list]
 						[#if (PLLUsed! = 1) ]
 			[#lt]${T1}pll${PLLnb}:st,pll@${PLLnb?number -1} {
-				[#lt]${T2}cfg = < ${DIVM} ${DIVN} ${DIVP} ${DIVQ} ${DIVR} ${PQR}>;
+				[#lt]${T2}cfg = < ${DIVM} ${DIVN} ${DIVP} ${DIVQ} ${DIVR} ${PQR} >;
 								[#if PLLMODE == "RCC_PLL_FRACTIONAL"]
-									[#lt]${T2}frac = < ${PLLFRAC} >;
+[#if PLLFRAC?starts_with("0x")]
+									[#lt]${T2}frac = < ${PLLFRAC}>;
+[#else]
+[#assign fractional = String.format("0x%x" , Integer.valueOf(PLLFRAC))]
+									[#lt]${T2}frac = < ${fractional}>;
+[/#if]
 								[/#if]
 				[#if PLLCSG == "true"]
-									[#lt]${T2}csg = < ${PLLMODPER} ${PLLINCSTEP} ${PLLSSCGMODE}>; [#-- optionnal --]
+									[#lt]${T2}csg = < ${PLLMODPER} ${PLLINCSTEP} ${PLLSSCGMODE} >;
 								[/#if]
 [#if srvcmx_isTargetedFw_inDTS("U-BOOT")][#--FW contextualization--]
 				[#lt]${T2}u-boot,dm-pre-reloc;

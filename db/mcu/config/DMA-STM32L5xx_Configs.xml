@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
+<IP xmlns="http://mcd.rou.st.com/modules.php?name=mcu" DBVersion="V4.0" Name="DMA" Version="STM32Cube_FW_L5_V0.3.0" IncludeFile="stm32l5xx_hal.h" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Configs.xsd">
+    <RefConfig Name="HAL_DMA_Init">
+      <CallLibMethod Name="HAL_DMA_Init"/>
+      
+      <IFCondition Expression = "Channel_PRIV_NPRIV=DMA_CHANNEL_NPRIV_DISABLE">
+      <CallLibMethod Name="HAL_DMA_ConfigChannelAttributes">
+         <MethodArg Name="ChannelAttributes" FValue="DMA_CHANNEL_NPRIV"/>
+      </CallLibMethod> 
+      </IFCondition>
+      <IFCondition Expression = "Channel_PRIV_NPRIV=DMA_CHANNEL_PRIV_ENABLE">
+      <CallLibMethod Name="HAL_DMA_ConfigChannelAttributes">
+         <MethodArg Name="ChannelAttributes" FValue="DMA_CHANNEL_PRIV"/>
+      </CallLibMethod> 
+      </IFCondition>
+
+
+       <IFCondition Expression ="S_SECURE &amp;(Channel_SEC_NSEC=DMA_CHANNEL_NSEC_DISABLE) &amp; SEM_M33S ">
+       <CallLibMethod Name="HAL_DMA_ConfigChannelAttributes">
+         <MethodArg Name="ChannelAttributes" FValue="DMA_CHANNEL_NSEC"/>
+      </CallLibMethod> 
+       </IFCondition>       
+       <IFCondition Expression ="S_SECURE &amp;(Channel_SEC_NSEC=DMA_CHANNEL_SEC_ENABLE) &amp; SEM_M33S ">
+       <CallLibMethod Name="HAL_DMA_ConfigChannelAttributes">
+         <MethodArg Name="ChannelAttributes" FValue="DMA_CHANNEL_SEC"/>
+      </CallLibMethod> 
+       </IFCondition>
+
+       <IFCondition Expression ="S_SECURE &amp;(Src_SEC_NSEC=DMA_CHANNEL_SRC_NSEC_DISABLE) &amp; SEM_M33S">
+       <CallLibMethod Name="HAL_DMA_ConfigChannelAttributes">
+         <MethodArg Name="ChannelAttributes" FValue="DMA_CHANNEL_SRC_NSEC"/>
+      </CallLibMethod> 
+      </IFCondition>
+      <IFCondition Expression ="S_SECURE &amp;(Src_SEC_NSEC=DMA_CHANNEL_SRC_SEC_ENABLE) &amp; SEM_M33S">
+       <CallLibMethod Name="HAL_DMA_ConfigChannelAttributes">
+         <MethodArg Name="ChannelAttributes" FValue="DMA_CHANNEL_SRC_SEC"/>
+      </CallLibMethod> 
+      </IFCondition>
+
+      <IFCondition Expression ="S_SECURE &amp;(Dest_SEC_NSEC=DMA_CHANNEL_DEST_SEC_ENABLE) &amp; SEM_M33S">
+       <CallLibMethod Name="HAL_DMA_ConfigChannelAttributes">
+         <MethodArg Name="ChannelAttributes" FValue="DMA_CHANNEL_DEST_SEC"/>
+      </CallLibMethod> 
+      </IFCondition>
+      <IFCondition Expression ="S_SECURE &amp;(Dest_SEC_NSEC=DMA_CHANNEL_DEST_NSEC_DISABLE) &amp; SEM_M33S">
+       <CallLibMethod Name="HAL_DMA_ConfigChannelAttributes">
+         <MethodArg Name="ChannelAttributes" FValue="DMA_CHANNEL_DEST_NSEC"/>
+      </CallLibMethod> 
+      </IFCondition>
+
+      <IFCondition Expression = "((Request=DMA_REQUEST_GENERATOR0)|(Request=DMA_REQUEST_GENERATOR1)|(Request=DMA_REQUEST_GENERATOR2)|(Request=DMA_REQUEST_GENERATOR3))&amp; !(SignalID=NONE)">
+         <CallLibMethod Name="HAL_DMAEx_ConfigMuxRequestGenerator"/>
+      </IFCondition>
+      <IFCondition Expression = "!(SyncSignalID=NONE)">
+        <CallLibMethod Name="HAL_DMAEx_ConfigMuxSync">
+          <MethodArg Name="RequestNumber" ParameterName="SyncRequestNumber"/>
+        </CallLibMethod>
+      </IFCondition>
+      <IFCondition Expression = "(SyncSignalID=NONE) &amp; (EventEnable=ENABLE)">
+        <CallLibMethod Name="HAL_DMAEx_ConfigMuxSync">
+          <MethodArg Name="RequestNumber" ParameterName="SyncRequestNumber"/>
+          <MethodArg Name="SyncSignalID" FValue="HAL_DMAMUX1_SYNC_EXTI0"/> <!--Forcage-->
+          <MethodArg Name="SyncEnable" FValue="DISABLE"/> <!--Forcage-->
+        </CallLibMethod>
+      </IFCondition>
+      <Component Name="HAL:DMA"/>
+    </RefConfig>
+    <RefConfig Name="HAL_DMA_DeInit">
+      <CallLibMethod Name="HAL_DMA_DeInit"/>
+    </RefConfig>
+    <LibMethod Comment="" Name="HAL_DMA_Init">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hdma" TypeName="DMA_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="DMA_Channel_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="DMA_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="Request"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Direction"/>
+                <Argument AddressOf="false" GenericType="simple" Name="PeriphInc"/>
+                <Argument AddressOf="false" GenericType="simple" Name="MemInc"/>
+                <Argument AddressOf="false" GenericType="simple" Name="PeriphDataAlignment"/>
+                <Argument AddressOf="false" GenericType="simple" Name="MemDataAlignment"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Mode"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Priority"/>
+            </Argument>
+            <Argument AddressOf="false" GenericType="enum" Name="Lock" TypeName="HAL_LockTypeDef"/>
+            <Argument AddressOf="false" GenericType="enum" Name="State" TypeName="HAL_DMA_StateTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="Parent"/>
+            <Argument AddressOf="true" GenericType="simple" Name="XferCpltCallback"/>
+            <Argument AddressOf="true" GenericType="simple" Name="XferHalfCpltCallback"/>
+            <Argument AddressOf="true" GenericType="simple" Name="XferM1CpltCallback"/>
+            <Argument AddressOf="true" GenericType="simple" Name="XferM1HalfCpltCallback"/>
+            <Argument AddressOf="true" GenericType="simple" Name="XferErrorCallback"/>
+            <Argument AddressOf="true" GenericType="simple" Name="XferAbortCallback"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode"/>
+            <Argument AddressOf="false" GenericType="baseaddress" Name="DmaBaseAddress" TypeName="DMA_TypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ChannelIndex"/>
+            <Argument AddressOf="false" GenericType="baseaddress" Name="DMAmuxChannel" TypeName="DMAMUX_Channel_TypeDef"/>
+            <Argument AddressOf="false" GenericType="baseaddress" Name="DMAmuxChannelStatus" TypeName="DMAMUX_ChannelStatus_TypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="DMAmuxChannelStatusMask"/>
+            <Argument AddressOf="false" GenericType="baseaddress" Name="DMAmuxRequestGen" TypeName="DMAMUX_RequestGen_TypeDef"/>
+            <Argument AddressOf="false" GenericType="baseaddress" Name="DMAmuxRequestGenStatus" TypeName="DMAMUX_RequestGenStatus_TypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="DMAmuxRequestGenStatusMask"/>
+        </Argument>
+    </LibMethod>
+
+<LibMethod Comment="" Name="HAL_DMA_ConfigChannelAttributes">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hdma" TypeName="DMA_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="DMA_Channel_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="DMA_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="Request"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Direction"/>
+                <Argument AddressOf="false" GenericType="simple" Name="PeriphInc"/>
+                <Argument AddressOf="false" GenericType="simple" Name="MemInc"/>
+                <Argument AddressOf="false" GenericType="simple" Name="PeriphDataAlignment"/>
+                <Argument AddressOf="false" GenericType="simple" Name="MemDataAlignment"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Mode"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Priority"/>
+            </Argument>
+            <Argument AddressOf="false" GenericType="enum" Name="Lock" TypeName="HAL_LockTypeDef"/>
+            <Argument AddressOf="false" GenericType="enum" Name="State" TypeName="HAL_DMA_StateTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="Parent"/>
+            <Argument AddressOf="true" GenericType="simple" Name="XferCpltCallback"/>
+            <Argument AddressOf="true" GenericType="simple" Name="XferHalfCpltCallback"/>
+            <Argument AddressOf="true" GenericType="simple" Name="XferM1CpltCallback"/>
+            <Argument AddressOf="true" GenericType="simple" Name="XferM1HalfCpltCallback"/>
+            <Argument AddressOf="true" GenericType="simple" Name="XferErrorCallback"/>
+            <Argument AddressOf="true" GenericType="simple" Name="XferAbortCallback"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode"/>
+            <Argument AddressOf="false" GenericType="baseaddress" Name="DmaBaseAddress" TypeName="DMA_TypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ChannelIndex"/>
+            <Argument AddressOf="false" GenericType="baseaddress" Name="DMAmuxChannel" TypeName="DMAMUX_Channel_TypeDef"/>
+            <Argument AddressOf="false" GenericType="baseaddress" Name="DMAmuxChannelStatus" TypeName="DMAMUX_ChannelStatus_TypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="DMAmuxChannelStatusMask"/>
+            <Argument AddressOf="false" GenericType="baseaddress" Name="DMAmuxRequestGen" TypeName="DMAMUX_RequestGen_TypeDef"/>
+            <Argument AddressOf="false" GenericType="baseaddress" Name="DMAmuxRequestGenStatus" TypeName="DMAMUX_RequestGenStatus_TypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="DMAmuxRequestGenStatusMask"/>
+        </Argument>
+        <Argument AddressOf="false" GenericType="simple" Name="ChannelAttributes" OptimizationCondition="equal"/>
+    </LibMethod>
+
+    <LibMethod Comment="" Name="HAL_DMA_DeInit">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hdma" TypeName="DMA_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="DMA_Channel_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="DMA_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="Request"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Direction"/>
+                <Argument AddressOf="false" GenericType="simple" Name="PeriphInc"/>
+                <Argument AddressOf="false" GenericType="simple" Name="MemInc"/>
+                <Argument AddressOf="false" GenericType="simple" Name="PeriphDataAlignment"/>
+                <Argument AddressOf="false" GenericType="simple" Name="MemDataAlignment"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Mode"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Priority"/>
+            </Argument>
+            <Argument AddressOf="false" GenericType="enum" Name="Lock" TypeName="HAL_LockTypeDef"/>
+            <Argument AddressOf="false" GenericType="enum" Name="State" TypeName="HAL_DMA_StateTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="Parent"/>
+            <Argument AddressOf="true" GenericType="simple" Name="XferCpltCallback"/>
+            <Argument AddressOf="true" GenericType="simple" Name="XferHalfCpltCallback"/>
+            <Argument AddressOf="true" GenericType="simple" Name="XferM1CpltCallback"/>
+            <Argument AddressOf="true" GenericType="simple" Name="XferM1HalfCpltCallback"/>
+            <Argument AddressOf="true" GenericType="simple" Name="XferErrorCallback"/>
+            <Argument AddressOf="true" GenericType="simple" Name="XferAbortCallback"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode"/>
+            <Argument AddressOf="false" GenericType="baseaddress" Name="DmaBaseAddress" TypeName="DMA_TypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ChannelIndex"/>
+            <Argument AddressOf="false" GenericType="baseaddress" Name="DMAmuxChannel" TypeName="DMAMUX_Channel_TypeDef"/>
+            <Argument AddressOf="false" GenericType="baseaddress" Name="DMAmuxChannelStatus" TypeName="DMAMUX_ChannelStatus_TypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="DMAmuxChannelStatusMask"/>
+            <Argument AddressOf="false" GenericType="baseaddress" Name="DMAmuxRequestGen" TypeName="DMAMUX_RequestGen_TypeDef"/>
+            <Argument AddressOf="false" GenericType="baseaddress" Name="DMAmuxRequestGenStatus" TypeName="DMAMUX_RequestGenStatus_TypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="DMAmuxRequestGenStatusMask"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_DMA_IRQHandler">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hdma" TypeName="DMA_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="DMA_Channel_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="DMA_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="Request"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Direction"/>
+                <Argument AddressOf="false" GenericType="simple" Name="PeriphInc"/>
+                <Argument AddressOf="false" GenericType="simple" Name="MemInc"/>
+                <Argument AddressOf="false" GenericType="simple" Name="PeriphDataAlignment"/>
+                <Argument AddressOf="false" GenericType="simple" Name="MemDataAlignment"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Mode"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Priority"/>
+            </Argument>
+            <Argument AddressOf="false" GenericType="enum" Name="Lock" TypeName="HAL_LockTypeDef"/>
+            <Argument AddressOf="false" GenericType="enum" Name="State" TypeName="HAL_DMA_StateTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="Parent"/>
+            <Argument AddressOf="true" GenericType="simple" Name="XferCpltCallback"/>
+            <Argument AddressOf="true" GenericType="simple" Name="XferHalfCpltCallback"/>
+            <Argument AddressOf="true" GenericType="simple" Name="XferM1CpltCallback"/>
+            <Argument AddressOf="true" GenericType="simple" Name="XferM1HalfCpltCallback"/>
+            <Argument AddressOf="true" GenericType="simple" Name="XferErrorCallback"/>
+            <Argument AddressOf="true" GenericType="simple" Name="XferAbortCallback"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode"/>
+            <Argument AddressOf="false" GenericType="baseaddress" Name="DmaBaseAddress" TypeName="DMA_TypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ChannelIndex"/>
+            <Argument AddressOf="false" GenericType="baseaddress" Name="DMAmuxChannel" TypeName="DMAMUX_Channel_TypeDef"/>
+            <Argument AddressOf="false" GenericType="baseaddress" Name="DMAmuxChannelStatus" TypeName="DMAMUX_ChannelStatus_TypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="DMAmuxChannelStatusMask"/>
+            <Argument AddressOf="false" GenericType="baseaddress" Name="DMAmuxRequestGen" TypeName="DMAMUX_RequestGen_TypeDef"/>
+            <Argument AddressOf="false" GenericType="baseaddress" Name="DMAmuxRequestGenStatus" TypeName="DMAMUX_RequestGenStatus_TypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="DMAmuxRequestGenStatusMask"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="Configure the DMAMUX request generator for the selected DMA channel" Name="HAL_DMAEx_ConfigMuxRequestGenerator">
+        <Argument AddressOf="true" GenericType="struct" Name="hdma" TypeName="DMA_HandleTypeDef" Context="global">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="DMA_Stream_TypeDef *"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="DMA_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="Request"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Direction"/>
+                <Argument AddressOf="false" GenericType="simple" Name="PeriphInc"/>
+                <Argument AddressOf="false" GenericType="simple" Name="MemInc"/>
+                <Argument AddressOf="false" GenericType="simple" Name="PeriphDataAlignment"/>
+                <Argument AddressOf="false" GenericType="simple" Name="MemDataAlignment"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Mode"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Priority"/>
+            </Argument>
+            <Argument AddressOf="false" GenericType="enum" Name="Lock" TypeName="HAL_LockTypeDef"/>
+            <Argument AddressOf="false" GenericType="enum" Name="State" TypeName="HAL_DMA_StateTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="Parent"/>
+            <Argument AddressOf="true" GenericType="simple" Name="XferCpltCallback"/>
+            <Argument AddressOf="true" GenericType="simple" Name="XferHalfCpltCallback"/>
+            <Argument AddressOf="true" GenericType="simple" Name="XferM1CpltCallback"/>
+            <Argument AddressOf="true" GenericType="simple" Name="XferM1HalfCpltCallback"/>
+            <Argument AddressOf="true" GenericType="simple" Name="XferErrorCallback"/>
+            <Argument AddressOf="true" GenericType="simple" Name="XferAbortCallback"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode"/>
+            <Argument AddressOf="false" GenericType="baseaddress" Name="DmaBaseAddress" TypeName="DMA_TypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ChannelIndex"/>
+            <Argument AddressOf="false" GenericType="baseaddress" Name="DMAmuxChannel" TypeName="DMAMUX_Channel_TypeDef"/>
+            <Argument AddressOf="false" GenericType="baseaddress" Name="DMAmuxChannelStatus" TypeName="DMAMUX_ChannelStatus_TypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="DMAmuxChannelStatusMask"/>
+            <Argument AddressOf="false" GenericType="baseaddress" Name="DMAmuxRequestGen" TypeName="DMAMUX_RequestGen_TypeDef"/>
+            <Argument AddressOf="false" GenericType="baseaddress" Name="DMAmuxRequestGenStatus" TypeName="DMAMUX_RequestGenStatus_TypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="DMAmuxRequestGenStatusMask"/>
+        </Argument>
+        <Argument AddressOf="true" GenericType="struct" Name="pRequestGeneratorConfig" TypeName="HAL_DMA_MuxRequestGeneratorConfigTypeDef">
+            <Argument AddressOf="false" GenericType="simple" Name="SignalID"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Polarity"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RequestNumber"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="Configure the DMAMUX synchronization parameters for the selected DMA channel" Name="HAL_DMAEx_ConfigMuxSync">
+        <Argument AddressOf="true" GenericType="struct" Name="hdma" TypeName="DMA_HandleTypeDef" Context="global">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="DMA_Stream_TypeDef *"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="DMA_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="Request"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Direction"/>
+                <Argument AddressOf="false" GenericType="simple" Name="PeriphInc"/>
+                <Argument AddressOf="false" GenericType="simple" Name="MemInc"/>
+                <Argument AddressOf="false" GenericType="simple" Name="PeriphDataAlignment"/>
+                <Argument AddressOf="false" GenericType="simple" Name="MemDataAlignment"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Mode"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Priority"/>
+            </Argument>
+            <Argument AddressOf="false" GenericType="enum" Name="Lock" TypeName="HAL_LockTypeDef"/>
+            <Argument AddressOf="false" GenericType="enum" Name="State" TypeName="HAL_DMA_StateTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="Parent"/>
+            <Argument AddressOf="true" GenericType="simple" Name="XferCpltCallback"/>
+            <Argument AddressOf="true" GenericType="simple" Name="XferHalfCpltCallback"/>
+            <Argument AddressOf="true" GenericType="simple" Name="XferM1CpltCallback"/>
+            <Argument AddressOf="true" GenericType="simple" Name="XferM1HalfCpltCallback"/>
+            <Argument AddressOf="true" GenericType="simple" Name="XferErrorCallback"/>
+            <Argument AddressOf="true" GenericType="simple" Name="XferAbortCallback"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode"/>
+            <Argument AddressOf="false" GenericType="baseaddress" Name="DmaBaseAddress" TypeName="DMA_TypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ChannelIndex"/>
+            <Argument AddressOf="false" GenericType="baseaddress" Name="DMAmuxChannel" TypeName="DMAMUX_Channel_TypeDef"/>
+            <Argument AddressOf="false" GenericType="baseaddress" Name="DMAmuxChannelStatus" TypeName="DMAMUX_ChannelStatus_TypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="DMAmuxChannelStatusMask"/>
+            <Argument AddressOf="false" GenericType="baseaddress" Name="DMAmuxRequestGen" TypeName="DMAMUX_RequestGen_TypeDef"/>
+            <Argument AddressOf="false" GenericType="baseaddress" Name="DMAmuxRequestGenStatus" TypeName="DMAMUX_RequestGenStatus_TypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="DMAmuxRequestGenStatusMask"/>
+        </Argument>
+        <Argument AddressOf="true" GenericType="struct" Name="pSyncConfig" TypeName="HAL_DMA_MuxSyncConfigTypeDef">
+            <Argument AddressOf="false" GenericType="simple" Name="SyncSignalID"/>
+            <Argument AddressOf="false" GenericType="simple" Name="SyncPolarity"/>
+            <Argument AddressOf="false" GenericType="simple" Name="SyncEnable"/>
+            <Argument AddressOf="false" GenericType="simple" Name="EventEnable"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RequestNumber"/>
+        </Argument>
+    </LibMethod>
+
+    <!--
+    <RefComponent Cclass="HAL" Cgroup="DMA" Cversion="0.3.0">
+        <File Category="header" Name="Drivers/STM32L5xx_HAL_Driver/Inc/stm32l5xx_hal_dma.h"/>
+        <File Category="header" Name="Drivers/STM32L5xx_HAL_Driver/Inc/stm32l5xx_hal_dma_ex.h"/>
+        <File Category="source" Name="Drivers/STM32L5xx_HAL_Driver/Src/stm32l5xx_hal_dma.c"/>
+        <File Category="source" Name="Drivers/STM32L5xx_HAL_Driver/Src/stm32l5xx_hal_dma_ex.c"/>
+        <File Category="header" Name="Drivers/STM32L5xx_HAL_Driver/Inc/Legacy/stm32_hal_legacy.h"/>
+    </RefComponent>
+    -->
+</IP>

@@ -57,6 +57,7 @@ void ${defaultTaskFunction}(void const * argument)
 __weak void ${defaultTaskFunction}(void const * argument)
 [/#if]
 {
+[#compress] [#-- To avoid blank lines at the beginning --]
 [#-- Start Detection of middlewares used --]
 [#assign USE_LWIP = false]
 [#assign USE_MBEDTLS = false] 
@@ -84,10 +85,10 @@ __weak void ${defaultTaskFunction}(void const * argument)
 [#assign USE_GRAPHICS = false] 
 [#list SWIPdatas as SWIP]
   [#if SWIP.variables??]
-	[#list SWIP.variables as variable]
-	  [#if variable.name=="MiddlewareInUse"]
-	  [#assign s = variable.valueList]
-	  [#assign index = 0] 
+    [#list SWIP.variables as variable]
+      [#if variable.name=="MiddlewareInUse"]
+        [#assign s = variable.valueList]
+        [#assign index = 0] 
         [#list s as i] 
           [#if index == 0]
             [#assign mw = i]
@@ -95,11 +96,11 @@ __weak void ${defaultTaskFunction}(void const * argument)
           [#assign index = index + 1]
         [/#list]
         [#-- specific cases to be handled (no Init generation) --]  
-        [#if mw!="USBPD" && mw!="TRACER_EMB" && mw!="OPENAMP" && mw!="RESMGR_UTILITY"]
+        [#if mw!="USBPD" && mw!="TRACER_EMB" && mw!="OPENAMP" && mw!="RESMGR_UTILITY" && mw!="MotorControl"] [#--last added, cf BZ 53327 --]
           [#if mw!="GRAPHICS"]
             [#if !((mw == "LWIP") && (USE_MBEDTLS == true))]
               [#if (mw == "MBEDTLS")]
-#t/* Up to user define the empty MX_MBEDTLS_Init() function located in mbedtls.c file */
+#t/* Up to user define the empty MX_MBEDTLS_Init() function located in mbedtls.c file */#n
               [#else]
                 [#if !mw?contains("WPAN")] [#-- cf BZ 68409 --]
 #t/* init code for ${mw?replace("MX_","")?replace("_Init","")} */
@@ -121,9 +122,9 @@ __weak void ${defaultTaskFunction}(void const * argument)
 
 [#if USE_GRAPHICS] 
 /* Graphic application */  
-  GRAPHICS_MainTask();
+#tGRAPHICS_MainTask();#n
 [/#if]
-#n
+
 [#list SWIPdatas as SWIP]
   [#if SWIP.variables??]
     [#list SWIP.variables as variable]
@@ -144,6 +145,7 @@ __weak void ${defaultTaskFunction}(void const * argument)
     [/#list]
   [/#if]
 [/#list]
+[/#compress]
 [#if inMain == 1]
 #t/* USER CODE BEGIN 5 */
 [#else]

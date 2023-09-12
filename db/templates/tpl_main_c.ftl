@@ -5,10 +5,10 @@
 [#assign coreDir=""]
 [/#if]
 [#assign coreDir=sourceDir]
-[#assign contextFolder=""]
-[#if cpucore!=""]    
+[#if cpucore!="" && (contextFolder=="" || contextFolder=="/")]
 [#assign contextFolder = cpucore?replace("ARM_CORTEX_","C")+"/"]
 [/#if]
+[#assign familyName=FamilyName?lower_case]
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
@@ -50,7 +50,7 @@
 [/#if]
 [/#list]
 [#list ips as ip]
-[#if !ip?contains("FATFS") && !ip?contains("FREERTOS") && !ip?contains("NVIC")&& !ip?contains("NVIC1")&& !ip?contains("NVIC2")&& !ip?contains("CORTEX") && !ip?contains("GRAPHICS") && !ip?contains("GRAPHICS_M4")&& !ip?contains("GRAPHICS_M7") && !ip?contains("TRACER_EMB")]
+[#if !ip?contains("FATFS") && !ip?contains("FREERTOS") && !ip?contains("NVIC")&& !ip?contains("NVIC1")&& !ip?contains("NVIC2")&& !ip?contains("CORTEX") && !ip?contains("GRAPHICS") && !ip?contains("GRAPHICS_M4")&& !ip?contains("GRAPHICS_M7") && !ip?contains("TRACER_EMB")&& !ip?contains("GUI_INTERFACE")]
 [#if ip?contains("STM32_WPAN")]
 #include "app_entry.h"
 #include "app_common.h"
@@ -61,7 +61,7 @@
 [#-- Examples Migration (FCR) - Begin--]
 [#if ip?contains("FATFS")]
  [#assign familyName=FamilyName?lower_case]
- [#if familyName="stm32g0" || familyName="stm32wb" || familyName="stm32g4"]
+ [#if familyName="stm32g0" || familyName="stm32wb" || familyName="stm32g4" || familyName="stm32l5"]
  #include "app_fatfs.h"
  [#else]
  #include "fatfs.h"
@@ -98,7 +98,13 @@
 [#if bootMode?? && bootMode=="boot0" && McuDualCore??] [#-- boot0 sequence --]
 #define HSEM_ID_0 (0U) /* HW semaphore 0*/
 [/#if]
-
+[#if TZEN=="1" && Secure=="true"]
+#n
+/* Non-secure Vector table to jump to (internal Flash Bank2 here)             */
+/* Caution: address must correspond to non-secure internal Flash where is     */
+/*          mapped in the non-secure vector table                             */
+#define VTOR_TABLE_NS_START_ADDR  0x08040000UL
+[/#if]
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -235,11 +241,20 @@ ${dHandle};
 [#compress]
 [#if clockConfig??]
 /* Private function prototypes -----------------------------------------------*/
-[#if rccFctName?? && ((!McuDualCore??) || (bootMode?? && bootMode=="boot0" && cpucore=="ARM_CORTEX_M7" && McuDualCore??))]
+[#if TZEN=="1" && Secure=="true"]
+static void NonSecure_Init(void);
+[/#if]
+[#if rccFctName?? && ((!McuDualCore?? && TZEN=="0") || ((TZEN=="1" && Secure=="true") && rccIsSecure??) || ((TZEN=="1" && Secure=="false") && !rccIsSecure??)|| (bootMode?? && bootMode=="boot0" && cpucore=="ARM_CORTEX_M7" && McuDualCore??))]
 [#if USE_Touch_GFX_STACK??]
 extern "C" void SystemClock_Config(void); [#-- remove static --]
+[#if commonClockConfig??]
+extern "C" void PeriphCommonClock_Config(void);
+[/#if]
 [#else]
 void SystemClock_Config(void); [#-- remove static --]
+[#if commonClockConfig??]
+void PeriphCommonClock_Config(void);
+[/#if]
 [/#if]
 [/#if]
 [/#if]
@@ -257,7 +272,7 @@ static void MPU_Config(void);
 [/#if]
 [#if HALCompliant??]
     [#list voids as void]
-        [#if !void.ipType?contains("thirdparty")&&!void.functionName?contains("FREERTOS")&&void.functionName!="Init"&&!void.functionName?contains("FATFS")&& !void.functionName?contains("LWIP")&& !void.functionName?contains("MBEDTLS")&& !void.functionName?contains("USB_DEVICE") && !void.functionName?contains("USB_Device") && !void.functionName?contains("USB_HOST")&& !void.functionName?contains("CORTEX")&& !void.functionName?contains("SystemClock_Config")&& !void.functionName?contains("LIBJPEG")&& !void.functionName?contains("PDM2PCM")&& !void.functionName?contains("TOUCHSENSING")&& !void.functionName?contains("MotorControl")&& !void.functionName?contains("RESMGR_UTILITY") && !void.functionName?contains("OPENAMP") && !void.functionName?contains("TRACER_EMB") && !void.functionName?contains("APPE_Init") && !void.functionName?contains("ETZPC")]
+        [#if !void.ipType?contains("thirdparty")&&!void.functionName?contains("FREERTOS")&&!void.functionName?contains("VREFBUF")&&void.functionName!="Init"&&!void.functionName?contains("FATFS")&& !void.functionName?contains("LWIP")&& !void.functionName?contains("MBEDTLS")&& !void.functionName?contains("USB_DEVICE") && !void.functionName?contains("USB_Device") && !void.functionName?contains("USB_HOST")&& !void.functionName?contains("CORTEX")&& !void.functionName?contains("SystemClock_Config")&& !void.functionName?contains("LIBJPEG")&& !void.functionName?contains("PDM2PCM")&& !void.functionName?contains("TOUCHSENSING")&& !void.functionName?contains("MotorControl")&& !void.functionName?contains("RESMGR_UTILITY") && !void.functionName?contains("OPENAMP") && !void.functionName?contains("TRACER_EMB") && !void.functionName?contains("APPE_Init") && !void.functionName?contains("ETZPC") && !void.functionName?contains("GUI_INTERFACE")]
             [#if !void.functionName?contains("GRAPHICS") && !void.functionName?contains("USBPD")]
                 [#if void.isStatic]
                     static void ${""?right_pad(2)}${void.functionName}(void);
@@ -392,9 +407,15 @@ int main(void)
     [#if void.functionName?? && void.functionName?contains("SystemClock_Config") && !void.isNotGenerated]
 
 [#if rccFctName??]
-[#if (!McuDualCore??) || (bootMode?? && bootMode=="boot0" && cpucore=="ARM_CORTEX_M7" && McuDualCore??)]
+[#if (!McuDualCore?? && TZEN=="0") ||  ((TZEN=="1" && Secure=="true") && rccIsSecure??) || ((TZEN=="1" && Secure=="false") && !rccIsSecure??) || (bootMode?? && bootMode=="boot0" && cpucore=="ARM_CORTEX_M7" && McuDualCore??)]
     #n#t/* Configure the system clock */
-#tSystemClock_Config();[/#if][/#if]
+#tSystemClock_Config();
+[#if commonClockConfig??]
+#t
+/* Configure the peripherals common clocks */
+#tPeriphCommonClock_Config();
+[/#if]
+[/#if][/#if]
     [/#if]
 [/#list]
 [/#if]
@@ -420,7 +441,13 @@ int main(void)
   }
 /* USER CODE END Boot_Mode_Sequence_2 */
 [/#if]
-
+#n
+[#list voids as void]
+[#if void.functionName?? && void.functionName?contains("GTZC") && !void.isNotGenerated]
+#t/* GTZC initialisation */
+#tMX_GTZC_Init();
+[/#if]
+[/#list]
 #n
 [#list voids as void]
 [#if void.functionName?? && void.functionName?contains("IPCC") && !void.isNotGenerated]
@@ -443,10 +470,10 @@ int main(void)
 #n
 #n#t/* Initialize all configured peripherals */
 [#list voids as void]
-[#if void.functionName?? && !void.functionName?contains("FREERTOS")&&!void.functionName?contains("CORTEX")&& !void.functionName?contains("SystemClock_Config")&&void.functionName!="Init" && !void.functionName?contains("Process") && !void.functionName?contains("RESMGR_UTILITY")  && !void.functionName?contains("OPENAMP") && !void.functionName?contains("IPCC") && !void.functionName?contains("ETZPC") && !void.functionName?contains("TRACER_EMB")]
+[#if void.functionName?? && !void.functionName?contains("FREERTOS")&&!void.functionName?contains("VREFBUF")&&!void.functionName?contains("CORTEX")&& !void.functionName?contains("SystemClock_Config")&&void.functionName!="Init" && !void.functionName?contains("Process") && !void.functionName?contains("RESMGR_UTILITY")  && !void.functionName?contains("OPENAMP") && !void.functionName?contains("IPCC") && !void.functionName?contains("GTZC") && !void.functionName?contains("ETZPC") && !void.functionName?contains("TRACER_EMB") && !void.functionName?contains("GUI_INTERFACE")]
 [#if !void.isNotGenerated]
-[#if ((FREERTOS?? && void.ipType=="peripheral") || !FREERTOS??) && void.functionName!="GRAPHICS_Init"]
-[#if void.functionName?contains("FATFS") && (familyName="stm32g0" || familyName="stm32wb")]
+[#if ((FREERTOS?? && void.ipType=="peripheral") || !FREERTOS?? || void.functionName?contains("MotorControl") ) && void.functionName!="GRAPHICS_Init"]
+[#if void.functionName?contains("FATFS") && (familyName="stm32g0" || familyName="stm32wb" || familyName="stm32l5" || familyName="stm32g4")]
  [#-- Required by the examples migration (due to the fact that the function signature has changed and returns a value now. --]
  #tif (MX_FATFS_Init() != APP_OK) {
  #t#tError_Handler();
@@ -471,10 +498,12 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
-[#if USBPD??]
+[#list voids as void]
+  [#if USBPD?? && void.functionName?? && void.functionName?contains("USBPD")]
     [#lt]#t/* USBPD initialisation ---------------------------------*/
     [#lt]#tMX_USBPD_Init();
-[/#if]
+  [/#if]
+[/#list]
 
 [#if FREERTOS??] [#-- If FreeRtos is used --]
     [#if GRAPHICS??]
@@ -506,17 +535,21 @@ int main(void)
 #tAPPE_Init();
 [/#if]
 [/#list]
-
 [/#if]
-
+[#if TZEN=="1" && Secure=="true"]
+#n
+#t/*************** Setup and jump to non-secure *******************************/
+#n
+#tNonSecure_Init();
+#n
+#t/* Non-secure software does not return, this code is not executed */
+[/#if]
 [#-- if !FREERTOS?? --] 
 #n
 [#if GRAPHICS?? && !FREERTOS??]
 
 /* Initialise the graphical hardware */
   GRAPHICS_HW_Init();
-
-
 
   /* Initialise the graphical stack engine */
   GRAPHICS_Init();
@@ -548,8 +581,32 @@ int main(void)
 [#-- if --]
 }
 [/#if]
+[#if TZEN=="1" && Secure=="true"]
+#n
+/**
+  * @brief  Non-secure call function
+  *         This function is responsible for Non-secure initialization and switch 
+  *         to non-secure state
+  * @retval None
+  */
+static void NonSecure_Init(void)
+{
+  funcptr_NS NonSecure_ResetHandler;
+
+  SCB_NS->VTOR = VTOR_TABLE_NS_START_ADDR;
+
+  /* Set non-secure main stack (MSP_NS) */
+  __TZ_set_MSP_NS((*(uint32_t *)VTOR_TABLE_NS_START_ADDR));
+
+  /* Get non-secure reset handler */
+  NonSecure_ResetHandler = (funcptr_NS)(*((uint32_t *)((VTOR_TABLE_NS_START_ADDR) + 4U)));
+
+  /* Start non-secure state software application */
+  NonSecure_ResetHandler();
+}
+[/#if]
 [#compress]
-[#if clockConfig?? && rccFctName?? && (!McuDualCore?? || (bootMode?? && bootMode=="boot0" && cpucore=="ARM_CORTEX_M7"))]
+[#if clockConfig?? && rccFctName?? && ((!McuDualCore?? && TZEN=="0") ||  ((TZEN=="1" && Secure=="true") && rccIsSecure??) || ((TZEN=="1" && Secure=="false") && !rccIsSecure??) ||(bootMode?? && bootMode=="boot0" && cpucore=="ARM_CORTEX_M7"))]
 
 #n/**
 #t* @brief System Clock Configuration
@@ -586,7 +643,42 @@ void SystemClock_Config(void)
 [#if FamilyName=="STM32MP1"]
 [#--  #endif --]
 [/#if]
+}
+[#compress]
+[#if commonClockConfig??]
+
+#n/**
+#t* @brief Peripherals Common Clock Configuration
+#t* @retval None
+#t*/
+void PeriphCommonClock_Config(void)
+{
+[#compress]
+[#assign nbVars = 0]
+[#assign listOfLocalVariables =""]
+        [#assign resultList =""]
+    [#list commonClockConfig as configModel] [#--list0--]
+        [#list configModel.configs as config] [#--list1--]
+           [#compress] [@common.getLocalVariable configModel1=config listOfLocalVariables=listOfLocalVariables resultList=resultList/][/#compress]
+            [#assign listOfLocalVariables =resultList]
+            [#assign nbVars = nbVars + getNbVariable(config)]
+        [/#list]
+    [/#list]
+[/#compress]
+[#if nbVars != 0 ]
+#n
+[/#if]
+[#assign clockInst=""]
+[#assign nTab=1]
+[#if commonClockConfig??] 
+[#list commonClockConfig as configModel] [#--list0--]
+    [#--list configModel.configs as config--] [#--list1--]
+   [#compress] [@common.generateConfigModelListCode configModel=configModel inst=clockInst  nTab=1 index=""/][/#compress]
+    [#--/#list--]
+[/#list][/#if]
 }[/#if]
+[/#compress]
+[/#if]
 [/#compress]
 
 [#compress]
@@ -726,7 +818,7 @@ static void MX_NVIC_Init(void)
 [#compress]
 [#list IP.configModelList as instanceData]
 [#assign ipName = instanceData.ipName]
-[#if instanceData.isMWUsed=="false" && instanceData.isBusDriverUSed=="false" && !ipName?contains("CORTEX") && !ipName?contains("RESMGR_UTILITY") && !ipName?contains("TRACER_EMB")]
+[#if instanceData.isMWUsed=="false" && instanceData.isBusDriverUSed=="false" && !ipName?contains("CORTEX") && !ipName?contains("RESMGR_UTILITY") && !ipName?contains("TRACER_EMB") && !ipName?contains("GUI_INTERFACE")]
      [#assign instName = instanceData.instanceName]
 
         [#assign halMode= instanceData.halMode]
@@ -737,8 +829,7 @@ static void MX_NVIC_Init(void)
 #t*/
             [#if halMode!=ipName&&!ipName?contains("TIM")&&!ipName?contains("CEC")][#if staticVoids?contains('MX_${instName}_${halMode}_Init')]static[/#if] void MX_${instName}_${halMode}_Init(void)[#else][#if staticVoids?contains('MX_${instName}_Init')]static[/#if] void MX_${instName}_Init(void)[/#if]
             {     
-  #n
-
+#n
 [#if RESMGR_UTILITY??]
     [@common.optinclude name=contextFolder+mxTmpFolder+"/resmgrutility_"+instName+".tmp"/][#-- ADD RESMGR_UTILITY Code--]
 [/#if]
@@ -790,6 +881,28 @@ static void MX_NVIC_Init(void)
 
     [/#if]
 
+[#assign listOfLocalVariables =""]
+    [#assign resultList =""]
+[#if instanceData.initServices??]
+    [#if instanceData.initServices.pclockConfig??]
+        [#assign   pclockConfig=instanceData.initServices.pclockConfig] [#--list0--]
+        [#list pclockConfig.configs as config] [#--list1--]
+            [@common.getLocalVariable configModel1=config listOfLocalVariables=listOfLocalVariables resultList=resultList/]
+            [#assign listOfLocalVariables =resultList]
+        [/#list]
+    [/#if]
+[/#if]
+#n
+[#assign clockInst=""]
+[#assign nTab=1]
+
+[#if instanceData.initServices??]
+    [#if instanceData.initServices.pclockConfig??]
+[#assign   pclockConfig=instanceData.initServices.pclockConfig] [#--list0--]
+[@common.generateConfigModelListCode configModel=pclockConfig inst=""  nTab=1 index=""/]#n
+#n
+    [/#if]
+[/#if]
     [#-- Generate service code --]
     #n[@common.generateServiceCode ipName=instName serviceType="Init" modeName="mode" instHandler=instName tabN=1 IPData=instanceData/] 
 #n
@@ -845,7 +958,7 @@ static void MX_NVIC_Init(void)
 [@common.optinclude name=contextFolder+mxTmpFolder+"/dma.tmp"/][#-- ADD DMA Code--]
 [@common.optinclude name=contextFolder+mxTmpFolder+"/mdma.tmp"/][#-- ADD MDMA Code--]
 [@common.optinclude name=contextFolder+mxTmpFolder+"/mx_fmc_HC.tmp"/][#-- FMC Init --]
-[@common.optinclude name=contextFolder+mxTmpFolder+"/gpio.tmp"/][#-- ADD GPIO Code--]
+[@common.optinclude name=contextFolder+mxTmpFolder+"/gpio.tmp"/][#-- ADD GPIO Code--] 
 [/#if] [#-- if HALCompliant End --]
 #n
 [#-- FSMC Init --]
@@ -925,7 +1038,6 @@ void Error_Handler(void)
   * @param  line: assert_param error line source number
   * @retval None
   */
-[#assign familyName=FamilyName?lower_case]
 [#if familyName="stm32f0" || familyName="stm32f3" ||familyName="stm32l4"]
 void assert_failed(char *file, uint32_t line)
 [#else]

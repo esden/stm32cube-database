@@ -65,5 +65,20 @@
 [/#list]
 [/#if]
 #n
+
+[#-- vrefbuf configuration --]
+[#if vrefbufConfig??]
+[#list vrefbufConfig as config]
+[@common.generateConfigModelListCode configModel=config inst="VREFBUF"  nTab=1 index=""/]
+[/#list]
+[/#if]
+#n
+[#-- PWR configuration --]
+[#if pwrConfig??]
+[#list pwrConfig as config]
+[@common.generateConfigModelListCode configModel=config inst="PWR"  nTab=1 index=""/]
+[/#list]
+[/#if]
+#n
 [/#compress]
 

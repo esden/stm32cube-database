@@ -15,13 +15,21 @@
 [/#compress]
 ${TABnode}&m4_rproc{
 [#t]
-	[#if srvcmx_isDeviceEnabled("openamp")]
+	[#if srvcmx_isDeviceEnabled("ipcc")]
 ${TABsubnode}/*Restriction: "memory-region" property is not managed - please to use User-Section if needed*/
 	[/#if]
 [#t]
 	[#if srvcmx_isDeviceEnabled("ipcc")]
-${TABsubnode}mboxes = <&ipcc 0>, <&ipcc 1>, <&ipcc 2>;
-${TABsubnode}mbox-names = "vq0", "vq1", "shutdown";
+${TABsubnode}mboxes = [#t]
+		[#if srvcmx_isDeviceEnabled("openamp")]
+<&ipcc 0>, <&ipcc 1>, [#t]
+		[/#if]
+<&ipcc 2>;
+${TABsubnode}mbox-names = [#t]
+		[#if srvcmx_isDeviceEnabled("openamp")]
+"vq0", "vq1", [#t]
+		[/#if]
+"shutdown";
 	[/#if]
 [#t]
 ${TABsubnode}recovery;
