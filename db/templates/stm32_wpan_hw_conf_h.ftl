@@ -3,9 +3,8 @@
 /**
  ******************************************************************************
   * File Name          : ${name}
-  * Description        : Hardware configuration file for BLE 
-  *                      middleWare.
-  ******************************************************************************
+  * Description        : Hardware configuration file for STM32WPAN Middleware.
+ ******************************************************************************
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
@@ -70,6 +69,7 @@
 [#assign USART1_TX_DMA = ""]
 [#assign USART1_TX_DMA_LL_CHANNEL = ""]
 
+[#assign FREERTOS_STATUS = 0]
 [#-- SWIPdatas is a list of SWIPconfigModel --]
 [#list SWIPdatas as SWIP]
     [#if SWIP.defines??]
@@ -242,7 +242,9 @@
                     [#assign USART1_TX_DMA_LL_CHANNEL = "valueNotSetted"]
                 [/#if]
             [/#if]
-
+            [#if (definition.name == "FREERTOS_STATUS") && (definition.value == "1")]
+                [#assign FREERTOS_STATUS = 1]
+            [/#if]
         [/#list]
     [/#if]
 [/#list]
@@ -251,6 +253,10 @@
 #ifndef HW_CONF_H
 #define HW_CONF_H
 
+[#if (FREERTOS_STATUS = 1)]
+#include "FreeRTOSConfig.h"
+
+[/#if]
 /******************************************************************************
  * Semaphores
  * THIS SHALL NO BE CHANGED AS THESE SEMAPHORES ARE USED AS WELL ON THE CM0+
@@ -292,6 +298,9 @@
  * wakeup timer.
  * This setting is the preemptpriority part of the NVIC.
  */
+[#if (FREERTOS_STATUS = 1)]
+#define CFG_HW_TS_NVIC_RTC_WAKEUP_IT_PREEMPTPRIO    (configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY + 1) /* FreeRTOS requirement */
+[#else]
 [#list SWIPdatas as SWIP]
 	[#if SWIP.defines??]
 		[#list SWIP.defines as definition]
@@ -301,6 +310,7 @@
 		[/#list]
 	[/#if]
 [/#list]
+[/#if]
 
 /**
  * The user may define the priority in the NVIC of the RTC_WKUP interrupt handler that is used to manage the

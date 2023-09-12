@@ -2,8 +2,42 @@
 
 [#--Common services--]
 
+
+[#--------------------------------------------------------------------------------------------------------------------------------]
+[#-- Basic srvc (Java data models).
+	 Some FTL built-in do not operate on Java data models.--]
+[#--------------------------------------------------------------------------------------------------------------------------------]
+
+[#-- return the keys list from a Java map
+(?keys operates only on FTL map.--]
+[#function srvc_javaMap_getKeysList  map]
+
+	[#local keysList = []]
+	[#list map.entrySet() as entry]
+		[#local keysList = keysList + [entry.key]]
+	[/#list]
+
+[#return keysList!]
+[/#function]
+
+
+[#-- return a value from a Java "entrySet.keyIn"--]
+[#function srvc_javaEntrySet_getValue  entrySet keyIn]
+
+	[#list entrySet as entry]
+		[#if entry.key==keyIn]
+			[#return entry.value]
+		[/#if]
+	[/#list]
+
+	[#return null!]
+[/#function]
+
+
+
 [#--------------------------------------------------------------------------------------------------------------------------------]				
-[#-- Basic srvc --]
+[#-- Basic srvc (FTL data models)
+	 NB: this functions should not be used on java DM (else undefined behavior) --]
 [#--------------------------------------------------------------------------------------------------------------------------------]				
 
 [#function srvc_convertNberDecToHexaString	pDecNber]
@@ -18,17 +52,6 @@
 	[/#if]
 
 [#return {"errors":errors!, "res":res!, "traces":traces!} ]
-[/#function]
-
-
-[#function srvc_map_getKeysList  map]
-
-	[#local keysList = []]
-	[#list map.entrySet() as entry]
-		[#local keysList = keysList + [entry.key]]
-	[/#list]
-
-[#return keysList]
 [/#function]
 
 
@@ -96,6 +119,24 @@ Return empty value if no match.--]
 	[#else]
 		[#return {"keyFound":false, "value":map[keyIn]!}]
 	[/#if]
+[/#function]
+
+
+[#--copie an elmtsListIn into an existing map.
+The elmtsListIn is inserted at key position in the map.
+No check of compatibility between elmtsListIn and map: the map
+is supposed to contain elmts of list type--]
+[#function srvc_map_putElmtsList  map key elmtsListIn]
+
+	[#local newElmtsList = srvc_map_getValue(map, key)]
+
+	[#list elmtsListIn as elmt]
+		[#local newElmtsList = newElmtsList + [elmt]]
+	[/#list]
+
+	[#local map = map + {key:newElmtsList}]
+
+[#return map!]
 [/#function]
 
 

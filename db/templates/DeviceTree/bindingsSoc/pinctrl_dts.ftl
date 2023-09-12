@@ -28,8 +28,8 @@
 
 	[#--build nodes list to generate based on dtIODevicesList IPs list--]
 	[#assign ipToGenerate = []]
-	[#assign generateNode = false]
-	[#assign generateNodeZ = false]
+	[#assign generateNode = true]
+	[#assign generateNodeZ = true]
 	[#list srvcmx_getListOfDevicesWithPinCtrl_inDTS() as ip]
 		[#assign ipUpper = ip?upper_case ]
 		[#if ipPinCtrlNodesNoZ.containsKey(ipUpper)]
@@ -60,10 +60,13 @@
 &pinctrl {
 			[#if kernelDt][#--no 'u-boot,dm-pre-reloc' tags for atf DT--]
 ${T1}u-boot,dm-pre-reloc;
+#n
 				[@pinctrlPrint dtPinCtrlDataModel=dtPinCtrlDataModelNoZ ipInstanceList=ipInstanceListExtraNodeNoZ bankZ=false/]
 			[#else]
 				[@pinctrlPrint dtPinCtrlDataModel=dtPinCtrlDataModelNoZ ipInstanceList=ipInstanceListNoZ bankZ=false/]
 			[/#if]
+${T1}/* USER CODE BEGIN pinctrl */
+${T1}/* USER CODE END pinctrl */
 };
 		[/#if]
 [#t]
@@ -73,10 +76,13 @@ ${T1}u-boot,dm-pre-reloc;
 &pinctrl_z {
 			[#if kernelDt][#--no 'u-boot,dm-pre-reloc' tags for atf DT--]
 ${T1}u-boot,dm-pre-reloc;
+#n
 				[@pinctrlPrint dtPinCtrlDataModel=dtPinCtrlDataModelZ ipInstanceList=ipInstanceListExtraNodeZ bankZ=true/]
 			[#else]
 				[@pinctrlPrint dtPinCtrlDataModel=dtPinCtrlDataModelZ ipInstanceList=ipInstanceListZ bankZ=true/]
 			[/#if]
+${T1}/* USER CODE BEGIN pinctrl_z */
+${T1}/* USER CODE END pinctrl_z */
 };
 			[/#if]
 		[/#if]
@@ -241,7 +247,8 @@ ${T2}u-boot,dm-pre-reloc;
 				[#if multiConfig][#-- if pinmuxs with different gpio configs --]
 					[#assign index = 1]
 					[#assign signalDone = []]
-					[#list gpioParam?keys as pinMux][#--for all pinMux (ex: <STM32_PINMUX('A',6,ANALOG)>)--]
+					[#list gpioParam?keys?sort as pinMux][#--for all pinMux (ex: <STM32_PINMUX('A',6,ANALOG)>)
+															 NB: key sorting is mandatory--]
 							[#if noContainsStr(signalDone, pinMux)][#--signalDone records pinMux already traited for the ip--]
 								[#assign config = gpioParam[pinMux]]
 [#t]
@@ -261,7 +268,8 @@ ${T3}u-boot,dm-pre-reloc;
 									[#assign signalDone = signalDone + [pinMux]]
 									[#assign signalsSameConfig = signalsSameConfig + [pinMux]]
 [#t]
-									[#list gpioParam?keys as pinMux2][#-- find pinMuxs with same config --]
+									[#list gpioParam?keys?sort as pinMux2][#-- find pinMuxs with same config
+																				NB: key sorting is mandatory--]
 										[#if noContainsStr(signalDone, pinMux2) && (gpioParam[pinMux2] == config)]
 											[#assign signalDone = signalDone + [pinMux2]][#-- save pinMux already traited --]
 											[#assign signalsSameConfig = signalsSameConfig + [pinMux2]][#-- save pinMux with same config --]
@@ -325,7 +333,8 @@ ${T2}};
 					[#assign ls1 = []]
 					[#assign ls2 = []]
 [#t]
-					[#list gpioParam?keys as pinMux][#--for all pinMux (ex: <STM32_PINMUX('A',6,ANALOG)>)--]
+					[#list gpioParam?keys?sort as pinMux][#--for all pinMux (ex: <STM32_PINMUX('A',6,ANALOG)>)
+															NB: key sorting in case of--]
 						[#assign signals = signals + [pinMux]]
 					[/#list]
 [#t]
@@ -382,6 +391,7 @@ ${T3}${conf};
 ${T2}};
 				[/#if][#-- multiConfig --]
 ${T1}};
+#n
 		[/#if][#--  --]
 	[/#list][#-- eof list usedIPs --]
 [/#macro]

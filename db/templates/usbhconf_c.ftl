@@ -158,7 +158,7 @@ void HAL_HCD_HC_NotifyURBChange_Callback(HCD_HandleTypeDef *hhcd, uint8_t chnum,
   USBH_LL_NotifyURBChange(hhcd->pData);
 #endif
 }
-[#if FamilyName.contains("STM32F7") | FamilyName.contains("STM32F4")]
+[#if FamilyName.contains("STM32F7") | FamilyName.contains("STM32F4") | FamilyName.contains("STM32H7")]
 /**
 * @brief  Port Port Enabled callback.
   * @param  hhcd: HCD handle

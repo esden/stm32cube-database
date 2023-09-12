@@ -3,7 +3,7 @@
 xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance"
 CodeTemplate=""
 DBVersion="V4.0"
-IncludeFile="app_entry.h,app_common.h,lpm.h,scheduler.h,dbg_trace.h"
+IncludeFile="app_entry.h,app_common.h,dbg_trace.h"
 Name="STM32_WPAN"
 RootFolder="Middlewares/ST/STM32_WPAN/"
 Version="STM32Cube_FW_WB_V1.0.0"
@@ -19,6 +19,9 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <Component Name="Middleware:WPAN_COMMON"/>
         <Component Name="Middleware:WPAN_INTERFACES"/>
         <Component Name="Middleware:WPAN_UTILITIES"/>
+<!--
+        <Component Name="Middleware:WPAN_UTILITIES_NO_FREERTOS:NO_FREERTOS:$FREERTOS_STATUS"/>
+-->
         <Component Name="Middleware:BLE_HOST_COMMON:BLE:$BLE"/>
         <Component Name="Middleware:BLE_HOST_BEACON:BEACON:$BT_SIG_BEACON"/>
         <Component Name="Middleware:BLE_HOST_BLOOD_PRESSURE:BLOOD_PRESSURE:$BT_SIG_BLOOD_PRESSURE_SENSOR"/>
@@ -75,6 +78,10 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <ConfigFile Name="THREAD_STM_LOGGING_H"/>
         <ConfigFile Name="THREAD_STM_LOGGING_C"/>
 
+<!--
+        <ConfigFile Name="UTILITIES_STM32_LPM_C"/>
+-->
+
     <!-- Common with THREAD -->
     <!-- WPAN target -->
         <ConfigFile Name="BLE_HW_IPCC_C"/>
@@ -85,13 +92,19 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <ConfigFile Name="BLE_APP_ENTRY_H"/>
         <ConfigFile Name="BLE_HW_CONF_H"/>
         <ConfigFile Name="BLE_UTILITIES_CONF_H"/>
+        <ConfigFile Name="STM32_LMP_IF_H"/>
         <ConfigFile Name="BLE_VCP_CONF_H"/>
     <!-- Core - src -->
         <ConfigFile Name="BLE_APP_ENTRY_C"/>
+<!--
         <ConfigFile Name="BLE_HW_LPM_C"/>
+-->
         <ConfigFile Name="BLE_HW_TIMERSERVER_C"/>
         <ConfigFile Name="BLE_HW_UART_C"/>
-        <Defines Name="OPENTHREAD_CONFIG_FILE" Value="&lt;openthread_api_config_ftd.h&gt;" />
+        <ConfigFile Name="STM32_LMP_IF_C"/>
+        <ConfigFile Name="FREERTOS_PORT_C"/>
+        <Defines Name="OPENTHREAD_CONFIG_FILE" Value="&lt;openthread_api_config_ftd.h&gt;" Condition="Semaphore_FTD_CLI | Semaphore_FTD"/>
+        <Defines Name="OPENTHREAD_CONFIG_FILE" Value="&lt;openthread_api_config_mtd.h&gt;" Condition="Semaphore_MTD"/>
         <Defines Name="THREAD_WB" Value="" Condition="S_THREAD"/>
 <!--
         <Defines Name="WITH_NO_TRACE_AT_ALL" Value="" Condition="GCC;SIiTcompilerIiGCC"/>
@@ -148,185 +161,198 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
     <RefComponent Cclass="Middleware" Cgroup="WPAN_UTILITIES" Cversion="1.0.0">
         <!-- Header files for utilities -->
         <File Category="header" Name="utilities/dbg_trace.h"/>
-        <File Category="header" Name="utilities/lpm.h"/>
         <File Category="header" Name="utilities/otp.h"/>
-        <File Category="header" Name="utilities/scheduler.h"/>
         <File Category="header" Name="utilities/stm_list.h"/>
         <File Category="header" Name="utilities/stm_queue.h"/>
         <File Category="header" Name="utilities/utilities_common.h"/>
         <!-- Source files for utilities -->
         <File Category="source" Name="utilities/dbg_trace.c"/>
-        <File Category="source" Name="utilities/lpm.c"/>
         <File Category="source" Name="utilities/otp.c"/>
-        <File Category="source" Name="utilities/scheduler.c"/>
         <File Category="source" Name="utilities/stm_list.c"/>
         <File Category="source" Name="utilities/stm_queue.c"/>
+    </RefComponent>
 
+    <RefComponent Cclass="Middleware" Cgroup="WPAN_UTILITIES_NO_FREERTOS" Cversion="1.0.0">
+        <SubComponent Csub="NO_FREERTOS" Cvariant="0">
+            <File Category="header" Name="utilities/scheduler.h"/>
+            <File Category="source" Name="utilities/scheduler.c"/>
+        </SubComponent>
     </RefComponent>
 
     <RefComponent Cclass="Middleware" Cgroup="BLE_HOST_COMMON" Cversion="1.0.0">
         <SubComponent Csub="BLE" Cvariant="Enabled">
-            <File Category="header" Name="ble/ble_common.h"/>
-        <!-- Header files for ble/core/Inc/core/ -->
-            <File Category="header" Name="ble/core/Inc/ble.h"/>
-            <File Category="header" Name="ble/core/Inc/core/ble_gap.h"/>
-            <File Category="header" Name="ble/core/Inc/core/ble_gap_aci.h"/>
-            <File Category="header" Name="ble/core/Inc/core/ble_gatt_aci.h"/>
-            <File Category="header" Name="ble/core/Inc/core/ble_gatt_server.h"/>
-            <File Category="header" Name="ble/core/Inc/core/ble_hal.h"/>
-            <File Category="header" Name="ble/core/Inc/core/ble_hal_aci.h"/>
-            <File Category="header" Name="ble/core/Inc/core/ble_hci_le.h"/>
-            <File Category="header" Name="ble/core/Inc/core/ble_l2cap_aci.h"/>
-            <File Category="header" Name="ble/core/Inc/core/ble_status.h"/>
-            <File Category="header" Name="ble/core/Inc/core/ble_types.h"/>
-            <File Category="header" Name="ble/core/Inc/core/hci_const.h"/>
-            <File Category="header" Name="ble/core/Inc/core/link_layer.h"/>
-            <File Category="header" Name="ble/core/Inc/core/sm.h"/>
-            <File Category="header" Name="ble/core/Inc/core/uuid.h"/>
-            <!-- Header files for Core -->
-            <File Category="header" Name="ble/core/Src/core/ble_const.h"/>
-            <File Category="header" Name="ble/core/Src/core/ble_defs.h"/>
-            <File Category="header" Name="ble/core/Src/core/compiler.h"/>
-            <File Category="header" Name="ble/core/Src/core/hal_types.h"/>
-            <File Category="header" Name="ble/core/Src/core/osal.h"/>
-            <!-- Source files for Core -->
-            <File Category="source" Name="ble/core/Src/core/osal.c"/>
-            <!-- Header files for blesvc -->
-            <File Category="header" Name="ble/core/Src/blesvc/common_blesvc.h"/>
-            <File Category="header" Name="ble/core/Inc/blesvc/svc_ctl.h"/>
-            <!-- Source files for blesvc -->
-            <File Category="source" Name="ble/core/Src/blesvc/svc_ctl.c"/>
-            <!-- TEMPORARY SOLUTION FOR H FILES-->
-            <File Category="header" Name="ble/core/Inc/blesvc/dis.h"/>
-            <File Category="header" Name="ble/core/Inc/blesvc/hrs.h"/>
-            <File Category="header" Name="ble/core/Inc/blesvc/hts.h"/>
-            <File Category="header" Name="ble/core/Inc/blesvc/p2p_stm.h"/>
-            <File Category="header" Name="ble/core/Inc/blesvc/eds_stm.h"/>
-            <File Category="header" Name="ble/core/Inc/blesvc/bls.h"/>
-            <File Category="header" Name="ble/core/Inc/blesvc/otas_stm.h"/>
-            <!-- TEMPORARY SOLUTION FOR H FILES NOT USED BY CURRENT PROFILES SERVICES-->
-            <File Category="header" Name="ble/core/Inc/blesvc/bas.h"/>
-            <File Category="header" Name="ble/core/Inc/blesvc/crs_stm.h"/>
-            <File Category="header" Name="ble/core/Inc/blesvc/hids.h"/>
-            <File Category="header" Name="ble/core/Inc/blesvc/ias.h"/>
-            <File Category="header" Name="ble/core/Inc/blesvc/lls.h"/>
-            <File Category="header" Name="ble/core/Inc/blesvc/tps.h"/>
-            <File Category="header" Name="ble/core/Inc/blesvc/template_stm.h"/>
-            <File Category="header" Name="ble/core/Inc/blesvc/mesh.h"/>
+        <!-- Header files for ble/ -->
+            <File Category="header" Name="ble/*.h"/>
+        <!-- Header files for ble/core/ -->
+            <File Category="header" Name="ble/core/ble_bufsize.h"/>
+            <File Category="header" Name="ble/core/ble_core.h"/>
+            <File Category="header" Name="ble/core/ble_defs.h"/>
+            <File Category="header" Name="ble/core/ble_legacy.h"/>
+            <File Category="header" Name="ble/core/ble_std.h"/>
+        <!-- Header files for ble/core/auto -->
+            <File Category="header" Name="ble/core/auto/ble_gap_aci.h"/>
+            <File Category="header" Name="ble/core/auto/ble_gatt_aci.h"/>
+            <File Category="header" Name="ble/core/auto/ble_hal_aci.h"/>
+            <File Category="header" Name="ble/core/auto/ble_hci_le.h"/>
+            <File Category="header" Name="ble/core/auto/ble_l2cap_aci.h"/>
+            <File Category="header" Name="ble/core/auto/ble_types.h"/>
+            <File Category="header" Name="ble/core/auto/ble_events.h"/>
+        <!-- Header files for ble/core/template -->
+            <File Category="header" Name="ble/core/template/ble_const.h"/>
+            <File Category="header" Name="ble/core/template/compiler.h"/>
+            <File Category="header" Name="ble/core/template/osal.h"/>
+        <!-- Source files for ble/core/template -->
+             <File Category="source" Name="ble/core/template/osal.c"/>
+        <!-- Header files for ble/svc/Inc -->
+            <File Category="header" Name="ble/svc/Inc/bls.h"/>
+            <File Category="header" Name="ble/svc/Inc/crs_stm.h"/>
+            <File Category="header" Name="ble/svc/Inc/dis.h"/>
+            <File Category="header" Name="ble/svc/Inc/eds_stm.h"/>
+            <File Category="header" Name="ble/svc/Inc/hids.h"/>
+            <File Category="header" Name="ble/svc/Inc/hrs.h"/>
+            <File Category="header" Name="ble/svc/Inc/hts.h"/>
+            <File Category="header" Name="ble/svc/Inc/ias.h"/>
+            <File Category="header" Name="ble/svc/Inc/lls.h"/>
+            <File Category="header" Name="ble/svc/Inc/mesh.h"/>
+            <File Category="header" Name="ble/svc/Inc/otas_stm.h"/>
+            <File Category="header" Name="ble/svc/Inc/p2p_stm.h"/>
+            <File Category="header" Name="ble/svc/Inc/svc_ctl.h"/>
+            <File Category="header" Name="ble/svc/Inc/template_stm.h"/>
+            <File Category="header" Name="ble/svc/Inc/tps.h"/>
+            <File Category="header" Name="ble/svc/Inc/uuid.h"/>
+        <!-- Header files for ble/svc/Src -->
+            <File Category="header" Name="ble/svc/Src/common_blesvc.h"/>
+        <!-- Source files for ble/svc/Src -->
+            <File Category="source" Name="ble/svc/Src/svc_ctl.c"/>
         </SubComponent>
     </RefComponent>
 
     <RefComponent Cclass="Middleware" Cgroup="BLE_HOST_BEACON" Cversion="1.0.0">
         <SubComponent Csub="BEACON" Cvariant="Enabled">
-            <File Category="source" Name="ble/core/Src/core/ble_gap_aci.c"/>
-            <File Category="source" Name="ble/core/Src/core/ble_gatt_aci.c"/>
-            <File Category="source" Name="ble/core/Src/core/ble_hal_aci.c"/>
-            <File Category="source" Name="ble/core/Src/core/ble_hci_le.c"/>
-            <File Category="source" Name="ble/core/Src/core/ble_l2cap_aci.c"/>
-            <File Category="source" Name="interface/patterns/ble_thread/tl/hci_tl.c"/>
-            <File Category="source" Name="interface/patterns/ble_thread/tl/shci_tl.c"/>
-            <File Category="source" Name="interface/patterns/ble_thread/tl/tl_if.c"/>
+            <File Category="source" Name="ble/core/auto/ble_gap_aci.c"/>
+            <File Category="source" Name="ble/core/auto/ble_gatt_aci.c"/>
+            <File Category="source" Name="ble/core/auto/ble_hal_aci.c"/>
+            <File Category="source" Name="ble/core/auto/ble_hci_le.c"/>
+            <File Category="source" Name="ble/core/auto/ble_l2cap_aci.c"/>
 
+            <File Category="source" Name="interface/patterns/ble_thread/tl/hci_tl.c"/>
+            <File Category="source" Name="interface/patterns/ble_thread/tl/hci_tl_if.c"/>
+            <File Category="source" Name="interface/patterns/ble_thread/tl/shci_tl.c"/>
+            <File Category="source" Name="interface/patterns/ble_thread/tl/shci_tl_if.c"/>
         </SubComponent>
     </RefComponent>
 
     <RefComponent Cclass="Middleware" Cgroup="BLE_HOST_BLOOD_PRESSURE" Cversion="1.0.0">
         <SubComponent Csub="BLOOD_PRESSURE" Cvariant="Enabled">
-            <File Category="source" Name="ble/core/Src/blesvc/bls.c"/>
-            <File Category="source" Name="ble/core/Src/core/ble_gap_aci.c"/>
-            <File Category="source" Name="ble/core/Src/core/ble_gatt_aci.c"/>
-            <File Category="source" Name="ble/core/Src/core/ble_hal_aci.c"/>
-            <File Category="source" Name="ble/core/Src/core/ble_hci_le.c"/>
-            <File Category="source" Name="ble/core/Src/core/ble_l2cap_aci.c"/>
+            <File Category="source" Name="ble/core/auto/ble_gap_aci.c"/>
+            <File Category="source" Name="ble/core/auto/ble_gatt_aci.c"/>
+            <File Category="source" Name="ble/core/auto/ble_hal_aci.c"/>
+            <File Category="source" Name="ble/core/auto/ble_hci_le.c"/>
+            <File Category="source" Name="ble/core/auto/ble_l2cap_aci.c"/>
+            <File Category="source" Name="ble/svc/Src/bls.c"/>
+
             <File Category="source" Name="interface/patterns/ble_thread/tl/hci_tl.c"/>
+            <File Category="source" Name="interface/patterns/ble_thread/tl/hci_tl_if.c"/>
             <File Category="source" Name="interface/patterns/ble_thread/tl/shci_tl.c"/>
-            <File Category="source" Name="interface/patterns/ble_thread/tl/tl_if.c"/>
+            <File Category="source" Name="interface/patterns/ble_thread/tl/shci_tl_if.c"/>
         </SubComponent>
     </RefComponent>
 
     <RefComponent Cclass="Middleware" Cgroup="BLE_HOST_HEALTH_THERMOMETER" Cversion="1.0.0">
         <SubComponent Csub="HEALTH_THERMOMETER" Cvariant="Enabled">
-            <File Category="source" Name="ble/core/Src/blesvc/hts.c"/>
-            <File Category="source" Name="ble/core/Src/blesvc/dis.c"/>
-            <File Category="source" Name="ble/core/Src/core/ble_gap_aci.c"/>
-            <File Category="source" Name="ble/core/Src/core/ble_gatt_aci.c"/>
-            <File Category="source" Name="ble/core/Src/core/ble_hal_aci.c"/>
-            <File Category="source" Name="ble/core/Src/core/ble_hci_le.c"/>
-            <File Category="source" Name="ble/core/Src/core/ble_l2cap_aci.c"/>
+            <File Category="source" Name="ble/core/auto/ble_gap_aci.c"/>
+            <File Category="source" Name="ble/core/auto/ble_gatt_aci.c"/>
+            <File Category="source" Name="ble/core/auto/ble_hal_aci.c"/>
+            <File Category="source" Name="ble/core/auto/ble_hci_le.c"/>
+            <File Category="source" Name="ble/core/auto/ble_l2cap_aci.c"/>
+            <File Category="source" Name="ble/svc/Src/dis.c"/>
+            <File Category="source" Name="ble/svc/Src/hts.c"/>
+
             <File Category="source" Name="interface/patterns/ble_thread/tl/hci_tl.c"/>
+            <File Category="source" Name="interface/patterns/ble_thread/tl/hci_tl_if.c"/>
             <File Category="source" Name="interface/patterns/ble_thread/tl/shci_tl.c"/>
-            <File Category="source" Name="interface/patterns/ble_thread/tl/tl_if.c"/>
+            <File Category="source" Name="interface/patterns/ble_thread/tl/shci_tl_if.c"/>
         </SubComponent>
     </RefComponent>
     
     <RefComponent Cclass="Middleware" Cgroup="BLE_HOST_HEART_RATE" Cversion="1.0.0">
         <SubComponent Csub="HEART_RATE" Cvariant="Enabled">
-            <File Category="source" Name="ble/core/Src/blesvc/dis.c"/>
-            <File Category="source" Name="ble/core/Src/blesvc/hrs.c"/>
-            <File Category="source" Name="ble/core/Src/core/ble_gap_aci.c"/>
-            <File Category="source" Name="ble/core/Src/core/ble_gatt_aci.c"/>
-            <File Category="source" Name="ble/core/Src/core/ble_hal_aci.c"/>
-            <File Category="source" Name="ble/core/Src/core/ble_hci_le.c"/>
-            <File Category="source" Name="ble/core/Src/core/ble_l2cap_aci.c"/>
+            <File Category="source" Name="ble/core/auto/ble_gap_aci.c"/>
+            <File Category="source" Name="ble/core/auto/ble_gatt_aci.c"/>
+            <File Category="source" Name="ble/core/auto/ble_hal_aci.c"/>
+            <File Category="source" Name="ble/core/auto/ble_hci_le.c"/>
+            <File Category="source" Name="ble/core/auto/ble_l2cap_aci.c"/>
+            <File Category="source" Name="ble/svc/Src/hrs.c"/>
+            <File Category="source" Name="ble/svc/Src/dis.c"/>
+
             <File Category="source" Name="interface/patterns/ble_thread/tl/hci_tl.c"/>
+            <File Category="source" Name="interface/patterns/ble_thread/tl/hci_tl_if.c"/>
             <File Category="source" Name="interface/patterns/ble_thread/tl/shci_tl.c"/>
-            <File Category="source" Name="interface/patterns/ble_thread/tl/tl_if.c"/>
+            <File Category="source" Name="interface/patterns/ble_thread/tl/shci_tl_if.c"/>
         </SubComponent>
     </RefComponent>
 
     <RefComponent Cclass="Middleware" Cgroup="BLE_HOST_P2P_SERVER" Cversion="1.0.0">
         <SubComponent Csub="P2P_SERVER" Cvariant="Enabled">
-            <File Category="source" Name="ble/core/Src/blesvc/p2p_stm.c"/>
-            <File Category="source" Name="ble/core/Src/core/ble_gap_aci.c"/>
-            <File Category="source" Name="ble/core/Src/core/ble_gatt_aci.c"/>
-            <File Category="source" Name="ble/core/Src/core/ble_hal_aci.c"/>
-            <File Category="source" Name="ble/core/Src/core/ble_hci_le.c"/>
-            <File Category="source" Name="ble/core/Src/core/ble_l2cap_aci.c"/>
+            <File Category="source" Name="ble/core/auto/ble_gap_aci.c"/>
+            <File Category="source" Name="ble/core/auto/ble_gatt_aci.c"/>
+            <File Category="source" Name="ble/core/auto/ble_hal_aci.c"/>
+            <File Category="source" Name="ble/core/auto/ble_hci_le.c"/>
+            <File Category="source" Name="ble/core/auto/ble_l2cap_aci.c"/>
+            <File Category="source" Name="ble/svc/Src/p2p_stm.c"/>
+
             <File Category="source" Name="interface/patterns/ble_thread/tl/hci_tl.c"/>
+            <File Category="source" Name="interface/patterns/ble_thread/tl/hci_tl_if.c"/>
             <File Category="source" Name="interface/patterns/ble_thread/tl/shci_tl.c"/>
-            <File Category="source" Name="interface/patterns/ble_thread/tl/tl_if.c"/>
+            <File Category="source" Name="interface/patterns/ble_thread/tl/shci_tl_if.c"/>
         </SubComponent>
     </RefComponent>
 
     <RefComponent Cclass="Middleware" Cgroup="BLE_HOST_P2P_ROUTER" Cversion="1.0.0">
         <SubComponent Csub="P2P_ROUTER" Cvariant="Enabled">
-            <File Category="source" Name="ble/core/Src/blesvc/p2p_stm.c"/>
-            <File Category="source" Name="ble/core/Src/blesvc/eds_stm.c"/>
-            <File Category="source" Name="ble/core/Src/core/ble_gap_aci.c"/>
-            <File Category="source" Name="ble/core/Src/core/ble_gatt_aci.c"/>
-            <File Category="source" Name="ble/core/Src/core/ble_hal_aci.c"/>
-            <File Category="source" Name="ble/core/Src/core/ble_hci_le.c"/>
-            <File Category="source" Name="ble/core/Src/core/ble_l2cap_aci.c"/>
+            <File Category="source" Name="ble/core/auto/ble_gap_aci.c"/>
+            <File Category="source" Name="ble/core/auto/ble_gatt_aci.c"/>
+            <File Category="source" Name="ble/core/auto/ble_hal_aci.c"/>
+            <File Category="source" Name="ble/core/auto/ble_hci_le.c"/>
+            <File Category="source" Name="ble/core/auto/ble_l2cap_aci.c"/>
+            <File Category="source" Name="ble/svc/Src/eds_stm.c"/>
+            <File Category="source" Name="ble/svc/Src/p2p_stm.c"/>
+
             <File Category="source" Name="interface/patterns/ble_thread/tl/hci_tl.c"/>
+            <File Category="source" Name="interface/patterns/ble_thread/tl/hci_tl_if.c"/>
             <File Category="source" Name="interface/patterns/ble_thread/tl/shci_tl.c"/>
-            <File Category="source" Name="interface/patterns/ble_thread/tl/tl_if.c"/>
+            <File Category="source" Name="interface/patterns/ble_thread/tl/shci_tl_if.c"/>
         </SubComponent>
     </RefComponent>
 
     <RefComponent Cclass="Middleware" Cgroup="BLE_HOST_P2P_CLIENT" Cversion="1.0.0">
         <SubComponent Csub="P2P_CLIENT" Cvariant="Enabled">
-            <File Category="source" Name="ble/core/Src/core/ble_gap_aci.c"/>
-            <File Category="source" Name="ble/core/Src/core/ble_gatt_aci.c"/>
-            <File Category="source" Name="ble/core/Src/core/ble_hal_aci.c"/>
-            <File Category="source" Name="ble/core/Src/core/ble_hci_le.c"/>
-            <File Category="source" Name="ble/core/Src/core/ble_l2cap_aci.c"/>
+            <File Category="source" Name="ble/core/auto/ble_gap_aci.c"/>
+            <File Category="source" Name="ble/core/auto/ble_gatt_aci.c"/>
+            <File Category="source" Name="ble/core/auto/ble_hal_aci.c"/>
+            <File Category="source" Name="ble/core/auto/ble_hci_le.c"/>
+            <File Category="source" Name="ble/core/auto/ble_l2cap_aci.c"/>
+
             <File Category="source" Name="interface/patterns/ble_thread/tl/hci_tl.c"/>
+            <File Category="source" Name="interface/patterns/ble_thread/tl/hci_tl_if.c"/>
             <File Category="source" Name="interface/patterns/ble_thread/tl/shci_tl.c"/>
-            <File Category="source" Name="interface/patterns/ble_thread/tl/tl_if.c"/>
+            <File Category="source" Name="interface/patterns/ble_thread/tl/shci_tl_if.c"/>
         </SubComponent>
     </RefComponent>
 
     <RefComponent Cclass="Middleware" Cgroup="BLE_HOST_OTA" Cversion="1.0.0">
         <SubComponent Csub="OTA" Cvariant="Enabled">
-            <File Category="source" Name="ble/core/Src/blesvc/otas_stm.c"/>
-            <File Category="source" Name="ble/core/Src/core/ble_gap_aci.c"/>
-            <File Category="source" Name="ble/core/Src/core/ble_gatt_aci.c"/>
-            <File Category="source" Name="ble/core/Src/core/ble_hal_aci.c"/>
-            <File Category="source" Name="ble/core/Src/core/ble_hci_le.c"/>
-            <File Category="source" Name="ble/core/Src/core/ble_l2cap_aci.c"/>
+            <File Category="source" Name="ble/core/auto/ble_gap_aci.c"/>
+            <File Category="source" Name="ble/core/auto/ble_gatt_aci.c"/>
+            <File Category="source" Name="ble/core/auto/ble_hal_aci.c"/>
+            <File Category="source" Name="ble/core/auto/ble_hci_le.c"/>
+            <File Category="source" Name="ble/core/auto/ble_l2cap_aci.c"/>
+            <File Category="source" Name="ble/svc/Src/otas_stm.c"/>
+
             <File Category="source" Name="interface/patterns/ble_thread/tl/hci_tl.c"/>
+            <File Category="source" Name="interface/patterns/ble_thread/tl/hci_tl_if.c"/>
             <File Category="source" Name="interface/patterns/ble_thread/tl/shci_tl.c"/>
-            <File Category="source" Name="interface/patterns/ble_thread/tl/tl_if.c"/>
+            <File Category="source" Name="interface/patterns/ble_thread/tl/shci_tl_if.c"/>
         </SubComponent>
     </RefComponent>
 
@@ -353,9 +379,10 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
 
     <RefComponent Cclass="Middleware" Cgroup="CUSTOM_TEMPLATE" Cversion="1.0.0">
         <SubComponent Csub="TEMPLATE" Cvariant="Enabled">
-            <File Category="source" Name="ble/core/src/blesvc/template_stm.c"/>
-            <File Category="header" Name="ble/core/Inc/blesvc/template_stm.h"/>
-            <File Category="source" Name="interface/patterns/ble_thread/tl/tl_if.c"/>
+            <File Category="source" Name="ble/svc/Src/template_stm.c"/>
+            <File Category="header" Name="ble/svc/Inc/template_stm.h"/>
+
+            <File Category="source" Name="interface/patterns/ble_thread/tl/shci_tl_if.c"/>
         </SubComponent>
     </RefComponent>
 
@@ -375,7 +402,7 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
             <File Category="source" Name="thread/openthread/core/openthread_api/*.c"/>
             <File Category="source" Name="interface/patterns/ble_thread/tl/tl_thread_hci.c"/>
             <File Category="source" Name="interface/patterns/ble_thread/tl/shci_tl.c"/>
-            <File Category="source" Name="interface/patterns/ble_thread/tl/tl_if.c"/>
+            <File Category="source" Name="interface/patterns/ble_thread/tl/shci_tl_if.c"/>
          </SubComponent>
     </RefComponent>
 <!-- Thread RefComponents end -->
@@ -415,7 +442,7 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <Argument Name="THREAD_APPLICATION" GenericType="Simple"/>
         <Argument Name="THREAD" GenericType="Simple"/>
         <Argument Name="BLE" GenericType="Simple"/>
-        <Argument Name="UART_CLI" GenericType="Simple"/>
+        <Argument Name="CFG_CLI_UART" GenericType="Simple"/>
     <!-- ftl specific items end-->
         <Argument Name="CFG_ADV_BD_ADDRESS" GenericType="Simple"/>
         <Argument Name="CFG_FAST_CONN_ADV_INTERVAL_MIN" GenericType="Simple"/>
@@ -431,7 +458,7 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <Argument Name="P2P_SERVER_NUMBER" GenericType="Simple"/>
         <Argument Name="L2CAP_REQUEST_NEW_CONN_PARAM" GenericType="Simple"/>
         <Argument Name="CFG_UART_GUI" GenericType="Simple"/>
-        <Argument Name="DBG_TRACE_UART_CFG" GenericType="Simple"/>
+        <Argument Name="CFG_DEBUG_TRACE_UART" GenericType="Simple"/>
         <Argument Name="CFG_CONSOLE_MENU" GenericType="Simple"/>
         <Argument Name="CFG_USB_INTERFACE_ENABLE" GenericType="Simple"/>
         <Argument Name="CFG_RTCCLK_DIVIDER_CONF" GenericType="Simple"/>
@@ -440,9 +467,15 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <Argument Name="CFG_DEBUGGER_SUPPORTED" GenericType="Simple"/>
         <Argument Name="CFG_DEBUG_BLE_TRACE" GenericType="Simple"/>
         <Argument Name="CFG_DEBUG_APP_TRACE" GenericType="Simple"/>
-        <Argument Name="CFG_DEBUG_TRACE_LIGTH" GenericType="Simple"/>
+        <Argument Name="CFG_DEBUG_TRACE" GenericType="Simple"/>
+        <Argument Name="CFG_FULL_LOW_POWER" GenericType="Simple"/>
+        <Argument Name="CFG_DEBUG_TRACE_LIGHT" GenericType="Simple"/>
         <Argument Name="CFG_DEBUG_TRACE_FULL" GenericType="Simple"/>
+        <Argument Name="APPLI_CONFIG_LOG_LEVEL" GenericType="Simple"/>
+        <Argument Name="APPLI_PRINT_FILE_FUNC_LINE" GenericType="Simple"/>
+<!--
         <Argument Name="APP_DBG_EN" GenericType="Simple"/>
+-->
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="BLE_APP_ENTRY_H" Template="stm32_wpan_app_entry_h.ftl" destinationFolder="Core/Inc/"> 
@@ -486,7 +519,9 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <Argument Name="USART1_RX_PIN" GenericType="simple" Comment="RX for USART1"/>
         <Argument Name="USART1_CTS_PIN" GenericType="simple" Comment="CTS for USART1"/>
         <Argument Name="USART1_TX_DMA_CHANNEL" GenericType="simple" Comment="USART1 DMA Request TX"/>
-    </RefConfigFile>
+
+        <Argument Name="FREERTOS_STATUS" GenericType="simple" Comment="FreeRTOS Status"/>
+        </RefConfigFile>
 
     <RefConfigFile Description="" Name="BLE_VCP_CONF_H" Template="stm32_wpan_vcp_conf_h.ftl" destinationFolder="Core/Inc/">
         <File Category="header" Condition="Semaphore_BLE_TRANSPARENT_MODE_VCP" Name="vcp_conf.h" Version="1.0"/>
@@ -496,6 +531,10 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <File Category="header" Condition="all" Name="utilities_conf.h" Version="1.0"/>
         <Argument Name="THREAD" GenericType="Simple"/>
     </RefConfigFile> 
+
+    <RefConfigFile Description="" Name="STM32_LMP_IF_H" Template="stm32_wpan_stm32_lpm_if_h.ftl" destinationFolder="Core/Inc/">
+        <File Category="header" Condition="all" Name="stm32_lpm_if.h" Version="1.0"/>
+    </RefConfigFile>
 
 <!-- Core/inc end -->
 
@@ -521,7 +560,7 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <Argument Name="THREAD_APPLICATION" GenericType="Simple"/>
         <Argument Name="THREAD" GenericType="Simple"/>
         <Argument Name="BLE" GenericType="Simple"/>
-        <Argument Name="DBG_TRACE_UART_CFG" GenericType="Simple"/>
+        <Argument Name="CFG_DEBUG_TRACE_UART" GenericType="Simple"/>
         <!-- ftl specific items end-->
 
         </RefConfigFile>
@@ -539,7 +578,23 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <File Category="source" Condition="Semaphore_CFG_HW_USART1_ENABLED | Semaphore_CFG_HW_LPUART1_ENABLED" Name="Src/hw_uart.c" Version="1.0"/>
     </RefConfigFile>
 
+    <RefConfigFile Description="" Name="STM32_LMP_IF_C" Template="stm32_wpan_stm32_lpm_if_c.ftl" destinationFolder="Core/Src/">
+        <File Category="source" Condition="all" Name="stm32_lpm_if.c" Version="1.0"/>
+    </RefConfigFile>
+
+    <RefConfigFile Description="" Name="FREERTOS_PORT_C" Template="stm32_wpan_freertos_port_c.ftl" destinationFolder="Core/Src/">
+        <File Category="source" Condition="S_FREERTOS$context" Name="freertos_port.c" Version="1.0"/>
+    </RefConfigFile>
 <!-- Core/src end -->
+<!-- Utilities/lpm/tiny_lpm begin -->
+
+<!--
+    <RefConfigFile Description="" Name="UTILITIES_STM32_LPM_C" Template="stm32_wpan_stm32_lpm_c.ftl">
+        <File Category="source" Condition="all" Name="../Utilities/lpm/tiny_lpm/stm32_lpm.c" Version="1.0"/>
+    </RefConfigFile>
+-->
+
+<!-- Utilities/lpm/tiny_lpm end -->
 
 <!-- STM32_WPAN/app begin -->
     
@@ -714,13 +769,16 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
 
     <RefConfigFile Description="" Name="THREAD_APP_THREAD_C" Template="stm32_wpan_thread_app_thread_c.ftl">
         <File Category="source" Condition="Semaphore_THREAD" Name="App/app_thread.c" Version="1.0"/>
-        <Argument Name="THREAD_APPLICATION" GenericType="Simple" Comment="String (Thread_Cli_Cmd by default)"/>
-        <Argument Name="UART_CLI" GenericType="Simple" Comment=""/>
+        <Argument Name="THREAD_APPLICATION" GenericType="Simple" Comment="String (Full Thread Device with Command Line Interface by default)"/>
+        <Argument Name="CFG_CLI_UART" GenericType="Simple" Comment=""/>
+        <Argument Name="PANID" GenericType="Simple" Comment=""/>
+        <Argument Name="CHANNEL" GenericType="Simple" Comment=""/>
+        <Argument Name="FREERTOS_STATUS" GenericType="Simple" Comment=""/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="THREAD_APP_THREAD_H" Template="stm32_wpan_thread_app_thread_h.ftl">
         <File Category="header" Condition="Semaphore_THREAD" Name="App/app_thread.h" Version="1.0"/>
-        <Argument Name="THREAD_APPLICATION" GenericType="Simple" Comment="String (Thread_Cli_Cmd by default)"/>
+        <Argument Name="THREAD_APPLICATION" GenericType="Simple" Comment="String (Full Thread Device with Command Line Interface by default)"/>
     </RefConfigFile>    
     
     <RefConfigFile Description="" Name="BLE_EDDYSTONE_BEACON_H" Template="stm32_wpan_ble_eddystone_beacon_h.ftl">

@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
  ******************************************************************************
   * File Name          : ${name?lower_case}.c
@@ -8,7 +9,7 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]  
   ******************************************************************************
   */
-
+/* USER CODE END Header */
 [#-- 'UserCode sections' are indexed dynamically --]
 [#assign userCodeIdx = 0]
 

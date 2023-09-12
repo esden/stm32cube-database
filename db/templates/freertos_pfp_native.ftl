@@ -4,6 +4,7 @@
 [#assign generateFunction = "1"]
 [#assign option = "Default"]
 [#assign useMPU = "0"]
+[#assign familyName=FamilyName?lower_case]
 
 [#list SWIPdatas as SWIP]
   [#if SWIP.defines??]
@@ -37,8 +38,8 @@
         [/#list]
 
         [#assign nbThreads = nbThreads + 1]
-        [#if nbThreads == 1 && useMPU == "1"]
-          [#-- For Dory and MPU: do not generate default task --]
+        [#if (nbThreads == 1) && (useMPU == "1") && (familyName=="stm32wb")]
+          [#-- For WB and MPU: do not generate default task --]
         [#else]
          [#if generateFunction == "1"]
           [#if option == "As external"]
@@ -47,7 +48,7 @@
            void ${threadFunction}(void * argument);
           [/#if]
          [/#if]
-        [/#if]        
+        [/#if]
 
       [/#if]
       [#-- Look for timers --]  

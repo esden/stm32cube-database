@@ -335,6 +335,9 @@
 #if defined(__ICCARM__) || defined(__CC_ARM) || defined(__GNUC__)
     #include <stdint.h>
     extern uint32_t SystemCoreClock;
+[#if timeBaseSource?? && timeBaseSource=="SysTick"] [#-- generated when timebase=systick --]
+    void xPortSysTickHandler(void);
+[/#if] 
 [#if configGENERATE_RUN_TIME_STATS=="1"]
 /* USER CODE BEGIN 0 */   	      
     extern void configureTimerForRunTimeStats(void);
@@ -416,6 +419,9 @@
 [/#if]
 [#if configUSE_TICKLESS_IDLE=="1"]
 #define configUSE_TICKLESS_IDLE                  1
+[/#if]
+[#if configUSE_TICKLESS_IDLE=="2"]
+#define configUSE_TICKLESS_IDLE                  2
 [/#if]
 [#if configUSE_TASK_NOTIFICATIONS=="0"]
 #define configUSE_TASK_NOTIFICATIONS             0

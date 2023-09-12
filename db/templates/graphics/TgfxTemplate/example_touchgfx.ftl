@@ -66,11 +66,15 @@
       "AvailableResolutions": [],
       "PhysicalButtons": [],
       "GenerateAssetsCommand": "make -f simulator/gcc/Makefile assets -j10",
-      [#if IDE == "SW4STM32" || IDE == "STM32CubeIDE"]
-      "PostGenerateCommand": [#if underRoot?? && underRoot=="true"]"touchgfx update_project --project-file=[#if dualCore??]../[/#if]../.project "[#else]"touchgfx update_project --project-file=${ideProjectFile?replace(MXPRojectRootPath,"..")}  --gui-group-name=Application/User/TouchGFX/gui --generated-group-name=Application/User/TouchGFX/generated"[/#if],      
-      [#else]
+      [#if IDE == "SW4STM32"]
+      "PostGenerateCommand": [#if underRoot?? && underRoot=="true"]"touchgfx update_project --project-file=[#if dualCore??]../[/#if]../.project "[#else]"touchgfx update_project --project-file=${ideProjectFile?replace(MXPRojectRootPath,"..")}/.project [/#if],      
+	  [#else]
+		[#if IDE == "STM32CubeIDE"]
+      "PostGenerateCommand": [#if underRoot?? && underRoot=="true"]"touchgfx update_project --project-file=[#if dualCore??]../[/#if]../.cproject "[#else]"touchgfx update_project --project-file=${ideProjectFile?replace(MXPRojectRootPath,"..")}/.project [/#if],
+		[#else]
       "PostGenerateCommand":[#if IDE?contains("EWARM")]"touchgfx update_project --project-file=[#if dualCore??]..\\[/#if]${ideProjectFile?replace(MXPRojectRootPath,"..")}"[#else]"touchgfx update_project --project-file=${ideProjectFile?replace(MXPRojectRootPath,"..")} --gui-group-name=Application/User/TouchGFX/gui --generated-group-name=Application/User/TouchGFX/generated"[/#if],
-      [/#if]
+		[/#if]
+	  [/#if]
       "CompileSimulatorCommand": "make -f simulator/gcc/Makefile -j10",
       "RunSimulatorCommand": "build\\bin\\simulator.exe",
       "CompileTargetCommand": "",

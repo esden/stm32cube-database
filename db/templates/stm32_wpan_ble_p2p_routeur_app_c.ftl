@@ -29,7 +29,7 @@
 #include "app_ble.h"
 #include "p2p_routeur_app.h"
 [#if  (FREERTOS_STATUS = 0)]
-#include "scheduler.h"
+#include "stm32_seq.h"
 [/#if]
 [#if  (FREERTOS_STATUS = 1)]
 #include "cmsis_os.h"
@@ -253,7 +253,7 @@ void P2P_Router_APP_Init(void)
 
     /* USER CODE END P2P_Router_APP_Init_1 */
 
-    SCH_RegTask( CFG_TASK_SEARCH_SERVICE_ID, Client_Update_Service );
+    UTIL_SEQ_RegTask( 1<< CFG_TASK_SEARCH_SERVICE_ID, UTIL_SEQ_RFU, Client_Update_Service );
 
     /* USER CODE BEGIN P2P_Router_APP_Init_2 */
 
@@ -763,7 +763,7 @@ static SVCCTL_EvtAckStatus_t Client_Event_Handler(void *Event)
 
                     if(index < BLE_CFG_CLT_MAX_NBR_CB)
                     {
-                        SCH_SetTask(  1<<CFG_TASK_SEARCH_SERVICE_ID, CFG_SCH_PRIO_0 );
+                        UTIL_SEQ_SetTask(  1<<CFG_TASK_SEARCH_SERVICE_ID, CFG_SCH_PRIO_0 );
                     }
                 }
                 break; /*EVT_BLUE_GATT_PROCEDURE_COMPLETE*/

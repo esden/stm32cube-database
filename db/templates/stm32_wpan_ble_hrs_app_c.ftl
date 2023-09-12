@@ -25,7 +25,11 @@
 
 #include "ble.h"
 #include "hrs_app.h"
-#include "scheduler.h"
+[#if FREERTOS_STATUS = 0]
+#include "stm32_seq.h"
+[#else]
+#include "cmsis_os.h"
+[/#if]
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -66,12 +70,28 @@ PLACE_IN_SECTION("BLE_APP_CONTEXT") static HRSAPP_Context_t HRSAPP_Context;
 /**
  * END of Section BLE_APP_CONTEXT
  */
+ [#if FREERTOS_STATUS = 1]
+osThreadId_t HrsProcessId;
+
+const osThreadAttr_t HrsProcess_attr = {
+    .name = CFG_HRS_PROCESS_NAME,
+    .attr_bits = CFG_HRS_PROCESS_ATTR_BITS,
+    .cb_mem = CFG_HRS_PROCESS_CB_MEM,
+    .cb_size = CFG_HRS_PROCESS_CB_SIZE,
+    .stack_mem = CFG_HRS_PROCESS_STACK_MEM,
+    .priority = CFG_HRS_PROCESS_PRIORITY,
+    .stack_size = CFG_HRS_PROCESS_STACk_SIZE
+};
+[/#if]
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
 
 /* Private functions prototypes-----------------------------------------------*/
 static void HrMeas( void );
+[#if FREERTOS_STATUS = 1]
+static void HrsProcess(void *argument);
+[/#if]
 static void HRSAPP_Measurement(void);
 static uint32_t HRSAPP_Read_RTC_SSR_SS ( void );
 /* USER CODE BEGIN PFP */
@@ -131,13 +151,29 @@ void HRS_Notification(HRS_App_Notification_evt_t *pNotification)
 
 void HRSAPP_Init(void)
 {
-  SCH_RegTask( CFG_TASK_MEAS_REQ_ID, HRSAPP_Measurement );
+[#if FREERTOS_STATUS = 1]
+  HrsProcessId = osThreadNew(HrsProcess, NULL, &HrsProcess_attr);
+[#else]
+  UTIL_SEQ_RegTask( 1<< CFG_TASK_MEAS_REQ_ID, UTIL_SEQ_RFU, HRSAPP_Measurement );
+[/#if]
 /* USER CODE BEGIN HRSAPP_Init */
 
 /* USER CODE END HRSAPP_Init */
   return;
 }
 
+[#if FREERTOS_STATUS = 1]
+static void HrsProcess(void *argument)
+{
+  UNUSED(argument);
+
+  for(;;)
+  {
+    osThreadFlagsWait( 1, osFlagsWaitAny, osWaitForever);
+    HRSAPP_Measurement( );
+  }
+}
+[/#if]
 static void HRSAPP_Measurement(void)
 {
 /* USER CODE BEGIN HRSAPP_Measurement */
@@ -153,8 +189,13 @@ static void HrMeas( void )
    * The background is the only place where the application can make sure a new aci command
    * is not sent if there is a pending one
    */
-  SCH_SetTask( 1<<CFG_TASK_MEAS_REQ_ID, CFG_SCH_PRIO_0);
-  /* USER CODE BEGIN HrMeas */
+[#if FREERTOS_STATUS = 1]
+  osThreadFlagsSet( HrsProcessId, 1 );
+  
+[#else]
+  UTIL_SEQ_SetTask( 1<<CFG_TASK_MEAS_REQ_ID, CFG_SCH_PRIO_0);
+[/#if]
+/* USER CODE BEGIN HrMeas */
 
 /* USER CODE END HrMeas */
 

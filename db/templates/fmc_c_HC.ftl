@@ -1,4 +1,10 @@
 [#ftl]
+
+[#assign contextFolder=""]
+[#if cpucore!=""]
+[#assign contextFolder = cpucore?replace("ARM_CORTEX_","C")+"/"]
+[/#if]
+
 [#list IPdatas as IP]
 [#assign ipvar = IP]
 [#assign useGpio = false]
@@ -551,6 +557,11 @@
   [/#if]
 {
 [/#if]
+
+[#if RESMGR_UTILITY??]
+    [@common.optinclude name=contextFolder+mxTmpFolder+"/resmgrutility_"+instName+".tmp"/][#-- ADD RESMGR_UTILITY Code--]
+[/#if]
+
 #n#t/* USER CODE BEGIN ${instName}_Init 0 */
 #n
 #t/* USER CODE END ${instName}_Init 0 */

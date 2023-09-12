@@ -253,6 +253,18 @@
 		<Parameter Name="HighImpedanceMode" />
 	</RefMode>
 
+	<RefParameter Comment="UCPD Disable Dead Battery Signals" DefaultValue="Disable" Name="DisableDeadBatterySignalsConfig" Type="list" Visible="false">
+		<Condition Expression="UCPD1_Exist &amp; !S_UCPD_ModeUCPD1" Diagnostic=""/>
+		<PossibleValue Comment="S_UCPD_ModeUCPD1" Value="Disable"/>
+	</RefParameter>
+
+	<RefParameter Comment="UCPD Disable Dead Battery Signals" DefaultValue="null" Name="DisableDeadBatterySignalsConfig" Type="list" Visible="false"/>
+
+	<RefMode Name="DisableDeadBatterySignals">
+		<ConfigForMode>DisableDeadBatterySignals</ConfigForMode>
+		<Parameter Name="DisableDeadBatterySignalsConfig"/>
+	</RefMode>
+
 	<!-- Modes for Debug (JTAG and Trace) -->
 	<ModeLogicOperator Name="OR">
 		<Mode Name="Debug">
@@ -644,6 +656,16 @@
                 </Mode>                
             </ModeLogicOperator>
         </Mode>                        	
+        <Mode Name="DisableDeadBatterySignals" UserName="save power of non-active UCPD - deactive Dead Battery pull-up" RemoveDisable="true">
+            <ModeLogicOperator Name="NONE">
+                <Mode Name="DisableDeadBatterySignals" UserName="Dead Battery Signals disabled">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="VS_DBSignals"/>
+                    </SignalLogicalOp>
+                    <Semaphore>SYS_DisabledDeadBattery</Semaphore>
+                </Mode>
+            </ModeLogicOperator>
+        </Mode>
 	</ModeLogicOperator>
 
 	<!-- RefSignal for System -->
@@ -693,5 +715,6 @@
     <RefSignal Name="VS_tim23" Virtual="true"/>
     <RefSignal Name="VS_RTC" Virtual="true"/>
     <RefSignal Name="VS_Systick" Virtual="true"/>
+    <RefSignal Name="VS_DBSignals" Virtual="true"/>
 
 </IP>

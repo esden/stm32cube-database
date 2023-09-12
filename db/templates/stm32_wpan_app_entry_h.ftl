@@ -3,9 +3,8 @@
 /**
  ******************************************************************************
   * File Name          : ${name}
-  * Description        : App entry configuration file for BLE 
-  *                      middleWare.
-  ******************************************************************************
+  * Description        : App entry configuration file for STM32WPAN Middleware.
+ ******************************************************************************
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */

@@ -2,9 +2,9 @@
 /**
  ******************************************************************************
   * File Name          : ${name}
-  * Description        : Hardware IPCC source file for BLE/THREAD 
-  *                      middleWare.
-  ******************************************************************************
+  * Description        : Hardware IPCC source file for STM32WPAN Middleware.
+  *
+ ******************************************************************************
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */

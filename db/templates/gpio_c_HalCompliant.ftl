@@ -1,5 +1,10 @@
 [#ftl]
 
+[#assign contextFolder=""]
+[#if cpucore!=""]
+[#assign contextFolder = cpucore?replace("ARM_CORTEX_","C")+"/"]
+[/#if]
+
 [#compress]
 [#list datas as data]
     [#if data.ipName=="gpio"]
@@ -10,6 +15,11 @@
 #t*/
 static void MX_GPIO_Init(void) 
 {
+
+[#if RESMGR_UTILITY??]
+    [@common.optinclude name=contextFolder+mxTmpFolder+"/resmgrutility_"+data.ipName+".tmp"/][#-- ADD RESMGR_UTILITY Code--]
+[/#if]
+
         [#assign v = ""]
 [#if data.ipName=="gpio" && FamilyName!="STM32MP1"][#-- Actualy we don't need to generate code for gpio modes not associated to any peripheral --]
         [#list data.variables as variable]				
@@ -41,6 +51,7 @@ static void MX_GPIO_Init(void)
 [/#if]
 static void MX_${data.ipName}_GPIO_Init(void) 
 {
+
 #n
         [#assign v = ""]
         [#list data.variables as variable] [#-- variables declaration --]

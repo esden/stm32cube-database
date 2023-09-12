@@ -17,8 +17,8 @@
 
 [#list SWIPdatas as SWIP]
   [#if SWIP.variables??]
-        [#list SWIP.variables as variable]
-          [#if variable.name=="Mutexes"]
+    [#list SWIP.variables as variable]
+      [#if variable.name=="Mutexes"]
         [#assign s = variable.valueList]
         [#assign index = 0]
         [#list s as i]

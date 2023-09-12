@@ -4,7 +4,7 @@
   ******************************************************************************
   * @file    tracer_emb_conf.h
   * @author  MCD Application Team
-  * @brief   This file contains the device define.
+  * @brief   This file contains the Trace HW related defines.
   ******************************************************************************
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
@@ -33,75 +33,80 @@
 [#assign UART_TX_DMA_interrupt = ""]
 
 [#-- SWIPdatas is a list of SWIPconfigModel --]
-[#list SWIPdatas as SWIP]
-    [#if SWIP.defines??]
-        [#list SWIP.defines as definition]
-            [#if definition.name == "UARTinstance" && definition.value != ""]
-                [#assign UARTUsed = true]
-                [#assign UARTinstance = definition.value]
-            [/#if]
-            [#if definition.name == "UARTbaudrate"]
-                [#assign UARTbaudrate = definition.value]
-            [/#if]
-            [#if definition.name == "UARTinterrupt"]
-                [#assign UARTinterrupt = definition.value]
-            [/#if]
-            [#if definition.name == "UARTenableClock"]
-                [#assign UARTenableClock = definition.value]
-            [/#if]
-            [#if definition.name == "UARTdisableClock"]
-                [#assign UARTdisableClock = definition.value]
-            [/#if]
-            [#if definition.name == "UART_TX_PIN"]
-                [#assign UART_TX_PIN = definition.value]
-                [#if UART_TX_PIN != "" && UART_TX_PIN != "valueNotSetted"]
-                    [#assign UART_TX_PIN_elems = UART_TX_PIN.split("_")]
-                    [#assign UART_TX_GPIO_PORT = UART_TX_PIN_elems[1]]
-                    [#assign UART_TX_GPIO_PIN = UART_TX_PIN_elems[2]]
-                    [#assign UART_TX_SELECT_AF = UART_TX_PIN_elems[4]]
-                [#else]
-                    [#assign UART_TX_GPIO_PORT = "valueNotSetted"]
-                    [#assign UART_TX_GPIO_PIN = "valueNotSetted"]
-                    [#assign UART_TX_SELECT_AF = "valueNotSetted"]
-                [/#if]
-            [/#if]
-            [#if definition.name == "UART_RX_PIN"]
-                [#assign UART_RX_PIN = definition.value]
-                [#if UART_RX_PIN != "" && UART_RX_PIN != "valueNotSetted"]
-                    [#assign UART_RX_PIN_elems = UART_RX_PIN.split("_")]
-                    [#assign UART_RX_GPIO_PORT = UART_RX_PIN_elems[1]]
-                    [#assign UART_RX_GPIO_PIN = UART_RX_PIN_elems[2]]
-                    [#assign UART_RX_SELECT_AF = UART_RX_PIN_elems[4]]
-                [#else]
-                    [#assign UART_RX_GPIO_PORT = "valueNotSetted"]
-                    [#assign UART_RX_GPIO_PIN = "valueNotSetted"]
-                    [#assign UART_RX_SELECT_AF = "valueNotSetted"]
-                [/#if]
-            [/#if]
-            [#if definition.name == "UART_TX_DMA_CHANNEL"]
-                [#assign UART_TX_DMA_CHANNEL = definition.value]
-                [#if UART_TX_DMA_CHANNEL != ""]
-                    [#assign UART_TX_DMA_CHANNEL_elems = UART_TX_DMA_CHANNEL.split("_")]
-                    [#assign UART_TX_DMA_REQUEST = UART_TX_DMA_CHANNEL_elems[0] + "_" + UART_TX_DMA_CHANNEL_elems[1]]
-                    [#assign UART_TX_DMA = UART_TX_DMA_CHANNEL_elems[2]]
-                    [#assign UART_TX_DMA_LL_CHANNEL = UART_TX_DMA_CHANNEL_elems[3]?upper_case]
-                    [#assign UART_TX_DMA_LL_CHANNEL = UART_TX_DMA_LL_CHANNEL + "_" + UART_TX_DMA_CHANNEL_elems[4]]
-                    [#assign UART_TX_DMA_CHANNEL_ID = UART_TX_DMA_CHANNEL_elems[4]]
-                [#else]
-                    [#assign UART_TX_DMA_REQUEST = "valueNotSetted"]
-                    [#assign UART_TX_DMA = "valueNotSetted"]
-                    [#assign UART_TX_DMA_LL_CHANNEL = "valueNotSetted"]
-                    [#assign UART_TX_DMA_CHANNEL_ID = "valueNotSetted"]
-                [/#if]
-            [/#if]
-            [#if definition.name == "UART_TX_DMA_interrupt"]
-                [#assign UART_TX_DMA_interrupt = definition.value]
-            [/#if]
-            [#if definition.name == "UART_TX_DMA_enableClock"]
-                [#assign UART_TX_DMA_enableClock = definition.value]
+
+[#list IPdatas as IP]
+    [#list IP.configModelList as configModel]
+        [#list configModel.refConfigFiles as refConfigFile]
+            [#if refConfigFile.name?contains("TRACER_EMB_CONF")]
+                [#list refConfigFile.arguments as argument]
+                    [#if argument.name == "UARTinstance" && argument.value != ""]
+                        [#assign UARTUsed = true]
+                        [#assign UARTinstance = argument.value]
+                    [/#if]
+                    [#if argument.name == "UARTbaudrate"]
+                        [#assign UARTbaudrate = argument.value]
+                    [/#if]
+                    [#if argument.name == "UARTinterrupt"]
+                        [#assign UARTinterrupt = argument.value]
+                    [/#if]
+                    [#if argument.name == "UARTenableClock"]
+                        [#assign UARTenableClock = argument.value]
+                    [/#if]
+                    [#if argument.name == "UARTdisableClock"]
+                        [#assign UARTdisableClock = argument.value]
+                    [/#if]
+                    [#if argument.name == "UART_TX_PIN"]
+                        [#assign UART_TX_PIN = argument.value]
+                        [#if UART_TX_PIN != "" && UART_TX_PIN != "valueNotSetted"]
+                            [#assign UART_TX_PIN_elems = UART_TX_PIN.split("_")]
+                            [#assign UART_TX_GPIO_PORT = UART_TX_PIN_elems[1]]
+                            [#assign UART_TX_GPIO_PIN = UART_TX_PIN_elems[2]]
+                            [#assign UART_TX_SELECT_AF = UART_TX_PIN_elems[4]]
+                        [#else]
+                            [#assign UART_TX_GPIO_PORT = "valueNotSetted"]
+                            [#assign UART_TX_GPIO_PIN = "valueNotSetted"]
+                            [#assign UART_TX_SELECT_AF = "valueNotSetted"]
+                        [/#if]
+                    [/#if]
+                    [#if argument.name == "UART_RX_PIN"]
+                        [#assign UART_RX_PIN = argument.value]
+                        [#if UART_RX_PIN != "" && UART_RX_PIN != "valueNotSetted"]
+                            [#assign UART_RX_PIN_elems = UART_RX_PIN.split("_")]
+                            [#assign UART_RX_GPIO_PORT = UART_RX_PIN_elems[1]]
+                            [#assign UART_RX_GPIO_PIN = UART_RX_PIN_elems[2]]
+                            [#assign UART_RX_SELECT_AF = UART_RX_PIN_elems[4]]
+                        [#else]
+                            [#assign UART_RX_GPIO_PORT = "valueNotSetted"]
+                            [#assign UART_RX_GPIO_PIN = "valueNotSetted"]
+                            [#assign UART_RX_SELECT_AF = "valueNotSetted"]
+                        [/#if]
+                    [/#if]
+                    [#if argument.name == "UART_TX_DMA_CHANNEL"]
+                        [#assign UART_TX_DMA_CHANNEL = argument.value]
+                        [#if UART_TX_DMA_CHANNEL != ""]
+                            [#assign UART_TX_DMA_CHANNEL_elems = UART_TX_DMA_CHANNEL.split("_")]
+                            [#assign UART_TX_DMA_REQUEST = UART_TX_DMA_CHANNEL_elems[0] + "_" + UART_TX_DMA_CHANNEL_elems[1]]
+                            [#assign UART_TX_DMA = UART_TX_DMA_CHANNEL_elems[2]]
+                            [#assign UART_TX_DMA_LL_CHANNEL = UART_TX_DMA_CHANNEL_elems[3]?upper_case]
+                            [#assign UART_TX_DMA_LL_CHANNEL = UART_TX_DMA_LL_CHANNEL + "_" + UART_TX_DMA_CHANNEL_elems[4]]
+                            [#assign UART_TX_DMA_CHANNEL_ID = UART_TX_DMA_CHANNEL_elems[4]]
+                        [#else]
+                            [#assign UART_TX_DMA_REQUEST = "valueNotSetted"]
+                            [#assign UART_TX_DMA = "valueNotSetted"]
+                            [#assign UART_TX_DMA_LL_CHANNEL = "valueNotSetted"]
+                            [#assign UART_TX_DMA_CHANNEL_ID = "valueNotSetted"]
+                        [/#if]
+                    [/#if]
+                    [#if argument.name == "UART_TX_DMA_interrupt"]
+                        [#assign UART_TX_DMA_interrupt = argument.value]
+                    [/#if]
+                    [#if argument.name == "UART_TX_DMA_enableClock"]
+                        [#assign UART_TX_DMA_enableClock = argument.value]
+                    [/#if]
+                [/#list]
             [/#if]
         [/#list]
-    [/#if]
+    [/#list]
 [/#list]
 
 /* CubeMX Generated */
@@ -111,7 +116,7 @@
 #define TRACER_EMB_CONF_H
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
@@ -136,8 +141,6 @@
 [#if !UARTUsed]/*[/#if]
 #define TRACER_EMB_BAUDRATE                          ${UARTbaudrate}UL
 
-#define TRACER_EMB_BUFFER_SIZE                       1024UL
-
 [#if UART_TX_DMA != ""]
 #define TRACER_EMB_DMA_MODE                          1UL
 #define TRACER_EMB_IT_MODE                           0UL
@@ -145,6 +148,8 @@
 #define TRACER_EMB_DMA_MODE                          0UL
 #define TRACER_EMB_IT_MODE                           1UL
 [/#if]
+
+#define TRACER_EMB_BUFFER_SIZE                       1024UL
 
 /* -----------------------------------------------------------------------------
       Definitions for TRACE Hw information
@@ -169,7 +174,7 @@
 
 #define TRACER_EMB_ENABLE_CLK_USART()                ${UARTenableClock}
 #define TRACER_EMB_DISABLE_CLK_USART()               ${UARTdisableClock}
-#define TRACER_EMB_SET_CLK_SOURCE_USART()            // No need for clock source selection in case of USART3 // LL_RCC_SetUSARTClockSource(LL_RCC_USART3_CLKSOURCE_PCLK2)
+#define TRACER_EMB_SET_CLK_SOURCE_USART()            /* No need for clock source selection in case of USART3 // LL_RCC_SetUSARTClockSource(LL_RCC_USART3_CLKSOURCE_PCLK2) */
 #define TRACER_EMB_USART_IRQ                         ${UARTinterrupt}
 #define TRACER_EMB_USART_IRQHANDLER                  ${UARTinterrupt.replace("IRQn", "IRQHandler")}
 [#if UART_TX_GPIO_PIN?number < 8]
@@ -194,9 +199,10 @@
 #define TRACER_EMB_TX_DMA_CLEAR_FLAG                 LL_DMA_ClearFlag_GI${UART_TX_DMA_CHANNEL_ID}
 [/#if]
 
+[#if !UARTUsed]*/[/#if]
 
 #ifdef __cplusplus
- }
+}
 #endif
 
 #endif /* TRACER_EMB_CONF_H */

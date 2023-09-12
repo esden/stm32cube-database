@@ -8,6 +8,12 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
+
+[#assign contextFolder=""]
+[#if cpucore!=""]
+[#assign contextFolder = cpucore?replace("ARM_CORTEX_","C")+"/"]
+[/#if]
+
 [#list IPdatas as IP]
 [#assign ipvar = IP]
 /* Includes ------------------------------------------------------------------*/
@@ -586,6 +592,11 @@ void MX_${instName}_Init(void)
     [#if halMode!=name]void MX_${instName}_${halMode}_Init(void)[#else]void MX_${instName}_Init(void)[/#if]
   [/#if]
 {
+
+[#if RESMGR_UTILITY??]
+    [@common.optinclude name=contextFolder+mxTmpFolder+"/resmgrutility_"+instName+".tmp"/][#-- ADD RESMGR_UTILITY Code--]
+[/#if]
+
   [#assign args = ""]
   [#assign listOfLocalVariables=""]
   [#assign resultList=""]

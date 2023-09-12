@@ -7,36 +7,40 @@
     IncludeFile="usbpd_core.h,usbpd_dpm_core.h,usbpd_hw_if.h"
     Name="USBPD"
     RootFolder="Middlewares/ST/STM32_USBPD_Library/"
-    Version="STM32Cube_FW_G0_v0.9.0">
+    Version="STM32Cube_FW_G0_v1.3.0">
 
     <RefConfig Name="USBPD_Init">
         <!-- CallLibMethod Name="USBPDStackInit"/--> <!-- (used by USB) w/ method arguments -->
         <!-- CallLibMethod Name="USBPD_DPM_Init"/-->
         <!-- CallLibMethod Name="USBPD_HW_IF_GlobalHwInit"/-->
         <!--ImplementCallBack Name=""-->
-        <Component Name="Middleware:USBPD"/>
+        <Component Name="Middleware:USBPD_Core"/>
         <ConfigFile Name="USBPD_DPM_CONF"/>
         <ConfigFile Name="USBPD_DPM_USER_H"/>
         <ConfigFile Name="USBPD_DPM_USER_C"/>
+        <ConfigFile Name="USBPD_DPM_CORE_H"/>
+        <ConfigFile Name="USBPD_DPM_CORE_C"/>
+        <ConfigFile Name="USBPD_VDM_USER_H"/>
+        <ConfigFile Name="USBPD_VDM_USER_C"/>
+
+        <Component Name="Middleware:USBPD_Device"/>
         <ConfigFile Name="USBPD_PDO_DEFS"/>
         <ConfigFile Name="USBPD_PWR_IF_H"/>
         <ConfigFile Name="USBPD_PWR_IF_C"/>
         <ConfigFile Name="USBPD_PWR_USER_H"/>
         <ConfigFile Name="USBPD_PWR_USER_C"/>
-        <ConfigFile Name="USBPD_DPM_CORE_H"/>
-        <ConfigFile Name="USBPD_DPM_CORE_C"/>
-        <ConfigFile Name="USBPD_VDM_USER_H"/>
-        <ConfigFile Name="USBPD_VDM_USER_C"/>
         <ConfigFile Name="USBPD_DEVICES_CONF"/>
+
         <Defines Name="USBPD_PORT_COUNT" Value="$USBPD_NbPorts"/>
         <Defines Name="USBPDCORE_LIB_PD3_FULL" Value=""/>
         <Defines Name="_RTOS" Value=""/>
         <Defines Name="_DRP" Value="" Condition="DualRoleUCPD1 | DualRoleUCPD2 | (SourceUCPD1 &amp; SinkUCPD2) | (SourceUCPD2 &amp; SinkUCPD1)"/>
         <Defines Name="_SRC" Value="" Condition="(SourceUCPD1 &amp; !(SinkUCPD2 | DualRoleUCPD2)) | (SourceUCPD2 &amp; !(SinkUCPD1 | DualRoleUCPD1))"/>
         <Defines Name="_SNK" Value="" Condition="(SinkUCPD1 &amp; !(SourceUCPD2 | DualRoleUCPD2)) | (SinkUCPD2 &amp; !(SourceUCPD1 | DualRoleUCPD1))"/>
+        <Defines Name="_TRACE" Value="" Condition="USBPD_TRACEREMB"/>
     </RefConfig>
 
-    <RefComponent Cclass="Middleware" Cgroup="USBPD" Cversion="0.9.0">
+    <RefComponent Cclass="Middleware" Cgroup="USBPD_Core" Cversion="2.6.0">
         <!-- USB Power Delivery - Core -->
         <File Category="header" Name="Core/inc/usbpd_core.h"/>
         <File Category="header" Name="Core/inc/usbpd_def.h"/>
@@ -52,6 +56,9 @@
         <File Category="library" Condition="KEIL6;SIiTideIiMDKAaARMOoV6" Name="Core/lib/USBPDCORE_PD3_FULL_CM0PLUS_wc32.a" Version=""/>
         <File Category="library" Condition="KEIL5;SIiTideIiMDKAaARMOoV5" Name="Core/lib/USBPDCORE_PD3_FULL_CM0PLUS_Keil.lib" Version=""/>
 
+    </RefComponent>
+
+    <RefComponent Cclass="Middleware" Cgroup="USBPD_Device" Cversion="2.6.0">
         <!-- USB Power Delivery - Devices -->
         <File Category="header" Name="Devices/STM32G0XX/inc/usbpd_cad_hw_if.h"/>
         <File Category="header" Name="Devices/STM32G0XX/inc/usbpd_hw.h"/>
@@ -67,14 +74,14 @@
         <File Category="source" Name="Devices/STM32G0XX/src/usbpd_pwr_hw_if.c"/>
         <File Category="source" Name="Devices/STM32G0XX/src/usbpd_timersserver.c"/>
 
-        <!-- TIM -->
+        <!-- TIM requested by usbpd_timersserver -->
         <File Category="header" Name="../../../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_ll_tim.h"/>
         <File Category="source" Name="../../../Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_ll_tim.c"/>
 
     </RefComponent>
 
     <RefConfigFile Description="Definitions for the header file usbpd_dpm_conf.h" Name="USBPD_DPM_CONF" Template="usbpd_dpm_conf.ftl">
-        <File Name="usbpd_dpm_conf.h" Category="header" Condition="all" Version="0.9.0"/>
+        <File Name="usbpd_dpm_conf.h" Category="header" Condition="all" Version="2.6.0"/>
         <!--  Common -->
         <Argument Name="DRP" GenericType="simple" Comment=""/>
         <Argument Name="SRC" GenericType="simple" Comment=""/>
@@ -150,21 +157,21 @@
     </RefConfigFile>
 
     <RefConfigFile Description="Definitions for the header file usbpd_dpm_user.h" Name="USBPD_DPM_USER_H" Template="usbpd_dpm_user_h.ftl">
-        <File Name="usbpd_dpm_user.h" Category="header" Condition="all" Version="0.9.0"/>
+        <File Name="usbpd_dpm_user.h" Category="header" Condition="all" Version="2.6.0"/>
     </RefConfigFile>
     <RefConfigFile Description="Definitions for the header file usbpd_dpm_user.c" Name="USBPD_DPM_USER_C" Template="usbpd_dpm_user_c.ftl">
-        <File Name="usbpd_dpm_user.c" Category="source" Condition="all" Version="0.9.0"/>
+        <File Name="usbpd_dpm_user.c" Category="source" Condition="all" Version="2.6.0"/>
     </RefConfigFile>
 
-    <RefConfigFile Description="Definitions for the header file usbpd_pwr_user.h" Name="USBPD_PWR_USER_H" Template="usbpd_pwr_user_h.ftl">
-        <File Name="usbpd_pwr_user.h" Category="header" Condition="all" Version="0.9.0"/>
+    <RefConfigFile Description="Definitions for the header file usbpd_pwr_user.h" Name="USBPD_PWR_USER_H" Template="usbpd_pwr_user_h_g0.ftl">
+        <File Name="usbpd_pwr_user.h" Category="header" Condition="all" Version="2.6.0"/>
     </RefConfigFile>
-    <RefConfigFile Description="Definitions for the header file usbpd_pwr_user.c" Name="USBPD_PWR_USER_C" Template="usbpd_pwr_user_c.ftl">
-        <File Name="usbpd_pwr_user.c" Category="source" Condition="all" Version="0.9.0"/>
+    <RefConfigFile Description="Definitions for the header file usbpd_pwr_user.c" Name="USBPD_PWR_USER_C" Template="usbpd_pwr_user_c_g0.ftl">
+        <File Name="usbpd_pwr_user.c" Category="source" Condition="all" Version="2.6.0"/>
     </RefConfigFile>
 
     <RefConfigFile Description="Definitions for the header file usbpd_pdo_defs.h" Name="USBPD_PDO_DEFS" Template="usbpd_pdo_defs.ftl">
-        <File Name="usbpd_pdo_defs.h" Category="header" Condition="all" Version="0.9.0"/>
+        <File Name="usbpd_pdo_defs.h" Category="header" Condition="all" Version="2.6.0"/>
         <Argument Name="USBPD_NbPorts" GenericType="simple" Comment="The number of the USBPD ports"/>
         <Argument Name="PORT0_SOURCE_PDO1" GenericType="simple" Comment="Source PDO 1 for port 0"/>
         <Argument Name="PORT0_SOURCE_PDO2" GenericType="simple" Comment="Source PDO 2 for port 0"/>
@@ -197,32 +204,32 @@
     </RefConfigFile>
 
     <RefConfigFile Description="Definitions for the header file usbpd_pwr_if.h" Name="USBPD_PWR_IF_H" Template="usbpd_pwr_if_h.ftl">
-        <File Name="usbpd_pwr_if.h" Category="header" Condition="all" Version="0.9.0"/>
+        <File Name="usbpd_pwr_if.h" Category="header" Condition="all" Version="2.6.0"/>
         <!--Argument Name="" GenericType="simple" Comment=""/-->
     </RefConfigFile>
 
     <RefConfigFile Description="Definitions for the file usbpd_pwr_if.c" Name="USBPD_PWR_IF_C" Template="usbpd_pwr_if_c.ftl">
-        <File Name="usbpd_pwr_if.c" Category="source" Condition="all" Version="0.9.0"/>
+        <File Name="usbpd_pwr_if.c" Category="source" Condition="all" Version="2.6.0"/>
         <!--Argument Name="" GenericType="simple" Comment=""/-->
     </RefConfigFile>
 
     <RefConfigFile Description="Definitions for the header file usbpd_vdm_user.h" Name="USBPD_VDM_USER_H" Template="usbpd_vdm_user_h.ftl">
-        <File Name="usbpd_vdm_user.h" Category="header" Condition="all" Version="0.9.0"/>
+        <File Name="usbpd_vdm_user.h" Category="header" Condition="all" Version="2.6.0"/>
         <!--Argument Name="" GenericType="simple" Comment=""/-->
     </RefConfigFile>
 
     <RefConfigFile Description="Definitions for the  file usbpd_vdm_user.c" Name="USBPD_VDM_USER_C" Template="usbpd_vdm_user_c.ftl">
-        <File Name="usbpd_vdm_user.c" Category="header" Condition="all" Version="0.9.0"/>
+        <File Name="usbpd_vdm_user.c" Category="header" Condition="all" Version="2.6.0"/>
         <!--Argument Name="" GenericType="simple" Comment=""/-->
     </RefConfigFile>
 
     <RefConfigFile Description="Definitions for the header file usbpd_dpm_core.h" Name="USBPD_DPM_CORE_H" Template="usbpd_dpm_core_h.ftl">
-        <File Name="usbpd_dpm_core.h" Category="header" Condition="all" Version="0.9.0"/>
+        <File Name="usbpd_dpm_core.h" Category="header" Condition="all" Version="2.6.0"/>
         <Argument Name="RTOS" GenericType="simple" Comment=""/>
     </RefConfigFile>
 
     <RefConfigFile Description="Definitions for the header file usbpd_dpm_core.c" Name="USBPD_DPM_CORE_C" Template="usbpd_dpm_core_c.ftl">
-        <File Name="usbpd_dpm_core.c" Category="source" Condition="all" Version="0.9.0"/>
+        <File Name="usbpd_dpm_core.c" Category="source" Condition="all" Version="2.6.0"/>
         <Argument Name="RTOS" GenericType="simple" Comment=""/>
         <Argument Name="USBPD_REV30_SUPPORT" GenericType="simple" Comment=""/>
         <Argument Name="DRP" GenericType="simple" Comment=""/>
@@ -232,7 +239,7 @@
     </RefConfigFile>
 
     <RefConfigFile Description="Definitions for the source file usbpd_bsp_hw.c" Name="USBPD_DEVICES_CONF" Template="usbpd_devices_conf_g0.ftl">
-        <File Name="usbpd_devices_conf.h" Category="header" Condition="all" Version="0.9.0"/>
+        <File Name="usbpd_devices_conf.h" Category="header" Condition="all" Version="2.6.0"/>
         <Argument Name="USBPD_PORT0" GenericType="simple" Comment="UCPD instance used for USBPD port 0"/>
         <Argument Name="USBPD_PORT1" GenericType="simple" Comment="UCPD instance used for USBPD port 1"/>
         <Argument Name="USBPDenableClock" GenericType="simple" Comment="USBPD DMA enable Clock"/>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
-<IP xmlns="http://mcd.rou.st.com/modules.php?name=mcu" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" CodeTemplate="" DBVersion="V4.0" IncludeFile="cmsis_os.h" Name="FREERTOS" RootFolder="Middlewares/Third_Party/FreeRTOS/" Version="STM32Cube_FW_F4_V1.15.0" ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Configs.xsd">
+<IP xmlns="http://mcd.rou.st.com/modules.php?name=mcu" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" CodeTemplate="" DBVersion="V4.0" IncludeFile="cmsis_os.h" Name="FREERTOS" RootFolder="Middlewares/Third_Party/FreeRTOS/" Version="STM32Cube_FW_WB_V1.1.0" ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Configs.xsd">
 
     <RefConfig Comment="" Name="FREERTOS_ENABLE_Init">
         <CallLibMethod Name="osKernelStart" ReturnHAL="false"/>
@@ -128,13 +128,6 @@
             <File Category="source" Name="Source/portable/GCC/ARM_CM4_MPU/port.c" Condition="S_FREERTOS_WITH_MPU"/>
             <File Category="header" Name="Source/portable/GCC/ARM_CM4_MPU/portmacro.h" Condition="S_FREERTOS_WITH_MPU"/>
         </SubComponent> 
-        <!--
-        <SubComponent Csub="Tasking" >
-            <File Name="Source/portable/Tasking/ARM_CM7/r0p1/port.c" Category="source"/>
-            <File Name="Source/portable/Tasking/ARM_CM7/r0p1/port_asm.asm" Category="source"/>
-            <File Name="Source/portable/Tasking/ARM_CM7/r0p1/portmacro.h" Category="header"/>
-        </SubComponent>
-         -->
     </RefComponent>
     
     <RefConfigFile Description="Header file for #include" Name="INC" Template="freertos_inc.ftl">
@@ -271,7 +264,9 @@
         
          <!--  New for FreeRTOS 10.0.0 -->
          <Argument Comment="" GenericType="simple" Name="configRECORD_STACK_HIGH_ADDRESS"/>
-
+         
+          <!--  New for BLE -->
+          <Argument Comment="" GenericType="simple" Name="configOVERRIDE_DEFAULT_TICK_CONFIGURATION"/>
     </RefConfigFile>
 
     <!-- Putting it at the end of the file (as the last one to deal with) allows to include all tmp files previously generated in app_freertos.c -->
@@ -422,11 +417,16 @@
         
          <!--  New for FreeRTOS 10.0.0 -->
          <Argument Comment="" GenericType="simple" Name="configRECORD_STACK_HIGH_ADDRESS"/>
-
+         
+         <!--  For CMSIS V2 -->
+         <Argument Comment="" GenericType="simple" Name="HEAP_NUMBER"/>
+         
+         <!--  New for BLE -->
+          <Argument Comment="" GenericType="simple" Name="configOVERRIDE_DEFAULT_TICK_CONFIGURATION"/>
     </RefConfigFile>
 
     <!-- Putting it at the end of the file (as the last one to deal with) allows to include all tmp files previously generated in freertos.c -->
-    <RefConfigFile Description="Optional hook functions" Name="HOOKS_V2" Template="freertos_c_v10_0_0_cmsis_v2.ftl"> <!-- should be another template? app...? -->
+    <RefConfigFile Description="Optional hook functions" Name="HOOKS_V2" Template="freertos_app_c_v10_0_cmsis_v2.ftl"> <!-- TBC -->
         <File Category="source" Condition="all" Name="app_freertos.c" Version="10.0.1"/>
         <Argument Comment="When set to 1, a collection of run time statistics is enabled" GenericType="simple" Name="configGENERATE_RUN_TIME_STATS"/>
         <Argument Comment="Set to 1 if you wish to use an idle hook, or 0 to omit it" GenericType="simple" Name="configUSE_IDLE_HOOK"/>
@@ -451,7 +451,7 @@
         <File Category="source" Condition="all" Name="rtos_inc.tmp" Version="10.0.1"/>
     </RefConfigFile>
 
-    <RefConfigFile Description="Variable declarations for FreeRTOS" Name="VARS_NATIVE" Template="freertos_vars_native.ftl">
+    <RefConfigFile Description="Variable declarations for FreeRTOS" Name="VARS_NATIVE" Template="freertos_vars_native.ftl"> <!-- maybe a custom ftl for WB? -->
         <File Category="source" Condition="all" Name="rtos_vars.tmp" Version="10.0.1"/>
         <Argument Comment="User threads" GenericType="rtos_list" Name="Threads"/>
         <Argument Comment="User queues" GenericType="rtos_list" Name="Queues"/>
@@ -486,7 +486,7 @@
         <File Category="source" Condition="all" Name="rtos_start.tmp" Version="10.0.1"/>
     </RefConfigFile>
 
-    <!-- 16/07/2018: Temporary fix for Dory and MPU: do not generate default task -->
+    <!-- 16/07/2018: Temporary fix for WB and MPU: do not generate default task -->
     <RefConfigFile Description="FreeRTOS default thread" Name="DEFAULT_THREAD_NATIVE" Template="freertos_threads_native.ftl">
         <File Category="source" Condition="!S_FREERTOS_WITH_MPU" Name="rtos_threads.tmp" Version="10.0.1"/>
         <Argument Comment="User threads" GenericType="rtos_list" Name="Threads"/>

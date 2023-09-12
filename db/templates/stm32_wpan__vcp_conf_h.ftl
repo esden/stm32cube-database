@@ -2,8 +2,9 @@
 /**
  ******************************************************************************
   * File Name          : ${name}
-  * Description        : VCP configuration file for BLE middleWare.
-  ******************************************************************************
+  * Description        : VCP configuration file for STM32WPAN Middleware.
+  *
+ ******************************************************************************
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */

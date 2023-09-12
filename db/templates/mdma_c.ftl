@@ -15,6 +15,12 @@
     [#assign ipName = dma]
   [/#list]
 [/#if]
+
+[#assign contextFolder=""]
+[#if cpucore!=""]
+[#assign contextFolder = cpucore?replace("ARM_CORTEX_","C")+"/"]
+[/#if]
+
 /* Includes ------------------------------------------------------------------*/
 #include "${ipName?lower_case}.h"
 
@@ -86,6 +92,11 @@ ${variable.value} ${variable.name};
   */
 void MX_${ipName}_Init(void) 
 {
+
+[#if RESMGR_UTILITY??]
+    [@common.optinclude name=contextFolder+mxTmpFolder+"/resmgrutility_"+ipName+".tmp"/][#-- ADD RESMGR_UTILITY Code--]
+[/#if]
+
 [#if LL_Driver]
   /* Init with LL driver */
 [/#if]

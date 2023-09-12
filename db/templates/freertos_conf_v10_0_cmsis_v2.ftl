@@ -84,6 +84,8 @@
 [#assign configRECORD_STACK_HIGH_ADDRESS = "0"]
 [#-- For CMSIS V2 --] 
 [#assign heapNUMBER = "4"]
+[#-- For BLE --] 
+[#assign configOVERRIDE_DEFAULT_TICK_CONFIGURATION = "0"]
 
   [#if SWIP.defines??]
     [#list SWIP.defines as definition]
@@ -272,7 +274,11 @@
       [#-- New ones from CMSIS-RTOS V2 --]
       [#if definition.name=="HEAP_NUMBER"]
           [#assign heapNUMBER = definition.value]
-      [/#if]      
+      [/#if]
+      [#-- New ones for BLE --]
+      [#if definition.name=="configOVERRIDE_DEFAULT_TICK_CONFIGURATION"]
+          [#assign configOVERRIDE_DEFAULT_TICK_CONFIGURATION = definition.value]
+      [/#if]     
     [/#list]
   [/#if]
 
@@ -293,17 +299,32 @@
 /* Section where include file can be added */
 /* USER CODE END Includes */ 
 
-/* Ensure stdint is only used by the compiler, and not the assembler. */
+[#compress]
+[#assign prototypeNeeded = "false"]
+[#if timeBaseSource?? && timeBaseSource=="SysTick"]
+   [#assign prototypeNeeded = "true"]
+[/#if]
+[#if timeBaseSource_M4?? && timeBaseSource_M4=="SysTick"]
+   [#assign prototypeNeeded = "true"]
+[/#if]
+[#if timeBaseSource_M7?? && timeBaseSource_M7=="SysTick"]
+   [#assign prototypeNeeded = "true"]
+[/#if]
+/* Ensure definitions are only used by the compiler, and not by the assembler. */
 #if defined(__ICCARM__) || defined(__CC_ARM) || defined(__GNUC__)
-    #include <stdint.h>
-    extern uint32_t SystemCoreClock;
+#t#include <stdint.h>
+#textern uint32_t SystemCoreClock;
+[#if prototypeNeeded == "true"] [#-- generated when timebase=systick --]
+#tvoid xPortSysTickHandler(void);
+[/#if]
 [#if configGENERATE_RUN_TIME_STATS=="1"]
 /* USER CODE BEGIN 0 */   	      
-    extern void configureTimerForRunTimeStats(void);
-    extern unsigned long getRunTimeCounterValue(void);  
+#textern void configureTimerForRunTimeStats(void);
+#textern unsigned long getRunTimeCounterValue(void);  
 /* USER CODE END 0 */       
 [/#if]
 #endif
+[/#compress]
 
 #define configUSE_PREEMPTION                     ${valueUsePreemption}
 [#if valueMemoryAllocation == "0"]
@@ -377,11 +398,17 @@
 [#if configUSE_TICKLESS_IDLE=="1"]
 #define configUSE_TICKLESS_IDLE                  1
 [/#if]
+[#if configUSE_TICKLESS_IDLE=="2"]
+#define configUSE_TICKLESS_IDLE                  2
+[/#if]
 [#if configUSE_TASK_NOTIFICATIONS=="0"]
 #define configUSE_TASK_NOTIFICATIONS             0
 [/#if]
 [#if configRECORD_STACK_HIGH_ADDRESS=="1"]
 #define configRECORD_STACK_HIGH_ADDRESS          1
+[/#if]
+[#if configOVERRIDE_DEFAULT_TICK_CONFIGURATION=="1"]
+#define configOVERRIDE_DEFAULT_TICK_CONFIGURATION          1
 [/#if]
 
 /* Co-routine definitions. */

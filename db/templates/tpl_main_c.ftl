@@ -53,6 +53,7 @@
 [#if !ip?contains("FATFS") && !ip?contains("FREERTOS") && !ip?contains("NVIC")&& !ip?contains("NVIC1")&& !ip?contains("NVIC2")&& !ip?contains("CORTEX") && !ip?contains("GRAPHICS") && !ip?contains("GRAPHICS_M4")&& !ip?contains("GRAPHICS_M7") && !ip?contains("TRACER_EMB")]
 [#if ip?contains("STM32_WPAN")]
 #include "app_entry.h"
+#include "app_common.h"
 [/#if]
 [#if (!ip?contains("LWIP")&& !ip?contains("STM32_WPAN")) || (ip?contains("LWIP") && (MBEDTLSUSed=="false"))]
 #include "${ip?lower_case}.h"
@@ -470,11 +471,6 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
-[#list voids as void]
-[#if void.functionName?? && void.functionName?contains("APPE_Init")]
-#tAPPE_Init();
-[/#if]
-[/#list]
 [#if USBPD??]
     [#lt]#t/* USBPD initialisation ---------------------------------*/
     [#lt]#tMX_USBPD_Init();
@@ -490,13 +486,27 @@ int main(void)
       [/#if]
   [#if HALCompliant??]
   [@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_HalInit.tmp"/] [#-- include generated tmp file22 Augst 2014 --]
+[#list voids as void]
+[#if void.functionName?? && void.functionName?contains("APPE_Init")]
+#t/* Init code for STM32_WPAN */
+#tAPPE_Init();
+[/#if]
+[/#list]
   [#else]
   /* Call init function for freertos objects (in freertos.c) */
-  MX_FREERTOS_Init();
+  MX_FREERTOS_Init(); 
   [/#if]
 
   [@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_start.tmp"/] [#-- include generated tmp file 13 Nov 2014 --] 
   /* We should never get here as control is now taken by the scheduler */
+[#else]
+[#list voids as void]
+[#if void.functionName?? && void.functionName?contains("APPE_Init")]
+#t/* Init code for STM32_WPAN */  
+#tAPPE_Init();
+[/#if]
+[/#list]
+
 [/#if]
 
 [#-- if !FREERTOS?? --] 
@@ -716,7 +726,7 @@ static void MX_NVIC_Init(void)
 [#compress]
 [#list IP.configModelList as instanceData]
 [#assign ipName = instanceData.ipName]
-[#if instanceData.isMWUsed=="false" && instanceData.isBusDriverUSed=="false" && !ipName?contains("CORTEX") && !ipName?contains("RESMGR_UTILITY")]
+[#if instanceData.isMWUsed=="false" && instanceData.isBusDriverUSed=="false" && !ipName?contains("CORTEX") && !ipName?contains("RESMGR_UTILITY") && !ipName?contains("TRACER_EMB")]
      [#assign instName = instanceData.instanceName]
 
         [#assign halMode= instanceData.halMode]

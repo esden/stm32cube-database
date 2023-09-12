@@ -25,9 +25,9 @@
         [/#list]
         [#if generateFunction == "1"]
          [#if option == "As external"]
-         extern void ${threadFunction}(void *argument);  // for v2
+         extern void ${threadFunction}(void *argument);
          [#else]
-         void ${threadFunction}(void *argument);  // for v2
+         void ${threadFunction}(void *argument);
          [/#if]
         [/#if]
       [/#if]
@@ -49,9 +49,9 @@
         [/#list]
         [#if generateCallback == "1"]
          [#if option == "As external"]
-         extern void ${timerCallback}(void *argument);  // for v2
+         extern void ${timerCallback}(void *argument);
          [#else]
-         void ${timerCallback}(void *argument);  // for v2
+         void ${timerCallback}(void *argument);
          [/#if]
         [/#if]
       [/#if]

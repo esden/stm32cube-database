@@ -32,6 +32,20 @@
 [/#if]
 #include "usbd_def.h"
 
+[#assign useLPM=false]
+[#-- IPdatas is a list of IPconfigModel --]
+[#if configs??]
+   [#list configs as config]
+        [#list config.peripheralParams?keys as PeripheralParams]
+            [#if PeripheralParams=="USB"]            
+                [#assign values = config.peripheralParams[PeripheralParams]][#-- values is a hash list --]
+                [#if values["lpm_enable"]=="ENABLE"]                	
+					[#assign useLPM=true]			 
+                [/#if]
+            [/#if]
+        [/#list]
+    [/#list]
+ [/#if]
 /* USER CODE BEGIN INCLUDE */
 
 /* USER CODE END INCLUDE */
@@ -56,7 +70,9 @@
 #define         USB_SIZ_STRING_SERIAL       0x1A
 
 [#if family?contains("STM32F7") || family?contains("STM32F4") || family?contains("STM32L4")  || family?contains("STM32WB") || family?contains("STM32G4") || family?contains("STM32L5")]
+[#if useLPM=true]
 #define         USB_SIZ_BOS_DESC            0x0C
+[/#if]
 [/#if]
 
 /* USER CODE BEGIN EXPORTED_CONSTANTS */

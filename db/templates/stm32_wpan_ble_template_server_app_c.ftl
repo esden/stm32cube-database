@@ -9,13 +9,28 @@
   ******************************************************************************
   */
 /* USER CODE END Header */
+[#assign FREERTOS_STATUS = 0]
+[#list SWIPdatas as SWIP]
+	[#if SWIP.defines??]
+		[#list SWIP.defines as definition]
+            [#if (definition.name == "FREERTOS_STATUS") && (definition.value == "1")]
+                [#assign FREERTOS_STATUS = 1]
+            [/#if]
+
+        [/#list]
+	[/#if]
+[/#list]
 /* USER CODE BEGIN UserCode */
 /* Includes ------------------------------------------------------------------*/
 #include "app_common.h"
 #include "dbg_trace.h"
 #include "ble.h"
 #include "template_server_app.h"
-#include "scheduler.h"
+[#if  (FREERTOS_STATUS = 0)]
+#include "stm32_seq.h"
+[#else]
+#include "cmsis_os.h"
+[/#if]
 
 /* Private typedef -----------------------------------------------------------*/
 typedef struct

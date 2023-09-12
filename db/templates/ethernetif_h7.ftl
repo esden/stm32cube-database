@@ -12,6 +12,7 @@
 [#compress] 
 [#list SWIPdatas as SWIP]
 [#assign with_rtos = 0]
+[#assign cmsis_version = "n/a"]
 [#assign custom_pbuf = 0]
 [#assign lwip_arp = 0]
 [#assign bsp = 0][#-- bsp is LAN8742 for H7 --]
@@ -34,6 +35,14 @@
                 [#assign with_rtos = 0]
             [/#if][#-- "0" --]
         [/#if][#-- NO_SYS --]
+        [#if (definition.name == "CMSIS_VERSION") && (with_rtos == 1)]
+            [#if definition.value == "0"]
+               [#assign cmsis_version = "v1"]
+            [/#if]
+            [#if definition.value == "1"]
+               [#assign cmsis_version = "v2"]
+            [/#if]
+        [/#if][#-- CMSIS_VERSION --]
         [#if (definition.name == "LWIP_SUPPORT_CUSTOM_PBUF") && (definition.value == "1")]
             [#assign custom_pbuf = 1] 
         [/#if]
@@ -246,7 +255,10 @@ void HAL_ETH_RxCpltCallback(ETH_HandleTypeDef *heth)
  */
 static void low_level_init(struct netif *netif)
 {
-  HAL_StatusTypeDef hal_eth_init_status; 
+  HAL_StatusTypeDef hal_eth_init_status;
+[#if cmsis_version = "v2"]
+  osThreadAttr_t attributes;
+[/#if][#-- endif cmsis_version --]    
   uint32_t idx = 0;
 [#if with_rtos == 1]
 [#if bsp == 1]
@@ -302,11 +314,24 @@ static void low_level_init(struct netif *netif)
       
 [#if with_rtos == 1]
   /* create a binary semaphore used for informing ethernetif of frame reception */
-  RxPktSemaphore = xSemaphoreCreateBinary();
+[#if cmsis_version = "v2"]
+  RxPktSemaphore = osSemaphoreNew(1, 1, NULL);
+[#else]
+  osSemaphoreDef(SEM);
+  RxPktSemaphore = osSemaphoreCreate(osSemaphore(SEM) , 1 );
+[/#if][#-- endif cmsis_version --]
 
   /* create the task that handles the ETH_MAC */
+[#if cmsis_version = "v2"]
+  memset(&attributes, 0x0, sizeof(osThreadAttr_t));
+  attributes.name = "EthIf";
+  attributes.stack_size = INTERFACE_THREAD_STACK_SIZE;
+  attributes.priority = osPriorityRealtime;
+  osThreadNew(ethernetif_input, netif, &attributes);
+[#else]
   osThreadDef(EthIf, ethernetif_input, osPriorityRealtime, 0, INTERFACE_THREAD_STACK_SIZE);
   osThreadCreate (osThread(EthIf), netif);
+[/#if][#-- endif cmsis_version --]
 [/#if][#-- endif with_rtos --]
 [#if bsp == 1]
 /* USER CODE BEGIN PHY_PRE_CONFIG */ 
@@ -475,10 +500,11 @@ static struct pbuf * low_level_input(struct netif *netif)
     /* Build Rx descriptor to be ready for next data reception */
     HAL_ETH_BuildRxDescriptors(&heth);
 
-#if defined(DUAL_CORE) && defined(CORE_CM7) 
+#if !defined(DUAL_CORE) || defined(CORE_CM7)
     /* Invalidate data cache for ETH Rx Buffers */
     SCB_InvalidateDCache_by_Addr((uint32_t *)RxBuff.buffer, framelength);
 #endif
+
 [#if custom_pbuf == 1]    
     custom_pbuf  = (struct pbuf_custom*)LWIP_MEMPOOL_ALLOC(RX_POOL);
     custom_pbuf->custom_free_function = pbuf_free_custom;
@@ -499,10 +525,10 @@ static struct pbuf * low_level_input(struct netif *netif)
     /* Build Rx descriptor to be ready for next data reception */
     HAL_ETH_BuildRxDescriptors(&heth);
 
-#if defined(DUAL_CORE) && defined(CORE_CM7) 
+#if !defined(DUAL_CORE) || defined(CORE_CM7)
     /* Invalidate data cache for ETH Rx Buffers */
     SCB_InvalidateDCache_by_Addr((uint32_t *)RxBuff.buffer, framelength);
-#endif    
+#endif
     
     custom_pbuf  = (struct pbuf_custom*)LWIP_MEMPOOL_ALLOC(RX_POOL);
     custom_pbuf->custom_free_function = pbuf_free_custom;
@@ -515,7 +541,7 @@ static struct pbuf * low_level_input(struct netif *netif)
   {
     return NULL;
   }
-[/#if][#-- endif with_rtos --] 
+[/#if][#-- endif with_rtos --]
 }
 
 /**
@@ -528,7 +554,11 @@ static struct pbuf * low_level_input(struct netif *netif)
  * @param netif the lwip network interface structure for this ethernetif
  */
 [#if with_rtos == 1]
-void ethernetif_input( void const * argument ) 
+[#if cmsis_version = "v1"]
+void ethernetif_input(void const * argument)
+[#else]
+void ethernetif_input(void* argument)
+[/#if][#-- endif cmsis_version --]
 [#else]
 void ethernetif_input(struct netif *netif)
 [/#if][#-- endif with_rtos --]
@@ -542,7 +572,11 @@ void ethernetif_input(struct netif *netif)
   
   for( ;; )
   {
-    if (osSemaphoreWait( RxPktSemaphore, TIME_WAITING_FOR_INPUT)==osOK)
+[#if cmsis_version = "v2"]
+    if (osSemaphoreAcquire(RxPktSemaphore, TIME_WAITING_FOR_INPUT) == osOK)
+[#else]
+    if (osSemaphoreWait(RxPktSemaphore, TIME_WAITING_FOR_INPUT) == osOK)
+[/#if][#-- endif cmsis_version --]
     {
       do
       {
@@ -666,10 +700,10 @@ void pbuf_free_custom(struct pbuf *p)
 {
   struct pbuf_custom* custom_pbuf = (struct pbuf_custom*)p;
   
+#if !defined(DUAL_CORE) || defined(CORE_CM7)
   /* Invalidate data cache: lwIP and/or application may have written into buffer */
-#if defined(DUAL_CORE) && defined(CORE_CM7)  
   SCB_InvalidateDCache_by_Addr((uint32_t *)p->payload, p->tot_len);
-#endif  
+#endif
   
   LWIP_MEMPOOL_FREE(RX_POOL, custom_pbuf);
 }
@@ -786,7 +820,11 @@ int32_t ETH_PHY_IO_GetTick(void)
   * @retval None
   */
 [#if with_rtos == 1]
-void ethernet_link_thread( void const * argument )
+[#if cmsis_version = "v2"]
+void ethernet_link_thread(void* argument)
+[#else]
+void ethernet_link_thread(void const * argument)
+[/#if][#-- endif cmsis_version --]
 [#else][#-- else with_rtos --]  
 void ethernet_link_check_state(struct netif *netif)
 [/#if][#-- endif with_rtos --]

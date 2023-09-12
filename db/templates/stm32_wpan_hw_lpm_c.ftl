@@ -2,9 +2,9 @@
 /**
  ******************************************************************************
   * File Name          : ${name}
-  * Description        : Hardware Low Power Mode source file for BLE 
-  *                      middleWare.
-  ******************************************************************************
+  * Description        : Hardware Low Power Mode source file for STM32WPAN Middleware.
+  *
+ ******************************************************************************
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */

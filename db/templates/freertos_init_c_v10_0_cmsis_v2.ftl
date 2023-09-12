@@ -14,19 +14,8 @@
 [#assign queueAllocation = "Dynamic"]
 [#assign timerAllocation = "Dynamic"]
 [#assign queueThreadId = "NULL"]
-[#assign apiUsed = "0"]  [#-- Default is CMSIS-RTOS-V1 --]
 
-[#list SWIPdatas as SWIP]
-  [#if SWIP.variables??]
-    [#list SWIP.variables as variable]
-      [#if variable.name=="FreeRTOS_API"]
-        [#assign apiUsed = variable.valueList]
-      [/#if] 	
-    [/#list]
-  [/#if] 
-[/#list]
-
-osKernelInitialize();                 // Initialize CMSIS-RTOS
+osKernelInitialize();
 
 [#list SWIPdatas as SWIP]
   [#if SWIP.variables??]

@@ -19,8 +19,10 @@
 #include "${main_h}"
 #include "${FamilyName?lower_case}xx_it.h"
 [#if FREERTOS??] [#-- If FreeRtos is used --]
-[#-- #include "cmsis_os.h" --]
-[@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_inc.tmp"/][#--include freertos includes --]
+[#-- [@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_inc.tmp"/] --] [#--include freertos includes --]
+[#-- cf BZ 64089 --]
+#include "FreeRTOS.h"
+#include "task.h"
 [/#if]
 [#if TOUCHSENSING??] [#-- If TouchSensing is used --]
 #include "tsl_time.h"

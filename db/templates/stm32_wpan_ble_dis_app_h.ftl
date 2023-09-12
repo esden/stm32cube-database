@@ -3,9 +3,9 @@
 /**
  ******************************************************************************
   * File Name          : ${name}
-  * Description        : Entry application source file for BLE
-  *                      middleWare.
-  ******************************************************************************
+  * Description        : Entry application source file for BLE Middleware.
+  *
+ ******************************************************************************
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
  ******************************************************************************
  */

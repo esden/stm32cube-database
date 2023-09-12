@@ -46,98 +46,102 @@ value will be applied.
 
 
 [#macro bind_etzpc	pDtLevel]
+[#compress]
 [#local TABres = dts_get_tabs(pDtLevel)]
-[#local TABetzpc = TABres.TABN]
-[#t]
-	[#local showDecprot = false]
-	[#if !showDecprot]
-		[#local showDecprot = true]
-${TABetzpc}st,decprot = <
-	[/#if]
-[#t]
+[#local TABnode = TABres.TABN]
+[#local TABprop = TABres.TABP]
+
 	[#local runtimeContextNamesList = srvcmx_getRuntimeCtxtNamesList()]
-	[#local isPeriphFound = false]
+	[#local periphIdsMap = {}]
+
 	[#list runtimeContextNamesList as runtimeContextName]
 		[#local isCtxtSecure = srvcmx_isContextSecure(runtimeContextName)]
 		[#local ctxtCoreName = srvcmx_getContextCoreName(runtimeContextName)]
-[#t]
-		[#--Get IP devices--]
+
 		[#local deviceNamesList = srvcmx_getRuntimeCtxtEnableIPDeviceNamesList(runtimeContextName)]
-[#t]
-		[#local isPeriphFoundInCtxt = false]
 		[#list deviceNamesList as deviceName]
-[#t]
+
 			[#local res = srvc_map_getValueIfMatchWithStatus(etzpc_map_periphIds, deviceName)]
 			[#if res.errors?has_content]
 /*ERR : bind_etzpc() returns errors. The DTS may be incomplete. Reason:
 ${res.errors} - deviceName=${deviceName}*/
 			[/#if]
-[#t]
+
 			[#if res.isMatching]
-				[#local isPeriphFound = true]
-[#t]
 				[#if res.res?has_content]
-					[#local periphIdsList = [res.res?upper_case]]
+					[#local newPeriphId = res.res?upper_case]
 				[#else]
-					[#local periphIdsList = [deviceName?upper_case]]
+					[#local newPeriphId = deviceName?upper_case]
 				[/#if]
-[#t]
-				[#--Special configurations--]
+				[#local newPeriphIdsList = [newPeriphId]]
+
+				[#--Special configurations => a device can lead to several IDs--]
 				[#if (deviceName=="quadspi")]
-					[#local periphIdsList = periphIdsList + ["DLYBQ"]]
+					[#local newPeriphIdsList = newPeriphIdsList + ["DLYBQ"]]
+				[#elseif (deviceName=="sdmmc3")]
+					[#local newPeriphIdsList = newPeriphIdsList + ["DLYBSD3"]]
 				[/#if]
-				[#if (deviceName=="sdmmc3")]
-					[#local periphIdsList = periphIdsList + ["DLYBSD3"]]
-				[/#if]
-[#t]
-				[#--keep in case of--]
-				[#if !showDecprot]
-					[#local showDecprot = true]
-${TABetzpc}st,decprot = <
-				[/#if]
-[#t]
-				[#if !isPeriphFoundInCtxt]
-					[#local isPeriphFoundInCtxt = true]
-${TABetzpc}/*"${srvcmx_getContextLongName(runtimeContextName)}" context*/
-				[/#if]
-[#t]
-				[#list periphIdsList as periphId]
-					[#if isCtxtSecure && !srvcmx_isEnabledDeviceNonSecure(deviceName)][#--if NS => shared => DECPROT_NS_RW--]
+
+				[#local deviceRtCtxtNber = srvcmx_getDeviceRtCtxtNber(deviceName)]
+				[#if (deviceRtCtxtNber==1)]
+					[#if isCtxtSecure]
 						[#if !(deviceName=="tim15")][#--HW restriction (Wildcat specific): TIM15 cannot be declared secured--]
-${TABetzpc}DECPROT(${mx_family?upper_case}_ETZPC_${periphId}_ID, DECPROT_S_RW, DECPROT_UNLOCK)
+							[#local periphIdsMap = srvc_map_putElmtsList(periphIdsMap, "Secured", newPeriphIdsList)]
 						[/#if]
-					[#elseif !isCtxtSecure][#--if NS only: DECPROT can not be duplicated--]
+					[#else]
 						[#if (ctxtCoreName?contains("Cortex-M"))][#--All Cortex-M cores are isolated--]
-${TABetzpc}DECPROT(${mx_family?upper_case}_ETZPC_${periphId}_ID, DECPROT_MCU_ISOLATION, DECPROT_UNLOCK)
+							[#local periphIdsMap = srvc_map_putElmtsList(periphIdsMap, "Mcu Isolation", newPeriphIdsList)]
 						[#else]
-${TABetzpc}DECPROT(${mx_family?upper_case}_ETZPC_${periphId}_ID, DECPROT_NS_RW, DECPROT_UNLOCK)
+							[#local periphIdsMap = srvc_map_putElmtsList(periphIdsMap, "Non Secured", newPeriphIdsList)]
 						[/#if]
 					[/#if]
-				[/#list]
-[#t]
+				[#elseif (deviceRtCtxtNber>1)]
+					[#--multi-assignments => DECPROT_NS_RW--]
+					[#local periphIdsList = srvc_map_getValue(periphIdsMap, "Non Secured")]
+					[#if !periphIdsList?? || !periphIdsList?seq_contains(newPeriphId)]
+						[#local periphIdsMap = srvc_map_putElmtsList(periphIdsMap, "Non Secured", newPeriphIdsList)]
+					[/#if]
+				[#else]
+/*ERR : bind_etzpc() returns errors. The DTS may be incomplete. Reason:
+device has no context*/
+				[/#if]
 			[#--else: no match, skip peripheral--]
 			[/#if]
 		[/#list]
 	[/#list]
+
+
+[/#compress]
+${TABnode}st,decprot = <
+	[#if periphIdsMap?has_content]
+	[#local securityAreasList = periphIdsMap?keys]
+		[#list securityAreasList as securityArea]
+${TABnode}/*"${securityArea}" peripherals*/
+			[#local periphIdsList = srvc_map_getValue(periphIdsMap, securityArea)]
+			[#list periphIdsList as periphId]
+				[#if securityArea=="Secured"]
+${TABnode}DECPROT(${mx_family?upper_case}_ETZPC_${periphId}_ID, DECPROT_S_RW, DECPROT_UNLOCK)
+				[#elseif securityArea=="Mcu Isolation"]
+${TABnode}DECPROT(${mx_family?upper_case}_ETZPC_${periphId}_ID, DECPROT_MCU_ISOLATION, DECPROT_UNLOCK)
+				[#else]
+${TABnode}DECPROT(${mx_family?upper_case}_ETZPC_${periphId}_ID, DECPROT_NS_RW, DECPROT_UNLOCK)
+				[/#if]
+			[/#list]
+		[/#list]
+#n
+${TABnode}/*Restriction: following IDs are not managed  - please to use User-Section if needed:
+${TABnode}	STM32MP1_ETZPC_DMA1_ID, STM32MP1_ETZPC_DMA2_ID, STM32MP1_ETZPC_DMAMUX_ID,
+${TABnode}	STM32MP1_ETZPC_SRAMx_ID, STM32MP1_ETZPC_RETRAM_ID, STM32MP1_ETZPC_BKPSRAM_ID*/
+#n
+${TABnode}/* USER CODE BEGIN etzpc_decprot */
+${TABnode}	/*STM32CubeMX generates a basic and standard configuration for ETZPC.
+${TABnode}	Additional device configurations can be added here if needed.
+${TABnode}	"etzpc" node could be also overloaded in "addons" User-Section.*/
+${TABnode}/* USER CODE END etzpc_decprot */
 [#t]
-	[#if !isPeriphFound]
-#n
-${TABetzpc}/*No peripherals found*/#n
-	[/#if]
-#n
-${TABetzpc}/*Restriction: following IDs are not managed  - please to use User-Section if needed:
-${TABetzpc}	STM32MP1_ETZPC_DMA1_ID, STM32MP1_ETZPC_DMA2_ID, STM32MP1_ETZPC_DMAMUX_ID,
-${TABetzpc}	STM32MP1_ETZPC_SRAMx_ID, STM32MP1_ETZPC_RETRAM_ID, STM32MP1_ETZPC_BKPSRAM_ID*/
-#n
-${TABetzpc}/* USER CODE BEGIN etzpc_decprot */
-${TABetzpc}	/*STM32CubeMX generates a basic and standard configuration for ETZPC.
-${TABetzpc}	Additional device configurations can be added here if needed.
-${TABetzpc}	"etzpc" node could be also overloaded in "addons" User-Section.*/
-${TABetzpc}/* USER CODE END etzpc_decprot */
-[#t]
-	[#if showDecprot]
-${TABetzpc}>;#n
 	[#else]
-#n
+${TABprop}/*No peripheral found*/
 	[/#if]
+${TABnode}>;
+#n
 [/#macro]

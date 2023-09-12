@@ -387,8 +387,13 @@
         [#if ResMgr_Utility??]
         <sourceEntry>
             <name>Utilities</name>
-            </sourceEntry>
+        </sourceEntry>
         [/#if]
+        [#if UtilitiesGroup??]
+        <sourceEntry>
+            <name>${UtilitiesGroup.name!''}</name>
+        </sourceEntry>
+    [/#if]
         </sourceEntries>
         [#-- add lib path --]        
         [#if atLeastOneMiddlewareIsUsed]

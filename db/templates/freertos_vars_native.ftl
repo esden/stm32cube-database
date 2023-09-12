@@ -7,6 +7,7 @@
 [#assign semaphoreControl   = "NULL"]
 [#assign nbThreads = 0]
 [#assign useMPU = "0"]
+[#assign familyName=FamilyName?lower_case]
 
 [#list SWIPdatas as SWIP]
   [#if SWIP.defines??]
@@ -16,7 +17,11 @@
       [/#if]
      [/#list]
   [/#if]
-[/#list]     
+[/#list]
+
+[#if useMPU == "1"]  [#-- Defines for xx (from yy board) --]
+/* put here the regions for the right series (from the right boarD) */
+[/#if]
 
 [#list SWIPdatas as SWIP]
   [#if SWIP.variables??]
@@ -59,8 +64,8 @@
         [/#list]
         [#assign nbThreads = nbThreads + 1]
         
-        [#if nbThreads == 1 && useMPU == "1"]
-          [#-- For Dory and MPU: do not generate default task --]
+        [#if (nbThreads == 1) && (useMPU == "1") && (familyName=="stm32wb")]
+          [#-- For WB and MPU: do not generate default task --]
         [#else]
           TaskHandle_t ${threadName}Handle;
           [#if threadControlBlock != "NULL"]

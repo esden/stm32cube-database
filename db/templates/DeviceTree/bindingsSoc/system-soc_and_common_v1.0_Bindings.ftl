@@ -8,48 +8,129 @@
 [#--------------------------------------------------]
 
 
-[#--Bind pinCtrl for Device nodes--]
-[#function Bind_pinCtrl	pDTInfoElmtsList pFwName]
+[#--Bind pinCtrl for Device nodes.
+The algorithm can operate only if "extraNode" feature is supported in this DB version.
+Extra nodes config name should be formed in "pinoutsynthesis.xml" of "xxx_configname".
+
+The pinctrl configurations arrive in order (default, extra) - re-ordering is not needed.
+pinctrl nodes maybe in random order (NoZ, Z, NoZ).
+--]
+[#function Bind_pinCtrl	pPinctrlConfigsList pFwName]
 	[#local module = "Bind_pinCtrl"]
 	[#local traces =  ftrace("", "module="+module+"\n") ]
 	[#local errors = ""]
 
-	[#if pDTInfoElmtsList?has_content]
+	[#local bindedElmtsList = [] ]
 
-		[#local propArrayItemsList = [] ]
-		[#local sleepPropArrayItemsList = [] ]
-		[#--2x to respect ordering--]
-		[#list pDTInfoElmtsList as dTInfoElmt]
-			[#if dTInfoElmt.bankName=="OTHER"]
-				[#local propArrayItemsList = propArrayItemsList + [DTBindedDtsElmtDM_new_PropertyArrayItem("phandle", dTInfoElmt.pinCtrlNodeName+"_pins_mx")] ]
-				[#local sleepPropArrayItemsList = sleepPropArrayItemsList + [DTBindedDtsElmtDM_new_PropertyArrayItem("phandle", dTInfoElmt.pinCtrlNodeName+"_sleep_pins_mx")] ]
+	[#--The test is done here to allow other DTS sections generation even in case of error--]
+	[#if !srvcmx_isDbFeatureEnabled("extraNode")]
+		[#local errors = "DB error: extra nodes feature is OFF"]
+		[#return {"errors":errors!, "bindedElmtsList":bindedElmtsList!, "traces":traces!} ]
+	[/#if]
+
+
+	[#--FW contextualization of binding--]
+	[#if (pFwName=="CUBE")||(pFwName=="TF-A")][#--Contextualize--]
+		[#--generate only the "default" config - no extra node--]
+		[#local pinCtrlConfigNodesList = [] ]
+		[#list pPinctrlConfigsList as pinctrlConfig]
+			[#--remove extraNode configs and merge all default configs--]
+			[#if (pinctrlConfig.pinctrlElmtType=="DEFAULT")]
+				[#local pinCtrlConfigNodesList = pinCtrlConfigNodesList + pinctrlConfig.pinCtrlConfigNodesList ]
 			[/#if]
 		[/#list]
-		[#list pDTInfoElmtsList as dTInfoElmt]
-			[#if dTInfoElmt.bankName=="Z"]
-				[#local propArrayItemsList = propArrayItemsList + [DTBindedDtsElmtDM_new_PropertyArrayItem("phandle", dTInfoElmt.pinCtrlNodeName+"_pins_z_mx")] ]
-				[#local sleepPropArrayItemsList = sleepPropArrayItemsList + [DTBindedDtsElmtDM_new_PropertyArrayItem("phandle", dTInfoElmt.pinCtrlNodeName+"_sleep_pins_z_mx")] ]
-			[/#if]
-		[/#list]
 
+		[#local pinctrlConfigsList = [DTInfoElmtDM_new("DEFAULT", "default", pinCtrlConfigNodesList)] ]
+	[#else]
+		[#local pinctrlConfigsList = pPinctrlConfigsList ]
+	[/#if]
+
+
+	[#if pinctrlConfigsList?has_content]
 		[#local copro_suffix = ""]
-		[#if (pFwName=="CUBE")] [#--Contextualize--]
+		[#if (pFwName=="CUBE")][#--Contextualize--]
 			[#local copro_suffix = "rproc_"]
 		[/#if]
 
-		[#local propValueItemsList = [DTBindedDtsElmtDM_new_PropertyValueItem("string", [DTBindedDtsElmtDM_new_PropertyArrayItem("", copro_suffix+"default")])] ]
-		[#if (pFwName=="LINUX")||(pFwName=="CUBE")] [#--Contextualize--]
-			[#local propValueItemsList = propValueItemsList + [DTBindedDtsElmtDM_new_PropertyValueItem("string", [DTBindedDtsElmtDM_new_PropertyArrayItem("", copro_suffix+"sleep")])] ]
-		[/#if]
-		[#local bindedElmtsList = [DTBindedDtsElmtDM_new_Property("pinctrl-names", propValueItemsList)]]
+		[#local idx = 0]
+		[#local configNameArrayItemsList = [] ]
+		[#local configsPropertiesList = [] ]
+		[#list pinctrlConfigsList as pinctrlConfig]
 
-		[#local bindedElmtsList = bindedElmtsList + [DTBindedDtsElmtDM_new_Property("pinctrl-0", [DTBindedDtsElmtDM_new_PropertyValueItem("integer", propArrayItemsList)])] ]
-		[#if (pFwName=="LINUX")||(pFwName=="CUBE")] [#--Contextualize--]
-			[#local bindedElmtsList = bindedElmtsList + [DTBindedDtsElmtDM_new_Property("pinctrl-1", [DTBindedDtsElmtDM_new_PropertyValueItem("integer", sleepPropArrayItemsList)])] ]
-		[/#if]
+			[#--extract config name--]
+			[#local configName = "" ]
+			[#if (pinctrlConfig.pinctrlElmtType=="DEFAULT")]
+				[#--ordering: 1st should be default--]
+				[#if idx!=0]
+					[#local errors = errors + " - wrong default node pinctrl ordering"]
+					[#--continue--]
+				[/#if]
+
+				[#local configName = "default" ]
+			[#elseif (pinctrlConfig.pinctrlElmtType=="EXTRA")]
+				[#if idx==0]
+					[#local errors = errors + " - wrong extra node pinctrl ordering"]
+					[#--continue--]
+				[/#if]
+
+				[#local configNameSplitsList = pinctrlConfig.pinCtrlConfigName?split("_")]
+				[#if configNameSplitsList?has_content]
+					[#local configName = configNameSplitsList?last][#--this rule should be respected in "pinoutsynthesis.xml" !--]
+					[#if ((configName=="sleep")&&(pFwName!="LINUX"))][#--Contextualize--]
+						[#local configName = ""][#--forbid "sleep" config - ex.: TF-A, SP-MIN--]
+					[/#if]
+				[#else]
+					[#local errors = errors + " - malformed extra nodes config name - name=" + pinctrlConfig.pinCtrlConfigName]
+					[#--continue--]
+				[/#if]
+			[#else]
+				[#local errors = errors + " - unknown pinctrl config type:" + pinctrlConfig.pinctrlElmtType]
+			[/#if]
+
+
+			[#if configName?has_content]
+				[#--compose config name--]
+				[#local configNameArrayItemsList = configNameArrayItemsList + [DTBindedDtsElmtDM_new_PropertyValueItem("string", [DTBindedDtsElmtDM_new_PropertyArrayItem("", copro_suffix+configName)])] ]
+
+				[#--Extract pinctrl nodes for this config--]
+				[#list pinctrlConfig.pinCtrlConfigNodesList as pinctrlNode]
+
+					[#local nodeNamesArrayItemsList = [] ]
+					[#local isSeveralBankTypes = false][#--for optimization--]
+					[#local pinCtrlConfigNodesList = pinctrlConfig.pinCtrlConfigNodesList ]
+					[#list pinCtrlConfigNodesList as nodeInfo]
+						[#if (nodeInfo.bankName=="OTHER")]
+							[#local nodeNamesArrayItemsList = nodeNamesArrayItemsList + [DTBindedDtsElmtDM_new_PropertyArrayItem("phandle", nodeInfo.pinCtrlNodeName+"_pins_mx")] ]
+						[#else]
+							[#local isSeveralBankTypes = true]
+						[/#if]
+					[/#list]
+
+					[#--x2 to respect ordering--]
+					[#if isSeveralBankTypes]
+						[#list pinCtrlConfigNodesList as nodeInfo]
+							[#if (nodeInfo.bankName=="Z")]
+								[#local nodeNamesArrayItemsList = nodeNamesArrayItemsList + [DTBindedDtsElmtDM_new_PropertyArrayItem("phandle", nodeInfo.pinCtrlNodeName+"_pins_z_mx")] ]
+							[/#if]
+						[/#list]
+					[/#if]
+
+				[/#list]
+
+				[#--compose config property--]
+				[#local configsPropertiesList = configsPropertiesList + [DTBindedDtsElmtDM_new_Property("pinctrl-"+idx?string.number, [DTBindedDtsElmtDM_new_PropertyValueItem("integer", nodeNamesArrayItemsList)])] ]
+
+				[#--id++ only if composition done--]
+				[#local idx = idx+1]
+			[/#if]
+
+		[/#list]
+
+		[#--respecting ordering--]
+		[#local bindedElmtsList = [DTBindedDtsElmtDM_new_Property("pinctrl-names", configNameArrayItemsList)] + configsPropertiesList]
 
 	[#else]
-		[#local errors = "empty pDTInfoElmtsList"]
+		[#local errors = errors + " - empty pinctrlConfigsList"]
 	[/#if]
 
 	[#return {"errors":errors!, "bindedElmtsList":bindedElmtsList!, "traces":traces!} ]

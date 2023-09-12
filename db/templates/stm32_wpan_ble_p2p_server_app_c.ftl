@@ -27,7 +27,7 @@
 #include "ble.h"
 #include "p2p_server_app.h"
 [#if  (FREERTOS_STATUS = 0)]
-#include "scheduler.h"
+#include "stm32_seq.h"
 [/#if]
 [#if  (FREERTOS_STATUS = 1)]
 #include "cmsis_os.h"

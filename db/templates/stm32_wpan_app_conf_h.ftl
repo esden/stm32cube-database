@@ -2,8 +2,9 @@
 /**
  ******************************************************************************
   * File Name          : ${name}
-  * Description        : Application configuration file for BLE middleWare.
-  ******************************************************************************
+  * Description        : Application configuration file for STM32WPAN Middleware.
+  *
+ ******************************************************************************
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
@@ -23,6 +24,12 @@
 [#assign CFG_USB_INTERFACE_ENABLE_VALUE = 0]
 [#assign THREAD = 0]
 [#assign BLE = 0]
+[#assign CFG_FULL_LOW_POWER = 0]
+[#assign CFG_DEBUG_TRACE_LIGHT = 0]
+[#assign CFG_DEBUG_TRACE_FULL = 0]
+[#assign CFG_DEBUG_TRACE = 0]
+[#assign CFG_DEBUG_TRACE_UART = 0]
+[#assign CFG_DEBUGGER_SUPPORTED = 0]
 
 [#list SWIPdatas as SWIP]
 	[#if SWIP.defines??]
@@ -73,19 +80,37 @@
             [#if definition.name == "THREAD_APPLICATION"]
                 [#assign THREAD_APPLICATION = definition.value]
             [/#if]
+            [#if definition.name == "CFG_DEBUG_TRACE"]
+                [#assign CFG_DEBUG_TRACE = definition.value]
+            [/#if]
+            [#if definition.name == "CFG_DEBUG_TRACE_UART"]
+                [#assign CFG_DEBUG_TRACE_UART = definition.value]
+            [/#if]
             [#if (definition.name == "BLE") && (definition.value == "Enabled")]
                 [#assign BLE = 1]
             [/#if]
             [#if (definition.name == "THREAD") && (definition.value == "Enabled")]
                 [#assign THREAD = 1]
             [/#if]
+            [#if (definition.name == "CFG_FULL_LOW_POWER") && (definition.value == "Enabled")]
+                [#assign CFG_FULL_LOW_POWER = 1]
+            [/#if]
+            [#if (definition.name == "CFG_DEBUG_TRACE_LIGHT") && (definition.value == "Enabled")]
+                [#assign CFG_DEBUG_TRACE_LIGHT = 1]
+            [/#if]
+            [#if (definition.name == "CFG_DEBUG_TRACE_FULL") && (definition.value == "Enabled")]
+                [#assign CFG_DEBUG_TRACE_FULL = 1]
+            [/#if]
+            [#if (definition.name == "CFG_DEBUGGER_SUPPORTED") && (definition.value == "Enabled")]
+                [#assign CFG_DEBUGGER_SUPPORTED = 1]
+            [/#if]
 		[/#list]
 	[/#if]
 [/#list]
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef APP_CONFIG_H
-#define APP_CONFIG_H
+#ifndef APP_CONF_H
+#define APP_CONF_H
 
 #include "hw.h"
 #include "hw_conf.h"
@@ -206,8 +231,6 @@
 [/#list]
 [/#if]
 
-
-[#if (BT_SIG_HEART_RATE_SENSOR = 1) || (CUSTOM_P2P_SERVER = 1)] 
 /**
  * Define PHY
  */
@@ -219,7 +242,6 @@
 #define RX_1M                                           0x01
 #define RX_2M                                           0x02 
 
-[/#if]
 [#if (BT_SIG_BEACON = 1) || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1)|| (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)|| (BT_SIG_HEART_RATE_SENSOR = 1)|| (CUSTOM_OTA = 1)|| (CUSTOM_P2P_SERVER = 1)|| (CUSTOM_P2P_CLIENT = 1)|| (CUSTOM_P2P_ROUTER = 1)|| ( BLE_TRANSPARENT_MODE_UART = 1)|| ( BLE_TRANSPARENT_MODE_VCP = 1)]
 /**
 *   Identity root key used to derive LTK and CSRK
@@ -280,8 +302,6 @@
 /**
 * AD Element - Group B Feature
 */ 
-/* LSB - First Byte */
-
 /* LSB - Second Byte */
 #define CFG_FEATURE_OTA_REBOOT                  (0x20)
 [/#if]
@@ -428,24 +448,6 @@
 #define CFG_APP_START_SECTOR_INDEX          (7)
 
 [/#if]
-[#if (CUSTOM_P2P_CLIENT = 1)]
-#define CFG_MAX_CONNECTION                      1
-#define UUID_128BIT_FORMAT                      1
-
-#define CFG_DEV_ID_P2P_SERVER1                  (0x83)
-
-#define CONN_L(x) ((int)((x)/0.625f))
-#define CONN_P(x) ((int)((x)/1.25f))
-#define SCAN_P (0x320)
-#define SCAN_L (0x320)
-#define CONN_P1   (CONN_P(50))
-#define CONN_P2   (CONN_P(100))
-#define SUPERV_TIMEOUT (0x1F4)
-#define CONN_L1   (CONN_L(10))
-#define CONN_L2   (CONN_L(10))
-
-#define OOB_DEMO                                1   /* Out Of Box Demo */  
-[/#if]
 [#if (CUSTOM_P2P_ROUTER = 1)]
 #define BLE_CLI_LED_BUTTON                1 /**< LED BUTTON CLIENT */
 #define CFG_MAX_CONNECTION                8
@@ -572,7 +574,7 @@
  *  1 : internal RO
  *  0 : external crystal ( no calibration )
  */
-#define CFG_BLE_LSE_SOURCE  1
+#define CFG_BLE_LSE_SOURCE  0
 
 /**
  * Start up time of the high speed (16 or 32 MHz) crystal oscillator in units of 625/256 us (~2.44 us)
@@ -660,7 +662,7 @@
 [#list SWIPdatas as SWIP]
     [#if SWIP.defines??]
         [#list SWIP.defines as definition]
-            [#if definition.name="DBG_TRACE_UART_CFG"]
+            [#if definition.name="CFG_DEBUG_TRACE_UART"]
                 [#lt]#define ${definition.name}    ${definition.value}
             [/#if]
         [/#list]
@@ -681,7 +683,7 @@
 [#list SWIPdatas as SWIP]
     [#if SWIP.defines??]
         [#list SWIP.defines as definition]
-            [#if definition.name="UART_CLI"]
+            [#if definition.name="CFG_CLI_UART"]
                 [#lt]#define ${definition.name}    ${definition.value}
             [/#if]
         [/#list]
@@ -705,22 +707,54 @@
     [/#if]
 [/#list]
 
+ [#if THREAD = 1]
 /******************************************************************************
  * Low Power
+ *
+ *  When CFG_FULL_LOW_POWER is set to 1, the system is configured in full
+ *  low power mode. It means that all what can have an impact on the consumptions
+ *  are powered down.(For instance LED, Access to Debugger, Etc.)
+ *
+ *  When CFG_FULL_LOW_POWER is set to 0, the low power mode is not activated
+ *
  ******************************************************************************/
+
+ [#else]
+/******************************************************************************
+ * Low Power
+******************************************************************************/
 /**
  *  When set to 1, the low power mode is enable
  *  When set to 0, the device stays in RUN mode
  */
+[/#if]
+[#if THREAD = 1]
+[#list SWIPdatas as SWIP]
+    [#if SWIP.defines??]
+        [#list SWIP.defines as definition]
+            [#if definition.name="CFG_FULL_LOW_POWER"]
+                [#lt]#define ${definition.name}    ${definition.value}
+
+            [/#if]
+        [/#list]
+    [/#if]
+[/#list]
+#if (CFG_FULL_LOW_POWER == 1)
+#undef CFG_LPM_SUPPORTED
+#define CFG_LPM_SUPPORTED   1
+#endif /* CFG_FULL_LOW_POWER */
+[#else]
 [#list SWIPdatas as SWIP]
     [#if SWIP.defines??]
         [#list SWIP.defines as definition]
             [#if definition.name="CFG_LPM_SUPPORTED"]
                 [#lt]#define ${definition.name}    ${definition.value}
+
             [/#if]
         [/#list]
     [/#if]
 [/#list]
+[/#if]
 
 /******************************************************************************
  * Timer Server
@@ -830,6 +864,7 @@ typedef enum
     [/#if]
 [/#list]
 
+[#if THREAD = 0]
 [#list SWIPdatas as SWIP]
     [#if SWIP.defines??]
         [#list SWIP.defines as definition]
@@ -848,7 +883,7 @@ typedef enum
         [/#list]
     [/#if]
 [/#list]
-
+[/#if]
 /**
  * keep debugger enabled while in any low power mode when set to 1
  * should be set to 0 in production
@@ -862,6 +897,13 @@ typedef enum
         [/#list]
     [/#if]
 [/#list]
+
+[#if THREAD = 1]
+#if (CFG_FULL_LOW_POWER == 1)
+#undef CFG_DEBUGGER_SUPPORTED
+#define CFG_DEBUGGER_SUPPORTED    0
+#endif /* CFG_FULL_LOW_POWER */
+[/#if]
 
 [#if (THREAD = 0)]
 /**
@@ -909,9 +951,33 @@ typedef enum
 #endif
 
 [#else]
+/*****************************************************************************
+ * Traces
+ * Enable or Disable traces in application
+ * When CFG_DEBUG_TRACE is set, traces are activated
+ *
+ * Note : Refer to utilities_conf.h file in order to details
+ *        the level of traces : CFG_DEBUG_TRACE_FULL or CFG_DEBUG_TRACE_LIGHT
+ *****************************************************************************/
+[#list SWIPdatas as SWIP]
+    [#if SWIP.defines??]
+        [#list SWIP.defines as definition]
+            [#if definition.name="CFG_DEBUG_TRACE"]
+                [#lt]#define ${definition.name}    ${definition.value}
+            [/#if]
+        [/#list]
+    [/#if]
+[/#list]
+
+#if (CFG_FULL_LOW_POWER == 1)
+#undef CFG_DEBUG_TRACE
+#define CFG_DEBUG_TRACE      0
+#endif /* CFG_FULL_LOW_POWER */
+[/#if]
+
 /**
  * When CFG_DEBUG_TRACE_FULL is set to 1, the trace are output with the API name, the file name and the line number
- * When CFG_DEBUG_TRACE_LIGTH is set to 1, only the debug message is output
+ * When CFG_DEBUG_TRACE_LIGHT is set to 1, only the debug message is output
  *
  * When both are set to 0, no trace are output
  * When both are set to 1,  CFG_DEBUG_TRACE_FULL is selected
@@ -919,7 +985,7 @@ typedef enum
 [#list SWIPdatas as SWIP]
     [#if SWIP.defines??]
         [#list SWIP.defines as definition]
-            [#if definition.name="CFG_DEBUG_TRACE_LIGTH"]
+            [#if definition.name="CFG_DEBUG_TRACE_LIGHT"]
                 [#lt]#define ${definition.name}    ${definition.value}
             [/#if]
         [/#list]
@@ -935,54 +1001,60 @@ typedef enum
     [/#if]
 [/#list]
 
-/* Define platform used: only ARM supported for TRACE trace */
-#define CFG_PLATFORM_LINUX        (0x01)
-#define CFG_PLATFORM_WINDOWS      (0x02)
-#define CFG_PLATFORM_ARM          (0x03)
+#if (( CFG_DEBUG_TRACE != 0 ) && ( CFG_DEBUG_TRACE_LIGHT == 0 ) && (CFG_DEBUG_TRACE_FULL == 0))
+#undef CFG_DEBUG_TRACE_FULL
+#undef CFG_DEBUG_TRACE_LIGHT
+#define CFG_DEBUG_TRACE_FULL      0
+#define CFG_DEBUG_TRACE_LIGHT     1
+#endif
 
-#define CFG_PLATFORM_TYPE         (CFG_PLATFORM_ARM)
+#if ( CFG_DEBUG_TRACE == 0 )
+#undef CFG_DEBUG_TRACE_FULL
+#undef CFG_DEBUG_TRACE_LIGHT
+#define CFG_DEBUG_TRACE_FULL      0
+#define CFG_DEBUG_TRACE_LIGHT     0
+#endif
 
 /**
- * Enable or Disable traces in application
+ * When not set, the traces is looping on sending the trace over UART
  */
+#define DBG_TRACE_USE_CIRCULAR_QUEUE 1
+
+/**
+ * max buffer Size to queue data traces and max data trace allowed.
+ * Only Used if DBG_TRACE_USE_CIRCULAR_QUEUE is defined
+ */
+#define DBG_TRACE_MSG_QUEUE_SIZE 4096
+#define MAX_DBG_TRACE_MSG_SIZE 1024
+
+[#if (THREAD = 1)]
+/******************************************************************************
+ * Configure Log level for Application
+ ******************************************************************************/
 [#list SWIPdatas as SWIP]
     [#if SWIP.defines??]
         [#list SWIP.defines as definition]
-            [#if definition.name="APP_DBG_EN"]
+            [#if definition.name="APPLI_CONFIG_LOG_LEVEL"]
                 [#lt]#define ${definition.name}    ${definition.value}
             [/#if]
         [/#list]
     [/#if]
 [/#list]
-
-#if (APP_DBG_EN != 0)
-#define APP_DBG_MSG             PRINT_MESG_DBG
-#else
-#define APP_DBG_MSG             PRINT_NO_MESG
-#endif
-
-#if (( CFG_DEBUG_TRACE_FULL == 1 ) || ( CFG_DEBUG_TRACE_LIGTH == 1 ))
-#define CFG_DEBUG_TRACE      1
-
-#undef CFG_LPM_SUPPORTED
-#define CFG_LPM_SUPPORTED         0
-
-#undef CFG_DEBUGGER_SUPPORTED
-#define CFG_DEBUGGER_SUPPORTED    1
-
-#undef CFG_PLATFORM_TYPE
-#define CFG_PLATFORM_TYPE         (CFG_PLATFORM_ARM)
-
-#else
-#define CFG_DEBUG_TRACE      0
-#endif
-
-[/#if]
+[#list SWIPdatas as SWIP]
+    [#if SWIP.defines??]
+        [#list SWIP.defines as definition]
+            [#if definition.name="APPLI_PRINT_FILE_FUNC_LINE"]
+                [#lt]#define ${definition.name}    ${definition.value}
+            [/#if]
+        [/#list]
+    [/#if]
+[/#list][/#if]
 
 /* USER CODE BEGIN Defines */
 
 /* USER CODE END Defines */
 
+[#if (FREERTOS_STATUS = 0)]
 /******************************************************************************
  * Scheduler
  ******************************************************************************/
@@ -1123,15 +1195,11 @@ typedef enum
 
 /* Scheduler types and defines        */
 /*------------------------------------*/
-
 #define TASK_MSG_FROM_M0_TO_M4      (1U << CFG_TASK_MSG_FROM_M0_TO_M4)
-#define EVENT_ACK_FROM_M0_EVT        (1U << CFG_EVT_ACK_FROM_M0_EVT)
-#define EVENT_SYNCHRO_BYPASS_IDLE    (1U << CFG_EVT_SYNCHRO_BYPASS_IDLE)
 /* USER CODE BEGIN DEFINE_TASK */ 
 
 /* USER CODE END DEFINE_TASK */  
  
-
 /**
  * This is the list of priority required by the application
  * Each Id shall be in the range 0..31
@@ -1162,12 +1230,65 @@ typedef enum
 
 /* USER CODE END DEFINE_EVENT */
 
+[/#if]
+[#else]
 /******************************************************************************
- * Configure Log level for Application
+ * FreeRTOS
  ******************************************************************************/
-#define APPLI_CONFIG_LOG_LEVEL          LOG_LEVEL_INFO
-#define APPLI_PRINT_FILE_FUNC_LINE      0
+#define CFG_SHCI_USER_EVT_PROCESS_NAME        "SHCI_USER_EVT_PROCESS"
+#define CFG_SHCI_USER_EVT_PROCESS_ATTR_BITS   (0)
+#define CFG_SHCI_USER_EVT_PROCESS_CB_MEM      (0)
+#define CFG_SHCI_USER_EVT_PROCESS_CB_SIZE     (0)
+#define CFG_SHCI_USER_EVT_PROCESS_STACK_MEM   (0)
+#define CFG_SHCI_USER_EVT_PROCESS_PRIORITY    osPriorityNone
+#define CFG_SHCI_USER_EVT_PROCESS_STACk_SIZE  (128 * 7)
 
+[#if (THREAD = 1)]
+#define CFG_THREAD_MSG_M0_TO_M4_PROCESS_NAME        "THREAD_MSG_M0_TO_M4_PROCESS"
+#define CFG_THREAD_MSG_M0_TO_M4_PROCESS_ATTR_BITS   (0)
+#define CFG_THREAD_MSG_M0_TO_M4_PROCESS_CB_MEM      (0)
+#define CFG_THREAD_MSG_M0_TO_M4_PROCESS_CB_SIZE     (0)
+#define CFG_THREAD_MSG_M0_TO_M4_PROCESS_STACK_MEM   (0)
+#define CFG_THREAD_MSG_M0_TO_M4_PROCESS_PRIORITY    osPriorityLow
+#define CFG_THREAD_MSG_M0_TO_M4_PROCESS_STACk_SIZE  (128 * 8)
+
+#define CFG_THREAD_CLI_PROCESS_NAME        "THREAD_CLI_PROCESS"
+#define CFG_THREAD_CLI_PROCESS_ATTR_BITS   (0)
+#define CFG_THREAD_CLI_PROCESS_CB_MEM      (0)
+#define CFG_THREAD_CLI_PROCESS_CB_SIZE     (0)
+#define CFG_THREAD_CLI_PROCESS_STACK_MEM   (0)
+#define CFG_THREAD_CLI_PROCESS_PRIORITY    osPriorityNormal
+#define CFG_THREAD_CLI_PROCESS_STACk_SIZE  (128 * 8)
+
+[/#if]
+[#if (BLE = 1)]
+#define CFG_HCI_USER_EVT_PROCESS_NAME         "HCI_USER_EVT_PROCESS"
+#define CFG_HCI_USER_EVT_PROCESS_ATTR_BITS    (0)
+#define CFG_HCI_USER_EVT_PROCESS_CB_MEM       (0)
+#define CFG_HCI_USER_EVT_PROCESS_CB_SIZE      (0)
+#define CFG_HCI_USER_EVT_PROCESS_STACK_MEM    (0)
+#define CFG_HCI_USER_EVT_PROCESS_PRIORITY     osPriorityNone
+#define CFG_HCI_USER_EVT_PROCESS_STACk_SIZE   (128 * 2)
+
+[/#if]
+/* USER CODE BEGIN FreeRTOS_Defines */
+#define CFG_ADV_UPDATE_PROCESS_NAME           "ADV_UPDATE_PROCESS"
+#define CFG_ADV_UPDATE_PROCESS_ATTR_BITS      (0)
+#define CFG_ADV_UPDATE_PROCESS_CB_MEM         (0)
+#define CFG_ADV_UPDATE_PROCESS_CB_SIZE        (0)
+#define CFG_ADV_UPDATE_PROCESS_STACK_MEM      (0)
+#define CFG_ADV_UPDATE_PROCESS_PRIORITY       osPriorityNone
+#define CFG_ADV_UPDATE_PROCESS_STACk_SIZE     (128 * 6)
+
+
+#define CFG_HRS_PROCESS_NAME                  "HRS_PROCESS"
+#define CFG_HRS_PROCESS_ATTR_BITS             (0)
+#define CFG_HRS_PROCESS_CB_MEM                (0)
+#define CFG_HRS_PROCESS_CB_SIZE               (0)
+#define CFG_HRS_PROCESS_STACK_MEM             (0)
+#define CFG_HRS_PROCESS_PRIORITY              osPriorityNone
+#define CFG_HRS_PROCESS_STACk_SIZE            (128 * 5)
+/* USER CODE END FreeRTOS_Defines */
 [/#if]
 /******************************************************************************
  * LOW POWER
@@ -1178,14 +1299,26 @@ typedef enum
  */
 typedef enum
 {
-[#if ((BLE = 1) && ((BLE_TRANSPARENT_MODE_UART = 1) || (BLE_TRANSPARENT_MODE_VCP = 1))) || (THREAD = 1)]
     CFG_LPM_APP,
-[#else]
-    CFG_LPM_APP,
-    CFG_LPM_APP_BLE
+[#if (BLE = 1)]
+    CFG_LPM_APP_BLE,
 [/#if]
+[#if (THREAD = 1)]
+    CFG_LPM_APP_THREAD,
+[/#if]
+  /* USER CODE BEGIN CFG_LPM_Id_t */
+
+  /* USER CODE END CFG_LPM_Id_t */
 } CFG_LPM_Id_t;
 
-#endif /*APP_CONFIG_H */
+
+/******************************************************************************
+ * OTP manager
+ ******************************************************************************/
+#define CFG_OTP_BASE_ADDRESS    OTP_AREA_BASE
+
+#define CFG_OTP_END_ADRESS      OTP_AREA_END_ADDR
+
+#endif /*APP_CONF_H */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

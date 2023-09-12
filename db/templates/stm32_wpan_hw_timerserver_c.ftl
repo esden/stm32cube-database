@@ -2,9 +2,9 @@
 /**
  ******************************************************************************
   * File Name          : ${name}
-  * Description        : Hardware timerserver source file for BLE 
-  *                      middleWare.
-  ******************************************************************************
+  * Description        : Hardware timerserver source file for STM32WPAN Middleware.
+  *
+ ******************************************************************************
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */

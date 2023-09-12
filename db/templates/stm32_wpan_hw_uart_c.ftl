@@ -2,7 +2,7 @@
 /**
  ******************************************************************************
   * File Name          : ${name}
-  * Description        : HW UART source file for BLE middleWare.
+  * Description        : HW UART source file for STM32WPAN Middleware.
   *
   ******************************************************************************
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]

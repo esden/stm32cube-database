@@ -13,6 +13,7 @@
 [#--FTL path--]
 [#assign mx_dtLibsPath = "DeviceTree" + mx_osPathDelimiter]
 
+
 [#--Load services libs --]
 [#include mx_dtLibsPath + "tpl_CommonLibs_v1-0.ftl"]
 [#include mx_dtLibsPath + "tpl_MxLibs_v1-0.ftl"]
@@ -115,7 +116,7 @@ before printing, position elements respecting ordering.--]
 				[#local pinCtrlBindedElmtsList = pinCtrlBindedElmtsListRes.bindedElmtsList ]
 			[#if pinCtrlBindedElmtsListRes.errors?has_content]
 /*ERR : Bind_pinCtrl() returns errors. The DTS may be incomplete. Reason:
-${pinCtrlBindedElmtsListRes.errors}*/
+#t	${pinCtrlBindedElmtsListRes.errors}*/#n
 				[@mtrace  traces=pinCtrlBindedElmtsListRes.traces /]
 			[/#if]
 		[/#if]
@@ -132,7 +133,7 @@ ${pinCtrlBindedElmtsListRes.errors}*/
 			[#local systemPropertiesElmtsList = systemPropertiesElmtsListRes.resElmtsList]
 			[#if systemPropertiesElmtsListRes.errors?has_content]
 /*ERR : DTBinding_bindBody() returns errors. The DTS may be incomplete. Reason:
-${systemPropertiesElmtsListRes.errors}*/
+#t	${systemPropertiesElmtsListRes.errors}*/#n
 				[@mtrace traces=systemPropertiesElmtsListRes.traces /]
 			[/#if]
 
@@ -319,6 +320,10 @@ ${propValueItemSeparator}${propValueItemStart}[#t]
 				[#local valueType = pElmt.valueType!]
 [#t]
 				[#if value?has_content]
+[#local propArrayItemSeparator = ""]
+					[#if pElmtIdx > 0]
+[#local propArrayItemSeparator = " "]
+					[/#if]
 					[#local inspectAndPrint = true]
 					[#if (valueType=="dec")]
 						[#local possibleValueStart = ""]
@@ -329,11 +334,12 @@ ${propValueItemSeparator}${propValueItemStart}[#t]
 					[#elseif (!valueType?has_content)]
 						[#local possibleValueStart = ""]
 					[#else]
+						[#local propArrayItemSeparator = " "]
 						[#local possibleValueStart = ""]
 					[#--FIX: improve err mngt: Today won't compile. Strategy is to always compile and add corrections is US--]
 						[@mlog  logMod=module logType="ERR" logMsg="unknown ArrayItem type" varsMap={"bindedHwName":bindedHwName!, "valueType":valueType!} /]
 					[/#if]
-${possibleValueStart}${value}[#t]
+${propArrayItemSeparator}${possibleValueStart}${value}[#t]
 				[#else]
 					[@mlog  logMod=module logType="ERR" logMsg="ArrayItem w no Value" varsMap={"bindedHwName":bindedHwName!} /]
 				[/#if]

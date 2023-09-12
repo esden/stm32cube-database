@@ -12,6 +12,7 @@
 [#-- SWIPdatas is a list of SWIPconfigModel --]
 [#list SWIPdatas as SWIP]
 [#assign use_rtos = 0]
+[#assign cmsis_version = "n/a"]
 [#if SWIP.defines??]
 	[#list SWIP.defines as definition]	 	
 		[#if (definition.name == "NO_SYS")]
@@ -19,6 +20,19 @@
 				[#assign use_rtos = 1]
 			[/#if]
 		[/#if]
+		[#if (definition.name == "WITH_RTOS")]
+			[#if definition.value == "1"]
+				[#assign with_rtos = 1]
+			[/#if][#-- "1" --]
+		[/#if][#-- WITH_RTOS --]
+		[#if (definition.name == "CMSIS_VERSION") && (use_rtos == 1)]
+			[#if definition.value == "0"]
+				[#assign cmsis_version = "v1"]
+			[/#if]
+			[#if definition.value == "1"]
+				[#assign cmsis_version = "v2"]
+			[/#if]
+		[/#if][#-- CMSIS_VERSION --]
 	[/#list]
 [/#if]
 [/#list]
@@ -51,7 +65,11 @@ struct link_str {
 err_t ethernetif_init(struct netif *netif);
 
 [#if use_rtos == 1]
-void ethernetif_input( void const * argument );
+[#if cmsis_version = "v1"]
+void ethernetif_input(void const * argument);
+[#else]
+void ethernetif_input(void* argument);
+[/#if][#-- endif cmsis_version --]
 [#else]
 void ethernetif_input(struct netif *netif);
 [/#if][#-- endif with_rtos --]
@@ -64,7 +82,11 @@ void ethernetif_set_link(struct netif *netif);
 [/#if][#-- endif series --]
 [#if series == "stm32h7"]
 [#if use_rtos == 1]
-void ethernet_link_thread(void const * argument );
+[#if cmsis_version = "v1"]
+void ethernet_link_thread(void const * argument);
+[#else]
+void ethernet_link_thread(void* argument );
+[/#if][#-- endif cmsis_version --]
 [#else]
 void ethernet_link_check_state(struct netif *netif);
 [/#if][#-- endif with_rtos --]

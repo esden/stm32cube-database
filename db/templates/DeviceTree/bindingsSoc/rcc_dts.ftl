@@ -22,7 +22,8 @@
 [#assign HSICalibration="Disable"]
 [#assign CSICalibration="Disable"]
 [#assign PeriodicCalibrationValue=0]
-[#list peripheralParams.get("RCC").entrySet() as paramEntry]
+[#list srvc_javaMap_getKeysList(peripheralParams.get("RCC"))?sort as key]
+[#assign paramEntry = {"key":key, "value":srvc_javaEntrySet_getValue(peripheralParams.get("RCC").entrySet(), key)}]
 [#if paramEntry.key == "HSICalibration"][#assign HSICalibration=paramEntry.value]
 [#if (HSICalibration = "Enable") ]
 [#lt]${T1}st,hsi-cal;

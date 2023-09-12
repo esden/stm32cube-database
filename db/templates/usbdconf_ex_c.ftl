@@ -28,6 +28,7 @@
 [#assign className = ""]
 [#assign useLPM = false]
 [#assign useBCD=false]
+[#assign BspUsed = false]
 [#-- IPdatas is a list of IPconfigModel --]
 [#if configs??]
    [#list configs as config]
@@ -56,6 +57,7 @@
 [#if BspIpDatas??]
 [#list BspIpDatas as SWIP] 
 	[#if SWIP.variables??]
+[#assign BspUsed = true]	
 		[#list SWIP.variables as variables]
 			[#if variables.name?contains("IpInstance")]
 				[#assign IpInstance = variables.value]
@@ -622,8 +624,10 @@ USBD_StatusTypeDef USBD_LL_Init(USBD_HandleTypeDef *pdev)
 #thpcd_USB_FS.pData = pdev;
 #t/* Link the driver to the stack. */
 #tpdev->pData = &hpcd_USB_FS;
-[#--  #t/* Enable USB power on Pwrctrl CR2 register. */--]
-[#--  #tHAL_PWREx_EnableVddUSB();--]
+[#if DIE="DIE495"]
+#t/* Enable USB power on Pwrctrl CR2 register. */
+#tHAL_PWREx_EnableVddUSB();
+[/#if]
 [#include mxTmpFolder+"/usb_HalInit.tmp"]
 #if (USE_HAL_PCD_REGISTER_CALLBACKS == 1U)
   /* Register USB PCD CallBacks */
@@ -923,6 +927,7 @@ uint32_t USBD_LL_GetRxDataSize(USBD_HandleTypeDef *pdev, uint8_t ep_addr)
   */
 USBD_StatusTypeDef USBD_LL_BatterryCharging(USBD_HandleTypeDef *pdev)
 {
+[#if BspUsed=true]
 #tif (HAL_GPIO_ReadPin(${BCD_PORT}, ${BCD_PIN}) == GPIO_PIN_SET)
   {
     /*wait for bus stabilization*/
@@ -931,6 +936,7 @@ USBD_StatusTypeDef USBD_LL_BatterryCharging(USBD_HandleTypeDef *pdev)
     HAL_PCDEx_ActivateBCD (pdev->pData);
     HAL_PCDEx_BCD_VBUSDetect(pdev->pData);
   }
+[/#if]  
   return USBD_OK;
 }
 [/#if]
@@ -942,6 +948,7 @@ USBD_StatusTypeDef USBD_LL_BatterryCharging(USBD_HandleTypeDef *pdev)
    */
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
+[#if BspUsed=true]
   if (GPIO_Pin == ${BCD_PIN})
   {
     if (HAL_GPIO_ReadPin(${BCD_PORT}, ${BCD_PIN}) == GPIO_PIN_SET)
@@ -959,6 +966,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
       USBD_BCD_PortState = USB_BCD_DEVICE_DISCONNECTED;
     }
   }
+[/#if]  
 }
 [/#if]
           

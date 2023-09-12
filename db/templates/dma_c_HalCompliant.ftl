@@ -1,4 +1,10 @@
 [#ftl]
+
+[#assign contextFolder=""]
+[#if cpucore!=""]
+[#assign contextFolder = cpucore?replace("ARM_CORTEX_","C")+"/"]
+[/#if]
+
 [#function list_contains string_list element]
   [#list string_list?split(" ") as string_element]
     [#if string_element == element]
@@ -45,6 +51,11 @@
   */
 static void MX_${ipName}_Init(void) 
 {
+
+[#if RESMGR_UTILITY??]
+    [@common.optinclude name=contextFolder+mxTmpFolder+"/resmgrutility_"+ipName+".tmp"/][#-- ADD RESMGR_UTILITY Code--]
+[/#if]
+
 [#if hasLocalVariables]
   /* Local variables */
   [#assign local_variables = ""]

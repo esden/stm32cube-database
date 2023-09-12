@@ -30,7 +30,7 @@
 #include "ble.h"
 #include "p2p_client_app.h"
 
-#include "scheduler.h"
+#include "stm32_seq.h"
 #include "app_ble.h"
 
 /* USER CODE BEGIN Includes */
@@ -506,7 +506,7 @@ static SVCCTL_EvtAckStatus_t Event_Handler(void *Event)
           {
 
 
-            SCH_SetTask( 1<<CFG_TASK_SEARCH_SERVICE_ID, CFG_SCH_PRIO_0);
+            UTIL_SEQ_SetTask( 1<<CFG_TASK_SEARCH_SERVICE_ID, CFG_SCH_PRIO_0);
 
           }
         }

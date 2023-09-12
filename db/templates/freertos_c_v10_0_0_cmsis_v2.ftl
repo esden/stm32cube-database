@@ -15,38 +15,32 @@
 [#assign useNewHandle = 0]
 [#assign useTimers = 0]
 [#assign hookUsed = 0]
-[#assign useCmsisV1 = 1]   [#-- Default is CMSIS-RTOS v1 --]
 
 [#list SWIPdatas as SWIP]
-    [#if SWIP.variables??]
-    	[#list SWIP.variables as variable]	
-	      [#if variable.name=="HALCompliant"]
-	         [#assign inMain = 1]
-	      [/#if]
-	    [/#list]
-    [/#if]
+  [#if SWIP.variables??]
+    [#list SWIP.variables as variable]	
+      [#if variable.name=="HALCompliant"]
+        [#assign inMain = 1]
+      [/#if]
+    [/#list]
+  [/#if]
 [/#list]
 
 [#list SWIPdatas as SWIP]
-    [#if SWIP.defines??]     
-	  [#list SWIP.defines as definition]
-	    [#if definition.name=="configENABLE_BACKWARD_COMPATIBILITY"]
-	      [#if definition.value=="0"]
-	        [#assign useNewHandle = 1]
-          [/#if]   
-	    [/#if]
-	    [#if definition.name=="configUSE_TIMERS"]
-	      [#if definition.value=="1"]
-	        [#assign useTimers = 1]
-          [/#if]    
-	    [/#if]
-	    [#if definition.name=="FreeRTOS_API"]
-	      [#if definition.value == "1"]
-	        [#assign useCmsisV1 = 0]
-          [/#if]  	      
-	    [/#if]    
-	  [/#list]
-    [/#if]
+  [#if SWIP.defines??]
+    [#list SWIP.defines as definition]
+      [#if definition.name=="configENABLE_BACKWARD_COMPATIBILITY"]
+        [#if definition.value=="0"]
+          [#assign useNewHandle = 1]
+        [/#if]
+      [/#if]
+      [#if definition.name=="configUSE_TIMERS"]
+        [#if definition.value=="1"]
+          [#assign useTimers = 1]
+        [/#if]
+      [/#if]
+    [/#list]
+  [/#if]
 [/#list]
 
 /* Includes ------------------------------------------------------------------*/
@@ -96,47 +90,37 @@
 [#if inMain == 0]
 [@common.optinclude name=mxTmpFolder+"/rtos_pfp.tmp"/]
 #n
- [#list SWIPdatas as SWIP]
-  [#if SWIP.variables??]
-	[#list SWIP.variables as variable]
-	  [#if variable.name=="MiddlewareInUse"]
-	  [#assign s = variable.valueList]
-	  [#assign index = 0] 
-        [#list s as i] 
-          [#if index == 0]
-            [#assign mw = i]
-          [/#if]
-          [#assign index = index + 1]
-        [/#list]
+  [#list SWIPdatas as SWIP]
+    [#if SWIP.variables??]
+      [#list SWIP.variables as variable]
+        [#if variable.name=="MiddlewareInUse"]
+          [#assign s = variable.valueList]
+          [#assign index = 0] 
+          [#list s as i] 
+            [#if index == 0]
+              [#assign mw = i]
+            [/#if]
+            [#assign index = index + 1]
+          [/#list]
+          [#if mw!="USBPD" && mw!="TRACER_EMB" && mw!="OPENAMP" && mw!="RESMGR_UTILITY"]
 extern void MX_${mw}_Init(void);
-	  [/#if]
-    [/#list]
-  [/#if]
- [/#list]
+          [/#if]
+        [/#if]
+      [/#list]
+    [/#if]
+  [/#list]
 void MX_FREERTOS_Init(void);  /* (MISRA C 2004 rule 8.1) */
 #n
 [/#if]
 
 [#list SWIPdatas as SWIP]
   [#if SWIP.defines??]     
-	[#list SWIP.defines as definition]
-	  [#if definition.name=="configUSE_TICKLESS_IDLE"]
-	      [#if definition.value=="1"]
+    [#list SWIP.defines as definition]
+      [#if definition.name=="configUSE_TICKLESS_IDLE"]
+        [#if definition.value=="1"]
 #n/* Pre/Post sleep processing prototypes */
 void PreSleepProcessing(uint32_t *ulExpectedIdleTime);
 void PostSleepProcessing(uint32_t *ulExpectedIdleTime);
-          [/#if]
-      [/#if]
-      [#if useCmsisV1 == 1]
-	    [#if definition.name=="MEMORY_ALLOCATION"]
-	      [#if definition.value!="0"] [#--Not "Dynamic" alone --]
-#n/* GetIdleTaskMemory prototype (linked to static allocation support) */
-void vApplicationGetIdleTaskMemory( StaticTask_t **ppxIdleTaskTCBBuffer, StackType_t **ppxIdleTaskStackBuffer, uint32_t *pulIdleTaskStackSize );
-            [#if useTimers==1]
-#n/* GetTimerTaskMemory prototype (linked to static allocation support) */
-void vApplicationGetTimerTaskMemory( StaticTask_t **ppxTimerTaskTCBBuffer, StackType_t **ppxTimerTaskStackBuffer, uint32_t *pulTimerTaskStackSize );            
-            [/#if]
-          [/#if]
         [/#if]
       [/#if]	                        
     [/#list]
@@ -144,28 +128,28 @@ void vApplicationGetTimerTaskMemory( StaticTask_t **ppxTimerTaskTCBBuffer, Stack
 [/#list]
 
 [#list SWIPdatas as SWIP]
-    [#if SWIP.defines??]
-     [#list SWIP.defines as definition]
-        [#if definition.name=="configGENERATE_RUN_TIME_STATS"]
-          [#if definition.value=="1"]
-            [#assign hookUsed = 1]         
-          [/#if]
+  [#if SWIP.defines??]
+    [#list SWIP.defines as definition]
+      [#if definition.name=="configGENERATE_RUN_TIME_STATS"]
+        [#if definition.value=="1"]
+          [#assign hookUsed = 1]         
         [/#if]
-        [#if definition.name=="configUSE_IDLE_HOOK"]
-          [#if definition.value=="1"]
-            [#assign hookUsed = 1]      
-          [/#if]
+      [/#if]
+      [#if definition.name=="configUSE_IDLE_HOOK"]
+        [#if definition.value=="1"]
+          [#assign hookUsed = 1]      
         [/#if]
-        [#if definition.name=="configUSE_TICK_HOOK"]
-          [#if definition.value=="1"]
-            [#assign hookUsed = 1]      
-          [/#if]
-        [/#if]   
-        [#if definition.name=="configUSE_DAEMON_TASK_STARTUP_HOOK"]
-          [#if definition.value=="1"]
-            [#assign hookUsed = 1]         
-          [/#if]    
-        [/#if]     
+      [/#if]
+      [#if definition.name=="configUSE_TICK_HOOK"]
+        [#if definition.value=="1"]
+          [#assign hookUsed = 1]      
+        [/#if]
+      [/#if]   
+      [#if definition.name=="configUSE_DAEMON_TASK_STARTUP_HOOK"]
+        [#if definition.value=="1"]
+          [#assign hookUsed = 1]         
+        [/#if]    
+      [/#if]     
         [#if definition.name=="configCHECK_FOR_STACK_OVERFLOW"]
           [#if definition.value !="0"]
             [#assign hookUsed = 1]    
@@ -182,9 +166,9 @@ void vApplicationGetTimerTaskMemory( StaticTask_t **ppxTimerTaskTCBBuffer, Stack
 
 [#if hookUsed==1]
 #n/* Hook prototypes */
-[#list SWIPdatas as SWIP]
+  [#list SWIPdatas as SWIP]
     [#if SWIP.defines??]
-     [#list SWIP.defines as definition]
+      [#list SWIP.defines as definition]
         [#if definition.name=="configGENERATE_RUN_TIME_STATS"]
           [#if definition.value=="1"]
 void configureTimerForRunTimeStats(void);
@@ -220,16 +204,16 @@ void vApplicationStackOverflowHook(TaskHandle_t xTask, signed char *pcTaskName);
 void vApplicationMallocFailedHook(void);       
           [/#if]
         [/#if]             
-     [/#list]
- [/#if]
-[/#list]
+      [/#list]
+    [/#if]
+  [/#list]
 [/#if]
 
 [#list SWIPdatas as SWIP]
-    [#if SWIP.defines??]     
-	  [#list SWIP.defines as definition]	
-	    [#if definition.name=="configGENERATE_RUN_TIME_STATS"]
-	      [#if definition.value=="1"]
+  [#if SWIP.defines??]
+    [#list SWIP.defines as definition]
+      [#if definition.name=="configGENERATE_RUN_TIME_STATS"]
+        [#if definition.value=="1"]
 #n
 /* USER CODE BEGIN 1 */
 /* Functions needed when configGENERATE_RUN_TIME_STATS is on */
@@ -243,11 +227,11 @@ __weak void configureTimerForRunTimeStats(void)
     return 0;
 }  
 /* USER CODE END 1 */
-	      [/#if]
-	    [/#if]
+        [/#if]
+      [/#if]
 		    
-		[#if definition.name=="configUSE_IDLE_HOOK"]
-	      [#if definition.value=="1"]
+      [#if definition.name=="configUSE_IDLE_HOOK"]
+        [#if definition.value=="1"]
 #n
 /* USER CODE BEGIN 2 */
 __weak void vApplicationIdleHook( void ) 
@@ -262,12 +246,12 @@ __weak void vApplicationIdleHook( void )
 #t    function, because it is the responsibility of the idle task to clean up
 #t    memory allocated by the kernel to any task that has since been deleted. */
 }
-/* USER CODE END 2 */  
-	      [/#if]
-	    [/#if]  
+/* USER CODE END 2 */
+        [/#if]
+      [/#if]  
 
-	    [#if definition.name=="configUSE_TICK_HOOK"]
-	      [#if definition.value=="1"]
+      [#if definition.name=="configUSE_TICK_HOOK"]
+        [#if definition.value=="1"]
 #n/* USER CODE BEGIN 3 */
 __weak void vApplicationTickHook( void ) 
 {
@@ -278,11 +262,11 @@ __weak void vApplicationTickHook( void )
 #t    functions can be used (those that end in FromISR()). */ 
 }
  /* USER CODE END 3 */ 	      
-	      [/#if]
-	    [/#if]
-	        
-	    [#if definition.name=="configCHECK_FOR_STACK_OVERFLOW"]
-	      [#if definition.value !="0"]
+        [/#if]
+      [/#if]
+
+      [#if definition.name=="configCHECK_FOR_STACK_OVERFLOW"]
+        [#if definition.value !="0"]
 #n/* USER CODE BEGIN 4 */
 [#if useNewHandle==0]
 __weak void vApplicationStackOverflowHook(xTaskHandle xTask, signed char *pcTaskName)
@@ -295,11 +279,11 @@ __weak void vApplicationStackOverflowHook(TaskHandle_t xTask, signed char *pcTas
 #t    called if a stack overflow is detected. */ 
 }
  /* USER CODE END 4 */ 
-	      [/#if]
-	    [/#if]
+        [/#if]
+      [/#if]
 	    
-	    [#if definition.name=="configUSE_MALLOC_FAILED_HOOK"]
-	      [#if definition.value=="1"]
+      [#if definition.name=="configUSE_MALLOC_FAILED_HOOK"]
+        [#if definition.value=="1"]
 #n/* USER CODE BEGIN 5 */
 __weak void vApplicationMallocFailedHook(void) 
 {
@@ -315,29 +299,28 @@ __weak void vApplicationMallocFailedHook(void)
 #t    provide information on how the remaining heap might be fragmented). */
 }
 /* USER CODE END 5 */
-	      [/#if]
-	    [/#if]
+        [/#if]
+      [/#if]
 	    
-	    [#if definition.name=="configUSE_DAEMON_TASK_STARTUP_HOOK"]
-	      [#if definition.value=="1"]
+      [#if definition.name=="configUSE_DAEMON_TASK_STARTUP_HOOK"]
+        [#if definition.value=="1"]
 #n/* USER CODE BEGIN DAEMON_TASK_STARTUP_HOOK */
 void vApplicationDaemonTaskStartupHook(void) 
 {
 }
 /* USER CODE END DAEMON_TASK_STARTUP_HOOK */	    
-	      [/#if]
-	    [/#if]
-	    
-	  [/#list]
-	 [/#if]
+        [/#if]
+      [/#if]
+    [/#list]
+  [/#if]
 [/#list]
 [/#compress]
 
 [#list SWIPdatas as SWIP]
-    [#if SWIP.defines??]     
-	  [#list SWIP.defines as definition]
-	  	[#if definition.name=="configUSE_TICKLESS_IDLE"]
-	      [#if definition.value=="1"]
+  [#if SWIP.defines??]     
+    [#list SWIP.defines as definition]
+      [#if definition.name=="configUSE_TICKLESS_IDLE"]
+        [#if definition.value=="1"]
 #n
 /* USER CODE BEGIN PREPOSTSLEEP */
 __weak void PreSleepProcessing(uint32_t *ulExpectedIdleTime)
@@ -351,46 +334,22 @@ __weak void PostSleepProcessing(uint32_t *ulExpectedIdleTime)
 }
 /* USER CODE END PREPOSTSLEEP */
 #n
-          [/#if]
         [/#if]
-        [#if useCmsisV1 == 1]
-	  	 [#if definition.name=="MEMORY_ALLOCATION"]
-	      [#if definition.value!="0"]
+        [#if definition.value=="2"]
 #n
-/* USER CODE BEGIN GET_IDLE_TASK_MEMORY */
-static StaticTask_t xIdleTaskTCBBuffer;
-static StackType_t xIdleStack[configMINIMAL_STACK_SIZE];
-  
-void vApplicationGetIdleTaskMemory( StaticTask_t **ppxIdleTaskTCBBuffer, StackType_t **ppxIdleTaskStackBuffer, uint32_t *pulIdleTaskStackSize )
+/* USER CODE BEGIN VPORT_SUPPORT_TICKS_AND_SLEEP */
+__weak void vPortSuppressTicksAndSleep( TickType_t xExpectedIdleTime )
 {
-  *ppxIdleTaskTCBBuffer = &xIdleTaskTCBBuffer;
-  *ppxIdleTaskStackBuffer = &xIdleStack[0];
-  *pulIdleTaskStackSize = configMINIMAL_STACK_SIZE;
-  /* place for user code */
-}                   
-/* USER CODE END GET_IDLE_TASK_MEMORY */
-#n
-            [#if useTimers==1]
-#n
-/* USER CODE BEGIN GET_TIMER_TASK_MEMORY */
-static StaticTask_t xTimerTaskTCBBuffer;
-static StackType_t xTimerStack[configTIMER_TASK_STACK_DEPTH];
-  
-void vApplicationGetTimerTaskMemory( StaticTask_t **ppxTimerTaskTCBBuffer, StackType_t **ppxTimerTaskStackBuffer, uint32_t *pulTimerTaskStackSize )  
-{
-  *ppxTimerTaskTCBBuffer = &xTimerTaskTCBBuffer;
-  *ppxTimerTaskStackBuffer = &xTimerStack[0];
-  *pulTimerTaskStackSize = configTIMER_TASK_STACK_DEPTH;
-  /* place for user code */
-}                   
-/* USER CODE END GET_TIMER_TASK_MEMORY */
-#n
-            [/#if]
-          [/#if]
+  // Generated when configUSE_TICKLESS_IDLE == 2.
+  // Function called in tasks.c (in portTASK_FUNCTION).
+  // TO BE COMPLETED or TO BE REPLACED by a user one, overriding that weak one.
+}
+/* USER CODE END VPORT_SUPPORT_TICKS_AND_SLEEP */
+#n        
         [/#if]
-       [/#if]              
-     [/#list]
- [/#if]
+      [/#if]
+    [/#list]
+  [/#if]
 [/#list]	
 
 [#if inMain == 0]

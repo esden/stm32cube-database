@@ -2,9 +2,9 @@
 /**
  ******************************************************************************
   * File Name          : ${name}
-  * Description        : Configuration file for BLE 
-  *                      middleWare.
-  ******************************************************************************
+  * Description        : Configuration file for BLE Middleware.
+  *
+ ******************************************************************************
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */

@@ -30,7 +30,7 @@
 [#-- Section2: Create global Variables for each middle ware instance --]
 [#-- Global variables --]
 [#if SWIP.variables??]
-	[#list SWIP.variables as variable]
+	[#list SWIP.variables as variable]	
 		[#-- extern ${variable.type} --][#if variable.value??][#--${variable.value};--]
 		[#if variable.value == "MSC"][#assign className = "MSC"][/#if]
 		[#if variable.value == "DFU"][#assign className = "DFU"][/#if]
@@ -39,7 +39,7 @@
 		[#if variable.value == "CCID"][#assign className = "CCID"][/#if]
 		[#if variable.value == "MTP"][#assign className = "MTP"][/#if]
 		[#if variable.value == "CDC"][#assign className = "CDC"][/#if]
-		[#if variable.value == "CUSTOMHID"][#assign className = "CUSTOMHID"][/#if]
+		[#if variable.value == "CUSTOM_HID"][#assign className = "CUSTOMHID"][/#if]
 		[#if variable.value?contains("OTG_FS")][#assign handleNameFS = "FS"][/#if]
 		[#if variable.value?contains("USB_FS")][#assign handleNameUSB_FS = "FS"][/#if]
 		[#if variable.value?contains("OTG_HS")][#assign handleNameHS = "HS"][/#if]
@@ -215,27 +215,6 @@ static void PCD_ResetCallback(PCD_HandleTypeDef *hpcd)
 void HAL_PCD_ResetCallback(PCD_HandleTypeDef *hpcd)
 #endif /* USE_HAL_PCD_REGISTER_CALLBACKS */
 { 
-[#if Line?contains("STM32F105/107")]
-  USBD_SpeedTypeDef speed = USBD_SPEED_FULL;
-
-  if ( hpcd->Init.speed == PCD_SPEED_HIGH)
-  {
-    speed = USBD_SPEED_HIGH;
-  }
-  else if ( hpcd->Init.speed == PCD_SPEED_FULL)
-  {
-    speed = USBD_SPEED_FULL;
-  }
-  else
-  {
-    Error_Handler();
-  }
-    /* Set Speed. */
-  USBD_LL_SetSpeed((USBD_HandleTypeDef*)hpcd->pData, speed);
-
-  /* Reset Device. */
-  USBD_LL_Reset((USBD_HandleTypeDef*)hpcd->pData);
-[#else]
   USBD_SpeedTypeDef speed = USBD_SPEED_FULL;
 
   if ( hpcd->Init.speed != PCD_SPEED_FULL)
@@ -247,7 +226,6 @@ void HAL_PCD_ResetCallback(PCD_HandleTypeDef *hpcd)
 
   /* Reset Device. */
   USBD_LL_Reset((USBD_HandleTypeDef*)hpcd->pData);
-[/#if] 
 }
 
 /**

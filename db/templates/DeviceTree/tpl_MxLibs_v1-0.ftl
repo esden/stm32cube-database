@@ -1,9 +1,11 @@
 [#ftl]
 
-[#--MX Data models access services--]
+[#--MX Data models access services
+NB: all the string lists should be re-ordered to insure DTS ordering.
+--]
 
 [#--------------------------------------------------------------------------------------------------------------------------------]
-[#-- Extract DT info --]
+[#-- Extract DT DM info --]
 [#--------------------------------------------------------------------------------------------------------------------------------]
 
 [#--pre-process MX DM to extract info--]
@@ -54,7 +56,7 @@
 
 	[#--get runtime context names list--]
 	[#assign mx_runtimeContextNamesList = []]
-	[#local contextNamesList = srvc_map_getKeysList(mx_contextsInfo)]
+	[#local contextNamesList = srvc_javaMap_getKeysList(mx_contextsInfo)]
 	[#list contextNamesList as contextName]
 		[#--FIX: dirty - use ContextKeyEnum--]
 		[#if !contextName?starts_with("Boot")]
@@ -78,7 +80,7 @@
 [#-- return the names list of all available runtimeContexts
      empty list if no context --]
 [#function srvcmx_getRuntimeCtxtNamesList]
-	[#return mx_runtimeContextNamesList]
+	[#return mx_runtimeContextNamesList?sort]
 [/#function]
 
 
@@ -107,14 +109,26 @@
 [/#function]
 
 
+
 [#--------------------------------------------------------------------------------------------------------------------------------]
-[#-- Extracting info from DT --]
+[#-- Extracting global (not specific to a DTS) DT info --]
 [#--------------------------------------------------------------------------------------------------------------------------------]
+
+[#--returns true if the DbFeature is enabled--]
+[#function srvcmx_isDbFeatureEnabled	pFeatureName]
+
+	[#if mxDtDM.dt_featuresList?seq_contains(pFeatureName)]
+		[#return true]
+	[/#if]
+
+[#return false]
+[/#function]
+
 
 [#--returns the list of devices assigned to "BootLoader" context and enabled--]
 [#function srvcmx_getBootloadersEnabledDevicesList]
 
-[#return mxDtDM.dt_bootloadersEnabledDevicesNamesList]
+[#return mxDtDM.dt_bootloadersEnabledDevicesNamesList?sort]
 [/#function]
 
 
@@ -129,7 +143,7 @@
 		[/#if]
 	[/#list]
 	
-[#return devicesNamesList]	
+[#return devicesNamesList?sort]
 [/#function]
 
 
@@ -140,7 +154,7 @@
 	[#local devicesList = srvc_map_getValue(mxDtDM.dt_enabledDevicesPerRuntimeCtxtMap, pRuntimeContextName) ]
 	[#local devicesNamesList = srvcmx_getIPDeviceNamesList(devicesList) ]
 
-[#return devicesNamesList]
+[#return devicesNamesList?sort]
 [/#function]
 
 
@@ -151,7 +165,7 @@
 	[#local devicesList = srvc_map_getValue(mxDtDM.dt_bindedEnabledDevicesPerRuntimeCtxtMap, pRuntimeContextName) ]
 	[#local devicesNamesList = srvcmx_getIPDeviceNamesList(devicesList) ]
 
-[#return devicesNamesList]
+[#return devicesNamesList?sort]
 [/#function]
 
 
@@ -221,7 +235,7 @@ NB: independently to its state--]
 [#--returns the list of devices w IO for this DTS--]
 [#function srvcmx_getListOfDevicesWithPinCtrl_inDTS]
 
-[#return mxDtDM.dts_devicesWithPinCtrlList]
+[#return mxDtDM.dts_devicesWithPinCtrlList?sort]
 [/#function]
 
 
@@ -369,7 +383,7 @@ Returns the 1st found "bindedHwName" as a "String".
 
 
 [#--------------------------------------------------------------------------------------------------------------------------------]
-[#-- DTS elmt creation services --]
+[#-- DTBindedDtsElmtDM object creation services --]
 [#--------------------------------------------------------------------------------------------------------------------------------]
 
 [#--FIX: secure Api by improving i/f checking--]
@@ -377,9 +391,9 @@ Returns the 1st found "bindedHwName" as a "String".
 		=>to modify whenever "DTBindedDtsElmtDM" java class changes
 		-today only the mandatory and minimum set of attributes are implemented
 --]
+
 [#function DTBindedDtsElmtDM_new  pTypeName pDeviceName pFwName pElmtsList]
 	[#return {"typeName":pTypeName, "deviceName":pDeviceName, "fwName":pFwName, "areUserSectionsAllowed":true, "elmtsList":pElmtsList}]
-	[#return elmt]
 [/#function]
 
 
@@ -416,6 +430,21 @@ Returns the 1st found "bindedHwName" as a "String".
 	--]
 [#function DTBindedDtsElmtDM_new_Property_noValue  pName]
 	[#return DTBindedDtsElmtDM_new_Property(pName, [])]
+[/#function]
+
+
+[#--------------------------------------------------------------------------------------------------------------------------------]
+[#-- DTInfoElmtDM object creation services --]
+[#--------------------------------------------------------------------------------------------------------------------------------]
+
+[#--FIX: secure Api by improving i/f checking--]
+[#--DTInfoElmtDM class mirroring
+		=>to modify whenever "DTInfoElmtDM" java class changes
+		-today only the mandatory and minimum set of attributes are implemented
+--]
+
+[#function DTInfoElmtDM_new  pPinctrlElmtType pPinCtrlConfigName pPinCtrlConfigNodesList]
+	[#return {"pinctrlElmtType":pPinctrlElmtType, "pinCtrlConfigName":pPinCtrlConfigName, "pinCtrlConfigNodesList":pPinCtrlConfigNodesList}]
 [/#function]
 
 

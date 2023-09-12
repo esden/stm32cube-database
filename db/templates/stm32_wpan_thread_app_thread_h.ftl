@@ -33,8 +33,8 @@ extern "C" {
 #include "stm32wbxx_core_interface_def.h"
 #include "tl_thread_hci.h"
 
-/* Use OpenThread FTD */
-#include "openthread_api_config_ftd.h"
+/* OpenThread Library */
+#include OPENTHREAD_CONFIG_FILE
 
 /* USER CODE BEGIN Includes */
 
@@ -50,7 +50,7 @@ typedef enum
   APP_THREAD_FULL,
 } APP_THREAD_InitMode_t;
 
-[#if (THREAD_APPLICATION = "Thread_Coap_Generic")]
+[#if (THREAD_APPLICATION != "FTD_CLI")]
 /* ipv6-addressing defines        */
 /*------------------------------------*/
 /* Key Point: A major difference between FTDs and MTDs are that FTDs subscribe to the ff03::2 multicast address.
@@ -72,30 +72,18 @@ typedef enum
 {
   ERR_REC_MULTI_MSG_FROM_M0,
   ERR_THREAD_SET_STATE_CB,
-[#if (THREAD_APPLICATION = "Thread_Coap_Generic")]
+[#if (THREAD_APPLICATION != "FTD_CLI")]
   ERR_THREAD_SET_CHANNEL,
   ERR_THREAD_SET_PANID,
   ERR_THREAD_IPV6_ENABLE,
   ERR_THREAD_START,
-  ERR_THREAD_COAP_START,
-  ERR_THREAD_COAP_ADD_RESSOURCE,
-  ERR_THREAD_MESSAGE_READ,
-  ERR_THREAD_COAP_SEND_RESPONSE,
-  ERR_THREAD_COAP_NEW_MSG,
-  ERR_THREAD_COAP_APPEND,
-  ERR_THREAD_COAP_SEND_REQUEST,
-  ERR_THREAD_COAP_DATA_RESPONSE,
-  ERR_THREAD_SETUP,
-  ERR_THREAD_LINK_MODE,
-  ERR_TIMER_INIT,
-  ERR_TIMER_START,
 [/#if]
   ERR_THREAD_ERASE_PERSISTENT_INFO,
-[#if (THREAD_APPLICATION = "Thread_Coap_Generic")]
-  ERR_THREAD_MSG_COMPARE_FAILED,
-[/#if]
+/* USER CODE BEGIN ERROR_APPLI_ENUM */
+
+/* USER CODE END ERROR_APPLI_ENUM */
   ERR_THREAD_CHECK_WIRELESS
-} ErrAppliIdEnum_t;
+  } ErrAppliIdEnum_t;
 /* USER CODE BEGIN ET */
 
 /* USER CODE END ET */

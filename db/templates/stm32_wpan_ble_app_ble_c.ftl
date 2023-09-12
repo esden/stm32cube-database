@@ -3,9 +3,9 @@
 /**
  ******************************************************************************
   * File Name          : ${name}
-  * Description        : Application file for BLE 
-  *                      middleWare.
-  ******************************************************************************
+  * Description        : Application file for BLE Middleware.
+  *
+ ******************************************************************************
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
@@ -89,9 +89,13 @@
 #include "tl.h"
 #include "app_ble.h"
 
-#include "scheduler.h"
+[#if  (FREERTOS_STATUS = 0)]
+#include "stm32_seq.h"
+[#else]
+#include "cmsis_os.h"
+[/#if]
 #include "shci.h"
-#include "lpm.h"
+#include "stm32_lpm.h"
 #include "otp.h"
 [#if  (BT_SIG_BEACON = 1)]
 #include "eddystone_beacon.h"
@@ -488,11 +492,43 @@ static const char local_name[] = {AD_TYPE_COMPLETE_LOCAL_NAME ${LOCAL_NAME_FORMA
 [/#if]
 [/#if]
 [/#if]
+
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
 
+[#if  (FREERTOS_STATUS = 1)]
+/* Global variables ----------------------------------------------------------*/
+osMutexId_t MtxHciId;
+osSemaphoreId_t SemHciId;
+osThreadId_t AdvUpdateProcessId;
+osThreadId_t HciUserEvtProcessId;
+
+const osThreadAttr_t AdvUpdateProcess_attr = {
+    .name = CFG_ADV_UPDATE_PROCESS_NAME,
+    .attr_bits = CFG_ADV_UPDATE_PROCESS_ATTR_BITS,
+    .cb_mem = CFG_ADV_UPDATE_PROCESS_CB_MEM,
+    .cb_size = CFG_ADV_UPDATE_PROCESS_CB_SIZE,
+    .stack_mem = CFG_ADV_UPDATE_PROCESS_STACK_MEM,
+    .priority = CFG_ADV_UPDATE_PROCESS_PRIORITY,
+    .stack_size = CFG_ADV_UPDATE_PROCESS_STACk_SIZE
+};
+
+const osThreadAttr_t HciUserEvtProcess_attr = {
+    .name = CFG_HCI_USER_EVT_PROCESS_NAME,
+    .attr_bits = CFG_HCI_USER_EVT_PROCESS_ATTR_BITS,
+    .cb_mem = CFG_HCI_USER_EVT_PROCESS_CB_MEM,
+    .cb_size = CFG_HCI_USER_EVT_PROCESS_CB_SIZE,
+    .stack_mem = CFG_HCI_USER_EVT_PROCESS_STACK_MEM,
+    .priority = CFG_HCI_USER_EVT_PROCESS_PRIORITY,
+    .stack_size = CFG_HCI_USER_EVT_PROCESS_STACk_SIZE
+};
+
+[/#if]
 /* Private function prototypes -----------------------------------------------*/
+[#if  (FREERTOS_STATUS = 1)]
+static void HciUserEvtProcess(void *argument);
+[/#if]
 static void BLE_UserEvtRx( void * pPayload );
 static void BLE_StatusNot( HCI_TL_CmdStatus_t status );
 static void Ble_Tl_Init( void );
@@ -507,6 +543,9 @@ static void Adv_Request( APP_BLE_ConnStatus_t New_Status );
 [#if  (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_HEART_RATE_SENSOR = 1)]
 static void Add_Advertisment_Service_UUID( uint16_t servUUID );
 static void Adv_Mgr( void );
+[#if  (FREERTOS_STATUS = 1)]
+static void AdvUpdateProcess(void *argument);
+[/#if]
 static void Adv_Update( void );
 [/#if]
 [#if  (CUSTOM_P2P_SERVER = 1)]
@@ -559,12 +598,16 @@ void APP_BLE_Init( void )
   /**
    * Do not allow standby in the application
    */
-  LPM_SetOffMode(1 << CFG_LPM_APP_BLE, LPM_OffMode_Dis);
+  UTIL_LPM_SetOffMode(1 << CFG_LPM_APP_BLE, UTIL_LPM_DISABLE);
 
   /**
    * Register the hci transport layer to handle BLE User Asynchronous Events
    */
-  SCH_RegTask(CFG_TASK_HCI_ASYNCH_EVT_ID, hci_user_evt_proc);
+[#if  (FREERTOS_STATUS = 0)]
+  UTIL_SEQ_RegTask( 1<<CFG_TASK_HCI_ASYNCH_EVT_ID, UTIL_SEQ_RFU, hci_user_evt_proc);
+[#else]
+  HciUserEvtProcessId = osThreadNew(HciUserEvtProcess, NULL, &HciUserEvtProcess_attr);
+[/#if]
 
   /**
    * Starts the BLE Stack on CPU2
@@ -587,29 +630,24 @@ void APP_BLE_Init( void )
   /**
    * Initialization of the BLE App Context
    */
-[#if  (FREERTOS_STATUS = 0)]
   BleApplicationContext.Device_Connection_Status = APP_BLE_IDLE;
   BleApplicationContext.BleApplicationContext_legacy.connectionHandle = 0xFFFF;  
-[#else]
-  for (index = 0; index < CFG_MAX_CONNECTION; index++)
-  {
-    BleApplicationContext.Device_Connection_Status[index] = HR_IDLE;
-    BleApplicationContext.BleApplicationContext_legacy.connectionHandle[index] = 0xFFFF;
-  }
-[/#if]  
 [/#if]
   /**
    * From here, all initialization are BLE application specific
    */
-[#if  (FREERTOS_STATUS = 0)]
 [#if  (BT_SIG_BEACON = 1)]
-  SCH_RegTask(CFG_TASK_BEACON_UPDATE_REQ_ID, Beacon_Update);
+  UTIL_SEQ_RegTask( 1<<CFG_TASK_BEACON_UPDATE_REQ_ID, UTIL_SEQ_RFU, Beacon_Update);
 [/#if]
 [#if  (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_HEART_RATE_SENSOR = 1)]
-  SCH_RegTask(CFG_TASK_ADV_UPDATE_ID, Adv_Update);
+[#if  (FREERTOS_STATUS = 0)]
+  UTIL_SEQ_RegTask( 1<<CFG_TASK_ADV_UPDATE_ID, UTIL_SEQ_RFU, Adv_Update);
+[#else]
+  AdvUpdateProcessId = osThreadNew(AdvUpdateProcess, NULL, &AdvUpdateProcess_attr);
+[/#if]
 [/#if]
 [#if  (CUSTOM_P2P_SERVER = 1)]
-  SCH_RegTask(CFG_TASK_ADV_CANCEL_ID, Adv_Cancel);
+    UTIL_SEQ_RegTask( 1<<CFG_TASK_ADV_CANCEL_ID, UTIL_SEQ_RFU, Adv_Cancel);
 [/#if]
 [#if  (BT_SIG_HEART_RATE_SENSOR = 1) || (CUSTOM_P2P_SERVER = 1)]
   /**
@@ -628,7 +666,6 @@ void APP_BLE_Init( void )
   index_con_int = 0; 
   mutex = 1; 
 #endif
-[/#if]
 [/#if]
 [#if  (BT_SIG_BLOOD_PRESSURE_SENSOR = 1)]
   /**
@@ -772,7 +809,11 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification( void *pckt )
   hci_event_pckt *event_pckt;
   evt_le_meta_event *meta_evt;
   evt_blue_aci *blue_evt;
-
+[#if  (BT_SIG_BEACON = 0)]
+  hci_le_phy_update_complete_event_rp0 *evt_le_phy_update_complete; 
+  uint8_t TX_PHY, RX_PHY;
+  tBleStatus ret = BLE_STATUS_INVALID_PARAMS;
+[/#if]
   event_pckt = (hci_event_pckt*) ((hci_uart_pckt *) pckt)->data;
 
   switch (event_pckt->evt)
@@ -803,7 +844,10 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification( void *pckt )
         P2PS_APP_Notification(&handleNotification);
 
 [/#if]
-}
+      /* USER CODE BEGIN EVT_DISCONN_COMPLETE */
+
+      /* USER CODE END EVT_DISCONN_COMPLETE */
+    }
 [/#if]
 
     break; /* EVT_DISCONN_COMPLETE */
@@ -826,6 +870,55 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification( void *pckt )
           /* USER CODE BEGIN EVT_LE_CONN_UPDATE_COMPLETE */
 
           /* USER CODE END EVT_LE_CONN_UPDATE_COMPLETE */
+          break;
+[/#if]
+[#if (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_HEART_RATE_SENSOR = 1) ||(CUSTOM_P2P_SERVER = 1)]
+        case EVT_LE_PHY_UPDATE_COMPLETE:
+#if(CFG_DEBUG_APP_TRACE != 0)
+          APP_DBG_MSG("EVT_UPDATE_PHY_COMPLETE \n");
+#endif
+          evt_le_phy_update_complete = (hci_le_phy_update_complete_event_rp0*)meta_evt->data;
+          if (evt_le_phy_update_complete->Status == 0)
+          {
+#if(CFG_DEBUG_APP_TRACE != 0)
+            APP_DBG_MSG("EVT_UPDATE_PHY_COMPLETE, status ok \n");
+#endif
+          }
+          else
+          {
+#if(CFG_DEBUG_APP_TRACE != 0)
+            APP_DBG_MSG("EVT_UPDATE_PHY_COMPLETE, status nok \n");
+#endif
+          }
+          ret = hci_le_read_phy(BleApplicationContext.BleApplicationContext_legacy.connectionHandle,&TX_PHY,&RX_PHY);
+          if (ret == BLE_STATUS_SUCCESS)
+          {
+#if(CFG_DEBUG_APP_TRACE != 0)
+            APP_DBG_MSG("Read_PHY success \n");
+#endif
+           
+            if ((TX_PHY == TX_2M) && (RX_PHY == RX_2M))
+            {
+#if(CFG_DEBUG_APP_TRACE != 0)
+              APP_DBG_MSG("PHY Param  TX= %d, RX= %d \n", TX_PHY, RX_PHY);
+#endif
+            }
+            else
+            {
+#if(CFG_DEBUG_APP_TRACE != 0)
+              APP_DBG_MSG("PHY Param  TX= %d, RX= %d \n", TX_PHY, RX_PHY);
+#endif
+            } 
+          }
+          else
+          {
+#if(CFG_DEBUG_APP_TRACE != 0)
+            APP_DBG_MSG("Read conf not succeess \n");
+#endif
+          }
+          /* USER CODE BEGIN EVT_LE_PHY_UPDATE_COMPLETE */
+
+          /* USER CODE END EVT_LE_PHY_UPDATE_COMPLETE */          
           break;
 [/#if]
         case EVT_LE_CONN_COMPLETE:
@@ -956,6 +1049,11 @@ static void Ble_Tl_Init( void )
 {
   HCI_TL_HciInitConf_t Hci_Tl_Init_Conf;
 
+[#if (FREERTOS_STATUS = 1)]
+  MtxHciId = osMutexNew( NULL );
+  SemHciId = osSemaphoreNew( 1, 0, NULL ); /*< Create the semaphore and make it busy at initialization */
+
+[/#if]
   Hci_Tl_Init_Conf.p_cmdbuffer = (uint8_t*)&BleCmdBuffer;
   Hci_Tl_Init_Conf.StatusNotCallBack = BLE_StatusNot;
   hci_init(BLE_UserEvtRx, (void*) &Hci_Tl_Init_Conf);
@@ -1125,7 +1223,7 @@ static void Ble_Tl_Init( void )
   BleApplicationContext.BleApplicationContext_legacy.bleSecurityParam.OOB_Data_Present = 0;
   BleApplicationContext.BleApplicationContext_legacy.bleSecurityParam.encryptionKeySizeMin = 8;
   BleApplicationContext.BleApplicationContext_legacy.bleSecurityParam.encryptionKeySizeMax = 16;
-  BleApplicationContext.BleApplicationContext_legacy.bleSecurityParam.Use_Fixed_Pin = 0;
+  BleApplicationContext.BleApplicationContext_legacy.bleSecurityParam.Use_Fixed_Pin = 1;
   BleApplicationContext.BleApplicationContext_legacy.bleSecurityParam.Fixed_Pin = 111111;
   BleApplicationContext.BleApplicationContext_legacy.bleSecurityParam.bonding_mode = 1;
   for (index = 0; index < 16; index++)
@@ -1135,7 +1233,7 @@ static void Ble_Tl_Init( void )
 
   aci_gap_set_authentication_requirement(BleApplicationContext.BleApplicationContext_legacy.bleSecurityParam.bonding_mode,
                                          BleApplicationContext.BleApplicationContext_legacy.bleSecurityParam.mitm_mode,
-                                         0,
+                                         1,
                                          0,
                                          BleApplicationContext.BleApplicationContext_legacy.bleSecurityParam.encryptionKeySizeMin,
                                          BleApplicationContext.BleApplicationContext_legacy.bleSecurityParam.encryptionKeySizeMax,
@@ -1187,8 +1285,6 @@ static void Beacon_Update( void )
    * Nb Sectors  : 1
    */
   NVIC_SystemReset();
-
-  return;
 }
 
 [/#if]
@@ -1267,7 +1363,9 @@ static void Adv_Request(APP_BLE_ConnStatus_t New_Status)
     {
       if (New_Status == APP_BLE_FAST_ADV)
       {
+#if(CFG_DEBUG_APP_TRACE != 0)
         APP_DBG_MSG("Successfully Start Fast Advertising \n" );
+#endif
         /* Start Timer to STOP ADV - TIMEOUT */
         HW_TS_Start(BleApplicationContext.Advertising_mgr_timer_Id, INITIAL_ADV_TIMEOUT);
       }
@@ -1374,18 +1472,47 @@ static void Adv_Mgr( void )
    * The background is the only place where the application can make sure a new aci command
    * is not sent if there is a pending one
    */
-  SCH_SetTask(1 << CFG_TASK_ADV_UPDATE_ID, CFG_SCH_PRIO_0);
+[#if (FREERTOS_STATUS = 1)]
+  osThreadFlagsSet( AdvUpdateProcessId, 1 );
+[#else]
+   UTIL_SEQ_SetTask(1 << CFG_TASK_ADV_UPDATE_ID, CFG_SCH_PRIO_0);
+[/#if]
 
   return;
 }
 
+[#if (FREERTOS_STATUS = 1)]
+static void AdvUpdateProcess(void *argument)
+{
+  UNUSED(argument);
+
+  for(;;)
+  {
+    osThreadFlagsWait( 1, osFlagsWaitAny, osWaitForever);
+    Adv_Update( );
+  }
+}
+
+[/#if]
 static void Adv_Update( void )
 {
   Adv_Request(APP_BLE_LP_ADV);
 
   return;
 }
+[#if (FREERTOS_STATUS = 1)]
 
+static void HciUserEvtProcess(void *argument)
+{
+  UNUSED(argument);
+
+  for(;;)
+  {
+    osThreadFlagsWait( 1, osFlagsWaitAny, osWaitForever);
+    hci_user_evt_proc( );
+  }
+}
+[/#if]
 [/#if]
 [#if (CUSTOM_P2P_SERVER = 1)]
 /*************************************************************
@@ -1434,7 +1561,7 @@ static void Adv_Cancel_Req( void )
 /* USER CODE BEGIN Adv_Cancel_Req_1 */
 
 /* USER CODE END Adv_Cancel_Req_1 */
-  SCH_SetTask(1 << CFG_TASK_ADV_CANCEL_ID, CFG_SCH_PRIO_0);
+  UTIL_SEQ_SetTask(1 << CFG_TASK_ADV_CANCEL_ID, CFG_SCH_PRIO_0);
 /* USER CODE BEGIN Adv_Cancel_Req_2 */
 
 /* USER CODE END Adv_Cancel_Req_2 */
@@ -1498,19 +1625,34 @@ void BLE_SVC_L2CAP_Conn_Update(uint16_t Connection_Handle)
  *************************************************************/
 void hci_notify_asynch_evt(void* pdata)
 {
-  SCH_SetTask(1 << CFG_TASK_HCI_ASYNCH_EVT_ID, CFG_SCH_PRIO_0);
+[#if (FREERTOS_STATUS = 0)]
+  UTIL_SEQ_SetTask(1 << CFG_TASK_HCI_ASYNCH_EVT_ID, CFG_SCH_PRIO_0);
+[#else]
+  UNUSED(pdata);
+  osThreadFlagsSet( HciUserEvtProcessId, 1 );
+[/#if]
   return;
 }
 
 void hci_cmd_resp_release(uint32_t flag)
 {
-  SCH_SetEvt(1 << CFG_IDLEEVT_SYSTEM_HCI_CMD_EVT_RSP_ID);
+[#if (FREERTOS_STATUS = 0)]
+  UTIL_SEQ_SetEvt(1 << CFG_IDLEEVT_HCI_CMD_EVT_RSP_ID);
+[#else]
+  UNUSED(flag);
+  osSemaphoreRelease( SemHciId );
+[/#if]
   return;
 }
 
 void hci_cmd_resp_wait(uint32_t timeout)
 {
-  SCH_WaitEvt(1 << CFG_IDLEEVT_SYSTEM_HCI_CMD_EVT_RSP_ID);
+[#if (FREERTOS_STATUS = 0)]
+  UTIL_SEQ_WaitEvt(1 << CFG_IDLEEVT_HCI_CMD_EVT_RSP_ID);
+[#else]
+  UNUSED(timeout);
+  osSemaphoreAcquire( SemHciId, osWaitForever );
+[/#if]
   return;
 }
 
@@ -1534,27 +1676,37 @@ static void BLE_UserEvtRx( void * pPayload )
 
 static void BLE_StatusNot( HCI_TL_CmdStatus_t status )
 {
+[#if (FREERTOS_STATUS = 0)]
   uint32_t task_id_list;
+[/#if]
   switch (status)
   {
     case HCI_TL_CmdBusy:
+[#if (FREERTOS_STATUS = 0)]
       /**
        * All tasks that may send an aci/hci commands shall be listed here
        * This is to prevent a new command is sent while one is already pending
        */
       task_id_list = (1 << CFG_LAST_TASK_ID_WITH_HCICMD) - 1;
-      SCH_PauseTask(task_id_list);
+      UTIL_SEQ_PauseTask(task_id_list);
 
+      [#else]
+      osMutexAcquire( MtxHciId, osWaitForever );
+[/#if]
       break;
 
     case HCI_TL_CmdAvailable:
+[#if (FREERTOS_STATUS = 0)]
       /**
        * All tasks that may send an aci/hci commands shall be listed here
        * This is to prevent a new command is sent while one is already pending
        */
       task_id_list = (1 << CFG_LAST_TASK_ID_WITH_HCICMD) - 1;
-      SCH_ResumeTask(task_id_list);
+      UTIL_SEQ_ResumeTask(task_id_list);    
 
+[#else]
+      osMutexRelease( MtxHciId );
+[/#if]
       break;
 
     default:

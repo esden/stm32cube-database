@@ -15,6 +15,20 @@
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __${name?upper_case}__H__
 #define __${name?upper_case}__H__
+[#-- IPdatas is a list of IPconfigModel --]
+[#assign useBCD=false]
+[#if configs??]
+   [#list configs as config]
+        [#list config.peripheralParams?keys as PeripheralParams]
+            [#if PeripheralParams=="USB"]
+                [#assign values = config.peripheralParams[PeripheralParams]][#-- values is a hash list --]
+                [#if values["battery_charging_enable"]=="ENABLE"]	
+[#assign useBCD=true]			 
+                [/#if]
+            [/#if]
+        [/#list]
+    [/#list]
+ [/#if]
 
 #ifdef __cplusplus
  extern "C" {

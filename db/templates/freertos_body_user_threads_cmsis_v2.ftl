@@ -81,9 +81,9 @@
          [#else]
          /* ${timerCallback} function */
          [#if option == "As weak"]
-         __weak void ${timerCallback}(void *argument) // for v2
+         __weak void ${timerCallback}(void *argument)
          [#else]
-         void ${timerCallback}(void *argument)  // for v2
+         void ${timerCallback}(void *argument)
          [/#if]
          {
          #t/* USER CODE BEGIN ${timerCallback} */

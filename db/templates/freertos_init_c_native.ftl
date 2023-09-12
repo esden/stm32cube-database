@@ -15,6 +15,7 @@
 [#assign timerAllocation = "Dynamic"]
 [#assign queueThreadId = "NULL"]
 [#assign useMPU = "0"]
+[#assign familyName=FamilyName?lower_case]
 
 [#list SWIPdatas as SWIP]
   [#if SWIP.defines??]
@@ -219,13 +220,13 @@
           [/#if]
           #t/* definition and creation of ${timerName} */    
           [#if timerAllocation == "Dynamic"]
-            [#if timerType == "osTimerPeriodic"]    
+            [#if timerType == "auto-reload"]    
               #t${timerName}Handle = xTimerCreate("${timerName}", 1, pdTRUE, NULL, ${timerCallback});
             [#else]
               #t${timerName}Handle = xTimerCreate("${timerName}", 1, pdFALSE, NULL, ${timerCallback});
             [/#if]  
           [#else]
-            [#if timerType == "osTimerPeriodic"]    
+            [#if timerType == "auto-reload"]    
               #t${timerName}Handle = xTimerCreateStatic("${timerName}", 1, pdTRUE, NULL, ${timerCallback}, &${timerControlBlock});
             [#else]
               #t${timerName}Handle = xTimerCreateStatic("${timerName}", 1, pdFALSE, NULL, ${timerCallback}, &${timerControlBlock});
@@ -343,11 +344,11 @@
         [/#list]
         [#assign nbThreads = nbThreads + 1]
 
-        [#if nbThreads == 1 && useMPU == "1"]
-          [#-- For Dory and MPU: do not generate default task --]
+        [#if (nbThreads == 1) && (useMPU == "1") && (familyName=="stm32wb")]
+          [#-- For WB and MPU: do not generate default task --]
         [#else]
             #n#t/* Create the thread(s) */
-            #t/* definition and creation of ${threadName} */
+            #t/* definition and creation of ${threadName} */   
           [#if threadAllocation == "Dynamic"]
             #txTaskCreate(${threadFunction}, "${threadName}", ${threadStackSize}, NULL, ${taskPriority}, &${threadName}Handle);
           [#else]

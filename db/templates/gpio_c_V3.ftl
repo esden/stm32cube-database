@@ -9,6 +9,11 @@
   ******************************************************************************
   */
 
+[#assign contextFolder=""]
+[#if cpucore!=""]
+[#assign contextFolder = cpucore?replace("ARM_CORTEX_","C")+"/"]
+[/#if]
+
   [#compress]
 /* Includes ------------------------------------------------------------------*/
 #include "gpio.h"
@@ -29,6 +34,11 @@
 [#compress]
 void MX_GPIO_Init(void) 
 {
+
+[#if RESMGR_UTILITY??]
+    [@common.optinclude name=contextFolder+mxTmpFolder+"/resmgrutility_"+data.ipName+".tmp"/][#-- ADD RESMGR_UTILITY Code--]
+[/#if]
+
 [#assign v = ""]
 [#list datas as data]
 	[#list data.variables as variable]				

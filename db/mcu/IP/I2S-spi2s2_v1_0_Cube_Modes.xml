@@ -10,27 +10,31 @@
     <!-- Generic RefParameters for I2S. Instance is SPI because I2S is same IP that SPI. -->
     <RefParameter Comment="Instance" Name="Instance" DefaultValue="SPI$Index" Type="" Visible="false"/>
 				
-    <RefParameter Comment="Mode" DefaultValue="I2S_MODE_MASTER" Name="VirtualMode" Type="list" Group="Generic Parameters" Visible="false">
-        <PossibleValue Comment="Master" Value="I2S_MODE_MASTER"/>
-        <PossibleValue Comment="Slave" Value="I2S_MODE_SLAVE"/>
-    </RefParameter>
-		
     <RefParameter Comment="Transmission Mode" DefaultValue="I2S_MODE_MASTER_TX" Name="Mode" Type="list" Group="Generic Parameters">
         <Condition Expression="$IpInstance_Master" Diagnostic=""/>
         <PossibleValue Comment="Mode Master Transmit" Value="I2S_MODE_MASTER_TX" Semaphore="$IpInstance_TX"/>
         <PossibleValue Comment="Mode Master Receive" Value="I2S_MODE_MASTER_RX" Semaphore="$IpInstance_RX"/>
     </RefParameter>
+
     <RefParameter Comment="Transmission Mode" DefaultValue="I2S_MODE_SLAVE_RX" Name="Mode" Type="list" Group="Generic Parameters">
         <Condition Expression="$IpInstance_Slave" Diagnostic=""/>
         <PossibleValue Comment="Mode Slave Transmit" Value="I2S_MODE_SLAVE_TX" Semaphore="$IpInstance_TX"/>
         <PossibleValue Comment="Mode Slave Receive" Value="I2S_MODE_SLAVE_RX" Semaphore="$IpInstance_RX"/>
     </RefParameter>
+
+    <RefParameter Comment="Transmission Mode" DefaultValue="I2S_MODE_MASTER_FULLDUPLEX" Name="Mode" Type="list" Group="Generic Parameters">
+        <Condition Expression="$IpInstance_Master_FullDuplex" Diagnostic=""/>
+        <PossibleValue Comment="Mode Master Transmit" Value="I2S_MODE_MASTER_FULLDUPLEX" Semaphore="$IpInstance_TX"/>
+        <PossibleValue Comment="Mode Master Receive" Value="I2S_MODE_MASTER_FULLDUPLEX" Semaphore="$IpInstance_RX"/>
+    </RefParameter>
+
+    <RefParameter Comment="Transmission Mode" DefaultValue="I2S_MODE_SLAVE_FULLDUPLEX" Name="Mode" Type="list" Group="Generic Parameters">
+        <Condition Expression="$IpInstance_Slave_FullDuplex" Diagnostic=""/>
+        <PossibleValue Comment="Mode Slave Transmit" Value="I2S_MODE_SLAVE_FULLDUPLEX" Semaphore="$IpInstance_TX"/>
+        <PossibleValue Comment="Mode Slave Receive" Value="I2S_MODE_SLAVE_FULLDUPLEX" Semaphore="$IpInstance_RX"/>
+    </RefParameter>
+
     <RefParameter Comment="Mode" DefaultValue="I2S_MODE_SLAVE_TX" Name="Mode" Type="string" Group="Generic Parameters" Visible="false"/>
-	
-    <RefParameter Comment="Full-Duplex Mode" DefaultValue="I2S_MODE_SLAVE_FD" Name="FullDuplexMode" Type="list" Group="Generic Parameters" Visible="false">
-        <PossibleValue Comment="Full Duplex Master" Value="I2S_MODE_MASTER_FD"/>
-        <PossibleValue Comment="Full Duplex Slave" Value="I2S_MODE_SLAVE_FD"/>
-    </RefParameter>	
 	
     <RefParameter Comment="Communication Standard" DefaultValue="I2S_STANDARD_PHILIPS" Name="Standard" Type="list" Group="Generic Parameters">
         <PossibleValue Comment="I2S Philips" Value="I2S_STANDARD_PHILIPS"/>
@@ -135,12 +139,6 @@
         <Parameter Name="Instance">
             <PossibleValue>SPI$Index</PossibleValue>
         </Parameter>
-        <Parameter Name="VirtualMode">
-            <PossibleValue>I2S_MODE_MASTER</PossibleValue>
-        </Parameter>
-        <Parameter Name="FullDuplexMode">
-            <PossibleValue>I2S_MODE_MASTER_FD</PossibleValue>
-        </Parameter>
         <!-- Selected Mode User Generic Parameters -->
         <Parameter Name="Mode"/>
         <Parameter Name="Standard"/>
@@ -164,12 +162,6 @@
         <!-- Selected Mode Fixed Parameters -->
         <Parameter Name="Instance">
             <PossibleValue>SPI$Index</PossibleValue>
-        </Parameter>
-        <Parameter Name="VirtualMode">
-            <PossibleValue>I2S_MODE_SLAVE</PossibleValue>
-        </Parameter>
-        <Parameter Name="FullDuplexMode">
-            <PossibleValue>I2S_MODE_MASTER_FD</PossibleValue>
         </Parameter>
         <!-- Selected Mode User Generic Parameters -->
         <Parameter Name="Mode"/>
@@ -196,12 +188,6 @@
         <Parameter Name="Instance">
             <PossibleValue>SPI$Index</PossibleValue>
         </Parameter>
-        <Parameter Name="VirtualMode">
-            <PossibleValue>I2S_MODE_MASTER</PossibleValue>
-        </Parameter>
-        <Parameter Name="FullDuplexMode">
-            <PossibleValue>I2S_MODE_SLAVE_FD</PossibleValue>
-        </Parameter>
         <!-- Selected Mode User Generic Parameters -->
         <Parameter Name="Mode"/>
         <Parameter Name="Standard"/>
@@ -226,12 +212,6 @@
         <!-- Selected Mode Fixed Parameters -->
         <Parameter Name="Instance">
             <PossibleValue>SPI$Index</PossibleValue>
-        </Parameter>
-        <Parameter Name="VirtualMode">
-            <PossibleValue>I2S_MODE_SLAVE</PossibleValue>
-        </Parameter>
-        <Parameter Name="FullDuplexMode">
-            <PossibleValue>I2S_MODE_SLAVE_FD</PossibleValue>
         </Parameter>
         <!-- Selected Mode User Generic Parameters -->
         <Parameter Name="Mode"/>
@@ -271,8 +251,8 @@
                         <Signal Name="WS"/>
                         <Signal Name="SDI"/>
                     </SignalLogicalOp>
-                    <Semaphore>$IpInstance_I2S_FULL_DUPLEX</Semaphore>
-                    <Semaphore>$IpInstance_Master</Semaphore>
+                    <Semaphore>$IpInstance_RX</Semaphore>
+                    <Semaphore>$IpInstance_Master_FullDuplex</Semaphore>
                 </Mode>
                 <Mode Name="Full_Duplex_Slave" UserName="Full-Duplex Slave">
                     <SignalLogicalOp Name="AND">
@@ -281,8 +261,8 @@
                         <Signal Name="WS"/>
                         <Signal Name="SDI"/>
                     </SignalLogicalOp>
-                    <Semaphore>$IpInstance_I2S_FULL_DUPLEX</Semaphore>
-                    <Semaphore>$IpInstance_Slave</Semaphore>
+                    <Semaphore>$IpInstance_TX</Semaphore>
+                    <Semaphore>$IpInstance_Slave_FullDuplex</Semaphore>
                 </Mode>
                 <Mode Name="Half_Duplex_Master" UserName="Half-Duplex Master">
                     <SignalLogicalOp Name="AND">
@@ -291,7 +271,6 @@
                         <Signal Name="WS"/>
                     </SignalLogicalOp>
                     <Semaphore>$IpInstance_Master</Semaphore>
-        	    <Semaphore>$IpInstance_SEM_Half_Duplex_Master</Semaphore>
                 </Mode>
                 <Mode Name="Half_Duplex_Slave" UserName="Half-Duplex Slave">
                     <SignalLogicalOp Name="AND">
@@ -300,7 +279,6 @@
                         <Signal Name="WS"/>
                     </SignalLogicalOp>
                     <Semaphore>$IpInstance_Slave</Semaphore>
-        	    <Semaphore>$IpInstance_SEM_Half_Duplex_Slave</Semaphore>
                 </Mode>
             </ModeLogicOperator>
             <Semaphore>$IpInstance</Semaphore>

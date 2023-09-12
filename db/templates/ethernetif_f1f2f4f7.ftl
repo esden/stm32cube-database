@@ -17,6 +17,7 @@
 [#assign lan8742a = 0]
 [#assign dp83848 = 0]
 [#assign lwip_ipv6 = 0]
+[#assign cmsis_version = "n/a"]
 [#if SWIP.defines??]
 	[#list SWIP.defines as definition] 	
 		[#if (definition.name == "WITH_RTOS")]
@@ -24,6 +25,14 @@
 				[#assign with_rtos = 1]
 			[/#if][#-- "1" --]
 		[/#if][#-- WITH_RTOS --]
+		[#if (definition.name == "CMSIS_VERSION") && (with_rtos == 1)]
+			[#if definition.value == "0"]
+				[#assign cmsis_version = "v1"]
+			[/#if]
+			[#if definition.value == "1"]
+				[#assign cmsis_version = "v2"]
+			[/#if]
+		[/#if][#-- CMSIS_VERSION --]
 		[#if (definition.name == "NO_SYS")]
 			[#if definition.value == "0"]
 				[#assign with_rtos = 1]
@@ -168,6 +177,9 @@ static void low_level_init(struct netif *netif)
   uint32_t regvalue = 0;
 [/#if]
   HAL_StatusTypeDef hal_eth_init_status;
+[#if cmsis_version = "v2"]
+  osThreadAttr_t attributes;
+[/#if][#-- endif cmsis_version --]  
   
 /* Init ETH */
 [#include mxTmpFolder+"/eth_HalInit.tmp"]  
@@ -213,12 +225,24 @@ static void low_level_init(struct netif *netif)
   
 [#if with_rtos == 1]
 /* create a binary semaphore used for informing ethernetif of frame reception */
+[#if cmsis_version = "v2"]
+  s_xSemaphore = osSemaphoreNew(1, 1, NULL);
+[#else]
   osSemaphoreDef(SEM);
-  s_xSemaphore = osSemaphoreCreate(osSemaphore(SEM) , 1 );
+  s_xSemaphore = osSemaphoreCreate(osSemaphore(SEM), 1);
+[/#if][#-- endif cmsis_version --]
 
 /* create the task that handles the ETH_MAC */
+[#if cmsis_version = "v2"]
+  memset(&attributes, 0x0, sizeof(osThreadAttr_t));
+  attributes.name = "EthIf";
+  attributes.stack_size = INTERFACE_THREAD_STACK_SIZE;
+  attributes.priority = osPriorityRealtime;
+  osThreadNew(ethernetif_input, netif, &attributes);
+[#else]
   osThreadDef(EthIf, ethernetif_input, osPriorityRealtime, 0, INTERFACE_THREAD_STACK_SIZE);
   osThreadCreate (osThread(EthIf), netif);
+[/#if][#-- endif cmsis_version --]
 [/#if][#-- endif with_rtos --]
   /* Enable MAC and DMA transmission and reception */
   HAL_ETH_Start(&heth);
@@ -463,7 +487,11 @@ static struct pbuf * low_level_input(struct netif *netif)
  * @param netif the lwip network interface structure for this ethernetif
  */
 [#if with_rtos == 1]
-void ethernetif_input( void const * argument ) 
+[#if cmsis_version = "v1"]
+void ethernetif_input(void const * argument)
+[#else]
+void ethernetif_input(void* argument)
+[/#if][#-- endif cmsis_version --]
 [#else]
 void ethernetif_input(struct netif *netif)
 [/#if][#-- endif with_rtos --]
@@ -477,7 +505,11 @@ void ethernetif_input(struct netif *netif)
   
   for( ;; )
   {
-    if (osSemaphoreWait( s_xSemaphore, TIME_WAITING_FOR_INPUT)==osOK)
+[#if cmsis_version = "v2"]
+    if (osSemaphoreAcquire(s_xSemaphore, TIME_WAITING_FOR_INPUT) == osOK)
+[#else]
+    if (osSemaphoreWait(s_xSemaphore, TIME_WAITING_FOR_INPUT) == osOK)
+[/#if][#-- endif cmsis_version --]
     {
       do
       {   

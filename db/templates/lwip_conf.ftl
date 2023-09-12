@@ -73,7 +73,8 @@ extern ${variable.value} ${variable.name};
 [#-- Special parameters RECV_BUFSIZE_DEFAULT is defined with 0xFFFFFFF (INT_MAX in opt.h) >> generate always with freertos --]
 [#-- Special parameters TCP_RCV_SCALE is not defined if LWIP_WND_SCALE is enabled (see opt.h) >> generate always --]
 [#-- Special parameters LWIP_SUPPORT_CUSTOM_PBUF (for H7) >> generate only for h7 --]
-[#assign specialList = ["LWIP_DNS_SECURE", "LWIP_DHCP", "CHECKSUM_BY_HARDWARE", "RECV_BUFSIZE_DEFAULT", "TCP_RCV_SCALE", "LWIP_SUPPORT_CUSTOM_PBUF", "LWIP_TCP"]]
+[#-- Special parameters HTTPD_USE_CUSTOM_FSDATA >> limitation to force to 1 when HTTPD is used --]
+[#assign specialList = ["LWIP_DNS_SECURE", "LWIP_DHCP", "CHECKSUM_BY_HARDWARE", "RECV_BUFSIZE_DEFAULT", "TCP_RCV_SCALE", "LWIP_SUPPORT_CUSTOM_PBUF", "LWIP_TCP", "HTTPD_USE_CUSTOM_FSDATA"]]
 
 [#-- Checksum parameters enabled (in opt.h) and disabled in CubeMx --]
 [#assign checksumList = ["CHECKSUM_GEN_IP", "CHECKSUM_GEN_UDP", "CHECKSUM_GEN_TCP", "CHECKSUM_GEN_ICMP", "CHECKSUM_GEN_ICMP6", "CHECKSUM_CHECK_IP", "CHECKSUM_CHECK_UDP", "CHECKSUM_CHECK_TCP", "CHECKSUM_CHECK_ICMP", "CHECKSUM_CHECK_ICMP6"]]
@@ -100,6 +101,7 @@ extern ${variable.value} ${variable.name};
 [#assign fileName = SWIP.fileName]
 [#assign version = SWIP.version]
 [#assign lwip_mbed = 0]
+[#assign lwip_httpd = 0]
 	
 [#if SWIP.defines??]
 	[#list SWIP.defines as definition]
@@ -115,7 +117,12 @@ extern ${variable.value} ${variable.name};
 			[#if definition.value == "1"] 
 			    [#assign lwip_mbed = 1]
 			[/#if]
-		[/#if]		
+		[/#if]
+		[#if definition.name == "LWIP_HTTPD"] 
+			[#if definition.value == "1"] 
+			    [#assign lwip_httpd = 1]
+			[/#if]
+		[/#if]	
 		[#if definition.name == "LWIP_STATS"] [#assign lwip_stats = definition.value] [/#if]
 		[#if definition.name == "LWIP_SO_RCVBUF"] [#assign lwip_so_rcvbuf = definition.value] [/#if]
 		[#if definition.name == "MEMP_NUM_TCPIP_MSG_API"] [#assign memp_num_tcpip_msg_api = definition.value] [/#if]
@@ -218,7 +225,13 @@ extern ${variable.value} ${variable.name};
             [#if (definition.name=="LWIP_TCP") && (definition.value == "0")]
 /*----- Value in opt.h for ${definition.name}: 1 -----*/
 #define ${definition.name}   ${definition.value}
-            [/#if]         
+            [/#if]
+            [#if lwip_httpd == 1]
+                [#if (definition.name=="HTTPD_USE_CUSTOM_FSDATA") && (definition.value == "1")]
+/*----- Value in opt.h for ${definition.name}: 0 -----*/
+#define ${definition.name}   ${definition.value}
+                [/#if]
+            [/#if]
 			[#if (definition.name=="NO_SYS") && (definition.value !="0")]
 /*----- Value in opt.h for ${definition.name}: 0 -----*/
 #define ${definition.name}  ${definition.value}

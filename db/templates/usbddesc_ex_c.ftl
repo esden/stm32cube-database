@@ -97,6 +97,21 @@
 [/#compress]
 [/#list]
 
+[#assign useLPM=false]
+[#-- IPdatas is a list of IPconfigModel --]
+[#if configs??]
+   [#list configs as config]
+        [#list config.peripheralParams?keys as PeripheralParams]
+            [#if PeripheralParams=="USB"]            
+                [#assign values = config.peripheralParams[PeripheralParams]][#-- values is a hash list --]
+                [#if values["lpm_enable"]=="ENABLE"]                                	
+					[#assign useLPM=true]			 
+                [/#if]
+            [/#if]
+        [/#list]
+    [/#list]
+ [/#if]
+
 /* USER CODE BEGIN PRIVATE_DEFINES */
 
 /* USER CODE END PRIVATE_DEFINES */
@@ -150,14 +165,17 @@ uint8_t * USBD_${CLASS_FS}_SerialStrDescriptor(USBD_SpeedTypeDef speed, uint16_t
 uint8_t * USBD_${CLASS_FS}_ConfigStrDescriptor(USBD_SpeedTypeDef speed, uint16_t *length);
 uint8_t * USBD_${CLASS_FS}_InterfaceStrDescriptor(USBD_SpeedTypeDef speed, uint16_t *length);
 
-#ifdef USBD_SUPPORT_USER_STRING
+[#-- Ticket 66338 
+#ifdef USBD_SUPPORT_USER_STRING_DESC
 uint8_t * USBD_${CLASS_FS}_USRStringDesc(USBD_SpeedTypeDef speed, uint8_t idx, uint16_t *length);
-#endif /* USBD_SUPPORT_USER_STRING */
-
+#endif /* USBD_SUPPORT_USER_STRING_DESC */
+--]
 [#if family?contains("STM32F7") || family?contains("STM32F4") || family?contains("STM32L4") || family?contains("STM32WB") || family?contains("STM32G4") || family?contains("STM32L5")]
+[#if useLPM=true]
 #if (USBD_LPM_ENABLED == 1)
 uint8_t * USBD_${CLASS_FS}_USR_BOSDescriptor(USBD_SpeedTypeDef speed, uint16_t *length);
 #endif /* (USBD_LPM_ENABLED == 1) */
+[/#if]
 [/#if]
 
 /**
@@ -180,9 +198,11 @@ USBD_DescriptorsTypeDef ${CLASS_FS}_Desc =
   USBD_${CLASS_FS}_ConfigStrDescriptor, 
   USBD_${CLASS_FS}_InterfaceStrDescriptor
 [#if family?contains("STM32F7") || family?contains("STM32F4") || family?contains("STM32L4") || family?contains("STM32WB") || family?contains("STM32G4") || family?contains("STM32L5")]
+[#if useLPM=true]
 #if (USBD_LPM_ENABLED == 1)
 , USBD_${CLASS_FS}_USR_BOSDescriptor
 #endif /* (USBD_LPM_ENABLED == 1) */
+[/#if]
 [/#if]
 };
 
@@ -195,6 +215,7 @@ __ALIGN_BEGIN uint8_t USBD_${CLASS_FS}_DeviceDesc[USB_LEN_DEV_DESC] __ALIGN_END 
   0x12,                       /*bLength */
   USB_DESC_TYPE_DEVICE,       /*bDescriptorType*/
 [#if family?contains("STM32F7") || family?contains("STM32F4") || family?contains("STM32L4") || family?contains("STM32WB") || family?contains("STM32G4") || family?contains("STM32L5") ]
+[#if useLPM=true]
 #if (USBD_LPM_ENABLED == 1)
   0x01,                       /*bcdUSB */ /* changed to USB version 2.01
                                              in order to support LPM L1 suspend
@@ -202,6 +223,7 @@ __ALIGN_BEGIN uint8_t USBD_${CLASS_FS}_DeviceDesc[USB_LEN_DEV_DESC] __ALIGN_END 
 #else
   0x00,                       /*bcdUSB */
 #endif /* (USBD_LPM_ENABLED == 1) */
+[/#if]
 [#else]
   0x00,                       /*bcdUSB */
 [/#if]
@@ -229,6 +251,7 @@ __ALIGN_BEGIN uint8_t USBD_${CLASS_FS}_DeviceDesc[USB_LEN_DEV_DESC] __ALIGN_END 
 
 /* USB_DeviceDescriptor */
 [#if family?contains("STM32F7") || family?contains("STM32F4") || family?contains("STM32L4") || family?contains("STM32WB") || family?contains("STM32G4") || family?contains("STM32L5")]
+[#if useLPM=true]
 /** BOS descriptor. */
 #if (USBD_LPM_ENABLED == 1)
 #if defined ( __ICCARM__ ) /* IAR Compiler */
@@ -252,6 +275,7 @@ __ALIGN_BEGIN uint8_t USBD_FS_BOSDesc[USB_SIZ_BOS_DESC] __ALIGN_END =
 };
 #endif /* (USBD_LPM_ENABLED == 1) */
 [/#if]
+[/#if]
 
 /**
   * @}
@@ -273,14 +297,17 @@ uint8_t * USBD_HS_SerialStrDescriptor(USBD_SpeedTypeDef speed, uint16_t *length)
 uint8_t * USBD_HS_ConfigStrDescriptor(USBD_SpeedTypeDef speed, uint16_t *length);
 uint8_t * USBD_HS_InterfaceStrDescriptor(USBD_SpeedTypeDef speed, uint16_t *length);
 
-#ifdef USBD_SUPPORT_USER_STRING
+[#-- Ticket 66338 
+#ifdef USBD_SUPPORT_USER_STRING_DESC
 uint8_t * USBD_HS_USRStringDesc(USBD_SpeedTypeDef speed, uint8_t idx, uint16_t *length);
-#endif /* USBD_SUPPORT_USER_STRING */
-
+#endif /* USBD_SUPPORT_USER_STRING_DESC */
+--]
 [#if family?contains("STM32F7") || family?contains("STM32F4") || family?contains("STM32L4") || family?contains("STM32WB") || family?contains("STM32G4") || family?contains("STM32L5")]
+[#if useLPM=true]
 #if (USBD_LPM_ENABLED == 1)
 uint8_t * USBD_HS_USR_BOSDescriptor(USBD_SpeedTypeDef speed, uint16_t *length);
 #endif /* (USBD_LPM_ENABLED == 1) */
+[/#if]
 [/#if]
 
 /**
@@ -303,9 +330,11 @@ USBD_DescriptorsTypeDef HS_Desc =
 , USBD_HS_ConfigStrDescriptor
 , USBD_HS_InterfaceStrDescriptor
 [#if family?contains("STM32F7") || family?contains("STM32F4") || family?contains("STM32L4") || family?contains("STM32WB") || family?contains("STM32G4") || family?contains("STM32L5")]
+[#if useLPM=true]
 #if (USBD_LPM_ENABLED == 1)
 , USBD_HS_USR_BOSDescriptor
 #endif /* (USBD_LPM_ENABLED == 1) */
+[/#if]
 [/#if]
 };
 
@@ -318,6 +347,7 @@ __ALIGN_BEGIN uint8_t USBD_HS_DeviceDesc[USB_LEN_DEV_DESC] __ALIGN_END =
   0x12,                       /*bLength */
   USB_DESC_TYPE_DEVICE,       /*bDescriptorType*/
 [#if family?contains("STM32F7") || family?contains("STM32F4")  || family?contains("STM32L4") || family?contains("STM32WB") || family?contains("STM32G4") || family?contains("STM32L5")]
+[#if useLPM=true]
 #if (USBD_LPM_ENABLED == 1)
   0x01,                       /*bcdUSB */ /* changed to USB version 2.01
                                              in order to support LPM L1 suspend
@@ -325,6 +355,7 @@ __ALIGN_BEGIN uint8_t USBD_HS_DeviceDesc[USB_LEN_DEV_DESC] __ALIGN_END =
 #else
   0x00,                       /*bcdUSB */
 #endif /* (USBD_LPM_ENABLED == 1) */
+[/#if]
 [#else]
   0x00,                       /*bcdUSB */
 [/#if]
@@ -352,6 +383,7 @@ __ALIGN_BEGIN uint8_t USBD_HS_DeviceDesc[USB_LEN_DEV_DESC] __ALIGN_END =
 };
 
 [#if family?contains("STM32F7") || family?contains("STM32F4") || family?contains("STM32L4") || family?contains("STM32WB") || family?contains("STM32G4") || family?contains("STM32L5")]
+[#if useLPM=true]
 /** BOS descriptor. */
 #if (USBD_LPM_ENABLED == 1)
 #if defined ( __ICCARM__ ) /* IAR Compiler */
@@ -374,6 +406,7 @@ __ALIGN_BEGIN uint8_t USBD_HS_BOSDesc[USB_SIZ_BOS_DESC] __ALIGN_END =
   0x0
 };
 #endif /* (USBD_LPM_ENABLED == 1) */
+[/#if]
 [/#if]
 
 /**
@@ -498,6 +531,9 @@ uint8_t * USBD_HS_SerialStrDescriptor(USBD_SpeedTypeDef speed, uint16_t *length)
   /* Update the serial number string descriptor with the data from the unique
    * ID */
   Get_SerialNum();
+  /* USER CODE BEGIN USBD_HS_SerialStrDescriptor */
+  
+  /* USER CODE END USBD_HS_SerialStrDescriptor */
 
   return (uint8_t *) USBD_StringSerial;
 }
@@ -539,7 +575,7 @@ uint8_t * USBD_HS_InterfaceStrDescriptor(USBD_SpeedTypeDef speed, uint16_t *leng
   }
   return USBD_StrDesc;
 }
-
+[#if useLPM=true]
 #if (USBD_LPM_ENABLED == 1)
 /**
   * @brief  Return the BOS descriptor
@@ -554,6 +590,7 @@ uint8_t * USBD_HS_USR_BOSDescriptor(USBD_SpeedTypeDef speed, uint16_t *length)
   return (uint8_t*)USBD_HS_BOSDesc;
 }
 #endif /* (USBD_LPM_ENABLED == 1) */
+[/#if]
 [/#if]
 
 
@@ -630,6 +667,10 @@ uint8_t * USBD_${CLASS_FS}_SerialStrDescriptor(USBD_SpeedTypeDef speed, uint16_t
   /* Update the serial number string descriptor with the data from the unique
    * ID */
   Get_SerialNum();
+  
+  /* USER CODE BEGIN USBD_${CLASS_FS}_SerialStrDescriptor */
+  
+  /* USER CODE END USBD_${CLASS_FS}_SerialStrDescriptor */
 
   return (uint8_t *) USBD_StringSerial;
 }
@@ -673,6 +714,7 @@ uint8_t * USBD_${CLASS_FS}_InterfaceStrDescriptor(USBD_SpeedTypeDef speed, uint1
 }
 
 [#if family?contains("STM32F7") || family?contains("STM32F4") || family?contains("STM32L4") || family?contains("STM32WB") || family?contains("STM32G4") || family?contains("STM32L5")]
+[#if useLPM=true]
 #if (USBD_LPM_ENABLED == 1)
 /**
   * @brief  Return the BOS descriptor
@@ -687,6 +729,7 @@ uint8_t * USBD_${CLASS_FS}_USR_BOSDescriptor(USBD_SpeedTypeDef speed, uint16_t *
   return (uint8_t*)USBD_FS_BOSDesc;
 }
 #endif /* (USBD_LPM_ENABLED == 1) */
+[/#if]
 [/#if]
 [/#if]
 

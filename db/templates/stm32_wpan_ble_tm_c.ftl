@@ -33,9 +33,9 @@
 #include "shci.h"
 #include "stm_list.h"
 #include "tm.h"
-#include "lpm.h"
+#include "stm32_lpm.h"
 #include "shci_tl.h"
-#include "scheduler.h"
+#include "stm32_seq.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -152,19 +152,19 @@ void TM_Init( void  )
   tl_ble_init_conf.IoBusAclDataTxAck = TM_AclDataAck;
   TL_BLE_Init( (void*) &tl_ble_init_conf );
 
-  LPM_SetOffMode(1 << CFG_LPM_APP, LPM_OffMode_Dis);
-  LPM_SetStopMode( 1<<CFG_LPM_APP, LPM_StopMode_Dis);
+  UTIL_LPM_SetOffMode(1 << CFG_LPM_APP, UTIL_LPM_DISABLE);
+  UTIL_LPM_SetStopMode( 1<<CFG_LPM_APP, UTIL_LPM_DISABLE);
   LowPowerModeStatus = LOW_POWER_MODE_DISABLE;
 
   SysLocalCmdStatus = 0;
 
   SHCI_C2_BLE_Init( &ble_init_cmd_packet );
 
-  SCH_RegTask( CFG_TASK_SYS_LOCAL_CMD_ID, TM_SysLocalCmd);
-  SCH_RegTask( CFG_TASK_BLE_HCI_CMD_ID, (void (*)( void )) TL_BLE_SendCmd);
-  SCH_RegTask( CFG_TASK_TX_TO_HOST_ID, TM_TxToHost);
-  SCH_RegTask( CFG_TASK_SYS_HCI_CMD_ID, (void (*)( void )) TL_SYS_SendCmd);
-  SCH_RegTask( CFG_TASK_HCI_ACL_DATA_ID, (void (*)( void )) TL_BLE_SendAclData);
+  UTIL_SEQ_RegTask( 1<< CFG_TASK_SYS_LOCAL_CMD_ID, UTIL_SEQ_RFU, TM_SysLocalCmd);
+  UTIL_SEQ_RegTask( 1<< CFG_TASK_BLE_HCI_CMD_ID, UTIL_SEQ_RFU, (void (*)( void )) TL_BLE_SendCmd);
+  UTIL_SEQ_RegTask( 1<< CFG_TASK_TX_TO_HOST_ID, UTIL_SEQ_RFU, TM_TxToHost);
+  UTIL_SEQ_RegTask( 1<< CFG_TASK_SYS_HCI_CMD_ID, UTIL_SEQ_RFU, (void (*)( void )) TL_SYS_SendCmd);
+  UTIL_SEQ_RegTask( 1<< CFG_TASK_HCI_ACL_DATA_ID, UTIL_SEQ_RFU, (void (*)( void )) TL_BLE_SendAclData);
 
   HostTxStatus = TX_DONE;
   pTxToHostPacket = 0;
@@ -197,13 +197,13 @@ void TM_SysCmdRspCb (TL_EvtPacket_t * p_cmd_resp)
   if(SysLocalCmdStatus != 0)
   {
     SysLocalCmdStatus = 0;
-    SCH_SetEvt( 1<< CFG_IDLEEVT_SYSTEM_HCI_CMD_EVT_RSP_ID );
+    UTIL_SEQ_SetEvt( 1<< CFG_IDLEEVT_SYSTEM_HCI_CMD_EVT_RSP_ID );
   }
   else
   {
     LST_insert_tail (&HostTxQueue, (tListNode *)p_cmd_resp);
 
-    SCH_SetTask( 1<<CFG_TASK_TX_TO_HOST_ID,CFG_SCH_PRIO_0);
+    UTIL_SEQ_SetTask( 1<<CFG_TASK_TX_TO_HOST_ID,CFG_SCH_PRIO_0);
   }
 /* USER CODE BEGIN TM_SysCmdRspCb_2 */
 
@@ -290,8 +290,8 @@ static void TM_SysLocalCmd ( void )
   }
 
   LST_insert_tail (&HostTxQueue, (tListNode *)&SysLocalCmd);
-  SCH_SetTask( 1<<CFG_TASK_TX_TO_HOST_ID,CFG_SCH_PRIO_0);
-
+  UTIL_SEQ_SetTask( 1<<CFG_TASK_TX_TO_HOST_ID,CFG_SCH_PRIO_0);
+  
   return;
 }
 
@@ -373,19 +373,19 @@ static void RxCpltCallback( void )
         switch ( packet_indicator )
         {
           case TL_SYSCMD_PKT_TYPE:
-            SCH_SetTask( 1<<CFG_TASK_SYS_HCI_CMD_ID,CFG_SCH_PRIO_0);
+            UTIL_SEQ_SetTask( 1<<CFG_TASK_SYS_HCI_CMD_ID,CFG_SCH_PRIO_0);
             break;
 
           case TL_LOCCMD_PKT_TYPE:
-            SCH_SetTask( 1<<CFG_TASK_SYS_LOCAL_CMD_ID,CFG_SCH_PRIO_0);
+            UTIL_SEQ_SetTask( 1<<CFG_TASK_SYS_LOCAL_CMD_ID,CFG_SCH_PRIO_0);
             break;
 
           case TL_ACL_DATA_PKT_TYPE:
-            SCH_SetTask( 1<<CFG_TASK_HCI_ACL_DATA_ID,CFG_SCH_PRIO_0);
+            UTIL_SEQ_SetTask( 1<<CFG_TASK_HCI_ACL_DATA_ID,CFG_SCH_PRIO_0);
             break;
 
           default:
-            SCH_SetTask( 1<<CFG_TASK_BLE_HCI_CMD_ID,CFG_SCH_PRIO_0);
+            UTIL_SEQ_SetTask( 1<<CFG_TASK_BLE_HCI_CMD_ID,CFG_SCH_PRIO_0);
             break;
         }
 
@@ -402,19 +402,19 @@ static void RxCpltCallback( void )
           switch ( packet_indicator )
           {
             case TL_SYSCMD_PKT_TYPE:
-              SCH_SetTask( 1<<CFG_TASK_SYS_HCI_CMD_ID,CFG_SCH_PRIO_0);
+              UTIL_SEQ_SetTask( 1<<CFG_TASK_SYS_HCI_CMD_ID,CFG_SCH_PRIO_0);
               break;
 
             case TL_LOCCMD_PKT_TYPE:
-              SCH_SetTask( 1<<CFG_TASK_SYS_LOCAL_CMD_ID,CFG_SCH_PRIO_0);
+              UTIL_SEQ_SetTask( 1<<CFG_TASK_SYS_LOCAL_CMD_ID,CFG_SCH_PRIO_0);
               break;
 
             case TL_ACL_DATA_PKT_TYPE:
-              SCH_SetTask( 1<<CFG_TASK_HCI_ACL_DATA_ID,CFG_SCH_PRIO_0);
+              UTIL_SEQ_SetTask( 1<<CFG_TASK_HCI_ACL_DATA_ID,CFG_SCH_PRIO_0);
               break;
 
             default:
-              SCH_SetTask( 1<<CFG_TASK_BLE_HCI_CMD_ID,CFG_SCH_PRIO_0);
+              UTIL_SEQ_SetTask( 1<<CFG_TASK_BLE_HCI_CMD_ID,CFG_SCH_PRIO_0);
               break;
           }
 
@@ -445,7 +445,7 @@ static void HostTxCb( void )
 
   if ( LST_is_empty( &HostTxQueue ) == FALSE )
   {
-    SCH_SetTask( 1<<CFG_TASK_TX_TO_HOST_ID,CFG_SCH_PRIO_0 );
+    UTIL_SEQ_SetTask( 1<<CFG_TASK_TX_TO_HOST_ID,CFG_SCH_PRIO_0 );
   }
 
   return;
@@ -455,7 +455,7 @@ static void TM_BleEvtRx( TL_EvtPacket_t *phcievt )
 {
   LST_insert_tail ( &HostTxQueue, (tListNode *)phcievt );
 
-  SCH_SetTask( 1<<CFG_TASK_TX_TO_HOST_ID,CFG_SCH_PRIO_0 );
+  UTIL_SEQ_SetTask( 1<<CFG_TASK_TX_TO_HOST_ID,CFG_SCH_PRIO_0 );
 
   return;
 }
@@ -500,7 +500,7 @@ void shci_send( uint16_t cmd_code, uint8_t len_cmd_payload, uint8_t * p_cmd_payl
 
   TL_SYS_SendCmd( 0, 0 );
 
-  SCH_WaitEvt( 1<< CFG_IDLEEVT_SYSTEM_HCI_CMD_EVT_RSP_ID );
+  UTIL_SEQ_WaitEvt( 1<< CFG_IDLEEVT_SYSTEM_HCI_CMD_EVT_RSP_ID );
 
   /**
    * The command complete of a system command does not have the header

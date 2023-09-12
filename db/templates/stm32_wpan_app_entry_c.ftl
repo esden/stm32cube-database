@@ -3,9 +3,8 @@
 /**
  ******************************************************************************
   * File Name          : ${name}
-  * Description        : Entry application source file for BLE
-  *                      middleWare.
-  ******************************************************************************
+  * Description        : Entry application source file for STM32WPAN Middleware
+ ******************************************************************************
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
  ******************************************************************************
  */
@@ -25,7 +24,7 @@
 [#assign FREERTOS_STATUS = 0]
 [#assign THREAD = 0]
 [#assign BLE = 0]
-[#assign DBG_TRACE_UART_CFG = ""]
+[#assign CFG_DEBUG_TRACE_UART  = ""]
 
 [#list SWIPdatas as SWIP]
     [#if SWIP.defines??]
@@ -81,8 +80,8 @@
             [#if (definition.name == "THREAD") && (definition.value == "Enabled")]
                 [#assign THREAD = 1]
             [/#if]
-            [#if (definition.name == "DBG_TRACE_UART_CFG")  && (definition.value != "0")]
-                [#assign DBG_TRACE_UART_CFG = definition.value]
+            [#if (definition.name == "CFG_DEBUG_TRACE_UART")  && (definition.value != "0")]
+                [#assign CFG_DEBUG_TRACE_UART  = definition.value]
             [/#if]
         [/#list]
     [/#if]
@@ -108,7 +107,11 @@
 #include "app_conf.h"
 #include "hw_conf.h"
 [/#if]
-#include "scheduler.h"
+[#if FREERTOS_STATUS = 1 ]
+#include "cmsis_os.h"
+[#else]
+#include "stm32_seq.h"
+[/#if]
 [#if BLE = 1 ]
 [#if (BLE_TRANSPARENT_MODE_UART = 1) || (BLE_TRANSPARENT_MODE_VCP = 1)]
 #include "stm_list.h"
@@ -120,7 +123,7 @@
 #include "stm_logging.h"
 #include "shci_tl.h"
 [/#if]
-#include "lpm.h"
+#include "stm32_lpm.h"
 #include "dbg_trace.h"
 [#if THREAD = 1 ]
 #include "shci.h"
@@ -145,6 +148,7 @@ extern RTC_HandleTypeDef hrtc;
 [/#if]
 [/#if]
 [#if THREAD = 1 ]
+/* POOL_SIZE = 2(TL_PacketHeader_t) + 258 (3(TL_EVT_HDR_SIZE) + 255(Payload size)) */
 #define POOL_SIZE (CFG_TL_EVT_QUEUE_LENGTH * 4U * DIVC(( sizeof(TL_PacketHeader_t) + TL_EVENT_FRAME_SIZE ), 4U))
 [/#if]
 
@@ -180,6 +184,23 @@ static tListNode  SysEvtQueue;
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
+[#if FREERTOS_STATUS = 1]
+/* Global variables ----------------------------------------------------------*/
+osMutexId_t MtxShciId;
+osSemaphoreId_t SemShciId;
+osThreadId_t ShciUserEvtProcessId;
+
+const osThreadAttr_t ShciUserEvtProcess_attr = {
+    .name = CFG_SHCI_USER_EVT_PROCESS_NAME,
+    .attr_bits = CFG_SHCI_USER_EVT_PROCESS_ATTR_BITS,
+    .cb_mem = CFG_SHCI_USER_EVT_PROCESS_CB_MEM,
+    .cb_size = CFG_SHCI_USER_EVT_PROCESS_CB_SIZE,
+    .stack_mem = CFG_SHCI_USER_EVT_PROCESS_STACK_MEM,
+    .priority = CFG_SHCI_USER_EVT_PROCESS_PRIORITY,
+    .stack_size = CFG_SHCI_USER_EVT_PROCESS_STACk_SIZE
+};
+[/#if]
+
 [#if (THREAD = 1)]
 /* Global function prototypes -----------------------------------------------*/
 size_t DbgTraceWrite(int handle, const unsigned char * buf, size_t bufSize);
@@ -190,10 +211,12 @@ size_t DbgTraceWrite(int handle, const unsigned char * buf, size_t bufSize);
 [/#if]
 
 /* Private functions prototypes-----------------------------------------------*/
+[#if FREERTOS_STATUS = 1]
+static void ShciUserEvtProcess(void *argument);
+[/#if]
 static void SystemPower_Config( void );
 static void Init_Debug( void );
 static void appe_Tl_Init( void );
-static void Switch_On_HSI( void );
 [#if (BLE = 1)]
 [#if (BLE_TRANSPARENT_MODE_UART = 1) || (BLE_TRANSPARENT_MODE_VCP = 1)]
 static void APPE_SysUserEvtRx( TL_EvtPacket_t * p_evt_rx );
@@ -305,17 +328,14 @@ static void Init_Debug( void )
  */
 static void SystemPower_Config( void )
 {
-  LPM_Conf_t LowPowerModeConfiguration;
 
   /**
    * Select HSI as system clock source after Wake Up from Stop mode
    */
   LL_RCC_SetClkAfterWakeFromStop(LL_RCC_STOP_WAKEUPCLOCK_HSI);
 
-  /**< Configure low power manager */
-  LowPowerModeConfiguration.Stop_Mode_Config = LPM_StopMode2;
-  LowPowerModeConfiguration.OFF_Mode_Config = LPM_Standby;
-  LPM_SetConf(&LowPowerModeConfiguration);
+  /* Initialize low power manager */
+  UTIL_LPM_Init( );
 
 #if (CFG_USB_INTERFACE_ENABLE != 0)
   /**
@@ -337,16 +357,28 @@ static void appe_Tl_Init( void )
 [/#if]
   /**< Reference table initialization */
   TL_Init();
+[#if (FREERTOS_STATUS = 1)]
+
+  MtxShciId = osMutexNew( NULL );
+  SemShciId = osSemaphoreNew( 1, 0, NULL ); /*< Create the semaphore and make it busy at initialization */
+
+  /** FreeRTOS system task creation */
+  ShciUserEvtProcessId = osThreadNew(ShciUserEvtProcess, NULL,&ShciUserEvtProcess_attr);
+[/#if]
 
   /**< System channel initialization */
 [#if (BLE = 1) && ((BLE_TRANSPARENT_MODE_UART = 1) ||(BLE_TRANSPARENT_MODE_VCP = 1))]
   LST_init_head (&SysEvtQueue);
 [/#if]
 [#if (BLE = 1)]
-  SCH_RegTask( CFG_TASK_SYSTEM_HCI_ASYNCH_EVT_ID, shci_user_evt_proc );
+[#if (FREERTOS_STATUS = 0)]
+  UTIL_SEQ_RegTask( 1<< CFG_TASK_SYSTEM_HCI_ASYNCH_EVT_ID, UTIL_SEQ_RFU, shci_user_evt_proc );
+[/#if]
 [/#if]
 [#if (THREAD = 1)]
-  SCH_RegTask( CFG_TASK_SYSTEM_HCI_ASYNCH_EVT, shci_user_evt_proc );
+[#if (FREERTOS_STATUS = 0)]
+  UTIL_SEQ_RegTask( 1<< CFG_TASK_SYSTEM_HCI_ASYNCH_EVT, UTIL_SEQ_RFU, shci_user_evt_proc );
+[/#if]
 [/#if]
 [#if BLE = 1 && ((BLE_TRANSPARENT_MODE_UART = 1) ||(BLE_TRANSPARENT_MODE_VCP = 1))]
   tl_sys_init_conf.p_cmdbuffer =  (uint8_t*)&SystemCmdBuffer;
@@ -376,22 +408,12 @@ static void appe_Tl_Init( void )
   return;
 }
 
-static void Switch_On_HSI( void )
-{
-  LL_RCC_HSI_Enable();
-  while(!LL_RCC_HSI_IsReady());
-  LL_RCC_SetSysClkSource(LL_RCC_SYS_CLKSOURCE_HSI);
-  while (LL_RCC_GetSysClkSource() != LL_RCC_SYS_CLKSOURCE_STATUS_HSI);
-
-  return;
-}
-
 [#if (BLE = 1) && ((BLE_TRANSPARENT_MODE_UART = 1) ||(BLE_TRANSPARENT_MODE_VCP = 1))]
 static void APPE_SysUserEvtRx( TL_EvtPacket_t * p_evt_rx )
 {
   LST_insert_tail (&SysEvtQueue, (tListNode *)p_evt_rx);
 
-  SCH_SetTask( 1<<CFG_TASK_SYSTEM_HCI_ASYNCH_EVT_ID, CFG_SCH_PRIO_0);
+  UTIL_SEQ_SetTask( 1<<CFG_TASK_SYSTEM_HCI_ASYNCH_EVT_ID, CFG_SCH_PRIO_0);
 
   return;
 }
@@ -406,7 +428,7 @@ static void shci_user_evt_proc ( void )
   /**< Traces channel initialization */
   TL_TRACES_Init( );
 
-  LPM_SetOffMode(1 << CFG_LPM_APP, LPM_OffMode_En);
+  UTIL_LPM_SetOffMode(1 << CFG_LPM_APP, UTIL_LPM_ENABLE);
 
   LST_remove_head( &SysEvtQueue, (tListNode **)&p_evt_rx );
 
@@ -418,7 +440,23 @@ static void shci_user_evt_proc ( void )
 [#else]
 static void APPE_SysStatusNot( SHCI_TL_CmdStatus_t status )
 {
+[#if (FREERTOS_STATUS = 0)]
   UNUSED(status);
+[#else]
+  switch (status)
+  {
+    case SHCI_TL_CmdBusy:
+      osMutexAcquire( MtxShciId, osWaitForever );
+      break;
+
+    case SHCI_TL_CmdAvailable:
+      osMutexRelease( MtxShciId );
+      break;
+
+    default:
+      break;
+  }
+[/#if]
   return;
 }
 
@@ -489,8 +527,31 @@ static void APPE_SysEvtReadyProcessing( void )
 [#if (THREAD = 1)]
   APP_THREAD_Init();
 [/#if]
-  LPM_SetOffMode(1U << CFG_LPM_APP, LPM_OffMode_En);
+  UTIL_LPM_SetOffMode(1U << CFG_LPM_APP, UTIL_LPM_ENABLE);
   return;
+}
+[/#if]
+[#if (FREERTOS_STATUS = 1)]
+
+/*************************************************************
+ *
+ * FREERTOS WRAPPER FUNCTIONS
+ *
+*************************************************************/
+static void ShciUserEvtProcess(void *argument)
+{
+  UNUSED(argument);
+  for(;;)
+  {
+    /* USER CODE BEGIN SHCI_USER_EVT_PROCESS_1 */
+
+    /* USER CODE END SHCI_USER_EVT_PROCESS_1 */
+     osThreadFlagsWait(1, osFlagsWaitAny, osWaitForever);
+     shci_user_evt_proc();
+    /* USER CODE BEGIN SHCI_USER_EVT_PROCESS_2 */
+
+    /* USER CODE END SHCI_USER_EVT_PROCESS_2 */
+    }
 }
 [/#if]
 
@@ -504,80 +565,26 @@ static void APPE_SysEvtReadyProcessing( void )
  *
  *************************************************************/
 
-void SCH_Idle( void )
+[#if (FREERTOS_STATUS = 0)]
+void UTIL_SEQ_Idle( void )
 {
 #if ( CFG_LPM_SUPPORTED == 1)
-  LPM_EnterModeSelected();
+  UTIL_LPM_EnterLowPower( );
 #endif
   return;
 }
+[/#if]
+[#if (THREAD = 1)]
+[#if (FREERTOS_STATUS = 1)]
 
-void LPM_EnterStopMode(void)
+void shci_notify_asynch_evt(void* pdata)
 {
-  /**
-   * This function is called from CRITICAL SECTION
-   */
-
-  while( LL_HSEM_1StepLock( HSEM, CFG_HW_RCC_SEMID ) );
-
-  if ( ! LL_HSEM_1StepLock( HSEM, CFG_HW_ENTRY_STOP_MODE_SEMID ) )
-  {
-    if( LL_PWR_IsActiveFlag_C2DS() )
-    {
-      /* Release ENTRY_STOP_MODE semaphore */
-      LL_HSEM_ReleaseLock( HSEM, CFG_HW_ENTRY_STOP_MODE_SEMID, 0 );
-
-      Switch_On_HSI();
-    }
-  }
-  else
-  {
-    Switch_On_HSI();
-  }
-
-  /* Release RCC semaphore */
-  LL_HSEM_ReleaseLock( HSEM, CFG_HW_RCC_SEMID, 0 );
-
+  UNUSED(pdata);
+  osThreadFlagsSet(ShciUserEvtProcessId,1);
   return;
-}
-
-void LPM_ExitStopMode(void)
-{
-  /**
-   * This function is called from CRITICAL SECTION
-   */
-
-  /* Release ENTRY_STOP_MODE semaphore */
-  LL_HSEM_ReleaseLock( HSEM, CFG_HW_ENTRY_STOP_MODE_SEMID, 0 );
-
-  if( (LL_RCC_GetSysClkSource() == LL_RCC_SYS_CLKSOURCE_STATUS_HSI) || (LL_PWR_IsActiveFlag_C1STOP() != 0) )
-  {
-    LL_PWR_ClearFlag_C1STOP_C1STB();
-
-    while( LL_HSEM_1StepLock( HSEM, CFG_HW_RCC_SEMID ) );
-
-    if(LL_RCC_GetSysClkSource() == LL_RCC_SYS_CLKSOURCE_STATUS_HSI)
-    {
-      LL_RCC_HSE_Enable();
-      while(!LL_RCC_HSE_IsReady());
-      LL_RCC_SetSysClkSource(LL_RCC_SYS_CLKSOURCE_HSE);
-      while (LL_RCC_GetSysClkSource() != LL_RCC_SYS_CLKSOURCE_STATUS_HSE);
-    }
-    else
-    {
-      /**
-       * As long as the current application is fine with HSE as system clock source,
-       * there is nothing to do here
-       */
-    }
-
-    /* Release RCC semaphore */
-    LL_HSEM_ReleaseLock( HSEM, CFG_HW_RCC_SEMID, 0 );
-  }
-
-  return;
-}
-
+}[/#if]
+[/#if]
+[#if (FREERTOS_STATUS = 0)]
 /**
   * @brief  This function is called by the scheduler each time an event
   *         is pending.
@@ -585,24 +592,24 @@ void LPM_ExitStopMode(void)
   * @param  evt_waited_bm : Event pending.
   * @retval None
   */
-void SCH_EvtIdle( uint32_t evt_waited_bm )
+void UTIL_SEQ_EvtIdle( UTIL_SEQ_bm_t task_id_bm, UTIL_SEQ_bm_t evt_waited_bm )
 {
 [#if (THREAD = 1)]
   switch(evt_waited_bm)
   {
   case EVENT_ACK_FROM_M0_EVT:
     /* Does not allow other tasks when waiting for OT Cmd response */
-    SCH_Run(0);
+    UTIL_SEQ_Run(0);
     break;
   case EVENT_SYNCHRO_BYPASS_IDLE:
-    SCH_SetEvt(EVENT_SYNCHRO_BYPASS_IDLE);
+    UTIL_SEQ_SetEvt(EVENT_SYNCHRO_BYPASS_IDLE);
     /* Run only the task CFG_TASK_MSG_FROM_M0_TO_M4 */
-    SCH_Run(TASK_MSG_FROM_M0_TO_M4);
+    UTIL_SEQ_Run(TASK_MSG_FROM_M0_TO_M4);
     break;
   default :
     /* default case */
 [/#if]
-  SCH_Run(~0);
+  UTIL_SEQ_Run( UTIL_SEQ_DEFAULT );
 [#if (THREAD = 1)]
     break;
   }
@@ -611,27 +618,43 @@ void SCH_EvtIdle( uint32_t evt_waited_bm )
 void shci_notify_asynch_evt(void* pdata)
 {
   UNUSED(pdata);
-  SCH_SetTask(1U << CFG_TASK_SYSTEM_HCI_ASYNCH_EVT, CFG_SCH_PRIO_0);
+  UTIL_SEQ_SetTask(1U << CFG_TASK_SYSTEM_HCI_ASYNCH_EVT, CFG_SCH_PRIO_0);
   return;
 [/#if]
 }
+[/#if]
 
 [#if (BLE = 1) && (BLE_TRANSPARENT_MODE_UART = 0) && (BLE_TRANSPARENT_MODE_VCP = 0)]
 void shci_notify_asynch_evt(void* pdata)
 {
-  SCH_SetTask( 1<<CFG_TASK_SYSTEM_HCI_ASYNCH_EVT_ID, CFG_SCH_PRIO_0);
+[#if (FREERTOS_STATUS = 1)]
+  UNUSED(pdata);
+  osThreadFlagsSet( ShciUserEvtProcessId, 1 );
+[#else]
+  UTIL_SEQ_SetTask( 1<<CFG_TASK_SYSTEM_HCI_ASYNCH_EVT_ID, CFG_SCH_PRIO_0);
+[/#if]
   return;
 }
 
 void shci_cmd_resp_release(uint32_t flag)
 {
-  SCH_SetEvt( 1<< CFG_IDLEEVT_SYSTEM_HCI_CMD_EVT_RSP_ID );
+[#if (FREERTOS_STATUS = 1)]
+  UNUSED(flag);
+  osSemaphoreRelease( SemShciId );
+[#else]
+  UTIL_SEQ_SetEvt( 1<< CFG_IDLEEVT_SYSTEM_HCI_CMD_EVT_RSP_ID );
+[/#if]
   return;
 }
 
 void shci_cmd_resp_wait(uint32_t timeout)
 {
-  SCH_WaitEvt( 1<< CFG_IDLEEVT_SYSTEM_HCI_CMD_EVT_RSP_ID );
+[#if (FREERTOS_STATUS = 1)]
+  UNUSED(timeout);
+  osSemaphoreAcquire( SemShciId, osWaitForever );
+[#else]
+  UTIL_SEQ_WaitEvt( 1<< CFG_IDLEEVT_SYSTEM_HCI_CMD_EVT_RSP_ID );
+[/#if]
   return;
 }
 
@@ -640,14 +663,22 @@ void shci_cmd_resp_wait(uint32_t timeout)
 void shci_cmd_resp_release(uint32_t flag)
 {
   UNUSED(flag);
-  SCH_SetEvt(1U << CFG_EVT_SYSTEM_HCI_CMD_EVT_RESP);
+[#if (FREERTOS_STATUS = 1)]
+  osSemaphoreRelease( SemShciId );
+[#else]
+  UTIL_SEQ_SetEvt(1U << CFG_EVT_SYSTEM_HCI_CMD_EVT_RESP);
+[/#if]
   return;
 }
 
 void shci_cmd_resp_wait(uint32_t timeout)
 {
   UNUSED(timeout);
-  SCH_WaitEvt(1U << CFG_EVT_SYSTEM_HCI_CMD_EVT_RESP);
+[#if (FREERTOS_STATUS = 1)]
+  osSemaphoreAcquire( SemShciId, osWaitForever );
+[#else]
+  UTIL_SEQ_WaitEvt(1U << CFG_EVT_SYSTEM_HCI_CMD_EVT_RESP);
+[/#if]
   return;
 }
 
@@ -672,10 +703,10 @@ void TL_TRACES_EvtReceived( TL_EvtPacket_t * hcievt )
 #if(CFG_DEBUG_TRACE != 0)
 void DbgOutputInit( void )
 {
-[#if DBG_TRACE_UART_CFG = "hw_lpuart1" ]
+[#if CFG_DEBUG_TRACE_UART  = "hw_lpuart1" ]
     MX_LPUART1_UART_Init();
 [/#if]
-[#if DBG_TRACE_UART_CFG = "hw_uart1" ]
+[#if CFG_DEBUG_TRACE_UART  = "hw_uart1" ]
     MX_USART1_UART_Init();
 [/#if]
 
@@ -691,7 +722,7 @@ void DbgOutputInit( void )
   */
 void DbgOutputTraces(  uint8_t *p_data, uint16_t size, void (*cb)(void) )
 {
-  HW_UART_Transmit_DMA(DBG_TRACE_UART_CFG, p_data, size, cb);
+  HW_UART_Transmit_DMA(CFG_DEBUG_TRACE_UART, p_data, size, cb);
 
   return;
 }
