@@ -56,7 +56,7 @@
 /**
   * @brief radio buffer to exchange data between CM4 and CM0+
   */
-UTIL_MEM_PLACE_IN_SECTION("MB_MEM2") uint8_t aRadioMbWrapRxBuffer[RADIO_RX_BUF_SIZE];
+UTIL_MEM_PLACE_IN_SECTION("MB_MEM3") uint8_t aRadioMbWrapRxBuffer[RADIO_RX_BUF_SIZE];
 
 [#if LORAWAN_FUOTA == "0"]
 /**
@@ -426,7 +426,7 @@ static void RadioRxDone_mbwrapper(uint8_t *payload, uint16_t size, int16_t rssi,
 
   /* USER CODE END RadioRxDone_mbwrapper_1 */
   MBMUX_ComParam_t *com_obj;
-  uint32_t *com_buffer = NULL ;
+  uint32_t *com_buffer = NULL;
   uint16_t i = 0;
 
   /* copy data from Cm0 private memory to shared memory */
@@ -511,4 +511,3 @@ static void RadioRxError_mbwrapper(void)
 /* USER CODE BEGIN PrFD */
 
 /* USER CODE END PrFD */
-

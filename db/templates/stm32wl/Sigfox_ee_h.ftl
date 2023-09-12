@@ -66,7 +66,6 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include <stdint.h>
-#include "utilities_conf.h"
 
 /* USER CODE BEGIN Includes */
 
@@ -193,4 +192,3 @@ extern int32_t EE_Clean(int32_t bank, int32_t interrupt);
 /* USER CODE END EFP */
 
 #endif /* EE_H__ */
-

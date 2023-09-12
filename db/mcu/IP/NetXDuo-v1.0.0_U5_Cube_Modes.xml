@@ -126,7 +126,8 @@
         </Parameter>
                 <Parameter Added="true" Name="AZRTOS_APP_MEM_ALLOCATION_METHOD">
 		  <Condition Diagnostic="" Expression="SEMThreadXCcRTOSJjThreadXJjCore" Name="APP_MEM_ALLOCATION_CONDITION"/>
-		  </Parameter>
+		</Parameter>
+		<Parameter Added="true" Name="NX_ENABLE_TCPIP_OFFLOAD"/>
 	</RefMode>
 	<RefMode Abstract="true" Name="Addons_AutoIP">
 		<ConfigForMode>Addons_AutoIP</ConfigForMode>
@@ -265,7 +266,7 @@
 	<RefMode Abstract="true" Name="Addons_HTTP_Server">
 		<ConfigForMode>Addons_HTTP_Server</ConfigForMode>
 		<Parameter Added="true" Name="NX_HTTP_NO_FILEX">
-			<Condition Diagnostic="" Expression="SEMFileXCcFileOoSystemJjFileXJjCoreJjRTOSIiMODE" Name="NX_HTTP_SERVER_FILEX"/>
+			<Condition Diagnostic="" Expression="SEMFileXCcFileOoSystemJjFileXJjCore" Name="NX_HTTP_SERVER_FILEX"/>
 		</Parameter>
         <Parameter Added="true" Name="NX_HTTP_TYPE_OF_SERVICE"/>
         <Parameter Added="true" Name="NX_HTTP_FRAGMENT_OPTION"/>
@@ -401,7 +402,7 @@
 	<RefMode Abstract="true" Name="Addons_Web_Server">
 		<ConfigForMode>Addons_Web_Server</ConfigForMode>
 		<Parameter Added="true" Name="NX_WEB_HTTP_NO_FILEX">
-			<Condition Diagnostic="" Expression="SEMFileXCcFileOoSystemJjFileXJjCoreJjRTOSIiMODE" Name="NX_WEB_HTTP_SERVER_FILEX"/>
+			<Condition Diagnostic="" Expression="SEMFileXCcFileOoSystemJjFileXJjCore" Name="NX_WEB_HTTP_SERVER_FILEX"/>
 		</Parameter>
 		<Parameter Added="true" Name="NX_WEB_HTTP_TYPE_OF_SERVICE"/>
         <Parameter Added="true" Name="NX_WEB_HTTP_FRAGMENT_OPTION"/>
@@ -1416,10 +1417,10 @@ The default value is 2 NX_DHCPV6_DEFAULT_T1_TIME.</Description>
         <PossibleValue Comment="NX_FRAGMENT_OKAY" Value="((ULONG)0x00000000)"/>
         <PossibleValue Comment="NX_MORE_FRAGMENTS" Value="((ULONG)0x00002000)"/>
     </RefParameter>
-    <RefParameter Added="true" Comment="NX_ENABLE_INTERFACE_CAPABILITY" DefaultValue="false" Group="Core" Name="NX_ENABLE_INTERFACE_CAPABILITY" TabName="NetXDuo" Type="boolean">
+    <RefParameter Added="true" Comment="NX_ENABLE_INTERFACE_CAPABILITY" DefaultValue="false" Group="Core" Name="NX_ENABLE_INTERFACE_CAPABILITY" TabName="NetXDuo" Type="list">
         <Description>Defined, allows the interface device driver to specify extra capability information, such as checksum off-loading. By default this option is not defined.</Description>
         <PossibleValue Comment="true" Value="true"/>
-        <PossibleValue Comment="false" Value="false"/>
+        <PossibleValue Comment="false" Condition="NX_ENABLE_TCPIP_OFFLOAD=1" Diagnostic="Active only if NX_ENABLE_TCPIP_OFFLOAD is disabled" Action="true" Value="false"/>
     </RefParameter>
     <RefParameter Added="true" Comment="NX_DISABLE_IPV4" DefaultValue="false" Group="IP" Name="NX_DISABLE_IPV4" TabName="NetXDuo" Type="boolean">
         <Description>Defined, disables IPv4 functionality. This option can be used to build NetX Duo to suupport IPv6 only. By default this option is not defined. 
@@ -2175,7 +2176,7 @@ The default value is (5 *NX_DHCP_PACKET_PAYLOAD) which will provide four packets
         <PossibleValue Comment="true" Value="true"/>
         <PossibleValue Comment="false" Value="false"/>
     </RefParameter>
-    <RefParameter Added="true" Comment="NetXDuo version" DefaultValue="6.1.7" Group="Version" Name="NetXDuo_Version" TabName="NetXDuo" Type="string">
+    <RefParameter Added="true" Comment="NetXDuo version" DefaultValue="6.1.9" Group="Version" Name="NetXDuo_Version" TabName="NetXDuo" Type="string">
         <Description>NetXDuo version</Description>
     </RefParameter>
     <RefParameter Added="true" Comment="NX_SECURE_TLS_MINIMUM_CERTIFICATE_SIZE" DefaultValue="256" Group="TLS CORE" Max="65535" Min="0" Name="NX_SECURE_TLS_MINIMUM_CERTIFICATE_SIZE" TabName="NetXDuo" Type="integer" Unit="">
@@ -2452,10 +2453,16 @@ When a FileSystem is needed this option should be set to flase  FileX should be 
 	
 	<RefParameter Added="true" Comment="FILEX_ENABLED" DefaultValue="false" Group="Core"  Name="FILEX_ENABLED" TabName="ThreadX" Type="boolean" Visible="false">
         <Description></Description>
-		<Condition Diagnostic="" Expression="!SEMFileXCcFileOoSystemJjFileXJjCoreJjRTOSIiMODE"/>
+		<Condition Diagnostic="" Expression="!SEMFileXCcFileOoSystemJjFileXJjCore"/>
     </RefParameter>
     <RefParameter Added="true" Comment="FILEX_ENABLED" DefaultValue="true" Group="Core"  Name="FILEX_ENABLED" TabName="ThreadX" Type="boolean" Visible="false">
         <Description></Description>
-		<Condition Diagnostic="" Expression="SEMFileXCcFileOoSystemJjFileXJjCoreJjRTOSIiMODE"/>
+		<Condition Diagnostic="" Expression="SEMFileXCcFileOoSystemJjFileXJjCore"/>
+    </RefParameter>
+	
+	<RefParameter Added="true" Comment="NX_ENABLE_TCPIP_OFFLOAD" DefaultValue="0" Group="Core"  Name="NX_ENABLE_TCPIP_OFFLOAD" TabName="NetXDuo" Type="List">
+        <Description>Offload TCP/IP processing to the underlining HW</Description>
+        <PossibleValue Comment="Disabled" Value="0"/>
+        <PossibleValue Comment="Enabled" Semaphore="SEM_NX_ENABLE_TCPIP_OFFLOAD" Value="1"/>
     </RefParameter>
 </IP>

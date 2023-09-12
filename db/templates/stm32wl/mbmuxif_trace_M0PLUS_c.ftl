@@ -225,4 +225,3 @@ static void MBMUXIF_TaskTraceAckRcv(void)
 /* USER CODE BEGIN PrFD */
 
 /* USER CODE END PrFD */
-

@@ -235,28 +235,34 @@ void vcom_Resume(void)
   /* USER CODE END vcom_Resume_2 */
 }
 
-void HAL_UART_TxCpltCallback(UART_HandleTypeDef *h${IpInstance?lower_case?replace("s","")})
+void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 {
   /* USER CODE BEGIN HAL_UART_TxCpltCallback_1 */
 
   /* USER CODE END HAL_UART_TxCpltCallback_1 */
   /* buffer transmission complete*/
-  TxCpltCallback(NULL);
+  if (huart->Instance == ${IpInstance})
+  {
+    TxCpltCallback(NULL);
+  }
   /* USER CODE BEGIN HAL_UART_TxCpltCallback_2 */
 
   /* USER CODE END HAL_UART_TxCpltCallback_2 */
 }
 
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *h${IpInstance?lower_case?replace("s","")})
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
   /* USER CODE BEGIN HAL_UART_RxCpltCallback_1 */
 
   /* USER CODE END HAL_UART_RxCpltCallback_1 */
-  if ((NULL != RxCpltCallback) && (HAL_UART_ERROR_NONE == h${IpInstance?lower_case?replace("s","")}->ErrorCode))
+  if (huart->Instance == ${IpInstance})
   {
-    RxCpltCallback(&charRx, 1, 0);
+    if ((NULL != RxCpltCallback) && (HAL_UART_ERROR_NONE == huart->ErrorCode))
+    {
+      RxCpltCallback(&charRx, 1, 0);
+    }
+    HAL_UART_Receive_IT(huart, &charRx, 1);
   }
-  HAL_UART_Receive_IT(h${IpInstance?lower_case?replace("s","")}, &charRx, 1);
   /* USER CODE BEGIN HAL_UART_RxCpltCallback_2 */
 
   /* USER CODE END HAL_UART_RxCpltCallback_2 */
@@ -271,4 +277,3 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *h${IpInstance?lower_case?replac
 /* USER CODE BEGIN PrFD */
 
 /* USER CODE END PrFD */
-

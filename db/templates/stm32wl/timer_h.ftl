@@ -6,7 +6,7 @@
   * @author  MCD Application Team
   * @brief   Wrapper to timer server
   ******************************************************************************
-  [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
+[@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
 /* USER CODE END Header */
@@ -108,4 +108,3 @@ extern "C" {
 #endif
 
 #endif /* __TIMER_H__*/
-

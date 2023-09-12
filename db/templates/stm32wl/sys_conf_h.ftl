@@ -24,11 +24,17 @@
 [#assign CPUCORE = cpucore?replace("ARM_CORTEX_","C")?replace("+","PLUS")]
 [#assign SUBGHZ_APPLICATION = ""]
 [#assign SECURE_PROJECTS = "0"]
-[#assign Activate_DEBUG_LINE = ""]
-[#assign LINE = Line]
 [#assign VERBOSE_LEVEL = ""]
 [#assign APP_LOG_ENABLED = "0"]
+[#assign SENSOR_ENABLED = "0"]
 [#assign DEBUGGER_ON = "0"]
+[#assign DEBUG_SUBGHZSPI_MONITORING = "0"]
+[#assign DEBUG_RF_NRESET = "0"]
+[#assign DEBUG_RF_HSE32RDY = "0"]
+[#assign DEBUG_RF_SMPSRDY = "0"]
+[#assign DEBUG_RF_LDORDY = "0"]
+[#assign DEBUG_RF_DTB1 = "0"]
+[#assign DEBUG_RF_BUSY = "0"]
 [#assign LOW_POWER_DISABLE = "0"]
 [#if SWIPdatas??]
     [#list SWIPdatas as SWIP]
@@ -37,10 +43,47 @@
                 [#if definition.name == "SUBGHZ_APPLICATION"]
                     [#assign SUBGHZ_APPLICATION = definition.value]
                 [/#if]
-                [#if definition.name == "Activate_DEBUG_LINE"]
-                    [#assign Activate_DEBUG_LINE = definition.value]
+                [#if definition.name == "DEBUGGER_ON"]
+                    [#if definition.value == "true"]
+                        [#assign DEBUGGER_ON = "1"]
+                    [/#if]
                 [/#if]
-                [#if (CPUCORE == "") && (LINE == "STM32WLEx")]
+                [#if definition.name == "DEBUG_SUBGHZSPI_MONITORING"]
+                    [#if definition.value == "true"]
+                        [#assign DEBUG_SUBGHZSPI_MONITORING = "1"]
+                    [/#if]
+                [/#if]
+                [#if definition.name == "DEBUG_RF_NRESET"]
+                    [#if definition.value == "true"]
+                        [#assign DEBUG_RF_NRESET = "1"]
+                    [/#if]
+                [/#if]
+                [#if definition.name == "DEBUG_RF_HSE32RDY"]
+                    [#if definition.value == "true"]
+                        [#assign DEBUG_RF_HSE32RDY = "1"]
+                    [/#if]
+                [/#if]
+                [#if definition.name == "DEBUG_RF_SMPSRDY"]
+                    [#if definition.value == "true"]
+                        [#assign DEBUG_RF_SMPSRDY = "1"]
+                    [/#if]
+                [/#if]
+                [#if definition.name == "DEBUG_RF_LDORDY"]
+                    [#if definition.value == "true"]
+                        [#assign DEBUG_RF_LDORDY = "1"]
+                    [/#if]
+                [/#if]
+                [#if definition.name == "DEBUG_RF_DTB1"]
+                    [#if definition.value == "true"]
+                        [#assign DEBUG_RF_DTB1 = "1"]
+                    [/#if]
+                [/#if]
+                [#if definition.name == "DEBUG_RF_BUSY"]
+                    [#if definition.value == "true"]
+                        [#assign DEBUG_RF_BUSY = "1"]
+                    [/#if]
+                [/#if]
+                [#if (CPUCORE == "")]
                     [#if definition.name == "VERBOSE_LEVEL"]
                         [#assign VERBOSE_LEVEL = definition.value]
                     [/#if]
@@ -49,9 +92,9 @@
                             [#assign APP_LOG_ENABLED = "1"]
                         [/#if]
                     [/#if]
-                    [#if definition.name == "DEBUGGER_ON"]
+                    [#if definition.name == "SENSOR_ENABLED"]
                         [#if definition.value == "true"]
-                            [#assign DEBUGGER_ON = "1"]
+                            [#assign SENSOR_ENABLED = "1"]
                         [/#if]
                     [/#if]
                     [#if definition.name == "LOW_POWER_DISABLE"]
@@ -59,8 +102,7 @@
                             [#assign LOW_POWER_DISABLE = "1"]
                         [/#if]
                     [/#if]
-                [/#if]
-                [#if CPUCORE == "CM0PLUS"]
+                [#elseif (CPUCORE == "CM0PLUS")]
                     [#if definition.name == "VERBOSE_LEVEL_CM0PLUS"]
                         [#assign VERBOSE_LEVEL = definition.value]
                     [/#if]
@@ -69,18 +111,12 @@
                             [#assign APP_LOG_ENABLED = "1"]
                         [/#if]
                     [/#if]
-                    [#if definition.name == "DEBUGGER_ON_CM0PLUS"]
-                        [#if definition.value == "true"]
-                            [#assign DEBUGGER_ON = "1"]
-                        [/#if]
-                    [/#if]
                     [#if definition.name == "LOW_POWER_DISABLE_CM0PLUS"]
                         [#if definition.value == "true"]
                             [#assign LOW_POWER_DISABLE = "1"]
                         [/#if]
                     [/#if]
-                [/#if]
-                [#if ((CPUCORE == "") && (LINE == "STM32WL5x")) || (CPUCORE == "CM4")]
+                [#elseif (CPUCORE == "CM4")]
                     [#if definition.name == "VERBOSE_LEVEL_CM4"]
                         [#assign VERBOSE_LEVEL = definition.value]
                     [/#if]
@@ -89,9 +125,9 @@
                             [#assign APP_LOG_ENABLED = "1"]
                         [/#if]
                     [/#if]
-                    [#if definition.name == "DEBUGGER_ON_CM4"]
+                    [#if definition.name == "SENSOR_ENABLED_CM4"]
                         [#if definition.value == "true"]
-                            [#assign DEBUGGER_ON = "1"]
+                            [#assign SENSOR_ENABLED = "1"]
                         [/#if]
                     [/#if]
                     [#if definition.name == "LOW_POWER_DISABLE_CM4"]
@@ -136,7 +172,7 @@ extern "C" {
   * @brief Temperature and pressure values are retrieved from sensors shield
   *        (instead of sending dummy values). It requires MEMS IKS shield
   */
-#define SENSOR_ENABLED              0
+#define SENSOR_ENABLED                       ${SENSOR_ENABLED}
 [/#if]
 [/#if]
 
@@ -146,39 +182,50 @@ extern "C" {
   * @note In AT_SLAVE usart speed is just 9600. VLEVEL_H will not work
 [/#if]
   */
-#define VERBOSE_LEVEL               ${VERBOSE_LEVEL}
+#define VERBOSE_LEVEL                        ${VERBOSE_LEVEL}
 
 /**
   * @brief Enable trace logs
   */
-#define APP_LOG_ENABLED             ${APP_LOG_ENABLED}
+#define APP_LOG_ENABLED                      ${APP_LOG_ENABLED}
 
 /**
-  * @brief Enable MCU Debugger pins (dbg serial wires, sbg spi, etc)
+  * @brief Activate monitoring (probes) of some internal RF signals for debug purpose
   */
-#define DEBUGGER_ENABLED            ${DEBUGGER_ON}
+#define DEBUG_SUBGHZSPI_MONITORING_ENABLED   ${DEBUG_SUBGHZSPI_MONITORING}
 
+#define DEBUG_RF_NRESET_ENABLED_ENABLED      ${DEBUG_RF_NRESET}
+
+#define DEBUG_RF_HSE32RDY_ENABLED_ENABLED    ${DEBUG_RF_HSE32RDY}
+
+#define DEBUG_RF_SMPSRDY_ENABLED             ${DEBUG_RF_SMPSRDY}
+
+#define DEBUG_RF_LDORDY_ENABLED              ${DEBUG_RF_LDORDY}
+
+#define DEBUG_RF_DTB1_ENABLED                ${DEBUG_RF_DTB1}
+
+#define DEBUG_RF_BUSY_ENABLED                ${DEBUG_RF_BUSY}
+
+[#if CPUCORE != "CM0PLUS"]
 /**
-  * @brief Enable four wires usable as probes (two of them PROBE1 and PROBE2 used by the MW)
+  * @brief Enable/Disable MCU Debugger pins (dbg serial wires)
+  * @note  by HW serial wires are ON by default, need to put them OFF to save power
   */
-[#if (Activate_DEBUG_LINE == "false") ]
-#define PROBE_PINS_ENABLED          0
-[#else]
-#define PROBE_PINS_ENABLED          ${DEBUGGER_ON}
+#define DEBUGGER_ENABLED                     ${DEBUGGER_ON}
+
 [/#if]
-
 /**
   * @brief Disable Low Power mode
   * @note  0: LowPowerMode enabled. MCU enters stop2 mode, 1: LowPowerMode disabled. MCU enters sleep mode only
   */
-#define LOW_POWER_DISABLE           ${LOW_POWER_DISABLE}
+#define LOW_POWER_DISABLE                    ${LOW_POWER_DISABLE}
 
 [#if (SECURE_PROJECTS == "1") && (CPUCORE == "CM0PLUS") ]
 /**
   * @brief Enable unprivilege mode
   * @note 1: execute the code in unprivileged mode, 0: execute the code fully in privileged mode
   */
-#define SECURE_UNPRIVILEGE_ENABLE   1
+#define SECURE_UNPRIVILEGE_ENABLE            1
 
 [/#if]
 /* USER CODE BEGIN EC */
@@ -205,4 +252,3 @@ extern "C" {
 #endif
 
 #endif /* __SYS_CONF_H__ */
-

@@ -112,4 +112,3 @@ void vcom_Resume(void);
 #endif
 
 #endif /* __USART_IF_H__ */
-

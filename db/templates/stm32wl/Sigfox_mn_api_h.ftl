@@ -31,6 +31,16 @@ extern "C" {
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/
+[#if FREERTOS??][#-- If FreeRtos is used --]
+/* Monarch process*/
+#define CFG_MONARCH_PROCESS_NAME                  "MONARCH_PROCESS"
+#define CFG_MONARCH_PROCESS_ATTR_BITS             (0)
+#define CFG_MONARCH_PROCESS_CB_MEM                (0)
+#define CFG_MONARCH_PROCESS_CB_SIZE               (0)
+#define CFG_MONARCH_PROCESS_STACK_MEM             (0)
+#define CFG_MONARCH_PROCESS_PRIORITY              osPriorityNone
+#define CFG_MONARCH_PROCESS_STACK_SIZE            1024
+[/#if]
 /* USER CODE BEGIN EC */
 
 /* USER CODE END EC */

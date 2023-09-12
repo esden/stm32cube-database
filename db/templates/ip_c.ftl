@@ -22,6 +22,9 @@
 [#assign ipvar = IP]
 /* Includes ------------------------------------------------------------------*/
 #include "${name?lower_case}.h"
+[#if name=="ETH" && F4_ETH_NoLWIP??]
+#include "string.h"
+[/#if]
 
 [#assign useGpio = false]
 [#assign useBdma = false]
@@ -94,8 +97,17 @@
 [#-- static ${variable.value} ${variable.name}; --]
 [/#list]
 [/#if]
+[#assign coreDir=""] 
 [#if GFXMMUisUsed?? && name=="GFXMMU"]
-[@common.optincludeFile path="Inc" name="gfxmmu_lut.h"/]
+[#if FamilyName=="STM32U5"]
+[#if TZEN=="1" && Secure=="false"]
+[#assign coreDir="NonSecure/Core/"] 
+[/#if]
+[#if TZEN=="1" && Secure=="true"]
+[#assign coreDir="Secure/Core/"] 
+[/#if]
+[/#if]
+[@common.optincludeFile path=coreDir+"Inc" name="gfxmmu_lut.h"/]
 [/#if]
 [#-- WorkAround for Ticket 30863 --]
 [#if name=="ETH" && H7_ETH_NoLWIP??]
@@ -121,6 +133,12 @@ ETH_DMADescTypeDef DMATxDscrTab[ETH_TX_DESC_CNT] __attribute__((section(".TxDecr
 uint8_t Rx_Buff[ETH_RX_DESC_CNT][ETH_MAX_PACKET_SIZE] __attribute__((section(".RxArraySection"))); /* Ethernet Receive Buffers */
 
 #endif
+
+ETH_TxPacketConfig TxConfig; 
+[/#if]
+[#if name=="ETH" && F4_ETH_NoLWIP??]
+ETH_DMADescTypeDef  DMARxDscrTab[ETH_RX_DESC_CNT]; /* Ethernet Rx DMA Descriptors */
+ETH_DMADescTypeDef  DMATxDscrTab[ETH_TX_DESC_CNT]; /* Ethernet Tx DMA Descriptors */
 
 ETH_TxPacketConfig TxConfig; 
 [/#if]
@@ -1089,7 +1107,9 @@ ETH_TxPacketConfig TxConfig;
 [#--#treturn &${variable.name};--]
 [#--}--]
 [#-- Tracker 276386 -- GetHandle End --]
+
 ${variable.value} ${variable.name};
+
 [/#list]
 [#-- Add global dma Handler --]
 [#list IP.configModelList as instanceData]
@@ -1129,7 +1149,7 @@ ${variable.value} ${variable.name};
 [/#if]
 
 [#-- if used Driver is LL --]
-[#if instanceData.usedDriver?? && instanceData.usedDriver!="HAL"][#--Check if LL driver is used. instanceData:ConfigModel --]
+[#if instName?starts_with("GPDMA") | instName?starts_with("LPDMA")| (instanceData.usedDriver?? && instanceData.usedDriver!="HAL")][#--Check if LL driver is used. instanceData:ConfigModel --]
     [#-- variable declaration --]
     [#assign v = ""]
     [#if instanceData.initServices?? && instanceData.initServices.gpio?? ]
@@ -1257,11 +1277,14 @@ static uint32_t ${entry.value}=0;
 
 [#assign ipHandler = "h" + mode?lower_case]
 
-[#if  mode?contains("DFSDM") && DFSDM_var == "false"]
+[#if  mode?contains("DFSDM")]
 [#assign n = 1]
     [#list instanceList as dfsdmInst]
+	  [#if !DFSDM_var?contains(dfsdmInst)]
         static uint32_t DFSDM${dfsdmInst?replace("DFSDM","")}_Init = 0;
         [#assign n = n + 1]
+		[#assign DFSDM_var = DFSDM_var + " " + dfsdmInst]
+	  [/#if]
     [/#list]
 [#assign DFSDM_var = "true"]
 [/#if]

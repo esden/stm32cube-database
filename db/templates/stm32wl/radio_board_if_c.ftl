@@ -86,7 +86,8 @@ int32_t RBI_Init(void)
    * 1/ For User boards, the BSP/STM32WLxx_Nucleo/ directory can be copied and replaced in the project. The copy must then be updated depending:
    *       on board RF switch configuration (pin control, number of port etc)
    *       on TCXO configuration
-   *       on DC/DC configuration */
+   *       on DC/DC configuration
+   *       on maximum output power that the board can deliver*/
   return BSP_RADIO_Init();
 [#if (Activate_RADIO_BOARD_INTERFACE =="NucleoPseudo")]
 #elif defined(MX_NUCLEO_WL55JC1)
@@ -140,7 +141,8 @@ int32_t RBI_DeInit(void)
    * 1/ For User boards, the BSP/STM32WLxx_Nucleo/ directory can be copied and replaced in the project. The copy must then be updated depending:
    *       on board RF switch configuration (pin control, number of port etc)
    *       on TCXO configuration
-   *       on DC/DC configuration */
+   *       on DC/DC configuration
+   *       on maximum output power that the board can deliver*/
   return BSP_RADIO_DeInit();
 [#if (Activate_RADIO_BOARD_INTERFACE =="NucleoPseudo")]
 #elif defined(MX_NUCLEO_WL55JC1)
@@ -184,7 +186,8 @@ int32_t RBI_ConfigRFSwitch(RBI_Switch_TypeDef Config)
    * 1/ For User boards, the BSP/STM32WLxx_Nucleo/ directory can be copied and replaced in the project. The copy must then be updated depending:
    *       on board RF switch configuration (pin control, number of port etc)
    *       on TCXO configuration
-   *       on DC/DC configuration */
+   *       on DC/DC configuration
+   *       on maximum output power that the board can deliver*/
   return BSP_RADIO_ConfigRFSwitch((BSP_RADIO_Switch_TypeDef) Config);
 [#if (Activate_RADIO_BOARD_INTERFACE =="NucleoPseudo")]
 #elif defined(MX_NUCLEO_WL55JC1)
@@ -251,7 +254,8 @@ int32_t RBI_GetTxConfig(void)
    * 1/ For User boards, the BSP/STM32WLxx_Nucleo/ directory can be copied and replaced in the project. The copy must then be updated depending:
    *       on board RF switch configuration (pin control, number of port etc)
    *       on TCXO configuration
-   *       on DC/DC configuration */
+   *       on DC/DC configuration
+   *       on maximum output power that the board can deliver*/
   return BSP_RADIO_GetTxConfig();
 [#if (Activate_RADIO_BOARD_INTERFACE =="NucleoPseudo")]
 #elif defined(MX_NUCLEO_WL55JC1)
@@ -280,7 +284,8 @@ int32_t RBI_IsTCXO(void)
    * 1/ For User boards, the BSP/STM32WLxx_Nucleo/ directory can be copied and replaced in the project. The copy must then be updated depending:
    *       on board RF switch configuration (pin control, number of port etc)
    *       on TCXO configuration
-   *       on DC/DC configuration */
+   *       on DC/DC configuration
+   *       on maximum output power that the board can deliver*/
   return BSP_RADIO_IsTCXO();
 [#if (Activate_RADIO_BOARD_INTERFACE =="NucleoPseudo")]
 #elif defined(MX_NUCLEO_WL55JC1)
@@ -309,7 +314,8 @@ int32_t RBI_IsDCDC(void)
    * 1/ For User boards, the BSP/STM32WLxx_Nucleo/ directory can be copied and replaced in the project. The copy must then be updated depending:
    *       on board RF switch configuration (pin control, number of port etc)
    *       on TCXO configuration
-   *       on DC/DC configuration */
+   *       on DC/DC configuration
+   *       on maximum output power that the board can deliver*/
   return BSP_RADIO_IsDCDC();
 [#if (Activate_RADIO_BOARD_INTERFACE =="NucleoPseudo")]
 #elif defined(MX_NUCLEO_WL55JC1)
@@ -325,6 +331,54 @@ int32_t RBI_IsDCDC(void)
 #endif  /* USE_BSP_DRIVER  */
 }
 
+int32_t RBI_GetRFOMaxPowerConfig(RBI_RFOMaxPowerConfig_TypeDef Config)
+{
+  /* USER CODE BEGIN RBI_GetRFOMaxPowerConfig_1 */
+
+  /* USER CODE END RBI_GetRFOMaxPowerConfig_1 */
+#if defined(USE_BSP_DRIVER)
+  /* Important note: BSP code is board dependent
+   * STM32WL_Nucleo code can be found
+   *       either in STM32CubeWL package under Drivers/BSP/STM32WLxx_Nucleo/
+   *       or at https://github.com/STMicroelectronics/STM32CubeWL/tree/main/Drivers/BSP/STM32WLxx_Nucleo/
+   * 1/ For User boards, the BSP/STM32WLxx_Nucleo/ directory can be copied and replaced in the project. The copy must then be updated depending:
+   *       on board RF switch configuration (pin control, number of port etc)
+   *       on TCXO configuration
+   *       on DC/DC configuration
+   *       on maximum output power that the board can deliver*/
+  return BSP_RADIO_GetRFOMaxPowerConfig((BSP_RADIO_RFOMaxPowerConfig_TypeDef) Config);
+[#if (Activate_RADIO_BOARD_INTERFACE =="NucleoPseudo")]
+#elif defined(MX_NUCLEO_WL55JC1)
+  int32_t ret;
+
+  if (Config == RBI_RFO_LP_MAXPOWER)
+  {
+    ret = 15; /*dBm*/
+  }
+  else
+  {
+    ret = 22; /*dBm*/
+  }
+
+  return ret;
+[/#if]
+#else
+  /* 2/ Or implement RBI_RBI_GetRFOMaxPowerConfig here */
+  int32_t ret = 0;
+  /* USER CODE BEGIN RBI_GetRFOMaxPowerConfig_2 */
+#warning user to provide its board code or to call his board driver functions
+  if (Config == RBI_RFO_LP_MAXPOWER)
+  {
+    ret = 15; /*dBm*/
+  }
+  else
+  {
+    ret = 22; /*dBm*/
+  }
+  /* USER CODE END RBI_GetRFOMaxPowerConfig_2 */
+  return ret;
+#endif  /* USE_BSP_DRIVER  */
+}
 /* USER CODE BEGIN EF */
 
 /* USER CODE END EF */
@@ -333,4 +387,3 @@ int32_t RBI_IsDCDC(void)
 /* USER CODE BEGIN PrFD */
 
 /* USER CODE END PrFD */
-

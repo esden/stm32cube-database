@@ -1,0 +1,15 @@
+[#ftl]
+[#assign SUBGHZ_PHY_APP_MEM_POOL_SIZE = "4096"]
+[#if SWIPdatas??]
+    [#list SWIPdatas as SWIP]
+        [#if SWIP.defines??]
+            [#list SWIP.defines as definition]
+                [#if definition.name == "SUBGHZ_PHY_APP_MEM_POOL_SIZE"]
+                    [#assign SUBGHZ_PHY_APP_MEM_POOL_SIZE = definition.value]
+                [/#if]
+            [/#list]
+        [/#if]
+    [/#list]
+[/#if]
+
+#define SUBGHZ_PHY_APP_MEM_POOL_SIZE             ${SUBGHZ_PHY_APP_MEM_POOL_SIZE}

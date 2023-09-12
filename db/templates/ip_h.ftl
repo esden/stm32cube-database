@@ -37,7 +37,9 @@ extern "C" {
 
 /* USER CODE END Includes */
 #n
-[#list IPdatas as IP]  
+
+[#list IPdatas as IP]
+[#assign var1= ""]  
 [#assign ipvar = IP]
 [#-- Global variables --]
 [#if IP.variables??]
@@ -45,10 +47,16 @@ extern "C" {
 [#-- Tracker 276386 -- GetHandle Start --]
 [#--${variable.value}* MX_${variable.name?replace("h","")?upper_case}_GetHandle(void);--]
 [#-- Tracker 276386 -- GetHandle End --]
+
 [#if !variable.value?contains("static const") && !variable.value?contains("uint")]
 extern ${variable.value} ${variable.name};
+[#assign var1= var1+" " + variable.name]
 [/#if]
+
 [/#list]
+[/#if]
+[#if name=="TAMP" && !var1?contains("hrtc")]
+extern RTC_HandleTypeDef hrtc;
 [/#if]
 [#-- Global variables --]
 

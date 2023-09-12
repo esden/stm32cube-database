@@ -120,7 +120,7 @@ extern "C" {
 [#if  AZRTOS_APP_MEM_ALLOCATION_METHOD_VAL == "1"]
 /* Using static memory allocation via threadX Byte memory pools */
 
-#define USE_MEMORY_POOL_ALLOCATION               ${AZRTOS_APP_MEM_ALLOCATION_METHOD_VAL}
+#define USE_STATIC_ALLOCATION                ${AZRTOS_APP_MEM_ALLOCATION_METHOD_VAL}
 
 [#if TX_ENABLED == "true" && TX_APP_MEM_POOL_SIZE_VAL != "valueNotSetted"]
 #define TX_APP_MEM_POOL_SIZE                     ${TX_APP_MEM_POOL_SIZE_VAL}
@@ -161,7 +161,7 @@ extern "C" {
 
 [#else]
 /*  To enable static memory allocation using threadx memory pools the following defines should be set */
-/* #define USE_MEMORY_POOL_ALLOCATION               1 */
+/* #define USE_STATIC_ALLOCATION               1 */
 
 [#if TX_ENABLED == "true"]
 /* #define TX_APP_MEM_POOL_SIZE                     <Add TX memory pool Size> */

@@ -47,9 +47,19 @@
 #include "sigfox_mbwrapper.h"
 [/#if]
 #include "mcu_api.h"
+[#if THREADX??][#-- If AzRtos is used --]
+#include "app_azure_rtos.h"
+#include "tx_api.h"
+[/#if]
 [#if (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION")]
 #include "stm32_timer.h"
+[#if !THREADX??][#-- If AzRtos is not used --]
+[#if !FREERTOS??][#-- If FreeRtos is not used --]
 #include "stm32_seq.h"
+[#else]
+#include "cmsis_os.h"
+[/#if]
+[/#if]
 #include "sgfx_eeprom_if.h"
 #include "sys_debug.h"
 #include "sgfx_cstimer.h"
@@ -67,6 +77,18 @@
 /* USER CODE END Includes */
 
 /* External variables ---------------------------------------------------------*/
+[#if (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION")]
+[#if THREADX??]
+extern TX_SEMAPHORE  Sem_Delay;
+extern TX_SEMAPHORE  Sem_Timeout;
+
+[/#if]
+[#if FREERTOS??][#-- If FreeRtos is used --]
+extern osSemaphoreId_t Sem_Delay;
+extern osSemaphoreId_t Sem_Timeout;
+
+[/#if]
+[/#if]
 /* USER CODE BEGIN EV */
 
 /* USER CODE END EV */
@@ -161,7 +183,7 @@ sfx_u8 MCU_API_malloc(sfx_u16 size, sfx_u8 **returned_pointer)
   if (size <= LIBRARY_MEM_SIZE_MAX)
   {
     /* The memory block is free, we can allocate it */
-    *returned_pointer = LibraryMem ;
+    *returned_pointer = LibraryMem;
   }
   else
   {
@@ -169,6 +191,7 @@ sfx_u8 MCU_API_malloc(sfx_u16 size, sfx_u8 **returned_pointer)
     error = MCU_ERR_API_MALLOC;
   }
 [/#if]
+
   /* USER CODE BEGIN MCU_API_malloc_2 */
 
   /* USER CODE END MCU_API_malloc_2 */
@@ -204,14 +227,15 @@ sfx_u8 MCU_API_get_voltage_temperature(sfx_u16 *voltage_idle, sfx_u16 *voltage_t
    * return the voltage_idle in 1/10 volt on 16bits and 1/10 degrees for the temperature */
 [#if (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION")]
 [#if (CPUCORE == "")]
-  *voltage_idle = (uint16_t) SYS_GetBatteryLevel(); /* mV */
+  *voltage_idle = (sfx_u16) SYS_GetBatteryLevel(); /* mV */
   *voltage_tx = 0;   /* mV */
-  *temperature = (uint16_t)((SYS_GetTemperatureLevel() * 10) >> 8);  /* */
+  *temperature = (sfx_s16)(GetTemperatureLevel() * 10);  /* */
 [#elseif (CPUCORE == "CM0PLUS")]
-  *voltage_idle = (uint16_t)GetBatteryLevel_mbwrapper(); /* mV */
+  *voltage_idle = (sfx_u16)GetBatteryLevel_mbwrapper(); /* mV */
   *voltage_tx = 0;
-  *temperature = (uint16_t)((GetTemperatureLevel_mbwrapper() * 10) >> 8);   /* */
+  *temperature = (sfx_s16)(GetTemperatureLevel_mbwrapper() * 10);   /* */
 [/#if]
+
   APP_LOG(TS_ON, VLEVEL_M, "temp=%d , ", (int32_t) *temperature);
   APP_LOG(TS_OFF, VLEVEL_M, "voltage=%u\n\r", (uint32_t) *voltage_idle);
 
@@ -339,9 +363,9 @@ sfx_u8 MCU_API_delay(sfx_delay_t delay_type)
 sfx_u8 MCU_API_get_nv_mem(sfx_u8 read_data[SFX_NVMEM_BLOCK_SIZE])
 {
   sfx_u8 ret = SFX_ERR_NONE;
-  /* USER CODE BEGIN MCU_API_get_nv_mem1 */
+  /* USER CODE BEGIN MCU_API_get_nv_mem_1 */
 
-  /* USER CODE END MCU_API_get_nv_mem1 */
+  /* USER CODE END MCU_API_get_nv_mem_1 */
   /* Read out SFX_NVMEM_BLOCK_SIZE bytes in eeprom or equivalent
    * in flash as Non Volatile Memory (NVM)
    * This cannot be in RAM : must be remanent*/
@@ -351,9 +375,9 @@ sfx_u8 MCU_API_get_nv_mem(sfx_u8 read_data[SFX_NVMEM_BLOCK_SIZE])
     return MCU_ERR_API_GETNVMEM;
   }
 [/#if]
-  /* USER CODE BEGIN MCU_API_get_nv_mem2 */
+  /* USER CODE BEGIN MCU_API_get_nv_mem_2 */
 
-  /* USER CODE END MCU_API_get_nv_mem2 */
+  /* USER CODE END MCU_API_get_nv_mem_2 */
   return ret;
 }
 
@@ -481,7 +505,15 @@ sfx_u8 MCU_API_timer_wait_for_end(void)
 [#if (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION")]
   APP_LOG(TS_ON, VLEVEL_M, "TIM timeout Wait\n\r");
 
+[#if THREADX??][#-- If AzRtos is used --]
+  while (tx_semaphore_get(&Sem_Timeout, TX_WAIT_FOREVER) != TX_SUCCESS) {}
+[#else]
+[#if !FREERTOS??][#-- If FreeRtos is not used --]
   UTIL_SEQ_WaitEvt(1 << CFG_SEQ_Evt_Timeout);
+[#else]
+  osSemaphoreAcquire(Sem_Timeout, osWaitForever);
+[/#if]
+[/#if]
 [/#if]
   /* USER CODE BEGIN MCU_API_timer_wait_for_end_2 */
 
@@ -508,9 +540,9 @@ sfx_u8 MCU_API_report_test_result(sfx_bool status, sfx_s16 rssi)
     /* Last Rx Packet received*/
     /* USER CODE BEGIN SFX_TRUE_1 */
 [#if (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION") && (FILL_UCS == "true")]
-    BSP_LED_On(LED_GREEN);
+    HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, GPIO_PIN_SET); /* LED_GREEN */
     HAL_Delay(50);
-    BSP_LED_Off(LED_GREEN);
+    HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, GPIO_PIN_RESET); /* LED_GREEN */
 [#else]
 
 [/#if]
@@ -528,9 +560,9 @@ sfx_u8 MCU_API_report_test_result(sfx_bool status, sfx_s16 rssi)
     /* Last Rx Packet on error or timeout*/
     /* USER CODE BEGIN SFX_FALSE_1 */
 [#if (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION") && (FILL_UCS == "true")]
-    BSP_LED_On(LED_BLUE);
+    HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_SET); /* LED_BLUE */
     HAL_Delay(50);
-    BSP_LED_Off(LED_BLUE);
+    HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_RESET); /* LED_BLUE */
 [#else]
 
 [/#if]
@@ -585,7 +617,15 @@ static void Delay_Lp(uint32_t delay_ms)
     UTIL_TIMER_Stop(&Timer_delayMs);
     UTIL_TIMER_SetPeriod(&Timer_delayMs,  delay_ms);
     UTIL_TIMER_Start(&Timer_delayMs);
+[#if THREADX??][#-- If AzRtos is used --]
+    while (tx_semaphore_get(&Sem_Delay, TX_WAIT_FOREVER) != TX_SUCCESS) {}
+[#else]
+[#if !FREERTOS??][#-- If FreeRtos is not used --]
     UTIL_SEQ_WaitEvt(1 << CFG_SEQ_Evt_Delay);
+[#else]
+    osSemaphoreAcquire(Sem_Delay, osWaitForever);
+[/#if]
+[/#if]
   }
   else
   {
@@ -608,7 +648,16 @@ static void OnTimerDelayEvt(void *context)
   /* USER CODE BEGIN OnTimerDelayEvt_1 */
 
   /* USER CODE END OnTimerDelayEvt_1 */
+[#if THREADX??][#-- If AzRtos is used --]
+  /* Set the semaphore to release the Sem_Delay Thread */
+  tx_semaphore_put(&Sem_Delay);
+[#else]
+[#if !FREERTOS??][#-- If FreeRtos is not used --]
   UTIL_SEQ_SetEvt(1 << CFG_SEQ_Evt_Delay);
+[#else]
+  osSemaphoreRelease(Sem_Delay);
+[/#if]
+[/#if]
   /* USER CODE BEGIN OnTimerDelayEvt_2 */
 
   /* USER CODE END OnTimerDelayEvt_2 */
@@ -619,7 +668,16 @@ static void OnTimerTimeoutEvt(void *context)
   /* USER CODE BEGIN OnTimerTimeoutEvt_1 */
 
   /* USER CODE END OnTimerTimeoutEvt_1 */
+[#if THREADX??][#-- If AzRtos is used --]
+  /* Set the semaphore to release the Sem_Timeout Thread */
+  tx_semaphore_put(&Sem_Timeout);
+[#else]
+[#if !FREERTOS??][#-- If FreeRtos is not used --]
   UTIL_SEQ_SetEvt(1 << CFG_SEQ_Evt_Timeout);
+[#else]
+  osSemaphoreRelease(Sem_Timeout);
+[/#if]
+[/#if]
 
   APP_LOG(TS_ON, VLEVEL_M, "TIM timeout Stopped\n\r");
   /* USER CODE BEGIN OnTimerTimeoutEvt_2 */

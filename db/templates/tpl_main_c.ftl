@@ -17,7 +17,7 @@
   ******************************************************************************
   */
 /* USER CODE END Header */
-[#assign IpInit_ToIgnore = "VREFBUF CORTEX_M4 CORTEX_M7 CORTEX_M33_S CORTEX_M33_NS HSEM PWR RCC"]
+[#assign IpInit_ToIgnore = "VREFBUF CORTEX_M4 CORTEX_M7 CORTEX_M0+ CORTEX_M33_S CORTEX_M33_NS HSEM PWR RCC"]
 [#assign azureMW_list = "threadx levelx filex netxduo usbx"]
 [#assign staticVoids =""]
 [#assign includeList =""]
@@ -25,12 +25,21 @@
 [#assign usb_device = false]
 /* Includes ------------------------------------------------------------------*/
 #include "${main_h}"
-[#if H7_ETH_NoLWIP?? &&HALCompliant??]
+[#if (H7_ETH_NoLWIP?? || F4_ETH_NoLWIP??) && HALCompliant??]
 #include "string.h"
 [/#if]
 [#-- IF GFXMMU is used and all is generated in the main and the Lut is configured--]
 [#if GFXMMUisUsed?? && HALCompliant?? && !Display_Interface_LTDC_DSIHOST?? ]
+[#if FamilyName=="STM32U5"]
+[#if TZEN=="1" && Secure=="false"]
+[#assign coreDir="NonSecure/"+coreDir] 
+[/#if]
+[#if TZEN=="1" && Secure=="true"]
+[#assign coreDir="Secure/"+coreDir] 
+[/#if]
+[/#if]
 [@common.optincludeFile path=coreDir+"Inc" name="gfxmmu_lut.h"/]
+
 [/#if]
 [#-- move includes to main.h --]
 [#if THREADX??]
@@ -74,11 +83,11 @@
 					[#-- FileX, NetXDuo and USBX calls should be performed in threadx.
 					This should be updated to support the bare-metal mode
 					--]
-					[#if !THREADX?? && ip?lower_case!="usb"]
+					[#if !THREADX?? && ip?lower_case!="usb" && ip?lower_case!="levelx"]
 						#include "app_${ip?lower_case}.h"
 					[/#if]	
                                 [#else]
-                                        [#if !includeList?contains("${ip?lower_case}.h")]
+                                        [#if !existsInList(includeList?split(" "),ip?lower_case+".h")]
 					#include "${ip?lower_case}.h"
                                         [#assign includeList =includeList + " "+ '${ip?lower_case}.h']
                                         [/#if]
@@ -94,7 +103,7 @@
         [/#list]
     [/#if]
     [#if (ip?has_content && ipExistsIntoreducevoids == false) && !ip?lower_case?contains("threadx")]
-    [#if !includeList?contains("${ip?lower_case}.h")]
+    [#if !existsInList(includeList?split(" "),ip?lower_case+".h")]
     #include "${ip?lower_case}.h"
     [#assign includeList =includeList + " "+ '${ip?lower_case}.h']
     [/#if] 
@@ -120,7 +129,7 @@
 [#-- BZ 106035 --]
 [#if includesFilesByMw??]
 [#list includesFilesByMw as includeFile]
-[#if !includeList?contains("${includeFile?lower_case}.h")]
+[#if !existsInList(includeList?split(" "),includeFile?lower_case+".h")]
 #include "${includeFile?lower_case}.h"
 [#assign includeList =includeList + " "+ '${includeFile?lower_case}.h']
 [/#if]
@@ -160,6 +169,8 @@
 /*          mapped in the non-secure vector table                             */
 [#if FamilyName=="STM32L5"]
 #define VTOR_TABLE_NS_START_ADDR  0x08040000UL
+[#elseif McuName?starts_with("STM32U5A") || McuName?starts_with("STM32U59")]
+#define VTOR_TABLE_NS_START_ADDR  0x08200000UL
 [#else]
 #define VTOR_TABLE_NS_START_ADDR  0x08100000UL
 [/#if]
@@ -191,9 +202,9 @@ extern PCD_HandleTypeDef ${handleName};
 [/#if]
 /* Private variables ---------------------------------------------------------*/
 [#-- WorkAround for Ticket 30863 --]
-[#if H7_ETH_NoLWIP?? &&HALCompliant??]
+[#if (H7_ETH_NoLWIP?? || F4_ETH_NoLWIP??) && HALCompliant??]
+[#if H7_ETH_NoLWIP??]
 #if defined ( __ICCARM__ ) /*!< IAR Compiler */
-
 #pragma location=[#if RxDescAddress??]${RxDescAddress}[#else]0x30040000[/#if]
 ETH_DMADescTypeDef  DMARxDscrTab[ETH_RX_DESC_CNT]; /* Ethernet Rx DMA Descriptors */
 #pragma location=[#if TxDescAddress??]${TxDescAddress}[#else]0x30040060[/#if]
@@ -216,7 +227,6 @@ __attribute__((at([#if RxBuffAddress??]${RxBuffAddress}[#else]0x30040200[/#if]))
 [/#if]
 
 #elif defined ( __GNUC__ ) /* GNU Compiler */ 
-
 ETH_DMADescTypeDef DMARxDscrTab[ETH_RX_DESC_CNT] __attribute__((section(".RxDecripSection"))); /* Ethernet Rx DMA Descriptors */
 ETH_DMADescTypeDef DMATxDscrTab[ETH_TX_DESC_CNT] __attribute__((section(".TxDecripSection")));   /* Ethernet Tx DMA Descriptors */
 [#-- BZ 97589 --]
@@ -224,15 +234,19 @@ ETH_DMADescTypeDef DMATxDscrTab[ETH_TX_DESC_CNT] __attribute__((section(".TxDecr
 [#else]
 uint8_t Rx_Buff[ETH_RX_DESC_CNT][ETH_MAX_PACKET_SIZE] __attribute__((section(".RxArraySection"))); /* Ethernet Receive Buffers */
 [/#if]
-
 #endif
-
-ETH_TxPacketConfig TxConfig; 
-[/#if]
+[/#if] [#-- end if (H7_ETH_NoLWIP?? || F4_ETH_NoLWIP??) --]
+ETH_TxPacketConfig TxConfig;
+[#if F4_ETH_NoLWIP??]
+ETH_DMADescTypeDef  DMARxDscrTab[ETH_RX_DESC_CNT]; /* Ethernet Rx DMA Descriptors */
+ETH_DMADescTypeDef  DMATxDscrTab[ETH_TX_DESC_CNT]; /* Ethernet Tx DMA Descriptors */
+[/#if] [#--  F4_ETH_NoLWIP?? --]
+[/#if] [#-- (H7_ETH_NoLWIP?? || F4_ETH_NoLWIP??) && HALCompliant?? --]
 [#-- End workaround for Ticket 30863 --]
 [#-- If HAL compliant generate Global variable : Peripherals handler -Begin --]
 [#if HALCompliant??][#-- if HALCompliant Begin --]
 [#compress]
+[#assign dmahandler =""]
 [#assign variablename =""]
     [#list Peripherals as Peripheral]
         [#if Peripheral??]                
@@ -241,12 +255,10 @@ ETH_TxPacketConfig TxConfig;
                 [#if periph.variables??]
 
                     [#list periph.variables as variable]
-                    [#if !variablename?contains(variable.name) && !handlerToignore?contains(variable.name)]
+                    [#if !variablename?contains(variable.value+ " "+variable.name) && !handlerToignore?contains(variable.name)]
                     ${variable.value} ${variable.name};
-                    [/#if]
-                    [#if periph.ipName="RTC" | periph.ipName="TAMP"]
-                    [#assign variablename =variablename + " "+ '${variable.name}']
-                    [/#if]
+                    [#assign variablename =variablename + " "+ variable.value+ " "+variable.name]
+                    [/#if]                    
                     [/#list]
                 [/#if][#--if periph.variables??--]
                 [#-- Add global dma Handler --]
@@ -254,12 +266,22 @@ ETH_TxPacketConfig TxConfig;
                     [#if instanceData.dmaHandel?? && periph.ipName!="GPDMA" && periph.ipName!="LPDMA"]
                         [#list instanceData.dmaHandel as dHandle]
 ${dHandle};
+[#assign dmahandler =dmahandler + " "+ dHandle]
                         [/#list]
                     [/#if]
                 [/#list]                
             [/#list]#n
         [/#if][#--if Peripheral??--]
     [/#list]
+[#if lpbamGHandlers??]
+    [#list lpbamGHandlers as variable]
+        [#if !variablename?contains(variable.value+ " "+variable.name) && !dmahandler?contains(variable.name) !handlerToignore?contains(variable.name)]
+        ${variable.value} ${variable.name};
+        [#assign variablename = variablename + " " + variable.value+ " "+variable.name]
+        [/#if]
+    [/#list]
+[/#if]
+
 [#-- Add EXTI handler --]
 [#--if BspExtiHandler??] [#-- Fix 59273 --]
 [#--    [#list BspExtiHandler as ipHandle]
@@ -340,6 +362,11 @@ void PeriphCommonClock_Config(void);
 [/#if]
 [/#if]
 [/#if]
+[#if FamilyName=="STM32U5" && pwrConfig??]
+
+static void SystemPower_Config(void);
+
+[/#if]
 [#if mpuControl??] [#-- if MPU config is enabled --]
 [#--if !McuDualCore?? || (cpucore=="ARM_CORTEX_M7" && McuDualCore??)--]
 static void MPU_Config(void); 
@@ -402,7 +429,7 @@ int main(void)
 [/#if]
 [#if TZEN=="1" && Secure=="true" && FamilyName=="STM32U5"]
   /* SAU/IDAU, FPU and interrupts secure/non-secure allocation setup done */
-  /* in SystemInit() based on partition_[#if McuName?starts_with("STM32U585")]stm32u585xx.h[#else]stm32u575xx.h[/#if] file's definitions. */
+/* in SystemInit() based on partition_[#if McuName?starts_with("STM32U585")]stm32u585xx.h[/#if][#if McuName?starts_with("STM32U575")]stm32u575xx.h[/#if][#if McuName?starts_with("STM32U595")]stm32u595xx.h[/#if][#if McuName?starts_with("STM32U5A5")]stm32u5a5xx.h[/#if][#if McuName?starts_with("STM32U5A9")]stm32u5a9xx.h[/#if][#if McuName?starts_with("STM32U599")]stm32u599xx.h[/#if] file's definitions. */
 [/#if]
 #t/* USER CODE BEGIN 1 */
 
@@ -470,16 +497,17 @@ int main(void)
 [/#if]
 [#if isHALUsed??]
 #tHAL_Init();
-[#if isportGUsed??]
+[#if isportGUsed?? && FamilyName!="STM32U5"]
 #tHAL_PWREx_EnableVddIO2();
 [/#if]
 [#else]
     [#if clockConfig??]
-#t[@common.optinclude name=contextFolder+mxTmpFolder+"/system.tmp"/] [#-- if LL include system.tmp --]
+    [@common.optinclude name=contextFolder+mxTmpFolder+"/system.tmp"/] [#-- if LL include system.tmp --]
 [/#if]
 [/#if]
 [#if PWRLL??]
-#tLL_AHB3_GRP1_EnableClock(LL_AHB3_GRP1_PERIPH_PWR);
+#n#t/* Enable PWR clock interface */
+#n#tLL_AHB3_GRP1_EnableClock(LL_AHB3_GRP1_PERIPH_PWR);
 [/#if]
 [#list voids as void]
 [#if void.functionName?? && void.functionName?contains("APPE_Init")]
@@ -489,7 +517,7 @@ int main(void)
 [/#list]
 [#-- start NVIC configuration for LL PWR--]
 
-[#if PWRLL??]
+[#if PWRLL?? && FamilyName!="STM32U5"]
 [#if systemVectors??]
 [#assign systemHandlers = false]
 [#assign firstSystemInterrupt = true]
@@ -529,7 +557,7 @@ int main(void)
 [/#if]
 [#-- End NVIC configuration for LL PWR--]
 #n
-[#if pwrConfig??]
+[#if pwrConfig?? && FamilyName!="STM32U5"]
 [#list pwrConfig as config]
  [#assign listOfLocalVariables =""]
         [#assign resultList =""] 	
@@ -538,7 +566,7 @@ int main(void)
 [/#if]
 #n
 [#-- PWR configuration --]
-[#if pwrConfig??]
+[#if pwrConfig?? && FamilyName!="STM32U5"]
 [#list pwrConfig as config]
 
 [@common.generateConfigModelListCode configModel=config inst="PWR"  nTab=1 index=""/]
@@ -587,7 +615,12 @@ int main(void)
 [/#if]
 [/#if]
 [/#if][/#if]
+[#if FamilyName=="STM32U5" && pwrConfig??]
+#t
+#t/* Configure the System Power */
+#tSystemPower_Config();
 
+[/#if]
 [/#if]
 [/#list]
    
@@ -689,10 +722,15 @@ int main(void)
 					void.functionName?contains("LoRaWAN") || 
 					void.functionName?contains("Sigfox") || 
 					void.functionName?contains("SubGHz_Phy"))) ||
-	void.functionName?contains("FileX") || 
+	(THREADX?? && (void.functionName?contains("FileX") || 
 	void.functionName?contains("USBX") || 
 	void.functionName?contains("NetXDuo") || 
-	void.functionName?contains("LevelX")
+	void.functionName?contains("LevelX"))) ||
+	(!THREADX?? && void.functionName?contains("LevelX")) ||
+            (THREADX?? &&(void.functionName?contains("LoRaWAN") || 
+                void.functionName?contains("Sigfox") || 
+		void.functionName?contains("SubGHz_Phy") || 
+		void.functionName?contains("KMS")))
  ]
  [#-- Nothing generated for 
   - USBPD
@@ -742,6 +780,7 @@ int main(void)
     [#lt]#tMX_USBPD_Init();
   [/#if]
 [/#list]
+
 [#if HALCompliant??][#-- Put after UBSPD init to keep examples generated unchanged --]
 [@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_obj_creat.tmp"/][#-- any RTOS can include here --]
 [/#if]
@@ -774,8 +813,9 @@ int main(void)
 [/#if]
 [/#list]
 [/#if][#-- If FreeRtos is used --]
+#n
 [@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_kernelStart.tmp"/]
-[#if FREERTOS??] [#-- If FreeRtos is used (should become more generic: if RTOS??) --]
+[#if FREERTOS?? || THREADX??] [#-- If FreeRtos is used (should become more generic: if RTOS??) --]
   /* We should never get here as control is now taken by the scheduler */
 [/#if]
 [#if TZEN=="1" && Secure=="true"][#-- FreeRTOS is not enabled in that case --]
@@ -941,6 +981,98 @@ void PeriphCommonClock_Config(void)
 [/#compress]
 
 [#compress]
+
+[#--  #add power config for U5 --]
+[#if FamilyName=="STM32U5" && pwrConfig??]
+#n/**
+#t* @brief Power Configuration
+#t* @retval None
+#t*/
+static void SystemPower_Config(void)
+{[#if isHALUsed??]
+[#if isportGUsed?? && FamilyName="STM32U5"]
+#tHAL_PWREx_EnableVddIO2();
+#n
+[/#if]
+[/#if]
+[#if pwrConfig??]
+[#list pwrConfig as config]
+ [#assign listOfLocalVariables =""]
+        [#assign resultList =""] 	
+            [@common.getLocalVariableList instanceData=config/] 
+[/#list]
+[/#if]
+[#-- PWR configuration --]
+[#if pwrConfig??]
+[#list pwrConfig as config]
+[@common.generateConfigModelListCode2 configModel=config inst="PWR"  nTab=1 index=""/]
+[/#list]
+[/#if]
+[#if !PWRLL??]
+[#if systemVectors??]
+[#assign systemHandlers = false]
+[#assign firstSystemInterrupt = true]
+[#assign firstPeripheralInterrupt = true]
+[#list systemVectors as initVector] 
+ [#if initVector.systemHandler=="false" || initVector.preemptionPriority!="0" || initVector.subPriority!="0"]
+   
+    [#if initVector.vector=="PVD_AVD_IRQn" || initVector.vector=="PWR_S3WU_IRQn"|| initVector.vector=="PVD_PVM_IRQn"]
+    #t/* ${initVector.vector} interrupt configuration */
+    #tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
+    [/#if]
+    
+ 
+    [/#if]
+    [#if initVector.systemHandler=="false"]
+    [#if initVector.vector=="PVD_AVD_IRQn" || initVector.vector=="PWR_S3WU_IRQn" || initVector.vector=="PVD_PVM_IRQn"]
+      #tHAL_NVIC_EnableIRQ(${initVector.vector});
+    
+    [/#if]
+    [/#if]
+[/#list]
+ [/#if]
+[/#if]
+
+[#if PWRLL??]
+[#if systemVectors??]
+[#assign systemHandlers = false]
+[#assign firstSystemInterrupt = true]
+[#assign firstPeripheralInterrupt = true]
+[#list systemVectors as initVector] 
+    [#if (initVector.vector?contains("PWR")) || (initVector.vector?contains("PVD"))]
+    [#if initVector.systemHandler=="true"]
+    [#assign systemHandlers = true]
+    [#if firstSystemInterrupt]
+    [#assign firstSystemInterrupt = false]
+    #t/* System interrupt init*/
+    [/#if]
+    [#elseif firstPeripheralInterrupt]
+    [#assign firstPeripheralInterrupt = false]
+    [#if systemHandlers]
+    #n
+    [/#if]
+    #t/* Peripheral interrupt init*/
+    [/#if]
+    [#if initVector.systemHandler=="false" || initVector.preemptionPriority!="0" || initVector.subPriority!="0"]
+    #t/* ${initVector.vector} interrupt configuration */
+        [#if NVICPriorityGroup??]
+    #tNVIC_SetPriority(${initVector.vector}, NVIC_EncodePriority(NVIC_GetPriorityGrouping(),${initVector.preemptionPriority}, ${initVector.subPriority}));
+        [#else]
+    #tNVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority});
+        [/#if]
+        [/#if]
+        [#if initVector.systemHandler=="false"]
+    #tNVIC_EnableIRQ(${initVector.vector});
+        [/#if]    
+[/#if]
+[/#list]
+[/#if]
+[/#if][#-- End NVIC configuration for LL PWR--]
+}
+
+
+[/#if]
+[#--  #End add power config for U5 --]
 [#if vectors??]
 #n/**
 #t* @brief NVIC Configuration.
@@ -1347,4 +1479,14 @@ void assert_failed(uint8_t *file, uint32_t line)
   /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */
-
+[#function existsInList(myList,keyName)]
+    [#if myList?? && keyName??]
+        [#list myList as elem]
+                [#if elem==keyName]
+                   [#return true]                    
+                [/#if]
+        [/#list]
+        [#return false]
+    [/#if]   
+    [#return false]
+[/#function]

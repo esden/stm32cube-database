@@ -136,7 +136,7 @@
 	[/#if]
 [/#list]
 
-[#if (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_HEART_RATE_SENSOR = 1) || (BLE_TRANSPARENT_MODE_UART = 1)]
+[#if (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_HEART_RATE_SENSOR = 1) || (BLE_TRANSPARENT_MODE_UART = 1) || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1)]
 /******************************************************************************
  * Device Information Service (DIS)
  ******************************************************************************/

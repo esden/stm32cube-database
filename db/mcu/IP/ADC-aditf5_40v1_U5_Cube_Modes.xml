@@ -597,8 +597,9 @@
     </RefParameter>
  
     <RefParameter Comment="External Trigger Conversion Source" DefaultValue="ADC_EXTERNALTRIG_EXT_IT11" Group="ADCgroup" Name="ExternalTrigConv" Type="list">
-        <Condition Diagnostic="EXTI Line11 is used for External-Trigger-for-Regular-conversion mode." Expression="(RegularExternalTrigger_$IpInstance)"/>
+        <Condition Diagnostic="EXTI Line11 and EXTI15  are used for External-Trigger-for-Regular-conversion mode." Expression="(RegularExternalTrigger_$IpInstance)"/>
         <PossibleValue Comment="EXTI Line11" Value="ADC_EXTERNALTRIG_EXT_IT11"/>
+        <PossibleValue Comment="EXTI Line15" Value="ADC_EXTERNALTRIG_EXT_IT15"/>
     </RefParameter>
 	    
     <RefParameter Comment="External Trigger Conversion Source" DefaultValue="ADC_SOFTWARE_START" Group="ADCgroup" Name="ExternalTrigConv" Type="list">
@@ -620,7 +621,6 @@
         <PossibleValue Action="Remove" Comment="Timer 3 Capture Compare 4 event" Condition="!TIM3_Exist" Diagnostic="" Value="ADC_EXTERNALTRIG_T3_CC4"/>
         <PossibleValue Action="Remove" Comment="HRTIM1 Trigger Out 1 event" Condition="!HRTIM_Exist" Diagnostic="" Value="ADC_EXTERNALTRIG_HR1_ADCTRG1"/>
         <PossibleValue Action="Remove" Comment="HRTIM1 Trigger Out 3 event" Condition="!HRTIM_Exist" Diagnostic="" Value="ADC_EXTERNALTRIG_HR1_ADCTRG3"/>
-        <PossibleValue Action="Remove" Comment="HRTIM Trigger Out 1 event"  Diagnostic="" Value="ADC_EXTERNALTRIG_EXT_IT15"/>
 
         <PossibleValue Action="Remove" Comment="LPTIM 1 Out event" Condition="!LPTIM1_Exist" Diagnostic="" Value="ADC_EXTERNALTRIG_LPTIM1_CH1"/>
         <PossibleValue Action="Remove" Comment="LPTIM 2 Out event" Condition="!LPTIM2_Exist" Diagnostic="" Value="ADC_EXTERNALTRIG_LPTIM2_CH1"/>
@@ -705,6 +705,9 @@
         <Description>Data offset for regular channel</Description>
     </RefParameter>
     
+     <RefParameter Comment="Right offset shif" DefaultValue="null" Group="ADCgroup" Name="OffsetRightShift" Type="list" Visible="false">
+           <Condition Diagnostic="" Expression="OffsetNumber = ADC_OFFSET_NONE"/>
+       </RefParameter>
     <RefParameter Comment="Right offset shift" DefaultValue="DISABLE" Group="ADCgroup" Name="OffsetRightShift" Type="list">
         <Condition Diagnostic="" Expression="(ADC_RESOLUTION8b_$IpInstance|ADC_RESOLUTION14b_$IpInstance)"/>
         <PossibleValue Comment="Disable" Value="DISABLE"/>
@@ -784,27 +787,84 @@
     </RefParameter>	
     <RefParameter Comment="Regular ITMode" DefaultValue="null" Group="ADCChannel" Name="RegITMode" Type="list" Visible="false">
     </RefParameter>
-			
-    <RefParameter Comment="Monitored by" DefaultValue="__NULL" Group="ADCgroup" Name="MonitoredBy" Type="list">
-        <Condition Diagnostic="" Expression="AWD2_isSelected_$IpInstance&amp;AWD3_isSelected_$IpInstance"/>
+    
+    <!-- Possible value of WatchdogModewdg2 parameters -->
+    <RefParameter Comment="Watchdog Mode" DefaultValue="null" Group="ADCgroup" Name="WatchdogMode2" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="EnableAnalogWatchDog2=false"/>
+    </RefParameter>
+    <RefParameter Comment="Watchdog Mode" Visible="false" DefaultValue="ADC_ANALOGWATCHDOG_SINGLE_REGINJEC" Group="ADCgroup" Name="WatchdogMode2" Type="list">
+        <PossibleValue Comment="Single regular or injected channel" Value="ADC_ANALOGWATCHDOG_SINGLE_REGINJEC"/>
+    </RefParameter>
+
+     <!-- Possible value of WatchdogModewdg3 parameters -->
+    <RefParameter Comment="Watchdog Mode" DefaultValue="null" Group="ADCgroup" Name="WatchdogMode3" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="EnableAnalogWatchDog3=false"/>
+    </RefParameter>
+     <RefParameter Comment="Watchdog Mode" Visible="false" DefaultValue="ADC_ANALOGWATCHDOG_SINGLE_REGINJEC" Group="ADCgroup" Name="WatchdogMode3" Type="list">
+        <PossibleValue Comment="Single regular or injected channel" Value="ADC_ANALOGWATCHDOG_SINGLE_REGINJEC"/>
+    </RefParameter>
+   
+         <!-- Possible value of Regular watchdogmode parameters -->
+
+   <RefParameter Comment="Regular Watchdogmode" DefaultValue="null" Group="ADCChannel" Name="RegWDModeFC" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="MonitoredBy=__NULL"/>
+   </RefParameter>		
+   <RefParameter Comment="Regular Watchdogmode" DefaultValue="ADC_ANALOGWATCHDOG_SINGLE_REGINJEC" Group="ADCChannel" Name="RegWDModeFC" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="MonitoredBy=ADC_ANALOGWATCHDOG_2 &amp; WatchdogMode2=ADC_ANALOGWATCHDOG_SINGLE_REGINJEC"/>
+    </RefParameter>
+     <RefParameter Comment="Regular Watchdogmode" DefaultValue="ADC_ANALOGWATCHDOG_SINGLE_REGINJEC" Group="ADCChannel" Name="RegWDModeFC" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="MonitoredBy=ADC_ANALOGWATCHDOG_3 &amp; WatchdogMode3=ADC_ANALOGWATCHDOG_SINGLE_REGINJEC"/>
+    </RefParameter>
+   <RefParameter Comment="Regular Watchdogmode" DefaultValue="null" Group="ADCChannel" Name="RegWDModeFC" Type="list" Visible="false">
+    </RefParameter>
+    
+      <!-- Possible value of Injected watchdogmode parameters -->
+
+   <RefParameter Comment="Injected Watchdogmode" DefaultValue="null" Group="ADCChannel" Name="InjWDModeFC" Type="list" Visible="false">
+       <Condition Diagnostic="" Expression="InjMonitoredBy=__NULL"/>
+   </RefParameter>
+   <RefParameter Comment="Injected Watchdogmode" DefaultValue="ADC_ANALOGWATCHDOG_SINGLE_REGINJEC" Group="ADCChannel" Name="InjWDModeFC" Type="list" Visible="false">
+       <PossibleValue Comment="Multiple channels"  Value="ADC_ANALOGWATCHDOG_SINGLE_REGINJEC"/>
+   </RefParameter>	
+    <RefParameter Comment="Injected Watchdogmode" DefaultValue="ADC_ANALOGWATCHDOG_SINGLE_REGINJEC" Group="ADCChannel" Name="RegWDModeFC" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="MonitoredBy=ADC_ANALOGWATCHDOG_2 &amp; WatchdogMode2=ADC_ANALOGWATCHDOG_SINGLE_REGINJEC"/>
+    </RefParameter>
+     <RefParameter Comment="Injected Watchdogmode" DefaultValue="ADC_ANALOGWATCHDOG_SINGLE_REGINJEC" Group="ADCChannel" Name="RegWDModeFC" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="MonitoredBy=ADC_ANALOGWATCHDOG_3 &amp; WatchdogMode3=ADC_ANALOGWATCHDOG_SINGLE_REGINJEC"/>
+    </RefParameter>
+    <RefParameter Comment="Injected Watchdogmode" DefaultValue="null" Group="ADCChannel" Name="InjWDModeFC" Type="list" Visible="false">
+    </RefParameter>
+    
+         <!-- Possible value of MonitoredBy parameters -->
+
+      <RefParameter Comment="Monitored by" DefaultValue="__NULL" Group="ADCgroup" Name="MonitoredBy" Type="list">
         <PossibleValue Comment="None" Value="__NULL"/>
-        <PossibleValue Comment="Analog Watchdog 2" Semaphore="AWD2_isSelected_$IpInstance" Value="ADC_ANALOGWATCHDOG_2"/>
-        <PossibleValue Comment="Analog Watchdog 3" Semaphore="AWD3_isSelected_$IpInstance" Value="ADC_ANALOGWATCHDOG_3"/>
-        <Description>Select a watchdog to monitor the channel.</Description> 
-    </RefParameter>        
+        <PossibleValue Comment="Analog Watchdog 2"  Condition="!AWD2_isSelected_$IpInstance" Action="Disable" Diagnostic="Analog Watchdog 2 is not selected " Value="ADC_ANALOGWATCHDOG_2"/>
+        <PossibleValue Comment="Analog Watchdog 3"  Condition="!AWD3_isSelected_$IpInstance" Action="Disable" Diagnostic="Analog Watchdog 3 is not selected " Value="ADC_ANALOGWATCHDOG_3"/>
+	 <PossibleValue Comment="Analog Watchdog 2 and 3"  Condition="!(AWD2_isSelected_$IpInstance&amp;AWD3_isSelected_$IpInstance)" Action="Disable" Diagnostic="Analog Watchdog 2 and 3 are not selected " Value="ADC_ANALOGWATCHDOG_32"/>
+        <Description>For a dedicated channel, the generated analog watchdog configuration will correspond to the sum of all "Monitored" configurations for this channel when the number of ranks is  greater than 1.</Description> 
+    </RefParameter>       
     <RefParameter Comment="Monitored by" DefaultValue="__NULL" Group="ADCgroup" Name="MonitoredBy" Type="list">
         <Condition Diagnostic="" Expression="AWD2_isSelected_$IpInstance"/>
         <PossibleValue Comment="None" Value="__NULL"/>
         <PossibleValue Comment="Analog Watchdog 2" Value="ADC_ANALOGWATCHDOG_2"/>
-        <Description>Select a watchdog to monitor the channel.</Description> 
+        <Description>For a dedicated channel, the generated analog watchdog configuration will correspond to the sum of all "Monitored" configurations for this channel when the number of ranks is  greater than 1.</Description> 
     </RefParameter>
     <RefParameter Comment="Monitored by" DefaultValue="__NULL" Group="ADCgroup" Name="MonitoredBy" Type="list">
         <Condition Diagnostic="" Expression="AWD3_isSelected_$IpInstance"/>
         <PossibleValue Comment="None" Value="__NULL"/>
         <PossibleValue Comment="Analog Watchdog 3" Value="ADC_ANALOGWATCHDOG_3"/>
-        <Description>Select a watchdog to monitor the channel.</Description> 
+        <Description>For a dedicated channel, the generated analog watchdog configuration will correspond to the sum of all "Monitored" configurations for this channel when the number of ranks is  greater than 1.</Description> 
     </RefParameter>
     <RefParameter Comment="Monitored by" DefaultValue="null" Group="ADCgroup" Name="MonitoredBy" Type="list" Visible="false"/>
+    <RefParameter Comment="Watchdog instance" DefaultValue="ADC_ANALOGWATCHDOG_2" Group="ADCgroup" Name="AWD2WatchdogNumber" Type="list" Visible="false">
+        <PossibleValue Comment="WatchDog 2" Value="ADC_ANALOGWATCHDOG_2"/>
+        <Description>Number of used watchDogs.</Description>
+    </RefParameter>
+    <RefParameter Comment="Watchdog instance" DefaultValue="ADC_ANALOGWATCHDOG_3" Group="ADCgroup" Name="AWD3WatchdogNumber" Type="list" Visible="false">
+        <PossibleValue Comment="WatchDog 2" Value="ADC_ANALOGWATCHDOG_3"/>
+        <Description>Number of used watchDogs.</Description>
+    </RefParameter>
 				
     <!--  ########################################################################################Injected  conversion parameters######################################################################################## -->
 	  
@@ -1090,6 +1150,10 @@
         <Description>Signed saturation for injected channel</Description>
     </RefParameter>
     
+    <RefParameter Comment="Offset signed saturation" DefaultValue="null" Group="ADCgroup" Name="OffsetSignedSaturation" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="OffsetNumber = ADC_OFFSET_NONE"/>
+        <Description>Signed saturation for injected channel</Description>
+    </RefParameter>
         <RefParameter Comment="Offset Signed Saturation" DefaultValue="DISABLE" Group="ADCChannel" Name="OffsetSignedSaturation" Type="list">
         <Condition Diagnostic="" Expression="(ADC_RESOLUTION8b_$IpInstance)|(ADC_RESOLUTION14b_$IpInstance)"/>
         <PossibleValue Comment="Enable" Value="ENABLE"/>
@@ -1188,12 +1252,12 @@
     <RefParameter Comment="Monitored by" DefaultValue="__NULL" Group="ADCgroup" Name="InjMonitoredBy" Type="list" Visible="false">
         <Condition Diagnostic="In case of usage of channels on injected group, ADC frequency should be low than AHB clock frequency /4 for resolution 12 or 10 bits, AHB clock frequency /3 for resolution 8 bits, AHB clock frequency /2 for resolution 6 bits." Expression="EnableInjectedConversion=DISABLE"/> 
     </RefParameter>
-    <RefParameter Comment="Monitored by" DefaultValue="__NULL" Group="ADCgroup" Name="InjMonitoredBy" Type="list">
-        <Condition Diagnostic="" Expression="AWD2_isSelected_$IpInstance&amp;AWD3_isSelected_$IpInstance"/>
+   <RefParameter Comment="Monitored by" DefaultValue="__NULL" Group="ADCgroup" Name="InjMonitoredBy" Type="list">
         <PossibleValue Comment="None" Value="__NULL"/>
-        <PossibleValue Comment="Analog Watchdog 2" Value="ADC_ANALOGWATCHDOG_2"/>
-        <PossibleValue Comment="Analog Watchdog 3" Value="ADC_ANALOGWATCHDOG_3"/>
-        <Description>The ADC analog input channel is not monitored by Watchdog 2 or 3.</Description> 
+        <PossibleValue Comment="Analog Watchdog 2"  Condition="!AWD2_isSelected_$IpInstance" Action="Disable" Diagnostic="Analog Watchdog 2 is not selected " Value="ADC_ANALOGWATCHDOG_2"/>
+        <PossibleValue Comment="Analog Watchdog 3"  Condition="!AWD3_isSelected_$IpInstance" Action="Disable" Diagnostic="Analog Watchdog 3 is not selected " Value="ADC_ANALOGWATCHDOG_3"/>
+	 <PossibleValue Comment="Analog Watchdog 2 and 3"  Condition="!(AWD2_isSelected_$IpInstance&amp;AWD3_isSelected_$IpInstance)" Action="Disable" Diagnostic="Analog Watchdog 2 and 3 are not selected " Value="ADC_ANALOGWATCHDOG_32"/>
+        <Description>For a dedicated channel, the generated analog watchdog configuration will correspond to the sum of all "Monitored" configurations for this channel when the number of ranks is  greater than 1.</Description> 
     </RefParameter>
     <RefParameter Comment="Monitored by" DefaultValue="__NULL" Group="ADCgroup" Name="InjMonitoredBy" Type="list">
         <Condition Diagnostic="" Expression="AWD2_isSelected_$IpInstance"/>
@@ -1789,6 +1853,8 @@
         <Parameter Name="RegITMode"/>
         <Parameter Name="MonitoredBy"/>
         <Parameter Name="AWDChannel"/>
+        <Parameter Name="RegWDModeFC"/>
+
     </RefMode>				
     <RefMode BaseMode="ADC_Regular_ConversionMode" Comment="Regular Channel Settings" Group="ADC_Regular_ConversionMode" Name="ChannelRegularConversion">
         <ConfigForMode>ADC_RegularChannelConfig</ConfigForMode>
@@ -1808,6 +1874,8 @@
         <Parameter Name="RegITMode"/>
         <Parameter Name="MonitoredBy"/>
         <Parameter Name="AWDChannel"/>
+        <Parameter Name="RegWDModeFC"/>
+
     </RefMode>
 		                      
     <RefMode BaseMode="ADC_Injected_ConversionMode" Comment="Injected Channel Settings" Group="ADC_Injected_ConversionMode" Name="ChannelInjectedConversion">
@@ -1829,6 +1897,8 @@
         <Parameter Name="InjITMode"/>
         <Parameter Name="InjMonitoredBy"/>
         <Parameter Name="InjAWDChannel"/>
+        <Parameter Name="InjWDModeFC"/>
+
     </RefMode>
     <RefMode Comment="Injected Channel Settings" Name="CpChannelInjectedConversion">
         <ConfigForMode>ADC_InjectedChannelConfig</ConfigForMode>
@@ -1848,6 +1918,9 @@
         <Parameter Name="InjectedOffset"/>
         <Parameter Name="InjMonitoredBy"/>
         <Parameter Name="InjAWDChannel"/>
+        <Parameter Name="InjWDModeFC"/>
+
+
     </RefMode>
 		
 								
@@ -1875,6 +1948,8 @@
         <Parameter Name="AWD2LowThreshold"/>
         <Parameter Name="AWD2ITMode"/>
         <Parameter Name="AWD2FilteringConfig"/>
+        <Parameter Name="WatchdogMode2"/>
+
 
     </RefMode> 
 	
@@ -1886,7 +1961,7 @@
         <Parameter Name="AWD3HighThreshold"/>
         <Parameter Name="AWD3LowThreshold"/>
         <Parameter Name="AWD3ITMode"/>
-
+        <Parameter Name="WatchdogMode3"/>
         <Parameter Name="AWD3FilteringConfig"/>
 
     </RefMode>

@@ -205,6 +205,7 @@
         <Parameter Added="true" Name="MAX_POWER_IN_MILLI_AMPER"/>
         <Parameter Added="true" Name="USBD_MAX_POWER"/>
         <Parameter Added="true" Name="USBD_COMPOSITE_USE_IAD"/>
+		<Parameter Added="true" Name="UX_DEVICE_BIDIRECTIONAL_ENDPOINT_SUPPORT"/>
 		<Parameter Name="UX_Device_CoreStack">
 			<PossibleValue>1</PossibleValue>
 		</Parameter>
@@ -254,6 +255,7 @@
 		<Parameter Added="true" Name="USBD_CDCACM_EPIN_HS_MPS"/>
 		<Parameter Added="true" Name="USBD_CDCACM_EPOUT_ADDR"/>
 		<Parameter Added="true" Name="USBD_CDCACM_EPOUT_HS_MPS"/>
+		<Parameter Added="true" Name="UX_DEVICE_CLASS_CDC_ACM_TRANSMISSION_DISABLE"/>
 	</RefMode>
 	<RefMode Abstract="false" Name="UX_Device_class_CDC_ECM_HS">
 		<ConfigForMode>UX_Device_class_CDC_ECM</ConfigForMode>
@@ -487,6 +489,7 @@
         <Parameter Added="true" Name="MAX_POWER_IN_MILLI_AMPER"/>
         <Parameter Added="true" Name="USBD_MAX_POWER"/>
         <Parameter Added="true" Name="USBD_COMPOSITE_USE_IAD"/>
+		<Parameter Added="true" Name="UX_DEVICE_BIDIRECTIONAL_ENDPOINT_SUPPORT"/>
 		<Parameter Name="UX_Device_CoreStack">
 			<PossibleValue>1</PossibleValue>
 		</Parameter>
@@ -537,6 +540,7 @@
 		<Parameter Added="true" Name="USBD_CDCACM_EPIN_FS_MPS"/>
 		<Parameter Added="true" Name="USBD_CDCACM_EPOUT_ADDR"/>
 		<Parameter Added="true" Name="USBD_CDCACM_EPOUT_FS_MPS"/>
+		<Parameter Added="true" Name="UX_DEVICE_CLASS_CDC_ACM_TRANSMISSION_DISABLE"/>
 	</RefMode>
 	<RefMode Abstract="false" Name="UX_Device_class_CDC_ECM_FS">
 		<ConfigForMode>UX_Device_class_CDC_ECM</ConfigForMode>
@@ -651,7 +655,7 @@
 								<Signal Name="UX Host Controller_HS"/>
 							</SignalLogicalOp>
 							<Semaphore>SEMUSBXCcUSBJjUSBXJjUXOoHostOoControllers_HS</Semaphore>
-							<Condition Expression="SEMUSBXCcUSBJjUSBXJjUXOoHostOoCoreStackJjUSEIiRTOS_HS" Diagnostic="&lt;b&gt; Requires: &lt;/b&gt; Middleware:USBX:Host CoreStack HS"/>
+							<Condition Expression="SEMUSBXCcUSBJjUSBXJjUXOoHostOoCoreStackJjRTOSIiMODE_HS" Diagnostic="&lt;b&gt; Requires: &lt;/b&gt; Middleware:USBX:Host CoreStack HS"/>
 						</Mode>
 					</ModeLogicOperator>
 				</Mode>	
@@ -664,7 +668,7 @@
 										<Signal Name="UX Host MSC_HS"/>
 									</SignalLogicalOp>
 									<Semaphore>SEMUSBXCcUSBJjUSBXJjUXOoHostOoClassOoSTORAGE_HS</Semaphore>
-									<Condition Expression="SEMUSBXCcUSBJjUSBXJjUXOoHostOoCoreStackJjRTOSIiMODE_HS &amp; SEMFileXCcFileOoSystemJjFileXJjCoreJjRTOSIiMODE" 
+									<Condition Expression="SEMUSBXCcUSBJjUSBXJjUXOoHostOoCoreStackJjRTOSIiMODE_HS &amp; SEMFileXCcFileOoSystemJjFileXJjCore" 
 									Diagnostic="&lt;b&gt; Requires: &lt;/b&gt; &lt;br&gt; Middleware:USBX:Host CoreStack HS &lt;br&gt; Middleware:FILEX:FileX Core" />
 								</Mode>
 							</ModeLogicOperator>
@@ -845,7 +849,7 @@
 					</ModeLogicOperator>
 				</Mode>				
 			</ModeLogicOperator>
-			<Condition Expression="SEMAOoUSBOoOTGOoHSOoHOSTOoFOROoUSBX" Diagnostic="Active only when USB_OTG_HS IP is configured in host mode"/>
+			<Condition Expression="SEMAOoUSBOoOTGOoHSOoHOSTOoFOROoUSBX | SEMAOoUSBOoOTGOoHSOoDRDOoFOROoUSBX" Diagnostic="Active only when USB_OTG_HS IP is configured in host mode or DRD mode"/>
 		</Mode>
 		<Mode Name="Device_Class_HS" UserName="UX Device HS" RemoveCondition="DIE482 |DIE423 | DIE463 | DIE441 | DIE431 | DIE461 | !USB_OTG_HS_Exist">
 			<ModeLogicOperator Name="OR">
@@ -967,7 +971,7 @@
 					</ModeLogicOperator>
 				</Mode>
 			</ModeLogicOperator>
-			<Condition Expression="SEMAOoUSBOoOTGOoHSOoDEVICEOoFOROoUSBX" Diagnostic="Active only when USB_OTG_HS IP is configured in device mode"/>
+			<Condition Expression="SEMAOoUSBOoOTGOoHSOoDEVICEOoFOROoUSBX | SEMAOoUSBOoOTGOoHSOoDRDOoFOROoUSBX" Diagnostic="Active only when USB_OTG_HS IP is configured in device mode or DRD mode"/>
 		</Mode>			
 	
 		<Mode Name="Host_Class_FS" UserName="UX Host FS" RemoveCondition="DIE483 | !USB_OTG_FS_Exist">
@@ -1004,7 +1008,7 @@
 										<Signal Name="UX Host MSC_FS"/>
 									</SignalLogicalOp>
 									<Semaphore>SEMUSBXCcUSBJjUSBXJjUXOoHostOoClassOoSTORAGE_FS</Semaphore>
-									<Condition Expression="SEMUSBXCcUSBJjUSBXJjUXOoHostOoCoreStackJjRTOSIiMODE_FS &amp; SEMFileXCcFileOoSystemJjFileXJjCoreJjRTOSIiMODE" 
+									<Condition Expression="SEMUSBXCcUSBJjUSBXJjUXOoHostOoCoreStackJjRTOSIiMODE_FS &amp; SEMFileXCcFileOoSystemJjFileXJjCore" 
 									Diagnostic="&lt;b&gt; Requires: &lt;/b&gt; &lt;br&gt; Middleware:USBX:Host CoreStack FS &lt;br&gt; Middleware:FILEX:FileX Core" />
 								</Mode>
 							</ModeLogicOperator>
@@ -1320,6 +1324,7 @@
 			<Condition Expression="SEMAOoUSBOoOTGOoFSOoDEVICEOoFOROoUSBX | SEMAOoUSBOoOTGOoFSOoDRDOoFOROoUSBX" Diagnostic="Active only when USB_OTG_FS IP is configured in device mode or DRD mode"/>
 		</Mode>		
 	</ModeLogicOperator>
+	<Condition Expression="SEMThreadXCcRTOSJjThreadXJjCore" Diagnostic="&lt;b&gt; Require: &lt;/b&gt; Middleware:THREADX:Core"/>
 	
 	<RefSignal Name="Core_System" Virtual="true"/>
 	<RefSignal Name="TraceX_Support" Virtual="true"/>
@@ -1388,28 +1393,38 @@
 		<Condition Diagnostic="Active only when TX_ENABLE_EVENT_TRACE is enabled" Expression="ThreadX:TX_ENABLE_EVENT_TRACE = 0"/>
 		<PossibleValue Comment="Disabled" Value="0"/>		
     </RefParameter>
-	
 	<RefParameter Added="true" Comment="UX_TRACE_INSERT_MACROS" DefaultValue="1" Group="TraceX" Name="UX_TRACE_INSERT_MACROS" TabName="USBX" Type="uniqueElementList">
         <Description>Determine if tracing is enabled.</Description>
 		<Condition Diagnostic="Active only when TX_ENABLE_EVENT_TRACE is enabled" Expression="ThreadX:TX_ENABLE_EVENT_TRACE = 1"/>
 		<PossibleValue Comment="Enabled" Value="1"/>		
     </RefParameter>
 	   
-	<RefParameter Added="true" Comment="UX_THREAD_STACK_SIZE" DefaultValue="2048" Group="Host Core" Max="65535" Min="0" Name="UX_THREAD_STACK_SIZE" TabName="USBX" Type="integer" Unit="Bytes">
+	<RefParameter Added="true" Comment="UX_DEVICE_BIDIRECTIONAL_ENDPOINT_SUPPORT" DefaultValue="1" Group="Device Core" Name="UX_DEVICE_BIDIRECTIONAL_ENDPOINT_SUPPORT" TabName="USBX" Type="list">
+        <Description>Enable device bi-directional endpoint support.</Description>
+        <PossibleValue Comment="Disabled" Value="0"/>
+        <PossibleValue Comment="Enabled" Value="1"/>
+    </RefParameter>
+	<RefParameter Added="true" Comment="UX_DEVICE_CLASS_CDC_ACM_TRANSMISSION_DISABLE" DefaultValue="1" Group="Device Class CDC ACM" Name="UX_DEVICE_CLASS_CDC_ACM_TRANSMISSION_DISABLE" TabName="USBX" Type="list">
+        <Description>disable CDC ACM non-blocking transmission support.</Description>
+        <PossibleValue Comment="Disabled" Value="0"/>
+        <PossibleValue Comment="Enabled" Value="1"/>
+    </RefParameter>
+	
+	<RefParameter Added="true" Comment="UX_THREAD_STACK_SIZE" DefaultValue="2048" Group="Host Core" Max="65535" Min="ThreadX:TX_MINIMUM_STACK" Name="UX_THREAD_STACK_SIZE" TabName="USBX" Type="integer" Unit="Bytes">
         <Description>This value is the size of the stack in bytes for the USBX threads.It can be typically 1024 or 2048 bytes depending on the processor used and the host controller.&#65533;</Description>
-		<ValueCondition Diagnostic="UX_THREAD_STACK_SIZE must be greater than TX_MINIMUM_STACK" Expression="Value  &gt; ( ThreadX:TX_MINIMUM_STACK + 1 )"/>
+		<ValueCondition Diagnostic="UX_THREAD_STACK_SIZE must be greater than TX_MINIMUM_STACK" Expression="Value  &gt; ( ThreadX:TX_MINIMUM_STACK - 1 )"/>
     </RefParameter>
     <RefParameter Added="true" Comment="UX_HOST_ENUM_THREAD_STACK_SIZE" DefaultValue="2048" Group="Host Core" Max="65535" Min="ThreadX:TX_MINIMUM_STACK" Name="UX_HOST_ENUM_THREAD_STACK_SIZE" TabName="USBX" Type="integer" Unit="Bytes">
         <Description>Define USBX Host Enum Thread Stack Size</Description>
-        <ValueCondition Diagnostic="UX_HOST_ENUM_THREAD_STACK_SIZE must be less than UX_THREAD_STACK_SIZE AND greater than TX_MINIMUM_STACK" Expression="Value  &lt; ( UX_THREAD_STACK_SIZE + 1 ) &amp; (Value  &gt; ThreadX:TX_MINIMUM_STACK)"/>
+        <ValueCondition Diagnostic="UX_HOST_ENUM_THREAD_STACK_SIZE must be less than UX_THREAD_STACK_SIZE AND greater than TX_MINIMUM_STACK" Expression="Value  &lt; ( UX_THREAD_STACK_SIZE + 1 ) &amp; (Value  &gt; ThreadX:TX_MINIMUM_STACK-1)"/>
     </RefParameter>
-    <RefParameter Added="true" Comment="UX_HOST_HCD_THREAD_STACK_SIZE" DefaultValue="2048" Group="Host Core" Max="65535" Min="0" Name="UX_HOST_HCD_THREAD_STACK_SIZE" TabName="USBX" Type="integer" Unit="Bytes">
+    <RefParameter Added="true" Comment="UX_HOST_HCD_THREAD_STACK_SIZE" DefaultValue="2048" Group="Host Core" Max="65535" Min="ThreadX:TX_MINIMUM_STACK" Name="UX_HOST_HCD_THREAD_STACK_SIZE" TabName="USBX" Type="integer" Unit="Bytes">
         <Description>Define USBX Host Thread Stack Size</Description>
-        <ValueCondition Diagnostic="UX_HOST_HCD_THREAD_STACK_SIZE must be less than UX_THREAD_STACK_SIZE AND greater than TX_MINIMUM_STACK" Expression="Value  &lt; ( UX_THREAD_STACK_SIZE + 1 ) &amp; (Value  &gt; ThreadX:TX_MINIMUM_STACK)"/>
+        <ValueCondition Diagnostic="UX_HOST_HCD_THREAD_STACK_SIZE must be less than UX_THREAD_STACK_SIZE AND greater than TX_MINIMUM_STACK" Expression="Value  &lt; ( UX_THREAD_STACK_SIZE + 1 ) &amp; (Value  &gt; ThreadX:TX_MINIMUM_STACK-1)"/>
     </RefParameter>
-    <RefParameter Added="true" Comment="UX_HOST_HNP_POLLING_THREAD_STACK" DefaultValue="2048" Group="Host Core" Max="65535" Min="0" Name="UX_HOST_HNP_POLLING_THREAD_STACK" TabName="USBX" Type="integer" Unit="Bytes">
+    <RefParameter Added="true" Comment="UX_HOST_HNP_POLLING_THREAD_STACK" DefaultValue="2048" Group="Host Core" Max="65535" Min="ThreadX:TX_MINIMUM_STACK" Name="UX_HOST_HNP_POLLING_THREAD_STACK" TabName="USBX" Type="integer" Unit="Bytes">
         <Description>Define USBX Host HNP Polling Thread Stack Size</Description>
-        <ValueCondition Diagnostic="UX_HOST_HNP_POLLING_THREAD_STACK must be less than UX_THREAD_STACK_SIZE AND greater than TX_MINIMUM_STACK" Expression="Value  &lt; ( UX_THREAD_STACK_SIZE + 1 ) &amp; (Value  &gt; ThreadX:TX_MINIMUM_STACK)"/>
+        <ValueCondition Diagnostic="UX_HOST_HNP_POLLING_THREAD_STACK must be less than UX_THREAD_STACK_SIZE AND greater than TX_MINIMUM_STACK" Expression="Value  &lt; ( UX_THREAD_STACK_SIZE + 1 ) &amp; (Value  &gt; ThreadX:TX_MINIMUM_STACK-1)"/>
     </RefParameter>
     <RefParameter Added="true" Comment="UX_MAX_HCD" DefaultValue="1" Group="Host Core" Name="UX_MAX_HCD" TabName="USBX" Type="list">
         <Description>This value represents the number of different host controllers available in the system. 
@@ -1427,9 +1442,9 @@
     <RefParameter Added="true" Comment="UX_HOST_CLASS_STORAGE_MEMORY_BUFFER_SIZE" DefaultValue="8192" Group="Host Class STORAGE" Max="65535" Min="0" Name="UX_HOST_CLASS_STORAGE_MEMORY_BUFFER_SIZE" TabName="USBX" Type="integer" Unit="">
         <Description>This value represents the maximum number of bytes that a storage payload can send/receive.</Description>
     </RefParameter>
-    <RefParameter Added="true" Comment="UX_HOST_CLASS_STORAGE_THREAD_STACK_SIZE" DefaultValue="2048" Group="Host Class STORAGE" Max="65535" Min="0" Name="UX_HOST_CLASS_STORAGE_THREAD_STACK_SIZE" TabName="USBX" Type="integer" Unit="Bytes">
+    <RefParameter Added="true" Comment="UX_HOST_CLASS_STORAGE_THREAD_STACK_SIZE" DefaultValue="2048" Group="Host Class STORAGE" Max="65535" Min="ThreadX:TX_MINIMUM_STACK" Name="UX_HOST_CLASS_STORAGE_THREAD_STACK_SIZE" TabName="USBX" Type="integer" Unit="Bytes">
         <Description>USBX Mass Storage Thread Stack Size</Description>
-        <ValueCondition Diagnostic="UX_HOST_CLASS_STORAGE_THREAD_STACK_SIZE must be less than UX_THREAD_STACK_SIZE AND greater than TX_MINIMUM_STACK" Expression="Value  &lt; ( UX_THREAD_STACK_SIZE + 1 ) &amp; (Value  &gt; ThreadX:TX_MINIMUM_STACK)"/>
+        <ValueCondition Diagnostic="UX_HOST_CLASS_STORAGE_THREAD_STACK_SIZE must be less than UX_THREAD_STACK_SIZE AND greater than TX_MINIMUM_STACK" Expression="Value  &lt; ( UX_THREAD_STACK_SIZE + 1 ) &amp; (Value  &gt; ThreadX:TX_MINIMUM_STACK-1)"/>
     </RefParameter>
     <RefParameter Added="true" Comment="UX_MAX_ED" DefaultValue="80" Group="Host Controller" Max="255" Min="0" Name="UX_MAX_ED" TabName="USBX" Type="integer" Unit="">
         <Description>This value represents the maximum number of EDs in the controller pool. This number is assigned to one controller only. If multiple instances of controllers are present, this value is used by each individual controller</Description>
@@ -1530,7 +1545,7 @@ Note that this value represents the total number of devices regardless of the nu
     <RefParameter Added="true" Comment="UX_SLAVE_REQUEST_CONTROL_MAX_LENGTH" DefaultValue="256" Group="Device Core" Max="65535" Min="64" Name="UX_SLAVE_REQUEST_CONTROL_MAX_LENGTH" TabName="USBX" Type="integer" Unit="">
         <Description>This value represents the maximum number of bytes received on a control endpoint in the device stack</Description>
     </RefParameter>
-    <RefParameter Added="true" Comment="UX_SLAVE_REQUEST_DATA_MAX_LENGTH" DefaultValue="4096" Group="Device Core" Max="65535" Min="2048" Name="UX_SLAVE_REQUEST_DATA_MAX_LENGTH" TabName="USBX" Type="integer" Unit="">
+    <RefParameter Added="true" Comment="UX_SLAVE_REQUEST_DATA_MAX_LENGTH" DefaultValue="2048" Group="Device Core" Max="65535" Min="64" Name="UX_SLAVE_REQUEST_DATA_MAX_LENGTH" TabName="USBX" Type="integer" Unit="">
         <Description>This value represents the maximum number of bytes that can be received or transmitted on any endpoint. This value cannot be less than the maximum packet size of any endpoint.</Description>
     </RefParameter>
     <RefParameter Added="true" Comment="UX_SLAVE_CLASS_STORAGE_INCLUDE_MMC" DefaultValue="0" Group="Device Class STORAGE" Name="UX_SLAVE_CLASS_STORAGE_INCLUDE_MMC" TabName="USBX" Type="list">
@@ -1578,17 +1593,56 @@ Note that this value represents the total number of devices regardless of the nu
     <RefParameter Added="true" Comment="UX_MAX_TT" DefaultValue="8" Group="Host Core" Max="255" Min="1" Name="UX_MAX_TT" TabName="USBX" Type="integer" Unit="">
         <Description>Define USBX max TT.</Description>
     </RefParameter>
-    <RefParameter Added="true" Comment="USBX version" DefaultValue="6.1.7" Group="Version" Name="USBX_Version" TabName="USBX" Type="string">
+	<RefParameter Added="true" Comment="USBX version" DefaultValue="6.1.9" Group="Version" Name="USBX_Version" TabName="USBX" Type="string">
         <Description>USBX version</Description>
     </RefParameter>
-    <RefParameter Added="true" Comment="USBD_MSC_ENDPOINT_IN_ADDR" DefaultValue="1" Group="Device Class STORAGE" Max="9" Min="1" Name="USBD_MSC_EPIN_ADDR" TabName="USBX" Type="integer" Unit="">
+    <RefParameter Added="true" Comment="USBD_MSC_ENDPOINT_IN_ADDR" DefaultValue="1" Group="Device Class STORAGE" Max="5" Min="1" Name="USBD_MSC_EPIN_ADDR" TabName="USBX" Type="integer" Unit="">
+        <Description>this the device storage endpoint in address, &lt;font color=&quot;red&quot;&gt;make sure to have a unique address for the same class and alongside other device classes.&lt;/font&gt;</Description>
+		<Condition Diagnostic="" Expression="UX_DEVICE_BIDIRECTIONAL_ENDPOINT_SUPPORT = 0 &amp; DIE482"/>
+    </RefParameter>
+    <RefParameter Added="true" Comment="USBD_MSC_ENDPOINT_IN_ADDR" DefaultValue="1" Group="Device Class STORAGE" Max="5" Min="1" Name="USBD_MSC_EPIN_ADDR" TabName="USBX" Type="integer" Unit="">
         <Description>this the device storage endpoint in address, &lt;font color=&quot;red&quot;&gt;make sure to have a unique address when used alongside other device classes.&lt;/font&gt;</Description>
+		<Condition Diagnostic="" Expression="UX_DEVICE_BIDIRECTIONAL_ENDPOINT_SUPPORT = 1 &amp; DIE482"/>
     </RefParameter>
-    <RefParameter Added="true" Comment="USBD_MSC_ENDPOINT_OUT_ADDR" DefaultValue="2" Group="Device Class STORAGE" Max="9" Min="1" Name="USBD_MSC_EPOUT_ADDR" TabName="USBX" Type="integer" Unit="">
+	<RefParameter Added="true" Comment="USBD_MSC_ENDPOINT_IN_ADDR" DefaultValue="1" Group="Device Class STORAGE" Max="8" Min="1" Name="USBD_MSC_EPIN_ADDR" TabName="USBX" Type="integer" Unit="">
+        <Description>this the device storage endpoint in address, &lt;font color=&quot;red&quot;&gt;make sure to have a unique address for the same class and alongside other device classes.&lt;/font&gt;</Description>
+		<Condition Diagnostic="" Expression="UX_DEVICE_BIDIRECTIONAL_ENDPOINT_SUPPORT = 0 &amp; DIE481"/>
+    </RefParameter>
+    <RefParameter Added="true" Comment="USBD_MSC_ENDPOINT_IN_ADDR" DefaultValue="1" Group="Device Class STORAGE" Max="8" Min="1" Name="USBD_MSC_EPIN_ADDR" TabName="USBX" Type="integer" Unit="">
+        <Description>this the device storage endpoint in address, &lt;font color=&quot;red&quot;&gt;make sure to have a unique address when used alongside other device classes.&lt;/font&gt;</Description>
+		<Condition Diagnostic="" Expression="UX_DEVICE_BIDIRECTIONAL_ENDPOINT_SUPPORT = 1 &amp; DIE481"/>
+    </RefParameter>
+    <RefParameter Added="true" Comment="USBD_MSC_ENDPOINT_OUT_ADDR" DefaultValue="2" Group="Device Class STORAGE" Max="5" Min="1" Name="USBD_MSC_EPOUT_ADDR" TabName="USBX" Type="integer" Unit="">
+        <Description>this the device storage endpoint out address, &lt;font color=&quot;red&quot;&gt;make sure to have a unique address for the same class and alongside other device classes.&lt;/font&gt;</Description>
+		<Condition Diagnostic="" Expression="UX_DEVICE_BIDIRECTIONAL_ENDPOINT_SUPPORT = 0 &amp; DIE482"/>
+    </RefParameter>
+	<RefParameter Added="true" Comment="USBD_MSC_ENDPOINT_OUT_ADDR" DefaultValue="2" Group="Device Class STORAGE" Max="5" Min="1" Name="USBD_MSC_EPOUT_ADDR" TabName="USBX" Type="integer" Unit="">
         <Description>this the device storage endpoint out address, &lt;font color=&quot;red&quot;&gt;make sure to have a unique address when used alongside other device classes.&lt;/font&gt;</Description>
+		<Condition Diagnostic="" Expression="UX_DEVICE_BIDIRECTIONAL_ENDPOINT_SUPPORT = 1 &amp; DIE482"/>
     </RefParameter>
-    <RefParameter Added="true" Comment="USBD_HID_ENDPOINT_IN_ADDRESS" DefaultValue="1" Group="Device Class HID" Max="9" Min="1" Name="USBD_HID_EPIN_ADDR" TabName="USBX" Type="integer" Unit="">
-        <Description>this the device HID endpoint in address, make sure to have a unique address when used alongside other device classes.</Description>
+	<RefParameter Added="true" Comment="USBD_MSC_ENDPOINT_OUT_ADDR" DefaultValue="2" Group="Device Class STORAGE" Max="8" Min="1" Name="USBD_MSC_EPOUT_ADDR" TabName="USBX" Type="integer" Unit="">
+        <Description>this the device storage endpoint out address, &lt;font color=&quot;red&quot;&gt;make sure to have a unique address for the same class and alongside other device classes.&lt;/font&gt;</Description>
+		<Condition Diagnostic="" Expression="UX_DEVICE_BIDIRECTIONAL_ENDPOINT_SUPPORT = 0 &amp; DIE481"/>
+    </RefParameter>
+	<RefParameter Added="true" Comment="USBD_MSC_ENDPOINT_OUT_ADDR" DefaultValue="2" Group="Device Class STORAGE" Max="8" Min="1" Name="USBD_MSC_EPOUT_ADDR" TabName="USBX" Type="integer" Unit="">
+        <Description>this the device storage endpoint out address, &lt;font color=&quot;red&quot;&gt;make sure to have a unique address when used alongside other device classes.&lt;/font&gt;</Description>
+		<Condition Diagnostic="" Expression="UX_DEVICE_BIDIRECTIONAL_ENDPOINT_SUPPORT = 1 &amp; DIE481"/>
+    </RefParameter>
+    <RefParameter Added="true" Comment="USBD_HID_ENDPOINT_IN_ADDRESS" DefaultValue="1" Group="Device Class HID" Max="5" Min="1" Name="USBD_HID_EPIN_ADDR" TabName="USBX" Type="integer" Unit="">
+        <Description>this the device HID endpoint in address, &lt;font color=&quot;red&quot;&gt;make sure to have a unique address when used alongside other device classes.&lt;/font&gt;</Description>
+		<Condition Diagnostic="" Expression="UX_DEVICE_BIDIRECTIONAL_ENDPOINT_SUPPORT = 1 &amp; DIE482"/>
+    </RefParameter>
+	<RefParameter Added="true" Comment="USBD_HID_ENDPOINT_IN_ADDRESS" DefaultValue="1" Group="Device Class HID" Max="5" Min="1" Name="USBD_HID_EPIN_ADDR" TabName="USBX" Type="integer" Unit="">
+        <Description>this the device HID endpoint in address, &lt;font color=&quot;red&quot;&gt;make sure to have a unique address for the same class and alongside other device classes.&lt;/font&gt;</Description>
+		<Condition Diagnostic="" Expression="UX_DEVICE_BIDIRECTIONAL_ENDPOINT_SUPPORT = 0 &amp; DIE482"/>
+    </RefParameter>
+	<RefParameter Added="true" Comment="USBD_HID_ENDPOINT_IN_ADDRESS" DefaultValue="1" Group="Device Class HID" Max="8" Min="1" Name="USBD_HID_EPIN_ADDR" TabName="USBX" Type="integer" Unit="">
+        <Description>this the device HID endpoint in address, &lt;font color=&quot;red&quot;&gt;make sure to have a unique address when used alongside other device classes.&lt;/font&gt;</Description>
+		<Condition Diagnostic="" Expression="UX_DEVICE_BIDIRECTIONAL_ENDPOINT_SUPPORT = 1 &amp; DIE481"/>
+    </RefParameter>
+	<RefParameter Added="true" Comment="USBD_HID_ENDPOINT_IN_ADDRESS" DefaultValue="1" Group="Device Class HID" Max="8" Min="1" Name="USBD_HID_EPIN_ADDR" TabName="USBX" Type="integer" Unit="">
+        <Description>this the device HID endpoint in address, &lt;font color=&quot;red&quot;&gt;make sure to have a unique address for the same class and alongside other device classes.&lt;/font&gt;</Description>
+		<Condition Diagnostic="" Expression="UX_DEVICE_BIDIRECTIONAL_ENDPOINT_SUPPORT = 0 &amp; DIE481"/>
     </RefParameter>
     <RefParameter Added="true" Comment="USBD_MSC_ENDPOINT_OUT_FS_MPS" DefaultValue="64" Group="Device Class STORAGE" Name="USBD_MSC_EPOUT_FS_MPS" TabName="USBX" Type="string">
         <Description>Device storage class endpoint out_FS Max Packet Size</Description>
@@ -1689,8 +1743,21 @@ simple mode disabled: status is queried from application once requested, (bwPoll
     <RefParameter Added="true" Comment="USBD_HID_ENDPOINT_IN_HS_BINTERVAL" DefaultValue="5" Group="Device Class HID" Max="16" Min="1" Name="USBD_HID_EPIN_HS_BINTERVAL" TabName="USBX" Type="integer" Unit="">
         <Description>Device HID class endpoint in_HS BINERVAL</Description>
     </RefParameter>
-    <RefParameter Added="true" Comment="USBD_CDCACM_ENDPOINT_IN_CMD_ADDR" DefaultValue="1" Group="Device Class CDC ACM" Max="9" Min="1" Name="USBD_CDCACM_EPINCMD_ADDR" TabName="USBX" Type="integer" Unit="">
-        <Description>Device CDC ACM class command endpoint in  Address, &lt;font color=&quot;red&quot;&gt;should have a unique value when used alongside other device classes.&lt;/font&gt;</Description>
+    <RefParameter Added="true" Comment="USBD_CDCACM_ENDPOINT_IN_CMD_ADDR" DefaultValue="1" Group="Device Class CDC ACM" Max="5" Min="1" Name="USBD_CDCACM_EPINCMD_ADDR" TabName="USBX" Type="integer" Unit="">
+        <Description>Device CDC ACM class command endpoint in  Address, &lt;font color=&quot;red&quot;&gt;make sure to have a unique address when used alongside other device classes.&lt;/font&gt;</Description>
+		<Condition Diagnostic="" Expression="UX_DEVICE_BIDIRECTIONAL_ENDPOINT_SUPPORT = 1 &amp; DIE482"/>
+    </RefParameter>
+	<RefParameter Added="true" Comment="USBD_CDCACM_ENDPOINT_IN_CMD_ADDR" DefaultValue="1" Group="Device Class CDC ACM" Max="5" Min="1" Name="USBD_CDCACM_EPINCMD_ADDR" TabName="USBX" Type="integer" Unit="">
+        <Description>Device CDC ACM class command endpoint in  Address, &lt;font color=&quot;red&quot;&gt;make sure to have a unique address for the same class and alongside other device classes.&lt;/font&gt;</Description>
+		<Condition Diagnostic="" Expression="UX_DEVICE_BIDIRECTIONAL_ENDPOINT_SUPPORT = 0 &amp; DIE482"/>
+    </RefParameter>
+	<RefParameter Added="true" Comment="USBD_CDCACM_ENDPOINT_IN_CMD_ADDR" DefaultValue="1" Group="Device Class CDC ACM" Max="8" Min="1" Name="USBD_CDCACM_EPINCMD_ADDR" TabName="USBX" Type="integer" Unit="">
+        <Description>Device CDC ACM class command endpoint in  Address, &lt;font color=&quot;red&quot;&gt;make sure to have a unique address when used alongside other device classes.&lt;/font&gt;</Description>
+		<Condition Diagnostic="" Expression="UX_DEVICE_BIDIRECTIONAL_ENDPOINT_SUPPORT = 1 &amp; DIE481"/>
+    </RefParameter>
+	<RefParameter Added="true" Comment="USBD_CDCACM_ENDPOINT_IN_CMD_ADDR" DefaultValue="1" Group="Device Class CDC ACM" Max="8" Min="1" Name="USBD_CDCACM_EPINCMD_ADDR" TabName="USBX" Type="integer" Unit="">
+        <Description>Device CDC ACM class command endpoint in  Address, &lt;font color=&quot;red&quot;&gt;make sure to have a unique address for the same class and alongside other device classes.&lt;/font&gt;</Description>
+		<Condition Diagnostic="" Expression="UX_DEVICE_BIDIRECTIONAL_ENDPOINT_SUPPORT = 0 &amp; DIE481"/>
     </RefParameter>
     <RefParameter Added="true" Comment="USBD_CDCACM_ENDPOINT_IN_CMD_HS_MPS" DefaultValue="8" Group="Device Class CDC ACM" Max="64" Min="1" Name="USBD_CDCACM_EPINCMD_HS_MPS" TabName="USBX" Type="integer" Unit="">
         <Description>Device CDC ACM class endpoint_HS max packet size</Description>
@@ -1698,14 +1765,40 @@ simple mode disabled: status is queried from application once requested, (bwPoll
     <RefParameter Added="true" Comment="USBD_CDCACM_ENDPOINT_IN_CMD_HS_BINTERVAL" DefaultValue="5" Group="Device Class CDC ACM" Max="255" Min="1" Name="USBD_CDCACM_EPINCMD_HS_BINTERVAL" TabName="USBX" Type="integer" Unit="">
         <Description>Device HID class endpoint cmd in_HS BINERVAL</Description>
     </RefParameter>
-    <RefParameter Added="true" Comment="USBD_CDCACM_ENDPOINT_IN_ADDR" DefaultValue="3" Group="Device Class CDC ACM" Max="9" Min="1" Name="USBD_CDCACM_EPIN_ADDR" TabName="USBX" Type="integer" Unit="">
-        <Description>Device CDC-ACM endpoint in address, &lt;font color=&quot;red&quot;&gt;should have a unique address when used alongside other device classes.&lt;/font&gt;</Description>
+    <RefParameter Added="true" Comment="USBD_CDCACM_ENDPOINT_IN_ADDR" DefaultValue="3" Group="Device Class CDC ACM" Max="5" Min="1" Name="USBD_CDCACM_EPIN_ADDR" TabName="USBX" Type="integer" Unit="">
+        <Description>Device CDC-ACM endpoint in address, &lt;font color=&quot;red&quot;&gt;make sure to have a unique address when used alongside other device classes.&lt;/font&gt;</Description>
+		<Condition Diagnostic="" Expression="UX_DEVICE_BIDIRECTIONAL_ENDPOINT_SUPPORT = 1 &amp; DIE482"/>
+    </RefParameter>
+	<RefParameter Added="true" Comment="USBD_CDCACM_ENDPOINT_IN_ADDR" DefaultValue="3" Group="Device Class CDC ACM" Max="5" Min="1" Name="USBD_CDCACM_EPIN_ADDR" TabName="USBX" Type="integer" Unit="">
+        <Description>Device CDC-ACM endpoint in address, &lt;font color=&quot;red&quot;&gt;make sure to have a unique address for the same class and alongside other device classes.&lt;/font&gt;</Description>
+		<Condition Diagnostic="" Expression="UX_DEVICE_BIDIRECTIONAL_ENDPOINT_SUPPORT = 0 &amp; DIE482"/>
+    </RefParameter>
+	<RefParameter Added="true" Comment="USBD_CDCACM_ENDPOINT_IN_ADDR" DefaultValue="3" Group="Device Class CDC ACM" Max="8" Min="1" Name="USBD_CDCACM_EPIN_ADDR" TabName="USBX" Type="integer" Unit="">
+        <Description>Device CDC-ACM endpoint in address, &lt;font color=&quot;red&quot;&gt;make sure to have a unique address when used alongside other device classes.&lt;/font&gt;</Description>
+		<Condition Diagnostic="" Expression="UX_DEVICE_BIDIRECTIONAL_ENDPOINT_SUPPORT = 1 &amp; DIE481"/>
+    </RefParameter>
+	<RefParameter Added="true" Comment="USBD_CDCACM_ENDPOINT_IN_ADDR" DefaultValue="3" Group="Device Class CDC ACM" Max="8" Min="1" Name="USBD_CDCACM_EPIN_ADDR" TabName="USBX" Type="integer" Unit="">
+        <Description>Device CDC-ACM endpoint in address, &lt;font color=&quot;red&quot;&gt;make sure to have a unique address for the same class and alongside other device classes.&lt;/font&gt;</Description>
+		<Condition Diagnostic="" Expression="UX_DEVICE_BIDIRECTIONAL_ENDPOINT_SUPPORT = 0 &amp; DIE481"/>
     </RefParameter>
     <RefParameter Added="true" Comment="USBD_CDCACM_ENDPOINT_IN_HS_MPS" DefaultValue="512" Group="Device Class CDC ACM" Max="512" Min="1" Name="USBD_CDCACM_EPIN_HS_MPS" TabName="USBX" Type="integer" Unit="">
         <Description>Device CDC ACM class endpoint in _HS max packet size</Description>
     </RefParameter>
-    <RefParameter Added="true" Comment="USBD_CDCACM_ENDPOINT_OUT_ADDR" DefaultValue="1" Group="Device Class CDC ACM" Max="9" Min="1" Name="USBD_CDCACM_EPOUT_ADDR" TabName="USBX" Type="integer" Unit="">
-        <Description>Device CDC-ACM endpoint out address, &lt;font color=&quot;red&quot;&gt;should have a unique address when used alongside other device classes.&lt;/font&gt;</Description>
+    <RefParameter Added="true" Comment="USBD_CDCACM_ENDPOINT_OUT_ADDR" DefaultValue="1" Group="Device Class CDC ACM" Max="5" Min="1" Name="USBD_CDCACM_EPOUT_ADDR" TabName="USBX" Type="integer" Unit="">
+        <Description>Device CDC-ACM endpoint out address, &lt;font color=&quot;red&quot;&gt;make sure to have a unique address when used alongside other device classes.&lt;/font&gt;</Description>
+		<Condition Diagnostic="" Expression="UX_DEVICE_BIDIRECTIONAL_ENDPOINT_SUPPORT = 1 &amp; DIE482"/>
+    </RefParameter>
+	<RefParameter Added="true" Comment="USBD_CDCACM_ENDPOINT_OUT_ADDR" DefaultValue="1" Group="Device Class CDC ACM" Max="5" Min="1" Name="USBD_CDCACM_EPOUT_ADDR" TabName="USBX" Type="integer" Unit="">
+        <Description>Device CDC-ACM endpoint out address, &lt;font color=&quot;red&quot;&gt;make sure to have a unique address for the same class and alongside other device classes.&lt;/font&gt;</Description>
+		<Condition Diagnostic="" Expression="UX_DEVICE_BIDIRECTIONAL_ENDPOINT_SUPPORT = 0 &amp; DIE482"/>
+    </RefParameter>
+	<RefParameter Added="true" Comment="USBD_CDCACM_ENDPOINT_OUT_ADDR" DefaultValue="1" Group="Device Class CDC ACM" Max="8" Min="1" Name="USBD_CDCACM_EPOUT_ADDR" TabName="USBX" Type="integer" Unit="">
+        <Description>Device CDC-ACM endpoint out address, &lt;font color=&quot;red&quot;&gt;make sure to have a unique address when used alongside other device classes.&lt;/font&gt;</Description>
+		<Condition Diagnostic="" Expression="UX_DEVICE_BIDIRECTIONAL_ENDPOINT_SUPPORT = 1 &amp; DIE481"/>
+    </RefParameter>
+	<RefParameter Added="true" Comment="USBD_CDCACM_ENDPOINT_OUT_ADDR" DefaultValue="1" Group="Device Class CDC ACM" Max="8" Min="1" Name="USBD_CDCACM_EPOUT_ADDR" TabName="USBX" Type="integer" Unit="">
+        <Description>Device CDC-ACM endpoint out address, &lt;font color=&quot;red&quot;&gt;make sure to have a unique address for the same class and alongside other device classes.&lt;/font&gt;</Description>
+		<Condition Diagnostic="" Expression="UX_DEVICE_BIDIRECTIONAL_ENDPOINT_SUPPORT = 0 &amp; DIE481"/>
     </RefParameter>
     <RefParameter Added="true" Comment="USBD_CDCACM_ENDPOINT_OUT_HS_MPS" DefaultValue="512" Group="Device Class CDC ACM" Max="512" Min="1" Name="USBD_CDCACM_EPOUT_HS_MPS" TabName="USBX" Type="integer" Unit="">
         <Description>Device CDC ACM class endpoint out_HS max packet size</Description>
@@ -1870,8 +1963,21 @@ simple mode disabled: status is queried from application once requested, (bwPoll
     <RefParameter Added="true" Comment="USBD_CDCECM_ENDPOINT_IN_CMD_HS_MPS" DefaultValue="16" Group="Device Class CDC ECM" Max="512" Min="1" Name="USBD_CDCECM_EPINCMD_HS_MPS" TabName="USBX" Type="integer" Unit="">
         <Description>Device CDC ECM class endpoint out_HS max packet size</Description>
     </RefParameter>
-    <RefParameter Added="true" Comment="USBD_CDCECM_ENDPOINT_IN_CMD_ADDR" DefaultValue="1" Group="Device Class CDC ECM" Max="9" Min="1" Name="USBD_CDCECM_EPINCMD_ADDR" TabName="USBX" Type="integer" Unit="">
-        <Description>Device CDC ECM class command endpoint in  Address, &lt;font color=&quot;red&quot;&gt;should have a unique value when used alongside other device classes.&lt;/font&gt;</Description>
+    <RefParameter Added="true" Comment="USBD_CDCECM_ENDPOINT_IN_CMD_ADDR" DefaultValue="1" Group="Device Class CDC ECM" Max="5" Min="1" Name="USBD_CDCECM_EPINCMD_ADDR" TabName="USBX" Type="integer" Unit="">
+        <Description>Device CDC ECM class command endpoint in  Address, &lt;font color=&quot;red&quot;&gt;make sure to have a unique address when used alongside other device classes.&lt;/font&gt;</Description>
+		<Condition Diagnostic="" Expression="UX_DEVICE_BIDIRECTIONAL_ENDPOINT_SUPPORT = 1 &amp; DIE482"/>
+    </RefParameter>
+	<RefParameter Added="true" Comment="USBD_CDCECM_ENDPOINT_IN_CMD_ADDR" DefaultValue="1" Group="Device Class CDC ECM" Max="5" Min="1" Name="USBD_CDCECM_EPINCMD_ADDR" TabName="USBX" Type="integer" Unit="">
+        <Description>Device CDC ECM class command endpoint in  Address, &lt;font color=&quot;red&quot;&gt;make sure to have a unique address for the same class and alongside other device classes.&lt;/font&gt;</Description>
+		<Condition Diagnostic="" Expression="UX_DEVICE_BIDIRECTIONAL_ENDPOINT_SUPPORT = 0 &amp; DIE482"/>
+    </RefParameter>
+	<RefParameter Added="true" Comment="USBD_CDCECM_ENDPOINT_IN_CMD_ADDR" DefaultValue="1" Group="Device Class CDC ECM" Max="8" Min="1" Name="USBD_CDCECM_EPINCMD_ADDR" TabName="USBX" Type="integer" Unit="">
+        <Description>Device CDC ECM class command endpoint in  Address, &lt;font color=&quot;red&quot;&gt;make sure to have a unique address when used alongside other device classes.&lt;/font&gt;</Description>
+		<Condition Diagnostic="" Expression="UX_DEVICE_BIDIRECTIONAL_ENDPOINT_SUPPORT = 1 &amp; DIE481"/>
+    </RefParameter>
+	<RefParameter Added="true" Comment="USBD_CDCECM_ENDPOINT_IN_CMD_ADDR" DefaultValue="1" Group="Device Class CDC ECM" Max="8" Min="1" Name="USBD_CDCECM_EPINCMD_ADDR" TabName="USBX" Type="integer" Unit="">
+        <Description>Device CDC ECM class command endpoint in  Address, &lt;font color=&quot;red&quot;&gt;make sure to have a unique address for the same class and alongside other device classes.&lt;/font&gt;</Description>
+		<Condition Diagnostic="" Expression="UX_DEVICE_BIDIRECTIONAL_ENDPOINT_SUPPORT = 0 &amp; DIE481"/>
     </RefParameter>
     <RefParameter Added="true" Comment="USBD_CDCECM_ENDPOINT_IN_CMD_FS_MPS" DefaultValue="16" Group="Device Class CDC ECM" Max="64" Min="1" Name="USBD_CDCECM_EPINCMD_FS_MPS" TabName="USBX" Type="integer" Unit="">
         <Description>Device CDC ECM class endpoint in _FS max packet size</Description>
@@ -1879,8 +1985,21 @@ simple mode disabled: status is queried from application once requested, (bwPoll
     <RefParameter Added="true" Comment="USBD_CDCECM_ENDPOINT_OUT_HS_MPS" DefaultValue="512" Group="Device Class CDC ECM" Max="512" Min="1" Name="USBD_CDCECM_EPOUT_HS_MPS" TabName="USBX" Type="integer" Unit="">
         <Description>Device CDC ECM class endpoint out_HS max packet size</Description>
     </RefParameter>
-    <RefParameter Added="true" Comment="USBD_CDCECM_ENDPOINT_OUT_ADDR" DefaultValue="1" Group="Device Class CDC ECM" Max="9" Min="1" Name="USBD_CDCECM_EPOUT_ADDR" TabName="USBX" Type="integer" Unit="">
-        <Description>Device CDC-ECM endpoint out address, &lt;font color=&quot;red&quot;&gt;should have a unique address when used alongside other device classes.&lt;/font&gt;</Description>
+    <RefParameter Added="true" Comment="USBD_CDCECM_ENDPOINT_OUT_ADDR" DefaultValue="1" Group="Device Class CDC ECM" Max="5" Min="1" Name="USBD_CDCECM_EPOUT_ADDR" TabName="USBX" Type="integer" Unit="">
+        <Description>Device CDC-ECM endpoint out address, &lt;font color=&quot;red&quot;&gt;make sure to have a unique address when used alongside other device classes.&lt;/font&gt;</Description>
+		<Condition Diagnostic="" Expression="UX_DEVICE_BIDIRECTIONAL_ENDPOINT_SUPPORT = 1 &amp; DIE482"/>
+    </RefParameter>
+	<RefParameter Added="true" Comment="USBD_CDCECM_ENDPOINT_OUT_ADDR" DefaultValue="1" Group="Device Class CDC ECM" Max="5" Min="1" Name="USBD_CDCECM_EPOUT_ADDR" TabName="USBX" Type="integer" Unit="">
+        <Description>Device CDC-ECM endpoint out address, &lt;font color=&quot;red&quot;&gt;make sure to have a unique address for the same class and alongside other device classes.&lt;/font&gt;</Description>
+		<Condition Diagnostic="" Expression="UX_DEVICE_BIDIRECTIONAL_ENDPOINT_SUPPORT = 0 &amp; DIE482"/>
+    </RefParameter>
+	<RefParameter Added="true" Comment="USBD_CDCECM_ENDPOINT_OUT_ADDR" DefaultValue="1" Group="Device Class CDC ECM" Max="8" Min="1" Name="USBD_CDCECM_EPOUT_ADDR" TabName="USBX" Type="integer" Unit="">
+        <Description>Device CDC-ECM endpoint out address, &lt;font color=&quot;red&quot;&gt;make sure to have a unique address when used alongside other device classes.&lt;/font&gt;</Description>
+		<Condition Diagnostic="" Expression="UX_DEVICE_BIDIRECTIONAL_ENDPOINT_SUPPORT = 1 &amp; DIE481"/>
+    </RefParameter>
+	<RefParameter Added="true" Comment="USBD_CDCECM_ENDPOINT_OUT_ADDR" DefaultValue="1" Group="Device Class CDC ECM" Max="8" Min="1" Name="USBD_CDCECM_EPOUT_ADDR" TabName="USBX" Type="integer" Unit="">
+        <Description>Device CDC-ECM endpoint out address, &lt;font color=&quot;red&quot;&gt;make sure to have a unique address for the same class and alongside other device classes.&lt;/font&gt;</Description>
+		<Condition Diagnostic="" Expression="UX_DEVICE_BIDIRECTIONAL_ENDPOINT_SUPPORT = 0 &amp; DIE481"/>
     </RefParameter>
     <RefParameter Added="true" Comment="USBD_CDCECM_ENDPOINT_IN_HS_MPS" DefaultValue="512" Group="Device Class CDC ECM" Max="512" Min="1" Name="USBD_CDCECM_EPIN_HS_MPS" TabName="USBX" Type="integer" Unit="">
         <Description>Device CDC ECM class endpoint in _HS max packet size</Description>
@@ -1888,8 +2007,21 @@ simple mode disabled: status is queried from application once requested, (bwPoll
     <RefParameter Added="true" Comment="USBD_CDCECM_ENDPOINT_IN_CMD_HS_BINTERVAL" DefaultValue="16" Group="Device Class CDC ECM" Max="255" Min="1" Name="USBD_CDCECM_EPINCMD_HS_BINTERVAL" TabName="USBX" Type="integer" Unit="">
         <Description>Device CDC ECM class endpoint cmd in_HS BINERVAL</Description>
     </RefParameter>
-    <RefParameter Added="true" Comment="USBD_CDCECM_ENDPOINT_IN_ADDR" DefaultValue="3" Group="Device Class CDC ECM" Max="9" Min="1" Name="USBD_CDCECM_EPIN_ADDR" TabName="USBX" Type="integer" Unit="">
-        <Description>Device CDC-ECM endpoint in address, &lt;font color=&quot;red&quot;&gt;should have a unique address when used alongside other device classes.&lt;/font&gt;</Description>
+    <RefParameter Added="true" Comment="USBD_CDCECM_ENDPOINT_IN_ADDR" DefaultValue="3" Group="Device Class CDC ECM" Max="5" Min="1" Name="USBD_CDCECM_EPIN_ADDR" TabName="USBX" Type="integer" Unit="">
+        <Description>Device CDC-ECM endpoint in address, &lt;font color=&quot;red&quot;&gt;make sure to have a unique address when used alongside other device classes.&lt;/font&gt;</Description>
+		<Condition Diagnostic="" Expression="UX_DEVICE_BIDIRECTIONAL_ENDPOINT_SUPPORT = 1 &amp; DIE482"/>
+    </RefParameter>
+	<RefParameter Added="true" Comment="USBD_CDCECM_ENDPOINT_IN_ADDR" DefaultValue="3" Group="Device Class CDC ECM" Max="5" Min="1" Name="USBD_CDCECM_EPIN_ADDR" TabName="USBX" Type="integer" Unit="">
+        <Description>Device CDC-ECM endpoint in address, &lt;font color=&quot;red&quot;&gt;make sure to have a unique address for the same class and alongside other device classes.&lt;/font&gt;</Description>
+		<Condition Diagnostic="" Expression="UX_DEVICE_BIDIRECTIONAL_ENDPOINT_SUPPORT = 0 &amp; DIE482"/>
+    </RefParameter>
+	<RefParameter Added="true" Comment="USBD_CDCECM_ENDPOINT_IN_ADDR" DefaultValue="3" Group="Device Class CDC ECM" Max="8" Min="1" Name="USBD_CDCECM_EPIN_ADDR" TabName="USBX" Type="integer" Unit="">
+        <Description>Device CDC-ECM endpoint in address, &lt;font color=&quot;red&quot;&gt;make sure to have a unique address when used alongside other device classes.&lt;/font&gt;</Description>
+		<Condition Diagnostic="" Expression="UX_DEVICE_BIDIRECTIONAL_ENDPOINT_SUPPORT = 1 &amp; DIE481"/>
+    </RefParameter>
+	<RefParameter Added="true" Comment="USBD_CDCECM_ENDPOINT_IN_ADDR" DefaultValue="3" Group="Device Class CDC ECM" Max="8" Min="1" Name="USBD_CDCECM_EPIN_ADDR" TabName="USBX" Type="integer" Unit="">
+        <Description>Device CDC-ECM endpoint in address, &lt;font color=&quot;red&quot;&gt;make sure to have a unique address for the same class and alongside other device classes.&lt;/font&gt;</Description>
+		<Condition Diagnostic="" Expression="UX_DEVICE_BIDIRECTIONAL_ENDPOINT_SUPPORT = 0 &amp; DIE481"/>
     </RefParameter>
     <RefParameter Added="true" Comment="USBD_CDCECM_ENDPOINT_OUT_FS_MPS" DefaultValue="64" Group="Device Class CDC ECM" Max="64" Min="1" Name="USBD_CDCECM_EPOUT_FS_MPS" TabName="USBX" Type="integer" Unit="">
         <Description>Device CDC ECM class endpoint out_FS max packet size</Description>

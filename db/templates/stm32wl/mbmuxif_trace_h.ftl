@@ -87,4 +87,3 @@ void MBMUXIF_TraceSendNotif_NoWait(void);
 #endif
 
 #endif /*__MBMUXIF_TRACE_${CPUCORE}_H__ */
-

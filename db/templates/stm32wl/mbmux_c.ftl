@@ -55,7 +55,7 @@ static MBMUX_ComTable_t *p_MBMUX_ComTable;
 [#if CPUCORE == "CM4"]
 static FEAT_INFO_List_t *p_MBMUX_Cm0plusFeatureList = NULL;
 [#else]
-static MBMUX_MsgCbPointersTab_t MBMUX_MsgCbPointersTabCm0 UTIL_MEM_ALIGN(4) ;
+static MBMUX_MsgCbPointersTab_t MBMUX_MsgCbPointersTabCm0 UTIL_MEM_ALIGN(4);
 static FLASH_OBProgramInitTypeDef OptionsBytesStruct;
 static uint32_t unsecure_sram1_end;
 static uint32_t unsecure_sram2_end;
@@ -215,11 +215,11 @@ int8_t MBMUX_RegisterFeatureCallback(FEAT_INFO_IdTypeDef e_featID, MBMUX_ComType
   int8_t ret = -1;
 [/#if]
   uint8_t check_existing_feature_registration;
-  /* USER CODE BEGIN MBMUX_RegisterFeatureC_1 */
-
-  /* USER CODE END MBMUX_RegisterFeatureC_1 */
 
 [#if CPUCORE == "CM4"]
+  /* USER CODE BEGIN MBMUX_RegisterFeature_1 */
+
+  /* USER CODE END MBMUX_RegisterFeature_1 */
   if (e_featID == FEAT_INFO_SYSTEM_ID)
   {
     check_if_feature_provided_by_cm0plus = 1;
@@ -275,7 +275,13 @@ int8_t MBMUX_RegisterFeatureCallback(FEAT_INFO_IdTypeDef e_featID, MBMUX_ComType
     }
     ret = channel_idx;
   }
+  /* USER CODE BEGIN MBMUX_RegisterFeature_Last */
+
+  /* USER CODE END MBMUX_RegisterFeature_Last */
 [#else]
+  /* USER CODE BEGIN MBMUX_RegisterFeatureCallback_1 */
+
+  /* USER CODE END MBMUX_RegisterFeatureCallback_1 */
   check_existing_feature_registration = MBMUX_GetFeatureChIdx(e_featID, ComType);
 
   if (check_existing_feature_registration != MB_CHANNEL_NOT_REGISTERED)
@@ -296,10 +302,10 @@ int8_t MBMUX_RegisterFeatureCallback(FEAT_INFO_IdTypeDef e_featID, MBMUX_ComType
       ret = channel_idx;
     }
   }
-[/#if]
-  /* USER CODE BEGIN MBMUX_RegisterFeatureC_Last */
+  /* USER CODE BEGIN MBMUX_RegisterFeatureCallback_Last */
 
-  /* USER CODE END MBMUX_RegisterFeatureC_Last */
+  /* USER CODE END MBMUX_RegisterFeatureCallback_Last */
+[/#if]
   return ret;
 }
 

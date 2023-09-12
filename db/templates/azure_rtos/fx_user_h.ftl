@@ -123,24 +123,12 @@
       [#assign FX_MEDIA_STATISTICS_DISABLE_value = value]
     [/#if]
 
-    [#if name == "FX_NO_LOCAL_PATH"]
-      [#assign FX_NO_LOCAL_PATH_value = value]
-    [/#if]
-
-    [#if name == "FX_NO_TIMER"]
-      [#assign FX_NO_TIMER_value = value]
-    [/#if]
-
     [#if name == "FX_RENAME_PATH_INHERIT"]
       [#assign FX_RENAME_PATH_INHERIT_value = value]
     [/#if]
 
     [#if name == "FX_SINGLE_OPEN_LEGACY"]
       [#assign FX_SINGLE_OPEN_LEGACY_value = value]
-    [/#if]
-
-    [#if name == "FX_SINGLE_THREAD"]
-      [#assign FX_SINGLE_THREAD_value = value]
     [/#if]
 
     [#if name == "FX_UPDATE_RATE_IN_SECONDS"]
@@ -155,6 +143,55 @@
       [#assign ULONG_64_DEFINED_value = value]
     [/#if]
 
+	[#if name == "FX_STANDALONE_ENABLE"]
+      [#assign FX_STANDALONE_ENABLE_value = value]
+    [/#if]
+	
+	[#if name == "FX_SINGLE_THREAD"]
+      [#assign FX_SINGLE_THREAD_value = value]
+    [/#if]
+	
+	[#if name == "FX_NO_LOCAL_PATH"]
+      [#assign FX_NO_LOCAL_PATH_value = value]
+    [/#if]
+	
+	[#if name == "FX_NO_TIMER"]
+      [#assign FX_NO_TIMER_value = value]
+    [/#if]
+	
+	[#if name == "FX_DISABLE_CACHE"]
+      [#assign FX_DISABLE_CACHE_value = value]
+    [/#if]
+
+    [#if name == "FX_DISABLE_FILE_CLOSE"]
+      [#assign FX_DISABLE_FILE_CLOSE_value = value]
+    [/#if]
+
+    [#if name == "FX_DISABLE_FAST_OPEN"]
+      [#assign FX_DISABLE_FAST_OPEN_value = value]
+    [/#if]
+
+    [#if name == "FX_DISABLE_FORCE_MEMORY_OPERATION"]
+      [#assign FX_DISABLE_FORCE_MEMORY_OPERATION_value = value]
+    [/#if]
+
+    [#if name == "FX_DISABLE_BUILD_OPTIONS"]
+      [#assign FX_DISABLE_BUILD_OPTIONS_value = value]
+    [/#if]
+
+    [#if name == "FX_DISABLE_ONE_LINE_FUNCTION"]
+      [#assign FX_DISABLE_ONE_LINE_FUNCTION_value = value]
+    [/#if]
+
+    [#if name == "FX_DISABLE_FAT_ENTRY_REFRESH"]
+      [#assign FX_DISABLE_FAT_ENTRY_REFRESH_value = value]
+    [/#if]
+
+    [#if name == "FX_DISABLE_CONSECUTIVE_DETECT"]
+      [#assign FX_DISABLE_CONSECUTIVE_DETECT_value = value]
+    [/#if]
+
+	
     [/#list]
 [/#if]
 [/#list]
@@ -171,7 +208,7 @@
 /* Avoid doule definition warning, as ULONG64 typedef is already defined by ThreadX */
 #define ULONG64_DEFINED
 [#else]
-/* #define FX_DISABLE_DIRECT_DATA_READ_CACHE_FILL */
+/* #define ULONG64_DEFINED */
 [/#if]
 
 /* Defined, the direct read sector update of cache is disabled.  */
@@ -380,6 +417,12 @@
 [/#if]
 
 
+[#if FX_STANDALONE_ENABLE_value == "1"]
+#define FX_STANDALONE_ENABLE
+[#else]
+/* #define FX_STANDALONE_ENABLE */
+[/#if]
+
 /* Defines the number of seconds the time parameters are updated in FileX.  */
 
 [#if FX_UPDATE_RATE_IN_SECONDS_value == "10"]
@@ -399,5 +442,76 @@
 #define FX_UPDATE_RATE_IN_TICKS     ${FX_UPDATE_RATE_IN_TICKS_value}
 [/#if]
 
+
+/* If defined, cache is disabled.  */
+
+[#if FX_DISABLE_CACHE_value == "1"]
+#define FX_DISABLE_CACHE
+[#else]
+/*#define FX_DISABLE_CACHE   */
+[/#if]
+
+
+/* If defined, file close is disabled.  */
+
+[#if FX_DISABLE_FILE_CLOSE_value == "1"]
+#define FX_DISABLE_FILE_CLOSE
+[#else]
+/* #define FX_DISABLE_FILE_CLOSE */
+[/#if]
+
+
+/* If defined, fast open is disabled.  */
+
+[#if FX_DISABLE_FAST_OPEN_value == "1"]
+#define FX_DISABLE_FAST_OPEN
+[#else]
+/* #define FX_DISABLE_FAST_OPEN */
+[/#if]
+
+
+/* If defined, force memory operations are disabled.  */
+
+[#if FX_DISABLE_FORCE_MEMORY_OPERATION_value == "1"]
+#define FX_DISABLE_FORCE_MEMORY_OPERATION
+[#else]
+/* #define FX_DISABLE_FORCE_MEMORY_OPERATION */
+[/#if]
+
+
+/* If defined, build options is disabled.  */
+
+[#if FX_DISABLE_BUILD_OPTIONS_value == "1"]
+#define FX_DISABLE_BUILD_OPTIONS
+[#else]
+/* #define FX_DISABLE_BUILD_OPTIONS */
+[/#if]
+
+
+/* If defined, one line function is disabled.  */
+
+[#if FX_DISABLE_ONE_LINE_FUNCTION_value == "1"]
+#define FX_DISABLE_ONE_LINE_FUNCTION
+[#else]
+/* #define FX_DISABLE_ONE_LINE_FUNCTION */
+[/#if]
+
+
+/* If defined, FAT entry refresh is disabled.  */
+
+[#if FX_DISABLE_FAT_ENTRY_REFRESH_value == "1"]
+#define FX_DISABLE_FAT_ENTRY_REFRESH
+[#else]
+/* #define FX_DISABLE_FAT_ENTRY_REFRESH */
+[/#if]
+
+
+/* If defined, consecutive detect is disabled.  */
+
+[#if FX_DISABLE_CONSECUTIVE_DETECT_value == "1"]
+#define FX_DISABLE_CONSECUTIVE_DETECT
+[#else]
+/* #define FX_DISABLE_CONSECUTIVE_DETECT */
+[/#if]
 
 #endif

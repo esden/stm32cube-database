@@ -69,4 +69,3 @@ extern "C" {
 #endif
 
 #endif /* KMS_IF_H */
-

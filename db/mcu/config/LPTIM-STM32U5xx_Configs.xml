@@ -63,6 +63,80 @@
         </CallLibMethod>
     </RefConfig>
 
+<!-- 
+    <RefConfig Name="LPBAM_ADD_HALCONFIG" Comment="Configuration in LPBAM context">
+         <IFCondition Expression="LPBAM$IpInstance_Used">
+        <CallLibMethod Name="__HAL_LPTIM_ENABLE_IT" ReturnHAL="false">
+        </CallLibMethod>
+         <CallLibMethod Name="ADV_LPBAM_LPTIM_EnableDMARequests">
+             <MethodArg Name="Channel" FValue="LPBAM_LPTIM_CHANNEL_1"/>
+        </CallLibMethod>
+        <CallLibMethod Name="ADV_LPBAM_LPTIM_EnableDMARequests">
+             <MethodArg Name="Channel" FValue="LPBAM_LPTIM_CHANNEL_2"/>
+        </CallLibMethod>
+          </IFCondition>
+    </RefConfig>
+-->
+
+    <RefConfig Name="LPBAM_ADD_HALCONFIG" Comment="Configuration in LPBAM context">
+	
+        <IFCondition Expression="LPBAM$IpInstance_Used">
+            <CallLibMethod Name="__HAL_LPTIM_ENABLE_IT" ReturnHAL="false"/>
+		</IFCondition>
+		
+		<IFCondition Expression="LPBAM$IpInstance_Used &amp; ((($IpNumber=1) &amp; Semaphore_Channel1_ActiveLPTIM1) | (($IpNumber=3) &amp; Semaphore_Channel1_ActiveLPTIM3)) ">
+            <CallLibMethod Name="ADV_LPBAM_LPTIM_EnableDMARequests">
+                <MethodArg Name="Channel" FValue="LPBAM_LPTIM_CHANNEL_1"/>
+            </CallLibMethod>
+		</IFCondition>
+		
+		<IFCondition Expression="LPBAM$IpInstance_Used &amp; ((($IpNumber=1) &amp; Semaphore_Channel2_ActiveLPTIM1) | (($IpNumber=3) &amp; Semaphore_Channel2_ActiveLPTIM3)) ">		
+            <CallLibMethod Name="ADV_LPBAM_LPTIM_EnableDMARequests">
+                <MethodArg Name="Channel" FValue="LPBAM_LPTIM_CHANNEL_2"/>
+            </CallLibMethod>
+        </IFCondition>
+		  
+    </RefConfig>
+
+
+     <LibMethod Comment="" Name="__HAL_LPTIM_ENABLE_IT">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hlptim" TypeName="LPTIM_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="LPTIM_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="LPTIM_InitTypeDef">
+                <Argument AddressOf="false" GenericType="struct" Name="Clock" TypeName="LPTIM_ClockConfigTypeDef">
+                    <Argument AddressOf="false" GenericType="simple" Name="Source" OptimizationCondition="equal"/>
+                    <Argument AddressOf="false" GenericType="simple" Name="Prescaler" OptimizationCondition="equal"/>
+                </Argument>
+                <Argument AddressOf="false" GenericType="struct" Name="UltraLowPowerClock" TypeName="LPTIM_ULPClockConfigTypeDef">
+                    <Argument AddressOf="false" GenericType="simple" Name="Polarity" OptimizationCondition="equal"/>
+                    <Argument AddressOf="false" GenericType="simple" Name="SampleTime" OptimizationCondition="equal"/>
+                </Argument>
+                <Argument AddressOf="false" GenericType="struct" Name="Trigger" TypeName="LPTIM_TriggerConfigTypeDef">
+                    <Argument AddressOf="false" GenericType="simple" Name="Source" OptimizationCondition="equal"/>
+                    <Argument AddressOf="false" GenericType="simple" Name="ActiveEdge" OptimizationCondition="equal"/>
+                    <Argument AddressOf="false" GenericType="simple" Name="SampleTime" OptimizationCondition="equal"/>
+                </Argument>
+                <Argument AddressOf="false" GenericType="simple" Name="Period" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="UpdateMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CounterSource" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Input1Source" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Input2Source" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="RepetitionCounter" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="false" GenericType="simple" Name="Channel" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdma" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Status" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="false" GenericType="simple" Name="ORingInterrupt" OptimizationCondition="equal"/>
+    </LibMethod>
+
+    <LibMethod Comment="" Name="ADV_LPBAM_LPTIM_EnableDMARequests">
+            <Argument AddressOf="false" GenericType="simple" Name="Instance" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Channel" OptimizationCondition="equal"/>
+     </LibMethod>  
+
 
 
     <LibMethod Comment="" Name="HAL_LPTIM_Init">
@@ -1844,5 +1918,6 @@
         <File Category="header" Condition="all" Name="Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_hal_lptim.h"/>
         <File Category="header" Condition="all" Name="Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_hal_lptim_ex.h"/>
         <File Category="source" Condition="all" Name="Drivers/STM32U5xx_HAL_Driver/Src/stm32u5xx_hal_lptim.c"/>
+        <File Category="header" Condition="all" Name="Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_ll_lptim.h"/>
     </RefComponent>
 </IP>

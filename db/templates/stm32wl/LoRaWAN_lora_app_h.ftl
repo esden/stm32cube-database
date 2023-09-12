@@ -23,6 +23,7 @@
 --]
 [#assign CPUCORE = cpucore?replace("ARM_CORTEX_","C")?replace("+","PLUS")]
 [#assign SUBGHZ_APPLICATION = ""]
+[#assign SECURE_PROJECTS = "0"]
 [#assign ACTIVE_REGION = ""]
 [#assign APP_TX_DUTYCYCLE = ""]
 [#assign LORAWAN_SWITCH_CLASS_PORT = ""]
@@ -31,8 +32,10 @@
 [#assign LORAWAN_DEFAULT_CONFIRMED_MSG_STATE = ""]
 [#assign LORAWAN_ADR_STATE = ""]
 [#assign LORAWAN_DEFAULT_ACTIVATION_TYPE = ""]
+[#assign LORAWAN_FORCE_REJOIN_AT_BOOT = ""]
 [#assign LORAWAN_DEFAULT_DATA_RATE = ""]
 [#assign LORAWAN_DEFAULT_PING_SLOT_PERIODICITY = ""]
+[#assign LORAWAN_DEFAULT_CLASS_B_C_RESP_TIMEOUT = ""]
 [#if SWIPdatas??]
     [#list SWIPdatas as SWIP]
         [#if SWIP.defines??]
@@ -64,11 +67,17 @@
                 [#if definition.name == "LORAWAN_DEFAULT_ACTIVATION_TYPE"]
                     [#assign LORAWAN_DEFAULT_ACTIVATION_TYPE = definition.value]
                 [/#if]
+                [#if definition.name == "LORAWAN_FORCE_REJOIN_AT_BOOT"]
+                    [#assign LORAWAN_FORCE_REJOIN_AT_BOOT = definition.value]
+                [/#if]
                 [#if definition.name == "LORAWAN_DEFAULT_DATA_RATE"]
                     [#assign LORAWAN_DEFAULT_DATA_RATE = definition.value]
                 [/#if]
                 [#if definition.name == "LORAWAN_DEFAULT_PING_SLOT_PERIODICITY"]
                     [#assign LORAWAN_DEFAULT_PING_SLOT_PERIODICITY = definition.value]
+                [/#if]
+                [#if definition.name == "LORAWAN_DEFAULT_CLASS_B_C_RESP_TIMEOUT"]
+                    [#assign LORAWAN_DEFAULT_CLASS_B_C_RESP_TIMEOUT = definition.value]
                 [/#if]
             [/#list]
         [/#if]
@@ -123,13 +132,11 @@ extern "C" {
  */
 #define LORAWAN_SWITCH_CLASS_PORT                   ${LORAWAN_SWITCH_CLASS_PORT}
 
-[/#if]
 /*!
- * LoRaWAN default endNode class port
+ * LoRaWAN default class
  */
 #define LORAWAN_DEFAULT_CLASS                       ${LORAWAN_DEFAULT_CLASS}
 
-[#if (SUBGHZ_APPLICATION == "LORA_END_NODE")]
 /*!
  * LoRaWAN default confirm state
  */
@@ -155,6 +162,12 @@ extern "C" {
 #define LORAWAN_DEFAULT_ACTIVATION_TYPE             ${LORAWAN_DEFAULT_ACTIVATION_TYPE}
 
 /*!
+ * LoRaWAN force rejoin even if the NVM context is restored
+ * @note useful only when context management is enabled by CONTEXT_MANAGEMENT_ENABLED
+ */
+#define LORAWAN_FORCE_REJOIN_AT_BOOT                ${LORAWAN_FORCE_REJOIN_AT_BOOT}
+
+/*!
  * User application data buffer size
  */
 #define LORAWAN_APP_DATA_BUFFER_MAX_SIZE            242
@@ -164,14 +177,24 @@ extern "C" {
  * Default Unicast ping slots periodicity
  *
  * \remark periodicity is equal to 2^LORAWAN_DEFAULT_PING_SLOT_PERIODICITY seconds
- *         example: 2^3 = 8 seconds. The end-device will open an Rx slot every 8 seconds.
+ *         example: 2^4 = 16 seconds. The end-device will open an Rx slot every 16 seconds.
  */
 #define LORAWAN_DEFAULT_PING_SLOT_PERIODICITY       ${LORAWAN_DEFAULT_PING_SLOT_PERIODICITY}
 
+/*!
+ * Default response timeout for class b and class c confirmed
+ * downlink frames in milli seconds.
+ *
+ * The value shall not be smaller than RETRANSMIT_TIMEOUT plus
+ * the maximum time on air.
+ */
+#define LORAWAN_DEFAULT_CLASS_B_C_RESP_TIMEOUT      ${LORAWAN_DEFAULT_CLASS_B_C_RESP_TIMEOUT}
+
 [/#if]
 [/#if]
-[#if CPUCORE == ""]
 [#if FREERTOS??][#-- If FreeRtos is used --]
+[#if CPUCORE == ""]
+[#if (SUBGHZ_APPLICATION == "LORA_END_NODE")]
 /*Send*/
 #define CFG_APP_LORA_PROCESS_NAME                  "LORA_SEND_PROCESS"
 #define CFG_APP_LORA_PROCESS_ATTR_BITS             (0)
@@ -179,8 +202,27 @@ extern "C" {
 #define CFG_APP_LORA_PROCESS_CB_SIZE               (0)
 #define CFG_APP_LORA_PROCESS_STACK_MEM             (0)
 #define CFG_APP_LORA_PROCESS_PRIORITY              osPriorityNone
-#define CFG_APP_LORA_PROCESS_STACk_SIZE            (256 * 4)
+#define CFG_APP_LORA_PROCESS_STACK_SIZE            1024
 
+/*Store Context*/
+#define CFG_APP_LORA_STORE_CONTEXT_NAME            "LORA_STORE_CONTEXT"
+#define CFG_APP_LORA_STORE_CONTEXT_ATTR_BITS       (0)
+#define CFG_APP_LORA_STORE_CONTEXT_CB_MEM          (0)
+#define CFG_APP_LORA_STORE_CONTEXT_CB_SIZE         (0)
+#define CFG_APP_LORA_STORE_CONTEXT_STACK_MEM       (0)
+#define CFG_APP_LORA_STORE_CONTEXT_PRIORITY        osPriorityNone
+#define CFG_APP_LORA_STORE_CONTEXT_STACK_SIZE      1024
+
+/*Stop Join*/
+#define CFG_APP_LORA_STOP_JOIN_NAME                "LORA_STOP_JOIN"
+#define CFG_APP_LORA_STOP_JOIN_ATTR_BITS           (0)
+#define CFG_APP_LORA_STOP_JOIN_CB_MEM              (0)
+#define CFG_APP_LORA_STOP_JOIN_CB_SIZE             (0)
+#define CFG_APP_LORA_STOP_JOIN_STACK_MEM           (0)
+#define CFG_APP_LORA_STOP_JOIN_PRIORITY            osPriorityNone
+#define CFG_APP_LORA_STOP_JOIN_STACK_SIZE          1024
+
+[/#if]
 /*LM Handler*/
 #define CFG_LM_HANDLER_PROCESS_NAME                "LM_HANDLER_PROCESS"
 #define CFG_LM_HANDLER_PROCESS_ATTR_BITS           (0)
@@ -188,7 +230,54 @@ extern "C" {
 #define CFG_LM_HANDLER_PROCESS_CB_SIZE             (0)
 #define CFG_LM_HANDLER_PROCESS_STACK_MEM           (0)
 #define CFG_LM_HANDLER_PROCESS_PRIORITY            osPriorityNone
-#define CFG_LM_HANDLER_PROCESS_STACk_SIZE          (256 * 4)
+#define CFG_LM_HANDLER_PROCESS_STACK_SIZE          1024
+
+[/#if]
+[#if (SUBGHZ_APPLICATION == "LORA_AT_SLAVE")]
+/*Vcom*/
+#define CFG_VCOM_PROCESS_NAME                      "VCOM_PROCESS"
+#define CFG_VCOM_PROCESS_ATTR_BITS                 (0)
+#define CFG_VCOM_PROCESS_CB_MEM                    (0)
+#define CFG_VCOM_PROCESS_CB_SIZE                   (0)
+#define CFG_VCOM_PROCESS_STACK_MEM                 (0)
+#define CFG_VCOM_PROCESS_PRIORITY                  osPriorityNone
+#define CFG_VCOM_PROCESS_STACK_SIZE                1024
+
+[/#if]
+[/#if]
+[#if THREADX??]
+#define CFG_APP_LORA_THREAD_STACK_SIZE                   1024  /* to check if possible to set it in lora gui if rtos detected*/
+#define CFG_APP_LORA_THREAD_PRIO                         10 /* to check if possible to set it in lora gui if rtos detected*/
+#define CFG_APP_LORA_THREAD_PREEMPTION_THRESHOLD         CFG_APP_LORA_THREAD_PRIO
+
+[#if (CPUCORE == "") && ((SUBGHZ_APPLICATION == "LORA_AT_SLAVE") || (SUBGHZ_APPLICATION == "LORA_END_NODE"))]
+#define CFG_LM_HANDLER_THREAD_STACK_SIZE                 1536  /* to check if possible to set it in lora gui if rtos detected*/
+#define CFG_LM_HANDLER_THREAD_PRIO                       CFG_APP_LORA_THREAD_PRIO
+#define CFG_LM_HANDLER_THREAD_PREEMPTION_THRESHOLD       CFG_APP_LORA_THREAD_PRIO
+
+[/#if]
+[#if (SUBGHZ_APPLICATION == "LORA_END_NODE")]
+#define CFG_APP_LORA_STORE_CONTEXT_STACK_SIZE            1024  /* to check if possible to set it in lora gui if rtos detected*/
+#define CFG_APP_LORA_STORE_CONTEXT_PRIO                  CFG_APP_LORA_THREAD_PRIO
+#define CFG_APP_LORA_STORE_CONTEXT_PREEMPTION_THRESHOLD  CFG_APP_LORA_THREAD_PRIO
+
+[#if (SECURE_PROJECTS == "0")]
+#define CFG_APP_LORA_STOP_JOIN_STACK_SIZE                1024  /* to check if possible to set it in lora gui if rtos detected*/
+#define CFG_APP_LORA_STOP_JOIN_PRIO                      CFG_APP_LORA_THREAD_PRIO
+#define CFG_APP_LORA_STOP_JOIN_PREEMPTION_THRESHOLD      CFG_APP_LORA_THREAD_PRIO
+
+[/#if]
+[/#if]
+[#if (SUBGHZ_APPLICATION == "LORA_AT_SLAVE")]
+#define CFG_VCOM_THREAD_STACK_SIZE                       1024  /* to check if possible to set it in lora gui if rtos detected*/
+#define CFG_VCOM_THREAD_PRIO                             CFG_APP_LORA_THREAD_PRIO
+#define CFG_VCOM_THREAD_PREEMPTION_THRESHOLD             CFG_APP_LORA_THREAD_PRIO
+
+[/#if]
+[#if (SUBGHZ_APPLICATION == "LORA_AT_SLAVE")]
+#define CFG_AT_THREAD_STACK_SIZE                         1536  /* to check if possible to set it in lora gui if rtos detected*/
+#define CFG_AT_THREAD_PRIO                               CFG_APP_LORA_THREAD_PRIO
+#define CFG_AT_THREAD_PREEMPTION_THRESHOLD               CFG_APP_LORA_THREAD_PRIO
 
 [/#if]
 [/#if]
@@ -196,7 +285,7 @@ extern "C" {
 
 /* USER CODE END EC */
 
-/* Exported macro ------------------------------------------------------------*/
+/* Exported macros -----------------------------------------------------------*/
 /* USER CODE BEGIN EM */
 
 /* USER CODE END EM */
@@ -214,6 +303,14 @@ void OnMacProcessNotify(void);
 void LoRaWAN_Init(void);
 [/#if]
 
+[#if THREADX??]
+/**
+  * @brief  Function implementing the LoraWAN Main Thread thread.
+  * @param  thread_input: Not used
+  * @retval None
+  */
+void App_Main_Thread_Entry(unsigned long thread_input);
+[/#if]
 /* USER CODE BEGIN EFP */
 
 /* USER CODE END EFP */

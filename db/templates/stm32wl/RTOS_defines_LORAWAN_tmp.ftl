@@ -1,0 +1,15 @@
+[#ftl]
+[#assign LORAWAN_APP_MEM_POOL_SIZE = "4096"]
+[#if SWIPdatas??]
+    [#list SWIPdatas as SWIP]
+        [#if SWIP.defines??]
+            [#list SWIP.defines as definition]
+                [#if definition.name == "LORAWAN_APP_MEM_POOL_SIZE"]
+                    [#assign LORAWAN_APP_MEM_POOL_SIZE = definition.value]
+                [/#if]
+            [/#list]
+        [/#if]
+    [/#list]
+[/#if]
+
+#define LORAWAN_APP_MEM_POOL_SIZE                ${LORAWAN_APP_MEM_POOL_SIZE}

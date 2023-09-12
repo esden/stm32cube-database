@@ -9,20 +9,12 @@
     <RefParameter Comment="I2C Speed Mode " DefaultValue="I2C_Standard" Group="Timing configuration" Name="I2C_Speed_Mode" Type="list">
         <Condition Diagnostic="" Expression="$IpInstance_SMBUS_Enable"/>
         <PossibleValue Comment="Standard Mode" Value="I2C_Standard"/>
-      
+        <PossibleValue Comment="Fast Mode" Value="I2C_Fast"/>
+        <PossibleValue Comment="Fast Mode Plus" Semaphore="$IpInstance_SMBusFastMP" Value="I2C_Fast_Plus"/>      
     </RefParameter> 
-	<RefParameter Comment="I2C Speed Mode " DefaultValue="I2C_Standard" Group="Timing configuration" Name="I2C_Speed_Mode" Type="list">
-        <Condition Diagnostic="" Expression="(STM32F030C8Tx|STM32F030R8Tx|STM32F051R8Tx|STM32F051C8Tx|STM32F051R8Ux|STM32F051C8Ux) &amp; ($Index=2)"/>
-        <PossibleValue Comment="Standard Mode" Value="I2C_Standard"/>
-        <PossibleValue Comment="Fast Mode" Value="I2C_Fast"/>
-    </RefParameter>
-    <RefParameter Comment="I2C Speed Mode " DefaultValue="I2C_Standard" Group="Timing configuration" Name="I2C_Speed_Mode" Type="list">
-        <Condition Diagnostic="" Expression="STM32L010RBTx|STM32L010R8Tx|STM32L010K8Tx|STM32L010K4Tx|STM32L010F4Px|STM32L010C6Tx"/>
-        <PossibleValue Comment="Standard Mode" Value="I2C_Standard"/>
-        <PossibleValue Comment="Fast Mode" Value="I2C_Fast"/>
-    </RefParameter>
     
-     <RefParameter Comment="I2C Speed Mode " DefaultValue="I2C_Standard" Group="Timing configuration" Name="I2C_Speed_Mode" Type="list">
+    <RefParameter Comment="I2C Speed Mode " DefaultValue="I2C_Standard" Group="Timing configuration" Name="I2C_Speed_Mode" Type="list">
+        <Condition Diagnostic="" Expression="$IpInstance_I2C_Mode"/>
         <PossibleValue Comment="Standard Mode" Value="I2C_Standard"/>
         <PossibleValue Comment="Fast Mode" Value="I2C_Fast"/>
         <PossibleValue Comment="Fast Mode Plus" Semaphore="$IpInstance_FastMP" Value="I2C_Fast_Plus"/> 
@@ -37,10 +29,13 @@
         <PossibleValue Comment="Disabled" Value="I2C_ANALOGFILTER_DISABLE"/>
         <PossibleValue Comment="Enabled" Value="I2C_ANALOGFILTER_ENABLE"/>
     </RefParameter>
-      <!--Fast mode plus I2C -->
+      <!--Fast mode plus I2C/SMBus -->
     <RefParameter Comment="FASTMODEPLUS" DefaultValue="I2C_FASTMODEPLUS_ENABLE" Name="FASTMODEPLUS" Type="list" Visible="false">
         <Condition Diagnostic="" Expression="$IpInstance_FastMP"/>
-    </RefParameter>    
+    </RefParameter>
+    <RefParameter Comment="FASTMODEPLUS" DefaultValue="SMBUS_FASTMODEPLUS_ENABLE" Name="FASTMODEPLUS" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="$IpInstance_SMBusFastMP"/>
+    </RefParameter>  
     <RefParameter Comment="FASTMODEPLUS" DefaultValue="null" Group="Timing configuration" Name="FASTMODEPLUS" Type="list"/>
     
     <!--Specifies the speed frequency-->																							 
@@ -54,9 +49,9 @@
 				
     <RefParameter Comment="I2C Speed Frequency (KHz) " DefaultValue="1000" Group="Timing configuration" Max="1000" Min="1" Name="Speed" Type="integer" Visible="true" NoCheckOpt="false" >													 
 																	 
-    </RefParameter>		
-				
-				
+    </RefParameter>
+    
+							
     <RefParameter Comment="Custom Timing" DefaultValue="Disabled" Group="Timing configuration" Name="CustomTiming" Type="list">
         <Condition Diagnostic="" Expression="STM32G0 | STM32WB | STM32G4 | STM32L5| STM32L4"/>
         <PossibleValue Comment="Disabled" Value="Disabled"/>        
@@ -102,7 +97,15 @@
     </RefParameter>					
 
     <RefParameter Comment="Coefficient of Digital Filter" DefaultValue="0" Group="Timing configuration" Max="15" Min="0" Name="I2C_Coeff_DF" Type="integer" Visible="true" NoCheckOpt="false" >													 
-    </RefParameter>	
+    </RefParameter>
+    <!-- LPBAM: if Digital filter > 0 then Wake up by match must not appear -->
+    <RefParameter Comment="Digital Filter" DefaultValue="Enable" Group="Timing configuration" Name="LPBAMDigitalFiltre" Type="list" Visible="false">										 
+        <Condition Diagnostic="" Expression="S_LPBAM_CONF &amp; (I2C_Coeff_DF &gt; 0)"/>
+        <PossibleValue Semaphore="$IpInstance_DF0" Comment="Enable" Value="Enable"/>
+    </RefParameter>
+    <RefParameter Comment="Digital Filter" DefaultValue="null" Group="Timing configuration" Name="LPBAMDigitalFiltre" Type="list" Visible="false">										 
+        <Condition Diagnostic="" Expression="!S_LPBAM_CONF | (S_LPBAM_CONF &amp; (I2C_Coeff_DF &lt; 1)) "/>
+    </RefParameter>
 				
     <!--Specifies the I2C_TIMINGR_register value  -->
     <RefParameter Comment="Timing" DefaultValue="0x00000708" Group="Timing configuration" Name="Timing" Type="string">
@@ -256,8 +259,14 @@
     <!-- Specifies if Clock No Stretch Mode enable-->   
 
     <RefParameter Comment="Clock No Stretch Mode" DefaultValue="I2C_NOSTRETCH_DISABLE" Group="Slave Features" Name="NoStretchMode" Type="list">
+        <Condition Diagnostic="" Expression="!S_LPBAM_CONF"/>
         <PossibleValue Comment="Disabled" Value="I2C_NOSTRETCH_DISABLE"/>
         <PossibleValue Comment="Enabled" Value="I2C_NOSTRETCH_ENABLE"/>
+    </RefParameter> 
+    
+    <RefParameter Comment="Clock No Stretch Mode" DefaultValue="I2C_NOSTRETCH_DISABLE" Group="Slave Features" Name="NoStretchMode" Type="list">
+        <Condition Diagnostic="" Expression="S_LPBAM_CONF"/>
+        <PossibleValue Comment="Disabled" Value="I2C_NOSTRETCH_DISABLE"/>
     </RefParameter> 
 
     <!--SMBus Mode-->
@@ -338,39 +347,27 @@
         <Description>In case of switching your device form Slave ARP to Master (Peripheral mode SMBus Master) on your application, you need to set addressing mode parameters. And if you are using SMBUS device protocol and Host mode(Peripheral mode SMBus Master), please make sure that there may be at most one host in your system.</Description>
     </RefParameter>
     <!--SMBus Slave Features -->
-    <!--RefParameter Comment="Primary Address Length selection : 7 bit" DefaultValue="SMBUS_ADDRESSINGMODE_7BIT" Name="SMBusAddressingMode" Type="integer" Group="SMBus Slave Features"-->
-    <RefParameter Comment="Primary Address Length selection" DefaultValue="SMBUS_ADDRESSINGMODE_7BIT" Group="SMBus Slave Features" Name="SMBusAddressingMode" Type="list" Visible="false">
-        <Condition Diagnostic="" Expression="SMBusPeripheralMode=SMBUS_PERIPHERAL_MODE_SMBUS_SLAVE_ARP"/>    
-        <PossibleValue Comment="7-bit" Value="SMBUS_ADDRESSINGMODE_7BIT"/>		
-    </RefParameter>
     <RefParameter Comment="Primary Address Length selection" DefaultValue="SMBUS_ADDRESSINGMODE_7BIT" Group="SMBus Slave Features" Name="SMBusAddressingMode" Type="list">
         <PossibleValue Comment="7-bit" Value="SMBUS_ADDRESSINGMODE_7BIT"/>
         <Description>The Parameter " SMBusAddressingMode " is not supported by LL Driver </Description>
     </RefParameter>
-    <RefParameter Comment="Primary Address Length selection" DefaultValue="null" Group="SMBus Slave Features" Name="SMBusAddressingMode" Type="list" Visible="false"/>
 
-
-      <RefParameter Comment="Primary slave address" DefaultValue="1" Group="SMBus Slave Features" Max="127" Min="1" Name="SMBusOwnAddress" Type="integer" Visible="false">
+    <RefParameter Comment="Primary slave address" DefaultValue="1" Group="SMBus Slave Features" Max="127" Min="1" Name="SMBusOwnAddress" Type="integer" Visible="false">
         <Description>The generated value of the address is shifted left by 1 bit.</Description>       
-
         <Condition Diagnostic="" Expression="SMBusPeripheralMode=SMBUS_PERIPHERAL_MODE_SMBUS_SLAVE_ARP"/>   
         <PossibleValue Comment="1" Value="1"/>	
     </RefParameter>
     <RefParameter Comment="Primary slave address" DefaultValue="1" Group="SMBus Slave Features" Max="127" Min="1" Name="SMBusOwnAddress" Type="integer">
         <Description>The generated value of the address is shifted left by 1 bit.</Description>       
-
         <Condition Diagnostic="Address value from 1 to 127" Expression="SMBusAddressingMode=SMBUS_ADDRESSINGMODE_7BIT"/>        
     </RefParameter> 
     
     <RefParameter Comment="Primary slave address" DefaultValue="1" Group="SMBus Slave Features" Max="127" Min="1" Name="SMBusOwnAddress" Type="integer">
         <Description>The generated value of the address is shifted left by 1 bit.</Description>       
-
         <Condition Diagnostic="Address value from 1 to 127" Expression="SMBusDualAddressMode=SMBUS_DUALADDRESS_ENABLE"/>        
     </RefParameter>  
-    
-    
-    <RefParameter Comment="Primary slave address" DefaultValue="1" Group="SMBus Slave Features" Max="1023" Min="1" Name="SMBusOwnAddress" Type="integer">     
-   
+      
+    <RefParameter Comment="Primary slave address" DefaultValue="1" Group="SMBus Slave Features" Max="1023" Min="1" Name="SMBusOwnAddress" Type="integer">       
     </RefParameter>
 
     <RefParameter Comment="Primary slave address" DefaultValue="0" Group="SMBus Slave Features" Max="127" Min="0" Name="SMBusOwnAddress1" Type="integer" Visible="false">
@@ -385,29 +382,24 @@
         <Condition Diagnostic="Address value from 1 to 127" Expression="SMBusDualAddressMode=SMBUS_DUALADDRESS_ENABLE"/>        
     </RefParameter>  
     
-    
     <RefParameter Comment="Primary slave address" DefaultValue="=SMBusOwnAddress" Group="SMBus Slave Features" Max="1023" Min="1" Name="SMBusOwnAddress1" Type="integer" Visible="false">        
     </RefParameter>
     
     <RefParameter Comment="Secondary slave address" DefaultValue="0" Group="SMBus Slave Features" Max="127" Min="0" Name="SMBusOwnAddress2" Type="integer" Visible="false">
         <Description>The generated value of the address is shifted left by 1 bit.</Description>       
-
         <Condition Diagnostic="Address value from 0 to 127" Expression="SMBusDualAddressMode=SMBUS_DUALADDRESS_DISABLE"/>  
         <PossibleValue Comment=" 0" Value="0"/>			
     </RefParameter>
     
     <RefParameter Comment="Secondary slave address" DefaultValue="0" Group="SMBus Slave Features" Max="127" Min="0" Name="SMBusOwnAddress2" Type="integer" Visible="true">
         <Description>The generated value of the address is shifted left by 1 bit.</Description>       
-
         <Condition Diagnostic="Address value from 0 to 127" Expression="SMBusDualAddressMode=SMBUS_DUALADDRESS_ENABLE"/>  
     </RefParameter>
     
     <RefParameter Comment="Secondary slave address" DefaultValue="0" Group="SMBus Slave Features" Max="127" Min="0" Name="SMBusOwnAddress2" Type="integer" Visible="false">
         <Description>The generated value of the address is shifted left by 1 bit.</Description>       
-
         <!-- <Condition Diagnostic="Address value from 0 to 127" Expression="SMBusDualAddressMode=SMBUS_DUALADDRESS_ENABLED"/> -->  
     </RefParameter>
-
 
     <RefParameter Comment="Secondary slave address" DefaultValue="0" Group="SMBus Slave Features" Max="127" Min="0" Name="SMBusOwnAddress22" Type="integer" Visible="false">
         <Condition Diagnostic="Address value from 0 to 127" Expression="SMBusDualAddressMode=SMBUS_DUALADDRESS_DISABLE"/>  
@@ -423,23 +415,17 @@
     </RefParameter>
         
     <RefParameter Comment="Dual Address Acknowledged" DefaultValue="SMBUS_DUALADDRESS_DISABLE" Group="SMBus Slave Features" Name="SMBusDualAddressMode" Type="list">
-        <Condition Diagnostic="When primary address is 7 bits length we can have a dual address" Expression="(SMBusAddressingMode=SMBUS_ADDRESSINGMODE_7BIT) &amp; !(SMBusPeripheralMode=SMBUS_PERIPHERAL_MODE_SMBUS_SLAVE_ARP)"/>  
+        <Condition Diagnostic="" Expression="!(SMBusPeripheralMode=SMBUS_PERIPHERAL_MODE_SMBUS_SLAVE_ARP)"/>  
         <PossibleValue Comment="Disabled" Value="SMBUS_DUALADDRESS_DISABLE"/>
         <PossibleValue Comment="Enabled" Value="SMBUS_DUALADDRESS_ENABLE"/>
         <Description>The Parameter " SMBusDualAddressMode " is not supported by LL Driver </Description>
-
     </RefParameter>
     
-    <RefParameter Comment="Dual Address Acknowledged" DefaultValue="SMBUS_DUALADDRESS_DISABLE" Group="SMBus Slave Features" Name="SMBusDualAddressMode" Type="list">         
-        <Condition Diagnostic="" Expression=" !(SMBusPeripheralMode=SMBUS_PERIPHERAL_MODE_SMBUS_SLAVE_ARP)"/>  
-        <PossibleValue Comment="Disabled" Value="SMBUS_DUALADDRESS_DISABLE"/>       
-    </RefParameter>
     <RefParameter Comment="Dual Address Acknowledged" DefaultValue="SMBUS_DUALADDRESS_DISABLE" Group="SMBus Slave Features" Name="SMBusDualAddressMode" Type="list" Visible="false">         
         <Condition Diagnostic="" Expression=" (SMBusPeripheralMode=SMBUS_PERIPHERAL_MODE_SMBUS_SLAVE_ARP)"/>  
         <PossibleValue Comment="Disabled" Value="SMBUS_DUALADDRESS_DISABLE"/>       
     </RefParameter>
     <RefParameter Comment="Dual Address Acknowledged" DefaultValue="null" Group="SMBus Slave Features" Name="SMBusDualAddressMode" Type="list" Visible="false"/>         
-
 
     <RefParameter Comment="General Call Address Detection" DefaultValue="SMBUS_GENERALCALL_DISABLE" Group="SMBus Slave Features" Name="SMBusGeneralCallMode" Type="list">
         <PossibleValue Comment="Disabled" Value="SMBUS_GENERALCALL_DISABLE"/>
@@ -568,6 +554,31 @@
     </RefParameter>
     <!-- Autonomous Mode  __end. -->
 
+
+<!-- LPBAM specific configuration -->
+<RefParameter Name="Interrupt1" Comment="Bus,Arbitration lost,Overrun,Underrun (slave mode) Errors"   DefaultValue="DISABLE"  Type="list" Group="IP Internal Interrupt" TabName="Advanced Settings for LPBAM">
+        <Description>description</Description>
+        <PossibleValue Comment="Enable" Value="I2C_IT_ERRI"/>
+        <PossibleValue Comment="Disable" Value="DISABLE"/>
+</RefParameter>
+
+
+<RefParameter Comment="Interrupt parameter for code generation __HAL_DAC_ENABLE_IT" DefaultValue="+Interrupt1"  Type="list"  Name="ORingInterrupt"  Visible="false">
+      <Condition Diagnostic="" Expression="!((Interrupt1=DISABLE))"/> 
+</RefParameter>
+<RefParameter  Comment="Interrupt parameter for code generation __HAL_DAC_ENABLE_IT" DefaultValue="__NULL" Name="ORingInterrupt" Type="String" >
+               <Condition Diagnostic="" Expression="(Interrupt1=DISABLE)"/> 
+ </RefParameter>
+
+
+<RefMode Name="LPBAMSPECIFIC">
+        <ConfigForMode>LPBAM_ADD_HALCONFIG</ConfigForMode>
+        <Parameter Name="Interrupt1"/>
+        
+ </RefMode>
+
+<!-- LPBAM specific configuration -->
+
     <!-- RefMode for I2C -->
     <RefMode HalMode="I2C" Name="I2C">
         <ConfigForMode>I2C</ConfigForMode>   
@@ -581,6 +592,7 @@
         <Parameter Name="I2C_Rise_Time"/>
         <Parameter Name="I2C_Fall_Time"/>
         <Parameter Name="I2C_Coeff_DF"/>
+        <Parameter Name="LPBAMDigitalFiltre"/>
         <Parameter Name="Analog_Filter"/>
         <Parameter Name="Timing"/>
         <Parameter Name="NoStretchMode"/> 
@@ -662,6 +674,7 @@
                     <Semaphore>I2CMode_Enable</Semaphore>
                 </Mode>
                 <Mode Name="SMBus-Alert-mode">
+                    <Condition Diagnostic="Not available when configuring IP from LPBAM context" Expression="!S_LPBAM_CONF"/>
                     <Semaphore>$IpInstance_SMBus_Mode</Semaphore>
                     <Semaphore>$IpInstance_SMBUS_Enable</Semaphore>
                     <SignalLogicalOp Name="AND">
@@ -671,6 +684,7 @@
                     </SignalLogicalOp>
                 </Mode>
                 <Mode Name="SMBus-two-wire-Interface" RemoveCondition="(((STM32L0|STM32F0|STM32G0)) &amp; ($Index=2))">
+                    <Condition Diagnostic="Not available when configuring IP from LPBAM context" Expression="!S_LPBAM_CONF"/>
                     <Semaphore>$IpInstance_SMBus_Mode</Semaphore>
                     <Semaphore>$IpInstance_SMBUS_Enable</Semaphore>
                     <SignalLogicalOp Name="AND">
@@ -680,11 +694,25 @@
                 </Mode>
             </ModeLogicOperator>
         </Mode>
+      <!-- LPBAM specific configuration -->  
+         <Mode Name="LPBAMSPECIFICTOP" UserName="LPBAM Advanced Settings" RemoveDisable="true" RemoveCondition="!($Index=3)"> <!-- only I2C3 is managed by LPBAM-->
+
+             <Condition Diagnostic="only available when configurring IP from LPBAM context" Expression="S_LPBAM_CONF &amp; ($IpInstance_I2C_Mode|$IpInstance_SMBus_Mode)"/>
+              <ModeLogicOperator Name="XOR">
+                 <Mode Name="LPBAMSPECIFIC" UserName="">
+            <SignalLogicalOp Name="AND">
+                        <Signal Name="VS_I2C_LPBAM"/>
+            </SignalLogicalOp>
+            </Mode>
+            </ModeLogicOperator>
+        </Mode>
+        <!-- LPBAM specific configuration -->
     </ModeLogicOperator>
 
     <!-- RefSignal for I2C -->
     <RefSignal IOMode="AlternateFunctionOpenDrainNoPullOrPullUp" Name="SCL"/>        
     <RefSignal IOMode="AlternateFunctionOpenDrainNoPullOrPullUp" Name="SDA"/>       
     <RefSignal IOMode="AlternateFunctionOpenDrainNoPullOrPullUp" Name="SMBA"/>
+     <RefSignal Name="VS_I2C_LPBAM" Virtual="true"/><!-- LPBAM specific configuration -->
     <Semaphore>$IpInstanceUsed_ForRCC</Semaphore>
 </IP>

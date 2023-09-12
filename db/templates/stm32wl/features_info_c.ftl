@@ -86,13 +86,13 @@ UTIL_MEM_PLACE_IN_SECTION("MB_MEM2") FEAT_INFO_Param_t Feat_Info_Table[] =
 {
   {
     .Feat_Info_Feature_Id =   FEAT_INFO_SYSTEM_ID,
-    .Feat_Info_Feature_Version = __CM0_APP_VERSION,
+    .Feat_Info_Feature_Version = APP_VERSION,
     .Feat_Info_Config_Size =  0,
     .Feat_Info_Config_Ptr = (void *) NULL
   },
   {
     .Feat_Info_Feature_Id =   FEAT_INFO_SYSTEM_NOTIF_PRIO_A_ID,
-    .Feat_Info_Feature_Version = __CM0_APP_VERSION,
+    .Feat_Info_Feature_Version = APP_VERSION,
     .Feat_Info_Config_Size = 0,
     .Feat_Info_Config_Ptr = (void *) NULL
   },
@@ -105,7 +105,7 @@ UTIL_MEM_PLACE_IN_SECTION("MB_MEM2") FEAT_INFO_Param_t Feat_Info_Table[] =
 [#if ((SUBGHZ_APPLICATION == "LORA_END_NODE") || (SUBGHZ_APPLICATION == "LORA_AT_SLAVE"))|| (SUBGHZ_APPLICATION == "LORA_USER_APPLICATION") ]
   {
     .Feat_Info_Feature_Id =   FEAT_INFO_LORAWAN_ID,
-    .Feat_Info_Feature_Version = __LORAWAN_VERSION,
+    .Feat_Info_Feature_Version = LORAWAN_VERSION,
     .Feat_Info_Config_Size = 0,
     .Feat_Info_Config_Ptr = (void *) NULL
   },
@@ -113,20 +113,20 @@ UTIL_MEM_PLACE_IN_SECTION("MB_MEM2") FEAT_INFO_Param_t Feat_Info_Table[] =
 [#if ((SUBGHZ_APPLICATION == "SIGFOX_AT_SLAVE") || (SUBGHZ_APPLICATION == "SIGFOX_PUSHBUTTON"))|| (SUBGHZ_APPLICATION == "SIGFOX_USER_APPLICATION") ]
   {
     .Feat_Info_Feature_Id =   FEAT_INFO_SIGFOX_ID,
-    .Feat_Info_Feature_Version = __SIGFOX_VERSION,
+    .Feat_Info_Feature_Version = SIGFOX_VERSION,
     .Feat_Info_Config_Size = 0,
     .Feat_Info_Config_Ptr = (void *) NULL
   },
 [/#if]
   {
     .Feat_Info_Feature_Id =   FEAT_INFO_TRACE_ID,
-    .Feat_Info_Feature_Version = __CM0_APP_VERSION,
+    .Feat_Info_Feature_Version = APP_VERSION,
     .Feat_Info_Config_Size = 0,
     .Feat_Info_Config_Ptr = (void *) NULL
   },
   {
     .Feat_Info_Feature_Id =   FEAT_INFO_RADIO_ID,
-    .Feat_Info_Feature_Version = __SUBGHZ_PHY_VERSION,
+    .Feat_Info_Feature_Version = SUBGHZ_PHY_VERSION,
     .Feat_Info_Config_Size = 0,
     .Feat_Info_Config_Ptr = (void *) NULL
   },

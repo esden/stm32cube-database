@@ -6,7 +6,7 @@
   * @author  MCD Application Team
   * @brief   Header for LoRaWAN middleware instances
   ******************************************************************************
-  [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
+[@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
 /* USER CODE END Header */
@@ -22,9 +22,11 @@
 [/#if]
 --]
 [#assign CPUCORE = cpucore?replace("ARM_CORTEX_","C")?replace("+","PLUS")]
+[#assign LORAMAC_SPECIFICATION_VERSION = "0x01000300"]
 [#assign REGION = ""]
 [#assign HYBRID_ENABLED = "0"]
 [#assign KEY_EXTRACTABLE = "0"]
+[#assign CONTEXT_MANAGEMENT_ENABLED = "0"]
 [#assign LORAMAC_CLASSB_ENABLED = "0"]
 [#assign REGION_AS923 = ""]
 [#assign REGION_AU915 = ""]
@@ -45,6 +47,9 @@
     [#list SWIPdatas as SWIP]
         [#if SWIP.defines??]
             [#list SWIP.defines as definition]
+                [#if definition.name == "LORAMAC_SPECIFICATION_VERSION"]
+                    [#assign LORAMAC_SPECIFICATION_VERSION = definition.value]
+                [/#if]
                 [#if definition.name == "REGION"]
                     [#assign REGION = definition.value]
                 [/#if]
@@ -56,6 +61,11 @@
                 [#if definition.name == "KEY_EXTRACTABLE"]
                     [#if definition.value == "true"]
                         [#assign KEY_EXTRACTABLE = "1"]
+                    [/#if]
+                [/#if]
+                [#if definition.name == "CONTEXT_MANAGEMENT_ENABLED"]
+                    [#if definition.value == "true"]
+                        [#assign CONTEXT_MANAGEMENT_ENABLED = "1"]
                     [/#if]
                 [/#if]
                 [#if definition.name == "LORAMAC_CLASSB_ENABLED"]
@@ -120,6 +130,27 @@ extern "C" {
 
 /* Exported constants --------------------------------------------------------*/
 [#if CPUCORE != "CM4"]
+#if defined(__ICCARM__)
+#define SOFT_SE_PLACE_IN_NVM_START _Pragma(" default_variable_attributes = @ \".USER_embedded_Keys\"")
+#elif defined(__CC_ARM)
+#define SOFT_SE_PLACE_IN_NVM_START _Pragma("  arm section rodata = \".USER_embedded_Keys\"")
+#elif defined(__GNUC__)
+#define SOFT_SE_PLACE_IN_NVM_START __attribute__((section(".USER_embedded_Keys")))
+#endif /* __ICCARM__ | __CC_ARM | __GNUC__ */
+
+/* Stop placing data in specified section*/
+#if defined(__ICCARM__)
+#define SOFT_SE_PLACE_IN_NVM_STOP _Pragma("default_variable_attributes =")
+#elif defined(__CC_ARM)
+#define SOFT_SE_PLACE_IN_NVM_STOP _Pragma("arm section code")
+#endif /* __ICCARM__ | __CC_ARM | __GNUC__ */
+
+/*!
+ * @brief LoRaWAN version definition
+ * @note  possible values: 0x01000300 or 0x01000400
+ */
+#define LORAMAC_SPECIFICATION_VERSION                   ${LORAMAC_SPECIFICATION_VERSION}
+
 [#if (CPUCORE == "CM0PLUS") || (LORAWAN_FUOTA == "1")]
 [#if (useKMS) && (LORAWAN_FUOTA == "0")]
 /* To enable the KMS Middleware with LoRaWAN, you must update these files from the DualCore example project:
@@ -139,12 +170,12 @@ extern "C" {
 #define OVER_THE_AIR_ACTIVATION 1
 #define ACTIVATION_BY_PERSONALIZATION 1
 #endif /* LORAWAN_KMS */
+
 [#if (LORAWAN_FUOTA == "1")]
-
 #define LORAWAN_DATA_DISTRIB_MGT   1
-[/#if]
-[/#if]
 
+[/#if]
+[/#if]
 /* Region ------------------------------------*/
 [#if CPUCORE == ""]
 /* the region listed here will be linked in the MW code */
@@ -227,10 +258,10 @@ extern "C" {
  * Enables/Disables the context storage management storage.
  * Must be enabled for LoRaWAN 1.0.4 or later.
  */
-#define CONTEXT_MANAGEMENT_ENABLED                      0
+#define CONTEXT_MANAGEMENT_ENABLED                      ${CONTEXT_MANAGEMENT_ENABLED}
 
 /* Class B ------------------------------------*/
-#define LORAMAC_CLASSB_ENABLED  ${LORAMAC_CLASSB_ENABLED}
+#define LORAMAC_CLASSB_ENABLED                          ${LORAMAC_CLASSB_ENABLED}
 
 #if ( LORAMAC_CLASSB_ENABLED == 1 )
 /* CLASS B LSE crystal calibration*/
@@ -254,6 +285,16 @@ extern "C" {
   */
 #define RTC_TEMP_DEV_TURNOVER                           ( 5.0 )
 #endif /* LORAMAC_CLASSB_ENABLED == 1 */
+
+/**
+  * \brief Disable the ClassA receive windows after Tx (after the Join Accept if OTAA mode defined)
+  * \note  Behavior to reduce power consumption but not compliant with LoRa Alliance recommendations.
+  *        All device parameters (Spreading Factor, channels selection, Tx Power, ...) should be fixed
+  *        and the adaptive datarate should be disabled.
+  * /warning This limitation may have consequences for the proper functioning of the device,
+             if the LoRaMac ever generates MAC commands that require a response.
+  */
+#define DISABLE_LORAWAN_RX_WINDOW                       0
 
 [/#if]
 /* USER CODE BEGIN EC */
@@ -289,5 +330,3 @@ extern "C" {
 #endif
 
 #endif /* __LORAWAN_CONF_H__ */
-
-

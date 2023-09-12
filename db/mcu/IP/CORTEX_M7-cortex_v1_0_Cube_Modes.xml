@@ -4,7 +4,22 @@
     ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd"
     xmlns="http://mcd.rou.st.com/modules.php?name=mcu">
     <About>CORTEX_M7 configuration</About>
-  
+   <RefMode Name="Speculation default mode_Settings" Comment="Speculation default mode Settings" Group="Speculation default mode Settings" >
+        <Parameter Name="default_mode_Activation"/>
+        
+    </RefMode>
+    <RefParameter Name="default_mode_Activation" Comment="Speculation default mode"  Type="list" DefaultValue="1" Group="Speculation default mode Settings" >
+        <Condition Expression="Speculation" Diagnostic="" /> 
+        <PossibleValue Value="1" Comment="Enabled" Semaphore="Speculation1"/>
+        <PossibleValue Value="0" Comment="Disabled"/>
+        <Description>Configure Flash Instruction cache through ART accelerator (Only for TCM)</Description>
+    </RefParameter>
+    <RefParameter Name="default_mode_Activation" Comment="Speculation default mode"  Type="list" DefaultValue="0" Group="Speculation default mode Settings" >
+        <PossibleValue Value="1" Comment="Enabled" Semaphore="Speculation1"/>
+        <PossibleValue Value="0" Comment="Disabled"/>
+        <Description>Configure Flash Instruction cache through ART accelerator (Only for TCM)</Description>
+    </RefParameter>
+    
     <RefMode Name="Cortex_Interface_Settings" Comment="Cortex Interface Settings" Group="Cortex Interface Settings" >
         <Parameter Name="FlashInterface"/>
         <Parameter Name="ART_ACCELERATOR_ENABLE"/>
@@ -73,8 +88,18 @@
         <!--ConfigForMode>MPU_Enable</ConfigForMode-->
         <Parameter Name="MPU_Control"/> 
     </RefMode>
-	 
+    <RefParameter Name="MPU_Control" Comment="MPU Control Mode" Type="list" DefaultValue="MPU_PRIVILEGED_DEFAULT" Group="Cortex_Memory_Protection_Unit_Region_Settings">
+         <Condition Expression="Speculation1" Diagnostic="" /> 
+        
+        <PossibleValue Value="__NULL" Comment="MPU NOT USED" Semaphore="$IpInstance_NOT_USED"/> 
+        <PossibleValue Value="MPU_HFNMI_PRIVDEF_NONE" Comment="Background Region Access Not Allowed + MPU Disabled during hard fault, NMI and FAULTMASK handlers" Semaphore="MPU_USED"/> 
+        <PossibleValue Value="MPU_HARDFAULT_NMI" Comment="Background Region Access Not Allowed + MPU Enabled during hard fault, NMI and FAULTMASK handlers" Semaphore="MPU_USED"/> 
+        <PossibleValue Value="MPU_PRIVILEGED_DEFAULT" Comment="Background Region Privileged accesses only + MPU Disabled during hard fault, NMI and FAULTMASK handlers" Semaphore="MPU_USED"/>  
+        <PossibleValue Value="MPU_HFNMI_PRIVDEF" Comment="Background Region Privileged accesses only + MPU Enabled during hard fault, NMI and FAULTMASK handlers" Semaphore="MPU_USED"/> 
+        <Description>Specifies the control mode of the MPU (in case MPU USED) during hard fault, NMI, FAULTMASK and privileged access to the default memory</Description> 
+    </RefParameter>
     <RefParameter Name="MPU_Control" Comment="MPU Control Mode" Type="list" DefaultValue="__NULL" Group="Cortex_Memory_Protection_Unit_Region_Settings" >
+        <Condition Expression="!Speculation1" Diagnostic="" />
         <PossibleValue Value="__NULL" Comment="MPU NOT USED" Semaphore="$IpInstance_NOT_USED"/> 
         <PossibleValue Value="MPU_HFNMI_PRIVDEF_NONE" Comment="Background Region Access Not Allowed + MPU Disabled during hard fault, NMI and FAULTMASK handlers" Semaphore="MPU_USED"/> 
         <PossibleValue Value="MPU_HARDFAULT_NMI" Comment="Background Region Access Not Allowed + MPU Enabled during hard fault, NMI and FAULTMASK handlers" Semaphore="MPU_USED"/> 
@@ -82,10 +107,12 @@
         <PossibleValue Value="MPU_HFNMI_PRIVDEF" Comment="Background Region Privileged accesses only + MPU Enabled during hard fault, NMI and FAULTMASK handlers" Semaphore="MPU_USED"/> 
         <Description>Specifies the control mode of the MPU (in case MPU USED) during hard fault, NMI, FAULTMASK and privileged access to the default memory</Description> 
     </RefParameter>	
+    
+     	
 	
     <!-- MPU Region Configurations -->       
     <RefMode Name="Cortex_Memory_Protection_Unit_Region0_Settings" Comment="Cortex Memory Protection Unit Region 0 Settings" Group="Cortex Memory Protection Unit Region 0 Settings">
-        <Condition Expression="MPU_USED" Diagnostic="" />  
+        <Condition Expression="MPU_USED &amp; !Speculation1" Diagnostic="" />  
         <ConfigForMode>MPU_ConfigRegion</ConfigForMode>
         <Parameter Name="Enable"/> 
         <Parameter Name="Number"> 
@@ -102,9 +129,47 @@
         <Parameter Name="IsCacheable"/>
         <Parameter Name="IsBufferable"/>   
     </RefMode>
+    
+    <RefMode Name="Cortex_Memory_Protection_Unit_Region0_Settings_Spec" Comment="Cortex Memory Protection Unit Region 0 Settings" Group="Cortex Memory Protection Unit Region 0 Settings">
+        
+        <Condition Expression="MPU_USED &amp; Speculation1" Diagnostic="" />  
+        <ConfigForMode>MPU_ConfigRegion_Spec</ConfigForMode>
+        <Parameter Name="Enable_Spec"/> 
+        <Parameter Name="Number_Spec"> 
+            <PossibleValue>MPU_REGION_NUMBER0</PossibleValue>
+            <PossibleValue>__NULL</PossibleValue>
+        </Parameter>
+        <Parameter Name="BaseAddress_Spec"/>
+        <Parameter Name="Size_Spec"/>
+        <Parameter Name="SubRegionDisable_Spec"/>
+        <Parameter Name="TypeExtField_Spec"/>
+        <Parameter Name="AccessPermission_Spec"/>
+        <Parameter Name="DisableExec_Spec"/>
+        <Parameter Name="IsShareable_Spec"/>
+        <Parameter Name="IsCacheable_Spec"/>
+        <Parameter Name="IsBufferable_Spec"/>   
+    </RefMode>
 	 
-    <RefMode Name="Cortex_Memory_Protection_Unit_Region1_Settings" Comment="Cortex Memory Protection Unit Region 1 Settings" Group="Cortex Memory Protection Unit Region 1 Settings" >
-        <Condition Expression="MPU_USED" Diagnostic="" />  
+    <RefMode Name="Cortex_Memory_Protection_Unit_Region1_Settings_S" Comment="Cortex Memory Protection Unit Region 1 Settings" Group="Cortex Memory Protection Unit Region 1 Settings" >
+        <Condition Expression="MPU_USED &amp; Speculation1" Diagnostic="" />  
+        <ConfigForMode>MPU_ConfigRegion_S</ConfigForMode>
+        <Parameter Name="Enable_S"/> 
+        <Parameter Name="Number_Spec"> 
+            <PossibleValue>MPU_REGION_NUMBER1</PossibleValue>
+            <PossibleValue>__NULL</PossibleValue>
+        </Parameter>
+        <Parameter Name="BaseAddress_S"/>
+        <Parameter Name="Size_S"/>
+        <Parameter Name="SubRegionDisable_S"/>
+        <Parameter Name="TypeExtField_S"/>
+        <Parameter Name="AccessPermission_S"/>
+        <Parameter Name="DisableExec_S"/>
+        <Parameter Name="IsShareable_S"/>
+        <Parameter Name="IsCacheable_S"/>
+        <Parameter Name="IsBufferable_S"/>    
+    </RefMode>
+     <RefMode Name="Cortex_Memory_Protection_Unit_Region1_Settings" Comment="Cortex Memory Protection Unit Region 1 Settings" Group="Cortex Memory Protection Unit Region 1 Settings" >
+        <Condition Expression="MPU_USED &amp; !Speculation1" Diagnostic="" />  
         <ConfigForMode>MPU_ConfigRegion</ConfigForMode>
         <Parameter Name="Enable"/> 
         <Parameter Name="Number"> 
@@ -121,8 +186,26 @@
         <Parameter Name="IsCacheable"/>
         <Parameter Name="IsBufferable"/>    
     </RefMode>
+    <RefMode Name="Cortex_Memory_Protection_Unit_Region2_Settings_S"  Comment="Cortex Memory Protection Unit Region 2 Settings" Group="Cortex Memory Protection Unit Region 2 Settings" >
+        <Condition Expression="MPU_USED  &amp; Speculation1" Diagnostic="" />  
+        <ConfigForMode>MPU_ConfigRegion_S</ConfigForMode>
+        <Parameter Name="Enable_S"/> 
+        <Parameter Name="Number_Spec"> 
+            <PossibleValue>MPU_REGION_NUMBER2</PossibleValue>
+            <PossibleValue>__NULL</PossibleValue>
+        </Parameter>
+        <Parameter Name="BaseAddress_S"/>
+        <Parameter Name="Size_S"/>
+        <Parameter Name="SubRegionDisable_S"/>
+        <Parameter Name="TypeExtField_S"/>
+        <Parameter Name="AccessPermission_S"/>
+        <Parameter Name="DisableExec_S"/>
+        <Parameter Name="IsShareable_S"/>
+        <Parameter Name="IsCacheable_S"/>
+        <Parameter Name="IsBufferable_S"/>   
+    </RefMode>
     <RefMode Name="Cortex_Memory_Protection_Unit_Region2_Settings"  Comment="Cortex Memory Protection Unit Region 2 Settings" Group="Cortex Memory Protection Unit Region 2 Settings" >
-        <Condition Expression="MPU_USED" Diagnostic="" />  
+        <Condition Expression="MPU_USED  &amp; !Speculation1" Diagnostic="" />  
         <ConfigForMode>MPU_ConfigRegion</ConfigForMode>
         <Parameter Name="Enable"/> 
         <Parameter Name="Number"> 
@@ -140,8 +223,26 @@
         <Parameter Name="IsBufferable"/>   
     </RefMode>
 	 
+    <RefMode Name="Cortex_Memory_Protection_Unit_Region3_Settings_S"  Comment="Cortex Memory Protection Unit Region 3 Settings" Group="Cortex Memory Protection Unit Region 3 Settings" >
+        <Condition Expression="MPU_USED  &amp; Speculation1" Diagnostic="" />  
+        <ConfigForMode>MPU_ConfigRegion_S</ConfigForMode>
+        <Parameter Name="Enable_S"/> 
+        <Parameter Name="Number_Spec"> 
+            <PossibleValue>MPU_REGION_NUMBER3</PossibleValue>
+            <PossibleValue>__NULL</PossibleValue>
+        </Parameter>
+        <Parameter Name="BaseAddress_S"/>
+        <Parameter Name="Size_S"/>
+        <Parameter Name="SubRegionDisable_S"/>
+        <Parameter Name="TypeExtField_S"/>
+        <Parameter Name="AccessPermission_S"/>
+        <Parameter Name="DisableExec_S"/>
+        <Parameter Name="IsShareable_S"/>
+        <Parameter Name="IsCacheable_S"/>
+        <Parameter Name="IsBufferable_S"/>   
+    </RefMode>
     <RefMode Name="Cortex_Memory_Protection_Unit_Region3_Settings"  Comment="Cortex Memory Protection Unit Region 3 Settings" Group="Cortex Memory Protection Unit Region 3 Settings" >
-        <Condition Expression="MPU_USED" Diagnostic="" />  
+        <Condition Expression="MPU_USED  &amp; !Speculation1" Diagnostic="" />  
         <ConfigForMode>MPU_ConfigRegion</ConfigForMode>
         <Parameter Name="Enable"/> 
         <Parameter Name="Number"> 
@@ -159,8 +260,26 @@
         <Parameter Name="IsBufferable"/>   
     </RefMode>
 	 
+    <RefMode Name="Cortex_Memory_Protection_Unit_Region4_Settings_S"  Comment="Cortex Memory Protection Unit Region 4 Settings" Group="Cortex Memory Protection Unit Region 4 Settings" >
+        <Condition Expression="MPU_USED  &amp; Speculation1" Diagnostic="" />  
+        <ConfigForMode>MPU_ConfigRegion_S</ConfigForMode>
+        <Parameter Name="Enable_S"/> 
+        <Parameter Name="Number_Spec"> 
+            <PossibleValue>MPU_REGION_NUMBER4</PossibleValue>
+            <PossibleValue>__NULL</PossibleValue>
+        </Parameter>
+        <Parameter Name="BaseAddress_S"/>
+        <Parameter Name="Size_S"/>
+        <Parameter Name="SubRegionDisable_S"/>
+        <Parameter Name="TypeExtField_S"/>
+        <Parameter Name="AccessPermission_S"/>
+        <Parameter Name="DisableExec_S"/>
+        <Parameter Name="IsShareable_S"/>
+        <Parameter Name="IsCacheable_S"/>
+        <Parameter Name="IsBufferable_S"/>   
+    </RefMode>
     <RefMode Name="Cortex_Memory_Protection_Unit_Region4_Settings"  Comment="Cortex Memory Protection Unit Region 4 Settings" Group="Cortex Memory Protection Unit Region 4 Settings" >
-        <Condition Expression="MPU_USED" Diagnostic="" />  
+        <Condition Expression="MPU_USED  &amp; !Speculation1" Diagnostic="" />  
         <ConfigForMode>MPU_ConfigRegion</ConfigForMode>
         <Parameter Name="Enable"/> 
         <Parameter Name="Number"> 
@@ -178,8 +297,45 @@
         <Parameter Name="IsBufferable"/>   
     </RefMode>
 	 
+    <RefMode Name="Cortex_Memory_Protection_Unit_Region5_Settings_S"  Comment="Cortex Memory Protection Unit Region 5 Settings" Group="Cortex Memory Protection Unit Region 5 Settings" >
+        <Condition Expression="MPU_USED  &amp; Speculation1" Diagnostic="" />  
+        <ConfigForMode>MPU_ConfigRegion_S</ConfigForMode>
+        <Parameter Name="Enable_S"/> 
+        <Parameter Name="Number_Spec"> 
+            <PossibleValue>MPU_REGION_NUMBER5</PossibleValue>
+            <PossibleValue>__NULL</PossibleValue>
+        </Parameter>
+        <Parameter Name="BaseAddress_S"/>
+        <Parameter Name="Size_S"/>
+        <Parameter Name="SubRegionDisable_S"/>
+        <Parameter Name="TypeExtField_S"/>
+        <Parameter Name="AccessPermission_S"/>
+        <Parameter Name="DisableExec_S"/>
+        <Parameter Name="IsShareable_S"/>
+        <Parameter Name="IsCacheable_S"/>
+        <Parameter Name="IsBufferable_S"/>   
+    </RefMode>
+	 
+    <RefMode Name="Cortex_Memory_Protection_Unit_Region6_Settings_S"  Comment="Cortex Memory Protection Unit Region 6 Settings" Group="Cortex Memory Protection Unit Region 6 Settings" >
+        <Condition Expression="MPU_USED  &amp; Speculation1" Diagnostic="" />  
+        <ConfigForMode>MPU_ConfigRegion_S</ConfigForMode>
+        <Parameter Name="Enable_S"/> 
+        <Parameter Name="Number_Spec"> 
+            <PossibleValue>MPU_REGION_NUMBER6</PossibleValue>	
+            <PossibleValue>__NULL</PossibleValue>		
+        </Parameter>
+        <Parameter Name="BaseAddress_S"/>
+        <Parameter Name="Size_S"/>
+        <Parameter Name="SubRegionDisable_S"/>
+        <Parameter Name="TypeExtField_S"/>
+        <Parameter Name="AccessPermission_S"/>
+        <Parameter Name="DisableExec_S"/>
+        <Parameter Name="IsShareable_S"/>
+        <Parameter Name="IsCacheable_S"/>
+        <Parameter Name="IsBufferable_S"/>  
+    </RefMode>
     <RefMode Name="Cortex_Memory_Protection_Unit_Region5_Settings"  Comment="Cortex Memory Protection Unit Region 5 Settings" Group="Cortex Memory Protection Unit Region 5 Settings" >
-        <Condition Expression="MPU_USED" Diagnostic="" />  
+        <Condition Expression="MPU_USED  &amp; !Speculation1" Diagnostic="" />  
         <ConfigForMode>MPU_ConfigRegion</ConfigForMode>
         <Parameter Name="Enable"/> 
         <Parameter Name="Number"> 
@@ -198,7 +354,7 @@
     </RefMode>
 	 
     <RefMode Name="Cortex_Memory_Protection_Unit_Region6_Settings"  Comment="Cortex Memory Protection Unit Region 6 Settings" Group="Cortex Memory Protection Unit Region 6 Settings" >
-        <Condition Expression="MPU_USED" Diagnostic="" />  
+        <Condition Expression="MPU_USED  &amp; !Speculation1" Diagnostic="" />  
         <ConfigForMode>MPU_ConfigRegion</ConfigForMode>
         <Parameter Name="Enable"/> 
         <Parameter Name="Number"> 
@@ -216,8 +372,26 @@
         <Parameter Name="IsBufferable"/>   
     </RefMode>
 	 
+    <RefMode Name="Cortex_Memory_Protection_Unit_Region7_Settings_S"  Comment="Cortex Memory Protection Unit Region 7 Settings" Group="Cortex Memory Protection Unit Region 7 Settings" >
+        <Condition Expression="MPU_USED  &amp; Speculation1" Diagnostic="" />  
+        <ConfigForMode>MPU_ConfigRegion_S</ConfigForMode>
+        <Parameter Name="Enable_S"/> 
+        <Parameter Name="Number_Spec"> 
+            <PossibleValue>MPU_REGION_NUMBER7</PossibleValue>
+            <PossibleValue>__NULL</PossibleValue>
+        </Parameter>
+         <Parameter Name="BaseAddress_S"/>
+        <Parameter Name="Size_S"/>
+        <Parameter Name="SubRegionDisable_S"/>
+        <Parameter Name="TypeExtField_S"/>
+        <Parameter Name="AccessPermission_S"/>
+        <Parameter Name="DisableExec_S"/>
+        <Parameter Name="IsShareable_S"/>
+        <Parameter Name="IsCacheable_S"/>
+        <Parameter Name="IsBufferable_S"/>   
+    </RefMode>
     <RefMode Name="Cortex_Memory_Protection_Unit_Region7_Settings"  Comment="Cortex Memory Protection Unit Region 7 Settings" Group="Cortex Memory Protection Unit Region 7 Settings" >
-        <Condition Expression="MPU_USED" Diagnostic="" />  
+        <Condition Expression="MPU_USED  &amp; !Speculation1" Diagnostic="" />  
         <ConfigForMode>MPU_ConfigRegion</ConfigForMode>
         <Parameter Name="Enable"/> 
         <Parameter Name="Number"> 
@@ -235,8 +409,26 @@
         <Parameter Name="IsBufferable"/>   
     </RefMode>
 	
-	    <RefMode Name="Cortex_Memory_Protection_Unit_Region8_Settings"  Comment="Cortex Memory Protection Unit Region 8 Settings" Group="Cortex Memory Protection Unit Region 8 Settings" >
-        <Condition Expression="MPU_USED" Diagnostic="" />  
+	    <RefMode Name="Cortex_Memory_Protection_Unit_Region8_Settings_S"  Comment="Cortex Memory Protection Unit Region 8 Settings" Group="Cortex Memory Protection Unit Region 8 Settings" >
+        <Condition Expression="MPU_USED  &amp; Speculation1 &amp; !STM32F7" Diagnostic="" />  
+        <ConfigForMode>MPU_ConfigRegion_S</ConfigForMode>
+        <Parameter Name="Enable_S"/> 
+        <Parameter Name="Number_Spec"> 
+            <PossibleValue>MPU_REGION_NUMBER8</PossibleValue>
+            <PossibleValue>__NULL</PossibleValue>
+        </Parameter>
+        <Parameter Name="BaseAddress_S"/>
+        <Parameter Name="Size_S"/>
+        <Parameter Name="SubRegionDisable_S"/>
+        <Parameter Name="TypeExtField_S"/>
+        <Parameter Name="AccessPermission_S"/>
+        <Parameter Name="DisableExec_S"/>
+        <Parameter Name="IsShareable_S"/>
+        <Parameter Name="IsCacheable_S"/>
+        <Parameter Name="IsBufferable_S"/>    
+    </RefMode>
+    <RefMode Name="Cortex_Memory_Protection_Unit_Region8_Settings"  Comment="Cortex Memory Protection Unit Region 8 Settings" Group="Cortex Memory Protection Unit Region 8 Settings" >
+        <Condition Expression="MPU_USED  &amp; !Speculation1 &amp; !STM32F7" Diagnostic="" />  
         <ConfigForMode>MPU_ConfigRegion</ConfigForMode>
         <Parameter Name="Enable"/> 
         <Parameter Name="Number"> 
@@ -253,8 +445,26 @@
         <Parameter Name="IsCacheable"/>
         <Parameter Name="IsBufferable"/>   
     </RefMode>
-	    <RefMode Name="Cortex_Memory_Protection_Unit_Region9_Settings"  Comment="Cortex Memory Protection Unit Region 9 Settings" Group="Cortex Memory Protection Unit Region 9 Settings" >
-        <Condition Expression="MPU_USED" Diagnostic="" />  
+	    <RefMode Name="Cortex_Memory_Protection_Unit_Region9_Settings_S"  Comment="Cortex Memory Protection Unit Region 9 Settings" Group="Cortex Memory Protection Unit Region 9 Settings" >
+        <Condition Expression="MPU_USED  &amp; Speculation1 &amp; !STM32F7" Diagnostic="" />  
+        <ConfigForMode>MPU_ConfigRegion_S</ConfigForMode>
+        <Parameter Name="Enable_S"/> 
+        <Parameter Name="Number_Spec"> 
+            <PossibleValue>MPU_REGION_NUMBER9</PossibleValue>
+            <PossibleValue>__NULL</PossibleValue>
+        </Parameter>
+        <Parameter Name="BaseAddress_S"/>
+        <Parameter Name="Size_S"/>
+        <Parameter Name="SubRegionDisable_S"/>
+        <Parameter Name="TypeExtField_S"/>
+        <Parameter Name="AccessPermission_S"/>
+        <Parameter Name="DisableExec_S"/>
+        <Parameter Name="IsShareable_S"/>
+        <Parameter Name="IsCacheable_S"/>
+        <Parameter Name="IsBufferable_S"/>    
+    </RefMode>
+     <RefMode Name="Cortex_Memory_Protection_Unit_Region9_Settings"  Comment="Cortex Memory Protection Unit Region 9 Settings" Group="Cortex Memory Protection Unit Region 9 Settings" >
+        <Condition Expression="MPU_USED  &amp; !Speculation1 &amp; !STM32F7" Diagnostic="" />  
         <ConfigForMode>MPU_ConfigRegion</ConfigForMode>
         <Parameter Name="Enable"/> 
         <Parameter Name="Number"> 
@@ -271,8 +481,26 @@
         <Parameter Name="IsCacheable"/>
         <Parameter Name="IsBufferable"/>   
     </RefMode>
-	    <RefMode Name="Cortex_Memory_Protection_Unit_Region10_Settings"  Comment="Cortex Memory Protection Unit Region 10 Settings" Group="Cortex Memory Protection Unit Region 10 Settings" >
-        <Condition Expression="MPU_USED" Diagnostic="" />  
+	    <RefMode Name="Cortex_Memory_Protection_Unit_Region10_Settings_S"  Comment="Cortex Memory Protection Unit Region 10 Settings" Group="Cortex Memory Protection Unit Region 10 Settings" >
+        <Condition Expression="MPU_USED  &amp; Speculation1 &amp; !STM32F7" Diagnostic="" />  
+        <ConfigForMode>MPU_ConfigRegion_S</ConfigForMode>
+        <Parameter Name="Enable_S"/> 
+        <Parameter Name="Number_Spec"> 
+            <PossibleValue>MPU_REGION_NUMBER10</PossibleValue>
+            <PossibleValue>__NULL</PossibleValue>
+        </Parameter>
+         <Parameter Name="BaseAddress_S"/>
+        <Parameter Name="Size_S"/>
+        <Parameter Name="SubRegionDisable_S"/>
+        <Parameter Name="TypeExtField_S"/>
+        <Parameter Name="AccessPermission_S"/>
+        <Parameter Name="DisableExec_S"/>
+        <Parameter Name="IsShareable_S"/>
+        <Parameter Name="IsCacheable_S"/>
+        <Parameter Name="IsBufferable_S"/>   
+    </RefMode>
+    <RefMode Name="Cortex_Memory_Protection_Unit_Region10_Settings"  Comment="Cortex Memory Protection Unit Region 10 Settings" Group="Cortex Memory Protection Unit Region 10 Settings" >
+        <Condition Expression="MPU_USED  &amp; !Speculation1 &amp; !STM32F7" Diagnostic="" />  
         <ConfigForMode>MPU_ConfigRegion</ConfigForMode>
         <Parameter Name="Enable"/> 
         <Parameter Name="Number"> 
@@ -290,8 +518,26 @@
         <Parameter Name="IsBufferable"/>   
     </RefMode>
 	    
-	    <RefMode Name="Cortex_Memory_Protection_Unit_Region11_Settings"  Comment="Cortex Memory Protection Unit Region 11 Settings" Group="Cortex Memory Protection Unit Region 11 Settings" >
-        <Condition Expression="MPU_USED" Diagnostic="" />  
+	    <RefMode Name="Cortex_Memory_Protection_Unit_Region11_Settings_S"  Comment="Cortex Memory Protection Unit Region 11 Settings" Group="Cortex Memory Protection Unit Region 11 Settings" >
+        <Condition Expression="MPU_USED  &amp; Speculation1 &amp; !STM32F7" Diagnostic="" />  
+        <ConfigForMode>MPU_ConfigRegion_S</ConfigForMode>
+        <Parameter Name="Enable_S"/> 
+        <Parameter Name="Number_Spec"> 
+            <PossibleValue>MPU_REGION_NUMBER11</PossibleValue>
+            <PossibleValue>__NULL</PossibleValue>
+        </Parameter>
+        <Parameter Name="BaseAddress_S"/>
+        <Parameter Name="Size_S"/>
+        <Parameter Name="SubRegionDisable_S"/>
+        <Parameter Name="TypeExtField_S"/>
+        <Parameter Name="AccessPermission_S"/>
+        <Parameter Name="DisableExec_S"/>
+        <Parameter Name="IsShareable_S"/>
+        <Parameter Name="IsCacheable_S"/>
+        <Parameter Name="IsBufferable_S"/> 
+    </RefMode>
+    <RefMode Name="Cortex_Memory_Protection_Unit_Region11_Settings"  Comment="Cortex Memory Protection Unit Region 11 Settings" Group="Cortex Memory Protection Unit Region 11 Settings" >
+        <Condition Expression="MPU_USED  &amp; !Speculation1 &amp; !STM32F7" Diagnostic="" />  
         <ConfigForMode>MPU_ConfigRegion</ConfigForMode>
         <Parameter Name="Enable"/> 
         <Parameter Name="Number"> 
@@ -309,8 +555,26 @@
         <Parameter Name="IsBufferable"/>   
     </RefMode>
 	    
-	    <RefMode Name="Cortex_Memory_Protection_Unit_Region12_Settings"  Comment="Cortex Memory Protection Unit Region 12 Settings" Group="Cortex Memory Protection Unit Region 12 Settings" >
-        <Condition Expression="MPU_USED" Diagnostic="" />  
+	    <RefMode Name="Cortex_Memory_Protection_Unit_Region12_Settings_S"  Comment="Cortex Memory Protection Unit Region 12 Settings" Group="Cortex Memory Protection Unit Region 12 Settings" >
+        <Condition Expression="MPU_USED  &amp; Speculation1 &amp; !STM32F7" Diagnostic="" />  
+        <ConfigForMode>MPU_ConfigRegion</ConfigForMode>
+        <Parameter Name="Enable_S"/> 
+        <Parameter Name="Number_Spec"> 
+            <PossibleValue>MPU_REGION_NUMBER12</PossibleValue>
+            <PossibleValue>__NULL</PossibleValue>
+        </Parameter>
+        <Parameter Name="BaseAddress_S"/>
+        <Parameter Name="Size_S"/>
+        <Parameter Name="SubRegionDisable_S"/>
+        <Parameter Name="TypeExtField_S"/>
+        <Parameter Name="AccessPermission_S"/>
+        <Parameter Name="DisableExec_S"/>
+        <Parameter Name="IsShareable_S"/>
+        <Parameter Name="IsCacheable_S"/>
+        <Parameter Name="IsBufferable_S"/>  
+    </RefMode>
+     <RefMode Name="Cortex_Memory_Protection_Unit_Region12_Settings"  Comment="Cortex Memory Protection Unit Region 12 Settings" Group="Cortex Memory Protection Unit Region 12 Settings" >
+        <Condition Expression="MPU_USED  &amp; !Speculation1 &amp; !STM32F7" Diagnostic="" />  
         <ConfigForMode>MPU_ConfigRegion</ConfigForMode>
         <Parameter Name="Enable"/> 
         <Parameter Name="Number"> 
@@ -328,8 +592,26 @@
         <Parameter Name="IsBufferable"/>   
     </RefMode>
 		   
-	    <RefMode Name="Cortex_Memory_Protection_Unit_Region13_Settings"  Comment="Cortex Memory Protection Unit Region 13 Settings" Group="Cortex Memory Protection Unit Region 13 Settings" >
-        <Condition Expression="MPU_USED" Diagnostic="" />  
+	    <RefMode Name="Cortex_Memory_Protection_Unit_Region13_Settings_S"  Comment="Cortex Memory Protection Unit Region 13 Settings" Group="Cortex Memory Protection Unit Region 13 Settings" >
+        <Condition Expression="MPU_USED  &amp; Speculation1 &amp; !STM32F7" Diagnostic="" />  
+        <ConfigForMode>MPU_ConfigRegion_S</ConfigForMode>
+        <Parameter Name="Enable_S"/> 
+        <Parameter Name="Number_Spec"> 
+            <PossibleValue>MPU_REGION_NUMBER13</PossibleValue>
+            <PossibleValue>__NULL</PossibleValue>
+        </Parameter>
+        <Parameter Name="BaseAddress_S"/>
+        <Parameter Name="Size_S"/>
+        <Parameter Name="SubRegionDisable_S"/>
+        <Parameter Name="TypeExtField_S"/>
+        <Parameter Name="AccessPermission_S"/>
+        <Parameter Name="DisableExec_S"/>
+        <Parameter Name="IsShareable_S"/>
+        <Parameter Name="IsCacheable_S"/>
+        <Parameter Name="IsBufferable_S"/>   
+    </RefMode>
+     <RefMode Name="Cortex_Memory_Protection_Unit_Region13_Settings"  Comment="Cortex Memory Protection Unit Region 13 Settings" Group="Cortex Memory Protection Unit Region 13 Settings" >
+        <Condition Expression="MPU_USED  &amp; !Speculation1 &amp; !STM32F7" Diagnostic="" />  
         <ConfigForMode>MPU_ConfigRegion</ConfigForMode>
         <Parameter Name="Enable"/> 
         <Parameter Name="Number"> 
@@ -347,8 +629,26 @@
         <Parameter Name="IsBufferable"/>   
     </RefMode>
 			   
-	    <RefMode Name="Cortex_Memory_Protection_Unit_Region14_Settings"  Comment="Cortex Memory Protection Unit Region 14 Settings" Group="Cortex Memory Protection Unit Region 14 Settings" >
-        <Condition Expression="MPU_USED" Diagnostic="" />  
+	    <RefMode Name="Cortex_Memory_Protection_Unit_Region14_Settings_S"  Comment="Cortex Memory Protection Unit Region 14 Settings" Group="Cortex Memory Protection Unit Region 14 Settings" >
+        <Condition Expression="MPU_USED  &amp; Speculation1 &amp; !STM32F7" Diagnostic="" />  
+        <ConfigForMode>MPU_ConfigRegion_S</ConfigForMode>
+        <Parameter Name="Enable_S"/> 
+        <Parameter Name="Number_Spec"> 
+            <PossibleValue>MPU_REGION_NUMBER14</PossibleValue>
+            <PossibleValue>__NULL</PossibleValue>
+        </Parameter>
+        <Parameter Name="BaseAddress_S"/>
+        <Parameter Name="Size_S"/>
+        <Parameter Name="SubRegionDisable_S"/>
+        <Parameter Name="TypeExtField_S"/>
+        <Parameter Name="AccessPermission_S"/>
+        <Parameter Name="DisableExec_S"/>
+        <Parameter Name="IsShareable_S"/>
+        <Parameter Name="IsCacheable_S"/>
+        <Parameter Name="IsBufferable_S"/>    
+    </RefMode>
+    <RefMode Name="Cortex_Memory_Protection_Unit_Region14_Settings"  Comment="Cortex Memory Protection Unit Region 14 Settings" Group="Cortex Memory Protection Unit Region 14 Settings" >
+        <Condition Expression="MPU_USED  &amp; !Speculation1 &amp; !STM32F7" Diagnostic="" />  
         <ConfigForMode>MPU_ConfigRegion</ConfigForMode>
         <Parameter Name="Enable"/> 
         <Parameter Name="Number"> 
@@ -366,8 +666,26 @@
         <Parameter Name="IsBufferable"/>   
     </RefMode>
 				   
-	    <RefMode Name="Cortex_Memory_Protection_Unit_Region15_Settings"  Comment="Cortex Memory Protection Unit Region 15 Settings" Group="Cortex Memory Protection Unit Region 15 Settings" >
-        <Condition Expression="MPU_USED" Diagnostic="" />  
+	    <RefMode Name="Cortex_Memory_Protection_Unit_Region15_Settings_S"  Comment="Cortex Memory Protection Unit Region 15 Settings" Group="Cortex Memory Protection Unit Region 15 Settings" >
+        <Condition Expression="MPU_USED  &amp; Speculation1 &amp; !STM32F7" Diagnostic="" />  
+        <ConfigForMode>MPU_ConfigRegion_S</ConfigForMode>
+        <Parameter Name="Enable_S"/> 
+        <Parameter Name="Number_Spec"> 
+            <PossibleValue>MPU_REGION_NUMBER15</PossibleValue>
+            <PossibleValue>__NULL</PossibleValue>
+        </Parameter>
+        <Parameter Name="BaseAddress_S"/>
+        <Parameter Name="Size_S"/>
+        <Parameter Name="SubRegionDisable_S"/>
+        <Parameter Name="TypeExtField_S"/>
+        <Parameter Name="AccessPermission_S"/>
+        <Parameter Name="DisableExec_S"/>
+        <Parameter Name="IsShareable_S"/>
+        <Parameter Name="IsCacheable_S"/>
+        <Parameter Name="IsBufferable_S"/>   
+    </RefMode>
+    <RefMode Name="Cortex_Memory_Protection_Unit_Region15_Settings"  Comment="Cortex Memory Protection Unit Region 15 Settings" Group="Cortex Memory Protection Unit Region 15 Settings" >
+        <Condition Expression="MPU_USED  &amp; !Speculation1 &amp; !STM32F7" Diagnostic="" />  
         <ConfigForMode>MPU_ConfigRegion</ConfigForMode>
         <Parameter Name="Enable"/> 
         <Parameter Name="Number"> 
@@ -384,17 +702,31 @@
         <Parameter Name="IsCacheable"/>
         <Parameter Name="IsBufferable"/>   
     </RefMode>
-    <RefParameter Name="Enable" Comment="MPU Region" Type="list" DefaultValue="__NULL" Group="Cortex_Memory_Protection_Unit_Region_Settings">
+    <RefParameter Name="Enable_Spec" Comment="MPU Region" Type="list" DefaultValue="MPU_REGION_ENABLE" Group="Cortex_Memory_Protection_Unit_Region_Settings">
+        <Condition Expression="Speculation1" Diagnostic="" /> 
+        <PossibleValue Value="MPU_REGION_ENABLE" Comment="Enabled" Semaphore="MPU_Enabled_Spec"/>
+        <PossibleValue Value="__NULL" Comment="Disabled" />
+        <Description>Enable/Disable MPU Region Configurations</Description> 
+    </RefParameter>
+	
+    <RefParameter Name="Enable_S" Comment="MPU Region" Type="list" DefaultValue="__NULL" Group="Cortex_Memory_Protection_Unit_Region_Settings">
+       <Condition Expression="Speculation1" Diagnostic="" /> 
+        <PossibleValue Value="MPU_REGION_ENABLE" Comment="Enabled" Semaphore="MPU_Enabled_S"/>
+        <PossibleValue Value="__NULL" Comment="Disabled" />
+        <Description>Enable/Disable MPU Region Configurations</Description> 
+    </RefParameter>
+     <RefParameter Name="Enable" Comment="MPU Region" Type="list" DefaultValue="__NULL" Group="Cortex_Memory_Protection_Unit_Region_Settings">
+        <Condition Expression="!Speculation1" Diagnostic="" /> 
         <PossibleValue Value="MPU_REGION_ENABLE" Comment="Enabled" Semaphore="MPU_Enabled"/>
         <PossibleValue Value="__NULL" Comment="Disabled" />
         <Description>Enable/Disable MPU Region Configurations</Description> 
     </RefParameter>
 	
     <RefParameter Name="Number" Comment="MPU Region Number" Type="list" DefaultValue="__NULL" Group="Cortex_Memory_Protection_Unit_Region_Settings" Visible="false">
-        <Condition Expression="!MPU_Enabled" Diagnostic="" /> 
+        <Condition Expression="((!MPU_Enabled &amp; !MPU_Enabled_Spec &amp; !MPU_Enabled_S))" Diagnostic="" /> 
     </RefParameter>
     <RefParameter Name="Number" Comment="MPU Region Number" Type="list" DefaultValue="MPU_REGION_NUMBER0" Group="Cortex_Memory_Protection_Unit_Region_Settings" Visible="false" >
-        <Condition Expression="MPU_Enabled" Diagnostic="" />  
+        <Condition Expression="(MPU_Enabled)" Diagnostic="" />  
         <PossibleValue Value="MPU_REGION_NUMBER0" Comment="Region 0"/>
         <PossibleValue Value="MPU_REGION_NUMBER1" Comment="Region 1"/>
         <PossibleValue Value="MPU_REGION_NUMBER2" Comment="Region 2"/>
@@ -412,21 +744,68 @@
         <PossibleValue Value="MPU_REGION_NUMBER7" Comment="Region 14"/>
         <PossibleValue Value="MPU_REGION_NUMBER7" Comment="Region 15"/>
     </RefParameter>
-	
-    <RefParameter Name="BaseAddress" Comment="MPU Region Base Address" DefaultValue="null" Max="0xDFFFFFFF" Min="0x0" Type="hex" Group="Cortex_Memory_Protection_Unit_Region_Settings" Visible="false" >
-        <Condition Expression="!MPU_Enabled" Diagnostic="" />  
+     <RefParameter Name="Number_Spec" Comment="MPU Region Number" Type="list" DefaultValue="MPU_REGION_NUMBER0" Group="Cortex_Memory_Protection_Unit_Region_Settings" Visible="false" >
+        <Condition Expression="(MPU_Enabled_Spec)" Diagnostic="" />  
+        <PossibleValue Value="MPU_REGION_NUMBER0" Comment="Region 0" Semaphore="Region0"/>
+        <PossibleValue Value="MPU_REGION_NUMBER1" Comment="Region 1"/>
+        <PossibleValue Value="MPU_REGION_NUMBER2" Comment="Region 2"/>
+        <PossibleValue Value="MPU_REGION_NUMBER3" Comment="Region 3"/>
+        <PossibleValue Value="MPU_REGION_NUMBER4" Comment="Region 4"/>
+        <PossibleValue Value="MPU_REGION_NUMBER5" Comment="Region 5"/>
+        <PossibleValue Value="MPU_REGION_NUMBER6" Comment="Region 6"/>
+        <PossibleValue Value="MPU_REGION_NUMBER7" Comment="Region 7"/>
+        <PossibleValue Value="MPU_REGION_NUMBER7" Comment="Region 8"/>
+        <PossibleValue Value="MPU_REGION_NUMBER7" Comment="Region 9"/>
+        <PossibleValue Value="MPU_REGION_NUMBER7" Comment="Region 10"/>
+        <PossibleValue Value="MPU_REGION_NUMBER7" Comment="Region 11"/>
+        <PossibleValue Value="MPU_REGION_NUMBER7" Comment="Region 12"/>
+        <PossibleValue Value="MPU_REGION_NUMBER7" Comment="Region 13"/>
+        <PossibleValue Value="MPU_REGION_NUMBER7" Comment="Region 14"/>
+        <PossibleValue Value="MPU_REGION_NUMBER7" Comment="Region 15"/>
     </RefParameter>
-    <RefParameter Name="BaseAddress" Comment="MPU Region Base Address" DefaultValue="0x0" Max="0xDFFFFFFF" Min="0x0" Type="hex" Group="Cortex_Memory_Protection_Unit_Region_Settings"  >
-        <Condition Expression="MPU_Enabled" Diagnostic="" /> 
+    	<RefParameter Name="Number_S" Comment="MPU Region Number" Type="list" DefaultValue="MPU_REGION_NUMBER1" Group="Cortex_Memory_Protection_Unit_Region_Settings" Visible="false" >
+        <Condition Expression="(MPU_Enabled_S)" Diagnostic="" />  
+        <PossibleValue Value="MPU_REGION_NUMBER0" Comment="Region 0" Semaphore="Region0"/>
+        <PossibleValue Value="MPU_REGION_NUMBER1" Comment="Region 1"/>
+        <PossibleValue Value="MPU_REGION_NUMBER2" Comment="Region 2"/>
+        <PossibleValue Value="MPU_REGION_NUMBER3" Comment="Region 3"/>
+        <PossibleValue Value="MPU_REGION_NUMBER4" Comment="Region 4"/>
+        <PossibleValue Value="MPU_REGION_NUMBER5" Comment="Region 5"/>
+        <PossibleValue Value="MPU_REGION_NUMBER6" Comment="Region 6"/>
+        <PossibleValue Value="MPU_REGION_NUMBER7" Comment="Region 7"/>
+        <PossibleValue Value="MPU_REGION_NUMBER7" Comment="Region 8"/>
+        <PossibleValue Value="MPU_REGION_NUMBER7" Comment="Region 9"/>
+        <PossibleValue Value="MPU_REGION_NUMBER7" Comment="Region 10"/>
+        <PossibleValue Value="MPU_REGION_NUMBER7" Comment="Region 11"/>
+        <PossibleValue Value="MPU_REGION_NUMBER7" Comment="Region 12"/>
+        <PossibleValue Value="MPU_REGION_NUMBER7" Comment="Region 13"/>
+        <PossibleValue Value="MPU_REGION_NUMBER7" Comment="Region 14"/>
+        <PossibleValue Value="MPU_REGION_NUMBER7" Comment="Region 15"/>
+    </RefParameter>
+    <RefParameter Name="BaseAddress" Comment="MPU Region Base Address" DefaultValue="null" Max="0xDFFFFFFF" Min="0x0" Type="hex" Group="Cortex_Memory_Protection_Unit_Region_Settings" Visible="false" >
+        <Condition Expression="((!MPU_Enabled &amp; !MPU_Enabled_Spec &amp; !MPU_Enabled_S))" Diagnostic="" />  
+    </RefParameter>
+    
+    <RefParameter Name="BaseAddress_S" Comment="MPU Region Base Address" DefaultValue="0x0" Max="0xDFFFFFFF" Min="0x0" Type="hex" Group="Cortex_Memory_Protection_Unit_Region_Settings"  >
+        <Condition Expression="(MPU_Enabled_S)" Diagnostic="" /> 
         <Description>Specifies the base address of the region to protect: &lt;html&gt;&lt;br&gt;&lt;font color=&quot;red&quot;&gt;&lt;b&gt;*&lt;/b&gt; The base address is aligned to the size of the region.For example, a 64 KB region must be aligned on a multiple of 64 KB, for example, at 0x00010000 or 0x00020000. &lt;/font&gt;&lt;/br&gt;&lt;/html&gt;</Description> 	
     </RefParameter>
-
+    <RefParameter Name="BaseAddress" Comment="MPU Region Base Address" DefaultValue="0x0" Max="0xDFFFFFFF" Min="0x0" Type="hex" Group="Cortex_Memory_Protection_Unit_Region_Settings"  >
+         <Condition Expression="(MPU_Enabled)" Diagnostic="" /> 
+        <Description>Specifies the base address of the region to protect: &lt;html&gt;&lt;br&gt;&lt;font color=&quot;red&quot;&gt;&lt;b&gt;*&lt;/b&gt; The base address is aligned to the size of the region.For example, a 64 KB region must be aligned on a multiple of 64 KB, for example, at 0x00010000 or 0x00020000. &lt;/font&gt;&lt;/br&gt;&lt;/html&gt;</Description> 	
+    </RefParameter>
+    
+ <RefParameter Name="BaseAddress_Spec" Comment="MPU Region Base Address" DefaultValue="0x0" Max="0xDFFFFFFF" Min="0x0" Type="hex" Group="Cortex_Memory_Protection_Unit_Region_Settings"  >
+        <Condition Expression="(MPU_Enabled_Spec)" Diagnostic="" /> 
+        <Description>Specifies the base address of the region to protect: &lt;html&gt;&lt;br&gt;&lt;font color=&quot;red&quot;&gt;&lt;b&gt;*&lt;/b&gt; The base address is aligned to the size of the region.For example, a 64 KB region must be aligned on a multiple of 64 KB, for example, at 0x00010000 or 0x00020000. &lt;/font&gt;&lt;/br&gt;&lt;/html&gt;</Description> 	
+    </RefParameter>
 	
     <RefParameter Name="Size" Comment="MPU Region Size" Type="list" DefaultValue="null" Group="Cortex_Memory_Protection_Unit_Region_Settings" Visible="false">
-        <Condition Expression="!MPU_Enabled" Diagnostic="" />  
+        <Condition Expression="((!MPU_Enabled &amp; !MPU_Enabled_Spec &amp; !MPU_Enabled_S))" Diagnostic="" />  
     </RefParameter>
+ 
     <RefParameter Name="Size" Comment="MPU Region Size" Type="list" DefaultValue="MPU_REGION_SIZE_32B" Group="Cortex_Memory_Protection_Unit_Region_Settings" >
-        <Condition Expression="MPU_Enabled" Diagnostic="" />  
+        <Condition Expression="(MPU_Enabled)" Diagnostic="" />  
         <PossibleValue Value="MPU_REGION_SIZE_32B" Comment="32B" Semaphore="MPU_SubRegionNotAvailable"/>
         <PossibleValue Value="MPU_REGION_SIZE_64B" Comment="64B" Semaphore="MPU_SubRegionNotAvailable"/>
         <PossibleValue Value="MPU_REGION_SIZE_128B" Comment="128B" Semaphore="MPU_SubRegionNotAvailable"/>
@@ -457,34 +836,139 @@
         <PossibleValue Value="MPU_REGION_SIZE_4GB" Comment="4GB"/>
         <Description>Specifies the size of the region to protect:&lt;html&gt;&lt;br&gt;&lt;font color=&quot;red&quot;&gt;&lt;b&gt;*&lt;/b&gt; For Region size 32B, 64B and 128B SubRegion Disable in not available&lt;/font&gt;&lt;/br&gt;&lt;/html&gt;</Description> 	
     </RefParameter>
-	
+    <RefParameter Name="Size_Spec" Comment="MPU Region Size" Type="list" DefaultValue="MPU_REGION_SIZE_4GB" Group="Cortex_Memory_Protection_Unit_Region_Settings" >
+        <Condition Expression="(MPU_Enabled_Spec) &amp; Speculation1" Diagnostic="" />  
+        <PossibleValue Value="MPU_REGION_SIZE_32B" Comment="32B" Semaphore="MPU_SubRegionNotAvailable"/>
+        <PossibleValue Value="MPU_REGION_SIZE_64B" Comment="64B" Semaphore="MPU_SubRegionNotAvailable"/>
+        <PossibleValue Value="MPU_REGION_SIZE_128B" Comment="128B" Semaphore="MPU_SubRegionNotAvailable"/>
+        <PossibleValue Value="MPU_REGION_SIZE_256B" Comment="256B"/>
+        <PossibleValue Value="MPU_REGION_SIZE_512B" Comment="512B"/>
+        <PossibleValue Value="MPU_REGION_SIZE_1KB" Comment="1KB"/>
+        <PossibleValue Value="MPU_REGION_SIZE_2KB" Comment="2KB"/>
+        <PossibleValue Value="MPU_REGION_SIZE_4KB" Comment="4KB"/>
+        <PossibleValue Value="MPU_REGION_SIZE_8KB" Comment="8KB"/>
+        <PossibleValue Value="MPU_REGION_SIZE_16KB" Comment="16KB"/>	
+        <PossibleValue Value="MPU_REGION_SIZE_32KB" Comment="32KB"/>
+        <PossibleValue Value="MPU_REGION_SIZE_64KB" Comment="64KB"/>
+        <PossibleValue Value="MPU_REGION_SIZE_128KB" Comment="128KB"/>
+        <PossibleValue Value="MPU_REGION_SIZE_256KB" Comment="256KB"/>
+        <PossibleValue Value="MPU_REGION_SIZE_512KB" Comment="512KB"/>
+        <PossibleValue Value="MPU_REGION_SIZE_1MB" Comment="1MB"/>
+        <PossibleValue Value="MPU_REGION_SIZE_2MB" Comment="2MB"/>	
+        <PossibleValue Value="MPU_REGION_SIZE_4MB" Comment="4MB"/>
+        <PossibleValue Value="MPU_REGION_SIZE_8MB" Comment="8MB"/>
+        <PossibleValue Value="MPU_REGION_SIZE_16MB" Comment="16MB"/>	
+        <PossibleValue Value="MPU_REGION_SIZE_32MB" Comment="32MB"/>
+        <PossibleValue Value="MPU_REGION_SIZE_64MB" Comment="64MB"/>
+        <PossibleValue Value="MPU_REGION_SIZE_128MB" Comment="128MB"/>
+        <PossibleValue Value="MPU_REGION_SIZE_256MB" Comment="256MB"/>
+        <PossibleValue Value="MPU_REGION_SIZE_512MB" Comment="512MB"/>
+        <PossibleValue Value="MPU_REGION_SIZE_1GB" Comment="1GB"/>
+        <PossibleValue Value="MPU_REGION_SIZE_2GB" Comment="2GB"/>
+        <PossibleValue Value="MPU_REGION_SIZE_4GB" Comment="4GB"/>
+        <Description>Specifies the size of the region to protect:&lt;html&gt;&lt;br&gt;&lt;font color=&quot;red&quot;&gt;&lt;b&gt;*&lt;/b&gt; For Region size 32B, 64B and 128B SubRegion Disable in not available&lt;/font&gt;&lt;/br&gt;&lt;/html&gt;</Description> 	
+    </RefParameter>
+	 <RefParameter Name="Size_S" Comment="MPU Region Size" Type="list" DefaultValue="MPU_REGION_SIZE_32B" Group="Cortex_Memory_Protection_Unit_Region_Settings" >
+        <Condition Expression="(MPU_Enabled_S) &amp; Speculation1" Diagnostic="" />  
+        <PossibleValue Value="MPU_REGION_SIZE_32B" Comment="32B" Semaphore="MPU_SubRegionNotAvailable"/>
+        <PossibleValue Value="MPU_REGION_SIZE_64B" Comment="64B" Semaphore="MPU_SubRegionNotAvailable"/>
+        <PossibleValue Value="MPU_REGION_SIZE_128B" Comment="128B" Semaphore="MPU_SubRegionNotAvailable"/>
+        <PossibleValue Value="MPU_REGION_SIZE_256B" Comment="256B"/>
+        <PossibleValue Value="MPU_REGION_SIZE_512B" Comment="512B"/>
+        <PossibleValue Value="MPU_REGION_SIZE_1KB" Comment="1KB"/>
+        <PossibleValue Value="MPU_REGION_SIZE_2KB" Comment="2KB"/>
+        <PossibleValue Value="MPU_REGION_SIZE_4KB" Comment="4KB"/>
+        <PossibleValue Value="MPU_REGION_SIZE_8KB" Comment="8KB"/>
+        <PossibleValue Value="MPU_REGION_SIZE_16KB" Comment="16KB"/>	
+        <PossibleValue Value="MPU_REGION_SIZE_32KB" Comment="32KB"/>
+        <PossibleValue Value="MPU_REGION_SIZE_64KB" Comment="64KB"/>
+        <PossibleValue Value="MPU_REGION_SIZE_128KB" Comment="128KB"/>
+        <PossibleValue Value="MPU_REGION_SIZE_256KB" Comment="256KB"/>
+        <PossibleValue Value="MPU_REGION_SIZE_512KB" Comment="512KB"/>
+        <PossibleValue Value="MPU_REGION_SIZE_1MB" Comment="1MB"/>
+        <PossibleValue Value="MPU_REGION_SIZE_2MB" Comment="2MB"/>	
+        <PossibleValue Value="MPU_REGION_SIZE_4MB" Comment="4MB"/>
+        <PossibleValue Value="MPU_REGION_SIZE_8MB" Comment="8MB"/>
+        <PossibleValue Value="MPU_REGION_SIZE_16MB" Comment="16MB"/>	
+        <PossibleValue Value="MPU_REGION_SIZE_32MB" Comment="32MB"/>
+        <PossibleValue Value="MPU_REGION_SIZE_64MB" Comment="64MB"/>
+        <PossibleValue Value="MPU_REGION_SIZE_128MB" Comment="128MB"/>
+        <PossibleValue Value="MPU_REGION_SIZE_256MB" Comment="256MB"/>
+        <PossibleValue Value="MPU_REGION_SIZE_512MB" Comment="512MB"/>
+        <PossibleValue Value="MPU_REGION_SIZE_1GB" Comment="1GB"/>
+        <PossibleValue Value="MPU_REGION_SIZE_2GB" Comment="2GB"/>
+        <PossibleValue Value="MPU_REGION_SIZE_4GB" Comment="4GB"/>
+        <Description>Specifies the size of the region to protect:&lt;html&gt;&lt;br&gt;&lt;font color=&quot;red&quot;&gt;&lt;b&gt;*&lt;/b&gt; For Region size 32B, 64B and 128B SubRegion Disable in not available&lt;/font&gt;&lt;/br&gt;&lt;/html&gt;</Description> 	
+    </RefParameter>
     <RefParameter Name="SubRegionDisable" Comment="MPU SubRegion Disable" DefaultValue="null" Max="0xFF" Min="0x0" Type="hex" Group="Cortex_Memory_Protection_Unit_Region_Settings" Visible="false">
-        <Condition Expression="!MPU_Enabled" Diagnostic=""/>  
+        <Condition Expression="((!MPU_Enabled &amp; !MPU_Enabled_Spec &amp; !MPU_Enabled_S))" Diagnostic=""/>  
     </RefParameter>
     <RefParameter Name="SubRegionDisable" Comment="MPU SubRegion Disable" DefaultValue="0x0" Max="0x0" Min="0x0" Type="hex" Group="Cortex_Memory_Protection_Unit_Region_Settings" Visible="false">
         <Condition Expression="MPU_SubRegionNotAvailable" Diagnostic=""/>  
     </RefParameter>
+        
     <RefParameter Name="SubRegionDisable" Comment="MPU SubRegion Disable" DefaultValue="0x0" Max="0xFF" Min="0x0" Type="hex"  Group="Cortex_Memory_Protection_Unit_Region_Settings" >	
-        <Condition Expression="MPU_Enabled" Diagnostic="" />  
+        <Condition Expression="(MPU_Enabled)" Diagnostic="" />  
         <Description>Specifies the number of the subregion protection to disable</Description> 	
     </RefParameter>
-	
-    <RefParameter Name="TypeExtField" Comment="MPU TEX field level" Type="list" DefaultValue="null" Group="Cortex_Memory_Protection_Unit_Region_Settings" Visible="false">
-        <Condition Expression="!MPU_Enabled" Diagnostic="" />  
+    
+     <RefParameter Name="SubRegionDisable_Spec" Comment="MPU SubRegion Disable" DefaultValue="0x87" Max="0xFF" Min="0x0" Type="hex"  Group="Cortex_Memory_Protection_Unit_Region_Settings" >	
+        <Condition Expression="(MPU_Enabled_Spec) &amp; Speculation1" Diagnostic="" />  
+        <Description>Specifies the number of the subregion protection to disable</Description> 	
     </RefParameter>
-    <RefParameter Name="TypeExtField" Comment="MPU TEX field level" Type="list" DefaultValue="MPU_TEX_LEVEL0" Group="Cortex_Memory_Protection_Unit_Region_Settings" >
-        <Condition Expression="MPU_Enabled" Diagnostic="" />  
+    <RefParameter Name="SubRegionDisable_S" Comment="MPU SubRegion Disable" DefaultValue="0x0" Max="0xFF" Min="0x0" Type="hex"  Group="Cortex_Memory_Protection_Unit_Region_Settings" >	
+        <Condition Expression="(MPU_Enabled_S) &amp; Speculation1" Diagnostic="" />  
+        <Description>Specifies the number of the subregion protection to disable</Description> 	
+    </RefParameter>
+    <RefParameter Name="TypeExtField" Comment="MPU TEX field level" Type="list" DefaultValue="null" Group="Cortex_Memory_Protection_Unit_Region_Settings" Visible="false">
+        <Condition Expression="((!MPU_Enabled &amp; !MPU_Enabled_Spec &amp; !MPU_Enabled_S))" Diagnostic="" />  
+    </RefParameter>
+    <RefParameter Name="TypeExtField_Spec" Comment="MPU TEX field level" Type="list" DefaultValue="MPU_TEX_LEVEL0" Group="Cortex_Memory_Protection_Unit_Region_Settings" >
+        <Condition Expression="(MPU_Enabled_Spec) &amp; Speculation1" Diagnostic="" />  
         <PossibleValue Value="MPU_TEX_LEVEL0" Comment="level 0"/>
         <PossibleValue Value="MPU_TEX_LEVEL1" Comment="level 1"/>
         <PossibleValue Value="MPU_TEX_LEVEL2" Comment="level 2"/>
         <Description>Specifies the TEX field level</Description> 	
     </RefParameter>
-	
+     <RefParameter Name="TypeExtField_S" Comment="MPU TEX field level" Type="list" DefaultValue="MPU_TEX_LEVEL0" Group="Cortex_Memory_Protection_Unit_Region_Settings" >
+        <Condition Expression="(MPU_Enabled_S) &amp; Speculation1" Diagnostic="" />  
+        <PossibleValue Value="MPU_TEX_LEVEL0" Comment="level 0"/>
+        <PossibleValue Value="MPU_TEX_LEVEL1" Comment="level 1"/>
+        <PossibleValue Value="MPU_TEX_LEVEL2" Comment="level 2"/>
+        <Description>Specifies the TEX field level</Description> 	
+    </RefParameter>
+	    <RefParameter Name="TypeExtField" Comment="MPU TEX field level" Type="list" DefaultValue="MPU_TEX_LEVEL0" Group="Cortex_Memory_Protection_Unit_Region_Settings" >
+        <Condition Expression="(MPU_Enabled)" Diagnostic="" />  
+        <PossibleValue Value="MPU_TEX_LEVEL0" Comment="level 0"/>
+        <PossibleValue Value="MPU_TEX_LEVEL1" Comment="level 1"/>
+        <PossibleValue Value="MPU_TEX_LEVEL2" Comment="level 2"/>
+        <Description>Specifies the TEX field level</Description> 	
+    </RefParameter>
     <RefParameter Name="AccessPermission" Comment="MPU Access Permission" Type="list" DefaultValue="null" Group="Cortex_Memory_Protection_Unit_Region_Settings" Visible="false">
-        <Condition Expression="!MPU_Enabled" Diagnostic="" />  
+        <Condition Expression="((!MPU_Enabled &amp; !MPU_Enabled_Spec &amp; !MPU_Enabled_S))" Diagnostic="" />  
+    </RefParameter>
+    <RefParameter Name="AccessPermission_Spec" Comment="MPU Access Permission" Type="list" DefaultValue="MPU_REGION_NO_ACCESS" Group="Cortex_Memory_Protection_Unit_Region_Settings" >
+        <Condition Expression="(MPU_Enabled_Spec) &amp; Speculation1" Diagnostic="" />  
+        <PossibleValue Value="MPU_REGION_NO_ACCESS" Comment="ALL ACCESS NOT PERMITTED"/>
+        <PossibleValue Value="MPU_REGION_PRIV_RW" Comment="Privileged READS\WRITES Permissions"/>
+        <PossibleValue Value="MPU_REGION_PRIV_RW_URO" Comment="Privileged READS\WRITES Permissions + Unprivileged READS Permissions"/>
+        <PossibleValue Value="MPU_REGION_FULL_ACCESS" Comment="ALL ACCESS PERMITTED"/>
+        <PossibleValue Value="MPU_REGION_PRIV_RO" Comment="Privileged READS Permissions"/>
+        <PossibleValue Value="MPU_REGION_PRIV_RO_URO" Comment="Privileged READS Permissions + Unprivileged  READS Permissions"/>
+        <Description>Specifies the region access permission type</Description> 
+    </RefParameter>
+     <RefParameter Name="AccessPermission_S" Comment="MPU Access Permission" Type="list" DefaultValue="MPU_REGION_NO_ACCESS" Group="Cortex_Memory_Protection_Unit_Region_Settings" >
+        <Condition Expression="(MPU_Enabled_S) &amp; Speculation1" Diagnostic="" />  
+        <PossibleValue Value="MPU_REGION_NO_ACCESS" Comment="ALL ACCESS NOT PERMITTED"/>
+        <PossibleValue Value="MPU_REGION_PRIV_RW" Comment="Privileged READS\WRITES Permissions"/>
+        <PossibleValue Value="MPU_REGION_PRIV_RW_URO" Comment="Privileged READS\WRITES Permissions + Unprivileged READS Permissions"/>
+        <PossibleValue Value="MPU_REGION_FULL_ACCESS" Comment="ALL ACCESS PERMITTED"/>
+        <PossibleValue Value="MPU_REGION_PRIV_RO" Comment="Privileged READS Permissions"/>
+        <PossibleValue Value="MPU_REGION_PRIV_RO_URO" Comment="Privileged READS Permissions + Unprivileged  READS Permissions"/>
+        <Description>Specifies the region access permission type</Description> 
     </RefParameter>
     <RefParameter Name="AccessPermission" Comment="MPU Access Permission" Type="list" DefaultValue="MPU_REGION_NO_ACCESS" Group="Cortex_Memory_Protection_Unit_Region_Settings" >
-        <Condition Expression="MPU_Enabled" Diagnostic="" />  
+        <Condition Expression="(MPU_Enabled)" Diagnostic="" />  
         <PossibleValue Value="MPU_REGION_NO_ACCESS" Comment="ALL ACCESS NOT PERMITTED"/>
         <PossibleValue Value="MPU_REGION_PRIV_RW" Comment="Privileged READS\WRITES Permissions"/>
         <PossibleValue Value="MPU_REGION_PRIV_RW_URO" Comment="Privileged READS\WRITES Permissions + Unprivileged READS Permissions"/>
@@ -495,43 +979,94 @@
     </RefParameter>
 	
     <RefParameter Name="DisableExec" Comment="MPU Instruction Access" Type="list" DefaultValue="null" Group="Cortex_Memory_Protection_Unit_Region_Settings" Visible="false">
-        <Condition Expression="!MPU_Enabled" Diagnostic="" />  
+        <Condition Expression="((!MPU_Enabled &amp; !MPU_Enabled_Spec &amp; !MPU_Enabled_S))" Diagnostic="" />  
     </RefParameter>
+    
     <RefParameter Name="DisableExec" Comment="MPU Instruction Access" Type="list" DefaultValue="ENABLE" Group="Cortex_Memory_Protection_Unit_Region_Settings">
-        <Condition Expression="MPU_Enabled" Diagnostic="" />  
+        <Condition Expression="(MPU_Enabled)" Diagnostic="" />  
         <PossibleValue Value="MPU_INSTRUCTION_ACCESS_ENABLE" Comment="ENABLE"/>
         <PossibleValue Value="MPU_INSTRUCTION_ACCESS_DISABLE" Comment="DISABLE"/>
         <Description>Specifies the instruction access status</Description> 
     </RefParameter>
-	
+    <RefParameter Name="DisableExec_Spec" Comment="MPU Instruction Access" Type="list" DefaultValue="MPU_INSTRUCTION_ACCESS_DISABLE" Group="Cortex_Memory_Protection_Unit_Region_Settings">
+        <Condition Expression="(MPU_Enabled_Spec) &amp; Speculation1" Diagnostic="" />  
+        <PossibleValue Value="MPU_INSTRUCTION_ACCESS_ENABLE" Comment="ENABLE"/>
+        <PossibleValue Value="MPU_INSTRUCTION_ACCESS_DISABLE" Comment="DISABLE"/>
+        <Description>Specifies the instruction access status</Description> 
+    </RefParameter>
+     <RefParameter Name="DisableExec_S" Comment="MPU Instruction Access" Type="list" DefaultValue="ENABLE" Group="Cortex_Memory_Protection_Unit_Region_Settings">
+        <Condition Expression="(MPU_Enabled_S) &amp; Speculation1" Diagnostic="" />  
+        <PossibleValue Value="MPU_INSTRUCTION_ACCESS_ENABLE" Comment="ENABLE"/>
+        <PossibleValue Value="MPU_INSTRUCTION_ACCESS_DISABLE" Comment="DISABLE"/>
+        <Description>Specifies the instruction access status</Description> 
+    </RefParameter>
     <RefParameter Name="IsShareable" Comment="MPU Shareability Permission" Type="list" DefaultValue="null" Group="Cortex_Memory_Protection_Unit_Region_Settings" Visible="false">
-        <Condition Expression="!MPU_Enabled" Diagnostic="" />  
+        <Condition Expression="((!MPU_Enabled &amp; !MPU_Enabled_Spec &amp; !MPU_Enabled_S))" Diagnostic="" />  
     </RefParameter>	
+    
     <RefParameter Name="IsShareable" Comment="MPU Shareability Permission" Type="list" DefaultValue="MPU_ACCESS_NOT_SHAREABLE" Group="Cortex_Memory_Protection_Unit_Region_Settings">
-        <Condition Expression="MPU_Enabled" Diagnostic="" />  
+        <Condition Expression="(MPU_Enabled)" Diagnostic="" />  
+        <PossibleValue Value="MPU_ACCESS_NOT_SHAREABLE" Comment="DISABLE"/>
+        <PossibleValue Value="MPU_ACCESS_SHAREABLE" Comment="ENABLE"/>	 
+        <Description>Specifies the shareability status of the protected region</Description> 
+    </RefParameter>
+    
+    <RefParameter Name="IsShareable_Spec" Comment="MPU Shareability Permission" Type="list" DefaultValue="MPU_ACCESS_SHAREABLE" Group="Cortex_Memory_Protection_Unit_Region_Settings">
+        <Condition Expression="(MPU_Enabled_Spec) &amp; Speculation1" Diagnostic="" />  
+        <PossibleValue Value="MPU_ACCESS_NOT_SHAREABLE" Comment="DISABLE"/>
+        <PossibleValue Value="MPU_ACCESS_SHAREABLE" Comment="ENABLE"/>	 
+        <Description>Specifies the shareability status of the protected region</Description> 
+    </RefParameter>
+    <RefParameter Name="IsShareable_S" Comment="MPU Shareability Permission" Type="list" DefaultValue="MPU_ACCESS_NOT_SHAREABLE" Group="Cortex_Memory_Protection_Unit_Region_Settings">
+        <Condition Expression="(MPU_Enabled_S) &amp; Speculation1" Diagnostic="" />  
         <PossibleValue Value="MPU_ACCESS_NOT_SHAREABLE" Comment="DISABLE"/>
         <PossibleValue Value="MPU_ACCESS_SHAREABLE" Comment="ENABLE"/>	 
         <Description>Specifies the shareability status of the protected region</Description> 
     </RefParameter>
 	
     <RefParameter Name="IsCacheable" Comment="MPU Cacheable  Permission" Type="list" DefaultValue="null" Group="Cortex_Memory_Protection_Unit_Region_Settings" Visible="false">
-        <Condition Expression="!MPU_Enabled" Diagnostic="" />  
+        <Condition Expression="((!MPU_Enabled &amp; !MPU_Enabled_Spec &amp; !MPU_Enabled_S))" Diagnostic="" />  
     </RefParameter>	
-    <RefParameter Name="IsCacheable" Comment="MPU Cacheable Permission" Type="list" DefaultValue="MPU_ACCESS_NOT_CACHEABLE" Group="Cortex_Memory_Protection_Unit_Region_Settings">
-        <Condition Expression="MPU_Enabled" Diagnostic="" />  
+    <RefParameter Name="IsCacheable_Spec" Comment="MPU Cacheable Permission" Type="list" DefaultValue="MPU_ACCESS_NOT_CACHEABLE" Group="Cortex_Memory_Protection_Unit_Region_Settings">
+        <Condition Expression="(MPU_Enabled_Spec) &amp; Speculation1" Diagnostic="" />  
         <PossibleValue Value="MPU_ACCESS_NOT_CACHEABLE" Comment="DISABLE"/>	
         <PossibleValue Value="MPU_ACCESS_CACHEABLE" Comment="ENABLE"/>	
         <Description>Specifies the cacheable status of the region protected</Description> 	
     </RefParameter>
-	
+    <RefParameter Name="IsCacheable_S" Comment="MPU Cacheable Permission" Type="list" DefaultValue="MPU_ACCESS_NOT_CACHEABLE" Group="Cortex_Memory_Protection_Unit_Region_Settings">
+        <Condition Expression="(MPU_Enabled_S) &amp; Speculation1" Diagnostic="" />  
+        <PossibleValue Value="MPU_ACCESS_NOT_CACHEABLE" Comment="DISABLE"/>	
+        <PossibleValue Value="MPU_ACCESS_CACHEABLE" Comment="ENABLE"/>	
+        <Description>Specifies the cacheable status of the region protected</Description> 	
+    </RefParameter>
+	    <RefParameter Name="IsCacheable" Comment="MPU Cacheable Permission" Type="list" DefaultValue="MPU_ACCESS_NOT_CACHEABLE" Group="Cortex_Memory_Protection_Unit_Region_Settings">
+        <Condition Expression="(MPU_Enabled)" Diagnostic="" />  
+        <PossibleValue Value="MPU_ACCESS_NOT_CACHEABLE" Comment="DISABLE"/>	
+        <PossibleValue Value="MPU_ACCESS_CACHEABLE" Comment="ENABLE"/>	
+        <Description>Specifies the cacheable status of the region protected</Description> 	
+    </RefParameter>
     <RefParameter Name="IsBufferable" Comment="MPU Bufferable  Permission" Type="list" DefaultValue="null" Group="Cortex_Memory_Protection_Unit_Region_Settings" Visible="false">
-        <Condition Expression="!MPU_Enabled" Diagnostic="" />  
+        <Condition Expression="((!MPU_Enabled &amp; !MPU_Enabled_Spec &amp; !MPU_Enabled_S))" Diagnostic="" />  
     </RefParameter>	
     <RefParameter Name="IsBufferable" Comment="MPU Bufferable  Permission" Type="list" DefaultValue="MPU_ACCESS_NOT_BUFFERABLE" Group="Cortex_Memory_Protection_Unit_Region_Settings">
-        <Condition Expression="MPU_Enabled" Diagnostic="" />  
+        <Condition Expression="(MPU_Enabled)" Diagnostic="" />  
+        <PossibleValue Value="MPU_ACCESS_NOT_BUFFERABLE" Comment="DISABLE"/>
+        <PossibleValue Value="MPU_ACCESS_BUFFERABLE" Comment="ENABLE"/>	 
+        <Description>Specifies the bufferable status of the protected region</Description> 	
+    </RefParameter>
+     <RefParameter Name="IsBufferable_Spec" Comment="MPU Bufferable  Permission" Type="list" DefaultValue="MPU_ACCESS_NOT_BUFFERABLE" Group="Cortex_Memory_Protection_Unit_Region_Settings">
+        <Condition Expression="(MPU_Enabled_Spec) &amp; Speculation1" Diagnostic="" />  
+        <PossibleValue Value="MPU_ACCESS_NOT_BUFFERABLE" Comment="DISABLE"/>
+        <PossibleValue Value="MPU_ACCESS_BUFFERABLE" Comment="ENABLE"/>	 
+        <Description>Specifies the bufferable status of the protected region</Description> 	
+    </RefParameter>
+    <RefParameter Name="IsBufferable_S" Comment="MPU Bufferable  Permission" Type="list" DefaultValue="MPU_ACCESS_NOT_BUFFERABLE" Group="Cortex_Memory_Protection_Unit_Region_Settings">
+        <Condition Expression="(MPU_Enabled_S) &amp; Speculation1" Diagnostic="" />  
         <PossibleValue Value="MPU_ACCESS_NOT_BUFFERABLE" Comment="DISABLE"/>
         <PossibleValue Value="MPU_ACCESS_BUFFERABLE" Comment="ENABLE"/>	 
         <Description>Specifies the bufferable status of the protected region</Description> 	
     </RefParameter>	
+            
+   
 		
 </IP>

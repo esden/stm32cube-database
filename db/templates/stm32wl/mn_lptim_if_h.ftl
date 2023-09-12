@@ -69,4 +69,3 @@ void MN_LPTIM_IF_DeInit(void);
 #endif
 
 #endif /* __MN_LPTIM_IF_H__ */
-

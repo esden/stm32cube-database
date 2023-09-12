@@ -10,11 +10,13 @@
         <Component Name="Middleware:LevelX:NOROoFlashOoSupport:true"/>
         <ConfigFile Name="LX_USER"/>
         <Defines Name="LX_INCLUDE_USER_DEFINE_FILE" Type="Cdefine"/>
+		<Defines Name="LX_STANDALONE_ENABLE" Condition="!SEMThreadXCcRTOSJjThreadXJjCore" Type="Cdefine"/>
     </RefConfig>
 	<RefConfig Name="FileOoSystemJjLevelXJjNAND">
 		<Component Name="Middleware:LevelX:NANDOoFlashOoSupport:true"/>
         <ConfigFile Name="LX_USER"/>
         <Defines Name="LX_INCLUDE_USER_DEFINE_FILE" Type="Cdefine"/>
+		<Defines Name="LX_STANDALONE_ENABLE" Condition="!SEMThreadXCcRTOSJjThreadXJjCore" Type="Cdefine"/>
     </RefConfig>
 	<RefConfig Name="NOROoSimulatorOointerface">
 		<Component Name="Middleware:LevelX:NOROoSimulatorOointerface:true"/>
@@ -36,13 +38,17 @@
     </RefConfig>
 	<RefConfig Name="OctoSPIOomemoryOointerface">
 		<Component Name="Middleware:LevelX:OctoSPIOomemoryOointerface:true"/>
-		<ConfigFile Name="LX_STM32_NOR_OSPI_H_FTL"/>
 		<ConfigFile Name="LX_CUSTOM_OSPI_DRIVER_H"/>
         <ConfigFile Name="LX_CUSTOM_GLUE_FUNCTIONS_C"/>
+		<ConfigFile Name="LX_OSPI"/>
     </RefConfig>
 	
+	<RefConfigFile Name="LX_OSPI" Description="LX OSPI" Template="azure_rtos/mx25lm51245g_conf_template_h.ftl" destinationFolder="Core/Inc">
+        <File Name="./mx25lm51245g_conf.h" Category="header" Condition="SEMA_MX25LM51245G"/>
+    </RefConfigFile>
+	
     <RefConfigFile Added="true" Description="LevelX's user.h file" Name="LX_USER" Template="azure_rtos/lx_user_h.ftl" destinationFolder="LevelX/App">
-        <File Category="header" Condition="( SEMLevelXCcFileOoSystemJjLevelXJjNANDOoFlashOoSupport | SEMLevelXCcFileOoSystemJjLevelXJjNOROoFlashOoSupport )" Name="./lx_user.h"/>
+        <File Category="header" Condition="all" Name="./lx_user.h"/>
         <Argument Added="true" AddressOf="false" GenericType="simple" Name="LX_NOR_DISABLE_EXTENDED_CACHE" OptimizationCondition="equal"/>
         <Argument Added="true" AddressOf="false" GenericType="simple" Name="LX_NOR_SECTOR_MAPPING_CACHE_SIZE" OptimizationCondition="equal"/>
         <Argument Added="true" AddressOf="false" GenericType="simple" Name="LX_THREAD_SAFE_ENABLE" OptimizationCondition="equal"/>
@@ -54,6 +60,8 @@
         <Argument Added="true" AddressOf="false" GenericType="simple" Name="LX_DIRECT_READ" OptimizationCondition="equal"/>
         <Argument Added="true" AddressOf="false" GenericType="simple" Name="NAND_SECTOR_MAPPING_CACHE_SIZE_NB_BIT" OptimizationCondition="equal"/>
         <Argument Added="true" AddressOf="false" GenericType="simple" Name="LX_NOR_EXTENDED_CACHE_SIZE" OptimizationCondition="equal"/>
+		<Argument AddressOf="true" Context="global" GenericType="struct" Name="LX_NOR_Flash_Support" TypeName=""/>
+		<Argument AddressOf="true" Context="global" GenericType="struct" Name="LX_NAND_Flash_Support" TypeName=""/>
     </RefConfigFile>
 	<RefConfigFile Added="true" Description="lx_stm32_nor_simulator_driver.h template file" Name="lx_stm32_nor_simulator_driver_h" Template="azure_rtos/lx_stm32_nor_simulator_driver_h.ftl" destinationFolder="LevelX/Target">
         <File Category="header" Condition="SEMInterfacesCcFileOoSystemJjLevelXOoNOROoSimulatorOointerface" Name="./lx_stm32_nor_simulator_driver.h"/>
@@ -77,20 +85,45 @@
     <RefConfigFile Added="true" Description="lx nand customer driver header ftl" Name="LX_NAND_CUSTOM_DRIVER_H_FTL" Template="azure_rtos/lx_stm32_nand_driver_h.ftl" destinationFolder="LevelX/Target">
         <File Category="header" Condition="SEMInterfacesCcFileOoSystemJjLevelXOoNANDOocustomOointerface" Name="./lx_stm32_nand_custom_driver.h"/>
     </RefConfigFile>
-    <RefConfigFile Added="true" Description="Levelx nor ospi driver header template" Name="LX_CUSTOM_OSPI_DRIVER_H" Template="azure_rtos/lx_stm32_nor_ospi_h.ftl" destinationFolder="LevelX/Target">
-        <File Category="header" Condition="SEMInterfacesCcFileOoSystemJjLevelXOoOctoSPIOomemoryOointerface &amp; OSPI_CUSTOM_API" Name="./lx_stm32_ospi_driver.h"/>
-        <Argument Added="true" AddressOf="false" GenericType="simple" Name="LX_DRIVER_ERASES_OSPI_AFTER_INIT" OptimizationCondition="equal"/>
+    
+	<RefConfigFile Added="true" Description="Levelx nor ospi driver header template" Name="LX_CUSTOM_OSPI_DRIVER_H" Template="azure_rtos/lx_stm32_nor_ospi_h_rtos.ftl" destinationFolder="LevelX/Target">
+        <File Category="header" Condition="SEMInterfacesCcFileOoSystemJjLevelXOoOctoSPIOomemoryOointerface &amp; (SEMA_MX25LM51245G | SEMA_CUSTOM) &amp; SEMThreadXCcRTOSJjThreadXJjCore" Name="./lx_stm32_ospi_driver.h"/>
+        <Argument Added="true" AddressOf="false" GenericType="simple" Name="LX_USE_OCTOSPI" OptimizationCondition="equal"/>
+		<Argument Added="true" AddressOf="false" GenericType="simple" Name="LX_DRIVER_ERASES_OSPI_AFTER_INIT" OptimizationCondition="equal"/>
         <Argument Added="true" AddressOf="false" GenericType="simple" Name="LX_DRIVER_CALLS_OSPI_INIT" OptimizationCondition="equal"/>
         <Argument Added="true" AddressOf="false" GenericType="simple" Name="LX_OSPI_INSTANCE" OptimizationCondition="equal"/>
         <Argument Added="true" AddressOf="false" GenericType="simple" Name="LX_OSPI_USE_BSP_API" OptimizationCondition="equal"/>
+		<Argument Added="true" AddressOf="false" GenericType="simple" Name="GLUE_FUNCTIONS" OptimizationCondition="equal"/>
+		<Argument Added="true" AddressOf="false" GenericType="simple" Name="TRANSFER_NOTIFICATION" OptimizationCondition="equal"/>
     </RefConfigFile>
-     <RefConfigFile Added="true" Description="FileX sd driver header template" Name="LX_CUSTOM_GLUE_FUNCTIONS_C" Template="azure_rtos/lx_stm32_ospi_driver_glue_c.ftl" destinationFolder="LevelX/Target">
-		<File Category="source" Condition="SEMInterfacesCcFileOoSystemJjLevelXOoOctoSPIOomemoryOointerface &amp; OSPI_CUSTOM_API" Name="./lx_stm32_ospi_driver_glue.c"/>
-        <Argument Added="true" AddressOf="false" GenericType="simple" Name="GLUE_FUNCTIONS" OptimizationCondition="equal"/>
+    <RefConfigFile Added="true" Description="LevelX ospi driver glue template" Name="LX_CUSTOM_GLUE_FUNCTIONS_C" Template="azure_rtos/lx_stm32_ospi_driver_glue_c_rtos.ftl" destinationFolder="LevelX/Target">
+		<File Category="source" Condition="SEMInterfacesCcFileOoSystemJjLevelXOoOctoSPIOomemoryOointerface &amp; (SEMA_MX25LM51245G | SEMA_CUSTOM) &amp; SEMThreadXCcRTOSJjThreadXJjCore" Name="./lx_stm32_ospi_driver_glue.c"/>
+        <Argument Added="true" AddressOf="false" GenericType="simple" Name="LX_USE_OCTOSPI" OptimizationCondition="equal"/>
+		<Argument Added="true" AddressOf="false" GenericType="simple" Name="GLUE_FUNCTIONS" OptimizationCondition="equal"/>
         <Argument Added="true" AddressOf="false" GenericType="simple" Name="TRANSFER_NOTIFICATION" OptimizationCondition="equal"/>
+		<Argument Added="true" AddressOf="false" GenericType="simple" Name="LX_OSPI_INSTANCE" OptimizationCondition="equal"/>
     </RefConfigFile>
-	<RefComponent Cclass="Middleware" Cgroup="LevelX" Cversion="6Gg1Gg6">
-        <SubComponent Csub="NOROoFlashOoSupport" Cvariant="true" Cversion="6Gg1Gg6">
+	
+	<RefConfigFile Added="true" Description="Levelx nor ospi driver header template" Name="LX_CUSTOM_OSPI_DRIVER_H" Template="azure_rtos/lx_stm32_nor_ospi_h_standalone.ftl" destinationFolder="LevelX/Target">
+        <File Category="header" Condition="SEMInterfacesCcFileOoSystemJjLevelXOoOctoSPIOomemoryOointerface &amp; (SEMA_MX25LM51245G | SEMA_CUSTOM) &amp; !SEMThreadXCcRTOSJjThreadXJjCore" Name="./lx_stm32_ospi_driver.h"/>
+        <Argument Added="true" AddressOf="false" GenericType="simple" Name="LX_USE_OCTOSPI" OptimizationCondition="equal"/>
+		<Argument Added="true" AddressOf="false" GenericType="simple" Name="LX_DRIVER_ERASES_OSPI_AFTER_INIT" OptimizationCondition="equal"/>
+        <Argument Added="true" AddressOf="false" GenericType="simple" Name="LX_DRIVER_CALLS_OSPI_INIT" OptimizationCondition="equal"/>
+        <Argument Added="true" AddressOf="false" GenericType="simple" Name="LX_OSPI_INSTANCE" OptimizationCondition="equal"/>
+        <Argument Added="true" AddressOf="false" GenericType="simple" Name="LX_OSPI_USE_BSP_API" OptimizationCondition="equal"/>
+		<Argument Added="true" AddressOf="false" GenericType="simple" Name="GLUE_FUNCTIONS" OptimizationCondition="equal"/>
+		<Argument Added="true" AddressOf="false" GenericType="simple" Name="TRANSFER_NOTIFICATION" OptimizationCondition="equal"/>
+    </RefConfigFile>
+    <RefConfigFile Added="true" Description="LevelX ospi driver glue template" Name="LX_CUSTOM_GLUE_FUNCTIONS_C" Template="azure_rtos/lx_stm32_ospi_driver_glue_c_standalone.ftl" destinationFolder="LevelX/Target">
+		<File Category="source" Condition="SEMInterfacesCcFileOoSystemJjLevelXOoOctoSPIOomemoryOointerface &amp; (SEMA_MX25LM51245G | SEMA_CUSTOM) &amp; !SEMThreadXCcRTOSJjThreadXJjCore" Name="./lx_stm32_ospi_driver_glue.c"/>
+        <Argument Added="true" AddressOf="false" GenericType="simple" Name="LX_USE_OCTOSPI" OptimizationCondition="equal"/>
+		<Argument Added="true" AddressOf="false" GenericType="simple" Name="GLUE_FUNCTIONS" OptimizationCondition="equal"/>
+        <Argument Added="true" AddressOf="false" GenericType="simple" Name="TRANSFER_NOTIFICATION" OptimizationCondition="equal"/>
+		<Argument Added="true" AddressOf="false" GenericType="simple" Name="LX_OSPI_INSTANCE" OptimizationCondition="equal"/>
+    </RefConfigFile>
+
+	<RefComponent Cclass="Middleware" Cgroup="LevelX" Cversion="6Gg1Gg9">
+        <SubComponent Csub="NOROoFlashOoSupport" Cvariant="true" Cversion="6Gg1Gg9">
 			<File Category="header" Condition="" Name="common/inc/*"/>
             <File Category="source" Condition="" Name="common/src/lx_nor_flash_block_reclaim.c"/>
             <File Category="source" Condition="" Name="common/src/lx_nor_flash_close.c"/>
@@ -111,7 +144,7 @@
             <File Category="source" Condition="" Name="common/src/lx_nor_flash_sector_write.c"/>
             <File Category="source" Condition="" Name="common/src/lx_nor_flash_system_error.c"/>
         </SubComponent>
-        <SubComponent Csub="NANDOoFlashOoSupport" Cvariant="true" Cversion="6Gg1Gg6">
+        <SubComponent Csub="NANDOoFlashOoSupport" Cvariant="true" Cversion="6Gg1Gg9">
 			<File Category="header" Condition="" Name="common/inc/*"/>
             <File Category="source" Condition="" Name="common/src/lx_nand_flash_256byte_ecc_check.c"/>
             <File Category="source" Condition="" Name="common/src/lx_nand_flash_256byte_ecc_compute.c"/>
@@ -156,4 +189,13 @@
 		    <File Category="source" Condition="" Name="common/drivers/lx_stm32_ospi_driver.c"/>
         </SubComponent>
 	</RefComponent>
+	<RefBspComponent BspIpName="" BspModeName="" Name="OSPI Component">
+		<!-- <File Category="template" Name="azure_rtos/mx25lm51245g_conf_template_h.ftl;Core/Inc/mx25lm51245g_conf.h" ComponentName="MX25LM51245G"/> -->
+		<File Category="template" Name="azure_rtos/lx_stm32_nor_ospi_h.ftl;Target/lx_stm32_ospi_driver.h" ComponentName="MX25LM51245G"/>
+		<File Category="template" Name="azure_rtos/lx_stm32_ospi_driver_glue_c.ftl;Target/lx_stm32_ospi_driver_glue.c" ComponentName="MX25LM51245G"/>
+        <File Category="header" Name="Drivers/BSP/Components/mx25lm51245g/mx25lm51245g.h" ComponentName="MX25LM51245G"/>
+        <File Category="source" Name="Drivers/BSP/Components/mx25lm51245g/mx25lm51245g.c" ComponentName="MX25LM51245G"/>
+		<File Category="template" Name="azure_rtos/lx_stm32_nor_ospi_h.ftl;Target/lx_stm32_ospi_driver.h" ComponentName="custom"/>
+		<File Category="template" Name="azure_rtos/lx_stm32_ospi_driver_glue_c.ftl;Target/lx_stm32_ospi_driver_glue.c" ComponentName="custom"/>
+    </RefBspComponent>
 </IP>

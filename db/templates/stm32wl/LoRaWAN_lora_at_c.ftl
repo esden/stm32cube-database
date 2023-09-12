@@ -24,19 +24,34 @@
 [/#if]
 #include "test_rf.h"
 #include "adc_if.h"
+[#if THREADX??][#-- If AzRtos is used --]
+#include "app_azure_rtos.h"
+#include "tx_api.h"
+#include "lora_app.h"
+[#else]
+[#if !FREERTOS??][#-- If FreeRtos is not used --]
 #include "stm32_seq.h"
+[#else]
+#include "cmsis_os.h"
+[/#if]
+[/#if]
 #include "utilities_def.h"
 #include "radio.h"
 [#if CPUCORE == "CM4"]
 #include "mbmuxif_sys.h"
 [/#if]
 #include "lora_info.h"
+#include "flash_if.h"
 
 /* USER CODE BEGIN Includes */
 
 /* USER CODE END Includes */
 
 /* External variables ---------------------------------------------------------*/
+[#if THREADX??][#-- If AzRtos is used --]
+extern  TX_BYTE_POOL *byte_pool;
+extern  CHAR *pointer;
+[/#if]
 /* USER CODE BEGIN EV */
 
 /* USER CODE END EV */
@@ -51,6 +66,19 @@
  * User application data buffer size
  */
 #define LORAWAN_APP_DATA_BUFFER_MAX_SIZE            242
+
+/*---------------------------------------------------------------------------*/
+/*                             LoRaWAN NVM configuration                     */
+/*---------------------------------------------------------------------------*/
+/**
+  * @brief LoRaWAN NVM Flash address
+  * @note last 2 sector of a 128kBytes device
+  */
+[#if (CPUCORE == "CM4")]
+#define LORAWAN_NVM_BASE_ADDRESS                    ((uint32_t)0x0801F000UL)
+[#else]
+#define LORAWAN_NVM_BASE_ADDRESS                    ((uint32_t)0x0803F000UL)
+[/#if]
 
 /* USER CODE BEGIN PD */
 
@@ -77,6 +105,26 @@ static LmHandlerAppData_t AppData = { 0, 0, AppDataBuffer };
 /* Dummy data sent periodically to let the tester respond with start test command*/
 static UTIL_TIMER_Object_t TxCertifTimer;
 
+[#if THREADX??][#-- If AzRtos is used --]
+/* LoRaCertifTxProcess thread handle*/
+TX_THREAD Thd_LoRaCertifTxProcessId;
+[/#if]
+[#if FREERTOS??][#-- If FreeRtos is used --]
+osThreadId_t Thd_LoRaCertifTxProcessId;
+
+const osThreadAttr_t Thd_LoRaCertifTxProcess_attr =
+{
+  .name = CFG_APP_LORA_CERTIF_TX_PROCESS_NAME,
+  .attr_bits = CFG_APP_LORA_CERTIF_TX_PROCESS_ATTR_BITS,
+  .cb_mem = CFG_APP_LORA_CERTIF_TX_PROCESS_CB_MEM,
+  .cb_size = CFG_APP_LORA_CERTIF_TX_PROCESS_CB_SIZE,
+  .stack_mem = CFG_APP_LORA_CERTIF_TX_PROCESS_STACK_MEM,
+  .priority = CFG_APP_LORA_CERTIF_TX_PROCESS_PRIORITY,
+  .stack_size = CFG_APP_LORA_CERTIF_TX_PROCESS_STACK_SIZE
+};
+
+[/#if]
+
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -96,7 +144,7 @@ static int32_t sscanf_uint32_as_hhx(const char *from, uint32_t *value);
   * @param  pt buffer that will contain the bytes read
   * @retval The number of bytes read
   */
-static int sscanf_16_hhx(const char *from, uint8_t *pt);
+static int32_t sscanf_16_hhx(const char *from, uint8_t *pt);
 
 /**
   * @brief  Print 4 bytes as %02x
@@ -160,6 +208,24 @@ static uint8_t Char2Nibble(char Char);
   */
 static int32_t stringToData(const char *str, uint8_t *data, uint32_t Size);
 
+[#if THREADX??][#-- If AzRtos is used --]
+/**
+  * @brief  Entry point for the thread when LoRaCertifTxProcess
+  * @param  thread_input: Not used
+  * @retval None
+  */
+static void Thd_LoRaCertifTxProcess_Entry(unsigned long thread_input);
+
+[/#if]
+[#if FREERTOS??][#-- If FreeRtos is used --]
+/**
+  * @brief  Thd_LoRaCertifTxProcess
+  * @param  argument
+  * @retval None
+  */
+static void Thd_LoRaCertifTxProcess(void *argument);
+
+[/#if]
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -199,43 +265,45 @@ void AT_event_receive(LmHandlerAppData_t *appData, LmHandlerRxParams_t *params)
   /* USER CODE BEGIN AT_event_receive_1 */
 
   /* USER CODE END AT_event_receive_1 */
-  const char *slotStrings[] = { "1", "2", "C", "C Multicast", "B Ping-Slot", "B Multicast Ping-Slot" };
+  const char *slotStrings[] = { "1", "2", "C", "C_MC", "P", "P_MC" };
   uint8_t ReceivedDataSize = 0;
+  uint8_t RxPort = 0;
 
-  if ((appData != NULL) && (appData->BufferSize > 0))
+  if (appData != NULL)
   {
-    /* Received data to be copied*/
-    if (LORAWAN_APP_DATA_BUFFER_MAX_SIZE <= appData->BufferSize)
+    RxPort = appData->Port;
+    if ((appData->Buffer != NULL) && (appData->BufferSize > 0))
     {
-      ReceivedDataSize = LORAWAN_APP_DATA_BUFFER_MAX_SIZE;
-    }
-    else
-    {
-      ReceivedDataSize = appData->BufferSize;
-    }
+      /* Received data to be copied*/
+      if (LORAWAN_APP_DATA_BUFFER_MAX_SIZE <= appData->BufferSize)
+      {
+        ReceivedDataSize = LORAWAN_APP_DATA_BUFFER_MAX_SIZE;
+      }
+      else
+      {
+        ReceivedDataSize = appData->BufferSize;
+      }
 
-    /*asynchronous notification to the host*/
-    AT_PRINTF("+EVT:%d:%02X:", appData->Port, ReceivedDataSize);
+      /*asynchronous notification to the host*/
+      AT_PRINTF("+EVT:%d:%02X:", appData->Port, ReceivedDataSize);
 
-    for (uint8_t i = 0; i < ReceivedDataSize; i++)
-    {
-      AT_PRINTF("%02x", appData->Buffer[i]);
+      for (uint8_t i = 0; i < ReceivedDataSize; i++)
+      {
+        AT_PRINTF("%02X", appData->Buffer[i]);
+      }
+      AT_PRINTF("\r\n");
     }
-    AT_PRINTF("\r\n");
   }
 
-  if (params != NULL)
+  if ((params != NULL) && (params->RxSlot < RX_SLOT_NONE))
   {
+    AT_PRINTF("+EVT:RX_%s, PORT %d, DR %d, RSSI %d, SNR %d", slotStrings[params->RxSlot], RxPort,
+              params->Datarate, params->Rssi, params->Snr);
     if (params->LinkCheck == true)
     {
-      AT_PRINTF("+EVT:RX_%s, DR %d, RSSI %d, SNR %d, DMODM %d, GWN %d\r\n", slotStrings[params->RxSlot], params->Datarate,
-                params->Rssi, params->Snr, params->DemodMargin, params->NbGateways);
+      AT_PRINTF(", DMODM %d, GWN %d", params->DemodMargin, params->NbGateways);
     }
-    else
-    {
-      AT_PRINTF("+EVT:RX_%s, DR %d, RSSI %d, SNR %d\r\n", slotStrings[params->RxSlot], params->Datarate, params->Rssi,
-                params->Snr);
-    }
+    AT_PRINTF("\r\n");
   }
 
   /* USER CODE BEGIN AT_event_receive_2 */
@@ -257,6 +325,85 @@ void AT_event_confirm(LmHandlerTxParams_t *params)
   /* USER CODE END AT_event_confirm_2 */
 }
 
+void AT_event_ClassUpdate(DeviceClass_t deviceClass)
+{
+  /* USER CODE BEGIN AT_event_ClassUpdate_1 */
+
+  /* USER CODE END AT_event_ClassUpdate_1 */
+  AT_PRINTF("+EVT:SWITCH_TO_CLASS_%c\r\n", "ABC"[deviceClass]);
+  /* USER CODE BEGIN AT_event_ClassUpdate_2 */
+
+  /* USER CODE END AT_event_ClassUpdate_2 */
+}
+
+void AT_event_Beacon(LmHandlerBeaconParams_t *params)
+{
+  /* USER CODE BEGIN AT_event_Beacon_1 */
+
+  /* USER CODE END AT_event_Beacon_1 */
+  if (params != NULL)
+  {
+    switch (params->State)
+    {
+      default:
+      case LORAMAC_HANDLER_BEACON_LOST:
+      {
+        AT_PRINTF("+EVT:BEACON_LOST\r\n");
+        break;
+      }
+      case LORAMAC_HANDLER_BEACON_RX:
+      {
+        AT_PRINTF("+EVT:RX_BC, DR %d, RSSI %d, SNR %d, FQ %d, TIME %d, DESC %d, "
+                  "INFO %02X%02X%02X,%02X%02X%02X\r\n",
+                  params->Info.Datarate, params->Info.Rssi, params->Info.Snr, params->Info.Frequency,
+                  params->Info.Time.Seconds, params->Info.GwSpecific.InfoDesc,
+                  params->Info.GwSpecific.Info[0], params->Info.GwSpecific.Info[1],
+                  params->Info.GwSpecific.Info[2], params->Info.GwSpecific.Info[3],
+                  params->Info.GwSpecific.Info[4], params->Info.GwSpecific.Info[5]);
+        break;
+      }
+      case LORAMAC_HANDLER_BEACON_NRX:
+      {
+        AT_PRINTF("+EVT:BEACON_NOT_RECEIVED\r\n");
+        break;
+      }
+    }
+  }
+  /* USER CODE BEGIN AT_event_Beacon_2 */
+
+  /* USER CODE END AT_event_Beacon_2 */
+}
+
+void AT_event_OnNvmDataChange(LmHandlerNvmContextStates_t state)
+{
+  if (state == LORAMAC_HANDLER_NVM_STORE)
+  {
+    AT_PRINTF("NVM DATA STORED\r\n");
+  }
+  else
+  {
+    AT_PRINTF("NVM DATA RESTORED\r\n");
+  }
+}
+
+void AT_event_OnStoreContextRequest(void *nvm, uint32_t nvm_size)
+{
+  /* store nvm in flash */
+  if (HAL_FLASH_Unlock() == HAL_OK)
+  {
+    if (FLASH_IF_EraseByPages(PAGE(LORAWAN_NVM_BASE_ADDRESS), 1, 0U) == FLASH_OK)
+    {
+      FLASH_IF_Write(LORAWAN_NVM_BASE_ADDRESS, (uint8_t *)nvm, nvm_size, NULL);
+    }
+    HAL_FLASH_Lock();
+  }
+}
+
+void AT_event_OnRestoreContextRequest(void *nvm, uint32_t nvm_size)
+{
+  UTIL_MEM_cpy_8(nvm, (void *)LORAWAN_NVM_BASE_ADDRESS, nvm_size);
+}
+
 /* --------------- General commands --------------- */
 ATEerror_t AT_reset(const char *param)
 {
@@ -267,6 +414,51 @@ ATEerror_t AT_reset(const char *param)
   /* USER CODE BEGIN AT_reset_2 */
 
   /* USER CODE END AT_reset_2 */
+}
+
+ATEerror_t AT_restore_factory_settings(const char *param)
+{
+  /* USER CODE BEGIN AT_restore_factory_settings_1 */
+
+  /* USER CODE END AT_restore_factory_settings_1 */
+  /* store nvm in flash */
+  if (HAL_FLASH_Unlock() == HAL_OK)
+  {
+    if (FLASH_IF_EraseByPages(PAGE(LORAWAN_NVM_BASE_ADDRESS), 1, 0U) == FLASH_OK)
+    {
+      /* System Reboot*/
+      NVIC_SystemReset();
+    }
+    HAL_FLASH_Lock();
+  }
+  return AT_OK;
+  /* USER CODE BEGIN AT_restore_factory_settings_2 */
+
+  /* USER CODE END AT_restore_factory_settings_2 */
+}
+
+ATEerror_t AT_store_context(const char *param)
+{
+  /* USER CODE BEGIN AT_store_context_1 */
+
+  /* USER CODE END AT_store_context_1 */
+  LmHandlerErrorStatus_t status = LORAMAC_HANDLER_ERROR;
+
+  status = LmHandlerNvmDataStore();
+
+  if (status == LORAMAC_HANDLER_NVM_DATA_UP_TO_DATE)
+  {
+    AT_PRINTF("NVM DATA UP TO DATE\r\n");
+  }
+  else if (status == LORAMAC_HANDLER_ERROR)
+  {
+    AT_PRINTF("NVM DATA STORE FAILED\r\n");
+    return AT_ERROR;
+  }
+  return AT_OK;
+  /* USER CODE BEGIN AT_store_context_2 */
+
+  /* USER CODE END AT_store_context_2 */
 }
 
 ATEerror_t AT_verbose_get(const char *param)
@@ -667,10 +859,10 @@ ATEerror_t AT_Join(const char *param)
   switch (param[0])
   {
     case '0':
-      LmHandlerJoin(ACTIVATION_TYPE_ABP);
+      LmHandlerJoin(ACTIVATION_TYPE_ABP, true);
       break;
     case '1':
-      LmHandlerJoin(ACTIVATION_TYPE_OTAA);
+      LmHandlerJoin(ACTIVATION_TYPE_OTAA, true);
       break;
     default:
       return AT_PARAM_ERROR;
@@ -709,7 +901,6 @@ ATEerror_t AT_Send(const char *param)
   LmHandlerMsgTypes_t isTxConfirmed;
   unsigned size = 0;
   char hex[3] = {0, 0, 0};
-  UTIL_TIMER_Time_t nextTxIn = 0;
   LmHandlerErrorStatus_t lmhStatus = LORAMAC_HANDLER_ERROR;
   ATEerror_t status = AT_ERROR;
 
@@ -790,12 +981,12 @@ ATEerror_t AT_Send(const char *param)
   AppData.BufferSize = size;
   AppData.Port = appPort;
 
-  lmhStatus = LmHandlerSend(&AppData, isTxConfirmed, &nextTxIn, false);
+  lmhStatus = LmHandlerSend(&AppData, isTxConfirmed, false);
 
   switch (lmhStatus)
   {
     case LORAMAC_HANDLER_SUCCESS:
-      status = (nextTxIn > 0) ? AT_DUTYCYCLE_RESTRICTED : AT_OK;
+      status = AT_OK;
       break;
     case LORAMAC_HANDLER_BUSY_ERROR:
     case LORAMAC_HANDLER_COMPLIANCE_RUNNING:
@@ -830,55 +1021,87 @@ ATEerror_t AT_version_get(const char *param)
   /* USER CODE END AT_version_get_1 */
 [#if CPUCORE == "CM4"]
   FEAT_INFO_Param_t *p_cm0plus_specific_features_info;
-  uint32_t lora_cm0plus_app;
+[/#if]
+  uint32_t feature_version;
 
+[#if CPUCORE == "CM4"]
   /* Get CM4 LoRa APP version*/
-  AT_PRINTF("M4 APP_VERSION:     V%X.%X.%X\r\n",
-            (uint8_t)(__CM4_APP_VERSION >> __APP_VERSION_MAIN_SHIFT),
-            (uint8_t)(__CM4_APP_VERSION >> __APP_VERSION_SUB1_SHIFT),
-            (uint8_t)(__CM4_APP_VERSION >> __APP_VERSION_SUB2_SHIFT));
+  AT_PRINTF("M4_APP_VERSION:      V%X.%X.%X\r\n",
+            (uint8_t)(APP_VERSION_MAIN),
+            (uint8_t)(APP_VERSION_SUB1),
+            (uint8_t)(APP_VERSION_SUB2));
 
   /* Get CM0 LoRa APP version*/
   p_cm0plus_specific_features_info = MBMUXIF_SystemGetFeatCapabInfoPtr(FEAT_INFO_SYSTEM_ID);
-  lora_cm0plus_app = p_cm0plus_specific_features_info->Feat_Info_Feature_Version ;
-  AT_PRINTF("M0PLUS_APP_VERSION: V%X.%X.%X\r\n",
-            (uint8_t)(lora_cm0plus_app >> __APP_VERSION_MAIN_SHIFT),
-            (uint8_t)(lora_cm0plus_app >> __APP_VERSION_SUB1_SHIFT),
-            (uint8_t)(lora_cm0plus_app >> __APP_VERSION_SUB2_SHIFT));
+  feature_version = p_cm0plus_specific_features_info->Feat_Info_Feature_Version ;
+  AT_PRINTF("M0PLUS_APP_VERSION:  V%X.%X.%X\r\n",
+            (uint8_t)(feature_version >> 24),
+            (uint8_t)(feature_version >> 16),
+            (uint8_t)(feature_version >> 8));
 
   /* Get MW LoraWAN info */
   p_cm0plus_specific_features_info = MBMUXIF_SystemGetFeatCapabInfoPtr(FEAT_INFO_LORAWAN_ID);
-  lora_cm0plus_app = p_cm0plus_specific_features_info->Feat_Info_Feature_Version ;
-  AT_PRINTF("MW_LORAWAN_VERSION: V%X.%X.%X\r\n",
-            (uint8_t)(lora_cm0plus_app >> __APP_VERSION_MAIN_SHIFT),
-            (uint8_t)(lora_cm0plus_app >> __APP_VERSION_SUB1_SHIFT),
-            (uint8_t)(lora_cm0plus_app >> __APP_VERSION_SUB2_SHIFT));
+  feature_version = p_cm0plus_specific_features_info->Feat_Info_Feature_Version ;
+  AT_PRINTF("MW_LORAWAN_VERSION:  V%X.%X.%X\r\n",
+            (uint8_t)(feature_version >> 24),
+            (uint8_t)(feature_version >> 16),
+            (uint8_t)(feature_version >> 8));
 
   /* Get MW SubGhz_Phy info */
   p_cm0plus_specific_features_info = MBMUXIF_SystemGetFeatCapabInfoPtr(FEAT_INFO_RADIO_ID);
-  lora_cm0plus_app = p_cm0plus_specific_features_info->Feat_Info_Feature_Version ;
-  AT_PRINTF("MW_RADIO_VERSION:   V%X.%X.%X\r\n",
-            (uint8_t)(lora_cm0plus_app >> __APP_VERSION_MAIN_SHIFT),
-            (uint8_t)(lora_cm0plus_app >> __APP_VERSION_SUB1_SHIFT),
-            (uint8_t)(lora_cm0plus_app >> __APP_VERSION_SUB2_SHIFT));
+  feature_version = p_cm0plus_specific_features_info->Feat_Info_Feature_Version ;
+  AT_PRINTF("MW_RADIO_VERSION:    V%X.%X.%X\r\n",
+            (uint8_t)(feature_version >> 24),
+            (uint8_t)(feature_version >> 16),
+            (uint8_t)(feature_version >> 8));
+
+  /* Get LoraWAN Link Layer info */
+  LmHandlerGetVersion(LORAMAC_HANDLER_L2_VERSION, &feature_version);
+  AT_PRINTF("L2_SPEC_VERSION:     V%X.%X.%X\r\n",
+            (uint8_t)(feature_version >> 24),
+            (uint8_t)(feature_version >> 16),
+            (uint8_t)(feature_version >> 8));
+
+  /* Get LoraWAN Regional Parameters info */
+  LmHandlerGetVersion(LORAMAC_HANDLER_REGION_VERSION, &feature_version);
+  AT_PRINTF("RP_SPEC_VERSION:     V%X-%X.%X.%X\r\n",
+            (uint8_t)(feature_version >> 24),
+            (uint8_t)(feature_version >> 16),
+            (uint8_t)(feature_version >> 8),
+            (uint8_t)(feature_version));
 [#else]
   /* Get LoRa APP version*/
-  AT_PRINTF("APP_VERSION:        V%X.%X.%X\r\n",
-            (uint8_t)(__LORA_APP_VERSION >> __APP_VERSION_MAIN_SHIFT),
-            (uint8_t)(__LORA_APP_VERSION >> __APP_VERSION_SUB1_SHIFT),
-            (uint8_t)(__LORA_APP_VERSION >> __APP_VERSION_SUB2_SHIFT));
+  AT_PRINTF("APPLICATION_VERSION: V%X.%X.%X\r\n",
+            (uint8_t)(APP_VERSION_MAIN),
+            (uint8_t)(APP_VERSION_SUB1),
+            (uint8_t)(APP_VERSION_SUB2));
 
   /* Get MW LoraWAN info */
-  AT_PRINTF("MW_LORAWAN_VERSION: V%X.%X.%X\r\n",
-            (uint8_t)(__LORAWAN_VERSION >> __APP_VERSION_MAIN_SHIFT),
-            (uint8_t)(__LORAWAN_VERSION >> __APP_VERSION_SUB1_SHIFT),
-            (uint8_t)(__LORAWAN_VERSION >> __APP_VERSION_SUB2_SHIFT));
+  AT_PRINTF("MW_LORAWAN_VERSION:  V%X.%X.%X\r\n",
+            (uint8_t)(LORAWAN_VERSION_MAIN),
+            (uint8_t)(LORAWAN_VERSION_SUB1),
+            (uint8_t)(LORAWAN_VERSION_SUB2));
 
   /* Get MW SubGhz_Phy info */
-  AT_PRINTF("MW_RADIO_VERSION:   V%X.%X.%X\r\n",
-            (uint8_t)(__SUBGHZ_PHY_VERSION >> __APP_VERSION_MAIN_SHIFT),
-            (uint8_t)(__SUBGHZ_PHY_VERSION >> __APP_VERSION_SUB1_SHIFT),
-            (uint8_t)(__SUBGHZ_PHY_VERSION >> __APP_VERSION_SUB2_SHIFT));
+  AT_PRINTF("MW_RADIO_VERSION:    V%X.%X.%X\r\n",
+            (uint8_t)(SUBGHZ_PHY_VERSION_MAIN),
+            (uint8_t)(SUBGHZ_PHY_VERSION_SUB1),
+            (uint8_t)(SUBGHZ_PHY_VERSION_SUB2));
+
+  /* Get LoraWAN Link Layer info */
+  LmHandlerGetVersion(LORAMAC_HANDLER_L2_VERSION, &feature_version);
+  AT_PRINTF("L2_SPEC_VERSION:     V%X.%X.%X\r\n",
+            (uint8_t)(feature_version >> 24),
+            (uint8_t)(feature_version >> 16),
+            (uint8_t)(feature_version >> 8));
+
+  /* Get LoraWAN Regional Parameters info */
+  LmHandlerGetVersion(LORAMAC_HANDLER_REGION_VERSION, &feature_version);
+  AT_PRINTF("RP_SPEC_VERSION:     V%X-%X.%X.%X\r\n",
+            (uint8_t)(feature_version >> 24),
+            (uint8_t)(feature_version >> 16),
+            (uint8_t)(feature_version >> 8),
+            (uint8_t)(feature_version));
 [/#if]
 
   return AT_OK;
@@ -1544,7 +1767,7 @@ ATEerror_t AT_test_get_config(const char *param)
   AT_PRINTF("1: Freq= %d Hz\r\n", testParam.freq);
   AT_PRINTF("2: Power= %d dBm\r\n", testParam.power);
 
-  if (testParam.modulation == 0)
+  if ((testParam.modulation == TEST_FSK) || (testParam.modulation == TEST_MSK))
   {
     /*fsk*/
     AT_PRINTF("3: Bandwidth= %d Hz\r\n", testParam.bandwidth);
@@ -1552,13 +1775,27 @@ ATEerror_t AT_test_get_config(const char *param)
     AT_PRINTF("5: Coding Rate not applicable\r\n");
     AT_PRINTF("6: LNA State= %d  \r\n", testParam.lna);
     AT_PRINTF("7: PA Boost State= %d  \r\n", testParam.paBoost);
-    AT_PRINTF("8: modulation FSK\r\n");
+    if (testParam.modulation == TEST_FSK)
+    {
+      AT_PRINTF("8: modulation FSK\r\n");
+    }
+    else
+    {
+      AT_PRINTF("8: modulation MSK\r\n");
+    }
     AT_PRINTF("9: Payload len= %d Bytes\r\n", testParam.payloadLen);
-    AT_PRINTF("10: FSK deviation= %d Hz\r\n", testParam.fskDev);
+    if (testParam.modulation == TEST_FSK)
+    {
+      AT_PRINTF("10: FSK deviation= %d Hz\r\n", testParam.fskDev);
+    }
+    else
+    {
+      AT_PRINTF("10: FSK deviation forced to FSK datarate/4\r\n");
+    }
     AT_PRINTF("11: LowDRopt not applicable\r\n");
     AT_PRINTF("12: FSK gaussian BT product= %d \r\n", testParam.BTproduct);
   }
-  else if (testParam.modulation == 1)
+  else if (testParam.modulation == TEST_LORA)
   {
     /*Lora*/
     AT_PRINTF("3: Bandwidth= %d (=%d Hz)\r\n", testParam.bandwidth, loraBW[testParam.bandwidth]);
@@ -1576,12 +1813,6 @@ ATEerror_t AT_test_get_config(const char *param)
   {
     AT_PRINTF("4: BPSK datarate= %d bps\r\n", testParam.loraSf_datarate);
   }
-
-  AT_PRINTF("can be copy/paste in set cmd: AT+TCONF=%d:%d:%d:%d:4/%d:%d:%d:%d:%d:%d:%d:%d\r\n", testParam.freq,
-            testParam.power,
-            testParam.bandwidth, testParam.loraSf_datarate, testParam.codingRate + 4, \
-            testParam.lna, testParam.paBoost, testParam.modulation, testParam.payloadLen, testParam.fskDev, testParam.lowDrOpt,
-            testParam.BTproduct);
   return AT_OK;
   /* USER CODE BEGIN AT_test_get_config_2 */
 
@@ -1634,17 +1865,21 @@ ATEerror_t AT_test_set_config(const char *param)
 
   /* 8: modulation check and set */
   /* first check because required for others */
-  if (modulation == 0)
+  if (modulation == TEST_FSK)
   {
     testParam.modulation = TEST_FSK;
   }
-  else if (modulation == 1)
+  else if (modulation == TEST_LORA)
   {
     testParam.modulation = TEST_LORA;
   }
-  else if (modulation == 2)
+  else if (modulation == TEST_BPSK)
   {
     testParam.modulation = TEST_BPSK;
+  }
+  else if (modulation == TEST_MSK)
+  {
+    testParam.modulation = TEST_MSK;
   }
   else
   {
@@ -1677,6 +1912,10 @@ ATEerror_t AT_test_set_config(const char *param)
   {
     testParam.bandwidth = bandwidth;
   }
+  else if ((testParam.modulation == TEST_MSK) && (bandwidth >= 4800) && (bandwidth <= 467000))
+  {
+    testParam.bandwidth = bandwidth;
+  }
   else if ((testParam.modulation == TEST_LORA) && (bandwidth <= BW_500kHz))
   {
     testParam.bandwidth = bandwidth;
@@ -1695,6 +1934,10 @@ ATEerror_t AT_test_set_config(const char *param)
   {
     testParam.loraSf_datarate = loraSf_datarate;
   }
+  else if ((testParam.modulation == TEST_MSK) && (loraSf_datarate >= 100) && (loraSf_datarate <= 300000))
+  {
+    testParam.loraSf_datarate = loraSf_datarate;
+  }
   else if ((testParam.modulation == TEST_LORA) && (loraSf_datarate >= 5) && (loraSf_datarate <= 12))
   {
     testParam.loraSf_datarate = loraSf_datarate;
@@ -1709,7 +1952,7 @@ ATEerror_t AT_test_set_config(const char *param)
   }
 
   /* 5: coding rate check and set */
-  if ((testParam.modulation == TEST_FSK) || (testParam.modulation == TEST_BPSK))
+  if ((testParam.modulation == TEST_FSK) || (testParam.modulation == TEST_MSK) || (testParam.modulation == TEST_BPSK))
   {
     /* Not used */
   }
@@ -1750,7 +1993,7 @@ ATEerror_t AT_test_set_config(const char *param)
   }
 
   /* 10: fsk Deviation check and set */
-  if ((testParam.modulation == TEST_LORA) || (testParam.modulation == TEST_BPSK))
+  if ((testParam.modulation == TEST_LORA) || (testParam.modulation == TEST_BPSK) || (testParam.modulation == TEST_MSK))
   {
     /* Not used */
   }
@@ -1765,7 +2008,7 @@ ATEerror_t AT_test_set_config(const char *param)
   }
 
   /* 11: low datarate optimization check and set */
-  if ((testParam.modulation == TEST_FSK) || (testParam.modulation == TEST_BPSK))
+  if ((testParam.modulation == TEST_FSK) || (testParam.modulation == TEST_BPSK) || (testParam.modulation == TEST_MSK))
   {
     /* Not used */
   }
@@ -1783,7 +2026,7 @@ ATEerror_t AT_test_set_config(const char *param)
   {
     /* Not used */
   }
-  else if ((testParam.modulation == TEST_FSK) && (BTproduct <= 4))
+  else if (((testParam.modulation == TEST_FSK) || (testParam.modulation == TEST_MSK)) && (BTproduct <= 4))
   {
     /*given in MHz*/
     testParam.BTproduct = BTproduct;
@@ -1821,7 +2064,7 @@ ATEerror_t AT_test_tx(const char *param)
   }
   else
   {
-    return AT_BUSY_ERROR;
+    return AT_ERROR;
   }
   /* USER CODE BEGIN AT_test_tx_2 */
 
@@ -1848,7 +2091,7 @@ ATEerror_t AT_test_rx(const char *param)
   }
   else
   {
-    return AT_BUSY_ERROR;
+    return AT_ERROR;
   }
   /* USER CODE BEGIN AT_test_rx_2 */
 
@@ -1862,18 +2105,35 @@ ATEerror_t AT_Certif(const char *param)
   switch (param[0])
   {
     case '0':
-      LmHandlerJoin(ACTIVATION_TYPE_ABP);
+      LmHandlerJoin(ACTIVATION_TYPE_ABP, true);
     case '1':
-      LmHandlerJoin(ACTIVATION_TYPE_OTAA);
+      LmHandlerJoin(ACTIVATION_TYPE_OTAA, true);
       break;
     default:
       return AT_PARAM_ERROR;
   }
 
-  UTIL_TIMER_Create(&TxCertifTimer,  0xFFFFFFFFU, UTIL_TIMER_ONESHOT, OnCertifTimer, NULL);  /* 8s */
-  UTIL_TIMER_SetPeriod(&TxCertifTimer,  8000);  /* 8s */
+  UTIL_TIMER_Create(&TxCertifTimer, 8000, UTIL_TIMER_ONESHOT, OnCertifTimer, NULL);  /* 8s */
   UTIL_TIMER_Start(&TxCertifTimer);
+[#if THREADX??][#-- If AzRtos is not used --]
+  /* Allocate the stack for LoRaCertifTxProcess.  */
+  tx_byte_allocate(byte_pool, (VOID **) &pointer, CFG_AT_THREAD_STACK_SIZE, TX_NO_WAIT);
+
+  tx_thread_create(&Thd_LoRaCertifTxProcessId, "Thread LoRaCertifTxProcess", Thd_LoRaCertifTxProcess_Entry, 0,
+                   pointer, CFG_AT_THREAD_STACK_SIZE,
+                   CFG_AT_THREAD_PRIO, CFG_AT_THREAD_PREEMPTION_THRESHOLD,
+                   TX_NO_TIME_SLICE, TX_AUTO_START);
+[#else][#-- THREADX--]
+[#if !FREERTOS??][#-- If FreeRtos is not used --]
   UTIL_SEQ_RegTask((1 << CFG_SEQ_Task_LoRaCertifTx), UTIL_SEQ_RFU, CertifSend);
+[#else]
+  Thd_LoRaCertifTxProcessId = osThreadNew(Thd_LoRaCertifTxProcess, NULL, &Thd_LoRaCertifTxProcess_attr);
+  if (Thd_LoRaCertifTxProcessId == NULL)
+  {
+    Error_Handler();
+  }
+[/#if]
+[/#if]
 
   return AT_OK;
   /* USER CODE BEGIN AT_Certif_2 */
@@ -2036,6 +2296,43 @@ ATEerror_t AT_bat_get(const char *param)
 /* USER CODE END EF */
 
 /* Private Functions Definition -----------------------------------------------*/
+[#if THREADX??][#-- If AzRtos is used --]
+static void Thd_LoRaCertifTxProcess_Entry(ULONG thread_input)
+{
+  /* USER CODE BEGIN Thd_LoRaCertifTxProcess_Entry_1 */
+
+  /* USER CODE END Thd_LoRaCertifTxProcess_Entry_1 */
+  (void) thread_input;
+  /* Infinite loop */
+  for (;;)
+  {
+    tx_thread_suspend(&Thd_LoRaCertifTxProcessId);
+    CertifSend();
+    /* USER CODE BEGIN Thd_LoRaCertifTxProcess_Entry_2 */
+
+    /* USER CODE END Thd_LoRaCertifTxProcess_Entry_2 */
+  }
+}
+
+[/#if]
+[#if FREERTOS??][#-- If FreeRtos is used --]
+static void Thd_LoRaCertifTxProcess(void *argument)
+{
+  /* USER CODE BEGIN Thd_LoRaCertifTxProcess_1 */
+
+  /* USER CODE END Thd_LoRaCertifTxProcess_1 */
+  UNUSED(argument);
+  for (;;)
+  {
+    osThreadFlagsWait(1, osFlagsWaitAny, osWaitForever);
+    CertifSend();  /*what you want to do*/
+  }
+  /* USER CODE BEGIN Thd_LoRaCertifTxProcess_2 */
+
+  /* USER CODE END Thd_LoRaCertifTxProcess_2 */
+}
+
+[/#if]
 static int32_t sscanf_uint32_as_hhx(const char *from, uint32_t *value)
 {
   /* USER CODE BEGIN sscanf_uint32_as_hhx_1 */
@@ -2051,7 +2348,7 @@ static int32_t sscanf_uint32_as_hhx(const char *from, uint32_t *value)
   /* USER CODE END sscanf_uint32_as_hhx_2 */
 }
 
-static int sscanf_16_hhx(const char *from, uint8_t *pt)
+static int32_t sscanf_16_hhx(const char *from, uint8_t *pt)
 {
   /* USER CODE BEGIN sscanf_16_hhx_1 */
 
@@ -2134,7 +2431,15 @@ static void OnCertifTimer(void *context)
   /* USER CODE BEGIN OnCertifTimer_1 */
 
   /* USER CODE END OnCertifTimer_1 */
+[#if THREADX??][#-- If AzRtos is used --]
+  tx_thread_resume(&Thd_LoRaCertifTxProcessId);
+[#else]
+[#if !FREERTOS??][#-- If FreeRtos is not used --]
   UTIL_SEQ_SetTask((1 << CFG_SEQ_Task_LoRaCertifTx), CFG_SEQ_Prio_0);
+[#else]
+  osThreadFlagsSet(Thd_LoRaCertifTxProcessId, 1);
+[/#if]
+[/#if]
   /* USER CODE BEGIN OnCertifTimer_2 */
 
   /* USER CODE END OnCertifTimer_2 */
@@ -2154,7 +2459,7 @@ static void CertifSend(void)
   {
     UTIL_TIMER_Start(&TxCertifTimer);
   }
-  LmHandlerSend(&AppData, LORAMAC_HANDLER_UNCONFIRMED_MSG, NULL, false);
+  LmHandlerSend(&AppData, LORAMAC_HANDLER_UNCONFIRMED_MSG, false);
 }
 
 static uint8_t Char2Nibble(char Char)

@@ -1540,6 +1540,10 @@
 [/#list]
 [/#compress]
 
+/* USER CODE BEGIN 1 */
+
+/* USER CODE END 1 */
+
 /* Define various build options for the NetX Duo port. The application should
    either make changes here by commenting or un-commenting the conditional
    compilation defined OR supply the defines though the compiler's equivalent
@@ -5524,5 +5528,9 @@
 [#else]
 #define NX_WEB_HTTP_SERVER_RETRY_MAX			${NX_WEB_HTTP_SERVER_RETRY_MAX_value}
 [/#if]
+
+/* USER CODE BEGIN 2 */
+
+/* USER CODE END 2 */
 
 #endif /* NX_USER_H */

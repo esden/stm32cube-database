@@ -151,4 +151,3 @@ void MN_LPTIM_IF_DeInit(void)
 /* USER CODE BEGIN PrFD */
 
 /* USER CODE END PrFD */
-

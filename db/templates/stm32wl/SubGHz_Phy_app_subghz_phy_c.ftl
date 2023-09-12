@@ -41,10 +41,15 @@
 #include "subghz_phy_app.h"
 [/#if]
 #include "sys_app.h"
+[#if !THREADX??][#-- If AzRtos is not used --]
 [#if !FREERTOS??][#-- If FreeRtos is not used --]
 #include "stm32_seq.h"
 [#else]
 #include "cmsis_os.h"
+[/#if]
+[/#if]
+[#if THREADX??]
+#include "tx_api.h"
 [/#if]
 
 /* USER CODE BEGIN Includes */
@@ -52,6 +57,11 @@
 /* USER CODE END Includes */
 
 /* External variables ---------------------------------------------------------*/
+[#if THREADX??]
+TX_THREAD App_MainThread;
+TX_BYTE_POOL *byte_pool;
+CHAR *pointer;
+[/#if]
 /* USER CODE BEGIN EV */
 
 /* USER CODE END EV */
@@ -83,12 +93,16 @@
 
 /* Exported functions --------------------------------------------------------*/
 
+[#if !THREADX??][#-- If AzRtos is not used --]
 void MX_SubGHz_Phy_Init(void)
 {
   /* USER CODE BEGIN MX_SubGHz_Phy_Init_1 */
 
   /* USER CODE END MX_SubGHz_Phy_Init_1 */
   SystemApp_Init();
+  /* USER CODE BEGIN MX_SubGHz_Phy_Init_1_1 */
+
+  /* USER CODE END MX_SubGHz_Phy_Init_1_1 */
 [#if (CPUCORE == "CM4") ||  (CPUCORE == "")]
   SubghzApp_Init();
 [/#if]
@@ -96,8 +110,44 @@ void MX_SubGHz_Phy_Init(void)
 
   /* USER CODE END MX_SubGHz_Phy_Init_2 */
 }
+[#else]
+uint32_t MX_SubGHz_Phy_Init(void *memory_ptr)
+{
+  uint32_t ret = TX_SUCCESS;
+
+  /* USER CODE BEGIN MX_SubGHz_Phy_Init_1 */
+
+  /* USER CODE END MX_SubGHz_Phy_Init_1 */
+  byte_pool = memory_ptr;
+
+  /* Allocate the stack for App App_MainThread.  */
+  if (tx_byte_allocate(byte_pool, (VOID **) &pointer,
+                       CFG_APP_SUBGHZ_THREAD_STACK_SIZE, TX_NO_WAIT) != TX_SUCCESS)
+  {
+    ret = TX_POOL_ERROR;
+  }
+
+  /* Create App_MainThread.  */
+  if (ret == TX_SUCCESS)
+  {
+    if (tx_thread_create(&App_MainThread, "App SubGHz Phy Main Thread", App_Main_Thread_Entry, 0,
+                         pointer, CFG_APP_SUBGHZ_THREAD_STACK_SIZE,
+                         CFG_APP_SUBGHZ_THREAD_PRIO, CFG_APP_SUBGHZ_THREAD_PREEMPTION_THRESHOLD,
+                         TX_NO_TIME_SLICE, TX_AUTO_START) != TX_SUCCESS)
+    {
+      ret = TX_THREAD_ERROR;
+    }
+  }
+
+  /* USER CODE BEGIN MX_SubGHz_Phy_Init_Last */
+
+  /* USER CODE END MX_SubGHz_Phy_Init_Last */
+  return ret;
+}
+[/#if]
 
 [#if !FREERTOS??][#-- If FreeRtos, only available in CM4 is not used --]
+[#if !THREADX??][#-- If AzRtos is not used --]
 void MX_SubGHz_Phy_Process(void)
 {
   /* USER CODE BEGIN MX_SubGHz_Phy_Process_1 */
@@ -110,6 +160,7 @@ void MX_SubGHz_Phy_Process(void)
   /* USER CODE END MX_SubGHz_Phy_Process_2 */
 [/#if]
 }
+[/#if]
 [/#if]
 
 /* USER CODE BEGIN EF */

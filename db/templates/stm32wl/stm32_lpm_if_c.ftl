@@ -177,8 +177,16 @@ void PWR_EnterSleepMode(void)
 
   /* USER CODE END EnterSleepMode_1 */
 [#if ((SUBGHZ_APPLICATION != "LORA_USER_APPLICATION") && (SUBGHZ_APPLICATION != "SUBGHZ_USER_APPLICATION") && (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION")) || (USE_LPM == "true")]
+[#if THREADX??][#-- If AzRtos is used --]
+  /* Suspend HAL_Tick (based on TIM) */
+  HAL_SuspendTick();
+  /* Disable SysTick Interrupt (RTOS timer) */
+  CLEAR_BIT(SysTick->CTRL, SysTick_CTRL_TICKINT_Msk);
+
+[#else]
   /* Suspend sysTick */
   HAL_SuspendTick();
+[/#if]
   /* USER CODE BEGIN EnterSleepMode_2 */
 
   /* USER CODE END EnterSleepMode_2 */
@@ -195,8 +203,16 @@ void PWR_ExitSleepMode(void)
 
   /* USER CODE END ExitSleepMode_1 */
 [#if ((SUBGHZ_APPLICATION != "LORA_USER_APPLICATION") && (SUBGHZ_APPLICATION != "SUBGHZ_USER_APPLICATION") && (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION")) || (USE_LPM == "true")]
-  /* Suspend sysTick */
+[#if THREADX??][#-- If AzRtos is used --]
+
+  /* Resume HAL_Tick (based on TIM17)  */
   HAL_ResumeTick();
+  /* Resume SysTick Interrupt (RTOS timer) */
+  SET_BIT(SysTick->CTRL, SysTick_CTRL_TICKINT_Msk);
+[#else]
+  /* Resume sysTick */
+  HAL_ResumeTick();
+[/#if]
 
   /* USER CODE BEGIN ExitSleepMode_2 */
 
@@ -212,4 +228,3 @@ void PWR_ExitSleepMode(void)
 /* USER CODE BEGIN PrFD */
 
 /* USER CODE END PrFD */
-

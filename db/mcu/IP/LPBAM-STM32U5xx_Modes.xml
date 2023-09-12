@@ -1,0 +1,550 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<IP DBVersion="V4.0" IPType="service" Name="LPBAM" Version="STM32L55x"
+	xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance"
+	ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd"
+	xmlns="http://mcd.rou.st.com/modules.php?name=mcu">
+	<About>LPBAM: Low Power Background Activity Mode</About>
+
+    <RefParameter Name="Instance" DefaultValue="LPBAM" Comment="Instance" Type="" Visible="false"/>
+	
+    <RefParameter Name="instance" DefaultValue="TIM1" Comment="" Type="list" Visible="false">
+        <PossibleValue Value="TIM1" Comment="" />
+    </RefParameter>
+
+
+
+
+
+<ModeLogicOperator Name="OR">
+    <Mode Name="ActiveDomain" UserName="LPBAM Scenarios Settings" RemoveDisable="true">
+          	 <ModeLogicOperator Name="XOR">
+          <Mode Name="ActiveDomain" UserName="LPBAM Scenario uses resources from Smart Run Domain only" RemoveDisable="true">
+                <ModeLogicOperator Name="XOR">
+                  <!--   <Mode Name="SelectDomain" UserName="No selection"> 
+                        <Semaphore>Semaphore_LPBAM_no_select</Semaphore>
+                        <SignalLogicalOp Name="AND">
+                        <Signal Name="VS_SIG1"/>
+                        </SignalLogicalOp>
+                    </Mode>
+-->
+                  <!--  <Mode Name="AllDomain" UserName="CPU and SmartRun">
+                        <Condition Diagnostic="CPU Domain not compatible with STOP2 Mode" Expression="!Semaphore_LPBAM_PM_STOP2"/> 
+                        <Semaphore>Semaphore_LPBAM_AD_ALL</Semaphore>
+                        <SignalLogicalOp Name="AND">
+                        <Signal Name="VS_SIG1"/>
+                        </SignalLogicalOp>
+                    </Mode>  
+
+                    <Mode Name="CPU" UserName="CPU only" >
+                     <Condition Diagnostic="CPU Domain not compatible with STOP2 Mode and not compatible with LPDMA/ IP from Smart Run Domain selected" Expression="!Semaphore_LPBAM_PM_STOP2 &amp; !Semaphore_LPBAM_IP_SMR &amp; !(Semaphore_LPBAM_BOTHDMA_SELECTED | Semaphore_LPBAM_LPDMA1_SELECTED)"/> 
+                        <Semaphore>Semaphore_LPBAM_AD_CPU</Semaphore>
+                        <SignalLogicalOp Name="AND">
+                        <Signal Name="VS_SIG1"/>
+                        </SignalLogicalOp>
+                    </Mode>   
+-->
+                    <Mode Name="SmartRun" UserName="Smart Run only">
+                       <Condition Diagnostic="IP from CPU Domain selected / not compatible with GPDMA" Expression="!Semaphore_LPBAM_GPDMA1_SELECTED &amp; !Semaphore_LPBAM_IP_CPU"/> 
+                        <Semaphore>Semaphore_LPBAM_AD_SMR</Semaphore>
+
+
+                        <!-- actvate automaticcaly all IPs of the SMR Domain-->
+                        <Semaphore>Semaphore_LPBAM_ADC4_SELECTED$noContext</Semaphore>
+                        <Semaphore>Semaphore_LPBAM_COMP1_SELECTED$noContext</Semaphore>
+                        <Semaphore>Semaphore_LPBAM_COMP2_SELECTED$noContext</Semaphore>
+                        <Semaphore>Semaphore_LPBAM_DAC1_SELECTED$noContext</Semaphore>
+                        <Semaphore>Semaphore_LPBAM_I2C3_SELECTED$noContext</Semaphore>
+                        <Semaphore>Semaphore_LPBAM_LPGPIO1_SELECTED$noContext</Semaphore>
+                        <Semaphore>Semaphore_LPBAM_LPDMA1_SELECTED$noContext</Semaphore>
+                        <Semaphore>Semaphore_LPBAM_LPTIM1_SELECTED$noContext</Semaphore>
+                        <Semaphore>Semaphore_LPBAM_LPTIM3_SELECTED$noContext</Semaphore>
+                        <Semaphore>Semaphore_LPBAM_LPUART1_SELECTED$noContext</Semaphore>
+                        <Semaphore>Semaphore_LPBAM_OPAMP1_SELECTED$noContext</Semaphore>
+                        <Semaphore>Semaphore_LPBAM_OPAMP2_SELECTED$noContext</Semaphore>
+                        <Semaphore>Semaphore_LPBAM_SPI3_SELECTED$noContext</Semaphore>
+                        <Semaphore>Semaphore_LPBAM_VREFBUF_SELECTED$noContext</Semaphore>
+
+                        <SignalLogicalOp Name="AND">
+                        <Signal Name="VS_SIG1"/>
+                        </SignalLogicalOp>
+                    </Mode> 
+                     </ModeLogicOperator>
+                   </Mode>   
+               
+            
+
+           
+
+            
+           <!-- <Mode Name="AccessibleMemory" UserName="LPBAM Scenarios : Memory and DMA " RemoveDisable="true"> in context of only one possibility replaced by-->
+          <Mode Name="AccessibleMemory" UserName="LPBAM Scenario is hosted by LPDMA1" RemoveDisable="true">
+                <ModeLogicOperator Name="XOR">
+                 <!--    <Mode Name="AllMemories" UserName="No selection">
+                        <Semaphore>Semaphore_LPBAM_no_select</Semaphore>
+                         <SignalLogicalOp Name="AND">
+                        <Signal Name="VS_SIG4"/>
+                        </SignalLogicalOp>
+                    </Mode>  
+
+
+                    <Mode Name="AllDMA" UserName="GPDMA1 and LPDMA1 and access to SRMA1/2/3 and SRAM4">
+                        <Condition Diagnostic="CPU Domain and smart run domain  must be selected / not compatible with STOP2 mode" Expression="!(Semaphore_LPBAM_AD_SMR |Semaphore_LPBAM_AD_CPU) &amp; !Semaphore_LPBAM_PM_STOP2"/>
+                        <Semaphore>Semaphore_LPBAM_BOTHDMA_SELECTED</Semaphore>
+                        <SignalLogicalOp Name="AND">
+                        <Signal Name="VS_SIG4"/>
+                        </SignalLogicalOp>
+                    </Mode>    
+
+                    <Mode Name="GPDMA1" UserName="GPDMA1 only and access to SRAM1/2/3 and SRAM4">
+                     <Condition Diagnostic="CPU Domain must be selected / not compatible with STOP2 mode / selected IP not compatible with GPDMA and access to SRMA123" Expression="!Semaphore_LPBAM_AD_SMR &amp; !Semaphore_LPBAM_PM_STOP2 &amp; !Semaphore_LPBAM_IP_LPDMA"/>  
+                        <Semaphore>Semaphore_LPBAM_GPDMA1_SELECTED</Semaphore>
+                        <SignalLogicalOp Name="AND">
+                        <Signal Name="VS_SIG4"/>
+                        </SignalLogicalOp>
+                    </Mode>   
+-->
+                    <Mode Name="LPDMA1" UserName="LPBAM Scenario is hosted by LPDMA1">
+                        <Condition Diagnostic="Smart Run Domain must be selected  / selected IP not compatible with LPDMA " Expression="!Semaphore_LPBAM_AD_CPU &amp; !Semaphore_LPBAM_IP_GPDMA"/>  
+                        <Semaphore>Semaphore_LPBAM_LPDMA1_SELECTED</Semaphore>
+                        <SignalLogicalOp Name="AND">
+                        <Signal Name="VS_SIG4"/>
+                        </SignalLogicalOp>
+                    </Mode>   
+                </ModeLogicOperator>
+            </Mode>   
+             </ModeLogicOperator>
+            </Mode>         
+	   
+    
+<!--    <Mode Name="HW IPs available for LPBAM configuration">
+       <ModeLogicOperator Name="OR"> -->
+      <!--  <Mode Name="LPBAMADC1_selection" UserName="ADC1 / CPU Domain" RemoveCondition="!ADC1_Exist">
+                <Condition Diagnostic="CPU Domain and GPDMA must be selected and STOP2 mode is not compatible" Expression="!Semaphore_LPBAM_AD_SMR &amp; !Semaphore_LPBAM_LPDMA1_SELECTED &amp; !Semaphore_LPBAM_PM_STOP2"/> 
+                <ModeLogicOperator Name="XOR">
+                    <Mode Name="EnableLPBAMADC1" UserName="Enable ADC1">
+                        <SignalLogicalOp Name="AND">
+                        <Signal Name="VS_ADC1"/>
+                        </SignalLogicalOp>
+                        <Semaphore>Semaphore_LPBAM_IP_CPU</Semaphore>
+                        <Semaphore>Semaphore_LPBAM_IP_GPDMA</Semaphore>
+                        <Semaphore>Semaphore_LPBAM_ADC1_SELECTED$noContext</Semaphore>
+                    </Mode>       
+                </ModeLogicOperator>
+            </Mode>   -->
+     <!--       <Mode Name="LPBAMADC4_selection" UserName="ADC4 / Smart Run Domain" RemoveCondition="!ADC4_Exist">
+                <Condition Diagnostic="SmartRun Domain must be selected" Expression="!Semaphore_LPBAM_AD_CPU"/> 
+                <ModeLogicOperator Name="XOR">
+                    <Mode Name="EnableLPBAMADC4" UserName="Enable ADC4">
+                        <SignalLogicalOp Name="AND">
+                        <Signal Name="VS_ADC4"/>
+                        </SignalLogicalOp>
+                        <Semaphore>Semaphore_LPBAM_IP_SMR</Semaphore>
+                        <Semaphore>Semaphore_LPBAM_IP_BOTHDMA</Semaphore>
+                        <Semaphore>Semaphore_LPBAM_ADC4_SELECTED$noContext</Semaphore>
+                    </Mode>       
+                </ModeLogicOperator>
+            </Mode>  
+            <Mode Name="LPBAMCOMP1_selection" UserName="COMP1 / Smart Run Domain" RemoveCondition="!COMP1_Exist">
+                <Condition Diagnostic="SmartRun Domain must be selected" Expression="!Semaphore_LPBAM_AD_CPU"/> 
+                <ModeLogicOperator Name="XOR">
+                    <Mode Name="EnableLPBAMCOMP1" UserName="Enable COMP1">
+                        <SignalLogicalOp Name="AND">
+                        <Signal Name="VS_COMP1"/>
+                        </SignalLogicalOp>
+                        <Semaphore>Semaphore_LPBAM_IP_SMR</Semaphore>
+                        <Semaphore>Semaphore_LPBAM_IP_BOTHDMA</Semaphore>
+                        <Semaphore>Semaphore_LPBAM_COMP1_SELECTED$noContext</Semaphore>
+                    </Mode>       
+                </ModeLogicOperator>
+            </Mode>   
+            <Mode Name="LPBAMCOMP2_selection" UserName="COMP2 / Smart Run Domain" RemoveCondition="!COMP2_Exist">
+                <Condition Diagnostic="SmartRun Domain must be selected" Expression="!Semaphore_LPBAM_AD_CPU"/> 
+                <ModeLogicOperator Name="XOR">
+                    <Mode Name="EnableLPBAMCOMP2" UserName="Enable COMP2">
+                        <SignalLogicalOp Name="AND">
+                        <Signal Name="VS_COMP2"/>
+                        </SignalLogicalOp>
+                        <Semaphore>Semaphore_LPBAM_IP_SMR</Semaphore>
+                        <Semaphore>Semaphore_LPBAM_IP_BOTHDMA</Semaphore>
+                        <Semaphore>Semaphore_LPBAM_COMP2_SELECTED$noContext</Semaphore>
+                    </Mode>       
+                </ModeLogicOperator>
+            </Mode> 
+
+             <Mode Name="LPBAMDAC1_selection" UserName="DAC1 / Smart Run Domain" RemoveCondition="!DAC1_Exist">
+                <Condition Diagnostic="SmartRun Domain must be selected" Expression="!Semaphore_LPBAM_AD_CPU"/> 
+                <ModeLogicOperator Name="XOR">
+                    <Mode Name="EnableLPBAMDAC1" UserName="Enable DAC1">
+                        <SignalLogicalOp Name="AND">
+                        <Signal Name="VS_DAC1"/>
+                        </SignalLogicalOp>
+                        <Semaphore>Semaphore_LPBAM_IP_SMR</Semaphore>
+                        <Semaphore>Semaphore_LPBAM_IP_BOTHDMA</Semaphore>
+                        <Semaphore>Semaphore_LPBAM_DAC1_SELECTED$noContext</Semaphore>
+                    </Mode>       
+                </ModeLogicOperator>
+            </Mode>  
+
+              <Mode Name="LPBAMI2C3_selection" UserName="I2C3 / Smart Run Domain" RemoveCondition="!I2C3_Exist">
+                <Condition Diagnostic="SmartRun Domain must be selected" Expression="!Semaphore_LPBAM_AD_CPU"/> 
+                <ModeLogicOperator Name="XOR">
+                    <Mode Name="EnableLPBAMI2C3" UserName="Enable I2C3">
+                        <SignalLogicalOp Name="AND">
+                        <Signal Name="VS_I2C3"/>
+                        </SignalLogicalOp>
+                        <Semaphore>Semaphore_LPBAM_IP_SMR</Semaphore>
+                        <Semaphore>Semaphore_LPBAM_IP_BOTHDMA</Semaphore>
+                        <Semaphore>Semaphore_LPBAM_I2C3_SELECTED$noContext</Semaphore>
+                    </Mode>       
+                </ModeLogicOperator>
+            </Mode> 
+             <Mode Name="LPBAMLPGPIO1_selection" UserName="LPGPIO1"> 
+              
+                <ModeLogicOperator Name="XOR">
+                    <Mode Name="EnableLPBAMLPGPIO1" UserName="Enable LPGPIO1">
+                        <SignalLogicalOp Name="AND">
+                        <Signal Name="VS_LPGPIO1"/>
+                        </SignalLogicalOp>
+                        <Semaphore>Semaphore_LPBAM_IP_SMR</Semaphore>
+                        <Semaphore>Semaphore_LPBAM_IP_BOTHDMA</Semaphore>
+                        <Semaphore>Semaphore_LPBAM_LPGPIO1_SELECTED$noContext</Semaphore>
+                    </Mode>       
+                </ModeLogicOperator>
+            </Mode> 
+           
+            
+             <Mode Name="LPBAMLPDMA1_selection" UserName="LPDMA1 / Smart Run Domain" RemoveCondition="!LPDMA1_Exist">
+                <Condition Diagnostic="SmartRun Domain must be selected" Expression="!Semaphore_LPBAM_AD_CPU"/> 
+                <ModeLogicOperator Name="XOR">
+                    <Mode Name="EnableLPBAMLPDMA1" UserName="Enable LPDMA1">
+                        <SignalLogicalOp Name="AND">
+                        <Signal Name="VS_LPDMA1"/>
+                        </SignalLogicalOp>
+                        <Semaphore>Semaphore_LPBAM_IP_SMR</Semaphore>
+                        <Semaphore>Semaphore_LPBAM_IP_BOTHDMA</Semaphore>
+                        <Semaphore>Semaphore_LPBAM_LPDMA1_SELECTED$noContext</Semaphore>
+                    </Mode>       
+                </ModeLogicOperator>
+            </Mode>  
+             <Mode Name="LPBAMLPTIM1_selection" UserName="LPTIM1 / Smart Run Domain" RemoveCondition="!LPTIM1_Exist">
+                <Condition Diagnostic="SmartRun Domain must be selected" Expression="!Semaphore_LPBAM_AD_CPU"/> 
+                <ModeLogicOperator Name="XOR">
+                    <Mode Name="EnableLPBAMLPTIM1" UserName="Enable LPTIM1">
+                        <SignalLogicalOp Name="AND">
+                        <Signal Name="VS_LPTIM1"/>
+                        </SignalLogicalOp>
+                        <Semaphore>Semaphore_LPBAM_IP_SMR</Semaphore>
+                        <Semaphore>Semaphore_LPBAM_IP_BOTHDMA</Semaphore>
+                        <Semaphore>Semaphore_LPBAM_LPTIM1_SELECTED$noContext</Semaphore>
+                    </Mode>       
+                </ModeLogicOperator>
+            </Mode>  
+             <Mode Name="LPBAMLPTIM3_selection" UserName="LPTIM3 / Smart Run Domain" RemoveCondition="!LPTIM3_Exist">
+                <Condition Diagnostic="SmartRun Domain must be selected" Expression="!Semaphore_LPBAM_AD_CPU"/> 
+                <ModeLogicOperator Name="XOR">
+                    <Mode Name="EnableLPBAMLPTIM3" UserName="Enable LPTIM3">
+                        <SignalLogicalOp Name="AND">
+                        <Signal Name="VS_LPTIM3"/>
+                        </SignalLogicalOp>
+                        <Semaphore>Semaphore_LPBAM_IP_SMR</Semaphore>
+                        <Semaphore>Semaphore_LPBAM_IP_BOTHDMA</Semaphore>
+                        <Semaphore>Semaphore_LPBAM_LPTIM3_SELECTED$noContext</Semaphore>
+                    </Mode>       
+                </ModeLogicOperator>
+            </Mode>
+             <Mode Name="LPBAMLPUART1_selection" UserName="LPUART1 / Smart Run Domain" RemoveCondition="!LPUART1_Exist">
+                <Condition Diagnostic="SmartRun Domain must be selected" Expression="!Semaphore_LPBAM_AD_CPU"/> 
+                <ModeLogicOperator Name="XOR">
+                    <Mode Name="EnableLPBAMLPUART1" UserName="Enable LPUART1">
+                        <SignalLogicalOp Name="AND">
+                        <Signal Name="VS_LPUART1"/>
+                        </SignalLogicalOp>
+                        <Semaphore>Semaphore_LPBAM_IP_SMR</Semaphore>
+                        <Semaphore>Semaphore_LPBAM_IP_BOTHDMA</Semaphore>
+                        <Semaphore>Semaphore_LPBAM_LPUART1_SELECTED$noContext</Semaphore>
+                    </Mode>       
+                </ModeLogicOperator>
+            </Mode>  
+             <Mode Name="LPBAMOPAMP1_selection" UserName="OPAMP1 / Smart Run Domain" RemoveCondition="!OPAMP1_Exist">
+                <Condition Diagnostic="SmartRun Domain must be selected" Expression="!Semaphore_LPBAM_AD_CPU"/> 
+                <ModeLogicOperator Name="XOR">
+                    <Mode Name="EnableLPBAMOPAMP1" UserName="Enable OPAMP1">
+                        <SignalLogicalOp Name="AND">
+                        <Signal Name="VS_OPAMP1"/>
+                        </SignalLogicalOp>
+                        <Semaphore>Semaphore_LPBAM_IP_SMR</Semaphore>
+                        <Semaphore>Semaphore_LPBAM_IP_BOTHDMA</Semaphore>
+                        <Semaphore>Semaphore_LPBAM_OPAMP1_SELECTED$noContext</Semaphore>
+                    </Mode>       
+                </ModeLogicOperator>
+            </Mode>   
+            <Mode Name="LPBAMOPAMP2_selection" UserName="OPAMP2 / Smart Run Domain" RemoveCondition="!OPAMP2_Exist">
+                <Condition Diagnostic="SmartRun Domain must be selected" Expression="!Semaphore_LPBAM_AD_CPU"/> 
+                <ModeLogicOperator Name="XOR">
+                    <Mode Name="EnableLPBAMOPAMP2" UserName="Enable OPAMP2">
+                        <SignalLogicalOp Name="AND">
+                        <Signal Name="VS_OPAMP2"/>
+                        </SignalLogicalOp>
+                        <Semaphore>Semaphore_LPBAM_IP_SMR</Semaphore>
+                        <Semaphore>Semaphore_LPBAM_IP_BOTHDMA</Semaphore>
+                        <Semaphore>Semaphore_LPBAM_OPAMP2_SELECTED$noContext</Semaphore>
+                    </Mode>       
+                </ModeLogicOperator>
+            </Mode> 
+            <Mode Name="LPBAMSPI1_selection" UserName="SPI1 / CPU Domain" RemoveCondition="!SPI1_Exist">
+                <Condition Diagnostic="CPU domain must be selected and GPDMA1 and STOP2 mode is not compatible" Expression="!Semaphore_LPBAM_AD_SMR &amp; !Semaphore_LPBAM_PM_STOP2 &amp; !Semaphore_LPBAM_LPDMA1_SELECTED "/> 
+                <ModeLogicOperator Name="XOR">
+                    <Mode Name="EnableLPBAMSPI1" UserName="Enable SPI1">
+                        <SignalLogicalOp Name="AND">
+                        <Signal Name="VS_SPI1"/>
+                        </SignalLogicalOp>
+                        <Semaphore>Semaphore_LPBAM_IP_CPU</Semaphore>
+                        <Semaphore>Semaphore_LPBAM_IP_GPDMA</Semaphore>
+                        <Semaphore>Semaphore_LPBAM_SPI1_SELECTED$noContext</Semaphore>
+                    </Mode>       
+                </ModeLogicOperator>
+            </Mode> 
+            <Mode Name="LPBAMSPI3_selection" UserName="SPI3 / Smart Run Domain" RemoveCondition="!SPI3_Exist">
+                <Condition Diagnostic="SmartRun Domain must be selected" Expression="!Semaphore_LPBAM_AD_CPU"/> 
+                <ModeLogicOperator Name="XOR">
+                    <Mode Name="EnableLPBAMSPI3" UserName="Enable SPI3">
+                        <SignalLogicalOp Name="AND">
+                        <Signal Name="VS_SPI3"/>
+                        </SignalLogicalOp>
+                    <Semaphore>Semaphore_LPBAM_IP_SMR</Semaphore>
+                    <Semaphore>Semaphore_LPBAM_IP_BOTHDMA</Semaphore>
+                    <Semaphore>Semaphore_LPBAM_SPI3_SELECTED$noContext</Semaphore>
+                    </Mode>       
+                </ModeLogicOperator>
+            </Mode>   
+            <Mode Name="LPBAMSPI4_selection" UserName="SPI4 to test Ip exist" RemoveCondition="!SPI4_Exist">
+                <Condition Diagnostic="SmartRun Domain must be selected" Expression="!Semaphore_LPBAM_AD_CPU" /> 
+                <ModeLogicOperator Name="XOR">
+                    <Mode Name="EnableLPBAMSPI4" UserName="Enable SPI4">
+                        <SignalLogicalOp Name="AND">
+                        <Signal Name="VS_SPI4"/>
+                        </SignalLogicalOp>
+                    <Semaphore>Semaphore_LPBAM_IP_SMR</Semaphore>
+                    <Semaphore>Semaphore_LPBAM_IP_BOTHDMA</Semaphore>
+                    <Semaphore>Semaphore_LPBAM_SPI4_SELECTED$noContext</Semaphore>
+                    </Mode>       
+                </ModeLogicOperator>
+            </Mode>        
+              <Mode Name="LPBAMVREFBUF_selection" UserName="VREFBUF / Smart Run Domain" RemoveCondition="!VREFBUF_Exist">
+                <Condition Diagnostic="SmartRun Domain must be selected" Expression="!Semaphore_LPBAM_AD_CPU"/> 
+                <ModeLogicOperator Name="XOR">
+                    <Mode Name="EnableLPBAMVREFBUF" UserName="Enable VREFBUF">
+                        <SignalLogicalOp Name="AND">
+                        <Signal Name="VS_VREFBUF"/>
+                        </SignalLogicalOp>
+                        <Semaphore>Semaphore_LPBAM_IP_SMR</Semaphore>
+                        <Semaphore>Semaphore_LPBAM_IP_BOTHDMA</Semaphore>
+                        <Semaphore>Semaphore_LPBAM_VREFBUF_SELECTED$noContext</Semaphore>
+                    </Mode>       
+                </ModeLogicOperator>
+            </Mode>  
+            
+              
+
+            
+           
+        
+       </ModeLogicOperator>
+    </Mode>-->       
+
+  <!--  <Mode Name="Select DMAs to run the Scenarios TO BE SET BY USER">
+       <ModeLogicOperator Name="OR"> 
+        <Mode Name="LPBAMGPDMA1_selection" UserName="GPDMA1 and access to SRAM123 and SRAM4">
+                <Condition Diagnostic="CPU Domain must be selected and STOP2 mode is not compatible" Expression="!Semaphore_LPBAM_AD_SMR &amp; !Semaphore_LPBAM_PM_STOP2"/> 
+                <ModeLogicOperator Name="XOR">
+                    <Mode Name="EnableLPBAMGPDMA1" UserName="Enable GPDMA1">
+                        <SignalLogicalOp Name="AND">
+                        <Signal Name="VS_GPDMA1"/>
+                        </SignalLogicalOp>
+                        <Semaphore>Semaphore_LPBAM_IP_CPU</Semaphore>
+                        <Semaphore>Semaphore_LPBAM_IP_GPDMA</Semaphore>
+                        <Semaphore>Semaphore_LPBAM_GPDMA1_SELECTED</Semaphore>
+                    </Mode>       
+                </ModeLogicOperator>
+            </Mode>               
+            <Mode Name="LPBAMLPDMA1_selection" UserName="LPDMA1 and access to SRAM4" >
+                <Condition Diagnostic="SmartRun Domain must be selected and SRAM1_2_3 is not compatible" Expression="!Semaphore_LPBAM_AD_CPU"/> 
+                <ModeLogicOperator Name="XOR">
+                    <Mode Name="EnableLPBAMLPDMA1" UserName="Enable LPDMA1">
+                        <SignalLogicalOp Name="AND">
+                        <Signal Name="VS_LPDMA1"/>
+                        </SignalLogicalOp>
+                        <Semaphore>Semaphore_LPBAM_IP_SMR</Semaphore>
+                        <Semaphore>Semaphore_LPBAM_IP_BOTHDMA</Semaphore>
+                        <Semaphore>Semaphore_LPBAM_LPDMA1_SELECTED</Semaphore>
+                    </Mode>       
+                </ModeLogicOperator>
+            </Mode>    
+       </ModeLogicOperator>
+    </Mode>   -->
+
+  <!--  <Mode Name="Resulting DMA available  NOT TO BE SELECTED BY USER HERE : WILL Be proposed when describing a scenario. CAN BE DISPLAYED HERE FOR INFO">
+       <ModeLogicOperator Name="OR"> 
+            <Mode Name="DMAHosting" UserName="DMA Hosting the LPBAM Scenarios" RemoveDisable="true">
+                <ModeLogicOperator Name="XOR">
+                     <Mode Name="SelectDMA" UserName="No selection">
+                        <Semaphore>Semaphore_LPBAM_no_select</Semaphore>
+                        <SignalLogicalOp Name="AND">
+                        <Signal Name="VS_SIG3"/>
+                        </SignalLogicalOp>
+                    </Mode> 
+
+                    <Mode Name="AllDMA" UserName="GPDMA and LPDMA">
+                       <Condition Diagnostic="CPU and SmartRun Domain must be selected and STOP2 mode musn't be selected" Expression="!Semaphore_LPBAM_AD_SMR &amp; !Semaphore_LPBAM_AD_CPU &amp; !Semaphore_LPBAM_PM_STOP2 &amp; !Semaphore_LPBAM_AM_SRAM123"/>  
+                        <Semaphore>Semaphore_LPBAM_DH_BOTH</Semaphore>
+                        <SignalLogicalOp Name="AND">
+                        <Signal Name="VS_SIG3"/>
+                        </SignalLogicalOp>
+                    </Mode>       
+
+                    <Mode Name="GPDMA" UserName="GPDMA">
+                        <Condition Diagnostic="CPU Domain must be selected and STOP2 mode musn't be selected" Expression="!Semaphore_LPBAM_AD_SMR &amp; !Semaphore_LPBAM_PM_STOP2"/>  
+                        <Semaphore>Semaphore_LPBAM_DH_GPDMA</Semaphore>
+                        <SignalLogicalOp Name="AND">
+                        <Signal Name="VS_SIG3"/>
+                        </SignalLogicalOp>
+                    </Mode> 
+
+                    <Mode Name="LPDMA" UserName="LPDMA">
+                        <Condition Diagnostic="SmartRun Domain must be selected" Expression="!Semaphore_LPBAM_AD_CPU &amp; !Semaphore_LPBAM_AM_SRAM123 &amp; !Semaphore_LPBAM_AM_SRAM1234"/>  
+                        <Semaphore>Semaphore_LPBAM_DH_LPDMA</Semaphore>
+                        <SignalLogicalOp Name="AND">
+                        <Signal Name="VS_SIG3"/>
+                        </SignalLogicalOp>
+                    </Mode>   
+                </ModeLogicOperator>
+            </Mode>           
+       </ModeLogicOperator>
+    </Mode> -->
+    
+  <!--  <Mode Name="Scenario Setting">
+       <ModeLogicOperator Name="OR"> 
+            <Mode Name="DMAHostingScenario" UserName="DMA Hosting this Scenario" RemoveDisable="true">
+                  
+                <ModeLogicOperator Name="XOR">
+                    <Mode Name="DMAToSet" UserName="Select a DMA Instance">
+                        <SignalLogicalOp Name="AND">
+                        <Signal Name="VS_SIG5"/>
+                        </SignalLogicalOp>
+                    </Mode>       
+
+                    <Mode Name="GPDMA" UserName="GPDMA">
+                        <Condition Diagnostic="" Expression="!Semaphore_LPBAM_AD_SMR"/>  
+                        <Semaphore>Semaphore_LPBAM_DH_SCE_GPDMA</Semaphore>
+
+                        <SignalLogicalOp Name="AND">
+                        <Signal Name="VS_SIG5"/>
+                        </SignalLogicalOp>
+                    </Mode> 
+
+                    <Mode Name="LPDMA" UserName="LPDMA">
+                        <Condition Diagnostic="" Expression="!Semaphore_LPBAM_AD_CPU"/> 
+
+                        <Semaphore>Semaphore_LPBAM_DH_SCE_LPDMA</Semaphore>
+
+                        <SignalLogicalOp Name="AND">
+                        <Signal Name="VS_SIG5"/>
+                        </SignalLogicalOp>
+                    </Mode>   
+                </ModeLogicOperator>
+            </Mode>            
+       </ModeLogicOperator>
+    </Mode>    
+    <Mode Name="Queue Setting">
+       <ModeLogicOperator Name="OR"> 
+            <Mode Name="DMAHostingQueue" UserName="DMA Channel Hosting this Queue" RemoveDisable="true">
+                <ModeLogicOperator Name="XOR">
+                    <Mode Name="DMAchannelToSet" UserName="Select a DMA Channel">
+                        <SignalLogicalOp Name="AND">
+                        <Signal Name="VS_SIG6"/>
+                        </SignalLogicalOp>
+                    </Mode>       
+
+                    <Mode Name="GPDMACH0" UserName="GPDMA CHannel 0">
+                        <Condition Diagnostic="" Expression="!Semaphore_LPBAM_DH_SCE_LPDMA"/> 
+                        <SignalLogicalOp Name="AND">
+                        <Signal Name="VS_GPDMACH0"/>
+                        </SignalLogicalOp>
+                    </Mode> 
+
+                    <Mode Name="GPDMACH1" UserName="GPDMA CHannel 1">
+                        <Condition Diagnostic="" Expression="!Semaphore_LPBAM_DH_SCE_LPDMA"/> 
+                        <SignalLogicalOp Name="AND">
+                        <Signal Name="VS_GPDMACH1"/>
+                        </SignalLogicalOp>
+                    </Mode>   
+
+                    <Mode Name="LPDMACH0" UserName="LPDMA CHannel 0">
+                        <Condition Diagnostic="" Expression="!Semaphore_LPBAM_DH_SCE_GPDMA"/> 
+                        <SignalLogicalOp Name="AND">
+                        <Signal Name="VS_LPDMACH0"/>
+                        </SignalLogicalOp>
+                    </Mode> 
+
+                    <Mode Name="LPDMACH1" UserName="LPDMA CHannel 1" >
+                        <Condition Diagnostic="" Expression="!Semaphore_LPBAM_DH_SCE_GPDMA"/> 
+                        <SignalLogicalOp Name="AND">
+                        <Signal Name="VS_LPDMACH1"/>
+                        </SignalLogicalOp>
+                    </Mode>
+                </ModeLogicOperator>
+            </Mode>            
+       </ModeLogicOperator>
+    </Mode>   
+
+-->     
+</ModeLogicOperator>	
+
+
+
+<RefSignal Name="VS_SIG1" Virtual="true"/>
+<RefSignal Name="VS_SIG11" Virtual="true"/>
+<RefSignal Name="VS_SIG12" Virtual="true"/>
+<RefSignal Name="VS_SIG13" Virtual="true"/>
+<RefSignal Name="VS_SIG14" Virtual="true"/>
+<RefSignal Name="VS_SIG2" Virtual="true"/>
+<RefSignal Name="VS_SIG3" Virtual="true"/>
+<RefSignal Name="VS_SIG4" Virtual="true"/>
+<RefSignal Name="VS_SIG5" Virtual="true"/>
+<RefSignal Name="VS_SIG6" Virtual="true"/>
+
+
+
+
+
+<RefSignal Name="VS_GPDMACH0" Virtual="true"/>
+<RefSignal Name="VS_GPDMACH1" Virtual="true"/>
+<RefSignal Name="VS_LPDMACH0" Virtual="true"/>
+<RefSignal Name="VS_LPDMACH1" Virtual="true"/>
+
+
+<RefSignal Name="VS_SPI1" Virtual="true"/>
+<RefSignal Name="VS_SPI3" Virtual="true"/>
+<RefSignal Name="VS_SPI4" Virtual="true"/>
+<RefSignal Name="VS_ADC1" Virtual="true"/>
+<RefSignal Name="VS_ADC4" Virtual="true"/>
+<RefSignal Name="VS_COMP1" Virtual="true"/>
+<RefSignal Name="VS_COMP2" Virtual="true"/>
+<RefSignal Name="VS_OPAMP1" Virtual="true"/>
+<RefSignal Name="VS_OPAMP2" Virtual="true"/>
+<RefSignal Name="VS_GPDMA1" Virtual="true"/>
+<RefSignal Name="VS_LPDMA1" Virtual="true"/>
+<RefSignal Name="VS_DAC1" Virtual="true"/>
+<RefSignal Name="VS_LPGPIO1" Virtual="true"/>
+<RefSignal Name="VS_I2C3" Virtual="true"/>
+<RefSignal Name="VS_LPUART1" Virtual="true"/>
+<RefSignal Name="VS_LPTIM1" Virtual="true"/>
+<RefSignal Name="VS_LPTIM3" Virtual="true"/>
+<RefSignal Name="VS_VREFBUF" Virtual="true"/>
+<RefSignal Name="VS_LPDMA1" Virtual="true"/>
+<RefSignal Name="VS_SIGPW" Virtual="true"/>
+<RefSignal Name="VS_SIGPWOPT" Virtual="true"/>
+
+
+
+</IP>

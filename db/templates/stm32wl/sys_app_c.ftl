@@ -25,6 +25,7 @@
 [#assign SUBGHZ_APPLICATION = ""]
 [#assign SECURE_PROJECTS = "0"]
 [#assign LORAWAN_FUOTA = "0"]
+[#assign FILL_UCS = ""]
 [#if SWIPdatas??]
     [#list SWIPdatas as SWIP]
         [#if SWIP.defines??]
@@ -32,9 +33,21 @@
                 [#if definition.name == "SUBGHZ_APPLICATION"]
                     [#assign SUBGHZ_APPLICATION = definition.value]
                 [/#if]
+                [#if definition.name == "FILL_UCS"]
+                    [#assign FILL_UCS = definition.value]
+                [/#if]
             [/#list]
         [/#if]
     [/#list]
+[/#if]
+[#if (CPUCORE == "CM0PLUS")]
+    [#if  timeBaseSource_M0PLUS??]
+        [#assign timeBaseSource = timeBaseSource_M0PLUS]
+    [/#if]
+[#elseif (CPUCORE == ("CM4"))]
+    [#if  timeBaseSource_M4??]
+        [#assign timeBaseSource = timeBaseSource_M4]
+    [/#if]
 [/#if]
 
 /* Includes ------------------------------------------------------------------*/
@@ -44,8 +57,13 @@
 [#if ((CPUCORE != "CM0PLUS") && (SUBGHZ_APPLICATION != "SUBGHZ_ADV_APPLICATION") && (SUBGHZ_APPLICATION != "LORA_USER_APPLICATION") && (SUBGHZ_APPLICATION != "SUBGHZ_USER_APPLICATION") && (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION"))]
 #include "adc_if.h"
 [/#if]
+[#if !THREADX??][#-- If AzRtos is not used --]
 [#if !FREERTOS??][#-- If FreeRtos is not used --]
 #include "stm32_seq.h"
+[/#if]
+[#else][#-- If AzRtos is used --]
+#include "app_threadx.h"
+#include "tx_user.h"
 [/#if]
 #include "stm32_systime.h"
 #include "stm32_lpm.h"
@@ -120,6 +138,14 @@ __IO uint32_t lets_go_on = 0;
   * Defines the maximum battery level
   */
 #define LORAWAN_MAX_BAT   254
+
+[/#if]
+[#if THREADX??]
+/**
+  * Tick rate reference 1ms
+  */
+#define configTICK_RATE_HZ_1MS                 1000
+
 [/#if]
 /* USER CODE BEGIN PD */
 
@@ -134,11 +160,17 @@ __IO uint32_t lets_go_on = 0;
 [#if (SECURE_PROJECTS == "1") && (CPUCORE == "CM0PLUS") ]
 static EXTI_HandleTypeDef Exti41;
 [/#if]
+[#if THREADX??]
+static uint32_t Time_BeforeSleep;
+static uint32_t Time_SleepFract = 0;
+[#else]
 [#if (CPUCORE == "CM4")]
 uint32_t InstanceIndex;
 uint8_t SYS_Cm0plusRdyNotificationFlag = 0;
-
 [/#if]
+[/#if]
+static uint8_t SYS_TimerInitialisedFlag = 0;
+
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -180,11 +212,82 @@ static void tiny_snprintf_like(char *buf, uint32_t maxsize, const char *strForma
 static void MX_EXTI_Init(void);
 
 [/#if]
+[#if THREADX??]
+/**
+  * @brief  Convert ms to AzRTOS ticks
+  * @param  time in ms
+  * @retval time in AzRTOS ticks
+  */
+static uint32_t app_azrtos_ms_to_tick(uint32_t ms);
+
+/**
+  * @brief  Convert time in RTOS ticks to ms
+  * @param  value in RTOS tick
+  * @retval value in milliseconds
+  */
+static uint32_t app_azrtos_tick_to_ms(uint32_t tick);
+
+[/#if]
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
 
 /* Exported functions ---------------------------------------------------------*/
+[#if THREADX??]
+void App_ThreadX_LowPower_Enter(void)
+{
+  /* Called by the kernel before it places the MCU into a LowPower mode .
+
+  NOTE:  Additional actions can be taken here to get the power consumption
+  even lower.  For example, peripherals can be turned off here, and then back
+  on again in the post sleep processing function.  For maximum power saving
+  ensure all unused pins are in their lowest power state. */
+
+  /* USER CODE BEGIN App_ThreadX_LowPower_Enter_0 */
+
+  /* USER CODE END App_ThreadX_LowPower_Enter_0 */
+
+  /*Get Current Time*/
+  Time_BeforeSleep = UTIL_TIMER_GetCurrentTime();
+
+  /*Enter to LowPower Mode using the Utilities LPM functions*/
+  UTIL_LPM_EnterLowPower();
+
+  /* USER CODE BEGIN App_ThreadX_LowPower_Enter_Last */
+
+  /* USER CODE END App_ThreadX_LowPower_Enter_Last */
+}
+
+void App_ThreadX_LowPower_Exit(void)
+{
+  /* USER CODE BEGIN App_ThreadX_LowPower_Exit */
+
+  /* USER CODE END App_ThreadX_LowPower_Exit */
+}
+
+unsigned long App_ThreadX_LowPower_Timer_Adjust(void)
+{
+  uint32_t  ret = 0;
+  uint32_t SleepDuration = UTIL_TIMER_GetElapsedTime(Time_BeforeSleep);
+
+  /* USER CODE BEGIN App_ThreadX_LowPower_Timer_Adjust_0 */
+
+  /* USER CODE END App_ThreadX_LowPower_Timer_Adjust_0 */
+
+  if (TX_TIMER_TICKS_PER_SECOND < configTICK_RATE_HZ_1MS)
+  {
+    /* keep the fractional part and add it next time */
+    ret =  app_azrtos_ms_to_tick(SleepDuration + Time_SleepFract);
+    Time_SleepFract = (SleepDuration + Time_SleepFract) - app_azrtos_tick_to_ms(ret);
+  }
+
+  /* USER CODE BEGIN App_ThreadX_LowPower_Timer_Adjust_Last */
+
+  /* USER CODE END App_ThreadX_LowPower_Timer_Adjust_Last */
+  return ret;
+}
+
+[/#if]
 void SystemApp_Init(void)
 {
 [#if (CPUCORE == "CM0PLUS")]
@@ -205,43 +308,34 @@ void SystemApp_Init(void)
 [#if (CPUCORE != "CM4")]
   /*Initialize timer and RTC*/
   UTIL_TIMER_Init();
-
-[/#if]
-[#if (CPUCORE == "")]
-  /* Debug config : disable serial wires and DbgMcu pins settings */
-  DBG_Disable();
-
+  SYS_TimerInitialisedFlag = 1;
 [/#if]
 [#if (CPUCORE != "CM0PLUS")]
   /* Initializes the SW probes pins and the monitor RF pins via Alternate Function */
-  DBG_ProbesInit();
+  DBG_Init();
 
-[#if (SECURE_PROJECTS == "1") && (CPUCORE == "CM4") ]
-#if ( DEBUGGER_ENABLED == 1 )
-  BSP_PB_Init(BUTTON_SW2, BUTTON_MODE_EXTI);
-#endif /* DEBUGGER_ENABLED */
-
-[/#if]
   /*Initialize the terminal */
   UTIL_ADV_TRACE_Init();
   UTIL_ADV_TRACE_RegisterTimeStampFunction(TimestampNow);
 
 [/#if]
-[#if (CPUCORE != "CM4")]
-[#if ((SUBGHZ_APPLICATION == "SIGFOX_AT_SLAVE") || (SUBGHZ_APPLICATION == "SIGFOX_PUSHBUTTON")) || (LORAWAN_FUOTA == "1") ]
+[#if ((CPUCORE != "CM4") && ((SUBGHZ_APPLICATION == "SIGFOX_AT_SLAVE") || (SUBGHZ_APPLICATION == "SIGFOX_PUSHBUTTON") || (LORAWAN_FUOTA == "1"))) || ((CPUCORE != "CM0PLUS") && ((SUBGHZ_APPLICATION == "LORA_END_NODE") || (SUBGHZ_APPLICATION == "LORA_AT_SLAVE"))) ]
   /* #warning "should be removed when proper obl is done" */
   __HAL_FLASH_CLEAR_FLAG(FLASH_FLAG_OPTVERR);
 
 [/#if]
-[#if ((SUBGHZ_APPLICATION == "SIGFOX_AT_SLAVE") || (SUBGHZ_APPLICATION == "SIGFOX_PUSHBUTTON"))]
+[#if (CPUCORE != "CM4") && ((SUBGHZ_APPLICATION == "SIGFOX_AT_SLAVE") || (SUBGHZ_APPLICATION == "SIGFOX_PUSHBUTTON"))]
   E2P_Init();
-[/#if]
 [/#if]
 
 [#if (CPUCORE != "CM0PLUS")]
   /*Set verbose LEVEL*/
 [#if (CPUCORE == "") && ((SUBGHZ_APPLICATION == "SIGFOX_AT_SLAVE") || (SUBGHZ_APPLICATION == "SIGFOX_PUSHBUTTON")) ]
+[#if !THREADX??]
   UTIL_ADV_TRACE_SetVerboseLevel(E2P_Read_VerboseLevel());
+[#else]
+  UTIL_ADV_TRACE_SetVerboseLevel(VERBOSE_LEVEL);
+[/#if]
 [#else]
   UTIL_ADV_TRACE_SetVerboseLevel(VERBOSE_LEVEL);
 [/#if]
@@ -300,13 +394,12 @@ void SystemApp_Init(void)
 
 [/#if]
 [#if (SUBGHZ_APPLICATION != "LORA_USER_APPLICATION") && (SUBGHZ_APPLICATION != "SUBGHZ_USER_APPLICATION") && (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION")]
+  /* Initialise only TimeServer. RTC Init already done by CM0PLUS */
   UTIL_TIMER_Init();
-
-  /* Debug config : disable serial wires and DbgMcu pins settings */
-  DBG_Disable();
+  SYS_TimerInitialisedFlag = 1;
 [/#if]
-[#elseif (CPUCORE == "CM0PLUS")]
 
+[#elseif (CPUCORE == "CM0PLUS")]
   /* Init Feat_Info table */
   FEAT_INFO_Init();
 
@@ -318,11 +411,7 @@ void SystemApp_Init(void)
   }
 
   System_Init();
-[#if (SUBGHZ_APPLICATION != "LORA_USER_APPLICATION") && (SUBGHZ_APPLICATION != "SUBGHZ_USER_APPLICATION") && (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION")]
 
-  /* Initializes the SW probes pins and the monitor RF pins via Alternate Func */
-  DBG_ProbesInit();
-[/#if]
 [#if (SUBGHZ_APPLICATION == "SIGFOX_AT_SLAVE") || (SUBGHZ_APPLICATION == "SIGFOX_PUSHBUTTON") || (SUBGHZ_APPLICATION == "SIGFOX_USER_APPLICATION") ]
 
   /* Registers Sigfox Notif to the sequencer */
@@ -468,6 +557,7 @@ void Process_Sys_Cmd(MBMUX_ComParam_t *ComObj)
 }
 [/#if]
 [#if !FREERTOS??][#-- If FreeRtos is not used --]
+[#if !THREADX??][#-- If AzRtos is not used --]
 [#if (CPUCORE != "")]
 
 void UTIL_SEQ_EvtIdle(uint32_t TaskId_bm, uint32_t EvtWaited_bm)
@@ -486,9 +576,7 @@ void UTIL_SEQ_EvtIdle(uint32_t TaskId_bm, uint32_t EvtWaited_bm)
   return;
 }
 [/#if]
-[/#if]
 [#if (SUBGHZ_APPLICATION != "LORA_USER_APPLICATION") && (SUBGHZ_APPLICATION != "SUBGHZ_USER_APPLICATION") && (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION")]
-[#if !FREERTOS??][#-- If FreeRtos is not used --]
 
 /**
   * @brief redefines __weak function in stm32_seq.c such to enter low power
@@ -505,9 +593,10 @@ void UTIL_SEQ_Idle(void)
 }
 [/#if]
 [/#if]
+[/#if]
 
-[#if ((SUBGHZ_APPLICATION == "LORA_END_NODE") || (SUBGHZ_APPLICATION == "LORA_AT_SLAVE") || (SUBGHZ_APPLICATION == "LORA_USER_APPLICATION"))]
 [#if (CPUCORE != "CM0PLUS")]
+[#if ((SUBGHZ_APPLICATION == "LORA_END_NODE") || (SUBGHZ_APPLICATION == "LORA_AT_SLAVE") || (SUBGHZ_APPLICATION == "LORA_USER_APPLICATION"))]
 uint8_t GetBatteryLevel(void)
 {
   uint8_t batteryLevel = 0;
@@ -536,8 +625,6 @@ uint8_t GetBatteryLevel(void)
     batteryLevel = (((uint32_t)(batteryLevelmV - VDD_MIN) * LORAWAN_MAX_BAT) / (VDD_BAT - VDD_MIN));
   }
 
-  APP_LOG(TS_ON, VLEVEL_M, "VDDA= %d\r\n", batteryLevel);
-
   /* USER CODE BEGIN GetBatteryLevel_2 */
 
   /* USER CODE END GetBatteryLevel_2 */
@@ -545,14 +632,20 @@ uint8_t GetBatteryLevel(void)
 [/#if]
   return batteryLevel;  /* 1 (very low) to 254 (fully charged) */
 }
+[/#if]
 
-
-uint16_t GetTemperatureLevel(void)
+[#if ((SUBGHZ_APPLICATION == "LORA_END_NODE") || (SUBGHZ_APPLICATION == "LORA_AT_SLAVE") || (SUBGHZ_APPLICATION == "LORA_USER_APPLICATION") || (SUBGHZ_APPLICATION == "SIGFOX_PUSHBUTTON") || (SUBGHZ_APPLICATION == "SIGFOX_AT_SLAVE"))]
+int16_t GetTemperatureLevel(void)
 {
-  uint16_t temperatureLevel = 0;
+  int16_t temperatureLevel = 0;
 
-[#if (SUBGHZ_APPLICATION != "LORA_USER_APPLICATION")]
-  temperatureLevel = (uint16_t)(SYS_GetTemperatureLevel() / 256);
+[#if (SUBGHZ_APPLICATION == "LORA_AT_SLAVE") || (SUBGHZ_APPLICATION == "SIGFOX_AT_SLAVE")]
+  temperatureLevel = (int16_t)(SYS_GetTemperatureLevel() >> 8);
+[#elseif ((SUBGHZ_APPLICATION == "LORA_END_NODE") || (SUBGHZ_APPLICATION == "SIGFOX_PUSHBUTTON"))]
+  sensor_t sensor_data;
+
+  EnvSensors_Read(&sensor_data);
+  temperatureLevel = (int16_t)(sensor_data.temperature);
 [/#if]
   /* USER CODE BEGIN GetTemperatureLevel */
 
@@ -561,7 +654,9 @@ uint16_t GetTemperatureLevel(void)
 }
 
 [/#if]
+[/#if]
 [#if CPUCORE != "CM4"]
+[#if ((SUBGHZ_APPLICATION == "LORA_END_NODE") || (SUBGHZ_APPLICATION == "LORA_AT_SLAVE") || (SUBGHZ_APPLICATION == "LORA_USER_APPLICATION"))]
 void GetUniqueId(uint8_t *id)
 {
   /* USER CODE BEGIN GetUniqueId_1 */
@@ -705,7 +800,7 @@ static void MBMUXIF_Init(void)
   {
     Error_Handler();
   }
-  APP_LOG(TS_ON, VLEVEL_H, "Radio registration CM4-CM0PLUS completed \r\n");
+  APP_LOG(TS_ON, VLEVEL_H, "Lora registration CM4-CM0PLUS completed \r\n");
 
 [/#if]
 [#if (SUBGHZ_APPLICATION == "LORA_AT_SLAVE") || (SUBGHZ_APPLICATION == "SUBGHZ_ADV_APPLICATION") || (SUBGHZ_APPLICATION == "SIGFOX_AT_SLAVE") || (SUBGHZ_APPLICATION == "SIGFOX_PUSHBUTTON") || (SUBGHZ_APPLICATION == "SIGFOX_USER_APPLICATION")]
@@ -829,28 +924,40 @@ static void MX_EXTI_Init(void)
 }
 
 [/#if]
+[#if THREADX??]
+static uint32_t app_azrtos_ms_to_tick(uint32_t ms)
+{
+  uint32_t tick = ms;
+  if (TX_TIMER_TICKS_PER_SECOND != configTICK_RATE_HZ_1MS)
+  {
+    tick = (uint32_t)((((uint64_t)(ms)) * TX_TIMER_TICKS_PER_SECOND) / configTICK_RATE_HZ_1MS);
+  }
+  return tick;
+}
+
+static uint32_t app_azrtos_tick_to_ms(uint32_t tick)
+{
+  uint32_t ms = tick;
+  if (TX_TIMER_TICKS_PER_SECOND != configTICK_RATE_HZ_1MS)
+  {
+    ms = (uint32_t)((((uint64_t)(tick)) * configTICK_RATE_HZ_1MS) / TX_TIMER_TICKS_PER_SECOND);
+  }
+  return ms;
+}
+
+[/#if]
 /* USER CODE BEGIN PrFD */
 
 /* USER CODE END PrFD */
 
-[#if !FREERTOS??][#-- If FreeRtos is not used --]
 /* HAL overload functions ---------------------------------------------------------*/
 
 [#if (SUBGHZ_APPLICATION == "LORA_USER_APPLICATION") || (SUBGHZ_APPLICATION == "SUBGHZ_USER_APPLICATION") || (SUBGHZ_APPLICATION == "SIGFOX_USER_APPLICATION")]
-/* Use #if 0 if you want to keep the default HAL instead overcharge them*/
+/* Set #if 0 if you want to keep the default HAL instead overcharge them*/
 /* USER CODE BEGIN Overload_HAL_weaks_1 */
 #if 1
 /* USER CODE END Overload_HAL_weaks_1 */
 
-[/#if]
-[#if (CPUCORE == "CM0PLUS")]
-    [#if  timeBaseSource_M0PLUS??]
-        [#assign timeBaseSource = timeBaseSource_M0PLUS]
-    [/#if]
-[#elseif (CPUCORE == ("CM4"))]
-    [#if  timeBaseSource_M4??]
-        [#assign timeBaseSource = timeBaseSource_M4]
-    [/#if]
 [/#if]
 [#if (timeBaseSource??) && (timeBaseSource=="None")]
 /**
@@ -869,19 +976,46 @@ HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
 }
 [/#if]
 
+[#if (SUBGHZ_APPLICATION == "LORA_USER_APPLICATION") || (SUBGHZ_APPLICATION == "SUBGHZ_USER_APPLICATION") || (SUBGHZ_APPLICATION == "SIGFOX_USER_APPLICATION")]
+/* USER CODE BEGIN Overload_HAL_weaks_1a */
+
+/* USER CODE END Overload_HAL_weaks_1a */
+
+[/#if]
 /**
   * @note This function overwrites the __weak one from HAL
   */
 uint32_t HAL_GetTick(void)
 {
+  uint32_t ret = 0;
   /* TIMER_IF can be based on other counter the SysTick e.g. RTC */
   /* USER CODE BEGIN HAL_GetTick_1 */
 
   /* USER CODE END HAL_GetTick_1 */
-  return TIMER_IF_GetTimerValue();
+  if (SYS_TimerInitialisedFlag == 0)
+  {
+    /* TIMER_IF_GetTimerValue should be used only once UTIL_TIMER_Init() is initialized */
+    /* If HAL_Delay or a TIMEOUT countdown is necessary during initialization phase */
+    /* please use temporarily another timebase source (SysTick or TIMx), which implies also */
+    /* to rework the above function HAL_InitTick() and to call HAL_IncTick() on the timebase IRQ */
+[#if (CPUCORE == "CM4")]
+    /* Note: In DualCore UTIL_TIMER_Init() is called rather late because it needs first CM0PLUS to init RTC */
+[#else]
+    /* Note: when TIMER_IF is based on RTC, stm32wlxx_hal_rtc.c calls this function before TimeServer is functional */
+    /* RTC TIMEOUT will not expire, i.e. if RTC has an hw problem it will keep looping in the RTC_Init function */
+[/#if]
+    /* USER CODE BEGIN HAL_GetTick_EarlyCall */
+
+    /* USER CODE END HAL_GetTick_EarlyCall */
+  }
+  else
+  {
+    ret = TIMER_IF_GetTimerValue();
+  }
   /* USER CODE BEGIN HAL_GetTick_2 */
 
   /* USER CODE END HAL_GetTick_2 */
+  return ret;
 }
 
 /**
@@ -898,10 +1032,11 @@ void HAL_Delay(__IO uint32_t Delay)
 
   /* USER CODE END HAL_Delay_2 */
 }
+
 [#if (SUBGHZ_APPLICATION == "LORA_USER_APPLICATION") || (SUBGHZ_APPLICATION == "SUBGHZ_USER_APPLICATION") || (SUBGHZ_APPLICATION == "SIGFOX_USER_APPLICATION")]
 /* USER CODE BEGIN Overload_HAL_weaks_2 */
-#endif
-/* Redefine here your own if needed */
+#endif /* 1 default HAL overcharge */
+/* if needed set #if 0 and redefine here your own "Tick" functions*/
 
 /* USER CODE END Overload_HAL_weaks_2 */
 [#else]
@@ -910,5 +1045,3 @@ void HAL_Delay(__IO uint32_t Delay)
 
 /* USER CODE END Overload_HAL_weaks */
 [/#if]
-[/#if]
-

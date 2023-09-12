@@ -64,6 +64,7 @@ typedef struct
 #define TEST_FSK                           0
 #define TEST_LORA                          1
 #define TEST_BPSK                          2
+#define TEST_MSK                           3
 
 /* USER CODE BEGIN EC */
 
@@ -80,6 +81,21 @@ typedef struct
 /* USER CODE END EM */
 
 /* Exported functions ------------------------------------------------------- */
+[#if THREADX??][#-- If AzRtos is used --]
+/**
+  * @brief Create semaphore used by ThreadX
+  * @retval status 0 ok, -1 ko
+  */
+int32_t  TST_Semaphore_Init(void);
+
+[/#if]
+[#if FREERTOS??][#-- If FreeRtos is used --]
+/**
+  * @brief Create semaphore used by FreeRTOS
+  */
+void  TST_Semaphore_Init(void);
+
+[/#if]
 /**
   * @brief RF Tone test command
   * @retval status 0 ok, -1 ko

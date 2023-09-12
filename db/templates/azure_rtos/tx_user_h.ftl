@@ -54,6 +54,9 @@
 
 [#compress]
 
+[#assign TX_ENABLE_IAR_LIBRARY_SUPPORT_value = "not defined"]
+[#assign TX_ENABLE_STACK_CHECKING_value = "not defined"]
+	  
 [#list SWIPdatas as SWIP]
 [#if SWIP.defines??]
   [#list SWIP.defines as definition]
@@ -212,6 +215,22 @@
 	[#if name == "TX_LOW_POWER_USER_TIMER_ADJUST"]
       [#assign TX_LOW_POWER_USER_TIMER_ADJUST_value = value]
     [/#if]
+	
+	[#if name == "TX_ENABLE_IAR_LIBRARY_SUPPORT"]
+      [#assign TX_ENABLE_IAR_LIBRARY_SUPPORT_value = value]
+    [/#if]
+	
+	[#if name == "TX_ENABLE_STACK_CHECKING"]
+      [#assign TX_ENABLE_STACK_CHECKING_value = value]
+    [/#if]
+	
+	[#if name == "TX_NO_FILEX_POINTER"]
+      [#assign TX_NO_FILEX_POINTER_value = value]
+    [/#if]
+	
+	[#if name == "TX_DISABLE_ERROR_CHECKING"]
+      [#assign TX_DISABLE_ERROR_CHECKING_value = value]
+    [/#if]
   [/#list]
 [/#if]
 [/#list]
@@ -311,6 +330,20 @@
 #define TX_DISABLE_STACK_FILLING
 [#else]
 /*#define TX_DISABLE_STACK_FILLING*/
+[/#if]
+
+[#if TX_ENABLE_STACK_CHECKING_value != "not defined"]
+/* Determine whether or not stack checking is enabled. By default, ThreadX stack checking is
+   disabled. When the following is defined, ThreadX thread stack checking is enabled.  If stack
+   checking is enabled (TX_ENABLE_STACK_CHECKING is defined), the TX_DISABLE_STACK_FILLING
+   define is negated, thereby forcing the stack fill which is necessary for the stack checking
+   logic.  */
+
+[#if TX_ENABLE_STACK_CHECKING_value == "1"]
+#define TX_ENABLE_STACK_CHECKING
+[#else]
+/*#define TX_ENABLE_STACK_CHECKING*/
+[/#if]
 [/#if]
 
 /* Determine if preemption-threshold should be disabled. By default, preemption-threshold is
@@ -495,6 +528,26 @@
 #define TX_TIMER_TICKS_PER_SECOND                ${TX_TIMER_TICKS_PER_SECOND_value}
 [/#if]
 
+/* Defined, the basic parameter error checking is disabled. */
+
+[#if TX_DISABLE_ERROR_CHECKING_value == "1"]
+#define TX_DISABLE_ERROR_CHECKING
+[#else]
+/*#define TX_DISABLE_ERROR_CHECKING*/
+[/#if]
+
+/* Determine if there is a FileX pointer in the thread control block.
+   By default, the pointer is there for legacy/backwards compatibility.
+   The pointer must also be there for applications using FileX.
+   Define this to save space in the thread control block.
+*/
+
+[#if TX_NO_FILEX_POINTER_value == "1"]
+#define TX_NO_FILEX_POINTER
+[#else]
+/*#define TX_NO_FILEX_POINTER*/
+[/#if]
+
 /* Determinate if the basic alignment type is defined. */
 
 [#if ALIGN_TYPE_DEFINED_value == "1"]
@@ -517,6 +570,17 @@
 #define TX_MEMSET  ${TX_MEMSET_value}((a),(b),(c))
 [#else]
 /*#define TX_MEMSET  memset((a),(b),(c))*/
+[/#if]
+
+[#if TX_ENABLE_IAR_LIBRARY_SUPPORT_value != "not defined"]
+#ifdef __IAR_SYSTEMS_ASM__
+/* Define if the IAR library is supported. */
+[#if TX_ENABLE_IAR_LIBRARY_SUPPORT_value == "1"]
+#define TX_ENABLE_IAR_LIBRARY_SUPPORT
+[#else]
+/*#define TX_ENABLE_IAR_LIBRARY_SUPPORT*/
+[/#if]
+#endif
 [/#if]
 
 /* Define if the safety critical configuration is enabled. */
@@ -549,7 +613,7 @@ void ${TX_LOW_POWER_TIMER_SETUP_value}(unsigned long count);
 [#if TX_LOW_POWER_USER_ENTER_value == " " || TX_LOW_POWER_USER_ENTER_value == ""]
 /*#define TX_LOW_POWER_USER_ENTER */
 [#else]
-void ${TX_LOW_POWER_USER_ENTER_value}();
+void ${TX_LOW_POWER_USER_ENTER_value}(void);
 #define TX_LOW_POWER_USER_ENTER ${TX_LOW_POWER_USER_ENTER_value}()
 [/#if]
 
@@ -558,7 +622,7 @@ void ${TX_LOW_POWER_USER_ENTER_value}();
 [#if TX_LOW_POWER_USER_EXIT_value == " " || TX_LOW_POWER_USER_EXIT_value == ""]
 /*#define TX_LOW_POWER_USER_EXIT */
 [#else]
-void ${TX_LOW_POWER_USER_EXIT_value}();
+void ${TX_LOW_POWER_USER_EXIT_value}(void);
 #define TX_LOW_POWER_USER_EXIT ${TX_LOW_POWER_USER_EXIT_value}()
 [/#if]
 
@@ -566,7 +630,7 @@ void ${TX_LOW_POWER_USER_EXIT_value}();
 [#if TX_LOW_POWER_USER_TIMER_ADJUST_value == " " || TX_LOW_POWER_USER_TIMER_ADJUST_value == ""]
 /*#define TX_LOW_POWER_USER_TIMER_ADJUST */
 [#else]
-unsigned long ${TX_LOW_POWER_USER_TIMER_ADJUST_value}();
+unsigned long ${TX_LOW_POWER_USER_TIMER_ADJUST_value}(void);
 #define TX_LOW_POWER_USER_TIMER_ADJUST ${TX_LOW_POWER_USER_TIMER_ADJUST_value}()
 [/#if]
 

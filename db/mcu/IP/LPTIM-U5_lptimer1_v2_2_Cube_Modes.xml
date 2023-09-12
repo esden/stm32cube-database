@@ -352,6 +352,38 @@
         <PossibleValue Value="LPTIM_OCPOLARITY_HIGH" Comment="active high"/>
         <PossibleValue Value="LPTIM_OCPOLARITY_LOW" Comment="active low"/>
     </RefParameter>
+
+    
+<RefParameter Name="Interrupt1" Comment="Capture/compare 1 over-capture interrupt"   DefaultValue="DISABLE"  Type="list" Group="IP Internal Interrupt" TabName="Advanced Settings for LPBAM">
+        <Description>description</Description>
+        <PossibleValue Comment="Enable" Value="LPTIM_IT_CC1O"/>
+        <PossibleValue Comment="Disable" Value="DISABLE"/>
+</RefParameter>
+
+<RefParameter Name="Interrupt2" Comment="Capture/compare 2 over-capture interrupt"   DefaultValue="DISABLE"  Type="list" Group="IP Internal Interrupt" TabName="Advanced Settings for LPBAM">
+        <Description>description</Description>
+        <PossibleValue Comment="Enable" Value="LPTIM_IT_CC2O"/>
+        <PossibleValue Comment="Disable" Value="DISABLE"/>
+</RefParameter>
+
+
+
+<RefParameter Comment="Interrupt parameter for code generation __HAL_DAC_ENABLE_IT" DefaultValue="/+Interrupt1+|Interrupt2/\|DISABLE//DISABLE\|//"  Type="list"  Name="ORingInterrupt"  Visible="false">
+      <Condition Diagnostic="" Expression="!((Interrupt1=DISABLE) &amp; (Interrupt2=DISABLE))"/> 
+</RefParameter>
+<RefParameter  Comment="Interrupt parameter for code generation __HAL_DAC_ENABLE_IT" DefaultValue="__NULL" Name="ORingInterrupt" Type="String" >
+               <Condition Diagnostic="" Expression="(Interrupt1=DISABLE) &amp; (Interrupt2=DISABLE)"/> 
+ </RefParameter>
+
+
+    <RefMode Name="LPBAMSPECIFIC">
+        <ConfigForMode>LPBAM_ADD_HALCONFIG</ConfigForMode>
+        <Parameter Name="Interrupt1"/>
+        <Parameter Name="Interrupt2"/>
+    </RefMode>
+
+
+
     <RefMode Name="NoIO_Channel_1_Active" Comment="">
         <Condition Diagnostic="capture mode" Expression="Semaphore_input_int_ch1_$IpInstance"/>
         <ConfigForMode>Channel1_Configuration_input</ConfigForMode>
@@ -498,6 +530,7 @@
   <Parameter Name="Input1Source"/>
   <Parameter Name="Input2Source"/>
  </RefMode>
+ 
  <ModeLogicOperator Name="OR">
   <Mode Name="Mode">
                         <Semaphore>Semaphore_ModeSelected$IpInstance</Semaphore>
@@ -705,6 +738,18 @@
             </Mode>
      </ModeLogicOperator>
   </Mode>
+
+         <Mode Name="LPBAMSPECIFICTOP" UserName="LPBAM Advanced Settings" RemoveDisable="true" RemoveCondition="!(($Index=1)|($Index=3))"> <!-- only LPTIM1 and LPTIM3 are managed by LPBAM-->
+
+             <Condition Diagnostic="only available when configurring IP from LPBAM context" Expression="S_LPBAM_CONF &amp; (Semaphore_ModeSelected$IpInstance)"/>
+              <ModeLogicOperator Name="XOR">
+                 <Mode Name="LPBAMSPECIFIC" UserName="">
+            <SignalLogicalOp Name="AND">
+                        <Signal Name="VS_LPTIM_LPBAM"/>
+            </SignalLogicalOp>
+            </Mode>
+            </ModeLogicOperator>
+        </Mode>
  </ModeLogicOperator>
  <RefSignal IOMode="AlternateFunctionOpenDrainAndPushPullDefaultPP" Name="OUT"/>
  <RefSignal IOMode="AlternateFunctionPushPull" Name="IN1"/>
@@ -721,4 +766,5 @@
     <RefSignal Name="VS_CH2" Virtual="true"/>
     <RefSignal Name="VS_noIO1" Virtual="true"/>
     <RefSignal Name="VS_noIO2" Virtual="true"/>
+    <RefSignal Name="VS_LPTIM_LPBAM" Virtual="true"/>
 </IP>

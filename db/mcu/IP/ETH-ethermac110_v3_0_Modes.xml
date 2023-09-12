@@ -17,12 +17,11 @@
 
 	<!-- ST MicroElectronics prefixe Adress -->
 	<RefParameter Comment="Ethernet MAC Address" ArraySize="6" ArrayTypeElement="uint8_t;16" Name="MACAddr" Type="Array" Separator=":" Group="General : Ethernet Configuration" DefaultValue="00:80:E1:00:00:00"/>
-
 	<RefParameter Comment="Rx Descriptor Length" DefaultValue="4" Max="256" Min="0" Type="integer" Name="ETH_RX_DESC_CNT" Group="General : Ethernet Configuration">
 		<Description>Rx Descriptor Length value must be modulo 4. Rx descriptor length must be set in a way that Rx descriptor contents must not exceed max value and must not overlap with Rx buffer and Tx descriptor.</Description>
 		<ValueCondition Diagnostic="Value must be modulo 4" Expression="MOD(Value,4) = 0"/>
 	</RefParameter>
-	<RefParameter Comment="First Rx Descriptor Address" DefaultValue="=IF(STM32H723_733|STM32H725_735|STM32H730_Value_line,0x30000000,0x30040000)" Max="=IF(STM32H723_733|STM32H725_735|STM32H730_Value_line,0x30007FFF,0x30047FFF)" Min="0x30000000" Type="hex" Name="RxDescAddress" Group="General : Ethernet Configuration">
+	<RefParameter Comment="First Rx Descriptor Address" DefaultValue="0x30000000" Max="=IF(STM32H723_733|STM32H725_735|STM32H730_Value_line,0x30007FFF,0x30047FFF)" Min="0x24000000" Type="hex" Name="RxDescAddress" Group="General : Ethernet Configuration">
 		<Description>Fisrt Rx Descriptor address must be only in the D2 Domain AHB SRAM. Rx descriptor address must not exceed Max value and must no overlap with Tx descriptor and Rx buffer. These areas must not be cacheable.</Description>
 	</RefParameter>
     <RefParameter Name="TxDesc" Comment="Tx Desc" Type="string" Group="General : Ethernet  Configuration" DefaultValue="DMATxDscrTab"  Visible="false"/>
@@ -31,17 +30,17 @@
 		<Description>Tx Descriptor Length value must be modulo 4. Tx descriptor length must be set in a way that Tx descriptor contents must not exceed max value and must not overlap with Rx descriptor and buffer.</Description>
 		<ValueCondition Diagnostic="Value must be modulo 4" Expression="MOD(Value,4) = 0"/>
 	</RefParameter>
-	<RefParameter Comment="First Tx Descriptor Address" DefaultValue="=RxDescAddress+ETH_RX_DESC_CNT*24" Max="=IF(STM32H723_733|STM32H725_735|STM32H730_Value_line,0x30007FFF,0x30047FFF)" Min="0x30000000" Type="hex" Name="TxDescAddress" Group="General : Ethernet Configuration">
+	<RefParameter Comment="First Tx Descriptor Address" DefaultValue="0x30000200" Max="=IF(STM32H723_733|STM32H725_735|STM32H730_Value_line,0x30007FFF,0x30047FFF)" Min="0x24000000" Type="hex" Name="TxDescAddress" Group="General : Ethernet Configuration">
 		<Description>First Tx Descriptor address must be only in the D2 Domain AHB SRAM. Tx descriptor address must not exceed Max value and must no overlap with Rx descriptor and buffer. These areas must not be cacheable.</Description>
 	</RefParameter>
 	 <RefParameter Name="RxDesc" Comment="Rx Desc" Type="string" Group="General : Ethernet  Configuration" DefaultValue="DMARxDscrTab"  Visible="false"/>
 	
 	<!-- BZ 97589 Start -->
-	<RefParameter Comment="Rx Buffers Address" DefaultValue="=TxDescAddress+ETH_TX_DESC_CNT*24" Max="=IF(STM32H723_733|STM32H725_735|STM32H730_Value_line,0x30007FFF,0x30047FFF)" Min="0x30000000"  Type="hex" Name="RxBuffAddress" Group="General : Ethernet Configuration" Visible="false">
+	<RefParameter Comment="Rx Buffers Address" DefaultValue="=TxDescAddress+ETH_TX_DESC_CNT*24" Max="=IF(STM32H723_733|STM32H725_735|STM32H730_Value_line,0x30007FFF,0x30047FFF)" Min="0x24000000"  Type="hex" Name="RxBuffAddress" Group="General : Ethernet Configuration" Visible="false">
 		<Condition Expression="S_AzureRTOS$context" Diagnostic="NetXDuo in use"/>
 		<Description>Rx Buffers Address not used with NetXDuo Mw. Rx buffer address must not exceed Max value and must no overlap with Tx and Rx descriptors.</Description>
 	</RefParameter>
-	<RefParameter Comment="Rx Buffers Address" DefaultValue="=TxDescAddress+ETH_TX_DESC_CNT*24" Max="=IF(STM32H723_733|STM32H725_735|STM32H730_Value_line,0x30007FFF,0x30047FFF)" Min="0x30000000"  Type="hex" Name="RxBuffAddress" Group="General : Ethernet Configuration">
+	<RefParameter Comment="Rx Buffers Address" DefaultValue="=TxDescAddress+ETH_TX_DESC_CNT*24" Max="=IF(STM32H723_733|STM32H725_735|STM32H730_Value_line,0x30007FFF,0x30047FFF)" Min="0x24000000"  Type="hex" Name="RxBuffAddress" Group="General : Ethernet Configuration">
 		<Description>Rx Buffers address must be only in the D2 Domain AHB SRAM. Rx buffer address must not exceed Max value and must no overlap with Tx and Rx descriptors</Description>
 	</RefParameter>
 	<RefParameter Comment="Rx Buffers Length" DefaultValue="1536" Max="1536" Min="4" Type="integer" Name="RxBuffLen" Group="General : Ethernet Configuration" Visible="true">
@@ -59,8 +58,6 @@
 		<PossibleValue Value="HAL_ETH_MII_MODE" Comment=""/>
 		<PossibleValue Value="HAL_ETH_RMII_MODE" Comment=""/>
 	</RefParameter>
-	
-	 
 	
 	<!-- RefMode for ETH -->
 	<RefMode Name="MII" HalMode="ETH">
@@ -82,23 +79,6 @@
 		<Parameter Name="Instance"/>
 	</RefMode>
 	
-	
-	<!--
-	<RefMode Name="MII_PTP_Synchro" HalMode="ETH">
-		<ConfigForMode>Init</ConfigForMode>   
-		<Parameter Name="AutoNegotiation"/>
-		<Parameter Name="Speed"/>
-		<Parameter Name="DuplexMode"/> 
-		<Parameter Name="MACAddr"/>
-		<Parameter Name="RxMode"/>
-		<Parameter Name="ChecksumMode"/>		
-		<Parameter Name="PhyAddress"/>
-		<Parameter Name="MediaInterface">
-			<PossibleValue>ETH_MEDIA_INTERFACE_MII</PossibleValue>
-		</Parameter>
-		<Parameter Name="Instance"/>
-	</RefMode>
-	-->
 	<RefMode Name="RMII" HalMode="ETH">
 		<ConfigForMode>Init</ConfigForMode>   
 		<Parameter Name="Warning"/>
@@ -117,22 +97,7 @@
 		</Parameter>
 		<Parameter Name="Instance"/>
 	</RefMode>
-	<!--
-	<RefMode Name="RMII_PTP_Synchro" HalMode="ETH">
-		<ConfigForMode>Init</ConfigForMode>   
-		<Parameter Name="AutoNegotiation"/>
-		<Parameter Name="Speed"/>
-		<Parameter Name="DuplexMode"/> 
-		<Parameter Name="MACAddr"/>
-		<Parameter Name="RxMode"/>
-		<Parameter Name="ChecksumMode"/> 
-		<Parameter Name="PhyAddress"/>
-		<Parameter Name="MediaInterface">
-			<PossibleValue>ETH_MEDIA_INTERFACE_RMII</PossibleValue>
-		</Parameter>
-		<Parameter Name="Instance"/>
-	</RefMode>
-	-->
+
 	<ModeLogicOperator Name="OR">
 		<Mode Name="Mode">
 			<ModeLogicOperator Name="XOR">

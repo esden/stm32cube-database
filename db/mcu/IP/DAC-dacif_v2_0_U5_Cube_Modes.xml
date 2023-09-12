@@ -32,6 +32,13 @@
         
     
     <RefParameter Name="DAC_HighFrequency" Comment="DAC High Frequency Mode" Type="list" DefaultValue="DAC_HIGH_FREQUENCY_INTERFACE_MODE_DISABLE" Group="Common DAC Settings">
+        <Condition Expression="S_LPBAM_CONF" Diagnostic="LPBAM context "/>
+        <PossibleValue Value="DAC_HIGH_FREQUENCY_INTERFACE_MODE_DISABLE" Comment="Disable"/>
+        <Description>
+            High frequency mode is disabled in LPBAM context
+        </Description>
+    </RefParameter>
+    <RefParameter Name="DAC_HighFrequency" Comment="DAC High Frequency Mode" Type="list" DefaultValue="DAC_HIGH_FREQUENCY_INTERFACE_MODE_DISABLE" Group="Common DAC Settings">
         <PossibleValue Value="DAC_HIGH_FREQUENCY_INTERFACE_MODE_DISABLE" Comment="Disable"/>
         <PossibleValue Value="DAC_HIGH_FREQUENCY_INTERFACE_MODE_ABOVE_80MHZ" Comment="AHB frequency above 80MHz" />
         <PossibleValue Value="DAC_HIGH_FREQUENCY_INTERFACE_MODE_ABOVE_160MHZ" Comment="AHB frequency above 160MHz"/>
@@ -42,6 +49,13 @@
         </Description>
     </RefParameter>
 
+    <RefParameter Name="DAC_AutonomousMode" Comment="Autonomous mode" DefaultValue="DAC_AUTONOMOUS_MODE_ENABLE" Type="list"  Group="Common DAC Settings">
+        <Condition Expression="S_LPBAM_CONF" Diagnostic="LPBAM context "/>
+        <PossibleValue Value="DAC_AUTONOMOUS_MODE_ENABLE" Comment="Enable" />
+        <Description>
+            Autonomous mode is mandatory in LPBAM context
+        </Description>
+    </RefParameter>
     <RefParameter Name="DAC_AutonomousMode" Comment="Autonomous mode" DefaultValue="DAC_AUTONOMOUS_MODE_DISABLE" Type="list"  Group="Common DAC Settings">
         <PossibleValue Value="DAC_AUTONOMOUS_MODE_DISABLE" Comment="Disable"/>
         <PossibleValue Value="DAC_AUTONOMOUS_MODE_ENABLE" Comment="Enable" />
@@ -67,6 +81,17 @@
 
 
     <RefParameter Name="DAC_Trigger" Comment="Trigger" DefaultValue="DAC_TRIGGER_NONE" Type="list" >
+        <Condition Expression="S_LPBAM_CONF" Diagnostic="LPBAM context "/>
+        <PossibleValue Comment="No trigger, conversion is performed when the register is loaded" Value="DAC_TRIGGER_NONE"/>
+        <PossibleValue Comment="LPTimer1 Channel 1"           Value="DAC_TRIGGER_LPTIM1_OUT" Condition="!LPTIM1_Exist" Diagnostic="available only if TIMx exists" Action="Remove"/>
+        <PossibleValue Comment="LPTimer3 Channel 1"           Value="DAC_TRIGGER_LPTIM3_OUT" Condition="!LPTIM2_Exist" Diagnostic="available only if TIMx exists" Action="Remove"/>
+        <PossibleValue Comment="External Line 9"              Value="DAC_TRIGGER_EXT_IT9"    Condition="!($IpInstance_External_Trigger)" Diagnostic="Activate External Trigger in Mode windows to enable this choice"/>
+        <Description>
+            Specifies the external trigger for the selected DAC channel.&lt;br/&gt;
+            A selection of a Trigger allows the activation of a Triangle or Noise Wave generation mode&lt;br/&gt;
+        </Description>
+    </RefParameter>   
+    <RefParameter Name="DAC_Trigger" Comment="Trigger" DefaultValue="DAC_TRIGGER_NONE" Type="list" >
         <PossibleValue Comment="None" Value="DAC_TRIGGER_NONE"/>
         <PossibleValue Comment="Timer 1 Trigger Out event "   Value="DAC_TRIGGER_T1_TRGO"    Condition="!TIM1_Exist"   Diagnostic="available only if TIMx exists" Action="Remove"/>
         <PossibleValue Comment="Timer 2 Trigger Out event "   Value="DAC_TRIGGER_T2_TRGO"    Condition="!TIM2_Exist"   Diagnostic="available only if TIMx exists" Action="Remove"/>
@@ -83,6 +108,8 @@
         <Description>
             Specifies the external trigger for the selected DAC channel.&lt;br/&gt;
             A selection of a Trigger allows the activation of a Triangle or Noise Wave generation mode&lt;br/&gt;
+            
+            &lt;b&gt;Warning&lt;/b&gt; : when the autonomous mode is used in stop mode then only three triggers could be used (LPTIM1, LPTIM3 or External Line 9 triggers)
         </Description>
     </RefParameter>   
 
@@ -210,6 +237,13 @@
     <RefParameter Comment="Trimming Value" DefaultValue="__NULL" Name="DAC_TrimmingValue" Type="string" Visible="false"/>
          
     <!-- Sample and hold settings-->
+    <RefParameter Name="DAC_SampleAndHold" Comment="Mode selected" DefaultValue="DAC_SAMPLEANDHOLD_ENABLE" Type="list">
+        <Condition Expression="S_LPBAM_CONF" Diagnostic="LPBAM context "/>
+        <Description>
+            Specifies the DAC mode which is Smple and Hold in LPBA context&lt;br/&gt;
+        </Description>
+        <PossibleValue Comment="Sample and Hold Mode" Value="DAC_SAMPLEANDHOLD_ENABLE" Semaphore="RCC_DAC_SAMPLEANDHOLD"/>
+    </RefParameter>
     <RefParameter Name="DAC_SampleAndHold" Comment="Mode selected" DefaultValue="DAC_SAMPLEANDHOLD_DISABLE" Type="list">
         <Description>
             Specifies the DAC mode.&lt;br/&gt;
@@ -239,8 +273,38 @@
         <Description>On Sample and Hold Mode : Specifies the refresh time</Description>
     </RefParameter>	
     <RefParameter Name="DAC_RefreshTime" Comment="Refresh Time" DefaultValue="__NULL" Type="string"  Visible="false"/>
-   
-    
+
+<!-- LPBAM specific configuration -->  
+ 
+
+<RefParameter Name="Interrupt1" Comment="DMA underrun error for DAC1_CH1"   DefaultValue="DISABLE"  Type="list" Group="IP Internal Interrupt" TabName="Advanced Settings for LPBAM">
+        <Description>description</Description>
+        <PossibleValue Comment="Enable" Value="DAC_IT_DMAUDR1"/>
+        <PossibleValue Comment="Disable" Value="DISABLE"/>
+</RefParameter>
+
+<RefParameter Name="Interrupt2" Comment="DMA underrun error for DAC1_CH2"   DefaultValue="DISABLE"  Type="list" Group="IP Internal Interrupt" TabName="Advanced Settings for LPBAM">
+        <Description>description</Description>
+        <PossibleValue Comment="Enable" Value="DAC_IT_DMAUDR2"/>
+        <PossibleValue Comment="Disable" Value="DISABLE"/>
+</RefParameter>
+
+
+<RefParameter Comment="Interrupt parameter for code generation __HAL_DAC_ENABLE_IT" DefaultValue="/+Interrupt1+|Interrupt2/\|DISABLE//DISABLE\|//"  Type="list"  Name="ORingInterrupt"  Visible="false">
+      <Condition Diagnostic="" Expression="!((Interrupt1=DISABLE) &amp; (Interrupt2=DISABLE))"/> 
+</RefParameter>
+<RefParameter  Comment="Interrupt parameter for code generation __HAL_DAC_ENABLE_IT" DefaultValue="__NULL" Name="ORingInterrupt" Type="String" >
+               <Condition Diagnostic="" Expression="(Interrupt1=DISABLE) &amp; (Interrupt2=DISABLE)"/> 
+ </RefParameter>
+
+
+<RefMode Name="LPBAMSPECIFIC">
+        <ConfigForMode>LPBAM_ADD_HALCONFIG</ConfigForMode>
+        <Parameter Name="Interrupt1"/>
+        <Parameter Name="Interrupt2"/>
+ </RefMode>
+
+<!-- LPBAM specific configuration -->     
     
     <RefMode Name="DAC_COMMON" Comment="DAC_COMMON" Group="Common DAC Settings" Abstract="true">
         <Parameter Name="DAC_HighFrequency"/>
@@ -251,6 +315,7 @@
         <ConfigForMode>CommonParamLLConfig</ConfigForMode>
         <ConfigForMode>DAC_ChannelConfig1</ConfigForMode>
         <ConfigForMode>DAC_Init</ConfigForMode>
+        <ConfigForMode>DAC_AutonomousModeConfig</ConfigForMode>
         <ConfigForMode>DAC_TriangleWaveGenerate1</ConfigForMode>
         <ConfigForMode>DAC_NoiseWaveGenerate1</ConfigForMode>
         <Parameter Name="DAC_Channel">
@@ -277,6 +342,7 @@
         <ConfigForMode>CommonParamLLConfig</ConfigForMode>
         <ConfigForMode>DAC_ChannelConfig2</ConfigForMode>
         <ConfigForMode>DAC_Init</ConfigForMode>
+        <ConfigForMode>DAC_AutonomousModeConfig</ConfigForMode>
         <ConfigForMode>DAC_TriangleWaveGenerate2</ConfigForMode>
         <ConfigForMode>DAC_NoiseWaveGenerate2</ConfigForMode>
         <Parameter Name="DAC_Channel">
@@ -392,6 +458,20 @@
                 </Mode>
             </ModeLogicOperator>
         </Mode>
+
+        <!-- LPBAM specific -->
+        <Mode Name="LPBAMSPECIFICTOP" UserName="LPBAM Advanced Settings" RemoveDisable="true" RemoveCondition="!($Index=1)"> <!-- only DAC1 is managed by LPBAM-->
+            <Condition Diagnostic="only available when configurring IP from LPBAM context" Expression="S_LPBAM_CONF &amp; ($IpInstance_External_Trigger|$IpInstance_Channel2_Used|$IpInstance_Channel1_Used)"/>
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="LPBAMSPECIFIC" UserName="">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="VS_DAC_LPBAM"/>
+                    </SignalLogicalOp>
+                </Mode>
+            </ModeLogicOperator>
+        </Mode>
+        <!-- LPBAM specific -->
+        
     </ModeLogicOperator>
     <!--	<RefSignal IOMode="EXTI" Name="EXTI9"/>-->
     <RefSignal IOMode="EXTI" Name="EXTI9" ShareableGroupName="GPXTI9" /> <!-- GPXTI is a keyword -->
@@ -399,6 +479,7 @@
     <RefSignal IOMode="Analog" Name="OUT2" ShareableGroupName="COMP_$IpInstance2_group"/>
     <RefSignal Name="VS_DACI1" Virtual="true"/>
     <RefSignal Name="VS_DACI2" Virtual="true"/>
+    <RefSignal Name="VS_DAC_LPBAM" Virtual="true"/> <!-- LPBAM specific -->
         
 
 </IP>

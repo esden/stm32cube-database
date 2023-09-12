@@ -9,7 +9,7 @@
   [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
-/* USER CODE END  */
+/* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
 

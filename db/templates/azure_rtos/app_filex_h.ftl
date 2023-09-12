@@ -56,6 +56,9 @@ extern "C" {
 [#if name?contains("LX_NOR_USE_OSPI_DRIVER") && value == "true"]
 #include "lx_stm32_ospi_driver.h"
 [/#if]
+[#if name == "FX_STANDALONE_ENABLE"]
+    [#assign FX_STANDALONE_ENABLE_value = value]
+[/#if]
 [/#list]
 [/#if]
 [/#list]
@@ -81,7 +84,12 @@ extern "C" {
 /* USER CODE END EM */
 
 /* Exported functions prototypes ---------------------------------------------*/
+[#if FX_STANDALONE_ENABLE_value == "1"]
+UINT MX_FileX_Init(void);
+[#else]
 UINT MX_FileX_Init(VOID *memory_ptr);
+[/#if]
+
 
 /* USER CODE BEGIN EFP */
 

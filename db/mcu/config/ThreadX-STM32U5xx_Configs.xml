@@ -13,12 +13,17 @@ RootFolder="Middlewares/ST/threadx/"
 		<ConfigFile Name="TX_INITIALIZE_LOW_LEVEL_S" />
 		<ConfigFile Name="AZURE_RTOS_CONFIG_H_FTL" />
         <Defines Name="TX_INCLUDE_USER_DEFINE_FILE" Condition="!S_SECURE | SEM_M33NS" Type="Cdefine"/>
-        <!-- preprocessors defines when TZEN=0 -->
+		<!-- preprocessors defines when TZEN=0 -->
         <Defines Name="TX_SINGLE_MODE_NON_SECURE" Condition="!S_SECURE" Type="Adefine" Value="1"/>
         <Defines Name="TX_SINGLE_MODE_NON_SECURE" Condition="!S_SECURE" Type="Cdefine" Value="1"/>
 		<!-- preprocessors defines when TZEN=1 for secure project -->
 		<Defines Name="TX_THREAD_SECURE_STACK_MAXIMUM" Condition="(S_SECURE &amp; !SEM_M33NS) &amp; !SEMSTACK_MINIMUM" Type="Cdefine" Value="$TX_THREAD_SECURE_STACK_MAXIMUM"/>
 		<Defines Name="TX_THREAD_SECURE_STACK_MINIMUM" Condition="(S_SECURE &amp; !SEM_M33NS) &amp; !SEMSTACK_MAXIMUM" Type="Cdefine" Value="$TX_THREAD_SECURE_STACK_MINIMUM"/>
+
+		<Defines Name="TX_PORT_USE_BASEPRI " Condition="TX_ENABLE_BASEPRI_SUPPORT" Type="Cdefine"/>
+		<Defines Name="TX_PORT_USE_BASEPRI " Condition="TX_ENABLE_BASEPRI_SUPPORT" Type="Adefine"/> 
+		<Defines Name="TX_PORT_BASEPRI" Condition="TX_ENABLE_BASEPRI_SUPPORT" Type="Cdefine" Value="$TX_PORT_BASEPRI_VALUE"/>
+		<Defines Name="TX_PORT_BASEPRI" Condition="TX_ENABLE_BASEPRI_SUPPORT" Type="Adefine" Value="$TX_PORT_BASEPRI_VALUE" />
 	</RefConfig>
 	
 	<RefConfig Name="Performance_Default">
@@ -62,7 +67,7 @@ RootFolder="Middlewares/ST/threadx/"
 		<Argument Added="true" AddressOf="false" GenericType="simple" Name="TX_LOW_POWER_USER_EXIT" OptimizationCondition="equal"/>
 		<Argument Added="true" AddressOf="false" GenericType="simple" Name="TX_LOW_POWER_USER_TIMER_ADJUST" OptimizationCondition="equal"/>
 	</RefConfigFile>
-	<RefConfigFile Description="" Name="APP_AZURE_RTOS_C" Template="azure_rtos/app_azrtos-u5_c.ftl" 
+	<RefConfigFile Description="" Name="APP_AZURE_RTOS_C" Template="azure_rtos/app_azrtos_c.ftl" 
 	destinationFolder="AZURE_RTOS/App">
 		<File Category="source" Condition="!S_SECURE | SEM_M33NS" Name="app_azure_rtos.c" />
 		 <Argument Added="true" AddressOf="false" GenericType="simple" Name="FILEX_ENABLED" OptimizationCondition="equal"/>
@@ -73,7 +78,7 @@ RootFolder="Middlewares/ST/threadx/"
         <Argument Added="true" AddressOf="false" GenericType="simple" Name="TSC_ENABLED" OptimizationCondition="equal"/>
         <Argument Added="true" AddressOf="false" GenericType="simple" Name="GUI_INTERFACE_ENABLED" OptimizationCondition="equal"/>
 	</RefConfigFile>
-	<RefConfigFile Description="" Name="APP_AZURE_RTOS_h" Template="azure_rtos/app_azrtos-u5_h.ftl" 
+	<RefConfigFile Description="" Name="APP_AZURE_RTOS_h" Template="azure_rtos/app_azrtos_h.ftl" 
 	destinationFolder="AZURE_RTOS/App">
 		<File Category="source" Condition="!S_SECURE | SEM_M33NS" Name="app_azure_rtos.h" />
 		 <Argument Added="true" AddressOf="false" GenericType="simple" Name="FILEX_ENABLED" OptimizationCondition="equal"/>
@@ -126,9 +131,10 @@ RootFolder="Middlewares/ST/threadx/"
 		<Argument Added="true" AddressOf="false" GenericType="simple" Name="TX_BYTE_POOL_ENABLE_PERFORMANCE_INFO" OptimizationCondition="equal" />
 		<Argument Added="true" AddressOf="false" GenericType="simple" Name="ALIGN_TYPE_DEFINED" OptimizationCondition="equal" />
 		<Argument Added="true" AddressOf="false" GenericType="simple" Name="TX_EVENT_FLAGS_ENABLE_PERFORMANCE_INFO" OptimizationCondition="equal" />
+		<Argument Added="true" AddressOf="false" GenericType="simple" Name="TX_DISABLE_ERROR_CHECKING" OptimizationCondition="equal"/>
 	</RefConfigFile>
 	<RefConfigFile Added="true" Description="ThreadX low level init file" Name="TX_INITIALIZE_LOW_LEVEL_S" Template="azure_rtos/tx_initialize_low_level_s.ftl" destinationFolder="Core/Src">
-		<File Category="source" Condition="!S_SECURE | SEM_M33NS" Name="./tx_initialize_low_level.s"/>
+		<File Category="source" Condition="!S_SECURE | SEM_M33NS" Name="./tx_initialize_low_level.S"/>
         <Argument Added="true" AddressOf="false" GenericType="simple" Name="TX_TIMER_TICKS_PER_SECOND" OptimizationCondition="equal"/>
          <Argument Added="true" AddressOf="false" GenericType="simple" Name="AZRTOS_APP_MEM_ALLOCATION_METHOD" OptimizationCondition="equal"/>
     </RefConfigFile>
@@ -151,8 +157,8 @@ RootFolder="Middlewares/ST/threadx/"
         <Argument Added="true" AddressOf="false" GenericType="simple" Name="TSC_ENABLED" OptimizationCondition="equal"/>
         <Argument Added="true" AddressOf="false" GenericType="simple" Name="GUI_INTERFACE_ENABLED" OptimizationCondition="equal"/>
     </RefConfigFile>
-	<RefComponent Cclass="Middleware" Cgroup="ThreadX" Cversion="6Gg1Gg7">
-		<SubComponent Csub="Core" Cvariant="Default" Cversion="6Gg1Gg7">
+	<RefComponent Cclass="Middleware" Cgroup="ThreadX" Cversion="6Gg1Gg9">
+		<SubComponent Csub="Core" Cvariant="Default" Cversion="6Gg1Gg9">
 			<File Category="header" Condition="all" Name="common/inc/tx_api.h" />
 			<File Category="header" Condition="all" Name="common/inc/tx_block_pool.h" />
 			<File Category="header" Condition="all" Name="common/inc/tx_byte_pool.h" />
@@ -179,7 +185,7 @@ RootFolder="Middlewares/ST/threadx/"
                         <File Category="source" Condition="(SIiTcompilerIiIAR&amp;SIiDcoreIiCortexAaM33)&amp; SEM_M33NS &amp; S_SECURE" Name="ports/cortex_m33/iar/src/tx_thread_secure_stack_initialize.s" />
                         <File Category="source" Condition="(SIiTcompilerIiARMCC&amp;SIiDcoreIiCortexAaM33)&amp; SEM_M33NS &amp; S_SECURE" Name="ports/cortex_m33/ac6/src/tx_thread_secure_stack_initialize.S" /> 
                         <File Category="source" Condition="(SIiTcompilerIiGCC&amp;SIiDcoreIiCortexAaM33)&amp; SEM_M33NS &amp; S_SECURE" Name="ports/cortex_m33/gnu/src/tx_thread_secure_stack_initialize.S" /> 
-			<!-- tx_thread_secure_stack_allocate.s -->
+						<!-- tx_thread_secure_stack_allocate.s -->
                         <File Category="source" Condition="(SIiTcompilerIiIAR&amp;SIiDcoreIiCortexAaM33)&amp; SEM_M33NS &amp; S_SECURE" Name="ports/cortex_m33/iar/src/tx_thread_secure_stack_allocate.s" />
                         <File Category="source" Condition="(SIiTcompilerIiARMCC&amp;SIiDcoreIiCortexAaM33)&amp; SEM_M33NS &amp; S_SECURE" Name="ports/cortex_m33/ac6/src/tx_thread_secure_stack_allocate.S" /> 
                         <File Category="source" Condition="(SIiTcompilerIiGCC&amp;SIiDcoreIiCortexAaM33)&amp; SEM_M33NS &amp; S_SECURE" Name="ports/cortex_m33/gnu/src/tx_thread_secure_stack_allocate.S" /> 
@@ -376,7 +382,7 @@ RootFolder="Middlewares/ST/threadx/"
 			<File Category="source"  Condition="(SEM_M33NS | !S_SECURE)" Name="common/src/txe_timer_delete.c" />
 			<File Category="source"  Condition="(SEM_M33NS | !S_SECURE)" Name="common/src/txe_timer_info_get.c" />
 		</SubComponent>
-		<SubComponent Csub="Performance" Cvariant="Default" Cversion="6Gg1Gg7">
+		<SubComponent Csub="Performance" Cvariant="Default" Cversion="6Gg1Gg9">
 			<File Category="source"  Condition="(SEM_M33NS | !S_SECURE)" Name="common/src/tx_thread_performance_info_get.c" />
 			<File Category="source"  Condition="(SEM_M33NS | !S_SECURE)" Name="common/src/tx_thread_performance_system_info_get.c" />
 			<File Category="source"  Condition="(SEM_M33NS | !S_SECURE)" Name="common/src/tx_block_pool_performance_info_get.c" />
@@ -394,7 +400,7 @@ RootFolder="Middlewares/ST/threadx/"
 			<File Category="source"  Condition="(SEM_M33NS | !S_SECURE)" Name="common/src/tx_timer_performance_info_get.c" />
 			<File Category="source"  Condition="(SEM_M33NS | !S_SECURE)" Name="common/src/tx_timer_performance_system_info_get.c" />
 		</SubComponent>
-		<SubComponent Csub="TraceX_Support" Cvariant="Default" Cversion="6Gg1Gg7">
+		<SubComponent Csub="TraceX_Support" Cvariant="Default" Cversion="6Gg1Gg9">
 			<File Category="source"  Condition="(SEM_M33NS | !S_SECURE)" Name="common/src/tx_trace_buffer_full_notify.c" />
 			<File Category="source"  Condition="(SEM_M33NS | !S_SECURE)" Name="common/src/tx_trace_disable.c" />
 			<File Category="source"  Condition="(SEM_M33NS | !S_SECURE)" Name="common/src/tx_trace_enable.c" />
@@ -408,7 +414,7 @@ RootFolder="Middlewares/ST/threadx/"
 			<File Category="source"  Condition="(SEM_M33NS | !S_SECURE)" Name="common/src/tx_trace_object_unregister.c" />
 			<File Category="source"  Condition="(SEM_M33NS | !S_SECURE)" Name="common/src/tx_trace_user_event_insert.c" />
 		</SubComponent> 
-		<SubComponent Csub="Low_Power_Support" Cvariant="true" Cversion="6Gg1Gg7">
+		<SubComponent Csub="Low_Power_Support" Cvariant="true" Cversion="6Gg1Gg9">
 		 <File Category="source" Condition="(SEM_M33NS | !S_SECURE)" Name="utility/low_power/tx_low_power.c"/>
             <File Category="header" Condition="(SEM_M33NS | !S_SECURE)" Name="utility/low_power/*"/>
 		</SubComponent> 

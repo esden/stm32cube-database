@@ -49,7 +49,16 @@ extern "C" {
 /* Exported functions prototypes ---------------------------------------------*/
 /**
   * @brief   Registers Sigfox feature to the mailbox and to the sequencer
-  * @retval  0: OK; -1: no more ipcc channel available; -2: feature not provided by CM0PLUS; -3: callback error on CM0PLUS
+  * @retval   0: OK;
+             -1: no more ipcc channel available;
+             -2: feature not provided by CM0PLUS;
+             -3: callback error on CM0PLUS
+             -4: mismatch between CM4 and CM0PLUS sigfox versions
+[#if THREADX??]
+             -10: threadx TX_POOL_ERROR
+             -11: threadx TX_THREAD_ERROR
+             -12: threadx TX_SEMAPHORE_ERROR
+[/#if]
   */
 int8_t MBMUXIF_SigfoxInit(void);
 [#if CPUCORE == "CM4"]
@@ -99,4 +108,3 @@ void MBMUXIF_SigfoxSendResp(void);
 #endif
 
 #endif /*__MBMUXIF_SIGFOX_${CPUCORE}_H__ */
-

@@ -1,0 +1,2040 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+// La definition des regles de coherence est faite par la definition des ConsistencyRule
+// Les ConsistencyRule pourront etre de plusieurs type
+// - Type=SingleApplication
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~
+//    * cela veut dire que on ne regarde la coherence de la configuration que d'une application a la fois
+// - Type=SingleQueue
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~
+//   * cela veut dire que on ne regarde la coherence de la configuration que d'une queue a la fois.
+//   * cela implique qu'on regarde une seule application a la fois bien evidemment
+// - Type=MultiApplication
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~
+//    * pourra etre defini si on doit verifier a la coherence entre les configurations LPBAM etre elles (pas sur que cela soit necessaire)
+// Les ConsistencyRule de Type=SingleApplication, vont donc etre appliquées pour chaque configuration
+// C'est a dire on traite toutes les clés de la CONF1 puis CONF2 ...
+// Les Macher disposent aussi d'un attribut "type"
+// Type="MainApplication"
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~
+// La CONF1 (Main IOC) est traitée specifiquement c'est a dire que
+// - Les Matcher avec un attribut Type="MainApplication" vont permettre de collecter les variables de la configuration main
+// - Les autres Macher sans cet attribut vont etre appliqué pour chaque CONF successivement
+// // Type="precondition"
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~
+// Cet attribut permet de dire que la regle a besoin d'avoir ce matcher qui matche pour appliquer la regle.
+//
+// Note, l'attribut peut donc contenir plusieurs valeur qui seront separées par des virgules eg Type="MainApplication, precondition"
+//
+-->
+
+
+
+<ConsistencyRules>
+
+
+
+
+
+<!-- all IPs -->
+
+<ConsistencyRule Type= "SingleApplication" Name= "CONFIGLPBAMHAL">
+        <Matcher Name= "LPBAM_CONFIG_EXISTS_ON_IP" Type="precondition">    
+            <MatcherOnKey>CONF(.*)\.S1\.Q(.*)\.F(.*)\.IpInstanceName</MatcherOnKey>  
+            <MatcherPattern>LPBAM(ADC4|COMP1|COMP2|OPAMP1|OPAMP2|VREFBUF|LPTIM1|LPTIM3|I2C3|LPUART1)</MatcherPattern>       
+        </Matcher>
+
+       <Matcher Name= "HAL_CONFIG_EXISTS">    
+            <MatcherOnKey>CONF{LPBAM_CONFIG_EXISTS_ON_IP_#1}\.Mcu\.IP.*</MatcherOnKey> 
+            <MatcherPattern>{LPBAM_CONFIG_EXISTS_ON_IP_#4}</MatcherPattern>       
+        </Matcher>
+
+        <Checker Condition="!HAL_CONFIG_EXISTS" 
+               Diagnostic="Peripheral Configuration: {LPBAM_CONFIG_EXISTS_ON_IP_#4} is used through S1.Q{LPBAM_CONFIG_EXISTS_ON_IP_#2}/'{LPBAM_CONFIG_EXISTS_ON_IP_#4}:S1.Q{LPBAM_CONFIG_EXISTS_ON_IP_#2}.F{LPBAM_CONFIG_EXISTS_ON_IP_#3}' and is not configured. IP must be configured in this Application 'Pinout &amp; Configuration' panel"
+               Type="error" /> 
+    </ConsistencyRule>
+
+
+    <ConsistencyRule Type= "SingleApplication" Name= "CONFIGLPBAM">
+        <Matcher Name= "LPBAM_CONFIG_EXISTS_ON_IP" Type="precondition">    
+            <MatcherOnKey>CONF(.*)\.S1\.Q(.*)\.F(.*)\.IpInstanceName</MatcherOnKey>  
+            <MatcherPattern>.*</MatcherPattern>       
+        </Matcher>
+
+    <!-- trigger management -->   
+        <Checker Condition="LPBAM_CONFIG_EXISTS_ON_IP" 
+               Diagnostic="Peripheral Configuration: All Trigger Hardware Signals used in this scenario should be configured in this application 'Pinout &amp; Configuration' panel"
+               Type="info" /> 
+    </ConsistencyRule>
+
+
+
+<ConsistencyRule Type= "SingleApplication" Name= "FUNCTIONSCONFIGDATA">
+
+        <Matcher Name= "LPBAM_CONFIG_EXISTS" Type="precondition">    
+            <MatcherOnKey>CONF(.*)\.S1\.Q(.*)\.F(.*)\.VP_LPBAM(.*)_VS_(.*)_CONFIG\.Mode</MatcherOnKey>  
+            <MatcherPattern>.*_CONFIG</MatcherPattern>       
+        </Matcher>
+
+        <Checker Condition="LPBAM_CONFIG_EXISTS" 
+               Diagnostic="Scenario Design: function {LPBAM_CONFIG_EXISTS_#4}:{LPBAM_CONFIG_EXISTS_#5}_CONFIG is used Through S1.Q{LPBAM_CONFIG_EXISTS_#2}/'{LPBAM_CONFIG_EXISTS_#4}:S1.Q{LPBAM_CONFIG_EXISTS_#2}.F{LPBAM_CONFIG_EXISTS_#3}'. For memory optimization purpose, when a reconfiguration is necessary, it's recommended to use {LPBAM_CONFIG_EXISTS_#5} instead of {LPBAM_CONFIG_EXISTS_#5}_CONFIG and {LPBAM_CONFIG_EXISTS_#5}_DATA"
+               Type="info" /> 
+    </ConsistencyRule>
+
+
+<!-- all IPs -->
+
+
+<!-- LPGPIO -->
+
+   <ConsistencyRule Type= "SingleApplication" Name= "LPGPIOREAD">
+
+        <Matcher Name= "LPBAM_LPGPIOREAD_EXISTS" Type="precondition">
+            <MatcherOnKey>CONF(.*)\.S1\.(.*)\.F(.*)\.VP_LPBAMLPGPIO1_VS_READPINSEQUENCE\.Mode</MatcherOnKey>  <!--CONF2.S1.Q1.F4.VP_LPBAMLPGPIO1_VS_READPINSEQUENCE.Mode=READPINSEQUENCE-->
+            <MatcherPattern>READPINSEQUENCE</MatcherPattern>
+        </Matcher>
+
+        <!--   <Matcher Name= "LPBAM_LPGPIOREAD_PIN_0">
+               <MatcherOnKey>CONF$1\.S1$2\.F$3\.LPBAMLPGPIO1.Pin_READPINSEQUENCE</MatcherOnKey>
+               <MatcherPattern>LPBAM_GPIO_PIN_0</MatcherPattern>
+           </Matcher>
+        -->
+        <Matcher Name= "LPBAM_LPGPIOREAD_PIN_1">
+            <MatcherOnKey>CONF{LPBAM_LPGPIOREAD_EXISTS_#1}\.S1\.{LPBAM_LPGPIOREAD_EXISTS_#2}\.F{LPBAM_LPGPIOREAD_EXISTS_#3}\.LPBAMLPGPIO1.Pin_READPINSEQUENCE</MatcherOnKey>  <!--CONF2.S1.Q1.F5.LPBAMLPGPIO1.Pin_READPINSEQUENCE=LPBAM_GPIO_PIN_1-->
+            <MatcherPattern>LPBAM_GPIO_PIN_1</MatcherPattern>
+        </Matcher>
+        <Matcher Name= "LPBAM_LPGPIOREAD_PIN_2">
+            <MatcherOnKey>CONF{LPBAM_LPGPIOREAD_EXISTS_#1}\.S1\.{LPBAM_LPGPIOREAD_EXISTS_#2}\.F{LPBAM_LPGPIOREAD_EXISTS_#3}\.LPBAMLPGPIO1.Pin_READPINSEQUENCE</MatcherOnKey>
+            <MatcherPattern>LPBAM_GPIO_PIN_2</MatcherPattern>
+        </Matcher>
+        <Matcher Name= "LPBAM_LPGPIOREAD_PIN_3">
+            <MatcherOnKey>CONF{LPBAM_LPGPIOREAD_EXISTS_#1}\.S1\.{LPBAM_LPGPIOREAD_EXISTS_#2}\.F{LPBAM_LPGPIOREAD_EXISTS_#3}\.LPBAMLPGPIO1.Pin_READPINSEQUENCE</MatcherOnKey>
+            <MatcherPattern>LPBAM_GPIO_PIN_3</MatcherPattern>
+        </Matcher>
+        <Matcher Name= "LPBAM_LPGPIOREAD_PIN_4">
+            <MatcherOnKey>CONF{LPBAM_LPGPIOREAD_EXISTS_#1}\.S1\.{LPBAM_LPGPIOREAD_EXISTS_#2}\.F{LPBAM_LPGPIOREAD_EXISTS_#3}\.LPBAMLPGPIO1.Pin_READPINSEQUENCE</MatcherOnKey>
+            <MatcherPattern>LPBAM_GPIO_PIN_4</MatcherPattern>
+        </Matcher>
+        <Matcher Name= "LPBAM_LPGPIOREAD_PIN_5">
+            <MatcherOnKey>CONF{LPBAM_LPGPIOREAD_EXISTS_#1}\.S1\.{LPBAM_LPGPIOREAD_EXISTS_#2}\.F{LPBAM_LPGPIOREAD_EXISTS_#3}\.LPBAMLPGPIO1.Pin_READPINSEQUENCE</MatcherOnKey>
+            <MatcherPattern>LPBAM_GPIO_PIN_5</MatcherPattern>
+        </Matcher>
+        <Matcher Name= "LPBAM_LPGPIOREAD_PIN_6">
+            <MatcherOnKey>CONF{LPBAM_LPGPIOREAD_EXISTS_#1}\.S1\.{LPBAM_LPGPIOREAD_EXISTS_#2}\.F{LPBAM_LPGPIOREAD_EXISTS_#3}\.LPBAMLPGPIO1.Pin_READPINSEQUENCE</MatcherOnKey>
+            <MatcherPattern>LPBAM_GPIO_PIN_6</MatcherPattern>
+        </Matcher>
+        <Matcher Name= "LPBAM_LPGPIOREAD_PIN_7">
+            <MatcherOnKey>CONF{LPBAM_LPGPIOREAD_EXISTS_#1}\.S1\.{LPBAM_LPGPIOREAD_EXISTS_#2}\.F{LPBAM_LPGPIOREAD_EXISTS_#3}\.LPBAMLPGPIO1.Pin_READPINSEQUENCE</MatcherOnKey>
+            <MatcherPattern>LPBAM_GPIO_PIN_7</MatcherPattern>
+        </Matcher>
+        <Matcher Name= "LPBAM_LPGPIOREAD_PIN_8">
+            <MatcherOnKey>CONF{LPBAM_LPGPIOREAD_EXISTS_#1}\.S1\.{LPBAM_LPGPIOREAD_EXISTS_#2}\.F{LPBAM_LPGPIOREAD_EXISTS_#3}\.LPBAMLPGPIO1.Pin_READPINSEQUENCE</MatcherOnKey>
+            <MatcherPattern>LPBAM_GPIO_PIN_8</MatcherPattern>
+        </Matcher>
+        <Matcher Name= "LPBAM_LPGPIOREAD_PIN_9">
+            <MatcherOnKey>CONF{LPBAM_LPGPIOREAD_EXISTS_#1}\.S1\.{LPBAM_LPGPIOREAD_EXISTS_#2}\.F{LPBAM_LPGPIOREAD_EXISTS_#3}\.LPBAMLPGPIO1.Pin_READPINSEQUENCE</MatcherOnKey>
+            <MatcherPattern>LPBAM_GPIO_PIN_9</MatcherPattern>
+        </Matcher>
+        <Matcher Name= "LPBAM_LPGPIOREAD_PIN_10">
+            <MatcherOnKey>CONF{LPBAM_LPGPIOREAD_EXISTS_#1}\.S1\.{LPBAM_LPGPIOREAD_EXISTS_#2}\.F{LPBAM_LPGPIOREAD_EXISTS_#3}\.LPBAMLPGPIO1.Pin_READPINSEQUENCE</MatcherOnKey>
+            <MatcherPattern>LPBAM_GPIO_PIN_10</MatcherPattern>
+        </Matcher>
+        <Matcher Name= "LPBAM_LPGPIOREAD_PIN_11">
+            <MatcherOnKey>CONF{LPBAM_LPGPIOREAD_EXISTS_#1}\.S1\.{LPBAM_LPGPIOREAD_EXISTS_#2}\.F{LPBAM_LPGPIOREAD_EXISTS_#3}\.LPBAMLPGPIO1.Pin_READPINSEQUENCE</MatcherOnKey>
+            <MatcherPattern>LPBAM_GPIO_PIN_11</MatcherPattern>
+        </Matcher>
+        <Matcher Name= "LPBAM_LPGPIOREAD_PIN_12">
+            <MatcherOnKey>CONF{LPBAM_LPGPIOREAD_EXISTS_#1}\.S1\.{LPBAM_LPGPIOREAD_EXISTS_#2}\.F{LPBAM_LPGPIOREAD_EXISTS_#3}\.LPBAMLPGPIO1.Pin_READPINSEQUENCE</MatcherOnKey>
+            <MatcherPattern>LPBAM_GPIO_PIN_12</MatcherPattern>
+        </Matcher>
+        <Matcher Name= "LPBAM_LPGPIOREAD_PIN_13">
+            <MatcherOnKey>CONF{LPBAM_LPGPIOREAD_EXISTS_#1}\.S1\.{LPBAM_LPGPIOREAD_EXISTS_#2}\.F{LPBAM_LPGPIOREAD_EXISTS_#3}\.LPBAMLPGPIO1.Pin_READPINSEQUENCE</MatcherOnKey>
+            <MatcherPattern>LPBAM_GPIO_PIN_13</MatcherPattern>
+        </Matcher>
+        <Matcher Name= "LPBAM_LPGPIOREAD_PIN_14">
+            <MatcherOnKey>CONF{LPBAM_LPGPIOREAD_EXISTS_#1}\.S1\.{LPBAM_LPGPIOREAD_EXISTS_#2}\.F{LPBAM_LPGPIOREAD_EXISTS_#3}\.LPBAMLPGPIO1.Pin_READPINSEQUENCE</MatcherOnKey>
+            <MatcherPattern>LPBAM_GPIO_PIN_14</MatcherPattern>
+        </Matcher>
+        <Matcher Name= "LPBAM_LPGPIOREAD_PIN_15">
+            <MatcherOnKey>CONF{LPBAM_LPGPIOREAD_EXISTS_#1}\.S1\.{LPBAM_LPGPIOREAD_EXISTS_#2}\.F{LPBAM_LPGPIOREAD_EXISTS_#3}\.LPBAMLPGPIO1.Pin_READPINSEQUENCE</MatcherOnKey>
+            <MatcherPattern>LPBAM_GPIO_PIN_15</MatcherPattern>
+        </Matcher>
+
+<Matcher Name= "HAL_PIN_0_INPUT">
+            <MatcherOnKey>CONF{LPBAM_LPGPIOREAD_EXISTS_#1}\.PA1(\D)*\.Signal</MatcherOnKey>
+            <MatcherPattern>LPGPIO_Input</MatcherPattern>
+        </Matcher>
+        <Matcher Name= "HAL_PIN_1_INPUT">
+            <MatcherOnKey>CONF{LPBAM_LPGPIOREAD_EXISTS_#1}\.PA3(\D)*\.Signal</MatcherOnKey>
+            <MatcherPattern>LPGPIO_Input</MatcherPattern>
+        </Matcher>
+        <Matcher Name= "HAL_PIN_2_INPUT">
+            <MatcherOnKey>CONF{LPBAM_LPGPIOREAD_EXISTS_#1}\.PA6(\D)*\.Signal</MatcherOnKey>
+            <MatcherPattern>LPGPIO_Input</MatcherPattern>
+        </Matcher>
+        <Matcher Name= "HAL_PIN_3_INPUT">
+            <MatcherOnKey>CONF{LPBAM_LPGPIOREAD_EXISTS_#1}\.PB1(\D)*\.Signal</MatcherOnKey>
+            <MatcherPattern>LPGPIO_Input</MatcherPattern>
+        </Matcher>
+        <Matcher Name= "HAL_PIN_4_INPUT">
+            <MatcherOnKey>CONF{LPBAM_LPGPIOREAD_EXISTS_#1}\.PB10(\D)*\.Signal</MatcherOnKey>
+            <MatcherPattern>LPGPIO_Input</MatcherPattern>
+        </Matcher>
+        <Matcher Name= "HAL_PIN_5_INPUT">
+            <MatcherOnKey>CONF{LPBAM_LPGPIOREAD_EXISTS_#1}\.PC2(\D)*\.Signal</MatcherOnKey>
+            <MatcherPattern>LPGPIO_Input</MatcherPattern>
+        </Matcher>
+        <Matcher Name= "HAL_PIN_6_INPUT">
+            <MatcherOnKey>CONF{LPBAM_LPGPIOREAD_EXISTS_#1}\.PD13(\D)*\.Signal</MatcherOnKey>
+            <MatcherPattern>LPGPIO_Input</MatcherPattern>
+        </Matcher>
+        <Matcher Name= "HAL_PIN_7_INPUT">
+            <MatcherOnKey>CONF{LPBAM_LPGPIOREAD_EXISTS_#1}\.PD2(\D)*\.Signal</MatcherOnKey>
+            <MatcherPattern>LPGPIO_Input</MatcherPattern>
+        </Matcher>
+        <Matcher Name= "HAL_PIN_8_INPUT">
+            <MatcherOnKey>CONF{LPBAM_LPGPIOREAD_EXISTS_#1}\.PD13(\D)*\.Signal</MatcherOnKey>
+            <MatcherPattern>LPGPIO_Input</MatcherPattern>
+        </Matcher>
+        <Matcher Name= "HAL_PIN_9_INPUT">
+            <MatcherOnKey>CONF{LPBAM_LPGPIOREAD_EXISTS_#1}\.PB0(\D)*\.Signal</MatcherOnKey>
+            <MatcherPattern>LPGPIO_Input</MatcherPattern>
+        </Matcher>
+        <Matcher Name= "HAL_PIN_10_INPUT">
+            <MatcherOnKey>CONF{LPBAM_LPGPIOREAD_EXISTS_#1}\.PC12(\D)*\.Signal</MatcherOnKey>
+            <MatcherPattern>LPGPIO_Input</MatcherPattern>
+        </Matcher>
+        <Matcher Name= "HAL_PIN_11_INPUT">
+            <MatcherOnKey>CONF{LPBAM_LPGPIOREAD_EXISTS_#1}\.PB3(\D)*\.Signal</MatcherOnKey>
+            <MatcherPattern>LPGPIO_Input</MatcherPattern>
+        </Matcher>
+        <Matcher Name= "HAL_PIN_12_INPUT">
+            <MatcherOnKey>CONF{LPBAM_LPGPIOREAD_EXISTS_#1}\.PB4(\D)*\.Signal</MatcherOnKey>
+            <MatcherPattern>LPGPIO_Input</MatcherPattern>
+        </Matcher>
+        <Matcher Name= "HAL_PIN_13_INPUT">
+            <MatcherOnKey>CONF{LPBAM_LPGPIOREAD_EXISTS_#1}\.PE0(\D)*\.Signal</MatcherOnKey>
+            <MatcherPattern>LPGPIO_Input</MatcherPattern>
+        </Matcher>
+        <Matcher Name= "HAL_PIN_14_INPUT">
+            <MatcherOnKey>CONF{LPBAM_LPGPIOREAD_EXISTS_#1}\.PE2(\D)*\.Signal</MatcherOnKey>
+            <MatcherPattern>LPGPIO_Input</MatcherPattern>
+        </Matcher>
+        <Matcher Name= "HAL_PIN_15_INPUT">
+            <MatcherOnKey>CONF{LPBAM_LPGPIOREAD_EXISTS_#1}\.PE3(\D)*\.Signal</MatcherOnKey>
+            <MatcherPattern>LPGPIO_Input</MatcherPattern>
+        </Matcher>
+
+        <Checker Condition="(LPBAM_LPGPIOREAD_PIN_1 &amp; !HAL_PIN_1_INPUT) | (LPBAM_LPGPIOREAD_PIN_2 &amp; !HAL_PIN_2_INPUT) | (LPBAM_LPGPIOREAD_PIN_3 &amp; !HAL_PIN_3_INPUT) |(LPBAM_LPGPIOREAD_PIN_4 &amp; !HAL_PIN_4_INPUT) |(LPBAM_LPGPIOREAD_PIN_5 &amp; !HAL_PIN_5_INPUT) | (LPBAM_LPGPIOREAD_PIN_6 &amp; !HAL_PIN_6_INPUT) |(LPBAM_LPGPIOREAD_PIN_7 &amp; !HAL_PIN_7_INPUT) | (LPBAM_LPGPIOREAD_PIN_8 &amp; !HAL_PIN_8_INPUT) | (LPBAM_LPGPIOREAD_PIN_9 &amp; !HAL_PIN_9_INPUT) | (LPBAM_LPGPIOREAD_PIN_10 &amp; !HAL_PIN_10_INPUT) | (LPBAM_LPGPIOREAD_PIN_11 &amp; !HAL_PIN_11_INPUT) | (LPBAM_LPGPIOREAD_PIN_12 &amp; !HAL_PIN_12_INPUT) | (LPBAM_LPGPIOREAD_PIN_13 &amp; !HAL_PIN_13_INPUT) | (LPBAM_LPGPIOREAD_PIN_14 &amp; !HAL_PIN_14_INPUT) | (LPBAM_LPGPIOREAD_PIN_15 &amp; !HAL_PIN_15_INPUT) |
+         (!(LPBAM_LPGPIOREAD_PIN_1|LPBAM_LPGPIOREAD_PIN_2|LPBAM_LPGPIOREAD_PIN_3 |LPBAM_LPGPIOREAD_PIN_4 |LPBAM_LPGPIOREAD_PIN_5 |LPBAM_LPGPIOREAD_PIN_6 |LPBAM_LPGPIOREAD_PIN_7|LPBAM_LPGPIOREAD_PIN_8 |LPBAM_LPGPIOREAD_PIN_9|LPBAM_LPGPIOREAD_PIN_10|LPBAM_LPGPIOREAD_PIN_11|LPBAM_LPGPIOREAD_PIN_12|LPBAM_LPGPIOREAD_PIN_13|LPBAM_LPGPIOREAD_PIN_14 |LPBAM_LPGPIOREAD_PIN_15) &amp; !HAL_PIN_0_INPUT)"
+                 Diagnostic="Peripheral Configuration: LPGPIO PIN read in S1.{LPBAM_LPGPIOREAD_EXISTS_#2}/'LPGPIO1:S1.{LPBAM_LPGPIOREAD_EXISTS_#2}.F{LPBAM_LPGPIOREAD_EXISTS_#3}' is not configured as LPGPIO_INPUT. It should be configured in this application 'Pinout &amp; Configuration' panel"
+                 Type="error" />
+    </ConsistencyRule>
+
+
+
+
+
+
+  
+
+ <ConsistencyRule Type= "SingleApplication" Name= "LPGPIOWRITE">
+
+        <Matcher Name= "LPBAM_LPGPIOWRITE_EXISTS" Type="precondition">
+            <MatcherOnKey>CONF(.*)\.S1\.(.*)\.F(.*)\.VP_LPBAMLPGPIO1_VS_WRITEPIN.*\.Mode</MatcherOnKey>  
+            <MatcherPattern>WRITEPIN.*</MatcherPattern>
+        </Matcher>
+
+       
+        <Matcher Name= "LPBAM_LPGPIOWRITE_PIN_1">
+            <MatcherOnKey>CONF{LPBAM_LPGPIOWRITE_EXISTS_#1}\.S1\.{LPBAM_LPGPIOWRITE_EXISTS_#2}\.F{LPBAM_LPGPIOWRITE_EXISTS_#3}\.LPBAMLPGPIO1.Pin_WRITEPIN.*</MatcherOnKey> 
+            <MatcherPattern>LPBAM_GPIO_PIN_1</MatcherPattern>
+        </Matcher>
+        <Matcher Name= "LPBAM_LPGPIOWRITE_PIN_2">
+            <MatcherOnKey>CONF{LPBAM_LPGPIOWRITE_EXISTS_#1}\.S1\.{LPBAM_LPGPIOWRITE_EXISTS_#2}\.F{LPBAM_LPGPIOWRITE_EXISTS_#3}\.LPBAMLPGPIO1.Pin_WRITEPIN.*</MatcherOnKey>
+            <MatcherPattern>LPBAM_GPIO_PIN_2</MatcherPattern>
+        </Matcher>
+        <Matcher Name= "LPBAM_LPGPIOWRITE_PIN_3">
+            <MatcherOnKey>CONF{LPBAM_LPGPIOWRITE_EXISTS_#1}\.S1\.{LPBAM_LPGPIOWRITE_EXISTS_#2}\.F{LPBAM_LPGPIOWRITE_EXISTS_#3}\.LPBAMLPGPIO1.Pin_WRITEPIN.*</MatcherOnKey>
+            <MatcherPattern>LPBAM_GPIO_PIN_3</MatcherPattern>
+        </Matcher>
+        <Matcher Name= "LPBAM_LPGPIOWRITE_PIN_4">
+            <MatcherOnKey>CONF{LPBAM_LPGPIOWRITE_EXISTS_#1}\.S1\.{LPBAM_LPGPIOWRITE_EXISTS_#2}\.F{LPBAM_LPGPIOWRITE_EXISTS_#3}\.LPBAMLPGPIO1.Pin_WRITEPIN.*</MatcherOnKey>
+            <MatcherPattern>LPBAM_GPIO_PIN_4</MatcherPattern>
+        </Matcher>
+        <Matcher Name= "LPBAM_LPGPIOWRITE_PIN_5">
+            <MatcherOnKey>CONF{LPBAM_LPGPIOWRITE_EXISTS_#1}\.S1\.{LPBAM_LPGPIOWRITE_EXISTS_#2}\.F{LPBAM_LPGPIOWRITE_EXISTS_#3}\.LPBAMLPGPIO1.Pin_WRITEPIN.*</MatcherOnKey>
+            <MatcherPattern>LPBAM_GPIO_PIN_5</MatcherPattern>
+        </Matcher>
+        <Matcher Name= "LPBAM_LPGPIOWRITE_PIN_6">
+            <MatcherOnKey>CONF{LPBAM_LPGPIOWRITE_EXISTS_#1}\.S1\.{LPBAM_LPGPIOWRITE_EXISTS_#2}\.F{LPBAM_LPGPIOWRITE_EXISTS_#3}\.LPBAMLPGPIO1.Pin_WRITEPIN.*</MatcherOnKey>
+            <MatcherPattern>LPBAM_GPIO_PIN_6</MatcherPattern>
+        </Matcher>
+        <Matcher Name= "LPBAM_LPGPIOWRITE_PIN_7">
+            <MatcherOnKey>CONF{LPBAM_LPGPIOWRITE_EXISTS_#1}\.S1\.{LPBAM_LPGPIOWRITE_EXISTS_#2}\.F{LPBAM_LPGPIOWRITE_EXISTS_#3}\.LPBAMLPGPIO1.Pin_WRITEPIN.*</MatcherOnKey>
+            <MatcherPattern>LPBAM_GPIO_PIN_7</MatcherPattern>
+        </Matcher>
+        <Matcher Name= "LPBAM_LPGPIOWRITE_PIN_8">
+            <MatcherOnKey>CONF{LPBAM_LPGPIOWRITE_EXISTS_#1}\.S1{LPBAM_LPGPIOWRITE_EXISTS_#2}\.F{LPBAM_LPGPIOWRITE_EXISTS_#3}\.LPBAMLPGPIO1.Pin_WRITEPIN.*</MatcherOnKey>
+            <MatcherPattern>LPBAM_GPIO_PIN_8</MatcherPattern>
+        </Matcher>
+        <Matcher Name= "LPBAM_LPGPIOWRITE_PIN_9">
+            <MatcherOnKey>CONF{LPBAM_LPGPIOWRITE_EXISTS_#1}\.S1\.{LPBAM_LPGPIOWRITE_EXISTS_#2}\.F{LPBAM_LPGPIOWRITE_EXISTS_#3}\.LPBAMLPGPIO1.Pin_WRITEPIN.*</MatcherOnKey>
+            <MatcherPattern>LPBAM_GPIO_PIN_9</MatcherPattern>
+        </Matcher>
+        <Matcher Name= "LPBAM_LPGPIOWRITE_PIN_10">
+            <MatcherOnKey>CONF{LPBAM_LPGPIOWRITE_EXISTS_#1}\.S1\.{LPBAM_LPGPIOWRITE_EXISTS_#2}\.F{LPBAM_LPGPIOWRITE_EXISTS_#3}\.LPBAMLPGPIO1.Pin_WRITEPIN.*</MatcherOnKey>
+            <MatcherPattern>LPBAM_GPIO_PIN_10</MatcherPattern>
+        </Matcher>
+        <Matcher Name= "LPBAM_LPGPIOWRITE_PIN_11">
+            <MatcherOnKey>CONF{LPBAM_LPGPIOWRITE_EXISTS_#1}\.S1\.{LPBAM_LPGPIOWRITE_EXISTS_#2}\.F{LPBAM_LPGPIOWRITE_EXISTS_#3}\.LPBAMLPGPIO1.Pin_WRITEPIN.*</MatcherOnKey>
+            <MatcherPattern>LPBAM_GPIO_PIN_11</MatcherPattern>
+        </Matcher>
+        <Matcher Name= "LPBAM_LPGPIOWRITE_PIN_12">
+            <MatcherOnKey>CONF{LPBAM_LPGPIOWRITE_EXISTS_#1}\.S1\.{LPBAM_LPGPIOWRITE_EXISTS_#2}\.F{LPBAM_LPGPIOWRITE_EXISTS_#3}\.LPBAMLPGPIO1.Pin_WRITEPIN.*</MatcherOnKey>
+            <MatcherPattern>LPBAM_GPIO_PIN_12</MatcherPattern>
+        </Matcher>
+        <Matcher Name= "LPBAM_LPGPIOWRITE_PIN_13">
+            <MatcherOnKey>CONF{LPBAM_LPGPIOWRITE_EXISTS_#1}\.S1\.{LPBAM_LPGPIOWRITE_EXISTS_#2}\.F{LPBAM_LPGPIOWRITE_EXISTS_#3}\.LPBAMLPGPIO1.Pin_WRITEPIN.*</MatcherOnKey>
+            <MatcherPattern>LPBAM_GPIO_PIN_13</MatcherPattern>
+        </Matcher>
+        <Matcher Name= "LPBAM_LPGPIOWRITE_PIN_14">
+            <MatcherOnKey>CONF{LPBAM_LPGPIOWRITE_EXISTS_#1}\.S1\.{LPBAM_LPGPIOWRITE_EXISTS_#2}\.F{LPBAM_LPGPIOWRITE_EXISTS_#3}\.LPBAMLPGPIO1.Pin_WRITEPIN.*</MatcherOnKey>
+            <MatcherPattern>LPBAM_GPIO_PIN_14</MatcherPattern>
+        </Matcher>
+        <Matcher Name= "LPBAM_LPGPIOWRITE_PIN_15">
+            <MatcherOnKey>CONF{LPBAM_LPGPIOWRITE_EXISTS_#1}\.S1\.{LPBAM_LPGPIOWRITE_EXISTS_#2}\.F{LPBAM_LPGPIOWRITE_EXISTS_#3}\.LPBAMLPGPIO1.Pin_WRITEPIN.*</MatcherOnKey>
+            <MatcherPattern>LPBAM_GPIO_PIN_15</MatcherPattern>
+        </Matcher>
+
+        <Matcher Name= "HAL_PIN_0_OUTPUT">
+            <MatcherOnKey>CONF{LPBAM_LPGPIOWRITE_EXISTS_#1}\.PA1(\D)*\.Signal</MatcherOnKey>
+            <MatcherPattern>LPGPIO_Output</MatcherPattern>
+        </Matcher>
+        <Matcher Name= "HAL_PIN_1_OUTPUT">
+            <MatcherOnKey>CONF{LPBAM_LPGPIOWRITE_EXISTS_#1}\.PA3(\D)*\.Signal</MatcherOnKey>
+            <MatcherPattern>LPGPIO_Output</MatcherPattern>
+        </Matcher>
+        <Matcher Name= "HAL_PIN_2_OUTPUT">
+            <MatcherOnKey>CONF{LPBAM_LPGPIOWRITE_EXISTS_#1}\.PA6(\D)*\.Signal</MatcherOnKey>
+            <MatcherPattern>LPGPIO_Output</MatcherPattern>
+        </Matcher>
+        <Matcher Name= "HAL_PIN_3_OUTPUT">
+            <MatcherOnKey>CONF{LPBAM_LPGPIOWRITE_EXISTS_#1}\.PB1(\D)*\.Signal</MatcherOnKey>
+            <MatcherPattern>LPGPIO_Output</MatcherPattern>
+        </Matcher>
+        <Matcher Name= "HAL_PIN_4_OUTPUT">
+            <MatcherOnKey>CONF{LPBAM_LPGPIOWRITE_EXISTS_#1}\.PB10(\D)*\.Signal</MatcherOnKey>
+            <MatcherPattern>LPGPIO_Output</MatcherPattern>
+        </Matcher>
+        <Matcher Name= "HAL_PIN_5_OUTPUT">
+            <MatcherOnKey>CONF{LPBAM_LPGPIOWRITE_EXISTS_#1}\.PC2(\D)*\.Signal</MatcherOnKey>
+            <MatcherPattern>LPGPIO_Output</MatcherPattern>
+        </Matcher>
+        <Matcher Name= "HAL_PIN_6_OUTPUT">
+            <MatcherOnKey>CONF{LPBAM_LPGPIOWRITE_EXISTS_#1}\.PD13(\D)*\.Signal</MatcherOnKey>
+            <MatcherPattern>LPGPIO_Output</MatcherPattern>
+        </Matcher>
+        <Matcher Name= "HAL_PIN_7_OUTPUT">
+            <MatcherOnKey>CONF{LPBAM_LPGPIOWRITE_EXISTS_#1}\.PD2(\D)*\.Signal</MatcherOnKey>
+            <MatcherPattern>LPGPIO_Output</MatcherPattern>
+        </Matcher>
+        <Matcher Name= "HAL_PIN_8_OUTPUT">
+            <MatcherOnKey>CONF{LPBAM_LPGPIOWRITE_EXISTS_#1}\.PD13(\D)*\.Signal</MatcherOnKey>
+            <MatcherPattern>LPGPIO_Output</MatcherPattern>
+        </Matcher>
+        <Matcher Name= "HAL_PIN_9_OUTPUT">
+            <MatcherOnKey>CONF{LPBAM_LPGPIOWRITE_EXISTS_#1}\.PB0(\D)*\.Signal</MatcherOnKey>
+            <MatcherPattern>LPGPIO_Output</MatcherPattern>
+        </Matcher>
+        <Matcher Name= "HAL_PIN_10_OUTPUT">
+            <MatcherOnKey>CONF{LPBAM_LPGPIOWRITE_EXISTS_#1}\.PC12(\D)*\.Signal</MatcherOnKey>
+            <MatcherPattern>LPGPIO_Output</MatcherPattern>
+        </Matcher>
+        <Matcher Name= "HAL_PIN_11_OUTPUT">
+            <MatcherOnKey>CONF{LPBAM_LPGPIOWRITE_EXISTS_#1}\.PB3(\D)*\.Signal</MatcherOnKey>
+            <MatcherPattern>LPGPIO_Output</MatcherPattern>
+        </Matcher>
+        <Matcher Name= "HAL_PIN_12_OUTPUT">
+            <MatcherOnKey>CONF{LPBAM_LPGPIOWRITE_EXISTS_#1}\.PB4(\D)*\.Signal</MatcherOnKey>
+            <MatcherPattern>LPGPIO_Output</MatcherPattern>
+        </Matcher>
+        <Matcher Name= "HAL_PIN_13_OUTPUT">
+            <MatcherOnKey>CONF{LPBAM_LPGPIOWRITE_EXISTS_#1}\.PE0(\D)*\.Signal</MatcherOnKey>
+            <MatcherPattern>LPGPIO_Output</MatcherPattern>
+        </Matcher>
+        <Matcher Name= "HAL_PIN_14_OUTPUT">
+            <MatcherOnKey>CONF{LPBAM_LPGPIOWRITE_EXISTS_#1}\.PE2(\D)*\.Signal</MatcherOnKey>
+            <MatcherPattern>LPGPIO_Output</MatcherPattern>
+        </Matcher>
+        <Matcher Name= "HAL_PIN_15_OUTPUT">
+            <MatcherOnKey>CONF{LPBAM_LPGPIOWRITE_EXISTS_#1}\.PE3(\D)*\.Signal</MatcherOnKey>
+            <MatcherPattern>LPGPIO_Output</MatcherPattern>
+        </Matcher>
+
+        <Checker Condition="(LPBAM_LPGPIOWRITE_PIN_1 &amp; !HAL_PIN_1_OUTPUT) | (LPBAM_LPGPIOWRITE_PIN_2 &amp; !HAL_PIN_2_OUTPUT) | (LPBAM_LPGPIOWRITE_PIN_3 &amp; !HAL_PIN_3_OUTPUT) |(LPBAM_LPGPIOWRITE_PIN_4 &amp; !HAL_PIN_4_OUTPUT) |(LPBAM_LPGPIOWRITE_PIN_5 &amp; !HAL_PIN_5_OUTPUT) | (LPBAM_LPGPIOWRITE_PIN_6 &amp; !HAL_PIN_6_OUTPUT) |(LPBAM_LPGPIOWRITE_PIN_7 &amp; !HAL_PIN_7_OUTPUT) | (LPBAM_LPGPIOWRITE_PIN_8 &amp; !HAL_PIN_8_OUTPUT) | (LPBAM_LPGPIOWRITE_PIN_9 &amp; !HAL_PIN_9_OUTPUT) | (LPBAM_LPGPIOWRITE_PIN_10 &amp; !HAL_PIN_10_OUTPUT) | (LPBAM_LPGPIOWRITE_PIN_11 &amp; !HAL_PIN_11_OUTPUT) | (LPBAM_LPGPIOWRITE_PIN_12 &amp; !HAL_PIN_12_OUTPUT) | (LPBAM_LPGPIOWRITE_PIN_13 &amp; !HAL_PIN_13_OUTPUT) | (LPBAM_LPGPIOWRITE_PIN_14 &amp; !HAL_PIN_14_OUTPUT) | (LPBAM_LPGPIOWRITE_PIN_15 &amp; !HAL_PIN_15_OUTPUT) |
+         (!(LPBAM_LPGPIOWRITE_PIN_1|LPBAM_LPGPIOWRITE_PIN_2|LPBAM_LPGPIOWRITE_PIN_3 |LPBAM_LPGPIOWRITE_PIN_4 |LPBAM_LPGPIOWRITE_PIN_5 |LPBAM_LPGPIOWRITE_PIN_6 |LPBAM_LPGPIOWRITE_PIN_7|LPBAM_LPGPIOWRITE_PIN_8 |LPBAM_LPGPIOWRITE_PIN_9|LPBAM_LPGPIOWRITE_PIN_10|LPBAM_LPGPIOWRITE_PIN_11|LPBAM_LPGPIOWRITE_PIN_12|LPBAM_LPGPIOWRITE_PIN_13|LPBAM_LPGPIOWRITE_PIN_14 |LPBAM_LPGPIOWRITE_PIN_15) &amp; !HAL_PIN_0_OUTPUT)"
+                 Diagnostic="Peripheral Configuration: LPGPIO PIN written in S1.{LPBAM_LPGPIOWRITE_EXISTS_#2}/'LPGPIO1:S1.{LPBAM_LPGPIOWRITE_EXISTS_#2}.F{LPBAM_LPGPIOWRITE_EXISTS_#3}' is not configured as LPGPIO_OUTPUT.  It should be configured in this application 'Pinout &amp; Configuration' panel"
+                 Type="error" />
+    </ConsistencyRule>
+
+
+
+    <ConsistencyRule Type="SingleApplication" Name= "LPGPIOSAMEPINDIFFERENTQUEUES"><!-- default value for PIN is not managed : PA1 -->
+        <Matcher Name= "LPBAMLPGPIOPINUSED" Type="precondition">
+            <MatcherOnKey>CONF(.*)\.S1\.(.*)\.F(.*)\.LPBAMLPGPIO1.*</MatcherOnKey>
+            <MatcherPattern>LPBAM_GPIO_PIN_(.*)</MatcherPattern>
+        </Matcher>
+
+        <Matcher Name= "LPBAMLPGPIOPINUSEDANOTHERQUEUE">
+            <MatcherOnKey>CONF{LPBAMLPGPIOPINUSED_#1}\.S1\.Q[^{LPBAMLPGPIOPINUSED_#2}]\.F.*</MatcherOnKey>
+            <MatcherPattern>LPBAM_GPIO_PIN_{LPBAMLPGPIOPINUSED_#4}</MatcherPattern>
+        </Matcher>
+
+        <Checker Condition="LPBAMLPGPIOPINUSEDANOTHERQUEUE"
+                Diagnostic="Scenario Design: LPGPIO PIN set in S1.{LPBAMLPGPIOPINUSED_#2}/'LPGPIO1:S1.{LPBAMLPGPIOPINUSED_#2}.F{LPBAMLPGPIOPINUSED_#3}' is used in several Queues, be sure these Queues are not executed simultaneously at runtime"
+                 Type="info"/>
+    </ConsistencyRule>
+
+
+
+
+
+
+<ConsistencyRule Type= "SingleApplication" Name= "LPGPIOPA1">
+
+        <Matcher Name= "LPBAM_LPGPIOWRITEREAD_EXISTS" Type="precondition">
+            <MatcherOnKey>CONF(.*)\.S1\.(.*)\.F(.*)\.VP_LPBAMLPGPIO1_VS_.*PIN.*\.Mode</MatcherOnKey>  
+            <MatcherPattern>.*PIN.*</MatcherPattern>
+        </Matcher>
+
+         <Matcher Name= "LPBAM_LPGPIOWRITEREAD_EXISTS_OTHERQUEUE">
+            <MatcherOnKey>CONF{LPBAM_LPGPIOWRITEREAD_EXISTS_#1}\.S1\.Q[^{LPBAM_LPGPIOWRITEREAD_EXISTS_#2}]\.F(.*)\.VP_LPBAMLPGPIO1_VS_.*PIN.*\.Mode</MatcherOnKey>  
+            <MatcherPattern>.*PIN.*</MatcherPattern>
+        </Matcher>
+
+
+        <Matcher Name= "LPBAM_LPGPIOWRITEREAD_PIN_1">
+            <MatcherOnKey>CONF{LPBAM_LPGPIOWRITEREAD_EXISTS_#1}\.S1\.{LPBAM_LPGPIOWRITEREAD_EXISTS_#2}\.F{LPBAM_LPGPIOWRITEREAD_EXISTS_#3}\.LPBAMLPGPIO1.Pin_.*PIN.*</MatcherOnKey> 
+            <MatcherPattern>LPBAM_GPIO_PIN_1</MatcherPattern>
+        </Matcher>
+        <Matcher Name= "LPBAM_LPGPIOWRITEREAD_PIN_2">
+            <MatcherOnKey>CONF{LPBAM_LPGPIOWRITEREAD_EXISTS_#1}\.S1\.{LPBAM_LPGPIOWRITEREAD_EXISTS_#2}\.F{LPBAM_LPGPIOWRITEREAD_EXISTS_#3}\.LPBAMLPGPIO1.Pin_.*PIN.*</MatcherOnKey>
+            <MatcherPattern>LPBAM_GPIO_PIN_2</MatcherPattern>
+        </Matcher>
+        <Matcher Name= "LPBAM_LPGPIOWRITEREAD_PIN_3">
+            <MatcherOnKey>CONF{LPBAM_LPGPIOWRITEREAD_EXISTS_#1}\.S1\.{LPBAM_LPGPIOWRITEREAD_EXISTS_#2}\.F{LPBAM_LPGPIOWRITEREAD_EXISTS_#3}\.LPBAMLPGPIO1.Pin_.*PIN.*</MatcherOnKey>
+            <MatcherPattern>LPBAM_GPIO_PIN_3</MatcherPattern>
+        </Matcher>
+        <Matcher Name= "LPBAM_LPGPIOWRITEREAD_PIN_4">
+            <MatcherOnKey>CONF{LPBAM_LPGPIOWRITEREAD_EXISTS_#1}\.S1\.{LPBAM_LPGPIOWRITEREAD_EXISTS_#2}\.F{LPBAM_LPGPIOWRITEREAD_EXISTS_#3}\.LPBAMLPGPIO1.Pin_.*PIN.*</MatcherOnKey>
+            <MatcherPattern>LPBAM_GPIO_PIN_4</MatcherPattern>
+        </Matcher>
+        <Matcher Name= "LPBAM_LPGPIOWRITEREAD_PIN_5">
+            <MatcherOnKey>CONF{LPBAM_LPGPIOWRITEREAD_EXISTS_#1}\.S1\.{LPBAM_LPGPIOWRITEREAD_EXISTS_#2}\.F{LPBAM_LPGPIOWRITEREAD_EXISTS_#3}\.LPBAMLPGPIO1.Pin_.*PIN.*</MatcherOnKey>
+            <MatcherPattern>LPBAM_GPIO_PIN_5</MatcherPattern>
+        </Matcher>
+        <Matcher Name= "LPBAM_LPGPIOWRITEREAD_PIN_6">
+            <MatcherOnKey>CONF{LPBAM_LPGPIOWRITEREAD_EXISTS_#1}\.S1\.{LPBAM_LPGPIOWRITEREAD_EXISTS_#2}\.F{LPBAM_LPGPIOWRITEREAD_EXISTS_#3}\.LPBAMLPGPIO1.Pin_.*PIN.*</MatcherOnKey>
+            <MatcherPattern>LPBAM_GPIO_PIN_6</MatcherPattern>
+        </Matcher>
+        <Matcher Name= "LPBAM_LPGPIOWRITEREAD_PIN_7">
+            <MatcherOnKey>CONF{LPBAM_LPGPIOWRITEREAD_EXISTS_#1}\.S1\.{LPBAM_LPGPIOWRITEREAD_EXISTS_#2}\.F{LPBAM_LPGPIOWRITEREAD_EXISTS_#3}\.LPBAMLPGPIO1.Pin_.*PIN.*</MatcherOnKey>
+            <MatcherPattern>LPBAM_GPIO_PIN_7</MatcherPattern>
+        </Matcher>
+        <Matcher Name= "LPBAM_LPGPIOWRITEREAD_PIN_8">
+            <MatcherOnKey>CONF{LPBAM_LPGPIOWRITEREAD_EXISTS_#1}\.S1{LPBAM_LPGPIOWRITEREAD_EXISTS_#2}\.F{LPBAM_LPGPIOWRITEREAD_EXISTS_#3}\.LPBAMLPGPIO1.Pin_.*PIN.*</MatcherOnKey>
+            <MatcherPattern>LPBAM_GPIO_PIN_8</MatcherPattern>
+        </Matcher>
+        <Matcher Name= "LPBAM_LPGPIOWRITEREAD_PIN_9">
+            <MatcherOnKey>CONF{LPBAM_LPGPIOWRITEREAD_EXISTS_#1}\.S1\.{LPBAM_LPGPIOWRITEREAD_EXISTS_#2}\.F{LPBAM_LPGPIOWRITEREAD_EXISTS_#3}\.LPBAMLPGPIO1.Pin_.*PIN.*</MatcherOnKey>
+            <MatcherPattern>LPBAM_GPIO_PIN_9</MatcherPattern>
+        </Matcher>
+        <Matcher Name= "LPBAM_LPGPIOWRITEREAD_PIN_10">
+            <MatcherOnKey>CONF{LPBAM_LPGPIOWRITEREAD_EXISTS_#1}\.S1\.{LPBAM_LPGPIOWRITEREAD_EXISTS_#2}\.F{LPBAM_LPGPIOWRITEREAD_EXISTS_#3}\.LPBAMLPGPIO1.Pin_.*PIN.*</MatcherOnKey>
+            <MatcherPattern>LPBAM_GPIO_PIN_10</MatcherPattern>
+        </Matcher>
+        <Matcher Name= "LPBAM_LPGPIOWRITEREAD_PIN_11">
+            <MatcherOnKey>CONF{LPBAM_LPGPIOWRITEREAD_EXISTS_#1}\.S1\.{LPBAM_LPGPIOWRITEREAD_EXISTS_#2}\.F{LPBAM_LPGPIOWRITEREAD_EXISTS_#3}\.LPBAMLPGPIO1.Pin_.*PIN.*</MatcherOnKey>
+            <MatcherPattern>LPBAM_GPIO_PIN_11</MatcherPattern>
+        </Matcher>
+        <Matcher Name= "LPBAM_LPGPIOWRITEREAD_PIN_12">
+            <MatcherOnKey>CONF{LPBAM_LPGPIOWRITEREAD_EXISTS_#1}\.S1\.{LPBAM_LPGPIOWRITEREAD_EXISTS_#2}\.F{LPBAM_LPGPIOWRITEREAD_EXISTS_#3}\.LPBAMLPGPIO1.Pin_.*PIN.*</MatcherOnKey>
+            <MatcherPattern>LPBAM_GPIO_PIN_12</MatcherPattern>
+        </Matcher>
+        <Matcher Name= "LPBAM_LPGPIOWRITEREAD_PIN_13">
+            <MatcherOnKey>CONF{LPBAM_LPGPIOWRITEREAD_EXISTS_#1}\.S1\.{LPBAM_LPGPIOWRITEREAD_EXISTS_#2}\.F{LPBAM_LPGPIOWRITEREAD_EXISTS_#3}\.LPBAMLPGPIO1.Pin_.*PIN.*</MatcherOnKey>
+            <MatcherPattern>LPBAM_GPIO_PIN_13</MatcherPattern>
+        </Matcher>
+        <Matcher Name= "LPBAM_LPGPIOWRITEREAD_PIN_14">
+            <MatcherOnKey>CONF{LPBAM_LPGPIOWRITEREAD_EXISTS_#1}\.S1\.{LPBAM_LPGPIOWRITEREAD_EXISTS_#2}\.F{LPBAM_LPGPIOWRITEREAD_EXISTS_#3}\.LPBAMLPGPIO1.Pin_.*PIN.*</MatcherOnKey>
+            <MatcherPattern>LPBAM_GPIO_PIN_14</MatcherPattern>
+        </Matcher>
+        <Matcher Name= "LPBAM_LPGPIOWRITEREAD_PIN_15">
+            <MatcherOnKey>CONF{LPBAM_LPGPIOWRITEREAD_EXISTS_#1}\.S1\.{LPBAM_LPGPIOWRITEREAD_EXISTS_#2}\.F{LPBAM_LPGPIOWRITEREAD_EXISTS_#3}\.LPBAMLPGPIO1.Pin_.*PIN.*</MatcherOnKey>
+            <MatcherPattern>LPBAM_GPIO_PIN_15</MatcherPattern>
+        </Matcher>
+
+
+        <Checker Condition="LPBAM_LPGPIOWRITEREAD_EXISTS_OTHERQUEUE &amp; ! (LPBAM_LPGPIOWRITEREAD_PIN_15 | LPBAM_LPGPIOWRITEREAD_PIN_14 | LPBAM_LPGPIOWRITEREAD_PIN_13 |LPBAM_LPGPIOWRITEREAD_PIN_12 | LPBAM_LPGPIOWRITEREAD_PIN_11 | LPBAM_LPGPIOWRITEREAD_PIN_10 | LPBAM_LPGPIOWRITEREAD_PIN_9 | LPBAM_LPGPIOWRITEREAD_PIN_8 | LPBAM_LPGPIOWRITEREAD_PIN_7 | LPBAM_LPGPIOWRITEREAD_PIN_6 | LPBAM_LPGPIOWRITEREAD_PIN_5 | LPBAM_LPGPIOWRITEREAD_PIN_4 | LPBAM_LPGPIOWRITEREAD_PIN_3 | LPBAM_LPGPIOWRITEREAD_PIN_2 | LPBAM_LPGPIOWRITEREAD_PIN_1)"
+                 Diagnostic="Scenario Design: LPGPIO PIN set in S1.{LPBAM_LPGPIOWRITEREAD_EXISTS_#2}/'LPGPIO1:S1.{LPBAM_LPGPIOWRITEREAD_EXISTS_#2}.F{LPBAM_LPGPIOWRITEREAD_EXISTS_#3}' is used in several Queues, be sure these Queues are not executed simultaneously at runtime"
+                 Type="info"/>
+</ConsistencyRule>
+
+
+
+
+    <ConsistencyRule Type= "SingleApplication" Name= "LPGPIOTRIGGER">
+
+        <Matcher Name= "LPBAM_LPGPIO_EXISTS" Type="precondition">    
+            <MatcherOnKey>CONF(.*)\.S1\.Q(.*)\.F(.*)\.VP_LPBAMLPGPIO1_VS_.*\.Mode</MatcherOnKey>  
+            <MatcherPattern>.*</MatcherPattern>       
+        </Matcher>
+
+        
+        <Matcher Name= "TRIGGERISUSED">
+            <MatcherOnKey>CONF{LPBAM_LPGPIO_EXISTS_#1}\.S1\.Q{LPBAM_LPGPIO_EXISTS_#2}\.F{LPBAM_LPGPIO_EXISTS_#3}\.LPBAMLPGPIO1\.TriggerPolarity</MatcherOnKey> 
+            <MatcherPattern>LPBAM_DMA_TRIG_POLARITY_.*ING</MatcherPattern>       
+        </Matcher>
+
+        <Checker Condition="!TRIGGERISUSED" 
+               Diagnostic="Scenario Design: The cadency of reading and writing a LPGPIO PIN is equal to the speed of the DMA channel access when no Trigger is configured as in S1.Q{LPBAM_LPGPIO_EXISTS_#2}/'LPGPIO1:S1.Q{LPBAM_LPGPIO_EXISTS_#2}.F{LPBAM_LPGPIO_EXISTS_#3}'. To customize the speed of reading or writing it is recommented to use a Trigger"
+               Type="info" /> 
+    </ConsistencyRule>
+
+<!-- LPGPIO -->
+
+
+<!-- COMP -->
+
+ <ConsistencyRule Type="SingleApplication" Name="COMP1GPIO">
+  
+
+        <Matcher Name= "COMP1START" Type="precondition" > <!-- si la condition mandatory n'est pas à 1, on sort -->
+            <MatcherOnKey>CONF(.*)\.S1\.Q(.*)\.F(.*)\.VP_LPBAMCOMP1_VS_START\.Mode</MatcherOnKey> 
+            <MatcherPattern>START</MatcherPattern>       
+        </Matcher>
+
+        <Matcher Name= "COMP1HALWINDOWMODEINP">
+            <MatcherOnKey>CONF{COMP1START_#1}\.COMP1\.IPParameters</MatcherOnKey> 
+            <MatcherPattern>WindowMode</MatcherPattern>
+        </Matcher> 
+
+        <Matcher Name= "COMP1LPBAMINPIO2">
+            <MatcherOnKey>CONF{COMP1START_#1}\.S1\.Q{COMP1START_#2}\.F{COMP1START_#3}\.LPBAMCOMP1.InputPlus</MatcherOnKey> 
+            <MatcherPattern>LPBAM_COMP_INPUT_PLUS_IO2</MatcherPattern>
+        </Matcher> 
+        <Matcher Name= "COMP1LPBAMINPIO3">
+            <MatcherOnKey>CONF{COMP1START_#1}\.S1.Q{COMP1START_#2}\.F{COMP1START_#3}*\.LPBAMCOMP1.InputPlus</MatcherOnKey> 
+            <MatcherPattern>LPBAM_COMP_INPUT_PLUS_IO3</MatcherPattern>
+        </Matcher> 
+        <Matcher Name= "COMP1LPBAMINMIO1">
+            <MatcherOnKey>CONF{COMP1START_#1}\.S1.Q{COMP1START_#2}\.F{COMP1START_#3}*\.LPBAMCOMP1.InputMinus</MatcherOnKey> 
+            <MatcherPattern>LPBAM_COMP_INPUT_MINUS_IO1</MatcherPattern>
+        </Matcher> 
+        <Matcher Name= "COMP1LPBAMINMIO2">
+            <MatcherOnKey>CONF{COMP1START_#1}\.S1.Q{COMP1START_#2}\.F{COMP1START_#3}*\.LPBAMCOMP1.InputMinus</MatcherOnKey> 
+            <MatcherPattern>LPBAM_COMP_INPUT_MINUS_IO2</MatcherPattern>
+        </Matcher> 
+
+        <Matcher Name= "COMP1HALINPIO1">
+            <MatcherOnKey>CONF{COMP1START_#1}\.PC5(\D)*\.Signal</MatcherOnKey> 
+            <MatcherPattern>COMP1_INP</MatcherPattern>
+        </Matcher>
+         <Matcher Name= "COMP1HALINPIO2">
+            <MatcherOnKey>CONF{COMP1START_#1}\.PB2(\D)*\.Signal</MatcherOnKey> 
+            <MatcherPattern>COMP1_INP</MatcherPattern>
+        </Matcher>
+        <Matcher Name= "COMP1HALINPIO3">
+            <MatcherOnKey>CONF{COMP1START_#1}\.PA2(\D)*\.Signal</MatcherOnKey> 
+            <MatcherPattern>COMP1_INP</MatcherPattern>
+        </Matcher>
+        <Matcher Name= "COMP1HALINMIO1">
+            <MatcherOnKey>CONF{COMP1START_#1}\.PB1(\D)*\.Signal</MatcherOnKey> 
+            <MatcherPattern>COMP1_INM</MatcherPattern>
+        </Matcher>
+         <Matcher Name= "COMP1HALINMIO2">
+            <MatcherOnKey>CONF{COMP1START_#1}\.PC4(\D)*\.Signal</MatcherOnKey> 
+            <MatcherPattern>COMP1_INM</MatcherPattern>
+        </Matcher>
+
+        
+       <Checker Condition="(COMP1LPBAMINPIO2 &amp; !COMP1HALWINDOWMODEINP &amp; !COMP1HALINPIO2 ) | (COMP1LPBAMINPIO3 &amp; !COMP1HALWINDOWMODEINP &amp; !COMP1HALINPIO3 ) | (!(COMP1LPBAMINPIO2 |COMP1LPBAMINPIO3 ) &amp; !COMP1HALWINDOWMODEINP &amp; !COMP1HALINPIO1) | (COMP1LPBAMINMIO1 &amp; !COMP1HALINMIO1) | (COMP1LPBAMINMIO2 &amp; !COMP1HALINMIO2) " 
+               Diagnostic="Peripheral Configuration: COMP1 START function is used in S1.Q{COMP1START_#2}/'COMP1:S1.Q{COMP1START_#2}.F{COMP1START_#3}' and IOs used as Input[+] and Input[-] are not configured. They should be be configured in this application 'Pinout &amp; Configuration' panel"
+               Type="error" /> 
+
+        <Checker Condition="COMP1HALWINDOWMODEINP" 
+               Diagnostic="Peripheral Configuration: COMP1 is configured in Window Mode from this application 'Pinout &amp; Configuration' panel. PLease note that 'Input Plus' Selection set in the LPBAM UI is not taken into account"
+               Type="warning" /> 
+    </ConsistencyRule>
+
+    <ConsistencyRule Type="SingleApplication" Name="COMP2GPIO">
+  
+        <Matcher Name= "COMP2START" Type="precondition" > <!-- si la condition mandatory n'est pas à 1, on sort -->
+            <MatcherOnKey>CONF(.*)\.S1\.Q(.*)\.F(.*)\.VP_LPBAMCOMP2_VS_START\.Mode</MatcherOnKey> 
+            <MatcherPattern>START</MatcherPattern>       
+        </Matcher>
+
+         <Matcher Name= "COMP2HALWINDOWMODEINP">
+            <MatcherOnKey>CONF{COMP2START_#1}\.COMP2\.IPParameters</MatcherOnKey> 
+            <MatcherPattern>WindowMode</MatcherPattern>
+        </Matcher> 
+
+        <Matcher Name= "COMP2LPBAMINPIO2">
+            <MatcherOnKey>CONF{COMP2START_#1}\.S1.Q{COMP2START_#2}\.F{COMP2START_#3}\.LPBAMCOMP2.InputPlus</MatcherOnKey> 
+            <MatcherPattern>LPBAM_COMP_INPUT_PLUS_IO2</MatcherPattern>
+        </Matcher> 
+        <Matcher Name= "COMP2LPBAMINMIO1">
+            <MatcherOnKey>CONF{COMP2START_#1}\.S1.Q{COMP2START_#2}\.F{COMP2START_#3}\.LPBAMCOMP2.InputMinus</MatcherOnKey> 
+            <MatcherPattern>LPBAM_COMP_INPUT_MINUS_IO1</MatcherPattern>
+        </Matcher> 
+        <Matcher Name= "COMP2LPBAMINMIO2">
+            <MatcherOnKey>CONF{COMP2START_#1}\.S1.Q{COMP2START_#2}\.F{COMP2START_#3}\.LPBAMCOMP2.InputMinus</MatcherOnKey> 
+            <MatcherPattern>LPBAM_COMP_INPUT_MINUS_IO2</MatcherPattern>
+        </Matcher> 
+
+        <Matcher Name= "COMP2HALINPIO1">
+            <MatcherOnKey>CONF{COMP2START_#1}\.PB4(\D)*\.Signal</MatcherOnKey> 
+            <MatcherPattern>COMP2_INP</MatcherPattern>
+        </Matcher>
+         <Matcher Name= "COMP2HALINPIO2">
+            <MatcherOnKey>CONF{COMP2START_#1}\.PB6(\D)*\.Signal</MatcherOnKey> 
+            <MatcherPattern>COMP2_INP</MatcherPattern>
+        </Matcher>
+        
+        <Matcher Name= "COMP2HALINMIO1">
+            <MatcherOnKey>CONF{COMP2START_#1}\.PB7(\D)*\.Signal</MatcherOnKey> 
+            <MatcherPattern>COMP2_INM</MatcherPattern>
+        </Matcher>
+         <Matcher Name= "COMP2HALINMIO2">
+            <MatcherOnKey>CONF{COMP2START_#1}\.PB3(\D)*\.Signal</MatcherOnKey> 
+            <MatcherPattern>COMP2_INM</MatcherPattern>
+        </Matcher>
+
+        
+       <Checker Condition="(COMP2LPBAMINPIO2 &amp; !COMP2HALWINDOWMODEINP &amp; !COMP2HALINPIO2 ) | (!COMP2LPBAMINPIO2 &amp; !COMP2HALWINDOWMODEINP &amp; !COMP2HALINPIO1) | (COMP2LPBAMINMIO1 &amp; !COMP2HALINMIO1) | (COMP2LPBAMINMIO2 &amp; !COMP2HALINMIO2) " 
+               Diagnostic="Peripheral Configuration: COMP2 START function is used in S1.Q{COMP2START_#2}/'COMP2:S1.Q{COMP2START_#2}.F{COMP2START_#3}' and IOs used as Input[+] and Input[-] are not configured. They should be be configured in this application 'Pinout &amp; Configuration' panel"
+               Type="error" /> 
+
+         <Checker Condition="COMP2HALWINDOWMODEINP" 
+               Diagnostic="Peripheral Configuration: COMP2 is configured in Window Mode from this application 'Pinout &amp; Configuration' panel. PLease note that 'Input Plus' Selection set in the LPBAM UI is not taken into account"
+               Type="warning" /> 
+    </ConsistencyRule>
+
+     <ConsistencyRule Type="SingleApplication" Name= "COMPSEVERALQUEUES">
+ 
+
+        <Matcher Name= "LPBAMCOMPINSTANCEONONEQUEUE" Type="precondition">
+            <MatcherOnKey>CONF(.*)\.S1\.Q(.*)\.F.*\.VP_LPBAMCOMP(.*)_VS_.*\.Mode</MatcherOnKey>  
+            <MatcherPattern>.*</MatcherPattern>       
+        </Matcher>
+        <Matcher Name= "LPBAMCOMPINSTANCEONANOTHERQUEUE">
+            <MatcherOnKey>CONF{LPBAMCOMPINSTANCEONONEQUEUE_#1}\.S1\.Q[^{LPBAMCOMPINSTANCEONONEQUEUE_#2}]\.F.*\.VP_LPBAMCOMP{LPBAMCOMPINSTANCEONONEQUEUE_#3}_.*\.Mode</MatcherOnKey> 
+            <MatcherPattern>.*</MatcherPattern>       
+        </Matcher>
+
+
+
+        <Checker Condition="LPBAMCOMPINSTANCEONANOTHERQUEUE" 
+                 Diagnostic="Scenario Design: COMP{LPBAMCOMPINSTANCEONONEQUEUE_#3} is used in several Queues, be sure these Queues are not executed simultaneously at runtime"
+                 Type="info"/>
+    </ConsistencyRule>
+
+
+    <ConsistencyRule Type="SingleApplication" Name="COMPUSEDAC">
+  
+
+        <Matcher Name= "DACUSED" Type="precondition" > <!-- si la condition mandatory n'est pas à 1, on sort -->
+            <MatcherOnKey>CONF(.*)\.S1\.Q(.*)\.F(.*)\.LPBAMCOMP(.*)\.InputMinus</MatcherOnKey> 
+            <MatcherPattern>LPBAM_COMP_INPUT_MINUS_DAC1_CH(.*)</MatcherPattern>       
+        </Matcher>
+
+        
+         <Matcher Name= "HALDACCONFIGURED">
+            <MatcherOnKey>CONF{DACUSED_#1}\.DAC1\.DAC_Channel\-DAC_OUT{DACUSED_#5}_(.*)Int</MatcherOnKey> 
+            <MatcherPattern>DAC_CHANNEL_{DACUSED_#5}</MatcherPattern>
+        </Matcher>
+
+        
+       <Checker Condition="!HALDACCONFIGURED" 
+               Diagnostic="Peripheral Configuration: DAC1 Channel{DACUSED_#5} is used as InputMinus in S1.Q{DACUSED_#2}/'COMP{DACUSED_#4}:S1.Q{DACUSED_#2}.F{DACUSED_#3}' and not configured. It should be configured in this application 'Pinout &amp; Configuration' panel"
+               Type="error" /> 
+
+    </ConsistencyRule>
+<!-- COMP -->
+
+<!-- DAC -->
+<ConsistencyRule Type="SingleApplication" Name="DACCHACTIVE">
+  
+
+        <Matcher Name= "LPBAMDACUSED" Type="precondition" > 
+            <MatcherOnKey>CONF(.*)\.S1\.Q(.*)\.F(.*)\.VP_LPBAMDAC1_VS_CONVERSION.*\.Mode</MatcherOnKey> 
+            <MatcherPattern>CONVERSION.*</MatcherPattern>       
+        </Matcher>
+
+        <Matcher Name= "LPBAMDACCH2USED"> 
+            <MatcherOnKey>CONF{LPBAMDACUSED_#1}\.S1\.Q{LPBAMDACUSED_#2}.F{LPBAMDACUSED_#3}\.LPBAMDAC1\.MYCHANNELCONVERSION(.*)</MatcherOnKey> 
+            <MatcherPattern>LPBAM_DAC_CHANNEL_2</MatcherPattern>       
+        </Matcher>
+
+         <Matcher Name= "HALDACCH1">
+            <MatcherOnKey>CONF{LPBAMDACUSED_#1}\.DAC1\.DAC_Channel\-DAC_OUT1(.*)</MatcherOnKey> 
+            <MatcherPattern>DAC_CHANNEL_1</MatcherPattern>
+        </Matcher>
+
+        <Matcher Name= "HALDACCH2">
+            <MatcherOnKey>CONF{LPBAMDACUSED_#1}\.DAC1\.DAC_Channel\-DAC_OUT2(.*)</MatcherOnKey> 
+            <MatcherPattern>DAC_CHANNEL_2</MatcherPattern>
+        </Matcher>
+
+        
+       <Checker Condition="(LPBAMDACCH2USED &amp; !HALDACCH2)" 
+               Diagnostic="Peripheral Configuration: DAC1 Channel2 is used in S1.Q{LPBAMDACUSED_#2}/'DAC1:S1.Q{LPBAMDACUSED_#2}.F{LPBAMDACUSED_#3}' and is not configured. It should be configured in this application 'Pinout &amp; Configuration' panel"
+               Type="error" /> 
+
+        <Checker Condition="(!LPBAMDACCH2USED &amp; !HALDACCH1)" 
+               Diagnostic="Peripheral Configuration: DAC1 Channel1 is used in S1.Q{LPBAMDACUSED_#2}/'DAC1:S1.Q{LPBAMDACUSED_#2}.F{LPBAMDACUSED_#3}' and is not configured. It should be configured in this application 'Pinout &amp; Configuration' panel"
+               Type="error" /> 
+
+    </ConsistencyRule>
+
+     <ConsistencyRule Type="SingleApplication" Name="DACCONFIG">
+  
+
+        <Matcher Name= "DACCONFIGUSED" Type="precondition"> 
+            <MatcherOnKey>CONF(.*)\.S1\.Q(.*)\.F(.*)\.VP_LPBAMDAC1_VS_CONVERSION[_CONFIG]*\.Mode</MatcherOnKey> 
+            <MatcherPattern>CONVERSION[_CONFIG]*</MatcherPattern>       
+        </Matcher>
+
+
+        <Matcher Name= "DACCONFIGUSEDANOTHERQUEUE"> 
+            <MatcherOnKey>CONF{DACCONFIGUSED_#1}\.S1\.Q[^{DACCONFIGUSED_#2}]\.F(.*)\.VP_LPBAMDAC1_VS_CONVERSION.*\.Mode</MatcherOnKey> 
+            <MatcherPattern>CONVERSION.*</MatcherPattern>       
+        </Matcher>
+
+
+        
+       <Checker Condition="DACCONFIGUSED"
+        Diagnostic= "Scenario Design: S1.Q{DACCONFIGUSED_#2} is using DAC1 functions Converion_Config or Conversion on Channelx. At runtime be sure that when starting this Queue, no DAC1 Channel (channelx and/or channely) is operating"
+        Type="info" />
+
+        <Checker Condition="DACCONFIGUSEDANOTHERQUEUE"
+        Diagnostic="Scenario Design: DAC1 is used in several Queues, be sure these Queues are not executed simultaneously at runtime"
+        Type="info" />  
+
+
+    </ConsistencyRule>
+
+
+     <ConsistencyRule Type="SingleApplication" Name="DACSEVERALQUEUES">
+  
+
+        <Matcher Name= "DACDATAQx" Type="precondition"> 
+            <MatcherOnKey>CONF(.*)\.S1\.Q(.*)\.F(.*)\.VP_LPBAMDAC1_VS_CONVERSION_DATA\.Mode</MatcherOnKey> 
+            <MatcherPattern>CONVERSION_DATA</MatcherPattern>       
+        </Matcher>
+
+        <Matcher Name= "DACDATAQxCH2"> 
+            <MatcherOnKey>CONF{DACDATAQx_#1}\.S1\.Q{DACDATAQx_#2}\.F{DACDATAQx_#3}\.LPBAMDAC1\.MYCHANNELCONVERSION_DATA</MatcherOnKey> 
+            <MatcherPattern>LPBAM_DAC_CHANNEL_2</MatcherPattern>       
+        </Matcher>
+
+        <Matcher Name= "DACDATAQyCH2"> 
+            <MatcherOnKey>CONF{DACDATAQx_#1}\.S1\.Q[^{DACDATAQx_#2}]\.F{DACDATAQx_#3}\.LPBAMDAC1\.MYCHANNELCONVERSION_DATA</MatcherOnKey> 
+            <MatcherPattern>LPBAM_DAC_CHANNEL_2</MatcherPattern>       
+        </Matcher>
+
+
+        
+       <Checker Condition="(!DACDATAQxCH2 &amp; DACDATAQyCH2)"
+        Diagnostic="Scenario Design: It is allowed to use DAC function Converion_Data both on CHx and CHy on 2 different Queues of a same application. At runtime, if x=y, be sure these 2 Queues are not executed simultaneously"
+        Type="info" />
+
+        
+
+    </ConsistencyRule>
+
+     <ConsistencyRule Type="SingleApplication" Name="DACTRIGGERLPTIMCH1">
+  
+
+        <Matcher Name= "TRIGGERLPTIMCH1" Type="precondition" > <!-- si la condition mandatory n'est pas à 1, on sort -->
+            <MatcherOnKey>CONF(.*)\.S1\.Q(.*)\.F(.*)\.LPBAMDAC1\.DAC_Trigger_CONVERSION[_CONFIG]*</MatcherOnKey> 
+            <MatcherPattern>LPBAM_DAC_TRIGGER_LPTIM(.*)_CH1</MatcherPattern>       
+        </Matcher>
+
+        
+         <Matcher Name= "HALLPTIMCH1CONFIGURED">
+            <MatcherOnKey>CONF{TRIGGERLPTIMCH1_#1}\.VP_LPTIM{TRIGGERLPTIMCH1_#4}_VS_CH1\.Mode</MatcherOnKey> 
+            <MatcherPattern>Channel_1_Active</MatcherPattern>
+        </Matcher>
+
+        
+       <Checker Condition="!HALLPTIMCH1CONFIGURED" 
+               Diagnostic="Peripheral Configuration: LPTIM{TRIGGERLPTIMCH1_#4} CH1 is used as a trigger for DAC1 in S1.Q{TRIGGERLPTIMCH1_#2}/'DAC1:S1.Q{TRIGGERLPTIMCH1_#2}.F{TRIGGERLPTIMCH1_#3}' and is not configured. It must be configured in this application 'Pinout &amp; Configuration' panel"
+               Type="error" /> 
+
+    </ConsistencyRule>
+
+    <ConsistencyRule Type="SingleApplication" Name="DACTRIGGEREXTI">
+  
+
+        <Matcher Name= "TRIGGEREXTI" Type="precondition" > <!-- si la condition mandatory n'est pas à 1, on sort -->
+            <MatcherOnKey>CONF(.*)\.S1\.Q(.*)\.F(.*)\.LPBAMDAC1\.DAC_Trigger_CONVERSION[_CONFIG]*</MatcherOnKey> 
+            <MatcherPattern>LPBAM_DAC_TRIGGER_EXT_IT9</MatcherPattern>       
+        </Matcher>
+
+        
+         <Matcher Name= "HALEXTICONFIGURED">
+            <MatcherOnKey>CONF{TRIGGEREXTI_#1}\.SH.*</MatcherOnKey> 
+            <MatcherPattern>DAC1_EXTI9.*</MatcherPattern>
+        </Matcher>
+
+        
+       <Checker Condition="!HALEXTICONFIGURED" 
+               Diagnostic="Peripheral Configuration: EXTI9 is used as a trigger for DAC1 in S1.Q{TRIGGEREXTI_#2}/'DAC1:S1.Q{TRIGGEREXTI_#2}.F{TRIGGEREXTI_#3}' and is not configured. It must be configured in this application 'Pinout &amp; Configuration' panel"
+               Type="error" /> 
+
+    </ConsistencyRule>
+<!-- DAC -->
+
+<!-- DMA -->
+
+
+
+<ConsistencyRule Type= "SingleApplication" Name= "CIRCULARITY">
+    
+        <Matcher Name= "LPBAM_DMACH_START" Type="precondition">
+            <MatcherOnKey>CONF(.*)\.S1\.Q(.*)\.F(.*)\.VP_LPBAMLPDMA(.*)_VS_START\.Mode</MatcherOnKey>  
+            <MatcherPattern>START</MatcherPattern>       
+        </Matcher>
+
+
+        <Checker Condition="LPBAM_DMACH_START" 
+               Diagnostic="Queue Configuration: When using 'LPDMA1 Start' function, 'DMA channel to be started' and 'Queue to start' should have coherent circularity settings"
+               Type="info" />  
+    </ConsistencyRule>
+
+
+
+<!-- very complicated rule to manage config on channel 0 
+not possible with actual checker to provide a correct diagnostic for channel0 as it can be provided for other channels
+it this condition, for cohenrecy,he rules are simpler -->
+ <ConsistencyRule Type="SingleApplication" Name= "DMASLAVECH0TWOQUEUES">
+
+
+        <Matcher Name= "LPBAM_DMACH_START" Type="precondition">
+            <MatcherOnKey>CONF(.*)\.S1\.Q(.*)\.F(.*)\.VP_LPBAMLPDMA(.*)_VS_START\.Mode</MatcherOnKey>  
+            <MatcherPattern>START</MatcherPattern>       
+        </Matcher>
+
+
+        <Matcher Name= "LPBAM_DMASLAVECH1">
+            <MatcherOnKey>CONF{LPBAM_DMACH_START_#1}\.S1\.Q{LPBAM_DMACH_START_#2}\.F{LPBAM_DMACH_START_#3}\.LPBAMLPDMA{LPBAM_DMACH_START_#4}\.InstanceIP</MatcherOnKey>  
+            <MatcherPattern>LPDMA{LPBAM_DMACH_START_#4}_Channel1</MatcherPattern>       
+        </Matcher>
+
+        <Matcher Name= "LPBAM_DMASLAVECH2">
+            <MatcherOnKey>CONF{LPBAM_DMACH_START_#1}\.S1\.Q{LPBAM_DMACH_START_#2}\.F{LPBAM_DMACH_START_#3}\.LPBAMLPDMA{LPBAM_DMACH_START_#4}\.InstanceIP</MatcherOnKey>  
+            <MatcherPattern>LPDMA{LPBAM_DMACH_START_#4}_Channel2</MatcherPattern>       
+        </Matcher>
+
+        <Matcher Name= "LPBAM_DMASLAVECH3">
+            <MatcherOnKey>CONF{LPBAM_DMACH_START_#1}\.S1\.Q{LPBAM_DMACH_START_#2}\.F{LPBAM_DMACH_START_#3}\.LPBAMLPDMA{LPBAM_DMACH_START_#4}\.InstanceIP</MatcherOnKey>  
+            <MatcherPattern>LPDMA{LPBAM_DMACH_START_#4}_Channel3</MatcherPattern>       
+        </Matcher>
+
+
+         <Checker Condition="!(LPBAM_DMASLAVECH1 | LPBAM_DMASLAVECH2 | LPBAM_DMASLAVECH3)" 
+                  Diagnostic="Scenario Design: LPDMA1_Channel0 is set through 'LPDMA1 Start' function in this scenario. If LPDMA1_Channel0 is started in more than one Queue in this scenario, be sure that Queues are not executed simultaneously at runtime"
+                 Type="info"/>
+    </ConsistencyRule>
+
+
+
+
+<!-- this rule is not managing  CH0 as it is default value. detailed diagnostic that is not used because not possible to provide such details for CH0
+<ConsistencyRule Type="SingleApplication" Name= "SLAVELPDMA1_OTHERQUEUE">
+
+
+        <Matcher Name= "LPBAM_DMASLAVECHx" Type="precondition">
+            <MatcherOnKey>CONF(.*)\.S1\.Q(.*)\.F(.*)\.LPBAMLPDMA1\.InstanceIP</MatcherOnKey>  
+            <MatcherPattern>LPDMA1_Channel(.*)</MatcherPattern>       
+        </Matcher>
+
+        <Matcher Name= "LPBAM_DMASLAVECHxOTHERCHANNEL">
+            <MatcherOnKey>CONF{LPBAM_DMASLAVECHx_#1}\.S1\.Q[^{LPBAM_DMASLAVECHx_#2}]\.F.*\.LPBAMLPDMA1\.InstanceIP</MatcherOnKey>  
+            <MatcherPattern>LPDMA1_Channel{LPBAM_DMASLAVECHx_#4}</MatcherPattern>       
+        </Matcher>
+         
+
+        <Checker Condition="LPBAM_DMASLAVECHxOTHERCHANNEL" 
+                 Diagnostic="Scenario Design: LPDMA1_Channel{LPBAM_DMASLAVECHx_#4} is set through 'LPDMA1 Start' function in several Queues, be sure that Queues are not executed simultaneously at runtime"
+                 Type="info"/>
+    </ConsistencyRule>
+
+-->
+
+<!-- this rule manage all channels but CHO and  not detailed diagnostic-->
+<ConsistencyRule Type="SingleApplication" Name= "SLAVELPDMA1_OTHERQUEUE">
+
+
+        <Matcher Name= "LPBAM_DMASLAVECHx" Type="precondition">
+            <MatcherOnKey>CONF(.*)\.S1\.Q(.*)\.F(.*)\.LPBAMLPDMA1\.InstanceIP</MatcherOnKey>  
+            <MatcherPattern>LPDMA1_Channel(.*)</MatcherPattern>       
+        </Matcher>
+
+       
+
+        <Checker Condition="LPBAM_DMASLAVECHx" 
+                 Diagnostic="Scenario Design: LPDMA1_Channel{LPBAM_DMASLAVECHx_#4} is set through 'LPDMA1 Start' function in this scenario. If LPDMA1_Channel{LPBAM_DMASLAVECHx_#4} is started in more than one Queue in this scenario, be sure that Queues are not executed simultaneously at runtime"
+                 Type="info"/>
+    </ConsistencyRule>
+
+
+
+ <ConsistencyRule Type="SingleApplication" Name= "DMASLAVECONFIG">
+
+
+        <Matcher Name= "LPBAM_DMACH_START" Type="precondition">
+            <MatcherOnKey>CONF(.*)\.S1\.Q(.*)\.F(.*)\.VP_LPBAMLPDMA(.*)_VS_START\.Mode</MatcherOnKey>  
+            <MatcherPattern>START</MatcherPattern>       
+        </Matcher>
+
+        <Matcher Name= "LPBAM_DMASLAVECH1">
+            <MatcherOnKey>CONF{LPBAM_DMACH_START_#1}\.S1\.Q{LPBAM_DMACH_START_#2}\.F{LPBAM_DMACH_START_#3}\.LPBAMLPDMA{LPBAM_DMACH_START_#4}\.InstanceIP</MatcherOnKey>  
+            <MatcherPattern>LPDMA{LPBAM_DMACH_START_#4}_Channel1</MatcherPattern>       
+        </Matcher>
+
+        <Matcher Name= "LPBAM_DMASLAVECH2">
+            <MatcherOnKey>CONF{LPBAM_DMACH_START_#1}\.S1\.Q{LPBAM_DMACH_START_#2}\.F{LPBAM_DMACH_START_#3}\.LPBAMLPDMA{LPBAM_DMACH_START_#4}\.InstanceIP</MatcherOnKey>  
+            <MatcherPattern>LPDMA{LPBAM_DMACH_START_#4}_Channel2</MatcherPattern>       
+        </Matcher>
+
+        <Matcher Name= "LPBAM_DMASLAVECH3">
+            <MatcherOnKey>CONF{LPBAM_DMACH_START_#1}\.S1\.Q{LPBAM_DMACH_START_#2}\.F{LPBAM_DMACH_START_#3}\.LPBAMLPDMA{LPBAM_DMACH_START_#4}\.InstanceIP</MatcherOnKey>  
+            <MatcherPattern>LPDMA{LPBAM_DMACH_START_#4}_Channel3</MatcherPattern>       
+        </Matcher>
+
+
+        <Matcher Name= "HAL_DMASLAVECH1">
+            <MatcherOnKey>CONF{LPBAM_DMACH_START_#1}\.Mcu\.Pin.*</MatcherOnKey>  
+            <MatcherPattern>VP_LPDMA{LPBAM_DMACH_START_#4}_VS_LPDMACH1</MatcherPattern>       
+        </Matcher>
+
+        <Matcher Name= "HAL_DMASLAVECH2">
+            <MatcherOnKey>CONF{LPBAM_DMACH_START_#1}\.Mcu\.Pin.*</MatcherOnKey>  
+            <MatcherPattern>VP_LPDMA{LPBAM_DMACH_START_#4}_VS_LPDMACH2</MatcherPattern>       
+        </Matcher>
+
+        <Matcher Name= "HAL_DMASLAVECH3">
+            <MatcherOnKey>CONF{LPBAM_DMACH_START_#1}\.Mcu\.Pin.*</MatcherOnKey>  
+            <MatcherPattern>VP_LPDMA{LPBAM_DMACH_START_#4}_VS_LPDMACH3</MatcherPattern>       
+        </Matcher>
+
+        <Matcher Name= "HAL_DMASLAVECH0">
+            <MatcherOnKey>CONF{LPBAM_DMACH_START_#1}\.Mcu\.Pin.*</MatcherOnKey>  
+            <MatcherPattern>VP_LPDMA{LPBAM_DMACH_START_#4}_VS_LPDMACH0</MatcherPattern>       
+        </Matcher>
+
+
+
+
+        <Checker Condition="LPBAM_DMASLAVECH1 &amp; !HAL_DMASLAVECH1" 
+                 Diagnostic="Peripheral Configuration: LPDMA1_Channel1 is used in S1.Q{LPBAM_DMACH_START_#2}/'LPDMA1:S1.Q{LPBAM_DMACH_START_#2}.F{LPBAM_DMACH_START_#3}' and not configured. It should be configured through this application 'Pinout &amp; Configuration' panel"
+                 Type="error"/>
+        <Checker Condition="LPBAM_DMASLAVECH2 &amp; !HAL_DMASLAVECH2" 
+                 Diagnostic="Peripheral Configuration: LPDMA1_Channel2 is used in S1.Q{LPBAM_DMACH_START_#2}/'LPDMA1:S1.Q{LPBAM_DMACH_START_#2}.F{LPBAM_DMACH_START_#3}' and not configured. It should be configured through this application 'Pinout &amp; Configuration' panel"
+                 Type="error"/>
+        <Checker Condition="LPBAM_DMASLAVECH3 &amp; !HAL_DMASLAVECH3" 
+                 Diagnostic="Peripheral Configuration: LPDMA1_Channel3 is used in S1.Q{LPBAM_DMACH_START_#2}/'LPDMA1:S1.Q{LPBAM_DMACH_START_#2}.F{LPBAM_DMACH_START_#3}' and not configured. It should be configured through this application 'Pinout &amp; Configuration' panel"
+                 Type="error"/>
+        <Checker Condition="!(LPBAM_DMASLAVECH1 | LPBAM_DMASLAVECH2 | LPBAM_DMASLAVECH3) &amp; !HAL_DMASLAVECH0" 
+                 Diagnostic="Peripheral Configuration: LPDMA1_Channel0 is used in S1.Q{LPBAM_DMACH_START_#2}/'LPDMA1:S1.Q{LPBAM_DMACH_START_#2}.F{LPBAM_DMACH_START_#3}' and not configured. It should be configured through this application 'Pinout &amp; Configuration' panel"
+                 Type="error"/>
+    </ConsistencyRule>
+
+
+
+ <ConsistencyRule Type="SingleApplication" Name= "DMA_PRIVILEGE">
+
+
+        <Matcher Name= "LPBAM_DMA_START" Type="precondition">
+            <MatcherOnKey>CONF(.*)\.S1\.Q(.*)\.F(.*)\.VP_LPBAMLPDMA(.*)_VS_START\.Mode</MatcherOnKey>  
+            <MatcherPattern>START</MatcherPattern>       
+        </Matcher>
+
+        <Matcher Name= "QUEUECONFIG_PRIVILEGE">
+            <MatcherOnKey>CONF{LPBAM_DMA_START_#1}\.S1\.Q{LPBAM_DMA_START_#2}\.LPBAMQUEUE\.ChannelPRIV</MatcherOnKey>  
+            <MatcherPattern>DMA_CHANNEL_PRIV</MatcherPattern>       
+        </Matcher>
+
+
+        
+
+        <Checker Condition="!QUEUECONFIG_PRIVILEGE" 
+                 Diagnostic="Peripheral Configuration: LPDMA channel hosting S1.Q{LPBAM_DMA_START_#2} /'LPDMA1:S1.Q{LPBAM_DMA_START_#2}.F{LPBAM_DMA_START_#3}' function is not configured as priviledged. It must be configured as privileged"
+                 Type="error"/>
+    </ConsistencyRule>
+
+
+
+
+     <ConsistencyRule Type="SingleApplication" Name= "DMA_QUEUETOSTARTRENAMING">
+
+        
+
+        <Matcher Name= "QUEUEFROMLIST" Type="precondition">
+            <MatcherOnKey>CONF(.*)\.S1\.Q(.*)\.F(.*)\.LPBAMLPDMA1\.HeadQAddress_LIST</MatcherOnKey>  
+            <MatcherPattern>(.*)</MatcherPattern>       
+        </Matcher>
+
+        <Matcher Name= "QUEUEEXIST">
+            <MatcherOnKey>CONF{QUEUEFROMLIST_#1}\.S1\.Q.*\.QueueUserName</MatcherOnKey>  
+            <MatcherPattern>{QUEUEFROMLIST_#4}</MatcherPattern>       
+        </Matcher>
+
+
+        <Checker Condition="!QUEUEEXIST" 
+                 Diagnostic="Peripheral Configuration: S1.Q{QUEUEFROMLIST_#2} / 'LPDMA1:S1.Q{QUEUEFROMLIST_#2}.F{QUEUEFROMLIST_#3}'. 'LPDMA1 Start' function is used and parameter 'Queue to start' is not set. A valid 'Queue to start' must be selected from the function configuration panel"
+                 Type="error"/>
+    </ConsistencyRule>
+
+<!-- DMA -->
+
+<!-- GENERAL -->
+
+ <ConsistencyRule Type="SingleApplication" Name= "PRIORITYGROUP">
+
+
+        <Matcher Name= "MXPRIORITYGROUP" Type="preconditionMain">
+            <MatcherOnKey>CONF.*\.NVIC\.PriorityGroup</MatcherOnKey>  
+            <MatcherPattern>NVIC_PRIORITYGROUP_(.*)</MatcherPattern>       
+        </Matcher>
+
+        <Matcher Name= "LPBAMAPPLIPRIORITYGROUP">
+            <MatcherOnKey>CONF.*\.NVIC\.PriorityGroup</MatcherOnKey>  
+            <MatcherPattern>(NVIC_PRIORITYGROUP_[^{MXPRIORITYGROUP_#1}])</MatcherPattern>       
+        </Matcher>
+
+
+        
+
+        <Checker Condition="LPBAMAPPLIPRIORITYGROUP" 
+                 Diagnostic="PROJECT: all LPBAM Applications must have the same PRIORITYGROUP as the one set in the main MX project. issue detected in this application"
+                 Type="error" />
+    </ConsistencyRule>
+
+<!-- GENERAL -->
+
+<!-- LPTIM -->
+
+ <ConsistencyRule Type="SingleApplication" Name= "LPTIMIC_LPTIM1CHANNEL">
+
+        <Matcher Name= "LPBAM_LPTIMIC_LPTIM1_EXISTS" Type="precondition">
+            <MatcherOnKey>CONF(.*)\.S1\.Q(.*)\.F(.*)\.VP_LPBAMLPTIM1_VS_IC\.Mode</MatcherOnKey>  
+            <MatcherPattern>IC</MatcherPattern>       
+        </Matcher>
+
+        <Matcher Name= "LPBAM_LPTIMIC_LPTIM1CHANNELTWO_USED"> <!-- if not CH2 so it is CH1 -->
+            <MatcherOnKey>CONF{LPBAM_LPTIMIC_LPTIM1_EXISTS_#1}\.S1\.Q{LPBAM_LPTIMIC_LPTIM1_EXISTS_#2}\.F{LPBAM_LPTIMIC_LPTIM1_EXISTS_#3}\.LPBAMLPTIM1\.MYCHANNEL_IC</MatcherOnKey> 
+            <MatcherPattern>LPBAM_LPTIM_CHANNEL_2</MatcherPattern>       
+        </Matcher>
+
+        <Matcher Name= "HAL_LPTIMIC_LPTIM1CHANNELTWO_IO_INPUT"> 
+            <MatcherOnKey>CONF{LPBAM_LPTIMIC_LPTIM1_EXISTS_#1}\.SH\.S_LPTIM1_CH2.*</MatcherOnKey> 
+            <MatcherPattern>.*InputIO_CH2.*</MatcherPattern>       
+        </Matcher>
+
+        <Matcher Name= "HAL_LPTIMIC_LPTIM1CHANNELONE_IO_INPUT"> 
+            <MatcherOnKey>CONF{LPBAM_LPTIMIC_LPTIM1_EXISTS_#1}\.SH\.S_LPTIM1_CH1.*</MatcherOnKey> 
+            <MatcherPattern>.*InputIO_CH1.*</MatcherPattern>       
+        </Matcher>
+
+         <Matcher Name= "HAL_LPTIMIC_LPTIM1CHANNELTWO_NOIO"> 
+            <MatcherOnKey>CONF{LPBAM_LPTIMIC_LPTIM1_EXISTS_#1}\.Mcu\.Pin.*</MatcherOnKey> 
+            <MatcherPattern>.*VP_LPTIM1_VS_noIO2.*</MatcherPattern>       
+        </Matcher>
+        <Matcher Name= "HAL_LPTIMIC_LPTIM1CHANNELONE_NOIO"> 
+            <MatcherOnKey>CONF{LPBAM_LPTIMIC_LPTIM1_EXISTS_#1}\.Mcu\.Pin.*</MatcherOnKey> 
+            <MatcherPattern>.*VP_LPTIM1_VS_noIO1.*</MatcherPattern>       
+        </Matcher>
+
+        <Matcher Name= "HAL_LPTIMIC_LPTIM1CHANNELTWO_NOIO_OUTPUT"> 
+            <MatcherOnKey>CONF{LPBAM_LPTIMIC_LPTIM1_EXISTS_#1}\.LPTIM1\.Capture_Compare_Selection_2</MatcherOnKey> 
+            <MatcherPattern>UI_output</MatcherPattern>       
+        </Matcher>
+
+        <Matcher Name= "HAL_LPTIMIC_LPTIM1CHANNELONE_NOIO_OUTPUT"> 
+            <MatcherOnKey>CONF{LPBAM_LPTIMIC_LPTIM1_EXISTS_#1}\.LPTIM1\.Capture_Compare_Selection_1</MatcherOnKey> 
+            <MatcherPattern>UI_output</MatcherPattern>       
+        </Matcher>
+
+        
+
+        <Checker Condition="(LPBAM_LPTIMIC_LPTIM1CHANNELTWO_USED &amp; !(HAL_LPTIMIC_LPTIM1CHANNELTWO_IO_INPUT | (HAL_LPTIMIC_LPTIM1CHANNELTWO_NOIO &amp; !HAL_LPTIMIC_LPTIM1CHANNELTWO_NOIO_OUTPUT))) | (!LPBAM_LPTIMIC_LPTIM1CHANNELTWO_USED &amp; !(HAL_LPTIMIC_LPTIM1CHANNELONE_IO_INPUT | (HAL_LPTIMIC_LPTIM1CHANNELTWO_NOIO &amp; !HAL_LPTIMIC_LPTIM1CHANNELTWO_NOIO_OUTPUT)))" 
+                 Diagnostic="Peripheral Configuration: IC mode is used by LPTIM1 through S1.Q{LPBAM_LPTIMIC_LPTIM1_EXISTS_#2}/'LPTIM1:S1.Q{LPBAM_LPTIMIC_LPTIM1_EXISTS_#2}.F{LPBAM_LPTIMIC_LPTIM1_EXISTS_#3}' and the channel set is not configured as intput. It should be configured as input in this application 'Pinout &amp; Configuration' panel"
+                 Type="error"/>
+    </ConsistencyRule>
+    
+    <ConsistencyRule Type="SingleApplication" Name= "LPTIMIC_LPTIM3CHANNEL">
+
+        <Matcher Name= "LPBAM_LPTIMIC_LPTIM3_EXISTS" Type="precondition">
+            <MatcherOnKey>CONF(.*)\.S1\.Q(.*)\.F(.*)\.VP_LPBAMLPTIM3_VS_IC\.Mode</MatcherOnKey>  
+            <MatcherPattern>IC</MatcherPattern>       
+        </Matcher>
+
+        <Matcher Name= "LPBAM_LPTIMIC_LPTIM3CHANNELTWO_USED"> <!-- if not CH2 so it is CH1 -->
+            <MatcherOnKey>CONF{LPBAM_LPTIMIC_LPTIM3_EXISTS_#1}\.S1\.Q{LPBAM_LPTIMIC_LPTIM3_EXISTS_#2}\.F{LPBAM_LPTIMIC_LPTIM3_EXISTS_#3}\.LPBAMLPTIM3\.MYCHANNEL_IC</MatcherOnKey> 
+            <MatcherPattern>LPBAM_LPTIM_CHANNEL_2</MatcherPattern>       
+        </Matcher>
+
+        <Matcher Name= "HAL_LPTIMIC_LPTIM3CHANNELTWO_IO_INPUT"> 
+            <MatcherOnKey>CONF{LPBAM_LPTIMIC_LPTIM3_EXISTS_#1}\.SH\.S_LPTIM3_CH2.*</MatcherOnKey> 
+            <MatcherPattern>.*InputIO_CH2.*</MatcherPattern>       
+        </Matcher>
+
+        <Matcher Name= "HAL_LPTIMIC_LPTIM3CHANNELONE_IO_INPUT"> 
+            <MatcherOnKey>CONF{LPBAM_LPTIMIC_LPTIM3_EXISTS_#1}\.SH\.S_LPTIM3_CH1.*</MatcherOnKey> 
+            <MatcherPattern>.*InputIO_CH1.*</MatcherPattern>       
+        </Matcher>
+
+        <Matcher Name= "HAL_LPTIMIC_LPTIM3CHANNELTWO_NOIO"> 
+            <MatcherOnKey>CONF{LPBAM_LPTIMIC_LPTIM3_EXISTS_#1}\.Mcu\.Pin.*</MatcherOnKey> 
+            <MatcherPattern>.*VP_LPTIM3_VS_noIO2.*</MatcherPattern>       
+        </Matcher>
+        <Matcher Name= "HAL_LPTIMIC_LPTIM3CHANNELONE_NOIO"> 
+            <MatcherOnKey>CONF{LPBAM_LPTIMIC_LPTIM3_EXISTS_#1}\.Mcu\.Pin.*</MatcherOnKey> 
+            <MatcherPattern>.*VP_LPTIM3_VS_noIO1.*</MatcherPattern>       
+        </Matcher>
+
+        <Matcher Name= "HAL_LPTIMIC_LPTIM3CHANNELTWO_NOIO_OUTPUT"> 
+            <MatcherOnKey>CONF{LPBAM_LPTIMIC_LPTIM3_EXISTS_#1}\.LPTIM3\.Capture_Compare_Selection_2</MatcherOnKey> 
+            <MatcherPattern>UI_output</MatcherPattern>       
+        </Matcher>
+
+        <Matcher Name= "HAL_LPTIMIC_LPTIM3CHANNELONE_NOIO_OUTPUT"> 
+            <MatcherOnKey>CONF{LPBAM_LPTIMIC_LPTIM3_EXISTS_#1}\.LPTIM3\.Capture_Compare_Selection_1</MatcherOnKey> 
+            <MatcherPattern>UI_output</MatcherPattern>       
+        </Matcher>
+
+
+       
+
+        <Checker Condition="(LPBAM_LPTIMIC_LPTIM3CHANNELTWO_USED &amp; !HAL_LPTIMIC_LPTIM3CHANNELTWO_IO_INPUT) | 
+            (!LPBAM_LPTIMIC_LPTIM3CHANNELTWO_USED &amp; !(HAL_LPTIMIC_LPTIM3CHANNELONE_IO_INPUT | (HAL_LPTIMIC_LPTIM3CHANNELONE_NOIO &amp; !HAL_LPTIMIC_LPTIM3CHANNELONE_NOIO_OUTPUT )))" 
+                 Diagnostic="Peripheral Configuration: IC mode is used by LPTIM3 through S1.Q{LPBAM_LPTIMIC_LPTIM3_EXISTS_#2}/'LPTIM3:S1.Q{LPBAM_LPTIMIC_LPTIM3_EXISTS_#2}.F{LPBAM_LPTIMIC_LPTIM3_EXISTS_#3}' and the channel set is not configured as intput. It should be configured as input in this application 'Pinout &amp; Configuration' panel"
+                 Type="error"/>
+    </ConsistencyRule>
+
+      <ConsistencyRule Type="SingleApplication" Name= "LPTIM_MIXMODES">
+
+        <Matcher Name= "LPBAM_LPTIM_UEMODE_EXISTS" Type="precondition">
+            <MatcherOnKey>CONF(.*)\.S1\.Q(.*)\.F(.*)\.VP_LPBAMLPTIM(.*)_VS_UE\.Mode</MatcherOnKey>  
+            <MatcherPattern>UE</MatcherPattern>       
+        </Matcher>
+
+        <Matcher Name= "LPBAM_LPTIM_PWMMODE_SAMEINSTANCE" >
+            <MatcherOnKey>CONF{LPBAM_LPTIM_UEMODE_EXISTS_#1}\.S1\.Q.*\.F.*\.VP_LPBAMLPTIM{LPBAM_LPTIM_UEMODE_EXISTS_#4}_VS_PWM\.Mode</MatcherOnKey>  
+            <MatcherPattern>PWM</MatcherPattern>       
+        </Matcher>
+
+        <Matcher Name= "LPBAM_LPTIM_ICMODE_SAMEINSTANCE">
+            <MatcherOnKey>CONF{LPBAM_LPTIM_UEMODE_EXISTS_#1}\.S1\.Q.*\.F.*\.VP_LPBAMLPTIM{LPBAM_LPTIM_UEMODE_EXISTS_#1}_VS_IC\.Mode</MatcherOnKey>  
+            <MatcherPattern>IC</MatcherPattern>       
+        </Matcher>
+       
+        <Checker Condition="LPBAM_LPTIM_PWMMODE_SAMEINSTANCE |LPBAM_LPTIM_ICMODE_SAMEINSTANCE "
+         Diagnostic="Scenario Design: LPTIM{LPBAM_LPTIM_UEMODE_EXISTS_#4} is used in 'Update Event Mode' through S1.Q{LPBAM_LPTIM_UEMODE_EXISTS_#2}/'LPTIM{LPBAM_LPTIM_UEMODE_EXISTS_#4}:S1.Q{LPBAM_LPTIM_UEMODE_EXISTS_#2}.F{LPBAM_LPTIM_UEMODE_EXISTS_#3}'. No other Mode can be used by LPTIM{LPBAM_LPTIM_UEMODE_EXISTS_#4} in this application"
+          Type="error"/>
+    </ConsistencyRule>
+
+     <ConsistencyRule Type="SingleApplication" Name= "LPTIMPWM_LPTIM1CHANNEL">
+
+        <Matcher Name= "LPBAM_LPTIMPWM_LPTIM1_EXISTS" Type="precondition">
+            <MatcherOnKey>CONF(.*)\.S1\.Q(.*)\.F(.*)\.VP_LPBAMLPTIM1_VS_PWM\.Mode</MatcherOnKey>  
+            <MatcherPattern>PWM</MatcherPattern>       
+        </Matcher>
+
+        <Matcher Name= "LPBAM_LPTIMPWM_LPTIM1CHANNELTWO_USED"> <!-- if not CH2 so it is CH1 -->
+            <MatcherOnKey>CONF{LPBAM_LPTIMPWM_LPTIM1_EXISTS_#1}\.S1\.Q{LPBAM_LPTIMPWM_LPTIM1_EXISTS_#2}\.F{LPBAM_LPTIMPWM_LPTIM1_EXISTS_#3}\.LPBAMLPTIM1\.MYCHANNEL_PWM</MatcherOnKey> 
+            <MatcherPattern>LPBAM_LPTIM_CHANNEL_2</MatcherPattern>       
+        </Matcher>
+
+        <Matcher Name= "HAL_LPTIMPWM_LPTIM1CHANNELTWO_IO_OUTPUT"> 
+            <MatcherOnKey>CONF{LPBAM_LPTIMPWM_LPTIM1_EXISTS_#1}\.SH\.S_LPTIM1_CH2.*</MatcherOnKey> 
+            <MatcherPattern>.*OutputIO_CH2.*</MatcherPattern>       
+        </Matcher>
+
+        <Matcher Name= "HAL_LPTIMPWM_LPTIM1CHANNELONE_IO_OUTPUT"> 
+            <MatcherOnKey>CONF{LPBAM_LPTIMPWM_LPTIM1_EXISTS_#1}\.SH\.S_LPTIM1_CH1.*</MatcherOnKey> 
+            <MatcherPattern>.*OutputIO_CH1.*</MatcherPattern>       
+        </Matcher>
+
+        <Matcher Name= "HAL_LPTIMPWM_LPTIM1CHANNELTWO_NOIO_OUTPUT"> 
+            <MatcherOnKey>CONF{LPBAM_LPTIMPWM_LPTIM1_EXISTS_#1}\.LPTIM1\.Capture_Compare_Selection_2</MatcherOnKey> 
+            <MatcherPattern>UI_output</MatcherPattern>       
+        </Matcher>
+
+        <Matcher Name= "HAL_LPTIMPWM_LPTIM1CHANNELONE_NOIO_OUTPUT"> 
+            <MatcherOnKey>CONF{LPBAM_LPTIMPWM_LPTIM1_EXISTS_#1}\.LPTIM1\.Capture_Compare_Selection_1</MatcherOnKey> 
+            <MatcherPattern>UI_output</MatcherPattern>       
+        </Matcher>
+
+        
+
+        <Checker Condition="(LPBAM_LPTIMPWM_LPTIM1CHANNELTWO_USED &amp; !(HAL_LPTIMPWM_LPTIM1CHANNELTWO_IO_OUTPUT |HAL_LPTIMPWM_LPTIM1CHANNELTWO_NOIO_OUTPUT)) | (!LPBAM_LPTIMPWM_LPTIM1CHANNELTWO_USED &amp; !(HAL_LPTIMPWM_LPTIM1CHANNELONE_IO_OUTPUT |HAL_LPTIMPWM_LPTIM1CHANNELONE_NOIO_OUTPUT))" 
+                 Diagnostic="Peripheral Configuration: PWM Mode is used by LPTIM1 through  S1.Q{LPBAM_LPTIMPWM_LPTIM1_EXISTS_#2}/'LPTIM1:S1.Q{LPBAM_LPTIMPWM_LPTIM1_EXISTS_#2}.F{LPBAM_LPTIMPWM_LPTIM1_EXISTS_#3' and the channel set is not configured as output. It must be configured as output in this application 'Pinout &amp; Configuration' panel"
+                 Type="error"/>
+    </ConsistencyRule>
+    
+    <ConsistencyRule Type="SingleApplication" Name= "LPTIMPWM_LPTIM3CHANNEL">
+
+        <Matcher Name= "LPBAM_LPTIMPWM_LPTIM3_EXISTS" Type="precondition">
+            <MatcherOnKey>CONF(.*)\.S1\.Q(.*)\.F(.*)\.VP_LPBAMLPTIM3_VS_PWM\.Mode</MatcherOnKey>  
+            <MatcherPattern>PWM</MatcherPattern>       
+        </Matcher>
+
+        <Matcher Name= "LPBAM_LPTIMPWM_LPTIM3CHANNELTWO_USED"> <!-- if not CH2 so it is CH1 -->
+            <MatcherOnKey>CONF{LPBAM_LPTIMPWM_LPTIM3_EXISTS_#1}\.S1\.Q{LPBAM_LPTIMPWM_LPTIM3_EXISTS_#2}\.F{LPBAM_LPTIMPWM_LPTIM3_EXISTS_#3}\.LPBAMLPTIM3\.MYCHANNEL_PWM</MatcherOnKey> 
+            <MatcherPattern>LPBAM_LPTIM_CHANNEL_2</MatcherPattern>       
+        </Matcher>
+
+        <Matcher Name= "HAL_LPTIMPWM_LPTIM3CHANNELTWO_IO_INPUT"> 
+            <MatcherOnKey>CONF{LPBAM_LPTIMPWM_LPTIM3_EXISTS_#1}\.SH\.S_LPTIM3_CH2.*</MatcherOnKey> 
+            <MatcherPattern>.*InputIO_CH2.*</MatcherPattern>       
+        </Matcher>
+
+        <Matcher Name= "HAL_LPTIMPWM_LPTIM3CHANNELTWO_IO_OUTPUT"> 
+            <MatcherOnKey>CONF{LPBAM_LPTIMPWM_LPTIM3_EXISTS_#1}\.SH\.S_LPTIM3_CH2.*</MatcherOnKey> 
+            <MatcherPattern>.*OutputIO_CH2.*</MatcherPattern>       
+        </Matcher>
+
+
+        <Matcher Name= "HAL_LPTIMPWM_LPTIM3CHANNELTWO_NOIO"> 
+            <MatcherOnKey>CONF{LPBAM_LPTIMPWM_LPTIM3_EXISTS_#1}\.Mcu\.Pin.*</MatcherOnKey> 
+            <MatcherPattern>.*VP_LPTIM3_VS_noIO2.*</MatcherPattern>       
+        </Matcher>
+
+        <Matcher Name= "HAL_LPTIMPWM_LPTIM3CHANNELONE_IO_OUTPUT"> 
+            <MatcherOnKey>CONF{LPBAM_LPTIMPWM_LPTIM3_EXISTS_#1}\.SH\.S_LPTIM3_CH1.*</MatcherOnKey> 
+            <MatcherPattern>.*OutputIO_CH1.*</MatcherPattern>       
+        </Matcher>
+
+        <Matcher Name= "HAL_LPTIMPWM_LPTIM3CHANNELONE_NOIO_OUTPUT"> 
+            <MatcherOnKey>CONF{LPBAM_LPTIMPWM_LPTIM3_EXISTS_#1}\.LPTIM3\.Capture_Compare_Selection_1</MatcherOnKey> 
+            <MatcherPattern>UI_output</MatcherPattern>       
+        </Matcher>
+
+        
+
+        <Checker Condition="(LPBAM_LPTIMPWM_LPTIM3CHANNELTWO_USED &amp; (HAL_LPTIMPWM_LPTIM3CHANNELTWO_IO_INPUT | !(HAL_LPTIMPWM_LPTIM3CHANNELTWO_NOIO |HAL_LPTIMPWM_LPTIM3CHANNELTWO_IO_OUTPUT)))
+        | (!LPBAM_LPTIMPWM_LPTIM3CHANNELTWO_USED &amp; !(HAL_LPTIMPWM_LPTIM3CHANNELONE_IO_OUTPUT |HAL_LPTIMPWM_LPTIM3CHANNELONE_NOIO_OUTPUT))" 
+                 Diagnostic="Peripheral Configuration: PWM Mode is used by LPTIM3 through  S1.Q{LPBAM_LPTIMPWM_LPTIM3_EXISTS_#2}/'LPTIM3:S1.Q{LPBAM_LPTIMPWM_LPTIM3_EXISTS_#2}.F{LPBAM_LPTIMPWM_LPTIM3_EXISTS_#3}' and the channel set is not configured as output. It must be configured as output in this application 'Pinout &amp; Configuration' panel"
+                 Type="error"/>
+    </ConsistencyRule>
+
+
+    <ConsistencyRule Type="SingleApplication" Name= "LPTIMSEVERALQUEUES">
+ 
+
+        <Matcher Name= "LPBAMLPTIMINSTANCEONONEQUEUE" Type="precondition">
+            <MatcherOnKey>CONF(.*)\.S1\.Q(.*)\.F.*\.VP_LPBAMLPTIM(.*)_VS_.*\.Mode</MatcherOnKey>  
+            <MatcherPattern>.*</MatcherPattern>       
+        </Matcher>
+        <Matcher Name= "LPBAMLPTIMINSTANCEONANOTHERQUEUE">
+            <MatcherOnKey>CONF{LPBAMLPTIMINSTANCEONONEQUEUE_#1}\.S1\.Q[^{LPBAMLPTIMINSTANCEONONEQUEUE_#2}]\.F.*\.VP_LPBAMLPTIM{LPBAMLPTIMINSTANCEONONEQUEUE_#3}_.*\.Mode</MatcherOnKey> 
+            <MatcherPattern>.*</MatcherPattern>       
+        </Matcher>
+
+        <Checker Condition="LPBAMLPTIMINSTANCEONANOTHERQUEUE" 
+                 Diagnostic="Scenario Design: LPTIM{LPBAMLPTIMINSTANCEONONEQUEUE_#3} is used in several Queues, be sure these Queues are not executed simultaneously at runtime"
+                  Type="info"/>
+    </ConsistencyRule>
+
+
+<ConsistencyRule Type="SingleApplication" Name= "LPTIM_STOP">
+
+        <Matcher Name= "LPBAM_LPTIMSTOP_EXISTS" Type="precondition">
+            <MatcherOnKey>CONF(.*)\.S1\.Q(.*)\.F(.*)\.VP_LPBAMLPTIM(.*)_VS_STOP\.Mode</MatcherOnKey>  
+            <MatcherPattern>STOP</MatcherPattern>       
+        </Matcher>
+
+        <Matcher Name= "LPBAM_LPTIMSTOP_MODE_NO_UE" >
+            <MatcherOnKey>CONF{LPBAM_LPTIMSTOP_EXISTS_#1}\.S1\.Q{LPBAM_LPTIMSTOP_EXISTS_#2}\.F{LPBAM_LPTIMSTOP_EXISTS_#3}\.LPBAMLPTIM{LPBAM_LPTIMSTOP_EXISTS_#4}\.Mode_STOP</MatcherOnKey>  
+            <MatcherPattern>LPBAM_LPTIM_NO_UE_MODE</MatcherPattern>       
+        </Matcher>
+
+        <Matcher Name= "LPBAM_LPTIMUE_EXISTS" >
+            <MatcherOnKey>CONF{LPBAM_LPTIMSTOP_EXISTS_#1}\.S1\.Q.*\.F.*\.VP_LPBAMLPTIM{LPBAM_LPTIMSTOP_EXISTS_#4}_VS_UE\.Mode</MatcherOnKey>  
+            <MatcherPattern>UE</MatcherPattern>       
+        </Matcher>
+   
+
+         <Matcher Name= "LPBAM_LPTIMSTART_EXISTS" >
+            <MatcherOnKey>CONF{LPBAM_LPTIMSTOP_EXISTS_#1}\.S1\.Q.*\.F.*\.VP_LPBAMLPTIM{LPBAM_LPTIMSTOP_EXISTS_#4}_VS_START\.Mode</MatcherOnKey>  
+            <MatcherPattern>START</MatcherPattern>       
+        </Matcher>
+
+        <Checker Condition="LPBAM_LPTIMUE_EXISTS &amp; LPBAM_LPTIMSTOP_MODE_NO_UE" 
+                 Diagnostic="Scenario Design: LPTIM{LPBAM_LPTIMSTOP_EXISTS_#4} is used in Update Event MODE and is not stopped in UE mode through S1.Q{LPBAM_LPTIMSTOP_EXISTS_#2}/'LPTIM{LPBAM_LPTIMSTOP_EXISTS_#4}:S1.Q{LPBAM_LPTIMSTOP_EXISTS_#2}.F{LPBAM_LPTIMSTOP_EXISTS_#3}'. It must be stopped in Update Event Mode in this scenario"
+                 Type="error"/>
+    
+
+        <Checker Condition="!LPBAM_LPTIMUE_EXISTS &amp; !LPBAM_LPTIMSTOP_MODE_NO_UE" 
+                 Diagnostic="Scenario Design: LPTIM{LPBAM_LPTIMSTOP_EXISTS_#4} is not using Update Event Mode, and is stopped in Update Event mode through S1.Q{LPBAM_LPTIMSTOP_EXISTS_#2}/'LPTIM{LPBAM_LPTIMSTOP_EXISTS_#4}:S1.Q{LPBAM_LPTIMSTOP_EXISTS_#2}.F{LPBAM_LPTIMSTOP_EXISTS_#3}'. It must be stopped in Non Update Event Mode in this scenario"
+                 Type="error"/>
+
+
+        <Checker Condition="LPBAM_LPTIMSTART_EXISTS" 
+                 Diagnostic="Scenario Design: At runtime, ensure the necessary timing between stopping through S1.Q{LPBAM_LPTIMSTOP_EXISTS_#2}/'LPTIM{LPBAM_LPTIMSTOP_EXISTS_#4}:S1.Q{LPBAM_LPTIMSTOP_EXISTS_#2}.F{LPBAM_LPTIMSTOP_EXISTS_#3}' and starting LPTIM{LPBAM_LPTIMSTOP_EXISTS_#4} through 'LPTIM Start' function"
+                 Type="info"/>
+    </ConsistencyRule>
+
+
+    <ConsistencyRule Type="SingleApplication" Name= "LPTIMUE_LPTIM1CHANNEL">
+
+        <Matcher Name= "LPBAM_LPTIMUE_LPTIM1_EXISTS" Type="precondition">
+            <MatcherOnKey>CONF(.*)\.S1\.Q(.*)\.F(.*)\.VP_LPBAMLPTIM1_VS_UE\.Mode</MatcherOnKey>  
+            <MatcherPattern>UE</MatcherPattern>       
+        </Matcher>
+
+       
+
+        <Matcher Name= "HAL_LPTIMUE_LPTIM1CHANNELTWO_IO"> 
+            <MatcherOnKey>CONF{LPBAM_LPTIMUE_LPTIM1_EXISTS_#1}\.SH\.S_LPTIM1_CH2.*</MatcherOnKey> 
+            <MatcherPattern>.*putIO_CH2.*</MatcherPattern>       
+        </Matcher>
+
+        <Matcher Name= "HAL_LPTIMUE_LPTIM1CHANNELONE_IO"> 
+            <MatcherOnKey>CONF{LPBAM_LPTIMUE_LPTIM1_EXISTS_#1}\.SH\.S_LPTIM1_CH1.*</MatcherOnKey> 
+            <MatcherPattern>.*putIO_CH1.*</MatcherPattern>       
+        </Matcher>
+
+         <Matcher Name= "HAL_LPTIMUE_LPTIM1CHANNELTWO_NOIO"> 
+            <MatcherOnKey>CONF{LPBAM_LPTIMUE_LPTIM1_EXISTS_#1}\.Mcu\.Pin.*</MatcherOnKey> 
+            <MatcherPattern>.*VP_LPTIM1_VS_noIO2.*</MatcherPattern>       
+        </Matcher>
+        <Matcher Name= "HAL_LPTIMUE_LPTIM1CHANNELONE_NOIO"> 
+            <MatcherOnKey>CONF{LPBAM_LPTIMUE_LPTIM1_EXISTS_#1}\.Mcu\.Pin.*</MatcherOnKey> 
+            <MatcherPattern>.*VP_LPTIM1_VS_noIO1.*</MatcherPattern>       
+        </Matcher>
+        
+
+        <Checker Condition="(HAL_LPTIMUE_LPTIM1CHANNELONE_IO|HAL_LPTIMUE_LPTIM1CHANNELTWO_NOIO|HAL_LPTIMUE_LPTIM1CHANNELONE_IO|HAL_LPTIMUE_LPTIM1CHANNELONE_NOIO)" 
+                 Diagnostic="Peripheral Configuration:  Update Event mode is used by LPTIM1 through S1.Q{LPBAM_LPTIMUE_LPTIM1_EXISTS_#2}/'LPTIM1:S1.Q{LPBAM_LPTIMUE_LPTIM1_EXISTS_#2}.F{LPBAM_LPTIMUE_LPTIM1_EXISTS_#3}' and a LPTIM1 Channel is also configured in this application 'Pinout &amp; Configuration' panel. It must be disabled from this application 'Pinout &amp; Configuration' panel"
+                 Type="error"/>
+
+        <Checker Condition="LPBAM_LPTIMUE_LPTIM1_EXISTS" 
+                 Diagnostic="Scenario Design: Update Event mode is used by LPTIM1 through S1.Q{LPBAM_LPTIMUE_LPTIM1_EXISTS_#2}/'LPTIM1:S1.Q{LPBAM_LPTIMUE_LPTIM1_EXISTS_#2}.F{LPBAM_LPTIMUE_LPTIM1_EXISTS_#3}', be sure that no LPBAM API Nodes are inserted between 'LPTIM Start' and 'LPTIM Stop' functions: if Nodes are inserted it should affect the timing"
+                 Type="info"/>
+    </ConsistencyRule>
+
+    <ConsistencyRule Type="SingleApplication" Name= "LPTIMUE_LPTIM3CHANNEL">
+
+        <Matcher Name= "LPBAM_LPTIMUE_LPTIM3_EXISTS" Type="precondition">
+            <MatcherOnKey>CONF(.*)\.S1\.Q(.*)\.F(.*)\.VP_LPBAMLPTIM3_VS_UE\.Mode</MatcherOnKey>  
+            <MatcherPattern>UE</MatcherPattern>       
+        </Matcher>
+
+        <Matcher Name= "HAL_LPTIMUE_LPTIM3CHANNELTWO_IO"> 
+            <MatcherOnKey>CONF{LPBAM_LPTIMUE_LPTIM3_EXISTS_#1}\.SH\.S_LPTIM3_CH2.*</MatcherOnKey> 
+            <MatcherPattern>.*putIO_CH2.*</MatcherPattern>       
+        </Matcher>
+
+        <Matcher Name= "HAL_LPTIMUE_LPTIM3CHANNELONE_IO"> 
+            <MatcherOnKey>CONF{LPBAM_LPTIMUE_LPTIM3_EXISTS_#1}\.SH\.S_LPTIM3_CH1.*</MatcherOnKey> 
+            <MatcherPattern>.*putIO_CH1.*</MatcherPattern>       
+        </Matcher>
+
+         <Matcher Name= "HAL_LPTIMUE_LPTIM3CHANNELTWO_NOIO"> 
+            <MatcherOnKey>CONF{LPBAM_LPTIMUE_LPTIM3_EXISTS_#1}\.Mcu\.Pin.*</MatcherOnKey> 
+            <MatcherPattern>.*VP_LPTIM3_VS_noIO2.*</MatcherPattern>       
+        </Matcher>
+        <Matcher Name= "HAL_LPTIMUE_LPTIM3CHANNELONE_NOIO"> 
+            <MatcherOnKey>CONF{LPBAM_LPTIMUE_LPTIM3_EXISTS_#1}\.Mcu\.Pin.*</MatcherOnKey> 
+            <MatcherPattern>.*VP_LPTIM3_VS_noIO1.*</MatcherPattern>       
+        </Matcher>
+        
+
+        <Checker Condition="(HAL_LPTIMUE_LPTIM3CHANNELONE_IO|HAL_LPTIMUE_LPTIM3CHANNELTWO_NOIO|HAL_LPTIMUE_LPTIM3CHANNELONE_IO|HAL_LPTIMUE_LPTIM3CHANNELONE_NOIO)" 
+                 Diagnostic="Peripheral Configuration: Update Event mode is used by LPTIM3 through S1.Q{LPBAM_LPTIMUE_LPTIM3_EXISTS_#2}/'LPTIM3:S1.Q{LPBAM_LPTIMUE_LPTIM3_EXISTS_#2}.F{LPBAM_LPTIMUE_LPTIM3_EXISTS_#3}' and a LPTIM3 Channel is also configured in this application 'Pinout &amp; Configuration' panel. It must be disabled from this application 'Pinout &amp; Configuration' panel"
+                 Type="error"/>
+        <Checker Condition="LPBAM_LPTIMUE_LPTIM3_EXISTS" 
+                 Diagnostic="Scenario Design: Update Event mode is used by LPTIM3 through S1.Q{LPBAM_LPTIMUE_LPTIM3_EXISTS_#2}/'LPTIM3:S1.Q{LPBAM_LPTIMUE_LPTIM3_EXISTS_#2}.F{LPBAM_LPTIMUE_LPTIM3_EXISTS_#3}', be sure that no LPBAM API Nodes are inserted between 'LPTIM Start' and 'LPTIM Stop' functions: if Nodes are inserted it should affect the timing"
+                 Type="info"/>
+    </ConsistencyRule>
+
+    <!-- LPTIM -->
+
+
+    <!-- LPUART -->
+
+
+    <ConsistencyRule Type="SingleApplication" Name= "LPUARTTWOQUEUES">
+
+        <Matcher Name= "LPBAM_LPUART_RXTX_CONF" Type="precondition">
+            <MatcherOnKey>CONF(.*)\.S1\.Q(.*)\.F(.*)\.VP_LPBAMLPUART(.*)_VS_(RECEIVE|TRANSMIT)[_CONFIG]*\.Mode</MatcherOnKey>  
+            <MatcherPattern>(TRANSMIT|RECEIVE)[_CONFIG]*</MatcherPattern>       
+        </Matcher>
+
+        <Matcher Name= "LPBAM_LPUART_RXTX_CONF_ANOTHER_QUEUE">
+            <MatcherOnKey>CONF{LPBAM_LPUART_RXTX_CONF_#1}\.S1\.Q[^{LPBAM_LPUART_RXTX_CONF_#2}]\.F.*\.VP_LPBAMLPUART{LPBAM_LPUART_RXTX_CONF_#4}_VS_(TRANSMIT|RECEIVE)[_CONFIG]*\.Mode</MatcherOnKey>  
+            <MatcherPattern>(TRANSMIT|RECEIVE)[_CONFIG]*</MatcherPattern>       
+        </Matcher>
+
+
+        <Checker Condition=" LPBAM_LPUART_RXTX_CONF_ANOTHER_QUEUE" 
+                 Diagnostic="Scenario Design: LPUART{LPBAM_LPUART_RXTX_CONF_#4} is used in several Queues, be sure these Queues are not executed simultaneously at runtime"
+                 Type="info"/>
+        
+    </ConsistencyRule>
+
+
+
+ <ConsistencyRule Type="SingleApplication" Name= "LPUARTRXANDTX">
+
+        <Matcher Name= "LPBAM_LPUART_EXIST" Type="precondition">
+            <MatcherOnKey>CONF(.*)\.S1\.Q(.*)\.F(.*)\.IpInstanceName</MatcherOnKey>  
+            <MatcherPattern>LPBAMLPUART(.*)</MatcherPattern>       
+        </Matcher>
+
+        <Matcher Name= "LPBAM_LPUART_RX">
+            <MatcherOnKey>CONF{LPBAM_LPUART_EXIST_#1}\.S1\.Q.*\.F.*\.VP_LPBAMLPUART{LPBAM_LPUART_EXIST_#4}_VS_RECEIVE.*\.Mode</MatcherOnKey>  
+            <MatcherPattern>RECEIVE.*</MatcherPattern>       
+        </Matcher>
+
+        <Matcher Name= "LPBAM_LPUART_TX">
+            <MatcherOnKey>CONF{LPBAM_LPUART_EXIST_#1}\.S1\.Q.*\.F.*\.VP_LPBAMLPUART{LPBAM_LPUART_EXIST_#4}_VS_TRANSMIT.*\.Mode</MatcherOnKey>  
+            <MatcherPattern>TRANSMIT.*</MatcherPattern>       
+        </Matcher>
+        
+        <Matcher Name= "HAL_LPUART_EXIST" >
+            <MatcherOnKey>CONF{LPBAM_LPUART_EXIST_#1}\.Mcu\.IP.*</MatcherOnKey>  
+            <MatcherPattern>LPUART{LPBAM_LPUART_EXIST_#4}</MatcherPattern>       
+        </Matcher>
+
+
+        <Matcher Name= "HAL_LPUART_RX" >
+            <MatcherOnKey>CONF{LPBAM_LPUART_EXIST_#1}\.LPUART{LPBAM_LPUART_EXIST_#4}\.Mode</MatcherOnKey>  
+            <MatcherPattern>UART_MODE_RX</MatcherPattern>       
+        </Matcher>
+        
+         <Matcher Name= "HAL_LPUART_TX" >
+            <MatcherOnKey>CONF{LPBAM_LPUART_EXIST_#1}\.LPUART{LPBAM_LPUART_EXIST_#4}\.Mode</MatcherOnKey>  
+            <MatcherPattern>UART_MODE_TX</MatcherPattern>       
+        </Matcher>
+        
+
+        <Checker Condition="(LPBAM_LPUART_RX &amp; LPBAM_LPUART_TX) &amp; HAL_LPUART_EXIST &amp; (HAL_LPUART_RX | HAL_LPUART_TX)" 
+                 Diagnostic="Peripheral Configuration: LPUART{LPBAM_LPUART_EXIST_#4} is used both for Reveive and Transmit in this scenario and is not configured in Full Duplex Mode. It should be configured in Full Duplex Mode in this application 'Pinout &amp; Configuration' panel"
+                 Type="error"/>
+
+    </ConsistencyRule>
+
+
+     <ConsistencyRule Type="SingleApplication" Name= "LPUARTFULLDUPLEX">
+
+        <Matcher Name= "LPBAM_LPUART_EXIST" Type="precondition">
+            <MatcherOnKey>CONF(.*)\.S1\.Q(.*)\.F(.*)\.IpInstanceName</MatcherOnKey>  
+            <MatcherPattern>LPBAMLPUART(.*)</MatcherPattern>       
+        </Matcher>
+
+        <Matcher Name= "LPBAM_LPUART_RX">
+            <MatcherOnKey>CONF{LPBAM_LPUART_EXIST_#1}\.S1\.Q{LPBAM_LPUART_EXIST_#2}\.F{LPBAM_LPUART_EXIST_#3}\.VP_LPBAMLPUART{LPBAM_LPUART_EXIST_#4}_VS_RECEIVE[_CONFIG]*\.Mode</MatcherOnKey>  
+            <MatcherPattern>RECEIVE[_CONFIG]*</MatcherPattern>       
+        </Matcher>
+
+        <Matcher Name= "LPBAM_LPUART_TX">
+            <MatcherOnKey>CONF{LPBAM_LPUART_EXIST_#1}\.S1\.Q{LPBAM_LPUART_EXIST_#2}\.F{LPBAM_LPUART_EXIST_#3}\.VP_LPBAMLPUART{LPBAM_LPUART_EXIST_#4}_VS_TRANSMIT[_CONFIG]*\.Mode</MatcherOnKey>  
+            <MatcherPattern>TRANSMIT[_CONFIG]*</MatcherPattern>       
+        </Matcher>
+
+
+        <Matcher Name= "LPBAM_LPUART_RXMODE" >
+            <MatcherOnKey>CONF{LPBAM_LPUART_EXIST_#1}\.S1\.Q{LPBAM_LPUART_EXIST_#2}\.F{LPBAM_LPUART_EXIST_#3}\.LPBAMLPUART{LPBAM_LPUART_EXIST_#4}\.Mode_RX[_CONFIG]*</MatcherOnKey>  
+            <MatcherPattern>LPBAM_UART_MODE_RX</MatcherPattern>       
+        </Matcher>
+
+        <Matcher Name= "LPBAM_LPUART_TXMODE" >
+            <MatcherOnKey>CONF{LPBAM_LPUART_EXIST_#1}\.S1\.Q{LPBAM_LPUART_EXIST_#2}\.F{LPBAM_LPUART_EXIST_#3}\.LPBAMLPUART{LPBAM_LPUART_EXIST_#4}\.Mode_TX[_CONFIG]*</MatcherOnKey>  
+            <MatcherPattern>LPBAM_UART_MODE_TX</MatcherPattern>       
+        </Matcher>
+        
+        <Matcher Name= "HAL_LPUART_EXIST" >
+            <MatcherOnKey>CONF{LPBAM_LPUART_EXIST_#1}\.Mcu\.IP.*</MatcherOnKey>  
+            <MatcherPattern>LPUART{LPBAM_LPUART_EXIST_#4}</MatcherPattern>       
+        </Matcher>
+
+
+        <Matcher Name= "HAL_LPUART_RX" >
+            <MatcherOnKey>CONF{LPBAM_LPUART_EXIST_#1}\.LPUART{LPBAM_LPUART_EXIST_#4}\.Mode</MatcherOnKey>  
+            <MatcherPattern>UART_MODE_RX</MatcherPattern>       
+        </Matcher>
+        
+         <Matcher Name= "HAL_LPUART_TX" >
+            <MatcherOnKey>CONF{LPBAM_LPUART_EXIST_#1}\.LPUART{LPBAM_LPUART_EXIST_#4}\.Mode</MatcherOnKey>  
+            <MatcherPattern>UART_MODE_TX</MatcherPattern>       
+        </Matcher>
+        
+        
+
+        <Checker Condition="((LPBAM_LPUART_RX &amp; !LPBAM_LPUART_RXMODE) | (LPBAM_LPUART_TX &amp; !LPBAM_LPUART_TXMODE)) &amp; (HAL_LPUART_EXIST &amp; (HAL_LPUART_RX|HAL_LPUART_TX)) " 
+                 Diagnostic="Peripheral Configuration: LPUART{LPBAM_LPUART_EXIST_#4} is set in 'Receive and Transmit' Mode through S1.Q{LPBAM_LPUART_EXIST_#2}/'LPUART{LPBAM_LPUART_EXIST_#4}:S1.Q{LPBAM_LPUART_EXIST_#2}.F{LPBAM_LPUART_EXIST_#3}'and is not configured in Full Duplex Mode. It should be configured in Full Duplex Mode in this application 'Pinout &amp; Configuration' panel"
+                 Type="error"/>
+    </ConsistencyRule>
+
+     <ConsistencyRule Type="SingleApplication" Name= "LPUARTRX">
+
+        <Matcher Name= "LPBAM_LPUART_RX" Type="precondition">
+            <MatcherOnKey>CONF(.*)\.S1\.Q(.*)\.F(.*)\.VP_LPBAMLPUART(.*)_VS_RECEIVE[_CONFIG]*\.Mode</MatcherOnKey>  
+            <MatcherPattern>RECEIVE[_CONFIG]*</MatcherPattern>       
+        </Matcher>
+
+        <Matcher Name= "LPBAM_LPUART_RXMODE" >
+            <MatcherOnKey>CONF{LPBAM_LPUART_RX_#1}\.S1\.Q{LPBAM_LPUART_RX_#2}\.F{LPBAM_LPUART_RX_#3}\.LPBAMLPUART{LPBAM_LPUART_RX_#4}\.Mode_RX[_CONFIG]*</MatcherOnKey>  
+            <MatcherPattern>LPBAM_UART_MODE_RX</MatcherPattern>       
+        </Matcher>
+        
+
+        <Matcher Name= "HAL_LPUART_RX" >
+            <MatcherOnKey>CONF{LPBAM_LPUART_RX_#1}\.LPUART{LPBAM_LPUART_RX_#4}\.Mode</MatcherOnKey>  
+            <MatcherPattern>UART_MODE_RX</MatcherPattern>       
+        </Matcher>
+        
+        
+
+        <Checker Condition="LPBAM_LPUART_RXMODE &amp; !HAL_LPUART_RX" 
+                 Diagnostic="Peripheral Configuration: LPUART{LPBAM_LPUART_RX_#4} is used in 'Receive' mode through S1.Q{LPBAM_LPUART_RX_#2}/'LPUART{LPBAM_LPUART_RX_#4}:S1.Q{LPBAM_LPUART_RX_#2}.F{LPBAM_LPUART_RX_#3}' and is not configured in receive mode. It should be configured in this application 'Pinout &amp; Configuration' panel"
+                 Type="error"/>
+    </ConsistencyRule>
+
+
+     <ConsistencyRule Type="SingleApplication" Name= "LPUARTTX">
+
+        <Matcher Name= "LPBAM_LPUART_TX" Type="precondition">
+            <MatcherOnKey>CONF(.*)\.S1\.Q(.*)\.F(.*)\.VP_LPBAMLPUART(.*)_VS_TRANSMIT[_CONFIG]*\.Mode</MatcherOnKey>  
+            <MatcherPattern>TRANSMIT[_CONFIG]*</MatcherPattern>       
+        </Matcher>
+
+        <Matcher Name= "LPBAM_LPUART_TXMODE" >
+            <MatcherOnKey>CONF{LPBAM_LPUART_TX_#1}\.S1\.Q{LPBAM_LPUART_TX_#2}\.F{LPBAM_LPUART_TX_#3}\.LPBAMLPUART{LPBAM_LPUART_TX_#4}\.Mode_TX[_CONFIG]*</MatcherOnKey>  
+            <MatcherPattern>LPBAM_UART_MODE_TX</MatcherPattern>       
+        </Matcher>
+        
+
+        <Matcher Name= "HAL_LPUART_TX" >
+            <MatcherOnKey>CONF{LPBAM_LPUART_TX_#1}\.LPUART{LPBAM_LPUART_TX_#4}\.Mode</MatcherOnKey>  
+            <MatcherPattern>UART_MODE_TX</MatcherPattern>       
+        </Matcher>
+        
+        
+
+        <Checker Condition="LPBAM_LPUART_TXMODE &amp; !HAL_LPUART_TX" 
+                 Diagnostic="Peripheral Configuration: LPUART{LPBAM_LPUART_TX_#4} is used in 'Transmit' mode through S1.Q{LPBAM_LPUART_TX_#2}/'LPUART{LPBAM_LPUART_TX_#4}:S1.Q{LPBAM_LPUART_TX_#2}.F{LPBAM_LPUART_TX_#3}' and is not configured in transmit mode. It should be configured in this application 'Pinout &amp; Configuration' panel"
+                 Type="error"/>
+    </ConsistencyRule>
+    
+    <!--LPUART -->
+
+    <!--OPAMP -->
+
+    <ConsistencyRule Type="SingleApplication" Name= "OPAMPSEVERALQUEUES">
+ 
+
+        <Matcher Name= "LPBAMOPAMPINSTANCEONONEQUEUE" Type="precondition">
+            <MatcherOnKey>CONF(.*)\.S1\.Q(.*)\.F.*\.VP_LPBAMOPAMP(.*)_VS_START\.Mode</MatcherOnKey>  
+            <MatcherPattern>START</MatcherPattern>       
+        </Matcher>
+        <Matcher Name= "LPBAMOPAMPINSTANCEONANOTHERQUEUE">
+            <MatcherOnKey>CONF{LPBAMOPAMPINSTANCEONONEQUEUE_#1}\.S1\.Q[^{LPBAMOPAMPINSTANCEONONEQUEUE_#2}]\.F.*\.VP_LPBAMOPAMP{LPBAMOPAMPINSTANCEONONEQUEUE_#3}_VS_START\.Mode</MatcherOnKey> 
+            <MatcherPattern>START</MatcherPattern>       
+        </Matcher>
+
+
+
+        <Checker Condition="LPBAMOPAMPINSTANCEONANOTHERQUEUE" 
+                 Diagnostic="Scenario Design: OPAMP{LPBAMOPAMPINSTANCEONONEQUEUE_#3} is used in several Queues, be sure these Queues are not executed simultaneously at runtime"
+                 Type="info"/>
+    </ConsistencyRule>
+
+
+
+
+     <ConsistencyRule Type="SingleApplication" Name= "OPAMPIO">
+ 
+
+        <Matcher Name= "LPBAMOPAMPSTART" Type="precondition">
+            <MatcherOnKey>CONF(.*)\.S1\.Q(.*)\.F(.*)\.VP_LPBAMOPAMP(.*)_VS_START\.Mode</MatcherOnKey>  
+            <MatcherPattern>START</MatcherPattern>       
+        </Matcher>
+
+
+        <Matcher Name= "LPBAMOPAMPFOLLOWER">
+            <MatcherOnKey>CONF{LPBAMOPAMPSTART_#1}\.S1\.Q{LPBAMOPAMPSTART_#2}\.F{LPBAMOPAMPSTART_#3}\.LPBAMOPAMP{LPBAMOPAMPSTART_#4}\.Mode</MatcherOnKey> 
+            <MatcherPattern>LPBAM_OPAMP_FOLLOWER_MODE</MatcherPattern>       
+        </Matcher>
+
+        <Matcher Name= "LPBAMOPAMPPGA">
+            <MatcherOnKey>CONF{LPBAMOPAMPSTART_#1}\.S1\.Q{LPBAMOPAMPSTART_#2}\.F{LPBAMOPAMPSTART_#3}\.LPBAMOPAMP{LPBAMOPAMPSTART_#4}\.Mode</MatcherOnKey> 
+            <MatcherPattern>LPBAM_OPAMP_PGA_MODE</MatcherPattern>       
+        </Matcher>
+
+        <!-- DAC1_CH1 pour OPAMP1 et DAC1_CH2 pour OPAMP2 autrement PA0 pour OPAMP1 et PA6 pour OPAMP2-->
+       <Matcher Name= "LPBAMOPAMP_NIIDACH">
+            <MatcherOnKey>CONF{LPBAMOPAMPSTART_#1}\.S1\.Q{LPBAMOPAMPSTART_#2}\.F{LPBAMOPAMPSTART_#3}\.LPBAMOPAMP{LPBAMOPAMPSTART_#4}\.NonInvertingInput</MatcherOnKey> 
+            <MatcherPattern>LPBAM_OPAMP_NONINVERTINGINPUT_DAC_CH</MatcherPattern>       
+        </Matcher>
+
+
+        <!-- if non of theses two values PA1 for OPAMP1 and PA7 for OPAMP2-->
+        <Matcher Name= "LPBAMOPAMP_IIVINM">
+            <MatcherOnKey>CONF{LPBAMOPAMPSTART_#1}\.S1\.Q{LPBAMOPAMPSTART_#2}\.F{LPBAMOPAMPSTART_#3}\.LPBAMOPAMP{LPBAMOPAMPSTART_#4}\.InvertingInput</MatcherOnKey> 
+            <MatcherPattern>LPBAM_OPAMP_INVERTINGINPUT_IO1</MatcherPattern>       
+        </Matcher>
+        <Matcher Name= "LPBAMOPAMP_IINOCONNECT">
+            <MatcherOnKey>CONF{LPBAMOPAMPSTART_#1}\.S1\.Q{LPBAMOPAMPSTART_#2}\.F{LPBAMOPAMPSTART_#3}\.LPBAMOPAMP{LPBAMOPAMPSTART_#4}\.InvertingInput</MatcherOnKey> 
+            <MatcherPattern>LPBAM_OPAMP_INVERTINGINPUT_CONNECT_NO</MatcherPattern>       
+        </Matcher>
+
+
+
+        <Matcher Name= "OPAMPHAL_PA0">
+            <MatcherOnKey>CONF{LPBAMOPAMPSTART_#1}\.PA0\.Signal</MatcherOnKey> 
+            <MatcherPattern>OPAMP1_VINP</MatcherPattern>       
+        </Matcher>
+
+        <Matcher Name= "OPAMPHAL_PA1">
+            <MatcherOnKey>CONF{LPBAMOPAMPSTART_#1}\.PA1\.Signal</MatcherOnKey> 
+            <MatcherPattern>OPAMP1_VINM</MatcherPattern>       
+        </Matcher>
+
+        <Matcher Name= "OPAMPHAL_PA6">
+            <MatcherOnKey>CONF{LPBAMOPAMPSTART_#1}\.PA6\.Signal</MatcherOnKey> 
+            <MatcherPattern>OPAMP2_VINP</MatcherPattern>       
+        </Matcher>
+
+        <Matcher Name= "OPAMPHAL_PA7">
+            <MatcherOnKey>CONF{LPBAMOPAMPSTART_#1}\.PA7\.Signal</MatcherOnKey> 
+            <MatcherPattern>OPAMP2_VINM</MatcherPattern>       
+        </Matcher>
+
+        <Matcher Name= "OPAMPHAL_OPAMP1_VINM">
+            <MatcherOnKey>CONF{LPBAMOPAMPSTART_#1}\.OPAMP1_VINM\.Signal</MatcherOnKey> 
+            <MatcherPattern>OPAMP1_VINM</MatcherPattern>       
+        </Matcher>
+
+        <Matcher Name= "OPAMPHAL_OPAMP2_VINM">
+            <MatcherOnKey>CONF{LPBAMOPAMPSTART_#1}\.OPAMP2_VINM\.Signal</MatcherOnKey> 
+            <MatcherPattern>OPAMP2_VINM</MatcherPattern>       
+        </Matcher>
+
+        <Matcher Name= "OPAMPHAL_DACH1">
+            <MatcherOnKey>CONF{LPBAMOPAMPSTART_#1}\.DAC1\.DAC_Channel\-DAC_OUT1_[ExtAndInt]*Int</MatcherOnKey> 
+            <MatcherPattern>DAC_CHANNEL_1</MatcherPattern>       
+        </Matcher>
+
+        <Matcher Name= "OPAMPHAL_DACH2">
+            <MatcherOnKey>CONF{LPBAMOPAMPSTART_#1}\.DAC1\.DAC_Channel\-DAC_OUT2_[ExtAndInt]*Int</MatcherOnKey> 
+            <MatcherPattern>DAC_CHANNEL_2</MatcherPattern>       
+        </Matcher>
+
+
+       <!-- <Checker Condition="LPBAMOPAMPFOLLOWER" 
+                 Diagnostic="OPAMP: mode is FOLLOWER S1.Q{LPBAMOPAMPSTART_#2} on Node S1.Q{LPBAMOPAMPSTART_#2}.F{LPBAMOPAMPSTART_#3} for OPAMP{LPBAMOPAMPSTART_#4}"/>
+
+        <Checker Condition="LPBAMOPAMPPGA"
+                 Diagnostic="OPAMP: mode is PGA S1.Q{LPBAMOPAMPSTART_#2} on Node S1.Q{LPBAMOPAMPSTART_#2}.F{LPBAMOPAMPSTART_#3} for OPAMP{LPBAMOPAMPSTART_#4}"/>
+
+        <Checker Condition="! (LPBAMOPAMPFOLLOWER | LPBAMOPAMPPGA)"
+                 Diagnostic="OPAMP: mode is STANDALONE S1.Q{LPBAMOPAMPSTART_#2} on Node S1.Q{LPBAMOPAMPSTART_#2}.F{LPBAMOPAMPSTART_#3} for OPAMP{LPBAMOPAMPSTART_#4}"/>
+-->
+        <Checker Condition="({LPBAMOPAMPSTART_#4}=1) &amp; LPBAMOPAMP_NIIDACH &amp; !OPAMPHAL_DACH1"
+                 Diagnostic="Peripheral Configuration: DAC1_CH1 is set for NonInvertingInput through S1.Q{LPBAMOPAMPSTART_#2}/'OPAMP{LPBAMOPAMPSTART_#4}:S1.Q{LPBAMOPAMPSTART_#2}.F{LPBAMOPAMPSTART_#3}' and is not configured properly. It should be configured in this application 'Pinout &amp; Configuration' panel"
+                 Type="error"/>
+
+        <Checker Condition="({LPBAMOPAMPSTART_#4}=2) &amp; LPBAMOPAMP_NIIDACH &amp; !OPAMPHAL_DACH2"
+                 Diagnostic="Peripheral Configuration: DAC1_CH2 is set for NonInvertingInput through S1.Q{LPBAMOPAMPSTART_#2}/'OPAMP{LPBAMOPAMPSTART_#4}:S1.Q{LPBAMOPAMPSTART_#2}.F{LPBAMOPAMPSTART_#3}' and is not configured properly. It should be configured in this application 'Pinout &amp; Configuration' panel"
+                 Type="error"/>
+
+        <Checker Condition="({LPBAMOPAMPSTART_#4}=1) &amp; !LPBAMOPAMP_NIIDACH &amp; !OPAMPHAL_PA0"
+                 Diagnostic="Peripheral Configuration: PA0 is set for NonInvertingInput through S1.Q{LPBAMOPAMPSTART_#2}/'OPAMP{LPBAMOPAMPSTART_#4}:S1.Q{LPBAMOPAMPSTART_#2}.F{LPBAMOPAMPSTART_#3}' and is not configured. It should be configured in this application 'Pinout &amp; Configuration' panel"
+                 Type="error"/>
+
+
+        <Checker Condition="({LPBAMOPAMPSTART_#4}=2) &amp; !LPBAMOPAMP_NIIDACH &amp; !OPAMPHAL_PA6"
+                 Diagnostic="Peripheral Configuration: PA6 is set on NonInvertingInput through S1.Q{LPBAMOPAMPSTART_#2}/'OPAMP{LPBAMOPAMPSTART_#4}:S1.Q{LPBAMOPAMPSTART_#2}.F{LPBAMOPAMPSTART_#3}' and is not configured. It should be configured in this application 'Pinout &amp; Configuration' panel"
+                 Type="error"/>
+
+
+         <Checker Condition="({LPBAMOPAMPSTART_#4}=1) &amp; LPBAMOPAMP_IIVINM &amp;  !OPAMPHAL_OPAMP1_VINM"
+                 Diagnostic="Peripheral Configuration: OPAMP_VINM PIN is set for InvertingInput through S1.Q{LPBAMOPAMPSTART_#2}/'OPAMP{LPBAMOPAMPSTART_#4}:S1.Q{LPBAMOPAMPSTART_#2}.F{LPBAMOPAMPSTART_#3}' and is not configured. It should be configured in this application 'Pinout &amp; Configuration' panel"
+                 Type="error"/>
+
+        <Checker Condition="({LPBAMOPAMPSTART_#4}=2) &amp; LPBAMOPAMP_IIVINM &amp;  !OPAMPHAL_OPAMP2_VINM "
+                 Diagnostic="Peripheral Configuration: OPAMP_VINM PIN is set for InvertingInput through S1.Q{LPBAMOPAMPSTART_#2}/'OPAMP{LPBAMOPAMPSTART_#4}:S1.Q{LPBAMOPAMPSTART_#2}.F{LPBAMOPAMPSTART_#3}' and is not configured. It should be configured in this application 'Pinout &amp; Configuration' panel"
+                 Type="error"/>
+
+        <!--<<Checker Condition="({LPBAMOPAMPSTART_#4}=1) &amp; LPBAMOPAMP_IINOCONNECT"
+                Diagnostic="OPAMP:  NO connect OMPAM1 on InvertingInput S1.Q{LPBAMOPAMPSTART_#2} on Node S1.Q{LPBAMOPAMPSTART_#2}.F{LPBAMOPAMPSTART_#3} for OPAMP{LPBAMOPAMPSTART_#4}"/>
+
+        <Checker Condition="({LPBAMOPAMPSTART_#4}=2) &amp; LPBAMOPAMP_IINOCONNECT"
+                 Diagnostic="OPAMP:  No connect OMPAM2 on InvertingInput S1.Q{LPBAMOPAMPSTART_#2} on Node S1.Q{LPBAMOPAMPSTART_#2}.F{LPBAMOPAMPSTART_#3} for OPAMP{LPBAMOPAMPSTART_#4}"/>
+-->
+        <Checker Condition="({LPBAMOPAMPSTART_#4}=1) &amp; !(LPBAMOPAMP_IINOCONNECT |LPBAMOPAMP_IIVINM) &amp; !LPBAMOPAMPFOLLOWER &amp; !OPAMPHAL_PA1"
+                 Diagnostic="Peripheral Configuration: PA1 is set for InvertingInput through S1.Q{LPBAMOPAMPSTART_#2}/'OPAMP{LPBAMOPAMPSTART_#4}:S1.Q{LPBAMOPAMPSTART_#2}.F{LPBAMOPAMPSTART_#3}' and is not configured. It should be configured in this application 'Pinout &amp; Configuration' panel"
+                 Type="error"/>
+
+        <Checker Condition="({LPBAMOPAMPSTART_#4}=2) &amp; !(LPBAMOPAMP_IINOCONNECT |LPBAMOPAMP_IIVINM) &amp; !LPBAMOPAMPFOLLOWER &amp; !OPAMPHAL_PA7"
+                 Diagnostic="Peripheral Configuration: PA7 is set for InvertingInput through S1.Q{LPBAMOPAMPSTART_#2}/'OPAMP{LPBAMOPAMPSTART_#4}:S1.Q{LPBAMOPAMPSTART_#2}.F{LPBAMOPAMPSTART_#3}'and is not configured. It should be configured in this application 'Pinout &amp; Configuration' panel"
+                 Type="error"/>
+
+
+
+    </ConsistencyRule>
+    
+    
+    <!--OPAMP -->
+
+    <!--VREFBUF -->
+
+     <ConsistencyRule Type="SingleApplication" Name= "VREFBUFMODE">
+
+        <Matcher Name= "LPBAMVREFBUFINTERNALMODEUSED" Type="precondition">
+            <MatcherOnKey>CONF(.*)\.S1\.Q(.*)\.F(.*)\.LPBAMVREFBUF\.BufferMode</MatcherOnKey>  
+            <MatcherPattern>LPBAM_VREFBUF_INTERNAL_VOLTAGE_MODE</MatcherPattern>       
+        </Matcher>
+
+        <Matcher Name= "HALVREFBUFINTERNAL">
+            <MatcherOnKey>CONF{LPBAMVREFBUFINTERNALMODEUSED_#1}\.VREF\+\.Mode</MatcherOnKey>  
+            <MatcherPattern>InternalMode</MatcherPattern>       
+        </Matcher>
+        
+        <Checker Condition="!HALVREFBUFINTERNAL" 
+                 Diagnostic="Peripheral Configuration: VREFBUF 'Buffer Mode' is set as 'Internal Voltage' in S1.Q{LPBAMVREFBUFINTERNALMODEUSED_#2}/'VREFBUF:S1.Q{LPBAMVREFBUFINTERNALMODEUSED_#2}.F{LPBAMVREFBUFINTERNALMODEUSED_#3}' and not configured as 'internal voltage reference'. It should be configured through this application 'Pinout &amp; Configuration' panel"
+                 Type="error"/>
+    </ConsistencyRule>
+
+
+    <ConsistencyRule Type="SingleApplication" Name= "VREFBUFSEVERALQUEUES">
+ 
+
+        <Matcher Name= "LPBAMVREFBUFINSTANCEONONEQUEUE" Type="precondition">
+            <MatcherOnKey>CONF(.*)\.S1\.Q(.*)\.F.*\.VP_LPBAMVREFBUF_VS_BUFFERMODE\.Mode</MatcherOnKey>  
+            <MatcherPattern>BUFFERMODE</MatcherPattern>       
+        </Matcher>
+        <Matcher Name= "LPBAMVREFBUFINSTANCEONANOTHERQUEUE">
+            <MatcherOnKey>CONF{LPBAMVREFBUFINSTANCEONONEQUEUE_#1}\.S1\.Q[^{LPBAMVREFBUFINSTANCEONONEQUEUE_#2}]\.F.*\.VP_LPBAMVREFBUF_VS_BUFFERMODE\.Mode</MatcherOnKey> 
+            <MatcherPattern>.*</MatcherPattern>       
+        </Matcher>
+
+
+
+        <Checker Condition="LPBAMVREFBUFINSTANCEONANOTHERQUEUE" 
+                 Diagnostic="Scenario Design: LPBAM VREFBUF functions are used in several Queues, be sure these Queues are not executed simultaneously at runtime"
+                 Type="info"/>
+    </ConsistencyRule>
+
+    <!--VREFBUF -->
+
+
+     <!--ADC -->
+
+
+      <ConsistencyRule Type="SingleApplication" Name= "ADCGPIO"> <!-- CH1 not tested -->
+ 
+
+        <Matcher Name= "LPBAMADCCONVERSIONONGPIO" Type="precondition">
+            <MatcherOnKey>CONF(.*)\.S1\.Q(.*)\.F(.*)\.LPBAMADC(.*)\.Channel_Rank.*</MatcherOnKey> 
+            <MatcherPattern>LPBAM_ADC_CHANNEL_([1-9][1-9]*)</MatcherPattern>       
+        </Matcher>
+
+        <Matcher Name= "LPBAMADCGPIOHAL">
+            <MatcherOnKey>CONF{LPBAMADCCONVERSIONONGPIO_#1}\..*\.Signal</MatcherOnKey> 
+            <MatcherPattern>ADC{LPBAMADCCONVERSIONONGPIO_#4}_IN{LPBAMADCCONVERSIONONGPIO_#5}</MatcherPattern>       
+        </Matcher>
+
+
+
+        <Checker Condition="!LPBAMADCGPIOHAL" 
+                 Diagnostic="Peripheral Configuration: ADC{LPBAMADCCONVERSIONONGPIO_#4}_Channel{LPBAMADCCONVERSIONONGPIO_#5} is set through S1.Q{LPBAMADCCONVERSIONONGPIO_#2}/' ADC{LPBAMADCCONVERSIONONGPIO_#4}:S1.Q{LPBAMADCCONVERSIONONGPIO_#2}.F{LPBAMADCCONVERSIONONGPIO_#3}', be sure that this channel is mapped on a GPIO and is configured in this application 'Pinout &amp; Configuration' panel"
+                 Type="warning"/>
+    </ConsistencyRule>
+
+
+    <ConsistencyRule Type="SingleApplication" Name= "ADCONERANKCH1"> 
+ 
+
+        <Matcher Name= "LPBAMADCCONVERSION" Type="precondition">
+            <MatcherOnKey>CONF(.*)\.S1\.Q(.*)\.F(.*)\.LPBAMADC(.*)\.EnableRegularConversion.*</MatcherOnKey>
+            <MatcherPattern>ENABLE</MatcherPattern>       
+        </Matcher>
+
+        <Matcher Name= "LPBAMADCCONVERSIONONGPIO">
+            <MatcherOnKey>CONF{LPBAMADCCONVERSION_#1}\.S1\.Q{LPBAMADCCONVERSION_#2}\.F{LPBAMADCCONVERSION_#3}\.LPBAMADC{LPBAMADCCONVERSION_#4}\.Channel_Rank[_Conv]*1</MatcherOnKey> 
+            <MatcherPattern>.*</MatcherPattern>       
+        </Matcher>
+
+        <Matcher Name= "LPBAMADCGPIOCH1HAL">
+            <MatcherOnKey>CONF{LPBAMADCCONVERSION_#1}\..*\.Signal</MatcherOnKey> 
+            <MatcherPattern>ADC{LPBAMADCCONVERSION_#4}_IN1</MatcherPattern>       
+        </Matcher>
+
+
+
+        <Checker Condition="!LPBAMADCCONVERSIONONGPIO &amp; !LPBAMADCGPIOCH1HAL" 
+                 Diagnostic="Peripheral Configuration: ADC{LPBAMADCCONVERSION_#4}_Channel_1 is set through S1.Q{LPBAMADCCONVERSION_#2}/'ADC{LPBAMADCCONVERSION_#4}:S1.Q{LPBAMADCCONVERSION_#2}.F{LPBAMADCCONVERSION_#3}', be sure that this channel is mapped on a GPIO and is configured in this application 'Pinout &amp; Configuration' panel"
+                 Type="warning"/>
+    </ConsistencyRule>
+
+
+    <ConsistencyRule Type="SingleApplication" Name= "ADCCH1ONANYRANK"> 
+ 
+
+        <Matcher Name= "LPBAMADCCONVERSION" Type="precondition">
+            <MatcherOnKey>CONF(.*)\.S1\.Q(.*)\.F(.*)\.LPBAMADC(.*)\.NbrOfConversion.*</MatcherOnKey>
+            <MatcherPattern>(.*)</MatcherPattern>       
+        </Matcher>
+
+        <Matcher Name= "LPBAMADCRANK2">
+            <MatcherOnKey>CONF{LPBAMADCCONVERSION_#1}\.S1\.Q{LPBAMADCCONVERSION_#2}\.F{LPBAMADCCONVERSION_#3}\.LPBAMADC{LPBAMADCCONVERSION_#4}\.Channel_Rank[_Conv]*2</MatcherOnKey> 
+            <MatcherPattern>.*</MatcherPattern>       
+        </Matcher>
+        <Matcher Name= "LPBAMADCRANK3">
+            <MatcherOnKey>CONF{LPBAMADCCONVERSION_#1}\.S1\.Q{LPBAMADCCONVERSION_#2}\.F{LPBAMADCCONVERSION_#3}\.LPBAMADC{LPBAMADCCONVERSION_#4}\.Channel_Rank[_Conv]*3</MatcherOnKey> 
+            <MatcherPattern>.*</MatcherPattern>       
+        </Matcher>
+        <Matcher Name= "LPBAMADCRANK4">
+            <MatcherOnKey>CONF{LPBAMADCCONVERSION_#1}\.S1\.Q{LPBAMADCCONVERSION_#2}\.F{LPBAMADCCONVERSION_#3}\.LPBAMADC{LPBAMADCCONVERSION_#4}\.Channel_Rank[_Conv]*4</MatcherOnKey> 
+            <MatcherPattern>.*</MatcherPattern>       
+        </Matcher>
+        <Matcher Name= "LPBAMADCRANK5">
+            <MatcherOnKey>CONF{LPBAMADCCONVERSION_#1}\.S1\.Q{LPBAMADCCONVERSION_#2}\.F{LPBAMADCCONVERSION_#3}\.LPBAMADC{LPBAMADCCONVERSION_#4}\.Channel_Rank[_Conv]*5</MatcherOnKey> 
+            <MatcherPattern>.*</MatcherPattern>       
+        </Matcher>
+        <Matcher Name= "LPBAMADCRANK6">
+            <MatcherOnKey>CONF{LPBAMADCCONVERSION_#1}\.S1\.Q{LPBAMADCCONVERSION_#2}\.F{LPBAMADCCONVERSION_#3}\.LPBAMADC{LPBAMADCCONVERSION_#4}\.Channel_Rank[_Conv]*6</MatcherOnKey> 
+            <MatcherPattern>.*</MatcherPattern>       
+        </Matcher>
+        <Matcher Name= "LPBAMADCRANK7">
+            <MatcherOnKey>CONF{LPBAMADCCONVERSION_#1}\.S1\.Q{LPBAMADCCONVERSION_#2}\.F{LPBAMADCCONVERSION_#3}\.LPBAMADC{LPBAMADCCONVERSION_#4}\.Channel_Rank[_Conv]*7</MatcherOnKey> 
+            <MatcherPattern>.*</MatcherPattern>       
+        </Matcher>
+        <Matcher Name= "LPBAMADCRANK8">
+            <MatcherOnKey>CONF{LPBAMADCCONVERSION_#1}\.S1\.Q{LPBAMADCCONVERSION_#2}\.F{LPBAMADCCONVERSION_#3}\.LPBAMADC{LPBAMADCCONVERSION_#4}\.Channel_Rank[_Conv]*3</MatcherOnKey> 
+            <MatcherPattern>.*</MatcherPattern>       
+        </Matcher>
+
+
+         <Matcher Name= "LPBAMADCGPIOCH1HAL">
+            <MatcherOnKey>CONF{LPBAMADCCONVERSION_#1}\..*\.Signal</MatcherOnKey> 
+            <MatcherPattern>ADC{LPBAMADCCONVERSION_#4}_IN1</MatcherPattern>       
+         </Matcher>
+
+
+        <Checker Condition="((({LPBAMADCCONVERSION_#5}=2) &amp; !(LPBAMADCRANK2)) | (({LPBAMADCCONVERSION_#5}=3) &amp; !(LPBAMADCRANK2 &amp; LPBAMADCRANK3)) | (({LPBAMADCCONVERSION_#5}=4) &amp; !(LPBAMADCRANK2 &amp; LPBAMADCRANK3 &amp; LPBAMADCRANK4 )) | (({LPBAMADCCONVERSION_#5}=5) &amp; !(LPBAMADCRANK2 &amp; LPBAMADCRANK3 &amp; LPBAMADCRANK4 &amp; LPBAMADCRANK4 )) | (({LPBAMADCCONVERSION_#5}=6) &amp; !(LPBAMADCRANK2 &amp; LPBAMADCRANK3 &amp; LPBAMADCRANK4 &amp; LPBAMADCRANK5 &amp; LPBAMADCRANK6)) | (({LPBAMADCCONVERSION_#5}=8) &amp; !(LPBAMADCRANK2 &amp; LPBAMADCRANK3 &amp; LPBAMADCRANK4 &amp; LPBAMADCRANK5 &amp; LPBAMADCRANK6 &amp; LPBAMADCRANK7)) | (({LPBAMADCCONVERSION_#5}=7) &amp; !(LPBAMADCRANK2 &amp; LPBAMADCRANK3 &amp; LPBAMADCRANK4 &amp; LPBAMADCRANK5 &amp; LPBAMADCRANK6 &amp; LPBAMADCRANK7 &amp; LPBAMADCRANK8 ))) &amp; !LPBAMADCGPIOCH1HAL" 
+                 Diagnostic="Peripheral Configuration: ADC{LPBAMADCCONVERSION_#4}_Channel_1 is set through S1.Q{LPBAMADCCONVERSION_#2}/'ADC{LPBAMADCCONVERSION_#4}:S1.Q{LPBAMADCCONVERSION_#2}.F{LPBAMADCCONVERSION_#3}', be sure that this channel is mapped on a GPIO and is configured in this application 'Pinout &amp; Configuration' panel"
+                 Type="warning"/>
+    </ConsistencyRule>
+
+
+    <ConsistencyRule Type="SingleApplication" Name= "ADCSEVERALQUEUES">
+ 
+
+        <Matcher Name= "LPBAMADCINSTANCEONONEQUEUE" Type="precondition">
+            <MatcherOnKey>CONF(.*)\.S1\.Q(.*)\.F.*\.VP_LPBAMADC(.*)_VS_.*\.Mode</MatcherOnKey>  
+            <MatcherPattern>.*</MatcherPattern>       
+        </Matcher>
+        <Matcher Name= "LPBAMADCINSTANCEONANOTHERQUEUE">
+            <MatcherOnKey>CONF{LPBAMADCINSTANCEONONEQUEUE_#1}\.S1\.Q[^{LPBAMADCINSTANCEONONEQUEUE_#2}]\.F.*\.VP_LPBAMADC{LPBAMADCINSTANCEONONEQUEUE_#3}_.*\.Mode</MatcherOnKey> 
+            <MatcherPattern>.*</MatcherPattern>       
+        </Matcher>
+
+
+
+        <Checker Condition="LPBAMADCINSTANCEONANOTHERQUEUE" 
+                 Diagnostic="Scenario Design: ADC{LPBAMADCINSTANCEONONEQUEUE_#3} is used in several Queues, be sure these Queues are not executed simultaneously at runtime"
+                 Type="info"/>
+    </ConsistencyRule>
+
+
+
+     <ConsistencyRule Type="SingleApplication" Name= "LPBAMADCAWDG">
+ 
+
+        <Matcher Name= "LPBAMADCAWDGUSED" Type="precondition">            
+            <MatcherOnKey>CONF(.*)\.S1\.Q(.*)\.F(.*)\.VP_LPBAMADC(.*)_VS_ANALOGWDCONFIG\.Mode</MatcherOnKey>  
+            <MatcherPattern>ANALOGWDCONFIG</MatcherPattern>       
+        </Matcher>
+
+        <Matcher Name= "LPBAMADCAWDG1USED">
+            <MatcherOnKey>CONF{LPBAMADCAWDGUSED_#1}\.S1\.Q{LPBAMADCAWDGUSED_#2}\.F{LPBAMADCAWDGUSED_#3}\.LPBAMADC{LPBAMADCAWDGUSED_#4}\.EnableAnalogWatchDog1</MatcherOnKey>  
+            <MatcherPattern>ENABLE</MatcherPattern>       
+        </Matcher>
+
+        <Matcher Name= "LPBAMADCAWDG2USED">
+            <MatcherOnKey>CONF{LPBAMADCAWDGUSED_#1}\.S1\.Q{LPBAMADCAWDGUSED_#2}\.F{LPBAMADCAWDGUSED_#3}\.LPBAMADC{LPBAMADCAWDGUSED_#4}\.EnableAnalogWatchDog2</MatcherOnKey>  
+            <MatcherPattern>ENABLE</MatcherPattern>       
+        </Matcher>
+
+        <Matcher Name= "LPBAMADCAWDG3USED">
+            <MatcherOnKey>CONF{LPBAMADCAWDGUSED_#1}\.S1\.Q{LPBAMADCAWDGUSED_#2}\.F{LPBAMADCAWDGUSED_#3}\.LPBAMADC{LPBAMADCAWDGUSED_#4}\.EnableAnalogWatchDog3</MatcherOnKey>  
+            <MatcherPattern>ENABLE</MatcherPattern>       
+        </Matcher>
+        
+
+        <Checker Condition="!(LPBAMADCAWDG1USED &amp;  LPBAMADCAWDG2USED &amp; LPBAMADCAWDG3USED )" 
+                 Diagnostic="Peripheral Configuration: not all 3 ADC4 Analog Watchdogs are enabled through S1.Q{LPBAMADCAWDGUSED_#2}/'ADC{LPBAMADCAWDGUSED_#4}:S1.Q{LPBAMADCAWDGUSED_#2}.F{LPBAMADCAWDGUSED_#3}'. Please note that the Analog Watchdog remaining 'Disabled' will not be functional even if previoulsy configured"
+                 Type="warning"/>
+    </ConsistencyRule>
+
+
+    <ConsistencyRule Type="SingleApplication" Name= "LPBAMADCAWDGFROMCONF">
+ 
+
+        <Matcher Name= "LPBAMADCCONFGUSED" Type="precondition">
+            <MatcherOnKey>CONF(.*)\.S1\.Q(.*)\.F(.*)\.VP_LPBAMADC(.*)_VS_CONVERSION[_CONFIG]*\.Mode</MatcherOnKey>  
+            <MatcherPattern>CONVERSION[_CONFIG]*</MatcherPattern>       
+        </Matcher>
+
+        <Matcher Name= "LPBAMADCAWDG1USED">
+            <MatcherOnKey>CONF{LPBAMADCCONFGUSED_#1}\.S1\.Q{LPBAMADCCONFGUSED_#2}\.F{LPBAMADCCONFGUSED_#3}\.LPBAMADC{LPBAMADCCONFGUSED_#4}\.EnableAnalogWatchDog1.*</MatcherOnKey>  
+            <MatcherPattern>ENABLE</MatcherPattern>       
+        </Matcher>
+
+        <Matcher Name= "LPBAMADCAWDG2USED">
+            <MatcherOnKey>CONF{LPBAMADCCONFGUSED_#1}\.S1\.Q{LPBAMADCCONFGUSED_#2}\.F{LPBAMADCCONFGUSED_#3}\.LPBAMADC{LPBAMADCCONFGUSED_#4}\.EnableAnalogWatchDog2.*</MatcherOnKey>  
+            <MatcherPattern>ENABLE</MatcherPattern>       
+        </Matcher>
+
+        <Matcher Name= "LPBAMADCAWDG3USED">
+            <MatcherOnKey>CONF{LPBAMADCCONFGUSED_#1}\.S1\.Q{LPBAMADCCONFGUSED_#2}\.F{LPBAMADCCONFGUSED_#3}\.LPBAMADC{LPBAMADCCONFGUSED_#4}\.EnableAnalogWatchDog3.*</MatcherOnKey>  
+            <MatcherPattern>ENABLE</MatcherPattern>       
+        </Matcher>
+
+        
+        <Checker Condition="!(LPBAMADCAWDG1USED | LPBAMADCAWDG2USED | LPBAMADCAWDG3USED)" 
+                 Diagnostic="Peripheral Configuration: ADC{LPBAMADCCONFGUSED_#4} is configured through S1.Q{LPBAMADCCONFGUSED_#2}/'ADC{LPBAMADCCONFGUSED_#4}:S1.Q{LPBAMADCCONFGUSED_#2}.F{LPBAMADCCONFGUSED_#3}' and no Analog Watchdog is enabled. Please note that the Analog Watchdog remaining 'Disabled' will not be functional even if previoulsy configured"
+                 Type="warning"/>
+    </ConsistencyRule>
+
+
+    
+
+
+
+
+
+     <!--ADC -->
+
+<!-- SPI -->
+
+ <ConsistencyRule Type="SingleApplication" Name= "SPISEVERALQUEUES">
+ 
+
+        <Matcher Name= "LPBAMSPIINSTANCEONONEQUEUE" Type="precondition">
+            <MatcherOnKey>CONF(.*)\.S1\.Q(.*)\.F.*\.VP_LPBAMSPI(.*)_VS_.*\.Mode</MatcherOnKey>  
+            <MatcherPattern>.*</MatcherPattern>       
+        </Matcher>
+        <Matcher Name= "LPBAMSPIINSTANCEONANOTHERQUEUE">
+            <MatcherOnKey>CONF{LPBAMSPIINSTANCEONONEQUEUE_#1}\.S1\.Q[^{LPBAMSPIINSTANCEONONEQUEUE_#2}]\.F.*\.VP_LPBAMSPI{LPBAMSPIINSTANCEONONEQUEUE_#3}_.*\.Mode</MatcherOnKey> 
+            <MatcherPattern>.*</MatcherPattern>       
+        </Matcher>
+
+
+
+        <Checker Condition="LPBAMSPIINSTANCEONANOTHERQUEUE" 
+                 Diagnostic="Scenario Design: SPI{LPBAMSPIINSTANCEONONEQUEUE_#3} is used in several Queues, be sure these Queues are not executed simultaneously at runtime"
+                 Type="info"/>
+    </ConsistencyRule>
+
+
+
+
+
+  <ConsistencyRule Type="SingleApplication" Name= "SPIRECEIVECONFIGHAL">
+ 
+
+        <Matcher Name= "LPBAMSPIRECEIVE" Type="precondition">
+            <MatcherOnKey>CONF(.*)\.S1\.Q(.*)\.F(.*)\.VP_LPBAMSPI(.*)_VS_[TRANSMIT]*RECEIVE.*\.Mode</MatcherOnKey>  
+            <MatcherPattern>[TRANSMIT]*RECEIVE.*</MatcherPattern> 
+        </Matcher>
+
+        <Matcher Name= "HALSPIRECEIVE">
+            <MatcherOnKey>CONF{LPBAMSPIRECEIVE_#1}\.SPI{LPBAMSPIRECEIVE_#4}\.Direction</MatcherOnKey>  
+            <MatcherPattern>SPI_DIRECTION_2LINES[_RXONLY]*</MatcherPattern> 
+        </Matcher>
+
+        <Checker Condition="!HALSPIRECEIVE" 
+                 Diagnostic="Peripheral Configuration: SPI{LPBAMSPIRECEIVE_#4} is set for Receive transfer through S1.Q{LPBAMSPIRECEIVE_#2}/'SPI{LPBAMSPIRECEIVE_#4}:S1.Q{LPBAMSPIRECEIVE_#2}.F{LPBAMSPIRECEIVE_#3}'and is not configured to support Receive Transfer. It should be configured properly in this application 'Pinout &amp; Configuration'panel"
+                 Type="error"/>
+
+    </ConsistencyRule>
+
+
+     <ConsistencyRule Type="SingleApplication" Name= "SPITRANSMITCONFIGHAL">
+ 
+
+        <Matcher Name= "LPBAMSPITRANSMIT" Type="precondition">
+            <MatcherOnKey>CONF(.*)\.S1\.Q(.*)\.F(.*)\.VP_LPBAMSPI(.*)_VS_TRANSMIT[RECEIVE]*.*\.Mode</MatcherOnKey>  
+            <MatcherPattern>TRANSMIT[RECEIVE]*.*</MatcherPattern>       
+        </Matcher>
+
+        <Matcher Name= "HALSPITRANSMIT">
+            <MatcherOnKey>CONF{LPBAMSPITRANSMIT_#1}\.SPI{LPBAMSPITRANSMIT_#4}\.Direction</MatcherOnKey>  
+            <MatcherPattern>SPI_DIRECTION_2LINES[_TXONLY]*</MatcherPattern> 
+        </Matcher>
+
+
+        <Checker Condition="!HALSPITRANSMIT" 
+                 Diagnostic="Peripheral Configuration: SPI{LPBAMSPITRANSMIT_#4} is set for Transmit transfer through S1.Q{LPBAMSPITRANSMIT_#2}/'SPI{LPBAMSPITRANSMIT_#4}:S1.Q{LPBAMSPITRANSMIT_#2}.F{LPBAMSPITRANSMIT_#3}' and is not configured to support Transmit Transfer. It should be configured properly in this application 'Pinout &amp; Configuration' panel"
+                 Type="error"/>
+    </ConsistencyRule>
+
+
+
+     <ConsistencyRule Type="SingleApplication" Name= "SPIDATASIZECOHERENCY">
+ 
+
+        <Matcher Name= "LPBAMSPITRANSFER_DATA" Type="precondition">
+            <MatcherOnKey>CONF(.*)\.S1\.Q(.*)\.F(.*)\.VP_LPBAMSPI(.*)_VS_([TRANSMIT]*[RECEIVE]*)_DATA.*\.Mode</MatcherOnKey>  
+            <MatcherPattern>[TRANSMIT]*[RECEIVE]*_DATA.*</MatcherPattern>       
+        </Matcher>
+
+        
+        <Checker Condition="LPBAMSPITRANSFER_DATA" 
+                 Diagnostic="Peripheral Configuration: SPI{LPBAMSPITRANSFER_DATA_#4} Data Transfer is used through S1.Q{LPBAMSPITRANSFER_DATA_#2}/'SPI{LPBAMSPITRANSFER_DATA_#4}:S1.Q{LPBAMSPITRANSFER_DATA_#2}.F{LPBAMSPITRANSFER_DATA_#3}'. At runtime, be sure that previous configuration of parameters 'Data Size' and 'Autonomous Mode / State' are coherent with current Data Transfer settings; depending on the sceanrio Design, previous configuration can be the one done in this application 'Pinout &amp; Configuration' panel or using a SPI Config function in this scenario"
+                 Type="info"/>
+    </ConsistencyRule>
+
+<!-- SPI -->
+
+<!-- I2C -->
+
+ <ConsistencyRule Type="SingleApplication" Name= "I2CSEVERALQUEUES">
+ 
+
+        <Matcher Name= "LPBAMI2CINSTANCEONONEQUEUE" Type="precondition">
+            <MatcherOnKey>CONF(.*)\.S1\.Q(.*)\.F.*\.VP_LPBAMI2C(.*)_VS_.*\.Mode</MatcherOnKey>  
+            <MatcherPattern>.*</MatcherPattern>       
+        </Matcher>
+        <Matcher Name= "LPBAMI2CINSTANCEONANOTHERQUEUE">
+            <MatcherOnKey>CONF{LPBAMI2CINSTANCEONONEQUEUE_#1}\.S1\.Q[^{LPBAMI2CINSTANCEONONEQUEUE_#2}]\.F.*\.VP_LPBAMI2C{LPBAMI2CINSTANCEONONEQUEUE_#3}_.*\.Mode</MatcherOnKey> 
+            <MatcherPattern>.*</MatcherPattern>       
+        </Matcher>
+
+
+        <Checker Condition="LPBAMI2CINSTANCEONANOTHERQUEUE" 
+                 Diagnostic="Scenario Design: I2C{LPBAMI2CINSTANCEONONEQUEUE_#3} is used in several Queues, be sure these Queues are not executed simultaneously at runtime"
+                 Type="info"/> 
+    </ConsistencyRule>
+
+
+<!-- I2C -->
+
+
+
+
+
+
+
+</ConsistencyRules>

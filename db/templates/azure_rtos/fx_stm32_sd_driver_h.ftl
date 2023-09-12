@@ -1,11 +1,12 @@
 [#ftl]
 
 [#assign  sd_instance = "0"]
-[#assign  maintain_cpu_cache = "1"]
+[#assign  maintain_cpu_cache = "0"]
+[#assign  use_dma = "0"]
 
 [#assign  sector_size = "512"]
 [#assign  sd_init = "1"]
-
+[#assign FX_STANDALONE_ENABLE_value = "3"]
 [#compress]
 [#list SWIPdatas as SWIP]
 [#if SWIP.defines??]
@@ -15,20 +16,29 @@
     [#if name == "GLUE_FUNCTIONS"]
       [#assign glue_functions = value]
     [/#if]
-	[#if name == "SD_INSTANCE"]
+	[#if name == "SDMMC_INSTANCE"]
       [#assign sd_instance = value]
     [/#if]
+	[#if name == "USE_SD_DMA"]
+      [#if value.contains("1")]
+        [#assign use_dma = "1"]
+      [/#if]
+    [/#if]
+
     [#if name == "ENABLE_CACHE_MAINTENANCE"]
-      [#if value.contains("false")]
-        [#assign maintain_cpu_cache = "0"]
+      [#if value.contains("true")]
+        [#assign maintain_cpu_cache = "1"]
       [/#if]
     [/#if]
     [#if name == "SD_SECTOR_SIZE"]
       [#assign sector_size = value]
     [/#if]
-    [#if name == "FX_DRIVER_SD_INIT"]
+    [#if name == "FX_DRIVER_SDMMC_INIT"]
       [#assign sd_init = value]
     [/#if]
+	[#if name == "FX_STANDALONE_ENABLE"]
+		[#assign FX_STANDALONE_ENABLE_value = value]
+	[/#if]
     [/#list]
 [/#if]
 [/#list]
@@ -65,13 +75,15 @@ extern "C" {
 /* Exported constants --------------------------------------------------------*/
 
 /* Default timeout used to wait for fx operations */
-#define FX_STM32_SD_DEFAULT_TIMEOUT                         (10 * TX_TIMER_TICKS_PER_SECOND)
-
-/* SD instance default to 0 */
-#define FX_STM32_SD_INSTANCE                                ${sd_instance}
+[#if FX_STANDALONE_ENABLE_value == "0"]
+#define FX_STM32_SD_DEFAULT_TIMEOUT                           (10 * TX_TIMER_TICKS_PER_SECOND)
+[/#if]
+[#if FX_STANDALONE_ENABLE_value == "1"]
+#define FX_STM32_SD_DEFAULT_TIMEOUT                           (10 * 1000)
+[/#if]
 
 /* Default SD sector size typically 512 for uSD */
-#define FX_STM32_SD_DEFAULT_SECTOR_SIZE                     512
+#define FX_STM32_SD_DEFAULT_SECTOR_SIZE                    	512
 
 /* let the filex low-level driver initialize the SD driver */
 #define FX_STM32_SD_INIT                                    ${sd_init}
@@ -80,14 +92,19 @@ extern "C" {
 /* Use the SD DMA API, when enabled cache maintenance
  * may be required
  */
-#define FX_STM32_SD_DMA_API                                   0
+#define FX_STM32_SD_DMA_API									${use_dma}
 
 /* Enable the cache maintenance, needed when using SD DMA
  * and accessing buffers in cacheable area
  * this is valid only for CM7 based products or those
  * with dedicated cache IP.
+ * For STM32U5 this flag should be always set to 0 unless external
+ * memories are being used.
  */
-#define FX_STM32_SD_CACHE_MAINTENANCE                         0
+#define FX_STM32_SD_CACHE_MAINTENANCE						${maintain_cpu_cache}
+
+/* SD instance default to 0 */
+#define FX_STM32_SD_INSTANCE                                ${sd_instance}
 
 /* USER CODE BEGIN EC */
 
@@ -95,26 +112,20 @@ extern "C" {
 
 /* Exported macro ------------------------------------------------------------*/
 /* USER CODE BEGIN EM */
+
 /* USER CODE END EM */
 
-#if (FX_STM32_SD_CACHE_MAINTENANCE == 1)
-[#if FamilyName?lower_case?contains("stm32u5")]
-/* USER CODE BEGIN CACHE_MAINTENANCE_MACROS  */
-#if defined (HAL_DCACHE_MODULE_ENABLED)
-extern DCACHE_HandleTypeDef hdcache1;
-#define invalidate_cache_by_addr(__ptr__, __size__)           HAL_DCACHE_InvalidateByAddr(&hdcache1, (UINT *)__ptr__, (UINT)__size__)
-#define clean_cache_by_addr(__ptr__, __size__)                HAL_DCACHE_CleanByAddr(&hdcache1, (UINT *)__ptr__, (UINT)__size__)
-#endif
-/* USER CODE END CACHE_MAINTENANCE_MACROS  */
-[/#if]
-
-#endif
 
 /* Get the current time in ticks */
 
 /* USER CODE BEGIN FX_STM32_SD_CURRENT_TIME */
 
-#define FX_STM32_SD_CURRENT_TIME                                     tx_time_get
+[#if FX_STANDALONE_ENABLE_value == "0"]
+#define FX_STM32_SD_CURRENT_TIME()                          tx_time_get()
+[/#if]
+[#if FX_STANDALONE_ENABLE_value == "1"]
+#define FX_STM32_SD_CURRENT_TIME()                          HAL_GetTick()
+[/#if]
 
 /* USER CODE END FX_STM32_SD_CURRENT_TIME */
 
@@ -179,7 +190,7 @@ extern DCACHE_HandleTypeDef hdcache1;
 /* USER CODE BEGIN FX_STM32_SD_READ_CPLT_NOTIFY */
 
 /* Define how to notify about Read completion operation */
-#define FX_STM32_SD_READ_CPLT_NOTIFY
+#define FX_STM32_SD_READ_CPLT_NOTIFY()
 
 /* USER CODE END FX_STM32_SD_READ_CPLT_NOTIFY */
 
@@ -187,7 +198,7 @@ extern DCACHE_HandleTypeDef hdcache1;
 /* USER CODE BEGIN FX_STM32_SD_WRITE_CPLT_NOTIFY */
 
 /* Define how to notify about write completion operation */
-#define FX_STM32_SD_WRITE_CPLT_NOTIFY
+#define FX_STM32_SD_WRITE_CPLT_NOTIFY()
 
 /* USER CODE END FX_STM32_SD_WRITE_CPLT_NOTIFY */
 

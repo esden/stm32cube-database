@@ -276,8 +276,13 @@
         </RefParameter>
         
         <!-- Autonomous Mode with Parameters __begin -->
+        <RefParameter Comment="Autonomous Mode" DefaultValue="AUTONOMOUS_MODE_ENABLE" Group="Advanced Parameters" Name="AutonomousMode" Type="list">
+            <Condition Diagnostic="" Expression="STM32U5 &amp; $IpInstance_Asynchronous &amp; !$IpInstance_FlowControl &amp; !S_$IpInstance_RX &amp; S_LPBAM_CONF"/>
+            <PossibleValue Comment="Enable " Value="AUTONOMOUS_MODE_ENABLE"/>
+        </RefParameter>
+        
         <RefParameter Comment="Autonomous Mode" DefaultValue="AUTONOMOUS_MODE_DISABLE" Group="Advanced Parameters" Name="AutonomousMode" Type="list">
-            <Condition Diagnostic="" Expression="STM32U5 &amp; $IpInstance_Asynchronous &amp; !$IpInstance_FlowControl &amp; !S_$IpInstance_RX"/>
+            <Condition Diagnostic="" Expression="STM32U5 &amp; $IpInstance_Asynchronous &amp; !$IpInstance_FlowControl &amp; !S_$IpInstance_RX &amp; !S_LPBAM_CONF"/>
             <PossibleValue Comment="Disable " Value="AUTONOMOUS_MODE_DISABLE"/>
             <PossibleValue Comment="Enable " Value="AUTONOMOUS_MODE_ENABLE"/>
         </RefParameter>
@@ -338,6 +343,40 @@
             <PossibleValue Comment="Disable" Value="UART_IDLE_FRAME_DISABLE"/>
         </RefParameter>
         <!-- Autonomous Mode  __end. -->
+
+
+<!-- LPBAM specific config -->
+ 
+<RefParameter Name="Interrupt1" Comment="Overrun Error, Framing Error, Noise Error"   DefaultValue="DISABLE"  Type="list" Group="IP Internal Interrupt" TabName="Advanced Settings for LPBAM">
+        <Description>description</Description>
+        <PossibleValue Comment="Enable" Value="UART_IT_ERR"/>
+        <PossibleValue Comment="Disable" Value="DISABLE"/>
+</RefParameter>
+
+<RefParameter Name="Interrupt2" Comment="Parity Error (When parity bit is enabled)"   DefaultValue="DISABLE"  Type="list" Group="IP Internal Interrupt" TabName="Advanced Settings for LPBAM">
+        <Description>description</Description>
+        <PossibleValue Comment="Enable" Value="UART_IT_PE"/>
+        <PossibleValue Comment="Disable" Value="DISABLE"/>
+</RefParameter>
+
+
+
+
+<RefParameter Comment="Interrupt parameter for code generation __HAL_DAC_ENABLE_IT" DefaultValue="/+Interrupt1+|Interrupt2/\|DISABLE//DISABLE\|//"  Type="list"  Name="ORingInterrupt"  Visible="false">
+      <Condition Diagnostic="" Expression="!((Interrupt1=DISABLE) &amp; (Interrupt2=DISABLE))"/> 
+</RefParameter>
+<RefParameter  Comment="Interrupt parameter for code generation __HAL_DAC_ENABLE_IT" DefaultValue="__NULL" Name="ORingInterrupt" Type="String" >
+               <Condition Diagnostic="" Expression="(Interrupt1=DISABLE) &amp; (Interrupt2=DISABLE)"/> 
+ </RefParameter>
+
+
+<RefMode Name="LPBAMSPECIFIC">
+        <ConfigForMode>LPBAM_ADD_HALCONFIG</ConfigForMode>
+        <Parameter Name="Interrupt1"/>
+        <Parameter Name="Interrupt2"/>
+ </RefMode>
+<!-- LPBAM specific config -->
+
 
 	<!-- RefMode for Asynchronous UART -->
 	<RefMode HalMode="UART" Name="Asynchronous">
@@ -515,74 +554,92 @@
 	</RefMode>
 	<!-- Modes Description for LPUART -->
 	<ModeLogicOperator Name="OR">
-		<Mode Name="Mode">
-			<ModeLogicOperator Name="XOR">
-				<Mode Name="Asynchronous">
-					<SignalLogicalOp Name="AND">
-						<Signal IOMode="AlternateFunctionPushPullUp" Name="RX"/>
-						<Signal IOMode="AlternateFunctionPushPullUp" Name="TX"/>
-					</SignalLogicalOp>
-					<Semaphore>$IpInstance_Asynchronous</Semaphore>
-					<Semaphore>Asynchronous</Semaphore>
-				</Mode>
-				<Mode Name="Half_duplex(single_wire_mode)" UserName="Single Wire (Half-Duplex)">
-					<SignalLogicalOp Name="AND">
-						<Signal IOMode="AlternateFunctionOpenDrain" Name="TX"/>
-					</SignalLogicalOp>
-				</Mode>
-				<Mode Name="Multiprocessor_communication" UserName="Multiprocessor Communication">
-					<SignalLogicalOp Name="AND">
-						<Signal Name="RX"/>
-						<Signal Name="TX"/>
-					</SignalLogicalOp>
-				</Mode>			
-			</ModeLogicOperator>
-                        <Semaphore>S_LPUART</Semaphore>
-		</Mode>
-		<Mode Name="Hardware Flow Control (RS232)">
-			<ModeLogicOperator Name="XOR">
-				<Mode Name="CTS_Only" UserName="CTS Only">
-					<SignalLogicalOp Name="AND">
-						<Signal Name="CTS"/>
-					</SignalLogicalOp>
-					<Semaphore>$IpInstance_Clear</Semaphore>
-				</Mode>
-				<Mode Name="RTS_Only" UserName="RTS Only">
-					<SignalLogicalOp Name="AND">
-						<Signal Name="RTS"/>
-					</SignalLogicalOp>
-					<Semaphore>$IpInstance_Request</Semaphore>
-				</Mode>
-				<Mode Name="CTS_RTS" UserName="CTS/RTS">
-					<SignalLogicalOp Name="AND">
-						<Signal Name="CTS"/>
-						<Signal Name="RTS"/>
-					</SignalLogicalOp>
-					<Semaphore>$IpInstance_CTS_RTS</Semaphore>
-				</Mode>
-			</ModeLogicOperator>
-			<Condition Diagnostic="Active only with Asynchronous Mode" Expression="$IpInstance_Asynchronous &amp; !$IpInstance_HardwareControl"/>
-			<Semaphore>$IpInstance_FlowControl</Semaphore>
-                        <Semaphore>S_LPUART</Semaphore>
-		</Mode>
-		<Mode Name="Hardware Flow Control (RS485)">
-		    <ModeLogicOperator Name="XOR">
-				 <Mode Name="Hardware Flow Control (RS485)">
-					<SignalLogicalOp Name="AND">
-						<Signal Name="DE"/>
-					</SignalLogicalOp>
-		        </Mode>
-		    </ModeLogicOperator>
-		<Condition Diagnostic="Active only with Asynchronous Mode" Expression="!$IpInstance_FlowControl &amp; $IpInstance_Asynchronous"/>
-		<Semaphore>$IpInstance_HardwareControl</Semaphore>
+            <Mode Name="Mode">
+                <ModeLogicOperator Name="XOR">
+                    <Mode Name="Asynchronous">
+                        <SignalLogicalOp Name="AND">
+                            <Signal IOMode="AlternateFunctionPushPullUp" Name="RX"/>
+                            <Signal IOMode="AlternateFunctionPushPullUp" Name="TX"/>
+                        </SignalLogicalOp>
+                        <Semaphore>$IpInstance_Asynchronous</Semaphore>
+                        <Semaphore>Asynchronous</Semaphore>
+                    </Mode>
+                    <Mode Name="Half_duplex(single_wire_mode)" UserName="Single Wire (Half-Duplex)">
+                        <Condition Diagnostic="Not available when configuring IP from LPBAM context" Expression="!S_LPBAM_CONF"/>
+                            <SignalLogicalOp Name="AND">
+                                    <Signal IOMode="AlternateFunctionOpenDrain" Name="TX"/>
+                            </SignalLogicalOp>
+                    </Mode>
+                    <Mode Name="Multiprocessor_communication" UserName="Multiprocessor Communication">
+                        <Condition Diagnostic="Not available when configuring IP from LPBAM context" Expression="!S_LPBAM_CONF"/>
+                        <SignalLogicalOp Name="AND">
+                            <Signal Name="RX"/>
+                            <Signal Name="TX"/>
+                        </SignalLogicalOp>
+                    </Mode>			
+                </ModeLogicOperator> 
                 <Semaphore>S_LPUART</Semaphore>
-		</Mode>
+            </Mode>
+            <Mode Name="Hardware Flow Control (RS232)">
+                <ModeLogicOperator Name="XOR">
+                    <Mode Name="CTS_Only" UserName="CTS Only">
+                        <SignalLogicalOp Name="AND">
+                            <Signal Name="CTS"/>
+                        </SignalLogicalOp>
+                        <Semaphore>$IpInstance_Clear</Semaphore>
+                    </Mode>
+                    <Mode Name="RTS_Only" UserName="RTS Only">
+                        <SignalLogicalOp Name="AND">
+                            <Signal Name="RTS"/>
+                        </SignalLogicalOp>
+                        <Semaphore>$IpInstance_Request</Semaphore>
+                    </Mode>
+                    <Mode Name="CTS_RTS" UserName="CTS/RTS">
+                        <SignalLogicalOp Name="AND">
+                            <Signal Name="CTS"/>
+                            <Signal Name="RTS"/>
+                        </SignalLogicalOp>
+                        <Semaphore>$IpInstance_CTS_RTS</Semaphore>
+                    </Mode>
+                </ModeLogicOperator>
+                <Condition Diagnostic="Active only with Asynchronous Mode" Expression="$IpInstance_Asynchronous &amp; !$IpInstance_HardwareControl &amp; !S_LPBAM_CONF"/>
+                <Semaphore>$IpInstance_FlowControl</Semaphore>
+                <Semaphore>S_LPUART</Semaphore>
+            </Mode>
+            <Mode Name="Hardware Flow Control (RS485)">
+                <ModeLogicOperator Name="XOR">
+                    <Mode Name="Hardware Flow Control (RS485)">
+                        <SignalLogicalOp Name="AND">
+                            <Signal Name="DE"/>
+                        </SignalLogicalOp>
+                    </Mode>
+                </ModeLogicOperator>
+                <Condition Diagnostic="Active only with Asynchronous Mode" Expression="!$IpInstance_FlowControl &amp; $IpInstance_Asynchronous &amp; !S_LPBAM_CONF"/>
+                <Semaphore>$IpInstance_HardwareControl</Semaphore>
+                <Semaphore>S_LPUART</Semaphore>
+            </Mode>
+
+<!-- LPBAM specific config -->
+            <Mode Name="LPBAMSPECIFICTOP" UserName="LPBAM Advanced Settings" RemoveDisable="true" RemoveCondition="!($Index=1)"> <!-- only LPUART1 is managed by LPBAM-->
+                <Condition Diagnostic="only available when configurring IP from LPBAM context" Expression="S_LPBAM_CONF &amp; (S_LPUART)"/>
+                <ModeLogicOperator Name="XOR">
+                    <Mode Name="LPBAMSPECIFIC" UserName="">
+                        <SignalLogicalOp Name="AND">
+                            <Signal Name="VS_LPUART_LPBAM"/>
+                        </SignalLogicalOp>
+                    </Mode>
+                </ModeLogicOperator>
+            </Mode>
+ <!-- LPBAM specific config -->
 	</ModeLogicOperator>
+        
 	<!-- RefSignal for LPUART -->
 	<RefSignal IOMode="AlternateFunctionPushPull" Name="CTS"/>
 	<RefSignal IOMode="AlternateFunctionPushPull" Name="RTS"/>
 	<RefSignal IOMode="AlternateFunctionPushPull" Name="DE"/>
 	<RefSignal IOMode="AlternateFunctionPushPullUp" Name="RX"/>
 	<RefSignal IOMode="AlternateFunctionPushPullUp" Name="TX"/>
+	<RefSignal Name="VS_LPUART_LPBAM" Virtual="true"/> <!-- LPBAM specific config -->
+
 	<Semaphore>LPUARTUsed_ForRCC</Semaphore>    
 </IP>

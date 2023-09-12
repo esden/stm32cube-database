@@ -61,11 +61,14 @@
 		<Parameter Added="true" Name="LX_DRIVER_CALLS_OSPI_INIT"/>
         <Parameter Added="true" Name="LX_DRIVER_ERASES_OSPI_AFTER_INIT"/>
         <Parameter Added="true" Name="LX_OSPI_USE_BSP_API"/>
+		<Parameter Added="true" Name="LX_USE_OCTOSPI"/>
 		<Parameter Name="LX_OctoSPI_Memory_Interface">
 			<PossibleValue>1</PossibleValue>
 		</Parameter>
 		<Parameter Added="true" Name="GLUE_FUNCTIONS"/>
 		<Parameter Added="true" Name="TRANSFER_NOTIFICATION"/>
+		<BspDependency Name="OSPI Component" Comment="OctoSPI driver" BspIpName="" BspModeName="" Api="BSP_COMPONENT_DRIVER" Component="MX25LM51245G" Semaphore="SEMA_MX25LM51245G"/>
+		<BspDependency Name="OSPI Component" Comment="OctoSPI driver" BspIpName="" BspModeName="" Api="BSP_COMPONENT_DRIVER" Component="custom" Semaphore="SEMA_CUSTOM"/>
     </RefMode>
 	
 	<ModeLogicOperator Name="OR">
@@ -76,7 +79,6 @@
 						<Signal Name="VS_FileOoSystemJjLevelXJjNOR"/>
 					</SignalLogicalOp>
 					<Semaphore>SEMLevelXCcFileOoSystemJjLevelXJjNOROoFlashOoSupport</Semaphore>
-					<Condition Expression="SEMThreadXCcRTOSJjThreadXJjCore" Diagnostic="&lt;b&gt; Require: &lt;/b&gt; Middleware:THREADX:Core"/>
 				</Mode>
 			</ModeLogicOperator>
 		</Mode>
@@ -87,7 +89,6 @@
 						<Signal Name="VS_FileOoSystemJjLevelXJjNAND"/>
 					</SignalLogicalOp>
 					<Semaphore>SEMLevelXCcFileOoSystemJjLevelXJjNANDOoFlashOoSupport</Semaphore>
-					<Condition Expression="SEMThreadXCcRTOSJjThreadXJjCore" Diagnostic="&lt;b&gt; Require: &lt;/b&gt; Middleware:THREADX:Core"/> 	
 				</Mode>
 			</ModeLogicOperator>
 		</Mode>
@@ -149,15 +150,19 @@
 								<Signal Name="VS_OctoSPIOomemoryOointerface"/>
 							</SignalLogicalOp>
 							<Semaphore>SEMInterfacesCcFileOoSystemJjLevelXOoOctoSPIOomemoryOointerface</Semaphore>
-							<Condition Expression="SEMLevelXCcFileOoSystemJjLevelXJjNOROoFlashOoSupport &amp; (Sem_OCTOSPI1_Octo | Sem_OCTOSPI2_Octo)"  
-							Diagnostic="&lt;b&gt; Require: &lt;/b&gt; &lt;br&gt;  Middleware:LEVELX:NOR Flash Support and &lt;br&gt; Device:OctoSPI:Octo SPI"/>
+							<Condition Expression="SEMLevelXCcFileOoSystemJjLevelXJjNOROoFlashOoSupport &amp; (Sem_OCTOSPI1_Octo | Sem_OCTOSPI2_Octo | 
+							Sem_OCTOSPI1_Single | Sem_OCTOSPI2_Single | Sem_OCTOSPI1_Dual | Sem_OCTOSPI2_Dual | Sem_OCTOSPI1_Quad | Sem_OCTOSPI2_Quad | 
+							Sem_OCTOSPI1_DualSingle | Sem_OCTOSPI2_DualSingle | Sem_OCTOSPI1_DualDual | Sem_OCTOSPI2_DualDual | 
+							Sem_OCTOSPI1_DualQuad | Sem_OCTOSPI2_DualQuad | Sem_OCTOSPI1_HyperBus | Sem_OCTOSPI2_HyperBus | s_o1_singlemx | s_o1_dualmx |
+							s_o1_quadmx | s_o1_dualsinglemx | s_o1_dualdualmx | s_o1_dualquadmx | s_o1_octomx | s_o1_hyperbusmx | s_o2_singlemx | s_o2_dualmx |
+							s_o2_quadmx | s_o2_dualsinglemx | s_o2_dualdualmx | s_o2_dualquadmx | s_o2_octomx | s_o2_hyperbusmx)"  
+							Diagnostic="&lt;b&gt; Require: &lt;/b&gt; &lt;br&gt;  Middleware:LEVELX:NOR Flash Support and &lt;br&gt; Device:OctoSPI:* (except MULTIPLEXED)"/>
 						</Mode>
 					</ModeLogicOperator>
 				</Mode>
 			</ModeLogicOperator>
 		</Mode>
 	</ModeLogicOperator>
-	<Condition Expression="SEMThreadXCcRTOSJjThreadXJjCore" Diagnostic="&lt;b&gt; Require: &lt;/b&gt; Middleware:THREADX:Core"/>
 
 	<RefSignal Name="VS_FileOoSystemJjLevelXJjNOR" Virtual="true"/>
 	<RefSignal Name="VS_FileOoSystemJjLevelXJjNAND" Virtual="true"/>
@@ -195,11 +200,11 @@ The minimum size is 8 and all values must be a power of 2.</Description>
 	
 	<RefParameter Added="true" Comment="LX_THREAD_SAFE_ENABLE" DefaultValue="0" Group="Core" Name="LX_THREAD_SAFE_ENABLE" TabName="LevelX" Type="list">
         <Description>Defined, this makes LevelX thread-safe by using a ThreadX mutex object throughout the API.</Description>
-        <PossibleValue Comment="Disabled" Value="0"/>
-        <PossibleValue Comment="Enabled" Value="1"/>
+		<PossibleValue Comment="Disabled" Value="0"/>
+		<PossibleValue Comment="Enabled" Value="1" Condition="!SEMThreadXCcRTOSJjThreadXJjCore" Diagnostic="Enabled only with RTOS Mode" Action="0"/>
     </RefParameter>
 	
-	<RefParameter Added="true" Comment="LevelX version" DefaultValue="6.1.6" Group="Version" Name="LevelX_Version" TabName="LevelX" Type="string">
+	<RefParameter Added="true" Comment="LevelX version" DefaultValue="6.1.9" Group="Version" Name="LevelX_Version" TabName="LevelX" Type="string">
         <Description>LevelX version</Description>
     </RefParameter>
    
@@ -222,7 +227,7 @@ The minimum size is 8 and all values must be a power of 2.</Description>
 		<PossibleValue Comment="SRAM2_BASE_NS (0x20030000UL)" Value="SRAM2_BASE_NS" />
 		<PossibleValue Comment="SRAM3_BASE_NS (0x20040000UL)" Value="SRAM3_BASE_NS" />
 		<PossibleValue Comment="SRAM4_BASE_NS (0x28000000UL)" Value="SRAM4_BASE_NS" />
-		<Condition Diagnostic="U5 disk size" Expression="DIE482"/>
+		<Condition Diagnostic="U5 disk size" Expression="DIE482 | DIE481"/>
     </RefParameter>	
 	<RefParameter Added="true" Comment="NOR Simulator Base Address" DefaultValue="0x20000000" Group="NOR Simulator Driver" Max="0x20030000" Min="0x20000000" Name="LX_NOR_SIM_BASE_ADDRESS" TabName="LevelX" Type="Hex" Unit="">
         <Description>the base address from which the NOR flash starts</Description>
@@ -273,10 +278,16 @@ The minimum size is 8 and all values must be a power of 2.</Description>
 	
 	<RefParameter Added="true" Comment="OctoSPI Instance" DefaultValue="0" Group="NOR OctoSPI driver" Name="LX_OSPI_INSTANCE" TabName="LevelX" Type="list" >
         <Description>the Octo SPI instance.</Description>
-		<PossibleValue Comment="OCTOSPI1" Condition="!(Sem_OCTOSPI1_Octo)" Diagnostic="Available only when OCTOSPI1 is activated in OCTO mode. If trust zone is enabled OCTOSPI1 must be activated in non secure context." Value="0"/>
-        <PossibleValue Comment="OCTOSPI2" Condition="!(Sem_OCTOSPI2_Octo)" Diagnostic="Available only when OCTOSPI2 is activated in OCTO mode. If trust zone is enabled OCTOSPI2 must be activated in non secure context." Value="1"/>
+		<PossibleValue Comment="OCTOSPI1" Condition="!(Sem_OCTOSPI1_Octo | Sem_OCTOSPI1_Single | Sem_OCTOSPI1_Dual | Sem_OCTOSPI1_Quad | 
+							Sem_OCTOSPI1_DualSingle | Sem_OCTOSPI1_DualDual | Sem_OCTOSPI1_DualQuad | Sem_OCTOSPI1_HyperBus | s_o1_singlemx | s_o1_dualmx |
+							s_o1_quadmx | s_o1_dualsinglemx | s_o1_dualdualmx | s_o1_dualquadmx | s_o1_octomx | s_o1_hyperbusmx)" 
+							Diagnostic="Available only when OCTOSPI1 is activated in OCTO mode. If trust zone is enabled OCTOSPI1 must be activated in non secure context." Value="0"/>
+        <PossibleValue Comment="OCTOSPI2" Condition="!(Sem_OCTOSPI2_Octo | Sem_OCTOSPI2_Single | Sem_OCTOSPI2_Dual | Sem_OCTOSPI2_Quad | 
+							Sem_OCTOSPI2_DualSingle | Sem_OCTOSPI2_DualDual | Sem_OCTOSPI2_DualQuad | Sem_OCTOSPI2_HyperBus | s_o2_singlemx | s_o2_dualmx |
+							s_o2_quadmx | s_o2_dualsinglemx | s_o2_dualdualmx | s_o2_dualquadmx | s_o2_octomx | s_o2_hyperbusmx)" 
+							Diagnostic="Available only when OCTOSPI2 is activated in OCTO mode. If trust zone is enabled OCTOSPI2 must be activated in non secure context." Value="1"/>
     </RefParameter>
-	<RefParameter Added="true" Comment="Driver calls OctoSPI Init" DefaultValue="1" Group="NOR OctoSPI driver" Name="LX_DRIVER_CALLS_OSPI_INIT" TabName="LevelX" Type="list">
+	<RefParameter Added="true" Comment="Driver calls OctoSPI Init" DefaultValue="0" Group="NOR OctoSPI driver" Name="LX_DRIVER_CALLS_OSPI_INIT" TabName="LevelX" Type="list">
         <Description>the LevelX OctoSPI interface intialializes the OSPI hw memory. If true, the parameter &lt;b&gt; Driver Erases the OctoSPI after init &lt;/b&gt; will be available.</Description>
         <PossibleValue Comment="false" Value="0"/>
         <PossibleValue Comment="true" Value="1"/>
@@ -286,7 +297,6 @@ The minimum size is 8 and all values must be a power of 2.</Description>
 		</Description>
         <PossibleValue Comment="false" Value="0"/>
         <PossibleValue Comment="true" Value="1"/>
-        <Condition Diagnostic="" Expression="LX_DRIVER_CALLS_OSPI_INIT = 1"/>
     </RefParameter>
 	<RefParameter Added="true" Comment="Use BSP/OSPI API" DefaultValue="false" Group="NOR OctoSPI driver" Name="LX_OSPI_USE_BSP_API" TabName="LevelX" Type="string" Visible="false">
         <Description>When set to 1 the LevelX octoSPI driver will use the BSP/OctoSPI API provided by the STM32Cube_FW under &lt;b&gt; "Drivers/BSP/{borad_name}_ospi.[c/h]"&lt;/b&gt; &lt;br&gt;
@@ -303,18 +313,24 @@ When Set the 0 the user needs to implment the following API at application level
  &lt;/ul&gt;</Description>
     </RefParameter>
 
-<RefParameter Added="true" Comment="Glue Function Implementation" DefaultValue="Custom" Group="NOR OctoSPI driver" Name="GLUE_FUNCTIONS" TabName="FileX" Type="list" Visible="false">
+	<RefParameter Added="true" Comment="Glue Function Implementation" DefaultValue="Custom" Group="NOR OctoSPI driver" Name="GLUE_FUNCTIONS" TabName="LevelX" Type="list" Visible="true">
         <Description></Description>
         <PossibleValue Comment="HAL DMA API" Semaphore="OSPI_DMA_API" Value="DMA_API"/>
-        <PossibleValue Comment="HAL IT API" Semaphore="OSPI_IT_API" Value="IT_API"/>
-        <PossibleValue Comment="HAL POLLING API" Semaphore="OSPI_POLLING_API" Value="POLLING_API"/>
+        <!-- <PossibleValue Comment="HAL IT API" Semaphore="OSPI_IT_API" Value="IT_API"/> -->
+        <!-- <PossibleValue Comment="HAL POLLING API" Semaphore="OSPI_POLLING_API" Value="POLLING_API"/> -->
         <PossibleValue Comment="Custom" Semaphore="OSPI_CUSTOM_API" Value="Custom"/>
     </RefParameter>
-    <RefParameter Added="true" Comment="Transfer Completion Notification" DefaultValue="Custom" Group="NOR OctoSPI driver" Name="TRANSFER_NOTIFICATION" TabName="FileX" Type="list" Visible="false">
+    <RefParameter Added="true" Comment="Transfer Completion Notification" DefaultValue="Custom" Group="NOR OctoSPI driver" Name="TRANSFER_NOTIFICATION" TabName="LevelX" Type="list" Visible="true">
         <Description></Description>
-        <Condition Diagnostic="" Expression="(GLUE_FUNCTIONS &lt;&gt; POLLING_API)"/>
-        <PossibleValue Comment="ThreadX Semaphore" Semaphore="SD_THREADX_SEMAPHORE_NOTIFICATION" Value="ThreadX_Semaphore"/>
+        <PossibleValue Comment="ThreadX Semaphore" Semaphore="OSPI_THREADX_SEMAPHORE_NOTIFICATION" Value="ThreadX_Semaphore" Condition="!OSPI_DMA_API" />
         <PossibleValue Comment="Custom" Semaphore="SD_CUSTOM_NOTIFICATION" Value="Custom"/>
+		<Condition Diagnostic="" Expression="(GLUE_FUNCTIONS=DMA_API &amp; SEMThreadXCcRTOSJjThreadXJjCore)" />
+    </RefParameter>
+	<RefParameter Added="true" Comment="Transfer Completion Notification" DefaultValue="Custom" Group="NOR OctoSPI driver" Name="TRANSFER_NOTIFICATION" TabName="LevelX" Type="list" Visible="true">
+        <Description></Description>
+        <PossibleValue Comment="Global state variables" Semaphore="OSPI_GLOBALE_STAT_VARIABLE_NOTIFICATION" Value="Global_state_variables" Condition="!OSPI_DMA_API" />
+        <PossibleValue Comment="Custom" Semaphore="SD_CUSTOM_NOTIFICATION" Value="Custom"/>
+		<Condition Diagnostic="" Expression="(GLUE_FUNCTIONS=DMA_API &amp; !SEMThreadXCcRTOSJjThreadXJjCore)" />
     </RefParameter>
     
 	<RefParameter Name="LX_NOR_Flash_Support" Comment="" DefaultValue="0" Type="integer" Min="0" Max="1" Group="" TabName="" Visible="false">
@@ -337,5 +353,70 @@ When Set the 0 the user needs to implment the following API at application level
 	</RefParameter>
 	<RefParameter Name="LX_OctoSPI_Memory_Interface" Comment="" DefaultValue="0" Type="integer" Min="0" Max="1" Group="" TabName="" Visible="false">
 		<Description></Description>		
+	</RefParameter>
+
+	<RefParameter Name="LX_USE_OCTOSPI" Comment="LX_USE_OCTOSPI" DefaultValue="single SPI" Type="list"  Group="NOR OctoSPI driver" TabName="LevelX" Visible="false">
+		<Description></Description>
+		<Condition Diagnostic="" Expression="Sem_OCTOSPI1_Single | Sem_OCTOSPI2_Single"/>
+	</RefParameter>
+	<RefParameter Name="LX_USE_OCTOSPI" Comment="LX_USE_OCTOSPI" DefaultValue="single SPI mx" Type="list"  Group="NOR OctoSPI driver" TabName="LevelX" Visible="false">
+		<Description></Description>
+		<Condition Diagnostic="" Expression="s_o1_singlemx | s_o2_singlemx"/>
+	</RefParameter>
+	<RefParameter Name="LX_USE_OCTOSPI" Comment="LX_USE_OCTOSPI" DefaultValue="dual SPI" Type="list"  Group="NOR OctoSPI driver" TabName="LevelX" Visible="false">
+		<Description></Description>
+		<Condition Diagnostic="" Expression="Sem_OCTOSPI1_Dual | Sem_OCTOSPI2_Dual"/>
+	</RefParameter>
+	<RefParameter Name="LX_USE_OCTOSPI" Comment="LX_USE_OCTOSPI" DefaultValue="dual SPI mx" Type="list"  Group="NOR OctoSPI driver" TabName="LevelX" Visible="false">
+		<Description></Description>
+		<Condition Diagnostic="" Expression="s_o1_dualmx | s_o2_dualmx"/>
+	</RefParameter>
+	<RefParameter Name="LX_USE_OCTOSPI" Comment="LX_USE_OCTOSPI" DefaultValue="quad SPI" Type="list"  Group="NOR OctoSPI driver" TabName="LevelX" Visible="false">
+		<Description></Description>
+		<Condition Diagnostic="" Expression="Sem_OCTOSPI1_Quad | Sem_OCTOSPI2_Quad"/>
+	</RefParameter>
+	<RefParameter Name="LX_USE_OCTOSPI" Comment="LX_USE_OCTOSPI" DefaultValue="quad SPI mx" Type="list"  Group="NOR OctoSPI driver" TabName="LevelX" Visible="false">
+		<Description></Description>
+		<Condition Diagnostic="" Expression="s_o1_quadmx | s_o2_quadmx"/>
+	</RefParameter>
+	<RefParameter Name="LX_USE_OCTOSPI" Comment="LX_USE_OCTOSPI" DefaultValue="octo SPI" Type="list"  Group="NOR OctoSPI driver" TabName="LevelX" Visible="false">
+		<Description></Description>
+		<Condition Diagnostic="" Expression="Sem_OCTOSPI1_Octo | Sem_OCTOSPI2_Octo"/>
+	</RefParameter>
+	<RefParameter Name="LX_USE_OCTOSPI" Comment="LX_USE_OCTOSPI" DefaultValue="octo SPI mx" Type="list"  Group="NOR OctoSPI driver" TabName="LevelX" Visible="false">
+		<Description></Description>
+		<Condition Diagnostic="" Expression="s_o1_octomx | s_o2_octomx"/>
+	</RefParameter>
+	<RefParameter Name="LX_USE_OCTOSPI" Comment="LX_USE_OCTOSPI" DefaultValue="dual-single SPI" Type="list"  Group="NOR OctoSPI driver" TabName="LevelX" Visible="false">
+		<Description></Description>
+		<Condition Diagnostic="" Expression="Sem_OCTOSPI1_DualSingle | Sem_OCTOSPI2_DualSingle"/>
+	</RefParameter>
+	<RefParameter Name="LX_USE_OCTOSPI" Comment="LX_USE_OCTOSPI" DefaultValue="dual-single SPI mx" Type="list"  Group="NOR OctoSPI driver" TabName="LevelX" Visible="false">
+		<Description></Description>
+		<Condition Diagnostic="" Expression="s_o1_dualsinglemx | s_o1_dualsinglemx"/>
+	</RefParameter>
+	<RefParameter Name="LX_USE_OCTOSPI" Comment="LX_USE_OCTOSPI" DefaultValue="dual-dual SPI" Type="list"  Group="NOR OctoSPI driver" TabName="LevelX" Visible="false">
+		<Description></Description>
+		<Condition Diagnostic="" Expression="Sem_OCTOSPI1_DualDual | Sem_OCTOSPI2_DualDual"/>
+	</RefParameter>
+	<RefParameter Name="LX_USE_OCTOSPI" Comment="LX_USE_OCTOSPI" DefaultValue="dual-dual SPI x" Type="list"  Group="NOR OctoSPI driver" TabName="LevelX" Visible="false">
+		<Description></Description>
+		<Condition Diagnostic="" Expression="s_o1_dualdualmx | s_o2_dualdualmx"/>
+	</RefParameter>
+	<RefParameter Name="LX_USE_OCTOSPI" Comment="LX_USE_OCTOSPI" DefaultValue="dual-quad SPI" Type="list"  Group="NOR OctoSPI driver" TabName="LevelX" Visible="false">
+		<Description></Description>
+		<Condition Diagnostic="" Expression="Sem_OCTOSPI1_DualQuad | Sem_OCTOSPI2_DualQuad"/>
+	</RefParameter>
+	<RefParameter Name="LX_USE_OCTOSPI" Comment="LX_USE_OCTOSPI" DefaultValue="dual-quad SPI mx" Type="list"  Group="NOR OctoSPI driver" TabName="LevelX" Visible="false">
+		<Description></Description>
+		<Condition Diagnostic="" Expression="s_o1_dualquadmx | s_o2_dualquadmx"/>
+	</RefParameter>
+	<RefParameter Name="LX_USE_OCTOSPI" Comment="LX_USE_OCTOSPI" DefaultValue="hyperBus" Type="list"  Group="NOR OctoSPI driver" TabName="LevelX" Visible="false">
+		<Description></Description>
+		<Condition Diagnostic="" Expression="Sem_OCTOSPI1_HyperBus | Sem_OCTOSPI2_HyperBus"/>
+	</RefParameter>
+	<RefParameter Name="LX_USE_OCTOSPI" Comment="LX_USE_OCTOSPI" DefaultValue="hyperBus mx" Type="list"  Group="NOR OctoSPI driver" TabName="LevelX" Visible="false">
+		<Description></Description>
+		<Condition Diagnostic="" Expression="s_o1_hyperbusmx | s_o2_hyperbusmx"/>
 	</RefParameter>
 </IP>

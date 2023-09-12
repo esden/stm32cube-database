@@ -7,7 +7,7 @@
     IncludeFile=""
     Name="Sigfox"
     RootFolder="Middlewares/Third_Party/"
-    Version="STM32Cube_FW_WL_V1.1.0">
+    Version="STM32Cube_FW_WL_V1.2.0">
 
     <RefConfig Comment="" Name="Sigfox_Init">
         <CallLibMethod Name="Sigfox_Init"/>
@@ -56,6 +56,7 @@
         <ConfigFile Name="APP_SIGFOX_H"/>
         <ConfigFile Name="APP_EE_C"/>
         <ConfigFile Name="APP_EE_H"/>
+        <ConfigFile Name="APP_EE_CONF_H"/>
         <ConfigFile Name="APP_SIGFOX_APP_C"/>
         <ConfigFile Name="APP_SIGFOX_APP_H"/>
         <ConfigFile Name="APP_SIGFOX_APP_VERSION_H"/>
@@ -129,6 +130,11 @@
         <ConfigFile Name="MBMUX_FEATURES_INFO_H"/>
         <ConfigFile Name="MBMUX_MBMUX_TABLE_H"/>
         <ConfigFile Name="MBMUX_MESSAGE_ID_H"/>
+
+        <!-- AzRTOS -->
+        <ConfigFile Name="RTOS_VARIABLES_SIGFOX_TMP"/>
+        <ConfigFile Name="RTOS_POOL_CREATE_SIGFOX_TMP"/>
+        <ConfigFile Name="RTOS_DEFINES_SIGFOX_TMP"/>
 
     </RefConfig>
 
@@ -220,7 +226,9 @@
         <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
         <Argument Name="FILL_UCS" GenericType="Simple" Comment=""/>
         <Argument Name="Activate_RADIO_BOARD_INTERFACE" GenericType="Simple" Comment=""/>
+<!--
         <Argument Name="Activate_BOARD_RESOURCES" GenericType="Simple" Comment=""/>
+-->
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="STM32_LPM_IF_H" Template="stm32wl/stm32_lpm_if_h.ftl" destinationFolder="Core/Inc/">
@@ -235,19 +243,25 @@
     <RefConfigFile Description="" Name="SYS_CONF_H" Template="stm32wl/sys_conf_h.ftl" destinationFolder="Core/Inc/">
         <File Category="header" Name="sys_conf.h" Version="1.0" Condition="!SEM_SGX_USER_APPLICATION"/>
         <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
-        <Argument Name="Activate_DEBUG_LINE" GenericType="Simple" Comment=""/>
         <Argument Name="VERBOSE_LEVEL" GenericType="Simple" Comment=""/>
         <Argument Name="APP_LOG_ENABLED" GenericType="Simple" Comment=""/>
+        <Argument Name="SENSOR_ENABLED" GenericType="Simple" Comment=""/>
         <Argument Name="DEBUGGER_ON" GenericType="Simple" Comment=""/>
         <Argument Name="LOW_POWER_DISABLE" GenericType="Simple" Comment=""/>
         <Argument Name="VERBOSE_LEVEL_CM4" GenericType="Simple" Comment=""/>
         <Argument Name="APP_LOG_ENABLED_CM4" GenericType="Simple" Comment=""/>
-        <Argument Name="DEBUGGER_ON_CM4" GenericType="Simple" Comment=""/>
+        <Argument Name="SENSOR_ENABLED_CM4" GenericType="Simple" Comment=""/>
         <Argument Name="LOW_POWER_DISABLE_CM4" GenericType="Simple" Comment=""/>
         <Argument Name="VERBOSE_LEVEL_CM0PLUS" GenericType="Simple" Comment=""/>
         <Argument Name="APP_LOG_ENABLED_CM0PLUS" GenericType="Simple" Comment=""/>
-        <Argument Name="DEBUGGER_ON_CM0PLUS" GenericType="Simple" Comment=""/>
         <Argument Name="LOW_POWER_DISABLE_CM0PLUS" GenericType="Simple" Comment=""/>
+        <Argument Name="DEBUG_SUBGHZSPI_MONITORING" GenericType="Simple" Comment=""/>
+        <Argument Name="DEBUG_RF_SMPSRDY" GenericType="Simple" Comment=""/>
+        <Argument Name="DEBUG_RF_NRESET" GenericType="Simple" Comment=""/>
+        <Argument Name="DEBUG_RF_HSE32RDY" GenericType="Simple" Comment=""/>
+        <Argument Name="DEBUG_RF_LDORDY" GenericType="Simple" Comment=""/>
+        <Argument Name="DEBUG_RF_DTB1" GenericType="Simple" Comment=""/>
+        <Argument Name="DEBUG_RF_BUSY" GenericType="Simple" Comment=""/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="SYS_SENSORS_H" Template="stm32wl/sys_sensors_h.ftl" destinationFolder="Core/Inc/">
@@ -269,7 +283,7 @@
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="NUCLEO_CONF_H" Template="stm32wl/stm32wlxx_nucleo_conf_h.ftl" destinationFolder="Core/Inc/">
-        <File Category="header" Name="stm32wlxx_nucleo_conf.h" Version="1.0" Condition="!SEM_M0PLUS &amp; !SEM_M4 &amp; !SEM_SGX_USER_APPLICATION"/>
+        <File Category="header" Name="stm32wlxx_nucleo_conf.h" Version="1.0" Condition="!SEM_M0PLUS &amp; !SEM_M4 &amp; !SEM_USER_BOARD_FOR_SIGFOX"/>
         <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
     </RefConfigFile>
 
@@ -336,6 +350,11 @@
 
     <RefConfigFile Description="" Name="APP_EE_H" Template="stm32wl/Sigfox_ee_h.ftl">
         <File Category="header" Name="App/ee.h" Version="1.0" Condition="!SEM_M4 &amp; !SEM_SGX_USER_APPLICATION"/>
+    </RefConfigFile>
+
+    <RefConfigFile Description="" Name="APP_EE_CONF_H" Template="stm32wl/Sigfox_ee_conf_h.ftl">
+        <File Category="header" Name="App/ee_conf.h" Version="1.0" Condition="!SEM_M4 &amp; !SEM_SGX_USER_APPLICATION"/>
+        <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="APP_SIGFOX_APP_C" Template="stm32wl/Sigfox_sgfx_app_c.ftl" >
@@ -615,7 +634,7 @@
 
 <!-- COMMON/Board Begin-->
     <RefConfigFile Description="" Name="NUCLEO_CONF_H" Template="stm32wl/stm32wlxx_nucleo_conf_h.ftl" destinationFolder="../Common/Board/">
-        <File Category="header" Name="stm32wlxx_nucleo_conf.h" Version="1.0" Condition="(SEM_M0PLUS | SEM_M4) &amp; !SEM_SGX_USER_APPLICATION" />
+        <File Category="header" Name="stm32wlxx_nucleo_conf.h" Version="1.0" Condition="(SEM_M0PLUS | SEM_M4) &amp; !SEM_USER_BOARD_FOR_SIGFOX" />
         <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
     </RefConfigFile>
 <!-- COMMON/Board end-->
@@ -651,6 +670,23 @@
     </RefConfigFile>
 
 <!-- COMMON/MbMux end-->
+
+<!-- AzRTOS Begin-->
+
+    <RefConfigFile Description="" Name="RTOS_VARIABLES_SIGFOX_TMP" Template="stm32wl/RTOS_variables_SIGFOX_tmp.ftl">
+        <File Category="header" Condition="S_RTOS_M4 | S_RTOS" Name="RTOS_variables_Sigfox.tmp" Version="1.0"/>
+    </RefConfigFile>
+
+    <RefConfigFile Description="" Name="RTOS_POOL_CREATE_SIGFOX_TMP" Template="stm32wl/RTOS_pool_create_SIGFOX_tmp.ftl">
+        <File Category="header" Condition="S_RTOS_M4 | S_RTOS" Name="RTOS_pool_create_Sigfox.tmp" Version="1.0"/>
+    </RefConfigFile>
+
+    <RefConfigFile Description="" Name="RTOS_DEFINES_SIGFOX_TMP" Template="stm32wl/RTOS_defines_SIGFOX_tmp.ftl">
+        <File Category="header" Condition="S_RTOS_M4 | S_RTOS" Name="RTOS_defines_Sigfox.tmp" Version="1.0"/>
+        <Argument Name="SIGFOX_APP_MEM_POOL_SIZE" GenericType="Simple" Comment=""/>
+    </RefConfigFile>
+
+<!-- AzRTOS end-->
 
 <!-- Platform Setting Begin -->
     <!-- BSP HMI Begin -->

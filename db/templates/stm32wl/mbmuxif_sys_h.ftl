@@ -64,24 +64,24 @@ extern "C" {
 /* -- FreeRTOS tasks configuration -- */
 [#if SUBGHZ_APPLICATION?contains("LORA")]
 /*Mailbox Lora*/
-#define CFG_MB_LORA_PROCESS_NAME                  "MB_LORA_PROCESS"
-#define CFG_MB_LORA_PROCESS_ATTR_BITS             (0)
-#define CFG_MB_LORA_PROCESS_CB_MEM                (0)
-#define CFG_MB_LORA_PROCESS_CB_SIZE               (0)
-#define CFG_MB_LORA_PROCESS_STACK_MEM             (0)
-#define CFG_MB_LORA_PROCESS_PRIORITY              osPriorityNone
-#define CFG_MB_LORA_PROCESS_STACk_SIZE            (128 * 10)
+#define CFG_MB_LORA_PROCESS_NAME                   "MB_LORA_PROCESS"
+#define CFG_MB_LORA_PROCESS_ATTR_BITS              (0)
+#define CFG_MB_LORA_PROCESS_CB_MEM                 (0)
+#define CFG_MB_LORA_PROCESS_CB_SIZE                (0)
+#define CFG_MB_LORA_PROCESS_STACK_MEM              (0)
+#define CFG_MB_LORA_PROCESS_PRIORITY               osPriorityNone
+#define CFG_MB_LORA_PROCESS_STACK_SIZE             (128 * 10)
 [/#if]
 
 [#if SUBGHZ_APPLICATION?contains("SIGFOX")]
 /*Mailbox Sigfox*/
-#define CFG_MB_SIGFOX_PROCESS_NAME                  "MB_SIGFOX_PROCESS"
-#define CFG_MB_SIGFOX_PROCESS_ATTR_BITS             (0)
-#define CFG_MB_SIGFOX_PROCESS_CB_MEM                (0)
-#define CFG_MB_SIGFOX_PROCESS_CB_SIZE               (0)
-#define CFG_MB_SIGFOX_PROCESS_STACK_MEM             (0)
-#define CFG_MB_SIGFOX_PROCESS_PRIORITY              osPriorityNone
-#define CFG_MB_SIGFOX_PROCESS_STACk_SIZE            (128 * 10)
+#define CFG_MB_SIGFOX_PROCESS_NAME                 "MB_SIGFOX_PROCESS"
+#define CFG_MB_SIGFOX_PROCESS_ATTR_BITS            (0)
+#define CFG_MB_SIGFOX_PROCESS_CB_MEM               (0)
+#define CFG_MB_SIGFOX_PROCESS_CB_SIZE              (0)
+#define CFG_MB_SIGFOX_PROCESS_STACK_MEM            (0)
+#define CFG_MB_SIGFOX_PROCESS_PRIORITY             osPriorityNone
+#define CFG_MB_SIGFOX_PROCESS_STACK_SIZE           (128 * 10)
 [/#if]
 
 /*Mailbox Radio*/
@@ -91,25 +91,25 @@ extern "C" {
 #define CFG_MB_RADIO_PROCESS_CB_SIZE               (0)
 #define CFG_MB_RADIO_PROCESS_STACK_MEM             (0)
 #define CFG_MB_RADIO_PROCESS_PRIORITY              osPriorityNone
-#define CFG_MB_RADIO_PROCESS_STACk_SIZE            (128 * 10)
+#define CFG_MB_RADIO_PROCESS_STACK_SIZE            (128 * 10)
 
 /*Mailbox Sys*/
-#define CFG_MB_SYS_PROCESS_NAME                  "MB_SYS_PROCESS"
-#define CFG_MB_SYS_PROCESS_ATTR_BITS             (0)
-#define CFG_MB_SYS_PROCESS_CB_MEM                (0)
-#define CFG_MB_SYS_PROCESS_CB_SIZE               (0)
-#define CFG_MB_SYS_PROCESS_STACK_MEM             (0)
-#define CFG_MB_SYS_PROCESS_PRIORITY              osPriorityNone
-#define CFG_MB_SYS_PROCESS_STACk_SIZE            (128 * 10)
+#define CFG_MB_SYS_PROCESS_NAME                    "MB_SYS_PROCESS"
+#define CFG_MB_SYS_PROCESS_ATTR_BITS               (0)
+#define CFG_MB_SYS_PROCESS_CB_MEM                  (0)
+#define CFG_MB_SYS_PROCESS_CB_SIZE                 (0)
+#define CFG_MB_SYS_PROCESS_STACK_MEM               (0)
+#define CFG_MB_SYS_PROCESS_PRIORITY                osPriorityNone
+#define CFG_MB_SYS_PROCESS_STACK_SIZE              (128 * 10)
 
 /*Mailbox Kms*/
-#define CFG_MB_KMS_PROCESS_NAME                  "MB_KMS_PROCESS"
-#define CFG_MB_KMS_PROCESS_ATTR_BITS             (0)
-#define CFG_MB_KMS_PROCESS_CB_MEM                (0)
-#define CFG_MB_KMS_PROCESS_CB_SIZE               (0)
-#define CFG_MB_KMS_PROCESS_STACK_MEM             (0)
-#define CFG_MB_KMS_PROCESS_PRIORITY              osPriorityNone
-#define CFG_MB_KMS_PROCESS_STACk_SIZE            (128 * 10)
+#define CFG_MB_KMS_PROCESS_NAME                    "MB_KMS_PROCESS"
+#define CFG_MB_KMS_PROCESS_ATTR_BITS               (0)
+#define CFG_MB_KMS_PROCESS_CB_MEM                  (0)
+#define CFG_MB_KMS_PROCESS_CB_SIZE                 (0)
+#define CFG_MB_KMS_PROCESS_STACK_MEM               (0)
+#define CFG_MB_KMS_PROCESS_PRIORITY                osPriorityNone
+#define CFG_MB_KMS_PROCESS_STACK_SIZE              (128 * 10)
 
 [#if SUBGHZ_APPLICATION?contains("LORA")]
 /*Send*/
@@ -119,18 +119,36 @@ extern "C" {
 #define CFG_APP_LORA_PROCESS_CB_SIZE               (0)
 #define CFG_APP_LORA_PROCESS_STACK_MEM             (0)
 #define CFG_APP_LORA_PROCESS_PRIORITY              osPriorityNone
-#define CFG_APP_LORA_PROCESS_STACk_SIZE            (128 * 10)
+#define CFG_APP_LORA_PROCESS_STACK_SIZE            (128 * 10)
+
+/*Store Context*/
+#define CFG_APP_LORA_STORE_CONTEXT_NAME            "LORA_STORE_CONTEXT"
+#define CFG_APP_LORA_STORE_CONTEXT_ATTR_BITS       (0)
+#define CFG_APP_LORA_STORE_CONTEXT_CB_MEM          (0)
+#define CFG_APP_LORA_STORE_CONTEXT_CB_SIZE         (0)
+#define CFG_APP_LORA_STORE_CONTEXT_STACK_MEM       (0)
+#define CFG_APP_LORA_STORE_CONTEXT_PRIORITY        osPriorityNone
+#define CFG_APP_LORA_STORE_CONTEXT_STACK_SIZE      (128 * 10)
+
+/*Stop Join*/
+#define CFG_APP_LORA_STOP_JOIN_NAME                "LORA_STOP_JOIN"
+#define CFG_APP_LORA_STOP_JOIN_ATTR_BITS           (0)
+#define CFG_APP_LORA_STOP_JOIN_CB_MEM              (0)
+#define CFG_APP_LORA_STOP_JOIN_CB_SIZE             (0)
+#define CFG_APP_LORA_STOP_JOIN_STACK_MEM           (0)
+#define CFG_APP_LORA_STOP_JOIN_PRIORITY            osPriorityNone
+#define CFG_APP_LORA_STOP_JOIN_STACK_SIZE          (128 * 10)
 
 [/#if]
 [#if SUBGHZ_APPLICATION?contains("SIGFOX")]
 /*Send*/
-#define CFG_APP_SIGFOX_PROCESS_NAME                  "SIGFOX_SEND_PROCESS"
-#define CFG_APP_SIGFOX_PROCESS_ATTR_BITS             (0)
-#define CFG_APP_SIGFOX_PROCESS_CB_MEM                (0)
-#define CFG_APP_SIGFOX_PROCESS_CB_SIZE               (0)
-#define CFG_APP_SIGFOX_PROCESS_STACK_MEM             (0)
-#define CFG_APP_SIGFOX_PROCESS_PRIORITY              osPriorityNone
-#define CFG_APP_SIGFOX_PROCESS_STACk_SIZE            (128 * 10)
+#define CFG_APP_SIGFOX_PROCESS_NAME                "SIGFOX_SEND_PROCESS"
+#define CFG_APP_SIGFOX_PROCESS_ATTR_BITS           (0)
+#define CFG_APP_SIGFOX_PROCESS_CB_MEM              (0)
+#define CFG_APP_SIGFOX_PROCESS_CB_SIZE             (0)
+#define CFG_APP_SIGFOX_PROCESS_STACK_MEM           (0)
+#define CFG_APP_SIGFOX_PROCESS_PRIORITY            osPriorityNone
+#define CFG_APP_SIGFOX_PROCESS_STACK_SIZE          (128 * 10)
 
 [/#if]
 [/#if]
@@ -153,7 +171,15 @@ extern "C" {
 /* Exported functions ------------------------------------------------------- */
 /**
   * @brief Inits the MBMUX and registers SYS channel to the mailbox and SYS task to the sequencer
-  * @retval   0: OK; -1: no more ipcc channel available; -2: feature not provided by CM0PLUS
+  * @retval   0: OK;
+             -1: no more ipcc channel available;
+             -2: feature not provided by CM0PLUS;
+             -3: callback error on CM0PLUS
+[#if THREADX??]
+             -10: threadx TX_POOL_ERROR
+             -11: threadx TX_THREAD_ERROR
+             -12: threadx TX_SEMAPHORE_ERROR
+[/#if]
   */
 int8_t MBMUXIF_SystemInit(void);
 

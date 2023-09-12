@@ -297,6 +297,13 @@
       [#assign UX_TRACE_INSERT_MACROS_value = value]
     [/#if]
 	
+	[#if name == "UX_DEVICE_BIDIRECTIONAL_ENDPOINT_SUPPORT"]
+      [#assign UX_DEVICE_BIDIRECTIONAL_ENDPOINT_SUPPORT_value = value]
+    [/#if]
+	
+	[#if name == "UX_DEVICE_CLASS_CDC_ACM_TRANSMISSION_DISABLE"]
+      [#assign UX_DEVICE_CLASS_CDC_ACM_TRANSMISSION_DISABLE_value = value]
+    [/#if]
   [/#list]
 [/#if]
 [/#list]
@@ -366,11 +373,8 @@
 
 /* Defined, this value is the maximum number of classes in the device stack that can be loaded by
    USBX.  */
-[#if UX_MAX_SLAVE_CLASS_DRIVER_value == "1"]
-/* #define UX_MAX_SLAVE_CLASS_DRIVER    1 */
-[#else]
+
 #define UX_MAX_SLAVE_CLASS_DRIVER                         ${UX_MAX_SLAVE_CLASS_DRIVER_value}
-[/#if]
 
 /* Defined, this value is the maximum number of interfaces in the device framework.  */
 
@@ -828,6 +832,22 @@
 #define UX_TRACE_INSERT_MACROS
 [#else]
 /*#define UX_TRACE_INSERT_MACROS*/
+[/#if]
+
+/* Defined, this macro enables device bi-directional endpoint support. */
+
+[#if UX_DEVICE_BIDIRECTIONAL_ENDPOINT_SUPPORT_value == "1" && UX_DEVICE_ENABLED_Value == "true"]
+#define UX_DEVICE_BIDIRECTIONAL_ENDPOINT_SUPPORT
+[#else]
+/* #define UX_DEVICE_BIDIRECTIONAL_ENDPOINT_SUPPORT */
+[/#if]
+
+/* Defined, this macro disables CDC ACM non-blocking transmission support. */
+
+[#if UX_DEVICE_CLASS_CDC_ACM_TRANSMISSION_DISABLE_value == "1" && UX_DEVICE_ENABLED_Value == "true"]
+#define UX_DEVICE_CLASS_CDC_ACM_TRANSMISSION_DISABLE
+[#else]
+/* #define UX_DEVICE_CLASS_CDC_ACM_TRANSMISSION_DISABLE */
 [/#if]
 #endif
 

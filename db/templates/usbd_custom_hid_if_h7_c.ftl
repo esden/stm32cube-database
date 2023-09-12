@@ -250,7 +250,10 @@ static int8_t CUSTOM_HID_OutEvent_FS(uint8_t event_idx, uint8_t state)
   UNUSED(state);
 
   /* Start next USB packet transfer once data processing is completed */
-  USBD_CUSTOM_HID_ReceivePacket(&hUsbDeviceFS);
+  if (USBD_CUSTOM_HID_ReceivePacket(&hUsbDeviceFS) != (uint8_t)USBD_OK)
+  {
+    return -1;
+  }
 
   return (USBD_OK);
   /* USER CODE END 6 */
@@ -309,7 +312,10 @@ static int8_t CUSTOM_HID_OutEvent_HS(uint8_t event_idx, uint8_t state)
   UNUSED(state);
 
     /* Start next USB packet transfer once data processing is completed */
-  USBD_CUSTOM_HID_ReceivePacket(&hUsbDeviceHS);
+  if (USBD_CUSTOM_HID_ReceivePacket(&hUsbDeviceHS) != (uint8_t)USBD_OK)
+  {
+    return -1;
+  }
 
   return (USBD_OK);
   /* USER CODE END 10 */

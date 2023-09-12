@@ -61,14 +61,13 @@ extern "C" {
 #include "sys_privileged_wrap.h"
 #include "stm32_seq.h"
 
-[#if (SUBGHZ_APPLICATION == "SIGFOX_PUSHBUTTON") ]
-#if defined(__ARMCC_VERSION)
-#include "mapping_sbsfu.h"
-#elif defined (__ICCARM__) || defined(__GNUC__)
-#include "mapping_export.h"
-#endif /* __ARMCC_VERSION */
-
 [/#if]
+[/#if]
+
+[#if !THREADX??][#-- If AzRtos is not used --]
+[#if !FREERTOS??][#-- If FreeRtos is not used --]
+/* enum number of task and priority*/
+#include "utilities_def.h"
 [/#if]
 [/#if]
 /* USER CODE BEGIN Includes */
@@ -81,107 +80,6 @@ extern "C" {
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/
-[#if (CPUCORE == "CM0PLUS") || (CPUCORE == "CM4")]
-/*---------------------------------------------------------------------------*/
-/*                             sequencer configuration                       */
-/*---------------------------------------------------------------------------*/
-/**
-  * @brief Sequencer flag reserved for future use
-  */
-#define UTIL_SEQ_RFU 0
-
-[#if CPUCORE == "CM4"]
-/**
-  * @brief default number of tasks configured in sequencer
-  */
-#define SEQ_CONF_TASK_NBR    3
-
-/**
-  * @brief default value of priority task
-  */
-#define SEQ_CONF_PRIO_NBR    1
-
-[#elseif CPUCORE == "CM0PLUS"]
-/**
-  * @brief default number of tasks configured in sequencer
-  */
-#define SEQ_CONF_TASK_NBR    4
-
-/**
-  * @brief default value of priority task
-  */
-#define SEQ_CONF_PRIO_NBR    1
-
-[/#if]
-[/#if]
-
-[#if ((SUBGHZ_APPLICATION == "SIGFOX_AT_SLAVE") || (SUBGHZ_APPLICATION == "SIGFOX_PUSHBUTTON")) ]
-/*---------------------------------------------------------------------------*/
-/*                             eeprom configuration                       */
-/*---------------------------------------------------------------------------*/
-
-[#if (SECURE_PROJECTS == "1") && (CPUCORE == "CM0PLUS")]
-/**
-  * @brief Flash address
-  */
-#define HW_FLASH_ADDRESS                FLASH_BASE
-
-/**
-  * @brief Flash page size in bytes
-  */
-#define HW_FLASH_PAGE_SIZE              FLASH_PAGE_SIZE
-[#else]
-/**
-  * @brief Flash address
-  */
-#define HW_FLASH_ADDRESS                (0x08000000UL)
-
-/**
-  * @brief Flash page size in bytes
-  */
-#define HW_FLASH_PAGE_SIZE              (0x00000800UL)
-[/#if]
-
-/**
-  * @brief Flash width in bytes
-  */
-#define HW_FLASH_WIDTH                  8
-
-/**
-  * @brief Flash bank0 size in bytes
-  */
-#define CFG_EE_BANK0_SIZE               2*HW_FLASH_PAGE_SIZE
-
-/**
-  * @brief Maximum number of data that can be stored in bank0
-  */
-#define CFG_EE_BANK0_MAX_NB             EE_ID_COUNT<<2 /*from uint32 to byte*/
-
-/* Unused Bank1 */
-/**
-  * @brief Flash bank1 size in bytes
-  */
-#define CFG_EE_BANK1_SIZE              0
-
-/**
-  * @brief Maximum number of data that can be stored in bank1
-  */
-#define CFG_EE_BANK1_MAX_NB            0
-
-[#if (SECURE_PROJECTS == "1") && (CPUCORE == "CM0PLUS")]
-/**
-  * @brief EEPROM Flash address
-  */
-#define EE_BASE_ADRESS                  EE_DATASTORAGE_START
-[#else]
-/**
-  * @brief EEPROM Flash address
-  * @note last 2 sector of a 128kBytes device
-  */
-#define EE_BASE_ADRESS                  (0x0801D000UL)
-[/#if]
-
-[/#if]
 #define VLEVEL_OFF    0  /*!< used to set UTIL_ADV_TRACE_SetVerboseLevel() (not as message param) */
 #define VLEVEL_ALWAYS 0  /*!< used as message params, if this level is given
                               trace will be printed even when UTIL_ADV_TRACE_SetVerboseLevel(OFF) */
@@ -203,6 +101,9 @@ extern "C" {
 /* USER CODE END EV */
 
 /* Exported macros -----------------------------------------------------------*/
+/******************************************************************************
+  * common
+  ******************************************************************************/
 /**
   * @brief Memory placement macro
   */
@@ -227,45 +128,6 @@ extern "C" {
 /**
   * @brief macro used to initialize the critical section
   */
-#define UTIL_SEQ_INIT_CRITICAL_SECTION( )    UTILS_INIT_CRITICAL_SECTION()
-
-/**
-  * @brief macro used to enter the critical section
-  */
-#define UTIL_SEQ_ENTER_CRITICAL_SECTION( )   UTILS_ENTER_CRITICAL_SECTION()
-
-/**
-  * @brief macro used to exit the critical section
-  */
-#define UTIL_SEQ_EXIT_CRITICAL_SECTION( )    UTILS_EXIT_CRITICAL_SECTION()
-
-[#if (SECURE_PROJECTS == "1") && (CPUCORE == "CM0PLUS") ]
-/**
-  * @brief macro to Enter CS used specifically by UTIL_SEQ_Run before going to Idle
-  */
-#define UTIL_SEQ_ENTER_CRITICAL_SECTION_IDLE( )   SYS_PRIVIL_DisableIrqsAndRemainPriv()
-
-/**
-  * @brief macro to Exit CS used specifically by UTIL_SEQ_Run exiting from Idle
-  */
-#define UTIL_SEQ_EXIT_CRITICAL_SECTION_IDLE( )    SYS_PRIVIL_EnableIrqsAndGoUnpriv()
-
-/**
-  * @brief Security: Map UTIL_TIMER_IRQ on Sequencer Task (rather then Isr) such to run Unprivileged
-  */
-#define UTIL_TIMER_IRQ_MAP_INIT()     do{ UTIL_SEQ_RegTask((1 << CFG_SEQ_Task_UtilTimer_Process), UTIL_SEQ_RFU, UTIL_TIMER_IRQ_Handler);} while(0)
-
-#define UTIL_TIMER_IRQ_MAP_PROCESS()  do{ UTIL_SEQ_SetTask(1 << CFG_SEQ_Task_UtilTimer_Process, CFG_SEQ_Prio_0); } while(0)
-
-[/#if]
-/**
-  * @brief Memset utilities interface to application
-  */
-#define UTIL_SEQ_MEMSET8( dest, value, size )   UTIL_MEM_set_8( dest, value, size )
-
-/**
-  * @brief macro used to initialize the critical section
-  */
 #define UTILS_INIT_CRITICAL_SECTION()
 
 [#if (SECURE_PROJECTS == "1") && (CPUCORE == "CM0PLUS") ]
@@ -278,6 +140,10 @@ extern "C" {
   * @brief macro used to exit the critical section
   */
 #define UTILS_EXIT_CRITICAL_SECTION()  SYS_PRIVIL_ExitCriticalSection(nvic_iser_state)
+
+/******************************************************************************
+  * tiny low power manager
+  ******************************************************************************/
 /**
   * @brief macro used to Enter critical section specifically for UTIL_LPM_EnterLowPower()
   */
@@ -298,6 +164,69 @@ extern "C" {
   */
 #define UTILS_EXIT_CRITICAL_SECTION()  __set_PRIMASK(primask_bit)
 [/#if]
+/******************************************************************************
+  * sequencer
+  ******************************************************************************/
+[#if !THREADX??][#-- If AzRTOS is not used --]
+[#if !FREERTOS??][#-- If FreeRtos is not used --]
+
+/**
+  * @brief default number of tasks configured in sequencer
+  */
+#define UTIL_SEQ_CONF_TASK_NBR    CFG_SEQ_Task_NBR
+
+/**
+  * @brief default value of priority task
+  */
+
+#define UTIL_SEQ_CONF_PRIO_NBR    CFG_SEQ_Prio_NBR
+
+[/#if]
+[/#if]
+[#if !THREADX??][#-- If AzRTOS is not used --]
+/**
+  * @brief macro used to initialize the critical section
+  */
+#define UTIL_SEQ_INIT_CRITICAL_SECTION( )    UTILS_INIT_CRITICAL_SECTION()
+
+/**
+  * @brief macro used to enter the critical section
+  */
+#define UTIL_SEQ_ENTER_CRITICAL_SECTION( )   UTILS_ENTER_CRITICAL_SECTION()
+
+/**
+  * @brief macro used to exit the critical section
+  */
+#define UTIL_SEQ_EXIT_CRITICAL_SECTION( )    UTILS_EXIT_CRITICAL_SECTION()
+
+[/#if]
+[#if (SECURE_PROJECTS == "1") && (CPUCORE == "CM0PLUS") ]
+/**
+  * @brief macro to Enter CS used specifically by UTIL_SEQ_Run before going to Idle
+  */
+#define UTIL_SEQ_ENTER_CRITICAL_SECTION_IDLE( )   SYS_PRIVIL_DisableIrqsAndRemainPriv()
+
+/**
+  * @brief macro to Exit CS used specifically by UTIL_SEQ_Run exiting from Idle
+  */
+#define UTIL_SEQ_EXIT_CRITICAL_SECTION_IDLE( )    SYS_PRIVIL_EnableIrqsAndGoUnpriv()
+
+/******************************************************************************
+  * tim_serv
+  * (any macro that does not need to be modified can be removed)
+  ******************************************************************************/
+/**
+  * @brief Security: Map UTIL_TIMER_IRQ on Sequencer Task (rather then Isr) such to run Unprivileged
+  */
+#define UTIL_TIMER_IRQ_MAP_INIT()     do{ UTIL_SEQ_RegTask((1 << CFG_SEQ_Task_UtilTimer_Process), UTIL_SEQ_RFU, UTIL_TIMER_IRQ_Handler);} while(0)
+
+#define UTIL_TIMER_IRQ_MAP_PROCESS()  do{ UTIL_SEQ_SetTask(1 << CFG_SEQ_Task_UtilTimer_Process, CFG_SEQ_Prio_0); } while(0)
+
+[/#if]
+/**
+  * @brief Memset utilities interface to application
+  */
+#define UTIL_SEQ_MEMSET8( dest, value, size )   UTIL_MEM_set_8( dest, value, size )
 
 /******************************************************************************
   * trace\advanced
@@ -310,13 +239,17 @@ extern "C" {
 #define UTIL_ADV_TRACE_CONDITIONNAL                                                      /*!< not used */
 #define UTIL_ADV_TRACE_UNCHUNK_MODE                                                      /*!< not used */
 [#if CPUCORE == "CM0PLUS"]
-#define UTIL_ADV_TRACE_MEMLOCATION                 UTIL_MEM_PLACE_IN_SECTION("MB_MEM2")  /*!< memory placement for trace buffer */
+#define UTIL_ADV_TRACE_MEMLOCATION                 UTIL_MEM_PLACE_IN_SECTION("MB_MEM3")  /*!< memory placement for trace buffer */
 [/#if]
 #define UTIL_ADV_TRACE_DEBUG(...)                                                        /*!< not used */
 #define UTIL_ADV_TRACE_INIT_CRITICAL_SECTION( )    UTILS_INIT_CRITICAL_SECTION()         /*!< init the critical section in trace feature */
 #define UTIL_ADV_TRACE_ENTER_CRITICAL_SECTION( )   UTILS_ENTER_CRITICAL_SECTION()        /*!< enter the critical section in trace feature */
 #define UTIL_ADV_TRACE_EXIT_CRITICAL_SECTION( )    UTILS_EXIT_CRITICAL_SECTION()         /*!< exit the critical section in trace feature */
-[#if ((SUBGHZ_APPLICATION == "LORA_AT_SLAVE") || (SUBGHZ_APPLICATION == "LORA_END_NODE"))]
+[#if (SUBGHZ_APPLICATION == "LORA_AT_SLAVE")]
+#define UTIL_ADV_TRACE_TMP_BUF_SIZE                (1024U)                               /*!< default trace buffer size */
+#define UTIL_ADV_TRACE_TMP_MAX_TIMESTMAP_SIZE      (15U)                                 /*!< default trace timestamp size */
+#define UTIL_ADV_TRACE_FIFO_SIZE                   (2048U)                               /*!< default trace fifo size */
+[#elseif (SUBGHZ_APPLICATION == "LORA_END_NODE")]
 #define UTIL_ADV_TRACE_TMP_BUF_SIZE                (512U)                                /*!< default trace buffer size */
 #define UTIL_ADV_TRACE_TMP_MAX_TIMESTMAP_SIZE      (15U)                                 /*!< default trace timestamp size */
 #define UTIL_ADV_TRACE_FIFO_SIZE                   (1024U)                               /*!< default trace fifo size */
@@ -342,4 +275,3 @@ extern "C" {
 #endif
 
 #endif /*__UTILITIES_CONF_H__ */
-

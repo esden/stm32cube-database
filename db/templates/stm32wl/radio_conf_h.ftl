@@ -23,10 +23,10 @@
 [/#if]
 --]
 [#assign SUBGHZ_APPLICATION = ""]
-[#assign USER_SUBGHZ_APP = ""]
+[#assign INTERNAL_USER_SUBGHZ_APP = ""]
 [#assign FILL_UCS = ""]
-[#assign Activate_DEBUG_LINE = ""]
-[#assign RF_WAKEUP_TIME=""]
+[#assign Activate_DEBUG_LINE = "false"]
+[#assign RF_WAKEUP_TIME="0"]
 [#assign SECURE_PROJECTS = "0"]
 [#if SWIPdatas??]
     [#list SWIPdatas as SWIP]
@@ -34,9 +34,6 @@
             [#list SWIP.defines as definition]
                 [#if definition.name == "SUBGHZ_APPLICATION"]
                     [#assign SUBGHZ_APPLICATION = definition.value]
-                [/#if]
-                [#if definition.name == "USER_SUBGHZ_APP"]
-                    [#assign USER_SUBGHZ_APP = definition.value]
                 [/#if]
                 [#if definition.name == "FILL_UCS"]
                     [#assign FILL_UCS = definition.value]
@@ -113,31 +110,6 @@ extern SUBGHZ_HandleTypeDef hsubghz;
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/
-[#if ((Activate_DEBUG_LINE == "false") || (SUBGHZ_APPLICATION == "LORA_USER_APPLICATION") || (SUBGHZ_APPLICATION == "SUBGHZ_USER_APPLICATION") || (SUBGHZ_APPLICATION == "SIGFOX_USER_APPLICATION"))]
-/* USER CODE BEGIN DBG_GPIO_RADIO */
-#define DBG_GPIO_RADIO_RX(set_rst) /*PROBE_GPIO_##set_rst##_LINE(PROBE_LINE1_PORT, PROBE_LINE1_PIN);*/
-#define DBG_GPIO_RADIO_TX(set_rst) /*PROBE_GPIO_##set_rst##_LINE(PROBE_LINE2_PORT, PROBE_LINE2_PIN);*/
-/* USER CODE END DBG_GPIO_RADIO */
-[#else]
-/**
-  * @brief Set RX pin to high or low level
-  */
-[#if PROBE_LINE["1"] == "1"]
-#define DBG_GPIO_RADIO_RX(set_rst) PROBE_GPIO_##set_rst##_LINE(PROBE_LINE1_PORT, PROBE_LINE1_PIN);
-[#else]
-#define DBG_GPIO_RADIO_RX(set_rst) /*PROBE_GPIO_##set_rst##_LINE(PROBE_LINE1_PORT, PROBE_LINE1_PIN);*/
-[/#if]
-
-/**
-  * @brief Set TX pin to high or low level
-  */
-[#if PROBE_LINE["2"] == "1"]
-#define DBG_GPIO_RADIO_TX(set_rst) PROBE_GPIO_##set_rst##_LINE(PROBE_LINE2_PORT, PROBE_LINE2_PIN);
-[#else]
-#define DBG_GPIO_RADIO_TX(set_rst) /*PROBE_GPIO_##set_rst##_LINE(PROBE_LINE2_PORT, PROBE_LINE2_PIN);*/
-[/#if]
-[/#if]
-
 [#if CPUCORE == "CM0PLUS"]
 /**
   * @brief Max payload buffer size
@@ -197,8 +169,19 @@ extern SUBGHZ_HandleTypeDef hsubghz;
   */
 #define DCDC_ENABLE                 ( 1UL )
 
-[#if (SUBGHZ_APPLICATION != "SUBGHZ_USER_APPLICATION") && (USER_SUBGHZ_APP == "SUBGHZ_PER")]
+[#if (SECURE_PROJECTS == "1")]
+#define RADIO_IRQ_PROCESS_INIT()   do{ UTIL_SEQ_RegTask((1 << CFG_SEQ_Task_RadioIrq_Process), UTIL_SEQ_RFU, RadioIrqProcess); \
+                                       UTIL_SEQ_RegTask((1 << CFG_SEQ_Task_RadioRxTimeout_Process), UTIL_SEQ_RFU, RadioOnRxTimeoutProcess);\
+                                       UTIL_SEQ_RegTask((1 << CFG_SEQ_Task_RadioTxTimeout_Process), UTIL_SEQ_RFU, RadioOnTxTimeoutProcess);} while(0)
 
+#define RADIO_IRQ_PROCESS()        do{ UTIL_SEQ_SetTask(1 << CFG_SEQ_Task_RadioIrq_Process, CFG_SEQ_Prio_0); } while(0)
+#define RADIO_RX_TIMEOUT_PROCESS() do{ UTIL_SEQ_SetTask(1 << CFG_SEQ_Task_RadioRxTimeout_Process, CFG_SEQ_Prio_0); } while(0)
+#define RADIO_TX_TIMEOUT_PROCESS() do{ UTIL_SEQ_SetTask(1 << CFG_SEQ_Task_RadioTxTimeout_Process, CFG_SEQ_Prio_0); } while(0)
+
+[/#if]
+/* USER CODE BEGIN EC */
+[#if  (FILL_UCS == "true")]
+[#if (SUBGHZ_APPLICATION != "SUBGHZ_USER_APPLICATION") && (INTERNAL_USER_SUBGHZ_APP == "SUBGHZ_PER")]
 /**
   * @brief enables the RFW module
   * @note disabled by default
@@ -211,24 +194,62 @@ extern SUBGHZ_HandleTypeDef hsubghz;
   */
 #define RFW_LONGPACKET_ENABLE 1
 
-[/#if]
-[#if (SECURE_PROJECTS == "1")]
-#define RADIO_IRQ_PROCESS_INIT()   do{ UTIL_SEQ_RegTask((1 << CFG_SEQ_Task_RadioIrq_Process), UTIL_SEQ_RFU, RadioIrqProcess); \
-                                       UTIL_SEQ_RegTask((1 << CFG_SEQ_Task_RadioRxTimeout_Process), UTIL_SEQ_RFU, RadioOnRxTimeoutProcess);\
-                                       UTIL_SEQ_RegTask((1 << CFG_SEQ_Task_RadioTxTimeout_Process), UTIL_SEQ_RFU, RadioOnTxTimeoutProcess);} while(0)
-
-#define RADIO_IRQ_PROCESS()        do{ UTIL_SEQ_SetTask(1 << CFG_SEQ_Task_RadioIrq_Process, CFG_SEQ_Prio_0); } while(0)
-#define RADIO_RX_TIMEOUT_PROCESS() do{ UTIL_SEQ_SetTask(1 << CFG_SEQ_Task_RadioRxTimeout_Process, CFG_SEQ_Prio_0); } while(0)
-#define RADIO_TX_TIMEOUT_PROCESS() do{ UTIL_SEQ_SetTask(1 << CFG_SEQ_Task_RadioTxTimeout_Process, CFG_SEQ_Prio_0); } while(0)
-
-[/#if]
-/* USER CODE BEGIN EC */
-[#if (SUBGHZ_APPLICATION != "SUBGHZ_USER_APPLICATION") && (USER_SUBGHZ_APP == "SUBGHZ_PER") && (FILL_UCS == "true")]
 /**
   * @brief enables the RFW module log
   * @note disabled by default
   */
-#define RWF_MW_LOG_ENABLE
+#define RFW_MW_LOG_ENABLE
+
+[/#if]
+[#if (SUBGHZ_APPLICATION == "LORA_END_NODE") || (SUBGHZ_APPLICATION == "LORA_USER_APPLICATION")]
+/**
+  * @brief disable the Sigfox radio modulation
+  * @note enabled by default
+  */
+#define RADIO_SIGFOX_ENABLE 0
+
+/**
+  * @brief disable the radio generic features
+  * @note enabled by default
+  */
+#define RADIO_GENERIC_CONFIG_ENABLE 0
+
+[#elseif (SUBGHZ_APPLICATION == "LORA_AT_SLAVE")]
+/**
+  * @brief disable the Sigfox radio modulation
+  * @note enabled by default
+  */
+#define RADIO_SIGFOX_ENABLE 0
+
+/**
+  * @brief disable the radio generic features
+  * @note enabled by default
+  */
+#define RADIO_GENERIC_CONFIG_ENABLE 1
+
+[/#if]
+[#if ((Activate_DEBUG_LINE == "false") || (SUBGHZ_APPLICATION == "LORA_USER_APPLICATION") || (SUBGHZ_APPLICATION == "SUBGHZ_USER_APPLICATION") || (SUBGHZ_APPLICATION == "SIGFOX_USER_APPLICATION"))]
+#define DBG_GPIO_RADIO_RX(set_rst) /*PROBE_GPIO_##set_rst##_LINE(PROBE_LINE1_PORT, PROBE_LINE1_PIN);*/
+#define DBG_GPIO_RADIO_TX(set_rst) /*PROBE_GPIO_##set_rst##_LINE(PROBE_LINE2_PORT, PROBE_LINE2_PIN);*/
+[#else]
+/**
+  * @brief Set RX pin to high or low level
+  */
+[#if PROBE_LINE["1"] == "1"]
+#define DBG_GPIO_RADIO_RX(set_rst) PROBE_GPIO_##set_rst##_LINE(PROBE_LINE1_PORT, PROBE_LINE1_PIN);
+[#else]
+#define DBG_GPIO_RADIO_RX(set_rst) /*PROBE_GPIO_##set_rst##_LINE(PROBE_LINE1_PORT, PROBE_LINE1_PIN);*/
+[/#if]
+
+/**
+  * @brief Set TX pin to high or low level
+  */
+[#if PROBE_LINE["2"] == "1"]
+#define DBG_GPIO_RADIO_TX(set_rst) PROBE_GPIO_##set_rst##_LINE(PROBE_LINE2_PORT, PROBE_LINE2_PIN);
+[#else]
+#define DBG_GPIO_RADIO_TX(set_rst) /*PROBE_GPIO_##set_rst##_LINE(PROBE_LINE2_PORT, PROBE_LINE2_PIN);*/
+[/#if]
+[/#if]
 [/#if]
 
 /* USER CODE END EC */
@@ -287,4 +308,3 @@ extern SUBGHZ_HandleTypeDef hsubghz;
 #endif
 
 #endif /* __RADIO_CONF_H__*/
-

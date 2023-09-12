@@ -3,6 +3,9 @@
     <Background  imageName="shsihidecross" name="shsihidecross"  x="195" y="1568">
         <Condition Diagnostic="" Expression="!SAES_Exist"/>
     </Background>
+    <Background  imageName="WKUPCLOCK" name="WKUPClock"  x="730" y="50">
+        <Condition Diagnostic="" Expression="S_LPBAM_CONF"/>
+    </Background>
     <Background  imageName="stm32hidefdcan" name="stm32hidefdcan"  x="1575" y="1745">
         <Condition Diagnostic="" Expression="!FDCAN1_Exist"/>
     </Background>
@@ -89,7 +92,7 @@
             <Input signalId="HSI48" from="HSI48RC"/>
         </Element>
 		
-	<Element id="HSI48RC" type="fixedSource" isKey="true" refParameter="HSI48_VALUE" x="295" y="1218" isTZRes="true" refEnable="EnableCRS,USBEnable,RNGEnable,MCOEnable,SDMMCEnable">
+	<Element id="HSI48RC" type="fixedSource" isKey="true" refParameter="HSI48_VALUE" x="295" y="1218" isTZRes="true" refEnable="EnableCRS,RNGEnableLPBAM,MCOEnable,SDMMCEnableLPBAM,USBEnable">
             <Output signalId="HSI48" to="MCOMult"/>
             <Output signalId="HSI48" to="CK48Mult"/>
             <Output signalId="HSI48" to="RNGMult"/>
@@ -170,9 +173,21 @@
         <Element id="SAI1_EXT" type="variedSource" x="200" y="940" refParameter="EXTERNALSAI1_CLOCK_VALUE" refEnable="EnableExtClockForSAI1">
             <Output signalId="SAI1ExtClock" to="SAI1Mult"/>
         </Element>
+        
+        <!-- WKUP from stop clock -->
+        <Element id="RCC_Stop_WakeUpClock" type="multiplexor" refParameter="RCC_Stop_WakeUpClock" x="785" y="189">
+            <Condition Diagnostic="" Expression="S_LPBAM_CONF"/>
+            <Input signalId="MSIS"     from="MSIRC"  refValue="RCC_STOP_WAKEUPCLOCK_MSI"/>
+            <Input signalId="HSI"     from="HSIRC"   refValue="RCC_STOP_WAKEUPCLOCK_HSI"/>
+            <Output signalId="WakeUpCLKOutput" to="WakeUpClockOutput"/>           
+        </Element>
+        <Element id="WakeUpClockOutput" type="output" refParameter="WakeUpClockFreq_VALUE" x="822" y="207">
+            <Condition Diagnostic="" Expression="S_LPBAM_CONF"/>
+            <Input signalId="WakeUpCLKOutput" from="RCC_Stop_WakeUpClock"/>
+        </Element>
 		
         <!--System clock-->
-        <Element id="SysClkSource" type="multiplexor" refParameter="SYSCLKSource" x="695" y="396" isTZRes="true">
+        <Element id="SysClkSource" type="multiplexor" refParameter="SYSCLKSource" x="695" y="396" isTZRes="true" refEnable="notInLPBAM">
             <Input signalId="MSIS"     from="MSIRC"  refValue="RCC_SYSCLKSOURCE_MSI"/>
             <Input signalId="HSI"     from="HSIRC"   refValue="RCC_SYSCLKSOURCE_HSI"/>
             <Input signalId="HSE"     from="HSEOSC"  refValue="RCC_SYSCLKSOURCE_HSE"/>
@@ -180,7 +195,7 @@
             <Output signalId="SYSCLKInput" to="SysCLKOutput"/>
            
         </Element>
-        <Element id="SysCLKOutput" type="output" refParameter="SYSCLKFreq_VALUE" x="732" y="427">
+        <Element id="SysCLKOutput" type="output" refParameter="SYSCLKFreq_VALUE" x="732" y="427" refEnable="notInLPBAM">
             <Input signalId="SYSCLKInput" from="SysClkSource"/>
             <Output signalId="SYSCLK" to="AHBPrescaler"/>
             <Output signalId="SYSCLK" to="USART1Mult"/>
@@ -198,33 +213,33 @@
             
         </Element>
         <!--Main PLL source-->
-        <Element id="PLLSource" type="multiplexor" refParameter="PLLSourceVirtual" orientation="LEFT" x="402" y="477" isTZRes="true">
+        <Element id="PLLSource" type="multiplexor" refParameter="PLLSourceVirtual" orientation="LEFT" x="402" y="477" isTZRes="true" refEnable="notInLPBAM">
             <Input signalId="MSIS" from="MSIRC" refValue="RCC_PLLSOURCE_MSI"/>
             <Input signalId="HSI" from="HSIRC"  refValue="RCC_PLLSOURCE_HSI"/>
             <Input signalId="HSE" from="HSEOSC" refValue="RCC_PLLSOURCE_HSE"/>
             <Output signalId="PLLSRC" to="PLLM"/>
         </Element>
-        <Element id="PLL2Source" type="multiplexor" refParameter="PLL2Source" orientation="LEFT" x="402" y="607" isTZRes="true">
+        <Element id="PLL2Source" type="multiplexor" refParameter="PLL2Source" orientation="LEFT" x="402" y="607" isTZRes="true" refEnable="notInLPBAM">
             <Input signalId="MSIS" from="MSIRC" refValue="RCC_PLLSOURCE_MSI"/>
             <Input signalId="HSI" from="HSIRC"  refValue="RCC_PLLSOURCE_HSI"/>
             <Input signalId="HSE" from="HSEOSC" refValue="RCC_PLLSOURCE_HSE"/>
             <Output signalId="PLL2SRC" to="PLL2M"/>
         </Element>
-        <Element id="PLL3Source" type="multiplexor" refParameter="PLL3Source" orientation="LEFT" x="402" y="757" isTZRes="true">
+        <Element id="PLL3Source" type="multiplexor" refParameter="PLL3Source" orientation="LEFT" x="402" y="757" isTZRes="true" refEnable="notInLPBAM">
             <Input signalId="MSIS" from="MSIRC" refValue="RCC_PLLSOURCE_MSI"/>
             <Input signalId="HSI" from="HSIRC"  refValue="RCC_PLLSOURCE_HSI"/>
             <Input signalId="HSE" from="HSEOSC" refValue="RCC_PLLSOURCE_HSE"/>
             <Output signalId="PLL3SRC" to="PLL3M"/>
         </Element>
-        <Element id="PLLM" type="devisor" refParameter="PLLM" x="444" y="510" refLock="PLLIsSecureLocked">
+        <Element id="PLLM" type="devisor" refParameter="PLLM" x="444" y="510" refLock="PLLIsSecureLocked" refEnable="notInLPBAM">
             <Input signalId="PLLSRC" from="PLLSource"/>
             <Output signalId="VCOInput" to="PLLN"/>
         </Element>
-        <Element id="PLL2M" type="devisor" refParameter="PLL2M" x="444" y="637"  refLock="PLL2IsSecureLocked">
+        <Element id="PLL2M" type="devisor" refParameter="PLL2M" x="444" y="637"  refLock="PLL2IsSecureLocked" refEnable="notInLPBAM">
             <Input signalId="PLL2SRC" from="PLL2Source"/>
             <Output signalId="VCOInput2" to="PLL2N"/>
         </Element>
-        <Element id="PLL3M" type="devisor" refParameter="PLL3M" x="444" y="790" refLock="PLL3IsSecureLocked">
+        <Element id="PLL3M" type="devisor" refParameter="PLL3M" x="444" y="790" refLock="PLL3IsSecureLocked" refEnable="notInLPBAM">
             <Input signalId="PLL3SRC" from="PLL3Source"/>
             <Output signalId="VCOInput3" to="PLL3N"/>
         </Element>    
@@ -519,7 +534,7 @@
         </Element>
         
         <!-- RNG clock selection -->
-        <Element id="HSI48DivToRNG" type="devisor" refParameter="HSI48DivToRNG" x="1255" y="1415" refEnable="RNGEnable">
+        <Element id="HSI48DivToRNG" type="devisor" refParameter="HSI48DivToRNG" x="1255" y="1415" refEnable="RNGEnableLPBAM">
             <Input  signalId="HSI48"       from="HSI48RC"/>
             <Output signalId="HSI48DivToRNGClk" to="RNGMult"/>
         </Element>
@@ -565,12 +580,12 @@
         </Element>
     
         <!--AHB, APB1 and APB2 main block-->
-        <Element id="AHBPrescaler" type="devisor" refParameter="AHBCLKDivider" x="835" y="429" isTZRes="true">
+        <Element id="AHBPrescaler" type="devisor" refParameter="AHBCLKDivider" x="835" y="429" isTZRes="true" refEnable="notInLPBAM">
             <Input signalId="SYSCLK" from="SysCLKOutput"/>
             <Output signalId="HCLK" to="AHBOutput"/>
         </Element>
 
-        <Element id="AHBOutput" type="activeOutput" isKey="true" refParameter="HCLKFreq_Value" x="920" y="427">
+        <Element id="AHBOutput" type="activeOutput" isKey="true" refParameter="HCLKFreq_Value" x="920" y="427" refEnable="notInLPBAM">
             <Input signalId="HCLK" from="AHBPrescaler"/>
             <Output signalId="AHBCLK" to="CortexPrescaler"/>
             <Output signalId="AHBCLK" to="HCLKOutput"       />
@@ -578,26 +593,26 @@
             <Output signalId="AHBCLK" to="APB1Prescaler"/>
             <Output signalId="AHBCLK" to="APB2Prescaler"/>
         </Element>
-        <Element id="HCLKOutput" type="activeOutput" refParameter="AHBFreq_Value" x="1490" y="510">
+        <Element id="HCLKOutput" type="activeOutput" refParameter="AHBFreq_Value" x="1490" y="510" refEnable="notInLPBAM">
             <Input signalId="AHBCLK" from="AHBOutput"/>
         </Element>
-        <Element id="CortexPrescaler" type="devisor" refParameter="Cortex_Div" x="1150" y="208">
+        <Element id="CortexPrescaler" type="devisor" refParameter="Cortex_Div" x="1150" y="208" refEnable="notInLPBAM">
             <Input signalId="AHBCLK" from="AHBOutput"/>
             <Output signalId="AHBCLK2" to="CortexCLockSelection" />
         </Element>
-        <Element id="CortexCLockSelection" type="multiplexor" refParameter="CortexCLockSelectionVirtual" x="1400" y="208">
+        <Element id="CortexCLockSelection" type="multiplexor" refParameter="CortexCLockSelectionVirtual" x="1400" y="208" refEnable="notInLPBAM">
             <Input signalId="AHBCLK2" from="CortexPrescaler" refValue="SYSTICK_CLKSOURCE_HCLK_1_8"/>
             <Input signalId="LSE"    from="LSEOSC"   refValue="SYSTICK_CLKSOURCE_LSE"/>
             <Input signalId="LSIclk" from="LSIDIV"   refValue="SYSTICK_CLKSOURCE_LSI"/>
             <Output signalId="CortexCLK" to="CortexSysOutput"/>
         </Element>
-        <Element id="CortexSysOutput" type="activeOutput" refParameter="CortexFreq_Value" x="1490" y="238">
+        <Element id="CortexSysOutput" type="activeOutput" refParameter="CortexFreq_Value" x="1490" y="238" refEnable="notInLPBAM">
             <Input signalId="CortexCLK" from="CortexCLockSelection"/>
         </Element>
-        <Element id="FCLKCortexOutput" type="activeOutput" refParameter="FCLKCortexFreq_Value" x="1490" y="480">
+        <Element id="FCLKCortexOutput" type="activeOutput" refParameter="FCLKCortexFreq_Value" x="1490" y="480" refEnable="notInLPBAM">
             <Input signalId="AHBCLK" from="AHBOutput"/>
         </Element>
-        <Element id="APB1Prescaler" type="devisor" refParameter="APB1CLKDivider" x="1020" y="310" refLock="APB1TrustZoneEnable">
+        <Element id="APB1Prescaler" type="devisor" refParameter="APB1CLKDivider" x="1020" y="310" refLock="APB1TrustZoneEnable" refEnable="notInLPBAM">
             <Input signalId="AHBCLK" from="AHBOutput"/>
             <Output signalId="PCLK1" to="APB1Output" />
             <Output signalId="PCLK1" to="TimPrescalerAPB1" />
@@ -612,37 +627,37 @@
             <Output signalId="PCLK1" to="I2C2Mult"/>
             <Output signalId="PCLK1" to="I2C3Mult"/>            
         </Element>		
-        <Element id="APB1Output" type="activeOutput" refParameter="APB1Freq_Value" x="1490" y="308">
+        <Element id="APB1Output" type="activeOutput" refParameter="APB1Freq_Value" x="1490" y="308" refEnable="notInLPBAM">
             <Input signalId="PCLK1" from="APB1Prescaler"/>
         </Element>
-        <Element id="TimPrescalerAPB1" type="multiplicator" refParameter="APB1TimCLKDivider" x="1150" y="342">
+        <Element id="TimPrescalerAPB1" type="multiplicator" refParameter="APB1TimCLKDivider" x="1150" y="342" refEnable="notInLPBAM">
             <Input signalId="PCLK1" from="APB1Prescaler"/>
             <Output signalId="TimCLK" to="TimPrescOut1"/>
         </Element>
-        <Element id="TimPrescOut1" type="activeOutput" refParameter="APB1TimFreq_Value" x="1490" y="342">
+        <Element id="TimPrescOut1" type="activeOutput" refParameter="APB1TimFreq_Value" x="1490" y="342" refEnable="notInLPBAM">
             <Input signalId="TimCLK" from="TimPrescalerAPB1"/>
         </Element>
-        <Element id="APB2Prescaler" type="devisor" refParameter="APB2CLKDivider" x="1020" y="379"  refLock="APB1TrustZoneEnable">
+        <Element id="APB2Prescaler" type="devisor" refParameter="APB2CLKDivider" x="1020" y="379"  refLock="APB1TrustZoneEnable" refEnable="notInLPBAM">
             <Input signalId="AHBCLK" from="AHBOutput"/>
             <Output signalId="PCLK2" to="APB2Output" />
             <Output signalId="PCLK2" to="TimPrescalerAPB2" />
             <Output signalId="PCLK2" to="USART1Mult" />
         </Element>
-        <Element id="APB2Output" type="activeOutput" refParameter="APB2Freq_Value" x="1490" y="377">
+        <Element id="APB2Output" type="activeOutput" refParameter="APB2Freq_Value" x="1490" y="377" refEnable="notInLPBAM">
             <Input signalId="PCLK2" from="APB2Prescaler"/>
         </Element>
-        <Element id="APB3Prescaler" type="devisor" refParameter="APB3CLKDivider" x="1020" y="449"  refLock="APB1TrustZoneEnable">
+        <Element id="APB3Prescaler" type="devisor" refParameter="APB3CLKDivider" x="1020" y="449"  refLock="APB1TrustZoneEnable" refEnable="notInLPBAM">
             <Input signalId="AHBCLK" from="AHBOutput"/>
             <Output signalId="PCLK3" to="APB3Output" />
         </Element>
-        <Element id="APB3Output" type="activeOutput" refParameter="APB3Freq_Value" x="1490" y="447">
+        <Element id="APB3Output" type="activeOutput" refParameter="APB3Freq_Value" x="1490" y="447" refEnable="notInLPBAM">
             <Input signalId="PCLK3" from="APB3Prescaler"/>
         </Element>
-        <Element id="TimPrescalerAPB2" type="multiplicator" refParameter="APB2TimCLKDivider" x="1150" y="409">
+        <Element id="TimPrescalerAPB2" type="multiplicator" refParameter="APB2TimCLKDivider" x="1150" y="409" refEnable="notInLPBAM">
             <Input signalId="PCLK2" from="APB2Prescaler"/>
             <Output signalId="PeriphCLK" to="TimPrescOut2"/>
         </Element>
-        <Element id="TimPrescOut2" type="activeOutput" refParameter="APB2TimFreq_Value" x="1490" y="409">
+        <Element id="TimPrescOut2" type="activeOutput" refParameter="APB2TimFreq_Value" x="1490" y="409" refEnable="notInLPBAM">
             <Input signalId="PeriphCLK" from="TimPrescalerAPB2"/>
         </Element>
         
@@ -691,17 +706,17 @@
         		
   <!--Main PLL-->
         <Tree id="PLL">
-            <Element id="PLLN" type="multiplicatorFrac" refParameter="PLLN" x="509" y="510" refLock="PLLIsSecureLocked">
+            <Element id="PLLN" type="multiplicatorFrac" refParameter="PLLN" x="509" y="510" refLock="PLLIsSecureLocked" refEnable="notInLPBAM">
                 <Input signalId="VCOInput" from="PLLM"/>
                 <Input signalId="PLL1FRACNClk" from="PLLFRACN"/>
                 <Output signalId="VCOOutput" to="PLL1Q"/>
                 <Output signalId="VCOOutput" to="PLL1P"/>
                 <Output signalId="VCOOutput" to="PLL1R"/>
             </Element>
-            <Element id="PLLFRACN" type="fractional" refParameter="PLLFRACN" x="507" y="580" refLock="PLLIsSecureLocked">
+            <Element id="PLLFRACN" type="fractional" refParameter="PLLFRACN" x="507" y="580" refLock="PLLIsSecureLocked" refEnable="notInLPBAM">
                 <Output signalId="PLL1FRACNClk" to="PLLN"/>
             </Element>
-            <Element id="PLL1P" type="devisor" refParameter="PLL1P" x="575" y="586" refEnable="SAI1Enable,SAI2Enable,SDMMCEnable,MDF1Enable,ADF1Enable" refLock="PLLIsSecureLocked">
+            <Element id="PLL1P" type="devisor" refParameter="PLL1P" x="575" y="586" refEnable="SAI1EnableLPBAM,SAI2EnableLPBAM,SDMMCEnableLPBAM,MDF1EnableLPBAM,ADF1EnableLPBAM" refLock="PLLIsSecureLocked">
                 <Input signalId="VCOOutput" from="PLLN"/>
                 <Output signalId="PLLPCLK" to="SAI1Mult"/>
                 <Output signalId="PLLPCLK" to="SAI2Mult"/>
@@ -710,39 +725,39 @@
                 <Output signalId="PLLPCLK" to="MDF1Mult"/>
                 <Output signalId="PLLPCLK" to="ADF1Mult"/>       
             </Element>
-            <Element id="PLLPoutput" type="output" refParameter="PLLPoutputFreq_Value" x="661" y="585" refEnable="SAI1Enable,SAI2Enable,SDMMCEnable,MDF1Enable,ADF1Enable">
+            <Element id="PLLPoutput" type="output" refParameter="PLLPoutputFreq_Value" x="661" y="585" refEnable="SAI1EnableLPBAM,SAI2EnableLPBAM,SDMMCEnableLPBAM,MDF1EnableLPBAM,ADF1EnableLPBAM">
                 <Input signalId="PLLPCLK" from="PLL1P"/>
             </Element>
 
-            <Element id="PLL1Q" type="devisor" refParameter="PLL1Q" x="575" y="548" refEnable="USBEnable,SDMMCEnable,FDCANEnable,OCTOSPIMEnable" refLock="PLLIsSecureLocked">
+            <Element id="PLL1Q" type="devisor" refParameter="PLL1Q" x="575" y="548" refEnable="USBEnable,SDMMCEnableLPBAM,FDCANEnableLPBAM,OCTOSPIMEnableLPBAM" refLock="PLLIsSecureLocked">
                 <Input signalId="VCOOutput" from="PLLN"/>
                 <Output signalId="PLLQCLK" to="CK48Mult"/>
                 <Output signalId="PLLQCLK" to="PLLQoutput"/>
                 <Output signalId="PLLQCLK" to="OCTOSPIMMult"/>
                 <Output signalId="PLLQCLK" to="FDCANMult"/>                
             </Element>
-            <Element id="PLLQoutput" type="output" refParameter="PLLQoutputFreq_Value" x="661" y="547" refEnable="USBEnable,SDMMCEnable,FDCANEnable,OCTOSPIMEnable">
+            <Element id="PLLQoutput" type="output" refParameter="PLLQoutputFreq_Value" x="661" y="547" refEnable="USBEnable,SDMMCEnableLPBAM,FDCANEnableLPBAM,OCTOSPIMEnableLPBAM">
                 <Input signalId="PLLQCLK" from="PLL1Q"/>
             </Element>
 				
-            <Element id="PLL1R" type="devisor" refParameter="PLL1R" x="575" y="510" refLock="PLLIsSecureLocked">
+            <Element id="PLL1R" type="devisor" refParameter="PLL1R" x="575" y="510" refLock="PLLIsSecureLocked" refEnable="notInLPBAM">
                 <Input signalId="VCOOutput" from="PLLN"/>
                 <Output signalId="PLLCLK" to="SysClkSource"/>
                 <Output signalId="PLLCLK" to="MCOMult"/>       
             </Element>
         </Tree>
         <Tree id="PLL2">
-            <Element id="PLL2N" type="multiplicatorFrac" refParameter="PLL2N" x="509" y="641" refEnable="FDCANEnable,SAI1Enable,SAI2Enable,USBEnable,SDMMCEnable,ADCEnable,DACEnable" refLock="PLL2IsSecureLocked">
+            <Element id="PLL2N" type="multiplicatorFrac" refParameter="PLL2N" x="509" y="641" refEnable="FDCANEnableLPBAM,SAI1EnableLPBAM,SAI2EnableLPBAM,USBEnable,SDMMCEnableLPBAM,ADCEnableLPBAM,DACEnableLPBAM" refLock="PLL2IsSecureLocked">
                 <Input signalId="VCOInput2" from="PLL2M"/>
                 <Input signalId="PLL2FRACNClk" from="PLL2FRACN"/>
                 <Output signalId="VCOPLL2Output" to="PLL2Q"/>
                 <Output signalId="VCOPLL2Output" to="PLL2P"/>
                 <Output signalId="VCOPLL2Output" to="PLL2R"/>                 
             </Element>
-            <Element id="PLL2FRACN" type="fractional" refParameter="PLL2FRACN" x="507" y="712" refLock="PLL2IsSecureLocked">
+            <Element id="PLL2FRACN" type="fractional" refParameter="PLL2FRACN" x="507" y="712" refLock="PLL2IsSecureLocked" refEnable="notInLPBAM">
                 <Output signalId="PLL2FRACNClk" to="PLL2N"/>
             </Element>
-            <Element id="PLL2P" type="devisor" refParameter="PLL2P" x="575" y="718" refEnable="SAI1Enable,SAI2Enable,FDCANEnable" refLock="PLL2IsSecureLocked">
+            <Element id="PLL2P" type="devisor" refParameter="PLL2P" x="575" y="718" refEnable="SAI1EnableLPBAM,SAI2EnableLPBAM,FDCANEnableLPBAM" refLock="PLL2IsSecureLocked">
                 <Input signalId="VCOPLL2Output" from="PLL2N"/>
                 <Output signalId="PLL2PCLK" to="SAI1Mult"/>
                 <Output signalId="PLL2PCLK" to="SAI2Mult"/>
@@ -750,28 +765,28 @@
                 <Output signalId="PLL2PCLK" to="FDCANMult"/>
          
             </Element>
-            <Element id="PLL2Poutput" type="output" refParameter="PLL2PoutputFreq_Value" x="661" y="717" refEnable="SAI1Enable,SAI2Enable,FDCANEnable">
+            <Element id="PLL2Poutput" type="output" refParameter="PLL2PoutputFreq_Value" x="661" y="717" refEnable="SAI1EnableLPBAM,SAI2EnableLPBAM,FDCANEnableLPBAM">
                 <Input signalId="PLL2PCLK" from="PLL2P"/>
             </Element>
 
         
-            <Element id="PLL2Q" type="devisor" refParameter="PLL2Q" x="575" y="680" refEnable="USBEnable,SDMMCEnable,OCTOSPIMEnable" refLock="PLL2IsSecureLocked">
+            <Element id="PLL2Q" type="devisor" refParameter="PLL2Q" x="575" y="680" refEnable="USBEnable,SDMMCEnableLPBAM,OCTOSPIMEnableLPBAM" refLock="PLL2IsSecureLocked">
                 <Input signalId="VCOPLL2Output" from="PLL2N"/>
                 <Output signalId="PLL2QCLK" to="CK48Mult"/>
                 <Output signalId="PLL2QCLK" to="PLL2Qoutput"/>
                 <Output signalId="PLL2QCLK" to="OCTOSPIMMult"/>
             </Element>
-            <Element id="PLL2Qoutput" type="output" refParameter="PLL2QoutputFreq_Value" x="661" y="679" refEnable="USBEnable,SDMMCEnable,OCTOSPIMEnable">
+            <Element id="PLL2Qoutput" type="output" refParameter="PLL2QoutputFreq_Value" x="661" y="679" refEnable="USBEnable,SDMMCEnableLPBAM,OCTOSPIMEnableLPBAM">
                 <Input signalId="PLL2QCLK" from="PLL2Q"/>
             </Element>
 										    
 
-            <Element id="PLL2R" type="devisor" refParameter="PLL2R" x="575" y="641" refEnable="ADCEnable,DACEnable" refLock="PLL2IsSecureLocked">
+            <Element id="PLL2R" type="devisor" refParameter="PLL2R" x="575" y="641" refEnable="ADCEnableLPBAM,DACEnableLPBAM" refLock="PLL2IsSecureLocked">
                 <Input signalId="VCOPLL2Output" from="PLL2N"/>
                 <Output signalId="PLL2RCLK" to="ADCMult"/>
                 <Output signalId="PLL2RCLK" to="PLL2Routput"/>
             </Element>
-            <Element id="PLL2Routput" type="output" refParameter="PLL2RoutputFreq_Value" x="661" y="640" refEnable="ADCEnable,DACEnable">
+            <Element id="PLL2Routput" type="output" refParameter="PLL2RoutputFreq_Value" x="661" y="640" refEnable="ADCEnableLPBAM,DACEnableLPBAM">
                 <Input signalId="PLL2RCLK" from="PLL2R"/>
             </Element>
 										
@@ -779,32 +794,32 @@
             
         </Tree>
         <Tree id="PLL3">
-            <Element id="PLL3N" type="multiplicatorFrac" refParameter="PLL3N" x="509" y="788" refEnable="SAI1Enable,SAI2Enable,MDF1Enable,ADF1Enable" refLock="PLL3IsSecureLocked">
+            <Element id="PLL3N" type="multiplicatorFrac" refParameter="PLL3N" x="509" y="788" refEnable="SAI1EnableLPBAM,SAI2EnableLPBAM,MDF1EnableLPBAM,ADF1EnableLPBAM" refLock="PLL3IsSecureLocked">
                 <Input signalId="VCOInput3" from="PLL3M"/>   
                 <Input signalId="PLL3FRACNClk" from="PLL3FRACN"/>            
                 <Output signalId="VCOPLL3Output" to="PLL3P"/>
                 <Output signalId="VCOPLL3Output" to="PLL3Q"/>
                 <Output signalId="VCOPLL3Output" to="PLL3R"/>
             </Element>
-            <Element id="PLL3FRACN" type="fractional" refParameter="PLL3FRACN" x="507" y="850" refLock="PLL3IsSecureLocked">
+            <Element id="PLL3FRACN" type="fractional" refParameter="PLL3FRACN" x="507" y="850" refLock="PLL3IsSecureLocked" refEnable="notInLPBAM">
                 <Output signalId="PLL3FRACNClk" to="PLL3N"/>
             </Element>
-            <Element id="PLL3P" type="devisor" refParameter="PLL3P" x="575" y="868" refEnable="SAI1Enable,SAI2Enable" refLock="PLL3IsSecureLocked">
+            <Element id="PLL3P" type="devisor" refParameter="PLL3P" x="575" y="868" refEnable="SAI1EnableLPBAM,SAI2EnableLPBAM" refLock="PLL3IsSecureLocked">
                 <Input signalId="VCOPLL3Output" from="PLL3N"/>
                 <Output signalId="PLL3PCLK" to="SAI1Mult"/>
                 <Output signalId="PLL3PCLK" to="SAI2Mult"/>
                 <Output signalId="PLL3PCLK" to="PLL3Poutput"/>
          
             </Element>
-            <Element id="PLL3Poutput" type="output" refParameter="PLL3PoutputFreq_Value"  x="661" y="867" refEnable="SAI1Enable,SAI2Enable">
+            <Element id="PLL3Poutput" type="output" refParameter="PLL3PoutputFreq_Value"  x="661" y="867" refEnable="SAI1EnableLPBAM,SAI2EnableLPBAM">
                 <Input signalId="PLL3PCLK" from="PLL3P"/>
             </Element>
             
-            <Element id="PLL3Q" type="devisor" refParameter="PLL3Q" x="575" y="828" refEnable="MDF1Enable,ADF1Enable" refLock="PLL3IsSecureLocked">
+            <Element id="PLL3Q" type="devisor" refParameter="PLL3Q" x="575" y="828" refEnable="MDF1EnableLPBAM,ADF1EnableLPBAM" refLock="PLL3IsSecureLocked">
                 <Input signalId="VCOPLL3Output" from="PLL3N"/>       
                 <Output signalId="PLL3QCLK" to="PLL3Qoutput"/>
             </Element>
-            <Element id="PLL3Qoutput" type="output" refParameter="PLL3QoutputFreq_Value"  x="661" y="827" refEnable="MDF1Enable,ADF1Enable">
+            <Element id="PLL3Qoutput" type="output" refParameter="PLL3QoutputFreq_Value"  x="661" y="827" refEnable="MDF1EnableLPBAM,ADF1EnableLPBAM">
                 <Input signalId="PLL3QCLK" from="PLL3Q"/>
             </Element>
             
@@ -822,6 +837,7 @@
         </Tree>
     </Tree>
     <Signals>
+        <Signal id="WakeUpCLKOutput"/>
         <Signal id="HSE"   refParameter="HSE_VALUE"/>
         <Signal id="LSI"   refParameter="LSI_VALUE"/>
         <Signal id="LSE"   refParameter="LSE_VALUE"/>
@@ -938,6 +954,19 @@
     <Label id="LSIForRTCLabel"    type="signal"      text="LSI"     posX="503" posY="226" refEnable="RTCEnable,LCDEnable"/>
     <Label id="HSEForRTCLabel"    type="signal"      text="HSE"     posX="385" posY="160" refEnable="EnableHSERTCDevisor,EnableHSELCDDevisor"/>
     <Label id="HSERTCForRTCLabel" type="signal"      text="HSE_RTC" posX="479" posY="160" refEnable="EnableHSERTCDevisor,EnableHSELCDDevisor"/>
+    <!--wakeup from stop clock  labels-->
+    <Label id="Wake-UpfromSTOPClock"    type="muxLabel" text="Wake-Up from STOP Mux"  posX="752" posY="154">
+        <Condition Diagnostic="" Expression="S_LPBAM_CONF"/>
+    </Label>
+    <Label id="Wake-UpfromSTOPClock"    type="SpecialInfo" text="To Wake-Up Clock (MHz)"  posX="880" posY="206">
+        <Condition Diagnostic="" Expression="S_LPBAM_CONF"/>
+    </Label>
+    <Label id="LSIForWake-UpfromSTOPClockLabel"    type="signal"      text="MSI"     posX="753" posY="176">
+        <Condition Diagnostic="" Expression="S_LPBAM_CONF"/>
+    </Label>
+    <Label id="HSEForWake-UpfromSTOPClockLabel"    type="signal"      text="HSI"     posX="753" posY="220">
+        <Condition Diagnostic="" Expression="S_LPBAM_CONF"/>
+    </Label>
     <!--sysclock labels-->
     <Label id="SystemCLKMuxLabel" type="muxLabel" posX="639" posY="362" text="System Clock Mux"/>
     <Label id="SystemHSILabel"    type="signal"   posX="662" posY="382" text="MSIS"/>
@@ -992,7 +1021,7 @@
     <Label id="SHSIRCLabel"    type="info"       posX="302" posY="1298" text="SHSI RC">
         <Condition Diagnostic="" Expression="SAES_Exist"/>
     </Label>
-    <Label id="SHSIRCCstLabel" type="constraint" posX="302" posY="1346" text="16 MHz">
+    <Label id="SHSIRCCstLabel" type="constraint" posX="302" posY="1346" text="48 MHz">
         <Condition Diagnostic="" Expression="SAES_Exist"/>
     </Label>
 

@@ -194,6 +194,12 @@ extern "C" {
 #define PAYLOAD_LEN                                 ${PAYLOAD_LEN}
 [/#if]
 
+[#if THREADX??]
+#define CFG_APP_SUBGHZ_THREAD_STACK_SIZE                   1024  /* to check if possible to set it in lora gui if rtos detected*/
+#define CFG_APP_SUBGHZ_THREAD_PRIO                         10 /* to check if possible to set it in lora gui if rtos detected*/
+#define CFG_APP_SUBGHZ_THREAD_PREEMPTION_THRESHOLD         CFG_APP_SUBGHZ_THREAD_PRIO
+
+[/#if]
 /* USER CODE BEGIN EC */
 
 /* USER CODE END EC */
@@ -203,7 +209,7 @@ extern "C" {
 
 /* USER CODE END EV */
 
-/* Exported macro ------------------------------------------------------------*/
+/* Exported macros -----------------------------------------------------------*/
 /* USER CODE BEGIN EM */
 
 /* USER CODE END EM */
@@ -214,6 +220,14 @@ extern "C" {
   */
 void SubghzApp_Init(void);
 
+[#if THREADX??]
+/**
+  * @brief  Function implementing the Sigfox Main Thread thread.
+  * @param  thread_input: Not used
+  * @retval None
+  */
+void App_Main_Thread_Entry(unsigned long thread_input);
+[/#if]
 /* USER CODE BEGIN EFP */
 
 /* USER CODE END EFP */

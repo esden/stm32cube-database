@@ -72,4 +72,3 @@ void Process_Radio_Cmd(MBMUX_ComParam_t *ComObj);
 #endif
 
 #endif /*__RADIO_MBWRAPPER_${CPUCORE}_H__ */
-

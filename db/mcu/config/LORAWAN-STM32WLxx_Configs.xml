@@ -7,7 +7,7 @@
     IncludeFile=""
     Name="LoRaWAN"
     RootFolder="Middlewares/Third_Party/"
-    Version="STM32Cube_FW_WL_V1.1.0">
+    Version="STM32Cube_FW_WL_V1.2.0">
 
     <RefConfig Comment="" Name="LoRaWAN_Init">
         <CallLibMethod Name="LoRaWAN_Init"/>
@@ -25,6 +25,7 @@
 
         <!-- Core/Inc -->
         <ConfigFile Name="IPCC_IF_H"/>
+        <ConfigFile Name="FLASH_IF_H"/>
         <ConfigFile Name="NUCLEO_CONF_H"/>
         <ConfigFile Name="PLATFORM_H"/>
         <ConfigFile Name="STM32_LPM_IF_H"/>
@@ -40,6 +41,7 @@
         <!-- Core/Src -->
         <ConfigFile Name="IPCC_IF_M0PLUS_C"/>
         <ConfigFile Name="IPCC_IF_M4_C"/>
+        <ConfigFile Name="FLASH_IF_C"/>
         <ConfigFile Name="STM32_LPM_IF_C"/>
         <ConfigFile Name="SYS_APP_C"/>
         <ConfigFile Name="SYS_DEBUG_C"/>
@@ -119,6 +121,10 @@
         <ConfigFile Name="MBMUX_MBMUX_TABLE_H"/>
         <ConfigFile Name="MBMUX_MESSAGE_ID_H"/>
 
+        <!-- AzRTOS -->
+        <ConfigFile Name="RTOS_VARIABLES_LORAWAN_TMP"/>
+        <ConfigFile Name="RTOS_POOL_CREATE_LORAWAN_TMP"/>
+        <ConfigFile Name="RTOS_DEFINES_LORAWAN_TMP"/>
     </RefConfig>
 
     <LibMethod Name="LoRaWAN_Init" Comment="Initialize the LoRaWAN stack">
@@ -202,12 +208,18 @@
 
 <!-- Core/Inc begin-->
 
+    <RefConfigFile Description="" Name="FLASH_IF_H" Template="stm32wl/flash_if_h.ftl" destinationFolder="Core/Inc/">
+        <File Category="header" Name="flash_if.h" Version="1.0" Condition="!SEM_M0PLUS &amp; !SEM_LORA_USER_APPLICATION"/>
+    </RefConfigFile>
+
     <RefConfigFile Description="" Name="PLATFORM_H" Template="stm32wl/platform_h.ftl" destinationFolder="Core/Inc/">
         <File Category="header" Name="platform.h" Version="1.0" Condition="all"/>
         <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
         <Argument Name="FILL_UCS" GenericType="Simple" Comment=""/>
         <Argument Name="Activate_RADIO_BOARD_INTERFACE" GenericType="Simple" Comment=""/>
+<!--
         <Argument Name="Activate_BOARD_RESOURCES" GenericType="Simple" Comment=""/>
+-->
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="STM32_LPM_IF_H" Template="stm32wl/stm32_lpm_if_h.ftl" destinationFolder="Core/Inc/">
@@ -222,19 +234,25 @@
     <RefConfigFile Description="" Name="SYS_CONF_H" Template="stm32wl/sys_conf_h.ftl" destinationFolder="Core/Inc/">
         <File Category="header" Name="sys_conf.h" Version="1.0" Condition="!SEM_LORA_USER_APPLICATION"/>
         <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
-        <Argument Name="Activate_DEBUG_LINE" GenericType="Simple" Comment=""/>
         <Argument Name="VERBOSE_LEVEL" GenericType="Simple" Comment=""/>
         <Argument Name="APP_LOG_ENABLED" GenericType="Simple" Comment=""/>
+        <Argument Name="SENSOR_ENABLED" GenericType="Simple" Comment=""/>
         <Argument Name="DEBUGGER_ON" GenericType="Simple" Comment=""/>
         <Argument Name="LOW_POWER_DISABLE" GenericType="Simple" Comment=""/>
         <Argument Name="VERBOSE_LEVEL_CM4" GenericType="Simple" Comment=""/>
         <Argument Name="APP_LOG_ENABLED_CM4" GenericType="Simple" Comment=""/>
-        <Argument Name="DEBUGGER_ON_CM4" GenericType="Simple" Comment=""/>
+        <Argument Name="SENSOR_ENABLED_CM4" GenericType="Simple" Comment=""/>
         <Argument Name="LOW_POWER_DISABLE_CM4" GenericType="Simple" Comment=""/>
         <Argument Name="VERBOSE_LEVEL_CM0PLUS" GenericType="Simple" Comment=""/>
         <Argument Name="APP_LOG_ENABLED_CM0PLUS" GenericType="Simple" Comment=""/>
-        <Argument Name="DEBUGGER_ON_CM0PLUS" GenericType="Simple" Comment=""/>
         <Argument Name="LOW_POWER_DISABLE_CM0PLUS" GenericType="Simple" Comment=""/>
+        <Argument Name="DEBUG_SUBGHZSPI_MONITORING" GenericType="Simple" Comment=""/>
+        <Argument Name="DEBUG_RF_SMPSRDY" GenericType="Simple" Comment=""/>
+        <Argument Name="DEBUG_RF_NRESET" GenericType="Simple" Comment=""/>
+        <Argument Name="DEBUG_RF_HSE32RDY" GenericType="Simple" Comment=""/>
+        <Argument Name="DEBUG_RF_LDORDY" GenericType="Simple" Comment=""/>
+        <Argument Name="DEBUG_RF_DTB1" GenericType="Simple" Comment=""/>
+        <Argument Name="DEBUG_RF_BUSY" GenericType="Simple" Comment=""/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="SYS_SENSORS_H" Template="stm32wl/sys_sensors_h.ftl" destinationFolder="Core/Inc/">
@@ -256,7 +274,7 @@
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="NUCLEO_CONF_H" Template="stm32wl/stm32wlxx_nucleo_conf_h.ftl" destinationFolder="Core/Inc/">
-        <File Category="header" Name="stm32wlxx_nucleo_conf.h" Version="1.0" Condition="!SEM_M0PLUS &amp; !SEM_M4 &amp; !SEM_LORA_USER_APPLICATION"/>
+        <File Category="header" Name="stm32wlxx_nucleo_conf.h" Version="1.0" Condition="!SEM_M0PLUS &amp; !SEM_M4 &amp; !SEM_USER_BOARD_FOR_LORA"/>
         <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
     </RefConfigFile>
 
@@ -271,6 +289,10 @@
 <!-- Core/Inc end-->
 
 <!-- Core/Src begin-->
+
+    <RefConfigFile Description="" Name="FLASH_IF_C" Template="stm32wl/flash_if_c.ftl" destinationFolder="Core/Src/">
+        <File Category="source" Name="flash_if.c" Version="1.0" Condition="!SEM_M0PLUS &amp; !SEM_LORA_USER_APPLICATION"/>
+    </RefConfigFile>
 
     <RefConfigFile Description="" Name="IPCC_IF_M4_C" Template="stm32wl/ipcc_if_M4_c.ftl" destinationFolder="Core/Src/">
         <File Category="source" Name="ipcc_if.c" Version="1.0" Condition="SEM_M4"/>
@@ -359,8 +381,10 @@
         <Argument Name="LORAWAN_DEFAULT_CONFIRMED_MSG_STATE" GenericType="Simple" Comment=""/>
         <Argument Name="LORAWAN_ADR_STATE" GenericType="Simple" Comment=""/>
         <Argument Name="LORAWAN_DEFAULT_ACTIVATION_TYPE" GenericType="Simple" Comment=""/>
+        <Argument Name="LORAWAN_FORCE_REJOIN_AT_BOOT" GenericType="Simple" Comment=""/>
         <Argument Name="LORAWAN_DEFAULT_DATA_RATE" GenericType="Simple" Comment=""/>
         <Argument Name="LORAWAN_DEFAULT_PING_SLOT_PERIODICITY" GenericType="Simple" Comment=""/>
+        <Argument Name="LORAWAN_DEFAULT_CLASS_B_C_RESP_TIMEOUT" GenericType="Simple" Comment=""/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="APP_LORA_APP_M0PLUS_C" Template="stm32wl/LoRaWAN_lora_app_M0PLUS_c.ftl">
@@ -413,9 +437,11 @@
     <RefConfigFile Description="" Name="TARGET_LORAWAN_CONF_H" Template="stm32wl/LoRaWAN_lorawan_conf_h.ftl" >
         <File Category="header" Condition="SEM_LORA_AT_SLAVE | SEM_LORA_END_NODE | SEM_LORA_USER_APPLICATION" Name="Target/lorawan_conf.h" Version="1.0"/>
         <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
+        <Argument Name="LORAMAC_SPECIFICATION_VERSION" GenericType="Simple" Comment=""/>
         <Argument Name="REGION" GenericType="Simple" Comment=""/>
         <Argument Name="HYBRID_ENABLED" GenericType="Simple" Comment=""/>
         <Argument Name="KEY_EXTRACTABLE" GenericType="Simple" Comment=""/>
+        <Argument Name="CONTEXT_MANAGEMENT_ENABLED" GenericType="Simple" Comment=""/>
         <Argument Name="LORAMAC_CLASSB_ENABLED" GenericType="Simple" Comment=""/>
         <Argument Name="REGION_AS923" GenericType="Simple" Comment=""/>
         <Argument Name="REGION_AU915" GenericType="Simple" Comment=""/>
@@ -593,7 +619,7 @@
 
 <!-- COMMON/Board Begin-->
     <RefConfigFile Description="" Name="NUCLEO_CONF_H" Template="stm32wl/stm32wlxx_nucleo_conf_h.ftl" destinationFolder="../Common/Board/">
-        <File Category="header" Name="stm32wlxx_nucleo_conf.h" Version="1.0" Condition="(SEM_M0PLUS | SEM_M4) &amp; !SEM_LORA_USER_APPLICATION" />
+        <File Category="header" Name="stm32wlxx_nucleo_conf.h" Version="1.0" Condition="(SEM_M0PLUS | SEM_M4) &amp; !SEM_USER_BOARD_FOR_LORA" />
         <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
     </RefConfigFile>
 <!-- COMMON/Board end-->
@@ -629,6 +655,23 @@
     </RefConfigFile>
 
 <!-- COMMON/MbMux end-->
+
+<!-- AzRTOS Begin-->
+
+    <RefConfigFile Description="" Name="RTOS_VARIABLES_LORAWAN_TMP" Template="stm32wl/RTOS_variables_LORAWAN_tmp.ftl">
+        <File Category="header" Condition="S_RTOS_M4 | S_RTOS" Name="RTOS_variables_LoRaWAN.tmp" Version="1.0"/>
+    </RefConfigFile>
+
+    <RefConfigFile Description="" Name="RTOS_POOL_CREATE_LORAWAN_TMP" Template="stm32wl/RTOS_pool_create_LORAWAN_tmp.ftl">
+        <File Category="header" Condition="S_RTOS_M4 | S_RTOS" Name="RTOS_pool_create_LoRaWAN.tmp" Version="1.0"/>
+    </RefConfigFile>
+
+    <RefConfigFile Description="" Name="RTOS_DEFINES_LORAWAN_TMP" Template="stm32wl/RTOS_defines_LORAWAN_tmp.ftl">
+        <File Category="header" Condition="S_RTOS_M4 | S_RTOS" Name="RTOS_defines_LoRaWAN.tmp" Version="1.0"/>
+        <Argument Name="LORAWAN_APP_MEM_POOL_SIZE" GenericType="Simple" Comment=""/>
+    </RefConfigFile>
+
+<!-- AzRTOS end-->
 
 <!-- Platform Setting Begin -->
     <!-- BSP HMI Begin -->

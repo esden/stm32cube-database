@@ -1,0 +1,15 @@
+[#ftl]
+[#assign USBPD_APP_MEM_POOL_SIZE = "6144"]
+[#if SWIPdatas??]
+    [#list SWIPdatas as SWIP]
+        [#if SWIP.defines??]
+            [#list SWIP.defines as definition]
+                [#if definition.name == "USBPD_APP_MEM_POOL_SIZE"]
+                    [#assign USBPD_APP_MEM_POOL_SIZE = definition.value]
+                [/#if]
+            [/#list]
+        [/#if]
+    [/#list]
+[/#if]
+
+#define USBPD_APP_MEM_POOL_SIZE ${USBPD_APP_MEM_POOL_SIZE}

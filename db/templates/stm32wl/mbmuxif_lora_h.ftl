@@ -54,6 +54,11 @@ extern "C" {
              -2: feature not provided by CM0PLUS;
              -3: callback error on CM0PLUS
              -4: mismatch between CM4 and CM0PLUS lora stack versions
+[#if THREADX??]
+             -10: threadx TX_POOL_ERROR
+             -11: threadx TX_THREAD_ERROR
+             -12: threadx TX_SEMAPHORE_ERROR
+[/#if]
   */
 int8_t MBMUXIF_LoraInit(void);
 

@@ -20,6 +20,9 @@ extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
+[#if THREADX??]
+#include <stdint.h>
+[/#if]
 /* USER CODE BEGIN Includes */
 
 /* USER CODE END Includes */
@@ -44,19 +47,25 @@ extern "C" {
 
 /* USER CODE END EM */
 
-/* Exported functions prototypes ---------------------------------------------*/
+/* Exported Functions Prototypes ---------------------------------------------*/
 /**
   * @brief  Init SubGHz Radio Application
   */
+[#if !THREADX??][#-- If AzRtos is not used --]
 void MX_SubGHz_Phy_Init(void);
+[#else]
+uint32_t MX_SubGHz_Phy_Init(void *memory_ptr);
+[/#if]
 
 [#if !FREERTOS??][#-- If FreeRtos, only available in CM4 is not used --]
+[#if !THREADX??][#-- If AzRtos is not used --]
 /**
   * @brief  SubGHz Radio Application Process
   */
 void MX_SubGHz_Phy_Process(void);
-[/#if]
 
+[/#if]
+[/#if]
 /* USER CODE BEGIN EFP */
 
 /* USER CODE END EFP */

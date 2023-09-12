@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<IP DBVersion="V4.0" IPType="LPBAM" Name="LPBAMLPDMA" Version="STM32U55x"
+    xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance"
+    ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd"
+    xmlns="http://mcd.rou.st.com/modules.php?name=mcu">
+    <About>LPBAMLPDMA: Low Power Background Activity Mode for LPDMA</About>
+
+   
+    <RefParameter Name="Instance" DefaultValue="LPBAMLPDMA$Index" Comment="LPBAM IP Instance" Type="" Visible="false"/>
+    <RefParameter Name="InstanceHAL" DefaultValue="LPDMA$Index" Comment="HAL IP Instance" Type="" Visible="false"/>
+                          
+    <!-- tempory parameters to be replaced by names provided by UI/lpbam service-->
+
+    <RefParameter Name="QUEUE_NAME" Comment="Define the name of your Queue"   DefaultValue="YourQueueName"  Type="StringRW" >
+    </RefParameter>
+    <RefParameter Name="DESCRIPTOR_NAME_START" Comment="name of the descriptor"   DefaultValue="descriptorx_OPAMP_START"  Type="StringRW" >
+    </RefParameter>
+
+    <!-- tempory parameters to be replaced by names provided by UI/lpbam service-->
+
+    <!-- parameter for circular Mode management for Mode START-->
+    <RefParameter Comment="Circular Node for START" DefaultValue="__NULL" Name="CircularNode_START" Type="list" Group="Start" Visible="false">
+        <Description>description</Description>
+        <PossibleValue Comment="DISABLE" Value="__NULL"/>
+        <PossibleValue Comment="Configuration Node" Value="LPBAM_DMA_START_FULLQ_CONFIG_NODE"/>
+    </RefParameter>
+    <!-- parameter for circular Mode management for Mode START-->
+
+ 
+    <RefParameter Comment="Queue to start" DefaultValue="Yes" Name="OriginOfQueue" Type="list"  Group="Start Parameters - Queue Configuration">
+        <Description>description</Description>
+        <PossibleValue Comment="Designed inside LPBAM tool" Value="YES"/>
+        <PossibleValue Comment="Designed outside LPBAM tool" Value="NO"/>
+    </RefParameter>
+
+    <RefParameter Comment="Queue Name" DefaultValue="" Name="HeadQAddress_LIST" Type="list"  Group="Start Parameters - Queue Configuration">
+        <Description>description</Description>
+        <Condition Diagnostic="QUEUE is output by LPBAM TOOL" Expression="OriginOfQueue=YES"/>
+        <PossibleValue Comment="Unknown QName1" Value="Unknown_QName1"/>
+    </RefParameter>
+
+    <RefParameter Comment="Queue Name" DefaultValue="" Name="HeadQAddress_LIST" Type="list"  Group="Start Parameters - Queue Configuration" Visible="false">
+        <Description>description</Description>
+        <Condition Diagnostic="QUEUE is output by LPBAM TOOL" Expression="OriginOfQueue=NO"/>
+        <PossibleValue Comment="Unknown QName1" Value="Unknown_QName1"/>
+    </RefParameter>
+
+
+    <RefParameter Comment="Queue Name"  Name="HeadQAddress_RW" Type="StringRW" DefaultValue="QueueName" Group="Start Parameters - Queue Configuration">
+        <Description>description</Description>
+          <Condition Diagnostic="QUEUE is output by LPBAM TOOL" Expression="OriginOfQueue=NO"/>
+    </RefParameter>
+
+    <RefParameter Comment="Queue Name"  Name="HeadQAddress_RW" Type="StringRW" DefaultValue="QueueName" Group="Start Parameters - Queue Configuration" Visible="false">
+        <Description>description</Description>
+          <Condition Diagnostic="QUEUE is output by LPBAM TOOL" Expression="OriginOfQueue=YES"/>
+    </RefParameter>
+
+    <RefParameter Comment="Queue to start Arg" DefaultValue="+(uint32_t)+HeadQAddress_LIST+_Q+.+Head" Name="HeadQAddressArg" Type="String" Visible="false">
+        <Condition Diagnostic="QUEUE is output by LPBAM TOOL" Expression="OriginOfQueue=YES"/>
+        <Description>only replace MYQUEUENAME in the proposed string</Description>
+    </RefParameter> 
+    <RefParameter Comment="Queue to start Arg" DefaultValue="+(uint32_t)+HeadQAddress_RW+.+Head" Name="HeadQAddressArg" Type="String" Visible="false">
+        <Condition Diagnostic="QUEUE is not output by LPBAM TOOL" Expression="!(OriginOfQueue=YES)"/>
+        <Description>only replace MYQUEUENAME in the proposed string</Description>
+    </RefParameter> 
+
+    <RefParameter Name="Interrupt1" Comment="Transfer Complete"   DefaultValue="LPBAM_DMA_IT_NONE"  Type="list"  Group="Start Parameters - WakeUp Interrupts Configuration" >
+        <Description>description</Description>
+        <PossibleValue Comment="Enable" Value="LPBAM_DMA_IT_TC"/>
+        <PossibleValue Comment="Disable" Value="LPBAM_DMA_IT_NONE"/>
+    </RefParameter>
+
+    <RefParameter Name="Interrupt2" Comment="Half Transfer Complete"   DefaultValue="LPBAM_DMA_IT_NONE"  Type="list"  Group="Start Parameters - WakeUp Interrupts Configuration">
+        <Description>description</Description>
+        <PossibleValue Comment="Enable" Value="LPBAM_DMA_IT_HT"/>
+        <PossibleValue Comment="Disable" Value="LPBAM_DMA_IT_NONE"/>
+    </RefParameter>
+
+
+    <RefParameter Name="InstanceIP" Comment="DMA channel to be started"   DefaultValue="LPDMA1_Channel0"  Type="list"  Group="Start Parameters - Queue Configuration">
+        <Description>description</Description>
+        <PossibleValue Comment="LPDMA1 Channel0" Value="LPDMA1_Channel0"/>
+        <PossibleValue Comment="LPDMA1 Channel1" Value="LPDMA1_Channel1"/>
+        <PossibleValue Comment="LPDMA1 Channel2" Value="LPDMA1_Channel2"/>
+        <PossibleValue Comment="LPDMA1 Channel3" Value="LPDMA1_Channel3"/>
+    </RefParameter>
+
+
+
+    <RefParameter Comment="Wake Up sources" DefaultValue="/+Interrupt1+|Interrupt2/\|LPBAM_DMA_IT_NONE//LPBAM_DMA_IT_NONE\|//" Group="Start Parameters - WakeUp Interrupts Configuration"  Type="list"  Name="WakeupIT"  Visible="false">
+    </RefParameter>
+
+
+    <!-- Trigger common description   -->
+
+
+    <RefParameter DefaultValue="LPBAM_DMA_TRIG_POLARITY_MASKED" Name="TriggerPolarity" Type="list" Comment="The Function execution is" Group="Trigger Configuration">
+        <Description>description</Description>
+        <PossibleValue Comment="not conditionned by a Trigger" Value="LPBAM_DMA_TRIG_POLARITY_MASKED"/>
+        <PossibleValue Comment="trigged on the Rising Edge of the Hardware Signal" Value="LPBAM_DMA_TRIG_POLARITY_RISING"/>
+        <PossibleValue Comment="trigged on the Falling Edge of the Hardware Signal" Value="LPBAM_DMA_TRIG_POLARITY_FALLING"/>
+    </RefParameter>   
+
+    <RefParameter Comment="Trigger Hardware Signal is" DefaultValue="LPBAM_LPDMA1_TRIGGER_EXTI_LINE0" Name="TriggerSelection" Type="list" Group="Trigger Configuration">
+        <Description>description</Description>
+        <PossibleValue Comment="EXTI Line 0" Value="LPBAM_LPDMA1_TRIGGER_EXTI_LINE0" />
+        <PossibleValue Comment="EXTI Line 1" Value="LPBAM_LPDMA1_TRIGGER_EXTI_LINE1" />
+        <PossibleValue Comment="EXTI Line 2" Value="LPBAM_LPDMA1_TRIGGER_EXTI_LINE2" />
+        <PossibleValue Comment="EXTI Line 3" Value="LPBAM_LPDMA1_TRIGGER_EXTI_LINE3" />
+        <PossibleValue Comment="EXTI Line 4" Value="LPBAM_LPDMA1_TRIGGER_EXTI_LINE4" />
+        <PossibleValue Comment="TAMP TRG1" Value="LPBAM_LPDMA1_TRIGGER_TAMP_TRG1"  />
+        <PossibleValue Comment="TAMP TRG2" Value="LPBAM_LPDMA1_TRIGGER_TAMP_TRG2"  />
+        <PossibleValue Comment="TAMP TRG3" Value="LPBAM_LPDMA1_TRIGGER_TAMP_TRG3"  />
+        <PossibleValue Comment="LPTIM1 CH1" Value="LPBAM_LPDMA1_TRIGGER_LPTIM1_CH1" />
+        <PossibleValue Comment="LPTIM1 CH2" Value="LPBAM_LPDMA1_TRIGGER_LPTIM1_CH2" />
+        <PossibleValue Comment="LPTIM3 CH1" Value="LPBAM_LPDMA1_TRIGGER_LPTIM3_CH1" />
+        <PossibleValue Comment="LPTIM4 OUT" Value="LPBAM_LPDMA1_TRIGGER_LPTIM4_OUT" />
+        <PossibleValue Comment="COMP1 OUT" Value="LPBAM_LPDMA1_TRIGGER_COMP1_OUT"  />
+        <PossibleValue Comment="COMP2 OUT" Value="LPBAM_LPDMA1_TRIGGER_COMP2_OUT"  />
+        <PossibleValue Comment="RTC ALRA TRG" Value="LPBAM_LPDMA1_TRIGGER_RTC_ALRA_TRG" />
+        <PossibleValue Comment="RTC ALRB TRG" Value="LPBAM_LPDMA1_TRIGGER_RTC_ALRB_TRG" />
+        <PossibleValue Comment="RTC WUT TRG" Value="LPBAM_LPDMA1_TRIGGER_RTC_WUT_TRG" />
+        <PossibleValue Comment="ADC4 AWD1" Value="LPBAM_LPDMA1_TRIGGER_ADC4_AWD1" />
+        <PossibleValue Comment="LPDMA1 CH0 TCF" Value="LPBAM_LPDMA1_TRIGGER_LPDMA1_CH0_TCF" />
+        <PossibleValue Comment="LPDMA1 CH1 TCF" Value="LPBAM_LPDMA1_TRIGGER_LPDMA1_CH1_TCF" />
+        <PossibleValue Comment="LPDMA1 CH2 TCF" Value="LPBAM_LPDMA1_TRIGGER_LPDMA1_CH2_TCF" />
+        <PossibleValue Comment="LPDMA1 CH3 TCF" Value="LPBAM_LPDMA1_TRIGGER_LPDMA1_CH3_TCF" />
+    </RefParameter>
+  
+
+    <RefParameter Comment="Trigger Mode" DefaultValue="LPBAM_DMA_TRIGM_BLOCK_TRANSFER" Name="TriggerMode_CONFIG" Type="list" Group="Trigger Configuration" Visible="false">
+        <Description>description</Description>
+        <PossibleValue Comment="A LLI link transfer is conditioned by (at least) one hit trigger" Value="LPBAM_DMA_TRIGM_BLOCK_TRANSFER"/>      
+    </RefParameter>
+
+
+    <RefParameter Comment="Node on which the trigger is applied (not visible)" DefaultValue="NONE" Name="NodeLevel" Type="list"  Visible="false" Group="Trigger Configuration">
+        <Description>description</Description>
+        <PossibleValue Comment="NONE" Value="NONE"/>
+        <PossibleValue Comment="Config Node" Value="LPBAM_DMA_START_FULLQ_CONFIG_NODE"/> <!-- ADV_LPBAM_DMA_Start_SetFullQ-->
+    </RefParameter> 
+
+
+    <!-- trigger end -->
+
+
+  
+    <RefMode Name="START">
+	 
+        <ConfigForMode>LPDMA_START</ConfigForMode>
+        <Parameter  Name="InstanceIP"/>
+        <Parameter  Name="OriginOfQueue"/>    
+        <Parameter  Name="HeadQAddress_RW"/>   
+        <Parameter  Name="HeadQAddress_LIST"/>
+        <Parameter  Name="HeadQAddressArg"/>
+        <Parameter  Name="Interrupt1"/>
+        <Parameter Name="Interrupt2"/>
+         
+
+
+        <!--Trigger -->
+        <Parameter Name="TriggerPolarity_START" RefParameter="TriggerPolarity"/>
+
+        <Parameter Name="TriggerSelection_START" RefParameter="TriggerSelection">
+            <Condition Diagnostic=""  Expression="!(TriggerPolarity_START=LPBAM_DMA_TRIG_POLARITY_MASKED)"/>
+        </Parameter>
+
+        <Parameter Name="TriggerMode_START" RefParameter="TriggerMode_CONFIG"> 
+            <Condition Diagnostic="" Expression="!(TriggerPolarity_START=LPBAM_DMA_TRIG_POLARITY_MASKED)"/>
+        </Parameter>
+
+        <Parameter Name="NodeLevel_START" RefParameter="NodeLevel">
+            <PossibleValue>LPBAM_DMA_START_FULLQ_CONFIG_NODE</PossibleValue>
+        </Parameter>
+        <!--Trigger -->
+
+        <Parameter  Name="CircularNode_START"/> 
+         
+    </RefMode> 
+
+    <ModeLogicOperator Name="OR">
+        <Mode Name="START" UserName="Start"> 
+            <Condition Diagnostic="hardware IP must be selected to be part of LPBAM" Expression="Semaphore_LPBAM_LPDMA$IpNumber_SELECTED"/>  
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="START" UserName="Start"> 
+                    <Semaphore>Semaphore_$IpInstance_START</Semaphore>
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="VS_START"/>
+                    </SignalLogicalOp>
+                </Mode> 
+            </ModeLogicOperator>
+        </Mode>        
+    </ModeLogicOperator>    
+
+ 
+
+
+    <RefSignal Name="VS_START" Virtual="true"/>
+
+
+</IP>

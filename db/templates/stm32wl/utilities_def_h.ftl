@@ -76,6 +76,7 @@ typedef enum
   /* USER CODE END CFG_LPM_Id_t */
 } CFG_LPM_Id_t;
 [#if !FREERTOS??][#-- If FreeRtos is not used --]
+[#if !THREADX??][#-- If AzRtos is not used --]
 
 /*---------------------------------------------------------------------------*/
 /*                             sequencer definitions                         */
@@ -93,7 +94,6 @@ typedef enum
   /* USER CODE END CFG_SEQ_Prio_Id_t */
   CFG_SEQ_Prio_NBR,
 } CFG_SEQ_Prio_Id_t;
-
 
 /**
   * This is the list of task id required by the application
@@ -117,7 +117,7 @@ typedef enum
   CFG_SEQ_Task_MbKmsCmdRcv,
 [/#if]
 [#if (SUBGHZ_APPLICATION == "LORA_AT_SLAVE") || (SUBGHZ_APPLICATION == "LORA_END_NODE") || (SUBGHZ_APPLICATION == "LORA_USER_APPLICATION")]
-  CFG_SEQ_Task_MbLmHandlerProcess,
+  CFG_SEQ_Task_LmHandlerProcess,
 [/#if]
 [#if (SUBGHZ_APPLICATION == "SIGFOX_AT_SLAVE") || (SUBGHZ_APPLICATION == "SIGFOX_PUSHBUTTON") || (SUBGHZ_APPLICATION == "SIGFOX_USER_APPLICATION") ]
   CFG_SEQ_Task_MbSigfoxNotifRcv,
@@ -151,29 +151,30 @@ typedef enum
 [#if (SUBGHZ_APPLICATION == "SIGFOX_PUSHBUTTON") || (SUBGHZ_APPLICATION == "SIGFOX_AT_SLAVE")]
   CFG_SEQ_Evt_Monarch,
 [/#if]
-[#if (SUBGHZ_APPLICATION == "SIGFOX_AT_SLAVE") ]
+[#if (SUBGHZ_APPLICATION == "SIGFOX_AT_SLAVE") || (SUBGHZ_APPLICATION == "LORA_AT_SLAVE")]
   CFG_SEQ_Task_Vcom,
 [/#if]
-[#if (SUBGHZ_APPLICATION == "LORA_AT_SLAVE")]
-  CFG_SEQ_Task_MbVcom,
-[/#if]
 [#if (SUBGHZ_APPLICATION == "LORA_END_NODE")]
-  CFG_SEQ_Task_MbLoRaSendOnTxTimerOrButtonEvent,
-[/#if]
-[#if (SUBGHZ_APPLICATION == "LORA_AT_SLAVE") || (SUBGHZ_APPLICATION == "LORA_END_NODE")]
-  CFG_SEQ_Task_MbLmHandlerProcess,
+  CFG_SEQ_Task_LoRaSendOnTxTimerOrButtonEvent,
+  CFG_SEQ_Task_LoRaStoreContextEvent,
+  CFG_SEQ_Task_LoRaStopJoinEvent,
 [/#if]
 [#if (SUBGHZ_APPLICATION == "LORA_AT_SLAVE")]
   CFG_SEQ_Task_LoRaCertifTx,
 [/#if]
-[#else]
-[#if (SUBGHZ_APPLICATION == "LORA_AT_SLAVE")]
+[#else][#-- Single Core --]
+[#if (SUBGHZ_APPLICATION == "LORA_USER_APPLICATION") || (SUBGHZ_APPLICATION == "SIGFOX_USER_APPLICATION") || (SUBGHZ_APPLICATION == "SUBGHZ_USER_APPLICATION") ]
+  CFG_SEQ_Task_Default,
+[#elseif (SUBGHZ_APPLICATION == "LORA_AT_SLAVE")]
   CFG_SEQ_Task_Vcom,
   CFG_SEQ_Task_LmHandlerProcess,
+  CFG_SEQ_Task_LoRaStoreContextEvent,
   CFG_SEQ_Task_LoRaCertifTx,
 [#elseif (SUBGHZ_APPLICATION == "LORA_END_NODE")]
   CFG_SEQ_Task_LmHandlerProcess,
   CFG_SEQ_Task_LoRaSendOnTxTimerOrButtonEvent,
+  CFG_SEQ_Task_LoRaStoreContextEvent,
+  CFG_SEQ_Task_LoRaStopJoinEvent,
 [#elseif (SUBGHZ_APPLICATION == "SUBGHZ_ADV_APPLICATION")]
   CFG_SEQ_Task_SubGHz_Phy_App_Process,
 [#elseif (SUBGHZ_APPLICATION == "SIGFOX_AT_SLAVE") ]
@@ -248,6 +249,7 @@ typedef enum
 
 [/#if]
 [/#if]
+[/#if]
 /* USER CODE BEGIN ET */
 
 /* USER CODE END ET */
@@ -277,4 +279,3 @@ typedef enum
 #endif
 
 #endif /* __UTILITIES_DEF_H__ */
-

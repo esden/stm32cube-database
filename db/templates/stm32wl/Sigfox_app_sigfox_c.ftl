@@ -43,11 +43,21 @@
 #include "sgfx_app.h"
 [/#if]
 #include "sys_app.h"
+[#if THREADX??][#-- If AzRtos is used --]
+#include "app_azure_rtos.h"
+#include "tx_api.h"
+[/#if]
 [#if (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION") ]
+[#if (CPUCORE != "CM0PLUS")]
+[#if !THREADX??][#-- If AzRtos is not used --]
 [#if !FREERTOS??][#-- If FreeRtos is not used --]
 #include "stm32_seq.h"
 [#else]
 #include "cmsis_os.h"
+[/#if]
+[/#if]
+[#else][#-- If CM0PLUS --]
+#include "stm32_seq.h"
 [/#if]
 [/#if]
 
@@ -56,6 +66,11 @@
 /* USER CODE END Includes */
 
 /* External variables ---------------------------------------------------------*/
+[#if THREADX??]
+TX_THREAD App_MainThread;
+TX_BYTE_POOL *byte_pool;
+CHAR *pointer;
+[/#if]
 [#if (CPUCORE == "CM0PLUS")]
 extern RadioEvents_t RfApiRadioEvents;
 
@@ -90,13 +105,16 @@ extern RadioEvents_t RfApiRadioEvents;
 /* USER CODE END PFP */
 
 /* Exported functions --------------------------------------------------------*/
-
+[#if !THREADX??][#-- If AzRtos is not used --]
 void MX_Sigfox_Init(void)
 {
   /* USER CODE BEGIN MX_Sigfox_Init_1 */
 
   /* USER CODE END MX_Sigfox_Init_1 */
   SystemApp_Init();
+  /* USER CODE BEGIN MX_Sigfox_Init_1_1 */
+
+  /* USER CODE END MX_Sigfox_Init_1_1 */
 [#if (CPUCORE == "CM4") || (CPUCORE == "")]
   Sigfox_Init();
 [#elseif (CPUCORE == "CM0PLUS")]
@@ -106,8 +124,44 @@ void MX_Sigfox_Init(void)
 
   /* USER CODE END MX_Sigfox_Init_2 */
 }
+[#else]
+uint32_t MX_Sigfox_Init(void *memory_ptr)
+{
+  uint32_t ret = TX_SUCCESS;
+
+  /* USER CODE BEGIN MX_Sigfox_Init_1 */
+
+  /* USER CODE END MX_Sigfox_Init_1 */
+  byte_pool = memory_ptr;
+
+  /* Allocate the stack for App App_MainThread.  */
+  if (tx_byte_allocate(byte_pool, (VOID **) &pointer,
+                       CFG_APP_SIGFOX_THREAD_STACK_SIZE, TX_NO_WAIT) != TX_SUCCESS)
+  {
+    ret = TX_POOL_ERROR;
+  }
+
+  /* Create App_MainThread.  */
+  if (ret == TX_SUCCESS)
+  {
+    if (tx_thread_create(&App_MainThread, "App Sigfox Main Thread", App_Main_Thread_Entry, 0,
+                         pointer, CFG_APP_SIGFOX_THREAD_STACK_SIZE,
+                         CFG_APP_SIGFOX_THREAD_PRIO, CFG_APP_SIGFOX_THREAD_PREEMPTION_THRESHOLD,
+                         TX_NO_TIME_SLICE, TX_AUTO_START) != TX_SUCCESS)
+    {
+      ret = TX_THREAD_ERROR;
+    }
+  }
+
+  /* USER CODE BEGIN MX_Sigfox_Init_Last */
+
+  /* USER CODE END MX_Sigfox_Init_Last */
+  return ret;
+}
+[/#if]
 
 [#if !FREERTOS??][#-- If FreeRtos, only available in CM4 is not used --]
+[#if !THREADX??][#-- If AzRtos is not used --]
 void MX_Sigfox_Process(void)
 {
   /* USER CODE BEGIN MX_Sigfox_Process_1 */
@@ -120,6 +174,7 @@ void MX_Sigfox_Process(void)
   /* USER CODE END MX_Sigfox_Process_2 */
 [/#if]
 }
+[/#if]
 [/#if]
 
 /* USER CODE BEGIN EF */

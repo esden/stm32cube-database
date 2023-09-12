@@ -7,7 +7,7 @@
     IncludeFile=""
     Name="SubGHz_Phy"
     RootFolder="Middlewares/Third_Party/"
-    Version="STM32Cube_FW_WL_V1.1.0">
+    Version="STM32Cube_FW_WL_V1.2.0">
 
     <RefConfig Comment="" Name="SubGhz_Phy_Init">
         <CallLibMethod Name="SubGhz_Phy_Init"/>
@@ -85,6 +85,11 @@
         <ConfigFile Name="MBMUX_MBMUX_TABLE_H"/>
         <ConfigFile Name="MBMUX_MESSAGE_ID_H"/>
 
+        <!-- AzRTOS -->
+        <ConfigFile Name="RTOS_VARIABLES_SUBGHZ_PHY_TMP"/>
+        <ConfigFile Name="RTOS_POOL_CREATE_SUBGHZ_PHY_TMP"/>
+        <ConfigFile Name="RTOS_DEFINES_SUBGHZ_PHY_TMP"/>
+
     </RefConfig>
 
     <LibMethod Name="SubGhz_Phy_Init" Comment="Initialize the SubGHz_Phy stack">
@@ -153,7 +158,9 @@
         <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
         <Argument Name="FILL_UCS" GenericType="Simple" Comment=""/>
         <Argument Name="Activate_RADIO_BOARD_INTERFACE" GenericType="Simple" Comment=""/>
+<!--
         <Argument Name="Activate_BOARD_RESOURCES" GenericType="Simple" Comment=""/>
+-->
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="STM32_LPM_IF_H" Template="stm32wl/stm32_lpm_if_h.ftl" destinationFolder="Core/Inc/">
@@ -168,19 +175,23 @@
     <RefConfigFile Description="" Name="SYS_CONF_H" Template="stm32wl/sys_conf_h.ftl" destinationFolder="Core/Inc/">
         <File Category="header" Name="sys_conf.h" Version="1.0" Condition="!SEM_SUBGHZ_USER_APPLICATION"/>
         <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
-        <Argument Name="Activate_DEBUG_LINE" GenericType="Simple" Comment=""/>
         <Argument Name="VERBOSE_LEVEL" GenericType="Simple" Comment=""/>
         <Argument Name="APP_LOG_ENABLED" GenericType="Simple" Comment=""/>
         <Argument Name="DEBUGGER_ON" GenericType="Simple" Comment=""/>
         <Argument Name="LOW_POWER_DISABLE" GenericType="Simple" Comment=""/>
         <Argument Name="VERBOSE_LEVEL_CM4" GenericType="Simple" Comment=""/>
         <Argument Name="APP_LOG_ENABLED_CM4" GenericType="Simple" Comment=""/>
-        <Argument Name="DEBUGGER_ON_CM4" GenericType="Simple" Comment=""/>
         <Argument Name="LOW_POWER_DISABLE_CM4" GenericType="Simple" Comment=""/>
         <Argument Name="VERBOSE_LEVEL_CM0PLUS" GenericType="Simple" Comment=""/>
         <Argument Name="APP_LOG_ENABLED_CM0PLUS" GenericType="Simple" Comment=""/>
-        <Argument Name="DEBUGGER_ON_CM0PLUS" GenericType="Simple" Comment=""/>
         <Argument Name="LOW_POWER_DISABLE_CM0PLUS" GenericType="Simple" Comment=""/>
+        <Argument Name="DEBUG_SUBGHZSPI_MONITORING" GenericType="Simple" Comment=""/>
+        <Argument Name="DEBUG_RF_SMPSRDY" GenericType="Simple" Comment=""/>
+        <Argument Name="DEBUG_RF_NRESET" GenericType="Simple" Comment=""/>
+        <Argument Name="DEBUG_RF_HSE32RDY" GenericType="Simple" Comment=""/>
+        <Argument Name="DEBUG_RF_LDORDY" GenericType="Simple" Comment=""/>
+        <Argument Name="DEBUG_RF_DTB1" GenericType="Simple" Comment=""/>
+        <Argument Name="DEBUG_RF_BUSY" GenericType="Simple" Comment=""/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="SYS_DEBUG_H" Template="stm32wl/sys_debug_h.ftl" destinationFolder="Core/Inc/">
@@ -198,7 +209,7 @@
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="NUCLEO_CONF_H" Template="stm32wl/stm32wlxx_nucleo_conf_h.ftl" destinationFolder="Core/Inc/">
-        <File Category="header" Name="stm32wlxx_nucleo_conf.h" Version="1.0" Condition="!SEM_M0PLUS &amp; !SEM_M4 &amp; !SEM_SUBGHZ_USER_APPLICATION"/>
+        <File Category="header" Name="stm32wlxx_nucleo_conf.h" Version="1.0" Condition="!SEM_M0PLUS &amp; !SEM_M4 &amp; !SEM_USER_BOARD_FOR_SUBGHZ_PHY"/>
         <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
     </RefConfigFile>
 
@@ -250,7 +261,6 @@
     <RefConfigFile Description="" Name="APP_SUBGHZ_PHY_APP_C" Template="stm32wl/SubGHz_Phy_subghz_phy_app_c.ftl" >
         <File Category="source" Name="App/subghz_phy_app.c" Version="1.0" Condition="!SEM_M0PLUS"/>
         <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
-        <Argument Name="USER_SUBGHZ_APP" GenericType="Simple" Comment=""/>
         <Argument Name="FILL_UCS" GenericType="Simple" Comment=""/>
     </RefConfigFile>
 
@@ -306,7 +316,6 @@
         <File Category="header" Name="Target/radio_conf.h" Version="1.0" Condition="!SEM_M4"/>
         <Argument Name="Activate_DEBUG_LINE" GenericType="Simple" Comment=""/>
         <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
-        <Argument Name="USER_SUBGHZ_APP" GenericType="Simple" Comment=""/>
         <Argument Name="FILL_UCS" GenericType="Simple" Comment=""/>
         <Argument Name="RF_WAKEUP_TIME" GenericType="Simple" Comment=""/>
     </RefConfigFile>
@@ -406,7 +415,7 @@
 
 <!-- COMMON/Board Begin-->
     <RefConfigFile Description="" Name="NUCLEO_CONF_H" Template="stm32wl/stm32wlxx_nucleo_conf_h.ftl" destinationFolder="../Common/Board/">
-        <File Category="header" Name="stm32wlxx_nucleo_conf.h" Version="1.0" Condition="(SEM_M0PLUS | SEM_M4) &amp; !SEM_SUBGHZ_USER_APPLICATION" />
+        <File Category="header" Name="stm32wlxx_nucleo_conf.h" Version="1.0" Condition="(SEM_M0PLUS | SEM_M4) &amp; !SEM_USER_BOARD_FOR_SUBGHZ_PHY" />
         <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
     </RefConfigFile>
 <!-- COMMON/Board end-->
@@ -438,6 +447,23 @@
     </RefConfigFile>
 
 <!-- COMMON/MbMux end-->
+
+<!-- AzRTOS Begin-->
+
+    <RefConfigFile Description="" Name="RTOS_VARIABLES_SUBGHZ_PHY_TMP" Template="stm32wl/RTOS_variables_SUBGHZ_PHY_tmp.ftl">
+        <File Category="header" Condition="S_RTOS_M4 | S_RTOS" Name="RTOS_variables_SubGHz_Phy.tmp" Version="1.0"/>
+    </RefConfigFile>
+
+    <RefConfigFile Description="" Name="RTOS_POOL_CREATE_SUBGHZ_PHY_TMP" Template="stm32wl/RTOS_pool_create_SUBGHZ_PHY_tmp.ftl">
+        <File Category="header" Condition="S_RTOS_M4 | S_RTOS" Name="RTOS_pool_create_SubGHz_Phy.tmp" Version="1.0"/>
+    </RefConfigFile>
+
+    <RefConfigFile Description="" Name="RTOS_DEFINES_SUBGHZ_PHY_TMP" Template="stm32wl/RTOS_defines_SUBGHZ_PHY_tmp.ftl">
+        <File Category="header" Condition="S_RTOS_M4 | S_RTOS" Name="RTOS_defines_SubGHz_Phy.tmp" Version="1.0"/>
+        <Argument Name="SUBGHZ_PHY_APP_MEM_POOL_SIZE" GenericType="Simple" Comment=""/>
+    </RefConfigFile>
+
+<!-- AzRTOS end-->
 
 <!-- Platform Setting Begin -->
     <!-- BSP HMI Begin -->

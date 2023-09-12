@@ -13,7 +13,7 @@
 [#assign CPUCORE = cpucore?replace("ARM_CORTEX_","C")?replace("+","PLUS")]
 [#assign SUBGHZ_APPLICATION = ""]
 [#assign FILL_UCS = ""]
-[#assign USER_SUBGHZ_APP = ""]
+[#assign INTERNAL_USER_SUBGHZ_APP = ""]
 [#if SWIPdatas??]
     [#list SWIPdatas as SWIP]
         [#if SWIP.defines??]
@@ -24,47 +24,10 @@
                 [#if definition.name == "FILL_UCS"]
                     [#assign FILL_UCS = definition.value]
                 [/#if]
-                [#if definition.name == "USER_SUBGHZ_APP"]
-                    [#assign USER_SUBGHZ_APP = definition.value]
-                [/#if]
             [/#list]
         [/#if]
     [/#list]
 [/#if]
-[#if (SUBGHZ_APPLICATION != "SUBGHZ_USER_APPLICATION") && (USER_SUBGHZ_APP == "SUBGHZ_PINGPONG")]
-/*!
- * \file      subghz_phy_app.c
- *
- * \brief     Ping-Pong implementation
- *
- * \copyright Revised BSD License, see section \ref LICENSE.
- *
- * \code
- *                ______                              _
- *               / _____)             _              | |
- *              ( (____  _____ ____ _| |_ _____  ____| |__
- *               \____ \| ___ |    (_   _) ___ |/ ___)  _ \
- *               _____) ) ____| | | || |_| ____( (___| | | |
- *              (______/|_____)_|_|_| \__)_____)\____)_| |_|
- *              (C)2013-2017 Semtech
- *
- * \endcode
- *
- * \author    Miguel Luis ( Semtech )
- *
- * \author    Gregory Cristian ( Semtech )
- */
-/**
-  ******************************************************************************
-  *
-  *          Portions COPYRIGHT 2020 STMicroelectronics
-  *
-  * @file    subghz_phy_app.c
-  * @author  MCD Application Team
-  * @brief   Application of the SubGHz_Phy Middleware
-  ******************************************************************************
-  */
-[#else]
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
@@ -76,28 +39,44 @@
   ******************************************************************************
   */
 /* USER CODE END Header */
-[/#if]
 
 /* Includes ------------------------------------------------------------------*/
 #include "platform.h"
 #include "sys_app.h"
 #include "subghz_phy_app.h"
 #include "radio.h"
-#include "app_version.h"
+[#if THREADX??][#-- If AzRtos is used --]
+#include "app_azure_rtos.h"
+#include "tx_api.h"
+[/#if]
 
 /* USER CODE BEGIN Includes */
 [#if (SUBGHZ_APPLICATION != "SUBGHZ_USER_APPLICATION") && (FILL_UCS == "true")]
 #include "stm32_timer.h"
+[#if !THREADX??][#-- If AzRtos is not used --]
 [#if !FREERTOS??][#-- If FreeRtos is not used --]
 #include "stm32_seq.h"
 [#else]
 #include "cmsis_os.h"
 [/#if]
+[/#if]
 #include "utilities_def.h"
+#include "app_version.h"
+[#if CPUCORE == ""]
+#include "subghz_phy_version.h"
+[/#if]
+[#if (CPUCORE == "CM4")]
+#include "mbmuxif_sys.h"
+[/#if]
 [/#if]
 /* USER CODE END Includes */
 
 /* External variables ---------------------------------------------------------*/
+[#if THREADX??][#-- If AzRtos is used --]
+extern TX_THREAD App_MainThread;
+extern  TX_BYTE_POOL *byte_pool;
+extern  CHAR *pointer;
+[/#if]
 /* USER CODE BEGIN EV */
 
 /* USER CODE END EV */
@@ -105,7 +84,7 @@
 /* Private typedef -----------------------------------------------------------*/
 
 /* USER CODE BEGIN PTD */
-[#if (SUBGHZ_APPLICATION != "SUBGHZ_USER_APPLICATION") && (USER_SUBGHZ_APP == "SUBGHZ_PINGPONG") && (FILL_UCS == "true")]
+[#if (SUBGHZ_APPLICATION != "SUBGHZ_USER_APPLICATION") && (INTERNAL_USER_SUBGHZ_APP == "SUBGHZ_PINGPONG") && (FILL_UCS == "true")]
 typedef enum
 {
   RX,
@@ -120,7 +99,7 @@ typedef enum
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 [#if (SUBGHZ_APPLICATION != "SUBGHZ_USER_APPLICATION") && (FILL_UCS == "true")]
-[#if (USER_SUBGHZ_APP == "SUBGHZ_PINGPONG")]
+[#if (INTERNAL_USER_SUBGHZ_APP == "SUBGHZ_PINGPONG")]
 /* Configurations */
 /*Timeout*/
 #define RX_TIMEOUT_VALUE              3000
@@ -141,7 +120,7 @@ typedef enum
 #define FSK_AFC_BANDWIDTH             83333
 /* LED blink Period*/
 #define LED_PERIOD_MS                 200
-[#elseif (USER_SUBGHZ_APP == "SUBGHZ_PER")]
+[#elseif (INTERNAL_USER_SUBGHZ_APP == "SUBGHZ_PER")]
 /* Configurations */
 /*Timeout*/
 #define RX_TIMEOUT_VALUE              2000
@@ -184,7 +163,7 @@ static RadioEvents_t RadioEvents;
 /* USER CODE BEGIN PV */
 
 [#if (SUBGHZ_APPLICATION != "SUBGHZ_USER_APPLICATION") && (FILL_UCS == "true")]
-[#if (USER_SUBGHZ_APP == "SUBGHZ_PINGPONG")]
+[#if (INTERNAL_USER_SUBGHZ_APP == "SUBGHZ_PINGPONG")]
 /*Ping Pong FSM states */
 static States_t State = RX;
 /* App Rx Buffer*/
@@ -205,7 +184,7 @@ bool isMaster = true;
 /* the closest the random delays are, the longer it will
    take for the devices to sync when started simultaneously*/
 static int32_t random_delay;
-[#elseif (USER_SUBGHZ_APP == "SUBGHZ_PER")]
+[#elseif (INTERNAL_USER_SUBGHZ_APP == "SUBGHZ_PER")]
 static __IO uint32_t RadioTxDone_flag = 0;
 static __IO uint32_t RadioTxTimeout_flag = 0;
 static __IO uint32_t RadioRxDone_flag = 0;
@@ -267,7 +246,7 @@ static void OnRxError(void);
 
 /* USER CODE BEGIN PFP */
 [#if (SUBGHZ_APPLICATION != "SUBGHZ_USER_APPLICATION") && (FILL_UCS == "true")]
-[#if (USER_SUBGHZ_APP == "SUBGHZ_PINGPONG")]
+[#if (INTERNAL_USER_SUBGHZ_APP == "SUBGHZ_PINGPONG")]
 /**
   * @brief  Function executed on when led timer elapses
   * @param  context ptr of LED context
@@ -278,7 +257,7 @@ static void OnledEvent(void *context);
   * @brief PingPong state machine implementation
   */
 static void PingPong_Process(void);
-[#elseif (USER_SUBGHZ_APP == "SUBGHZ_PER")]
+[#elseif (INTERNAL_USER_SUBGHZ_APP == "SUBGHZ_PER")]
 /**
   * @brief Packet Error Rate state machine implementation
   */
@@ -315,47 +294,63 @@ void RxLongPacketChunk(uint8_t *buffer, uint8_t chunk_size);
 void SubghzApp_Init(void)
 {
   /* USER CODE BEGIN SubghzApp_Init_1 */
+[#if (CPUCORE == "CM4") && (SUBGHZ_APPLICATION != "SUBGHZ_USER_APPLICATION") && (FILL_UCS == "true")]
+  FEAT_INFO_Param_t *p_cm0plus_specific_features_info;
+  uint32_t feature_version = 0UL;
+[/#if]
+
 [#if (SUBGHZ_APPLICATION != "SUBGHZ_USER_APPLICATION") && (FILL_UCS == "true")]
-[#if (USER_SUBGHZ_APP == "SUBGHZ_PINGPONG")]
+[#if (INTERNAL_USER_SUBGHZ_APP == "SUBGHZ_PINGPONG")]
   APP_LOG(TS_OFF, VLEVEL_M, "\n\rPING PONG\n\r");
-[#elseif (USER_SUBGHZ_APP == "SUBGHZ_PER")]
+[#elseif (INTERNAL_USER_SUBGHZ_APP == "SUBGHZ_PER")]
 #if (TEST_MODE == RADIO_RX)
   RxConfigGeneric_t RxConfig = {0};
-  /* RX LEDs*/
-  BSP_LED_Init(LED_GREEN);
-  BSP_LED_Init(LED_RED);
 #elif (TEST_MODE == RADIO_TX)
   TxConfigGeneric_t TxConfig;
-  BSP_PB_Init(BUTTON_SW1, BUTTON_MODE_EXTI);
-  BSP_PB_Init(BUTTON_SW2, BUTTON_MODE_EXTI);
-  BSP_PB_Init(BUTTON_SW3, BUTTON_MODE_EXTI);
-  /* TX LED*/
-  BSP_LED_Init(LED_BLUE);
 #else
 #endif /* TEST_MODE */
 [/#if]
-  /* Print APP version*/
 [#if CPUCORE == "CM4"]
-  APP_LOG(TS_OFF, VLEVEL_M, "APP_VERSION= V%X.%X.%X\r\n",
-          (uint8_t)(__CM4_APP_VERSION >> __APP_VERSION_MAIN_SHIFT),
-          (uint8_t)(__CM4_APP_VERSION >> __APP_VERSION_SUB1_SHIFT),
-          (uint8_t)(__CM4_APP_VERSION >> __APP_VERSION_SUB2_SHIFT));
+  /* Get CM4 SubGHY_Phy APP version*/
+  APP_LOG(TS_OFF, VLEVEL_M, "M4 APP_VERSION:      V%X.%X.%X\r\n",
+          (uint8_t)(APP_VERSION_MAIN),
+          (uint8_t)(APP_VERSION_SUB1),
+          (uint8_t)(APP_VERSION_SUB2));
+
+  /* Get CM0 SubGHY_Phy APP version*/
+  p_cm0plus_specific_features_info = MBMUXIF_SystemGetFeatCapabInfoPtr(FEAT_INFO_SYSTEM_ID);
+  feature_version = p_cm0plus_specific_features_info->Feat_Info_Feature_Version;
+  APP_LOG(TS_OFF, VLEVEL_M, "M0PLUS_APP_VERSION:  V%X.%X.%X\r\n",
+          (uint8_t)(feature_version >> 24),
+          (uint8_t)(feature_version >> 16),
+          (uint8_t)(feature_version >> 8));
+
+  /* Get MW SubGhz_Phy info */
+  p_cm0plus_specific_features_info = MBMUXIF_SystemGetFeatCapabInfoPtr(FEAT_INFO_RADIO_ID);
+  feature_version = p_cm0plus_specific_features_info->Feat_Info_Feature_Version;
+  APP_LOG(TS_OFF, VLEVEL_M, "MW_RADIO_VERSION:    V%X.%X.%X\r\n",
+          (uint8_t)(feature_version >> 24),
+          (uint8_t)(feature_version >> 16),
+          (uint8_t)(feature_version >> 8));
 [#else]
-  APP_LOG(TS_OFF, VLEVEL_M, "APP_VERSION= V%X.%X.%X\r\n",
-          (uint8_t)(__APP_VERSION >> __APP_VERSION_MAIN_SHIFT),
-          (uint8_t)(__APP_VERSION >> __APP_VERSION_SUB1_SHIFT),
-          (uint8_t)(__APP_VERSION >> __APP_VERSION_SUB2_SHIFT));
+  /* Get SubGHY_Phy APP version*/
+  APP_LOG(TS_OFF, VLEVEL_M, "APPLICATION_VERSION: V%X.%X.%X\r\n",
+          (uint8_t)(APP_VERSION_MAIN),
+          (uint8_t)(APP_VERSION_SUB1),
+          (uint8_t)(APP_VERSION_SUB2));
+
+  /* Get MW SubGhz_Phy info */
+  APP_LOG(TS_OFF, VLEVEL_M, "MW_RADIO_VERSION:    V%X.%X.%X\r\n",
+          (uint8_t)(SUBGHZ_PHY_VERSION_MAIN),
+          (uint8_t)(SUBGHZ_PHY_VERSION_SUB1),
+          (uint8_t)(SUBGHZ_PHY_VERSION_SUB2));
 [/#if]
 
-[#if (USER_SUBGHZ_APP == "SUBGHZ_PINGPONG")]
+[#if (INTERNAL_USER_SUBGHZ_APP == "SUBGHZ_PINGPONG")]
   /* Led Timers*/
-  UTIL_TIMER_Create(&timerLed, 0xFFFFFFFFU, UTIL_TIMER_ONESHOT, OnledEvent, NULL);
-  UTIL_TIMER_SetPeriod(&timerLed, LED_PERIOD_MS);
+  UTIL_TIMER_Create(&timerLed, LED_PERIOD_MS, UTIL_TIMER_ONESHOT, OnledEvent, NULL);
   UTIL_TIMER_Start(&timerLed);
-[#elseif (USER_SUBGHZ_APP == "SUBGHZ_PER")]
-  /* Init leds*/
-  BSP_LED_Init(LED_GREEN);
-
+[#elseif (INTERNAL_USER_SUBGHZ_APP == "SUBGHZ_PER")]
   APP_LOG(TS_OFF, VLEVEL_M, "---------------\n\r");
   APP_LOG(TS_OFF, VLEVEL_M, "FSK_MODULATION\n\r");
   APP_LOG(TS_OFF, VLEVEL_M, "FSK_BW=%d Hz\n\r", FSK_BANDWIDTH);
@@ -380,10 +375,15 @@ void SubghzApp_Init(void)
 
   /* USER CODE BEGIN SubghzApp_Init_2 */
 [#if (SUBGHZ_APPLICATION != "SUBGHZ_USER_APPLICATION") && (FILL_UCS == "true")]
+[#if (INTERNAL_USER_SUBGHZ_APP == "SUBGHZ_PINGPONG")]
+  /*calculate random delay for synchronization*/
+  random_delay = (Radio.Random()) >> 22; /*10bits random e.g. from 0 to 1023 ms*/
+
+[/#if]
   /* Radio Set frequency */
   Radio.SetChannel(RF_FREQUENCY);
 
-[#if (USER_SUBGHZ_APP == "SUBGHZ_PINGPONG")]
+[#if (INTERNAL_USER_SUBGHZ_APP == "SUBGHZ_PINGPONG")]
   /* Radio configuration */
 #if ((USE_MODEM_LORA == 1) && (USE_MODEM_FSK == 0))
   APP_LOG(TS_OFF, VLEVEL_M, "---------------\n\r");
@@ -424,20 +424,22 @@ void SubghzApp_Init(void)
 #else
 #error "Please define a modulation in the subghz_phy_app.h file."
 #endif /* USE_MODEM_LORA | USE_MODEM_FSK */
-  /* LED initialization*/
-  BSP_LED_Init(LED_GREEN);
-  BSP_LED_Init(LED_RED);
-  /*calculate random delay for synchronization*/
-  random_delay = (Radio.Random()) >> 22; /*10bits random e.g. from 0 to 1023 ms*/
+
   /*fills tx buffer*/
   memset(BufferTx, 0x0, MAX_APP_BUFFER_SIZE);
 
   APP_LOG(TS_ON, VLEVEL_L, "rand=%d\n\r", random_delay);
   /*starts reception*/
   Radio.Rx(RX_TIMEOUT_VALUE + random_delay);
+
+[#if THREADX??][#-- If AzRtos is used --]
+  /* No need to allocate the stack and create thread for SubGHz_Phy_App_Process. */
+  /* App_MainThread is used for it (see app_sigfox.c)  */
+[#else][#-- not THREADX--]
   /*register task to to be run in while(1) after Radio IT*/
   UTIL_SEQ_RegTask((1 << CFG_SEQ_Task_SubGHz_Phy_App_Process), UTIL_SEQ_RFU, PingPong_Process);
-[#elseif (USER_SUBGHZ_APP == "SUBGHZ_PER")]
+[/#if]
+[#elseif (INTERNAL_USER_SUBGHZ_APP == "SUBGHZ_PER")]
   data_offset = 0;
 #if (TEST_MODE == RADIO_RX)
   APP_TPRINTF("Rx FSK Test\r\n");
@@ -449,7 +451,7 @@ void SubghzApp_Init(void)
   RxConfig.fsk.SyncWordLength = sizeof(syncword); /*in Byte*/
   RxConfig.fsk.PreambleMinDetect = RADIO_FSK_PREAMBLE_DETECTOR_08_BITS;
   RxConfig.fsk.SyncWord = syncword; /*SyncWord Buffer*/
-  RxConfig.fsk.whiteSeed = 0x01FF ; /*WhiteningSeed*/
+  RxConfig.fsk.whiteSeed = 0x01FF; /*WhiteningSeed*/
 #if (APP_LONG_PACKET==0)
   RxConfig.fsk.LengthMode  = RADIO_FSK_PACKET_VARIABLE_LENGTH; /* legacy: payload length field is 1 byte long*/
 #else
@@ -477,13 +479,12 @@ void SubghzApp_Init(void)
 
   /*fsk modulation*/
   TxConfig.fsk.ModulationShaping = RADIO_FSK_MOD_SHAPING_G_BT_05;
-  TxConfig.fsk.Bandwidth = FSK_BANDWIDTH;
   TxConfig.fsk.FrequencyDeviation = FSK_FDEV;
   TxConfig.fsk.BitRate = FSK_DATARATE; /*BitRate*/
   TxConfig.fsk.PreambleLen = 4;   /*in Byte        */
   TxConfig.fsk.SyncWordLength = sizeof(syncword); /*in Byte        */
   TxConfig.fsk.SyncWord = syncword; /*SyncWord Buffer*/
-  TxConfig.fsk.whiteSeed =  0x01FF ; /*WhiteningSeed  */
+  TxConfig.fsk.whiteSeed =  0x01FF; /*WhiteningSeed  */
 #if (APP_LONG_PACKET==0)
   TxConfig.fsk.HeaderType  = RADIO_FSK_PACKET_VARIABLE_LENGTH; /*legacy: payload length field is 1 byte long*/
 #else
@@ -509,8 +510,15 @@ void SubghzApp_Init(void)
 #error should be either Tx or Rx
 #endif /* TEST_MODE */
 
+[#if THREADX??][#-- If AzRtos is used --]
+  /* No need to allocate the stack and create thread for SubGHz_Phy_App_Process. */
+  /* App_MainThread is used for it (see app_sigfox.c)  */
+[#else][#-- not THREADX--]
   UTIL_SEQ_RegTask((1 << CFG_SEQ_Task_SubGHz_Phy_App_Process), UTIL_SEQ_RFU, Per_Process);
 [/#if]
+[/#if]
+[#else] [#-- not FILL_UCS--]
+
 [/#if]
   /* USER CODE END SubghzApp_Init_2 */
 }
@@ -520,20 +528,65 @@ void SubghzApp_Init(void)
 /* USER CODE END EF */
 
 /* Private functions ---------------------------------------------------------*/
+[#if THREADX??][#-- If AzRtos is used --]
 
+void App_Main_Thread_Entry(unsigned long thread_input)
+{
+  (void) thread_input;
+
+  /* USER CODE BEGIN App_Main_Thread_Entry_1 */
+
+  /* USER CODE END App_Main_Thread_Entry_1 */
+  SystemApp_Init();
+  SubghzApp_Init();
+  /* USER CODE BEGIN App_Main_Thread_Entry_2 */
+
+  /* USER CODE END App_Main_Thread_Entry_2 */
+
+  /* Infinite loop */
+  while (1)
+  {
+    tx_thread_suspend(&App_MainThread);
+    /*do what else you want*/
+    /* USER CODE BEGIN App_Main_Thread_Entry_Loop */
+[#if (SUBGHZ_APPLICATION != "SUBGHZ_USER_APPLICATION") && (FILL_UCS == "true")]
+[#if (INTERNAL_USER_SUBGHZ_APP == "SUBGHZ_PINGPONG")]
+    PingPong_Process();
+[#elseif (INTERNAL_USER_SUBGHZ_APP == "SUBGHZ_PER")]
+    Per_Process();
+[/#if]
+[/#if]
+    /* USER CODE END App_Main_Thread_Entry_Loop */
+  }
+  /* Following USER CODE SECTION will be never reached */
+  /* it can be use for compilation flag like #else or #endif */
+  /* USER CODE BEGIN App_Main_Thread_Entry_Last */
+
+  /* USER CODE END App_Main_Thread_Entry_Last */
+}
+
+[/#if]
 static void OnTxDone(void)
 {
   /* USER CODE BEGIN OnTxDone */
 [#if (SUBGHZ_APPLICATION != "SUBGHZ_USER_APPLICATION") && (FILL_UCS == "true")]
-[#if (USER_SUBGHZ_APP == "SUBGHZ_PINGPONG")]
+[#if (INTERNAL_USER_SUBGHZ_APP == "SUBGHZ_PINGPONG")]
   APP_LOG(TS_ON, VLEVEL_L, "OnTxDone\n\r");
   /* Update the State of the FSM*/
   State = TX;
+[#if THREADX??]
+  tx_thread_resume(&App_MainThread);
+[#else]
   /* Run PingPong process in background*/
   UTIL_SEQ_SetTask((1 << CFG_SEQ_Task_SubGHz_Phy_App_Process), CFG_SEQ_Prio_0);
-[#elseif (USER_SUBGHZ_APP == "SUBGHZ_PER")]
+[/#if]
+[#elseif (INTERNAL_USER_SUBGHZ_APP == "SUBGHZ_PER")]
   RadioTxDone_flag = 1;
+[#if THREADX??]
+  tx_thread_resume(&App_MainThread);
+[#else]
   UTIL_SEQ_SetTask((1 << CFG_SEQ_Task_SubGHz_Phy_App_Process), CFG_SEQ_Prio_0);
+[/#if]
 [/#if]
 [/#if]
   /* USER CODE END OnTxDone */
@@ -543,7 +596,7 @@ static void OnRxDone(uint8_t *payload, uint16_t size, int16_t rssi, int8_t LoraS
 {
   /* USER CODE BEGIN OnRxDone */
 [#if (SUBGHZ_APPLICATION != "SUBGHZ_USER_APPLICATION") && (FILL_UCS == "true")]
-[#if (USER_SUBGHZ_APP == "SUBGHZ_PINGPONG")]
+[#if (INTERNAL_USER_SUBGHZ_APP == "SUBGHZ_PINGPONG")]
   APP_LOG(TS_ON, VLEVEL_L, "OnRxDone\n\r");
 #if ((USE_MODEM_LORA == 1) && (USE_MODEM_FSK == 0))
   APP_LOG(TS_ON, VLEVEL_L, "RssiValue=%d dBm, SnrValue=%ddB\n\r", rssi, LoraSnr_FskCfo);
@@ -577,16 +630,24 @@ static void OnRxDone(uint8_t *payload, uint16_t size, int16_t rssi, int8_t LoraS
     }
   }
   APP_LOG(TS_OFF, VLEVEL_H, "\n\r");
+[#if THREADX??]
+  tx_thread_resume(&App_MainThread);
+[#else]
   /* Run PingPong process in background*/
   UTIL_SEQ_SetTask((1 << CFG_SEQ_Task_SubGHz_Phy_App_Process), CFG_SEQ_Prio_0);
-[#elseif (USER_SUBGHZ_APP == "SUBGHZ_PER")]
+[/#if]
+[#elseif (INTERNAL_USER_SUBGHZ_APP == "SUBGHZ_PER")]
   last_rx_rssi = rssi;
   last_rx_cfo = LoraSnr_FskCfo;
 
   /* Set Rxdone flag */
   RadioRxDone_flag = 1;
+[#if THREADX??]
+  tx_thread_resume(&App_MainThread);
+[#else]
   /* Run Per process in background*/
   UTIL_SEQ_SetTask((1 << CFG_SEQ_Task_SubGHz_Phy_App_Process), CFG_SEQ_Prio_0);
+[/#if]
 #if (APP_LONG_PACKET==0)
   memcpy(data_buffer, payload, size);
   payloadLen = size;
@@ -604,16 +665,24 @@ static void OnTxTimeout(void)
 {
   /* USER CODE BEGIN OnTxTimeout */
 [#if (SUBGHZ_APPLICATION != "SUBGHZ_USER_APPLICATION") && (FILL_UCS == "true")]
-[#if (USER_SUBGHZ_APP == "SUBGHZ_PINGPONG")]
+[#if (INTERNAL_USER_SUBGHZ_APP == "SUBGHZ_PINGPONG")]
   APP_LOG(TS_ON, VLEVEL_L, "OnTxTimeout\n\r");
   /* Update the State of the FSM*/
   State = TX_TIMEOUT;
+[#if THREADX??]
+  tx_thread_resume(&App_MainThread);
+[#else]
   /* Run PingPong process in background*/
   UTIL_SEQ_SetTask((1 << CFG_SEQ_Task_SubGHz_Phy_App_Process), CFG_SEQ_Prio_0);
-[#elseif (USER_SUBGHZ_APP == "SUBGHZ_PER")]
+[/#if]
+[#elseif (INTERNAL_USER_SUBGHZ_APP == "SUBGHZ_PER")]
   RadioTxTimeout_flag = 1;
+[#if THREADX??]
+  tx_thread_resume(&App_MainThread);
+[#else]
   /* Run Per process in background*/
   UTIL_SEQ_SetTask((1 << CFG_SEQ_Task_SubGHz_Phy_App_Process), CFG_SEQ_Prio_0);
+[/#if]
 [/#if]
 [/#if]
   /* USER CODE END OnTxTimeout */
@@ -623,16 +692,24 @@ static void OnRxTimeout(void)
 {
   /* USER CODE BEGIN OnRxTimeout */
 [#if (SUBGHZ_APPLICATION != "SUBGHZ_USER_APPLICATION") && (FILL_UCS == "true")]
-[#if (USER_SUBGHZ_APP == "SUBGHZ_PINGPONG")]
+[#if (INTERNAL_USER_SUBGHZ_APP == "SUBGHZ_PINGPONG")]
   APP_LOG(TS_ON, VLEVEL_L, "OnRxTimeout\n\r");
   /* Update the State of the FSM*/
   State = RX_TIMEOUT;
+[#if THREADX??]
+  tx_thread_resume(&App_MainThread);
+[#else]
   /* Run PingPong process in background*/
   UTIL_SEQ_SetTask((1 << CFG_SEQ_Task_SubGHz_Phy_App_Process), CFG_SEQ_Prio_0);
-[#elseif (USER_SUBGHZ_APP == "SUBGHZ_PER")]
+[/#if]
+[#elseif (INTERNAL_USER_SUBGHZ_APP == "SUBGHZ_PER")]
   RadioRxTimeout_flag = 1;
+[#if THREADX??]
+  tx_thread_resume(&App_MainThread);
+[#else]
   /* Run Per process in background*/
   UTIL_SEQ_SetTask((1 << CFG_SEQ_Task_SubGHz_Phy_App_Process), CFG_SEQ_Prio_0);
+[/#if]
 [/#if]
 [/#if]
   /* USER CODE END OnRxTimeout */
@@ -642,16 +719,24 @@ static void OnRxError(void)
 {
   /* USER CODE BEGIN OnRxError */
 [#if (SUBGHZ_APPLICATION != "SUBGHZ_USER_APPLICATION") && (FILL_UCS == "true")]
-[#if (USER_SUBGHZ_APP == "SUBGHZ_PINGPONG")]
+[#if (INTERNAL_USER_SUBGHZ_APP == "SUBGHZ_PINGPONG")]
   APP_LOG(TS_ON, VLEVEL_L, "OnRxError\n\r");
   /* Update the State of the FSM*/
   State = RX_ERROR;
+[#if THREADX??]
+  tx_thread_resume(&App_MainThread);
+[#else]
   /* Run PingPong process in background*/
   UTIL_SEQ_SetTask((1 << CFG_SEQ_Task_SubGHz_Phy_App_Process), CFG_SEQ_Prio_0);
-[#elseif (USER_SUBGHZ_APP == "SUBGHZ_PER")]
+[/#if]
+[#elseif (INTERNAL_USER_SUBGHZ_APP == "SUBGHZ_PER")]
   RadioError_flag = 1;
+[#if THREADX??]
+  tx_thread_resume(&App_MainThread);
+[#else]
   /* Run Per process in background*/
   UTIL_SEQ_SetTask((1 << CFG_SEQ_Task_SubGHz_Phy_App_Process), CFG_SEQ_Prio_0);
+[/#if]
 [/#if]
 [/#if]
   /* USER CODE END OnRxError */
@@ -659,7 +744,7 @@ static void OnRxError(void)
 
 /* USER CODE BEGIN PrFD */
 [#if (SUBGHZ_APPLICATION != "SUBGHZ_USER_APPLICATION") && (FILL_UCS == "true")]
-[#if (USER_SUBGHZ_APP == "SUBGHZ_PINGPONG")]
+[#if (INTERNAL_USER_SUBGHZ_APP == "SUBGHZ_PINGPONG")]
 static void PingPong_Process(void)
 {
   Radio.Sleep();
@@ -676,9 +761,9 @@ static void PingPong_Process(void)
           {
             UTIL_TIMER_Stop(&timerLed);
             /* switch off green led */
-            BSP_LED_Off(LED_GREEN);
+            HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, GPIO_PIN_RESET); /* LED_GREEN */
             /* master toggles red led */
-            BSP_LED_Toggle(LED_RED);
+            HAL_GPIO_TogglePin(LED3_GPIO_Port, LED3_Pin); /* LED_RED */
             /* Add delay between RX and TX */
             HAL_Delay(Radio.GetWakeupTime() + RX_TIME_MARGIN);
             /* master sends PING*/
@@ -713,9 +798,9 @@ static void PingPong_Process(void)
           {
             UTIL_TIMER_Stop(&timerLed);
             /* switch off red led */
-            BSP_LED_Off(LED_RED);
+            HAL_GPIO_WritePin(LED3_GPIO_Port, LED3_Pin, GPIO_PIN_RESET); /* LED_RED */
             /* slave toggles green led */
-            BSP_LED_Toggle(LED_GREEN);
+            HAL_GPIO_TogglePin(LED2_GPIO_Port, LED2_Pin); /* LED_GREEN */
             /* Add delay between RX and TX */
             HAL_Delay(Radio.GetWakeupTime() + RX_TIME_MARGIN);
             /*slave sends PONG*/
@@ -770,15 +855,15 @@ static void PingPong_Process(void)
 
 static void OnledEvent(void *context)
 {
-  BSP_LED_Toggle(LED_GREEN);
-  BSP_LED_Toggle(LED_RED);
+  HAL_GPIO_TogglePin(LED2_GPIO_Port, LED2_Pin); /* LED_GREEN */
+  HAL_GPIO_TogglePin(LED3_GPIO_Port, LED3_Pin); /* LED_RED */
   UTIL_TIMER_Start(&timerLed);
 }
 
 [/#if]
 [/#if]
 [#if (SUBGHZ_APPLICATION != "SUBGHZ_USER_APPLICATION") && (FILL_UCS == "true")]
-[#if (USER_SUBGHZ_APP == "SUBGHZ_PER")]
+[#if (INTERNAL_USER_SUBGHZ_APP == "SUBGHZ_PER")]
 #if (APP_LONG_PACKET!=0)
 void RxLongPacketChunk(uint8_t *buffer, uint8_t chunk_size)
 {
@@ -814,7 +899,7 @@ static void Per_Process(void)
   {
     int16_t rssi = last_rx_rssi;
     int8_t cfo = last_rx_cfo;
-    BSP_LED_On(LED_GREEN) ;
+    HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, GPIO_PIN_SET); /* LED_GREEN */
     APP_TPRINTF("OnRxDone\r\n");
     APP_TPRINTF("RssiValue=%d dBm, cfo=%d kHz\r\n", rssi, cfo);
     APP_TPRINTF("payloadLen=%d bytes\r\n", payloadLen);
@@ -834,7 +919,7 @@ static void Per_Process(void)
   }
   else
   {
-    BSP_LED_On(LED_RED);
+    HAL_GPIO_WritePin(LED3_GPIO_Port, LED3_Pin, GPIO_PIN_SET); /* LED_RED */
   }
 
   if (RadioRxTimeout_flag == 1)
@@ -870,10 +955,10 @@ static void Per_Process(void)
   (void) Radio.ReceiveLongPacket(0, RX_TIMEOUT_VALUE, RxLongPacketChunk);
 #endif /* APP_LONG_PACKET */
   HAL_Delay(10);
-  BSP_LED_Off(LED_GREEN) ;
-  BSP_LED_Off(LED_RED) ;
+  HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, GPIO_PIN_RESET); /* LED_GREEN */
+  HAL_GPIO_WritePin(LED3_GPIO_Port, LED3_Pin, GPIO_PIN_RESET); /* LED_RED */
 #elif (TEST_MODE == RADIO_TX)
-  BSP_LED_Off(LED_BLUE) ;
+  HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_RESET); /* LED_BLUE */
   if (RadioTxDone_flag == 1)
   {
     APP_TPRINTF("OnTxDone\r\n");
@@ -905,7 +990,7 @@ static void Per_Process(void)
   }
 #endif /* APP_LONG_PACKET */
   APP_TPRINTF("Tx %d \r\n", packetCnt);
-  BSP_LED_On(LED_BLUE) ;
+  HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_SET); /* LED_BLUE */
 #endif /* TEST_MODE */
 }
 
@@ -914,7 +999,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
   switch (GPIO_Pin)
   {
-    case  BUTTON_SW1_PIN:
+    case  BUT1_Pin:
       /* Note: when "EventType == TX_ON_TIMER" this GPIO is not initialized */
       /*increment by 16*/
       payloadLen += 16;
@@ -925,8 +1010,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
       APP_TPRINTF("New Tx Payload Length= %d\r\n", payloadLen);
 
       break;
-    case  BUTTON_SW2_PIN:
-
+    case  BUT2_Pin:
       /*increment by 1*/
       payloadLen += 1;
       if (payloadLen > MAX_APP_BUFFER_SIZE)
@@ -936,9 +1020,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
       APP_TPRINTF("New Tx Payload Length= %d\r\n", payloadLen);
 
       break;
-
-    case  BUTTON_SW3_PIN:
-
+    case  BUT3_Pin:
       TxPayloadMode = (TxPayloadMode + 1) % 2;
       if (TxPayloadMode == 1)
       {
@@ -948,9 +1030,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
       {
         APP_TPRINTF("Payload Inc mode\r\n");
       }
-
       break;
-
     default:
       break;
   }
@@ -986,4 +1066,3 @@ static int32_t tx_payload_generator(void)
 [/#if]
 [/#if]
 /* USER CODE END PrFD */
-

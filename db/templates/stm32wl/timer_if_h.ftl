@@ -162,4 +162,3 @@ uint32_t TIMER_IF_BkUp_Read_SubSeconds(void);
 #endif
 
 #endif /* __TIMER_IF_H__ */
-

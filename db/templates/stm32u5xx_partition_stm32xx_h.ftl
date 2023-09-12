@@ -2,9 +2,9 @@
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-  * @file    partition_[#if McuName?starts_with("STM32U585")]stm32u585xx.h[#else]stm32u575xx.h[/#if]
+  * @file    partition_[#if McuName?starts_with("STM32U585")]stm32u585xx.h[/#if][#if McuName?starts_with("STM32U575")]stm32u575xx.h[/#if][#if McuName?starts_with("STM32U595")]stm32u595xx.h[/#if][#if McuName?starts_with("STM32U5A5")]stm32u5a5xx.h[/#if][#if McuName?starts_with("STM32U5A9")]stm32u5a9xx.h[/#if][#if McuName?starts_with("STM32U599")]stm32u599xx.h[/#if]
   * @author  MCD Application Team
-  * @brief   CMSIS [#if McuName?starts_with("STM32U585")]STM32U585xx[#else]STM32U575xx[/#if] Device Initial Setup for Secure / Non-Secure Zones
+  * @brief   CMSIS [#if McuName?starts_with("STM32U585")]STM32U585xx[/#if][#if McuName?starts_with("STM32U575")]STM32U575xx[/#if][#if McuName?starts_with("STM32U595")]STM32U595xx[/#if][#if McuName?starts_with("STM32U5A5")]STM32U5A5xx[/#if][#if McuName?starts_with("STM32U5A9")]STM32U5A9xx[/#if][#if McuName?starts_with("STM32U599")]STM32U599xx[/#if] Device Initial Setup for Secure / Non-Secure Zones
   *          for ARMCM33 based on CMSIS CORE partition_ARMCM33.h Template.
   *
   *          This file contains:
@@ -16,7 +16,7 @@
   ******************************************************************************/
 /*
   * Copyright (c) 2009-2016 ARM Limited. All rights reserved.
-  * Portions Copyright (c) 2020 STMicroelectronics, all rights reserved
+  * Portions Copyright (c) 2021 STMicroelectronics, all rights reserved
   *
   * SPDX-License-Identifier: Apache-2.0
  
@@ -46,9 +46,26 @@
 [#if McuName?starts_with("STM32U585")]
 #ifndef PARTITION_STM32U585XX_H
 #define PARTITION_STM32U585XX_H
-[#else]
+[/#if]
+[#if McuName?starts_with("STM32U575")]
 #ifndef PARTITION_STM32U575XX_H
 #define PARTITION_STM32U575XX_H
+[/#if]
+[#if McuName?starts_with("STM32U595")]
+#ifndef PARTITION_STM32U595XX_H
+#define PARTITION_STM32U595XX_H
+[/#if]
+[#if McuName?starts_with("STM32U5A5")]
+#ifndef PARTITION_STM32U5A5XX_H
+#define PARTITION_STM32U5A5XX_H
+[/#if]
+[#if McuName?starts_with("STM32U5A9")]
+#ifndef PARTITION_STM32U5A9XX_H
+#define PARTITION_STM32U5A9XX_H
+[/#if]
+[#if McuName?starts_with("STM32U599")]
+#ifndef PARTITION_STM32U599XX_H
+#define PARTITION_STM32U599XX_H
 [/#if]
 [#assign nonSecureIT0 = "100, 100"/]
 [#assign nonSecureIT1 = "100, 100"/]
@@ -97,6 +114,7 @@
 */
 #define SAU_INIT_REGION0    0
 
+[#if McuName?starts_with("STM32U585")]
 /*
 //     <o>Start Address <0-0xFFFFFFE0>
 */
@@ -107,6 +125,69 @@
 //     <o>End Address <0x1F-0xFFFFFFFF>
 */
 #define SAU_INIT_END0       0x0C0FFFFF      /* end address of SAU region 0 */
+[/#if]
+
+[#if McuName?starts_with("STM32U575")]
+/*
+//     <o>Start Address <0-0xFFFFFFE0>
+*/
+
+#define SAU_INIT_START0     0x0C0FE000      /* start address of SAU region 0 */
+
+/*
+//     <o>End Address <0x1F-0xFFFFFFFF>
+*/
+#define SAU_INIT_END0       0x0C0FFFFF      /* end address of SAU region 0 */
+[/#if]
+
+[#if McuName?starts_with("STM32U5A5")]
+/*
+//     <o>Start Address <0-0xFFFFFFE0>
+*/
+#define SAU_INIT_START0     0x0C1FE000      /* start address of SAU region 0 */
+
+/*
+//     <o>End Address <0x1F-0xFFFFFFFF>
+*/
+#define SAU_INIT_END0       0x0C1FFFFF      /* end address of SAU region 0 */
+[/#if]
+
+[#if McuName?starts_with("STM32U5A9")]
+/*
+//     <o>Start Address <0-0xFFFFFFE0>
+*/
+#define SAU_INIT_START0     0x0C1FE000      /* start address of SAU region 0 */
+
+/*
+//     <o>End Address <0x1F-0xFFFFFFFF>
+*/
+#define SAU_INIT_END0       0x0C1FFFFF      /* end address of SAU region 0 */
+[/#if]
+
+[#if McuName?starts_with("STM32U595")]
+/*
+//     <o>Start Address <0-0xFFFFFFE0>
+*/
+#define SAU_INIT_START0     0x0C1FE000      /* start address of SAU region 0 */
+
+/*
+//     <o>End Address <0x1F-0xFFFFFFFF>
+*/
+#define SAU_INIT_END0       0x0C1FFFFF      /* end address of SAU region 0 */
+[/#if]
+
+[#if McuName?starts_with("STM32U599")]
+/*
+//     <o>Start Address <0-0xFFFFFFE0>
+*/
+#define SAU_INIT_START0     0x0C1FE000      /* start address of SAU region 0 */
+
+/*
+//     <o>End Address <0x1F-0xFFFFFFFF>
+*/
+#define SAU_INIT_END0       0x0C1FFFFF      /* end address of SAU region 0 */
+[/#if]
+
 /*
 //     <o>Region is
 //         <0=>Non-Secure
@@ -123,6 +204,7 @@
 */
 #define SAU_INIT_REGION1    0
 
+[#if McuName?starts_with("STM32U585")]
 /*
 //     <o>Start Address <0-0xFFFFFFE0>
 */
@@ -132,6 +214,68 @@
 //     <o>End Address <0x1F-0xFFFFFFFF>
 */
 #define SAU_INIT_END1       0x081FFFFF      /* end address of SAU region 1 */
+[/#if]
+
+[#if McuName?starts_with("STM32U575")]
+/*
+//     <o>Start Address <0-0xFFFFFFE0>
+*/
+#define SAU_INIT_START1     0x08100000      /* start address of SAU region 1 */
+
+/*
+//     <o>End Address <0x1F-0xFFFFFFFF>
+*/
+#define SAU_INIT_END1       0x081FFFFF      /* end address of SAU region 1 */
+[/#if]
+
+[#if McuName?starts_with("STM32U5A5")]
+/*
+//     <o>Start Address <0-0xFFFFFFE0>
+*/
+#define SAU_INIT_START1     0x08200000      /* start address of SAU region 1 */
+
+/*
+//     <o>End Address <0x1F-0xFFFFFFFF>
+*/
+#define SAU_INIT_END1       0x083FFFFF      /* end address of SAU region 1 */
+[/#if]
+
+[#if McuName?starts_with("STM32U5A9")]
+/*
+//     <o>Start Address <0-0xFFFFFFE0>
+*/
+#define SAU_INIT_START1     0x08200000      /* start address of SAU region 1 */
+
+/*
+//     <o>End Address <0x1F-0xFFFFFFFF>
+*/
+#define SAU_INIT_END1       0x083FFFFF      /* end address of SAU region 1 */
+[/#if]
+
+[#if McuName?starts_with("STM32U595")]
+/*
+//     <o>Start Address <0-0xFFFFFFE0>
+*/
+#define SAU_INIT_START1     0x08200000      /* start address of SAU region 1 */
+
+/*
+//     <o>End Address <0x1F-0xFFFFFFFF>
+*/
+#define SAU_INIT_END1       0x083FFFFF      /* end address of SAU region 1 */
+[/#if]
+
+[#if McuName?starts_with("STM32U599")]
+/*
+//     <o>Start Address <0-0xFFFFFFE0>
+*/
+#define SAU_INIT_START1     0x08200000      /* start address of SAU region 1 */
+
+/*
+//     <o>End Address <0x1F-0xFFFFFFFF>
+*/
+#define SAU_INIT_END1       0x083FFFFF      /* end address of SAU region 1 */
+[/#if]
+
 /*
 //     <o>Region is
 //         <0=>Non-Secure
@@ -148,6 +292,7 @@
 */
 #define SAU_INIT_REGION2    0
 
+[#if McuName?starts_with("STM32U585")]
 /*
 //     <o>Start Address <0-0xFFFFFFE0>
 */
@@ -157,6 +302,67 @@
 //     <o>End Address <0x1F-0xFFFFFFFF>
 */
 #define SAU_INIT_END2       0x200BFFFF      /* end address of SAU region 2 */
+[/#if]
+
+[#if McuName?starts_with("STM32U575")]
+/*
+//     <o>Start Address <0-0xFFFFFFE0>
+*/
+#define SAU_INIT_START2     0x20040000      /* start address of SAU region 2 */
+
+/*
+//     <o>End Address <0x1F-0xFFFFFFFF>
+*/
+#define SAU_INIT_END2       0x200BFFFF      /* end address of SAU region 2 */
+[/#if]
+
+[#if McuName?starts_with("STM32U5A5")]
+/*
+//     <o>Start Address <0-0xFFFFFFE0>
+*/
+#define SAU_INIT_START2     0x200D0000      /* start address of SAU region 2 */
+
+/*
+//     <o>End Address <0x1F-0xFFFFFFFF>
+*/
+#define SAU_INIT_END2       0x2026FFFF      /* end address of SAU region 2 */
+[/#if]
+
+[#if McuName?starts_with("STM32U5A9")]
+/*
+//     <o>Start Address <0-0xFFFFFFE0>
+*/
+#define SAU_INIT_START2     0x200D0000      /* start address of SAU region 2 */
+
+/*
+//     <o>End Address <0x1F-0xFFFFFFFF>
+*/
+#define SAU_INIT_END2       0x2026FFFF      /* end address of SAU region 2 */
+[/#if]
+
+[#if McuName?starts_with("STM32U595")]
+/*
+//     <o>Start Address <0-0xFFFFFFE0>
+*/
+#define SAU_INIT_START2     0x200D0000      /* start address of SAU region 2 */
+
+/*
+//     <o>End Address <0x1F-0xFFFFFFFF>
+*/
+#define SAU_INIT_END2       0x2026FFFF      /* end address of SAU region 2 */
+[/#if]
+
+[#if McuName?starts_with("STM32U599")]
+/*
+//     <o>Start Address <0-0xFFFFFFE0>
+*/
+#define SAU_INIT_START2     0x200D0000      /* start address of SAU region 2 */
+
+/*
+//     <o>End Address <0x1F-0xFFFFFFFF>
+*/
+#define SAU_INIT_END2       0x2026FFFF      /* end address of SAU region 2 */
+[/#if]
 
 /*
 //     <o>Region is
@@ -205,10 +411,47 @@
 */
 #define SAU_INIT_START4     0x60000000      /* start address of SAU region 4 */
 
+[#if McuName?starts_with("STM32U585")]
 /*
 //     <o>End Address <0x1F-0xFFFFFFFF>
 */
 #define SAU_INIT_END4       0x9FFFFFFF      /* end address of SAU region 4 */
+[/#if]
+
+[#if McuName?starts_with("STM32U575")]
+/*
+//     <o>End Address <0x1F-0xFFFFFFFF>
+*/
+#define SAU_INIT_END4       0x9FFFFFFF      /* end address of SAU region 4 */
+[/#if]
+
+[#if McuName?starts_with("STM32U5A5")]
+/*
+//     <o>End Address <0x1F-0xFFFFFFFF>
+*/
+#define SAU_INIT_END4       0xAFFFFFFF      /* end address of SAU region 4 */
+[/#if]
+
+[#if McuName?starts_with("STM32U5A9")]
+/*
+//     <o>End Address <0x1F-0xFFFFFFFF>
+*/
+#define SAU_INIT_END4       0xAFFFFFFF      /* end address of SAU region 4 */
+[/#if]
+
+[#if McuName?starts_with("STM32U595")]
+/*
+//     <o>End Address <0x1F-0xFFFFFFFF>
+*/
+#define SAU_INIT_END4       0xAFFFFFFF      /* end address of SAU region 4 */
+[/#if]
+
+[#if McuName?starts_with("STM32U599")]
+/*
+//     <o>End Address <0x1F-0xFFFFFFFF>
+*/
+#define SAU_INIT_END4       0xAFFFFFFF      /* end address of SAU region 4 */
+[/#if]
 
 /*
 //     <o>Region is
@@ -519,7 +762,24 @@
 //   <o.6>  TIM16_IRQn            [#if enabledIT?contains("TIM16_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"6"/][#else]<0=> Secure state[/#if]
 //   <o.7>  TIM17_IRQn            [#if enabledIT?contains("TIM17_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"7"/][#else]<0=> Secure state[/#if]
 //   <o.8>  COMP_IRQn             [#if enabledIT?contains("COMP_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"8"/][#else]<0=> Secure state[/#if]
+[#if McuName?starts_with("STM32U585")]
 //   <o.9>  OTG_FS_IRQn           [#if enabledIT?contains("OTG_FS_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"9"/][#else]<0=> Secure state[/#if]
+[/#if]
+[#if McuName?starts_with("STM32U575")]
+//   <o.9>  OTG_FS_IRQn           [#if enabledIT?contains("OTG_FS_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"9"/][#else]<0=> Secure state[/#if]
+[/#if]
+[#if McuName?starts_with("STM32U5A5")]
+//   <o.9>  OTG_HS_IRQn           [#if enabledIT?contains("OTG_HS_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"9"/][#else]<0=> Secure state[/#if]
+[/#if]
+[#if McuName?starts_with("STM32U5A9")]
+//   <o.9>  OTG_HS_IRQn           [#if enabledIT?contains("OTG_HS_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"9"/][#else]<0=> Secure state[/#if]
+[/#if]
+[#if McuName?starts_with("STM32U595")]
+//   <o.9>  OTG_HS_IRQn           [#if enabledIT?contains("OTG_HS_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"9"/][#else]<0=> Secure state[/#if]
+[/#if]
+[#if McuName?starts_with("STM32U599")]
+//   <o.9>  OTG_HS_IRQn           [#if enabledIT?contains("OTG_HS_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"9"/][#else]<0=> Secure state[/#if]
+[/#if]
 //   <o.10> CRS_IRQn              [#if enabledIT?contains("CRS_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"10"/][#else]<0=> Secure state[/#if]
 //   <o.11> FMC_IRQn              [#if enabledIT?contains("FMC_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"11"/][#else]<0=> Secure state[/#if]
 //   <o.12> OCTOSPI1_IRQn         [#if enabledIT?contains("OCTOSPI1_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"12"/][#else]<0=> Secure state[/#if]
@@ -567,12 +827,31 @@
 */
 
 /*
+[#if McuName?starts_with("STM32U585")]
 //   <e>Initialize ITNS 3 (Interrupts 96..108)
+[/#if]
+[#if McuName?starts_with("STM32U575")]
+//   <e>Initialize ITNS 3 (Interrupts 96..108)
+[/#if]
+[#if McuName?starts_with("STM32U5A5")]
+//   <e>Initialize ITNS 3 (Interrupts 96..127)
+[/#if]
+[#if McuName?starts_with("STM32U5A9")]
+//   <e>Initialize ITNS 3 (Interrupts 96..127)
+[/#if]
+[#if McuName?starts_with("STM32U595")]
+//   <e>Initialize ITNS 3 (Interrupts 96..127)
+[/#if]
+[#if McuName?starts_with("STM32U599")]
+//   <e>Initialize ITNS 3 (Interrupts 96..127)
+[/#if]
+
 */
 #define NVIC_INIT_ITNS3    1
 
 /*
-// Interrupts 96..125
+[#if McuName?starts_with("STM32U575")]// Interrupts 96..125[/#if][#if McuName?starts_with("STM32U585")]// Interrupts 96..125[/#if]
+[#if McuName?starts_with("STM32U5A5")]// Interrupts 96..127[/#if][#if McuName?starts_with("STM32U5A9")]// Interrupts 96..127[/#if][#if McuName?starts_with("STM32U595")]// Interrupts 96..127[/#if][#if McuName?starts_with("STM32U599")]// Interrupts 96..127[/#if]
 //   <o.0>  HASH_IRQn             [#if enabledIT?contains("HASH_IRQn")]<1=> Non-Secure state[#assign nonSecureIT3 = nonSecureIT3+", "+"0"/][#else]<0=> Secure state[/#if]
 //   <o.1>  PKA_IRQn              [#if enabledIT?contains("PKA_IRQn")]<1=> Non-Secure state[#assign nonSecureIT3 = nonSecureIT3+", "+"1"/][#else]<0=> Secure state[/#if]
 //   <o.2>  LPTIM3_IRQn           [#if enabledIT?contains("LPTIM3_IRQn")]<1=> Non-Secure state[#assign nonSecureIT3 = nonSecureIT3+", "+"2"/][#else]<0=> Secure state[/#if]
@@ -602,6 +881,22 @@
 //   <o.26> MDF1_FLT5_IRQn        [#if enabledIT?contains("MDF1_FLT5_IRQn")]<1=> Non-Secure state[#assign nonSecureIT3 = nonSecureIT3+", "+"26"/][#else]<0=> Secure state[/#if]
 //   <o.27> CORDIC_IRQn           [#if enabledIT?contains("CORDIC_IRQn")]<1=> Non-Secure state[#assign nonSecureIT3 = nonSecureIT3+", "+"27"/][#else]<0=> Secure state[/#if]
 //   <o.28> FMAC_IRQn             [#if enabledIT?contains("FMAC_IRQn")]<1=> Non-Secure state[#assign nonSecureIT3 = nonSecureIT3+", "+"28"/][#else]<0=> Secure state[/#if]
+[#if McuName?starts_with("STM32U5A5")]
+//   <o.30> USART6_IRQn           [#if enabledIT?contains("USART6_IRQn")]<1=> Non-Secure state[#assign nonSecureIT3 = nonSecureIT3+", "+"30"/][#else]<0=> Secure state[/#if]
+//   <o.31> I2C5_ER_IRQn          [#if enabledIT?contains("I2C5_ER_IRQn")]<1=> Non-Secure state[#assign nonSecureIT3 = nonSecureIT3+", "+"31"/][#else]<0=> Secure state[/#if]
+[/#if]
+[#if McuName?starts_with("STM32U5A9")]
+//   <o.30> USART6_IRQn           [#if enabledIT?contains("USART6_IRQn")]<1=> Non-Secure state[#assign nonSecureIT3 = nonSecureIT3+", "+"30"/][#else]<0=> Secure state[/#if]
+//   <o.31> I2C5_ER_IRQn          [#if enabledIT?contains("I2C5_ER_IRQn")]<1=> Non-Secure state[#assign nonSecureIT3 = nonSecureIT3+", "+"31"/][#else]<0=> Secure state[/#if]
+[/#if]
+[#if McuName?starts_with("STM32U595")]
+//   <o.30> USART6_IRQn           [#if enabledIT?contains("USART6_IRQn")]<1=> Non-Secure state[#assign nonSecureIT3 = nonSecureIT3+", "+"30"/][#else]<0=> Secure state[/#if]
+//   <o.31> I2C5_ER_IRQn          [#if enabledIT?contains("I2C5_ER_IRQn")]<1=> Non-Secure state[#assign nonSecureIT3 = nonSecureIT3+", "+"31"/][#else]<0=> Secure state[/#if]
+[/#if]
+[#if McuName?starts_with("STM32U599")]
+//   <o.30> USART6_IRQn           [#if enabledIT?contains("USART6_IRQn")]<1=> Non-Secure state[#assign nonSecureIT3 = nonSecureIT3+", "+"30"/][#else]<0=> Secure state[/#if]
+//   <o.31> I2C5_ER_IRQn          [#if enabledIT?contains("I2C5_ER_IRQn")]<1=> Non-Secure state[#assign nonSecureIT3 = nonSecureIT3+", "+"31"/][#else]<0=> Secure state[/#if]
+[/#if]
 
 */
 
@@ -618,6 +913,107 @@
 
 [#assign res3 = String.format("0x%08X" , Math.round(decVal3)) /]
 #define NVIC_INIT_ITNS3_VAL      ${res3}
+
+[#if McuName?starts_with("STM32U5A5")]
+/*
+//   </e>
+*/
+
+/*
+//   <e>Initialize ITNS 4 (Interrupts 109..138)
+*/
+#define NVIC_INIT_ITNS4    1
+
+/*
+// Interrupts 96..138
+//   <o.0>  I2C5_EV_IRQn          <0=> Secure state <1=> Non-Secure state
+//   <o.1>  I2C6_ER_IRQn          <0=> Secure state <1=> Non-Secure state
+//   <o.2>  I2C6_EV_IRQn          <0=> Secure state <1=> Non-Secure state
+//   <o.3>  HSPI1_IRQn            <0=> Secure state <1=> Non-Secure state
+*/
+#define NVIC_INIT_ITNS4_VAL      0x00000000
+[/#if]
+
+[#if McuName?starts_with("STM32U5A9")]
+/*
+//   </e>
+*/
+
+/*
+//   <e>Initialize ITNS 4 (Interrupts 109..138)
+*/
+#define NVIC_INIT_ITNS4    1
+
+/*
+// Interrupts 96..138
+//   <o.0>  I2C5_EV_IRQn          <0=> Secure state <1=> Non-Secure state
+//   <o.1>  I2C6_ER_IRQn          <0=> Secure state <1=> Non-Secure state
+//   <o.2>  I2C6_EV_IRQn          <0=> Secure state <1=> Non-Secure state
+//   <o.3>  HSPI1_IRQn            <0=> Secure state <1=> Non-Secure state
+//   <o.4>  GPU2D_IRQn            <0=> Secure state <1=> Non-Secure state
+//   <o.5>  GPU2D_ER_IRQn         <0=> Secure state <1=> Non-Secure state
+//   <o.6>  GFXMMU_IRQn           <0=> Secure state <1=> Non-Secure state
+//   <o.7>  LTDC_IRQn             <0=> Secure state <1=> Non-Secure state
+//   <o.8>  LTDC_ER_IRQn          <0=> Secure state <1=> Non-Secure state
+//   <o.9>  DSI_IRQn              <0=> Secure state <1=> Non-Secure state
+//   <o.10> DCACHE2_IRQn          <0=> Secure state <1=> Non-Secure state
+*/
+#define NVIC_INIT_ITNS4_VAL      0x00000000
+[/#if]
+
+[#if McuName?starts_with("STM32U595")]
+/*
+//   </e>
+*/
+
+/*
+//   <e>Initialize ITNS 4 (Interrupts 109..138)
+*/
+#define NVIC_INIT_ITNS4    1
+
+/*
+// Interrupts 96..138
+//   <o.0>  I2C5_EV_IRQn          <0=> Secure state <1=> Non-Secure state
+//   <o.1>  I2C6_ER_IRQn          <0=> Secure state <1=> Non-Secure state
+//   <o.2>  I2C6_EV_IRQn          <0=> Secure state <1=> Non-Secure state
+//   <o.3>  HSPI1_IRQn            <0=> Secure state <1=> Non-Secure state
+//   <o.4>  GPU2D_IRQn            <0=> Secure state <1=> Non-Secure state
+//   <o.5>  GPU2D_ER_IRQn         <0=> Secure state <1=> Non-Secure state
+//   <o.6>  GFXMMU_IRQn           <0=> Secure state <1=> Non-Secure state
+//   <o.7>  LTDC_IRQn             <0=> Secure state <1=> Non-Secure state
+//   <o.8>  LTDC_ER_IRQn          <0=> Secure state <1=> Non-Secure state
+//   <o.9>  DSI_IRQn              <0=> Secure state <1=> Non-Secure state
+//   <o.10> DCACHE2_IRQn          <0=> Secure state <1=> Non-Secure state
+*/
+#define NVIC_INIT_ITNS4_VAL      0x00000000
+[/#if]
+
+[#if McuName?starts_with("STM32U599")]
+/*
+//   </e>
+*/
+
+/*
+//   <e>Initialize ITNS 4 (Interrupts 109..138)
+*/
+#define NVIC_INIT_ITNS4    1
+
+/*
+// Interrupts 96..138
+//   <o.0>  I2C5_EV_IRQn          <0=> Secure state <1=> Non-Secure state
+//   <o.1>  I2C6_ER_IRQn          <0=> Secure state <1=> Non-Secure state
+//   <o.2>  I2C6_EV_IRQn          <0=> Secure state <1=> Non-Secure state
+//   <o.3>  HSPI1_IRQn            <0=> Secure state <1=> Non-Secure state
+//   <o.4>  GPU2D_IRQn            <0=> Secure state <1=> Non-Secure state
+//   <o.5>  GPU2D_ER_IRQn         <0=> Secure state <1=> Non-Secure state
+//   <o.6>  GFXMMU_IRQn           <0=> Secure state <1=> Non-Secure state
+//   <o.7>  LTDC_IRQn             <0=> Secure state <1=> Non-Secure state
+//   <o.8>  LTDC_ER_IRQn          <0=> Secure state <1=> Non-Secure state
+//   <o.9>  DSI_IRQn              <0=> Secure state <1=> Non-Secure state
+//   <o.10> DCACHE2_IRQn          <0=> Secure state <1=> Non-Secure state
+*/
+#define NVIC_INIT_ITNS4_VAL      0x00000000
+[/#if]
 
 /*
 //   </e>
@@ -732,10 +1128,54 @@ __STATIC_INLINE void TZ_SAU_Setup (void)
     NVIC->ITNS[3] = NVIC_INIT_ITNS3_VAL;
   #endif
 
+[#if McuName?starts_with("STM32U5A5")]
+  #if defined (NVIC_INIT_ITNS4) && (NVIC_INIT_ITNS4 == 1U)
+    NVIC->ITNS[4] = NVIC_INIT_ITNS4_VAL;
+  #endif
+[/#if]
+
+[#if McuName?starts_with("STM32U5A9")]
+  #if defined (NVIC_INIT_ITNS4) && (NVIC_INIT_ITNS4 == 1U)
+    NVIC->ITNS[4] = NVIC_INIT_ITNS4_VAL;
+  #endif
+[/#if]
+
+[#if McuName?starts_with("STM32U595")]
+  #if defined (NVIC_INIT_ITNS4) && (NVIC_INIT_ITNS4 == 1U)
+    NVIC->ITNS[4] = NVIC_INIT_ITNS4_VAL;
+  #endif
+[/#if]
+
+[#if McuName?starts_with("STM32U599")]
+  #if defined (NVIC_INIT_ITNS4) && (NVIC_INIT_ITNS4 == 1U)
+    NVIC->ITNS[4] = NVIC_INIT_ITNS4_VAL;
+  #endif
+[/#if]
+
 }
 /* USER CODE END 2 */
 [#if McuName?starts_with("STM32U585")]
 #endif  /* PARTITION_STM32U585XX_H */
-[#else]
+[/#if]
+
+[#if McuName?starts_with("STM32U575")]
 #endif  /* PARTITION_STM32U575XX_H */
 [/#if]
+
+[#if McuName?starts_with("STM32U5A5")]
+#endif  /* PARTITION_STM32U5A5XX_H */
+[/#if]
+
+[#if McuName?starts_with("STM32U5A9")]
+#endif  /* PARTITION_STM32U5A9XX_H */
+[/#if]
+
+[#if McuName?starts_with("STM32U595")]
+#endif  /* PARTITION_STM32U595XX_H */
+[/#if]
+
+[#if McuName?starts_with("STM32U599")]
+#endif  /* PARTITION_STM32U599XX_H */
+[/#if]
+
+

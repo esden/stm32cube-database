@@ -71,8 +71,7 @@ extern "C" {
 
 [#if CPUCORE != ""]
 /* make sure a pin is not used simultaneously by the two cores */
-/* PROBE_LINE1 & PROBE_LINE2 for CM4: this mapping can be changed*/
-#if defined(CORE_CM0PLUS)
+
 [/#if]
 [#if BspIpDatas??]
   [#list BspIpDatas as SWIP]
@@ -88,9 +87,6 @@ extern "C" {
         [#if variables.value?contains("Debug ") ]
           [#assign i=(variables.value?substring((variables.value?last_index_of(" ") + 1) ,variables.value?length))]
 
-          [#if (i == "3") && CPUCORE != ""]
-#else
-          [/#if]
 /**  Definition for Probe Line ${i}   **/
 /**
   * @brief Pin of Probe Line ${i}
@@ -111,14 +107,10 @@ extern "C" {
   * @brief Disable GPIOs clock of Probe Line ${i}
   */
 #define PROBE_LINE${i}_CLK_DISABLE()                 __HAL_RCC_${IpName}_CLK_DISABLE()
-
           [/#if]
       [/#list]
     [/#if]
   [/#list]
-[/#if]
-[#if CPUCORE != ""]
-#endif /* CORE_CM0PLUS */
 [/#if]
 
 /* USER CODE BEGIN EC */
@@ -131,24 +123,28 @@ extern "C" {
 /* USER CODE END EV */
 
 /* Exported macro ------------------------------------------------------------*/
-#if defined (PROBE_PINS_ENABLED) && (PROBE_PINS_ENABLED == 1)
+#if !defined (DISABLE_PROBE_GPIO)
 
-#define PROBE_GPIO_WRITE( gpio, n, x )  HAL_GPIO_WritePin( gpio, n, (GPIO_PinState)(x) )
+/**
+  * @brief Set pin to x value
+  */
+#define PROBE_GPIO_WRITE( gpio, n, x )     HAL_GPIO_WritePin( gpio, n, (GPIO_PinState)(x) )
 
 /**
   * @brief Set pin to high level
   */
-#define PROBE_GPIO_SET_LINE( gpio, n )       LL_GPIO_SetOutputPin( gpio, n )
+#define PROBE_GPIO_SET_LINE( gpio, n )     LL_GPIO_SetOutputPin( gpio, n )
 
 /**
   * @brief Set pin to low level
   */
-#define PROBE_GPIO_RST_LINE( gpio, n )       LL_GPIO_ResetOutputPin ( gpio, n )
+#define PROBE_GPIO_RST_LINE( gpio, n )     LL_GPIO_ResetOutputPin( gpio, n )
 
-/*enabling RTC_OUTPUT should be set via STM32CubeMX GUI because MX_RTC_Init is now entirely generated */
+#else  /* DISABLE_PROBE_GPIO */
 
-#elif defined (PROBE_PINS_ENABLED) && (PROBE_PINS_ENABLED == 0) /* PROBE_PINS_OFF */
-
+/**
+  * @brief not usable
+  */
 #define PROBE_GPIO_WRITE( gpio, n, x )
 
 /**
@@ -161,11 +157,7 @@ extern "C" {
   */
 #define PROBE_GPIO_RST_LINE( gpio, n )
 
-/*disabling RTC_OUTPUT should be set via STM32CubeMX GUI because MX_RTC_Init is now entirely generated */
-
-#else
-#error "PROBE_PINS_ENABLED not defined or out of range <0,1>"
-#endif /* PROBE_PINS_ENABLED */
+#endif /* DISABLE_PROBE_GPIO */
 
 /* USER CODE BEGIN EM */
 
@@ -177,25 +169,14 @@ extern "C" {
 
 [/#if]
 /**
-  * @brief Disable debugger (serial wires pins)
+  * @brief Initializes the SW probes pins and the monitor RF pins via Alternate Function
   */
-void DBG_Disable(void);
+void DBG_Init(void);
 
-/**
-  * @brief Config debugger when working in Low Power Mode
-  * @note  When in Dual Core DbgMcu pins should be better disable only after CM0+ is started
-  */
-void DBG_ConfigForLpm(uint8_t enableDbg);
 [#if (CPUCORE != "") ]
 
 #endif /* CORE_CM4 */
 [/#if]
-
-/**
-  * @brief Initializes the SW probes pins and the monitor RF pins via Alternate Function
-  */
-void DBG_ProbesInit(void);
-
 /* USER CODE BEGIN EFP */
 
 /* USER CODE END EFP */
@@ -205,4 +186,3 @@ void DBG_ProbesInit(void);
 #endif
 
 #endif /* __SYS_DEBUG_H__ */
-

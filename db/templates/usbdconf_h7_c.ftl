@@ -717,6 +717,24 @@ void HAL_PCDEx_LPM_Callback(PCD_HandleTypeDef *hpcd, PCD_LPM_MsgTypeDef msg)
 }
 [/#if]
 [/#if]
+
+[#if family?contains("STM32H7")]
+#ifdef USBD_HS_TESTMODE_ENABLE
+/**
+  * @brief  Set High speed Test mode.
+  * @param  pdev: Device handle
+  * @param  testmode: test mode
+  * @retval USBD Status
+  */
+USBD_StatusTypeDef USBD_LL_SetTestMode(USBD_HandleTypeDef *pdev, uint8_t testmode)
+{
+  UNUSED(pdev);
+  UNUSED(testmode);
+
+  return USBD_OK;
+}
+#endif /* USBD_HS_TESTMODE_ENABLE */
+[/#if]
 /**
   * @brief  Static single allocation.
   * @param  size: Size of allocated memory

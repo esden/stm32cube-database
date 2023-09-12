@@ -47,6 +47,9 @@ extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
+[#if THREADX??]
+#include <stdint.h>
+[/#if]
 /* USER CODE BEGIN Includes */
 
 /* USER CODE END Includes */
@@ -87,17 +90,23 @@ extern "C" {
 
 /* USER CODE END EM */
 
-/* Exported functions prototypes ---------------------------------------------*/
+/* Exported Functions Prototypes ---------------------------------------------*/
 /**
   * @brief  Init Sigfox Application
   */
+[#if !THREADX??][#-- If AzRtos is not used --]
 void MX_Sigfox_Init(void);
+[#else]
+uint32_t MX_Sigfox_Init(void *memory_ptr);
+[/#if]
 
 [#if !FREERTOS??][#-- If FreeRtos, only available in CM4 is not used --]
+[#if !THREADX??][#-- If AzRtos is not used --]
 /**
   * @brief  entry Sigfox Process or scheduling
   */
 void MX_Sigfox_Process(void);
+[/#if]
 [/#if]
 
 /* USER CODE BEGIN EFP */
@@ -109,4 +118,3 @@ void MX_Sigfox_Process(void);
 #endif
 
 #endif /*__APP_SIGFOX_H__*/
-

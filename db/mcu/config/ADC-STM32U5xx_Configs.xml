@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
 <IP xmlns="http://mcd.rou.st.com/modules.php?name=mcu" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" DBVersion="V4.0" Name="STM32Cube_FW_U5_V0.4.0" Version="V0.2.0" ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Configs.xsd">
 	
+    
+    
+    
+    <RefConfig Comment="Configure the ADC multi-mode" Name="multiMode">
+        
+        <IFCondition Expression="DIE481">
+        <CallLibMethod Name="HAL_ADCEx_MultiModeConfigChannel"/>
+        </IFCondition>
+    </RefConfig>
    <RefConfig Name="ADC_RegularChannelRankConfig" Comment="Configure Regular Channel">
         <IFCondition Expression="Sequencer = FULLY_CONFIGURABLE">
             <CallLibMethod Name="HAL_ADC_ConfigChannel">
@@ -10,13 +19,16 @@
     </RefConfig>
     <RefConfig Name="ADC_RegularChannelConfig" Comment="Configure Regular Channel">      
          
-        <IFCondition  Expression="$Index=1">
+        <IFCondition  Expression="$Index=1|$Index=2">
         <CallLibMethod Name="HAL_ADC_ConfigChannel">
         </CallLibMethod>
         </IFCondition>
         <IFCondition  Expression="Sequencer = NOT_FULLY_CONFIGURABLE ">
-        <CallLibMethod Name="HAL_ADC_ConfigChannel"/>
-        </IFCondition>        
+            <CallLibMethod Name="HAL_ADC_ConfigChannel">
+                <MethodArg Name="SamplingTime" ParameterName="SamplingTime_NFC"/>
+            </CallLibMethod>
+        </IFCondition>  
+              
     </RefConfig>
     <RefConfig Comment="Common config" Name="ADC_RegularConfig">
         <CallLibMethod Name="HAL_ADC_Init"/>
@@ -27,11 +39,12 @@
    
     <RefConfig Comment="Configure Injected Channel" Name="ADC_InjectedChannelConfig">
         <CallLibMethod Name="HAL_ADCEx_InjectedConfigChannel">
-        	<MethodArg Name="InjectedNbrOfConversion" ParameterName="InjNumberOfConversion"/>
-			<MethodArg Name="InjecOversamplingMode" ParameterName="EnableInjectedOversampling"/>
-			<MethodArg Name="Ratio" ParameterName="InjOversamplingRatio"/>
-			<MethodArg Name="RightBitShift" ParameterName="InjOversamplingRightShift"/>
-		</CallLibMethod>
+            <MethodArg Name="InjectedNbrOfConversion" ParameterName="InjNumberOfConversion"/>
+            <MethodArg Name="InjecOversamplingMode" ParameterName="EnableInjectedOversampling"/>
+            <MethodArg Name="Ratio" ParameterName="InjOversamplingRatio"/>
+            <MethodArg Name="RightBitShift" ParameterName="InjOversamplingRightShift"/>
+
+        </CallLibMethod>
     </RefConfig>
     <!--  -->
     <RefConfig Comment="Configure Analog WatchDog 1" Name="ADC_AnalogWDGConfig">
@@ -52,10 +65,10 @@
     	 
     </RefConfig>
   
-    <RefConfig Comment="Configure the injected channel to be monitored by WatchDog 2 or 3" Name="ADC_InjectedChannelConfigForWD">
+    <RefConfig Comment="Configure the  WatchDogs 2 or 3" Name="ADC_InjectedChannelConfigForWD">
         <IFCondition Expression="(InjMonitoredBy=ADC_ANALOGWATCHDOG_2 &amp; EnableAnalogWatchDog2=true)|(InjMonitoredBy=ADC_ANALOGWATCHDOG_3 &amp; EnableAnalogWatchDog3=true)">
         <CallLibMethod Name="HAL_ADC_AnalogWDGConfig">
-            <MethodArg Name="WatchdogMode" ParameterName="WatchdogMode23"/>
+            <MethodArg Name="WatchdogMode" ParameterName="InjWDModeFC"/>
             <MethodArg Name="WatchdogNumber" ParameterName="InjMonitoredBy"/>
             <MethodArg Name="Channel" ParameterName="InjAWDChannel"/>
             <MethodArg Name="ITMode" ParameterName="InjITMode"/>
@@ -66,12 +79,34 @@
             <MethodArg Name="FilteringConfig" ParameterName="AWD3FilteringConfig"/>	
         </CallLibMethod>
         </IFCondition>
+         <IFCondition Expression="InjMonitoredBy=ADC_ANALOGWATCHDOG_32 &amp; ($Index=1|$Index=2)">
+            <CallLibMethod Name="HAL_ADC_AnalogWDGConfig">
+                <MethodArg Name="WatchdogMode" ParameterName="WatchdogMode2"/>
+                <MethodArg Name="WatchdogNumber" ParameterName="AWD2WatchdogNumber"/>
+                <MethodArg Name="Channel" ParameterName="InjAWDChannel"/>
+                <MethodArg Name="ITMode" ParameterName="AWD2ITMode"/>
+                <MethodArg Name="HighThreshold" ParameterName="AWD2HighThreshold"/>
+                <MethodArg Name="LowThreshold" ParameterName="AWD2LowThreshold"/>
+                <MethodArg Name="FilteringConfig" ParameterName="AWD2FilteringConfig"/>
+
+            </CallLibMethod>
+            <CallLibMethod Name="HAL_ADC_AnalogWDGConfig">
+                <MethodArg Name="WatchdogMode" ParameterName="WatchdogMode3"/>
+                <MethodArg Name="WatchdogNumber" ParameterName="AWD3WatchdogNumber"/>
+                <MethodArg Name="Channel" ParameterName="InjAWDChannel"/>
+                <MethodArg Name="ITMode" ParameterName="AWD3ITMode"/>
+                <MethodArg Name="HighThreshold" ParameterName="AWD3HighThreshold"/>
+                <MethodArg Name="LowThreshold" ParameterName="AWD3LowThreshold"/>
+                <MethodArg Name="FilteringConfig" ParameterName="AWD3FilteringConfig"/>
+
+            </CallLibMethod>
+        </IFCondition> 
     </RefConfig>
 
-    <RefConfig Comment="Configure the regular channel to be monitored by WatchDog 2 or 3" Name="ADC_RegularChannelConfigForWD">
+    <RefConfig Comment="Configure the WatchDogs 2 or 3" Name="ADC_RegularChannelConfigForWD">
         <IFCondition Expression="(MonitoredBy=ADC_ANALOGWATCHDOG_2 &amp; EnableAnalogWatchDog2=true)|(MonitoredBy=ADC_ANALOGWATCHDOG_3 &amp; EnableAnalogWatchDog3=true)">
             <CallLibMethod Name="HAL_ADC_AnalogWDGConfig">
-                <MethodArg Name="WatchdogMode" ParameterName="WatchdogMode23"/>
+                <MethodArg Name="WatchdogMode" ParameterName="RegWDModeFC"/>
                 <MethodArg Name="WatchdogNumber" ParameterName="MonitoredBy"/>
                 <MethodArg Name="Channel" ParameterName="AWDChannel"/>
                 <MethodArg Name="ITMode" ParameterName="RegITMode"/>
@@ -82,9 +117,96 @@
                 <MethodArg Name="FilteringConfig" ParameterName="AWD3FilteringConfig"/>	
             </CallLibMethod>
         </IFCondition> 
+        <IFCondition Expression="MonitoredBy=ADC_ANALOGWATCHDOG_32 &amp; ($Index=1|$Index=2)">
+            <CallLibMethod Name="HAL_ADC_AnalogWDGConfig">
+                <MethodArg Name="WatchdogMode" ParameterName="WatchdogMode2"/>
+                <MethodArg Name="WatchdogNumber" ParameterName="AWD2WatchdogNumber"/>
+                <MethodArg Name="Channel" ParameterName="AWDChannel"/>
+                <MethodArg Name="ITMode" ParameterName="AWD2ITMode"/>
+                <MethodArg Name="HighThreshold" ParameterName="AWD2HighThreshold"/>
+                <MethodArg Name="LowThreshold" ParameterName="AWD2LowThreshold"/>
+                <MethodArg Name="FilteringConfig" ParameterName="AWD2FilteringConfig"/>
+
+            </CallLibMethod>
+            <CallLibMethod Name="HAL_ADC_AnalogWDGConfig">
+                <MethodArg Name="WatchdogMode" ParameterName="WatchdogMode3"/>
+                <MethodArg Name="WatchdogNumber" ParameterName="AWD3WatchdogNumber"/>
+                <MethodArg Name="Channel" ParameterName="AWDChannel"/>
+                <MethodArg Name="ITMode" ParameterName="AWD3ITMode"/>
+                <MethodArg Name="HighThreshold" ParameterName="AWD3HighThreshold"/>
+                <MethodArg Name="LowThreshold" ParameterName="AWD3LowThreshold"/>
+                <MethodArg Name="FilteringConfig" ParameterName="AWD3FilteringConfig"/>
+
+            </CallLibMethod>
+        </IFCondition> 
+        <IFCondition Expression="MonitoredBy=ADC_ANALOGWATCHDOG_32 &amp; $Index=4">
+            <CallLibMethod Name="HAL_ADC_AnalogWDGConfig">
+                <MethodArg Name="WatchdogMode" ParameterName="WatchdogMode2"/>
+                <MethodArg Name="WatchdogNumber" ParameterName="AWD2WatchdogNumber"/>
+                <MethodArg Name="Channel" ParameterName="AWDChannel"/>
+                <MethodArg Name="ITMode" ParameterName="AWD2ITMode"/>
+                <MethodArg Name="HighThreshold" ParameterName="AWD2HighThreshold"/>
+                <MethodArg Name="LowThreshold" ParameterName="AWD2LowThreshold"/>
+
+            </CallLibMethod>
+            <CallLibMethod Name="HAL_ADC_AnalogWDGConfig">
+                <MethodArg Name="WatchdogMode" ParameterName="WatchdogMode3"/>
+                <MethodArg Name="WatchdogNumber" ParameterName="AWD3WatchdogNumber"/>
+                <MethodArg Name="Channel" ParameterName="AWDChannel"/>
+                <MethodArg Name="ITMode" ParameterName="AWD3ITMode"/>
+                <MethodArg Name="HighThreshold" ParameterName="AWD3HighThreshold"/>
+                <MethodArg Name="LowThreshold" ParameterName="AWD3LowThreshold"/>
+
+            </CallLibMethod>
+        </IFCondition> 
     </RefConfig>
     
-   <LibMethod Comment="" Name="HAL_ADCEx_InjectedConfigChannel">
+    
+    <RefConfig Comment="Configure the WatchDogs 2 " Name="ADC_AnalogWDGConfigForAWD2">
+        <IFCondition Expression="$IpInstance_NOTCONFIGURABLE">
+            <CallLibMethod Name="HAL_ADC_AnalogWDGConfig">
+                <MethodArg Name="WatchdogMode" ParameterName="WatchdogMode2"/>
+                <MethodArg Name="WatchdogNumber" ParameterName="WDG2MonitoredBy"/>
+                <MethodArg Name="Channel" ParameterName="WDGCONV1Channel1|WDGCONV1Channel2|WDGCONV1Channel3|WDGCONV1Channel4|WDGCONV1Channel5|WDGCONV1Channel6|WDGCONV1Channel7|WDGCONV1Channel8|WDGCONV1Channel9|WDGCONV1Channel10|WDGCONV1Channel11|WDGCONV1Channel12
+|WDGCONV1Channel13|WDGCONV1Channel14|WDGCONV1Channel15|WDGCONV1Channel16|WDGCONV1Channel17|WDGCONV1Channel18|WDGCONV1Channel19|WDGCONV1Channel20|WDGCONV1Channel21|WDGCONV1Channel23|WDGCONV1Channel24|WDGCONV1Channel25
+|WDGCONV1Channel26|WDGCONV1Channel27|WDGCONV1Channel28|WDGCONV1Channel29"/>
+                <MethodArg Name="ITMode" ParameterName="AWD2ITMode"/>
+                <MethodArg Name="HighThreshold" ParameterName="AWD2HighThreshold"/>
+                <MethodArg Name="LowThreshold" ParameterName="AWD2LowThreshold"/>
+            </CallLibMethod>
+        </IFCondition> 
+    </RefConfig>
+    <RefConfig Comment="Configure the WatchDogs  3" Name="ADC_AnalogWDGConfigForAWD3">
+        <IFCondition Expression="$IpInstance_NOTCONFIGURABLE">
+            <CallLibMethod Name="HAL_ADC_AnalogWDGConfig">
+                <MethodArg Name="WatchdogMode" ParameterName="WatchdogMode3"/>
+                <MethodArg Name="WatchdogNumber" ParameterName="WDG3MonitoredBy"/>
+                <MethodArg Name="Channel" ParameterName="WDG3CONV1Channel1|WDG3CONV1Channel2|WDG3CONV1Channel3|WDG3CONV1Channel4|WDG3CONV1Channel5|WDG3CONV1Channel6|WDG3CONV1Channel7|WDG3CONV1Channel8|WDG3CONV1Channel9|WDG3CONV1Channel10|WDG3CONV1Channel11|WDG3CONV1Channel12
+|WDG3CONV1Channel13|WDG3CONV1Channel14|WDG3CONV1Channel15|WDG3CONV1Channel16|WDG3CONV1Channel17|WDG3CONV1Channel18|WDG3CONV1Channel19|WDG3CONV1Channel20|WDG3CONV1Channel21|WDG3CONV1Channel23|WDG3CONV1Channel24|WDG3CONV1Channel25
+|WDG3CONV1Channel26|WDG3CONV1Channel27|WDG3CONV1Channel28|WDG3CONV1Channel29"/>
+                <MethodArg Name="ITMode" ParameterName="AWD3ITMode"/>
+                <MethodArg Name="HighThreshold" ParameterName="AWD3HighThreshold"/>
+                <MethodArg Name="LowThreshold" ParameterName="AWD3LowThreshold"/>
+            </CallLibMethod>
+        </IFCondition> 
+    </RefConfig>
+
+
+    <RefConfig Name="LPBAM_ADD_HALCONFIG" Comment="Configuration in LPBAM context">
+        <IFCondition Expression="LPBAM$IpInstance_Used">
+        <CallLibMethod Name="" Type="HardCode">
+                <HardCode Text="#t/* USER CODE BEGIN ADC4_Init Calibration */
+       #n#n#t/* USER CODE END ADC4_Init Calibration */"/>
+        </CallLibMethod>
+        <CallLibMethod Name="__HAL_ADC_ENABLE_IT" ReturnHAL="false">
+        </CallLibMethod>
+        <CallLibMethod Name="ADV_LPBAM_ADC_EnableDMARequests">
+        </CallLibMethod>
+         </IFCondition>
+    </RefConfig>
+    
+
+     <LibMethod Comment="" Name="__HAL_ADC_ENABLE_IT">
         <Argument AddressOf="true" Context="global" GenericType="struct" Name="hadc" TypeName="__ADC_HandleTypeDef">
             <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="ADC_TypeDef"/>
             <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="ADC_InitTypeDef">
@@ -110,6 +232,53 @@
                     <Argument AddressOf="false" GenericType="simple" Name="OversamplingStopReset" OptimizationCondition="equal"/>
                     <Argument AddressOf="false" GenericType="simple" Name="TriggerFrequencyMode" OptimizationCondition="equal"/>
                      <Argument AddressOf="false" GenericType="simple" Name="OversamplingStopReset" OptimizationCondition="equal"/>
+                </Argument>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="DMA_Handle" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="struct" Name="InjectionConfig" TypeName="ADC_InjectionConfigTypeDef">
+                <Argument AddressOf="false" GenericType="enum" Name="ContextQueue" TypeName="HAL_ADCEx_InjectedConfigChannel()"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ChannelCount" OptimizationCondition="equal"/>
+            </Argument>
+        </Argument>
+        <Argument AddressOf="false" GenericType="simple" Name="Interrupt" OptimizationCondition="equal"/>
+    </LibMethod>
+
+    <LibMethod Comment="" Name="ADV_LPBAM_ADC_EnableDMARequests">
+            <Argument AddressOf="false" GenericType="simple" Name="Instance" OptimizationCondition="equal"/>
+     </LibMethod>  
+
+
+
+   <LibMethod Comment="" Name="HAL_ADCEx_InjectedConfigChannel">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hadc" TypeName="__ADC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="ADC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="ADC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Resolution" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DataAlign" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ScanConvMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="EOCSelection" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="enum" Name="LowPowerAutoWait" TypeName="HAL_ADCEx_InjectedGetValue()"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ContinuousConvMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="NbrOfConversion" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DiscontinuousConvMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="NbrOfDiscConversion" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ExternalTrigConv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ExternalTrigConvEdge" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="InjectedLeftBitShift" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DMAContinuousRequests" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Overrun" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OversamplingMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="struct" Name="Oversampling" TypeName="ADC_OversamplingTypeDef">
+                    <Argument AddressOf="false" GenericType="simple" Name="Ratio" OptimizationCondition="equal"/>
+                    <Argument AddressOf="false" GenericType="simple" Name="RightBitShift" OptimizationCondition="equal"/>
+                    <Argument AddressOf="false" GenericType="simple" Name="TriggeredMode" OptimizationCondition="equal"/>
+                    <Argument AddressOf="false" GenericType="simple" Name="OversamplingStopReset" OptimizationCondition="equal"/>
+                    <Argument AddressOf="false" GenericType="simple" Name="TriggerFrequencyMode" OptimizationCondition="equal"/>
+                    <Argument AddressOf="false" GenericType="simple" Name="OversamplingStopReset" OptimizationCondition="equal"/>
 
 
 
@@ -186,9 +355,9 @@
                 <Argument AddressOf="false" GenericType="simple" Name="ChannelCount" OptimizationCondition="equal"/>
             </Argument>
         </Argument>
-        <Argument AddressOf="true" GenericType="struct" Name="multimode" TypeName="ADC_MultiModeTypeDef">
+        <Argument AddressOf="true" GenericType="struct" Name="Multimode" TypeName="ADC_MultiModeTypeDef">
             <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
-            <Argument AddressOf="false" GenericType="simple" Name="DMAAccessMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="DualModeData" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="TwoSamplingDelay" OptimizationCondition="equal"/>
         </Argument>
     </LibMethod>
@@ -247,6 +416,7 @@
                 <Argument AddressOf="false" GenericType="simple" Name="DataAlign" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="ScanConvMode" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="EOCSelection" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="LowPowerAutoPowerOff" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="enum" Name="LowPowerAutoWait" TypeName="HAL_ADCEx_InjectedGetValue()"/>
                 <Argument AddressOf="false" GenericType="simple" Name="ContinuousConvMode" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="NbrOfConversion" OptimizationCondition="equal"/>

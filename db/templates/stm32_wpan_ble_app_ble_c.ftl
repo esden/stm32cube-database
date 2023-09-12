@@ -688,7 +688,7 @@
 [#if  (BT_SIG_BLOOD_PRESSURE_SENSOR = 1)]
 #include "bls_app.h"
 [/#if]
-[#if  (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_HEART_RATE_SENSOR = 1)]
+[#if  (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_HEART_RATE_SENSOR = 1) || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1)]
 #include "dis_app.h"
 [/#if]
 [#if  (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)]
@@ -1350,7 +1350,7 @@ void APP_BLE_Init( void )
   BLSAPP_Init();
 
 [/#if]
-[#if  (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_HEART_RATE_SENSOR = 1)]
+[#if  (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_HEART_RATE_SENSOR = 1) || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1)]
   /**
    * Initialize DIS Application
    */

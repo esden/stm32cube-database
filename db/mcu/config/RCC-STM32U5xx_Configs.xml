@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
 <IP xmlns="http://mcd.rou.st.com/modules.php?name=mcu" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" DBVersion="V4.0" Name="RCC" Version="STM32Cube_FW_U5_V0.1.0" ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Configs.xsd">
     <RefConfig Comment="Configure LSE Drive Capability" Name="RCC_LSEDRIVE_CONFIG">
-        <IFCondition Expression="LSEOscillator &amp; (LSEUsed=1)">
+        <IFCondition Expression="(LSEOscillator | LSEOscillatorRTC) &amp; (LSEUsed=1)">
             <CallLibMethod Name="HAL_PWR_EnableBkUpAccess" ReturnHAL="false">                   
             </CallLibMethod>
         </IFCondition>
@@ -15,6 +15,11 @@
 
     <RefConfig Comment="Enable the SYSCFG APB clock" Name="SYSCFG_CLK_ENABLE">
         <CallLibMethod Name="__HAL_RCC_SYSCFG_CLK_ENABLE" ReturnHAL="false"/>
+    </RefConfig>    
+    <RefConfig Comment="Configure the wakeup clock" Name="WAKEUPSTOP_CLK_CONFIG">
+        <CallLibMethod Name="__HAL_RCC_WAKEUPSTOP_CLK_CONFIG" ReturnHAL="false">
+            <MethodArg Name="WakeUpClk" ParameterName="RCC_Stop_WakeUpClockARG"/>
+        </CallLibMethod>
     </RefConfig>
     <RefConfig Comment="Initializes the CPU, AHB and APB busses clocks" Name="RCC_OSCConfig">
         <CallLibMethod Name="HAL_RCC_OscConfig">
@@ -57,7 +62,57 @@
         <CallLibMethod Name="__HAL_RCC_CRS_CLK_ENABLE" ReturnHAL="false"/>
     </RefConfig>
 
+    <RefConfig Comment="Enable the force of MSIK in stop mode" Name="MSIKSTOP_ENABLE">
+        <IFCondition Expression="MSIKERON=true">
+            <CallLibMethod Name="__HAL_RCC_MSIKSTOP_ENABLE" ReturnHAL="false"/>
+        </IFCondition>
+    </RefConfig>
+    <RefConfig Comment="Disable the force MSIK in stop mode" Name="MSIKSTOP_DISABLE">
+        <IFCondition Expression="MSIKERON=false &amp; S_LPBAM_CONF">
+            <CallLibMethod Name="__HAL_RCC_MSIKSTOP_DISABLE" ReturnHAL="false"/>
+        </IFCondition>
+    </RefConfig>
+    
+    <RefConfig Comment="Enable the force of HSI in stop mode" Name="HSISTOP_ENABLE">
+        <IFCondition Expression="HSIKERON=true">
+            <CallLibMethod Name="__HAL_RCC_HSISTOP_ENABLE" ReturnHAL="false"/>
+        </IFCondition>
+    </RefConfig>
+    <RefConfig Comment="Disable the force HSI in stop mode" Name="HSISTOP_DISABLE">
+        <IFCondition Expression="HSIKERON=false &amp; S_LPBAM_CONF">
+            <CallLibMethod Name="__HAL_RCC_HSISTOP_DISABLE" ReturnHAL="false"/>
+        </IFCondition>
+    </RefConfig>
+
+    <RefConfig Comment="Initializes the CPU, AHB and APB busses clocks" Name="RCC_LPBAMClockConfig">
+        <IFCondition Expression="S_LPBAM_CONF">
+            <IFCondition Expression ="WakeUpClockMSI">
+            <CallLibMethod Name="" Type="HardCode">
+                <HardCode Text="#tif ((__HAL_RCC_GET_PLL_OSCSOURCE() == RCC_PLLSOURCE_MSI) &amp;&amp; #n#t#t#t(__HAL_RCC_GET_SYSCLK_SOURCE() == RCC_SYSCLKSOURCE_STATUS_PLLCLK))#n#t{"/>
+            </CallLibMethod>            
+            </IFCondition>
+            <IFCondition Expression ="WakeUpClockHSI">
+            <CallLibMethod Name="" Type="HardCode">
+                <HardCode Text="#tif ((__HAL_RCC_GET_PLL_OSCSOURCE() == RCC_PLLSOURCE_HSI) &amp;&amp; #n#t#t#t(__HAL_RCC_GET_SYSCLK_SOURCE() == RCC_SYSCLKSOURCE_STATUS_PLLCLK))#n#t{"/>
+            </CallLibMethod>            
+            </IFCondition>
+            <IFCondition Expression ="1=1">
+            <CallLibMethod Name="HAL_RCC_ClockConfig">
+                <MethodArg Name="ClockType" ParameterName="ClockTypeARG"/>
+                <MethodArg Name="SYSCLKSource" ParameterName="SYSCLKSourceARG"/>
+                <MethodArg Name="AHBCLKDivider" ParameterName=""/>
+                <MethodArg Name="APB1CLKDivider" ParameterName=""/>
+                <MethodArg Name="APB2CLKDivider" ParameterName=""/>
+                <MethodArg Name="APB3CLKDivider" ParameterName=""/>
+            </CallLibMethod>
+             <CallLibMethod Name="" Type="HardCode">
+                <HardCode Text="#t}"/>
+            </CallLibMethod>
+            </IFCondition>
+        </IFCondition>
+    </RefConfig>
     <RefConfig Comment="Initializes the CPU, AHB and APB busses clocks" Name="RCC_ClockConfig">
+        <IFCondition Expression="!S_LPBAM_CONF">
         <CallLibMethod Name="HAL_RCC_ClockConfig">
             <MethodArg Name="ClockType" ParameterName="ClockTypeARG"/>
             <MethodArg Name="SYSCLKSource" ParameterName="SYSCLKSourceARG"/>
@@ -66,6 +121,7 @@
             <MethodArg Name="APB2CLKDivider" ParameterName="APB2CLKDividerARG"/>
             <MethodArg Name="APB3CLKDivider" ParameterName="APB3CLKDividerARG"/>
         </CallLibMethod>
+        </IFCondition>
     </RefConfig>
     <RefConfig Comment="Initializes the peripherals clock" Name="RCC_PeriphClockConfig">
         <CallLibMethod Name="HAL_RCCEx_PeriphCLKConfig">
@@ -76,11 +132,14 @@
             <MethodArg Name="Usart3ClockSelection" ParameterName="USART3lockSelectionARG"/>
             <MethodArg Name="Uart4ClockSelection" ParameterName="UART4lockSelectionARG"/>
             <MethodArg Name="Uart5ClockSelection" ParameterName="UART5lockSelectionARG"/>
+            <MethodArg Name="Usart6ClockSelection" ParameterName="UART6lockSelectionARG"/>
             <MethodArg Name="Lpuart1ClockSelection" ParameterName="LPUART1lockSelectionARG"/>
             <MethodArg Name="I2c1ClockSelection" ParameterName="I2C1lockSelectionARG"/>
             <MethodArg Name="I2c2ClockSelection" ParameterName="I2C2lockSelectionARG"/>
             <MethodArg Name="I2c3ClockSelection" ParameterName="I2C3lockSelectionARG"/>
             <MethodArg Name="I2c4ClockSelection" ParameterName="I2C4lockSelectionARG"/>
+            <MethodArg Name="I2c5ClockSelection" ParameterName="I2C5lockSelectionARG"/>
+            <MethodArg Name="I2c6ClockSelection" ParameterName="I2C6lockSelectionARG"/>
             <MethodArg Name="Lptim1ClockSelection" ParameterName="LPTIM1lockSelectionARG"/>
             <MethodArg Name="Lptim2ClockSelection" ParameterName="LPTIM2lockSelectionARG"/>
             <MethodArg Name="Lptim34ClockSelection" ParameterName="LPTIM3lockSelectionARG"/>
@@ -90,7 +149,7 @@
             <MethodArg Name="Sai1ClockSelection" ParameterName="SAI1lockSelectionARG"/>
             <MethodArg Name="Sai2ClockSelection" ParameterName="SAI2lockSelectionARG"/>
             <MethodArg Name="RngClockSelection" ParameterName="RNGClockSelectionARG"/>
-            <MethodArg Name="Clk48ClockSelection" ParameterName="Clk48ClockSelectionARG"/>
+            <MethodArg Name="IclkClockSelection" ParameterName="Clk48ClockSelectionARG"/>
             <MethodArg Name="SaesClockSelection" ParameterName="SaesClockSelectionARG"/>
             <MethodArg Name="SdmmcClockSelection" ParameterName="SDMMCClockSelectionARG"/>
             <MethodArg Name="AdcDacClockSelection" ParameterName="ADCClockSelectionARG"/>
@@ -99,6 +158,10 @@
             <MethodArg Name="Spi1ClockSelection" ParameterName="Spi1ClockSelectionARG"/>
             <MethodArg Name="Spi2ClockSelection" ParameterName="Spi2ClockSelectionARG"/>
             <MethodArg Name="Spi3ClockSelection" ParameterName="Spi3ClockSelectionARG"/>
+            <MethodArg Name="HspiClockSelection" ParameterName="HspiClockSelectionARG"/>     
+            <MethodArg Name="DsiClockSelection"  ParameterName="DSICLockSelectionARG"/>
+            <MethodArg Name="UsbPhyClockSelection"  ParameterName="UsbPhyClockSelectionARG"/>
+            <MethodArg Name="LtdcClockSelection" ParameterName="LtdcClockSelectionARG"/> 
             <MethodArg Name="PLL2Source" ParameterName="PLL2SourceARGP"/>
             <MethodArg Name="PLL2M" ParameterName="PLL2MARGP"/>
             <MethodArg Name="PLL2N" ParameterName="PLL2NARGP"/>
@@ -128,6 +191,7 @@
             <MethodArg Name="Usart3ClockSelection" ParameterName=""/>
             <MethodArg Name="Uart4ClockSelection" ParameterName=""/>
             <MethodArg Name="Uart5ClockSelection" ParameterName=""/>
+            <MethodArg Name="Usart6ClockSelection" ParameterName=""/>
             <MethodArg Name="Lpuart1ClockSelection" ParameterName=""/>
             <MethodArg Name="Lptim1ClockSelection" ParameterName=""/>
             <MethodArg Name="Lptim2ClockSelection" ParameterName=""/>
@@ -140,13 +204,19 @@
             <MethodArg Name="OspiClockSelection" ParameterName="CommonOCTOSPIMClockSelectionARG"/>
             <MethodArg Name="Spi1ClockSelection" ParameterName=""/>
             <MethodArg Name="Spi2ClockSelection" ParameterName=""/>
-            <MethodArg Name="Spi3ClockSelection" ParameterName=""/>
+            <MethodArg Name="Spi3ClockSelection" ParameterName=""/>            
+            <MethodArg Name="HspiClockSelection" ParameterName="CommonHspiClockSelectionARG"/>
+            <MethodArg Name="DsiClockSelection"  ParameterName="CommonDSICLockSelectionARG"/>
+            <MethodArg Name="UsbPhyClockSelection"  ParameterName="commonUsbPhyClockSelectionARG"/>
+            <MethodArg Name="LtdcClockSelection" ParameterName="CommonLtdcClockSelectionARG"/>
+            <MethodArg Name="I2c6ClockSelection" ParameterName=""/>
+            <MethodArg Name="I2c5ClockSelection" ParameterName=""/>
             <MethodArg Name="I2c4ClockSelection" ParameterName=""/>
             <MethodArg Name="I2c3ClockSelection" ParameterName=""/>
             <MethodArg Name="I2c2ClockSelection" ParameterName=""/>
             <MethodArg Name="I2c1ClockSelection" ParameterName=""/>
             <MethodArg Name="RngClockSelection" ParameterName=""/>
-            <MethodArg Name="Clk48ClockSelection" ParameterName="commonClk48ClockSelectionARG"/>
+            <MethodArg Name="IclkClockSelection" ParameterName="commonClk48ClockSelectionARG"/>
             <MethodArg Name="SaesClockSelection" ParameterName=""/>
             <MethodArg Name="SdmmcClockSelection" ParameterName="CommonSDMMCClockSelectionARG"/>
             <MethodArg Name="AdcDacClockSelection" ParameterName="CommonADCClockSelectionARG"/>
@@ -189,13 +259,11 @@
             <MethodArg Name="REGULATOR" ParameterName="PWR_Regulator_Voltage_Scale"/>
         </CallLibMethod>
     </RefConfig>
-    <RefConfig Comment="" Name="PWR_CLK_DISABLE">
-        <CallLibMethod Name="__HAL_RCC_PWR_CLK_DISABLE" ReturnHAL="false"/>
-    </RefConfig>
+
     <RefConfig Comment="MCO configuration" Name="RCC_MCO1Config">
         <CallLibMethod Name="HAL_RCC_MCOConfig" ReturnHAL="false">
             <MethodArg Name="RCC_MCOx" ParameterName="RCC_MCO"/>
-            <MethodArg Name="RCC_MCOSource" ParameterName="RCC_MCO1Source"/>
+            <MethodArg Name="RCC_MCOSource" ParameterName="RCC_MCO1SourceARG"/>
             <MethodArg Name="RCC_MCODiv" ParameterName="RCC_MCODiv"/>
         </CallLibMethod>
     </RefConfig>
@@ -226,6 +294,10 @@
     </RefConfig>
     <LibMethod Comment="Enable the CRS" Name="__HAL_RCC_CRS_CLK_ENABLE">
     </LibMethod>
+    <LibMethod Comment="Enable the force of the Internal Multi Speed kernel oscillator (MSIK) in stop mode" Name="__HAL_RCC_MSIKSTOP_ENABLE"/>
+    <LibMethod Comment="Disable the force of the Internal Multi Speed kernel oscillator (MSIK) in stop mode" Name="__HAL_RCC_MSIKSTOP_DISABLE"/>
+    <LibMethod Comment="Enable the force of the Internal High Speed oscillator (HSI) in stop mode" Name="__HAL_RCC_HSISTOP_ENABLE"/>
+    <LibMethod Comment="Disable the force of the Internal High Speed oscillator (HSI) in stop mode" Name="__HAL_RCC_HSISTOP_DISABLE"/>
     <LibMethod Comment="" Name="__HAL_RCC_PLL_PLLSOURCE_CONFIG">
         <Argument AddressOf="false" GenericType="simple" Name="RCC_PLLSource" OptimizationCondition="equal"/>
     </LibMethod>
@@ -322,11 +394,14 @@
             <Argument AddressOf="false" GenericType="simple" Name="Usart3ClockSelection" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="Uart4ClockSelection" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="Uart5ClockSelection" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Usart6ClockSelection" OptimizationCondition="equal"/>            
             <Argument AddressOf="false" GenericType="simple" Name="Lpuart1ClockSelection" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="I2c1ClockSelection" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="I2c2ClockSelection" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="I2c3ClockSelection" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="I2c4ClockSelection" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="I2c5ClockSelection" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="I2c6ClockSelection" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="Lptim1ClockSelection" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="Lptim2ClockSelection" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="Lptim34ClockSelection" OptimizationCondition="equal"/>
@@ -340,10 +415,14 @@
             <Argument AddressOf="false" GenericType="simple" Name="OspiClockSelection" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="Spi1ClockSelection" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="Spi2ClockSelection" OptimizationCondition="equal"/>
-            <Argument AddressOf="false" GenericType="simple" Name="Spi3ClockSelection" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Spi3ClockSelection" OptimizationCondition="equal"/>            
+            <Argument AddressOf="false" GenericType="simple" Name="HspiClockSelection" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="DsiClockSelection" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="UsbPhyClockSelection" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="LtdcClockSelection" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="RTCClockSelection" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="RngClockSelection" OptimizationCondition="equal"/>
-            <Argument AddressOf="false" GenericType="simple" Name="Clk48ClockSelection" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="IclkClockSelection" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="SaesClockSelection" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="SdmmcClockSelection" OptimizationCondition="equal"/>
             <Argument AddressOf="true" GenericType="struct" Name="PLL3" TypeName="RCC_PLL3InitTypeDef">
@@ -378,6 +457,9 @@
     <LibMethod Comment="__HAL_RCC_PWR_CLK_DISABLE" Name="__HAL_RCC_PWR_CLK_DISABLE">
     </LibMethod>
     <LibMethod Comment="Enable the SYSCFG APB clock" Name="__HAL_RCC_SYSCFG_CLK_ENABLE">
+    </LibMethod>
+    <LibMethod Comment="Configure the wakeup clock" Name="__HAL_RCC_WAKEUPSTOP_CLK_CONFIG">
+        <Argument AddressOf="false" GenericType="simple" Name="WakeUpClk" OptimizationCondition="equal"/>
     </LibMethod>
     <LibMethod Comment="" Name="HAL_RCCEx_EnableLSECSS"/>
    

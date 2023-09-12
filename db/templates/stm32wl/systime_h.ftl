@@ -55,4 +55,3 @@ extern "C" {
 #endif
 
 #endif /*__SYSTIME_H__*/
-

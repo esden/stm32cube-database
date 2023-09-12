@@ -99,7 +99,7 @@ void HAL_MspInit(void)
             [@common.getLocalVariableList instanceData=config/] 
 [/#list]
 [/#if]
-[#if pwrConfig??]
+[#if pwrConfig?? && FamilyName!="STM32U5"]
 [#list pwrConfig as config]
  [#assign listOfLocalVariables =""]
         [#assign resultList =""] 	
@@ -158,16 +158,53 @@ void HAL_MspInit(void)
 #t/* Peripheral interrupt init */
 [/#if]
 
-[#if initVector.codeInMspInit]
+[#if initVector.codeInMspInit && initVector.usedDriver=="HAL"]
     [#if initVector.systemHandler=="false" || initVector.preemptionPriority!="0" || initVector.subPriority!="0"]
     [#if initVector.vector!="SysTick_IRQn"]
+    [#if (initVector.vector!="PVD_AVD_IRQn" && FamilyName=="STM32U5") && (initVector.vector!="PVD_PVM_IRQn" && FamilyName=="STM32U5")]
+    #t/* ${initVector.vector} interrupt configuration */
+    #tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
+    [/#if]
+[#if FamilyName!="STM32U5"]
     #t/* ${initVector.vector} interrupt configuration */
     #tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
     [/#if]
     [/#if]
+    [/#if]
     [#if initVector.systemHandler=="false"]
+    [#if (initVector.vector!="PVD_AVD_IRQn" && FamilyName=="STM32U5")&& (initVector.vector!="PVD_PVM_IRQn" && FamilyName=="STM32U5")]
       #tHAL_NVIC_EnableIRQ(${initVector.vector});
     [/#if]
+[#if FamilyName!="STM32U5"]
+    #t/* ${initVector.vector} interrupt configuration */
+   #tHAL_NVIC_EnableIRQ(${initVector.vector});
+    [/#if]
+[/#if]
+[/#if]
+[#if initVector.vector=="RCC_IRQn"]
+[#if initVector.codeInMspInit]
+    [#if initVector.systemHandler=="false" || initVector.preemptionPriority!="0" || initVector.subPriority!="0"]
+    [#if initVector.vector!="SysTick_IRQn"]
+    [#if (initVector.vector!="PVD_AVD_IRQn" && FamilyName=="STM32U5") && (initVector.vector!="PVD_PVM_IRQn" && FamilyName=="STM32U5")]
+    #t/* ${initVector.vector} interrupt configuration */
+    #tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
+    [/#if]
+[#if FamilyName!="STM32U5"]
+    #t/* ${initVector.vector} interrupt configuration */
+    #tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
+    [/#if]
+    [/#if]
+    [/#if]
+    [#if initVector.systemHandler=="false"]
+    [#if (initVector.vector!="PVD_AVD_IRQn" && FamilyName=="STM32U5")&& (initVector.vector!="PVD_PVM_IRQn" && FamilyName=="STM32U5")]
+      #tHAL_NVIC_EnableIRQ(${initVector.vector});
+    [/#if]
+[#if FamilyName!="STM32U5"]
+    #t/* ${initVector.vector} interrupt configuration */
+   #tHAL_NVIC_EnableIRQ(${initVector.vector});
+    [/#if]
+[/#if]
+[/#if]
 [/#if]
 [/#list]
 [/#if]
@@ -180,7 +217,7 @@ void HAL_MspInit(void)
 [/#if]
 #n
 [#-- pwr configuration --]
-[#if pwrConfig??]
+[#if pwrConfig?? && FamilyName!="STM32U5"]
 [#list pwrConfig as config]
 [@common.generateConfigModelListCode configModel=config inst="PWR"  nTab=1 index=""/]
 [/#list]
@@ -1268,13 +1305,16 @@ static uint32_t ${entry.value}=0;
 
 [#assign ipHandler = "h" + mode?lower_case]
 
-[#if  mode?contains("DFSDM") && DFSDM_var == "false"]
+[#if  mode?contains("DFSDM")]
 [#assign n = 1]
     [#list instanceList as dfsdmInst]
+      [#if !DFSDM_var?contains(dfsdmInst)] 
         static uint32_t DFSDM${dfsdmInst?replace("DFSDM","")}_Init = 0;
         [#assign n = n + 1]
+        [#assign DFSDM_var = DFSDM_var + " " + dfsdmInst]
+      [/#if]
     [/#list]
-[#assign DFSDM_var = "true"]
+
 [/#if]
 [#compress]
 /**
@@ -1886,4 +1926,3 @@ uint32_t DFSDM_Init = 0;
 /* USER CODE BEGIN 1 */
 
 /* USER CODE END 1 */
-

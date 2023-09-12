@@ -310,7 +310,7 @@ const char *CREDENTIALS_get_version(void)
 [#if (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION")]
   return sgfxSeeLibVersion;
 [#else]
-  char  *retval=  "1.0.0";
+  char *retval = "1.0.0";
   /* USER CODE BEGIN CREDENTIALS_get_version_user_retval */
 
   /* USER CODE END CREDENTIALS_get_version_user_retval */

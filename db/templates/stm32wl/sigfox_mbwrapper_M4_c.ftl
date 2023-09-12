@@ -21,9 +21,6 @@
 #include "msg_id.h"
 #include "mbmuxif_sigfox.h"
 #include "stm32_mem.h"
-[#if !FREERTOS??][#-- If FreeRtos is not used --]
-#include "stm32_seq.h"
-[/#if]
 #include "sys_app.h"
 #include "st_sigfox_api.h"
 #include "sigfox_monarch_api.h"
@@ -93,7 +90,7 @@ sfx_error_t SIGFOX_API_open(sfx_rc_t *rc)
 
   /* USER CODE END SIGFOX_API_open_1 */
   MBMUX_ComParam_t *com_obj;
-  uint32_t *com_buffer ;
+  uint32_t *com_buffer;
   uint16_t i = 0;
   uint32_t ret;
 
@@ -153,7 +150,7 @@ sfx_error_t SIGFOX_API_send_frame(sfx_u8 *customer_data, sfx_u8 customer_data_le
 
   /* USER CODE END SIGFOX_API_send_frame_1 */
   MBMUX_ComParam_t *com_obj;
-  uint32_t *com_buffer ;
+  uint32_t *com_buffer;
   uint16_t i = 0;
   uint32_t ret;
 
@@ -179,7 +176,7 @@ sfx_error_t SIGFOX_API_send_frame(sfx_u8 *customer_data, sfx_u8 customer_data_le
   com_buffer[i++] = (uint32_t) customer_data_length;
   com_buffer[i++] = ((uint32_t) aSigfoxMbWrapShareBuffer + SGFX_MAX_UL_PAYLOAD_SIZE * sizeof(sfx_u8));
   com_buffer[i++] = (uint32_t) tx_mode;
-  com_buffer[i++] = (uint32_t) initiate_downlink_flag ;
+  com_buffer[i++] = (uint32_t) initiate_downlink_flag;
 
   com_obj->ParamCnt = i;
   MBMUXIF_SigfoxSendCmd();
@@ -209,7 +206,7 @@ sfx_error_t SIGFOX_API_send_bit(sfx_bool bit_value,
 
   /* USER CODE END SIGFOX_API_send_bit_1 */
   MBMUX_ComParam_t *com_obj;
-  uint32_t *com_buffer ;
+  uint32_t *com_buffer;
   uint16_t i = 0;
   uint32_t ret;
 
@@ -252,7 +249,7 @@ sfx_error_t SIGFOX_API_send_outofband(sfx_oob_enum_t oob_type)
 
   /* USER CODE END SIGFOX_API_send_outofband_1 */
   MBMUX_ComParam_t *com_obj;
-  uint32_t *com_buffer ;
+  uint32_t *com_buffer;
   uint16_t i = 0;
   uint32_t ret;
 
@@ -279,7 +276,7 @@ sfx_error_t SIGFOX_API_set_std_config(sfx_u32 config_words[NB_ELEMENTS_MAX],
 
   /* USER CODE END SIGFOX_API_set_std_config_1 */
   MBMUX_ComParam_t *com_obj;
-  uint32_t *com_buffer ;
+  uint32_t *com_buffer;
   uint16_t i = 0;
   uint32_t ret;
 
@@ -313,7 +310,7 @@ sfx_error_t SIGFOX_API_start_continuous_transmission(sfx_u32 frequency, sfx_modu
 
   /* USER CODE END SIGFOX_API_start_continuous_transmission_1 */
   MBMUX_ComParam_t *com_obj;
-  uint32_t *com_buffer ;
+  uint32_t *com_buffer;
   uint16_t i = 0;
   uint32_t ret;
 
@@ -368,7 +365,7 @@ sfx_error_t SIGFOX_API_get_version(sfx_u8 **version, sfx_u8 *size, sfx_version_t
 
   /* USER CODE END SIGFOX_API_get_version_1 */
   MBMUX_ComParam_t *com_obj;
-  uint32_t *com_buffer ;
+  uint32_t *com_buffer;
   uint16_t i = 0;
   uint32_t ret;
 
@@ -386,7 +383,7 @@ sfx_error_t SIGFOX_API_get_version(sfx_u8 **version, sfx_u8 *size, sfx_version_t
   com_buffer = com_obj->ParamBuf;
   com_buffer[i++] = (uint32_t) aSigfoxMbWrapShareBuffer;
   com_buffer[i++] = (uint32_t)(aSigfoxMbWrapShareBuffer + sizeof(sfx_u32));
-  com_buffer[i++] = (uint32_t) type ;
+  com_buffer[i++] = (uint32_t) type;
   com_obj->ParamCnt = i;
   MBMUXIF_SigfoxSendCmd();
   /* waiting for event */
@@ -409,7 +406,7 @@ sfx_error_t SIGFOX_API_get_device_id(sfx_u8 *dev_id)
 
   /* USER CODE END SIGFOX_API_get_device_id_1 */
   MBMUX_ComParam_t *com_obj;
-  uint32_t *com_buffer ;
+  uint32_t *com_buffer;
   uint16_t i = 0;
   uint32_t ret;
 
@@ -446,7 +443,7 @@ sfx_error_t SIGFOX_API_get_initial_pac(sfx_u8 *initial_pac)
 
   /* USER CODE END SIGFOX_API_get_initial_pac_1 */
   MBMUX_ComParam_t *com_obj;
-  uint32_t *com_buffer ;
+  uint32_t *com_buffer;
   uint16_t i = 0;
   uint32_t ret;
 
@@ -483,7 +480,7 @@ sfx_error_t SIGFOX_API_set_rc_sync_period(sfx_u16 rc_sync_period)
 
   /* USER CODE END SIGFOX_API_set_rc_sync_period_1 */
   MBMUX_ComParam_t *com_obj;
-  uint32_t *com_buffer ;
+  uint32_t *com_buffer;
   uint16_t i = 0;
   uint32_t ret;
 
@@ -509,7 +506,7 @@ sfx_error_t ADDON_SIGFOX_RF_PROTOCOL_API_test_mode(sfx_rc_enum_t rc_enum, sfx_te
 
   /* USER CODE END ADDON_SIGFOX_RF_PROTOCOL_API_test_mode_1 */
   MBMUX_ComParam_t *com_obj;
-  uint32_t *com_buffer ;
+  uint32_t *com_buffer;
   uint16_t i = 0;
   uint32_t ret;
 
@@ -537,7 +534,7 @@ sfx_error_t ST_ADDON_SIGFOX_RF_PROTOCOL_API_monarch_test_mode(sfx_rc_enum_t rc_e
 
   /* USER CODE END ST_ADDON_SIGFOX_RF_PROTOCOL_API_monarch_test_mode_1 */
   MBMUX_ComParam_t *com_obj;
-  uint32_t *com_buffer ;
+  uint32_t *com_buffer;
   uint16_t i = 0;
   uint32_t ret;
 
@@ -566,7 +563,7 @@ sfx_error_t SIGFOX_MONARCH_API_execute_rc_scan(sfx_u8 rc_capabilities_bit_mask, 
 
   /* USER CODE END SIGFOX_MONARCH_API_execute_rc_scan_1 */
   MBMUX_ComParam_t *com_obj;
-  uint32_t *com_buffer ;
+  uint32_t *com_buffer;
   uint16_t i = 0;
   uint32_t ret;
 
@@ -645,7 +642,7 @@ SigfoxInfo_t *SigfoxInfo_GetPtr(void)
   FEAT_INFO_Param_t  *p_feature;
 
   p_feature = MBMUXIF_SystemGetFeatCapabInfoPtr(FEAT_INFO_SIGFOX_ID);
-  return (SigfoxInfo_t *) p_feature->Feat_Info_Config_Ptr ;
+  return (SigfoxInfo_t *) p_feature->Feat_Info_Config_Ptr;
   /* USER CODE BEGIN SigfoxInfo_GetPtr_2 */
 
   /* USER CODE END SigfoxInfo_GetPtr_2 */
@@ -733,4 +730,3 @@ void Process_Sigfox_Notif(MBMUX_ComParam_t *ComObj)
 /* USER CODE BEGIN PrFD */
 
 /* USER CODE END PrFD */
-

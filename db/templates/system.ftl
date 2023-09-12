@@ -7,7 +7,6 @@
 [@common.getLocalVariableList instanceData=config/] 
 [/#list]
 [/#if]
-#n
 [#if clock??]
     [#list clock as clk]
         [#if clk!=""]
@@ -16,11 +15,13 @@
     [/#list]
 [/#if]
 #n
-  [#if NVICPriorityGroup??]
+ [#if NVICPriorityGroup??]
     [#if isHALUsed??]
-#tHAL_NVIC_SetPriorityGrouping(${NVICPriorityGroup});#n
+    #t/* System interrupt init*/
+    #t HAL_NVIC_SetPriorityGrouping(${NVICPriorityGroup});#n
     [#else]
-#tNVIC_SetPriorityGrouping(${NVICPriorityGroup});#n
+    #t/* System interrupt init*/
+    #tNVIC_SetPriorityGrouping(${NVICPriorityGroup});#n
     [/#if]
   [/#if]
 [#-- configure system interrupts (RCC, systick, ...) --]
@@ -33,14 +34,14 @@
     [#assign systemHandlers = true]
     [#if firstSystemInterrupt]
     [#assign firstSystemInterrupt = false]
-    #t/* System interrupt init*/
+    
     [/#if]
     [#elseif firstPeripheralInterrupt]
     [#assign firstPeripheralInterrupt = false]
     [#if systemHandlers]
     #n
     [/#if]
-    #t/* Peripheral interrupt init*/
+    #n#t/* Peripheral interrupt init*/
     [/#if]
     [#if initVector.codeInMspInit]
         [#if initVector.systemHandler=="false" || initVector.preemptionPriority!="0" || initVector.subPriority!="0"]

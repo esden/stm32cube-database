@@ -57,7 +57,7 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
-UTIL_MEM_PLACE_IN_SECTION("MB_MEM2") uint8_t aSigfoxMbWrapShare2Buffer[SIGFOX_MBWRAP_SHBUF_SIZE];
+UTIL_MEM_PLACE_IN_SECTION("MB_MEM3") uint8_t aSigfoxMbWrapShare2Buffer[SIGFOX_MBWRAP_SHBUF_SIZE];
 
 /* USER CODE BEGIN PV */
 
@@ -363,4 +363,3 @@ static void sfx_monarch_test_mode_wait_end_cb(void)
 /* USER CODE BEGIN PrFD */
 
 /* USER CODE END PrFD */
-

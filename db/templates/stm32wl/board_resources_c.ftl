@@ -205,7 +205,6 @@ EXTI_HandleTypeDef* sys_hpb_exti[SYS_BUTTONn];
 
 /* USER CODE END PFP */
 
-
 /* Exported functions --------------------------------------------------------*/
 int32_t SYS_LED_Init(Sys_Led_TypeDef Led)
 {
@@ -365,7 +364,6 @@ __weak void SYS_BUTTON${i}_EXTI_Callback(void)
     [/#if]
   [/#list]
 [/#if]
-
 
 /* USER CODE BEGIN EF */
 

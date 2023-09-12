@@ -54,6 +54,11 @@
     [#if name == "AZRTOS_APP_MEM_ALLOCATION_METHOD"]
       [#assign AZRTOS_APP_MEM_ALLOCATION_METHOD_VAL = value]
     [/#if]
+	
+	[#if name == "FX_STANDALONE_ENABLE"]
+      [#assign FX_STANDALONE_ENABLE_value = value]
+    [/#if]
+	
    [/#list]
 [/#if]
 [/#list]
@@ -64,6 +69,17 @@
   * @param memory_ptr: memory pointer
   * @retval int
   */
+[#if FX_STANDALONE_ENABLE_value == "1"]
+UINT MX_FileX_Init(void)
+{
+  UINT ret = FX_SUCCESS;
+  /* USER CODE BEGIN MX_FileX_Init */
+  
+  /* USER CODE END MX_FileX_Init */
+  
+  return ret;
+}
+[#else]
 UINT MX_FileX_Init(VOID *memory_ptr)
 {
   UINT ret = FX_SUCCESS;
@@ -80,6 +96,8 @@ UINT MX_FileX_Init(VOID *memory_ptr)
   
   return ret;
 }
+[/#if]  
+
 
 /* USER CODE BEGIN 1 */
 

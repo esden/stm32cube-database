@@ -168,9 +168,9 @@ int32_t FLASH_IF_Write64(uint32_t address, uint64_t data)
   }
 
   return FLASH_OK;
-  /* USER CODE BEGIN HW_FLASH_Write_2 */
+  /* USER CODE BEGIN FLASH_IF_Write64_2 */
 
-  /* USER CODE END HW_FLASH_Write_2 */
+  /* USER CODE END FLASH_IF_Write64_2 */
 }
 
 int32_t FLASH_IF_EraseByPages(uint32_t page, uint16_t n, int32_t interrupt)

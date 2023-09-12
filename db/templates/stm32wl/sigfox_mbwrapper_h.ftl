@@ -81,14 +81,14 @@ typedef struct sSigfoxCallback
 void Process_Sigfox_Notif(MBMUX_ComParam_t *ComObj);
 
 /**
- * @brief Register the callbacks structure for the process notification
- * @param SigfoxCallback struct of callbacks
- */
+  * @brief Register the callbacks structure for the process notification
+  * @param SigfoxCallback struct of callbacks
+  */
 void Sigfox_Register(SigfoxCallback_t *SigfoxCallback);
 [#elseif CPUCORE == "CM0PLUS"]
 void Process_Sigfox_Cmd(MBMUX_ComParam_t *ComObj);
 
-/*!
+/**
   * @brief   Measures the battery level
   * @return  Battery level [0: node is connected to an external
   *          power source, 1..254: battery level, where 1 is the minimum
@@ -97,7 +97,7 @@ void Process_Sigfox_Cmd(MBMUX_ComParam_t *ComObj);
   */
 uint16_t GetBatteryLevel_mbwrapper(void);
 
-/*!
+/**
   * @brief   Measures the temperature level
   * @return  Temperature level
   */
@@ -113,4 +113,3 @@ int16_t GetTemperatureLevel_mbwrapper(void);
 #endif
 
 #endif /*__SIGFOX_MBWRAPPER_${CPUCORE}_H__ */
-

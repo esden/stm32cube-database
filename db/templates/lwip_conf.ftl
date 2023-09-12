@@ -589,7 +589,7 @@ extern ${variable.value} ${variable.name};
 /*----- Value in opt.h for ${definition.name}: 1 -----*/
 #define ${definition.name}   ${definition.value}
             [/#if]
-            [#if series == "stm32h7"]
+            [#if (series == "stm32h7") || (series == "stm32f4")]
             [#if (definition.name=="LWIP_SUPPORT_CUSTOM_PBUF") && (definition.value != "valueNotSetted") && (definition.value == "1")]
 /*----- Value supported for H7 devices: 1 -----*/
 #define ${definition.name}   ${definition.value}
@@ -602,7 +602,7 @@ extern ${variable.value} ${variable.name};
 /*----- Default value in ETH configuration GUI in CubeMx: 1524 -----*/
 #define ${definition.name}   ${definition.value}
             [/#if]
-            [/#if][#-- stm32h7 --]
+            [/#if][#-- stm32h7/f4 --]
 		[/#if][#-- definition.defaultValue --]
 	[/#list][#-- SWIP.defines line 108 --]
 /*-----------------------------------------------------------------------------*/

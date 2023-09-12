@@ -28,7 +28,7 @@
 		<Parameter Added="true" Name="TX_NO_FILEX_POINTER"/>
 		<Parameter Added="true" Name="TX_APP_MEM_POOL_SIZE"/>
          <Parameter Added="true" Name="FX_APP_MEM_POOL_SIZE">
-         <Condition Diagnostic="" Expression="SEMFileXCcFileOoSystemJjFileXJjCoreJjRTOSIiMODE"/>
+         <Condition Diagnostic="" Expression="SEMFileXCcFileOoSystemJjFileXJjCore"/>
         </Parameter>
          <Parameter Added="true" Name="NX_APP_MEM_POOL_SIZE">
          <Condition Diagnostic="" Expression="SEMNetXDuoCcNetworkJjNetXDuoJjNXOoCore"/>
@@ -62,7 +62,10 @@
 		<Parameter Added="true" Name="TX_THREAD_SECURE_STACK_MAXIMUM">
 			<Condition Diagnostic="Available only in secure context" Expression="S_SECURE"/>
 		</Parameter>
-	
+		<Parameter Added="true" Name="TX_ENABLE_BASEPRI_SUPPORT"/>
+		<Parameter Added="true" Name="TX_BASEPRI_VALUE"/>
+		<Parameter Added="true" Name="TX_PORT_BASEPRI_VALUE"/>
+		<Parameter Name="TX_DISABLE_ERROR_CHECKING"/>
 	</RefMode>
 
 	<RefMode Abstract="false" Name="Performance_Default">
@@ -321,42 +324,35 @@ TX_TIMER_ENABLE_PERFORMANCE_INFO must not be defined.</Description>
 		<Condition Diagnostic="" Expression="USBPD_P0U1 &amp; !USBPD_TYPECONLY"/>
 		<Description>Define the common timer tick reference for use by other middleware components. This is forced to 1000 for USBPD stack constraints</Description>
 	</RefParameter>
-	<RefParameter Added="true" Comment="ThreadX version" DefaultValue="6.1.7" Group="Version" Name="ThreadX_Version" TabName="ThreadX" Type="string">
+	<RefParameter Added="true" Comment="ThreadX version" DefaultValue="6.1.9" Group="Version" Name="ThreadX_Version" TabName="ThreadX" Type="string">
         <Description>Current ThreadX version</Description>
     </RefParameter>
         <RefParameter Added="true" Comment="Enable LowPower Support" DefaultValue="0" Group="Low Power" Name="TX_LOW_POWER" TabName="ThreadX" Type="list">
-        <Description>Enable Low Power support in ThreadX.&lt;br&gt;
-when this flag is enabled, the following macros should be adjusted in the tx_user.h&lt;br&gt;
-&lt;ul&gt;
-  &lt;li&gt;&lt;b&gt;TX_LOW_POWER_TIMER_SETUP&lt;/b&gt; :  is a macro to a routine that sets up a low power clock and keep track of time&lt;/li&gt;
-  &lt;li&gt;&lt;b&gt;TX_LOW_POWER_TICKLESS&lt;/b&gt; : when defined ThreadX does not track the internal ticks&lt;/li&gt;
-  &lt;li&gt;&lt;b&gt;TX_LOW_POWER_USER_ENTER&lt;/b&gt;: a user defined macro to make the system enter  low power mode&lt;/li&gt;
-  &lt;li&gt;&lt;b&gt;TX_LOW_POWER_USER_EXIT&lt;/b&gt;: a user defined macro to make the system exit low mower mode&lt;/li&gt;
-   &lt;li&gt;&lt;b&gt;TX_LOW_POWER_USER_TIMER_ADJUST&lt;/b&gt;: a user defined macro to get the amount of time the system has been in lowpower mode &lt;/b&gt;/ul&gt;</Description>
-        <PossibleValue Comment="Disabled" Value="0"/>
+        <Description>When enabled ThreadX will support LowPower feature.</Description>
+		<PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1" Semaphore="Low_Power_ENABLED"/>
     </RefParameter>
-    <RefParameter Added="true" Comment="TX_LOW_POWER_TIMER_SETUP" DefaultValue="" Group="Low Power" Name="TX_LOW_POWER_TIMER_SETUP" TabName="ThreadX" Type="stringRW">
+    <RefParameter Added="true" Comment="TX_LOW_POWER_TIMER_SETUP" DefaultValue="App_ThreadX_LowPower_Timer_Setup" Group="Low Power" Name="TX_LOW_POWER_TIMER_SETUP" TabName="ThreadX" Type="stringRW">
         <Condition Diagnostic="" Expression="(TX_LOW_POWER = 1)"/>
-        <Description>A macro to setup a timer expiration.</Description>
+        <Description>A macro used to track the current time.</Description>
     </RefParameter>
     <RefParameter Added="true" Comment="TX_LOW_POWER_TICKLESS" DefaultValue="1" Group="Low Power" Name="TX_LOW_POWER_TICKLESS" TabName="ThreadX" Type="list">
         <Condition Diagnostic="" Expression="(TX_LOW_POWER = 1)"/>
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
-        <Description>When enabled ThreadX will ignore active timer wakup events.</Description>
+        <Description>When enabled timer tracking is disabled.</Description>
     </RefParameter>
     <RefParameter Added="true" Comment="TX_LOW_POWER_USER_ENTER" DefaultValue="App_ThreadX_LowPower_Enter" Group="Low Power" Name="TX_LOW_POWER_USER_ENTER" TabName="ThreadX" Type="stringRW">
         <Condition Diagnostic="" Expression="(TX_LOW_POWER = 1)"/>
-        <Description>A macro that defines how to make the system enter lowpower mode.</Description>
+        <Description>User macro to be called before entering the LowPower Mode.</Description>
     </RefParameter>
     <RefParameter Added="true" Comment="TX_LOW_POWER_USER_EXIT" DefaultValue="App_ThreadX_LowPower_Exit" Group="Low Power" Name="TX_LOW_POWER_USER_EXIT" TabName="ThreadX" Type="stringRW">
         <Condition Diagnostic="" Expression="(TX_LOW_POWER = 1)"/>
-        <Description>A macro that defines how to make the system exit lowpower mode.</Description>
+        <Description>User macro to be called after exiting the LowPower Mode.</Description>
     </RefParameter>
-    <RefParameter Added="true" Comment="TX_LOW_POWER_USER_TIMER_ADJUST" DefaultValue="" Group="Low Power" Name="TX_LOW_POWER_USER_TIMER_ADJUST" TabName="ThreadX" Type="stringRW">
+    <RefParameter Added="true" Comment="TX_LOW_POWER_USER_TIMER_ADJUST" DefaultValue="App_ThreadX_LowPower_Timer_Adjust" Group="Low Power" Name="TX_LOW_POWER_USER_TIMER_ADJUST" TabName="ThreadX" Type="stringRW">
         <Condition Diagnostic="" Expression="(TX_LOW_POWER = 1)"/>
-        <Description>A Macro to get the amount of ticks the system has been in lowpower mode.</Description>
+        <Description>A macro to retrieve the number of ticks the system was in low power mode.</Description>
     </RefParameter>
         <RefParameter Added="true" Comment="TX_NO_FILEX_POINTER" DefaultValue="0" Group="Core" Name="TX_NO_FILEX_POINTER" TabName="ThreadX" Type="list">
         <Description> Determine if there is a FileX pointer in the thread control block. By default, the pointer is there for legacy/backwards compatibility.&lt;br&gt;
@@ -365,10 +361,10 @@ when this flag is enabled, the following macros should be adjusted in the tx_use
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
     </RefParameter>
-        <RefParameter Added="true" Comment="Memory Allocation" DefaultValue="1" Group="Memory Configuration" Name="AZRTOS_APP_MEM_ALLOCATION_METHOD" TabName="ThreadX" Type="list">
-        <Description>&lt;b&gt; Use Static MemPool Allocation &lt;/b&gt; : use predefined threadX memory pools for allocation.&lt;br&gt;
+        <RefParameter Added="true" Comment="Memory Pool Allocation" DefaultValue="1" Group="Memory Configuration" Name="AZRTOS_APP_MEM_ALLOCATION_METHOD" TabName="ThreadX" Type="list">
+        <Description>&lt;b&gt; Use Static Allocation &lt;/b&gt; : use predefined threadX memory pools for allocation.&lt;br&gt;
 a static &lt;b&gt;TX_BYTE_POOL &lt;/b&gt; is created using the &lt;code&gt; tx_byte_pool_create() &lt;/code&gt; API and allocations are done with &lt;code&gt;tx_byte_allocate() &lt;/code&gt;&lt;br&gt;
-&lt;b&gt; Use Dynamic Memory Allocation &lt;/b&gt; : use dynamic allocation starting from the first free memory  byte in the RAM&lt;br&gt;
+&lt;b&gt; Use Dynamic Allocation &lt;/b&gt; : use dynamic allocation starting from the first free memory  byte in the RAM&lt;br&gt;
 Application should used that first free memory location as allocation start address, then dynamically increment the pointer after
 each allocation  0
 
@@ -398,13 +394,13 @@ in the &lt;i&gt;"first_unused_memory"&lt;/i&gt;. This needs changes in the linke
  the&lt;code&gt; "tx_initialize_low_level.s" &lt;/code&gt; should be also modified to correctly export these symobls to application.&lt;br&gt;
 This is automatically generated by STM32CubeMX under the &lt;b&gt;USE_DYNAMIC_MEMORY_ALLOCATION &lt;/b&gt; flag.
  </Description>
-        <PossibleValue Comment="Use Static MemPool Allocation" Value="1"/>
-        <PossibleValue Comment="Use Dynamic Memory Allocation" Value="0"/>
+        <PossibleValue Comment="Use Static Allocation" Value="1"/>
+        <PossibleValue Comment="Use Dynamic Allocation" Value="0"/>
     </RefParameter>
     
         <RefParameter Added="true" Comment="ThreadX memory pool size" DefaultValue="1024" Group="Memory Configuration" Max="262144" Min="512" Name="TX_APP_MEM_POOL_SIZE" TabName="ThreadX" Type="integer" Unit="">
         <Description>Default memory pool size for the ThreadX application.</Description>
-        <Condition Diagnostic="" Expression="(AZRTOS_APP_MEM_ALLOCATION_METHOD = 1)"/>
+		<Condition Diagnostic="" Expression="(AZRTOS_APP_MEM_ALLOCATION_METHOD = 1)"/>
     </RefParameter>
      <RefParameter Added="true" Comment="FileX memory pool size" DefaultValue="=FileX:FX_APP_MEM_POOL_SIZE" Group="Memory Configuration" Max="262144" Min="512" Name="FX_APP_MEM_POOL_SIZE" TabName="ThreadX" Type="integer" Unit="" Visible="false">
         <Description>Default memory pool size for the FileX application.</Description>
@@ -444,11 +440,11 @@ This is automatically generated by STM32CubeMX under the &lt;b&gt;USE_DYNAMIC_ME
     </RefParameter>
     <RefParameter Added="true" Comment="FILEX_ENABLED" DefaultValue="false" Group="Memory Configuration"  Name="FILEX_ENABLED" TabName="ThreadX" Type="boolean" Visible="false">
         <Description></Description>
-		<Condition Diagnostic="" Expression="!SEMFileXCcFileOoSystemJjFileXJjCoreJjRTOSIiMODE"/>
+		<Condition Diagnostic="" Expression="!SEMFileXCcFileOoSystemJjFileXJjCore"/>
     </RefParameter>
     <RefParameter Added="true" Comment="FILEX_ENABLED" DefaultValue="true" Group="Memory Configuration"  Name="FILEX_ENABLED" TabName="ThreadX" Type="boolean" Visible="false">
         <Description></Description>
-		<Condition Diagnostic="" Expression="SEMFileXCcFileOoSystemJjFileXJjCoreJjRTOSIiMODE"/>
+		<Condition Diagnostic="" Expression="SEMFileXCcFileOoSystemJjFileXJjCore"/>
     </RefParameter>
     <RefParameter Added="true" Comment="NETXDUO_ENABLED" DefaultValue="false" Group="Memory Configuration"  Name="NETXDUO_ENABLED" TabName="ThreadX" Type="boolean" Visible="false">
         <Description></Description>
@@ -509,5 +505,29 @@ This is automatically generated by STM32CubeMX under the &lt;b&gt;USE_DYNAMIC_ME
         <Description></Description>
 		<PossibleValue Comment="true" Semaphore="SEMSTACK_MAXIMUM" Value="true"/>
 		<Condition Diagnostic="" Expression="TX_THREAD_SECURE_STACK_MAXIMUM=1024"/>
+    </RefParameter>
+	
+	
+	
+	<RefParameter Added="true" Comment="Enable BASEPRI support" DefaultValue="0" Group="Core" Name="TX_ENABLE_BASEPRI_SUPPORT" TabName="ThreadX" Type="list" >
+        <Description>When enabled ThreadX will use the Base Priority Mask Register</Description>
+		<PossibleValue Comment="Disabled" Value="0"/>
+        <PossibleValue Comment="Enabled" Semaphore="TX_ENABLE_BASEPRI_SUPPORT" Value="1"/>
+    </RefParameter>
+    <RefParameter Added="true" Comment="TX_BASEPRI_VALUE" DefaultValue="0" Min="0" Max="15" Group="Core" Name="TX_BASEPRI_VALUE" TabName="ThreadX" Type="integer" >
+        <Description>When the value is set to a nonzero ThreeadX will prevent the activation of exception with a same priority or lower than the TX_BASEPRI_VALUE &lt;br&gt;
+		Min : 0  no Effect  (default value) &lt;br&gt;
+		Max: (2 ^ __NVIC_PRIO_BITS) -1 </Description>
+		<Condition Diagnostic="" Expression="TX_ENABLE_BASEPRI_SUPPORT"/>
+    </RefParameter>
+	<RefParameter Added="true" Comment="TX_PORT_BASEPRI_VALUE" DefaultValue="=TX_BASEPRI_VALUE*16" Min="0" Max="12332315" Group="Core" Name="TX_PORT_BASEPRI_VALUE" TabName="ThreadX" Type="integer" Visible="false">
+        <Description></Description>
+		<Condition Diagnostic="" Expression="TX_ENABLE_BASEPRI_SUPPORT"/>
+    </RefParameter> 
+	
+	<RefParameter Added="true" Comment="TX_DISABLE_ERROR_CHECKING" DefaultValue="0" Group="Core" Name="TX_DISABLE_ERROR_CHECKING" TabName="ThreadX" Type="list" >
+        <Description>Defined, the basic parameter error checking is disabled.</Description>
+		<PossibleValue Comment="Disabled" Value="0"/>
+        <PossibleValue Comment="Enabled" Value="1"/>
     </RefParameter>
 </IP>

@@ -45,7 +45,16 @@
 #include "rf_api.h"
 #include "radio.h"
 [#if (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION")]
+[#if THREADX??][#-- If AzRtos is used --]
+#include "app_azure_rtos.h"
+#include "tx_api.h"
+[#else]
+[#if !FREERTOS??][#-- If FreeRtos is not used --]
 #include "stm32_seq.h"
+[#else]
+#include "cmsis_os.h"
+[/#if]
+[/#if]
 #include "stm32_mem.h"
 #include "utilities_def.h"
 #include "sgfx_eeprom_if.h"
@@ -61,6 +70,17 @@
 /* USER CODE END Includes */
 
 /* External variables ---------------------------------------------------------*/
+[#if (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION")]
+[#if THREADX??]
+extern TX_SEMAPHORE  Sem_TxTimeout;
+extern TX_SEMAPHORE  Sem_Timeout;
+
+[#elseif FREERTOS??][#-- If FreeRtos is used --]
+extern osSemaphoreId_t Sem_TxTimeout;
+extern osSemaphoreId_t Sem_Timeout;
+
+[/#if]
+[/#if]
 /* USER CODE BEGIN EV */
 
 /* USER CODE END EV */
@@ -358,7 +378,7 @@ sfx_u8 RF_API_send(sfx_u8 *stream, sfx_modulation_type_t type, sfx_u8 size)
   }
   /* USER CODE BEGIN RF_API_send_2 */
 [#if (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION") && (FILL_UCS == "true")]
-  BSP_LED_On(LED_BLUE);
+  HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_SET); /* LED_BLUE */
 [/#if]
 
   /* USER CODE END RF_API_send_2 */
@@ -375,7 +395,15 @@ sfx_u8 RF_API_send(sfx_u8 *stream, sfx_modulation_type_t type, sfx_u8 size)
 
     APP_LOG(TS_ON, VLEVEL_M, "Wait For End of Tx\n\r");
 
+[#if THREADX??][#-- If AzRtos is used --]
+    while (tx_semaphore_get(&Sem_TxTimeout, TX_WAIT_FOREVER) != TX_SUCCESS) {}
+[#else]
+[#if !FREERTOS??][#-- If FreeRtos is not used --]
     UTIL_SEQ_WaitEvt(1 << CFG_SEQ_Evt_TxTimeout);
+[#else]
+    osSemaphoreAcquire(Sem_TxTimeout, osWaitForever);
+[/#if]
+[/#if]
 
     APP_LOG(TS_ON, VLEVEL_M, "End Of Tx\n\r");
 
@@ -385,7 +413,7 @@ sfx_u8 RF_API_send(sfx_u8 *stream, sfx_modulation_type_t type, sfx_u8 size)
 [/#if]
   /* USER CODE BEGIN RF_API_send_3 */
 [#if (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION") && (FILL_UCS == "true")]
-  BSP_LED_Off(LED_BLUE);
+  HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_RESET); /* LED_BLUE */
 [/#if]
 
   /* USER CODE END RF_API_send_3 */
@@ -638,7 +666,16 @@ static void OnTxDone(void)
 
   /* USER CODE END OnTxDone_1 */
 [#if (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION")]
+[#if THREADX??][#-- If AzRtos is used --]
+  /* Set the semaphore to release the Sem_TxTimeout Thread */
+  tx_semaphore_put(&Sem_TxTimeout);
+[#else]
+[#if !FREERTOS??][#-- If FreeRtos is not used --]
   UTIL_SEQ_SetEvt(1 << CFG_SEQ_Evt_TxTimeout);
+[#else]
+  osSemaphoreRelease(Sem_TxTimeout);
+[/#if]
+[/#if]
 
   APP_LOG(TS_ON, VLEVEL_M, "OnTxDone\n\r");
 
@@ -660,7 +697,16 @@ static void OnRxDone(uint8_t *payload, uint16_t size, int16_t rssi, int8_t offse
 
   RxPacketReceived = 1;
   /*wakes up the MCU at line UTIL_SEQ_WaitEvt( 1 << CFG_SEQ_Evt_Timeout );*/
+[#if THREADX??][#-- If AzRtos is used --]
+  /* Set the semaphore to release the Sem_Timeout Thread */
+  tx_semaphore_put(&Sem_Timeout);
+[#else]
+[#if !FREERTOS??][#-- If FreeRtos is not used --]
   UTIL_SEQ_SetEvt(1 << CFG_SEQ_Evt_Timeout);
+[#else]
+  osSemaphoreRelease(Sem_Timeout);
+[/#if]
+[/#if]
 
   APP_LOG(TS_ON, VLEVEL_M, "OnRxDone\n\r");
 
@@ -676,7 +722,16 @@ static void OnTxTimeout(void)
 
   /* USER CODE END OnTxTimeout_1 */
 [#if (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION")]
+[#if THREADX??][#-- If AzRtos is used --]
+  /* Set the semaphore to release the Sem_TxTimeout Thread */
+  tx_semaphore_put(&Sem_TxTimeout);
+[#else]
+[#if !FREERTOS??][#-- If FreeRtos is not used --]
   UTIL_SEQ_SetEvt(1 << CFG_SEQ_Evt_TxTimeout);
+[#else]
+  osSemaphoreRelease(Sem_TxTimeout);
+[/#if]
+[/#if]
 
   APP_LOG(TS_ON, VLEVEL_M,  "OnTxTimeout\n\r");
 
@@ -694,7 +749,16 @@ static void OnRxTimeout(void)
 [#if (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION")]
   RxPacketReceived = 0;
 
+[#if THREADX??][#-- If AzRtos is used --]
+  /* Set the semaphore to release the Sem_Timeout Thread */
+  tx_semaphore_put(&Sem_Timeout);
+[#else]
+[#if !FREERTOS??][#-- If FreeRtos is not used --]
   UTIL_SEQ_SetEvt(1 << CFG_SEQ_Evt_Timeout);
+[#else]
+  osSemaphoreRelease(Sem_Timeout);
+[/#if]
+[/#if]
 
   APP_LOG(TS_ON, VLEVEL_M,  "OnRxTimeout\n\r");
 
@@ -712,7 +776,16 @@ static void OnRxError(void)
 [#if (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION")]
   RxPacketReceived = 0;
 
+[#if THREADX??][#-- If AzRtos is used --]
+  /* Set the semaphore to release the Sem_Timeout Thread */
+  tx_semaphore_put(&Sem_Timeout);
+[#else]
+[#if !FREERTOS??][#-- If FreeRtos is not used --]
   UTIL_SEQ_SetEvt(1 << CFG_SEQ_Evt_Timeout);
+[#else]
+  osSemaphoreRelease(Sem_Timeout);
+[/#if]
+[/#if]
 
   APP_LOG(TS_ON, VLEVEL_M, "OnRxError\n\r");
 
@@ -734,9 +807,17 @@ static sfx_u8 sfx_wait_end_of_rx(void)
 
   APP_LOG(TS_ON, VLEVEL_M, "Wait For End of Rx\n\r");
 
+[#if THREADX??][#-- If AzRtos is used --]
+  while (tx_semaphore_get(&Sem_Timeout, TX_WAIT_FOREVER) != TX_SUCCESS) {}
+[#else]
+[#if !FREERTOS??][#-- If FreeRtos is not used --]
   UTIL_SEQ_ClrEvt(1 << CFG_SEQ_Evt_Timeout);
 
   UTIL_SEQ_WaitEvt(1 << CFG_SEQ_Evt_Timeout);
+[#else]
+  osSemaphoreAcquire(Sem_Timeout, osWaitForever);
+[/#if]
+[/#if]
 
   APP_LOG(TS_ON, VLEVEL_M, "End Of Rx\n\r");
 

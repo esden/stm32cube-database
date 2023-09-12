@@ -20,8 +20,10 @@
             [#if filesName?ends_with(".a")||filesName?ends_with(".lib")]
                 [#assign grouplibExist = "1"]
                 [#break]
+            [#-- excluded from build --]
             [#else]
                 [#if underRoot != "true" || filesName?starts_with("..") || copyAsReference == "true"]
+[#if !isExcludedFromBuild(filesName)]
         <file>
             <name>${filesName!''}</name>
             [#if  isApplicationGroup=="0" && excludeFromConfig=="0" && prtGrpexcluded =="0" && multiConfigurationProject?? && ConfigsAndFiles??]
@@ -34,12 +36,13 @@
                 [/#list]
             [/#if]              
         </file>
+[/#if]
                 [/#if]
             [/#if]
         [/#list]
         [#if grouplibExist=="1"]
             [#list groupArg.sourceFilesNameList as filesName]
-                [#if filesName?ends_with(".a")||filesName?ends_with(".lib")]
+                [#if !isExcludedFromBuild(filesName) && (filesName?ends_with(".a")||filesName?ends_with(".lib"))]
     <file>
         <name>${filesName!''}</name>
         [#if isApplicationGroup=="0" && excludeFromConfig=="0" && prtGrpexcluded =="0" && multiConfigurationProject?? && ConfigsAndFiles??]
@@ -83,6 +86,7 @@
 
     [#--<Version>${version}</Version>--]
 <IocFile>${projectName}.ioc</IocFile>
+
 [#if TrustZone=="0"]
 [@generateProject prjSecure="-1"/]
 [#else]
@@ -92,6 +96,7 @@
 
 [#--[/#list]--]
 [/#if]
+
 [#if (IdeMode?? || ide=="STM32CubeIDE") && family=="STM32MP1xx"]
 <Project>    
     <ProjectName>${projectName}_DTS</ProjectName>
@@ -466,9 +471,9 @@
         
 [#assign listFTR = " "]
 [#list SourceFilesToRemove as SourceFile]
-        [#if SourceFile!="null" && !listFTR?contains(SourceFile)]
+        [#if !isExcludedFromBuild(SourceFile) && SourceFile!="null" && !listFTR?contains(SourceFile)]
 <file>
-            <name>${SourceFile}</name>
+            <name>${SourceFile}</name>       
  </file>
 [#assign listFTR = listFTR +" "+ SourceFile]
     [/#if]
@@ -711,10 +716,12 @@
             	[#list deviceDriverGroups as grp]
             		<name>${grp.name!''}</name>
             		[#if grp.sourceFilesNameList??]
-        				[#list grp.sourceFilesNameList as filesName]	
+        				[#list grp.sourceFilesNameList as filesName]
+[#if !isExcludedFromBuild(filesName)]	
         				<file>
         					<name>${filesName!''}</name>
-        				</file>        					
+        				</file> 
+ [/#if]      					
         				[/#list]				
             	[/#if]
             	[/#list]
@@ -733,9 +740,11 @@
                 <name>${subGrp.name!''}</name>
                                 [#if subGrp.sourceFilesNameList??]
                                         [#list subGrp.sourceFilesNameList as filesName]
+[#if !isExcludedFromBuild(filesName)]
                 <file>
-                    <name>${filesName!''}</name>											
+                    <name>${filesName!''}</name>
                 </file>
+[/#if]				
 							[/#list]
 						[/#if]
                 </group>
@@ -756,9 +765,11 @@
                 <name>${subGrp.name!''}</name>
                                 [#if subGrp.sourceFilesNameList??]
                                         [#list subGrp.sourceFilesNameList as filesName]
+[#if !isExcludedFromBuild(filesName)]
                 <file>
-                    <name>${filesName!''}</name>											
+                    <name>${filesName!''}</name>
                 </file>
+[/#if]
 							[/#list]
 						[/#if]
                 </group>
@@ -924,7 +935,7 @@
                                         [/#if]
                                     [/#list]
                                 [/#if] 
-                                [#if used==false]
+                                [#if used==false ]
                             <excluded>
                                 <configuration>${Configuration}_${mwcore?replace("CortexM", "CM")}</configuration>
                             </excluded>
@@ -965,6 +976,18 @@
         [#else]
             <sourceEntry>
             <name>Middlewares</name>
+[#if excludedFilesFromBuild?? && excludedFilesFromBuild?size>0]
+    [#list excludedFilesFromBuild as exFile]
+        [#if exFile?replace("\\","/")?starts_with("Middlewares")]
+<file>
+                        <name>${exFile?replace("Middlewares/","")}</name> 
+        <excluded>
+                            <configuration>${Configuration}</configuration>
+                           </excluded>
+</file>
+        [/#if]
+    [/#list]
+[/#if]
             </sourceEntry>
             
         [/#if]       
@@ -1090,7 +1113,7 @@
                                 [#list group.sourceFilesNameList as filesName]
                                     [#if filesName?ends_with(".a")||filesName?ends_with(".lib")]
             <file>
-                <name>${filesName!''}</name>                          
+                <name>${filesName!''}</name> 
                 </file>
                                     [/#if]
                                 [/#list]
@@ -1263,7 +1286,7 @@
 								[#assign removeFromConfig = "1"]
 							[/#if]
 						[/#if]
-						[#if removeFromConfig == "0"]						
+						[#if !isExcludedFromBuild(filesName) && removeFromConfig == "0"]						
             <file>
                 <name>${filesName!''}</name>
 							[#if  multiConfigurationProject?? && ConfigsAndFiles??]
@@ -1292,7 +1315,7 @@
 											[#assign removeFromConfig = "1"]
 										[/#if]
 									[/#if]
-									[#if removeFromConfig == "0"]
+									[#if !isExcludedFromBuild(filesName) && removeFromConfig == "0"]
                 <file>
                     <name>${filesName!''}</name>
 										[#if  multiConfigurationProject?? && ConfigsAndFiles??]										
@@ -1331,9 +1354,10 @@
             <name>${grp.name!''}</name>
                       [#if grp.sourceFilesNameList??]                          
                            [#list grp.sourceFilesNameList as filesName]
-                <file>
-                    <name>${filesName!''}</name>											
+[#if !isExcludedFromBuild(filesName)]                <file>
+                    <name>${filesName!''}</name>
                 </file>
+[/#if] 
 							[/#list]
 						[/#if]               
                 [/#list]	
@@ -1350,9 +1374,11 @@
             	 <name>${grp.name!''}</name>
             		[#if grp.sourceFilesNameList??]
         				[#list grp.sourceFilesNameList as filesName]
+[#if !isExcludedFromBuild(filesName)]
         				<file>	
         					 <name>${filesName!''}</name>
-        				</file>        				
+        				</file>  
+[/#if]      				
         				[/#list]				
             	[/#if]
             	[/#list]
@@ -1371,8 +1397,9 @@
                 <name>${subGrp.name!''}</name>
                         [#if subGrp.sourceFilesNameList??]
                             [#list subGrp.sourceFilesNameList as filesName]
+[#if !isExcludedFromBuild(filesName)]
                 <file>
-                    <name>${filesName!''}</name>						
+                    <name>${filesName!''}</name>	
 					[#if  multiConfigurationProject?? && ConfigsAndFiles??]
 												[#list ConfigsAndFiles?keys as configKey]
 													[#if !ConfigsAndFiles[configKey]?seq_contains(filesName?replace("/","\\")) && TrustZone=="0"]
@@ -1383,6 +1410,7 @@
 												[/#list]
 											[/#if]
                     </file>
+[/#if]
                             [/#list]
                         [/#if]
                 </group>
@@ -1404,7 +1432,7 @@
                 [#assign removeFromConfig = "1"]
 [/#if]
 [/#if]
-[#if removeFromConfig == "0"]
+[#if !isExcludedFromBuild(filesName) && removeFromConfig == "0"]
             <file>
                 <name>${filesName!''}</name>
 [#if  multiConfigurationProject?? && ConfigsAndFiles??]
@@ -1449,7 +1477,7 @@
                 [#assign removeFromConfig = "1"]
 [/#if]
 [/#if]
-[#if removeFromConfig == "0"]
+[#if !isExcludedFromBuild(filesName) && removeFromConfig == "0"]
         <file>
             <name>${filesName!''}</name>
                                    [#if ConfigsAndFiles??]
@@ -1478,9 +1506,11 @@
         [/#if]
         [#list mxSourceFilesNameList as mxCFiles]
             [#if mxCFiles?contains("Src")]
+[#if !isExcludedFromBuild(mxCFiles)]
                 <file>
                     <name>${mxCFiles}</name>
                     </file>
+[/#if]
             [/#if]
         [/#list]
         [#if mxSourceDir?replace("\\","/") == "Core/Src"]
@@ -1504,9 +1534,11 @@
             <name>${grp.name!''}</name> 
         [#if grp.sourceFilesNameList??]
             [#list grp.sourceFilesNameList as filesName]
+[#if !isExcludedFromBuild(filesName)]
             <file>
                 <name>${filesName!''}</name>
                 </file>
+[/#if]
             [/#list]
         [/#if]
             [#if grp.subGroups??]
@@ -1515,9 +1547,11 @@
                 <name>${subGrp.name!''}</name>
                     [#if subGrp.sourceFilesNameList??]
                             [#list subGrp.sourceFilesNameList as filesName]
+[#if !isExcludedFromBuild(filesName)]
                 <file>
                     <name>${filesName!''}</name>
                     </file>
+[/#if]
                             [/#list]
                     [/#if]
                 </group>
@@ -1531,3 +1565,13 @@
 [/#if]
 </Project>
 [/#macro]
+[#function isExcludedFromBuild(file)]
+[#if excludedFilesFromBuild?? && excludedFilesFromBuild?size>0]
+    [#list excludedFilesFromBuild as exFile]
+        [#if file?replace("\\","/")?ends_with(exFile)]
+        [#return true]
+        [/#if]
+    [/#list]
+[/#if]
+[#return false]
+[/#function]

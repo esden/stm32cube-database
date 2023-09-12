@@ -108,7 +108,7 @@ int16_t SYS_GetTemperatureLevel(void)
   /* USER CODE BEGIN SYS_GetTemperatureLevel_1 */
 
   /* USER CODE END SYS_GetTemperatureLevel_1 */
-  int16_t temperatureDegreeC = 0;
+  __IO int16_t temperatureDegreeC = 0;
   uint32_t measuredLevel = 0;
   uint16_t batteryLevelmV = SYS_GetBatteryLevel();
 
@@ -135,8 +135,6 @@ int16_t SYS_GetTemperatureLevel(void)
                                                               measuredLevel,
                                                               LL_ADC_RESOLUTION_12B);
   }
-
-  APP_LOG(TS_ON, VLEVEL_L, "temp= %d\n\r", temperatureDegreeC);
 
   /* from int16 to q8.7*/
   temperatureDegreeC <<= 8;
@@ -223,7 +221,7 @@ static uint32_t ADC_ReadChannels(uint32_t channel)
   HAL_ADC_PollForConversion(&h${IpInstance?lower_case}, HAL_MAX_DELAY);
 
   /** Wait for end of conversion */
-  HAL_ADC_Stop(&h${IpInstance?lower_case}) ;   /* it calls also ADC_Disable() */
+  HAL_ADC_Stop(&h${IpInstance?lower_case});   /* it calls also ADC_Disable() */
 
   ADCxConvertedValues = HAL_ADC_GetValue(&h${IpInstance?lower_case});
 
@@ -234,4 +232,3 @@ static uint32_t ADC_ReadChannels(uint32_t channel)
 
   /* USER CODE END ADC_ReadChannels_2 */
 }
-

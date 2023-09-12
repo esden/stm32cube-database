@@ -295,4 +295,3 @@ void ${vector.irqHandler}(void)
 /* USER CODE BEGIN 1 */
 
 /* USER CODE END 1 */
-

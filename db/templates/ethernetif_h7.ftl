@@ -132,6 +132,7 @@
 
 /* ETH Setting  */
 #define ETH_DMA_TRANSMIT_TIMEOUT               ( 20U )
+#define ETH_TX_BUFFER_MAX             ((ETH_TX_DESC_CNT) * 2U)
 /* ETH_RX_BUFFER_SIZE parameter is defined in lwipopts.h */
 
 /* USER CODE BEGIN 1 */
@@ -161,26 +162,45 @@
        to L1-CACHE line size (32 bytes).       
 */
 
+/* Data Type Definitions */
+typedef enum
+{
+  RX_ALLOC_OK       = 0x00,
+  RX_ALLOC_ERROR    = 0x01
+} RxAllocStatusTypeDef;
+
+typedef struct
+{
+  struct pbuf_custom pbuf_custom;
+  uint8_t buff[(ETH_RX_BUFFER_SIZE + 31) & ~31] __ALIGNED(32);
+} RxBuff_t;
+
+/* Memory Pool Declaration */
+#define ETH_RX_BUFFER_CNT             12U
+LWIP_MEMPOOL_DECLARE(RX_POOL, ETH_RX_BUFFER_CNT, sizeof(RxBuff_t), "Zero-copy RX PBUF pool");
+
+/* Variable Definitions */
+static uint8_t RxAllocStatus;
+
+__IO uint32_t TxPkt = 0;
+__IO uint32_t RxPkt = 0;
+
 #if defined ( __ICCARM__ ) /*!< IAR Compiler */
 
 #pragma location=${rx_descr_address}
 ETH_DMADescTypeDef  DMARxDscrTab[ETH_RX_DESC_CNT]; /* Ethernet Rx DMA Descriptors */
 #pragma location=${tx_descr_address}
 ETH_DMADescTypeDef  DMATxDscrTab[ETH_TX_DESC_CNT]; /* Ethernet Tx DMA Descriptors */
-#pragma location=${rx_buffer_address}
-uint8_t Rx_Buff[ETH_RX_DESC_CNT][ETH_RX_BUFFER_SIZE]; /* Ethernet Receive Buffers */
 
 #elif defined ( __CC_ARM )  /* MDK ARM Compiler */
 
 __attribute__((at(${rx_descr_address}))) ETH_DMADescTypeDef  DMARxDscrTab[ETH_RX_DESC_CNT]; /* Ethernet Rx DMA Descriptors */
 __attribute__((at(${tx_descr_address}))) ETH_DMADescTypeDef  DMATxDscrTab[ETH_TX_DESC_CNT]; /* Ethernet Tx DMA Descriptors */
-__attribute__((at(${rx_buffer_address}))) uint8_t Rx_Buff[ETH_RX_DESC_CNT][ETH_RX_BUFFER_SIZE]; /* Ethernet Receive Buffer */
 
 #elif defined ( __GNUC__ ) /* GNU Compiler */ 
 
 ETH_DMADescTypeDef DMARxDscrTab[ETH_RX_DESC_CNT] __attribute__((section(".RxDecripSection"))); /* Ethernet Rx DMA Descriptors */
 ETH_DMADescTypeDef DMATxDscrTab[ETH_TX_DESC_CNT] __attribute__((section(".TxDecripSection")));   /* Ethernet Tx DMA Descriptors */
-uint8_t Rx_Buff[ETH_RX_DESC_CNT][ETH_RX_BUFFER_SIZE] __attribute__((section(".RxArraySection"))); /* Ethernet Receive Buffers */
 
 #endif
 
@@ -189,15 +209,13 @@ uint8_t Rx_Buff[ETH_RX_DESC_CNT][ETH_RX_BUFFER_SIZE] __attribute__((section(".Rx
 /* USER CODE END 2 */
 
 [#if with_rtos == 1]
-osSemaphoreId RxPktSemaphore = NULL; /* Semaphore to signal incoming packets */
+osSemaphoreId RxPktSemaphore = NULL;   /* Semaphore to signal incoming packets */
+osSemaphoreId TxPktSemaphore = NULL;   /* Semaphore to signal transmit packet complete */
 [/#if][#-- endif with_rtos --]
 
 /* Global Ethernet handle */
 ETH_HandleTypeDef heth;
 ETH_TxPacketConfig TxConfig;
-
-/* Memory Pool Declaration */
-LWIP_MEMPOOL_DECLARE(RX_POOL, 10, sizeof(struct pbuf_custom), "Zero-copy RX PBUF pool");
 
 /* Private function prototypes -----------------------------------------------*/
 [#if bsp == 1]
@@ -226,23 +244,40 @@ ${BspComponent?lower_case}_IOCtx_t  ${BspComponent}_IOCtx = {ETH_PHY_IO_Init,
 /* Private functions ---------------------------------------------------------*/
 [#if custom_pbuf == 1]
 void pbuf_free_custom(struct pbuf *p);
-void Error_Handler(void);
 [/#if][#-- endif custom_pbuf --]
 
-[#include mxTmpFolder+"/eth_Msp.tmp"]
-
-[#if with_rtos == 1]
+[#if with_rtos == 1][#-- rtos used MAIN --]
 /**
   * @brief  Ethernet Rx Transfer completed callback
-  * @param  heth: ETH handle
+  * @param  handlerEth: ETH handler
   * @retval None
   */
-void HAL_ETH_RxCpltCallback(ETH_HandleTypeDef *heth)
+void HAL_ETH_RxCpltCallback(ETH_HandleTypeDef *handlerEth)
 {
   osSemaphoreRelease(RxPktSemaphore);
 }
-
-[/#if][#-- endif with_rtos --]
+/**
+  * @brief  Ethernet Tx Transfer completed callback
+  * @param  handlerEth: ETH handler
+  * @retval None
+  */
+void HAL_ETH_TxCpltCallback(ETH_HandleTypeDef *handlerEth)
+{
+  osSemaphoreRelease(TxPktSemaphore);
+}
+/**
+  * @brief  Ethernet DMA transfer error callback
+  * @param  handlerEth: ETH handler
+  * @retval None
+  */
+void HAL_ETH_ErrorCallback(ETH_HandleTypeDef *handlerEth)
+{
+  if((HAL_ETH_GetDMAError(handlerEth) & ETH_DMACSR_RBU) == ETH_DMACSR_RBU)
+  {
+     osSemaphoreRelease(RxPktSemaphore);
+  }
+}
+[/#if][#-- endif with_rtos MAIN --]
 
 /* USER CODE BEGIN 4 */
 
@@ -266,13 +301,12 @@ static void low_level_init(struct netif *netif)
 /* USER CODE BEGIN OS_THREAD_ATTR_CMSIS_RTOS_V2 */
   osThreadAttr_t attributes;
 /* USER CODE END OS_THREAD_ATTR_CMSIS_RTOS_V2 */
-[/#if][#-- endif cmsis_version --]    
-  uint32_t idx = 0;
+[/#if][#-- endif cmsis_version --]
 [#if with_rtos == 1]
 [#if bsp == 1]
-  ETH_MACConfigTypeDef MACConf;
-  int32_t PHYLinkState;
   uint32_t duplex, speed = 0;
+  int32_t PHYLinkState = 0;
+  ETH_MACConfigTypeDef MACConf = {0};
 [#else]
 /* USER CODE BEGIN low_level_init Variables Initialization for User BSP */
 
@@ -314,19 +348,20 @@ static void low_level_init(struct netif *netif)
   #else 
     netif->flags |= NETIF_FLAG_BROADCAST;
   #endif /* LWIP_ARP */
-
-  for(idx = 0; idx < ETH_RX_DESC_CNT; idx ++)
-  {
-    HAL_ETH_DescAssignMemory(&heth, idx, Rx_Buff[idx], NULL);
-  } 
       
 [#if with_rtos == 1]
-  /* create a binary semaphore used for informing ethernetif of frame reception */
 [#if cmsis_version = "v2"]
+  /* create a binary semaphore used for informing ethernetif of frame reception */
   RxPktSemaphore = osSemaphoreNew(1, 1, NULL);
-[#else]
-  osSemaphoreDef(SEM);
-  RxPktSemaphore = osSemaphoreCreate(osSemaphore(SEM) , 1 );
+  
+  /* create a binary semaphore used for informing ethernetif of frame transmission */
+  TxPktSemaphore = osSemaphoreNew(1, 1, NULL);
+[#else][#-- else cmsis_version --]
+  /* create a binary semaphore used for informing ethernetif of frame reception */
+  RxPktSemaphore = xSemaphoreCreateBinary();
+  
+  /* create a binary semaphore used for informing ethernetif of frame transmission */
+  TxPktSemaphore = xSemaphoreCreateBinary();
 [/#if][#-- endif cmsis_version --]
 
   /* create the task that handles the ETH_MAC */
@@ -345,6 +380,7 @@ static void low_level_init(struct netif *netif)
 /* USER CODE END OS_THREAD_DEF_CREATE_CMSIS_RTOS_V1 */
 [/#if][#-- endif cmsis_version --]
 [/#if][#-- endif with_rtos --]
+
 [#if bsp == 1]
 /* USER CODE BEGIN PHY_PRE_CONFIG */ 
     
@@ -452,8 +488,8 @@ static void low_level_init(struct netif *netif)
 
 static err_t low_level_output(struct netif *netif, struct pbuf *p)
 {
-  uint32_t i=0;
-  struct pbuf *q;
+  uint32_t i = 0U;
+  struct pbuf *q = NULL;
   err_t errval = ERR_OK;
   ETH_BufferTypeDef Txbuffer[ETH_TX_DESC_CNT];
   
@@ -480,10 +516,27 @@ static err_t low_level_output(struct netif *netif, struct pbuf *p)
     i++;
   }
 
-  TxConfig.Length =  p->tot_len;
+  TxConfig.Length = p->tot_len;
   TxConfig.TxBuffer = Txbuffer;
+  TxConfig.pData = p;
 
+[#if with_rtos == 1]
+  pbuf_ref(p);
+  
+  HAL_ETH_Transmit_IT(&heth, &TxConfig);
+[#if cmsis_version = "v1"]
+  while(osSemaphoreWait(TxPktSemaphore, TIME_WAITING_FOR_INPUT)!=osOK)
+[#else]
+  while(osSemaphoreAcquire(TxPktSemaphore, TIME_WAITING_FOR_INPUT)!=osOK)
+[/#if][#-- endif cmsis_version --]
+
+  {
+  }
+
+  HAL_ETH_ReleaseTxPacket(&heth);
+[#else][#-- endif with_rtos --]
   HAL_ETH_Transmit(&heth, &TxConfig, ETH_DMA_TRANSMIT_TIMEOUT);
+[/#if][#-- endelse with_rtos --]
   
   return errval;
 }
@@ -499,71 +552,13 @@ static err_t low_level_output(struct netif *netif, struct pbuf *p)
 static struct pbuf * low_level_input(struct netif *netif)
 {
   struct pbuf *p = NULL;
-  ETH_BufferTypeDef RxBuff[ETH_RX_DESC_CNT];
-  uint32_t framelength = 0, i = 0;
-[#if custom_pbuf == 1] 
-  struct pbuf_custom* custom_pbuf;
-[/#if][#-- endif custom_pbuf --]
 
-  memset(RxBuff, 0 , ETH_RX_DESC_CNT*sizeof(ETH_BufferTypeDef));
-
-  for(i = 0; i < ETH_RX_DESC_CNT -1; i++)
+  if(RxAllocStatus == RX_ALLOC_OK)
   {
-    RxBuff[i].next=&RxBuff[i+1];
+    HAL_ETH_ReadData(&heth, (void **)&p);
   }
-  
-[#if with_rtos == 1]
-  if (HAL_ETH_GetRxDataBuffer(&heth, RxBuff) == HAL_OK) 
-  {
-    HAL_ETH_GetRxDataLength(&heth, &framelength);
-    
-    /* Build Rx descriptor to be ready for next data reception */
-    HAL_ETH_BuildRxDescriptors(&heth);
 
-#if !defined(DUAL_CORE) || defined(CORE_CM7)
-    /* Invalidate data cache for ETH Rx Buffers */
-    SCB_InvalidateDCache_by_Addr((uint32_t *)RxBuff->buffer, framelength);
-#endif
-
-[#if custom_pbuf == 1] 
-    custom_pbuf  = (struct pbuf_custom*)LWIP_MEMPOOL_ALLOC(RX_POOL);
-    if(custom_pbuf != NULL)
-    {
-      custom_pbuf->custom_free_function = pbuf_free_custom;
-      p = pbuf_alloced_custom(PBUF_RAW, framelength, PBUF_REF, custom_pbuf, RxBuff->buffer, framelength);
-    }
-[/#if][#-- endif custom_pbuf --]
-  }
-  
-  
   return p;
-[#else][#-- else with_rtos --]
-  
-  if (HAL_ETH_IsRxDataAvailable(&heth))
-  {
-    HAL_ETH_GetRxDataBuffer(&heth, RxBuff);
-    HAL_ETH_GetRxDataLength(&heth, &framelength);
-    
-    /* Build Rx descriptor to be ready for next data reception */
-    HAL_ETH_BuildRxDescriptors(&heth);
-
-#if !defined(DUAL_CORE) || defined(CORE_CM7)
-    /* Invalidate data cache for ETH Rx Buffers */
-    SCB_InvalidateDCache_by_Addr((uint32_t *)RxBuff->buffer, framelength);
-#endif
-    
-    custom_pbuf  = (struct pbuf_custom*)LWIP_MEMPOOL_ALLOC(RX_POOL);
-    custom_pbuf->custom_free_function = pbuf_free_custom;
-    
-    p = pbuf_alloced_custom(PBUF_RAW, framelength, PBUF_REF, custom_pbuf, RxBuff->buffer, framelength);
-    
-    return p;
-  }
-  else
-  {
-    return NULL;
-  }
-[/#if][#-- endif with_rtos --]
 }
 
 /**
@@ -577,27 +572,24 @@ static struct pbuf * low_level_input(struct netif *netif)
  */
 [#if with_rtos == 1]
 [#if cmsis_version = "v1"]
-void ethernetif_input(void const * argument)
+static void ethernetif_input(void const * argument)
 [#else]
 void ethernetif_input(void* argument)
 [/#if][#-- endif cmsis_version --]
-[#else]
+[#else][#-- else with_rtos --]
 void ethernetif_input(struct netif *netif)
 [/#if][#-- endif with_rtos --]
 {
-[#if with_rtos == 0]
-  err_t err;
-[/#if][#-- endif with_rtos --]
-  struct pbuf *p;
+  struct pbuf *p = NULL;
 [#if with_rtos == 1]
   struct netif *netif = (struct netif *) argument;
   
   for( ;; )
   {
-[#if cmsis_version = "v2"]
-    if (osSemaphoreAcquire(RxPktSemaphore, TIME_WAITING_FOR_INPUT) == osOK)
-[#else]
+[#if cmsis_version = "v1"]
     if (osSemaphoreWait(RxPktSemaphore, TIME_WAITING_FOR_INPUT) == osOK)
+[#else][#-- else cmsis_version v2 --]
+    if (osSemaphoreAcquire(RxPktSemaphore, TIME_WAITING_FOR_INPUT) == osOK)
 [/#if][#-- endif cmsis_version --]
     {
       do
@@ -615,23 +607,18 @@ void ethernetif_input(struct netif *netif)
   }
 [#else][#-- else with_rtos --]
 
-  /* move received packet into a new pbuf */
-  p = low_level_input(netif);
-    
-  /* no packet could be read, silently ignore this */
-  if (p == NULL) return;
-    
-  /* entry point to the LwIP stack */
-  err = netif->input(p, netif);
-    
-  if (err != ERR_OK)
+  do
   {
-    LWIP_DEBUGF(NETIF_DEBUG, ("ethernetif_input: IP input error\n"));
-    pbuf_free(p);
-    p = NULL;    
-  }
+    p = low_level_input( netif );
+    if (p != NULL)
+    {
+      if (netif->input( p, netif) != ERR_OK )
+      {
+        pbuf_free(p);
+      }
+    }
+  } while(p!=NULL);
 [/#if][#-- endif with_rtos --]
-  
 }
 
 #if !LWIP_ARP
@@ -676,7 +663,13 @@ err_t ethernetif_init(struct netif *netif)
   netif->hostname = "lwip";
 #endif /* LWIP_NETIF_HOSTNAME */
 
-  
+  /*
+   * Initialize the snmp variables and counters inside the struct netif.
+   * The last argument should be replaced with your link speed, in units
+   * of bits per second.
+   */
+  // MIB2_INIT_NETIF(netif, snmp_ifType_ethernet_csmacd, LINK_SPEED_OF_YOUR_NETIF_IN_BPS);
+    
   netif->name[0] = IFNAME0;
   netif->name[1] = IFNAME1;
   /* We directly use etharp_output() here to save a function call.
@@ -716,23 +709,24 @@ err_t ethernetif_init(struct netif *netif)
 void pbuf_free_custom(struct pbuf *p)
 {
   struct pbuf_custom* custom_pbuf = (struct pbuf_custom*)p;
-  
   LWIP_MEMPOOL_FREE(RX_POOL, custom_pbuf);
+  
+  /* If the Rx Buffer Pool was exhausted, signal the ethernetif_input task to
+   * call HAL_ETH_GetRxDataBuffer to rebuild the Rx descriptors. */
+  
+  if (RxAllocStatus == RX_ALLOC_ERROR)
+  {
+    RxAllocStatus = RX_ALLOC_OK;
+[#if with_rtos == 1]
+    osSemaphoreRelease(RxPktSemaphore);
+[#else][#-- else with_rtos --]
+    RxPkt = 1 ;
+[/#if][#-- endif with_rtos --]
+  }
 }
 [/#if][#-- endif custom_pbuf --]
 
 /* USER CODE BEGIN 6 */
-
-/**
-* @brief  Returns the current time in milliseconds
-*         when LWIP_TIMERS == 1 and NO_SYS == 1
-* @param  None
-* @retval Current Time value
-*/
-u32_t sys_jiffies(void)
-{
-  return HAL_GetTick();
-}
 
 /**
 * @brief  Returns the current time in milliseconds
@@ -748,6 +742,9 @@ u32_t sys_now(void)
 /* USER CODE END 6 */
 
 [#if bsp == 1]
+
+[#include mxTmpFolder+"/eth_Msp.tmp"]
+
 /*******************************************************************************
                        PHI IO Functions
 *******************************************************************************/
@@ -842,9 +839,9 @@ void ethernet_link_check_state(struct netif *netif)
 [/#if][#-- endelse with_rtos --]
 {
 [#if bsp == 1]
-  ETH_MACConfigTypeDef MACConf;
-  int32_t PHYLinkState;
-  uint32_t linkchanged = 0, speed = 0, duplex =0;
+  ETH_MACConfigTypeDef MACConf = {0};
+  int32_t PHYLinkState = 0;
+  uint32_t linkchanged = 0U, speed = 0U, duplex = 0U;
 [/#if][#-- endif bsp --]
   
 [#if with_rtos == 1]
@@ -865,7 +862,7 @@ void ethernet_link_check_state(struct netif *netif)
   {
 [#if with_rtos == 1]
     HAL_ETH_Stop_IT(&heth);
-[#else][#-- else with_rtos --]
+[#else]
     HAL_ETH_Stop(&heth);
 [/#if][#-- endif with_rtos --]
     netif_set_down(netif);
@@ -906,12 +903,7 @@ void ethernet_link_check_state(struct netif *netif)
       MACConf.DuplexMode = duplex;
       MACConf.Speed = speed;
       HAL_ETH_SetMACConfig(&heth, &MACConf);
-      
-[#if with_rtos == 1]
-      HAL_ETH_Start_IT(&heth);
-[#else][#-- else with_rtos --]
       HAL_ETH_Start(&heth);
-[/#if][#-- endif with_rtos --]
       netif_set_up(netif);
       netif_set_link_up(netif);
     }
@@ -929,6 +921,79 @@ void ethernet_link_check_state(struct netif *netif)
   }
 [/#if][#-- endif with_rtos --]   
 }
+
+void HAL_ETH_RxAllocateCallback(uint8_t **buff)
+{
+/* USER CODE BEGIN HAL ETH RxAllocateCallback */
+
+  struct pbuf_custom *p = LWIP_MEMPOOL_ALLOC(RX_POOL);
+  if (p)
+  {
+    /* Get the buff from the struct pbuf address. */
+    *buff = (uint8_t *)p + offsetof(RxBuff_t, buff);
+    p->custom_free_function = pbuf_free_custom;
+    /* Initialize the struct pbuf.
+    * This must be performed whenever a buffer's allocated because it may be
+    * changed by lwIP or the app, e.g., pbuf_free decrements ref. */
+    pbuf_alloced_custom(PBUF_RAW, 0, PBUF_REF, p, *buff, ETH_RX_BUFFER_SIZE);
+  }
+  else
+  {
+    RxAllocStatus = RX_ALLOC_ERROR;
+    *buff = NULL;
+  }
+/* USER CODE END HAL ETH RxAllocateCallback */  
+}
+
+void HAL_ETH_RxLinkCallback(void **pStart, void **pEnd, uint8_t *buff, uint16_t Length)
+{
+/* USER CODE BEGIN HAL ETH RxLinkCallback */
+
+  struct pbuf **ppStart = (struct pbuf **)pStart;
+  struct pbuf **ppEnd = (struct pbuf **)pEnd;
+  struct pbuf *p = NULL;
+
+  /* Get the struct pbuf from the buff address. */
+  p = (struct pbuf *)(buff - offsetof(RxBuff_t, buff));
+  p->next = NULL;
+  p->tot_len = 0;
+  p->len = Length;
+
+  /* Chain the buffer. */
+  if (!*ppStart)
+  {
+    /* The first buffer of the packet. */
+    *ppStart = p;
+  }
+  else
+  {
+    /* Chain the buffer to the end of the packet. */
+    (*ppEnd)->next = p;
+  }
+  *ppEnd  = p;
+
+  /* Update the total length of all the buffers of the chain. Each pbuf in the chain should have its tot_len
+   * set to its own length, plus the length of all the following pbufs in the chain. */
+  for (p = *ppStart; p != NULL; p = p->next)
+  {
+    p->tot_len += Length;
+  }
+
+  /* Invalidate data cache because Rx DMA's writing to physical memory makes it stale. */
+  SCB_InvalidateDCache_by_Addr((uint32_t *)buff, Length);
+  
+/* USER CODE END HAL ETH RxLinkCallback */  
+}
+
+void HAL_ETH_TxFreeCallback(uint32_t * buff)
+{
+/* USER CODE BEGIN HAL ETH TxFreeCallback */
+
+  pbuf_free((struct pbuf *)buff);
+  
+/* USER CODE END HAL ETH TxFreeCallback */  
+}
+
 /* USER CODE BEGIN 8 */
 
 /* USER CODE END 8 */

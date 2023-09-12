@@ -41,6 +41,9 @@ TIM_HandleTypeDef        h${instance?lower_case};
 [#if FamilyName=="STM32G0"]
 [#assign APB = "APB1"]
 [/#if]
+[#if FamilyName=="STM32C0"]
+[#assign APB = "APB1"]
+[/#if]
 HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
 {
   RCC_ClkInitTypeDef    clkconfig;
@@ -58,6 +61,9 @@ HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
   uint32_t              uwPrescalerValue;
 [/#if]
   uint32_t              pFLatency;
+[#if FamilyName=="STM32U5"]
+  HAL_StatusTypeDef     status;
+[/#if]
 [#if FamilyName=="STM32WL"]
   HAL_StatusTypeDef     status = HAL_OK;
 
@@ -65,7 +71,7 @@ HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
 [#if FamilyName=="STM32G4"]
   HAL_StatusTypeDef     status = HAL_OK;
 [/#if]
-[#if FamilyName!="STM32WL" && FamilyName!="STM32H7" && FamilyName!="STM32G4"]
+[#if FamilyName!="STM32WL" && FamilyName!="STM32H7" && FamilyName!="STM32G4" && FamilyName!="STM32U5"]
   /*Configure the ${instance} IRQ priority */
   HAL_NVIC_SetPriority(${timeBaseInterrupt}, TickPriority ,0); 
   
@@ -158,7 +164,7 @@ HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
   h${instance?lower_case}.Init.Prescaler = uwPrescalerValue;
   h${instance?lower_case}.Init.ClockDivision = 0;
   h${instance?lower_case}.Init.CounterMode = TIM_COUNTERMODE_UP;
-[#if FamilyName=="STM32WL" || FamilyName=="STM32G4"]
+[#if FamilyName=="STM32WL" || FamilyName=="STM32G4" || FamilyName=="STM32U5"]
 
   status = HAL_TIM_Base_Init(&h${instance?lower_case});
   if (status == HAL_OK)
@@ -167,12 +173,18 @@ HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
     status = HAL_TIM_Base_Start_IT(&h${instance?lower_case});
     if (status == HAL_OK)
     {
+    [#if FamilyName!="STM32U5"]
     /* Enable the ${instance} global Interrupt */
         HAL_NVIC_EnableIRQ(${timeBaseInterrupt}); 
       /* Configure the SysTick IRQ priority */
+     [/#if]
       if (TickPriority < (1UL << __NVIC_PRIO_BITS))
       {
+      [#if FamilyName!="STM32U5"]
         /* Configure the TIM IRQ priority */
+      [#else]
+        /* Enable the ${instance} global Interrupt */
+      [/#if]
         HAL_NVIC_SetPriority(${timeBaseInterrupt}, TickPriority, 0U);
         uwTickPrio = TickPriority;
       }
@@ -182,6 +194,10 @@ HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
       }
     }
   }
+[#if FamilyName=="STM32U5"]
+  /* Enable the ${instance} global Interrupt */
+  HAL_NVIC_EnableIRQ(${timeBaseInterrupt}); 
+  [/#if]
  /* Return function status */
   return status;
 [#else]

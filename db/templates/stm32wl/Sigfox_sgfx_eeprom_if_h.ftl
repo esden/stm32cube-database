@@ -330,4 +330,3 @@ int32_t EE_WriteValue(e_EE_ID EEsgfxID,  uint32_t data);
 /* USER CODE END EFP */
 
 #endif /* __SGFX_EEPROM_IF_H__ */
-

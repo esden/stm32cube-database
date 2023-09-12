@@ -83,12 +83,6 @@
         <!--PLL activation-->        
 		
         <IFCondition Expression ="PLL1Used=1">
-            <CallLibMethod Name="LL_RCC_PLL1_Enable"/>
-   
-            <CallLibMethod Name="" Type="HardCode">
-                <HardCode Text="#n#t /* Wait till PLL is ready */#n#twhile(LL_RCC_PLL1_IsReady() != 1)#n#t{#n#t}#n"/>
-            </CallLibMethod>
-
             <CallLibMethod Name="LL_RCC_PLL1_SetM">
                 <MethodArg Name="div" ParameterName="DIVM1"/>
             </CallLibMethod>
@@ -116,14 +110,21 @@
                 <MethodArg Name="IncStep" ParameterName="PLL1INCSTEP"/>
             </CallLibMethod>
             <CallLibMethod Name="LL_RCC_PLL1CSG_Enable"/>
-        </IFCondition>      
-        <IFCondition Expression ="PLL2Used=1">
-            <CallLibMethod Name="LL_RCC_PLL2_Enable"/>            
-   
-            <CallLibMethod Name="" Type="HardCode">
-                <HardCode Text="#n#t /* Wait till PLL is ready */#n#twhile(LL_RCC_PLL2_IsReady() != 1)#n#t{#n#t}#n"/>
+        </IFCondition>
+        <IFCondition Expression ="PLL1Used=1 | PLL2Used=1">
+            <CallLibMethod Name="LL_RCC_PLL12_SetSource">
+                <MethodArg Name="Source" ParameterName="PLL12Source"/>
             </CallLibMethod>
-            
+        </IFCondition>
+        
+        <IFCondition Expression ="PLL1Used=1">        
+            <CallLibMethod Name="LL_RCC_PLL1_Enable"/>   
+            <CallLibMethod Name="" Type="HardCode">
+                <HardCode Text="#n#t /* Wait till PLL is ready */#n#twhile(LL_RCC_PLL1_IsReady() != 1)#n#t{#n#t}#n"/>
+            </CallLibMethod>
+        </IFCondition>
+
+        <IFCondition Expression ="PLL2Used=1">
             <CallLibMethod Name="LL_RCC_PLL2_SetM">
                 <MethodArg Name="div" ParameterName="DIVM2"/>
             </CallLibMethod>
@@ -159,21 +160,19 @@
                 <MethodArg Name="IncStep" ParameterName="PLL2INCSTEP"/>
             </CallLibMethod>
             <CallLibMethod Name="LL_RCC_PLL2CSG_Enable"/>
-        </IFCondition> 
-        <IFCondition Expression ="PLL1Used=1 | PLL2Used=1">
-            <CallLibMethod Name="LL_RCC_PLL12_SetSource">
-                <MethodArg Name="Source" ParameterName="PLL12Source"/>
+        </IFCondition>
+
+        <IFCondition Expression ="PLL2Used=1">
+            <CallLibMethod Name="LL_RCC_PLL2_Enable"/>            
+   
+            <CallLibMethod Name="" Type="HardCode">
+                <HardCode Text="#n#t /* Wait till PLL is ready */#n#twhile(LL_RCC_PLL2_IsReady() != 1)#n#t{#n#t}#n"/>
             </CallLibMethod>
         </IFCondition>
         
+        
 
         <IFCondition Expression ="PLL3Used=1">
-            <CallLibMethod Name="LL_RCC_PLL3_Enable"/>
-   
-            <CallLibMethod Name="" Type="HardCode">
-                <HardCode Text="#n#t /* Wait till PLL is ready */#n#twhile(LL_RCC_PLL3_IsReady() != 1)#n#t{#n#t}#n"/>
-            </CallLibMethod>
-            
             <CallLibMethod Name="LL_RCC_PLL3_SetSource">
                 <MethodArg Name="Source" ParameterName="PLL3Source"/>
             </CallLibMethod>
@@ -221,12 +220,16 @@
             </CallLibMethod>
             <CallLibMethod Name="LL_RCC_PLL3CSG_Enable"/>
         </IFCondition>
-        <IFCondition Expression ="PLL4Used=1">
-            <CallLibMethod Name="LL_RCC_PLL4_Enable"/>
+
+        <IFCondition Expression ="PLL3Used=1">
+            <CallLibMethod Name="LL_RCC_PLL3_Enable"/>
    
             <CallLibMethod Name="" Type="HardCode">
-                <HardCode Text="#n#t /* Wait till PLL is ready */#n#twhile(LL_RCC_PLL4_IsReady() != 1)#n#t{#n#t}#n"/>
+                <HardCode Text="#n#t /* Wait till PLL is ready */#n#twhile(LL_RCC_PLL3_IsReady() != 1)#n#t{#n#t}#n"/>
             </CallLibMethod>
+        </IFCondition>
+
+        <IFCondition Expression ="PLL4Used=1">
             <CallLibMethod Name="LL_RCC_PLL4_SetSource">
                 <MethodArg Name="Source" ParameterName="PLL4Source"/>
             </CallLibMethod>
@@ -271,6 +274,14 @@
                 <MethodArg Name="IncStep" ParameterName="PLL4INCSTEP"/>
             </CallLibMethod>
             <CallLibMethod Name="LL_RCC_PLL4CSG_Enable"/>
+        </IFCondition>
+
+        <IFCondition Expression ="PLL4Used=1">
+            <CallLibMethod Name="LL_RCC_PLL4_Enable"/>
+   
+            <CallLibMethod Name="" Type="HardCode">
+                <HardCode Text="#n#t /* Wait till PLL is ready */#n#twhile(LL_RCC_PLL4_IsReady() != 1)#n#t{#n#t}#n"/>
+            </CallLibMethod>
         </IFCondition>
         
         <IFCondition Expression ="1=1">
@@ -339,7 +350,7 @@
 
         <!--system core frequency set,systick init,systick priority configuration-->
         <IFCondition Expression ="USE_FULL_LL_DRIVER">
-             <CallLibMethod Name="" Type="HardCode">
+            <CallLibMethod Name="" Type="HardCode">
                 <HardCode Text="#n"/>
             </CallLibMethod>
             <CallLibMethod Name="LL_Init1msTick">
@@ -365,7 +376,7 @@
             </CallLibMethod>
         </IFCondition>
 
-       <IFCondition Expression ="1=1">
+        <IFCondition Expression ="1=1">
             <CallLibMethod Name="LL_RCC_SetAXISSClkSource">
                 <MethodArg Name="Source" ParameterName="AXICLKSource"/>
             </CallLibMethod>

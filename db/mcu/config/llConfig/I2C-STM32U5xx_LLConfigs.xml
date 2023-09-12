@@ -55,95 +55,22 @@
             <CallLibMethod Name="LL_I2C_EnableOwnAddress2">
                 <MethodArg  Name="I2Cx" ParameterName="Instance"/>
             </CallLibMethod>
-        </IFCondition>
-<!--        <IFCondition Expression="($Index=1 )">
-            <CallLibMethod Name="MODE_I2C" Type="HardCode">
-                <HardCode Text="#n#t LL_I2C_SetMode(I2C1, LL_I2C_MODE_I2C);"/>
-            </CallLibMethod>
-        </IFCondition> 
-                              
-        <IFCondition Expression="($Index=2 )">
-            <CallLibMethod Name="MODE_I2C" Type="HardCode">
-                <HardCode Text="#n#t LL_I2C_SetMode(I2C2, LL_I2C_MODE_I2C);"/>
-            </CallLibMethod>
-        </IFCondition>
-                
-        <IFCondition Expression="($Index=3 )">
-            <CallLibMethod Name="MODE_I2C" Type="HardCode">
-                <HardCode Text="#n#t LL_I2C_SetMode(I2C3, LL_I2C_MODE_I2C);"/>
-            </CallLibMethod>
-        </IFCondition>-->
-                        
-    <!--    <CallLibMethod Name="LL_I2C_SetTiming">
-            <MethodArg Name="I2Cx" ParameterName="Instance"/>
-            <MethodArg  Name="Timing" ParameterName="Timing" />
-        </CallLibMethod>
-        <CallLibMethod Name="LL_I2C_SetOwnAddress1">
-            <MethodArg  Name="I2Cx" ParameterName="Instance" />
-            <MethodArg  Name="OwnAddress1" ParameterName="OwnAddress1" />
-            <MethodArg Name="OwnAddrSize" ParameterName="AddressingMode" />
-        </CallLibMethod>
-        
-        <CallLibMethod  Name="LL_I2C_EnableOwnAddress1">
-            <MethodArg  Name="I2Cx" ParameterName="Instance"/>
-        </CallLibMethod>-->
-
-        <!--IFCondition Expression="(NoStretchMode =I2C_NOSTRETCH_DISABLE )">
-            <CallLibMethod  Name="LL_I2C_EnableClockStretching">
-                <MethodArg  Name="I2Cx" ParameterName="Instance"/>
-            </CallLibMethod>    
-        </IFCondition-->
-        
+        </IFCondition>      
         <IFCondition Expression="(AddressingMode = I2C_ADDRESSINGMODE_10BIT )">
             <CallLibMethod  Name="LL_I2C_SetMasterAddressingMode">
                 <MethodArg Name="I2Cx" ParameterName="Instance" />
                 <MethodArg Name="AddressingMode" ParameterName="AddressingMode" />
             </CallLibMethod>
         </IFCondition>
-    <!--     <IFCondition Expression=" (Analog_Filter=I2C_ANALOGFILTER_ENABLE )">
-
-            <CallLibMethod Name="LL_I2C_EnableAnalogFilter">
-                <MethodArg Name="I2Cx" ParameterName="Instance"/>		
-            </CallLibMethod>
-        </IFCondition>
-
-        <IFCondition Expression="(Analog_Filter=I2C_ANALOGFILTER_DISABLE)">
-            <CallLibMethod Name="LL_I2C_DisableAnalogFilter">
-                <MethodArg  Name="I2Cx" ParameterName="Instance"/>
-            </CallLibMethod>
-        </IFCondition>-->
-<!--		
-        <IFCondition Expression="(1=1 )">
-            <CallLibMethod Name="LL_I2C_Enable">
-                <MethodArg  Name="I2Cx" ParameterName="Instance"/>
-            </CallLibMethod>
-        </IFCondition>-->
     </RefConfig>
+    
     <RefConfig Name="I2C_DeInit">
         <CallLibMethod Name="LL_I2C_DeInit"/>
     </RefConfig>
-   <!-- <RefConfig  Name="I2C_Analogue">
-        <IFCondition Expression=" (Analog_Filter=I2C_ANALOGFILTER_ENABLE )">
-
-            <CallLibMethod Name="LL_I2C_EnableAnalogFilter">
-                <MethodArg Name="I2Cx" ParameterName="Instance"/>		
-            </CallLibMethod>
-        </IFCondition>
-
-        <IFCondition Expression="(Analog_Filter=I2C_ANALOGFILTER_DISABLE)">
-            <CallLibMethod Name="LL_I2C_DisableAnalogFilter">
-                <MethodArg  Name="I2Cx" ParameterName="Instance"/>
-            </CallLibMethod>
-        </IFCondition>
-		
-    </RefConfig>-->
-    <RefConfig Comment="I2C Fast mode Plus enable" Name="FASTMODE_Config">
-        <!--CallLibMethod Name="LL_SYSCFG_EnableFastModePlus" >
-            <MethodArg Name="Parametre" ParameterName="FASTMODEPLUS"/>
-        </CallLibMethod-->
-    </RefConfig>
+    
     <RefConfig  Name="I2C_Analogue">
     </RefConfig>
+    
     <RefConfig  Name="I2C_DigitalFolter">
     </RefConfig>
     
@@ -327,11 +254,19 @@
             </IFCondition>     
         </IFCondition>
     </RefConfig>
+    
+    <RefConfig Comment="I2C Fast mode Plus enable" Name="FASTMODE_Config">
+        <IFCondition Expression="$IpInstance_FastMP | $IpInstance_SMBusFastMP">
+            <CallLibMethod Name="LL_I2C_EnableFastModePlus" >
+                <MethodArg Name="I2Cx" ParameterName="Instance" />
+            </CallLibMethod>
+        </IFCondition>
+    </RefConfig>
         
     
     <!--Add Lib Method For FastModePlus-->	
-    <LibMethod Comment="" Name="LL_SYSCFG_EnableFastModePlus">
-        <Argument Comment="" GenericType="simple" Name="Parametre" OptimizationCondition="equal"/>
+    <LibMethod Comment="" Name="LL_I2C_EnableFastModePlus">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="I2Cx" TypeName="I2C_TypeDef"/>
     </LibMethod>
     
     <LibMethod Comment="" Name="LL_I2C_Enable">

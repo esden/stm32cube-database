@@ -68,7 +68,7 @@ int32_t RxCarrierSenseGetStatus(void)
   /* USER CODE BEGIN RxCarrierSenseGetStatus_1 */
 
   /* USER CODE END RxCarrierSenseGetStatus_1 */
-  return rxCarrierSenseFlag ;
+  return rxCarrierSenseFlag;
   /* USER CODE BEGIN RxCarrierSenseGetStatus_2 */
 
   /* USER CODE END RxCarrierSenseGetStatus_2 */

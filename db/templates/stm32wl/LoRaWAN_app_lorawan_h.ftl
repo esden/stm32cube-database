@@ -20,6 +20,9 @@ extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
+[#if THREADX??]
+#include <stdint.h>
+[/#if]
 /* USER CODE BEGIN Includes */
 
 /* USER CODE END Includes */
@@ -44,19 +47,25 @@ extern "C" {
 
 /* USER CODE END EM */
 
-/* Exported Functions Prototypes------------------------------------------------------- */
+/* Exported Functions Prototypes ---------------------------------------------*/
 /**
   * @brief  Init Lora Application
   */
+[#if !THREADX??][#-- If AzRtos is not used --]
 void MX_LoRaWAN_Init(void);
+[#else]
+uint32_t MX_LoRaWAN_Init(void *memory_ptr);
+[/#if]
 
 [#if !FREERTOS??][#-- If FreeRtos, only available in CM4 is not used --]
+[#if !THREADX??][#-- If AzRtos is not used --]
 /**
   * @brief  Entry Lora Process or scheduling
   */
 void MX_LoRaWAN_Process(void);
-[/#if]
 
+[/#if]
+[/#if]
 /* USER CODE BEGIN EFP */
 
 /* USER CODE END EFP */

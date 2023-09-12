@@ -74,4 +74,3 @@ SigfoxInfo_t *SigfoxInfo_GetPtr(void);
 #endif
 
 #endif /* __SIGFOX_INFO_H__ */
-

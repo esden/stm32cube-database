@@ -38,10 +38,15 @@
 #include "platform.h"
 #include "mbmuxif_sys.h"
 #include "stm32_mem.h"
+[#if THREADX??][#-- If AzRtos is used --]
+#include "app_azure_rtos.h"
+#include "tx_api.h"
+[#else]
 [#if !FREERTOS??][#-- If FreeRtos is not used --]
 #include "stm32_seq.h"
 [#else]
 #include "cmsis_os.h"
+[/#if]
 [/#if]
 #include "stm32_timer.h"
 #include "sys_app.h"
@@ -53,6 +58,10 @@
 /* USER CODE END Includes */
 
 /* External variables ---------------------------------------------------------*/
+[#if THREADX??]
+extern  TX_BYTE_POOL *byte_pool;
+extern  CHAR *pointer;
+[/#if]
 /* USER CODE BEGIN EV */
 
 /* USER CODE END EV */
@@ -77,7 +86,7 @@ static FLASH_OBProgramInitTypeDef OptionsBytesStruct;
 static __IO uint8_t AllowSequencerForSysCmd = 0;
 static __IO uint8_t MbSystemRespRcvFlag;
 
-UTIL_MEM_PLACE_IN_SECTION("MAPPING_TABLE") static  MBMUX_ComTable_t MBSYS_RefTable UTIL_MEM_ALIGN(16) ;
+UTIL_MEM_PLACE_IN_SECTION("MAPPING_TABLE") static  MBMUX_ComTable_t MBSYS_RefTable UTIL_MEM_ALIGN(16);
 
 MBMUX_ComTable_t *pMb_RefTable = &MBSYS_RefTable;
 MBMUX_ComParam_t *SystemComObj;
@@ -85,13 +94,19 @@ MBMUX_ComParam_t *SystemComObj;
 UTIL_MEM_PLACE_IN_SECTION("MB_MEM1") uint32_t aSystemCmdRespBuff[MAX_PARAM_OF_SYS_CMD_FUNCTIONS];/*shared*/
 UTIL_MEM_PLACE_IN_SECTION("MB_MEM1") uint32_t aSystemNotifAckBuff[MAX_PARAM_OF_SYS_NOTIF_FUNCTIONS];/*shared*/
 UTIL_MEM_PLACE_IN_SECTION("MB_MEM1") uint32_t aSystemPrioACmdRespBuff[MAX_PARAM_OF_SYS_PRIOA_CMD_FUNCTIONS];/*shared*/
-UTIL_MEM_PLACE_IN_SECTION("MB_MEM1") uint32_t aSystemPrioANotifAckBuff[MAX_PARAM_OF_SYS_PRIOA_NOTIF_FUNCTIONS];/*shared*/
+UTIL_MEM_PLACE_IN_SECTION("MB_MEM1") uint32_t
+aSystemPrioANotifAckBuff[MAX_PARAM_OF_SYS_PRIOA_NOTIF_FUNCTIONS];/*shared*/
 UTIL_MEM_PLACE_IN_SECTION("MB_MEM1") uint32_t aSystemPrioBCmdRespBuff[MAX_PARAM_OF_SYS_PRIOB_CMD_FUNCTIONS];/*shared*/
-UTIL_MEM_PLACE_IN_SECTION("MB_MEM1") uint32_t aSystemPrioBNotifAckBuff[MAX_PARAM_OF_SYS_PRIOB_NOTIF_FUNCTIONS];/*shared*/
+UTIL_MEM_PLACE_IN_SECTION("MB_MEM1") uint32_t
+aSystemPrioBNotifAckBuff[MAX_PARAM_OF_SYS_PRIOB_NOTIF_FUNCTIONS];/*shared*/
+[#if THREADX??]
+
+static TX_THREAD Thd_SystemNotifRcv;
+static TX_SEMAPHORE Sem_MbSystemRespRcv;
+[/#if]
 [#if FREERTOS??][#-- If FreeRtos is used --]
 
 static osSemaphoreId_t Sem_MbSystemRespRcv;
-
 osThreadId_t Thd_SysNotifRcvProcessId;
 
 const osThreadAttr_t Thd_SysNotifRcvProcess_attr =
@@ -102,9 +117,8 @@ const osThreadAttr_t Thd_SysNotifRcvProcess_attr =
   .cb_size = CFG_MB_SYS_PROCESS_CB_SIZE,
   .stack_mem = CFG_MB_SYS_PROCESS_STACK_MEM,
   .priority = CFG_MB_SYS_PROCESS_PRIORITY,
-  .stack_size = CFG_MB_SYS_PROCESS_STACk_SIZE
+  .stack_size = CFG_MB_SYS_PROCESS_STACK_SIZE
 };
-static void Thd_SysNotifRcvProcess(void *argument);
 [/#if]
 
 /* USER CODE BEGIN PV */
@@ -153,6 +167,21 @@ static void MBMUXIF_IsrSystemPrioBRespRcvCb(void *ComObj);
   */
 static void MBMUXIF_IsrSystemPrioBNotifRcvCb(void *ComObj);
 
+[#if FREERTOS??][#-- If FreeRtos is used --]
+/**
+  * @brief  FreeRTOS process when receiving MailBox System Notification .
+  */
+static void Thd_SysNotifRcvProcess(void *argument);
+[/#if]
+[#if THREADX??]
+/**
+  * @brief  Entry point for the thread when receiving MailBox System Notification .
+  * @param  thread_input: Not used
+  * @retval None
+  */
+static void Thd_MbSystemNotifRcv_Entry(unsigned long thread_input);
+[/#if]
+
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -160,8 +189,12 @@ static void MBMUXIF_IsrSystemPrioBNotifRcvCb(void *ComObj);
 /* Exported functions --------------------------------------------------------*/
 int8_t MBMUXIF_SystemInit(void)
 {
-  int8_t ret;
+  int8_t ret = 0;
+[#if ((SUBGHZ_APPLICATION == "LORA_USER_APPLICATION") || (SUBGHZ_APPLICATION == "SUBGHZ_USER_APPLICATION") || (SUBGHZ_APPLICATION == "SIGFOX_USER_APPLICATION"))]
+  /* RCC_OscInitTypeDef RCC_OscInitStruct = {0}; */
+[#else]
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
+[/#if]
 
   /* USER CODE BEGIN MBMUXIF_SystemInit_1 */
 
@@ -188,10 +221,12 @@ int8_t MBMUXIF_SystemInit(void)
 
 [/#if]
 [#if ((SUBGHZ_APPLICATION == "LORA_USER_APPLICATION") || (SUBGHZ_APPLICATION == "SUBGHZ_USER_APPLICATION") || (SUBGHZ_APPLICATION == "SIGFOX_USER_APPLICATION"))]
-    /* WARNING: If there is a difference between the MAPPING_TABLE placement in memory */
-    /* and the address calculated according to the IPCCDBA option byte, */
-    /* To avoid writing the IPCCDBA OB by mistake, the execution enters now in a while(1){} */
-    /* Read below and Replace #if 1 by #if 0 if you are sure*/
+    /*
+     * WARNING: If there is a difference between the MAPPING_TABLE placement in memory
+     * and the address calculated according to the IPCCDBA option byte,
+     * to avoid writing the IPCCDBA OB by mistake, the execution enters now in a while(1){}
+     * Read below, uncomment RCC_OscInitStruct local variable and replace #if 1 by #if 0 if you are sure
+     */
     /* USER CODE BEGIN MBMUXIF_SystemInit_Prevent_OB_Programming */
 #if 1
     /* USER CODE END MBMUXIF_SystemInit_Prevent_OB_Programming */
@@ -262,21 +297,57 @@ int8_t MBMUXIF_SystemInit(void)
     /* Lock the Flash to disable the flash control register access  *********/
     (void) HAL_FLASH_Lock();
 [#if ((SUBGHZ_APPLICATION == "LORA_USER_APPLICATION") || (SUBGHZ_APPLICATION == "SUBGHZ_USER_APPLICATION") || (SUBGHZ_APPLICATION == "SIGFOX_USER_APPLICATION"))]
-#endif
+#endif /* MAPPING_TABLE placement in OB */
 [/#if]
   }
 [#if FREERTOS??][#-- If FreeRtos is used --]
   Sem_MbSystemRespRcv = osSemaphoreNew(1, 0, NULL);   /*< Create the semaphore and make it busy at initialization */
 
 [/#if]
-  /* Init MailBoxMultiplexer */
-  MBMUX_Init(pMb_RefTable);
+[#if THREADX??][#-- If AzRtos is used --]
+  /* Create the semaphore.  */
+  if (tx_semaphore_create(&Sem_MbSystemRespRcv, "Sem_MbSystemRespRcv", 0) != TX_SUCCESS)
+  {
+    ret = -12; /* equivalent at TX_SEMAPHORE_ERROR */
+  }
+[/#if]
+  if (ret >= 0)
+  {
+    /* Init MailBoxMultiplexer */
+    MBMUX_Init(pMb_RefTable);
 
-  ret = MBMUX_RegisterFeature(FEAT_INFO_SYSTEM_ID, MBMUX_CMD_RESP, MBMUXIF_IsrSystemRespRcvCb, aSystemCmdRespBuff, sizeof(aSystemCmdRespBuff));
+    ret = MBMUX_RegisterFeature(FEAT_INFO_SYSTEM_ID, MBMUX_CMD_RESP, MBMUXIF_IsrSystemRespRcvCb, aSystemCmdRespBuff, sizeof(aSystemCmdRespBuff));
+  }
+
   if (ret >= 0)
   {
     ret = MBMUX_RegisterFeature(FEAT_INFO_SYSTEM_ID, MBMUX_NOTIF_ACK, MBMUXIF_IsrSystemNotifRcvCb, aSystemNotifAckBuff, sizeof(aSystemNotifAckBuff));
   }
+
+[#if THREADX??]
+  if (ret >= 0)
+  {
+    /* Allocate the stack for MbSystemNotifRcv.  */
+    if (tx_byte_allocate(byte_pool, (VOID **) &pointer,
+                         CFG_MAILBOX_THREAD_STACK_SIZE, TX_NO_WAIT) != TX_SUCCESS)
+    {
+      ret = -10;  /* equivalent at TX_POOL_ERROR */
+    }
+
+    /* Create MbSystemNotifRcv.  */
+    if (tx_thread_create(&Thd_SystemNotifRcv, "Thread MbSystemNotifRcv", Thd_MbSystemNotifRcv_Entry, 0,
+                         pointer, CFG_MAILBOX_THREAD_STACK_SIZE,
+                         CFG_MAILBOX_THREAD_PRIO, CFG_MAILBOX_THREAD_PREEMPTION_THRESHOLD,
+                         TX_NO_TIME_SLICE, TX_AUTO_START) != TX_SUCCESS)
+    {
+      ret = -11;  /* equivalent at TX_THREAD_ERROR */
+    }
+  }
+  if (ret >= 0)
+  {
+    ret = 0;
+  }
+[#else]
   if (ret >= 0)
   {
     ret = 0;
@@ -286,6 +357,7 @@ int8_t MBMUXIF_SystemInit(void)
     Thd_SysNotifRcvProcessId = osThreadNew(Thd_SysNotifRcvProcess, NULL, &Thd_SysNotifRcvProcess_attr);
 [/#if]
   }
+[/#if]
   /* USER CODE BEGIN MBMUXIF_SystemInit_2 */
 
   /* USER CODE END MBMUXIF_SystemInit_2 */
@@ -404,10 +476,14 @@ void MBMUXIF_SystemSendCmd(FEAT_INFO_IdTypeDef SystemPrioFeat)
     {
       if (AllowSequencerForSysCmd)
       {
+[#if THREADX??][#-- If AzRtos is used --]
+        while (tx_semaphore_get(&Sem_MbSystemRespRcv, TX_WAIT_FOREVER) != TX_SUCCESS) {}
+[#else]
 [#if !FREERTOS??][#-- If FreeRtos is not used --]
         UTIL_SEQ_WaitEvt(1 << CFG_SEQ_Evt_MbSystemRespRcv);
 [#else]
         osSemaphoreAcquire(Sem_MbSystemRespRcv, osWaitForever);
+[/#if]
 [/#if]
       }
       else
@@ -521,7 +597,7 @@ int8_t MBMUXIF_SystemSendCm0plusRegistrationCmd(FEAT_INFO_IdTypeDef e_featID)
 {
   MBMUX_ComParam_t *com_obj;
   uint32_t ret = 0;
-  uint32_t *com_buffer ;
+  uint32_t *com_buffer;
   uint16_t i = 0;
   /* USER CODE BEGIN MBMUXIF_SystemSendCm0plusRegistrationCmd_1 */
 
@@ -561,10 +637,15 @@ static void MBMUXIF_IsrSystemRespRcvCb(void *ComObj)
   MbSystemRespRcvFlag = 1;
   if (AllowSequencerForSysCmd) /* To avoid using Sequencer during Init sequence */
   {
+[#if THREADX??][#-- If AzRtos is used --]
+    /* Set the semaphore to release the MbSystemRespRcv Thread */
+    tx_semaphore_put(&Sem_MbSystemRespRcv);
+[#else]
 [#if !FREERTOS??][#-- If FreeRtos is not used --]
     UTIL_SEQ_SetEvt(1 << CFG_SEQ_Evt_MbSystemRespRcv);
 [#else]
     osSemaphoreRelease(Sem_MbSystemRespRcv);
+[/#if]
 [/#if]
   }
   /* USER CODE BEGIN MBMUXIF_IsrSystemRespRcvCb_Last */
@@ -578,10 +659,14 @@ static void MBMUXIF_IsrSystemNotifRcvCb(void *ComObj)
 
   /* USER CODE END MBMUXIF_IsrSystemNotifRcvCb_1 */
   SystemComObj = (MBMUX_ComParam_t *) ComObj;
+[#if THREADX??][#-- If AzRtos is used --]
+  tx_thread_resume(&Thd_SystemNotifRcv);
+[#else]
 [#if !FREERTOS??][#-- If FreeRtos is not used --]
   UTIL_SEQ_SetTask((1 << CFG_SEQ_Task_MbSystemNotifRcv), CFG_SEQ_Prio_0);
 [#else]
   osThreadFlagsSet(Thd_SysNotifRcvProcessId, 1);
+[/#if]
 [/#if]
   /* USER CODE BEGIN MBMUXIF_IsrSystemNotifRcvCb_Last */
 
@@ -600,9 +685,35 @@ static void Thd_SysNotifRcvProcess(void *argument)
     osThreadFlagsWait(1, osFlagsWaitAny, osWaitForever);
     MBMUXIF_TaskSystemNotifRcv();  /*what you want to do*/
   }
+  /* Following USER CODE SECTION will be never reached */
+  /* it can be use for compilation flag like #else or #endif */
   /* USER CODE BEGIN Thd_SysNotifRcvProcess_Last */
 
   /* USER CODE END Thd_SysNotifRcvProcess_Last */
+}
+
+[/#if]
+[#if THREADX??][#-- If AzRtos is used --]
+static void Thd_MbSystemNotifRcv_Entry(ULONG thread_input)
+{
+  (void) thread_input;
+  /* USER CODE BEGIN Thd_MbSystemNotifRcv_Entry_1 */
+
+  /* USER CODE END Thd_MbSystemNotifRcv_Entry_1 */
+  /* Infinite loop */
+  for (;;)
+  {
+    tx_thread_suspend(&Thd_SystemNotifRcv);
+    MBMUXIF_TaskSystemNotifRcv();  /*what you want to do*/
+    /* USER CODE BEGIN Thd_MbSystemNotifRcv_Entry_2 */
+
+    /* USER CODE END Thd_MbSystemNotifRcv_Entry_2 */
+  }
+  /* Following USER CODE SECTION will be never reached */
+  /* it can be use for compilation flag like #else or #endif */
+  /* USER CODE BEGIN Thd_MbSystemNotifRcv_Entry_Last */
+
+  /* USER CODE END Thd_MbSystemNotifRcv_Entry_Last */
 }
 
 [/#if]
@@ -654,4 +765,3 @@ static void MBMUXIF_IsrSystemPrioBNotifRcvCb(void *ComObj)
 /* USER CODE BEGIN PrFD */
 
 /* USER CODE END PrFD */
-

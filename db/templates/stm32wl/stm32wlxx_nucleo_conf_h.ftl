@@ -6,7 +6,7 @@
   * @author  MCD Application Team
   * @brief   STM32WLxx_Nucleo board configuration file.
   ******************************************************************************
- [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
+[@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
 /* USER CODE END Header */
@@ -77,7 +77,7 @@
 #define USE_COM_LOG                         0U
 
 /* IRQ priorities */
-#define BSP_BUTTON_SWx_IT_PRIORITY         15U
+#define BSP_BUTTON_USER_IT_PRIORITY         14U
 
 /**
   * @}
@@ -119,4 +119,3 @@
 #endif
 
 #endif /* STM32WLXX_NUCLEO_CONF_H */
-

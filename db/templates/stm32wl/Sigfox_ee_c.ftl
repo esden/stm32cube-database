@@ -13,6 +13,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "ee.h"
+#include "ee_conf.h"
 #include "flash_if.h"
 
 /* USER CODE BEGIN Includes */
@@ -762,4 +763,3 @@ static uint16_t EE_Crc(uint64_t v)
 /* USER CODE BEGIN PrFD */
 
 /* USER CODE END PrFD */
-

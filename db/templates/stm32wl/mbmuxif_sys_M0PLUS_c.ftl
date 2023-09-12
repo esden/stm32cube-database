@@ -266,7 +266,7 @@ int16_t MBMUXIF_ChipRevId(void)
   /* USER CODE BEGIN MBMUXIF_ChipRevId */
 
   /* USER CODE END MBMUXIF_ChipRevId */
-  return ret ;
+  return ret;
 }
 
 /* USER CODE BEGIN ExpoS */
@@ -291,7 +291,7 @@ static void MBMUXIF_IsrSystemCmdRcvCb(void *ComObj)
 [#if ((SUBGHZ_APPLICATION == "SIGFOX_AT_SLAVE") || (SUBGHZ_APPLICATION == "SIGFOX_PUSHBUTTON"))]
   uint32_t *com_buffer = SystemComObj->ParamBuf;
 [/#if]
-[#if ((SUBGHZ_APPLICATION == "SIGFOX_AT_SLAVE") || (SUBGHZ_APPLICATION == "SIGFOX_PUSHBUTTON"))|| (SUBGHZ_APPLICATION == "SIGFOX_USER_APPLICATION") ]
+[#if ((SUBGHZ_APPLICATION == "SIGFOX_AT_SLAVE") || (SUBGHZ_APPLICATION == "SIGFOX_PUSHBUTTON")) ]
   uint32_t status;
 [/#if]
 

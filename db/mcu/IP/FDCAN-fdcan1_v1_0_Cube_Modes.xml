@@ -11,8 +11,8 @@
     <RefParameter Comment="Frame Format" DefaultValue="FDCAN_FRAME_CLASSIC" Name="FrameFormat" Type="list" Group="Basic Parameters">
         <Description>Specifies the FDCAN frame format.</Description>
         <PossibleValue Comment="Classic mode" Value="FDCAN_FRAME_CLASSIC"/>
-        <PossibleValue Comment="FD mode without BitRate Switshing" Value="FDCAN_FRAME_FD_NO_BRS"/>
-        <PossibleValue Comment="FD mode with BitRate Switshing" Value="FDCAN_FRAME_FD_BRS"/>
+        <PossibleValue Comment="FD mode without BitRate Switching" Value="FDCAN_FRAME_FD_NO_BRS"/>
+        <PossibleValue Comment="FD mode with BitRate Switching" Value="FDCAN_FRAME_FD_BRS"/>
     </RefParameter>
 
     <RefParameter Comment="Mode" DefaultValue="lol" Name="Mode" Type="list" Group="Basic Parameters">
@@ -725,6 +725,69 @@
         <PossibleValue Comment="Sync pulse at start of basic cycle " Value="FDCAN_TT_SYNC_PULSE_AT_START_OF_BASIC_CYCLE"/>		
         <PossibleValue Comment="Sync pulse at start of matrix " Value="FDCAN_TT_SYNC_PULSE_AT_START_OF_MATRIX"/>		
     </RefParameter>	
+	
+	<!-- CCU config -->
+    <RefParameter Comment="Clock Calibration" DefaultValue="DISABLE" Name="ClockCalibrationCCU" Type="list" Group="Clock Calibration Unit" >	
+        <Condition Diagnostic="" Expression="STM32H7"/>	
+        <Description>Enable or disable the clock calibration.</Description>		
+        <PossibleValue Comment="Disable" Value="DISABLE"/>		
+        <PossibleValue Comment="Enable" Value="ENABLE"/>		
+    </RefParameter>
+    <!--RefParameter Comment="Clock Calibration" DefaultValue="null" Group="Clock Calibration Unit" Name="ClockCalibrationCCU" Type="list" Visible="false"/-->
+    
+        <RefParameter Comment="Clock Divider" DefaultValue="FDCAN_CLOCK_DIV1" Name="ClockDividerCCU" Type="list" Group="Clock Calibration Unit">
+        <Condition Diagnostic="" Expression="(STM32H7) &amp; ($Index=1) &amp; (ClockCalibrationCCU=ENABLE)" />
+        <Description>Specifies the FDCAN kernel clock divider when the clock calibration is bypassed.</Description>
+        <PossibleValue Comment="Divide kernel clock by 1 " Value="FDCAN_CLOCK_DIV1"/>
+        <PossibleValue Comment="Divide kernel clock by 2 " Value="FDCAN_CLOCK_DIV2"/>
+        <PossibleValue Comment="Divide kernel clock by 4 " Value="FDCAN_CLOCK_DIV4"/>
+        <PossibleValue Comment="Divide kernel clock by 6 " Value="FDCAN_CLOCK_DIV6"/>
+        <PossibleValue Comment="Divide kernel clock by 8 " Value="FDCAN_CLOCK_DIV8"/>
+        <PossibleValue Comment="Divide kernel clock by 10 " Value="FDCAN_CLOCK_DIV10"/>
+        <PossibleValue Comment="Divide kernel clock by 12 " Value="FDCAN_CLOCK_DIV12"/>
+        <PossibleValue Comment="Divide kernel clock by 14 " Value="FDCAN_CLOCK_DIV14"/>
+        <PossibleValue Comment="Divide kernel clock by 16 " Value="FDCAN_CLOCK_DIV16"/>
+        <PossibleValue Comment="Divide kernel clock by 18 " Value="FDCAN_CLOCK_DIV18"/>
+        <PossibleValue Comment="Divide kernel clock by 20 " Value="FDCAN_CLOCK_DIV20"/>
+        <PossibleValue Comment="Divide kernel clock by 22 " Value="FDCAN_CLOCK_DIV22"/>
+        <PossibleValue Comment="Divide kernel clock by 24 " Value="FDCAN_CLOCK_DIV24"/>
+        <PossibleValue Comment="Divide kernel clock by 26 " Value="FDCAN_CLOCK_DIV26"/>
+        <PossibleValue Comment="Divide kernel clock by 28 " Value="FDCAN_CLOCK_DIV28"/>
+        <PossibleValue Comment="Divide kernel clock by 30 " Value="FDCAN_CLOCK_DIV30"/>
+    </RefParameter>
+    <RefParameter Comment="Clock Divider" DefaultValue="FDCAN_CLOCK_DIV1" Name="ClockDividerCCU" Type="list" Group="Clock Calibration Unit">
+        <Condition Diagnostic="" Expression="(STM32H7) &amp; !($Index=1) &amp; (ClockCalibrationCCU=ENABLE)" />
+        <Description>Specifies the FDCAN kernel clock divider when the clock calibration is bypassed.</Description>
+        <PossibleValue Comment="Divide kernel clock by 1 " Value="FDCAN_CLOCK_DIV1"/>
+    </RefParameter>
+    <!--RefParameter Comment="Clock Divider" DefaultValue="null" Group="Clock Calibration Unit" Name="ClockDividerCCU" Type="list" Visible="false"/-->
+    
+        <RefParameter Comment="Min Osc Clk Periods" DefaultValue="0x00" Max="0xFF" Min="0x00" Name="MinOscClkPeriodsCCU" Type="integer" Group="Clock Calibration Unit">
+            <Condition Diagnostic="" Expression="(STM32H7) &amp; (ClockCalibrationCCU=ENABLE) "/>		
+        <Description>Configures the minimum number of periods in two CAN bit times.</Description>		
+    </RefParameter>
+    <!--RefParameter Comment="Min Osc Clk Periods" DefaultValue="null" Group="Clock Calibration Unit" Name="MinOscClkPeriodsCCU" Type="list" Visible="false"/-->
+    
+        <RefParameter Comment="Cal Field Length" DefaultValue="FDCAN_CALIBRATION_FIELD_LENGTH_32BITS" Name="CalFieldLengthCCU" Type="list" Group="Clock Calibration Unit">
+            <Condition Diagnostic="" Expression="(STM32H7) &amp; (ClockCalibrationCCU=ENABLE) "/>		
+        <Description>Specifies the calibration field length.</Description>		
+        <PossibleValue Comment="Calibration field length is 32 bits test " Value="FDCAN_CALIB_FIELD_LENGTH_32"/>		
+        <PossibleValue Comment="Calibration field length is 64 bits test" Value="FDCAN_CALIB_FIELD_LENGTH_64"/>		
+    </RefParameter>
+    <RefParameter Comment="Cal Field Length" DefaultValue="null" Group="Clock Calibration Unit" Name="CalFieldLengthCCU" Type="list" Visible="false"/>
+    
+        <RefParameter Comment="Time Quanta Per Bit Time" DefaultValue="4" Max="25" Min="4" Name="TimeQuantaPerBitTimeCCU" Type="integer" Group="Clock Calibration Unit">
+            <Condition Diagnostic="" Expression="(STM32H7) &amp; (ClockCalibrationCCU=ENABLE)"/>		
+        <Description>Configures the number of time quanta per bit time.</Description>		
+    </RefParameter>
+    <!--RefParameter Comment="Time Quanta Per Bit Time" DefaultValue="null" Group="Clock Calibration Unit" Name="TimeQuantaPerBitTimeCCU" Type="list" Visible="false"/-->
+    
+        <RefParameter Comment="Watchdog Start Value" DefaultValue="0x0000" Max="0xFFFF" Min="0x0000" Name="WatchdogStartValueCCU" Type="integer" Group="Clock Calibration Unit">
+            <Condition Diagnostic="" Expression="(STM32H7) &amp; (ClockCalibrationCCU=ENABLE) "/>		
+        <Description>Start value of the Calibration Watchdog Counter.</Description>		
+    </RefParameter>
+    <!--RefParameter Comment="Watchdog Start Value" DefaultValue="null" Group="Clock Calibration Unit" Name="WatchdogStartValueCCU" Type="list" Visible="false"/-->	
+
 
     <!-- RefMode for FDCAN Mode -->	
     <RefMode Name="FDCAN_Activate" BaseMode="canBasic">
@@ -761,6 +824,15 @@
         <Parameter Name="TxFifoQueueElmtsNbr"/>
         <Parameter Name="TxFifoQueueMode"/>
         <Parameter Name="TxElmtSize"/>
+		
+		<!--CCU config-->
+        <ConfigForMode>Can_CCUInit</ConfigForMode>
+        <Parameter Name="ClockCalibrationCCU"/>
+        <Parameter Name="ClockDividerCCU"/>
+        <Parameter Name="MinOscClkPeriodsCCU"/>
+        <Parameter Name="CalFieldLengthCCU"/>
+        <Parameter Name="TimeQuantaPerBitTimeCCU"/>
+        <Parameter Name="WatchdogStartValueCCU"/>
        
 <!--    <Parameter Name="StandardFilterSA"/>
         <Parameter Name="ExtendedFilterSA"/>                  

@@ -881,7 +881,7 @@ ${definition.name}: ${definition.value}
 [/#list]
 
 /*
- * When replacing the elliptic curve module, pleace consider, that it is
+ * When replacing the elliptic curve module, please consider, that it is
  * implemented with two .c files:
  *      - ecp.c
  *      - ecp_curves.c

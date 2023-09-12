@@ -55,7 +55,7 @@
 uint32_t SYS_EE_ReadBuffer_mbwrapper(e_EE_ID EEsgfxID, uint32_t *data)
 {
   MBMUX_ComParam_t *com_obj;
-  uint32_t *com_buffer ;
+  uint32_t *com_buffer;
   uint16_t i = 0;
   uint32_t ret = 0;
 
@@ -79,7 +79,7 @@ uint32_t SYS_EE_ReadBuffer_mbwrapper(e_EE_ID EEsgfxID, uint32_t *data)
 uint32_t SYS_EE_WriteBuffer_mbwrapper(e_EE_ID EEsgfxID, uint32_t data)
 {
   MBMUX_ComParam_t *com_obj;
-  uint32_t *com_buffer ;
+  uint32_t *com_buffer;
   uint16_t i = 0;
   uint32_t ret = 0;
 
@@ -103,4 +103,3 @@ uint32_t SYS_EE_WriteBuffer_mbwrapper(e_EE_ID EEsgfxID, uint32_t data)
 /* USER CODE BEGIN EF */
 
 /* USER CODE END EF */
-

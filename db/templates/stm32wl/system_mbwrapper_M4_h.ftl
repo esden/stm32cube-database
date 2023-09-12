@@ -69,4 +69,3 @@ uint32_t SYS_EE_WriteBuffer_mbwrapper(e_EE_ID EEsgfxID, uint32_t data);
 #endif
 
 #endif /*__SYSTEM_MBWRAPPER_CM4_H__*/
-

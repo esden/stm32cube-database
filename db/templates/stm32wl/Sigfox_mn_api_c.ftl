@@ -45,6 +45,11 @@
 
 [/#if]
 #include "mn_api.h"
+[#if THREADX??][#-- If AzRtos is used --]
+#include "app_azure_rtos.h"
+#include "tx_api.h"
+#include "sgfx_app.h"
+[/#if]
 [#if (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION")]
 #include "mn_lptim_if.h"
 #include "radio.h"
@@ -52,7 +57,13 @@
 #include "sys_app.h"           /*For log*/
 #include "stm32_lpm.h"
 #include "stm32_timer.h"
+[#if !THREADX??][#-- If AzRtos is not used --]
+[#if !FREERTOS??][#-- If FreeRtos is not used --]
 #include "stm32_seq.h"
+[#else]
+#include "cmsis_os.h"
+[/#if]
+[/#if]
 #include "utilities_def.h"
 [/#if]
 
@@ -61,6 +72,10 @@
 /* USER CODE END Includes */
 
 /* External variables ---------------------------------------------------------*/
+[#if THREADX??]
+extern  TX_BYTE_POOL *byte_pool;
+extern  CHAR *pointer;
+[/#if]
 [#if (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION")]
 /**
   * @brief LPTIM handle
@@ -79,9 +94,6 @@ extern LPTIM_HandleTypeDef hlptim1;
 
 /* Private define ------------------------------------------------------------*/
 [#if (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION")]
-/*OOK demod on for debug*/
-#define MN_PROCESS_IN_BG 1
-
 #define LPTIM_PERIOD     ((uint32_t)  2)        /* 1/16384~61.03us  */
 
 #define LPTIM_PULSE      ((uint32_t) 0 )
@@ -103,13 +115,33 @@ extern LPTIM_HandleTypeDef hlptim1;
 /* RSSi register to be restored after end of Monarch*/
 static uint8_t Reg0x089B;
 
-#if (MN_PROCESS_IN_BG==1)
 #define SIZE_OF_RSSI_BUFF   (1<<4)
 int16_t RssiBuff[SIZE_OF_RSSI_BUFF];
 __IO int16_t RssiBuffWriteIdx;
 int16_t RssiBuffReadIdx;
 static void process_MonarchBackGround(void);
-#endif /* MN_PROCESS_IN_BG==1 */
+[#if THREADX??][#-- If AzRtos is used --]
+static TX_THREAD Thd_MonarchProcessId;
+static uint8_t FirstTimeInit = 1;
+[/#if]
+
+[#if FREERTOS??][#-- If FreeRtos is used --]
+
+osThreadId_t Thd_MonarchProcessId;
+
+const osThreadAttr_t Thd_MonarchProcess_attr =
+{
+  .name = CFG_MONARCH_PROCESS_NAME,
+  .attr_bits = CFG_MONARCH_PROCESS_ATTR_BITS,
+  .cb_mem = CFG_MONARCH_PROCESS_CB_MEM,
+  .cb_size = CFG_MONARCH_PROCESS_CB_SIZE,
+  .stack_mem = CFG_MONARCH_PROCESS_STACK_MEM,
+  .priority = CFG_MONARCH_PROCESS_PRIORITY,
+  .stack_size = CFG_MONARCH_PROCESS_STACK_SIZE
+};
+static void Thd_MonarchProcess(void *argument);
+
+[/#if]
 
 /* Flag to disable rssi read transfer (in timer cB) while configuring radio*/
 static uint8_t RssiReadOnIT_Enable = 1;
@@ -141,6 +173,14 @@ static void MN_TIM_Start(void);
   */
 static void MN_TIM_Stop(void);
 
+[#if THREADX??][#-- If AzRtos is used --]
+/**
+  * @brief  Entry point for the thread MonarchProcess.
+  * @param  thread_input: Not used
+  * @retval None
+  */
+static void Thd_MonarchProcess_Entry(unsigned long thread_input);
+[/#if]
 [/#if]
 /* USER CODE BEGIN PFP */
 
@@ -165,7 +205,7 @@ void MN_API_Init(void (*MN_API_Timer_CB)(int16_t rssi))
   Radio.Write(0x089B, 0x0);
 
   UTIL_LPM_SetStopMode((1 << CFG_LPM_SGFX_MN_Id), UTIL_LPM_DISABLE);
-#if (MN_PROCESS_IN_BG==1)
+
   /*reset write indices*/
   RssiBuffWriteIdx = 0;
   /*reset read indices*/
@@ -173,8 +213,37 @@ void MN_API_Init(void (*MN_API_Timer_CB)(int16_t rssi))
   /*reset RssiBuff*/
   UTIL_MEM_set_8((uint8_t *) RssiBuff, 0, SIZE_OF_RSSI_BUFF * sizeof(int16_t));
   /* register process_MonarchBackGround under CFG_SEQ_TASK_MONARCH */
+[#if THREADX??][#-- If AzRtos is used --]
+  if (FirstTimeInit)
+  {
+    FirstTimeInit = 0;
+    /* Allocate the stack for MonarchProcess.  */
+    if (tx_byte_allocate(byte_pool, (VOID **) &pointer,
+                         CFG_MN_THREAD_STACK_SIZE, TX_NO_WAIT) != TX_SUCCESS)
+    {
+      Error_Handler();
+    }
+
+    if (tx_thread_create(&Thd_MonarchProcessId, "Thread MonarchProcess", Thd_MonarchProcess_Entry, 0,
+                         pointer, CFG_MN_THREAD_STACK_SIZE,
+                         CFG_MN_THREAD_PRIO, CFG_MN_THREAD_PREEMPTION_THRESHOLD,
+                         TX_NO_TIME_SLICE, TX_AUTO_START) != TX_SUCCESS)
+    {
+      Error_Handler();
+    }
+  }
+[#else][#-- not THREADX--]
+[#if !FREERTOS??][#-- If FreeRtos is not used --]
   UTIL_SEQ_RegTask((1 << CFG_SEQ_Task_Monarch), UTIL_SEQ_RFU, process_MonarchBackGround);
-#endif /* MN_PROCESS_IN_BG==1 */
+[#else]
+  Thd_MonarchProcessId = osThreadNew(Thd_MonarchProcess, NULL, &Thd_MonarchProcess_attr);
+  if (Thd_MonarchProcessId == NULL)
+  {
+    Error_Handler();
+  }
+[/#if]
+[/#if]
+
   /* USER CODE BEGIN MN_API_Init_2 */
 
   /* USER CODE END MN_API_Init_2 */
@@ -202,6 +271,10 @@ void MN_API_DeInit(void)
 
   Radio.Write(0x089B, Reg0x089B);
 
+[#if FREERTOS??][#-- If FreeRtos is not used --]
+  osThreadTerminate(Thd_MonarchProcessId);
+
+[/#if]
   APP_LOG(TS_ON, VLEVEL_M, "MN Deinit\r\n");
   /* USER CODE BEGIN MN_API_DeInit_2 */
 
@@ -317,7 +390,7 @@ void MN_API_Pattern_Found(int32_t window_type, int32_t pattern, int32_t frequenc
 {
   /* USER CODE BEGIN MN_API_Pattern_Found_1 */
 [#if (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION") && (FILL_UCS == "true")]
-  BSP_LED_On(LED_BLUE);
+  HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_SET); /* LED_BLUE */
 [#else]
 
 [/#if]
@@ -349,7 +422,7 @@ void MN_API_Pattern_Found(int32_t window_type, int32_t pattern, int32_t frequenc
   }
   /* USER CODE BEGIN MN_API_Pattern_Found_2 */
 [#if (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION") && (FILL_UCS == "true")]
-  BSP_LED_Off(LED_BLUE);
+  HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_RESET); /* LED_BLUE */
 [#else]
 
 [/#if]
@@ -393,9 +466,9 @@ void MN_API_TimerStop(void)
   /* USER CODE END MN_API_TimerStop_2 */
 [#else]
   /*monarch window timer stops*/
-    /* USER CODE BEGIN MN_API_TimerStop */
+  /* USER CODE BEGIN MN_API_TimerStop */
 
-    /* USER CODE END MN_API_TimerStop */
+  /* USER CODE END MN_API_TimerStop */
 [/#if]
 }
 
@@ -447,8 +520,6 @@ void HAL_LPTIM_AutoReloadMatchCallback(LPTIM_HandleTypeDef *hlptim)
   if (RssiReadOnIT_Enable == 1)
   {
     rssi = Radio.Rssi(MODEM_FSK);
-
-#if (MN_PROCESS_IN_BG==1)
     /*record rssi in buffer*/
     RssiBuff[RssiBuffWriteIdx++] = rssi;
     if (RssiBuffWriteIdx == SIZE_OF_RSSI_BUFF)
@@ -456,17 +527,21 @@ void HAL_LPTIM_AutoReloadMatchCallback(LPTIM_HandleTypeDef *hlptim)
       RssiBuffWriteIdx = 0;
     }
     /*run process_MonarchBackGround in background*/
+[#if THREADX??][#-- If AzRtos is used --]
+    tx_thread_resume(&Thd_MonarchProcessId);
+[#else]
+[#if !FREERTOS??][#-- If FreeRtos is not used --]
     UTIL_SEQ_SetTask(1 << CFG_SEQ_Task_Monarch, CFG_SEQ_Prio_0);
-#else
-    MN_Timer_CB(rssi);
-#endif /* MN_PROCESS_IN_BG==1 */
+[#else]
+    osThreadFlagsSet(Thd_MonarchProcessId, 1);
+[/#if]
+[/#if]
   }
   /* USER CODE BEGIN HAL_LPTIM_AutoReloadMatchCallback_2 */
 
   /* USER CODE END HAL_LPTIM_AutoReloadMatchCallback_2 */
 }
 
-#if (MN_PROCESS_IN_BG==1)
 static void process_MonarchBackGround(void)
 {
   /* USER CODE BEGIN process_MonarchBackGround_1 */
@@ -488,7 +563,51 @@ static void process_MonarchBackGround(void)
 
   /* USER CODE END process_MonarchBackGround_2 */
 }
-#endif /* MN_PROCESS_IN_BG==1 */
+[#if THREADX??][#-- If AzRtos is used --]
+
+void Thd_MonarchProcess_Entry(unsigned long thread_input)
+{
+  (void) thread_input;
+
+  /* USER CODE BEGIN Thd_MonarchProcess_Entry_1 */
+
+  /* USER CODE END Thd_MonarchProcess_Entry_1 */
+
+  /* Infinite loop */
+  while (1)
+  {
+    tx_thread_suspend(&Thd_MonarchProcessId);
+    process_MonarchBackGround();
+    /*do what you want*/
+    /* USER CODE BEGIN Thd_MonarchProcess_Entry_Loop */
+
+    /* USER CODE END Thd_MonarchProcess_Entry_Loop */
+  }
+  /* Following USER CODE SECTION will be never reached */
+  /* it can be use for compilation flag like #else or #endif */
+  /* USER CODE BEGIN Thd_MonarchProcess_Entry_Last */
+
+  /* USER CODE END Thd_MonarchProcess_Entry_Last */
+}
+[/#if]
+[#if FREERTOS??][#-- If FreeRtos is used --]
+
+static void Thd_MonarchProcess(void *argument)
+{
+  /* USER CODE BEGIN Thd_MonarchProcess_1 */
+
+  /* USER CODE END Thd_MonarchProcess_1 */
+  UNUSED(argument);
+  for (;;)
+  {
+    osThreadFlagsWait(1, osFlagsWaitAny, osWaitForever);
+    process_MonarchBackGround(); /*what you want to do*/
+  }
+  /* USER CODE BEGIN Thd_MonarchProcess_2 */
+
+  /* USER CODE END Thd_MonarchProcess_2 */
+}
+[/#if]
 [/#if]
 
 /* USER CODE BEGIN PrFD */

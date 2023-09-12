@@ -37,12 +37,12 @@
   
 #define HAL_MODULE_ENABLED
 
-[#assign allModules = ["ADC","MDF","COMP","CORDIC","CRC","AES","DAC","DMA2D","FDCAN","FMAC","GTZC","HASH","HRTIM","IRDA","IWDG","I2C", "I2S","LPTIM","NAND","NOR","OPAMP", "OCTOSPI","OTFDEC","PCD","PKA","QUADSPI","RNG","RTC","SAI","SAES","SD","MMC", "SMARTCARD","SMBUS","SPI","SRAM","TIM","TSC","RAMCFG","UART","USART","WWDG","DCMI","PSSI", "ICACHE","DCACHE", "PCD", "HCD"]]
+[#assign allModules = ["ADC","MDF","COMP","CORDIC","CRC","AES","DAC","DMA2D","DSI","FDCAN","FMAC","GFXMMU","GPU2D","GTZC","HASH","HRTIM","IRDA","IWDG","I2C", "I2S","LPTIM","LTDC","NAND","NOR","OPAMP", "OCTOSPI","OTFDEC","PCD","PKA","QUADSPI","RNG","RTC","SAI","SAES","SD","MMC", "SMARTCARD","SMBUS","SPI","SRAM","TIM","TSC","RAMCFG","UART","USART","WWDG","DCMI","PSSI", "ICACHE","DCACHE", "PCD", "HCD", "HSPI"]]
 [#list allModules as module]
     [#if isModuleUsed(module)]
-[#compress]#define HAL_${module?replace("QUADSPI","QSPI")?replace("OCTOSPI","OSPI")?replace("AES","CRYP")?replace("SCRYP","CRYP")?replace("ADF","MDF")}_MODULE_ENABLED[/#compress]
+[#compress]#define HAL_${module?replace("QUADSPI","QSPI")?replace("OCTOSPI","OSPI")?replace("HSPI","XSPI")?replace("AES","CRYP")?replace("SCRYP","CRYP")?replace("ADF","MDF")}_MODULE_ENABLED[/#compress]
 	[#else]
-[#compress]/*#define HAL_${module?replace("QUADSPI","QSPI")?replace("OCTOSPI","OSPI")?replace("AES","CRYP")?replace("SCRYP","CRYP")?replace("ADF","MDF")}_MODULE_ENABLED   */[/#compress]
+[#compress]/*#define HAL_${module?replace("QUADSPI","QSPI")?replace("OCTOSPI","OSPI")?replace("HSPI","XSPI")?replace("AES","CRYP")?replace("SCRYP","CRYP")?replace("ADF","MDF")}_MODULE_ENABLED   */[/#compress]
 	[/#if]	
   [/#list]
   [#function isModuleUsed moduleName]
@@ -175,11 +175,14 @@
 #define  USE_HAL_DAC_REGISTER_CALLBACKS        0U /* DAC register callback disabled       */
 #define  USE_HAL_DCMI_REGISTER_CALLBACKS       0U /* DCMI register callback disabled      */
 #define  USE_HAL_DMA2D_REGISTER_CALLBACKS      0U /* DMA2D register callback disabled     */
+#define  USE_HAL_DSI_REGISTER_CALLBACKS        0U /* DSI register callback disabled       */
 #define  USE_HAL_ETH_REGISTER_CALLBACKS        0U /* ETH register callback disabled       */
 #define  USE_HAL_FDCAN_REGISTER_CALLBACKS      0U /* FDCAN register callback disabled     */
 #define  USE_HAL_FMAC_REGISTER_CALLBACKS       0U /* FMAC register callback disabled      */
 #define  USE_HAL_HASH_REGISTER_CALLBACKS       0U /* HASH register callback disabled      */
 #define  USE_HAL_HCD_REGISTER_CALLBACKS        0U /* HCD register callback disabled       */
+#define  USE_HAL_GFXMMU_REGISTER_CALLBACKS     0U /* GFXMMU register callback disabled    */
+#define  USE_HAL_GPU2D_REGISTER_CALLBACKS      0U /* GPU2D register callback disabled     */
 #define  USE_HAL_I2C_REGISTER_CALLBACKS        0U /* I2C register callback disabled       */
 #define  USE_HAL_IWDG_REGISTER_CALLBACKS       0U /* IWDG register callback disabled      */
 #define  USE_HAL_IRDA_REGISTER_CALLBACKS       0U /* IRDA register callback disabled      */
@@ -255,6 +258,10 @@
   #include "stm32u5xx_hal_dma2d.h"
 #endif /* HAL_DMA2D_MODULE_ENABLED */
 
+#ifdef HAL_DSI_MODULE_ENABLED
+#include "stm32u5xx_hal_dsi.h"
+#endif /* HAL_DSI_MODULE_ENABLED */
+
 #ifdef HAL_CORTEX_MODULE_ENABLED
   #include "stm32u5xx_hal_cortex.h"
 #endif /* HAL_CORTEX_MODULE_ENABLED */
@@ -318,6 +325,10 @@
 #ifdef HAL_LPTIM_MODULE_ENABLED
 #include "stm32u5xx_hal_lptim.h"
 #endif /* HAL_LPTIM_MODULE_ENABLED */
+
+#ifdef HAL_LTDC_MODULE_ENABLED
+#include "stm32u5xx_hal_ltdc.h"
+#endif /* HAL_LTDC_MODULE_ENABLED */
 
 #ifdef HAL_OPAMP_MODULE_ENABLED
 #include "stm32u5xx_hal_opamp.h"
@@ -411,6 +422,14 @@
  #include "stm32u5xx_hal_fmac.h"
 #endif /* HAL_FMAC_MODULE_ENABLED */
 
+#ifdef HAL_GFXMMU_MODULE_ENABLED
+  #include "stm32u5xx_hal_gfxmmu.h"
+#endif /* HAL_GFXMMU_MODULE_ENABLED */
+
+#ifdef HAL_GPU2D_MODULE_ENABLED
+  #include "stm32u5xx_hal_gpu2d.h"
+#endif /* HAL_GPU2D_MODULE_ENABLED */
+
 #ifdef HAL_OTFDEC_MODULE_ENABLED
  #include "stm32u5xx_hal_otfdec.h"
 #endif /* HAL_OTFDEC_MODULE_ENABLED */
@@ -426,6 +445,10 @@
 #ifdef HAL_MDF_MODULE_ENABLED
  #include "stm32u5xx_hal_mdf.h"
 #endif /* HAL_MDF_MODULE_ENABLED */
+
+#ifdef HAL_XSPI_MODULE_ENABLED
+ #include "stm32u5xx_hal_xspi.h"
+#endif /* HAL_XSPI_MODULE_ENABLED */
 
 /* Exported macro ------------------------------------------------------------*/
 #ifdef  USE_FULL_ASSERT

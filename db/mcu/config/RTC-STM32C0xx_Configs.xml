@@ -1,0 +1,1083 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
+<IP xmlns="http://mcd.rou.st.com/modules.php?name=mcu" DBVersion="V4.0" Name="RTC" Version="STM32Cube_FW_C0_V0.7.0" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Configs.xsd">
+    
+    <RefConfig Comment="Initialize RTC Only" Name="RTC_Init_Only">
+		<CallLibMethod Name="HAL_RTC_Init"/>
+		<ImplementCallBack Name="HAL_RTC_MspInit"/>
+		<ImplementCallBack Name="HAL_RTC_MspDeInit"/>
+	</RefConfig>
+	<RefConfig Name="RTC_Init" Comment="Initialize RTC and set the Time and Date">
+		<CallLibMethod Name="HAL_RTC_Init" />
+
+		<CallLibMethod Name="HAL_RTC_SetTime">
+			<MethodArg Name="sTime.Hours" ParameterName="HoursARG" />
+			<MethodArg Name="sTime.Minutes" ParameterName="MinutesARG" />
+			<MethodArg Name="sTime.Seconds" ParameterName="SecondsARG" />
+                        <MethodArg Name="sTime.SubSeconds" ParameterName="SubSecondsARG" />
+		</CallLibMethod>
+		<CallLibMethod Name="HAL_RTC_SetDate">
+			<MethodArg Name="sDate.Date" ParameterName="DateARG" />
+			<MethodArg Name="sDate.Year" ParameterName="YearARG" />
+		</CallLibMethod>
+		
+		<ImplementCallBack Name="HAL_RTC_MspInit" />
+		<ImplementCallBack Name="HAL_RTC_MspDeInit" />
+	</RefConfig>
+	<!-- Alarm A -->
+	<RefConfig Name="RTC_SetAlarm_A" Comment="Enable the Alarm A">
+		<CallLibMethod Name="HAL_RTC_SetAlarm">
+			<MethodArg Name="sAlarm.AlarmTime.Hours" ParameterName="HoursARG_A" />
+			<MethodArg Name="sAlarm.AlarmTime.Minutes" ParameterName="MinutesARG_A" />
+			<MethodArg Name="sAlarm.AlarmTime.Seconds" ParameterName="SecondsARG_A" />
+			<MethodArg Name="sAlarm.AlarmTime.SubSeconds" ParameterName="SubSecondsARG_A" />
+			<MethodArg Name="AlarmDateWeekDay" ParameterName="AlarmDateWeekDayARG" />
+		</CallLibMethod>
+	</RefConfig>
+	<RefConfig Name="RTC_SetAlarm_A_IT" Comment="Enable the Alarm A">
+		<CallLibMethod Name="HAL_RTC_SetAlarm_IT">
+			<MethodArg Name="sAlarm.AlarmTime.Hours" ParameterName="HoursARG_A" />
+			<MethodArg Name="sAlarm.AlarmTime.Minutes" ParameterName="MinutesARG_A" />
+			<MethodArg Name="sAlarm.AlarmTime.Seconds" ParameterName="SecondsARG_A" />
+			<MethodArg Name="sAlarm.AlarmTime.SubSeconds" ParameterName="SubSecondsARG_A" />
+			<MethodArg Name="AlarmDateWeekDay" ParameterName="AlarmDateWeekDayARG" />
+		</CallLibMethod>
+	</RefConfig>
+	
+	
+	<RefConfig Name="RTC_DeInit" Comment="Restore Default Initialisation">
+		<CallLibMethod Name="HAL_RTC_DeInit"/>
+	</RefConfig>
+
+	<!-- TimeStamp -->
+	<RefConfig Name="RTC_Timestamp" Comment="Enable the TimeStamp">
+		<CallLibMethod Name="HAL_RTCEx_SetTimeStamp">
+			<MethodArg Name="TimeStampEdge" ParameterName="TimeStampEdge"/>
+			<MethodArg Name="RTC_TimeStampPin" ParameterName="TimeStampPin"/>
+		</CallLibMethod>
+	</RefConfig>
+	<RefConfig Name="RTC_Timestamp_IT" Comment="Enable the TimeStamp">
+		<CallLibMethod Name="HAL_RTCEx_SetTimeStamp_IT">
+			<MethodArg Name="TimeStampEdge" ParameterName="TimeStampEdge"/>
+			<MethodArg Name="RTC_TimeStampPin" ParameterName="TimeStampPin"/>
+		</CallLibMethod>
+	</RefConfig>
+	
+	<!-- Calibration -->
+	<RefConfig Name="RTC_Calibration" Comment="Enable Calibration">
+		<CallLibMethod Name="HAL_RTCEx_SetCalibrationOutPut"/>
+	</RefConfig>
+	
+	<!-- RefClock -->
+	<RefConfig Name="RTC_RefClock" Comment="Enable the reference Clock input">
+		<CallLibMethod Name="HAL_RTCEx_SetRefClock"/>
+	</RefConfig>
+	
+	<LibMethod Comment="" Name="HAL_RTC_Init" Optimizable="true">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hrtc" TypeName="RTC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="RTC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="RTC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="HourFormat" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AsynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPut" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutRemap" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutType" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutPullUp" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_RTC_DeInit" Optimizable="true">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hrtc" TypeName="RTC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="RTC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="RTC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="HourFormat" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AsynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPut" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutRemap" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutType" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutPullUp" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_RTC_MspInit" Optimizable="true">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hrtc" TypeName="RTC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="RTC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="RTC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="HourFormat" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AsynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPut" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutRemap" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutType" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutPullUp" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_RTC_MspDeInit" Optimizable="true">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hrtc" TypeName="RTC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="RTC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="RTC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="HourFormat" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AsynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPut" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutRemap" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutType" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutPullUp" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_RTC_SetTime" Optimizable="true">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hrtc" TypeName="RTC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="RTC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="RTC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="HourFormat" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AsynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPut" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutRemap" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutType" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutPullUp" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="true" GenericType="struct" Name="sTime" TypeName="RTC_TimeTypeDef">
+            <Argument AddressOf="false" GenericType="simple" Name="Hours" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Minutes" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Seconds" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="SubSeconds" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TimeFormat" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="DayLightSaving" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="StoreOperation" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="false" GenericType="simple" Name="Format" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_RTC_GetTime">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hrtc" TypeName="RTC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="RTC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="RTC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="HourFormat" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AsynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPut" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutRemap" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutType" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutPullUp" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="true" GenericType="struct" Name="sTime" TypeName="RTC_TimeTypeDef">
+            <Argument AddressOf="false" GenericType="simple" Name="Hours" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Minutes" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Seconds" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="SubSeconds" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TimeFormat" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="DayLightSaving" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="StoreOperation" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="false" GenericType="simple" Name="Format" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_RTC_SetDate" Optimizable="true">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hrtc" TypeName="RTC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="RTC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="RTC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="HourFormat" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AsynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPut" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutRemap" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutType" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutPullUp" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="true" GenericType="struct" Name="sDate" TypeName="RTC_DateTypeDef">
+            <Argument AddressOf="false" GenericType="simple" Name="WeekDay" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Month" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Date" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Year" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="false" GenericType="simple" Name="Format" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_RTC_GetDate">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hrtc" TypeName="RTC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="RTC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="RTC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="HourFormat" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AsynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPut" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutRemap" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutType" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutPullUp" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="true" GenericType="struct" Name="sDate" TypeName="RTC_DateTypeDef">
+            <Argument AddressOf="false" GenericType="simple" Name="WeekDay" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Month" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Date" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Year" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="false" GenericType="simple" Name="Format" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_RTC_SetAlarm" >
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hrtc" TypeName="RTC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="RTC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="RTC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="HourFormat" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AsynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPut" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutRemap" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutType" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutPullUp" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="true" GenericType="struct" Name="sAlarm" TypeName="RTC_AlarmTypeDef">
+            <Argument AddressOf="false" GenericType="struct" Name="AlarmTime" TypeName="RTC_TimeTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="Hours" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Minutes" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Seconds" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SubSeconds" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="TimeFormat" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DayLightSaving" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="StoreOperation" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="false" GenericType="simple" Name="AlarmMask" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="AlarmSubSecondMask" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="AlarmDateWeekDaySel" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="AlarmDateWeekDay" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Alarm" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="false" GenericType="simple" Name="Format" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_RTC_SetAlarm_IT">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hrtc" TypeName="RTC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="RTC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="RTC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="HourFormat" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AsynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPut" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutRemap" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutType" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutPullUp" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="true" GenericType="struct" Name="sAlarm" TypeName="RTC_AlarmTypeDef">
+            <Argument AddressOf="false" GenericType="struct" Name="AlarmTime" TypeName="RTC_TimeTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="Hours" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Minutes" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Seconds" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SubSeconds" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="TimeFormat" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DayLightSaving" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="StoreOperation" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="false" GenericType="simple" Name="AlarmMask" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="AlarmSubSecondMask" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="AlarmDateWeekDaySel" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="AlarmDateWeekDay" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Alarm" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="false" GenericType="simple" Name="Format" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_RTC_DeactivateAlarm">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hrtc" TypeName="RTC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="RTC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="RTC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="HourFormat" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AsynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPut" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutRemap" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutType" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutPullUp" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="false" GenericType="simple" Name="Alarm" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_RTC_GetAlarm">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hrtc" TypeName="RTC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="RTC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="RTC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="HourFormat" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AsynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPut" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutRemap" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutType" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutPullUp" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="true" GenericType="struct" Name="sAlarm" TypeName="RTC_AlarmTypeDef">
+            <Argument AddressOf="false" GenericType="struct" Name="AlarmTime" TypeName="RTC_TimeTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="Hours" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Minutes" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Seconds" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SubSeconds" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="TimeFormat" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DayLightSaving" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="StoreOperation" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="false" GenericType="simple" Name="AlarmMask" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="AlarmSubSecondMask" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="AlarmDateWeekDaySel" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="AlarmDateWeekDay" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Alarm" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="false" GenericType="simple" Name="Alarm" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Format" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_RTC_AlarmIRQHandler">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hrtc" TypeName="RTC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="RTC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="RTC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="HourFormat" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AsynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPut" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutRemap" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutType" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutPullUp" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_RTC_PollForAlarmAEvent">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hrtc" TypeName="RTC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="RTC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="RTC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="HourFormat" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AsynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPut" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutRemap" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutType" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="false" GenericType="simple" Name="Timeout" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_RTC_AlarmAEventCallback">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hrtc" TypeName="RTC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="RTC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="RTC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="HourFormat" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AsynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPut" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutType" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_RTC_WaitForSynchro">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hrtc" TypeName="RTC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="RTC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="RTC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="HourFormat" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AsynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPut" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutRemap" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutType" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_RTC_GetState">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hrtc" TypeName="RTC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="RTC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="RTC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="HourFormat" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AsynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPut" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutRemap" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutType" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="RTC_EnterInitMode">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hrtc" TypeName="RTC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="RTC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="RTC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="HourFormat" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AsynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPut" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutRemap" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutType" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="RTC_ByteToBcd2">
+        <Argument AddressOf="false" GenericType="simple" Name="Value" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="RTC_Bcd2ToByte">
+        <Argument AddressOf="false" GenericType="simple" Name="Value" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_RTCEx_SetTimeStamp" Optimizable="true">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hrtc" TypeName="RTC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="RTC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="RTC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="HourFormat" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AsynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPut" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutRemap" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutType" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutPullUp" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="false" GenericType="simple" Name="TimeStampEdge" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="RTC_TimeStampPin" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_RTCEx_SetTimeStamp_IT">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hrtc" TypeName="RTC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="RTC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="RTC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="HourFormat" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AsynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPut" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutRemap" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutType" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="false" GenericType="simple" Name="TimeStampEdge" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="RTC_TimeStampPin" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_RTCEx_DeactivateTimeStamp">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hrtc" TypeName="RTC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="RTC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="RTC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="HourFormat" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AsynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPut" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutRemap" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutType" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_RTCEx_GetTimeStamp">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hrtc" TypeName="RTC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="RTC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="RTC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="HourFormat" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AsynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPut" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutRemap" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutType" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutPullUp" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="true" GenericType="struct" Name="sTimeStamp" TypeName="RTC_TimeTypeDef">
+            <Argument AddressOf="false" GenericType="simple" Name="Hours" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Minutes" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Seconds" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TimeFormat" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="DayLightSaving" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="StoreOperation" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="true" GenericType="struct" Name="sTimeStampDate" TypeName="RTC_DateTypeDef">
+            <Argument AddressOf="false" GenericType="simple" Name="WeekDay" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Month" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Date" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Year" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="false" GenericType="simple" Name="Format" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_RTCEx_SetTamper">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hrtc" TypeName="RTC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="RTC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="RTC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="HourFormat" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AsynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPut" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutRemap" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutType" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutPullUp" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="true" GenericType="struct" Name="sTamper" TypeName="RTC_TamperTypeDef">
+            <Argument AddressOf="false" GenericType="simple" Name="Tamper" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Trigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NoErase" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="MaskFlag" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Filter" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="SamplingFrequency" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="PrechargeDuration" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TamperPullUp" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TimeStampOnTamperDetection" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_RTCEx_SetTamper_IT">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hrtc" TypeName="RTC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="RTC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="RTC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="HourFormat" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AsynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPut" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutRemap" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutType" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="true" GenericType="struct" Name="sTamper" TypeName="RTC_TamperTypeDef">
+            <Argument AddressOf="false" GenericType="simple" Name="Tamper" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Trigger" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NoErase" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="MaskFlag" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Filter" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="SamplingFrequency" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="PrechargeDuration" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TamperPullUp" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TimeStampOnTamperDetection" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_RTCEx_DeactivateTamper">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hrtc" TypeName="RTC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="RTC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="RTC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="HourFormat" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AsynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPut" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutRemap" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutType" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="false" GenericType="simple" Name="Tamper" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_RTCEx_SetWakeUpTimer">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hrtc" TypeName="RTC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="RTC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="RTC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="HourFormat" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AsynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPut" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutRemap" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutType" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutPullUp" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="false" GenericType="simple" Name="WakeUpCounter" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="WakeUpClock" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_RTCEx_SetWakeUpTimer_IT">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hrtc" TypeName="RTC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="RTC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="RTC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="HourFormat" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AsynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPut" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutRemap" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutType" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="false" GenericType="simple" Name="WakeUpCounter" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="WakeUpClock" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_RTCEx_DeactivateWakeUpTimer">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hrtc" TypeName="RTC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="RTC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="RTC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="HourFormat" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AsynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPut" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutRemap" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutType" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_RTCEx_GetWakeUpTimer">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hrtc" TypeName="RTC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="RTC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="RTC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="HourFormat" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AsynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPut" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutRemap" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutType" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_RTCEx_BKUPWrite">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hrtc" TypeName="RTC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="RTC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="RTC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="HourFormat" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AsynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPut" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutRemap" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutType" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="false" GenericType="simple" Name="BackupRegister" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Data" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_RTCEx_BKUPRead">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hrtc" TypeName="RTC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="RTC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="RTC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="HourFormat" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AsynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPut" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutRemap" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutType" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="false" GenericType="simple" Name="BackupRegister" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_RTCEx_SetCoarseCalib">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hrtc" TypeName="RTC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="RTC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="RTC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="HourFormat" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AsynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPut" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutRemap" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutType" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="false" GenericType="simple" Name="CalibSign" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Value" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_RTCEx_DeactivateCoarseCalib">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hrtc" TypeName="RTC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="RTC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="RTC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="HourFormat" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AsynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPut" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutRemap" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutType" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_RTCEx_SetSmoothCalib">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hrtc" TypeName="RTC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="RTC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="RTC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="HourFormat" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AsynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPut" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutRemap" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutType" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="false" GenericType="simple" Name="SmoothCalibPeriod" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="SmoothCalibPlusPulses" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="SmouthCalibMinusPulsesValue" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_RTCEx_SetSynchroShift">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hrtc" TypeName="RTC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="RTC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="RTC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="HourFormat" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AsynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPut" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutRemap" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutType" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="false" GenericType="simple" Name="ShiftAdd1S" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="ShiftSubFS" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_RTCEx_SetCalibrationOutPut">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hrtc" TypeName="RTC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="RTC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="RTC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="HourFormat" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AsynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPut" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutRemap" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutType" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="false" GenericType="simple" Name="CalibOutput" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_RTCEx_DeactivateCalibrationOutPut">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hrtc" TypeName="RTC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="RTC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="RTC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="HourFormat" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AsynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPut" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutRemap" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutType" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_RTCEx_SetRefClock">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hrtc" TypeName="RTC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="RTC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="RTC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="HourFormat" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AsynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPut" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutRemap" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutType" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_RTCEx_DeactivateRefClock">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hrtc" TypeName="RTC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="RTC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="RTC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="HourFormat" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AsynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPut" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutRemap" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutType" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_RTCEx_EnableBypassShadow">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hrtc" TypeName="RTC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="RTC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="RTC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="HourFormat" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AsynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPut" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutRemap" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutType" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_RTCEx_DisableBypassShadow">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hrtc" TypeName="RTC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="RTC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="RTC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="HourFormat" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AsynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPut" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutRemap" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutType" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_RTCEx_TamperTimeStampIRQHandler">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hrtc" TypeName="RTC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="RTC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="RTC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="HourFormat" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AsynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPut" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutRemap" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutType" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_RTCEx_WakeUpTimerIRQHandler">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hrtc" TypeName="RTC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="RTC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="RTC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="HourFormat" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AsynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPut" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutRemap" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutType" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_RTCEx_AlarmBEventCallback">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hrtc" TypeName="RTC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="RTC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="RTC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="HourFormat" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AsynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPut" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutRemap" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutType" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_RTCEx_TimeStampEventCallback">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hrtc" TypeName="RTC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="RTC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="RTC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="HourFormat" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AsynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPut" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutRemap" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutType" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_RTCEx_WakeUpTimerEventCallback">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hrtc" TypeName="RTC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="RTC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="RTC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="HourFormat" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AsynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPut" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutRemap" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutType" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_RTCEx_Tamper1EventCallback">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hrtc" TypeName="RTC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="RTC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="RTC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="HourFormat" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AsynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPut" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutRemap" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutType" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_RTCEx_Tamper2EventCallback">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hrtc" TypeName="RTC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="RTC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="RTC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="HourFormat" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AsynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPut" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutRemap" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutType" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_RTCEx_PollForAlarmBEvent">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hrtc" TypeName="RTC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="RTC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="RTC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="HourFormat" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AsynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPut" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutRemap" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutType" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="false" GenericType="simple" Name="Timeout" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_RTCEx_PollForTimeStampEvent">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hrtc" TypeName="RTC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="RTC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="RTC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="HourFormat" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AsynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPut" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutRemap" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutType" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="false" GenericType="simple" Name="Timeout" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_RTCEx_PollForTamper1Event">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hrtc" TypeName="RTC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="RTC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="RTC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="HourFormat" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AsynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPut" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutRemap" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutType" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="false" GenericType="simple" Name="Timeout" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_RTCEx_PollForTamper2Event">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hrtc" TypeName="RTC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="RTC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="RTC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="HourFormat" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AsynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SynchPrediv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPut" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutRemap" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OutPutType" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <RefComponent Cclass="HAL" Cgroup="RTC" Cversion="0.3.0">
+        <File Category="header" Name="Drivers/STM32C0xx_HAL_Driver/Inc/stm32c0xx_hal_rtc.h"/>
+        <File Category="source" Name="Drivers/STM32C0xx_HAL_Driver/Src/stm32c0xx_hal_rtc.c"/>
+		<File Category="header" Name="Drivers/STM32C0xx_HAL_Driver/Inc/stm32c0xx_hal_rtc_ex.h"/>
+        <File Category="source" Name="Drivers/STM32C0xx_HAL_Driver/Src/stm32c0xx_hal_rtc_ex.c"/>
+    </RefComponent>
+</IP>

@@ -158,7 +158,7 @@ void ${TX_LOW_POWER_TIMER_SETUP_value}(ULONG count)
   * @param  None
   * @retval None
   */
-void ${TX_LOW_POWER_USER_ENTER_value}()
+void ${TX_LOW_POWER_USER_ENTER_value}(void)
 {
   /* USER CODE BEGIN  ${TX_LOW_POWER_USER_ENTER_value} */
 
@@ -172,7 +172,7 @@ void ${TX_LOW_POWER_USER_ENTER_value}()
   * @param  None
   * @retval None
   */
-void ${TX_LOW_POWER_USER_EXIT_value}()
+void ${TX_LOW_POWER_USER_EXIT_value}(void)
 {
   /* USER CODE BEGIN  ${TX_LOW_POWER_USER_EXIT_value} */
 
@@ -186,7 +186,7 @@ void ${TX_LOW_POWER_USER_EXIT_value}()
   * @param  None
   * @retval Amount of time (in ticks)
   */
-ULONG ${TX_LOW_POWER_USER_TIMER_ADJUST_value}()
+ULONG ${TX_LOW_POWER_USER_TIMER_ADJUST_value}(void)
 {
   /* USER CODE BEGIN  ${TX_LOW_POWER_USER_TIMER_ADJUST_value} */
   return 0;

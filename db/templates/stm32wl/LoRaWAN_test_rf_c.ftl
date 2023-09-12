@@ -16,7 +16,16 @@
 #include "sys_app.h"
 #include "test_rf.h"
 #include "radio.h"
+[#if THREADX??][#-- If AzRtos is used --]
+#include "app_azure_rtos.h"
+#include "tx_api.h"
+[#else]
+[#if !FREERTOS??][#-- If FreeRtos is not used --]
 #include "stm32_seq.h"
+[#else]
+#include "cmsis_os.h"
+[/#if]
+[/#if]
 #include "utilities_def.h"
 
 /* USER CODE BEGIN Includes */
@@ -48,8 +57,8 @@
 #define LORA_IQ_INVERSION_OFF         false
 #define TX_TEST_TONE                  (1<<0)
 #define RX_TEST_RSSI                  (1<<1)
-#define TX_TEST_LORA                  (1<<2)
-#define RX_TEST_LORA                  (1<<3)
+#define TX_TEST_MODU                  (1<<2)
+#define RX_TEST_MODU                  (1<<3)
 #define RX_TIMEOUT_VALUE              5000
 #define RX_CONTINUOUS_ON              1
 #define PRBS9_INIT                    ( ( uint16_t) 2 )
@@ -90,6 +99,15 @@ static RadioEvents_t RadioEvents;
  */
 static uint8_t payload[256] = {0};
 
+[#if THREADX??][#-- If AzRtos is used --]
+/* RadioOnTstRF Semaphore*/
+static TX_SEMAPHORE Sem_RadioOnTstRF;
+
+[/#if]
+[#if FREERTOS??][#-- If FreeRtos is used --]
+static osSemaphoreId_t Sem_RadioOnTstRF;
+
+[/#if]
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -130,6 +148,38 @@ void OnRxError(void);
 /* USER CODE END PFP */
 
 /* Exported functions --------------------------------------------------------*/
+[#if THREADX??][#-- If AzRtos is used --]
+int32_t  TST_Semaphore_Init(void)
+{
+  /* USER CODE BEGIN TST_Semaphore_Init_1 */
+
+  /* USER CODE END TST_Semaphore_Init_1 */
+  /* Create the semaphore.  */
+  if (tx_semaphore_create(&Sem_RadioOnTstRF, "Sem_RadioOnTstRF", 0) != TX_SUCCESS)
+  {
+    return -1;
+  }
+  return 0;
+  /* USER CODE BEGIN TST_Semaphore_Init_2 */
+
+  /* USER CODE END TST_Semaphore_Init_2 */
+}
+
+[/#if]
+[#if FREERTOS??][#-- If FreeRtos is used --]
+void  TST_Semaphore_Init(void)
+{
+  /* USER CODE BEGIN TST_Semaphore_Init_1 */
+
+  /* USER CODE END TST_Semaphore_Init_1 */
+  Sem_RadioOnTstRF = osSemaphoreNew(1, 0, NULL);   /*< Create the semaphore and make it busy at initialization */
+
+  /* USER CODE BEGIN TST_Semaphore_Init_2 */
+
+  /* USER CODE END TST_Semaphore_Init_2 */
+}
+
+[/#if]
 int32_t TST_TxTone(void)
 {
   /* USER CODE BEGIN TST_TxTone_1 */
@@ -180,7 +230,7 @@ int32_t TST_RxRssi(void)
     RxConfig.fsk.PreambleLen = 3;   /*in Byte*/
     RxConfig.fsk.SyncWordLength = 3; /*in Byte*/
     RxConfig.fsk.SyncWord = syncword; /*SyncWord Buffer*/
-    RxConfig.fsk.whiteSeed = 0x01FF ; /*WhiteningSeed*/
+    RxConfig.fsk.whiteSeed = 0x01FF; /*WhiteningSeed*/
     RxConfig.fsk.LengthMode = RADIO_FSK_PACKET_VARIABLE_LENGTH; /* If the header is explicit, it will be transmitted in the GFSK packet. If the header is implicit, it will not be transmitted*/
     RxConfig.fsk.CrcLength = RADIO_FSK_CRC_2_BYTES_CCIT;       /* Size of the CRC block in the GFSK packet*/
     RxConfig.fsk.CrcPolynomial = 0x1021;
@@ -264,11 +314,11 @@ int32_t TST_TX_Start(int32_t nb_packet)
   int32_t i;
   TxConfigGeneric_t TxConfig;
 
-  if ((TestState & TX_TEST_LORA) != TX_TEST_LORA)
+  if ((TestState & TX_TEST_MODU) != TX_TEST_MODU)
   {
-    TestState |= TX_TEST_LORA;
+    TestState |= TX_TEST_MODU;
 
-    APP_TPRINTF("Tx LoRa Test\r\n");
+    APP_TPRINTF("Tx Test\r\n");
 
     /* Radio initialization */
     RadioEvents.TxDone = OnTxDone;
@@ -291,18 +341,33 @@ int32_t TST_TX_Start(int32_t nb_packet)
         /*fsk modulation*/
         uint8_t syncword[] = { 0xC1, 0x94, 0xC1, 0x00, 0x00, 0x00, 0x00, 0x00 };
         TxConfig.fsk.ModulationShaping = (RADIO_FSK_ModShapings_t)((testParam.BTproduct == 0) ? 0 : testParam.BTproduct + 7);
-        TxConfig.fsk.Bandwidth = testParam.bandwidth;
         TxConfig.fsk.FrequencyDeviation = testParam.fskDev;
         TxConfig.fsk.BitRate = testParam.loraSf_datarate; /*BitRate*/
         TxConfig.fsk.PreambleLen = 3;   /*in Byte        */
         TxConfig.fsk.SyncWordLength = 3; /*in Byte        */
         TxConfig.fsk.SyncWord = syncword; /*SyncWord Buffer*/
-        TxConfig.fsk.whiteSeed = 0x01FF ; /*WhiteningSeed  */
+        TxConfig.fsk.whiteSeed = 0x01FF; /*WhiteningSeed  */
         TxConfig.fsk.HeaderType = RADIO_FSK_PACKET_VARIABLE_LENGTH; /* If the header is explicit, it will be transmitted in the GFSK packet. If the header is implicit, it will not be transmitted*/
         TxConfig.fsk.CrcLength = RADIO_FSK_CRC_2_BYTES_CCIT;       /* Size of the CRC block in the GFSK packet*/
         TxConfig.fsk.CrcPolynomial = 0x1021;
         TxConfig.fsk.Whitening = RADIO_FSK_DC_FREE_OFF;
         Radio.RadioSetTxGenericConfig(GENERIC_FSK, &TxConfig, testParam.power, TX_TIMEOUT_VALUE);
+      }
+      else if (testParam.modulation == TEST_MSK)
+      {
+        /*fsk modulation*/
+        uint8_t syncword[] = { 0xC1, 0x94, 0xC1, 0x00, 0x00, 0x00, 0x00, 0x00 };
+        TxConfig.msk.ModulationShaping = (RADIO_FSK_ModShapings_t)((testParam.BTproduct == 0) ? 0 : testParam.BTproduct + 7);
+        TxConfig.msk.BitRate = testParam.loraSf_datarate; /*BitRate*/
+        TxConfig.msk.PreambleLen = 3;   /*in Byte        */
+        TxConfig.msk.SyncWordLength = 3; /*in Byte        */
+        TxConfig.msk.SyncWord = syncword; /*SyncWord Buffer*/
+        TxConfig.msk.whiteSeed = 0x01FF; /*WhiteningSeed  */
+        TxConfig.msk.HeaderType = RADIO_FSK_PACKET_VARIABLE_LENGTH; /* If the header is explicit, it will be transmitted in the GFSK packet. If the header is implicit, it will not be transmitted*/
+        TxConfig.msk.CrcLength = RADIO_FSK_CRC_2_BYTES_CCIT;       /* Size of the CRC block in the GFSK packet*/
+        TxConfig.msk.CrcPolynomial = 0x1021;
+        TxConfig.msk.Whitening = RADIO_FSK_DC_FREE_OFF;
+        Radio.RadioSetTxGenericConfig(GENERIC_MSK, &TxConfig, testParam.power, TX_TIMEOUT_VALUE);
       }
       else if (testParam.modulation == TEST_LORA)
       {
@@ -329,7 +394,15 @@ int32_t TST_TX_Start(int32_t nb_packet)
       /* Send payload once*/
       Radio.Send(payload, testParam.payloadLen);
       /* Wait Tx done/timeout */
+[#if THREADX??][#-- If AzRtos is used --]
+      while (tx_semaphore_get(&Sem_RadioOnTstRF, TX_WAIT_FOREVER) != TX_SUCCESS) {}
+[#else]
+[#if !FREERTOS??][#-- If FreeRtos is not used --]
       UTIL_SEQ_WaitEvt(1 << CFG_SEQ_Evt_RadioOnTstRF);
+[#else]
+      osSemaphoreAcquire(Sem_RadioOnTstRF, osWaitForever);
+[/#if]
+[/#if]
       Radio.Sleep();
 
       if (RadioTxDone_flag == 1)
@@ -354,7 +427,7 @@ int32_t TST_TX_Start(int32_t nb_packet)
       RadioTxTimeout_flag = 0;
       RadioError_flag = 0;
     }
-    TestState &= ~TX_TEST_LORA;
+    TestState &= ~TX_TEST_MODU;
     return 0;
   }
   else
@@ -378,9 +451,9 @@ int32_t TST_RX_Start(int32_t nb_packet)
   uint32_t PER = 0;
   RxConfigGeneric_t RxConfig = {0};
 
-  if (((TestState & RX_TEST_LORA) != RX_TEST_LORA) && (nb_packet > 0))
+  if (((TestState & RX_TEST_MODU) != RX_TEST_MODU) && (nb_packet > 0))
   {
-    TestState |= RX_TEST_LORA;
+    TestState |= RX_TEST_MODU;
 
     /* Radio initialization */
     RadioEvents.TxDone = OnTxDone;
@@ -406,7 +479,7 @@ int32_t TST_RX_Start(int32_t nb_packet)
         RxConfig.fsk.SyncWordLength = 3; /*in Byte*/
         RxConfig.fsk.SyncWord = syncword; /*SyncWord Buffer*/
         RxConfig.fsk.PreambleMinDetect = RADIO_FSK_PREAMBLE_DETECTOR_08_BITS;
-        RxConfig.fsk.whiteSeed = 0x01FF ; /*WhiteningSeed*/
+        RxConfig.fsk.whiteSeed = 0x01FF; /*WhiteningSeed*/
         RxConfig.fsk.LengthMode = RADIO_FSK_PACKET_VARIABLE_LENGTH; /* If the header is explicit, it will be transmitted in the GFSK packet. If the header is implicit, it will not be transmitted*/
         RxConfig.fsk.CrcLength = RADIO_FSK_CRC_2_BYTES_CCIT;       /* Size of the CRC block in the GFSK packet*/
         RxConfig.fsk.CrcPolynomial = 0x1021;
@@ -430,13 +503,29 @@ int32_t TST_RX_Start(int32_t nb_packet)
       }
       else
       {
-        return -1; /*error*/
+        /* excluding MSK Rx */
+        return -1; /* error */
       }
 
-      Radio.Rx(RX_TIMEOUT_VALUE);
+      if (testParam.lna == 0)
+      {
+        Radio.Rx(RX_TIMEOUT_VALUE);
+      }
+      else
+      {
+        Radio.RxBoosted(RX_TIMEOUT_VALUE);
+      }
 
       /* Wait Rx done/timeout */
+[#if THREADX??][#-- If AzRtos is used --]
+      while (tx_semaphore_get(&Sem_RadioOnTstRF, TX_WAIT_FOREVER) != TX_SUCCESS) {}
+[#else]
+[#if !FREERTOS??][#-- If FreeRtos is not used --]
       UTIL_SEQ_WaitEvt(1 << CFG_SEQ_Evt_RadioOnTstRF);
+[#else]
+      osSemaphoreAcquire(Sem_RadioOnTstRF, osWaitForever);
+[/#if]
+[/#if]
       Radio.Sleep();
 
       if (RadioRxDone_flag == 1)
@@ -482,7 +571,7 @@ int32_t TST_RX_Start(int32_t nb_packet)
       PER = (100 * (count_RxKo)) / (count_RxKo + count_RxOk);
       APP_TPRINTF("Rx %d of %d  >>> PER= %d %%\r\n", i, nb_packet, PER);
     }
-    TestState &= ~RX_TEST_LORA;
+    TestState &= ~RX_TEST_MODU;
     return 0;
   }
   else
@@ -507,7 +596,16 @@ void OnTxDone(void)
   /* USER CODE END OnTxDone_1 */
   /* Set TxDone flag */
   RadioTxDone_flag = 1;
+[#if THREADX??][#-- If AzRtos is used --]
+  /* Set the semaphore to release the Sem_RadioOnTstRF Thread */
+  tx_semaphore_put(&Sem_RadioOnTstRF);
+[#else]
+[#if !FREERTOS??][#-- If FreeRtos is not used --]
   UTIL_SEQ_SetEvt(1 << CFG_SEQ_Evt_RadioOnTstRF);
+[#else]
+  osSemaphoreRelease(Sem_RadioOnTstRF);
+[/#if]
+[/#if]
   /* USER CODE BEGIN OnTxDone_2 */
 
   /* USER CODE END OnTxDone_2 */
@@ -523,7 +621,16 @@ void OnRxDone(uint8_t *payload, uint16_t size, int16_t rssi, int8_t LoraSnr_FskC
 
   /* Set Rxdone flag */
   RadioRxDone_flag = 1;
+[#if THREADX??][#-- If AzRtos is used --]
+  /* Set the semaphore to release the Sem_RadioOnTstRF Thread */
+  tx_semaphore_put(&Sem_RadioOnTstRF);
+[#else]
+[#if !FREERTOS??][#-- If FreeRtos is not used --]
   UTIL_SEQ_SetEvt(1 << CFG_SEQ_Evt_RadioOnTstRF);
+[#else]
+  osSemaphoreRelease(Sem_RadioOnTstRF);
+[/#if]
+[/#if]
   /* USER CODE BEGIN OnRxDone_2 */
 
   /* USER CODE END OnRxDone_2 */
@@ -536,7 +643,16 @@ void OnTxTimeout(void)
   /* USER CODE END OnTxTimeout_1 */
   /* Set timeout flag */
   RadioTxTimeout_flag = 1;
+[#if THREADX??][#-- If AzRtos is used --]
+  /* Set the semaphore to release the Sem_RadioOnTstRF Thread */
+  tx_semaphore_put(&Sem_RadioOnTstRF);
+[#else]
+[#if !FREERTOS??][#-- If FreeRtos is not used --]
   UTIL_SEQ_SetEvt(1 << CFG_SEQ_Evt_RadioOnTstRF);
+[#else]
+  osSemaphoreRelease(Sem_RadioOnTstRF);
+[/#if]
+[/#if]
   /* USER CODE BEGIN OnTxTimeout_2 */
 
   /* USER CODE END OnTxTimeout_2 */
@@ -549,7 +665,16 @@ void OnRxTimeout(void)
   /* USER CODE END OnRxTimeout_1 */
   /* Set timeout flag */
   RadioRxTimeout_flag = 1;
+[#if THREADX??][#-- If AzRtos is used --]
+  /* Set the semaphore to release the Sem_RadioOnTstRF Thread */
+  tx_semaphore_put(&Sem_RadioOnTstRF);
+[#else]
+[#if !FREERTOS??][#-- If FreeRtos is not used --]
   UTIL_SEQ_SetEvt(1 << CFG_SEQ_Evt_RadioOnTstRF);
+[#else]
+  osSemaphoreRelease(Sem_RadioOnTstRF);
+[/#if]
+[/#if]
   /* USER CODE BEGIN OnRxTimeout_2 */
 
   /* USER CODE END OnRxTimeout_2 */
@@ -562,7 +687,16 @@ void OnRxError(void)
   /* USER CODE END OnRxError_1 */
   /* Set error flag */
   RadioError_flag = 1;
+[#if THREADX??][#-- If AzRtos is used --]
+  /* Set the semaphore to release the Sem_RadioOnTstRF Thread */
+  tx_semaphore_put(&Sem_RadioOnTstRF);
+[#else]
+[#if !FREERTOS??][#-- If FreeRtos is not used --]
   UTIL_SEQ_SetEvt(1 << CFG_SEQ_Evt_RadioOnTstRF);
+[#else]
+  osSemaphoreRelease(Sem_RadioOnTstRF);
+[/#if]
+[/#if]
   /* USER CODE BEGIN OnRxError_2 */
 
   /* USER CODE END OnRxError_2 */

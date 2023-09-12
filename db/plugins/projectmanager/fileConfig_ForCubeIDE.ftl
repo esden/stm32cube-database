@@ -25,18 +25,22 @@
                 [#break]
             [#else]
                 [#if underRoot != "true" || filesName?starts_with("..") || copyAsReference == "true"]
+[#if !isExcludedFromBuild(filesName)]
         <file>
             <name>${filesName!''}</name>                    
         </file>
+[/#if]
                 [/#if]
             [/#if]
         [/#list]
         [#if grouplibExist=="1"]
             [#list groupArg.sourceFilesNameList as filesName]
                 [#if filesName?ends_with(".a")||filesName?ends_with(".lib")]
+[#if !isExcludedFromBuild(filesName)]
     <file>
         <name>${filesName!''}</name>
     </file>
+[/#if]
     [/#if]             
             [/#list]
         [/#if]
@@ -447,9 +451,11 @@
 [#assign listFTR = " "]
 [#list SourceFilesToRemove as SourceFile]
         [#if SourceFile!="null" && !listFTR?contains(SourceFile)]
+[#if !isExcludedFromBuild(SourceFile)]
 <file>
             <name>${SourceFile}</name>
  </file>
+[/#if]
 [#assign listFTR = listFTR +" "+ SourceFile]
     [/#if]
 [/#list]
@@ -535,6 +541,7 @@
                             [#assign exclude = true] 
                             [#assign MwRoot =  usedMWandRootFolder[middName]] 
                             <file>
+[#if !isExcludedFromBuild(filesName)]
                             [#if MwRoot?ends_with("/")]
                                [#assign MwRoot = MwRoot?keep_before_last("/")]
                             [/#if]
@@ -558,6 +565,7 @@
                                 [/#if]
                             [/#list]
                         </file> 
+[/#if]
                         [/#list]
                 </sourceEntry>
             [#else]                
@@ -620,9 +628,11 @@
             <name>${grp.name!''}</name>
                     [#if grp.sourceFilesNameList??]
                         [#list grp.sourceFilesNameList as filesName]	
+[#if !isExcludedFromBuild(filesName)]
             <file>
         	<name>${filesName!''}</name>
-            </file>        					
+            </file>    
+[/#if]    					
                         [/#list]				
                     [/#if]
             	[/#list]
@@ -641,9 +651,11 @@
                     <name>${subGrp.name!''}</name>
                                 [#if subGrp.sourceFilesNameList??]
                                     [#list subGrp.sourceFilesNameList as filesName]
+[#if !isExcludedFromBuild(filesName)]
                         <file>
                             <name>${filesName!''}</name>											
                         </file>
+[/#if]
                                     [/#list]
                                 [/#if]
                     </group>
@@ -664,9 +676,11 @@
                 <name>${subGrp.name!''}</name>
                             [#if subGrp.sourceFilesNameList??]
                                 [#list subGrp.sourceFilesNameList as filesName]
+[#if !isExcludedFromBuild(filesName)]
                     <file>
                         <name>${filesName!''}</name>											
                     </file>
+[/#if]
                                 [/#list]
                             [/#if]
                 </group>
@@ -689,9 +703,11 @@
                     [/#if]
                 [/#if]
                 [#if removeFromConfig == "0"]
+[#if !isExcludedFromBuild(filesName)]
                     <file>
                         <name>${filesName!''}</name>                        
                     </file>
+[/#if]
                 [/#if]
             [/#list]
         [/#if]
@@ -736,9 +752,11 @@
                                                         [/#if]
                                                     [/#if]
                                                     [#if removeFromConfig == "0"]
+[#if !isExcludedFromBuild(filesName)]
                                                         <file>
                                                             <name>${filesName!''}</name>                                                            
                                                         </file>
+[/#if]
                                                     [/#if]
                                                 [/#list]
                                             [/#if]
@@ -756,9 +774,11 @@
                                                                 [/#if]
                                                             [/#if]
                                                             [#if removeFromConfig == "0"]
+[#if !isExcludedFromBuild(filesName)]
                                                                 <file>
                                                                     <name>${filesName!''}</name>                                                                    
                                                                 </file>
+[/#if]
                                                             [/#if]
                                                         [/#list]
                                                         </group>
@@ -797,8 +817,10 @@
                                         [/#if]
                                         [#if removeFromConfig == "0"]
                 <file>
+[#if !isExcludedFromBuild(filesName)]
                     <name>${filesName!''}</name>                    
                 </file>
+[/#if]
                                         [/#if]
                                 [/#list]
                         [/#if]
@@ -956,10 +978,12 @@
             [#list deviceDriverGroups as grp]
         <name>${grp.name!''}</name>
                 [#if grp.sourceFilesNameList??]
-                    [#list grp.sourceFilesNameList as filesName]	
+                    [#list grp.sourceFilesNameList as filesName]
+[#if !isExcludedFromBuild(filesName)]	
         <file>
             <name>${filesName!''}</name>
-        </file>        					
+        </file>        			
+[/#if]		
                     [/#list]				
                 [/#if]
             [/#list]
@@ -978,9 +1002,11 @@
                     <name>${subGrp.name!''}</name>
                                 [#if subGrp.sourceFilesNameList??]
                                     [#list subGrp.sourceFilesNameList as filesName]
+[#if !isExcludedFromBuild(filesName)]
                         <file>
                             <name>${filesName!''}</name>											
                         </file>
+[/#if]
                                     [/#list]
                                 [/#if]
                     </group>
@@ -1001,9 +1027,11 @@
                 <name>${subGrp.name!''}</name>
                             [#if subGrp.sourceFilesNameList??]
                                 [#list subGrp.sourceFilesNameList as filesName]
+[#if !isExcludedFromBuild(filesName)]
                     <file>
                         <name>${filesName!''}</name>											
                     </file>
+[/#if]
                                 [/#list]
                             [/#if]
                 </group>
@@ -1026,9 +1054,11 @@
                         [/#if]
                     [/#if]
                     [#if removeFromConfig == "0"]
+[#if !isExcludedFromBuild(filesName)]
                         <file>
                             <name>${filesName!''}</name>                        
                         </file>
+[/#if]
                     [/#if]
                 [/#list]
             [/#if]
@@ -1097,9 +1127,11 @@
                                                         [/#if]
                                                     [/#if]
                                                     [#if removeFromConfig == "0"]
+[#if !isExcludedFromBuild(filesName)]
                                                         <file>
                                                             <name>${filesName!''}</name>                                                            
                                                         </file>
+[/#if]
                                                     [/#if]
                                                 [/#list]
                                             [/#if]
@@ -1117,9 +1149,11 @@
                                                                 [/#if]
                                                             [/#if]
                                                             [#if removeFromConfig == "0"]
+[#if !isExcludedFromBuild(filesName)]
                                                                 <file>
                                                                     <name>${filesName!''}</name>                                                                    
                                                                 </file>
+[/#if]
                                                             [/#if]
                                                         [/#list]
                                                         </group>
@@ -1163,9 +1197,11 @@
                                                 [/#if]
                                         [/#if]
                                         [#if removeFromConfig == "0"]
+[#if !isExcludedFromBuild(filesName)]
                 <file>
                     <name>${filesName!''}</name>                    
                 </file>
+[/#if]
                                         [/#if]
                                 [/#list]
                         [/#if]
@@ -1194,9 +1230,11 @@
             <name>${grp.name!''}</name>
                     [#if grp.sourceFilesNameList??]
                         [#list grp.sourceFilesNameList as filesName]	
+[#if !isExcludedFromBuild(filesName)]
             <file>
         	<name>${filesName!''}</name>
-            </file>        					
+            </file>        		
+[/#if]			
                         [/#list]				
                     [/#if]
             	[/#list]
@@ -1215,9 +1253,11 @@
                     <name>${subGrp.name!''}</name>
                                 [#if subGrp.sourceFilesNameList??]
                                     [#list subGrp.sourceFilesNameList as filesName]
+[#if !isExcludedFromBuild(filesName)]
                         <file>
                             <name>${filesName!''}</name>											
                         </file>
+[/#if]
                                     [/#list]
                                 [/#if]
                     </group>
@@ -1238,9 +1278,11 @@
                 <name>${subGrp.name!''}</name>
                             [#if subGrp.sourceFilesNameList??]
                                 [#list subGrp.sourceFilesNameList as filesName]
+[#if !isExcludedFromBuild(filesName)]
                     <file>
                         <name>${filesName!''}</name>											
                     </file>
+[/#if]
                                 [/#list]
                             [/#if]
                 </group>
@@ -1263,9 +1305,11 @@
                         [/#if]
                     [/#if]
                     [#if removeFromConfig == "0"]
+[#if !isExcludedFromBuild(filesName)]
                         <file>
                             <name>${filesName!''}</name>                        
                         </file>
+[/#if]
                     [/#if]
                 [/#list]
             [/#if]
@@ -1276,10 +1320,11 @@
                 [#assign cmsisFilesAdded = ""]
                 [#list cmsisSourceFileNameList as filesName]
                    [#if !cmsisFilesAdded?contains(filesName?replace("\\","/"))]
+[#if !isExcludedFromBuild(filesName)]
                            <file>
                                        <name>${filesName?replace("\\","/")}</name>
                                        </file>
-
+[/#if]
                        [#assign cmsisFilesAdded = cmsisFilesAdded + " - " + filesName?replace("\\","/")]
                    [/#if]
                 [/#list]
@@ -1335,9 +1380,11 @@
                                                         [/#if]
                                                     [/#if]
                                                     [#if removeFromConfig == "0"]
+[#if !isExcludedFromBuild(filesName)]
                                                         <file>
                                                             <name>${filesName!''}</name>                                                            
                                                         </file>
+[/#if]
                                                     [/#if]
                                                 [/#list]
                                             [/#if]
@@ -1355,9 +1402,11 @@
                                                                 [/#if]
                                                             [/#if]
                                                             [#if removeFromConfig == "0"]
+[#if !isExcludedFromBuild(filesName)]
                                                                 <file>
                                                                     <name>${filesName!''}</name>                                                                    
                                                                 </file>
+[/#if]
                                                             [/#if]
                                                         [/#list]
                                                         </group>
@@ -1399,9 +1448,11 @@
                                                 [/#if]
                                         [/#if]
                                         [#if removeFromConfig == "0"]
+[#if !isExcludedFromBuild(filesName)]
                 <file>
                     <name>${filesName!''}</name>                    
                 </file>
+[/#if]
                                         [/#if]
                                 [/#list]
                         [/#if]
@@ -1419,9 +1470,11 @@
         [/#if]
         [#list mxSourceFilesNameList as mxCFiles]
             [#if mxCFiles?contains("Src")]
+[#if !isExcludedFromBuild(mxFiles)]
                 <file>
                     <name>${mxCFiles}</name>
                     </file>
+[/#if]
             [/#if]
         [/#list]
         [#if mxSourceDir?replace("\\","/") == "Core/Src"]
@@ -1445,9 +1498,11 @@
             <name>${grp.name!''}</name> 
         [#if grp.sourceFilesNameList??]
             [#list grp.sourceFilesNameList as filesName]
+[#if !isExcludedFromBuild(filesName)]
             <file>
                 <name>${filesName!''}</name>
                 </file>
+[/#if]
             [/#list]
         [/#if]
             [#if grp.subGroups??]
@@ -1456,9 +1511,11 @@
                 <name>${subGrp.name!''}</name>
                     [#if subGrp.sourceFilesNameList??]
                             [#list subGrp.sourceFilesNameList as filesName]
+[#if !isExcludedFromBuild(filesName)]
                 <file>
                     <name>${filesName!''}</name>
                     </file>
+[/#if]
                             [/#list]
                     [/#if]
                 </group>
@@ -1473,3 +1530,13 @@
 
 </Project>
 [/#macro]
+[#function isExcludedFromBuild(file)]
+[#if excludedFilesFromBuild?? && excludedFilesFromBuild?size>0]
+    [#list excludedFilesFromBuild as exFile]
+        [#if file?replace("\\","/")?ends_with(exFile)]
+        [#return true]
+        [/#if]
+    [/#list]
+[/#if]
+[#return false]
+[/#function]

@@ -40,6 +40,7 @@
 #include "sgfx_eeprom_if.h"
 [#if (CPUCORE == "CM0PLUS") || (CPUCORE == "")]
 #include "ee.h"
+#include "ee_conf.h"
 [#elseif CPUCORE == "CM4"]
 #include "system_mbwrapper.h"
 [/#if]
@@ -210,7 +211,7 @@ int8_t E2P_Read_Power(sfx_rc_enum_t SgfxRc)
   /* USER CODE BEGIN E2P_Read_Power_1 */
 
   /* USER CODE END E2P_Read_Power_1 */
-  uint32_t power ;
+  uint32_t power;
   switch (SgfxRc)
   {
     case SFX_RC1:
@@ -298,7 +299,7 @@ sfx_rc_enum_t E2P_Read_Rc(void)
   /* USER CODE BEGIN E2P_Read_Rc_1 */
 
   /* USER CODE END E2P_Read_Rc_1 */
-  uint32_t SgfxRc ;
+  uint32_t SgfxRc;
   E2P_Read(EE_SGFX_RC_ID, &SgfxRc);
   return (sfx_rc_enum_t) SgfxRc;
   /* USER CODE BEGIN E2P_Read_Rc_2 */
@@ -330,7 +331,7 @@ int16_t E2P_Read_RssiCal(void)
   /* USER CODE BEGIN E2P_Read_RssiCal_1 */
 
   /* USER CODE END E2P_Read_RssiCal_1 */
-  uint32_t rssi_cal ;
+  uint32_t rssi_cal;
   E2P_Read(EE_RSSI_CAL_ID, &rssi_cal);
   return (int16_t) rssi_cal;
   /* USER CODE BEGIN E2P_Read_RssiCal_2 */
@@ -362,7 +363,7 @@ uint32_t E2P_Read_AtEcho(void)
   /* USER CODE BEGIN E2P_Read_AtEcho_1 */
 
   /* USER CODE END E2P_Read_AtEcho_1 */
-  uint32_t at_echo ;
+  uint32_t at_echo;
   E2P_Read(EE_AT_ECHO_ID, &at_echo);
   return (E2P_flagStatus_t) at_echo;
   /* USER CODE BEGIN E2P_Read_AtEcho_2 */
@@ -840,4 +841,3 @@ static void E2P_Read(e_EE_ID addr, uint32_t *data)
 /* USER CODE BEGIN PrFD */
 
 /* USER CODE END PrFD */
-

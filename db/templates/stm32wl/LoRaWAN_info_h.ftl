@@ -6,7 +6,7 @@
   * @author  MCD Application Team
   * @brief   To give info to the application about LoRaWAN configuration
   ******************************************************************************
-  [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
+[@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
 /* USER CODE END Header */

@@ -45,20 +45,44 @@
 #include "usart_if.h"
 #include "stm32_tiny_sscanf.h"
 #include "sgfx_app_version.h"
+[#if CPUCORE == ""]
+#include "sigfox_version.h"
+#include "subghz_phy_version.h"
+[/#if]
 #include "sgfx_eeprom_if.h"
 #include "sigfox_monarch_api.h"
 #include "se_nvm.h"
 #include "adc_if.h"
 #include "sys_app.h"
+[#if THREADX??][#-- If AzRtos is used --]
+#include "app_azure_rtos.h"
+#include "tx_api.h"
+[#else]
+[#if !FREERTOS??][#-- If FreeRtos is not used --]
 #include "stm32_seq.h"
+[#else]
+#include "cmsis_os.h"
+[/#if]
+[/#if]
 #include "stm32_lpm.h"
 #include "utilities_def.h"
+[#if CPUCORE == "CM4"]
+#include "mbmuxif_sys.h"
+[/#if]
 
 /* USER CODE BEGIN Includes */
 
 /* USER CODE END Includes */
 
 /* External variables ---------------------------------------------------------*/
+[#if THREADX??]
+extern TX_SEMAPHORE  Sem_Monarch;
+
+[/#if]
+[#if FREERTOS??][#-- If FreeRtos is used --]
+extern osSemaphoreId_t Sem_Monarch;
+
+[/#if]
 /* USER CODE BEGIN EV */
 
 /* USER CODE END EV */
@@ -79,9 +103,9 @@
 /**
   * @brief Macro to return when an error occurs
   */
-#define CHECK_STATUS(status) do {                                                 \
-                                 ATEerror_t at_status = translate_status(status); \
-                                 if (at_status != AT_OK) { return at_status; }    \
+#define CHECK_STATUS(status) do {                                                  \
+                                  ATEerror_t at_status = translate_status(status); \
+                                  if (at_status != AT_OK) { return at_status; }    \
                                 } while (0)
 
 /* USER CODE BEGIN PM */
@@ -428,8 +452,62 @@ ATEerror_t AT_version_get(const char *param)
   /* USER CODE BEGIN AT_version_get_1 */
 
   /* USER CODE END AT_version_get_1 */
+[#if CPUCORE == "CM4"]
+  FEAT_INFO_Param_t *p_cm0plus_specific_features_info;
+  uint32_t feature_version;
+[/#if]
   sfx_u8 *version;
   sfx_u8 size;
+
+[#if CPUCORE == "CM4"]
+  /* Get CM4 Sigfox APP version*/
+  APP_LOG(TS_OFF, VLEVEL_M, "M4_APP_VERSION:      V%X.%X.%X\r\n",
+          (uint8_t)(APP_VERSION_MAIN),
+          (uint8_t)(APP_VERSION_SUB1),
+          (uint8_t)(APP_VERSION_SUB2));
+
+  /* Get CM0 Sigfox APP version*/
+  p_cm0plus_specific_features_info = MBMUXIF_SystemGetFeatCapabInfoPtr(FEAT_INFO_SYSTEM_ID);
+  feature_version = p_cm0plus_specific_features_info->Feat_Info_Feature_Version;
+  APP_LOG(TS_OFF, VLEVEL_M, "M0PLUS_APP_VERSION:  V%X.%X.%X\r\n",
+          (uint8_t)(feature_version >> 24),
+          (uint8_t)(feature_version >> 16),
+          (uint8_t)(feature_version >> 8));
+
+  /* Get MW Sigfox info */
+  p_cm0plus_specific_features_info = MBMUXIF_SystemGetFeatCapabInfoPtr(FEAT_INFO_SIGFOX_ID);
+  feature_version = p_cm0plus_specific_features_info->Feat_Info_Feature_Version;
+  APP_LOG(TS_OFF, VLEVEL_M, "MW_SIGFOX_VERSION:   V%X.%X.%X\r\n",
+          (uint8_t)(feature_version >> 24),
+          (uint8_t)(feature_version >> 16),
+          (uint8_t)(feature_version >> 8));
+
+  /* Get MW SubGhz_Phy info */
+  p_cm0plus_specific_features_info = MBMUXIF_SystemGetFeatCapabInfoPtr(FEAT_INFO_RADIO_ID);
+  feature_version = p_cm0plus_specific_features_info->Feat_Info_Feature_Version;
+  APP_LOG(TS_OFF, VLEVEL_M, "MW_RADIO_VERSION:    V%X.%X.%X\r\n",
+          (uint8_t)(feature_version >> 24),
+          (uint8_t)(feature_version >> 16),
+          (uint8_t)(feature_version >> 8));
+[#else]
+  /* Get Sigfox APP version*/
+  APP_LOG(TS_OFF, VLEVEL_M, "APPLICATION_VERSION: V%X.%X.%X\r\n",
+          (uint8_t)(APP_VERSION_MAIN),
+          (uint8_t)(APP_VERSION_SUB1),
+          (uint8_t)(APP_VERSION_SUB2));
+
+  /* Get MW Sigfox info */
+  APP_LOG(TS_OFF, VLEVEL_M, "MW_SIGFOX_VERSION:   V%X.%X.%X\r\n",
+          (uint8_t)(SIGFOX_VERSION_MAIN),
+          (uint8_t)(SIGFOX_VERSION_SUB1),
+          (uint8_t)(SIGFOX_VERSION_SUB2));
+
+  /* Get MW SubGhz_Phy info */
+  APP_LOG(TS_OFF, VLEVEL_M, "MW_RADIO_VERSION:    V%X.%X.%X\r\n",
+          (uint8_t)(SUBGHZ_PHY_VERSION_MAIN),
+          (uint8_t)(SUBGHZ_PHY_VERSION_SUB1),
+          (uint8_t)(SUBGHZ_PHY_VERSION_SUB2));
+[/#if]
 
   SIGFOX_API_get_version(&version, &size, VERSION_SIGFOX);
   print_n(version, size);
@@ -450,10 +528,6 @@ ATEerror_t AT_version_get(const char *param)
   SIGFOX_API_get_version(&version, &size, VERSION_MONARCH);
   print_n(version, size);
   AT_PRINTF("\r\n");
-
-  AT_PPRINTF("APP_VERSION: STM32Cube_FW_WL_V%X.%X.%X\r\n", __APP_VERSION_MAIN,
-             __APP_VERSION_SUB1,
-             __APP_VERSION_SUB2);
 
   return AT_OK;
   /* USER CODE BEGIN AT_version_get_2 */
@@ -757,7 +831,15 @@ ATEerror_t AT_scan_mn(const char *param)
 
   SIGFOX_MONARCH_API_execute_rc_scan(rc_capabilities_bit_mask, timer, SFX_TIME_S, app_callback_handler);
 
+[#if THREADX??][#-- If AzRtos is used --]
+  while (tx_semaphore_get(&Sem_Monarch, TX_WAIT_FOREVER) != TX_SUCCESS) {}
+[#else]
+[#if !FREERTOS??][#-- If FreeRtos is not used --]
   UTIL_SEQ_WaitEvt(1 << CFG_SEQ_Evt_Monarch);
+[#else]
+  osSemaphoreAcquire(Sem_Monarch, osWaitForever);
+[/#if]
+[/#if]
 
   if (SIGFOX_reopen_and_reconf(sfx_rc, config_words) != SFX_ERR_NONE)
   {
@@ -826,7 +908,16 @@ static sfx_u8 app_callback_handler(sfx_u8 rc_bit_mask, sfx_s16 rssi)
       break;
   }
 
+[#if THREADX??][#-- If AzRtos is used --]
+  /* Set the semaphore to release the Sem_Monarch Thread */
+  tx_semaphore_put(&Sem_Monarch);
+[#else]
+[#if !FREERTOS??][#-- If FreeRtos is not used --]
   UTIL_SEQ_SetEvt(1 << CFG_SEQ_Evt_Monarch);
+[#else]
+  osSemaphoreRelease(Sem_Monarch);
+[/#if]
+[/#if]
 
   return SFX_ERR_NONE;
   /* USER CODE BEGIN app_callback_handler_2 */
@@ -837,13 +928,29 @@ static sfx_u8 app_callback_handler(sfx_u8 rc_bit_mask, sfx_s16 rssi)
 [#if (CPUCORE == "")]
 static void sfx_monarch_test_mode_wait_start_cb(void)
 {
+[#if THREADX??][#-- If AzRtos is used --]
+  while (tx_semaphore_get(&Sem_Monarch, TX_WAIT_FOREVER) != TX_SUCCESS) {}
+[#else]
+[#if !FREERTOS??][#-- If FreeRtos is not used --]
   UTIL_SEQ_WaitEvt(1 << CFG_SEQ_Evt_Monarch);
-
+[#else]
+  osSemaphoreAcquire(Sem_Monarch, osWaitForever);
+[/#if]
+[/#if]
 }
 
 static void sfx_monarch_test_mode_wait_end_cb(void)
 {
+[#if THREADX??][#-- If AzRtos is used --]
+  /* Set the semaphore to release the Sem_Monarch Thread */
+  tx_semaphore_put(&Sem_Monarch);
+[#else]
+[#if !FREERTOS??][#-- If FreeRtos is not used --]
   UTIL_SEQ_SetEvt(1 << CFG_SEQ_Evt_Monarch);
+[#else]
+  osSemaphoreRelease(Sem_Monarch);
+[/#if]
+[/#if]
 }
 [/#if]
 #endif /* MN_ON */

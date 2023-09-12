@@ -135,4 +135,3 @@ void SE_NVM_set_key_type(sfx_key_type_t keyType);
 #endif
 
 #endif /* __SE_NVM_H__ */
-

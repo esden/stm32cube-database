@@ -13,16 +13,21 @@
 #t* @param  None
 #t* @retval None
 #t*/
+[#assign fctExist = false]
 [#list voids as void]
     [#assign fctname = "MX_GPIO_Init"]
         [#if void.functionName == fctname]
+[#assign fctExist = true]
             [#if void.isStatic]
 static void MX_GPIO_Init(void) 
             [#else]
 void MX_GPIO_Init(void) 
             [/#if]
         [/#if]
-[/#list] 
+[/#list]
+[#if !fctExist]
+static void MX_GPIO_Init(void)
+[/#if]
 {
 
 [#if RESMGR_UTILITY??]
@@ -41,16 +46,29 @@ void MX_GPIO_Init(void)
         [/#list]
 [/#if]
 [#if isHalSupported=="true"]
-    [#if clock?size >0 ]#n#t/* GPIO Ports Clock Enable */[/#if]
-        [#list clock as clockMacro]
-            [#if clockMacro!=""] 
-                [#if clockMacro?contains("(")]
-                    #t${clockMacro};
-                [#else]
-                    #t${clockMacro}();
+    [#if GPIO_CLK_LIST?? && GPIO_CLK_LIST?size >0]#n#t/* GPIO Ports Clock Enable */
+        [#list GPIO_CLK_LIST as clockMacro]
+          [#if clockMacro!="" && clockMacro?contains("(")]
+                        #t${clockMacro};
+                    [#else]
+                    [#if clockMacro!=""]
+                        #t${clockMacro}();
+                    [/#if]
+                    [/#if]
+        [/#list]
+        
+    [#else]
+        [#if clock?size >0 ]#n#t/* GPIO Ports Clock Enable */[/#if]
+            [#list clock as clockMacro]
+                [#if clockMacro!=""] 
+                    [#if clockMacro?contains("(")]
+                        #t${clockMacro};
+                    [#else]
+                        #t${clockMacro}();
+                    [/#if]
                 [/#if]
-            [/#if]
-        [/#list] 
+            [/#list] 
+        [/#if]
     [/#if]
 
 [#else] [#-- peripheral gpio init function --]
@@ -178,7 +196,7 @@ static void MX_${data.ipName}_GPIO_Init(void)
         [#if initVector.codeInMspInit]
                 [#assign irqNum = irqNum+1]
                 [#if irqNum==1]#n#t/* EXTI interrupt init*/[/#if]
-[#if usedDriver == "HAL"]
+[#if !usedDriver?? || (usedDriver?? && usedDriver == "HAL")]
                 #tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
                 #tHAL_NVIC_EnableIRQ(${initVector.vector});#n
 [#else]

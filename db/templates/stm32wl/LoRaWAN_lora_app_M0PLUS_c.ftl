@@ -62,7 +62,7 @@ void InitPackageProcess(void)
   /* USER CODE BEGIN InitPackageProcess_1 */
 
   /* USER CODE END InitPackageProcess_1 */
-  UTIL_SEQ_RegTask((1 << CFG_SEQ_Task_MbLmHandlerProcess), UTIL_SEQ_RFU, LmHandlerProcess);
+  UTIL_SEQ_RegTask((1 << CFG_SEQ_Task_LmHandlerProcess), UTIL_SEQ_RFU, LmHandlerProcess);
   /* USER CODE BEGIN InitPackageProcess_2 */
 
   /* USER CODE END InitPackageProcess_2 */
@@ -73,7 +73,7 @@ void OnMacProcessNotify(void)
   /* USER CODE BEGIN OnMacProcessNotify_1 */
 
   /* USER CODE END OnMacProcessNotify_1 */
-  UTIL_SEQ_SetTask((1 << CFG_SEQ_Task_MbLmHandlerProcess), CFG_SEQ_Prio_0);
+  UTIL_SEQ_SetTask((1 << CFG_SEQ_Task_LmHandlerProcess), CFG_SEQ_Prio_0);
   /* USER CODE BEGIN OnMacProcessNotify_2 */
 
   /* USER CODE END OnMacProcessNotify_2 */

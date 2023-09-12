@@ -1,4 +1,8 @@
 [#ftl]
+[#assign core=""]
+[#if cpucore?? && cpucore!=""]
+    [#assign core= cpucore?replace("ARM_CORTEX_","C")?replace("+","PLUS")]
+[/#if]
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
@@ -153,12 +157,16 @@
 /**
   * @brief This is the HAL system configuration section
   */
-#define  VDD_VALUE                          3300U                             /*!< Value of VDD in mv */
+#define  VDD_VALUE                          [#if vdd_value??]${vdd_value}U[#else]3300U[/#if]                             /*!< Value of VDD in mv */
+[#if TICK_INT_PRIORITY?? && ((core == "" && TICK_INT_PRIORITY == "15") || (core=="CM4" && TICK_INT_PRIORITY == "15") || (core=="CM0PLUS" && TICK_INT_PRIORITY == "3"))]
 #define  TICK_INT_PRIORITY                  ((1uL <<__NVIC_PRIO_BITS) - 1uL)  /*!< tick interrupt priority (lowest by default) */
-#define  USE_RTOS                           0U
-#define  PREFETCH_ENABLE                    0U
-#define  INSTRUCTION_CACHE_ENABLE           1U
-#define  DATA_CACHE_ENABLE                  1U
+[#else]
+#define  TICK_INT_PRIORITY                  [#if TICK_INT_PRIORITY??]${TICK_INT_PRIORITY}U[#else]((1uL <<__NVIC_PRIO_BITS) - 1uL)[/#if]
+[/#if]
+#define  USE_RTOS                           [#if advancedSettings?? && advancedSettings.USE_RTOS??]${advancedSettings.USE_RTOS}[#else]0[/#if]U
+#define  PREFETCH_ENABLE                    [#if PREFETCH_ENABLE??]${PREFETCH_ENABLE}[#else]0[/#if]U
+#define  INSTRUCTION_CACHE_ENABLE           [#if INSTRUCTION_CACHE_ENABLE??]${INSTRUCTION_CACHE_ENABLE}[#else]1[/#if]U
+#define  DATA_CACHE_ENABLE                  [#if DATA_CACHE_ENABLE??]${DATA_CACHE_ENABLE}[#else]1[/#if]U
 
 /* ########################## Assert Selection ############################## */
 /**
@@ -330,4 +338,3 @@
 #endif
 
 #endif /* STM32WLxx_HAL_CONF_H */
-

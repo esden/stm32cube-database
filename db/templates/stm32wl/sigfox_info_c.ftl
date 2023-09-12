@@ -44,7 +44,7 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
-UTIL_MEM_PLACE_IN_SECTION("MB_MEM2") SigfoxInfo_t SigfoxInfoTable;
+UTIL_MEM_PLACE_IN_SECTION("MB_MEM3") SigfoxInfo_t SigfoxInfoTable;
 
 /* USER CODE BEGIN PV */
 
@@ -66,13 +66,13 @@ void SigfoxInfo_Init(void)
   /* USER CODE BEGIN SigfoxInfo_Init_1 */
 
   /* USER CODE END SigfoxInfo_Init_1 */
-  SigfoxInfoTable.Region |= (1 << SFX_BITFIELD_SHIFT_RC1) ;
-  SigfoxInfoTable.Region |= (1 << SFX_BITFIELD_SHIFT_RC2) ;
-  SigfoxInfoTable.Region |= (1 << SFX_BITFIELD_SHIFT_RC3) ;
-  SigfoxInfoTable.Region |= (1 << SFX_BITFIELD_SHIFT_RC4) ;
-  SigfoxInfoTable.Region |= (1 << SFX_BITFIELD_SHIFT_RC5) ;
-  SigfoxInfoTable.Region |= (1 << SFX_BITFIELD_SHIFT_RC6) ;
-  SigfoxInfoTable.Region |= (1 << SFX_BITFIELD_SHIFT_RC7) ;
+  SigfoxInfoTable.Region |= (1 << SFX_BITFIELD_SHIFT_RC1);
+  SigfoxInfoTable.Region |= (1 << SFX_BITFIELD_SHIFT_RC2);
+  SigfoxInfoTable.Region |= (1 << SFX_BITFIELD_SHIFT_RC3);
+  SigfoxInfoTable.Region |= (1 << SFX_BITFIELD_SHIFT_RC4);
+  SigfoxInfoTable.Region |= (1 << SFX_BITFIELD_SHIFT_RC5);
+  SigfoxInfoTable.Region |= (1 << SFX_BITFIELD_SHIFT_RC6);
+  SigfoxInfoTable.Region |= (1 << SFX_BITFIELD_SHIFT_RC7);
 
   /* For DualCore */
   StoreValueInFeatureListTable();
@@ -145,4 +145,3 @@ static void StoreValueInFeatureListTable(void)
 /* USER CODE BEGIN PrFD */
 
 /* USER CODE END PrFD */
-

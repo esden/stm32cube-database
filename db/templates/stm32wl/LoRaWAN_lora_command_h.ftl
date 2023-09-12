@@ -68,4 +68,3 @@ void CMD_Process(void);
 #endif
 
 #endif /* __LORA_COMMAND_H__*/
-

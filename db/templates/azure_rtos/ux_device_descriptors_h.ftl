@@ -291,6 +291,10 @@ extern "C" {
     [#if name == "USBD_DFU_MEDIA"]
       [#assign usbd_dfu_string_desc = value]
     [/#if]
+	
+	[#if name == "UX_DEVICE_BIDIRECTIONAL_ENDPOINT_SUPPORT"]
+      [#assign ux_device_bidirectional_endpoint_support_val = value]
+    [/#if]
 
   [/#list]
 [/#if]
@@ -659,9 +663,11 @@ uint8_t *USBD_Get_Device_HID_MOUSE_ReportDesc(void);
 /* Device Storage Class */
 #define USBD_MSC_EPOUT_ADDR                            0x0${usbd_msc_ep_out_address}U
 #define USBD_MSC_EPIN_ADDR                             0x8${usbd_msc_ep_in_address}U
+[#if ux_device_bidirectional_endpoint_support_val == "0"]
 #if (USBD_MSC_EPOUT_ADDR == (USBD_MSC_EPIN_ADDR & 0x0FU))
 #error Address endpoint IN shall be different form endpoint OUT.
 #endif
+[/#if]
 #define USBD_MSC_EPOUT_FS_MPS                          ${usbd_msc_ep_out_fs_mps}U
 #define USBD_MSC_EPOUT_HS_MPS                          ${usbd_msc_ep_out_hs_mps}U
 #define USBD_MSC_EPIN_FS_MPS                           ${usbd_msc_ep_in_fs_mps}U
@@ -684,9 +690,11 @@ uint8_t *USBD_Get_Device_HID_MOUSE_ReportDesc(void);
 #define USBD_CDCACM_EPINCMD_HS_MPS                    ${usbd_cdc_ep_in_cmd_hs_mps}U
 #define USBD_CDCACM_EPIN_ADDR                         0x8${usbd_cdc_ep_in_address}U
 #define USBD_CDCACM_EPOUT_ADDR                        0x0${usbd_cdc_ep_out_address}U
+[#if ux_device_bidirectional_endpoint_support_val == "0"]
 #if (USBD_CDCACM_EPOUT_ADDR == (USBD_CDCACM_EPIN_ADDR & 0x0FU))
 #error Address endpoint IN shall be different form endpoint OUT.
 #endif
+[/#if]
 #define USBD_CDCACM_EPIN_FS_MPS                       ${usbd_cdc_ep_in_fs_mps}U
 #define USBD_CDCACM_EPIN_HS_MPS                       ${usbd_cdc_ep_in_hs_mps}U
 #define USBD_CDCACM_EPOUT_FS_MPS                      ${usbd_cdc_ep_out_fs_mps}U
@@ -723,6 +731,11 @@ uint8_t *USBD_Get_Device_HID_MOUSE_ReportDesc(void);
 #define USBD_CDCECM_EPINCMD_HS_BINTERVAL              ${usbd_cdcecm_ep_in_cmd_hs_bint}U
 #define USBD_CDCECM_EPIN_ADDR                         0x8${usbd_cdcecm_ep_in_address}U
 #define USBD_CDCECM_EPOUT_ADDR                        0x0${usbd_cdcecm_ep_out_address}U
+[#if ux_device_bidirectional_endpoint_support_val == "0"]
+#if (USBD_CDCECM_EPOUT_ADDR == (USBD_CDCECM_EPIN_ADDR & 0x0FU))
+#error Address endpoint IN shall be different form endpoint OUT.
+#endif
+[/#if]
 #define USBD_CDCECM_EPIN_FS_MPS                       ${usbd_cdcecm_ep_in_fs_mps}U
 #define USBD_CDCECM_EPIN_HS_MPS                       ${usbd_cdcecm_ep_in_hs_mps}U
 #define USBD_CDCECM_EPOUT_FS_MPS                      ${usbd_cdcecm_ep_out_fs_mps}U

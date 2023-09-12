@@ -127,7 +127,7 @@
 /**
   * @brief This is the HAL system configuration section
   */     
-#define  VDD_VALUE                    ((uint32_t)[#if vdd_value??]${vdd_value}[#else]3300[/#if]U) /*!< Value of VDD in mv */
+#define  VDD_VALUE                    [#if vdd_value??]${vdd_value}[#else]3300[/#if]U /*!< Value of VDD in mv */
 #define  TICK_INT_PRIORITY            ((uint32_t)[#if TICK_INT_PRIORITY??]${TICK_INT_PRIORITY}[#else]0x0F[/#if]U) /*!< tick interrupt priority */
 #define  USE_RTOS                     [#if advancedSettings?? && advancedSettings.USE_RTOS??]${advancedSettings.USE_RTOS}[#else]0[/#if]U
 #define  PREFETCH_ENABLE              [#if PREFETCH_ENABLE??]${PREFETCH_ENABLE}[#else]1[/#if]U

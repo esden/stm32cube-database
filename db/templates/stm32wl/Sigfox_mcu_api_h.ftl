@@ -204,7 +204,6 @@ sfx_u8 MCU_API_get_voltage_temperature(sfx_u16 *voltage_idle,
   *******************************************************************/
 sfx_u8 MCU_API_delay(sfx_delay_t delay_type);
 
-
 /*!******************************************************************
   * \fn sfx_u8 MCU_API_get_nv_mem(sfx_u8 read_data[SFX_NVMEM_BLOCK_SIZE])
   * \brief This function copies the data read from non volatile memory
@@ -341,4 +340,3 @@ sfx_u8 MCU_API_get_version(sfx_u8 **version, sfx_u8 *size);
 #endif
 
 #endif /*__SIGFOX_MCU_API_H__*/
-
