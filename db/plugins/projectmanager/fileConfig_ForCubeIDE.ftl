@@ -155,9 +155,11 @@
         </memories>
     <startup>${startup}</startup> [#-- add relatif startup path needed for UC30 --]     
 <LinkSettings>
-        [#list LinkerFile as linker]
-	<LinkerFile>${linker}</LinkerFile>
-        [/#list]
+        [#if LinkerFile??]
+            [#list LinkerFile as linker]
+            <LinkerFile>${linker}</LinkerFile>
+            [/#list]
+        [/#if]
 	[#if !IdeMode??]
         <icfloc>${icfloc}</icfloc>
         [/#if]
