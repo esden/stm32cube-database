@@ -53,26 +53,15 @@
             <MethodArg Name="GainCompensation" ParameterName="GainCompensation" />
         </CallLibMethod>
         <IFCondition Expression="Injected_Mode_Enabled" >
-             <IFCondition Expression="QueueDisable$IpInstance" >
+             
             <CallLibMethod Name="LL_ADC_INJ_Init">
                 <MethodArg Name="ADCx" ParameterName="Instance" />
                 <MethodArg Name="SequencerLength" ParameterName="InjNumberOfConversion" />
                 <MethodArg Name="SequencerDiscont" ParameterName="InjectedDiscontinuousConvMode" />
                 <MethodArg Name="TrigAuto" ParameterName="AutoInjectedConv" />
             </CallLibMethod>
-             </IFCondition>
-             <IFCondition Expression="QueueEnable$IpInstance" >
-            <CallLibMethod  Name="LL_ADC_INJ_ConfigQueueContext">
-                <MethodArg Name="ADCx" ParameterName="Instance" />
-                <MethodArg Name="TriggerSource" ParameterName="ExternalTrigInjecConv" />
-                <MethodArg Name="ExternalTriggerEdge" ParameterName="ExternalTrigInjecConvEdge" />
-                <MethodArg Name="SequencerLength" ParameterName="InjNumberOfConversion" />
-                <MethodArg Name="Rank1_Channel" ParameterName="InjectedChannel"/>
-                <MethodArg Name="Rank2_Channel" ParameterName="InjectedChannel"/>
-                <MethodArg Name="Rank3_Channel" ParameterName="InjectedChannel"/>      
-                <MethodArg Name="Rank4_Channel" ParameterName="InjectedChannel"/>         
-            </CallLibMethod>
-             </IFCondition>
+             
+             
             <IFCondition Expression="!(ExternalTrigInjecConvEdge = ADC_EXTERNALTRIGINJECCONV_EDGE_NONE)">
                 <CallLibMethod Name="LL_ADC_INJ_SetTriggerEdge">
                     <MethodArg Name="ADCx" ParameterName="Instance" />
@@ -81,7 +70,7 @@
             </IFCondition>
             <CallLibMethod Name="LL_ADC_INJ_SetQueueMode">
                 <MethodArg Name="ADCx" ParameterName="Instance" />
-                <MethodArg Name="QueueMode" ParameterName="InjectedQueue,QueueInjectedContext" />
+                <MethodArg Name="QueueMode" ParameterName="injectedQueueMode,QueueInjectedContext" />
             </CallLibMethod>
             
             <CallLibMethod Name="LL_ADC_SetOverSamplingScope">
@@ -107,7 +96,7 @@
             </IFCondition>
 
             <IFCondition Expression="(EOCSelection = ADC_EOC_SINGLE_SEQ_CONV)">
-                <CallLibMethod Name="LL_ADC_DisabelIT_JEOS">
+                <CallLibMethod Name="LL_ADC_DisableIT_JEOS">
                     <MethodArg Name="ADCx" ParameterName="Instance" />
                 </CallLibMethod>
                 <CallLibMethod Name="LL_ADC_DisableIT_JEOC">
@@ -229,11 +218,11 @@
     <RefConfig Name="ADC_InjectedChannelConfig" Comment="Configure Injected Channel">
  
         <!-- Injected Channel configuration -->
-        <CallLibMethod Name="LL_ADC_INJ_SetSequencerRanks">
+<!--        <CallLibMethod Name="LL_ADC_INJ_SetSequencerRanks">
             <MethodArg Name="ADCx" ParameterName="Instance" />
             <MethodArg Name="Rank" ParameterName="InjectedRank" />
             <MethodArg Name="Channel" ParameterName="InjectedChannel" />
-        </CallLibMethod>
+        </CallLibMethod>-->
 
         <CallLibMethod Name="LL_ADC_SetChannelSamplingTime">
             <MethodArg Name="ADCx" ParameterName="Instance" />
@@ -246,6 +235,18 @@
             <MethodArg Name="Channel" ParameterName="InjectedChannel" />
             <MethodArg Name="SingleDiff" ParameterName="InjectedSingleDiff" />
         </CallLibMethod>
+        <!--IFCondition Expression="QueueEnable$IpInstance">
+            <CallLibMethod  Name="LL_ADC_INJ_ConfigQueueContext">
+                <MethodArg Name="ADCx" ParameterName="Instance" />
+                <MethodArg Name="TriggerSource" ParameterName="ExternalTrigInjecConv" />
+                <MethodArg Name="ExternalTriggerEdge" ParameterName="ExternalTrigInjecConvEdge" />
+                <MethodArg Name="SequencerLength" ParameterName="InjNumberOfConversion" />
+                <MethodArg Name="Rank1_Channel" ParameterName="InjectedChannel"/>
+                <MethodArg Name="Rank2_Channel" ParameterName="InjectedChannel"/>
+                <MethodArg Name="Rank3_Channel" ParameterName="InjectedChannel"/>      
+                <MethodArg Name="Rank4_Channel" ParameterName="InjectedChannel"/>         
+            </CallLibMethod>
+        </IFCondition-->
 
         <IFCondition Expression="!(InjectedOffsetNumber = ADC_OFFSET_NONE)">
             <CallLibMethod Name="LL_ADC_SetOffset">
@@ -279,6 +280,23 @@
             </CallLibMethod>
         </IFCondition>
     </RefConfig>
+    
+    <RefConfig Name="ADC_InjectedQueueEnable" Comment="Configure injected channel ADC_JSQR register">
+        <IFCondition Expression="QueueEnable$IpInstance">
+            <CallLibMethod  Name="LL_ADC_INJ_ConfigQueueContext">
+                <MethodArg Name="ADCx" ParameterName="Instance" />
+                <MethodArg Name="TriggerSource" ParameterName="ExternalTrigInjecConv" />
+                <MethodArg Name="ExternalTriggerEdge" ParameterName="ExternalTrigInjecConvEdge" />
+                <MethodArg Name="SequencerLength" ParameterName="InjNumberOfConversion" />
+               <MethodArg Name="Rank1_Channel" ParameterName="Rank1_Channel"/>
+               <MethodArg Name="Rank2_Channel" ParameterName="Rank2_Channel"/>
+               <MethodArg Name="Rank3_Channel" ParameterName="Rank3_Channel"/>      
+               <MethodArg Name="Rank4_Channel" ParameterName="Rank4_Channel"/>        
+            </CallLibMethod>
+        </IFCondition>
+        
+    </RefConfig>
+    
 
     <RefConfig Name="ADC_AnalogWDGConfig" Comment="Configure Analog WatchDog 1">
         <CallLibMethod Name="LL_ADC_SetAnalogWDMonitChannels">
@@ -574,7 +592,7 @@
                   OptimizationCondition="equal" />
         <Argument AddressOf="false" GenericType="simple" Name="Rank1_Channel"
                   OptimizationCondition="equal" />
-        <Argument AddressOf="false" GenericType="simple" Name="Rank2_Channel"
+       <Argument AddressOf="false" GenericType="simple" Name="Rank2_Channel"
                   OptimizationCondition="equal" />
         <Argument AddressOf="false" GenericType="simple" Name="Rank3_Channel"
                   OptimizationCondition="equal" />
@@ -1242,6 +1260,10 @@
                   TypeName="ADC_TypeDef" />
     </LibMethod>
     <LibMethod Comment="" Name="LL_ADC_DisableIT_JEOC">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="ADCx"
+                  TypeName="ADC_TypeDef" />
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_ADC_DisabeIT_JEOS">
         <Argument AddressOf="false" GenericType="baseaddress" Name="ADCx"
                   TypeName="ADC_TypeDef" />
     </LibMethod>

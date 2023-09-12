@@ -622,8 +622,8 @@ USBD_StatusTypeDef USBD_LL_Init(USBD_HandleTypeDef *pdev)
 #thpcd_USB_FS.pData = pdev;
 #t/* Link the driver to the stack. */
 #tpdev->pData = &hpcd_USB_FS;
-#t/* Enable USB power on Pwrctrl CR2 register. */
-#tHAL_PWREx_EnableVddUSB();
+[#--  #t/* Enable USB power on Pwrctrl CR2 register. */--]
+[#--  #tHAL_PWREx_EnableVddUSB();--]
 [#include mxTmpFolder+"/usb_HalInit.tmp"]
 #if (USE_HAL_PCD_REGISTER_CALLBACKS == 1U)
   /* Register USB PCD CallBacks */
@@ -968,9 +968,14 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
   * @param  hpcd: PCD handle
   * @param  msg: LPM message
   * @retval None
-  */
+  */          
+#if (USE_HAL_PCD_REGISTER_CALLBACKS == 1U)
+static void PCDEx_LPM_Callback(PCD_HandleTypeDef *hpcd, PCD_LPM_MsgTypeDef msg)
+#else
 void HAL_PCDEx_LPM_Callback(PCD_HandleTypeDef *hpcd, PCD_LPM_MsgTypeDef msg)
+#endif /* USE_HAL_PCD_REGISTER_CALLBACKS */
 {
+  /* USER CODE BEGIN LPM_Callback */
   switch (msg)
   {
   case PCD_LPM_L0_ACTIVE:
@@ -1001,6 +1006,7 @@ void HAL_PCDEx_LPM_Callback(PCD_HandleTypeDef *hpcd, PCD_LPM_MsgTypeDef msg)
     }
     break;   
   }
+  /* USER CODE END LPM_Callback */
 }
 [/#if]
 

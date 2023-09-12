@@ -256,11 +256,11 @@
     </RefParameter>
     <!--TIM1CLockSelection-->
     <RefParameter Visible="false"  Comment="TIM1 Clock Selection" DefaultValue="RCC_TIM1CLKSOURCE_PCLK1" Name="TIM1CLockSelectionVirtual" Type="list" IP="TIMER1">
-        <Condition Diagnostic="When TIM1/TIM15 derives from PLLQ, they can be only an integer multiple of PCLK and must be aligned with it." Expression="!(((PLLR2 &amp; PLLQ2) |(PLLR3 &amp; PLLQ3) | (PLLR4 &amp; (PLLQ4 | PLLQ2)) | (PLLR5 &amp; PLLQ5) | (PLLR6 &amp; (PLLQ3 | PLLQ2 | PLLQ6)) | (PLLR7 &amp; PLLQ7) | (PLLR8 &amp; (PLLQ8 | PLLQ4 | PLLQ2))) &amp; (SYSCLKFreq_VALUE1=SYSCLKFreq_VALUE2) &amp; SysSourcePLL) &amp; !STM32G0x0_Value_line"/>
+        <Condition Diagnostic="When TIM1 derives from PLLQ, they can be only an integer multiple of PCLK and must be aligned with it." Expression="!(((PLLR2 &amp; PLLQ2) |(PLLR3 &amp; PLLQ3) | (PLLR4 &amp; (PLLQ4 | PLLQ2)) | (PLLR5 &amp; PLLQ5) | (PLLR6 &amp; (PLLQ3 | PLLQ2 | PLLQ6)) | (PLLR7 &amp; PLLQ7) | (PLLR8 &amp; (PLLQ8 | PLLQ4 | PLLQ2))) &amp; (SYSCLKFreq_VALUE1=SYSCLKFreq_VALUE2) &amp; SysSourcePLL) &amp; !STM32G0x0_Value_line"/>
         <PossibleValue Comment="tim1 Clksource Pclk" Value="RCC_TIM1CLKSOURCE_PCLK1" Semaphore="TIM1SOURCEPclk"/>
     </RefParameter>
     <RefParameter Visible="false"  Comment="TIM1 Clock Selection" DefaultValue="RCC_TIM1CLKSOURCE_PCLK1" Name="TIM1CLockSelectionVirtual" Type="list" IP="TIMER1">
-        <Condition Diagnostic="" Expression="STM32G0x1"/>
+        <Condition Diagnostic="" Expression="!STM32G0x0_Value_line"/>
         <PossibleValue Comment="tim1 Clksource Pclk" Value="RCC_TIM1CLKSOURCE_PCLK1" Semaphore="TIM1SOURCEPclk"/>
         <PossibleValue Comment="tim1 Clksource Lsi"  Value="RCC_TIM1CLKSOURCE_PLL"   Semaphore="TIM1SOURCEPll"/>
     </RefParameter>
@@ -366,7 +366,7 @@
     <RefParameter Visible="false" Comment="LPTIM2 clock Source"  Name="LPTIM2Freq_Value"  DefaultValue="4000000"  Type="double" Display="value/1000000" Unit="MHz" IP="LPTIM2"/>
 
     <RefParameter Visible="false" Comment="TIM1 clock Source"   Name="TIM1Freq_Value"  DefaultValue="=APBTimFreq_Value"  Type="double" Display="value/1000000" Unit="MHz" IP="TIMER1">
-        <Condition Diagnostic="" Expression="STM32G0x1"/>
+        <Condition Diagnostic="" Expression="!STM32G0x0_Value_line"/>
     </RefParameter>
     
     <RefParameter Visible="false" Comment="TIM1 clock Source"   Name="TIM1Freq_Value"  DefaultValue="4000000" Max="128000000" Type="double" Display="value/1000000" Unit="MHz" IP="TIMER1"/>
@@ -512,18 +512,22 @@
    
 	
     <!-- ADC Output Enable -->
-    <RefParameter Visible="false" Name="PLLPEnable" Comment="PLLP enabled" Type="list" DefaultValue="true">
-        <Condition Expression="CodegenConfigPeriph=false" Diagnostic="PLLP is activated"/>
+    <RefParameter Visible="false" Name="I2S1PLLEnable" Comment="I2S1" Type="list" DefaultValue="true">
+        <Condition Expression="I2S1Used_ForRCC &amp; CodegenConfigPeriph=true | CodegenConfigPeriph=false" Diagnostic="I2S1 is activated"/>
         <PossibleValue Value="true" Comment="true"/>
-    </RefParameter>
-    <RefParameter Visible="false" Name="PLLPEnable" Comment="PLLP enabled" Type="list" DefaultValue="true">
-        <Condition Expression="(ADC1_USED | I2S1Used_ForRCC) &amp; CodegenConfigPeriph=true" Diagnostic="ADC is activated"/>
-        <PossibleValue Value="true" Comment="true"/>
-    </RefParameter>
-    <RefParameter Visible="false" Name="PLLPEnable" Comment="PLLP enabled" Type="list" DefaultValue="false" >
+    </RefParameter>	
+    <RefParameter Visible="false" Name="I2S1PLLEnable" Comment="I2S1" Type="list" DefaultValue="false">
         <PossibleValue Value="false" Comment="false"/>
     </RefParameter>
-    <RefParameter Visible="false" Name="ADCEnable" Comment="ADC1 enabled" Type="list" DefaultValue="true" IP="ADC1">
+    
+    <RefParameter Visible="false" Name="ADCPLLEnable" Comment="ADC1" Type="list" DefaultValue="true" IP="ADC1">
+        <Condition Expression="ADC1_USED &amp; CodegenConfigPeriph=true | CodegenConfigPeriph=false" Diagnostic="ADC is activated"/>
+        <PossibleValue Value="true" Comment="true"/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="ADCPLLEnable" Comment="ADC1" Type="list" DefaultValue="false" >
+        <PossibleValue Value="false" Comment="false"/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="ADCEnable" Comment="ADC1" Type="list" DefaultValue="true" IP="ADC1">
         <Condition Expression="ADC1_USED &amp; CodegenConfigPeriph=true" Diagnostic="ADC is activated"/>
         <PossibleValue Value="true" Comment="true"/>
     </RefParameter>
@@ -599,6 +603,20 @@
     <RefParameter Visible="false" Name="RNGEnable" Comment="RNG" Type="list" DefaultValue="false">
         <PossibleValue Value="false" Comment="false"/>
     </RefParameter>
+    <RefParameter Visible="false" Name="RNGPLLEnable" Comment="RNG" Type="list" DefaultValue="true">
+        <Condition Expression="RNGUsed_ForRCC &amp; CodegenConfigPeriph=true | CodegenConfigPeriph=false" Diagnostic="RNG is activated"/>
+        <PossibleValue Value="true" Comment="true"/>
+    </RefParameter>	
+    <RefParameter Visible="false" Name="RNGPLLEnable" Comment="RNG" Type="list" DefaultValue="false">
+        <PossibleValue Value="false" Comment="false"/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="TIM1PLLEnable" Comment="TIM1" Type="list" DefaultValue="true">
+        <Condition Expression="TIM1 &amp; !STM32G0x0_Value_line &amp; CodegenConfigPeriph=true | CodegenConfigPeriph=false" Diagnostic="TIM1 is activated"/>
+        <PossibleValue Value="true" Comment="true"/>
+    </RefParameter>	
+    <RefParameter Visible="false" Name="TIM1PLLEnable" Comment="TIM1" Type="list" DefaultValue="false">
+        <PossibleValue Value="false" Comment="false"/>
+    </RefParameter>
 	
     <!--USART1 Enable-->
     <RefParameter Visible="false" Name="USART1Enable" Comment="USART1" Type="list" DefaultValue="true">
@@ -658,14 +676,14 @@
     </RefParameter>
     <!--TIM1 Enable-->
     <RefParameter Visible="false" Name="TIM1Enable" Comment="TIM1" Type="list" DefaultValue="true">
-        <Condition Expression="TIM1 &amp; CodegenConfigPeriph=true &amp; STM32G0x1" Diagnostic="TIM1 is activated"/>
+        <Condition Expression="TIM1 &amp; CodegenConfigPeriph=true &amp; !STM32G0x0_Value_line" Diagnostic="TIM1 is activated"/>
         <PossibleValue Value="true" Comment="true"/>
     </RefParameter>
 	
     <RefParameter Visible="false" Name="TIM1Enable" Comment="TIM1" Type="list" DefaultValue="false">
         <PossibleValue Value="false" Comment="false"/>
-    </RefParameter>	
-	
+    </RefParameter>
+    
     <!--LPTIM2 Enable-->
     <RefParameter Visible="false" Name="LPTIM2Enable" Comment="LPTIM2" Type="list" DefaultValue="true">
         <Condition Expression="LPTIM2Used_ForRCC &amp; CodegenConfigPeriph=true" Diagnostic="LPTIM2 is activated"/>
@@ -965,7 +983,7 @@
     
 
     <RefParameter Visible="false" Name="RCC_PERIPHCLK_TIM1Var" Comment="RCC_PERIPHCLK_TIM1Var" Type="list" DefaultValue="RCC_PERIPHCLK_TIM1">
-        <Condition Expression="TIM1 &amp; STM32G0x1" Diagnostic="TIM1 Activated"/>
+        <Condition Expression="TIM1 &amp; !STM32G0x0_Value_line" Diagnostic="TIM1 Activated"/>
         <PossibleValue Comment="Periphclk TIM1" Value="RCC_PERIPHCLK_TIM1"/>
     </RefParameter>
 	
@@ -1085,7 +1103,7 @@
 
     
     <RefParameter Visible="false" Name="Tim1ClockSelectionARG" Comment="Tim1ClockSelectionARG" Type="list" DefaultValue="+TIM1CLockSelection">
-        <Condition Expression="(TIM1 &amp; CodegenConfigPeriph=true) &amp; STM32G0x1" Diagnostic="TIM1 Activated"/>
+        <Condition Expression="(TIM1 &amp; CodegenConfigPeriph=true) &amp; !STM32G0x0_Value_line" Diagnostic="TIM1 Activated"/>
     </RefParameter>
     <RefParameter Visible="false" Name="Tim1ClockSelectionARG" Comment="Tim1ClockSelectionARG" Type="list" DefaultValue="null"/>
 
@@ -1227,7 +1245,7 @@
         <Condition Diagnostic="PLL used" Expression="((CodegenConfigPeriph=false) &amp; !(SysSourcePLL))"/>
     </RefParameter>
     <RefParameter Visible="false" Comment="PLLQARG" DefaultValue="+PLLQ" Name="PLLQARG" Type="list">
-        <Condition Diagnostic="PLL used" Expression="PLLUsed=1 &amp; STM32G0x1"/>
+        <Condition Diagnostic="PLL used" Expression="PLLUsed=1 &amp; !STM32G0x0_Value_line"/>
     </RefParameter>
 	
     <RefParameter Visible="false" Comment="PLLQARG" DefaultValue="null" Name="PLLQARG" Type="list"/>

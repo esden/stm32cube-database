@@ -28,7 +28,7 @@
                 [#if filesName?ends_with(".a")||filesName?ends_with(".lib")]
     <file>
         <name>${filesName!''}</name>
-        </file>
+    </file>
     [/#if]             
             [/#list]
         [/#if]
@@ -48,6 +48,7 @@
 
     <ProjectName>${projectName}</ProjectName> [#-- modified to give only the project name without path --]
 
+    [#-- <ProjectNature>${ProjectNature}</ProjectNature> --][#-- Cpp --]
     <ProjectNature>${ProjectNature}</ProjectNature> [#-- Cpp --]
 [#if staticLibraryProject??]<StaticLibraryProject>true</StaticLibraryProject> [#-- Static Library Project --][/#if]
     <HAL_Driver>${HAL_Driver}</HAL_Driver>[#-- modified to give only the hal driver path --]
@@ -326,27 +327,16 @@
          [/#if]
         <sourceEntry>
             <name>${HALDriver}</name>
-            </sourceEntry>
-        [#--if atLeastOneMiddlewareIsUsed]
-            <sourceEntry>
-            <name>Middlewares</name>
-            </sourceEntry>
-            [#list MiddlewareList as Middleware]
-                <sourceEntry>
-                <name>${Middleware}</name>
-                </sourceEntry>
-            [/#list]                            
-	[/#if--]
-	[#if atLeastOneMiddlewareIsUsed]
-   
+           </sourceEntry>        
+	[#if atLeastOneMiddlewareIsUsed]   
         [#-- ************************* --]
         [#if  multiConfigurationProject?? && usedMWPerCore??]    
- <sourceEntry>
-        <name>Middlewares</name>   
-                                    [#list usedMWPerCore?keys as mwcore]
+            <sourceEntry>
+                   <name>Middlewares</name>   
+                        [#list usedMWPerCore?keys as mwcore]
                         [#assign usedMw =  usedMWPerCore[mwcore]]
                         [#list usedMWandRootFolder?keys as middName]
-                                        [#assign exclude = true]
+                        [#assign exclude = true]
                         [#assign used = false] 
                                         [#if usedMw??]  
                             [#list usedMw as m]
@@ -452,7 +442,7 @@
                                                 [#if n?starts_with("USB_Host") && mwName?starts_with("USB_HOST")]
                                                     [#assign used = true]
                                                 [/#if]
-                                                [#if n?starts_with("PDM2PCM") && mwName?starts_with("PDMFilter")]
+                                                [#if n?starts_with("PDMFilter") && mwName?starts_with("PDM2PCM")]
                                                     [#assign used = true]
                                                 [/#if]                                                
                                                 [#if (mw?lower_case == n?lower_case) || used]
@@ -523,9 +513,9 @@
                                                 [#if n?starts_with("USB_HOST") && mwName?starts_with("USB_HOST")]
                                                     [#assign used = true]
                                                 [/#if]
-                                [#if n?starts_with("PDM2PCM") && mwName?starts_with("PDMFilter")]
+                                [#if n?starts_with("PDMFilter") && mwName?starts_with("PDM2PCM")]
                                     [#assign used = true]
-                                [/#if]                 debug ==== ${mw?lower_case}     ${n?lower_case}
+                                [/#if]                
                                 [#if (n?lower_case?starts_with(mw?lower_case)) || used]
                                 [#assign exclude = false] 
                                 [/#if]
@@ -543,7 +533,15 @@
                     [#list group.sourceFilesNameList as filesName]
             <file>
                 <name>${filesName!''}</name>
-
+[#if  multiConfigurationProject?? && ConfigsAndFiles??]
+    [#list ConfigsAndFiles?keys as configKey]
+[#if !ConfigsAndFiles[configKey]?seq_contains(filesName?replace("/","\\"))]
+                    <excluded>
+                        <configuration>${Configuration}_${configKey?replace("ARM Cortex-", "C")}</configuration>
+                        </excluded>
+[/#if]
+[/#list]
+[/#if]
                 </file>
 		    [/#list]
 		[/#if]

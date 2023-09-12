@@ -46,61 +46,110 @@
 			<MethodArg Name="ContinuousMode" ParameterName="ContinuousConvMode" />
 			<MethodArg Name="DMATransfer" ParameterName="DMAContinuousRequestsForConfigFile" />
 			<MethodArg Name="Overrun" ParameterName="Overrun" />
-		</CallLibMethod>
+                </CallLibMethod>
+                <IFCondition Expression="Injected_Mode_Enabled" >
+             
+                    <CallLibMethod Name="LL_ADC_INJ_Init">
+                        <MethodArg Name="ADCx" ParameterName="Instance" />
+                        <MethodArg Name="SequencerLength" ParameterName="InjNumberOfConversion" />
+                        <MethodArg Name="SequencerDiscont" ParameterName="InjectedDiscontinuousConvMode" />
+                        <MethodArg Name="TrigAuto" ParameterName="AutoInjectedConv" />
+                    </CallLibMethod>
+             
+             
+                    <IFCondition Expression="!(ExternalTrigInjecConvEdge = ADC_EXTERNALTRIGINJECCONV_EDGE_NONE)">
+                        <CallLibMethod Name="LL_ADC_INJ_SetTriggerEdge">
+                            <MethodArg Name="ADCx" ParameterName="Instance" />
+                            <MethodArg Name="ExternalTriggerEdge" ParameterName="ExternalTrigInjecConvEdge" />
+                        </CallLibMethod>
+                    </IFCondition>
+                    <CallLibMethod Name="LL_ADC_INJ_SetQueueMode">
+                        <MethodArg Name="ADCx" ParameterName="Instance" />
+                        <MethodArg Name="QueueMode" ParameterName="injectedQueueMode,QueueInjectedContext" />
+                    </CallLibMethod>
+            
+                    <CallLibMethod Name="LL_ADC_SetOverSamplingScope">
+                        <MethodArg Name="ADCx" ParameterName="Instance" />
+                        <MethodArg Name="OvsScope"
+                                   ParameterName="OversamplingMode,EnableInjectedOversampling,OversamplingStopReset" />
+                    </CallLibMethod>
 
-		<IFCondition Expression="!(ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE)">
-			<CallLibMethod Name="LL_ADC_REG_SetTriggerEdge">
-				<MethodArg Name="ADCx" ParameterName="Instance" />
-				<MethodArg Name="ExternalTriggerEdge" ParameterName="ExternalTrigConvEdge" />
-			</CallLibMethod>
-		</IFCondition>
+                    <CallLibMethod Name="LL_ADC_ConfigOverSamplingRatioShift">
+                        <MethodArg Name="ADCx" ParameterName="Instance" />
+                        <MethodArg Name="Ratio" ParameterName="InjOversamplingRatio" />
+                        <MethodArg Name="Shift" ParameterName="InjOversamplingRightShift" />
+                    </CallLibMethod>
 
-		<CallLibMethod Name="LL_ADC_SetOverSamplingScope">
-			<MethodArg Name="ADCx" ParameterName="Instance" />
-			<MethodArg Name="OvsScope"
-				ParameterName="OversamplingMode,EnableInjectedOversampling,OversamplingStopReset" />
-		</CallLibMethod>
+                    <!-- parameter EOCSelection -->
+                    <IFCondition Expression="(EOCSelection = ADC_EOC_SINGLE_CONV)">
+                        <CallLibMethod Name="LL_ADC_DisableIT_JEOC">
+                            <MethodArg Name="ADCx" ParameterName="Instance" />
+                        </CallLibMethod>
+                        <CallLibMethod Name="LL_ADC_DisableIT_JEOS">
+                            <MethodArg Name="ADCx" ParameterName="Instance" />
+                        </CallLibMethod>
+                    </IFCondition>
 
-		<CallLibMethod Name="LL_ADC_ConfigOverSamplingRatioShift">
-			<MethodArg Name="ADCx" ParameterName="Instance" />
-			<MethodArg Name="Ratio" ParameterName="Ratio" />
-			<MethodArg Name="Shift" ParameterName="RightBitShift" />
-		</CallLibMethod>
+                    <IFCondition Expression="(EOCSelection = ADC_EOC_SINGLE_SEQ_CONV)">
+                        <CallLibMethod Name="LL_ADC_DisableIT_JEOS">
+                            <MethodArg Name="ADCx" ParameterName="Instance" />
+                        </CallLibMethod>
+                        <CallLibMethod Name="LL_ADC_DisableIT_JEOC">
+                            <MethodArg Name="ADCx" ParameterName="Instance" />
+                        </CallLibMethod>
+                    </IFCondition>  
+                </IFCondition>  
 
-		<CallLibMethod Name="LL_ADC_SetOverSamplingDiscont">
-			<MethodArg Name="ADCx" ParameterName="Instance" />
-			<MethodArg Name="OverSamplingDiscont" ParameterName="TriggeredMode" />
-		</CallLibMethod>
+                <IFCondition Expression="!(ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE)">
+                    <CallLibMethod Name="LL_ADC_REG_SetTriggerEdge">
+                        <MethodArg Name="ADCx" ParameterName="Instance" />
+                        <MethodArg Name="ExternalTriggerEdge" ParameterName="ExternalTrigConvEdge" />
+                    </CallLibMethod>
+                </IFCondition>
 
-		<!-- parameter EOCSelection -->
-		<!--IFCondition Expression="(EOCSelection = ADC_EOC_SINGLE_CONV)"-->
-			<CallLibMethod Name="LL_ADC_DisableIT_EOC">
-				<MethodArg Name="ADCx" ParameterName="Instance" />
-			</CallLibMethod>
-			<CallLibMethod Name="LL_ADC_DisableIT_EOS">
-				<MethodArg Name="ADCx" ParameterName="Instance" />
-			</CallLibMethod>
-                        <CallLibMethod Name="LL_ADC_DisableDeepPowerDown">
-				<MethodArg Name="ADCx" ParameterName="Instance" />
-			</CallLibMethod>
-                        <CallLibMethod Name="LL_ADC_EnableInternalRegulator">
-				<MethodArg Name="ADCx" ParameterName="Instance" />
-			</CallLibMethod>
-		<!--/IFCondition-->
+               
 
-		<!--IFCondition Expression="(EOCSelection = ADC_EOC_SEQ_CONV)">
-			<CallLibMethod Name="LL_ADC_EnableIT_EOS">
-				<MethodArg Name="ADCx" ParameterName="Instance" />
-			</CallLibMethod>
-			<CallLibMethod Name="LL_ADC_DisableIT_EOC">
-				<MethodArg Name="ADCx" ParameterName="Instance" />
-			</CallLibMethod>
-		</IFCondition-->
+                <CallLibMethod Name="LL_ADC_ConfigOverSamplingRatioShift">
+                    <MethodArg Name="ADCx" ParameterName="Instance" />
+                    <MethodArg Name="Ratio" ParameterName="Ratio" />
+                    <MethodArg Name="Shift" ParameterName="RightBitShift" />
+                </CallLibMethod>
 
-	</RefConfig>
+                <CallLibMethod Name="LL_ADC_SetOverSamplingDiscont">
+                    <MethodArg Name="ADCx" ParameterName="Instance" />
+                    <MethodArg Name="OverSamplingDiscont" ParameterName="TriggeredMode" />
+                </CallLibMethod>
+                
 
-	<RefConfig Name="ADC_RegularChannelConfig" Comment="Configure Regular Channel">
-		<CallLibMethod Name="LL_ADC_REG_SetSequencerRanks">
+                <!-- parameter EOCSelection -->
+                <!--IFCondition Expression="(EOCSelection = ADC_EOC_SINGLE_CONV)"-->
+                <CallLibMethod Name="LL_ADC_DisableIT_EOC">
+                    <MethodArg Name="ADCx" ParameterName="Instance" />
+                </CallLibMethod>
+                <CallLibMethod Name="LL_ADC_DisableIT_EOS">
+                    <MethodArg Name="ADCx" ParameterName="Instance" />
+                </CallLibMethod>
+                <CallLibMethod Name="LL_ADC_DisableDeepPowerDown">
+                    <MethodArg Name="ADCx" ParameterName="Instance" />
+                </CallLibMethod>
+                <CallLibMethod Name="LL_ADC_EnableInternalRegulator">
+                    <MethodArg Name="ADCx" ParameterName="Instance" />
+                </CallLibMethod>
+                <!--/IFCondition-->
+
+                <!--IFCondition Expression="(EOCSelection = ADC_EOC_SEQ_CONV)">
+                        <CallLibMethod Name="LL_ADC_EnableIT_EOS">
+                                <MethodArg Name="ADCx" ParameterName="Instance" />
+                        </CallLibMethod>
+                        <CallLibMethod Name="LL_ADC_DisableIT_EOC">
+                                <MethodArg Name="ADCx" ParameterName="Instance" />
+                        </CallLibMethod>
+                </IFCondition-->
+
+        </RefConfig>
+
+        <RefConfig Name="ADC_RegularChannelConfig" Comment="Configure Regular Channel">
+            <CallLibMethod Name="LL_ADC_REG_SetSequencerRanks">
 			<MethodArg Name="ADCx" ParameterName="Instance" />
 			<MethodArg Name="Rank" ParameterName="Rank" />
 			<MethodArg Name="Channel" ParameterName="Channel" />
@@ -114,194 +163,175 @@
 		<CallLibMethod Name="LL_ADC_SetChannelSingleDiff">
 			<MethodArg Name="ADCx" ParameterName="Instance" />
 			<MethodArg Name="Channel" ParameterName="Channel" />
-			<MethodArg Name="SingleDiff" ParameterName="SingleDiff" />
-		</CallLibMethod>
-		<IFCondition Expression="!(OffsetNumber = ADC_OFFSET_NONE)">
-			<CallLibMethod Name="LL_ADC_SetOffset">
-				<MethodArg Name="ADCx" ParameterName="Instance" />
-				<MethodArg Name="Offsety" ParameterName="OffsetNumber" />
-				<MethodArg Name="Channel" ParameterName="Channel" />
-				<MethodArg Name="OffsetLevel" ParameterName="Offset" />
-			</CallLibMethod>
-		</IFCondition>
-		<!-- PathInternal Depend on selected channel -->
-		<IFCondition
-			Expression="(Channel = ADC_CHANNEL_TEMPSENSOR) | (Channel = ADC_CHANNEL_VREFINT) | (Channel = ADC_CHANNEL_VBAT)">
-			<CallLibMethod Name="LL_ADC_SetCommonPathInternalCh">
+                        <MethodArg Name="SingleDiff" ParameterName="SingleDiff" />
+                </CallLibMethod>
+                <IFCondition Expression="!(OffsetNumber = ADC_OFFSET_NONE)">
+                    <CallLibMethod Name="LL_ADC_SetOffset">
+                        <MethodArg Name="ADCx" ParameterName="Instance" />
+                        <MethodArg Name="Offsety" ParameterName="OffsetNumber" />
+                        <MethodArg Name="Channel" ParameterName="Channel" />
+                        <MethodArg Name="OffsetLevel" ParameterName="Offset" />
+                    </CallLibMethod>
+                </IFCondition>
+                <!-- PathInternal Depend on selected channel -->
+                <IFCondition
+                    Expression="(Channel = ADC_CHANNEL_TEMPSENSOR) | (Channel = ADC_CHANNEL_VREFINT) | (Channel = ADC_CHANNEL_VBAT)">
+                    <CallLibMethod Name="LL_ADC_SetCommonPathInternalCh">
 				<MethodArg Name="ADCxy_COMMON">
-					<CallLibMethod Name="__LL_ADC_COMMON_INSTANCE">
-						<MethodArg Name="ADCx" ParameterName="Instance" />
-					</CallLibMethod>
-				</MethodArg>
-				<MethodArg Name="PathInternal" ParameterName="Channel" />
-			</CallLibMethod>
-		</IFCondition>
-	</RefConfig>
+                                    <CallLibMethod Name="__LL_ADC_COMMON_INSTANCE">
+                                        <MethodArg Name="ADCx" ParameterName="Instance" />
+                                    </CallLibMethod>
+                                </MethodArg>
+                                <MethodArg Name="PathInternal" ParameterName="Channel" />
+                        </CallLibMethod>
+                </IFCondition>
+        </RefConfig>
+        <RefConfig Name="ADC_InjectedChannelConfig" Comment="Configure Injected Channel">
+ 
+            <!-- Injected Channel configuration -->
+            <!--        <CallLibMethod Name="LL_ADC_INJ_SetSequencerRanks">
+                <MethodArg Name="ADCx" ParameterName="Instance" />
+                <MethodArg Name="Rank" ParameterName="InjectedRank" />
+                <MethodArg Name="Channel" ParameterName="InjectedChannel" />
+            </CallLibMethod>-->
 
-	<RefConfig Name="ADC_InjectedChannelConfig" Comment="Configure Injected Channel">
-		<CallLibMethod Name="LL_ADC_INJ_Init">
-			<MethodArg Name="ADCx" ParameterName="Instance" />
-			<MethodArg Name="TriggerSource" ParameterName="ExternalTrigInjecConv" />
-			<MethodArg Name="SequencerLength" ParameterName="InjNumberOfConversion" />
-			<MethodArg Name="SequencerDiscont" ParameterName="InjectedDiscontinuousConvMode" />
-			<MethodArg Name="TrigAuto" ParameterName="AutoInjectedConv" />
-		</CallLibMethod>
-		<IFCondition Expression="!(ExternalTrigInjecConvEdge = ADC_EXTERNALTRIGINJECCONV_EDGE_NONE)">
-			<CallLibMethod Name="LL_ADC_INJ_SetTriggerEdge">
-				<MethodArg Name="ADCx" ParameterName="Instance" />
-				<MethodArg Name="ExternalTriggerEdge" ParameterName="ExternalTrigInjecConvEdge" />
-			</CallLibMethod>
-		</IFCondition>
-		<CallLibMethod Name="LL_ADC_INJ_SetQueueMode">
-			<MethodArg Name="ADCx" ParameterName="Instance" />
-			<MethodArg Name="QueueMode" ParameterName="InjectedQueue,QueueInjectedContext" />
-		</CallLibMethod>
+            <CallLibMethod Name="LL_ADC_SetChannelSamplingTime">
+                <MethodArg Name="ADCx" ParameterName="Instance" />
+                <MethodArg Name="Channel" ParameterName="InjectedChannel" />
+                <MethodArg Name="SamplingTime" ParameterName="InjectedSamplingTime" />
+            </CallLibMethod>
 
-		<CallLibMethod Name="LL_ADC_SetOverSamplingScope">
-			<MethodArg Name="ADCx" ParameterName="Instance" />
-			<MethodArg Name="OvsScope"
-				ParameterName="OversamplingMode,EnableInjectedOversampling,OversamplingStopReset" />
-		</CallLibMethod>
+            <CallLibMethod Name="LL_ADC_SetChannelSingleDiff">
+                <MethodArg Name="ADCx" ParameterName="Instance" />
+                <MethodArg Name="Channel" ParameterName="InjectedChannel" />
+                <MethodArg Name="SingleDiff" ParameterName="InjectedSingleDiff" />
+            </CallLibMethod>
+           
+                   
+            
 
-		<CallLibMethod Name="LL_ADC_ConfigOverSamplingRatioShift">
-			<MethodArg Name="ADCx" ParameterName="Instance" />
-			<MethodArg Name="Ratio" ParameterName="InjOversamplingRatio" />
-			<MethodArg Name="Shift" ParameterName="InjOversamplingRightShift" />
-		</CallLibMethod>
-
-		<!-- parameter EOCSelection -->
-		<!--IFCondition Expression="(EOCSelection = ADC_EOC_SINGLE_CONV)"-->
-			<CallLibMethod Name="LL_ADC_DisableIT_JEOC">
-				<MethodArg Name="ADCx" ParameterName="Instance" />
-			</CallLibMethod>
-			<CallLibMethod Name="LL_ADC_DisableIT_JEOS">
-				<MethodArg Name="ADCx" ParameterName="Instance" />
-			</CallLibMethod>
-                        
-                                               
-		<!--/IFCondition-->
-
-		<!--IFCondition Expression="(EOCSelection = ADC_EOC_SINGLE_SEQ_CONV)">
-			<CallLibMethod Name="LL_ADC_EnableIT_JEOS">
-				<MethodArg Name="ADCx" ParameterName="Instance" />
-			</CallLibMethod>
-			<CallLibMethod Name="LL_ADC_DisableIT_JEOC">
-				<MethodArg Name="ADCx" ParameterName="Instance" />
-			</CallLibMethod>
-		</IFCondition-->
-
-		<!-- Injected Channel configuration -->
-		<CallLibMethod Name="LL_ADC_INJ_SetSequencerRanks">
-			<MethodArg Name="ADCx" ParameterName="Instance" />
-			<MethodArg Name="Rank" ParameterName="InjectedRank" />
-			<MethodArg Name="Channel" ParameterName="InjectedChannel" />
-		</CallLibMethod>
-
-		<CallLibMethod Name="LL_ADC_SetChannelSamplingTime">
-			<MethodArg Name="ADCx" ParameterName="Instance" />
-			<MethodArg Name="Channel" ParameterName="InjectedChannel" />
-			<MethodArg Name="SamplingTime" ParameterName="InjectedSamplingTime" />
-		</CallLibMethod>
-
-		<CallLibMethod Name="LL_ADC_SetChannelSingleDiff">
-			<MethodArg Name="ADCx" ParameterName="Instance" />
-			<MethodArg Name="Channel" ParameterName="InjectedChannel" />
-			<MethodArg Name="SingleDiff" ParameterName="InjectedSingleDiff" />
-		</CallLibMethod>
-
-		<IFCondition Expression="!(InjectedOffsetNumber = ADC_OFFSET_NONE)">
-			<CallLibMethod Name="LL_ADC_SetOffset">
-				<MethodArg Name="ADCx" ParameterName="Instance" />
-				<MethodArg Name="Offsety" ParameterName="InjectedOffsetNumber" />
-				<MethodArg Name="Channel" ParameterName="InjectedChannel" />
-				<MethodArg Name="OffsetLevel" ParameterName="InjectedOffset" />
-			</CallLibMethod>
-		</IFCondition>
-		<!-- PathInternal Depend on selected channel -->
-		<IFCondition
-			Expression="(InjectedChannel = ADC_CHANNEL_TEMPSENSOR) | (InjectedChannel = ADC_CHANNEL_VREFINT) | (InjectedChannel = ADC_CHANNEL_VBAT)">
-			<CallLibMethod Name="LL_ADC_SetCommonPathInternalCh">
-				<MethodArg Name="ADCxy_COMMON">
-					<CallLibMethod Name="__LL_ADC_COMMON_INSTANCE">
-						<MethodArg Name="ADCx" ParameterName="Instance" />
-					</CallLibMethod>
-				</MethodArg>
-				<MethodArg Name="PathInternal" ParameterName="InjectedChannel" />
-			</CallLibMethod>
-		</IFCondition>
-	</RefConfig>
-
-	<RefConfig Name="ADC_AnalogWDGConfig" Comment="Configure Analog WatchDog 1">
-		<CallLibMethod Name="LL_ADC_SetAnalogWDMonitChannels">
-			<MethodArg Name="ADCx" ParameterName="Instance" />
-			<MethodArg Name="AWDy" ParameterName="AWD1WatchdogNumber" />
-			<MethodArg Name="AWDChannelGroup" ParameterName="WatchdogMode,WatchdogChannel" />
-		</CallLibMethod>
-
-		<CallLibMethod Name="LL_ADC_ConfigAnalogWDThresholds">
-			<MethodArg Name="ADCx" ParameterName="Instance" />
-			<MethodArg Name="AWDy" ParameterName="AWD1WatchdogNumber" />
-			<MethodArg Name="AWDThresholdHighValue" ParameterName="AWD1HighThreshold" />
-			<MethodArg Name="AWDThresholdLowValue" ParameterName="AWD1LowThreshold" />
-		</CallLibMethod>
-		<!-- parameter AWD1ITMode ENABLE -->
-		<IFCondition Expression="(AWD1ITMode = ENABLE)">
-			<CallLibMethod Name="LL_ADC_EnableIT_AWD1">
-				<MethodArg Name="ADCx" ParameterName="Instance" />
-			</CallLibMethod>
-		</IFCondition>
-		<!-- parameter AWD1ITMode DISABLE -->
-		<IFCondition Expression="(AWD1ITMode = DISABLE)">
-			<CallLibMethod Name="LL_ADC_DisableIT_AWD1">
-				<MethodArg Name="ADCx" ParameterName="Instance" />
-			</CallLibMethod>
-		</IFCondition>
-	</RefConfig>
-
-	<RefConfig Name="ADC_RegularChannelConfigForWD"
-		Comment="Configure the regular channel to be monitored by WatchDog 2 or 3">
-            <IFCondition Expression="(MonitoredBy=ADC_ANALOGWATCHDOG_2 &amp; EnableAnalogWatchDog2=true)|(MonitoredBy=ADC_ANALOGWATCHDOG_3 &amp; EnableAnalogWatchDog3=true)">
-		<CallLibMethod Name="LL_ADC_SetAnalogWDMonitChannels">
-			<MethodArg Name="ADCx" ParameterName="Instance" />
-			<MethodArg Name="AWDy" ParameterName="MonitoredBy" />
-			<MethodArg Name="AWDChannelGroup" ParameterName="AWDChannel" />
-		</CallLibMethod>            
-		<CallLibMethod Name="LL_ADC_ConfigAnalogWDThresholds">
-			<MethodArg Name="ADCx" ParameterName="Instance" />
-			<MethodArg Name="AWDy" ParameterName="MonitoredBy" />
-			<MethodArg Name="AWDThresholdHighValue" ParameterName="RegHighThreshold" />
-			<MethodArg Name="AWDThresholdLowValue" ParameterName="RegLowThreshold" />
-		</CallLibMethod>
+            <IFCondition Expression="!(InjectedOffsetNumber = ADC_OFFSET_NONE)">
+                <CallLibMethod Name="LL_ADC_SetOffset">
+                    <MethodArg Name="ADCx" ParameterName="Instance" />
+                    <MethodArg Name="Offsety" ParameterName="InjectedOffsetNumber" />
+                    <MethodArg Name="Channel" ParameterName="InjectedChannel" />
+                    <MethodArg Name="OffsetLevel" ParameterName="InjectedOffset" />
+                </CallLibMethod>
+		
+                <CallLibMethod Name="LL_ADC_SetOffsetSign">
+                    <MethodArg Name="ADCx" ParameterName="Instance" />
+                    <MethodArg Name="Offsety" ParameterName="InjectedOffsetNumber" />
+                    <MethodArg Name="OffsetSign" ParameterName="InjectedOffsetSign" />
+                </CallLibMethod>
+                <CallLibMethod Name="LL_ADC_SetOffsetSaturation">
+                    <MethodArg Name="ADCx" ParameterName="Instance" />
+                    <MethodArg Name="Offsety" ParameterName="InjectedOffsetNumber" />
+                    <MethodArg Name="OffsetSaturation" ParameterName="InjectedOffsetSaturation" />
+                </CallLibMethod>
             </IFCondition>
-		<!-- parameter RegITMode = ENABLE/DISABLE and parameter MonitoredBy= (AWD2 
-			or AWD3) -->
-		<IFCondition
-			Expression="(RegITMode = ENABLE) &amp; (MonitoredBy = ADC_ANALOGWATCHDOG_2)">
-			<CallLibMethod Name="LL_ADC_EnableIT_AWD2">
-				<MethodArg Name="ADCx" ParameterName="Instance" />
-			</CallLibMethod>
-		</IFCondition>
+            <!-- PathInternal Depend on selected channel -->
+            <IFCondition
+                Expression="(InjectedChannel = ADC_CHANNEL_TEMPSENSOR) | (InjectedChannel = ADC_CHANNEL_VREFINT) | (InjectedChannel = ADC_CHANNEL_VBAT)">
+                <CallLibMethod Name="LL_ADC_SetCommonPathInternalCh">
+                    <MethodArg Name="ADCxy_COMMON">
+                        <CallLibMethod Name="__LL_ADC_COMMON_INSTANCE">
+                            <MethodArg Name="ADCx" ParameterName="Instance" />
+                        </CallLibMethod>
+                    </MethodArg>
+                    <MethodArg Name="PathInternal" ParameterName="InjectedChannel" />
+                </CallLibMethod>
+            </IFCondition>
+        </RefConfig>
+    
+        <RefConfig Name="ADC_InjectedQueueEnable" Comment="Configure injected channel ADC_JSQR register">
+            <IFCondition Expression="QueueEnable$IpInstance">
+                <CallLibMethod  Name="LL_ADC_INJ_ConfigQueueContext">
+                    <MethodArg Name="ADCx" ParameterName="Instance" />
+                    <MethodArg Name="TriggerSource" ParameterName="ExternalTrigInjecConv" />
+                    <MethodArg Name="ExternalTriggerEdge" ParameterName="ExternalTrigInjecConvEdge" />
+                    <MethodArg Name="SequencerLength" ParameterName="InjNumberOfConversion" />
+                    <MethodArg Name="Rank1_Channel" ParameterName="Rank1_Channel"/>
+                    <MethodArg Name="Rank2_Channel" ParameterName="Rank2_Channel"/>
+                    <MethodArg Name="Rank3_Channel" ParameterName="Rank3_Channel"/>      
+                    <MethodArg Name="Rank4_Channel" ParameterName="Rank4_Channel"/>        
+                </CallLibMethod>
+            </IFCondition>
+        
+        </RefConfig>
 
-		<IFCondition
-			Expression="(RegITMode = ENABLE) &amp; (MonitoredBy = ADC_ANALOGWATCHDOG_3)">
-			<CallLibMethod Name="LL_ADC_EnableIT_AWD3">
-				<MethodArg Name="ADCx" ParameterName="Instance" />
-			</CallLibMethod>
-		</IFCondition>
+	
 
-		<IFCondition
-			Expression="(RegITMode = DISABLE) &amp; (MonitoredBy = ADC_ANALOGWATCHDOG_2)">
-			<CallLibMethod Name="LL_ADC_DisableIT_AWD2">
-				<MethodArg Name="ADCx" ParameterName="Instance" />
-			</CallLibMethod>
-		</IFCondition>
+        <RefConfig Name="ADC_AnalogWDGConfig" Comment="Configure Analog WatchDog 1">
+            <CallLibMethod Name="LL_ADC_SetAnalogWDMonitChannels">
+                <MethodArg Name="ADCx" ParameterName="Instance" />
+                <MethodArg Name="AWDy" ParameterName="AWD1WatchdogNumber" />
+                <MethodArg Name="AWDChannelGroup" ParameterName="WatchdogMode,WatchdogChannel" />
+            </CallLibMethod>
 
-		<IFCondition
-			Expression="(RegITMode = DISABLE) &amp; (MonitoredBy = ADC_ANALOGWATCHDOG_3)">
-			<CallLibMethod Name="LL_ADC_DisableIT_AWD3">
-				<MethodArg Name="ADCx" ParameterName="Instance" />
-			</CallLibMethod>
-		</IFCondition>
+            <CallLibMethod Name="LL_ADC_ConfigAnalogWDThresholds">
+                <MethodArg Name="ADCx" ParameterName="Instance" />
+                <MethodArg Name="AWDy" ParameterName="AWD1WatchdogNumber" />
+                <MethodArg Name="AWDThresholdHighValue" ParameterName="AWD1HighThreshold" />
+                <MethodArg Name="AWDThresholdLowValue" ParameterName="AWD1LowThreshold" />
+            </CallLibMethod>
+            <!-- parameter AWD1ITMode ENABLE -->
+            <IFCondition Expression="(AWD1ITMode = ENABLE)">
+                <CallLibMethod Name="LL_ADC_EnableIT_AWD1">
+                    <MethodArg Name="ADCx" ParameterName="Instance" />
+                </CallLibMethod>
+            </IFCondition>
+            <!-- parameter AWD1ITMode DISABLE -->
+            <IFCondition Expression="(AWD1ITMode = DISABLE)">
+                <CallLibMethod Name="LL_ADC_DisableIT_AWD1">
+                    <MethodArg Name="ADCx" ParameterName="Instance" />
+                </CallLibMethod>
+            </IFCondition>
+        </RefConfig>
+
+        <RefConfig Name="ADC_RegularChannelConfigForWD"
+                   Comment="Configure the regular channel to be monitored by WatchDog 2 or 3">
+            <IFCondition Expression="(MonitoredBy=ADC_ANALOGWATCHDOG_2 &amp; EnableAnalogWatchDog2=true)|(MonitoredBy=ADC_ANALOGWATCHDOG_3 &amp; EnableAnalogWatchDog3=true)">
+                <CallLibMethod Name="LL_ADC_SetAnalogWDMonitChannels">
+                    <MethodArg Name="ADCx" ParameterName="Instance" />
+                    <MethodArg Name="AWDy" ParameterName="MonitoredBy" />
+                    <MethodArg Name="AWDChannelGroup" ParameterName="AWDChannel" />
+                </CallLibMethod>            
+                <CallLibMethod Name="LL_ADC_ConfigAnalogWDThresholds">
+                    <MethodArg Name="ADCx" ParameterName="Instance" />
+                    <MethodArg Name="AWDy" ParameterName="MonitoredBy" />
+                    <MethodArg Name="AWDThresholdHighValue" ParameterName="RegHighThreshold" />
+                    <MethodArg Name="AWDThresholdLowValue" ParameterName="RegLowThreshold" />
+                </CallLibMethod>
+            </IFCondition>
+            <!-- parameter RegITMode = ENABLE/DISABLE and parameter MonitoredBy= (AWD2 
+            or AWD3) -->
+            <IFCondition
+                Expression="(RegITMode = ENABLE) &amp; (MonitoredBy = ADC_ANALOGWATCHDOG_2)">
+                <CallLibMethod Name="LL_ADC_EnableIT_AWD2">
+                    <MethodArg Name="ADCx" ParameterName="Instance" />
+                </CallLibMethod>
+            </IFCondition>
+
+            <IFCondition
+                Expression="(RegITMode = ENABLE) &amp; (MonitoredBy = ADC_ANALOGWATCHDOG_3)">
+                <CallLibMethod Name="LL_ADC_EnableIT_AWD3">
+                    <MethodArg Name="ADCx" ParameterName="Instance" />
+                </CallLibMethod>
+            </IFCondition>
+
+            <IFCondition
+                Expression="(RegITMode = DISABLE) &amp; (MonitoredBy = ADC_ANALOGWATCHDOG_2)">
+                <CallLibMethod Name="LL_ADC_DisableIT_AWD2">
+                    <MethodArg Name="ADCx" ParameterName="Instance" />
+                </CallLibMethod>
+            </IFCondition>
+
+            <IFCondition
+                Expression="(RegITMode = DISABLE) &amp; (MonitoredBy = ADC_ANALOGWATCHDOG_3)">
+                <CallLibMethod Name="LL_ADC_DisableIT_AWD3">
+                    <MethodArg Name="ADCx" ParameterName="Instance" />
+                </CallLibMethod>
+            </IFCondition>
 
 	</RefConfig>
 
@@ -502,7 +532,7 @@
 			OptimizationCondition="equal" />
 		<Argument AddressOf="false" GenericType="simple" Name="ExternalTriggerEdge"
 			OptimizationCondition="equal" />
-		<Argument AddressOf="false" GenericType="simple" Name="SequencerNbRanks"
+		<Argument AddressOf="false" GenericType="simple" Name="SequencerLength"
 			OptimizationCondition="equal" />
 		<Argument AddressOf="false" GenericType="simple" Name="Rank1_Channel"
 			OptimizationCondition="equal" />
@@ -1225,6 +1255,14 @@
 		<Argument AddressOf="false" GenericType="baseaddress" Name="ADCx"
 			TypeName="ADC_TypeDef" />
 	</LibMethod>
+         <LibMethod Comment="" Name="LL_ADC_SetOffsetSign">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="ADCx"
+                  TypeName="ADC_TypeDef" />
+        <Argument AddressOf="false" GenericType="simple" Name="Offsety"
+                  OptimizationCondition="equal" />
+        <Argument AddressOf="false" GenericType="simple" Name="OffsetSign"
+                  OptimizationCondition="equal" />
+        </LibMethod>
 	<LibMethod Comment="" Name="LL_ADC_INJ_StartConversion">
 		<Argument AddressOf="false" GenericType="baseaddress" Name="ADCx"
 			TypeName="ADC_TypeDef" />

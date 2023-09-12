@@ -4,11 +4,11 @@
         <Condition Diagnostic="" Expression="RNG_Exist"/>
     </Background>
     <Background  imageName="STM32G0-TIM1" name="STM32G0-TIM1"  x="1227" y="374">
-        <Condition Diagnostic="" Expression="TIM1_Exist &amp; STM32G0x1"/>
+        <Condition Diagnostic="" Expression="TIM1_Exist &amp; !STM32G0x0_Value_line"/>
     </Background>
     
     <Background  imageName="STM32G0-PLLLineZeor" name="STM32G0-PLLLineZeor"  x="406" y="438">
-        <Condition Diagnostic="" Expression="!STM32G0x1"/>
+        <Condition Diagnostic="" Expression="STM32G0x0_Value_line"/>
     </Background>
     
     <Background  imageName="STM32G0-Lpuart1" name="STM32G0-Lpuart1"  x="1265" y="598">
@@ -194,13 +194,13 @@
                
 
         <Element id="TIM1Mult" type="multiplexor" refParameter="TIM1CLockSelectionVirtual" orientation="LEFT" x="1184" y="480" refEnable="TIM1Enable">
-            <Condition Diagnostic="" Expression="STM32G0x1"/>
+            <Condition Diagnostic="" Expression="!STM32G0x0_Value_line"/>
             <Input signalId="TimCLK"    from="TimPrescalerAPB"  refValue="RCC_TIM1CLKSOURCE_PCLK1"/>
             <Input signalId="PLLQCLK"   from="PLLQ"             refValue="RCC_TIM1CLKSOURCE_PLL"  />
             <Output signalId="TIM1CLK" to="TIM1output"/>
         </Element>
         <Element id="TIM1output" type="activeOutput" refParameter="TIM1Freq_Value" x="1358" y="495"  refEnable="TIM1Enable">
-            <Condition Diagnostic="" Expression="STM32G0x1"/>
+            <Condition Diagnostic="" Expression="!STM32G0x0_Value_line"/>
             <Input signalId="TIM1CLK" from="TIM1Mult"/>
         </Element>
         
@@ -333,7 +333,7 @@
         <!--Main PLL-->
         <Tree id="PLL">
             <Element id="PLLN" type="multiplicator" refParameter="PLLN" x="509" y="478" >
-                <Condition Diagnostic="" Expression="STM32G0x1"/>
+                <Condition Diagnostic="" Expression="!STM32G0x0_Value_line"/>
                 <Input signalId="VCOInput" from="PLLM"/>
                 <Output signalId="VCOOutput" to="PLLQ"/>
                 <Output signalId="VCOOutput" to="PLLP"/>
@@ -344,26 +344,26 @@
                 <Output signalId="VCOOutput" to="PLLP"/>
                 <Output signalId="VCOOutput" to="PLLR"/>
             </Element>
-            <Element id="PLLP" type="devisor" refParameter="PLLP" x="575" y="554" refEnable="PLLPEnable">
+            <Element id="PLLP" type="devisor" refParameter="PLLP" x="575" y="554" refEnable="ADCPLLEnable,I2S1PLLEnable">
                 <Input signalId="VCOOutput" from="PLLN"/>
                 <Output signalId="PLLPCLK" to="PLLPoutput"/>
                 <Output signalId="PLLPCLK" to="I2S1Mult"/>
                 <Output signalId="PLLPCLK" to="ADCMult"/>
          
             </Element>
-            <Element id="PLLPoutput" type="output" refParameter="PLLPoutputFreq_Value" x="641" y="553" refEnable="PLLPEnable">
+            <Element id="PLLPoutput" type="output" refParameter="PLLPoutputFreq_Value" x="641" y="553" refEnable="ADCPLLEnable,I2S1PLLEnable">
                 <Input signalId="PLLPCLK" from="PLLP"/>
             </Element>
 
-            <Element id="PLLQ" type="devisor" refParameter="PLLQ" x="575" y="516" refEnable="PLLQEnable">
-                <Condition Diagnostic="" Expression="STM32G0x1"/>
+            <Element id="PLLQ" type="devisor" refParameter="PLLQ" x="575" y="516" refEnable="RNGPLLEnable,TIM1PLLEnable">
+                <Condition Diagnostic="" Expression="!STM32G0x0_Value_line"/>
                 <Input signalId="VCOOutput" from="PLLN"/>
                 <Output signalId="PLLQCLK" to="CK48Mult"/>
                 <Output signalId="PLLQCLK" to="PLLQoutput"/>
                 <Output signalId="PLLQCLK" to="TIM1Mult"/>
             </Element>
-            <Element id="PLLQoutput" type="output" refParameter="PLLQoutputFreq_Value" x="641" y="515" refEnable="PLLPEnable">
-                <Condition Diagnostic="" Expression="STM32G0x1"/>
+            <Element id="PLLQoutput" type="output" refParameter="PLLQoutputFreq_Value" x="641" y="515" refEnable="RNGPLLEnable,TIM1PLLEnable">
+                <Condition Diagnostic="" Expression="!STM32G0x0_Value_line"/>
                 <Input signalId="PLLQCLK" from="PLLQ"/>
             </Element>
 				
@@ -421,7 +421,7 @@
     </Signals>
     <!-- PLLs output 	label -->
     <Label id="PLLQPoutputLabel"     type="info" text="PLLQ"         posX="651" posY="503">
-        <Condition Diagnostic="" Expression="STM32G0x1"/>
+        <Condition Diagnostic="" Expression="!STM32G0x0_Value_line"/>
     </Label>
     <Label id="PLLPPoutputLabel"     type="info" text="PLLP"         posX="651" posY="542"/>
 
@@ -465,7 +465,7 @@
     <Label id="PLLNLabel"       type="info" text="*N"       posX="520" posY="501"/>
     <Label id="PLLPLabel"       type="info" text="/R"       posX="595" posY="501"/>
     <Label id="PLLQLabel"       type="info" text="/Q"       posX="595" posY="536">
-        <Condition Diagnostic="" Expression="STM32G0x1"/>
+        <Condition Diagnostic="" Expression="!STM32G0x0_Value_line"/>
     </Label>
     <Label id="PLLRLabel"       type="info" text="/P"       posX="595" posY="579"/>
     <Label id="PLLLabel"        type="info" text="PLL"      posX="510" posY="559"/>
@@ -488,16 +488,16 @@
     /****/
     <!--TIM1 mux-->
     <Label id="TIM1MUXLabel"     type="muxLabel"    text="TIM1 Clock Mux"   posX="1145" posY="455" refEnable="TIM1Enable">
-        <Condition Diagnostic="" Expression="STM32G0x1"/>
+        <Condition Diagnostic="" Expression="!STM32G0x0_Value_line"/>
     </Label>
     <Label id="TIM1Output"       type="SpecialInfo" text="To TIM1 (MHz)"    posX="1415" posY="494" refEnable="TIM1Enable">
-        <Condition Diagnostic="" Expression="STM32G0x1"/>	
+        <Condition Diagnostic="" Expression="!STM32G0x0_Value_line"/>	
     </Label>
     <Label id="TIM1TIMPCLKLabel" type="signal"      text="TPCLK"            posX="1142" posY="475" refEnable="TIM1Enable">
-        <Condition Diagnostic="" Expression="STM32G0x1"/>
+        <Condition Diagnostic="" Expression="!STM32G0x0_Value_line"/>
     </Label>
     <Label id="TIM1PLLQCLKLabel" type="signal"      text="PLLQ"             posX="1142" posY="510" refEnable="TIM1Enable">
-        <Condition Diagnostic="" Expression="STM32G0x1"/>
+        <Condition Diagnostic="" Expression="!STM32G0x0_Value_line"/>
     </Label>
 
     <!--LPTIM1 mux-->

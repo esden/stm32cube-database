@@ -477,7 +477,11 @@ void MX_${name}_Init(void)
 [/#list]
 [/#compress]
 
+
 #t/* USER CODE BEGIN ${ipName}_Init_PostTreatment */
+[#if family?contains("STM32H7")]
+#tHAL_PWREx_EnableUSBVoltageDetector();
+[/#if]
 #t
 #t/* USER CODE END ${ipName}_Init_PostTreatment */
 }

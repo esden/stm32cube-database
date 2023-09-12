@@ -532,13 +532,20 @@
 [#-- Section1: Create the void MX_<IpInstance>_<HalMode>_init() function for each ip instance --]
 [#compress]
 [#list IP.configModelList as instanceData]
+    [#assign static = true]
+    [#if instanceData.core?? && instanceData.ipInitializerCore??]
+        [#if instanceData.core!=instanceData.ipInitializerCore]
+            [#assign static = false]
+        [/#if]
+    [/#if]
+        
   [#assign instName = instanceData.instanceName]
   [#assign halMode= instanceData.halMode]
 /* ${instName} initialization function */
 [#if instanceData.isMWUsed=="false"]  
 [#if ipvar.ipName=="FMC"||ipvar.ipName=="FSMC"]
 
-static void MX_${instName}_Init(void)
+[#if static]static[/#if] void MX_${instName}_Init(void)
   [#else]
     [#if halMode!=name]void MX_${instName}_${halMode}_Init(void)[#else]void MX_${instName}_Init(void)[/#if]
   [/#if]

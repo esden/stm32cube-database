@@ -73,7 +73,11 @@
 [/#if]
 #n
 /* External functions --------------------------------------------------------*/
+[#if family?contains("STM32F7") || family?contains("STM32F4") || family?contains("STM32L4xx") || family?contains("STM32H7xx") ]
+[#if useLPM]
 void SystemClock_Config(void);
+[/#if]
+[/#if]
 
 /* USER CODE BEGIN 0 */
 
@@ -88,9 +92,13 @@ USBD_StatusTypeDef USBD_Get_USB_Status(HAL_StatusTypeDef hal_status);
 /* Private functions ---------------------------------------------------------*/
 
 /* USER CODE BEGIN 1 */
+[#if family?contains("STM32F7") || family?contains("STM32F4") || family?contains("STM32L4xx") || family?contains("STM32H7xx") ]
+[#if useLPM]
 static void SystemClockConfig_Resume(void);
-
+[/#if]
+[/#if]
 /* USER CODE END 1 */
+
 
 /*******************************************************************************
                        LL Driver Callbacks (PCD -> USB Device Library)
@@ -682,6 +690,9 @@ void USBD_LL_Delay(uint32_t Delay)
 {
   HAL_Delay(Delay);
 }
+
+[#if family?contains("STM32F7") || family?contains("STM32F4") || family?contains("STM32L4xx") || family?contains("STM32H7xx") ]
+[#if useLPM]
 /* USER CODE BEGIN 5 */
 /**
   * @brief  Configures system clock after wake-up from USB resume callBack:
@@ -693,7 +704,8 @@ static void SystemClockConfig_Resume(void)
   SystemClock_Config();
 }
 /* USER CODE END 5 */
-
+[/#if]
+[/#if]
 /**
   * @brief  Retuns the USB status depending on the HAL status:
   * @param  hal_status: HAL status
