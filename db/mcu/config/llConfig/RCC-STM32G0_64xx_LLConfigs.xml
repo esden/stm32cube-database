@@ -124,17 +124,9 @@
 
         <!--sys clock source + AHB/APB configuration-->
         <IFCondition Expression ="1=1">
-            <IFCondition Expression ="(HCLKFreq_Value &gt; 80000000)">
-            <CallLibMethod Name="LL_RCC_SetAHBPrescaler">
-                <MethodArg Name="Prescaler" ParameterName="AHBCLKDivider" FValue="LL_RCC_SYSCLK_DIV_2"/>
-            </CallLibMethod>
-            </IFCondition>
-
             <CallLibMethod Name="LL_RCC_SetSysClkSource">
                 <MethodArg Name="Source" ParameterName="SYSCLKSource"/>
             </CallLibMethod>
-        
-        
         </IFCondition>
         <IFCondition Expression ="SysSourcePLL">
 
@@ -158,21 +150,6 @@
             </CallLibMethod>
         </IFCondition>		
 
-        <IFCondition Expression ="(HCLKFreq_Value &gt; 80000000)">
-            <CallLibMethod Name="" Type="HardCode">
-                <HardCode Text="#t/* Insure 1µs transition state at intermediate medium speed clock based on DWT */"/>
-            </CallLibMethod>
-            <CallLibMethod Name="" Type="HardCode">
-                <HardCode Text="#tCoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;#n#tDWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;"/>
-            </CallLibMethod>
-            <CallLibMethod Name="" Type="HardCode">
-                <HardCode Text="#tDWT->CYCCNT = 0;"/>
-            </CallLibMethod>
-            <CallLibMethod Name="" Type="HardCode">
-                <HardCode Text="#twhile(DWT->CYCCNT &lt; 100);"/>
-            </CallLibMethod>
-         
-        </IFCondition>
         <IFCondition Expression ="1=1">
             <CallLibMethod Name="" Type="HardCode">
                 <HardCode Text="#t/* Set AHB prescaler*/"/>
@@ -182,7 +159,6 @@
                 <MethodArg Name="Prescaler" ParameterName="AHBCLKDivider"/>
             </CallLibMethod>
         </IFCondition>
-
      
         <IFCondition Expression ="1=1">
             <CallLibMethod Name="LL_RCC_SetAPB1Prescaler">
@@ -192,7 +168,7 @@
 
         <!--system core frequency set,systick init,systick priority configuration-->
         <IFCondition Expression ="USE_FULL_LL_DRIVER">
-             <CallLibMethod Name="" Type="HardCode">
+            <CallLibMethod Name="" Type="HardCode">
                 <HardCode Text="#n"/>
             </CallLibMethod>
             <CallLibMethod Name="LL_Init1msTick">
@@ -290,7 +266,7 @@
             </CallLibMethod>
         </IFCondition>
         <IFCondition Expression ="!(HSISYSCLKDivider=RCC_HSI_DIV1) &amp; (((CodegenConfigPeriph=false) &amp; (HSIUsedForSys=1)) | ((CodegenConfigPeriph=true) &amp; HSIUsed=1))">
-        <CallLibMethod Name="LL_RCC_SetHSIDiv">
+            <CallLibMethod Name="LL_RCC_SetHSIDiv">
                 <MethodArg Name="HSIDiv" ParameterName="HSISYSCLKDivider"/>
             </CallLibMethod>
         </IFCondition>
@@ -533,7 +509,7 @@
 
         <!--system core frequency set,systick init,systick priority configuration-->
         <IFCondition Expression ="USE_FULL_LL_DRIVER">
-             <CallLibMethod Name="" Type="HardCode">
+            <CallLibMethod Name="" Type="HardCode">
                 <HardCode Text="#n"/>
             </CallLibMethod>
             <CallLibMethod Name="LL_Init1msTick">
@@ -671,13 +647,13 @@
                     <CallLibMethod Name="HardCode:RTC" Type="HardCode">
                         <HardCode Text="#t#tLL_RCC_SetRTCClockSource(LL_RCC_RTC_CLKSOURCE_LSE);"/>
                     </CallLibMethod>
-                <Else>
-                    <IFCondition Expression ="RTCUsed_ForRCC &amp; RTCSourceHSE">
-                        <CallLibMethod Name="HardCode:RTC" Type="HardCode">
-                            <HardCode Text="#t#tLL_RCC_SetRTCClockSource(LL_RCC_RTC_CLKSOURCE_HSE_DIV32);"/>
-                        </CallLibMethod>
-                    </IFCondition>
-                </Else>
+                    <Else>
+                        <IFCondition Expression ="RTCUsed_ForRCC &amp; RTCSourceHSE">
+                            <CallLibMethod Name="HardCode:RTC" Type="HardCode">
+                                <HardCode Text="#t#tLL_RCC_SetRTCClockSource(LL_RCC_RTC_CLKSOURCE_HSE_DIV32);"/>
+                            </CallLibMethod>
+                        </IFCondition>
+                    </Else>
                 </IFCondition>
             </Else>
         </IFCondition>
@@ -760,7 +736,7 @@
             </CallLibMethod>
         </IFCondition>
 		
-        <IFCondition Expression ="(CodegenConfigPeriph=true) &amp; ADC1_USED">
+        <IFCondition Expression ="(CodegenConfigPeriph=true) &amp; ADC1_USED &amp; ADCUsed_ForRCC">
             <CallLibMethod Name="LL_RCC_SetADCClockSource">
                 <MethodArg Name="ADCxSource" ParameterName="ADCCLockSelection"/>
             </CallLibMethod>
@@ -1073,7 +1049,7 @@
         <File Category="header" Name="Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_ll_system.h"/>
         <File Category="header" Name="Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_ll_utils.h"/>
         <File Category="header" Name="Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_ll_utils.c"/> 
-	<File Category="header" Name="Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_ll_exti.h"/>
+        <File Category="header" Name="Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_ll_exti.h"/>
         <File Category="header" Name="Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_ll_exti.c"/>
         <File Category="header" Name="Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_ll_pwr.h"/>
         <File Category="header" Name="Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_ll_gpio.h"/>

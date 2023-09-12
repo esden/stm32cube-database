@@ -25,11 +25,18 @@
 [#assign BATT_FEATURE = false]
 [#assign DR_SWAP_TO_XFP_FEATURE = false]
 [#assign GUI_V1_8_0_OR_NEWER = false]
+[#assign REV3_SUPPORT = false]
 
 [#-- SWIPdatas is a list of SWIPconfigModel --]
 [#list SWIPdatas as SWIP]
     [#if SWIP.defines??]
         [#list SWIP.defines as definition]
+            [#if definition.name == "PE_SpecRevision_P0" && definition.value == "USBPD_SPECIFICATION_REV3"]
+                [#assign REV3_SUPPORT = true]
+            [/#if]
+            [#if definition.name == "PE_SpecRevision_P1" && definition.value == "USBPD_SPECIFICATION_REV3"]
+                [#assign REV3_SUPPORT = true]
+            [/#if]
             [#if definition.name == "USBPD_CoreLib" && definition.value != ""]
                 [#assign USBPD_CoreLib = definition.value]
             [/#if]
@@ -480,7 +487,7 @@ USBPD_USER_SettingsTypeDef       DPM_USER_Settings[USBPD_PORT_COUNT] =
     .PE_DR_Swap_To_DFP = ${valuePE_DR_Swap_To_DFP_P0},                  /*  Support of DR Swap to DFP                                  */
     .PE_DR_Swap_To_UFP = ${valuePE_DR_Swap_To_UFP_P0},                  /*  Support of DR Swap to UFP                                  */
 [/#if]
-#if defined(USBPD_REV30_SUPPORT)
+[#if REV3_SUPPORT]
 #if _MANU_INFO
     .DPM_ManuInfoPort =                      /*!< Manufacturer information used for the port            */
     {
@@ -489,7 +496,7 @@ USBPD_USER_SettingsTypeDef       DPM_USER_Settings[USBPD_PORT_COUNT] =
       .ManuString = "STMicroelectronics",    /*!< Vendor defined byte array                 */
     },
 #endif /* _MANU_INFO */
-#endif /* USBPD_REV30_SUPPORT */
+[/#if]
   },
 [#if nbPorts=="2"]
 #if USBPD_PORT_COUNT >= 2
@@ -500,7 +507,7 @@ USBPD_USER_SettingsTypeDef       DPM_USER_Settings[USBPD_PORT_COUNT] =
     .PE_DR_Swap_To_DFP = ${valuePE_DR_Swap_To_DFP_P1},                  /*  Support of DR Swap to DFP                                  */
     .PE_DR_Swap_To_UFP = ${valuePE_DR_Swap_To_UFP_P1},                  /*  Support of DR Swap to UFP                                  */
 [/#if]
-#if defined(USBPD_REV30_SUPPORT)
+[#if REV3_SUPPORT]
 #if _MANU_INFO
     .DPM_ManuInfoPort =                      /*!< Manufacturer information used for the port            */
     {
@@ -509,7 +516,7 @@ USBPD_USER_SettingsTypeDef       DPM_USER_Settings[USBPD_PORT_COUNT] =
       .ManuString = "STMicroelectronics",    /*!< Vendor defined byte array                 */
     },
 #endif /* _MANU_INFO */
-#endif /* USBPD_REV30_SUPPORT */
+[/#if]
   }
 #endif /* USBPD_PORT_COUNT >= 2 */
 [/#if]

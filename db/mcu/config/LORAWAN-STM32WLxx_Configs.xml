@@ -7,7 +7,7 @@
     IncludeFile=""
     Name="LoRaWAN"
     RootFolder="Middlewares/Third_Party/"
-    Version="STM32Cube_FW_WL_V1.2.0">
+    Version="STM32Cube_FW_WL_V1.3.0">
 
     <RefConfig Comment="" Name="LoRaWAN_Init">
         <CallLibMethod Name="LoRaWAN_Init"/>
@@ -24,8 +24,10 @@
         <Component Name="Middleware:MW_LORAWAN"/>
 
         <!-- Core/Inc -->
-        <ConfigFile Name="IPCC_IF_H"/>
+        <ConfigFile Name="BOARD_WL5M_CONF_H"/>
         <ConfigFile Name="FLASH_IF_H"/>
+        <ConfigFile Name="IPCC_IF_H"/>
+        <ConfigFile Name="KMS_IF_H"/>
         <ConfigFile Name="NUCLEO_CONF_H"/>
         <ConfigFile Name="PLATFORM_H"/>
         <ConfigFile Name="STM32_LPM_IF_H"/>
@@ -36,7 +38,7 @@
         <ConfigFile Name="STM32_TIMER_IF_H"/>
         <ConfigFile Name="UTILITIES_CONF_H"/>
         <ConfigFile Name="UTILITIES_DEF_H"/>
-        <ConfigFile Name="KMS_IF_H"/>
+        <ConfigFile Name="STM32_ADV_TRACE_IF_H"/>
 
         <!-- Core/Src -->
         <ConfigFile Name="IPCC_IF_M0PLUS_C"/>
@@ -47,7 +49,6 @@
         <ConfigFile Name="SYS_DEBUG_C"/>
         <ConfigFile Name="SYS_SENSORS_C"/>
         <ConfigFile Name="STM32_ADV_TRACE_IF_C"/>
-        <ConfigFile Name="STM32_ADV_TRACE_IF_H"/>
         <ConfigFile Name="STM32_TIMER_IF_C"/>
 
         <!-- LoRaWAN/App -->
@@ -69,6 +70,8 @@
         <ConfigFile Name="APP_TEST_RF_H"/>
         <ConfigFile Name="APP_LORA_INFO_C"/>
         <ConfigFile Name="APP_LORA_INFO_H"/>
+        <ConfigFile Name="APP_FW_UPDATE_AGENT_C"/>
+        <ConfigFile Name="APP_FW_UPDATE_AGENT_H"/>
 
         <!-- LoRaWAN/Target -->
         <ConfigFile Name="TARGET_LORAWAN_CONF_H"/>
@@ -77,7 +80,10 @@
         <ConfigFile Name="TARGET_RADIO_BOARD_H"/>
         <ConfigFile Name="TARGET_RADIO_CONF_H"/>
         <ConfigFile Name="TARGET_SYSTIME_H"/>
+        <ConfigFile Name="TARGET_TIMER_C"/>
         <ConfigFile Name="TARGET_TIMER_H"/>
+        <ConfigFile Name="TARGET_FRAG_DECODER_IF_C"/>
+        <ConfigFile Name="TARGET_FRAG_DECODER_IF_H"/>
 
        <!-- MbMux-->
         <ConfigFile Name="MBMUX_FEATURE_INFO_C"/>
@@ -184,46 +190,58 @@
         <File Category="header" Name="LoRaWAN/*.h" Condition="!SEM_M4"/>
         <File Category="source" Name="LoRaWAN/*.c" Condition="!SEM_M4"/>
         <File Category="header" Name="LoRaWAN/LmHandler/*.h" Condition="all"/>
-        <File Category="source" Name="LoRaWAN/LmHandler/*.c" Condition="(!SEM_M0PLUS &amp; !SEM_M4)"/>
-        <File Category="source" Name="LoRaWAN/LmHandler/LmHandler.c" Condition="SEM_M0PLUS"/>
-        <File Category="source" Name="LoRaWAN/LmHandler/NvmDataMgmt.c" Condition="SEM_M0PLUS"/>
+        <File Category="source" Name="LoRaWAN/LmHandler/*.c" Condition="!SEM_M4"/>
+        <File Category="source" Name="LoRaWAN/LmHandler/Packages/FragDecoder.c" Condition="!SEM_M4 &amp; SEM_LORAWAN_DATA_DISTRIB_MGT"/>
+        <File Category="header" Name="LoRaWAN/LmHandler/Packages/FragDecoder.h" Condition="!SEM_M4 &amp; SEM_LORAWAN_DATA_DISTRIB_MGT"/>
+        <File Category="header" Name="LoRaWAN/LmHandler/Packages/LmhPackage.h" Condition="!SEM_M4"/>
+        <File Category="header" Name="LoRaWAN/LmHandler/Packages/LmhpClockSync.h" Condition="!SEM_M4 &amp; SEM_LORAWAN_DATA_DISTRIB_MGT"/>
+        <File Category="source" Name="LoRaWAN/LmHandler/Packages/LmhpClockSync.c" Condition="!SEM_M4 &amp; SEM_LORAWAN_DATA_DISTRIB_MGT"/>
         <File Category="header" Name="LoRaWAN/LmHandler/Packages/LmhpCompliance.h" Condition="!SEM_M4"/>
         <File Category="source" Name="LoRaWAN/LmHandler/Packages/LmhpCompliance.c" Condition="!SEM_M4"/>
-        <File Category="header" Name="LoRaWAN/LmHandler/Packages/LmhPackage.h" Condition="!SEM_M4"/>
+        <File Category="header" Name="LoRaWAN/LmHandler/Packages/LmhpFirmwareManagement.h" Condition="!SEM_M4 &amp; SEM_LORAWAN_DATA_DISTRIB_MGT"/>
+        <File Category="source" Name="LoRaWAN/LmHandler/Packages/LmhpFirmwareManagement.c" Condition="!SEM_M4 &amp; SEM_LORAWAN_DATA_DISTRIB_MGT"/>
+        <File Category="header" Name="LoRaWAN/LmHandler/Packages/LmhpFragmentation.h" Condition="!SEM_M4 &amp; SEM_LORAWAN_DATA_DISTRIB_MGT"/>
+        <File Category="source" Name="LoRaWAN/LmHandler/Packages/LmhpFragmentation.c" Condition="!SEM_M4 &amp; SEM_LORAWAN_DATA_DISTRIB_MGT"/>
+        <File Category="header" Name="LoRaWAN/LmHandler/Packages/LmhpPackagesRegistration.h" Condition="!SEM_M4"/>
+        <File Category="source" Name="LoRaWAN/LmHandler/Packages/LmhpPackagesRegistration.c" Condition="!SEM_M4"/>
+        <File Category="header" Name="LoRaWAN/LmHandler/Packages/LmhpRemoteMcastSetup.h" Condition="!SEM_M4 &amp; SEM_LORAWAN_DATA_DISTRIB_MGT"/>
+        <File Category="source" Name="LoRaWAN/LmHandler/Packages/LmhpRemoteMcastSetup.c" Condition="!SEM_M4 &amp; SEM_LORAWAN_DATA_DISTRIB_MGT"/>
         <File Category="header" Name="LoRaWAN/Utilities/*.h" Condition="all"/>
         <File Category="source" Name="LoRaWAN/Utilities/*.c" Condition="!SEM_M4"/>
     </RefComponent>
 
-<!-- MZA agree to get it, as the radio component is inside the MCU, not on the board -->
     <RefComponent Cclass="Middleware" Cgroup="MW_SUBGHZ_PHY" Cversion="1.0.0">
-        <File Category="header" Name="SubGHz_Phy/radio.h" Condition="all"/>
-        <File Category="header" Name="SubGHz_Phy/radio_ex.h" Condition="!SEM_M4"/>
-        <File Category="header" Name="SubGHz_Phy/stm32_radio_driver/radio_driver.h" Condition="all"/>
-        <File Category="source" Name="SubGHz_Phy/stm32_radio_driver/radio_driver.c" Condition="!SEM_M4"/>
-        <File Category="header" Name="SubGHz_Phy/stm32_radio_driver/radio_fw.h" Condition="all"/>
-        <File Category="source" Name="SubGHz_Phy/stm32_radio_driver/radio_fw.c" Condition="!SEM_M4"/>
+        <File Category="header" Name="SubGHz_Phy/*.h" Condition="all"/>
+        <File Category="header" Name="SubGHz_Phy/stm32_radio_driver/*.h" Condition="!SEM_M4"/>
         <File Category="source" Name="SubGHz_Phy/stm32_radio_driver/radio.c" Condition="!SEM_M4"/>
-        <File Category="header" Name="SubGHz_Phy/stm32_radio_driver/subghz_phy_version.h" Condition="all"/>
+        <File Category="source" Name="SubGHz_Phy/stm32_radio_driver/radio_driver.c" Condition="!SEM_M4"/>
+        <File Category="source" Name="SubGHz_Phy/stm32_radio_driver/radio_fw.c" Condition="!SEM_M4"/>
     </RefComponent>
 
 <!-- Core/Inc begin-->
-
-    <RefConfigFile Description="" Name="FLASH_IF_H" Template="stm32wl/flash_if_h.ftl" destinationFolder="Core/Inc/">
-        <File Category="header" Name="flash_if.h" Version="1.0" Condition="!SEM_M0PLUS &amp; !SEM_LORA_USER_APPLICATION"/>
-    </RefConfigFile>
-
     <RefConfigFile Description="" Name="PLATFORM_H" Template="stm32wl/platform_h.ftl" destinationFolder="Core/Inc/">
         <File Category="header" Name="platform.h" Version="1.0" Condition="all"/>
         <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
         <Argument Name="FILL_UCS" GenericType="Simple" Comment=""/>
         <Argument Name="Activate_RADIO_BOARD_INTERFACE" GenericType="Simple" Comment=""/>
-<!--
+        <Argument Name="STM32WL5MXX" GenericType="Simple" Comment=""/>
+        <!--
         <Argument Name="Activate_BOARD_RESOURCES" GenericType="Simple" Comment=""/>
--->
+        -->
+    </RefConfigFile>
+
+    <RefConfigFile Description="" Name="FLASH_IF_H" Template="stm32wl/flash_if_h.ftl" destinationFolder="Core/Inc/">
+        <File Category="header" Name="flash_if.h" Version="1.0" Condition="!SEM_M0PLUS &amp; !SEM_LORA_USER_APPLICATION"/>
+        <Argument Name="STM32WL5MXX" GenericType="Simple" Comment=""/>
+    </RefConfigFile>
+
+    <RefConfigFile Description="" Name="IPCC_IF_H" Template="stm32wl/ipcc_if_h.ftl" destinationFolder="Core/Inc/">
+        <File Category="header" Name="ipcc_if.h" Version="1.0" Condition="SEM_M0PLUS | SEM_M4"/>
+        <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="STM32_LPM_IF_H" Template="stm32wl/stm32_lpm_if_h.ftl" destinationFolder="Core/Inc/">
-        <File Category="header" Name="stm32_lpm_if.h" Version="1.0" Condition="all"/>
+        <File Category="header" Name="stm32_lpm_if.h" Version="1.0" Condition="S_TINY_LPM"/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="SYS_APP_H" Template="stm32wl/sys_app_h.ftl" destinationFolder="Core/Inc/">
@@ -266,32 +284,49 @@
     <RefConfigFile Description="" Name="UTILITIES_CONF_H" Template="stm32wl/utilities_conf_h.ftl" destinationFolder="Core/Inc/">
         <File Category="header" Name="utilities_conf.h" Version="1.0" Condition="all"/>
         <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
+        <Argument Name="UTIL_SEQ_EN_M4" GenericType="Simple" Comment=""/>
+        <Argument Name="UTIL_SEQ_EN_M0" GenericType="Simple" Comment=""/>
+        <Argument Name="USE_UART" GenericType="Simple" Comment=""/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="UTILITIES_DEF_H" Template="stm32wl/utilities_def_h.ftl" destinationFolder="Core/Inc/">
         <File Category="header" Name="utilities_def.h" Version="1.0" Condition="all"/>
         <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
+        <Argument Name="UTIL_SEQ_EN_M4" GenericType="Simple" Comment=""/>
+        <Argument Name="UTIL_SEQ_EN_M0" GenericType="Simple" Comment=""/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="NUCLEO_CONF_H" Template="stm32wl/stm32wlxx_nucleo_conf_h.ftl" destinationFolder="Core/Inc/">
-        <File Category="header" Name="stm32wlxx_nucleo_conf.h" Version="1.0" Condition="!SEM_M0PLUS &amp; !SEM_M4 &amp; !SEM_USER_BOARD_FOR_LORA"/>
+        <File Category="header" Name="stm32wlxx_nucleo_conf.h" Version="1.0" Condition="!SEM_STM32WL5MXX &amp; !SEM_M0PLUS &amp; !SEM_M4 &amp; !SEM_USER_BOARD_FOR_LORA"/>
         <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
     </RefConfigFile>
 
-    <RefConfigFile Description="" Name="IPCC_IF_H" Template="stm32wl/ipcc_if_h.ftl" destinationFolder="Core/Inc/">
-        <File Category="header" Name="ipcc_if.h" Version="1.0" Condition="SEM_M0PLUS | SEM_M4"/>
+    <RefConfigFile Description="" Name="BOARD_WL5M_CONF_H" Template="stm32wl/b_wl5m_subg_conf_h.ftl" destinationFolder="Core/Inc/">
+        <File Category="header" Name="b_wl5m_subg_conf.h" Version="1.0" Condition="SEM_STM32WL5MXX &amp; !SEM_M0PLUS &amp; SEM_LORA_END_NODE"/>
         <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="KMS_IF_H" Template="stm32wl/kms_if_h.ftl" destinationFolder="Core/Inc/">
         <File Category="header" Name="kms_if.h" Version="1.0" Condition="SEM_M0PLUS"/>
     </RefConfigFile>
+
+    <RefConfigFile Description="" Name="STM32_TIMER_IF_H" Template="stm32wl/timer_if_h.ftl" destinationFolder="Core/Inc/">
+        <File Category="header" Name="timer_if.h" Version="1.0"  Condition="all"/>
+        <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
+        <Argument Name="UTIL_TIMER_EN" GenericType="Simple" Comment=""/>
+    </RefConfigFile>
+
+    <RefConfigFile Description="" Name="STM32_ADV_TRACE_IF_H" Template="stm32wl/stm32_adv_trace_if_h.ftl" destinationFolder="Core/Inc/">
+        <File Category="header" Name="stm32_adv_trace_if.h" Version="1.0" Condition="((!SEM_M0PLUS &amp; !SEM_M4) | SEM_M4) &amp; SEM_LORA_USER_APPLICATION &amp; !SEM_LORA_USE_UART &amp; S_ADV_TRACE"/>
+    </RefConfigFile>
+
 <!-- Core/Inc end-->
 
 <!-- Core/Src begin-->
 
     <RefConfigFile Description="" Name="FLASH_IF_C" Template="stm32wl/flash_if_c.ftl" destinationFolder="Core/Src/">
         <File Category="source" Name="flash_if.c" Version="1.0" Condition="!SEM_M0PLUS &amp; !SEM_LORA_USER_APPLICATION"/>
+        <Argument Name="STM32WL5MXX" GenericType="Simple" Comment=""/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="IPCC_IF_M4_C" Template="stm32wl/ipcc_if_M4_c.ftl" destinationFolder="Core/Src/">
@@ -302,7 +337,7 @@
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="STM32_LPM_IF_C" Template="stm32wl/stm32_lpm_if_c.ftl" destinationFolder="Core/Src/">
-        <File Category="source" Name="stm32_lpm_if.c" Version="1.0" Condition="all"/>
+        <File Category="source" Name="stm32_lpm_if.c" Version="1.0" Condition="S_TINY_LPM"/>
         <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
         <Argument Name="USE_UART" GenericType="Simple" Comment=""/>
         <Argument Name="USE_LPM" GenericType="Simple" Comment=""/>
@@ -311,8 +346,13 @@
     <RefConfigFile Description="" Name="SYS_APP_C" Template="stm32wl/sys_app_c.ftl" destinationFolder="Core/Src/">
         <File Category="source" Name="sys_app.c" Version="1.0" Condition="all"/>
         <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
+        <Argument Name="UTIL_SEQ_EN_M4" GenericType="Simple" Comment=""/>
+        <Argument Name="UTIL_SEQ_EN_M0" GenericType="Simple" Comment=""/>
+        <Argument Name="UTIL_TIMER_EN" GenericType="Simple" Comment=""/>
+        <Argument Name="USE_LPM" GenericType="Simple" Comment=""/>
+        <Argument Name="USE_UART" GenericType="Simple" Comment=""/>
+        <Argument Name="STM32WL5MXX" GenericType="Simple" Comment=""/>
     </RefConfigFile>
-
 
     <RefConfigFile Description="" Name="SYS_DEBUG_C" Template="stm32wl/sys_debug_c.ftl" destinationFolder="Core/Src/">
         <File Category="source" Name="sys_debug.c" Version="1.0" Condition="!SEM_M0PLUS &amp; !SEM_M4 &amp; !SEM_LORA_USER_APPLICATION"/>
@@ -322,6 +362,17 @@
         <File Category="source" Name="sys_sensors.c" Version="1.0" Condition="SEM_LORA_END_NODE &amp; !SEM_M0PLUS"/>
     </RefConfigFile>
 
+    <RefConfigFile Description="" Name="STM32_TIMER_IF_C" Template="stm32wl/timer_if_c.ftl" destinationFolder="Core/Src/">
+        <File Category="source" Name="timer_if.c" Version="1.0"  Condition="all"/>
+        <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
+        <Argument Name="UTIL_TIMER_EN" GenericType="Simple" Comment=""/>
+        <Argument Name="USE_RTC" GenericType="Simple" Comment=""/>
+    </RefConfigFile>
+
+    <RefConfigFile Description="" Name="STM32_ADV_TRACE_IF_C" Template="stm32wl/stm32_adv_trace_if_c.ftl" destinationFolder="Core/Src/">
+        <File Category="source" Name="stm32_adv_trace_if.c" Version="1.0" Condition="((!SEM_M0PLUS &amp; !SEM_M4) | SEM_M4) &amp; SEM_LORA_USER_APPLICATION &amp; !SEM_LORA_USE_UART &amp; S_ADV_TRACE"/>
+    </RefConfigFile>
+
 <!-- Core/Src end-->
 
 <!-- LoRaWAN/App begin-->
@@ -329,6 +380,8 @@
     <RefConfigFile Description="" Name="APP_APP_LORAWAN_C" Template="stm32wl/LoRaWAN_app_lorawan_c.ftl">
         <File Category="source" Condition="all" Name="App/app_lorawan.c" Version="1.0"/>
         <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
+        <Argument Name="UTIL_SEQ_EN_M4" GenericType="Simple" Comment=""/>
+        <Argument Name="UTIL_SEQ_EN_M0" GenericType="Simple" Comment=""/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="APP_APP_LORAWAN_H" Template="stm32wl/LoRaWAN_app_lorawan_h.ftl">
@@ -352,12 +405,10 @@
 
     <RefConfigFile Description="" Name="APP_SE_IDENTITY_H" Template="stm32wl/LoRaWAN_se-identity_h.ftl" >
         <File Category="header" Condition="!SEM_M4" Name="App/se-identity.h" Version="1.0"/>
-        <Argument Name="STATIC_DEVICE_EUI" GenericType="Simple" Comment=""/>
-        <Argument Name="LORAWAN_DEVICE_EUI_HEX" GenericType="Simple" Comment=""/>
-        <Argument Name="LORAWAN_JOIN_EUI_HEX" GenericType="Simple" Comment=""/>
+        <Argument Name="LORAWAN_DEVICE_EUI" GenericType="Simple" Comment=""/>
+        <Argument Name="LORAWAN_JOIN_EUI" GenericType="Simple" Comment=""/>
         <Argument Name="LORAWAN_APP_KEY" GenericType="Simple" Comment=""/>
         <Argument Name="LORAWAN_NWK_KEY" GenericType="Simple" Comment=""/>
-        <Argument Name="STATIC_DEVICE_ADDRESS" GenericType="Simple" Comment=""/>
         <Argument Name="LORAWAN_DEVICE_ADDRESS" GenericType="Simple" Comment=""/>
         <Argument Name="LORAWAN_NWK_S_KEY" GenericType="Simple" Comment=""/>
         <Argument Name="LORAWAN_APP_S_KEY" GenericType="Simple" Comment=""/>
@@ -366,8 +417,10 @@
     <RefConfigFile Description="" Name="APP_LORA_APP_C" Template="stm32wl/LoRaWAN_lora_app_c.ftl">
         <File Category="source" Name="App/lora_app.c" Version="1.0" Condition="!SEM_M0PLUS"/>
         <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
+        <Argument Name="UTIL_SEQ_EN_M4" GenericType="Simple" Comment=""/>
         <Argument Name="FILL_UCS" GenericType="Simple" Comment=""/>
         <Argument Name="LORAWAN_TIMER_OR_BUTTON" GenericType="Simple" Comment=""/>
+        <Argument Name="STM32WL5MXX" GenericType="Simple" Comment=""/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="APP_LORA_APP_H" Template="stm32wl/LoRaWAN_lora_app_h.ftl">
@@ -383,6 +436,7 @@
         <Argument Name="LORAWAN_DEFAULT_ACTIVATION_TYPE" GenericType="Simple" Comment=""/>
         <Argument Name="LORAWAN_FORCE_REJOIN_AT_BOOT" GenericType="Simple" Comment=""/>
         <Argument Name="LORAWAN_DEFAULT_DATA_RATE" GenericType="Simple" Comment=""/>
+        <Argument Name="LORAWAN_DEFAULT_TX_POWER" GenericType="Simple" Comment=""/>
         <Argument Name="LORAWAN_DEFAULT_PING_SLOT_PERIODICITY" GenericType="Simple" Comment=""/>
         <Argument Name="LORAWAN_DEFAULT_CLASS_B_C_RESP_TIMEOUT" GenericType="Simple" Comment=""/>
     </RefConfigFile>
@@ -390,34 +444,39 @@
     <RefConfigFile Description="" Name="APP_LORA_APP_M0PLUS_C" Template="stm32wl/LoRaWAN_lora_app_M0PLUS_c.ftl">
         <File Category="source" Name="App/lora_app.c" Version="1.0" Condition="(SEM_LORA_AT_SLAVE | SEM_LORA_END_NODE | SEM_LORA_USER_APPLICATION) &amp; SEM_M0PLUS"/>
         <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
+        <Argument Name="UTIL_SEQ_EN_M0" GenericType="Simple" Comment=""/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="APP_LORA_APP_VERSION_H" Template="stm32wl/app_version_h.ftl" >
-        <File Category="header" Condition="all" Name="App/lora_app_version.h" Version="1.0"/>
+        <File Category="header" Condition="all" Name="App/app_version.h" Version="1.0"/>
         <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
     </RefConfigFile>
 
-    <RefConfigFile Description="" Name="APP_LORA_AT_C" Template="stm32wl/LoRaWAN_lora_at_c.ftl">
+    <RefConfigFile Description="" Name="APP_LORA_AT_C" Template="stm32wl/at_functions_c.ftl">
         <File Category="source" Name="App/lora_at.c" Version="1.0" Condition="SEM_LORA_AT_SLAVE &amp; !SEM_M0PLUS"/>
+        <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
     </RefConfigFile>
 
-    <RefConfigFile Description="" Name="APP_LORA_AT_H" Template="stm32wl/LoRaWAN_lora_at_h.ftl">
+    <RefConfigFile Description="" Name="APP_LORA_AT_H" Template="stm32wl/at_functions_h.ftl">
         <File Category="header" Name="App/lora_at.h" Version="1.0" Condition="SEM_LORA_AT_SLAVE &amp; !SEM_M0PLUS"/>
+        <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
     </RefConfigFile>
 
-    <RefConfigFile Description="" Name="APP_LORA_COMMAND_C" Template="stm32wl/LoRaWAN_lora_command_c.ftl">
+    <RefConfigFile Description="" Name="APP_LORA_COMMAND_C" Template="stm32wl/at_command_c.ftl">
         <File Category="source" Name="App/lora_command.c" Version="1.0" Condition="SEM_LORA_AT_SLAVE &amp; !SEM_M0PLUS"/>
+        <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
     </RefConfigFile>
 
-    <RefConfigFile Description="" Name="APP_LORA_COMMAND_H" Template="stm32wl/LoRaWAN_lora_command_h.ftl">
+    <RefConfigFile Description="" Name="APP_LORA_COMMAND_H" Template="stm32wl/at_command_h.ftl">
         <File Category="header" Name="App/lora_command.h" Version="1.0" Condition="SEM_LORA_AT_SLAVE &amp; !SEM_M0PLUS"/>
+        <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
     </RefConfigFile>
 
-    <RefConfigFile Description="" Name="APP_TEST_RF_C" Template="stm32wl/LoRaWAN_test_rf_c.ftl" >
+    <RefConfigFile Description="" Name="APP_TEST_RF_C" Template="stm32wl/at_test_rf_c.ftl" >
         <File Category="source" Name="App/test_rf.c" Version="1.0" Condition="SEM_LORA_AT_SLAVE &amp; !SEM_M0PLUS"/>
     </RefConfigFile>
 
-    <RefConfigFile Description="" Name="APP_TEST_RF_H" Template="stm32wl/LoRaWAN_test_rf_h.ftl" >
+    <RefConfigFile Description="" Name="APP_TEST_RF_H" Template="stm32wl/at_test_rf_h.ftl" >
         <File Category="header" Name="App/test_rf.h" Version="1.0" Condition="SEM_LORA_AT_SLAVE &amp; !SEM_M0PLUS"/>
     </RefConfigFile>
 
@@ -430,6 +489,14 @@
         <File Category="source" Name="App/lora_info.h" Condition="!SEM_M0PLUS &amp; !SEM_M4" Version="1.0"/>
     </RefConfigFile>
 
+    <RefConfigFile Description="" Name="APP_FW_UPDATE_AGENT_C" Template="stm32wl/fw_update_agent_c.ftl">
+        <File Category="source" Name="App/fw_update_agent.c" Version="1.0" Condition="!SEM_M4 &amp; SEM_LORAWAN_DATA_DISTRIB_MGT"/>
+        <Argument Name="STM32WL5MXX" GenericType="Simple" Comment=""/>
+    </RefConfigFile>
+
+    <RefConfigFile Description="" Name="APP_FW_UPDATE_AGENT_H" Template="stm32wl/fw_update_agent_h.ftl">
+        <File Category="header" Name="App/fw_update_agent.h" Version="1.0" Condition="!SEM_M4 &amp; SEM_LORAWAN_DATA_DISTRIB_MGT"/>
+    </RefConfigFile>
 <!-- LoRaWAN/App end-->
 
 <!-- LoRaWAN/Target begin-->
@@ -437,12 +504,15 @@
     <RefConfigFile Description="" Name="TARGET_LORAWAN_CONF_H" Template="stm32wl/LoRaWAN_lorawan_conf_h.ftl" >
         <File Category="header" Condition="SEM_LORA_AT_SLAVE | SEM_LORA_END_NODE | SEM_LORA_USER_APPLICATION" Name="Target/lorawan_conf.h" Version="1.0"/>
         <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
+        <Argument Name="LORAWAN_KMS" GenericType="Simple" Comment=""/>
         <Argument Name="LORAMAC_SPECIFICATION_VERSION" GenericType="Simple" Comment=""/>
         <Argument Name="REGION" GenericType="Simple" Comment=""/>
         <Argument Name="HYBRID_ENABLED" GenericType="Simple" Comment=""/>
         <Argument Name="KEY_EXTRACTABLE" GenericType="Simple" Comment=""/>
         <Argument Name="CONTEXT_MANAGEMENT_ENABLED" GenericType="Simple" Comment=""/>
         <Argument Name="LORAMAC_CLASSB_ENABLED" GenericType="Simple" Comment=""/>
+        <Argument Name="LORAWAN_DATA_DISTRIB_MGT" GenericType="Simple" Comment=""/>
+        <Argument Name="LORAWAN_PACKAGES_VERSION" GenericType="Simple" Comment=""/>
         <Argument Name="REGION_AS923" GenericType="Simple" Comment=""/>
         <Argument Name="REGION_AU915" GenericType="Simple" Comment=""/>
         <Argument Name="REGION_CN470" GenericType="Simple" Comment=""/>
@@ -453,6 +523,7 @@
         <Argument Name="REGION_IN865" GenericType="Simple" Comment=""/>
         <Argument Name="REGION_US915" GenericType="Simple" Comment=""/>
         <Argument Name="REGION_RU864" GenericType="Simple" Comment=""/>
+        <Argument Name="REGION_AS923_DEFAULT_CHANNEL_PLAN" GenericType="Simple" Comment=""/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="TARGET_MW_LOG_CONF_H" Template="stm32wl/mw_log_conf_h.ftl" >
@@ -464,6 +535,7 @@
     <RefConfigFile Description="" Name="TARGET_RADIO_BOARD_C" Template="stm32wl/radio_board_if_c.ftl">
         <File Category="source" Name="Target/radio_board_if.c" Version="1.0" Condition="!SEM_M4"/>
         <Argument Name="Activate_RADIO_BOARD_INTERFACE" GenericType="Simple" Comment=""/>
+        <Argument Name="STM32WL5MXX" GenericType="Simple" Comment=""/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="TARGET_RADIO_BOARD_H" Template="stm32wl/radio_board_if_h.ftl">
@@ -472,6 +544,7 @@
         <Argument Name="TX_RFO_CONFIG" GenericType="Simple" Comment=""/>
         <Argument Name="IS_TCXO_SUPPORTED" GenericType="Simple" Comment=""/>
         <Argument Name="IS_DCDC_SUPPORTED" GenericType="Simple" Comment=""/>
+        <Argument Name="STM32WL5MXX" GenericType="Simple" Comment=""/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="TARGET_RADIO_CONF_H" Template="stm32wl/radio_conf_h.ftl">
@@ -485,29 +558,25 @@
         <File Category="header" Name="Target/systime.h" Version="1.0" Condition="all"/>
     </RefConfigFile>
 
+    <RefConfigFile Description="" Name="TARGET_TIMER_C" Template="stm32wl/timer_user_c.ftl">
+        <File Category="source" Name="Target/timer.c" Version="1.0" Condition="!S_TIMER"/>
+    </RefConfigFile>
+
     <RefConfigFile Description="" Name="TARGET_TIMER_H" Template="stm32wl/timer_h.ftl">
+        <File Category="header" Name="Target/timer.h" Version="1.0" Condition="S_TIMER"/>
+        <Argument Name="UTIL_TIMER_EN" GenericType="Simple" Comment=""/>
+    </RefConfigFile>
+    <RefConfigFile Description="" Name="TARGET_TIMER_H" Template="stm32wl/timer_user_h.ftl">
         <File Category="header" Name="Target/timer.h" Version="1.0" Condition="all"/>
     </RefConfigFile>
 
-    <RefConfigFile Description="" Name="STM32_TIMER_IF_H" Template="stm32wl/timer_if_h.ftl" destinationFolder="Core/Inc/">
-        <File Category="header" Name="timer_if.h" Version="1.0"  Condition="all"/>
-        <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
+    <RefConfigFile Description="" Name="TARGET_FRAG_DECODER_IF_C" Template="stm32wl/frag_decoder_if_c.ftl">
+        <File Category="source" Name="Target/frag_decoder_if.c" Version="1.0" Condition="!SEM_M4 &amp; SEM_LORAWAN_DATA_DISTRIB_MGT"/>
     </RefConfigFile>
 
-    <RefConfigFile Description="" Name="STM32_TIMER_IF_C" Template="stm32wl/timer_if_c.ftl" destinationFolder="Core/Src/">
-        <File Category="source" Name="timer_if.c" Version="1.0"  Condition="all"/>
-        <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
-        <Argument Name="USE_RTC" GenericType="Simple" Comment=""/>
+    <RefConfigFile Description="" Name="TARGET_FRAG_DECODER_IF_H" Template="stm32wl/frag_decoder_if_h.ftl">
+        <File Category="header" Name="Target/frag_decoder_if.h" Version="1.0" Condition="!SEM_M4 &amp; SEM_LORAWAN_DATA_DISTRIB_MGT"/>
     </RefConfigFile>
-
-    <RefConfigFile Description="" Name="STM32_ADV_TRACE_IF_C" Template="stm32wl/stm32_adv_trace_if_c.ftl" destinationFolder="Core/Src/">
-        <File Category="source" Name="stm32_adv_trace_if.c" Version="1.0" Condition="((!SEM_M0PLUS &amp; !SEM_M4) | SEM_M4) &amp; SEM_LORA_USER_APPLICATION &amp; !SEM_LORA_USE_UART"/>
-    </RefConfigFile>
-
-    <RefConfigFile Description="" Name="STM32_ADV_TRACE_IF_H" Template="stm32wl/stm32_adv_trace_if_h.ftl" destinationFolder="Core/Inc/">
-        <File Category="source" Name="stm32_adv_trace_if.h" Version="1.0" Condition="((!SEM_M0PLUS &amp; !SEM_M4) | SEM_M4) &amp; SEM_LORA_USER_APPLICATION &amp; !SEM_LORA_USE_UART"/>
-    </RefConfigFile>
-
 <!-- LoRaWAN/Target end-->
 
 <!-- MbMux begin-->
@@ -553,10 +622,12 @@
 
     <RefConfigFile Description="" Name="MBMUX_MBMUXIF_LORA_M4_C" Template="stm32wl/mbmuxif_lora_M4_c.ftl" destinationFolder="MbMux">
         <File Category="source" Condition="SEM_M4" Name="mbmuxif_lora.c" Version="1.0"/>
+        <Argument Name="UTIL_SEQ_EN_M4" GenericType="Simple" Comment=""/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="MBMUX_MBMUXIF_LORA_M0PLUS_C" Template="stm32wl/mbmuxif_lora_M0PLUS_c.ftl" destinationFolder="MbMux">
         <File Category="source" Condition="SEM_M0PLUS" Name="mbmuxif_lora.c" Version="1.0"/>
+        <Argument Name="UTIL_SEQ_EN_M0" GenericType="Simple" Comment=""/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="MBMUX_MBMUXIF_LORA_H" Template="stm32wl/mbmuxif_lora_h.ftl" destinationFolder="MbMux">
@@ -565,10 +636,12 @@
 
     <RefConfigFile Description="" Name="MBMUX_MBMUXIF_RADIO_M4_C" Template="stm32wl/mbmuxif_radio_M4_c.ftl" destinationFolder="MbMux">
         <File Category="source" Condition="SEM_M4" Name="mbmuxif_radio.c" Version="1.0"/>
+        <Argument Name="UTIL_SEQ_EN_M4" GenericType="Simple" Comment=""/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="MBMUX_MBMUXIF_RADIO_M0PLUS_C" Template="stm32wl/mbmuxif_radio_M0PLUS_c.ftl" destinationFolder="MbMux">
         <File Category="source" Condition="SEM_M0PLUS" Name="mbmuxif_radio.c" Version="1.0"/>
+        <Argument Name="UTIL_SEQ_EN_M0" GenericType="Simple" Comment=""/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="MBMUX_MBMUXIF_RADIO_H" Template="stm32wl/mbmuxif_radio_h.ftl" destinationFolder="MbMux">
@@ -578,11 +651,15 @@
     <RefConfigFile Description="" Name="MBMUX_MBMUXIF_SYS_M4_C" Template="stm32wl/mbmuxif_sys_M4_c.ftl" destinationFolder="MbMux">
         <File Category="source" Condition="SEM_M4" Name="mbmuxif_sys.c" Version="1.0"/>
         <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
+        <Argument Name="UTIL_SEQ_EN_M4" GenericType="Simple" Comment=""/>
+        <Argument Name="UTIL_TIMER_EN" GenericType="Simple" Comment=""/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="MBMUX_MBMUXIF_SYS_M0PLUS_C" Template="stm32wl/mbmuxif_sys_M0PLUS_c.ftl" destinationFolder="MbMux">
         <File Category="source" Condition="SEM_M0PLUS" Name="mbmuxif_sys.c" Version="1.0"/>
         <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
+        <Argument Name="USE_UART" GenericType="Simple" Comment=""/>
+        <Argument Name="UTIL_SEQ_EN_M0" GenericType="Simple" Comment=""/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="MBMUX_MBMUXIF_SYS_H" Template="stm32wl/mbmuxif_sys_h.ftl" destinationFolder="MbMux">
@@ -591,16 +668,17 @@
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="MBMUX_MBMUXIF_TRACE_M4_C" Template="stm32wl/mbmuxif_trace_M4_c.ftl" destinationFolder="MbMux">
-        <File Category="source" Condition="SEM_M4" Name="mbmuxif_trace.c" Version="1.0"/>
+        <File Category="source" Condition="SEM_M4 &amp; S_ADV_TRACE" Name="mbmuxif_trace.c" Version="1.0"/>
         <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="MBMUX_MBMUXIF_TRACE_M0PLUS_C" Template="stm32wl/mbmuxif_trace_M0PLUS_c.ftl" destinationFolder="MbMux">
-        <File Category="source" Condition="SEM_M0PLUS" Name="mbmuxif_trace.c" Version="1.0"/>
+        <File Category="source" Condition="SEM_M0PLUS &amp; S_ADV_TRACE" Name="mbmuxif_trace.c" Version="1.0"/>
+        <Argument Name="UTIL_SEQ_EN_M0" GenericType="Simple" Comment=""/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="MBMUX_MBMUXIF_TRACE_H" Template="stm32wl/mbmuxif_trace_h.ftl" destinationFolder="MbMux">
-        <File Category="header" Condition="SEM_M4 | SEM_M0PLUS" Name="mbmuxif_trace.h" Version="1.0"/>
+        <File Category="header" Condition="(SEM_M4 | SEM_M0PLUS) &amp; S_ADV_TRACE" Name="mbmuxif_trace.h" Version="1.0"/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="MBMUX_RADIO_MBWRAPPER_M4_C" Template="stm32wl/radio_mbwrapper_M4_c.ftl" destinationFolder="MbMux">
@@ -619,7 +697,7 @@
 
 <!-- COMMON/Board Begin-->
     <RefConfigFile Description="" Name="NUCLEO_CONF_H" Template="stm32wl/stm32wlxx_nucleo_conf_h.ftl" destinationFolder="../Common/Board/">
-        <File Category="header" Name="stm32wlxx_nucleo_conf.h" Version="1.0" Condition="(SEM_M0PLUS | SEM_M4) &amp; !SEM_USER_BOARD_FOR_LORA" />
+        <File Category="header" Name="stm32wlxx_nucleo_conf.h" Version="1.0" Condition="!SEM_STM32WL5MXX &amp; (SEM_M0PLUS | SEM_M4) &amp; !SEM_USER_BOARD_FOR_LORA" />
         <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
     </RefConfigFile>
 <!-- COMMON/Board end-->

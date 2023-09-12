@@ -91,35 +91,42 @@ extern "C" {
 #define CFG_VCOM_PROCESS_STACK_SIZE                1024
 
 [/#if]
-[/#if]
+[/#if][#--  FREERTOS --]
 [#if THREADX??]
+/*
+ * THREADs configuration defines: stack size and priorities
+ * of the different Azure RTOS threads used by the Sigfox application.
+ */
+/* USER CODE BEGIN THREADX_EC */
 /*Main Sigfox Thread*/
-#define CFG_APP_SIGFOX_THREAD_STACK_SIZE                 1024  /* to check if possible to set it in lora gui if rtos detected*/
-#define CFG_APP_SIGFOX_THREAD_PRIO                       10 /* to check if possible to set it in lora gui if rtos detected*/
+#define CFG_APP_SIGFOX_THREAD_STACK_SIZE                 1024
+#define CFG_APP_SIGFOX_THREAD_PRIO                       10
 #define CFG_APP_SIGFOX_THREAD_PREEMPTION_THRESHOLD       CFG_APP_SIGFOX_THREAD_PRIO
 
 [#if (SUBGHZ_APPLICATION == "SIGFOX_AT_SLAVE")]
 /*Vcom*/
-#define CFG_VCOM_THREAD_STACK_SIZE                       1024  /* to check if possible to set it in lora gui if rtos detected*/
+#define CFG_VCOM_THREAD_STACK_SIZE                       1024
 #define CFG_VCOM_THREAD_PRIO                             CFG_APP_SIGFOX_THREAD_PRIO
 #define CFG_VCOM_THREAD_PREEMPTION_THRESHOLD             CFG_APP_SIGFOX_THREAD_PRIO
 
 [/#if]
 [#if (SUBGHZ_APPLICATION == "SIGFOX_PUSHBUTTON")]
 /*Push Button Process (send)*/
-#define CFG_PBP_THREAD_STACK_SIZE                        1024  /* to check if possible to set it in lora gui if rtos detected*/
+#define CFG_PBP_THREAD_STACK_SIZE                        1024
 #define CFG_PBP_THREAD_PRIO                              CFG_APP_SIGFOX_THREAD_PRIO
 #define CFG_PBP_THREAD_PREEMPTION_THRESHOLD              CFG_APP_SIGFOX_THREAD_PRIO
 
 [/#if]
 [#if (CPUCORE == "")]
 /*Monarch*/
-#define CFG_MN_THREAD_STACK_SIZE                         1024  /* to check if possible to set it in lora gui if rtos detected*/
+#define CFG_MN_THREAD_STACK_SIZE                         1024
 #define CFG_MN_THREAD_PRIO                               CFG_APP_SIGFOX_THREAD_PRIO
 #define CFG_MN_THREAD_PREEMPTION_THRESHOLD               CFG_APP_SIGFOX_THREAD_PRIO
 
 [/#if]
-[/#if]
+/* USER CODE END THREADX_EC */
+
+[/#if][#--  THREADX --]
 /* USER CODE BEGIN EC */
 
 /* USER CODE END EC */

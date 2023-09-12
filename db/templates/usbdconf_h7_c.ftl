@@ -410,11 +410,11 @@ USBD_StatusTypeDef USBD_LL_Init(USBD_HandleTypeDef *pdev)
   HAL_PCD_RegisterIsoOutIncpltCallback(&hpcd_USB_OTG_HS, PCD_ISOOUTIncompleteCallback);
   HAL_PCD_RegisterIsoInIncpltCallback(&hpcd_USB_OTG_HS, PCD_ISOINIncompleteCallback);
 #endif /* USE_HAL_PCD_REGISTER_CALLBACKS */
-#t/* USER CODE BEGIN TxRx_Configuration */
+#t/* USER CODE BEGIN TxRx_HS_Configuration */
 #tHAL_PCDEx_SetRxFiFo(&hpcd_USB_OTG_HS, 0x200);
 #tHAL_PCDEx_SetTxFiFo(&hpcd_USB_OTG_HS, 0, 0x80);
 #tHAL_PCDEx_SetTxFiFo(&hpcd_USB_OTG_HS, 1, 0x174);
-#t/* USER CODE END TxRx_Configuration */
+#t/* USER CODE END TxRx_HS_Configuration */
 #t}
 [/#if]
 [#if handleNameUSB_FS == "FS"]
@@ -742,6 +742,7 @@ USBD_StatusTypeDef USBD_LL_SetTestMode(USBD_HandleTypeDef *pdev, uint8_t testmod
   */
 void *USBD_static_malloc(uint32_t size)
 {
+  UNUSED(size);
 [#if className == "AUDIO"]
   static uint32_t mem[(sizeof(USBD_AUDIO_HandleTypeDef)/4)+1];/* On 32-bit boundary */ 
 [/#if]
@@ -776,7 +777,7 @@ void *USBD_static_malloc(uint32_t size)
   */
 void USBD_static_free(void *p)
 {
-
+  UNUSED(p);
 }
 
 /**

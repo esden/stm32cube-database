@@ -10,13 +10,27 @@
   ******************************************************************************
   */
 /* USER CODE END Header */
+[#assign UTIL_SEQ_EN_M0 = "true"]
+[#if SWIPdatas??]
+    [#list SWIPdatas as SWIP]
+        [#if SWIP.defines??]
+            [#list SWIP.defines as definition]
+                [#if definition.name == "UTIL_SEQ_EN_M0"]
+                    [#assign UTIL_SEQ_EN_M0 = definition.value]
+                [/#if]
+            [/#list]
+        [/#if]
+    [/#list]
+[/#if]
 
 /* Includes ------------------------------------------------------------------*/
 #include "platform.h"
 #include "mbmuxif_lora.h"
 #include "mbmux.h"
 #include "sys_app.h"
+[#if UTIL_SEQ_EN_M0 == "true"]
 #include "stm32_seq.h"
+[/#if]
 #include "LmHandler_mbwrapper.h"
 #include "utilities_def.h"
 /* USER CODE BEGIN Includes */
@@ -85,7 +99,13 @@ int8_t MBMUXIF_LoraInit(void)
   }
   if (ret >= 0)
   {
+[#if UTIL_SEQ_EN_M0 == "true"]
     UTIL_SEQ_RegTask((1 << CFG_SEQ_Task_MbLoRaCmdRcv), UTIL_SEQ_RFU, MBMUXIF_TaskLoraCmdRcv);
+[#else]
+    /* USER CODE BEGIN MBMUXIF_LoraInit_OS */
+
+    /* USER CODE END MBMUXIF_LoraInit_OS */
+[/#if][#--  SEQUENCER --]
     ret = 0;
   }
 
@@ -120,7 +140,13 @@ void MBMUXIF_LoraSendNotif(void)
   /* USER CODE END MBMUXIF_LoraSendNotif_1 */
   if (MBMUX_NotificationSnd(FEAT_INFO_LORAWAN_ID) == 0)
   {
+[#if UTIL_SEQ_EN_M0 == "true"]
     UTIL_SEQ_WaitEvt(1 << CFG_SEQ_Evt_MbLoraAckRcv);
+[#else]
+    /* USER CODE BEGIN MBMUXIF_LoraSendNotif_OS */
+
+    /* USER CODE END MBMUXIF_LoraSendNotif_OS */
+[/#if][#--  SEQUENCER --]
   }
   else
   {
@@ -155,7 +181,13 @@ static void MBMUXIF_IsrLoraAckRcvCb(void *ComObj)
   /* USER CODE BEGIN MBMUXIF_IsrLoraAckRcvCb_1 */
 
   /* USER CODE END MBMUXIF_IsrLoraAckRcvCb_1 */
+[#if UTIL_SEQ_EN_M0 == "true"]
   UTIL_SEQ_SetEvt(1 << CFG_SEQ_Evt_MbLoraAckRcv);
+[#else]
+  /* USER CODE BEGIN MBMUXIF_IsrLoraAckRcvCb_OS */
+
+  /* USER CODE END MBMUXIF_IsrLoraAckRcvCb_OS */
+[/#if][#--  SEQUENCER --]
   /* USER CODE BEGIN MBMUXIF_IsrLoraAckRcvCb_Last */
 
   /* USER CODE END MBMUXIF_IsrLoraAckRcvCb_Last */
@@ -167,7 +199,13 @@ static void MBMUXIF_IsrLoraCmdRcvCb(void *ComObj)
 
   /* USER CODE END MBMUXIF_IsrLoraCmdRcvCb_1 */
   LoraComObj = (MBMUX_ComParam_t *) ComObj;
+[#if UTIL_SEQ_EN_M0 == "true"]
   UTIL_SEQ_SetTask((1 << CFG_SEQ_Task_MbLoRaCmdRcv), CFG_SEQ_Prio_0);
+[#else]
+  /* USER CODE BEGIN MBMUXIF_IsrLoraCmdRcvCb_OS */
+
+  /* USER CODE END MBMUXIF_IsrLoraCmdRcvCb_OS */
+[/#if][#--  SEQUENCER --]
   /* USER CODE BEGIN MBMUXIF_IsrLoraCmdRcvCb_Last */
 
   /* USER CODE END MBMUXIF_IsrLoraCmdRcvCb_Last */

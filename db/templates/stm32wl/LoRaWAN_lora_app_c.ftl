@@ -26,8 +26,10 @@
 [#assign SECURE_PROJECTS = "0"]
 [#assign INTROPACK_EXAMPLE = ""]
 [#assign FILL_UCS = ""]
+[#assign UTIL_SEQ_EN_M4 = "true"]
 [#assign LORAWAN_TIMER_OR_BUTTON = ""]
-[#assign LORAWAN_FUOTA = "0"]
+[#assign INTERNAL_LORAWAN_FUOTA = "0"]
+[#assign STM32WL5MXX = "false"]
 [#if SWIPdatas??]
     [#list SWIPdatas as SWIP]
         [#if SWIP.defines??]
@@ -44,6 +46,12 @@
                 [#if definition.name == "LORAWAN_TIMER_OR_BUTTON"]
                     [#assign LORAWAN_TIMER_OR_BUTTON = definition.value]
                 [/#if]
+                [#if definition.name == "STM32WL5MXX"]
+                    [#assign STM32WL5MXX = definition.value]
+                [/#if]
+                [#if definition.name == "UTIL_SEQ_EN_M4"]
+                    [#assign UTIL_SEQ_EN_M4 = definition.value]
+                [/#if]
             [/#list]
         [/#if]
     [/#list]
@@ -56,24 +64,24 @@
 [#if THREADX??][#-- If AzRtos is used --]
 #include "app_azure_rtos.h"
 #include "tx_api.h"
-[#else]
-[#if !FREERTOS??][#-- If FreeRtos is not used --]
-#include "stm32_seq.h"
-[#else]
+[#elseif FREERTOS??][#-- If FreeRtos is used --]
 #include "cmsis_os.h"
+[#elseif (UTIL_SEQ_EN_M4 == "true")]
+[#if (SUBGHZ_APPLICATION != "LORA_USER_APPLICATION") || (CPUCORE == "CM0PLUS")]
+#include "stm32_seq.h"
 [/#if]
-[/#if]
+[/#if][#--  THREADX vs FREERTOS vs SEQUENCER --]
 [#if (SUBGHZ_APPLICATION == "LORA_END_NODE") || (SUBGHZ_APPLICATION == "LORA_AT_SLAVE")]
 #include "stm32_timer.h"
 #include "utilities_def.h"
-#include "lora_app_version.h"
+#include "app_version.h"
 [#if CPUCORE == ""]
 #include "lorawan_version.h"
 #include "subghz_phy_version.h"
 [/#if]
 [#elseif (SUBGHZ_APPLICATION == "LORA_USER_APPLICATION")]
-#include "lora_app_version.h"
-[/#if]
+#include "app_version.h"
+[/#if][#--  SUBGHZ_APPLICATION == "LORA_XXX" --]
 [#if (SUBGHZ_APPLICATION != "LORA_USER_APPLICATION")]
 [#if CPUCORE == ""]
 #include "lora_info.h"
@@ -81,7 +89,6 @@
 [/#if]
 #include "LmHandler.h"
 [#if (SUBGHZ_APPLICATION == "LORA_END_NODE")]
-#include "stm32_lpm.h"
 #include "adc_if.h"
 #include "CayenneLpp.h"
 #include "sys_sensors.h"
@@ -96,7 +103,7 @@
 [#if FREERTOS??][#-- If FreeRtos is used --]
 #include "test_rf.h"
 [/#if]
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION == "LORA_XXX" --]
 [#if (SUBGHZ_APPLICATION != "LORA_USER_APPLICATION")]
 [#if (CPUCORE == "CM4")]
 #include "mbmuxif_sys.h"
@@ -113,7 +120,7 @@ extern  TX_THREAD App_MainThread;
 extern  TX_BYTE_POOL *byte_pool;
 extern  CHAR *pointer;
 [/#if]
-[#if (SECURE_PROJECTS == "1") && (CPUCORE == "CM4") ]
+[#if (SECURE_PROJECTS == "1") && (CPUCORE == "CM4") && (STM32WL5MXX == "false")]
 #if defined (DEBUGGER_ENABLED) && ( DEBUGGER_ENABLED == 1 )
 extern __IO uint32_t lets_go_on;
 #elif !defined (DEBUGGER_ENABLED)
@@ -169,18 +176,22 @@ typedef enum TxEventType_e
   * @note last 2 sector of a 128kBytes device
   */
 [#if (CPUCORE == "CM4")]
-[#if (LORAWAN_FUOTA == "0") && (SECURE_PROJECTS == "1")]
-#define LORAWAN_NVM_BASE_ADDRESS                    ((uint32_t)0x0801B000UL)
-[#elseif (LORAWAN_FUOTA == "1") && (SECURE_PROJECTS == "1")]
-#define LORAWAN_NVM_BASE_ADDRESS                    ((uint32_t)0x0801E000UL)
+[#if (INTERNAL_LORAWAN_FUOTA == "0") && (SECURE_PROJECTS == "1")]
+#define LORAWAN_NVM_BASE_ADDRESS                    ((void *)0x0801B000UL)
+[#elseif (INTERNAL_LORAWAN_FUOTA == "1") && (SECURE_PROJECTS == "1")]
+[#if STM32WL5MXX=="false"]
+#define LORAWAN_NVM_BASE_ADDRESS                    ((void *)0x0801E000UL)
 [#else]
-#define LORAWAN_NVM_BASE_ADDRESS                    ((uint32_t)0x0801F000UL)
+#define LORAWAN_NVM_BASE_ADDRESS                    ((void *)0x08014000UL)
 [/#if]
 [#else]
-#define LORAWAN_NVM_BASE_ADDRESS                    ((uint32_t)0x0803F000UL)
+#define LORAWAN_NVM_BASE_ADDRESS                    ((void *)0x0801F000UL)
 [/#if]
+[#else]
+#define LORAWAN_NVM_BASE_ADDRESS                    ((void *)0x0803F000UL)
+[/#if][#--  CPUCORE == CM4 vs CM0 vs SINGLE --]
 
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION == "LORA_END_NODE" --]
 /* USER CODE BEGIN PD */
 [#if (SUBGHZ_APPLICATION == "LORA_END_NODE") && (FILL_UCS == "true")]
 static const char *slotStrings[] = { "1", "2", "C", "C_MC", "P", "P_MC" };
@@ -207,7 +218,7 @@ static void SendTxData(void);
   */
 static void OnTxTimerEvent(void *context);
 
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION == "LORA_END_NODE" --]
 /**
   * @brief  join event callback function
   * @param  joinParams status of join
@@ -235,6 +246,11 @@ static void OnRxData(LmHandlerAppData_t *appData, LmHandlerRxParams_t *params);
 static void OnBeaconStatusChange(LmHandlerBeaconParams_t *params);
 
 /**
+  * @brief callback when system time has been updated
+  */
+static void OnSysTimeUpdate(void);
+
+/**
   * @brief callback when LoRaWAN application Class is changed
   * @param deviceClass new class
   */
@@ -259,7 +275,7 @@ static void StopJoin(void);
 static void OnStopJoinTimerEvent(void *context);
 
 [/#if]
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION == "LORA_END_NODE" --]
 [#if (SUBGHZ_APPLICATION == "LORA_END_NODE") || (SUBGHZ_APPLICATION == "LORA_AT_SLAVE")]
 /**
   * @brief  Notifies the upper layer that the NVM context has changed
@@ -281,7 +297,7 @@ static void OnStoreContextRequest(void *nvm, uint32_t nvm_size);
   */
 static void OnRestoreContextRequest(void *nvm, uint32_t nvm_size);
 
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION == "LORA_XXX" --]
 
 /**
   * Will be called each time a Radio IRQ is handled by the MAC layer
@@ -357,8 +373,8 @@ static void Thd_StoreContext_Entry(unsigned long thread_input);
 static void Thd_StopJoin_Entry(unsigned long thread_input);
 
 [/#if]
-[/#if]
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION == "LORA_XXX" --]
+[/#if][#--  THREADX --]
 /* USER CODE BEGIN PFP */
 
 [#if ((SUBGHZ_APPLICATION == "LORA_END_NODE") || (SUBGHZ_APPLICATION == "LORA_AT_SLAVE")) && (FILL_UCS == "true")]
@@ -398,7 +414,7 @@ TX_THREAD Thd_LoraStopJoinId;
 [/#if]
 [/#if]
 
-[/#if]
+[/#if][#--  THREADX --]
 [#if (SUBGHZ_APPLICATION == "LORA_END_NODE")]
 /**
   * @brief LoRaWAN default activation type
@@ -409,6 +425,13 @@ static ActivationType_t ActivationType = LORAWAN_DEFAULT_ACTIVATION_TYPE;
   * @brief LoRaWAN force rejoin even if the NVM context is restored
   */
 static bool ForceRejoin = LORAWAN_FORCE_REJOIN_AT_BOOT;
+
+[/#if][#--  SUBGHZ_APPLICATION == "LORA_END_NODE" --]
+[#if (INTERNAL_LORAWAN_FUOTA == "1")]
+/**
+  * @brief LoRaWAN force the DeviceTimeReq until Answer is not received
+  */
+static bool DeviceTimeAnsReceived = false;
 
 [/#if]
 /**
@@ -434,6 +457,7 @@ static LmHandlerCallbacks_t LmHandlerCallbacks =
   .OnTxData =                     OnTxData,
   .OnRxData =                     OnRxData,
   .OnBeaconStatusChange =         OnBeaconStatusChange,
+  .OnSysTimeUpdate =              OnSysTimeUpdate,
   .OnClassChange =                OnClassChange,
   .OnTxPeriodicityChanged =       OnTxPeriodicityChanged,
   .OnTxFrameCtrlChanged =         OnTxFrameCtrlChanged,
@@ -458,11 +482,12 @@ static LmHandlerParams_t LmHandlerParams =
   .IsTxConfirmed =            LORAWAN_DEFAULT_CONFIRMED_MSG_STATE,
 [/#if]
   .TxDatarate =               LORAWAN_DEFAULT_DATA_RATE,
+  .TxPower =                  LORAWAN_DEFAULT_TX_POWER,
   .PingSlotPeriodicity =      LORAWAN_DEFAULT_PING_SLOT_PERIODICITY,
   .RxBCTimeout =              LORAWAN_DEFAULT_CLASS_B_C_RESP_TIMEOUT
 };
 
-[/#if]
+[/#if][#-- SUBGHZ_APPLICATION != "LORA_USER_APPLICATION"  --]
 [#if (SUBGHZ_APPLICATION == "LORA_END_NODE")]
 /**
   * @brief Type of Event to generate application Tx
@@ -486,7 +511,7 @@ static UTIL_TIMER_Time_t TxPeriodicity = APP_TX_DUTYCYCLE;
 static UTIL_TIMER_Object_t StopJoinTimer;
 
 [/#if]
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION == "LORA_END_NODE" --]
 [#if (SUBGHZ_APPLICATION == "LORA_END_NODE") || (SUBGHZ_APPLICATION == "LORA_AT_SLAVE")]
 [#if FREERTOS??][#-- If FreeRtos is used --]
 [#if (SUBGHZ_APPLICATION == "LORA_END_NODE")]
@@ -567,8 +592,8 @@ const osThreadAttr_t Thd_VcomProcess_attr =
 static void Thd_VcomProcess(void *argument);
 
 [/#if]
-[/#if]
-[/#if]
+[/#if][#--  FREERTOS --]
+[/#if][#--  SUBGHZ_APPLICATION == "LORA_XXX" --]
 /* USER CODE BEGIN PV */
 [#if (SUBGHZ_APPLICATION == "LORA_END_NODE") && (FILL_UCS == "true")]
 /**
@@ -603,6 +628,13 @@ static UTIL_TIMER_Object_t RxLedTimer;
   */
 static UTIL_TIMER_Object_t JoinLedTimer;
 
+[#if (INTERNAL_LORAWAN_FUOTA == "1")]
+/**
+  * Temp buffer to store a FLASH page in RAM when partial replacement is needed
+  */
+static uint8_t FLASH_RAM_buffer[FLASH_IF_BUFFER_SIZE];
+
+[/#if]
 [/#if]
 /* USER CODE END PV */
 
@@ -710,14 +742,23 @@ void LoRaWAN_Init(void)
           (uint8_t)(feature_version >> 16),
           (uint8_t)(feature_version >> 8),
           (uint8_t)(feature_version));
-[/#if]
+[/#if][#--  CPUCORE == CM4 vs CM0 vs SINGLE --]
 
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION != "LORA_USER_APPLICATION --]
   UTIL_TIMER_Create(&TxLedTimer, LED_PERIOD_TIME, UTIL_TIMER_ONESHOT, OnTxTimerLedEvent, NULL);
   UTIL_TIMER_Create(&RxLedTimer, LED_PERIOD_TIME, UTIL_TIMER_ONESHOT, OnRxTimerLedEvent, NULL);
   UTIL_TIMER_Create(&JoinLedTimer, LED_PERIOD_TIME, UTIL_TIMER_PERIODIC, OnJoinTimerLedEvent, NULL);
 
+[#if (INTERNAL_LORAWAN_FUOTA == "1")]
+  if (FLASH_IF_Init(FLASH_RAM_buffer) != FLASH_IF_OK)
+[#else]
+  if (FLASH_IF_Init(NULL) != FLASH_IF_OK)
 [/#if]
+  {
+    Error_Handler();
+  }
+
+[/#if][#--  SUBGHZ_APPLICATION == "LORA_XXX" --]
   /* USER CODE END LoRaWAN_Init_1 */
 
 [#if (SUBGHZ_APPLICATION == "LORA_END_NODE") && (SECURE_PROJECTS == "0")]
@@ -747,10 +788,10 @@ void LoRaWAN_Init(void)
   }
 [#else]
   UTIL_SEQ_RegTask((1 << CFG_SEQ_Task_LmHandlerProcess), UTIL_SEQ_RFU, LmHandlerProcess);
-[/#if]
+[/#if][#--  THREADX vs FREERTOS vs SEQUENCER --]
 
 [/#if]
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION != "LORA_USER_APPLICATION --]
 [#if (SUBGHZ_APPLICATION == "LORA_END_NODE")]
 [#if THREADX??]
   /* No need to allocate the stack and create thread for Thd_LoraSendProcess. */
@@ -805,9 +846,9 @@ void LoRaWAN_Init(void)
 [#if (SECURE_PROJECTS == "0")]
   UTIL_SEQ_RegTask((1 << CFG_SEQ_Task_LoRaStopJoinEvent), UTIL_SEQ_RFU, StopJoin);
 [/#if]
-[/#if]
+[/#if][#--  THREADX vs FREERTOS vs SEQUENCER --]
 
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION == "LORA_END_NODE" --]
 [#if (SUBGHZ_APPLICATION == "LORA_AT_SLAVE")]
 [#if THREADX??]
   /* Allocate the stack for Thd_VcomProcess.  */
@@ -837,9 +878,9 @@ void LoRaWAN_Init(void)
   TST_Semaphore_Init();
 [#else]
   UTIL_SEQ_RegTask((1 << CFG_SEQ_Task_Vcom), UTIL_SEQ_RFU, CMD_Process);
-[/#if]
+[/#if][#--  THREADX vs FREERTOS vs SEQUENCER --]
 
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION == "LORA_AT_SLAVE" --]
 [#if (SUBGHZ_APPLICATION != "LORA_USER_APPLICATION")]
 [#if CPUCORE == "CM4"]
 [#else]
@@ -847,7 +888,7 @@ void LoRaWAN_Init(void)
   LoraInfo_Init();
 
 [/#if]
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION != "LORA_USER_APPLICATION --]
   /* Init the Lora Stack*/
   LmHandlerInit(&LmHandlerCallbacks, APP_VERSION);
 
@@ -878,7 +919,7 @@ void LoRaWAN_Init(void)
     /* USER CODE END LoRaWAN_Init_3 */
   }
 
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION == "LORA_END_NODE" --]
 
   /* USER CODE BEGIN LoRaWAN_Init_Last */
 [#if (SUBGHZ_APPLICATION == "LORA_AT_SLAVE")  && (FILL_UCS == "true")]
@@ -914,6 +955,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 [/#if]
       }
       break;
+[#if STM32WL5MXX=="false"]
     case  BUT2_Pin:
 [#if (SECURE_PROJECTS == "1")]
 [#if (CPUCORE == "CM4")]
@@ -942,6 +984,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
       UTIL_SEQ_SetTask((1 << CFG_SEQ_Task_LoRaStoreContextEvent), CFG_SEQ_Prio_0);
 [/#if]
       break;
+[/#if]
     default:
       break;
   }
@@ -949,7 +992,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 [#if (FILL_UCS != "true")]
 #endif
 [/#if]
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION == "LORA_END_NODE" --]
 
 /* USER CODE END PB_Callbacks */
 
@@ -990,7 +1033,7 @@ void App_Main_Thread_Entry(unsigned long thread_input)
 
   /* USER CODE END App_Main_Thread_Entry_Last */
 }
-[/#if]
+[/#if][#--  THREADX --]
 [#if (SUBGHZ_APPLICATION == "LORA_END_NODE") || (SUBGHZ_APPLICATION == "LORA_AT_SLAVE")]
 [#if CPUCORE == ""][#-- singleCore --]
 [#if THREADX??]
@@ -1043,7 +1086,7 @@ static void Thd_LmHandlerProcess(void *argument)
   }
 }
 [/#if]
-[/#if]
+[/#if][#--  THREADX vs FREERTOS vs SEQUENCER --]
 [#if (SUBGHZ_APPLICATION == "LORA_END_NODE")]
 [#if THREADX??]
 
@@ -1146,7 +1189,7 @@ static void Thd_LoraStopJoin(void *argument)
   /* USER CODE END Thd_LoraStopJoin_2 */
 }
 [/#if]
-[/#if]
+[/#if][#--  THREADX vs FREERTOS vs SEQUENCER --]
 [#elseif (SUBGHZ_APPLICATION == "LORA_AT_SLAVE")]
 [#if THREADX??]
 
@@ -1189,9 +1232,9 @@ static void Thd_VcomProcess(void *argument)
 
   /* USER CODE END Thd_VcomProcess_2 */
 }
-[/#if]
-[/#if]
-[/#if]
+[/#if][#--  THREADX vs FREERTOS vs SEQUENCER --]
+[/#if][#--  CPUCORE == "" --]
+[/#if][#--  SUBGHZ_APPLICATION == "LORA_END_XXX" --]
 
 static void OnRxData(LmHandlerAppData_t *appData, LmHandlerRxParams_t *params)
 {
@@ -1272,13 +1315,14 @@ static void OnRxData(LmHandlerAppData_t *appData, LmHandlerRxParams_t *params)
     if (params->RxSlot < RX_SLOT_NONE)
     {
       APP_LOG(TS_OFF, VLEVEL_H, "###### D/L FRAME:%04d | PORT:%d | DR:%d | SLOT:%s | RSSI:%d | SNR:%d\r\n",
-              params->DownlinkCounter, RxPort, params->Datarate, slotStrings[params->RxSlot], params->Rssi, params->Snr);
+              params->DownlinkCounter, RxPort, params->Datarate, slotStrings[params->RxSlot],
+              params->Rssi, params->Snr);
     }
 [#elseif (SUBGHZ_APPLICATION == "LORA_AT_SLAVE")]
     AT_event_receive(appData, params);
 [/#if]
   }
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION == "LORA_XXX" --]
   /* USER CODE END OnRxData_1 */
 }
 
@@ -1292,96 +1336,107 @@ static void SendTxData(void)
   sensor_t sensor_data;
   UTIL_TIMER_Time_t nextTxIn = 0;
 
+  if (LmHandlerIsBusy() == false)
+  {
 #ifdef CAYENNE_LPP
-  uint8_t channel = 0;
+    uint8_t channel = 0;
 #else
-  uint16_t pressure = 0;
-  int16_t temperature = 0;
-  uint16_t humidity = 0;
-  uint32_t i = 0;
-  int32_t latitude = 0;
-  int32_t longitude = 0;
-  uint16_t altitudeGps = 0;
+    uint16_t pressure = 0;
+    int16_t temperature = 0;
+    uint16_t humidity = 0;
+    uint32_t i = 0;
+    int32_t latitude = 0;
+    int32_t longitude = 0;
+    uint16_t altitudeGps = 0;
 #endif /* CAYENNE_LPP */
 
-  EnvSensors_Read(&sensor_data);
+    EnvSensors_Read(&sensor_data);
 
-  APP_LOG(TS_ON, VLEVEL_M, "VDDA: %d\r\n", batteryLevel);
-  APP_LOG(TS_ON, VLEVEL_M, "temp: %d\r\n", (int16_t)(sensor_data.temperature));
+    APP_LOG(TS_ON, VLEVEL_M, "VDDA: %d\r\n", batteryLevel);
+    APP_LOG(TS_ON, VLEVEL_M, "temp: %d\r\n", (int16_t)(sensor_data.temperature));
 
-  AppData.Port = LORAWAN_USER_APP_PORT;
+    AppData.Port = LORAWAN_USER_APP_PORT;
 
 #ifdef CAYENNE_LPP
-  CayenneLppReset();
-  CayenneLppAddBarometricPressure(channel++, sensor_data.pressure);
-  CayenneLppAddTemperature(channel++, sensor_data.temperature);
-  CayenneLppAddRelativeHumidity(channel++, (uint16_t)(sensor_data.humidity));
+    CayenneLppReset();
+    CayenneLppAddBarometricPressure(channel++, sensor_data.pressure);
+    CayenneLppAddTemperature(channel++, sensor_data.temperature);
+    CayenneLppAddRelativeHumidity(channel++, (uint16_t)(sensor_data.humidity));
 
-  if ((LmHandlerParams.ActiveRegion != LORAMAC_REGION_US915) && (LmHandlerParams.ActiveRegion != LORAMAC_REGION_AU915)
-      && (LmHandlerParams.ActiveRegion != LORAMAC_REGION_AS923))
-  {
-    CayenneLppAddDigitalInput(channel++, GetBatteryLevel());
-    CayenneLppAddDigitalOutput(channel++, AppLedStateOn);
-  }
+    if ((LmHandlerParams.ActiveRegion != LORAMAC_REGION_US915) && (LmHandlerParams.ActiveRegion != LORAMAC_REGION_AU915)
+        && (LmHandlerParams.ActiveRegion != LORAMAC_REGION_AS923))
+    {
+      CayenneLppAddDigitalInput(channel++, GetBatteryLevel());
+      CayenneLppAddDigitalOutput(channel++, AppLedStateOn);
+    }
 
-  CayenneLppCopy(AppData.Buffer);
-  AppData.BufferSize = CayenneLppGetSize();
+    CayenneLppCopy(AppData.Buffer);
+    AppData.BufferSize = CayenneLppGetSize();
 #else  /* not CAYENNE_LPP */
-  humidity    = (uint16_t)(sensor_data.humidity * 10);            /* in %*10     */
-  temperature = (int16_t)(sensor_data.temperature);
-  pressure = (uint16_t)(sensor_data.pressure * 100 / 10); /* in hPa / 10 */
+    humidity    = (uint16_t)(sensor_data.humidity * 10);            /* in %*10     */
+    temperature = (int16_t)(sensor_data.temperature);
+    pressure = (uint16_t)(sensor_data.pressure * 100 / 10); /* in hPa / 10 */
 
-  AppData.Buffer[i++] = AppLedStateOn;
-  AppData.Buffer[i++] = (uint8_t)((pressure >> 8) & 0xFF);
-  AppData.Buffer[i++] = (uint8_t)(pressure & 0xFF);
-  AppData.Buffer[i++] = (uint8_t)(temperature & 0xFF);
-  AppData.Buffer[i++] = (uint8_t)((humidity >> 8) & 0xFF);
-  AppData.Buffer[i++] = (uint8_t)(humidity & 0xFF);
+    AppData.Buffer[i++] = AppLedStateOn;
+    AppData.Buffer[i++] = (uint8_t)((pressure >> 8) & 0xFF);
+    AppData.Buffer[i++] = (uint8_t)(pressure & 0xFF);
+    AppData.Buffer[i++] = (uint8_t)(temperature & 0xFF);
+    AppData.Buffer[i++] = (uint8_t)((humidity >> 8) & 0xFF);
+    AppData.Buffer[i++] = (uint8_t)(humidity & 0xFF);
 
-  if ((LmHandlerParams.ActiveRegion == LORAMAC_REGION_US915) || (LmHandlerParams.ActiveRegion == LORAMAC_REGION_AU915)
-      || (LmHandlerParams.ActiveRegion == LORAMAC_REGION_AS923))
-  {
-    AppData.Buffer[i++] = 0;
-    AppData.Buffer[i++] = 0;
-    AppData.Buffer[i++] = 0;
-    AppData.Buffer[i++] = 0;
-  }
-  else
-  {
-    latitude = sensor_data.latitude;
-    longitude = sensor_data.longitude;
+    if ((LmHandlerParams.ActiveRegion == LORAMAC_REGION_US915) || (LmHandlerParams.ActiveRegion == LORAMAC_REGION_AU915)
+        || (LmHandlerParams.ActiveRegion == LORAMAC_REGION_AS923))
+    {
+      AppData.Buffer[i++] = 0;
+      AppData.Buffer[i++] = 0;
+      AppData.Buffer[i++] = 0;
+      AppData.Buffer[i++] = 0;
+    }
+    else
+    {
+      latitude = sensor_data.latitude;
+      longitude = sensor_data.longitude;
 
-    AppData.Buffer[i++] = GetBatteryLevel();        /* 1 (very low) to 254 (fully charged) */
-    AppData.Buffer[i++] = (uint8_t)((latitude >> 16) & 0xFF);
-    AppData.Buffer[i++] = (uint8_t)((latitude >> 8) & 0xFF);
-    AppData.Buffer[i++] = (uint8_t)(latitude & 0xFF);
-    AppData.Buffer[i++] = (uint8_t)((longitude >> 16) & 0xFF);
-    AppData.Buffer[i++] = (uint8_t)((longitude >> 8) & 0xFF);
-    AppData.Buffer[i++] = (uint8_t)(longitude & 0xFF);
-    AppData.Buffer[i++] = (uint8_t)((altitudeGps >> 8) & 0xFF);
-    AppData.Buffer[i++] = (uint8_t)(altitudeGps & 0xFF);
-  }
+      AppData.Buffer[i++] = GetBatteryLevel();        /* 1 (very low) to 254 (fully charged) */
+      AppData.Buffer[i++] = (uint8_t)((latitude >> 16) & 0xFF);
+      AppData.Buffer[i++] = (uint8_t)((latitude >> 8) & 0xFF);
+      AppData.Buffer[i++] = (uint8_t)(latitude & 0xFF);
+      AppData.Buffer[i++] = (uint8_t)((longitude >> 16) & 0xFF);
+      AppData.Buffer[i++] = (uint8_t)((longitude >> 8) & 0xFF);
+      AppData.Buffer[i++] = (uint8_t)(longitude & 0xFF);
+      AppData.Buffer[i++] = (uint8_t)((altitudeGps >> 8) & 0xFF);
+      AppData.Buffer[i++] = (uint8_t)(altitudeGps & 0xFF);
+    }
 
-  AppData.BufferSize = i;
+    AppData.BufferSize = i;
 #endif /* CAYENNE_LPP */
 
-  if ((JoinLedTimer.IsRunning) && (LmHandlerJoinStatus() == LORAMAC_HANDLER_SET))
-  {
-    UTIL_TIMER_Stop(&JoinLedTimer);
-    HAL_GPIO_WritePin(LED3_GPIO_Port, LED3_Pin, GPIO_PIN_RESET); /* LED_RED */
-  }
-
-  status = LmHandlerSend(&AppData, LmHandlerParams.IsTxConfirmed, false);
-  if (LORAMAC_HANDLER_SUCCESS == status)
-  {
-    APP_LOG(TS_ON, VLEVEL_L, "SEND REQUEST\r\n");
-  }
-  else if (LORAMAC_HANDLER_DUTYCYCLE_RESTRICTED == status)
-  {
-    nextTxIn = LmHandlerGetDutyCycleWaitTime();
-    if (nextTxIn > 0)
+    if ((JoinLedTimer.IsRunning) && (LmHandlerJoinStatus() == LORAMAC_HANDLER_SET))
     {
-      APP_LOG(TS_ON, VLEVEL_L, "Next Tx in  : ~%d second(s)\r\n", (nextTxIn / 1000));
+      UTIL_TIMER_Stop(&JoinLedTimer);
+      HAL_GPIO_WritePin(LED3_GPIO_Port, LED3_Pin, GPIO_PIN_RESET); /* LED_RED */
+    }
+
+[#if (INTERNAL_LORAWAN_FUOTA == "1")]
+    if (DeviceTimeAnsReceived == false)
+    {
+      /* Force a clock synchronization to be able to start a Multicast Session */
+      LmHandlerDeviceTimeReq();
+    }
+
+[/#if]
+    status = LmHandlerSend(&AppData, LmHandlerParams.IsTxConfirmed, false);
+    if (LORAMAC_HANDLER_SUCCESS == status)
+    {
+      APP_LOG(TS_ON, VLEVEL_L, "SEND REQUEST\r\n");
+    }
+    else if (LORAMAC_HANDLER_DUTYCYCLE_RESTRICTED == status)
+    {
+      nextTxIn = LmHandlerGetDutyCycleWaitTime();
+      if (nextTxIn > 0)
+      {
+        APP_LOG(TS_ON, VLEVEL_L, "Next Tx in  : ~%d second(s)\r\n", (nextTxIn / 1000));
+      }
     }
   }
 
@@ -1391,7 +1446,7 @@ static void SendTxData(void)
     UTIL_TIMER_SetPeriod(&TxTimer, MAX(nextTxIn, TxPeriodicity));
     UTIL_TIMER_Start(&TxTimer);
   }
-[/#if]
+[/#if][#--  FILL_UCS --]
 
   /* USER CODE END SendTxData_1 */
 }
@@ -1408,7 +1463,7 @@ static void OnTxTimerEvent(void *context)
   osThreadFlagsSet(Thd_LoraSendProcessId, 1);
 [#else]
   UTIL_SEQ_SetTask((1 << CFG_SEQ_Task_LoRaSendOnTxTimerOrButtonEvent), CFG_SEQ_Prio_0);
-[/#if]
+[/#if][#--  THREADX vs FREERTOS vs SEQUENCER --]
 
   /*Wait for next tx slot*/
   UTIL_TIMER_Start(&TxTimer);
@@ -1416,7 +1471,7 @@ static void OnTxTimerEvent(void *context)
 
   /* USER CODE END OnTxTimerEvent_2 */
 }
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION == "LORA_END_NODE" --]
 
 /* USER CODE BEGIN PrFD_LedEvents */
 [#if ((SUBGHZ_APPLICATION == "LORA_END_NODE") || (SUBGHZ_APPLICATION == "LORA_AT_SLAVE")) && (FILL_UCS == "true")]
@@ -1434,7 +1489,7 @@ static void OnJoinTimerLedEvent(void *context)
 {
   HAL_GPIO_TogglePin(LED3_GPIO_Port, LED3_Pin); /* LED_RED */
 }
-[/#if]
+[/#if][#--  FILL_UCS --]
 
 /* USER CODE END PrFD_LedEvents */
 
@@ -1470,7 +1525,7 @@ static void OnTxData(LmHandlerTxParams_t *params)
     AT_event_confirm(params);
 [/#if]
   }
-[/#if]
+[/#if][#--  FILL_UCS --]
   /* USER CODE END OnTxData_1 */
 }
 
@@ -1495,22 +1550,19 @@ static void OnJoinRequest(LmHandlerJoinParams_t *joinParams)
       {
         APP_LOG(TS_OFF, VLEVEL_M, "OTAA =====================\r\n");
       }
-[#if (LORAWAN_FUOTA == "1")]
-
-      /* Force a clock synchronization to be able to start a Multicast Session */
-      LmHandlerDeviceTimeReq();
-[/#if]
     }
     else
     {
       APP_LOG(TS_OFF, VLEVEL_M, "\r\n###### = JOIN FAILED\r\n");
     }
+
+    APP_LOG(TS_OFF, VLEVEL_H, "###### U/L FRAME:JOIN | DR:%d | PWR:%d\r\n", joinParams->Datarate, joinParams->TxPower);
 [#elseif (SUBGHZ_APPLICATION == "LORA_AT_SLAVE")]
     }
     AT_event_join(joinParams);
 [/#if]
   }
-[/#if]
+[/#if][#--  FILL_UCS --]
   /* USER CODE END OnJoinRequest_1 */
 }
 
@@ -1551,15 +1603,26 @@ static void OnBeaconStatusChange(LmHandlerBeaconParams_t *params)
     AT_event_Beacon(params);
 [/#if]
   }
-[/#if]
+[/#if][#--  FILL_UCS --]
   /* USER CODE END OnBeaconStatusChange_1 */
+}
+
+static void OnSysTimeUpdate(void)
+{
+  /* USER CODE BEGIN OnSysTimeUpdate_1 */
+[#if (INTERNAL_LORAWAN_FUOTA == "1")]
+  DeviceTimeAnsReceived = true;
+[#else]
+
+[/#if][#-- INTERNAL_LORAWAN_FUOTA --]
+  /* USER CODE END OnSysTimeUpdate_1 */
 }
 
 static void OnClassChange(DeviceClass_t deviceClass)
 {
   /* USER CODE BEGIN OnClassChange_1 */
 [#if ((SUBGHZ_APPLICATION == "LORA_END_NODE") || (SUBGHZ_APPLICATION == "LORA_AT_SLAVE")) && (FILL_UCS == "true")]
-[#if (LORAWAN_FUOTA == "1")]
+[#if (INTERNAL_LORAWAN_FUOTA == "1")]
   /*
    * This implementation should be modified to adapt to the network configuration.
    * This custom code allows to temporarily remove the Tx transactions from the device
@@ -1580,7 +1643,7 @@ static void OnClassChange(DeviceClass_t deviceClass)
 [#elseif (SUBGHZ_APPLICATION == "LORA_AT_SLAVE")]
   AT_event_ClassUpdate(deviceClass);
 [/#if]
-[/#if]
+[/#if][#--  FILL_UCS --]
   /* USER CODE END OnClassChange_1 */
 }
 
@@ -1602,7 +1665,7 @@ static void CmdProcessNotify(void)
   /* USER CODE END CmdProcessNotify_2 */
 }
 
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION == "LORA_AT_SLAVE" --]
 static void OnMacProcessNotify(void)
 {
   /* USER CODE BEGIN OnMacProcessNotify_1 */
@@ -1620,13 +1683,13 @@ static void OnMacProcessNotify(void)
   osThreadFlagsSet(Thd_LmHandlerProcessId, 1);
 [#else]
   UTIL_SEQ_SetTask((1 << CFG_SEQ_Task_LmHandlerProcess), CFG_SEQ_Prio_0);
-[/#if]
+[/#if][#--  THREADX vs FREERTOS vs SEQUENCER --]
 
   /* USER CODE BEGIN OnMacProcessNotify_2 */
 
   /* USER CODE END OnMacProcessNotify_2 */
-[/#if]
-[/#if]
+[/#if][#--  CPUCORE != CM4 --]
+[/#if][#--  SUBGHZ_APPLICATION == "LORA_XXX" --]
 }
 
 static void OnTxPeriodicityChanged(uint32_t periodicity)
@@ -1650,7 +1713,7 @@ static void OnTxPeriodicityChanged(uint32_t periodicity)
   /* USER CODE BEGIN OnTxPeriodicityChanged_2 */
 
   /* USER CODE END OnTxPeriodicityChanged_2 */
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION == "LORA_END_NODE" --]
 }
 
 static void OnTxFrameCtrlChanged(LmHandlerMsgTypes_t isTxConfirmed)
@@ -1663,7 +1726,7 @@ static void OnTxFrameCtrlChanged(LmHandlerMsgTypes_t isTxConfirmed)
   /* USER CODE BEGIN OnTxFrameCtrlChanged_2 */
 
   /* USER CODE END OnTxFrameCtrlChanged_2 */
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION == "LORA_END_NODE" --]
 }
 
 static void OnPingSlotPeriodicityChanged(uint8_t pingSlotPeriodicity)
@@ -1676,7 +1739,7 @@ static void OnPingSlotPeriodicityChanged(uint8_t pingSlotPeriodicity)
   /* USER CODE BEGIN OnPingSlotPeriodicityChanged_2 */
 
   /* USER CODE END OnPingSlotPeriodicityChanged_2 */
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION != "LORA_USER_APPLICATION --]
 }
 
 static void OnSystemReset(void)
@@ -1692,7 +1755,7 @@ static void OnSystemReset(void)
   /* USER CODE BEGIN OnSystemReset_Last */
 
   /* USER CODE END OnSystemReset_Last */
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION == "LORA_END_NODE" --]
 }
 
 [#if (SUBGHZ_APPLICATION == "LORA_END_NODE")]
@@ -1764,7 +1827,7 @@ static void OnStopJoinTimerEvent(void *context)
   /* USER CODE END OnStopJoinTimerEvent_Last */
 }
 
-[/#if]
+[/#if][#--  SECURE_PROJECTS == "0" --]
 static void StoreContext(void)
 {
   LmHandlerErrorStatus_t status = LORAMAC_HANDLER_ERROR;
@@ -1787,7 +1850,7 @@ static void StoreContext(void)
   /* USER CODE END StoreContext_Last */
 }
 
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION == "LORA_AT_SLAVE" --]
 [#if (SUBGHZ_APPLICATION == "LORA_END_NODE") || (SUBGHZ_APPLICATION == "LORA_AT_SLAVE")]
 static void OnNvmDataChange(LmHandlerNvmContextStates_t state)
 {
@@ -1820,13 +1883,9 @@ static void OnStoreContextRequest(void *nvm, uint32_t nvm_size)
   AT_event_OnStoreContextRequest(nvm, nvm_size);
 [#else]
   /* store nvm in flash */
-  if (HAL_FLASH_Unlock() == HAL_OK)
+  if (FLASH_IF_Erase(LORAWAN_NVM_BASE_ADDRESS, FLASH_PAGE_SIZE) == FLASH_IF_OK)
   {
-    if (FLASH_IF_EraseByPages(PAGE(LORAWAN_NVM_BASE_ADDRESS), 1, 0U) == FLASH_OK)
-    {
-      FLASH_IF_Write(LORAWAN_NVM_BASE_ADDRESS, (uint8_t *)nvm, nvm_size, NULL);
-    }
-    HAL_FLASH_Lock();
+    FLASH_IF_Write(LORAWAN_NVM_BASE_ADDRESS, (const void *)nvm, nvm_size);
   }
 [/#if]
   /* USER CODE BEGIN OnStoreContextRequest_Last */
@@ -1842,11 +1901,11 @@ static void OnRestoreContextRequest(void *nvm, uint32_t nvm_size)
 [#if (SUBGHZ_APPLICATION == "LORA_AT_SLAVE")]
   AT_event_OnRestoreContextRequest(nvm, nvm_size);
 [#else]
-  UTIL_MEM_cpy_8(nvm, (void *)LORAWAN_NVM_BASE_ADDRESS, nvm_size);
+  FLASH_IF_Read(nvm, LORAWAN_NVM_BASE_ADDRESS, nvm_size);
 [/#if]
   /* USER CODE BEGIN OnRestoreContextRequest_Last */
 
   /* USER CODE END OnRestoreContextRequest_Last */
 }
 
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION == "LORA_XXX" --]

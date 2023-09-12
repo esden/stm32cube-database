@@ -155,7 +155,7 @@ extern "C" {
 
 [#if packs??]
 [#list packs as variables]
-[@common.optinclude name=mxTmpFolder+"/RTOS_defines_${variables.name}.tmp"/]
+[@common.optinclude name=contextFolder + mxTmpFolder+"/RTOS_defines_${variables.name}.tmp"/]
 [/#list]
 [/#if]
 

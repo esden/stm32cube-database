@@ -147,8 +147,8 @@
 [#if BLE = 1]
 #include "app_debug.h"
 [/#if]
-[#if (THREAD = 1 || ZIGBEE = 1) || ((BLE = 1) && (BLE_TRANSPARENT_MODE_UART != 1) && (BLE_TRANSPARENT_MODE_VCP != 1))]
 #include "dbg_trace.h"
+[#if (THREAD = 1 || ZIGBEE = 1) || ((BLE = 1) && (BLE_TRANSPARENT_MODE_UART != 1) && (BLE_TRANSPARENT_MODE_VCP != 1))]
 #include "shci.h"
 [/#if]
 #include "otp.h"
@@ -856,6 +856,7 @@ static void APPE_SysEvtReadyProcessing(void * pPayload)
   
   SHCI_C2_CONFIG_Cmd_Param_t config_param = {0};
   uint32_t RevisionID=0;
+  uint32_t DeviceID=0;
   
   p_sys_event = (TL_AsynchEvt_t*)(((tSHCI_UserEvtRxParam*)pPayload)->pckt->evtserial.evt.payload);
   p_sys_ready_event = (SHCI_C2_Ready_Evt_t*) p_sys_event->payload;
@@ -891,7 +892,11 @@ static void APPE_SysEvtReadyProcessing(void * pPayload)
     
     APP_DBG_MSG(">>== DBGMCU_GetRevisionID= %lx \n\r", RevisionID);
 
-    config_param.RevisionID = RevisionID;
+    config_param.RevisionID = (uint16_t)RevisionID;
+
+    DeviceID = LL_DBGMCU_GetDeviceID();
+    APP_DBG_MSG(">>== DBGMCU_GetDeviceID= %lx \n\r", DeviceID);
+    config_param.DeviceID = (uint16_t)DeviceID;
     (void)SHCI_C2_Config(&config_param);
 
     APP_BLE_Init();

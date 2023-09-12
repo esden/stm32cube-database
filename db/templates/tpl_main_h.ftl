@@ -245,6 +245,15 @@ typedef funcptr funcptr_NS;
 #n
 /* Exported functions prototypes ---------------------------------------------*/
 void Error_Handler(void);
+[#if HALCompliant??]
+[#list voids as void]
+  [#if (void.isStatic?? && !void.isStatic) && ((void.bspUsed?? && void.bspUsed && !void.isNotGenerated)||(void.functionName!="SystemClock_Config"))]
+[#if !void.ipType?contains("thirdparty")&&!void.ipType?contains("middleware")&&!void.functionName?contains("VREFBUF")&&void.functionName!="Init" && !void.functionName?contains("MotorControl") && !void.functionName?contains("ETZPC") && !void.functionName?contains("TRACER_EMB") && !void.functionName?contains("GUI_INTERFACE")]
+void ${""?right_pad(2)}${void.functionName}(void);
+[/#if]
+  [/#if]
+[/#list]
+[/#if]
 
 /* USER CODE BEGIN EFP */
 
@@ -254,7 +263,9 @@ void Error_Handler(void);
 [#if UserDefines??][#-- user defines declaration --]
 [#assign defines = UserDefines.get(0)]
 [#list defines.entrySet() as define]
+[#if (define.key)?? & (define.value)??]
 #define ${define.key} ${define.value}
+[/#if]
 [/#list]
 [/#if]
 [#if LabelDefines??][#-- user defines declaration --]
@@ -292,15 +303,7 @@ void Error_Handler(void);
 #endif
 [/#if]
 [/#if]
-[#if HALCompliant??]
-[#list voids as void]
-  [#if (void.isStatic?? && !void.isStatic) && ((void.bspUsed?? && void.bspUsed && !void.isNotGenerated)||(void.functionName!="SystemClock_Config"))]
-[#if !void.ipType?contains("thirdparty")&&!void.ipType?contains("middleware")&&!void.functionName?contains("VREFBUF")&&void.functionName!="Init" && !void.functionName?contains("MotorControl") && !void.functionName?contains("ETZPC") && !void.functionName?contains("TRACER_EMB") && !void.functionName?contains("GUI_INTERFACE")]
-void ${""?right_pad(2)}${void.functionName}(void);
-[/#if]
-  [/#if]
-[/#list]
-[/#if]
+
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */

@@ -3,6 +3,8 @@
 [#assign s = name]
 [#assign titi = s?replace("Target/","")]
 [#assign toto = titi?replace(".","__")]
+[#assign CLASS_FS = ""]
+[#assign CLASS_HS = ""]
 /**
   ******************************************************************************
   * @file           : ${titi}
@@ -89,13 +91,19 @@ extern ${variable.value} ${variable.name};
 [#if SWIP.defines??]
 	[#list SWIP.defines as definition]
 	[#assign value = definition.value]
+	[#assign paramName = definition.paramName]
+	[#if definition.paramName == "CLASS_NAME_HS"]
+		[#assign CLASS_HS = value]
+	[#elseif definition.paramName == "CLASS_NAME_FS"]
+	[#assign CLASS_FS = value]
+	[/#if]
 	[#if value!="valueNotSetted"]
 /*---------- [#if definition.comments??]${definition.comments} [/#if] -----------*/
 [#-- Tracker 253306 --]
     [#if definition.name="USBD_DFU_APP_DEFAULT_ADD"]
 #define ${definition.name} #t#t${value}U
     [/#if]
-    [#if definition.name!="USBD_DFU_APP_DEFAULT_ADD"]
+    [#if definition.name!="USBD_DFU_APP_DEFAULT_ADD" && paramName!="CLASS_NAME_FS" && paramName!="CLASS_NAME_HS"]
 #define ${definition.name} #t#t${value}U
     [/#if]
 [#-- Tracker 253306 --]
@@ -106,6 +114,13 @@ extern ${variable.value} ${variable.name};
 [/#compress]
 [/#list]
 #n
+
+[#if CLASS_HS == "CUSTOM_HID" || CLASS_FS == "CUSTOM_HID"]
+/* #define USBD_CUSTOMHID_CTRL_REQ_GET_REPORT_ENABLED */
+/* #define USBD_CUSTOMHID_OUT_PREPARE_RECEIVE_DISABLED */
+/* #define USBD_CUSTOMHID_EP0_OUT_PREPARE_RECEIVE_DISABLED */
+/* #define USBD_CUSTOMHID_CTRL_REQ_COMPLETE_CALLBACK_ENABLED */
+[/#if]
 
 /****************************************/
 /* #define for FS and HS identification */
@@ -158,7 +173,7 @@ extern ${variable.value} ${variable.name};
 
 #if (USBD_DEBUG_LEVEL > 1)
 
-#define USBD_ErrLog(...)    printf("ERROR: ") ;\
+#define USBD_ErrLog(...)    printf("ERROR: ");\
                             printf(__VA_ARGS__);\
                             printf("\n");
 #else
@@ -167,7 +182,7 @@ extern ${variable.value} ${variable.name};
 
 
 #if (USBD_DEBUG_LEVEL > 2)
-#define USBD_DbgLog(...)    printf("DEBUG : ") ;\
+#define USBD_DbgLog(...)    printf("DEBUG : ");\
                             printf(__VA_ARGS__);\
                             printf("\n");
 #else

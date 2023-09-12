@@ -10,6 +10,18 @@
   ******************************************************************************
   */
 /* USER CODE END Header */
+[#assign UTIL_SEQ_EN_M4 = "true"]
+[#if SWIPdatas??]
+    [#list SWIPdatas as SWIP]
+        [#if SWIP.defines??]
+            [#list SWIP.defines as definition]
+                [#if definition.name == "UTIL_SEQ_EN_M4"]
+                    [#assign UTIL_SEQ_EN_M4 = definition.value]
+                [/#if]
+            [/#list]
+        [/#if]
+    [/#list]
+[/#if]
 
 /* Includes ------------------------------------------------------------------*/
 #include "platform.h"
@@ -20,16 +32,14 @@
 [#if THREADX??][#-- If AzRtos is used --]
 #include "app_azure_rtos.h"
 #include "tx_api.h"
-[#else]
-[#if !FREERTOS??][#-- If FreeRtos is not used --]
-#include "stm32_seq.h"
-[#else]
+[#elseif FREERTOS??][#-- If FreeRtos is used --]
 #include "cmsis_os.h"
-[/#if]
-[/#if]
+[#elseif UTIL_SEQ_EN_M4 == "true"]
+#include "stm32_seq.h"
+[/#if][#--  THREADX vs FREERTOS vs SEQUENCER --]
 #include "radio_mbwrapper.h"
-#include "subghz_phy_version.h"
 #include "utilities_def.h"
+#include "app_version.h"
 
 /* USER CODE BEGIN Includes */
 
@@ -135,25 +145,32 @@ static void Thd_MbRadioNotifRcv_Entry(unsigned long thread_input);
 /* Exported functions --------------------------------------------------------*/
 int8_t MBMUXIF_RadioInit(void)
 {
-  FEAT_INFO_Param_t *p_cm0plus_specific_features_info;
+  FEAT_INFO_Param_t *p_cm0plus_system_info;
+  int32_t cm0_vers = 0;
   int8_t ret = 0;
 
   /* USER CODE BEGIN MBMUXIF_RadioInit_1 */
 
   /* USER CODE END MBMUXIF_RadioInit_1 */
 
-  p_cm0plus_specific_features_info = MBMUXIF_SystemGetFeatCapabInfoPtr(FEAT_INFO_RADIO_ID);
-  if (p_cm0plus_specific_features_info->Feat_Info_Feature_Version != SUBGHZ_PHY_VERSION)
+  p_cm0plus_system_info = MBMUXIF_SystemGetFeatCapabInfoPtr(FEAT_INFO_SYSTEM_ID);
+  /* abstract CM0 release version from RC (release candidate) and compare */
+  cm0_vers = p_cm0plus_system_info->Feat_Info_Feature_Version >> APP_VERSION_SUB2_SHIFT;
+  if (cm0_vers < (LAST_COMPATIBLE_CM0_RELEASE >> APP_VERSION_SUB2_SHIFT))
   {
-    ret = -4; /* version mismatch */
+    ret = -4; /* version incompatibility */
   }
   if (ret >= 0)
   {
-    ret = MBMUX_RegisterFeature(FEAT_INFO_RADIO_ID, MBMUX_CMD_RESP, MBMUXIF_IsrRadioRespRcvCb, aRadioCmdRespBuff, sizeof(aRadioCmdRespBuff));
+    ret = MBMUX_RegisterFeature(FEAT_INFO_RADIO_ID, MBMUX_CMD_RESP,
+                                MBMUXIF_IsrRadioRespRcvCb,
+                                aRadioCmdRespBuff, sizeof(aRadioCmdRespBuff));
   }
   if (ret >= 0)
   {
-    ret = MBMUX_RegisterFeature(FEAT_INFO_RADIO_ID, MBMUX_NOTIF_ACK, MBMUXIF_IsrRadioNotifRcvCb, aRadioNotifAckBuff, sizeof(aRadioNotifAckBuff));
+    ret = MBMUX_RegisterFeature(FEAT_INFO_RADIO_ID, MBMUX_NOTIF_ACK,
+                                MBMUXIF_IsrRadioNotifRcvCb,
+                                aRadioNotifAckBuff, sizeof(aRadioNotifAckBuff));
   }
 
 [#if THREADX??]
@@ -177,25 +194,26 @@ int8_t MBMUXIF_RadioInit(void)
       ret = -11;  /* equivalent at TX_THREAD_ERROR */
     }
   }
+[/#if][#--  THREADX --]
   if (ret >= 0)
   {
+[#if THREADX??]
     /* Create the semaphore.  */
     if (tx_semaphore_create(&Sem_MbRadioRespRcv, "Sem_MbRadioRespRcv", 0) != TX_SUCCESS)
     {
       ret = -12; /* equivalent at TX_SEMAPHORE_ERROR */
     }
-  }
-[#else]
-  if (ret >= 0)
-  {
-[#if !FREERTOS??][#-- If FreeRtos is not used --]
-    UTIL_SEQ_RegTask((1 << CFG_SEQ_Task_MbRadioNotifRcv), UTIL_SEQ_RFU, MBMUXIF_TaskRadioNotifRcv);
-[#else]
+[#elseif FREERTOS??][#-- If FreeRtos is used --]
     Thd_RadioNotifRcvProcessId = osThreadNew(Thd_RadioNotifRcvProcess, NULL, &Thd_RadioNotifRcvProcess_attr);
     Sem_MbRadioRespRcv = osSemaphoreNew(1, 0, NULL);   /*< Create the semaphore and make it busy at initialization */
-[/#if]
+[#elseif UTIL_SEQ_EN_M4 == "true"]
+    UTIL_SEQ_RegTask((1 << CFG_SEQ_Task_MbRadioNotifRcv), UTIL_SEQ_RFU, MBMUXIF_TaskRadioNotifRcv);
+[#else]
+  /* USER CODE BEGIN MBMUXIF_RadioInit_OS */
+
+  /* USER CODE END MBMUXIF_RadioInit_OS */
+[/#if][#--  THREADX vs FREERTOS vs SEQUENCER --]
   }
-[/#if]
 
   if (ret >= 0)
   {
@@ -242,13 +260,15 @@ void MBMUXIF_RadioSendCmd(void)
   {
 [#if THREADX??][#-- If AzRtos is used --]
     while (tx_semaphore_get(&Sem_MbRadioRespRcv, TX_WAIT_FOREVER) != TX_SUCCESS) {}
-[#else]
-[#if !FREERTOS??][#-- If FreeRtos is not used --]
+[#elseif FREERTOS??][#-- If FreeRtos is used --]
+    osSemaphoreAcquire(Sem_MbRadioRespRcv, osWaitForever);
+[#elseif UTIL_SEQ_EN_M4 == "true"]
     UTIL_SEQ_WaitEvt(1 << CFG_SEQ_Evt_MbRadioRespRcv);
 [#else]
-    osSemaphoreAcquire(Sem_MbRadioRespRcv, osWaitForever);
-[/#if]
-[/#if]
+    /* USER CODE BEGIN MBMUXIF_RadioSendCmd_OS */
+
+    /* USER CODE END MBMUXIF_RadioSendCmd_OS */
+[/#if][#--  THREADX vs FREERTOS vs SEQUENCER --]
   }
   else
   {
@@ -286,13 +306,15 @@ static void MBMUXIF_IsrRadioRespRcvCb(void *ComObj)
 [#if THREADX??][#-- If AzRtos is used --]
   /* Set the semaphore to release the Sem_MbRadioRespRcv Thread */
   tx_semaphore_put(&Sem_MbRadioRespRcv);
-[#else]
-[#if !FREERTOS??][#-- If FreeRtos is not used --]
+[#elseif FREERTOS??][#-- If FreeRtos is used --]
+  osSemaphoreRelease(Sem_MbRadioRespRcv);
+[#elseif UTIL_SEQ_EN_M4 == "true"]
   UTIL_SEQ_SetEvt(1 << CFG_SEQ_Evt_MbRadioRespRcv);
 [#else]
-  osSemaphoreRelease(Sem_MbRadioRespRcv);
-[/#if]
-[/#if]
+  /* USER CODE BEGIN MBMUXIF_IsrRadioRespRcvCb_OS */
+
+  /* USER CODE END MBMUXIF_IsrRadioRespRcvCb_OS */
+[/#if][#--  THREADX vs FREERTOS vs SEQUENCER --]
   /* USER CODE BEGIN MBMUXIF_IsrRadioRespRcvCb_Last */
 
   /* USER CODE END MBMUXIF_IsrRadioRespRcvCb_Last */
@@ -310,13 +332,15 @@ static void MBMUXIF_IsrRadioNotifRcvCb(void *ComObj)
     Thd_RadioNotifRcv_RescheduleFlag++;
   }
   tx_thread_resume(&Thd_RadioNotifRcv);
-[#else]
-[#if !FREERTOS??][#-- If FreeRtos is not used --]
+[#elseif FREERTOS??][#-- If FreeRtos is used --]
+  osThreadFlagsSet(Thd_RadioNotifRcvProcessId, 1);
+[#elseif UTIL_SEQ_EN_M4 == "true"]
   UTIL_SEQ_SetTask((1 << CFG_SEQ_Task_MbRadioNotifRcv), CFG_SEQ_Prio_0);
 [#else]
-  osThreadFlagsSet(Thd_RadioNotifRcvProcessId, 1);
-[/#if]
-[/#if]
+  /* USER CODE BEGIN MBMUXIF_IsrRadioNotifRcvCb_OS */
+
+  /* USER CODE END MBMUXIF_IsrRadioNotifRcvCb_OS */
+[/#if][#--  THREADX vs FREERTOS vs SEQUENCER --]
   /* USER CODE BEGIN MBMUXIF_IsrRadioNotifRcvCb_Last */
 
   /* USER CODE END MBMUXIF_IsrRadioNotifRcvCb_Last */

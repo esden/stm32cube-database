@@ -10,6 +10,18 @@
   ******************************************************************************
   */
 /* USER CODE END Header */
+[#assign UTIL_SEQ_EN_M4 = "true"]
+[#if SWIPdatas??]
+    [#list SWIPdatas as SWIP]
+        [#if SWIP.defines??]
+            [#list SWIP.defines as definition]
+                [#if definition.name == "UTIL_SEQ_EN_M4"]
+                    [#assign UTIL_SEQ_EN_M4 = definition.value]
+                [/#if]
+            [/#list]
+        [/#if]
+    [/#list]
+[/#if]
 
 /* Includes ------------------------------------------------------------------*/
 #include "platform.h"
@@ -20,17 +32,15 @@
 [#if THREADX??][#-- If AzRtos is used --]
 #include "app_azure_rtos.h"
 #include "tx_api.h"
-[#else]
-[#if !FREERTOS??][#-- If FreeRtos is not used --]
-#include "stm32_seq.h"
-[#else]
+[#elseif FREERTOS??][#-- If FreeRtos is used --]
 #include "cmsis_os.h"
-[/#if]
-[/#if]
+[#elseif UTIL_SEQ_EN_M4 == "true"]
+#include "stm32_seq.h"
+[/#if][#--  THREADX vs FREERTOS vs SEQUENCER --]
 #include "LoRaMac.h"
 #include "LmHandler_mbwrapper.h"
 #include "utilities_def.h"
-#include "lora_app_version.h"
+#include "app_version.h"
 
 /* USER CODE BEGIN Includes */
 
@@ -151,11 +161,15 @@ int8_t MBMUXIF_LoraInit(void)
   }
   if (ret >= 0)
   {
-    ret = MBMUX_RegisterFeature(FEAT_INFO_LORAWAN_ID, MBMUX_CMD_RESP, MBMUXIF_IsrLoraRespRcvCb, aLoraCmdRespBuff, sizeof(aLoraCmdRespBuff));
+    ret = MBMUX_RegisterFeature(FEAT_INFO_LORAWAN_ID, MBMUX_CMD_RESP,
+                                MBMUXIF_IsrLoraRespRcvCb,
+                                aLoraCmdRespBuff, sizeof(aLoraCmdRespBuff));
   }
   if (ret >= 0)
   {
-    ret = MBMUX_RegisterFeature(FEAT_INFO_LORAWAN_ID, MBMUX_NOTIF_ACK, MBMUXIF_IsrLoraNotifRcvCb, aLoraNotifAckBuff, sizeof(aLoraNotifAckBuff));
+    ret = MBMUX_RegisterFeature(FEAT_INFO_LORAWAN_ID, MBMUX_NOTIF_ACK,
+                                MBMUXIF_IsrLoraNotifRcvCb,
+                                aLoraNotifAckBuff, sizeof(aLoraNotifAckBuff));
   }
 
 [#if THREADX??]
@@ -168,8 +182,10 @@ int8_t MBMUXIF_LoraInit(void)
       ret = -10; /* equivalent at TX_POOL_ERROR */
     }
   }
+[/#if][#--  THREADX --]
   if (ret >= 0)
   {
+[#if THREADX??]
     /* Create MbLoraNotifRcv.  */
     if (tx_thread_create(&Thd_LoraNotifRcv, "Thread MbLoraNotifRcv", Thd_MbLoraNotifRcv_Entry, 0,
                          pointer, CFG_MAILBOX_THREAD_STACK_SIZE,
@@ -178,17 +194,16 @@ int8_t MBMUXIF_LoraInit(void)
     {
       ret = -11;  /* equivalent at TX_THREAD_ERROR */
     }
-  }
-[#else]
-  if (ret >= 0)
-  {
-[#if !FREERTOS??][#-- If FreeRtos is not used --]
+[#elseif FREERTOS??][#-- If FreeRtos is used --]
+    Thd_LoraNotifRcvProcessId = osThreadNew(Thd_LoraNotifRcvProcess, NULL, &Thd_LoraNotifRcvProcess_attr);
+[#elseif UTIL_SEQ_EN_M4 == "true"]
     UTIL_SEQ_RegTask((1 << CFG_SEQ_Task_MbLoRaNotifRcv), UTIL_SEQ_RFU, MBMUXIF_TaskLoraNotifRcv);
 [#else]
-    Thd_LoraNotifRcvProcessId = osThreadNew(Thd_LoraNotifRcvProcess, NULL, &Thd_LoraNotifRcvProcess_attr);
-[/#if]
+  /* USER CODE BEGIN MBMUXIF_LoraInit_OS */
+
+  /* USER CODE END MBMUXIF_LoraInit_OS */
+[/#if][#--  THREADX vs FREERTOS vs SEQUENCER --]
   }
-[/#if]
 
   if (ret >= 0)
   {
@@ -199,9 +214,6 @@ int8_t MBMUXIF_LoraInit(void)
     }
   }
 
-[#if FREERTOS??][#-- If FreeRtos is used --]
-  Sem_MbLoRaRespRcv = osSemaphoreNew(1, 0, NULL);   /*< Create the semaphore and make it busy at initialization */
-[/#if]
 [#if THREADX??]
   if (ret >= 0)
   {
@@ -211,6 +223,8 @@ int8_t MBMUXIF_LoraInit(void)
       ret = -12; /* equivalent at TX_SEMAPHORE_ERROR */
     }
   }
+[#elseif FREERTOS??][#-- If FreeRtos is used --]
+  Sem_MbLoRaRespRcv = osSemaphoreNew(1, 0, NULL);   /*< Create the semaphore and make it busy at initialization */
 [/#if]
 
   if (ret >= 0)
@@ -249,13 +263,15 @@ void MBMUXIF_LoraSendCmd(void)
   {
 [#if THREADX??][#-- If AzRtos is used --]
     while (tx_semaphore_get(&Sem_MbLoraRespRcv, TX_WAIT_FOREVER) != TX_SUCCESS) {}
-[#else]
-[#if !FREERTOS??][#-- If FreeRtos is not used --]
+[#elseif FREERTOS??][#-- If FreeRtos is used --]
+    osSemaphoreAcquire(Sem_MbLoRaRespRcv, osWaitForever);
+[#elseif UTIL_SEQ_EN_M4 == "true"]
     UTIL_SEQ_WaitEvt(1 << CFG_SEQ_Evt_MbLoRaRespRcv);
 [#else]
-    osSemaphoreAcquire(Sem_MbLoRaRespRcv, osWaitForever);
-[/#if]
-[/#if]
+    /* USER CODE BEGIN MBMUXIF_LoraSendCmd_OS */
+
+    /* USER CODE END MBMUXIF_LoraSendCmd_OS */
+[/#if][#--  THREADX vs FREERTOS vs SEQUENCER --]
   }
   else
   {
@@ -293,13 +309,15 @@ static void MBMUXIF_IsrLoraRespRcvCb(void *ComObj)
 [#if THREADX??][#-- If AzRtos is used --]
   /* Set the semaphore to release the MbLoraRespRcv thread */
   tx_semaphore_put(&Sem_MbLoraRespRcv);
-[#else]
-[#if !FREERTOS??][#-- If FreeRtos is not used --]
+[#elseif FREERTOS??][#-- If FreeRtos is used --]
+  osSemaphoreRelease(Sem_MbLoRaRespRcv);
+[#elseif UTIL_SEQ_EN_M4 == "true"]
   UTIL_SEQ_SetEvt(1 << CFG_SEQ_Evt_MbLoRaRespRcv);
 [#else]
-  osSemaphoreRelease(Sem_MbLoRaRespRcv);
-[/#if]
-[/#if]
+  /* USER CODE BEGIN MBMUXIF_IsrLoraRespRcvCb_OS */
+
+  /* USER CODE END MBMUXIF_IsrLoraRespRcvCb_OS */
+[/#if][#--  THREADX vs FREERTOS vs SEQUENCER --]
   /* USER CODE BEGIN MBMUXIF_IsrLoraRespRcvCb_Last */
 
   /* USER CODE END MBMUXIF_IsrLoraRespRcvCb_Last */
@@ -317,13 +335,15 @@ static void MBMUXIF_IsrLoraNotifRcvCb(void *ComObj)
     Thd_LoraNotifRcv_RescheduleFlag++;
   }
   tx_thread_resume(&Thd_LoraNotifRcv);
-[#else]
-[#if !FREERTOS??][#-- If FreeRtos is not used --]
+[#elseif FREERTOS??][#-- If FreeRtos is used --]
+  osThreadFlagsSet(Thd_LoraNotifRcvProcessId, 1);
+[#elseif UTIL_SEQ_EN_M4 == "true"]
   UTIL_SEQ_SetTask((1 << CFG_SEQ_Task_MbLoRaNotifRcv), CFG_SEQ_Prio_0);
 [#else]
-  osThreadFlagsSet(Thd_LoraNotifRcvProcessId, 1);
-[/#if]
-[/#if]
+  /* USER CODE BEGIN MBMUXIF_IsrLoraNotifRcvCb_OS */
+
+  /* USER CODE END MBMUXIF_IsrLoraNotifRcvCb_OS */
+[/#if][#--  THREADX vs FREERTOS vs SEQUENCER --]
   /* USER CODE BEGIN MBMUXIF_IsrLoraNotifRcvCb_Last */
 
   /* USER CODE END MBMUXIF_IsrLoraNotifRcvCb_Last */

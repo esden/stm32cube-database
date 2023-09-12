@@ -10,6 +10,30 @@
   ******************************************************************************
   */
 /* USER CODE END Header */
+[#--
+SWIP Data:
+[#if SWIPdatas??]
+    [#list SWIPdatas as SWIP]
+        [#if SWIP.defines??]
+            [#list SWIP.defines as definition]
+                ${definition.name}: ${definition.value}
+            [/#list]
+        [/#if]
+    [/#list]
+[/#if]
+--]
+[#assign UTIL_TIMER_EN = "true"]
+[#if SWIPdatas??]
+    [#list SWIPdatas as SWIP]
+        [#if SWIP.defines??]
+            [#list SWIP.defines as definition]
+                [#if definition.name == "UTIL_TIMER_EN"]
+                    [#assign UTIL_TIMER_EN = definition.value]
+                [/#if]
+            [/#list]
+        [/#if]
+    [/#list]
+[/#if]
 
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __TIMER_IF_H__
@@ -20,7 +44,11 @@ extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
+[#if (UTIL_TIMER_EN == "true")]
 #include "stm32_timer.h"
+[#else]
+#include "timer.h"
+[/#if]
 #include "stm32_systime.h"
 
 /* USER CODE BEGIN Includes */
@@ -48,6 +76,7 @@ extern "C" {
 /* USER CODE END EM */
 
 /* Exported functions prototypes ---------------------------------------------*/
+[#if (UTIL_TIMER_EN == "true")]
 /**
   * @brief Init RTC hardware
   * @return Status based on @ref UTIL_TIMER_Status_t
@@ -118,6 +147,7 @@ uint32_t TIMER_IF_Convert_ms2Tick(uint32_t timeMilliSec);
   */
 uint32_t TIMER_IF_Convert_Tick2ms(uint32_t tick);
 
+[/#if]
 /**
   * @brief Get rtc time
   * @param[out] subSeconds in ticks

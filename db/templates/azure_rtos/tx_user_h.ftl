@@ -236,6 +236,10 @@
 [/#list]
 [/#compress]
 
+/* USER CODE BEGIN 1 */
+
+/* USER CODE END 1 */
+
 /* Define various build options for the ThreadX port.  The application should either make changes
    here by commenting or un-commenting the conditional compilation defined OR supply the defines
    though the compiler's equivalent of the -D option.
@@ -635,4 +639,9 @@ unsigned long ${TX_LOW_POWER_USER_TIMER_ADJUST_value}(void);
 [/#if]
 
 [/#if]
+
+/* USER CODE BEGIN 2 */
+
+/* USER CODE END 2 */
+
 #endif

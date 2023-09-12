@@ -22,6 +22,7 @@
 [#assign CUSTOM_P2P_SERVER = 0]
 [#assign CUSTOM_TEMPLATE = 0]
 [#assign FREERTOS_STATUS = 0]
+[#assign RFWKPCLKSOURCE = ""]
 [#assign CFG_USB_INTERFACE_ENABLE_VALUE = 0]
 [#assign THREAD = 0]
 [#assign BLE = 0]
@@ -36,6 +37,8 @@
 [#assign CFG_CLI_UART = "0"]
 [#assign CFG_DEBUGGER_SUPPORTED = 0]
 [#assign CFG_ADV_BD_ADDRESS = 0]
+[#assign CFG_IDENTITY_ADDRESS = "GAP_PUBLIC_ADDR"]
+[#assign CFG_PRIVACY = "PRIVACY_DISABLED"]
 [#assign CFG_STATIC_RANDOM_ADDRESS = 0]
 [#assign STATIC_RANDOM_ADDRESS = 0]
 [#assign CFG_FAST_CONN_ADV_INTERVAL_MAX_HEXA = 0]
@@ -82,7 +85,16 @@
 [#assign CFG_BLE_OPTIONS_DEVICE_NAME = "SHCI_C2_BLE_INIT_OPTIONS_DEVICE_NAME_RW"]
 [#assign CFG_BLE_OPTIONS_EXT_ADV = "SHCI_C2_BLE_INIT_OPTIONS_NO_EXT_ADV"]
 [#assign CFG_BLE_OPTIONS_CS_ALGO = "SHCI_C2_BLE_INIT_OPTIONS_NO_CS_ALGO2"]
+[#assign CFG_BLE_OPTIONS_GATTDB_NVM = "SHCI_C2_BLE_INIT_OPTIONS_FULL_GATTDB_NVM"]
+
+[#assign CFG_BLE_OPTIONS_GATT_CACHING = "SHCI_C2_BLE_INIT_OPTIONS_GATT_CACHING_NOTUSED"]
+
 [#assign CFG_BLE_OPTIONS_POWER_CLASS = "SHCI_C2_BLE_INIT_OPTIONS_POWER_CLASS_2_3"]
+
+[#assign CFG_BLE_OPTIONS_APPEARANCE = "SHCI_C2_BLE_INIT_OPTIONS_APPEARANCE_READONLY"]
+[#assign CFG_BLE_OPTIONS_ENHANCED_ATT = "SHCI_C2_BLE_INIT_OPTIONS_ENHANCED_ATT_NOTSUPPORTED"]
+
+
 [#assign CFG_BLE_MAX_COC_INITIATOR_NBR = 32]
 [#assign CFG_BLE_MIN_TX_POWER = 0]
 [#assign CFG_BLE_MAX_TX_POWER = 0]
@@ -91,6 +103,7 @@
 [#assign CFG_BLE_MAX_ADV_DATA_LEN = 0]
 [#assign CFG_BLE_TX_PATH_COMPENS = 0]
 [#assign CFG_BLE_RX_PATH_COMPENS = 0]
+[#assign CFG_BLE_CORE_VERSION = "SHCI_C2_BLE_INIT_BLE_CORE_5_3"]
 [#assign CFG_TLBLE_EVT_QUEUE_LENGTH = 5]
 [#assign CFG_TLBLE_MOST_EVENT_PAYLOAD_SIZE = 255]
 [#assign DBG_TRACE_USE_CIRCULAR_QUEUE = 1]
@@ -156,6 +169,9 @@
             [#if (definition.name == "FREERTOS_STATUS") && (definition.value == "1")]
                 [#assign FREERTOS_STATUS = 1]
             [/#if]
+            [#if definition.name == "RFWKPCLKSOURCE"]
+                [#assign RFWKPCLKSOURCE = definition.value]
+            [/#if]
             [#if (definition.name == "BLE") && (definition.value == "Enabled")]
                 [#assign BLE = 1]
             [/#if]
@@ -206,6 +222,12 @@
             [/#if]
             [#if (definition.name == "CFG_ADV_BD_ADDRESS")]
                 [#assign CFG_ADV_BD_ADDRESS = definition.value]
+            [/#if]
+            [#if (definition.name == "CFG_IDENTITY_ADDRESS")]
+                [#assign CFG_IDENTITY_ADDRESS = definition.value]
+            [/#if]
+            [#if (definition.name == "CFG_PRIVACY")]
+                [#assign CFG_PRIVACY = definition.value]
             [/#if]
             [#if (definition.name == "CFG_STATIC_RANDOM_ADDRESS")]
                 [#assign CFG_STATIC_RANDOM_ADDRESS = definition.value]
@@ -341,8 +363,20 @@
             [#if (definition.name == "CFG_BLE_OPTIONS_CS_ALGO")]
                 [#assign CFG_BLE_OPTIONS_CS_ALGO = definition.value]
             [/#if]
+            [#if (definition.name == "CFG_BLE_OPTIONS_GATTDB_NVM")]
+                [#assign CFG_BLE_OPTIONS_GATTDB_NVM = definition.value]
+            [/#if]
+            [#if (definition.name == "CFG_BLE_OPTIONS_GATT_CACHING")]
+                [#assign CFG_BLE_OPTIONS_GATT_CACHING = definition.value]
+            [/#if]
             [#if (definition.name == "CFG_BLE_OPTIONS_POWER_CLASS")]
                 [#assign CFG_BLE_OPTIONS_POWER_CLASS = definition.value]
+            [/#if]
+            [#if (definition.name == "CFG_BLE_OPTIONS_APPEARANCE")]
+                [#assign CFG_BLE_OPTIONS_APPEARANCE = definition.value]
+            [/#if]
+            [#if (definition.name == "CFG_BLE_OPTIONS_ENHANCED_ATT")]
+                [#assign CFG_BLE_OPTIONS_ENHANCED_ATT = definition.value]
             [/#if]
             [#if (definition.name == "CFG_BLE_MAX_COC_INITIATOR_NBR")]
                 [#assign CFG_BLE_MAX_COC_INITIATOR_NBR = definition.value]
@@ -367,6 +401,9 @@
             [/#if]
             [#if (definition.name == "CFG_BLE_RX_PATH_COMPENS")]
                 [#assign CFG_BLE_RX_PATH_COMPENS = definition.value]
+            [/#if]
+            [#if (definition.name == "CFG_BLE_CORE_VERSION")]
+                [#assign CFG_BLE_CORE_VERSION = definition.value]
             [/#if]
             [#if (definition.name == "CFG_TLBLE_EVT_QUEUE_LENGTH")]
                 [#assign CFG_TLBLE_EVT_QUEUE_LENGTH = definition.value]
@@ -404,6 +441,9 @@
 		[/#list]
 	[/#if]
 [/#list]
+[#if CFG_PRIVACY == "PRIVACY_DISABLED"]
+  [#assign BLE_ADDR_TYPE = CFG_IDENTITY_ADDRESS]
+[/#if]
 
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef APP_CONF_H
@@ -434,11 +474,32 @@
  */
 #define CFG_ADV_BD_ADDRESS                (${CFG_ADV_BD_ADDRESS})
 [/#if]
+
 [#if (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_HEART_RATE_SENSOR = 1) || (CUSTOM_P2P_SERVER = 1) || (CUSTOM_P2P_ROUTER = 1) || (CUSTOM_TEMPLATE = 1)]
-#define CFG_BLE_ADDRESS_TYPE              ${BLE_ADDR_TYPE} /**< Bluetooth address types defined in ble_legacy.h */
-[#if ((CFG_STATIC_RANDOM_ADDRESS = "1") && (BLE_ADDR_TYPE = "RANDOM_ADDR"))]
-#define CFG_STATIC_RANDOM_ADDRESS         (${STATIC_RANDOM_ADDRESS}) /**< Static Random Address fixed for lifetime of the device */
+/**
+ * Define BD_ADDR type: define proper address. Can only be GAP_PUBLIC_ADDR (0x00) or GAP_STATIC_RANDOM_ADDR (0x01)
+ */
+#define CFG_IDENTITY_ADDRESS              ${CFG_IDENTITY_ADDRESS}
+[#if ((CFG_STATIC_RANDOM_ADDRESS = "1") && (CFG_IDENTITY_ADDRESS = "GAP_STATIC_RANDOM_ADDR"))]
+
+/**
+ * Define Static Random Address fixed for lifetime of the device
+ */
+#define CFG_STATIC_RANDOM_ADDRESS         (${STATIC_RANDOM_ADDRESS})
 [/#if]
+
+/**
+ * Define privacy: PRIVACY_DISABLED or PRIVACY_ENABLED
+ */
+#define CFG_PRIVACY                       ${CFG_PRIVACY}
+
+/**
+ * Define BLE Address Type
+ * Bluetooth address types defined in ble_legacy.h
+ * if CFG_PRIVACY equals PRIVACY_DISABLED, CFG_BLE_ADDRESS_TYPE has 2 allowed values: GAP_PUBLIC_ADDR or GAP_STATIC_RANDOM_ADDR
+ * if CFG_PRIVACY equals PRIVACY_ENABLED, CFG_BLE_ADDRESS_TYPE has 2 allowed values: GAP_RESOLVABLE_PRIVATE_ADDR or GAP_NON_RESOLVABLE_PRIVATE_ADDR
+ */
+#define CFG_BLE_ADDRESS_TYPE              ${BLE_ADDR_TYPE}
 [/#if]
 
 [#if (BT_SIG_BEACON != "0") || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1)|| (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)|| (BT_SIG_HEART_RATE_SENSOR = 1)|| (CUSTOM_OTA = 1)|| (CUSTOM_P2P_SERVER = 1)|| (CUSTOM_TEMPLATE = 1)]
@@ -883,24 +944,33 @@
  */
 #define CFG_BLE_MASTER_SCA   ${CFG_BLE_MASTER_SCA}
 
-[#-- BZ126317
-/**
- *  Source for the low speed clock for RF wake-up
- *  1 : external high speed crystal HSE/32/32
- *  0 : external low speed crystal ( no calibration )
- */
-#define CFG_BLE_LSE_SOURCE  ${CFG_BLE_LSE_SOURCE}
---]
+
 /**
  * LsSource
  * Some information for Low speed clock mapped in bits field
  * - bit 0:   1: Calibration for the RF system wakeup clock source   0: No calibration for the RF system wakeup clock source
- * - bit 1:   1: STM32W5M Module device                              0: Other devices as STM32WBxx SOC, STM32WB1M module
+ * - bit 1:   1: STM32WB5M Module device                             0: Other devices as STM32WBxx SOC, STM32WB1M module
+ * - bit 2:   1: HSE/1024 Clock config                               0: LSE Clock config
+[#if DIE == "DIE494"]
+ * Note: Enable Calibration when LSI selected as RF system wakeup clock and "bit 2" is meaningless with LSI
+[/#if]
  */
 #if defined(STM32WB5Mxx)
-  #define CFG_BLE_LSE_SOURCE  (SHCI_C2_BLE_INIT_CFG_BLE_LSE_NOCALIB | SHCI_C2_BLE_INIT_CFG_BLE_LSE_MOD5MM_DEV)
+[#if (RFWKPCLKSOURCE == "LSE")]
+  #define CFG_BLE_LS_SOURCE  (SHCI_C2_BLE_INIT_CFG_BLE_LS_NOCALIB | SHCI_C2_BLE_INIT_CFG_BLE_LS_MOD5MM_DEV | SHCI_C2_BLE_INIT_CFG_BLE_LS_CLK_LSE)
 #else
-  #define CFG_BLE_LSE_SOURCE  (SHCI_C2_BLE_INIT_CFG_BLE_LSE_NOCALIB | SHCI_C2_BLE_INIT_CFG_BLE_LSE_OTHER_DEV)
+  #define CFG_BLE_LS_SOURCE  (SHCI_C2_BLE_INIT_CFG_BLE_LS_NOCALIB | SHCI_C2_BLE_INIT_CFG_BLE_LS_OTHER_DEV | SHCI_C2_BLE_INIT_CFG_BLE_LS_CLK_LSE)
+[/#if]
+[#if (RFWKPCLKSOURCE == "HSE")]
+  #define CFG_BLE_LS_SOURCE  (SHCI_C2_BLE_INIT_CFG_BLE_LS_NOCALIB | SHCI_C2_BLE_INIT_CFG_BLE_LS_MOD5MM_DEV | SHCI_C2_BLE_INIT_CFG_BLE_LS_CLK_HSE_1024)
+#else
+  #define CFG_BLE_LS_SOURCE  (SHCI_C2_BLE_INIT_CFG_BLE_LS_NOCALIB | SHCI_C2_BLE_INIT_CFG_BLE_LS_OTHER_DEV | SHCI_C2_BLE_INIT_CFG_BLE_LS_CLK_HSE_1024)
+[/#if]
+[#if (RFWKPCLKSOURCE == "LSI")]
+  #define CFG_BLE_LS_SOURCE  (SHCI_C2_BLE_INIT_CFG_BLE_LS_CALIB | SHCI_C2_BLE_INIT_CFG_BLE_LS_MOD5MM_DEV | SHCI_C2_BLE_INIT_CFG_BLE_LS_CLK_LSE)
+#else
+  #define CFG_BLE_LS_SOURCE  (SHCI_C2_BLE_INIT_CFG_BLE_LS_CALIB | SHCI_C2_BLE_INIT_CFG_BLE_LS_OTHER_DEV | SHCI_C2_BLE_INIT_CFG_BLE_LS_CLK_LSE)
+[/#if]
 #endif
 
 /**
@@ -932,8 +1002,16 @@
  * - SHCI_C2_BLE_INIT_OPTIONS_NO_EXT_ADV
  * - SHCI_C2_BLE_INIT_OPTIONS_CS_ALGO2
  * - SHCI_C2_BLE_INIT_OPTIONS_NO_CS_ALGO2
+ * - SHCI_C2_BLE_INIT_OPTIONS_REDUC_GATTDB_NVM
+ * - SHCI_C2_BLE_INIT_OPTIONS_FULL_GATTDB_NVM
+ * - SHCI_C2_BLE_INIT_OPTIONS_GATT_CACHING_USED
+ * - SHCI_C2_BLE_INIT_OPTIONS_GATT_CACHING_NOTUSED
  * - SHCI_C2_BLE_INIT_OPTIONS_POWER_CLASS_1
  * - SHCI_C2_BLE_INIT_OPTIONS_POWER_CLASS_2_3
+ * - SHCI_C2_BLE_INIT_OPTIONS_APPEARANCE_WRITABLE
+ * - SHCI_C2_BLE_INIT_OPTIONS_APPEARANCE_READONLY
+ * - SHCI_C2_BLE_INIT_OPTIONS_ENHANCED_ATT_SUPPORTED
+ * - SHCI_C2_BLE_INIT_OPTIONS_ENHANCED_ATT_NOTSUPPORTED
  * which are used to set following configuration bits:
  * (bit 0): 1: LL only
  *          0: LL + host
@@ -945,11 +1023,19 @@
  *          0: extended advertizing not supported
  * (bit 4): 1: CS Algo #2 supported
  *          0: CS Algo #2 not supported
+ * (bit 5): 1: Reduced GATT database in NVM
+ *          0: Full GATT database in NVM
+ * (bit 6): 1: GATT caching is used
+ *          0: GATT caching is not used
  * (bit 7): 1: LE Power Class 1
  *          0: LE Power Class 2-3
+ * (bit 8): 1: appearance Writable
+ *          0: appearance Read-Only
+ * (bit 9): 1: Enhanced ATT supported
+ *          0: Enhanced ATT not supported 
  * other bits: reserved (shall be set to 0)
  */
-#define CFG_BLE_OPTIONS  (${CFG_BLE_OPTIONS_LL} | ${CFG_BLE_OPTIONS_SVC} | ${CFG_BLE_OPTIONS_DEVICE_NAME} | ${CFG_BLE_OPTIONS_EXT_ADV} | ${CFG_BLE_OPTIONS_CS_ALGO} | ${CFG_BLE_OPTIONS_POWER_CLASS})
+#define CFG_BLE_OPTIONS  (${CFG_BLE_OPTIONS_LL} | ${CFG_BLE_OPTIONS_SVC} | ${CFG_BLE_OPTIONS_DEVICE_NAME} | ${CFG_BLE_OPTIONS_EXT_ADV} | ${CFG_BLE_OPTIONS_CS_ALGO} | ${CFG_BLE_OPTIONS_GATTDB_NVM} | ${CFG_BLE_OPTIONS_GATT_CACHING} | ${CFG_BLE_OPTIONS_POWER_CLASS} | ${CFG_BLE_OPTIONS_APPEARANCE} | ${CFG_BLE_OPTIONS_ENHANCED_ATT})
 
 #define CFG_BLE_MAX_COC_INITIATOR_NBR   (${CFG_BLE_MAX_COC_INITIATOR_NBR})
 
@@ -998,6 +1084,15 @@
   */
 
 #define CFG_BLE_RX_PATH_COMPENS    (${CFG_BLE_RX_PATH_COMPENS})
+
+  /* BLE core version (16-bit signed integer). 
+   * - SHCI_C2_BLE_INIT_BLE_CORE_5_2
+   * - SHCI_C2_BLE_INIT_BLE_CORE_5_3
+   * which are used to set: 11(5.2), 12(5.3).
+   */
+
+#define CFG_BLE_CORE_VERSION   (${CFG_BLE_CORE_VERSION})
+
 
 [/#if]
 [/#if]

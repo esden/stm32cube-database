@@ -391,7 +391,10 @@
 	
 	
 	
-    <!--frequence Values -->     
+    <!--frequence Values -->
+    <RefParameter Visible="false" Comment="HSE OSC"    Name="HSE_VALUE" DefaultValue="32000000" Max="32000000" Min="32000000" Type="double" Display="value/1000000" Unit="MHz">
+        <Condition Diagnostic="" Expression="STM32WL5MOCHx"/>
+    </RefParameter>
     <RefParameter Visible="false" Comment="HSE OSC"    Name="HSE_VALUE" DefaultValue="8000000" Max="32000000" Min="4000000" Type="double" Display="value/1000000" Unit="MHz"/><!--HSE in OSI mode-->
     <RefParameter Visible="false" Comment="LSE OSC"    Name="LSE_VALUE" DefaultValue="32768" Max="1000000" Min="1000"  Type="double" Display="value/1000" Unit="KHz"/>
    
@@ -1634,6 +1637,18 @@
     <RefParameter Visible="false" Comment="LSIEnable" DefaultValue="true" Name="LSIEnable" Type="list">
         <PossibleValue Comment="LSIEnable" Value="true"/>
     </RefParameter>
+    
+    <RefParameter Visible="false" Comment="Hse is Internal osc" DefaultValue="true" Name="HSEOSCisInternal" Type="list">
+        <Condition Diagnostic="Hse is Internal osc" Expression="STM32WL5MOCHx"/>
+        <PossibleValue Comment="Hse is Internal osc" Value="true"/>
+    </RefParameter>
+    
+    <RefParameter Visible="false" Comment="LSE is Internal osc" DefaultValue="true" Name="LSEOSCisInternal" Type="list">
+        <Condition Diagnostic="LSE is Internal osc" Expression="STM32WL5MOCHx"/>
+        <PossibleValue Comment="LSE is Internal osc" Value="true"/>
+    </RefParameter>
+    
+    
     <RefMode Name="ClockTree">
 	<ConfigForMode>RCC_LSEDRIVE_CONFIG</ConfigForMode>
         <ConfigForMode>RCC_ConfigVoltageScaling</ConfigForMode> 
@@ -1758,7 +1773,7 @@
    
     <ModeLogicOperator Name="OR">
         <!-- Modes for Oscillators & Clocks -->
-        <Mode Name="OSC" UserName="High Speed Clock (HSE)">
+        <Mode Name="OSC" UserName="High Speed Clock (HSE)" RemoveCondition="STM32WL5MOCHx">
             <ModeLogicOperator Name="XOR">                
                 <Mode Name="HSE-External-Oscillator" UserName="Crystal/Ceramic Resonator">
                     <SignalLogicalOp Name="AND">
@@ -1778,7 +1793,7 @@
             </ModeLogicOperator>
         </Mode>
         
-        <Mode Name="OSC32" UserName="Low Speed Clock (LSE) ">
+        <Mode Name="OSC32" UserName="Low Speed Clock (LSE) " RemoveCondition="STM32WL5MOCHx">
             <ModeLogicOperator Name="XOR">
                 <Mode Name="LSE-External-Clock-Source" UserName="BYPASS Clock Source">
                     <SignalLogicalOp Name="AND">
@@ -1796,6 +1811,28 @@
                 </Mode>
             </ModeLogicOperator>
         </Mode>
+        <Mode Name="OSC" UserName="High Speed Clock (HSE)" RemoveCondition="!STM32WL5MOCHx">
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="HSE-External-Clock-Source" UserName="Crystal/Ceramic Resonator">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="V_OSC_IN"/>
+                    </SignalLogicalOp>
+                    <Semaphore>HSEOscillator</Semaphore>
+                </Mode>
+            </ModeLogicOperator>
+         </Mode>
+         
+        <Mode Name="OSC32" UserName="Low Speed Clock (LSE) " RemoveCondition="!STM32WL5MOCHx">
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="LSE-External-Clock-Source" UserName="Crystal/Ceramic Resonator">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="V_OSC32_IN"/>
+                    </SignalLogicalOp>
+                    <Semaphore>LSEOscillator</Semaphore>
+                </Mode>
+            </ModeLogicOperator>
+        </Mode>
+
         <Mode Name="Clock-out" UserName="Master Clock Output">
             <ModeLogicOperator Name="OR">
                 <Mode Name="Clock-out">
@@ -1867,4 +1904,8 @@
     <RefSignal IOMode="AlternateFunctionPushPull" Name="$SingleInstanceI2S_CKIN"/>  
     <RefSignal Virtual="true" Name="USB" />
     <RefSignal Virtual="true" Name="LSE" />
+    
+    <RefSignal Name="V_OSC_IN"  Virtual="true"/>
+    <RefSignal Name="V_OSC_OUT" Virtual="true"/>
+    <RefSignal Name="V_OSC32_IN" Virtual="true"/>
 </IP>	

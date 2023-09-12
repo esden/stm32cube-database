@@ -34,6 +34,7 @@
 [#assign LORAWAN_DEFAULT_ACTIVATION_TYPE = ""]
 [#assign LORAWAN_FORCE_REJOIN_AT_BOOT = ""]
 [#assign LORAWAN_DEFAULT_DATA_RATE = ""]
+[#assign LORAWAN_DEFAULT_TX_POWER = ""]
 [#assign LORAWAN_DEFAULT_PING_SLOT_PERIODICITY = ""]
 [#assign LORAWAN_DEFAULT_CLASS_B_C_RESP_TIMEOUT = ""]
 [#if SWIPdatas??]
@@ -73,6 +74,9 @@
                 [#if definition.name == "LORAWAN_DEFAULT_DATA_RATE"]
                     [#assign LORAWAN_DEFAULT_DATA_RATE = definition.value]
                 [/#if]
+                [#if definition.name == "LORAWAN_DEFAULT_TX_POWER"]
+                    [#assign LORAWAN_DEFAULT_TX_POWER = definition.value]
+                [/#if]
                 [#if definition.name == "LORAWAN_DEFAULT_PING_SLOT_PERIODICITY"]
                     [#assign LORAWAN_DEFAULT_PING_SLOT_PERIODICITY = definition.value]
                 [/#if]
@@ -110,10 +114,12 @@ extern "C" {
 #define ACTIVE_REGION                               ${ACTIVE_REGION}
 
 [#if (SUBGHZ_APPLICATION == "LORA_END_NODE")]
+/* USER CODE BEGIN EC_CAYENNE_LPP */
 /*!
  * CAYENNE_LPP is myDevices Application server.
  */
 /*#define CAYENNE_LPP*/
+/* USER CODE END EC_CAYENNE_LPP */
 
 /*!
  * Defines the application data transmission duty cycle. 10s, value in [ms].
@@ -142,7 +148,7 @@ extern "C" {
  */
 #define LORAWAN_DEFAULT_CONFIRMED_MSG_STATE         ${LORAWAN_DEFAULT_CONFIRMED_MSG_STATE}
 
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION == "LORA_END_NODE" --]
 /*!
  * LoRaWAN Adaptive Data Rate
  * @note Please note that when ADR is enabled the end-device should be static
@@ -150,10 +156,17 @@ extern "C" {
 #define LORAWAN_ADR_STATE                           ${LORAWAN_ADR_STATE}
 
 /*!
- * LoRaWAN Default data Rate Data Rate
+ * LoRaWAN Default Data Rate
  * @note Please note that LORAWAN_DEFAULT_DATA_RATE is used only when LORAWAN_ADR_STATE is disabled
  */
 #define LORAWAN_DEFAULT_DATA_RATE                   ${LORAWAN_DEFAULT_DATA_RATE}
+
+/*!
+ * LoRaWAN Default Tx output power
+ * @note LORAWAN_DEFAULT_TX_POWER must be defined in the [XXXX_MIN_TX_POWER - XXXX_MAX_TX_POWER] range,
+         else the end-device uses the XXXX_DEFAULT_TX_POWER value
+ */
+#define LORAWAN_DEFAULT_TX_POWER                    ${LORAWAN_DEFAULT_TX_POWER}
 
 [#if (SUBGHZ_APPLICATION == "LORA_END_NODE")]
 /*!
@@ -172,7 +185,7 @@ extern "C" {
  */
 #define LORAWAN_APP_DATA_BUFFER_MAX_SIZE            242
 
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION == "LORA_END_NODE" --]
 /*!
  * Default Unicast ping slots periodicity
  *
@@ -190,11 +203,10 @@ extern "C" {
  */
 #define LORAWAN_DEFAULT_CLASS_B_C_RESP_TIMEOUT      ${LORAWAN_DEFAULT_CLASS_B_C_RESP_TIMEOUT}
 
-[/#if]
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION != "LORA_USER_APPLICATION --]
+[/#if][#--  CPUCORE != "CM0PLUS" --]
 [#if FREERTOS??][#-- If FreeRtos is used --]
-[#if CPUCORE == ""]
-[#if (SUBGHZ_APPLICATION == "LORA_END_NODE")]
+[#if (CPUCORE == "") && (SUBGHZ_APPLICATION == "LORA_END_NODE")]
 /*Send*/
 #define CFG_APP_LORA_PROCESS_NAME                  "LORA_SEND_PROCESS"
 #define CFG_APP_LORA_PROCESS_ATTR_BITS             (0)
@@ -223,6 +235,7 @@ extern "C" {
 #define CFG_APP_LORA_STOP_JOIN_STACK_SIZE          1024
 
 [/#if]
+[#if (CPUCORE == "") && ((SUBGHZ_APPLICATION == "LORA_AT_SLAVE") || (SUBGHZ_APPLICATION == "LORA_END_NODE"))]
 /*LM Handler*/
 #define CFG_LM_HANDLER_PROCESS_NAME                "LM_HANDLER_PROCESS"
 #define CFG_LM_HANDLER_PROCESS_ATTR_BITS           (0)
@@ -230,7 +243,11 @@ extern "C" {
 #define CFG_LM_HANDLER_PROCESS_CB_SIZE             (0)
 #define CFG_LM_HANDLER_PROCESS_STACK_MEM           (0)
 #define CFG_LM_HANDLER_PROCESS_PRIORITY            osPriorityNone
+[#if (SUBGHZ_APPLICATION == "LORA_END_NODE")]
 #define CFG_LM_HANDLER_PROCESS_STACK_SIZE          1024
+[#else]
+#define CFG_LM_HANDLER_PROCESS_STACK_SIZE          1536
+[/#if]
 
 [/#if]
 [#if (SUBGHZ_APPLICATION == "LORA_AT_SLAVE")]
@@ -244,43 +261,50 @@ extern "C" {
 #define CFG_VCOM_PROCESS_STACK_SIZE                1024
 
 [/#if]
-[/#if]
+[/#if][#--  FREERTOS --]
 [#if THREADX??]
-#define CFG_APP_LORA_THREAD_STACK_SIZE                   1024  /* to check if possible to set it in lora gui if rtos detected*/
-#define CFG_APP_LORA_THREAD_PRIO                         10 /* to check if possible to set it in lora gui if rtos detected*/
+/* USER CODE BEGIN THREADX_EC */
+/*!
+ * THREADs configuration defines: stack size and priorities
+ * of the different Azure RTOS threads used by the LoRaWAN application.
+ */
+#define CFG_APP_LORA_THREAD_STACK_SIZE                   1024
+#define CFG_APP_LORA_THREAD_PRIO                         10
 #define CFG_APP_LORA_THREAD_PREEMPTION_THRESHOLD         CFG_APP_LORA_THREAD_PRIO
 
 [#if (CPUCORE == "") && ((SUBGHZ_APPLICATION == "LORA_AT_SLAVE") || (SUBGHZ_APPLICATION == "LORA_END_NODE"))]
-#define CFG_LM_HANDLER_THREAD_STACK_SIZE                 1536  /* to check if possible to set it in lora gui if rtos detected*/
+#define CFG_LM_HANDLER_THREAD_STACK_SIZE                 1536
 #define CFG_LM_HANDLER_THREAD_PRIO                       CFG_APP_LORA_THREAD_PRIO
 #define CFG_LM_HANDLER_THREAD_PREEMPTION_THRESHOLD       CFG_APP_LORA_THREAD_PRIO
 
 [/#if]
 [#if (SUBGHZ_APPLICATION == "LORA_END_NODE")]
-#define CFG_APP_LORA_STORE_CONTEXT_STACK_SIZE            1024  /* to check if possible to set it in lora gui if rtos detected*/
+#define CFG_APP_LORA_STORE_CONTEXT_STACK_SIZE            1024
 #define CFG_APP_LORA_STORE_CONTEXT_PRIO                  CFG_APP_LORA_THREAD_PRIO
 #define CFG_APP_LORA_STORE_CONTEXT_PREEMPTION_THRESHOLD  CFG_APP_LORA_THREAD_PRIO
 
 [#if (SECURE_PROJECTS == "0")]
-#define CFG_APP_LORA_STOP_JOIN_STACK_SIZE                1024  /* to check if possible to set it in lora gui if rtos detected*/
+#define CFG_APP_LORA_STOP_JOIN_STACK_SIZE                1024
 #define CFG_APP_LORA_STOP_JOIN_PRIO                      CFG_APP_LORA_THREAD_PRIO
 #define CFG_APP_LORA_STOP_JOIN_PREEMPTION_THRESHOLD      CFG_APP_LORA_THREAD_PRIO
 
 [/#if]
 [/#if]
 [#if (SUBGHZ_APPLICATION == "LORA_AT_SLAVE")]
-#define CFG_VCOM_THREAD_STACK_SIZE                       1024  /* to check if possible to set it in lora gui if rtos detected*/
+#define CFG_VCOM_THREAD_STACK_SIZE                       1024
 #define CFG_VCOM_THREAD_PRIO                             CFG_APP_LORA_THREAD_PRIO
 #define CFG_VCOM_THREAD_PREEMPTION_THRESHOLD             CFG_APP_LORA_THREAD_PRIO
 
 [/#if]
 [#if (SUBGHZ_APPLICATION == "LORA_AT_SLAVE")]
-#define CFG_AT_THREAD_STACK_SIZE                         1536  /* to check if possible to set it in lora gui if rtos detected*/
+#define CFG_AT_THREAD_STACK_SIZE                         1536
 #define CFG_AT_THREAD_PRIO                               CFG_APP_LORA_THREAD_PRIO
 #define CFG_AT_THREAD_PREEMPTION_THRESHOLD               CFG_APP_LORA_THREAD_PRIO
 
 [/#if]
-[/#if]
+/* USER CODE END THREADX_EC */
+
+[/#if][#--  THREADX --]
 /* USER CODE BEGIN EC */
 
 /* USER CODE END EC */
@@ -301,7 +325,7 @@ void OnMacProcessNotify(void);
   * @brief  Init Lora Application
   */
 void LoRaWAN_Init(void);
-[/#if]
+[/#if][#--  CPUCORE == CM4 vs CM0 vs SINGLE --]
 
 [#if THREADX??]
 /**
@@ -310,7 +334,7 @@ void LoRaWAN_Init(void);
   * @retval None
   */
 void App_Main_Thread_Entry(unsigned long thread_input);
-[/#if]
+[/#if][#--  THREADX --]
 /* USER CODE BEGIN EFP */
 
 /* USER CODE END EFP */

@@ -3,6 +3,7 @@
 [#assign s = name]
 [#assign titi = s?replace("Target/","")]
 [#assign toto = titi?replace(".","__")]
+[#assign CLASS_FS = ""]
 /**
   ******************************************************************************
   * @file           : ${titi}
@@ -71,7 +72,7 @@
   */
 
 [#-- SWIPdatas is a list of SWIPconfigModel --]
-[#list SWIPdatas as SWIP]
+[#list SWIPdatas as SWIP]	
 [#-- Global variables --]
 [#if SWIP.variables??]
 	[#list SWIP.variables as variable]
@@ -116,13 +117,17 @@ typedef enum
 [#if SWIP.defines??]
 	[#list SWIP.defines as definition]
 	[#assign value = definition.value]
+	[#assign paramName = definition.paramName]
+	[#if definition.paramName == "CLASS_NAME_FS"]
+		[#assign CLASS_FS = value]
+	[/#if]
 	[#if value!="valueNotSetted"]
 /*---------- [#if definition.comments??]${definition.comments} [/#if] -----------*/
 [#-- Tracker 253306 --]
     [#if definition.name="USBD_DFU_APP_DEFAULT_ADD"]
 #define ${definition.name} #t#t${value}U
     [/#if]
-    [#if definition.name!="USBD_DFU_APP_DEFAULT_ADD"]
+    [#if definition.name!="USBD_DFU_APP_DEFAULT_ADD" && paramName!="CLASS_NAME_FS"]
 #define ${definition.name} #t#t${value}U
     [/#if]
 [#-- Tracker 253306 --]
@@ -133,6 +138,13 @@ typedef enum
 [/#compress]
 [/#list]
 #n
+
+[#if CLASS_FS == "CUSTOM_HID"]
+/* #define USBD_CUSTOMHID_CTRL_REQ_GET_REPORT_ENABLED */
+/* #define USBD_CUSTOMHID_OUT_PREPARE_RECEIVE_DISABLED */
+/* #define USBD_CUSTOMHID_EP0_OUT_PREPARE_RECEIVE_DISABLED */
+/* #define USBD_CUSTOMHID_CTRL_REQ_COMPLETE_CALLBACK_ENABLED */
+[/#if]
 
 /****************************************/
 /* #define for FS and HS identification */
@@ -172,26 +184,26 @@ typedef enum
                             printf("\n");
 #else
 #define USBD_UsrLog(...)
-#endif
+#endif /* (USBD_DEBUG_LEVEL > 0U) */
 
 
 #if (USBD_DEBUG_LEVEL > 1)
 
-#define USBD_ErrLog(...)    printf("ERROR: ") ;\
+#define USBD_ErrLog(...)    printf("ERROR: ");\
                             printf(__VA_ARGS__);\
                             printf("\n");
 #else
 #define USBD_ErrLog(...)
-#endif
+#endif /* (USBD_DEBUG_LEVEL > 1U) */
 
 
 #if (USBD_DEBUG_LEVEL > 2)
-#define USBD_DbgLog(...)    printf("DEBUG : ") ;\
+#define USBD_DbgLog(...)    printf("DEBUG : ");\
                             printf(__VA_ARGS__);\
                             printf("\n");
 #else
 #define USBD_DbgLog(...)
-#endif
+#endif /* (USBD_DEBUG_LEVEL > 2U) */
 
 /**
   * @}

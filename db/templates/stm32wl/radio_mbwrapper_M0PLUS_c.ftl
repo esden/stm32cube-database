@@ -11,7 +11,7 @@
   ******************************************************************************
   */
 /* USER CODE END Header */
-[#assign LORAWAN_FUOTA = "0"]
+[#assign INTERNAL_LORAWAN_FUOTA = "0"]
 
 /* Includes ------------------------------------------------------------------*/
 #include "platform.h"
@@ -58,7 +58,7 @@
   */
 UTIL_MEM_PLACE_IN_SECTION("MB_MEM3") uint8_t aRadioMbWrapRxBuffer[RADIO_RX_BUF_SIZE];
 
-[#if LORAWAN_FUOTA == "0"]
+[#if INTERNAL_LORAWAN_FUOTA == "0"]
 /**
   * @brief local structure of radio callbacks for command processes
   */
@@ -70,7 +70,7 @@ static  RadioEvents_t radioevents_mbwrapper;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
-[#if LORAWAN_FUOTA == "0"]
+[#if INTERNAL_LORAWAN_FUOTA == "0"]
 /*!
  * \brief  Tx Done callback prototype.
  */
@@ -114,23 +114,24 @@ void Process_Radio_Cmd(MBMUX_ComParam_t *ComObj)
   /* USER CODE BEGIN Process_Radio_Cmd_1 */
 
   /* USER CODE END Process_Radio_Cmd_1 */
-[#if LORAWAN_FUOTA == "0"]
+[#if INTERNAL_LORAWAN_FUOTA == "0"]
   uint32_t *com_buffer = NULL;
   uint32_t ret_uint;
   int32_t ret_int;
-  RadioState_t status;
+  radio_status_t ret_status;
+  RadioState_t state;
 [/#if]
 
   APP_LOG(TS_ON, VLEVEL_H, ">CM0PLUS(Radio)\r\n");
 
-[#if LORAWAN_FUOTA == "0"]
+[#if INTERNAL_LORAWAN_FUOTA == "0"]
   com_buffer = MBMUX_SEC_VerifySramBufferPtr(ComObj->ParamBuf, ComObj->BufSize);
 
 [/#if]
   /* process Command */
   switch (ComObj->MsgId)
   {
-[#if LORAWAN_FUOTA == "0"]
+[#if INTERNAL_LORAWAN_FUOTA == "0"]
     case RADIO_INIT_ID:
       radioevents_mbwrapper.TxDone = &RadioTxDone_mbwrapper;
       radioevents_mbwrapper.TxTimeout = &RadioTxTimeout_mbwrapper;
@@ -145,10 +146,10 @@ void Process_Radio_Cmd(MBMUX_ComParam_t *ComObj)
       break;
 
     case RADIO_GET_STATUS_ID:
-      status = Radio.GetStatus();
+      state = Radio.GetStatus();
       /* prepare response buffer */
       ComObj->ParamCnt = 0; /* reset ParamCnt */
-      ComObj->ReturnVal = (uint32_t) status; /* */
+      ComObj->ReturnVal = (uint32_t) state; /* */
       break;
 
     case RADIO_SET_MODEM_ID:
@@ -221,10 +222,10 @@ void Process_Radio_Cmd(MBMUX_ComParam_t *ComObj)
       break;
 
     case RADIO_SEND_ID:
-      Radio.Send((uint8_t *) com_buffer[0], (uint8_t) com_buffer[1]);
+      ret_status = Radio.Send((uint8_t *) com_buffer[0], (uint8_t) com_buffer[1]);
       /* prepare response buffer */
       ComObj->ParamCnt = 0; /* reset ParamCnt */
-      ComObj->ReturnVal = 0; /* */
+      ComObj->ReturnVal = (uint32_t) ret_status; /* */
       break;
 
     case RADIO_SLEEP_ID:
@@ -381,7 +382,7 @@ void Process_Radio_Cmd(MBMUX_ComParam_t *ComObj)
 /* USER CODE END EF */
 
 /* Private Functions Definition -----------------------------------------------*/
-[#if LORAWAN_FUOTA == "0"]
+[#if INTERNAL_LORAWAN_FUOTA == "0"]
 static void RadioTxDone_mbwrapper(void)
 {
   /* USER CODE BEGIN RadioTxDone_mbwrapper_1 */

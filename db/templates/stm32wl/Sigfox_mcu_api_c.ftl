@@ -59,7 +59,7 @@
 [#else]
 #include "cmsis_os.h"
 [/#if]
-[/#if]
+[/#if][#--  THREADX vs FREERTOS vs SEQUENCER --]
 #include "sgfx_eeprom_if.h"
 #include "sys_debug.h"
 #include "sgfx_cstimer.h"
@@ -70,7 +70,7 @@
 #include "sys_app.h" /*for APP_LOG*/
 #include "radio_board_if.h"
 #include "radio_conf.h" /* RF_WAKEUP_TIME */
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION" --]
 
 /* USER CODE BEGIN Includes */
 
@@ -88,7 +88,7 @@ extern osSemaphoreId_t Sem_Delay;
 extern osSemaphoreId_t Sem_Timeout;
 
 [/#if]
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION" --]
 /* USER CODE BEGIN EV */
 
 /* USER CODE END EV */
@@ -239,7 +239,7 @@ sfx_u8 MCU_API_get_voltage_temperature(sfx_u16 *voltage_idle, sfx_u16 *voltage_t
   APP_LOG(TS_ON, VLEVEL_M, "temp=%d , ", (int32_t) *temperature);
   APP_LOG(TS_OFF, VLEVEL_M, "voltage=%u\n\r", (uint32_t) *voltage_idle);
 
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION" --]
   /* USER CODE BEGIN MCU_API_get_voltage_temperature_2 */
 
   /* USER CODE END MCU_API_get_voltage_temperature_2 */
@@ -513,8 +513,8 @@ sfx_u8 MCU_API_timer_wait_for_end(void)
 [#else]
   osSemaphoreAcquire(Sem_Timeout, osWaitForever);
 [/#if]
-[/#if]
-[/#if]
+[/#if][#--  THREADX vs FREERTOS vs SEQUENCER --]
+[/#if][#--  SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION" --]
   /* USER CODE BEGIN MCU_API_timer_wait_for_end_2 */
 
   /* USER CODE END MCU_API_timer_wait_for_end_2 */
@@ -625,7 +625,7 @@ static void Delay_Lp(uint32_t delay_ms)
 [#else]
     osSemaphoreAcquire(Sem_Delay, osWaitForever);
 [/#if]
-[/#if]
+[/#if][#--  THREADX vs FREERTOS vs SEQUENCER --]
   }
   else
   {
@@ -636,7 +636,7 @@ static void Delay_Lp(uint32_t delay_ms)
 
   /* USER CODE END Delay_Lp_2 */
 }
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION" --]
 /* USER CODE BEGIN EF */
 
 /* USER CODE END EF */
@@ -657,7 +657,7 @@ static void OnTimerDelayEvt(void *context)
 [#else]
   osSemaphoreRelease(Sem_Delay);
 [/#if]
-[/#if]
+[/#if][#--  THREADX vs FREERTOS vs SEQUENCER --]
   /* USER CODE BEGIN OnTimerDelayEvt_2 */
 
   /* USER CODE END OnTimerDelayEvt_2 */
@@ -677,14 +677,14 @@ static void OnTimerTimeoutEvt(void *context)
 [#else]
   osSemaphoreRelease(Sem_Timeout);
 [/#if]
-[/#if]
+[/#if][#--  THREADX vs FREERTOS vs SEQUENCER --]
 
   APP_LOG(TS_ON, VLEVEL_M, "TIM timeout Stopped\n\r");
   /* USER CODE BEGIN OnTimerTimeoutEvt_2 */
 
   /* USER CODE END OnTimerTimeoutEvt_2 */
 }
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION" --]
 
 /* USER CODE BEGIN PrFD */
 

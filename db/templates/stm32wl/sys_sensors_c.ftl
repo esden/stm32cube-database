@@ -22,6 +22,9 @@
 
 /* USER CODE BEGIN Includes */
 #if defined (SENSOR_ENABLED) && (SENSOR_ENABLED == 1)
+[#if Board_RPN=="B-WL5M-SUBG1"]
+#include "b_wl5m_subg_env_sensors.h"
+[#else][#--  Board_RPN==NUCLEO-WL55JC1 --]
 #if defined (X_NUCLEO_IKS01A2)
 #warning "IKS drivers are today available for several families but not stm32WL"
 #warning "up to the user adapt IKS low layer to map it on WL board driver"
@@ -56,6 +59,7 @@
 #else  /* not X_IKS01xx */
 #error "user to include its sensor drivers"
 #endif  /* X_NUCLEO_IKS01xx */
+[/#if][#--  B-WL5M-SUBG1 vs NUCLEO-WL55JC1 --]
 #elif !defined (SENSOR_ENABLED)
 #error SENSOR_ENABLED not defined
 #endif  /* SENSOR_ENABLED */
@@ -91,6 +95,9 @@
 
 /* USER CODE BEGIN PV */
 #if defined (SENSOR_ENABLED) && (SENSOR_ENABLED == 1)
+[#if Board_RPN=="B-WL5M-SUBG1"]
+ENV_SENSOR_Capabilities_t EnvCapabilities;
+[#else][#--  Board_RPN==NUCLEO-WL55JC1 --]
 #if defined (X_NUCLEO_IKS01A2)
 #warning "IKS drivers are today available for several families but not stm32WL"
 #warning "up to the user adapt IKS low layer to map it on WL board driver"
@@ -101,6 +108,7 @@ IKS01A3_ENV_SENSOR_Capabilities_t EnvCapabilities;
 #else  /* not X_IKS01Ax */
 #error "user to include its sensor drivers"
 #endif  /* X_NUCLEO_IKS01 */
+[/#if][#--  B-WL5M-SUBG1 vs NUCLEO-WL55JC1 --]
 #elif !defined (SENSOR_ENABLED)
 #error SENSOR_ENABLED not defined
 #endif  /* SENSOR_ENABLED */
@@ -120,6 +128,10 @@ int32_t EnvSensors_Read(sensor_t *sensor_data)
   float PRESSURE_Value = PRESSURE_DEFAULT_VAL;
 
 #if defined (SENSOR_ENABLED) && (SENSOR_ENABLED == 1)
+[#if Board_RPN=="B-WL5M-SUBG1"]
+  BSP_ENV_SENSOR_GetValue(ENV_SENSOR_STTS22H_0, ENV_TEMPERATURE, &TEMPERATURE_Value);
+  BSP_ENV_SENSOR_GetValue(ENV_SENSOR_ILPS22QS_0, ENV_PRESSURE, &PRESSURE_Value);
+[#else][#--  Board_RPN==NUCLEO-WL55JC1 --]
 #if (USE_IKS01A2_ENV_SENSOR_HTS221_0 == 1)
   IKS01A2_ENV_SENSOR_GetValue(HTS221_0, ENV_HUMIDITY, &HUMIDITY_Value);
   IKS01A2_ENV_SENSOR_GetValue(HTS221_0, ENV_TEMPERATURE, &TEMPERATURE_Value);
@@ -136,6 +148,7 @@ int32_t EnvSensors_Read(sensor_t *sensor_data)
   IKS01A3_ENV_SENSOR_GetValue(IKS01A3_LPS22HH_0, ENV_PRESSURE, &PRESSURE_Value);
   IKS01A3_ENV_SENSOR_GetValue(IKS01A3_LPS22HH_0, ENV_TEMPERATURE, &TEMPERATURE_Value);
 #endif /* USE_IKS01A3_ENV_SENSOR_LPS22HH_0 */
+[/#if][#--  B-WL5M-SUBG1 vs NUCLEO-WL55JC1 --]
 #else
   TEMPERATURE_Value = (SYS_GetTemperatureLevel() >> 8);
 #endif  /* SENSOR_ENABLED */
@@ -153,15 +166,43 @@ int32_t EnvSensors_Read(sensor_t *sensor_data)
 
 int32_t EnvSensors_Init(void)
 {
-#if defined( USE_IKS01A2_ENV_SENSOR_HTS221_0 ) || defined( USE_IKS01A2_ENV_SENSOR_LPS22HB_0 ) || \
-    defined( USE_IKS01A3_ENV_SENSOR_HTS221_0 ) || defined( USE_IKS01A3_ENV_SENSOR_LPS22HH_0 ) || \
-    defined( USE_BSP_DRIVER )
-  int32_t ret = BSP_ERROR_NONE;
-#else
   int32_t ret = 0;
-#endif /* USE_BSP_DRIVER */
   /* USER CODE BEGIN EnvSensors_Init */
 #if defined (SENSOR_ENABLED) && (SENSOR_ENABLED == 1)
+[#if Board_RPN=="B-WL5M-SUBG1"]
+  /* Temperature sensor */
+  ret = BSP_ENV_SENSOR_Init(ENV_SENSOR_STTS22H_0, ENV_TEMPERATURE);
+  if (ret != BSP_ERROR_NONE)
+  {
+    Error_Handler();
+  }
+  ret = BSP_ENV_SENSOR_Enable(ENV_SENSOR_STTS22H_0, ENV_TEMPERATURE);
+  if (ret != BSP_ERROR_NONE)
+  {
+    Error_Handler();
+  }
+  ret = BSP_ENV_SENSOR_GetCapabilities(ENV_SENSOR_STTS22H_0, &EnvCapabilities);
+  if (ret != BSP_ERROR_NONE)
+  {
+    Error_Handler();
+  }
+  /* Pressure sensor */
+  ret = BSP_ENV_SENSOR_Init(ENV_SENSOR_ILPS22QS_0, ENV_PRESSURE);
+  if (ret != BSP_ERROR_NONE)
+  {
+    Error_Handler();
+  }
+  ret = BSP_ENV_SENSOR_Enable(ENV_SENSOR_ILPS22QS_0, ENV_PRESSURE);
+  if (ret != BSP_ERROR_NONE)
+  {
+    Error_Handler();
+  }
+  ret = BSP_ENV_SENSOR_GetCapabilities(ENV_SENSOR_ILPS22QS_0, &EnvCapabilities);
+  if (ret != BSP_ERROR_NONE)
+  {
+    Error_Handler();
+  }
+[#else][#--  Board_RPN==NUCLEO-WL55JC1 --]
   /* Init */
 #if (USE_IKS01A2_ENV_SENSOR_HTS221_0 == 1)
   ret = IKS01A2_ENV_SENSOR_Init(HTS221_0, ENV_TEMPERATURE | ENV_HUMIDITY);
@@ -272,6 +313,7 @@ int32_t EnvSensors_Init(void)
   }
 #endif /* USE_IKS01A3_ENV_SENSOR_LPS22HH_0 */
 
+[/#if][#--  B-WL5M-SUBG1 vs NUCLEO-WL55JC1 --]
 #elif !defined (SENSOR_ENABLED)
 #error SENSOR_ENABLED not defined
 #endif /* SENSOR_ENABLED  */

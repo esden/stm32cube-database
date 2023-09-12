@@ -10,7 +10,11 @@
   ******************************************************************************
   */
 /* USER CODE END Header */
-
+[#assign THREADX_MEM_POOL_VAR_NAME_value = "tx_app_byte_pool"]
+[#assign FILEX_MEM_POOL_VAR_NAME_value = "fx_app_byte_pool"]
+[#assign USBX_HOST_MEM_POOL_VAR_NAME_value = "ux_host_app_byte_pool"]
+[#assign USBX_DEVICE_MEM_POOL_VAR_NAME_value = "ux_device_app_byte_pool"]
+[#assign NETXDUO_MEM_POOL_VAR_NAME_value = "nx_app_byte_pool"]
 [#assign TX_ENABLED = "true"]
 [#assign FX_ENABLED = "false"]
 [#assign NX_ENABLED = "false"]
@@ -51,6 +55,22 @@
     [/#if]
 	 [#if name.contains("AZRTOS_APP_MEM_ALLOCATION_METHOD")]
       [#assign AZRTOS_APP_MEM_ALLOCATION_METHOD_VAL = value]
+    [/#if]
+	
+	[#if name.contains("THREADX_MEM_POOL_VAR_NAME")]
+      [#assign THREADX_MEM_POOL_VAR_NAME_value = value]
+    [/#if]
+	[#if name.contains("FILEX_MEM_POOL_VAR_NAME")]
+      [#assign FILEX_MEM_POOL_VAR_NAME_value = value]
+    [/#if]
+	[#if name.contains("USBX_HOST_MEM_POOL_VAR_NAME")]
+      [#assign USBX_HOST_MEM_POOL_VAR_NAME_value = value]
+    [/#if]
+	[#if name.contains("USBX_DEVICE_MEM_POOL_VAR_NAME")]
+      [#assign USBX_DEVICE_MEM_POOL_VAR_NAME_value = value]
+    [/#if]
+	[#if name.contains("NETXDUO_MEM_POOL_VAR_NAME")]
+      [#assign NETXDUO_MEM_POOL_VAR_NAME_value = value]
     [/#if]
     [/#list]
 [/#if]
@@ -109,7 +129,7 @@
 #pragma data_alignment=4
 #endif
 __ALIGN_BEGIN static UCHAR tx_byte_pool_buffer[TX_APP_MEM_POOL_SIZE] __ALIGN_END;
-static TX_BYTE_POOL tx_app_byte_pool;
+static TX_BYTE_POOL ${THREADX_MEM_POOL_VAR_NAME_value};
 [/#if]
 
 [#if FX_ENABLED == "true"]
@@ -119,7 +139,7 @@ static TX_BYTE_POOL tx_app_byte_pool;
 #pragma data_alignment=4
 #endif
 __ALIGN_BEGIN static UCHAR  fx_byte_pool_buffer[FX_APP_MEM_POOL_SIZE] __ALIGN_END;
-static TX_BYTE_POOL fx_app_byte_pool;
+static TX_BYTE_POOL ${FILEX_MEM_POOL_VAR_NAME_value};
 [/#if]
 
 [#if NX_ENABLED == "true"]
@@ -129,7 +149,7 @@ static TX_BYTE_POOL fx_app_byte_pool;
 #pragma data_alignment=4
 #endif
 __ALIGN_BEGIN static UCHAR  nx_byte_pool_buffer[NX_APP_MEM_POOL_SIZE] __ALIGN_END;
-static TX_BYTE_POOL nx_app_byte_pool;
+static TX_BYTE_POOL ${NETXDUO_MEM_POOL_VAR_NAME_value};
 [/#if]
 
 [#if UX_HOST_ENABLED == "true"]
@@ -139,7 +159,7 @@ static TX_BYTE_POOL nx_app_byte_pool;
 #pragma data_alignment=4
 #endif
 __ALIGN_BEGIN static UCHAR  ux_host_byte_pool_buffer[UX_HOST_APP_MEM_POOL_SIZE] __ALIGN_END;
-static TX_BYTE_POOL ux_host_app_byte_pool;
+static TX_BYTE_POOL ${USBX_HOST_MEM_POOL_VAR_NAME_value};
 [/#if]
 
 [#if UX_DEVICE_ENABLED == "true"]
@@ -149,7 +169,7 @@ static TX_BYTE_POOL ux_host_app_byte_pool;
 #pragma data_alignment=4
 #endif
 __ALIGN_BEGIN static UCHAR  ux_device_byte_pool_buffer[UX_DEVICE_APP_MEM_POOL_SIZE] __ALIGN_END;
-static TX_BYTE_POOL ux_device_app_byte_pool;
+static TX_BYTE_POOL ${USBX_DEVICE_MEM_POOL_VAR_NAME_value};
 [/#if]
 [#if USBPD_DEVICE_ENABLED == "true"]
 /* USER CODE BEGIN USBPD_Pool_Buffer */
@@ -181,7 +201,7 @@ static TX_BYTE_POOL gui_interface_app_byte_pool;
 
 [#if packs??]
 [#list packs as variables]
-[@common.optinclude name=mxTmpFolder+"/RTOS_variables_${variables.name}.tmp"/]
+[@common.optinclude name=contextFolder +mxTmpFolder+"/RTOS_variables_${variables.name}.tmp"/]
 [/#list]
 [/#if]
 
@@ -207,7 +227,7 @@ VOID tx_application_define(VOID *first_unused_memory)
   VOID *memory_ptr;
 
 [#if TX_ENABLED == "true" ]
-  if (tx_byte_pool_create(&tx_app_byte_pool, "Tx App memory pool", tx_byte_pool_buffer, TX_APP_MEM_POOL_SIZE) != TX_SUCCESS)
+  if (tx_byte_pool_create(&${THREADX_MEM_POOL_VAR_NAME_value}, "Tx App memory pool", tx_byte_pool_buffer, TX_APP_MEM_POOL_SIZE) != TX_SUCCESS)
   {
     /* USER CODE BEGIN TX_Byte_Pool_Error */
 
@@ -219,7 +239,7 @@ VOID tx_application_define(VOID *first_unused_memory)
 
     /* USER CODE END TX_Byte_Pool_Success */
 
-    memory_ptr = (VOID *)&tx_app_byte_pool;
+    memory_ptr = (VOID *)&${THREADX_MEM_POOL_VAR_NAME_value};
     status = App_ThreadX_Init(memory_ptr);
     if (status != TX_SUCCESS)
     {
@@ -236,7 +256,7 @@ VOID tx_application_define(VOID *first_unused_memory)
   }
 [/#if]
 [#if FX_ENABLED == "true"]
-  if (tx_byte_pool_create(&fx_app_byte_pool, "Fx App memory pool", fx_byte_pool_buffer, FX_APP_MEM_POOL_SIZE) != TX_SUCCESS)
+  if (tx_byte_pool_create(&${FILEX_MEM_POOL_VAR_NAME_value}, "Fx App memory pool", fx_byte_pool_buffer, FX_APP_MEM_POOL_SIZE) != TX_SUCCESS)
   {
     /* USER CODE BEGIN FX_Byte_Pool_Error */
 
@@ -248,7 +268,7 @@ VOID tx_application_define(VOID *first_unused_memory)
 
     /* USER CODE END FX_Byte_Pool_Success */
 
-    memory_ptr = (VOID *)&fx_app_byte_pool;
+    memory_ptr = (VOID *)&${FILEX_MEM_POOL_VAR_NAME_value};
     status = MX_FileX_Init(memory_ptr);
     if (status != FX_SUCCESS)
     {
@@ -265,7 +285,7 @@ VOID tx_application_define(VOID *first_unused_memory)
   [/#if]
 
 [#if NX_ENABLED == "true"]
-  if (tx_byte_pool_create(&nx_app_byte_pool, "Nx App memory pool", nx_byte_pool_buffer, NX_APP_MEM_POOL_SIZE) != TX_SUCCESS)
+  if (tx_byte_pool_create(&${NETXDUO_MEM_POOL_VAR_NAME_value}, "Nx App memory pool", nx_byte_pool_buffer, NX_APP_MEM_POOL_SIZE) != TX_SUCCESS)
   {
     /* USER CODE BEGIN NX_Byte_Pool_Error */
 
@@ -277,7 +297,7 @@ VOID tx_application_define(VOID *first_unused_memory)
 
     /* USER CODE END TX_Byte_Pool_Success */
 
-    memory_ptr = (VOID *)&nx_app_byte_pool;
+    memory_ptr = (VOID *)&${NETXDUO_MEM_POOL_VAR_NAME_value};
     status = MX_NetXDuo_Init(memory_ptr);
     if (status != NX_SUCCESS)
     {
@@ -294,7 +314,7 @@ VOID tx_application_define(VOID *first_unused_memory)
   }
 [/#if]
 [#if UX_HOST_ENABLED == "true"]
-  if (tx_byte_pool_create(&ux_host_app_byte_pool, "Ux App memory pool", ux_host_byte_pool_buffer, UX_HOST_APP_MEM_POOL_SIZE) != TX_SUCCESS)
+  if (tx_byte_pool_create(&${USBX_HOST_MEM_POOL_VAR_NAME_value}, "Ux App memory pool", ux_host_byte_pool_buffer, UX_HOST_APP_MEM_POOL_SIZE) != TX_SUCCESS)
   {
     /* USER CODE BEGIN TX_Byte_Pool_Error */
 
@@ -306,7 +326,7 @@ VOID tx_application_define(VOID *first_unused_memory)
 
     /* USER CODE END UX_HOST_Byte_Pool_Success */
 
-    memory_ptr = (VOID *)&ux_host_app_byte_pool;
+    memory_ptr = (VOID *)&${USBX_HOST_MEM_POOL_VAR_NAME_value};
     status = MX_USBX_Host_Init(memory_ptr);
     if (status != UX_SUCCESS)
     {
@@ -322,7 +342,7 @@ VOID tx_application_define(VOID *first_unused_memory)
   }
 [/#if]
 [#if UX_DEVICE_ENABLED == "true"]
-  if (tx_byte_pool_create(&ux_device_app_byte_pool, "Ux App memory pool", ux_device_byte_pool_buffer, UX_DEVICE_APP_MEM_POOL_SIZE) != TX_SUCCESS)
+  if (tx_byte_pool_create(&${USBX_DEVICE_MEM_POOL_VAR_NAME_value}, "Ux App memory pool", ux_device_byte_pool_buffer, UX_DEVICE_APP_MEM_POOL_SIZE) != TX_SUCCESS)
   {
     /* USER CODE BEGIN UX_Device_Byte_Pool_Error */
 
@@ -334,7 +354,7 @@ VOID tx_application_define(VOID *first_unused_memory)
 
     /* USER CODE END UX_Device_Byte_Pool_Success */
 
-    memory_ptr = (VOID *)&ux_device_app_byte_pool;
+    memory_ptr = (VOID *)&${USBX_DEVICE_MEM_POOL_VAR_NAME_value};
     status = MX_USBX_Device_Init(memory_ptr);
     if (status != UX_SUCCESS)
     {
@@ -467,7 +487,7 @@ VOID tx_application_define(VOID *first_unused_memory)
      place in RAM_region    { last section FREE_MEM };
  * For MDK-ARM
      - either define the RW_IRAM1 region in the ".sct" file
-     - or modify the line below in "tx_low_level_initilize.s to match the memory region being used
+     - or modify the line below in "tx_initialize_low_level.S to match the memory region being used
         LDR r1, =|Image$$RW_IRAM1$$ZI$$Limit|
 
  * For STM32CubeIDE add the following section into the .ld file:
@@ -484,7 +504,7 @@ VOID tx_application_define(VOID *first_unused_memory)
     * Caution: Make sure that ThreadX does not need more than the provided heap memory (64KBytes in this example).
     * Read more in STM32CubeIDE User Guide, chapter: "Linker script".
 
- * The "tx_initialize_low_level.s" should be also modified to enable the "USE_DYNAMIC_MEMORY_ALLOCATION" flag.
+ * The "tx_initialize_low_level.S" should be also modified to enable the "USE_DYNAMIC_MEMORY_ALLOCATION" flag.
  */
 
   /* USER CODE BEGIN DYNAMIC_MEM_ALLOC */

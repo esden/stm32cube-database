@@ -96,8 +96,6 @@ bool NVMS_LL_IsBlockErased(nvms_block_t block)
   /* USER CODE END NVMS_LL_IsBlockErased */
 }
 
-
-
 /**
   * @brief   Erases a block.
   * @note    The erase operation is verified internally.
@@ -136,7 +134,6 @@ bool NVMS_LL_Write(const uint8_t *source, uint8_t *destination, size_t size)
   return true;
   /* USER CODE END NVMS_LL_Write */
 }
-
 
 /**
   * @}

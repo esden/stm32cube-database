@@ -10,6 +10,18 @@
   ******************************************************************************
   */
 /* USER CODE END Header */
+[#assign UTIL_SEQ_EN_M4 = "true"]
+[#if SWIPdatas??]
+    [#list SWIPdatas as SWIP]
+        [#if SWIP.defines??]
+            [#list SWIP.defines as definition]
+                [#if definition.name == "UTIL_SEQ_EN_M4"]
+                    [#assign UTIL_SEQ_EN_M4 = definition.value]
+                [/#if]
+            [/#list]
+        [/#if]
+    [/#list]
+[/#if]
 
 /* Includes ------------------------------------------------------------------*/
 #include "platform.h"
@@ -20,15 +32,13 @@
 [#if THREADX??][#-- If AzRtos is used --]
 #include "app_azure_rtos.h"
 #include "tx_api.h"
-[#else]
-[#if !FREERTOS??][#-- If FreeRtos is not used --]
-#include "stm32_seq.h"
-[#else]
+[#elseif FREERTOS??][#-- If FreeRtos is used --]
 #include "cmsis_os.h"
-[/#if]
-[/#if]
+[#elseif UTIL_SEQ_EN_M4 == "true"]
+#include "stm32_seq.h"
+[/#if][#--  THREADX vs FREERTOS vs SEQUENCER --]
 #include "sigfox_mbwrapper.h"
-#include "sgfx_app_version.h"
+#include "app_version.h"
 #include "utilities_def.h"
 /* USER CODE BEGIN Includes */
 
@@ -139,11 +149,15 @@ int8_t MBMUXIF_SigfoxInit(void)
   }
   if (ret >= 0)
   {
-    ret = MBMUX_RegisterFeature(FEAT_INFO_SIGFOX_ID, MBMUX_CMD_RESP, MBMUXIF_IsrSigfoxRespRcvCb, aSigfoxCmdRespBuff, sizeof(aSigfoxCmdRespBuff));
+    ret = MBMUX_RegisterFeature(FEAT_INFO_SIGFOX_ID, MBMUX_CMD_RESP,
+                                MBMUXIF_IsrSigfoxRespRcvCb,
+                                aSigfoxCmdRespBuff, sizeof(aSigfoxCmdRespBuff));
   }
   if (ret >= 0)
   {
-    ret = MBMUX_RegisterFeature(FEAT_INFO_SIGFOX_ID, MBMUX_NOTIF_ACK, MBMUXIF_IsrSigfoxNotifRcvCb, aSigfoxNotifAckBuff, sizeof(aSigfoxNotifAckBuff));
+    ret = MBMUX_RegisterFeature(FEAT_INFO_SIGFOX_ID, MBMUX_NOTIF_ACK,
+                                MBMUXIF_IsrSigfoxNotifRcvCb,
+                                aSigfoxNotifAckBuff, sizeof(aSigfoxNotifAckBuff));
   }
 [#if THREADX??]
   if (ret >= 0)
@@ -155,8 +169,10 @@ int8_t MBMUXIF_SigfoxInit(void)
       ret = -10; /* equivalent at TX_POOL_ERROR */
     }
   }
+[/#if][#--  THREADX --]
   if (ret >= 0)
   {
+[#if THREADX??]
     /* Create MbSigfoxNotifRcv.  */
     if (tx_thread_create(&Thd_SigfoxNotifRcv, "Thread MbSigfoxNotifRcv", Thd_MbSigfoxNotifRcv_Entry, 0,
                          pointer, CFG_MAILBOX_THREAD_STACK_SIZE,
@@ -165,17 +181,16 @@ int8_t MBMUXIF_SigfoxInit(void)
     {
       ret = -11;  /* equivalent at TX_THREAD_ERROR */
     }
-  }
-[#else]
-  if (ret >= 0)
-  {
-[#if !FREERTOS??][#-- If FreeRtos is not used --]
+[#elseif FREERTOS??][#-- If FreeRtos is used --]
+    Thd_SigfoxNotifRcvProcessId = osThreadNew(Thd_SigfoxNotifRcvProcess, NULL, &Thd_SigfoxNotifRcvProcess_attr);
+[#elseif UTIL_SEQ_EN_M4 == "true"]
     UTIL_SEQ_RegTask(1 << CFG_SEQ_Task_MbSigfoxNotifRcv, UTIL_SEQ_RFU, MBMUXIF_TaskSigfoxNotifRcv);
 [#else]
-    Thd_SigfoxNotifRcvProcessId = osThreadNew(Thd_SigfoxNotifRcvProcess, NULL, &Thd_SigfoxNotifRcvProcess_attr);
-[/#if]
+  /* USER CODE BEGIN MBMUXIF_SigfoxInit_OS */
+
+  /* USER CODE END MBMUXIF_SigfoxInit_OS */
+[/#if][#--  THREADX vs FREERTOS vs SEQUENCER --]
   }
-[/#if]
 
   if (ret >= 0)
   {
@@ -237,13 +252,15 @@ void MBMUXIF_SigfoxSendCmd(void)
   {
 [#if THREADX??][#-- If AzRtos is used --]
     while (tx_semaphore_get(&Sem_MbSigfoxRespRcv, TX_WAIT_FOREVER) != TX_SUCCESS) {}
-[#else]
-[#if !FREERTOS??][#-- If FreeRtos is not used --]
+[#elseif FREERTOS??][#-- If FreeRtos is used --]
+    osSemaphoreAcquire(Sem_MbSigfoxRespRcv, osWaitForever);
+[#elseif UTIL_SEQ_EN_M4 == "true"]
     UTIL_SEQ_WaitEvt(1 << CFG_SEQ_Evt_MbSigfoxRespRcv);
 [#else]
-    osSemaphoreAcquire(Sem_MbSigfoxRespRcv, osWaitForever);
-[/#if]
-[/#if]
+    /* USER CODE BEGIN MBMUXIF_SigfoxSendCmd_OS */
+
+    /* USER CODE END MBMUXIF_SigfoxSendCmd_OS */
+[/#if][#--  THREADX vs FREERTOS vs SEQUENCER --]
   }
   else
   {
@@ -281,13 +298,15 @@ static void MBMUXIF_IsrSigfoxRespRcvCb(void *ComObj)
 [#if THREADX??][#-- If AzRtos is used --]
   /* Set the semaphore to release the Sem_MbSigfoxRespRcv Thread */
   tx_semaphore_put(&Sem_MbSigfoxRespRcv);
-[#else]
-[#if !FREERTOS??][#-- If FreeRtos is not used --]
+[#elseif FREERTOS??][#-- If FreeRtos is used --]
+  osSemaphoreRelease(Sem_MbSigfoxRespRcv);
+[#elseif UTIL_SEQ_EN_M4 == "true"]
   UTIL_SEQ_SetEvt(1 << CFG_SEQ_Evt_MbSigfoxRespRcv);
 [#else]
-  osSemaphoreRelease(Sem_MbSigfoxRespRcv);
-[/#if]
-[/#if]
+  /* USER CODE BEGIN MBMUXIF_IsrSigfoxRespRcvCb_OS */
+
+  /* USER CODE END MBMUXIF_IsrSigfoxRespRcvCb_OS */
+[/#if][#--  THREADX vs FREERTOS vs SEQUENCER --]
   /* USER CODE BEGIN MBMUXIF_IsrSigfoxRespRcvCb_Last */
 
   /* USER CODE END MBMUXIF_IsrSigfoxRespRcvCb_Last */
@@ -305,13 +324,15 @@ static void MBMUXIF_IsrSigfoxNotifRcvCb(void *ComObj)
     Thd_SigfoxNotifRcv_RescheduleFlag++;
   }
   tx_thread_resume(&Thd_SigfoxNotifRcv);
-[#else]
-[#if !FREERTOS??][#-- If FreeRtos is not used --]
+[#elseif FREERTOS??][#-- If FreeRtos is used --]
+  osThreadFlagsSet(Thd_SigfoxNotifRcvProcessId, 1);
+[#elseif UTIL_SEQ_EN_M4 == "true"]
   UTIL_SEQ_SetTask(1 << CFG_SEQ_Task_MbSigfoxNotifRcv, CFG_SEQ_Prio_0);
 [#else]
-  osThreadFlagsSet(Thd_SigfoxNotifRcvProcessId, 1);
-[/#if]
-[/#if]
+  /* USER CODE BEGIN MBMUXIF_IsrSigfoxNotifRcvCb_OS */
+
+  /* USER CODE END MBMUXIF_IsrSigfoxNotifRcvCb_OS */
+[/#if][#--  THREADX vs FREERTOS vs SEQUENCER --]
   /* USER CODE BEGIN MBMUXIF_IsrSigfoxNotifRcvCb_Last */
 
   /* USER CODE END MBMUXIF_IsrSigfoxNotifRcvCb_Last */

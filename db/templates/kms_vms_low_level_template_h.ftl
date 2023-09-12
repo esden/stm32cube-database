@@ -58,11 +58,9 @@ extern "C" {
   */
 #define VMS_LL_PAGE_SIZE    8
 
-
 /**
   * @}
   */
-
 
 /* Exported functions prototypes ---------------------------------------------*/
 /* USER CODE BEGIN VMS_LOW_LEVEL_Exported_Function_Prototypes */

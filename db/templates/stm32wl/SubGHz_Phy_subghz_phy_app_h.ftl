@@ -22,6 +22,9 @@
 [/#if]
 --]
 [#assign SUBGHZ_APPLICATION = ""]
+[#assign FILL_UCS = ""]
+[#assign INTERNAL_USER_SUBGHZ_APP = ""]
+[#assign RF_FREQUENCY = ""]
 [#assign MODEM_USED = ""]
 [#assign REGION = ""]
 [#assign LORA_BANDWIDTH = ""]
@@ -43,6 +46,9 @@
             [#list SWIP.defines as definition]
                 [#if definition.name == "SUBGHZ_APPLICATION"]
                     [#assign SUBGHZ_APPLICATION = definition.value]
+                [/#if]
+                [#if definition.name == "RF_FREQUENCY"]
+                    [#assign RF_FREQUENCY = definition.value]
                 [/#if]
                 [#if definition.name == "MODEM_USED"]
                     [#assign MODEM_USED = definition.value]
@@ -113,63 +119,24 @@ extern "C" {
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/
-[#if (SUBGHZ_APPLICATION != "SUBGHZ_USER_APPLICATION")]
-/* MODEM type: one shall be 1 the other shall be 0 */
+[#if (SUBGHZ_APPLICATION != "SUBGHZ_USER_APPLICATION") && (SUBGHZ_APPLICATION != "SUBGHZ_AT_SLAVE")]
 [#if (MODEM_USED == "USE_MODEM_FSK")]
+/* MODEM type: one shall be 1 the other shall be 0 */
 #define USE_MODEM_LORA  0
 #define USE_MODEM_FSK   1
-[#else]
+[#elseif (MODEM_USED == "USE_MODEM_LORA")]
+/* MODEM type: one shall be 1 the other shall be 0 */
 #define USE_MODEM_LORA  1
 #define USE_MODEM_FSK   0
 [/#if]
 
-#define ${REGION}
+#define RF_FREQUENCY                                ${RF_FREQUENCY} /* Hz */
 
-#if defined( REGION_AS923 )
-
-#define RF_FREQUENCY                                923000000 /* Hz */
-#elif defined( REGION_AU915 )
-
-#define RF_FREQUENCY                                915000000 /* Hz */
-
-#elif defined( REGION_CN470 )
-
-#define RF_FREQUENCY                                470000000 /* Hz */
-
-#elif defined( REGION_CN779 )
-
-#define RF_FREQUENCY                                779000000 /* Hz */
-
-#elif defined( REGION_EU433 )
-
-#define RF_FREQUENCY                                433000000 /* Hz */
-
-#elif defined( REGION_EU868 )
-
-#define RF_FREQUENCY                                868000000 /* Hz */
-
-#elif defined( REGION_KR920 )
-
-#define RF_FREQUENCY                                920000000 /* Hz */
-
-#elif defined( REGION_IN865 )
-
-#define RF_FREQUENCY                                865000000 /* Hz */
-
-#elif defined( REGION_US915 )
-
-#define RF_FREQUENCY                                915000000 /* Hz */
-
-#elif defined( REGION_RU864 )
-
-#define RF_FREQUENCY                                864000000 /* Hz */
-
-#else
-#error "Please define a frequency band in the compiler options."
-#endif /* REGION_XXxxx */
-
+#ifndef TX_OUTPUT_POWER   /* please, to change this value, redefine it in USER CODE SECTION */
 #define TX_OUTPUT_POWER                             14        /* dBm */
+#endif /* TX_OUTPUT_POWER */
 
+[#if (MODEM_USED == "USE_MODEM_FSK") || (MODEM_USED == "USE_MODEM_LORA")]
 #if (( USE_MODEM_LORA == 1 ) && ( USE_MODEM_FSK == 0 ))
 #define LORA_BANDWIDTH                              ${LORA_BANDWIDTH}         /* [0: 125 kHz, 1: 250 kHz, 2: 500 kHz, 3: Reserved] */
 #define LORA_SPREADING_FACTOR                       ${LORA_SPREADING_FACTOR}         /* [SF7..SF12] */
@@ -190,17 +157,70 @@ extern "C" {
 #else
 #error "Please define a modem in the compiler subghz_phy_app.h."
 #endif /* USE_MODEM_LORA | USE_MODEM_FSK */
-
-#define PAYLOAD_LEN                                 ${PAYLOAD_LEN}
 [/#if]
 
+#define PAYLOAD_LEN                                 ${PAYLOAD_LEN}
+[/#if][#--  SUBGHZ_APPLICATION  --]
+
 [#if THREADX??]
-#define CFG_APP_SUBGHZ_THREAD_STACK_SIZE                   1024  /* to check if possible to set it in lora gui if rtos detected*/
-#define CFG_APP_SUBGHZ_THREAD_PRIO                         10 /* to check if possible to set it in lora gui if rtos detected*/
+/* USER CODE BEGIN THREADX_EC */
+/*
+ * THREADs configuration defines: stack size and priorities
+ * of the different Azure RTOS threads used by the RF application.
+ */
+#define CFG_APP_SUBGHZ_THREAD_STACK_SIZE                   1024
+#define CFG_APP_SUBGHZ_THREAD_PRIO                         10
 #define CFG_APP_SUBGHZ_THREAD_PREEMPTION_THRESHOLD         CFG_APP_SUBGHZ_THREAD_PRIO
+
+[#if (SUBGHZ_APPLICATION == "SUBGHZ_AT_SLAVE")]
+#define CFG_VCOM_THREAD_STACK_SIZE                       1024
+#define CFG_VCOM_THREAD_PRIO                             CFG_APP_SUBGHZ_THREAD_PRIO
+#define CFG_VCOM_THREAD_PREEMPTION_THRESHOLD             CFG_APP_SUBGHZ_THREAD_PRIO
+
+[/#if]
+[#if (SUBGHZ_APPLICATION == "SUBGHZ_AT_SLAVE")]
+#define CFG_AT_THREAD_STACK_SIZE                         1536
+#define CFG_AT_THREAD_PRIO                               CFG_APP_SUBGHZ_THREAD_PRIO
+#define CFG_AT_THREAD_PREEMPTION_THRESHOLD               CFG_APP_SUBGHZ_THREAD_PRIO
+
+[/#if]
+/* USER CODE END THREADX_EC */
+
+[#elseif FREERTOS??][#-- If FreeRtos is used --]
+/* USER CODE BEGIN FREERTOS_EC */
+#define CFG_VCOM_PROCESS_NAME                      "VCOM_PROCESS"
+#define CFG_VCOM_PROCESS_ATTR_BITS                 (0)
+#define CFG_VCOM_PROCESS_CB_MEM                    (0)
+#define CFG_VCOM_PROCESS_CB_SIZE                   (0)
+#define CFG_VCOM_PROCESS_STACK_MEM                 (0)
+#define CFG_VCOM_PROCESS_PRIORITY                  osPriorityNone
+#define CFG_VCOM_PROCESS_STACK_SIZE                1024
+
+/* USER CODE END FREERTOS_EC */
 
 [/#if]
 /* USER CODE BEGIN EC */
+[#if (FILL_UCS == "true")]
+[#if (INTERNAL_USER_SUBGHZ_APP == "SUBGHZ_SWITCH_MODULATION")]
+#define LORA_FREQUENCY                              868500000 /* Hz */
+#define LORA_BANDWIDTH                              0         /* [0: 125 kHz, 1: 250 kHz, 2: 500 kHz, 3: Reserved] */
+#define LORA_SPREADING_FACTOR                       7         /* [SF7..SF12] */
+#define LORA_CODINGRATE                             1         /* [1: 4/5, 2: 4/6, 3: 4/7, 4: 4/8] */
+#define LORA_PREAMBLE_LENGTH                        8         /* Same for Tx and Rx */
+#define LORA_SYMBOL_TIMEOUT                         5         /* Symbols */
+#define LORA_FIX_LENGTH_PAYLOAD_ON                  false
+#define LORA_IQ_INVERSION_ON                        false
+
+#define FSK_FREQUENCY                               869100000 /* Hz */
+#define FSK_FDEV                                    25000     /* Hz */
+#define FSK_DATARATE                                50000     /* bps */
+#define FSK_BANDWIDTH                               125000    /* Hz */
+#define FSK_PREAMBLE_LENGTH                         5         /* Same for Tx and Rx */
+#define FSK_FIX_LENGTH_PAYLOAD_ON                   false
+
+#define LRFHSS_FREQUENCY                            868000000 /* Hz */
+[/#if][#--  INTERNAL_USER_SUBGHZ_APP --]
+[/#if][#--  FILL_UCS --]
 
 /* USER CODE END EC */
 

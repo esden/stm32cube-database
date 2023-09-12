@@ -268,7 +268,7 @@ uint8_t *FLASH_If_Read(uint8_t *src, uint8_t *dest, uint32_t Len)
 {
   /* Return a valid address to avoid HardFault */
   /* USER CODE BEGIN 4 */
-  return (uint8_t*)(USBD_OK);
+  return (uint8_t*)(FLASH_BASE);
   /* USER CODE END 4 */
 }
 
@@ -358,7 +358,7 @@ uint8_t *FLASH_If_Read_HS(uint8_t *src, uint8_t *dest, uint32_t Len)
 {
   /* Return a valid address to avoid HardFault */
   /* USER CODE BEGIN 10 */
-  return (uint8_t*)(USBD_OK);
+  return (uint8_t*)(FLASH_BASE);
   /* USER CODE END 10 */
 }
 

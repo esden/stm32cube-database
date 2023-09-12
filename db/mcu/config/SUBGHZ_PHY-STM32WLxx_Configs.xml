@@ -7,7 +7,7 @@
     IncludeFile=""
     Name="SubGHz_Phy"
     RootFolder="Middlewares/Third_Party/"
-    Version="STM32Cube_FW_WL_V1.2.0">
+    Version="STM32Cube_FW_WL_V1.3.0">
 
     <RefConfig Comment="" Name="SubGhz_Phy_Init">
         <CallLibMethod Name="SubGhz_Phy_Init"/>
@@ -50,12 +50,20 @@
         <ConfigFile Name="APP_SUBGHZ_PHY_APP_C"/>
         <ConfigFile Name="APP_SUBGHZ_PHY_APP_H"/>
         <ConfigFile Name="APP_SUBGHZ_PHY_APP_VERSION_H"/>
+        <ConfigFile Name="APP_SUBGHZ_PHY_AT_C"/>
+        <ConfigFile Name="APP_SUBGHZ_PHY_AT_H"/>
+        <ConfigFile Name="APP_SUBGHZ_PHY_COMMAND_C"/>
+        <ConfigFile Name="APP_SUBGHZ_PHY_COMMAND_H"/>
+        <ConfigFile Name="APP_TEST_RF_C"/>
+        <ConfigFile Name="APP_TEST_RF_H"/>
+
         <!-- SubGHz_Phy/Target -->
         <ConfigFile Name="TARGET_MW_LOG_CONF_H"/>
         <ConfigFile Name="TARGET_RADIO_BOARD_C"/>
         <ConfigFile Name="TARGET_RADIO_BOARD_H"/>
         <ConfigFile Name="TARGET_RADIO_CONF_H"/>
         <ConfigFile Name="TARGET_SYSTIME_H"/>
+        <ConfigFile Name="TARGET_TIMER_C"/>
         <ConfigFile Name="TARGET_TIMER_H"/>
 
        <!-- MbMux-->
@@ -139,16 +147,10 @@
 
 <!-- Requested by  -->
 
-<!-- MZA agree to get it, as the radio component is inside the MCU, not on the board -->
     <RefComponent Cclass="Middleware" Cgroup="MW_SUBGHZ_PHY" Cversion="1.0.0">
-        <File Category="header" Name="SubGHz_Phy/radio.h" Condition="all"/>
-        <File Category="header" Name="SubGHz_Phy/radio_ex.h" Condition="!SEM_M4"/>
-        <File Category="header" Name="SubGHz_Phy/stm32_radio_driver/radio_driver.h" Condition="all"/>
-        <File Category="source" Name="SubGHz_Phy/stm32_radio_driver/radio_driver.c" Condition="!SEM_M4"/>
-        <File Category="header" Name="SubGHz_Phy/stm32_radio_driver/radio_fw.h" Condition="all"/>
-        <File Category="source" Name="SubGHz_Phy/stm32_radio_driver/radio_fw.c" Condition="!SEM_M4"/>
-        <File Category="source" Name="SubGHz_Phy/stm32_radio_driver/radio.c" Condition="!SEM_M4"/>
-        <File Category="header" Name="SubGHz_Phy/stm32_radio_driver/subghz_phy_version.h" Condition="all"/>
+        <File Category="header" Name="SubGHz_Phy/*.h" Condition="all"/>
+        <File Category="header" Name="SubGHz_Phy/stm32_radio_driver/*.h" Condition="!SEM_M4"/>
+        <File Category="source" Name="SubGHz_Phy/stm32_radio_driver/*.c" Condition="!SEM_M4"/>
     </RefComponent>
 
 <!-- Core/Inc begin-->
@@ -158,13 +160,14 @@
         <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
         <Argument Name="FILL_UCS" GenericType="Simple" Comment=""/>
         <Argument Name="Activate_RADIO_BOARD_INTERFACE" GenericType="Simple" Comment=""/>
+        <Argument Name="STM32WL5MXX" GenericType="Simple" Comment=""/>
 <!--
         <Argument Name="Activate_BOARD_RESOURCES" GenericType="Simple" Comment=""/>
 -->
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="STM32_LPM_IF_H" Template="stm32wl/stm32_lpm_if_h.ftl" destinationFolder="Core/Inc/">
-        <File Category="header" Name="stm32_lpm_if.h" Version="1.0" Condition="all"/>
+        <File Category="header" Name="stm32_lpm_if.h" Version="1.0" Condition="S_TINY_LPM"/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="SYS_APP_H" Template="stm32wl/sys_app_h.ftl" destinationFolder="Core/Inc/">
@@ -201,15 +204,20 @@
     <RefConfigFile Description="" Name="UTILITIES_CONF_H" Template="stm32wl/utilities_conf_h.ftl" destinationFolder="Core/Inc/">
         <File Category="header" Name="utilities_conf.h" Version="1.0" Condition="all"/>
         <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
+        <Argument Name="UTIL_SEQ_EN_M4" GenericType="Simple" Comment=""/>
+        <Argument Name="UTIL_SEQ_EN_M0" GenericType="Simple" Comment=""/>
+        <Argument Name="USE_UART" GenericType="Simple" Comment=""/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="UTILITIES_DEF_H" Template="stm32wl/utilities_def_h.ftl" destinationFolder="Core/Inc/">
         <File Category="header" Name="utilities_def.h" Version="1.0" Condition="all"/>
+        <Argument Name="UTIL_SEQ_EN_M4" GenericType="Simple" Comment=""/>
+        <Argument Name="UTIL_SEQ_EN_M0" GenericType="Simple" Comment=""/>
         <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="NUCLEO_CONF_H" Template="stm32wl/stm32wlxx_nucleo_conf_h.ftl" destinationFolder="Core/Inc/">
-        <File Category="header" Name="stm32wlxx_nucleo_conf.h" Version="1.0" Condition="!SEM_M0PLUS &amp; !SEM_M4 &amp; !SEM_USER_BOARD_FOR_SUBGHZ_PHY"/>
+        <File Category="header" Name="stm32wlxx_nucleo_conf.h" Version="1.0" Condition="!SEM_STM32WL5MXX &amp; !SEM_M0PLUS &amp; !SEM_M4 &amp; !SEM_USER_BOARD_FOR_SUBGHZ_PHY"/>
         <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
     </RefConfigFile>
 
@@ -230,7 +238,7 @@
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="STM32_LPM_IF_C" Template="stm32wl/stm32_lpm_if_c.ftl" destinationFolder="Core/Src/">
-        <File Category="source" Name="stm32_lpm_if.c" Version="1.0" Condition="all"/>
+        <File Category="source" Name="stm32_lpm_if.c" Version="1.0" Condition="S_TINY_LPM"/>
         <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
         <Argument Name="USE_UART" GenericType="Simple" Comment=""/>
         <Argument Name="USE_LPM" GenericType="Simple" Comment=""/>
@@ -239,6 +247,12 @@
     <RefConfigFile Description="" Name="SYS_APP_C" Template="stm32wl/sys_app_c.ftl" destinationFolder="Core/Src/">
         <File Category="source" Name="sys_app.c" Version="1.0" Condition="all"/>
         <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
+        <Argument Name="UTIL_SEQ_EN_M4" GenericType="Simple" Comment=""/>
+        <Argument Name="UTIL_SEQ_EN_M0" GenericType="Simple" Comment=""/>
+        <Argument Name="UTIL_TIMER_EN" GenericType="Simple" Comment=""/>
+        <Argument Name="USE_LPM" GenericType="Simple" Comment=""/>
+        <Argument Name="USE_UART" GenericType="Simple" Comment=""/>
+        <Argument Name="STM32WL5MXX" GenericType="Simple" Comment=""/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="SYS_DEBUG_C" Template="stm32wl/sys_debug_c.ftl" destinationFolder="Core/Src/">
@@ -252,6 +266,8 @@
     <RefConfigFile Description="" Name="APP_APP_SUBGHZ_PHY_C" Template="stm32wl/SubGHz_Phy_app_subghz_phy_c.ftl" >
         <File Category="source" Name="App/app_subghz_phy.c" Version="1.0" Condition="all"/>
         <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
+        <Argument Name="UTIL_SEQ_EN_M4" GenericType="Simple" Comment=""/>
+        <Argument Name="UTIL_SEQ_EN_M0" GenericType="Simple" Comment=""/>
     </RefConfigFile>
     <RefConfigFile Description="" Name="APP_APP_SUBGHZ_PHY_H" Template="stm32wl/SubGHz_Phy_app_subghz_phy_h.ftl" >
         <File Category="header" Name="App/app_subghz_phy.h" Version="1.0" Condition="all"/>
@@ -261,14 +277,17 @@
     <RefConfigFile Description="" Name="APP_SUBGHZ_PHY_APP_C" Template="stm32wl/SubGHz_Phy_subghz_phy_app_c.ftl" >
         <File Category="source" Name="App/subghz_phy_app.c" Version="1.0" Condition="!SEM_M0PLUS"/>
         <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
+        <Argument Name="UTIL_SEQ_EN_M4" GenericType="Simple" Comment=""/>
+        <Argument Name="UTIL_SEQ_EN_M0" GenericType="Simple" Comment=""/>
         <Argument Name="FILL_UCS" GenericType="Simple" Comment=""/>
+        <Argument Name="STM32WL5MXX" GenericType="Simple" Comment=""/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="APP_SUBGHZ_PHY_APP_H" Template="stm32wl/SubGHz_Phy_subghz_phy_app_h.ftl" >
         <File Category="header" Name="App/subghz_phy_app.h" Version="1.0" Condition="!SEM_M0PLUS"/>
         <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
+        <Argument Name="RF_FREQUENCY" GenericType="Simple" Comment=""/>
         <Argument Name="MODEM_USED" GenericType="Simple" Comment=""/>
-        <Argument Name="REGION" GenericType="Simple" Comment=""/>
         <Argument Name="LORA_BANDWIDTH" GenericType="Simple" Comment=""/>
         <Argument Name="LORA_SPREADING_FACTOR" GenericType="Simple" Comment=""/>
         <Argument Name="LORA_CODINGRATE" GenericType="Simple" Comment=""/>
@@ -289,6 +308,33 @@
         <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
     </RefConfigFile>
 
+    <RefConfigFile Description="" Name="APP_SUBGHZ_PHY_AT_C" Template="stm32wl/at_functions_c.ftl">
+        <File Category="source" Name="App/subg_at.c" Version="1.0" Condition="SEM_SUBGHZ_AT_SLAVE &amp; !SEM_M0PLUS"/>
+        <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
+    </RefConfigFile>
+
+    <RefConfigFile Description="" Name="APP_SUBGHZ_PHY_AT_H" Template="stm32wl/at_functions_h.ftl">
+        <File Category="header" Name="App/subg_at.h" Version="1.0" Condition="SEM_SUBGHZ_AT_SLAVE &amp; !SEM_M0PLUS"/>
+        <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
+    </RefConfigFile>
+
+    <RefConfigFile Description="" Name="APP_SUBGHZ_PHY_COMMAND_C" Template="stm32wl/at_command_c.ftl">
+        <File Category="source" Name="App/subg_command.c" Version="1.0" Condition="SEM_SUBGHZ_AT_SLAVE &amp; !SEM_M0PLUS"/>
+        <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
+    </RefConfigFile>
+
+    <RefConfigFile Description="" Name="APP_SUBGHZ_PHY_COMMAND_H" Template="stm32wl/at_command_h.ftl">
+        <File Category="header" Name="App/subg_command.h" Version="1.0" Condition="SEM_SUBGHZ_AT_SLAVE &amp; !SEM_M0PLUS"/>
+        <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
+    </RefConfigFile>
+
+    <RefConfigFile Description="" Name="APP_TEST_RF_C" Template="stm32wl/at_test_rf_c.ftl" >
+        <File Category="source" Name="App/test_rf.c" Version="1.0" Condition="SEM_SUBGHZ_AT_SLAVE &amp; !SEM_M0PLUS"/>
+    </RefConfigFile>
+
+    <RefConfigFile Description="" Name="APP_TEST_RF_H" Template="stm32wl/at_test_rf_h.ftl" >
+        <File Category="header" Name="App/test_rf.h" Version="1.0" Condition="SEM_SUBGHZ_AT_SLAVE &amp; !SEM_M0PLUS"/>
+    </RefConfigFile>
 <!-- SubGHz_Phy/App end-->
 
 <!-- SubGHz_Phy/Target begin-->
@@ -302,6 +348,7 @@
     <RefConfigFile Description="" Name="TARGET_RADIO_BOARD_C" Template="stm32wl/radio_board_if_c.ftl">
         <File Category="source" Name="Target/radio_board_if.c" Version="1.0" Condition="!SEM_M4"/>
         <Argument Name="Activate_RADIO_BOARD_INTERFACE" GenericType="Simple" Comment=""/>
+        <Argument Name="STM32WL5MXX" GenericType="Simple" Comment=""/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="TARGET_RADIO_BOARD_H" Template="stm32wl/radio_board_if_h.ftl">
@@ -310,6 +357,7 @@
         <Argument Name="TX_RFO_CONFIG" GenericType="Simple" Comment=""/>
         <Argument Name="IS_TCXO_SUPPORTED" GenericType="Simple" Comment=""/>
         <Argument Name="IS_DCDC_SUPPORTED" GenericType="Simple" Comment=""/>
+        <Argument Name="STM32WL5MXX" GenericType="Simple" Comment=""/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="TARGET_RADIO_CONF_H" Template="stm32wl/radio_conf_h.ftl">
@@ -320,27 +368,37 @@
         <Argument Name="RF_WAKEUP_TIME" GenericType="Simple" Comment=""/>
     </RefConfigFile>
 
+    <RefConfigFile Description="" Name="TARGET_TIMER_C" Template="stm32wl/timer_user_c.ftl">
+        <File Category="source" Name="Target/timer.c" Version="1.0" Condition="!S_TIMER &amp; !SEM_M4"/>
+    </RefConfigFile>
+
     <RefConfigFile Description="" Name="TARGET_TIMER_H" Template="stm32wl/timer_h.ftl">
+        <File Category="header" Name="Target/timer.h" Version="1.0" Condition="S_TIMER &amp; !SEM_M4"/>
+        <Argument Name="UTIL_TIMER_EN" GenericType="Simple" Comment=""/>
+    </RefConfigFile>
+    <RefConfigFile Description="" Name="TARGET_TIMER_H" Template="stm32wl/timer_user_h.ftl">
         <File Category="header" Name="Target/timer.h" Version="1.0" Condition="!SEM_M4"/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="STM32_TIMER_IF_H" Template="stm32wl/timer_if_h.ftl" destinationFolder="Core/Inc/">
         <File Category="header" Name="timer_if.h" Version="1.0"  Condition="all"/>
         <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
+        <Argument Name="UTIL_TIMER_EN" GenericType="Simple" Comment=""/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="STM32_TIMER_IF_C" Template="stm32wl/timer_if_c.ftl" destinationFolder="Core/Src/">
         <File Category="source" Name="timer_if.c" Version="1.0"  Condition="all"/>
         <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
         <Argument Name="USE_RTC" GenericType="Simple" Comment=""/>
+        <Argument Name="UTIL_TIMER_EN" GenericType="Simple" Comment=""/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="STM32_ADV_TRACE_IF_C" Template="stm32wl/stm32_adv_trace_if_c.ftl" destinationFolder="Core/Src/">
-        <File Category="source" Name="stm32_adv_trace_if.c" Version="1.0" Condition="((!SEM_M0PLUS &amp; !SEM_M4) | SEM_M4) &amp; SEM_SUBGHZ_USER_APPLICATION &amp; !SEM_SUBGHZ_USE_UART"/>
+        <File Category="source" Name="stm32_adv_trace_if.c" Version="1.0" Condition="((!SEM_M0PLUS &amp; !SEM_M4) | SEM_M4) &amp; SEM_SUBGHZ_USER_APPLICATION &amp; !SEM_SUBGHZ_USE_UART &amp; S_ADV_TRACE"/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="STM32_ADV_TRACE_IF_H" Template="stm32wl/stm32_adv_trace_if_h.ftl" destinationFolder="Core/Inc/">
-        <File Category="source" Name="stm32_adv_trace_if.h" Version="1.0" Condition="((!SEM_M0PLUS &amp; !SEM_M4) | SEM_M4) &amp; SEM_SUBGHZ_USER_APPLICATION &amp; !SEM_SUBGHZ_USE_UART"/>
+        <File Category="source" Name="stm32_adv_trace_if.h" Version="1.0" Condition="((!SEM_M0PLUS &amp; !SEM_M4) | SEM_M4) &amp; SEM_SUBGHZ_USER_APPLICATION &amp; !SEM_SUBGHZ_USE_UART &amp; S_ADV_TRACE"/>
     </RefConfigFile>
 
 <!-- SubGHz_Phy/Target end-->
@@ -361,10 +419,12 @@
 
     <RefConfigFile Description="" Name="MBMUX_MBMUXIF_RADIO_M4_C" Template="stm32wl/mbmuxif_radio_M4_c.ftl" destinationFolder="MbMux">
         <File Category="source" Condition="SEM_M4" Name="mbmuxif_radio.c" Version="1.0"/>
+        <Argument Name="UTIL_SEQ_EN_M4" GenericType="Simple" Comment=""/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="MBMUX_MBMUXIF_RADIO_M0PLUS_C" Template="stm32wl/mbmuxif_radio_M0PLUS_c.ftl" destinationFolder="MbMux">
         <File Category="source" Condition="SEM_M0PLUS" Name="mbmuxif_radio.c" Version="1.0"/>
+        <Argument Name="UTIL_SEQ_EN_M0" GenericType="Simple" Comment=""/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="MBMUX_MBMUXIF_RADIO_H" Template="stm32wl/mbmuxif_radio_h.ftl" destinationFolder="MbMux">
@@ -374,11 +434,15 @@
     <RefConfigFile Description="" Name="MBMUX_MBMUXIF_SYS_M4_C" Template="stm32wl/mbmuxif_sys_M4_c.ftl" destinationFolder="MbMux">
         <File Category="source" Condition="SEM_M4" Name="mbmuxif_sys.c" Version="1.0"/>
         <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
+        <Argument Name="UTIL_SEQ_EN_M4" GenericType="Simple" Comment=""/>
+        <Argument Name="UTIL_TIMER_EN" GenericType="Simple" Comment=""/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="MBMUX_MBMUXIF_SYS_M0PLUS_C" Template="stm32wl/mbmuxif_sys_M0PLUS_c.ftl" destinationFolder="MbMux">
         <File Category="source" Condition="SEM_M0PLUS" Name="mbmuxif_sys.c" Version="1.0"/>
         <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
+        <Argument Name="USE_UART" GenericType="Simple" Comment=""/>
+        <Argument Name="UTIL_SEQ_EN_M0" GenericType="Simple" Comment=""/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="MBMUX_MBMUXIF_SYS_H" Template="stm32wl/mbmuxif_sys_h.ftl" destinationFolder="MbMux">
@@ -387,16 +451,17 @@
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="MBMUX_MBMUXIF_TRACE_M4_C" Template="stm32wl/mbmuxif_trace_M4_c.ftl" destinationFolder="MbMux">
-        <File Category="source" Condition="SEM_M4" Name="mbmuxif_trace.c" Version="1.0"/>
+        <File Category="source" Condition="SEM_M4 &amp; S_ADV_TRACE" Name="mbmuxif_trace.c" Version="1.0"/>
         <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="MBMUX_MBMUXIF_TRACE_M0PLUS_C" Template="stm32wl/mbmuxif_trace_M0PLUS_c.ftl" destinationFolder="MbMux">
-        <File Category="source" Condition="SEM_M0PLUS" Name="mbmuxif_trace.c" Version="1.0"/>
+        <File Category="source" Condition="SEM_M0PLUS &amp; S_ADV_TRACE" Name="mbmuxif_trace.c" Version="1.0"/>
+        <Argument Name="UTIL_SEQ_EN_M0" GenericType="Simple" Comment=""/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="MBMUX_MBMUXIF_TRACE_H" Template="stm32wl/mbmuxif_trace_h.ftl" destinationFolder="MbMux">
-        <File Category="header" Condition="SEM_M4 | SEM_M0PLUS" Name="mbmuxif_trace.h" Version="1.0"/>
+        <File Category="header" Condition="(SEM_M4 | SEM_M0PLUS) &amp; S_ADV_TRACE" Name="mbmuxif_trace.h" Version="1.0"/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="MBMUX_RADIO_MBWRAPPER_M4_C" Template="stm32wl/radio_mbwrapper_M4_c.ftl" destinationFolder="MbMux">
@@ -415,7 +480,7 @@
 
 <!-- COMMON/Board Begin-->
     <RefConfigFile Description="" Name="NUCLEO_CONF_H" Template="stm32wl/stm32wlxx_nucleo_conf_h.ftl" destinationFolder="../Common/Board/">
-        <File Category="header" Name="stm32wlxx_nucleo_conf.h" Version="1.0" Condition="(SEM_M0PLUS | SEM_M4) &amp; !SEM_USER_BOARD_FOR_SUBGHZ_PHY" />
+        <File Category="header" Name="stm32wlxx_nucleo_conf.h" Version="1.0" Condition="!SEM_STM32WL5MXX &amp; (SEM_M0PLUS | SEM_M4) &amp; !SEM_USER_BOARD_FOR_SUBGHZ_PHY" />
         <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
     </RefConfigFile>
 <!-- COMMON/Board end-->

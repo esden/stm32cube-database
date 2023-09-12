@@ -284,7 +284,19 @@
 	<RefParameter Name="INTERFACE_STRING_CDC_HS" Comment="INTERFACE_STRING (Interface Identifier)" DefaultValue="CDC Interface" Type="stringRW" Group="Device Descriptor HS" TabName="Device Descriptor">
 		<Description>The interface identifier</Description>
 	</RefParameter>
-	
+	<RefParameter Name="DEVICE_SERIAL0_CDC_HS" Comment="DEVICE_SERIAL0 (Device Serial Number 0)" DefaultValue="0x11223344" Type="integer" Min="0x1" Max="0x7FFFFFFF" Group="Device Descriptor HS" TabName="Device Descriptor">
+		<Condition Expression="$IpInstance_Cortex_M4" Diagnostic=""/>
+		<Description>The device serial number 0</Description>
+	</RefParameter>
+	<RefParameter Name="DEVICE_SERIAL1_CDC_HS" Comment="DEVICE_SERIAL1 (Device Serial Number 1)" DefaultValue="0x55667788" Type="integer" Min="0x1" Max="0x7FFFFFFF" Group="Device Descriptor HS" TabName="Device Descriptor">
+		<Condition Expression="$IpInstance_Cortex_M4" Diagnostic=""/>	
+		<Description>The device serial number 1</Description>
+	</RefParameter>
+	<RefParameter Name="DEVICE_SERIAL2_CDC_HS" Comment="DEVICE_SERIAL2 (Device Serial Number 2)" DefaultValue="0x12345678" Type="integer" Min="0x1" Max="0x7FFFFFFF" Group="Device Descriptor HS" TabName="Device Descriptor">
+		<Condition Expression="$IpInstance_Cortex_M4" Diagnostic=""/>
+		<Description>The device serial number 2</Description>
+	</RefParameter>
+
 	<RefParameter Name="PRODUCT_STRING_CDC_FS" Comment="PRODUCT_STRING (Product Identifier)" DefaultValue="STM32 Virtual ComPort" Type="stringRW" Group="Device Descriptor FS" TabName="Device Descriptor">
 		<Description>The product identifier</Description>
 	</RefParameter>
@@ -297,7 +309,19 @@
 	<RefParameter Name="INTERFACE_STRING_CDC_FS" Comment="INTERFACE_STRING (Interface Identifier)" DefaultValue="CDC Interface" Type="stringRW" Group="Device Descriptor FS" TabName="Device Descriptor">
 		<Description>The interface identifier</Description>
 	</RefParameter>
-	
+	<RefParameter Name="DEVICE_SERIAL0_CDC_FS" Comment="DEVICE_SERIAL0 (Device Serial Number 0)" DefaultValue="0x11223344" Type="integer" Min="0x1" Max="0x7FFFFFFF" Group="Device Descriptor FS" TabName="Device Descriptor">
+		<Condition Expression="$IpInstance_Cortex_M4" Diagnostic=""/>
+		<Description>The device serial number 0</Description>
+	</RefParameter>
+	<RefParameter Name="DEVICE_SERIAL1_CDC_FS" Comment="DEVICE_SERIAL1 (Device Serial Number 1)" DefaultValue="0x55667788" Type="integer" Min="0x1" Max="0x7FFFFFFF" Group="Device Descriptor FS" TabName="Device Descriptor">
+		<Condition Expression="$IpInstance_Cortex_M4" Diagnostic=""/>	
+		<Description>The device serial number 1</Description>
+	</RefParameter>
+	<RefParameter Name="DEVICE_SERIAL2_CDC_FS" Comment="DEVICE_SERIAL2 (Device Serial Number 2)" DefaultValue="0x12345678" Type="integer" Min="0x1" Max="0x7FFFFFFF" Group="Device Descriptor FS" TabName="Device Descriptor">
+		<Condition Expression="$IpInstance_Cortex_M4" Diagnostic=""/>
+		<Description>The device serial number 2</Description>
+	</RefParameter>
+
 	<!-- Dfu Class -->
 	<RefParameter Name="PRODUCT_STRING_DFU_HS" Comment="PRODUCT_STRING (Product Identifier)" DefaultValue="STM32 DownLoad Firmware Update" Type="stringRW" Group="Device Descriptor HS" TabName="Device Descriptor">
 		<Description>The product identifier</Description>
@@ -505,27 +529,63 @@
 	</RefParameter>
 	
     <RefParameter Name="APP_RX_DATA_SIZE" Comment="USB CDC Rx Buffer Size" DefaultValue="2048"  Min="4" Max="2048" Type="integer" Group="Class Parameters" Unit="Bytes">
-        <Condition Expression="VirtualMode = Cdc &amp; MCU_RAM_SIZE&gt;64" Diagnostic=""/>
+        <Condition Expression="VirtualMode = Cdc &amp; MCU_RAM_SIZE&gt;64 &amp; (CDC_HS$context | (CDC_FS$context &amp; CDC_HS$context))" Diagnostic=""/>
+		<ValueCondition Diagnostic="Value must be multiple of 512" Expression="MOD(Value,512) = 0"/>
         <Description>Number of bytes for the receive buffer</Description>
     </RefParameter>
-    <RefParameter Name="APP_RX_DATA_SIZE" Comment="USB CDC Rx Buffer Size" DefaultValue="1000"  Min="1" Max="1000" Type="integer" Group="Class Parameters" Unit="Bytes">
-        <Condition Expression="VirtualMode = Cdc &amp; MCU_RAM_SIZE&lt;=64" Diagnostic=""/>
+	<RefParameter Name="APP_RX_DATA_SIZE" Comment="USB CDC Rx Buffer Size" DefaultValue="2048"  Min="4" Max="2048" Type="integer" Group="Class Parameters" Unit="Bytes">
+        <Condition Expression="VirtualMode = Cdc &amp; MCU_RAM_SIZE&gt;64 &amp; CDC_FS$context" Diagnostic=""/>
+		<ValueCondition Diagnostic="Value must be multiple of 64" Expression="MOD(Value,64) = 0"/>
         <Description>Number of bytes for the receive buffer</Description>
     </RefParameter>
-    <RefParameter Name="APP_RX_DATA_SIZE" Comment="USB CDC Rx Buffer Size" DefaultValue="500"  Min="1" Max="500" Type="integer" Group="Class Parameters" Unit="Bytes">
-        <Condition Expression="VirtualMode = Cdc" Diagnostic=""/>
+    <RefParameter Name="APP_RX_DATA_SIZE" Comment="USB CDC Rx Buffer Size" DefaultValue="1024"  Min="1" Max="1024" Type="integer" Group="Class Parameters" Unit="Bytes">
+        <Condition Expression="VirtualMode = Cdc &amp; MCU_RAM_SIZE&lt;=64 &amp; (CDC_HS$context | (CDC_FS$context &amp; CDC_HS$context))" Diagnostic=""/>
+		<ValueCondition Diagnostic="Value must be multiple of 512" Expression="MOD(Value,512) = 0"/>
+        <Description>Number of bytes for the receive buffer</Description>
+    </RefParameter>
+	<RefParameter Name="APP_RX_DATA_SIZE" Comment="USB CDC Rx Buffer Size" DefaultValue="1024"  Min="1" Max="1024" Type="integer" Group="Class Parameters" Unit="Bytes">
+        <Condition Expression="VirtualMode = Cdc &amp; MCU_RAM_SIZE&lt;=64 &amp; CDC_FS$context" Diagnostic=""/>
+		<ValueCondition Diagnostic="Value must be multiple of 64" Expression="MOD(Value,64) = 0"/>
+        <Description>Number of bytes for the receive buffer</Description>
+    </RefParameter>
+    <RefParameter Name="APP_RX_DATA_SIZE" Comment="USB CDC Rx Buffer Size" DefaultValue="512"  Min="1" Max="512" Type="integer" Group="Class Parameters" Unit="Bytes">
+        <Condition Expression="VirtualMode = Cdc &amp; (CDC_HS$context | (CDC_FS$context &amp; CDC_HS$context))" Diagnostic=""/>
+		<ValueCondition Diagnostic="Value must be multiple of 512" Expression="MOD(Value,512) = 0"/>
+        <Description>Number of bytes for the receive buffer</Description>
+    </RefParameter>
+	    <RefParameter Name="APP_RX_DATA_SIZE" Comment="USB CDC Rx Buffer Size" DefaultValue="512"  Min="1" Max="512" Type="integer" Group="Class Parameters" Unit="Bytes">
+        <Condition Expression="VirtualMode = Cdc &amp; CDC_FS$context" Diagnostic=""/>
+		<ValueCondition Diagnostic="Value must be multiple of 64" Expression="MOD(Value,64) = 0"/>
         <Description>Number of bytes for the receive buffer</Description>
     </RefParameter>
     <RefParameter Name="APP_TX_DATA_SIZE" Comment="USB CDC Tx Buffer Size" DefaultValue="2048"  Min="4" Max="2048" Type="integer" Group="Class Parameters" Unit="Bytes">
-        <Condition Expression="VirtualMode = Cdc &amp; MCU_RAM_SIZE&gt;64" Diagnostic=""/>
+        <Condition Expression="VirtualMode = Cdc &amp; MCU_RAM_SIZE&gt;64 &amp; (CDC_HS$context | (CDC_FS$context &amp; CDC_HS$context))" Diagnostic=""/>
+		<ValueCondition Diagnostic="Value must be multiple of 512" Expression="MOD(Value,512) = 0"/>
         <Description>Number of bytes for the transmit buffer</Description>
     </RefParameter>
-    <RefParameter Name="APP_TX_DATA_SIZE" Comment="USB CDC Tx Buffer Size" DefaultValue="1000"  Min="1" Max="1000" Type="integer" Group="Class Parameters" Unit="Bytes">
-        <Condition Expression="VirtualMode = Cdc &amp; MCU_RAM_SIZE&lt;=64" Diagnostic=""/>
+    <RefParameter Name="APP_TX_DATA_SIZE" Comment="USB CDC Tx Buffer Size" DefaultValue="2048"  Min="4" Max="2048" Type="integer" Group="Class Parameters" Unit="Bytes">
+        <Condition Expression="VirtualMode = Cdc &amp; MCU_RAM_SIZE&gt;64 &amp; CDC_FS$context" Diagnostic=""/>
+		<ValueCondition Diagnostic="Value must be multiple of 64" Expression="MOD(Value,64) = 0"/>
         <Description>Number of bytes for the transmit buffer</Description>
     </RefParameter>
-    <RefParameter Name="APP_TX_DATA_SIZE" Comment="USB CDC Tx Buffer Size" DefaultValue="500"  Min="1" Max="500" Type="integer" Group="Class Parameters" Unit="Bytes">
-        <Condition Expression="VirtualMode = Cdc" Diagnostic=""/>
+    <RefParameter Name="APP_TX_DATA_SIZE" Comment="USB CDC Tx Buffer Size" DefaultValue="1024"  Min="1" Max="1024" Type="integer" Group="Class Parameters" Unit="Bytes">
+        <Condition Expression="VirtualMode = Cdc &amp; MCU_RAM_SIZE&lt;=64 &amp; (CDC_HS$context | (CDC_FS$context &amp; CDC_HS$context))" Diagnostic=""/>
+		<ValueCondition Diagnostic="Value must be multiple of 512" Expression="MOD(Value,512) = 0"/>
+        <Description>Number of bytes for the transmit buffer</Description>
+    </RefParameter>
+    <RefParameter Name="APP_TX_DATA_SIZE" Comment="USB CDC Tx Buffer Size" DefaultValue="1024"  Min="1" Max="1024" Type="integer" Group="Class Parameters" Unit="Bytes">
+        <Condition Expression="VirtualMode = Cdc &amp; MCU_RAM_SIZE&lt;=64 &amp; CDC_FS$context" Diagnostic=""/>
+		<ValueCondition Diagnostic="Value must be multiple of 64" Expression="MOD(Value,64) = 0"/>
+        <Description>Number of bytes for the transmit buffer</Description>
+    </RefParameter>
+    <RefParameter Name="APP_TX_DATA_SIZE" Comment="USB CDC Tx Buffer Size" DefaultValue="512"  Min="1" Max="512" Type="integer" Group="Class Parameters" Unit="Bytes">
+        <Condition Expression="VirtualMode = Cdc &amp; (CDC_HS$context | (CDC_FS$context &amp; CDC_HS$context))" Diagnostic=""/>
+		<ValueCondition Diagnostic="Value must be multiple of 512" Expression="MOD(Value,512) = 0"/>
+        <Description>Number of bytes for the transmit buffer</Description>
+    </RefParameter>
+    <RefParameter Name="APP_TX_DATA_SIZE" Comment="USB CDC Tx Buffer Size" DefaultValue="512"  Min="1" Max="512" Type="integer" Group="Class Parameters" Unit="Bytes">
+        <Condition Expression="VirtualMode = Cdc &amp; CDC_FS$context" Diagnostic=""/>
+		<ValueCondition Diagnostic="Value must be multiple of 64" Expression="MOD(Value,64) = 0"/>
         <Description>Number of bytes for the transmit buffer</Description>
     </RefParameter>
 	<!--Bug 33846, USBD_CDC_INERVAL no more use with the USB device CDC class-->
@@ -1113,7 +1173,10 @@
 		<Parameter Name="PRODUCT_STRING_CDC_HS"/>		
 		<Parameter Name="CONFIGURATION_STRING_CDC_HS"/>
 		<Parameter Name="INTERFACE_STRING_CDC_HS"/>		
-		<Parameter Name="USBD_HandleTypeDef_HS"/>					
+		<Parameter Name="USBD_HandleTypeDef_HS"/>
+		<Parameter Name="DEVICE_SERIAL0_CDC_HS"/>
+		<Parameter Name="DEVICE_SERIAL1_CDC_HS"/>
+		<Parameter Name="DEVICE_SERIAL2_CDC_HS"/>					
 		<Parameter Name="CLASS_NAME_HS">
 			<PossibleValue>CDC</PossibleValue>
 		</Parameter>
@@ -1170,7 +1233,10 @@
 		<Parameter Name="PRODUCT_STRING_CDC_FS"/>		
 		<Parameter Name="CONFIGURATION_STRING_CDC_FS"/>
 		<Parameter Name="INTERFACE_STRING_CDC_FS"/>		
-		<Parameter Name="USBD_HandleTypeDef_FS"/>					
+		<Parameter Name="USBD_HandleTypeDef_FS"/>
+		<Parameter Name="DEVICE_SERIAL0_CDC_FS"/>
+		<Parameter Name="DEVICE_SERIAL1_CDC_FS"/>
+		<Parameter Name="DEVICE_SERIAL2_CDC_FS"/>				
 		<Parameter Name="CLASS_NAME_FS">
 			<PossibleValue>CDC</PossibleValue>
 		</Parameter>

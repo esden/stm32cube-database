@@ -200,6 +200,31 @@ extern SUBGHZ_HandleTypeDef hsubghz;
   */
 #define RFW_MW_LOG_ENABLE
 
+[#elseif (SUBGHZ_APPLICATION != "SUBGHZ_USER_APPLICATION") && ((INTERNAL_USER_SUBGHZ_APP == "SUBGHZ_FHSS") || (INTERNAL_USER_SUBGHZ_APP == "SUBGHZ_SWITCH_MODULATION"))]
+/**
+  * @brief enables the RFW module
+  * @note disabled by default
+  */
+#define RFW_ENABLE                  1
+
+/**
+  * @brief enables the RFW long packet feature
+  * @note disabled by default, require RFW_ENABLE set to 1
+  */
+#define RFW_LONGPACKET_ENABLE       0
+
+/**
+  * @brief enable LR_FHSS feature
+  * @note override the default configuration of radio.c
+  */
+#define RADIO_LR_FHSS_IS_ON         1
+
+/**
+  * @brief enables the RFW module log
+  * @note disabled by default
+  */
+#define RFW_MW_LOG_ENABLE
+
 [/#if]
 [#if (SUBGHZ_APPLICATION == "LORA_END_NODE") || (SUBGHZ_APPLICATION == "LORA_USER_APPLICATION")]
 /**
@@ -250,7 +275,7 @@ extern SUBGHZ_HandleTypeDef hsubghz;
 #define DBG_GPIO_RADIO_TX(set_rst) /*PROBE_GPIO_##set_rst##_LINE(PROBE_LINE2_PORT, PROBE_LINE2_PIN);*/
 [/#if]
 [/#if]
-[/#if]
+[/#if][#--  FILL_UCS --]
 
 /* USER CODE END EC */
 

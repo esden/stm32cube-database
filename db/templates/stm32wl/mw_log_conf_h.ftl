@@ -1,10 +1,15 @@
 [#ftl]
+[#assign CPUCORE = cpucore?replace("ARM_CORTEX_","C")?replace("+","PLUS")]
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file    mw_log_conf.h
   * @author  MCD Application Team
+[#if (CPUCORE == "")]
+  * @brief   Configure (enable/disable) traces
+[#else]
   * @brief   Configure (enable/disable) traces for CM0
+[/#if]
   *******************************************************************************
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************

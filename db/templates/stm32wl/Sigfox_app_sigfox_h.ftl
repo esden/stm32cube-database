@@ -33,6 +33,11 @@
                 [#if definition.name == "SUBGHZ_APPLICATION"]
                     [#assign SUBGHZ_APPLICATION = definition.value]
                 [/#if]
+                [#if definition.name == "SIGFOX_KMS"]
+                    [#if definition.value == "true"]
+                        [#assign SIGFOX_KMS = "1"]
+                    [/#if]
+                [/#if]
             [/#list]
         [/#if]
     [/#list]
@@ -62,17 +67,16 @@ extern "C" {
 /* Exported constants --------------------------------------------------------*/
 [#if (CPUCORE == "CM0PLUS")]
 [#if useKMS]
-/* To enable the KMS Middleware with Sigfox, you must update these files from the DualCore example project:
+
+/* To configure Sigfox to use the KMS Middleware, following files in the DualCore example project must be completed:
    - CM0PLUS/Core/Inc/kms_platf_objects_config.h : Add all Sigfox keys as kms_object_keyhead_32_t structures.
    - CM0PLUS/Core/Inc/kms_platf_objects_interface.h : Add all Sigfox key indexes
    - CM0PLUS/Core/Inc/nvms_low_level.h : Enable the NVMS (Non Volatile Memory) to store the session keys
    - CM0PLUS/Core/Src/nvms_low_level.c : Implement the Flash read/write functions to manage the NVMS items
-   And finally, change the SIGFOX_KMS define to 1
-*/
-[/#if]
-/* USER CODE BEGIN SIGFOX_KMS */
+   Then SIGFOX_KMS flag can be set to 1 */
 #define SIGFOX_KMS ${SIGFOX_KMS}
-/* USER CODE END SIGFOX_KMS */
+
+[/#if]
 [#elseif (CPUCORE == "CM4")]
 #define DEFAULT_RC SFX_RC1
 [/#if]

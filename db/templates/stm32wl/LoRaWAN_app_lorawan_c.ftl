@@ -23,12 +23,20 @@
 --]
 [#assign CPUCORE = cpucore?replace("ARM_CORTEX_","C")?replace("+","PLUS")]
 [#assign SUBGHZ_APPLICATION = ""]
+[#assign UTIL_SEQ_EN_M4 = "true"]
+[#assign UTIL_SEQ_EN_M0 = "true"]
 [#if SWIPdatas??]
     [#list SWIPdatas as SWIP]
         [#if SWIP.defines??]
             [#list SWIP.defines as definition]
                 [#if definition.name == "SUBGHZ_APPLICATION"]
                     [#assign SUBGHZ_APPLICATION = definition.value]
+                [/#if]
+                [#if definition.name == "UTIL_SEQ_EN_M4"]
+                    [#assign UTIL_SEQ_EN_M4 = definition.value]
+                [/#if]
+                [#if definition.name == "UTIL_SEQ_EN_M0"]
+                    [#assign UTIL_SEQ_EN_M0 = definition.value]
                 [/#if]
             [/#list]
         [/#if]
@@ -41,9 +49,11 @@
 #include "sys_app.h"
 [#if !FREERTOS??][#-- If FreeRtos is not used --]
 [#if !THREADX??][#-- If AzRtos is not used --]
+[#if ((UTIL_SEQ_EN_M0 == "true") && (CPUCORE == "CM0PLUS")) || ((UTIL_SEQ_EN_M4 == "true") && (CPUCORE != "CM0PLUS") && (SUBGHZ_APPLICATION != "LORA_USER_APPLICATION"))]
 #include "stm32_seq.h"
+[/#if][#--  SEQ_EN_M4 or SEQ_EN_M0 --]
 [/#if]
-[/#if]
+[/#if][#--  !THREADX && !FREERTOS --]
 [#if THREADX??]
 #include "tx_api.h"
 [/#if]
@@ -108,7 +118,7 @@ void MX_LoRaWAN_Init(void)
   /* USER CODE END MX_LoRaWAN_Init_3 */
 [/#if]
 }
-[#else]
+[#else][#--  THREADX?? --]
 uint32_t MX_LoRaWAN_Init(void *memory_ptr)
 {
   uint32_t ret = TX_SUCCESS;
@@ -142,7 +152,7 @@ uint32_t MX_LoRaWAN_Init(void *memory_ptr)
   /* USER CODE END MX_LoRaWAN_Init_Last */
   return ret;
 }
-[/#if]
+[/#if][#--  THREADX vs FREERTOS vs SEQUENCER --]
 
 [#if !FREERTOS??][#-- If FreeRtos, only available in CM4 is not used --]
 [#if !THREADX??][#-- If AzRtos is not used --]
@@ -151,12 +161,16 @@ void MX_LoRaWAN_Process(void)
   /* USER CODE BEGIN MX_LoRaWAN_Process_1 */
 
   /* USER CODE END MX_LoRaWAN_Process_1 */
-[#if (SUBGHZ_APPLICATION != "LORA_USER_APPLICATION") || (CPUCORE == "CM0PLUS")]
+[#if ((UTIL_SEQ_EN_M0 == "true") && (CPUCORE == "CM0PLUS")) || ((UTIL_SEQ_EN_M4 == "true") && (CPUCORE != "CM0PLUS") && (SUBGHZ_APPLICATION != "LORA_USER_APPLICATION"))]
   UTIL_SEQ_Run(UTIL_SEQ_DEFAULT);
   /* USER CODE BEGIN MX_LoRaWAN_Process_2 */
 
   /* USER CODE END MX_LoRaWAN_Process_2 */
-[/#if]
+[#else]
+  /* USER CODE BEGIN MX_LoRaWAN_Process_OS */
+
+  /* USER CODE END MX_LoRaWAN_Process_OS */
+[/#if][#--  UTIL_SEQ_EN_M0 or UTIL_SEQ_EN_M4 --]
 }
 [/#if]
 [/#if]

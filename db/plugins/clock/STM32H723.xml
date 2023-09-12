@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Clock xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" savedConfig="false" xsi:noNamespaceSchemaLocation="file:///C:/Users/ennarolf/Desktop/ToAchieve/xsd/MCU_Clock.xsd">
-    <Background  imageName="STM32H7DSI" name="STM32H7DSI"  x="151" y="1735">
-        <Condition Diagnostic="" Expression="(DSIHOST_Exist)"/>
-    </Background>
- 
     <Tree id="ClockTree">
         <!--Divers source-->
         <!--HSI RC-->
@@ -165,78 +161,8 @@
             <Input signalId="MCO2DivOuput" from="MCO2Div"/>
         </Element>
 		 
-        <Element id="DSIPHYPrescaler" type="devisor" refParameter="DSIPHY_Div" x="565" y="1555" refEnable="EnableHSEDSI">
-            <Condition Diagnostic="" Expression="(DSIHOST_Exist)"/>
-            <Input signalId="PLLDSIODFCLK" from="PLLDSIODF"/>
-            <Output signalId="DSIPHYCLK" to="DSIMult" />
-        </Element>
-        <Element id="DSIMult" type="multiplexor" refParameter="DSICLockSelection" orientation="LEFT" x="745" y="1520" refEnable="EnableHSEDSI">
-            <Condition Diagnostic="" Expression="(DSIHOST_Exist)"/> 
-            <Input signalId="PLL2QCLK" from="DIVQ2"   refValue="RCC_DSICLKSOURCE_PLL2"/>
-            <Input signalId="DSIPHYCLK"  from="DSIPHYPrescaler"   refValue="RCC_DSICLKSOURCE_PHY"/> 
-            <Output signalId="DSIInput" to="DSIoutput"/>
-            <Output signalId="DSIInput" to="DSITXPrescaler"/>
-        </Element>
-        <Element id="DSIoutput" type="activeOutput" refParameter="DSIFreq_Value" x="808" y="1534"  refEnable="EnableHSEDSI">
-            <Condition Diagnostic="" Expression="(DSIHOST_Exist)"/>
-            <Input signalId="DSIInput" from="DSIMult"/> 
-        </Element>
-			
-        <!-- DSI TX -->
-        <Element id="DSITXPrescaler" type="devisor" refParameter="DSITX_Div" x="660" y="1450" refEnable="EnableHSEDSI">
-            <Condition Diagnostic="" Expression="(DSIHOST_Exist)"/>
-            <Input signalId="DSIInput" from="DSIMult"/>
-            <Output signalId="DSITXCLK" to="DSITXCLKEsc" />
-        </Element>
-        <Element id="DSITXCLKEsc" type="activeOutput" refParameter="DSITXEscFreq_Value" x="808" y="1445"  refEnable="EnableHSEDSI">
-            <Condition Diagnostic="" Expression="(DSIHOST_Exist)"/>
-            <Input signalId="DSITXCLK" from="DSITXPrescaler"/>
-        </Element>	
-        <!-- DSI PLL -->
-        <Tree id="PLLDSI">
-		
-            <Element id="PLLDSIIDF" type="devisor" refParameter="PLLDSIIDF" x="355" y="1450" refEnable="EnableHSEDSI">
-                <Condition Diagnostic="" Expression="(DSIHOST_Exist)"/>
-                <Input signalId="HSE"     from="HSEOSC" refValue="RCC_SYSCLKSOURCE_HSE"/>
-                <Output signalId="PLLDSIIDFCLK" to="PLLDSIMultiplicator"/>               
-            </Element>
-			
-            <Element id="PLLDSIMultiplicator" type="multiplicator" refParameter="PLLDSIMult" x="424" y="1449" refEnable="EnableHSEDSI">
-                <Condition Diagnostic="" Expression="(DSIHOST_Exist)"/>
-                <Input signalId="PLLDSIIDFCLK" from="PLLDSIIDF"/>                
-                <Output signalId="PLLDSIMultCLK" to="PLLDSINDIV"/>                
-            </Element> 
-			
-            <Element id="PLLDSINDIV" type="multiplicator" refParameter="PLLDSINDIV" x="412" y="1483" refEnable="EnableHSEDSI">
-                <Condition Diagnostic="" Expression="(DSIHOST_Exist)"/>
-                <Input signalId="PLLDSIMultCLK" from="PLLDSIMultiplicator"/>                
-                <Output signalId="PLLDSINDIVCLK" to="PLLDSIODF"/>                
-            </Element>  
-				
-            <Element id="VCOoutput" type="output" refParameter="PLLDSIVCOFreq_Value" x="410" y="1520" refEnable="EnableHSEDSI">
-                <Condition Diagnostic="" Expression="(DSIHOST_Exist)"/>
-                <Input signalId="PLLDSINDIVCLK" from="PLLDSINDIV"/>
-                <Output signalId="PLLDSIVCOCLK" to="DSIPHYPrescaler"/> 
-            </Element>	
-			
-            <Element id="PLLDSIDevisor" type="devisor" refParameter="PLLDSIDev" x="424" y="1571" refEnable="EnableDSI">
-                <Condition Diagnostic="" Expression="(DSIHOST_Exist)"/>
-                <Input signalId="PLLDSIVCOCLK" from="VCOoutput"/>
-                <Output signalId="PLLDSIDEVCLK" to="PLLDSIODF"/>               
-            </Element> 
-            
-            <Element id="PLLDSIODF" type="devisor" refParameter="PLLDSIODF" x="412" y="1601" refEnable="EnableHSEDSI">
-                <Condition Diagnostic="" Expression="(DSIHOST_Exist)"/>
-                <Input signalId="PLLDSIDEVCLK" from="PLLDSIDevisor"/>
-                <Output signalId="PLLDSIODFCLK" to="PLLDSIoutput"/>               
-            </Element>  
-            <Element id="PLLDSIoutput" type="output" refParameter="PLLDSIFreq_Value" x="480" y="1600" refEnable="EnableHSEDSI">
-                <Condition Diagnostic="" Expression="(DSIHOST_Exist)"/>
-                <Input signalId="PLLDSIODFCLK" from="PLLDSIODF"/>
-                <Output signalId="PLLDSICLK" to="DSIPHYPrescaler"/> 
-            </Element>			
-        </Tree> 
-		
+        	
+	
 		
         <!--system main block-->
         <Element id="D1CPRE" type="devisor" refParameter="D1CPRE" x="815" y="444">
@@ -534,7 +460,6 @@
                 <Output signalId="PLL2QCLK" to="LPUART1Mult"/>
                 <Output signalId="PLL2QCLK" to="SPI6Mult"/>
                 <Output signalId="PLL2QCLK" to="DIVQ2output"/>
-                <Output signalId="PLL2QCLK" to="DSIMult"/>
             </Element>
 			
             <Element id="DIVQ2output" type="output" refParameter="DIVQ2Freq_Value" x="639" y="696" refEnable="FDCANEnable,SPI6Enable,LPUART1Enable,USART234578Enable,USART16Enable,SPI45Enable">
@@ -1035,18 +960,6 @@
 	  <Signal id="HRTIMCLK" />
 	  <Signal id="Tim1MulCLK" />
 	  <Signal id="Tim2MulCLK" />
-	  
-	  <Signal id="PLLDSIMultCLK" />
-        <Signal id="PLLDSIVCOCLK" />
-        <Signal id="PLLDSIDEVCLK" />
-        <Signal id="PLLROutputCLK" />
-        <Signal id="PLLDSICLK" />
-        <Signal id="DSITXCLK" />
-        <Signal id="PLLDSINDIVCLK" />
-        <Signal id="PLLDSIIDFCLK" />
-        <Signal id="PLLDSIODFCLK" />
-        <Signal id="DSIPHYCLK" />
-        <Signal id="DSIInput" /> 
         <Signal id="HSI"/>
         <Signal id="HSIDivClk"/>
         <Signal id="HSE"/>
@@ -1127,57 +1040,6 @@
 		
     </Signals>
 	<!--RTC labels-->
-
-    <Label id="DSIMuxLabel"       type="muxLabel"      posX="670"   posY="1490"   text="DSI Clock Mux"                 refEnable="EnableDSI">
-        <Condition Diagnostic="" Expression="(DSIHOST_Exist)"/>
-    </Label>
-    <Label id="DSIByteLaneLabel"  type="SpecialInfo"   posX="868"   posY="1538"  text="To DSI lane byte(MHz)"  refEnable="EnableHSEDSI">
-        <Condition Diagnostic="" Expression="(DSIHOST_Exist)"/>
-    </Label>     
-    <Label id="DSITxEscLabel"     type="SpecialInfo"   posX="868"   posY="1450"  text="To DSI txclkesc(MHz)"   refEnable="EnableHSEDSI">
-        <Condition Diagnostic="" Expression="(DSIHOST_Exist)"/>
-    </Label>	
-    <Label id="DSIMuxSYSLabel"    type="signal"        posX="627"   posY="1510"  text="PLL2Q"                          refEnable="EnablePLLRDSI">
-        <Condition Diagnostic="" Expression="(DSIHOST_Exist)"/>
-    </Label>  
-    <Label id="HSEForDSILabel"    type="signal"        posX="305"   posY="1443"  text="HSE"                           refEnable="EnableHSE">
-        <Condition Diagnostic="" Expression="(DSIHOST_Exist)"/>
-    </Label>
- 
-    <Label id="PLLDSIIdfLabel"       type="info" text="/IDF"            posX="365" posY="1470">
-        <Condition Diagnostic="" Expression="(DSIHOST_Exist)"/>
-    </Label>  
-    <Label id="PLLDSINdivLabel"      type="info" text="*NDIV"           posX="407" posY="1503">
-        <Condition Diagnostic="" Expression="(DSIHOST_Exist)"/>
-    </Label>
-    <Label id="PLLDSIOdfLabel"       type="info" text="/ODF"            posX="407" posY="1622">
-        <Condition Diagnostic="" Expression="(DSIHOST_Exist)"/>
-    </Label>
-    <Label id="PLLDSIVCOLabel"       type="info" text="VCO"             posX="407" posY="1543">
-        <Condition Diagnostic="" Expression="(DSIHOST_Exist)"/>
-    </Label>
-    <Label id="DSITxLabel"           type="info" text="TX Prescaler"    posX="657" posY="1430"   refEnable="EnableHSEDSI">
-        <Condition Diagnostic="" Expression="(DSIHOST_Exist)"/>
-    </Label>
-    <Label id="PLLDSILabel"          type="info" text="PLL DSI"         posX="360" posY="1610">
-        <Condition Diagnostic="" Expression="(DSIHOST_Exist)"/>
-    </Label>
-    <Label id="DSIPHYLabel"          type="info" text="PHY DSI"         posX="567" posY="1610">
-        <Condition Diagnostic="" Expression="(DSIHOST_Exist)"/>
-    </Label>
-
-<!--Label id="DSIPLLRMaxLimitConstraint"     type="dynamiConstraint" posX="625" posY="1510"  text="62,5 MHz max" refEnable="EnablePLLRDSI">
-    <Condition Diagnostic="" Expression="(DSIHOST_Exist)"/>
-</Label-->
-<Label id="DSIByteLaneMaxLimitConstraint" type="dynamiConstraint" posX="625" posY="1550"  text="62 MHz max" refEnable="EnableHSEDSI">
-    <Condition Diagnostic="" Expression="(DSIHOST_Exist)"/>
-</Label>	
-<Label id="DSITxEscMaxLimitConstraint"    type="dynamiConstraint" posX="717" posY="1462" text="20 MHz max"   refEnable="EnableHSEDSI">
-    <Condition Diagnostic="" Expression="(DSIHOST_Exist)"/>
-</Label>
-<Label id="DSIMaxLimitConstraint"         type="dynamiConstraint" posX="480" posY="1580" text="1 GHz max"  refEnable="EnableHSEDSI">
-    <Condition Diagnostic="" Expression="(DSIHOST_Exist)"/>
-</Label>
 	
     <Label id="RTCMuxLabel"       type="muxLabel"    text="RTC Clock Mux" posX="511" posY="144" refEnable="RTCEnable"/>
     <Label id="RTCOutputLabel"    type="SpecialInfo" text="To RTC (KHz)"  posX="672" posY="204" refEnable="RTCEnable"/>

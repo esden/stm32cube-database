@@ -22,12 +22,20 @@
 [/#if]
 --]
 [#assign SUBGHZ_APPLICATION = ""]
+[#assign UTIL_SEQ_EN_M4 = "true"]
+[#assign UTIL_TIMER_EN = "true"]
 [#if SWIPdatas??]
     [#list SWIPdatas as SWIP]
         [#if SWIP.defines??]
             [#list SWIP.defines as definition]
                 [#if definition.name == "SUBGHZ_APPLICATION"]
                     [#assign SUBGHZ_APPLICATION = definition.value]
+                [/#if]
+                [#if definition.name == "UTIL_SEQ_EN_M4"]
+                    [#assign UTIL_SEQ_EN_M4 = definition.value]
+                [/#if]
+                [#if definition.name == "UTIL_TIMER_EN"]
+                    [#assign UTIL_TIMER_EN = definition.value]
                 [/#if]
             [/#list]
         [/#if]
@@ -41,14 +49,16 @@
 [#if THREADX??][#-- If AzRtos is used --]
 #include "app_azure_rtos.h"
 #include "tx_api.h"
-[#else]
-[#if !FREERTOS??][#-- If FreeRtos is not used --]
-#include "stm32_seq.h"
-[#else]
+[#elseif FREERTOS??][#-- If FreeRtos is used --]
 #include "cmsis_os.h"
-[/#if]
-[/#if]
+[#elseif UTIL_SEQ_EN_M4 == "true"]
+#include "stm32_seq.h"
+[/#if][#--  THREADX vs FREERTOS vs SEQUENCER --]
+[#if (UTIL_TIMER_EN == "true")]
 #include "stm32_timer.h"
+[#else]
+#include "timer.h"
+[/#if]
 #include "sys_app.h"
 #include "msg_id.h"
 #include "utilities_def.h"
@@ -209,7 +219,8 @@ int8_t MBMUXIF_SystemInit(void)
   if (OptionsBytesStruct.IPCCdataBufAddr != (uint32_t) pMb_RefTable)
   {
 [#if ((SUBGHZ_APPLICATION != "LORA_USER_APPLICATION") && (SUBGHZ_APPLICATION != "SUBGHZ_USER_APPLICATION") && (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION"))]
-    APP_PPRINTF("There is a difference between the MAPPING_TABLE placement in memory: 0x%X \r\n", (uint32_t) pMb_RefTable);
+    APP_PPRINTF("There is a difference between the MAPPING_TABLE placement in memory: 0x%X \r\n",
+                (uint32_t) pMb_RefTable);
     APP_PPRINTF("and the address calculated according to the IPCCDBA option byte: 0x%X \r\n",
                 OptionsBytesStruct.IPCCdataBufAddr);
     APP_PPRINTF("IPCCDBA is automatically updated\n\rSystem restarting...\r\n\r\n");
@@ -317,12 +328,16 @@ int8_t MBMUXIF_SystemInit(void)
     /* Init MailBoxMultiplexer */
     MBMUX_Init(pMb_RefTable);
 
-    ret = MBMUX_RegisterFeature(FEAT_INFO_SYSTEM_ID, MBMUX_CMD_RESP, MBMUXIF_IsrSystemRespRcvCb, aSystemCmdRespBuff, sizeof(aSystemCmdRespBuff));
+    ret = MBMUX_RegisterFeature(FEAT_INFO_SYSTEM_ID, MBMUX_CMD_RESP,
+                                MBMUXIF_IsrSystemRespRcvCb,
+                                aSystemCmdRespBuff, sizeof(aSystemCmdRespBuff));
   }
 
   if (ret >= 0)
   {
-    ret = MBMUX_RegisterFeature(FEAT_INFO_SYSTEM_ID, MBMUX_NOTIF_ACK, MBMUXIF_IsrSystemNotifRcvCb, aSystemNotifAckBuff, sizeof(aSystemNotifAckBuff));
+    ret = MBMUX_RegisterFeature(FEAT_INFO_SYSTEM_ID, MBMUX_NOTIF_ACK,
+                                MBMUXIF_IsrSystemNotifRcvCb,
+                                aSystemNotifAckBuff, sizeof(aSystemNotifAckBuff));
   }
 
 [#if THREADX??]
@@ -334,7 +349,12 @@ int8_t MBMUXIF_SystemInit(void)
     {
       ret = -10;  /* equivalent at TX_POOL_ERROR */
     }
-
+  }
+[/#if][#--  THREADX --]
+  if (ret >= 0)
+  {
+    ret = 0;
+[#if THREADX??]
     /* Create MbSystemNotifRcv.  */
     if (tx_thread_create(&Thd_SystemNotifRcv, "Thread MbSystemNotifRcv", Thd_MbSystemNotifRcv_Entry, 0,
                          pointer, CFG_MAILBOX_THREAD_STACK_SIZE,
@@ -343,22 +363,16 @@ int8_t MBMUXIF_SystemInit(void)
     {
       ret = -11;  /* equivalent at TX_THREAD_ERROR */
     }
-  }
-  if (ret >= 0)
-  {
-    ret = 0;
-  }
-[#else]
-  if (ret >= 0)
-  {
-    ret = 0;
-[#if !FREERTOS??][#-- If FreeRtos is not used --]
+[#elseif FREERTOS??][#-- If FreeRtos is used --]
+    Thd_SysNotifRcvProcessId = osThreadNew(Thd_SysNotifRcvProcess, NULL, &Thd_SysNotifRcvProcess_attr);
+[#elseif UTIL_SEQ_EN_M4 == "true"]
     UTIL_SEQ_RegTask((1 << CFG_SEQ_Task_MbSystemNotifRcv), UTIL_SEQ_RFU, MBMUXIF_TaskSystemNotifRcv);
 [#else]
-    Thd_SysNotifRcvProcessId = osThreadNew(Thd_SysNotifRcvProcess, NULL, &Thd_SysNotifRcvProcess_attr);
-[/#if]
+  /* USER CODE BEGIN MBMUXIF_SystemInit_OS */
+
+  /* USER CODE END MBMUXIF_SystemInit_OS */
+[/#if][#--  THREADX vs FREERTOS vs SEQUENCER --]
   }
-[/#if]
   /* USER CODE BEGIN MBMUXIF_SystemInit_2 */
 
   /* USER CODE END MBMUXIF_SystemInit_2 */
@@ -385,22 +399,30 @@ int8_t MBMUXIF_SystemPrio_Add(FEAT_INFO_IdTypeDef SystemPrioFeat)
   {
     case FEAT_INFO_SYSTEM_CMD_PRIO_A_ID:
     {
-      ret = MBMUX_RegisterFeature(SystemPrioFeat, MBMUX_CMD_RESP, MBMUXIF_IsrSystemPrioARespRcvCb, aSystemPrioACmdRespBuff, sizeof(aSystemPrioACmdRespBuff));
+      ret = MBMUX_RegisterFeature(SystemPrioFeat, MBMUX_CMD_RESP,
+                                  MBMUXIF_IsrSystemPrioARespRcvCb,
+                                  aSystemPrioACmdRespBuff, sizeof(aSystemPrioACmdRespBuff));
       break;
     }
     case FEAT_INFO_SYSTEM_NOTIF_PRIO_A_ID:
     {
-      ret = MBMUX_RegisterFeature(SystemPrioFeat, MBMUX_NOTIF_ACK, MBMUXIF_IsrSystemPrioANotifRcvCb, aSystemPrioANotifAckBuff, sizeof(aSystemPrioANotifAckBuff));
+      ret = MBMUX_RegisterFeature(SystemPrioFeat, MBMUX_NOTIF_ACK,
+                                  MBMUXIF_IsrSystemPrioANotifRcvCb,
+                                  aSystemPrioANotifAckBuff, sizeof(aSystemPrioANotifAckBuff));
       break;
     }
     case FEAT_INFO_SYSTEM_CMD_PRIO_B_ID:
     {
-      ret = MBMUX_RegisterFeature(SystemPrioFeat, MBMUX_CMD_RESP, MBMUXIF_IsrSystemPrioBRespRcvCb, aSystemPrioBCmdRespBuff, sizeof(aSystemPrioBCmdRespBuff));
+      ret = MBMUX_RegisterFeature(SystemPrioFeat, MBMUX_CMD_RESP,
+                                  MBMUXIF_IsrSystemPrioBRespRcvCb,
+                                  aSystemPrioBCmdRespBuff, sizeof(aSystemPrioBCmdRespBuff));
       break;
     }
     case FEAT_INFO_SYSTEM_NOTIF_PRIO_B_ID:
     {
-      ret = MBMUX_RegisterFeature(SystemPrioFeat, MBMUX_NOTIF_ACK, MBMUXIF_IsrSystemPrioBNotifRcvCb, aSystemPrioBNotifAckBuff, sizeof(aSystemPrioBNotifAckBuff));
+      ret = MBMUX_RegisterFeature(SystemPrioFeat, MBMUX_NOTIF_ACK,
+                                  MBMUXIF_IsrSystemPrioBNotifRcvCb,
+                                  aSystemPrioBNotifAckBuff, sizeof(aSystemPrioBNotifAckBuff));
       break;
     }
     default:
@@ -479,13 +501,15 @@ void MBMUXIF_SystemSendCmd(FEAT_INFO_IdTypeDef SystemPrioFeat)
       {
 [#if THREADX??][#-- If AzRtos is used --]
         while (tx_semaphore_get(&Sem_MbSystemRespRcv, TX_WAIT_FOREVER) != TX_SUCCESS) {}
-[#else]
-[#if !FREERTOS??][#-- If FreeRtos is not used --]
+[#elseif FREERTOS??][#-- If FreeRtos is used --]
+        osSemaphoreAcquire(Sem_MbSystemRespRcv, osWaitForever);
+[#elseif UTIL_SEQ_EN_M4 == "true"]
         UTIL_SEQ_WaitEvt(1 << CFG_SEQ_Evt_MbSystemRespRcv);
 [#else]
-        osSemaphoreAcquire(Sem_MbSystemRespRcv, osWaitForever);
-[/#if]
-[/#if]
+        /* USER CODE BEGIN MBMUXIF_SystemSendCmd_OS */
+
+        /* USER CODE END MBMUXIF_SystemSendCmd_OS */
+[/#if][#--  THREADX vs FREERTOS vs SEQUENCER --]
       }
       else
       {
@@ -641,13 +665,15 @@ static void MBMUXIF_IsrSystemRespRcvCb(void *ComObj)
 [#if THREADX??][#-- If AzRtos is used --]
     /* Set the semaphore to release the MbSystemRespRcv Thread */
     tx_semaphore_put(&Sem_MbSystemRespRcv);
-[#else]
-[#if !FREERTOS??][#-- If FreeRtos is not used --]
+[#elseif FREERTOS??][#-- If FreeRtos is used --]
+    osSemaphoreRelease(Sem_MbSystemRespRcv);
+[#elseif UTIL_SEQ_EN_M4 == "true"]
     UTIL_SEQ_SetEvt(1 << CFG_SEQ_Evt_MbSystemRespRcv);
 [#else]
-    osSemaphoreRelease(Sem_MbSystemRespRcv);
-[/#if]
-[/#if]
+  /* USER CODE BEGIN MBMUXIF_IsrSystemRespRcvCb_OS */
+
+  /* USER CODE END MBMUXIF_IsrSystemRespRcvCb_OS */
+[/#if][#--  THREADX vs FREERTOS vs SEQUENCER --]
   }
   /* USER CODE BEGIN MBMUXIF_IsrSystemRespRcvCb_Last */
 
@@ -666,13 +692,15 @@ static void MBMUXIF_IsrSystemNotifRcvCb(void *ComObj)
     Thd_SystemNotifRcv_RescheduleFlag++;
   }
   tx_thread_resume(&Thd_SystemNotifRcv);
-[#else]
-[#if !FREERTOS??][#-- If FreeRtos is not used --]
+[#elseif FREERTOS??][#-- If FreeRtos is used --]
+  osThreadFlagsSet(Thd_SysNotifRcvProcessId, 1);
+[#elseif UTIL_SEQ_EN_M4 == "true"]
   UTIL_SEQ_SetTask((1 << CFG_SEQ_Task_MbSystemNotifRcv), CFG_SEQ_Prio_0);
 [#else]
-  osThreadFlagsSet(Thd_SysNotifRcvProcessId, 1);
-[/#if]
-[/#if]
+  /* USER CODE BEGIN MBMUXIF_IsrSystemNotifRcvCb_OS */
+
+  /* USER CODE END MBMUXIF_IsrSystemNotifRcvCb_OS */
+[/#if][#--  THREADX vs FREERTOS vs SEQUENCER --]
   /* USER CODE BEGIN MBMUXIF_IsrSystemNotifRcvCb_Last */
 
   /* USER CODE END MBMUXIF_IsrSystemNotifRcvCb_Last */

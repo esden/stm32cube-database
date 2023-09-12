@@ -50,14 +50,12 @@
 		  </Parameter>
 		<Parameter Added="true" Name="AZRTOS_APP_MEM_ALLOCATION_METHOD">
 		  <Condition Diagnostic="" Expression="SEMThreadXCcRTOSJjThreadXJjCore" Name="APP_MEM_ALLOCATION_CONDITION"/>
-		  </Parameter>
-	</RefMode>
-	<RefMode Abstract="true" Name="FileX_Tracing">
-        <ConfigForMode>FileOoSystemJjFileXJjTracing</ConfigForMode>
-		<Parameter Name="FileXTracing">
-			<PossibleValue>1</PossibleValue>
+		</Parameter>
+		<Parameter Added="true" Name="FILEX_MEM_POOL_VAR_NAME">
+		  <Condition Diagnostic="" Expression="SEMThreadXCcRTOSJjThreadXJjCore" />
 		</Parameter>
 	</RefMode>
+	
 	<RefMode Abstract="true" Name="Internal_RAM_interface">
         <ConfigForMode>FileOoSystemJjFileXJjInternalOoRamOointerface</ConfigForMode>
 		<Parameter Added="true" Name="FX_SRAM_BASE_ADDRESS_RANGES"/>
@@ -85,17 +83,6 @@
 				</Mode>
 			</ModeLogicOperator>
 		</Mode>
-		<Mode Name="FileX_Tracing" UserName="TraceX Support">
-            <ModeLogicOperator Name="NONE">
-                <Mode Name="FileX_Tracing">
-                    <SignalLogicalOp Name="AND">
-                        <Signal Name="VS_FileOoSystemJjFileXJjTraceXOoSupport"/>
-                    </SignalLogicalOp>
-					<Semaphore>SEMFileXCcFileOoSystemJjFileXJjTraceXOoSupport</Semaphore>
-					<Condition Expression="SEMFileXCcFileOoSystemJjFileXJjCore &amp; SEMThreadXCcRTOSJjThreadXJjCore" Diagnostic="&lt;b&gt; Require: &lt;/b&gt; &lt;br&gt; Middleware:FILEX:Core &lt;/b&gt; Middleware:THREADX:Core"/>
-                </Mode>
-            </ModeLogicOperator>
-        </Mode>
 		
 		<Mode Name="File_System_Interfaces" UserName="File System Interfaces">
 			<ModeLogicOperator Name="OR">
@@ -126,7 +113,6 @@
 	</ModeLogicOperator>
 	
     <RefSignal Name="VS_FileOoSystemJjFileXJjCore" Virtual="true"/>
-	<RefSignal Name="VS_FileOoSystemJjFileXJjTraceXOoSupport" Virtual="true"/>
 	<RefSignal Name="VS_InternalOoRAMOointerface" Virtual="true"/>
 	<RefSignal Name="VS_CustomOointerface" Virtual="true"/>
 
@@ -163,7 +149,8 @@
     </RefParameter>
     <RefParameter Added="true" Comment="FX_ENABLE_FAULT_TOLERANT" DefaultValue="0" Group="Core" Name="FX_ENABLE_FAULT_TOLERANT" TabName="FileX" Type="list">
         <Description>Defined, enables FileX fault tolerant service.
-</Description>
+		&lt;br&gt; &lt;font color=&quot;red&quot;&gt; If FX_ENABLE_FAULT_TOLERANT and FX_DISABLE_CACHE are enabled simultaneously, compilation errors will be generated in the project.&lt;/font&gt;
+		</Description>
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
     </RefParameter>
@@ -262,9 +249,6 @@ All values must be a power of 2.</Description>
 	<RefParameter Name="useRTOS" Comment="" DefaultValue="0" Type="integer" Min="0" Max="1" Group="" TabName="" Visible="false">
 		<Description></Description>		
 	</RefParameter>
-	<RefParameter Name="FileXTracing" Comment="" DefaultValue="0" Type="integer" Min="0" Max="1" Group="" TabName="" Visible="false">
-		<Description></Description>		
-	</RefParameter>
 	<RefParameter Name="FX_SRAM_INTERFACE" Comment="" DefaultValue="0" Type="integer" Min="0" Max="1" Group="" TabName="" Visible="false">
 		<Description></Description>		
 	</RefParameter>
@@ -326,7 +310,9 @@ Doing so causes default time and date to be placed on all file operations.</Desc
 	</RefParameter>
 	
 	<RefParameter Added="true" Comment="FX_DISABLE_CACHE" DefaultValue="0" Group="Core" Name="FX_DISABLE_CACHE" TabName="FileX" Type="list">
-        <Description>If defined, cache is disabled.</Description>
+        <Description>If defined, cache is disabled.
+		&lt;br&gt; &lt;font color=&quot;red&quot;&gt; If FX_DISABLE_CACHE and FX_ENABLE_FAULT_TOLERANT are enabled simultaneously, compilation errors will be generated in the project.&lt;/font&gt;
+		</Description>
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
     </RefParameter>
@@ -365,5 +351,9 @@ Doing so causes default time and date to be placed on all file operations.</Desc
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
     </RefParameter>
-
+	
+	<RefParameter Added="true" Comment="FileX MemPool Name" DefaultValue="fx_app_byte_pool" Group="Memory Configuration" Name="FILEX_MEM_POOL_VAR_NAME" TabName="FileX" Type="stringRW">
+        <Description>Default FileX memory pool var name &lt;br&gt; &lt;font color=&quot;red&quot;&gt; &lt;b&gt;This is a variable name. It should be C compliant declaration, Otherwise compilation errors will be generated in the project. &lt;/b&gt; &lt;/font&gt;</Description>
+		<Condition Diagnostic="" Expression="(ThreadX:AZRTOS_APP_MEM_ALLOCATION_METHOD = 1)"/>
+    </RefParameter>
 </IP>

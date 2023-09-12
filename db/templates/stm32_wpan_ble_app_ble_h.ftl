@@ -180,12 +180,11 @@ typedef struct
 
 /* Exported functions ---------------------------------------------*/
 void APP_BLE_Init(void); 
-
-[#if  (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (CUSTOM_P2P_SERVER = 1) || (BT_SIG_HEART_RATE_SENSOR = 1)]
+[#if  (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (CUSTOM_P2P_SERVER = 1) || (BT_SIG_HEART_RATE_SENSOR = 1) || (CUSTOM_TEMPLATE = 1)]
 APP_BLE_ConnStatus_t APP_BLE_Get_Server_Connection_Status(void);
 [/#if]
 [#if  (CUSTOM_P2P_ROUTER = 1) || (CUSTOM_P2P_CLIENT = 1)]
-APP_BLE_ConnStatus_t APP_BLE_Get_Client_Connection_Status( uint16_t Connection_Handle );
+APP_BLE_ConnStatus_t APP_BLE_Get_Client_Connection_Status(uint16_t Connection_Handle);
 [/#if]
 
 /* USER CODE BEGIN EF */

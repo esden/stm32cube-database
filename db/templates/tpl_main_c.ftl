@@ -102,7 +102,7 @@
             [/#if]
         [/#list]
     [/#if]
-    [#if (ip?has_content && ipExistsIntoreducevoids == false) && !ip?lower_case?contains("threadx")]
+    [#if (ip?has_content && ipExistsIntoreducevoids == false) && !ip?lower_case?contains("threadx") && !ip?lower_case?contains("levelx") && !ip?lower_case?contains("usbx")]
     [#if !existsInList(includeList?split(" "),ip?lower_case+".h")]
     #include "${ip?lower_case}.h"
     [#assign includeList =includeList + " "+ '${ip?lower_case}.h']
@@ -119,12 +119,14 @@
  #include "fatfs.h"
  [/#if]
 [/#if]
-[#-- Examples Migration (FCR) - End--]
+[#-- Examples Migration (FCR) - End--]		
 [#if ip?contains("USB_DEVICE") || ip?contains("USB_Device")]
 [#assign usb_device = true]
 [/#if]
-
-
+[#if (ip?lower_case ==("usb")) && !existsInList(includeList?split(" "),ip?lower_case+".h")]
+	#include "${ip?lower_case}.h"
+[#assign includeList =includeList + " "+ '${ip?lower_case}.h']
+[/#if]		
 [/#list]
 [#-- BZ 106035 --]
 [#if includesFilesByMw??]
@@ -229,10 +231,10 @@ ETH_DMADescTypeDef  DMATxDscrTab[ETH_TX_DESC_CNT]; /* Ethernet Tx DMA Descriptor
 [/#if][#-- (H7_ETH_NoLWIP?? || F7_ETH_NoLWIP??  || F4_ETH_NoLWIP??) && HALCompliant?? --]
 [#-- End workaround for Ticket 30863 --]
 [#-- If HAL compliant generate Global variable : Peripherals handler -Begin --]
+[#assign variablename =""]
+[#assign dmahandler =""]
 [#if HALCompliant??][#-- if HALCompliant Begin --]
 [#compress]
-[#assign dmahandler =""]
-[#assign variablename =""]
     [#list Peripherals as Peripheral]
         [#if Peripheral??]                
         [#list Peripheral as periph]
@@ -240,9 +242,9 @@ ETH_DMADescTypeDef  DMATxDscrTab[ETH_TX_DESC_CNT]; /* Ethernet Tx DMA Descriptor
                 [#if periph.variables??]
 
                     [#list periph.variables as variable]
-                    [#if !variablename?contains(variable.value+ " "+variable.name) && !handlerToignore?contains(variable.name)]
+                    [#if !variablename?contains(variable.value+ " "+variable.name + ";") && !handlerToignore?contains(variable.name)]
                     ${variable.value} ${variable.name};
-                    [#assign variablename =variablename + " "+ variable.value+ " "+variable.name]
+                    [#assign variablename =variablename + " "+ variable.value+ " "+variable.name + ";"]
                     [/#if]                    
                     [/#list]
                 [/#if][#--if periph.variables??--]
@@ -260,9 +262,9 @@ ${dHandle};
     [/#list]
 [#if lpbamGHandlers??]
     [#list lpbamGHandlers as variable]
-        [#if !variablename?contains(variable.value+ " "+variable.name) && !dmahandler?contains(variable.name) !handlerToignore?contains(variable.name)]
+        [#if !variablename?contains(variable.value+ " "+variable.name + ";") && !dmahandler?contains(variable.name) !handlerToignore?contains(variable.name)]
         ${variable.value} ${variable.name};
-        [#assign variablename = variablename + " " + variable.value+ " "+variable.name]
+        [#assign variablename = variablename + " " + variable.value+ " "+variable.name +";"]
         [/#if]
     [/#list]
 [/#if]
@@ -309,6 +311,17 @@ ${dHandle};
     [@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_vars.tmp"/]   
     [#-- ADD RTOS Code End--]
     [/#compress]
+   [#else] [#-- if !HALCompliant : add only LPBAM handler --]
+        [#compress]
+            [#if lpbamGHandlers??]
+            [#list lpbamGHandlers as variable]
+                [#if !variablename?contains(variable.value+ " "+variable.name + ";") && !dmahandler?contains(variable.name) !handlerToignore?contains(variable.name)]
+                ${variable.value} ${variable.name};
+                [#assign variablename = variablename + " " + variable.value+ " "+variable.name +";"]
+                [/#if]
+            [/#list]
+        [/#if]
+        [/#compress]
    [/#if][#-- if HALCompliant End --]
 [#if HALCompliant??]
   [#-- CEC array --]
@@ -482,13 +495,68 @@ int main(void)
 [/#if]
 [#if isHALUsed??]
 #tHAL_Init();
-[#if isportGUsed?? && FamilyName!="STM32U5"]
-#tHAL_PWREx_EnableVddIO2();
+[#if HSEMConfig??]
+#n
+[#list HSEMConfig as clk]
+        [#if clk!="none"]
+            [#if clk!=""]#t${clk}[#if !clk?contains('(')]()[/#if];[/#if]
+        [/#if]
+[/#list]
+
+[#if systemVectors??]
+[#assign systemHandlers = false]
+[#assign firstSystemInterrupt = true]
+[#assign firstPeripheralInterrupt = true]
+[#list systemVectors as initVector] 
+    [#if initVector.vector?contains("HSEM")]
+        [#if initVector.systemHandler=="true"]
+            [#assign systemHandlers = true]
+            [#if firstSystemInterrupt]
+                [#assign firstSystemInterrupt = false]
+                #t/* System interrupt init*/
+            [/#if]
+        [#elseif firstPeripheralInterrupt]
+            [#assign firstPeripheralInterrupt = false]
+            [#if systemHandlers]
+                #n
+            [/#if]
+        [/#if]    
+        [#if initVector.systemHandler=="false" || initVector.preemptionPriority!="0" || initVector.subPriority!="0"]
+            #t/* ${initVector.vector} interrupt configuration */
+            [#if NVICPriorityGroup??]
+                #tNVIC_SetPriority(${initVector.vector}, NVIC_EncodePriority(NVIC_GetPriorityGrouping(),${initVector.preemptionPriority}, ${initVector.subPriority}));
+            [#else]
+                #tNVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority});
+            [/#if]
+        [/#if]
+        [#if initVector.systemHandler=="false"]
+            [#if EnableCode??]
+                #tNVIC_EnableIRQ(${initVector.vector});
+            [/#if]
+        [/#if]
+    
+    [/#if]
+[/#list]
 [/#if]
-[#else]
-    [#if clockConfig??]
-    [@common.optinclude name=contextFolder+mxTmpFolder+"/system.tmp"/] [#-- if LL include system.tmp --]
+
 [/#if]
+        [#if isportGUsed?? && FamilyName!="STM32U5"]
+        #tHAL_PWREx_EnableVddIO2();
+        [/#if]
+[#else][#-- Full LL --]
+
+    [#if HSEMConfig??]
+    #n
+    #t/* HSEM Clock enable */
+        [#list HSEMConfig as clk]
+                [#if clk!="none"]
+                    [#if clk!=""]#t${clk}[#if !clk?contains('(')]()[/#if];[/#if]
+                [/#if]
+        [/#list]
+    [/#if]
+        [#if clockConfig??]
+        [@common.optinclude name=contextFolder+mxTmpFolder+"/system.tmp"/] [#-- if LL include system.tmp --]
+    [/#if]
 [/#if]
 [#if PWRLL??]
 #n#t/* Enable PWR clock interface */
@@ -653,14 +721,14 @@ int main(void)
 #telse
 #t{
     #t#t/* IPCC initialisation */
-	#t#t MX_IPCC_Init();
+	#t#tMX_IPCC_Init();
 [#if !OPENAMP??]
 #t}
 [/#if]
 [#else] [#--Ticket 99342  --]
 #n
  #t/* IPCC initialisation */
-	#t MX_IPCC_Init();
+	#tMX_IPCC_Init();
 [/#if]
 [/#if]
 [/#list]

@@ -158,7 +158,7 @@ void HAL_MspInit(void)
 #t/* Peripheral interrupt init */
 [/#if]
 
-[#if initVector.codeInMspInit && initVector.usedDriver=="HAL" &&initVector.vector!="RCC_IRQn"]
+[#if initVector.codeInMspInit && initVector.usedDriver=="HAL" && initVector.vector!="RCC_IRQn" && initVector.vector!="RCC_WAKEUP_IRQn"]
     [#if initVector.systemHandler=="false" || initVector.preemptionPriority!="0" || initVector.subPriority!="0"]
     [#if initVector.vector!="SysTick_IRQn"]
     [#if (initVector.vector!="PVD_AVD_IRQn" && FamilyName=="STM32U5") && (initVector.vector!="PVD_PVM_IRQn" && FamilyName=="STM32U5")]
@@ -184,7 +184,7 @@ void HAL_MspInit(void)
     [/#if]
 [/#if]
 [/#if]
-[#if initVector.vector=="RCC_IRQn"]
+[#if initVector.vector=="RCC_IRQn" || initVector.vector=="RCC_WAKEUP_IRQn"]
 [#if initVector.codeInMspInit]
     [#if initVector.systemHandler=="false" || initVector.preemptionPriority!="0" || initVector.subPriority!="0"]
     [#if initVector.vector!="SysTick_IRQn"]

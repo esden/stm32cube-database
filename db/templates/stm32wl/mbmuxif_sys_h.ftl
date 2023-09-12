@@ -151,7 +151,7 @@ extern "C" {
 #define CFG_APP_SIGFOX_PROCESS_STACK_SIZE          (128 * 10)
 
 [/#if]
-[/#if]
+[/#if][#--  FREERTOS  --]
 [/#if]
 
 /* USER CODE BEGIN EC */

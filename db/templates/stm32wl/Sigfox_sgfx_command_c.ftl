@@ -470,8 +470,8 @@ static int32_t CMD_ProcessBackSpace(char *cmd)
   /*for every backspace, remove backspace and its preceding character*/
   for (i = 0; i < bs_cnt; i++)
   {
-    int curs = 0;
-    int j = 0;
+    int32_t curs = 0;
+    int32_t j = 0;
 
     /*set cursor to backspace*/
     while (cmd[curs] != '\b')

@@ -5,7 +5,9 @@
     <Background  imageName="STM32L4-withLCDBlock" name="STM32L4-withLCDBlock"  x="501" y="24">
         <Condition Diagnostic="" Expression="(LCD_Exist)"/>
     </Background>
-    
+    <Background  imageName="WLM" name="WLM"  x="0" y="0">
+        <Condition Diagnostic="" Expression="STM32WL5MOCHx"/>
+    </Background> 
     <Background  imageName="STM32WL_hide_cpu2" name="STM32WL_hide_cpu2"  x="826" y="373">
          <Condition Diagnostic="" Expression="!STM32WL5x | S_SINGLE_CORE"/>
     </Background>
@@ -33,9 +35,25 @@
            
         </Element>        
         <Element id="LSIRC" type="variedSource" refParameter="LSI_VALUE" x="200" y="234" refEnable="LSIEnable">
+            <Condition Diagnostic="" Expression="!STM32WL5MOCHx"/>
+            <Output signalId="LSIDUAL" to="LSIDIV"/>
+        </Element>
+        <Element id="LSIRC" type="variedSource" refParameter="LSI_VALUE" x="200" y="304" refEnable="LSIEnable">
+            <Condition Diagnostic="" Expression="STM32WL5MOCHx"/>
             <Output signalId="LSIDUAL" to="LSIDIV"/>
         </Element>
         <Element id="LSIDIV" type="devisor" refParameter="LSIDIV" x="395" y="234">
+            <Condition Diagnostic="" Expression="!STM32WL5MOCHx"/>
+            <Input signalId="LSIDUAL" from="LSIRC"/>
+            <Output signalId="LSI" to="RTCClkSource"/>
+            <Output signalId="LSI" to="LPTIM1Mult"/>
+            <Output signalId="LSI" to="LPTIM2Mult"/>
+            <Output signalId="LSI" to="LPTIM3Mult"/>
+            <Output signalId="LSI" to="LSCOMult"/>
+            <Output signalId="LSI" to="MCOMult"/>
+        </Element>
+        <Element id="LSIDIV" type="devisor" refParameter="LSIDIV" x="395" y="310">
+            <Condition Diagnostic="" Expression="STM32WL5MOCHx"/>
             <Input signalId="LSIDUAL" from="LSIRC"/>
             <Output signalId="LSI" to="RTCClkSource"/>
             <Output signalId="LSI" to="LPTIM1Mult"/>

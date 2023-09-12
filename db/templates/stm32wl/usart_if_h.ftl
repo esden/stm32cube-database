@@ -6,7 +6,7 @@
   * @author  MCD Application Team
   * @brief   Header for USART interface configuration
   ******************************************************************************
-[@common.optinclude name=mxTmpFolder+ "/license.tmp"/][#--include License text --]
+[@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
 /* USER CODE END Header */

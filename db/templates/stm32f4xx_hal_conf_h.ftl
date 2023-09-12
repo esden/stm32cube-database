@@ -39,14 +39,29 @@
   */
 #define HAL_MODULE_ENABLED  
 
-  [#assign allModules = ["ADC","AES","CAN","CRC", "CAN_LEGACY", "CRYP","DAC","DCMI","DMA2D","ETH","NAND","NOR","PCCARD","SRAM","SDRAM","HASH","I2C","I2S","IWDG","LTDC","RNG","RTC","SAI","SD","MMC","SPI","TIM","UART","USART","IRDA","SMARTCARD","SMBUS","WWDG","PCD","HCD", "DSI","QSPI","QUADSPI","CEC","FMPI2C","FMPSMBUS","SPDIFRX", "DFSDM","LPTIM"]]
-  [#list allModules as module]
-	[#if isModuleUsed(module)]
+  [#assign allModules = ["AES", "CRYP","ADC","CAN","CRC", "CAN_LEGACY","DAC","DCMI","DMA2D","ETH","NAND","NOR","PCCARD","SRAM","SDRAM","HASH","I2C","I2S","IWDG","LTDC","RNG","RTC","SAI","SD","MMC","SPI","TIM","UART","USART","IRDA","SMARTCARD","SMBUS","WWDG","PCD","HCD", "DSI","QSPI","QUADSPI","CEC","FMPI2C","FMPSMBUS","SPDIFRX", "DFSDM","LPTIM"]]
+[#assign isUsed=false]
+[#list allModules as module]
+[#if isModuleUsed(module)]
+[#if (module = "AES" || module = "CRYP") && !isUsed]
+[#assign isUsed=true]
 [#compress]#define HAL_${module?replace("QUADSPI","QSPI")?replace("AES","CRYP")}_MODULE_ENABLED[/#compress]
-	[#else]
-/* #define HAL_${module?replace("QUADSPI","QSPI")?replace("AES","CRYP")}_MODULE_ENABLED   */
-	[/#if]	
-  [/#list]
+[#else]
+[#compress]#define HAL_${module?replace("QUADSPI","QSPI")?replace("AES","CRYP")}_MODULE_ENABLED[/#compress]
+[#assign isUsed=false]
+[/#if]
+[#else]
+[#if isUsed && (module = "CRYP")]
+[#assign isUsed=false]
+[#continue]
+[#else]
+[#if module != "AES"]
+[#compress]/* #define HAL_${module?replace("QUADSPI","QSPI")}_MODULE_ENABLED */[/#compress]
+[#assign isUsed=true]
+[/#if]
+[/#if]
+[/#if]
+[/#list]
   [#function isModuleUsed moduleName]
 	[#assign used=false]
 	[#list modules as usedModule]
@@ -191,7 +206,7 @@
 #define MAC_ADDR5   0U
 
 /* Definition of the Ethernet driver buffers size and count */   
-#define ETH_RX_BUF_SIZE                ETH_MAX_PACKET_SIZE /* buffer size for receive               */
+#define ETH_RX_BUF_SIZE                [#if RxBuffLen??]${RxBuffLen}[/#if] /* buffer size for receive               */
 #define ETH_TX_BUF_SIZE                ETH_MAX_PACKET_SIZE /* buffer size for transmit              */
 #define ETH_RXBUFNB                    [#if ETH_RXBUFNB??]${ETH_RXBUFNB}[#if ETH_RXBUFNB?matches("(0x[0-9]*[a-f]*[A-F]*)|([0-9]*)")]U[/#if][#else]4U[/#if]       /* 4 Rx buffers of size ETH_RX_BUF_SIZE  */
 #define ETH_TXBUFNB                    [#if ETH_TXBUFNB??]${ETH_TXBUFNB}[#if ETH_TXBUFNB?matches("(0x[0-9]*[a-f]*[A-F]*)|([0-9]*)")]U[/#if][#else]4U[/#if]       /* 4 Tx buffers of size ETH_TX_BUF_SIZE  */

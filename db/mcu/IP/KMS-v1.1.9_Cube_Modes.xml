@@ -1,0 +1,710 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<IP xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance"
+    ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd"
+     xmlns="http://mcd.rou.st.com/modules.php?name=mcu"
+     DBVersion="V6.0"
+    IPType="middleware"
+    IpGroup="Middleware"
+    Name="KMS"
+     Version="v1.1.9_Cube">
+    <About>Key Management Services (KMS) provides cryptographic services through the standard PKCS#11 APIs (developed by OASIS) allowing to abstract the key value to the caller (using object ID and not directly the key value). KMS can be executed inside a protected/isolated environment in order to ensure that key value can’t be accessed by an unauthorized code running outside the protected/isolated environment.</About>
+
+    <!-- KMS Services -->
+    <!-- RefParameters for KMS - Version-->
+    <RefParameter Name="KMS_Version" Comment="KMS version" DefaultValue="1.1.9" Type="String" Group="Version">
+        <PossibleValue Comment="Current version of KMS" Value="1.1.9"/>
+    </RefParameter>
+    <RefParameter Name="NULL" Comment="NULL" DefaultValue="__NULL" Type="String" Group="" Visible="false"/>
+
+    <!-- KMS_HW_Config Hardware -->
+    <RefParameter Name="KMS_EXT_TOKEN_ENABLED" Comment="support External Token" DefaultValue="no" Type="list" Group="Hardware Configuration" Visible="false">
+        <!-- PossibleValue Value="#define KMS_EXT_TOKEN_ENABLED" Comment="yes"/-->
+        <PossibleValue Value="//#define KMS_EXT_TOKEN_ENABLED" Comment="no"/>
+        <Description>KMS_EXT_TOKEN_ENABLED : to support External Token</Description>
+    </RefParameter>
+
+    <!-- KMS_Storage_Config Storage -->
+    <RefParameter Name="KMS_NVM_ENABLED" Comment="support Non Volatile Memory storage" DefaultValue="yes" Type="list" Group="Storage Configuration">
+        <PossibleValue Value="#define KMS_NVM_ENABLED" Comment="yes" Semaphore="S_KMS_NVM_ENABLED"/>
+        <PossibleValue Value="//#define KMS_NVM_ENABLED" Comment="no"/>
+        <Description>KMS_NVM_ENABLED : to support Non Volatile Memory storage&lt;br&gt;
+        Mandatory to handle runtime objects addition through blob import or creation through specific KMS services&lt;br&gt;
+        Requires @ref KMS_NVM_SLOT_NUMBERS to be defined</Description>
+    </RefParameter>
+
+    <RefParameter Name="KMS_NVM_DYNAMIC_ENABLED" Comment="support Dynamic Non Volatile Memory storage" DefaultValue="no" Type="list" Group="Storage Configuration">
+        <PossibleValue Value="//#define KMS_NVM_DYNAMIC_ENABLED" Comment="no"/>
+        <PossibleValue Value="#define KMS_NVM_DYNAMIC_ENABLED" Comment="yes" Semaphore="S_KMS_NVM_DYNAMIC_ENABLED" Condition="!S_KMS_NVM_ENABLED | S_KMS_VM_DYNAMIC_ENABLED" Diagnostic="only available when KMS support Non Volatile Memory storage (KMS_NVM_ENABLED) is defined &amp; support Dynamic Volatile Memory storage (KMS_VM_DYNAMIC_ENABLED) is not defined"/>
+        <Description>KMS_NVM_DYNAMIC_ENABLED : to support Non Volatile Memory storage&lt;br&gt;
+        Mandatory to handle runtime objects creation through specific KMS services&lt;br&gt;
+        Requires "support Non Volatile Memory storage" (KMS_NVM_ENABLED) to be defined</Description>
+    </RefParameter>
+    <RefParameter Name="KMS_NVM_SLOT_NUMBERS" Comment="number of slots to use in the Non Volatile Memory storage" DefaultValue="50" Min="1" Max="300" Type="integer" Group="Storage Configuration">
+        <Condition Expression="S_KMS_NVM_DYNAMIC_ENABLED" Diagnostic="Requires support Non Volatile Memory storage (KMS_NVM_ENABLED) to be defined"/>
+        <Description>KMS_NVM_SLOT_NUMBERS : Specify here the number of slots to use in the Non Volatile Memory storage&lt;br&gt;
+        NVM slots correspond to storage slots, it should be at least equal to the number of keys you'll store&lt;br&gt;
+        into NVM. But if you intend to manipulate objects (create, destroy, derivate...) better use a greater&lt;br&gt;
+        number to avoid too much erase of the flash sectors containing the NVM storage.&lt;br&gt;
+        Memory impact is a 4 bytes per slot to store slot address in NVM.&lt;br&gt;
+        Mandatory to set if "support Non Volatile Memory storage" (KMS_NVM_ENABLED) is defined</Description>
+    </RefParameter>
+
+    <RefParameter Name="KMS_VM_DYNAMIC_ENABLED" Comment="support Dynamic Volatile Memory storage" DefaultValue="no" Type="list" Group="Storage Configuration">
+        <PossibleValue Value="//#define KMS_VM_DYNAMIC_ENABLED" Comment="no"/>
+        <PossibleValue Value="#define KMS_VM_DYNAMIC_ENABLED" Comment="yes" Semaphore="S_KMS_VM_DYNAMIC_ENABLED" Condition="S_KMS_NVM_DYNAMIC_ENABLED" Diagnostic="only available when KMS support Dynamic Non Volatile Memory storage (KMS_NVM_DYNAMIC_ENABLED) is not defined"/>
+        <Description>KMS_VM_DYNAMIC_ENABLED : to support Volatile Memory storage&lt;br&gt;
+        Mandatory to handle runtime objects creation through specific KMS services</Description>
+    </RefParameter>
+    <RefParameter Name="KMS_VM_SLOT_NUMBERS" Comment="number of slots to use in the Volatile Memory storage" DefaultValue="50" Min="1" Max="300" Type="integer" Group="Storage Configuration">
+        <Condition Expression="S_KMS_VM_DYNAMIC_ENABLED" Diagnostic="Requires support Volatile Memory storage (KMS_VM_DYNAMIC_ENABLED) to be defined"/>
+        <Description>KMS_VM_SLOT_NUMBERS : Specify here the number of slots to use in the Volatile Memory storage&lt;br&gt;
+        VM slots correspond to storage slots, it should be at least equal to the number of keys you'll store&lt;br&gt;
+        into VM.&lt;br&gt;
+        Memory impact is a 4 bytes per slot to store slot address in VM.&lt;br&gt;
+        Mandatory to set if "support Non Volatile Memory storage" (KMS_VM_DYNAMIC_ENABLED) is defined</Description>
+    </RefParameter>
+
+    <!-- KMS_Config Services -->
+    <RefParameter Name="KMS_NB_SESSIONS_MAX" Comment="number of sessions KMS will be able to handle in parallel" DefaultValue="10" Min="1" Max="50" Type="integer" Group="Services Configuration">
+        <Description>KMS_NB_SESSIONS_MAX : Defines the number of sessions KMS will be able to handle in parallel&lt;br&gt;
+        This value has an impact on memory footprint</Description>
+    </RefParameter>
+
+    <!-- KMS_PKCS_Config PKCS#11 services -->
+    <RefParameter Name="KMS_ENCRYPT" Comment="support encryption services" DefaultValue="yes" Type="list" Group="PKCS#11 Services Configuration">
+        <PossibleValue Value="//#define KMS_ENCRYPT" Comment="no"/>
+        <Description>KMS_ENCRYPT : to support encryption services&lt;br&gt;
+        Requires a supported encryption algorithm to be enabled too:&lt;br&gt;
+        - KMS_AES_CBC&lt;br&gt;
+        - KMS_AES_CCM&lt;br&gt;
+        - KMS_AES_ECB&lt;br&gt;
+        - KMS_AES_GCM</Description>
+    </RefParameter>
+    <RefParameter Name="KMS_DECRYPT" Comment="support decryption services" DefaultValue="yes" Type="list" Group="PKCS#11 Services Configuration">
+        <PossibleValue Value="//#define KMS_DECRYPT" Comment="no"/>
+        <Description>KMS_DECRYPT : to support decryption services&lt;br&gt;
+        Requires a supported decryption algorithm to be enabled too:&lt;br&gt;
+        - KMS_AES_CBC&lt;br&gt;
+        - KMS_AES_CCM&lt;br&gt;
+        - KMS_AES_ECB&lt;br&gt;
+        - KMS_AES_GCM</Description>
+    </RefParameter>
+    <RefParameter Name="KMS_DIGEST" Comment="support digest services" DefaultValue="yes" Type="list" Group="PKCS#11 Services Configuration">
+        <PossibleValue Value="//#define KMS_DIGEST" Comment="no"/>
+        <Description>KMS_DIGEST : to support digest services&lt;br&gt;
+        Requires a supported digest algorithm to be enabled too:&lt;br&gt;
+        - KMS_SHA1&lt;br&gt;
+        - KMS_SHA256</Description>
+    </RefParameter>
+    <RefParameter Name="KMS_SIGN" Comment="support signature services" DefaultValue="yes" Type="list" Group="PKCS#11 Services Configuration">
+        <PossibleValue Value="//#define KMS_SIGN" Comment="no"/>
+        <Description>KMS_SIGN : to support signature services&lt;br&gt;
+        Requires a supported signature algorithm to be enabled too:&lt;br&gt;
+        - KMS_RSA1&lt;br&gt;
+        - KMS_AES_CMAC</Description>
+    </RefParameter>
+    <RefParameter Name="KMS_VERIFY" Comment="support verification services" DefaultValue="yes" Type="list" Group="PKCS#11 Services Configuration">
+        <PossibleValue Value="//#define KMS_VERIFY" Comment="no"/>
+        <Description>KMS_VERIFY : to support verification services&lt;br&gt;
+        Requires a supported verification algorithm to be enabled too:&lt;br&gt;
+        - KMS_RSA1&lt;br&gt;
+        - KMS_ECDSA&lt;br&gt;
+        - KMS_AES_CMAC</Description>
+    </RefParameter>
+    <RefParameter Name="KMS_DERIVE_KEY" Comment="support key derivation services" DefaultValue="yes" Type="list" Group="PKCS#11 Services Configuration">
+        <PossibleValue Value="//#define KMS_DERIVE_KEY" Comment="no"/>
+        <Description>KMS_DERIVE_KEY : to support key derivation services&lt;br&gt;
+        Requires a supported derivation algorithm to be enabled too:&lt;br&gt;
+        - KMS_AES_ECB&lt;br&gt;
+        <!-- - KMS_ECDSA&lt;br&gt; -->
+        Requires KMS_NVM_DYNAMIC_ENABLED to be enabled to store derived key into NVM&lt;br&gt;
+          or @ref KMS_VM_DYNAMIC_ENABLED to be enabled to store derived key into VM</Description>
+    </RefParameter>
+    <RefParameter Name="KMS_SEARCH" Comment="support key search or mechanism search services" DefaultValue="yes" Type="list" Group="PKCS#11 Services Configuration">
+        <PossibleValue Value="//#define KMS_SEARCH" Comment="no"/>
+        <Description>KMS_SEARCH : to support key search or mechanism search services</Description>
+    </RefParameter>
+    <RefParameter Name="KMS_GENERATE_KEYS" Comment="support key generation services" DefaultValue="no" Type="list" Group="PKCS#11 Services Configuration" Visible="false">
+        <PossibleValue Value="//#define KMS_GENERATE_KEYS" Comment="no"/>
+        <Description>KMS_GENERATE_KEYS : to support key generation services&lt;br&gt;
+        Requires a supported key generation algorithm to be enabled too:&lt;br&gt;
+        - KMS_ECDSA&lt;br&gt;
+        Requires KMS_NVM_DYNAMIC_ENABLED to be enabled to store generated key into NVM&lt;br&gt;
+          or @ref KMS_VM_DYNAMIC_ENABLED to be enabled to store generated key into VM</Description>
+    </RefParameter>
+    <RefParameter Name="KMS_ATTRIBUTES" Comment="support attributes manipulation services" DefaultValue="yes" Type="list" Group="PKCS#11 Services Configuration">
+        <PossibleValue Value="//#define KMS_ATTRIBUTES" Comment="no"/>
+        <Description>KMS_ATTRIBUTES : to support attributes manipulation services&lt;br&gt;
+        Requires @ref KMS_NVM_DYNAMIC_ENABLED or @ref KMS_VM_DYNAMIC_ENABLED to be enabled&lt;br&gt;
+          in order to modify attributes</Description>
+    </RefParameter>
+    <RefParameter Name="KMS_OBJECTS" Comment="support objects manipulation services" DefaultValue="yes" Type="list" Group="PKCS#11 Services Configuration">
+        <PossibleValue Value="//#define KMS_OBJECTS" Comment="no"/>
+        <Description>KMS_OBJECTS : to support objects manipulation services&lt;br&gt;
+        Requires KMS_NVM_DYNAMIC_ENABLED to be enabled to create or delete objects into NVM&lt;br&gt;
+          or @ref KMS_VM_DYNAMIC_ENABLED to be enabled to create or delete objects into VM</Description>
+    </RefParameter>
+    <RefParameter Name="KMS_PKCS11_GET_FUNCTION_LIST_SUPPORT" Comment="support C_GetFunctionList API" DefaultValue="yes" Type="list" Group="PKCS#11 Services Configuration">
+        <PossibleValue Value="//#define KMS_PKCS11_GET_FUNCTION_LIST_SUPPORT" Comment="no"/>
+        <Description>KMS_PKCS11_GET_FUNCTION_LIST_SUPPORT : to support C_GetFunctionList API&lt;br&gt;
+        Disabling this feature allows to save some code footprint</Description>
+    </RefParameter>
+    <RefParameter Name="KMS_PKCS11_COMPLIANCE" Comment="support PKCS11 APIs and implementation that are required to be compliant with PKCS11 standard" DefaultValue="yes" Type="list" Group="PKCS#11 Services Configuration">
+        <PossibleValue Value="//#define KMS_PKCS11_COMPLIANCE" Comment="no"/>
+        <Description>KMS_PKCS11_COMPLIANCE : to support PKCS11 APIs and implementation that are required&lt;br&gt;
+        to be compliant with PKCS11 standard&lt;br&gt;
+        Disabling this feature allows to save some code footprint</Description>
+    </RefParameter>
+    <RefParameter Name="KMS_NIKMS_ROUTER_BYPASS" Comment="bypass KMS router and perform direct KMS API calls" DefaultValue="yes" Type="list" Group="PKCS#11 Services Configuration">
+        <PossibleValue Value="//#define KMS_NIKMS_ROUTER_BYPASS" Comment="no"/>
+        <Description>KMS_NIKMS_ROUTER_BYPASS : to bypass KMS router and perform direct KMS API calls&lt;br&gt;
+        Only applicable when using 'niKMS' access&lt;br&gt;
+        Enabling this feature allows to save some code footprint, but forbid any use of the external token services</Description>
+    </RefParameter>
+    <RefParameter Name="KMS_IMPORT_BLOB" Comment="use vendor defined blob import features" DefaultValue="no" Type="list" Group="PKCS#11 Services Configuration">
+        <PossibleValue Value="//#define KMS_IMPORT_BLOB" Comment="no"/>
+        <Description>KMS_IMPORT_BLOB : to use vendor defined blob import features&lt;br&gt;
+        Requires KMS_NVM_ENABLED to store imported keys&lt;br&gt;
+        Requires the following services and algorithm to Authenticate, Verify and decrypt the imported blobs:&lt;br&gt;
+        - KMS_DECRYPT&lt;br&gt;
+        - KMS_AES_CBC&lt;br&gt;
+        - KMS_DIGEST&lt;br&gt;
+        - KMS_SHA256&lt;br&gt;
+        - KMS_VERIFY&lt;br&gt;
+        - KMS_ECDSA&lt;br&gt;
+        - KMS_EC_SECP256&lt;br&gt;</Description>
+    </RefParameter>
+    <RefParameter Name="KMS_IMPORT_BLOB_CHUNK_SIZE" Comment="Configure the blob importation chunk size" DefaultValue="512" Min="0" Type="integer" Group="PKCS#11 Services Configuration" Visible="false">
+        <!-- Condition Expression="S_KMS_IMPORT_BLOB" Diagnostic="only available when KMS_IMPORT_BLOB is enabled"/-->
+        <Description>KMS_IMPORT_BLOB_CHUNK_SIZE : Configure the blob importation chunk size&lt;br&gt;
+        - This size must be a multiple of 4&lt;br&gt;
+        - This size must be greater to at least the blob import header size (@ref KMS_BlobRawHeaderTypeDef)&lt;br&gt;
+        Requires KMS_IMPORT_BLOB to be enabled</Description>
+    </RefParameter>
+    <RefParameter Name="KMS_ENCRYPT_DECRYPT_BLOB" Comment="enable the encryption of the blobs within the KMS data storage" DefaultValue="no" Type="list" Group="PKCS#11 Services Configuration">
+        <PossibleValue Value="//#define KMS_ENCRYPT_DECRYPT_BLOB" Comment="no"/>
+        <Description>KMS_ENCRYPT_DECRYPT_BLOB : Enable the encryption of the blobs within the KMS data storage&lt;br&gt;
+        Requires KMS_VM_DYNAMIC_ENABLED to be defined</Description>
+    </RefParameter>
+    <RefParameter Name="KMS_SECURE_COUNTERS" Comment="support KMS secure counters" DefaultValue="no" Type="list" Group="PKCS#11 Services Configuration">
+        <PossibleValue Value="//#define KMS_SECURE_COUNTERS" Comment="no"/>
+        <Description>KMS_SECURE_COUNTERS : to support KMS secure counters&lt;br&gt;
+        Mandatory to handle counter objects through specific KMS services&lt;br&gt;
+        Requires @ref KMS_NVM_ENABLED or @ref KMS_VM_DYNAMIC_ENABLED to be defined</Description>
+    </RefParameter>
+
+
+    <!-- KMS_Memory_Config Memory management -->
+    <RefParameter Name="KMS_MEM_USE_ALLOCATOR" Comment="perform dynamic allocation" DefaultValue="no" Type="list" Group="Memory management Configuration">
+        <PossibleValue Value="KMS_MEM_USE_HEAP_ALLOCATOR" Comment="in HEAP" Semaphore="S_KMS_MEM_USE_HEAP_ALLOCATOR"/>
+        <PossibleValue Value="KMS_MEM_USE_POOL_ALLOCATOR" Comment="using internal pool allocator" Semaphore="S_KMS_MEM_USE_POOL_ALLOCATOR"/>
+        <PossibleValue Value="KMS_MEM_USE_CUSTOM_ALLOCATOR" Comment="using a custom allocator" Semaphore="S_KMS_MEM_USE_CUSTOM_ALLOCATOR"/>
+        <Description>KMS_MEM_USE_HEAP_ALLOCATOR : to perform dynamic allocation in HEAP&lt;br&gt;
+        - KMS will use standard malloc and free APIs&lt;br&gt;
+        - Requires a dynamic allocator provided by the toolchain like dlmalloc&lt;br&gt;
+        KMS_MEM_USE_POOL_ALLOCATOR : to perform dynamic allocation using internal pool allocator&lt;br&gt;
+        - Requires a pool definition in a file called kms_mem_pool_def.h (see kms_mem_pool_def_template.h for example)&lt;br&gt;
+        KMS_MEM_USE_CUSTOM_ALLOCATOR : to perform dynamic allocation using a custom allocator&lt;br&gt;
+        To use this custom allocator, implement the kms_mem_low_level.c&lt;br&gt;
+        - void KMS_MemInit(void)&lt;br&gt;
+        - CK_VOID_PTR KMS_Alloc(CK_SESSION_HANDLE session, size_t size)&lt;br&gt;
+        - void KMS_Free(CK_SESSION_HANDLE session, CK_VOID_PTR ptr)</Description>
+    </RefParameter>
+    <RefParameter Name="KMS_MEM_USE_HEAP_ALLOCATOR" Comment="perform dynamic allocation in HEAP" DefaultValue="yes" Type="list" Group="Memory management Configuration" Visible="false">
+        <PossibleValue Value="#define KMS_MEM_USE_HEAP_ALLOCATOR" Comment="yes" Condition="!S_KMS_MEM_USE_HEAP_ALLOCATOR"/>
+        <PossibleValue Value="//#define KMS_MEM_USE_HEAP_ALLOCATOR" Comment="no"/>
+        <Description>KMS_MEM_USE_HEAP_ALLOCATOR : to perform dynamic allocation in HEAP&lt;br&gt;
+        - KMS will use standard malloc and free APIs&lt;br&gt;
+        - Requires a dynamic allocator provided by the toolchain like dlmalloc&lt;br&gt;
+        KMS_MEM_USE_HEAP_ALLOCATOR, KMS_MEM_USE_POOL_ALLOCATOR and KMS_MEM_USE_CUSTOM_ALLOCATOR are mutually exclusive</Description>
+    </RefParameter>
+    <RefParameter Name="KMS_MEM_USE_POOL_ALLOCATOR" Comment="perform dynamic allocation using internal pool allocator" DefaultValue="yes" Type="list" Group="Memory management Configuration" Visible="false">
+        <PossibleValue Value="#define KMS_MEM_USE_POOL_ALLOCATOR" Comment="yes" Condition="!S_KMS_MEM_USE_POOL_ALLOCATOR"/>
+        <PossibleValue Value="//#define KMS_MEM_USE_POOL_ALLOCATOR" Comment="no"/>
+        <Description>KMS_MEM_USE_POOL_ALLOCATOR : to perform dynamic allocation using internal pool allocator&lt;br&gt;
+        - Requires a pool definition in a file called kms_mem_pool_def.h (see kms_mem_pool_def_template.h for example)&lt;br&gt;
+        KMS_MEM_USE_HEAP_ALLOCATOR, KMS_MEM_USE_POOL_ALLOCATOR and KMS_MEM_USE_CUSTOM_ALLOCATOR are mutually exclusive</Description>
+    </RefParameter>
+    <RefParameter Name="KMS_MEM_USE_CUSTOM_ALLOCATOR" Comment="perform dynamic allocation using custom allocator" DefaultValue="yes" Type="list" Group="Memory management Configuration" Visible="false">
+        <PossibleValue Value="#define KMS_MEM_USE_CUSTOM_ALLOCATOR" Comment="yes" Condition="!S_KMS_MEM_USE_CUSTOM_ALLOCATOR"/>
+        <PossibleValue Value="//#define KMS_MEM_USE_CUSTOM_ALLOCATOR" Comment="no"/>
+        <Description>KMS_MEM_USE_CUSTOM_ALLOCATOR : to perform dynamic allocation using a custom allocator&lt;br&gt;
+        To use this custom allocator, implement the kms_mem_low_level.c&lt;br&gt;
+        - void KMS_MemInit(void)&lt;br&gt;
+        - CK_VOID_PTR KMS_Alloc(CK_SESSION_HANDLE session, size_t size)&lt;br&gt;
+        - void KMS_Free(CK_SESSION_HANDLE session, CK_VOID_PTR ptr)&lt;br&gt;
+        KMS_MEM_USE_HEAP_ALLOCATOR, KMS_MEM_USE_POOL_ALLOCATOR and KMS_MEM_USE_CUSTOM_ALLOCATOR are mutually exclusive</Description>
+    </RefParameter>
+    <RefParameter Name="KMS_MEM_DEBUGGING" Comment="keep memory profiling information" DefaultValue="yes" Type="list" Group="Memory management Configuration">
+        <PossibleValue Value="#define KMS_MEM_DEBUGGING" Comment="yes" Condition="S_KMS_MEM_USE_CUSTOM_ALLOCATOR" Diagnostic="Not usable when perform dynamic allocation using custom allocator (KMS_MEM_USE_CUSTOM_ALLOCATOR)"/>
+        <PossibleValue Value="//#define KMS_MEM_DEBUGGING" Comment="no" Condition="S_KMS_MEM_CLEANING &amp; S_KMS_MEM_USE_HEAP_ALLOCATOR" Diagnostic="Not usable when clean dynamically freed memory (KMS_MEM_CLEANING) &amp; perform dynamic allocation in HEAP(KMS_MEM_USE_HEAP_ALLOCATOR)"/>
+        <Description>KMS_MEM_DEBUGGING : to keep memory profiling information&lt;br&gt;
+        Not usable with KMS_MEM_USE_CUSTOM_ALLOCATOR</Description>
+    </RefParameter>
+    <RefParameter Name="KMS_MEM_CLEANING" Comment="clean dynamically freed memory" DefaultValue="yes" Type="list" Group="Memory management Configuration">
+        <PossibleValue Value="#define KMS_MEM_CLEANING" Comment="yes" Semaphore="S_KMS_MEM_CLEANING" Condition="S_KMS_MEM_USE_CUSTOM_ALLOCATOR" Diagnostic="Not usable when perform dynamic allocation using custom allocator (KMS_MEM_USE_CUSTOM_ALLOCATOR)"/>
+        <PossibleValue Value="//#define KMS_MEM_CLEANING" Comment="no"/>
+        <Description>KMS_MEM_CLEANING : to clean dynamically freed memory&lt;br&gt;
+        The freed memory will be reset to 0&lt;br&gt;
+        If using KMS_MEM_USE_HEAP_ALLOCATOR, KMS_MEM_DEBUGGING required&lt;br&gt;
+        Not usable with KMS_MEM_USE_CUSTOM_ALLOCATOR</Description>
+    </RefParameter>
+    <RefParameter Name="KMS_MEM_LOGGING" Comment="log memory allocation information" DefaultValue="yes" Type="list" Group="Memory management Configuration">
+        <PossibleValue Value="#define KMS_MEM_LOGGING" Comment="yes" Condition="S_KMS_MEM_USE_CUSTOM_ALLOCATOR" Diagnostic="Not usable when perform dynamic allocation using custom allocator (KMS_MEM_USE_CUSTOM_ALLOCATOR)"/>
+        <PossibleValue Value="//#define KMS_MEM_LOGGING" Comment="no"/>
+        <Description>KMS_MEM_LOGGING : to log memory allocation information&lt;br&gt;
+        Information about allocations will be transmitted to KMS_LL_ReportMemAlloc and KMS_LL_ReportMemFree&lt;br&gt;
+        Not usable with KMS_MEM_USE_CUSTOM_ALLOCATOR</Description>
+    </RefParameter>
+
+    <!-- KMS_Security_Config Security Enforcement -->
+    <RefParameter Name="KMS_SE_CHECK_PARAMS" Comment="check input &amp; output parameters location vs secure enclave" DefaultValue="no" Type="list" Group="Security Enforcement Configuration" Visible="false">
+        <!-- PossibleValue Value="#define KMS_SE_CHECK_PARAMS" Comment="yes"/-->
+        <PossibleValue Value="//#define KMS_SE_CHECK_PARAMS" Comment="no"/>
+        <Description>KMS_SE_CHECK_PARAMS : to check input &amp; output parameters location vs secure enclave&lt;br&gt;
+        Secure enforcement only applicable when using iKMS and secure enclave</Description>
+    </RefParameter>
+    <RefParameter Name="KMS_SE_LOCK_KEYS" Comment="use key locking services" DefaultValue="no" Type="list" Group="Security Enforcement Configuration" Visible="false">
+        <!-- PossibleValue Value="#define KMS_SE_LOCK_KEYS" Comment="yes"/-->
+        <PossibleValue Value="//#define KMS_SE_LOCK_KEYS" Comment="no"/>
+        <Description>KMS_SE_CHECK_PARAMS : to use key locking services&lt;br&gt;
+        Secure enforcement only applicable when using iKMS and secure enclave</Description>
+    </RefParameter>
+    <RefParameter Name="KMS_SE_LOCK_KEYS_MAX" Comment="the number of keys that can be locked" DefaultValue="10" Type="integer" Group="Security Enforcement Configuration" Visible="false">
+        <Description>KMS_SE_LOCK_KEYS_MAX : the number of keys that can be locked&lt;br&gt;
+        Mandatory to set if KMS_SE_LOCK_KEYS is defined</Description>
+    </RefParameter>
+    <RefParameter Name="KMS_SE_LOCK_SERVICES" Comment="use services locking services" DefaultValue="no" Type="list" Group="Security Enforcement Configuration" Visible="false">
+        <!--PossibleValue Value="#define KMS_SE_LOCK_SERVICES" Comment="yes"/-->
+        <PossibleValue Value="//#define KMS_SE_LOCK_SERVICES" Comment="no"/>
+        <Description>KMS_SE_LOCK_SERVICES : to use services locking services&lt;br&gt;
+        Secure enforcement only applicable when using iKMS and secure enclave</Description>
+    </RefParameter>
+    <RefParameter Name="KMS_SE_LOCK_SERVICES_MAX" Comment="the number of services that can be locked" DefaultValue="2" Type="integer" Group="Security Enforcement Configuration" Visible="false">
+        <Description>KMS_SE_LOCK_SERVICES_MAX : the number of services that can be locked&lt;br&gt;
+        Mandatory to set if KMS_SE_LOCK_SERVICES is defined</Description>
+    </RefParameter>
+
+    <!-- KMS_Features_Config Features -->
+    <RefParameter Name="KMS_ACTIVATED_Encrypt_Service" Comment="encryption service" Group="Features Configuration" Type="string" DefaultValue="not activated">
+        <Condition Expression="!S_KMS_ENCRYPT" Diagnostic="encryption service not activated"/>
+    </RefParameter>
+    <RefParameter Name="KMS_ACTIVATED_Encrypt_Service" Comment="encryption service" Group="Features Configuration" Type="list" DefaultValue="please associate an algorithm to this service">
+        <Condition Expression="S_KMS_ENCRYPT &amp; !(S_KMS_ENCRYPT_USED | S_KMS_ENCRYPT_DECRYPT_USED | S_KMS_ENCRYPT_DERIVE_KEY_USED | S_KMS_ENCRYPT_DECRYPT_DERIVE_KEY_USED)" Diagnostic="encryption service should be used by a feature"/>
+    </RefParameter>
+    <RefParameter Name="KMS_ACTIVATED_Encrypt_Service" Comment="encryption service" Group="Features Configuration" Type="string" DefaultValue="activated and associated to an algorithm"/>
+
+    <RefParameter Name="KMS_ACTIVATED_Decrypt_Service" Comment="decryption service" Group="Features Configuration" Type="string" DefaultValue="not activated">
+        <Condition Expression="!S_KMS_DECRYPT" Diagnostic="decryption service not activated"/>
+    </RefParameter>
+    <RefParameter Name="KMS_ACTIVATED_Decrypt_Service" Comment="decryption service" Group="Features Configuration" Type="list" DefaultValue="please associate an algorithm to this service">
+        <Condition Expression="S_KMS_DECRYPT &amp; !(S_KMS_DECRYPT_USED | S_KMS_ENCRYPT_DECRYPT_USED | S_KMS_DECRYPT_DERIVE_KEY_USED | S_KMS_ENCRYPT_DECRYPT_DERIVE_KEY_USED)" Diagnostic="decryption service should be used by a feature"/>
+    </RefParameter>
+    <RefParameter Name="KMS_ACTIVATED_Decrypt_Service" Comment="decryption service" Group="Features Configuration" Type="string" DefaultValue="activated and associated to an algorithm"/>
+
+    <RefParameter Name="KMS_ACTIVATED_Derive_Key_Service" Comment="key derivation service" Group="Features Configuration" Type="string" DefaultValue="not activated">
+        <Condition Expression="!S_KMS_DERIVE_KEY" Diagnostic="key derivation service not activated"/>
+    </RefParameter>
+    <RefParameter Name="KMS_ACTIVATED_Derive_Key_Service" Comment="key derivation service" Group="Features Configuration" Type="list" DefaultValue="please associate an algorithm to this service">
+        <Condition Expression="S_KMS_DERIVE_KEY &amp; !(S_KMS_DERIVE_KEY_USED | S_KMS_ENCRYPT_DERIVE_KEY_USED | S_KMS_DECRYPT_DERIVE_KEY_USED | S_KMS_ENCRYPT_DECRYPT_DERIVE_KEY_USED | S_KMS_VERIFY_DERIVE_KEY_USED | S_KMS_GENERATE_KEY_DERIVE_KEY_USED | S_KMS_VERIFY_GENERATE_KEY_DERIVE_KEY_USED)" Diagnostic="key derivation service should be used by a feature"/>
+    </RefParameter>
+    <RefParameter Name="KMS_ACTIVATED_Derive_Key_Service" Comment="key derivation service" Group="Features Configuration" Type="string" DefaultValue="activated and associated to an algorithm"/>
+
+    <RefParameter Name="KMS_ACTIVATED_Generate_Key_Service" Comment="key generation service" Group="Features Configuration" Type="string" DefaultValue="not activated" Visible="false">
+        <Condition Expression="!S_KMS_GENERATE_KEYS" Diagnostic="key generation service not activated"/>
+    </RefParameter>
+    <RefParameter Name="KMS_ACTIVATED_Generate_Key_Service" Comment="key generation service" Group="Features Configuration" Type="list" DefaultValue="please associate an algorithm to this service" Visible="false">
+        <Condition Expression="S_KMS_GENERATE_KEYS &amp; !(S_KMS_GENERATE_KEY_USED | S_KMS_VERIFY_GENERATE_KEY_USED | S_KMS_GENERATE_KEY_DERIVE_KEY_USED | S_KMS_VERIFY_GENERATE_KEY_DERIVE_KEY_USED)" Diagnostic="key generation service should be used by a feature"/>
+    </RefParameter>
+    <RefParameter Name="KMS_ACTIVATED_Generate_Key_Service" Comment="key generation service" Group="Features Configuration" Type="string" DefaultValue="activated and associated to an algorithm" Visible="false"/>
+
+    <RefParameter Name="KMS_ACTIVATED_Sign_Service" Comment="signature service" Group="Features Configuration" Type="string" DefaultValue="not activated">
+        <Condition Expression="!S_KMS_SIGN" Diagnostic="signature service not activated"/>
+    </RefParameter>
+    <RefParameter Name="KMS_ACTIVATED_Sign_Service" Comment="signature service" Group="Features Configuration" Type="list" DefaultValue="please associate an algorithm to this service">
+        <Condition Expression="S_KMS_SIGN &amp; !(S_KMS_SIGN_USED | S_KMS_SIGN_VERIFY_USED)" Diagnostic="signature service should be used by a feature"/>
+    </RefParameter>
+    <RefParameter Name="KMS_ACTIVATED_Sign_Service" Comment="signature service" Group="Features Configuration" Type="string" DefaultValue="activated and associated to an algorithm"/>
+
+    <RefParameter Name="KMS_ACTIVATED_Verify_Service" Comment="verification service" Group="Features Configuration" Type="string" DefaultValue="not activated">
+        <Condition Expression="!S_KMS_VERIFY" Diagnostic="verification service not activated"/>
+    </RefParameter>
+    <RefParameter Name="KMS_ACTIVATED_Verify_Service" Comment="verification service" Group="Features Configuration" Type="list" DefaultValue="please associate an algorithm to this service">
+        <Condition Expression="S_KMS_VERIFY &amp; !(S_KMS_VERIFY_USED | S_KMS_SIGN_VERIFY_USED | S_KMS_VERIFY_GENERATE_KEY_USED | S_KMS_VERIFY_DERIVE_KEY_USED | S_KMS_VERIFY_GENERATE_KEY_DERIVE_KEY_USED)" Diagnostic="verification service should be used by a feature"/>
+    </RefParameter>
+    <RefParameter Name="KMS_ACTIVATED_Verify_Service" Comment="verification service" Group="Features Configuration" Type="string" DefaultValue="activated and associated to an algorithm"/>
+
+    <RefParameter Name="KMS_ACTIVATED_Digest_Service" Comment="digest service" Group="Features Configuration" Type="string" DefaultValue="not activated">
+        <Condition Expression="!S_KMS_DIGEST" Diagnostic="digest service not activated"/>
+    </RefParameter>
+    <RefParameter Name="KMS_ACTIVATED_Digest_Service" Comment="digest service" Group="Features Configuration" Type="list" DefaultValue="please associate an algorithm to this service">
+        <Condition Expression="S_KMS_DIGEST &amp; !(S_KMS_DIGEST_USED)" Diagnostic="digest service should be used by a feature"/>
+    </RefParameter>
+    <RefParameter Name="KMS_ACTIVATED_Digest_Service" Comment="digest service" Group="Features Configuration" Type="string" DefaultValue="activated and associated to an algorithm"/>
+
+    <RefParameter Name="KMS_AES_CBC" Comment="support AES CBC algorithm" DefaultValue="no" Type="list" Group="Features Configuration">
+        <PossibleValue Value="" Comment="no"/>
+        <Description>KMS_AES_CBC : to support AES CBC algorithm&lt;br&gt;
+        This defines is a bit mask that include information on the algorithm purpose:&lt;br&gt;
+        - KMS_FCT_ENCRYPT          This algorithm can be used to perform encryption&lt;br&gt;
+        - KMS_FCT_DECRYPT          This algorithm can be used to perform decryption&lt;br&gt;
+        Requires at least one of the following PKCS#11 services to be enabled:&lt;br&gt;
+        - KMS_ENCRYPT&lt;br&gt;
+        - KMS_DECRYPT</Description>
+    </RefParameter>
+    <RefParameter Name="KMS_AES_CCM" Comment="support AES CCM algorithm" DefaultValue="no" Type="list" Group="Features Configuration">
+        <PossibleValue Value="" Comment="no"/>
+        <Description>KMS_AES_CCM : to support AES CCM algorithm&lt;br&gt;
+        This defines is a bit mask that include information on the algorithm purpose:&lt;br&gt;
+        - KMS_FCT_ENCRYPT          This algorithm can be used to perform encryption&lt;br&gt;
+        - KMS_FCT_DECRYPT          This algorithm can be used to perform decryption&lt;br&gt;
+        Requires at least one of the following PKCS#11 services to be enabled:&lt;br&gt;
+        - KMS_ENCRYPT&lt;br&gt;
+        - KMS_DECRYPT</Description>
+    </RefParameter>
+    <RefParameter Name="KMS_AES_ECB" Comment="support AES ECB algorithm" DefaultValue="no" Type="list" Group="Features Configuration">
+        <PossibleValue Value="" Comment="no"/>
+        <Description>KMS_AES_ECB : to support AES ECB algorithm&lt;br&gt;
+        This defines is a bit mask that include information on the algorithm purpose:&lt;br&gt;
+        - KMS_FCT_ENCRYPT          This algorithm can be used to perform encryption&lt;br&gt;
+        - KMS_FCT_DECRYPT          This algorithm can be used to perform decryption&lt;br&gt;
+        - KMS_FCT_DERIVE_KEY       This algorithm can be used to perform key derivation&lt;br&gt;
+        Requires at least one of the following PKCS#11 services to be enabled:&lt;br&gt;
+        - KMS_ENCRYPT
+        - KMS_DECRYPT&lt;br&gt;
+        - KMS_DERIVE_KEY</Description>
+    </RefParameter>
+    <RefParameter Name="KMS_AES_GCM" Comment="support AES GCM algorithm" DefaultValue="no" Type="list" Group="Features Configuration">
+        <PossibleValue Value="" Comment="no"/>
+        <Description>KMS_AES_GCM : to support AES GCM algorithm&lt;br&gt;
+        This defines is a bit mask that include information on the algorithm purpose:&lt;br&gt;
+        - KMS_FCT_ENCRYPT          This algorithm can be used to perform encryption&lt;br&gt;
+        - KMS_FCT_DECRYPT          This algorithm can be used to perform decryption&lt;br&gt;
+        Requires at least one of the following PKCS#11 services to be enabled:&lt;br&gt;
+        - KMS_ENCRYPT&lt;br&gt;
+        - KMS_DECRYPT</Description>
+    </RefParameter>
+    <RefParameter Name="KMS_AES_CMAC" Comment="support AES CMAC algorithm" DefaultValue="no" Type="list" Group="Features Configuration">
+        <PossibleValue Value="" Comment="no"/>
+        <Description>KMS_AES_CMAC : to support AES CMAC algorithm&lt;br&gt;
+        This defines is a bit mask that include information on the algorithm purpose:&lt;br&gt;
+        - KMS_FCT_SIGN             This algorithm can be used to perform signature&lt;br&gt;
+        - KMS_FCT_VERIFY           This algorithm can be used to perform verification&lt;br&gt;
+        Requires at least one of the following PKCS#11 services to be enabled:&lt;br&gt;
+        - KMS_SIGN&lt;br&gt;
+        - KMS_VERIFY</Description>
+    </RefParameter>
+
+    <RefParameter Name="KMS_RSA" Comment="support RSA algorithm" DefaultValue="no" Type="list" Group="Features Configuration">
+        <PossibleValue Value="" Comment="no"/>
+        <Description>KMS_RSA : to support RSA algorithm&lt;br&gt;
+        This defines is a bit mask that include information on the algorithm purpose:&lt;br&gt;
+        - KMS_FCT_SIGN             This algorithm can be used to perform signature&lt;br&gt;
+        - KMS_FCT_VERIFY           This algorithm can be used to perform verification&lt;br&gt;
+        Requires at least one of the following PKCS#11 services to be enabled:&lt;br&gt;
+        - KMS_SIGN&lt;br&gt;
+        - KMS_VERIFY&lt;br&gt;
+        Requires at least one of the following RSA modulus length to be enabled:&lt;br&gt;
+        - KMS_RSA_1024&lt;br&gt;
+        - KMS_RSA_2048</Description>
+    </RefParameter>
+
+    <RefParameter Name="KMS_RSA_Modulus" Comment="RSA algorithm" Group="Features Configuration" Type="string" DefaultValue="not activated">
+        <Condition Expression="!S_KMS_RSA" Diagnostic="RSA algorithm not activated"/>
+    </RefParameter>
+    <RefParameter Name="KMS_RSA_Modulus" Comment="RSA algorithm" Group="Features Configuration" Type="list" DefaultValue="please associate a modulus to this algorithm">
+        <Condition Expression="S_KMS_RSA &amp; !(S_KMS_RSA_1024 | S_KMS_RSA_2048)" Diagnostic="signature service should be used by a feature"/>
+    </RefParameter>
+    <RefParameter Name="KMS_RSA_Modulus" Comment="RSA algorithm" Group="Features Configuration" Type="string" DefaultValue="activated and associated to a modulus"/>
+
+    <RefParameter Name="KMS_RSA_1024" Comment="support RSA 1024 bits modulus length" DefaultValue="yes" Type="list" Group="Features Configuration">
+        <PossibleValue Value="//#define KMS_RSA_1024" Comment="no"/>
+        <Description>KMS_RSA_1024 : to support RSA 1024 bits modulus length&lt;br&gt;
+        Requires KMS_RSA to be defined</Description>
+    </RefParameter>
+    <RefParameter Name="KMS_RSA_2048" Comment="support RSA 2048 bits modulus length" DefaultValue="yes" Type="list" Group="Features Configuration">
+        <PossibleValue Value="//#define KMS_RSA_2048" Comment="no"/>
+        <Description>KMS_RSA_2048 : to support RSA 2048 bits modulus length&lt;br&gt;
+        Requires KMS_RSA to be defined</Description>
+    </RefParameter>
+
+    <RefParameter Name="KMS_ECDSA" Comment="support ECDSA algorithm" DefaultValue="no" Type="list" Group="Features Configuration">
+        <PossibleValue Value="" Comment="no"/>
+        <Description>KMS_ECDSA Uncomment the below line to support ECDSA algorithm&lt;br&gt;
+        This defines is a bit mask that include information on the algorithm purpose:&lt;br&gt;
+        - KMS_FCT_VERIFY           This algorithm can be used to perform verification&lt;br&gt;
+        <!-- - KMS_FCT_DERIVE_KEY       This algorithm can be used to perform key derivation&lt;br&gt;
+        - KMS_FCT_GENERATE_KEYS    This algorithm can be used to perform key generation&lt;br&gt;-->
+        Requires at least one of the following PKCS#11 services to be enabled:&lt;br&gt;
+        - KMS_VERIFY&lt;br&gt;
+        <!-- - KMS_DERIVE_KEY&lt;br&gt;
+        - KMS_GENERATE_KEYS&lt;br&gt;-->
+        Requires at least one of the following elliptic curve to be enabled:&lt;br&gt;
+        - KMS_EC_SECP192&lt;br&gt;
+        - KMS_EC_SECP256&lt;br&gt;
+        - KMS_EC_SECP384</Description>
+    </RefParameter>
+
+    <RefParameter Name="KMS_ECDSA_Elliptic_Curve" Comment="ECDSA algorithm" Group="Features Configuration" Type="string" DefaultValue="not activated">
+        <Condition Expression="!S_KMS_ECDSA" Diagnostic="RSA algorithm not activated"/>
+    </RefParameter>
+    <RefParameter Name="KMS_ECDSA_Elliptic_Curve" Comment="ECDSA algorithm" Group="Features Configuration" Type="list" DefaultValue="please associate an ellictic curve to this algorithm">
+        <Condition Expression="S_KMS_ECDSA &amp; !(S_KMS_ECDSA_SECP192 | S_KMS_ECDSA_SECP256 | S_KMS_ECDSA_SECP384)" Diagnostic="signature service should be used by a feature"/>
+    </RefParameter>
+    <RefParameter Name="KMS_ECDSA_Elliptic_Curve" Comment="ECDSA algorithm" Group="Features Configuration" Type="string" DefaultValue="activated and associated to an ellictic curve"/>
+
+    <RefParameter Name="KMS_EC_SECP192" Comment="support elliptic curve SECP-192" DefaultValue="yes" Type="list" Group="Features Configuration">
+        <PossibleValue Value="//#define KMS_EC_SECP192" Comment="no"/>
+        <Description>KMS_EC_SECP192 : to support elliptic curve SECP-192&lt;br&gt;
+        Requires KMS_ECDSA to be defined</Description>
+    </RefParameter>
+    <RefParameter Name="KMS_EC_SECP256" Comment="support elliptic curve SECP-256" DefaultValue="yes" Type="list" Group="Features Configuration">
+        <PossibleValue Value="//#define KMS_EC_SECP256" Comment="no"/>
+        <Description>KMS_EC_SECP256 : to support elliptic curve SECP-256&lt;br&gt;
+        Requires KMS_ECDSA to be defined</Description>
+    </RefParameter>
+    <RefParameter Name="KMS_EC_SECP384" Comment="support elliptic curve SECP-384" DefaultValue="yes" Type="list" Group="Features Configuration">
+        <PossibleValue Value="//#define KMS_EC_SECP384" Comment="no"/>
+        <Description>KMS_EC_SECP384 : to support elliptic curve SECP-384&lt;br&gt;
+        Requires KMS_ECDSA to be defined</Description>
+    </RefParameter>
+
+    <RefParameter Name="KMS_SHA1" Comment="support SHA1 digest algorithm" DefaultValue="no" Type="list" Group="Features Configuration">
+        <PossibleValue Value="" Comment="no"/>
+        <Description>KMS_SHA1 : to support SHA1 algorithm&lt;br&gt;
+        This defines is a bit mask that include information on the algorithm purpose:&lt;br&gt;
+        - KMS_FCT_DIGEST          This algorithm can be used to perform digesting&lt;br&gt;
+        Requires at least one of the following PKCS#11 services to be enabled:&lt;br&gt;
+        - KMS_DIGEST</Description>
+    </RefParameter>
+    <RefParameter Name="KMS_SHA256" Comment="support SHA256 digest algorithm" DefaultValue="no" Type="list" Group="Features Configuration">
+        <PossibleValue Value="" Comment="no"/>
+        <Description>KMS_SHA256 : to support SHA256 algorithm&lt;br&gt;
+        This defines is a bit mask that include information on the algorithm purpose:&lt;br&gt;
+        - KMS_FCT_DIGEST          This algorithm can be used to perform digesting&lt;br&gt;
+        Requires at least one of the following PKCS#11 services to be enabled:&lt;br&gt;
+        - KMS_DIGEST</Description>
+    </RefParameter>
+
+    <!-- RefMode -->
+    <RefMode Name="KMS_Common" Abstract="true" Group="KMS_Common">
+        <!-- Parameters for KMS - Version-->
+        <Parameter Name="KMS_Version"/>
+        <Parameter Name="NULL"/>
+    </RefMode>
+
+    <!-- RefMode for Microphone -->
+    <RefMode Name="KMS_Enabled" BaseMode="KMS_Common">
+        <ConfigForMode>KMS_Init</ConfigForMode>
+        <!-- KMS -->
+
+        <!-- File - kms_config_template.h -->
+
+        <!-- KMS_HW_Config Hardware -->
+        <Parameter Name="KMS_EXT_TOKEN_ENABLED"/>
+
+        <!-- KMS_Storage_Config Storage -->
+        <Parameter Name="KMS_NVM_ENABLED"/>
+        <Parameter Name="KMS_NVM_DYNAMIC_ENABLED"/>
+        <Parameter Name="KMS_NVM_SLOT_NUMBERS"/>
+        <Parameter Name="KMS_VM_DYNAMIC_ENABLED"/>
+        <Parameter Name="KMS_VM_SLOT_NUMBERS"/>
+
+        <!-- KMS_Config Services -->
+        <Parameter Name="KMS_NB_SESSIONS_MAX"/>
+
+        <!-- KMS_PKCS_Config PKCS#11 services -->
+        <Parameter Name="KMS_ENCRYPT">
+            <PossibleValue Comment="no">//#define KMS_ENCRYPT</PossibleValue>
+            <PossibleValue Comment="yes" Semaphore="S_KMS_ENCRYPT">#define KMS_ENCRYPT</PossibleValue>
+        </Parameter>
+        <Parameter Name="KMS_DECRYPT">
+            <PossibleValue Comment="no">//#define KMS_DECRYPT</PossibleValue>
+            <PossibleValue Comment="yes" Semaphore="S_KMS_DECRYPT">#define KMS_DECRYPT</PossibleValue>
+        </Parameter>
+        <Parameter Name="KMS_DIGEST">
+            <PossibleValue Comment="no">//#define KMS_DIGEST</PossibleValue>
+            <PossibleValue Comment="yes" Semaphore="S_KMS_DIGEST">#define KMS_DIGEST</PossibleValue>
+        </Parameter>
+        <Parameter Name="KMS_SIGN">
+            <PossibleValue Comment="no">//#define KMS_SIGN</PossibleValue>
+            <PossibleValue Comment="yes" Semaphore="S_KMS_SIGN">#define KMS_SIGN</PossibleValue>
+        </Parameter>
+        <Parameter Name="KMS_VERIFY">
+            <PossibleValue Comment="no">//#define KMS_VERIFY</PossibleValue>
+            <PossibleValue Comment="yes" Semaphore="S_KMS_VERIFY">#define KMS_VERIFY</PossibleValue>
+        </Parameter>
+        <Parameter Name="KMS_DERIVE_KEY">
+            <PossibleValue Comment="no">//#define KMS_DERIVE_KEY</PossibleValue>
+            <PossibleValue Comment="yes" Semaphore="S_KMS_DERIVE_KEY" Condition="!S_KMS_NVM_DYNAMIC_ENABLED &amp; !S_KMS_VM_DYNAMIC_ENABLED" Diagnostic="only available when KMS support Dynamic Non Volatile Memory storage (KMS_NVM_ENABLED) or support Dynamic Volatile Memory storage (KMS_VM_DYNAMIC_ENABLED) is defined">#define KMS_DERIVE_KEY</PossibleValue>
+        </Parameter>
+        <Parameter Name="KMS_SEARCH">
+            <PossibleValue Comment="no">//#define KMS_SEARCH</PossibleValue>
+            <PossibleValue Comment="yes">#define KMS_SEARCH</PossibleValue>
+        </Parameter>
+        <Parameter Name="KMS_GENERATE_KEYS">
+            <PossibleValue Comment="no">//#define KMS_GENERATE_KEYS</PossibleValue>
+            <!-- PossibleValue Comment="yes" Semaphore="S_KMS_GENERATE_KEYS" Condition="!S_KMS_NVM_DYNAMIC_ENABLED &amp; !S_KMS_VM_DYNAMIC_ENABLED" Diagnostic="only available when KMS support Dynamic Non Volatile Memory storage (KMS_NVM_ENABLED) or support Dynamic Volatile Memory storage (KMS_VM_DYNAMIC_ENABLED) is defined">#define KMS_GENERATE_KEYS</PossibleValue /-->
+        </Parameter>
+        <Parameter Name="KMS_ATTRIBUTES">
+            <PossibleValue Comment="no">//#define KMS_ATTRIBUTES</PossibleValue>
+            <PossibleValue Comment="yes" Condition="!S_KMS_NVM_DYNAMIC_ENABLED &amp; !S_KMS_VM_DYNAMIC_ENABLED" Diagnostic="only available when KMS support Dynamic Non Volatile Memory storage (KMS_NVM_ENABLED) or support Dynamic Volatile Memory storage (KMS_VM_DYNAMIC_ENABLED) is defined">#define KMS_ATTRIBUTES</PossibleValue>
+        </Parameter>
+         <Parameter Name="KMS_OBJECTS">
+            <PossibleValue Comment="no">//#define KMS_OBJECTS</PossibleValue>
+            <PossibleValue Comment="yes" Condition="!S_KMS_NVM_DYNAMIC_ENABLED &amp; !S_KMS_VM_DYNAMIC_ENABLED" Diagnostic="only available when KMS support Dynamic Non Volatile Memory storage (KMS_NVM_ENABLED) or support Dynamic Volatile Memory storage (KMS_VM_DYNAMIC_ENABLED) is defined">#define KMS_OBJECTS</PossibleValue>
+        </Parameter>
+        <Parameter Name="KMS_PKCS11_GET_FUNCTION_LIST_SUPPORT">
+            <PossibleValue Comment="no">//#define KMS_PKCS11_GET_FUNCTION_LIST_SUPPORT</PossibleValue>
+            <PossibleValue Comment="yes">#define KMS_PKCS11_GET_FUNCTION_LIST_SUPPORT</PossibleValue>
+        </Parameter>
+        <Parameter Name="KMS_PKCS11_COMPLIANCE">
+            <PossibleValue Comment="no">//#define KMS_PKCS11_COMPLIANCE</PossibleValue>
+            <PossibleValue Comment="yes">#define KMS_PKCS11_COMPLIANCE</PossibleValue>
+        </Parameter>
+        <Parameter Name="KMS_NIKMS_ROUTER_BYPASS">
+            <PossibleValue Comment="no">//#define KMS_NIKMS_ROUTER_BYPASS</PossibleValue>
+            <PossibleValue Comment="yes">#define KMS_NIKMS_ROUTER_BYPASS</PossibleValue>
+        </Parameter>
+        <Parameter Name="KMS_IMPORT_BLOB">
+            <PossibleValue Comment="no">//#define KMS_IMPORT_BLOB</PossibleValue>
+            <PossibleValue Comment="yes" Semaphore="S_KMS_IMPORT_BLOB"
+                Condition="!(S_KMS_NVM_ENABLED &amp; S_KMS_AES_CBC_DECRYPT &amp; S_KMS_SHA256_DIGEST  &amp; (S_KMS_ECDSA_SECP256 &amp; S_KMS_ECDSA_VERIFY))"
+                Diagnostic="only available when KMS support Non Volatile Memory storage (KMS_NVM_ENABLED) is defined &amp; AES CBC algorithm use decryption &amp; SHA256 algorithm use digest &amp; ECDSA algorithm with elliptic curve 256 use verification ">#define KMS_IMPORT_BLOB</PossibleValue>
+        </Parameter>
+        <Parameter Name="KMS_IMPORT_BLOB_CHUNK_SIZE"/>
+        <Parameter Name="KMS_ENCRYPT_DECRYPT_BLOB">
+            <PossibleValue Comment="no">//#define KMS_ENCRYPT_DECRYPT_BLOB</PossibleValue>
+            <PossibleValue Comment="yes" Condition="!S_KMS_IMPORT_BLOB" Diagnostic="only available when KMS use vendor defined blob import features (KMS_IMPORT_BLOB) is defined">#define KMS_ENCRYPT_DECRYPT_BLOB</PossibleValue>
+        </Parameter>
+        <Parameter Name="KMS_SECURE_COUNTERS">
+            <PossibleValue Comment="no">//#define KMS_SECURE_COUNTERS</PossibleValue>
+            <PossibleValue Comment="yes" Condition="!S_KMS_NVM_DYNAMIC_ENABLED &amp; !S_KMS_VM_DYNAMIC_ENABLED" Diagnostic="only available when KMS support Dynamic Non Volatile Memory storage (KMS_NVM_ENABLED) or support Dynamic Volatile Memory storage (KMS_VM_DYNAMIC_ENABLED) is defined">#define KMS_SECURE_COUNTERS</PossibleValue>
+        </Parameter>
+
+        <!-- KMS_Memory_Config Memory management -->
+        <Parameter Name="KMS_MEM_USE_ALLOCATOR"/>
+        <Parameter Name="KMS_MEM_USE_HEAP_ALLOCATOR"/>
+        <Parameter Name="KMS_MEM_USE_POOL_ALLOCATOR"/>
+        <Parameter Name="KMS_MEM_USE_CUSTOM_ALLOCATOR"/>
+        <Parameter Name="KMS_MEM_DEBUGGING"/>
+        <Parameter Name="KMS_MEM_CLEANING"/>
+        <Parameter Name="KMS_MEM_LOGGING"/>
+
+        <!-- KMS_Security_Config Security Enforcement -->
+        <Parameter Name="KMS_SE_CHECK_PARAMS"/>
+        <Parameter Name="KMS_SE_LOCK_KEYS"/>
+        <Parameter Name="KMS_SE_LOCK_KEYS_MAX"/>
+        <Parameter Name="KMS_SE_LOCK_SERVICES"/>
+        <Parameter Name="KMS_SE_LOCK_SERVICES_MAX"/>
+
+        <!-- KMS_Features_Config Features -->
+        <Parameter Name="KMS_ACTIVATED_Encrypt_Service"/>
+        <Parameter Name="KMS_ACTIVATED_Decrypt_Service"/>
+        <Parameter Name="KMS_ACTIVATED_Derive_Key_Service"/>
+        <Parameter Name="KMS_ACTIVATED_Generate_Key_Service"/>
+        <Parameter Name="KMS_ACTIVATED_Sign_Service"/>
+        <Parameter Name="KMS_ACTIVATED_Verify_Service"/>
+        <Parameter Name="KMS_ACTIVATED_Digest_Service"/>
+        <Parameter Name="KMS_AES_CBC">
+            <PossibleValue Comment="no"></PossibleValue>
+            <PossibleValue Comment="encryption" Condition="!S_KMS_ENCRYPT" Diagnostic="only available if support encryption services" Semaphore="S_KMS_ENCRYPT_USED">KMS_FCT_ENCRYPT</PossibleValue>
+            <PossibleValue Comment="decryption" Condition="!S_KMS_DECRYPT" Diagnostic="only available if support decryption services" Semaphore="S_KMS_DECRYPT_USED,S_KMS_AES_CBC_DECRYPT">KMS_FCT_DECRYPT</PossibleValue>
+            <PossibleValue Comment="encryption &amp; decryption" Condition="!S_KMS_ENCRYPT | !S_KMS_DECRYPT" Diagnostic="only available if support encryption &amp; decryption services" Semaphore="S_KMS_ENCRYPT_USED,S_KMS_DECRYPT_USED,S_KMS_AES_CBC_DECRYPT">KMS_FCT_ENCRYPT|KMS_FCT_DECRYPT</PossibleValue>
+        </Parameter>
+        <Parameter Name="KMS_AES_CCM">
+            <PossibleValue Comment="no"></PossibleValue>
+            <PossibleValue Comment="encryption" Condition="!S_KMS_ENCRYPT" Diagnostic="only available if support encryption services" Semaphore="S_KMS_ENCRYPT_USED">KMS_FCT_ENCRYPT</PossibleValue>
+            <PossibleValue Comment="decryption" Condition="!S_KMS_DECRYPT" Diagnostic="only available if support decryption services" Semaphore="S_KMS_DECRYPT_USED">KMS_FCT_DECRYPT</PossibleValue>
+            <PossibleValue Comment="encryption &amp; decryption" Condition="!S_KMS_ENCRYPT | !S_KMS_DECRYPT" Diagnostic="only available if support encryption &amp; decryption services" Semaphore="S_KMS_ENCRYPT_USED,S_KMS_DECRYPT_USED">KMS_FCT_ENCRYPT|KMS_FCT_DECRYPT</PossibleValue>
+        </Parameter>
+        <Parameter Name="KMS_AES_ECB">
+            <PossibleValue Comment="no"></PossibleValue>
+            <PossibleValue Comment="encryption" Condition="!S_KMS_ENCRYPT" Diagnostic="only available if support encryption services" Semaphore="S_KMS_ENCRYPT_USED">KMS_FCT_ENCRYPT</PossibleValue>
+            <PossibleValue Comment="decryption" Condition="!S_KMS_DECRYPT" Diagnostic="only available if support decryption services" Semaphore="S_KMS_DECRYPT_USED">KMS_FCT_DECRYPT</PossibleValue>
+            <PossibleValue Comment="key derivation" Condition="!S_KMS_DERIVE_KEY" Diagnostic="only available if support key derivation services" Semaphore="S_KMS_DERIVE_KEY_USED">KMS_FCT_DERIVE_KEY</PossibleValue>
+            <PossibleValue Comment="encryption &amp; decryption" Condition="!S_KMS_ENCRYPT | !S_KMS_DECRYPT" Diagnostic="only available if support encryption &amp; decryption services" Semaphore="S_KMS_ENCRYPT_USED,S_KMS_DECRYPT_USED">KMS_FCT_ENCRYPT|KMS_FCT_DECRYPT</PossibleValue>
+            <PossibleValue Comment="encryption &amp; key derivation" Condition="!S_KMS_ENCRYPT | !S_KMS_DERIVE_KEY" Diagnostic="only available if support encryption &amp; key derivation services" Semaphore="S_KMS_ENCRYPT_USED,S_KMS_DERIVE_KEY_USED">KMS_FCT_ENCRYPT|KMS_FCT_DERIVE_KEY</PossibleValue>
+            <PossibleValue Comment="decryption &amp; key derivation" Condition="!S_KMS_DECRYPT | !S_KMS_DERIVE_KEY" Diagnostic="only available if support decryption &amp; key derivation services" Semaphore="S_KMS_DECRYPT_USED,S_KMS_DERIVE_KEY_USED">KMS_FCT_DECRYPT|KMS_FCT_DERIVE_KEY</PossibleValue>
+            <PossibleValue Comment="encryption &amp; decryption &amp; key derivation" Condition="!S_KMS_ENCRYPT | !S_KMS_DECRYPT | !S_KMS_DERIVE_KEY" Diagnostic="only available if support encryption &amp; decryption services" Semaphore="S_KMS_ENCRYPT_USED,S_KMS_DECRYPT_USED,S_KMS_DERIVE_KEY_USED">KMS_FCT_ENCRYPT|KMS_FCT_DECRYPT|KMS_FCT_DERIVE_KEY</PossibleValue>
+        </Parameter>
+        <Parameter Name="KMS_AES_GCM">
+            <PossibleValue Comment="no"></PossibleValue>
+            <PossibleValue Comment="encryption" Condition="!S_KMS_ENCRYPT" Diagnostic="only available if support encryption services" Semaphore="S_KMS_ENCRYPT_USED">KMS_FCT_ENCRYPT</PossibleValue>
+            <PossibleValue Comment="decryption" Condition="!S_KMS_DECRYPT" Diagnostic="only available if support decryption services" Semaphore="S_KMS_DECRYPT_USED">KMS_FCT_DECRYPT</PossibleValue>
+            <PossibleValue Comment="encryption &amp; decryption" Condition="!S_KMS_ENCRYPT | !S_KMS_DECRYPT" Diagnostic="only available if support encryption &amp; decryption services" Semaphore="S_KMS_ENCRYPT_USED,S_KMS_DECRYPT_USED">KMS_FCT_ENCRYPT|KMS_FCT_DECRYPT</PossibleValue>
+        </Parameter>
+        <Parameter Name="KMS_AES_CMAC">
+            <PossibleValue Comment="no"></PossibleValue>
+            <PossibleValue Comment="signature" Condition="!S_KMS_SIGN" Diagnostic="only available if support signature services" Semaphore="S_KMS_SIGN_USED">KMS_FCT_SIGN</PossibleValue>
+            <PossibleValue Comment="verification" Condition="!S_KMS_VERIFY" Diagnostic="only available if support verification services" Semaphore="S_KMS_VERIFY_USED">KMS_FCT_VERIFY</PossibleValue>
+            <PossibleValue Comment="signature &amp; verification" Condition="!S_KMS_SIGN | !S_KMS_VERIFY" Diagnostic="only available if support signature &amp; verification services" Semaphore="S_KMS_SIGN_USED,S_KMS_VERIFY_USED">KMS_FCT_SIGN|KMS_FCT_VERIFY</PossibleValue>
+        </Parameter>
+        <Parameter Name="KMS_RSA">
+            <PossibleValue Comment="no"></PossibleValue>
+            <PossibleValue Comment="signature" Condition="!S_KMS_SIGN" Diagnostic="only available if support signature services" Semaphore="S_KMS_SIGN_USED,S_KMS_RSA">KMS_FCT_SIGN</PossibleValue>
+            <PossibleValue Comment="verification" Condition="!S_KMS_VERIFY" Diagnostic="only available if support verification services" Semaphore="S_KMS_VERIFY_USED,S_KMS_RSA">KMS_FCT_VERIFY</PossibleValue>
+            <PossibleValue Comment="signature &amp; verification" Condition="!S_KMS_SIGN | !S_KMS_VERIFY" Diagnostic="only available if support signature &amp; verification services" Semaphore="S_KMS_SIGN_USED,S_KMS_VERIFY_USED,S_KMS_RSA">KMS_FCT_SIGN|KMS_FCT_VERIFY</PossibleValue>
+        </Parameter>
+        <Parameter Name="KMS_RSA_Modulus"/>
+        <Parameter Name="KMS_RSA_1024">
+            <PossibleValue Comment="no">//#define KMS_RSA_1024</PossibleValue>
+            <PossibleValue Comment="yes" Condition="!S_KMS_RSA" Diagnostic="only available when KMS support RSA algorithm (KMS_RSA) is defined" Semaphore="S_KMS_RSA_1024">#define KMS_RSA_1024</PossibleValue>
+        </Parameter>
+        <Parameter Name="KMS_RSA_2048">
+            <PossibleValue Comment="no">//#define KMS_RSA_2048</PossibleValue>
+            <PossibleValue Comment="yes" Condition="!S_KMS_RSA" Diagnostic="only available when KMS support RSA algorithm (KMS_RSA) is defined" Semaphore="S_KMS_RSA_2048">#define KMS_RSA_2048</PossibleValue>
+        </Parameter>
+        <Parameter Name="KMS_ECDSA">
+            <PossibleValue Comment="no"></PossibleValue>
+            <PossibleValue Comment="verification" Condition="!S_KMS_VERIFY" Diagnostic="only available if support verification services" Semaphore="S_KMS_VERIFY_USED,S_KMS_ECDSA,S_KMS_ECDSA_VERIFY">KMS_FCT_VERIFY</PossibleValue>
+            <!-- PossibleValue Comment="key generation" Semaphore="S_KMS_GENERATE_KEY_USED,S_KMS_ECDSA">KMS_FCT_GENERATE_KEYS</PossibleValue>
+            <PossibleValue Comment="verification &amp; key generation" Semaphore="S_KMS_VERIFY_USED,S_KMS_GENERATE_KEY_USED,S_KMS_ECDSA,S_KMS_ECDSA_VERIFY">KMS_FCT_VERIFY|KMS_FCT_GENERATE_KEYS</PossibleValue>
+            <PossibleValue Comment="verification &amp; key derivation" Semaphore="S_KMS_VERIFY_USED,S_KMS_DERIVE_KEY_USED,S_KMS_ECDSA,S_KMS_ECDSA_VERIFY">KMS_FCT_VERIFY|KMS_FCT_DERIVE_KEY</PossibleValue>
+            <PossibleValue Comment="key generation &amp; key derivation" Semaphore="S_KMS_GENERATE_KEY_USED,S_KMS_DERIVE_KEY_USED,S_KMS_ECDSA_GENERATE_KEY,S_KMS_ECDSA">KMS_FCT_GENERATE_KEYS|KMS_FCT_DERIVE_KEY</PossibleValue>
+            <PossibleValue Comment="verification &amp; key generation &amp; key derivation" Semaphore="S_KMS_VERIFY_USED,S_KMS_GENERATE_KEY_USED,S_KMS_DERIVE_KEY_USED,S_KMS_ECDSA,S_KMS_ECDSA_VERIFY">KMS_FCT_VERIFY|KMS_FCT_GENERATE_KEYS|KMS_FCT_DERIVE_KEY</PossibleValue /-->
+        </Parameter>
+        <Parameter Name="KMS_ECDSA_Elliptic_Curve"/>
+        <Parameter Name="KMS_EC_SECP192">
+            <PossibleValue Comment="no">//#define KMS_EC_SECP192</PossibleValue>
+            <PossibleValue Comment="yes" Condition="!S_KMS_ECDSA" Diagnostic="only available when KMS support ECDSA algorithm (KMS_ECDSA) for Verify services is defined" Semaphore="S_KMS_ECDSA_SECP192">#define KMS_EC_SECP192</PossibleValue>
+        </Parameter>
+        <Parameter Name="KMS_EC_SECP256">
+            <PossibleValue Comment="no">//#define KMS_EC_SECP256</PossibleValue>
+            <PossibleValue Comment="yes" Condition="!S_KMS_ECDSA" Diagnostic="only available when KMS support ECDSA algorithm (KMS_ECDSA) for Verify services is defined" Semaphore="S_KMS_ECDSA_SECP256">#define KMS_EC_SECP256</PossibleValue>
+        </Parameter>
+        <Parameter Name="KMS_EC_SECP384">
+            <PossibleValue Comment="no">//#define KMS_EC_SECP384</PossibleValue>
+            <PossibleValue Comment="yes" Condition="!S_KMS_ECDSA" Diagnostic="only available when KMS support ECDSA algorithm (KMS_ECDSA) for Verify services is defined" Semaphore="S_KMS_ECDSA_SECP384">#define KMS_EC_SECP384</PossibleValue>
+        </Parameter>
+        <Parameter Name="KMS_SHA1">
+            <PossibleValue Comment="no"></PossibleValue>
+            <PossibleValue Comment="digest" Condition="!S_KMS_DIGEST" Diagnostic="digest services is requested" Semaphore="S_KMS_DIGEST_USED,S_KMS_SHA1_DIGEST">KMS_FCT_DIGEST</PossibleValue>
+        </Parameter>
+        <Parameter Name="KMS_SHA256">
+            <PossibleValue Comment="no"></PossibleValue>
+            <PossibleValue Comment="digest" Condition="!S_KMS_DIGEST" Diagnostic="digest services is requested" Semaphore="S_KMS_DIGEST_USED,S_KMS_SHA256_DIGEST">KMS_FCT_DIGEST</PossibleValue>
+        </Parameter>
+
+    </RefMode>
+
+    <!-- Mode -->
+    <ModeLogicOperator Name="OR">
+        <Mode Name="Enabled">
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="KMS_Enabled">
+                    <SignalLogicalOp Name="AND">
+                        <Signal IOMode="Basic" Name="VS_KMS"/>
+                    </SignalLogicalOp>
+                    <Semaphore>S_KMS</Semaphore>
+                    <Semaphore>S_KMS$noContext</Semaphore>
+                    <Semaphore>S_KMS_Used$context</Semaphore>
+                </Mode>
+            </ModeLogicOperator>
+            <Condition Expression="!PKA_Activated &amp; !AES_Activated" Diagnostic="not available if one of PKA or AES is already used"/>
+        </Mode>
+    </ModeLogicOperator>
+
+    <!-- RefSignal -->
+    <RefSignal Name="VS_KMS" Virtual="true"/>
+</IP>

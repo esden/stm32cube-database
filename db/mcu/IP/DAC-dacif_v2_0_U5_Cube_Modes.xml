@@ -4,23 +4,24 @@
     <Semaphore>$IpInstance</Semaphore>
     
     <!--
-        "DAC_Channel" 
-        "DAC1_ConnectOnChipPeripheral" 
-        "DAC_SampleAndHold" 
-        "DAC1_OutputBuffer"  
-        "DAC_HighFrequency" 
-        "DAC_AutonomousMode" 
-        "DAC_DMADoubleDataMode" 
-        "DAC_SignedFormat" 
-        "DAC_Trigger"           
-        "WaveGeneration"    Dépendant de DAC_Trigger
-        "TriangleAmplitude" Dépendant de WaveGeneration
-        "NoiseAmplitude"    Dépendant de WaveGeneration
-        "DAC_UserTrimming" 
-        "DAC_TrimmingValue" Dépendant de DAC_UserTrimming
-        "DAC_SampleTime"   Dépendant de DAC_SampleAndHold
-        "DAC_HoldTime"     Dépendant de DAC_SampleAndHold
-        "DAC_RefreshTime"  Dépendant de DAC_SampleAndHold
+     "DAC_Channel" 
+     "DAC1_ConnectOnChipPeripheral" 
+     "DAC_SampleAndHold" 
+     "DAC_OutputBuffer_OUT1"  
+     "DAC_OutputBuffer_OUT2"  
+     "DAC_HighFrequency" 
+     "DAC_AutonomousMode" 
+     "DAC_DMADoubleDataMode" 
+     "DAC_SignedFormat" 
+     "DAC_Trigger"    
+     "WaveGeneration"    Dépendant de DAC_Trigger
+     "TriangleAmplitude" Dépendant de WaveGeneration
+     "NoiseAmplitude"    Dépendant de WaveGeneration
+     "DAC_UserTrimming" 
+     "DAC_TrimmingValue" Dépendant de DAC_UserTrimming
+     "DAC_SampleTime"   Dépendant de DAC_SampleAndHold
+     "DAC_HoldTime"     Dépendant de DAC_SampleAndHold
+     "DAC_RefreshTime"  Dépendant de DAC_SampleAndHold
 
     -->
     
@@ -29,7 +30,7 @@
         <PossibleValue Comment="DAC_CHANNEL_2" Value="DAC_CHANNEL_2"/>
     </RefParameter>
     <RefParameter Name="Instance" Comment="Channel" DefaultValue="DAC$Index" Type="string"  Visible="false"/>
-        
+ 
     
     <RefParameter Name="DAC_HighFrequency" Comment="DAC High Frequency Mode" Type="list" DefaultValue="DAC_HIGH_FREQUENCY_INTERFACE_MODE_DISABLE" Group="Common DAC Settings">
         <Condition Expression="S_LPBAM_CONF" Diagnostic="LPBAM context "/>
@@ -108,35 +109,58 @@
         <Description>
             Specifies the external trigger for the selected DAC channel.&lt;br/&gt;
             A selection of a Trigger allows the activation of a Triangle or Noise Wave generation mode&lt;br/&gt;
-            
-            &lt;b&gt;Warning&lt;/b&gt; : when the autonomous mode is used in stop mode then only three triggers could be used (LPTIM1, LPTIM3 or External Line 9 triggers)
+     
+     &lt;b&gt;Warning&lt;/b&gt; : when the autonomous mode is used in stop mode then only three triggers could be used (LPTIM1, LPTIM3 or External Line 9 triggers)
         </Description>
     </RefParameter>   
 
-    <RefParameter Name="DAC1_OutputBuffer" Comment="Output Buffer" DefaultValue="DAC_OUTPUTBUFFER_ENABLE" Type="list" >
-        <PossibleValue Comment="Enable" Value="DAC_OUTPUTBUFFER_ENABLE" Condition="$IpInstance_OUT1_Int" Diagnostic="Buffer not available when DAC OUT1 is not connected to an external pin"/>
-        <PossibleValue Comment="Disable" Value="DAC_OUTPUTBUFFER_DISABLE" Condition="($IpInstance_OUT1_ExtAndInt&amp;(DAC_SampleAndHold=DAC_SAMPLEANDHOLD_DISABLE)) | ($IpInstance_OUT1_Ext&amp;(DAC_SampleAndHold=DAC_SAMPLEANDHOLD_ENABLE))" Diagnostic="To disable the output buffer change Mode or the out connection"/>
+    <RefParameter Name="DAC_OutputBuffer_OUT1" Comment="Output Buffer" DefaultValue="DAC_OUTPUTBUFFER_ENABLE" Type="list" >
+        <Condition Expression="$IpInstance_OUT1_ExtAndInt" Diagnostic=""/>
+        <PossibleValue Comment="Enable" Value="DAC_OUTPUTBUFFER_ENABLE"/>
+        <PossibleValue Comment="Disable" Value="DAC_OUTPUTBUFFER_DISABLE" Condition="DAC_SampleAndHold=DAC_SAMPLEANDHOLD_DISABLE" Diagnostic="Enable Sample and Hold"/>
         <Description>
             The activation/deactivation of the buffer is linked to the combination the mode selected and the out connection. &lt;br/&gt;
-            Buffer could be enabled only if out is at least connected to the external pin (with or without the on chip peripheral connection)&lt;br/&gt;
+            Buffer could be enabled only if "OUT mode" is at least connected to the external pin (with or without the on chip peripheral connection)&lt;br/&gt;
             Buffer could be disabled is not possible in two case : &lt;br/&gt;
-            - out connected to external pin only with Sample and Hold selected mode&lt;br/&gt;
-            - out connected to external pin and internal on chip peripheral with the Normal selected mode &lt;br/&gt;
+            - "OUT mode" connected to external pin only with Sample and Hold selected mode&lt;br/&gt;
+            - "OUT mode" connected to external pin and internal on chip peripheral with the Normal selected mode &lt;br/&gt;
+        </Description>
+    </RefParameter>
+    <RefParameter Name="DAC_OutputBuffer_OUT1" Comment="Output Buffer" DefaultValue="DAC_OUTPUTBUFFER_DISABLE" Type="list" >
+        <PossibleValue Comment="Enable" Value="DAC_OUTPUTBUFFER_ENABLE"/>
+        <PossibleValue Comment="Disable" Value="DAC_OUTPUTBUFFER_DISABLE" Condition="DAC_SampleAndHold=DAC_SAMPLEANDHOLD_ENABLE" Diagnostic="Disable Sample and Hold"/>
+        <Description>
+            The activation/deactivation of the buffer is linked to the combination the mode selected and the out connection. &lt;br/&gt;
+            Buffer could be enabled only if "OUT mode" is at least connected to the external pin (with or without the on chip peripheral connection)&lt;br/&gt;
+            Buffer could be disabled is not possible in two case : &lt;br/&gt;
+            - "OUT mode" connected to external pin only with Sample and Hold selected mode&lt;br/&gt;
+            - "OUT mode" connected to external pin and internal on chip peripheral with the Normal selected mode &lt;br/&gt;
         </Description>
     </RefParameter>
     
-    <RefParameter Name="DAC2_OutputBuffer" Comment="Output Buffer" DefaultValue="DAC_OUTPUTBUFFER_ENABLE" Type="list" >
-        <PossibleValue Comment="Enable" Value="DAC_OUTPUTBUFFER_ENABLE" Condition="$IpInstance_OUT2_Int" Diagnostic="Buffer not available when DAC OUT2 is not connected to an external pin"/>
-        <PossibleValue Comment="Disable" Value="DAC_OUTPUTBUFFER_DISABLE" Condition="($IpInstance_OUT2_ExtAndInt&amp;(DAC_SampleAndHold=DAC_SAMPLEANDHOLD_DISABLE)) | ($IpInstance_OUT2_Ext&amp;(DAC_SampleAndHold=DAC_SAMPLEANDHOLD_ENABLE))" Diagnostic="To disable the output buffer change Mode or the out connection"/>
+    <RefParameter Name="DAC_OutputBuffer_OUT2" Comment="Output Buffer" DefaultValue="DAC_OUTPUTBUFFER_ENABLE" Type="list" >
+        <Condition Expression="$IpInstance_OUT2_ExtAndInt" Diagnostic=""/>
+        <PossibleValue Comment="Enable" Value="DAC_OUTPUTBUFFER_ENABLE"/>
+        <PossibleValue Comment="Disable" Value="DAC_OUTPUTBUFFER_DISABLE" Condition="DAC_SampleAndHold=DAC_SAMPLEANDHOLD_DISABLE" Diagnostic="Enable Sample and Hold"/>
         <Description>
             The activation/deactivation of the buffer is linked to the combination the mode selected and the out connection. &lt;br/&gt;
-            Buffer could be enabled only if out is at least connected to the external pin (with or without the on chip peripheral connection)&lt;br/&gt;
+            Buffer could be enabled only if "OUT mode" is at least connected to the external pin (with or without the on chip peripheral connection)&lt;br/&gt;
             Buffer could be disabled is not possible in two case : &lt;br/&gt;
-            - out connected to external pin only with Sample and Hold selected mode&lt;br/&gt;
-            - out connected to external pin and internal on chip peripheral with the Normal selected mode &lt;br/&gt;
+            - "OUT mode" connected to external pin only with Sample and Hold selected mode&lt;br/&gt;
+            - "OUT mode" connected to external pin and internal on chip peripheral with the Normal selected mode &lt;br/&gt;
         </Description>
     </RefParameter>
-
+    <RefParameter Name="DAC_OutputBuffer_OUT2" Comment="Output Buffer" DefaultValue="DAC_OUTPUTBUFFER_DISABLE" Type="list" >
+        <PossibleValue Comment="Enable" Value="DAC_OUTPUTBUFFER_ENABLE"/>
+        <PossibleValue Comment="Disable" Value="DAC_OUTPUTBUFFER_DISABLE" Condition="DAC_SampleAndHold=DAC_SAMPLEANDHOLD_ENABLE" Diagnostic="Disable Sample and Hold"/>
+        <Description>
+            The activation/deactivation of the buffer is linked to the combination the mode selected and the out connection. &lt;br/&gt;
+            Buffer could be enabled only if "OUT mode" is at least connected to the external pin (with or without the on chip peripheral connection)&lt;br/&gt;
+            Buffer could be disabled is not possible in two case : &lt;br/&gt;
+            - "OUT mode" connected to external pin only with Sample and Hold selected mode&lt;br/&gt;
+            - "OUT mode" connected to external pin and internal on chip peripheral with the Normal selected mode &lt;br/&gt;
+        </Description>
+    </RefParameter>
     <RefParameter Name="WaveGeneration" Comment="Wave generation mode" Type="list" DefaultValue="DISABLE"  Visible="false">
         <Condition Expression="DAC_Trigger=DAC_TRIGGER_NONE" Diagnostic="DAC Trigger is disabled"/>
         <PossibleValue Value="DISABLE" Comment="Disabled"/>
@@ -193,7 +217,7 @@
     <RefParameter Name="NoiseAmplitude" Comment="Noise Amplitude" DefaultValue="null" Type="string"   Visible="false"/>
 	
      
-        
+ 
     <!-- Connect On Chip Peripheral -->
     <RefParameter Name="DAC1_ConnectOnChipPeripheral" Comment="Connect On Chip Peripheral1" DefaultValue="DAC_CHIPCONNECT_INTERNAL" Type="list" Visible="false">
         <Condition Expression="$IpInstance_OUT1_Int" Diagnostic=""/>
@@ -206,8 +230,8 @@
     <RefParameter Name="DAC1_ConnectOnChipPeripheral" Comment="Connect On Chip Peripheral1" DefaultValue="DAC_CHIPCONNECT_EXTERNAL" Type="list" Visible="false">
         <PossibleValue Comment="DAC_CHIPCONNECT_EXTERNAL" Value="DAC_CHIPCONNECT_EXTERNAL"/>
     </RefParameter>
-        
-        
+ 
+ 
     <RefParameter Name="DAC2_ConnectOnChipPeripheral" Comment="Connect On Chip Peripheral2" DefaultValue="DAC_CHIPCONNECT_INTERNAL" Type="list" Visible="false">
         <Condition Expression="$IpInstance_OUT2_Int" Diagnostic=""/>
         <Description>Specifies whether the DAC output is connected or not to on chip peripheral .</Description>
@@ -229,13 +253,13 @@
         <PossibleValue Comment="Factory trimming " Value="DAC_TRIMMING_FACTORY"/>
         <PossibleValue Comment="User trimming " Value="DAC_TRIMMING_USER"/>
     </RefParameter>
-                
+  
     <RefParameter Comment="Trimming Value" DefaultValue="1" Max="31" Min="1" Name="DAC_TrimmingValue" Type="integer" >
         <Condition Expression="DAC_UserTrimming=DAC_TRIMMING_USER" Diagnostic=""/>
         <Description>Specifies the offset trimming value.</Description>
     </RefParameter>
     <RefParameter Comment="Trimming Value" DefaultValue="__NULL" Name="DAC_TrimmingValue" Type="string" Visible="false"/>
-         
+  
     <!-- Sample and hold settings-->
     <RefParameter Name="DAC_SampleAndHold" Comment="Mode selected" DefaultValue="DAC_SAMPLEANDHOLD_ENABLE" Type="list">
         <Condition Expression="S_LPBAM_CONF" Diagnostic="LPBAM context "/>
@@ -255,7 +279,7 @@
         <PossibleValue Comment="Normal Mode" Value="DAC_SAMPLEANDHOLD_DISABLE"/>
         <PossibleValue Comment="Sample and Hold Mode" Value="DAC_SAMPLEANDHOLD_ENABLE" Semaphore="RCC_DAC_SAMPLEANDHOLD"/>
     </RefParameter>
-        
+ 
     <RefParameter Name="DAC_SampleTime" Comment="Sample Time" DefaultValue="0" Max="1023" Min="0" Type="integer">
         <Condition Expression="DAC_SampleAndHold=DAC_SAMPLEANDHOLD_ENABLE" Diagnostic=""/>
         <Description>On Sample and Hold Mode : Specifies the Sample time</Description>
@@ -274,37 +298,37 @@
     </RefParameter>	
     <RefParameter Name="DAC_RefreshTime" Comment="Refresh Time" DefaultValue="__NULL" Type="string"  Visible="false"/>
 
-<!-- LPBAM specific configuration -->  
+    <!-- LPBAM specific configuration -->  
  
 
-<RefParameter Name="Interrupt1" Comment="DMA underrun error for DAC1_CH1"   DefaultValue="DISABLE"  Type="list" Group="IP Internal Interrupt" TabName="Advanced Settings for LPBAM">
+    <RefParameter Name="Interrupt1" Comment="DMA underrun error for DAC1_CH1"   DefaultValue="DISABLE"  Type="list" Group="IP Internal Interrupt" TabName="Advanced Settings for LPBAM">
         <Description>description</Description>
         <PossibleValue Comment="Enable" Value="DAC_IT_DMAUDR1"/>
         <PossibleValue Comment="Disable" Value="DISABLE"/>
-</RefParameter>
+    </RefParameter>
 
-<RefParameter Name="Interrupt2" Comment="DMA underrun error for DAC1_CH2"   DefaultValue="DISABLE"  Type="list" Group="IP Internal Interrupt" TabName="Advanced Settings for LPBAM">
+    <RefParameter Name="Interrupt2" Comment="DMA underrun error for DAC1_CH2"   DefaultValue="DISABLE"  Type="list" Group="IP Internal Interrupt" TabName="Advanced Settings for LPBAM">
         <Description>description</Description>
         <PossibleValue Comment="Enable" Value="DAC_IT_DMAUDR2"/>
         <PossibleValue Comment="Disable" Value="DISABLE"/>
-</RefParameter>
+    </RefParameter>
 
 
-<RefParameter Comment="Interrupt parameter for code generation __HAL_DAC_ENABLE_IT" DefaultValue="/+Interrupt1+|Interrupt2/\|DISABLE//DISABLE\|//"  Type="list"  Name="ORingInterrupt"  Visible="false">
-      <Condition Diagnostic="" Expression="!((Interrupt1=DISABLE) &amp; (Interrupt2=DISABLE))"/> 
-</RefParameter>
-<RefParameter  Comment="Interrupt parameter for code generation __HAL_DAC_ENABLE_IT" DefaultValue="__NULL" Name="ORingInterrupt" Type="String" >
-               <Condition Diagnostic="" Expression="(Interrupt1=DISABLE) &amp; (Interrupt2=DISABLE)"/> 
- </RefParameter>
+    <RefParameter Comment="Interrupt parameter for code generation __HAL_DAC_ENABLE_IT" DefaultValue="/+Interrupt1+|Interrupt2/\|DISABLE//DISABLE\|//"  Type="list"  Name="ORingInterrupt"  Visible="false">
+        <Condition Diagnostic="" Expression="!((Interrupt1=DISABLE) &amp; (Interrupt2=DISABLE))"/> 
+    </RefParameter>
+    <RefParameter  Comment="Interrupt parameter for code generation __HAL_DAC_ENABLE_IT" DefaultValue="__NULL" Name="ORingInterrupt" Type="String" >
+        <Condition Diagnostic="" Expression="(Interrupt1=DISABLE) &amp; (Interrupt2=DISABLE)"/> 
+    </RefParameter>
 
 
-<RefMode Name="LPBAMSPECIFIC">
+    <RefMode Name="LPBAMSPECIFIC">
         <ConfigForMode>LPBAM_ADD_HALCONFIG</ConfigForMode>
         <Parameter Name="Interrupt1"/>
         <Parameter Name="Interrupt2"/>
- </RefMode>
+    </RefMode>
 
-<!-- LPBAM specific configuration -->     
+    <!-- LPBAM specific configuration -->     
     
     <RefMode Name="DAC_COMMON" Comment="DAC_COMMON" Group="Common DAC Settings" Abstract="true">
         <Parameter Name="DAC_HighFrequency"/>
@@ -326,7 +350,7 @@
         <Parameter Name="DAC_SampleTime"/>
         <Parameter Name="DAC_HoldTime"/>
         <Parameter Name="DAC_RefreshTime"/>
-        <Parameter Name="DAC1_OutputBuffer" />
+        <Parameter Name="DAC_OutputBuffer_OUT1" />
         <Parameter Name="DAC_DMADoubleDataMode"/>
         <Parameter Name="DAC_SignedFormat"/>
         <Parameter Name="DAC_Trigger"/>
@@ -336,6 +360,59 @@
         <Parameter Name="DAC_UserTrimming"/>
         <Parameter Name="DAC_TrimmingValue"/>
     </RefMode>	
+    <RefMode Name="DAC_OUT1_Int"  Comment="DAC Out1 Mode" Group="DAC Out1 Settings" BaseMode="DAC_COMMON">
+        <ConfigForMode>CommonParamLLConfig</ConfigForMode>
+        <ConfigForMode>DAC_ChannelConfig1</ConfigForMode>
+        <ConfigForMode>DAC_Init</ConfigForMode>
+        <ConfigForMode>DAC_AutonomousModeConfig</ConfigForMode>
+        <ConfigForMode>DAC_TriangleWaveGenerate1</ConfigForMode>
+        <ConfigForMode>DAC_NoiseWaveGenerate1</ConfigForMode>
+        <Parameter Name="DAC_Channel">
+            <PossibleValue>DAC_CHANNEL_1</PossibleValue>
+        </Parameter>
+        <Parameter Name="DAC1_ConnectOnChipPeripheral"/>
+        <Parameter Name="DAC_SampleAndHold"/>
+        <Parameter Name="DAC_SampleTime"/>
+        <Parameter Name="DAC_HoldTime"/>
+        <Parameter Name="DAC_RefreshTime"/>
+        <Parameter Name="DAC_OutputBuffer_OUT1">
+            <PossibleValue>DAC_OUTPUTBUFFER_DISABLE</PossibleValue>
+        </Parameter>
+        <Parameter Name="DAC_DMADoubleDataMode"/>
+        <Parameter Name="DAC_SignedFormat"/>
+        <Parameter Name="DAC_Trigger"/>
+        <Parameter Name="WaveGeneration"/>
+        <Parameter Name="TriangleAmplitude"/>
+        <Parameter Name="NoiseAmplitude"/>
+        <Parameter Name="DAC_UserTrimming"/>
+        <Parameter Name="DAC_TrimmingValue"/>
+    </RefMode>	     
+    <RefMode Name="DAC_OUT1_ExtAndInt"  Comment="DAC Out1 Mode" Group="DAC Out1 Settings" BaseMode="DAC_COMMON">
+        <ConfigForMode>CommonParamLLConfig</ConfigForMode>
+        <ConfigForMode>DAC_ChannelConfig1</ConfigForMode>
+        <ConfigForMode>DAC_Init</ConfigForMode>
+        <ConfigForMode>DAC_AutonomousModeConfig</ConfigForMode>
+        <ConfigForMode>DAC_TriangleWaveGenerate1</ConfigForMode>
+        <ConfigForMode>DAC_NoiseWaveGenerate1</ConfigForMode>
+        <Parameter Name="DAC_Channel">
+            <PossibleValue>DAC_CHANNEL_1</PossibleValue>
+        </Parameter>
+        <Parameter Name="DAC1_ConnectOnChipPeripheral"/>
+        <Parameter Name="DAC_SampleAndHold"/>
+        <Parameter Name="DAC_SampleTime"/>
+        <Parameter Name="DAC_HoldTime"/>
+        <Parameter Name="DAC_RefreshTime"/>
+        <Parameter Name="DAC_OutputBuffer_OUT1" />
+        <Parameter Name="DAC_DMADoubleDataMode"/>
+        <Parameter Name="DAC_SignedFormat"/>
+        <Parameter Name="DAC_Trigger"/>
+        <Parameter Name="WaveGeneration"/>
+        <Parameter Name="TriangleAmplitude"/>
+        <Parameter Name="NoiseAmplitude"/>
+        <Parameter Name="DAC_UserTrimming"/>
+        <Parameter Name="DAC_TrimmingValue"/>
+    </RefMode>	       
+
 
     <RefMode Name="DAC_OUT2" Comment="DAC Out2 Mode" Group="DAC Out2 Settings" BaseMode="DAC_COMMON">
         <Condition Diagnostic="" Expression="!$IpInstance_OUT1_Conf"/>
@@ -353,7 +430,7 @@
         <Parameter Name="DAC_SampleTime"/>
         <Parameter Name="DAC_HoldTime"/>
         <Parameter Name="DAC_RefreshTime"/>
-        <Parameter Name="DAC2_OutputBuffer"/>
+        <Parameter Name="DAC_OutputBuffer_OUT2"/>
         <Parameter Name="DAC_DMADoubleDataMode"/>
         <Parameter Name="DAC_SignedFormat"/>
         <Parameter Name="DAC_Trigger"/>
@@ -363,9 +440,10 @@
         <Parameter Name="DAC_UserTrimming"/>
         <Parameter Name="DAC_TrimmingValue"/>
     </RefMode>
+  
     <RefMode Name="DAC_OUT2" Comment="DAC Out2 Mode" Group="DAC Out2 Settings" BaseMode="DAC_COMMON">
+        <!-- refmode "DAC_OUT2" duplicated to suppress common ConfigForMode  -->
         <ConfigForMode>DAC_ChannelConfig2</ConfigForMode>
-        <ConfigForMode>DAC_Init</ConfigForMode>
         <ConfigForMode>DAC_TriangleWaveGenerate2</ConfigForMode>
         <ConfigForMode>DAC_NoiseWaveGenerate2</ConfigForMode>
         <Parameter Name="DAC_Channel">
@@ -376,7 +454,7 @@
         <Parameter Name="DAC_SampleTime"/>
         <Parameter Name="DAC_HoldTime"/>
         <Parameter Name="DAC_RefreshTime"/>
-        <Parameter Name="DAC2_OutputBuffer"/>
+        <Parameter Name="DAC_OutputBuffer_OUT2"/>
         <Parameter Name="DAC_DMADoubleDataMode"/>
         <Parameter Name="DAC_SignedFormat"/>
         <Parameter Name="DAC_Trigger"/>
@@ -386,12 +464,109 @@
         <Parameter Name="DAC_UserTrimming"/>
         <Parameter Name="DAC_TrimmingValue"/>
     </RefMode>
-
-    <RefMode Name="DAC_OUT1_Int"        BaseMode="DAC_OUT1"/>                   
-    <RefMode Name="DAC_OUT1_ExtAndInt"  BaseMode="DAC_OUT1"/>                                   
-    <RefMode Name="DAC_OUT2_Int"        BaseMode="DAC_OUT2"/>                   
-    <RefMode Name="DAC_OUT2_ExtAndInt"  BaseMode="DAC_OUT2"/>                   
-    <RefMode Name="External-Trigger"    Comment="External-Trigger"/>                   
+    <RefMode Name="DAC_OUT2_Int" Comment="DAC Out2 Mode" Group="DAC Out2 Settings" BaseMode="DAC_COMMON">    
+        <Condition Diagnostic="" Expression="!$IpInstance_OUT1_Conf"/>
+        <ConfigForMode>CommonParamLLConfig</ConfigForMode>
+        <ConfigForMode>DAC_ChannelConfig2</ConfigForMode>
+        <ConfigForMode>DAC_Init</ConfigForMode>
+        <ConfigForMode>DAC_AutonomousModeConfig</ConfigForMode>
+        <ConfigForMode>DAC_TriangleWaveGenerate2</ConfigForMode>
+        <ConfigForMode>DAC_NoiseWaveGenerate2</ConfigForMode>
+        <Parameter Name="DAC_Channel">
+            <PossibleValue>DAC_CHANNEL_2</PossibleValue>
+        </Parameter>
+        <Parameter Name="DAC2_ConnectOnChipPeripheral"/>
+        <Parameter Name="DAC_SampleAndHold"/>
+        <Parameter Name="DAC_SampleTime"/>
+        <Parameter Name="DAC_HoldTime"/>
+        <Parameter Name="DAC_RefreshTime"/>
+        <Parameter Name="DAC_OutputBuffer_OUT2">
+            <PossibleValue>DAC_OUTPUTBUFFER_DISABLE</PossibleValue>
+        </Parameter>
+        <Parameter Name="DAC_DMADoubleDataMode"/>
+        <Parameter Name="DAC_SignedFormat"/>
+        <Parameter Name="DAC_Trigger"/>
+        <Parameter Name="WaveGeneration"/>
+        <Parameter Name="TriangleAmplitude"/>
+        <Parameter Name="NoiseAmplitude"/>
+        <Parameter Name="DAC_UserTrimming"/>
+        <Parameter Name="DAC_TrimmingValue"/>
+    </RefMode>   
+    <RefMode Name="DAC_OUT2_Int" Comment="DAC Out2 Mode" Group="DAC Out2 Settings" BaseMode="DAC_COMMON">    
+        <!-- refmode "DAC_OUT2" duplicated to suppress common ConfigForMode  -->
+        <ConfigForMode>DAC_ChannelConfig2</ConfigForMode>
+        <ConfigForMode>DAC_TriangleWaveGenerate2</ConfigForMode>
+        <ConfigForMode>DAC_NoiseWaveGenerate2</ConfigForMode>
+        <Parameter Name="DAC_Channel">
+            <PossibleValue>DAC_CHANNEL_2</PossibleValue>
+        </Parameter>
+        <Parameter Name="DAC2_ConnectOnChipPeripheral"/>
+        <Parameter Name="DAC_SampleAndHold"/>
+        <Parameter Name="DAC_SampleTime"/>
+        <Parameter Name="DAC_HoldTime"/>
+        <Parameter Name="DAC_RefreshTime"/>
+        <Parameter Name="DAC_OutputBuffer_OUT2">
+            <PossibleValue>DAC_OUTPUTBUFFER_DISABLE</PossibleValue>
+        </Parameter>
+        <Parameter Name="DAC_DMADoubleDataMode"/>
+        <Parameter Name="DAC_SignedFormat"/>
+        <Parameter Name="DAC_Trigger"/>
+        <Parameter Name="WaveGeneration"/>
+        <Parameter Name="TriangleAmplitude"/>
+        <Parameter Name="NoiseAmplitude"/>
+        <Parameter Name="DAC_UserTrimming"/>
+        <Parameter Name="DAC_TrimmingValue"/>
+    </RefMode>        
+    <RefMode Name="DAC_OUT2_ExtAndInt"  Comment="DAC Out2 Mode" Group="DAC Out2 Settings" BaseMode="DAC_COMMON">      
+        <Condition Diagnostic="" Expression="!$IpInstance_OUT1_Conf"/>
+        <ConfigForMode>CommonParamLLConfig</ConfigForMode>
+        <ConfigForMode>DAC_ChannelConfig2</ConfigForMode>
+        <ConfigForMode>DAC_Init</ConfigForMode>
+        <ConfigForMode>DAC_AutonomousModeConfig</ConfigForMode>
+        <ConfigForMode>DAC_TriangleWaveGenerate2</ConfigForMode>
+        <ConfigForMode>DAC_NoiseWaveGenerate2</ConfigForMode>
+        <Parameter Name="DAC_Channel">
+            <PossibleValue>DAC_CHANNEL_2</PossibleValue>
+        </Parameter>
+        <Parameter Name="DAC2_ConnectOnChipPeripheral"/>
+        <Parameter Name="DAC_SampleAndHold"/>
+        <Parameter Name="DAC_SampleTime"/>
+        <Parameter Name="DAC_HoldTime"/>
+        <Parameter Name="DAC_RefreshTime"/>
+        <Parameter Name="DAC_OutputBuffer_OUT2"/>
+        <Parameter Name="DAC_DMADoubleDataMode"/>
+        <Parameter Name="DAC_SignedFormat"/>
+        <Parameter Name="DAC_Trigger"/>
+        <Parameter Name="WaveGeneration"/>
+        <Parameter Name="TriangleAmplitude"/>
+        <Parameter Name="NoiseAmplitude"/>
+        <Parameter Name="DAC_UserTrimming"/>
+        <Parameter Name="DAC_TrimmingValue"/>
+    </RefMode>   
+    <RefMode Name="DAC_OUT2_ExtAndInt"  Comment="DAC Out2 Mode" Group="DAC Out2 Settings" BaseMode="DAC_COMMON">      
+        <!-- refmode "DAC_OUT2" duplicated to suppress common ConfigForMode  -->
+        <ConfigForMode>DAC_ChannelConfig2</ConfigForMode>
+        <ConfigForMode>DAC_TriangleWaveGenerate2</ConfigForMode>
+        <ConfigForMode>DAC_NoiseWaveGenerate2</ConfigForMode>
+        <Parameter Name="DAC_Channel">
+            <PossibleValue>DAC_CHANNEL_2</PossibleValue>
+        </Parameter>
+        <Parameter Name="DAC2_ConnectOnChipPeripheral"/>
+        <Parameter Name="DAC_SampleAndHold"/>
+        <Parameter Name="DAC_SampleTime"/>
+        <Parameter Name="DAC_HoldTime"/>
+        <Parameter Name="DAC_RefreshTime"/>
+        <Parameter Name="DAC_OutputBuffer_OUT2"/>
+        <Parameter Name="DAC_DMADoubleDataMode"/>
+        <Parameter Name="DAC_SignedFormat"/>
+        <Parameter Name="DAC_Trigger"/>
+        <Parameter Name="WaveGeneration"/>
+        <Parameter Name="TriangleAmplitude"/>
+        <Parameter Name="NoiseAmplitude"/>
+        <Parameter Name="DAC_UserTrimming"/>
+        <Parameter Name="DAC_TrimmingValue"/>
+    </RefMode>      
+    <RefMode Name="External-Trigger"    Comment="External-Trigger"/>     
     <ModeLogicOperator Name="OR">
         <Mode Name="DAC_OUT1" UserName="OUT1 connected to">
             <ModeLogicOperator Name="XOR">
@@ -416,7 +591,7 @@
                     <Semaphore>$IpInstance_OUT1_ExtAndInt</Semaphore>
                     <Semaphore>$IpInstance_OUT1_Conf</Semaphore>
                 </Mode>
-                                
+    
             </ModeLogicOperator>
             <Semaphore>$IpInstance_Channel1_Used</Semaphore>
         </Mode>
@@ -471,7 +646,7 @@
             </ModeLogicOperator>
         </Mode>
         <!-- LPBAM specific -->
-        
+ 
     </ModeLogicOperator>
     <!--	<RefSignal IOMode="EXTI" Name="EXTI9"/>-->
     <RefSignal IOMode="EXTI" Name="EXTI9" ShareableGroupName="GPXTI9" /> <!-- GPXTI is a keyword -->
@@ -480,6 +655,6 @@
     <RefSignal Name="VS_DACI1" Virtual="true"/>
     <RefSignal Name="VS_DACI2" Virtual="true"/>
     <RefSignal Name="VS_DAC_LPBAM" Virtual="true"/> <!-- LPBAM specific -->
-        
+ 
 
 </IP>

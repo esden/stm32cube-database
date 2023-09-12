@@ -67,11 +67,9 @@ struct link_str {
 err_t ethernetif_init(struct netif *netif);
 
 [#if use_rtos == 1][#-- rtos used --]
-[#if cmsis_version = "v1"][#-- cmsis_version v1 --]
-static void ethernetif_input(void const * argument);
-[#else][#-- cmsis_version v2 --]
+[#if cmsis_version = "v2"][#-- cmsis_version v2 --]
 void ethernetif_input(void* argument);
-[/#if][#-- endif cmsis_version --]
+[/#if][#-- endif cmsis_version v2 --]
 [#else][#-- rtos NOT used --]
 void ethernetif_input(struct netif *netif);
 [/#if][#-- endif use_rtos --]

@@ -13,6 +13,15 @@
 [#t]
 [#t]
 [#-- Clock Tree configuration (rcc node)--]
+[#list peripheralParams.get("RCC").entrySet() as paramEntry]
+    [#if paramEntry.key == "LSE_STATUS"][#assign lse_status="${paramEntry.value}"][/#if]
+    [#if paramEntry.key == "HSE_STATUS"][#assign hse_status="${paramEntry.value}"][/#if]
+    [#if paramEntry.key == "I2S_CLK_STATUS"][#assign i2s_clk_status="${paramEntry.value}"][/#if]
+[/#list]
+[#if srvcmx_isTargetedFw_inDTS("OP-TEE")][#--FW contextualization--]
+	[#lt]${T1}clocks = [#if hse_status=="enabled"]<&clk_hse>, [/#if]<&clk_hsi>, [#if lse_status=="enabled"]<&clk_lse>, [/#if]<&clk_lsi>, <&clk_csi>[#if i2s_clk_status=="enabled"], <&clk_i2sin>[/#if]; 
+	[#lt]${T1}clock-names = [#if hse_status=="enabled"]"clk-hse", [/#if]"clk-hsi", [#if lse_status=="enabled"]"clk-lse", [/#if]"clk-lsi", "clk-csi"[#if i2s_clk_status=="enabled"], "clk-i2sin"[/#if];
+[/#if]
 
 	/* USER CODE BEGIN rcc */
 	/* USER CODE END rcc */
@@ -70,7 +79,7 @@
 				[#if paramEntry.key == "PLL${PLLnb}SourceARG"][#assign PLLSource="${paramEntry.value}"][/#if]
 			[/#list]
 						[#if (PLLUsed! = 1) ]
-			[#lt]${T2}pll${PLLnb}_vco_${VCOM}Mhz_mx: pll${PLLnb}-vco-${VCOM}Mhz-mx {
+			[#lt]${T2}pll${PLLnb}_vco_${VCOM}Mhz: pll${PLLnb}-vco-${VCOM}Mhz {
 				[#lt]${T3}src = < ${PLLSource} >;
 				[#lt]${T3}divmn = < ${DIVM} ${DIVN} >;
 								[#if PLLMODE == "RCC_PLL_FRACTIONAL"]
@@ -120,7 +129,7 @@
                                 [#lt]${T2}st,pll = < &pll${PLLnb}_cfg1 >;
 
                                 [#lt]${T2}pll${PLLnb}_cfg1: pll${PLLnb}_cfg1 {
-				[#lt]${T3}st,pll_vco = < &pll${PLLnb}_vco_${VCOM}Mhz_mx >;
+				[#lt]${T3}st,pll_vco = < &pll${PLLnb}_vco_${VCOM}Mhz >;
 				[#lt]${T3}st,pll_div_pqr = < ${DIVP} ${DIVQ} ${DIVR} >;
 				[#lt]${T2}};
 			[#lt]${T2}/* USER CODE BEGIN pll${PLLnb} */

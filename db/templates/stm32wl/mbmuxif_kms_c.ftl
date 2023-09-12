@@ -73,7 +73,7 @@ static osSemaphoreId_t Sem_MbKmsRespRcv;
 [#else]
 static void MBMUXIF_IsrKmsCmdRcvCb(void *ComObj);
 static void MBMUXIF_TaskKmsCmdRcv(void);
-[/#if]
+[/#if][#--  CPUCORE == CM4 vs CM0 vs SINGLE --]
 
 /* USER CODE BEGIN PFP */
 
@@ -101,7 +101,9 @@ int8_t MBMUXIF_KmsInit(void)
   /* USER CODE END MBMUXIF_KmsInit_1 */
 
 [#if CPUCORE == "CM4"]
-  ret = MBMUX_RegisterFeature(FEAT_INFO_KMS_ID, MBMUX_CMD_RESP, MBMUXIF_IsrKmsRespRcvCb, aKmsCmdRespBuff, sizeof(aKmsCmdRespBuff));
+  ret = MBMUX_RegisterFeature(FEAT_INFO_KMS_ID, MBMUX_CMD_RESP,
+                              MBMUXIF_IsrKmsRespRcvCb,
+                              aKmsCmdRespBuff, sizeof(aKmsCmdRespBuff));
 [#else]
   ret = MBMUX_RegisterFeatureCallback(FEAT_INFO_KMS_ID, MBMUX_CMD_RESP, MBMUXIF_IsrKmsCmdRcvCb);
 [/#if]
@@ -197,7 +199,7 @@ void MBMUXIF_KmsSendResp(void)
 
   /* USER CODE END MBMUXIF_KmsSendResp_Last */
 }
-[/#if]
+[/#if][#--  CPUCORE == CM4 vs CM0 vs SINGLE --]
 
 /* USER CODE BEGIN EFD */
 
@@ -259,7 +261,7 @@ static void MBMUXIF_TaskKmsCmdRcv(void)
 
   /* USER CODE END MBMUXIF_TaskKmsCmdRcv_Last */
 }
-[/#if]
+[/#if][#--  CPUCORE == CM4 vs CM0 vs SINGLE --]
 
 /* USER CODE BEGIN PrFD */
 

@@ -811,10 +811,10 @@
     </RefParameter>
     <RefParameter Visible="false" Comment="LSE"     Name="LSE_VALUE" DefaultValue="32768" Max="1000000" Min="0"     Type="double" Display="value/1000" Unit="KHz"/>
     
-    <RefParameter Visible="false" Name="LSE_STATUS" Comment="LSE STATUS" Type="string" DefaultValue="null"   Group="CLKClockSourceLSE">
-        <Condition Expression="LSEUsed=1" Diagnostic=""/>
+    <RefParameter Visible="false" Name="LSE_STATUS" Comment="LSE STATUS" Type="string" DefaultValue="enabled">
+        <Condition Expression="LSEOscillator | LSEByPass|LSEDIGByPass" Diagnostic=""/>
     </RefParameter>
-    <RefParameter Visible="false" Name="LSE_STATUS" Comment="LSE STATUS" Type="string" DefaultValue="disabled"   Group="CLKClockSourceLSE"/>
+    <RefParameter Visible="false" Name="LSE_STATUS" Comment="LSE STATUS" Type="string" DefaultValue="disabled"/>
     
     <RefParameter Visible="false" Name="LSE_VALUE_DT" Comment="clk_lse: clk-lse" Type="double" DefaultValue="+LSE_VALUE"   Group="Source"/>
 		    <RefParameter Visible="false" Name="LSE_VALUE_OSC" Comment="st,bypass" Type="string" DefaultValue="st,bypass"   Group="CLKClockSourceLSE">
@@ -839,6 +839,8 @@
     </RefParameter>
     <RefParameter Visible="false" Name="LSE_VALUE_Drive" Comment="LSE_Drive_Capability" Type="string" DefaultValue="null"   Group="CLKClockSourceLSE"/>
 
+    <RefParameter Visible="false" Name="I2S_CLK_STATUS" Comment="I2S_CLK STATUS" Type="string" DefaultValue="disabled"/>
+    
     <RefParameter Visible="false" Comment="HSE"    Name="HSE_VALUE" DefaultValue="24000000" Max="48000000" Min="0"       Type="double" Display="value/1000000" Unit="MHz" ><!--HSE bypass and !PLL and !CSS-->
         <Condition Diagnostic="HSE in bypass Mode" Expression="HSEByPass  | HSEOscillator|HSEDIGByPass"/>
     </RefParameter>	
@@ -848,10 +850,10 @@
     <RefParameter Visible="false" Name="HSE_VALUE_DT" Comment="clk_hse: clk-hse" Type="double" DefaultValue="+HSE_VALUE"   Group="Source"/>
     
     
-    <RefParameter Visible="false" Name="HSE_STATUS" Comment="HSE STATUS" Type="string" DefaultValue="null"   Group="CLKClockSourceHSE">
-        <Condition Expression="HSEUsed=1" Diagnostic=""/>
+    <RefParameter Visible="false" Name="HSE_STATUS" Comment="HSE STATUS" Type="string" DefaultValue="enabled">
+        <Condition Expression="HSEOscillator|HSEByPass|HSEDIGByPass" Diagnostic=""/>
     </RefParameter>
-    <RefParameter Visible="false" Name="HSE_STATUS" Comment="HSE STATUS" Type="string" DefaultValue="disabled"   Group="CLKClockSourceHSE"/>
+    <RefParameter Visible="false" Name="HSE_STATUS" Comment="HSE STATUS" Type="string" DefaultValue="disabled"/>
 
     <RefParameter Visible="false" Name="HSE_VALUE_OSC" Comment="st,bypass" Type="string" DefaultValue="st,bypass"   Group="CLKClockSourceHSE">
         <Condition Expression="HSEUsed=1 &amp; HSEByPass" Diagnostic=""/>
@@ -1928,31 +1930,6 @@
 	
     <RefParameter Visible="false" Comment="LSI StateARG" DefaultValue="null" Name="LSIStateARG" Type="list"/>
 	
-    <RefParameter Comment="HSI Calibration Value" DefaultValue="16" Max="31" Min="0" Name="HSICalibrationValue" Group="RCC Parameters" Type="integer">
-        <Condition Diagnostic="HSI used" Expression="HSIUsed=1"/>
-    </RefParameter>
-    <RefParameter Comment="HSI Calibration Value" DefaultValue="16" Max="31" Min="0" Name="HSICalibrationValue" Group="RCC Parameters" Type="integer"/>
-	
-	
-    <RefParameter Comment="CSI Calibration Value" DefaultValue="16" Max="31" Min="0" Name="CSICalibrationValue" Group="RCC Parameters" Type="integer">
-        <Condition Diagnostic="CSI used" Expression="CSIUsed=1"/>
-    </RefParameter>
-    <RefParameter Comment="CSI Calibration Value" DefaultValue="16" Max="31" Min="0" Name="CSICalibrationValue" Group="RCC Parameters" Type="integer"/>
-	
-    <RefParameter Visible="false" Comment="HSICalibrationValueARG" DefaultValue="+HSICalibrationValue" Name="HSICalibrationValueARG" Type="list">
-        <Condition Diagnostic="HSI used" Expression="HSIUsed=1"/>
-    </RefParameter>
-	
-    <RefParameter Visible="false" Comment="HSICalibrationValueARG" DefaultValue="null" Name="HSICalibrationValueARG" Type="list"/>
-	
-	
-    <RefParameter Visible="false" Comment="CSICalibrationValueARG" DefaultValue="+CSICalibrationValue" Name="CSICalibrationValueARG" Type="list">
-        <Condition Diagnostic="CSI used" Expression="CSIUsed=1"/>
-    </RefParameter>
-	
-    <RefParameter Visible="false" Comment="CSICalibrationValueARG" DefaultValue="null" Name="CSICalibrationValueARG" Type="list"/>
-	
-
     <RefParameter Visible="false" Comment="800 MHz max" DefaultValue="60"  Name="MPUMaxLimitConstraint" Group="RCC Parameters" Type="list">
         <Condition Diagnostic="" Expression="Max650=false"/>
         <PossibleValue Value="800Mhz" Comment="800 MHz max"/>
@@ -3743,6 +3720,7 @@
         <Parameter Name="LSI_VALUE_DT"/>
         <Parameter Name="HSI_VALUE"/>
         <Parameter Name="HSI_VALUE_DT"/>
+        <Parameter Name="I2S_CLK_STATUS"/>
         <!--Parameter Name="DSI_VALUE_DT"/-->
         <Parameter Name="CSI_VALUE"/>
         <Parameter Name="CSI_VALUE_DT"/>
@@ -3755,7 +3733,7 @@
         <Parameter Name="HSE_VALUE_DT"/>
         <Parameter Name="HSE_STATUS"/>
         <Parameter Name="EXTERNAL_CLOCK_VALUE"/>
-        <Parameter Name="EXTERNAL_CLOCK_VALUE_DT"/>
+        <!--Parameter Name="EXTERNAL_CLOCK_VALUE_DT"/-->
         <!--Parameter Name="MCUDIVFreq_Value"/-->
         <Parameter Name="HCLKFreq_Value"/>
         <Parameter Name="I2C46Freq_Value"/>
@@ -3882,8 +3860,6 @@
         <Parameter Name="LSE_Timout"/>
         <Parameter Name="LSE_Drive_Capability"/>
 
-        <Parameter Name="CSICalibrationValue"/>
-        <Parameter Name="HSICalibrationValue"/>
         <Parameter Name="PLL1UserDefinedConfig"/>
     </RefMode>
 

@@ -107,9 +107,6 @@ extern "C" {
 /* USER CODE END EM */
 
 /* Get the current time in ticks */
-
-/* USER CODE BEGIN FX_STM32_MMC_CURRENT_TIME */
-
 [#if FX_STANDALONE_ENABLE_value == "0"]
 #define FX_STM32_MMC_CURRENT_TIME()                          tx_time_get()
 [/#if]
@@ -117,7 +114,7 @@ extern "C" {
 #define FX_STM32_MMC_CURRENT_TIME()                          HAL_GetTick()
 [/#if]
 
-/* USER CODE END FX_STM32_MMC_CURRENT_TIME */
+
 
 
 /* Macro called before initializing the MMC driver

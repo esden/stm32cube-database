@@ -70,7 +70,7 @@
 /**************************************************************************/
 /**************************************************************************/
 
-SYSTEM_CLOCK      =   ${SYSCLKFreq_VALUE}
+SYSTEM_CLOCK      =   ${HCLKFreq_Value}
 SYSTICK_CYCLES    =   ((SYSTEM_CLOCK / ${TX_TIMER_TICKS_PER_SECOND_value}) -1)
 
 /**************************************************************************/
@@ -287,10 +287,12 @@ __tx_DBGHandler:
     EXTERN  _tx_thread_system_stack_ptr
     EXTERN  _tx_initialize_unused_memory
     EXTERN  _tx_timer_interrupt
+    EXTERN  _tx_execution_isr_enter
+    EXTERN  _tx_execution_isr_exit
     EXTERN  __vector_table
 ;
 ;
-SYSTEM_CLOCK      EQU   ${SYSCLKFreq_VALUE}
+SYSTEM_CLOCK      EQU   ${HCLKFreq_Value}
 SYSTICK_CYCLES    EQU   ((SYSTEM_CLOCK / ${TX_TIMER_TICKS_PER_SECOND_value}) -1)
 ;
 ;
@@ -489,7 +491,7 @@ __tx_DBGHandler:
 /**************************************************************************/
 /**************************************************************************/
 
-SYSTEM_CLOCK      =   ${SYSCLKFreq_VALUE}
+SYSTEM_CLOCK      =   ${HCLKFreq_Value}
 SYSTICK_CYCLES    =   ((SYSTEM_CLOCK / ${TX_TIMER_TICKS_PER_SECOND_value}) -1)
 
 /**************************************************************************/

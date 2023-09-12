@@ -48,6 +48,10 @@
 	</RefParameter>
 
 	<RefParameter Comment="Output Buffer" DefaultValue="DAC_OUTPUTBUFFER_ENABLE" Name="DAC_OutputBuffer" Type="list" >
+            <Condition Expression="($IpInstance_OUT1_Ext &amp; DAC_SampleAndHold=DAC_SAMPLEANDHOLD_ENABLE) | ($IpInstance_OUT1_ExtAndInt &amp; DAC_SampleAndHold=DAC_SAMPLEANDHOLD_DISABLE)" Diagnostic=""/>
+            <PossibleValue Comment="Enable" Value="DAC_OUTPUTBUFFER_ENABLE"/>
+	</RefParameter>
+	<RefParameter Comment="Output Buffer" DefaultValue="DAC_OUTPUTBUFFER_ENABLE" Name="DAC_OutputBuffer" Type="list" >
 		<PossibleValue Comment="Enable" Value="DAC_OUTPUTBUFFER_ENABLE"/>
 		<PossibleValue Comment="Disable" Value="DAC_OUTPUTBUFFER_DISABLE"/>
 	</RefParameter>
@@ -167,10 +171,16 @@
         </RefParameter>
         
         <!-- Sample and hold settings-->
-        <RefParameter Comment="Sample And Hold" DefaultValue="DAC_SAMPLEANDHOLD_DISABLE" Name="DAC_SampleAndHold" Type="list">
-            <Description>Specifies whether the DAC mode.</Description>
-            <PossibleValue Comment="Sampleandhold Disable" Value="DAC_SAMPLEANDHOLD_DISABLE"/>
-            <PossibleValue Comment="Sampleandhold Enable" Value="DAC_SAMPLEANDHOLD_ENABLE" Semaphore="RCC_DAC_SAMPLEANDHOLD"/>
+        <RefParameter Name="DAC_SampleAndHold" Comment="Mode selected" DefaultValue="DAC_SAMPLEANDHOLD_DISABLE" Type="list">
+            <Description>
+                Specifies the DAC mode.&lt;br/&gt;
+                In case of Sample and Hold Mode then specifies values in additionnal parameters :&lt;br/&gt;
+                - Sample Time&lt;br/&gt;
+                - Hold Time &lt;br/&gt;
+                - Refresh Time&lt;br/&gt;
+            </Description>
+            <PossibleValue Comment="Normal Mode" Value="DAC_SAMPLEANDHOLD_DISABLE"/>
+            <PossibleValue Comment="Sample and Hold Mode" Value="DAC_SAMPLEANDHOLD_ENABLE" Semaphore="RCC_DAC_SAMPLEANDHOLD"/>
         </RefParameter>
         <RefParameter Comment="Sample Time" DefaultValue="null" Name="DAC_SampleTime" Type="list" Visible="false">
             <Condition Expression="DAC_SampleAndHold=DAC_SAMPLEANDHOLD_DISABLE" Diagnostic=""/>
@@ -202,52 +212,10 @@
 		<ConfigForMode>DAC_Init</ConfigForMode>
                 <ConfigForMode>DAC_TriangleWaveGenerate1</ConfigForMode>
                 <ConfigForMode>DAC_NoiseWaveGenerate1</ConfigForMode>
-                <Parameter Name="DAC_OutputBuffer">
-                <PossibleValue>DAC_OUTPUTBUFFER_ENABLE</PossibleValue>
-            </Parameter>
-                <Parameter Name="DAC_Trigger"/>
-                <Parameter Name="DAC_Channel">
-                    <PossibleValue>DAC_CHANNEL_1</PossibleValue>
-                </Parameter>
-                <Parameter Name="WaveGeneration"/>
-                <Parameter Name="TriangleAmplitude"/>
-                <Parameter Name="NoiseAmplitude"/>
-                <Parameter Name="DAC_UserTrimming"/>
-                <Parameter Name="DAC_TrimmingValue"/>
                 <Parameter Name="DAC_SampleAndHold"/>
                 <Parameter Name="DAC_SampleTime"/>
                 <Parameter Name="DAC_HoldTime"/>
                 <Parameter Name="DAC_RefreshTime"/>
-    </RefMode>	
-    <RefMode Name="DAC_OUT1_Int" Comment="DAC Out1 Mode" Group="DAC Out1 Settings" >
-        <Condition Expression="$IpInstance_OUT1_Int" Diagnostic=""/>
-		<ConfigForMode>DAC_ChannelConfig1</ConfigForMode>
-		<ConfigForMode>DAC_Init</ConfigForMode>
-                <ConfigForMode>DAC_TriangleWaveGenerate1</ConfigForMode>
-                <ConfigForMode>DAC_NoiseWaveGenerate1</ConfigForMode>
-                <Parameter Name="DAC_OutputBuffer">
-                <PossibleValue>DAC_OUTPUTBUFFER_DISABLE</PossibleValue>
-                </Parameter>
-                <Parameter Name="DAC_Trigger"/>
-                <Parameter Name="DAC_Channel">
-                    <PossibleValue>DAC_CHANNEL_1</PossibleValue>
-                </Parameter>
-                <Parameter Name="WaveGeneration"/>
-                <Parameter Name="TriangleAmplitude"/>
-                <Parameter Name="NoiseAmplitude"/>
-                <Parameter Name="DAC_UserTrimming"/>
-                <Parameter Name="DAC_TrimmingValue"/>
-                <Parameter Name="DAC_SampleAndHold"/>
-                <Parameter Name="DAC_SampleTime"/>
-                <Parameter Name="DAC_HoldTime"/>
-                <Parameter Name="DAC_RefreshTime"/>
-    </RefMode>	
-	<RefMode Name="DAC_OUT1" Comment="DAC Out1 Mode" Group="DAC Out1 Settings" >
-    	<Condition Expression="$IpInstance_OUT1_Ext" Diagnostic=""/>
-		<ConfigForMode>DAC_ChannelConfig1</ConfigForMode>
-		<ConfigForMode>DAC_Init</ConfigForMode>
-                <ConfigForMode>DAC_TriangleWaveGenerate1</ConfigForMode>
-                <ConfigForMode>DAC_NoiseWaveGenerate1</ConfigForMode>
                 <Parameter Name="DAC_OutputBuffer"/>
                 <Parameter Name="DAC_Trigger"/>
                 <Parameter Name="DAC_Channel">
@@ -258,10 +226,50 @@
                 <Parameter Name="NoiseAmplitude"/>
                 <Parameter Name="DAC_UserTrimming"/>
                 <Parameter Name="DAC_TrimmingValue"/>
+    </RefMode>	
+    <RefMode Name="DAC_OUT1_Int" Comment="DAC Out1 Mode" Group="DAC Out1 Settings" >
+        <Condition Expression="$IpInstance_OUT1_Int" Diagnostic=""/>
+		<ConfigForMode>DAC_ChannelConfig1</ConfigForMode>
+		<ConfigForMode>DAC_Init</ConfigForMode>
+                <ConfigForMode>DAC_TriangleWaveGenerate1</ConfigForMode>
+                <ConfigForMode>DAC_NoiseWaveGenerate1</ConfigForMode>
                 <Parameter Name="DAC_SampleAndHold"/>
                 <Parameter Name="DAC_SampleTime"/>
                 <Parameter Name="DAC_HoldTime"/>
                 <Parameter Name="DAC_RefreshTime"/>
+                <Parameter Name="DAC_OutputBuffer">
+                    <PossibleValue>DAC_OUTPUTBUFFER_DISABLE</PossibleValue>
+                </Parameter>
+                <Parameter Name="DAC_Trigger"/>
+                <Parameter Name="DAC_Channel">
+                    <PossibleValue>DAC_CHANNEL_1</PossibleValue>
+                </Parameter>
+                <Parameter Name="WaveGeneration"/>
+                <Parameter Name="TriangleAmplitude"/>
+                <Parameter Name="NoiseAmplitude"/>
+                <Parameter Name="DAC_UserTrimming"/>
+                <Parameter Name="DAC_TrimmingValue"/>
+    </RefMode>	
+	<RefMode Name="DAC_OUT1" Comment="DAC Out1 Mode" Group="DAC Out1 Settings" >
+    	<Condition Expression="$IpInstance_OUT1_Ext" Diagnostic=""/>
+		<ConfigForMode>DAC_ChannelConfig1</ConfigForMode>
+		<ConfigForMode>DAC_Init</ConfigForMode>
+                <ConfigForMode>DAC_TriangleWaveGenerate1</ConfigForMode>
+                <ConfigForMode>DAC_NoiseWaveGenerate1</ConfigForMode>
+                <Parameter Name="DAC_SampleAndHold"/>
+                <Parameter Name="DAC_SampleTime"/>
+                <Parameter Name="DAC_HoldTime"/>
+                <Parameter Name="DAC_RefreshTime"/>
+                <Parameter Name="DAC_OutputBuffer"/>
+                <Parameter Name="DAC_Trigger"/>
+                <Parameter Name="DAC_Channel">
+                    <PossibleValue>DAC_CHANNEL_1</PossibleValue>
+                </Parameter>
+                <Parameter Name="WaveGeneration"/>
+                <Parameter Name="TriangleAmplitude"/>
+                <Parameter Name="NoiseAmplitude"/>
+                <Parameter Name="DAC_UserTrimming"/>
+                <Parameter Name="DAC_TrimmingValue"/>
     </RefMode>
         
         

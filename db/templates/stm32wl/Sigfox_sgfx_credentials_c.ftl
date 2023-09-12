@@ -62,7 +62,7 @@
 #include "kms_if.h"
 #endif /* SIGFOX_KMS */
 [/#if]
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION" --]
 
 /* USER CODE BEGIN Includes */
 
@@ -150,7 +150,7 @@ static CK_ATTRIBUTE DeriveKey_template[] =
 static CK_OBJECT_HANDLE kms_sgfx_session_key_handle;
 #endif  /* SIGFOX_KMS */
 [/#if]
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION" --]
 
 /* USER CODE BEGIN PV */
 
@@ -172,7 +172,7 @@ static sfx_error_t Sgfx_KMS_GetAttribute(CK_OBJECT_HANDLE input, uint8_t *pAttrV
 static void Sgfx_KMS_DeleteDerivedKeys(CK_OBJECT_HANDLE input);
 #endif /* SIGFOX_KMS */
 [/#if]
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION" --]
 
 /* USER CODE BEGIN PFP */
 
@@ -222,7 +222,7 @@ sfx_error_t CREDENTIALS_aes_128_cbc_encrypt(uint8_t *encrypted_data, uint8_t *da
   }
 #endif /* SIGFOX_KMS */
 [/#if]
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION" --]
   /* USER CODE BEGIN CREDENTIALS_aes_128_cbc_encrypt_2 */
 
   /* USER CODE END CREDENTIALS_aes_128_cbc_encrypt_2 */
@@ -255,7 +255,7 @@ sfx_error_t CREDENTIALS_aes_128_cbc_encrypt_with_session_key(uint8_t *encrypted_
   retval = Sgfx_KMS_AES_CBC_encrypt(data_to_encrypt, encrypted_data, (CK_OBJECT_HANDLE)kms_sgfx_session_key_handle, blocks);
 #endif /* SIGFOX_KMS */
 [/#if]
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION" --]
   /* USER CODE BEGIN CREDENTIALS_aes_128_cbc_encrypt_with_session_key_2 */
 
   /* USER CODE END CREDENTIALS_aes_128_cbc_encrypt_with_session_key_2 */
@@ -295,7 +295,7 @@ sfx_error_t CREDENTIALS_wrap_session_key(uint8_t *data, uint8_t blocks)
   retval = Sgfx_KMS_DeriveKey(data, (CK_OBJECT_HANDLE)kms_sgfx_session_key_handle);
 #endif /* SIGFOX_KMS */
 [/#if]
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION" --]
   /* USER CODE BEGIN CREDENTIALS_wrap_session_key_2 */
 
   /* USER CODE END CREDENTIALS_wrap_session_key_2 */
@@ -343,7 +343,7 @@ void CREDENTIALS_get_dev_id(uint8_t *dev_id)
   Sgfx_KMS_GetAttribute(KMS_SGFX_ID_OBJECT_HANDLE, dev_id);
 #endif /* SIGFOX_KMS */
 [/#if]
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION" --]
   /* USER CODE BEGIN CREDENTIALS_get_dev_id_2 */
 
   /* USER CODE END CREDENTIALS_get_dev_id_2 */
@@ -370,7 +370,7 @@ void CREDENTIALS_get_initial_pac(uint8_t *pac)
   Sgfx_KMS_GetAttribute(KMS_SGFX_PAC_OBJECT_HANDLE, pac);
 #endif /* SIGFOX_KMS */
 [/#if]
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION" --]
   /* USER CODE BEGIN CREDENTIALS_get_initial_pac_2 */
 
   /* USER CODE END CREDENTIALS_get_initial_pac_2 */
@@ -687,8 +687,8 @@ static void Sgfx_KMS_DeleteDerivedKeys(CK_OBJECT_HANDLE input)
 }
 
 #endif /* SIGFOX_KMS */
-[/#if]
-[/#if]
+[/#if][#--  CPUCORE == "CM0PLUS" --]
+[/#if][#--  SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION" --]
 
 /* USER CODE BEGIN PrFD */
 

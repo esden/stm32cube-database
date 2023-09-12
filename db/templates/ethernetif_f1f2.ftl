@@ -141,6 +141,13 @@ osSemaphoreId s_xSemaphore = NULL;
 /* Global Ethernet handle */
 ETH_HandleTypeDef heth;
 
+/* Private function prototypes -----------------------------------------------*/
+[#if with_rtos == 1][#-- rtos used --]
+[#if cmsis_version = "v1"][#-- cmsis_version v1 --]
+static void ethernetif_input(void const * argument);
+[/#if][#-- endif cmsis_version v1 --]
+[/#if][#-- rtos used --]
+
 /* USER CODE BEGIN 3 */
 
 /* USER CODE END 3 */
@@ -500,7 +507,7 @@ static struct pbuf * low_level_input(struct netif *netif)
  */
 [#if with_rtos == 1]
 [#if cmsis_version = "v1"]
-void ethernetif_input(void const * argument)
+static void ethernetif_input(void const * argument)
 [#else][#-- endif cmsis_version --]
 void ethernetif_input(void* argument)
 [/#if][#-- endif cmsis_version --]

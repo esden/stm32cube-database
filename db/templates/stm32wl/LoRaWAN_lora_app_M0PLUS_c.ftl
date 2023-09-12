@@ -10,11 +10,25 @@
   ******************************************************************************
   */
 /* USER CODE END Header */
+[#assign UTIL_SEQ_EN_M0 = "true"]
+[#if SWIPdatas??]
+    [#list SWIPdatas as SWIP]
+        [#if SWIP.defines??]
+            [#list SWIP.defines as definition]
+                [#if definition.name == "UTIL_SEQ_EN_M0"]
+                    [#assign UTIL_SEQ_EN_M0 = definition.value]
+                [/#if]
+            [/#list]
+        [/#if]
+    [/#list]
+[/#if]
 
 /* Includes ------------------------------------------------------------------*/
 #include "sys_app.h"
 #include "lora_app.h"
+[#if UTIL_SEQ_EN_M0 == "true"]
 #include "stm32_seq.h"
+[/#if]
 #include "utilities_def.h"
 #include "LmHandler.h"
 
@@ -62,7 +76,13 @@ void InitPackageProcess(void)
   /* USER CODE BEGIN InitPackageProcess_1 */
 
   /* USER CODE END InitPackageProcess_1 */
+[#if UTIL_SEQ_EN_M0 == "true"]
   UTIL_SEQ_RegTask((1 << CFG_SEQ_Task_LmHandlerProcess), UTIL_SEQ_RFU, LmHandlerProcess);
+[#else]
+  /* USER CODE BEGIN InitPackageProcess_OS */
+
+  /* USER CODE END InitPackageProcess_OS */
+[/#if][#--  SEQUENCER --]
   /* USER CODE BEGIN InitPackageProcess_2 */
 
   /* USER CODE END InitPackageProcess_2 */
@@ -73,7 +93,13 @@ void OnMacProcessNotify(void)
   /* USER CODE BEGIN OnMacProcessNotify_1 */
 
   /* USER CODE END OnMacProcessNotify_1 */
+[#if UTIL_SEQ_EN_M0 == "true"]
   UTIL_SEQ_SetTask((1 << CFG_SEQ_Task_LmHandlerProcess), CFG_SEQ_Prio_0);
+[#else]
+  /* USER CODE BEGIN OnMacProcessNotify_OS */
+
+  /* USER CODE END OnMacProcessNotify_OS */
+[/#if][#--  SEQUENCER --]
   /* USER CODE BEGIN OnMacProcessNotify_2 */
 
   /* USER CODE END OnMacProcessNotify_2 */

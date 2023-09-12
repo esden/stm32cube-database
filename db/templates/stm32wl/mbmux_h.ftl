@@ -78,7 +78,8 @@ void MBMUX_SetCm0plusFeatureListPtr(FEAT_INFO_List_t *pCM0PLUS_FeatureList);
 int8_t MBMUX_RegisterFeature(FEAT_INFO_IdTypeDef e_featID, MBMUX_ComType_t ComType,
                              void (*MsgCb)(void *ComObj), uint32_t *const ComBuffer, uint16_t ComBufSize);
 [#else]
-int8_t MBMUX_RegisterFeatureCallback(FEAT_INFO_IdTypeDef e_featID, MBMUX_ComType_t ComType, void (*MsgCb)(void *ComObj));
+int8_t MBMUX_RegisterFeatureCallback(FEAT_INFO_IdTypeDef e_featID, MBMUX_ComType_t ComType,
+                                     void (*MsgCb)(void *ComObj));
 [/#if]
 
 /**

@@ -536,10 +536,10 @@
     
 	<RefParameter Visible="false" Comment="CK48 clock Source"   Name="SDMMCFreq_Value" DefaultValue="16000000" Max="50000000"  Type="double" Display="value/1000000" Unit="MHz" IP="SDMMC1"/>
     <RefParameter Visible="false" Comment="CK48 clock Source"   Name="RNGFreq_Value"   DefaultValue="16000000" Max="48000000" Type="double" Display="value/1000000" Unit="MHz" IP="RNG"/>
-    <RefParameter Visible="false" Comment="ADC clock Source"    Name="ADCFreq_Value" Min="1400000"   Max="26000000"  DefaultValue="16000000"  Type="double" Display="value/1000000" Unit="MHz" >
+    <RefParameter Visible="false" Comment="ADC clock Source"    Name="ADCFreq_Value" Min="140000"   Max="26000000"  DefaultValue="16000000"  Type="double" Display="value/1000000" Unit="MHz" >
      <Condition Diagnostic="HSE in bypass Mode" Expression="scale2"/>
     </RefParameter>  
-    <RefParameter Visible="false" Comment="ADC clock Source"    Name="ADCFreq_Value"  Min="1400000"   Max="80000000" DefaultValue="16000000"  Type="double" Display="value/1000000" Unit="MHz" />
+    <RefParameter Visible="false" Comment="ADC clock Source"    Name="ADCFreq_Value"  Min="140000"   Max="80000000" DefaultValue="16000000"  Type="double" Display="value/1000000" Unit="MHz" />
     <RefParameter Visible="false" Comment="ADC synchr"  Name="synchADCFreq_Value"  DefaultValue="=HCLKFreq_Value" Type="double" Display="value/1000000" Unit="MHz" IP="ADC1"/>
     <RefParameter Visible="false" Comment="ADC asynchr" Name="asynchADCFreq_Value" DefaultValue="=ADCFreq_Value"  Type="double" Display="value/1000000"  Unit="MHz" IP="ADC1"/>
      
@@ -573,7 +573,7 @@
     <RefParameter Visible="false" Comment="PLLQ"     Name="PLLQoutputFreq_Value"     DefaultValue="4000000"   Type="double" Display="value/1000000" Unit="MHz"/>
 	<!--PLLP output-->
     <RefParameter Visible="false" Comment="PLLP"     Name="PLLPoutputFreq_Value" Min="2064000" Max="122000000"    DefaultValue="4571429"   Type="double" Display="value/1000000" Unit="MHz">
-        <Condition Expression=" (ADC1_USED &amp; ADCSourcePllp) | (I2S1SourcePll &amp; I2S1Used_ForRCC) | (I2S2SourcePll &amp; I2S2Used_ForRCC)" Diagnostic=" "/>
+        <Condition Expression=" (ADC1_USED &amp; ADCSourcePllp &amp; ADCUsed_ForRCC) | (I2S1SourcePll &amp; I2S1Used_ForRCC) | (I2S2SourcePll &amp; I2S2Used_ForRCC)" Diagnostic=" "/>
     </RefParameter>
     <RefParameter Visible="false" Comment="PLLP"     Name="PLLPoutputFreq_Value"     DefaultValue="4000000"   Type="double" Display="value/1000000" Unit="MHz"/>
 		
@@ -693,7 +693,7 @@
 	
     <!-- ADC Output Enable -->
     <RefParameter Visible="false" Name="ADCEnable" Comment="ADC1" Type="list" DefaultValue="true" IP="ADC1">
-        <Condition Expression="ADC1_USED &amp; CodegenConfigPeriph=true" Diagnostic="ADC is activated"/>
+        <Condition Expression="ADC1_USED &amp; ADCUsed_ForRCC &amp; CodegenConfigPeriph=true" Diagnostic="ADC is activated"/>
         <PossibleValue Value="true" Comment="true"/>
     </RefParameter>	
     <RefParameter Visible="false" Name="ADCEnable" Comment="ADC1" Type="list" DefaultValue="false" >
@@ -701,7 +701,7 @@
     </RefParameter>
     
     <RefParameter Visible="false" Name="ADCPLLEnable" Comment="ADC1" Type="list" DefaultValue="true" IP="ADC1">
-        <Condition Expression="ADC1_USED &amp; CodegenConfigPeriph=true | CodegenConfigPeriph=false" Diagnostic="ADC is activated"/>
+        <Condition Expression="ADC1_USED &amp; ADCUsed_ForRCC &amp; CodegenConfigPeriph=true | CodegenConfigPeriph=false" Diagnostic="ADC is activated"/>
         <PossibleValue Value="true" Comment="true"/>
     </RefParameter>
     <RefParameter Visible="false" Name="ADCPLLEnable" Comment="ADC1" Type="list" DefaultValue="false" >
@@ -1148,7 +1148,7 @@
     </RefParameter>
     <RefParameter Visible="false" Comment="HSI is Used" DefaultValue="0" Name="HSIUsedForSys" Min="0" Type="integer"/>
     <RefParameter Visible="false" Comment="HSI Is Used" DefaultValue="1" Name="HSIUsed" Min="1" Type="integer">
-        <Condition Expression="UCPD_Used|(CECSOURCEHSI &amp; CECUsed_ForRCC) | (I2S1SourceHsi &amp; I2S1Used_ForRCC) | (I2S2SourceHsi &amp; I2S2Used_ForRCC)| (ADCSourceHsi &amp; ADC1_USED) | (RNGClockisHSI &amp; RNGUsed_ForRCC)|(USART1SourceHSI&amp; USART1Used_ForRCC)|(USART2SourceHSI&amp; USART2Used_ForRCC)|(USART3SourceHSI&amp; USART3Used_ForRCC)|(LPUART1SourceHSI&amp; LPUART1Used_ForRCC)|(LPUART2SourceHSI&amp; LPUART2Used_ForRCC)|(LPTIM1SOURCEHSI&amp; LPTIM1Used_ForRCC)|(LPTIM2SOURCEHSI &amp; LPTIM2Used_ForRCC)|(I2C1SourceHSI&amp; I2C1Used_ForRCC)|(I2C2SourceHSI&amp; I2C2Used_ForRCC)|((PLLSourceHSI)&amp; (PLLUsed=1))|(SYSCLKSource=RCC_SYSCLKSOURCE_HSI)|((RCC_MCO1Source=RCC_MCO1SOURCE_HSI)&amp;((((Semaphore_input_Channel1TIM17 &amp; TIM17 &amp; SEM2RCC_MCO_REQUIRED_TIM17)|MCOConfig))))|((RCC_MCO2Source=RCC_MCO2SOURCE_HSI)&amp;((((Semaphore_input_Channel1TIM17 &amp; TIM17 &amp; SEM2RCC_MCO_REQUIRED_TIM17)|MCOC2onfig))))" Diagnostic="LSE is used if "/>
+        <Condition Expression="UCPD_Used|(CECSOURCEHSI &amp; CECUsed_ForRCC) | (I2S1SourceHsi &amp; I2S1Used_ForRCC) | (I2S2SourceHsi &amp; I2S2Used_ForRCC)| (ADCSourceHsi &amp; ADC1_USED &amp; ADCUsed_ForRCC) | (RNGClockisHSI &amp; RNGUsed_ForRCC)|(USART1SourceHSI&amp; USART1Used_ForRCC)|(USART2SourceHSI&amp; USART2Used_ForRCC)|(USART3SourceHSI&amp; USART3Used_ForRCC)|(LPUART1SourceHSI&amp; LPUART1Used_ForRCC)|(LPUART2SourceHSI&amp; LPUART2Used_ForRCC)|(LPTIM1SOURCEHSI&amp; LPTIM1Used_ForRCC)|(LPTIM2SOURCEHSI &amp; LPTIM2Used_ForRCC)|(I2C1SourceHSI&amp; I2C1Used_ForRCC)|(I2C2SourceHSI&amp; I2C2Used_ForRCC)|((PLLSourceHSI)&amp; (PLLUsed=1))|(SYSCLKSource=RCC_SYSCLKSOURCE_HSI)|((RCC_MCO1Source=RCC_MCO1SOURCE_HSI)&amp;((((Semaphore_input_Channel1TIM17 &amp; TIM17 &amp; SEM2RCC_MCO_REQUIRED_TIM17)|MCOConfig))))|((RCC_MCO2Source=RCC_MCO2SOURCE_HSI)&amp;((((Semaphore_input_Channel1TIM17 &amp; TIM17 &amp; SEM2RCC_MCO_REQUIRED_TIM17)|MCOC2onfig))))" Diagnostic="LSE is used if "/>
     </RefParameter>
     <RefParameter Visible="false" Comment="HSI is Used" DefaultValue="0" Name="HSIUsed" Min="0" Type="integer"/>
 	
@@ -1209,7 +1209,7 @@
     
     <!-- PLLUsedForADC used -->
     <RefParameter Visible="false" Comment="PLL is ADC" DefaultValue="1" Name="PLLUsedForADC" Min="1" Max="1" Type="integer">
-        <Condition Expression="(ADCSourcePllp &amp; ADC1_USED)| MCO2SOURCE_PLLPCLK &amp; MCO2Config| MCO1SOURCE_PLLPCLK &amp; ((Semaphore_input_Channel1TIM17 &amp; TIM17 &amp; SEM2RCC_MCO_REQUIRED_TIM17)|MCOConfig)" Diagnostic=" "/>
+        <Condition Expression="(ADCSourcePllp &amp; ADC1_USED &amp; ADCUsed_ForRCC)| MCO2SOURCE_PLLPCLK &amp; MCO2Config| MCO1SOURCE_PLLPCLK &amp; ((Semaphore_input_Channel1TIM17 &amp; TIM17 &amp; SEM2RCC_MCO_REQUIRED_TIM17)|MCOConfig)" Diagnostic=" "/>
     </RefParameter>
 	
     <RefParameter Visible="false" Comment="PLL is ADC" DefaultValue="0" Name="PLLUsedForADC" Min="0" Max="0" Type="integer"/>
@@ -1228,7 +1228,7 @@
     <RefParameter Visible="false" Comment="PLL is I2S" DefaultValue="0" Name="PLLUsedForI2S2" Min="0" Max="0" Type="integer"/>
         <!-- PLL used -->
     <RefParameter Visible="false" Comment="MainPLL Is Used" DefaultValue="1" Name="PLLUsed" Min="1" Max="1" Type="integer">
-        <Condition Expression="USBUsed_ForRCC &amp; USBCLKSOURCE_PLL | (FDCAN1Used_ForRCC | FDCAN2Used_ForRCC) &amp;FDCANCLKSOURCE_PLL|(I2S1SourcePll &amp; I2S1Used_ForRCC) | (I2S2SourcePll &amp; I2S2Used_ForRCC)|(ADC1_USED &amp; ADCSourcePllp) | (TIM15 &amp; TIM15SOURCEPll) | (TIM1 &amp; TIM1SOURCEPll) |(SysSourcePLL)|(((RCC_MCO1Source=RCC_MCO1SOURCE_PLLCLK) | MCO1SOURCE_PLLPCLK | MCO1SOURCE_PLLQCLK)&amp; ((Semaphore_input_Channel1TIM17 &amp; TIM17 &amp; SEM2RCC_MCO_REQUIRED_TIM17)|MCOConfig))|( RNGClockisPll &amp; (RNGUsed_ForRCC))" Diagnostic=" "/>
+        <Condition Expression="USBUsed_ForRCC &amp; USBCLKSOURCE_PLL | (FDCAN1Used_ForRCC | FDCAN2Used_ForRCC) &amp;FDCANCLKSOURCE_PLL|(I2S1SourcePll &amp; I2S1Used_ForRCC) | (I2S2SourcePll &amp; I2S2Used_ForRCC)|(ADC1_USED &amp; ADCUsed_ForRCC &amp; ADCSourcePllp) | (TIM15 &amp; TIM15SOURCEPll) | (TIM1 &amp; TIM1SOURCEPll) |(SysSourcePLL)|(((RCC_MCO1Source=RCC_MCO1SOURCE_PLLCLK) | MCO1SOURCE_PLLPCLK | MCO1SOURCE_PLLQCLK)&amp; ((Semaphore_input_Channel1TIM17 &amp; TIM17 &amp; SEM2RCC_MCO_REQUIRED_TIM17)|MCOConfig))|( RNGClockisPll &amp; (RNGUsed_ForRCC))" Diagnostic=" "/>
     </RefParameter>
 	
     <RefParameter Visible="false" Comment="Main PLL is Used" DefaultValue="0" Name="PLLUsed" Min="0" Max="0" Type="integer"/>
@@ -1335,7 +1335,7 @@
         <PossibleValue Comment="Periphclk I2S2" Value="RCC_PERIPHCLK_I2S2"/>
     </RefParameter>
     <RefParameter Visible="false" Name="PeriphClockSelectionARG" Comment="PeriphClockSelectionARG" IP="ADC1" Type="list" DefaultValue="RCC_PERIPHCLK_ADC">
-        <Condition Expression="(ADC1_USED)" Diagnostic="ADC Activated"/>
+        <Condition Expression="(ADC1_USED &amp; ADCUsed_ForRCC)" Diagnostic="ADC Activated"/>
         <PossibleValue Comment="Periphclk ADC" Value="RCC_PERIPHCLK_ADC"/>
     </RefParameter>    
     <RefParameter Visible="false" Name="PeriphClockSelectionARG" Comment="PeriphClockSelectionARG" IP="FDCAN1" Type="list" DefaultValue="RCC_PERIPHCLK_FDCAN">
@@ -1454,7 +1454,7 @@
 	
 	
     <RefParameter Visible="false" Name="AdcClockSelectionARG" Comment="AdcClockSelectionARG" Type="list" IP="ADC1" DefaultValue="+ADCCLockSelection">
-        <Condition Expression="(ADC1_USED)&amp; CodegenConfigPeriph=true" Diagnostic="ADC Activated"/>
+        <Condition Expression="(ADC1_USED &amp; ADCUsed_ForRCC)&amp; CodegenConfigPeriph=true" Diagnostic="ADC Activated"/>
     </RefParameter>
     <RefParameter Visible="false" Name="AdcClockSelectionARG" Comment="AdcClockSelectionARG" Type="list" DefaultValue="null"/>
 	

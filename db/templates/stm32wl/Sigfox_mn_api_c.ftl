@@ -65,7 +65,7 @@
 [/#if]
 [/#if]
 #include "utilities_def.h"
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION" --]
 
 /* USER CODE BEGIN Includes */
 
@@ -100,7 +100,7 @@ extern LPTIM_HandleTypeDef hlptim1;
 
 #define RADIO_NOISE_LEVEL (int16_t) (-130)
 
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION" --]
 /* USER CODE BEGIN PD */
 
 /* USER CODE END PD */
@@ -150,7 +150,7 @@ static uint8_t RssiReadOnIT_Enable = 1;
 /*Monarch timeout timer*/
 static UTIL_TIMER_Object_t Monarch_TimerTimeout;
 
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION" --]
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -182,7 +182,7 @@ static void MN_TIM_Stop(void);
   */
 static void Thd_MonarchProcess_Entry(unsigned long thread_input);
 [/#if]
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION" --]
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -243,19 +243,19 @@ void MN_API_Init(void (*MN_API_Timer_CB)(int16_t rssi))
     Error_Handler();
   }
 [/#if]
-[/#if]
+[/#if][#--  THREADX vs FREERTOS vs SEQUENCER --]
 
   /* USER CODE BEGIN MN_API_Init_2 */
 
   /* USER CODE END MN_API_Init_2 */
-[#else]
+[#else][#--  SUBGHZ_APPLICATION == "SIGFOX_USER_APPLICATION" --]
   /*Initialization of the hardware timer and RF for Monarch*/
   /*Register call back MN_API_Timer_CB*/
   /*monarch API callback at every timer interrupt*/
   /* USER CODE BEGIN MN_API_Init */
 
   /* USER CODE END MN_API_Init */
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION" --]
 }
 
 void MN_API_DeInit(void)
@@ -280,12 +280,12 @@ void MN_API_DeInit(void)
   /* USER CODE BEGIN MN_API_DeInit_2 */
 
   /* USER CODE END MN_API_DeInit_2 */
-[#else]
+[#else][#--  SUBGHZ_APPLICATION == "SIGFOX_USER_APPLICATION" --]
   /*De-Initialization of the hardware timer and RF for Monarch*/
   /* USER CODE BEGIN MN_API_DeInit */
 
   /* USER CODE END MN_API_DeInit */
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION" --]
 }
 
 void MN_API_StartRx(void)
@@ -540,7 +540,7 @@ void HAL_LPTIM_AutoReloadMatchCallback(LPTIM_HandleTypeDef *hlptim)
 [#else]
     osThreadFlagsSet(Thd_MonarchProcessId, 1);
 [/#if]
-[/#if]
+[/#if][#--  THREADX vs FREERTOS vs SEQUENCER --]
   }
   /* USER CODE BEGIN HAL_LPTIM_AutoReloadMatchCallback_2 */
 
@@ -623,7 +623,7 @@ static void Thd_MonarchProcess(void *argument)
   /* USER CODE END Thd_MonarchProcess_2 */
 }
 [/#if]
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION != "LORA_USER_APPLICATION --]
 
 /* USER CODE BEGIN PrFD */
 

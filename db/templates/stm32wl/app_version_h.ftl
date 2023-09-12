@@ -26,13 +26,7 @@
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-[#if ((SUBGHZ_APPLICATION == "LORA_END_NODE") || (SUBGHZ_APPLICATION == "LORA_AT_SLAVE") || (SUBGHZ_APPLICATION == "LORA_USER_APPLICATION"))]
-  * @file    lora_app_version.h
-[#elseif ((SUBGHZ_APPLICATION == "SIGFOX_AT_SLAVE") || (SUBGHZ_APPLICATION == "SIGFOX_PUSHBUTTON") || (SUBGHZ_APPLICATION == "SIGFOX_USER_APPLICATION")) ]
-  * @file    sgfx_app_version.h
-[#else]
   * @file    app_version.h
-[/#if]
   * @author  MCD Application Team
 [#if (CPUCORE == "")]
   * @brief   Definition the version of the application
@@ -66,7 +60,7 @@ extern "C" {
 
 /* Exported constants --------------------------------------------------------*/
 #define APP_VERSION_MAIN   (0x01U) /*!< [31:24] main version */
-#define APP_VERSION_SUB1   (0x02U) /*!< [23:16] sub1 version */
+#define APP_VERSION_SUB1   (0x03U) /*!< [23:16] sub1 version */
 #define APP_VERSION_SUB2   (0x00U) /*!< [15:8]  sub2 version */
 #define APP_VERSION_RC     (0x00U) /*!< [7:0]  release candidate */
 
@@ -97,7 +91,10 @@ extern "C" {
 /**
   * @brief CM0PLUS minimum required version
   */
-#define LAST_COMPATIBLE_CM0_RELEASE APP_VERSION
+#define LAST_COMPATIBLE_CM0_RELEASE      ((0x01U  << APP_VERSION_MAIN_SHIFT)\
+                                          |(0x03U << APP_VERSION_SUB1_SHIFT)\
+                                          |(0x00U << APP_VERSION_SUB2_SHIFT)\
+                                          |(0x00U << APP_VERSION_RC_SHIFT))
 [/#if]
 
 /* USER CODE BEGIN EM */

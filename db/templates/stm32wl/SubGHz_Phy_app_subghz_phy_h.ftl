@@ -53,7 +53,7 @@ extern "C" {
   */
 [#if !THREADX??][#-- If AzRtos is not used --]
 void MX_SubGHz_Phy_Init(void);
-[#else]
+[#else][#--  THREADX --]
 uint32_t MX_SubGHz_Phy_Init(void *memory_ptr);
 [/#if]
 

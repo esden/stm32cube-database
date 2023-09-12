@@ -159,7 +159,7 @@ extern ${variable.value} ${variable.name};
 [#if FamilyName.contains("STM32F7") | FamilyName.contains("STM32G0")]
                             printf("ERROR: "); \
 [#else]
-                            printf("ERROR: ") ; \
+                            printf("ERROR: "); \
 [/#if]
                             printf(__VA_ARGS__); \
                             printf("\n"); \
@@ -173,7 +173,7 @@ extern ${variable.value} ${variable.name};
 [#if FamilyName.contains("STM32F7") | FamilyName.contains("STM32G0")]
                             printf("ERROR: "); \
 [#else]
-                            printf("DEBUG : ") ; \
+                            printf("DEBUG : "); \
 [/#if]
                             printf(__VA_ARGS__); \
                             printf("\n"); \

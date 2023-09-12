@@ -94,6 +94,10 @@
 [/#list]
 [/#compress]
 
+/* USER CODE BEGIN 1 */
+
+/* USER CODE END 1 */
+
 [#if LX_NOR_ENABLED_Value == "true"]
 [#if LX_DIRECT_READ_value == "1"]
 #define LX_DIRECT_READ
@@ -146,5 +150,8 @@
 /* #define LX_THREAD_SAFE_ENABLE */
 [/#if]
 
+/* USER CODE BEGIN 2 */
+
+/* USER CODE END 2 */
 
 #endif

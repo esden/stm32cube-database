@@ -77,9 +77,12 @@ extern "C" {
 /* Exported constants --------------------------------------------------------*/
 [#if THREADX??]
 [#if (CPUCORE == "CM4")]
+/* USER CODE BEGIN THREADX_EC */
 #define CFG_MAILBOX_THREAD_STACK_SIZE                    256  /* to check if possible to set it in lora gui if rtos detected*/
 #define CFG_MAILBOX_THREAD_PRIO                          9
 #define CFG_MAILBOX_THREAD_PREEMPTION_THRESHOLD          9
+
+/* USER CODE END THREADX_EC */
 
 [/#if]
 [/#if]
@@ -114,7 +117,7 @@ extern "C" {
 #define APP_PRINTF(...)     /* do{ {UTIL_ADV_TRACE_COND_FSend(VLEVEL_ALWAYS, T_REG_OFF, TS_OFF, __VA_ARGS__);} }while(0); */
 #define APP_LOG(TS,VL,...)  /* do{ {UTIL_ADV_TRACE_COND_FSend(VL, T_REG_OFF, TS, __VA_ARGS__);} }while(0); */
 /* USER CODE END APP_PRINT */
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION != "XXX_USER_APPLICATION" --]
 
 /* USER CODE BEGIN EM */
 
@@ -156,7 +159,7 @@ uint8_t GetBatteryLevel(void);
 int16_t GetTemperatureLevel(void);
 
 [/#if]
-[/#if]
+[/#if][#--  CPUCORE != "CM0PLUS" --]
 [#if CPUCORE != "CM4"]
 [#if ((SUBGHZ_APPLICATION == "LORA_END_NODE") || (SUBGHZ_APPLICATION == "LORA_AT_SLAVE") || (SUBGHZ_APPLICATION == "LORA_USER_APPLICATION"))]
 /**
@@ -167,12 +170,12 @@ void GetUniqueId(uint8_t *id);
 
 /**
   * @brief  callback to get the board 32 bits unique ID (LSB)
-  * @retval devAddr Device Address
+  * @param  devAddr Device Address
   */
-uint32_t GetDevAddr(void);
+void GetDevAddr(uint32_t *devAddr);
 
 [/#if]
-[/#if]
+[/#if][#--  CPUCORE != "CM4" --]
 [#if (CPUCORE == "CM0PLUS")]
 /**
   * @brief Returns sec and msec based on the systime in use
@@ -194,9 +197,9 @@ void Process_Sys_Cmd(MBMUX_ComParam_t *ComObj);
 void Process_Kms_Cmd(MBMUX_ComParam_t *ComObj);
 #endif /* ALLOW_KMS_VIA_MBMUX */
 
-[/#if]
+[/#if][#--  CPUCORE == "CM0PLUS" --]
 [#if THREADX??]
-[#if (CPUCORE == "") || (CPUCORE == "CM4")]
+[#if (CPUCORE != "CM0PLUS")]
 /**
   * @brief  Enter LowPower Mode configuration (to be called by App_ThreadX_LowPower_Enter()
   * @param  None
@@ -218,8 +221,8 @@ void App_ThreadX_LowPower_Exit(void);
   */
 unsigned long App_ThreadX_LowPower_Timer_Adjust(void);
 
-[/#if]
-[/#if]
+[/#if][#--  CPUCORE != "CM0PLUS" --]
+[/#if][#--  THREADX --]
 /* USER CODE BEGIN EFP */
 
 /* USER CODE END EFP */

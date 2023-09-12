@@ -22,12 +22,21 @@
 [/#if]
 --]
 [#assign SUBGHZ_APPLICATION = ""]
+[#assign UTIL_SEQ_EN_M0 = "true"]
+[#assign USE_UART = "true"]
+[#assign INTERNAL_LORAWAN_FUOTA = "0"]
 [#if SWIPdatas??]
     [#list SWIPdatas as SWIP]
         [#if SWIP.defines??]
             [#list SWIP.defines as definition]
                 [#if definition.name == "SUBGHZ_APPLICATION"]
                     [#assign SUBGHZ_APPLICATION = definition.value]
+                [/#if]
+                [#if definition.name == "USE_UART"]
+                    [#assign USE_UART = definition.value]
+                [/#if]
+                [#if definition.name == "UTIL_SEQ_EN_M0"]
+                    [#assign UTIL_SEQ_EN_M0 = definition.value]
                 [/#if]
             [/#list]
         [/#if]
@@ -38,11 +47,15 @@
 /* Includes ------------------------------------------------------------------*/
 #include "platform.h"
 #include "mbmuxif_sys.h"
+[#if UTIL_SEQ_EN_M0 == "true"]
 #include "stm32_seq.h"
+[/#if]
 #include "sys_app.h"
 #include "msg_id.h"
 #include "mbmux.h"
+[#if (USE_UART == "true")]
 #include "mbmuxif_trace.h"
+[/#if]
 [#if ((SUBGHZ_APPLICATION == "LORA_END_NODE") || (SUBGHZ_APPLICATION == "LORA_AT_SLAVE"))|| (SUBGHZ_APPLICATION == "LORA_USER_APPLICATION") ]
 #include "mbmuxif_lora.h"
 [/#if]
@@ -50,6 +63,9 @@
 #include "mbmuxif_sigfox.h"
 [/#if]
 #include "mbmuxif_radio.h"
+[#if (INTERNAL_LORAWAN_FUOTA == "1")]
+#include "mbmuxif_flash.h"
+[/#if]
 #include "features_info.h"
 #include "utilities_def.h"
 
@@ -167,7 +183,13 @@ int8_t MBMUXIF_SystemInit(void)
   }
   if (ret >= 0)
   {
+[#if UTIL_SEQ_EN_M0 == "true"]
     UTIL_SEQ_RegTask((1 << CFG_SEQ_Task_MbSystemCmdRcv), UTIL_SEQ_RFU, MBMUXIF_TaskSystemCmdRcv);
+[#else]
+    /* USER CODE BEGIN MBMUXIF_SystemInit_OS */
+
+    /* USER CODE END MBMUXIF_SystemInit_OS */
+[/#if][#--  SEQUENCER --]
     ret = 0;
   }
 
@@ -216,7 +238,13 @@ void MBMUXIF_SystemSendNotif(FEAT_INFO_IdTypeDef SystemPrioFeat)
   /* USER CODE END MBMUXIF_SystemSendNotif_1 */
   if (MBMUX_NotificationSnd(SystemPrioFeat) == 0)
   {
+[#if UTIL_SEQ_EN_M0 == "true"]
     UTIL_SEQ_WaitEvt(1 << CFG_SEQ_Evt_MbSystemAckRcv);
+[#else]
+    /* USER CODE BEGIN MBMUXIF_GetSystemFeatureNotifComPtr_OS */
+
+    /* USER CODE END MBMUXIF_GetSystemFeatureNotifComPtr_OS */
+[/#if][#--  SEQUENCER --]
   }
   else
   {
@@ -279,7 +307,13 @@ static void MBMUXIF_IsrSystemAckRcvCb(void *ComObj)
   /* USER CODE BEGIN MBMUXIF_IsrSystemAckRcvCb_1 */
 
   /* USER CODE END MBMUXIF_IsrSystemAckRcvCb_1 */
+[#if UTIL_SEQ_EN_M0 == "true"]
   UTIL_SEQ_SetEvt(1 << CFG_SEQ_Evt_MbSystemAckRcv);
+[#else]
+  /* USER CODE BEGIN MBMUXIF_IsrSystemAckRcvCb_OS */
+
+  /* USER CODE END MBMUXIF_IsrSystemAckRcvCb_OS */
+[/#if][#--  SEQUENCER --]
   /* USER CODE BEGIN MBMUXIF_IsrSystemAckRcvCb_Last */
 
   /* USER CODE END MBMUXIF_IsrSystemAckRcvCb_Last */
@@ -330,7 +364,13 @@ static void MBMUXIF_IsrSystemCmdRcvCb(void *ComObj)
     /* USER CODE END MBMUXIF_IsrSystemCmdRcvCb_Switch */
 
     default:
+[#if UTIL_SEQ_EN_M0 == "true"]
       UTIL_SEQ_SetTask((1 << CFG_SEQ_Task_MbSystemCmdRcv), CFG_SEQ_Prio_0);
+[#else]
+      /* USER CODE BEGIN MBMUXIF_IsrSystemCmdRcvCb_OS */
+
+      /* USER CODE END MBMUXIF_IsrSystemCmdRcvCb_OS */
+[/#if][#--  SEQUENCER --]
       break;
   }
 
@@ -403,19 +443,23 @@ static int8_t MBMUXIF_FeatureCm0plusRegistrationCmd(uint32_t *pBuf)
   switch (pBuf[0])
   {
     case FEAT_INFO_SYSTEM_CMD_PRIO_A_ID:
-      ret = MBMUX_RegisterFeatureCallback(FEAT_INFO_SYSTEM_CMD_PRIO_A_ID, MBMUX_CMD_RESP, MBMUXIF_IsrSystemPrioACmdRcvCb);
+      ret = MBMUX_RegisterFeatureCallback(FEAT_INFO_SYSTEM_CMD_PRIO_A_ID, MBMUX_CMD_RESP,
+                                          MBMUXIF_IsrSystemPrioACmdRcvCb);
       break;
 
     case FEAT_INFO_SYSTEM_NOTIF_PRIO_A_ID:
-      ret = MBMUX_RegisterFeatureCallback(FEAT_INFO_SYSTEM_NOTIF_PRIO_A_ID, MBMUX_NOTIF_ACK, MBMUXIF_IsrSystemPrioAAckRcvCb);
+      ret = MBMUX_RegisterFeatureCallback(FEAT_INFO_SYSTEM_NOTIF_PRIO_A_ID, MBMUX_NOTIF_ACK,
+                                          MBMUXIF_IsrSystemPrioAAckRcvCb);
       break;
 
     case FEAT_INFO_SYSTEM_CMD_PRIO_B_ID:
-      ret = MBMUX_RegisterFeatureCallback(FEAT_INFO_SYSTEM_CMD_PRIO_B_ID, MBMUX_CMD_RESP, MBMUXIF_IsrSystemPrioBCmdRcvCb);
+      ret = MBMUX_RegisterFeatureCallback(FEAT_INFO_SYSTEM_CMD_PRIO_B_ID, MBMUX_CMD_RESP,
+                                          MBMUXIF_IsrSystemPrioBCmdRcvCb);
       break;
 
     case FEAT_INFO_SYSTEM_NOTIF_PRIO_B_ID:
-      ret = MBMUX_RegisterFeatureCallback(FEAT_INFO_SYSTEM_NOTIF_PRIO_B_ID, MBMUX_NOTIF_ACK, MBMUXIF_IsrSystemPrioBAckRcvCb);
+      ret = MBMUX_RegisterFeatureCallback(FEAT_INFO_SYSTEM_NOTIF_PRIO_B_ID, MBMUX_NOTIF_ACK,
+                                          MBMUXIF_IsrSystemPrioBAckRcvCb);
       break;
 
     case FEAT_INFO_KMS_ID:
@@ -432,6 +476,12 @@ static int8_t MBMUXIF_FeatureCm0plusRegistrationCmd(uint32_t *pBuf)
 [/#if]
       break;
 
+[#if (INTERNAL_LORAWAN_FUOTA == "1")]
+    case FEAT_INFO_FLASH_ID:
+      ret = MBMUXIF_FlashInit();
+      break;
+
+[/#if]
     case FEAT_INFO_RADIO_ID:
       ret = MBMUXIF_RadioInit();
       APP_LOG(TS_OFF, VLEVEL_L, "CM0PLUS : Radio registration done\r\n");

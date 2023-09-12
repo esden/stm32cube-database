@@ -11,12 +11,37 @@
   ******************************************************************************
   */
 /* USER CODE END Header */
+[#--
+[#if SWIPdatas??]
+    [#list SWIPdatas as SWIP]
+        [#if SWIP.defines??]
+            [#list SWIP.defines as definition]
+                ${definition.name}: ${definition.value}
+            [/#list]
+        [/#if]
+    [/#list]
+[/#if]
+--]
+[#assign UTIL_SEQ_EN_M0 = "true"]
+[#if SWIPdatas??]
+    [#list SWIPdatas as SWIP]
+        [#if SWIP.defines??]
+            [#list SWIP.defines as definition]
+                [#if definition.name == "UTIL_SEQ_EN_M0"]
+                    [#assign UTIL_SEQ_EN_M0 = definition.value]
+                [/#if]
+            [/#list]
+        [/#if]
+    [/#list]
+[/#if]
 
 /* Includes ------------------------------------------------------------------*/
 #include "platform.h"
 #include "sigfox_mbwrapper.h"
 #include "stm32_mem.h"
+[#if UTIL_SEQ_EN_M0 == "true"]
 #include "stm32_seq.h"
+[/#if]
 #include "mbmux_table.h"
 #include "msg_id.h"
 #include "mbmux.h"
@@ -340,7 +365,9 @@ static void sfx_monarch_test_mode_wait_start_cb(void)
   /* USER CODE END sfx_monarch_test_mode_wait_start_cb_1 */
 
   /* don't exit this function until test_mode_wait_end callback is called */
+[#if UTIL_SEQ_EN_M0 == "true"]
   UTIL_SEQ_WaitEvt(1 << CFG_SEQ_Evt_Monarch);
+[/#if]
 
   /* USER CODE BEGIN sfx_monarch_test_mode_wait_start_cb_2 */
 
@@ -354,7 +381,9 @@ static void sfx_monarch_test_mode_wait_end_cb(void)
   /* USER CODE END sfx_monarch_test_mode_wait_end_cb_1 */
 
   /* release from the test_mode_wait */
+[#if UTIL_SEQ_EN_M0 == "true"]
   UTIL_SEQ_SetEvt(1 << CFG_SEQ_Evt_Monarch);
+[/#if]
 
   /* USER CODE BEGIN sfx_monarch_test_mode_wait_end_cb_2 */
 

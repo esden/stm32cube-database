@@ -128,7 +128,7 @@ extern "C" {
 #define EE_BASE_ADRESS                  (0x0801D000UL)
 [/#if]
 
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION == "SIGFOX_XXX" --]
 
 /* USER CODE BEGIN EC */
 

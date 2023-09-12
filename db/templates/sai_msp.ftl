@@ -430,7 +430,10 @@
 [#list ipvar.initCallBacks.entrySet() as entry]
 [#assign instanceList = entry.value]
 [#list instanceList as saiInst]
+[#assign servicesForTest = getInitServiceMode(saiInst)]
+[#if servicesForTest.gpioA?? || servicesForTest.gpioB??]
 static uint32_t ${saiInst}_client =0;
+[/#if]
 [/#list]
 [#assign mode=entry.key?replace("_MspInit","")?replace("_BspInit","")?replace("HAL_","")]
 

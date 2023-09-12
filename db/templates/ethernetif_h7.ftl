@@ -215,6 +215,11 @@ ETH_HandleTypeDef heth;
 ETH_TxPacketConfig TxConfig;
 
 /* Private function prototypes -----------------------------------------------*/
+[#if with_rtos == 1][#-- rtos used --]
+[#if cmsis_version = "v1"][#-- cmsis_version v1 --]
+static void ethernetif_input(void const * argument);
+[/#if][#-- endif cmsis_version v1 --]
+[/#if][#-- rtos used --]
 [#if bsp == 1]
 int32_t ETH_PHY_IO_Init(void);
 int32_t ETH_PHY_IO_DeInit (void);
@@ -902,7 +907,11 @@ void ethernet_link_check_state(struct netif *netif)
       MACConf.DuplexMode = duplex;
       MACConf.Speed = speed;
       HAL_ETH_SetMACConfig(&heth, &MACConf);
+    [#if with_rtos == 1]
+      HAL_ETH_Start_IT(&heth);
+    [#else]
       HAL_ETH_Start(&heth);
+    [/#if][#-- endif with_rtos --]
       netif_set_up(netif);
       netif_set_link_up(netif);
     }

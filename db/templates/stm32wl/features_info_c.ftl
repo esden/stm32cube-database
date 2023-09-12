@@ -22,6 +22,7 @@
 [/#if]
 --]
 [#assign SUBGHZ_APPLICATION = ""]
+[#assign INTERNAL_LORAWAN_FUOTA = "0"]
 [#if SWIPdatas??]
     [#list SWIPdatas as SWIP]
         [#if SWIP.defines??]
@@ -41,16 +42,12 @@
 [#if (SUBGHZ_APPLICATION == "LORA_END_NODE") || (SUBGHZ_APPLICATION == "LORA_AT_SLAVE") || (SUBGHZ_APPLICATION == "LORA_USER_APPLICATION") ]
 #include "lora_info.h"
 #include "lorawan_version.h"
-#include "lora_app_version.h"
 [/#if]
 [#if (SUBGHZ_APPLICATION == "SIGFOX_AT_SLAVE") || (SUBGHZ_APPLICATION == "SIGFOX_PUSHBUTTON") || (SUBGHZ_APPLICATION == "SIGFOX_USER_APPLICATION") ]
 #include "sigfox_info.h"
 #include "sigfox_version.h"
-#include "sgfx_app_version.h"
 [/#if]
-[#if (SUBGHZ_APPLICATION == "SUBGHZ_ADV_APPLICATION") || (SUBGHZ_APPLICATION == "SUBGHZ_USER_APPLICATION") ]
 #include "app_version.h"
-[/#if]
 #include "subghz_phy_version.h"
 #include "stm32_mem.h"
 
@@ -124,6 +121,14 @@ UTIL_MEM_PLACE_IN_SECTION("MB_MEM2") FEAT_INFO_Param_t Feat_Info_Table[] =
     .Feat_Info_Config_Size = 0,
     .Feat_Info_Config_Ptr = (void *) NULL
   },
+[#if (INTERNAL_LORAWAN_FUOTA == "1")]
+  {
+    .Feat_Info_Feature_Id =   FEAT_INFO_FLASH_ID,
+    .Feat_Info_Feature_Version = APP_VERSION,
+    .Feat_Info_Config_Size = 0,
+    .Feat_Info_Config_Ptr = (void *) NULL
+  },
+[/#if]
   {
     .Feat_Info_Feature_Id =   FEAT_INFO_RADIO_ID,
     .Feat_Info_Feature_Version = SUBGHZ_PHY_VERSION,

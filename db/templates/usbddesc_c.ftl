@@ -77,7 +77,19 @@
 	[/#if]
 	[#if definition.paramName == "PID_FS"]
 		[#assign FS = 1]
-	[/#if]
+	[/#if]	
+[#if cpucore=="ARM_CORTEX_M4"]
+    [#if definition.paramName == "DEVICE_SERIAL0"]
+#define DEVICE_SERIAL0 #t#t(*(uint32_t *) ${value})
+    [/#if]
+    [#if definition.paramName == "DEVICE_SERIAL1"]	
+#define DEVICE_SERIAL1 #t#t(*(uint32_t *) ${value})
+    [/#if]
+    [#if definition.paramName == "DEVICE_SERIAL2"]	
+#define DEVICE_SERIAL2 #t#t(*(uint32_t *) ${value})
+    [/#if]
+[/#if]
+[#if !definition.paramName.contains("DEVICE_SERIAL")]
 [#if definition.paramName == "CLASS_NAME_HS"]
 	[#assign CLASS_HS = value]
 [#elseif definition.paramName == "CLASS_NAME_FS"]
@@ -90,6 +102,7 @@
 #define USBD_${definition.paramName} #t#t"${value}"
 [#else]
 #define USBD_${definition.paramName} #t#t${value}
+[/#if]
 [/#if]
 	[/#list]
 [/#if]
@@ -708,11 +721,23 @@ uint8_t * USBD_FS_USR_BOSDescriptor(USBD_SpeedTypeDef speed, uint16_t *length)
   */
 static void Get_SerialNum(void)
 {
-  uint32_t deviceserial0, deviceserial1, deviceserial2;
+  uint32_t deviceserial0;
+  uint32_t deviceserial1; 
+  uint32_t deviceserial2;
 
+[#if cpucore=="ARM_CORTEX_M4" && (CLASS_FS=="CDC" | CLASS_HS=="CDC")]
+/* USER CODE BEGIN SerialNum */
+
+  deviceserial0 = DEVICE_SERIAL0;
+  deviceserial1 = DEVICE_SERIAL1;
+  deviceserial2 = DEVICE_SERIAL2;
+
+/* USER CODE END SerialNum */
+[#elseif cpucore=="ARM_CORTEX_M7" | CLASS_FS!="CDC" | CLASS_HS!="CDC"]
   deviceserial0 = *(uint32_t *) DEVICE_ID1;
   deviceserial1 = *(uint32_t *) DEVICE_ID2;
   deviceserial2 = *(uint32_t *) DEVICE_ID3;
+[/#if]
 
   deviceserial0 += deviceserial2;
 

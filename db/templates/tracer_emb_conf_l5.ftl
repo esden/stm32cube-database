@@ -107,9 +107,6 @@
     [/#list]
 [/#list]
 
-/* CubeMX Generated */
-#define CUBEMX_GENERATED
-
 #ifndef TRACER_EMB_CONF_H
 #define TRACER_EMB_CONF_H
 
@@ -172,7 +169,7 @@ extern "C" {
 
 #define TRACER_EMB_ENABLE_CLK_USART()                ${UARTenableClock}
 #define TRACER_EMB_DISABLE_CLK_USART()               ${UARTdisableClock}
-#define TRACER_EMB_SET_CLK_SOURCE_USART()            /* No need for clock source selection in case of USART3 // LL_RCC_SetUSARTClockSource(LL_RCC_USART3_CLKSOURCE_PCLK2) */
+#define TRACER_EMB_SET_CLK_SOURCE_USART()            /* No need for clock source selection in case of USART${UARTinstance} */
 #define TRACER_EMB_USART_IRQ                         ${UARTinterrupt}
 #define TRACER_EMB_USART_IRQHANDLER                  ${UARTinterrupt.replace("IRQn", "IRQHandler")}
 
@@ -181,10 +178,9 @@ extern "C" {
 
 [#if UART_TX_DMA != ""]
 #define TRACER_EMB_DMA_INSTANCE                      ${UART_TX_DMA}
-#define TRACER_EMB_ENABLE_CLK_DMA()                  do {                                                         \
-                                                       LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_DMAMUX1);     \
+#define TRACER_EMB_ENABLE_CLK_DMA()                  do {                                                       \
                                                        ${UART_TX_DMA_enableClock};                               \
-                                                       }while(0)
+                                                       } while(0)
 #define TRACER_EMB_TX_DMA_REQUEST                    LL_DMAMUX_REQ_${UART_TX_DMA_REQUEST}
 #define TRACER_EMB_TX_DMA_CHANNEL                    LL_DMA_${UART_TX_DMA_LL_CHANNEL}
 #define TRACER_EMB_ENABLECHANNEL                     LL_DMA_EnableChannel
@@ -202,4 +198,3 @@ extern "C" {
 #endif
 
 #endif /* TRACER_EMB_CONF_H */
-

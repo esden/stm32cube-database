@@ -45,6 +45,7 @@ Defines:
 --]
 [#assign CPUCORE = cpucore?replace("ARM_CORTEX_","C")?replace("+","PLUS")]
 [#assign SUBGHZ_APPLICATION = ""]
+[#assign UTIL_TIMER_EN = "true"]
 [#assign USE_RTC = "false"]
 [#assign IpInstance = ""]
 [#assign IpName = ""]
@@ -69,6 +70,9 @@ Defines:
                 [#if definition.name == "SUBGHZ_APPLICATION"]
                     [#assign SUBGHZ_APPLICATION = definition.value]
                 [/#if]
+                [#if definition.name == "UTIL_TIMER_EN"]
+                    [#assign UTIL_TIMER_EN = definition.value]
+                [/#if]
                 [#if definition.name == "USE_RTC"]
                     [#assign USE_RTC = definition.value]
                 [/#if]
@@ -87,14 +91,13 @@ Defines:
 #include "rtc.h"
 [/#if]
 [/#if]
-#include "stm32_lpm.h"
 #include "utilities_def.h"
 #include "stm32wlxx_ll_rtc.h"
 [#if CPUCORE == "CM0PLUS"]
 #include "msg_id.h"
 #include "mbmuxif_sys.h"
 [/#if]
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION != "XXX_USER_APPLICATION" || USE_RTC --]
 
 /* USER CODE BEGIN Includes */
 
@@ -110,8 +113,9 @@ extern RTC_HandleTypeDef h${IpInstance?lower_case};
 [#else]
 RTC_HandleTypeDef h${IpInstance?lower_case};
 [/#if]
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION != "XXX_USER_APPLICATION" || USE_RTC --]
 
+[#if (UTIL_TIMER_EN == "true")]
 /**
   * @brief Timer driver callbacks handler
   */
@@ -134,6 +138,7 @@ const UTIL_TIMER_Driver_s UTIL_TimerDriver =
   TIMER_IF_Convert_Tick2ms,
 };
 
+[/#if][#--  UTIL_TIMER_EN --]
 /**
   * @brief SysTime driver callbacks handler
   */
@@ -192,7 +197,7 @@ const UTIL_SYSTIM_Driver_s UTIL_SYSTIMDriver =
 #endif /* UTIL_TIMER_IRQ_MAP_PROCESS */
 
 [/#if]
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION != "XXX_USER_APPLICATION" || USE_RTC --]
 /* USER CODE BEGIN PD */
 
 /* USER CODE END PD */
@@ -212,7 +217,7 @@ const UTIL_SYSTIM_Driver_s UTIL_SYSTIMDriver =
 #define TIMER_IF_DBG_PRINTF(...)
 #endif /* RTIF_DEBUG */
 
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION != "XXX_USER_APPLICATION" || USE_RTC --]
 /* USER CODE BEGIN PM */
 
 /* USER CODE END PM */
@@ -224,12 +229,14 @@ const UTIL_SYSTIM_Driver_s UTIL_SYSTIMDriver =
   */
 static bool RTC_Initialized = false;
 
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION != "XXX_USER_APPLICATION" || USE_RTC --]
+[#if (UTIL_TIMER_EN == "true")]
 /**
   * @brief RtcTimerContext
   */
 static uint32_t RtcTimerContext = 0;
 
+[/#if][#--  UTIL_TIMER_EN --]
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -260,12 +267,13 @@ static void TIMER_IF_BkUp_Write_MSBticks(uint32_t MSBticks);
   */
 static uint32_t TIMER_IF_BkUp_Read_MSBticks(void);
 
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION != "XXX_USER_APPLICATION" || USE_RTC --]
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
 
 /* Exported functions ---------------------------------------------------------*/
+[#if (UTIL_TIMER_EN == "true")]
 UTIL_TIMER_Status_t TIMER_IF_Init(void)
 {
   UTIL_TIMER_Status_t ret = UTIL_TIMER_OK;
@@ -279,7 +287,7 @@ UTIL_TIMER_Status_t TIMER_IF_Init(void)
   HAL_RTC_DeactivateAlarm(&h${IpInstance?lower_case}, RTC_ALARM_A);
   TIMER_IF_SetTimerContext();
   RTC_Initialized = true;
-[#else]
+[#else][#--  CPUCORE == CM0PLUS || SINGLE --]
   if (RTC_Initialized == false)
   {
     h${IpInstance?lower_case}.IsEnabled.RtcFeatures = UINT32_MAX;
@@ -291,7 +299,7 @@ UTIL_TIMER_Status_t TIMER_IF_Init(void)
     /** DeActivate the Alarm A and Alarm B enabled by STM32CubeMX during MX_RTC_Init() */
     HAL_RTC_DeactivateAlarm(&h${IpInstance?lower_case}, RTC_ALARM_A); /* handled by Cm4 */
     HAL_RTC_DeactivateAlarm(&h${IpInstance?lower_case}, RTC_ALARM_B); /* handled by Cm0plus */
-[#else]
+[#else][#--  CPUCORE == SINGLE --]
     /** DeActivate the Alarm A enabled by STM32CubeMX during MX_RTC_Init() */
     HAL_RTC_DeactivateAlarm(&h${IpInstance?lower_case}, RTC_ALARM_A);
 [/#if]
@@ -305,19 +313,17 @@ UTIL_TIMER_Status_t TIMER_IF_Init(void)
 
     TIMER_IF_SetTimerContext();
 
-[#if CPUCORE != "CM4"]
     /* Register a task to associate to UTIL_TIMER_Irq() interrupt */
     UTIL_TIMER_IRQ_MAP_INIT();
 
-[/#if]
     RTC_Initialized = true;
   }
 
   /* USER CODE BEGIN TIMER_IF_Init_Last */
 
   /* USER CODE END TIMER_IF_Init_Last */
-[/#if]
-[/#if]
+[/#if][#--  CPUCORE == CM4 vs CM0 vs SINGLE --]
+[/#if][#--  SUBGHZ_APPLICATION != "XXX_USER_APPLICATION" || USE_RTC --]
   return ret;
 }
 
@@ -351,7 +357,7 @@ UTIL_TIMER_Status_t TIMER_IF_StartTimer(uint32_t timeout)
   /* USER CODE BEGIN TIMER_IF_StartTimer_Last */
 
   /* USER CODE END TIMER_IF_StartTimer_Last */
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION != "XXX_USER_APPLICATION" || USE_RTC --]
   return ret;
 }
 
@@ -365,21 +371,25 @@ UTIL_TIMER_Status_t TIMER_IF_StopTimer(void)
   /* Clear RTC Alarm Flag */
 [#if CPUCORE == "CM0PLUS"]
   __HAL_RTC_ALARM_CLEAR_FLAG(&h${IpInstance?lower_case}, RTC_FLAG_ALRBF);
-  /* Disable the Alarm A interrupt */
+  /* Disable the Alarm B interrupt */
   HAL_RTC_DeactivateAlarm(&h${IpInstance?lower_case}, RTC_ALARM_B);
-[#else]
+  /*overload RTC feature enable*/
+  h${IpInstance?lower_case}.IsEnabled.RtcFeatures = UINT32_MAX;
+[#elseif CPUCORE == "CM4"]
   __HAL_RTC_ALARM_CLEAR_FLAG(&h${IpInstance?lower_case}, RTC_FLAG_ALRAF);
   /* Disable the Alarm A interrupt */
   HAL_RTC_DeactivateAlarm(&h${IpInstance?lower_case}, RTC_ALARM_A);
-[/#if]
-[#if CPUCORE != "CM4"]
+[#elseif CPUCORE == ""]
+  __HAL_RTC_ALARM_CLEAR_FLAG(&h${IpInstance?lower_case}, RTC_FLAG_ALRAF);
+  /* Disable the Alarm A interrupt */
+  HAL_RTC_DeactivateAlarm(&h${IpInstance?lower_case}, RTC_ALARM_A);
   /*overload RTC feature enable*/
   h${IpInstance?lower_case}.IsEnabled.RtcFeatures = UINT32_MAX;
 [/#if]
   /* USER CODE BEGIN TIMER_IF_StopTimer_Last */
 
   /* USER CODE END TIMER_IF_StopTimer_Last */
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION != "XXX_USER_APPLICATION" || USE_RTC --]
   return ret;
 }
 
@@ -512,6 +522,7 @@ void TIMER_IF_DelayMs(uint32_t delay)
 [/#if]
 }
 
+[/#if][#--  UTIL_TIMER_EN --]
 [#if ((SUBGHZ_APPLICATION != "LORA_USER_APPLICATION") && (SUBGHZ_APPLICATION != "SUBGHZ_USER_APPLICATION") && (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION")) || (USE_RTC == "true")]
 [#if CPUCORE == ""]
 void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *h${IpInstance?lower_case})
@@ -561,7 +572,7 @@ void HAL_RTCEx_AlarmBEventCallback(RTC_HandleTypeDef *h${IpInstance?lower_case})
   /* USER CODE END HAL_RTCEx_AlarmBEventCallback_Last */
 }
 
-[/#if]
+[/#if][#--  CPUCORE == "CM0PLUS" --]
 [#if CPUCORE != "CM4"]
 void HAL_RTCEx_SSRUEventCallback(RTC_HandleTypeDef *h${IpInstance?lower_case})
 {
@@ -578,8 +589,8 @@ void HAL_RTCEx_SSRUEventCallback(RTC_HandleTypeDef *h${IpInstance?lower_case})
   /* USER CODE END HAL_RTCEx_SSRUEventCallback_Last */
 }
 
-[/#if]
-[/#if]
+[/#if][#--  CPUCORE != "CM4" --]
+[/#if][#--  SUBGHZ_APPLICATION != "XXX_USER_APPLICATION" || USE_RTC --]
 uint32_t TIMER_IF_GetTime(uint16_t *mSeconds)
 {
   uint32_t seconds = 0;
@@ -680,7 +691,7 @@ static void TIMER_IF_BkUp_Write_MSBticks(uint32_t MSBticks)
   /* USER CODE END TIMER_IF_BkUp_Write_MSBticks_Last */
 }
 
-[/#if]
+[/#if][#--  CPUCORE != "CM4" --]
 static uint32_t TIMER_IF_BkUp_Read_MSBticks(void)
 {
   /* USER CODE BEGIN TIMER_IF_BkUp_Read_MSBticks */
@@ -711,7 +722,7 @@ static inline uint32_t GetTimerTicks(void)
   /* USER CODE END GetTimerTicks_Last */
 }
 
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION != "XXX_USER_APPLICATION" || USE_RTC --]
 /* USER CODE BEGIN PrFD */
 
 /* USER CODE END PrFD */

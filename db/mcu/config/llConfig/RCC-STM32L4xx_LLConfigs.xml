@@ -211,7 +211,7 @@
         </IFCondition>		
  
         <!--sys clock source + AHB/APB configuration-->
-        <IFCondition Expression ="HCLKsup80=1 &amp; (DIE470 | DIE471)" >
+        <IFCondition Expression ="(SYSCLKFreq_VALUEArg &gt; 80000000) &amp; (DIE470 | DIE471)" >
             <CallLibMethod Name="" Type="HardCode">
                 <HardCode Text="#n#t   /* Intermediate AHB prescaler 2 when target frequency clock is higher than 80 MHz */#n#t LL_RCC_SetAHBPrescaler(LL_RCC_SYSCLK_DIV_2);#n#t"/>
             </CallLibMethod>
@@ -243,14 +243,9 @@
             </CallLibMethod>
         </IFCondition>		
 
-        <IFCondition Expression ="HCLKsup80=1 &amp; (DIE470 | DIE471)">
+        <IFCondition Expression ="(SYSCLKFreq_VALUEArg &gt; 80000000) &amp; (DIE470 | DIE471)">
             <CallLibMethod Name="" Type="HardCode">
-                <HardCode Text="#n#t/* Insure 1µs transition state at intermediate medium speed clock based on DWT*/#n#tCoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;#n#t"/>
-            </CallLibMethod>
-        </IFCondition>
-        <IFCondition Expression ="HCLKsup80=1 &amp; (DIE470 | DIE471)">
-            <CallLibMethod Name="" Type="HardCode">
-                <HardCode Text="#n#tDWT-&gt;CTRL |= DWT_CTRL_CYCCNTENA_Msk;#n#tDWT-&gt;CYCCNT = 0;#n#twhile(DWT->CYCCNT &lt; 100);#n#t"/>
+                <HardCode Text="#n#t/* Insure 1µs transition state at intermediate medium speed clock*/#n#tfor (__IO uint32_t i = (120 >> 1); i !=0; i--);#n#t"/>
             </CallLibMethod>
         </IFCondition>
 

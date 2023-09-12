@@ -13,18 +13,10 @@
 [#t]
 [#t]
 [#-- Fixed Clocks (clocks node)--]
-[#if srvcmx_isTargetedFw_inDTS("LINUX")]
 [#assign  TAB = dts_get_tabs(1)]
-[#else]
-[#assign  TAB = dts_get_tabs(1)]
-[/#if]
 [#assign  TABN = TAB.TABN]
 [#assign  TABP = TAB.TABP]
-[#if srvcmx_isTargetedFw_inDTS("LINUX")]
 [#assign  TAB = dts_get_tabs(3)]
-[#else]
-[#assign  TAB = dts_get_tabs(3)]
-[/#if]
 [#assign  TABN1 = TAB.TABN]
 ${TABN}clocks {
 ${TABP}/* USER CODE BEGIN clocks */
@@ -38,8 +30,7 @@ ${TABP}/* USER CODE END clocks */
 [/#list]
 [#list RCCClockSourceParam.get("Source").entrySet() as paramEntry]
 [#t]
-    [#if srvcmx_isTargetedFw_inDTS("TF-A") || srvcmx_isTargetedFw_inDTS("OP-TEE")]
-        [#if paramEntry.key == "clk_lse: clk-lse" || paramEntry.key == "clk_hse: clk-hse" || paramEntry.key == "clk_i2s_ckin: i2s_ckin" || paramEntry.key == "clk_hsi: clk-hsi"]
+        [#if paramEntry.key == "clk_lse: clk-lse" || paramEntry.key == "clk_hse: clk-hse" || paramEntry.key == "clk_i2sin: clk-i2sin" || paramEntry.key == "clk_hsi: clk-hsi"]
             [#lt]${TABP}${paramEntry.key} {
                 [#if paramEntry.key == "clk_lse: clk-lse"]
 [#if lse_status=="enabled"]
@@ -68,7 +59,7 @@ ${TABP}/* USER CODE END clocks */
             [#if paramEntry.key == "clk_hsi: clk-hsi"]
                 [#lt]${TABN1}clock-frequency = <${paramEntry.value}>;
             [/#if]
-            [#if paramEntry.key == "clk_i2s_ckin: i2s_ckin"]
+            [#if paramEntry.key == "clk_i2sin: clk-i2sin"]
 [#if i2s_clk_status=="enabled"]
                 [#lt]${TABN1}clock-frequency = <${paramEntry.value}>;
 [#else]
@@ -81,7 +72,6 @@ ${TABN1}/* USER CODE BEGIN ${nodeLabel} */
 ${TABN1}/* USER CODE END ${nodeLabel} */
         [#lt]${TABP}};
 [/#if]   
-    [/#if]
 [/#list]
 ${TABN}};
 #n

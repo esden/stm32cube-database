@@ -1157,8 +1157,8 @@
 [/#macro]
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __CUSTOM_STM_H
-#define __CUSTOM_STM_H
+#ifndef CUSTOM_STM_H
+#define CUSTOM_STM_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -1256,4 +1256,4 @@ tBleStatus Custom_STM_App_Update_Char(Custom_STM_Char_Opcode_t CharOpcode,  uint
 }
 #endif
 
-#endif /*__CUSTOM_STM_H */
+#endif /*CUSTOM_STM_H */

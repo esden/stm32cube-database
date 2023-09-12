@@ -23,8 +23,11 @@
 --]
 [#assign CPUCORE = cpucore?replace("ARM_CORTEX_","C")?replace("+","PLUS")]
 [#assign SUBGHZ_APPLICATION = ""]
+[#assign UTIL_SEQ_EN_M4 = "true"]
+[#assign UTIL_SEQ_EN_M0 = "true"]
 [#assign SECURE_PROJECTS = "0"]
 [#assign FILL_UCS = ""]
+[#assign STM32WL5MXX = "false"]
 [#if SWIPdatas??]
     [#list SWIPdatas as SWIP]
         [#if SWIP.defines??]
@@ -32,8 +35,17 @@
                 [#if definition.name == "SUBGHZ_APPLICATION"]
                     [#assign SUBGHZ_APPLICATION = definition.value]
                 [/#if]
+                [#if definition.name == "UTIL_SEQ_EN_M4"]
+                    [#assign UTIL_SEQ_EN_M4 = definition.value]
+                [/#if]
+                [#if definition.name == "UTIL_SEQ_EN_M0"]
+                    [#assign UTIL_SEQ_EN_M0 = definition.value]
+                [/#if]
                 [#if definition.name == "FILL_UCS"]
                     [#assign FILL_UCS = definition.value]
+                [/#if]
+                [#if definition.name == "STM32WL5MXX"]
+                    [#assign STM32WL5MXX = definition.value]
                 [/#if]
             [/#list]
         [/#if]
@@ -44,27 +56,27 @@
 
 #include "st_sigfox_api.h"
 #include "sgfx_app.h"
-#include "sgfx_app_version.h"
+#include "app_version.h"
+[#if CPUCORE == ""]
 #include "sigfox_version.h"
-[#if THREADX??][#-- If AzRtos is used --]
-#include "app_azure_rtos.h"
-#include "tx_api.h"
-#include "sys_app.h"
 [/#if]
 [#if (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION")]
+[#if CPUCORE == ""]
 #include "subghz_phy_version.h"
+[/#if]
 #include "radio.h"
 #include "sys_conf.h"
 #include "sgfx_eeprom_if.h"
 #include "sys_app.h"
-#include "stm32_lpm.h"
-[#if !THREADX??][#-- If AzRtos is not used --]
-[#if !FREERTOS??][#-- If FreeRtos is not used --]
-#include "stm32_seq.h"
-[#else]
+[#if THREADX??][#-- If AzRtos is used --]
+#include "app_azure_rtos.h"
+#include "tx_api.h"
+#include "sys_app.h"
+[#elseif FREERTOS??][#-- If FreeRtos is used --]
 #include "cmsis_os.h"
-[/#if]
-[/#if]
+[#elseif ((UTIL_SEQ_EN_M0 == "true") && (CPUCORE == "CM0PLUS")) || ((UTIL_SEQ_EN_M4 == "true") && (CPUCORE != "CM0PLUS"))]
+#include "stm32_seq.h"
+[/#if][#--  THREADX vs FREERTOS vs SEQUENCER --]
 #include "utilities_def.h"
 [#if (SUBGHZ_APPLICATION == "SIGFOX_AT_SLAVE") ]
 #include "sgfx_command.h"
@@ -74,7 +86,12 @@
 #include "sigfox_info.h"
 #include "mbmuxif_sys.h"
 [/#if]
+[#else][#--  SUBGHZ_APPLICATION == "SIGFOX_USER_APPLICATION" --]
+[#if THREADX??][#-- If AzRtos is used --]
+#include "tx_api.h"
+#include "sys_app.h"
 [/#if]
+[/#if][#--  SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION" --]
 
 /* USER CODE BEGIN Includes */
 [#if (SUBGHZ_APPLICATION == "SIGFOX_PUSHBUTTON") && (FILL_UCS == "true")]
@@ -94,8 +111,8 @@ TX_SEMAPHORE  Sem_TxTimeout;    /* used by rf_api.c */
 osSemaphoreId_t Sem_Delay;      /* used by mcu_api.c */
 osSemaphoreId_t Sem_Timeout;    /* used by mcu_api.c and rf_api.c*/
 osSemaphoreId_t Sem_TxTimeout;  /* used by rf_api.c */
-[/#if]
-[/#if]
+[/#if][#--  THREADX vs FREERTOS --]
+[/#if][#--  CPUCORE == "" (single) --]
 [#if (SUBGHZ_APPLICATION == "SIGFOX_AT_SLAVE")]
 [#if THREADX??]
 TX_SEMAPHORE  Sem_Monarch;      /* used by sgfx_at.c */
@@ -103,7 +120,7 @@ TX_SEMAPHORE  Sem_Monarch;      /* used by sgfx_at.c */
 osSemaphoreId_t Sem_Monarch;    /* used by sgfx_at.c */
 [/#if]
 [/#if]
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION" --]
 
 /* USER CODE BEGIN ExpV */
 
@@ -118,7 +135,7 @@ extern CHAR *pointer;
 [#if (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION")]
 extern RadioEvents_t RfApiRadioEvents;
 [/#if]
-[#if (SECURE_PROJECTS == "1") && (CPUCORE == "CM4") ]
+[#if (SECURE_PROJECTS == "1") && (CPUCORE == "CM4") && (STM32WL5MXX == "false")]
 #if defined (DEBUGGER_ENABLED) && ( DEBUGGER_ENABLED == 1 )
 extern __IO uint32_t lets_go_on;
 #elif !defined (DEBUGGER_ENABLED)
@@ -161,7 +178,7 @@ TX_THREAD Thd_PushButtonProcessId;
 TX_THREAD Thd_VcomProcessId;
 [/#if]
 
-[/#if]
+[/#if][#--  THREADX --]
 [#if FREERTOS??][#-- If FreeRtos is used --]
 [#if (SUBGHZ_APPLICATION == "SIGFOX_PUSHBUTTON")]
 osThreadId_t Thd_SendProcessId;
@@ -195,8 +212,8 @@ const osThreadAttr_t Thd_VcomProcess_attr =
 static void Thd_VcomProcess(void *argument);
 
 [/#if]
-[/#if]
-[/#if]
+[/#if][#--  FREERTOS --]
+[/#if][#--  SUBGHZ_APPLICATION == "SIGFOX_XXX" --]
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -221,7 +238,7 @@ static void Thd_PushButtonProcess_Entry(unsigned long thread_input);
 static void Thd_VcomProcess_Entry(unsigned long thread_input);
 
 [/#if]
-[/#if]
+[/#if][#--  THREADX --]
 /**
   * @brief  It calls SIGFOX_API_open()
   * @param  Config
@@ -274,12 +291,12 @@ void Sigfox_Init(void)
 
 [/#if]
   /* USER CODE END Sigfox_Init_0 */
-[/#if]
+[/#if][#--  CPUCORE == "CM4" --]
 [#if (SUBGHZ_APPLICATION == "SIGFOX_AT_SLAVE") ]
   CMD_Init(CmdProcessNotify);
 
 [/#if]
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION" --]
   /* USER CODE BEGIN Sigfox_Init_1 */
 [#if (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION") && (FILL_UCS == "true")]
 
@@ -331,7 +348,7 @@ void Sigfox_Init(void)
           (uint8_t)(SUBGHZ_PHY_VERSION_MAIN),
           (uint8_t)(SUBGHZ_PHY_VERSION_SUB1),
           (uint8_t)(SUBGHZ_PHY_VERSION_SUB2));
-[/#if]
+[/#if][#--  CPUCORE == CM4 vs CM0 vs SINGLE --]
 [#if (SUBGHZ_APPLICATION == "SIGFOX_AT_SLAVE") ]
 
   APP_PPRINTF("ATtention command interface\n\r");
@@ -340,40 +357,9 @@ void Sigfox_Init(void)
 
   /* USER CODE END Sigfox_Init_1 */
 
-[#if (SUBGHZ_APPLICATION == "SIGFOX_AT_SLAVE") ]
-[#if THREADX??][#-- If AzRtos is used --]
-  /* Allocate the stack for Thd_VcomProcess.  */
-  if (tx_byte_allocate(byte_pool, (VOID **) &pointer, CFG_VCOM_THREAD_STACK_SIZE, TX_NO_WAIT) != TX_SUCCESS)
-  {
-    Error_Handler();
-  }
-  if (tx_thread_create(&Thd_VcomProcessId, "Thread VcomProcess", Thd_VcomProcess_Entry, 0,
-                       pointer, CFG_VCOM_THREAD_STACK_SIZE,
-                       CFG_VCOM_THREAD_PRIO, CFG_VCOM_THREAD_PREEMPTION_THRESHOLD,
-                       TX_NO_TIME_SLICE, TX_AUTO_START) != TX_SUCCESS)
-  {
-    Error_Handler();
-  }
-
-  if (tx_semaphore_create(&Sem_Monarch, "Sem_Monarch", 0) != TX_SUCCESS)
-  {
-    Error_Handler();
-  }
-
-[/#if]
-[#if FREERTOS??][#-- If FreeRtos is used --]
-  Thd_VcomProcessId = osThreadNew(Thd_VcomProcess, NULL, &Thd_VcomProcess_attr);
-  if (Thd_VcomProcessId == NULL)
-  {
-    Error_Handler();
-  }
-  Sem_Monarch = osSemaphoreNew(1, 0, NULL);
-
-[/#if]
-[/#if]
 [#if (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION")]
 
-[#if (CPUCORE == "")]
+[#if (CPUCORE == "")][#--  SINGLE --]
 [#if THREADX??][#-- If AzRtos is used --]
   if (tx_semaphore_create(&Sem_Delay, "Sem_Delay", 0) != TX_SUCCESS)
   {
@@ -395,7 +381,7 @@ void Sigfox_Init(void)
   Sem_TxTimeout = osSemaphoreNew(1, 0, NULL);   /*< Create the semaphore and make it busy at initialization */
 
 [/#if]
-[/#if]
+[/#if][#--  CPUCORE == "" (SINGLE) --]
 [#if (SUBGHZ_APPLICATION == "SIGFOX_AT_SLAVE") ]
   sfx_rc = E2P_Read_Rc();
 
@@ -405,12 +391,12 @@ void Sigfox_Init(void)
   sfx_rc = E2P_Read_Rc();
 
 [/#if]
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION" --]
   /*Open Sigfox library */
   error = st_sigfox_open(sfx_rc);
 
 [#if (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION")]
-[#if (CPUCORE == "CM0PLUS") || (CPUCORE == "")]
+[#if (CPUCORE == "")]
   Radio.Init(&RfApiRadioEvents);
 [#elseif (CPUCORE == "CM4")]
   /* Init SigfoxInfo capabilities table (redundant: Cm0 is supposed to have done it already) */
@@ -425,9 +411,9 @@ void Sigfox_Init(void)
 
   /* Register GetBatteryLevel and GetTemperatureLevel functions */
   Sigfox_Register(&SigfoxCallbacks);
-[/#if]
+[/#if][#--  CPUCORE == CM4 vs SINGLE --]
   /* USER CODE BEGIN Sigfox_Init_ErrorCheck */
-[#if (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION") && (FILL_UCS == "true")]
+[#if (FILL_UCS == "true")]
   if (1U == E2P_Read_AtEcho())
   {
     if (error == SFX_ERR_NONE)
@@ -443,22 +429,48 @@ void Sigfox_Init(void)
 
 [/#if]
   /* USER CODE END Sigfox_Init_ErrorCheck */
+[/#if][#-- SIGFOX_USER_APPLICATION--]
   (void)error;
 
 [#if (SUBGHZ_APPLICATION == "SIGFOX_AT_SLAVE") ]
-[#if !THREADX??][#-- If AzRtos not is not used --]
-[#if !FREERTOS??][#-- If FreeRtos is not used --]
-  /* Put radio in Sleep waiting next cmd */
+[#if THREADX??][#-- If AzRtos is used --]
+  /* Allocate the stack for Thd_VcomProcess.  */
+  if (tx_byte_allocate(byte_pool, (VOID **) &pointer, CFG_VCOM_THREAD_STACK_SIZE, TX_NO_WAIT) != TX_SUCCESS)
+  {
+    Error_Handler();
+  }
+  if (tx_thread_create(&Thd_VcomProcessId, "Thread VcomProcess", Thd_VcomProcess_Entry, 0,
+                       pointer, CFG_VCOM_THREAD_STACK_SIZE,
+                       CFG_VCOM_THREAD_PRIO, CFG_VCOM_THREAD_PREEMPTION_THRESHOLD,
+                       TX_NO_TIME_SLICE, TX_AUTO_START) != TX_SUCCESS)
+  {
+    Error_Handler();
+  }
+
+  if (tx_semaphore_create(&Sem_Monarch, "Sem_Monarch", 0) != TX_SUCCESS)
+  {
+    Error_Handler();
+  }
+
+[#elseif FREERTOS??][#-- If FreeRtos is used --]
+  Thd_VcomProcessId = osThreadNew(Thd_VcomProcess, NULL, &Thd_VcomProcess_attr);
+  if (Thd_VcomProcessId == NULL)
+  {
+    Error_Handler();
+  }
+  Sem_Monarch = osSemaphoreNew(1, 0, NULL);
+
+[#elseif ((UTIL_SEQ_EN_M0 == "true") && (CPUCORE == "CM0PLUS")) || ((UTIL_SEQ_EN_M4 == "true") && (CPUCORE != "CM0PLUS"))]
+  /* Register Virtual-Com task then radio goes in Sleep/Stop mode waiting an AT cmd */
   UTIL_SEQ_RegTask(1 << CFG_SEQ_Task_Vcom, UTIL_SEQ_RFU, CMD_Process);
-[/#if]
-[/#if]
-[/#if]
-[#else][#-- SIGFOX_USER_APPLICATION--]
 
-  (void)error;
-  /*initialize an event to send data periodically*/
+[#else]
+    /* USER CODE BEGIN Sigfox_Init_Vcom_OS */
 
-[/#if][#-- SIGFOX_USER_APPLICATION--]
+    /* USER CODE END Sigfox_Init_Vcom_OS */
+
+[/#if][#--  THREADX vs FREERTOS vs SEQUENCER --]
+[/#if][#--  SUBGHZ_APPLICATION == "SIGFOX_AT_SLAVE" --]
 [#if (SUBGHZ_APPLICATION == "SIGFOX_PUSHBUTTON")]
 [#if THREADX??][#-- If AzRtos is used --]
   /* Allocate the stack for PushButtonProcess.  */
@@ -476,19 +488,21 @@ void Sigfox_Init(void)
     Error_Handler();
   }
 
-[#else][#-- not THREADX--]
-[#if !FREERTOS??][#-- If FreeRtos is not used --]
-  UTIL_SEQ_RegTask((1 << CFG_SEQ_Task_Pb), UTIL_SEQ_RFU, SendSigfox);
-[#else]
+[#elseif FREERTOS??][#-- If FreeRtos is used --]
   Thd_SendProcessId = osThreadNew(Thd_SendProcess, NULL, &Thd_SendProcess_attr);
   if (Thd_SendProcessId == NULL)
   {
     Error_Handler();
   }
-[/#if]
-[/#if][#-- THREADX--]
+[#elseif ((UTIL_SEQ_EN_M0 == "true") && (CPUCORE == "CM0PLUS")) || ((UTIL_SEQ_EN_M4 == "true") && (CPUCORE != "CM0PLUS"))]
+  UTIL_SEQ_RegTask((1 << CFG_SEQ_Task_Pb), UTIL_SEQ_RFU, SendSigfox);
+[#else]
+    /* USER CODE BEGIN Sigfox_Init_Pb_OS */
 
-[/#if]
+    /* USER CODE END Sigfox_Init_Pb_OS */
+[/#if][#--  THREADX vs FREERTOS vs SEQUENCER --]
+
+[/#if][#--  SUBGHZ_APPLICATION == "SIGFOX_PUSHBUTTON" --]
   /* USER CODE BEGIN Sigfox_Init_2 */
 
   /* USER CODE END Sigfox_Init_2 */
@@ -653,13 +667,15 @@ static void CmdProcessNotify(void)
   /* USER CODE END CmdProcessNotify_1 */
 [#if THREADX??][#-- If AzRtos is used --]
   tx_thread_resume(&Thd_VcomProcessId);
-[#else]
-[#if !FREERTOS??][#-- If FreeRtos is not used --]
+[#elseif FREERTOS??][#-- If FreeRtos is used --]
+  osThreadFlagsSet(Thd_VcomProcessId, 1);
+[#elseif ((UTIL_SEQ_EN_M0 == "true") && (CPUCORE == "CM0PLUS")) || ((UTIL_SEQ_EN_M4 == "true") && (CPUCORE != "CM0PLUS"))]
   UTIL_SEQ_SetTask(1 << CFG_SEQ_Task_Vcom, CFG_SEQ_Prio_0);
 [#else]
-  osThreadFlagsSet(Thd_VcomProcessId, 1);
-[/#if]
-[/#if]
+    /* USER CODE BEGIN CmdProcessNotify_OS */
+
+    /* USER CODE END CmdProcessNotify_OS */
+[/#if][#--  THREADX vs FREERTOS vs SEQUENCER --]
   /* USER CODE BEGIN CmdProcessNotify_2 */
 
   /* USER CODE END CmdProcessNotify_2 */
@@ -706,7 +722,7 @@ static void Thd_VcomProcess(void *argument)
   /* USER CODE END Thd_VcomProcess_2 */
 }
 [/#if]
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION == "SIGFOX_AT_SLAVE" --]
 
 [#if (SUBGHZ_APPLICATION == "SIGFOX_PUSHBUTTON")]
 [#if THREADX??][#-- If AzRtos is used --]
@@ -752,8 +768,6 @@ static void Thd_SendProcess(void *argument)
 }
 
 [/#if]
-[/#if]
-[#if (SUBGHZ_APPLICATION == "SIGFOX_PUSHBUTTON")]
 /* USER CODE BEGIN PB_Callbacks */
 [#if (FILL_UCS != "true")]
 
@@ -766,14 +780,13 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
     case  BUT1_Pin:
 [#if THREADX??]
       tx_thread_resume(&Thd_PushButtonProcessId);
-[#else]
-[#if !FREERTOS??][#-- If FreeRtos is not used --]
-      UTIL_SEQ_SetTask((1 << CFG_SEQ_Task_Pb), CFG_SEQ_Prio_0);
-[#else]
+[#elseif FREERTOS??][#-- If FreeRtos is used --]
       osThreadFlagsSet(Thd_SendProcessId, 1);
-[/#if]
-[/#if]
+[#elseif ((UTIL_SEQ_EN_M0 == "true") && (CPUCORE == "CM0PLUS")) || ((UTIL_SEQ_EN_M4 == "true") && (CPUCORE != "CM0PLUS"))]
+      UTIL_SEQ_SetTask((1 << CFG_SEQ_Task_Pb), CFG_SEQ_Prio_0);
+[/#if][#--  THREADX vs FREERTOS vs SEQUENCER --]
       break;
+[#if STM32WL5MXX=="false"]
     case  BUT2_Pin:
 [#if (SECURE_PROJECTS == "1") && (CPUCORE == "CM4") ]
 #if defined (DEBUGGER_ENABLED) && ( DEBUGGER_ENABLED == 1 )
@@ -783,6 +796,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 #endif /* DEBUGGER_ENABLED */
 [/#if]
       break;
+[/#if]
     default:
       break;
   }
@@ -828,10 +842,10 @@ static void SendSigfox(void)
   SIGFOX_API_send_frame(ul_msg, ul_size, dl_msg, nbTxRepeatFlag, SFX_FALSE);
 
   APP_LOG(TS_OFF, VLEVEL_L, " done\n\r");
-[/#if]
+[/#if][#--  FILL_UCS --]
   /* USER CODE END SendSigfox */
 }
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION == "SIGFOX_PUSHBUTTON" --]
 
 /* USER CODE BEGIN PrFD */
 

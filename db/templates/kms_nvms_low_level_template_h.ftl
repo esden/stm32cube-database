@@ -76,11 +76,9 @@ typedef enum
   */
 #define NVMS_LL_PAGE_SIZE    8
 
-
 /**
   * @}
   */
-
 
 /* Exported functions prototypes ---------------------------------------------*/
 /* USER CODE BEGIN NVMS_LOW_LEVEL_Exported_Function_Prototypes */

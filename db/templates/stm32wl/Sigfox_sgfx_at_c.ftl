@@ -44,7 +44,7 @@
 #include "st_sigfox_api.h"
 #include "usart_if.h"
 #include "stm32_tiny_sscanf.h"
-#include "sgfx_app_version.h"
+#include "app_version.h"
 [#if CPUCORE == ""]
 #include "sigfox_version.h"
 #include "subghz_phy_version.h"
@@ -64,7 +64,6 @@
 #include "cmsis_os.h"
 [/#if]
 [/#if]
-#include "stm32_lpm.h"
 #include "utilities_def.h"
 [#if CPUCORE == "CM4"]
 #include "mbmuxif_sys.h"
@@ -839,7 +838,7 @@ ATEerror_t AT_scan_mn(const char *param)
 [#else]
   osSemaphoreAcquire(Sem_Monarch, osWaitForever);
 [/#if]
-[/#if]
+[/#if][#--  THREADX vs FREERTOS vs SEQUENCER --]
 
   if (SIGFOX_reopen_and_reconf(sfx_rc, config_words) != SFX_ERR_NONE)
   {
@@ -917,7 +916,7 @@ static sfx_u8 app_callback_handler(sfx_u8 rc_bit_mask, sfx_s16 rssi)
 [#else]
   osSemaphoreRelease(Sem_Monarch);
 [/#if]
-[/#if]
+[/#if][#--  THREADX vs FREERTOS vs SEQUENCER --]
 
   return SFX_ERR_NONE;
   /* USER CODE BEGIN app_callback_handler_2 */
@@ -936,7 +935,7 @@ static void sfx_monarch_test_mode_wait_start_cb(void)
 [#else]
   osSemaphoreAcquire(Sem_Monarch, osWaitForever);
 [/#if]
-[/#if]
+[/#if][#--  THREADX vs FREERTOS vs SEQUENCER --]
 }
 
 static void sfx_monarch_test_mode_wait_end_cb(void)
@@ -950,7 +949,7 @@ static void sfx_monarch_test_mode_wait_end_cb(void)
 [#else]
   osSemaphoreRelease(Sem_Monarch);
 [/#if]
-[/#if]
+[/#if][#--  THREADX vs FREERTOS vs SEQUENCER --]
 }
 [/#if]
 #endif /* MN_ON */

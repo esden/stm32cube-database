@@ -24,7 +24,14 @@
 [#assign CPUCORE = cpucore?replace("ARM_CORTEX_","C")?replace("+","PLUS")]
 [#assign SUBGHZ_APPLICATION = ""]
 [#assign SECURE_PROJECTS = "0"]
-[#assign LORAWAN_FUOTA = "0"]
+[#assign STM32WL5MXX = "false"]
+[#assign USE_LPM = "true"]
+[#assign USE_UART = "true"]
+[#assign UTIL_SEQ_EN_M4 = "true"]
+[#assign UTIL_SEQ_EN_M0 = "true"]
+[#assign UTIL_TIMER_EN = "true"]
+[#assign INTERNAL_LORAWAN_FUOTA = "0"]
+[#assign INTERNAL_THREADX_TRACEX = "0"]
 [#assign FILL_UCS = ""]
 [#if SWIPdatas??]
     [#list SWIPdatas as SWIP]
@@ -35,6 +42,24 @@
                 [/#if]
                 [#if definition.name == "FILL_UCS"]
                     [#assign FILL_UCS = definition.value]
+                [/#if]
+                [#if definition.name == "STM32WL5MXX"]
+                    [#assign STM32WL5MXX = definition.value]
+                [/#if]
+                [#if definition.name == "USE_LPM"]
+                    [#assign USE_LPM = definition.value]
+                [/#if]
+                [#if definition.name == "USE_UART"]
+                    [#assign USE_UART = definition.value]
+                [/#if]
+                [#if definition.name == "UTIL_SEQ_EN_M4"]
+                    [#assign UTIL_SEQ_EN_M4 = definition.value]
+                [/#if]
+                [#if definition.name == "UTIL_SEQ_EN_M0"]
+                    [#assign UTIL_SEQ_EN_M0 = definition.value]
+                [/#if]
+                [#if definition.name == "UTIL_TIMER_EN"]
+                    [#assign UTIL_TIMER_EN = definition.value]
                 [/#if]
             [/#list]
         [/#if]
@@ -54,19 +79,24 @@
 #include <stdio.h>
 #include "platform.h"
 #include "sys_app.h"
-[#if ((CPUCORE != "CM0PLUS") && (SUBGHZ_APPLICATION != "SUBGHZ_ADV_APPLICATION") && (SUBGHZ_APPLICATION != "LORA_USER_APPLICATION") && (SUBGHZ_APPLICATION != "SUBGHZ_USER_APPLICATION") && (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION"))]
+[#if ((CPUCORE != "CM0PLUS") && (SUBGHZ_APPLICATION != "LORA_USER_APPLICATION") && (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION") && (SUBGHZ_APPLICATION != "SUBGHZ_USER_APPLICATION") && (SUBGHZ_APPLICATION != "SUBGHZ_AT_SLAVE") && (SUBGHZ_APPLICATION != "SUBGHZ_ADV_APPLICATION"))]
 #include "adc_if.h"
 [/#if]
-[#if !THREADX??][#-- If AzRtos is not used --]
-[#if !FREERTOS??][#-- If FreeRtos is not used --]
-#include "stm32_seq.h"
-[/#if]
-[#else][#-- If AzRtos is used --]
+[#if THREADX??]
 #include "app_threadx.h"
 #include "tx_user.h"
+[#elseif FREERTOS??]
+[#elseif ((UTIL_SEQ_EN_M0 == "true") && (CPUCORE == "CM0PLUS")) || ((UTIL_SEQ_EN_M4 == "true") && (CPUCORE == "CM4"))][#--  dual --]
+#include "stm32_seq.h"
+[#elseif ((UTIL_SEQ_EN_M4 == "true") && (CPUCORE == ""))][#--  single --]
+[#if ((SUBGHZ_APPLICATION != "LORA_USER_APPLICATION") && (SUBGHZ_APPLICATION != "SUBGHZ_USER_APPLICATION") && (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION"))]
+#include "stm32_seq.h"
 [/#if]
+[/#if][#--  THREADX vs FREERTOS vs SEQUENCER_M0 vs SEQUENCER_M4 --]
 #include "stm32_systime.h"
+[#if (USE_LPM == "true")]
 #include "stm32_lpm.h"
+[/#if]
 #include "timer_if.h"
 #include "utilities_def.h"
 [#if (SUBGHZ_APPLICATION != "LORA_USER_APPLICATION") && (SUBGHZ_APPLICATION != "SUBGHZ_USER_APPLICATION") && (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION")]
@@ -85,36 +115,41 @@
 [#if (SUBGHZ_APPLICATION == "SIGFOX_AT_SLAVE") || (SUBGHZ_APPLICATION == "SIGFOX_PUSHBUTTON") ]
 #include "sgfx_eeprom_if.h"
 [/#if]
-[#if (CPUCORE != "")]
+[#if (CPUCORE != "")][#--  !SINGLE --]
 #include "msg_id.h"
 #include "mbmuxif_sys.h"
+[#if (USE_UART == "true")]
 #include "mbmuxif_trace.h"
+[/#if]
 #include "mbmuxif_radio.h"
 [#if (CPUCORE == "CM0PLUS")]
 #include "features_info.h"
 [/#if]
 [#if ((SUBGHZ_APPLICATION == "LORA_END_NODE") || (SUBGHZ_APPLICATION == "LORA_AT_SLAVE"))|| (SUBGHZ_APPLICATION == "LORA_USER_APPLICATION") ]
 #include "mbmuxif_lora.h"
+[/#if][#--  SUBGHZ_APPLICATION == "LORA_XXX" --]
+[#if (INTERNAL_LORAWAN_FUOTA == "1")]
+#include "mbmuxif_flash.h"
 [/#if]
 [#if (SUBGHZ_APPLICATION == "SIGFOX_AT_SLAVE") || (SUBGHZ_APPLICATION == "SIGFOX_PUSHBUTTON") || (SUBGHZ_APPLICATION == "SIGFOX_USER_APPLICATION") ]
 #include "mbmuxif_sigfox.h"
 [#if (CPUCORE == "CM4")]
 #include "sgfx_app.h"
 [/#if]
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION == "SIGFOX_XXX" --]
 [#if ((SUBGHZ_APPLICATION != "SUBGHZ_ADV_APPLICATION") && (SUBGHZ_APPLICATION != "SUBGHZ_USER_APPLICATION")) ]
 #ifdef ALLOW_KMS_VIA_MBMUX /* currently not supported */
 /* #include "mbmuxif_kms.h" */
 #endif /* ALLOW_KMS_VIA_MBMUX */
-[/#if]
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION == "SUBGHZ_XXX" --]
+[/#if][#--  CPUCORE == !SINGLE --]
 
 /* USER CODE BEGIN Includes */
 
 /* USER CODE END Includes */
 
 /* External variables ---------------------------------------------------------*/
-[#if (SECURE_PROJECTS == "1") && (CPUCORE == "CM4") ]
+[#if (SECURE_PROJECTS == "1") && (CPUCORE == "CM4") && (STM32WL5MXX == "false")]
 #if ( DEBUGGER_ENABLED == 1 )
 __IO uint32_t lets_go_on = 0;
 #endif /* DEBUGGER_ENABLED */
@@ -146,7 +181,16 @@ __IO uint32_t lets_go_on = 0;
   */
 #define configTICK_RATE_HZ_1MS                 1000
 
-[/#if]
+[#if (INTERNAL_THREADX_TRACEX == "1")]
+/**
+  * TraceX definitions: buffer size and max thread
+  */
+#define APP_TRACE_SIZE  (12*1024)
+#define APP_MAX_THREAD  8
+#define APP_TRACE_INFO  (TX_TRACE_USER_EVENT_START+1)
+
+[/#if][#--  INTERNAL_THREADX_TRACEX --]
+[/#if][#--  THREADX --]
 /* USER CODE BEGIN PD */
 
 /* USER CODE END PD */
@@ -161,15 +205,24 @@ __IO uint32_t lets_go_on = 0;
 static EXTI_HandleTypeDef Exti41;
 [/#if]
 [#if THREADX??]
+[#if (USE_LPM == "true")]
 static uint32_t Time_BeforeSleep;
 static uint32_t Time_SleepFract = 0;
+[/#if][#--  USE_LPM --]
 [#else]
 [#if (CPUCORE == "CM4")]
 uint32_t InstanceIndex;
 uint8_t SYS_Cm0plusRdyNotificationFlag = 0;
 [/#if]
-[/#if]
+[/#if][#--  THREADX vs FREERTOS vs SEQUENCER --]
+[#if (UTIL_TIMER_EN == "true")]
 static uint8_t SYS_TimerInitialisedFlag = 0;
+[/#if]
+[#if (INTERNAL_THREADX_TRACEX == "1")]
+#ifdef TX_ENABLE_EVENT_TRACE
+uint8_t app_trace[APP_TRACE_SIZE];
+#endif /* TX_ENABLE_EVENT_TRACE */
+[/#if][#--  INTERNAL_THREADX_TRACEX --]
 
 /* USER CODE BEGIN PV */
 
@@ -188,7 +241,7 @@ static void System_Init(void);
   */
 static void MBMUXIF_Init(void);
 
-[/#if]
+[/#if][#--  CPUCORE == CM4 vs CM0 --]
 [#if (SUBGHZ_APPLICATION != "LORA_USER_APPLICATION") && (SUBGHZ_APPLICATION != "SUBGHZ_USER_APPLICATION") && (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION")]
 [#if (CPUCORE != "CM0PLUS")]
 /**
@@ -211,8 +264,9 @@ static void tiny_snprintf_like(char *buf, uint32_t maxsize, const char *strForma
   */
 static void MX_EXTI_Init(void);
 
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION != "XXX_USER_APPLICATION" --]
 [#if THREADX??]
+[#if (USE_LPM == "true")]
 /**
   * @brief  Convert ms to AzRTOS ticks
   * @param  time in ms
@@ -227,13 +281,15 @@ static uint32_t app_azrtos_ms_to_tick(uint32_t ms);
   */
 static uint32_t app_azrtos_tick_to_ms(uint32_t tick);
 
-[/#if]
+[/#if][#--  USE_LPM --]
+[/#if][#--  THREADX --]
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
 
 /* Exported functions ---------------------------------------------------------*/
 [#if THREADX??]
+[#if (USE_LPM == "true")]
 void App_ThreadX_LowPower_Enter(void)
 {
   /* Called by the kernel before it places the MCU into a LowPower mode .
@@ -287,7 +343,8 @@ unsigned long App_ThreadX_LowPower_Timer_Adjust(void)
   return ret;
 }
 
-[/#if]
+[/#if][#--  USE_LPM --]
+[/#if][#--  THREADX --]
 void SystemApp_Init(void)
 {
 [#if (CPUCORE == "CM0PLUS")]
@@ -304,22 +361,31 @@ void SystemApp_Init(void)
 
 [#else]
   /* RTC_Init: normally already executed by overloading HAL_InitTick(), but need to be sure before notify Cm4 */
-[/#if]
+[/#if][#--  CPUCORE == CM4 vs CM0 vs SINGLE --]
 [#if (CPUCORE != "CM4")]
   /*Initialize timer and RTC*/
   UTIL_TIMER_Init();
   SYS_TimerInitialisedFlag = 1;
-[/#if]
+[/#if][#--  CPUCORE == !CM4 --]
 [#if (CPUCORE != "CM0PLUS")]
   /* Initializes the SW probes pins and the monitor RF pins via Alternate Function */
   DBG_Init();
 
+[#if (INTERNAL_THREADX_TRACEX == "1")]
+  /*Initialize TRACEX */
+#ifdef TX_ENABLE_EVENT_TRACE
+  tx_trace_enable(app_trace, sizeof(app_trace), APP_MAX_THREAD);
+  /* to filter some default trace that we don't want to see with TraceX */
+  tx_trace_event_filter(TX_TRACE_INTERNAL_EVENTS);
+#endif /* TX_ENABLE_EVENT_TRACE */
+
+[/#if]
   /*Initialize the terminal */
   UTIL_ADV_TRACE_Init();
   UTIL_ADV_TRACE_RegisterTimeStampFunction(TimestampNow);
 
-[/#if]
-[#if ((CPUCORE != "CM4") && ((SUBGHZ_APPLICATION == "SIGFOX_AT_SLAVE") || (SUBGHZ_APPLICATION == "SIGFOX_PUSHBUTTON") || (LORAWAN_FUOTA == "1"))) || ((CPUCORE != "CM0PLUS") && ((SUBGHZ_APPLICATION == "LORA_END_NODE") || (SUBGHZ_APPLICATION == "LORA_AT_SLAVE"))) ]
+[/#if][#--  CPUCORE == !CM0PLUS --]
+[#if ((CPUCORE != "CM4") && ((SUBGHZ_APPLICATION == "SIGFOX_AT_SLAVE") || (SUBGHZ_APPLICATION == "SIGFOX_PUSHBUTTON") || (INTERNAL_LORAWAN_FUOTA == "1"))) || ((CPUCORE != "CM0PLUS") && ((SUBGHZ_APPLICATION == "LORA_END_NODE") || (SUBGHZ_APPLICATION == "LORA_AT_SLAVE"))) ]
   /* #warning "should be removed when proper obl is done" */
   __HAL_FLASH_CLEAR_FLAG(FLASH_FLAG_OPTVERR);
 
@@ -340,7 +406,7 @@ void SystemApp_Init(void)
   UTIL_ADV_TRACE_SetVerboseLevel(VERBOSE_LEVEL);
 [/#if]
 
-[#if (SUBGHZ_APPLICATION != "SUBGHZ_ADV_APPLICATION") ]
+[#if (SUBGHZ_APPLICATION != "SUBGHZ_ADV_APPLICATION") && (SUBGHZ_APPLICATION != "SUBGHZ_AT_SLAVE")]
   /*Initialize the temperature and Battery measurement services */
   SYS_InitMeasurement();
 [/#if]
@@ -349,7 +415,7 @@ void SystemApp_Init(void)
   /*Initialize the Sensors */
   EnvSensors_Init();
 [/#if]
-[/#if]
+[/#if][#--  CPUCORE == != "CM0PLUS" --]
 
   /*Init low power manager*/
   UTIL_LPM_Init();
@@ -363,7 +429,7 @@ void SystemApp_Init(void)
 #error LOW_POWER_DISABLE not defined
 #endif /* LOW_POWER_DISABLE */
 
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION != "XXX_USER_APPLICATION" --]
 [#if (SECURE_PROJECTS == "1") && (CPUCORE == "CM0PLUS") ]
   /* Init the Exti used for sync the two CPU after SBSFU download */
   MX_EXTI_Init();
@@ -413,11 +479,12 @@ void SystemApp_Init(void)
   System_Init();
 
 [#if (SUBGHZ_APPLICATION == "SIGFOX_AT_SLAVE") || (SUBGHZ_APPLICATION == "SIGFOX_PUSHBUTTON") || (SUBGHZ_APPLICATION == "SIGFOX_USER_APPLICATION") ]
-
+[#if (UTIL_SEQ_EN_M0 == "true") ]
   /* Registers Sigfox Notif to the sequencer */
   UTIL_SEQ_RegTask((1 << CFG_SEQ_Task_MbSigfoxNotifRcv), UTIL_SEQ_RFU, MBMUXIF_SigfoxSendNotifTask);
 [/#if]
 [/#if]
+[/#if][#--  CPUCORE == CM4 vs CM0 --]
 
 [#if (CPUCORE != "") || ((SUBGHZ_APPLICATION != "LORA_USER_APPLICATION") && (SUBGHZ_APPLICATION != "SUBGHZ_USER_APPLICATION") && (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION"))]
   /* USER CODE BEGIN SystemApp_Init_2 */
@@ -519,7 +586,7 @@ void Process_Kms_Cmd(MBMUX_ComParam_t *ComObj)
   /* USER CODE END Process_Kms_Cmd_2 */
 }
 #endif /* ALLOW_KMS_VIA_MBMUX */
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION != XXX --]
 
 void Process_Sys_Cmd(MBMUX_ComParam_t *ComObj)
 {
@@ -555,10 +622,10 @@ void Process_Sys_Cmd(MBMUX_ComParam_t *ComObj)
 
   /* USER CODE END Process_Sys_Cmd_2 */
 }
-[/#if]
+[/#if][#--  CPUCORE == CM4 vs CM0 --]
 [#if !FREERTOS??][#-- If FreeRtos is not used --]
 [#if !THREADX??][#-- If AzRtos is not used --]
-[#if (CPUCORE != "")]
+[#if ((UTIL_SEQ_EN_M0 == "true") && (CPUCORE == "CM0PLUS")) || ((UTIL_SEQ_EN_M4 == "true") && (CPUCORE == "CM4"))][#--  DUAL && UTIL_SEQ_EN --]
 
 void UTIL_SEQ_EvtIdle(uint32_t TaskId_bm, uint32_t EvtWaited_bm)
 {
@@ -575,7 +642,7 @@ void UTIL_SEQ_EvtIdle(uint32_t TaskId_bm, uint32_t EvtWaited_bm)
   /* USER CODE END UTIL_SEQ_EvtIdle_2 */
   return;
 }
-[/#if]
+[/#if][#--  CPUCORE == DUAL && UTIL_SEQ_EN --]
 [#if (SUBGHZ_APPLICATION != "LORA_USER_APPLICATION") && (SUBGHZ_APPLICATION != "SUBGHZ_USER_APPLICATION") && (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION")]
 
 /**
@@ -593,7 +660,7 @@ void UTIL_SEQ_Idle(void)
 }
 [/#if]
 [/#if]
-[/#if]
+[/#if][#--  THREADX vs FREERTOS vs SEQUENCER --]
 
 [#if (CPUCORE != "CM0PLUS")]
 [#if ((SUBGHZ_APPLICATION == "LORA_END_NODE") || (SUBGHZ_APPLICATION == "LORA_AT_SLAVE") || (SUBGHZ_APPLICATION == "LORA_USER_APPLICATION"))]
@@ -632,7 +699,7 @@ uint8_t GetBatteryLevel(void)
 [/#if]
   return batteryLevel;  /* 1 (very low) to 254 (fully charged) */
 }
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION == "LORA_XXX" --]
 
 [#if ((SUBGHZ_APPLICATION == "LORA_END_NODE") || (SUBGHZ_APPLICATION == "LORA_AT_SLAVE") || (SUBGHZ_APPLICATION == "LORA_USER_APPLICATION") || (SUBGHZ_APPLICATION == "SIGFOX_PUSHBUTTON") || (SUBGHZ_APPLICATION == "SIGFOX_AT_SLAVE"))]
 int16_t GetTemperatureLevel(void)
@@ -653,8 +720,8 @@ int16_t GetTemperatureLevel(void)
   return temperatureLevel;
 }
 
-[/#if]
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION == "LORA_XXX" || SIGFOX_XXX --]
+[/#if][#--  CPUCORE != "CM0PLUS" --]
 [#if CPUCORE != "CM4"]
 [#if ((SUBGHZ_APPLICATION == "LORA_END_NODE") || (SUBGHZ_APPLICATION == "LORA_AT_SLAVE") || (SUBGHZ_APPLICATION == "LORA_USER_APPLICATION"))]
 void GetUniqueId(uint8_t *id)
@@ -692,33 +759,36 @@ void GetUniqueId(uint8_t *id)
     id[0] = (val >> 16) & 0xFF;
   }
 
+[#if (INTERNAL_THREADX_TRACEX == "1")]
+#ifdef TX_ENABLE_EVENT_TRACE
+  /* Example of User Event (UE) traceX usage to see on traceX the variable "val" and the constant 0xABCD*/
+  tx_trace_user_event_insert(APP_TRACE_INFO, 0, val, 0, 0xABCD);
+#endif /* TX_ENABLE_EVENT_TRACE */
+[/#if]
   /* USER CODE BEGIN GetUniqueId_2 */
 
   /* USER CODE END GetUniqueId_2 */
 }
 
-uint32_t GetDevAddr(void)
+void GetDevAddr(uint32_t *devAddr)
 {
-  uint32_t val = 0;
   /* USER CODE BEGIN GetDevAddr_1 */
 
   /* USER CODE END GetDevAddr_1 */
 
-  val = LL_FLASH_GetUDN();
-  if (val == 0xFFFFFFFF)
+  *devAddr = LL_FLASH_GetUDN();
+  if (*devAddr == 0xFFFFFFFF)
   {
-    val = ((HAL_GetUIDw0()) ^ (HAL_GetUIDw1()) ^ (HAL_GetUIDw2()));
+    *devAddr = ((HAL_GetUIDw0()) ^ (HAL_GetUIDw1()) ^ (HAL_GetUIDw2()));
   }
 
   /* USER CODE BEGIN GetDevAddr_2 */
 
   /* USER CODE END GetDevAddr_2 */
-  return val;
-
 }
 
-[/#if]
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION == "LORA_XXX" --]
+[/#if][#--  CPUCORE != "CM4" --]
 /* USER CODE BEGIN EF */
 
 /* USER CODE END EF */
@@ -746,12 +816,13 @@ static void MBMUXIF_Init(void)
   /* On the other hand is up to the developer make sure the CM0PLUS debugger is run after CM4 debugger */
   HAL_PWREx_ReleaseCore(PWR_CORE_CPU2);
 
-[#if (SECURE_PROJECTS == "1") && (CPUCORE == "CM4") ]
+[#if (SECURE_PROJECTS == "1") && (CPUCORE == "CM4")]
   /* Warn CPU2 that CPU1 is ready */
   /* Set Cpu Event then consume it to allow next low power entry */
   __SEV();
   __WFE();
 
+[#if (STM32WL5MXX == "false")]
   /* Push Button for stop the core in other to attach debugger */
 #if ( DEBUGGER_ENABLED == 1 )
   APP_LOG(TS_ON, VLEVEL_L, "\r\nPress PushButton2 to continue \r\n");
@@ -759,6 +830,7 @@ static void MBMUXIF_Init(void)
   lets_go_on = 0;
 #endif /* DEBUGGER_ENABLED */
 
+[/#if]
 [/#if]
   /* CM4 has started and it has reset the mailbox and initialized the MbMux; */
   /* once CM0PLUS is also initialized it send a SYS notification */
@@ -792,8 +864,8 @@ static void MBMUXIF_Init(void)
     Error_Handler();
   }
   APP_LOG(TS_ON, VLEVEL_H, "Trace registration CM4-CM0PLUS completed \r\n");
-[/#if]
 
+[/#if]
 [#if ((SUBGHZ_APPLICATION == "LORA_END_NODE") || (SUBGHZ_APPLICATION == "LORA_AT_SLAVE") || (SUBGHZ_APPLICATION == "LORA_USER_APPLICATION"))]
   init_status = MBMUXIF_LoraInit();
   if (init_status < 0)
@@ -810,8 +882,8 @@ static void MBMUXIF_Init(void)
     Error_Handler();
   }
   APP_LOG(TS_ON, VLEVEL_H, "Radio registration CM4-CM0PLUS completed \r\n");
-[/#if]
 
+[/#if]
 [#if (SUBGHZ_APPLICATION == "SIGFOX_AT_SLAVE")||(SUBGHZ_APPLICATION == "SIGFOX_PUSHBUTTON")|| (SUBGHZ_APPLICATION == "SIGFOX_USER_APPLICATION") ]
   init_status = MBMUXIF_SigfoxInit();
   if (init_status < 0)
@@ -819,8 +891,17 @@ static void MBMUXIF_Init(void)
     Error_Handler();
   }
   APP_LOG(TS_ON, VLEVEL_H, "Sigfox registration CM4-CM0PLUS completed \n\r");
-[/#if]
 
+[/#if]
+[#if (INTERNAL_LORAWAN_FUOTA == "1")]
+  init_status = MBMUXIF_FlashInit();
+  if (init_status < 0)
+  {
+    Error_Handler();
+  }
+  APP_LOG(TS_ON, VLEVEL_H, "Flash registration CM4-CM0PLUS completed \n\r");
+
+[/#if]
   /* USER CODE BEGIN MBMUXIF_Init_Last */
 
   /* USER CODE END MBMUXIF_Init_Last */
@@ -852,7 +933,7 @@ static void System_Init(void)
   /* USER CODE END System_Init_Last */
 }
 
-[/#if]
+[/#if][#--  CPUCORE == CM4 vs CM0 --]
 [#if (SUBGHZ_APPLICATION != "LORA_USER_APPLICATION") && (SUBGHZ_APPLICATION != "SUBGHZ_USER_APPLICATION") && (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION")]
 [#if (CPUCORE != "CM0PLUS")]
 
@@ -907,7 +988,7 @@ static void tiny_snprintf_like(char *buf, uint32_t maxsize, const char *strForma
   /* USER CODE END tiny_snprintf_like_2 */
 }
 
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION != "XXX_USER_APPLICATION" --]
 [#if (SECURE_PROJECTS == "1") && (CPUCORE == "CM0PLUS") ]
 /**
   * Enable EXTI controller
@@ -925,6 +1006,7 @@ static void MX_EXTI_Init(void)
 
 [/#if]
 [#if THREADX??]
+[#if (USE_LPM == "true")]
 static uint32_t app_azrtos_ms_to_tick(uint32_t ms)
 {
   uint32_t tick = ms;
@@ -945,7 +1027,8 @@ static uint32_t app_azrtos_tick_to_ms(uint32_t tick)
   return ms;
 }
 
-[/#if]
+[/#if][#--  USE_LPM --]
+[/#if][#--  THREADX --]
 /* USER CODE BEGIN PrFD */
 
 /* USER CODE END PrFD */
@@ -982,6 +1065,7 @@ HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
 /* USER CODE END Overload_HAL_weaks_1a */
 
 [/#if]
+[#if (UTIL_TIMER_EN == "true")]
 /**
   * @note This function overwrites the __weak one from HAL
   */
@@ -1033,6 +1117,7 @@ void HAL_Delay(__IO uint32_t Delay)
   /* USER CODE END HAL_Delay_2 */
 }
 
+[/#if][#--  UTIL_TIMER_EN --]
 [#if (SUBGHZ_APPLICATION == "LORA_USER_APPLICATION") || (SUBGHZ_APPLICATION == "SUBGHZ_USER_APPLICATION") || (SUBGHZ_APPLICATION == "SIGFOX_USER_APPLICATION")]
 /* USER CODE BEGIN Overload_HAL_weaks_2 */
 #endif /* 1 default HAL overcharge */

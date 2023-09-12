@@ -10,6 +10,18 @@
   ******************************************************************************
   */
 /* USER CODE END Header */
+[#assign UTIL_SEQ_EN_M0 = "true"]
+[#if SWIPdatas??]
+    [#list SWIPdatas as SWIP]
+        [#if SWIP.defines??]
+            [#list SWIP.defines as definition]
+                [#if definition.name == "UTIL_SEQ_EN_M0"]
+                    [#assign UTIL_SEQ_EN_M0 = definition.value]
+                [/#if]
+            [/#list]
+        [/#if]
+    [/#list]
+[/#if]
 
 /* Includes ------------------------------------------------------------------*/
 #include "platform.h"
@@ -17,7 +29,9 @@
 #include "mbmux.h"
 #include "sys_app.h"
 #include "msg_id.h"
+[#if UTIL_SEQ_EN_M0 == "true"]
 #include "stm32_seq.h"
+[/#if]
 #include "stm32_adv_trace.h"
 #include "utilities_def.h"   /* for CFG_SEQ_Evt_MbTraceAckRcv */
 
@@ -109,7 +123,13 @@ int8_t MBMUXIF_TraceInit(uint8_t verboseLevel)
   ret = MBMUX_RegisterFeatureCallback(FEAT_INFO_TRACE_ID, MBMUX_NOTIF_ACK, MBMUXIF_IsrTraceAckRcvCb);
   if (ret >= 0)
   {
+[#if UTIL_SEQ_EN_M0 == "true"]
     UTIL_SEQ_RegTask((1 << CFG_SEQ_Task_MbTraceAckRcv), UTIL_SEQ_RFU, MBMUXIF_TaskTraceAckRcv);
+[#else]
+  /* USER CODE BEGIN MBMUXIF_TraceInit_OS */
+
+  /* USER CODE END MBMUXIF_TraceInit_OS */
+[/#if][#--  SEQUENCER --]
 
     /*Initialize the terminal */
     UTIL_ADV_TRACE_Init();
@@ -205,8 +225,14 @@ static void MBMUXIF_IsrTraceAckRcvCb(void *ComObj)
   /* USER CODE BEGIN MBMUXIF_IsrTraceAckRcvCb_1 */
 
   /* USER CODE END MBMUXIF_IsrTraceAckRcvCb_1 */
+[#if UTIL_SEQ_EN_M0 == "true"]
   UTIL_SEQ_SetEvt(1 << CFG_SEQ_Evt_MbTraceAckRcv); /* not necessary */
   UTIL_SEQ_SetTask((1 << CFG_SEQ_Task_MbTraceAckRcv), CFG_SEQ_Prio_0);
+[#else]
+  /* USER CODE BEGIN MBMUXIF_IsrTraceAckRcvCb_OS */
+
+  /* USER CODE END MBMUXIF_IsrTraceAckRcvCb_OS */
+[/#if][#--  SEQUENCER --]
   /* USER CODE BEGIN MBMUXIF_IsrTraceAckRcvCb_Last */
 
   /* USER CODE END MBMUXIF_IsrTraceAckRcvCb_Last */

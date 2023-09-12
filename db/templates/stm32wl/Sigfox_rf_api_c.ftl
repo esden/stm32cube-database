@@ -54,7 +54,7 @@
 [#else]
 #include "cmsis_os.h"
 [/#if]
-[/#if]
+[/#if][#--  THREADX vs FREERTOS vs SEQUENCER --]
 #include "stm32_mem.h"
 #include "utilities_def.h"
 #include "sgfx_eeprom_if.h"
@@ -63,7 +63,7 @@
 #include "stm32_timer.h"
 #include "sys_app.h" /*for APP_LOG*/
 #include "platform.h"
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION" --]
 
 /* USER CODE BEGIN Includes */
 
@@ -80,7 +80,7 @@ extern osSemaphoreId_t Sem_TxTimeout;
 extern osSemaphoreId_t Sem_Timeout;
 
 [/#if]
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION" --]
 /* USER CODE BEGIN EV */
 
 /* USER CODE END EV */
@@ -403,14 +403,14 @@ sfx_u8 RF_API_send(sfx_u8 *stream, sfx_modulation_type_t type, sfx_u8 size)
 [#else]
     osSemaphoreAcquire(Sem_TxTimeout, osWaitForever);
 [/#if]
-[/#if]
+[/#if][#--  THREADX vs FREERTOS vs SEQUENCER --]
 
     APP_LOG(TS_ON, VLEVEL_M, "End Of Tx\n\r");
 
   }
 
   APP_LOG(TS_ON, VLEVEL_M, "TX END\n\r");
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION" --]
   /* USER CODE BEGIN RF_API_send_3 */
 [#if (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION") && (FILL_UCS == "true")]
   HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_RESET); /* LED_BLUE */
@@ -575,7 +575,7 @@ sfx_u8 RF_API_wait_frame(sfx_u8 *frame, sfx_s16 *rssi, sfx_rx_state_enum_t *stat
   /* USER CODE BEGIN RF_API_wait_frame_2 */
 
   /* USER CODE END RF_API_wait_frame_2 */
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION" --]
   *state = ret_state;
   *rssi = res_rssi;
   return status;
@@ -675,11 +675,11 @@ static void OnTxDone(void)
 [#else]
   osSemaphoreRelease(Sem_TxTimeout);
 [/#if]
-[/#if]
+[/#if][#--  THREADX vs FREERTOS vs SEQUENCER --]
 
   APP_LOG(TS_ON, VLEVEL_M, "OnTxDone\n\r");
 
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION" --]
   /* USER CODE BEGIN OnTxDone_2 */
 
   /* USER CODE END OnTxDone_2 */
@@ -706,11 +706,11 @@ static void OnRxDone(uint8_t *payload, uint16_t size, int16_t rssi, int8_t offse
 [#else]
   osSemaphoreRelease(Sem_Timeout);
 [/#if]
-[/#if]
+[/#if][#--  THREADX vs FREERTOS vs SEQUENCER --]
 
   APP_LOG(TS_ON, VLEVEL_M, "OnRxDone\n\r");
 
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION" --]
   /* USER CODE BEGIN OnRxDone_2 */
 
   /* USER CODE END OnRxDone_2 */
@@ -731,11 +731,11 @@ static void OnTxTimeout(void)
 [#else]
   osSemaphoreRelease(Sem_TxTimeout);
 [/#if]
-[/#if]
+[/#if][#--  THREADX vs FREERTOS vs SEQUENCER --]
 
   APP_LOG(TS_ON, VLEVEL_M,  "OnTxTimeout\n\r");
 
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION" --]
   /* USER CODE BEGIN OnTxTimeout_2 */
 
   /* USER CODE END OnTxTimeout_2 */
@@ -758,11 +758,11 @@ static void OnRxTimeout(void)
 [#else]
   osSemaphoreRelease(Sem_Timeout);
 [/#if]
-[/#if]
+[/#if][#--  THREADX vs FREERTOS vs SEQUENCER --]
 
   APP_LOG(TS_ON, VLEVEL_M,  "OnRxTimeout\n\r");
 
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION" --]
   /* USER CODE BEGIN OnRxTimeout_2 */
 
   /* USER CODE END OnRxTimeout_2 */
@@ -785,11 +785,11 @@ static void OnRxError(void)
 [#else]
   osSemaphoreRelease(Sem_Timeout);
 [/#if]
-[/#if]
+[/#if][#--  THREADX vs FREERTOS vs SEQUENCER --]
 
   APP_LOG(TS_ON, VLEVEL_M, "OnRxError\n\r");
 
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION" --]
   /* USER CODE BEGIN OnRxError_2 */
 
   /* USER CODE END OnRxError_2 */
@@ -817,7 +817,7 @@ static sfx_u8 sfx_wait_end_of_rx(void)
 [#else]
   osSemaphoreAcquire(Sem_Timeout, osWaitForever);
 [/#if]
-[/#if]
+[/#if][#--  THREADX vs FREERTOS vs SEQUENCER --]
 
   APP_LOG(TS_ON, VLEVEL_M, "End Of Rx\n\r");
 
@@ -854,7 +854,7 @@ bool RF_API_isChannelFree(int16_t rssiThresh, uint32_t maxCarrierSenseTime)
 
   /* USER CODE END RF_API_isChannelFree_2 */
 }
-[/#if]
+[/#if][#--  SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION" --]
 
 /* USER CODE BEGIN PrFD */
 

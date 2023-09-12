@@ -124,8 +124,11 @@
 		 <Parameter Added="true" Name="NX_APP_MEM_POOL_SIZE">
             <Condition Diagnostic="" Expression="SEMThreadXCcRTOSJjThreadXJjCore" Name="NX_APP_MEM_POOL_CONDITION"/>
         </Parameter>
-                <Parameter Added="true" Name="AZRTOS_APP_MEM_ALLOCATION_METHOD">
+        <Parameter Added="true" Name="AZRTOS_APP_MEM_ALLOCATION_METHOD">
 		  <Condition Diagnostic="" Expression="SEMThreadXCcRTOSJjThreadXJjCore" Name="APP_MEM_ALLOCATION_CONDITION"/>
+		</Parameter>
+		<Parameter Added="true" Name="NETXDUO_MEM_POOL_VAR_NAME">
+		  <Condition Diagnostic="" Expression="SEMThreadXCcRTOSJjThreadXJjCore" />
 		</Parameter>
 		<Parameter Added="true" Name="NX_ENABLE_TCPIP_OFFLOAD"/>
 	</RefMode>
@@ -512,9 +515,7 @@
 	<RefMode Abstract="true" Name="Custom_Interface">
 		<ConfigForMode>Custom_Interface</ConfigForMode>
 	</RefMode>
-	<RefMode Abstract="true" Name="TraceX_Support">
-		<ConfigForMode>TraceX_Support</ConfigForMode>
-	</RefMode>
+	
 	<RefMode Abstract="true" Name="Addons_Cloud">
 		<ConfigForMode>Addons_Cloud</ConfigForMode>
 		<Parameter Added="true" Name="NXD_MQTT_CLOUD_ENABLE"/>
@@ -557,17 +558,6 @@
 				</Mode>
 			</ModeLogicOperator>
 		</Mode>			
-		<Mode Name="TraceX_Support" UserName="TraceX Support">
-			<ModeLogicOperator Name="NONE">
-				<Mode Name="TraceX_Support" >
-					<SignalLogicalOp Name="AND">
-						<Signal Name="VS_TraceXOoSupport"/>
-					</SignalLogicalOp>
-					<Semaphore>SEMNetXDuoCcNetworkJjNetXDuoJjTraceXOoSupport</Semaphore>
-					<Condition Expression="SEMNetXDuoCcNetworkJjNetXDuoJjNXOoCore" Diagnostic="&lt;b&gt; Requires: &lt;/b&gt; Middleware:NETXDUO:NX Core"/>
-				</Mode>
-			</ModeLogicOperator>
-		</Mode>	
 		<Mode Name="Addons" UserName="Addons">
 			<ModeLogicOperator Name="OR">
 				<Mode Name="Addons DHCP" UserName="DHCP">
@@ -751,7 +741,6 @@
 	<RefSignal Name="VS_TLS" Virtual="true"/>
 	<RefSignal Name="VS_Crypto" Virtual="true"/>
 	<RefSignal Name="VS_CustomOoInterface" Virtual="true"/>
-	<RefSignal Name="VS_TraceXOoSupport" Virtual="true"/>
 	
 	<RefParameter Added="true" Comment="NX_SNTP_CLIENT_PREEMPTION_THRESHOLD" DefaultValue="2" Group="SNTP" Max="255" Min="0" Name="NX_SNTP_CLIENT_PREEMPTION_THRESHOLD" TabName="NetXDuo" Type="integer" Unit="">
         <Description>This option sets the sets the level of priority at which the Client thread allows preemption. The default NetX Duo SNTP Client value is set to NX_SNTP_CLIENT_ THREAD_PRIORITY.</Description>
@@ -2465,4 +2454,10 @@ When a FileSystem is needed this option should be set to flase  FileX should be 
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Semaphore="SEM_NX_ENABLE_TCPIP_OFFLOAD" Value="1"/>
     </RefParameter>
+	
+	<RefParameter Added="true" Comment="NetXDuo MemPool Name" DefaultValue="nx_app_byte_pool" Group="Memory Configuration" Name="NETXDUO_MEM_POOL_VAR_NAME" TabName="NetXDuo" Type="stringRW">
+        <Description>Default NetXDuo memory pool var name &lt;br&gt; &lt;font color=&quot;red&quot;&gt; &lt;b&gt;This is a variable name. It should be C compliant declaration, Otherwise compilation errors will be generated in the project. &lt;/b&gt; &lt;/font&gt;</Description>
+		<Condition Diagnostic="" Expression="(ThreadX:AZRTOS_APP_MEM_ALLOCATION_METHOD = 1)"/>
+    </RefParameter>
+	
 </IP>

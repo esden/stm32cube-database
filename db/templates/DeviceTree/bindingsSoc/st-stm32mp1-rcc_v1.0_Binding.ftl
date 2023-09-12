@@ -13,6 +13,11 @@
 [#t]
 [#t]
 [#-- Clock Tree configuration (rcc node)--]
+[#list peripheralParams.get("RCC").entrySet() as paramEntry]
+    [#if paramEntry.key == "LSE_STATUS"][#assign lse_status="${paramEntry.value}"][/#if]
+    [#if paramEntry.key == "HSE_STATUS"][#assign hse_status="${paramEntry.value}"][/#if]
+    [#if paramEntry.key == "I2S_CLK_STATUS"][#assign i2s_clk_status="${paramEntry.value}"][/#if]
+[/#list]
 
 	/* USER CODE BEGIN rcc */
 	/* USER CODE END rcc */

@@ -615,12 +615,6 @@ extern ${variable.value} ${variable.name};
 #define ${definition.name}   ${definition.value}
                 [/#if]
             [/#if][#-- stm32f4 --]
-            [#if (series == "stm32f4") || (series == "stm32f7")]
-                [#if (definition.value != "valueNotSetted") && (definition.name=="ETH_RX_BUFFER_SIZE")]
-/*----- Default value in ETH configuration GUI in CubeMx: 1524 -----*/
-#define ${definition.name}   ${definition.value}
-                [/#if]
-            [/#if][#-- stm32f7/f4 --]
 		[/#if][#-- definition.defaultValue --]
 	[/#list][#-- SWIP.defines line 108 --]
 /*-----------------------------------------------------------------------------*/

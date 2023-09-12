@@ -10,13 +10,27 @@
   ******************************************************************************
   */
 /* USER CODE END Header */
+[#assign UTIL_SEQ_EN_M0 = "true"]
+[#if SWIPdatas??]
+    [#list SWIPdatas as SWIP]
+        [#if SWIP.defines??]
+            [#list SWIP.defines as definition]
+                [#if definition.name == "UTIL_SEQ_EN_M0"]
+                    [#assign UTIL_SEQ_EN_M0 = definition.value]
+                [/#if]
+            [/#list]
+        [/#if]
+    [/#list]
+[/#if]
 
 /* Includes ------------------------------------------------------------------*/
 #include "platform.h"
 #include "mbmuxif_radio.h"
 #include "mbmux.h"
 #include "sys_app.h"
+[#if UTIL_SEQ_EN_M0 == "true"]
 #include "stm32_seq.h"
+[/#if][#--  SEQUENCER --]
 #include "radio_mbwrapper.h"
 #include "utilities_def.h"
 
@@ -93,8 +107,14 @@ int8_t MBMUXIF_RadioInit(void)
   }
   if (ret >= 0)
   {
+[#if UTIL_SEQ_EN_M0 == "true"]
     UTIL_SEQ_RegTask((1 << CFG_SEQ_Task_MbRadioCmdRcv), UTIL_SEQ_RFU, MBMUXIF_TaskRadioCmdRcv);
     UTIL_SEQ_RegTask((1 << CFG_SEQ_Task_MbRadioNotifSnd), UTIL_SEQ_RFU, MBMUXIF_TaskRadioNotifSnd);
+[#else]
+  /* USER CODE BEGIN MBMUXIF_RadioInit_OS */
+
+  /* USER CODE END MBMUXIF_RadioInit_OS */
+[/#if][#--  SEQUENCER --]
     ret = 0;
   }
 
@@ -125,7 +145,13 @@ void MBMUXIF_RadioSendNotif(void)
   /* USER CODE BEGIN MBMUXIF_RadioSendNotif_1 */
 
   /* USER CODE END MBMUXIF_RadioSendNotif_1 */
+[#if UTIL_SEQ_EN_M0 == "true"]
   UTIL_SEQ_SetTask((1 << CFG_SEQ_Task_MbRadioNotifSnd), CFG_SEQ_Prio_0);
+[#else]
+  /* USER CODE BEGIN MBMUXIF_RadioSendNotif_OS */
+
+  /* USER CODE END MBMUXIF_RadioSendNotif_OS */
+[/#if][#--  SEQUENCER --]
   /* USER CODE BEGIN MBMUXIF_RadioSendNotif_Last */
 
   /* USER CODE END MBMUXIF_RadioSendNotif_Last */
@@ -155,7 +181,13 @@ static void MBMUXIF_IsrRadioAckRcvCb(void *ComObj)
   /* USER CODE BEGIN MBMUXIF_IsrRadioAckRcvCb_1 */
 
   /* USER CODE END MBMUXIF_IsrRadioAckRcvCb_1 */
+[#if UTIL_SEQ_EN_M0 == "true"]
   UTIL_SEQ_SetEvt(1 << CFG_SEQ_Evt_MbRadioAckRcv);
+[#else]
+  /* USER CODE BEGIN MBMUXIF_IsrRadioAckRcvCb_OS */
+
+  /* USER CODE END MBMUXIF_IsrRadioAckRcvCb_OS */
+[/#if][#--  SEQUENCER --]
   /* USER CODE BEGIN MBMUXIF_IsrRadioAckRcvCb_Last */
 
   /* USER CODE END MBMUXIF_IsrRadioAckRcvCb_Last */
@@ -167,7 +199,13 @@ static void MBMUXIF_IsrRadioCmdRcvCb(void *ComObj)
 
   /* USER CODE END MBMUXIF_IsrRadioCmdRcvCb_1 */
   RadioComObj = (MBMUX_ComParam_t *) ComObj;
+[#if UTIL_SEQ_EN_M0 == "true"]
   UTIL_SEQ_SetTask((1 << CFG_SEQ_Task_MbRadioCmdRcv), CFG_SEQ_Prio_0);
+[#else]
+  /* USER CODE BEGIN MBMUXIF_IsrRadioCmdRcvCb_OS */
+
+  /* USER CODE END MBMUXIF_IsrRadioCmdRcvCb_OS */
+[/#if][#--  SEQUENCER --]
   /* USER CODE BEGIN MBMUXIF_IsrRadioCmdRcvCb_Last*/
 
   /* USER CODE END MBMUXIF_IsrRadioCmdRcvCb_Last */
@@ -191,7 +229,13 @@ static void MBMUXIF_TaskRadioNotifSnd(void)
   /* USER CODE END MBMUXIF_TaskRadioNotifSnd_1 */
   if (MBMUX_NotificationSnd(FEAT_INFO_RADIO_ID) == 0)
   {
+[#if UTIL_SEQ_EN_M0 == "true"]
     UTIL_SEQ_WaitEvt(1 << CFG_SEQ_Evt_MbRadioAckRcv);
+[#else]
+    /* USER CODE BEGIN MBMUXIF_TaskRadioNotifSnd_OS */
+
+    /* USER CODE END MBMUXIF_TaskRadioNotifSnd_OS */
+[/#if][#--  SEQUENCER --]
   }
   else
   {

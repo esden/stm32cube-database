@@ -309,6 +309,10 @@
 [/#list]
 [/#compress]
 
+/* USER CODE BEGIN 1 */
+
+/* USER CODE END 1 */
+
 /* Define various build options for the USBX port.  The application should either make changes
    here by commenting or un-commenting the conditional compilation defined OR supply the defines
    though the compiler's equivalent of the -D option.  */
@@ -849,5 +853,9 @@
 [#else]
 /* #define UX_DEVICE_CLASS_CDC_ACM_TRANSMISSION_DISABLE */
 [/#if]
-#endif
 
+/* USER CODE BEGIN 2 */
+
+/* USER CODE END 2 */
+
+#endif

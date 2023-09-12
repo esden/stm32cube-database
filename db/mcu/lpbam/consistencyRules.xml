@@ -998,6 +998,105 @@ it this condition, for cohenrecy,he rules are simpler -->
                  Diagnostic="Peripheral Configuration: S1.Q{QUEUEFROMLIST_#2} / 'LPDMA1:S1.Q{QUEUEFROMLIST_#2}.F{QUEUEFROMLIST_#3}'. 'LPDMA1 Start' function is used and parameter 'Queue to start' is not set. A valid 'Queue to start' must be selected from the function configuration panel"
                  Type="error"/>
     </ConsistencyRule>
+    <ConsistencyRule Type="SingleApplication" Name= "LPDMAWAKEUPINTERRUPT">
+
+
+        <Matcher Name= "LPDMASTARTCHECK" Type="precondition">
+            <MatcherOnKey>CONF(.*)\.S.*\.Q(.*)\.F(.*)\.LPBAMLPDMA1\.IPParameters</MatcherOnKey>  
+            <MatcherPattern>NodeLevel_START.*</MatcherPattern>       
+        </Matcher>
+        <Matcher Name= "LPDMASTARTINTERRUPTCHECK" >
+            <MatcherOnKey>CONF{LPDMASTARTCHECK_#1}\.S.*\.Q{LPDMASTARTCHECK_#2}\.F{LPDMASTARTCHECK_#3}\.LPBAMLPDMA1\.IPParameters</MatcherOnKey>  
+            <MatcherPattern>.*Interrupt.*</MatcherPattern>       
+        </Matcher>
+        <Matcher Name= "LPDMASTARTCHANELCHECK" >
+            <MatcherOnKey>CONF{LPDMASTARTCHECK_#1}\.S.*\.Q{LPDMASTARTCHECK_#2}\.F{LPDMASTARTCHECK_#3}\.LPBAMLPDMA1\.InstanceIP</MatcherOnKey>  
+            <MatcherPattern>(.*)</MatcherPattern>       
+        </Matcher>
+        <Matcher Name= "CHANELGLOBALINTERRUPTCHECK" >
+            <MatcherOnKey>CONF{LPDMASTARTCHECK_#1}\.NVIC\.{LPDMASTARTCHANELCHECK_#1}.*</MatcherOnKey>  
+            <MatcherPattern>.*</MatcherPattern>       
+        </Matcher>
+        <Matcher Name= "CHANEL0GLOBALINTERRUPTCHECK" >
+            <MatcherOnKey>CONF{LPDMASTARTCHECK_#1}\.NVIC\.LPDMA1_Channel0.*</MatcherOnKey>  
+            <MatcherPattern>.*</MatcherPattern>       
+        </Matcher>
+
+
+        <Checker Condition="LPDMASTARTCHECK &amp; LPDMASTARTINTERRUPTCHECK &amp; LPDMASTARTCHANELCHECK &amp; !CHANELGLOBALINTERRUPTCHECK" 
+                 Diagnostic="Peripheral Configuration: Wakeup Interrupts are enabled for {LPDMASTARTCHANELCHECK_#1} in S1.Q{LPDMASTARTCHECK_#2}/S1.Q{LPDMASTARTCHECK_#2}.F{LPDMASTARTCHECK_#3} and {LPDMASTARTCHANELCHECK_#1} Global interrupt is not enabled. It should be enabled through NVIC in this application 'Pinout &amp; Configuration' panel "
+                 Type="warning"/>
+        <Checker Condition="LPDMASTARTCHECK &amp; LPDMASTARTINTERRUPTCHECK &amp; !LPDMASTARTCHANELCHECK &amp; !CHANEL0GLOBALINTERRUPTCHECK" 
+                 Diagnostic="Peripheral Configuration: Wakeup Interrupts are enabled for LPDMA1_Channel0 in S1.Q{LPDMASTARTCHECK_#2}/S1.Q{LPDMASTARTCHECK_#2}.F{LPDMASTARTCHECK_#3} and LPDMA1_Channel0 Global interrupt is not enabled. It should be enabled through NVIC in this application 'Pinout &amp; Configuration' panel "
+                 Type="warning"/>
+    </ConsistencyRule>
+        <ConsistencyRule Type="SingleApplication" Name= "LPDMAINTERNALINTERRUPT">
+
+
+        <Matcher Name= "LPDMASTARTCHECK" Type="precondition">
+            <MatcherOnKey>CONF(.*)\.S.*\.Q(.*)\.F(.*)\.LPBAMLPDMA1\.IPParameters</MatcherOnKey>  
+            <MatcherPattern>NodeLevel_START.*</MatcherPattern>       
+        </Matcher>
+        <Matcher Name= "LPDMASTARTCHANELCHECK" >
+            <MatcherOnKey>CONF{LPDMASTARTCHECK_#1}\.S.*\.Q{LPDMASTARTCHECK_#2}\.F{LPDMASTARTCHECK_#3}\.LPBAMLPDMA1\.InstanceIP</MatcherOnKey>  
+            <MatcherPattern>(LPDMA1_Channel(.*))</MatcherPattern>       
+        </Matcher>
+        <Matcher Name= "CHANELGLOBALINTERRUPTCHECK" >
+            <MatcherOnKey>CONF{LPDMASTARTCHECK_#1}\.NVIC\.{LPDMASTARTCHANELCHECK_#1}.*</MatcherOnKey>  
+            <MatcherPattern>.*</MatcherPattern>       
+        </Matcher>
+        <Matcher Name= "CHANELCONFIGCHECK" >
+            <MatcherOnKey>CONF{LPDMASTARTCHECK_#1}\VP_LPDMA1_VS_LPDMACH{LPDMASTARTCHANELCHECK_#2}\.Mode</MatcherOnKey>  
+            <MatcherPattern>.*</MatcherPattern>       
+        </Matcher>
+        <Matcher Name= "CHANEL0GLOBALINTERRUPTCHECK" >
+            <MatcherOnKey>CONF{LPDMASTARTCHECK_#1}\.NVIC\.LPDMA1_Channel0.*</MatcherOnKey>  
+            <MatcherPattern>.*</MatcherPattern>       
+        </Matcher>
+        <Matcher Name= "CHANEL0CONFIGCHECK" >
+            <MatcherOnKey>CONF{LPDMASTARTCHECK_#1}\VP_LPDMA1_VS_LPDMACH0\.Mode</MatcherOnKey>  
+            <MatcherPattern>.*</MatcherPattern>       
+        </Matcher>
+        <Matcher Name= "LPDMAINTERNALINTERRUPTCHECK" >
+            <MatcherOnKey>CONF{LPDMASTARTCHECK_#1}\.LPDMA1\.Interrupt.*_LPDMACH{LPDMASTARTCHANELCHECK_#2}</MatcherOnKey>  
+            <MatcherPattern>^(?!.*?DISABLE).*</MatcherPattern>       
+        </Matcher>
+        <Matcher Name= "LPDMAINTERNALINTERRUPTCHECK0" >
+            <MatcherOnKey>CONF{LPDMASTARTCHECK_#1}\.LPDMA1\.Interrupt.*_LPDMACH0</MatcherOnKey>  
+            <MatcherPattern>^(?!.*?DISABLE).*</MatcherPattern>       
+        </Matcher>
+        <Checker Condition="LPDMASTARTCHECK &amp; LPDMAINTERNALINTERRUPTCHECK &amp; LPDMASTARTCHANELCHECK &amp; !CHANELGLOBALINTERRUPTCHECK" 
+                 Diagnostic="Peripheral Configuration: Internal Interrupts are enabled for {LPDMASTARTCHANELCHECK_#1} in S1.Q{LPDMASTARTCHECK_#2}/S1.Q{LPDMASTARTCHECK_#2}.F{LPDMASTARTCHECK_#3} and {LPDMASTARTCHANELCHECK_#1} Global interrupt is not enabled. It should be enabled through NVIC in this application 'Pinout &amp; Configuration'"
+                 Type="warning"/>
+        <Checker Condition="LPDMASTARTCHECK &amp; LPDMAINTERNALINTERRUPTCHECK0 &amp; !LPDMASTARTCHANELCHECK &amp; !CHANEL0GLOBALINTERRUPTCHECK" 
+                 Diagnostic="Peripheral Configuration: Internal Interrupts are enabled for LPDMA1_Channel0 in S1.Q{LPDMASTARTCHECK_#2}/S1.Q{LPDMASTARTCHECK_#2}.F{LPDMASTARTCHECK_#3} and LPDMA1_Channel0 Global interrupt is not enabled. It should be enabled through NVIC in this application 'Pinout &amp; Configuration'"
+                 Type="warning"/>
+    </ConsistencyRule>
+    <ConsistencyRule Type="SingleApplication" Name= "LPDMASTART" Attribute="TZEN">
+        <Matcher Name= "LPDMASTARTCHECK" Type="precondition">
+            <MatcherOnKey>CONF(.*)\.S.*\.Q(.*)\.F(.*)\.LPBAMLPDMA1\.IPParameters</MatcherOnKey>  
+            <MatcherPattern>NodeLevel_START.*</MatcherPattern>       
+        </Matcher>
+        <Matcher Name= "LPDMASTARTCHANELCHECK" >
+            <MatcherOnKey>CONF{LPDMASTARTCHECK_#1}\.S.*\.Q{LPDMASTARTCHECK_#2}\.F{LPDMASTARTCHECK_#3}\.LPBAMLPDMA1\.InstanceIP</MatcherOnKey>  
+            <MatcherPattern>(LPDMA1_Channel(.*))</MatcherPattern>       
+        </Matcher>
+        <Checker Condition="LPDMASTARTCHECK &amp; LPDMASTARTCHANELCHECK" 
+                 Diagnostic="Privilege attributes : NPrivilege access to Privilege or unknown attribute item.|
+    LPDMA channel hosting S1.Q{LPDMASTARTCHECK_#2}|
+        Item           : DMA hosting S1.Q{LPDMASTARTCHECK_#2} queue.|
+        Protection     : Standard->LPDMA1->Channel {LPDMASTARTCHANELCHECK_#2}->SECURITY->Enable Channel as Priviliged.|
+        Recommandation : Configure DMA channel attributes as priviliged."
+                 Type="info"/>
+        <Checker Condition="LPDMASTARTCHECK &amp; !LPDMASTARTCHANELCHECK" 
+                 Diagnostic="Privilege attributes : NPrivilege access to Privilege or unknown attribute item.|
+    LPDMA channel hosting S1.Q{LPDMASTARTCHECK_#2}|
+        Item           : DMA hosting S1.Q{LPDMASTARTCHECK_#2} queue.|
+        Protection     : Standard->LPDMA1->Channel 0->SECURITY->Enable Channel as Priviliged.|
+        Recommandation : Configure DMA channel attributes as priviliged."
+                 Type="info"/>
+    </ConsistencyRule>
+
 
 <!-- DMA -->
 
@@ -1022,6 +1121,41 @@ it this condition, for cohenrecy,he rules are simpler -->
         <Checker Condition="LPBAMAPPLIPRIORITYGROUP" 
                  Diagnostic="PROJECT: all LPBAM Applications must have the same PRIORITYGROUP as the one set in the main MX project. issue detected in this application"
                  Type="error" />
+    </ConsistencyRule>
+    <ConsistencyRule Type="SingleApplication" Name= "INTERRUPT">
+
+
+        <Matcher Name= "INTERRUPTCHECK" Type="precondition">
+            <MatcherOnKey>CONF.*\.S.*\.Q(.*)\.LPBAMQUEUE\.Interrupt.*</MatcherOnKey>  
+            <MatcherPattern>.*</MatcherPattern>       
+        </Matcher>
+
+
+        <Checker Condition="INTERRUPTCHECK" 
+                 Diagnostic="Queue Configuration: One interrupt at least has been enabled in S1.Q{INTERRUPTCHECK_#1} setting: the DMA Channel Global Interrupt for the LPDMA Channel hosting this Queue should be enabled through NVIC in the main MX Project"
+                 Type="info" />
+    </ConsistencyRule>
+    <ConsistencyRule Type="SingleApplication" Name= "PARAMETERCHANGE">
+
+         <Matcher Name= "QUEUEEXIST" Type="precondition">
+            <MatcherOnKey>CONF(.*)\.S1\.Q(.*)\.QueueUserName</MatcherOnKey>  
+            <MatcherPattern>(.*)</MatcherPattern>       
+        </Matcher>
+
+        <Matcher Name= "PARAMETERCHANGECHECK">
+            <MatcherOnKey>CONF{QUEUEEXIST_#1}\.S1\.Q{QUEUEEXIST_#2}\.LPBAMQUEUE\.IPParameters</MatcherOnKey>  
+            <MatcherPattern>.*</MatcherPattern>       
+        </Matcher>
+        <Matcher Name= "QUEUECIRCULARITYCHECK">
+            <MatcherOnKey>CONF{QUEUEEXIST_#1}\.S1\.Q{QUEUEEXIST_#2}\.QueueCircularity</MatcherOnKey>  
+            <MatcherPattern>0</MatcherPattern>       
+        </Matcher>
+
+
+
+        <Checker Condition="!PARAMETERCHANGECHECK &amp; QUEUECIRCULARITYCHECK" 
+                 Diagnostic="Queue Configuration : Configuration of {QUEUEEXIST_#3} is the default configuration. Queue can be configured through this application ”LPBAM scenario &amp; Configuration” when focusing on the Queue in the central panel"
+                 Type="info" />
     </ConsistencyRule>
 
 <!-- GENERAL -->

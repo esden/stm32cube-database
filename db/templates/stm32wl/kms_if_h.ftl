@@ -11,7 +11,7 @@
   */
 /* USER CODE END Header */
 [#assign SECURE_PROJECTS = "0"]
-[#assign LORAWAN_FUOTA = "0"]
+[#assign INTERNAL_LORAWAN_FUOTA = "0"]
 [#assign ipNameList = configs[0].peripheralParams?keys]
 [#assign useKMS = ipNameList?seq_contains("KMS")]
 
@@ -28,7 +28,7 @@ extern "C" {
 
 #include "kms.h"
 #include "tkms.h"
-[#if (SECURE_PROJECTS == "1") || (LORAWAN_FUOTA == "1")]
+[#if (SECURE_PROJECTS == "1") || (INTERNAL_LORAWAN_FUOTA == "1")]
 #include "se_interface_kms.h"
 [#else]
 #include "kms_interface.h"

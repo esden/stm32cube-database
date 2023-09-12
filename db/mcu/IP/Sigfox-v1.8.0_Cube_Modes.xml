@@ -1,0 +1,895 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<IP xmlns="http://mcd.rou.st.com/modules.php?name=mcu"
+    xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance"
+    ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd"
+    DBVersion="V4.0"
+    IPType="middleware"
+    IpGroup="Middleware"
+    Name="Sigfox"
+    Version="v1.8.0_Cube">
+    <About>Middleware enabling Sigfox based on BPSK/FSK modulations.</About>
+
+    <RefParameter Name="STM32WL5MXX" Comment="Module " DefaultValue="true" Type="boolean" Group="Application selection" TabName="Sigfox application" Visible="false">
+        <Condition Diagnostic="" Expression="STM32WL5MOCHx"/>
+        <PossibleValue Value="true" Comment="true" Semaphore="SEM_STM32WL5MXX"/>
+        <Description> </Description>
+    </RefParameter>
+    <RefParameter Name="STM32WL5MXX" Comment="Module " DefaultValue="false" Type="boolean" Group="Application selection" TabName="Sigfox application" Visible="false">
+        <Description> </Description>
+    </RefParameter>
+
+    <RefParameter Name="SUBGHZ_APPLICATION" Comment="Application" DefaultValue="SIGFOX_USER_APPLICATION" Type="list" Group="Application selection" TabName="Sigfox application">
+        <Condition Diagnostic="" Expression="S_ADV_TRACE &amp; S_TINY_LPM &amp; S_TIMER &amp; ((S_SEQUENCER | SEMThreadXCcRTOSJjThreadXJjCore | S_FREERTOS) | (!S_SINGLE_CORE &amp; S_SEQUENCER_M0P &amp; (S_SEQUENCER_M4 | SEMThreadXCcRTOSJjThreadXJjCore_M4 | S_FREERTOS_M4)))"/>
+        <PossibleValue Value="SIGFOX_AT_SLAVE" Comment="AT Slave skeleton" Semaphore="SEM_SGX_AT_SLAVE"/>
+        <PossibleValue Value="SIGFOX_PUSHBUTTON" Comment="PushButton skeleton" Semaphore="SEM_SGX_PUSHBUTTON"/>
+        <PossibleValue Value="SIGFOX_USER_APPLICATION" Comment="User defined skeleton" Semaphore="SEM_SGX_USER_APPLICATION"/>
+        <Description>List of available applications</Description>
+    </RefParameter>
+    <RefParameter Name="SUBGHZ_APPLICATION" Comment="Application" DefaultValue="SIGFOX_USER_APPLICATION" Type="list" Group="Application selection" TabName="Sigfox application">
+        <PossibleValue Value="SIGFOX_USER_APPLICATION" Comment="User defined skeleton" Semaphore="SEM_SGX_USER_APPLICATION"/>
+        <Description>Please enable all Utilities for more options</Description>
+    </RefParameter>
+<!--
+    <RefParameter Name="DISPLAY_APPLICATION" Comment="Application" DefaultValue="SIGFOX_USER_APPLICATION" Type="list" Group="Application selection" TabName="Sigfox application" Visible="false">
+        <PossibleValue Value="SIGFOX_AT_SLAVE" Condition="!SEM_SGX_AT_SLAVE" Comment="AT_Slave (accessible from EXAMPLE selector)"/>
+        <PossibleValue Value="SIGFOX_PUSHBUTTON" Condition="!SEM_SGX_PUSHBUTTON" Comment="PushButton (accessible from EXAMPLE selector)"/>
+        <PossibleValue Value="SIGFOX_USER_APPLICATION" Condition="!SEM_SGX_USER_APPLICATION" Comment="User defined (accessible from WL MCU selector)"/>
+        <Description>List of available applications, some available starting the new project from EXAMPLE SELECTOR other from MCU or BOARD SELECTOR</Description>
+    </RefParameter>
+-->
+
+    <RefParameter Name="DEBUGGER_ON" Comment="Serial Wires or JTAG enabled" DefaultValue="true" Type="UniqueElementList" Group="Application selection" TabName="Sigfox application" Visible="false">
+        <Condition Diagnostic="" Expression="SWD | JTAG"/>
+        <PossibleValue Value="true" Comment="true"/>
+        <Description></Description>
+    </RefParameter>
+    <RefParameter Name="DEBUGGER_ON" Comment="Serial Wires or JTAG enabled" DefaultValue="false" Type="UniqueElementList" Group="Application selection" TabName="Sigfox application" Visible="false">
+        <PossibleValue Value="false" Comment="false"/>
+        <Description></Description>
+    </RefParameter>
+
+    <RefParameter Name="UTIL_SEQ_EN_M4" Comment="Use Sequencer kernel on CM4" DefaultValue="false" Type="boolean" Group="Application selection" TabName="Sigfox application" Visible="false">
+        <Condition Diagnostic="" Expression="((!(STM32WL55UCYx | STM32WL55CCUx | STM32WL55JCIx | STM32WL54CCUx | STM32WL54JCIx | STM32WL5MOCHx) | S_SINGLE_CORE) &amp; !S_SEQUENCER) | ((STM32WL55UCYx | STM32WL55CCUx | STM32WL55JCIx | STM32WL54CCUx | STM32WL54JCIx | STM32WL5MOCHx) &amp; !S_SINGLE_CORE &amp; !S_SEQUENCER_M4)"/>
+        <Description></Description>
+    </RefParameter>
+    <RefParameter Name="UTIL_SEQ_EN_M4" Comment="Use Sequencer kernel on CM4" DefaultValue="true" Type="boolean" Group="Application selection" TabName="Sigfox application" Visible="false">
+        <Condition Diagnostic="" Expression="((!(STM32WL55UCYx | STM32WL55CCUx | STM32WL55JCIx | STM32WL54CCUx | STM32WL54JCIx | STM32WL5MOCHx) | S_SINGLE_CORE) &amp; S_SEQUENCER)| ((STM32WL55UCYx | STM32WL55CCUx | STM32WL55JCIx | STM32WL54CCUx | STM32WL54JCIx | STM32WL5MOCHx) &amp; !S_SINGLE_CORE &amp; S_SEQUENCER_M4)"/>
+    </RefParameter>
+
+    <RefParameter Name="UTIL_SEQ_EN_M0" Comment="Use Sequencer kernel on CM0" DefaultValue="false" Type="boolean" Group="Application selection" TabName="Sigfox application" Visible="false">
+        <Condition Diagnostic="" Expression="(STM32WL55UCYx | STM32WL55CCUx | STM32WL55JCIx | STM32WL54CCUx | STM32WL54JCIx | STM32WL5MOCHx) &amp; !S_SEQUENCER_M0P"/>
+        <Description></Description>
+    </RefParameter>
+    <RefParameter Name="UTIL_SEQ_EN_M0" Comment="Use Sequencer kernel on CM0" DefaultValue="true" Type="boolean" Group="Application selection" TabName="Sigfox application" Visible="false">
+        <Condition Diagnostic="" Expression="(STM32WL55UCYx | STM32WL55CCUx | STM32WL55JCIx | STM32WL54CCUx | STM32WL54JCIx | STM32WL5MOCHx) &amp; S_SEQUENCER_M0P"/>
+    </RefParameter>
+
+    <RefParameter Name="UTIL_TIMER_EN" Comment="Enable/Disable TIMER utility" DefaultValue="false" Type="boolean" Group="Application selection" TabName="Sigfox application" Visible="false">
+        <Condition Diagnostic="" Expression="!S_TIMER"/>
+    </RefParameter>
+    <RefParameter Name="UTIL_TIMER_EN" Comment="Enable/Disable TIMER utility" DefaultValue="true" Type="boolean" Group="Application selection" TabName="Sigfox application" Visible="false">
+    </RefParameter>
+
+    <RefParameter Name="SIGFOX_APP_MEM_POOL_SIZE" Comment="ThreadX SIGFOX_APP_MEM_POOL_SIZE" DefaultValue="6144" Max="20480" Min="512" Type="integer" Group="Application selection" TabName="Sigfox application" Visible="true">
+        <Description>Default AzRTOS ThreadX memory pool size for the Sigfox application.</Description>
+        <Condition Diagnostic="" Expression="S_RTOS_M4 | S_RTOS"/>
+    </RefParameter>
+    <RefParameter Name="SIGFOX_APP_MEM_POOL_SIZE" Comment="ThreadX SIGFOX_APP_MEM_POOL_SIZE" DefaultValue="6144" Max="6144" Min="6144" Type="integer" Group="Application selection" TabName="Sigfox application" Visible="false">
+        <Description>Default AzRTOS ThreadX memory pool size for the Sigfox application.</Description>
+    </RefParameter>
+
+    <RefParameter Name="SIGFOX_KMS" Comment="Use KMS for Sigfox" DefaultValue="false" Type="UniqueElementList" Group="Application selection" TabName="Sigfox application" Visible="true">
+        <Description>enable KMS for Sigfox code, forbidden</Description>
+        <Condition Diagnostic="" Expression="S_KMS &amp; S_SINGLE_CORE"/>
+        <PossibleValue Value="false" Comment="false"/>
+    </RefParameter>
+    <RefParameter Name="SIGFOX_KMS" Comment="Use KMS for Sigfox" DefaultValue="false" Type="boolean" Group="Application selection" TabName="Sigfox application" Visible="true">
+        <Description>
+        &lt;font color=&quot;red&quot;&gt;&lt;b&gt;Careful:&lt;/b&gt; To set Sigfox using the KMS Middleware,&lt;/font&gt;&lt;&gt;
+        &lt;&gt; User Code Sections in following files in the DualCore example project must be filled manually after generation:&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; CM0PLUS/Core/Inc/&lt;b&gt;kms_platf_objects_config.h&lt;/b&gt; : Add all Sigfox keys as kms_object_keyhead_32_t structures&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; CM0PLUS/Core/Inc/&lt;b&gt;kms_platf_objects_interface.h&lt;/b&gt; : Add all Sigfox key indexes&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; CM0PLUS/Core/Inc/&lt;b&gt;nvms_low_level.h&lt;/b&gt; : Enable the NVMS (Non Volatile Memory) to store the session keys&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; CM0PLUS/Core/Src/&lt;b&gt;nvms_low_level.c&lt;/b&gt; : Implement the Flash read/write functions to manage the NVMS items&lt;br/&gt;
+        &lt;&gt; Example can be found in the RF projects in the STM32CubeWL MCU package : &lt;&gt;
+        &lt;font color=&quot;purple&quot;&gt; www.st.com/stm32cubewl&lt;/font&gt; &lt;br/&gt;
+        </Description>
+        <Condition Diagnostic="" Expression="S_KMS &amp; KMS_Cortex_M0PLUS"/>
+        <PossibleValue Value="true" Comment="true"/>
+        <PossibleValue Value="false" Comment="false"/>
+    </RefParameter>
+    <RefParameter Name="SIGFOX_KMS" Comment="Use KMS for Sigfox" DefaultValue="false" Type="UniqueElementList" Group="Application selection" TabName="Sigfox application" Visible="false">
+        <Description>enable KMS for Sigfox code</Description>
+        <PossibleValue Value="false" Comment="false"/>
+    </RefParameter>
+
+    <RefParameter Name="DEBUG_SUBGHZSPI_MONITORING" Comment="Sub-GHz radio SPI interface" DefaultValue="true" Type="UniqueElementList" Group="Application selection" TabName="Sigfox application" Visible="false">
+        <Condition Diagnostic="" Expression="SEM_DEBUG_SUBGHZSPI_MONITORING"/>
+        <PossibleValue Value="true" Comment="true" Semaphore="SEM_SGX_DEBUG_SUBGHZSPI_MONITORING"/>
+        <Description></Description>
+    </RefParameter>
+    <RefParameter Name="DEBUG_SUBGHZSPI_MONITORING" Comment="Sub-GHz radio SPI interface" DefaultValue="false" Type="UniqueElementList" Group="Application selection" TabName="Sigfox application" Visible="false">
+        <PossibleValue Value="false" Comment="false"/>
+        <Description></Description>
+    </RefParameter>
+
+    <RefParameter Name="DEBUG_RF_NRESET" Comment="Sub-GHz radio NRESET" DefaultValue="true" Type="UniqueElementList" Group="Application selection" TabName="Sigfox application" Visible="false">
+        <Condition Diagnostic="" Expression="SEM_DEBUG_RF_NRESET"/>
+        <PossibleValue Value="true" Comment="true" Semaphore="SEM_SGX_DEBUG_RF_NRESET"/>
+        <Description></Description>
+    </RefParameter>
+    <RefParameter Name="DEBUG_RF_NRESET" Comment="Sub-GHz radio NRESET" DefaultValue="false" Type="UniqueElementList" Group="Application selection" TabName="Sigfox application" Visible="false">
+        <PossibleValue Value="false" Comment="false"/>
+        <Description></Description>
+    </RefParameter>
+
+    <RefParameter Name="DEBUG_RF_HSE32RDY" Comment="Sub-GHz radio HSE32 CLOCK monitoring" DefaultValue="true" Type="UniqueElementList" Group="Application selection" TabName="Sigfox application" Visible="false">
+        <Condition Diagnostic="" Expression="SEM_DEBUG_RF_HSE32RDY"/>
+        <PossibleValue Value="true" Comment="true" Semaphore="SEM_SGX_DEBUG_DEBUG_RF_HSE32RDY"/>
+        <Description></Description>
+    </RefParameter>
+    <RefParameter Name="DEBUG_RF_HSE32RDY" Comment="Sub-GHz radio HSE32 CLOCK monitoring" DefaultValue="false" Type="UniqueElementList" Group="Application selection" TabName="Sigfox application" Visible="false">
+        <PossibleValue Value="false" Comment="false"/>
+        <Description></Description>
+    </RefParameter>
+
+    <RefParameter Name="DEBUG_RF_SMPSRDY" Comment="Sub-GHz radio SMPS ready monitoring" DefaultValue="true" Type="UniqueElementList" Group="Application selection" TabName="Sigfox application" Visible="false">
+        <Condition Diagnostic="" Expression="SEM_DEBUG_RF_SMPSRDY"/>
+        <PossibleValue Value="true" Comment="true" Semaphore="SEM_SGX_DEBUG_DEBUG_RF_SMPSRDY"/>
+        <Description></Description>
+    </RefParameter>
+    <RefParameter Name="DEBUG_RF_SMPSRDY" Comment="Sub-GHz radio SMPS ready monitoring" DefaultValue="false" Type="UniqueElementList" Group="Application selection" TabName="Sigfox application" Visible="false">
+        <PossibleValue Value="false" Comment="false"/>
+        <Description></Description>
+    </RefParameter>
+
+    <RefParameter Name="DEBUG_RF_LDORDY" Comment="Sub-GHz radio LDO ready monitoring" DefaultValue="true" Type="UniqueElementList" Group="Application selection" TabName="Sigfox application" Visible="false">
+        <Condition Diagnostic="" Expression="SEM_DEBUG_RF_LDORDY"/>
+        <PossibleValue Value="true" Comment="true" Semaphore="SEM_SGX_DEBUG_DEBUG_RF_LDORDY"/>
+        <Description></Description>
+    </RefParameter>
+    <RefParameter Name="DEBUG_RF_LDORDY" Comment="Sub-GHz radio LDO ready monitoring" DefaultValue="false" Type="UniqueElementList" Group="Application selection" TabName="Sigfox application" Visible="false">
+        <PossibleValue Value="false" Comment="false"/>
+        <Description></Description>
+    </RefParameter>
+
+    <RefParameter Name="DEBUG_RF_DTB1" Comment="Sub-GHz radio Internal Signal monitoring" DefaultValue="true" Type="UniqueElementList" Group="Application selection" TabName="Sigfox application" Visible="false">
+        <Condition Diagnostic="" Expression="SEM_DEBUG_RF_DTB1"/>
+        <PossibleValue Value="true" Comment="true" Semaphore="SEM_SGX_DEBUG_DEBUG_RF_DTB1"/>
+        <Description></Description>
+    </RefParameter>
+    <RefParameter Name="DEBUG_RF_DTB1" Comment="Sub-GHz radio Internal Signal monitoring" DefaultValue="false" Type="UniqueElementList" Group="Application selection" TabName="Sigfox application" Visible="false">
+        <PossibleValue Value="false" Comment="false"/>
+        <Description></Description>
+    </RefParameter>
+
+    <RefParameter Name="DEBUG_RF_BUSY" Comment="Sub-GHz radio Busy monitoring" DefaultValue="true" Type="UniqueElementList" Group="Application selection" TabName="Sigfox application" Visible="false">
+        <Condition Diagnostic="" Expression="SEM_DEBUG_RF_BUSY"/>
+        <PossibleValue Value="true" Comment="true" Semaphore="SEM_SGX_DEBUG_DEBUG_RF_BUSY"/>
+        <Description></Description>
+    </RefParameter>
+    <RefParameter Name="DEBUG_RF_BUSY" Comment="Sub-GHz radio Busy monitoring" DefaultValue="false" Type="UniqueElementList" Group="Application selection" TabName="Sigfox application" Visible="false">
+        <PossibleValue Value="false" Comment="false"/>
+        <Description></Description>
+    </RefParameter>
+
+    <RefParameter Name="FILL_UCS" Comment="Fill User Code Sections" DefaultValue="false" Type="boolean" Group="Application selection" TabName="Sigfox application" Visible="false">
+        <PossibleValue Value="true" Comment="true"/>
+        <PossibleValue Value="false" Comment="false"/>
+        <Description></Description>
+    </RefParameter>
+
+    <RefParameter Name="USE_LPM" Comment="Configure Low Power Mode" DefaultValue="false" Type="boolean" Group="Application selection" TabName="Sigfox application" Visible="true">
+        <Condition Diagnostic="" Expression="SEM_SGX_USER_APPLICATION &amp; S_TINY_LPM"/>
+        <PossibleValue Value="true" Comment="true" Semaphore="SEM_SGX_USE_LPM"/>
+        <PossibleValue Value="false" Comment="false"/>
+        <Description>
+        Allow pre-fill of stm32_lpm_if.c file.
+        </Description>
+    </RefParameter>
+    <RefParameter Name="USE_LPM" Comment="Use LPM Off" DefaultValue="false" Type="UniqueElementList" Group="Application selection" TabName="Sigfox application" Visible="false">
+        <Condition Diagnostic="" Expression="!S_TINY_LPM"/>
+        <PossibleValue Value="false" Comment="false"/>
+    </RefParameter>
+    <RefParameter Name="USE_LPM" Comment="Use LPM On" DefaultValue="true" Type="UniqueElementList" Group="Application selection" TabName="Sigfox application" Visible="false">
+        <PossibleValue Value="true" Comment="true"/>
+    </RefParameter>
+
+    <RefParameter Name="USE_ADC" Comment="Use ADC for T° and battery management" DefaultValue="false" Type="boolean" Group="Application selection" TabName="Sigfox application" Visible="true">
+        <Condition Diagnostic="" Expression="SEM_SGX_USER_APPLICATION"/>
+        <PossibleValue Value="true" Comment="true" Semaphore="SEM_SGX_USE_ADC"/>
+        <PossibleValue Value="false" Comment="false"/>
+        <Description>
+        &lt;font color=&quot;blue&quot;&gt;&lt;b&gt;ADC:&lt;/b&gt; Proposed solution to manage radio settings depending on Vrefint and device internal T°.&lt;/font&gt;&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; For Dual Core operation Runtime Context is Cortex-M4&lt;br/&gt;
+        &lt;b&gt;Modes:&lt;/b&gt; Temperature Sensor Channel and Vrefint Channel&lt;br/&gt;
+        &lt;b&gt;Configuration:&lt;/b&gt; - Parameters Settings:&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Clock Prescaler: Synchronous clock mode divided by 4&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Overrun behaviour: Overrun data overwritten&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; SamplingTime Common 1 and 2: 160.5 Cycles&lt;br/&gt;
+        &lt;br/&gt;
+        &lt;font color=&quot;blue&quot;&gt;&lt;b&gt;Sigfox - Platform Settings panel:&lt;/b&gt; Platform proposals&lt;/font&gt;&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Ensure that ADC is selected in Found Solutions&lt;br/&gt;
+        </Description>
+    </RefParameter>
+    <RefParameter Name="USE_ADC" Comment="Use ADC" DefaultValue="true" Type="UniqueElementList" Group="Application selection" TabName="Sigfox application" Visible="false">
+        <PossibleValue Value="true" Comment="true"/>
+    </RefParameter>
+
+    <RefParameter Name="USE_RTC" Comment="Use RTC for Timer" DefaultValue="false" Type="boolean" Group="Application selection" TabName="Sigfox application" Visible="true">
+        <Condition Diagnostic="" Expression="SEM_SGX_USER_APPLICATION &amp; S_TIMER"/>
+        <PossibleValue Value="true" Comment="true" Semaphore="SEM_SGX_USE_RTC"/>
+        <PossibleValue Value="false" Comment="false"/>
+        <Description>
+        &lt;font color=&quot;blue&quot;&gt;&lt;b&gt;RTC:&lt;/b&gt; Proposed solution to manage timer in Low Power mode.&lt;/font&gt;&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; For Dual Core operation Runtime Contexts are both Cortex-M4 and Cortex-M0+ and initializer is Cortex-M0+&lt;br/&gt;
+        &lt;b&gt;Modes:&lt;/b&gt; Activate Clock Source, Activate Calendar and activate Alarm A (and B for Dual Core) (Internal Alarm A (and B for Dual Core))&lt;br/&gt;
+        &lt;b&gt;User Constants:&lt;/b&gt; Add the following Constants&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Constant Name: &lt;b&gt;RTC_N_PREDIV_S&lt;/b&gt; Value: 10&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Constant Name: &lt;b&gt;RTC_PREDIV_S&lt;/b&gt; Value: ((1 &amp;lt;&amp;lt; RTC_N_PREDIV_S)-1)&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Constant Name: &lt;b&gt;RTC_PREDIV_A&lt;/b&gt; Value: ((1 &amp;lt;&amp;lt; (15-RTC_N_PREDIV_S))-1)&lt;br/&gt;
+        &lt;b&gt;Configuration&lt;/b&gt; - Parameters Settings:&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Asynchronous Predivider value: Set value to RTC_PREDIV_A&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Bin Mode: Free running Binary mode&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Alarm A Binary AutoControl: RTC_ALARMSUBSECONDBIN_AUTOCLR_NO&lt;br/&gt;
+        &lt;b&gt;Configuration&lt;/b&gt; - NVIC settings:&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Enable both Interrupts&lt;br/&gt;
+        &lt;br/&gt;
+        &lt;font color=&quot;blue&quot;&gt;&lt;b&gt;Sigfox - Platform Settings panel:&lt;/b&gt; Platform proposals&lt;/font&gt;&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Ensure that RTC is selected in Found Solutions&lt;br/&gt;
+        </Description>
+    </RefParameter>
+    <RefParameter Name="USE_RTC" Comment="Use RTC Off" DefaultValue="false" Type="UniqueElementList" Group="Application selection" TabName="Sigfox application" Visible="false">
+        <Condition Diagnostic="" Expression="!S_TIMER"/>
+        <PossibleValue Value="false" Comment="false"/>
+    </RefParameter>
+    <RefParameter Name="USE_RTC" Comment="Use RTC On" DefaultValue="true" Type="UniqueElementList" Group="Application selection" TabName="Sigfox application" Visible="false">
+        <PossibleValue Value="true" Comment="true"/>
+    </RefParameter>
+
+    <RefParameter Name="USE_LPTIM" Comment="Use LPTIM for Monarch" DefaultValue="false" Type="boolean" Group="Application selection" TabName="Sigfox application" Visible="false">
+        <!-- This RefParam is currently useless and hidden (not visible) buy mantained for PlatformSettingsTest.java compatibility (the test hardcodes the check to SEM_SGX_USE_LPTIM and no time to clean by 1.3.0) -->
+        <!-- After 1.3.0 release either this RefParameter is removed (and the MX PlatformSettingsTest.java cleaned specularly) -->
+        <!-- or it should be made visible, in that case USE_LPTIM management should be added in the Sigfox_mn_api_c.ftl -->
+        <Condition Diagnostic="" Expression="SEM_SGX_USER_APPLICATION"/>
+        <PossibleValue Value="true" Comment="true" Semaphore="SEM_SGX_USE_LPTIM"/>
+         <PossibleValue Value="false" Comment="false"/>
+        <Description>
+        &lt;font color=&quot;blue&quot;&gt;&lt;b&gt;LPTIM:&lt;/b&gt; Proposed solution to manage Monarch.&lt;/font&gt;&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; For Dual Core operation Runtime Context is Cortex-M0+&lt;br/&gt;
+        &lt;b&gt;Modes:&lt;/b&gt; Counts internal clock events&lt;br/&gt;
+        &lt;b&gt;Configuration&lt;/b&gt; - NVIC settings:&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Enable Interrupt&lt;br/&gt;&lt;br/&gt;
+        &lt;br/&gt;
+        &lt;font color=&quot;blue&quot;&gt;&lt;b&gt;Sigfox - Platform Settings panel:&lt;/b&gt; Platform proposals&lt;/font&gt;&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Ensure that chosen LPTIM is selected in Found Solutions&lt;br/&gt;
+        </Description>
+     </RefParameter>
+    <RefParameter Name="USE_LPTIM" Comment="Use LPTIM for Monarch" DefaultValue="true" Type="String" Group="Application selection" TabName="Sigfox application" Visible="false">
+    </RefParameter>
+
+    <RefParameter Name="USE_UART" Comment="Use UART for Trace" DefaultValue="false" Type="boolean" Group="Application selection" TabName="Sigfox application" Visible="true">
+        <Condition Diagnostic="" Expression="SEM_SGX_USER_APPLICATION &amp; S_ADV_TRACE"/>
+        <PossibleValue Value="true" Comment="true" Semaphore="SEM_SGX_USE_UART"/>
+        <PossibleValue Value="false" Comment="false"/>
+        <Description>
+        &lt;font color=&quot;blue&quot;&gt;&lt;b&gt;USART/LPUART:&lt;/b&gt; Proposed solution to manage trace.&lt;/font&gt;&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; For Dual Core operation Runtime Context is Cortex-M4&lt;br/&gt;
+        &lt;b&gt;Modes:&lt;/b&gt; Asynchronous&lt;br/&gt;
+        &lt;b&gt;Configuration&lt;/b&gt; - Parameters Settings:&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; If LPUART is selected then set Baud Rate: 9600 Bits/s&lt;br/&gt;
+        &lt;b&gt;Configuration&lt;/b&gt; - DMA Settings:&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Add USARTx_TX DMA Request with Channel configured with DMA1 Channel 5&lt;br/&gt;
+        &lt;b&gt;Configuration&lt;/b&gt; - NVIC settings:&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Enable both Interrupts&lt;br/&gt;
+        &lt;b&gt;Clock Configuration panel&lt;/b&gt;&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; If LPUART is selected then set Clock Mux to LSE&lt;br/&gt;
+        &lt;b&gt;NVIC Mode and Configuration panel&lt;/b&gt; - Preemption priority management&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Set preemption Priority for DMA and UART Interrupt to 2&lt;br/&gt;
+        &lt;br/&gt;
+        &lt;font color=&quot;blue&quot;&gt;&lt;b&gt;Sigfox - Platform Settings panel:&lt;/b&gt; Platform proposals&lt;/font&gt;&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Ensure that chosen UART is selected in Found Solutions&lt;br/&gt;
+        </Description>
+    </RefParameter>
+    <RefParameter Name="USE_UART" Comment="Use UART Off" DefaultValue="false" Type="UniqueElementList" Group="Application selection" TabName="Sigfox application" Visible="false">
+        <Condition Diagnostic="" Expression="!S_ADV_TRACE"/>
+        <PossibleValue Value="false" Comment="false"/>
+    </RefParameter>
+    <RefParameter Name="USE_UART" Comment="Use UART On" DefaultValue="true" Type="UniqueElementList" Group="Application selection" TabName="Sigfox application" Visible="false">
+        <PossibleValue Value="true" Comment="true"/>
+    </RefParameter>
+
+    <RefParameter Name="USER_GUIDANCE_UTIL" Comment="none" DefaultValue="none" Type="String" Group="Application selection" TabName="Sigfox application"  Visible="false">
+        <Condition Diagnostic="" Expression="S_ADV_TRACE &amp; S_TINY_LPM &amp; S_TIMER &amp; ((S_SEQUENCER | SEMThreadXCcRTOSJjThreadXJjCore | S_FREERTOS) | (!S_SINGLE_CORE &amp; S_SEQUENCER_M0P &amp; (S_SEQUENCER_M4 | SEMThreadXCcRTOSJjThreadXJjCore_M4 | S_FREERTOS_M4)))"/>
+        <Description>
+        </Description>
+    </RefParameter>
+    <RefParameter Name="USER_GUIDANCE_UTIL" Comment="How to see more Applications?" DefaultValue="Make sure all Utilities are enabled" Type="String" Group="Application selection" TabName="Sigfox application" Visible="true">
+        <Description>
+        &lt;&gt; If you see this message it means some Utilities are disabled.&lt;br/&gt;
+        &lt;&gt; In this case only "User Defined Skeleton" Application is allowed.&lt;br/&gt;
+        &lt;&gt; Please, enable all Utilities if you wish additional Application choices.&lt;br/&gt;
+        </Description>
+    </RefParameter>
+
+    <RefParameter Name="USER_GUIDANCE" Comment="Platform configuration recommandations " DefaultValue="!! Please read carefully Information panel below!!" Type="String" Group="Application selection" TabName="Sigfox application" Visible="true">
+        <Condition Diagnostic="" Expression="SEM_SGX_PUSHBUTTON"/>
+        <Description>
+        &lt;font color=&quot;blue&quot;&gt;&lt;b&gt;KMS:&lt;/b&gt; To set Sigfox using the KMS Middleware,&lt;/font&gt;&lt;&gt;
+        &lt;&gt; User Code Sections in following files in the DualCore example project must be filled manually after generation:&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; CM0PLUS/Core/Inc/kms_platf_objects_config.h : Add all Sigfox keys as kms_object_keyhead_32_t structures&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; CM0PLUS/Core/Inc/kms_platf_objects_interface.h : Add all Sigfox key indexes&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; CM0PLUS/Core/Inc/nvms_low_level.h : Enable the NVMS (Non Volatile Memory) to store the session keys&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; CM0PLUS/Core/Src/nvms_low_level.c : Implement the Flash read/write functions to manage the NVMS items&lt;br/&gt;
+        &lt;&gt; Example can be found in the RF projects in the STM32CubeWL MCU package : &lt;&gt;
+        &lt;font color=&quot;purple&quot;&gt; www.st.com/stm32cubewl&lt;/font&gt; &lt;br/&gt;
+        &lt;br/&gt;
+        &lt;font color=&quot;blue&quot;&gt;&lt;b&gt;ADC:&lt;/b&gt; Proposed solution to manage radio settings for internal T° measurement in conjunction with batterie level.&lt;/font&gt;&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; For Dual Core operation: Runtime Contexts is Cortex-M4&lt;br/&gt;
+        &lt;b&gt;Modes:&lt;/b&gt; Temperature Sensor Channel and Vrefint Channel&lt;br/&gt;
+        &lt;b&gt;Configuration:&lt;/b&gt; - Parameters Settings:&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Clock Prescaler: Synchronous clock mode divided by 4&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Overrun behaviour: Overrun data overwritten&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; SamplingTime Common 1 and 2: 160.5 Cycles&lt;br/&gt;
+        &lt;br/&gt;
+        &lt;font color=&quot;blue&quot;&gt;&lt;b&gt;RTC:&lt;/b&gt; Proposed solution to manage timer in Low Power mode.&lt;/font&gt;&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; For Dual Core operation Runtime Contexts are both Cortex-M4 and Cortex-M0+ and initializer is Cortex-M0+&lt;br/&gt;
+        &lt;b&gt;Modes:&lt;/b&gt; Activate Clock Source, Activate Calendar and activate Alarm A (and B for Dual Core) (Internal Alarm A (and B for Dual Core))&lt;br/&gt;
+        &lt;b&gt;User Constants:&lt;/b&gt; Add the following Constants&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Constant Name: &lt;b&gt;RTC_N_PREDIV_S&lt;/b&gt; Value: 10&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Constant Name: &lt;b&gt;RTC_PREDIV_S&lt;/b&gt; Value: ((1 &amp;lt;&amp;lt; RTC_N_PREDIV_S)-1)&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Constant Name: &lt;b&gt;RTC_PREDIV_A&lt;/b&gt; Value: ((1 &amp;lt;&amp;lt; (15-RTC_N_PREDIV_S))-1)&lt;br/&gt;
+        &lt;b&gt;Configuration&lt;/b&gt; - Parameters Settings:&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Asynchronous Predivider value: Set value to RTC_PREDIV_A&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Bin Mode: Free running Binary mode&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Alarm A Binary AutoControl: RTC_ALARMSUBSECONDBIN_AUTOCLR_NO&lt;br/&gt;
+        &lt;b&gt;Configuration&lt;/b&gt; - NVIC settings:&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Enable both Interrupts&lt;br/&gt;
+        &lt;br/&gt;
+        &lt;font color=&quot;blue&quot;&gt;&lt;b&gt;RCC:&lt;/b&gt; Proposed solution to manage RCC.&lt;/font&gt;&lt;br/&gt;
+        &lt;b&gt;Modes:&lt;/b&gt; Low Speed Clock (LSE): Set value to Crystal Ceramic Resonator&lt;br/&gt;
+        &lt;b&gt;Configuration&lt;/b&gt; - Parameters Settings:&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Flash Latency(WS): 2 WS (3 CPU cycle)&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Power Regulator Voltage Scale: Scale 1&lt;br/&gt;
+        &lt;b&gt;Clock Configuration panel&lt;/b&gt;&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Set MSI RC to 32MHz&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Set RTC Clock Mux to LSE&lt;br/&gt;
+        &lt;br/&gt;
+        &lt;font color=&quot;blue&quot;&gt;&lt;b&gt;USART/LPUART:&lt;/b&gt; Proposed solution to manage trace.&lt;/font&gt;&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; For Dual Core operation: Runtime Contexts is Cortex-M4&lt;br/&gt;
+        &lt;b&gt;Modes:&lt;/b&gt; Asynchronous&lt;br/&gt;
+        &lt;b&gt;Configuration&lt;/b&gt; - Parameters Settings:&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; If LPUART is selected then set Baud Rate: 9600 Bits/s&lt;br/&gt;
+        &lt;b&gt;Configuration&lt;/b&gt; - DMA Settings:&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Add USARTx_TX DMA Request with Channel configured with DMA1 Channel 5&lt;br/&gt;
+        &lt;b&gt;Configuration&lt;/b&gt; - NVIC settings:&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Enable both Interrupts&lt;br/&gt;
+        &lt;b&gt;Clock Configuration panel&lt;/b&gt;&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; If LPUART is selected then set Clock Mux to LSE&lt;br/&gt;
+        &lt;b&gt;NVIC Mode and Configuration panel&lt;/b&gt; - Preemption priority management&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Set preemption Priority for DMA and UART Interrupt to 2&lt;br/&gt;
+        &lt;br/&gt;
+        &lt;font color=&quot;blue&quot;&gt;&lt;b&gt;LPTIM:&lt;/b&gt; Proposed solution to manage Monarch.&lt;/font&gt;&lt;br/&gt;
+        &lt;b&gt;Modes:&lt;/b&gt; Counts internal clock events&lt;br/&gt;
+        &lt;b&gt;Configuration&lt;/b&gt; - NVIC settings:&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Enable Interrupt&lt;br/&gt;&lt;br/&gt;
+        &lt;br/&gt;
+        &lt;font color=&quot;blue&quot;&gt;&lt;b&gt;Sigfox - Platform Settings panel:&lt;/b&gt; Platform proposals&lt;/font&gt;&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Ensure that relevant solutions are properly selected&lt;br/&gt;
+        &lt;br/&gt;
+        &lt;font color=&quot;blue&quot;&gt;&lt;b&gt;Project Manager- Advanced Settings panel:&lt;/b&gt; Generated Function Calls management&lt;/font&gt;&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Untick "Generate Code" for RTC on CortexM4 and DMA on CortexM0PLUS for Dual Core&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Tick "Do Not Generate Function Call" for DMA, ADC, RTC, SUBGHZ, LPTIM, UART and IPCC(for Dual Core)&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Untick Visibility for all Function Calls on both cores
+        </Description>
+    </RefParameter>
+    <RefParameter Name="USER_GUIDANCE" Comment="Platform configuration recommandations " DefaultValue="!! Please read carefully Information panel below!!" Type="String" Group="Application selection" TabName="Sigfox application" Visible="true">
+        <Condition Diagnostic="" Expression="SEM_SGX_AT_SLAVE"/>
+        <Description>
+        &lt;font color=&quot;blue&quot;&gt;&lt;b&gt;KMS:&lt;/b&gt; To set Sigfox using the KMS Middleware,&lt;/font&gt;&lt;&gt;
+        &lt;&gt; User Code Sections in following files in the DualCore example project must be filled manually after generation:&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; CM0PLUS/Core/Inc/kms_platf_objects_config.h : Add all Sigfox keys as kms_object_keyhead_32_t structures&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; CM0PLUS/Core/Inc/kms_platf_objects_interface.h : Add all Sigfox key indexes&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; CM0PLUS/Core/Inc/nvms_low_level.h : Enable the NVMS (Non Volatile Memory) to store the session keys&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; CM0PLUS/Core/Src/nvms_low_level.c : Implement the Flash read/write functions to manage the NVMS items&lt;br/&gt;
+        &lt;&gt; Example can be found in the RF projects in the STM32CubeWL MCU package : &lt;&gt;
+        &lt;font color=&quot;purple&quot;&gt; www.st.com/stm32cubewl&lt;/font&gt; &lt;br/&gt;
+        &lt;br/&gt;
+        &lt;font color=&quot;blue&quot;&gt;&lt;b&gt;ADC:&lt;/b&gt; Proposed solution to manage radio settings for internal T° measurement in conjunction with batterie level.&lt;/font&gt;&lt;br/&gt;
+        &lt;b&gt;Modes:&lt;/b&gt; Temperature Sensor Channel and Vrefint Channel&lt;br/&gt;
+        &lt;b&gt;Configuration:&lt;/b&gt; - Parameters Settings:&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Clock Prescaler: Synchronous clock mode divided by 4&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Overrun behaviour: Overrun data overwritten&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; SamplingTime Common 1 and 2: 160.5 Cycles&lt;br/&gt;
+        &lt;br/&gt;
+        &lt;font color=&quot;blue&quot;&gt;&lt;b&gt;RTC:&lt;/b&gt; Proposed solution to manage timer in Low Power mode.&lt;/font&gt;&lt;br/&gt;
+        &lt;b&gt;Modes:&lt;/b&gt; Activate Clock Source, Activate Calendar and activate Alarm A (and B for Dual Core) (Internal Alarm A (and B for Dual Core))&lt;br/&gt;
+        &lt;b&gt;User Constants:&lt;/b&gt; Add the following Constants&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Constant Name: &lt;b&gt;RTC_N_PREDIV_S&lt;/b&gt; Value: 10&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Constant Name: &lt;b&gt;RTC_PREDIV_S&lt;/b&gt; Value: ((1 &amp;lt;&amp;lt; RTC_N_PREDIV_S)-1)&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Constant Name: &lt;b&gt;RTC_PREDIV_A&lt;/b&gt; Value: ((1 &amp;lt;&amp;lt; (15-RTC_N_PREDIV_S))-1)&lt;br/&gt;
+        &lt;b&gt;Configuration&lt;/b&gt; - Parameters Settings:&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Asynchronous Predivider value: Set value to RTC_PREDIV_A&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Bin Mode: Free running Binary mode&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Alarm A Binary AutoControl: RTC_ALARMSUBSECONDBIN_AUTOCLR_NO&lt;br/&gt;
+        &lt;b&gt;Configuration&lt;/b&gt; - NVIC settings:&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Enable both Interrupts&lt;br/&gt;
+        &lt;br/&gt;
+        &lt;font color=&quot;blue&quot;&gt;&lt;b&gt;RCC:&lt;/b&gt; Proposed solution to manage RCC.&lt;/font&gt;&lt;br/&gt;
+        &lt;b&gt;Modes:&lt;/b&gt; Low Speed Clock (LSE): Set value to Crystal Ceramic Resonator&lt;br/&gt;
+        &lt;b&gt;Configuration&lt;/b&gt; - Parameters Settings:&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Flash Latency(WS): 2 WS (3 CPU cycle)&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Power Regulator Voltage Scale: Scale 1&lt;br/&gt;
+        &lt;b&gt;Clock Configuration panel&lt;/b&gt;&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Set MSI RC to 48MHz&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Set RTC Clock Mux to LSE&lt;br/&gt;
+        &lt;br/&gt;
+        &lt;font color=&quot;blue&quot;&gt;&lt;b&gt;LPUART:&lt;/b&gt; Proposed solution to manage trace.&lt;/font&gt;&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; For Dual Core operation Runtime Context is Cortex-M4&lt;br/&gt;
+        &lt;b&gt;Modes:&lt;/b&gt; Asynchronous&lt;br/&gt;
+        &lt;b&gt;Configuration&lt;/b&gt; - Parameters Settings:&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Baud Rate: 9600 Bits/s&lt;br/&gt;
+        &lt;b&gt;Configuration&lt;/b&gt; - DMA Settings:&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Add USARTx_TX DMA Request with Channel configured with DMA1 Channel 5&lt;br/&gt;
+        &lt;b&gt;Configuration&lt;/b&gt; - NVIC settings:&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Enable both Interrupts&lt;br/&gt;
+        &lt;b&gt;Clock Configuration panel&lt;/b&gt;&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Set LPUART1 Clock Mux to LSE&lt;br/&gt;
+        &lt;b&gt;NVIC Mode and Configuration panel&lt;/b&gt; - Preemption priority management&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Set preemption Priority for DMA and UART Interrupt to 2&lt;br/&gt;
+        &lt;br/&gt;
+        &lt;font color=&quot;blue&quot;&gt;&lt;b&gt;LPTIM:&lt;/b&gt; Proposed solution to manage Monarch.&lt;/font&gt;&lt;br/&gt;
+        &lt;b&gt;Modes:&lt;/b&gt; Counts internal clock events&lt;br/&gt;
+        &lt;b&gt;Configuration&lt;/b&gt; - NVIC settings:&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Enable Interrupt&lt;br/&gt;
+        &lt;br/&gt;
+        &lt;font color=&quot;blue&quot;&gt;&lt;b&gt;Sigfox - Platform Settings panel:&lt;/b&gt; Platform proposals&lt;/font&gt;&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Ensure that relevant solutions are properly selected&lt;br/&gt;
+        &lt;br/&gt;
+        &lt;font color=&quot;blue&quot;&gt;&lt;b&gt;Project Manager - Advanced Settings panel:&lt;/b&gt; Generated Function Calls management&lt;/font&gt;&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Untick "Generate Code" for RTC on CortexM4 and DMA on CortexM0PLUS for Dual Core&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Tick "Do Not Generate Function Call" for DMA, ADC, RTC, SUBGHZ, LPTIM, UART and IPCC(for Dual Core)&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Untick Visibility for all Function Calls on both cores
+        </Description>
+    </RefParameter>
+
+    <RefParameter Name="USER_GUIDANCE" Comment="Platform configuration recommendations " DefaultValue="Please read carefully Information panel" Type="String" Group="Application selection" TabName="Sigfox application">
+        <Description>
+        &lt;font color=&quot;blue&quot;&gt;&lt;b&gt;RCC:&lt;/b&gt; Proposed solution to manage RCC.&lt;/font&gt;&lt;br/&gt;
+        &lt;b&gt;Modes:&lt;/b&gt; Low Speed Clock (LSE): Set value to Crystal Ceramic Resonator&lt;br/&gt;
+        &lt;b&gt;Configuration&lt;/b&gt; - Parameters Settings:&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Flash Latency(WS): 2 WS (3 CPU cycle)&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Power Regulator Voltage Scale: Scale 1&lt;br/&gt;
+        &lt;b&gt;Clock Configuration panel&lt;/b&gt;&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Set MSI RC to 32MHz&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Set RTC Clock Mux to LSE&lt;br/&gt;
+        &lt;br/&gt;
+        &lt;font color=&quot;blue&quot;&gt;&lt;b&gt;Project Manager- Advanced Settings panel:&lt;/b&gt; Generated Function Calls management&lt;/font&gt;&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Untick "Generate Code" for RTC on CortexM4 for Dual Core if you decide to use RTC for Timer and DMA on CortexM0PLUS for Dual Core&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Tick "Do Not Generate Function Call" for DMA, ADC, RTC, SUBGHZ, LPTIM, UART and IPCC(for Dual Core)&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Untick Visibility for all Function Calls on both cores
+        </Description>
+    </RefParameter>
+
+    <!-- Sigfox sys_conf.h RefParameters - Begin -->
+    <RefParameter Name="VERBOSE_LEVEL" Comment="Trace verbose level" DefaultValue="VLEVEL_M" Type="list" Group="sys_conf" TabName="Sigfox application" Visible="true">
+        <Condition Diagnostic="" Expression="(!(STM32WL55UCYx | STM32WL55CCUx | STM32WL55JCIx | STM32WL54CCUx | STM32WL54JCIx | STM32WL5MOCHx) | S_SINGLE_CORE) &amp; !SEM_SGX_USER_APPLICATION"/>
+        <PossibleValue Value="VLEVEL_H" Comment="VLEVEL_H"/>
+        <PossibleValue Value="VLEVEL_M" Comment="VLEVEL_M"/>
+        <PossibleValue Value="VLEVEL_L" Comment="VLEVEL_L"/>
+        <Description> </Description>
+    </RefParameter>
+    <RefParameter Name="VERBOSE_LEVEL" Comment="Trace verbose level" DefaultValue="" Type="list" Group="sys_conf" TabName="Sigfox application" Visible="false">
+        <Description> </Description>
+    </RefParameter>
+
+    <RefParameter Name="VERBOSE_LEVEL_CM4" Comment="Trace verbose level" DefaultValue="VLEVEL_M" Type="list" Group="sys_conf CM4" TabName="Sigfox application" Visible="true">
+        <Condition Diagnostic="" Expression="(STM32WL55UCYx | STM32WL55CCUx | STM32WL55JCIx | STM32WL54CCUx | STM32WL54JCIx | STM32WL5MOCHx) &amp; !S_SINGLE_CORE &amp; !SEM_SGX_USER_APPLICATION"/>
+        <PossibleValue Value="VLEVEL_H" Comment="VLEVEL_H"/>
+        <PossibleValue Value="VLEVEL_M" Comment="VLEVEL_M"/>
+        <PossibleValue Value="VLEVEL_L" Comment="VLEVEL_L"/>
+        <Description> </Description>
+    </RefParameter>
+    <RefParameter Name="VERBOSE_LEVEL_CM4" Comment="Trace verbose level" DefaultValue="" Type="list" Group="sys_conf CM4" TabName="Sigfox application" Visible="false">
+        <Description> </Description>
+    </RefParameter>
+
+    <RefParameter Name="VERBOSE_LEVEL_CM0PLUS" Comment="Trace verbose level" DefaultValue="VLEVEL_M" Type="list" Group="sys_conf CM0PLUS" TabName="Sigfox application" Visible="true">
+        <Condition Diagnostic="" Expression="(STM32WL55UCYx | STM32WL55CCUx | STM32WL55JCIx | STM32WL54CCUx | STM32WL54JCIx | STM32WL5MOCHx) &amp; !S_SINGLE_CORE &amp; !SEM_SGX_USER_APPLICATION"/>
+        <PossibleValue Value="VLEVEL_H" Comment="VLEVEL_H"/>
+        <PossibleValue Value="VLEVEL_M" Comment="VLEVEL_M"/>
+        <PossibleValue Value="VLEVEL_L" Comment="VLEVEL_L"/>
+        <Description> </Description>
+    </RefParameter>
+    <RefParameter Name="VERBOSE_LEVEL_CM0PLUS" Comment="Trace verbose level" DefaultValue="" Type="list" Group="sys_conf CM0PLUS" TabName="Sigfox application" Visible="false">
+        <Description> </Description>
+    </RefParameter>
+
+    <RefParameter Name="APP_LOG_ENABLED" Comment="Enable Application Logging" DefaultValue="true" Type="boolean" Group="sys_conf" TabName="Sigfox application" Visible="true">
+        <Condition Diagnostic="" Expression="(!(STM32WL55UCYx | STM32WL55CCUx | STM32WL55JCIx | STM32WL54CCUx | STM32WL54JCIx | STM32WL5MOCHx) | S_SINGLE_CORE) &amp; !SEM_SGX_USER_APPLICATION"/>
+        <PossibleValue Value="true" Comment="true"/>
+        <PossibleValue Value="false" Comment="false"/>
+        <Description> </Description>
+    </RefParameter>
+    <RefParameter Name="APP_LOG_ENABLED" Comment="Enable Application Logging" DefaultValue="true" Type="boolean" Group="sys_conf" TabName="Sigfox application" Visible="false">
+        <Description> </Description>
+    </RefParameter>
+
+    <RefParameter Name="APP_LOG_ENABLED_CM4" Comment="Enable Application Logging" DefaultValue="true" Type="boolean" Group="sys_conf CM4" TabName="Sigfox application" Visible="true">
+        <Condition Diagnostic="" Expression="(STM32WL55UCYx | STM32WL55CCUx | STM32WL55JCIx | STM32WL54CCUx | STM32WL54JCIx | STM32WL5MOCHx) &amp; !S_SINGLE_CORE &amp; !SEM_SGX_USER_APPLICATION"/>
+        <PossibleValue Value="true" Comment="true"/>
+        <PossibleValue Value="false" Comment="false"/>
+        <Description> </Description>
+    </RefParameter>
+    <RefParameter Name="APP_LOG_ENABLED_CM4" Comment="Enable Application Logging" DefaultValue="true" Type="boolean" Group="sys_conf CM4" TabName="Sigfox application" Visible="false">
+        <Description> </Description>
+    </RefParameter>
+
+    <RefParameter Name="APP_LOG_ENABLED_CM0PLUS" Comment="Enable Application Logging" DefaultValue="true" Type="boolean" Group="sys_conf CM0PLUS" TabName="Sigfox application" Visible="true">
+        <Condition Diagnostic="" Expression="(STM32WL55UCYx | STM32WL55CCUx | STM32WL55JCIx | STM32WL54CCUx | STM32WL54JCIx | STM32WL5MOCHx) &amp; !S_SINGLE_CORE &amp; !SEM_SGX_USER_APPLICATION"/>
+        <PossibleValue Value="true" Comment="true"/>
+        <PossibleValue Value="false" Comment="false"/>
+        <Description> </Description>
+    </RefParameter>
+    <RefParameter Name="APP_LOG_ENABLED_CM0PLUS" Comment="Enable Application Logging" DefaultValue="true" Type="boolean" Group="sys_conf CM0PLUS" TabName="Sigfox application" Visible="false">
+        <Description> </Description>
+    </RefParameter>
+
+<!--
+    <RefParameter Name="DEBUGGER_ON" Comment="Activate Debugger" DefaultValue="false" Type="boolean" Group="sys_conf" TabName="Sigfox application" Visible="true">
+        <Condition Diagnostic="" Expression="S_SINGLE_CORE &amp; !SEM_SGX_USER_APPLICATION"/>
+        <PossibleValue Value="true" Comment="true"/>
+        <PossibleValue Value="false" Comment="false"/>
+        <Description></Description>
+    </RefParameter>
+    <RefParameter Name="DEBUGGER_ON" Comment="Activate Debugger" DefaultValue="false" Type="boolean" Group="sys_conf" TabName="Sigfox application" Visible="false">
+        <Description></Description>
+    </RefParameter>
+
+    <RefParameter Name="DEBUGGER_ON_CM4" Comment="Activate Debugger" DefaultValue="false" Type="boolean" Group="sys_conf CM4" TabName="Sigfox application" Visible="true">
+        <Condition Diagnostic="" Expression="!S_SINGLE_CORE &amp; !SEM_SGX_USER_APPLICATION"/>
+        <PossibleValue Value="true" Comment="true"/>
+        <PossibleValue Value="false" Comment="false"/>
+        <Description></Description>
+    </RefParameter>
+    <RefParameter Name="DEBUGGER_ON_CM4" Comment="Activate Debugger" DefaultValue="false" Type="boolean" Group="sys_conf CM4" TabName="Sigfox application" Visible="false">
+        <Description></Description>
+    </RefParameter>
+
+    <RefParameter Name="DEBUGGER_ON_CM0PLUS" Comment="Activate Debugger" DefaultValue="false" Type="boolean" Group="sys_conf CM0PLUS" TabName="Sigfox application" Visible="true">
+        <Condition Diagnostic="" Expression="!S_SINGLE_CORE &amp; !SEM_SGX_USER_APPLICATION"/>
+        <PossibleValue Value="true" Comment="true"/>
+        <PossibleValue Value="false" Comment="false"/>
+        <Description></Description>
+    </RefParameter>
+    <RefParameter Name="DEBUGGER_ON_CM0PLUS" Comment="Activate Debugger" DefaultValue="false" Type="boolean" Group="sys_conf CM0PLUS" TabName="Sigfox application" Visible="false">
+        <Description></Description>
+    </RefParameter>
+-->
+
+    <RefParameter Name="LOW_POWER_DISABLE" Comment="Disable Low Power Mode" DefaultValue="false" Type="boolean" Group="sys_conf" TabName="Sigfox application" Visible="true">
+        <Condition Diagnostic="" Expression="(!(STM32WL55UCYx | STM32WL55CCUx | STM32WL55JCIx | STM32WL54CCUx | STM32WL54JCIx | STM32WL5MOCHx) | S_SINGLE_CORE) &amp; !SEM_SGX_USER_APPLICATION"/>
+        <PossibleValue Value="true" Comment="true"/>
+        <PossibleValue Value="false" Comment="false"/>
+        <Description>It goes only to SLEEP but not to STOP mode </Description>
+    </RefParameter>
+    <RefParameter Name="LOW_POWER_DISABLE" Comment="Disable Low Power Mode" DefaultValue="false" Type="boolean" Group="sys_conf" TabName="Sigfox application" Visible="false">
+        <Description>It goes only to SLEEP but not to STOP mode </Description>
+    </RefParameter>
+
+    <RefParameter Name="LOW_POWER_DISABLE_CM4" Comment="Disable Low Power Mode" DefaultValue="false" Type="boolean" Group="sys_conf CM4" TabName="Sigfox application" Visible="true">
+        <Condition Diagnostic="" Expression="(STM32WL55UCYx | STM32WL55CCUx | STM32WL55JCIx | STM32WL54CCUx | STM32WL54JCIx | STM32WL5MOCHx) &amp; !S_SINGLE_CORE &amp; !SEM_SGX_USER_APPLICATION"/>
+        <PossibleValue Value="true" Comment="true"/>
+        <PossibleValue Value="false" Comment="false"/>
+        <Description>It goes only to SLEEP but not to STOP mode </Description>
+    </RefParameter>
+    <RefParameter Name="LOW_POWER_DISABLE_CM4" Comment="Disable Low Power Mode" DefaultValue="false" Type="boolean" Group="sys_conf CM4" TabName="Sigfox application" Visible="false">
+        <Description>It goes only to SLEEP but not to STOP mode </Description>
+    </RefParameter>
+
+    <RefParameter Name="LOW_POWER_DISABLE_CM0PLUS" Comment="Disable Low Power Mode" DefaultValue="false" Type="boolean" Group="sys_conf CM0PLUS" TabName="Sigfox application" Visible="true">
+        <Condition Diagnostic="" Expression="(STM32WL55UCYx | STM32WL55CCUx | STM32WL55JCIx | STM32WL54CCUx | STM32WL54JCIx | STM32WL5MOCHx) &amp; !S_SINGLE_CORE &amp; !SEM_SGX_USER_APPLICATION"/>
+        <PossibleValue Value="true" Comment="true"/>
+        <PossibleValue Value="false" Comment="false"/>
+        <Description>It goes only to SLEEP but not to STOP mode </Description>
+    </RefParameter>
+    <RefParameter Name="LOW_POWER_DISABLE_CM0PLUS" Comment="Disable Low Power Mode" DefaultValue="false" Type="boolean" Group="sys_conf CM0PLUS" TabName="Sigfox application" Visible="false">
+        <Description>It goes only to SLEEP but not to STOP mode </Description>
+    </RefParameter>
+
+    <RefParameter Name="SENSOR_ENABLED" Comment="Enable Sensor" DefaultValue="false" Type="boolean" Group="sys_conf" TabName="Sigfox application" Visible="true">
+        <Condition Diagnostic="" Expression="(!(STM32WL55UCYx | STM32WL55CCUx | STM32WL55JCIx | STM32WL54CCUx | STM32WL54JCIx | STM32WL5MOCHx) | S_SINGLE_CORE) &amp; !SEM_SGX_USER_APPLICATION"/>
+        <PossibleValue Value="true" Comment="true"/>
+        <PossibleValue Value="false" Comment="false"/>
+        <Description> </Description>
+    </RefParameter>
+    <RefParameter Name="SENSOR_ENABLED" Comment="Enable Sensor" DefaultValue="false" Type="boolean" Group="sys_conf" TabName="Sigfox application" Visible="false">
+        <Description> </Description>
+    </RefParameter>
+
+    <RefParameter Name="SENSOR_ENABLED_CM4" Comment="Enable Sensor" DefaultValue="false" Type="boolean" Group="sys_conf CM4" TabName="Sigfox application" Visible="true">
+        <Condition Diagnostic="" Expression="(STM32WL55UCYx | STM32WL55CCUx | STM32WL55JCIx | STM32WL54CCUx | STM32WL54JCIx | STM32WL5MOCHx) &amp; !S_SINGLE_CORE &amp; !SEM_SGX_USER_APPLICATION"/>
+        <PossibleValue Value="true" Comment="true"/>
+        <PossibleValue Value="false" Comment="false"/>
+        <Description> </Description>
+    </RefParameter>
+    <RefParameter Name="SENSOR_ENABLED_CM4" Comment="Enable Sensor" DefaultValue="false" Type="boolean" Group="sys_conf CM4" TabName="Sigfox application" Visible="false">
+        <Description> </Description>
+    </RefParameter>
+    <!-- Sigfox sys_conf.h RefParameters - End -->
+
+    <!-- Sigfox sigfox_app.h RefParameters - Begin -->
+    <RefParameter Name="DEFAULT_RC" Comment="Default RC" DefaultValue="SFX_RC1" Type="list" Group="sigfox_app" TabName="Sigfox application" Visible="true">
+        <Condition Diagnostic="" Expression="SEM_SGX_PUSHBUTTON"/>
+        <PossibleValue Value="SFX_RC1" Comment="SFX_RC1"/>
+        <PossibleValue Value="SFX_RC2" Comment="SFX_RC2"/>
+        <PossibleValue Value="SFX_RC3A" Comment="SFX_RC3A"/>
+        <PossibleValue Value="SFX_RC3C" Comment="SFX_RC3C"/>
+        <PossibleValue Value="SFX_RC4" Comment="SFX_RC4"/>
+        <PossibleValue Value="SFX_RC5" Comment="SFX_RC5"/>
+        <PossibleValue Value="SFX_RC6" Comment="SFX_RC6"/>
+        <PossibleValue Value="SFX_RC7" Comment="SFX_RC7"/>
+        <PossibleValue Value="SFX_RC101" Comment="SFX_RC101"/>
+        <Description> </Description>
+    </RefParameter>
+    <RefParameter Name="DEFAULT_RC" Comment="Default RC" DefaultValue="SFX_RC1" Type="list" Group="sigfox_app" TabName="Sigfox application" Visible="false">
+        <PossibleValue Value="SFX_RC1" Comment="SFX_RC1"/>
+        <Description> </Description>
+    </RefParameter>
+    <!-- Sigfox sigfox_app.h RefParameters - End -->
+
+    <!-- Sigfox mw_log_conf.h RefParameters - Begin -->
+    <RefParameter Name="MW_LOG_ENABLED" Comment="Enable Middleware log" DefaultValue="true" Type="boolean" Group="mw_log_conf" TabName="Sigfox middleware" Visible="true">
+        <PossibleValue Value="true" Comment="true"/>
+        <PossibleValue Value="false" Comment="false"/>
+        <Description> </Description>
+    </RefParameter>
+    <!-- Sigfox mw_log_conf.h RefParameters - End -->
+
+    <!-- Sigfox radio_conf.h RefParameters - Begin -->
+    <RefParameter Name="RF_WAKEUP_TIME" Comment="Radio maximum wakeup time (in ms)" DefaultValue="15" Type="integer" Group="radio_conf" TabName="Sigfox middleware" Added="true">
+        <Description>Radio maximum wakeup time (in ms)</Description>
+    </RefParameter>
+    <!-- Sigfox radio_conf.h RefParameters - End -->
+
+    <!-- Sigfox radio_board_if.c/h RefParameters - Begin -->
+    <RefParameter Name="Activate_RADIO_BOARD_INTERFACE" Comment="Select radio Driver" DefaultValue="UserBoard" Type="list" Group="radio_board_if" TabName="Sigfox middleware" Added="true" Visible="true">
+        <PossibleValue Value="UserBoard" Comment="User Board" Semaphore="SEM_USER_BOARD_FOR_SIGFOX"/>
+        <PossibleValue Value="Bsp" Comment="Bsp via extSettings" />
+        <!--
+        <PossibleValue Value="NucleoPseudo" Comment="Nucleo Pseudo Driver" />
+        <Description>UserBoard: user to complete; Bsp: need to be included in the IDE; NucleoPseudo: just x backward compatibility.</Description>
+        -->
+    </RefParameter>
+
+    <RefParameter Name="IS_TCXO_SUPPORTED" Comment="TCXO support" DefaultValue="true" Type="boolean" Group="radio_board_if" TabName="Sigfox middleware" Added="true">
+        <Condition Diagnostic="" Expression="HSEByPassPwr &amp; SEM_USER_BOARD_FOR_SIGFOX"/>
+        <Description>Indicates whether or not TCXO is supported by the board. TCXO needs to be selected in RCC panel (HSE clock)</Description>
+    </RefParameter>
+    <RefParameter Name="IS_TCXO_SUPPORTED" Comment="TCXO support" DefaultValue="false" Type="list" Group="radio_board_if" TabName="Sigfox middleware" Added="true">
+        <Condition Expression="SEM_USER_BOARD_FOR_SIGFOX"  Diagnostic=""/>
+        <PossibleValue Value="false" Comment="TCXO not available!"/>
+        <Description>You need to activate TCXO in RCC configuration panel</Description>
+    </RefParameter>
+    <RefParameter Name="IS_TCXO_SUPPORTED" Comment="TCXO support" DefaultValue="true" Type="boolean" Group="radio_board_if" TabName="Sigfox middleware" Added="true" Visible="false">
+        <PossibleValue Value="true" Comment="true"/>
+    </RefParameter>
+
+    <RefParameter Name="IS_DCDC_SUPPORTED" Comment="DCDC support" DefaultValue="true" Type="boolean" Group="radio_board_if" TabName="Sigfox middleware" Added="true">
+        <Condition Expression="SEM_USER_BOARD_FOR_SIGFOX"  Diagnostic=""/>
+        <PossibleValue Value="false" Comment="false"/>
+        <PossibleValue Value="true" Comment="true"/>
+        <Description>Indicates whether or not DCDC is supported by the board</Description>
+    </RefParameter>
+    <RefParameter Name="IS_DCDC_SUPPORTED" Comment="DCDC support" DefaultValue="true" Type="boolean" Group="radio_board_if" TabName="Sigfox middleware" Added="true" Visible="false">
+        <PossibleValue Value="true" Comment="true"/>
+    </RefParameter>
+
+    <RefParameter Name="TX_RFO_CONFIG" Comment="Tx Rfo Config" DefaultValue="RBI_CONF_RFO_LP_HP" Type="list" Group="radio_board_if" TabName="Sigfox middleware" Visible="true">
+        <Condition Expression="SEM_USER_BOARD_FOR_SIGFOX"  Diagnostic=""/>
+        <PossibleValue Value="RBI_CONF_RFO_LP_HP" Comment="CONF_RFO_LP_HP"/>
+        <PossibleValue Value="RBI_CONF_RFO_LP" Comment="CONF_RFO_LP"/>
+        <PossibleValue Value="RBI_CONF_RFO_HP" Comment="CONF_RFO_HP"/>
+        <Description>Indicates the config</Description>
+    </RefParameter>
+    <RefParameter Name="TX_RFO_CONFIG" Comment="Tx Rfo Config" DefaultValue="RBI_CONF_RFO_LP_HP" Type="list" Group="radio_board_if" TabName="Sigfox middleware" Visible="false">
+        <PossibleValue Value="RBI_CONF_RFO_LP_HP" Comment="CONF_RFO_LP_HP"/>
+    </RefParameter>
+    <!-- Sigfox radio_board_if.h RefParameters - End -->
+
+    <!-- Sigfox sys_debug.c RefParameters - Begin -->
+    <RefParameter Name="Activate_DEBUG_LINE" Comment="Probes Lines in Platform Settings" DefaultValue="false" Type="boolean" Group="board settings" TabName="Sigfox application" Added="true">
+        <Condition Diagnostic="" Expression="!SEM_SGX_USER_APPLICATION"/>
+        <PossibleValue Comment="false" Value="false"/>
+        <PossibleValue Comment="true" Value="true" Semaphore="SEM_PROBE_LINE_FOR_SIGFOX"/>
+        <Description>Enable Probes Line using GPIO under Plaform Settings panel</Description>
+    </RefParameter>
+    <RefParameter Name="Activate_DEBUG_LINE" Comment="Probes Lines in Platform Settings" DefaultValue="false" Type="UniqueElementList" Group="board settings" TabName="Sigfox application" Added="true" Visible="false">
+        <PossibleValue Comment="false" Value="false"/>
+        <Description>Enable Probes Line using GPIO under Plaform Settings panel</Description>
+    </RefParameter>
+    <!-- Sigfox sys_debug.c RefParameters - End -->
+
+    <!-- Sigfox radio_resources.h/c RefParameters - Begin -->
+
+    <RefParameter Name="Activate_BOARD_RESOURCES" Comment="Board Resources" DefaultValue="none" Type="list" Group="board settings" TabName="Sigfox application" Added="true"  Visible="true">
+        <Condition Diagnostic="" Expression="(STM32WL55UCYx | STM32WL55CCUx | STM32WL55JCIx | STM32WL54CCUx | STM32WL54JCIx | STM32WL5MOCHx) &amp; !S_SINGLE_CORE"/>
+        <PossibleValue Comment="Cortex-M0+ via Platform Settings" Value="M0PLUS" Semaphore="SEM_BOARD_RESOURCES_M0PLUS_FOR_SIGFOX"/>
+        <PossibleValue Comment="Cortex-M4 via Platform Settings" Value="M4" Semaphore="SEM_BOARD_RESOURCES_M4_FOR_SIGFOX"/>
+        <PossibleValue Comment="Both cores via Platform Settings" Value="both" Semaphore="SEM_BOARD_RESOURCES_BOTH_FOR_SIGFOX"/>
+        <PossibleValue Comment="None" Value="none"/>
+        <Description>Enable LEDs and BUTTONs settings using GPIO under Plaform Settings panel or via .extSettings file</Description>
+    </RefParameter>
+    <RefParameter Name="Activate_BOARD_RESOURCES" Comment="Board Resources" DefaultValue="none" Type="list" Group="board settings" TabName="Sigfox application" Added="true"  Visible="false">
+        <PossibleValue Comment="Set pins via Platform Settings" Value="M4" Semaphore="SEM_BOARD_RESOURCES_M4_FOR_SIGFOX"/>
+        <PossibleValue Comment="None" Value="none"/>
+        <Description>Enable LEDs and BUTTONs settings using GPIO under Plaform Settings panel or via .extSettings file</Description>
+    </RefParameter>
+    <!-- Sigfox radio_resources.h/c RefParameters - End -->
+
+    <!-- RefMode for sigfox -->
+    <RefMode Name="Sigfox_Enabled">
+        <ConfigForMode>Sigfox_Init</ConfigForMode>
+        <!-- app_conf.h -->
+        <Parameter Name="SIGFOX_APP_MEM_POOL_SIZE"/>
+        <Parameter Name="SUBGHZ_APPLICATION"/>
+        <Parameter Name="USER_GUIDANCE_UTIL"/>
+        <Parameter Name="USER_GUIDANCE"/>
+        <Parameter Name="SIGFOX_KMS"/>
+        <Parameter Name="FILL_UCS"/>
+        <Parameter Name="USE_ADC"/>
+        <Parameter Name="USE_RTC"/>
+        <Parameter Name="USE_LPTIM"/>
+        <Parameter Name="USE_UART"/>
+        <Parameter Name="USE_LPM"/>
+
+        <!-- board_resources -->
+        <!-- Activate_BOARD_RESOURCES is hiden in CubeFw v1.2.0: check user reaction -->
+<!--
+        <Parameter Name="Activate_BOARD_RESOURCES" Added="true"/>
+-->
+        <!-- sys_conf.h -->
+        <Parameter Name="VERBOSE_LEVEL"/>
+        <Parameter Name="VERBOSE_LEVEL_CM4"/>
+        <Parameter Name="VERBOSE_LEVEL_CM0PLUS"/>
+        <Parameter Name="APP_LOG_ENABLED"/>
+        <Parameter Name="APP_LOG_ENABLED_CM4"/>
+        <Parameter Name="APP_LOG_ENABLED_CM0PLUS"/>
+        <Parameter Name="DEBUGGER_ON"/>
+        <Parameter Name="UTIL_SEQ_EN_M4"/>
+        <Parameter Name="UTIL_SEQ_EN_M0"/>
+        <Parameter Name="UTIL_TIMER_EN"/>
+        <!--
+        <Parameter Name="DEBUGGER_ON_CM4"/>
+        <Parameter Name="DEBUGGER_ON_CM0PLUS"/>  -->
+        <Parameter Name="LOW_POWER_DISABLE"/>
+        <Parameter Name="LOW_POWER_DISABLE_CM4"/>
+        <Parameter Name="LOW_POWER_DISABLE_CM0PLUS"/>
+        <Parameter Name="SENSOR_ENABLED"/>
+        <Parameter Name="SENSOR_ENABLED_CM4"/>
+        <Parameter Name="DEBUG_SUBGHZSPI_MONITORING"/>
+        <Parameter Name="DEBUG_RF_NRESET"/>
+        <Parameter Name="DEBUG_RF_HSE32RDY"/>
+        <Parameter Name="DEBUG_RF_SMPSRDY"/>
+        <Parameter Name="DEBUG_RF_LDORDY"/>
+        <Parameter Name="DEBUG_RF_DTB1"/>
+        <Parameter Name="DEBUG_RF_BUSY"/>
+        <!-- sys_conf.h -->
+
+        <!-- sgfx_app.h -->
+        <Parameter Name="DEFAULT_RC"/>
+        <!-- sgfx_app.h -->
+
+        <!-- radio_conf -->
+        <Parameter Name="RF_WAKEUP_TIME" Added="true"/>
+        <Parameter Name="Activate_DEBUG_LINE" Added="true"/>
+        <!-- radio_conf -->
+
+        <!-- radio_board interface -->
+        <Parameter Name="Activate_RADIO_BOARD_INTERFACE" Added="true"/>
+        <Parameter Name="IS_TCXO_SUPPORTED" Added="true"/>
+        <Parameter Name="IS_DCDC_SUPPORTED" Added="true"/>
+        <Parameter Name="TX_RFO_CONFIG" Added="true"/>
+        <!-- radio_board interface -->
+
+        <!-- mw_log_conf.h -->
+        <Parameter Name="MW_LOG_ENABLED"/>
+        <!-- mw_log_conf.h -->
+
+        <!-- BSP Board resources Driver Begin -->
+<!--
+        <BspDependency Name="LED 1" Comment="Use the User Led for this application" BspIpName="GPIO" BspModeName="Output" GroupName="Board resources">
+            <Condition Expression="SEM_BOARD_RESOURCES_M0PLUS_FOR_SIGFOX | SEM_BOARD_RESOURCES_M4_FOR_SIGFOX | SEM_BOARD_RESOURCES_BOTH_FOR_SIGFOX"  Diagnostic=""/>
+        </BspDependency>
+        <BspDependency Name="LED 2" Comment="Use the User Led for this application" BspIpName="GPIO" BspModeName="Output" GroupName="Board resources">
+            <Condition Expression="SEM_BOARD_RESOURCES_M0PLUS_FOR_SIGFOX | SEM_BOARD_RESOURCES_M4_FOR_SIGFOX | SEM_BOARD_RESOURCES_BOTH_FOR_SIGFOX"  Diagnostic=""/>
+        </BspDependency>
+        <BspDependency Name="LED 3" Comment="Use the User Led for this application" BspIpName="GPIO" BspModeName="Output" GroupName="Board resources">
+            <Condition Expression="SEM_BOARD_RESOURCES_M0PLUS_FOR_SIGFOX | SEM_BOARD_RESOURCES_M4_FOR_SIGFOX | SEM_BOARD_RESOURCES_BOTH_FOR_SIGFOX"  Diagnostic=""/>
+        </BspDependency>
+        <BspDependency Name="BUTTON 1" Comment="Use the User Button for this application" BspIpName="GPIO" BspModeName="EXTI" Api="HAL_EXTI_DRIVER" GroupName="Board resources">
+            <Condition Expression="SEM_BOARD_RESOURCES_M0PLUS_FOR_SIGFOX | SEM_BOARD_RESOURCES_M4_FOR_SIGFOX | SEM_BOARD_RESOURCES_BOTH_FOR_SIGFOX"  Diagnostic=""/>
+        </BspDependency>
+        <BspDependency Name="BUTTON 1" Comment="Use the User Button for this application" BspIpName="GPIO" BspModeName="Input" GroupName="Board resources">
+            <Condition Expression="SEM_BOARD_RESOURCES_M0PLUS_FOR_SIGFOX | SEM_BOARD_RESOURCES_M4_FOR_SIGFOX | SEM_BOARD_RESOURCES_BOTH_FOR_SIGFOX"  Diagnostic=""/>
+        </BspDependency>
+        <BspDependency Name="BUTTON 2" Comment="Use the User Button for this application" BspIpName="GPIO" BspModeName="EXTI" Api="HAL_EXTI_DRIVER" GroupName="Board resources">
+            <Condition Expression="SEM_BOARD_RESOURCES_M0PLUS_FOR_SIGFOX | SEM_BOARD_RESOURCES_M4_FOR_SIGFOX | SEM_BOARD_RESOURCES_BOTH_FOR_SIGFOX"  Diagnostic=""/>
+        </BspDependency>
+        <BspDependency Name="BUTTON 2" Comment="Use the User Button for this application" BspIpName="GPIO" BspModeName="Input" GroupName="Board resources">
+            <Condition Expression="SEM_BOARD_RESOURCES_M0PLUS_FOR_SIGFOX | SEM_BOARD_RESOURCES_M4_FOR_SIGFOX | SEM_BOARD_RESOURCES_BOTH_FOR_SIGFOX"  Diagnostic=""/>
+        </BspDependency>
+        <BspDependency Name="BUTTON 3" Comment="Use the User Button for this application" BspIpName="GPIO" BspModeName="EXTI" Api="HAL_EXTI_DRIVER" GroupName="Board resources">
+            <Condition Expression="SEM_BOARD_RESOURCES_M0PLUS_FOR_SIGFOX | SEM_BOARD_RESOURCES_M4_FOR_SIGFOX | SEM_BOARD_RESOURCES_BOTH_FOR_SIGFOX"  Diagnostic=""/>
+        </BspDependency>
+        <BspDependency Name="BUTTON 3" Comment="Use the User Button for this application" BspIpName="GPIO" BspModeName="Input" GroupName="Board resources">
+            <Condition Expression="SEM_BOARD_RESOURCES_M0PLUS_FOR_SIGFOX | SEM_BOARD_RESOURCES_M4_FOR_SIGFOX | SEM_BOARD_RESOURCES_BOTH_FOR_SIGFOX"  Diagnostic=""/>
+        </BspDependency>
+-->
+        <!-- BSP Board resources Driver End -->
+
+        <!-- BSP Virtual PortCom Begin -->
+        <BspDependency Name="USART" Comment="Use LPUART for hyperterminal " BspIpName="LPUART" BspModeName="Asynchronous" GroupName="VCOM">
+            <Condition Expression="SEM_SGX_AT_SLAVE" Diagnostic=""/>
+        </BspDependency>
+
+        <BspDependency Name="USART" Comment="Use an USART or LPUART for hyperterminal" BspIpName="(LPU|US)ART" BspModeName="Asynchronous" GroupName="VCOM">
+            <Condition Expression="SEM_SGX_PUSHBUTTON | SEM_SGX_USE_UART" Diagnostic=""/>
+        </BspDependency>
+        <!-- BSP Virtual PortCom End -->
+
+        <!-- BSP ADC Begin -->
+        <BspDependency Name="ADC" Comment="Use ADC for measurment" BspIpName="ADC" BspModeName="Vrefint Channel" GroupName="Vrefint T° calibration">
+            <Condition Expression="SEM_SGX_AT_SLAVE | SEM_SGX_PUSHBUTTON | SEM_SGX_USE_ADC" Diagnostic=""/>
+        </BspDependency>
+        <!-- BSP ADC End -->
+
+        <!-- BSP RTC Begin -->
+        <BspDependency Name="RTC" Comment="Use RTC for timeServer" BspIpName="RTC" BspModeName="RTC Enabled" GroupName="TimeServer">
+            <Condition Expression="!SEM_SGX_USER_APPLICATION | SEM_SGX_USE_RTC" Diagnostic=""/>
+        </BspDependency>
+        <!-- BSP RTC End -->
+
+        <!-- BSP LPTIM Begin -->
+        <BspDependency Name="TIM" Comment="Use LPTIM for Monarch" BspIpName="LPTIM" BspModeName="Counts internal clock events" GroupName="Monarch">
+            <Condition Expression="SEM_SGX_AT_SLAVE | SEM_SGX_PUSHBUTTON | SEM_SGX_USE_LPTIM" Diagnostic=""/>
+        </BspDependency>
+        <!-- BSP LPTIM End -->
+
+        <!-- BSP Probe Begin -->
+        <BspDependency Name="Debug Line 1" Comment="Probe Line 1" BspIpName="GPIO" BspModeName="Output" GroupName="Probe Lines">
+            <Condition Expression="SEM_PROBE_LINE_FOR_SIGFOX"  Diagnostic=""/>
+        </BspDependency>
+        <BspDependency Name="Debug Line 2" Comment="Probe Line 2" BspIpName="GPIO" BspModeName="Output" GroupName="Probe Lines">
+            <Condition Expression="SEM_PROBE_LINE_FOR_SIGFOX"  Diagnostic=""/>
+        </BspDependency>
+        <BspDependency Name="Debug Line 3" Comment="Probe Line 3" BspIpName="GPIO" BspModeName="Output" GroupName="Probe Lines">
+            <Condition Expression="SEM_PROBE_LINE_FOR_SIGFOX"  Diagnostic=""/>
+        </BspDependency>
+        <BspDependency Name="Debug Line 4" Comment="Probe Line 4" BspIpName="GPIO" BspModeName="Output" GroupName="Probe Lines">
+            <Condition Expression="SEM_PROBE_LINE_FOR_SIGFOX"  Diagnostic=""/>
+        </BspDependency>
+        <!-- BSP Probe End -->
+    </RefMode>
+
+    <!-- ModeLogicOperator for sigfox -->
+    <ModeLogicOperator Name="OR">
+        <Mode Name="Enabled">
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="Sigfox_Enabled">
+                    <SignalLogicalOp Name="AND">
+                        <Signal IOMode="Basic" Name="VS_Sigfox"/>
+                    </SignalLogicalOp>
+                    <Semaphore>S_Sigfox</Semaphore>
+                </Mode>
+            </ModeLogicOperator>
+            <Condition Expression="((STM32WL55UCYx | STM32WL55CCUx | STM32WL55JCIx | STM32WL54CCUx | STM32WL54JCIx | STM32WL5MOCHx) &amp; !S_LoRaWAN &amp; !S_SubGhzPhy &amp; S_SUBGHZ &amp; S_IPCC_Enabled &amp; !S_SINGLE_CORE)
+                                    | ((STM32WL55UCYx | STM32WL55CCUx | STM32WL55JCIx | STM32WL54CCUx | STM32WL54JCIx | STM32WL5MOCHx) &amp; !S_LoRaWAN &amp; !S_LoRaWAN &amp; !S_SubGhzPhy &amp; S_SUBGHZ &amp; S_SINGLE_CORE)
+                                    | ((!STM32WL55UCYx &amp; !STM32WL55CCUx &amp; !STM32WL55JCIx &amp; !STM32WL54CCUx &amp; !STM32WL54JCIx &amp; !STM32WL5MOCHx) &amp; !S_LoRaWAN &amp; !S_SubGhzPhy &amp; S_SUBGHZ)"
+                                    Diagnostic="You can enable this middleware only if only if SubGHz IP is enabled and LoRaWAN and SubGHz_Phy middlewares are not enabled. For Dual Core product you need also to activate IPCC"/>
+        </Mode>
+    </ModeLogicOperator>
+
+    <!-- RefSignal for sigfox -->
+    <RefSignal Name="VS_Sigfox" Virtual="true"/>
+</IP>

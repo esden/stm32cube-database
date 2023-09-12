@@ -24,12 +24,24 @@
 --]
 [#assign SUBGHZ_APPLICATION = ""]
 [#assign SECURE_PROJECTS = "0"]
+[#assign USE_UART = "true"]
+[#assign UTIL_SEQ_EN_M4 = "true"]
+[#assign UTIL_SEQ_EN_M0 = "true"]
 [#if SWIPdatas??]
     [#list SWIPdatas as SWIP]
         [#if SWIP.defines??]
             [#list SWIP.defines as definition]
                 [#if definition.name == "SUBGHZ_APPLICATION"]
                     [#assign SUBGHZ_APPLICATION = definition.value]
+                [/#if]
+                [#if definition.name == "USE_UART"]
+                    [#assign USE_UART = definition.value]
+                [/#if]
+                [#if definition.name == "UTIL_SEQ_EN_M4"]
+                    [#assign UTIL_SEQ_EN_M4 = definition.value]
+                [/#if]
+                [#if definition.name == "UTIL_SEQ_EN_M0"]
+                    [#assign UTIL_SEQ_EN_M0 = definition.value]
                 [/#if]
             [/#list]
         [/#if]
@@ -56,7 +68,9 @@ extern "C" {
 #include "stm32_tiny_vsnprintf.h"
 
 [#if CPUCORE == "CM0PLUS"]
+[#if (USE_UART == "true")]
 #include "mbmuxif_trace.h"
+[/#if]
 [#if (SECURE_PROJECTS == "1")]
 #include "sys_privileged_wrap.h"
 #include "stm32_seq.h"
@@ -66,8 +80,10 @@ extern "C" {
 
 [#if !THREADX??][#-- If AzRtos is not used --]
 [#if !FREERTOS??][#-- If FreeRtos is not used --]
+[#if ((UTIL_SEQ_EN_M0 == "true") && (CPUCORE == "CM0PLUS")) || ((UTIL_SEQ_EN_M4 == "true") && (CPUCORE != "CM0PLUS"))]
 /* enum number of task and priority*/
 #include "utilities_def.h"
+[/#if]
 [/#if]
 [/#if]
 /* USER CODE BEGIN Includes */
@@ -169,6 +185,7 @@ extern "C" {
   ******************************************************************************/
 [#if !THREADX??][#-- If AzRTOS is not used --]
 [#if !FREERTOS??][#-- If FreeRtos is not used --]
+[#if ((UTIL_SEQ_EN_M0 == "true") && (CPUCORE == "CM0PLUS")) || ((UTIL_SEQ_EN_M4 == "true") && (CPUCORE != "CM0PLUS"))]
 
 /**
   * @brief default number of tasks configured in sequencer
@@ -181,6 +198,7 @@ extern "C" {
 
 #define UTIL_SEQ_CONF_PRIO_NBR    CFG_SEQ_Prio_NBR
 
+[/#if][#--  SEQ_EN_M4 or SEQ_EN_M0 --]
 [/#if]
 [/#if]
 [#if !THREADX??][#-- If AzRTOS is not used --]
@@ -245,7 +263,7 @@ extern "C" {
 #define UTIL_ADV_TRACE_INIT_CRITICAL_SECTION( )    UTILS_INIT_CRITICAL_SECTION()         /*!< init the critical section in trace feature */
 #define UTIL_ADV_TRACE_ENTER_CRITICAL_SECTION( )   UTILS_ENTER_CRITICAL_SECTION()        /*!< enter the critical section in trace feature */
 #define UTIL_ADV_TRACE_EXIT_CRITICAL_SECTION( )    UTILS_EXIT_CRITICAL_SECTION()         /*!< exit the critical section in trace feature */
-[#if (SUBGHZ_APPLICATION == "LORA_AT_SLAVE")]
+[#if (SUBGHZ_APPLICATION == "LORA_AT_SLAVE") || (SUBGHZ_APPLICATION == "SUBGHZ_AT_SLAVE")]
 #define UTIL_ADV_TRACE_TMP_BUF_SIZE                (1024U)                               /*!< default trace buffer size */
 #define UTIL_ADV_TRACE_TMP_MAX_TIMESTMAP_SIZE      (15U)                                 /*!< default trace timestamp size */
 #define UTIL_ADV_TRACE_FIFO_SIZE                   (2048U)                               /*!< default trace fifo size */

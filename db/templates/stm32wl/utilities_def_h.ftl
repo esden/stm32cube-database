@@ -23,13 +23,22 @@
 --]
 [#assign CPUCORE = cpucore?replace("ARM_CORTEX_","C")?replace("+","PLUS")]
 [#assign SUBGHZ_APPLICATION = ""]
+[#assign UTIL_SEQ_EN_M4 = "true"]
+[#assign UTIL_SEQ_EN_M0 = "true"]
 [#assign SECURE_PROJECTS = "0"]
+[#assign INTERNAL_LORAWAN_FUOTA = "0"]
 [#if SWIPdatas??]
     [#list SWIPdatas as SWIP]
         [#if SWIP.defines??]
             [#list SWIP.defines as definition]
                 [#if definition.name == "SUBGHZ_APPLICATION"]
                     [#assign SUBGHZ_APPLICATION = definition.value]
+                [/#if]
+                [#if definition.name == "UTIL_SEQ_EN_M4"]
+                    [#assign UTIL_SEQ_EN_M4 = definition.value]
+                [/#if]
+                [#if definition.name == "UTIL_SEQ_EN_M0"]
+                    [#assign UTIL_SEQ_EN_M0 = definition.value]
                 [/#if]
             [/#list]
         [/#if]
@@ -45,6 +54,7 @@ extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
+#include <stddef.h>
 /* USER CODE BEGIN Includes */
 
 /* USER CODE END Includes */
@@ -77,6 +87,7 @@ typedef enum
 } CFG_LPM_Id_t;
 [#if !FREERTOS??][#-- If FreeRtos is not used --]
 [#if !THREADX??][#-- If AzRtos is not used --]
+[#if ((UTIL_SEQ_EN_M0 == "true") && (CPUCORE == "CM0PLUS")) || ((UTIL_SEQ_EN_M4 == "true") && (CPUCORE != "CM0PLUS"))]
 
 /*---------------------------------------------------------------------------*/
 /*                             sequencer definitions                         */
@@ -113,7 +124,7 @@ typedef enum
 [/#if]
   CFG_SEQ_Task_MbRadioCmdRcv,
   CFG_SEQ_Task_MbRadioNotifSnd,
-[#if ((SUBGHZ_APPLICATION != "SUBGHZ_ADV_APPLICATION")) ]
+[#if (SUBGHZ_APPLICATION != "SUBGHZ_ADV_APPLICATION")]
   CFG_SEQ_Task_MbKmsCmdRcv,
 [/#if]
 [#if (SUBGHZ_APPLICATION == "LORA_AT_SLAVE") || (SUBGHZ_APPLICATION == "LORA_END_NODE") || (SUBGHZ_APPLICATION == "LORA_USER_APPLICATION")]
@@ -151,7 +162,7 @@ typedef enum
 [#if (SUBGHZ_APPLICATION == "SIGFOX_PUSHBUTTON") || (SUBGHZ_APPLICATION == "SIGFOX_AT_SLAVE")]
   CFG_SEQ_Evt_Monarch,
 [/#if]
-[#if (SUBGHZ_APPLICATION == "SIGFOX_AT_SLAVE") || (SUBGHZ_APPLICATION == "LORA_AT_SLAVE")]
+[#if (SUBGHZ_APPLICATION == "SIGFOX_AT_SLAVE") || (SUBGHZ_APPLICATION == "LORA_AT_SLAVE") || (SUBGHZ_APPLICATION == "SUBGHZ_AT_SLAVE")]
   CFG_SEQ_Task_Vcom,
 [/#if]
 [#if (SUBGHZ_APPLICATION == "LORA_END_NODE")]
@@ -165,6 +176,8 @@ typedef enum
 [#else][#-- Single Core --]
 [#if (SUBGHZ_APPLICATION == "LORA_USER_APPLICATION") || (SUBGHZ_APPLICATION == "SIGFOX_USER_APPLICATION") || (SUBGHZ_APPLICATION == "SUBGHZ_USER_APPLICATION") ]
   CFG_SEQ_Task_Default,
+[#elseif (SUBGHZ_APPLICATION == "SUBGHZ_AT_SLAVE")]
+  CFG_SEQ_Task_Vcom,
 [#elseif (SUBGHZ_APPLICATION == "LORA_AT_SLAVE")]
   CFG_SEQ_Task_Vcom,
   CFG_SEQ_Task_LmHandlerProcess,
@@ -191,7 +204,7 @@ typedef enum
   CFG_SEQ_Task_NBR
 } CFG_SEQ_Task_Id_t;
 
-[#if ((CPUCORE != "") || (SUBGHZ_APPLICATION == "LORA_AT_SLAVE") || (SUBGHZ_APPLICATION == "SIGFOX_AT_SLAVE") || (SUBGHZ_APPLICATION == "SIGFOX_PUSHBUTTON")) ]
+[#if ((CPUCORE != "") || (SUBGHZ_APPLICATION == "SUBGHZ_AT_SLAVE") || (SUBGHZ_APPLICATION == "LORA_AT_SLAVE") || (SUBGHZ_APPLICATION == "SIGFOX_AT_SLAVE") || (SUBGHZ_APPLICATION == "SIGFOX_PUSHBUTTON")) ]
 /**
   * This is a bit mapping over 32bits listing all events id supported in the application
   */
@@ -209,6 +222,9 @@ typedef enum
   CFG_SEQ_Evt_Monarch,
 [/#if]
   CFG_SEQ_Evt_MbRadioAckRcv,
+[#if (INTERNAL_LORAWAN_FUOTA == "1")]
+  CFG_SEQ_Evt_MbFlashAckRcv,
+[/#if]
 [#if (SUBGHZ_APPLICATION == "SIGFOX_AT_SLAVE") || (SUBGHZ_APPLICATION == "SIGFOX_PUSHBUTTON")]
   CFG_SEQ_Evt_Timeout,
   CFG_SEQ_Evt_TxTimeout,
@@ -230,8 +246,8 @@ typedef enum
 [#if (SUBGHZ_APPLICATION == "LORA_AT_SLAVE")]
   CFG_SEQ_Evt_RadioOnTstRF,
 [/#if]
-[#else]
-[#if (SUBGHZ_APPLICATION == "LORA_AT_SLAVE")]
+[#else][#-- Single Core --]
+[#if (SUBGHZ_APPLICATION == "LORA_AT_SLAVE") ||  (SUBGHZ_APPLICATION == "SUBGHZ_AT_SLAVE")]
   CFG_SEQ_Evt_RadioOnTstRF,
 [/#if]
 [#if (SUBGHZ_APPLICATION == "SIGFOX_AT_SLAVE") || (SUBGHZ_APPLICATION == "SIGFOX_PUSHBUTTON") ]
@@ -240,16 +256,17 @@ typedef enum
   CFG_SEQ_Evt_Delay,
   CFG_SEQ_Evt_Monarch,
 [/#if]
-[/#if]
+[/#if][#--  CPUCORE == CM4 vs CM0 vs SINGLE --]
   /* USER CODE BEGIN CFG_SEQ_IdleEvt_Id_t */
 
   /* USER CODE END CFG_SEQ_IdleEvt_Id_t */
   CFG_SEQ_Evt_NBR
 } CFG_SEQ_IdleEvt_Id_t;
 
-[/#if]
-[/#if]
-[/#if]
+[/#if][#-- If any SUBGHZ_APPLICATION in dual core || XXX_AT_SLAVE in single --]
+[/#if][#--  SEQ_EN_M4 or SEQ_EN_M0 --]
+[/#if][#-- If AzRtos is not used --]
+[/#if][#-- If FreeRtos is not used --]
 /* USER CODE BEGIN ET */
 
 /* USER CODE END ET */

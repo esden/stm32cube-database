@@ -554,6 +554,7 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <File Category="header" Condition="all" Name="app_conf.h" Version="1.0"/>
     <!-- ftl specific items begin-->
         <Argument Name="FREERTOS_STATUS" GenericType="Simple" Comment="0 to 1 (0 by default)"/>
+        <Argument Name="RFWKPCLKSOURCE" GenericType="Simple" Comment="0 to 1 (0 by default)"/>
         <Argument Name="BLE_CFG_PERIPHERAL" GenericType="Simple" Comment="0 to 1 (1 by default)"/>
         <Argument Name="BLE_APPLICATION_TYPE" GenericType="Simple"/>
         <Argument Name="BLE_TRANSPARENT_MODE_UART" GenericType="Simple"/>
@@ -574,6 +575,8 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <Argument Name="CFG_CLI_UART" GenericType="Simple"/>
     <!-- ftl specific items end-->
         <Argument Name="CFG_ADV_BD_ADDRESS" GenericType="Simple"/>
+        <Argument Name="CFG_IDENTITY_ADDRESS" GenericType="Simple"/>
+        <Argument Name="CFG_PRIVACY" GenericType="Simple"/>
         <Argument Name="CFG_STATIC_RANDOM_ADDRESS" GenericType="Simple"/>
         <Argument Name="STATIC_RANDOM_ADDRESS" GenericType="Simple"/>
         <Argument Name="CFG_FAST_CONN_ADV_INTERVAL_MIN" GenericType="Simple"/>
@@ -630,7 +633,11 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <Argument Name="CFG_BLE_OPTIONS_DEVICE_NAME" GenericType="Simple"/>
         <Argument Name="CFG_BLE_OPTIONS_EXT_ADV" GenericType="Simple"/>
         <Argument Name="CFG_BLE_OPTIONS_CS_ALGO" GenericType="Simple"/>
+        <Argument Name="CFG_BLE_OPTIONS_GATTDB_NVM" GenericType="Simple"/>
+        <Argument Name="CFG_BLE_OPTIONS_GATT_CACHING" GenericType="Simple"/>
         <Argument Name="CFG_BLE_OPTIONS_POWER_CLASS" GenericType="Simple"/>
+        <Argument Name="CFG_BLE_OPTIONS_APPEARANCE" GenericType="Simple"/>
+        <Argument Name="CFG_BLE_OPTIONS_ENHANCED_ATT" GenericType="Simple"/>
         <Argument Name="CFG_BLE_MAX_COC_INITIATOR_NBR" GenericType="Simple"/>
         <Argument Name="CFG_BLE_MIN_TX_POWER" GenericType="Simple"/>
         <Argument Name="CFG_BLE_MAX_TX_POWER" GenericType="Simple"/>
@@ -639,6 +646,7 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <Argument Name="CFG_BLE_MAX_ADV_DATA_LEN" GenericType="Simple"/>
         <Argument Name="CFG_BLE_TX_PATH_COMPENS" GenericType="Simple"/>
         <Argument Name="CFG_BLE_RX_PATH_COMPENS" GenericType="Simple"/>
+        <Argument Name="CFG_BLE_CORE_VERSION" GenericType="Simple"/>
         <Argument Name="CFG_TLBLE_EVT_QUEUE_LENGTH" GenericType="Simple"/>
         <Argument Name="CFG_TLBLE_MOST_EVENT_PAYLOAD_SIZE" GenericType="Simple"/>
         <Argument Name="DBG_TRACE_USE_CIRCULAR_QUEUE" GenericType="Simple"/>
@@ -957,6 +965,8 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <Argument Name="AD_TYPE_MANUFACTURER_DATA_COMMENT_22" GenericType="Simple"/>
         <Argument Name="CFG_STATIC_RANDOM_ADDRESS" GenericType="Simple"/>
         <Argument Name="CFG_RNG" GenericType="Simple"/>
+        <Argument Name="CFG_IDENTITY_ADDRESS" GenericType="Simple"/>
+        <Argument Name="CFG_PRIVACY" GenericType="Simple"/>
 
         <!-- ftl specific items end-->
     </RefConfigFile>
@@ -1212,7 +1222,7 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <Argument Name="ZCL_POLL_CONTROL_ENDPOINT1" GenericType="Simple" 
                   Comment="zcl/general/zcl.poll.control.h:poll_control:pollControl:static struct ZbZclPollControl$ROLECallbackT:PollControl$ROLECallbacks_$ENDPOINT:zcl_poll_$LOWERROLE_alloc:(zigbee_app_info.zb, SW$ENDPOINT_ENDPOINT, &amp;PollControlClientCallbacks_$ENDPOINT, NULL):(zigbee_app_info.zb, SW$ENDPOINT_ENDPOINT, &amp;PollControlServerCallbacks_$ENDPOINT, NULL)"/>
         <Argument Name="CB_POLL_CONTROL_CLIENT_CHECKINRSPCALLBACK_ENDPOINT1" GenericType="Simple" Comment="checkin_rsp_callback:static enum ZclStatusCodeT:(struct ZbZclClusterT *cluster, struct zcl_poll_checkin_rsp_t *rsp_info, struct ZbZclAddrInfoT *srcInfo, void *arg)"/>
-        <Argument Name="CB_POLL_CONTROL_SERVER_CHECKINRSP_ENDPOINT1" GenericType="Simple" Comment="checkin_rsp:static void:(struct ZbZclClusterT *cluster, struct zcl_poll_checkin_rsp_t *rsp_info, struct ZbZclAddrInfoT *srcInfo, void *arg)"/>
+        <Argument Name="CB_POLL_CONTROL_SERVER_CHECKINRSP_ENDPOINT1" GenericType="Simple" Comment="checkin_rsp:static bool:(struct ZbZclClusterT *cluster, struct zcl_poll_checkin_rsp_t *rsp_info, struct ZbZclAddrInfoT *srcInfo, void *arg)"/>
 
         <Argument Name="ZCL_POWER_CONFIGURATION_ENDPOINT1" GenericType="Simple" 
                   Comment="zcl/general/zcl.power.config.h:power_config:powerConfig:::ZbZclPowerConfig$ROLEAlloc:(zigbee_app_info.zb, SW$ENDPOINT_ENDPOINT):(zigbee_app_info.zb, SW$ENDPOINT_ENDPOINT)"/>
@@ -1416,7 +1426,7 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <Argument Name="CB_METER_SERVER_GETPROFILE_ENDPOINT1" GenericType="Simple" Comment="get_profile:static enum ZclStatusCodeT:(struct ZbZclClusterT *cluster, void *arg, struct ZbZclMeterClientGetProfileReqT *req, struct ZbZclAddrInfoT *srcInfo)"/>
         <Argument Name="CB_METER_SERVER_GETSAMPLEDDATA_ENDPOINT1" GenericType="Simple" Comment="get_sampled_data:static enum ZclStatusCodeT:(struct ZbZclClusterT *cluster, void *arg, struct ZbZclMeterClientGetSampledDataReqT *req, struct ZbZclAddrInfoT *srcInfo)"/>
         <Argument Name="CB_METER_SERVER_LOCALCHANGESUPPLY_ENDPOINT1" GenericType="Simple" Comment="local_change_supply:static enum ZclStatusCodeT:(struct ZbZclClusterT *cluster, void *arg, struct ZbZclMeterClientLocalChangeSupplyReqT *req, struct ZbZclAddrInfoT *srcInfo)"/>
-        <Argument Name="CB_METER_SERVER_MIRRORREPORTATTR_ENDPOINT1" GenericType="Simple" Comment="mirror_report_attr_rsp:enum ZclStatusCodeT:(struct ZbZclClusterT *cluster, void *arg, struct ZbZclMeterClientMirrorReportAttrRspT *notify, struct ZbZclAddrInfoT *srcInfo)"/>
+        <Argument Name="CB_METER_SERVER_MIRRORREPORTATTR_ENDPOINT1" GenericType="Simple" Comment="mirror_report_attr_rsp:static enum ZclStatusCodeT:(struct ZbZclClusterT *cluster, void *arg, struct ZbZclMeterClientMirrorReportAttrRspT *notify, struct ZbZclAddrInfoT *srcInfo)"/>
         <Argument Name="CB_METER_SERVER_OPTIONAL_ENDPOINT1" GenericType="Simple" Comment="optional:static enum ZclStatusCodeT:(struct ZbZclClusterT *cluster, struct ZbZclHeaderT *zclHdrPtr, struct ZbApsdeDataIndT *dataIndPtr)"/>
         <Argument Name="CB_METER_CLIENT_REQUESTMIRROR_ENDPOINT1" GenericType="Simple" Comment="request_mirror:static uint16_t:(struct ZbZclClusterT *cluster, struct ZbZclAddrInfoT *srcInfo, void *arg)"/>
         <Argument Name="CB_METER_CLIENT_REMOVEMIRROR_ENDPOINT1" GenericType="Simple" Comment="remove_mirror:static uint16_t:(struct ZbZclClusterT *cluster, struct ZbZclAddrInfoT *srcInfo, void *arg)"/>

@@ -473,6 +473,8 @@ void USBPD_DPM_GetDataInfo(uint8_t PortNum, USBPD_CORE_DataInfoType_TypeDef Data
     // break;
 [/#if]
 //  case USBPD_CORE_DATATYPE_REQ_VOLTAGE:       /*!< Get voltage value requested for BIST tests, expect 5V*/
+//    *Size = 4;
+//    (void)memcpy((uint8_t *)Ptr, (uint8_t *)&DPM_Ports[PortNum].DPM_RequestedVoltage, *Size);
     // break;
 [#if SRC || DRP]
 //  case USBPD_CORE_DATATYPE_SRC_PDO:           /*!< Handling of port Source PDO                         */

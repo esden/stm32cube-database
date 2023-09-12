@@ -240,7 +240,7 @@
     <!-- Possible Value of Resolution parameter -->
    
     <RefParameter Comment="Resolution" DefaultValue="ADC_RESOLUTION_12B" Group="ADCgroup" Name="Resolution" Type="list">
-               <Condition Expression="DIE462" Diagnostic=""/>
+               <Condition Expression="DIE462|DIE464|DIE472" Diagnostic=""/>
         <PossibleValue Comment="ADC 12-bit resolution" Semaphore="ADC_RESOLUTION12b" Value="ADC_RESOLUTION_12B"/>
         <PossibleValue Comment="ADC 10-bit resolution" Semaphore="ADC_RESOLUTION10b" Value="ADC_RESOLUTION_10B"/>
         <PossibleValue Comment="ADC 8-bit resolution" Semaphore="ADC_RESOLUTION8b" Value="ADC_RESOLUTION_8B"/>
@@ -249,7 +249,7 @@
     </RefParameter>
     <!-- Possible Value of Resolution parameter -->
     <RefParameter Comment="Resolution" DefaultValue="ADC_RESOLUTION_12B" Group="ADCGroup" Name="Resolution" Type="list">
-        <PossibleValue Action="Disable" Comment="ADC 16-bit resolution" Condition="!Sem_16bit_resolution &amp; DIE495" Diagnostic="16-bit resolution available when 256 oversampling ratio is enabled." Semaphore="ADC_RESOLUTION16b_$IpInstance" Value="ADC_RESOLUTION_16B"/>
+        <PossibleValue Action="Disable" Comment="ADC 16-bit resolution" Condition="!Sem_16bit_resolution &amp; DIE495 &amp; !(DIE464)&amp;!(DIE472)" Diagnostic="16-bit resolution available when 256 oversampling ratio is enabled." Semaphore="ADC_RESOLUTION16b_$IpInstance" Value="ADC_RESOLUTION_16B"/>
         <PossibleValue Action="Disable" Comment="ADC 12-bit resolution" Condition="isNotAllowed_12b10b" Diagnostic="In case of usage of channels on injected group, ADC frequency should be low than AHB clock frequency /4 for resolution 12 or 10 bits." Semaphore="ADC_RESOLUTION12b_$IpInstance" Value="ADC_RESOLUTION_12B"/>
         <PossibleValue Action="Disable" Comment="ADC 10-bit resolution" Condition="isNotAllowed_12b10b" Diagnostic="In case of usage of channels on injected group, ADC frequency should be low than AHB clock frequency /4 for resolution 12 or 10 bits." Semaphore="ADC_RESOLUTION10b_$IpInstance" Value="ADC_RESOLUTION_10B"/>
         <PossibleValue Action="Disable" Comment="ADC 8-bit resolution" Condition="isNotAllowed_8b" Diagnostic="In case of usage of channels on injected group, ADC frequency should be low than AHB clock frequency /3 for resolution 8 bits." Semaphore="ADC_RESOLUTION8b_$IpInstance" Value="ADC_RESOLUTION_8B"/>
@@ -279,12 +279,12 @@
     
      <RefParameter Comment="Data Alignment" DefaultValue="ADC_DATAALIGN_RIGHT" Group="ADCgroup" Name="DataAlign" Type="list">
         <Condition Diagnostic="" Expression="EnableRegularConversion=ENABLE &amp; InjNumberOfConversion &gt; 0 &amp; (Regular_OversamplingMode_Enabled_$IpInstance | Injected_OversamplingMode_Enabled_$IpInstance)"/>
-        <PossibleValue Comment="Right alignment" Value="ADC_DATAALIGN_RIGHT"/>
+        <PossibleValue Comment="Right alignment" Semaphore="RightAlign_$IpInstance" Value="ADC_DATAALIGN_RIGHT"/>
         <PossibleValue Action="Disable" Comment="Left alignment" Condition="Regular_OversamplingMode_Enabled_$IpInstance | Injected_OversamplingMode_Enabled_$IpInstance" Diagnostic="The alignment mode is not available when working with oversampling: the data are always provided right-aligned" Value="ADC_DATAALIGN_LEFT"/>
         <Description>Select the alignment of the data stored after conversion.</Description>
     </RefParameter>
     <RefParameter Comment="Data Alignment" DefaultValue="ADC_DATAALIGN_RIGHT" Group="ADCGroup" Name="DataAlign" Type="list">
-        <PossibleValue Comment="Right alignment" Value="ADC_DATAALIGN_RIGHT"/>
+        <PossibleValue Comment="Right alignment" Semaphore="RightAlign_$IpInstance" Value="ADC_DATAALIGN_RIGHT"/>
         <PossibleValue Comment="Left alignment" Value="ADC_DATAALIGN_LEFT"/>
         <Description>Select the alignment of the data stored after conversion.</Description>
     </RefParameter>
@@ -429,7 +429,20 @@
         <PossibleValue Comment="Overrun data overwritten" Value="ADC_OVR_DATA_OVERWRITTEN"/>
         <Description>Select the behaviour in case of overrun</Description>
     </RefParameter>
-        
+    
+    <RefParameter Comment="DFSDM transfer of ADC conversion" DefaultValue="ADC_DFSDM_MODE_ENABLE" Group="ADCGroup" Name="DFSDMConfig" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="(STM32L4 &amp;(DIE462|DIE471|DIE470))|(STM32L5 &amp;(DIE472)) &amp; DMAContinuousRequests=DISABLE &amp; ADC_RESOLUTION16b_$IpInstance &amp; RightAlign_$IpInstance &amp; Semaphore_Channel_0_DFSDM1 "/>
+        <PossibleValue Comment="Enabled" Value="ADC_DFSDM_MODE_ENABLE"/>
+        <Description>Specify whether ADC conversion data is sent directly to DFSDM</Description>
+    </RefParameter>
+    <RefParameter Comment="DFSDM transfer of ADC conversion" DefaultValue="ADC_DFSDM_MODE_DISABLE" Group="ADCGroup" Name="DFSDMConfig" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="(STM32L4 &amp;(DIE462|DIE471|DIE470))|(STM32L5 &amp;(DIE472)) &amp; Semaphore_Channel_0_DFSDM1"/>   
+        <PossibleValue Comment="Disabled" Value="ADC_DFSDM_MODE_DISABLE"/>
+        <Description>Specify whether ADC conversion data is sent directly to DFSDM</Description>
+    </RefParameter>
+    <RefParameter Comment="DFSDM transfer of ADC conversion" DefaultValue="__NULL" Group="ADCGroup" Name="DFSDMConfig" Type="list" Visible="false">
+    </RefParameter>
+
     <!-- Possible values of AutoDelay parameter -->
     <RefParameter Comment="Low Power Auto Wait" DefaultValue="DISABLE" Group="ADCGroup" Name="LowPowerAutoWait" Type="list">
         <PossibleValue Comment="Disabled" Value="DISABLE"/>
@@ -525,6 +538,7 @@
     </RefParameter>
 
     <RefParameter Visible="false" Comment="comm" DefaultValue="+ChannelVREF+|ChannelTS+|ChannelVBAT" Name="commmn" Type="list"/>
+    <RefParameter Visible="false" Comment="comm" DefaultValue="+ChannelVREF+|ChannelTS+|ChannelVBAT" Name="CommonPathInternal" Type="list"/>
 
     
      <RefParameter Comment="ChannelVREF" DefaultValue="ADC_CHANNEL_VREFINT" Name="ChannelVREF" Type="list" Visible="false">
@@ -568,7 +582,22 @@
     </RefParameter>
 	
     <RefParameter Comment="External Trigger Conversion Source" DefaultValue="ADC_SOFTWARE_START" Group="ADCGroup" Name="ExternalTrigConv" Type="list">
-        <Condition Diagnostic="" Expression="(DIE435 | DIE462)  &amp;(!ADC2_Exist)"/>
+        <Condition Diagnostic="" Expression="(DIE462)  &amp;(!ADC2_Exist)"/>
+        <PossibleValue Comment="Regular Conversion launched by software" Value="ADC_SOFTWARE_START"/>
+        <PossibleValue Action="Remove" Comment="Timer 1 Capture Compare 1 event" Condition="!TIM1_Exist" Diagnostic="" Value="ADC_EXTERNALTRIG_T1_CC1"/>
+        <PossibleValue Action="Remove" Comment="Timer 1 Capture Compare 2 event" Condition="!TIM1_Exist" Diagnostic="" Value="ADC_EXTERNALTRIG_T1_CC2"/>			
+        <PossibleValue Action="Remove" Comment="Timer 1 Capture Compare 3 event" Condition="!TIM1_Exist" Diagnostic="" Value="ADC_EXTERNALTRIG_T1_CC3"/>		
+        <PossibleValue Action="Remove" Comment="Timer 2 Capture Compare 2 event" Condition="(!TIM2_Exist)" Diagnostic="" Value="ADC_EXTERNALTRIG_T2_CC2"/>	        
+        <PossibleValue Action="Remove" Comment="Timer 1 Trigger Out event" Condition="!TIM1_Exist" Diagnostic="" Value="ADC_EXTERNALTRIG_T1_TRGO"/>
+        <PossibleValue Action="Remove" Comment="Timer 1 Trigger Out event 2" Condition="!TIM1_Exist" Diagnostic="" Value="ADC_EXTERNALTRIG_T1_TRGO2"/>		
+        <PossibleValue Action="Remove" Comment="Timer 3 Trigger Out event" Condition="!TIM3_Exist" Diagnostic="" Value="ADC_EXTERNALTRIG_T3_TRGO"/>		
+        <PossibleValue Action="Remove" Comment="Timer 2 Trigger Out event" Condition="!TIM2_Exist" Diagnostic="" Value="ADC_EXTERNALTRIG_T2_TRGO"/>	        
+        <PossibleValue Action="Remove" Comment="Timer 6 Trigger Out event" Condition="!TIM6_Exist" Diagnostic="" Value="ADC_EXTERNALTRIG_T6_TRGO"/>
+        <PossibleValue Action="Remove" Comment="Timer 15 Trigger Out event" Condition="!TIM15_Exist" Diagnostic="" Value="ADC_EXTERNALTRIG_T15_TRGO"/>
+        <Description>Select the external event used to trigger the start of conversion of a regular group</Description>
+    </RefParameter>  
+        <RefParameter Comment="External Trigger Conversion Source" DefaultValue="ADC_SOFTWARE_START" Group="ADCGroup" Name="ExternalTrigConv" Type="list">
+        <Condition Diagnostic="" Expression="(DIE435)  &amp;(!ADC2_Exist)"/>
         <PossibleValue Comment="Regular Conversion launched by software" Value="ADC_SOFTWARE_START"/>
         <PossibleValue Action="Remove" Comment="Timer 1 Capture Compare 1 event" Condition="!TIM1_Exist" Diagnostic="" Value="ADC_EXTERNALTRIG_T1_CC1"/>
         <PossibleValue Action="Remove" Comment="Timer 1 Capture Compare 2 event" Condition="!TIM1_Exist" Diagnostic="" Value="ADC_EXTERNALTRIG_T1_CC2"/>			
@@ -580,7 +609,7 @@
         <PossibleValue Action="Remove" Comment="Timer 6 Trigger Out event" Condition="!TIM6_Exist" Diagnostic="" Value="ADC_EXTERNALTRIG_T6_TRGO"/>
         <PossibleValue Action="Remove" Comment="Timer 15 Trigger Out event" Condition="!TIM15_Exist" Diagnostic="" Value="ADC_EXTERNALTRIG_T15_TRGO"/>
         <Description>Select the external event used to trigger the start of conversion of a regular group</Description>
-    </RefParameter>     
+    </RefParameter>        
     <RefParameter Comment="External Trigger Conversion Source" DefaultValue="ADC_SOFTWARE_START" Group="ADCGroup" Name="ExternalTrigConv" Type="list">
         <PossibleValue Comment="Regular Conversion launched by software" Value="ADC_SOFTWARE_START"/>
         <PossibleValue Action="Remove" Comment="Timer 1 Capture Compare 1 event" Condition="!TIM1_Exist" Diagnostic="" Value="ADC_EXTERNALTRIG_T1_CC1"/>
@@ -677,10 +706,10 @@
     <RefParameter Comment="Sampling Time" DefaultValue="null" Group="ADCChannel" Name="SamplingTime" Type="list" Visible="false">
         <Condition Diagnostic="" Expression="EnableRegularConversion=DISABLE"/>
     </RefParameter>
-    <RefParameter Comment="Sampling Time" DefaultValue="ADC_SAMPLETIME_2CYCLES_5" Group="ADCChannel" Name="SamplingTime" Type="list">
+    <RefParameter Comment="Sampling Time" DefaultValue="ADC_SAMPLETIME_6CYCLES_5" Group="ADCChannel" Name="SamplingTime" Type="list">
         <Condition Diagnostic="" Expression="DIE464 &amp; ($IpNumber=2)"/>
-        <PossibleValue Comment="2.5 Cycles" Value="ADC_SAMPLETIME_2CYCLES_5" Semaphore="S_ADC_SAMPLETIME_2CYCLES_5"/>
-        <PossibleValue Comment="3.5 Cycles" Diagnostic="This sampling time cannot be used simultaneously with the sampling time 2.5 Cycles" Condition="S_ADC_SAMPLETIME_2CYCLES_5"  Value="ADC_SAMPLETIME_3CYCLES_5"/>
+        <PossibleValue Comment="2.5 Cycles" Diagnostic="This sampling time cannot be used simultaneously with the sampling time 3.5 Cycles" Action="Disable" Condition="S_ADC_SAMPLETIME_3CYCLES_5" Value="ADC_SAMPLETIME_2CYCLES_5" Semaphore="S_ADC_SAMPLETIME_2CYCLES_5"/>
+        <PossibleValue Comment="3.5 Cycles" Diagnostic="This sampling time cannot be used simultaneously with the sampling time 2.5 Cycles" Action="Disable" Condition="S_ADC_SAMPLETIME_2CYCLES_5" Value="ADC_SAMPLETIME_3CYCLES_5" Semaphore="S_ADC_SAMPLETIME_3CYCLES_5"/>
         <PossibleValue Comment="6.5 Cycles" Value="ADC_SAMPLETIME_6CYCLES_5"/>
         <PossibleValue Comment="12.5 Cycles" Value="ADC_SAMPLETIME_12CYCLES_5"/>
         <PossibleValue Comment="24.5 Cycles" Value="ADC_SAMPLETIME_24CYCLES_5"/>
@@ -1010,10 +1039,10 @@
     <RefParameter Comment="Sampling Time" DefaultValue="null" Group="ADCChannel" Name="InjectedSamplingTime" Type="list" Visible="false">
         <Condition Diagnostic="In case of usage of channels on injected group, ADC frequency should be low than AHB clock frequency /4 for resolution 12 or 10 bits, AHB clock frequency /3 for resolution 8 bits, AHB clock frequency /2 for resolution 6 bits." Expression="EnableInjectedConversion=DISABLE"/>
     </RefParameter>
-    <RefParameter Comment="Sampling Time" DefaultValue="ADC_SAMPLETIME_2CYCLES_5" Group="ADCChannel" Name="InjectedSamplingTime" Type="list">
-         <Condition Diagnostic="" Expression="DIE464 &amp; ($IpNumber=2) |($IpNumber=1)"/>
-        <PossibleValue Comment="2.5 Cycles" Value="ADC_SAMPLETIME_2CYCLES_5"/>
-         <PossibleValue Comment="3.5 Cycles" Diagnostic="This sampling time cannot be used simultaneously with the sampling time 2.5 Cycles" Condition="S_ADC_SAMPLETIME_2CYCLES_5"  Value="ADC_SAMPLETIME_3CYCLES_5"/>
+    <RefParameter Comment="Sampling Time" DefaultValue="ADC_SAMPLETIME_6CYCLES_5" Group="ADCChannel" Name="InjectedSamplingTime" Type="list">
+        <Condition Diagnostic="" Expression="DIE464 &amp; ($IpNumber=2)"/>
+        <PossibleValue Comment="2.5 Cycles" Diagnostic="This sampling time cannot be used simultaneously with the sampling time 3.5 Cycles" Action="Disable" Condition="S_ADC_SAMPLETIME_3CYCLES_5" Value="ADC_SAMPLETIME_2CYCLES_5" Semaphore="S_ADC_SAMPLETIME_2CYCLES_5"/>
+        <PossibleValue Comment="3.5 Cycles" Diagnostic="This sampling time cannot be used simultaneously with the sampling time 2.5 Cycles" Action="Disable" Condition="S_ADC_SAMPLETIME_2CYCLES_5" Value="ADC_SAMPLETIME_3CYCLES_5" Semaphore="S_ADC_SAMPLETIME_3CYCLES_5"/>
         <PossibleValue Comment="6.5 Cycles" Value="ADC_SAMPLETIME_6CYCLES_5"/>
         <PossibleValue Comment="12.5 Cycles" Value="ADC_SAMPLETIME_12CYCLES_5"/>
         <PossibleValue Comment="24.5 Cycles" Value="ADC_SAMPLETIME_24CYCLES_5"/>

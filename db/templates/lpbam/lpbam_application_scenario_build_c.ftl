@@ -40,20 +40,34 @@
 #n
 /* Private variables -------------------------------------------------------------------------------------------------*/
 /* LPBAM variables declaration */
-    [#list Queues as QName]       
+/* USER CODE BEGIN ${LPBAM_NAME}_${ScenarioName}_Descs 0 */
+
+/* USER CODE END ${LPBAM_NAME}_${ScenarioName}_Descs 0 */
+    [#list Queues as QName]     
         [#assign Descriptors = getQueueInfo(QName, "FunctionDescriptors")]
         [#if Descriptors?? && Descriptors?is_enumerable] 
             [#list Descriptors as descr]
                 [#if descr!=""]
+[#assign descName = descr?split(" ")[1]]#n
+/* USER CODE BEGIN ${descName} */
+
+/* USER CODE END ${descName} */
 static ${descr};
                 [/#if]
             [/#list]
         [#else]
             [#if Descriptors?? && Descriptors!=""]
+/* USER CODE BEGIN ${Descriptors} */
+
+/* USER CODE END ${Descriptors} */
 static ${Descriptors};
             [/#if]
         [/#if]
     [/#list]
+#n
+/* USER CODE BEGIN ${LPBAM_NAME}_${ScenarioName}_Descs 1 */
+
+/* USER CODE END ${LPBAM_NAME}_${ScenarioName}_Descs 1 */
 #n
 /* Exported variables ------------------------------------------------------------------------------------------------*/
 /* LPBAM queues declaration */

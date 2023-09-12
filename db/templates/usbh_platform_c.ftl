@@ -18,11 +18,11 @@
 [#assign IpNameFS = ""]
 [#assign IpInstanceFS = ""]
 [#assign I2CRegFS = "0"]
-[#assign I2CAddrFS = ""]
+[#assign I2CAddrFS = "0"]
 [#assign IpNameHS = ""]
 [#assign IpInstanceHS = ""]
 [#assign I2CRegHS = "0"]
-[#assign I2CAddrHS = ""]
+[#assign I2CAddrHS = "0"]
 
 [#list BspIpDatas as SWIP] 
 [#if SWIP.ipName?contains("FS")]
@@ -117,7 +117,9 @@ void MX_DriverVbusFS(uint8_t state)
   HAL_StatusTypeDef status = HAL_OK;
   [/#if]   
   [#if IpNameFS?contains("I2C")]
-  uint8_t Component_Addr = ${I2CAddrFS} << 1;    
+  /* USER CODE BEGIN PREPARE_I2C_ADDR_VBUS_FS */
+  uint8_t Component_Addr = ${I2CAddrFS} << 1;  
+  /* USER CODE END PREPARE_I2C_ADDR_VBUS_FS */ 
   /* USER CODE BEGIN PREPARE_I2C_DATA_VBUS_FS */
   uint8_t data = state;
   /* USER CODE END PREPARE_I2C_DATA_VBUS_FS */
@@ -170,7 +172,9 @@ void MX_DriverVbusHS(uint8_t state)
   HAL_StatusTypeDef status = HAL_OK;
   [/#if]   
   [#if IpNameHS?contains("I2C")]
+   /* USER CODE BEGIN PREPARE_I2C_ADDR_VBUS_HS */
   uint8_t Component_Addr = ${I2CAddrHS} << 1;  
+  /* USER CODE END PREPARE_I2C_ADDR_VBUS_HS */ 
   /* USER CODE BEGIN PREPARE_DATA_VBUS_HS */
   uint8_t data = state;
   /* USER CODE END PREPARE_DATA_VBUS_HS */

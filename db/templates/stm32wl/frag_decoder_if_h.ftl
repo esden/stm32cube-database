@@ -10,10 +10,11 @@
   ******************************************************************************
   */
 /* USER CODE END Header */
-[#assign FRAG_MAX_NB = "0"]
-[#assign FRAG_MAX_REDUNDANCY = "0"]
-[#assign FRAG_MAX_SIZE = "0"]
-[#assign FRAG_MIN_SIZE = "0"]
+[#assign INTERNAL_LORAWAN_FUOTA = "0"]
+[#assign FRAG_MAX_NB = "17"]
+[#assign FRAG_MAX_REDUNDANCY = "2"]
+[#assign FRAG_MAX_SIZE = "120"]
+[#assign FRAG_MIN_SIZE = "40"]
 
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __FRAG_DECODER_IF_H__
@@ -24,7 +25,9 @@ extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
+[#if INTERNAL_LORAWAN_FUOTA == "1"]
 #include "sfu_fwimg_regions.h"
+[/#if]
 #include "LmhpFragmentation.h"
 
 /* USER CODE BEGIN include */
@@ -68,7 +71,7 @@ extern "C" {
   * Maximum number of fragment that can be handled.
   *
   * \remark This parameter has an impact on the memory footprint.
-  * \note FRAG_MAX_NB = (SLOT_DWL_1_END - SLOT_DWL_1_START) / FRAG_MAX_SIZE
+  * \note FRAG_MAX_NB = (FRAG_DECODER_DWL_REGION_SIZE) / FRAG_MAX_SIZE
   */
 #define FRAG_MAX_NB                                 ${FRAG_MAX_NB}
 
@@ -95,6 +98,7 @@ extern "C" {
 
 #endif /* INTEROP_TEST_MODE */
 
+[#if INTERNAL_LORAWAN_FUOTA == "1"]
 #define FRAG_DECODER_SWAP_REGION_START              ((uint32_t)(SlotStartAdd[SLOT_SWAP]))
 
 #define FRAG_DECODER_SWAP_REGION_SIZE               ((uint32_t)(SlotEndAdd[SLOT_SWAP] - SlotStartAdd[SLOT_SWAP] + 1U))
@@ -102,6 +106,15 @@ extern "C" {
 #define FRAG_DECODER_DWL_REGION_START               ((uint32_t)(SlotStartAdd[SLOT_DWL_1]))
 
 #define FRAG_DECODER_DWL_REGION_SIZE                ((uint32_t)(SlotEndAdd[SLOT_DWL_1] - SlotStartAdd[SLOT_DWL_1] + 1U))
+[#else]
+#define FRAG_DECODER_SWAP_REGION_START              (0x0803F800)
+
+#define FRAG_DECODER_SWAP_REGION_SIZE               (0x800)
+
+#define FRAG_DECODER_DWL_REGION_START               (0x0803F000)
+
+#define FRAG_DECODER_DWL_REGION_SIZE                (0x800)
+[/#if]
 
 /* USER CODE BEGIN ED */
 
@@ -178,8 +191,9 @@ void FRAG_DECODER_IF_OnProgress(uint16_t fragCounter, uint16_t fragNb, uint8_t f
   *                                                  FRAG_SESSION_FINISHED or
   *                                                  FragDecoder.Status.FragNbLost]
   * \param [IN] size   Received file size
+  * \param [out] addr  Pointer address of the unfragmented datablock
   */
-void FRAG_DECODER_IF_OnDone(int32_t status, uint32_t size);
+void FRAG_DECODER_IF_OnDone(int32_t status, uint32_t size, uint32_t *addr);
 
 #ifdef __cplusplus
 }

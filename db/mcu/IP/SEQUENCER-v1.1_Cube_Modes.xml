@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<IP xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance"
+	ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd"
+ 	xmlns="http://mcd.rou.st.com/modules.php?name=mcu"
+    DBVersion="V4.0" 
+    IPType="service"
+    IpGroup="Utilities"
+    Name="SEQUENCER"
+    Version="v1.0_Cube">
+  <About>SEQUENCER: to be completed</About>
+	
+    <RefMode Name="SEQUENCER_Enabled">
+		<ConfigForMode>SEQUENCER_Init</ConfigForMode>
+    </RefMode>
+
+    <ModeLogicOperator Name="OR">
+ 		<Mode Name="Enabled" RemoveDisable = "true">
+			<ModeLogicOperator Name="NONE">
+				<Mode Name="SEQUENCER_Enabled">
+					<SignalLogicalOp Name="AND">
+						<Signal IOMode="Basic" Name="VS_SEQUENCER"/>
+					</SignalLogicalOp>
+					<Semaphore>S_SEQUENCER$context</Semaphore>
+				</Mode>
+			</ModeLogicOperator>
+            <Condition Diagnostic="Active only if RTOS is disabled and a Connectivity MW is enabled" Expression="!(S_FREERTOS_M4 | S_FREERTOS$context | S_RTOS_M4 | S_RTOS) &amp; (S_THREAD | S_BLE_HOST | S_ZIGBEE | S_LoRaWAN | S_SubGhzPhy | S_Sigfox)"/>
+
+        </Mode>
+    </ModeLogicOperator>
+    
+    <!-- RefSignal for SEQUENCER -->
+    <RefSignal Name="VS_SEQUENCER" Virtual="true"/>
+</IP>

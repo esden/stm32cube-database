@@ -23,6 +23,7 @@
 --]
 [#assign CPUCORE = cpucore?replace("ARM_CORTEX_","C")?replace("+","PLUS")]
 [#assign SUBGHZ_APPLICATION = ""]
+[#assign INTERNAL_LORAWAN_FUOTA = "0"]
 [#if SWIPdatas??]
     [#list SWIPdatas as SWIP]
         [#if SWIP.defines??]
@@ -71,6 +72,9 @@ typedef enum
   FEAT_INFO_LORAWAN_ID,  /* = 8 : position should not change between revisions */
   FEAT_INFO_SIGFOX_ID,  /* = 9 : position should not change between revisions */
   FEAT_INFO_WMBUS_ID,  /* = 10 : position should not change between revisions */
+[#if (INTERNAL_LORAWAN_FUOTA == "1")]
+  FEAT_INFO_FLASH_ID,  /* = 11 : position should not change between revisions */
+[/#if]
   /* USER CODE BEGIN FEAT_INFO_IdTypeDef */
 
   /* USER CODE END FEAT_INFO_IdTypeDef */
@@ -116,8 +120,10 @@ typedef struct
 [#if (SUBGHZ_APPLICATION == "LORA_AT_SLAVE") || (SUBGHZ_APPLICATION == "LORA_END_NODE")|| (SUBGHZ_APPLICATION == "LORA_USER_APPLICATION")]
 #define MAX_PARAM_OF_LORAWAN_CMD_FUNCTIONS      15 /*!< Max number of parameters that the lorawan_cmd can use */
 #define MAX_PARAM_OF_LORAWAN_NOTIF_FUNCTIONS     5 /*!< Max number of parameters that the lorawan_notif can use */
+[#if (INTERNAL_LORAWAN_FUOTA == "1")]
+#define MAX_PARAM_OF_FLASH_NOTIF_FUNCTIONS       3 /*!< Max number of parameters that the flash_notif can use */
 [/#if]
-[#if (SUBGHZ_APPLICATION == "SIGFOX_AT_SLAVE")|| (SUBGHZ_APPLICATION == "SIGFOX_PUSHBUTTON")|| (SUBGHZ_APPLICATION == "SIGFOX_USER_APPLICATION")]
+[#elseif (SUBGHZ_APPLICATION == "SIGFOX_AT_SLAVE")|| (SUBGHZ_APPLICATION == "SIGFOX_PUSHBUTTON")|| (SUBGHZ_APPLICATION == "SIGFOX_USER_APPLICATION")]
 #define MAX_PARAM_OF_SIGFOX_CMD_FUNCTIONS       15 /*!< Max number of parameters that the sigfox_cmd can use */
 #define MAX_PARAM_OF_SIGFOX_NOTIF_FUNCTIONS      5 /*!< Max number of parameters that the sigfox_notif can use */
 [/#if]

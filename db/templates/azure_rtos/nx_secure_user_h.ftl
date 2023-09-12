@@ -346,6 +346,10 @@
 [/#list]
 [/#compress]
 
+/* USER CODE BEGIN 1 */
+
+/* USER CODE END 1 */
+
 /* Define various build options for the NetX Secure port.  The application should either make changes
    here by commenting or un-commenting the conditional compilation defined OR supply the defines
    though the compiler's equivalent of the -D option.  */
@@ -1026,5 +1030,9 @@
 #define NX_SECURE_TLS_SERVER_DISABLED   
 */                   
 [/#if]
+
+/* USER CODE BEGIN 2 */
+
+/* USER CODE END 2 */
 
 #endif /* NX_SECURE_USER_H */

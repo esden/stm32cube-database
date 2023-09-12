@@ -6,7 +6,7 @@
   * @author  MCD Application Team
   * @brief   This file provides an interface layer between MW and Radio Board
   ******************************************************************************
-[@common.optinclude name=mxTmpFolder+ "/license.tmp"/][#--include License text --]
+[@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
 /* USER CODE END Header */
@@ -22,12 +22,16 @@
 [/#if]
 --]
 [#assign Activate_RADIO_BOARD_INTERFACE = ""]
+[#assign STM32WL5MXX = "false"]
 [#if SWIPdatas??]
     [#list SWIPdatas as SWIP]
         [#if SWIP.defines??]
             [#list SWIP.defines as definition]
                 [#if definition.name == "Activate_RADIO_BOARD_INTERFACE"]
                     [#assign Activate_RADIO_BOARD_INTERFACE = definition.value]
+                [/#if]
+                [#if definition.name == "STM32WL5MXX"]
+                    [#assign STM32WL5MXX = definition.value]
                 [/#if]
             [/#list]
         [/#if]
@@ -77,6 +81,7 @@ int32_t RBI_Init(void)
   /* USER CODE BEGIN RBI_Init_1 */
 
   /* USER CODE END RBI_Init_1 */
+[#if STM32WL5MXX=="false"]
 [#-- RBI INIT FOR BSP DRIVER --]
 #if defined(USE_BSP_DRIVER)
   /* Important note: BSP code is board dependent
@@ -126,6 +131,9 @@ int32_t RBI_Init(void)
   /* USER CODE END RBI_Init_2 */
   return retcode;
 #endif  /* USE_BSP_DRIVER  */
+[#else][#--  STM32WL5MXX --]
+  return (int32_t) HAL_RADIO_Init();
+[/#if][#--  STM32WL5MXX --]
 }
 
 int32_t RBI_DeInit(void)
@@ -133,6 +141,7 @@ int32_t RBI_DeInit(void)
   /* USER CODE BEGIN RBI_DeInit_1 */
 
   /* USER CODE END RBI_DeInit_1 */
+[#if STM32WL5MXX=="false"]
 #if defined(USE_BSP_DRIVER)
   /* Important note: BSP code is board dependent
    * STM32WL_Nucleo code can be found
@@ -170,6 +179,9 @@ int32_t RBI_DeInit(void)
   /* USER CODE END RBI_DeInit_2 */
   return retcode;
 #endif  /* USE_BSP_DRIVER */
+[#else][#--  STM32WL5MXX --]
+  return (int32_t) HAL_RADIO_DeInit();
+[/#if][#--  STM32WL5MXX --]
 }
 
 int32_t RBI_ConfigRFSwitch(RBI_Switch_TypeDef Config)
@@ -177,6 +189,7 @@ int32_t RBI_ConfigRFSwitch(RBI_Switch_TypeDef Config)
   /* USER CODE BEGIN RBI_ConfigRFSwitch_1 */
 
   /* USER CODE END RBI_ConfigRFSwitch_1 */
+[#if STM32WL5MXX=="false"]
 #if defined(USE_BSP_DRIVER)
 
   /* Important note: BSP code is board dependent
@@ -239,6 +252,9 @@ int32_t RBI_ConfigRFSwitch(RBI_Switch_TypeDef Config)
   /* USER CODE END RBI_ConfigRFSwitch_2 */
   return retcode;
 #endif  /* USE_BSP_DRIVER */
+[#else][#--  STM32WL5MXX --]
+  return (int32_t) HAL_RADIO_SetSwitchConfig((HAL_RADIO_SwitchConfig_TypeDef) Config);
+[/#if][#--  STM32WL5MXX --]
 }
 
 int32_t RBI_GetTxConfig(void)
@@ -246,6 +262,7 @@ int32_t RBI_GetTxConfig(void)
   /* USER CODE BEGIN RBI_GetTxConfig_1 */
 
   /* USER CODE END RBI_GetTxConfig_1 */
+[#if STM32WL5MXX=="false"]
 #if defined(USE_BSP_DRIVER)
   /* Important note: BSP code is board dependent
    * STM32WL_Nucleo code can be found
@@ -269,6 +286,9 @@ int32_t RBI_GetTxConfig(void)
   /* USER CODE END RBI_GetTxConfig_2 */
   return retcode;
 #endif  /* USE_BSP_DRIVER */
+[#else][#--  STM32WL5MXX --]
+  return RBI_CONF_RFO_LP_HP;
+[/#if][#--  STM32WL5MXX --]
 }
 
 int32_t RBI_IsTCXO(void)
@@ -276,6 +296,7 @@ int32_t RBI_IsTCXO(void)
   /* USER CODE BEGIN RBI_IsTCXO_1 */
 
   /* USER CODE END RBI_IsTCXO_1 */
+[#if STM32WL5MXX=="false"]
 #if defined(USE_BSP_DRIVER)
   /* Important note: BSP code is board dependent
    * STM32WL_Nucleo code can be found
@@ -299,6 +320,9 @@ int32_t RBI_IsTCXO(void)
   /* USER CODE END RBI_IsTCXO_2 */
   return retcode;
 #endif  /* USE_BSP_DRIVER  */
+[#else][#--  STM32WL5MXX --]
+  return HAL_RADIO_IsTCXO();
+[/#if][#--  STM32WL5MXX --]
 }
 
 int32_t RBI_IsDCDC(void)
@@ -306,6 +330,7 @@ int32_t RBI_IsDCDC(void)
   /* USER CODE BEGIN RBI_IsDCDC_1 */
 
   /* USER CODE END RBI_IsDCDC_1 */
+[#if STM32WL5MXX=="false"]
 #if defined(USE_BSP_DRIVER)
   /* Important note: BSP code is board dependent
    * STM32WL_Nucleo code can be found
@@ -329,6 +354,9 @@ int32_t RBI_IsDCDC(void)
   /* USER CODE END RBI_IsDCDC_2 */
   return retcode;
 #endif  /* USE_BSP_DRIVER  */
+[#else][#--  STM32WL5MXX --]
+  return HAL_RADIO_IsDCDC();
+[/#if][#--  STM32WL5MXX --]
 }
 
 int32_t RBI_GetRFOMaxPowerConfig(RBI_RFOMaxPowerConfig_TypeDef Config)
@@ -336,6 +364,7 @@ int32_t RBI_GetRFOMaxPowerConfig(RBI_RFOMaxPowerConfig_TypeDef Config)
   /* USER CODE BEGIN RBI_GetRFOMaxPowerConfig_1 */
 
   /* USER CODE END RBI_GetRFOMaxPowerConfig_1 */
+[#if STM32WL5MXX=="false"]
 #if defined(USE_BSP_DRIVER)
   /* Important note: BSP code is board dependent
    * STM32WL_Nucleo code can be found
@@ -378,6 +407,9 @@ int32_t RBI_GetRFOMaxPowerConfig(RBI_RFOMaxPowerConfig_TypeDef Config)
   /* USER CODE END RBI_GetRFOMaxPowerConfig_2 */
   return ret;
 #endif  /* USE_BSP_DRIVER  */
+[#else][#--  STM32WL5MXX --]
+  return HAL_RADIO_GetRFOMaxPowerConfig((HAL_RADIO_RFOMaxPowerConfig_TypeDef) Config);
+[/#if][#--  STM32WL5MXX --]
 }
 /* USER CODE BEGIN EF */
 

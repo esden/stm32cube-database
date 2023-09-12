@@ -73,11 +73,11 @@ extern "C" {
 #define KMS_INDEX_BLOBIMPORT_DECRYPT      (2U)      /*!< Index in @ref KMS_PlatfObjects_EmbeddedList
                                                          where the blob decryption key is stored */
 
-/* USER CODE END KMS_PLATF_OBJECTS_CONFIG_Exported_Constants */
-
 /**
   * @}
   */
+
+/* USER CODE END KMS_PLATF_OBJECTS_CONFIG_Exported_Constants */
 
 /*
  * Embedded objects definition
@@ -94,7 +94,8 @@ extern "C" {
   * @brief  KMS embedded objects definition
   * @note   Must contains KMS blob verification and decryption keys
   */
-const kms_obj_keyhead_t * const KMS_PlatfObjects_EmbeddedList[KMS_INDEX_MAX_EMBEDDED_OBJECTS - KMS_INDEX_MIN_EMBEDDED_OBJECTS + 1] =
+const kms_obj_keyhead_t *const KMS_PlatfObjects_EmbeddedList[KMS_INDEX_MAX_EMBEDDED_OBJECTS -
+                                                             KMS_INDEX_MIN_EMBEDDED_OBJECTS + 1] =
 {
 /* USER CODE BEGIN KMS_PlatfObjects_EmbeddedList */
   (kms_obj_keyhead_t *) NULL,       /* Index = 1 */
@@ -124,7 +125,6 @@ const kms_obj_keyhead_t * const KMS_PlatfObjects_EmbeddedList[KMS_INDEX_MAX_EMBE
   * @}
   */
 #endif /* KMS_PLATF_OBJECTS_C */
-
 
 /**
   * @}

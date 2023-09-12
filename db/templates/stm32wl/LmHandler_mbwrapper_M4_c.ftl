@@ -11,7 +11,7 @@
   ******************************************************************************
   */
 /* USER CODE END Header */
-[#assign LORAWAN_FUOTA = "0"]
+[#assign INTERNAL_LORAWAN_FUOTA = "0"]
 
 /* Includes ------------------------------------------------------------------*/
 #include "platform.h"
@@ -47,14 +47,15 @@
 #define ALIGN_X( operand, alignment ) ( ((operand + (alignment - 1)) & ~(alignment - 1)) )
 #endif /* ALIGN_X */
 #define LMH_CONFIG_SIZE     (sizeof(LmHandlerParams_t))
-#define LMH_SEND_SIZE       (256 + sizeof(UTIL_TIMER_Time_t))
+#define LMH_SEND_SIZE       (256 + sizeof(LmHandlerMsgTypes_t) + sizeof(bool))
 #define LMH_GET_CLASS_SIZE  (sizeof(DeviceClass_t))
 #define LMH_EUI_SIZE        (SE_EUI_SIZE)
 #define LMH_KEY_SIZE        (SE_KEY_SIZE)
 #define LMH_REGION_SIZE     (sizeof(LoRaMacRegion_t))
 #define LMH_RX_PARAM_SIZE   (sizeof(RxChannelParams_t))
 #define LMH_BEACON_SIZE     (sizeof(BeaconState_t))
-#define LORA_MBWRAP_SHBUF_SIZE MAX(MAX(MAX(LMH_CONFIG_SIZE, LMH_SEND_SIZE), MAX(LMH_GET_CLASS_SIZE, LMH_EUI_SIZE)), MAX(MAX(LMH_KEY_SIZE, LMH_REGION_SIZE), MAX(LMH_RX_PARAM_SIZE, LMH_BEACON_SIZE)))
+#define LORA_MBWRAP_SHBUF_SIZE MAX(MAX(MAX(LMH_CONFIG_SIZE, LMH_SEND_SIZE), MAX(LMH_GET_CLASS_SIZE, LMH_EUI_SIZE)), \
+                                   MAX(MAX(LMH_KEY_SIZE, LMH_REGION_SIZE), MAX(LMH_RX_PARAM_SIZE, LMH_BEACON_SIZE)))
 
 /* USER CODE BEGIN PD */
 
@@ -283,6 +284,29 @@ LmHandlerErrorStatus_t LmHandlerHalt(void)
   /* USER CODE END LmHandlerHalt_2 */
 }
 
+bool LmHandlerIsBusy(void)
+{
+  /* USER CODE BEGIN LmHandlerIsBusy_1 */
+
+  /* USER CODE END LmHandlerIsBusy_1 */
+  MBMUX_ComParam_t *com_obj;
+  uint32_t ret;
+
+  com_obj = MBMUXIF_GetLoraFeatureCmdComPtr();
+  com_obj->MsgId = LMHANDLER_IS_BUSY_ID;
+  com_obj->ParamCnt = 0;
+
+  MBMUXIF_LoraSendCmd();
+  /* waiting for event */
+  /* once event is received and semaphore released: */
+
+  ret = com_obj->ReturnVal;
+  return (bool) ret;
+  /* USER CODE BEGIN LmHandlerIsBusy_2 */
+
+  /* USER CODE END LmHandlerIsBusy_2 */
+}
+
 LmHandlerErrorStatus_t LmHandlerSend(LmHandlerAppData_t *appData, LmHandlerMsgTypes_t isTxConfirmed,
                                      bool allowDelayedTx)
 {
@@ -336,6 +360,7 @@ void LmHandlerProcess(void)
 
   com_obj = MBMUXIF_GetLoraFeatureCmdComPtr();
   com_obj->MsgId = LMHANDLER_PROCESS_ID;
+  com_obj->ParamCnt = 0;
 
   MBMUXIF_LoraSendCmd();
   /* waiting for event */
@@ -356,6 +381,7 @@ TimerTime_t LmHandlerGetDutyCycleWaitTime(void)
 
   com_obj = MBMUXIF_GetLoraFeatureCmdComPtr();
   com_obj->MsgId = LMHANDLER_GET_DUTY_CYCLE_TIME_ID;
+  com_obj->ParamCnt = 0;
 
   MBMUXIF_LoraSendCmd();
   /* waiting for event */
@@ -372,7 +398,7 @@ LmHandlerErrorStatus_t LmHandlerRequestClass(DeviceClass_t newClass)
   /* USER CODE BEGIN LmHandlerRequestClass_1 */
 
   /* USER CODE END LmHandlerRequestClass_1 */
-[#if LORAWAN_FUOTA == "0"]
+[#if INTERNAL_LORAWAN_FUOTA == "0"]
   MBMUX_ComParam_t *com_obj;
   uint32_t *com_buffer;
   uint16_t i = 0;
@@ -402,7 +428,7 @@ LmHandlerErrorStatus_t LmHandlerGetCurrentClass(DeviceClass_t *deviceClass)
   /* USER CODE BEGIN LmHandlerGetCurrentClass_1 */
 
   /* USER CODE END LmHandlerGetCurrentClass_1 */
-[#if LORAWAN_FUOTA == "0"]
+[#if INTERNAL_LORAWAN_FUOTA == "0"]
   MBMUX_ComParam_t *com_obj;
   uint32_t *com_buffer;
   uint16_t i = 0;
@@ -442,7 +468,7 @@ LmHandlerErrorStatus_t LmHandlerGetDevEUI(uint8_t *devEUI)
   /* USER CODE BEGIN LmHandlerGetDevEUI_1 */
 
   /* USER CODE END LmHandlerGetDevEUI_1 */
-[#if LORAWAN_FUOTA == "0"]
+[#if INTERNAL_LORAWAN_FUOTA == "0"]
   MBMUX_ComParam_t *com_obj;
   uint32_t *com_buffer;
   uint16_t i = 0;
@@ -482,7 +508,7 @@ LmHandlerErrorStatus_t LmHandlerSetDevEUI(uint8_t *devEUI)
   /* USER CODE BEGIN LmHandlerSetDevEUI_1 */
 
   /* USER CODE END LmHandlerSetDevEUI_1 */
-[#if LORAWAN_FUOTA == "0"]
+[#if INTERNAL_LORAWAN_FUOTA == "0"]
   MBMUX_ComParam_t *com_obj;
   uint32_t *com_buffer;
   uint16_t i = 0;
@@ -522,7 +548,7 @@ LmHandlerErrorStatus_t LmHandlerGetAppEUI(uint8_t *appEUI)
   /* USER CODE BEGIN LmHandlerGetAppEUI_1 */
 
   /* USER CODE END LmHandlerGetAppEUI_1 */
-[#if LORAWAN_FUOTA == "0"]
+[#if INTERNAL_LORAWAN_FUOTA == "0"]
   MBMUX_ComParam_t *com_obj;
   uint32_t *com_buffer;
   uint16_t i = 0;
@@ -562,7 +588,7 @@ LmHandlerErrorStatus_t LmHandlerSetAppEUI(uint8_t *appEUI)
   /* USER CODE BEGIN LmHandlerSetAppEUI_1 */
 
   /* USER CODE END LmHandlerSetAppEUI_1 */
-[#if LORAWAN_FUOTA == "0"]
+[#if INTERNAL_LORAWAN_FUOTA == "0"]
   MBMUX_ComParam_t *com_obj;
   uint32_t *com_buffer;
   uint16_t i = 0;
@@ -597,324 +623,86 @@ LmHandlerErrorStatus_t LmHandlerSetAppEUI(uint8_t *appEUI)
   /* USER CODE END LmHandlerSetAppEUI_2 */
 }
 
-LmHandlerErrorStatus_t LmHandlerGetNwkKey(uint8_t *nwkKey)
+LmHandlerErrorStatus_t LmHandlerGetKey(KeyIdentifier_t keyID, uint8_t *key)
 {
-  /* USER CODE BEGIN LmHandlerGetNwkKey_1 */
+  /* USER CODE BEGIN LmHandlerGetKey_1 */
 
-  /* USER CODE END LmHandlerGetNwkKey_1 */
-[#if LORAWAN_FUOTA == "0"]
+  /* USER CODE END LmHandlerGetKey_1 */
+[#if INTERNAL_LORAWAN_FUOTA == "0"]
   MBMUX_ComParam_t *com_obj;
   uint32_t *com_buffer;
   uint16_t i = 0;
   uint32_t ret;
 
-  if (nwkKey == NULL)
+  if (key == NULL)
   {
     return LORAMAC_HANDLER_ERROR;
   }
 
   /* copy data from Cm4 stack memory to shared memory */
-  UTIL_MEM_cpy_8(aLoraMbWrapShareBuffer, nwkKey, SE_KEY_SIZE);
+  UTIL_MEM_cpy_8(aLoraMbWrapShareBuffer, key, SE_KEY_SIZE);
 
   com_obj = MBMUXIF_GetLoraFeatureCmdComPtr();
-  com_obj->MsgId = LMHANDLER_GET_NWKKEY_ID;
+  com_obj->MsgId = LMHANDLER_GET_KEY_ID;
   com_buffer = com_obj->ParamBuf;
+  com_buffer[i++] = (uint32_t) keyID;
   com_buffer[i++] = (uint32_t) aLoraMbWrapShareBuffer;
   com_obj->ParamCnt = i;
 
   MBMUXIF_LoraSendCmd();
   /* waiting for event */
   /* once event is received and semaphore released: */
-  UTIL_MEM_cpy_8(nwkKey, aLoraMbWrapShareBuffer, SE_KEY_SIZE);
+  UTIL_MEM_cpy_8(key, aLoraMbWrapShareBuffer, SE_KEY_SIZE);
 
   ret = com_obj->ReturnVal;
   return (LmHandlerErrorStatus_t) ret;
 [#else]
   return (LmHandlerErrorStatus_t) 0UL;
 [/#if]
-  /* USER CODE BEGIN LmHandlerGetNwkKey_2 */
+  /* USER CODE BEGIN LmHandlerGetKey_2 */
 
-  /* USER CODE END LmHandlerGetNwkKey_2 */
+  /* USER CODE END LmHandlerGetKey_2 */
 }
 
-LmHandlerErrorStatus_t LmHandlerSetNwkKey(uint8_t *nwkKey)
+LmHandlerErrorStatus_t LmHandlerSetKey(KeyIdentifier_t keyID, uint8_t *key)
 {
-  /* USER CODE BEGIN LmHandlerSetNwkKey_1 */
+  /* USER CODE BEGIN LmHandlerSetKey_1 */
 
-  /* USER CODE END LmHandlerSetNwkKey_1 */
-[#if LORAWAN_FUOTA == "0"]
+  /* USER CODE END LmHandlerSetKey_1 */
+[#if INTERNAL_LORAWAN_FUOTA == "0"]
   MBMUX_ComParam_t *com_obj;
   uint32_t *com_buffer;
   uint16_t i = 0;
   uint32_t ret;
 
-  if (nwkKey == NULL)
+  if (key == NULL)
   {
     return LORAMAC_HANDLER_ERROR;
   }
 
   /* copy data from Cm4 stack memory to shared memory */
-  UTIL_MEM_cpy_8(aLoraMbWrapShareBuffer, nwkKey, SE_KEY_SIZE);
+  UTIL_MEM_cpy_8(aLoraMbWrapShareBuffer, key, SE_KEY_SIZE);
 
   com_obj = MBMUXIF_GetLoraFeatureCmdComPtr();
-  com_obj->MsgId = LMHANDLER_SET_NWKKEY_ID;
+  com_obj->MsgId = LMHANDLER_SET_KEY_ID;
   com_buffer = com_obj->ParamBuf;
+  com_buffer[i++] = (uint32_t) keyID;
   com_buffer[i++] = (uint32_t) aLoraMbWrapShareBuffer;
   com_obj->ParamCnt = i;
 
   MBMUXIF_LoraSendCmd();
   /* waiting for event */
   /* once event is received and semaphore released: */
-  UTIL_MEM_cpy_8(nwkKey, aLoraMbWrapShareBuffer, SE_KEY_SIZE);
+  UTIL_MEM_cpy_8(key, aLoraMbWrapShareBuffer, SE_KEY_SIZE);
 
   ret = com_obj->ReturnVal;
   return (LmHandlerErrorStatus_t) ret;
 [#else]
   return (LmHandlerErrorStatus_t) 0UL;
 [/#if]
-  /* USER CODE BEGIN LmHandlerSetNwkKey_2 */
+  /* USER CODE BEGIN LmHandlerSetKey_2 */
 
-  /* USER CODE END LmHandlerSetNwkKey_2 */
-}
-
-LmHandlerErrorStatus_t LmHandlerGetAppKey(uint8_t *appKey)
-{
-  /* USER CODE BEGIN LmHandlerGetAppKey_1 */
-
-  /* USER CODE END LmHandlerGetAppKey_1 */
-[#if LORAWAN_FUOTA == "0"]
-  MBMUX_ComParam_t *com_obj;
-  uint32_t *com_buffer;
-  uint16_t i = 0;
-  uint32_t ret;
-
-  if (appKey == NULL)
-  {
-    return LORAMAC_HANDLER_ERROR;
-  }
-
-  /* copy data from Cm4 stack memory to shared memory */
-  UTIL_MEM_cpy_8(aLoraMbWrapShareBuffer, appKey, SE_KEY_SIZE);
-
-  com_obj = MBMUXIF_GetLoraFeatureCmdComPtr();
-  com_obj->MsgId = LMHANDLER_GET_APPKEY_ID;
-  com_buffer = com_obj->ParamBuf;
-  com_buffer[i++] = (uint32_t) aLoraMbWrapShareBuffer;
-  com_obj->ParamCnt = i;
-
-  MBMUXIF_LoraSendCmd();
-  /* waiting for event */
-  /* once event is received and semaphore released: */
-  UTIL_MEM_cpy_8(appKey, aLoraMbWrapShareBuffer, SE_KEY_SIZE);
-
-  ret = com_obj->ReturnVal;
-  return (LmHandlerErrorStatus_t) ret;
-[#else]
-  return (LmHandlerErrorStatus_t) 0UL;
-[/#if]
-  /* USER CODE BEGIN LmHandlerGetAppKey_2 */
-
-  /* USER CODE END LmHandlerGetAppKey_2 */
-}
-
-LmHandlerErrorStatus_t LmHandlerSetAppKey(uint8_t *appKey)
-{
-  /* USER CODE BEGIN LmHandlerSetAppKey_1 */
-
-  /* USER CODE END LmHandlerSetAppKey_1 */
-[#if LORAWAN_FUOTA == "0"]
-  MBMUX_ComParam_t *com_obj;
-  uint32_t *com_buffer;
-  uint16_t i = 0;
-  uint32_t ret;
-
-  if (appKey == NULL)
-  {
-    return LORAMAC_HANDLER_ERROR;
-  }
-
-  /* copy data from Cm4 stack memory to shared memory */
-  UTIL_MEM_cpy_8(aLoraMbWrapShareBuffer, appKey, SE_KEY_SIZE);
-
-  com_obj = MBMUXIF_GetLoraFeatureCmdComPtr();
-  com_obj->MsgId = LMHANDLER_SET_APPKEY_ID;
-  com_buffer = com_obj->ParamBuf;
-  com_buffer[i++] = (uint32_t) aLoraMbWrapShareBuffer;
-  com_obj->ParamCnt = i;
-
-  MBMUXIF_LoraSendCmd();
-  /* waiting for event */
-  /* once event is received and semaphore released: */
-  UTIL_MEM_cpy_8(appKey, aLoraMbWrapShareBuffer, SE_KEY_SIZE);
-
-  ret = com_obj->ReturnVal;
-  return (LmHandlerErrorStatus_t) ret;
-[#else]
-  return (LmHandlerErrorStatus_t) 0UL;
-[/#if]
-  /* USER CODE BEGIN LmHandlerSetAppKey_2 */
-
-  /* USER CODE END LmHandlerSetAppKey_2 */
-}
-
-LmHandlerErrorStatus_t LmHandlerGetNwkSKey(uint8_t *nwkSKey)
-{
-  /* USER CODE BEGIN LmHandlerGetNwkSKey_1 */
-
-  /* USER CODE END LmHandlerGetNwkSKey_1 */
-[#if LORAWAN_FUOTA == "0"]
-  MBMUX_ComParam_t *com_obj;
-  uint32_t *com_buffer;
-  uint16_t i = 0;
-  uint32_t ret;
-
-  if (nwkSKey == NULL)
-  {
-    return LORAMAC_HANDLER_ERROR;
-  }
-
-  /* copy data from Cm4 stack memory to shared memory */
-  UTIL_MEM_cpy_8(aLoraMbWrapShareBuffer, nwkSKey, SE_KEY_SIZE);
-
-  com_obj = MBMUXIF_GetLoraFeatureCmdComPtr();
-  com_obj->MsgId = LMHANDLER_GET_NWKSKEY_ID;
-  com_buffer = com_obj->ParamBuf;
-  com_buffer[i++] = (uint32_t) aLoraMbWrapShareBuffer;
-  com_obj->ParamCnt = i;
-
-  MBMUXIF_LoraSendCmd();
-  /* waiting for event */
-  /* once event is received and semaphore released: */
-  UTIL_MEM_cpy_8(nwkSKey, aLoraMbWrapShareBuffer, SE_KEY_SIZE);
-
-  ret = com_obj->ReturnVal;
-  return (LmHandlerErrorStatus_t) ret;
-[#else]
-  return (LmHandlerErrorStatus_t) 0UL;
-[/#if]
-  /* USER CODE BEGIN LmHandlerGetNwkSKey_2 */
-
-  /* USER CODE END LmHandlerGetNwkSKey_2 */
-}
-
-LmHandlerErrorStatus_t LmHandlerSetNwkSKey(uint8_t *nwkSKey)
-{
-  /* USER CODE BEGIN LmHandlerSetNwkSKey_1 */
-
-  /* USER CODE END LmHandlerSetNwkSKey_1 */
-[#if LORAWAN_FUOTA == "0"]
-  MBMUX_ComParam_t *com_obj;
-  uint32_t *com_buffer;
-  uint16_t i = 0;
-  uint32_t ret;
-
-  if (nwkSKey == NULL)
-  {
-    return LORAMAC_HANDLER_ERROR;
-  }
-
-  /* copy data from Cm4 stack memory to shared memory */
-  UTIL_MEM_cpy_8(aLoraMbWrapShareBuffer, nwkSKey, SE_KEY_SIZE);
-
-  com_obj = MBMUXIF_GetLoraFeatureCmdComPtr();
-  com_obj->MsgId = LMHANDLER_SET_NWKSKEY_ID;
-  com_buffer = com_obj->ParamBuf;
-  com_buffer[i++] = (uint32_t) aLoraMbWrapShareBuffer;
-  com_obj->ParamCnt = i;
-
-  MBMUXIF_LoraSendCmd();
-  /* waiting for event */
-  /* once event is received and semaphore released: */
-  UTIL_MEM_cpy_8(nwkSKey, aLoraMbWrapShareBuffer, SE_KEY_SIZE);
-
-  ret = com_obj->ReturnVal;
-  return (LmHandlerErrorStatus_t) ret;
-[#else]
-  return (LmHandlerErrorStatus_t) 0UL;
-[/#if]
-  /* USER CODE BEGIN LmHandlerSetNwkSKey_2 */
-
-  /* USER CODE END LmHandlerSetNwkSKey_2 */
-}
-
-LmHandlerErrorStatus_t LmHandlerGetAppSKey(uint8_t *appSKey)
-{
-  /* USER CODE BEGIN LmHandlerGetAppSKey_1 */
-
-  /* USER CODE END LmHandlerGetAppSKey_1 */
-[#if LORAWAN_FUOTA == "0"]
-  MBMUX_ComParam_t *com_obj;
-  uint32_t *com_buffer;
-  uint16_t i = 0;
-  uint32_t ret;
-
-  if (appSKey == NULL)
-  {
-    return LORAMAC_HANDLER_ERROR;
-  }
-
-  /* copy data from Cm4 stack memory to shared memory */
-  UTIL_MEM_cpy_8(aLoraMbWrapShareBuffer, appSKey, SE_KEY_SIZE);
-
-  com_obj = MBMUXIF_GetLoraFeatureCmdComPtr();
-  com_obj->MsgId = LMHANDLER_GET_APPSKEY_ID;
-  com_buffer = com_obj->ParamBuf;
-  com_buffer[i++] = (uint32_t) aLoraMbWrapShareBuffer;
-  com_obj->ParamCnt = i;
-
-  MBMUXIF_LoraSendCmd();
-  /* waiting for event */
-  /* once event is received and semaphore released: */
-  UTIL_MEM_cpy_8(appSKey, aLoraMbWrapShareBuffer, SE_KEY_SIZE);
-
-  ret = com_obj->ReturnVal;
-  return (LmHandlerErrorStatus_t) ret;
-[#else]
-  return (LmHandlerErrorStatus_t) 0UL;
-[/#if]
-  /* USER CODE BEGIN LmHandlerGetAppSKey_2 */
-
-  /* USER CODE END LmHandlerGetAppSKey_2 */
-}
-
-LmHandlerErrorStatus_t LmHandlerSetAppSKey(uint8_t *appSKey)
-{
-  /* USER CODE BEGIN LmHandlerSetAppSKey_1 */
-
-  /* USER CODE END LmHandlerSetAppSKey_1 */
-[#if LORAWAN_FUOTA == "0"]
-  MBMUX_ComParam_t *com_obj;
-  uint32_t *com_buffer;
-  uint16_t i = 0;
-  uint32_t ret;
-
-  if (appSKey == NULL)
-  {
-    return LORAMAC_HANDLER_ERROR;
-  }
-
-  /* copy data from Cm4 stack memory to shared memory */
-  UTIL_MEM_cpy_8(aLoraMbWrapShareBuffer, appSKey, SE_KEY_SIZE);
-
-  com_obj = MBMUXIF_GetLoraFeatureCmdComPtr();
-  com_obj->MsgId = LMHANDLER_SET_APPSKEY_ID;
-  com_buffer = com_obj->ParamBuf;
-  com_buffer[i++] = (uint32_t) aLoraMbWrapShareBuffer;
-  com_obj->ParamCnt = i;
-
-  MBMUXIF_LoraSendCmd();
-  /* waiting for event */
-  /* once event is received and semaphore released: */
-  UTIL_MEM_cpy_8(appSKey, aLoraMbWrapShareBuffer, SE_KEY_SIZE);
-
-  ret = com_obj->ReturnVal;
-  return (LmHandlerErrorStatus_t) ret;
-[#else]
-  return (LmHandlerErrorStatus_t) 0UL;
-[/#if]
-  /* USER CODE BEGIN LmHandlerSetAppSKey_2 */
-
-  /* USER CODE END LmHandlerSetAppSKey_2 */
+  /* USER CODE END LmHandlerSetKey_2 */
 }
 
 LmHandlerErrorStatus_t LmHandlerGetNetworkID(uint32_t *networkId)
@@ -922,7 +710,7 @@ LmHandlerErrorStatus_t LmHandlerGetNetworkID(uint32_t *networkId)
   /* USER CODE BEGIN LmHandlerGetNetworkID_1 */
 
   /* USER CODE END LmHandlerGetNetworkID_1 */
-[#if LORAWAN_FUOTA == "0"]
+[#if INTERNAL_LORAWAN_FUOTA == "0"]
   MBMUX_ComParam_t *com_obj;
   uint32_t *com_buffer;
   uint16_t i = 0;
@@ -942,7 +730,10 @@ LmHandlerErrorStatus_t LmHandlerGetNetworkID(uint32_t *networkId)
   MBMUXIF_LoraSendCmd();
   /* waiting for event */
   /* once event is received and semaphore released: */
-  *networkId = (aLoraMbWrapShareBuffer[3] << 24) | (aLoraMbWrapShareBuffer[2] << 16) | (aLoraMbWrapShareBuffer[1] << 8) | aLoraMbWrapShareBuffer[0];
+  *networkId = (aLoraMbWrapShareBuffer[3] << 24) |
+               (aLoraMbWrapShareBuffer[2] << 16) |
+               (aLoraMbWrapShareBuffer[1] << 8) |
+               aLoraMbWrapShareBuffer[0];
 
   ret = com_obj->ReturnVal;
   return (LmHandlerErrorStatus_t) ret;
@@ -959,7 +750,7 @@ LmHandlerErrorStatus_t LmHandlerSetNetworkID(uint32_t networkId)
   /* USER CODE BEGIN LmHandlerSetNetworkID_1 */
 
   /* USER CODE END LmHandlerSetNetworkID_1 */
-[#if LORAWAN_FUOTA == "0"]
+[#if INTERNAL_LORAWAN_FUOTA == "0"]
   MBMUX_ComParam_t *com_obj;
   uint32_t *com_buffer;
   uint16_t i = 0;
@@ -990,7 +781,7 @@ LmHandlerErrorStatus_t LmHandlerGetDevAddr(uint32_t *devAddr)
   /* USER CODE BEGIN LmHandlerGetDevAddr_1 */
 
   /* USER CODE END LmHandlerGetDevAddr_1 */
-[#if LORAWAN_FUOTA == "0"]
+[#if INTERNAL_LORAWAN_FUOTA == "0"]
   MBMUX_ComParam_t *com_obj;
   uint32_t *com_buffer;
   uint16_t i = 0;
@@ -1030,7 +821,7 @@ LmHandlerErrorStatus_t LmHandlerSetDevAddr(uint32_t devAddr)
   /* USER CODE BEGIN LmHandlerSetDevAddr_1 */
 
   /* USER CODE END LmHandlerSetDevAddr_1 */
-[#if LORAWAN_FUOTA == "0"]
+[#if INTERNAL_LORAWAN_FUOTA == "0"]
   MBMUX_ComParam_t *com_obj;
   uint32_t *com_buffer;
   uint16_t i = 0;
@@ -1061,7 +852,7 @@ LmHandlerErrorStatus_t LmHandlerGetActiveRegion(LoRaMacRegion_t *region)
   /* USER CODE BEGIN LmHandlerGetActiveRegion_1 */
 
   /* USER CODE END LmHandlerGetActiveRegion_1 */
-[#if LORAWAN_FUOTA == "0"]
+[#if INTERNAL_LORAWAN_FUOTA == "0"]
   MBMUX_ComParam_t *com_obj;
   uint32_t *com_buffer;
   uint16_t i = 0;
@@ -1101,7 +892,7 @@ LmHandlerErrorStatus_t LmHandlerSetActiveRegion(LoRaMacRegion_t region)
   /* USER CODE BEGIN LmHandlerSetActiveRegion_1 */
 
   /* USER CODE END LmHandlerSetActiveRegion_1 */
-[#if LORAWAN_FUOTA == "0"]
+[#if INTERNAL_LORAWAN_FUOTA == "0"]
   MBMUX_ComParam_t *com_obj;
   uint32_t *com_buffer;
   uint16_t i = 0;
@@ -1135,7 +926,7 @@ LmHandlerErrorStatus_t LmHandlerGetAdrEnable(bool *adrEnable)
   /* USER CODE BEGIN LmHandlerGetAdrEnable_1 */
 
   /* USER CODE END LmHandlerGetAdrEnable_1 */
-[#if LORAWAN_FUOTA == "0"]
+[#if INTERNAL_LORAWAN_FUOTA == "0"]
   MBMUX_ComParam_t *com_obj;
   uint32_t *com_buffer;
   uint16_t i = 0;
@@ -1175,7 +966,7 @@ LmHandlerErrorStatus_t LmHandlerSetAdrEnable(bool adrEnable)
   /* USER CODE BEGIN LmHandlerSetAdrEnable_1 */
 
   /* USER CODE END LmHandlerSetAdrEnable_1 */
-[#if LORAWAN_FUOTA == "0"]
+[#if INTERNAL_LORAWAN_FUOTA == "0"]
   MBMUX_ComParam_t *com_obj;
   uint32_t *com_buffer;
   uint16_t i = 0;
@@ -1206,7 +997,7 @@ LmHandlerErrorStatus_t LmHandlerGetTxDatarate(int8_t *txDatarate)
   /* USER CODE BEGIN LmHandlerGetTxDatarate_1 */
 
   /* USER CODE END LmHandlerGetTxDatarate_1 */
-[#if LORAWAN_FUOTA == "0"]
+[#if INTERNAL_LORAWAN_FUOTA == "0"]
   MBMUX_ComParam_t *com_obj;
   uint32_t *com_buffer;
   uint16_t i = 0;
@@ -1246,7 +1037,7 @@ LmHandlerErrorStatus_t LmHandlerSetTxDatarate(int8_t txDatarate)
   /* USER CODE BEGIN LmHandlerSetTxDatarate_1 */
 
   /* USER CODE END LmHandlerSetTxDatarate_1 */
-[#if LORAWAN_FUOTA == "0"]
+[#if INTERNAL_LORAWAN_FUOTA == "0"]
   MBMUX_ComParam_t *com_obj;
   uint32_t *com_buffer;
   uint16_t i = 0;
@@ -1277,7 +1068,7 @@ LmHandlerErrorStatus_t LmHandlerGetDutyCycleEnable(bool *dutyCycleEnable)
   /* USER CODE BEGIN LmHandlerGetDutyCycleEnable_1 */
 
   /* USER CODE END LmHandlerGetDutyCycleEnable_1 */
-[#if LORAWAN_FUOTA == "0"]
+[#if INTERNAL_LORAWAN_FUOTA == "0"]
   MBMUX_ComParam_t *com_obj;
   uint32_t *com_buffer;
   uint16_t i = 0;
@@ -1317,7 +1108,7 @@ LmHandlerErrorStatus_t LmHandlerSetDutyCycleEnable(bool dutyCycleEnable)
   /* USER CODE BEGIN LmHandlerSetDutyCycleEnable_1 */
 
   /* USER CODE END LmHandlerSetDutyCycleEnable_1 */
-[#if LORAWAN_FUOTA == "0"]
+[#if INTERNAL_LORAWAN_FUOTA == "0"]
   MBMUX_ComParam_t *com_obj;
   uint32_t *com_buffer;
   uint16_t i = 0;
@@ -1348,7 +1139,7 @@ LmHandlerErrorStatus_t LmHandlerGetRX2Params(RxChannelParams_t *rxParams)
   /* USER CODE BEGIN LmHandlerGetRX2Params_1 */
 
   /* USER CODE END LmHandlerGetRX2Params_1 */
-[#if LORAWAN_FUOTA == "0"]
+[#if INTERNAL_LORAWAN_FUOTA == "0"]
   MBMUX_ComParam_t *com_obj;
   uint32_t *com_buffer;
   uint16_t i = 0;
@@ -1388,7 +1179,7 @@ LmHandlerErrorStatus_t LmHandlerGetTxPower(int8_t *txPower)
   /* USER CODE BEGIN LmHandlerGetTxPower_1 */
 
   /* USER CODE END LmHandlerGetTxPower_1 */
-[#if LORAWAN_FUOTA == "0"]
+[#if INTERNAL_LORAWAN_FUOTA == "0"]
   MBMUX_ComParam_t *com_obj;
   uint32_t *com_buffer;
   uint16_t i = 0;
@@ -1428,7 +1219,7 @@ LmHandlerErrorStatus_t LmHandlerGetRx1Delay(uint32_t *rxDelay)
   /* USER CODE BEGIN LmHandlerGetRx1Delay_1 */
 
   /* USER CODE END LmHandlerGetRx1Delay_1 */
-[#if LORAWAN_FUOTA == "0"]
+[#if INTERNAL_LORAWAN_FUOTA == "0"]
   MBMUX_ComParam_t *com_obj;
   uint32_t *com_buffer;
   uint16_t i = 0;
@@ -1468,7 +1259,7 @@ LmHandlerErrorStatus_t LmHandlerGetRx2Delay(uint32_t *rxDelay)
   /* USER CODE BEGIN LmHandlerGetRx2Delay_1 */
 
   /* USER CODE END LmHandlerGetRx2Delay_1 */
-[#if LORAWAN_FUOTA == "0"]
+[#if INTERNAL_LORAWAN_FUOTA == "0"]
   MBMUX_ComParam_t *com_obj;
   uint32_t *com_buffer;
   uint16_t i = 0;
@@ -1508,7 +1299,7 @@ LmHandlerErrorStatus_t LmHandlerGetJoinRx1Delay(uint32_t *rxDelay)
   /* USER CODE BEGIN LmHandlerGetJoinRx1Delay_1 */
 
   /* USER CODE END LmHandlerGetJoinRx1Delay_1 */
-[#if LORAWAN_FUOTA == "0"]
+[#if INTERNAL_LORAWAN_FUOTA == "0"]
   MBMUX_ComParam_t *com_obj;
   uint32_t *com_buffer;
   uint16_t i = 0;
@@ -1548,7 +1339,7 @@ LmHandlerErrorStatus_t LmHandlerGetJoinRx2Delay(uint32_t *rxDelay)
   /* USER CODE BEGIN LmHandlerGetJoinRx2Delay_1 */
 
   /* USER CODE END LmHandlerGetJoinRx2Delay_1 */
-[#if LORAWAN_FUOTA == "0"]
+[#if INTERNAL_LORAWAN_FUOTA == "0"]
   MBMUX_ComParam_t *com_obj;
   uint32_t *com_buffer;
   uint16_t i = 0;
@@ -1588,7 +1379,7 @@ LmHandlerErrorStatus_t LmHandlerSetRX2Params(RxChannelParams_t *rxParams)
   /* USER CODE BEGIN LmHandlerSetRX2Params_1 */
 
   /* USER CODE END LmHandlerSetRX2Params_1 */
-[#if LORAWAN_FUOTA == "0"]
+[#if INTERNAL_LORAWAN_FUOTA == "0"]
   MBMUX_ComParam_t *com_obj;
   uint32_t *com_buffer;
   uint16_t i = 0;
@@ -1628,7 +1419,7 @@ LmHandlerErrorStatus_t LmHandlerSetTxPower(int8_t txPower)
   /* USER CODE BEGIN LmHandlerSetTxPower_1 */
 
   /* USER CODE END LmHandlerSetTxPower_1 */
-[#if LORAWAN_FUOTA == "0"]
+[#if INTERNAL_LORAWAN_FUOTA == "0"]
   MBMUX_ComParam_t *com_obj;
   uint32_t *com_buffer;
   uint16_t i = 0;
@@ -1659,7 +1450,7 @@ LmHandlerErrorStatus_t LmHandlerSetRx1Delay(uint32_t rxDelay)
   /* USER CODE BEGIN LmHandlerSetRx1Delay_1 */
 
   /* USER CODE END LmHandlerSetRx1Delay_1 */
-[#if LORAWAN_FUOTA == "0"]
+[#if INTERNAL_LORAWAN_FUOTA == "0"]
   MBMUX_ComParam_t *com_obj;
   uint32_t *com_buffer;
   uint16_t i = 0;
@@ -1690,7 +1481,7 @@ LmHandlerErrorStatus_t LmHandlerSetRx2Delay(uint32_t rxDelay)
   /* USER CODE BEGIN LmHandlerSetRx2Delay_1 */
 
   /* USER CODE END LmHandlerSetRx2Delay_1 */
-[#if LORAWAN_FUOTA == "0"]
+[#if INTERNAL_LORAWAN_FUOTA == "0"]
   MBMUX_ComParam_t *com_obj;
   uint32_t *com_buffer;
   uint16_t i = 0;
@@ -1721,7 +1512,7 @@ LmHandlerErrorStatus_t LmHandlerSetJoinRx1Delay(uint32_t rxDelay)
   /* USER CODE BEGIN LmHandlerSetJoinRx1Delay_1 */
 
   /* USER CODE END LmHandlerSetJoinRx1Delay_1 */
-[#if LORAWAN_FUOTA == "0"]
+[#if INTERNAL_LORAWAN_FUOTA == "0"]
   MBMUX_ComParam_t *com_obj;
   uint32_t *com_buffer;
   uint16_t i = 0;
@@ -1752,7 +1543,7 @@ LmHandlerErrorStatus_t LmHandlerSetJoinRx2Delay(uint32_t rxDelay)
   /* USER CODE BEGIN LmHandlerSetJoinRx2Delay_1 */
 
   /* USER CODE END LmHandlerSetJoinRx2Delay_1 */
-[#if LORAWAN_FUOTA == "0"]
+[#if INTERNAL_LORAWAN_FUOTA == "0"]
   MBMUX_ComParam_t *com_obj;
   uint32_t *com_buffer;
   uint16_t i = 0;
@@ -1783,7 +1574,7 @@ LmHandlerErrorStatus_t LmHandlerGetPingPeriodicity(uint8_t *pingPeriodicity)
   /* USER CODE BEGIN LmHandlerGetPingPeriodicity_1 */
 
   /* USER CODE END LmHandlerGetPingPeriodicity_1 */
-[#if LORAWAN_FUOTA == "0"]
+[#if INTERNAL_LORAWAN_FUOTA == "0"]
   MBMUX_ComParam_t *com_obj;
   uint32_t *com_buffer;
   uint16_t i = 0;
@@ -1823,7 +1614,7 @@ LmHandlerErrorStatus_t LmHandlerSetPingPeriodicity(uint8_t pingPeriodicity)
   /* USER CODE BEGIN LmHandlerSetPingPeriodicity_1 */
 
   /* USER CODE END LmHandlerSetPingPeriodicity_1 */
-[#if LORAWAN_FUOTA == "0"]
+[#if INTERNAL_LORAWAN_FUOTA == "0"]
   MBMUX_ComParam_t *com_obj;
   uint32_t *com_buffer;
   uint16_t i = 0;
@@ -1854,7 +1645,7 @@ LmHandlerErrorStatus_t LmHandlerGetBeaconState(BeaconState_t *beaconState)
   /* USER CODE BEGIN LmHandlerGetBeaconState_1 */
 
   /* USER CODE END LmHandlerGetBeaconState_1 */
-[#if LORAWAN_FUOTA == "0"]
+[#if INTERNAL_LORAWAN_FUOTA == "0"]
   MBMUX_ComParam_t *com_obj;
   uint32_t *com_buffer;
   uint16_t i = 0;
@@ -1894,7 +1685,7 @@ LmHandlerErrorStatus_t LmHandlerLinkCheckReq(void)
   /* USER CODE BEGIN LmHandlerLinkCheckReq_1 */
 
   /* USER CODE END LmHandlerLinkCheckReq_1 */
-[#if LORAWAN_FUOTA == "0"]
+[#if INTERNAL_LORAWAN_FUOTA == "0"]
   MBMUX_ComParam_t *com_obj;
   uint32_t ret;
 

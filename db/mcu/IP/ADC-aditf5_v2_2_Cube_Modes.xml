@@ -278,12 +278,12 @@
     
      <RefParameter Comment="Data Alignment" DefaultValue="ADC_DATAALIGN_RIGHT" Group="ADCgroup" Name="DataAlign" Type="list">
         <Condition Diagnostic="" Expression="EnableRegularConversion=ENABLE &amp; InjNumberOfConversion &gt; 0 &amp; (Regular_OversamplingMode_Enabled_$IpInstance | Injected_OversamplingMode_Enabled_$IpInstance)"/>
-        <PossibleValue Comment="Right alignment" Value="ADC_DATAALIGN_RIGHT"/>
+        <PossibleValue Comment="Right alignment" Semaphore="RightAlign_$IpInstance" Value="ADC_DATAALIGN_RIGHT"/>
         <PossibleValue Action="Disable" Comment="Left alignment" Condition="Regular_OversamplingMode_Enabled_$IpInstance | Injected_OversamplingMode_Enabled_$IpInstance" Diagnostic="The alignment mode is not available when working with oversampling: the data are always provided right-aligned" Value="ADC_DATAALIGN_LEFT"/>
         <Description>Select the alignment of the data stored after conversion.</Description>
     </RefParameter>
     <RefParameter Comment="Data Alignment" DefaultValue="ADC_DATAALIGN_RIGHT" Group="ADCGroup" Name="DataAlign" Type="list">
-        <PossibleValue Comment="Right alignment" Value="ADC_DATAALIGN_RIGHT"/>
+        <PossibleValue Comment="Right alignment" Semaphore="RightAlign_$IpInstance" Value="ADC_DATAALIGN_RIGHT"/>
         <PossibleValue Comment="Left alignment" Value="ADC_DATAALIGN_LEFT"/>
         <Description>Select the alignment of the data stored after conversion.</Description>
     </RefParameter>
@@ -427,6 +427,20 @@
         <PossibleValue Comment="Overrun data preserved" Value="ADC_OVR_DATA_PRESERVED"/>
         <PossibleValue Comment="Overrun data overwritten" Value="ADC_OVR_DATA_OVERWRITTEN"/>
         <Description>Select the behaviour in case of overrun</Description>
+    </RefParameter>
+    
+    <!-- Possible values of DFSDM transfer -->
+    <RefParameter Comment="DFSDM transfer of ADC conversion" DefaultValue="ADC_DFSDM_MODE_ENABLE" Group="ADCGroup" Name="DFSDMConfig" Type="list" Visible="false">
+     <Condition Diagnostic="" Expression="STM32L4 &amp; DIE461 &amp; DMAContinuousRequests=DISABLE &amp; ADC_RESOLUTION16b_$IpInstance &amp; RightAlign_$IpInstance &amp; Semaphore_Channel_0_DFSDM1 "/>
+        <PossibleValue Comment="Enabled" Value="ADC_DFSDM_MODE_ENABLE"/>
+        <Description>Specify whether ADC conversion data is sent directly to DFSDM</Description>
+    </RefParameter>
+    <RefParameter Comment="DFSDM transfer of ADC conversion" DefaultValue="ADC_DFSDM_MODE_DISABLE" Group="ADCGroup" Name="DFSDMConfig" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="STM32L4 &amp; DIE461 &amp; Semaphore_Channel_0_DFSDM1"/>   
+        <PossibleValue Comment="Disabled" Value="ADC_DFSDM_MODE_DISABLE"/>
+        <Description>Specify whether ADC conversion data is sent directly to DFSDM</Description>
+    </RefParameter>
+    <RefParameter Comment="DFSDM transfer of ADC conversion" DefaultValue="__NULL" Group="ADCGroup" Name="DFSDMConfig" Type="list" Visible="false">
     </RefParameter>
         
     <!-- Possible values of AutoDelay parameter -->

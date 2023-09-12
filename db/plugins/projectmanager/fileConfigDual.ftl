@@ -170,9 +170,8 @@
     <heapSize>${HeapSize}</heapSize>
     <stackSize>${StackSize}</stackSize>
 
-    [#if ide=="EWARM" || ide=="MDK-ARM"]
     <cpuclock>${cpuclock}</cpuclock>
-    [/#if]
+ 
     [#if boardName != ""]
     <board>${boardName}</board>
     [/#if]

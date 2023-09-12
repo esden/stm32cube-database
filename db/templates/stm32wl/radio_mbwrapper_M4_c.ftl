@@ -11,7 +11,7 @@
   ******************************************************************************
   */
 /* USER CODE END Header */
-[#assign LORAWAN_FUOTA = "0"]
+[#assign INTERNAL_LORAWAN_FUOTA = "0"]
 
 /* Includes ------------------------------------------------------------------*/
 #include "platform.h"
@@ -47,7 +47,7 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
-[#if LORAWAN_FUOTA == "0"]
+[#if INTERNAL_LORAWAN_FUOTA == "0"]
 static RadioEvents_t   radioevents_wrap;
 
 [/#if]
@@ -254,7 +254,7 @@ static uint32_t RadioGetTimeOnAir(RadioModems_t modem, uint32_t bandwidth,
  * \param[in] buffer     Buffer pointer
  * \param[in] size       Buffer size
  */
-static void RadioSend(uint8_t *buffer, uint8_t size);
+static radio_status_t RadioSend(uint8_t *buffer, uint8_t size);
 
 /*!
  * \brief Sets the radio in sleep mode
@@ -464,7 +464,7 @@ void Process_Radio_Notif(MBMUX_ComParam_t *ComObj)
   /* USER CODE BEGIN Process_Radio_Notif_1 */
 
   /* USER CODE END Process_Radio_Notif_1 */
-[#if LORAWAN_FUOTA == "0"]
+[#if INTERNAL_LORAWAN_FUOTA == "0"]
   uint32_t *com_buffer = ComObj->ParamBuf;
 [/#if]
   /* Radio Notif received */
@@ -473,7 +473,7 @@ void Process_Radio_Notif(MBMUX_ComParam_t *ComObj)
   /* process Command */
   switch (ComObj->MsgId)
   {
-[#if LORAWAN_FUOTA == "0"]
+[#if INTERNAL_LORAWAN_FUOTA == "0"]
     /* callbacks */
     case RADIO_TX_DONE_CB_ID:
       if (radioevents_wrap.TxDone != NULL)
@@ -557,7 +557,7 @@ static void RadioInit(RadioEvents_t *events)
   /* USER CODE BEGIN RadioInit_1 */
 
   /* USER CODE END RadioInit_1 */
-[#if LORAWAN_FUOTA == "0"]
+[#if INTERNAL_LORAWAN_FUOTA == "0"]
   MBMUX_ComParam_t *com_obj;
 
   if (events == NULL)
@@ -596,7 +596,7 @@ static RadioState_t RadioGetStatus(void)
   /* USER CODE BEGIN RadioGetStatus_1 */
 
   /* USER CODE END RadioGetStatus_1 */
-[#if LORAWAN_FUOTA == "0"]
+[#if INTERNAL_LORAWAN_FUOTA == "0"]
   MBMUX_ComParam_t *com_obj;
   uint32_t ret;
 
@@ -621,7 +621,7 @@ static void RadioSetModem(RadioModems_t modem)
   /* USER CODE BEGIN RadioSetModem_1 */
 
   /* USER CODE END RadioSetModem_1 */
-[#if LORAWAN_FUOTA == "0"]
+[#if INTERNAL_LORAWAN_FUOTA == "0"]
   MBMUX_ComParam_t *com_obj;
   uint32_t *com_buffer;
   uint16_t i = 0;
@@ -650,7 +650,7 @@ static void RadioSetChannel(uint32_t freq)
   /* USER CODE BEGIN RadioSetChannel_1 */
 
   /* USER CODE END RadioSetChannel_1 */
-[#if LORAWAN_FUOTA == "0"]
+[#if INTERNAL_LORAWAN_FUOTA == "0"]
   MBMUX_ComParam_t *com_obj;
   uint32_t *com_buffer;
   uint16_t i = 0;
@@ -679,7 +679,7 @@ static bool RadioIsChannelFree(uint32_t freq, uint32_t rxBandwidth, int16_t rssi
   /* USER CODE BEGIN RadioIsChannelFree_1 */
 
   /* USER CODE END RadioIsChannelFree_1 */
-[#if LORAWAN_FUOTA == "0"]
+[#if INTERNAL_LORAWAN_FUOTA == "0"]
   MBMUX_ComParam_t *com_obj;
   uint32_t *com_buffer;
   uint16_t i = 0;
@@ -715,7 +715,7 @@ static uint32_t RadioRandom(void)
   /* USER CODE BEGIN RadioRandom_1 */
 
   /* USER CODE END RadioRandom_1 */
-[#if LORAWAN_FUOTA == "0"]
+[#if INTERNAL_LORAWAN_FUOTA == "0"]
   MBMUX_ComParam_t *com_obj;
   uint32_t ret;
 
@@ -746,7 +746,7 @@ static void RadioSetRxConfig(RadioModems_t modem, uint32_t bandwidth,
   /* USER CODE BEGIN RadioSetRxConfig_1 */
 
   /* USER CODE END RadioSetRxConfig_1 */
-[#if LORAWAN_FUOTA == "0"]
+[#if INTERNAL_LORAWAN_FUOTA == "0"]
   MBMUX_ComParam_t *com_obj;
   uint32_t *com_buffer;
   uint16_t i = 0;
@@ -792,7 +792,7 @@ static void RadioSetTxConfig(RadioModems_t modem, int8_t power, uint32_t fdev,
   /* USER CODE BEGIN RadioSetTxConfig_1 */
 
   /* USER CODE END RadioSetTxConfig_1 */
-[#if LORAWAN_FUOTA == "0"]
+[#if INTERNAL_LORAWAN_FUOTA == "0"]
   MBMUX_ComParam_t *com_obj;
   uint32_t *com_buffer;
   uint16_t i = 0;
@@ -833,7 +833,7 @@ static bool RadioCheckRfFrequency(uint32_t frequency)
   /* USER CODE BEGIN RadioCheckRfFrequency_1 */
 
   /* USER CODE END RadioCheckRfFrequency_1 */
-[#if LORAWAN_FUOTA == "0"]
+[#if INTERNAL_LORAWAN_FUOTA == "0"]
   MBMUX_ComParam_t *com_obj;
   uint32_t *com_buffer;
   uint16_t i = 0;
@@ -869,7 +869,7 @@ static uint32_t RadioGetTimeOnAir(RadioModems_t modem, uint32_t bandwidth,
   /* USER CODE BEGIN RadioGetTimeOnAir_1 */
 
   /* USER CODE END RadioGetTimeOnAir_1 */
-[#if LORAWAN_FUOTA == "0"]
+[#if INTERNAL_LORAWAN_FUOTA == "0"]
   MBMUX_ComParam_t *com_obj;
   uint32_t *com_buffer;
   uint16_t i = 0;
@@ -904,12 +904,13 @@ static uint32_t RadioGetTimeOnAir(RadioModems_t modem, uint32_t bandwidth,
   /* USER CODE END RadioGetTimeOnAir_2 */
 }
 
-static void RadioSend(uint8_t *buffer, uint8_t size)
+static radio_status_t RadioSend(uint8_t *buffer, uint8_t size)
 {
   /* USER CODE BEGIN RadioSend_1 */
 
   /* USER CODE END RadioSend_1 */
-[#if LORAWAN_FUOTA == "0"]
+  uint32_t ret = RADIO_STATUS_OK;
+[#if INTERNAL_LORAWAN_FUOTA == "0"]
   MBMUX_ComParam_t *com_obj;
   uint32_t *com_buffer;
   uint16_t i = 0;
@@ -927,8 +928,9 @@ static void RadioSend(uint8_t *buffer, uint8_t size)
   MBMUXIF_RadioSendCmd();
   /* waiting for event */
   /* once event is received and semaphore released: */
+  ret = com_obj->ReturnVal;
 [/#if]
-  return;
+  return (radio_status_t) ret;
   /* USER CODE BEGIN RadioSend_2 */
 
   /* USER CODE END RadioSend_2 */
@@ -939,7 +941,7 @@ static void RadioSleep(void)
   /* USER CODE BEGIN RadioSleep_1 */
 
   /* USER CODE END RadioSleep_1 */
-[#if LORAWAN_FUOTA == "0"]
+[#if INTERNAL_LORAWAN_FUOTA == "0"]
   MBMUX_ComParam_t *com_obj;
 
   com_obj = MBMUXIF_GetRadioFeatureCmdComPtr();
@@ -960,7 +962,7 @@ static void RadioStandby(void)
   /* USER CODE BEGIN RadioStandby_1 */
 
   /* USER CODE END RadioStandby_1 */
-[#if LORAWAN_FUOTA == "0"]
+[#if INTERNAL_LORAWAN_FUOTA == "0"]
   MBMUX_ComParam_t *com_obj;
 
   com_obj = MBMUXIF_GetRadioFeatureCmdComPtr();
@@ -981,7 +983,7 @@ static void RadioRx(uint32_t timeout)
   /* USER CODE BEGIN RadioRx_1 */
 
   /* USER CODE END RadioRx_1 */
-[#if LORAWAN_FUOTA == "0"]
+[#if INTERNAL_LORAWAN_FUOTA == "0"]
   MBMUX_ComParam_t *com_obj;
   uint32_t *com_buffer;
   uint16_t i = 0;
@@ -1010,7 +1012,7 @@ static void RadioStartCad(void)
   /* USER CODE BEGIN RadioStartCad_1 */
 
   /* USER CODE END RadioStartCad_1 */
-[#if LORAWAN_FUOTA == "0"]
+[#if INTERNAL_LORAWAN_FUOTA == "0"]
   MBMUX_ComParam_t *com_obj;
 
   com_obj = MBMUXIF_GetRadioFeatureCmdComPtr();
@@ -1031,7 +1033,7 @@ static void RadioSetTxContinuousWave(uint32_t freq, int8_t power, uint16_t time)
   /* USER CODE BEGIN RadioSetTxContinuousWave_1 */
 
   /* USER CODE END RadioSetTxContinuousWave_1 */
-[#if LORAWAN_FUOTA == "0"]
+[#if INTERNAL_LORAWAN_FUOTA == "0"]
   MBMUX_ComParam_t *com_obj;
   uint32_t *com_buffer;
   uint16_t i = 0;
@@ -1062,7 +1064,7 @@ static int16_t RadioRssi(RadioModems_t modem)
   /* USER CODE BEGIN RadioRssi_1 */
 
   /* USER CODE END RadioRssi_1 */
-[#if LORAWAN_FUOTA == "0"]
+[#if INTERNAL_LORAWAN_FUOTA == "0"]
   MBMUX_ComParam_t *com_obj;
   uint32_t *com_buffer;
   uint16_t i = 0;
@@ -1095,7 +1097,7 @@ static void RadioWrite(uint16_t addr, uint8_t data)
   /* USER CODE BEGIN RadioWrite_1 */
 
   /* USER CODE END RadioWrite_1 */
-[#if LORAWAN_FUOTA == "0"]
+[#if INTERNAL_LORAWAN_FUOTA == "0"]
   MBMUX_ComParam_t *com_obj;
   uint32_t *com_buffer;
   uint16_t i = 0;
@@ -1125,7 +1127,7 @@ static uint8_t RadioRead(uint16_t addr)
   /* USER CODE BEGIN RadioRead_1 */
 
   /* USER CODE END RadioRead_1 */
-[#if LORAWAN_FUOTA == "0"]
+[#if INTERNAL_LORAWAN_FUOTA == "0"]
   MBMUX_ComParam_t *com_obj;
   uint32_t *com_buffer;
   uint16_t i = 0;
@@ -1158,7 +1160,7 @@ static void RadioWriteRegisters(uint16_t addr, uint8_t *buffer, uint8_t size)
   /* USER CODE BEGIN RadioWriteRegisters_1 */
 
   /* USER CODE END RadioWriteRegisters_1 */
-[#if LORAWAN_FUOTA == "0"]
+[#if INTERNAL_LORAWAN_FUOTA == "0"]
   MBMUX_ComParam_t *com_obj;
   uint32_t *com_buffer;
   uint16_t i = 0;
@@ -1189,7 +1191,7 @@ static void RadioReadRegisters(uint16_t addr, uint8_t *buffer, uint8_t size)
   /* USER CODE BEGIN RadioReadRegisters_1 */
 
   /* USER CODE END RadioReadRegisters_1 */
-[#if LORAWAN_FUOTA == "0"]
+[#if INTERNAL_LORAWAN_FUOTA == "0"]
   MBMUX_ComParam_t *com_obj;
   uint32_t *com_buffer;
   uint16_t i = 0;
@@ -1220,7 +1222,7 @@ static void RadioSetMaxPayloadLength(RadioModems_t modem, uint8_t max)
   /* USER CODE BEGIN RadioSetMaxPayloadLength_1 */
 
   /* USER CODE END RadioSetMaxPayloadLength_1 */
-[#if LORAWAN_FUOTA == "0"]
+[#if INTERNAL_LORAWAN_FUOTA == "0"]
   MBMUX_ComParam_t *com_obj;
   uint32_t *com_buffer;
   uint16_t i = 0;
@@ -1250,7 +1252,7 @@ static void RadioSetPublicNetwork(bool enable)
   /* USER CODE BEGIN RadioSetPublicNetwork_1 */
 
   /* USER CODE END RadioSetPublicNetwork_1 */
-[#if LORAWAN_FUOTA == "0"]
+[#if INTERNAL_LORAWAN_FUOTA == "0"]
   MBMUX_ComParam_t *com_obj;
   uint32_t *com_buffer;
   uint16_t i = 0;
@@ -1279,7 +1281,7 @@ static uint32_t RadioGetWakeUpTime(void)
   /* USER CODE BEGIN RadioGetWakeUpTime_1 */
 
   /* USER CODE END RadioGetWakeUpTime_1 */
-[#if LORAWAN_FUOTA == "0"]
+[#if INTERNAL_LORAWAN_FUOTA == "0"]
   MBMUX_ComParam_t *com_obj;
   uint32_t ret;
 
@@ -1304,7 +1306,7 @@ static void RadioIrqProcess(void)
   /* USER CODE BEGIN RadioIrqProcess_1 */
 
   /* USER CODE END RadioIrqProcess_1 */
-[#if LORAWAN_FUOTA == "0"]
+[#if INTERNAL_LORAWAN_FUOTA == "0"]
   MBMUX_ComParam_t *com_obj;
 
   com_obj = MBMUXIF_GetRadioFeatureCmdComPtr();
@@ -1325,7 +1327,7 @@ static void RadioRxBoosted(uint32_t timeout)
   /* USER CODE BEGIN RadioRxBoosted_1 */
 
   /* USER CODE END RadioRxBoosted_1 */
-[#if LORAWAN_FUOTA == "0"]
+[#if INTERNAL_LORAWAN_FUOTA == "0"]
   MBMUX_ComParam_t *com_obj;
   uint32_t *com_buffer;
   uint16_t i = 0;
@@ -1354,7 +1356,7 @@ static void RadioSetRxDutyCycle(uint32_t rxTime, uint32_t sleepTime)
   /* USER CODE BEGIN RadioSetRxDutyCycle_1 */
 
   /* USER CODE END RadioSetRxDutyCycle_1 */
-[#if LORAWAN_FUOTA == "0"]
+[#if INTERNAL_LORAWAN_FUOTA == "0"]
   MBMUX_ComParam_t *com_obj;
   uint32_t *com_buffer;
   uint16_t i = 0;
@@ -1384,7 +1386,7 @@ static void RadioTxPrbs(void)
   /* USER CODE BEGIN RadioTxPrbs_1 */
 
   /* USER CODE END RadioTxPrbs_1 */
-[#if LORAWAN_FUOTA == "0"]
+[#if INTERNAL_LORAWAN_FUOTA == "0"]
   MBMUX_ComParam_t *com_obj;
   uint16_t i = 0;
 
@@ -1410,7 +1412,7 @@ static void RadioTxCw(int8_t power)
   /* USER CODE BEGIN RadioTxCw_1 */
 
   /* USER CODE END RadioTxCw_1 */
-[#if LORAWAN_FUOTA == "0"]
+[#if INTERNAL_LORAWAN_FUOTA == "0"]
   MBMUX_ComParam_t *com_obj;
   uint32_t *com_buffer;
   uint16_t i = 0;
@@ -1440,7 +1442,7 @@ static int32_t RadioSetRxGenericConfig(GenericModems_t modem, RxConfigGeneric_t 
   /* USER CODE BEGIN RadioSetRxGenericConfig_1 */
 
   /* USER CODE END RadioSetRxGenericConfig_1 */
-[#if LORAWAN_FUOTA == "0"]
+[#if INTERNAL_LORAWAN_FUOTA == "0"]
   MBMUX_ComParam_t *com_obj;
   uint32_t *com_buffer;
   uint32_t ret;
@@ -1472,7 +1474,7 @@ static int32_t RadioSetTxGenericConfig(GenericModems_t modem, TxConfigGeneric_t 
   /* USER CODE BEGIN RadioSetTxGenericConfig_1 */
 
   /* USER CODE END RadioSetTxGenericConfig_1 */
-[#if LORAWAN_FUOTA == "0"]
+[#if INTERNAL_LORAWAN_FUOTA == "0"]
   MBMUX_ComParam_t *com_obj;
   uint32_t *com_buffer;
   uint32_t ret;

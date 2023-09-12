@@ -225,14 +225,23 @@
     
 	    
     <!-- ScanconvMode -->
-    <RefParameter Comment="Scan Conversion Mode" DefaultValue="ADC_SCAN_ENABLE" Group="ADCGroup" Name="ScanConvMode" Type="list">
-        <Condition Diagnostic="" Expression="(NbrOfConversion&gt;1&amp;EnableRegularConversion=ENABLE)|(InjNumberOfConversion&gt;1&amp;EnableInjectedConversion=ENABLE)"/>
-        <PossibleValue Comment="Enabled" Value="ADC_SCAN_ENABLE" Semaphore="ScanConvMode_$IpInstance"/>
-        <Description>Enable or Disable the Scan Conversion Mode</Description>
+    <RefParameter Comment="Scan Conversion Mode" DefaultValue="ADC_SCAN_ENABLE" Group="ADCgroup" Name="ScanConvMode" Type="list">
+        <Condition Diagnostic="" Expression="(Sequencer=FULLY_CONFIGURABLE)"/>
+        <PossibleValue Comment="Enabled" Value="ADC_SCAN_ENABLE"  Diagnostic="Available when NbrOfConversion is grater than 1"  Condition="(NbrOfConversion =1) " />
+        <PossibleValue Comment="Disabled" Value="ADC_SCAN_DISABLE" Diagnostic="Available when NbrOfConversion =1" Condition="(NbrOfConversion &gt;1)" />
+        <Description>Enable or Disable the Scan Conversion Mode ,
+                     To enable Scan conversion Mode : the number of Conversion should be  > 1</Description>
     </RefParameter>
-    <RefParameter Comment="Scan Conversion Mode" DefaultValue="ADC_SCAN_DISABLE" Group="ADCGroup" Name="ScanConvMode" Type="list">
-        <PossibleValue Comment="Disabled" Value="ADC_SCAN_DISABLE"/>
-        <Description>Enable or Disable the Scan Conversion Mode</Description>
+    <RefParameter Name="ScanConvMode" Comment="Scan Conversion Mode" DefaultValue="ADC_SCAN_SEQ_FIXED" Group="ADCChannel" Type="list"><!-- aligned with HAL v1.2.0-->
+        <Condition Diagnostic="" Expression="(Sequencer=NOT_FULLY_CONFIGURABLE)"/>
+        <PossibleValue Comment="Forward" Value="ADC_SCAN_SEQ_FIXED"/><!-- aligned with HAL v1.2.0-->
+        <PossibleValue Comment="Backward" Value="ADC_SCAN_SEQ_FIXED_BACKWARD"/>
+        <Description>
+            Configurable scan direction (Forward from channel 0 to 18 or Backward from channel 18 to channel 0) &lt;br&gt;
+            Vbat = channel 14 &lt;br&gt;
+            Vrefint = channel 13 &lt;br&gt;
+            TempSensor = channel 12
+        </Description>
     </RefParameter>
 	            
     <!-- Possible values of ContinuousConvMode parameter -->
@@ -1790,35 +1799,17 @@
         <!-- External channels -->
         <Mode Name="IN0MPU" UserName="IN0">
             <ModeLogicOperator Name="XOR">
-                <Mode Name="IN0-Differential" UserName="IN0 Differential">
-                    <SignalLogicalOp Name="AND">
-                        <Signal Name="IN0"/>
-                        <Signal Name="IN1"/>
-                    </SignalLogicalOp>
-                    <Semaphore>IN0Used_$IpInstance</Semaphore>
-                    <Semaphore>IN0DiffUsed_$IpInstance</Semaphore>
-                    <Condition Diagnostic="Channel1 is already used" Expression="!IN1Used_$IpInstance"/>
-                </Mode>
                 <Mode Name="IN0-Single-Ended" UserName="IN0 Single-ended">
                     <SignalLogicalOp Name="AND">
                         <Signal Name="IN0"/>
                     </SignalLogicalOp>
                 </Mode>
-            
+        
             </ModeLogicOperator>
             <Semaphore>channelSelected$IpInstance</Semaphore>
         </Mode>
         <Mode Name="IN1">
             <ModeLogicOperator Name="XOR">
-                <Mode Name="IN1-Differential" UserName="IN1 Differential">
-                    <SignalLogicalOp Name="AND">
-                        <Signal Name="IN1"/>
-                        <Signal Name="IN2"/>
-                    </SignalLogicalOp>
-                    <Semaphore>IN1Used_$IpInstance</Semaphore>
-                    <Semaphore>IN1DiffUsed_$IpInstance</Semaphore>
-                    <Condition Diagnostic="Channel2 is already used" Expression="!IN2Used_$IpInstance"/>
-                </Mode>
                 <Mode Name="IN1-Single-Ended" UserName="IN1 Single-ended">
                     <SignalLogicalOp Name="AND">
                         <Signal Name="IN1"/>
@@ -1829,16 +1820,7 @@
             <Semaphore>channelSelected$IpInstance</Semaphore>
         </Mode>
         <Mode Name="IN2">
-            <ModeLogicOperator Name="XOR">
-                <Mode Name="IN2-Differential" UserName="IN2 Differential">
-                    <SignalLogicalOp Name="AND">
-                        <Signal Name="IN2"/>
-                        <Signal Name="IN3"/>                        
-                    </SignalLogicalOp>
-                    <Semaphore>IN2Used_$IpInstance</Semaphore>
-                    <Semaphore>IN2DiffUsed_$IpInstance</Semaphore>
-                    <Condition Diagnostic="Channel3 is already used" Expression="!IN3Used_$IpInstance"/>
-                </Mode>              
+            <ModeLogicOperator Name="XOR">         
                 <Mode Name="IN2-Single-Ended" UserName="IN2 Single-ended">
                     <SignalLogicalOp Name="AND">
                         <Signal Name="IN2"/>
@@ -1851,15 +1833,7 @@
         </Mode>
         <Mode Name="IN3">
             <ModeLogicOperator Name="XOR">
-                <Mode Name="IN3-Differential" UserName="IN3 Differential">
-                    <SignalLogicalOp Name="AND">
-                        <Signal Name="IN3"/>
-                        <Signal Name="IN4"/>
-                    </SignalLogicalOp>
-                    <Semaphore>IN3DiffUsed_$IpInstance</Semaphore>
-                    <Semaphore>IN3Used_$IpInstance</Semaphore>
-                    <Condition Diagnostic="Channel4 is already used" Expression="!IN4Used_$IpInstance"/>
-                </Mode>
+               
                 <Mode Name="IN3-Single-Ended" UserName="IN3 Single-ended">
                     <SignalLogicalOp Name="AND">
                         <Signal Name="IN3"/>
@@ -1872,15 +1846,7 @@
         </Mode>
         <Mode Name="IN4">
             <ModeLogicOperator Name="XOR">
-                <Mode Name="IN4-Differential" UserName="IN4 Differential">
-                    <SignalLogicalOp Name="AND">
-                        <Signal Name="IN4"/>
-                        <Signal Name="IN5"/>
-                    </SignalLogicalOp>
-                    <Semaphore>IN4Used_$IpInstance</Semaphore>
-                    <Semaphore>IN4DiffUsed_$IpInstance</Semaphore>
-                    <Condition Diagnostic="Channel5 is already used" Expression="!IN5Used_$IpInstance"/>
-                </Mode>
+          
                 <Mode Name="IN4-Single-Ended" UserName="IN4 Single-ended">
                     <SignalLogicalOp Name="AND">
                         <Signal Name="IN4"/>
@@ -1893,15 +1859,7 @@
         </Mode>
         <Mode Name="IN5" RemoveCondition="($IpNumber=3)">
             <ModeLogicOperator Name="XOR">
-                <Mode Name="IN5-Differential" UserName="IN5 Differential">
-                    <SignalLogicalOp Name="AND">
-                        <Signal Name="IN5"/>
-                        <Signal Name="IN6"/>
-                    </SignalLogicalOp>
-                    <Semaphore>IN5Used_$IpInstance</Semaphore>
-                    <Semaphore>IN5DiffUsed_$IpInstance</Semaphore>
-                    <Condition Diagnostic="Channel6 is already used" Expression="!IN6Used_$IpInstance"/>
-                </Mode>
+               
                 <Mode Name="IN5-Single-Ended" UserName="IN5 Single-ended">
                     <SignalLogicalOp Name="AND">
                         <Signal Name="IN5"/>
@@ -1914,15 +1872,7 @@
         </Mode>
         <Mode Name="IN6">
             <ModeLogicOperator Name="XOR">
-                <Mode Name="IN6-Differential" UserName="IN6 Differential">
-                    <SignalLogicalOp Name="AND">
-                        <Signal Name="IN6"/>
-                        <Signal Name="IN7"/>
-                    </SignalLogicalOp>
-                    <Semaphore>IN6Used_$IpInstance</Semaphore>
-                    <Semaphore>IN6DiffUsed_$IpInstance</Semaphore>
-                    <Condition Diagnostic="Channel7 is already used" Expression="!IN7Used_$IpInstance"/>
-                </Mode>
+                
                 <Mode Name="IN6-Single-Ended" UserName="IN6 Single-ended">
                     <SignalLogicalOp Name="AND">
                         <Signal Name="IN6"/>
@@ -1935,16 +1885,8 @@
         </Mode>
         <Mode Name="IN7">
             <ModeLogicOperator Name="XOR">
-                <Mode Name="IN7-Differential" UserName="IN7 Differential">
-                    <SignalLogicalOp Name="AND">
-                        <Signal Name="IN7"/>
-                        <Signal Name="IN8"/>
-                    </SignalLogicalOp>
-                    <Semaphore>IN7Used_$IpInstance</Semaphore>
-                    <Semaphore>IN7DiffUsed_$IpInstance</Semaphore>
-                    <Condition Diagnostic="Channel8 is already used" Expression="!IN8Used_$IpInstance"/>
-                </Mode>
-                <Mode Name="IN7-Single-Ended" UserName="IN7 Single-ended">
+               
+                <Mode Name="IN7-Single-Ended" UserName="IN7">
                     <SignalLogicalOp Name="AND">
                         <Signal Name="IN7"/>
                     </SignalLogicalOp>
@@ -1964,16 +1906,8 @@
         </Mode>
         <Mode Name="IN8">
             <ModeLogicOperator Name="XOR">
-                <Mode Name="IN8-Differential" UserName="IN8 Differential">
-                    <SignalLogicalOp Name="AND">
-                        <Signal Name="IN8"/>
-                        <Signal Name="IN9"/>
-                    </SignalLogicalOp>
-                    <Semaphore>IN8Used_$IpInstance</Semaphore>
-                    <Semaphore>IN8DiffUsed_$IpInstance</Semaphore>
-                    <Condition Diagnostic="Channel9 is already used" Expression="!IN9Used_$IpInstance"/>
-                </Mode>
-                <Mode Name="IN8-Single-Ended" UserName="IN8 Single-ended">
+                
+                <Mode Name="IN8-Single-Ended" UserName="IN8">
                     <SignalLogicalOp Name="AND">
                         <Signal Name="IN8"/>
                     </SignalLogicalOp>
@@ -2000,15 +1934,7 @@
         </Mode>
         <Mode Name="IN9">
             <ModeLogicOperator Name="XOR">
-                <Mode Name="IN9-Differential" UserName="IN9 Differential">
-                    <SignalLogicalOp Name="AND">
-                        <Signal Name="IN9"/>
-                        <Signal Name="IN10"/>
-                    </SignalLogicalOp>
-                    <Semaphore>IN9Used_$IpInstance</Semaphore>
-                    <Semaphore>IN9DiffUsed_$IpInstance</Semaphore>
-                    <Condition Diagnostic="Channel10 is already used" Expression="!IN10Used_$IpInstance"/>
-                </Mode>
+  
                 <Mode Name="IN9-Single-Ended" UserName="IN9 Single-ended">
                     <SignalLogicalOp Name="AND">
                         <Signal Name="IN9"/>
@@ -2021,15 +1947,7 @@
         </Mode>
         <Mode Name="IN10">
             <ModeLogicOperator Name="XOR">
-                <Mode Name="IN10-Differential" UserName="IN10 Differential">
-                    <SignalLogicalOp Name="AND">
-                        <Signal Name="IN10"/>
-                        <Signal Name="IN11"/>
-                    </SignalLogicalOp>
-                    <Semaphore>IN10Used_$IpInstance</Semaphore>
-                    <Semaphore>IN10DiffUsed_$IpInstance</Semaphore>
-                    <Condition Diagnostic="Channel11 is already used" Expression="!IN11Used_$IpInstance"/>
-                </Mode>
+
                 <Mode Name="IN10-Single-Ended" UserName="IN10 Single-ended">
                     <SignalLogicalOp Name="AND">
                         <Signal Name="IN10"/>
@@ -2041,15 +1959,7 @@
         </Mode>
         <Mode Name="IN11">
             <ModeLogicOperator Name="XOR">
-                <Mode Name="IN11-Differential" UserName="IN11 Differential">
-                    <SignalLogicalOp Name="AND">
-                        <Signal Name="IN11"/>
-                        <Signal Name="IN12"/>
-                    </SignalLogicalOp>
-                    <Semaphore>IN11Used_$IpInstance</Semaphore>
-                    <Semaphore>IN11DiffUsed_$IpInstance</Semaphore>
-                    <Condition Diagnostic="Channel12 is already used" Expression="!IN12Used_$IpInstance"/>
-                </Mode>
+
                 <Mode Name="IN11-Single-Ended" UserName="IN11 Single-ended">
                     <SignalLogicalOp Name="AND">
                         <Signal Name="IN11"/>
@@ -2062,15 +1972,7 @@
         </Mode>
         <Mode Name="IN12">
             <ModeLogicOperator Name="XOR">
-                <Mode Name="IN12-Differential" UserName="IN12 Differential">
-                    <SignalLogicalOp Name="AND">
-                        <Signal Name="IN12"/>
-                        <Signal Name="IN13"/>
-                    </SignalLogicalOp>
-                    <Semaphore>IN12Used_$IpInstance</Semaphore>
-                    <Semaphore>IN12DiffUsed_$IpInstance</Semaphore>
-                    <Condition Diagnostic="Channel13 is already used" Expression="!IN13Used_$IpInstance"/>
-                </Mode>
+
                 <Mode Name="IN12-Single-Ended" UserName="IN12 Single-ended">
                     <SignalLogicalOp Name="AND">
                         <Signal Name="IN12"/>
@@ -2083,15 +1985,7 @@
         </Mode>
         <Mode Name="IN13">
             <ModeLogicOperator Name="XOR">
-                <Mode Name="IN13-Differential" UserName="IN13 Differential">
-                    <SignalLogicalOp Name="AND">
-                        <Signal Name="IN13"/>
-                        <Signal Name="IN14"/>
-                    </SignalLogicalOp>
-                    <Semaphore>IN13Used_$IpInstance</Semaphore>
-                    <Semaphore>IN13DiffUsed_$IpInstance</Semaphore>
-                    <Condition Diagnostic="Channel14 is already used" Expression="!IN14Used_$IpInstance"/>
-                </Mode>
+               
                 <Mode Name="IN13-Single-Ended" UserName="IN13 Single-ended">
                     <SignalLogicalOp Name="AND">
                         <Signal Name="IN13"/>
@@ -2104,15 +1998,7 @@
         </Mode>
         <Mode Name="IN14" RemoveCondition="($IpNumber=3)">
             <ModeLogicOperator Name="XOR">
-                <Mode Name="IN14-Differential" UserName="IN14 Differential">
-                    <SignalLogicalOp Name="AND">
-                        <Signal Name="IN14"/>
-                        <Signal Name="IN15"/>
-                    </SignalLogicalOp>
-                    <Semaphore>IN14Used_$IpInstance</Semaphore>
-                    <Semaphore>IN14DiffUsed_$IpInstance</Semaphore>
-                    <Condition Diagnostic="Channel15 is already used" Expression="!IN15Used_$IpInstance"/>
-                </Mode>
+                
                 <Mode Name="IN14-Single-Ended" UserName="IN14 Single-ended">
                     <SignalLogicalOp Name="AND">
                         <Signal Name="IN14"/>
@@ -2134,15 +2020,7 @@
         </Mode>
         <Mode Name="IN15" RemoveCondition="($IpNumber=3)">
             <ModeLogicOperator Name="XOR">
-                <Mode Name="IN15-Differential" UserName="IN15 Differential">
-                    <SignalLogicalOp Name="AND">
-                        <Signal Name="IN15"/>
-                        <Signal Name="IN16"/>
-                    </SignalLogicalOp>
-                    <Semaphore>IN15Used_$IpInstance</Semaphore>
-                    <Semaphore>IN15DiffUsed_$IpInstance</Semaphore>
-                    <Condition Diagnostic="Channel16 is already used" Expression="!IN16Used_$IpInstance"/>
-                </Mode>
+
                 <Mode Name="IN15-Single-Ended" UserName="IN15 Single-ended">
                     <SignalLogicalOp Name="AND">
                         <Signal Name="IN15"/>

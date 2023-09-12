@@ -10,13 +10,27 @@
   ******************************************************************************
   */
 /* USER CODE END Header */
+[#assign UTIL_SEQ_EN_M0 = "true"]
+[#if SWIPdatas??]
+    [#list SWIPdatas as SWIP]
+        [#if SWIP.defines??]
+            [#list SWIP.defines as definition]
+                [#if definition.name == "UTIL_SEQ_EN_M0"]
+                    [#assign UTIL_SEQ_EN_M0 = definition.value]
+                [/#if]
+            [/#list]
+        [/#if]
+    [/#list]
+[/#if]
 
 /* Includes ------------------------------------------------------------------*/
 #include "platform.h"
 #include "mbmuxif_sigfox.h"
 #include "mbmux.h"
 #include "sys_app.h"
+[#if UTIL_SEQ_EN_M0 == "true"]
 #include "stm32_seq.h"
+[/#if]
 #include "sigfox_mbwrapper.h"
 #include "utilities_def.h"
 /* USER CODE BEGIN Includes */
@@ -88,7 +102,13 @@ int8_t MBMUXIF_SigfoxInit(void)
   }
   if (ret >= 0)
   {
+[#if UTIL_SEQ_EN_M0 == "true"]
     UTIL_SEQ_RegTask((1 << CFG_SEQ_Task_MbSigfoxCmdRcv), UTIL_SEQ_RFU, MBMUXIF_TaskSigfoxCmdRcv);
+[#else]
+    /* USER CODE BEGIN MBMUXIF_SigfoxInit_OS */
+
+    /* USER CODE END MBMUXIF_SigfoxInit_OS */
+[/#if][#--  SEQUENCER --]
     ret = 0;
   }
 
@@ -120,7 +140,13 @@ void MBMUXIF_SigfoxSendNotif(void)
   /* USER CODE BEGIN MBMUXIF_SigfoxSendNotif_1 */
 
   /* USER CODE END MBMUXIF_SigfoxSendNotif_1 */
+[#if UTIL_SEQ_EN_M0 == "true"]
   UTIL_SEQ_SetTask((1 << CFG_SEQ_Task_MbSigfoxNotifRcv), CFG_SEQ_Prio_0);
+[#else]
+  /* USER CODE BEGIN MBMUXIF_SigfoxSendNotif_OS */
+
+  /* USER CODE END MBMUXIF_SigfoxSendNotif_OS */
+[/#if][#--  SEQUENCER --]
   /* USER CODE BEGIN MBMUXIF_SigfoxSendNotif_Last */
 
   /* USER CODE END MBMUXIF_SigfoxSendNotif_Last */
@@ -133,7 +159,13 @@ void MBMUXIF_SigfoxSendNotifTask(void)
   /* USER CODE END MBMUXIF_SigfoxSendNotifTask_1 */
   if (MBMUX_NotificationSnd(FEAT_INFO_SIGFOX_ID) == 0)
   {
+[#if UTIL_SEQ_EN_M0 == "true"]
     UTIL_SEQ_WaitEvt(1 << CFG_SEQ_Evt_MbSigfoxAckRcv);
+[#else]
+    /* USER CODE BEGIN MBMUXIF_SigfoxSendNotifTask_OS */
+
+    /* USER CODE END MBMUXIF_SigfoxSendNotifTask_OS */
+[/#if][#--  SEQUENCER --]
   }
   else
   {
@@ -169,7 +201,13 @@ static void MBMUXIF_IsrSigfoxAckRcvCb(void *ComObj)
   /* USER CODE BEGIN MBMUXIF_IsrSigfoxAckRcvCb_1 */
 
   /* USER CODE END MBMUXIF_IsrSigfoxAckRcvCb_1 */
+[#if UTIL_SEQ_EN_M0 == "true"]
   UTIL_SEQ_SetEvt(1 << CFG_SEQ_Evt_MbSigfoxAckRcv);
+[#else]
+  /* USER CODE BEGIN MBMUXIF_IsrLoraSigfoxRcvCb_OS */
+
+  /* USER CODE END MBMUXIF_IsrLoraSigfoxRcvCb_OS */
+[/#if][#--  SEQUENCER --]
   /* USER CODE BEGIN MBMUXIF_IsrSigfoxAckRcvCb_Last */
 
   /* USER CODE END MBMUXIF_IsrSigfoxAckRcvCb_Last */
@@ -181,7 +219,13 @@ static void MBMUXIF_IsrSigfoxCmdRcvCb(void *ComObj)
 
   /* USER CODE END MBMUXIF_IsrSigfoxCmdRcvCb_1 */
   SigfoxComObj = (MBMUX_ComParam_t *) ComObj;
+[#if UTIL_SEQ_EN_M0 == "true"]
   UTIL_SEQ_SetTask((1 << CFG_SEQ_Task_MbSigfoxCmdRcv), CFG_SEQ_Prio_0);
+[#else]
+  /* USER CODE BEGIN MBMUXIF_IsrSigfoxCmdRcvCb_OS */
+
+  /* USER CODE END MBMUXIF_IsrSigfoxCmdRcvCb_OS */
+[/#if][#--  SEQUENCER --]
   /* USER CODE BEGIN MBMUXIF_IsrSigfoxCmdRcvCb_Last */
 
   /* USER CODE END MBMUXIF_IsrSigfoxCmdRcvCb_Last */
