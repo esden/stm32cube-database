@@ -49,8 +49,9 @@
 [@common.optincludeFile path=coreDir+"Inc" name="gfxmmu_lut.h"/]
 
 [/#if]
-
+[#if Secure=="false" || TZEN=="0" ]
 [@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_inc.tmp"/][#--include freertos includes --]
+[/#if]
 
 [#-- if !HALCompliant??--][#-- if HALCompliant Begin --]
 [#assign LWIPUSed = "false"]
@@ -157,7 +158,7 @@
 #n
 /* Private typedef -----------------------------------------------------------*/
 [#if HALCompliant??]
-[#if !XCUBEFREERTOS??]
+[#if !XCUBEFREERTOS?? && (Secure=="false" || TZEN=="0")]
 [@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_typedefs.tmp"/]
 [/#if]
 [/#if]
@@ -356,7 +357,7 @@ ${dHandle};
     [#--ADD FSMC Code End--] 
     [#-- RTOS variables --]
     [#-- ADD RTOS Code Begin--]
-	[#if !XCUBEFREERTOS??]
+	[#if !XCUBEFREERTOS?? && (Secure=="false" || TZEN=="0")]
     [@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_vars.tmp"/]   
 	[/#if]
     [#-- ADD RTOS Code End--]
@@ -453,7 +454,7 @@ static void MPU_Config(void);
 	[#if OPENAMP??]
        int MX_OPENAMP_Init(int RPMsgRole, rpmsg_ns_bind_cb ns_bind_cb);
     [/#if]
-	[#if !XCUBEFREERTOS??]
+	[#if !XCUBEFREERTOS?? && (Secure=="false" || TZEN=="0")]
  [@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_pfp.tmp"/]
     [/#if]
 
@@ -926,7 +927,9 @@ int main(void)
 #n
 [#compress]
 
+[#if Secure=="false" || TZEN=="0" ]
 [@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_kernelInit.tmp"/][#-- any RTOS can include here --]
+[/#if]
 [#list voids as void]
   [#if USBPD?? && void.functionName?? && void.functionName?contains("USBPD") && !void.isNotGenerated && void.genCode] [#-- cf BZ-79321 --]
     [#lt]#t/* USBPD initialisation ---------------------------------*/
@@ -942,7 +945,7 @@ int main(void)
 [/#if]
 
 [#if HALCompliant??][#-- Put after UBSPD init to keep examples generated unchanged --]
-[#if !XCUBEFREERTOS??]
+[#if !XCUBEFREERTOS?? && (Secure=="false" || TZEN=="0")]
 [@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_obj_creat.tmp"/][#-- any RTOS can include here --]
 [/#if]
 [/#if]
@@ -969,7 +972,9 @@ int main(void)
 [/#if][#-- If FreeRtos is used --]
 #n
 
+[#if Secure=="false" || TZEN=="0" ]
  [@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_kernelStart.tmp"/]
+[/#if]
 [#if FREERTOS?? || THREADX?? || XCUBEFREERTOS??] [#-- If FreeRtos is used (should become more generic: if RTOS??) --]
   /* We should never get here as control is now taken by the scheduler */
 [/#if]
@@ -1572,7 +1577,7 @@ static void MX_NVIC_Init(void)
 /* USER CODE END 4 */
 #n
 [#if HALCompliant??] [#-- If FreeRtos is used (and tmp files included in the main) --]
-[#if !XCUBEFREERTOS??]
+[#if !XCUBEFREERTOS?? && (Secure=="false" || TZEN=="0")]
 [@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_default_thread.tmp"/]
 [@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_threads.tmp"/]
 [@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_callbacks.tmp"/]
