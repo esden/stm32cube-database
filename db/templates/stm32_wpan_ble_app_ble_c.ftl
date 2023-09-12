@@ -12,7 +12,7 @@
 /* USER CODE END Header */
 [#assign BLE_TRANSPARENT_MODE_UART = 0]
 [#assign BLE_TRANSPARENT_MODE_VCP = 0]
-[#assign BT_SIG_BEACON = 0]
+[#assign BT_SIG_BEACON = "0"]
 [#assign BT_SIG_BLOOD_PRESSURE_SENSOR = 0]
 [#assign BT_SIG_HEALTH_THERMOMETER_SENSOR = 0]
 [#assign BT_SIG_HEART_RATE_SENSOR = 0]
@@ -151,8 +151,8 @@
             [#if (definition.name == "BLE_TRANSPARENT_MODE_VCP") && (definition.value == "Enabled")]
                 [#assign BLE_TRANSPARENT_MODE_VCP = 1]
             [/#if]
-            [#if (definition.name == "BT_SIG_BEACON") && (definition.value == "Enabled")]
-                [#assign BT_SIG_BEACON = 1]
+            [#if (definition.name == "BT_SIG_BEACON") && (definition.value != "Disabled")]
+                [#assign BT_SIG_BEACON = definition.value]
             [/#if]
             [#if (definition.name == "BT_SIG_BLOOD_PRESSURE_SENSOR") && (definition.value == "Enabled")]
                 [#assign BT_SIG_BLOOD_PRESSURE_SENSOR = 1]
@@ -614,7 +614,7 @@
 #include "shci.h"
 #include "stm32_lpm.h"
 #include "otp.h"
-[#if  (BT_SIG_BEACON = 1)]
+[#if  (BT_SIG_BEACON != "0")]
 #include "eddystone_beacon.h"
 #include "eddystone_uid_service.h"
 #include "eddystone_url_service.h"
@@ -670,18 +670,6 @@ typedef struct _tSecurityParams
    * bonding mode of the device
    */
   uint8_t bonding_mode;
-
-  /**
-   * Flag to tell whether OOB data has
-   * to be used during the pairing process
-   */
-  uint8_t OOB_Data_Present; 
-
-  /**
-   * OOB data to be used in the pairing process if
-   * OOB_Data_Present is set to TRUE
-   */
-  uint8_t OOB_Data[16]; 
 
   /**
    * this variable indicates whether to use a fixed pin
@@ -772,7 +760,7 @@ typedef struct
   BleGlobalContext_t BleApplicationContext_legacy;
   APP_BLE_ConnStatus_t Device_Connection_Status;
 
-[#if (BT_SIG_BEACON = 1) || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1)|| (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)|| (BT_SIG_HEART_RATE_SENSOR = 1)|| (CUSTOM_OTA = 1)|| (CUSTOM_P2P_SERVER = 1)]
+[#if (BT_SIG_BEACON != "0") || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1)|| (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)|| (BT_SIG_HEART_RATE_SENSOR = 1)|| (CUSTOM_OTA = 1)|| (CUSTOM_P2P_SERVER = 1)]
   /**
    * ID of the Advertising Timeout
    */
@@ -792,7 +780,7 @@ typedef struct
 [#if (CUSTOM_TEMPLATE = 0)]
 #define APPBLE_GAP_DEVICE_NAME_LENGTH 7
 [/#if]
-[#if  (BT_SIG_BEACON = 1)]
+[#if  (BT_SIG_BEACON != "0")]
   /**
   * Boot Mode:    1 (OTA)
   * Sector Index: 6
@@ -844,10 +832,10 @@ static const uint8_t BLE_CFG_IR_VALUE[16] = CFG_BLE_IRK;
 */
 static const uint8_t BLE_CFG_ER_VALUE[16] = CFG_BLE_ERK;
 
-[#if  (BT_SIG_BEACON = 1)]
+[#if  (BT_SIG_BEACON != "0")]
 static uint8_t sector_type;
 [/#if]
-[#if  (BT_SIG_BEACON = 1) || (BT_SIG_HEART_RATE_SENSOR = 1) || (CUSTOM_P2P_SERVER = 1) || (CUSTOM_TEMPLATE = 1)]
+[#if  (BT_SIG_BEACON != "0") || (BT_SIG_HEART_RATE_SENSOR = 1) || (CUSTOM_P2P_SERVER = 1) || (CUSTOM_TEMPLATE = 1)]
 /**
  * These are the two tags used to manage a power failure during OTA
  * The MagicKeywordAdress shall be mapped @0x140 from start of the binary image
@@ -1133,7 +1121,7 @@ static void BLE_StatusNot( HCI_TL_CmdStatus_t status );
 static void Ble_Tl_Init( void );
 static void Ble_Hci_Gap_Gatt_Init(void);
 static const uint8_t* BleGetBdAddress( void );
-[#if  (BT_SIG_BEACON = 1)]
+[#if  (BT_SIG_BEACON != "0")]
 static void Beacon_Update( void );
 [/#if]
 [#if  (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)
@@ -1215,7 +1203,10 @@ void APP_BLE_Init( void )
   /**
    * Starts the BLE Stack on CPU2
    */
-  SHCI_C2_BLE_Init( &ble_init_cmd_packet );
+  if (SHCI_C2_BLE_Init( &ble_init_cmd_packet ) != SHCI_Success)
+  {
+    Error_Handler();
+  }
 
   /**
    * Initialization of HCI & GATT & GAP layer
@@ -1240,7 +1231,7 @@ void APP_BLE_Init( void )
   /**
    * From here, all initialization are BLE application specific
    */
-[#if  (BT_SIG_BEACON = 1)]
+[#if  (BT_SIG_BEACON != "0")]
   UTIL_SEQ_RegTask( 1<<CFG_TASK_BEACON_UPDATE_REQ_ID, UTIL_SEQ_RFU, Beacon_Update);
 [/#if]
 [#if  (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_HEART_RATE_SENSOR = 1)]
@@ -1352,7 +1343,7 @@ void APP_BLE_Init( void )
   /**
    * Make device discoverable
    */
-[#if  (BT_SIG_BEACON = 1)]
+[#if  (BT_SIG_BEACON != "0")]
   if (CFG_BEACON_TYPE & CFG_EDDYSTONE_UID_BEACON_TYPE)
   {
     APP_DBG_MSG("Eddystone UID beacon advertize\n");
@@ -1429,7 +1420,7 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification( void *pckt )
   hci_event_pckt *event_pckt;
   evt_le_meta_event *meta_evt;
   evt_blue_aci *blue_evt;
-[#if  (BT_SIG_BEACON = 0) && ((BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)
+[#if  (BT_SIG_BEACON = "0") && ((BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)
  || (BT_SIG_HEART_RATE_SENSOR = 1) ||(CUSTOM_P2P_SERVER = 1))]
   hci_le_phy_update_complete_event_rp0 *evt_le_phy_update_complete; 
   uint8_t TX_PHY, RX_PHY;
@@ -1679,7 +1670,7 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification( void *pckt )
         case EVT_BLUE_GAP_NUMERIC_COMPARISON_VALUE:
             evt_numeric_value = (aci_gap_numeric_comparison_value_event_rp0 *)blue_evt->data;
             numeric_value = evt_numeric_value->Numeric_Value;
-            APP_DBG_MSG("numeric_value = %x\n", numeric_value);
+            APP_DBG_MSG("numeric_value = %lx\n", numeric_value);
             aci_gap_numeric_comparison_value_confirm_yesno(BleApplicationContext.BleApplicationContext_legacy.connectionHandle, YES);
         break;
         
@@ -1745,10 +1736,6 @@ static void Ble_Tl_Init( void )
 static void Ble_Hci_Gap_Gatt_Init(void){
 
   uint8_t role;
-[#if (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)
- || (BT_SIG_HEART_RATE_SENSOR = 1) || (CUSTOM_P2P_SERVER = 1) || (CUSTOM_TEMPLATE = 1)]
-  uint8_t index;
-[/#if]
   uint16_t gap_service_handle, gap_dev_name_char_handle, gap_appearance_char_handle;
   const uint8_t *bd_addr;
   uint32_t srd_bd_addr[2];
@@ -1769,7 +1756,7 @@ static void Ble_Hci_Gap_Gatt_Init(void){
                             CONFIG_DATA_PUBADDR_LEN,
                             (uint8_t*) bd_addr);
 
-[#if (BT_SIG_BEACON = 1) || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)]
+[#if (BT_SIG_BEACON != "0") || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)]
   /**
    * Static random Address
    * The two upper bits shall be set to 1
@@ -1909,16 +1896,11 @@ static void Ble_Hci_Gap_Gatt_Init(void){
    * Initialize authentication
    */
   BleApplicationContext.BleApplicationContext_legacy.bleSecurityParam.mitm_mode = CFG_MITM_PROTECTION;
-  BleApplicationContext.BleApplicationContext_legacy.bleSecurityParam.OOB_Data_Present = 0;
   BleApplicationContext.BleApplicationContext_legacy.bleSecurityParam.encryptionKeySizeMin = CFG_ENCRYPTION_KEY_SIZE_MIN;
   BleApplicationContext.BleApplicationContext_legacy.bleSecurityParam.encryptionKeySizeMax = CFG_ENCRYPTION_KEY_SIZE_MAX;
   BleApplicationContext.BleApplicationContext_legacy.bleSecurityParam.Use_Fixed_Pin = CFG_USED_FIXED_PIN;
   BleApplicationContext.BleApplicationContext_legacy.bleSecurityParam.Fixed_Pin = CFG_FIXED_PIN;
   BleApplicationContext.BleApplicationContext_legacy.bleSecurityParam.bonding_mode = CFG_BONDING_MODE;
-  for (index = 0; index < 16; index++)
-  {
-    BleApplicationContext.BleApplicationContext_legacy.bleSecurityParam.OOB_Data[index] = (uint8_t) index;
-  }
 
   aci_gap_set_authentication_requirement(BleApplicationContext.BleApplicationContext_legacy.bleSecurityParam.bonding_mode,
                                          BleApplicationContext.BleApplicationContext_legacy.bleSecurityParam.mitm_mode,
@@ -1940,7 +1922,7 @@ static void Ble_Hci_Gap_Gatt_Init(void){
    }
 [/#if]
 }
-[#if (BT_SIG_BEACON = 1)]
+[#if (BT_SIG_BEACON != "0")]
 static void Beacon_Update( void )
 {
   FLASH_EraseInitTypeDef erase;
@@ -2279,7 +2261,7 @@ static void Adv_Cancel( void )
   return;
 }
 
-[#if (BT_SIG_BEACON = 1) || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1)|| (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)|| (BT_SIG_HEART_RATE_SENSOR = 1)|| (CUSTOM_OTA = 1)|| (CUSTOM_P2P_SERVER = 1)]
+[#if (BT_SIG_BEACON != "0") || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1)|| (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)|| (BT_SIG_HEART_RATE_SENSOR = 1)|| (CUSTOM_OTA = 1)|| (CUSTOM_P2P_SERVER = 1)]
 static void Adv_Cancel_Req( void )
 {
 /* USER CODE BEGIN Adv_Cancel_Req_1 */

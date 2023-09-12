@@ -108,6 +108,32 @@
 
 /* USER CODE END PFP */
 
+/**
+  * @brief Software Device Connection
+  * @param hpcd: PCD handle
+  * @param state: Connection state (0: disconnected / 1: connected)
+  * @retval None
+  */
+#if (USE_HAL_PCD_REGISTER_CALLBACKS == 1U)
+static void PCDEx_SetConnectionState(PCD_HandleTypeDef *hpcd, uint8_t state)
+#else
+void HAL_PCDEx_SetConnectionState(PCD_HandleTypeDef *hpcd, uint8_t state)
+#endif /* USE_HAL_PCD_REGISTER_CALLBACKS */
+{
+  /* USER CODE BEGIN 6 */
+  if (state == 1)
+  {
+    /*  DP Pull-Down is Internal */
+    __HAL_SYSCFG_USBPULLUP_ENABLE();
+  }
+  else
+  {
+    /*  DP Pull-Down is Internal */
+    __HAL_SYSCFG_USBPULLUP_DISABLE();
+  }
+  /* USER CODE END 6 */
+}
+
 /* Private functions ---------------------------------------------------------*/
 static USBD_StatusTypeDef USBD_Get_USB_Status(HAL_StatusTypeDef hal_status);
 /* USER CODE BEGIN 1 */

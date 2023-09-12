@@ -11,6 +11,9 @@
 /* USER CODE END Header */
 
 [#compress]
+[#if cpucore!="" && (contextFolder=="" || contextFolder=="/")]
+[#assign contextFolder = cpucore?replace("ARM_CORTEX_","C")?replace("+","PLUS")+"/"]
+[/#if]
 [#assign inMain = 0]
 [#assign useNewHandle = 0]
 [#assign useTimers = 0]
@@ -18,7 +21,7 @@
 
 [#list SWIPdatas as SWIP]
   [#if SWIP.variables??]
-    [#list SWIP.variables as variable]	
+    [#list SWIP.variables as variable]
       [#if variable.name=="HALCompliant"]
         [#assign inMain = 1]
       [/#if]
@@ -50,7 +53,35 @@
 [/#compress]
 
 [#if inMain == 0]
-[@common.optinclude name=mxTmpFolder+"/rtos_inc.tmp"/][#--include freertos includes --]
+[@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_inc.tmp"/][#--include freertos includes --]
+[#-- BZ 94144: Here we should add (as in main template) the includes needed when the code is generated in a pair of .c/.h files --]
+ [#list SWIPdatas as SWIP]
+  [#if SWIP.variables??]
+    [#list SWIP.variables as variable]
+      [#if variable.name=="MiddlewareInUse"]
+        [#assign s = variable.valueList]
+        [#assign index = 0] 
+        [#list s as i] 
+          [#if index == 0]
+            [#assign mw = i]
+          [/#if]
+          [#assign index = index + 1]
+        [/#list]
+        [#-- specific cases to be handled hereafter: --]  
+        [#if mw == "LoRaWAN"]  
+#include "app_lorawan.h" 
+        [/#if]
+        [#if mw == "Sigfox"]
+#include "app_sigfox.h"
+        [/#if]
+        [#if mw == "SubGHz_Phy"]
+#include "app_subghz_phy.h"
+        [/#if]
+      [/#if] [#-- end if variable.name=="MiddlewareInUse"--]  
+    [/#list]
+  [/#if]
+ [/#list]
+[#-- BZ 94144 --]
 [/#if]
 
 /* Private includes ----------------------------------------------------------*/
@@ -59,6 +90,9 @@
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
+[#if inMain == 0]
+[@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_typedefs.tmp"/]
+[/#if]
 /* USER CODE BEGIN PTD */
 
 /* USER CODE END PTD */
@@ -78,7 +112,7 @@
 
 /* USER CODE END Variables */
 [#if inMain == 0]
-[@common.optinclude name=mxTmpFolder+"/rtos_vars.tmp"/]
+[@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_vars.tmp"/]
 [/#if]
 
 /* Private function prototypes -----------------------------------------------*/
@@ -88,7 +122,7 @@
 [#compress]
 #n
 [#if inMain == 0]
-[@common.optinclude name=mxTmpFolder+"/rtos_pfp.tmp"/]
+[@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_pfp.tmp"/]
 #n
   [#list SWIPdatas as SWIP]
     [#if SWIP.variables??]
@@ -114,15 +148,8 @@ void MX_FREERTOS_Init(void);  /* (MISRA C 2004 rule 8.1) */
 [/#if]
 
 [#list SWIPdatas as SWIP]
-  [#if SWIP.defines??]     
+  [#if SWIP.defines??]
     [#list SWIP.defines as definition]
-      [#if definition.name=="configUSE_TICKLESS_IDLE"]
-        [#if definition.value=="1"]
-#n/* Pre/Post sleep processing prototypes */
-void PreSleepProcessing(uint32_t *ulExpectedIdleTime);
-void PostSleepProcessing(uint32_t *ulExpectedIdleTime);
-        [/#if]
-      [/#if]
       [#if definition.name=="MEMORY_ALLOCATION"]
         [#if definition.value!="0"] [#--Not "Dynamic" alone --]
 #n/* GetIdleTaskMemory prototype (linked to static allocation support) */
@@ -407,11 +434,11 @@ void MX_FREERTOS_Init(void) {
 #t/* USER CODE BEGIN Init */
 #t     
 #t/* USER CODE END Init */
-[@common.optinclude name=mxTmpFolder+"/rtos_obj_creat.tmp"/]
+[@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_obj_creat.tmp"/]
 }
-[@common.optinclude name=mxTmpFolder+"/rtos_default_thread.tmp"/]
-[@common.optinclude name=mxTmpFolder+"/rtos_threads.tmp"/] 
-[@common.optinclude name=mxTmpFolder+"/rtos_callbacks.tmp"/]
+[@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_default_thread.tmp"/]
+[@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_threads.tmp"/]
+[@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_callbacks.tmp"/]
 [/#if]  
 
 /* Private application code --------------------------------------------------*/

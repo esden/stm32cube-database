@@ -18,7 +18,7 @@
  extern "C" {
 #endif 
 
-[#-- SWIPdatas is a list of SWIPconfigModel --]  
+[#-- SWIPdatas is a list of SWIPconfigModel --]
 [#list SWIPdatas as SWIP]
     [#if SWIP.defines??]
         [#list SWIP.defines as definition]

@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<IP DBVersion="V4.0" 
+  IPType="peripheral" 
+  Name="USB_DRD_FS" 
+  Version="usb2_v1_0_Cube" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" 
+  ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd" 
+  xmlns="http://mcd.rou.st.com/modules.php?name=mcu">
+	
+	<About>USB: Universal Serial Bus</About>
+	
+	<!-- Generic RefParameters for USB Full Speed Device Mode -->
+	<RefParameter Name="Instance" DefaultValue="USB_DRD_FS" Comment="Instance" Type="" Visible="false"/>
+			
+	<RefParameter Comment="Speed" DefaultValue="USB_DRD_SPEED_FS" Name="DeviceSpeed" Type="List" Group="Basic Parameters">			
+		<PossibleValue Comment="Full Speed 12MBit/s" Value="USB_DRD_SPEED_FS"/>	
+		<PossibleValue Comment="Low Speed 1.5MBit/s" Value="USB_DRD_SPEED_LS"/>			
+	</RefParameter>
+	
+	<RefParameter Comment="Device endpoints number" DefaultValue="8" Name="dev_endpoints" Min="1" Max="8" Type="integer" Group="" Visible="false">				
+	</RefParameter>				
+	
+	<RefParameter Comment="Host channel number" DefaultValue="8" Name="Host_channels" Min="1" Max="8" Type="integer" Group="" Visible="false">				
+	</RefParameter>	
+	
+	<RefParameter Comment="Physical interface" DefaultValue="PCD_PHY_EMBEDDED" Name="phy_itface" Type="List" Group="Basic Parameters" Visible="true">
+		<PossibleValue Value="PCD_PHY_EMBEDDED" Comment="Internal Phy"/>
+		<PossibleValue Value="HCD_PHY_EMBEDDED" Comment="Internal Phy"/>
+	</RefParameter>
+	
+	<RefParameter Comment="Sof Enable" DefaultValue="DISABLE" Name="Sof_enable" Type="List" Group="Basic Parameters" Visible="false"/>		
+	
+	<RefParameter Comment="Low Power" DefaultValue="DISABLE" Name="low_power_enable" Type="List" Group="Power Parameters" Visible="true">
+		<PossibleValue Value="ENABLE" Comment="Enabled" Semaphore="$IpInstance_INTERRUPT_WAKEUP_ON"/>
+		<PossibleValue Value="DISABLE" Comment="Disabled"/>	
+		<!--<Description>This mode is not supproted on CubeMx V4.2</Description>-->
+	</RefParameter>
+	
+    <RefParameter Comment="Link Power Management" DefaultValue="DISABLE" Name="lpm_enable" Type="List" Group="Power Parameters" Visible="true">    	
+    	<PossibleValue Value="ENABLE" Comment="Enabled"/>
+		<PossibleValue Value="DISABLE" Comment="Disabled"/>	
+	</RefParameter>	
+	
+	<RefParameter Comment="Battery Charging" DefaultValue="DISABLE" Name="battery_charging_enable" Type="List" Group="Power Parameters" Visible="true">    	
+		<PossibleValue Value="ENABLE" Comment="Enabled" Semaphore="SEM_BCD_ENABLED"/>
+		<PossibleValue Value="DISABLE" Comment="Disabled"/>	
+	</RefParameter>
+	
+	<RefParameter Comment="Battery charging" DefaultValue="DISABLE" Name="battery_charging_enable" Visible="false" Type="List">			
+		<PossibleValue Value="ENABLE" Comment="Enabled"/>
+		<PossibleValue Value="DISABLE" Comment="Disabled"/>	
+	</RefParameter>
+	
+	<RefParameter Comment="vbus_sensing_enable" DefaultValue="DISABLE" Name="vbus_sensing_enable" Group="Basic Parameters"  Type="List">			
+		<PossibleValue Value="ENABLE" Comment="Enabled"/>
+		<PossibleValue Value="DISABLE" Comment="Disabled"/>	
+	</RefParameter>
+  
+	<RefParameter Comment="bulk double buffer" DefaultValue="DISABLE" Name="bulk_doublebuffer_enable" Group="EndPoint Parameters" Type="List">			
+		<PossibleValue Value="ENABLE" Comment="Enabled"/>
+		<PossibleValue Value="DISABLE" Comment="Disabled"/>	
+	</RefParameter>
+	
+	<RefParameter Comment="iso single buffer" DefaultValue="DISABLE" Name="iso_singlebuffer_enable" Group="EndPoint Parameters" Type="List">			
+		<PossibleValue Value="ENABLE" Comment="Enabled"/>
+		<PossibleValue Value="DISABLE" Comment="Disabled"/>	
+	</RefParameter>
+  
+	<RefMode Name="Device" HalMode="PCD">
+		<ConfigForMode>PCD_Init_FS</ConfigForMode>	
+		<Parameter Name="dev_endpoints"/>	
+		<Parameter Name="DeviceSpeed"/>												
+		<Parameter Name="phy_itface">			
+			<PossibleValue>PCD_PHY_EMBEDDED</PossibleValue>
+		</Parameter>			
+		<Parameter Name="low_power_enable"/>
+		<Parameter Name="lpm_enable"/>
+		<Parameter Name="battery_charging_enable"/>			
+	</RefMode>
+	
+	<RefMode Name="Host" HalMode="HCD">
+		<ConfigForMode>HCD_Init_FS</ConfigForMode>	
+		<Parameter Name="Host_channels"/>	
+		<Parameter Name="DeviceSpeed"/>												
+		<Parameter Name="phy_itface">			
+			<PossibleValue>HCD_PHY_EMBEDDED</PossibleValue>
+		</Parameter>		
+		<Parameter Name="low_power_enable"/>	
+		<Parameter Name="lpm_enable"/>
+		<Parameter Name="battery_charging_enable"/>			
+		<Parameter Name="bulk_doublebuffer_enable"/>
+		<Parameter Name="iso_singlebuffer_enable"/>	     
+	</RefMode>
+	
+	<ModeLogicOperator Name="OR">
+		<Mode Name="Mode">
+			<ModeLogicOperator Name="XOR">
+				<Mode Name="Device" UserName="Device_Only (FS)">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="$SingleInstanceUSB_DM"/>
+						<Signal Name="$SingleInstanceUSB_DP"/>						
+					</SignalLogicalOp>
+					<Semaphore>MW_USB_DRD_FS_MW_DEVICE</Semaphore>
+				</Mode>
+				<Mode Name="Host" UserName="Host_Only (FS)">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="$SingleInstanceUSB_DM"/>
+						<Signal Name="$SingleInstanceUSB_DP"/>						
+					</SignalLogicalOp>
+					<Semaphore>MW_USB_DRD_FS_MW_HOST</Semaphore>
+				</Mode>
+			</ModeLogicOperator>
+		</Mode>
+		
+		<Mode Name="Activate_NOE" UserName="Activate NOE">
+			<ModeLogicOperator Name="OR">
+				<Mode Name="Activate_OE">					
+					<SignalLogicalOp Name="AND">				
+						<Signal Name="$SingleInstanceUSB_NOE"/>				
+					</SignalLogicalOp>	
+					<Condition Expression="MW_USB_DRD_FS_MW_DEVICE | MW_USB_DRD_FS_MW_HOST" Diagnostic="USB DRD FS IP must be selected"/>					
+				</Mode>				
+			</ModeLogicOperator>			
+		</Mode>		
+	</ModeLogicOperator>
+	
+	<RefSignal IOMode="System" Name="$SingleInstanceUSB_DM"/>
+	<RefSignal IOMode="System" Name="$SingleInstanceUSB_DP"/>	
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="$SingleInstanceUSB_NOE"/>
+	
+	<!-- Clock Semaphore for this IP. -->
+	<Semaphore>USBUsed_ForRCC</Semaphore>
+</IP>

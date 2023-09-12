@@ -1,0 +1,633 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<IP xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance"
+	ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd"
+ 	xmlns="http://mcd.rou.st.com/modules.php?name=mcu"
+ 	DBVersion="V4.0"
+ 	IPType="middleware"
+ 	IpGroup="Middleware"
+ 	Name="USB_Host"
+ 	Version="v3.0_Cube">
+  <About>USB_HOST: Universal Serial Bus Host</About>
+		
+	<!-- #define to be generated in usb_conf.h -->
+	<!-- Common RefParameter for mono and multi instance -->
+	<!-- i.e. USB_FS and USB_HS are together on Host/Device mode --> 	
+	<!-- Begin -->		
+	<!-- a voir si c'est utile en mode HOST -->
+	<RefParameter Name="USBH_MAX_NUM_ENDPOINTS" Comment="USBH_MAX_NUM_ENDPOINTS (Maximum number of endpoints)" Min="1" Max="255"  DefaultValue="5" Type="integer" Group="Host Configuration">
+		<Condition Expression="(VirtualModeFS = All_Classes) | (VirtualModeHS = All_Classes)" Diagnostic=""/>				
+		<Description>Maximum number of supported endpoints per interface for All Classes</Description>
+	</RefParameter>	
+	
+	<RefParameter Name="USBH_MAX_NUM_ENDPOINTS" Comment="USBH_MAX_NUM_ENDPOINTS (Maximum number of endpoints)" Min="1" Max="255"  DefaultValue="5" Type="integer" Group="Host Configuration">		
+		<Condition Expression="(USBH_USE_OS = 1)&amp;((VirtualModeFS = Audio) | (VirtualModeHS = Audio))" Diagnostic=""/>				
+		<Description>Maximum number of supported endpoints per interface</Description>
+	</RefParameter>		
+	
+	<RefParameter Name="USBH_MAX_NUM_ENDPOINTS" Comment="USBH_MAX_NUM_ENDPOINTS (Maximum number of endpoints)" Min="1" Max="255" DefaultValue="2" Type="integer" Group="Host Configuration">		
+		<Description>Maximum number of supported endpoints per interface</Description>
+	</RefParameter>		
+	
+	<RefParameter Name="USBH_MAX_NUM_INTERFACES" Comment="USBH_MAX_NUM_INTERFACES (Maximun number of interfaces)"  Min="1" Max="255" DefaultValue="10" Type="integer" Group="Host Configuration">		
+		<Condition Expression="(VirtualModeFS = All_Classes) | (VirtualModeHS = All_Classes)" Diagnostic=""/>	
+		<Description>Maximum number of supported Interfaces</Description>
+	</RefParameter>
+	<RefParameter Name="USBH_MAX_NUM_INTERFACES" Comment="USBH_MAX_NUM_INTERFACES (Maximun number of interfaces)"  Min="1" Max="255" DefaultValue="10" Type="integer" Group="Host Configuration">		
+		<Condition Expression="(USBH_USE_OS = 1)&amp;((VirtualModeFS = Audio) | (VirtualModeHS = Audio))" Diagnostic=""/>
+		<Description>Maximum number of supported Interfaces</Description>
+	</RefParameter>
+	<RefParameter Name="USBH_MAX_NUM_INTERFACES" Comment="USBH_MAX_NUM_INTERFACES (Maximun number of interfaces)"  Min="1" Max="255" DefaultValue="10" Type="integer" Group="Host Configuration">		
+		<Condition Expression="(VirtualModeFS = Audio) | (VirtualModeHS = Audio)" Diagnostic=""/>	
+		<Description>Maximum number of supported Interfaces</Description>
+	</RefParameter>	
+	<RefParameter Name="USBH_MAX_NUM_INTERFACES" Comment="USBH_MAX_NUM_INTERFACES (Maximun number of interfaces)" Min="1" Max="255" DefaultValue="2" Type="integer" Group="Host Configuration" >				
+		<Description>Maximum number of supported Interfaces</Description>
+	</RefParameter>
+	
+	<RefParameter Name="USBH_MAX_NUM_SUPPORTED_CLASS" Comment="USBH_MAX_NUM_SUPPORTED_CLASS (Maximun number of supported class)"  Min="1" Max="255"  DefaultValue="5" Type="integer" Group="Host Configuration" >			
+		<Condition Expression="(VirtualModeFS = All_Classes) | (VirtualModeHS = All_Classes)" Diagnostic=""/>
+		<Description>Maximum number of supported Classes</Description>
+	</RefParameter>	
+	<RefParameter Name="USBH_MAX_NUM_SUPPORTED_CLASS" Comment="USBH_MAX_NUM_SUPPORTED_CLASS (Maximun number of supported class)" Min="1" Max="255" DefaultValue="1" Type="integer" Group="Host Configuration" >				
+		<Description>Maximum number of supported Classes</Description>
+	</RefParameter>
+	
+	<!-- use an OS : FreeRTOS -->
+	<RefParameter Name="USBH_USE_OS" Comment="USBH_USE_OS (Enable the support of an RTOS) " DefaultValue="1" Type="list" Group="CMSIS_RTOS" >
+		<!-- Bug 80015 -->
+		<!--<Condition Expression="S_FREERTOS = 1" Diagnostic=""/>-->
+		<Condition Expression="S_FREERTOS$context" Diagnostic=""/>
+		<PossibleValue Comment="Enabled" Value="1"/>
+		<Description>Enable RTOS support</Description>
+	</RefParameter>	
+	<RefParameter Name="USBH_USE_OS" Comment="USBH_USE_OS (Enable the support of an RTOS) " DefaultValue="0" Type="list" Group="CMSIS_RTOS" >
+		<PossibleValue Comment="Disabled" Value="0"/>		
+		<Description>Enable RTOS support</Description>
+	</RefParameter>
+	<RefParameter Name="USBH_PROCESS_PRIO" Comment="USBH_PROCESS_PRIO (The CMSIS-RTOS osPriority value specifies the priority for the USB Host thread) " DefaultValue="osPriorityNormal" Type="list" Group="CMSIS_RTOS" >
+		<Condition Expression="S_FREERTOS$context &amp; FREERTOS:configMAX_PRIORITIES = 1" Diagnostic=""/>	
+		<PossibleValue Comment="priority: idle (lowest)" Value="osPriorityIdle"/>
+		<Description>The osPriority value specifies the priority for a thread. &lt;br&gt; &lt;b&gt;Note:&lt;/b&gt; &lt;br&gt;only one possible value as configMAX_PRIORITIES in FreeRTOS equals to 1</Description>
+	</RefParameter>
+	<RefParameter Name="USBH_PROCESS_PRIO" Comment="USBH_PROCESS_PRIO (The CMSIS-RTOS osPriority value specifies the priority for the USB Host thread) " DefaultValue="osPriorityNormal" Type="list" Group="CMSIS_RTOS" >
+		<Condition Expression="S_FREERTOS$context &amp; FREERTOS:configMAX_PRIORITIES = 2" Diagnostic=""/>	
+		<PossibleValue Comment="priority: idle (lowest)" Value="osPriorityIdle"/>
+		<PossibleValue Comment="priority: low" Value="osPriorityLow"/>
+		<Description>The osPriority value specifies the priority for a thread. &lt;br&gt;  &lt;b&gt;Note:&lt;/b&gt; &lt;br&gt;Two possible values as configMAX_PRIORITIES in FreeRTOS equals to 2</Description>
+	</RefParameter>	
+	<RefParameter Name="USBH_PROCESS_PRIO" Comment="USBH_PROCESS_PRIO (The CMSIS-RTOS osPriority value specifies the priority for the USB Host thread) " DefaultValue="osPriorityNormal" Type="list" Group="CMSIS_RTOS" >
+		<Condition Expression="S_FREERTOS$context &amp; FREERTOS:configMAX_PRIORITIES = 3" Diagnostic=""/>	
+		<PossibleValue Comment="priority: idle (lowest)" Value="osPriorityIdle"/>
+		<PossibleValue Comment="priority: low" Value="osPriorityLow"/>
+		<PossibleValue Comment="priority: below normal" Value="osPriorityBelowNormal"/>
+		<Description>The osPriority value specifies the priority for a thread. &lt;br&gt;  &lt;b&gt;Note:&lt;/b&gt; &lt;br&gt;Three possible values as configMAX_PRIORITIES in FreeRTOS equals to 3</Description>
+	</RefParameter>
+	<RefParameter Name="USBH_PROCESS_PRIO" Comment="USBH_PROCESS_PRIO (The CMSIS-RTOS osPriority value specifies the priority for the USB Host thread) " DefaultValue="osPriorityNormal" Type="list" Group="CMSIS_RTOS" >
+		<Condition Expression="S_FREERTOS$context &amp; FREERTOS:configMAX_PRIORITIES = 4" Diagnostic=""/>	
+		<PossibleValue Comment="priority: idle (lowest)" Value="osPriorityIdle"/>
+		<PossibleValue Comment="priority: low" Value="osPriorityLow"/>
+		<PossibleValue Comment="priority: below normal" Value="osPriorityBelowNormal"/>
+		<PossibleValue Comment="priority: normal (default)" Value="osPriorityNormal"/>
+		<Description>The osPriority value specifies the priority for a thread. &lt;br&gt;  &lt;b&gt;Note:&lt;/b&gt; &lt;br&gt;Four possible values as configMAX_PRIORITIES in FreeRTOS equals to 4</Description>
+	</RefParameter>
+	<RefParameter Name="USBH_PROCESS_PRIO" Comment="USBH_PROCESS_PRIO (The CMSIS-RTOS osPriority value specifies the priority for the USB Host thread) " DefaultValue="osPriorityNormal" Type="list" Group="CMSIS_RTOS" >
+		<Condition Expression="S_FREERTOS$context &amp; FREERTOS:configMAX_PRIORITIES = 5" Diagnostic=""/>	
+		<PossibleValue Comment="priority: idle (lowest)" Value="osPriorityIdle"/>
+		<PossibleValue Comment="priority: low" Value="osPriorityLow"/>
+		<PossibleValue Comment="priority: below normal" Value="osPriorityBelowNormal"/>
+		<PossibleValue Comment="priority: normal (default)" Value="osPriorityNormal"/>
+		<PossibleValue Comment="priority: above normal" Value="osPriorityAboveNormal"/>
+		<Description>The osPriority value specifies the priority for a thread. &lt;br&gt;  &lt;b&gt;Note:&lt;/b&gt; &lt;br&gt;Five possible values as configMAX_PRIORITIES in FreeRTOS equals to 5</Description>
+	</RefParameter>
+	<RefParameter Name="USBH_PROCESS_PRIO" Comment="USBH_PROCESS_PRIO (The CMSIS-RTOS osPriority value specifies the priority for the USB Host thread) " DefaultValue="osPriorityNormal" Type="list" Group="CMSIS_RTOS" >
+		<Condition Expression="S_FREERTOS$context &amp; FREERTOS:configMAX_PRIORITIES = 6" Diagnostic=""/>	
+		<PossibleValue Comment="priority: idle (lowest)" Value="osPriorityIdle"/>
+		<PossibleValue Comment="priority: low" Value="osPriorityLow"/>
+		<PossibleValue Comment="priority: below normal" Value="osPriorityBelowNormal"/>
+		<PossibleValue Comment="priority: normal (default)" Value="osPriorityNormal"/>
+		<PossibleValue Comment="priority: above normal" Value="osPriorityAboveNormal"/>
+		<PossibleValue Comment="priority: high" Value="osPriorityHigh"/>
+		<Description>The osPriority value specifies the priority for a thread. &lt;br&gt;  &lt;b&gt;Note:&lt;/b&gt; &lt;br&gt;Six possible values as configMAX_PRIORITIES in FreeRTOS equals to 6</Description>
+	</RefParameter>
+	<RefParameter Name="USBH_PROCESS_PRIO" Comment="USBH_PROCESS_PRIO (The CMSIS-RTOS osPriority value specifies the priority for the USB Host thread) " DefaultValue="osPriorityNormal" Type="list" Group="CMSIS_RTOS" >
+		<Condition Expression="S_FREERTOS$context" Diagnostic=""/>	
+		<PossibleValue Comment="priority: idle (lowest)" Value="osPriorityIdle"/>
+		<PossibleValue Comment="priority: low" Value="osPriorityLow"/>
+		<PossibleValue Comment="priority: below normal" Value="osPriorityBelowNormal"/>
+		<PossibleValue Comment="priority: normal (default)" Value="osPriorityNormal"/>	
+		<PossibleValue Comment="priority: above normal" Value="osPriorityAboveNormal"/>
+		<PossibleValue Comment="priority: high" Value="osPriorityHigh"/>
+		<PossibleValue Comment="priority: realtime (highest)" Value="osPriorityRealtime"/>
+		<Description>The osPriority value specifies the priority for a thread. &lt;br&gt;  &lt;b&gt;Note:&lt;/b&gt; &lt;br&gt;All values are available as configMAX_PRIORITIES in FreeRTOS is >= 7</Description>
+	</RefParameter>	
+	<RefParameter Name="USBH_PROCESS_PRIO" Comment="USBH_PROCESS_PRIO (The CMSIS-RTOS osPriority value specifies the priority for the USB Host thread) " DefaultValue="osPriorityNormal" Type="list" Group="CMSIS_RTOS" Visible = "false">
+		<PossibleValue Comment="priority: normal (default)" Value="osPriorityNormal"/>	
+	</RefParameter>
+	
+	
+	<RefParameter Name="USBH_PROCESS_STACK_SIZE" Comment="USBH_PROCESS_STACK_SIZE (The CMSIS-RTOS stack size requirements in words)" Min="=FREERTOS:configMINIMAL_STACK_SIZE" Max="=FREERTOS:configTOTAL_HEAP_SIZE/4" DefaultValue="=FREERTOS:configMINIMAL_STACK_SIZE" Type="integer" Group="CMSIS_RTOS" Unit="Words" >			
+		<Condition Expression="S_FREERTOS$context" Diagnostic=""/>	
+		<Description>Stack size used by the main USB Host thread. &lt;br&gt;It's up to the user to fine tune this parameter value considering all dependencies.</Description>		
+	</RefParameter>	
+	<RefParameter Name="USBH_PROCESS_STACK_SIZE" Comment="USBH_PROCESS_STACK_SIZE (The CMSIS-RTOS stack size requirements in words)" DefaultValue="0" Type="integer" Group="CMSIS_RTOS" Unit="Words" Visible="false">			
+		<Description>Stack size used by the main USB Host thread. &lt;br&gt;It's up to the user to fine tune this parameter value considering all dependencies.</Description>		
+	</RefParameter>
+	
+	
+	<RefParameter Name="USBH_MAX_NUM_CONFIGURATION" Comment="USBH_MAX_NUM_CONFIGURATION (Maximun number of supported configuration)" DefaultValue="1" Min ="1" Max = "255" Type="integer" Group="Host Configuration" Visible="true" >		
+		<Description>Maximum number of supported Configurations</Description>
+	</RefParameter>
+	
+	<!-- Enabled only for AllClasses, Audio and CDC , other Enabled/Disbaled -->
+	<!-- Tracker 307627 -->
+	<RefParameter Name="USBH_KEEP_CFG_DESCRIPTOR" Comment="USBH_KEEP_CFG_DESCRIPTOR (Keep the configuration into RAM) " DefaultValue="1" Type="list" Group="Host Configuration" Visible="true">
+		<Condition Expression="(VirtualModeHS = Audio) | (AUDIO_HOST_FS) " Diagnostic=""/>
+		<PossibleValue Comment="Enabled" Value="1"/>			
+		<Description>Allow to keep full configuration descriptor in RAM when further parsing is needed</Description>
+	</RefParameter>
+	<!-- Tracker 307679 -->
+	<!--
+	<RefParameter Name="USBH_KEEP_CFG_DESCRIPTOR" Comment="USBH_KEEP_CFG_DESCRIPTOR (Keep the configuration into RAM) " DefaultValue="1" Type="list" Group="" Visible="true">		
+		<Condition Expression="(VirtualModeHS = Cdc) | (VirtualModeFS = Cdc) " Diagnostic=""/>
+		<PossibleValue Comment="Enabled" Value="1"/>			
+		<Description>Allow to keep full configuration descriptor in RAM when further parsing is needed</Description>
+	</RefParameter>
+	-->	
+	<RefParameter Name="USBH_KEEP_CFG_DESCRIPTOR" Comment="USBH_KEEP_CFG_DESCRIPTOR (Keep the configuration into RAM) " DefaultValue="1" Type="list" Group="Host Configuration" Visible="true">		
+		<Condition Expression="(VirtualModeHS = All_Classes) | (VirtualModeFS = All_Classes) " Diagnostic=""/>
+		<PossibleValue Comment="Enabled" Value="1"/>				
+		<Description>Allow to keep full configuration descriptor in RAM when further parsing is needed</Description>
+	</RefParameter>
+	<RefParameter Name="USBH_KEEP_CFG_DESCRIPTOR" Comment="USBH_KEEP_CFG_DESCRIPTOR (Keep the configuration into RAM) " DefaultValue="1" Type="list" Group="Host Configuration" Visible="true">		
+		<!--<Condition Expression="(VirtualModeHS != Audio) &amp; (VirtualModeFS != Audio) &amp; (VirtualModeHS != All_Classes) &amp; (VirtualModeFS != All_Classes)" Diagnostic=""/>-->
+		<PossibleValue Comment="Enabled" Value="1"/>	
+		<PossibleValue Comment="Disabled" Value="0"/>
+		<Description>Allow to keep full configuration descriptor in RAM when further parsing is needed</Description>
+	</RefParameter>
+	
+	<RefParameter Name="USBH_MAX_SIZE_CONFIGURATION" Comment="USBH_MAX_SIZE_CONFIGURATION (Maximun size in bytes for the Configuration Descriptor)" Min="1" Max="512" DefaultValue="256" Type="integer" Group="Host Configuration" Visible="true" Unit="Byte(s)" >		
+		<Condition Expression="STM32F4 | STM32F2 | STM32F7" Diagnostic=""/>
+		<Description>Maximum size of configuration descriptor</Description>
+	</RefParameter>
+	
+	<RefParameter Name="USBH_MAX_SIZE_CONFIGURATION" Comment="USBH_MAX_SIZE_CONFIGURATION (Maximun size in bytes for the Configuration Descriptor)" Min="1" Max="256" DefaultValue="256" Type="integer" Group="Host Configuration" Visible="true" Unit="Byte(s)" >		
+		<Description>Maximum size of configuration descriptor</Description>
+	</RefParameter>
+	
+	<RefParameter Name="USBH_MAX_DATA_BUFFER" Comment="USBH_MAX_DATA_BUFFER (Maximun size of temporary data)" Min="1" Max="65536" DefaultValue="512" Type="integer" Group="Host Configuration" Visible="true" Unit="Byte(s)">			
+		<Description>Maximum size for USB descriptor container</Description>
+	</RefParameter>
+	
+	<RefParameter Name="USBH_DEBUG_LEVEL" Comment="USBH_DEBUG_LEVEL (USBH Debug Level)" DefaultValue="0" Type="list" Group="Host Configuration" Visible="true" >		
+		<PossibleValue Value="0" Comment="0: No debug message"/>	
+		<PossibleValue Value="1" Comment="1: Only User messages are shown"/>	
+		<PossibleValue Value="2" Comment="2: User + Error messages"/>
+		<PossibleValue Value="3" Comment="3: All messages and internal debug messages are shown"/>		
+		<Description>Define different level output trace as folowing :
+			&lt;br&gt; 0 : No debug message is shown
+			&lt;br&gt; 1 : only User message are shown
+			&lt;br&gt; 2 : User + Error messages are shown
+			&lt;br&gt; 3 : All message and interal debug message are shown
+		</Description>
+	</RefParameter>
+	
+	<!-- Virtual Mode Parameter, to define RefParameter in function of RefMode -->
+	<RefParameter Comment="" DefaultValue="None" Name="VirtualModeFS" Type="list" Visible="false" Group="Basic Parameters" >
+		<PossibleValue Comment="" Value="None"/>
+		<PossibleValue Comment="" Value="Audio"/>
+		<PossibleValue Comment="" Value="Hid"/>
+		<PossibleValue Comment="" Value="Msc"/>
+		<PossibleValue Comment="" Value="Cdc"/>
+		<PossibleValue Comment="" Value="Mtp"/>
+		<PossibleValue Comment="" Value="All_Classes"/>
+	</RefParameter>
+	<RefParameter Comment="" DefaultValue="None" Name="VirtualModeHS" Type="list" Visible="false" Group="Basic Parameters" >
+		<PossibleValue Comment="" Value="None"/>
+		<PossibleValue Comment="" Value="Audio"/>
+		<PossibleValue Comment="" Value="Hid"/>
+		<PossibleValue Comment="" Value="Msc"/>
+		<PossibleValue Comment="" Value="Cdc"/>
+		<PossibleValue Comment="" Value="Mtp"/>
+		<PossibleValue Comment="" Value="All_Classes"/>
+	</RefParameter>
+	<!-- VirtualModeIp Mode Parameter, to define RefParameter in function of RefMode -->
+	<RefParameter Comment="" DefaultValue="hhcd_USB_OTG_FS" Name="VirtualModeIp" Type="list" Visible="false" Group="Basic Parameters" >
+		<PossibleValue Comment="" Value="hhcd_USB_OTG_FS"/>
+		<PossibleValue Comment="" Value="hhcd_USB_OTG_HS"/>		
+	</RefParameter>
+	
+	<!-- Parameters for the Low Level driver (C files) -->	
+	<!-- This RefParameter is defined in order to be able to have the LibMethod with the status == OK -->
+	<RefParameter Name="gState" Comment="gState" DefaultValue="HOST_IDLE"  Max="HOST_ABORT_STATE" Min="HOST_IDLE" Type="integer" Group="" Visible="false"/>
+	
+	<RefParameter Name="USBH_HandleTypeDef" Comment="" DefaultValue="hUsbHostFS" Type="list" Visible="false">
+		<Condition Expression="MW_USB_OTG_FS_MW_HOST" Diagnostic=""/>
+		<PossibleValue Comment="" Value="hUsbHostFS"/>	
+	</RefParameter>	
+	
+	<RefParameter Name="USBH_HandleTypeDef" Comment="" DefaultValue="hUsbHostFS" Type="list" Visible="false">	
+		<Condition Expression="MW_USB_DRD_FS_MW_HOST" Diagnostic=""/>
+		<PossibleValue Comment="" Value="hUsbHostFS"/>	
+	</RefParameter>				
+	
+	<RefParameter Name="hUsbHost" Comment="" DefaultValue="hHostDuSmoflt" Type="list" Visible="false">		
+		<PossibleValue Value="hHostDuSmoflt" Comment=""/>
+	</RefParameter>
+	
+	<RefParameter Name="id" Comment="" DefaultValue="id" Type="list" Visible="false">		
+		<PossibleValue Value="id" Comment=""/>
+	</RefParameter>
+	<RefParameter Name="HOST_FS" Comment="" DefaultValue="0" Max="10" Min="0"  Type="integer" Visible="false">
+		<PossibleValue Comment="" Value="HOST_FS"/>	
+	</RefParameter>
+	<RefParameter Name="HOST_HS" Comment="" DefaultValue="0" Max="10" Min="0"  Type="integer" Visible="false">
+		<PossibleValue Comment="" Value="HOST_HS"/>	
+	</RefParameter>
+	
+	<RefParameter Name="USBH_UserProcess" Comment="" DefaultValue="0" Max="10" Min="0"  Type="integer" Visible="false"/>
+	
+	<RefParameter Name="USBH_CLASS" Comment="" DefaultValue="0" Max="10" Min="0"  Type="integer" Visible="false">
+		<PossibleValue Comment="" Value="USB_ALL_CLASSES"/>	
+	</RefParameter>
+	<RefParameter Name="USBH_AUDIO" Comment="" DefaultValue="0" Max="10" Min="0"  Type="integer" Visible="false">
+		<PossibleValue Comment="" Value="USBH_AUDIO_CLASS"/>	
+	</RefParameter>
+	<RefParameter Name="USBH_CDC" Comment="" DefaultValue="0" Max="10" Min="0"  Type="integer" Visible="false">
+		<PossibleValue Comment="" Value="USBH_CDC_CLASS"/>	
+	</RefParameter>
+	<RefParameter Name="USBH_HID" Comment="" DefaultValue="0" Max="10" Min="0"  Type="integer" Visible="false">
+		<PossibleValue Comment="" Value="USBH_HID_CLASS"/>	
+	</RefParameter>
+	<RefParameter Name="USBH_MSC" Comment="" DefaultValue="0" Max="10" Min="0"  Type="integer" Visible="false">
+		<PossibleValue Comment="" Value="USBH_MSC_CLASS"/>	
+	</RefParameter>
+	<RefParameter Name="USBH_MTP" Comment="" DefaultValue="0" Max="10" Min="0"  Type="integer" Visible="false">
+		<PossibleValue Comment="" Value="USBH_MTP_CLASS"/>	
+	</RefParameter>
+	
+	
+	<!-- RefMode for USB HOST : Support AUDIO Class-->
+	<RefMode Name="AUDIO_FS" Abstract="false" HalMode="">
+		<ConfigForMode>USB_HOST_AUDIO_FS</ConfigForMode>
+		<Parameter Name="VirtualModeFS">		
+			<PossibleValue>Audio</PossibleValue>
+		</Parameter>
+		<!-- Parameters for Function and Buffer Configurations -->
+		<Parameter Name="USBH_MAX_NUM_ENDPOINTS">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>					
+		<Parameter Name="USBH_MAX_NUM_INTERFACES">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>	
+		<Parameter Name="USBH_MAX_NUM_SUPPORTED_CLASS">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>	
+		<Parameter Name="USBH_MAX_NUM_CONFIGURATION">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>		
+		<Parameter Name="USBH_KEEP_CFG_DESCRIPTOR">			
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>			
+		<Parameter Name="USBH_MAX_SIZE_CONFIGURATION">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>			
+		<Parameter Name="USBH_MAX_DATA_BUFFER">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>			
+		<Parameter Name="USBH_DEBUG_LEVEL">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>			
+		<Parameter Name="USBH_USE_OS">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>
+		<Parameter Name="USBH_PROCESS_PRIO">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>
+		<Parameter Name="USBH_PROCESS_STACK_SIZE">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>
+		<Parameter Name="hUsbHost"/>
+		<Parameter Name="id"/>
+		<Parameter Name="USBH_HandleTypeDef">
+			<PossibleValue>hUsbHostFS</PossibleValue>
+		</Parameter>
+		<BspDependency Name="Drive_VBUS_FS" Comment="The GPIO is capable to drive the Pump charge of the VBUS" BspIpName="GPIO" BspModeName="Output"/>
+		<BspDependency Name="Drive_VBUS_FS" Comment="The I2C is capable to drive the Pump charge of the VBUS" BspIpName="I2C" BspModeName="I2C"/>
+	</RefMode>
+	
+	
+	<!-- RefMode for USB HOST : Support CDC Class (Virtual Port Com)-->
+	<RefMode Name="CDC_FS" Abstract="false" HalMode="">
+		<ConfigForMode>USB_HOST_CDC_FS</ConfigForMode>
+		<Parameter Name="VirtualModeFS">		
+			<PossibleValue>Cdc</PossibleValue>
+		</Parameter>
+		<!-- Parameters for Function and Buffer Configurations -->		
+		<Parameter Name="USBH_MAX_NUM_ENDPOINTS">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>					
+		<Parameter Name="USBH_MAX_NUM_INTERFACES">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>	
+		<Parameter Name="USBH_MAX_NUM_SUPPORTED_CLASS">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>	
+		<Parameter Name="USBH_MAX_NUM_CONFIGURATION">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>		
+		<Parameter Name="USBH_KEEP_CFG_DESCRIPTOR">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>			
+		<Parameter Name="USBH_MAX_SIZE_CONFIGURATION">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>			
+		<Parameter Name="USBH_MAX_DATA_BUFFER">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>			
+		<Parameter Name="USBH_DEBUG_LEVEL">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>			
+		<Parameter Name="USBH_USE_OS">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>
+		<Parameter Name="USBH_PROCESS_PRIO">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>
+		<Parameter Name="USBH_PROCESS_STACK_SIZE">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>
+		<Parameter Name="hUsbHost"/>
+		<Parameter Name="id"/>
+		<Parameter Name="USBH_HandleTypeDef">
+			<PossibleValue>hUsbHostFS</PossibleValue>
+		</Parameter>
+		<BspDependency Name="Drive_VBUS_FS" Comment="The GPIO is capable to drive the Pump charge of the VBUS" BspIpName="GPIO" BspModeName="Output"/>
+		<BspDependency Name="Drive_VBUS_FS" Comment="The I2C is capable to drive the Pump charge of the VBUS" BspIpName="I2C" BspModeName="I2C"/>	
+		<BspDependency Name="Drive_VBUS_FS" Comment="The I2C is capable to drive the VBUS over an IOExpander" BspIpName="I2C" BspModeName="I2C" Component="IOExpander"/>	
+	</RefMode>	
+	
+	<!-- RefMode for USB HOST : Support HID Class-->
+	<RefMode Name="HID_FS" Abstract="false" HalMode="">
+		<ConfigForMode>USB_HOST_HID_FS</ConfigForMode>
+		<Parameter Name="VirtualModeFS">		
+			<PossibleValue>Hid</PossibleValue>
+		</Parameter>
+		<!-- Parameters for Function and Buffer Configurations -->		
+		<Parameter Name="USBH_MAX_NUM_ENDPOINTS">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>					
+		<Parameter Name="USBH_MAX_NUM_INTERFACES">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>	
+		<Parameter Name="USBH_MAX_NUM_SUPPORTED_CLASS">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>	
+		<Parameter Name="USBH_MAX_NUM_CONFIGURATION">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>		
+		<Parameter Name="USBH_KEEP_CFG_DESCRIPTOR">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>			
+		<Parameter Name="USBH_MAX_SIZE_CONFIGURATION">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>			
+		<Parameter Name="USBH_MAX_DATA_BUFFER">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>			
+		<Parameter Name="USBH_DEBUG_LEVEL">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>			
+		<Parameter Name="USBH_USE_OS">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>
+		<Parameter Name="USBH_PROCESS_PRIO">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>
+		<Parameter Name="USBH_PROCESS_STACK_SIZE">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>
+		<Parameter Name="hUsbHost"/>
+		<Parameter Name="id"/>
+		<Parameter Name="USBH_HandleTypeDef">
+			<PossibleValue>hUsbHostFS</PossibleValue>
+		</Parameter>
+		<BspDependency Name="Drive_VBUS_FS" Comment="The GPIO is capable to drive the Pump charge of the VBUS" BspIpName="GPIO" BspModeName="Output"/>
+		<BspDependency Name="Drive_VBUS_FS" Comment="The I2C is capable to drive the Pump charge of the VBUS" BspIpName="I2C" BspModeName="I2C"/>		
+	</RefMode>
+	
+	<!-- RefMode for USB HOST : Support MSC Class (Mass Storage)-->
+	<RefMode Name="MSC_FS" Abstract="false" HalMode="">
+		<ConfigForMode>USB_HOST_MSC_FS</ConfigForMode>
+		<Parameter Name="VirtualModeFS">		
+			<PossibleValue>Msc</PossibleValue>
+		</Parameter>
+		<!-- Parameters for Function and Buffer Configurations -->		
+		<Parameter Name="USBH_MAX_NUM_ENDPOINTS">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>					
+		<Parameter Name="USBH_MAX_NUM_INTERFACES">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>	
+		<Parameter Name="USBH_MAX_NUM_SUPPORTED_CLASS">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>	
+		<Parameter Name="USBH_MAX_NUM_CONFIGURATION">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>		
+		<Parameter Name="USBH_KEEP_CFG_DESCRIPTOR">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>			
+		<Parameter Name="USBH_MAX_SIZE_CONFIGURATION">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>			
+		<Parameter Name="USBH_MAX_DATA_BUFFER">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>			
+		<Parameter Name="USBH_DEBUG_LEVEL">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>			
+		<Parameter Name="USBH_USE_OS">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>
+		<Parameter Name="USBH_PROCESS_PRIO">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>
+		<Parameter Name="USBH_PROCESS_STACK_SIZE">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>
+		<Parameter Name="hUsbHost"/>
+		<Parameter Name="id"/>
+		<Parameter Name="USBH_HandleTypeDef">
+			<PossibleValue>hUsbHostFS</PossibleValue>
+		</Parameter>
+		<BspDependency Name="Drive_VBUS_FS" Comment="The GPIO is capable to drive the Pump charge of the VBUS" BspIpName="GPIO" BspModeName="Output"/>
+		<BspDependency Name="Drive_VBUS_FS" Comment="The I2C is capable to drive the Pump charge of the VBUS" BspIpName="I2C" BspModeName="I2C"/>		
+	</RefMode>
+	
+	<!-- RefMode for USB HOST : Support MSC Class (Mass Storage)-->
+	<RefMode Name="ALL_Classes_FS"  Abstract="false" HalMode="">
+		<ConfigForMode>USB_HOST_ALL_CLASSES_FS</ConfigForMode>
+		<Parameter Name="VirtualModeFS">		
+			<PossibleValue>All_Classes</PossibleValue>
+		</Parameter>
+		<!-- Parameters for Function and Buffer Configurations -->		
+		<Parameter Name="USBH_MAX_NUM_ENDPOINTS">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>					
+		<Parameter Name="USBH_MAX_NUM_INTERFACES">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>	
+		<Parameter Name="USBH_MAX_NUM_SUPPORTED_CLASS">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>	
+		<Parameter Name="USBH_MAX_NUM_CONFIGURATION">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>		
+		<Parameter Name="USBH_KEEP_CFG_DESCRIPTOR">			
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>			
+		<Parameter Name="USBH_MAX_SIZE_CONFIGURATION">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>			
+		<Parameter Name="USBH_MAX_DATA_BUFFER">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>			
+		<Parameter Name="USBH_DEBUG_LEVEL">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>			
+		<Parameter Name="USBH_USE_OS">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>
+		<Parameter Name="USBH_PROCESS_PRIO">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>
+		<Parameter Name="USBH_PROCESS_STACK_SIZE">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>
+		<Parameter Name="hUsbHost"/>
+		<Parameter Name="id"/>
+		<Parameter Name="USBH_HandleTypeDef">
+			<PossibleValue>hUsbHostFS</PossibleValue>
+		</Parameter>
+		<BspDependency Name="Drive_VBUS_FS" Comment="The GPIO is capable to drive the Pump charge of the VBUS" BspIpName="GPIO" BspModeName="Output"/>
+		<BspDependency Name="Drive_VBUS_FS" Comment="The I2C is capable to drive the Pump charge of the VBUS" BspIpName="I2C" BspModeName="I2C"/>		
+	</RefMode>
+	
+	<!-- RefMode for USB HOST : Support MTP Class-->
+	<RefMode Name="MTP_FS" Abstract="false" HalMode="">
+		<ConfigForMode>USB_HOST_MTP_FS</ConfigForMode>
+		<Parameter Name="VirtualModeFS">		
+			<PossibleValue>Mtp</PossibleValue>
+		</Parameter>
+		<!-- Parameters for Function and Buffer Configurations -->
+		<Parameter Name="USBH_MAX_NUM_ENDPOINTS">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>					
+		<Parameter Name="USBH_MAX_NUM_INTERFACES">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>	
+		<Parameter Name="USBH_MAX_NUM_SUPPORTED_CLASS">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>	
+		<Parameter Name="USBH_MAX_NUM_CONFIGURATION">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>		
+		<Parameter Name="USBH_KEEP_CFG_DESCRIPTOR">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>			
+		<Parameter Name="USBH_MAX_SIZE_CONFIGURATION">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>			
+		<Parameter Name="USBH_MAX_DATA_BUFFER">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>			
+		<Parameter Name="USBH_DEBUG_LEVEL">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>			
+		<Parameter Name="USBH_USE_OS">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>
+		<Parameter Name="USBH_PROCESS_PRIO">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>
+		<Parameter Name="USBH_PROCESS_STACK_SIZE">
+			<Condition Expression="(USB_HOST_FS_CLASSES) &amp; (!USB_HOST_HS_CLASSES)" Diagnostic=""/>
+		</Parameter>
+		<Parameter Name="hUsbHost"/>
+		<Parameter Name="id"/>
+		<BspDependency Name="Drive_VBUS_FS" Comment="The GPIO is capable to drive the Pump charge of the VBUS" BspIpName="GPIO" BspModeName="Output"/>
+		<BspDependency Name="Drive_VBUS_FS" Comment="The I2C is capable to drive the Pump charge of the VBUS" BspIpName="I2C" BspModeName="I2C"/>		
+	</RefMode>
+	
+	
+	<!-- ModeLogicOperator for USB_HOST -->
+	<ModeLogicOperator Name="OR">								
+		<!--<Mode Name="Class For HS IP" RemoveCondition="!(USB_OTG_HS:$modeexist_External_Phy)">-->	
+		<!-- Bug395024 -->		
+				
+				<Mode Name="ClassFS" UserName="Class for FS IP">
+					<ModeLogicOperator Name="XOR">
+						<Mode Name="AUDIO_FS" UserName="Audio Host Class">
+							<SignalLogicalOp Name="AND">
+								<Signal IOMode="" Name="VS_USB_HOST_AUDIO_FS"/>
+							</SignalLogicalOp>
+							<Semaphore>HOST_FULL_SPEED</Semaphore>
+							<Semaphore>AUDIO_HOST_FS</Semaphore>
+						</Mode>
+						<Mode Name="HID_FS" UserName="Human Interface Host Class (HID)">
+							<SignalLogicalOp Name="AND">
+								<Signal IOMode="" Name="VS_USB_HOST_HID_FS"/>
+							</SignalLogicalOp>
+							<Semaphore>HOST_FULL_SPEED</Semaphore>
+							<Semaphore>HID_HOST_FS</Semaphore>
+						</Mode>
+						<Mode Name="MSC_FS" UserName="Mass Storage Host Class">
+							<SignalLogicalOp Name="AND">
+								<Signal IOMode="" Name="VS_USB_HOST_MSC_FS"/>
+							</SignalLogicalOp>
+							<Semaphore>USB_HOST_MSC_FS</Semaphore>
+							<Semaphore>MSC_HOST_FS</Semaphore>
+						</Mode>
+						<Mode Name="CDC_FS" UserName="Communication Host Class (Virtual Port Com)">
+							<SignalLogicalOp Name="AND">
+								<Signal IOMode="" Name="VS_USB_HOST_CDC_FS"/>
+							</SignalLogicalOp>
+							<Semaphore>HOST_FULL_SPEED</Semaphore>
+							<Semaphore>CDC_HOST_FS</Semaphore>
+						</Mode>	
+						<Mode Name="MTP_FS" UserName="Media Transfer Protocol Class (MTP)">
+							<SignalLogicalOp Name="AND">
+								<Signal IOMode="" Name="VS_USB_HOST_MTP_FS"/>
+							</SignalLogicalOp>
+							<Semaphore>HOST_FULL_SPEED</Semaphore>
+							<Semaphore>MTP_HOST_FS</Semaphore>
+						</Mode>	
+						<Mode Name="ALL_Classes_FS" UserName="Host Supporting ALL Classes">
+							<SignalLogicalOp Name="AND">
+								<Signal IOMode="" Name="VS_USB_HOST_ALL_CLASS_FS"/>
+							</SignalLogicalOp>
+							<Semaphore>USB_HOST_ALL_CLASS</Semaphore>
+							<Semaphore>ALL_Classes_FS</Semaphore>
+						</Mode>								
+					</ModeLogicOperator>
+					<Semaphore>USB_HOST_FS_CLASSES</Semaphore>					
+					<Condition Expression="(MW_USB_OTG_FS_MW_HOST | MW_USB_DRD_FS_MW_HOST)" Diagnostic="Active only when USB_OTG_FS or USBD_RD_FS IP is configured in host mode"/>
+				</Mode>
+				
+	</ModeLogicOperator>
+	
+	<!-- RefSignal for USB_HOST -->
+	<RefSignal Name="VS_USB_HOST_AUDIO_HS" Virtual="true"/>
+	<RefSignal Name="VS_USB_HOST_HID_HS" Virtual="true"/>
+	<RefSignal Name="VS_USB_HOST_MSC_HS" Virtual="true"/>
+	<RefSignal Name="VS_USB_HOST_CDC_HS" Virtual="true"/>
+	<RefSignal Name="VS_USB_HOST_MTP_HS" Virtual="true"/>
+	<RefSignal Name="VS_USB_HOST_ALL_CLASS_HS" Virtual="true"/>
+	
+	<RefSignal Name="VS_USB_HOST_AUDIO_FS" Virtual="true"/>
+	<RefSignal Name="VS_USB_HOST_HID_FS" Virtual="true"/>
+	<RefSignal Name="VS_USB_HOST_MSC_FS" Virtual="true"/>
+	<RefSignal Name="VS_USB_HOST_CDC_FS" Virtual="true"/>
+	<RefSignal Name="VS_USB_HOST_MTP_FS" Virtual="true"/>
+	<RefSignal Name="VS_USB_HOST_ALL_CLASS_FS" Virtual="true"/>
+</IP>

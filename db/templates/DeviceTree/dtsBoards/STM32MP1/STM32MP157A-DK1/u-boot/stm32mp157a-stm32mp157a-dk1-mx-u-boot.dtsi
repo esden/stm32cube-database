@@ -34,30 +34,50 @@
 			status = "okay";
 		};
 	};
+
+	firmware{
+
+		optee{
+			compatible = "linaro,optee-tz";
+			method = "smc";
+		};
+	};
+
+	reserved-memory{
+
+		optee@de000000{
+			reg = <0xde000000 0x02000000>;
+			no-map;
+		};
+	};
 	/* USER CODE END root */
 
 	clocks{
-		u-boot,dm-pre-reloc;
+
+#ifndef CONFIG_STM32MP1_TRUSTED
 
 		clk_lsi:clk-lsi{
-			u-boot,dm-pre-reloc;
 		};
 
 		clk_hsi:clk-hsi{
-			u-boot,dm-pre-reloc;
+		};
+
+		clk_csi:clk-csi{
+			status = "disabled";
 		};
 
 		clk_lse:clk-lse{
-			u-boot,dm-pre-reloc;
 			st,drive = < LSEDRV_MEDIUM_HIGH >;
 		};
 
 		clk_hse:clk-hse{
-			u-boot,dm-pre-reloc;
 			st,digbypass;
 		};
+#endif
 	};
 };
+
+#ifndef CONFIG_STM32MP1_TRUSTED
 
 &rcc{
 	u-boot,dm-pre-reloc;
@@ -149,6 +169,7 @@
 &sdmmc1{
 	u-boot,dm-pre-reloc;
 };
+#endif
 
 &hash1{
 	u-boot,dm-pre-reloc;
@@ -185,19 +206,4 @@
 &adc{
 	status = "okay";
 };
-
-#ifndef CONFIG_STM32MP1_TRUSTED
-&i2s2{
-	clocks = <&rcc SPI2>, <&rcc SPI2_K>, <&rcc PLL3_Q>, <&rcc PLL3_R>;
-};
-
-&pmic{
-	u-boot,dm-pre-reloc;
-};
-
-&sai2{
-	clocks = <&rcc SAI2>, <&rcc PLL3_Q>, <&rcc PLL3_R>;
-};
-#endif /*CONFIG_STM32MP1_TRUSTED*/
-
 /* USER CODE END addons */

@@ -16,6 +16,7 @@
 [#assign SNK = false]
 [#assign DRP = false]
 [#assign DR_SWAP_TO_XFP_FEATURE = false]
+[#assign USBPD_STATEMACHINE = false]
 
 [#-- SWIPdatas is a list of SWIPconfigModel --]
 [#list SWIPdatas as SWIP]
@@ -23,6 +24,9 @@
         [#list SWIP.defines as definition]
             [#if definition.name == "USBPD_CoreLib" && definition.value != ""]
                 [#assign USBPD_CoreLib = definition.value]
+            [/#if]
+            [#if definition.name == "USBPD_StateMachine" && definition.value == "true"]
+                [#assign USBPD_STATEMACHINE = true]
             [/#if]
             [#if definition.name == "SRC" && definition.value == "true"]
                 [#assign SRC = true]
@@ -33,7 +37,7 @@
             [#if definition.name == "DRP" && definition.value == "true"]
                 [#assign DRP = true]
             [/#if]
-            [#if definition.name=="PE_DR_Swap_To_DFP_P0"]
+            [#if definition.name=="PE_DR_Swap_To_DFP_P0" || definition.name=="PE_DR_Swap_To_DFP_P1"]
                 [#assign DR_SWAP_TO_XFP_FEATURE = true]
             [/#if]
         [/#list]
@@ -60,6 +64,7 @@
   */
 
 /* Exported typedef ----------------------------------------------------------*/
+[#if !USBPD_STATEMACHINE]
 [#if GUI_INTERFACE??]
 [#else]
 typedef struct
@@ -91,14 +96,17 @@ typedef struct
   uint16_t PID;               /*!< Product ID (assigned by the manufacturer)              */
 } USBPD_IdSettingsTypeDef;
 [/#if]
+[/#if]
 /* USER CODE BEGIN Typedef */
 
 /* USER CODE END Typedef */
 
+[#if !USBPD_STATEMACHINE]
 [#if GUI_INTERFACE??]
 typedef void     (*GUI_NOTIFICATION_POST)(uint8_t PortNum, uint16_t EventVal);
 typedef uint32_t (*GUI_NOTIFICATION_FORMAT_SEND)(uint32_t PortNum, uint32_t TypeNotification, uint32_t Value);
 typedef void     (*GUI_SAVE_INFO)(uint8_t PortNum, uint8_t DataId, uint8_t *Ptr, uint32_t Size);
+[/#if]
 [/#if]
 /* Exported define -----------------------------------------------------------*/
 /* USER CODE BEGIN Define */
@@ -127,22 +135,26 @@ typedef void     (*GUI_SAVE_INFO)(uint8_t PortNum, uint8_t DataId, uint8_t *Ptr,
 /** @addtogroup USBPD_USER_EXPORTED_FUNCTIONS_GROUP1
   * @{
   */
+[#if !USBPD_STATEMACHINE]
 USBPD_StatusTypeDef USBPD_DPM_UserInit(void);
 [#if GUI_INTERFACE??]
 void                USBPD_DPM_SetNotification_GUI(GUI_NOTIFICATION_FORMAT_SEND PtrFormatSend, GUI_NOTIFICATION_POST PtrPost, GUI_SAVE_INFO PtrSaveInfo);
+[/#if]
 [/#if]
 [#if FREERTOS?? && Secure!="true"]
 [#else]
 void                USBPD_DPM_UserExecute(void const *argument);
 [/#if]
 void                USBPD_DPM_UserCableDetection(uint8_t PortNum, USBPD_CAD_EVENT State);
-void                USBPD_DPM_WaitForTime(uint32_t Time);
+[#if !USBPD_STATEMACHINE]
 void                USBPD_DPM_UserTimerCounter(uint8_t PortNum);
+[/#if]
 
 /**
   * @}
   */
 
+[#if !USBPD_STATEMACHINE]
 /** @addtogroup USBPD_USER_EXPORTED_FUNCTIONS_GROUP2
   * @{
   */
@@ -176,7 +188,6 @@ USBPD_FunctionalState USBPD_DPM_IsPowerReady(uint8_t PortNum, USBPD_VSAFE_Status
   * @}
   */
 
-[#if USBPD_CoreLib != "USBPDCORE_LIB_NO_PD"]
 /** @addtogroup USBPD_USER_EXPORTED_FUNCTIONS_GROUP3
   * @{
   */
@@ -214,13 +225,13 @@ USBPD_StatusTypeDef USBPD_DPM_RequestGetCountryInfo(uint8_t PortNum, uint16_t Co
 USBPD_StatusTypeDef USBPD_DPM_RequestGetBatteryCapability(uint8_t PortNum, uint8_t *pBatteryCapRef);
 USBPD_StatusTypeDef USBPD_DPM_RequestGetBatteryStatus(uint8_t PortNum, uint8_t *pBatteryStatusRef);
 USBPD_StatusTypeDef USBPD_DPM_RequestSecurityRequest(uint8_t PortNum);
-[/#if]
 /* USER CODE BEGIN Function */
 
 /* USER CODE END Function */
 /**
   * @}
   */
+[/#if]
 
 /**
   * @}

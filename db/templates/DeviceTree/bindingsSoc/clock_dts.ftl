@@ -22,10 +22,6 @@
 [/#if]
 [#assign  TABN1 = TAB.TABN]
 ${TABN}clocks {
-[#if srvcmx_isTargetedFw_inDTS("U-BOOT")]
-		[#lt]${TABP}u-boot,dm-pre-reloc;
-[/#if]
-#n
 ${TABP}/* USER CODE BEGIN clocks */
 ${TABP}/* USER CODE END clocks */
 #n
@@ -41,8 +37,6 @@ ${TABP}/* USER CODE END clocks */
 				[#--lt--][#--${TABN1}#clock-cells = <0>;--]
 				[#--lt--][#--${TABN1}compatible = "fixed-clock";--]
 				[#lt]${TABN1}clock-frequency = <${paramEntry.value}>;
-[#else]
-				[#lt]${TABN1}u-boot,dm-pre-reloc;
 [/#if]
 							[#if paramEntry.key == "clk_lse: clk-lse"]
 								 [#list peripheralRCCParams.get("CLKClockSourceLSE").entrySet() as paramEntryLSE]

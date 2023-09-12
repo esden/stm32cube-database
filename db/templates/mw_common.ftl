@@ -57,7 +57,7 @@
                     [/#if]
                     [/#compress]
                     [#if argument.context??]
-                        [#if argument.context!="global"]
+                        [#if argument.context!="global" && argument.status!="NULL"]
                             [#assign varName= " " + argument.name]
                             [#if (argument.init=="false")]
                                 [@addTab nb=1 /]

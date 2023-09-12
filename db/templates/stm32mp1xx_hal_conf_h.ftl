@@ -33,7 +33,7 @@
   * @brief This is the list of modules to be used in the HAL driver 
   */
 #define HAL_MODULE_ENABLED  
-  [#assign allModules = ["ADC", "CEC", "CRC", "CRYP", "DAC", "DCMI", "DFSDM", "FDCAN", "HASH", "HSEM", "I2C", "I2S", "IPCC", "LPTIM", "QUADSPI", "RNG", "SAI",  "SD", "RTC",  "SMBUS",  "SPDIFRX",  "SPI",  "SRAM", "TIM", "UART", "USART", "WWDG"]]
+  [#assign allModules = ["ADC", "CEC", "CRC", "CRYP", "DAC", "DCMI", "DFSDM", "FDCAN", "HASH", "HSEM", "I2C", "I2S", "IPCC", "LPTIM", "QUADSPI", "RNG", "SAI",  "SD", "SMARTCARD", "RTC",  "SMBUS",  "SPDIFRX",  "SPI",  "SRAM", "TIM", "UART", "USART", "WWDG"]]
   [#list allModules as module]
 	[#if isModuleUsed(module)]
 [#compress]#define HAL_${module?replace("QUADSPI","QSPI")?replace("AES","CRYP")?replace("OCTOSPI","OSPI")}_MODULE_ENABLED[/#compress]
@@ -277,6 +277,10 @@
  #include "stm32mp1xx_hal_sd.h"
 #endif /* HAL_SD_MODULE_ENABLED */
 
+#ifdef HAL_SMARTCARD_MODULE_ENABLED
+  #include "stm32mp1xx_hal_smartcard.h"
+#endif /* HAL_SMARTCARD_MODULE_ENABLED */
+
 #ifdef HAL_SMBUS_MODULE_ENABLED
  #include "stm32mp1xx_hal_smbus.h"
 #endif /* HAL_SMBUS_MODULE_ENABLED */
@@ -288,6 +292,10 @@
 #ifdef HAL_SPI_MODULE_ENABLED
  #include "stm32mp1xx_hal_spi.h"
 #endif /* HAL_SPI_MODULE_ENABLED */
+
+#ifdef HAL_SRAM_MODULE_ENABLED
+ #include "stm32mp1xx_hal_sram.h"
+#endif /* HAL_SRAM_MODULE_ENABLED */
 
 #ifdef HAL_TIM_MODULE_ENABLED
  #include "stm32mp1xx_hal_tim.h"

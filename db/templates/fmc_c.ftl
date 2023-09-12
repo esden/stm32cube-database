@@ -11,7 +11,7 @@
 
 [#assign contextFolder=""]
 [#if cpucore!=""]
-[#assign contextFolder = cpucore?replace("ARM_CORTEX_","C")+"/"]
+[#assign contextFolder = cpucore?replace("ARM_CORTEX_","C")?replace("+","PLUS")+"/"]
 [/#if]
 
 [#list IPdatas as IP]
@@ -597,6 +597,11 @@ void MX_${instName}_Init(void)
     [@common.optinclude name=contextFolder+mxTmpFolder+"/resmgrutility_"+instName+".tmp"/][#-- ADD RESMGR_UTILITY Code--]
 [/#if]
 
+#t/* USER CODE BEGIN ${instName}_Init 0 */
+#n
+#t/* USER CODE END ${instName}_Init 0 */     
+#n
+
   [#assign args = ""]
   [#assign listOfLocalVariables=""]
   [#assign resultList=""]
@@ -605,9 +610,19 @@ void MX_${instName}_Init(void)
     [#assign listOfLocalVariables=resultList]
   [/#list]
   [#if listOfLocalVariables!=""]#n[/#if]
+
+#t/* USER CODE BEGIN ${instName}_Init 1 */
+#n
+#t/* USER CODE END ${instName}_Init 1 */
+#n
   [#list instanceData.configs as config]
     [@generateConfigModelCode configModel=config inst=instName nTab=1/]
   [/#list]
+
+#t/* USER CODE BEGIN ${instName}_Init 2 */
+#n
+#t/* USER CODE END ${instName}_Init 2 */
+
 }
 [/#list]
 [/#compress]

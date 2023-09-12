@@ -461,15 +461,12 @@ osThreadAttr_t attributes;
    [#assign instName = instanceData.instanceName]   
    [#assign halMode= instanceData.halMode]
    [#assign ipName = instanceData.ipName]
-   
 #n
 /**   
 #t* LwIP initialization function 
 #t*/				        
 void MX_LWIP_Init(void)
 {
-  [#-- MZA je dois remplir la liste des configs, pour l'instant j'utilise la liste des methods --]
-  [#-- assign ipInstanceIndex = instName?replace(name,"")--]
   [#assign args = ""]
   [#assign listOfLocalVariables =""]
   [#assign resultList =""]
@@ -478,23 +475,24 @@ void MX_LWIP_Init(void)
     [#assign listOfLocalVariables =resultList]
   [/#list]
 [#if (lwip_dhcp == 0) && (lwip_ipv4 == 1)]
-  [#list instanceData.configs as config]
-  [#--- Generation of IP @ initialization ex. IP_ADDRESS[0] = 000; ---]
+  [#list instanceData.configs as config] [#--- Generation of IP @ initialization ex. IP_ADDRESS[0] = 000; ---]
 #t/* IP addresses initialization */
   [@generateConfigModelCode configModel=config inst=instName  nTab=1/]
   [/#list]
+#n
+/* USER CODE BEGIN IP_ADDRESSES */
+/* USER CODE END IP_ADDRESSES */#n#n
 [/#if][#-- endif lwip_dhcp --] 
 [/#list]
 [/#compress]
 [/#list]
-
 [#compress]
 [#if with_rtos == 0]
-#t/* Initilialize the LwIP stack without RTOS */
+#n#t/* Initilialize the LwIP stack without RTOS */
 #tlwip_init();
 [/#if][#-- endif with_rtos --]
 [#if with_rtos == 1]
-#t/* Initilialize the LwIP stack with RTOS */
+#n#t/* Initilialize the LwIP stack with RTOS */
 #ttcpip_init( NULL, NULL );
 [/#if][#-- endif with_rtos --]
 #n

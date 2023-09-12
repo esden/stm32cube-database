@@ -11,6 +11,7 @@
 [#assign IpName = ""]
 [#assign IrqNumber = ""]
 [#assign ExtiLine = ""]
+[#assign BSP_MODE_NAME = ""]
 
 [#assign useLED = false]
 [#assign LED2_PORT = ""]
@@ -22,12 +23,14 @@
 [#assign BUTTON_PIN = ""]
 [#assign BUTTON_IRQn = ""]
 [#assign BUTTON_EXTI = ""]
+[#assign BUTTON_MODE = ""]
 
 [#assign useUSART = false]
 [#assign UsartInstance = ""]
 [#assign UART_PORT = ""]
 [#assign UART_PIN = ""]
 [#assign useDefine = false]
+[#assign useEXTI = false]
 
 [#if HalExtiUseDefine??]
 [#if HalExtiUseDefine == "true"]
@@ -55,13 +58,15 @@
             [#if variables.name?contains("IpName")]
                 [#assign IpName = variables.value]
             [/#if]	
+            [#if variables.name?contains("BspModeName")]            
+                [#assign BSP_MODE_NAME = variables.value]
+            [/#if]
             [#if variables.name?contains("GPIO_INT_NUM")]
                 [#assign IrqNumber = variables.value]
 				
             [/#if]
             [#if variables.name?contains("EXTI_LINE_NUMBER")]
-                [#assign ExtiLine = variables.value]
-				
+                [#assign ExtiLine = variables.value]				
             [/#if]			
             [#-- Usual BSP Led --]
             [#if variables.value?contains("BSP LED")]            
@@ -73,7 +78,7 @@
                 [#assign BUTTON_PORT = IpName]
                 [#assign BUTTON_PIN = IpInstance]
                 [#assign BUTTON_IRQn = IrqNumber]
-                [#assign BUTTON_EXTI = ExtiLine]
+                [#assign BUTTON_EXTI = ExtiLine]                            	
 				[#assign useBUTTON = true]	
             [/#if]
             [#if variables.value?contains("BSP USART")]
@@ -82,6 +87,16 @@
 				[#assign useUSART = true]
             [/#if]             
         [/#list]
+    [/#if]
+    [#-- BZ 94093 --]
+    [#if SWIP.bsp??]    
+     	[#list SWIP.bsp as bsp]
+     		[#if bsp.bspName?contains("BSP BUTTON")]
+     			[#if bsp.bspIpModeName?contains("EXTI")]
+     				[#assign useEXTI = true]  
+     				[/#if]  
+     		[/#if]
+     	[/#list]
     [/#if]
 [/#list] 
 
@@ -100,7 +115,7 @@
 
 #if (USE_BSP_COM_FEATURE > 0)
   #if (USE_COM_LOG > 0)
-    #ifndef __GNUC__
+    #if defined(__ICCARM__) || defined(__CC_ARM) /* For IAR and MDK-ARM */
       #include <stdio.h>
     #endif
   #endif
@@ -222,11 +237,12 @@
 
 #define USER_BUTTON_PIN	                  ${BUTTON_PIN}
 #define USER_BUTTON_GPIO_PORT              ${BUTTON_PORT}
+[#-- BZ 94093 --]	
 #define USER_BUTTON_EXTI_IRQn              ${BUTTON_IRQn}
 #define USER_BUTTON_EXTI_LINE              EXTI_LINE_${BUTTON_EXTI} 
-[#if useDefine]
-#define H_EXTI_${BUTTON_EXTI}			  hpb_exti[BUTTON_USER]
-[/#if]
+	[#if useDefine && useEXTI]
+#define H_EXTI_${BUTTON_EXTI}			  hpb_exti[BUTTON_USER]		
+	[/#if]
 [/#if]
 [#if numButton > 1]
 	[#list BspIpDatas as SWIP] 
@@ -237,7 +253,10 @@
             	[/#if]
             	[#if variables.name?contains("IpName")]
                 	[#assign IpName = variables.value]
-            	[/#if]	            
+            	[/#if]	   
+            	[#if variables.name?contains("BspModeName")]
+                	[#assign BSP_MODE_NAME = variables.value]
+            	[/#if]         
             	[#if variables.name?contains("GPIO_INT_NUM")]
                 	[#assign IrqNumber = variables.value]
 				
@@ -247,6 +266,7 @@
             	[/#if]		
             	[#-- User BSP Button --]
             	[#if variables.value?contains("BSP BUTTON ") ] 
+            		[#assign BUTTON_MODE = BSP_MODE_NAME]
               		[#assign i=(variables.value?substring((variables.value?last_index_of(" ") + 1) ,variables.value?length))]  
 /**  Definition for BSP USER BUTTON ${i}   **/
 [@common.optinclude name=mxTmpFolder+"/bsp_button_" + i + "_define_GPIO.tmp"/]          
@@ -254,9 +274,9 @@
 #define USER_BUTTON_${i}_GPIO_PORT              ${IpName} 
 #define USER_BUTTON_${i}_EXTI_IRQn              ${IrqNumber}
 #define USER_BUTTON_${i}_EXTI_LINE              EXTI_LINE_${ExtiLine} 
-[#if useDefine]
+[#if useDefine && useEXTI]
 #define H_EXTI_${ExtiLine}                      hpb_exti[BUTTON_USER_${i}]
-[/#if]
+[/#if]	
 			 	[/#if]                   												                       
         	[/#list]
     	[/#if]

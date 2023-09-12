@@ -2,22 +2,17 @@
 <IP DBVersion="V4.0" IPType="peripheral" Name="FDCAN" Version="fdcan1_v1_0_Cube" 
     xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd" 
     xmlns="http://mcd.rou.st.com/modules.php?name=mcu">
-    <About>CAN: Controller Area Network</About>
+    <About>FDCAN: Flexible Data-Rate Controller Area Network</About>
 	
-    <!--**** Generic RefParameters for CAN Modes ****-->
+    <!--**** Generic RefParameters for FDCAN Mode ****-->
    
     <RefParameter Name="Instance" DefaultValue="FDCAN$Index" Comment="Instance" Type="" Visible="false" Group="Basic Parameters"/>
    
     <RefParameter Comment="Frame Format" DefaultValue="FDCAN_FRAME_CLASSIC" Name="FrameFormat" Type="list" Group="Basic Parameters">
         <Description>Specifies the FDCAN frame format.</Description>
-        <Condition Diagnostic="" Expression="FDCAN_Master_$IpInstance|FDCAN_Slave_$IpInstance"/>
-        <PossibleValue Comment="Classic mode " Value="FDCAN_FRAME_CLASSIC"/>
-    </RefParameter>
-    <RefParameter Comment="Frame Format" DefaultValue="FDCAN_FRAME_FD_NO_BRS" Name="FrameFormat" Type="list" Group="Basic Parameters">
-        <Description>Specifies the FDCAN frame format.</Description>
-        <Condition Diagnostic="" Expression="FDCAN_FLEXIBLE_DATARATE_$IpInstance"/>
-        <PossibleValue Comment="FD mode without BitRate Switshing " Value="FDCAN_FRAME_FD_NO_BRS"/>
-        <PossibleValue Comment="FD mode with BitRate Switshing " Value="FDCAN_FRAME_FD_BRS"/>
+        <PossibleValue Comment="Classic mode" Value="FDCAN_FRAME_CLASSIC"/>
+        <PossibleValue Comment="FD mode without BitRate Switshing" Value="FDCAN_FRAME_FD_NO_BRS"/>
+        <PossibleValue Comment="FD mode with BitRate Switshing" Value="FDCAN_FRAME_FD_BRS"/>
     </RefParameter>
 
     <RefParameter Comment="Mode" DefaultValue="lol" Name="Mode" Type="list" Group="Basic Parameters">
@@ -35,7 +30,7 @@
     </RefParameter>
 
     <RefParameter Comment="Clock Divider" DefaultValue="FDCAN_CLOCK_DIV1" Name="ClockDivider" Type="list" Group="Basic Parameters">
-        <Condition Diagnostic="" Expression="STM32G4 &amp; ($Index=1)" />
+        <Condition Diagnostic="" Expression="(STM32G4|STM32L5|STM32G0) &amp; ($Index=1)" />
         <Description>Specifies the FDCAN kernel clock divider when the clock calibration is bypassed.</Description>
         <PossibleValue Comment="Divide kernel clock by 1 " Value="FDCAN_CLOCK_DIV1"/>
         <PossibleValue Comment="Divide kernel clock by 2 " Value="FDCAN_CLOCK_DIV2"/>
@@ -89,23 +84,16 @@
     </RefParameter>
     <RefParameter Comment="Std Filters Nbr" DefaultValue="0" Max="28" Min="0" Name="StdFiltersNbr" Type="integer" Group="Basic Parameters">
         <Description>Specifies the number of standard Message ID filter.</Description>
-        <Condition Diagnostic="" Expression="STM32G4" />
+        <Condition Diagnostic="" Expression="STM32G4|STM32L5|STM32G0" />
     </RefParameter>
-    <RefParameter Comment="Std Filters Nbr" DefaultValue="0" Max="28" Min="0" Name="StdFiltersNbr" Type="integer" Group="Basic Parameters">
-        <Description>Specifies the number of standard Message ID filter.</Description>
-        <Condition Diagnostic="" Expression="STM32L5" />
-    </RefParameter>
+    
     <RefParameter Comment="Ext Filters Nbr" DefaultValue="0" Max="64" Min="0" Name="ExtFiltersNbr" Type="integer" Group="Basic Parameters">
         <Description>Specifies the number of extended Message ID filters.</Description>
         <Condition Diagnostic="" Expression="STM32H7" />
     </RefParameter>
     <RefParameter Comment="Ext Filters Nbr" DefaultValue="0" Max="8" Min="0" Name="ExtFiltersNbr" Type="integer" Group="Basic Parameters">
         <Description>Specifies the number of extended Message ID filters.</Description>
-        <Condition Diagnostic="" Expression="STM32G4" />
-    </RefParameter>
-    <RefParameter Comment="Ext Filters Nbr" DefaultValue="0" Max="8" Min="0" Name="ExtFiltersNbr" Type="integer" Group="Basic Parameters">
-        <Description>Specifies the number of extended Message ID filters.</Description>
-        <Condition Diagnostic="" Expression="STM32L5" />
+        <Condition Diagnostic="" Expression="STM32G4|STM32L5|STM32G0" />
     </RefParameter>
     
     <RefParameter Comment="Rx Fifo0 Elmts Nbr" DefaultValue="0" Max="64" Min="0" Name="RxFifo0ElmtsNbr" Type="integer" Group="Basic Parameters">
@@ -480,7 +468,7 @@
         <PossibleValue Comment="fdcan1_evt3 selected as event trigger " Value="FDCAN_TT_EVENT_TRIGGER_3"/>		
     </RefParameter>
     <RefParameter Comment="Tt Memory Sa" DefaultValue="0" Max="4294967295" Min="0" Name="TTMemorySA" Type="integer" Group="msgRam">
-        	<Condition Diagnostic="" Expression="STM32H7"/>	
+        <Condition Diagnostic="" Expression="STM32H7"/>	
         <Description>Specifies the Trigger Memory Start Address.</Description>		
     </RefParameter>
     <RefParameter Comment="Clock Calibration" DefaultValue="DISABLE" Name="ClkCalUnit_ClockCalibration" Type="list">		
@@ -705,8 +693,6 @@
         <Description>Specifies the End Address of the allocated RAM.</Description>
     </RefParameter>
     
-    
-    
     <RefParameter Comment="Clock Calibration" DefaultValue="DISABLE" Name="ClockCalibration" Type="list" Group="TT Pararams">
         <Description>Enable or disable the ClockCalibration.</Description>
         <PossibleValue Comment="Disable" Value="DISABLE"/>
@@ -734,56 +720,8 @@
         <PossibleValue Comment="Sync pulse at start of matrix " Value="FDCAN_TT_SYNC_PULSE_AT_START_OF_MATRIX"/>		
     </RefParameter>	
 
-    <!-- RefMode for 'Master' FDCAN Mode -->
-    <RefMode Name="FDCANMaster" BaseMode="canBasic">
-        <ConfigForMode>Can_Init</ConfigForMode>
-        <Parameter Name="Instance"/>
-        <Parameter Name="OperationMode"/>
-         <Parameter Name="ClockDivider"/>
-        <Parameter Name="FrameFormat"/>
-        <Parameter Name="Mode"/>
-        <Parameter Name="AutoRetransmission"/>
-       
-        <Parameter Name="TransmitPause"/>
-        <Parameter Name="ProtocolException"/>
-
-        <Parameter Name="NominalPrescaler"/>
-        <Parameter Name="NominalSyncJumpWidth"/>
-        <Parameter Name="NominalTimeSeg1"/>
-        <Parameter Name="NominalTimeSeg2"/>
-        <Parameter Name="DataPrescaler"/>
-        <Parameter Name="DataSyncJumpWidth"/>
-        <Parameter Name="DataTimeSeg1"/>
-        <Parameter Name="DataTimeSeg2"/>
-        <Parameter Name="MessageRAMOffset"/>
-        <Parameter Name="StdFiltersNbr"/>
-        <Parameter Name="ExtFiltersNbr"/>
-        <Parameter Name="RxFifo0ElmtsNbr"/>
-        <Parameter Name="RxFifo0ElmtSize"/>
-        <Parameter Name="RxFifo1ElmtsNbr"/>
-        <Parameter Name="RxFifo1ElmtSize"/>
-        <Parameter Name="RxBuffersNbr"/>
-        <Parameter Name="RxBufferSize"/>
-        <Parameter Name="TxEventsNbr"/>
-        <Parameter Name="TxBuffersNbr"/>
-        <Parameter Name="TxFifoQueueElmtsNbr"/>
-        <Parameter Name="TxFifoQueueMode"/>
-        <Parameter Name="TxElmtSize"/>
-<!--        <Parameter Name="StandardFilterSA"/>
-        <Parameter Name="ExtendedFilterSA"/>                  
-        <Parameter Name="RxFIFO0SA"/> 
-        <Parameter Name="RxFIFO1SA"/> 
-        <Parameter Name="RxBufferSA"/>
-        <Parameter Name="TxEventFIFOSA"/>
-        <Parameter Name="TxBufferSA"/>
-        <Parameter Name="TxFIFOQSA"/>
-        <Parameter Name="TTMemorySA"/>
-        <Parameter Name="ErrorCode"/>
-        <Parameter Name="EndAddress"/>-->
-    </RefMode>
-	
-    <!-- For the Moment, only one Filter can be Parameter (90% of use cases). -->
-    <RefMode Name="FDCANSlave" BaseMode="canBasic">
+    <!-- RefMode for FDCAN Mode -->	
+    <RefMode Name="FDCAN_Activate" BaseMode="canBasic">
         <ConfigForMode>Can_Init</ConfigForMode>
         <Parameter Name="Instance"/>
         <Parameter Name="OperationMode"/>
@@ -791,55 +729,6 @@
         <Parameter Name="FrameFormat"/>
         <Parameter Name="Mode"/>
         <Parameter Name="AutoRetransmission"/>
-        
-        <Parameter Name="TransmitPause"/>
-        <Parameter Name="ProtocolException"/>
-
-        <Parameter Name="NominalPrescaler"/>
-        <Parameter Name="NominalSyncJumpWidth"/>
-        <Parameter Name="NominalTimeSeg1"/>
-        <Parameter Name="NominalTimeSeg2"/>
-        <Parameter Name="DataPrescaler"/>
-        <Parameter Name="DataSyncJumpWidth"/>
-        <Parameter Name="DataTimeSeg1"/>
-        <Parameter Name="DataTimeSeg2"/>
-        <Parameter Name="MessageRAMOffset"/>
-        <Parameter Name="StdFiltersNbr"/>
-        <Parameter Name="ExtFiltersNbr"/>
-        <Parameter Name="RxFifo0ElmtsNbr"/>
-        <Parameter Name="RxFifo0ElmtSize"/>
-        <Parameter Name="RxFifo1ElmtsNbr"/>
-        <Parameter Name="RxFifo1ElmtSize"/>
-        <Parameter Name="RxBuffersNbr"/>
-        <Parameter Name="RxBufferSize"/>
-        <Parameter Name="TxEventsNbr"/>
-        <Parameter Name="TxBuffersNbr"/>
-        <Parameter Name="TxFifoQueueElmtsNbr"/>
-        <Parameter Name="TxFifoQueueMode"/>
-        <Parameter Name="TxElmtSize"/>     
-<!--        <Parameter Name="StandardFilterSA"/>
-        <Parameter Name="ExtendedFilterSA"/>                  
-        <Parameter Name="RxFIFO0SA"/>
-        <Parameter Name="RxFIFO1SA"/> 
-        <Parameter Name="RxBufferSA"/>
-        <Parameter Name="TxEventFIFOSA"/>
-        <Parameter Name="TxBufferSA"/>
-        <Parameter Name="TxFIFOQSA"/>
-        <Parameter Name="TTMemorySA"/>
-        <Parameter Name="ErrorCode"/>
-        <Parameter Name="EndAddress"/>-->
-
-          
-    </RefMode>
-		
-    <RefMode Name="FDCANFD" BaseMode="canBasic">
-        <ConfigForMode>Can_Init</ConfigForMode>
-        <Parameter Name="Instance"/>
-        <Parameter Name="OperationMode"/>
-         <Parameter Name="ClockDivider"/>
-        <Parameter Name="FrameFormat"/>
-        <Parameter Name="Mode"/>
-        <Parameter Name="AutoRetransmission"/>
        
         <Parameter Name="TransmitPause"/>
         <Parameter Name="ProtocolException"/>
@@ -867,7 +756,7 @@
         <Parameter Name="TxFifoQueueMode"/>
         <Parameter Name="TxElmtSize"/>
        
-<!--        <Parameter Name="StandardFilterSA"/>
+<!--    <Parameter Name="StandardFilterSA"/>
         <Parameter Name="ExtendedFilterSA"/>                  
         <Parameter Name="RxFIFO0SA"/>
         <Parameter Name="RxFIFO1SA"/> 
@@ -880,67 +769,23 @@
         <Parameter Name="EndAddress"/>-->
     </RefMode>
    
-   
-    <!-- Modes for CAN. Suppose Silent and/or Loopback Modes are Debug, and need Tx/Rx on Board -->
+   <!-- ModeLogicOperator for FDCAN -->
     <ModeLogicOperator Name="OR">
-        <Mode Name="Mode" UserName="Mode">
+        <Mode Name="FDCAN_State" UserName="Activated">
             <ModeLogicOperator Name="XOR">
-                         
-                <Mode Name="FDCANMaster" UserName="Classic Master" ShrinkName="Master Mode" RemoveCondition="$IpNumber=2" >
+                <Mode Name="FDCAN_Activate" UserName="Activated">
                     <SignalLogicalOp Name="AND">
                         <Signal Name="RX"/>
                         <Signal Name="TX"/>
                     </SignalLogicalOp>
-                    
-                    <Semaphore>FDCAN_Master_$IpInstance</Semaphore>
-                </Mode>
-            
-                <Mode Name="FDCANSlave" UserName="Classic Slave" ShrinkName="Slave Mode" RemoveCondition="$IpNumber=1" >
-                    <SignalLogicalOp Name="AND">
-                        <Signal Name="RX"/>
-                        <Signal Name="TX"/>
-                    </SignalLogicalOp>
-                    
-                    <Semaphore>FDCAN_Slave_$IpInstance</Semaphore>
-                </Mode>
-                
-                <Mode Name="FDCANFD" UserName="FD">
-                    <SignalLogicalOp Name="AND">
-                        <Signal Name="RX"/>
-                        <Signal Name="TX"/>
-                    </SignalLogicalOp>
-                    <Semaphore>FDCAN_FLEXIBLE_DATARATE_$IpInstance</Semaphore>
                 </Mode>
             </ModeLogicOperator>
             <Semaphore>USB_OR_CAN</Semaphore>
         </Mode>
-<!--        <Mode Name="Enable_FDCAN_TXFD">
-            <ModeLogicOperator Name="XOR">
-                <Mode Name="Enable_FDCAN_TXFD" UserName="Enable FDCAN_TXFD">
-                    <SignalLogicalOp Name="AND">
-                        <Signal Name="TXFD_MODE"/>
-                    </SignalLogicalOp>
-                </Mode>
-            </ModeLogicOperator>
-            <Condition Expression="FDCAN_FLEXIBLE_DATARATE_$IpInstance" Diagnostic="Activable only in FD Mode"/>
-        </Mode>
-        <Mode Name="Enable_FDCAN_RXFD">
-            <ModeLogicOperator Name="XOR">
-                <Mode Name="Enable_FDCAN_RXFD" UserName="Enable FDCAN_RXFD">
-                    <SignalLogicalOp Name="AND">
-                        <Signal Name="RXFD_MODE"/>
-                    </SignalLogicalOp>
-                </Mode>
-            </ModeLogicOperator>
-            <Condition Expression="FDCAN_FLEXIBLE_DATARATE_$IpInstance" Diagnostic="Activable only in FD Mode"/>
-        </Mode>-->
-    </ModeLogicOperator>
-		
+    </ModeLogicOperator>	
                 
-    <!-- RefSignal for CAN -->
+    <!-- RefSignal for FDCAN -->
     <RefSignal IOMode="AlternateFunctionPushPull" Name="RX"/>
     <RefSignal IOMode="AlternateFunctionPushPull" Name="TX"/>
-<!--    <RefSignal IOMode="AlternateFunctionPushPull" Name="RXFD_MODE"/>
-    <RefSignal IOMode="AlternateFunctionPushPull" Name="TXFD_MODE"/>-->
     <Semaphore>$IpInstanceUsed_ForRCC</Semaphore>
 </IP>

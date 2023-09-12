@@ -15,9 +15,13 @@
         <ConfigFile Name="USER_THREADS_V2"/>
         <ConfigFile Name="RTOS_INIT"/>  <!-- new tmp generated now for CMSIS-RTOS v2 case -->
         <ConfigFile Name="RTOS_START"/>
-        <ConfigFile Name="HEAP_USER"/>	
+        <ConfigFile Name="HEAP_USER"/>
+<!-- BZ 75909: ok without condition on IAR  
+        <Defines Name="configENABLE_MPU" Type="Adefine" Value="$configENABLE_MPU"/>
+        <Defines Name="configENABLE_FPU" Type="Adefine" Value="$configENABLE_FPU"/> 
+--> 
     </RefConfig>
-        
+
     <LibMethod Comment="Start scheduler" Name="osKernelStart">
         <Argument Context="local" GenericType="baseaddress" Name="thread_def" TypeName="osThreadDef_t *"/>
         <Argument Context="local" GenericType="baseaddress" Name="argument" TypeName="void *"/>
@@ -71,10 +75,10 @@
         </SubComponent>
         <SubComponent Csub="HEAP" Cvariant="5">
             <File Category="source" Name="Source/portable/MemMang/heap_5.c" Condition="SEM_M33NS | !S_SECURE"/>
-        </SubComponent>      
+        </SubComponent>    
    
         <!-- L5 is based on Cortex-M33 (filenames to be confirmed, once FW pack available -->
-        <SubComponent Csub="IAR">
+        <SubComponent Csub="IAR">        
             <!-- Files to copy/use when TZEN=0 -->
             <File Category="source" Name="Source/portable/IAR/ARM_CM33_NTZ/non_secure/port.c" Condition="!S_SECURE"/>
             <File Category="source" Name="Source/portable/IAR/ARM_CM33_NTZ/non_secure/portasm.s" Condition="!S_SECURE"/>
@@ -184,26 +188,28 @@
         <File Category="source" Condition="!S_SECURE | SEM_M33NS" Name="rtos_inc.tmp" Version="10.2.1"/>
     </RefConfigFile>
     
-    <RefConfigFile Description="Variable declarations for FreeRTOS" Name="TYPEDEFS_V2" Template="freertos_typedefs_v10_0_cmsis_v2.ftl">  
-        <File Category="source" Condition="!S_SECURE | SEM_M33NS" Name="rtos_typedefs.tmp" Version="10.0.1"/>
+    <RefConfigFile Description="Variable declarations for FreeRTOS" Name="TYPEDEFS_V2" Template="freertos_typedefs_v10_0_cmsis_v2.ftl">
+        <File Category="source" Condition="!S_SECURE | SEM_M33NS" Name="rtos_typedefs.tmp" Version="10.2.1"/>
         <Argument Comment="User threads" GenericType="rtos_list" Name="Threads"/>
         <Argument Comment="User queues" GenericType="rtos_list" Name="Queues"/>
-        <Argument Comment="User timers" GenericType="rtos_list" Name="Timers"/>     
-        <Argument Comment="User mutexes" GenericType="rtos_list" Name="Mutexes"/>  
+        <Argument Comment="User timers" GenericType="rtos_list" Name="Timers"/>
+        <Argument Comment="User mutexes" GenericType="rtos_list" Name="Mutexes"/>
         <Argument Comment="User recursive mutexes" GenericType="rtos_list" Name="RecursiveMutexes"/>
-        <Argument Comment="User binary semaphores" GenericType="rtos_list" Name="BinarySemaphores"/>  
-        <Argument Comment="User counting semaphores" GenericType="rtos_list" Name="Semaphores"/>  
+        <Argument Comment="User binary semaphores" GenericType="rtos_list" Name="BinarySemaphores"/>
+        <Argument Comment="User counting semaphores" GenericType="rtos_list" Name="Semaphores"/>
+        <Argument Comment="User events" GenericType="rtos_list" Name="Events"/>  <!-- NEW FOR EVENTS -->
     </RefConfigFile>
 
-    <RefConfigFile Description="Variable declarations for FreeRTOS" Name="VARS_V2" Template="freertos_vars_v10_0_cmsis_v2_L5.ftl">  
+    <RefConfigFile Description="Variable declarations for FreeRTOS" Name="VARS_V2" Template="freertos_vars_v10_0_cmsis_v2_L5.ftl">
         <File Category="source" Condition="!S_SECURE | SEM_M33NS" Name="rtos_vars.tmp" Version="10.2.1"/>
         <Argument Comment="User threads" GenericType="rtos_list" Name="Threads"/>
         <Argument Comment="User queues" GenericType="rtos_list" Name="Queues"/>
-        <Argument Comment="User timers" GenericType="rtos_list" Name="Timers"/>     
-        <Argument Comment="User mutexes" GenericType="rtos_list" Name="Mutexes"/>  
+        <Argument Comment="User timers" GenericType="rtos_list" Name="Timers"/>
+        <Argument Comment="User mutexes" GenericType="rtos_list" Name="Mutexes"/>
         <Argument Comment="User recursive mutexes" GenericType="rtos_list" Name="RecursiveMutexes"/>
-        <Argument Comment="User binary semaphores" GenericType="rtos_list" Name="BinarySemaphores"/>  
-        <Argument Comment="User counting semaphores" GenericType="rtos_list" Name="Semaphores"/>  
+        <Argument Comment="User binary semaphores" GenericType="rtos_list" Name="BinarySemaphores"/>
+        <Argument Comment="User counting semaphores" GenericType="rtos_list" Name="Semaphores"/>
+        <Argument Comment="User events" GenericType="rtos_list" Name="Events"/>  <!-- NEW FOR EVENTS -->
     </RefConfigFile>
 
     <!-- NEW template for kernel init code -->
@@ -221,11 +227,12 @@
         <File Category="source" Condition="!S_SECURE | SEM_M33NS" Name="rtos_obj_creat.tmp" Version="10.2.1"/>
         <Argument Comment="User threads" GenericType="rtos_list" Name="Threads"/>
         <Argument Comment="User queues" GenericType="rtos_list" Name="Queues"/>
-        <Argument Comment="User timers" GenericType="rtos_list" Name="Timers"/>     
+        <Argument Comment="User timers" GenericType="rtos_list" Name="Timers"/>
         <Argument Comment="User mutexes" GenericType="rtos_list" Name="Mutexes"/>
         <Argument Comment="User recursive mutexes" GenericType="rtos_list" Name="RecursiveMutexes"/>
-        <Argument Comment="User binary semaphores" GenericType="rtos_list" Name="BinarySemaphores"/>  
-        <Argument Comment="User counting semaphores" GenericType="rtos_list" Name="Semaphores"/> 
+        <Argument Comment="User binary semaphores" GenericType="rtos_list" Name="BinarySemaphores"/>
+        <Argument Comment="User counting semaphores" GenericType="rtos_list" Name="Semaphores"/>
+        <Argument Comment="User events" GenericType="rtos_list" Name="Events"/>  <!-- NEW FOR EVENTS -->
         <Argument Comment="API in use" GenericType="simple" Name="FreeRTOS_API"/>   <!--  need to distinguish CMSIS v1 and v2 -->
     </RefConfigFile>
     
@@ -247,7 +254,7 @@
 
     <!-- use specific template file to generate header file containing #define -->
     <RefConfigFile Description="Header file for #define" Name="CONFIG_V2" Template="freertos_conf_v10_2_1_cmsis_v2.ftl">
-        <File Category="header" Condition="all" Name="FreeRTOSConfig.h" Version="10.0.1"/>
+        <File Category="header" Condition="all" Name="FreeRTOSConfig.h" Version="10.2.1"/>
         <!-- Parameters for FReeRTOS -->
         <Argument Comment="Set to 1 to use the preemptive RTOS scheduler, or 0 to use the cooperative RTOS scheduler. " GenericType="simple" Name="configUSE_PREEMPTION"/>
         <Argument Comment="Frequency in Hz of the internal CPU clock" GenericType="simple" Name="configCPU_CLOCK_HZ"/>

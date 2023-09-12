@@ -11,6 +11,9 @@
 /* USER CODE END Header */
 
 [#compress]
+[#if cpucore!="" && (contextFolder=="" || contextFolder=="/")]
+[#assign contextFolder = cpucore?replace("ARM_CORTEX_","C")?replace("+","PLUS")+"/"]
+[/#if]
 [#assign inMain = 0]
 [#assign useNewHandle = 0]
 [#assign useTimers = 0]
@@ -18,7 +21,7 @@
 
 [#list SWIPdatas as SWIP]
   [#if SWIP.variables??]
-    [#list SWIP.variables as variable]	
+    [#list SWIP.variables as variable]
       [#if variable.name=="HALCompliant"]
         [#assign inMain = 1]
       [/#if]
@@ -50,7 +53,35 @@
 [/#compress]
 
 [#if inMain == 0]
-[@common.optinclude name=mxTmpFolder+"/rtos_inc.tmp"/][#--include freertos includes --]
+[@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_inc.tmp"/][#--include freertos includes --]
+[#-- BZ 94144: Here we should add (as in main template) the includes needed when the code is generated in a pair of .c/.h files --]
+ [#list SWIPdatas as SWIP]
+  [#if SWIP.variables??]
+    [#list SWIP.variables as variable]
+      [#if variable.name=="MiddlewareInUse"]
+        [#assign s = variable.valueList]
+        [#assign index = 0] 
+        [#list s as i] 
+          [#if index == 0]
+            [#assign mw = i]
+          [/#if]
+          [#assign index = index + 1]
+        [/#list]
+        [#-- specific cases to be handled hereafter: --]  
+        [#if mw == "LoRaWAN"]  
+#include "app_lorawan.h" 
+        [/#if]
+        [#if mw == "Sigfox"]
+#include "app_sigfox.h"
+        [/#if]
+        [#if mw == "SubGHz_Phy"]
+#include "app_subghz_phy.h"
+        [/#if]
+      [/#if] [#-- end if variable.name=="MiddlewareInUse"--]  
+    [/#list]
+  [/#if]
+ [/#list]
+[#-- BZ 94144 --]
 [/#if]
 
 /* Private includes ----------------------------------------------------------*/
@@ -59,10 +90,8 @@
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
-[#-- in main template, contextFolder is used...  --]
-[#-- [@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_typedefs.tmp"/]  --]
 [#if inMain == 0]
-[@common.optinclude name=mxTmpFolder+"/rtos_typedefs.tmp"/]
+[@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_typedefs.tmp"/]
 [/#if]
 /* USER CODE BEGIN PTD */
 
@@ -83,7 +112,7 @@
 
 /* USER CODE END Variables */
 [#if inMain == 0]
-[@common.optinclude name=mxTmpFolder+"/rtos_vars.tmp"/]
+[@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_vars.tmp"/]
 [/#if]
 
 /* Private function prototypes -----------------------------------------------*/
@@ -93,7 +122,7 @@
 [#compress]
 #n
 [#if inMain == 0]
-[@common.optinclude name=mxTmpFolder+"/rtos_pfp.tmp"/]
+[@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_pfp.tmp"/]
 #n
   [#list SWIPdatas as SWIP]
     [#if SWIP.variables??]
@@ -117,20 +146,6 @@ extern void MX_${mw}_Init(void);
 void MX_FREERTOS_Init(void);  /* (MISRA C 2004 rule 8.1) */
 #n
 [/#if]
-
-[#list SWIPdatas as SWIP]
-  [#if SWIP.defines??]     
-    [#list SWIP.defines as definition]
-      [#if definition.name=="configUSE_TICKLESS_IDLE"]
-        [#if definition.value=="1"]
-#n/* Pre/Post sleep processing prototypes */
-void PreSleepProcessing(uint32_t *ulExpectedIdleTime);
-void PostSleepProcessing(uint32_t *ulExpectedIdleTime);
-        [/#if]
-      [/#if]	                        
-    [/#list]
-  [/#if]
-[/#list]
 
 [#list SWIPdatas as SWIP]
   [#if SWIP.defines??]
@@ -239,7 +254,7 @@ __weak void configureTimerForRunTimeStats(void)
         [#if definition.value=="1"]
 #n
 /* USER CODE BEGIN 2 */
-__weak void vApplicationIdleHook( void ) 
+void vApplicationIdleHook( void ) 
 {
 #t    /* vApplicationIdleHook() will only be called if configUSE_IDLE_HOOK is set
 #t    to 1 in FreeRTOSConfig.h.  It will be called on each iteration of the idle
@@ -258,7 +273,7 @@ __weak void vApplicationIdleHook( void )
       [#if definition.name=="configUSE_TICK_HOOK"]
         [#if definition.value=="1"]
 #n/* USER CODE BEGIN 3 */
-__weak void vApplicationTickHook( void ) 
+void vApplicationTickHook( void ) 
 {
 #t    /* This function will be called by each tick interrupt if
 #t    configUSE_TICK_HOOK is set to 1 in FreeRTOSConfig.h.  User code can be
@@ -274,9 +289,9 @@ __weak void vApplicationTickHook( void )
         [#if definition.value !="0"]
 #n/* USER CODE BEGIN 4 */
 [#if useNewHandle==0]
-__weak void vApplicationStackOverflowHook(xTaskHandle xTask, signed char *pcTaskName)
+void vApplicationStackOverflowHook(xTaskHandle xTask, signed char *pcTaskName)
 [#else]
-__weak void vApplicationStackOverflowHook(TaskHandle_t xTask, signed char *pcTaskName)
+void vApplicationStackOverflowHook(TaskHandle_t xTask, signed char *pcTaskName)
 [/#if]
 {
 #t    /* Run time stack overflow checking is performed if
@@ -290,7 +305,7 @@ __weak void vApplicationStackOverflowHook(TaskHandle_t xTask, signed char *pcTas
       [#if definition.name=="configUSE_MALLOC_FAILED_HOOK"]
         [#if definition.value=="1"]
 #n/* USER CODE BEGIN 5 */
-__weak void vApplicationMallocFailedHook(void) 
+void vApplicationMallocFailedHook(void) 
 {
 #t    /* vApplicationMallocFailedHook() will only be called if
 #t    configUSE_MALLOC_FAILED_HOOK is set to 1 in FreeRTOSConfig.h.  It is a hook
@@ -368,11 +383,11 @@ void MX_FREERTOS_Init(void) {
 #t/* USER CODE BEGIN Init */
 #t     
 #t/* USER CODE END Init */
-[@common.optinclude name=mxTmpFolder+"/rtos_obj_creat.tmp"/]
+[@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_obj_creat.tmp"/]
 }
-[@common.optinclude name=mxTmpFolder+"/rtos_default_thread.tmp"/]
-[@common.optinclude name=mxTmpFolder+"/rtos_threads.tmp"/]
-[@common.optinclude name=mxTmpFolder+"/rtos_callbacks.tmp"/]
+[@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_default_thread.tmp"/]
+[@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_threads.tmp"/]
+[@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_callbacks.tmp"/]
 [/#if]  
 
 /* Private application code --------------------------------------------------*/

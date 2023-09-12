@@ -1,9 +1,9 @@
 [#ftl]
 /**
   ******************************************************************************
-  * File Name          : dma.c
-  * Description        : This file provides code for the configuration
-  *                      of all the requested memory to memory DMA transfers.
+  * @file    ${name?lower_case}.c
+  * @brief   This file provides code for the configuration
+  *          of all the requested memory to memory DMA transfers.
   ******************************************************************************
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
@@ -11,7 +11,7 @@
 
 [#assign contextFolder=""]
 [#if cpucore!=""]
-[#assign contextFolder = cpucore?replace("ARM_CORTEX_","C")+"/"]
+[#assign contextFolder = cpucore?replace("ARM_CORTEX_","C")?replace("+","PLUS")+"/"]
 [/#if]
 
 [#function list_contains string_list element]
@@ -305,13 +305,5 @@ void MX_${ipName}_Init(void)
 /* USER CODE BEGIN 2 */
 
 /* USER CODE END 2 */
-
-/**
-  * @}
-  */
-
-/**
-  * @}
-  */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

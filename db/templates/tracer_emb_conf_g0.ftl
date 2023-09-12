@@ -32,8 +32,6 @@
 [#assign UART_TX_DMA_CHANNEL_ID = ""]
 [#assign UART_TX_DMA_interrupt = ""]
 
-[#-- SWIPdatas is a list of SWIPconfigModel --]
-
 [#list IPdatas as IP]
     [#list IP.configModelList as configModel]
         [#list configModel.refConfigFiles as refConfigFile]
@@ -156,9 +154,9 @@ extern "C" {
 -------------------------------------------------------------------------------*/
 
 [#if UARTinstance?starts_with("LPUART")][#t]
-#define TRACER_EMB_IS_INSTANCE_LPUART_TYPE           1UL /* set to 1UL as LPUART is used instead of USART */
+#define TRACER_EMB_IS_INSTANCE_LPUART_TYPE           1UL /* set to 1UL if LPUART is used instead of USART */
 [#else]
-#define TRACER_EMB_IS_INSTANCE_LPUART_TYPE           0UL /* set to 0UL as USART is used */
+#define TRACER_EMB_IS_INSTANCE_LPUART_TYPE           0UL /* set to 0UL if USART is used */
 [/#if][#t]
 
 #define TRACER_EMB_USART_INSTANCE                    ${UARTinstance}

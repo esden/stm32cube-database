@@ -149,7 +149,7 @@
                     [#assign LPUART1_TX_DMA_CHANNEL_elems = LPUART1_TX_DMA_CHANNEL.split("_")]
                     [#assign LPUART1_TX_DMA_REQUEST = LPUART1_TX_DMA_CHANNEL_elems[0] + "_" + LPUART1_TX_DMA_CHANNEL_elems[1]]
                     [#assign LPUART1_TX_DMA = LPUART1_TX_DMA_CHANNEL_elems[2]]
-                    [#assign LPUART1_TX_DMA_LL_CHANNEL = LPUART1_TX_DMA_CHANNEL_elems[3]?upper_case + "_" + LPUART1_TX_DMA_CHANNEL_elems[4]]
+                    [#assign LPUART1_TX_DMA_LL_CHANNEL = LPUART1_TX_DMA_CHANNEL_elems[3] + LPUART1_TX_DMA_CHANNEL_elems[4]]
                 [#else]
                     [#assign LPUART1_TX_DMA_REQUEST = "valueNotSetted"]
                     [#assign LPUART1_TX_DMA = "valueNotSetted"]
@@ -235,7 +235,7 @@
                     [#assign USART1_TX_DMA_CHANNEL_elems = USART1_TX_DMA_CHANNEL.split("_")]
                     [#assign USART1_TX_DMA_REQUEST = USART1_TX_DMA_CHANNEL_elems[0] + "_" + USART1_TX_DMA_CHANNEL_elems[1]]
                     [#assign USART1_TX_DMA = USART1_TX_DMA_CHANNEL_elems[2]]
-                    [#assign USART1_TX_DMA_LL_CHANNEL = USART1_TX_DMA_CHANNEL_elems[3]?upper_case + "_" + USART1_TX_DMA_CHANNEL_elems[4]]
+                    [#assign USART1_TX_DMA_LL_CHANNEL = USART1_TX_DMA_CHANNEL_elems[3] + USART1_TX_DMA_CHANNEL_elems[4]]
                 [#else]
                     [#assign USART1_TX_DMA_REQUEST = "valueNotSetted"]
                     [#assign USART1_TX_DMA = "valueNotSetted"]
@@ -266,6 +266,8 @@
 *  The CPU1 shall not either write or erase in flash when this semaphore is taken by the CPU2
 *  When the CPU1 needs to either write or erase in flash, it shall first get the semaphore and release it just
 *  after writing a raw (64bits data) or erasing one sector.
+*  Once the Semaphore has been released, there shall be at least 1us before it can be taken again. This is required
+*  to give the opportunity to CPU2 to take it.
 *  On v1.4.0 and older CPU2 wireless firmware, this semaphore is unused and CPU2 is using PES bit.
 *  By default, CPU2 is using the PES bit to protect its timing. The CPU1 may request the CPU2 to use the semaphore
 *  instead of the PES bit by sending the system command SHCI_C2_SetFlashActivityControl()
@@ -419,7 +421,6 @@
 /******************************************************************************
  * HW UART
  *****************************************************************************/
-
 [#if CFG_HW_LPUART1_ENABLED != "" ]
     [#lt]#define CFG_HW_LPUART1_ENABLED           ${CFG_HW_LPUART1_ENABLED}
 [/#if]
@@ -469,6 +470,7 @@
 #define CFG_HW_LPUART1_RX_SPEED                GPIO_SPEED_FREQ_VERY_HIGH
 #define CFG_HW_LPUART1_RX_ALTERNATE            GPIO_AF${LPUART1_RX_SELECT_AF}_LPUART1
 
+[#if LPUART1_CTS_PIN != "" && LPUART1_CTS_PIN != "valueNotSetted"]
 #define CFG_HW_LPUART1_CTS_PORT_CLK_ENABLE     __HAL_RCC_GPIO${LPUART1_CTS_GPIO_PORT}_CLK_ENABLE
 #define CFG_HW_LPUART1_CTS_PORT                GPIO${LPUART1_CTS_GPIO_PORT}
 #define CFG_HW_LPUART1_CTS_PIN                 GPIO_PIN_${LPUART1_CTS_GPIO_PIN}
@@ -476,6 +478,7 @@
 #define CFG_HW_LPUART1_CTS_PULL                GPIO_PULLDOWN
 #define CFG_HW_LPUART1_CTS_SPEED               GPIO_SPEED_FREQ_VERY_HIGH
 #define CFG_HW_LPUART1_CTS_ALTERNATE           GPIO_AF${LPUART1_CTS_SELECT_AF}_LPUART1
+[/#if]
 
 [#if CFG_HW_LPUART1_DMA_TX_SUPPORTED == "1" &&  LPUART1_TX_DMA != "" && LPUART1_TX_DMA != "valueNotSetted"]
 #define CFG_HW_LPUART1_DMA_TX_PREEMPTPRIORITY  0x0F
@@ -525,6 +528,7 @@
 #define CFG_HW_USART1_RX_SPEED                GPIO_SPEED_FREQ_VERY_HIGH
 #define CFG_HW_USART1_RX_ALTERNATE            GPIO_AF${USART1_RX_SELECT_AF}_USART1
 
+[#if USART1_CTS_PIN != "" && USART1_CTS_PIN != "valueNotSetted"]
 #define CFG_HW_USART1_CTS_PORT_CLK_ENABLE     __HAL_RCC_GPIO${USART1_CTS_GPIO_PORT}_CLK_ENABLE
 #define CFG_HW_USART1_CTS_PORT                GPIO${USART1_CTS_GPIO_PORT}
 #define CFG_HW_USART1_CTS_PIN                 GPIO_PIN_${USART1_CTS_GPIO_PIN}
@@ -532,6 +536,7 @@
 #define CFG_HW_USART1_CTS_PULL                GPIO_PULLDOWN
 #define CFG_HW_USART1_CTS_SPEED               GPIO_SPEED_FREQ_VERY_HIGH
 #define CFG_HW_USART1_CTS_ALTERNATE           GPIO_AF${USART1_CTS_SELECT_AF}_USART1
+[/#if]
 
 [#if CFG_HW_USART1_DMA_TX_SUPPORTED == "1" &&  USART1_TX_DMA != "" && USART1_TX_DMA != "valueNotSetted"]
 #define CFG_HW_USART1_DMA_TX_PREEMPTPRIORITY  0x0F

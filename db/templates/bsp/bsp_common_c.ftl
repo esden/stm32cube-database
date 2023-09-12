@@ -608,11 +608,11 @@ int32_t BSP_COM_SelectLogPort(COM_TypeDef COM)
   return BSP_ERROR_NONE; 
 }
 
-#ifdef __GNUC__ 
- int __io_putchar (int ch) 
-#else 
- int fputc (int ch, FILE *f) 
-#endif /* __GNUC__ */ 
+#if defined(__ICCARM__) || defined(__CC_ARM) /* For IAR and MDK-ARM */
+ int fputc (int ch, FILE *f)
+#else /* For GCC Toolchains */
+ int __io_putchar (int ch)
+#endif /* __GNUC__ */
 { 
   (void)HAL_UART_Transmit(&hcom_uart[COM_ActiveLogPort], (uint8_t *)&ch, 1, COM_POLL_TIMEOUT); 
   return ch;

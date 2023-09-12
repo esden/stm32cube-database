@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<IP xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance"
+    ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd"
+    xmlns="http://mcd.rou.st.com/modules.php?name=mcu"
+    DBVersion="V4.0"
+    IPType="service"
+    IpGroup="Utilities"
+    Name="GUI_INTERFACE"
+    Version="guiinterface_STM32G0_v1.11.0_Cube">
+
+    <About>GUI_INTERFACE : GUI Interface</About>
+
+    <!-- Generic RefParameters for GUI_INTERFACE -->
+    <RefParameter Name="Version" Comment="Version" Type="string" DefaultValue="1.11.0"/>
+    <RefParameter Name="IntVersion" Comment="IntVersion" Type="integer" DefaultValue="1110"/>
+
+    <RefParameter Name="HWBoardVersionName" Comment="HWBoardVersionName" Type="stringRW" DefaultValue="STM32G081B-EVAL">
+        <Condition Expression="STM32G081B-EVAL" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Name="HWBoardVersionName" Comment="HWBoardVersionName" Type="stringRW" DefaultValue=""/>
+    <RefParameter Name="PDTypeName" Comment="PDTypeName" Type="stringRW" DefaultValue="MB1352C">
+        <Condition Expression="STM32G081B-EVAL" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Name="PDTypeName" Comment="PDTypeName" Type="stringRW" DefaultValue=""/>
+
+    <!-- RefModes for GUI_INTERFACE -->
+    <RefMode Name="GUI_INTERFACE" Abstract="true">
+        <ConfigForMode>GUI_INTERFACE_Init</ConfigForMode>
+
+        <Parameter Name="Version"/>
+
+        <Parameter Name="HWBoardVersionName"/>
+        <Parameter Name="PDTypeName"/>
+
+    </RefMode>
+
+    <!-- ModeLogicOperator for GUI_INTERFACE -->
+    <ModeLogicOperator Name="OR">
+
+        <Mode Name="Enable" UserName="Enable">
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="GUI_INTERFACE" UserName="Enabled">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="VS_gui_interface"/>
+                    </SignalLogicalOp>
+                    <Semaphore>GUI_INTERFACE</Semaphore>
+                </Mode>
+            </ModeLogicOperator>
+            <Condition Expression="USBPD_TRACEREMB &amp; !USBPD_PD3TYPEC" Diagnostic="only available when TRACER_EMB configured and used by USBPD else USBPD Stack = Type C"/>
+        </Mode>
+
+    </ModeLogicOperator>
+
+    <!-- RefSignal for GUI_INTERFACE -->
+    <RefSignal Name="VS_gui_interface" Virtual="true"/>
+
+    <Semaphore>MW_GUI_INTERFACE_MW</Semaphore>
+
+</IP>

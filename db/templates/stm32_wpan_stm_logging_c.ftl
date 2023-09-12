@@ -10,6 +10,22 @@
   ******************************************************************************
   */
 
+[#assign THREAD = 0]
+[#assign ZIGBEE = 0]
+
+[#list SWIPdatas as SWIP]
+    [#if SWIP.defines??]
+        [#list SWIP.defines as definition]
+            [#if (definition.name == "THREAD") && (definition.value == "Enabled")]
+                [#assign THREAD = 1]
+            [/#if]
+            [#if (definition.name == "ZIGBEE") && (definition.value == "Enabled")]
+                [#assign ZIGBEE = 1]
+            [/#if]
+        [/#list]
+    [/#if]
+[/#list]
+
 /**
  * @file
  *   This file implements logging functions to be used in Application examples.
@@ -67,6 +83,7 @@ static inline uint16_t logRegion(char *aLogString, uint16_t aMaxSize,
     case APPLI_LOG_REGION_GENERAL:
       strcpy(logRegionString, "[M4 APPLICATION]");
       break;
+[#if THREAD = 1]
     case APPLI_LOG_REGION_OPENTHREAD_API:
       strcpy(logRegionString, "[M4 OPENTHREAD API]");
       break;
@@ -78,6 +95,11 @@ static inline uint16_t logRegion(char *aLogString, uint16_t aMaxSize,
       break;
     case APPLI_LOG_REGION_OT_API_MESSAGE:
       strcpy(logRegionString, "[M4 MESSAGE API]");
+[/#if]
+[#if ZIGBEE = 1]
+    case APPLI_LOG_REGION_ZIGBEE_API:
+      strcpy(logRegionString, "[M4 ZIGBEE API]");
+[/#if]
       break;
     default:
       strcpy(logRegionString, "[M4]");

@@ -462,8 +462,7 @@
                                         [#assign argValue=argument.value]
                                     [/#if][#-- if global --]
                                     [#-- Bz40086 - Begin tweak of the value in case of ADC --]
-                                    [#if ((config.name == "ADC_RegularChannelConfig" && FamilyName!="STM32G0" ) || config.name == "ADC_InjectedChannelConfig" ||  (FamilyName=="STM32G0" && config.name == "ADC_RegularChannelRankConfig")) && (FamilyName!="STM32F0" && FamilyName!="STM32L0" && FamilyName!="STM32F2" && FamilyName!="STM32F4")]
-                                        [#list argument?keys as k]
+[#if ((config.name == "ADC_RegularChannelConfig" && (FamilyName!="STM32G0" || FamilyName!="STM32WL") ) || config.name == "ADC_InjectedChannelConfig" ||  ((FamilyName=="STM32G0" || FamilyName=="STM32WL") && config.name == "ADC_RegularChannelRankConfig")) && (FamilyName!="STM32F0" && FamilyName!="STM32L0" && FamilyName!="STM32F2" && FamilyName!="STM32F4")]                                        [#list argument?keys as k]
                                             [#if k == "name"]
                                                 [#if argument[k] == "Rank"]
                                                  

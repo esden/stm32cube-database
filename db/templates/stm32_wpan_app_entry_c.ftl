@@ -12,7 +12,7 @@
 
 [#assign BLE_TRANSPARENT_MODE_UART = 0]
 [#assign BLE_TRANSPARENT_MODE_VCP = 0]
-[#assign BT_SIG_BEACON = 0]
+[#assign BT_SIG_BEACON = "0"]
 [#assign BT_SIG_BLOOD_PRESSURE_SENSOR = 0]
 [#assign BT_SIG_HEALTH_THERMOMETER_SENSOR = 0]
 [#assign BT_SIG_HEART_RATE_SENSOR = 0]
@@ -24,6 +24,7 @@
 [#assign FREERTOS_STATUS = 0]
 [#assign THREAD = 0]
 [#assign BLE = 0]
+[#assign ZIGBEE = 0]
 [#assign CFG_DEBUG_TRACE_UART  = ""]
 
 [#list SWIPdatas as SWIP]
@@ -38,8 +39,8 @@
             [#if (definition.name == "BLE_TRANSPARENT_MODE_VCP") && (definition.value == "Enabled")]
                 [#assign BLE_TRANSPARENT_MODE_VCP = 1]
             [/#if]
-            [#if (definition.name == "BT_SIG_BEACON") && (definition.value == "Enabled")]
-                [#assign BT_SIG_BEACON = 1]
+            [#if (definition.name == "BT_SIG_BEACON") && (definition.value != "Disabled")]
+                [#assign BT_SIG_BEACON = definition.value]
             [/#if]
             [#if (definition.name == "BT_SIG_BLOOD_PRESSURE_SENSOR") && (definition.value == "Enabled")]
                 [#assign BT_SIG_BLOOD_PRESSURE_SENSOR = 1]
@@ -80,6 +81,12 @@
             [#if (definition.name == "THREAD") && (definition.value == "Enabled")]
                 [#assign THREAD = 1]
             [/#if]
+            [#if (definition.name == "ZIGBEE") && (definition.value == "Enabled")]
+                [#assign ZIGBEE = 1]
+            [/#if]
+            [#if definition.name == "ZGB_SLEEPY_MODE"]
+                [#assign ZGB_SLEEPY_MODE = definition.value]
+            [/#if]
             [#if (definition.name == "CFG_DEBUG_TRACE_UART")  && (definition.value != "0")]
                 [#assign CFG_DEBUG_TRACE_UART  = definition.value]
             [/#if]
@@ -104,6 +111,11 @@
 [/#if]
 [#if THREAD = 1 ]
 #include "app_thread.h"
+[/#if]
+[#if ZIGBEE = 1]
+#include "app_zigbee.h"
+[/#if]
+[#if THREAD = 1 || ZIGBEE = 1]
 #include "app_conf.h"
 #include "hw_conf.h"
 [/#if]
@@ -119,12 +131,12 @@
 #include "shci_tl.h"
 [/#if]
 [/#if]
-[#if THREAD = 1 ]
+[#if THREAD = 1 || ZIGBEE = 1]
 #include "stm_logging.h"
 #include "shci_tl.h"
 [/#if]
 #include "stm32_lpm.h"
-[#if THREAD = 1 ]
+[#if THREAD = 1 || ZIGBEE = 1]
 #include "dbg_trace.h"
 #include "shci.h"
 [#else]
@@ -149,7 +161,7 @@ extern RTC_HandleTypeDef hrtc;
 #define INFORMATION_SECTION_KEYWORD   (0xA56959A6)
 [/#if]
 [/#if]
-[#if THREAD = 1 ]
+[#if THREAD = 1 || ZIGBEE = 1]
 /* POOL_SIZE = 2(TL_PacketHeader_t) + 258 (3(TL_EVT_HDR_SIZE) + 255(Payload size)) */
 #define POOL_SIZE (CFG_TL_EVT_QUEUE_LENGTH * 4U * DIVC(( sizeof(TL_PacketHeader_t) + TL_EVENT_FRAME_SIZE ), 4U))
 [/#if]
@@ -204,7 +216,7 @@ const osThreadAttr_t ShciUserEvtProcess_attr = {
 };
 [/#if]
 
-[#if (THREAD = 1)]
+[#if THREAD = 1 || ZIGBEE = 1]
 /* Global function prototypes -----------------------------------------------*/
 #if(CFG_DEBUG_TRACE != 0)
 size_t DbgTraceWrite(int handle, const unsigned char * buf, size_t bufSize);
@@ -220,7 +232,7 @@ size_t DbgTraceWrite(int handle, const unsigned char * buf, size_t bufSize);
 static void ShciUserEvtProcess(void *argument);
 [/#if]
 static void SystemPower_Config( void );
-[#if (THREAD = 1)]
+[#if THREAD = 1 || ZIGBEE = 1]
 static void Init_Debug( void );
 [/#if]
 static void appe_Tl_Init( void );
@@ -234,7 +246,7 @@ static void APPE_SysStatusNot( SHCI_TL_CmdStatus_t status );
 static void APPE_SysUserEvtRx( void * pPayload );
 [/#if]
 [/#if]
-[#if (THREAD = 1)]
+[#if THREAD = 1 || ZIGBEE = 1]
 static void APPE_SysStatusNot( SHCI_TL_CmdStatus_t status );
 static void APPE_SysUserEvtRx( void * pPayload );
 static void APPE_SysEvtReadyProcessing( void );
@@ -283,7 +295,7 @@ void APPE_Init( void )
  * LOCAL FUNCTIONS
  *
  *************************************************************/
-[#if (THREAD = 1)]
+[#if THREAD = 1 || ZIGBEE = 1]
 static void Init_Debug( void )
 {
 #if (CFG_DEBUGGER_SUPPORTED == 1)
@@ -337,7 +349,12 @@ static void Init_Debug( void )
  */
 static void SystemPower_Config(void)
 {
+  [#if ZGB_SLEEPY_MODE == "ON"]
+  // Before going to stop or standby modes, do the settings so that system clock and IP80215.4 clock start on HSI automatically
+  // start on HSI automatically
+  LL_RCC_HSI_EnableAutoFromStop();
 
+  [/#if]
   /**
    * Select HSI as system clock source after Wake Up from Stop mode
    */
@@ -347,6 +364,13 @@ static void SystemPower_Config(void)
   UTIL_LPM_Init();
   /* Initialize the CPU2 reset value before starting CPU2 with C2BOOT */
   LL_C2_PWR_SetPowerMode(LL_PWR_MODE_SHUTDOWN);
+
+  [#if ZGB_SLEEPY_MODE == "ON"]
+  /* Disable low power mode until INIT is complete */
+  UTIL_LPM_SetOffMode(1 << CFG_LPM_APP, UTIL_LPM_DISABLE);
+  UTIL_LPM_SetStopMode(1 << CFG_LPM_APP, UTIL_LPM_DISABLE);
+
+  [/#if]
 
 #if (CFG_USB_INTERFACE_ENABLE != 0)
   /**
@@ -386,7 +410,7 @@ static void appe_Tl_Init( void )
   UTIL_SEQ_RegTask( 1<< CFG_TASK_SYSTEM_HCI_ASYNCH_EVT_ID, UTIL_SEQ_RFU, shci_user_evt_proc );
 [/#if]
 [/#if]
-[#if (THREAD = 1)]
+[#if THREAD = 1 || ZIGBEE = 1]
 [#if (FREERTOS_STATUS = 0)]
   UTIL_SEQ_RegTask( 1<< CFG_TASK_SYSTEM_HCI_ASYNCH_EVT, UTIL_SEQ_RFU, shci_user_evt_proc );
 [/#if]
@@ -406,7 +430,7 @@ static void appe_Tl_Init( void )
 [#if (BLE = 1)]
   tl_mm_config.p_BleSpareEvtBuffer = BleSpareEvtBuffer;
 [/#if]
-[#if (THREAD = 1)]
+[#if THREAD = 1 || ZIGBEE = 1]
   tl_mm_config.p_BleSpareEvtBuffer = 0;
 [/#if]
   tl_mm_config.p_SystemSpareEvtBuffer = SystemSpareEvtBuffer;
@@ -479,7 +503,7 @@ static void APPE_SysStatusNot( SHCI_TL_CmdStatus_t status )
  * The type of the payload for a system user event is tSHCI_UserEvtRxParam
  * When the system event is both :
  *    - a ready event (subevtcode = SHCI_SUB_EVT_CODE_READY)
- *    - reported by the FUS (sysevt_ready_rsp == RSS_FW_RUNNING)
+ *    - reported by the FUS (sysevt_ready_rsp == FUS_FW_RUNNING)
  * The buffer shall not be released
  * ( eg ((tSHCI_UserEvtRxParam*)pPayload)->status shall be set to SHCI_TL_UserEventFlow_Disable )
  * When the status is not filled, the buffer is released by default
@@ -489,7 +513,7 @@ static void APPE_SysUserEvtRx( void * pPayload )
 [#if (BLE = 1)]
   UNUSED(pPayload);
 [/#if]
-[#if (THREAD = 1)]
+[#if THREAD = 1 || ZIGBEE = 1]
   TL_AsynchEvt_t *p_sys_event;
   p_sys_event = (TL_AsynchEvt_t*)(((tSHCI_UserEvtRxParam*)pPayload)->pckt->evtserial.evt.payload);
 
@@ -517,6 +541,7 @@ static void APPE_SysEvtError( SCHI_SystemErrCode_t ErrorCode)
 {
   switch(ErrorCode)
   {
+[#if THREAD == 1]
   case ERR_THREAD_LLD_FATAL_ERROR:
        APP_DBG("** ERR_THREAD : LLD_FATAL_ERROR \n");
        break;
@@ -525,6 +550,13 @@ static void APPE_SysEvtError( SCHI_SystemErrCode_t ErrorCode)
        break;
   default:
        APP_DBG("** ERR_THREAD : ErroCode=%d \n",ErrorCode);
+[#else]
+  case ERR_ZIGBEE_UNKNOWN_CMD:
+       APP_DBG("** ERR_ZIGBEE : UNKNOWN_CMD \n");
+       break;
+  default:
+       APP_DBG("** ERR_ZIGBEE : ErroCode=%d \n",ErrorCode);
+[/#if]
        break;
   }
   return;
@@ -534,7 +566,7 @@ static void APPE_SysEvtReadyProcessing( void )
 {
 [/#if]
   /* Traces channel initialization */
-[#if (THREAD = 1)]
+[#if THREAD = 1 || ZIGBEE = 1]
   TL_TRACES_Init( );
 [/#if]
 [#if (BLE = 1)]
@@ -546,6 +578,9 @@ static void APPE_SysEvtReadyProcessing( void )
 [/#if]
 [#if (THREAD = 1)]
   APP_THREAD_Init();
+[/#if]
+[#if ZIGBEE = 1]
+  APP_ZIGBEE_Init();
 [/#if]
   UTIL_LPM_SetOffMode(1U << CFG_LPM_APP, UTIL_LPM_ENABLE);
   return;
@@ -615,23 +650,37 @@ void shci_notify_asynch_evt(void* pdata)
   */
 void UTIL_SEQ_EvtIdle( UTIL_SEQ_bm_t task_id_bm, UTIL_SEQ_bm_t evt_waited_bm )
 {
-[#if (THREAD = 1)]
+[#if THREAD = 1 || ZIGBEE = 1]
   switch(evt_waited_bm)
   {
   case EVENT_ACK_FROM_M0_EVT:
+[#if THREAD = 1]
     /* Does not allow other tasks when waiting for OT Cmd response */
     UTIL_SEQ_Run(0);
+[#else]
+    /**
+     * Run only the task CFG_TASK_REQUEST_FROM_M0_TO_M4 to process
+     * direct requests from the M0 (e.g. ZbMalloc), but no stack notifications
+     * until we're done the request to the M0.
+     */
+    UTIL_SEQ_Run((1U << CFG_TASK_REQUEST_FROM_M0_TO_M4));
+[/#if]
     break;
   case EVENT_SYNCHRO_BYPASS_IDLE:
     UTIL_SEQ_SetEvt(EVENT_SYNCHRO_BYPASS_IDLE);
+[#if THREAD = 1]
     /* Run only the task CFG_TASK_MSG_FROM_M0_TO_M4 */
     UTIL_SEQ_Run(TASK_MSG_FROM_M0_TO_M4);
+[#else]
+    /* Process notifications and requests from the M0 */
+    UTIL_SEQ_Run((1U << CFG_TASK_NOTIFY_FROM_M0_TO_M4) | (1U << CFG_TASK_REQUEST_FROM_M0_TO_M4));
+[/#if]
     break;
   default :
     /* default case */
 [/#if]
   UTIL_SEQ_Run( UTIL_SEQ_DEFAULT );
-[#if (THREAD = 1)]
+[#if THREAD = 1 || ZIGBEE = 1]
     break;
   }
 }
@@ -680,7 +729,7 @@ void shci_cmd_resp_wait(uint32_t timeout)
 }
 
 [/#if]
-[#if (THREAD = 1)]
+[#if THREAD = 1 || ZIGBEE = 1]
 void shci_cmd_resp_release(uint32_t flag)
 {
   UNUSED(flag);
@@ -716,7 +765,7 @@ void TL_TRACES_EvtReceived( TL_EvtPacket_t * hcievt )
   TL_MM_EvtDone( hcievt );
 }
 [/#if]
-[#if (THREAD = 1)]
+[#if THREAD = 1 || ZIGBEE = 1]
 /**
   * @brief  Initialisation of the trace mechanism
   * @param  None

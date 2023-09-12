@@ -213,6 +213,7 @@
                 [/#if]
                 [#if definition.name=="PE_DR_Swap_To_DFP_P1"]
                     [#assign valuePE_DR_Swap_To_DFP_P1 = definition.value]
+                    [#assign DR_SWAP_TO_XFP_FEATURE = true]
                 [/#if]
                 [#if definition.name=="PE_DR_Swap_To_UFP_P1"]
                     [#assign valuePE_DR_Swap_To_UFP_P1 = definition.value]
@@ -303,8 +304,8 @@
 [/#list]
 
 /* Includes ------------------------------------------------------------------*/
+[#if USBPD_CoreLib != "USBPDCORE_LIB_NO_PD"]
 #include "usbpd_pdo_defs.h"
-[#if USBPD_CoreLib != "USBPDCORE_LIB_NO_PD" || USBPD_STATEMACHINE]
 #include "usbpd_dpm_user.h"
 [/#if]
 [#if USBPD_CoreLib == "USBPDCORE_LIB_PD3_FULL" | USBPD_CoreLib == "USBPDCORE_LIB_PD3_CONFIG_1"]
@@ -322,11 +323,13 @@
 /* USER CODE END Includes */
 
 /* Define   ------------------------------------------------------------------*/
+[#if USBPD_CoreLib != "USBPDCORE_LIB_NO_PD"]
 /* Define VID, PID,... manufacturer parameters */
 #define USBPD_VID (${valueUSBPD_VID}u)     /*!< Vendor ID (assigned by the USB-IF)                     */
 #define USBPD_PID (${valueUSBPD_PID}u)     /*!< Product ID (assigned by the manufacturer)              */
 #define USBPD_XID (${valueUSBPD_XID}u) /*!< Value provided by the USB-IF assigned to the product   */
 
+[/#if]
 /* USER CODE BEGIN Define */
 /* Section where Define can be added */
 
@@ -341,7 +344,7 @@
 /* Private variables ---------------------------------------------------------*/
 #ifndef __USBPD_DPM_CORE_C
 extern USBPD_SettingsTypeDef            DPM_Settings[USBPD_PORT_COUNT];
-[#if USBPD_CoreLib != "USBPDCORE_LIB_NO_PD" || USBPD_STATEMACHINE]
+[#if USBPD_CoreLib != "USBPDCORE_LIB_NO_PD"]
 [#if !GUI_INTERFACE?? || GUI_V1_8_0_OR_NEWER]
 extern USBPD_IdSettingsTypeDef          DPM_ID_Settings[USBPD_PORT_COUNT];
 extern USBPD_USER_SettingsTypeDef       DPM_USER_Settings[USBPD_PORT_COUNT];
@@ -351,13 +354,16 @@ extern USBPD_USER_SettingsTypeDef       DPM_USER_Settings[USBPD_PORT_COUNT];
 USBPD_SettingsTypeDef       DPM_Settings[USBPD_PORT_COUNT] =
 {
   {
+[#if USBPD_CoreLib != "USBPDCORE_LIB_NO_PD"]
     .PE_SupportedSOP = ${valuePE_SupportedSOP_P0}[#rt]
     [#if valuePE_SupportedSOPapos_P0!="USBPD_SUPPORTED_SOP_NONE"]|${valuePE_SupportedSOPapos_P0}[/#if][#t]
     [#if valuePE_SupportedSOPquot_P0!="USBPD_SUPPORTED_SOP_NONE"]|${valuePE_SupportedSOPquot_P0}[/#if][#t]
     [#if valuePE_SupportedSOPaposDBG_P0!="USBPD_SUPPORTED_SOP_NONE"]|${valuePE_SupportedSOPaposDBG_P0}[/#if][#t]
     [#if valuePE_SupportedSOPquotDBG_P0!="USBPD_SUPPORTED_SOP_NONE"]|${valuePE_SupportedSOPquotDBG_P0}[/#if], /* Supported SOP : SOP, SOP' SOP" SOP'Debug SOP"Debug */
     .PE_SpecRevision = ${valuePE_SpecRevision_P0},/* spec revision value                                     */
+[/#if]
     .PE_DefaultRole = ${valuePE_DefaultRole_P0},  /* Default port role                                       */    
+[#if USBPD_CoreLib != "USBPDCORE_LIB_NO_PD"]
     .PE_RoleSwap = ${valuePE_RoleSwap_P0},                  /* support port role swap                                  */
     .PE_VDMSupport = ${valuePE_VDMSupport_P0},
     .PE_RespondsToDiscovSOP = ${valuePE_RespondsToDiscovSOP_P0},      /*!< Can respond successfully to a Discover Identity */
@@ -365,9 +371,11 @@ USBPD_SettingsTypeDef       DPM_Settings[USBPD_PORT_COUNT] =
     .PE_PingSupport = ${valuePE_PingSupport_P0},              /* support Ping (only for PD3.0)                                            */
     .PE_CapscounterSupport = ${valuePE_CapscounterSupport_P0},       /* support caps counter                                    */
     .CAD_RoleToggle = ${valueCAD_RoleToggle_P0},               /* CAD role toggle                                         */
+[/#if]
 [#if SRC || DRP]
     .CAD_DefaultResistor = ${valueCAD_DefaultResistor_P0},
 [/#if]
+[#if USBPD_CoreLib != "USBPDCORE_LIB_NO_PD"]
     .CAD_TryFeature = ${valueCAD_TryFeature_P0},              /* CAD try feature                                         */
     .CAD_AccesorySupport = ${valueCAD_AccesorySupport_P0},         /* CAD accessory support                                   */
 [#if USBPD_CoreLib != "USBPDCORE_LIB_NO_PD"]
@@ -392,17 +400,21 @@ USBPD_SettingsTypeDef       DPM_Settings[USBPD_PORT_COUNT] =
 
     .CAD_SRCToggleTime = ${valueCAD_SRCToggleTime_P0},                    /* uint8_t CAD_SRCToggleTime; */
     .CAD_SNKToggleTime = ${valueCAD_SNKToggleTime_P0},                    /* uint8_t CAD_SNKToggleTime; */
+[/#if]
 [#if nbPorts=="2"]
 #if USBPD_PORT_COUNT >= 2
   },
   {
+[#if USBPD_CoreLib != "USBPDCORE_LIB_NO_PD"]
     .PE_SupportedSOP = ${valuePE_SupportedSOP_P1}[#rt]
     [#if valuePE_SupportedSOPapos_P1!="USBPD_SUPPORTED_SOP_NONE"]|${valuePE_SupportedSOPapos_P1}[/#if][#t]
     [#if valuePE_SupportedSOPquot_P1!="USBPD_SUPPORTED_SOP_NONE"]|${valuePE_SupportedSOPquot_P1}[/#if][#t]
     [#if valuePE_SupportedSOPaposDBG_P1!="USBPD_SUPPORTED_SOP_NONE"]|${valuePE_SupportedSOPaposDBG_P1}[/#if][#t]
     [#if valuePE_SupportedSOPquotDBG_P1!="USBPD_SUPPORTED_SOP_NONE"]|${valuePE_SupportedSOPquotDBG_P1}[/#if], /* Supported SOP : SOP, SOP' SOP" SOP'Debug SOP"Debug      */
     .PE_SpecRevision = ${valuePE_SpecRevision_P1},/* spec revision value                                     */
+[/#if]
     .PE_DefaultRole = ${valuePE_DefaultRole_P1},  /* Default port role                                       */
+[#if USBPD_CoreLib != "USBPDCORE_LIB_NO_PD"]
     .PE_RoleSwap = ${valuePE_RoleSwap_P1},                 /* support port role swap                                  */
     .PE_VDMSupport = ${valuePE_VDMSupport_P1},
     .PE_RespondsToDiscovSOP = ${valuePE_RespondsToDiscovSOP_P1},      /*!< Can respond successfully to a Discover Identity */
@@ -410,9 +422,11 @@ USBPD_SettingsTypeDef       DPM_Settings[USBPD_PORT_COUNT] =
     .PE_PingSupport = ${valuePE_PingSupport_P1},              /* support Ping (only for PD3.0)                                     */
     .PE_CapscounterSupport = ${valuePE_CapscounterSupport_P1},       /* support caps counter                                    */
     .CAD_RoleToggle = ${valueCAD_RoleToggle_P1},              /* CAD role toggle                                         */
+[/#if]
 [#if SRC || DRP]
     .CAD_DefaultResistor = ${valueCAD_DefaultResistor_P1},
 [/#if]
+[#if USBPD_CoreLib != "USBPDCORE_LIB_NO_PD"]
     .CAD_TryFeature = ${valueCAD_TryFeature_P1},              /* CAD try feature                                         */
     .CAD_AccesorySupport = ${valueCAD_AccesorySupport_P1},         /* CAD accessory support                                   */
     .PE_PD3_Support.d =                         /*!< PD3 SUPPORT FEATURE                                              */
@@ -435,6 +449,7 @@ USBPD_SettingsTypeDef       DPM_Settings[USBPD_PORT_COUNT] =
 
     .CAD_SRCToggleTime = ${valueCAD_SRCToggleTime_P1},                    /* uint8_t CAD_SRCToggleTime; */
     .CAD_SNKToggleTime = ${valueCAD_SNKToggleTime_P1},                    /* uint8_t CAD_SNKToggleTime; */
+[/#if]
 #endif
 [/#if]
   }

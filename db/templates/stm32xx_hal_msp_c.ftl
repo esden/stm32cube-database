@@ -1,13 +1,13 @@
 [#ftl]
 [#if cpucore!="" && (contextFolder=="" || contextFolder=="/")]    
-[#assign contextFolder = cpucore?replace("ARM_CORTEX_","C")+"/"]
+[#assign contextFolder = cpucore?replace("ARM_CORTEX_","C")?replace("+","PLUS")+"/"]
 [/#if]
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-  * File Name          : ${FamilyName?lower_case}xx_hal_msp.c
-  * Description        : This file provides code for the MSP Initialization 
-  *                      and de-Initialization codes.
+  * @file         ${FamilyName?lower_case}xx_hal_msp.c
+  * @brief        This file provides code for the MSP Initialization 
+  *               and de-Initialization codes.
   ******************************************************************************
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
@@ -116,7 +116,9 @@ void HAL_MspInit(void)
 #n
 [#if clock??]
     [#list clock as clk]
-        [#if clk!=""]#t${clk}[#if !clk?contains('(')]()[/#if];[/#if]
+        [#if clk!="none"]
+            [#if clk!=""]#t${clk}[#if !clk?contains('(')]()[/#if];[/#if]
+        [/#if]
     [/#list]
 [/#if]
 #n
@@ -138,14 +140,23 @@ void HAL_MspInit(void)
 [#if firstSystemInterrupt]
 [#assign firstSystemInterrupt = false]
 #t/* System interrupt init*/
+[#--if NVICPriorityGroup??]
+[#if (FamilyName=="STM32WL" && McuDualCore??)]
+#tHAL_NVIC_SetPriorityGrouping(${NVICPriorityGroup});#n
+#t/* Update SystemCoreClock variable */
+  #tSystemCoreClockUpdate();
+[/#if]
+  [/#if--]
 [/#if]
 [#elseif firstPeripheralInterrupt]
 [#assign firstPeripheralInterrupt = false]
 [#if systemHandlers]
 #n
 [/#if]
+
 #t/* Peripheral interrupt init */
 [/#if]
+
 [#if initVector.codeInMspInit]
     [#if initVector.systemHandler=="false" || initVector.preemptionPriority!="0" || initVector.subPriority!="0"]
     [#if initVector.vector!="SysTick_IRQn"]
@@ -1355,7 +1366,7 @@ static uint32_t ${entry.value}=0;
             #t{
     [#else]    
         [#if ipvar.instanceNbre > 1] [#-- IF number of IP instances greater than 0--]
-             [#if !words[0].contains("HASH")] 
+             [#if !words[0].contains("HASH") &&  !words[0].contains("SUBGHZ")] 
             #tif(h${mode?lower_case}->Instance==${words[0]?replace("I2S","SPI")})  
             #t{ 
             [/#if]
@@ -1391,7 +1402,7 @@ static uint32_t ${entry.value}=0;
 #t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspInit 1 */
 
 #n#t/* USER CODE END ${words[0]?replace("I2S","SPI")}_MspInit 1 */  
-[#if  words[0].contains("DFSDM")]
+[#if  words[0]?starts_with("DFSDM")]
 #t${words[0]}_Init++;
 [/#if]
 
@@ -1436,7 +1447,7 @@ static uint32_t ${entry.value}=0;
 #t/* USER CODE BEGIN ${words[i]?replace("I2S","SPI")}_MspInit 1 */
 
 #n#t/* USER CODE END ${words[i]?replace("I2S","SPI")}_MspInit 1 */    
-[#if  words[i].contains("DFSDM")]
+[#if  words[i]?starts_with("DFSDM")]
 #t${words[i]}_Init++;
 [/#if]
 
@@ -1475,9 +1486,12 @@ static uint32_t ${entry.value}=0;
 #t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspInit 1 */
 
 #n#t/* USER CODE END ${words[0]?replace("I2S","SPI")}_MspInit 1 */
+[#if  words[0]?starts_with("DFSDM")]
+#t${words[0]}_Init++;
+[/#if]
 [/#if]
 [#if ipvar.instanceNbre > 1 || words[0]?contains("DFSDM")] [#-- IF number of IP instances greater than 0--]
-[#if !words[0].contains("HASH")]
+[#if !words[0].contains("HASH") &&  !words[0].contains("SUBGHZ")]
 #t}
 [/#if]
 [/#if]
@@ -1568,7 +1582,7 @@ uint32_t DFSDM_Init = 0;
     #t{
 [#else]
     [#if ipvar.instanceNbre > 1] [#-- IF number of IP instances greater than 0--]
-         [#if !words[0].contains("HASH") ] 
+         [#if !words[0].contains("HASH") &&  !words[0].contains("SUBGHZ") ] 
         #tif(h${mode?lower_case}->Instance==${words[0]?replace("I2S","SPI")})
         #t{
         [/#if]
@@ -1582,7 +1596,7 @@ uint32_t DFSDM_Init = 0;
 #t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspPostInit 1 */
 
 #n#t/* USER CODE END ${words[0]?replace("I2S","SPI")}_MspPostInit 1 */  
-[#if !words[0]?contains("HASH") ] 
+[#if !words[0]?contains("HASH") &&  !words[0].contains("SUBGHZ") ] 
     #t}
 [/#if]
     [#assign i = 0]
@@ -1623,7 +1637,7 @@ uint32_t DFSDM_Init = 0;
         #n#t/* USER CODE END ${words[0]?replace("I2S","SPI")}_MspPostInit 1 */
     [/#if]
     [#if ipvar.instanceNbre > 1 || words[0]?contains("DFSDM")] [#-- IF number of IP instances greater than 0--]
-          [#if !words[0].contains("HASH") ] 
+          [#if !words[0].contains("HASH") &&  !words[0].contains("SUBGHZ")] 
         #t}   
         [/#if]
     [/#if]
@@ -1674,7 +1688,7 @@ uint32_t DFSDM_Init = 0;
         #t#t{
 [#else]
     [#if ipvar.instanceNbre > 1] [#-- IF number of IP instances greater than 0--] 
-         [#if !words[0].contains("HASH") ] 
+         [#if !words[0].contains("HASH")  &&  !words[0].contains("SUBGHZ") ] 
         #tif(h${mode?lower_case}->Instance==${words[0]?replace("I2S","SPI")})
         #t{
         [/#if]
@@ -1698,7 +1712,7 @@ uint32_t DFSDM_Init = 0;
 
 
 [/#if]
-[#if !words[0]?contains("HASH") ] 
+[#if !words[0]?contains("HASH") &&  !words[0].contains("SUBGHZ") ] 
 #t}
 [/#if]
   [#assign i = 0]
@@ -1765,7 +1779,7 @@ uint32_t DFSDM_Init = 0;
 
 [/#if]
 [#if ipvar.instanceNbre >  1 || words[0]?contains("DFSDM")] [#-- IF number of IP instances greater than 0--]
-[#if !words[0]?contains("HASH") ]
+[#if !words[0]?contains("HASH") &&  !words[0].contains("SUBGHZ") ]
 #t}
 [/#if]
 [/#if]

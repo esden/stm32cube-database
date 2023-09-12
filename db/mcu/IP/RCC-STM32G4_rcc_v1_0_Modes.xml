@@ -254,7 +254,7 @@
         <PossibleValue Comment="I2S Clksource Pclk1"  Value="RCC_I2SCLKSOURCE_SYSCLK"  Semaphore="I2SSourcePCLK1"/>
         <PossibleValue Comment="I2S Clksource Pll"    Value="RCC_I2SCLKSOURCE_PLL" Semaphore="I2SSourcePll"/>
         <PossibleValue Comment="I2S Clksource Ext"    Value="RCC_I2SCLKSOURCE_EXT"    Semaphore="I2SSourceEXT"/>
-        <PossibleValue Comment="I2S Clksource Hse"    Value="RCC_I2SCLKSOURCE_HSE"    Semaphore="I2SSourceHSE"/>
+        <PossibleValue Comment="I2S Clksource Hsi"    Value="RCC_I2SCLKSOURCE_HSI"    Semaphore="I2SSourceHSI"/>
     </RefParameter>
     
     
@@ -410,6 +410,9 @@
     <RefParameter Visible="false" Comment="Cortex System Timer"   Name="CortexFreq_Value"     DefaultValue="4000000"  Type="double" Max="170000000" Display="value/1000000" Unit="MHz"/>
 	
 	<!--main sysclock Freq value-->
+    <RefParameter Visible="false" Comment="System Clock"   Name="SYSCLKFreq_VALUE" DefaultValue="4000000" Max="170000000" Type="double" Display="value/1000000" Unit="MHz">
+        <Condition Diagnostic="overDrive activated" Expression="((VDD_VALUE&lt; 1.8)|(VDD_VALUE&gt; 2.1)) &amp;scale1boost"/>
+    </RefParameter>
 	<RefParameter Visible="false" Comment="System Clock"   Name="SYSCLKFreq_VALUE" DefaultValue="4000000" Max="26000000" Type="double" Display="value/1000000" Unit="MHz">
         <Condition Diagnostic="overDrive activated" Expression="((VDD_VALUE&lt; 1.8)|(VDD_VALUE&gt; 2.1)) &amp;scale2"/>
     </RefParameter>
@@ -491,6 +494,9 @@
 	<!--PLLs Freq value-->
 
 	<!--PLLQ output-->
+        <RefParameter Visible="false" Comment="PLLQ"     Name="PLLQoutputFreq_Value" Min="8000000" Max="170000000"     DefaultValue="16000000"  Type="double" Display="value/1000000" Unit="MHz">
+        <Condition Expression="scale1boost &amp; (((CK48SourcePLLCLK &amp; RNGUsed_ForRCC ) | (I2SSourcePll &amp; (I2S2Used_ForRCC | I2S3Used_ForRCC)) | (SAI1SourcePll &amp; (SAI_SAIBUsed_ForRCC | SAI_SAIAUsed_ForRCC|SAIBUsed_ForRCC|SAIAUsed_ForRCC))))" Diagnostic=" "/>
+    </RefParameter>
     <RefParameter Visible="false" Comment="PLLQ"     Name="PLLQoutputFreq_Value" Min="8000000" Max="26000000"     DefaultValue="16000000"  Type="double" Display="value/1000000" Unit="MHz">
         <Condition Expression="scale2 &amp; (((CK48SourcePLLCLK &amp; RNGUsed_ForRCC ) | (I2SSourcePll &amp; (I2S2Used_ForRCC | I2S3Used_ForRCC)) | (SAI1SourcePll &amp; (SAI_SAIBUsed_ForRCC | SAI_SAIAUsed_ForRCC|SAIBUsed_ForRCC|SAIAUsed_ForRCC))))" Diagnostic=" "/>
     </RefParameter>
@@ -502,6 +508,9 @@
     </RefParameter>
     <RefParameter Visible="false" Comment="PLLQ"     Name="PLLQoutputFreq_Value"     DefaultValue="4000000"   Type="double" Display="value/1000000" Unit="MHz"/>
 	<!--PLLP output-->
+        <RefParameter Visible="false" Comment="PLLP"     Name="PLLPoutputFreq_Value" Min="2064500" Max="170000000"    DefaultValue="4571429"   Type="double" Display="value/1000000" Unit="MHz">
+        <Condition Expression=" scale1boost &amp; (((USE_ADC1 | USE_ADC2) &amp; ADC12SourcePllp) | ((USE_ADC3 | USE_ADC4 | USE_ADC5) &amp; ADC345SourcePllp)) " Diagnostic=" "/>
+    </RefParameter>
     <RefParameter Visible="false" Comment="PLLP"     Name="PLLPoutputFreq_Value" Min="2064500" Max="26000000"    DefaultValue="4571429"   Type="double" Display="value/1000000" Unit="MHz">
         <Condition Expression=" scale2 &amp; (((USE_ADC1 | USE_ADC2) &amp; ADC12SourcePllp) | ((USE_ADC3 | USE_ADC4 | USE_ADC5) &amp; ADC345SourcePllp)) " Diagnostic=" "/>
     </RefParameter>
@@ -531,6 +540,9 @@
 		 
 	 
 	<!--PLLRCLK output ==> PLLCLK -->
+        <RefParameter Visible="false" Comment="PLLCLK"     Name="PLLRCLKFreq_Value"   Min="8000000" Max="170000000"     DefaultValue="16000000"   Type="double" Display="value/1000000" Unit="MHz">
+		<Condition Expression="scale1boost &amp; ((PLLUsed=1 &amp; SysSourcePLL) | (MCOSourcePLL &amp; MCOConfig)) " Diagnostic=" "/>
+    </RefParameter>
     <RefParameter Visible="false" Comment="PLLCLK"     Name="PLLRCLKFreq_Value"   Min="8000000" Max="26000000"     DefaultValue="16000000"   Type="double" Display="value/1000000" Unit="MHz">
 		<Condition Expression="scale2 &amp; ((PLLUsed=1 &amp; SysSourcePLL) | (MCOSourcePLL &amp; MCOConfig)) " Diagnostic=" "/>
     </RefParameter>
@@ -865,10 +877,20 @@
 	
     <!-- HSE used -->	
     <RefParameter Visible="false" Comment="HSE used flag" DefaultValue="1" Name="HSEUsed" Type="integer" Min="1" Max="1">
-        <Condition Expression="(FDCANSourceHSE &amp; (FDCAN1Used_ForRCC | FDCAN2Used_ForRCC | FDCAN3Used_ForRCC)) | (SEM2RCC_HSE_REQUIRED_TIM17 &amp; TIM17 &amp;Semaphore_input_Channel1TIM17)|(RTCUsed_ForRCC&amp;!((RTCClockSelection=RCC_RTCCLKSOURCE_LSE)|(RTCClockSelection=RCC_RTCCLKSOURCE_LSI)))|((PLLSourceHSE) &amp; (PLLUsed=1))|(SYSCLKSource=RCC_SYSCLKSOURCE_HSE)|((RCC_MCO1Source=RCC_MCO1SOURCE_HSE)&amp;(((Semaphore_input_Channel1TIM17 &amp; TIM17 &amp; SEM2RCC_MCO_REQUIRED_TIM17)|MCOConfig))) | (I2SSourceHSE &amp;(I2S2Used_ForRCC | I2S3Used_ForRCC))" Diagnostic="SYSCLK source OR PLL source OR RTC source OR MCO1 source OR MCO2 source"/>
+        <Condition Expression="(FDCANSourceHSE &amp; (FDCAN1Used_ForRCC | FDCAN2Used_ForRCC | FDCAN3Used_ForRCC)) | (SEM2RCC_HSE_REQUIRED_TIM17 &amp; TIM17 &amp;Semaphore_input_Channel1TIM17)|(RTCUsed_ForRCC&amp;!((RTCClockSelection=RCC_RTCCLKSOURCE_LSE)|(RTCClockSelection=RCC_RTCCLKSOURCE_LSI)))|((PLLSourceHSE) &amp; (PLLUsed=1))|(SYSCLKSource=RCC_SYSCLKSOURCE_HSE)|((RCC_MCO1Source=RCC_MCO1SOURCE_HSE)&amp;(((Semaphore_input_Channel1TIM17 &amp; TIM17 &amp; SEM2RCC_MCO_REQUIRED_TIM17)|MCOConfig)))" Diagnostic="SYSCLK source OR PLL source OR RTC source OR MCO1 source OR MCO2 source"/>
     </RefParameter>
 	
     <RefParameter Visible="false" Comment="HSE Is Used" DefaultValue="0" Name="HSEUsed" Min="0" Type="integer"/>
+    
+    <RefParameter Visible="false" Comment="HSE Is Used" DefaultValue="1" Name="HSEUsedForSys" Min="1" Type="integer">
+       <Condition Expression="((PLLSourceHSE)&amp; (SYSCLKSource=RCC_SYSCLKSOURCE_PLLCLK))|(SYSCLKSource=RCC_SYSCLKSOURCE_HSE)" Diagnostic="HSE is used if "/>
+    </RefParameter>
+
+    <RefParameter Visible="false" Comment="HSE is Used" DefaultValue="0" Name="HSEUsedForSys" Min="0" Type="integer"/>
+    <RefParameter Visible="false" Comment="HSI Is Used" DefaultValue="1" Name="HSIUsedForSys" Min="1" Type="integer">
+        <Condition Expression="((PLLSourceHSI)&amp; (SYSCLKSource=RCC_SYSCLKSOURCE_PLLCLK))|(SYSCLKSource=RCC_SYSCLKSOURCE_HSI)" Diagnostic="LSE is used if "/>
+    </RefParameter>
+    <RefParameter Visible="false" Comment="HSI is Used" DefaultValue="0" Name="HSIUsedForSys" Min="0" Type="integer"/>
 	
     <!-- HSE state for codGen -->	
     <RefParameter Visible="false" Comment="Hse State" DefaultValue="RCC_HSE_BYPASS" Name="HSEState" Type="list">
@@ -976,7 +998,7 @@
 	
     <!-- HSI used -->
     <RefParameter Visible="false" Comment="HSI Is Used" DefaultValue="1" Name="HSIUsed" Min="1" Type="integer">
-        <Condition Expression="UCPD_Used| (SAI1SourceHSI &amp; (SAI_SAIBUsed_ForRCC | SAI_SAIAUsed_ForRCC|SAIBUsed_ForRCC|SAIAUsed_ForRCC)) |(I2C4SourceHSI &amp; I2C4Used_ForRCC)| (QSPISourceHSI &amp; QSPI_Selected) | (ADC12SourceHsi &amp; (USE_ADC1 | USE_ADC2))|(USART1SourceHSI&amp; USART1Used_ForRCC)|(USART2SourceHSI&amp; USART2Used_ForRCC)|(USART3SourceHSI&amp; USART3Used_ForRCC)|(UART4SourceHSI&amp; UART4Used_ForRCC) | (USART3SourceHSI&amp; USART3Used_ForRCC) | (UART5SourceHSI&amp; UART5Used_ForRCC) |(LPUART1SourceHSI&amp; LPUARTUsed_ForRCC)|(LPTIM1SOURCEHSI&amp; LPTIM1Used_ForRCC)|(I2C1SourceHSI&amp; I2C1Used_ForRCC)|(I2C2SourceHSI&amp; I2C2Used_ForRCC)|(I2C3SourceHSI&amp; I2C3Used_ForRCC) | ((PLLSourceHSI)&amp; (PLLUsed=1))|(SYSCLKSource=RCC_SYSCLKSOURCE_HSI)|((RCC_MCO1Source=RCC_MCO1SOURCE_HSI)&amp;((((Semaphore_input_Channel1TIM17 &amp; TIM17 &amp; SEM2RCC_MCO_REQUIRED_TIM17)|MCOConfig))))" Diagnostic="LSE is used if "/>
+        <Condition Expression="(I2SSourceHSI &amp;(I2S2Used_ForRCC | I2S3Used_ForRCC)) | UCPD_Used| (SAI1SourceHSI &amp; (SAI_SAIBUsed_ForRCC | SAI_SAIAUsed_ForRCC|SAIBUsed_ForRCC|SAIAUsed_ForRCC)) |(I2C4SourceHSI &amp; I2C4Used_ForRCC)| (QSPISourceHSI &amp; QSPI_Selected) | (ADC12SourceHsi &amp; (USE_ADC1 | USE_ADC2))|(USART1SourceHSI&amp; USART1Used_ForRCC)|(USART2SourceHSI&amp; USART2Used_ForRCC)|(USART3SourceHSI&amp; USART3Used_ForRCC)|(UART4SourceHSI&amp; UART4Used_ForRCC) | (USART3SourceHSI&amp; USART3Used_ForRCC) | (UART5SourceHSI&amp; UART5Used_ForRCC) |(LPUART1SourceHSI&amp; LPUARTUsed_ForRCC)|(LPTIM1SOURCEHSI&amp; LPTIM1Used_ForRCC)|(I2C1SourceHSI&amp; I2C1Used_ForRCC)|(I2C2SourceHSI&amp; I2C2Used_ForRCC)|(I2C3SourceHSI&amp; I2C3Used_ForRCC) | ((PLLSourceHSI)&amp; (PLLUsed=1))|(SYSCLKSource=RCC_SYSCLKSOURCE_HSI)|((RCC_MCO1Source=RCC_MCO1SOURCE_HSI)&amp;((((Semaphore_input_Channel1TIM17 &amp; TIM17 &amp; SEM2RCC_MCO_REQUIRED_TIM17)|MCOConfig))))" Diagnostic="LSE is used if "/>
     </RefParameter>
     <RefParameter Visible="false" Comment="HSI is Used" DefaultValue="0" Name="HSIUsed" Min="0" Type="integer"/>
 	

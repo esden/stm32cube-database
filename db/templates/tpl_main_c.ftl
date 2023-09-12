@@ -4,7 +4,7 @@
 
 [#assign coreDir=sourceDir]
 [#if cpucore!="" && (contextFolder=="" || contextFolder=="/")]
-[#assign contextFolder = cpucore?replace("ARM_CORTEX_","C")+"/"]
+    [#assign contextFolder = cpucore?replace("ARM_CORTEX_","C")?replace("+","PLUS")+"/"]
 [/#if]
 [#assign familyName=FamilyName?lower_case]
 /* USER CODE BEGIN Header */
@@ -37,34 +37,57 @@
 [#assign MBEDTLSUSed = "false"]
 [#assign RESMGR_UTILITYUsed = false]
 [#list ips as ip]
-[#if ip?contains("LWIP")]
-[#assign LWIPUSed = "true"]
-[/#if]
-[#if ip=="MBEDTLS"]
-[#assign MBEDTLSUSed = "true"]
-[/#if]
-[#if ip=="RESMGR_UTILITY"]
-[#assign RESMGR_UTILITYUsed = true]
-[/#if]
+    [#if ip?contains("LWIP")]
+        [#assign LWIPUSed = "true"]
+    [/#if]
+    [#if ip=="MBEDTLS"]
+        [#assign MBEDTLSUSed = "true"]
+    [/#if]
+    [#if ip=="RESMGR_UTILITY"]
+        [#assign RESMGR_UTILITYUsed = true]
+    [/#if]
 [/#list]
 
 [#list ips as ip]
-
 [#if !ip?contains("FATFS") && !ip?contains("FREERTOS") && !ip?contains("NVIC")&& !ip?contains("NVIC1")&& !ip?contains("NVIC2")&& !ip?contains("CORTEX") && !ip?contains("TRACER_EMB")&& !ip?contains("GUI_INTERFACE")]
 [#if ip?contains("STM32_WPAN")]
 #include "app_entry.h"
 #include "app_common.h"
 [/#if]
-[#if (!ip?contains("LWIP")&& !ip?contains("STM32_WPAN")) || (ip?contains("LWIP") && (MBEDTLSUSed=="false"))]
-[#--  MZA avoid to generate an empty include header file "#include .h" --]
-[#if ip?has_content]
-#include "${ip?lower_case}.h"
+[#if ip?contains("Sigfox")]
+#include "app_sigfox.h"
 [/#if]
-[/#if][/#if]
+[#if ip?contains("SubGHz_Phy")]
+#include "app_subghz_phy.h"
+[/#if]
+[#if ip?contains("LoRaWAN")]
+#include "app_lorawan.h"
+[/#if]
+[#if ((!ip?contains("LWIP")&& !ip?contains("STM32_WPAN")&& !ip?contains("LoRaWAN")&& !ip?contains("SubGHz_Phy")&& !ip?contains("Sigfox") && !ip?contains("KMS")) || (ip?contains("LWIP") && (MBEDTLSUSed=="false")))]
+    [#assign ipExistsIntoreducevoids=false]
+    [#if reducevoids??]
+        [#list reducevoids as voidr]
+            [#if (!voidr.isNotGenerated && voidr.genCode && (voidr.ipgenericName != "SubGHz_Phy") && ((voidr.ipgenericName?lower_case?contains(ip?lower_case)) ||(voidr.ipgenericName?lower_case?contains("lpuart") && ip?contains("USART"))))]
+                #include "${ip?lower_case}.h"
+                [#break]
+            [/#if]
+        [/#list]
+        [#list reducevoids as voidr]
+            [#if (ipExistsIntoreducevoids == false) && (voidr.ipgenericName?lower_case?contains(ip?lower_case) && !voidr.ipgenericName?lower_case?contains("hrtim"))||(voidr.ipgenericName?lower_case?contains("lpuart") && ip?contains("USART"))]
+                [#assign ipExistsIntoreducevoids=true]
+                [#break]
+            [/#if]
+        [/#list]
+    [/#if]
+    [#if ip?has_content && ipExistsIntoreducevoids == false]
+    #include "${ip?lower_case}.h"
+    [/#if]    
+[/#if]
+[/#if]
 [#-- Examples Migration (FCR) - Begin--]
 [#if ip?contains("FATFS")]
  [#assign familyName=FamilyName?lower_case]
- [#if familyName="stm32g0" || familyName="stm32wb" || familyName="stm32g4" || familyName="stm32l5"]
+ [#if familyName="stm32g0" || familyName="stm32wb" || familyName="stm32g4" || familyName="stm32l5" || familyName="stm32wl"]
  #include "app_fatfs.h"
  [#else]
  #include "fatfs.h"
@@ -75,7 +98,11 @@
 [#assign usb_device = true]
 [/#if]
 
+
 [/#list]
+[#if RESMGR_UTILITY?? && !RESMGR_UTILITYUsed]
+#include "resmgr_utility.h"
+[/#if]
 [#-- /#if --]
 [/#compress]
 
@@ -95,8 +122,10 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-[#if bootMode?? && bootMode=="boot0" && McuDualCore??] [#-- boot0 sequence --]
+[#if bootMode?? && bootMode=="boot0" && McuDualCore?? && FamilyName=="STM32H7"] [#-- boot0 sequence --]
+#ifndef HSEM_ID_0
 #define HSEM_ID_0 (0U) /* HW semaphore 0*/
+#endif
 [/#if]
 [#if TZEN=="1" && Secure=="true"]
 #n
@@ -168,7 +197,9 @@ ETH_TxPacketConfig TxConfig;
                 [#-- Global variables --]
                 [#if periph.variables??]
                     [#list periph.variables as variable]
+[#if !handlerToignore?contains(variable.name)]
 ${variable.value} ${variable.name};
+[/#if]
                     [/#list]
                 [/#if][#--if periph.variables??--]
                 [#-- Add global dma Handler --]
@@ -252,7 +283,7 @@ ${dHandle};
 [#if TZEN=="1" && Secure=="true"]
 static void NonSecure_Init(void);
 [/#if]
-[#if rccFctName?? && ((!McuDualCore?? && TZEN=="0") || ((TZEN=="1" && Secure=="true") && rccIsSecure??) || ((TZEN=="1" && Secure=="false") && !rccIsSecure??)|| (bootMode?? && bootMode=="boot0" && cpucore=="ARM_CORTEX_M7" && McuDualCore??))]
+[#if rccFctName?? && ((!McuDualCore?? && TZEN=="0") || ((TZEN=="1" && Secure=="true") && rccIsSecure??) || ((TZEN=="1" && Secure=="false") && !rccIsSecure??)|| (bootMode?? && bootMode=="boot0" && cpucore=="ARM_CORTEX_M7" && McuDualCore??) || (cpucore=="ARM_CORTEX_M4" && McuDualCore?? && FamilyName=="STM32WL"))]
 void SystemClock_Config(void); [#-- remove static --]
 [#if commonClockConfig??]
 void PeriphCommonClock_Config(void);
@@ -273,12 +304,12 @@ static void MPU_Config(void);
 [/#if]
 [#if HALCompliant??]
     [#list voids as void]
-        [#if !(IpInit_ToIgnore?contains(void.ipName)) && !void.ipType?contains("thirdparty")&&!void.ipType?contains("middleware")&&!void.functionName?contains("VREFBUF")&&void.functionName!="Init" && !void.functionName?contains("MotorControl") && !void.functionName?contains("ETZPC") && !void.functionName?contains("TRACER_EMB") && !void.functionName?contains("GUI_INTERFACE")]
+        [#if void.genCode && !(IpInit_ToIgnore?contains(void.ipName)) && !void.ipType?contains("thirdparty")&&!void.ipType?contains("middleware")&&!void.functionName?contains("VREFBUF")&&void.functionName!="Init" && !void.functionName?contains("MotorControl") && !void.functionName?contains("ETZPC") && !void.functionName?contains("TRACER_EMB") && !void.functionName?contains("GUI_INTERFACE")]
                 [#if void.isStatic]
                     static void ${""?right_pad(2)}${void.functionName}(void);
                     [#assign staticVoids =staticVoids + " "+ '${void.functionName}']
                 [#else]
-                    void ${""?right_pad(2)}${void.functionName}(void);
+                    [#-- void ${""?right_pad(2)}${void.functionName}(void);--]
                 [/#if]
             
            
@@ -323,8 +354,7 @@ int main(void)
 
 #t/* USER CODE END 1 */
 [#compress]
-[#if bootMode?? && bootMode=="boot0" && cpucore=="ARM_CORTEX_M7" && McuDualCore??][#-- M7 boot0 sequence --]
-#n
+[#if bootMode?? && bootMode=="boot0" && cpucore=="ARM_CORTEX_M7" && McuDualCore?? && FamilyName=="STM32H7"][#-- M7 boot0 sequence --]
   /* USER CODE BEGIN Boot_Mode_Sequence_0 */
   #tint32_t timeout; 
   /* USER CODE END Boot_Mode_Sequence_0 */
@@ -348,9 +378,9 @@ int main(void)
 [/#if]
 [#--/#if--]
 #n
-[#if bootMode?? && McuDualCore??]
+[#if bootMode?? && McuDualCore?? && FamilyName=="STM32H7"]
 /* USER CODE BEGIN Boot_Mode_Sequence_1 */
-[#if bootMode?? && bootMode=="boot0" && cpucore=="ARM_CORTEX_M7" && McuDualCore??] [#-- M7 boot0 sequence --]
+    [#if bootMode=="boot0" && cpucore=="ARM_CORTEX_M7"] [#-- M7 boot0 sequence --]
 #t/* Wait until CPU2 boots and enters in stop mode or timeout*/
   #ttimeout = 0xFFFF;
   #twhile((__HAL_RCC_GET_FLAG(RCC_FLAG_D2CKRDY) != RESET) && (timeout-- > 0));
@@ -358,8 +388,8 @@ int main(void)
   #t{
     #tError_Handler();
   #t}
-[/#if]
-[#if bootMode?? && bootMode=="boot0" && cpucore=="ARM_CORTEX_M4" && McuDualCore??]
+    [/#if]
+    [#if bootMode=="boot0" && cpucore=="ARM_CORTEX_M4"]
 #t/*HW semaphore Clock enable*/
   #t__HAL_RCC_HSEM_CLK_ENABLE(); 
  #t/* Activate HSEM notification for Cortex-M4*/
@@ -373,7 +403,7 @@ int main(void)
   #t/* Clear HSEM flag */
   #t__HAL_HSEM_CLEAR_FLAG(__HAL_HSEM_SEMID_TO_MASK(HSEM_ID_0));
 #n
-[/#if]
+    [/#if]
 /* USER CODE END Boot_Mode_Sequence_1 */
 [/#if]
 #t/* MCU Configuration--------------------------------------------------------*/
@@ -425,7 +455,7 @@ int main(void)
     [#if void.functionName?? && void.functionName?contains("SystemClock_Config") && !void.isNotGenerated]
 
 [#if rccFctName??]
-[#if (!McuDualCore?? && TZEN=="0") ||  ((TZEN=="1" && Secure=="true") && rccIsSecure??) || ((TZEN=="1" && Secure=="false") && !rccIsSecure??) || (bootMode?? && bootMode=="boot0" && cpucore=="ARM_CORTEX_M7" && McuDualCore??)]
+[#if (!McuDualCore?? && TZEN=="0") ||  ((TZEN=="1" && Secure=="true") && rccIsSecure??) || ((TZEN=="1" && Secure=="false") && !rccIsSecure??) || (bootMode?? && bootMode=="boot0" && cpucore=="ARM_CORTEX_M7" && McuDualCore??) || (cpucore=="ARM_CORTEX_M4" && McuDualCore?? && FamilyName=="STM32WL")]
 [#if FamilyName=="STM32MP1"]
 #tif(IS_ENGINEERING_BOOT_MODE())
 #t{
@@ -451,11 +481,17 @@ int main(void)
 [/#if]
 [/#if]
 [/#if][/#if]
-    [/#if]
+
+[/#if]
 [/#list]
+   
 [/#if]
 
-[#if bootMode?? && cpucore=="ARM_CORTEX_M7" && McuDualCore??] [#-- M7 boot0 sequence --]
+[#if (cpucore=="ARM_CORTEX_M0+" && McuDualCore?? && FamilyName=="STM32WL" && !isHALUsed??)]
+#t/* Update SystemCoreClock variable */
+  #tSystemCoreClockUpdate();
+[/#if] 
+[#if bootMode?? && cpucore=="ARM_CORTEX_M7" && McuDualCore?? && FamilyName=="STM32H7"] [#-- M7 boot0 sequence --]
 /* USER CODE BEGIN Boot_Mode_Sequence_2 */
  /* When system initialization is finished, Cortex-M7 will release Cortex-M4  by means of 
      HSEM notification */
@@ -479,14 +515,14 @@ int main(void)
 [/#if]
 #n
 [#list voids as void]
-[#if void.functionName?? && void.functionName?contains("GTZC") && !void.isNotGenerated]
-#t/* GTZC initialisation */
-#tMX_GTZC_Init();
+[#if void.functionName?? && void.functionName?contains("GTZC") && !void.isNotGenerated && void.genCode]
+#t/* ${void.functionName} initialisation */
+#t${void.functionName}();
 [/#if]
 [/#list]
 #n
 [#list voids as void]
-[#if void.functionName?? && void.functionName?contains("IPCC") && !void.isNotGenerated]
+[#if void.functionName?? && void.functionName?contains("IPCC") && !void.isNotGenerated && void.genCode]
     #t/* IPCC initialisation */
 	#t MX_IPCC_Init();
 [/#if]
@@ -517,17 +553,17 @@ int main(void)
 [/#list]
 [#list voids as void]
 [#if void.functionName?? && !(IpInit_ToIgnore?contains(void.ipName)) && !void.functionName?contains("FREERTOS")&&void.functionName!="Init" && !void.functionName?contains("Process") && !void.functionName?contains("RESMGR_UTILITY")  && !void.functionName?contains("OPENAMP") && !void.functionName?contains("IPCC") && !void.functionName?contains("GTZC") && !void.functionName?contains("ETZPC") && !void.functionName?contains("TRACER_EMB") && !void.functionName?contains("GUI_INTERFACE")]
-[#if !void.isNotGenerated]
+[#if !void.isNotGenerated && void.genCode]
 [#-- FCR: Replaces previous loop (since 5.5.0) --]
 [#if void.functionName!="APPE_Init"]
- [#if void.functionName?contains("USBPD") || (FREERTOS?? && (void.functionName?contains("LWIP") || void.functionName?contains("MBEDTLS") || void.functionName?contains("USB_DEVICE") || void.functionName?contains("USB_HOST")))]
+ [#if void.functionName?contains("USBPD") || (FREERTOS?? && (void.functionName?contains("LWIP") || void.functionName?contains("MBEDTLS") || void.functionName?contains("USB_DEVICE") || void.functionName?contains("USB_HOST") || void.functionName?contains("LoRaWAN") || void.functionName?contains("Sigfox") || void.functionName?contains("SubGHz_Phy")))]
  [#-- Nothing generated for 
   - USBPD
   - MBEDTLS with FreeRTOS
   - Lwip with FreeRTOS
   - USBD and USBH when FreeRTOS (still generated in default task as temporary patch) 
  --]
-  [#if void.functionName?contains("MBEDTLS")][#-- special comment generated here --]
+  [#if void.functionName?contains("MBEDTLS") && void.genCode][#-- special comment generated here --]
     #tMX_MBEDTLS_Init();
   [/#if]
  [#else] [#-- must generate a call in all other cases --]
@@ -558,7 +594,7 @@ int main(void)
 [#compress]
 [@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_kernelInit.tmp"/][#-- any RTOS can include here --]
 [#list voids as void]
-  [#if USBPD?? && void.functionName?? && void.functionName?contains("USBPD") && !void.isNotGenerated] [#-- cf BZ-79321 --]
+  [#if USBPD?? && void.functionName?? && void.functionName?contains("USBPD") && !void.isNotGenerated && void.genCode] [#-- cf BZ-79321 --]
     [#lt]#t/* USBPD initialisation ---------------------------------*/
     [#lt]#tMX_USBPD_Init();
   [/#if]
@@ -599,24 +635,39 @@ int main(void)
 #n
 #t/* Non-secure software does not return, this code is not executed */
 [/#if]
+[#if bootMode?? && bootMode=="boot0" && McuDualCore?? && FamilyName=="STM32WL" && cpucore=="ARM_CORTEX_M4"]
+#t/* Boot CPU2 */
+[#if isHALUsed??]
+#tHAL_PWREx_ReleaseCore(PWR_CORE_CPU2);
+#n
+[#else]
+#tLL_PWR_EnableBootC2();
+#n
+[/#if]   
+[/#if]
 [#-- if !FREERTOS?? --] 
 #t/* Infinite loop */
 #t/* USER CODE BEGIN WHILE */
 #twhile (1)
 #t{
 #t#t/* USER CODE END WHILE */
-[#list voids as void]
-[#if !FREERTOS?? && USBPD?? && void.functionName?? && void.functionName?contains("USBPD") && !void.isNotGenerated]
-#t#t/* Start USBPD Processes */
-#t#tUSBPD_DPM_Run();
-[/#if]
-[/#list]
 [#if USB_HOST?? && !FREERTOS??]
 #t#tMX_USB_HOST_Process();
 [/#if]
+[#list ips as ip]
+[#if ip?contains("LoRaWAN") && !FREERTOS??]
+#t#tMX_LoRaWAN_Process();
+[/#if]
+[#if ip?contains("SubGHz_Phy") && !FREERTOS??]
+#t#tMX_SubGHz_Phy_Process();
+[/#if]
+[#if ip?contains("Sigfox") && !FREERTOS??]
+#t#tMX_Sigfox_Process();
+[/#if]
+[/#list]
 #n
 [#list voids as void]
-[#if void.functionName?? && !(IpInit_ToIgnore?contains(void.ipName)) && void.functionName?contains("Process") && !void.isNotGenerated && !FREERTOS??]
+[#if void.functionName?? && !(IpInit_ToIgnore?contains(void.ipName)) && void.functionName?contains("Process") && !void.isNotGenerated && !FREERTOS?? && void.genCode]
 #t${void.functionName}();
 [/#if]
 [/#list]
@@ -651,7 +702,7 @@ static void NonSecure_Init(void)
 }
 [/#if]
 [#compress]
-[#if clockConfig?? && rccFctName?? && ((!McuDualCore?? && TZEN=="0") ||  ((TZEN=="1" && Secure=="true") && rccIsSecure??) || ((TZEN=="1" && Secure=="false") && !rccIsSecure??) ||(bootMode?? && bootMode=="boot0" && cpucore=="ARM_CORTEX_M7"))]
+[#if clockConfig?? && rccFctName?? && ((!McuDualCore?? && TZEN=="0") ||  ((TZEN=="1" && Secure=="true") && rccIsSecure??) || ((TZEN=="1" && Secure=="false") && !rccIsSecure??) ||(bootMode?? && bootMode=="boot0" && cpucore=="ARM_CORTEX_M7") ||(cpucore=="ARM_CORTEX_M4" && FamilyName=="STM32WL"))]
 
 #n/**
 #t* @brief System Clock Configuration
@@ -864,7 +915,7 @@ static void MX_NVIC_Init(void)
 [#compress]
 [#list IP.configModelList as instanceData]
 [#assign ipName = instanceData.ipName]
-[#if instanceData.isMWUsed=="false" && instanceData.isBusDriverUSed=="false" && !ipName?contains("CORTEX") && !ipName?contains("PWR")&& !ipName?contains("VREFBUF")&& !ipName?contains("RESMGR_UTILITY") && !ipName?contains("TRACER_EMB") && !ipName?contains("GUI_INTERFACE")]
+[#if instanceData.isMWUsed=="false" && instanceData.isBusDriverUSed=="false" && !ipName?contains("CORTEX") && !ipName?contains("PWR")&& !ipName?contains("VREFBUF")&& !ipName?contains("HSEM")&& !ipName?contains("RESMGR_UTILITY") && !ipName?contains("TRACER_EMB") && !ipName?contains("GUI_INTERFACE")]
      [#assign instName = instanceData.instanceName]
 
         [#assign halMode= instanceData.halMode]
@@ -1037,10 +1088,12 @@ static void MX_NVIC_Init(void)
 [@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_threads.tmp"/]
 [@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_callbacks.tmp"/]
 [/#if] [#-- If FreeRtos is used (and tmp files included in the main) --]
+[#--if !McuDualCore?? || (cpucore=="ARM_CORTEX_M7" && McuDualCore??)--]
 [#if mpuControl??] [#-- if MPU config is enabled --]
 /* MPU Configuration */
 [@common.optinclude name=contextFolder+mxTmpFolder+"/cortex.tmp"/]
 [/#if]
+[#--/#if--]
 [#-- For Tim timebase --]
 [#if cpucore!="" && cpucore?replace("ARM_CORTEX_","")=="M4"]
     [#if  timeBaseSource_M4??]
@@ -1054,6 +1107,13 @@ static void MX_NVIC_Init(void)
         [#assign timeBaseSource = timeBaseSource_M7]
         [#assign timeBaseHandlerType = timeBaseHandlerType_M7]
         [#assign timeBaseHandler = timeBaseHandler_M7]
+    [/#if]
+[/#if]
+[#if cpucore!="" &&cpucore?replace("ARM_CORTEX_","")=="M0+"]
+    [#if  timeBaseSource_M0PLUS??]
+        [#assign timeBaseSource = timeBaseSource_M0PLUS]
+        [#assign timeBaseHandlerType = timeBaseHandlerType_M0PLUS]
+        [#assign timeBaseHandler = timeBaseHandler_M0PLUS]
     [/#if]
 [/#if]
 [#if timeBaseSource?? && timeBaseSource.contains("TIM")]
@@ -1087,7 +1147,10 @@ void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
   /* User can add his own implementation to report the HAL error return state */
-
+  __disable_irq();
+  while (1)
+  {
+  }
   /* USER CODE END Error_Handler_Debug */
 }
 
@@ -1103,7 +1166,7 @@ void assert_failed(uint8_t *file, uint32_t line)
 {
   /* USER CODE BEGIN 6 */
   /* User can add his own implementation to report the file name and line number,
-     tex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
+     ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
   /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */

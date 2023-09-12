@@ -12,7 +12,7 @@
 
 [#compress]
 [#if cpucore!="" && (contextFolder=="" || contextFolder=="/")]
-[#assign contextFolder = cpucore?replace("ARM_CORTEX_","C")+"/"]
+[#assign contextFolder = cpucore?replace("ARM_CORTEX_","C")?replace("+","PLUS")+"/"]
 [/#if]
 [#assign inMain = 0]
 [#assign useNewHandle = 0]
@@ -118,20 +118,6 @@ extern void MX_${mw}_Init(void);
 void MX_FREERTOS_Init(void);  /* (MISRA C 2004 rule 8.1) */
 #n
 [/#if]
-
-[#list SWIPdatas as SWIP]
-  [#if SWIP.defines??]     
-    [#list SWIP.defines as definition]
-      [#if definition.name=="configUSE_TICKLESS_IDLE"]
-        [#if definition.value=="1"]
-#n/* Pre/Post sleep processing prototypes */
-void PreSleepProcessing(uint32_t *ulExpectedIdleTime);
-void PostSleepProcessing(uint32_t *ulExpectedIdleTime);
-        [/#if]
-      [/#if]	                        
-    [/#list]
-  [/#if]
-[/#list]
 
 [#list SWIPdatas as SWIP]
   [#if SWIP.defines??]
@@ -240,7 +226,7 @@ __weak void configureTimerForRunTimeStats(void)
         [#if definition.value=="1"]
 #n
 /* USER CODE BEGIN 2 */
-__weak void vApplicationIdleHook( void ) 
+void vApplicationIdleHook( void ) 
 {
 #t    /* vApplicationIdleHook() will only be called if configUSE_IDLE_HOOK is set
 #t    to 1 in FreeRTOSConfig.h.  It will be called on each iteration of the idle
@@ -259,7 +245,7 @@ __weak void vApplicationIdleHook( void )
       [#if definition.name=="configUSE_TICK_HOOK"]
         [#if definition.value=="1"]
 #n/* USER CODE BEGIN 3 */
-__weak void vApplicationTickHook( void ) 
+void vApplicationTickHook( void ) 
 {
 #t    /* This function will be called by each tick interrupt if
 #t    configUSE_TICK_HOOK is set to 1 in FreeRTOSConfig.h.  User code can be
@@ -275,9 +261,9 @@ __weak void vApplicationTickHook( void )
         [#if definition.value !="0"]
 #n/* USER CODE BEGIN 4 */
 [#if useNewHandle==0]
-__weak void vApplicationStackOverflowHook(xTaskHandle xTask, signed char *pcTaskName)
+void vApplicationStackOverflowHook(xTaskHandle xTask, signed char *pcTaskName)
 [#else]
-__weak void vApplicationStackOverflowHook(TaskHandle_t xTask, signed char *pcTaskName)
+void vApplicationStackOverflowHook(TaskHandle_t xTask, signed char *pcTaskName)
 [/#if]
 {
 #t    /* Run time stack overflow checking is performed if
@@ -291,7 +277,7 @@ __weak void vApplicationStackOverflowHook(TaskHandle_t xTask, signed char *pcTas
       [#if definition.name=="configUSE_MALLOC_FAILED_HOOK"]
         [#if definition.value=="1"]
 #n/* USER CODE BEGIN 5 */
-__weak void vApplicationMallocFailedHook(void) 
+void vApplicationMallocFailedHook(void) 
 {
 #t    /* vApplicationMallocFailedHook() will only be called if
 #t    configUSE_MALLOC_FAILED_HOOK is set to 1 in FreeRTOSConfig.h.  It is a hook

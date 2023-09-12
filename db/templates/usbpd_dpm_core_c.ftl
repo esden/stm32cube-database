@@ -542,7 +542,7 @@ void USBPD_DPM_Run(void)
 
 }
 
-[/#if] /* FREERTOS */
+[/#if]
 
 
 [#if !USBPDCORE_LIB_NO_PD]
@@ -598,6 +598,8 @@ static void USBPD_PE_TaskWakeUp(uint8_t PortNum)
   uint32_t event = 0xFFFFU;
   (void)osMessageQueuePut(PEQueueId[PortNum], &event, 0U, 0U);
 #endif /* osCMSIS < 0x20000U */
+[#else]
+  DPM_Sleep_time[PortNum] = 0;
 [/#if]
 }
 [/#if]
@@ -616,9 +618,11 @@ static void USBPD_DPM_CADTaskWakeUp(void)
   uint32_t event = 0xFFFFU;
   (void)osMessageQueuePut(CADQueueId, &event, 0U, 0U);
 #endif /* osCMSIS < 0x20000U */
+[#else]
+  DPM_Sleep_time[USBPD_PORT_COUNT] = 0;
 [/#if]
 }
-[/#if] /* !USBPDCORE_LIB_NO_PD || USBPD_TYPE_STATE_MACHINE */
+[/#if]
 
 [#if FREERTOS?? && Secure!="true"]
 [#if !USBPDCORE_LIB_NO_PD]
@@ -689,7 +693,7 @@ static void PE_Task(uint32_t PortNum)
   }
 }
 #endif /* osCMSIS < 0x20000U */
-[/#if] /* !USBPDCORE_LIB_NO_PD */
+[/#if]
 
 [#if !USBPDCORE_LIB_NO_PD || USBPD_STATEMACHINE]
 /**
@@ -713,7 +717,7 @@ void USBPD_CAD_Task(void *argument)
 #endif /* osCMSIS < 0x20000U */
   }
 }
-[/#if] /* !USBPDCORE_LIB_NO_PD || USBPD_TYPE_STATE_MACHINE */
+[/#if]
 
 [#if TRACE]
 /**
@@ -833,16 +837,18 @@ void USBPD_DPM_CADCallback(uint8_t PortNum, USBPD_CAD_EVENT State, CCxPin_TypeDe
         osThreadTerminate(DPM_PEThreadId_Table[PortNum]);
         DPM_PEThreadId_Table[PortNum] = NULL;
       }
+[#else]
+      DPM_Sleep_time[PortNum] = 0xFFFFFFFFU;
 [/#if]
       DPM_Params[PortNum].PE_SwapOngoing = USBPD_FALSE;
       DPM_Params[PortNum].ActiveCCIs = CCNONE;
       DPM_Params[PortNum].PE_Power   = USBPD_POWER_NO;
+      USBPD_DPM_UserCableDetection(PortNum, State);
 #ifdef _VCONN_SUPPORT
       DPM_Params[PortNum].VconnCCIs = CCNONE;
       DPM_Params[PortNum].VconnStatus = USBPD_FALSE;
       DPM_CORE_DEBUG_TRACE(PortNum, "Note: VconnStatus=FALSE");
 #endif /* _VCONN_SUPPORT */
-      USBPD_DPM_UserCableDetection(PortNum, State);
       break;
     }
     default :
@@ -883,8 +889,10 @@ static void DPM_ManageAttachedState(uint8_t PortNum, USBPD_CAD_EVENT State, CCxP
       while (1);
     }
   }
+[#else]
+  DPM_Sleep_time[PortNum] = 0U;
 [/#if]
 }
-[/#if] /* USBPDCORE_LIB_NO_PD */
+[/#if]
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

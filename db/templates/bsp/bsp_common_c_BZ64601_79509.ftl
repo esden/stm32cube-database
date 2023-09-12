@@ -23,6 +23,7 @@
 [#assign BUTTON_EXTI = ""]
 
 [#assign useDefine = false]
+[#assign useEXTI = false]
 
 [#if HalExtiUseDefine??]
 [#if HalExtiUseDefine == "true"]
@@ -67,11 +68,22 @@
 				[#assign BUTTON_EXTI = ExtiLine]
 				[#assign BUTTON_PORT = IpName]
 				[#assign BUTTON_PIN  = IpInstance]
-				[#assign BUTTON_IRQn = IrqNumber]	
-				[#assign useBUTTON = true]				
+				[#assign BUTTON_IRQn = IrqNumber]								
+				[#assign useBUTTON = true]		
+					
 			[/#if]	
 		[/#list]
 	[/#if]
+	[#-- BZ 94093 --]
+    [#if SWIP.bsp??]    
+     	[#list SWIP.bsp as bsp]
+     		[#if bsp.bspName?contains("BSP BUTTON")]
+     			[#if bsp.bspIpModeName?contains("EXTI")]
+     				[#assign useEXTI = true]  
+     				[/#if]  
+     		[/#if]
+     	[/#list]
+    [/#if]
 [/#list]
 
 /* Includes ------------------------------------------------------------------*/ 
@@ -147,19 +159,21 @@ static void LED_USER_${i}_GPIO_Init(void);
 			 		[/#if]                   												                       
         		[/#list]
     		[/#if]
-		[/#list] 	
+		[/#list] 
 static GPIO_TypeDef*  LED_PORT[LEDn] = {${LED_GPIO_PORT}};
 static const uint16_t LED_PIN[LEDn]  = {${LED_PIN}};
 	[/#if]
 [/#if]
 
 
+
 [#if useBUTTON]
 	[#if numButton = 1]
 static GPIO_TypeDef*   BUTTON_PORT[BUTTONn] = {USER_BUTTON_GPIO_PORT}; 
-static const uint16_t  BUTTON_PIN[BUTTONn]  = {USER_BUTTON_PIN}; 
-static const IRQn_Type BUTTON_IRQn[BUTTONn] = {USER_BUTTON_EXTI_IRQn};
+static const uint16_t  BUTTON_PIN[BUTTONn]  = {USER_BUTTON_PIN}; 		
+static const IRQn_Type BUTTON_IRQn[BUTTONn] = {USER_BUTTON_EXTI_IRQn};		
 	[/#if]
+	[#assign BUTTON_EXTI_LINE= ""]
 	[#if numButton > 1]
 		[#assign BUTTON_GPIO_PORT=""]
 		[#assign BUTTON_PIN=""]
@@ -181,19 +195,23 @@ static const IRQn_Type BUTTON_IRQn[BUTTONn] = {USER_BUTTON_EXTI_IRQn};
                 		[#assign ExtiLine = variables.value]				
             		[/#if]		
             		[#-- User BSP Button --]
-            		[#if variables.value?contains("BSP BUTTON ") ] 
+            		[#if variables.value?contains("BSP BUTTON ") ]             		 	
             			[#assign i=(variables.value?substring((variables.value?last_index_of(" ") + 1) ,variables.value?length))]
             			[#assign BUTTON_GPIO_PORT = BUTTON_GPIO_PORT + "USER_BUTTON_" + i + "_GPIO_PORT" + ","]
-						[#assign BUTTON_PIN = BUTTON_PIN + "USER_BUTTON_" + i + "_PIN" + ","] 
-						[#assign BUTTON_IRQN = BUTTON_IRQN + "USER_BUTTON_" + i + "_EXTI_IRQn" + ","]  
-						[#assign BUTTON_EXTI_LINE = BUTTON_EXTI_LINE + ".Line = USER_BUTTON_" + i + "_EXTI_LINE" + ","]         
+						[#assign BUTTON_PIN = BUTTON_PIN + "USER_BUTTON_" + i + "_PIN" + ","]
+						[#if useEXTI] 							
+							[#assign BUTTON_IRQN = BUTTON_IRQN + "USER_BUTTON_" + i + "_EXTI_IRQn" + ","]  
+							[#assign BUTTON_EXTI_LINE = BUTTON_EXTI_LINE + ".Line = USER_BUTTON_" + i + "_EXTI_LINE" + ","] 
+						[/#if]        
             		[/#if]
             	[/#list]
 			[/#if]
 		[/#list]
 static GPIO_TypeDef*   BUTTON_PORT[BUTTONn] = {${BUTTON_GPIO_PORT}}; 
 static const uint16_t  BUTTON_PIN[BUTTONn]  = {${BUTTON_PIN}}; 
+			[#if useEXTI]
 static const IRQn_Type BUTTON_IRQn[BUTTONn] = {${BUTTON_IRQN}};
+			[/#if]
 	[/#if]
 [#if useDefine]
 	[#if numButton = 1]
@@ -515,8 +533,8 @@ int32_t BSP_PB_Init(Button_TypeDef Button, ButtonMode_TypeDef ButtonMode)
   
 [#if numButton = 1]
   static const BSP_EXTI_LineCallback ButtonCallback[BUTTONn] ={BUTTON_USER_EXTI_Callback};                                                
-  static const uint32_t  BSP_BUTTON_PRIO [BUTTONn] ={BSP_BUTTON_USER_IT_PRIORITY};  											     
-  static const uint32_t BUTTON_EXTI_LINE[BUTTONn] ={USER_BUTTON_EXTI_LINE};
+  static const uint32_t  BSP_BUTTON_PRIO [BUTTONn] ={BSP_BUTTON_USER_IT_PRIORITY};    											     
+  static const uint32_t BUTTON_EXTI_LINE[BUTTONn] ={USER_BUTTON_EXTI_LINE};  
   static const BSP_BUTTON_GPIO_Init ButtonGpioInit[BUTTONn] = {BUTTON_USER_GPIO_Init};
 [/#if]  
 [#if numButton > 1]
@@ -604,9 +622,9 @@ int32_t BSP_PB_Init(Button_TypeDef Button, ButtonMode_TypeDef ButtonMode)
     [/#if]  
 	else
     {
-      /* Enable and set Button EXTI Interrupt to the lowest priority */
+      /* Enable and set Button EXTI Interrupt to the lowest priority */     
       HAL_NVIC_SetPriority((BUTTON_IRQn[Button]), BSP_BUTTON_PRIO[Button], 0x00);
-      HAL_NVIC_EnableIRQ((BUTTON_IRQn[Button]));
+      HAL_NVIC_EnableIRQ((BUTTON_IRQn[Button]));      
     }
   }
   
@@ -626,7 +644,7 @@ int32_t BSP_PB_DeInit(Button_TypeDef Button)
   GPIO_InitTypeDef gpio_init_structure;
 
   gpio_init_structure.Pin = BUTTON_PIN[Button];
-  HAL_NVIC_DisableIRQ((IRQn_Type)(BUTTON_IRQn[Button]));
+  HAL_NVIC_DisableIRQ((IRQn_Type)(BUTTON_IRQn[Button]));  
   HAL_GPIO_DeInit(BUTTON_PORT[Button], gpio_init_structure.Pin);
 
   return BSP_ERROR_NONE;
@@ -934,10 +952,10 @@ int32_t BSP_COM_SelectLogPort(COM_TypeDef COM)
   return BSP_ERROR_NONE; 
 }
 
-#ifdef __GNUC__ 
- int __io_putchar (int ch) 
-#else 
- int fputc (int ch, FILE *f) 
+#if defined(__ICCARM__) || defined(__CC_ARM) /* For IAR and MDK-ARM */
+ int fputc (int ch, FILE *f)
+#else /* For GCC Toolchains */
+ int __io_putchar (int ch)
 #endif /* __GNUC__ */ 
 { 
   (void)HAL_UART_Transmit(&hcom_uart[COM_ActiveLogPort], (uint8_t *)&ch, 1, COM_POLL_TIMEOUT); 

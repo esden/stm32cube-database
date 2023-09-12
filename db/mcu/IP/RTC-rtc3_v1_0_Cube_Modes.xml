@@ -5,6 +5,18 @@
 	<!-- ORCA G0 -->
 	<!-- Generic RefParameters for RTC --> 
 	<RefParameter Comment="Instance" DefaultValue="RTC" Name="Instance" Type="" Visible="false"/>
+        <RefParameter Comment="Output1" DefaultValue="RTC_OUTPUT_ALARMA" Group="General" Name="OutPut1" Type="list" Visible="false">
+		<Condition Diagnostic="Alarms A outputed &amp; DIE467" Expression="AlarmA_Outputed"/>
+		<PossibleValue Comment="Output Alarm A" Value="RTC_OUTPUT_ALARMA"/>
+	</RefParameter>
+	<RefParameter Comment="Output2" DefaultValue="RTC_OUTPUT_ALARMB" Group="General" Name="OutPut2" Type="list" Visible="false">
+		<Condition Diagnostic="Alarms B outputed &amp; DIE467" Expression="AlarmB_Outputed"/>
+		<PossibleValue Comment="Output Alarm B" Value="RTC_OUTPUT_ALARMB"/>
+	</RefParameter>
+	<RefParameter Comment="Output3" DefaultValue="RTC_OUTPUT_WAKEUP" Group="General" Name="OutPut3" Type="list" Visible="false">
+		<Condition Diagnostic="Wake Up outputed &amp; DIE467" Expression="WakeUp_Outputed"/>
+		<PossibleValue Comment="Output Wakeup" Value="RTC_OUTPUT_WAKEUP"/>
+	</RefParameter>
 	
 	<!-- **************************************** General parameters ********************************************** -->
 	
@@ -37,17 +49,26 @@
 		<PossibleValue Comment="Output Wakeup" Value="RTC_OUTPUT_WAKEUP"/>
 	</RefParameter>
 	<RefParameter Comment="Output" DefaultValue="RTC_OUTPUT_TAMPER" Group="General" Name="OutPut" Type="list" Visible="false">
-		<Condition Diagnostic="Wake Up outputed" Expression="Tamper1_ON |Tamper2_ON"/>
+		<Condition Diagnostic="Wake Up outputed" Expression="Tamper1_ON |Tamper2_ON |Tamper3_ON"/>
 		<PossibleValue Comment="Output Tamper" Value="RTC_OUTPUT_TAMPER"/>
 	</RefParameter>
 	<RefParameter Comment="Output" DefaultValue="RTC_OUTPUT_DISABLE" Group="General" Name="OutPut" Type="list" Visible="false">
 		<PossibleValue Comment="Output Disable" Value="RTC_OUTPUT_DISABLE"/>
 	</RefParameter>
-	
-	<RefParameter Comment="Output Remap" DefaultValue="RTC_OUTPUT_REMAP_POS1" Group="General" Name="OutPutRemap" Type="list" Visible="false">
-		<Condition Diagnostic="" Expression="(PA4_RTC_OUT_ALARM | PA4_RTC_OUT_CALIB)"/>
+        <RefParameter Comment="Output Remap" DefaultValue="RTC_OUTPUT_REMAP_POS1" Group="General" Name="OutPutRemap" Type="list" Visible="false">
+		<Condition Diagnostic="" Expression="(PC13_RTC_OUT2) &amp; DIE467"/>
+		<PossibleValue Comment="Output Remap on PC13 pin" Value="RTC_OUTPUT_REMAP_POS1"/>
+	</RefParameter>
+        <RefParameter Comment="Output Remap" DefaultValue="RTC_OUTPUT_REMAP_POS1" Group="General" Name="OutPutRemap" Type="list" Visible="false">
+		<Condition Diagnostic="" Expression="(PA4_RTC_OUT2) &amp; DIE467"/>
+		<PossibleValue Comment="Output Remap on PC13 pin" Value="RTC_OUTPUT_REMAP_POS1"/>
+	</RefParameter>
+        
+        <RefParameter Comment="Output Remap" DefaultValue="RTC_OUTPUT_REMAP_POS1" Group="General" Name="OutPutRemap" Type="list" Visible="false">
+		<Condition Diagnostic="" Expression="(PA4_RTC_OUT2 &amp; PC13_RTC_OUT1)&amp; DIE467"/>
 		<PossibleValue Comment="Output Remap on PA4 pin" Value="RTC_OUTPUT_REMAP_POS1"/>
 	</RefParameter>
+         
 	<RefParameter Comment="Output Remap" DefaultValue="RTC_OUTPUT_REMAP_NONE" Group="General" Name="OutPutRemap" Type="list" Visible="false"/>
 		
 	<RefParameter Comment="Output Polarity" DefaultValue="RTC_OUTPUT_POLARITY_HIGH" Group="General" Name="OutPutPolarity" Type="list">
@@ -522,11 +543,11 @@
 	<!-- Wake Up -->
 	<RefParameter Comment="Wake Up Clock" DefaultValue="RTC_WAKEUPCLOCK_RTCCLK_DIV16" Group="Wake UP" Name="WakeUpClock" Type="list">
 		<PossibleValue Comment="RTCCLK / 16" Value="RTC_WAKEUPCLOCK_RTCCLK_DIV16"/>
-		<PossibleValue Comment="RTCCLK / 8" Value="RTC_WAKEUPCLOCK_RTCCLK_DIV8"/>
-		<PossibleValue Comment="RTCCLK / 4" Value="RTC_WAKEUPCLOCK_RTCCLK_DIV4"/>
-		<PossibleValue Comment="RTCCLK / 2" Value="RTC_WAKEUPCLOCK_RTCCLK_DIV2"/>
-		<PossibleValue Comment="1 Hz" Value="RTC_WAKEUPCLOCK_CK_SPRE_16BITS"/>
-		<PossibleValue Comment="1 Hz with 1 bit added to Wake Up Counter" Value="RTC_WAKEUPCLOCK_CK_SPRE_17BITS"/>
+		<PossibleValue Comment="RTCCLK / 8" Value="RTC_WAKEUPCLOCK_RTCCLK_DIV8" Semaphore="RTCCLK_DIV8"/>
+		<PossibleValue Comment="RTCCLK / 4" Value="RTC_WAKEUPCLOCK_RTCCLK_DIV4" Semaphore="RTCCLK_DIV4"/> 
+		<PossibleValue Comment="RTCCLK / 2" Value="RTC_WAKEUPCLOCK_RTCCLK_DIV2" Semaphore="RTCCLK_DIV2"/>
+		<PossibleValue Comment="1 Hz" Value="RTC_WAKEUPCLOCK_CK_SPRE_16BITS" Semaphore="CK_SPRE"/>
+		<PossibleValue Comment="1 Hz with 1 bit added to Wake Up Counter" Value="RTC_WAKEUPCLOCK_CK_SPRE_17BITS" Semaphore="CK_SPRE"/>
 	</RefParameter>
 	<RefParameter Comment="Wake Up Counter" DefaultValue="0" Group="Wake UP" Max="65535" Min="0" Name="WakeUpCounter" Type="integer"/>
 	<!-- Max = 0xFFFF -->
@@ -540,14 +561,20 @@
 	<RefMode Abstract="true" HalMode="RTC" Name="RTC_Enabled">
 		<ConfigForMode>RTC_Init_Only</ConfigForMode>
 		<!-- Basic Parameters -->
+                
 		<Parameter Name="HourFormat"/>
 		<Parameter Name="AsynchPrediv"/>
-		<Parameter Name="SynchPrediv"/>
-		<Parameter Name="OutPut"/>
-		<Parameter Name="OutPutPolarity"/>
-		<Parameter Name="OutPutType"/>
-		<Parameter Name="OutPutPullUp"/>
-	</RefMode>
+                <Parameter Name="SynchPrediv"/>
+                <Parameter Name="OutPut"/>
+                <Parameter Name="OutPutPolarity"/>
+                <Parameter Name="OutPutType"/>
+                <Parameter Name="OutPutPullUp"/>
+                <Parameter Name="OutPut1"/>
+                <Parameter Name="OutPut2"/>
+                <Parameter Name="OutPut3"/>
+
+
+        </RefMode>
 	
 	<RefMode Abstract="true" HalMode="RTC" Name="RTC_Calendar">
 		<ConfigForMode>RTC_Init</ConfigForMode>
@@ -697,7 +724,7 @@
 		<Parameter Name="AlarmSubSecondMask"/>
 		<Parameter Name="AlarmDateWeekDaySel"/>
 		<Parameter Name="AlarmDateWeekDay"/>
-		<Parameter Name="AlarmDateWeekDay"/>
+		<Parameter Name="AlarmDateWeekDayARG"/>
 		<Parameter Name="Alarm">
 			<PossibleValue>RTC_ALARM_A</PossibleValue>
 		</Parameter>
@@ -721,7 +748,7 @@
 		<Parameter Name="AlarmSubSecondMask"/>
 		<Parameter Name="AlarmDateWeekDaySel"/>
 		<Parameter Name="AlarmDateWeekDay"/>
-		<Parameter Name="AlarmDateWeekDay"/>
+		<Parameter Name="AlarmDateWeekDayARG"/>
 		<Parameter Name="Alarm">
 			<PossibleValue>RTC_ALARM_A</PossibleValue>
 		</Parameter>
@@ -747,7 +774,7 @@
 		<Parameter Name="AlarmSubSecondMask"/>
 		<Parameter Name="AlarmDateWeekDaySel"/>
 		<Parameter Name="AlarmDateWeekDay"/>
-		<Parameter Name="AlarmDateWeekDay"/>
+		<Parameter Name="AlarmDateWeekDayARG"/>
 		<Parameter Name="Alarm">
 			<PossibleValue>RTC_ALARM_A</PossibleValue>
 		</Parameter>
@@ -771,7 +798,7 @@
 		<Parameter Name="AlarmSubSecondMask"/>
 		<Parameter Name="AlarmDateWeekDaySel"/>
 		<Parameter Name="AlarmDateWeekDay"/>
-		<Parameter Name="AlarmDateWeekDay"/>
+		<Parameter Name="AlarmDateWeekDayARG"/>
 		<Parameter Name="Alarm">
 			<PossibleValue>RTC_ALARM_A</PossibleValue>
 		</Parameter>
@@ -779,7 +806,7 @@
         <!-- -->
 
 	<RefMode BaseMode="RTC_Init_And_Calender_Settings" HalMode="RTC" Name="Alarm B">
-		<Condition Diagnostic="" Expression="RTC_Alarm_IRQn | RTC_IRQn"/>
+		<Condition Diagnostic="" Expression="RTC_Alarm_IRQn | RTC_IRQn| RTC_TAMP_IRQn"/>
 		<ConfigForMode>RTC_SetAlarm_B_IT</ConfigForMode>
 		<!-- Basic Parameters -->
 		<Parameter Name="Hours_B"/>
@@ -798,7 +825,7 @@
 		<Parameter Name="AlarmSubSecondMask_B"/>
 		<Parameter Name="AlarmDateWeekDaySel_B"/>
 		<Parameter Name="AlarmDateWeekDay_B"/>
-		<Parameter Name="AlarmDateWeekDay_B"/>
+		<Parameter Name="AlarmDateWeekDayARG_B"/>
 		<Parameter Name="Alarm_B">
 			<PossibleValue>RTC_ALARM_B</PossibleValue>
 		</Parameter>
@@ -822,7 +849,7 @@
 		<Parameter Name="AlarmSubSecondMask_B"/>
 		<Parameter Name="AlarmDateWeekDaySel_B"/>
 		<Parameter Name="AlarmDateWeekDay_B"/>
-		<Parameter Name="AlarmDateWeekDay_B"/>
+		<Parameter Name="AlarmDateWeekDayARG_B"/>
 		<Parameter Name="Alarm_B">
 			<PossibleValue>RTC_ALARM_B</PossibleValue>
 		</Parameter>
@@ -848,7 +875,7 @@
 		<Parameter Name="AlarmSubSecondMask_B"/>
 		<Parameter Name="AlarmDateWeekDaySel_B"/>
 		<Parameter Name="AlarmDateWeekDay_B"/>
-		<Parameter Name="AlarmDateWeekDay_B"/>
+		<Parameter Name="AlarmDateWeekDayARG_B"/>
 		<Parameter Name="Alarm_B">
 			<PossibleValue>RTC_ALARM_B</PossibleValue>
 		</Parameter>
@@ -872,7 +899,7 @@
 		<Parameter Name="AlarmSubSecondMask_B"/>
 		<Parameter Name="AlarmDateWeekDaySel_B"/>
 		<Parameter Name="AlarmDateWeekDay_B"/>
-		<Parameter Name="AlarmDateWeekDay_B"/>
+		<Parameter Name="AlarmDateWeekDayARG_B"/>
 		<Parameter Name="Alarm_B">
 			<PossibleValue>RTC_ALARM_B</PossibleValue>
 		</Parameter>
@@ -966,7 +993,19 @@
 					</SignalLogicalOp>
 					<Semaphore>AlarmA_Intern</Semaphore>
 				</Mode>
-				<Mode Name="AlarmA_RoutedAF" UserName="Routed to OUT">
+				<Mode Name="AlarmA_RoutedAF" UserName="Routed to OUT1">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="OUT1"/>
+					</SignalLogicalOp>
+					<Semaphore>AlarmA_Outputed</Semaphore>
+				</Mode>
+                                <Mode Name="AlarmA_RoutedAF" UserName="Routed to OUT2">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="OUT2"/>
+					</SignalLogicalOp>
+					<Semaphore>AlarmA_Outputed</Semaphore>
+				</Mode>
+                                <Mode Name="AlarmA_RoutedAF" UserName="Routed to OUT" RemoveCondition="DIE467">
 					<SignalLogicalOp Name="AND">
 						<Signal Name="OUT_ALARM"/>
 					</SignalLogicalOp>
@@ -985,7 +1024,19 @@
 					</SignalLogicalOp>
 					<Semaphore>AlarmB_Intern</Semaphore>
 				</Mode>
-				<Mode Name="AlarmB_RoutedAF" UserName="Routed to OUT">
+                                <Mode Name="AlarmB_RoutedAF" UserName="Routed to OUT1">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="OUT1"/>
+					</SignalLogicalOp>
+					<Semaphore>AlarmB_Outputed</Semaphore>
+				</Mode>
+                                <Mode Name="AlarmB_RoutedAF" UserName="Routed to OUT2">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="OUT2"/>
+					</SignalLogicalOp>
+					<Semaphore>AlarmB_Outputed</Semaphore>
+				</Mode>
+				<Mode Name="AlarmB_RoutedAF" UserName="Routed to OUT" RemoveCondition="DIE467">
 					<SignalLogicalOp Name="AND">
 						<Signal Name="OUT_ALARM"/>
 					</SignalLogicalOp>
@@ -1017,7 +1068,19 @@
 					</SignalLogicalOp>
 					<Semaphore>WakeUp_Intern</Semaphore>
 				</Mode>
-				<Mode Name="WakeUpAF1" UserName="Routed to OUT">
+				<Mode Name="WakeUpAF1" UserName="Routed to OUT1">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="OUT1"/>
+					</SignalLogicalOp>
+					<Semaphore>WakeUp_Outputed</Semaphore>
+				</Mode>
+                                <Mode Name="WakeUpAF1" UserName="Routed to OUT2" >
+					<SignalLogicalOp Name="AND">
+						<Signal Name="OUT2"/>
+					</SignalLogicalOp>
+					<Semaphore>WakeUp_Outputed</Semaphore>
+				</Mode>
+                                <Mode Name="WakeUpAF1" UserName="Routed to OUT" RemoveCondition="DIE467">
 					<SignalLogicalOp Name="AND">
 						<Signal Name="OUT_ALARM"/>
 					</SignalLogicalOp>
@@ -1052,14 +1115,51 @@
 			<Semaphore>Tamper2_ON</Semaphore>
 			<Semaphore>RTC_TAMPER_INTERRUPT</Semaphore>
 		</Mode>
+		<Mode Name="Tamper_3" UserName="Tamper 3">
+                <Condition Diagnostic="RTC is already used for system time base" Expression="!SYS_$IpInstance &amp; RTC_ENABLED"/>
+                    
+			<ModeLogicOperator Name="XOR">
+				<Mode Name="Tamper 3 enabled" UserName="Tamper3 Routed to TAMP_IN3">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="TAMP_IN3"/>
+					</SignalLogicalOp>
+				</Mode>
+			</ModeLogicOperator>
+			<Semaphore>Tamper3_ON</Semaphore>
+			<Semaphore>RTC_TAMPER_INTERRUPT</Semaphore>
+		</Mode>
 		
 		<Mode Name="Calibration">
                 <Condition Diagnostic="RTC is already used for system time base" Expression="!SYS_$IpInstance &amp; RTC_ENABLED"/>
                     
 			<ModeLogicOperator Name="XOR">
-				<Mode Name="Calibration_512Hz" UserName="Calibration 512Hz">
+                            <Mode Name="Calibration_512Hz" UserName="Calibration 512Hz routed to OUT1">
 					<SignalLogicalOp Name="AND">
-						<Signal Name="OUT_CALIB"/>
+						<Signal Name="OUT1"/>
+					</SignalLogicalOp>
+				</Mode>
+                                <Mode Name="Calibration_512Hz" UserName="Calibration 512Hz routed to OUT2">
+                                    <SignalLogicalOp Name="AND">
+                                        <Signal Name="OUT2"/>
+                                    </SignalLogicalOp>
+                                </Mode>
+                                 <Mode Name="Calibration_1Hz" UserName="Calibration 1Hz routed to OUT1">
+
+                                    <SignalLogicalOp Name="AND">
+                                        <Signal Name="OUT1"/>
+                                    </SignalLogicalOp>
+                                </Mode>
+				<Mode Name="Calibration_1Hz" UserName="Calibration 1Hz routed to OUT2">
+					<SignalLogicalOp Name="AND">
+                                            <Signal Name="OUT2"/>
+                                        </SignalLogicalOp>
+                                </Mode>
+                                 
+                               
+                               
+                                <Mode Name="Calibration_512Hz" UserName="Calibration 512Hz">
+                                    <SignalLogicalOp Name="AND">
+                                        <Signal Name="OUT_CALIB"/>
 					</SignalLogicalOp>
 				</Mode>
 				<Mode Name="Calibration_1Hz" UserName="Calibration 1Hz">
@@ -1088,7 +1188,10 @@
 	<!-- ***************** Ref Signals********************* -->
 	<RefSignal IOMode="System" Name="TAMP_IN1"/>
 	<RefSignal IOMode="System" Name="TAMP_IN2"/>
+	<RefSignal IOMode="System" Name="TAMP_IN3"/>
 	<RefSignal IOMode="System" Name="TS"/>
+        <RefSignal IOMode="RTCAlternateFunctionPushPull" Name="OUT1"/>
+	<RefSignal IOMode="RTCAlternateFunctionPushPull" Name="OUT2"/>
 	<RefSignal IOMode="RTCAlternateFunctionPushPull" Name="OUT_ALARM"/>
 	<RefSignal IOMode="RTCAlternateFunctionPushPull" Name="OUT_CALIB"/>
 	<RefSignal IOMode="RTCAlternateFunctionPushPull" Name="REFIN"/>

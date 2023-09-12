@@ -12,7 +12,7 @@
 
 [#compress]
 [#if cpucore!="" && (contextFolder=="" || contextFolder=="/")]
-[#assign contextFolder = cpucore?replace("ARM_CORTEX_","C")+"/"]
+[#assign contextFolder = cpucore?replace("ARM_CORTEX_","C")?replace("+","PLUS")+"/"]
 [/#if]
 [#assign inMain = 0]
 [#assign useNewHandle = 0]
@@ -119,13 +119,6 @@ void MX_FREERTOS_Init(void);  /* (MISRA C 2004 rule 8.1) */
 [#list SWIPdatas as SWIP]
   [#if SWIP.defines??]     
     [#list SWIP.defines as definition]
-      [#if definition.name=="configUSE_TICKLESS_IDLE"]
-        [#if definition.value=="1"]
-#n/* Pre/Post sleep processing prototypes */
-void PreSleepProcessing(uint32_t *ulExpectedIdleTime);
-void PostSleepProcessing(uint32_t *ulExpectedIdleTime);
-        [/#if]
-      [/#if]
       [#if definition.name=="MEMORY_ALLOCATION"]
         [#if definition.value!="0"] [#--Not "Dynamic" alone --]
 #n/* GetIdleTaskMemory prototype (linked to static allocation support) */

@@ -44,19 +44,49 @@ TIM_HandleTypeDef        h${instance?lower_case};
 HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
 {
   RCC_ClkInitTypeDef    clkconfig;
+[#if FamilyName!="STM32H7"]
   uint32_t              uwTimclock = 0;
   uint32_t              uwPrescalerValue = 0;
+[/#if]
+[#if FamilyName=="STM32H7"]
+[#if APB=="APB1"]
+  uint32_t              uwTimclock, uwAPB1Prescaler;
+[#else]
+  uint32_t              uwTimclock;
+[/#if]
+
+  uint32_t              uwPrescalerValue;
+[/#if]
   uint32_t              pFLatency;
-  [#if FamilyName=="STM32G4"]
+[#if FamilyName=="STM32WL"]
+  HAL_StatusTypeDef     status = HAL_OK;
+
+[/#if]
+[#if FamilyName=="STM32G4"]
   HAL_StatusTypeDef     status = HAL_OK;
 [/#if]
-[#if FamilyName!="STM32G4"]
+[#if FamilyName!="STM32WL" && FamilyName!="STM32H7" && FamilyName!="STM32G4"]
   /*Configure the ${instance} IRQ priority */
   HAL_NVIC_SetPriority(${timeBaseInterrupt}, TickPriority ,0); 
   
   /* Enable the ${instance} global Interrupt */
   HAL_NVIC_EnableIRQ(${timeBaseInterrupt}); 
-  [/#if]
+[/#if]
+[#if FamilyName=="STM32H7"]
+/*Configure the ${instance} IRQ priority */
+  if (TickPriority < (1UL << __NVIC_PRIO_BITS))
+  {
+  HAL_NVIC_SetPriority(${timeBaseInterrupt}, TickPriority ,0U); 
+  
+  /* Enable the ${instance} global Interrupt */
+  HAL_NVIC_EnableIRQ(${timeBaseInterrupt}); 
+    uwTickPrio = TickPriority;
+    }
+  else
+  {
+    return HAL_ERROR;
+  }
+[/#if]
   /* Enable ${instance} clock */
   __HAL_RCC_${instance}_CLK_ENABLE();
 [#if FamilyName=="STM32MP1"]
@@ -67,8 +97,35 @@ HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
   /* Get clock configuration */
   HAL_RCC_GetClockConfig(&clkconfig, &pFLatency);
   
-  [#--/* Get ${APB} prescaler */
-  uw${APB}Prescaler = clkconfig.${APB}CLKDivider;--]  
+[#if FamilyName=="STM32H7"]
+ [#if APB=="APB1"]
+  /* Get ${APB} prescaler */
+  uw${APB}Prescaler = clkconfig.${APB}CLKDivider; 
+[/#if] 
+[/#if]
+[#if FamilyName=="STM32H7"]
+  /* Compute ${instance} clock */
+    [#if APB=="APB1"]
+  if (uwAPB1Prescaler == RCC_HCLK_DIV1)
+  {
+    uwTimclock = HAL_RCC_GetPCLK1Freq();
+  }
+  else
+  {
+    uwTimclock = 2UL * HAL_RCC_GetPCLK1Freq();
+  }
+        
+    [#else]
+        
+  [#if TIMAPB2Presc?? && TIMAPB2Presc!="1"]
+  uwTimclock = ${TIMAPB2Presc}*HAL_RCC_GetPCLK2Freq();
+        [#else]
+  uwTimclock = HAL_RCC_GetPCLK2Freq();
+        [/#if]
+     
+    [/#if]
+   [/#if]
+[#if FamilyName!="STM32H7"]
   /* Compute ${instance} clock */
     [#if APB=="APB1"]
         [#if TIMAPB1Presc?? && TIMAPB1Presc!="1"]
@@ -83,9 +140,9 @@ HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
   uwTimclock = HAL_RCC_GetPCLK2Freq();
         [/#if]
     [/#if]
-   
+   [/#if]
   /* Compute the prescaler value to have ${instance} counter clock equal to 1MHz */
-  uwPrescalerValue = (uint32_t) ((uwTimclock / 1000000) - 1);
+  uwPrescalerValue = (uint32_t) ((uwTimclock / 1000000U) - 1U);
   
   /* Initialize ${instance} */
   h${instance?lower_case}.Instance = ${instance};
@@ -96,11 +153,12 @@ HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
   + ClockDivision = 0
   + Counter direction = Up
   */
-  h${instance?lower_case}.Init.Period = (1000000 / 1000) - 1;
+  h${instance?lower_case}.Init.Period = (1000000U / 1000U) - 1U;
   h${instance?lower_case}.Init.Prescaler = uwPrescalerValue;
   h${instance?lower_case}.Init.ClockDivision = 0;
   h${instance?lower_case}.Init.CounterMode = TIM_COUNTERMODE_UP;
-[#if FamilyName=="STM32G4"]
+[#if FamilyName=="STM32WL" || FamilyName=="STM32G4"]
+
   status = HAL_TIM_Base_Init(&h${instance?lower_case});
   if (status == HAL_OK)
   {

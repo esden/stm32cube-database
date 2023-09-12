@@ -127,6 +127,9 @@
             [#if dataKey=="LinkerFile"]
                [#assign LinkerFile =  elem[dataKey]]
             [/#if]
+            [#if dataKey=="startup"]
+               [#assign startup =  elem[dataKey]]
+            [/#if]
         [/#list]   
     [/#if]
 [/#if]
@@ -188,7 +191,9 @@
     [/#if]
     [#-- <optimization>${project.compilerOptimization}</optimization> --]
     <optimization>${optimization}</optimization>
-
+    [#if ForceDebugOptimization?? && ide?contains("STM32CubeIDE")]
+    <ForceDebugOptimization>true</ForceDebugOptimization>
+    [/#if]
 
     <Aincludes>
         [#if usedfreeRTOS=="true" || (multiConfig == "true" && cpuCore=="ARM Cortex-M4" && usedfreeRTOS_M4?? && usedfreeRTOS_M4=="true")|| (multiConfig == "true" && cpuCore=="ARM Cortex-M7" && usedfreeRTOS_M7?? && usedfreeRTOS_M7=="true")]
@@ -208,14 +213,14 @@
         </Aincludes>
     <Adefines>
         [#list AdefinesList as define]
-        <define>${define}</define>
+        <define>${define?replace("+","PLUS")}</define>
         [/#list]
         </Adefines>  
     <Cdefines>
         [#assign deflist =""]
 	[#list CdefinesList as define]
         [#if !deflist?contains(define)]
-        <define>${define}</define>
+        <define>${define?replace("+","PLUS")}</define>
             [#assign deflist = deflist + " - " + define]
         [/#if]
         [/#list]
@@ -223,7 +228,7 @@
         </Cdefines>
     <Ldefines>
 	[#list LdefinesList as define]
-        <define>${define}</define>
+        <define>${define?replace("+","PLUS")}</define>
         [/#list]
 	   [#-- <define>__weak=__attribute__((weak))</define> --]
         </Ldefines>
@@ -317,6 +322,9 @@
             [#if dataKey=="ApplicationGroups"]            
                [#assign ApplicationGroups =  elem[dataKey]]
             [/#if]       
+            [#if dataKey=="AppSourceEntries"]            
+               [#assign AppSourceEntries =  elem[dataKey]]
+            [/#if]
             [#if dataKey=="cpuCore" || dataKey=="cpucore"]
                [#assign cpuCore =  elem[dataKey]]           
             [/#if]  
@@ -367,14 +375,17 @@
             [#if dataKey=="ExePath"]
                [#assign ExePath =  elem[dataKey]]
             [/#if]
-[#if dataKey=="LinkAdditionalLibs"]
+            [#if dataKey=="LinkAdditionalLibs"]
                [#assign LinkAdditionalLibs =  elem[dataKey]]
             [/#if]
-[#if dataKey=="TrustZoneLibName"]
+            [#if dataKey=="TrustZoneLibName"]
                [#assign TrustZoneLibName =  elem[dataKey]]
             [/#if]
-[#if dataKey=="prj_ctx"]
+            [#if dataKey=="prj_ctx"]
                [#assign prj_ctx =  elem[dataKey]]
+            [/#if]            
+            [#if dataKey=="localMwDriver"]
+               [#assign localMwDriver =  elem[dataKey]]
             [/#if]
         [/#list]
         [#--break--]
@@ -439,6 +450,13 @@
                 <sourceEntry>
                 <name>${src}</name>
                 </sourceEntry>
+                [#list AppSourceEntries as SrcEntry] [#-- add application Groups --]
+                    [#if !SrcEntry?ends_with("FREERTOS")]
+            <sourceEntry>
+            <name>${SrcEntry}</name>
+            </sourceEntry>
+                    [/#if]
+                [/#list]
             [#else]
                 [#list ProjectConfigs?keys as configName]
                     [#assign elem = Prjconfig]
@@ -450,6 +468,13 @@
                             </sourceEntry> 
                             [/#if]             
                         [/#list] 
+                        [#list AppSourceEntries as SrcEntry]
+                            [#if !SrcEntry?ends_with("FREERTOS")]
+                            <sourceEntry>
+                            <name>${SrcEntry}</name>
+                            </sourceEntry>
+                            [/#if]
+                        [/#list]
                     [/#if] 
                 [/#list]
             [/#if]
@@ -503,25 +528,28 @@
                     </sourceEntry>                   
                 [/#if]
             [/#if]
-        
-        [#list MiddlewareList as Middleware] 
-            [#if TrustZone == "0"]
-                <sourceEntry>
-                <name>${Middleware}</name>                
-                </sourceEntry>
-            [#else] [#-- trustzone == 1 --]
-                [#if Middleware?starts_with("Secure") && ConfigSecure=="1"]
-                    <sourceEntry>
-                            <name>${Middleware}</name>
-                    </sourceEntry>
+        [#if sourceStructure == "Advanced"]
+            [#list MiddlewareList as Middleware] 
+                [#if !Middleware?ends_with("FREERTOS") && !AppSourceEntries?seq_contains(Middleware?replace("/","\\")?replace("CM0Plus","CM0PLUS"))]
+                    [#if TrustZone == "0"]
+                        <sourceEntry>
+                        <name>${Middleware}</name>      
+                        </sourceEntry>
+                    [#else] [#-- trustzone == 1 --]
+                        [#if Middleware?starts_with("Secure") && ConfigSecure=="1"]
+                            <sourceEntry>
+                                    <name>${Middleware}</name>
+                            </sourceEntry>
+                        [/#if]
+                        [#if Middleware?starts_with("NonSecure") && ConfigSecure=="0"]
+                            <sourceEntry>
+                                    <name>${Middleware}</name>
+                            </sourceEntry>
+                        [/#if]
+                    [/#if]
                 [/#if]
-                [#if Middleware?starts_with("NonSecure") && ConfigSecure=="0"]
-                    <sourceEntry>
-                            <name>${Middleware}</name>
-                    </sourceEntry>
-                [/#if]
-            [/#if]
-        [/#list]
+            [/#list]
+        [/#if]
         [#-- ************************* --]
 	[/#if]
         [#if ResMgr_Utility?? || (UtilitiesGroup?? && UtilitiesGroup.sourceFilesNameList?size>0)]
@@ -658,7 +686,7 @@
                                 <group>
                                 <name>${MwRoot?replace("Middlewares/","")}</name>                                             
                                     [#list groups as group]
-                                        [#if (commponentAndGroupName[middName]?? && group.name==commponentAndGroupName[middName]) || WorkspaceType!="Multi-project"]
+                                        [#if (commponentAndGroupName[middName]?? && (group.name==commponentAndGroupName[middName] | group.name==middName))  || WorkspaceType!="Multi-project"]
                                             [#if group.sourceFilesNameList??]
                                                 [#list group.sourceFilesNameList as filesName]
                                                     [#-- selectedConfig --]
@@ -744,6 +772,13 @@
     <sourceEntries>
        	[#if src??]
             [#if !multiConfigurationProject??]
+                [#list AppSourceEntries as SrcEntry] [#-- add application Groups --]
+                    [#if !SrcEntry?ends_with("FREERTOS")]
+            <sourceEntry>
+            <name>${SrcEntry}</name>
+            </sourceEntry>
+                    [/#if]
+                [/#list]
             <sourceEntry>
             <name>${src}</name>
             </sourceEntry>
@@ -763,12 +798,15 @@
 
                         </sourceEntry> 
                         [/#if]                    
-                        [#if dataKey=="GFXSource"]
-                        <sourceEntry>
-                            <name>${elem[dataKey]}</name>
-                        </sourceEntry>            
-                        [/#if]                    
+                                          
                     [/#list] 
+                    [#list AppSourceEntries as SrcEntry]
+                        [#if !SrcEntry?ends_with("FREERTOS")]
+                        <sourceEntry>
+                        <name>${SrcEntry}</name>
+                        </sourceEntry>
+                        [/#if]
+                    [/#list]
                     [/#if] 
                 [/#list]
             [/#if]
@@ -814,7 +852,7 @@
                 [/#list]
                 </sourceEntry>
             [#else]
-                [#if  MultiProject=="0" | (MultiProject=="1" && usedMWPerCore[selectedConfig]?size>0)]    
+                [#if  MultiProject=="0" | (MultiProject=="1" && usedMWPerCore[selectedConfig]?size>0 && (!localMwDriver?? ||(localMwDriver?? && localMwDriver=="true")))]    
                     <sourceEntry>
                        <name>Middlewares</name>
                     </sourceEntry>                   
@@ -826,25 +864,28 @@
                     <name>Utilities</name>
                 </sourceEntry>
             [/#if]
-
-            [#list MiddlewareList as Middleware] 
-                [#if TrustZone == "0"]
-                    <sourceEntry>
-                    <name>${Middleware}</name>                
-                    </sourceEntry>
-                [#else] [#-- trustzone == 1 --]
-                    [#if Middleware?starts_with("Secure") && ConfigSecure=="1"]
-                        <sourceEntry>
-                                <name>${Middleware}</name>
-                        </sourceEntry>
+            [#if sourceStructure == "Advanced"]
+                [#list MiddlewareList as Middleware] 
+                    [#if !Middleware?ends_with("FREERTOS")&& !AppSourceEntries?seq_contains(Middleware?replace("/","\\")?replace("CM0Plus","CM0PLUS"))]
+                        [#if TrustZone == "0"]
+                            <sourceEntry>
+                            <name>${Middleware}</name>
+                            </sourceEntry>
+                        [#else] [#-- trustzone == 1 --]
+                            [#if Middleware?starts_with("Secure") && ConfigSecure=="1"]
+                                <sourceEntry>
+                                        <name>${Middleware}</name>
+                                </sourceEntry>
+                            [/#if]
+                            [#if Middleware?starts_with("NonSecure") && ConfigSecure=="0"]
+                                <sourceEntry>
+                                        <name>${Middleware}</name>
+                                </sourceEntry>
+                            [/#if]
+                        [/#if]
                     [/#if]
-                    [#if Middleware?starts_with("NonSecure") && ConfigSecure=="0"]
-                        <sourceEntry>
-                                <name>${Middleware}</name>
-                        </sourceEntry>
-                    [/#if]
-                [/#if]
-            [/#list]
+                [/#list]
+            [/#if]
         [#-- ************************* --]
 	[/#if] [#-- End of at least one mw--]
         [#if ResMgr_Utility?? || (UtilitiesGroup?? && UtilitiesGroup.sourceFilesNameList?size>0)]
@@ -855,9 +896,9 @@
         [#if ThirdPartyPackList??]
             [#list ThirdPartyPackList as pack]
                 [#if pack !=  ""]
-                    <sourceEntry>
+                   [#-- <sourceEntry>
                         <name>${pack}</name>
-                        </sourceEntry>
+                        </sourceEntry>--]
                 [/#if]
             [/#list]
         [/#if]
@@ -887,7 +928,7 @@
         </group>
     [/#if]
         
-        [#if atLeastOneBspComponentIsUsed]		        
+        [#if atLeastOneBspComponentIsUsed]        
             <group>					
                 [#if bspComponentGroups??]						
                     [#list bspComponentGroups as grp]
@@ -981,24 +1022,32 @@
                 [#if selectedConfig??]
                     [#assign usedMw =  usedMWPerCore[selectedConfig]]
                 [#else] [#-- case of MP1 multi-projrct but no slectedConfig --]
-                    [#list usedMWPerCore?keys as mwKey]                        
+                    [#list usedMWPerCore?keys as mwKey]         
                         [#assign usedMw =  usedMWPerCore[mwKey]]
                     [/#list]
                 [/#if]
+                [#assign declaredMW = ""]
                 [#list usedMWandRootFolder?keys as middName]
-                    [#assign exclude = true]
+                    
+                    [#assign exclude = true]                    
                     [#assign used = false] 
                     [#if usedMw??]  
                         [#list usedMw as m]
-                            [#if m==middName]
-                                [#assign used = true]
+                            [#if (m==middName)]
+                                [#assign used = true]    
+                                
                             [/#if]
-                            [#if used==true]
+                            [#assign MwRoot =  usedMWandRootFolder[middName]]  
+                            [#if used==true  && !(declaredMW?contains(MwRoot?replace("Middlewares/","")))]
                                 [#assign MwRoot =  usedMWandRootFolder[middName]]                 
-                                <group>
+                                <group>   
                                 <name>${MwRoot?replace("Middlewares/","")}</name>                                             
                                     [#list groups as group]
-                                        [#if commponentAndGroupName[middName]?? && group.name==commponentAndGroupName[middName]]
+                                        [#if commponentAndGroupName[middName]?? && (group.name==commponentAndGroupName[middName] | group.name==middName)]
+                                            [#if group.name?lower_case=="lorawan" || (group.name?lower_case)?starts_with("sigfox") || (group.name?lower_case)?starts_with("subghz")]
+                                                <group>
+                                                    <name>${group.name}</name>
+                                            [/#if]
                                             [#if group.sourceFilesNameList??]
                                                 [#list group.sourceFilesNameList as filesName]
                                                     [#-- selectedConfig --]
@@ -1038,11 +1087,17 @@
                                                     [/#if]
                                                 [/#list]
                                             [/#if]
+                                            [#if group.name?lower_case=="lorawan"|| (group.name?lower_case)?starts_with("sigfox")  || (group.name?lower_case)?starts_with("subghz")]
+                                                </group>
+                                            [/#if]
+
                                         [/#if]
+                                
                                     [/#list]   
                                 </group>
-                            [/#if]    
-                            
+                                 [#assign declaredMW = declaredMW + " " + MwRoot?replace("Middlewares/","")]
+                            [/#if]  
+                               
                         [/#list]
                     [/#if]      
                 
@@ -1222,11 +1277,15 @@
                                 <group>
                                 [#if MwRoot?ends_with("/")]
                                     [#assign MwRoot = MwRoot?keep_before_last("/")]
-                                [/#if]
+                                [/#if]                                
                                 [#assign mwpathList = MwRoot?split("/")]
                                 <name>${mwpathList[mwpathList?size - 1]}</name>                                      
                                     [#list groups as group]
-                                        [#if commponentAndGroupName[middName]?? && group.name==commponentAndGroupName[middName]]
+                                        [#if commponentAndGroupName[middName]?? && (group.name==commponentAndGroupName[middName] | group.name==middName)]
+                                            [#if group.name?lower_case=="lorawan" || (group.name?lower_case)?starts_with("sigfox")||(group.name?lower_case)?starts_with("subghz")]
+                                                <group>
+                                                    <name>${group.name}</name>
+                                            [/#if]
                                             [#if group.sourceFilesNameList??]
                                                 [#list group.sourceFilesNameList as filesName]
                                                     [#-- selectedConfig --]
@@ -1266,7 +1325,11 @@
                                                     [/#if]
                                                 [/#list]
                                             [/#if]
+                                            [#if group.name?lower_case=="lorawan" ||(group.name?lower_case)?starts_with("sigfox") || (group.name?lower_case)?starts_with("subghz")]
+                                                </group>
+                                            [/#if]
                                         [/#if]
+                                        
                                     [/#list]   
                                 </group>
                             [/#if]    

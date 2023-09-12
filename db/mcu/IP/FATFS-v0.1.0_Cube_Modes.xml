@@ -927,7 +927,12 @@
 	<RefParameter Name="_MULTI_PARTITION" Comment="MULTI_PARTITION (Volume partitions feature)" DefaultValue="0" Type="list" Group="Physical Drive Parameters" TabName="Set Defines">
 		<PossibleValue Comment="Disabled" Value="0"/>
 		<PossibleValue Comment="Enabled" Value="1"/>
-		<Description>When set to 0 (Disabled), each volume is bound to the same physical drive number and it can mount only first primaly partition. &lt;br&gt;When it is set to 1 (Enabled), each volume is tied to the partitions listed in VolToPart[].</Description>
+		<Description>When set to 0 (Disabled), each volume is bound to the same physical drive number and it can mount only first primaly partition. &lt;br&gt;
+		             When it is set to 1 (Enabled), each volume is tied to the partitions listed in VolToPart[].&lt;br&gt;
+		             &lt;b&gt;Warning: &lt;/b&gt; &lt;br&gt;
+		             The volToPart variable contains the "volume management table" defined by the user (&lt;b&gt;required&lt;/b&gt; when _MULTI_PARTITION != 0). &lt;br&gt;
+		             It is generated in a USER SECTION so that it can be completed by the user.
+		             </Description>
 	</RefParameter>
 	
     <RefParameter Name="_USE_TRIM" Comment="USE_TRIM (Erase feature)" DefaultValue="0" Type="list" Group="Physical Drive Parameters" TabName="Set Defines">
@@ -1028,8 +1033,9 @@
 
 
     <!-- ADDED/REWORKED FOR BETTER SUPPORT OF  CMSIS_RTOS V2 (cf syscall.c file) -->
+    <!-- H7 & L4 in 5.5, WB,G4,F4 & F7 in 5.6, WL to come -->
     <RefParameter Name="_USE_MUTEX" Comment="USE_MUTEX" DefaultValue="0" Type="list" Group="System Parameters" TabName="Set Defines">
-        <Condition Diagnostic="Useful when rtos is enabled" Expression="_FS_REENTRANT=1 &amp; (STM32F4 | STM32F7 | STM32G4 | STM32H7 | STM32L4 | STM32WB)"/> <!-- H7 & L4 in 5.5, WB,G4,F4 & F7 in 5.6 -->
+        <Condition Diagnostic="Useful when rtos is enabled" Expression="_FS_REENTRANT=1 &amp; (STM32F4 | STM32F7 | STM32G0 | STM32G4 | STM32H7 | STM32L4 | STM32WB | STM32WL )"/> <!-- H7 & L4 in 5.5, WB,G4,F4 & F7 in 5.6, G0 in 6.1 -->
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
         <Description>New param for better support of CMSIS-RTOS v2</Description>
@@ -1285,7 +1291,7 @@
                     <Semaphore>S_FATFS_SDRAM$context</Semaphore>
                 </Mode>
             </ModeLogicOperator>
-            <Condition Expression="!S_FREERTOS_NATIVE &amp; (SdramChipSelect1|SdramChipSelect2)" Diagnostic="Active only with at least one FMC SDRAM IP configured and FreeRTOS not in native mode"/>
+            <Condition Expression="(!S_FREERTOS_NATIVE &amp; (SdramChipSelect1|SdramChipSelect2)) &amp; (!S_AzureRTOS$context)" Diagnostic="Active only with at least one FMC SDRAM IP configured and FreeRTOS not in native mode"/>
         </Mode>
 
         <Mode Name="SRAM" UserName="External SRAM" RemoveCondition="!FMC:$modeexist_Sram1 &amp; !FSMC:$modeexist_Sram1 &amp; !FMC:$modeexist_Psram1 &amp; !FSMC:$modeexist_Psram1 &amp; !FMC:$modeexist_MuxedPsram1 &amp; !FSMC:$modeexist_MuxedPsram1 &amp; !FSMC_NOR_RAM:$modeexist_8-bit-PSRAM  &amp; !FSMC:$modeexist_Lcd1">
@@ -1297,7 +1303,7 @@
                     <Semaphore>S_FATFS_SRAM$context</Semaphore>
                 </Mode>
             </ModeLogicOperator>
-            <Condition Expression="!S_FREERTOS_NATIVE &amp; (Sram1|Sram2|Sram3|Sram4|Psram1|Psram2|Psram3|Psram4|MuxedPsram1|MuxedPsram2|MuxedPsram3|MuxedPsram4|Lcd1|Lcd2|Lcd3|Lcd4)" Diagnostic="Active only with at least one SRAM / PSRAM / Muxed PSRAM / LCD Interface configured and FreeRTOS not in native mode"/>
+            <Condition Expression="(!S_FREERTOS_NATIVE &amp; (Sram1|Sram2|Sram3|Sram4|Psram1|Psram2|Psram3|Psram4|MuxedPsram1|MuxedPsram2|MuxedPsram3|MuxedPsram4|Lcd1|Lcd2|Lcd3|Lcd4)) &amp; (!S_AzureRTOS$context) " Diagnostic="Active only with at least one SRAM / PSRAM / Muxed PSRAM / LCD Interface configured and FreeRTOS not in native mode"/>
         </Mode>
 
         <Mode Name="SDIO" UserName="SD Card" RemoveCondition="!SDIO:$modeexist_SD_1_bit &amp; !SDMMC:$modeexist_SD_1_bit &amp; !SDMMC1:$modeexist_SD_1_bit">
@@ -1310,7 +1316,7 @@
                 </Mode>
             </ModeLogicOperator>
             <!-- <Condition Expression="!S_FREERTOS_NATIVE &amp; !S_CMSIS_RTOS_V2 &amp; (SDIO_SD_Card|SDMMC1_SD_Card|SDMMC2_SD_Card)" Diagnostic="Active only with SDIO/SDMMC IP configured in a SD mode and CMSIS_RTOS V2 not enabled"/>  -->
-            <Condition Expression="!S_FREERTOS_NATIVE &amp; (SDIO_SD_Card|SDMMC1_SD_Card|SDMMC2_SD_Card)" Diagnostic="Active only with SDIO/SDMMC IP configured in a SD mode" />
+            <Condition Expression="(!S_FREERTOS_NATIVE &amp; (SDIO_SD_Card|SDMMC1_SD_Card|SDMMC2_SD_Card)) &amp; (!S_AzureRTOS$context)" Diagnostic="Active only with SDIO/SDMMC IP configured in a SD mode" />
         </Mode>
 
         <Mode Name="USB" UserName="USB Disk" RemoveCondition="!USB_HOST$context:$modeexist_MSC_HS &amp; !USB_HOST$context:$modeexist_MSC_FS">
@@ -1322,7 +1328,7 @@
                     <Semaphore>S_FATFS_USB$context</Semaphore>   <!-- to avoid some troubles with use dma template, for instance -->
                 </Mode>
             </ModeLogicOperator>
-            <Condition Expression="!S_FREERTOS_NATIVE &amp; (USB_HOST_MSC_FS$context|USB_HOST_MSC_HS$context|ALL_Classes_FS$context|ALL_Classes_HS$context)" Diagnostic="Active only with USB Host (class MSC) middleware and FreeRTOS not in native mode"/>
+            <Condition Expression="(!S_FREERTOS_NATIVE &amp; (USB_HOST_MSC_FS$context|USB_HOST_MSC_HS$context|ALL_Classes_FS$context|ALL_Classes_HS$context)) &amp; (!S_AzureRTOS$context)" Diagnostic="Active only with USB Host (class MSC) middleware and FreeRTOS not in native mode"/>
         </Mode>
 
         <Mode Name="User_defined" UserName="User-defined">
@@ -1334,7 +1340,7 @@
                     <Semaphore>S_FATFS_Generic$context</Semaphore>
                 </Mode>
             </ModeLogicOperator>
-            <Condition Expression="!S_FREERTOS_NATIVE" Diagnostic="Active only if FreeRTOS interface is not Native"/>
+            <Condition Expression="(!S_FREERTOS_NATIVE) &amp; (!S_AzureRTOS$context)" Diagnostic="Active only if FreeRTOS interface is not Native"/>
         </Mode>
     </ModeLogicOperator>
 

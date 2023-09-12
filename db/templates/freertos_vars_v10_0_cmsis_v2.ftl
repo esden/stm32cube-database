@@ -5,6 +5,7 @@
 [#assign timerControlBlock  = "NULL"]
 [#assign queueControlBlock  = "NULL"]
 [#assign semaphoreControl   = "NULL"]
+[#assign eventControl       = "NULL"]
 
 [#list SWIPdatas as SWIP]
   [#if SWIP.variables??]  
@@ -56,7 +57,7 @@
          const osThreadAttr_t ${threadName}_attributes = {
          #t.name = "${threadName}",
          #t.priority = (osPriority_t) ${threadPriority},
-         #t.stack_size = ${threadStackSize} * 4
+         #t.stack_size = ${threadStackSize} * 4  [#-- cf BZ 78929 --]
          };
         [#else]
          const osThreadAttr_t ${threadName}_attributes = {
@@ -320,6 +321,42 @@
             };
           [/#if]
         [/#if]
+      [/#if]
+      
+      [#if variable.name=="Events"]
+        [#assign s = variable.valueList]
+        [#assign index = 0]
+        [#list s as i]
+          [#if index == 0]
+            [#assign eventName = i]
+          [/#if]
+          [#if index == 1]
+            [#assign eventAllocation = i]
+          [/#if]
+          [#if index == 2]
+            [#assign eventControl = i]
+          [/#if]
+          [#assign index = index + 1]
+        [/#list]
+        [#if eventName != "0"]
+          /* Definitions for ${eventName} */
+          osEventFlagsId_t ${eventName}Handle;
+          [#if eventControl != "NULL"]
+          osStaticEventGroupDef_t ${eventControl};
+          [/#if]
+          [#if eventAllocation == "Dynamic"]
+            const osEventFlagsAttr_t ${eventName}_attributes = {
+            #t.name = "${eventName}"
+            };
+          [#else]
+            const osEventFlagsAttr_t ${eventName}_attributes = {
+            #t.name = "${eventName}",
+            #t.cb_mem = &${eventControl},
+            #t.cb_size = sizeof(${eventControl}),            
+            };
+          [/#if]          
+          
+        [/#if] 
       [/#if]
       
     [/#list] 

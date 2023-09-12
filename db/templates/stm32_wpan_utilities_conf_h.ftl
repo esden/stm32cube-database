@@ -5,7 +5,7 @@
   * File Name          : ${name}
   * Description        : Configuration file for STM32 Utilities.
   *
- ***************************************************************************************
+ ******************************************************************************
   * @attention
   *
   * <h2><center>&copy; Copyright (c) 2019 STMicroelectronics.
@@ -16,7 +16,7 @@
   * License. You may obtain a copy of the License at:
   *                        opensource.org/licenses/BSD-3-Clause
   *
-  ******************************************************************************
+  *****************************************************************************
   */
 /* USER CODE END Header */
 [#assign THREAD = 0]

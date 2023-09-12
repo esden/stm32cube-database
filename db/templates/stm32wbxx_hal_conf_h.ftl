@@ -34,7 +34,7 @@
   * @brief This is the list of modules to be used in the HAL driver
   */
 #define HAL_MODULE_ENABLED  
-[#assign allModules = ["ADC", "AES", "COMP", "CRC","HSEM","I2C", "I2S", "IPCC", "IRDA", "IWDG", "LCD", "LPTIM","PCD", "PKA","QUADSPI", "RNG", "RTC", "SAI", "SMBUS", "SMARTCARD", "SPI", "TIM", "TSC", "UART", "USART", "WWDG"]]
+[#assign allModules = ["ADC", "AES", "COMP", "CRC","HSEM","I2C","IPCC", "IRDA", "IWDG", "LCD", "LPTIM","PCD", "PKA","QUADSPI", "RNG", "RTC", "SAI", "SMBUS", "SMARTCARD", "SPI", "TIM", "TSC", "UART", "USART", "WWDG"]]
   [#list allModules as module]
 	[#if isModuleUsed(module)]
 [#compress]#define HAL_${module?replace("QUADSPI","QSPI")?replace("AES","CRYP")}_MODULE_ENABLED[/#compress]
@@ -64,7 +64,6 @@
 #define USE_HAL_COMP_REGISTER_CALLBACKS      0u
 #define USE_HAL_CRYP_REGISTER_CALLBACKS      0u
 #define USE_HAL_I2C_REGISTER_CALLBACKS       0u
-#define USE_HAL_I2S_REGISTER_CALLBACKS       0u
 #define USE_HAL_IRDA_REGISTER_CALLBACKS      0u
 #define USE_HAL_LPTIM_REGISTER_CALLBACKS     0u
 #define USE_HAL_PCD_REGISTER_CALLBACKS       0u
@@ -238,10 +237,6 @@
 #ifdef HAL_I2C_MODULE_ENABLED
  #include "stm32wbxx_hal_i2c.h"
 #endif /* HAL_I2C_MODULE_ENABLED */
-
-#ifdef HAL_I2S_MODULE_ENABLED
- #include "stm32wbxx_hal_i2s.h"
-#endif /* HAL_I2S_MODULE_ENABLED */
 
 #ifdef HAL_IPCC_MODULE_ENABLED
  #include "stm32wbxx_hal_ipcc.h"

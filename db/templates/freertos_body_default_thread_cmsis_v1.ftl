@@ -93,7 +93,7 @@ __weak void ${defaultTaskFunction}(void const * argument)
           [#assign index = index + 1]
         [/#list]
         [#-- specific cases to be handled --]  
-        [#if mw == "USB_HOST" || mw == "USB_DEVICE" || ((mw = "LWIP") && (USE_MBEDTLS == false)) ]
+        [#if mw == "USB_HOST" || mw == "USB_DEVICE" || ((mw = "LWIP") && (USE_MBEDTLS == false)) || mw == "LoRaWAN" || mw == "Sigfox" || mw == "SubGHz_Phy"]
 #t/* init code for ${mw} */
 #tMX_${mw}_Init();#n[#--  could be replaced by the call to the start function here! --]
         [#else]

@@ -1,9 +1,9 @@
 [#ftl]
 /**
   ******************************************************************************
-  * File Name          : dma.h
-  * Description        : This file contains all the function prototypes for
-  *                      the dma.c file
+  * @file    ${name?lower_case}.h
+  * @brief   This file contains all the function prototypes for
+  *          the ${name?lower_case}.c file
   ******************************************************************************
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
@@ -15,11 +15,11 @@
   [/#list]
 [/#if]
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __${ipName?lower_case}_H
-#define __${ipName?lower_case}_H
+#ifndef __${ipName}_H__
+#define __${ipName}_H__
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
@@ -52,10 +52,6 @@ void MX_${ipName}_Init(void);
 }
 #endif
 
-#endif /* __${ipName?lower_case}_H */
-
-/**
-  * @}
-  */
+#endif /* __${ipName}_H__ */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

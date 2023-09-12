@@ -846,7 +846,9 @@ void ethernet_link_check_state(struct netif *netif)
 [/#if][#-- endif bsp --]
   
 [#if with_rtos == 1]
-  
+[#if bsp == 1]
+  struct netif *netif = (struct netif *) argument;
+[/#if][#-- endif bsp --]
 /* USER CODE BEGIN ETH link init */
 
 /* USER CODE END ETH link init */
@@ -855,7 +857,6 @@ void ethernet_link_check_state(struct netif *netif)
   {
 [/#if][#-- endif with_rtos --]
 [#if bsp == 1]
-  struct netif *netif = (struct netif *) argument;
   PHYLinkState = ${BspComponent}_GetLinkState(&${BspComponent});
   
   if(netif_is_link_up(netif) && (PHYLinkState <= ${BspComponent}_STATUS_LINK_DOWN))

@@ -1,5 +1,5 @@
 [#ftl]
-[#assign familyName=FamilyName?lower_case]
+[#assign familyName=FamilyName?lower_case][#assign year="2018"][#if familyName="stm32h7"][#assign year="2017"][/#if][#if familyName="stm32g4" || familyName="stm32l5" ||familyName="stm32wb" ||familyName="stm32mp1"][#assign year="2019"][/#if][#if familyName="stm32wl"][#assign year="2020"][/#if] 
 /**
   ******************************************************************************
   * @file    stm32_assert.h
@@ -7,7 +7,7 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; Copyright (c) [#if familyName="stm32g4" || familyName="stm32l5" ||familyName="stm32wb"]2019[#else]2018[/#if] STMicroelectronics. 
+  * <h2><center>&copy; Copyright (c) ${year} STMicroelectronics. 
   * All rights reserved.</center></h2>
   *
   * This software component is licensed by ST under BSD 3-Clause license,

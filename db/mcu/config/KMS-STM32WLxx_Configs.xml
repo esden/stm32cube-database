@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
+<IP xmlns="http://mcd.rou.st.com/modules.php?name=mcu"
+xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance"
+CodeTemplate="kms_c.ftl;kms_h.ftl"
+DBVersion="V6.0"
+IncludeFile="tkms.h"
+Name="KMS"
+RootFolder="Middlewares/ST/STM32_Key_Management_Services/"
+Version="STM32Cube_FW_WL_V0.7.0"
+ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Configs.xsd">
+
+    <RefConfig Comment="" Name="KMS_Init">
+        <CallLibMethod Name="C_Initialize"/>
+        <ImplementCallBack Name="C_Finalize"/>
+
+        <Component Name="Middleware:KMS_CORE"/>
+        <Component Name="Middleware:KMS_MODULES"/>
+        <Component Name="Middleware:KMS_INTERFACE"/>
+        <Component Name="Middleware:KMS_NIKMS"/>
+        <Component Name="Middleware:KMS_MBED-CRYPTO"/>
+
+        <ConfigFile Name="KMS_LOW_LEVEL_TEMPLATE_H"/>
+        <ConfigFile Name="KMS_LOW_LEVEL_TEMPLATE_C"/>
+        <ConfigFile Name="KMS_MEM_LOW_LEVEL_TEMPLATE_C"/>
+        <ConfigFile Name="NVMS_LOW_LEVEL_TEMPLATE_H"/>
+        <ConfigFile Name="NVMS_LOW_LEVEL_TEMPLATE_C"/>
+        <ConfigFile Name="KMS_MEM_POOL_DEF_TEMPLATE_H"/>
+        <ConfigFile Name="KMS_PLATF_OBJECTS_CONFIG_TEMPLATE_H"/>
+        <ConfigFile Name="KMS_PLATF_OBJECTS_INTERFACE_TEMPLATE_H"/>
+
+        <ConfigFile Name="KMS_CA_CONF_TEMPLATE_H"/>
+        <ConfigFile Name="KMS_CA_LOW_LEVEL_TEMPLATE_H"/>
+        <ConfigFile Name="KMS_CA_LOW_LEVEL_TEMPLATE_C"/>
+        <ConfigFile Name="KMS_MBED_CRYPTO_CONFIG_TEMPLATE_H"/>
+
+        <ConfigFile Name="KMS_CONFIG_TEMPLATE_H"/>
+
+        <Defines Name="KMS_ENABLED" Value=""/>
+
+        <Component Name="HAL:CRYP"/>
+        <Component Name="HAL:PKA"/>
+    </RefConfig>
+
+    <LibMethod Name="C_Initialize" Comment="Initialize the KMS stack">
+        <Argument Name="NULL" GenericType="simple" Optional="true"/>
+    </LibMethod>
+
+    <LibMethod Name="C_Finalize" Comment="DeInitialize the KMS stack">
+        <Argument Name="NULL" GenericType="simple" Optional="true"/>
+    </LibMethod>
+
+    <RefComponent Cclass="Middleware" Cgroup="KMS_CORE" Cversion="1.1.3">
+        <!-- Header files for Core -->
+        <File Category="header" Name="Core/*.h"/>
+
+        <!-- Source files for Core -->
+        <File Category="source" Name="Core/*.c"/>
+    </RefComponent>
+
+    <RefComponent Cclass="Middleware" Cgroup="KMS_MODULES" Cversion="1.1.3">
+        <!-- Header files for Modules -->
+        <File Category="header" Name="Modules/*.h"/>
+
+        <!-- Source files for Modules -->
+        <File Category="source" Name="Modules/*.c"/>
+    </RefComponent>
+
+   <RefComponent Cclass="Middleware" Cgroup="KMS_INTERFACE" Cversion="1.1.3">
+        <!-- Header files for Interface -->
+        <File Category="header" Name="Interface/*.h"/>
+        <File Category="header" Name="Interface/CryptoApi/*.h"/>
+        <File Category="header" Name="Interface/CryptoApi/HAL/*.h"/>
+        <File Category="header" Name="Interface/CryptoApi/MBED/*.h"/>
+        <File Category="header" Name="Interface/CryptoApi/ST/*.h"/>
+
+        <!-- Source files for Interface -->
+        <File Category="source" Name="Interface/CryptoApi/ca_aes.c"/>
+        <File Category="source" Name="Interface/CryptoApi/ca_core.c"/>
+        <File Category="source" Name="Interface/CryptoApi/ca_ecc.c"/>
+        <File Category="source" Name="Interface/CryptoApi/ca_hash.c"/>
+        <File Category="source" Name="Interface/CryptoApi/ca_if_utils.c"/>
+        <File Category="source" Name="Interface/CryptoApi/ca_rng.c"/>
+        <File Category="source" Name="Interface/CryptoApi/ca_rsa.c"/>
+        <File Category="source" Name="Interface/CryptoApi/HAL/*.c"/>
+        <File Category="source" Name="Interface/CryptoApi/MBED/*.c"/>
+        <File Category="source" Name="Interface/CryptoApi/ST/*.c"/>
+    </RefComponent>
+
+    <RefComponent Cclass="Middleware" Cgroup="KMS_NIKMS" Cversion="1.1.3">
+        <!-- Header files for niKMS -->
+        <File Category="header" Name="niKMS/*.h"/>
+
+        <!-- Source files for niKMS -->
+        <File Category="source" Name="niKMS/*.c"/>
+    </RefComponent>
+
+    <RefComponent Cclass="Middleware" Cgroup="KMS_MBED-CRYPTO" Cversion="1.1.3">
+        <!-- Header files for MBED-CRYPTO -->
+        <File Category="header" Name="../../Third_Party/mbed-crypto/include/*"/>
+        <File Category="header" Name="../../Third_Party/mbed-crypto/include/mbedtls/*.h"/>
+        <File Category="header" Name="../../Third_Party/mbed-crypto/include/psa/*.h"/>
+
+        <!-- Source file for SHA1/256 -->
+        <File Category="source" Name="../../Third_Party/mbed-crypto/library/sha1.c"/>
+        <File Category="source" Name="../../Third_Party/mbed-crypto/library/sha256.c"/>
+        <File Category="source" Name="../../Third_Party/mbed-crypto/library/platform_util.c"/>
+    </RefComponent>
+
+    <RefConfigFile Description="" Name="KMS_LOW_LEVEL_TEMPLATE_H" Template="kms_low_level_template_h.ftl" destinationFolder="Core/Inc/">
+        <File Category="header" Condition="all" Name="kms_low_level.h" Version="1.1.3"/>
+    </RefConfigFile>
+    <RefConfigFile Description="" Name="KMS_LOW_LEVEL_TEMPLATE_C" Template="kms_low_level_template_c.ftl" destinationFolder="Core/Src/">
+        <File Category="source" Condition="all" Name="kms_low_level.c" Version="1.1.3"/>
+    </RefConfigFile>
+    <RefConfigFile Description="" Name="KMS_MEM_LOW_LEVEL_TEMPLATE_C" Template="kms_mem_low_level_template_c.ftl" destinationFolder="Core/Src/">
+        <File Category="source" Condition="S_KMS_MEM_USE_CUSTOM_ALLOCATOR" Name="kms_mem_low_level.c" Version="1.1.3"/>
+    </RefConfigFile>
+    <RefConfigFile Description="" Name="NVMS_LOW_LEVEL_TEMPLATE_H" Template="kms_nvms_low_level_template_h.ftl" destinationFolder="Core/Inc/">
+        <File Category="header" Condition="all" Name="nvms_low_level.h" Version="1.1.3"/>
+    </RefConfigFile>
+    <RefConfigFile Description="" Name="NVMS_LOW_LEVEL_TEMPLATE_C" Template="kms_nvms_low_level_template_c.ftl" destinationFolder="Core/Src/">
+        <File Category="source" Condition="all" Name="nvms_low_level.c" Version="1.1.3"/>
+    </RefConfigFile>
+    <RefConfigFile Description="" Name="KMS_MEM_POOL_DEF_TEMPLATE_H" Template="kms_mem_pool_def_template_h.ftl" destinationFolder="Core/Inc/">
+        <File Category="header" Condition="S_KMS_MEM_USE_POOL_ALLOCATOR" Name="kms_mem_pool_def.h" Version="1.1.3"/>
+    </RefConfigFile>
+    <RefConfigFile Description="" Name="KMS_PLATF_OBJECTS_CONFIG_TEMPLATE_H" Template="kms_platf_objects_config_template_h.ftl" destinationFolder="Core/Inc/">
+        <File Category="header" Condition="all" Name="kms_platf_objects_config.h" Version="1.1.3"/>
+    </RefConfigFile>
+    <RefConfigFile Description="" Name="KMS_PLATF_OBJECTS_INTERFACE_TEMPLATE_H" Template="kms_platf_objects_interface_template_h.ftl" destinationFolder="Core/Inc/">
+        <File Category="header" Condition="all" Name="kms_platf_objects_interface.h" Version="1.1.3"/>
+    </RefConfigFile>
+
+    <RefConfigFile Description="" Name="KMS_CA_CONF_TEMPLATE_H" Template="kms_ca_conf_template_h.ftl" destinationFolder="Core/Inc/">
+        <File Category="header" Condition="all" Name="ca_conf.h" Version="1.1.3"/>
+    </RefConfigFile>
+    <RefConfigFile Description="" Name="KMS_CA_LOW_LEVEL_TEMPLATE_H" Template="kms_ca_low_level_template_h.ftl" destinationFolder="Core/Inc/">
+        <File Category="header" Condition="all" Name="ca_low_level.h" Version="1.1.3"/>
+    </RefConfigFile>
+    <RefConfigFile Description="" Name="KMS_CA_LOW_LEVEL_TEMPLATE_C" Template="kms_ca_low_level_template_c.ftl" destinationFolder="Core/Src/">
+        <File Category="source" Condition="all" Name="ca_low_level.c" Version="1.1.3"/>
+    </RefConfigFile>
+    <RefConfigFile Description="" Name="KMS_MBED_CRYPTO_CONFIG_TEMPLATE_H" Template="kms_mbed_crypto_config_template_h.ftl" destinationFolder="Core/Inc/">
+        <File Category="header" Condition="all" Name="mbedtls_config.h" Version="1.1.3"/>
+    </RefConfigFile>
+
+    <RefConfigFile Description="" Name="KMS_CONFIG_TEMPLATE_H" Template="kms_config_template_h.ftl" destinationFolder="Core/Inc/">
+        <File Category="header" Condition="all" Name="kms_config.h" Version="1.1.3"/>
+
+        <!-- KMS_HW_Config Hardware -->
+        <Argument Name="KMS_EXT_TOKEN_ENABLED" GenericType="Simple"/>
+
+        <!-- KMS_Storage_Config Storage -->
+        <Argument Name="KMS_NVM_ENABLED" GenericType="Simple"/>
+        <Argument Name="KMS_NVM_DYNAMIC_ENABLED" GenericType="Simple"/>
+        <Argument Name="KMS_NVM_SLOT_NUMBERS" GenericType="Simple"/>
+
+        <!-- KMS_Config Services -->
+        <Argument Name="KMS_NB_SESSIONS_MAX" GenericType="Simple"/>
+
+        <!-- KMS_PKCS_Config PKCS#11 services -->
+        <Argument Name="KMS_ENCRYPT" GenericType="Simple"/>
+        <Argument Name="KMS_DECRYPT" GenericType="Simple"/>
+        <Argument Name="KMS_DIGEST" GenericType="Simple"/>
+        <Argument Name="KMS_SIGN" GenericType="Simple"/>
+        <Argument Name="KMS_VERIFY" GenericType="Simple"/>
+        <Argument Name="KMS_DERIVE_KEY" GenericType="Simple"/>
+        <Argument Name="KMS_SEARCH" GenericType="Simple"/>
+        <Argument Name="KMS_GENERATE_KEYS" GenericType="Simple"/>
+        <Argument Name="KMS_ATTRIBUTES" GenericType="Simple"/>
+        <Argument Name="KMS_OBJECTS" GenericType="Simple"/>
+        <Argument Name="KMS_PKCS11_GET_FUNCTION_LIST_SUPPORT" GenericType="Simple"/>
+        <Argument Name="KMS_PKCS11_COMPLIANCE" GenericType="Simple"/>
+        <Argument Name="KMS_NIKMS_ROUTER_BYPASS" GenericType="Simple"/>
+        <Argument Name="KMS_IMPORT_BLOB" GenericType="Simple"/>
+        <Argument Name="KMS_IMPORT_BLOB_CHUNK_SIZE" GenericType="Simple"/>
+
+        <!-- KMS_Memory_Config Memory management -->
+        <Argument Name="KMS_MEM_USE_HEAP_ALLOCATOR" GenericType="Simple"/>
+        <Argument Name="KMS_MEM_USE_POOL_ALLOCATOR" GenericType="Simple"/>
+        <Argument Name="KMS_MEM_USE_CUSTOM_ALLOCATOR" GenericType="Simple"/>
+        <Argument Name="KMS_MEM_DEBUGGING" GenericType="Simple"/>
+        <Argument Name="KMS_MEM_CLEANING" GenericType="Simple"/>
+        <Argument Name="KMS_MEM_LOGGING" GenericType="Simple"/>
+
+        <!-- KMS_Security_Config Security Enforcement -->
+        <Argument Name="KMS_SE_CHECK_PARAMS" GenericType="Simple"/>
+        <Argument Name="KMS_SE_LOCK_KEYS" GenericType="Simple"/>
+        <Argument Name="KMS_SE_LOCK_KEYS_MAX" GenericType="Simple"/>
+        <Argument Name="KMS_SE_LOCK_SERVICES" GenericType="Simple"/>
+        <Argument Name="KMS_SE_LOCK_SERVICES_MAX" GenericType="Simple"/>
+
+        <!-- KMS_Features_Config Features -->
+        <Argument Name="KMS_AES_CBC" GenericType="Simple"/>
+        <Argument Name="KMS_AES_CCM" GenericType="Simple"/>
+        <Argument Name="KMS_AES_ECB" GenericType="Simple"/>
+        <Argument Name="KMS_AES_GCM" GenericType="Simple"/>
+        <Argument Name="KMS_AES_CMAC" GenericType="Simple"/>
+        <Argument Name="KMS_RSA" GenericType="Simple"/>
+        <Argument Name="KMS_RSA_1024" GenericType="Simple"/>
+        <Argument Name="KMS_RSA_2048" GenericType="Simple"/>
+        <Argument Name="KMS_ECDSA" GenericType="Simple"/>
+        <Argument Name="KMS_EC_SECP192" GenericType="Simple"/>
+        <Argument Name="KMS_EC_SECP256" GenericType="Simple"/>
+        <Argument Name="KMS_EC_SECP384" GenericType="Simple"/>
+        <Argument Name="KMS_SHA1" GenericType="Simple"/>
+        <Argument Name="KMS_SHA256" GenericType="Simple"/>
+
+    </RefConfigFile>
+
+    <RefComponent Cclass="HAL" Cgroup="CRYP" Cversion="0.7.0">
+        <File Category="header" Name="Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_hal_cryp.h"/>
+        <File Category="header" Name="Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_hal_cryp_ex.h"/>
+        <File Category="source" Name="Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_cryp.c"/>
+        <File Category="source" Name="Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_cryp_ex.c"/>
+    </RefComponent>
+    <RefComponent Cclass="HAL" Cgroup="PKA" Cversion="0.7.0">
+        <File Category="header" Name="Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_hal_pka.h"/>
+        <File Category="source" Name="Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_pka.c"/>
+    </RefComponent>
+
+</IP>

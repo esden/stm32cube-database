@@ -292,7 +292,7 @@
     <!-- Possible values of DMAContinuousRequests parameter -->
     <RefParameter Comment="DMA Continuous Requests" DefaultValue="DISABLE" Group="ADCgroup" Name="DMAContinuousRequests" Type="list">
         <PossibleValue Comment="Disabled" Value="DISABLE"/>
-        <PossibleValue Comment="Enabled" Value="ENABLE" Action="Disable" Condition="!DMARequest_$IpInstance" Diagnostic="A DMA Request in Circular Mode must be configured in DMA Settings Tab for this ADC instance" />
+        <PossibleValue Comment="Enabled" Value="ENABLE"  Condition="!DMARequest_$IpInstance" Diagnostic="A DMA Request in Circular Mode must be configured in DMA Settings Tab for this ADC instance" />
         <Description>This parameter is used only when a DMA Request is configured. Else it is not relevant.&lt;br&gt;
             When the DMA Request for this ADC instance this parameter specifies whether 
             the DMA requests are performed in one shot mode (DMA transfer stops when number of conversions is reached)
@@ -300,6 +300,7 @@
             Note: In continuous mode, DMA must be configured in circular mode. Otherwise an overrun will be triggered when DMA buffer maximum pointer is reached.
         </Description>
     </RefParameter>
+    
    
     <RefParameter Comment="DMA Continuous Requests" DefaultValue="LIMITED" Group="ADCGroup" Name="DMAContinuousRequestsForConfigFile" Type="list" Visible="false">
          <Condition Diagnostic="" Expression="$IpNumber=1 &amp; DMARequest_ADC1 &amp; DMAContinuousRequests=DISABLE"/>
@@ -361,6 +362,9 @@
          <Condition Diagnostic="" Expression="$IpNumber=4 &amp; !DMARequest_ADC4 &amp; DMAContinuousRequests=DISABLE"/>
         <PossibleValue Comment="none" Value="NONE"/>
         <Description>Enable/Disable DMA Continuous Requests</Description>
+    </RefParameter>
+    <RefParameter Comment="DMA Continuous Requests" DefaultValue="null" Group="ADCGroup" Name="DMAContinuousRequestsForConfigFile" Type="list" Visible="false">
+      
     </RefParameter>
     
     
@@ -607,9 +611,9 @@
         <Condition Diagnostic="" Expression="EnableRegularConversion=DISABLE"/>
     </RefParameter>
     <RefParameter Comment="Sampling Time" DefaultValue="ADC_SAMPLETIME_2CYCLES_5" Group="ADCChannel" Name="SamplingTime" Type="list">
-        <Condition Diagnostic="" Expression="DIE464 &amp; ($IpNumber=2) |($IpNumber=1)"/>
+        <Condition Diagnostic="" Expression="DIE464 &amp; ($IpNumber=2)"/>
         <PossibleValue Comment="2.5 Cycles" Value="ADC_SAMPLETIME_2CYCLES_5" Semaphore="S_ADC_SAMPLETIME_2CYCLES_5"/>
-        <PossibleValue Comment="3.5 Cycles" Diagnostic="This sampling time cannot be used simultaneously with the sampling time 2.5 Cycles" Condition="S_ADC_SAMPLETIME_2CYCLES_5"  Value="ADC_SAMPLETIME_3CYCLES_5"/>
+        <PossibleValue Comment="3.5 Cycles" Action="Remove" Diagnostic="This sampling time cannot be used simultaneously with the sampling time 2.5 Cycles" Condition="!($IpNumber=1 &amp; DIE464)"  Value="ADC_SAMPLETIME_3CYCLES_5"/>
         <PossibleValue Comment="6.5 Cycles" Value="ADC_SAMPLETIME_6CYCLES_5"/>
         <PossibleValue Comment="12.5 Cycles" Value="ADC_SAMPLETIME_12CYCLES_5"/>
         <PossibleValue Comment="24.5 Cycles" Value="ADC_SAMPLETIME_24CYCLES_5"/>

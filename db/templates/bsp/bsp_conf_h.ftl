@@ -20,6 +20,11 @@
 [#if isHalSupported?? && isHALUsed?? ]
 #include "${FamilyName?lower_case}xx_hal.h"
 [/#if]
+[#assign STM32WL=false]
+[#if FamilyName?lower_case?contains("wl")]
+[#assign STM32WL=true]
+[/#if]
+
 
 /** @addtogroup BSP
   * @{
@@ -52,8 +57,16 @@
             [#if variables.value?contains("BSP USART")]
                 [#assign UsartInstance = IpInstance]				
 				[#assign useUSART = true]
-            [/#if]
+            [/#if]           
         [/#list]
+    [/#if]
+    [#-- BZ 94788 --]
+    [#if SWIP.bsp??]        
+     	[#list SWIP.bsp as bsp]
+     		[#if bsp.bspName?contains("BSP USART")]
+     			[#assign useUSART = true]
+     		[/#if]
+     	[/#list]
     [/#if]
 [/#list] 
 /* COM Feature define */
@@ -78,6 +91,23 @@
 
 /* UART1 Baud rate in bps  */
 #define BUS_UART1_BAUDRATE                  9600U /* baud rate of UARTn = 9600 baud */
+
+[#if STM32WL]
+/* Radio maximum wakeup time (in ms) */
+#define RF_WAKEUP_TIME                     100U
+
+/* Indicates whether or not TCXO is supported by the board
+ * 0: TCXO not supported
+ * 1: TCXO supported
+ */
+#define IS_TCXO_SUPPORTED                   0U
+
+/* Indicates whether or not DCDC is supported by the board
+ * 0: DCDC not supported
+ * 1: DCDC supported
+ */
+#define IS_DCDC_SUPPORTED                   1U
+[/#if]
 /**
   * @}
   */

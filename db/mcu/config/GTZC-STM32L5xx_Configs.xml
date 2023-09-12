@@ -2,7 +2,7 @@
 <IP xmlns="http://mcd.rou.st.com/modules.php?name=mcu"
 xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance"
 CodeTemplate=""
-DBVersion="V4.0"
+DBVersion="V6.0"
 IncludeFile=""
 Name="GTZC"
 RootFolder=""
@@ -11,14 +11,9 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
 
   <RefConfig Comment="" Name="GTZC_Init">
 
-    <!-- TZSC LOCK -->
-    <IFCondition Expression="(TZSC_Lock=LOCK)">
-      <CallLibMethod Name="HAL_GTZC_TZSC_Lock" ReturnHAL="false">
-        <MethodArg Name="TZSC_Instance" FValue="TZSC_Instance"/>
-      </CallLibMethod>
-    </IFCondition>
+    <Component Name="HAL:GTZC"/>
 
-    <!-- TZSC IPs -->
+    <!-- TZSC Peripherals -->
     <IFCondition Expression="(TIM2_Secure=GTZC_TZSC_PERIPH_SEC) | (TIM2_Privilege=GTZC_TZSC_PERIPH_PRIV)">
       <CallLibMethod Name="HAL_GTZC_TZSC_ConfigPeriphAttributes">
         <MethodArg Name="PeriphID" FValue="GTZC_PERIPH_TIM2"/>
@@ -405,6 +400,13 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
       </CallLibMethod>
     </IFCondition>
 
+    <!-- TZSC LOCK -->
+    <IFCondition Expression="(TZSC_Lock=LOCK)">
+      <CallLibMethod Name="HAL_GTZC_TZSC_Lock" ReturnHAL="false">
+        <MethodArg Name="TZSC_Instance" FValue="GTZC_TZSC"/>
+      </CallLibMethod>
+    </IFCondition>
+
     <!-- MPCBB LOCK -->
     <IFCondition Expression="(MPCBB1_Lock = LOCK)">
       <!-- <CallLibMethod Name="HAL_GTZC_MPCBB_LockConfig">
@@ -785,7 +787,7 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
   </RefConfig>
 
   <LibMethod Name="HAL_GTZC_TZSC_Lock" Comment="">
-    <Argument AddressOf="true" Context="global" GenericType="simple" Name="TZSC_Instance" TypeName="GTZC_TZSC_TypeDef">
+    <Argument AddressOf="false" Context="global" GenericType="simple" Name="TZSC_Instance" TypeName="GTZC_TZSC_TypeDef">
       <!-- Argument AddressOf="false" GenericType="simple" Name="CR" TypeName="uint32_t" Comment="CR"/>
       <Argument AddressOf="false" GenericType="simple" Name="RESERVED1_1" TypeName="uint32_t" Comment="RESERVED1_1"/>
       <Argument AddressOf="false" GenericType="simple" Name="RESERVED1_2" TypeName="uint32_t" Comment="RESERVED1_2"/>
@@ -848,7 +850,8 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
   </LibMethod>
 
   <LibMethod Name="HAL_GTZC_TZIC_S_Callback" Comment="" isCallBackMethod="true"/>
- <RefComponent Cclass="HAL" Cgroup="GTZC" Cversion="0.3.0">
+
+  <RefComponent Cclass="HAL" Cgroup="GTZC" Cversion="0.3.0">
         <File Category="header" Name="Drivers/STM32L5xx_HAL_Driver/Inc/stm32l5xx_hal_gtzc.h"/>
         <File Category="source" Name="Drivers/STM32L5xx_HAL_Driver/Src/stm32l5xx_hal_gtzc.c"/>
     </RefComponent>

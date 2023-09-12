@@ -13,7 +13,11 @@
         <Parameter Name="DMAAccessMode"/>
         <Parameter Name="TwoSamplingDelay"/>
     </RefMode>
-
+     <RefParameter Comment="TrigAuto" DefaultValue="2" Group="ADCgroup"  Name="TrigAuto" Type="integer" Visible="false">
+      <Condition Diagnostic="" Expression=" (AutoInjected_$IpInstance) | (ExternalTrigInjecConv = ADC_INJECTED_SOFTWARE_START)"/>
+    </RefParameter>
+    <RefParameter Comment="TrigAuto" DefaultValue="1" Group="ADCgroup"  Name="TrigAuto" Type="integer" Visible="false">
+    </RefParameter>
     <RefParameter Comment="Mode" DefaultValue="null" Group="ADCs_Common_Settings" Name="Mode" Type="list" Visible="false">
         <Condition Diagnostic="" Expression="(ADC1_Exist|ADC_Exist)&amp;(!ADC2_Exist)"/>
     </RefParameter>
@@ -306,8 +310,27 @@
         <PossibleValue Comment="Enabled" Value="ENABLE"/>
         <Description>Specifies the usage of Low Power Auto Wait Mode: new conversion start only when the previous conversion (for regular group) or previous sequence (for injected group) has been treated by user software.</Description>
     </RefParameter>
-  
+     <RefParameter Comment="Channel_Rank1" DefaultValue="0x0000" Group="ADCChannel" Name="Rank1_Channel" Type="String" Visible="false"/>
+    <RefParameter Comment="Channel_Rank2" DefaultValue="0x0000" Group="ADCChannel" Name="Rank2_Channel" Type="String" Visible="false"/>
+    <RefParameter Comment="Channel_Rank3" DefaultValue="0x0000" Group="ADCChannel" Name="Rank3_Channel" Type="String" Visible="false"/>
+    <RefParameter Comment="Channel_Rank4" DefaultValue="0x0000" Group="ADCChannel" Name="Rank4_Channel" Type="String" Visible="false"/>
     
+    
+    <RefMode Abstract="true" Comment="Injected Queue Enable" Group="ADC_Injected_ConversionMode" Name="ADC_Injected_Queue_Enable">
+        <Condition Diagnostic="" Expression="!(InjNumberOfConversion = 0)"/>
+        <ConfigForMode>ADC_InjectedQueueEnable</ConfigForMode>
+         <Parameter Name="EnableRegularConversion"/>
+        <Parameter Name="NbrOfConversionFlag"/>
+        <Parameter Name="NbrOfConversion"/>
+        <Parameter Name="ExternalTrigConv"/>
+        <Parameter Name="ExternalTrigConvEdge"/>
+        <Parameter Name="SequencerNbRanks"/>
+    </RefMode>
+    
+    <RefMode Abstract="true" Comment="Injected Queue Disable" Group="ADC_Injected_ConversionMode" Name="ADC_Injected_Queue_Disable">
+        <Condition Diagnostic="" Expression="!(InjNumberOfConversion = 0)"/>
+        <ConfigForMode>ADC_InjectedQueueDisable</ConfigForMode>
+    </RefMode>
     <!-- RefMode of ADC_Regular_ConversionMode -->
     <RefMode Abstract="true" Comment="Regular Conversion Settings" Group="ADC_Regular_ConversionMode" Name="ADC_Regular_ConversionMode">
         <Parameter Name="EnableRegularConversion"/>
@@ -315,6 +338,9 @@
         <Parameter Name="NbrOfConversion"/>
         <Parameter Name="ExternalTrigConv"/>
         <Parameter Name="ExternalTrigConvEdge"/>
+        <Parameter Name="SequencerNbRanks"/>
+
+        
     </RefMode>
     <RefParameter Comment="Enable Regular Conversions" DefaultValue="ENABLE" Group="ADC_Regular_ConversionMode" Name="EnableRegularConversion" Type="list">
         <PossibleValue Comment="Enable" Value="ENABLE"/>
@@ -686,6 +712,7 @@
         <Parameter Name="QueueInjectedContext"/>
         <Parameter Name="AutoInjectedConv"/>
         <Parameter Name="InjectedDiscontinuousConvMode"/>
+        <Parameter Name="TrigAuto"/>
     </RefMode>
 		    
     <!--  -->
@@ -802,11 +829,13 @@
     <!-- Possible Value of ExternalTrigInjecConvEdge parameter -->
     <RefParameter Comment="External Trigger Conversion Edge" DefaultValue="null" Group="ADCgroup" Name="ExternalTrigInjecConvEdge" Type="list" Visible="false">
         <Condition Diagnostic="" Expression="(EnableInjectedConversion=DISABLE) | (InjNumberOfConversion=0) | ((($IpNumber=2) | (($IpNumber=4)))  &amp; !(Mode=ADC_MODE_INDEPENDENT)) "/>
-    </RefParameter>   
-    <RefParameter Comment="External Trigger Conversion Edge" DefaultValue="ADC_EXTERNALTRIGINJECCONV_EDGE_NONE" Group="ADCgroup" Name="ExternalTrigInjecConvEdge" Type="list">
-        <Condition Diagnostic="" Expression=" (AutoInjected_$IpInstance) | (ExternalTrigInjecConv = ADC_INJECTED_SOFTWARE_START)"/>
-        <PossibleValue Comment="None" Value="ADC_EXTERNALTRIGINJECCONV_EDGE_NONE"/>
-        <Description>You cannot configure a trigger because the Auto Injected mode is selected.</Description>
+    </RefParameter>  
+    <RefParameter Comment="External Trigger Conversion Edge" DefaultValue="null" Group="ADCgroup" Name="ExternalTrigInjecConvEdge" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="(EnableInjectedConversion=DISABLE) | (InjNumberOfConversion=0) | ((($IpNumber=2) | (($IpNumber=4)))  &amp; !(Mode=ADC_MODE_INDEPENDENT)) "/>
+    </RefParameter> 
+   
+    <RefParameter Comment="SequencerNbRanks" DefaultValue="1" Group="ADCgroup" Name="SequencerNbRanks" Type="integer">
+        <Description>Data offset for regular channel</Description>
     </RefParameter>
     <RefParameter Comment="External Trigger Conversion Edge" DefaultValue="ADC_EXTERNALTRIGINJECCONV_EDGE_RISING" Group="ADCgroup" Name="ExternalTrigInjecConvEdge" Type="list">
         <PossibleValue Comment="Trigger detection on the rising edge" Value="ADC_EXTERNALTRIGINJECCONV_EDGE_RISING"/>

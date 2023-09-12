@@ -40,19 +40,12 @@
         </Description>
     </RefParameter>
     
-    <!-- For the first step, only F4/F7/G0/G4/H7/L4/MP1/WB config files to be modified to take into account the semaphore for copying or not (in 5.6) -->
+    <!-- Now available for any series (since 6.1.0) -->
     <RefParameter Name="copyHeapFile" Comment="Use FW pack heap file" DefaultValue="1" Type="list" Group="Project settings (see parameter description first)" TabName="Advanced settings">
-        <Condition Diagnostic="Can be changed on F4/F7/G0/G4/H7/L4/MP1/WB series" Expression="STM32F4|STM32F7|STM32G0|STM32G4|STM32H7|STM32L4|STM32MP1|STM32WB"/> 
         <PossibleValue Comment="Disabled" Value="0" Semaphore="S_DO_NOT_COPY_HEAP_FILE"/>
         <PossibleValue Comment="Enabled" Value="1"/>
         <Description>If &lt;b&gt;Enabled&lt;/b&gt; (default value), copies the heap file (defined in "Memory Management scheme") from the FW pack to the generated project. &lt;br&gt;
                      If &lt;b&gt;Disabled&lt;/b&gt;, it is up to the user to provide a file with, at least, vPortFree() and pvPortMalloc() implementations inside (they will otherwise be missing at linking time).
-        </Description>
-    </RefParameter>
-    <RefParameter Name="copyHeapFile" Comment="Use FW pack heap file" DefaultValue="1" Type="list" Group="Project settings" TabName="Advanced settings">
-        <PossibleValue Comment="Enabled" Value="1"/>
-        <Description>Copies the heap file (defined in "Memory Management scheme") from the FW pack to the generated project.&lt;br&gt;
-                     Can only be disabled on F4/F7/G0/G4/H7/L4/MP1/WB series (as a first step). 
         </Description>
     </RefParameter>
     
@@ -111,17 +104,18 @@
         <PossibleValue Comment="Version of FreeRTOS" Value="10.2.1" Semaphore="S_VERSION_10_2_1"/>
         <Condition Diagnostic="New version available for F7" Expression="STM32F7"/>
     </RefParameter>
-    <RefParameter Name="FREERTOS_version" Comment="FreeRTOS version" DefaultValue="10.0.1" Type="String" Group="Versions" TabName="Config parameters">
-        <PossibleValue Comment="Version of FreeRTOS" Value="10.0.1" Semaphore="S_VERSION_10_0_0"/>
-        <Condition Diagnostic="Version available for G0" Expression="STM32G0"/>
+    <!-- BZ 91892 -->
+    <RefParameter Name="FREERTOS_version" Comment="FreeRTOS version" DefaultValue="10.3.1" Type="String" Group="Versions" TabName="Config parameters"> 
+        <PossibleValue Comment="Version of FreeRTOS" Value="10.3.1" Semaphore="S_VERSION_10_3_1"/>
+        <Condition Diagnostic="New version available for G0" Expression="STM32G0"/>
     </RefParameter>
     <RefParameter Name="FREERTOS_version" Comment="FreeRTOS version" DefaultValue="10.2.1" Type="String" Group="Versions" TabName="Config parameters">
         <PossibleValue Comment="Version of FreeRTOS" Value="10.2.1" Semaphore="S_VERSION_10_2_1"/>
         <Condition Diagnostic="New version available for H7" Expression="STM32H7"/>
     </RefParameter>
-    <RefParameter Name="FREERTOS_version" Comment="FreeRTOS version" DefaultValue="10.0.1" Type="String" Group="Versions" TabName="Config parameters">
-        <PossibleValue Comment="Version of FreeRTOS" Value="10.0.1" Semaphore="S_VERSION_10_0_0"/>
-        <Condition Diagnostic="Version available for L0" Expression="STM32L0"/>  <!-- Note: check on configUSE_PORT_OPTIMISED_TASK_SELECTION when v10 comes -->
+    <RefParameter Name="FREERTOS_version" Comment="FreeRTOS version" DefaultValue="10.2.1" Type="String" Group="Versions" TabName="Config parameters">
+        <PossibleValue Comment="Version of FreeRTOS" Value="10.2.1" Semaphore="S_VERSION_10_2_1"/>
+        <Condition Diagnostic="New version available for L0" Expression="STM32L0"/>  <!-- Note: check on configUSE_PORT_OPTIMISED_TASK_SELECTION when v10 comes -->
     </RefParameter>
     <RefParameter Name="FREERTOS_version" Comment="FreeRTOS version" DefaultValue="10.0.1" Type="String" Group="Versions" TabName="Config parameters">
         <PossibleValue Comment="Version of FreeRTOS" Value="10.0.1" Semaphore="S_VERSION_10_0_0"/>
@@ -146,6 +140,10 @@
     <RefParameter Name="FREERTOS_version" Comment="FreeRTOS version" DefaultValue="10.2.1" Type="String" Group="Versions" TabName="Config parameters">
         <PossibleValue Comment="Version of FreeRTOS" Value="10.2.1" Semaphore="S_VERSION_10_2_1"/>
         <Condition Diagnostic="New version available for G4" Expression="STM32G4"/>
+    </RefParameter>
+    <RefParameter Name="FREERTOS_version" Comment="FreeRTOS version" DefaultValue="10.2.1" Type="String" Group="Versions" TabName="Config parameters">
+        <PossibleValue Comment="Version of FreeRTOS" Value="10.2.1" Semaphore="S_VERSION_10_2_1"/>
+        <Condition Diagnostic="New version available for WL" Expression="STM32WL"/>
     </RefParameter>
     <!--  default version for new series: current "new one" (10.2.1) -->
     <RefParameter Name="FREERTOS_version" Comment="FreeRTOS version" DefaultValue="10.2.1" Type="String" Group="Versions" TabName="Config parameters">
@@ -591,7 +589,7 @@
 	
 	
 	<RefParameter Name="configLIBRARY_LOWEST_INTERRUPT_PRIORITY" Comment="LIBRARY_LOWEST_INTERRUPT_PRIORITY" DefaultValue="15" Max="15" Min="1"  Type="integer" Group="Interrupt nesting behaviour configuration" TabName="Config parameters" NoCheckOpt="false">
-	    <Condition Diagnostic="Values for F1/F2/F3/F4/L1/L4/L5/F7/H7/WB/MP1/G4" Expression="STM32F4 | STM32F2 | STM32F3 | STM32L1 | STM32F1 | STM32F7 | STM32H7 | STM32L4 | STM32WB | STM32MP1 | STM32G4 | STM32L5 | STM33L5"/>
+	    <Condition Diagnostic="Available for series with a Cortex core that is not a M0." Expression="!(STM32F0 | STM32L0 | STM32G0)"/>
 	    <Description>The lowest interrupt priority that can be used in a call to a "set priority" function.</Description>
 	</RefParameter>
 	<RefParameter Name="configLIBRARY_LOWEST_INTERRUPT_PRIORITY" Comment="LIBRARY_LOWEST_INTERRUPT_PRIORITY" DefaultValue="3" Max="3" Min="1"  Type="integer" Group="Interrupt nesting behaviour configuration" TabName="Config parameters" NoCheckOpt="false" Visible="false">
@@ -600,7 +598,7 @@
 	
     <!-- <RefParameter Name="configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY" Comment="LIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY" DefaultValue="5" Max="15" Min="1"  Type="integer" Group="Interrupt nesting behaviour configuration" TabName="Config parameters">  -->
 	<RefParameter Name="configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY" Comment="LIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY" DefaultValue="5" Max="=configLIBRARY_LOWEST_INTERRUPT_PRIORITY" Min="1" Type="integer" Group="Interrupt nesting behaviour configuration" TabName="Config parameters" NoCheckOpt="false">
-	    <Condition Diagnostic="Values for F1/F2/F3/F4/L1/L4/L5/F7/H7/WB/MP1/G4" Expression="STM32F4 | STM32F2 | STM32F3 | STM32L1 | STM32F1 | STM32F7 | STM32H7 | STM32L4 | STM32WB | STM32MP1 | STM32G4 | STM32L5 | STM33L5"/>
+	    <Condition Diagnostic="Available for series with a Cortex core that is not a M0." Expression="!(STM32F0 | STM32L0 | STM32G0)"/>
 	    <Description>The highest interrupt priority that can be used by any interrupt service routine that makes calls to interrupt safe FreeRTOS API functions. &lt;br&gt; 
                      DO NOT CALL INTERRUPT SAFE FREERTOS API FUNCTIONS FROM ANY INTERRUPT THAT HAS A HIGHER PRIORITY THAN THIS! (higher priorities are lower numeric values).</Description>
     </RefParameter>
@@ -819,8 +817,17 @@
                      To exclude it from your build, set uxTaskGetStackHighWaterMark to 0 (Disabled).</Description>
     </RefParameter>
 
+    <!--  Must be forced to 1 with FreeRTOS 10.3.1 using CMSIS_RTOS v2 API -->
+    <RefParameter Name="INCLUDE_xTaskGetCurrentTaskHandle" Comment="xTaskGetCurrentTaskHandle" DefaultValue="1" Type="list" Group="Include definitions" TabName="Include parameters">
+        <Condition Diagnostic="Forced to enabled with FreeRTOS 10.3.1 and CMSIS RTOS v2" Expression="S_CMSIS_RTOS_V2$context &amp; S_VERSION_10_3_1"/>
+        <PossibleValue Comment="Enabled" Value="1"/>
+        <Description>It is one of the macros allowing those components of the real time kernel not utilized by your application to be excluded from your build. &lt;br&gt;
+                     - this ensures the RTOS does not use any more ROM or RAM than necessary for your particular embedded application. &lt;br&gt;
+                     To include the xTaskGetCurrentTaskHandle() API function, set xTaskGetCurrentTaskHandle to 1 (Enabled). &lt;br&gt;
+                     To exclude it from your build, set xTaskGetCurrentTaskHandle to 0 (Disabled).</Description>
+	</RefParameter>
     <RefParameter Name="INCLUDE_xTaskGetCurrentTaskHandle" Comment="xTaskGetCurrentTaskHandle" DefaultValue="0" Type="list" Group="Include definitions" TabName="Include parameters">
-	    <PossibleValue Comment="Disabled" Value="0"/>
+        <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
         <Description>It is one of the macros allowing those components of the real time kernel not utilized by your application to be excluded from your build. &lt;br&gt;
                      - this ensures the RTOS does not use any more ROM or RAM than necessary for your particular embedded application. &lt;br&gt;
@@ -1075,13 +1082,13 @@
     <!--  New For FreeRTOS v10.2.1 -->
     <!-- For future use of MPU mode (support was started with WB series, now with an official parameter for L5) --> 
     <RefParameter Name="configENABLE_MPU" Comment="ENABLE_MPU" DefaultValue="0" Type="list" Group="MPU/FPU" TabName="Config parameters">
-        <Condition Diagnostic="Can be enabled as the API in use is NATIVE" Expression="S_VERSION_10_2_1 &amp; S_FREERTOS_NATIVE"/>
+        <Condition Diagnostic="Can be enabled as the API in use is NATIVE" Expression="(S_VERSION_10_2_1 | S_VERSION_10_3_1) &amp; S_FREERTOS_NATIVE"/>
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1" Semaphore="S_FREERTOS_WITH_MPU"/>
         <Description>Use or not Memory Protection Unit with FreeRTOS. Very first step of implementation on WB for Examples Migration. To be consolidated on F4.</Description>
     </RefParameter>
     <RefParameter Name="configENABLE_MPU" Comment="ENABLE_MPU" DefaultValue="0" Type="uniqueElementList" Group="MPU/FPU" TabName="Config parameters">
-         <Condition Diagnostic="Disabled as it requires the support of Native API" Expression="S_VERSION_10_2_1"/>
+         <Condition Diagnostic="Disabled as it requires the support of Native API" Expression="(S_VERSION_10_2_1 | S_VERSION_10_3_1)"/>
         <PossibleValue Comment="Disabled" Value="0"/>
         <Description>Use of Memory Protection Unit with FreeRTOS (not yet available, as requires support of FreeRTOS Native API).</Description>
     </RefParameter>
@@ -1091,7 +1098,7 @@
     </RefParameter>
 
     <RefParameter Name="configENABLE_FPU" Comment="ENABLE_FPU" DefaultValue="0" Type="list" Group="MPU/FPU" TabName="Config parameters">
-        <Condition Diagnostic="Available on F4,F7,G4,H7,L4,L5,MP1 and WB series (supporting FreeRTOS 10.2.1)" Expression="S_VERSION_10_2_1"/>
+        <Condition Diagnostic="Available on the series supporting FreeRTOS >= 10.2.1" Expression="(S_VERSION_10_2_1 | S_VERSION_10_3_1)"/>
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
         <Description>Use or not FPU with FreeRTOS.</Description>
@@ -1102,7 +1109,7 @@
     </RefParameter>
     
     <RefParameter Name="configMESSAGE_BUFFER_LENGTH_TYPE" Comment="MESSAGE_BUFFER_LENGTH_TYPE" DefaultValue="size_t" Type="uniqueElementList" Group="Added with 10.2.1 support" TabName="Config parameters">
-        <Condition Diagnostic="Available on F4,F7,G4,H7,L4,L5,MP1 and WB series (supporting FreeRTOS 10.2.1)" Expression="S_VERSION_10_2_1"/>
+        <Condition Diagnostic="Available on the series supporting FreeRTOS >= 10.2.1" Expression="(S_VERSION_10_2_1 | S_VERSION_10_3_1)"/>
         <PossibleValue Comment="size_t" Value="size_t"/>
         <Description>Defaults to size_t for backward compatibility, but can be overridden in FreeRTOSConfig.h if lengths will always be less than the number of bytes in a size_t.</Description>
     </RefParameter>
@@ -1112,7 +1119,7 @@
     </RefParameter>
     
     <RefParameter Name="configUSE_POSIX_ERRNO" Comment="USE_POSIX_ERRNO" DefaultValue="0" Type="list" Group="Added with 10.2.1 support" TabName="Config parameters">
-        <Condition Diagnostic="Available on F4,F7,G4,H7,L4,L5,MP1 and WB series (supporting FreeRTOS 10.2.1)" Expression="S_VERSION_10_2_1"/>
+        <Condition Diagnostic="Available on the series supporting FreeRTOS >= 10.2.1" Expression="(S_VERSION_10_2_1 | S_VERSION_10_3_1)"/>
 	    <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
         <Description>Description to be completed.</Description>
@@ -1123,7 +1130,7 @@
     </RefParameter>
         
     <RefParameter Name="INCLUDE_uxTaskGetStackHighWaterMark2" Comment="uxTaskGetStackHighWaterMark2" DefaultValue="0" Type="list" Group="Include definitions" TabName="Include parameters">
-        <Condition Diagnostic="Available on F4,F7,G4,H7,L4,L5,MP1 and WB series (supporting FreeRTOS 10.2.1)" Expression="S_VERSION_10_2_1"/>
+        <Condition Diagnostic="Available on the series supporting FreeRTOS >= 10.2.1" Expression="(S_VERSION_10_2_1 | S_VERSION_10_3_1)"/>
 	    <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
         <Description>Description to be completed.</Description>
@@ -1137,6 +1144,75 @@
     <!--  10.2.1 but only for secure chips -->
     <!--  Check L5 Modes file the day it needs to be updated -->
     <!--  10.2.1 but only for secure chips -->
+
+    <!--  New For FreeRTOS v10.3.1 -->  
+    <RefParameter Name="configUSE_OS2_THREAD_SUSPEND_RESUME" Comment="USE_OS2_THREAD_SUSPEND_RESUME" DefaultValue="1" Type="list" Group="CMSIS-RTOS V2 flags" TabName="Config parameters" Visible="true">
+        <Condition Diagnostic="Available on the series supporting FreeRTOS >= 10.3.1" Expression="(S_VERSION_10_3_1) &amp; S_CMSIS_RTOS_V2$context"/>
+	    <PossibleValue Comment="Disabled" Value="0"/>
+        <PossibleValue Comment="Enabled" Value="1"/>
+        <Description>When set to Disabled, it will exclude CMSIS-RTOS2 functions osThreadSuspend and osThreadResume from the application image.</Description>
+    </RefParameter>
+    <RefParameter Name="configUSE_OS2_THREAD_SUSPEND_RESUME" Comment="USE_OS2_THREAD_SUSPEND_RESUME" DefaultValue="0" Type="list" Group="CMSIS-RTOS V2 flags" TabName="Config parameters" Visible="false">
+	    <PossibleValue Comment="Disabled" Value="0"/>
+        <Description>Not available in previous versions.</Description>
+    </RefParameter>
+
+    <RefParameter Name="configUSE_OS2_THREAD_ENUMERATE" Comment="USE_OS2_THREAD_ENUMERATE" DefaultValue="1" Type="list" Group="CMSIS-RTOS V2 flags" TabName="Config parameters" Visible="true">
+        <Condition Diagnostic="Available on the series supporting FreeRTOS >= 10.3.1" Expression="(S_VERSION_10_3_1) &amp; S_CMSIS_RTOS_V2$context"/>
+	    <PossibleValue Comment="Disabled" Value="0"/>
+        <PossibleValue Comment="Enabled" Value="1"/>
+        <Description>When set to Disabled, it will exclude CMSIS-RTOS2 function osThreadEnumerate from the application image.</Description>
+    </RefParameter>
+    <RefParameter Name="configUSE_OS2_THREAD_ENUMERATE" Comment="USE_OS2_THREAD_ENUMERATE" DefaultValue="0" Type="list" Group="CMSIS-RTOS V2 flags" TabName="Config parameters" Visible="false">
+	    <PossibleValue Comment="Disabled" Value="0"/>
+        <Description>Not available in previous versions.</Description>
+    </RefParameter>
+
+    <RefParameter Name="configUSE_OS2_EVENTFLAGS_FROM_ISR" Comment="USE_OS2_EVENTFLAGS_FROM_ISR" DefaultValue="1" Type="list" Group="CMSIS-RTOS V2 flags" TabName="Config parameters" Visible="true">
+        <Condition Diagnostic="Available on the series supporting FreeRTOS >= 10.3.1" Expression="(S_VERSION_10_3_1) &amp; S_CMSIS_RTOS_V2$context"/>
+	    <PossibleValue Comment="Disabled" Value="0"/>
+        <PossibleValue Comment="Enabled" Value="1"/>
+        <Description>When set to Disabled, it will disable CMSIS-RTOS2 function osEventFlagsSet and osEventFlagsClear operation from ISR.</Description>
+    </RefParameter>
+    <RefParameter Name="configUSE_OS2_EVENTFLAGS_FROM_ISR" Comment="USE_OS2_EVENTFLAGS_FROM_ISR" DefaultValue="0" Type="list" Group="CMSIS-RTOS V2 flags" TabName="Config parameters" Visible="false">
+	    <PossibleValue Comment="Disabled" Value="0"/>
+        <Description>Not available in previous versions.</Description>
+    </RefParameter>
+
+    <RefParameter Name="configUSE_OS2_THREAD_FLAGS" Comment="USE_OS2_THREAD_FLAGS" DefaultValue="1" Type="list" Group="CMSIS-RTOS V2 flags" TabName="Config parameters" Visible="true">
+        <Condition Diagnostic="Available on the series supporting FreeRTOS >= 10.3.1" Expression="(S_VERSION_10_3_1) &amp; S_CMSIS_RTOS_V2$context"/>
+	    <PossibleValue Comment="Disabled" Value="0"/>
+        <PossibleValue Comment="Enabled" Value="1"/>
+        <Description>When set to Disabled, it will exclude CMSIS-RTOS2 Thread Flags API functions from the application image.</Description>
+    </RefParameter>
+    <RefParameter Name="configUSE_OS2_THREAD_FLAGS" Comment="USE_OS2_THREAD_FLAGS" DefaultValue="0" Type="list" Group="CMSIS-RTOS V2 flags" TabName="Config parameters" Visible="false">
+	    <PossibleValue Comment="Disabled" Value="0"/>
+        <Description>Not available in previous versions.</Description>
+    </RefParameter>
+
+    <RefParameter Name="configUSE_OS2_TIMER" Comment="USE_OS2_TIMER" DefaultValue="1" Type="list" Group="CMSIS-RTOS V2 flags" TabName="Config parameters" Visible="true">
+        <Condition Diagnostic="Available on the series supporting FreeRTOS >= 10.3.1" Expression="(S_VERSION_10_3_1) &amp; S_CMSIS_RTOS_V2$context"/>
+	    <PossibleValue Comment="Disabled" Value="0"/>
+        <PossibleValue Comment="Enabled" Value="1"/>
+        <Description>When set to Disabled, it will exclude CMSIS-RTOS2 Timer API functions from the application image.</Description>
+    </RefParameter>
+    <RefParameter Name="configUSE_OS2_TIMER" Comment="USE_OS2_TIMER" DefaultValue="0" Type="list" Group="CMSIS-RTOS V2 flags" TabName="Config parameters" Visible="false">
+	    <PossibleValue Comment="Disabled" Value="0"/>
+        <Description>Not available in previous versions.</Description>
+    </RefParameter>
+
+    <RefParameter Name="configUSE_OS2_MUTEX" Comment="USE_OS2_MUTEX" DefaultValue="1" Type="list" Group="CMSIS-RTOS V2 flags" TabName="Config parameters" Visible="true">
+        <Condition Diagnostic="Available on the series supporting FreeRTOS >= 10.3.1" Expression="(S_VERSION_10_3_1) &amp; S_CMSIS_RTOS_V2$context"/>
+	    <PossibleValue Comment="Disabled" Value="0"/>
+        <PossibleValue Comment="Enabled" Value="1"/>
+        <Description>When set to Disabled, it will exclude CMSIS-RTOS2 Mutex API functions from the application image.</Description>
+    </RefParameter>
+    <RefParameter Name="configUSE_OS2_MUTEX" Comment="USE_OS2_MUTEX" DefaultValue="0" Type="list" Group="CMSIS-RTOS V2 flags" TabName="Config parameters" Visible="false">
+	    <PossibleValue Comment="Disabled" Value="0"/>
+        <Description>Not available in previous versions.</Description>
+    </RefParameter>
+
+    <!--  New For FreeRTOS v10.3.1 -->
 
     <!-- Custom GUI data -->
     <RefParameter Name="FirstAddedTab" Comment="First additional tab" DefaultValue="Tasks and Queues" Type="string" Visible="false"/>
@@ -1290,6 +1366,15 @@
         <Parameter Name="RecursiveMutexes01"/>
         <Parameter Name="BinarySemaphores01"/>
         <Parameter Name="CountingSemaphores01"/>
+        
+        <!-- new ones for 10.3.1 (CMSIS-RTOS v2 flags) -->
+        <Parameter Name="configUSE_OS2_THREAD_SUSPEND_RESUME"/>
+        <Parameter Name="configUSE_OS2_THREAD_ENUMERATE"/>
+        <Parameter Name="configUSE_OS2_EVENTFLAGS_FROM_ISR"/>
+        <Parameter Name="configUSE_OS2_THREAD_FLAGS"/>
+        <Parameter Name="configUSE_OS2_TIMER"/>
+        <Parameter Name="configUSE_OS2_MUTEX"/>
+
     </RefMode>
 
 	<!-- RefMode for CMSIS -->
@@ -1321,7 +1406,7 @@
             </SignalLogicalOp>
             <Semaphore>S_FREERTOS$context</Semaphore>
             <Semaphore>S_CMSIS_RTOS_V1$context</Semaphore>
-            <Condition Expression="!(STM32WB &amp; (S_THREAD | S_BLE_HOST))" Diagnostic="Not available when BLE or THREAD are activated in WB series"/>
+              <Condition Expression="(!(STM32WL &amp; (S_LoRaWAN | S_Sigfox | S_SubGhzPhy))) &amp; (!(STM32WB &amp; (S_THREAD | S_BLE_HOST | S_ZIGBEE))) &amp; (!S_AzureRTOS$context)" Diagnostic="CMSIS-RTOS V1 not available when connectivity middlewares are enabled"/>
           </Mode>
 
           <!-- "CMSIS_V2" being delivered series after series -->
@@ -1331,7 +1416,7 @@
             </SignalLogicalOp>
             <Semaphore>S_FREERTOS$context</Semaphore>
             <Semaphore>S_CMSIS_RTOS_V2$context</Semaphore>
-            <Condition Expression="STM32F0|STM32F1|STM32F2|STM32F3|STM32F4|STM32F7|STM32G0|STM32G4|STM32H7|STM32L1|STM32L4|STM32L5|STM32MP1|STM32WB" Diagnostic="Available for F0,F1,F2,F3,F4,F7,G0,G4,H7,L1,L4,L5,MP1 and WB series"/> <!-- L0 missing -->
+              <Condition Expression="(!S_AzureRTOS$context) &amp; (!S_ZIGBEE)" Diagnostic="CMSIS-RTOS V2 not available when ZIGBEE enabled on WB series"/>
           </Mode>
 	      
         </ModeLogicOperator>

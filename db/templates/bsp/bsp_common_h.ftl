@@ -87,7 +87,7 @@
 
 #if (USE_BSP_COM_FEATURE > 0)
   #if (USE_COM_LOG > 0)
-    #ifndef __GNUC__
+    #if defined(__ICCARM__) || defined(__CC_ARM) /* For IAR and MDK-ARM */
       #include <stdio.h>
     #endif
   #endif

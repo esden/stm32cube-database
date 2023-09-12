@@ -7,10 +7,12 @@
 [/#if]
 
 [#if BUS_DEFINES??][#-- BUS driver defines declaration --]
+[#if BUS_DEFINES.get(0)??]
 [#assign defines = BUS_DEFINES.get(0)]
 [#list defines.entrySet() as define]
 #define ${define.key} ${define.value}
 [/#list]
+[/#if]
 [/#if]
 
 [#if IoList??]

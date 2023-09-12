@@ -23,7 +23,7 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <Component Name="Middleware:WPAN_UTILITIES_NO_FREERTOS:NO_FREERTOS:$FREERTOS_STATUS"/>
 -->
         <Component Name="Middleware:BLE_HOST_COMMON:BLE:$BLE"/>
-        <Component Name="Middleware:BLE_HOST_BEACON:BEACON:$BT_SIG_BEACON"/>
+        <Component Name="Middleware:BLE_HOST_BEACON_ENABLED:BEACON:$BT_SIG_BEACON_ENABLED"/>
         <Component Name="Middleware:BLE_HOST_BLOOD_PRESSURE:BLOOD_PRESSURE:$BT_SIG_BLOOD_PRESSURE_SENSOR"/>
         <Component Name="Middleware:BLE_HOST_HEART_RATE:HEART_RATE:$BT_SIG_HEART_RATE_SENSOR"/>
         <Component Name="Middleware:BLE_HOST_HEALTH_THERMOMETER:HEALTH_THERMOMETER:$BT_SIG_HEALTH_THERMOMETER_SENSOR"/>
@@ -35,6 +35,7 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <Component Name="Middleware:BLE_HOST_TRANSPARENT_MODE_UART:TRANSPARENT_MODE_UART:$BLE_TRANSPARENT_MODE_UART"/>
         <Component Name="Middleware:BLE_HOST_CUSTOM_TEMPLATE:TEMPLATE:$CUSTOM_TEMPLATE"/>
         <Component Name="Middleware:THREAD:THREAD:$THREAD"/>
+        <Component Name="Middleware:ZIGBEE:ZIGBEE:$ZIGBEE"/>
 
         <ConfigFile Name="BLE_APP_BLE_H"/>
         <ConfigFile Name="BLE_APP_BLE_C"/>
@@ -43,6 +44,7 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <ConfigFile Name="BLE_APP_BLE_C_P2P_ROUTER"/>
         <ConfigFile Name="BLE_CONF_H"/> 
         <ConfigFile Name="BLE_DBG_CONF_H"/>
+        <ConfigFile Name="BLE_TL_DBG_CONF_H"/>
         <ConfigFile Name="BLE_DISP_APP_H"/>
         <ConfigFile Name="BLE_DISP_APP_C"/>
         <ConfigFile Name="BLE_EDDYSTONE_BEACON_H"/>
@@ -74,38 +76,43 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
 <!--
         <ConfigFile Name="BLE_TEMPLATE_SERVER_APP_C"/>
 -->
-
+    <!--  THREAD -->
         <ConfigFile Name="THREAD_APP_THREAD_C"/>
         <ConfigFile Name="THREAD_APP_THREAD_H"/>
-        <ConfigFile Name="THREAD_STM_LOGGING_H"/>
-        <ConfigFile Name="THREAD_STM_LOGGING_C"/>
+    <!--  ZIGBEE -->
+        <ConfigFile Name="ZGB_ZCL_CALLBACKS"/>
+        <ConfigFile Name="ZIGBEE_APP_ZIGBEE_C"/> 
+        <ConfigFile Name="ZIGBEE_APP_ZIGBEE_H"/>
 
+    <!-- Common with THREAD and ZIGBEE -->
+        <ConfigFile Name="THREAD_ZGB_STM_LOGGING_H"/>
+        <ConfigFile Name="THREAD_ZGB_STM_LOGGING_C"/>
 <!--
         <ConfigFile Name="UTILITIES_STM32_LPM_C"/>
 -->
 
-    <!-- Common with THREAD -->
+    <!-- Common with BLE, THREAD  and ZIGBEE-->
     <!-- WPAN target -->
-        <ConfigFile Name="BLE_HW_IPCC_C"/>
+        <ConfigFile Name="WB_HW_IPCC_C"/>
 
     <!-- Core - inc -->
-        <ConfigFile Name="BLE_APP_COMMON_H"/>
-        <ConfigFile Name="STM32_APP_DEBUG_H"/>
-        <ConfigFile Name="BLE_APP_CONF_H"/>
-        <ConfigFile Name="BLE_APP_ENTRY_H"/>
-        <ConfigFile Name="BLE_HW_CONF_H"/>
-        <ConfigFile Name="BLE_UTILITIES_CONF_H"/>
+        <ConfigFile Name="WB_APP_COMMON_H"/>
+        <ConfigFile Name="BLE_APP_DEBUG_H"/>
+        <ConfigFile Name="WB_APP_CONF_H"/>
+        <ConfigFile Name="WB_APP_ENTRY_H"/>
+        <ConfigFile Name="WB_HW_CONF_H"/>
+        <ConfigFile Name="WB_UTILITIES_CONF_H"/>
         <ConfigFile Name="STM32_LMP_IF_H"/>
         <ConfigFile Name="BLE_VCP_CONF_H"/>
-        <ConfigFile Name="BLE_HW_IF_H"/>
+        <ConfigFile Name="WB_HW_IF_H"/>
     <!-- Core - src -->
-        <ConfigFile Name="BLE_APP_ENTRY_C"/>
-        <ConfigFile Name="STM32_APP_DEBUG_C"/>
+        <ConfigFile Name="WB_APP_ENTRY_C"/>
+        <ConfigFile Name="BLE_APP_DEBUG_C"/>
 <!--
         <ConfigFile Name="BLE_HW_LPM_C"/>
 -->
-        <ConfigFile Name="BLE_HW_TIMERSERVER_C"/>
-        <ConfigFile Name="BLE_HW_UART_C"/>
+        <ConfigFile Name="WB_HW_TIMERSERVER_C"/>
+        <ConfigFile Name="WB_HW_UART_C"/>
         <ConfigFile Name="STM32_LMP_IF_C"/>
         <ConfigFile Name="FREERTOS_PORT_C"/>
 
@@ -117,9 +124,9 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <Defines Name="OPENTHREAD_CONFIG_FILE" Value="&lt;openthread_api_config_ftd.h&gt;" Condition="Semaphore_FTD_CLI | Semaphore_FTD"/>
         <Defines Name="OPENTHREAD_CONFIG_FILE" Value="&lt;openthread_api_config_mtd.h&gt;" Condition="Semaphore_MTD"/>
         <Defines Name="THREAD_WB" Value="" Condition="S_THREAD"/>
+        <Defines Name="ZIGBEE_WB" Value="" Condition="S_ZIGBEE"/>
 <!--
         <Defines Name="WITH_NO_TRACE_AT_ALL" Value="" Condition="GCC;SIiTcompilerIiGCC"/>
-
         <Defines Name="WITH_NO_TRACE_AT_ALL" Value=""/>
 -->        
     </RefConfig>
@@ -165,6 +172,9 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <File Category="header" Name="interface/patterns/ble_thread/tl/mbox_def.h"/>
         <File Category="header" Name="interface/patterns/ble_thread/shci/shci.h"/>
         <File Category="header" Name="interface/patterns/ble_thread/tl/tl.h"/>
+<!--
+        <File Category="header" Name="interface/patterns/ble_thread/tl/tl_dbg_conf.h"/>
+-->
         <!-- Source files for patterns -->
 <!--
         <File Category="source" Name="interface/patterns/ble_thread/tl/tl_if.c"/>
@@ -243,7 +253,7 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         </SubComponent>
     </RefComponent>
 
-    <RefComponent Cclass="Middleware" Cgroup="BLE_HOST_BEACON" Cversion="1.0.0">
+    <RefComponent Cclass="Middleware" Cgroup="BLE_HOST_BEACON_ENABLED" Cversion="1.0.0">
         <SubComponent Csub="BEACON" Cvariant="Enabled">
             <File Category="source" Name="ble/core/auto/ble_gap_aci.c"/>
             <File Category="source" Name="ble/core/auto/ble_gatt_aci.c"/>
@@ -428,22 +438,54 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
     </RefComponent>
 <!-- Thread RefComponents end -->
 
+<!-- Zigbee RefComponents begin -->
+    <RefComponent Cclass="Middleware" Cgroup="ZIGBEE" Cversion="1.0.0">
+        <SubComponent Csub="ZIGBEE" Cvariant="Enabled">
+            <!-- Files for stack -->
+            <File Category="header" Name="zigbee/stack/include/*.h"/>
+            <File Category="header" Name="zigbee/stack/include/extras/zigbee.extras.h"/>
+            <File Category="header" Name="zigbee/stack/include/mac/*.h"/>
+            <File Category="header" Name="zigbee/stack/include/zcl/*.h"/>
+            <File Category="header" Name="zigbee/stack/include/zcl/key/*.h"/>
+            <File Category="header" Name="zigbee/stack/include/zcl/se/*.h"/>
+            <File Category="header" Name="zigbee/stack/include/zcl/security/*.h"/>
+            <File Category="header" Name="zigbee/stack/include/zgp/zgp.proxybasic.h"/>
+            <!-- Files for platform -->
+            <File Category="header" Name="zigbee/platform/*.h"/>
+            <File Category="source" Name="zigbee/platform/*.c"/>
+            <!-- Files for core -->
+            <File Category="header" Name="zigbee/core/inc/*.h"/>
+            <File Category="source" Name="zigbee/core/src/*.c"/>
+            <!-- Libraries -->
+            <File Category="library" Condition="KEIL6;!(SIiTideIiMDKAaARMOoV5 | SIiTideIiMDKAaARMOoV5Gg27)" Name="zigbee/lib/stm32wb_zigbee_wb_lib.a" Version=""/>
+            <File Category="library" Condition="KEIL5;(SIiTideIiMDKAaARMOoV5 | SIiTideIiMDKAaARMOoV5Gg27)" Name="zigbee/lib/stm32wb_zigbee_wb_lib_keil.lib" Version=""/>
+
+            <!-- Files for patterns -->
+            <File Category="header" Name="interface/patterns/ble_thread/tl/tl_zigbee_hci.h"/>
+            <File Category="source" Name="interface/patterns/ble_thread/tl/tl_zigbee_hci.c"/>
+            <File Category="source" Name="interface/patterns/ble_thread/tl/shci_tl.c"/>
+            <File Category="source" Name="interface/patterns/ble_thread/tl/shci_tl_if.c"/>
+        </SubComponent>
+    </RefComponent>
+
 <!-- STM32_WPAN RefConfig begin -->
 <!-- Core/inc begin -->
 
-    <RefConfigFile Description="" Name="BLE_APP_COMMON_H" Template="stm32_wpan_app_common_h.ftl" destinationFolder="Core/Inc/">
+    <RefConfigFile Description="" Name="WB_APP_COMMON_H" Template="stm32_wpan_app_common_h.ftl" destinationFolder="Core/Inc/">
         <File Category="header" Condition="all" Name="app_common.h" Version="1.0"/>
     </RefConfigFile>
 
-    <RefConfigFile Description="" Name="STM32_APP_DEBUG_H" Template="stm32_wpan_app_debug_h.ftl" destinationFolder="Core/Inc/">
+    <RefConfigFile Description="" Name="BLE_APP_DEBUG_H" Template="stm32_wpan_app_debug_h.ftl" destinationFolder="Core/Inc/">
         <File Category="header" Condition="Semaphore_BLE" Name="app_debug.h" Version="1.0"/>
     </RefConfigFile>
 
-    <RefConfigFile Description="" Name="THREAD_STM_LOGGING_H" Template="stm32_wpan_stm_logging_h.ftl" destinationFolder="Core/Inc/">
-        <File Category="header" Condition="Semaphore_THREAD" Name="stm_logging.h" Version="1.0"/>
+    <RefConfigFile Description="" Name="THREAD_ZGB_STM_LOGGING_H" Template="stm32_wpan_stm_logging_h.ftl" destinationFolder="Core/Inc/">
+        <File Category="header" Condition="Semaphore_THREAD | Semaphore_ZIGBEE" Name="stm_logging.h" Version="1.0"/>
+		<Argument Name="THREAD" GenericType="Simple"/>
+		<Argument Name="ZIGBEE" GenericType="Simple"/>
     </RefConfigFile>
 
-    <RefConfigFile Description="" Name="BLE_APP_CONF_H" Template="stm32_wpan_app_conf_h.ftl" destinationFolder="Core/Inc/">
+    <RefConfigFile Description="" Name="WB_APP_CONF_H" Template="stm32_wpan_app_conf_h.ftl" destinationFolder="Core/Inc/">
         <File Category="header" Condition="all" Name="app_conf.h" Version="1.0"/>
     <!-- ftl specific items begin-->
         <Argument Name="FREERTOS_STATUS" GenericType="Simple" Comment="0 to 1 (0 by default)"/>
@@ -463,6 +505,7 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <Argument Name="THREAD_APPLICATION" GenericType="Simple"/>
         <Argument Name="THREAD" GenericType="Simple"/>
         <Argument Name="BLE" GenericType="Simple"/>
+		<Argument Name="ZIGBEE" GenericType="Simple"/>
         <Argument Name="CFG_CLI_UART" GenericType="Simple"/>
     <!-- ftl specific items end-->
         <Argument Name="CFG_ADV_BD_ADDRESS" GenericType="Simple"/>
@@ -517,11 +560,11 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
     <!-- Advertising end -->
     </RefConfigFile>
 
-    <RefConfigFile Description="" Name="BLE_APP_ENTRY_H" Template="stm32_wpan_app_entry_h.ftl" destinationFolder="Core/Inc/"> 
+    <RefConfigFile Description="" Name="WB_APP_ENTRY_H" Template="stm32_wpan_app_entry_h.ftl" destinationFolder="Core/Inc/"> 
         <File Category="header" Condition="all" Name="app_entry.h" Version="1.0"/>
     </RefConfigFile>
 
-    <RefConfigFile Description="" Name="BLE_HW_CONF_H" Template="stm32_wpan_hw_conf_h.ftl" destinationFolder="Core/Inc/">
+    <RefConfigFile Description="" Name="WB_HW_CONF_H" Template="stm32_wpan_hw_conf_h.ftl" destinationFolder="Core/Inc/">
         <File Category="header" Condition="all" Name="hw_conf.h" Version="1.0"/>
         <Argument Name="CFG_HW_TS_MAX_NBR_CONCURRENT_TIMER" GenericType="Simple" Comment="0 to 1 (0 by default)"/>
         <Argument Name="CFG_HW_TS_NVIC_RTC_WAKEUP_IT_PREEMPTPRIO" GenericType="Simple" Comment="0 to 1 (0 by default)"/>
@@ -566,11 +609,11 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <File Category="header" Condition="Semaphore_BLE_TRANSPARENT_MODE_VCP" Name="vcp_conf.h" Version="1.0"/>
     </RefConfigFile> 
 
-    <RefConfigFile Description="" Name="BLE_HW_IF_H" Template="stm32_wpan_hw_if_h.ftl" destinationFolder="Core/Inc/">
+    <RefConfigFile Description="" Name="WB_HW_IF_H" Template="stm32_wpan_hw_if_h.ftl" destinationFolder="Core/Inc/">
         <File Category="header" Condition="All" Name="hw_if.h" Version="1.0"/>
     </RefConfigFile> 
 
-    <RefConfigFile Description="" Name="BLE_UTILITIES_CONF_H" Template="stm32_wpan_utilities_conf_h.ftl" destinationFolder="Core/Inc/">
+    <RefConfigFile Description="" Name="WB_UTILITIES_CONF_H" Template="stm32_wpan_utilities_conf_h.ftl" destinationFolder="Core/Inc/">
         <File Category="header" Condition="all" Name="utilities_conf.h" Version="1.0"/>
         <Argument Name="THREAD" GenericType="Simple"/>
     </RefConfigFile> 
@@ -584,7 +627,7 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
 
 <!-- Core/src begin -->
     
-    <RefConfigFile Description="" Name="BLE_APP_ENTRY_C" Template="stm32_wpan_app_entry_c.ftl" destinationFolder="Core/Src/">
+    <RefConfigFile Description="" Name="WB_APP_ENTRY_C" Template="stm32_wpan_app_entry_c.ftl" destinationFolder="Core/Src/">
         <File Category="source" Condition="all" Name="app_entry.c" Version="1.0"/>
         <!-- ftl specific items begin-->
         <Argument Name="FREERTOS_STATUS" GenericType="Simple" Comment="0 to 1 (0 by default)"/>
@@ -604,12 +647,14 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <Argument Name="THREAD_APPLICATION" GenericType="Simple"/>
         <Argument Name="THREAD" GenericType="Simple"/>
         <Argument Name="BLE" GenericType="Simple"/>
+        <Argument Name="ZIGBEE" GenericType="Simple"/>
         <Argument Name="CFG_DEBUG_TRACE_UART" GenericType="Simple"/>
+        <Argument Name="ZGB_SLEEPY_MODE" GenericType="Simple"/>
         <!-- ftl specific items end-->
 
     </RefConfigFile>
 
-    <RefConfigFile Description="" Name="STM32_APP_DEBUG_C" Template="stm32_wpan_app_debug_c.ftl" destinationFolder="Core/Src/">
+    <RefConfigFile Description="" Name="BLE_APP_DEBUG_C" Template="stm32_wpan_app_debug_c.ftl" destinationFolder="Core/Src/">
         <File Category="source" Condition="Semaphore_BLE" Name="app_debug.c" Version="1.0"/>
     </RefConfigFile>
 
@@ -617,11 +662,11 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <File Category="source" Condition="all" Name="hw_lpm.c" Version="1.0"/>
     </RefConfigFile>
 
-    <RefConfigFile Description="" Name="BLE_HW_TIMERSERVER_C" Template="stm32_wpan_hw_timerserver_c.ftl" destinationFolder="Core/Src/">
+    <RefConfigFile Description="" Name="WB_HW_TIMERSERVER_C" Template="stm32_wpan_hw_timerserver_c.ftl" destinationFolder="Core/Src/">
         <File Category="source" Condition="all" Name="hw_timerserver.c" Version="1.0"/>
     </RefConfigFile>
 
-    <RefConfigFile Description="" Name="BLE_HW_UART_C" Template="stm32_wpan_hw_uart_c.ftl" destinationFolder="Core/Src/">
+    <RefConfigFile Description="" Name="WB_HW_UART_C" Template="stm32_wpan_hw_uart_c.ftl" destinationFolder="Core/Src/">
 <!--        <File Category="source" Condition="all" Name="Src/hw_uart.c" Version="1.0"/> -->
         <File Category="source" Condition="Semaphore_CFG_HW_USART1_ENABLED | Semaphore_CFG_HW_LPUART1_ENABLED" Name="Src/hw_uart.c" Version="1.0"/>
     </RefConfigFile>
@@ -634,8 +679,10 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <File Category="source" Condition="S_FREERTOS$context" Name="freertos_port.c" Version="1.0"/>
     </RefConfigFile>
 	
-    <RefConfigFile Description="" Name="THREAD_STM_LOGGING_C" Template="stm32_wpan_stm_logging_c.ftl" destinationFolder="Core/Src/">
-        <File Category="source" Condition="Semaphore_THREAD" Name="stm_logging.c" Version="1.0"/>
+    <RefConfigFile Description="" Name="THREAD_ZGB_STM_LOGGING_C" Template="stm32_wpan_stm_logging_c.ftl" destinationFolder="Core/Src/">
+        <File Category="source" Condition="Semaphore_THREAD | Semaphore_ZIGBEE" Name="stm_logging.c" Version="1.0"/>
+        <Argument Name="THREAD" GenericType="Simple"/>
+        <Argument Name="ZIGBEE" GenericType="Simple"/>
     </RefConfigFile>
 
 <!-- Core/src end -->
@@ -655,7 +702,7 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
 <!--
         <File Category="source" Name="App/app_ble.c" Version="1.0" Condition="!Semaphore_BLE_TRANSPARENT_MODE &amp; S_BLE_HOST &amp; (Semaphore_BT_SIG_BEACON | Semaphore_BT_SIG_BLOOD_PRESSURE_SENSOR | Semaphore_BT_SIG_HEALTH_THERMOMETER_SENSOR | Semaphore_BT_SIG_HEART_RATE_SENSOR | Semaphore_CUSTOM_P2P_SERVER) | (Semaphore_CUSTOM_TEMPLATE)"/>
 -->
-        <File Category="source" Name="App/app_ble.c" Version="1.0" Condition="(Semaphore_BT_SIG_BEACON | Semaphore_BT_SIG_BLOOD_PRESSURE_SENSOR | Semaphore_BT_SIG_HEALTH_THERMOMETER_SENSOR | Semaphore_BT_SIG_HEART_RATE_SENSOR | Semaphore_CUSTOM_P2P_SERVER | Semaphore_CUSTOM_TEMPLATE)"/>
+        <File Category="source" Name="App/app_ble.c" Version="1.0" Condition="S_BLE_HOST &amp; (Semaphore_BT_SIG_BEACON | Semaphore_BT_SIG_BLOOD_PRESSURE_SENSOR | Semaphore_BT_SIG_HEALTH_THERMOMETER_SENSOR | Semaphore_BT_SIG_HEART_RATE_SENSOR | Semaphore_CUSTOM_P2P_SERVER | Semaphore_CUSTOM_TEMPLATE)"/>
     <!-- ftl specific items begin-->
         <Argument Name="FREERTOS_STATUS" GenericType="Simple" Comment="0 to 1 (0 by default)"/>
         <Argument Name="BLE_CFG_PERIPHERAL" GenericType="Simple" Comment="0 to 1 (1 by default)"/>
@@ -789,7 +836,7 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="BLE_APP_BLE_C_OTA" Template="stm32_wpan_ble_app_ble_c_ota.ftl">
-        <File Category="source" Name="App/app_ble.c" Version="1.0" Condition="Semaphore_CUSTOM_OTAS"/>
+        <File Category="source" Name="App/app_ble.c" Version="1.0" Condition="S_BLE_HOST &amp; Semaphore_CUSTOM_OTAS"/>
     <!-- ftl specific items begin-->
         <Argument Name="FREERTOS_STATUS" GenericType="Simple" Comment="0 to 1 (0 by default)"/>
         <Argument Name="BLE_CFG_PERIPHERAL" GenericType="Simple" Comment="0 to 1 (1 by default)"/>
@@ -811,7 +858,7 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="BLE_APP_BLE_C_P2P_CLIENT" Template="stm32_wpan_ble_app_ble_c_p2p_client.ftl">
-        <File Category="source" Name="App/app_ble.c" Version="1.0" Condition="Semaphore_CUSTOM_P2P_CLIENT"/>
+        <File Category="source" Name="App/app_ble.c" Version="1.0" Condition="S_BLE_HOST &amp; Semaphore_BLE_CLIENT_PROFILE"/>
     <!-- ftl specific items begin-->
         <Argument Name="FREERTOS_STATUS" GenericType="Simple" Comment="0 to 1 (0 by default)"/>
         <Argument Name="BLE_CFG_PERIPHERAL" GenericType="Simple" Comment="0 to 1 (1 by default)"/>
@@ -833,7 +880,7 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="BLE_APP_BLE_C_P2P_ROUTER" Template="stm32_wpan_ble_app_ble_c_p2p_router.ftl">
-        <File Category="source" Name="App/app_ble.c" Version="1.0" Condition="Semaphore_CUSTOM_P2P_ROUTER"/>
+        <File Category="source" Name="App/app_ble.c" Version="1.0" Condition="S_BLE_HOST &amp; Semaphore_BLE_ROUTER_PROFILE"/>
     <!-- ftl specific items begin-->
         <Argument Name="FREERTOS_STATUS" GenericType="Simple" Comment="0 to 1 (0 by default)"/>
         <Argument Name="BLE_CFG_PERIPHERAL" GenericType="Simple" Comment="0 to 1 (1 by default)"/>
@@ -938,6 +985,10 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <Argument Name="BLE_DBG_P2P_STM_EN" GenericType="Simple" Comment="0 to 1 (0 by default)"/>
     </RefConfigFile> 
 
+    <RefConfigFile Description="" Name="BLE_TL_DBG_CONF_H" Template="stm32_wpan_tl_dbg_conf_h.ftl">
+        <File Category="header" Condition="all" Name="App/tl_dbg_conf.h" Version="1.0"/>
+    </RefConfigFile>
+
     <RefConfigFile Description="" Name="THREAD_APP_THREAD_C" Template="stm32_wpan_thread_app_thread_c.ftl">
         <File Category="source" Condition="Semaphore_THREAD" Name="App/app_thread.c" Version="1.0"/>
         <Argument Name="THREAD_APPLICATION" GenericType="Simple" Comment="String (Full Thread Device with Command Line Interface by default)"/>
@@ -950,6 +1001,109 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
     <RefConfigFile Description="" Name="THREAD_APP_THREAD_H" Template="stm32_wpan_thread_app_thread_h.ftl">
         <File Category="header" Condition="Semaphore_THREAD" Name="App/app_thread.h" Version="1.0"/>
         <Argument Name="THREAD_APPLICATION" GenericType="Simple" Comment="String (Full Thread Device with Command Line Interface by default)"/>
+    </RefConfigFile>
+
+    <RefConfigFile Description="" Name="ZIGBEE_APP_ZIGBEE_C" Template="stm32_wpan_zigbee_app_zigbee_c.ftl">
+        <File Category="source" Condition="Semaphore_ZIGBEE" Name="App/app_zigbee.c" Version="1.0"/>
+        <!-- Application parameters -->
+        <Argument Name="ZGB_APPLICATION" GenericType="Simple"/>
+        <Argument Name="ZGB_NW_MODE" GenericType="Simple"/>
+        <Argument Name="ZGB_DEVICE_ROLE" GenericType="Simple"/>
+        <Argument Name="ZGB_TOUCHLINK_CAPABILITY" GenericType="Simple"/>
+        <Argument Name="ZGB_NB_ENDPOINTS" GenericType="Simple"/>
+        <Argument Name="ZGB_CHANNEL" GenericType="Simple"/>
+        <Argument Name="ZGB_SLEEPY_MODE" GenericType="Simple"/>
+        <!-- Endpoint1 parameters -->
+        <Argument Name="ENDPOINT1_ID" GenericType="Simple"/>
+        <Argument Name="ZGB_ENDPOINT1_PROFILE_ID" GenericType="Simple"/>
+        <Argument Name="ENDPOINT1_DEVICE_ID_HA" GenericType="Simple"/>
+        <Argument Name="ENDPOINT1_DEVICE_ID_SE" GenericType="Simple"/>
+        <Argument Name="ENDPOINT1_DEVICE_ID_ZLL" GenericType="Simple"/>
+        <!-- zcl callbacks definitions: the comment field is constructed in two different ways:
+                1 - {base_of_callback_fcts}:{specific_name_of_first_fct}({args})/{specific_name_of_second_fct}({args})/etc...  => when args are too specific
+                2 - {base_of_callback_fcts}:{specific_name_of_first_fct}/{specific_name_of_second_fct}/etc... => when args follow an identified pattern
+        -->
+        <Argument Name="ZCL_ALARMS_CLIENT_CALLBACKS" GenericType="Simple" Comment="client"/>
+        <Argument Name="ZCL_MESSAGING_CLIENT_CALLBACKS" GenericType="Simple" Comment="messaging_client:display_message(struct ZbZclClusterT *cluster, void *arg, struct ZbZclMsgMessageT *msg, struct ZbZclAddrInfoT *srcInfo)/cancel_message(struct ZbZclClusterT *cluster, void *arg, struct ZbZclMsgMessageCancelT *cancel, struct ZbZclAddrInfoT *srcInfo)/cancel_all_messages(struct ZbZclClusterT *cluster, void *arg, struct ZbZclMsgMessageCancelAllT *cancel_all, struct ZbZclAddrInfoT *srcInfo)/display_protected_message(struct ZbZclClusterT *cluster, void *arg, struct ZbZclMsgMessageT *msg, struct ZbZclAddrInfoT *srcInfo)"/>
+        <Argument Name="ZCL_MESSAGING_SERVER_CALLBACKS" GenericType="Simple" Comment="messaging_server:get_last_message(struct ZbZclClusterT *cluster, void *arg, struct ZbZclAddrInfoT *srcInfo)/message_confirmation(struct ZbZclClusterT *cluster, void *arg, struct ZbZclMsgMessageConfT *conf, struct ZbZclAddrInfoT *srcInfo)/get_message_cancellation(struct ZbZclClusterT *cluster, void *arg, struct ZbZclMsgGetMsgCancellationT *req, struct ZbZclAddrInfoT *source)"/>
+        <Argument Name="ZCL_ON_OFF_SERVER_CALLBACKS" GenericType="Simple" Comment="onOff_server:off(struct ZbZclClusterT *clusterPtr, struct ZbZclAddrInfoT *srcInfo, void *arg)/on(struct ZbZclClusterT *clusterPtr, struct ZbZclAddrInfoT *srcInfo, void *arg)/toggle(struct ZbZclClusterT *clusterPtr, struct ZbZclAddrInfoT *srcInfo, void *arg)"/>
+        <Argument Name="ZCL_COLOR_CONTROL_SERVER_CALLBACKS" GenericType="Simple" Comment="color_server:move_to_hue/move_hue/step_hue/move_to_sat/move_sat/step_sat/move_to_hue_sat/move_to_color_xy/move_color_xy/step_color_xy/move_to_color_temp/move_to_hue_enh/move_hue_enh/step_hue_enh/move_to_hue_sat_enh/color_loop_set/stop_move_step/move_color_temp/step_color_temp"/>
+        <Argument Name="ZCL_COMMISSIONING_SERVER_CALLBACKS" GenericType="Simple" Comment="commission_server:restart_device/save_startup/restore_startup"/>
+        <Argument Name="ZCL_DOOR_LOCK_SERVER_CALLBACKS" GenericType="Simple" Comment="doorlock_server:lock/unlock/toggle/unlock_timeout/get_log/set_pin/get_pin/clr_pin/clr_all_pins/set_user_status/get_user_status/set_wd_sched/get_wd_sched/clr_wd_sched/set_yd_sched/get_yd_sched/clr_yd_sched/set_hd_sched/get_hd_sched/clr_hd_sched/set_user_type/get_user_type/set_rfid/get_rfid/clr_rfid/clr_all_rfids"/>
+        <Argument Name="ZCL_ELECTRICAL_MEASUREMENT_SERVER_CALLBACKS" GenericType="Simple" Comment="elecMeas_server:get_profile_info(struct ZbZclClusterT *clusterPtr, struct ZbZclAddrInfoT *src_info, void *arg)/get_meas_profile(struct ZbZclClusterT *clusterPtr, struct ZbZclElecMeasClientGetMeasProfileReqT *cmd_req, struct ZbZclAddrInfoT *src_info, void *arg)"/>
+        <Argument Name="ZCL_LEVEL_CONTROL_SERVER_CALLBACKS" GenericType="Simple" Comment="level_server:move_to_level/move/step/stop"/>
+        <Argument Name="ZCL_OTA_UPGRADE_CLIENT_CALLBACKS" GenericType="Simple" Comment="ota_client:discover_complete(struct ZbZclClusterT *clusterPtr, void *arg)/image_notify(struct ZbZclClusterT *clusterPtr, uint8_t payload_type, uint8_t jitter, struct ZbZclOtaImageDefinition *image_definition, struct ZbApsdeDataIndT *data_ind, struct ZbZclHeaderT *zcl_header)/query_next(struct ZbZclClusterT *clusterPtr, enum ZclStatusCodeT status, struct ZbZclOtaImageDefinition *image_definition, uint32_t image_size, void *arg)/update_raw(struct ZbZclClusterT *clusterPtr, uint8_t length, uint8_t *data, void *arg)/write_tag(struct ZbZclClusterT *clusterPtr, struct ZbZclOtaHeader *header, uint16_t tag_id, uint32_t tag_length, uint8_t data_length, uint8_t *data, void *arg)"/>
+        <Argument Name="ZCL_POWER_PROFILE_CLIENT_CALLBACKS" GenericType="Simple" Comment="powerProf_client:profile_notify/get_price/state_notify/get_sched_price/phases_req/phases_notify/constraints_notify/get_price_ext"/>
+        <Argument Name="ZCL_POWER_PROFILE_SERVER_CALLBACKS" GenericType="Simple" Comment="powerProf_server:profile_req/state_req/phases_notify/sched_contraints_req/phases_sched_state_req"/>
+        <Argument Name="ZCL_POLL_CONTROL_CLIENT_CALLBACKS" GenericType="Simple" Comment="pollControl_client:checkin_rsp_callback(struct ZbZclClusterT *clusterPtr, struct zcl_poll_checkin_rsp_t *rsp_info, struct ZbZclAddrInfoT *srcInfo, void *arg)"/>
+        <Argument Name="ZCL_POLL_CONTROL_SERVER_CALLBACKS" GenericType="Simple" Comment="pollControl_server:checkin_rsp(struct ZbZclClusterT *clusterPtr, struct zcl_poll_checkin_rsp_t *rsp_info, struct ZbZclAddrInfoT *srcInfo, void *arg)"/>
+        <Argument Name="ZCL_RSSI_LOCATION_CLIENT_CALLBACKS" GenericType="Simple" Comment="rssiLoc_client:loc_data_notif/comp_data_notif/rssi_ping/rssi_req/report_rssi/req_own_loc"/>
+        <Argument Name="ZCL_RSSI_LOCATION_SERVER_CALLBACKS" GenericType="Simple" Comment="rssiLoc_server:get_dev_config/get_loc_data/send_pings/anchor_node_annc"/>
+        <Argument Name="ZCL_THERMOSTAT_SERVER_CALLBACKS" GenericType="Simple" Comment="therm_server:setpoint_raise_lower(struct ZbZclClusterT *clusterPtr, void *arg, struct ZbZclThermCliSetpointT *req, struct ZbZclAddrInfoT *srcInfo)/set_weekly(struct ZbZclClusterT *clusterPtr, void *arg, struct ZbZclThermWeeklySchedT *req, struct ZbZclAddrInfoT *srcInfo)/get_weekly(struct ZbZclClusterT *clusterPtr, void *arg, struct ZbZclThermCliGetWeeklyT *req, struct ZbZclAddrInfoT *srcInfo)/clear_weekly(struct ZbZclClusterT *clusterPtr, void *arg, struct ZbZclAddrInfoT *srcInfo)/get_relay_status_log(struct ZbZclClusterT *clusterPtr, void *arg, struct ZbZclAddrInfoT *srcInfo)"/>
+        <Argument Name="ZCL_TIME_SERVER_CALLBACKS" GenericType="Simple" Comment="time_server:get_time(struct ZbZclClusterT *clusterPtr, void *arg)/set_time(struct ZbZclClusterT *clusterPtr, uint32_t time_val, void *arg)"/>
+        <Argument Name="ZCL_VOICE_OVER_ZGB_CLIENT_CALLBACKS" GenericType="Simple" Comment="voice_client:control"/>
+        <Argument Name="ZCL_VOICE_OVER_ZGB_SERVER_CALLBACKS" GenericType="Simple" Comment="voice_server:estab_req/voice_tx/tx_complete"/>
+        <Argument Name="ZCL_WINDOW_COVERING_SERVER_CALLBACKS" GenericType="Simple" Comment="window_server:up_command/down_command/set_lift_and_tilt_command/stop_command"/>
+        <Argument Name="ZCL_DRLC_CLIENT_CALLBACKS" GenericType="Simple" Comment="drlc_client:start/stop"/>
+        <Argument Name="ZCL_DRLC_SERVER_CALLBACKS" GenericType="Simple" Comment="drlc_server:report_status(struct ZbZclClusterT *clusterPtr, struct ZbZclAddrInfoT *srcInfo, struct ZbZclDrlcStatusT *status, void *arg)/get_events(struct ZbZclClusterT *clusterPtr, struct ZbZclAddrInfoT *srcInfo, struct ZbZclDrlcGetEventsReqT *req, void *arg)"/>
+        <Argument Name="ZCL_METERING_CLIENT_CALLBACKS" GenericType="Simple" Comment="metering_client:optional"/>
+        <Argument Name="ZCL_METERING_SERVER_CALLBACKS" GenericType="Simple" Comment="metering_server:get_profile/get_sampled_data/local_change_supply/request_mirror/remove_mirror/optional"/>
+        <Argument Name="ZCL_PRICE_CLIENT_CALLBACKS" GenericType="Simple" Comment="price_client:publish_price/optional"/>
+        <Argument Name="ZCL_PRICE_SERVER_CALLBACKS" GenericType="Simple" Comment="price_server:get_current_price/price_ack/get_tariff_info/get_price_matrix/get_block_thresholds/optional"/>
+        <Argument Name="ZCL_IAS_ACE_SERVER_CALLBACKS" GenericType="Simple" Comment="iasAce_server:arm_req/bypass_req/emerg_req/fire_req/panic_req"/>
+        <Argument Name="ZCL_IAS_WD_SERVER_CALLBACKS" GenericType="Simple" Comment="iasWd_server:start_warning/squawk"/>
+        <Argument Name="ZCL_IAS_ZONE_CLIENT_CALLBACKS" GenericType="Simple" Comment="iasZone_client:zone_status_change(struct ZbZclClusterT *clusterPtr, void *arg, struct ZbZclIasZoneServerStatusChangeNotifyT *notify, struct ZbApsAddrT const *src)/zone_enroll_req(struct ZbZclClusterT *clusterPtr, void *arg, struct ZbZclIasZoneServerEnrollRequestT *req, uint64_t ext_src_addr, enum ZbZclIasZoneClientResponseCodeT *rsp_code, uint8_t *zone_id)"/>
+        <Argument Name="ZCL_IAS_ZONE_SERVER_CALLBACKS" GenericType="Simple" Comment="iasZone_server:mode_change(struct ZbZclClusterT *clusterPtr, void *arg, enum ZbZclIasZoneServerModeT mode, struct ZbZclIasZoneClientTestModeReqT *req)"/>
+
+        <!-- Clusters -->
+        <Argument Name="ZCL_BASIC_ENDPOINT1" GenericType="Simple" Comment="basic"/>
+        <Argument Name="ZCL_IDENTIFY_ENDPOINT1" GenericType="Simple" Comment="identify"/>
+        <Argument Name="ZCL_ALARMS_ENDPOINT1" GenericType="Simple" Comment="alarm"/>
+        <Argument Name="ZCL_TIME_ENDPOINT1" GenericType="Simple" Comment="time"/>
+        <Argument Name="ZCL_COMMISSIONING_ENDPOINT1" GenericType="Simple" Comment="commissioning"/>
+        <Argument Name="ZCL_GROUPS_ENDPOINT1" GenericType="Simple" Comment="groups"/>
+        <Argument Name="ZCL_SCENES_ENDPOINT1" GenericType="Simple" Comment="scenes"/>
+        <Argument Name="ZCL_OCCUPANCY_SENSING_ENDPOINT1" GenericType="Simple" Comment="occupancy"/>
+        <Argument Name="ZCL_DIAGNOSTICS_ENDPOINT1" GenericType="Simple" Comment="diagnostics"/>
+        <Argument Name="ZCL_POLL_CONTROL_ENDPOINT1" GenericType="Simple" Comment="poll_control"/>
+        <Argument Name="ZCL_POWER_CONFIGURATION_ENDPOINT1" GenericType="Simple" Comment="power_config"/>
+        <Argument Name="ZCL_POWER_PROFILE_ENDPOINT1" GenericType="Simple" Comment="power_profile"/>
+        <Argument Name="ZCL_RSSI_LOCATION_ENDPOINT1" GenericType="Simple" Comment="rssi_location"/>
+        <Argument Name="ZCL_PRESSURE_MEASUREMENT_ENDPOINT1" GenericType="Simple" Comment="pressure_meas"/>
+        <Argument Name="ZCL_DEVICE_TEMPERATURE_CONFIGURATION_ENDPOINT1" GenericType="Simple" Comment="device_temperature"/>
+        <Argument Name="ZCL_TEMPERATURE_MEASUREMENT_ENDPOINT1" GenericType="Simple" Comment="temperature_meas"/>
+        <Argument Name="ZCL_THERMOSTAT_ENDPOINT1" GenericType="Simple" Comment="thermostat"/>
+        <Argument Name="ZCL_THERMOSTAT_UI_CONFIGURATION_ENDPOINT1" GenericType="Simple" Comment="thermostat_ui"/>
+        <Argument Name="ZCL_METER_IDENTIFICATION_ENDPOINT1" GenericType="Simple" Comment="meter_id"/>
+        <Argument Name="ZCL_ELECTRICAL_MEASUREMENT_ENDPOINT1" GenericType="Simple" Comment="electrical_meas"/>
+        <Argument Name="ZCL_FAN_CONTROL_ENDPOINT1" GenericType="Simple" Comment="fan"/>
+        <Argument Name="ZCL_PUMP_CONFIGURATION_CONTROL_ENDPOINT1" GenericType="Simple" Comment="pump"/>
+        <Argument Name="ZCL_RELATIVE_HUMIDITY_MEASUREMENT_ENDPOINT1" GenericType="Simple" Comment="relative_humidity"/>
+        <Argument Name="ZCL_ON_OFF_ENDPOINT1" GenericType="Simple" Comment="onOff"/>
+        <Argument Name="ZCL_COLOR_CONTROL_ENDPOINT1" GenericType="Simple" Comment="color_control"/>
+        <Argument Name="ZCL_ILLUMINANCE_LEVEL_SENSING_ENDPOINT1" GenericType="Simple" Comment="illuminance_level"/>
+        <Argument Name="ZCL_ILLUMINANCE_MEASUREMENT_ENDPOINT1" GenericType="Simple" Comment="illuminance_meas"/>
+        <Argument Name="ZCL_LEVEL_CONTROL_ENDPOINT1" GenericType="Simple" Comment="level_control"/>
+        <Argument Name="ZCL_ON_OFF_SWITCH_CONFIGURATION_ENDPOINT1" GenericType="Simple" Comment="onoff_swconfig"/>
+        <Argument Name="ZCL_DOOR_LOCK_ENDPOINT1" GenericType="Simple" Comment="doorLock"/>
+        <Argument Name="ZCL_WINDOW_COVERING_ENDPOINT1" GenericType="Simple" Comment="window"/>
+        <Argument Name="ZCL_IAS_ACE_ENDPOINT1" GenericType="Simple" Comment="ias_ace"/>
+        <Argument Name="ZCL_IAS_WD_ENDPOINT1" GenericType="Simple" Comment="ias_wd"/>
+        <Argument Name="ZCL_IAS_ZONE_ENDPOINT1" GenericType="Simple" Comment="ias_zone"/>
+        <Argument Name="ZCL_MESSAGING_ENDPOINT1" GenericType="Simple" Comment="messaging"/>
+        <Argument Name="ZCL_DRLC_ENDPOINT1" GenericType="Simple" Comment="drlc"/>
+        <Argument Name="ZCL_METERING_ENDPOINT1" GenericType="Simple" Comment="meter"/>
+        <Argument Name="ZCL_PRICE_ENDPOINT1" GenericType="Simple" Comment="price"/>
+        <Argument Name="ZCL_TUNNELING_ENDPOINT1" GenericType="Simple" Comment="tunnel"/>
+        <Argument Name="ZCL_NEAREST_GATEWAY_ENDPOINT1" GenericType="Simple" Comment="nearest_gateway"/>
+        <Argument Name="ZCL_OTA_UPGRADE_ENDPOINT1" GenericType="Simple" Comment="ota_upgrade"/>
+        <Argument Name="ZCL_DEHUMIDIFICATION_CONTROL_ENDPOINT1" GenericType="Simple" Comment="dehumidification_ctrl"/>
+        <Argument Name="ZCL_BALLAST_CONFIGURATION_ENDPOINT1" GenericType="Simple" Comment="ballast_config"/>
+        <Argument Name="ZCL_VOICE_OVER_ZGB_ENDPOINT1" GenericType="Simple" Comment="voice"/>
+    </RefConfigFile>
+
+    <RefConfigFile Description="" Name="ZIGBEE_APP_ZIGBEE_H" Template="stm32_wpan_zigbee_app_zigbee_h.ftl">
+        <File Category="header" Condition="Semaphore_ZIGBEE" Name="App/app_zigbee.h" Version="1.0"/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="BLE_EDDYSTONE_BEACON_H" Template="stm32_wpan_ble_eddystone_beacon_h.ftl">
@@ -1032,12 +1186,12 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="BLE_P2P_CLIENT_APP_C" Template="stm32_wpan_ble_p2p_client_app_c.ftl">
-        <File Category="source" Condition="Semaphore_CUSTOM_P2P_CLIENT &amp; S_BLE_HOST" Name="App/p2p_client_app.c" Version="1.0"/>
+        <File Category="source" Condition="Semaphore_BLE_CLIENT_PROFILE &amp; S_BLE_HOST" Name="App/p2p_client_app.c" Version="1.0"/>
         <Argument Name="FREERTOS_STATUS" GenericType="Simple" Comment="0 to 1 (0 by default)"/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="BLE_P2P_CLIENT_APP_H" Template="stm32_wpan_ble_p2p_client_app_h.ftl">
-        <File Category="header" Condition="Semaphore_CUSTOM_P2P_CLIENT &amp; S_BLE_HOST" Name="App/p2p_client_app.h" Version="1.0"/>
+        <File Category="header" Condition="Semaphore_BLE_CLIENT_PROFILE &amp; S_BLE_HOST" Name="App/p2p_client_app.h" Version="1.0"/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="BLE_P2P_SERVER_APP_C" Template="stm32_wpan_ble_p2p_server_app_c.ftl">
@@ -1050,12 +1204,12 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="BLE_P2P_ROUTER_APP_C" Template="stm32_wpan_ble_p2p_routeur_app_c.ftl">
-        <File Category="source" Condition="Semaphore_CUSTOM_P2P_ROUTER &amp; S_BLE_HOST" Name="App/p2p_routeur_app.c" Version="1.0"/>
+        <File Category="source" Condition="Semaphore_BLE_ROUTER_PROFILE &amp; S_BLE_HOST" Name="App/p2p_routeur_app.c" Version="1.0"/>
         <Argument Name="FREERTOS_STATUS" GenericType="Simple" Comment="0 to 1 (0 by default)"/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="BLE_P2P_ROUTER_APP_H" Template="stm32_wpan_ble_p2p_routeur_app_h.ftl">
-        <File Category="header" Condition="Semaphore_CUSTOM_P2P_ROUTER &amp; S_BLE_HOST" Name="App/p2p_routeur_app.h" Version="1.0"/>
+        <File Category="header" Condition="Semaphore_BLE_ROUTER_PROFILE &amp; S_BLE_HOST" Name="App/p2p_routeur_app.h" Version="1.0"/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="BLE_TM_C" Template="stm32_wpan_ble_tm_c.ftl">
@@ -2200,9 +2354,9 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
 
 <!-- STM32_WPAN/target begin -->
 
-    <RefConfigFile Description="" Name="BLE_HW_IPCC_C" Template="stm32_wpan_hw_ipcc_c.ftl">
+    <RefConfigFile Description="" Name="WB_HW_IPCC_C" Template="stm32_wpan_hw_ipcc_c.ftl">
         <File Category="source" Condition="all" Name="Target/hw_ipcc.c" Version="1.0"/>
-    </RefConfigFile>    
+    </RefConfigFile>
 
 <!-- STM32_WPAN/target end -->
 

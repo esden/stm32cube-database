@@ -11,7 +11,7 @@
 
 [#assign BLE_TRANSPARENT_MODE_UART = 0]
 [#assign BLE_TRANSPARENT_MODE_VCP = 0]
-[#assign BT_SIG_BEACON = 0]
+[#assign BT_SIG_BEACON = "0"]
 [#assign BT_SIG_BLOOD_PRESSURE_SENSOR = 0]
 [#assign BT_SIG_HEALTH_THERMOMETER_SENSOR = 0]
 [#assign BT_SIG_HEART_RATE_SENSOR = 0]
@@ -30,7 +30,7 @@
             [#if (definition.name == "BLE_TRANSPARENT_MODE_VCP") && (definition.value == "Enabled")]
                 [#assign BLE_TRANSPARENT_MODE_VCP = 1]
             [/#if]
-            [#if (definition.name == "BT_SIG_BEACON") && (definition.value == "Enabled")]
+            [#if (definition.name == "BT_SIG_BEACON") && (definition.value != "Disabled")]
                 [#assign BT_SIG_BEACON = 1]
             [/#if]
             [#if (definition.name == "BT_SIG_BLOOD_PRESSURE_SENSOR") && (definition.value == "Enabled")]

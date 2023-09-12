@@ -1,25 +1,26 @@
 [#ftl]
 /**
   ******************************************************************************
-  * File Name          : ${name}.h
-  * Description        : This file provides code for the configuration
-  *                      of the ${name} instances.
+  * @file    ${name?lower_case}.h
+  * @brief   This file contains all the function prototypes for
+  *          the ${name?lower_case}.c file
   ******************************************************************************
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __${name?lower_case}_H
-#define __${name?lower_case}_H
+#ifndef __${name}_H__
+#define __${name}_H__
+
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
 [#compress]
 #include "main.h"
 
-[#if H7_ETH_NoLWIP?? &&HALCompliant??]
+[#if H7_ETH_NoLWIP?? && !HALCompliant??]
 #include "string.h"
 [/#if]
 
@@ -84,14 +85,7 @@ extern ${variable.value} ${variable.name};
 #ifdef __cplusplus
 }
 #endif
-#endif /*__ ${name?lower_case}_H */
 
-/**
-  * @}
-  */
-
-/**
-  * @}
-  */
+#endif /* __${name}_H__ */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

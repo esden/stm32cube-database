@@ -13,12 +13,16 @@
 [#assign SRC = false]
 [#assign SNK = false]
 [#assign DRP = false]
+[#assign USBPD_CoreLib = ""]
 [#-- SWIPdatas is a list of SWIPconfigModel --]
 [#list SWIPdatas as SWIP]
     [#if SWIP.defines??]
         [#list SWIP.defines as definition]
             [#if definition.name=="USBPD_NbPorts"]
                 [#assign nbPorts = definition.value]
+            [/#if]
+            [#if definition.name == "USBPD_CoreLib" && definition.value != ""]
+                [#assign USBPD_CoreLib = definition.value]
             [/#if]
             [#if definition.name == "SRC" && definition.value == "true"]
                 [#assign SRC = true]
@@ -41,11 +45,12 @@
 /* Includes ------------------------------------------------------------------*/
 #include "usbpd_pwr_if.h"
 #include "usbpd_hw_if.h"
-#include "usbpd_pwr_if.h"
+[#if USBPD_CoreLib != "USBPDCORE_LIB_NO_PD"]
 #include "usbpd_dpm_core.h"
 #include "usbpd_dpm_conf.h"
 #include "usbpd_pdo_defs.h"
 #include "usbpd_core.h"
+[/#if]
 #if defined(_TRACE)
 #include "usbpd_trace.h"
 #endif /* _TRACE */
@@ -129,6 +134,7 @@
   * @{
   */
 
+[#if USBPD_CoreLib != "USBPDCORE_LIB_NO_PD"]
 /**
   * @brief  Initialize structures and variables related to power board profiles
   *         used by Sink and Source, for all available ports.
@@ -174,6 +180,7 @@ USBPD_StatusTypeDef USBPD_PWR_IF_SupplyReady(uint8_t PortNum, USBPD_VSAFE_Status
   return USBPD_ERROR;
 /* USER CODE END USBPD_PWR_IF_SupplyReady */
 }
+[/#if]
 
 [#if SRC || DRP]
 /**
@@ -201,7 +208,10 @@ USBPD_StatusTypeDef USBPD_PWR_IF_VBUSDisable(uint8_t PortNum)
   return _status;
 /* USER CODE END USBPD_PWR_IF_VBUSDisable */
 }
+[/#if]
 
+[#if USBPD_CoreLib != "USBPDCORE_LIB_NO_PD"]
+[#if SRC || DRP]
 /**
   * @brief  Checks if the power on a specified port is enabled
   * @param  PortNum Port number
@@ -360,6 +370,7 @@ void USBPD_PWR_IF_Alarm()
 
 /* USER CODE END USBPD_PWR_IF_Alarm */
 }
+[/#if]
 
 /**
   * @brief Function is called to get VBUS power status.
@@ -391,6 +402,7 @@ uint8_t USBPD_PWR_IF_GetVBUSStatus(uint8_t PortNum, USBPD_VBUSPOWER_STATUS Power
 /* USER CODE END USBPD_PWR_IF_GetVBUSStatus */
 }
 
+[#if USBPD_CoreLib != "USBPDCORE_LIB_NO_PD"]
 /**
   * @brief Function is called to set the VBUS threshold when a request has been accepted.
   * @param PortNum Port number
@@ -412,7 +424,18 @@ void USBPD_PWR_IF_ResetVbusThreshold(uint8_t PortNum)
 /* USER CODE BEGIN USBPD_PWR_IF_ResetVbusThreshold */
 /* USER CODE END USBPD_PWR_IF_ResetVbusThreshold */
 }
+[/#if]
 
+/**
+  * @}
+  */
+
+/** @addtogroup STM32_USBPD_APPLICATION_POWER_IF_Private_Functions
+  * @{
+  */
+/* USER CODE BEGIN USBPD_USER_PRIVATE_FUNCTIONS_Definition */
+
+/* USER CODE END USBPD_USER_PRIVATE_FUNCTIONS_Definition */
 /**
   * @}
   */

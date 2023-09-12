@@ -1,1 +1,1 @@
-Manifest=openstlinux-20-05-12_internal
+Manifest=ostl-20-11-12-rc3

@@ -122,7 +122,7 @@
     [#if IdeMode?? || ide=="STM32CubeIDE" || family=="STM32MP1xx"]
     <cpucore>${cpuCore}</cpucore>    
     [#else]
-    <cpucore>[#if (multiConfig == "true") && TrustZone=="0"]${cpuCore?replace("ARM Cortex-", "C")}[#else][/#if]</cpucore>
+    <cpucore>[#if (multiConfig == "true") && TrustZone=="0"]${cpuCore?replace("ARM Cortex-", "C")?replace("+", "PLUS")}[#else][/#if]</cpucore>
     [/#if]
     <fpu>${fpu}</fpu>  [#--add FPU for UC30 --]
     [#if !IdeMode?? && (multiConfig == "true")]

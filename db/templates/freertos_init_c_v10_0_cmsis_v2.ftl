@@ -319,4 +319,42 @@
 #t/* USER CODE END RTOS_THREADS */
 #n
 
+[#list SWIPdatas as SWIP]
+  [#if SWIP.variables??]
+    [#list SWIP.variables as variable]
+      [#if variable.name=="Events"]
+        [#assign s = variable.valueList]
+        [#assign index = 0]
+        [#list s as i]
+          [#if index == 0] 
+            [#assign eventName = i]
+          [/#if]
+          [#if index == 1]
+            [#assign eventAllocation = i]
+          [/#if]
+          [#if index == 2]
+            [#assign eventControl = i]
+          [/#if]
+          [#assign index = index + 1]
+        [/#list]
+        [#if eventName != "0"]
+          [#assign nbM = nbM + 1]
+          [#if nbM == 1]
+            #t/* Create the event(s) */
+          [/#if]
+            #t/* creation of ${eventName} */
+            #t${eventName}Handle = osEventFlagsNew(&${eventName}_attributes);
+            #n
+        [/#if]
+      [/#if]
+    [/#list]
+  [/#if] 
+[/#list]
+
+#n
+#t/* USER CODE BEGIN RTOS_EVENTS */
+#t/* add events, ... */          
+#t/* USER CODE END RTOS_EVENTS */
+#n
+
 [/#compress]

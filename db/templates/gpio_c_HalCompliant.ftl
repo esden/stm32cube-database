@@ -2,7 +2,7 @@
 
 [#assign contextFolder=""]
 [#if cpucore!=""]
-[#assign contextFolder = cpucore?replace("ARM_CORTEX_","C")+"/"]
+[#assign contextFolder = cpucore?replace("ARM_CORTEX_","C")?replace("+","PLUS")+"/"]
 [/#if]
 
 [#compress]

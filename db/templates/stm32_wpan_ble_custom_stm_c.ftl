@@ -3154,7 +3154,7 @@ void SVCCTL_InitCustomSvc(void)
     /*
      *          [@serviceLongName service/]
      *
-     * Max_Attribute_Records = 1 + 2*${SERVICES_NUMBER_OF_CHARACTERISTICS[service?string]} + 1*no_of_char_with_notify_or_indicate_property
+     * Max_Attribute_Records = 1 + 2*${SERVICES_NUMBER_OF_CHARACTERISTICS[service?string]} + 1*no_of_char_with_notify_or_indicate_property + 1*no_of_char_with_broadcast_property
      * service_max_attribute_record = 1 for [@serviceLongName service/] +
         [#list 1..SERVICES_NUMBER_OF_CHARACTERISTICS[service?string]?number as characteristic]
      *                                2 for [@characteristicLongName service characteristic/] +
@@ -3165,6 +3165,12 @@ void SVCCTL_InitCustomSvc(void)
                 (SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_INDICATE]?? &&
                 SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_INDICATE] != "")]
      *                                1 for [@characteristicLongName service characteristic/] configuration descriptor +
+            [/#if]
+        [/#list]
+        [#list 1..SERVICES_NUMBER_OF_CHARACTERISTICS[service?string]?number as characteristic]
+            [#if (SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_BROADCAST]??  &&
+                SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_BROADCAST] != "")]
+     *                                1 for [@characteristicLongName service characteristic/] broadcast property +
             [/#if]
         [/#list]
      *                              = ${SERVICES_INFO[service?string][item_MAX_ATTRIBUTES_RECORDS]}

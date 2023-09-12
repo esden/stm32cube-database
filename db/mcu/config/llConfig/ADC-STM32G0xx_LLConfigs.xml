@@ -2,7 +2,17 @@
 <IP xmlns="http://mcd.rou.st.com/modules.php?name=mcu" DBVersion="V6.0" Name="ADC" Version="STM32Cube_FW_G0_V0.6.0" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" IncludeFile="stm32g0xx_ll_adc.h" ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Configs.xsd">
 
     <RefConfig Name="ADC_RegularConfig" Comment="Configure the global features of the ADC (Clock, Resolution, Data Alignment and number of conversion)">
-	
+	<CallLibMethod Name="" Type="HardCode"  >
+                <HardCode Text="#t            
+            #n#t  #define ADC_CHANNEL_CONF_RDY_TIMEOUT_MS ( 1U)
+  #n#t  #if (USE_TIMEOUT == 1)     
+    #n#t  uint32_t Timeout ; /* Variable used for Timeout management */
+  #n#t  #endif /* USE_TIMEOUT */
+  #n
+  #n
+  
+         "/>
+            </CallLibMethod>
         <IFCondition Expression="(ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV1) | (ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV2) |(ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV4) ">
             <CallLibMethod Name="LL_ADC_Init">
                 <MethodArg Name="ADCx" ParameterName="Instance" />
@@ -21,6 +31,52 @@
                 <MethodArg Name="LowPowerMode" ParameterName="LowPowerAutoWait,LowPowerAutoPowerOff" />
             </CallLibMethod>
         </IFCondition>
+        <IFCondition Expression ="1=1">
+
+            <IFCondition  Expression="Sequencer = FULLY_CONFIGURABLE ">
+                <CallLibMethod Name="LL_ADC_REG_SetSequencerConfigurable">
+                    <MethodArg Name="ADCx" ParameterName="Instance" />
+                    <MethodArg Name="Configurability" ParameterName="Sequencer" />
+                </CallLibMethod>
+           <CallLibMethod Name="" Type="HardCode"  >
+                <HardCode Text="#t
+                
+                
+             #n#t   /* Poll for ADC channel configuration ready */
+   #n#t  #if (USE_TIMEOUT == 1)
+   #n#t   Timeout = ADC_CHANNEL_CONF_RDY_TIMEOUT_MS;
+  #n#t   #endif /* USE_TIMEOUT */
+  #n#t   while (LL_ADC_IsActiveFlag_CCRDY(ADC1) == 0)
+   #n#t#t   {
+  #n#t  #if (USE_TIMEOUT == 1)
+  #n#t   /* Check Systick counter flag to decrement the time-out value */
+   #n#t  if (LL_SYSTICK_IsActiveCounterFlag())
+     #n#t#t  {
+  #n#t  if(Timeout-- == 0)
+      #n#t#t#t#t   {
+   #n#t Error_Handler();
+       #n#t#t#t#t   }
+     #n#t#t }
+   #n#t #endif /* USE_TIMEOUT */
+    #n#t#t  }
+    #n#t  /* Clear flag ADC channel configuration ready */
+  #n#t   LL_ADC_ClearFlag_CCRDY(ADC1);
+   
+   
+"/>
+            </CallLibMethod>
+            </IFCondition>
+            
+            <IFCondition  Expression="Sequencer = NOT_FULLY_CONFIGURABLE ">
+                <CallLibMethod Name="LL_ADC_REG_SetSequencerConfigurable">
+                    <MethodArg Name="ADCx" ParameterName="Instance" />
+                    <MethodArg Name="Configurability" ParameterName="Sequencer" />
+                </CallLibMethod>       
+            </IFCondition>
+            
+             
+                    </IFCondition>
+
         <IFCondition Expression="1=1">
         <CallLibMethod Name="LL_ADC_REG_Init">
             <MethodArg Name="ADCx" ParameterName="Instance" />
@@ -47,11 +103,13 @@
                 <MethodArg Name="CommonClock" ParameterName="CommonClock" />
             </CallLibMethod>
         </IFCondition>
-        <IFCondition  Expression="Sequencer = NOT_FULLY_CONFIGURABLE ">
+       <IFCondition  Expression="Sequencer = NOT_FULLY_CONFIGURABLE ">
             <CallLibMethod Name="LL_ADC_REG_SetSequencerScanDirection">
                 <MethodArg Name="ADCx" ParameterName="Instance" />
                 <MethodArg Name="ScanDirection" ParameterName="ScanConvMode" />
             </CallLibMethod>
+           
+            
         </IFCondition>
          <IFCondition  Expression="1=1">
             <CallLibMethod Name="LL_ADC_SetOverSamplingScope">
@@ -72,6 +130,35 @@
                 <MethodArg Name="ADCx" ParameterName="Instance" />
                 <MethodArg Name="Resolution" ParameterName="TriggerFrequencyMode" />
             </CallLibMethod>
+            <IFCondition Expression="Sequencer = NOT_FULLY_CONFIGURABLE ">
+            <CallLibMethod Name="LL_ADC_REG_SetSequencerChAdd">
+                <MethodArg Name="ADCx" ParameterName="Instance" />
+                <MethodArg Name="Channel" ParameterName="SelectedChannel" />
+            </CallLibMethod>   
+            <CallLibMethod Name="" Type="HardCode"  >
+                <HardCode Text="#t
+            #n#t   /* Poll for ADC channel configuration ready */
+   #n#t  #if (USE_TIMEOUT == 1)
+   #n#t   Timeout = ADC_CHANNEL_CONF_RDY_TIMEOUT_MS;
+  #n#t   #endif /* USE_TIMEOUT */
+  #n#t   while (LL_ADC_IsActiveFlag_CCRDY(ADC1) == 0)
+   #n#t#t   {
+  #n#t  #if (USE_TIMEOUT == 1)
+  #n#t   /* Check Systick counter flag to decrement the time-out value */
+   #n#t  if (LL_SYSTICK_IsActiveCounterFlag())
+     #n#t#t  {
+  #n#t  if(Timeout-- == 0)
+      #n#t#t#t#t   {
+   #n#t Error_Handler();
+       #n#t#t#t#t   }
+     #n#t#t }
+   #n#t #endif /* USE_TIMEOUT */
+    #n#t#t  }
+    #n#t  /* Clear flag ADC channel configuration ready */
+  #n#t   LL_ADC_ClearFlag_CCRDY(ADC1);
+"/>
+            </CallLibMethod>         
+        </IFCondition>
          </IFCondition>
         <IFCondition Expression="!(ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE)">
             <CallLibMethod Name="LL_ADC_REG_SetTriggerEdge">
@@ -79,16 +166,8 @@
                 <MethodArg Name="ExternalTriggerEdge" ParameterName="ExternalTrigConvEdge" />
             </CallLibMethod>
         </IFCondition>
-            <CallLibMethod Name="LL_ADC_REG_SetSequencerConfigurable">
-                <MethodArg Name="ADCx" ParameterName="Instance" />
-                <MethodArg Name="Configurability" ParameterName="Sequencer" />
-            </CallLibMethod>
-        <IFCondition Expression="Sequencer = NOT_FULLY_CONFIGURABLE ">
-            <CallLibMethod Name="LL_ADC_REG_SetSequencerChAdd">
-                <MethodArg Name="ADCx" ParameterName="Instance" />
-                <MethodArg Name="Channel" ParameterName="SelectedChannel" />
-            </CallLibMethod>            
-        </IFCondition>  
+                
+           
         <IFCondition  Expression="1=1">
             <CallLibMethod Name="LL_ADC_SetCommonPathInternalCh">
                 <MethodArg Name="ADCxy_COMMON">
@@ -98,6 +177,7 @@
                 </MethodArg>
                 <MethodArg Name="PathInternal" ParameterName="ChannelVREF|ChannelTS|ChannelVBAT" />
             </CallLibMethod>
+              
             <CallLibMethod Name="LL_ADC_SetSamplingTimeCommonChannels">
                 <MethodArg Name="ADCx" ParameterName="Instance" />
                 <MethodArg Name="SamplingTimeY" ParameterName="SAMPLINGTIME_COMMON1" />
@@ -109,14 +189,14 @@
                 <MethodArg Name="SamplingTimeY" ParameterName="SAMPLINGTIME_COMMON2" />
                 <MethodArg Name="SamplingTimeC" ParameterName="SamplingTimeCommon2" />
             </CallLibMethod>
-            <!-- parameter EOCSelection 
-            
+            <!-- parameter EOCSelection -->
             <CallLibMethod Name="LL_ADC_DisableIT_EOC">
                 <MethodArg Name="ADCx" ParameterName="Instance" />
             </CallLibMethod>
             <CallLibMethod Name="LL_ADC_DisableIT_EOS">
                 <MethodArg Name="ADCx" ParameterName="Instance" />
-            </CallLibMethod>-->
+            </CallLibMethod>
+           
             <CallLibMethod Name="" Type="HardCode">
 		<HardCode Text="
 
@@ -162,7 +242,7 @@
                         <MethodArg Name="ADCx" ParameterName="Instance" />
                     </CallLibMethod>
                 </MethodArg>
-                <MethodArg Name="PathInternal" ParameterName="commmn" />
+                <MethodArg Name="PathInternal" ParameterName="common" />
             </CallLibMethod>
         </IFCondition-->
   
@@ -170,18 +250,59 @@
     
     <RefConfig Name="ADC_RegularChannelRankConfig" Comment="Configure Regular Channel">
         <IFCondition
-            Expression="Sequencer = FULLY_CONFIGURABLE ">
+            Expression="Sequencer = FULLY_CONFIGURABLE &amp; Channel=ADC_CHANNEL_0 ">
             <CallLibMethod Name="LL_ADC_REG_SetSequencerRanks">
                 <MethodArg Name="ADCx" ParameterName="Instance" />
                 <MethodArg Name="Rank" ParameterName="Rank" />
                 <MethodArg Name="Channel" ParameterName="Channel" />
             </CallLibMethod>
+            
             <CallLibMethod Name="LL_ADC_SetChannelSamplingTime">
                 <MethodArg Name="ADCx" ParameterName="Instance" />
                 <MethodArg Name="Channel" ParameterName="Channel" />
                 <MethodArg Name="SamplingTime" ParameterName="SamplingTime" />
             </CallLibMethod>    
         </IFCondition>
+        <IFCondition
+            Expression="Sequencer = FULLY_CONFIGURABLE &amp; Channel=ADC_CHANNEL_1|Channel=ADC_CHANNEL_2|Channel=ADC_CHANNEL_3|Channel=ADC_CHANNEL_4|Channel=ADC_CHANNEL_5|Channel=ADC_CHANNEL_6|Channel=ADC_CHANNEL_7|Channel=ADC_CHANNEL_8|Channel=ADC_CHANNEL_9|Channel=ADC_CHANNEL_10|Channel=ADC_CHANNEL_11|Channel=ADC_CHANNEL_12|Channel=ADC_CHANNEL_13|Channel=ADC_CHANNEL_14|Channel=ADC_CHANNEL_15|Channel=ADC_CHANNEL_16|Channel=ADC_CHANNEL_17|Channel=ADC_CHANNEL_18|Channel=ADC_CHANNEL_TEMPSENSOR|Channel=ADC_CHANNEL_VREFINT|Channel=ADC_CHANNEL_VBAT">
+            <CallLibMethod Name="LL_ADC_REG_SetSequencerRanks">
+                <MethodArg Name="ADCx" ParameterName="Instance" />
+                <MethodArg Name="Rank" ParameterName="Rank" />
+                <MethodArg Name="Channel" ParameterName="Channel" />
+            </CallLibMethod>
+            <CallLibMethod Name="" Type="HardCode"  >
+                <HardCode Text="#t
+            #n#t   /* Poll for ADC channel configuration ready */
+   #n#t  #if (USE_TIMEOUT == 1)
+   #n#t   Timeout = ADC_CHANNEL_CONF_RDY_TIMEOUT_MS;
+  #n#t   #endif /* USE_TIMEOUT */
+  #n#t   while (LL_ADC_IsActiveFlag_CCRDY(ADC1) == 0)
+   #n#t#t   {
+  #n#t  #if (USE_TIMEOUT == 1)
+  #n#t   /* Check Systick counter flag to decrement the time-out value */
+   #n#t  if (LL_SYSTICK_IsActiveCounterFlag())
+     #n#t#t  {
+  #n#t  if(Timeout-- == 0)
+      #n#t#t#t#t   {
+   #n#t Error_Handler();
+       #n#t#t#t#t   }
+     #n#t#t }
+   #n#t #endif /* USE_TIMEOUT */
+    #n#t#t  }
+    #n#t  /* Clear flag ADC channel configuration ready */
+  #n#t   LL_ADC_ClearFlag_CCRDY(ADC1);
+"/>
+            </CallLibMethod>
+            
+
+            
+            <CallLibMethod Name="LL_ADC_SetChannelSamplingTime">
+                <MethodArg Name="ADCx" ParameterName="Instance" />
+                <MethodArg Name="Channel" ParameterName="Channel" />
+                <MethodArg Name="SamplingTime" ParameterName="SamplingTime" />
+            </CallLibMethod>    
+        </IFCondition>
+        
         <!--IFCondition Expression ="(Channel = ADC_CHANNEL_TEMPSENSOR) | (Channel = ADC_CHANNEL_VREFINT) | (Channel = ADC_CHANNEL_VBAT)">
             <CallLibMethod Name="LL_ADC_SetCommonPathInternalCh">
                 <MethodArg Name="ADCxy_COMMON">
@@ -189,7 +310,7 @@
                         <MethodArg Name="ADCx" ParameterName="Instance" />
                     </CallLibMethod>
                 </MethodArg>
-                <MethodArg Name="PathInternal" ParameterName="commmn" />
+                <MethodArg Name="PathInternal" ParameterName="common" />
             </CallLibMethod>
         </IFCondition--> 
     </RefConfig>

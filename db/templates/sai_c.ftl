@@ -457,6 +457,10 @@
     [@common.optinclude name=mxTmpFolder+"/resmgrutility_"+instName+".tmp"/][#-- ADD RESMGR_UTILITY Code--]
 [/#if]
 
+#t/* USER CODE BEGIN ${instName}_Init 0 */
+#n
+ #t/* USER CODE END ${instName}_Init 0 */
+#n
         [#-- assign ipInstanceIndex = instName?replace(name,"")--]
         [#assign args = ""]
         [#assign listOfLocalVariables =""]
@@ -465,10 +469,20 @@
             [@common.getLocalVariable configModel1=config listOfLocalVariables=listOfLocalVariables resultList=resultList/]
             [#assign listOfLocalVariables =resultList]
 
+#t/* USER CODE BEGIN ${instName}_Init 1 */
+#n
+#t/* USER CODE END ${instName}_Init 1 */
+#n
+
         [/#list]
         [#--list instanceData.configs as config--]
             [#if instanceData.instIndex??][@common.generateConfigModelCode configModel=instanceData inst=instName  nTab=1 index=instanceData.instIndex mode="Init"/][#else][@common.generateConfigModelCode configModel=instanceData inst=instName  nTab=1 index="" mode="Init"/][/#if]
         [#--list--]
+
+#t/* USER CODE BEGIN ${instName}_Init 2 */
+#n
+#t/* USER CODE END ${instName}_Init 2 */
+
 #n}
   
 [/#list]

@@ -159,7 +159,7 @@ __weak int32_t BSP_USBPD_PWR_VBUSInit(uint32_t Instance)
   }
   else
   {
-    PWR_DEBUG_TRACE(Instance, "HELP: Update BSP_USBPD_PWR_VBUSInit");
+    PWR_DEBUG_TRACE(Instance, "ADVICE: Update BSP_USBPD_PWR_VBUSInit");
   }
 
   return ret;
@@ -208,7 +208,7 @@ __weak int32_t BSP_USBPD_PWR_VBUSOn(uint32_t Instance)
   else
   {
     ret = BSP_ERROR_FEATURE_NOT_SUPPORTED;
-    PWR_DEBUG_TRACE(Instance, "HELP: Update BSP_USBPD_PWR_VBUSOn");
+    PWR_DEBUG_TRACE(Instance, "ADVICE: Update BSP_USBPD_PWR_VBUSOn");
   }
   return ret;
   /* USER CODE END BSP_USBPD_PWR_VBUSOn */
@@ -234,7 +234,7 @@ __weak int32_t BSP_USBPD_PWR_VBUSOff(uint32_t Instance)
   else
   {
     ret = BSP_ERROR_FEATURE_NOT_SUPPORTED;
-    PWR_DEBUG_TRACE(Instance, "HELP: Update BSP_USBPD_PWR_VBUSOff");
+    PWR_DEBUG_TRACE(Instance, "ADVICE: Update BSP_USBPD_PWR_VBUSOff");
   }
   return ret;
   /* USER CODE END BSP_USBPD_PWR_VBUSOff */
@@ -375,7 +375,7 @@ __weak int32_t BSP_USBPD_PWR_VBUSGetVoltage(uint32_t Instance, uint32_t *pVoltag
   else
   {
     ret = BSP_ERROR_FEATURE_NOT_SUPPORTED;
-    PWR_DEBUG_TRACE(Instance, "HELP: Update BSP_USBPD_PWR_VBUSGetVoltage");
+    PWR_DEBUG_TRACE(Instance, "ADVICE: Update BSP_USBPD_PWR_VBUSGetVoltage");
   }
   *pVoltage = val;
   return ret;
@@ -616,7 +616,7 @@ __weak int32_t BSP_USBPD_PWR_VBUSIsOn(uint32_t Instance, uint8_t *pState)
   else
   {
     ret = BSP_ERROR_FEATURE_NOT_SUPPORTED;
-    PWR_DEBUG_TRACE(Instance, "HELP: Update BSP_USBPD_PWR_VBUSIsOn");
+    PWR_DEBUG_TRACE(Instance, "ADVICE: Update BSP_USBPD_PWR_VBUSIsOn");
   }
   *pState = state;
   return ret;

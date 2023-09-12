@@ -64,6 +64,9 @@ extern "C" {
 [#if ip?contains("STM32_WPAN") && !HALCompliant??]
 #include "app_conf.h"
 [/#if]
+[#if ip?contains("KMS")]
+#include "app_kms.h"
+[/#if]
 [/#list]
 [#compress]
 [#--include "mxconstants.h"--]
@@ -130,7 +133,7 @@ extern "C" {
         [#assign includesList = includesList+" "+FamilyName?lower_case+"xx_ll_dma.h"]
     [/#if]
 
-[#if ! isHALUsed??]
+[#if !isHALUsed??]
 #if defined(USE_FULL_ASSERT)
 #include "stm32_assert.h"
 #endif /* USE_FULL_ASSERT */
@@ -274,11 +277,15 @@ void Error_Handler(void);
 #endif
 [/#if]
 [/#if]
+[#if HALCompliant??]
 [#list voids as void]
-  [#if void.bspUsed?? && void.bspUsed]
+  [#if ((void.bspUsed?? && void.bspUsed) && !void.isNotGenerated)||(void.isStatic?? && !void.isStatic && void.functionName!="SystemClock_Config")]
+[#if !void.ipType?contains("thirdparty")&&!void.ipType?contains("middleware")&&!void.functionName?contains("VREFBUF")&&void.functionName!="Init" && !void.functionName?contains("MotorControl") && !void.functionName?contains("ETZPC") && !void.functionName?contains("TRACER_EMB") && !void.functionName?contains("GUI_INTERFACE")]
 void ${""?right_pad(2)}${void.functionName}(void);
+[/#if]
   [/#if]
-[/#list] 
+[/#list]
+[/#if]
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */

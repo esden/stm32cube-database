@@ -130,7 +130,7 @@
     [#if IdeMode?? || ide=="STM32CubeIDE" || family=="STM32MP1xx"]
     <cpucore>${cpuCore}</cpucore>    
     [#else]
-    <cpucore>[#if (multiConfig == "true") && TrustZone=="0"]${cpuCore?replace("ARM Cortex-", "C")}[#else][/#if]</cpucore>
+    <cpucore>[#if ((multiConfig == "true") && TrustZone=="0")|| multiToSingleCore=="true"]${cpuCore?replace("ARM Cortex-", "C")}[#else][/#if]</cpucore>
     [/#if]
     <fpu>${fpu}</fpu>  [#--add FPU for UC30 --]
     [#if !IdeMode?? && (multiConfig == "true")]
@@ -180,7 +180,9 @@
     [/#if]
     [#-- <optimization>${project.compilerOptimization}</optimization> --]
     <optimization>${optimization}</optimization>
-
+    [#if ForceDebugOptimization?? && ide?contains("STM32CubeIDE")]
+    <ForceDebugOptimization>true</ForceDebugOptimization>
+    [/#if]
 
     <Aincludes>
         [#if usedfreeRTOS=="true" || (multiConfig == "true" && cpuCore=="ARM Cortex-M4" && usedfreeRTOS_M4?? && usedfreeRTOS_M4=="true")|| (multiConfig == "true" && cpuCore=="ARM Cortex-M7" && usedfreeRTOS_M7?? && usedfreeRTOS_M7=="true")]
@@ -381,6 +383,9 @@
 [#else]
 <Secure/>
  [/#if]
+[#if  (multiToSingleCore=="true" && !ide?contains("STM32CubeIDE"))]
+<dualAsSingle>1</dualAsSingle>
+[/#if]
     
   <filestoremove>
         
@@ -489,36 +494,40 @@
         <sourceEntry>
                     <name>Middlewares</name>
                     </sourceEntry>
-            [#list MiddlewareList as Middleware]
-            [#if TrustZone == "0"]
+        [#if sourceStructure == "Advanced"]
+            [#list MiddlewareList as Middleware] 
+                [#if Middleware != "FREERTOS"]                    
+                        [#if TrustZone == "0"]
                     <sourceEntry>
                     <name>${Middleware}</name>
-                [#if multiConfigurationProject?? && family!="STM32MP1xx"]
-                    [#if Middleware?starts_with("CM4")]
-                        <excluded>
-                            <configuration>${Configuration}_CM7</configuration>
-                        </excluded>
+                    [#if multiConfigurationProject?? && family!="STM32MP1xx"]
+                        [#if Middleware?starts_with("CM4")]
+                            <excluded>
+                                <configuration>${Configuration}_CM7</configuration>
+                            </excluded>
+                        [/#if]
+                        [#if Middleware?starts_with("CM7")]
+                            <excluded>
+                                <configuration>${Configuration}_CM4</configuration>
+                            </excluded>
+                        [/#if]
                     [/#if]
-                    [#if Middleware?starts_with("CM7")]
-                        <excluded>
-                            <configuration>${Configuration}_CM4</configuration>
-                        </excluded>
-                    [/#if]
-                [/#if]
                     </sourceEntry>
-            [#else] [#-- trustzone == 1 --]
-                [#if Middleware?starts_with("Secure") && prjSecure=="1"]
+                [#else] [#-- trustzone == 1 --]
+                    [#if Middleware?starts_with("Secure") && prjSecure=="1"]
+                        <sourceEntry>
+                            <name>${Middleware}</name>
+                    </sourceEntry>
+                    [/#if]
+                    [#if Middleware?starts_with("NonSecure") && prjSecure=="0"]
                     <sourceEntry>
                             <name>${Middleware}</name>
                     </sourceEntry>
-                [/#if]
-                [#if Middleware?starts_with("NonSecure") && prjSecure=="0"]
-                    <sourceEntry>
-                            <name>${Middleware}</name>
-                    </sourceEntry>
+                    [/#if]
                 [/#if]
             [/#if]
         [/#list]
+    [/#if]
         [/#if]
 	
         [#if ResMgr_Utility?? || (UtilitiesGroup?? && UtilitiesGroup.sourceFilesNameList?size>0)]
@@ -740,6 +749,7 @@
             [/#if]
         </group>
         [/#if]
+        
         [#list externalGroups as grp]
             [@getGroups groupArg=grp/]
         [/#list]
@@ -872,7 +882,9 @@
         [/#if]       
         [/#if]
         
+    [#if sourceStructure == "Advanced"]
         [#list MiddlewareList as Middleware] 
+            [#if Middleware != "FREERTOS"]             
             [#if TrustZone == "0"]
                     <sourceEntry>
                     <name>${Middleware}</name>
@@ -901,7 +913,9 @@
                     </sourceEntry>
                 [/#if]
             [/#if]
+            [/#if]
         [/#list]
+        [/#if]
         [#-- ************************* --]
 	[/#if]
         [#if ResMgr_Utility?? || (UtilitiesGroup?? && UtilitiesGroup.sourceFilesNameList?size>0)]
@@ -909,7 +923,7 @@
                 <name>Utilities</name>
             </sourceEntry>
         [/#if]
-        [#if ThirdPartyPackList??]
+        [#if ThirdPartyPackList??]        
             [#list ThirdPartyPackList as pack]
      [#if pack !=  ""]
         <sourceEntry>
@@ -922,9 +936,9 @@
         </sourceEntries>
 [#-- add lib path --]   
 <Groups>
-        [#if atLeastOneMiddlewareIsUsed]
+        [#if atLeastOneMiddlewareIsUsed]                
             [#assign libExist = "0"]
-            [#list groups as group]
+            [#list groups as group]           
                 [#if group.name!="App" && group.name!="Target" ] 
                     [#if group.sourceFilesNameList??]
                         [#list group.sourceFilesNameList as filesName]
@@ -974,7 +988,7 @@
                                                     [#assign used = true]
                                                 [/#if]                                                
                                                 [#if (mw?lower_case == n?lower_case) || used]
-                                                [#assign exclude = false] 
+													[#assign exclude = false] 
                                                 [/#if]
                                             [/#list]
                                         [/#if]      
@@ -1038,6 +1052,12 @@
             [@getGroups groupArg=grp/]
         [/#list]
         [#-- end lib path --]
+        [#-- BZ89738 --]
+         [#if atLeastOneMiddlewareIsUsed]
+         	[#list groups as group]
+         	 	[@getGroups groupArg=group/]
+         	[/#list]  
+         [/#if]           
     </Groups>
     [/#if]
 
@@ -1065,10 +1085,11 @@
 [#if isMWUsed == "true" || TrustZone=="0"]
 
     <group>
-        <name>Middlewares</name> 
+        <name>Middlewares</name> 		
         [#assign grpList = []]
         [#list groups as group]
 [#-- search excluded groups --] 
+[#-- MZA 94378 --]
                 [#assign excludedGroup = "false"]
                 [#if multiConfigurationProject?? && usedMWPerCore?? && TrustZone=="0"]                    
 					[#assign exclude = true]										
@@ -1086,7 +1107,7 @@
                             [/#if]
                             [#if n?starts_with("PDMFilter") && mwName?starts_with("PDM2PCM")]
                                 [#assign used = true]
-                            [/#if]  																						
+                            [/#if]  					
                             [#if (mw?lower_case == n?lower_case) || used]													
 								[#assign exclude = false] 
                             [/#if]
@@ -1417,7 +1438,7 @@
             </group>
     [/#if]
 [/#list] 
-        </group>
+        </group>        
 </Groups>
 [/#if]
 </Project>

@@ -11,7 +11,7 @@
 /* USER CODE END Header */
 [#assign BLE_TRANSPARENT_MODE_UART = 0]
 [#assign BLE_TRANSPARENT_MODE_VCP = 0]
-[#assign BT_SIG_BEACON = 0]
+[#assign BT_SIG_BEACON = "0"]
 [#assign BT_SIG_BLOOD_PRESSURE_SENSOR = 0]
 [#assign BT_SIG_HEALTH_THERMOMETER_SENSOR = 0]
 [#assign BT_SIG_HEART_RATE_SENSOR = 0]
@@ -24,6 +24,7 @@
 [#assign CFG_USB_INTERFACE_ENABLE_VALUE = 0]
 [#assign THREAD = 0]
 [#assign BLE = 0]
+[#assign ZIGBEE = 0]
 [#assign CFG_FULL_LOW_POWER = 0]
 [#assign CFG_DEBUG_TRACE_LIGHT = 0]
 [#assign CFG_DEBUG_TRACE_FULL = 0]
@@ -71,8 +72,8 @@
             [#if (definition.name == "BLE_TRANSPARENT_MODE_VCP") && (definition.value == "Enabled")]
                 [#assign BLE_TRANSPARENT_MODE_VCP = 1]
             [/#if]
-            [#if (definition.name == "BT_SIG_BEACON") && (definition.value == "Enabled")]
-                [#assign BT_SIG_BEACON = 1]
+            [#if (definition.name == "BT_SIG_BEACON") && (definition.value != "Disabled")]
+                [#assign BT_SIG_BEACON = definition.value]
             [/#if]
             [#if (definition.name == "BT_SIG_BLOOD_PRESSURE_SENSOR") && (definition.value == "Enabled")]
                 [#assign BT_SIG_BLOOD_PRESSURE_SENSOR = 1]
@@ -110,6 +111,9 @@
             [/#if]
             [#if (definition.name == "THREAD") && (definition.value == "Enabled")]
                 [#assign THREAD = 1]
+            [/#if]
+            [#if (definition.name == "ZIGBEE") && (definition.value == "Enabled")]
+                [#assign ZIGBEE = 1]
             [/#if]
             [#if definition.name == "BLE_APPLICATION_TYPE"]
                 [#assign BLE_APPLICATION_TYPE = definition.value]
@@ -221,13 +225,16 @@
 #include "hw.h"
 #include "hw_conf.h"
 #include "hw_if.h"
+[#if (BLE = 1)]
+#include "ble_bufsize.h"
+[/#if]
 
 /******************************************************************************
  * Application Config
  ******************************************************************************/
-[#if (THREAD = 0)]
+[#if (BLE = 1)]
 
-[#if (BT_SIG_BEACON = 1) || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1)|| (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)|| (BT_SIG_HEART_RATE_SENSOR = 1)|| (CUSTOM_OTA = 1)|| (CUSTOM_P2P_SERVER = 1)|| (CUSTOM_P2P_CLIENT = 1)|| (CUSTOM_P2P_ROUTER = 1)|| (CUSTOM_TEMPLATE = 1)]
+[#if (BT_SIG_BEACON != "0") || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1)|| (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)|| (BT_SIG_HEART_RATE_SENSOR = 1)|| (CUSTOM_OTA = 1)|| (CUSTOM_P2P_SERVER = 1)|| (CUSTOM_P2P_CLIENT = 1)|| (CUSTOM_P2P_ROUTER = 1)|| (CUSTOM_TEMPLATE = 1)]
 /**< generic parameters ******************************************************/
 
 /**
@@ -240,7 +247,7 @@
  */
 #define CFG_ADV_BD_ADDRESS                (${CFG_ADV_BD_ADDRESS})
 [/#if]
-[#if (BT_SIG_BEACON = 1) || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1)|| (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)|| (BT_SIG_HEART_RATE_SENSOR = 1)|| (CUSTOM_OTA = 1)|| (CUSTOM_P2P_SERVER = 1)|| (CUSTOM_TEMPLATE = 1)]
+[#if (BT_SIG_BEACON != "0") || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1)|| (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)|| (BT_SIG_HEART_RATE_SENSOR = 1)|| (CUSTOM_OTA = 1)|| (CUSTOM_P2P_SERVER = 1)|| (CUSTOM_TEMPLATE = 1)]
 #define CFG_FAST_CONN_ADV_INTERVAL_MIN    (${CFG_FAST_CONN_ADV_INTERVAL_MIN_HEXA})   /**< 80ms */
 #define CFG_FAST_CONN_ADV_INTERVAL_MAX    (${CFG_FAST_CONN_ADV_INTERVAL_MAX_HEXA})  /**< 100ms */
 #define CFG_LP_CONN_ADV_INTERVAL_MIN      (${CFG_LP_CONN_ADV_INTERVAL_MIN_HEXA}) /**< 1s */
@@ -256,18 +263,22 @@
 #define LEDBUTTON_CONN_ADV_INTERVAL_MAX  (0x3E8)
 
 [/#if]
-[#if (BT_SIG_BEACON = 1) || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1)|| (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)|| (BT_SIG_HEART_RATE_SENSOR = 1)|| (CUSTOM_OTA = 1)|| (CUSTOM_P2P_SERVER = 1)|| (CUSTOM_P2P_CLIENT = 1)|| (CUSTOM_P2P_ROUTER = 1)|| (CUSTOM_TEMPLATE = 1)]
+[#if (BT_SIG_BEACON != "0") || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1)|| (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)|| (BT_SIG_HEART_RATE_SENSOR = 1)|| (CUSTOM_OTA = 1)|| (CUSTOM_P2P_SERVER = 1)|| (CUSTOM_P2P_CLIENT = 1)|| (CUSTOM_P2P_ROUTER = 1)|| (CUSTOM_TEMPLATE = 1)]
 
 /**
  * Define IO Authentication
  */
-[#if (BT_SIG_HEART_RATE_SENSOR = 1)]
+[#if (BT_SIG_HEART_RATE_SENSOR = 1)|| (CUSTOM_P2P_SERVER = 1)|| (CUSTOM_P2P_CLIENT = 1)|| (CUSTOM_P2P_ROUTER = 1)]
 #define CFG_BONDING_MODE                 (1)
 [#else]
 #define CFG_BONDING_MODE                 (${CFG_BONDING_MODE})
 [/#if]
 #define CFG_FIXED_PIN                    (${CFG_FIXED_PIN})
+[#if (CUSTOM_P2P_CLIENT = 1)|| (CUSTOM_P2P_ROUTER = 1)]
+#define CFG_USED_FIXED_PIN               (1)
+[#else]
 #define CFG_USED_FIXED_PIN               (${CFG_USED_FIXED_PIN})
+[/#if]
 #define CFG_ENCRYPTION_KEY_SIZE_MAX      (${CFG_ENCRYPTION_KEY_SIZE_MAX})
 #define CFG_ENCRYPTION_KEY_SIZE_MIN      (${CFG_ENCRYPTION_KEY_SIZE_MIN})
 
@@ -334,7 +345,7 @@
 #define RX_2M                                           0x02 
 [/#if]
 
-[#if (BT_SIG_BEACON = 1) || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1)|| (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)|| (BT_SIG_HEART_RATE_SENSOR = 1)|| (CUSTOM_OTA = 1)|| (CUSTOM_P2P_SERVER = 1)|| (CUSTOM_P2P_CLIENT = 1)|| (CUSTOM_P2P_ROUTER = 1)|| ( BLE_TRANSPARENT_MODE_UART = 1)|| ( BLE_TRANSPARENT_MODE_VCP = 1)|| (CUSTOM_TEMPLATE = 1)]
+[#if (BT_SIG_BEACON != "0") || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1)|| (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)|| (BT_SIG_HEART_RATE_SENSOR = 1)|| (CUSTOM_OTA = 1)|| (CUSTOM_P2P_SERVER = 1)|| (CUSTOM_P2P_CLIENT = 1)|| (CUSTOM_P2P_ROUTER = 1)|| ( BLE_TRANSPARENT_MODE_UART = 1)|| ( BLE_TRANSPARENT_MODE_VCP = 1)|| (CUSTOM_TEMPLATE = 1)]
 /**
 *   Identity root key used to derive LTK and CSRK
 */
@@ -375,7 +386,7 @@
 #define PUSH_BUTTON_SW2_EXTI_IRQHandler                         EXTI0_IRQHandler
 [/#if]
 
-[#if (BT_SIG_BEACON = 1)]
+[#if (BT_SIG_BEACON != "0")]
 /**
  * Beacon selection
  * Beacons are all exclusive
@@ -385,7 +396,7 @@
 #define CFG_EDDYSTONE_TLM_BEACON_TYPE   (1<<2)
 #define CFG_IBEACON                     (1<<3)
 
-#define CFG_BEACON_TYPE                 (CFG_IBEACON)
+#define CFG_BEACON_TYPE                 (${BT_SIG_BEACON})
 
 #define OTA_BEACON_DATA_ADDRESS         FLASH_BASE + 0x6000
 #define OFFSET_PAYLOAD_LENGTH           9
@@ -589,7 +600,7 @@
 #define CFG_FW_BUILD              (0)
 
 [/#if]
-[#if (BT_SIG_BEACON = 1) || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1)|| (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)|| (BT_SIG_HEART_RATE_SENSOR = 1)|| (CUSTOM_OTA = 1)|| (CUSTOM_P2P_SERVER = 1)|| (CUSTOM_P2P_CLIENT = 1)|| (CUSTOM_P2P_ROUTER = 1)|| ( BLE_TRANSPARENT_MODE_UART = 1 )|| ( BLE_TRANSPARENT_MODE_VCP = 1)|| (CUSTOM_TEMPLATE = 1)]
+[#if (BT_SIG_BEACON != "0") || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1)|| (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)|| (BT_SIG_HEART_RATE_SENSOR = 1)|| (CUSTOM_OTA = 1)|| (CUSTOM_P2P_SERVER = 1)|| (CUSTOM_P2P_CLIENT = 1)|| (CUSTOM_P2P_ROUTER = 1)|| ( BLE_TRANSPARENT_MODE_UART = 1 )|| ( BLE_TRANSPARENT_MODE_VCP = 1)|| (CUSTOM_TEMPLATE = 1)]
 
 /******************************************************************************
  * BLE Stack
@@ -598,7 +609,12 @@
  * Maximum number of simultaneous connections that the device will support.
  * Valid values are from 1 to 8
  */
+[#if (BT_SIG_BEACON != "0") || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1)|| (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)|| (BT_SIG_HEART_RATE_SENSOR = 1)|| (CUSTOM_OTA = 1)|| (CUSTOM_P2P_SERVER = 1)|| (CUSTOM_P2P_CLIENT = 1)|| ( BLE_TRANSPARENT_MODE_UART = 1 )|| ( BLE_TRANSPARENT_MODE_VCP = 1)|| (CUSTOM_TEMPLATE = 1)]
+#define CFG_BLE_NUM_LINK            2
+[/#if]
+[#if (CUSTOM_P2P_ROUTER = 1)]
 #define CFG_BLE_NUM_LINK            8
+[/#if]
 
 /**
  * Maximum number of Services that can be stored in the GATT database.
@@ -632,7 +648,7 @@
  */
 #define CFG_BLE_ATT_VALUE_ARRAY_SIZE    (1344)
 
-[#if (BT_SIG_BEACON = 1) || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1)|| (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)|| (BT_SIG_HEART_RATE_SENSOR = 1)|| (CUSTOM_OTA = 1)|| (CUSTOM_P2P_SERVER = 1)|| (CUSTOM_P2P_CLIENT = 1)|| (CUSTOM_P2P_ROUTER = 1)|| ( BLE_TRANSPARENT_MODE_UART = 1 )|| ( BLE_TRANSPARENT_MODE_VCP = 1)|| (CUSTOM_TEMPLATE = 1)]
+[#if (BT_SIG_BEACON != "0") || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1)|| (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)|| (BT_SIG_HEART_RATE_SENSOR = 1)|| (CUSTOM_OTA = 1)|| (CUSTOM_P2P_SERVER = 1)|| (CUSTOM_P2P_CLIENT = 1)|| (CUSTOM_P2P_ROUTER = 1)|| ( BLE_TRANSPARENT_MODE_UART = 1 )|| ( BLE_TRANSPARENT_MODE_VCP = 1)|| (CUSTOM_TEMPLATE = 1)]
 /**
  * Prepare Write List size in terms of number of packet
  */
@@ -668,9 +684,9 @@
 #define CFG_BLE_MASTER_SCA   0
 
 /**
- *  Source for the 32 kHz slow speed clock
- *  1 : internal RO
- *  0 : external crystal ( no calibration )
+ *  Source for the low speed clock for RF wake-up
+ *  1 : external high speed crystal HSE/32/32
+ *  0 : external low speed crystal ( no calibration )
  */
 #define CFG_BLE_LSE_SOURCE  0
 
@@ -715,7 +731,7 @@
  * for a CC/CS event, In that case, the notification TL_BLE_HCI_ToNot() is called to indicate
  * to the application a HCI command did not receive its command event within 30s (Default HCI Timeout).
  */
-[#if (THREAD = 0)]
+[#if (BLE = 1)]
 #define CFG_TLBLE_EVT_QUEUE_LENGTH 5
 [#else]
 #define CFG_TL_EVT_QUEUE_LENGTH 5
@@ -725,12 +741,10 @@
  * allocated in the queue of received events and can be used to optimize the amount of RAM allocated by the Memory Manager.
  * It should not exceed 255 which is the maximum HCI packet payload size (a greater value is a lost of memory as it will
  * never be used)
- * It shall be at least 4 to receive the command status event in one frame.
- * The default value is set to 27 to allow receiving an event of MTU size in a single buffer. This value maybe reduced
- * further depending on the application.
+ * With the current wireless firmware implementation, this parameter shall be kept to 255
  *
  */
-[#if (THREAD = 0)]
+[#if (BLE = 1)]
 #define CFG_TLBLE_MOST_EVENT_PAYLOAD_SIZE 255   /**< Set to 255 with the memory manager and the mailbox */
 
 #define TL_BLE_EVENT_FRAME_SIZE ( TL_EVT_HDR_SIZE + CFG_TLBLE_MOST_EVENT_PAYLOAD_SIZE )
@@ -753,7 +767,7 @@
 [#if (BLE_TRANSPARENT_MODE_UART = 0) && (BLE_TRANSPARENT_MODE_VCP = 0)]
     [#lt]#define CFG_CONSOLE_MENU      ${CFG_CONSOLE_MENU}
 [/#if]
-[#if (THREAD = 1)]
+[#if (THREAD = 1 || ZIGBEE = 1)]
     [#lt]#define CFG_CLI_UART    ${CFG_CLI_UART}
 [/#if]
 /******************************************************************************
@@ -773,7 +787,7 @@
     [/#if]
 [/#list]
 
- [#if THREAD = 1]
+ [#if THREAD = 1 || ZIGBEE = 1]
 /******************************************************************************
  * Low Power
  *
@@ -794,7 +808,7 @@
  *  When set to 0, the device stays in RUN mode
  */
 [/#if]
-[#if THREAD = 1]
+[#if THREAD = 1 || ZIGBEE = 1]
 [#list SWIPdatas as SWIP]
     [#if SWIP.defines??]
         [#list SWIP.defines as definition]
@@ -827,8 +841,8 @@
  ******************************************************************************/
 /**
  *  CFG_RTC_WUCKSEL_DIVIDER:  This sets the RTCCLK divider to the wakeup timer.
- *  The higher is the value, the better is the power consumption and the accuracy of the timerserver
- *  The lower is the value, the finest is the granularity
+ *  The lower is the value, the better is the power consumption and the accuracy of the timerserver
+ *  The higher is the value, the finest is the granularity
  *
  *  CFG_RTC_ASYNCH_PRESCALER: This sets the asynchronous prescaler of the RTC. It should as high as possible ( to ouput
  *  clock as low as possible) but the output clock should be equal or higher frequency compare to the clock feeding
@@ -908,6 +922,9 @@
 typedef enum
 {
   CFG_TIM_PROC_ID_ISR,
+  /* USER CODE BEGIN CFG_TimProcID_t */
+
+  /* USER CODE END CFG_TimProcID_t */
 } CFG_TimProcID_t;
 
 /******************************************************************************
@@ -930,7 +947,7 @@ typedef enum
     [/#if]
 [/#list]
 
-[#if THREAD = 0]
+[#if BLE = 1]
 [#list SWIPdatas as SWIP]
     [#if SWIP.defines??]
         [#list SWIP.defines as definition]
@@ -964,14 +981,14 @@ typedef enum
     [/#if]
 [/#list]
 
-[#if THREAD = 1]
+[#if THREAD = 1 || ZIGBEE = 1]
 #if (CFG_FULL_LOW_POWER == 1)
 #undef CFG_DEBUGGER_SUPPORTED
 #define CFG_DEBUGGER_SUPPORTED    0
 #endif /* CFG_FULL_LOW_POWER */
 [/#if]
 
-[#if (THREAD = 0)]
+[#if (BLE = 1)]
 /**
  * When set to 1, the traces are enabled in the BLE services
  */
@@ -1093,7 +1110,7 @@ typedef enum
 #define DBG_TRACE_MSG_QUEUE_SIZE 4096
 #define MAX_DBG_TRACE_MSG_SIZE 1024
 
-[#if (THREAD = 1)]
+[#if (THREAD = 1 || ZIGBEE = 1)]
 /******************************************************************************
  * Configure Log level for Application
  ******************************************************************************/
@@ -1124,7 +1141,7 @@ typedef enum
 /******************************************************************************
  * Scheduler
  ******************************************************************************/
-[#if (THREAD = 0)]
+[#if (BLE = 1)]
 
 
 /**
@@ -1137,7 +1154,7 @@ typedef enum
 /**< Add in that list all tasks that may send a ACI/HCI command */
 typedef enum
 {
-[#if BT_SIG_BEACON = 1]
+[#if BT_SIG_BEACON != "0"]
     CFG_TASK_BEACON_UPDATE_REQ_ID,
 [/#if]
 [#if (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_HEART_RATE_SENSOR = 1)]
@@ -1181,7 +1198,7 @@ typedef enum
     CFG_TASK_CONN_DEV_6_ID,
     CFG_TASK_SEARCH_SERVICE_ID,
 [/#if]
-[#if (BT_SIG_BEACON = 1) || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_HEART_RATE_SENSOR = 1) || (CUSTOM_OTA = 1) || (CUSTOM_P2P_SERVER = 1) || (CUSTOM_P2P_ROUTER = 1) || (CUSTOM_P2P_CLIENT = 1) || (CUSTOM_TEMPLATE = 1)]
+[#if (BT_SIG_BEACON != "0") || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_HEART_RATE_SENSOR = 1) || (CUSTOM_OTA = 1) || (CUSTOM_P2P_SERVER = 1) || (CUSTOM_P2P_ROUTER = 1) || (CUSTOM_P2P_CLIENT = 1) || (CUSTOM_TEMPLATE = 1)]
     CFG_TASK_HCI_ASYNCH_EVT_ID,
 [/#if]
 [#if (BLE_TRANSPARENT_MODE_UART = 1) || (BLE_TRANSPARENT_MODE_VCP = 1)]
@@ -1191,7 +1208,7 @@ typedef enum
     CFG_TASK_SYS_LOCAL_CMD_ID,
     CFG_TASK_TX_TO_HOST_ID,
 [/#if]
-[#if (BT_SIG_BEACON = 1) || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_HEART_RATE_SENSOR = 1) || (CUSTOM_OTA = 1) || (CUSTOM_P2P_SERVER = 1) || (CUSTOM_P2P_ROUTER = 1) || (CUSTOM_P2P_CLIENT = 1) || (BLE_TRANSPARENT_MODE_UART = 1) || (BLE_TRANSPARENT_MODE_VCP = 1) || (CUSTOM_TEMPLATE = 1)]
+[#if (BT_SIG_BEACON != "0") || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_HEART_RATE_SENSOR = 1) || (CUSTOM_OTA = 1) || (CUSTOM_P2P_SERVER = 1) || (CUSTOM_P2P_ROUTER = 1) || (CUSTOM_P2P_CLIENT = 1) || (BLE_TRANSPARENT_MODE_UART = 1) || (BLE_TRANSPARENT_MODE_VCP = 1) || (CUSTOM_TEMPLATE = 1)]
 /* USER CODE BEGIN CFG_Task_Id_With_HCI_Cmd_t */
 
 /* USER CODE END CFG_Task_Id_With_HCI_Cmd_t */
@@ -1247,8 +1264,14 @@ typedef enum
 
 typedef enum
 {
+[#if THREAD = 1]
   CFG_TASK_MSG_FROM_M0_TO_M4,
   CFG_TASK_SEND_CLI_TO_M0,
+[#elseif ZIGBEE = 1]
+  CFG_TASK_NOTIFY_FROM_M0_TO_M4,
+  CFG_TASK_REQUEST_FROM_M0_TO_M4,
+  CFG_TASK_ZIGBEE_NETWORK_FORM,
+[/#if]
   CFG_TASK_SYSTEM_HCI_ASYNCH_EVT,
 #if (CFG_USB_INTERFACE_ENABLE != 0)
   CFG_TASK_VCP_SEND_DATA,
@@ -1261,7 +1284,12 @@ typedef enum
 
 /* Scheduler types and defines        */
 /*------------------------------------*/
+[#if THREAD = 1]
 #define TASK_MSG_FROM_M0_TO_M4      (1U << CFG_TASK_MSG_FROM_M0_TO_M4)
+[#elseif ZIGBEE = 1]
+#define EVENT_ACK_FROM_M0_EVT        (1U << CFG_EVT_ACK_FROM_M0_EVT)
+#define EVENT_SYNCHRO_BYPASS_IDLE    (1U << CFG_EVT_SYNCHRO_BYPASS_IDLE)
+[/#if]
 /* USER CODE BEGIN DEFINE_TASK */
 
 /* USER CODE END DEFINE_TASK */
@@ -1285,6 +1313,9 @@ typedef enum
   CFG_EVT_SYSTEM_HCI_CMD_EVT_RESP,
   CFG_EVT_ACK_FROM_M0_EVT,
   CFG_EVT_SYNCHRO_BYPASS_IDLE,
+[#if ZIGBEE == 1]
+  CFG_EVT_ZIGBEE_STARTUP_ENDED,
+[/#if]
   /* USER CODE BEGIN CFG_IdleEvt_Id_t */
 
   /* USER CODE END CFG_IdleEvt_Id_t */
@@ -1292,6 +1323,9 @@ typedef enum
 
 #define EVENT_ACK_FROM_M0_EVT           (1U << CFG_EVT_ACK_FROM_M0_EVT)
 #define EVENT_SYNCHRO_BYPASS_IDLE       (1U << CFG_EVT_SYNCHRO_BYPASS_IDLE)
+[#if ZIGBEE == 1]
+#define EVENT_ZIGBEE_STARTUP_ENDED      (1U << CFG_EVT_ZIGBEE_STARTUP_ENDED)
+[/#if]
 /* USER CODE BEGIN DEFINE_EVENT */
 
 /* USER CODE END DEFINE_EVENT */

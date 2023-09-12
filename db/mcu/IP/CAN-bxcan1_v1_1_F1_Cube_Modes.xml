@@ -53,6 +53,9 @@
 	
 	<RefParameter Comment="Time Quantum" DefaultValue="1000" Name="CalculateTimeQuantum" Type="string" Unit="ns" Group="Bit Timings Parameters"/>
 	<RefParameter Comment="Time for one Bit" DefaultValue="1000" Name="CalculateTimeBit" Type="string" Unit="ns" Group="Bit Timings Parameters"/>
+        
+        <!-- **** CAN BaudRate ****-->
+        <RefParameter Comment="Baud Rate" DefaultValue="1000" Name="CalculateBaudRate" Type="string" Unit="bit/s" Group="Bit Timings Parameters"/>
 	
 	<!-- **** Transmission RefParameters for CAN Modes ****-->
 	<RefParameter Comment="Time Triggered Communication Mode" DefaultValue="DISABLE" Name="TTCM" Type="list" Group="Basic Parameters">
@@ -196,15 +199,15 @@
             		<Parameter Name="Prescaler"/>
         </RefMode>
 		
-	<!-- RefMode for 'Master' CAN Mode -->
-	<!-- For the Moment, only one Filter can be Parameter (90% of use cases). -->
-	<RefMode Name="Master" BaseMode="canBasic">
+	<!-- RefMode for CAN -->
+	<RefMode Name="CAN_Activate" BaseMode="canBasic">
 		<ConfigForMode>Can_Init</ConfigForMode>
 		<!-- 'Bit Timings' Parameters -->
 		<Parameter Name="CalculateTimeQuantum"/>
 		<Parameter Name="BS1"/>
 		<Parameter Name="BS2"/>
 		<Parameter Name="CalculateTimeBit"/>
+                <Parameter Name="CalculateBaudRate"/>
 		<Parameter Name="SJW"/>
 		<!-- 'Transmission' Parameters -->
 		<Parameter Name="TTCM"/>
@@ -232,69 +235,21 @@
 		<!-- Advanced/Debug Parameters -->
 		<Parameter Name="Mode"/>
 	</RefMode>
-	
-	<!-- RefMode for 'Slave' CAN Mode. -->
-	<!-- For the Moment, only one Filter can be Parameter (90% of use cases). -->
-	<RefMode Name="Slave" BaseMode="canBasic">
-		<ConfigForMode>Can_Init</ConfigForMode>
-		<!-- 'Bit Timing' Parameters -->
-		<Parameter Name="CalculateTimeQuantum"/>
-		<Parameter Name="BS1"/>
-		<Parameter Name="BS2"/>
-		<Parameter Name="CalculateTimeBit"/>
-		<Parameter Name="SJW"/>
-		<!-- 'Transmission' Parameters -->
-		<Parameter Name="TTCM"/>
-		<Parameter Name="ABOM"/>
-		<Parameter Name="AWUM"/>
-		<Parameter Name="NART"/>
-		<Parameter Name="RFLM"/>
-		<Parameter Name="TXFP"/>
-		<!-- 'Filter' Parameters  -->
-		<!--
-		<Parameter Name="FilterNumber">
-			<PossibleValue>14</PossibleValue>
-		</Parameter>
-		<Parameter Name="FilterActivation"/>
-		<Parameter Name="FilterScale"/>
-		<Parameter Name="FilterMode"/>
-		<Parameter Name="FilterId32b"/>
-		<Parameter Name="FilterIdHigh"/>
-		<Parameter Name="FilterIdLow"/>
-		<Parameter Name="FilterMaskId32b"/>
-		<Parameter Name="FilterMaskIdHigh"/>
-		<Parameter Name="FilterMaskIdLow"/>
-		<Parameter Name="FilterFIFOAssignment"/>
-		-->
-		<!-- Advanced/Debug Parameters -->
-		<Parameter Name="Mode"/>
-	</RefMode>	
-	
-	
-	<!-- Modes for CAN. Suppose Silent and/or Loopback Modes are Debug, and need Tx/Rx on Board -->
-	<ModeLogicOperator Name="OR">
-		<Mode Name="Mode" UserName="Mode">
-			<ModeLogicOperator Name="XOR">
-				<Mode Name="Master" UserName="Master"  ShrinkName="Master Mode" RemoveCondition="$IpNumber=2" >
-					<SignalLogicalOp Name="AND">
-						<Signal Name="RX"/>
-						<Signal Name="TX"/>
-					</SignalLogicalOp>
-					<Condition Expression="$IpNumber=1" Diagnostic="Master active only on CAN1"/>
-				
-				</Mode>
-				
-				<Mode Name="Slave" UserName="Slave" ShrinkName="Slave Mode" RemoveCondition="$IpNumber=1" >
-					<SignalLogicalOp Name="AND">
-						<Signal Name="RX"/>
-						<Signal Name="TX"/>
-					</SignalLogicalOp>
-					<Condition Expression="$IpNumber=2" Diagnostic="Slave active only on CAN2"/>
-				</Mode>
-			</ModeLogicOperator>
-			<Semaphore>USB_OR_CAN</Semaphore>
-		</Mode>
-	</ModeLogicOperator>
+        
+        <!-- ModeLogicOperator for CAN -->
+        <ModeLogicOperator Name="OR">
+            <Mode Name="CAN_State" UserName="Activated">
+                <ModeLogicOperator Name="XOR">
+                    <Mode Name="CAN_Activate" UserName="Activated">
+                        <SignalLogicalOp Name="AND">
+                            <Signal Name="RX"/>
+                            <Signal Name="TX"/>
+                        </SignalLogicalOp>
+                    </Mode>
+                </ModeLogicOperator>
+                <Semaphore>USB_OR_CAN</Semaphore>
+            </Mode>
+        </ModeLogicOperator>
 		
 	<!-- RefSignal for CAN -->
 	<RefSignal IOMode="InputFloatingAndPullUp" Name="RX"/>

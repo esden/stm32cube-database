@@ -114,11 +114,8 @@
                 <HardCode Text="#twhile(LL_RCC_MSI_IsReady() != 1)#n#t{#n#t}#n"/>
             </CallLibMethod>
 			
-        </IFCondition>
-		
-        <IFCondition Expression ="((CodegenConfigPeriph=false) &amp; (MSIUsedForSys=1) &amp;MSIAutoCalibrationON) | ((CodegenConfigPeriph=true) &amp; MSIUsed=1 &amp;MSIAutoCalibrationON)">
-            <CallLibMethod Name="LL_RCC_MSI_EnablePLLMode"/>
-        </IFCondition>
+        </IFCondition>	
+
 		
         <IFCondition Expression ="(((CodegenConfigPeriph=false) &amp; (MSIUsedForSys=1)) | ((CodegenConfigPeriph=true) &amp; MSIUsed=1)) &amp; !MSIClockRange=RCC_MSIRANGE_6">
             <CallLibMethod Name="LL_RCC_MSI_SetRange">
@@ -134,20 +131,7 @@
         <IFCondition Expression ="(CodegenConfigPeriph=true) &amp; (RTCUsed_ForRCC|LSCOConfig|(LSEUsed=1))">
             <CallLibMethod Name="LL_PWR_EnableBkUpAccess">
             </CallLibMethod>
-        </IFCondition> 	 
-		
-        <IFCondition Expression ="(CodegenConfigPeriph=true) &amp; RTCUsed_ForRCC">
-            <CallLibMethod Name="LL_RCC_ForceBackupDomainReset">
-            </CallLibMethod>
-        </IFCondition>  
-		
-        <IFCondition Expression ="(CodegenConfigPeriph=true) &amp; RTCUsed_ForRCC">
-            <CallLibMethod Name="LL_RCC_ReleaseBackupDomainReset">
-            </CallLibMethod>
-        </IFCondition>
-
-
-	
+        </IFCondition>	
 		
         <!--LSCO  code gen-->
         <IFCondition Expression ="(CodegenConfigPeriph=true) &amp; LSCOConfig">
@@ -177,7 +161,9 @@
             </CallLibMethod>
         </IFCondition> 
 	
-
+        <IFCondition Expression ="((CodegenConfigPeriph=false) &amp; (MSIUsedForSys=1) &amp;MSIAutoCalibrationON) | ((CodegenConfigPeriph=true) &amp; MSIUsed=1 &amp;MSIAutoCalibrationON)">
+            <CallLibMethod Name="LL_RCC_MSI_EnablePLLMode"/>
+        </IFCondition>
 		
 		
         <!--CSS enable code gen-->
@@ -562,12 +548,48 @@
 		
 	   
     </RefConfig>
-    <RefConfig Name="RCC_PClockConfig">
+    <RefConfig Name="RCC_PClockConfig">        
+        <IFCondition Expression ="(CodegenConfigPeriph=true) &amp; RTCUsed_ForRCC &amp; RTCClockSelection=RCC_RTCCLKSOURCE_LSI">
+            <CallLibMethod Name="" Type="HardCode">
+                <HardCode Text="#tif(LL_RCC_GetRTCClockSource() != LL_RCC_RTC_CLKSOURCE_LSI)#n#t{"/>
+            </CallLibMethod>
+        <Else>
+            <IFCondition Expression ="(CodegenConfigPeriph=true) &amp; RTCUsed_ForRCC &amp; RTCClockSelection=RCC_RTCCLKSOURCE_LSE">
+                <CallLibMethod Name="" Type="HardCode">
+                    <HardCode Text="#tif(LL_RCC_GetRTCClockSource() != LL_RCC_RTC_CLKSOURCE_LSE)#n#t{"/>
+                </CallLibMethod>
+                <Else>
+                    <IFCondition Expression ="(CodegenConfigPeriph=true) &amp; RTCUsed_ForRCC &amp; RTCClockSelection=RCC_RTCCLKSOURCE_HSE_DIV32">
+                        <CallLibMethod Name="" Type="HardCode">
+                            <HardCode Text="#tif(LL_RCC_GetRTCClockSource() != LL_RCC_RTC_CLKSOURCE_HSE_DIV32)#n#t{"/>
+                            </CallLibMethod>
+                    </IFCondition>
+                </Else>
+            </IFCondition>
+        </Else>
+        </IFCondition>
+
+        <IFCondition Expression ="(CodegenConfigPeriph=true) &amp; RTCUsed_ForRCC">
+            <CallLibMethod Name="#tLL_RCC_ForceBackupDomainReset">
+            </CallLibMethod>
+
+            <CallLibMethod Name="#tLL_RCC_ReleaseBackupDomainReset">
+            </CallLibMethod>
+        </IFCondition>
+
         <IFCondition Expression ="(CodegenConfigPeriph=true) &amp; (RTCUsed_ForRCC|LCDUsed_ForRCC)">
-            <CallLibMethod Name="LL_RCC_SetRTCClockSource">
+            <CallLibMethod Name="#tLL_RCC_SetRTCClockSource">
                 <MethodArg Name="Source" ParameterName="RTCClockSelection"/>
             </CallLibMethod>
         </IFCondition>
+        <IFCondition Expression ="(CodegenConfigPeriph=true) &amp; RTCUsed_ForRCC">
+            <CallLibMethod Name="" Type="HardCode">
+                <HardCode Text="#t}"/>
+            </CallLibMethod>
+        </IFCondition>
+        
+        
+        
         <IFCondition Expression ="(CodegenConfigPeriph=true) &amp; (RTCUsed_ForRCC|LCDUsed_ForRCC)">
             <CallLibMethod Name="LL_RCC_EnableRTC"/>
         </IFCondition>
@@ -804,19 +826,16 @@
     <LibMethod Comment="" Name="LL_RCC_SetADCClockSource">
         <Argument AddressOf="false" GenericType="simple" Name="ADCxSource"/>
     </LibMethod>
-
 	
-
-	
-    <LibMethod Comment="" Name="LL_RCC_SetRTCClockSource">
+    <LibMethod Comment="" Name="#tLL_RCC_SetRTCClockSource">
         <Argument AddressOf="false" GenericType="simple" Name="Source"/>
     </LibMethod>
 	
     <LibMethod Comment="" Name="LL_RCC_EnableRTC"/>
 	
     <LibMethod Comment="" Name="LL_PWR_EnableBkUpAccess"/>
-    <LibMethod Comment="" Name="LL_RCC_ForceBackupDomainReset"/>
-    <LibMethod Comment="" Name="LL_RCC_ReleaseBackupDomainReset"/>
+    <LibMethod Comment="" Name="#tLL_RCC_ForceBackupDomainReset"/>
+    <LibMethod Comment="" Name="#tLL_RCC_ReleaseBackupDomainReset"/>
     <LibMethod Comment="" Name="LL_RCC_PLL_Enable"/>
 	
     <LibMethod Comment="" Name="LL_RCC_PLL_ConfigDomain_SYS">

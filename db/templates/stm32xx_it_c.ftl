@@ -1,7 +1,7 @@
 [#ftl]
 [#assign contextFolder=""]
 [#if cpucore!=""]    
-[#assign contextFolder = cpucore?replace("ARM_CORTEX_","C")+"/"]
+[#assign contextFolder = cpucore?replace("ARM_CORTEX_","C")?replace("+","PLUS")+"/"]
 [/#if]
 /* USER CODE BEGIN Header */
 /**
@@ -18,6 +18,27 @@
 /* Includes ------------------------------------------------------------------*/
 #include "${main_h}"
 #include "${FamilyName?lower_case}xx_it.h"
+[#if cpucore!="" && cpucore?replace("ARM_CORTEX_","")=="M4"]
+    [#if  timeBaseSource_M4??]
+        [#assign timeBaseSource = timeBaseSource_M4]
+        [#assign timeBaseHandlerType = timeBaseHandlerType_M4]
+        [#assign timeBaseHandler = timeBaseHandler_M4]
+    [/#if]
+[/#if]
+[#if cpucore!="" &&cpucore?replace("ARM_CORTEX_","")=="M7"]
+    [#if  timeBaseSource_M7??]
+        [#assign timeBaseSource = timeBaseSource_M7]
+        [#assign timeBaseHandlerType = timeBaseHandlerType_M7]
+        [#assign timeBaseHandler = timeBaseHandler_M7]
+    [/#if]
+[/#if]
+[#if cpucore!="" &&cpucore?replace("ARM_CORTEX_","")=="M0+"]
+    [#if  timeBaseSource_M0PLUS??]
+        [#assign timeBaseSource = timeBaseSource_M0PLUS]
+        [#assign timeBaseHandlerType = timeBaseHandlerType_M0PLUS]
+        [#assign timeBaseHandler = timeBaseHandler_M0PLUS]
+    [/#if]
+[/#if]
 [#if FREERTOS?? && (Secure == "false" || Secure == "-1")] [#-- If FreeRtos is used --]
 [#-- [@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_inc.tmp"/] --] [#--include freertos includes --]
 [#-- cf BZ 64089 --]
@@ -28,6 +49,12 @@
 [/#if]
 [#if TOUCHSENSING??] [#-- If TouchSensing is used --]
 #include "tsl_time.h"
+[/#if]
+[#if USBPD??] [#-- If USBPD is used --]
+#include "usbpd.h"
+[/#if]
+[#if TRACER_EMB??] [#-- If TRACER_EMB is used --]
+#include "tracer_emb.h"
 [/#if]
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -118,20 +145,6 @@ extern ${ipHandle.type} ${ipHandle.name};
   [/#if]
 [/#list]
 [#-- If Time Base Source is different to Systick--]
-[#if cpucore!="" && cpucore?replace("ARM_CORTEX_","")=="M4"]
-    [#if  timeBaseSource_M4??]
-        [#assign timeBaseSource = timeBaseSource_M4]
-        [#assign timeBaseHandlerType = timeBaseHandlerType_M4]
-        [#assign timeBaseHandler = timeBaseHandler_M4]
-    [/#if]
-[/#if]
-[#if cpucore!="" &&cpucore?replace("ARM_CORTEX_","")=="M7"]
-    [#if  timeBaseSource_M7??]
-        [#assign timeBaseSource = timeBaseSource_M7]
-        [#assign timeBaseHandlerType = timeBaseHandlerType_M7]
-        [#assign timeBaseHandler = timeBaseHandler_M7]
-    [/#if]
-[/#if]
 [#if timeBaseSource?? && timeBaseSource!="SysTick" && timeBaseSource!="None"]
 extern ${timeBaseHandlerType} ${timeBaseHandler};
 #n
@@ -167,8 +180,14 @@ void ${vector.irqHandler}(void)
 [#--[#if vector.name != "UsageFault_IRQn"] --]
 [#if vector.operation != "W1"]
 #t/* USER CODE BEGIN ${vector.name} 1 */
-
-#n#t/* USER CODE END ${vector.name} 1 */
+[#if vector.name == "NonMaskableInt_IRQn"]
+#twhile (1)
+#t{
+#t}
+[#else]
+#n
+[/#if]
+#t/* USER CODE END ${vector.name} 1 */
 [#--[/#if]--]
 [#--[/#if]--]
 [#--[/#if]--]
@@ -256,6 +275,10 @@ void ${vector.irqHandler}(void)
   #t${vector.halHandler}[#if timeBaseSource==vector.ipName && FamilyName=="STM32MP1"][#else](&${vector.ipHandle});[/#if]
 [#elseif vector.halUsed]
   #t${vector.halHandler}();
+[/#if]
+[#assign extraHandler = vector.extraHandler]
+[#if extraHandler != ""]
+  #t${extraHandler}
 [/#if]
 
 #t/* USER CODE BEGIN ${vector.name} 1 */

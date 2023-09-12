@@ -51,26 +51,27 @@
 
 #define USBPD_DPM_USER_C
 /* Includes ------------------------------------------------------------------*/
+#include "main.h"
 #include "usbpd_core.h"
+#include "usbpd_dpm_user.h"
+[#if !USBPD_STATEMACHINE]
 #include "usbpd_pdo_defs.h"
 #include "usbpd_dpm_core.h"
 #include "usbpd_dpm_conf.h"
-#include "usbpd_dpm_user.h"
 [#if USBPD_CoreLib == "USBPDCORE_LIB_PD3_FULL" || USBPD_CoreLib == "USBPDCORE_LIB_PD3_CONFIG_1"]
 #include "usbpd_vdm_user.h"
 [/#if]
-#if defined(_TRACE)
-#include "usbpd_trace.h"
-#include "stdio.h"
-#endif /* _TRACE */
-[#if USBPD_CoreLib != "USBPDCORE_LIB_NO_PD" || USBPD_STATEMACHINE]
 #include "usbpd_pwr_if.h"
 #include "usbpd_pwr_user.h"
 [/#if]
-#include "string.h"
 [#if FREERTOS?? && Secure!="true"]
 #include "cmsis_os.h"
 [/#if]
+#if defined(_TRACE)
+#include "usbpd_trace.h"
+#include "string.h"
+#include "stdio.h"
+#endif /* _TRACE */
 
 /** @addtogroup STM32_USBPD_APPLICATION
   * @{
@@ -89,6 +90,7 @@
 /** @defgroup USBPD_USER_PRIVATE_DEFINES USBPD USER Private Defines
   * @{
   */
+[#if !USBPD_STATEMACHINE]
 [#if GUI_INTERFACE??]
 #define DPM_GUI_NOTIF_ISCONNECTED       (1 << 5)
 #define DPM_GUI_NOTIF_POWER_EVENT       (1 << 15)
@@ -99,6 +101,7 @@ void                USBPD_DPM_UserExecute(void const *argument);
 #else
 void                USBPD_DPM_UserExecute(void *argument);
 #endif /* osCMSIS < 0x20000U */
+[/#if]
 [/#if]
 /* USER CODE BEGIN Private_Define */
 
@@ -123,6 +126,7 @@ void                USBPD_DPM_UserExecute(void *argument);
         USBPD_TRACE_Add(USBPD_TRACE_DEBUG, (uint8_t)(_PORT_), 0, (uint8_t*)_str, DPM_USER_DEBUG_TRACE_SIZE);   \
   } while(0)
 
+[#if !USBPD_STATEMACHINE]
 #define DPM_USER_ERROR_TRACE(_PORT_, _STATUS_, ...)  do {                                                      \
     if (USBPD_OK != _STATUS_) {                                                                                \
         char _str[DPM_USER_DEBUG_TRACE_SIZE];                                                                  \
@@ -133,9 +137,12 @@ void                USBPD_DPM_UserExecute(void *argument);
           USBPD_TRACE_Add(USBPD_TRACE_DEBUG, (uint8_t)(_PORT_), 0, (uint8_t*)_str, DPM_USER_DEBUG_TRACE_SIZE); \
     }                                                                                                          \
   } while(0)
+[/#if]
 #else
 #define DPM_USER_DEBUG_TRACE(_PORT_, ...)
+[#if !USBPD_STATEMACHINE]
 #define DPM_USER_ERROR_TRACE(_PORT_, _STATUS_, ...)
+[/#if]
 #endif /* _TRACE */
 /* USER CODE BEGIN Private_Macro */
 
@@ -148,12 +155,15 @@ void                USBPD_DPM_UserExecute(void *argument);
 /** @defgroup USBPD_USER_PRIVATE_VARIABLES USBPD USER Private Variables
   * @{
   */
+[#if !USBPD_STATEMACHINE]
 [#if GUI_INTERFACE??]
 GUI_NOTIFICATION_POST         DPM_GUI_PostNotificationMessage   = NULL;
 GUI_NOTIFICATION_FORMAT_SEND  DPM_GUI_FormatAndSendNotification = NULL;
 GUI_SAVE_INFO                 DPM_GUI_SaveInfo                  = NULL;
 [/#if]
+[/#if]
 /* USER CODE BEGIN Private_Variables */
+
 
 /* USER CODE END Private_Variables */
 /**
@@ -190,6 +200,7 @@ GUI_SAVE_INFO                 DPM_GUI_SaveInfo                  = NULL;
   * @brief  Initialize DPM (port power role, PWR_IF, CAD and PE Init procedures)
   * @retval USBPD Status
   */
+[#if !USBPD_STATEMACHINE]
 USBPD_StatusTypeDef USBPD_DPM_UserInit(void)
 {
 /* USER CODE BEGIN USBPD_DPM_UserInit */
@@ -213,21 +224,7 @@ void USBPD_DPM_SetNotification_GUI(GUI_NOTIFICATION_FORMAT_SEND PtrFormatSend, G
 }
 
 [/#if]
-/**
-  * @brief  User delay implementation which is OS dependant
-  * @param  Time time in ms
-  * @retval None
-  */
-void USBPD_DPM_WaitForTime(uint32_t Time)
-{
-/* USER CODE BEGIN USBPD_DPM_WaitForTime */
-[#if FREERTOS?? && Secure!="true"]
-  osDelay(Time);
-[#else]
-  HAL_Delay(Time);
 [/#if]
-/* USER CODE END USBPD_DPM_WaitForTime */
-}
 
 /**
   * @brief  User processing time, it is recommended to avoid blocking task for long time
@@ -263,16 +260,18 @@ void USBPD_DPM_UserExecute(void const *argument)
   */
 void USBPD_DPM_UserCableDetection(uint8_t PortNum, USBPD_CAD_EVENT State)
 {
+[#if !USBPD_STATEMACHINE]
 [#if GUI_INTERFACE??]
   switch(State)
   {
   case USBPD_CAD_EVENT_ATTEMC:
   case USBPD_CAD_EVENT_ATTACHED:
-   /* Format and send a notification to GUI if enabled */
+    /* Format and send a notification to GUI if enabled */
     if (NULL != DPM_GUI_FormatAndSendNotification)
     {
-      DPM_GUI_FormatAndSendNotification(PortNum, DPM_GUI_NOTIF_ISCONNECTED | DPM_GUI_NOTIF_POWER_EVENT, 0);
+      DPM_GUI_FormatAndSendNotification(PortNum, DPM_GUI_NOTIF_ISCONNECTED, 0);
     }
+    break;
   default :
     /* Format and send a notification to GUI if enabled */
     if (NULL != DPM_GUI_FormatAndSendNotification)
@@ -280,6 +279,7 @@ void USBPD_DPM_UserCableDetection(uint8_t PortNum, USBPD_CAD_EVENT State)
       DPM_GUI_FormatAndSendNotification(PortNum, DPM_GUI_NOTIF_ISCONNECTED | DPM_GUI_NOTIF_POWER_EVENT, 0);
     }
   }
+[/#if]
 [/#if]
 /* USER CODE BEGIN USBPD_DPM_UserCableDetection */
 DPM_USER_DEBUG_TRACE(PortNum, "ADVICE: update USBPD_DPM_UserCableDetection");
@@ -313,6 +313,7 @@ DPM_USER_DEBUG_TRACE(PortNum, "ADVICE: update USBPD_DPM_UserCableDetection");
 /* USER CODE END USBPD_DPM_UserCableDetection */
 }
 
+[#if !USBPD_STATEMACHINE]
 /**
   * @brief  function used to manage user timer.
   * @param  PortNum Port number
@@ -324,11 +325,13 @@ void USBPD_DPM_UserTimerCounter(uint8_t PortNum)
 
 /* USER CODE END USBPD_DPM_UserTimerCounter */
 }
+[/#if]
 
 /**
   * @}
   */
 
+[#if !USBPD_STATEMACHINE]
 /** @defgroup USBPD_USER_EXPORTED_FUNCTIONS_GROUP2 USBPD USER Exported Callbacks functions called by PE
   * @{
   */
@@ -599,23 +602,41 @@ void USBPD_DPM_ExtendedMessageReceived(uint8_t PortNum, USBPD_ExtendedMsg_TypeDe
 }
 
 /**
-  * @brief  DPM callback used to know user choice about Data Role Swap.
+  * @brief  Callback used to ask application the reply status for a DataRoleSwap request
+  * @note   if the callback is not set (ie NULL) the stack will automatically reject the request
   * @param  PortNum Port number
-  * @retval USBPD_REJECT, UBPD_ACCEPT
+  * @retval Returned values are:
+            @ref USBPD_ACCEPT if DRS can be accepted
+            @ref USBPD_REJECT if DRS is not accepted in one data role (DFP or UFP) or in PD2.0 config
+            @ref USBPD_NOTSUPPORTED if DRS is not supported at all by the application (in both data roles) - P3.0 only
   */
 USBPD_StatusTypeDef USBPD_DPM_EvaluateDataRoleSwap(uint8_t PortNum)
 {
 /* USER CODE BEGIN USBPD_DPM_EvaluateDataRoleSwap */
   USBPD_StatusTypeDef status = USBPD_REJECT;
+[#if USBPD_CoreLib == "USBPDCORE_LIB_PD3_FULL" || USBPD_CoreLib == "USBPDCORE_LIB_PD3_CONFIG_1"]
+  /* Sent NOT_SUPPORTED if DRS is not supported at all by the application (in both data roles) - P3.0 only */
 [#if DR_SWAP_TO_XFP_FEATURE]
-  if ((USBPD_TRUE == DPM_USER_Settings[PortNum].PE_DataSwap)
-    && (((USBPD_TRUE == DPM_USER_Settings[PortNum].PE_DR_Swap_To_DFP) && (USBPD_PORTDATAROLE_UFP == DPM_Params[PortNum].PE_DataRole))
-     || ((USBPD_TRUE == DPM_USER_Settings[PortNum].PE_DR_Swap_To_UFP) && (USBPD_PORTDATAROLE_DFP == DPM_Params[PortNum].PE_DataRole))))
+  if ((USBPD_FALSE == DPM_USER_Settings[PortNum].PE_DataSwap)
+    || ((USBPD_FALSE == DPM_USER_Settings[PortNum].PE_DR_Swap_To_DFP)
+    && (USBPD_FALSE == DPM_USER_Settings[PortNum].PE_DR_Swap_To_UFP)))
 [#else]
-  if (USBPD_TRUE == DPM_USER_Settings[PortNum].PE_DataSwap)
+  if (USBPD_FALSE == DPM_USER_Settings[PortNum].PE_DataSwap)
 [/#if]
   {
-    status = USBPD_ACCEPT;
+    status = USBPD_NOTSUPPORTED;
+  }
+  else
+[/#if]
+  {
+[#if DR_SWAP_TO_XFP_FEATURE]
+    /* ACCEPT DRS if at least supported by 1 data role */
+    if (((USBPD_TRUE == DPM_USER_Settings[PortNum].PE_DR_Swap_To_DFP) && (USBPD_PORTDATAROLE_UFP == DPM_Params[PortNum].PE_DataRole))
+       || ((USBPD_TRUE == DPM_USER_Settings[PortNum].PE_DR_Swap_To_UFP) && (USBPD_PORTDATAROLE_DFP == DPM_Params[PortNum].PE_DataRole)))
+[/#if]
+    {
+      status = USBPD_ACCEPT;
+    }
   }
   return status;
 /* USER CODE END USBPD_DPM_EvaluateDataRoleSwap */
@@ -642,7 +663,6 @@ USBPD_FunctionalState USBPD_DPM_IsPowerReady(uint8_t PortNum, USBPD_VSAFE_Status
   * @{
   */
 
-[#if USBPD_CoreLib != "USBPDCORE_LIB_NO_PD"]
 /**
   * @brief  Request the PE to send a hard reset
   * @param  PortNum The current port number
@@ -1127,17 +1147,14 @@ USBPD_StatusTypeDef USBPD_DPM_RequestGetBatteryStatus(uint8_t PortNum, uint8_t *
 USBPD_StatusTypeDef USBPD_DPM_RequestSecurityRequest(uint8_t PortNum)
 {
   USBPD_StatusTypeDef _status = USBPD_ERROR;
-/* USER CODE BEGIN USBPD_DPM_RequestSecurityRequest */
-
-/* USER CODE END USBPD_DPM_RequestSecurityRequest */
   DPM_USER_ERROR_TRACE(PortNum, _status, "SECURITY_REQUEST not accepted by the stack");
   return _status;
 }
-[/#if]
 
 /**
   * @}
   */
+[/#if]
 
 /** @addtogroup USBPD_USER_PRIVATE_FUNCTIONS
   * @{
