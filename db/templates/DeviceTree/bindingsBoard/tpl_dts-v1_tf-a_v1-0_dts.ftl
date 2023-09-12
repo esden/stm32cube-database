@@ -7,9 +7,9 @@
 [#--------------------------]
 [#macro gen_tfa]
 [#local module = "gen_tfa"]
-/* SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause) */
+// SPDX-License-Identifier: (GPL-2.0-or-later OR BSD-3-Clause)
 /*
- * Copyright (C) STMicroelectronics ${year} - All Rights Reserved
+ * Copyright (C) ${year}, STMicroelectronics - All Rights Reserved
  * Author: STM32CubeMX code generation for STMicroelectronics.
  */
 
@@ -48,6 +48,9 @@
 	[@mlog  logMod=module logType="ERR" logMsg="unknown SOC package dtsi" varsMap={} /]
 /*#include "???.dtsi"*/
 [/#if]
+[#if mx_socDtRPN?has_content]
+#include "${mx_socDtRPN}-pinctrl.dtsi"
+[/#if]
 [#if (mx_socDtRPN == "stm32mp15")]
 	[#if mx_socPtCPN?has_content]
 #include "${mx_socPtCPN?substring(0,9) + "xx" + mx_socPtCPN?substring(11)}-pinctrl.dtsi"
@@ -85,7 +88,11 @@
 	/*model = "STMicroelectronics unknown STM32CubeMX board";*/
 	[/#if]
 	[#if mx_socRPN?has_content && mx_socFtRPN?has_content && mx_projectName?has_content]
+	[#if mx_isCustomBoard]
 	compatible = "st,${mx_socRPN}-${mx_projectName}-mx", "st,${mx_socFtRPN}";
+	[#else]
+	compatible = "st,${mx_socRPN}-${mx_projectName}-mx", "st,${mx_boardName_lowercase}", "st,${mx_socFtRPN}";
+	[/#if]
 	[#else]
 		[@mlog  logMod=module logType="ERR" logMsg="compatible' not generated" varsMap={} /]
 	/*compatible = "st,???-mx", "st,???";*/

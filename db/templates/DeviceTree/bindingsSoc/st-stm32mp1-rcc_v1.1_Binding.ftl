@@ -18,9 +18,11 @@
     [#if paramEntry.key == "HSE_STATUS"][#assign hse_status="${paramEntry.value}"][/#if]
     [#if paramEntry.key == "I2S_CLK_STATUS"][#assign i2s_clk_status="${paramEntry.value}"][/#if]
 [/#list]
+[#if DIE?starts_with("DIE501")]
 [#if srvcmx_isTargetedFw_inDTS("OP-TEE")][#--FW contextualization--]
 	[#lt]${T1}clocks = [#if hse_status=="enabled"]<&clk_hse>, [/#if]<&clk_hsi>, [#if lse_status=="enabled"]<&clk_lse>, [/#if]<&clk_lsi>, <&clk_csi>[#if i2s_clk_status=="enabled"], <&clk_i2sin>[/#if]; 
 	[#lt]${T1}clock-names = [#if hse_status=="enabled"]"clk-hse", [/#if]"clk-hsi", [#if lse_status=="enabled"]"clk-lse", [/#if]"clk-lsi", "clk-csi"[#if i2s_clk_status=="enabled"], "clk-i2sin"[/#if];
+[/#if]
 [/#if]
 
 	/* USER CODE BEGIN rcc */
@@ -47,9 +49,11 @@
 			[#lt]${T2}${paramEntry.value}
 		[/#list]
 [#if srvcmx_isTargetedFw_inDTS("OP-TEE")]
+[#if peripheralRCCParams.get("CLKDividerOP")??]
 		[#list peripheralRCCParams.get("CLKDividerOP").entrySet() as paramEntry]
 			[#lt]${T2}${paramEntry.value}
 		[/#list]
+[/#if]
 [/#if]
 [#t]
 	[#lt]${T1}>;
@@ -88,31 +92,30 @@
 				[#if paramEntry.key == "PLL${PLLnb}MODE"][#assign PLLMODE="${paramEntry.value}"][/#if]
 				[#if paramEntry.key == "PLL${PLLnb}CSG"][#assign PLLCSG="${paramEntry.value}"][/#if]
 			[/#list]
-                        [#list peripheralRCCParams.get("CLKDTPLLSource").entrySet() as paramEntry]
+            [#list peripheralRCCParams.get("CLKDTPLLSource").entrySet() as paramEntry]
 				[#if paramEntry.key == "PLL${PLLnb}SourceARG"][#assign PLLSource="${paramEntry.value}"][/#if]
 			[/#list]
-						[#if ((PLLUsedTFA! = 1) && srvcmx_isTargetedFw_inDTS("TF-A")) || ((PLLUsedA7! = 1) && srvcmx_isTargetedFw_inDTS("OP-TEE"))]
+			[#if ((PLLUsedTFA! = 1) && srvcmx_isTargetedFw_inDTS("TF-A")) || ((PLLUsedA7! = 1) && srvcmx_isTargetedFw_inDTS("OP-TEE"))]
 			[#lt]${T2}pll${PLLnb}_vco_${VCOM}Mhz: pll${PLLnb}-vco-${VCOM}Mhz {
 				[#lt]${T3}src = < ${PLLSource} >;
 				[#lt]${T3}divmn = < ${DIVM} ${DIVN} >;
 								[#if PLLMODE == "RCC_PLL_FRACTIONAL"]
-[#if PLLFRAC?starts_with("0x")]
-									[#lt]${T3}frac = < ${PLLFRAC} >;
-[#else]
-[#assign fractional = String.format("0x%x" , Integer.valueOf(PLLFRAC))]
-									[#lt]${T3}frac = < ${fractional} >;
-[/#if]
+									[#if PLLFRAC?starts_with("0x")]
+										[#lt]${T3}frac = < ${PLLFRAC} >;
+									[#else]
+										[#assign fractional = String.format("0x%x" , Integer.valueOf(PLLFRAC))]
+										[#lt]${T3}frac = < ${fractional} >;
+									[/#if]
 								[/#if]
-				[#if PLLCSG == "true"]
+								[#if PLLCSG == "true"]
 									[#lt]${T3}csg = < ${PLLMODPER} ${PLLINCSTEP} ${PLLSSCGMODE} >;
 								[/#if]
 [#if srvcmx_isTargetedFw_inDTS("U-BOOT") && !srvcmx_isDbFeatureEnabled("noUBootSplSupport")][#--FW contextualization--]
 				[#lt]${T3}u-boot,dm-pre-reloc;
 [/#if]
 			[#lt]${T2}};
-						[/#if]
+		[/#if]
 		[/#list]
-
 			[#lt]${T2}/* USER CODE BEGIN rcc_st-pll_vco */
 			[#lt]${T2}/* USER CODE END rcc_st-pll_vco */
 	[#lt]${T1}};
@@ -152,6 +155,7 @@
 		[/#list]
 	[/#if]
 
+[#if DIE?starts_with("DIE501")]
 [#-- st,clk_opp node creation --]
 [#if srvcmx_isTargetedFw_inDTS("OP-TEE")]
 [#list peripheralRCCParams.get("CLKSystemSource").entrySet() as paramEntry]
@@ -211,5 +215,6 @@
 [#lt]${T3}/* USER CODE END rcc_st-ck_mlahbs */
 [#lt]${T2}};
 [#lt]${T1}};
+[/#if]
 [/#if]
 [/#list]

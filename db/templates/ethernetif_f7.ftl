@@ -23,6 +23,7 @@
 [#assign rx_buffer_address = 0]
 [#assign lwip_ipv6 = 0]
 [#assign BspComponent = ""]
+[#assign lwip_netif_hostname = "lwip"]
 [#if SWIP.defines??]
 	[#list SWIP.defines as definition] 	
         [#if (definition.name == "WITH_RTOS")]
@@ -62,6 +63,9 @@
         [/#if] 
         [#if (definition.name == "LWIP_IPV6") && (definition.value == "1")]
             [#assign lwip_ipv6 = 1]
+        [/#if] 
+        [#if (definition.name == "LWIP_NETIF_HOSTNAME") && (definition.value != "valueNotSetted")]
+            [#assign lwip_netif_hostname = definition.value]
         [/#if]  
 	[/#list]
 [/#if][#-- SWIP.defines --]
@@ -217,6 +221,9 @@ ETH_TxPacketConfig TxConfig;
 [#if with_rtos == 1][#-- rtos used --]
 [#if cmsis_version = "v1"][#-- cmsis_version v1 --]
 static void ethernetif_input(void const * argument);
+[#if MediaInterface == "HAL_ETH_RMII_MODE"]
+static void RMII_Thread( void const * argument );
+[/#if]
 [/#if][#-- endif cmsis_version v1 --]
 [/#if][#-- rtos used --]
 [#if bsp == 1]
@@ -323,7 +330,7 @@ static void low_level_init(struct netif *netif)
 
 [#if lwip_ipv6 == 1]
   /* Pass all multicast frames: needed for IPv6 protocol*/
-  heth.Instance->MACPFR |= ETH_MACPFR_PM;
+  heth.Instance->MACFFR |= ETH_MACFFR_PM;
   
 [/#if] [#-- endif lwip_ipv6 --]
 #if LWIP_ARP || LWIP_ETHERNET 
@@ -469,6 +476,19 @@ static void low_level_init(struct netif *netif)
 /* USER CODE BEGIN LOW_LEVEL_INIT */ 
     
 /* USER CODE END LOW_LEVEL_INIT */
+
+[#if cmsis_version = "v1"]
+[#if MediaInterface == "HAL_ETH_RMII_MODE"]
+  if(HAL_GetREVID() == 0x1000)
+  { 
+    /* 
+      This thread will keep resetting the RMII interface until good frames are received
+    */
+    osThreadDef(RMII_Watchdog, RMII_Thread, osPriorityRealtime, 0, configMINIMAL_STACK_SIZE);
+    osThreadCreate (osThread(RMII_Watchdog), NULL);
+  }
+[/#if]
+[/#if]
 }
 
 /**
@@ -661,7 +681,7 @@ err_t ethernetif_init(struct netif *netif)
   
 #if LWIP_NETIF_HOSTNAME
   /* Initialize interface hostname */
-  netif->hostname = "lwip";
+  netif->hostname = "${lwip_netif_hostname}";
 #endif /* LWIP_NETIF_HOSTNAME */
 
   /*
@@ -1006,3 +1026,34 @@ void HAL_ETH_TxFreeCallback(uint32_t * buff)
 
 /* USER CODE END 8 */
 
+[#if cmsis_version = "v1"]
+[#if MediaInterface == "HAL_ETH_RMII_MODE"]
+void RMII_Thread( void const * argument )
+{
+  (void) argument; 
+
+  for(;;)
+  {
+    /* some unicast good packets are received */
+    if(heth.Instance->MMCRGUFCR > 0U)
+    {
+      /* RMII Init is OK: Delete the Thread */ 
+      osThreadTerminate(NULL);
+    }    
+    else if(heth.Instance->MMCRFCECR > 10U) 
+    {
+      /* ETH received too many packets with CRC errors, resetting RMII */
+      SYSCFG->PMC &= ~SYSCFG_PMC_MII_RMII_SEL;
+      SYSCFG->PMC |= SYSCFG_PMC_MII_RMII_SEL;
+    
+      heth.Instance->MMCCR |= ETH_MMCCR_CR;
+    }
+    else
+    {
+      /* Delay 200 ms */
+      osDelay(200);
+    }
+  }
+}
+[/#if]
+[/#if]

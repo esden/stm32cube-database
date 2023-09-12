@@ -197,14 +197,6 @@
             </CallLibMethod>
         </IFCondition>
 
-        <!--sys clock source + AHB/APB configuration-->
-        <IFCondition Expression ="HCLKsup80=1" >
-
-            <CallLibMethod Name="" Type="HardCode">
-                <HardCode Text="#n#t   /* Intermediate AHB prescaler 2 when target frequency clock is higher than 80 MHz */#n#tLL_RCC_SetAHBPrescaler(LL_RCC_SYSCLK_DIV_2);#n#t"/>
-            </CallLibMethod>
-        </IFCondition>
-
         <IFCondition Expression ="1=1">
             <CallLibMethod Name="LL_RCC_SetSysClkSource">
                 <MethodArg Name="Source" ParameterName="SYSCLKSourceVirtual"/>
@@ -229,17 +221,6 @@
             </CallLibMethod>
         </IFCondition>		
 		
-        <IFCondition Expression ="HCLKsup80=1">
-            <CallLibMethod Name="" Type="HardCode">
-                <HardCode Text="#n#t/* Insure 1us transition state at intermediate medium speed clock based on DWT*/#n#tCoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;#n#t"/>
-            </CallLibMethod>
-        </IFCondition>
-        <IFCondition Expression ="HCLKsup80=1">
-            <CallLibMethod Name="" Type="HardCode">
-                <HardCode Text="#n#tDWT-&gt;CTRL |= DWT_CTRL_CYCCNTENA_Msk;#n#tDWT-&gt;CYCCNT = 0;#n#twhile(DWT->CYCCNT &lt; 100);#n#t"/>
-            </CallLibMethod>
-        </IFCondition>
-
         <IFCondition Expression ="1=1">
             <CallLibMethod Name="LL_RCC_SetAHBPrescaler">
                 <MethodArg Name="Prescaler" ParameterName="AHBCLKDivider"/>
@@ -281,7 +262,7 @@
                 <HardCode Text="#n"/>
             </CallLibMethod>
             <CallLibMethod Name="LL_Init1msTick">
-                <MethodArg Name="HCLKFrequency" ParameterName="CortexFreq_Value"/>
+                <MethodArg Name="HCLKFrequency" ParameterName="HCLKFreq_Value"/>
             </CallLibMethod>
             <CallLibMethod Name="" Type="HardCode">
                 <HardCode Text="#n"/>

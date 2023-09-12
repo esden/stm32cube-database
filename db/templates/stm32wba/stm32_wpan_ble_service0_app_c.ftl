@@ -136,7 +136,6 @@ ${definition.name}: "${definition.value}"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
-
 /* USER CODE BEGIN PTD */
 
 /* USER CODE END PTD */
@@ -270,7 +269,7 @@ void ${SERVICE_SHORT_NAME_UpperCase}_APP_EvtRx(${SERVICE_SHORT_NAME_UpperCase}_A
   {
     /* USER CODE BEGIN Service${SvcNbr}_APP_EvtRx_Service${SvcNbr}_EvtOpcode */
 
-    /* USER CODE END Service${SvcNbr}_Notification_Service${SvcNbr}_EvtOpcode */
+    /* USER CODE END Service${SvcNbr}_APP_EvtRx_Service${SvcNbr}_EvtOpcode */
     case ${SERVICE_SHORT_NAME_UpperCase}_CONN_HANDLE_EVT :
       /* USER CODE BEGIN Service${SvcNbr}_APP_CONN_HANDLE_EVT */
               

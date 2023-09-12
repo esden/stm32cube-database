@@ -16,13 +16,12 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; Copyright (c) 2019 STMicroelectronics.
-  * All rights reserved.</center></h2>
+  * Copyright (c) 2019 STMicroelectronics.
+  * All rights reserved.
   *
-  * This software component is licensed by ST under Apache License, Version 2.0,
-  * the "License"; You may not use this file except in compliance with the
-  * License. You may obtain a copy of the License at:
-  *                        opensource.org/licenses/Apache-2.0
+  * This software is licensed under terms that can be found in the LICENSE file
+  * in the root directory of this software component.
+  * If no LICENSE file comes with this software, it is provided AS-IS.
   *
   ******************************************************************************
  */
@@ -45,7 +44,9 @@
 [#assign nonSecureIT1 = "100, 100"/]
 [#assign nonSecureIT2 = "100, 100"/]
 [#assign nonSecureIT3 = "100, 100"/]
-/*
+[#if SAU??]
+[@common.optinclude name=contextFolder+mxTmpFolder+"/sau_partition.tmp"/][#-- ADD SAU init Code--]
+[#else]/*
 //-------- <<< Use Configuration Wizard in Context Menu >>> -----------------
 */
 /* USER CODE BEGIN 0 */
@@ -91,20 +92,12 @@
 /*
 //     <o>Start Address <0-0xFFFFFFE0>
 */
-[#if FLASH_SIZE == "512"]
 #define SAU_INIT_START0     0x0C03E000      /* start address of SAU region 0 */
-[#else]
-#define SAU_INIT_START0     0x0C01E000      /* start address of SAU region 0 */
-[/#if]
 
 /*
 //     <o>End Address <0x1F-0xFFFFFFFF>
 */
-[#if FLASH_SIZE == "512"]
 #define SAU_INIT_END0       0x0C03FFFF      /* end address of SAU region 0 */
-[#else]
-#define SAU_INIT_END0       0x0C01FFFF      /* end address of SAU region 0 */
-[/#if]
 
 /*
 //     <o>Region is
@@ -125,19 +118,13 @@
 /*
 //     <o>Start Address <0-0xFFFFFFE0>
 */
-[#if FLASH_SIZE == "512"]
 #define SAU_INIT_START1     0x08040000      /* start address of SAU region 1 */
-[#else]
-#define SAU_INIT_START1       0x08020000      /* end address of SAU region 0 */
-[/#if]
+
 /*
 //     <o>End Address <0x1F-0xFFFFFFFF>
 */
-[#if FLASH_SIZE == "512"]
 #define SAU_INIT_END1       0x0807FFFF      /* end address of SAU region 1 */
-[#else]
-#define SAU_INIT_END1       0x0803FFFF      /* end address of SAU region 1 */
-[/#if]
+
 /*
 //     <o>Region is
 //         <0=>Non-Secure
@@ -307,7 +294,7 @@
 /*
 // </h>
 */
-
+[/#if]
 /*
 // <e>Setup behaviour of Sleep and Exception Handling
 */
@@ -433,6 +420,7 @@
 //   <o.30> DMA1_Channel2_IRQn  [#if enabledIT?contains("DMA1_Channel2_IRQn")]<1=> Non-Secure state[#assign nonSecureIT0 = nonSecureIT0+", "+"30"/][#else]<0=> Secure state[/#if]
 //   <o.31> DMA1_Channel3_IRQn  [#if enabledIT?contains("DMA1_Channel3_IRQn")]<1=> Non-Secure state[#assign nonSecureIT0 = nonSecureIT0+", "+"31"/][#else]<0=> Secure state[/#if]
 */
+
 [#assign decVal = 0/]
 [#if nonSecureIT0??]
 [#assign ll0 = nonSecureIT0?split(", ")/]
@@ -443,7 +431,6 @@
 [/#if]
 [/#list]
 [/#if]
-
 [#assign res = String.format("0x%08X" , Integer.valueOf(decVal)) /]
 #define NVIC_INIT_ITNS0_VAL      ${res}
 /*
@@ -501,7 +488,6 @@
 [/#if]
 [/#list]
 [/#if]
-
 [#assign res1 = String.format("0x%08X" , Integer.valueOf(decVal1)) /]
 #define NVIC_INIT_ITNS1_VAL      ${res1}
 
@@ -562,7 +548,6 @@
 [/#if]
 [/#list]
 [/#if]
-
 [#assign res2 = String.format("0x%08X" , Integer.valueOf(decVal2)) /]
 #define NVIC_INIT_ITNS2_VAL      ${res2}
 
@@ -594,6 +579,7 @@
 //   <o.11> ICACHE_IRQn         [#if enabledIT?contains("ICACHE_IRQn")]<1=> Non-Secure state[#assign nonSecureIT3 = nonSecureIT3+", "+"11"/][#else]<0=> Secure state[/#if]
 //   <o.12> OTFDEC1_IRQn        [#if enabledIT?contains("OTFDEC1_IRQn")]<1=> Non-Secure state[#assign nonSecureIT3 = nonSecureIT3+", "+"12"/][#else]<0=> Secure state[/#if]
 */
+
 [#assign decVal3 = 0/]
 [#if nonSecureIT3??]
 [#assign lll3 = nonSecureIT3?split(", ")/]
@@ -604,7 +590,6 @@
 [/#if]
 [/#list]
 [/#if]
-
 [#assign res3 = String.format("0x%08X" , Math.round(decVal3)) /]
 #define NVIC_INIT_ITNS3_VAL      ${res3}
 

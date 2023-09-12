@@ -10,6 +10,9 @@
   ******************************************************************************
   */
 /* USER CODE END Header */
+[#assign PG_FILL_UCS = "False"]
+[#assign PG_BSP_NUCLEO_WBA52CG = 0]
+[#assign PG_SKIP_LIST = "False"]
 [#assign myHash = {}]
 [#list SWIPdatas as SWIP]
     [#if SWIP.defines??]
@@ -85,6 +88,16 @@ void ThreadXLowPowerUserExit(void);
 [/#if]
 
 /* USER CODE BEGIN EF */
+[#if PG_FILL_UCS == "True"]
+[#if PG_BSP_NUCLEO_WBA52CG == 1]
+#if (CFG_BUTTON_SUPPORTED == 1)
+uint8_t APPE_ButtonIsLongPressed(uint16_t btnIdx);
+void APPE_Button1Action(void);
+void APPE_Button2Action(void);
+void APPE_Button3Action(void);
+#endif
+[/#if]
+[/#if]
 
 /* USER CODE END EF */
 

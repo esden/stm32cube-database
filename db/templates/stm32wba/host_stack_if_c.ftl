@@ -44,6 +44,11 @@ Key: ${key}; Value: ${myHash[key]}
 
 /* USER CODE END EFP */
 
+/**
+  * @brief  BLE Host stack processing request.
+  * @param  None
+  * @retval None
+  */
 void HostStack_Process(void)
 {
   /* USER CODE BEGIN HostStack_Process 0 */
@@ -51,6 +56,7 @@ void HostStack_Process(void)
   /* USER CODE END HostStack_Process 0 */
 
   [#if (myHash["BLE"] == "Enabled") || (myHash["BLE_MODE_SKELETON"] == "Enabled")]
+  /* Process BLE Host stack */
   BleStackCB_Process();
   [/#if]
 
@@ -60,6 +66,11 @@ void HostStack_Process(void)
 }
 
 [#if (myHash["BLE"] == "Enabled") || (myHash["BLE_MODE_SKELETON"] == "Enabled")]
+/**
+  * @brief  BLE Host stack processing callback.
+  * @param  None
+  * @retval None
+  */
 void BleStackCB_Process(void)
 {
   /* USER CODE BEGIN BleStackCB_Process 0 */
@@ -68,8 +79,9 @@ void BleStackCB_Process(void)
 [#if myHash["BLE_MODE_SKELETON"] == "Enabled" ]
 
 [#else]
+  /* BLE Host stack processing through background task */
 [#if myHash["SEQUENCER_STATUS"]?number == 1 ]
-  UTIL_SEQ_SetTask( 1U << CFG_TASK_BLE_HOST, CFG_SCH_PRIO_0);
+  UTIL_SEQ_SetTask( 1U << CFG_TASK_BLE_HOST, CFG_SEQ_PRIO_0);
 
 [#elseif myHash["THREADX_STATUS"]?number == 1 ]
   tx_semaphore_put(&BLE_HOST_Thread_Sem);

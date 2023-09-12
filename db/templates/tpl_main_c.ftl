@@ -33,6 +33,9 @@
 [#if (H7_ETH_NoLWIP?? || F4_ETH_NoLWIP?? || F7_ETH_NoLWIP?? || H5_ETH_NoLWIP??) && HALCompliant??]
 #include "string.h"
 [/#if]
+[#if jpeg_utils_conf_h??]
+  #include "${jpeg_utils_conf_h}"
+[/#if]
 [#-- IF GFXMMU is used and all is generated in the main and the Lut is configured--]
 [#if GFXMMUisUsed?? && HALCompliant?? && !Display_Interface_LTDC_DSIHOST?? ]
 [#if FamilyName=="STM32U5"]
@@ -46,9 +49,9 @@
 [@common.optincludeFile path=coreDir+"Inc" name="gfxmmu_lut.h"/]
 
 [/#if]
-[#if FREERTOS?? || XCUBEFREERTOS??]
+
 [@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_inc.tmp"/][#--include freertos includes --]
-[/#if]
+
 [#-- if !HALCompliant??--][#-- if HALCompliant Begin --]
 [#assign LWIPUSed = "false"]
 [#assign MBEDTLSUSed = "false"]
@@ -154,7 +157,7 @@
 #n
 /* Private typedef -----------------------------------------------------------*/
 [#if HALCompliant??]
-[#if FREERTOS??]
+[#if !XCUBEFREERTOS??]
 [@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_typedefs.tmp"/]
 [/#if]
 [/#if]
@@ -182,7 +185,7 @@
 #define VTOR_TABLE_NS_START_ADDR  0x08020000UL 
 [#elseif McuName?starts_with("STM32U535CB") || McuName?starts_with("STM32U535RB")]
 #define VTOR_TABLE_NS_START_ADDR  0x08010000UL
-[#elseif McuName?starts_with("STM32U5A") || McuName?starts_with("STM32U59")]
+[#elseif McuName?starts_with("STM32U5A") || McuName?starts_with("STM32U595QJ") || McuName?starts_with("STM32U595RJ")|| McuName?starts_with("STM32U595VJ")|| McuName?starts_with("STM32U595ZJ")|| McuName?starts_with("STM32U5G7")|| McuName?starts_with("STM32U5G9")|| McuName?starts_with("STM32U5F7VJ")|| McuName?starts_with("STM32U5F9BJ")|| McuName?starts_with("STM32U5F9NJ")|| McuName?starts_with("STM32U5F9VJ")|| McuName?starts_with("STM32U5F9ZJ")]
 #define VTOR_TABLE_NS_START_ADDR  0x08200000UL
 [#elseif FamilyName=="STM32WBA"]
   [#if McuName?matches("^STM32WBA5..[E]..")]
@@ -353,7 +356,7 @@ ${dHandle};
     [#--ADD FSMC Code End--] 
     [#-- RTOS variables --]
     [#-- ADD RTOS Code Begin--]
-	[#if FREERTOS??]
+	[#if !XCUBEFREERTOS??]
     [@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_vars.tmp"/]   
 	[/#if]
     [#-- ADD RTOS Code End--]
@@ -424,6 +427,7 @@ static void SystemPower_Config(void);
 [/#if]
 [#if mpuControl??] [#-- if MPU config is enabled --]
 [#--if !McuDualCore?? || (cpucore=="ARM_CORTEX_M7" && McuDualCore??)--]
+static void MPU_Initialize(void); 
 static void MPU_Config(void); 
 [#--/#if--]  
 [/#if]    
@@ -449,7 +453,7 @@ static void MPU_Config(void);
 	[#if OPENAMP??]
        int MX_OPENAMP_Init(int RPMsgRole, rpmsg_ns_bind_cb ns_bind_cb);
     [/#if]
-	[#if FREERTOS??]
+	[#if !XCUBEFREERTOS??]
  [@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_pfp.tmp"/]
     [/#if]
 
@@ -496,12 +500,7 @@ int main(void)
   #tint32_t timeout; 
   /* USER CODE END Boot_Mode_Sequence_0 */
 [/#if]
-[#if mpuControl??] [#-- if MPU config is enabled --]
-#n#t/* MPU Configuration--------------------------------------------------------*/
 
-    #tMPU_Config();
-    
-[/#if]
 
 [#if ICache??] [#-- if CPU ICache is enabled --]
 #n#t/* Enable I-Cache---------------------------------------------------------*/
@@ -553,10 +552,31 @@ int main(void)
 [/#if]
 [#if isHALUsed??]
 #tHAL_Init();
+
 [#if VTOR_TABLE_ADDR?? && TZEN=="1" && Secure=="true"]
 #n#t/* Configure The Vector Table address */
   #tSCB->VTOR = ${VTOR_TABLE_ADDR};
+[#if mpuControl??]
+[#else]
+[#if bootPathType?? && (bootPathType == "ST_IROT" || bootPathType == "ST_IROT_UROT")]  
+#t/* !!! To boot in a secure way, ${bootPathType} has configured and activated the Memory Protection Unit
+#t#tIn order to keep a secure environment execution, you should reconfigure the MPU to make it compatible with your application
+#t#tIn this example, MPU is disabled */
+#tHAL_MPU_Disable();
+#tHAL_MPU_Disable_NS();
 [/#if]
+[/#if]
+[/#if]
+
+[#if mpuControl??] [#-- if MPU config is enabled --]
+[#if bootPathType??]
+#n#t/* MPU Initialization--------------------------------------------------------*/
+#tMPU_Initialize();
+[/#if]
+#n#t/* MPU Configuration--------------------------------------------------------*/
+#tMPU_Config();
+[/#if]
+
 [#if HSEMConfig??]
 #n
 [#list HSEMConfig as clk]
@@ -704,7 +724,10 @@ int main(void)
 [/#if]
 #n
 #t/* USER CODE BEGIN Init */
-
+[#if VDDA_ISOLATION_LL??]
+#t/* Enable the independent analog and I/Os supply */
+#tLL_PWR_EnableVDDA();
+[/#if]
 #n#t/* USER CODE END Init */
 #n
 [#list voids as void]
@@ -902,9 +925,8 @@ int main(void)
   /* USER CODE END 2 */
 #n
 [#compress]
-[#if FREERTOS?? || THREADX?? || XCUBEFREERTOS??]
+
 [@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_kernelInit.tmp"/][#-- any RTOS can include here --]
-[/#if]
 [#list voids as void]
   [#if USBPD?? && void.functionName?? && void.functionName?contains("USBPD") && !void.isNotGenerated && void.genCode] [#-- cf BZ-79321 --]
     [#lt]#t/* USBPD initialisation ---------------------------------*/
@@ -920,7 +942,7 @@ int main(void)
 [/#if]
 
 [#if HALCompliant??][#-- Put after UBSPD init to keep examples generated unchanged --]
-[#if FREERTOS??]
+[#if !XCUBEFREERTOS??]
 [@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_obj_creat.tmp"/][#-- any RTOS can include here --]
 [/#if]
 [/#if]
@@ -947,8 +969,8 @@ int main(void)
 [/#if][#-- If FreeRtos is used --]
 #n
 
+ [@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_kernelStart.tmp"/]
 [#if FREERTOS?? || THREADX?? || XCUBEFREERTOS??] [#-- If FreeRtos is used (should become more generic: if RTOS??) --]
-  [@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_kernelStart.tmp"/]
   /* We should never get here as control is now taken by the scheduler */
 [/#if]
 [#if TZEN=="1" && Secure=="true"][#-- FreeRTOS is not enabled in that case --]
@@ -1550,12 +1572,40 @@ static void MX_NVIC_Init(void)
 /* USER CODE END 4 */
 #n
 [#if HALCompliant??] [#-- If FreeRtos is used (and tmp files included in the main) --]
-[#if FREERTOS??]
+[#if !XCUBEFREERTOS??]
 [@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_default_thread.tmp"/]
 [@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_threads.tmp"/]
 [@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_callbacks.tmp"/]
 [/#if]
 [/#if] [#-- If FreeRtos is used (and tmp files included in the main) --]
+[#if mpuControl?? && bootPathType??]
+void MPU_Initialize() 
+{
+#tuint32_t i = (MPU->TYPE & MPU_TYPE_DREGION_Msk) >> MPU_TYPE_DREGION_Pos;
+
+#twhile (i > 0)
+#t{
+#t#t__DMB(); /* Force any outstanding transfers to complete before disabling MPU */
+
+#t#t/* Disable fault exceptions */
+#t#tSCB->SHCSR &= ~SCB_SHCSR_MEMFAULTENA_Msk;		
+		
+#t#tMPU->CTRL = 0;
+
+#t#tMPU->RNR  = (i - 1) & MPU_RNR_REGION_Msk;
+
+#t#tMPU->RBAR = 0;
+#t#tMPU->RLAR = 0;
+
+#t#t/* Follow ARM recommendation with */
+#t#t/* Data Synchronization and Instruction Synchronization Barriers to ensure MPU configuration */
+#t#t__DSB(); /* Ensure that the subsequent instruction is executed only after the write to memory */
+#t#t__ISB(); /* Flush and refill pipeline with updated MPU configuration settings */
+		
+#t#ti--;
+#t}
+}
+[/#if]
 [#--if !McuDualCore?? || (cpucore=="ARM_CORTEX_M7" && McuDualCore??)--]
 [#if mpuControl??] [#-- if MPU config is enabled --]
 /* MPU Configuration */

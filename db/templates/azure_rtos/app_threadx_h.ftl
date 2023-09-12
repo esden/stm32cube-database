@@ -102,7 +102,6 @@
 /* USER CODE END EC */
 
 [#assign familyName=FamilyName?lower_case]
-[#if !familyName?starts_with("stm32c0")]
 /* Private defines -----------------------------------------------------------*/
 [#if AZRTOS_APP_MEM_ALLOCATION_METHOD_value != "0"]
 [#if TX_APP_GENERATE_INIT_CODE_value != "false"]
@@ -114,7 +113,6 @@
 #define TX_APP_SINGLE_MSG_SIZE                                     ${TX_MSG_SIZE_WORDS_value}
 #define TX_APP_MSG_QUEUE_NB_MSG                                    ${TX_NB_MSG_value}
 #define TX_APP_MSG_QUEUE_FULL_SIZE                                 TX_APP_SINGLE_MSG_SIZE * TX_APP_MSG_QUEUE_NB_MSG
-[/#if]
 [/#if]
 [/#if]
 
@@ -162,13 +160,6 @@ void ${TX_APP_THREAD_ENTRY_value}(ULONG thread_input);
 /* USER CODE BEGIN EFP */
 
 /* USER CODE END EFP */
-
-[#if familyName?starts_with("stm32c0")]
-/* Private defines -----------------------------------------------------------*/
-/* USER CODE BEGIN PD */
-
-/* USER CODE END PD */
-[/#if]
 
 /* USER CODE BEGIN 1 */
 

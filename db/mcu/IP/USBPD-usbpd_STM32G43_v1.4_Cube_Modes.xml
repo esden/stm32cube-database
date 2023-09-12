@@ -116,6 +116,27 @@
     <RefParameter Name="PE_SpecRevision_P0" Comment="Specification revision value" Type="list" Group="Port 0 Parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_SPECIFICATION_REV3">
         <PossibleValue Value="USBPD_SPECIFICATION_REV3" Comment="Revision 3 (PD3)" Semaphore="USBPD_SPEC_REV3"/>
     </RefParameter>
+
+    <RefParameter Name="PE_DefaultRole_P0" Comment="Default port role" Type="uniqueElementList" Group="Port 0 Parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_PORTPOWERROLE_SRC">
+<!--    <Condition Expression="(!((SourceUCPD1|DualRoleUCPD1) &amp; USBPD_P0U1) &amp; USBPD_PD3MINSRC)" Diagnostic="" />       -->
+        <Condition Expression="USBPD_PD3MINSRC" Diagnostic="" />
+        <PossibleValue Value="USBPD_PORTPOWERROLE_SRC" Comment="Source"/>
+        <Description>
+            When the UCPD instance is initialized to sink then the port role will always be sink.&lt;br&gt;
+            When the UCPD instance is initialized to source then the port role will always be source.&lt;br&gt;
+            When the UCPD instance is initialized to dual role then the port role can either be source or sink. By default it will be initialized to sink.
+        </Description>
+    </RefParameter>
+    <RefParameter Name="PE_DefaultRole_P0" Comment="Default port role" Type="uniqueElementList" Group="Port 0 Parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_PORTPOWERROLE_SNK">
+        <Condition Expression="USBPD_PD3MINSNK" Diagnostic="" />
+        <PossibleValue Value="USBPD_PORTPOWERROLE_SNK" Comment="Sink"/>
+        <Description>
+            When the UCPD instance is initialized to sink then the port role will always be sink.&lt;br&gt;
+            When the UCPD instance is initialized to source then the port role will always be source.&lt;br&gt;
+            When the UCPD instance is initialized to dual role then the port role can either be source or sink. By default it will be initialized to sink.
+        </Description>
+    </RefParameter>
+
     <RefParameter Name="PE_DefaultRole_P0" Comment="Default port role" Type="list" Group="Port 0 Parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_PORTPOWERROLE_SNK">
         <!--PossibleValue Value="USBPD_CABLEPLUG_FROMDFPUFP" Comment="Message originated from a DFP or UFP" Condition="!(DualRoleUCPD1)"/-->
         <PossibleValue Value="USBPD_PORTPOWERROLE_SNK" Comment="Sink" Condition="!((SinkUCPD1|DualRoleUCPD1) &amp; USBPD_P0U1)"/>
@@ -127,29 +148,71 @@
             When the UCPD instance is initialized to dual role then the port role can either be source or sink. By default it will be initialized to sink.
         </Description>
     </RefParameter>
+
+    <RefParameter Name="PE_RoleSwap_P0" Comment="Port role swap" Type="uniqueElementList" Group="Port 0 Parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE">
+        <Condition Expression="(USBPD_PD3MINSRC | USBPD_PD3MINSNK)" Diagnostic="" />
+        <PossibleValue Value="USBPD_FALSE" Comment="Not supported"  Condition="(DualRoleUCPD1 &amp; USBPD_P0U1)" Diagnostic="The UCPD instance has been configured as dual role"/>
+        <Description>"Port role swap" is not supported by "Min Source" and "Min Sink" mode.</Description>
+    </RefParameter>
     <RefParameter Name="PE_RoleSwap_P0" Comment="Port role swap" Type="list" Group="Port 0 Parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE">
         <PossibleValue Value="USBPD_FALSE" Comment="Not supported" Condition="(DualRoleUCPD1 &amp; USBPD_P0U1)" Diagnostic="The UCPD instance has been configured as dual role"/>
         <PossibleValue Value="USBPD_TRUE" Comment="Supported" Condition="((SinkUCPD1|SourceUCPD1) &amp; USBPD_P0U1)" Diagnostic="The UCPD instance has not been configured as dual role"/>
+    </RefParameter>
+
+    <RefParameter Name="PE_DataSwap_P0" Comment="Data role swap" Type="uniqueElementList" Group="Port 0 Parameters" TabName="User Port 0 Parameters" DefaultValue="USBPD_FALSE">
+        <Condition Expression="(USBPD_PD3MINSRC | USBPD_PD3MINSNK)" Diagnostic="" />
+        <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
     </RefParameter>
     <RefParameter Name="PE_DataSwap_P0" Comment="Data role swap" Type="list" Group="Port 0 Parameters" TabName="User Port 0 Parameters" DefaultValue="USBPD_FALSE">
         <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
         <PossibleValue Value="USBPD_TRUE" Comment="Supported"/>
     </RefParameter>
+
+    <RefParameter Name="PE_DR_Swap_To_DFP_P0" Comment="Data role swap to DFP" Type="uniqueElementList" Group="Port 0 Parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE">
+        <Condition Expression="(USBPD_PD3MINSRC | USBPD_PD3MINSNK)" Diagnostic="" />
+        <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
+        <Description>"Data role swap to DFP" is not supported by "Min Source" and "Min Sink" mode.</Description>
+    </RefParameter>
     <RefParameter Name="PE_DR_Swap_To_DFP_P0" Comment="Data role swap to DFP" Type="list" Group="Port 0 Parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_TRUE">
         <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
         <PossibleValue Value="USBPD_TRUE" Comment="Supported"/>
+    </RefParameter>
+
+    <RefParameter Name="PE_DR_Swap_To_UFP_P0" Comment="Data role swap to UFP" Type="uniqueElementList" Group="Port 0 Parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE">
+        <Condition Expression="(USBPD_PD3MINSRC | USBPD_PD3MINSNK)" Diagnostic="" />
+        <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
+        <Description>"Data role swap to UFP" is not supported by "Min Source" and "Min Sink" mode.</Description>
     </RefParameter>
     <RefParameter Name="PE_DR_Swap_To_UFP_P0" Comment="Data role swap to UFP" Type="list" Group="Port 0 Parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_TRUE">
         <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
         <PossibleValue Value="USBPD_TRUE" Comment="Supported"/>
     </RefParameter>
+
+    <RefParameter Name="PE_VconnSwap_P0" Comment="VCONN swap" Type="uniqueElementList" Group="Port 0 Parameters" TabName="User Port 0 Parameters" DefaultValue="USBPD_FALSE">
+        <Condition Expression="USBPD_PD3MINSNK" Diagnostic="" />
+        <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
+        <Description>"VCONN swap" is not supported by "Min Sink" mode.</Description>
+    </RefParameter>
     <RefParameter Name="PE_VconnSwap_P0" Comment="VCONN swap" Type="list" Group="Port 0 Parameters" TabName="User Port 0 Parameters" DefaultValue="USBPD_FALSE">
         <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
         <PossibleValue Value="USBPD_TRUE" Comment="Supported"/>
     </RefParameter>
+
+    <RefParameter Name="PE_VDMSupport_P0" Comment="Vendor defined messages" Type="uniqueElementList" Group="Port 0 Parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE">
+        <Condition Expression="(USBPD_PD3CFG1 | USBPD_PD3MINSRC | USBPD_PD3MINSNK | USBPD_PD3MINDRP)" Diagnostic="" />
+        <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
+        <Description>"Vendor defined messages" is not supported by "CONFIG1", "Min Source", "Min Sink" and "Min Drp" mode.</Description>
+    </RefParameter>
+
     <RefParameter Name="PE_VDMSupport_P0" Comment="Vendor defined messages" Type="list" Group="Port 0 Parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE">
         <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
         <PossibleValue Value="USBPD_TRUE" Comment="Supported"/>
+    </RefParameter>
+
+    <RefParameter Name="PE_RespondsToDiscovSOP_P0" Comment="Discover Identity response" Type="uniqueElementList" Group="Port 0 Parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE">
+        <Condition Expression="USBPD_PD3MINSNK" Diagnostic="" />
+        <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
+        <Description>"Discover Identity response" is not supported by "Min Sink" mode.</Description>
     </RefParameter>
     <RefParameter Name="PE_RespondsToDiscovSOP_P0" Comment="Discover Identity response" Type="list" Group="Port 0 Parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE">
         <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
@@ -158,6 +221,11 @@
     <RefParameter Name="PE_AttemptsDiscovSOP_P0" Comment="Discover Identity sent" Type="list" Group="Port 0 Parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE">
         <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
         <PossibleValue Value="USBPD_TRUE" Comment="Supported"/>
+    </RefParameter>
+
+    <RefParameter Name="PE_PingSupport_P0" Comment="Ping" Type="uniqueElementList" Group="Port 0 Parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE">
+        <Condition Expression="(USBPD_PD3MINSRC | USBPD_PD3MINSNK | USBPD_PD3MINDRP)" Diagnostic="" />
+        <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
     </RefParameter>
     <RefParameter Name="PE_PingSupport_P0" Comment="Ping" Type="list" Group="Port 0 Parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE">
         <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
@@ -172,6 +240,11 @@
         <PossibleValue Value="USBPD_TRUE" Comment="Supported"/>
     </RefParameter>
 
+    <RefParameter Name="PE_UnchunkSupport_P0" Comment="Unchunk mode" Type="uniqueElementList" Group="PD Revision 3 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE">
+        <Condition Expression="(USBPD_PD3MINSRC | USBPD_PD3MINSNK | USBPD_PD3MINDRP)" Diagnostic="" />
+        <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
+        <Description>"Unchunk mode" is not supported by "Min Source", "Min Sink" and "Min Drp" mode.</Description>
+    </RefParameter>
     <RefParameter Name="PE_UnchunkSupport_P0" Comment="Unchunk mode" Type="list" Group="PD Revision 3 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE">
         <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
         <PossibleValue Value="USBPD_TRUE" Comment="Supported"/>
@@ -180,21 +253,72 @@
     <RefParameter Name="PE_UnchunkSupport_P0" Comment="Unchunk mode" Type="list" Group="PD Revision 3 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE" Visible="false">
         <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
     </RefParameter>
-    <RefParameter Name="PE_FastRoleSwapSupport_P0" Comment="Fast role swap" Type="list" Group="PD Revision 3 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE">
-        <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
-        <PossibleValue Value="USBPD_TRUE" Comment="Supported"/>
+
+<RefParameter Name="PE_FastRoleSwapSupportDisplayed_P0" Comment="Fast role swap" Type="uniqueElementList" Group="PD Revision 3 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_PDO_SNK_FIXED_FRS_NOT_SUPPORTED">
+        <Condition Expression="(USBPD_PD3MINSRC | USBPD_PD3MINSNK | USBPD_PD3MINDRP)" Diagnostic="" />
+        <PossibleValue Value="USBPD_PDO_SNK_FIXED_FRS_NOT_SUPPORTED" Comment="Not supported" Semaphore="S_USBPD_FRS_NOT_SUPPORTED"/>
+        <Description>"Fast role swap" is not supported by "Min Source", "Min Sink" and "Min Drp" mode.</Description>
+</RefParameter>
+
+<RefParameter Name="PE_FastRoleSwapSupportDisplayed_P0" Comment="Fast role swap" Type="list" Group="PD Revision 3 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_PDO_SNK_FIXED_FRS_NOT_SUPPORTED">
+        <PossibleValue Value="USBPD_PDO_SNK_FIXED_FRS_NOT_SUPPORTED" Comment="Not supported" Semaphore="S_USBPD_FRS_NOT_SUPPORTED"/>
+        <PossibleValue Value="USBPD_PDO_SNK_FIXED_FRS_DEFAULT" Comment="Default USB Power"/>
+        <PossibleValue Value="USBPD_PDO_SNK_FIXED_FRS_1_5A" Comment="1.5A @ 5V"/>
+        <PossibleValue Value="USBPD_PDO_SNK_FIXED_FRS_3A" Comment="3.0A@ 5V"/>
         <Condition Expression="PE_SpecRevision_P0=USBPD_SPECIFICATION_REV3" Diagnostic="Only available if the specification revision value is set to 3"/>
-    </RefParameter>
-    <RefParameter Name="PE_FastRoleSwapSupport_P0" Comment="Fast role swap" Type="list" Group="PD Revision 3 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE" Visible="false">
-        <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
+</RefParameter>
+
+<RefParameter Name="PE_FastRoleSwapSupportDisplayed_P0" Comment="Fast role swap" Type="list" Group="PD Revision 3 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_PDO_SNK_FIXED_FRS_NOT_SUPPORTED">
+        <PossibleValue Value="USBPD_PDO_SNK_FIXED_FRS_NOT_SUPPORTED" Comment="Not supported" Semaphore="S_USBPD_FRS_NOT_SUPPORTED"/>
+</RefParameter>
+
+<RefParameter Name="PE_FastRoleSwapSupport_P0" Comment="Fast role swap hidden" Type="uniqueElementList" Group="PD Revision 3 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE" Visible="false">
+        <Condition Expression="S_USBPD_FRS_NOT_SUPPORTED" Diagnostic=""/>
+        <PossibleValue Value="USBPD_FALSE" Comment="USBPD_FALSE" />
+</RefParameter>
+<RefParameter Name="PE_FastRoleSwapSupport_P0" Comment="Fast role swap hidden" Type="uniqueElementList" Group="PD Revision 3 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_TRUE" Visible="false">
+                <PossibleValue Value="USBPD_TRUE" Comment="USBPD_TRUE" />
+</RefParameter>
+
+
+
+<RefParameter Name="USBPD_PDO_FIXED_EXT_POWER_P0" Comment="Unconstrained Power" Type="list" Group="PD Revision 3 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE">
+        <PossibleValue Value="VUSBPD_PDO_FIXED_EXT_POWER_NOT_SUPPORTED" Comment="Not supported"/>
+        <PossibleValue Value="VUSBPD_PDO_FIXED_EXT_POWER_SUPPORTED" Comment="Supported"/>
+</RefParameter>
+<RefParameter Name="USBPD_PDO_FIXED_HIGHERCAPAB_P0" Comment="Higher Capability" Type="list" Group="PD Revision 3 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_PDO_SNK_FIXED_HIGHERCAPAB_NOT_SUPPORTED">
+        <PossibleValue Value="USBPD_PDO_SNK_FIXED_HIGHERCAPAB_NOT_SUPPORTED" Comment="Not supported"/>
+        <PossibleValue Value="USBPD_PDO_SNK_FIXED_HIGHERCAPAB_SUPPORTED" Comment="Supported"/>
+</RefParameter>
+
+<RefParameter Name="USBPD_PDO_FIXED_USBCOMM_P0" Comment="USB Communication Capable" Type="list" Group="PD Revision 3 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_PDO_FIXED_USBCOMM_NOT_SUPPORTED">
+        <PossibleValue Value="USBPD_PDO_FIXED_USBCOMM_NOT_SUPPORTED" Comment="Not supported"/>
+        <PossibleValue Value="USBPD_PDO_FIXED_USBCOMM_SUPPORTED" Comment="Supported"/>
+</RefParameter>
+
+<RefParameter Name="USBPD_PDO_FIXED_USBSUSPEND_P0" Comment="USB Suspend Supported" Type="list" Group="PD Revision 3 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_PDO_SRC_FIXED_USBSUSPEND_NOT_SUPPORTED">
+        <PossibleValue Value="USBPD_PDO_SRC_FIXED_USBSUSPEND_NOT_SUPPORTED" Comment="Not supported"/>
+        <PossibleValue Value="USBPD_PDO_SRC_FIXED_USBSUSPEND_SUPPORTED" Comment="Supported"/>
+</RefParameter>
+
+    <RefParameter Name="Is_GetPPSStatus_Supported_P0" Comment="PPS message" Type="uniqueElementList" Group="PD Revision 3 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE">
+        <Condition Expression="(USBPD_PD3MINSRC | USBPD_PD3MINSNK | USBPD_PD3MINDRP)" Diagnostic="" />
+        <PossibleValue Value="USBPD_FALSE" Comment="Not supported" Semaphore="S_USBPD_PPS_APDO"/>
+        <Description>"PPS message" is not supported by "Min Sink", "Min Source" and "Min Drp" mode.</Description>
     </RefParameter>
     <RefParameter Name="Is_GetPPSStatus_Supported_P0" Comment="PPS message" Type="list" Group="PD Revision 3 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE">
-        <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
+        <PossibleValue Value="USBPD_FALSE" Comment="Not supported" Semaphore="S_USBPD_PPS_APDO1"/>
         <PossibleValue Value="USBPD_TRUE" Comment="Supported"/>
         <Condition Diagnostic="Only available if the specification revision value is set to 3" Expression="PE_SpecRevision_P0=USBPD_SPECIFICATION_REV3"/>
     </RefParameter>
     <RefParameter Name="Is_GetPPSStatus_Supported_P0" Comment="PPS message" Type="list" Group="PD Revision 3 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE" Visible="false">
+        <PossibleValue Value="USBPD_FALSE" Comment="Not supported" Semaphore="S_USBPD_PPS_APDO2"/>
+    </RefParameter>
+
+    <RefParameter Name="Is_SrcCapaExt_Supported_P0" Comment="Source Capabilities Extended message" Type="uniqueElementList" Group="PD Revision 3 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE">
+        <Condition Expression="(USBPD_PD3MINSRC | USBPD_PD3MINSNK | USBPD_PD3MINDRP)" Diagnostic="" />
         <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
+        <Description>"Source Capabilities Extended message" is not supported by "Min Sink", "Min Source" and "Min Drp" mode.</Description>
     </RefParameter>
     <RefParameter Name="Is_SrcCapaExt_Supported_P0" Comment="Source Capabilities Extended message" Type="list" Group="PD Revision 3 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE">
         <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
@@ -204,6 +328,12 @@
     <RefParameter Name="Is_SrcCapaExt_Supported_P0" Comment="Source Capabilities Extended message" Type="list" Group="PD Revision 3 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE" Visible="false">
         <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
     </RefParameter>
+
+    <RefParameter Name="Is_Alert_Supported_P0" Comment="Alert message" Type="uniqueElementList" Group="PD Revision 3 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE">
+        <Condition Expression="(USBPD_PD3MINSRC | USBPD_PD3MINSNK | USBPD_PD3MINDRP)" Diagnostic="" />
+        <PossibleValue Value="USBPD_FALSE" Comment="Not supported" Condition="Is_GetStatus_Supported_P0=USBPD_TRUE"/>
+        <Description>"Alert message" is not supported by "Min Sink", "Min Source" and "Min Drp" mode.</Description>
+    </RefParameter>
     <RefParameter Name="Is_Alert_Supported_P0" Comment="Alert message" Type="list" Group="PD Revision 3 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE">
         <PossibleValue Value="USBPD_FALSE" Comment="Not supported" Condition="Is_GetStatus_Supported_P0=USBPD_TRUE"/>
         <PossibleValue Value="USBPD_TRUE" Comment="Supported"/> <!-- Supported if Is_GetStatus_Supported_P0 is TRUE -->
@@ -211,6 +341,12 @@
     </RefParameter>
     <RefParameter Name="Is_Alert_Supported_P0" Comment="Alert message" Type="list" Group="PD Revision 3 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE" Visible="false">
         <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
+    </RefParameter>
+
+    <RefParameter Name="Is_GetStatus_Supported_P0" Comment="Status message" Type="uniqueElementList" Group="PD Revision 3 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE">
+        <Condition Expression="(USBPD_PD3MINSRC | USBPD_PD3MINSNK | USBPD_PD3MINDRP)" Diagnostic="" />
+        <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
+        <Description>"Status message" is not supported by "Min Sink", "Min Source" and "Min Drp" mode.</Description>
     </RefParameter>
     <RefParameter Name="Is_GetStatus_Supported_P0" Comment="Status message" Type="list" Group="PD Revision 3 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE">
         <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
@@ -220,6 +356,12 @@
     <RefParameter Name="Is_GetStatus_Supported_P0" Comment="Status message" Type="list" Group="PD Revision 3 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE" Visible="false">
         <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
     </RefParameter>
+
+    <RefParameter Name="Is_GetManufacturerInfo_Supported_P0" Comment="Manufacturer Info message" Type="uniqueElementList" Group="PD Revision 3 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE">
+        <Condition Expression="(USBPD_PD3MINSRC | USBPD_PD3MINSNK | USBPD_PD3MINDRP)" Diagnostic="" />
+        <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
+        <Description>"Manufacturer Info message" is not supported by "Min Sink", "Min Source" and "Min Drp" mode.</Description>
+    </RefParameter>
     <RefParameter Name="Is_GetManufacturerInfo_Supported_P0" Comment="Manufacturer Info message" Type="list" Group="PD Revision 3 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE">
         <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
         <PossibleValue Value="USBPD_TRUE" Comment="Supported"/>
@@ -227,6 +369,12 @@
     </RefParameter>
     <RefParameter Name="Is_GetManufacturerInfo_Supported_P0" Comment="Manufacturer Info message" Type="list" Group="PD Revision 3 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE" Visible="false">
         <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
+    </RefParameter>
+
+    <RefParameter Name="Is_GetCountryCodes_Supported_P0" Comment="Country Codes message" Type="uniqueElementList" Group="PD Revision 3 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE">
+        <Condition Expression="(USBPD_PD3MINSRC | USBPD_PD3MINSNK | USBPD_PD3MINDRP)" Diagnostic="" />
+        <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
+        <Description>"Country Codes message" is not supported by "Min Sink", "Min Source" and "Min Drp" mode.</Description>
     </RefParameter>
     <RefParameter Name="Is_GetCountryCodes_Supported_P0" Comment="Country Codes message" Type="list" Group="PD Revision 3 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE">
         <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
@@ -236,6 +384,12 @@
     <RefParameter Name="Is_GetCountryCodes_Supported_P0" Comment="Country Codes message" Type="list" Group="PD Revision 3 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE" Visible="false">
         <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
     </RefParameter>
+
+    <RefParameter Name="Is_GetCountryInfo_Supported_P0" Comment="Country Info message" Type="uniqueElementList" Group="PD Revision 3 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE">
+        <Condition Expression="(USBPD_PD3MINSRC | USBPD_PD3MINSNK | USBPD_PD3MINDRP)" Diagnostic="" />
+        <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
+        <Description>"Country Info message" is not supported by "Min Sink", "Min Source" and "Min Drp" mode.</Description>
+    </RefParameter>
     <RefParameter Name="Is_GetCountryInfo_Supported_P0" Comment="Country Info message" Type="list" Group="PD Revision 3 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE">
         <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
         <PossibleValue Value="USBPD_TRUE" Comment="Supported"/>
@@ -244,6 +398,12 @@
     <RefParameter Name="Is_GetCountryInfo_Supported_P0" Comment="Country Info message" Type="list" Group="PD Revision 3 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE" Visible="false">
         <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
     </RefParameter>
+
+    <RefParameter Name="Is_SecurityRequest_Supported_P0" Comment="Security Response message" Type="uniqueElementList" Group="PD Revision 3 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE">
+        <Condition Expression="(USBPD_PD3MINSRC | USBPD_PD3MINSNK | USBPD_PD3MINDRP)" Diagnostic="" />
+        <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
+        <Description>"Security Response message" is not supported by "Min Sink", "Min Source" and "Min Drp" mode.</Description>
+    </RefParameter>
     <RefParameter Name="Is_SecurityRequest_Supported_P0" Comment="Security Response message" Type="list" Group="PD Revision 3 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE">
         <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
         <PossibleValue Value="USBPD_TRUE" Comment="Supported"/>
@@ -251,6 +411,12 @@
     </RefParameter>
     <RefParameter Name="Is_SecurityRequest_Supported_P0" Comment="Security Response message" Type="list" Group="PD Revision 3 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE" Visible="false">
         <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
+    </RefParameter>
+
+    <RefParameter Name="Is_FirmUpdateRequest_Supported_P0" Comment="Firmware update Response message" Type="uniqueElementList" Group="PD Revision 3 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE">
+        <Condition Expression="(USBPD_PD3MINSRC | USBPD_PD3MINSNK | USBPD_PD3MINDRP)" Diagnostic="" />
+        <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
+        <Description>"Firmware update Response message" is not supported by "Min Sink", "Min Source" and "Min Drp" mode.</Description>
     </RefParameter>
     <RefParameter Name="Is_FirmUpdateRequest_Supported_P0" Comment="Firmware update Response message" Type="list" Group="PD Revision 3 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE">
         <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
@@ -262,6 +428,12 @@
     </RefParameter>
     <RefParameter Name="Is_SnkCapaExt_Supported_P0" Comment="Sink Capabilities Extended message" Type="list" Group="PD Revision 3 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_TRUE" Visible="false">
         <PossibleValue Value="USBPD_TRUE" Comment="IOCCompatibility"/>
+    </RefParameter>
+
+    <RefParameter Name="Is_GetBattery_Supported_P0" Comment="Get Battery Capabitity and Status messages" Type="uniqueElementList" Group="PD Revision 3 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE">
+        <Condition Expression="(USBPD_PD3MINSRC | USBPD_PD3MINSNK | USBPD_PD3MINDRP)" Diagnostic="" />
+        <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
+        <Description>"Get Battery Capabitity and Status messages" is not supported by "Min Sink", "Min Source" and "Min Drp" mode.</Description>
     </RefParameter>
     <RefParameter Name="Is_GetBattery_Supported_P0" Comment="Get Battery Capabitity and Status messages" Type="list" Group="PD Revision 3 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE">
         <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
@@ -471,7 +643,188 @@
     <RefParameter Name="PORT0_SINK_PDO7" Type="list" Comment="port 0 Sink PDO 7" TabName="PDO General Definitions" Min="0x00000000" Max="0x00000000" DefaultValue="0x00000000" Visible="false">
         <PossibleValue Value="0x00000000" Comment="0x00000000"/>
     </RefParameter>
+    <!-- Copy begin of RefPArameters sheet -->
+<RefParameter Name="USBPD_PDO_NB" Comment="Number of PDO to define" Type="integer" DefaultValue="1" Min="1" Max ="8"/>
 
+<RefParameter Name="USBPD_PDO_TYPE" Comment="PDO type" Type="list" DefaultValue="USBPD_PDO_TYPE_FIXED">
+        <Condition Expression="Is_GetPPSStatus_Supported_P0=USBPD_FALSE" Diagnostic="PPS should be supported" />
+        <PossibleValue Value="USBPD_PDO_TYPE_FIXED" Comment="Fixed Supply (Vmin=Vmax)" />
+        <PossibleValue Value="USBPD_PDO_TYPE_BATTERY" Comment="Battery"/>
+        <PossibleValue Value="USBPD_PDO_TYPE_VARIABLE" Comment="Variable Supply" />
+        <PossibleValue Value="USBPD_PDO_TYPE_APDO" Comment="Augmented Power Data Object (APDO)" Condition="!(S_USBPD_PPS_APDO) | !(S_USBPD_PPS_APDO2) | !(S_USBPD_PPS_APDO3)" Diagnostic="USBPD_PDO_TYPE_APDO"/>
+        <Description>It doesn't support "Augmented Power Data Object (APDO)" in case of "PPS Message" in sheet "Stack Port 0 Parameters" is "Not Supported"</Description>
+</RefParameter>
+<RefParameter Name="USBPD_PDO_TYPE" Comment="PDO type" Type="list" DefaultValue="USBPD_PDO_TYPE_FIXED">
+        <PossibleValue Value="USBPD_PDO_TYPE_FIXED" Comment="Fixed Supply (Vmin=Vmax)"/>
+        <PossibleValue Value="USBPD_PDO_TYPE_BATTERY" Comment="Battery"/>
+        <PossibleValue Value="USBPD_PDO_TYPE_VARIABLE" Comment="Variable Supply"/>
+        <PossibleValue Value="USBPD_PDO_TYPE_APDO" Comment="Augmented Power Data Object (APDO)" />
+</RefParameter>
+
+<RefParameter Name="USBPD_PDO_APDO_SET_MAX_CURRENT" Comment="Max Current (mA)" Type="integer" DefaultValue="0" Min="0" Max ="5000"> <Description>3A max, 5A only for 20V PDO</Description>    </RefParameter>
+<RefParameter Name="USBPD_PDO_APDO_SET_MAX_VOLTAGE" Comment="Max Voltage (mV)" Type="integer" DefaultValue="5000" Min="3300" Max ="21000"> <Description></Description>    </RefParameter>
+<RefParameter Name="USBPD_PDO_APDO_SET_MIN_VOLTAGE" Comment="Min Voltage (mV)" Type="integer" DefaultValue="5000" Min="3300" Max ="21000"> <Description></Description>    </RefParameter>
+
+
+<RefParameter Name="USBPD_PORT0_PDO_SRC_FIXED_DRD" Comment="Dual-Role Data" Type="uniqueElementList" DefaultValue="USBPD_PDO_SRC_FIXED_DRD_SUPPORTED">
+        <Condition Expression="(PE_DR_Swap_To_DFP_P0=USBPD_TRUE | PE_DR_Swap_To_UFP_P0=USBPD_TRUE)" Diagnostic="" />
+        <PossibleValue Value="USBPD_PDO_SRC_FIXED_DRD_SUPPORTED" Comment="Supported"/>
+        <Description>It takes "Supported" of "Data role swap to UFP" or "Data role swap to UFP" parameter available in the "Stack Port 0 Parameters" sheet in case of one of them is "supported" else "Not Supported"</Description>
+</RefParameter>
+<RefParameter Name="USBPD_PORT0_PDO_SRC_FIXED_DRD" Comment="Dual-Role Data" Type="uniqueElementList" DefaultValue="USBPD_PDO_SRC_FIXED_DRD_NOT_SUPPORTED">
+        <PossibleValue Value="USBPD_PDO_SRC_FIXED_DRD_NOT_SUPPORTED" Comment="Not supported"/>
+        <Description>It takes "Supported" of "Data role swap to UFP" or "Data role swap to UFP" parameter available in the "Stack Port 0 Parameters" sheet in case of one of them is "supported" else "Not Supported"</Description>
+</RefParameter>
+
+<RefParameter Name="USBPD_PORT0_PDO_SNK_FIXED_DRD" Comment="Dual-Role Data" Type="uniqueElementList" DefaultValue="USBPD_PDO_SNK_FIXED_DRD_SUPPORTED">
+        <Condition Expression="(PE_DR_Swap_To_DFP_P0=USBPD_TRUE | PE_DR_Swap_To_UFP_P0=USBPD_TRUE)" Diagnostic="" />
+        <PossibleValue Value="USBPD_PDO_SNK_FIXED_DRD_SUPPORTED" Comment="Supported"/>
+        <Description>It takes "Supported" of "Data role swap to UFP" or "Data role swap to UFP" parameter available in the "Stack Port 0 Parameters" sheet in case of one of them is "supported" else "Not Supported"</Description>
+</RefParameter>
+<RefParameter Name="USBPD_PORT0_PDO_SNK_FIXED_DRD" Comment="Dual-Role Data" Type="uniqueElementList" DefaultValue="USBPD_PDO_SNK_FIXED_DRD_NOT_SUPPORTED">
+        <PossibleValue Value="USBPD_PDO_SNK_FIXED_DRD_NOT_SUPPORTED" Comment="Not supported"/>
+        <Description>It takes "Supported" of "Data role swap to UFP" or "Data role swap to UFP" parameter available in the "Stack Port 0 Parameters" sheet in case of one of them is "supported" else "Not Supported"</Description>
+</RefParameter>
+
+
+<RefParameter Name="USBPD_PORT0_PDO_SRC_FIXED_DRP" Comment="Dual Role Power" Type="uniqueElementList" DefaultValue="USBPD_PDO_SRC_FIXED_DRP_SUPPORTED">
+        <Condition Expression="PE_RoleSwap_P0=USBPD_TRUE" Diagnostic="" />
+        <PossibleValue Value="USBPD_PDO_SRC_FIXED_DRP_SUPPORTED" Comment="Supported"/>
+        <Description>It takes the value of "Port role swap" parameter available in the "Stack Port 0 Parameters" sheet </Description>
+</RefParameter>
+<RefParameter Name="USBPD_PORT0_PDO_SRC_FIXED_DRP" Comment="Dual Role Power" Type="uniqueElementList" DefaultValue="USBPD_PDO_SRC_FIXED_DRP_NOT_SUPPORTED">
+        <PossibleValue Value="USBPD_PDO_SRC_FIXED_DRP_NOT_SUPPORTED" Comment="Not supported"/>
+        <Description>It takes the value of "Port role swap" parameter available in the "Stack Port 0 Parameters" sheet </Description>
+</RefParameter>
+
+<RefParameter Name="USBPD_PORT0_PDO_SNK_FIXED_DRP" Comment="Dual Role Power" Type="uniqueElementList" DefaultValue="USBPD_PDO_SNK_FIXED_DRP_SUPPORTED">
+        <Condition Expression="PE_RoleSwap_P0=USBPD_TRUE" Diagnostic="" />
+        <PossibleValue Value="USBPD_PDO_SNK_FIXED_DRP_SUPPORTED" Comment="Supported"/>
+        <Description>It takes the value of "Port role swap" parameter available in the "Stack Port 0 Parameters" sheet </Description>
+</RefParameter>
+<RefParameter Name="USBPD_PORT0_PDO_SNK_FIXED_DRP" Comment="Dual Role Power" Type="uniqueElementList" DefaultValue="USBPD_PDO_SNK_FIXED_DRP_NOT_SUPPORTED">
+        <PossibleValue Value="USBPD_PDO_SNK_FIXED_DRP_NOT_SUPPORTED" Comment="Not supported"/>
+        <Description>It takes the value of "Port role swap" parameter available in the "Stack Port 0 Parameters" sheet </Description>
+</RefParameter>
+
+
+<RefParameter Name="USBPD_PORT0_PDO_SRC_FIXED_EXT_POWER" Comment="Unconstrained Power" Type="uniqueElementList" DefaultValue="USBPD_PDO_SRC_FIXED_EXT_POWER_AVAILABLE">
+       <Condition Expression="USBPD_PDO_FIXED_EXT_POWER_P0=VUSBPD_PDO_FIXED_EXT_POWER_SUPPORTED" Diagnostic="" />
+       <PossibleValue Value="USBPD_PDO_SRC_FIXED_EXT_POWER_AVAILABLE" Comment="Supported"/>
+       <Description>It takes the value of "Unconstrained Power" parameter available in the "Stack Port 0 Parameters" sheet </Description>
+</RefParameter>
+<RefParameter Name="USBPD_PORT0_PDO_SRC_FIXED_EXT_POWER" Comment="Unconstrained Power" Type="uniqueElementList" DefaultValue="USBPD_PDO_SRC_FIXED_EXT_POWER_NOT_AVAILABLE">
+       <PossibleValue Value="USBPD_PDO_SRC_FIXED_EXT_POWER_NOT_AVAILABLE" Comment="Not supported"/>
+       <Description>It takes the value of "Unconstrained Power" parameter available in the "Stack Port 0 Parameters" sheet </Description>
+</RefParameter>
+
+
+<RefParameter Name="USBPD_PORT0_PDO_SNK_FIXED_EXT_POWER" Comment="Unconstrained Power" Type="uniqueElementList" DefaultValue="USBPD_PDO_SNK_FIXED_EXT_POWER_AVAILABLE">
+        <Condition Expression="USBPD_PDO_FIXED_EXT_POWER_P0=VUSBPD_PDO_FIXED_EXT_POWER_SUPPORTED" Diagnostic="" />
+        <PossibleValue Value="USBPD_PDO_SNK_FIXED_EXT_POWER_AVAILABLE" Comment="Supported"/>
+       <Description>It takes the value of "Unconstrained Power" parameter available in the "Stack Port 0 Parameters" sheet </Description>
+</RefParameter>
+<RefParameter Name="USBPD_PORT0_PDO_SNK_FIXED_EXT_POWER" Comment="Unconstrained Power" Type="uniqueElementList" DefaultValue="USBPD_PDO_SNK_FIXED_EXT_POWER_NOT_AVAILABLE">
+        <PossibleValue Value="USBPD_PDO_SNK_FIXED_EXT_POWER_NOT_AVAILABLE" Comment="Not supported"/>
+        <Description>It takes the value of "Unconstrained Power" parameter available in the "Stack Port 0 Parameters" sheet </Description>
+</RefParameter>
+
+
+<RefParameter Name="USBPD_PORT0_PDO_FIXED_FRS" Comment="Fast Role Swap" Type="uniqueElementList" DefaultValue="USBPD_PDO_SNK_FIXED_FRS_NOT_SUPPORTED">
+            <Condition Expression="PE_FastRoleSwapSupportDisplayed_P0=USBPD_PDO_SNK_FIXED_FRS_NOT_SUPPORTED" Diagnostic="" />
+            <PossibleValue Value="USBPD_PDO_SNK_FIXED_FRS_NOT_SUPPORTED" Comment="Not supported" />
+            <Description>"Fast Role Swap" takes the same value of "Fast Role Swap" in "Stack Port 0 Parameters" sheet.</Description>
+</RefParameter>
+<RefParameter Name="USBPD_PORT0_PDO_FIXED_FRS" Comment="Fast Role Swap" Type="uniqueElementList" DefaultValue="USBPD_PDO_SNK_FIXED_FRS_DEFAULT">
+            <Condition Expression="PE_FastRoleSwapSupportDisplayed_P0=USBPD_PDO_SNK_FIXED_FRS_DEFAULT" Diagnostic="" />
+            <PossibleValue Value="USBPD_PDO_SNK_FIXED_FRS_DEFAULT" Comment="Default USB Power"/>
+            <Description>"Fast Role Swap" takes the same value of "Fast Role Swap" in "Stack Port 0 Parameters" sheet.</Description>
+</RefParameter>
+<RefParameter Name="USBPD_PORT0_PDO_FIXED_FRS" Comment="Fast Role Swap" Type="uniqueElementList" DefaultValue="USBPD_PDO_SNK_FIXED_FRS_1_5A">
+            <Condition Expression="PE_FastRoleSwapSupportDisplayed_P0=USBPD_PDO_SNK_FIXED_FRS_1_5A" Diagnostic="" />
+            <PossibleValue Value="USBPD_PDO_SNK_FIXED_FRS_1_5A" Comment="1.5A @ 5V" />
+            <Description>"Fast Role Swap" takes the same value of "Fast Role Swap" in "Stack Port 0 Parameters" sheet.</Description>
+</RefParameter>
+<RefParameter Name="USBPD_PORT0_PDO_FIXED_FRS" Comment="Fast Role Swap" Type="uniqueElementList" DefaultValue="USBPD_PDO_SNK_FIXED_FRS_3A">
+            <PossibleValue Value="USBPD_PDO_SNK_FIXED_FRS_3A" Comment="3.0A@ 5V" />
+            <Description>"Fast Role Swap" takes the same value of "Fast Role Swap" in "Stack Port 0 Parameters" sheet.</Description>
+</RefParameter>
+
+<RefParameter Name="USBPD_PORT0_PDO_FIXED_HIGHERCAPAB" Comment="Higher Capability" Type="uniqueElementList" DefaultValue="USBPD_PDO_SNK_FIXED_HIGHERCAPAB_SUPPORTED">
+        <Condition Expression="USBPD_PDO_FIXED_HIGHERCAPAB_P0=USBPD_PDO_SNK_FIXED_HIGHERCAPAB_SUPPORTED" Diagnostic="" />
+        <PossibleValue Value="USBPD_PDO_SNK_FIXED_HIGHERCAPAB_SUPPORTED" Comment="Supported"/>
+        <Description>It takes the value of "Higher Capability" parameter available in the "Stack Port 0 Parameters" sheet </Description>
+</RefParameter>
+<RefParameter Name="USBPD_PORT0_PDO_FIXED_HIGHERCAPAB" Comment="Higher Capability" Type="uniqueElementList" DefaultValue="USBPD_PDO_SNK_FIXED_HIGHERCAPAB_NOT_SUPPORTED">
+        <PossibleValue Value="USBPD_PDO_SNK_FIXED_HIGHERCAPAB_NOT_SUPPORTED" Comment="Not supported"/>
+        <Description>It takes the value of "Higher Capability" parameter available in the "Stack Port 0 Parameters" sheet </Description>
+</RefParameter>
+
+<RefParameter Name="USBPD_PDO_FIXED_PEAKCURRENT" Comment="Peak Current" Type="list" DefaultValue="USBPD_PDO_SRC_FIXED_PEAKCURRENT_EQUAL">        <PossibleValue Value="USBPD_PDO_SRC_FIXED_PEAKCURRENT_EQUAL" Comment="Peak equal"/>    <PossibleValue Value="USBPD_PDO_SRC_FIXED_PEAKCURRENT_OVER1" Comment="Peak over1"/>        <PossibleValue Value="USBPD_PDO_SRC_FIXED_PEAKCURRENT_OVER2" Comment="Peak over2"/>        <PossibleValue Value="USBPD_PDO_SRC_FIXED_PEAKCURRENT_OVER3" Comment="Peak over3"/></RefParameter>
+<RefParameter Name="USBPD_PDO_FIXED_SET_MAX_CURRENT" Comment="Current (mA)" Type="integer" DefaultValue="100" Min="100" Max ="5000"> <Description>3A max, 5A only for 20V PDO</Description>    </RefParameter>
+<RefParameter Name="USBPD_PDO_FIXED_SET_OP_CURRENT" Comment="Current (mA)" Type="integer" DefaultValue="0" Min="0" Max ="5000"> <Description>Max 3A for all voltages, except 20V: max 5A (requires 5A cable).&lt;br&gt;For EPR: Same but 5A 20V requires EPR cable. + 5A 28V/36V/48V possible also with EPR cable</Description>    </RefParameter>
+<RefParameter Name="USBPD_PDO_FIXED_SET_VOLTAGE" Comment="Voltage (mV)" Type="list" DefaultValue="5000"> <PossibleValue Value="5000" Comment="5000"/><PossibleValue Value="9000" Comment="9000"/><PossibleValue Value="15000" Comment="15000"/><PossibleValue Value="20000" Comment="20000"/> <Description>Only possible 5V, 9V, 15V, 20V</Description>    </RefParameter>
+
+<RefParameter Name="USBPD_PORT0_PDO_FIXED_UNCHUNK" Comment="Unchunked Extended Messages Supported" Type="uniqueElementList" DefaultValue="USBPD_PDO_SRC_FIXED_UNCHUNK_SUPPORTED">
+        <Condition Expression="PE_UnchunkSupport_P0=USBPD_TRUE" Diagnostic="" />
+        <PossibleValue Value="USBPD_PDO_SRC_FIXED_UNCHUNK_SUPPORTED" Comment="Supported"/>
+        <Description>It takes the value of "Unchunk mode" parameter available in the "Stack Port 0 Parameters" sheet </Description>
+</RefParameter>
+<RefParameter Name="USBPD_PORT0_PDO_FIXED_UNCHUNK" Comment="Unchunked Extended Messages Supported" Type="uniqueElementList" DefaultValue="USBPD_PDO_SRC_FIXED_UNCHUNK_NOT_SUPPORTED">
+        <PossibleValue Value="USBPD_PDO_SRC_FIXED_UNCHUNK_NOT_SUPPORTED" Comment="Not supported"/>
+        <Description>It takes the value of "Unchunk mode" parameter available in the "Stack Port 0 Parameters" sheet </Description>
+</RefParameter>
+
+
+<RefParameter Name="USBPD_PORT0_PDO_SRC_FIXED_USBCOMM" Comment="USB Communication Capable" Type="uniqueElementList" DefaultValue="USBPD_PDO_SRC_FIXED_USBCOMM_SUPPORTED">
+        <Condition Expression="USBPD_PDO_FIXED_USBCOMM_P0=USBPD_PDO_FIXED_USBCOMM_SUPPORTED" Diagnostic="" />
+        <PossibleValue Value="USBPD_PDO_SRC_FIXED_USBCOMM_SUPPORTED" Comment="Supported"/>
+        <Description>It takes the value of "USB Communication Capable" parameter available in the "Stack Port 0 Parameters" sheet </Description>
+</RefParameter>
+<RefParameter Name="USBPD_PORT0_PDO_SRC_FIXED_USBCOMM" Comment="USB Communication Capable" Type="uniqueElementList" DefaultValue="USBPD_PDO_SRC_FIXED_USBCOMM_NOT_SUPPORTED">
+        <PossibleValue Value="USBPD_PDO_SRC_FIXED_USBCOMM_NOT_SUPPORTED" Comment="Not supported"/>
+        <Description>It takes the value of "USB Communication Capable" parameter available in the "Stack Port 0 Parameters" sheet </Description>
+</RefParameter>
+
+<RefParameter Name="USBPD_PORT0_PDO_SNK_FIXED_USBCOMM" Comment="USB Communication Capable" Type="uniqueElementList" DefaultValue="USBPD_PDO_SNK_FIXED_USBCOMM_SUPPORTED">
+        <Condition Expression="USBPD_PDO_FIXED_USBCOMM_P0=USBPD_PDO_FIXED_USBCOMM_SUPPORTED" Diagnostic="" />
+        <PossibleValue Value="USBPD_PDO_SNK_FIXED_USBCOMM_SUPPORTED" Comment="Supported"/>
+        <Description>It takes the value of "USB Communication Capable" parameter available in the "Stack Port 0 Parameters" sheet </Description>
+</RefParameter>
+<RefParameter Name="USBPD_PORT0_PDO_SNK_FIXED_USBCOMM" Comment="USB Communication Capable" Type="uniqueElementList" DefaultValue="USBPD_PDO_SNK_FIXED_USBCOMM_NOT_SUPPORTED">
+        <PossibleValue Value="USBPD_PDO_SNK_FIXED_USBCOMM_NOT_SUPPORTED" Comment="Not supported"/>
+        <Description>It takes the value of "USB Communication Capable" parameter available in the "Stack Port 0 Parameters" sheet </Description>
+</RefParameter>
+
+
+
+<RefParameter Name="USBPD_PORT0_PDO_FIXED_USBSUSPEND" Comment="USB Suspend Supported" Type="uniqueElementList" DefaultValue="USBPD_PDO_SRC_FIXED_USBSUSPEND_SUPPORTED">
+        <Condition Expression="USBPD_PDO_FIXED_USBSUSPEND_P0=USBPD_PDO_SRC_FIXED_USBSUSPEND_SUPPORTED" Diagnostic="" />
+        <PossibleValue Value="USBPD_PDO_SRC_FIXED_USBSUSPEND_SUPPORTED" Comment="Supported"/>
+        <Description>It takes the value of "USB Suspend Supported" parameter available in the "Stack Port 0 Parameters" sheet </Description>
+</RefParameter>
+<RefParameter Name="USBPD_PORT0_PDO_FIXED_USBSUSPEND" Comment="USB Suspend Supported" Type="uniqueElementList" DefaultValue="USBPD_PDO_SRC_FIXED_USBSUSPEND_NOT_SUPPORTED">
+        <PossibleValue Value="USBPD_PDO_SRC_FIXED_USBSUSPEND_NOT_SUPPORTED" Comment="Not supported"/>
+        <Description>It takes the value of "USB Suspend Supported" parameter available in the "Stack Port 0 Parameters" sheet </Description>
+</RefParameter>
+
+<RefParameter Name="USBPD_PDO_PPS_PWR_LIMITED" Comment="Programmable Power Supply : Power Limited" Type="list" DefaultValue="USBPD_PDO_SRC_APDO_PPS_PWR_LIMITED_CLEAR">        <PossibleValue Value="USBPD_PDO_SRC_APDO_PPS_PWR_LIMITED_CLEAR" Comment="Not supported"/>      <PossibleValue Value="USBPD_PDO_SRC_APDO_PPS_PWR_LIMITED_SET" Comment="Supported"/></RefParameter>
+<RefParameter Name="USBPD_PDO_SNK_APDO_PPS" Comment="PPS" Type="integer" DefaultValue="00" Visible="false"/>
+<RefParameter Name="USBPD_PDO_SNK_BATTERY_SET_MAX_VOLTAGE" Comment="Max Voltage (mV)" Type="integer" DefaultValue="5000" Min="3300" Max ="21000"> <Description></Description>    </RefParameter>
+<RefParameter Name="USBPD_PDO_SNK_BATTERY_SET_MIN_VOLTAGE" Comment="Min Voltage (mV)" Type="integer" DefaultValue="5000" Min="3300" Max ="21000"> <Description></Description>    </RefParameter>
+<RefParameter Name="USBPD_PDO_SNK_BATTERY_SET_OP_POWER" Comment="Operational Power  (mW)" Type="integer" DefaultValue="0" Min="0" Max ="100000"> <Description></Description>    </RefParameter>
+<RefParameter Name="USBPD_PDO_SNK_VARIABLE_SET_MAX_VOLTAGE" Comment="Max Voltage (mV)" Type="integer" DefaultValue="5000" Min="3300" Max ="21000"> <Description></Description>    </RefParameter>
+<RefParameter Name="USBPD_PDO_SNK_VARIABLE_SET_MIN_VOLTAGE" Comment="Min Voltage (mV)" Type="integer" DefaultValue="5000" Min="3300" Max ="21000"> <Description></Description>    </RefParameter>
+<RefParameter Name="USBPD_PDO_SNK_VARIABLE_SET_OP_CURRENT" Comment="Operationnal Current (mA)" Type="integer" DefaultValue="0" Min="0" Max ="5000"> <Description>3A max, 5A only for 20V PDO</Description>    </RefParameter>
+<RefParameter Name="USBPD_PDO_SRC_APDO_PPS" Comment="PPS" Type="integer" DefaultValue="00" Visible="false"/>
+<RefParameter Name="USBPD_PDO_SRC_BATTERY_SET_MAX_POWER" Comment="Max Power (mW)" Type="integer" DefaultValue="500" Min="500" Max ="100000"> <Description></Description>    </RefParameter>
+<RefParameter Name="USBPD_PDO_SRC_BATTERY_SET_MAX_VOLTAGE" Comment="Max Voltage (mV)" Type="integer" DefaultValue="5000" Min="3300" Max ="21000"> <Description></Description>    </RefParameter>
+<RefParameter Name="USBPD_PDO_SRC_BATTERY_SET_MIN_VOLTAGE" Comment="Min Voltage (mV)" Type="integer" DefaultValue="5000" Min="3300" Max ="21000"> <Description></Description>    </RefParameter>
+<RefParameter Name="USBPD_PDO_SRC_VARIABLE_SET_MAX_CURRENT" Comment="Max Current (mA)" Type="integer" DefaultValue="100" Min="100" Max ="5000"> <Description>3A max, 5A only for 20V PDO</Description>    </RefParameter>
+<RefParameter Name="USBPD_PDO_SRC_VARIABLE_SET_MAX_VOLTAGE" Comment="Max Voltage (mV)" Type="integer" DefaultValue="5000" Min="3300" Max ="21000"> <Description></Description>    </RefParameter>
+<RefParameter Name="USBPD_PDO_SRC_VARIABLE_SET_MIN_VOLTAGE" Comment="Min Voltage (mV)" Type="integer" DefaultValue="5000" Min="3300" Max ="21000"> <Description></Description>    </RefParameter>
+    <!-- End of copy begin of RefPArameters sheet -->
+    
 
     <!--  RefParameters for usbpd_bsp_hw.c -->
     <RefParameter Name="USBPD_PORT0" Comment="UCPD Instance" Type="string" Group="Port Configuration" TabName="Stack Port 0 Parameters" DefaultValue="UCPD1">
@@ -710,6 +1063,10 @@
         <Condition Expression="USBPD_PD3MINSNK" Diagnostic="USBPDCORE_LIB_PD3_CONFIG_MINSNK"/>
         <PossibleValue Value="USBPDCORE_LIB_PD3_CONFIG_MINSNK" Comment="USBPDCORE_LIB_PD3_CONFIG_MINSNK"/>
     </RefParameter>
+    <RefParameter Name="USBPD_CoreLib" DefaultValue="USBPDCORE_LIB_PD3_CONFIG_MINDRP" Type="list" Comment="USBPD_CoreLib" Visible="false">
+        <Condition Expression="USBPD_PD3MINDRP" Diagnostic="USBPDCORE_LIB_PD3_CONFIG_MINDRP"/>
+        <PossibleValue Value="USBPDCORE_LIB_PD3_CONFIG_MINDRP" Comment="USBPDCORE_LIB_PD3_CONFIG_MINDRP"/>
+    </RefParameter>
     <RefParameter Name="USBPD_CoreLib" DefaultValue="USBPDCORE_LIB_NO_PD" Type="list" Comment="USBPD_CoreLib" Visible="false">
         <Condition Expression="USBPD_PD3TYPEC" Diagnostic="USBPDCORE_LIB_NO_PD"/>
         <PossibleValue Value="USBPDCORE_LIB_NO_PD" Comment="USBPDCORE_LIB_NO_PD"/>
@@ -717,6 +1074,17 @@
     <RefParameter Name="USBPD_CoreLib" DefaultValue="USBPDCORE_LIB_PD3_FULL" Type="list" Comment="USBPD_CoreLib" Visible="false">
         <PossibleValue Value="USBPDCORE_LIB_PD3_FULL" Comment="USBPDCORE_LIB_PD3_FULL"/>
     </RefParameter>
+    <!-- Non visible RefParameter  -->
+
+    <RefParameter Name="PORT0_UCPD_MODE" DefaultValue="Sink_UCPD1" Type="string" Comment="USBPD Defined Mode used for ftl" Visible="false">
+        <Condition Expression="SinkUCPD1" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Name="PORT0_UCPD_MODE" DefaultValue="Source_UCPD1" Type="string" Comment="USBPD Defined Mode used for ftl" Visible="false">
+        <Condition Expression="SourceUCPD1" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Name="PORT0_UCPD_MODE" DefaultValue="UCPD" Type="string" Comment="USBPD Defined Mode used for ftl" Visible="false">
+    </RefParameter>
+    <!-- RefModes for USBPD -->
 
     <RefParameter Name="USBPD_DEVICE_APP_MEM_POOL_SIZE" Comment="USBPD memory pool size" DefaultValue="6144" Max="20480" Min="512" Type="integer" Group="Application selection" TabName="DPM Core Parameters" Visible="true">
         <Description>Default memory pool size for the USBPD application.</Description>
@@ -757,10 +1125,512 @@
         <Parameter Name="TIMenableClock"/>
         <Parameter Name="TIMdisableClock"/>
         <Parameter Name="USBPD_DEVICE_APP_MEM_POOL_SIZE"/>
+ </RefMode>
+    <RefMode Name="USBPD_PORT0_PDO_P0" BaseMode="USBPD_Common" Abstract="true">
+        <Condition Expression="(DualRoleUCPD1)" Diagnostic=""/>
+        <ConfigForMode>USBPD_Init_PDO</ConfigForMode>
 
+        <Parameter Name="PORT0_UCPD_MODE"/>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_NB" RefParameter="USBPD_PDO_NB" TabName="PDO Sources" Group="Number of PDO Source"><Condition Expression="!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_FIXED_UNCHUNK_0" RefParameter="USBPD_PORT0_PDO_FIXED_UNCHUNK" TabName="PDO Sources" Group="Generic Source Parameters"><Condition Expression="(USBPD_PORT0_PDO_SRC_NB>0) &amp; (!USBPD_PD3TYPEC)" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_FIXED_DRD_0" RefParameter="USBPD_PORT0_PDO_SRC_FIXED_DRD" TabName="PDO Sources" Group="Generic Source Parameters"><Condition Expression="(USBPD_PORT0_PDO_SRC_NB>0) &amp; (!USBPD_PD3TYPEC)" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_FIXED_USBCOMM_0" RefParameter="USBPD_PORT0_PDO_SRC_FIXED_USBCOMM" TabName="PDO Sources" Group="Generic Source Parameters"><Condition Expression="(USBPD_PORT0_PDO_SRC_NB>0) &amp; (!USBPD_PD3TYPEC)" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_FIXED_EXT_POWER_0" RefParameter="USBPD_PORT0_PDO_SRC_FIXED_EXT_POWER" TabName="PDO Sources" Group="Generic Source Parameters"><Condition Expression="(USBPD_PORT0_PDO_SRC_NB>0) &amp; (!USBPD_PD3TYPEC)" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_FIXED_USBSUSPEND_0" RefParameter="USBPD_PORT0_PDO_FIXED_USBSUSPEND" TabName="PDO Sources" Group="Generic Source Parameters"><Condition Expression="(USBPD_PORT0_PDO_SRC_NB>0) &amp; (!USBPD_PD3TYPEC)" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_FIXED_DRP_0" RefParameter="USBPD_PORT0_PDO_SRC_FIXED_DRP" TabName="PDO Sources" Group="Generic Source Parameters"><Condition Expression="(USBPD_PORT0_PDO_SRC_NB>0) &amp; (!USBPD_PD3TYPEC)" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_TYPE_0" RefParameter="USBPD_PDO_TYPE" TabName="PDO Sources" Group="PDO 0"><PossibleValue Comment="Fixed Supply (Vmin=Vmax)"/><Condition Expression="!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_FIXED_SET_VOLTAGE_0" RefParameter="USBPD_PDO_FIXED_SET_VOLTAGE" TabName="PDO Sources" Group="PDO 0"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>0&amp;USBPD_PORT0_PDO_SRC_TYPE_0=USBPD_PDO_TYPE_FIXED&amp;!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_FIXED_SET_MAX_CURRENT_0" RefParameter="USBPD_PDO_FIXED_SET_MAX_CURRENT" TabName="PDO Sources" Group="PDO 0"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>0&amp;USBPD_PORT0_PDO_SRC_TYPE_0=USBPD_PDO_TYPE_FIXED&amp;!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_FIXED_PEAKCURRENT_0" RefParameter="USBPD_PDO_FIXED_PEAKCURRENT" TabName="PDO Sources" Group="PDO 0"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>0&amp;USBPD_PORT0_PDO_SRC_TYPE_0=USBPD_PDO_TYPE_FIXED&amp;!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_BATTERY_SET_MAX_VOLTAGE_0" RefParameter="USBPD_PDO_SRC_BATTERY_SET_MAX_VOLTAGE" TabName="PDO Sources" Group="PDO 0"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>0&amp;USBPD_PORT0_PDO_SRC_TYPE_0=USBPD_PDO_TYPE_BATTERY&amp;!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_BATTERY_SET_MIN_VOLTAGE_0" RefParameter="USBPD_PDO_SRC_BATTERY_SET_MIN_VOLTAGE" TabName="PDO Sources" Group="PDO 0"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>0&amp;USBPD_PORT0_PDO_SRC_TYPE_0=USBPD_PDO_TYPE_BATTERY&amp;!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_BATTERY_SET_MAX_POWER_0" RefParameter="USBPD_PDO_SRC_BATTERY_SET_MAX_POWER" TabName="PDO Sources" Group="PDO 0"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>0&amp;USBPD_PORT0_PDO_SRC_TYPE_0=USBPD_PDO_TYPE_BATTERY&amp;!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_VARIABLE_SET_MAX_CURRENT_0" RefParameter="USBPD_PDO_SRC_VARIABLE_SET_MAX_CURRENT" TabName="PDO Sources" Group="PDO 0"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>0&amp;USBPD_PORT0_PDO_SRC_TYPE_0=USBPD_PDO_TYPE_VARIABLE&amp;!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_VARIABLE_SET_MAX_VOLTAGE_0" RefParameter="USBPD_PDO_SRC_VARIABLE_SET_MAX_VOLTAGE" TabName="PDO Sources" Group="PDO 0"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>0&amp;USBPD_PORT0_PDO_SRC_TYPE_0=USBPD_PDO_TYPE_VARIABLE&amp;!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_VARIABLE_SET_MIN_VOLTAGE_0" RefParameter="USBPD_PDO_SRC_VARIABLE_SET_MIN_VOLTAGE" TabName="PDO Sources" Group="PDO 0"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>0&amp;USBPD_PORT0_PDO_SRC_TYPE_0=USBPD_PDO_TYPE_VARIABLE&amp;!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_APDO_SET_MAX_VOLTAGE_0" RefParameter="USBPD_PDO_APDO_SET_MAX_VOLTAGE" TabName="PDO Sources" Group="PDO 0"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>0&amp;USBPD_PORT0_PDO_SRC_TYPE_0=USBPD_PDO_TYPE_APDO&amp;!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_APDO_SET_MIN_VOLTAGE_0" RefParameter="USBPD_PDO_APDO_SET_MIN_VOLTAGE" TabName="PDO Sources" Group="PDO 0"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>0&amp;USBPD_PORT0_PDO_SRC_TYPE_0=USBPD_PDO_TYPE_APDO&amp;!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_APDO_SET_MAX_CURRENT_0" RefParameter="USBPD_PDO_APDO_SET_MAX_CURRENT" TabName="PDO Sources" Group="PDO 0"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>0&amp;USBPD_PORT0_PDO_SRC_TYPE_0=USBPD_PDO_TYPE_APDO&amp;!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_APDO_PPS_0" RefParameter="USBPD_PDO_SRC_APDO_PPS" TabName="PDO Sources" Group="PDO 0"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>0&amp;USBPD_PORT0_PDO_SRC_TYPE_0=USBPD_PDO_TYPE_APDO&amp;!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_APDO_PPS_PWR_LIMITED_0" RefParameter="USBPD_PDO_PPS_PWR_LIMITED" TabName="PDO Sources" Group="PDO 0"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>0&amp;USBPD_PORT0_PDO_SRC_TYPE_0=USBPD_PDO_TYPE_APDO&amp;!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_TYPE_1" RefParameter="USBPD_PDO_TYPE" TabName="PDO Sources" Group="PDO 1"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>1" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_FIXED_SET_VOLTAGE_1" RefParameter="USBPD_PDO_FIXED_SET_VOLTAGE" TabName="PDO Sources" Group="PDO 1"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>1&amp;USBPD_PORT0_PDO_SRC_TYPE_1=USBPD_PDO_TYPE_FIXED" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_FIXED_SET_MAX_CURRENT_1" RefParameter="USBPD_PDO_FIXED_SET_MAX_CURRENT" TabName="PDO Sources" Group="PDO 1"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>1&amp;USBPD_PORT0_PDO_SRC_TYPE_1=USBPD_PDO_TYPE_FIXED" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_FIXED_PEAKCURRENT_1" RefParameter="USBPD_PDO_FIXED_PEAKCURRENT" TabName="PDO Sources" Group="PDO 1"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>1&amp;USBPD_PORT0_PDO_SRC_TYPE_1=USBPD_PDO_TYPE_FIXED" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_BATTERY_SET_MAX_VOLTAGE_1" RefParameter="USBPD_PDO_SRC_BATTERY_SET_MAX_VOLTAGE" TabName="PDO Sources" Group="PDO 1"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>1&amp;USBPD_PORT0_PDO_SRC_TYPE_1=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_BATTERY_SET_MIN_VOLTAGE_1" RefParameter="USBPD_PDO_SRC_BATTERY_SET_MIN_VOLTAGE" TabName="PDO Sources" Group="PDO 1"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>1&amp;USBPD_PORT0_PDO_SRC_TYPE_1=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_BATTERY_SET_MAX_POWER_1" RefParameter="USBPD_PDO_SRC_BATTERY_SET_MAX_POWER" TabName="PDO Sources" Group="PDO 1"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>1&amp;USBPD_PORT0_PDO_SRC_TYPE_1=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_VARIABLE_SET_MAX_CURRENT_1" RefParameter="USBPD_PDO_SRC_VARIABLE_SET_MAX_CURRENT" TabName="PDO Sources" Group="PDO 1"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>1&amp;USBPD_PORT0_PDO_SRC_TYPE_1=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_VARIABLE_SET_MAX_VOLTAGE_1" RefParameter="USBPD_PDO_SRC_VARIABLE_SET_MAX_VOLTAGE" TabName="PDO Sources" Group="PDO 1"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>1&amp;USBPD_PORT0_PDO_SRC_TYPE_1=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_VARIABLE_SET_MIN_VOLTAGE_1" RefParameter="USBPD_PDO_SRC_VARIABLE_SET_MIN_VOLTAGE" TabName="PDO Sources" Group="PDO 1"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>1&amp;USBPD_PORT0_PDO_SRC_TYPE_1=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_APDO_SET_MAX_VOLTAGE_1" RefParameter="USBPD_PDO_APDO_SET_MAX_VOLTAGE" TabName="PDO Sources" Group="PDO 1"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>1&amp;USBPD_PORT0_PDO_SRC_TYPE_1=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_APDO_SET_MIN_VOLTAGE_1" RefParameter="USBPD_PDO_APDO_SET_MIN_VOLTAGE" TabName="PDO Sources" Group="PDO 1"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>1&amp;USBPD_PORT0_PDO_SRC_TYPE_1=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_APDO_SET_MAX_CURRENT_1" RefParameter="USBPD_PDO_APDO_SET_MAX_CURRENT" TabName="PDO Sources" Group="PDO 1"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>1&amp;USBPD_PORT0_PDO_SRC_TYPE_1=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_APDO_PPS_1" RefParameter="USBPD_PDO_SRC_APDO_PPS" TabName="PDO Sources" Group="PDO 1"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>1&amp;USBPD_PORT0_PDO_SRC_TYPE_1=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_APDO_PPS_PWR_LIMITED_1" RefParameter="USBPD_PDO_PPS_PWR_LIMITED" TabName="PDO Sources" Group="PDO 1"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>1&amp;USBPD_PORT0_PDO_SRC_TYPE_1=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_TYPE_2" RefParameter="USBPD_PDO_TYPE" TabName="PDO Sources" Group="PDO 2"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>2" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_FIXED_SET_VOLTAGE_2" RefParameter="USBPD_PDO_FIXED_SET_VOLTAGE" TabName="PDO Sources" Group="PDO 2"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>2&amp;USBPD_PORT0_PDO_SRC_TYPE_2=USBPD_PDO_TYPE_FIXED" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_FIXED_SET_MAX_CURRENT_2" RefParameter="USBPD_PDO_FIXED_SET_MAX_CURRENT" TabName="PDO Sources" Group="PDO 2"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>2&amp;USBPD_PORT0_PDO_SRC_TYPE_2=USBPD_PDO_TYPE_FIXED" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_FIXED_PEAKCURRENT_2" RefParameter="USBPD_PDO_FIXED_PEAKCURRENT" TabName="PDO Sources" Group="PDO 2"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>2&amp;USBPD_PORT0_PDO_SRC_TYPE_2=USBPD_PDO_TYPE_FIXED" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_BATTERY_SET_MAX_VOLTAGE_2" RefParameter="USBPD_PDO_SRC_BATTERY_SET_MAX_VOLTAGE" TabName="PDO Sources" Group="PDO 2"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>2&amp;USBPD_PORT0_PDO_SRC_TYPE_2=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_BATTERY_SET_MIN_VOLTAGE_2" RefParameter="USBPD_PDO_SRC_BATTERY_SET_MIN_VOLTAGE" TabName="PDO Sources" Group="PDO 2"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>2&amp;USBPD_PORT0_PDO_SRC_TYPE_2=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_BATTERY_SET_MAX_POWER_2" RefParameter="USBPD_PDO_SRC_BATTERY_SET_MAX_POWER" TabName="PDO Sources" Group="PDO 2"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>2&amp;USBPD_PORT0_PDO_SRC_TYPE_2=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_VARIABLE_SET_MAX_CURRENT_2" RefParameter="USBPD_PDO_SRC_VARIABLE_SET_MAX_CURRENT" TabName="PDO Sources" Group="PDO 2"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>2&amp;USBPD_PORT0_PDO_SRC_TYPE_2=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_VARIABLE_SET_MAX_VOLTAGE_2" RefParameter="USBPD_PDO_SRC_VARIABLE_SET_MAX_VOLTAGE" TabName="PDO Sources" Group="PDO 2"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>2&amp;USBPD_PORT0_PDO_SRC_TYPE_2=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_VARIABLE_SET_MIN_VOLTAGE_2" RefParameter="USBPD_PDO_SRC_VARIABLE_SET_MIN_VOLTAGE" TabName="PDO Sources" Group="PDO 2"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>2&amp;USBPD_PORT0_PDO_SRC_TYPE_2=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_APDO_SET_MAX_VOLTAGE_2" RefParameter="USBPD_PDO_APDO_SET_MAX_VOLTAGE" TabName="PDO Sources" Group="PDO 2"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>2&amp;USBPD_PORT0_PDO_SRC_TYPE_2=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_APDO_SET_MIN_VOLTAGE_2" RefParameter="USBPD_PDO_APDO_SET_MIN_VOLTAGE" TabName="PDO Sources" Group="PDO 2"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>2&amp;USBPD_PORT0_PDO_SRC_TYPE_2=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_APDO_SET_MAX_CURRENT_2" RefParameter="USBPD_PDO_APDO_SET_MAX_CURRENT" TabName="PDO Sources" Group="PDO 2"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>2&amp;USBPD_PORT0_PDO_SRC_TYPE_2=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_APDO_PPS_2" RefParameter="USBPD_PDO_SRC_APDO_PPS" TabName="PDO Sources" Group="PDO 2"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>2&amp;USBPD_PORT0_PDO_SRC_TYPE_2=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_APDO_PPS_PWR_LIMITED_2" RefParameter="USBPD_PDO_PPS_PWR_LIMITED" TabName="PDO Sources" Group="PDO 2"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>2&amp;USBPD_PORT0_PDO_SRC_TYPE_2=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_TYPE_3" RefParameter="USBPD_PDO_TYPE" TabName="PDO Sources" Group="PDO 3"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>3" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_FIXED_SET_VOLTAGE_3" RefParameter="USBPD_PDO_FIXED_SET_VOLTAGE" TabName="PDO Sources" Group="PDO 3"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>3&amp;USBPD_PORT0_PDO_SRC_TYPE_3=USBPD_PDO_TYPE_FIXED" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_FIXED_SET_MAX_CURRENT_3" RefParameter="USBPD_PDO_FIXED_SET_MAX_CURRENT" TabName="PDO Sources" Group="PDO 3"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>3&amp;USBPD_PORT0_PDO_SRC_TYPE_3=USBPD_PDO_TYPE_FIXED" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_FIXED_PEAKCURRENT_3" RefParameter="USBPD_PDO_FIXED_PEAKCURRENT" TabName="PDO Sources" Group="PDO 3"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>3&amp;USBPD_PORT0_PDO_SRC_TYPE_3=USBPD_PDO_TYPE_FIXED" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_BATTERY_SET_MAX_VOLTAGE_3" RefParameter="USBPD_PDO_SRC_BATTERY_SET_MAX_VOLTAGE" TabName="PDO Sources" Group="PDO 3"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>3&amp;USBPD_PORT0_PDO_SRC_TYPE_3=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_BATTERY_SET_MIN_VOLTAGE_3" RefParameter="USBPD_PDO_SRC_BATTERY_SET_MIN_VOLTAGE" TabName="PDO Sources" Group="PDO 3"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>3&amp;USBPD_PORT0_PDO_SRC_TYPE_3=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_BATTERY_SET_MAX_POWER_3" RefParameter="USBPD_PDO_SRC_BATTERY_SET_MAX_POWER" TabName="PDO Sources" Group="PDO 3"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>3&amp;USBPD_PORT0_PDO_SRC_TYPE_3=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_VARIABLE_SET_MAX_CURRENT_3" RefParameter="USBPD_PDO_SRC_VARIABLE_SET_MAX_CURRENT" TabName="PDO Sources" Group="PDO 3"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>3&amp;USBPD_PORT0_PDO_SRC_TYPE_3=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_VARIABLE_SET_MAX_VOLTAGE_3" RefParameter="USBPD_PDO_SRC_VARIABLE_SET_MAX_VOLTAGE" TabName="PDO Sources" Group="PDO 3"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>3&amp;USBPD_PORT0_PDO_SRC_TYPE_3=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_VARIABLE_SET_MIN_VOLTAGE_3" RefParameter="USBPD_PDO_SRC_VARIABLE_SET_MIN_VOLTAGE" TabName="PDO Sources" Group="PDO 3"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>3&amp;USBPD_PORT0_PDO_SRC_TYPE_3=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_APDO_SET_MAX_VOLTAGE_3" RefParameter="USBPD_PDO_APDO_SET_MAX_VOLTAGE" TabName="PDO Sources" Group="PDO 3"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>3&amp;USBPD_PORT0_PDO_SRC_TYPE_3=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_APDO_SET_MIN_VOLTAGE_3" RefParameter="USBPD_PDO_APDO_SET_MIN_VOLTAGE" TabName="PDO Sources" Group="PDO 3"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>3&amp;USBPD_PORT0_PDO_SRC_TYPE_3=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_APDO_SET_MAX_CURRENT_3" RefParameter="USBPD_PDO_APDO_SET_MAX_CURRENT" TabName="PDO Sources" Group="PDO 3"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>3&amp;USBPD_PORT0_PDO_SRC_TYPE_3=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_APDO_PPS_3" RefParameter="USBPD_PDO_SRC_APDO_PPS" TabName="PDO Sources" Group="PDO 3"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>3&amp;USBPD_PORT0_PDO_SRC_TYPE_3=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_APDO_PPS_PWR_LIMITED_3" RefParameter="USBPD_PDO_PPS_PWR_LIMITED" TabName="PDO Sources" Group="PDO 3"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>3&amp;USBPD_PORT0_PDO_SRC_TYPE_3=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_TYPE_4" RefParameter="USBPD_PDO_TYPE" TabName="PDO Sources" Group="PDO 4"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>4" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_FIXED_SET_VOLTAGE_4" RefParameter="USBPD_PDO_FIXED_SET_VOLTAGE" TabName="PDO Sources" Group="PDO 4"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>4&amp;USBPD_PORT0_PDO_SRC_TYPE_4=USBPD_PDO_TYPE_FIXED" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_FIXED_SET_MAX_CURRENT_4" RefParameter="USBPD_PDO_FIXED_SET_MAX_CURRENT" TabName="PDO Sources" Group="PDO 4"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>4&amp;USBPD_PORT0_PDO_SRC_TYPE_4=USBPD_PDO_TYPE_FIXED" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_FIXED_PEAKCURRENT_4" RefParameter="USBPD_PDO_FIXED_PEAKCURRENT" TabName="PDO Sources" Group="PDO 4"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>4&amp;USBPD_PORT0_PDO_SRC_TYPE_4=USBPD_PDO_TYPE_FIXED" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_BATTERY_SET_MAX_VOLTAGE_4" RefParameter="USBPD_PDO_SRC_BATTERY_SET_MAX_VOLTAGE" TabName="PDO Sources" Group="PDO 4"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>4&amp;USBPD_PORT0_PDO_SRC_TYPE_4=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_BATTERY_SET_MIN_VOLTAGE_4" RefParameter="USBPD_PDO_SRC_BATTERY_SET_MIN_VOLTAGE" TabName="PDO Sources" Group="PDO 4"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>4&amp;USBPD_PORT0_PDO_SRC_TYPE_4=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_BATTERY_SET_MAX_POWER_4" RefParameter="USBPD_PDO_SRC_BATTERY_SET_MAX_POWER" TabName="PDO Sources" Group="PDO 4"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>4&amp;USBPD_PORT0_PDO_SRC_TYPE_4=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_VARIABLE_SET_MAX_CURRENT_4" RefParameter="USBPD_PDO_SRC_VARIABLE_SET_MAX_CURRENT" TabName="PDO Sources" Group="PDO 4"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>4&amp;USBPD_PORT0_PDO_SRC_TYPE_4=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_VARIABLE_SET_MAX_VOLTAGE_4" RefParameter="USBPD_PDO_SRC_VARIABLE_SET_MAX_VOLTAGE" TabName="PDO Sources" Group="PDO 4"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>4&amp;USBPD_PORT0_PDO_SRC_TYPE_4=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_VARIABLE_SET_MIN_VOLTAGE_4" RefParameter="USBPD_PDO_SRC_VARIABLE_SET_MIN_VOLTAGE" TabName="PDO Sources" Group="PDO 4"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>4&amp;USBPD_PORT0_PDO_SRC_TYPE_4=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_APDO_SET_MAX_VOLTAGE_4" RefParameter="USBPD_PDO_APDO_SET_MAX_VOLTAGE" TabName="PDO Sources" Group="PDO 4"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>4&amp;USBPD_PORT0_PDO_SRC_TYPE_4=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_APDO_SET_MIN_VOLTAGE_4" RefParameter="USBPD_PDO_APDO_SET_MIN_VOLTAGE" TabName="PDO Sources" Group="PDO 4"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>4&amp;USBPD_PORT0_PDO_SRC_TYPE_4=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_APDO_SET_MAX_CURRENT_4" RefParameter="USBPD_PDO_APDO_SET_MAX_CURRENT" TabName="PDO Sources" Group="PDO 4"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>4&amp;USBPD_PORT0_PDO_SRC_TYPE_4=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_APDO_PPS_4" RefParameter="USBPD_PDO_SRC_APDO_PPS" TabName="PDO Sources" Group="PDO 4"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>4&amp;USBPD_PORT0_PDO_SRC_TYPE_4=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_APDO_PPS_PWR_LIMITED_4" RefParameter="USBPD_PDO_PPS_PWR_LIMITED" TabName="PDO Sources" Group="PDO 4"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>4&amp;USBPD_PORT0_PDO_SRC_TYPE_4=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_TYPE_5" RefParameter="USBPD_PDO_TYPE" TabName="PDO Sources" Group="PDO 5"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>5" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_FIXED_SET_VOLTAGE_5" RefParameter="USBPD_PDO_FIXED_SET_VOLTAGE" TabName="PDO Sources" Group="PDO 5"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>5&amp;USBPD_PORT0_PDO_SRC_TYPE_5=USBPD_PDO_TYPE_FIXED" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_FIXED_SET_MAX_CURRENT_5" RefParameter="USBPD_PDO_FIXED_SET_MAX_CURRENT" TabName="PDO Sources" Group="PDO 5"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>5&amp;USBPD_PORT0_PDO_SRC_TYPE_5=USBPD_PDO_TYPE_FIXED" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_FIXED_PEAKCURRENT_5" RefParameter="USBPD_PDO_FIXED_PEAKCURRENT" TabName="PDO Sources" Group="PDO 5"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>5&amp;USBPD_PORT0_PDO_SRC_TYPE_5=USBPD_PDO_TYPE_FIXED" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_BATTERY_SET_MAX_VOLTAGE_5" RefParameter="USBPD_PDO_SRC_BATTERY_SET_MAX_VOLTAGE" TabName="PDO Sources" Group="PDO 5"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>5&amp;USBPD_PORT0_PDO_SRC_TYPE_5=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_BATTERY_SET_MIN_VOLTAGE_5" RefParameter="USBPD_PDO_SRC_BATTERY_SET_MIN_VOLTAGE" TabName="PDO Sources" Group="PDO 5"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>5&amp;USBPD_PORT0_PDO_SRC_TYPE_5=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_BATTERY_SET_MAX_POWER_5" RefParameter="USBPD_PDO_SRC_BATTERY_SET_MAX_POWER" TabName="PDO Sources" Group="PDO 5"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>5&amp;USBPD_PORT0_PDO_SRC_TYPE_5=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_VARIABLE_SET_MAX_CURRENT_5" RefParameter="USBPD_PDO_SRC_VARIABLE_SET_MAX_CURRENT" TabName="PDO Sources" Group="PDO 5"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>5&amp;USBPD_PORT0_PDO_SRC_TYPE_5=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_VARIABLE_SET_MAX_VOLTAGE_5" RefParameter="USBPD_PDO_SRC_VARIABLE_SET_MAX_VOLTAGE" TabName="PDO Sources" Group="PDO 5"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>5&amp;USBPD_PORT0_PDO_SRC_TYPE_5=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_VARIABLE_SET_MIN_VOLTAGE_5" RefParameter="USBPD_PDO_SRC_VARIABLE_SET_MIN_VOLTAGE" TabName="PDO Sources" Group="PDO 5"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>5&amp;USBPD_PORT0_PDO_SRC_TYPE_5=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_APDO_SET_MAX_VOLTAGE_5" RefParameter="USBPD_PDO_APDO_SET_MAX_VOLTAGE" TabName="PDO Sources" Group="PDO 5"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>5&amp;USBPD_PORT0_PDO_SRC_TYPE_5=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_APDO_SET_MIN_VOLTAGE_5" RefParameter="USBPD_PDO_APDO_SET_MIN_VOLTAGE" TabName="PDO Sources" Group="PDO 5"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>5&amp;USBPD_PORT0_PDO_SRC_TYPE_5=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_APDO_SET_MAX_CURRENT_5" RefParameter="USBPD_PDO_APDO_SET_MAX_CURRENT" TabName="PDO Sources" Group="PDO 5"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>5&amp;USBPD_PORT0_PDO_SRC_TYPE_5=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_APDO_PPS_5" RefParameter="USBPD_PDO_SRC_APDO_PPS" TabName="PDO Sources" Group="PDO 5"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>5&amp;USBPD_PORT0_PDO_SRC_TYPE_5=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_APDO_PPS_PWR_LIMITED_5" RefParameter="USBPD_PDO_PPS_PWR_LIMITED" TabName="PDO Sources" Group="PDO 5"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>5&amp;USBPD_PORT0_PDO_SRC_TYPE_5=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_TYPE_6" RefParameter="USBPD_PDO_TYPE" TabName="PDO Sources" Group="PDO 6"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>6" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_FIXED_SET_VOLTAGE_6" RefParameter="USBPD_PDO_FIXED_SET_VOLTAGE" TabName="PDO Sources" Group="PDO 6"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>6&amp;USBPD_PORT0_PDO_SRC_TYPE_6=USBPD_PDO_TYPE_FIXED" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_FIXED_SET_MAX_CURRENT_6" RefParameter="USBPD_PDO_FIXED_SET_MAX_CURRENT" TabName="PDO Sources" Group="PDO 6"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>6&amp;USBPD_PORT0_PDO_SRC_TYPE_6=USBPD_PDO_TYPE_FIXED" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_FIXED_PEAKCURRENT_6" RefParameter="USBPD_PDO_FIXED_PEAKCURRENT" TabName="PDO Sources" Group="PDO 6"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>6&amp;USBPD_PORT0_PDO_SRC_TYPE_6=USBPD_PDO_TYPE_FIXED" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_BATTERY_SET_MAX_VOLTAGE_6" RefParameter="USBPD_PDO_SRC_BATTERY_SET_MAX_VOLTAGE" TabName="PDO Sources" Group="PDO 6"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>6&amp;USBPD_PORT0_PDO_SRC_TYPE_6=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_BATTERY_SET_MIN_VOLTAGE_6" RefParameter="USBPD_PDO_SRC_BATTERY_SET_MIN_VOLTAGE" TabName="PDO Sources" Group="PDO 6"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>6&amp;USBPD_PORT0_PDO_SRC_TYPE_6=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_BATTERY_SET_MAX_POWER_6" RefParameter="USBPD_PDO_SRC_BATTERY_SET_MAX_POWER" TabName="PDO Sources" Group="PDO 6"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>6&amp;USBPD_PORT0_PDO_SRC_TYPE_6=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_VARIABLE_SET_MAX_CURRENT_6" RefParameter="USBPD_PDO_SRC_VARIABLE_SET_MAX_CURRENT" TabName="PDO Sources" Group="PDO 6"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>6&amp;USBPD_PORT0_PDO_SRC_TYPE_6=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_VARIABLE_SET_MAX_VOLTAGE_6" RefParameter="USBPD_PDO_SRC_VARIABLE_SET_MAX_VOLTAGE" TabName="PDO Sources" Group="PDO 6"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>6&amp;USBPD_PORT0_PDO_SRC_TYPE_6=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_VARIABLE_SET_MIN_VOLTAGE_6" RefParameter="USBPD_PDO_SRC_VARIABLE_SET_MIN_VOLTAGE" TabName="PDO Sources" Group="PDO 6"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>6&amp;USBPD_PORT0_PDO_SRC_TYPE_6=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_APDO_SET_MAX_VOLTAGE_6" RefParameter="USBPD_PDO_APDO_SET_MAX_VOLTAGE" TabName="PDO Sources" Group="PDO 6"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>6&amp;USBPD_PORT0_PDO_SRC_TYPE_6=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_APDO_SET_MIN_VOLTAGE_6" RefParameter="USBPD_PDO_APDO_SET_MIN_VOLTAGE" TabName="PDO Sources" Group="PDO 6"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>6&amp;USBPD_PORT0_PDO_SRC_TYPE_6=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_APDO_SET_MAX_CURRENT_6" RefParameter="USBPD_PDO_APDO_SET_MAX_CURRENT" TabName="PDO Sources" Group="PDO 6"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>6&amp;USBPD_PORT0_PDO_SRC_TYPE_6=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_APDO_PPS_6" RefParameter="USBPD_PDO_SRC_APDO_PPS" TabName="PDO Sources" Group="PDO 6"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>6&amp;USBPD_PORT0_PDO_SRC_TYPE_6=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_APDO_PPS_PWR_LIMITED_6" RefParameter="USBPD_PDO_PPS_PWR_LIMITED" TabName="PDO Sources" Group="PDO 6"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>6&amp;USBPD_PORT0_PDO_SRC_TYPE_6=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_TYPE_7" RefParameter="USBPD_PDO_TYPE" TabName="PDO Sources" Group="PDO 7"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>7" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_FIXED_SET_VOLTAGE_7" RefParameter="USBPD_PDO_FIXED_SET_VOLTAGE" TabName="PDO Sources" Group="PDO 7"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>7&amp;USBPD_PORT0_PDO_SRC_TYPE_7=USBPD_PDO_TYPE_FIXED" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_FIXED_SET_MAX_CURRENT_7" RefParameter="USBPD_PDO_FIXED_SET_MAX_CURRENT" TabName="PDO Sources" Group="PDO 7"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>7&amp;USBPD_PORT0_PDO_SRC_TYPE_7=USBPD_PDO_TYPE_FIXED" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_FIXED_PEAKCURRENT_7" RefParameter="USBPD_PDO_FIXED_PEAKCURRENT" TabName="PDO Sources" Group="PDO 7"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>7&amp;USBPD_PORT0_PDO_SRC_TYPE_7=USBPD_PDO_TYPE_FIXED" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_BATTERY_SET_MAX_VOLTAGE_7" RefParameter="USBPD_PDO_SRC_BATTERY_SET_MAX_VOLTAGE" TabName="PDO Sources" Group="PDO 7"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>7&amp;USBPD_PORT0_PDO_SRC_TYPE_7=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_BATTERY_SET_MIN_VOLTAGE_7" RefParameter="USBPD_PDO_SRC_BATTERY_SET_MIN_VOLTAGE" TabName="PDO Sources" Group="PDO 7"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>7&amp;USBPD_PORT0_PDO_SRC_TYPE_7=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_BATTERY_SET_MAX_POWER_7" RefParameter="USBPD_PDO_SRC_BATTERY_SET_MAX_POWER" TabName="PDO Sources" Group="PDO 7"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>7&amp;USBPD_PORT0_PDO_SRC_TYPE_7=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_VARIABLE_SET_MAX_CURRENT_7" RefParameter="USBPD_PDO_SRC_VARIABLE_SET_MAX_CURRENT" TabName="PDO Sources" Group="PDO 7"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>7&amp;USBPD_PORT0_PDO_SRC_TYPE_7=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_VARIABLE_SET_MAX_VOLTAGE_7" RefParameter="USBPD_PDO_SRC_VARIABLE_SET_MAX_VOLTAGE" TabName="PDO Sources" Group="PDO 7"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>7&amp;USBPD_PORT0_PDO_SRC_TYPE_7=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_VARIABLE_SET_MIN_VOLTAGE_7" RefParameter="USBPD_PDO_SRC_VARIABLE_SET_MIN_VOLTAGE" TabName="PDO Sources" Group="PDO 7"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>7&amp;USBPD_PORT0_PDO_SRC_TYPE_7=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_APDO_SET_MAX_VOLTAGE_7" RefParameter="USBPD_PDO_APDO_SET_MAX_VOLTAGE" TabName="PDO Sources" Group="PDO 7"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>7&amp;USBPD_PORT0_PDO_SRC_TYPE_7=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_APDO_SET_MIN_VOLTAGE_7" RefParameter="USBPD_PDO_APDO_SET_MIN_VOLTAGE" TabName="PDO Sources" Group="PDO 7"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>7&amp;USBPD_PORT0_PDO_SRC_TYPE_7=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_APDO_SET_MAX_CURRENT_7" RefParameter="USBPD_PDO_APDO_SET_MAX_CURRENT" TabName="PDO Sources" Group="PDO 7"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>7&amp;USBPD_PORT0_PDO_SRC_TYPE_7=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_APDO_PPS_7" RefParameter="USBPD_PDO_SRC_APDO_PPS" TabName="PDO Sources" Group="PDO 7"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>7&amp;USBPD_PORT0_PDO_SRC_TYPE_7=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_APDO_PPS_PWR_LIMITED_7" RefParameter="USBPD_PDO_PPS_PWR_LIMITED" TabName="PDO Sources" Group="PDO 7"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>7&amp;USBPD_PORT0_PDO_SRC_TYPE_7=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+
+        <Parameter Name="USBPD_PORT0_PDO_SNK_NB" RefParameter="USBPD_PDO_NB" TabName="PDO Sink" Group="Number of PDO Sink"><Condition Expression="!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_FIXED_FRS_0" RefParameter="USBPD_PORT0_PDO_FIXED_FRS" TabName="PDO Sink" Group="Generic Source Parameters"><Condition Expression="(USBPD_PORT0_PDO_SNK_NB>0) &amp; (!USBPD_PD3TYPEC)" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_FIXED_DRD_0" RefParameter="USBPD_PORT0_PDO_SNK_FIXED_DRD" TabName="PDO Sink" Group="Generic Source Parameters"><Condition Expression="(USBPD_PORT0_PDO_SNK_NB>0) &amp; (!USBPD_PD3TYPEC)" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_FIXED_USBCOMM_0" RefParameter="USBPD_PORT0_PDO_SNK_FIXED_USBCOMM" TabName="PDO Sink" Group="Generic Source Parameters"><Condition Expression="(USBPD_PORT0_PDO_SNK_NB>0) &amp; (!USBPD_PD3TYPEC)" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_FIXED_EXT_POWER_0" RefParameter="USBPD_PORT0_PDO_SNK_FIXED_EXT_POWER" TabName="PDO Sink" Group="Generic Source Parameters"><Condition Expression="(USBPD_PORT0_PDO_SNK_NB>0) &amp; (!USBPD_PD3TYPEC)" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_FIXED_HIGHERCAPAB_0" RefParameter="USBPD_PORT0_PDO_FIXED_HIGHERCAPAB" TabName="PDO Sink" Group="Generic Source Parameters"><Condition Expression="(USBPD_PORT0_PDO_SNK_NB>0) &amp; (!USBPD_PD3TYPEC)" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_FIXED_DRP_0" RefParameter="USBPD_PORT0_PDO_SNK_FIXED_DRP" TabName="PDO Sink" Group="Generic Source Parameters"><Condition Expression="(USBPD_PORT0_PDO_SNK_NB>0) &amp; (!USBPD_PD3TYPEC)" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_TYPE_0" RefParameter="USBPD_PDO_TYPE" TabName="PDO Sink" Group="PDO 0"><PossibleValue Comment="Fixed Supply (Vmin=Vmax)"/><Condition Expression="!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_FIXED_SET_VOLTAGE_0" RefParameter="USBPD_PDO_FIXED_SET_VOLTAGE" TabName="PDO Sink" Group="PDO 0"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>0&amp;USBPD_PORT0_PDO_SNK_TYPE_0=USBPD_PDO_TYPE_FIXED&amp;!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_FIXED_SET_OP_CURRENT_0" RefParameter="USBPD_PDO_FIXED_SET_OP_CURRENT" TabName="PDO Sink" Group="PDO 0"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>0&amp;USBPD_PORT0_PDO_SNK_TYPE_0=USBPD_PDO_TYPE_FIXED&amp;!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_BATTERY_SET_MAX_VOLTAGE_0" RefParameter="USBPD_PDO_SNK_BATTERY_SET_MAX_VOLTAGE" TabName="PDO Sink" Group="PDO 0"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>0&amp;USBPD_PORT0_PDO_SNK_TYPE_0=USBPD_PDO_TYPE_BATTERY&amp;!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_BATTERY_SET_MIN_VOLTAGE_0" RefParameter="USBPD_PDO_SNK_BATTERY_SET_MIN_VOLTAGE" TabName="PDO Sink" Group="PDO 0"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>0&amp;USBPD_PORT0_PDO_SNK_TYPE_0=USBPD_PDO_TYPE_BATTERY&amp;!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_BATTERY_SET_OP_POWER_0" RefParameter="USBPD_PDO_SNK_BATTERY_SET_OP_POWER" TabName="PDO Sink" Group="PDO 0"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>0&amp;USBPD_PORT0_PDO_SNK_TYPE_0=USBPD_PDO_TYPE_BATTERY&amp;!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_VARIABLE_SET_MAX_VOLTAGE_0" RefParameter="USBPD_PDO_SNK_VARIABLE_SET_MAX_VOLTAGE" TabName="PDO Sink" Group="PDO 0"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>0&amp;USBPD_PORT0_PDO_SNK_TYPE_0=USBPD_PDO_TYPE_VARIABLE&amp;!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_VARIABLE_SET_MIN_VOLTAGE_0" RefParameter="USBPD_PDO_SNK_VARIABLE_SET_MIN_VOLTAGE" TabName="PDO Sink" Group="PDO 0"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>0&amp;USBPD_PORT0_PDO_SNK_TYPE_0=USBPD_PDO_TYPE_VARIABLE&amp;!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_VARIABLE_SET_OP_CURRENT_0" RefParameter="USBPD_PDO_SNK_VARIABLE_SET_OP_CURRENT" TabName="PDO Sink" Group="PDO 0"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>0&amp;USBPD_PORT0_PDO_SNK_TYPE_0=USBPD_PDO_TYPE_VARIABLE&amp;!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_APDO_PPS_0" RefParameter="USBPD_PDO_SNK_APDO_PPS" TabName="PDO Sink" Group="PDO 0"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>0&amp;USBPD_PORT0_PDO_SNK_TYPE_0=USBPD_PDO_TYPE_APDO&amp;!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_APDO_SET_MAX_VOLTAGE_0" RefParameter="USBPD_PDO_APDO_SET_MAX_VOLTAGE" TabName="PDO Sink" Group="PDO 0"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>0&amp;USBPD_PORT0_PDO_SNK_TYPE_0=USBPD_PDO_TYPE_APDO&amp;!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_APDO_SET_MIN_VOLTAGE_0" RefParameter="USBPD_PDO_APDO_SET_MIN_VOLTAGE" TabName="PDO Sink" Group="PDO 0"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>0&amp;USBPD_PORT0_PDO_SNK_TYPE_0=USBPD_PDO_TYPE_APDO&amp;!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_APDO_SET_MAX_CURRENT_0" RefParameter="USBPD_PDO_APDO_SET_MAX_CURRENT" TabName="PDO Sink" Group="PDO 0"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>0&amp;USBPD_PORT0_PDO_SNK_TYPE_0=USBPD_PDO_TYPE_APDO&amp;!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_TYPE_1" RefParameter="USBPD_PDO_TYPE" TabName="PDO Sink" Group="PDO 1"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>1" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_FIXED_SET_VOLTAGE_1" RefParameter="USBPD_PDO_FIXED_SET_VOLTAGE" TabName="PDO Sink" Group="PDO 1"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>1&amp;USBPD_PORT0_PDO_SNK_TYPE_1=USBPD_PDO_TYPE_FIXED" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_FIXED_SET_OP_CURRENT_1" RefParameter="USBPD_PDO_FIXED_SET_OP_CURRENT" TabName="PDO Sink" Group="PDO 1"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>1&amp;USBPD_PORT0_PDO_SNK_TYPE_1=USBPD_PDO_TYPE_FIXED" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_BATTERY_SET_MAX_VOLTAGE_1" RefParameter="USBPD_PDO_SNK_BATTERY_SET_MAX_VOLTAGE" TabName="PDO Sink" Group="PDO 1"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>1&amp;USBPD_PORT0_PDO_SNK_TYPE_1=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_BATTERY_SET_MIN_VOLTAGE_1" RefParameter="USBPD_PDO_SNK_BATTERY_SET_MIN_VOLTAGE" TabName="PDO Sink" Group="PDO 1"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>1&amp;USBPD_PORT0_PDO_SNK_TYPE_1=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_BATTERY_SET_OP_POWER_1" RefParameter="USBPD_PDO_SNK_BATTERY_SET_OP_POWER" TabName="PDO Sink" Group="PDO 1"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>1&amp;USBPD_PORT0_PDO_SNK_TYPE_1=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_VARIABLE_SET_MAX_VOLTAGE_1" RefParameter="USBPD_PDO_SNK_VARIABLE_SET_MAX_VOLTAGE" TabName="PDO Sink" Group="PDO 1"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>1&amp;USBPD_PORT0_PDO_SNK_TYPE_1=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_VARIABLE_SET_MIN_VOLTAGE_1" RefParameter="USBPD_PDO_SNK_VARIABLE_SET_MIN_VOLTAGE" TabName="PDO Sink" Group="PDO 1"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>1&amp;USBPD_PORT0_PDO_SNK_TYPE_1=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_VARIABLE_SET_OP_CURRENT_1" RefParameter="USBPD_PDO_SNK_VARIABLE_SET_OP_CURRENT" TabName="PDO Sink" Group="PDO 1"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>1&amp;USBPD_PORT0_PDO_SNK_TYPE_1=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_APDO_PPS_1" RefParameter="USBPD_PDO_SNK_APDO_PPS" TabName="PDO Sink" Group="PDO 1"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>1&amp;USBPD_PORT0_PDO_SNK_TYPE_1=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_APDO_SET_MAX_VOLTAGE_1" RefParameter="USBPD_PDO_APDO_SET_MAX_VOLTAGE" TabName="PDO Sink" Group="PDO 1"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>1&amp;USBPD_PORT0_PDO_SNK_TYPE_1=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_APDO_SET_MIN_VOLTAGE_1" RefParameter="USBPD_PDO_APDO_SET_MIN_VOLTAGE" TabName="PDO Sink" Group="PDO 1"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>1&amp;USBPD_PORT0_PDO_SNK_TYPE_1=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_APDO_SET_MAX_CURRENT_1" RefParameter="USBPD_PDO_APDO_SET_MAX_CURRENT" TabName="PDO Sink" Group="PDO 1"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>1&amp;USBPD_PORT0_PDO_SNK_TYPE_1=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_TYPE_2" RefParameter="USBPD_PDO_TYPE" TabName="PDO Sink" Group="PDO 2"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>2" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_FIXED_SET_VOLTAGE_2" RefParameter="USBPD_PDO_FIXED_SET_VOLTAGE" TabName="PDO Sink" Group="PDO 2"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>2&amp;USBPD_PORT0_PDO_SNK_TYPE_2=USBPD_PDO_TYPE_FIXED" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_FIXED_SET_OP_CURRENT_2" RefParameter="USBPD_PDO_FIXED_SET_OP_CURRENT" TabName="PDO Sink" Group="PDO 2"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>2&amp;USBPD_PORT0_PDO_SNK_TYPE_2=USBPD_PDO_TYPE_FIXED" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_BATTERY_SET_MAX_VOLTAGE_2" RefParameter="USBPD_PDO_SNK_BATTERY_SET_MAX_VOLTAGE" TabName="PDO Sink" Group="PDO 2"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>2&amp;USBPD_PORT0_PDO_SNK_TYPE_2=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_BATTERY_SET_MIN_VOLTAGE_2" RefParameter="USBPD_PDO_SNK_BATTERY_SET_MIN_VOLTAGE" TabName="PDO Sink" Group="PDO 2"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>2&amp;USBPD_PORT0_PDO_SNK_TYPE_2=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_BATTERY_SET_OP_POWER_2" RefParameter="USBPD_PDO_SNK_BATTERY_SET_OP_POWER" TabName="PDO Sink" Group="PDO 2"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>2&amp;USBPD_PORT0_PDO_SNK_TYPE_2=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_VARIABLE_SET_MAX_VOLTAGE_2" RefParameter="USBPD_PDO_SNK_VARIABLE_SET_MAX_VOLTAGE" TabName="PDO Sink" Group="PDO 2"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>2&amp;USBPD_PORT0_PDO_SNK_TYPE_2=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_VARIABLE_SET_MIN_VOLTAGE_2" RefParameter="USBPD_PDO_SNK_VARIABLE_SET_MIN_VOLTAGE" TabName="PDO Sink" Group="PDO 2"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>2&amp;USBPD_PORT0_PDO_SNK_TYPE_2=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_VARIABLE_SET_OP_CURRENT_2" RefParameter="USBPD_PDO_SNK_VARIABLE_SET_OP_CURRENT" TabName="PDO Sink" Group="PDO 2"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>2&amp;USBPD_PORT0_PDO_SNK_TYPE_2=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_APDO_PPS_2" RefParameter="USBPD_PDO_SNK_APDO_PPS" TabName="PDO Sink" Group="PDO 2"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>2&amp;USBPD_PORT0_PDO_SNK_TYPE_2=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_APDO_SET_MAX_VOLTAGE_2" RefParameter="USBPD_PDO_APDO_SET_MAX_VOLTAGE" TabName="PDO Sink" Group="PDO 2"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>2&amp;USBPD_PORT0_PDO_SNK_TYPE_2=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_APDO_SET_MIN_VOLTAGE_2" RefParameter="USBPD_PDO_APDO_SET_MIN_VOLTAGE" TabName="PDO Sink" Group="PDO 2"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>2&amp;USBPD_PORT0_PDO_SNK_TYPE_2=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_APDO_SET_MAX_CURRENT_2" RefParameter="USBPD_PDO_APDO_SET_MAX_CURRENT" TabName="PDO Sink" Group="PDO 2"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>2&amp;USBPD_PORT0_PDO_SNK_TYPE_2=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_TYPE_3" RefParameter="USBPD_PDO_TYPE" TabName="PDO Sink" Group="PDO 3"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>3" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_FIXED_SET_VOLTAGE_3" RefParameter="USBPD_PDO_FIXED_SET_VOLTAGE" TabName="PDO Sink" Group="PDO 3"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>3&amp;USBPD_PORT0_PDO_SNK_TYPE_3=USBPD_PDO_TYPE_FIXED" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_FIXED_SET_OP_CURRENT_3" RefParameter="USBPD_PDO_FIXED_SET_OP_CURRENT" TabName="PDO Sink" Group="PDO 3"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>3&amp;USBPD_PORT0_PDO_SNK_TYPE_3=USBPD_PDO_TYPE_FIXED" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_BATTERY_SET_MAX_VOLTAGE_3" RefParameter="USBPD_PDO_SNK_BATTERY_SET_MAX_VOLTAGE" TabName="PDO Sink" Group="PDO 3"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>3&amp;USBPD_PORT0_PDO_SNK_TYPE_3=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_BATTERY_SET_MIN_VOLTAGE_3" RefParameter="USBPD_PDO_SNK_BATTERY_SET_MIN_VOLTAGE" TabName="PDO Sink" Group="PDO 3"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>3&amp;USBPD_PORT0_PDO_SNK_TYPE_3=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_BATTERY_SET_OP_POWER_3" RefParameter="USBPD_PDO_SNK_BATTERY_SET_OP_POWER" TabName="PDO Sink" Group="PDO 3"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>3&amp;USBPD_PORT0_PDO_SNK_TYPE_3=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_VARIABLE_SET_MAX_VOLTAGE_3" RefParameter="USBPD_PDO_SNK_VARIABLE_SET_MAX_VOLTAGE" TabName="PDO Sink" Group="PDO 3"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>3&amp;USBPD_PORT0_PDO_SNK_TYPE_3=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_VARIABLE_SET_MIN_VOLTAGE_3" RefParameter="USBPD_PDO_SNK_VARIABLE_SET_MIN_VOLTAGE" TabName="PDO Sink" Group="PDO 3"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>3&amp;USBPD_PORT0_PDO_SNK_TYPE_3=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_VARIABLE_SET_OP_CURRENT_3" RefParameter="USBPD_PDO_SNK_VARIABLE_SET_OP_CURRENT" TabName="PDO Sink" Group="PDO 3"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>3&amp;USBPD_PORT0_PDO_SNK_TYPE_3=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_APDO_PPS_3" RefParameter="USBPD_PDO_SNK_APDO_PPS" TabName="PDO Sink" Group="PDO 3"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>3&amp;USBPD_PORT0_PDO_SNK_TYPE_3=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_APDO_SET_MAX_VOLTAGE_3" RefParameter="USBPD_PDO_APDO_SET_MAX_VOLTAGE" TabName="PDO Sink" Group="PDO 3"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>3&amp;USBPD_PORT0_PDO_SNK_TYPE_3=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_APDO_SET_MIN_VOLTAGE_3" RefParameter="USBPD_PDO_APDO_SET_MIN_VOLTAGE" TabName="PDO Sink" Group="PDO 3"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>3&amp;USBPD_PORT0_PDO_SNK_TYPE_3=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_APDO_SET_MAX_CURRENT_3" RefParameter="USBPD_PDO_APDO_SET_MAX_CURRENT" TabName="PDO Sink" Group="PDO 3"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>3&amp;USBPD_PORT0_PDO_SNK_TYPE_3=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_TYPE_4" RefParameter="USBPD_PDO_TYPE" TabName="PDO Sink" Group="PDO 4"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>4" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_FIXED_SET_VOLTAGE_4" RefParameter="USBPD_PDO_FIXED_SET_VOLTAGE" TabName="PDO Sink" Group="PDO 4"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>4&amp;USBPD_PORT0_PDO_SNK_TYPE_4=USBPD_PDO_TYPE_FIXED" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_FIXED_SET_OP_CURRENT_4" RefParameter="USBPD_PDO_FIXED_SET_OP_CURRENT" TabName="PDO Sink" Group="PDO 4"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>4&amp;USBPD_PORT0_PDO_SNK_TYPE_4=USBPD_PDO_TYPE_FIXED" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_BATTERY_SET_MAX_VOLTAGE_4" RefParameter="USBPD_PDO_SNK_BATTERY_SET_MAX_VOLTAGE" TabName="PDO Sink" Group="PDO 4"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>4&amp;USBPD_PORT0_PDO_SNK_TYPE_4=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_BATTERY_SET_MIN_VOLTAGE_4" RefParameter="USBPD_PDO_SNK_BATTERY_SET_MIN_VOLTAGE" TabName="PDO Sink" Group="PDO 4"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>4&amp;USBPD_PORT0_PDO_SNK_TYPE_4=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_BATTERY_SET_OP_POWER_4" RefParameter="USBPD_PDO_SNK_BATTERY_SET_OP_POWER" TabName="PDO Sink" Group="PDO 4"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>4&amp;USBPD_PORT0_PDO_SNK_TYPE_4=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_VARIABLE_SET_MAX_VOLTAGE_4" RefParameter="USBPD_PDO_SNK_VARIABLE_SET_MAX_VOLTAGE" TabName="PDO Sink" Group="PDO 4"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>4&amp;USBPD_PORT0_PDO_SNK_TYPE_4=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_VARIABLE_SET_MIN_VOLTAGE_4" RefParameter="USBPD_PDO_SNK_VARIABLE_SET_MIN_VOLTAGE" TabName="PDO Sink" Group="PDO 4"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>4&amp;USBPD_PORT0_PDO_SNK_TYPE_4=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_VARIABLE_SET_OP_CURRENT_4" RefParameter="USBPD_PDO_SNK_VARIABLE_SET_OP_CURRENT" TabName="PDO Sink" Group="PDO 4"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>4&amp;USBPD_PORT0_PDO_SNK_TYPE_4=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_APDO_PPS_4" RefParameter="USBPD_PDO_SNK_APDO_PPS" TabName="PDO Sink" Group="PDO 4"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>4&amp;USBPD_PORT0_PDO_SNK_TYPE_4=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_APDO_SET_MAX_VOLTAGE_4" RefParameter="USBPD_PDO_APDO_SET_MAX_VOLTAGE" TabName="PDO Sink" Group="PDO 4"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>4&amp;USBPD_PORT0_PDO_SNK_TYPE_4=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_APDO_SET_MIN_VOLTAGE_4" RefParameter="USBPD_PDO_APDO_SET_MIN_VOLTAGE" TabName="PDO Sink" Group="PDO 4"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>4&amp;USBPD_PORT0_PDO_SNK_TYPE_4=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_APDO_SET_MAX_CURRENT_4" RefParameter="USBPD_PDO_APDO_SET_MAX_CURRENT" TabName="PDO Sink" Group="PDO 4"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>4&amp;USBPD_PORT0_PDO_SNK_TYPE_4=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_TYPE_5" RefParameter="USBPD_PDO_TYPE" TabName="PDO Sink" Group="PDO 5"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>5" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_FIXED_SET_VOLTAGE_5" RefParameter="USBPD_PDO_FIXED_SET_VOLTAGE" TabName="PDO Sink" Group="PDO 5"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>5&amp;USBPD_PORT0_PDO_SNK_TYPE_5=USBPD_PDO_TYPE_FIXED" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_FIXED_SET_OP_CURRENT_5" RefParameter="USBPD_PDO_FIXED_SET_OP_CURRENT" TabName="PDO Sink" Group="PDO 5"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>5&amp;USBPD_PORT0_PDO_SNK_TYPE_5=USBPD_PDO_TYPE_FIXED" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_BATTERY_SET_MAX_VOLTAGE_5" RefParameter="USBPD_PDO_SNK_BATTERY_SET_MAX_VOLTAGE" TabName="PDO Sink" Group="PDO 5"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>5&amp;USBPD_PORT0_PDO_SNK_TYPE_5=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_BATTERY_SET_MIN_VOLTAGE_5" RefParameter="USBPD_PDO_SNK_BATTERY_SET_MIN_VOLTAGE" TabName="PDO Sink" Group="PDO 5"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>5&amp;USBPD_PORT0_PDO_SNK_TYPE_5=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_BATTERY_SET_OP_POWER_5" RefParameter="USBPD_PDO_SNK_BATTERY_SET_OP_POWER" TabName="PDO Sink" Group="PDO 5"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>5&amp;USBPD_PORT0_PDO_SNK_TYPE_5=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_VARIABLE_SET_MAX_VOLTAGE_5" RefParameter="USBPD_PDO_SNK_VARIABLE_SET_MAX_VOLTAGE" TabName="PDO Sink" Group="PDO 5"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>5&amp;USBPD_PORT0_PDO_SNK_TYPE_5=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_VARIABLE_SET_MIN_VOLTAGE_5" RefParameter="USBPD_PDO_SNK_VARIABLE_SET_MIN_VOLTAGE" TabName="PDO Sink" Group="PDO 5"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>5&amp;USBPD_PORT0_PDO_SNK_TYPE_5=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_VARIABLE_SET_OP_CURRENT_5" RefParameter="USBPD_PDO_SNK_VARIABLE_SET_OP_CURRENT" TabName="PDO Sink" Group="PDO 5"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>5&amp;USBPD_PORT0_PDO_SNK_TYPE_5=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_APDO_PPS_5" RefParameter="USBPD_PDO_SNK_APDO_PPS" TabName="PDO Sink" Group="PDO 5"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>5&amp;USBPD_PORT0_PDO_SNK_TYPE_5=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_APDO_SET_MAX_VOLTAGE_5" RefParameter="USBPD_PDO_APDO_SET_MAX_VOLTAGE" TabName="PDO Sink" Group="PDO 5"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>5&amp;USBPD_PORT0_PDO_SNK_TYPE_5=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_APDO_SET_MIN_VOLTAGE_5" RefParameter="USBPD_PDO_APDO_SET_MIN_VOLTAGE" TabName="PDO Sink" Group="PDO 5"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>5&amp;USBPD_PORT0_PDO_SNK_TYPE_5=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_APDO_SET_MAX_CURRENT_5" RefParameter="USBPD_PDO_APDO_SET_MAX_CURRENT" TabName="PDO Sink" Group="PDO 5"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>5&amp;USBPD_PORT0_PDO_SNK_TYPE_5=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_TYPE_6" RefParameter="USBPD_PDO_TYPE" TabName="PDO Sink" Group="PDO 6"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>6" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_FIXED_SET_VOLTAGE_6" RefParameter="USBPD_PDO_FIXED_SET_VOLTAGE" TabName="PDO Sink" Group="PDO 6"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>6&amp;USBPD_PORT0_PDO_SNK_TYPE_6=USBPD_PDO_TYPE_FIXED" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_FIXED_SET_OP_CURRENT_6" RefParameter="USBPD_PDO_FIXED_SET_OP_CURRENT" TabName="PDO Sink" Group="PDO 6"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>6&amp;USBPD_PORT0_PDO_SNK_TYPE_6=USBPD_PDO_TYPE_FIXED" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_BATTERY_SET_MAX_VOLTAGE_6" RefParameter="USBPD_PDO_SNK_BATTERY_SET_MAX_VOLTAGE" TabName="PDO Sink" Group="PDO 6"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>6&amp;USBPD_PORT0_PDO_SNK_TYPE_6=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_BATTERY_SET_MIN_VOLTAGE_6" RefParameter="USBPD_PDO_SNK_BATTERY_SET_MIN_VOLTAGE" TabName="PDO Sink" Group="PDO 6"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>6&amp;USBPD_PORT0_PDO_SNK_TYPE_6=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_BATTERY_SET_OP_POWER_6" RefParameter="USBPD_PDO_SNK_BATTERY_SET_OP_POWER" TabName="PDO Sink" Group="PDO 6"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>6&amp;USBPD_PORT0_PDO_SNK_TYPE_6=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_VARIABLE_SET_MAX_VOLTAGE_6" RefParameter="USBPD_PDO_SNK_VARIABLE_SET_MAX_VOLTAGE" TabName="PDO Sink" Group="PDO 6"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>6&amp;USBPD_PORT0_PDO_SNK_TYPE_6=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_VARIABLE_SET_MIN_VOLTAGE_6" RefParameter="USBPD_PDO_SNK_VARIABLE_SET_MIN_VOLTAGE" TabName="PDO Sink" Group="PDO 6"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>6&amp;USBPD_PORT0_PDO_SNK_TYPE_6=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_VARIABLE_SET_OP_CURRENT_6" RefParameter="USBPD_PDO_SNK_VARIABLE_SET_OP_CURRENT" TabName="PDO Sink" Group="PDO 6"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>6&amp;USBPD_PORT0_PDO_SNK_TYPE_6=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_APDO_PPS_6" RefParameter="USBPD_PDO_SNK_APDO_PPS" TabName="PDO Sink" Group="PDO 6"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>6&amp;USBPD_PORT0_PDO_SNK_TYPE_6=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_APDO_SET_MAX_VOLTAGE_6" RefParameter="USBPD_PDO_APDO_SET_MAX_VOLTAGE" TabName="PDO Sink" Group="PDO 6"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>6&amp;USBPD_PORT0_PDO_SNK_TYPE_6=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_APDO_SET_MIN_VOLTAGE_6" RefParameter="USBPD_PDO_APDO_SET_MIN_VOLTAGE" TabName="PDO Sink" Group="PDO 6"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>6&amp;USBPD_PORT0_PDO_SNK_TYPE_6=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_APDO_SET_MAX_CURRENT_6" RefParameter="USBPD_PDO_APDO_SET_MAX_CURRENT" TabName="PDO Sink" Group="PDO 6"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>6&amp;USBPD_PORT0_PDO_SNK_TYPE_6=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_TYPE_7" RefParameter="USBPD_PDO_TYPE" TabName="PDO Sink" Group="PDO 7"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>7" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_FIXED_SET_VOLTAGE_7" RefParameter="USBPD_PDO_FIXED_SET_VOLTAGE" TabName="PDO Sink" Group="PDO 7"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>7&amp;USBPD_PORT0_PDO_SNK_TYPE_7=USBPD_PDO_TYPE_FIXED" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_FIXED_SET_OP_CURRENT_7" RefParameter="USBPD_PDO_FIXED_SET_OP_CURRENT" TabName="PDO Sink" Group="PDO 7"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>7&amp;USBPD_PORT0_PDO_SNK_TYPE_7=USBPD_PDO_TYPE_FIXED" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_BATTERY_SET_MAX_VOLTAGE_7" RefParameter="USBPD_PDO_SNK_BATTERY_SET_MAX_VOLTAGE" TabName="PDO Sink" Group="PDO 7"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>7&amp;USBPD_PORT0_PDO_SNK_TYPE_7=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_BATTERY_SET_MIN_VOLTAGE_7" RefParameter="USBPD_PDO_SNK_BATTERY_SET_MIN_VOLTAGE" TabName="PDO Sink" Group="PDO 7"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>7&amp;USBPD_PORT0_PDO_SNK_TYPE_7=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_BATTERY_SET_OP_POWER_7" RefParameter="USBPD_PDO_SNK_BATTERY_SET_OP_POWER" TabName="PDO Sink" Group="PDO 7"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>7&amp;USBPD_PORT0_PDO_SNK_TYPE_7=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_VARIABLE_SET_MAX_VOLTAGE_7" RefParameter="USBPD_PDO_SNK_VARIABLE_SET_MAX_VOLTAGE" TabName="PDO Sink" Group="PDO 7"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>7&amp;USBPD_PORT0_PDO_SNK_TYPE_7=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_VARIABLE_SET_MIN_VOLTAGE_7" RefParameter="USBPD_PDO_SNK_VARIABLE_SET_MIN_VOLTAGE" TabName="PDO Sink" Group="PDO 7"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>7&amp;USBPD_PORT0_PDO_SNK_TYPE_7=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_VARIABLE_SET_OP_CURRENT_7" RefParameter="USBPD_PDO_SNK_VARIABLE_SET_OP_CURRENT" TabName="PDO Sink" Group="PDO 7"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>7&amp;USBPD_PORT0_PDO_SNK_TYPE_7=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_APDO_PPS_7" RefParameter="USBPD_PDO_SNK_APDO_PPS" TabName="PDO Sink" Group="PDO 7"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>7&amp;USBPD_PORT0_PDO_SNK_TYPE_7=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_APDO_SET_MAX_VOLTAGE_7" RefParameter="USBPD_PDO_APDO_SET_MAX_VOLTAGE" TabName="PDO Sink" Group="PDO 7"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>7&amp;USBPD_PORT0_PDO_SNK_TYPE_7=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_APDO_SET_MIN_VOLTAGE_7" RefParameter="USBPD_PDO_APDO_SET_MIN_VOLTAGE" TabName="PDO Sink" Group="PDO 7"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>7&amp;USBPD_PORT0_PDO_SNK_TYPE_7=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_APDO_SET_MAX_CURRENT_7" RefParameter="USBPD_PDO_APDO_SET_MAX_CURRENT" TabName="PDO Sink" Group="PDO 7"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>7&amp;USBPD_PORT0_PDO_SNK_TYPE_7=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
     </RefMode>
 
-    <RefMode Name="USBPD_P0" BaseMode="USBPD_Common">
+    <RefMode Name="USBPD_PORT0_PDO_P0" BaseMode="USBPD_Common" Abstract="true">
+          <Condition Expression="(SourceUCPD1)" Diagnostic=""/>
+         <ConfigForMode>USBPD_Init_PDO</ConfigForMode>
+
+        <Parameter Name="PORT0_UCPD_MODE"/>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_NB" RefParameter="USBPD_PDO_NB" TabName="PDO Sources" Group="Number of PDO Source"><Condition Expression="!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_FIXED_UNCHUNK_0" RefParameter="USBPD_PORT0_PDO_FIXED_UNCHUNK" TabName="PDO Sources" Group="Generic Source Parameters"><Condition Expression="(USBPD_PORT0_PDO_SRC_NB>0) &amp; (!USBPD_PD3TYPEC)" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_FIXED_DRD_0" RefParameter="USBPD_PORT0_PDO_SRC_FIXED_DRD" TabName="PDO Sources" Group="Generic Source Parameters"><Condition Expression="(USBPD_PORT0_PDO_SRC_NB>0) &amp; (!USBPD_PD3TYPEC)" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_FIXED_USBCOMM_0" RefParameter="USBPD_PORT0_PDO_SRC_FIXED_USBCOMM" TabName="PDO Sources" Group="Generic Source Parameters"><Condition Expression="(USBPD_PORT0_PDO_SRC_NB>0) &amp; (!USBPD_PD3TYPEC)" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_FIXED_EXT_POWER_0" RefParameter="USBPD_PORT0_PDO_SRC_FIXED_EXT_POWER" TabName="PDO Sources" Group="Generic Source Parameters"><Condition Expression="(USBPD_PORT0_PDO_SRC_NB>0) &amp; (!USBPD_PD3TYPEC)" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_FIXED_USBSUSPEND_0" RefParameter="USBPD_PORT0_PDO_FIXED_USBSUSPEND" TabName="PDO Sources" Group="Generic Source Parameters"><Condition Expression="(USBPD_PORT0_PDO_SRC_NB>0) &amp; (!USBPD_PD3TYPEC)" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_FIXED_DRP_0" RefParameter="USBPD_PORT0_PDO_SRC_FIXED_DRP" TabName="PDO Sources" Group="Generic Source Parameters"><Condition Expression="(USBPD_PORT0_PDO_SRC_NB>0) &amp; (!USBPD_PD3TYPEC)" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_TYPE_0" RefParameter="USBPD_PDO_TYPE" TabName="PDO Sources" Group="PDO 0"><PossibleValue Comment="Fixed Supply (Vmin=Vmax)"/><Condition Expression="!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_FIXED_SET_VOLTAGE_0" RefParameter="USBPD_PDO_FIXED_SET_VOLTAGE" TabName="PDO Sources" Group="PDO 0"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>0&amp;USBPD_PORT0_PDO_SRC_TYPE_0=USBPD_PDO_TYPE_FIXED&amp;!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_FIXED_SET_MAX_CURRENT_0" RefParameter="USBPD_PDO_FIXED_SET_MAX_CURRENT" TabName="PDO Sources" Group="PDO 0"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>0&amp;USBPD_PORT0_PDO_SRC_TYPE_0=USBPD_PDO_TYPE_FIXED&amp;!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_FIXED_PEAKCURRENT_0" RefParameter="USBPD_PDO_FIXED_PEAKCURRENT" TabName="PDO Sources" Group="PDO 0"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>0&amp;USBPD_PORT0_PDO_SRC_TYPE_0=USBPD_PDO_TYPE_FIXED&amp;!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_BATTERY_SET_MAX_VOLTAGE_0" RefParameter="USBPD_PDO_SRC_BATTERY_SET_MAX_VOLTAGE" TabName="PDO Sources" Group="PDO 0"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>0&amp;USBPD_PORT0_PDO_SRC_TYPE_0=USBPD_PDO_TYPE_BATTERY&amp;!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_BATTERY_SET_MIN_VOLTAGE_0" RefParameter="USBPD_PDO_SRC_BATTERY_SET_MIN_VOLTAGE" TabName="PDO Sources" Group="PDO 0"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>0&amp;USBPD_PORT0_PDO_SRC_TYPE_0=USBPD_PDO_TYPE_BATTERY&amp;!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_BATTERY_SET_MAX_POWER_0" RefParameter="USBPD_PDO_SRC_BATTERY_SET_MAX_POWER" TabName="PDO Sources" Group="PDO 0"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>0&amp;USBPD_PORT0_PDO_SRC_TYPE_0=USBPD_PDO_TYPE_BATTERY&amp;!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_VARIABLE_SET_MAX_CURRENT_0" RefParameter="USBPD_PDO_SRC_VARIABLE_SET_MAX_CURRENT" TabName="PDO Sources" Group="PDO 0"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>0&amp;USBPD_PORT0_PDO_SRC_TYPE_0=USBPD_PDO_TYPE_VARIABLE&amp;!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_VARIABLE_SET_MAX_VOLTAGE_0" RefParameter="USBPD_PDO_SRC_VARIABLE_SET_MAX_VOLTAGE" TabName="PDO Sources" Group="PDO 0"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>0&amp;USBPD_PORT0_PDO_SRC_TYPE_0=USBPD_PDO_TYPE_VARIABLE&amp;!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_VARIABLE_SET_MIN_VOLTAGE_0" RefParameter="USBPD_PDO_SRC_VARIABLE_SET_MIN_VOLTAGE" TabName="PDO Sources" Group="PDO 0"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>0&amp;USBPD_PORT0_PDO_SRC_TYPE_0=USBPD_PDO_TYPE_VARIABLE&amp;!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_APDO_SET_MAX_VOLTAGE_0" RefParameter="USBPD_PDO_APDO_SET_MAX_VOLTAGE" TabName="PDO Sources" Group="PDO 0"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>0&amp;USBPD_PORT0_PDO_SRC_TYPE_0=USBPD_PDO_TYPE_APDO&amp;!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_APDO_SET_MIN_VOLTAGE_0" RefParameter="USBPD_PDO_APDO_SET_MIN_VOLTAGE" TabName="PDO Sources" Group="PDO 0"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>0&amp;USBPD_PORT0_PDO_SRC_TYPE_0=USBPD_PDO_TYPE_APDO&amp;!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_APDO_SET_MAX_CURRENT_0" RefParameter="USBPD_PDO_APDO_SET_MAX_CURRENT" TabName="PDO Sources" Group="PDO 0"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>0&amp;USBPD_PORT0_PDO_SRC_TYPE_0=USBPD_PDO_TYPE_APDO&amp;!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_APDO_PPS_0" RefParameter="USBPD_PDO_SRC_APDO_PPS" TabName="PDO Sources" Group="PDO 0"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>0&amp;USBPD_PORT0_PDO_SRC_TYPE_0=USBPD_PDO_TYPE_APDO&amp;!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_APDO_PPS_PWR_LIMITED_0" RefParameter="USBPD_PDO_PPS_PWR_LIMITED" TabName="PDO Sources" Group="PDO 0"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>0&amp;USBPD_PORT0_PDO_SRC_TYPE_0=USBPD_PDO_TYPE_APDO&amp;!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_TYPE_1" RefParameter="USBPD_PDO_TYPE" TabName="PDO Sources" Group="PDO 1"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>1" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_FIXED_SET_VOLTAGE_1" RefParameter="USBPD_PDO_FIXED_SET_VOLTAGE" TabName="PDO Sources" Group="PDO 1"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>1&amp;USBPD_PORT0_PDO_SRC_TYPE_1=USBPD_PDO_TYPE_FIXED" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_FIXED_SET_MAX_CURRENT_1" RefParameter="USBPD_PDO_FIXED_SET_MAX_CURRENT" TabName="PDO Sources" Group="PDO 1"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>1&amp;USBPD_PORT0_PDO_SRC_TYPE_1=USBPD_PDO_TYPE_FIXED" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_FIXED_PEAKCURRENT_1" RefParameter="USBPD_PDO_FIXED_PEAKCURRENT" TabName="PDO Sources" Group="PDO 1"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>1&amp;USBPD_PORT0_PDO_SRC_TYPE_1=USBPD_PDO_TYPE_FIXED" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_BATTERY_SET_MAX_VOLTAGE_1" RefParameter="USBPD_PDO_SRC_BATTERY_SET_MAX_VOLTAGE" TabName="PDO Sources" Group="PDO 1"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>1&amp;USBPD_PORT0_PDO_SRC_TYPE_1=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_BATTERY_SET_MIN_VOLTAGE_1" RefParameter="USBPD_PDO_SRC_BATTERY_SET_MIN_VOLTAGE" TabName="PDO Sources" Group="PDO 1"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>1&amp;USBPD_PORT0_PDO_SRC_TYPE_1=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_BATTERY_SET_MAX_POWER_1" RefParameter="USBPD_PDO_SRC_BATTERY_SET_MAX_POWER" TabName="PDO Sources" Group="PDO 1"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>1&amp;USBPD_PORT0_PDO_SRC_TYPE_1=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_VARIABLE_SET_MAX_CURRENT_1" RefParameter="USBPD_PDO_SRC_VARIABLE_SET_MAX_CURRENT" TabName="PDO Sources" Group="PDO 1"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>1&amp;USBPD_PORT0_PDO_SRC_TYPE_1=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_VARIABLE_SET_MAX_VOLTAGE_1" RefParameter="USBPD_PDO_SRC_VARIABLE_SET_MAX_VOLTAGE" TabName="PDO Sources" Group="PDO 1"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>1&amp;USBPD_PORT0_PDO_SRC_TYPE_1=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_VARIABLE_SET_MIN_VOLTAGE_1" RefParameter="USBPD_PDO_SRC_VARIABLE_SET_MIN_VOLTAGE" TabName="PDO Sources" Group="PDO 1"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>1&amp;USBPD_PORT0_PDO_SRC_TYPE_1=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_APDO_SET_MAX_VOLTAGE_1" RefParameter="USBPD_PDO_APDO_SET_MAX_VOLTAGE" TabName="PDO Sources" Group="PDO 1"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>1&amp;USBPD_PORT0_PDO_SRC_TYPE_1=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_APDO_SET_MIN_VOLTAGE_1" RefParameter="USBPD_PDO_APDO_SET_MIN_VOLTAGE" TabName="PDO Sources" Group="PDO 1"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>1&amp;USBPD_PORT0_PDO_SRC_TYPE_1=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_APDO_SET_MAX_CURRENT_1" RefParameter="USBPD_PDO_APDO_SET_MAX_CURRENT" TabName="PDO Sources" Group="PDO 1"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>1&amp;USBPD_PORT0_PDO_SRC_TYPE_1=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_APDO_PPS_1" RefParameter="USBPD_PDO_SRC_APDO_PPS" TabName="PDO Sources" Group="PDO 1"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>1&amp;USBPD_PORT0_PDO_SRC_TYPE_1=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_APDO_PPS_PWR_LIMITED_1" RefParameter="USBPD_PDO_PPS_PWR_LIMITED" TabName="PDO Sources" Group="PDO 1"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>1&amp;USBPD_PORT0_PDO_SRC_TYPE_1=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_TYPE_2" RefParameter="USBPD_PDO_TYPE" TabName="PDO Sources" Group="PDO 2"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>2" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_FIXED_SET_VOLTAGE_2" RefParameter="USBPD_PDO_FIXED_SET_VOLTAGE" TabName="PDO Sources" Group="PDO 2"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>2&amp;USBPD_PORT0_PDO_SRC_TYPE_2=USBPD_PDO_TYPE_FIXED" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_FIXED_SET_MAX_CURRENT_2" RefParameter="USBPD_PDO_FIXED_SET_MAX_CURRENT" TabName="PDO Sources" Group="PDO 2"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>2&amp;USBPD_PORT0_PDO_SRC_TYPE_2=USBPD_PDO_TYPE_FIXED" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_FIXED_PEAKCURRENT_2" RefParameter="USBPD_PDO_FIXED_PEAKCURRENT" TabName="PDO Sources" Group="PDO 2"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>2&amp;USBPD_PORT0_PDO_SRC_TYPE_2=USBPD_PDO_TYPE_FIXED" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_BATTERY_SET_MAX_VOLTAGE_2" RefParameter="USBPD_PDO_SRC_BATTERY_SET_MAX_VOLTAGE" TabName="PDO Sources" Group="PDO 2"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>2&amp;USBPD_PORT0_PDO_SRC_TYPE_2=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_BATTERY_SET_MIN_VOLTAGE_2" RefParameter="USBPD_PDO_SRC_BATTERY_SET_MIN_VOLTAGE" TabName="PDO Sources" Group="PDO 2"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>2&amp;USBPD_PORT0_PDO_SRC_TYPE_2=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_BATTERY_SET_MAX_POWER_2" RefParameter="USBPD_PDO_SRC_BATTERY_SET_MAX_POWER" TabName="PDO Sources" Group="PDO 2"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>2&amp;USBPD_PORT0_PDO_SRC_TYPE_2=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_VARIABLE_SET_MAX_CURRENT_2" RefParameter="USBPD_PDO_SRC_VARIABLE_SET_MAX_CURRENT" TabName="PDO Sources" Group="PDO 2"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>2&amp;USBPD_PORT0_PDO_SRC_TYPE_2=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_VARIABLE_SET_MAX_VOLTAGE_2" RefParameter="USBPD_PDO_SRC_VARIABLE_SET_MAX_VOLTAGE" TabName="PDO Sources" Group="PDO 2"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>2&amp;USBPD_PORT0_PDO_SRC_TYPE_2=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_VARIABLE_SET_MIN_VOLTAGE_2" RefParameter="USBPD_PDO_SRC_VARIABLE_SET_MIN_VOLTAGE" TabName="PDO Sources" Group="PDO 2"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>2&amp;USBPD_PORT0_PDO_SRC_TYPE_2=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_APDO_SET_MAX_VOLTAGE_2" RefParameter="USBPD_PDO_APDO_SET_MAX_VOLTAGE" TabName="PDO Sources" Group="PDO 2"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>2&amp;USBPD_PORT0_PDO_SRC_TYPE_2=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_APDO_SET_MIN_VOLTAGE_2" RefParameter="USBPD_PDO_APDO_SET_MIN_VOLTAGE" TabName="PDO Sources" Group="PDO 2"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>2&amp;USBPD_PORT0_PDO_SRC_TYPE_2=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_APDO_SET_MAX_CURRENT_2" RefParameter="USBPD_PDO_APDO_SET_MAX_CURRENT" TabName="PDO Sources" Group="PDO 2"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>2&amp;USBPD_PORT0_PDO_SRC_TYPE_2=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_APDO_PPS_2" RefParameter="USBPD_PDO_SRC_APDO_PPS" TabName="PDO Sources" Group="PDO 2"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>2&amp;USBPD_PORT0_PDO_SRC_TYPE_2=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_APDO_PPS_PWR_LIMITED_2" RefParameter="USBPD_PDO_PPS_PWR_LIMITED" TabName="PDO Sources" Group="PDO 2"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>2&amp;USBPD_PORT0_PDO_SRC_TYPE_2=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_TYPE_3" RefParameter="USBPD_PDO_TYPE" TabName="PDO Sources" Group="PDO 3"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>3" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_FIXED_SET_VOLTAGE_3" RefParameter="USBPD_PDO_FIXED_SET_VOLTAGE" TabName="PDO Sources" Group="PDO 3"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>3&amp;USBPD_PORT0_PDO_SRC_TYPE_3=USBPD_PDO_TYPE_FIXED" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_FIXED_SET_MAX_CURRENT_3" RefParameter="USBPD_PDO_FIXED_SET_MAX_CURRENT" TabName="PDO Sources" Group="PDO 3"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>3&amp;USBPD_PORT0_PDO_SRC_TYPE_3=USBPD_PDO_TYPE_FIXED" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_FIXED_PEAKCURRENT_3" RefParameter="USBPD_PDO_FIXED_PEAKCURRENT" TabName="PDO Sources" Group="PDO 3"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>3&amp;USBPD_PORT0_PDO_SRC_TYPE_3=USBPD_PDO_TYPE_FIXED" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_BATTERY_SET_MAX_VOLTAGE_3" RefParameter="USBPD_PDO_SRC_BATTERY_SET_MAX_VOLTAGE" TabName="PDO Sources" Group="PDO 3"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>3&amp;USBPD_PORT0_PDO_SRC_TYPE_3=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_BATTERY_SET_MIN_VOLTAGE_3" RefParameter="USBPD_PDO_SRC_BATTERY_SET_MIN_VOLTAGE" TabName="PDO Sources" Group="PDO 3"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>3&amp;USBPD_PORT0_PDO_SRC_TYPE_3=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_BATTERY_SET_MAX_POWER_3" RefParameter="USBPD_PDO_SRC_BATTERY_SET_MAX_POWER" TabName="PDO Sources" Group="PDO 3"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>3&amp;USBPD_PORT0_PDO_SRC_TYPE_3=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_VARIABLE_SET_MAX_CURRENT_3" RefParameter="USBPD_PDO_SRC_VARIABLE_SET_MAX_CURRENT" TabName="PDO Sources" Group="PDO 3"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>3&amp;USBPD_PORT0_PDO_SRC_TYPE_3=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_VARIABLE_SET_MAX_VOLTAGE_3" RefParameter="USBPD_PDO_SRC_VARIABLE_SET_MAX_VOLTAGE" TabName="PDO Sources" Group="PDO 3"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>3&amp;USBPD_PORT0_PDO_SRC_TYPE_3=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_VARIABLE_SET_MIN_VOLTAGE_3" RefParameter="USBPD_PDO_SRC_VARIABLE_SET_MIN_VOLTAGE" TabName="PDO Sources" Group="PDO 3"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>3&amp;USBPD_PORT0_PDO_SRC_TYPE_3=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_APDO_SET_MAX_VOLTAGE_3" RefParameter="USBPD_PDO_APDO_SET_MAX_VOLTAGE" TabName="PDO Sources" Group="PDO 3"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>3&amp;USBPD_PORT0_PDO_SRC_TYPE_3=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_APDO_SET_MIN_VOLTAGE_3" RefParameter="USBPD_PDO_APDO_SET_MIN_VOLTAGE" TabName="PDO Sources" Group="PDO 3"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>3&amp;USBPD_PORT0_PDO_SRC_TYPE_3=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_APDO_SET_MAX_CURRENT_3" RefParameter="USBPD_PDO_APDO_SET_MAX_CURRENT" TabName="PDO Sources" Group="PDO 3"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>3&amp;USBPD_PORT0_PDO_SRC_TYPE_3=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_APDO_PPS_3" RefParameter="USBPD_PDO_SRC_APDO_PPS" TabName="PDO Sources" Group="PDO 3"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>3&amp;USBPD_PORT0_PDO_SRC_TYPE_3=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_APDO_PPS_PWR_LIMITED_3" RefParameter="USBPD_PDO_PPS_PWR_LIMITED" TabName="PDO Sources" Group="PDO 3"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>3&amp;USBPD_PORT0_PDO_SRC_TYPE_3=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_TYPE_4" RefParameter="USBPD_PDO_TYPE" TabName="PDO Sources" Group="PDO 4"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>4" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_FIXED_SET_VOLTAGE_4" RefParameter="USBPD_PDO_FIXED_SET_VOLTAGE" TabName="PDO Sources" Group="PDO 4"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>4&amp;USBPD_PORT0_PDO_SRC_TYPE_4=USBPD_PDO_TYPE_FIXED" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_FIXED_SET_MAX_CURRENT_4" RefParameter="USBPD_PDO_FIXED_SET_MAX_CURRENT" TabName="PDO Sources" Group="PDO 4"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>4&amp;USBPD_PORT0_PDO_SRC_TYPE_4=USBPD_PDO_TYPE_FIXED" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_FIXED_PEAKCURRENT_4" RefParameter="USBPD_PDO_FIXED_PEAKCURRENT" TabName="PDO Sources" Group="PDO 4"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>4&amp;USBPD_PORT0_PDO_SRC_TYPE_4=USBPD_PDO_TYPE_FIXED" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_BATTERY_SET_MAX_VOLTAGE_4" RefParameter="USBPD_PDO_SRC_BATTERY_SET_MAX_VOLTAGE" TabName="PDO Sources" Group="PDO 4"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>4&amp;USBPD_PORT0_PDO_SRC_TYPE_4=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_BATTERY_SET_MIN_VOLTAGE_4" RefParameter="USBPD_PDO_SRC_BATTERY_SET_MIN_VOLTAGE" TabName="PDO Sources" Group="PDO 4"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>4&amp;USBPD_PORT0_PDO_SRC_TYPE_4=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_BATTERY_SET_MAX_POWER_4" RefParameter="USBPD_PDO_SRC_BATTERY_SET_MAX_POWER" TabName="PDO Sources" Group="PDO 4"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>4&amp;USBPD_PORT0_PDO_SRC_TYPE_4=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_VARIABLE_SET_MAX_CURRENT_4" RefParameter="USBPD_PDO_SRC_VARIABLE_SET_MAX_CURRENT" TabName="PDO Sources" Group="PDO 4"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>4&amp;USBPD_PORT0_PDO_SRC_TYPE_4=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_VARIABLE_SET_MAX_VOLTAGE_4" RefParameter="USBPD_PDO_SRC_VARIABLE_SET_MAX_VOLTAGE" TabName="PDO Sources" Group="PDO 4"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>4&amp;USBPD_PORT0_PDO_SRC_TYPE_4=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_VARIABLE_SET_MIN_VOLTAGE_4" RefParameter="USBPD_PDO_SRC_VARIABLE_SET_MIN_VOLTAGE" TabName="PDO Sources" Group="PDO 4"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>4&amp;USBPD_PORT0_PDO_SRC_TYPE_4=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_APDO_SET_MAX_VOLTAGE_4" RefParameter="USBPD_PDO_APDO_SET_MAX_VOLTAGE" TabName="PDO Sources" Group="PDO 4"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>4&amp;USBPD_PORT0_PDO_SRC_TYPE_4=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_APDO_SET_MIN_VOLTAGE_4" RefParameter="USBPD_PDO_APDO_SET_MIN_VOLTAGE" TabName="PDO Sources" Group="PDO 4"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>4&amp;USBPD_PORT0_PDO_SRC_TYPE_4=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_APDO_SET_MAX_CURRENT_4" RefParameter="USBPD_PDO_APDO_SET_MAX_CURRENT" TabName="PDO Sources" Group="PDO 4"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>4&amp;USBPD_PORT0_PDO_SRC_TYPE_4=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_APDO_PPS_4" RefParameter="USBPD_PDO_SRC_APDO_PPS" TabName="PDO Sources" Group="PDO 4"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>4&amp;USBPD_PORT0_PDO_SRC_TYPE_4=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_APDO_PPS_PWR_LIMITED_4" RefParameter="USBPD_PDO_PPS_PWR_LIMITED" TabName="PDO Sources" Group="PDO 4"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>4&amp;USBPD_PORT0_PDO_SRC_TYPE_4=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_TYPE_5" RefParameter="USBPD_PDO_TYPE" TabName="PDO Sources" Group="PDO 5"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>5" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_FIXED_SET_VOLTAGE_5" RefParameter="USBPD_PDO_FIXED_SET_VOLTAGE" TabName="PDO Sources" Group="PDO 5"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>5&amp;USBPD_PORT0_PDO_SRC_TYPE_5=USBPD_PDO_TYPE_FIXED" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_FIXED_SET_MAX_CURRENT_5" RefParameter="USBPD_PDO_FIXED_SET_MAX_CURRENT" TabName="PDO Sources" Group="PDO 5"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>5&amp;USBPD_PORT0_PDO_SRC_TYPE_5=USBPD_PDO_TYPE_FIXED" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_FIXED_PEAKCURRENT_5" RefParameter="USBPD_PDO_FIXED_PEAKCURRENT" TabName="PDO Sources" Group="PDO 5"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>5&amp;USBPD_PORT0_PDO_SRC_TYPE_5=USBPD_PDO_TYPE_FIXED" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_BATTERY_SET_MAX_VOLTAGE_5" RefParameter="USBPD_PDO_SRC_BATTERY_SET_MAX_VOLTAGE" TabName="PDO Sources" Group="PDO 5"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>5&amp;USBPD_PORT0_PDO_SRC_TYPE_5=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_BATTERY_SET_MIN_VOLTAGE_5" RefParameter="USBPD_PDO_SRC_BATTERY_SET_MIN_VOLTAGE" TabName="PDO Sources" Group="PDO 5"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>5&amp;USBPD_PORT0_PDO_SRC_TYPE_5=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_BATTERY_SET_MAX_POWER_5" RefParameter="USBPD_PDO_SRC_BATTERY_SET_MAX_POWER" TabName="PDO Sources" Group="PDO 5"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>5&amp;USBPD_PORT0_PDO_SRC_TYPE_5=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_VARIABLE_SET_MAX_CURRENT_5" RefParameter="USBPD_PDO_SRC_VARIABLE_SET_MAX_CURRENT" TabName="PDO Sources" Group="PDO 5"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>5&amp;USBPD_PORT0_PDO_SRC_TYPE_5=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_VARIABLE_SET_MAX_VOLTAGE_5" RefParameter="USBPD_PDO_SRC_VARIABLE_SET_MAX_VOLTAGE" TabName="PDO Sources" Group="PDO 5"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>5&amp;USBPD_PORT0_PDO_SRC_TYPE_5=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_VARIABLE_SET_MIN_VOLTAGE_5" RefParameter="USBPD_PDO_SRC_VARIABLE_SET_MIN_VOLTAGE" TabName="PDO Sources" Group="PDO 5"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>5&amp;USBPD_PORT0_PDO_SRC_TYPE_5=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_APDO_SET_MAX_VOLTAGE_5" RefParameter="USBPD_PDO_APDO_SET_MAX_VOLTAGE" TabName="PDO Sources" Group="PDO 5"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>5&amp;USBPD_PORT0_PDO_SRC_TYPE_5=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_APDO_SET_MIN_VOLTAGE_5" RefParameter="USBPD_PDO_APDO_SET_MIN_VOLTAGE" TabName="PDO Sources" Group="PDO 5"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>5&amp;USBPD_PORT0_PDO_SRC_TYPE_5=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_APDO_SET_MAX_CURRENT_5" RefParameter="USBPD_PDO_APDO_SET_MAX_CURRENT" TabName="PDO Sources" Group="PDO 5"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>5&amp;USBPD_PORT0_PDO_SRC_TYPE_5=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_APDO_PPS_5" RefParameter="USBPD_PDO_SRC_APDO_PPS" TabName="PDO Sources" Group="PDO 5"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>5&amp;USBPD_PORT0_PDO_SRC_TYPE_5=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_APDO_PPS_PWR_LIMITED_5" RefParameter="USBPD_PDO_PPS_PWR_LIMITED" TabName="PDO Sources" Group="PDO 5"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>5&amp;USBPD_PORT0_PDO_SRC_TYPE_5=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_TYPE_6" RefParameter="USBPD_PDO_TYPE" TabName="PDO Sources" Group="PDO 6"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>6" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_FIXED_SET_VOLTAGE_6" RefParameter="USBPD_PDO_FIXED_SET_VOLTAGE" TabName="PDO Sources" Group="PDO 6"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>6&amp;USBPD_PORT0_PDO_SRC_TYPE_6=USBPD_PDO_TYPE_FIXED" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_FIXED_SET_MAX_CURRENT_6" RefParameter="USBPD_PDO_FIXED_SET_MAX_CURRENT" TabName="PDO Sources" Group="PDO 6"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>6&amp;USBPD_PORT0_PDO_SRC_TYPE_6=USBPD_PDO_TYPE_FIXED" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_FIXED_PEAKCURRENT_6" RefParameter="USBPD_PDO_FIXED_PEAKCURRENT" TabName="PDO Sources" Group="PDO 6"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>6&amp;USBPD_PORT0_PDO_SRC_TYPE_6=USBPD_PDO_TYPE_FIXED" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_BATTERY_SET_MAX_VOLTAGE_6" RefParameter="USBPD_PDO_SRC_BATTERY_SET_MAX_VOLTAGE" TabName="PDO Sources" Group="PDO 6"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>6&amp;USBPD_PORT0_PDO_SRC_TYPE_6=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_BATTERY_SET_MIN_VOLTAGE_6" RefParameter="USBPD_PDO_SRC_BATTERY_SET_MIN_VOLTAGE" TabName="PDO Sources" Group="PDO 6"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>6&amp;USBPD_PORT0_PDO_SRC_TYPE_6=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_BATTERY_SET_MAX_POWER_6" RefParameter="USBPD_PDO_SRC_BATTERY_SET_MAX_POWER" TabName="PDO Sources" Group="PDO 6"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>6&amp;USBPD_PORT0_PDO_SRC_TYPE_6=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_VARIABLE_SET_MAX_CURRENT_6" RefParameter="USBPD_PDO_SRC_VARIABLE_SET_MAX_CURRENT" TabName="PDO Sources" Group="PDO 6"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>6&amp;USBPD_PORT0_PDO_SRC_TYPE_6=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_VARIABLE_SET_MAX_VOLTAGE_6" RefParameter="USBPD_PDO_SRC_VARIABLE_SET_MAX_VOLTAGE" TabName="PDO Sources" Group="PDO 6"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>6&amp;USBPD_PORT0_PDO_SRC_TYPE_6=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_VARIABLE_SET_MIN_VOLTAGE_6" RefParameter="USBPD_PDO_SRC_VARIABLE_SET_MIN_VOLTAGE" TabName="PDO Sources" Group="PDO 6"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>6&amp;USBPD_PORT0_PDO_SRC_TYPE_6=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_APDO_SET_MAX_VOLTAGE_6" RefParameter="USBPD_PDO_APDO_SET_MAX_VOLTAGE" TabName="PDO Sources" Group="PDO 6"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>6&amp;USBPD_PORT0_PDO_SRC_TYPE_6=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_APDO_SET_MIN_VOLTAGE_6" RefParameter="USBPD_PDO_APDO_SET_MIN_VOLTAGE" TabName="PDO Sources" Group="PDO 6"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>6&amp;USBPD_PORT0_PDO_SRC_TYPE_6=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_APDO_SET_MAX_CURRENT_6" RefParameter="USBPD_PDO_APDO_SET_MAX_CURRENT" TabName="PDO Sources" Group="PDO 6"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>6&amp;USBPD_PORT0_PDO_SRC_TYPE_6=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_APDO_PPS_6" RefParameter="USBPD_PDO_SRC_APDO_PPS" TabName="PDO Sources" Group="PDO 6"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>6&amp;USBPD_PORT0_PDO_SRC_TYPE_6=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_APDO_PPS_PWR_LIMITED_6" RefParameter="USBPD_PDO_PPS_PWR_LIMITED" TabName="PDO Sources" Group="PDO 6"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>6&amp;USBPD_PORT0_PDO_SRC_TYPE_6=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_TYPE_7" RefParameter="USBPD_PDO_TYPE" TabName="PDO Sources" Group="PDO 7"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>7" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_FIXED_SET_VOLTAGE_7" RefParameter="USBPD_PDO_FIXED_SET_VOLTAGE" TabName="PDO Sources" Group="PDO 7"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>7&amp;USBPD_PORT0_PDO_SRC_TYPE_7=USBPD_PDO_TYPE_FIXED" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_FIXED_SET_MAX_CURRENT_7" RefParameter="USBPD_PDO_FIXED_SET_MAX_CURRENT" TabName="PDO Sources" Group="PDO 7"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>7&amp;USBPD_PORT0_PDO_SRC_TYPE_7=USBPD_PDO_TYPE_FIXED" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_FIXED_PEAKCURRENT_7" RefParameter="USBPD_PDO_FIXED_PEAKCURRENT" TabName="PDO Sources" Group="PDO 7"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>7&amp;USBPD_PORT0_PDO_SRC_TYPE_7=USBPD_PDO_TYPE_FIXED" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_BATTERY_SET_MAX_VOLTAGE_7" RefParameter="USBPD_PDO_SRC_BATTERY_SET_MAX_VOLTAGE" TabName="PDO Sources" Group="PDO 7"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>7&amp;USBPD_PORT0_PDO_SRC_TYPE_7=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_BATTERY_SET_MIN_VOLTAGE_7" RefParameter="USBPD_PDO_SRC_BATTERY_SET_MIN_VOLTAGE" TabName="PDO Sources" Group="PDO 7"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>7&amp;USBPD_PORT0_PDO_SRC_TYPE_7=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_BATTERY_SET_MAX_POWER_7" RefParameter="USBPD_PDO_SRC_BATTERY_SET_MAX_POWER" TabName="PDO Sources" Group="PDO 7"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>7&amp;USBPD_PORT0_PDO_SRC_TYPE_7=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_VARIABLE_SET_MAX_CURRENT_7" RefParameter="USBPD_PDO_SRC_VARIABLE_SET_MAX_CURRENT" TabName="PDO Sources" Group="PDO 7"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>7&amp;USBPD_PORT0_PDO_SRC_TYPE_7=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_VARIABLE_SET_MAX_VOLTAGE_7" RefParameter="USBPD_PDO_SRC_VARIABLE_SET_MAX_VOLTAGE" TabName="PDO Sources" Group="PDO 7"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>7&amp;USBPD_PORT0_PDO_SRC_TYPE_7=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_VARIABLE_SET_MIN_VOLTAGE_7" RefParameter="USBPD_PDO_SRC_VARIABLE_SET_MIN_VOLTAGE" TabName="PDO Sources" Group="PDO 7"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>7&amp;USBPD_PORT0_PDO_SRC_TYPE_7=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_APDO_SET_MAX_VOLTAGE_7" RefParameter="USBPD_PDO_APDO_SET_MAX_VOLTAGE" TabName="PDO Sources" Group="PDO 7"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>7&amp;USBPD_PORT0_PDO_SRC_TYPE_7=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_APDO_SET_MIN_VOLTAGE_7" RefParameter="USBPD_PDO_APDO_SET_MIN_VOLTAGE" TabName="PDO Sources" Group="PDO 7"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>7&amp;USBPD_PORT0_PDO_SRC_TYPE_7=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_APDO_SET_MAX_CURRENT_7" RefParameter="USBPD_PDO_APDO_SET_MAX_CURRENT" TabName="PDO Sources" Group="PDO 7"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>7&amp;USBPD_PORT0_PDO_SRC_TYPE_7=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_APDO_PPS_7" RefParameter="USBPD_PDO_SRC_APDO_PPS" TabName="PDO Sources" Group="PDO 7"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>7&amp;USBPD_PORT0_PDO_SRC_TYPE_7=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SRC_APDO_PPS_PWR_LIMITED_7" RefParameter="USBPD_PDO_PPS_PWR_LIMITED" TabName="PDO Sources" Group="PDO 7"><Condition Expression="USBPD_PORT0_PDO_SRC_NB>7&amp;USBPD_PORT0_PDO_SRC_TYPE_7=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+
+    </RefMode>
+    <RefMode Name="USBPD_PORT0_PDO_P0" BaseMode="USBPD_Common" Abstract="true">
+        <Condition Expression="(SinkUCPD1)" Diagnostic=""/>
+        <ConfigForMode>USBPD_Init_PDO</ConfigForMode>
+
+
+        <Parameter Name="PORT0_UCPD_MODE"/>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_NB" RefParameter="USBPD_PDO_NB" TabName="PDO Sink" Group="Number of PDO Sink"><Condition Expression="!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_FIXED_FRS_0" RefParameter="USBPD_PORT0_PDO_FIXED_FRS" TabName="PDO Sink" Group="Generic Source Parameters"><Condition Expression="(USBPD_PORT0_PDO_SNK_NB>0) &amp; (!USBPD_PD3TYPEC)" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_FIXED_DRD_0" RefParameter="USBPD_PORT0_PDO_SNK_FIXED_DRD" TabName="PDO Sink" Group="Generic Source Parameters"><Condition Expression="(USBPD_PORT0_PDO_SNK_NB>0) &amp; (!USBPD_PD3TYPEC)" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_FIXED_USBCOMM_0" RefParameter="USBPD_PORT0_PDO_SNK_FIXED_USBCOMM" TabName="PDO Sink" Group="Generic Source Parameters"><Condition Expression="(USBPD_PORT0_PDO_SNK_NB>0) &amp; (!USBPD_PD3TYPEC)" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_FIXED_EXT_POWER_0" RefParameter="USBPD_PORT0_PDO_SNK_FIXED_EXT_POWER" TabName="PDO Sink" Group="Generic Source Parameters"><Condition Expression="(USBPD_PORT0_PDO_SNK_NB>0) &amp; (!USBPD_PD3TYPEC)" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_FIXED_HIGHERCAPAB_0" RefParameter="USBPD_PORT0_PDO_FIXED_HIGHERCAPAB" TabName="PDO Sink" Group="Generic Source Parameters"><Condition Expression="(USBPD_PORT0_PDO_SNK_NB>0) &amp; (!USBPD_PD3TYPEC)" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_FIXED_DRP_0" RefParameter="USBPD_PORT0_PDO_SNK_FIXED_DRP" TabName="PDO Sink" Group="Generic Source Parameters"><Condition Expression="(USBPD_PORT0_PDO_SNK_NB>0) &amp; (!USBPD_PD3TYPEC)" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_TYPE_0" RefParameter="USBPD_PDO_TYPE" TabName="PDO Sink" Group="PDO 0"><PossibleValue Comment="Fixed Supply (Vmin=Vmax)"/><Condition Expression="!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_FIXED_SET_VOLTAGE_0" RefParameter="USBPD_PDO_FIXED_SET_VOLTAGE" TabName="PDO Sink" Group="PDO 0"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>0&amp;USBPD_PORT0_PDO_SNK_TYPE_0=USBPD_PDO_TYPE_FIXED&amp;!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_FIXED_SET_OP_CURRENT_0" RefParameter="USBPD_PDO_FIXED_SET_OP_CURRENT" TabName="PDO Sink" Group="PDO 0"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>0&amp;USBPD_PORT0_PDO_SNK_TYPE_0=USBPD_PDO_TYPE_FIXED&amp;!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_BATTERY_SET_MAX_VOLTAGE_0" RefParameter="USBPD_PDO_SNK_BATTERY_SET_MAX_VOLTAGE" TabName="PDO Sink" Group="PDO 0"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>0&amp;USBPD_PORT0_PDO_SNK_TYPE_0=USBPD_PDO_TYPE_BATTERY&amp;!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_BATTERY_SET_MIN_VOLTAGE_0" RefParameter="USBPD_PDO_SNK_BATTERY_SET_MIN_VOLTAGE" TabName="PDO Sink" Group="PDO 0"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>0&amp;USBPD_PORT0_PDO_SNK_TYPE_0=USBPD_PDO_TYPE_BATTERY&amp;!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_BATTERY_SET_OP_POWER_0" RefParameter="USBPD_PDO_SNK_BATTERY_SET_OP_POWER" TabName="PDO Sink" Group="PDO 0"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>0&amp;USBPD_PORT0_PDO_SNK_TYPE_0=USBPD_PDO_TYPE_BATTERY&amp;!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_VARIABLE_SET_MAX_VOLTAGE_0" RefParameter="USBPD_PDO_SNK_VARIABLE_SET_MAX_VOLTAGE" TabName="PDO Sink" Group="PDO 0"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>0&amp;USBPD_PORT0_PDO_SNK_TYPE_0=USBPD_PDO_TYPE_VARIABLE&amp;!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_VARIABLE_SET_MIN_VOLTAGE_0" RefParameter="USBPD_PDO_SNK_VARIABLE_SET_MIN_VOLTAGE" TabName="PDO Sink" Group="PDO 0"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>0&amp;USBPD_PORT0_PDO_SNK_TYPE_0=USBPD_PDO_TYPE_VARIABLE&amp;!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_VARIABLE_SET_OP_CURRENT_0" RefParameter="USBPD_PDO_SNK_VARIABLE_SET_OP_CURRENT" TabName="PDO Sink" Group="PDO 0"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>0&amp;USBPD_PORT0_PDO_SNK_TYPE_0=USBPD_PDO_TYPE_VARIABLE&amp;!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_APDO_PPS_0" RefParameter="USBPD_PDO_SNK_APDO_PPS" TabName="PDO Sink" Group="PDO 0"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>0&amp;USBPD_PORT0_PDO_SNK_TYPE_0=USBPD_PDO_TYPE_APDO&amp;!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_APDO_SET_MAX_VOLTAGE_0" RefParameter="USBPD_PDO_APDO_SET_MAX_VOLTAGE" TabName="PDO Sink" Group="PDO 0"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>0&amp;USBPD_PORT0_PDO_SNK_TYPE_0=USBPD_PDO_TYPE_APDO&amp;!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_APDO_SET_MIN_VOLTAGE_0" RefParameter="USBPD_PDO_APDO_SET_MIN_VOLTAGE" TabName="PDO Sink" Group="PDO 0"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>0&amp;USBPD_PORT0_PDO_SNK_TYPE_0=USBPD_PDO_TYPE_APDO&amp;!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_APDO_SET_MAX_CURRENT_0" RefParameter="USBPD_PDO_APDO_SET_MAX_CURRENT" TabName="PDO Sink" Group="PDO 0"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>0&amp;USBPD_PORT0_PDO_SNK_TYPE_0=USBPD_PDO_TYPE_APDO&amp;!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_TYPE_1" RefParameter="USBPD_PDO_TYPE" TabName="PDO Sink" Group="PDO 1"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>1" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_FIXED_SET_VOLTAGE_1" RefParameter="USBPD_PDO_FIXED_SET_VOLTAGE" TabName="PDO Sink" Group="PDO 1"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>1&amp;USBPD_PORT0_PDO_SNK_TYPE_1=USBPD_PDO_TYPE_FIXED" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_FIXED_SET_OP_CURRENT_1" RefParameter="USBPD_PDO_FIXED_SET_OP_CURRENT" TabName="PDO Sink" Group="PDO 1"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>1&amp;USBPD_PORT0_PDO_SNK_TYPE_1=USBPD_PDO_TYPE_FIXED" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_BATTERY_SET_MAX_VOLTAGE_1" RefParameter="USBPD_PDO_SNK_BATTERY_SET_MAX_VOLTAGE" TabName="PDO Sink" Group="PDO 1"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>1&amp;USBPD_PORT0_PDO_SNK_TYPE_1=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_BATTERY_SET_MIN_VOLTAGE_1" RefParameter="USBPD_PDO_SNK_BATTERY_SET_MIN_VOLTAGE" TabName="PDO Sink" Group="PDO 1"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>1&amp;USBPD_PORT0_PDO_SNK_TYPE_1=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_BATTERY_SET_OP_POWER_1" RefParameter="USBPD_PDO_SNK_BATTERY_SET_OP_POWER" TabName="PDO Sink" Group="PDO 1"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>1&amp;USBPD_PORT0_PDO_SNK_TYPE_1=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_VARIABLE_SET_MAX_VOLTAGE_1" RefParameter="USBPD_PDO_SNK_VARIABLE_SET_MAX_VOLTAGE" TabName="PDO Sink" Group="PDO 1"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>1&amp;USBPD_PORT0_PDO_SNK_TYPE_1=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_VARIABLE_SET_MIN_VOLTAGE_1" RefParameter="USBPD_PDO_SNK_VARIABLE_SET_MIN_VOLTAGE" TabName="PDO Sink" Group="PDO 1"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>1&amp;USBPD_PORT0_PDO_SNK_TYPE_1=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_VARIABLE_SET_OP_CURRENT_1" RefParameter="USBPD_PDO_SNK_VARIABLE_SET_OP_CURRENT" TabName="PDO Sink" Group="PDO 1"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>1&amp;USBPD_PORT0_PDO_SNK_TYPE_1=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_APDO_PPS_1" RefParameter="USBPD_PDO_SNK_APDO_PPS" TabName="PDO Sink" Group="PDO 1"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>1&amp;USBPD_PORT0_PDO_SNK_TYPE_1=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_APDO_SET_MAX_VOLTAGE_1" RefParameter="USBPD_PDO_APDO_SET_MAX_VOLTAGE" TabName="PDO Sink" Group="PDO 1"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>1&amp;USBPD_PORT0_PDO_SNK_TYPE_1=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_APDO_SET_MIN_VOLTAGE_1" RefParameter="USBPD_PDO_APDO_SET_MIN_VOLTAGE" TabName="PDO Sink" Group="PDO 1"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>1&amp;USBPD_PORT0_PDO_SNK_TYPE_1=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_APDO_SET_MAX_CURRENT_1" RefParameter="USBPD_PDO_APDO_SET_MAX_CURRENT" TabName="PDO Sink" Group="PDO 1"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>1&amp;USBPD_PORT0_PDO_SNK_TYPE_1=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_TYPE_2" RefParameter="USBPD_PDO_TYPE" TabName="PDO Sink" Group="PDO 2"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>2" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_FIXED_SET_VOLTAGE_2" RefParameter="USBPD_PDO_FIXED_SET_VOLTAGE" TabName="PDO Sink" Group="PDO 2"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>2&amp;USBPD_PORT0_PDO_SNK_TYPE_2=USBPD_PDO_TYPE_FIXED" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_FIXED_SET_OP_CURRENT_2" RefParameter="USBPD_PDO_FIXED_SET_OP_CURRENT" TabName="PDO Sink" Group="PDO 2"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>2&amp;USBPD_PORT0_PDO_SNK_TYPE_2=USBPD_PDO_TYPE_FIXED" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_BATTERY_SET_MAX_VOLTAGE_2" RefParameter="USBPD_PDO_SNK_BATTERY_SET_MAX_VOLTAGE" TabName="PDO Sink" Group="PDO 2"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>2&amp;USBPD_PORT0_PDO_SNK_TYPE_2=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_BATTERY_SET_MIN_VOLTAGE_2" RefParameter="USBPD_PDO_SNK_BATTERY_SET_MIN_VOLTAGE" TabName="PDO Sink" Group="PDO 2"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>2&amp;USBPD_PORT0_PDO_SNK_TYPE_2=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_BATTERY_SET_OP_POWER_2" RefParameter="USBPD_PDO_SNK_BATTERY_SET_OP_POWER" TabName="PDO Sink" Group="PDO 2"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>2&amp;USBPD_PORT0_PDO_SNK_TYPE_2=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_VARIABLE_SET_MAX_VOLTAGE_2" RefParameter="USBPD_PDO_SNK_VARIABLE_SET_MAX_VOLTAGE" TabName="PDO Sink" Group="PDO 2"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>2&amp;USBPD_PORT0_PDO_SNK_TYPE_2=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_VARIABLE_SET_MIN_VOLTAGE_2" RefParameter="USBPD_PDO_SNK_VARIABLE_SET_MIN_VOLTAGE" TabName="PDO Sink" Group="PDO 2"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>2&amp;USBPD_PORT0_PDO_SNK_TYPE_2=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_VARIABLE_SET_OP_CURRENT_2" RefParameter="USBPD_PDO_SNK_VARIABLE_SET_OP_CURRENT" TabName="PDO Sink" Group="PDO 2"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>2&amp;USBPD_PORT0_PDO_SNK_TYPE_2=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_APDO_PPS_2" RefParameter="USBPD_PDO_SNK_APDO_PPS" TabName="PDO Sink" Group="PDO 2"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>2&amp;USBPD_PORT0_PDO_SNK_TYPE_2=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_APDO_SET_MAX_VOLTAGE_2" RefParameter="USBPD_PDO_APDO_SET_MAX_VOLTAGE" TabName="PDO Sink" Group="PDO 2"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>2&amp;USBPD_PORT0_PDO_SNK_TYPE_2=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_APDO_SET_MIN_VOLTAGE_2" RefParameter="USBPD_PDO_APDO_SET_MIN_VOLTAGE" TabName="PDO Sink" Group="PDO 2"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>2&amp;USBPD_PORT0_PDO_SNK_TYPE_2=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_APDO_SET_MAX_CURRENT_2" RefParameter="USBPD_PDO_APDO_SET_MAX_CURRENT" TabName="PDO Sink" Group="PDO 2"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>2&amp;USBPD_PORT0_PDO_SNK_TYPE_2=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_TYPE_3" RefParameter="USBPD_PDO_TYPE" TabName="PDO Sink" Group="PDO 3"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>3" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_FIXED_SET_VOLTAGE_3" RefParameter="USBPD_PDO_FIXED_SET_VOLTAGE" TabName="PDO Sink" Group="PDO 3"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>3&amp;USBPD_PORT0_PDO_SNK_TYPE_3=USBPD_PDO_TYPE_FIXED" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_FIXED_SET_OP_CURRENT_3" RefParameter="USBPD_PDO_FIXED_SET_OP_CURRENT" TabName="PDO Sink" Group="PDO 3"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>3&amp;USBPD_PORT0_PDO_SNK_TYPE_3=USBPD_PDO_TYPE_FIXED" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_BATTERY_SET_MAX_VOLTAGE_3" RefParameter="USBPD_PDO_SNK_BATTERY_SET_MAX_VOLTAGE" TabName="PDO Sink" Group="PDO 3"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>3&amp;USBPD_PORT0_PDO_SNK_TYPE_3=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_BATTERY_SET_MIN_VOLTAGE_3" RefParameter="USBPD_PDO_SNK_BATTERY_SET_MIN_VOLTAGE" TabName="PDO Sink" Group="PDO 3"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>3&amp;USBPD_PORT0_PDO_SNK_TYPE_3=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_BATTERY_SET_OP_POWER_3" RefParameter="USBPD_PDO_SNK_BATTERY_SET_OP_POWER" TabName="PDO Sink" Group="PDO 3"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>3&amp;USBPD_PORT0_PDO_SNK_TYPE_3=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_VARIABLE_SET_MAX_VOLTAGE_3" RefParameter="USBPD_PDO_SNK_VARIABLE_SET_MAX_VOLTAGE" TabName="PDO Sink" Group="PDO 3"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>3&amp;USBPD_PORT0_PDO_SNK_TYPE_3=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_VARIABLE_SET_MIN_VOLTAGE_3" RefParameter="USBPD_PDO_SNK_VARIABLE_SET_MIN_VOLTAGE" TabName="PDO Sink" Group="PDO 3"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>3&amp;USBPD_PORT0_PDO_SNK_TYPE_3=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_VARIABLE_SET_OP_CURRENT_3" RefParameter="USBPD_PDO_SNK_VARIABLE_SET_OP_CURRENT" TabName="PDO Sink" Group="PDO 3"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>3&amp;USBPD_PORT0_PDO_SNK_TYPE_3=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_APDO_PPS_3" RefParameter="USBPD_PDO_SNK_APDO_PPS" TabName="PDO Sink" Group="PDO 3"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>3&amp;USBPD_PORT0_PDO_SNK_TYPE_3=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_APDO_SET_MAX_VOLTAGE_3" RefParameter="USBPD_PDO_APDO_SET_MAX_VOLTAGE" TabName="PDO Sink" Group="PDO 3"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>3&amp;USBPD_PORT0_PDO_SNK_TYPE_3=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_APDO_SET_MIN_VOLTAGE_3" RefParameter="USBPD_PDO_APDO_SET_MIN_VOLTAGE" TabName="PDO Sink" Group="PDO 3"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>3&amp;USBPD_PORT0_PDO_SNK_TYPE_3=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_APDO_SET_MAX_CURRENT_3" RefParameter="USBPD_PDO_APDO_SET_MAX_CURRENT" TabName="PDO Sink" Group="PDO 3"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>3&amp;USBPD_PORT0_PDO_SNK_TYPE_3=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_TYPE_4" RefParameter="USBPD_PDO_TYPE" TabName="PDO Sink" Group="PDO 4"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>4" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_FIXED_SET_VOLTAGE_4" RefParameter="USBPD_PDO_FIXED_SET_VOLTAGE" TabName="PDO Sink" Group="PDO 4"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>4&amp;USBPD_PORT0_PDO_SNK_TYPE_4=USBPD_PDO_TYPE_FIXED" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_FIXED_SET_OP_CURRENT_4" RefParameter="USBPD_PDO_FIXED_SET_OP_CURRENT" TabName="PDO Sink" Group="PDO 4"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>4&amp;USBPD_PORT0_PDO_SNK_TYPE_4=USBPD_PDO_TYPE_FIXED" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_BATTERY_SET_MAX_VOLTAGE_4" RefParameter="USBPD_PDO_SNK_BATTERY_SET_MAX_VOLTAGE" TabName="PDO Sink" Group="PDO 4"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>4&amp;USBPD_PORT0_PDO_SNK_TYPE_4=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_BATTERY_SET_MIN_VOLTAGE_4" RefParameter="USBPD_PDO_SNK_BATTERY_SET_MIN_VOLTAGE" TabName="PDO Sink" Group="PDO 4"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>4&amp;USBPD_PORT0_PDO_SNK_TYPE_4=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_BATTERY_SET_OP_POWER_4" RefParameter="USBPD_PDO_SNK_BATTERY_SET_OP_POWER" TabName="PDO Sink" Group="PDO 4"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>4&amp;USBPD_PORT0_PDO_SNK_TYPE_4=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_VARIABLE_SET_MAX_VOLTAGE_4" RefParameter="USBPD_PDO_SNK_VARIABLE_SET_MAX_VOLTAGE" TabName="PDO Sink" Group="PDO 4"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>4&amp;USBPD_PORT0_PDO_SNK_TYPE_4=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_VARIABLE_SET_MIN_VOLTAGE_4" RefParameter="USBPD_PDO_SNK_VARIABLE_SET_MIN_VOLTAGE" TabName="PDO Sink" Group="PDO 4"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>4&amp;USBPD_PORT0_PDO_SNK_TYPE_4=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_VARIABLE_SET_OP_CURRENT_4" RefParameter="USBPD_PDO_SNK_VARIABLE_SET_OP_CURRENT" TabName="PDO Sink" Group="PDO 4"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>4&amp;USBPD_PORT0_PDO_SNK_TYPE_4=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_APDO_PPS_4" RefParameter="USBPD_PDO_SNK_APDO_PPS" TabName="PDO Sink" Group="PDO 4"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>4&amp;USBPD_PORT0_PDO_SNK_TYPE_4=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_APDO_SET_MAX_VOLTAGE_4" RefParameter="USBPD_PDO_APDO_SET_MAX_VOLTAGE" TabName="PDO Sink" Group="PDO 4"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>4&amp;USBPD_PORT0_PDO_SNK_TYPE_4=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_APDO_SET_MIN_VOLTAGE_4" RefParameter="USBPD_PDO_APDO_SET_MIN_VOLTAGE" TabName="PDO Sink" Group="PDO 4"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>4&amp;USBPD_PORT0_PDO_SNK_TYPE_4=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_APDO_SET_MAX_CURRENT_4" RefParameter="USBPD_PDO_APDO_SET_MAX_CURRENT" TabName="PDO Sink" Group="PDO 4"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>4&amp;USBPD_PORT0_PDO_SNK_TYPE_4=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_TYPE_5" RefParameter="USBPD_PDO_TYPE" TabName="PDO Sink" Group="PDO 5"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>5" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_FIXED_SET_VOLTAGE_5" RefParameter="USBPD_PDO_FIXED_SET_VOLTAGE" TabName="PDO Sink" Group="PDO 5"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>5&amp;USBPD_PORT0_PDO_SNK_TYPE_5=USBPD_PDO_TYPE_FIXED" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_FIXED_SET_OP_CURRENT_5" RefParameter="USBPD_PDO_FIXED_SET_OP_CURRENT" TabName="PDO Sink" Group="PDO 5"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>5&amp;USBPD_PORT0_PDO_SNK_TYPE_5=USBPD_PDO_TYPE_FIXED" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_BATTERY_SET_MAX_VOLTAGE_5" RefParameter="USBPD_PDO_SNK_BATTERY_SET_MAX_VOLTAGE" TabName="PDO Sink" Group="PDO 5"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>5&amp;USBPD_PORT0_PDO_SNK_TYPE_5=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_BATTERY_SET_MIN_VOLTAGE_5" RefParameter="USBPD_PDO_SNK_BATTERY_SET_MIN_VOLTAGE" TabName="PDO Sink" Group="PDO 5"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>5&amp;USBPD_PORT0_PDO_SNK_TYPE_5=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_BATTERY_SET_OP_POWER_5" RefParameter="USBPD_PDO_SNK_BATTERY_SET_OP_POWER" TabName="PDO Sink" Group="PDO 5"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>5&amp;USBPD_PORT0_PDO_SNK_TYPE_5=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_VARIABLE_SET_MAX_VOLTAGE_5" RefParameter="USBPD_PDO_SNK_VARIABLE_SET_MAX_VOLTAGE" TabName="PDO Sink" Group="PDO 5"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>5&amp;USBPD_PORT0_PDO_SNK_TYPE_5=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_VARIABLE_SET_MIN_VOLTAGE_5" RefParameter="USBPD_PDO_SNK_VARIABLE_SET_MIN_VOLTAGE" TabName="PDO Sink" Group="PDO 5"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>5&amp;USBPD_PORT0_PDO_SNK_TYPE_5=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_VARIABLE_SET_OP_CURRENT_5" RefParameter="USBPD_PDO_SNK_VARIABLE_SET_OP_CURRENT" TabName="PDO Sink" Group="PDO 5"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>5&amp;USBPD_PORT0_PDO_SNK_TYPE_5=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_APDO_PPS_5" RefParameter="USBPD_PDO_SNK_APDO_PPS" TabName="PDO Sink" Group="PDO 5"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>5&amp;USBPD_PORT0_PDO_SNK_TYPE_5=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_APDO_SET_MAX_VOLTAGE_5" RefParameter="USBPD_PDO_APDO_SET_MAX_VOLTAGE" TabName="PDO Sink" Group="PDO 5"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>5&amp;USBPD_PORT0_PDO_SNK_TYPE_5=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_APDO_SET_MIN_VOLTAGE_5" RefParameter="USBPD_PDO_APDO_SET_MIN_VOLTAGE" TabName="PDO Sink" Group="PDO 5"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>5&amp;USBPD_PORT0_PDO_SNK_TYPE_5=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_APDO_SET_MAX_CURRENT_5" RefParameter="USBPD_PDO_APDO_SET_MAX_CURRENT" TabName="PDO Sink" Group="PDO 5"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>5&amp;USBPD_PORT0_PDO_SNK_TYPE_5=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_TYPE_6" RefParameter="USBPD_PDO_TYPE" TabName="PDO Sink" Group="PDO 6"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>6" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_FIXED_SET_VOLTAGE_6" RefParameter="USBPD_PDO_FIXED_SET_VOLTAGE" TabName="PDO Sink" Group="PDO 6"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>6&amp;USBPD_PORT0_PDO_SNK_TYPE_6=USBPD_PDO_TYPE_FIXED" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_FIXED_SET_OP_CURRENT_6" RefParameter="USBPD_PDO_FIXED_SET_OP_CURRENT" TabName="PDO Sink" Group="PDO 6"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>6&amp;USBPD_PORT0_PDO_SNK_TYPE_6=USBPD_PDO_TYPE_FIXED" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_BATTERY_SET_MAX_VOLTAGE_6" RefParameter="USBPD_PDO_SNK_BATTERY_SET_MAX_VOLTAGE" TabName="PDO Sink" Group="PDO 6"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>6&amp;USBPD_PORT0_PDO_SNK_TYPE_6=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_BATTERY_SET_MIN_VOLTAGE_6" RefParameter="USBPD_PDO_SNK_BATTERY_SET_MIN_VOLTAGE" TabName="PDO Sink" Group="PDO 6"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>6&amp;USBPD_PORT0_PDO_SNK_TYPE_6=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_BATTERY_SET_OP_POWER_6" RefParameter="USBPD_PDO_SNK_BATTERY_SET_OP_POWER" TabName="PDO Sink" Group="PDO 6"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>6&amp;USBPD_PORT0_PDO_SNK_TYPE_6=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_VARIABLE_SET_MAX_VOLTAGE_6" RefParameter="USBPD_PDO_SNK_VARIABLE_SET_MAX_VOLTAGE" TabName="PDO Sink" Group="PDO 6"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>6&amp;USBPD_PORT0_PDO_SNK_TYPE_6=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_VARIABLE_SET_MIN_VOLTAGE_6" RefParameter="USBPD_PDO_SNK_VARIABLE_SET_MIN_VOLTAGE" TabName="PDO Sink" Group="PDO 6"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>6&amp;USBPD_PORT0_PDO_SNK_TYPE_6=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_VARIABLE_SET_OP_CURRENT_6" RefParameter="USBPD_PDO_SNK_VARIABLE_SET_OP_CURRENT" TabName="PDO Sink" Group="PDO 6"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>6&amp;USBPD_PORT0_PDO_SNK_TYPE_6=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_APDO_PPS_6" RefParameter="USBPD_PDO_SNK_APDO_PPS" TabName="PDO Sink" Group="PDO 6"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>6&amp;USBPD_PORT0_PDO_SNK_TYPE_6=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_APDO_SET_MAX_VOLTAGE_6" RefParameter="USBPD_PDO_APDO_SET_MAX_VOLTAGE" TabName="PDO Sink" Group="PDO 6"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>6&amp;USBPD_PORT0_PDO_SNK_TYPE_6=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_APDO_SET_MIN_VOLTAGE_6" RefParameter="USBPD_PDO_APDO_SET_MIN_VOLTAGE" TabName="PDO Sink" Group="PDO 6"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>6&amp;USBPD_PORT0_PDO_SNK_TYPE_6=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_APDO_SET_MAX_CURRENT_6" RefParameter="USBPD_PDO_APDO_SET_MAX_CURRENT" TabName="PDO Sink" Group="PDO 6"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>6&amp;USBPD_PORT0_PDO_SNK_TYPE_6=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_TYPE_7" RefParameter="USBPD_PDO_TYPE" TabName="PDO Sink" Group="PDO 7"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>7" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_FIXED_SET_VOLTAGE_7" RefParameter="USBPD_PDO_FIXED_SET_VOLTAGE" TabName="PDO Sink" Group="PDO 7"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>7&amp;USBPD_PORT0_PDO_SNK_TYPE_7=USBPD_PDO_TYPE_FIXED" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_FIXED_SET_OP_CURRENT_7" RefParameter="USBPD_PDO_FIXED_SET_OP_CURRENT" TabName="PDO Sink" Group="PDO 7"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>7&amp;USBPD_PORT0_PDO_SNK_TYPE_7=USBPD_PDO_TYPE_FIXED" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_BATTERY_SET_MAX_VOLTAGE_7" RefParameter="USBPD_PDO_SNK_BATTERY_SET_MAX_VOLTAGE" TabName="PDO Sink" Group="PDO 7"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>7&amp;USBPD_PORT0_PDO_SNK_TYPE_7=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_BATTERY_SET_MIN_VOLTAGE_7" RefParameter="USBPD_PDO_SNK_BATTERY_SET_MIN_VOLTAGE" TabName="PDO Sink" Group="PDO 7"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>7&amp;USBPD_PORT0_PDO_SNK_TYPE_7=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_BATTERY_SET_OP_POWER_7" RefParameter="USBPD_PDO_SNK_BATTERY_SET_OP_POWER" TabName="PDO Sink" Group="PDO 7"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>7&amp;USBPD_PORT0_PDO_SNK_TYPE_7=USBPD_PDO_TYPE_BATTERY" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_VARIABLE_SET_MAX_VOLTAGE_7" RefParameter="USBPD_PDO_SNK_VARIABLE_SET_MAX_VOLTAGE" TabName="PDO Sink" Group="PDO 7"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>7&amp;USBPD_PORT0_PDO_SNK_TYPE_7=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_VARIABLE_SET_MIN_VOLTAGE_7" RefParameter="USBPD_PDO_SNK_VARIABLE_SET_MIN_VOLTAGE" TabName="PDO Sink" Group="PDO 7"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>7&amp;USBPD_PORT0_PDO_SNK_TYPE_7=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_VARIABLE_SET_OP_CURRENT_7" RefParameter="USBPD_PDO_SNK_VARIABLE_SET_OP_CURRENT" TabName="PDO Sink" Group="PDO 7"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>7&amp;USBPD_PORT0_PDO_SNK_TYPE_7=USBPD_PDO_TYPE_VARIABLE" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_APDO_PPS_7" RefParameter="USBPD_PDO_SNK_APDO_PPS" TabName="PDO Sink" Group="PDO 7"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>7&amp;USBPD_PORT0_PDO_SNK_TYPE_7=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_APDO_SET_MAX_VOLTAGE_7" RefParameter="USBPD_PDO_APDO_SET_MAX_VOLTAGE" TabName="PDO Sink" Group="PDO 7"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>7&amp;USBPD_PORT0_PDO_SNK_TYPE_7=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_APDO_SET_MIN_VOLTAGE_7" RefParameter="USBPD_PDO_APDO_SET_MIN_VOLTAGE" TabName="PDO Sink" Group="PDO 7"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>7&amp;USBPD_PORT0_PDO_SNK_TYPE_7=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PORT0_PDO_SNK_APDO_SET_MAX_CURRENT_7" RefParameter="USBPD_PDO_APDO_SET_MAX_CURRENT" TabName="PDO Sink" Group="PDO 7"><Condition Expression="USBPD_PORT0_PDO_SNK_NB>7&amp;USBPD_PORT0_PDO_SNK_TYPE_7=USBPD_PDO_TYPE_APDO" Diagnostic=""/></Parameter>
+
+</RefMode>
+ <RefMode Name="USBPD_PORT0_PDO_P0" BaseMode="USBPD_Common" Abstract="true">
+ </RefMode>
+
+
+
+    <RefMode Name="USBPD_P0" BaseMode="USBPD_PORT0_PDO_P0">
         <!-- Instance 0 -->
         <Parameter Name="USBPD_PORT0"/>
         <Parameter Name="USBPD_PORT0_RX_DMA_CHANNEL"/>
@@ -769,52 +1639,41 @@
         <Parameter Name="USBPD_PORT0_FRSTX2_PIN"/>
         <Parameter Name="USBPD_PORT0_IRQ"/>
 
-        <Parameter Name="PORT0_NB_SOURCEPDO"/>
-        <Parameter Name="PORT0_SOURCE_PDO1"/>
-        <Parameter Name="PORT0_SOURCE_PDO2"/>
-        <Parameter Name="PORT0_SOURCE_PDO3"/>
-        <Parameter Name="PORT0_SOURCE_PDO4"/>
-        <Parameter Name="PORT0_SOURCE_PDO5"/>
-        <Parameter Name="PORT0_SOURCE_PDO6"/>
-        <Parameter Name="PORT0_SOURCE_PDO7"/>
-        <Parameter Name="PORT0_NB_SINKPDO"/>
-        <Parameter Name="PORT0_SINK_PDO1"/>
-        <Parameter Name="PORT0_SINK_PDO2"/>
-        <Parameter Name="PORT0_SINK_PDO3"/>
-        <Parameter Name="PORT0_SINK_PDO4"/>
-        <Parameter Name="PORT0_SINK_PDO5"/>
-        <Parameter Name="PORT0_SINK_PDO6"/>
-        <Parameter Name="PORT0_SINK_PDO7"/>
 
-        <Parameter Name="PE_SupportedSOP_P0"/>
-        <Parameter Name="PE_SupportedSOPapos_P0"/>
-        <Parameter Name="PE_SupportedSOPquot_P0"/>
-        <Parameter Name="PE_SupportedSOPaposDBG_P0"/>
-        <Parameter Name="PE_SupportedSOPquotDBG_P0"/>
-        <Parameter Name="PE_SpecRevision_P0"/>
-        <Parameter Name="PE_DefaultRole_P0"/>
-        <Parameter Name="PE_RoleSwap_P0"/>
+        <Parameter Name="PE_SupportedSOP_P0"><Condition Expression="!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="PE_SupportedSOPapos_P0"><Condition Expression="!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="PE_SupportedSOPquot_P0"><Condition Expression="!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="PE_SupportedSOPaposDBG_P0"><Condition Expression="!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="PE_SupportedSOPquotDBG_P0"><Condition Expression="!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="PE_SpecRevision_P0"><Condition Expression="!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="PE_DefaultRole_P0"><Condition Expression="!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="PE_RoleSwap_P0"><Condition Expression="!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
         <Parameter Name="PE_DataSwap_P0"/>
-        <Parameter Name="PE_DR_Swap_To_DFP_P0"/>
-        <Parameter Name="PE_DR_Swap_To_UFP_P0"/>
-        <Parameter Name="PE_VconnSwap_P0"/>
-        <Parameter Name="PE_VDMSupport_P0"/>
-        <Parameter Name="PE_RespondsToDiscovSOP_P0"/>
-        <Parameter Name="PE_AttemptsDiscovSOP_P0"/>
-        <Parameter Name="PE_PingSupport_P0"/>
-        <Parameter Name="PE_CapscounterSupport_P0"/>
-        <Parameter Name="PE_UnchunkSupport_P0"/>
-        <Parameter Name="PE_FastRoleSwapSupport_P0"/>
-        <Parameter Name="Is_GetPPSStatus_Supported_P0"/>
-        <Parameter Name="Is_SrcCapaExt_Supported_P0"/>
-        <Parameter Name="Is_Alert_Supported_P0"/>
-        <Parameter Name="Is_GetStatus_Supported_P0"/>
-        <Parameter Name="Is_GetManufacturerInfo_Supported_P0"/>
-        <Parameter Name="Is_GetCountryCodes_Supported_P0"/>
-        <Parameter Name="Is_GetCountryInfo_Supported_P0"/>
-        <Parameter Name="Is_SecurityRequest_Supported_P0"/>
-        <Parameter Name="Is_FirmUpdateRequest_Supported_P0"/>
-        <Parameter Name="Is_GetBattery_Supported_P0"/>
+        <Parameter Name="PE_DR_Swap_To_DFP_P0"><Condition Expression="!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="PE_DR_Swap_To_UFP_P0"><Condition Expression="!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="PE_VconnSwap_P0"><Condition Expression="!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="PE_VDMSupport_P0"><Condition Expression="!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="PE_RespondsToDiscovSOP_P0"><Condition Expression="!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="PE_AttemptsDiscovSOP_P0"><Condition Expression="!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="PE_PingSupport_P0"><Condition Expression="!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="PE_CapscounterSupport_P0"><Condition Expression="!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="PE_UnchunkSupport_P0"><Condition Expression="!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="PE_FastRoleSwapSupportDisplayed_P0"><Condition Expression="!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="PE_FastRoleSwapSupport_P0"><Condition Expression="!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PDO_FIXED_HIGHERCAPAB_P0"><Condition Expression="!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PDO_FIXED_USBCOMM_P0"><Condition Expression="!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PDO_FIXED_EXT_POWER_P0"><Condition Expression="!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="USBPD_PDO_FIXED_USBSUSPEND_P0"><Condition Expression="!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="Is_GetPPSStatus_Supported_P0"><Condition Expression="!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="Is_SrcCapaExt_Supported_P0"><Condition Expression="!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="Is_Alert_Supported_P0"><Condition Expression="!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="Is_GetStatus_Supported_P0"><Condition Expression="!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="Is_GetManufacturerInfo_Supported_P0"><Condition Expression="!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="Is_GetCountryCodes_Supported_P0"><Condition Expression="!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="Is_GetCountryInfo_Supported_P0"><Condition Expression="!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="Is_SecurityRequest_Supported_P0"><Condition Expression="!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="Is_FirmUpdateRequest_Supported_P0"><Condition Expression="!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
+        <Parameter Name="Is_GetBattery_Supported_P0"><Condition Expression="!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
         <Parameter Name="VDM_ModalOperation_P0"/>
         <Parameter Name="VDM_bcdDevice_SOP_P0"/>
         <Parameter Name="VDM_USBHostSupport_P0"/>
@@ -822,9 +1681,9 @@
         <Parameter Name="VDM_ProductTypeUFPorCP_P0"/>
         <Parameter Name="VDM_ProductTypeDFP_P0"/>
         <Parameter Name="CAD_RoleToggle_P0"/>
-        <Parameter Name="CAD_DefaultResistor_P0"/>
+        <Parameter Name="CAD_DefaultResistor_P0"><Condition Expression="!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
         <Parameter Name="CAD_TryFeature_P0"/>
-        <Parameter Name="CAD_AccesorySupport_P0"/>
+        <Parameter Name="CAD_AccesorySupport_P0"><Condition Expression="!USBPD_PD3TYPEC" Diagnostic=""/></Parameter>
         <Parameter Name="CAD_SRCToggleTime_P0"/>
         <Parameter Name="CAD_SNKToggleTime_P0"/>
     </RefMode>
@@ -873,6 +1732,13 @@
                         <Signal Name="VS_PD3MINSNK"/>
                     </SignalLogicalOp>
                     <Semaphore>USBPD_PD3MINSNK</Semaphore>
+                </Mode>
+                <Mode Name="PD3_Min_Drp" UserName="Min Drp">
+                    <Condition Expression="(SourceUCPD1|SinkUCPD1)" Diagnostic="UCPD1 should be Source or Sink "/>
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="VS_PD3MINDRP"/>
+                    </SignalLogicalOp>
+                    <Semaphore>USBPD_PD3MINDRP</Semaphore>
                 </Mode>
                 <Mode Name="PD3_TypeC" UserName="Type C only">
                     <Condition Expression="(SourceUCPD1|SinkUCPD1)" Diagnostic="UCPD1 should be Source or Sink"/>
@@ -1099,6 +1965,7 @@
     <RefSignal Name="VS_PD3CFG1" Virtual="true"/>
     <RefSignal Name="VS_PD3MINSRC" Virtual="true"/>
     <RefSignal Name="VS_PD3MINSNK" Virtual="true"/>
+    <RefSignal Name="VS_PD3MINDRP" Virtual="true"/>
     <RefSignal Name="VS_PD3TYPEC" Virtual="true"/>
 
     <RefSignal Name="VS_usbpd_tim1" Virtual="true"/>

@@ -1,0 +1,898 @@
+﻿<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<IP DBVersion="V4.0" IPType="peripheral" IpGroup="Security" Name="GFXTIM" Version="v1_0_Cube" 
+    xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance"
+     ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd"
+     xmlns="http://mcd.rou.st.com/modules.php?name=mcu">
+  <About>GFXTIM: </About>
+
+    <!-- Generic RefParameters for GFXTIM -->
+
+    <!-- Basic Parameters -->
+ <RefParameter Name="SynchroSrc" Comment="HSYNC and VSYNC sources" DefaultValue="GFXTIM_SYNC_SRC_HSYNC_VSYNC_0" Type="list" Group="Source Selection">
+        <PossibleValue Value="GFXTIM_SYNC_SRC_HSYNC_VSYNC_0" Comment="gfxtim_hsync[0] and gfxtim_vsync[0]"  />
+        <PossibleValue Value="GFXTIM_SYNC_SRC_HSYNC_VSYNC_1" Comment="gfxtim_hsync[1] and gfxtim_vsync[1]"  Action="Disable" Condition="1=1" />
+        <PossibleValue Value="GFXTIM_SYNC_SRC_HSYNC_VSYNC_2" Comment="gfxtim_hsync[2] and gfxtim_vsync[2]"  Action="Disable"  Condition="1=1"/>
+        <PossibleValue Value="GFXTIM_SYNC_SRC_HSYNC_VSYNC_3" Comment="gfxtim_hsync[3] and gfxtim_vsync[3]"  Action="Disable"  Condition="1=1"/>
+        <Description>
+            Synchronization signals (HSYNC and VSYNC) sources.
+            Note: This parameter can be a value.
+        </Description>
+ </RefParameter>
+
+ <RefParameter Name="TearingEffectActivation" Comment="Tearing effect (TE)" DefaultValue="DISABLE" Type="list" Group="Source Selection">
+        <PossibleValue Value="DISABLE" Comment="Disable" />
+        <PossibleValue Value="ENABLE" Comment="Enable"  Semaphore="Sem_TearingEnable"/>
+        <Description>
+            Tearing effect . Activate it to specify the configuration details
+        </Description>
+ </RefParameter>
+
+ <RefParameter Name="TearingEffectSrc" Comment="Tearing effect source" DefaultValue="GFXTIM_TE_SRC_GPIO" Type="list" Group="Source Selection">
+        <Condition   Diagnostic="" Expression="Sem_TearingEnable"/>
+        <PossibleValue Value="GFXTIM_TE_SRC_GPIO" Comment="GFXTIM_TE" Condition="!S_GFXTIM_$IpInstance_TE"/>
+        <PossibleValue Value="GFXTIM_TE_SRC_ITE" Comment="gfxtim_ite"/>
+        <PossibleValue Value="GFXTIM_TE_SRC_HSYNC" Comment="HSYNC" />
+        <PossibleValue Value="GFXTIM_TE_SRC_VSYNC" Comment="VSYNC" />
+        <Description>
+            Tearing effect source.
+            Note: This parameter can be a value.
+        </Description>
+ </RefParameter>
+ <RefParameter Name="TearingEffectSrc" Comment="Tearing effect source" DefaultValue="null" Type="string"  Group="Source Selection"  Visible="false"/>
+
+ <RefParameter Name="TearingEffectPolarity" Comment="Tearing effect polarity" DefaultValue="GFXTIM_TE_RISING_EDGE" Type="list"  Group="Source Selection">
+        <Condition   Diagnostic="" Expression="Sem_TearingEnable"/>
+        <PossibleValue Value="GFXTIM_TE_RISING_EDGE" Comment="Rising edge"/>
+        <PossibleValue Value="GFXTIM_TE_FALLING_EDGE" Comment="Falling edge"/>
+        <Description>
+            Tearing effect polarity.
+            Note: This parameter can be a value.
+        </Description>
+  </RefParameter>
+  <RefParameter Name="TearingEffectPolarity" Comment="Tearing effect polarity" DefaultValue="null" Type="string"  Group="Source Selection"  Visible="false"/>
+
+ <RefParameter Name="TearingEffectInterrupt" Comment="Tearing effect interrupt" DefaultValue="Disable" Type="list" Group="Source Selection" >
+        <Condition   Diagnostic="" Expression="Sem_TearingEnable"/>
+        <PossibleValue Value="DISABLE" Comment="Disable" />
+        <PossibleValue Value="ENABLE" Comment="Enable" />
+        <Description>
+            Tearing effect interrupt.
+            Note: Useful only when Tearing effect interrupt parameter is enabled.
+        </Description>
+  </RefParameter>
+
+ <RefParameter Name="TearingEffectInterrupt" Comment="Tearing effect interrupt" DefaultValue="null" Type="string"  Group="Source Selection"  Visible="false"/>
+   <!-- end Basic Parameters -->
+
+<!-- Clock generator -->
+ <RefParameter Name="LineClockCounter" Comment="Line Clock Counter (LCC)" DefaultValue="DISABLE" Type="list" Group="Clock Generator">
+        <PossibleValue Value="DISABLE" Comment="Disable"/>
+        <PossibleValue Value="ENABLE" Comment="Enable"  Semaphore="Sem_ClockEnable"/>
+        <Description>
+            Clock Generator Activation. Activate it to specify the configuration details
+        </Description>
+ </RefParameter>
+
+ <RefParameter Name="LCCHwReloadSrc" Comment="LCC Auto-reload trigger" DefaultValue="GFXTIM_LCC_HW_RELOAD_SRC_NONE" Type="list"  Group="Clock Generator">
+        <Condition   Diagnostic="" Expression="Sem_ClockEnable"/>
+        <PossibleValue Value="GFXTIM_LCC_HW_RELOAD_SRC_NONE"                               Comment="None" />
+        <PossibleValue Value="GFXTIM_LCC_HW_RELOAD_SRC_FCC_UNDERFLOW"                      Comment="FCC underflow"  Action="Disable" Condition="!Sem_Clock1Enable"/>
+        <PossibleValue Value="GFXTIM_LCC_HW_RELOAD_SRC_HSYNC_RISING"                       Comment="HSYNC rising" />
+        <PossibleValue Value="GFXTIM_LCC_HW_RELOAD_SRC_HSYNC_FALLING"                      Comment="HSYNC falling" />
+        <PossibleValue Value="GFXTIM_LCC_HW_RELOAD_SRC_VSYNC_RISING"                       Comment="VSYNC rising" />
+        <PossibleValue Value="GFXTIM_LCC_HW_RELOAD_SRC_VSYNC_FALLING"                      Comment="VSYNC falling" />
+        <PossibleValue Value="GFXTIM_LCC_HW_RELOAD_SRC_TE_RISING"                          Comment="TE rising"  Action="Disable" Condition="!Sem_TearingEnable"/>
+        <PossibleValue Value="GFXTIM_LCC_HW_RELOAD_SRC_TE_FALLING"                         Comment="TE falling" Action="Disable" Condition="!Sem_TearingEnable"/>
+        <Description>
+            Line Clock Counter hardware reload source.
+            Note: Useful only when Line Clock Counter hardware reload source parameter is enabled.
+        </Description>
+ </RefParameter>
+
+ <RefParameter Name="LCCHwReloadSrc" Comment="LCC Auto-reload trigger" DefaultValue="null" Type="string"  Group="Clock Generator"   Visible="false"/>
+
+ <RefParameter Comment="LCC Auto-reload value" DefaultValue="0" Max="4194303" Min="0" Name="LCCReloadValue" Type="integer" Group="Clock Generator" >
+       <Condition   Diagnostic="" Expression="Sem_ClockEnable"/>
+       <Description>
+            Line Clock Counter reload value (22 bits).
+            This parameter must be a number between Min_Data = 1 and Max_Data = 4194303.
+       </Description>
+ </RefParameter>
+
+ <RefParameter Name="LCCReloadValue" Comment="LCC Auto-reload value" DefaultValue="__NULL" Type="string"  Group="Clock Generator"   Visible="false"/>
+
+ <RefParameter Name="LCCClockSrc" Comment="LCC clock source" DefaultValue="GFXTIM_LCC_CLK_SRC_SYSCLOCK" Type="list"  Group="Clock Generator" >
+        <Condition   Diagnostic="" Expression="Sem_ClockEnable"/>
+        <PossibleValue Value="GFXTIM_LCC_CLK_SRC_SYSCLOCK" Comment="Sysclock"/>
+        <PossibleValue Value="GFXTIM_LCC_CLK_SRC_DISABLE" Comment="Disable"/>
+        <Description>
+            Line Clock Counter Clock Source.
+            Note: Useful only when Line Clock Counter Clock Source parameter is enabled.
+        </Description>
+  </RefParameter>
+
+ <RefParameter Name="LCCClockSrc" Comment="LCC clock source" DefaultValue="null" Type="string"  Group="Clock Generator"  Visible="false"/>
+
+<!-- FRame clock-->
+
+ <RefParameter Name="FrameClockCounter" Comment="Frame Clock Counter (FCC)" DefaultValue="DISABLE" Type="list" Group="Clock Generator">
+        <PossibleValue Value="DISABLE" Comment="Disable"/>
+        <PossibleValue Value="ENABLE" Comment="Enable"  Semaphore="Sem_Clock1Enable"/>
+        <Description>
+            Clock Generator Activation. Activate it to specify the configuration details
+        </Description>
+ </RefParameter>
+ 
+
+ <RefParameter Name="FCCHwReloadSrc" Comment="FCC Auto-reload trigger" DefaultValue="GFXTIM_FCC_HW_RELOAD_SRC_NONE" Type="list"  Group="Clock Generator">
+        <Condition   Diagnostic="" Expression="Sem_Clock1Enable"/>
+        <PossibleValue Value="GFXTIM_FCC_HW_RELOAD_SRC_NONE"              Comment="None"/>
+        <PossibleValue Value="GFXTIM_FCC_HW_RELOAD_SRC_LCC_UNDERFLOW"     Comment="LCC Underflow" Action="Disable" Condition="!Sem_ClockEnable"/>
+        <PossibleValue Value="GFXTIM_FCC_HW_RELOAD_SRC_HSYNC_RISING"      Comment="HSYNC Rising edge"/>
+        <PossibleValue Value="GFXTIM_FCC_HW_RELOAD_SRC_HSYNC_FALLING"     Comment="HSYNC Falling edge"/>
+        <PossibleValue Value="GFXTIM_FCC_HW_RELOAD_SRC_VSYNC_RISING"      Comment="VSYNC Rising edge"/>
+        <PossibleValue Value="GFXTIM_FCC_HW_RELOAD_SRC_VSYNC_FALLING"     Comment="VSYNC Falling edge"/>
+        <PossibleValue Value="GFXTIM_FCC_HW_RELOAD_SRC_TE_RISING"         Comment="TE Rising edge"  Action="Disable" Condition="!Sem_TearingEnable"/>
+        <PossibleValue Value="GFXTIM_FCC_HW_RELOAD_SRC_TE_FALLING"        Comment="TE Falling edge" Action="Disable" Condition="!Sem_TearingEnable"/>
+        <Description>
+            Frame Clock Counter hardware reload source.
+            Note: Useful only when Frame Clock Counter hardware reload source parameter is enabled.
+        </Description>
+ </RefParameter>
+
+ <RefParameter Name="FCCHwReloadSrc" Comment="FCC Auto-reload trigger" DefaultValue="null" Type="string"  Group="Clock Generator" Visible="false"/>
+
+ <RefParameter Comment="FCC Auto-reload value" DefaultValue="0" Max="4095" Min="0" Name="FCCReloadValue" Type="integer" Group="Clock Generator" >
+       <Condition   Diagnostic="" Expression="Sem_Clock1Enable"/>
+       <Description>
+            Frame Clock Counter reload value (12 bits).
+            This parameter must be a number between Min_Data = 1 and Max_Data = 4095.
+        </Description>
+ </RefParameter>
+
+ <RefParameter Name="FCCReloadValue" Comment="FCC Auto-reload value" DefaultValue="__NULL" Type="string"  Group="Clock Generator"  Visible="false"/>
+
+ <RefParameter Name="FCCClockSrc" Comment="FCC clock source" DefaultValue="GFXTIM_FCC_CLK_SRC_DISABLE" Type="list"  Group="Clock Generator">
+        <Condition   Diagnostic="" Expression="Sem_Clock1Enable"/>
+        <PossibleValue Value="GFXTIM_FCC_CLK_SRC_DISABLE"                                    Comment="DISABLE"/>
+        <PossibleValue Value="GFXTIM_FCC_CLK_SRC_LCC_UNDERFLOW"                              Comment="LCC Underflow" Action="Disable" Condition="!Sem_ClockEnable"/>
+        <PossibleValue Value="GFXTIM_FCC_CLK_SRC_HSYNC_RISING"                               Comment="HSYNC Rising edge"/>
+        <PossibleValue Value="GFXTIM_FCC_CLK_SRC_HSYNC_FALLING"                              Comment="HSYNC Falling edge"/>
+        <PossibleValue Value="GFXTIM_FCC_CLK_SRC_VSYNC_RISING"                               Comment="VSYNC Rising edge"/>
+        <PossibleValue Value="GFXTIM_FCC_CLK_SRC_VSYNC_FALLING"                              Comment="VSYNC Falling edge"/>
+        <PossibleValue Value="GFXTIM_FCC_CLK_SRC_TE_RISING"                                  Comment="TE Rising edge"  Action="Disable" Condition="!Sem_TearingEnable"/>
+        <PossibleValue Value="GFXTIM_FCC_CLK_SRC_TE_FALLING"                                 Comment="TE Falling edge" Action="Disable" Condition="!Sem_TearingEnable"/>
+        <Description>
+            Frame Clock Counter Clock Source.
+            Note: Useful only when Frame Clock Counter Clock Source parameter is enabled.
+        </Description>
+ </RefParameter>
+
+ <RefParameter Name="FCCClockSrc" Comment="FCC clock source" DefaultValue="null" Type="string"  Group="Clock Generator"  Visible="false"/>
+
+ <!--  line ck-->
+ <RefParameter Name="LineClockSrc" Comment="Line Ck source" DefaultValue="GFXTIM_LINE_CLK_SRC_LCC_UNDERFLOW" Type="list"  Group="Clock Generator" >
+    <!--    <Condition   Diagnostic="" Expression="Sem_ClockEnable"/> -->
+        <PossibleValue Value="GFXTIM_LINE_CLK_SRC_LCC_UNDERFLOW"                                            Comment="LCC Underflow"/>
+        <PossibleValue Value="GFXTIM_LINE_CLK_SRC_FCC_UNDERFLOW"                                            Comment="FCC Underflow"/>
+        <PossibleValue Value="GFXTIM_LINE_CLK_SRC_HSYNC_RISING"                                             Comment="HSYNC Rising edge"/>
+        <PossibleValue Value="GFXTIM_LINE_CLK_SRC_HSYNC_FALLING"                                            Comment="HSYNC Falling edge"/>
+        <PossibleValue Value="GFXTIM_LINE_CLK_SRC_VSYNC_RISING"                                             Comment="VSYNC Rising edge"/>
+        <PossibleValue Value="GFXTIM_LINE_CLK_SRC_VSYNC_FALLING"                                            Comment="VSYNC Falling edge"/>
+        <PossibleValue Value="GFXTIM_LINE_CLK_SRC_TE_RISING"                                                Comment="TE Rising edge" />
+        <PossibleValue Value="GFXTIM_LINE_CLK_SRC_TE_FALLING"                                               Comment="TE Falling edge" />
+        <Description>
+            Line Clock Source.
+            Note: Useful only when Line Clock Source parameter is enabled.
+        </Description>
+    </RefParameter>
+    
+    <RefParameter Name="LineClockCalib" Comment="Line Ck output calibration" DefaultValue="GFXTIM_LINE_CLK_CALIB_ENABLE" Type="list"  Group="Clock Generator" >
+   <!--       <Condition   Diagnostic="" Expression="Sem_ClockEnable"/> -->
+        <PossibleValue Value="GFXTIM_LINE_CLK_CALIB_ENABLE" Comment="Enable" Condition="!S_GFXTIM_$IpInstance_LCK"/>
+        <PossibleValue Value="GFXTIM_LINE_CLK_CALIB_DISABLE" Comment="Disable"/>
+         <Description>
+            Debug purpose.
+            Note: Useful only when Line Clock Calib parameter is enabled.
+        </Description>
+ </RefParameter> 
+
+ <!--   <RefParameter Name="LineClockSrc" Comment="Line clock source" DefaultValue="null" Type="string"  Group="Clock Generator"   Visible="false"/>-->
+
+ <RefParameter Name="FrameClockSrc" Comment="Frame Ck source" DefaultValue="GFXTIM_FRAME_CLK_SRC_LCC_UNDERFLOW" Type="list"  Group="Clock Generator" >
+    <!--   <Condition   Diagnostic="" Expression="Sem_ClockEnable"/>-->
+        <PossibleValue Value="GFXTIM_FRAME_CLK_SRC_LCC_UNDERFLOW"                                         Comment="LCC Underflow"/>
+        <PossibleValue Value="GFXTIM_FRAME_CLK_SRC_FCC_UNDERFLOW"                                         Comment="FCC Underflow"/>
+        <PossibleValue Value="GFXTIM_FRAME_CLK_SRC_HSYNC_RISING"                                          Comment="HSYNC Rising edge" />
+        <PossibleValue Value="GFXTIM_FRAME_CLK_SRC_HSYNC_FALLING"                                         Comment="HSYNC Falling edge" />
+        <PossibleValue Value="GFXTIM_FRAME_CLK_SRC_VSYNC_RISING"                                          Comment="VSYNC Rising edge" />
+        <PossibleValue Value="GFXTIM_FRAME_CLK_SRC_VSYNC_FALLING"                                         Comment="VSYNC Falling edge" />
+        <PossibleValue Value="GFXTIM_FRAME_CLK_SRC_TE_RISING"                                             Comment="TE Rising edge"/>
+        <PossibleValue Value="GFXTIM_FRAME_CLK_SRC_TE_FALLING"                                            Comment="TE Falling edge"/>
+        <Description>
+            Frame Clock Source.
+            Note: Useful only when Frame Clock Source parameter is enabled.
+        </Description>
+  </RefParameter>
+
+ <!-- <RefParameter Name="FrameClockSrc" Comment="Frame clock source" DefaultValue="null" Type="string"  Group="Clock Generator"   Visible="false"/>-->
+
+<!--  <RefParameter Name="LineClockCalib" Comment="Line clock calib" DefaultValue="null" Type="string"  Group="Clock Generator"  Visible="false"/>-->
+
+ <RefParameter Name="FrameClockCalib" Comment="Frame Ck output calibration" DefaultValue="GFXTIM_FRAME_CLK_CALIB_ENABLE" Type="list" Group="Clock Generator">
+    <!--     <Condition   Diagnostic="" Expression="Sem_ClockEnable"/> -->
+         <PossibleValue Value="GFXTIM_FRAME_CLK_CALIB_ENABLE"              Comment="Enable" Condition="!S_GFXTIM_$IpInstance_LCK"/>
+        <PossibleValue Value="GFXTIM_FRAME_CLK_CALIB_DISABLE"              Comment="Disable"/>
+        <Description>
+            Debug purpose.
+            Note: Useful only when Frame Clock Calib parameter is enabled.
+        </Description>
+  </RefParameter>
+
+ <!-- <RefParameter Name="FrameClockCalib" Comment="Frame clock calib" DefaultValue="null" Type="string"  Group="Clock Generator"   Visible="false"/>-->
+<!-- Clock generator -->
+
+ <RefParameter Name="EventGenerator1" Comment="Event generator 1" DefaultValue="DISABLE" Type="list" Group="Event Generators">
+        <PossibleValue Value="DISABLE" Comment="Disable" />
+        <PossibleValue Value="ENABLE"  Comment="Enable" Semaphore="Sem_Interupt1Enable"/>
+        <Description>
+            Event Generator 1.
+            Note: Useful only when Event Generator 1 parameter is enabled.
+        </Description>
+  </RefParameter>
+
+ <RefParameter Name="EventInterrupt1" Comment="   Event interrupt" DefaultValue="DISABLE" Type="list" Group="Event Generators">
+        <Condition   Diagnostic="" Expression="Sem_Interupt1Enable"/>
+        <PossibleValue Value="DISABLE" Comment="Disable"/>
+        <PossibleValue Value="ENABLE"  Comment="Enable"/>
+          <Description>
+            Event Interrupt 1.
+            Note: Useful only when Event Interrupt 1 parameter is enabled.
+        </Description>
+  </RefParameter>
+
+ <RefParameter Name="EventInterrupt1" Comment="   Event interrupt" DefaultValue="null" Type="string"  Group="Event Generators"  Visible="false"/>
+
+ <RefParameter Name="FrameEvent1" Comment="   Frame event" DefaultValue="GFXTIM_FRAME_EVENT_NONE" Type="list" Group="Event Generators">
+        <Condition   Diagnostic="" Expression="Sem_Interupt1Enable"/>
+        <PossibleValue Value="GFXTIM_FRAME_EVENT_NONE"                  Comment="None" />
+        <PossibleValue Value="GFXTIM_FRAME_EVENT_AFC_OVERFLOW"          Comment="Absolute frame counter overflow"                Action="Disable" Condition="!Sem_AbsoluteEnable" />
+        <PossibleValue Value="GFXTIM_FRAME_EVENT_AFC_COMPARE"           Comment="Absolute frame counter compare"                 Action="Disable" Condition="!Sem_AbsoluteEnable"/>
+        <PossibleValue Value="GFXTIM_FRAME_EVENT_RFC1_RELOAD"           Comment="Relative frame counter 1 reload"                Action="Disable" Condition="!Sem_Relative1Enable"/>
+        <PossibleValue Value="GFXTIM_FRAME_EVENT_RFC2_RELOAD"           Comment="Relative frame counter 2 reload"                Action="Disable" Condition="!Sem_Rel2Enable" />
+         <Description>
+            Event Frame 1.
+            Note: Useful only when Event Frame 1 parameter is enabled.
+        </Description>
+ </RefParameter>
+
+ <RefParameter Name="FrameEvent1" Comment="   Frame event" DefaultValue="null" Type="string"  Group="Event Generators"  Visible="false"/>
+
+  <RefParameter Name="LineEvent1" Comment="   Line event" DefaultValue="GFXTIM_LINE_EVENT_NONE" Type="list"  Group="Event Generators">
+        <Condition   Diagnostic="" Expression="Sem_Interupt1Enable"/>
+        <PossibleValue Value="GFXTIM_LINE_EVENT_NONE"                 Comment="None"/>
+        <PossibleValue Value="GFXTIM_LINE_EVENT_TE"                   Comment="TE" Action="Disable" Condition="!Sem_TearingEnable"/>
+        <PossibleValue Value="GFXTIM_LINE_EVENT_ALC_OVERFLOW"        Comment="Absolute line counter overflow"   Condition="!Sem_AbsoluteEnable"/>
+        <PossibleValue Value="GFXTIM_LINE_EVENT_ALC1_COMPARE"         Comment="Absolute line counter 1 compare"  Condition="!Sem_AbsoluteEnable"/>
+        <PossibleValue Value="GFXTIM_LINE_EVENT_ALC2_COMPARE"         Comment="Absolute line counter 2 compare"  Condition="!Sem_AbsoluteEnable"/>
+         <Description>
+            Event Line 1.
+            Note: Useful only when Event Line 1 parameter is enabled.
+        </Description>
+  </RefParameter>
+
+ <RefParameter Name="LineEvent1" Comment="   Line event" DefaultValue="null" Type="string"  Group="Event Generators"  Visible="false"/>
+
+ <RefParameter Name="EventGenerator2"  Comment="Event generator 2" DefaultValue="DISABLE" Type="list" Group="Event Generators">
+        <PossibleValue Value="DISABLE" Comment="Disable"/>
+        <PossibleValue Value="ENABLE"  Comment="Enable" Semaphore="Sem_Interupt2Enable"/>
+        <Description> 
+            Event generator 2.
+            Note: Useful only when Event Generator 2 parameter is enabled.
+        </Description>
+ </RefParameter>
+
+ <RefParameter Name="EventInterrupt2" Comment="   Event interrupt" DefaultValue="DISABLE" Type="list" Group="Event Generators">
+        <Condition   Diagnostic="" Expression="Sem_Interupt2Enable"/>
+        <PossibleValue Value="DISABLE" Comment="Disable"/>
+        <PossibleValue Value="ENABLE"  Comment="Enable"/>
+        <Description>
+            Event Interrupt 2.
+            Note: Useful only when Event Interrupt 2 parameter is enabled.
+        </Description>
+ </RefParameter>
+
+ <RefParameter Name="EventInterrupt2" Comment="   Event interrupt" DefaultValue="null" Type="string"  Group="Event Generators"  Visible="false"/>
+
+ <RefParameter Name="FrameEvent2" Comment="   Frame event" DefaultValue="GFXTIM_FRAME_EVENT_NONE" Type="list" Group="Event Generators">
+        <Condition   Diagnostic="" Expression="Sem_Interupt2Enable"/>
+        <PossibleValue Value="GFXTIM_FRAME_EVENT_NONE"                   Comment="None"/>
+        <PossibleValue Value="GFXTIM_FRAME_EVENT_AFC_OVERFLOW"           Comment="Absolute frame counter overflow" Action="Disable" Condition="!Sem_AbsoluteEnable"/>
+        <PossibleValue Value="GFXTIM_FRAME_EVENT_AFC_COMPARE"            Comment="Absolute frame counter compare"  Action="Disable" Condition="!Sem_AbsoluteEnable"/>
+        <PossibleValue Value="GFXTIM_FRAME_EVENT_RFC1_RELOAD"            Comment="Relative frame counter 1 reload" Action="Disable" Condition="!Sem_Relative1Enable"/>
+        <PossibleValue Value="GFXTIM_FRAME_EVENT_RFC2_RELOAD"            Comment="Relative frame counter 2 reload" Action="Disable" Condition="!Sem_Rel2Enable"/>
+        <Description>
+            Event Frame 2.
+            Note: Useful only when Event Frame 2 parameter is enabled.
+        </Description>
+ </RefParameter>
+
+ <RefParameter Name="FrameEvent2" Comment="   Frame event" DefaultValue="null" Type="string"  Group="Event Generators"  Visible="false"/>
+
+ <RefParameter Name="LineEvent2" Comment="   Line event" DefaultValue="GFXTIM_LINE_EVENT_NONE" Type="list"  Group="Event Generators">
+        <Condition   Diagnostic="" Expression="Sem_Interupt2Enable"/>
+        <PossibleValue Value="GFXTIM_LINE_EVENT_NONE"                 Comment="None"/>
+        <PossibleValue Value="GFXTIM_LINE_EVENT_TE"                   Comment="TE"                               Action="Disable" Condition="!Sem_TearingEnable"/>
+        <PossibleValue Value="GFXTIM_LINE_EVENT_ALC_OVERFLOW"         Comment="Absolute line counter overflow"   Action="Disable" Condition="!Sem_AbsoluteEnable"/>
+        <PossibleValue Value="GFXTIM_LINE_EVENT_ALC1_COMPARE"         Comment="Absolute line counter 1 compare"  Action="Disable" Condition="!Sem_AbsoluteEnable"/>
+        <PossibleValue Value="GFXTIM_LINE_EVENT_ALC2_COMPARE"         Comment="Absolute line counter 2 compare"  Action="Disable" Condition="!Sem_AbsoluteEnable"/>
+        <Description>
+            Event Line 2.
+            Note: Useful only when Event Line 2 parameter is enabled.
+        </Description>
+ </RefParameter>
+
+ <RefParameter Name="LineEvent2" Comment="   Line event" DefaultValue="null" Type="string"  Group="Event Generators"  Visible="false"/>
+
+ <RefParameter Name="EventGenerator3" Comment="Event generator 3" DefaultValue="DISABLE" Type="list" Group="Event Generators">
+        <PossibleValue Value="DISABLE" Comment="Disable"/>
+        <PossibleValue Value="ENABLE"  Comment="Enable" Semaphore="Sem_Interupt3Enable"/>
+        <Description>
+            Event Generator 3.
+            Note: Useful only when Event Generator 3 parameter is enabled.
+        </Description>
+  </RefParameter>
+
+ <RefParameter Name="EventInterrupt3" Comment="   Event interrupt" DefaultValue="DISABLE" Type="list" Group="Event Generators">
+        <Condition   Diagnostic="" Expression="Sem_Interupt3Enable"/>
+        <PossibleValue Value="DISABLE" Comment="Disable"/>
+        <PossibleValue Value="ENABLE"  Comment="Enable"/>
+        <Description>
+            Event Interrupt 3.
+            Note: Useful only when Event Interrupt 3 parameter is enabled.
+        </Description>
+ </RefParameter>
+
+ <RefParameter Name="EventInterrupt3" Comment="   Event interrupt" DefaultValue="null" Type="string"  Group="Event Generators"  Visible="false" />
+
+ <RefParameter Name="FrameEvent3" Comment="   Frame event" DefaultValue="GFXTIM_FRAME_EVENT_NONE" Type="list" Group="Event Generators">
+        <Condition   Diagnostic="" Expression="Sem_Interupt3Enable"/>
+        <PossibleValue Value="GFXTIM_FRAME_EVENT_NONE"                   Comment="None"/>
+        <PossibleValue Value="GFXTIM_FRAME_EVENT_AFC_OVERFLOW"           Comment="Absolute frame counter overflow"              Action="Disable" Condition="!Sem_AbsoluteEnable"/>
+        <PossibleValue Value="GFXTIM_FRAME_EVENT_AFC_COMPARE"            Comment="Absolute frame counter compare"               Action="Disable" Condition="!Sem_AbsoluteEnable"/>
+        <PossibleValue Value="GFXTIM_FRAME_EVENT_RFC1_RELOAD"            Comment="Relative frame counter 1 reload"              Action="Disable" Condition="!Sem_Relative1Enable"/>
+        <PossibleValue Value="GFXTIM_FRAME_EVENT_RFC2_RELOAD"            Comment="Relative frame counter 2 reload"              Action="Disable" Condition="!Sem_Rel2Enable"/>
+         <Description>
+            Event Frame 3.
+            Note: Useful only when Event Frame 3 parameter is enabled.
+        </Description> 
+ </RefParameter>
+
+ <RefParameter Name="FrameEvent3" Comment="   Frame event" DefaultValue="null" Type="string"  Group="Event Generators"  Visible="false"/>
+
+ <RefParameter Name="LineEvent3" Comment="   Line event" DefaultValue="GFXTIM_LINE_EVENT_NONE" Type="list"  Group="Event Generators">
+        <Condition   Diagnostic="" Expression="Sem_Interupt3Enable"/>
+        <PossibleValue Value="GFXTIM_LINE_EVENT_NONE"                 Comment="None"/>
+        <PossibleValue Value="GFXTIM_LINE_EVENT_TE"                   Comment="TE"                                Action="Disable" Condition="!Sem_TearingEnable"/>
+        <PossibleValue Value="GFXTIM_LINE_EVENT_ALC_OVERFLOW"         Comment="Absolute line counter overflow"    Action="Disable" Condition="!Sem_AbsoluteEnable"/>
+        <PossibleValue Value="GFXTIM_LINE_EVENT_ALC1_COMPARE"         Comment="Absolute line counter 1 compare"   Action="Disable" Condition="!Sem_AbsoluteEnable"/>
+        <PossibleValue Value="GFXTIM_LINE_EVENT_ALC2_COMPARE"         Comment="Absolute line counter 2 compare"   Action="Disable" Condition="!Sem_AbsoluteEnable"/>
+         <Description>
+            Event Line 3.
+            Note: Useful only when Event Line 3 parameter is enabled.
+        </Description>
+ </RefParameter>
+
+ <RefParameter Name="LineEvent3" Comment="   Line event" DefaultValue="null" Type="string"  Group="Event Generators"  Visible="false"/>
+
+ <RefParameter Name="EventGenerator4" Comment="Event generator 4" DefaultValue="DISABLE" Type="list" Group="Event Generators">
+        <PossibleValue Value="DISABLE" Comment="Disable"/>
+        <PossibleValue Value="ENABLE"  Comment="Enable" Semaphore="Sem_Interupt4Enable"/>
+         <Description>
+            Event Generator 4.
+            Note: Useful only when Event Generator 4 parameter is enabled.
+        </Description>
+ </RefParameter>
+
+ <RefParameter Name="EventInterrupt4" Comment="   Event interrupt" DefaultValue="DISABLE" Type="list" Group="Event Generators">
+        <Condition   Diagnostic="" Expression="Sem_Interupt4Enable"/>
+        <PossibleValue Value="DISABLE" Comment="Disable"/>
+        <PossibleValue Value="ENABLE"  Comment="Enable"/>
+        <Description>
+            Event Interrupt 4.
+            Note: Useful only when Event Interrupt 4 parameter is enabled.
+        </Description>
+ </RefParameter>
+
+ <RefParameter Name="EventInterrupt4" Comment="   Event interrupt" DefaultValue="null" Type="string"  Group="Event Generators"  Visible="false"/>
+
+ <RefParameter Name="FrameEvent4" Comment="   Frame event" DefaultValue="GFXTIM_FRAME_EVENT_NONE" Type="list" Group="Event Generators">
+        <Condition   Diagnostic="" Expression="Sem_Interupt4Enable"/>
+        <PossibleValue Value="GFXTIM_FRAME_EVENT_NONE"                          Comment="None"/>
+        <PossibleValue Value="GFXTIM_FRAME_EVENT_AFC_OVERFLOW"                  Comment="Absolute frame counter overflow"     Action="Disable" Condition="!Sem_AbsoluteEnable"/>
+        <PossibleValue Value="GFXTIM_FRAME_EVENT_AFC_COMPARE"                   Comment="Absolute frame counter compare"      Action="Disable" Condition="!Sem_AbsoluteEnable"/>
+        <PossibleValue Value="GFXTIM_FRAME_EVENT_RFC1_RELOAD"                   Comment="Relative frame counter 1 reload"     Action="Disable" Condition="!Sem_Relative1Enable"/>
+        <PossibleValue Value="GFXTIM_FRAME_EVENT_RFC2_RELOAD"                   Comment="Relative frame counter 2 reload"     Action="Disable" Condition="!Sem_Rel2Enable"/>
+        <Description>
+            Event Frame 4.
+            Note: Useful only when Event Frame 4 parameter is enabled.
+        </Description>
+  </RefParameter>
+
+ <RefParameter Name="FrameEvent4" Comment="   Frame event" DefaultValue="null" Type="string"  Group="Event Generators"  Visible="false"/>
+
+ <RefParameter Name="LineEvent4" Comment="   Line event" DefaultValue="GFXTIM_LINE_EVENT_NONE" Type="list"  Group="Event Generators">
+        <Condition   Diagnostic="" Expression="Sem_Interupt4Enable"/>
+        <PossibleValue Value="GFXTIM_LINE_EVENT_NONE"           Comment="None"/>
+        <PossibleValue Value="GFXTIM_LINE_EVENT_TE"             Comment="TE"                                 Action="Disable" Condition="!Sem_TearingEnable"/>
+        <PossibleValue Value="GFXTIM_LINE_EVENT_ALC_OVERFLOW"   Comment="Absolute line counter overflow"     Action="Disable" Condition="!Sem_AbsoluteEnable"/>
+        <PossibleValue Value="GFXTIM_LINE_EVENT_ALC1_COMPARE"   Comment="Absolute line counter 1 compare"    Action="Disable" Condition="!Sem_AbsoluteEnable"/>
+        <PossibleValue Value="GFXTIM_LINE_EVENT_ALC2_COMPARE"   Comment="Absolute line counter 2 compare"    Action="Disable" Condition="!Sem_AbsoluteEnable"/>
+         <Description>
+            Event Line 4.
+            Note: Useful only when Event Line 4 parameter is enabled.
+        </Description>
+ </RefParameter>
+
+ <RefParameter Name="LineEvent4" Comment="   Line event" DefaultValue="null" Type="string"  Group="Event Generators"  Visible="false"/>
+    <!-- end Clock generator -->
+
+ <!-- Absolute timer -->
+ 
+     <RefParameter Name="AbsoluteTimerActivation" Comment="Absolute Timer Activation" DefaultValue="DISABLE" Type="list" Group="Absolute Timer">
+        <PossibleValue Value="DISABLE" Comment="Disable"/>
+        <PossibleValue Value="ENABLE"  Comment="Enable"  Semaphore="Sem_AbsoluteEnable"/>
+        <Description>
+            Absolute Timer Activation. Activate it to specify the configuration details
+        </Description>
+  </RefParameter>
+
+ <RefParameter Comment="Absolute Frame Compare 1 value" DefaultValue="0" Max="1048575" Min="0" Name="FrameCompare1Value" Type="integer" Group="Absolute Timer">
+        <Condition   Diagnostic="" Expression="Sem_AbsoluteEnable"/>
+        <Description>
+           Absolute Frame Compare 1 value (20 bits).
+           This parameter must be a number between 1 and 1048575.
+        </Description>
+ </RefParameter>
+
+ <RefParameter Name="FrameCompare1Value" Comment="Absolute Frame Compare 1 value" DefaultValue="__NULL" Type="string"  Group="Absolute Timer"  Visible="false"/>
+
+ <RefParameter Comment="Absolute Frame Counter value" DefaultValue="0" Max="1048575" Min="0" Name="FrameCounterValue" Type="integer" Group="Absolute Timer">
+       <Condition   Diagnostic="" Expression="Sem_AbsoluteEnable"/>
+       <Description>
+            Absolute Frame Counter initial value (20 bits).
+            This parameter must be a number between 1 and 1048575.
+        </Description>
+ </RefParameter>
+
+ <RefParameter Name="FrameCounterValue" Comment="Absolute Frame Counter value" DefaultValue="__NULL" Type="string"  Group="Absolute Timer"  Visible="false"/>
+
+ <RefParameter Name="FrameOverflowInterrupt" Comment="Absolute Frame Counter Overflow Interrupt" DefaultValue="DISABLE" Type="list"  Group="Absolute Timer">
+        <Condition   Diagnostic="" Expression="Sem_AbsoluteEnable"/>
+        <PossibleValue Value="DISABLE" Comment="Disable"/>
+        <PossibleValue Value="ENABLE"  Comment="Enable"/>
+        <Description>
+            Overflow Interrupt.
+            Note: Useful only when Overflow Interrupt parameter is enabled.
+        </Description>
+ </RefParameter>
+
+ <RefParameter Name="FrameOverflowInterrupt" Comment="Absolute Frame Counter Overflow Interrupt" DefaultValue="null" Type="string"  Group="Absolute Timer"  Visible="false"/>
+
+ <RefParameter Name="FrameCompare1Interrupt" Comment="Absolute Frame Compare 1 Interrupt" DefaultValue="DISABLE" Type="list"  Group="Absolute Timer">
+        <Condition   Diagnostic="" Expression="Sem_AbsoluteEnable"/>
+        <PossibleValue Value="DISABLE" Comment="Disable"/>
+        <PossibleValue Value="ENABLE"  Comment="Enable"/>
+        <Description>
+            Frame Compare 1 Interrupt.
+            Note: Useful only when Frame Compare 1 Interrupt parameter is enabled.
+        </Description>
+ </RefParameter>
+
+ <RefParameter Name="FrameCompare1Interrupt" Comment="Absolute Frame Compare 1 Interrupt" DefaultValue="null" Type="string"  Group="Absolute Timer"  Visible="false"/>
+
+ <RefParameter Comment="Absolute Line Compare 1 value" DefaultValue="0" Max="4095" Min="0" Name="LineCompare1Value" Type="integer" Group="Absolute Timer">
+         <Condition   Diagnostic="" Expression="Sem_AbsoluteEnable"/>
+         <Description>
+            Absolute Line Compare 1.
+            Note: Useful only when Absolute Line Compare 1 parameter is enabled.
+         </Description>
+ </RefParameter>
+
+ <RefParameter Name="LineCompare1Value" Comment="Absolute Line Compare 1 value" DefaultValue="null" Type="string"  Group="Absolute Timer"  Visible="false"/>
+
+ <RefParameter Comment="Absolute Line Compare 2 value" DefaultValue="0" Max="4095" Min="0" Name="LineCompare2Value" Type="integer" Group="Absolute Timer">
+         <Condition   Diagnostic="" Expression="Sem_AbsoluteEnable"/>
+         <Description>
+            Absolute Line Compare 2 value (12 bits).
+            This parameter must be a number between 0 and 4095.
+         </Description>
+ </RefParameter>
+
+ <RefParameter Name="LineCompare2Value" Comment="Absolute Line Compare 2 value" DefaultValue="__NULL" Type="string"  Group="Absolute Timer"  Visible="false"/>
+
+ <RefParameter Comment="Absolute Line Counter value" DefaultValue="0" Max="4095" Min="0" Name="LineCounterValue" Type="integer" Group="Absolute Timer">
+        <Condition   Diagnostic="" Expression="Sem_AbsoluteEnable"/>
+        <Description>
+            Absolute Line Counter value (12 bits).
+            This parameter must be a number between 0 and 4095.
+        </Description>
+</RefParameter>
+
+  <RefParameter Name="LineCounterValue" Comment="Absolute Line Counter value" DefaultValue="__NULL" Type="string"  Group="Absolute Timer"  Visible="false"/>
+
+ <RefParameter Name="LineOverflowInterrupt" Comment="Absolute Line Counter Overflow Interrupt" DefaultValue="DISABLE" Type="list"  Group="Absolute Timer">
+        <Condition   Diagnostic="" Expression="Sem_AbsoluteEnable"/>
+        <PossibleValue Value="DISABLE" Comment="Disable" />
+        <PossibleValue Value="ENABLE"  Comment="Enable" />
+        <Description>
+            Line Overflow Interrupt.
+            Note: Useful only when Line Overflow Interrupt parameter is enabled.
+       </Description>
+  </RefParameter>
+
+ <RefParameter Name="LineOverflowInterrupt" Comment="Absolute Line Counter Overflow Interrupt" DefaultValue="null" Type="string"  Group="Absolute Timer"  Visible="false"/>
+
+ <RefParameter Name="LineCompare1Interrupt" Comment="Absolute Line Compare 1 Interrupt" DefaultValue="DISABLE" Type="list"  Group="Absolute Timer">
+        <Condition   Diagnostic="" Expression="Sem_AbsoluteEnable"/>
+        <PossibleValue Value="DISABLE" Comment="Disable"/>
+        <PossibleValue Value="ENABLE" Comment="Enable"/>
+        <Description>
+            Line Compare 1 Interrupt.
+            Note: Useful only when Line Compare 1 Interrupt parameter is enabled.
+       </Description>
+ </RefParameter>
+
+  <RefParameter Name="LineCompare1Interrupt" Comment="Absolute Line Compare 1 Interrupt" DefaultValue="null" Type="string"  Group="Absolute Timer"  Visible="false"/>
+
+ <RefParameter Name="LineCompare2Interrupt" Comment="Absolute Line Compare 2 Interrupt" DefaultValue="DISABLE" Type="list"  Group="Absolute Timer">
+        <Condition   Diagnostic="" Expression="Sem_AbsoluteEnable"/>
+        <PossibleValue Value="DISABLE" Comment="Disable"/>
+        <PossibleValue Value="ENABLE"  Comment="Enable"/>
+         <Description>
+            Line Compare 2 Interrupt.
+            Note: Useful only when Line Compare 2 Interrupt parameter is enabled.
+       </Description>
+ </RefParameter>
+
+ <RefParameter Name="LineCompare2Interrupt" Comment="Absolute Line Compare 2 Interrupt" DefaultValue="null" Type="string"  Group="Absolute Timer"  Visible="false"/>
+
+ <!-- WatchdogConfig -->
+ <RefParameter Name="WatchdogTimer" Comment="Watchdog Timer" DefaultValue="DISABLE" Type="list" Group="Watchdog">
+        <PossibleValue Value="DISABLE" Comment="Disable"/>
+        <PossibleValue Value="ENABLE"  Comment="Enable"  Semaphore="Sem_WatchdogEnable"/>
+        <Description>
+            Watchdog Activation. Activate it to specify the configuration details
+           
+        </Description>
+ </RefParameter>
+
+ <RefParameter Name="ClockSrc" Comment="Counter clock source" DefaultValue="GFXTIM_WATCHDOG_CLK_SRC_LINE_CLK" Type="list" Group="Watchdog">
+        <Condition   Diagnostic="" Expression="Sem_WatchdogEnable"/>
+        <PossibleValue Value="GFXTIM_WATCHDOG_CLK_SRC_LINE_CLK"      Comment="Line Ck" />
+        <PossibleValue Value="GFXTIM_WATCHDOG_CLK_SRC_FRAME_CLK"     Comment="Frame Ck"/>
+        <PossibleValue Value="GFXTIM_WATCHDOG_CLK_SRC_HSYNC_RISING"  Comment="HSYNC rising edge"/>
+        <PossibleValue Value="GFXTIM_WATCHDOG_CLK_SRC_HSYNC_FALLING" Comment="HSYNC falling edge"/>
+        <PossibleValue Value="GFXTIM_WATCHDOG_CLK_SRC_VSYNC_RISING"  Comment="VSYNC rising edge "/>
+        <PossibleValue Value="GFXTIM_WATCHDOG_CLK_SRC_VSYNC_FALLING" Comment="VSYNC falling edge"/>
+        <PossibleValue Value="GFXTIM_WATCHDOG_CLK_SRC_TE_RISING"     Comment="TE rising edge"    Action="Disable" Condition="!Sem_TearingEnable"/>
+        <PossibleValue Value="GFXTIM_WATCHDOG_CLK_SRC_TE_FALLING"    Comment="TE falling edge"   Action="Disable" Condition="!Sem_TearingEnable"/>
+        <PossibleValue Value="GFXTIM_WATCHDOG_CLK_SRC_EVENT_1"       Comment="Event Generator 1" Action="Disable" Condition="!Sem_Interupt1Enable"/>
+        <PossibleValue Value="GFXTIM_WATCHDOG_CLK_SRC_EVENT_2"       Comment="Event Generator 2" Action="Disable" Condition="!Sem_Interupt2Enable"/>
+        <PossibleValue Value="GFXTIM_WATCHDOG_CLK_SRC_EVENT_3"       Comment="Event Generator 3" Action="Disable" Condition="!Sem_Interupt3Enable"/>
+        <PossibleValue Value="GFXTIM_WATCHDOG_CLK_SRC_EVENT_4"       Comment="Event Generator 4" Action="Disable" Condition="!Sem_Interupt4Enable"/>
+        <Description>
+            Clock Source.
+            Note: Useful only when Clock Source parameter is enabled.
+        </Description>
+ </RefParameter>
+
+ <RefParameter Name="ClockSrc" Comment="Counter clock source" DefaultValue="null" Type="string"  Group="Watchdog"  Visible="false" />
+
+ <RefParameter Comment="Counter Auto-reload value" DefaultValue="0" Max="65535" Min="0" Name="AutoReloadValue" Type="integer" Group="Watchdog">
+      <Condition   Diagnostic="" Expression="Sem_WatchdogEnable"/>
+      <Description>
+            Auto Reload value (16 bits).
+            This parameter must be a number between 0 and 65535.
+        </Description>
+ </RefParameter>
+
+ <RefParameter Name="AutoReloadValue" Comment="Counter Auto-reload value" DefaultValue="__NULL" Type="string"  Group="Watchdog"  Visible="false" />
+
+ <RefParameter Name="HwReloadConfig" Comment="Auto-reload trigger" DefaultValue="GFXTIM_WATCHDOG_HW_RELOAD_DISABLE" Type="list" Group="Watchdog" >
+        <Condition   Diagnostic="" Expression="Sem_WatchdogEnable"/>
+        <PossibleValue Value="GFXTIM_WATCHDOG_HW_RELOAD_DISABLE"      Comment="Disable"/>
+        <PossibleValue Value="GFXTIM_WATCHDOG_HW_RELOAD_RISING_EDGE"  Comment="wrld rising edge"  Action="Disable" Condition="1=1"/>
+        <PossibleValue Value="GFXTIM_WATCHDOG_HW_RELOAD_FALLING_EDGE" Comment="wrld falling edge" Action="Disable"  Condition="1=1"/>
+        <Description>
+            Reload Configuration.
+            Note: Useful only when  Reload Configuration parameter is enabled.
+            The two values wrld rising edge and wrld falling edge not available on Tiger4M-U5.
+        </Description>
+ </RefParameter>
+
+ <RefParameter Name="HwReloadConfig" Comment="Auto-reload trigger" DefaultValue="null" Type="string"  Group="Watchdog"  Visible="false"  />
+
+ <RefParameter Comment="Pre-Alarm value" DefaultValue="0" Max="65535" Min="0" Name="PreAlarmValue" Type="integer" Group="Watchdog" >
+        <Condition   Diagnostic="" Expression="Sem_WatchdogEnable"/>
+        <Description>
+            Pre-alarm value (16 bits).
+            This parameter must be a number between 0 and 65535.
+        </Description>
+ </RefParameter>
+
+ <RefParameter Name="PreAlarmValue" Comment="Pre-Alarm value" DefaultValue="__NULL" Type="string"  Group="Watchdog"  Visible="false"  />
+
+ <RefParameter Name="AlarmInterrupt" Comment="Alarm interrupt" DefaultValue="DISABLE" Type="list" Group="Watchdog">
+        <Condition   Diagnostic="" Expression="Sem_WatchdogEnable"/>
+        <PossibleValue Value="DISABLE" Comment="Disable"/>
+        <PossibleValue Value="ENABLE"  Comment="Enable"/>
+        <Description>
+            Interrupt Alarm.
+            Note: Useful only when Interrupt Alarm parameter is enabled.
+        </Description>
+ </RefParameter>
+
+ <RefParameter Name="AlarmInterrupt" Comment="Alarm interrupt" DefaultValue="null" Type="string"  Group="Watchdog"  Visible="false" />
+
+ <RefParameter Name="PreAlarmInterrupt" Comment="Pre-Alarm interrupt" DefaultValue="DISABLE" Type="list" Group="Watchdog" >
+        <Condition   Diagnostic="" Expression="Sem_WatchdogEnable"/>
+        <PossibleValue Value="DISABLE" Comment="Disable"/>
+        <PossibleValue Value="ENABLE"  Comment="Enable"/>
+        <Description>
+            Interrupt Pre-alarm.
+            Note: Useful only when Interrupt Pre-Alarm parameter is enabled.
+        </Description>
+ </RefParameter>
+
+ <RefParameter Name="PreAlarmInterrupt" Comment="Pre-Alarm interrupt" DefaultValue="null" Type="string"  Group="Watchdog"   Visible="false"/>
+
+  <!-- relative timer 
+ <RefParameter Name="RelativeTimerActivation" Comment="Relative timer activation" DefaultValue="Disable" Type="list" Group="Relative timer">
+        <PossibleValue Value="DISABLE" Comment="Disable"/>
+        <PossibleValue Value="ENABLE" Comment="Enable"  Semaphore="Sem_RelativeEnable"/>
+        <Description>
+            Relative Timer Activation. Activate it to specify the configuration details
+        </Description>
+ </RefParameter>-->
+
+ <RefParameter Name="RelativeTimer1" Comment="Relative Timer 1" DefaultValue="DISABLE" Type="list" Group="Relative Timers" >
+      <!--  <Condition   Diagnostic="" Expression="Sem_RelativeEnable"/>-->
+        <PossibleValue Value="DISABLE" Comment="Disable"/>
+        <PossibleValue Value="ENABLE"  Comment="Enable"  Semaphore="Sem_Relative1Enable"/>
+        <Description>
+            Relative Timer 1
+            Note: Useful only when Relative Timer 1 parameter is enabled.
+        </Description>
+    </RefParameter>
+
+ <RefParameter Name="RelativeTimer1" Comment="Relative Timer 1" DefaultValue="null" Type="string"  Group="Relative Timers"   Visible="false"/>
+
+ <RefParameter Name="AutoReloadValue1" Comment="   Auto reload value" DefaultValue="0" Max="4095" Min="0" Type="integer" Group="Relative Timers" >
+         <Condition   Diagnostic="" Expression="Sem_Relative1Enable"/>
+         <Description>
+            Auto reload value 1 (12 bits).
+            This parameter must be a number between 0 and 4095.
+         </Description>
+ </RefParameter>
+
+ <RefParameter Name="AutoReloadValue1" Comment="   Auto reload value" DefaultValue="__NULL" Type="string"  Group="Relative Timers"   Visible="false"/>
+
+ <RefParameter Name="CounterMode1" Comment="   Counter mode" DefaultValue="GFXTIM_MODE_ONE_SHOT" Type="list" Group="Relative Timers" >
+        <Condition   Diagnostic="" Expression="Sem_Relative1Enable"/>
+        <PossibleValue Value="GFXTIM_MODE_ONE_SHOT"   Comment="One Shot"/>
+        <PossibleValue Value="GFXTIM_MODE_CONTINUOUS" Comment="Continuous"/>
+        <Description>
+            Counter Mode 1.
+            Note: Useful only when Counter Mode 1 parameter is enabled.
+      </Description>
+ </RefParameter>
+
+ <RefParameter Name="CounterMode1" Comment="   Counter mode" DefaultValue="null" Type="string"  Group="Relative Timers"   Visible="false"/>
+
+ <RefParameter Name="ReloadInterrupt1" Comment="   Reload interrupt" DefaultValue="DISABLE" Type="list" Group="Relative Timers" >
+       <Condition   Diagnostic="" Expression="Sem_Relative1Enable"/>
+       <PossibleValue Value="DISABLE" Comment="Disable"/>
+       <PossibleValue Value="ENABLE"  Comment="Enable"/>
+       <Description>
+            Reload Interrupt 1.
+            Note: Useful only when Reload Interrupt 1 parameter is enabled.
+      </Description>
+ </RefParameter>
+
+ <RefParameter Name="ReloadInterrupt1" Comment="   Reload interrupt" DefaultValue="null" Type="string"  Group="Relative Timers" Visible="false"/>
+
+ <RefParameter Name="RelativeTimer2" Comment="Relative Timer 2" DefaultValue="DISABLE" Type="list" Group="Relative Timers">
+        <!--  <Condition   Diagnostic="" Expression="Sem_RelativeEnable"/>--> 
+          <PossibleValue Value="DISABLE" Comment="Disable" />
+          <PossibleValue Value="ENABLE"  Comment="Enable"  Semaphore="Sem_Rel2Enable"/>
+          <Description>
+            Relative Timer 2
+            Note: Useful only when Relative Timer 2 parameter is enabled.
+          </Description>
+ </RefParameter>
+
+ <RefParameter Name="RelativeTimer2" Comment="Relative Timer 2" DefaultValue="null" Type="string"  Group="Relative Timers" Visible="false"/>
+
+ <RefParameter Name="AutoReloadValue2" Comment="   Auto reload value" DefaultValue="0" Max="4095" Min="0" Type="integer" Group="Relative Timers">
+          <Condition   Diagnostic="" Expression="Sem_Rel2Enable"/>
+          <Description>
+            Auto reload value 2 (12 bits).
+            This parameter must be a number between 0 and 4095.
+          </Description>
+ </RefParameter>
+
+ <RefParameter Name="AutoReloadValue2" Comment="   Auto reload value" DefaultValue="null" Type="string"  Group="Relative Timers"  Visible="false"/>
+
+ <RefParameter Name="CounterMode2" Comment="   Counter mode" DefaultValue="GFXTIM_MODE_ONE_SHOT" Type="list" Group="Relative Timers">
+          <Condition   Diagnostic="" Expression="Sem_Rel2Enable"/>
+          <PossibleValue Value="GFXTIM_MODE_ONE_SHOT"   Comment="One Shot"/>
+          <PossibleValue Value="GFXTIM_MODE_CONTINUOUS" Comment="Continuous"/>
+          <Description>
+            Counter Mode 2.
+            Note: Useful only when Counter Mode 2 parameter is enabled.
+          </Description>
+ </RefParameter>
+
+ <RefParameter Name="CounterMode2" Comment="   Counter mode" DefaultValue="null" Type="string"  Group="Relative Timers"  Visible="false"/>
+
+ <RefParameter Name="ReloadInterrupt2" Comment="   Reload interrupt" DefaultValue="DISABLE" Type="list" Group="Relative Timers">
+          <Condition   Diagnostic="" Expression="Sem_Rel2Enable"/>
+          <PossibleValue Value="DISABLE" Comment="Disable"/>
+          <PossibleValue Value="ENABLE"  Comment="Enable"/>
+          <Description>
+            Reload Interrupt 2.
+            Note: Useful only when Reload Interrupt 2 parameter is enabled.
+          </Description>
+ </RefParameter>
+ <RefParameter Name="ReloadInterrupt2" Comment="   Reload interrupt" DefaultValue="null" Type="string"  Group="Relative Timers"  Visible="false"/>
+<!-- WatchdogConfig -->
+
+    <RefMode Name="GFXTIM_Activate" HalMode ="GFXTIM">
+        <ConfigForMode>Gfxtim_Init</ConfigForMode>
+        <ConfigForMode>GFXTIM_ClockGenerator_Config</ConfigForMode>
+        <ConfigForMode>WatchdogConfig</ConfigForMode>
+        <ConfigForMode>GFXTIM_AbsoluteTimer</ConfigForMode>
+        <ConfigForMode>GFXTIM_EventGenerator_Config</ConfigForMode>
+       <ConfigForMode>GFXTIM_RelativeTimer_Config</ConfigForMode>
+        <Parameter Name="SynchroSrc"/>
+        <Parameter Name="TearingEffectActivation"/>
+        <Parameter Name="TearingEffectSrc"/>
+        <Parameter Name="TearingEffectPolarity"/>
+        <Parameter Name="TearingEffectInterrupt"/>
+        <Parameter Name="LineClockCounter"/>
+        <Parameter Name="LCCHwReloadSrc"/>
+        <Parameter Name="LCCReloadValue"/>
+        <Parameter Name="LCCClockSrc"/>
+        <Parameter Name="FrameClockCounter"/>
+        <Parameter Name="FCCHwReloadSrc"/>
+        <Parameter Name="FCCReloadValue"/>
+        <Parameter Name="FCCClockSrc"/>
+        <Parameter Name="LineClockSrc"/>
+        <Parameter Name="FrameClockSrc"/>
+        <Parameter Name="LineClockCalib"/>
+        <Parameter Name="FrameClockCalib"/>
+        <Parameter Name="AbsoluteTimerActivation"/>
+        <Parameter Name="FrameCompare1Value"/>
+        <Parameter Name="FrameCounterValue"/>
+        <Parameter Name="FrameOverflowInterrupt"/>
+        <Parameter Name="FrameCompare1Interrupt"/>
+        <Parameter Name="LineCompare1Value"/>
+        <Parameter Name="LineCompare2Value" />
+        <Parameter Name="LineCounterValue"/>
+        <Parameter Name="LineOverflowInterrupt"/>
+        <Parameter Name="LineCompare1Interrupt"/>
+        <Parameter Name="LineCompare2Interrupt"/>
+        <Parameter Name="RelativeTimer1"/>
+        <Parameter Name="AutoReloadValue1"/>
+        <Parameter Name="CounterMode1"/>
+        <Parameter Name="ReloadInterrupt1"/>
+        <Parameter Name="RelativeTimer2"/>
+        <Parameter Name="AutoReloadValue2"/>
+        <Parameter Name="CounterMode2"/>
+        <Parameter Name="ReloadInterrupt2"/>
+        <Parameter Name="EventGenerator1"/>
+        <Parameter Name="LineEvent1"/>
+        <Parameter Name="FrameEvent1"/>
+        <Parameter Name="EventInterrupt1"/>
+        <Parameter Name="EventGenerator2"/>
+        <Parameter Name="LineEvent2"/>
+        <Parameter Name="FrameEvent2"/>
+        <Parameter Name="EventInterrupt2"/>
+        <Parameter Name="EventGenerator3"/>
+        <Parameter Name="LineEvent3"/>
+        <Parameter Name="FrameEvent3"/>
+        <Parameter Name="EventInterrupt3"/>
+        <Parameter Name="EventGenerator4"/>
+        <Parameter Name="LineEvent4"/>
+        <Parameter Name="FrameEvent4"/>
+        <Parameter Name="EventInterrupt4"/>
+        <Parameter Name="WatchdogTimer"/>
+        <Parameter Name="ClockSrc"/>
+        <Parameter Name="AutoReloadValue"/>
+        <Parameter Name="HwReloadConfig"/>
+        <Parameter Name="PreAlarmValue"/>
+        <Parameter Name="AlarmInterrupt"/>
+        <Parameter Name="PreAlarmInterrupt"/>
+    </RefMode>
+
+  <!-- <ModeLogicOperator Name="OR">
+          <Mode Name="GFXTIM_Activate" UserName="Activated">
+              <ModeLogicOperator Name="XOR">
+                  <Mode Name="GFXTIM_Activate" UserName="Activated">
+                      <SignalLogicalOp Name="AND">
+                      <Signal Name="VS_GFXTIM" />
+                      </SignalLogicalOp>
+                  </Mode>
+              </ModeLogicOperator>
+               <Semaphore>$IpInstanceUsed_ForRCC</Semaphore>
+              <Semaphore>S_GFXTIM_Enabled</Semaphore>
+           </Mode>
+    </ModeLogicOperator>
+       <ModeLogicOperator Name="OR">
+          <Mode Name="Output Calibration" UserName="Output Calibration">
+              <ModeLogicOperator Name="XOR">
+                  <Mode Name="Output Calibration" UserName="Output Calibration">
+                      <SignalLogicalOp Name="AND">
+                      <Signal Name="LCKCAL" />
+                      <Signal Name="FCKCAL" />
+                      </SignalLogicalOp>
+                  </Mode>
+              </ModeLogicOperator>
+           </Mode>
+    </ModeLogicOperator>
+       <ModeLogicOperator Name="OR">
+          <Mode Name="External Tearing Effect Input" UserName="External Tearing Effect Input">
+              <ModeLogicOperator Name="XOR">
+                  <Mode Name="External Tearing Effect Input" UserName="External Tearing Effect Input">
+                      <SignalLogicalOp Name="AND">
+                      <Signal Name="TE" />
+                      </SignalLogicalOp>
+                  </Mode>
+              </ModeLogicOperator>
+           </Mode>
+    </ModeLogicOperator> --> 
+
+
+
+   <ModeLogicOperator Name="OR">
+        <Mode Name="GFXTIM_Activate" UserName="Activated">
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="GFXTIM_Activate">
+                    <SignalLogicalOp Name="AND">
+                    <Signal Name="VS_GFXTIM"/>
+                    </SignalLogicalOp>
+                     <Semaphore>S_GFXTIM_Enabled</Semaphore>
+                </Mode>
+            </ModeLogicOperator>
+        </Mode>
+        <Mode Name="Output Calibration" UserName="Output Calibration">
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="Output Calibration">
+                <Condition Expression="S_GFXTIM_Enabled" Diagnostic="Activate GFXTIM first"/>
+                    <SignalLogicalOp Name="AND">
+                     <Signal Name="LCKCAL" />
+                     <Signal Name="FCKCAL" /> 
+                    </SignalLogicalOp>
+                     <Semaphore>S_GFXTIM_$IpInstance_LCK</Semaphore>
+                </Mode>
+            </ModeLogicOperator>
+        </Mode>
+        <Mode Name="External Tearing Effect Input" UserName="External Tearing Effect Input">
+             <ModeLogicOperator Name="XOR">
+                <Mode Name="External Tearing Effect Input">
+                <Condition Expression="S_GFXTIM_Enabled" Diagnostic="Activate GFXTIM first"/>
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="TE" />
+                    </SignalLogicalOp>
+                   <Semaphore>S_GFXTIM_$IpInstance_TE</Semaphore>
+                </Mode>
+            </ModeLogicOperator>
+        </Mode>
+    </ModeLogicOperator>
+    <!-- RefSignal for GFXTIM -->
+    <RefSignal IOMode="AlternateFunctionPushPullUp" Name="FCKCAL" />
+    <RefSignal IOMode="AlternateFunctionPushPullUp" Name="LCKCAL" />
+    <RefSignal IOMode="AlternateFunctionPushPullUp" Name="TE" />
+    <RefSignal Name="VS_GFXTIM" Virtual="true"/>
+    </IP>

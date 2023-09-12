@@ -3,6 +3,8 @@
 	xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd">
 	<RefMode Abstract="false" Name="Core_Default">
 		<ConfigForMode>Core_Default</ConfigForMode>
+		<Parameter Name="CORTEX_CLOCK_SELECTION"/>
+		<Parameter Name="CORTEX_CLOCK_FREQ"/>
 		<Parameter Name="TX_MINIMUM_STACK"/>
 		<Parameter Name="TX_THREAD_USER_EXTENSION"/>
 		<Parameter Name="TX_DISABLE_STACK_FILLING"/>
@@ -22,6 +24,22 @@
 		<Parameter Name="TX_TIMER_THREAD_STACK_SIZE"/>
 		<Parameter Name="TX_TIMER_THREAD_PRIORITY"/>
 		<Parameter Name="ThreadX_Version"/>
+		<Parameter Added="true" Name="TX_APP_GENERATE_INIT_CODE"/>
+		<Parameter Added="true" Name="TX_APP_CREATION"/>
+		<Parameter Added="true" Name="TX_APP_THREAD_ENTRY"/>
+		<Parameter Added="true" Name="TX_APP_THREAD_NAME"/>
+		<Parameter Added="true" Name="TX_APP_THREAD_PRIO"/>
+		<Parameter Added="true" Name="TX_APP_STACK_SIZE"/>
+		<Parameter Added="true" Name="TX_APP_SEM_CREATION"/>
+		<Parameter Added="true" Name="TX_SEMAPHORE_NAME"/>
+		<Parameter Added="true" Name="TX_SEMAPHORE_COUNT"/>
+		<Parameter Added="true" Name="TX_APP_MUTEX_CREATION"/>
+		<Parameter Added="true" Name="TX_MUTEX_NAME"/>
+		<Parameter Added="true" Name="TX_MUTEX_INHERITANCE"/>
+		<Parameter Added="true" Name="TX_APP_MSG_QUEUE_CREATION"/>
+		<Parameter Added="true" Name="TX_MSG_QUEUE_NAME"/>
+		<Parameter Added="true" Name="TX_MSG_SIZE_WORDS"/>
+		<Parameter Added="true" Name="TX_NB_MSG"/>
 		<Parameter Added="true" Name="TX_NO_FILEX_POINTER"/>
 		<Parameter Added="true" Name="TX_APP_MEM_POOL_SIZE"/>
          <Parameter Added="true" Name="FX_APP_MEM_POOL_SIZE">
@@ -49,6 +67,10 @@
          <Condition Diagnostic="" Expression="S_STM32_WPAN"/>
         </Parameter>
 		<Parameter Added="true" Name="AZRTOS_APP_MEM_ALLOCATION_METHOD"/>
+		<Parameter Added="true" Name="THREADX_MEM_POOL_VAR_NAME" />
+		<Parameter Added="true" Name="FILEX_MEM_POOL_VAR_NAME">
+			<Condition Diagnostic="" Expression="SEMFileXCcFileOoSystemJjFileXJjCore" />
+		</Parameter>
 		<Parameter Added="true" Name="FILEX_ENABLED"/>
 		<Parameter Added="true" Name="NETXDUO_ENABLED"/>
 		<Parameter Added="true" Name="USBXDEVICE_ENABLED"/>
@@ -79,14 +101,14 @@
 		<Parameter Name="TX_THREAD_ENABLE_PERFORMANCE_INFO"/>
 		<Parameter Name="TX_TIMER_ENABLE_PERFORMANCE_INFO"/>
 	</RefMode>
-	
+
 	<RefMode Abstract="false" Name="TraceX_Support_Default">
 		<ConfigForMode>TraceX_Support_Default</ConfigForMode>
 		<Parameter Name="TX_TRACE_TIME_SOURCE"/>
 		<Parameter Name="TX_TRACE_TIME_MASK"/>
 		 <Parameter Added="true" Name="TX_ENABLE_EVENT_TRACE"/>
 	</RefMode>
-	
+
 	<RefMode Abstract="false" Name="Low_Power_Support">
 		<ConfigForMode>Low_Power_Support</ConfigForMode>
 		<Parameter Added="true" Name="TX_LOW_POWER"/>
@@ -99,7 +121,7 @@
 		<Parameter Added="true" Name="TX_LOW_POWER_USER_TIMER_ADJUST"/>
 	</RefMode>
 
-	
+
 	<ModeLogicOperator Name="OR">
 		<Mode Name="Core">
 			<ModeLogicOperator Name="OR">
@@ -120,7 +142,7 @@
 					<Semaphore>SEMThreadXCcRTOSJjThreadXJjPerformanceInfo</Semaphore>
 					<Condition Expression="SEMThreadXCcRTOSJjThreadXJjCore" Diagnostic="&lt;b&gt; Requires: &lt;/b&gt; Middleware:THREADX:Core"/>
 				</Mode>
-				
+
 			</ModeLogicOperator>
 		</Mode>
 		<Mode Name="TraceX_Support" UserName="TraceX Support">
@@ -146,12 +168,12 @@
 			</ModeLogicOperator>
 		</Mode>
 	</ModeLogicOperator>
-	
+
 	<RefSignal Name="VS_RTOSJjThreadXJjCoreJjDefault" Virtual="true" />
 	<RefSignal Name="VS_RTOSJjThreadXJjPerformance_InfoJjDefault" Virtual="true" />
 	<RefSignal Name="VS_RTOSJjThreadXJjTraceX_SupportJjDefault" Virtual="true" />
 	<RefSignal Name="VS_RTOSJjThreadXJjLow_Power_Support" Virtual="true" />
-	
+
 	<RefParameter Comment="TX_MINIMUM_STACK" DefaultValue="200" Group="Core" Max="1024" Min="200" Name="TX_MINIMUM_STACK" TabName="ThreadX" Type="integer" Unit="Bytes">
 		<Description>Define the minimum stack for a ThreadX thread on this processor</Description>
 	</RefParameter>
@@ -326,7 +348,7 @@ TX_TIMER_ENABLE_PERFORMANCE_INFO must not be defined.</Description>
     <RefParameter Added="true" Comment="TX_LOW_POWER_TIMER_SETUP" DefaultValue="App_ThreadX_LowPower_Timer_Setup" Group="Low Power" Name="TX_LOW_POWER_TIMER_SETUP" TabName="ThreadX" Type="stringRW">
         <Condition Diagnostic="" Expression="(TX_LOW_POWER = 1) &amp; TX_LOW_POWER_TIMER_SETUP_ENABLE=true &amp; DIE492"/>
         <Description>A macro used to track the current time.</Description>
-    </RefParameter>    
+    </RefParameter>
 	<RefParameter Added="true" Comment="TX_LOW_POWER_TIMER_SETUP" DefaultValue="App_ThreadX_LowPower_Timer_Setup" Group="Low Power" Name="TX_LOW_POWER_TIMER_SETUP" TabName="ThreadX" Type="stringRW">
         <Condition Diagnostic="" Expression="(TX_LOW_POWER = 1) &amp; !DIE492"/>
         <Description>A macro used to track the current time.</Description>
@@ -352,7 +374,7 @@ TX_TIMER_ENABLE_PERFORMANCE_INFO must not be defined.</Description>
 	<RefParameter Added="true" Comment="TX_LOW_POWER_USER_TIMER_ADJUST" DefaultValue="App_ThreadX_LowPower_Timer_Adjust" Group="Low Power" Name="TX_LOW_POWER_USER_TIMER_ADJUST" TabName="ThreadX" Type="stringRW">
         <Condition Diagnostic="" Expression="(TX_LOW_POWER = 1)&amp; !DIE492"/>
         <Description>A macro to retrieve the number of ticks the system was in low power mode.</Description>
-    </RefParameter> 
+    </RefParameter>
         <RefParameter Added="true" Comment="TX_NO_FILEX_POINTER" DefaultValue="0" Group="Core" Name="TX_NO_FILEX_POINTER" TabName="ThreadX" Type="list">
         <Description> Determine if there is a FileX pointer in the thread control block. By default, the pointer is there for legacy/backwards compatibility.&lt;br&gt;
  The pointer &lt;b&gt;must&lt;/b&gt; also be there for applications using &lt;b&gt;FileX&lt;/b&gt;. Define this to save space in the thread control block.
@@ -396,7 +418,7 @@ This is automatically generated by STM32CubeMX under the &lt;b&gt;USE_DYNAMIC_ME
         <PossibleValue Comment="Use Static Allocation" Value="1"/>
         <PossibleValue Comment="Use Dynamic Allocation" Value="0"/>
     </RefParameter>
-    
+
     <RefParameter Added="true" Comment="ThreadX memory pool size" DefaultValue="1024" Group="Memory Configuration" Max="=($RamSize*1024)/4" Min="512" Name="TX_APP_MEM_POOL_SIZE" TabName="ThreadX" Type="integer" Unit="">
         <Description>Default memory pool size for the ThreadX application.</Description>
 		<Condition Diagnostic="" Expression="(AZRTOS_APP_MEM_ALLOCATION_METHOD = 1)"/>
@@ -497,16 +519,16 @@ This is automatically generated by STM32CubeMX under the &lt;b&gt;USE_DYNAMIC_ME
         <Description></Description>
         <Condition Diagnostic="" Expression="GUI_INTERFACE"/>
     </RefParameter>
-    
-	
+
+
 	<RefParameter Added="true" Comment="TX_THREAD_SECURE_STACK_MINIMUM" DefaultValue="256" Group="Core" Max="1024" Min="0" Name="TX_THREAD_SECURE_STACK_MINIMUM" TabName="ThreadX" Type="integer">
         <Description>Define the minimum stack for a ThreadX secure thread on this processor</Description>
     </RefParameter>
     <RefParameter Added="true" Comment="TX_THREAD_SECURE_STACK_MAXIMUM" DefaultValue="1024" Group="Core" Max="10240" Min="=TX_THREAD_SECURE_STACK_MINIMUM" Name="TX_THREAD_SECURE_STACK_MAXIMUM" TabName="ThreadX" Type="integer" >
         <Description>Define the maximum stack for a ThreadX secure thread on this processor</Description>
     </RefParameter>
-	
-	
+
+
 	<RefParameter Added="true" Comment="STACK_MINIMUM" DefaultValue="true" Name="STACK_MINIMUM" TabName="ThreadX" Type="boolean" Visible="false">
         <Description></Description>
 		<PossibleValue Comment="true" Semaphore="SEMSTACK_MINIMUM" Value="true"/>
@@ -517,9 +539,8 @@ This is automatically generated by STM32CubeMX under the &lt;b&gt;USE_DYNAMIC_ME
 		<PossibleValue Comment="true" Semaphore="SEMSTACK_MAXIMUM" Value="true"/>
 		<Condition Diagnostic="" Expression="TX_THREAD_SECURE_STACK_MAXIMUM=1024"/>
     </RefParameter>
-	
-	
-	
+
+
 	<RefParameter Added="true" Comment="Enable BASEPRI support" DefaultValue="0" Group="Core" Name="TX_ENABLE_BASEPRI_SUPPORT" TabName="ThreadX" Type="list" >
         <Description>When enabled ThreadX will use the Base Priority Mask Register</Description>
 		<PossibleValue Comment="Disabled" Value="0"/>
@@ -534,8 +555,8 @@ This is automatically generated by STM32CubeMX under the &lt;b&gt;USE_DYNAMIC_ME
 	<RefParameter Added="true" Comment="TX_PORT_BASEPRI_VALUE" DefaultValue="=TX_BASEPRI_VALUE*16" Min="0" Max="12332315" Group="Core" Name="TX_PORT_BASEPRI_VALUE" TabName="ThreadX" Type="integer" Visible="false">
         <Description></Description>
 		<Condition Diagnostic="" Expression="TX_ENABLE_BASEPRI_SUPPORT"/>
-    </RefParameter> 
-	
+    </RefParameter>
+
 	<RefParameter Added="true" Comment="TX_DISABLE_ERROR_CHECKING" DefaultValue="0" Group="Core" Name="TX_DISABLE_ERROR_CHECKING" TabName="ThreadX" Type="list" >
         <Description>Defined, the basic parameter error checking is disabled.</Description>
 		<PossibleValue Comment="Disabled" Value="0"/>
@@ -554,4 +575,116 @@ This is automatically generated by STM32CubeMX under the &lt;b&gt;USE_DYNAMIC_ME
         <PossibleValue Comment="true" Value="true"/>
 		<Condition Diagnostic="" Expression="(TX_LOW_POWER = 1) &amp; DIE492"/>
     </RefParameter>
+	<RefParameter Added="true" Comment="ThreadX MemPool Name" DefaultValue="tx_app_byte_pool" Group="Memory Configuration" Name="THREADX_MEM_POOL_VAR_NAME" TabName="ThreadX" Type="stringRW">
+		<Description>Default ThreadX memory pool var name.&lt;br&gt; &lt;font color=&quot;red&quot;&gt; &lt;b&gt;This is a variable name. It should be C compliant declaration, Otherwise compilation errors will be generated in the project. &lt;/b&gt; &lt;/font&gt; </Description>
+		<Condition Diagnostic="" Expression="(ThreadX:AZRTOS_APP_MEM_ALLOCATION_METHOD = 1)" />
+	</RefParameter>
+	<RefParameter Added="true" Comment="FileX MemPool Name" DefaultValue="+FileX:FILEX_MEM_POOL_VAR_NAME" Group="Memory Configuration" Name="FILEX_MEM_POOL_VAR_NAME" TabName="ThreadX" Type="string" Visible="false">
+		<Description>Default memory pool size for the FileX application.</Description>
+		<Condition Diagnostic="" Expression="(ThreadX:AZRTOS_APP_MEM_ALLOCATION_METHOD = 1)" />
+	</RefParameter>
+	<RefParameter Added="true" Comment="USBXHost MemPool Name" DefaultValue="+USBX:USBX_HOST_MEM_POOL_VAR_NAME" Group="Memory Configuration" Name="USBX_HOST_MEM_POOL_VAR_NAME" TabName="ThreadX" Type="string" Visible="false">
+		<Description>Default memory pool size for the USBXHost application.</Description>
+		<Condition Diagnostic="" Expression="(ThreadX:AZRTOS_APP_MEM_ALLOCATION_METHOD = 1)" />
+	</RefParameter>
+	<RefParameter Added="true" Comment="USBXDevice MemPool Name" DefaultValue="+USBX:USBX_DEVICE_MEM_POOL_VAR_NAME" Group="Memory Configuration" Name="USBX_DEVICE_MEM_POOL_VAR_NAME" TabName="ThreadX" Type="string" Visible="false">
+		<Description>Default memory pool size for the USBXDevice application.</Description>
+		<Condition Diagnostic="" Expression="(ThreadX:AZRTOS_APP_MEM_ALLOCATION_METHOD = 1)" />
+	</RefParameter>
+	<RefParameter Added="true" Comment="NetXDuo MemPool Name" DefaultValue="+NetXDuo:NETXDUO_MEM_POOL_VAR_NAME" Group="Memory Configuration" Name="NETXDUO_MEM_POOL_VAR_NAME" TabName="ThreadX" Type="string" Visible="false">
+		<Description>Default memory pool size for the USBXDevice application.</Description>
+		<Condition Diagnostic="" Expression="(ThreadX:AZRTOS_APP_MEM_ALLOCATION_METHOD = 1)" />
+	</RefParameter>
+	<RefParameter Added="true" Comment="Generate App Init Code" DefaultValue="false" Group="ThreadX App Init" Name="TX_APP_GENERATE_INIT_CODE" TabName="ThreadX" Type="boolean">
+        <Description>Giving the access to generate the following application code:&lt;br&gt;
+        &lt;li&gt;Create ThreadX Application Thread.&lt;/li&gt;&lt;br&gt;
+        &lt;li&gt;Create ThreadX Application Semaphore.&lt;/li&gt;&lt;br&gt;
+        &lt;li&gt;Create ThreadX Application Mutex.&lt;/li&gt;&lt;br&gt;
+        &lt;li&gt;Create ThreadX Application MessageQueue.&lt;/li&gt;&lt;br&gt;</Description>
+		<Condition Diagnostic="" Expression="AZRTOS_APP_MEM_ALLOCATION_METHOD=1"/>
+        <PossibleValue Comment="true" Value="true"/>
+        <PossibleValue Comment="false" Value="false"/>
+    </RefParameter>
+    <RefParameter Added="true" Comment="Create ThreadX Application Thread" DefaultValue="0" Group="ThreadX App Init" Max="N/A" Min="N/A" Name="TX_APP_CREATION" TabName="ThreadX" Type="list">
+        <Description>Enable the allocation and creation of the thread.</Description>
+		<PossibleValue Comment="false" Value="0"/>
+        <PossibleValue Comment="true" Value="1"/>
+		<Condition Diagnostic="" Expression="(TX_APP_GENERATE_INIT_CODE = true) &amp;  (AZRTOS_APP_MEM_ALLOCATION_METHOD=1)"/>
+    </RefParameter>
+    <RefParameter Added="true" Comment="ThreadX Application Thread Entry" DefaultValue="tx_app_thread_entry" Group="ThreadX App Init"  Name="TX_APP_THREAD_ENTRY" TabName="ThreadX" Type="stringRW">
+        <Description>Main thread entry function Name.</Description>
+		<Condition Diagnostic="" Expression="(TX_APP_GENERATE_INIT_CODE= true) &amp;  (AZRTOS_APP_MEM_ALLOCATION_METHOD=1) &amp;  (TX_APP_CREATION = 1) "/>
+    </RefParameter>
+    <RefParameter Added="true" Comment="ThreadX Application Thread Name" DefaultValue="tx app thread" Group="ThreadX App Init"  Name="TX_APP_THREAD_NAME" TabName="ThreadX" Type="stringRW">
+		<Description>ThreadX Application thread Name.&lt;br&gt;
+         ThreadX Application Thread Name should not be empty.</Description>
+		<Condition Diagnostic="" Expression="(TX_APP_GENERATE_INIT_CODE= true) &amp; (TX_APP_CREATION = 1) &amp;  (AZRTOS_APP_MEM_ALLOCATION_METHOD=1)"/>
+    </RefParameter>
+    <RefParameter Added="true" Comment="ThreadX Application Thread Priority" DefaultValue="10" Group="ThreadX App Init" Max="1024" Min="0" Name="TX_APP_THREAD_PRIO" TabName="ThreadX" Type="integer">
+	    <Description>Default ThreadX Application Thread Priority value for ThreadX application.&lt;br&gt;
+       ThreadX Application Thread Priority must be between 0 and TX_MAX_PRIORITIES.</Description>
+	  <Condition Diagnostic="" Expression="(TX_APP_GENERATE_INIT_CODE= true) &amp; (TX_APP_CREATION = 1) &amp;  (AZRTOS_APP_MEM_ALLOCATION_METHOD=1)"/>
+    </RefParameter>
+    <RefParameter Added="true" Comment="ThreadX Application Thread Stack Size" DefaultValue="512" Group="ThreadX App Init" Max="=TX_APP_MEM_POOL_SIZE" Min="512" Name="TX_APP_STACK_SIZE" TabName="ThreadX" Type="integer">
+        <Description>Default thread stack size value for ThreadX application.</Description>
+	    <Condition Diagnostic="" Expression="(TX_APP_GENERATE_INIT_CODE= true) &amp; (TX_APP_CREATION = 1) &amp;  (AZRTOS_APP_MEM_ALLOCATION_METHOD=1)"/>
+		 <ValueCondition Diagnostic="Stack size should not exceed total application mem pool size" Expression="Value&lt;= TX_APP_MEM_POOL_SIZE"/>
+    </RefParameter>
+    <RefParameter Added="true" Comment="Create ThreadX Application Semaphore" DefaultValue="0" Group="ThreadX App Init"  Name="TX_APP_SEM_CREATION" TabName="ThreadX" Type="list">
+        <Description>Generate application code to initialize the ThreadX App Semaphore.</Description>
+		<PossibleValue Comment="false" Value="0"/>
+        <PossibleValue Comment="true" Value="1"/>
+		<Condition Diagnostic="" Expression="(TX_APP_GENERATE_INIT_CODE= true) &amp;  (AZRTOS_APP_MEM_ALLOCATION_METHOD=1)"/>
+    </RefParameter>
+    <RefParameter Added="true" Comment="ThreadX Application Semaphore Name" DefaultValue="tx app semaphore" Group="ThreadX App Init" Name="TX_SEMAPHORE_NAME" TabName="ThreadX" Type="stringRW" >
+		<Description>ThreadX Application Semaphore Name.&lt;br&gt;
+         ThreadX Application Semaphore Name should not be empty.</Description>
+		<Condition Diagnostic="" Expression="(TX_APP_GENERATE_INIT_CODE= true) &amp; (TX_APP_SEM_CREATION = 1) &amp;  (AZRTOS_APP_MEM_ALLOCATION_METHOD=1)"/>
+    </RefParameter>
+    <RefParameter Added="true" Comment="ThreadX Application Semaphore Init Count" DefaultValue="0" Group="ThreadX App Init" Max="1024" Min="0" Name="TX_SEMAPHORE_COUNT" TabName="ThreadX" Type="integer" >
+		<Description>Initial value for counting semaphores.</Description>
+		<Condition Diagnostic="" Expression="(TX_APP_GENERATE_INIT_CODE= true) &amp; (TX_APP_SEM_CREATION = 1) &amp;  (AZRTOS_APP_MEM_ALLOCATION_METHOD=1)"/>
+    </RefParameter>
+    <RefParameter Added="true" Comment="Create ThreadX Application Mutex" DefaultValue="0" Group="ThreadX App Init"  Name="TX_APP_MUTEX_CREATION" TabName="ThreadX" Type="list">
+        <Description>  Generate application code to initialize the ThreadX App Mutex.</Description>
+		<PossibleValue Comment="false" Value="0"/>
+        <PossibleValue Comment="true" Value="1"/>
+		<Condition Diagnostic="" Expression="(TX_APP_GENERATE_INIT_CODE= true) &amp;  (AZRTOS_APP_MEM_ALLOCATION_METHOD=1)"/>
+    </RefParameter>
+    <RefParameter Added="true" Comment="ThreadX Application Mutex Name" DefaultValue="tx app mutex" Group="ThreadX App Init" Name="TX_MUTEX_NAME" TabName="ThreadX" Type="stringRW" >
+		<Description>ThreadX Application Mutex Name.&lt;br&gt;
+        ThreadX Application Mutex Name should not be empty.</Description>
+		<Condition Diagnostic="" Expression="(TX_APP_GENERATE_INIT_CODE= true) &amp; (TX_APP_MUTEX_CREATION = 1) &amp;  (AZRTOS_APP_MEM_ALLOCATION_METHOD=1)"/>
+    </RefParameter>
+    <RefParameter Added="true" Comment="ThreadX Application Mutex Inheritance Support" DefaultValue="TX_NO_INHERIT" Group="ThreadX App Init" Name="TX_MUTEX_INHERITANCE" TabName="ThreadX" Type="list" >
+		<Description>Enable priority inheritance feature: TX_NO_INHERIT / TX_INHERIT Specifies whether or not this mutex supports priority inheritance.&lt;br&gt;
+         If this value is TX_INHERIT, then priority inheritance is supported. &lt;br&gt;
+        However, if TX_NO_INHERIT is specified, priority inheritance is not supported by this mutex.</Description>
+        <PossibleValue Comment="TX_NO_INHERIT" Value="TX_NO_INHERIT"/>
+        <PossibleValue Comment="TX_INHERIT" Value="TX_INHERIT"/>
+		<Condition Diagnostic="" Expression="(TX_APP_GENERATE_INIT_CODE= true) &amp; (TX_APP_MUTEX_CREATION = 1) &amp;  (AZRTOS_APP_MEM_ALLOCATION_METHOD=1)"/>
+    </RefParameter>
+    <RefParameter Added="true" Comment="Create ThreadX Application MessageQueue" DefaultValue="0" Group="ThreadX App Init"  Name="TX_APP_MSG_QUEUE_CREATION" TabName="ThreadX" Type="list">
+        <Description>Generate application code to initialize the ThreadX App MessageQueue.</Description>
+		<PossibleValue Comment="false" Value="0"/>
+        <PossibleValue Comment="true" Value="1"/>
+		<Condition Diagnostic="" Expression="(TX_APP_GENERATE_INIT_CODE= true) &amp;  (AZRTOS_APP_MEM_ALLOCATION_METHOD=1)"/>
+    </RefParameter>
+    <RefParameter Added="true" Comment="ThreadX Application Queue Name" DefaultValue="tx app queue" Group="ThreadX App Init" Name="TX_MSG_QUEUE_NAME" TabName="ThreadX" Type="stringRW" >
+		<Description>  ThreadX Application MessageQueue Name.&lt;br&gt;
+        ThreadX Application Queue Name should not be empty.</Description>
+		<Condition Diagnostic="" Expression="(TX_APP_GENERATE_INIT_CODE= true) &amp; (TX_APP_MSG_QUEUE_CREATION = 1) &amp;  (AZRTOS_APP_MEM_ALLOCATION_METHOD=1)"/>
+    </RefParameter>
+    <RefParameter Added="true" Comment="ThreadX Application Queue Message Size in words" DefaultValue="1" Group="ThreadX App Init" Max="16" Min="1" Name="TX_MSG_SIZE_WORDS" TabName="ThreadX" Type="integer" >
+		<Description>The size of a single message in words. </Description>
+		<Condition Diagnostic="" Expression="(TX_APP_GENERATE_INIT_CODE= true) &amp; (TX_APP_MSG_QUEUE_CREATION = 1) &amp;  (AZRTOS_APP_MEM_ALLOCATION_METHOD=1)"/>
+    </RefParameter>
+	<RefParameter Added="true" Comment="ThreadX Application Number of Messages" DefaultValue="1" Group="ThreadX App Init" Max="512" Min="1" Name="TX_NB_MSG" TabName="ThreadX" Type="integer" >
+		<Description>  The total number of messages in a Queue. </Description>
+		<Condition Diagnostic="" Expression="(TX_APP_GENERATE_INIT_CODE= true) &amp; (TX_APP_MSG_QUEUE_CREATION = 1) &amp;  (AZRTOS_APP_MEM_ALLOCATION_METHOD=1)"/>
+    </RefParameter>
+
+
+	<RefParameter Visible="false" Comment="CORTEX_CLOCK_SELECTION" Name="CORTEX_CLOCK_SELECTION" Type="string" DefaultValue="+RCC:CortexCLockSelection" TabName="ThreadX" Group="Core"/>
+	<RefParameter Visible="false" Comment="CORTEX_CLOCK_FREQ" Name="CORTEX_CLOCK_FREQ" Type="double" DefaultValue="+RCC:CortexFreq_Value" TabName="ThreadX" Group="Core"/>
 </IP>

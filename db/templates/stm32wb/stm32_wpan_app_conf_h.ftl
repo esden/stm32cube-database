@@ -21,7 +21,9 @@
 [#assign CUSTOM_P2P_ROUTER = 0]
 [#assign CUSTOM_P2P_SERVER = 0]
 [#assign CUSTOM_TEMPLATE = 0]
+[#assign SEQUENCER_STATUS = 0]
 [#assign FREERTOS_STATUS = 0]
+[#assign THREADX_STATUS = 0]
 [#assign RFWKPCLKSOURCE = ""]
 [#assign CFG_USB_INTERFACE_ENABLE_VALUE = 0]
 [#assign THREAD = 0]
@@ -117,6 +119,14 @@
 [#assign CFG_LPM_STANDBY_SUPPORTED = 0]
 [#assign DIE = DIE]
 [#assign Line = Line]
+[#assign myHash = {}]
+[#list SWIPdatas as SWIP]
+    [#if SWIP.defines??]
+        [#list SWIP.defines as definition]
+            [#assign myHash = {definition.name:definition.value} + myHash]
+        [/#list]
+    [/#if]
+[/#list]
 [#--
 [#list SWIPdatas as SWIP]
     [#if SWIP.defines??]
@@ -166,8 +176,14 @@
                 [#assign CFG_USB_INTERFACE_ENABLE = 1]
                 [#assign CFG_USB_INTERFACE_ENABLE_VALUE = 1]
             [/#if]
-            [#if (definition.name == "FREERTOS_STATUS") && (definition.value == "1")]
+            [#if FREERTOS??]
                 [#assign FREERTOS_STATUS = 1]
+            [/#if]
+            [#if THREADX??]
+                [#assign THREADX_STATUS = 1]
+            [/#if]
+            [#if !(THREADX?? || FREERTOS??)]
+                [#assign SEQUENCER_STATUS = 1]
             [/#if]
             [#if definition.name == "RFWKPCLKSOURCE"]
                 [#assign RFWKPCLKSOURCE = definition.value]
@@ -1563,7 +1579,7 @@ typedef enum
 
 /* USER CODE END Defines */
 
-[#if (FREERTOS_STATUS = 0)]
+[#if (SEQUENCER_STATUS = 1)]
 /******************************************************************************
  * Scheduler
  ******************************************************************************/
@@ -1724,6 +1740,10 @@ typedef enum
   CFG_TASK_ZIGBEE_NETWORK_FORM,
 [/#if]
   CFG_TASK_SYSTEM_HCI_ASYNCH_EVT,
+[#if (THREAD = 1)]
+  CFG_TASK_TRACE,
+  CFG_TASK_AMM_BCKGND,
+[/#if]  
 #if (CFG_USB_INTERFACE_ENABLE != 0)
   CFG_TASK_VCP_SEND_DATA,
 #endif /* (CFG_USB_INTERFACE_ENABLE != 0) */
@@ -1756,6 +1776,9 @@ typedef enum
   /* USER CODE BEGIN CFG_SCH_Prio_Id_t */
 
   /* USER CODE END CFG_SCH_Prio_Id_t */
+[#if ZIGBEE == 1]
+  CFG_SCH_PRIO_NBR  /**< Shall be last in the list */
+[/#if]
 } CFG_SCH_Prio_Id_t;
 
 /**
@@ -1784,7 +1807,8 @@ typedef enum
 /* USER CODE END DEFINE_EVENT */
 
 [/#if]
-[#else]
+[/#if]
+[#if (FREERTOS_STATUS = 1)]
 /******************************************************************************
  * FreeRTOS
  ******************************************************************************/
@@ -1847,6 +1871,19 @@ typedef enum
 
 /* USER CODE END FreeRTOS_Defines */
 [/#if]
+[#if (THREADX_STATUS = 1)]
+/******************************************************************************
+ * THREADX
+ ******************************************************************************/
+/* USER CODE BEGIN THREADX */
+
+/* USER CODE END THREADX */
+
+
+/* USER CODE BEGIN THREADX_Defines */
+
+/* USER CODE END THREADX_Defines */
+[/#if]
 
 /******************************************************************************
  * LOW POWER
@@ -1877,5 +1914,27 @@ typedef enum
 
 #define CFG_OTP_END_ADRESS      OTP_AREA_END_ADDR
 
+[#if (THREAD = 1)]
+/******************************************************************************
+ * MEMORY MANAGER
+ ******************************************************************************/
+#define CFG_MM_POOL_SIZE				(${myHash["CFG_MM_POOL_SIZE"]}U)
+#define CFG_AMM_VIRTUAL_MEMORY_NUMBER			(${myHash["CFG_AMM_VIRTUAL_MEMORY_NUMBER"]}U)
+[#if myHash["CFG_AMM_VIRTUAL_MEMORY_NUMBER"] != "0"]
+[#assign i = 0]
+[#list 1..(myHash["CFG_AMM_VIRTUAL_MEMORY_NUMBER"]?number) as i]
+#define CFG_AMM_VIRTUAL_${myHash["CFG_AMM_VIRTUAL_ID_NAME_"+i?string]}                    	(${myHash["CFG_AMM_VIRTUAL_ID_NBR_"+i?string]}U)
+#define CFG_AMM_VIRTUAL_${myHash["CFG_AMM_VIRTUAL_ID_NAME_"+i?string]}_BUFFER_SIZE        	(${myHash["CFG_AMM_VIRTUAL_BUFFER_SIZE_"+i?string]}U)
+[/#list]
+[/#if]
+#define CFG_AMM_POOL_SIZE                           	(CFG_MM_POOL_SIZE / sizeof (uint32_t)) \
+							+ (AMM_VIRTUAL_INFO_ELEMENT_SIZE * CFG_AMM_VIRTUAL_MEMORY_NUMBER)
+
+[#if (myHash["CFG_MM_POOL_SIZE"] == "0") && (myHash["CFG_AMM_VIRTUAL_MEMORY_NUMBER"] == "0")]
+#define CFG_AMM_ENABLED                             	(0U)
+[#else]
+#define CFG_AMM_ENABLED                             	(1U)
+[/#if]
+[/#if]
 #endif /*APP_CONF_H */
 

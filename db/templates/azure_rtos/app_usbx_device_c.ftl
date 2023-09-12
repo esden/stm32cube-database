@@ -201,7 +201,7 @@ extern USHORT USBD_MTP_ObjectPropSupported[];
 [#if REG_UX_DEVICE_THREAD_value  == "1"]
 static VOID ${USBX_DEVICE_APP_THREAD_NAME_value}(ULONG thread_input);
 [/#if]
-[#if REG_USBX_DEVICE_CON_CK_value == "1"]
+[#if (REG_USBX_DEVICE_CON_CK_value == "1") && (REG_UX_DEVICE_CORE_value  == "true") && (USBX_DEVICE_CLASS_NB != 0)]
 static UINT USBD_ChangeFunction(ULONG Device_State);
 [/#if]
 /* USER CODE BEGIN PFP */
@@ -757,7 +757,7 @@ static VOID ${USBX_DEVICE_APP_THREAD_NAME_value}(ULONG thread_input)
 }
 [/#if]
 
-[#if REG_USBX_DEVICE_CON_CK_value  == "1"]
+[#if (REG_USBX_DEVICE_CON_CK_value  == "1") && (REG_UX_DEVICE_CORE_value  == "true") && (USBX_DEVICE_CLASS_NB != 0)]
 /**
   * @brief  USBD_ChangeFunction
   *         This function is called when the device state changes.

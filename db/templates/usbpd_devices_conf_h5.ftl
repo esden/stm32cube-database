@@ -245,7 +245,7 @@ extern "C" {
 #define UCPDFRS_INSTANCE0_FRSCC1  do{                                                                   \
                                      LL_AHB2_GRP1_EnableClock(LL_AHB2_GRP1_PERIPH_GPIO${USBPD_PORT0_FRSTX1_GPIO_PORT});                \
                                      LL_GPIO_SetPinMode(GPIO${USBPD_PORT0_FRSTX1_GPIO_PORT}, LL_GPIO_PIN_${USBPD_PORT0_FRSTX1_GPIO_PIN}, LL_GPIO_MODE_ALTERNATE); \
-                                     [#if USBPD_PORT0_FRSTX2_GPIO_PIN?number < 8]LL_GPIO_SetAFPin_0_7[#else]LL_GPIO_SetAFPin_8_15[/#if](GPIO${USBPD_PORT0_FRSTX1_GPIO_PORT}, LL_GPIO_PIN_${USBPD_PORT0_FRSTX1_GPIO_PIN}, LL_GPIO_AF_${USBPD_PORT0_FRSTX1_SELECT_AF});         \
+                                     [#if USBPD_PORT0_FRSTX1_GPIO_PIN?number < 8]LL_GPIO_SetAFPin_0_7[#else]LL_GPIO_SetAFPin_8_15[/#if](GPIO${USBPD_PORT0_FRSTX1_GPIO_PORT}, LL_GPIO_PIN_${USBPD_PORT0_FRSTX1_GPIO_PIN}, LL_GPIO_AF_${USBPD_PORT0_FRSTX1_SELECT_AF});         \
                                    } while(0)
 [#else]
 #define UCPDFRS_INSTANCE0_FRSCC1

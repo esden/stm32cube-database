@@ -50,7 +50,6 @@
         <Description>Default memory pool size for the STM32_WPAN application.</Description>
     </RefParameter>
 
-
     <RefParameter Name="SEQUENCER_STATUS" Comment="Sequencer " DefaultValue="1" Type="UniqueElementList" Group="Application configuration - Project IP's Configuration" TabName="Configuration" Visible="false">
         <Description></Description>
         <Condition Diagnostic="" Expression="S_SEQUENCER"/>
@@ -112,7 +111,7 @@
     </RefParameter>
     <RefParameter Name="BLE_MODE_PERIPHERAL_CENTRAL" Comment="Custom P2P Router" DefaultValue="Disabled" Type="string" Group="BLE Services Configuration" TabName="BLE Applications and Services" Visible="false">
     </RefParameter>
-    
+
     <!-- App.conf - Begin -->
 
     <RefParameter Name="USER_GUIDANCE" Comment="Application configuration recommendations" DefaultValue="!! Please read carefully Information panel below!!" Type="String" Group="Application configuration - Project IP's Configuration" TabName="Configuration" Visible="true">
@@ -170,45 +169,161 @@
     <RefParameter Name="CFG_TX_POWER" Comment="CFG_TX_POWER" DefaultValue="" Type="string" TabName="Configuration" Group="Application configuration - Application parameters" Visible="false">
         <Description> </Description>
     </RefParameter>
+    
+    <RefParameter Name="CFG_GAP_DEVICE_NAME" Comment="CFG_GAP_DEVICE_NAME" DefaultValue="STM32WBA" Type="stringRW" TabName="Configuration" Group="Application configuration - Application parameters">
+        <Description>Device name; default value is TEMPLATE</Description>
+        <Condition Diagnostic="" Expression="(S_BLE_SP | S_BLE_RP)"/>
+    </RefParameter>
+    <RefParameter Name="CFG_GAP_DEVICE_NAME" Comment="CFG_GAP_DEVICE_NAME" DefaultValue="STM32WBA" Type="string" TabName="Configuration" Group="Application configuration - Application parameters" Visible="false">
+        <Description></Description>
+    </RefParameter>
+    
+    <RefParameter Name="CFG_GAP_DEVICE_NAME_LENGTH" Comment="CFG_GAP_DEVICE_NAME_LENGTH" DefaultValue="8" Type="integerReadOnly" Min = "1" Max = "48" TabName="Configuration" Group="Application configuration - Application parameters">
+        <Description>Device name lenght; max value is 48bytes, default value is 8 (TEMPLATE length)</Description>
+        <Condition Diagnostic="" Expression="(S_BLE_SP | S_BLE_RP)"/>
+    </RefParameter>
+    <RefParameter Name="CFG_GAP_DEVICE_NAME_LENGTH" Comment="CFG_GAP_DEVICE_NAME_LENGTH" DefaultValue="8" Type="integerReadOnly" Min = "8" Max = "8" TabName="Configuration" Group="Application configuration - Application parameters" Visible="false">
+        <Description></Description>
+    </RefParameter>
 
-    <RefParameter Name="CFG_ADV_BD_ADDRESS" Comment="CFG_ADV_BD_ADDRESS" DefaultValue="0x000000000000" Type="hex" Min="0x000000000000" Max="0xFFFFFFFFFFFF" TabName="Configuration" Group="Application configuration - Application parameters">
-        <Description>ex: 0x7257acd87a6c</Description>
+    <RefParameter Name="CFG_BD_ADDRESS" Comment="CFG_BD_ADDRESS" DefaultValue="0x0008E12A1234" Type="hex" Min="0x000000000000" Max="0xFFFFFFFFFFFF" TabName="Configuration" Group="Application configuration - Application parameters">
+        <Description>e.g. 0x0008E12A1234</Description>
         <Condition Diagnostic="" Expression="(S_BLE_SP | S_BLE_CP | S_BLE_RP)"/>
     </RefParameter>
-    <RefParameter Name="CFG_ADV_BD_ADDRESS" Comment="CFG_ADV_BD_ADDRESS" DefaultValue="0x000000000000" Type="hex" Min="0x000000000000" Max="0xFFFFFFFFFFFF" TabName="Configuration" Group="Application configuration - Application parameters" Visible="false">
-        <Description>ex: 0x7257acd87a6c</Description>
+    <RefParameter Name="CFG_BD_ADDRESS" Comment="CFG_BD_ADDRESS" DefaultValue="0x0008E12A1234" Type="hex" Min="0x000000000000" Max="0xFFFFFFFFFFFF" TabName="Configuration" Group="Application configuration - Application parameters" Visible="false">
+        <Description>e.g. 0x0008E12A1234</Description>
+    </RefParameter>
+    
+    <RefParameter Name="CFG_BD_ADDRESS_TYPE" Comment="Address Type" DefaultValue="GAP_PUBLIC_ADDR" Type="list" TabName="Configuration" Group="Application configuration - Application parameters">
+        <Condition Diagnostic="" Expression="(S_BLE_SP | S_BLE_CP | S_BLE_RP)"/>
+        <Description>List of advertising types, can be:
+        &lt;br&gt; - Public address(PUBLIC_ADDR 0)
+        &lt;br&gt; - Random address (RANDOM_ADDR 1); if you activate RNG then you will get the choice between STATIC and DYNAMIC Random address
+        &lt;br&gt; - Resolvable private address (RESOLVABLE_PRIVATE_ADDR 2)
+        &lt;br&gt; - Non resolvable private address(NON_RESOLVABLE_PRIVATE_ADDR 3)</Description>
+        <PossibleValue Value="GAP_PUBLIC_ADDR" Comment="Public address(0)"/>
+        <PossibleValue Value="GAP_STATIC_RANDOM_ADDR" Comment="Random address(1)" Semaphore="Semaphore_RANDOM_ADDR"/>
+        <PossibleValue Value="GAP_RESOLVABLE_PRIVATE_ADDR" Comment="Resolvable private address(2)"/>
+        <PossibleValue Value="GAP_NON_RESOLVABLE_PRIVATE_ADDR" Comment="Non resolvable private address(3)"/>
+    </RefParameter>
+    <RefParameter Name="CFG_BD_ADDRESS_TYPE" Comment="CFG_BD_ADDRESS_TYPE" DefaultValue="GAP_PUBLIC_ADDR" Type="list" TabName="Configuration" Group="Application configuration - Application parameters" Visible="false">
+        <Description>List of advertising types, can be:
+        &lt;br&gt; - Public address(PUBLIC_ADDR 0)
+        &lt;br&gt; - Random address (RANDOM_ADDR 1); if you activate RNG then you will get the choice between STATIC and DYNAMIC Random address
+        &lt;br&gt; - Resolvable private address (RESOLVABLE_PRIVATE_ADDR 2)
+        &lt;br&gt; - Non resolvable private address(NON_RESOLVABLE_PRIVATE_ADDR 3)</Description>
+        <PossibleValue Value="GAP_PUBLIC_ADDR" Comment="Public address(0)"/>
+        <PossibleValue Value="GAP_STATIC_RANDOM_ADDR" Comment="Random address(1)"/>
+        <PossibleValue Value="GAP_RESOLVABLE_PRIVATE_ADDR" Comment="Resolvable private address(2)"/>
+        <PossibleValue Value="GAP_NON_RESOLVABLE_PRIVATE_ADDR" Comment="Non resolvable private address(3)"/>
     </RefParameter>
 
-    <RefParameter Name="ADV_INTERVAL_MIN" Comment="ADV_INTERVAL_MIN" DefaultValue="80" Type="integer" Min="20" Max="10240" TabName="BLE Advertising" Group="Advertising configuration">
-        <Description> Shall be &amp;gt 20ms and &amp;lt 10240ms</Description>
-        <Condition Diagnostic="" Expression="(S_BLE_SP | S_BLE_RP)"/>
+    <RefParameter Name="CFG_GAP_APPEARANCE" Comment="CFG_GAP_APPEARANCE" DefaultValue="GAP_APPEARANCE_UNKNOWN" Type="list" TabName="Configuration" Group="Application configuration - Application parameters">
+        <Condition Diagnostic="" Expression="(S_BLE_SP | S_BLE_CP | S_BLE_RP)"/>
+        <Description>GAP appearance selection</Description>
+        <PossibleValue Value="GAP_APPEARANCE_UNKNOWN" Comment="GAP_APPEARANCE_UNKNOWN"/>
+        <PossibleValue Value="GAP_APPEARANCE_GENERIC_PHONE" Comment="GAP_APPEARANCE_GENERIC_PHONE"/>
+        <PossibleValue Value="GAP_APPEARANCE_GENERIC_COMPUTER" Comment="GAP_APPEARANCE_GENERIC_COMPUTER"/>
+        <PossibleValue Value="GAP_APPEARANCE_GENERIC_WATCH" Comment="GAP_APPEARANCE_GENERIC_WATCH"/>
+        <PossibleValue Value="GAP_APPEARANCE_WATCH_SPORT_WATCH" Comment="GAP_APPEARANCE_WATCH_SPORT_WATCH"/>
+        <PossibleValue Value="GAP_APPEARANCE_GENERIC_CLOCK" Comment="GAP_APPEARANCE_GENERIC_CLOCK"/>
+        <PossibleValue Value="GAP_APPEARANCE_GENERIC_DISPLAY" Comment="GAP_APPEARANCE_GENERIC_DISPLAY"/>
+        <PossibleValue Value="GAP_APPEARANCE_GENERIC_REMOTE_CONTROL" Comment="GAP_APPEARANCE_GENERIC_REMOTE_CONTROL"/>
+        <PossibleValue Value="GAP_APPEARANCE_GENERIC_EYE_GLASSES" Comment="GAP_APPEARANCE_GENERIC_EYE_GLASSES"/>
+        <PossibleValue Value="GAP_APPEARANCE_GENERIC_TAG" Comment="GAP_APPEARANCE_GENERIC_TAG"/>
+        <PossibleValue Value="GAP_APPEARANCE_GENERIC_KEYRING" Comment="GAP_APPEARANCE_GENERIC_KEYRING"/>
+        <PossibleValue Value="GAP_APPEARANCE_GENERIC_MEDIA_PLAYER" Comment="GAP_APPEARANCE_GENERIC_MEDIA_PLAYER"/>
+        <PossibleValue Value="GAP_APPEARANCE_GENERIC_BARCODE_SCANNER" Comment="GAP_APPEARANCE_GENERIC_BARCODE_SCANNER"/>
+        <PossibleValue Value="GAP_APPEARANCE_GENERIC_THERMOMETER" Comment="GAP_APPEARANCE_GENERIC_THERMOMETER"/>
+        <PossibleValue Value="GAP_APPEARANCE_THERMOMETER_EAR" Comment="GAP_APPEARANCE_THERMOMETER_EAR"/>
+        <PossibleValue Value="GAP_APPEARANCE_GENERIC_HEART_RATE_SENSOR" Comment="GAP_APPEARANCE_GENERIC_HEART_RATE_SENSOR"/>
+        <PossibleValue Value="GAP_APPEARANCE_HEART_RATE_SENSOR_HEART_RATE_BELT" Comment="GAP_APPEARANCE_HEART_RATE_SENSOR_HEART_RATE_BELT"/>
+        <PossibleValue Value="GAP_APPEARANCE_GENERIC_BLOOD_PRESSURE" Comment="GAP_APPEARANCE_GENERIC_BLOOD_PRESSURE"/>
+        <PossibleValue Value="GAP_APPEARANCE_BLOOD_PRESSURE_ARM" Comment="GAP_APPEARANCE_BLOOD_PRESSURE_ARM"/>
+        <PossibleValue Value="GAP_APPEARANCE_BLOOD_PRESSURE_WRIST" Comment="GAP_APPEARANCE_BLOOD_PRESSURE_WRIST"/>
+        <PossibleValue Value="GAP_APPEARANCE_HUMAN_INTERFACE_DEVICE" Comment="GAP_APPEARANCE_HUMAN_INTERFACE_DEVICE"/>
+        <PossibleValue Value="GAP_APPEARANCE_KEYBOARD" Comment="GAP_APPEARANCE_KEYBOARD"/>
+        <PossibleValue Value="GAP_APPEARANCE_MOUSE" Comment="GAP_APPEARANCE_MOUSE"/>
+        <PossibleValue Value="GAP_APPEARANCE_JOYSTICK" Comment="GAP_APPEARANCE_JOYSTICK"/>
+        <PossibleValue Value="GAP_APPEARANCE_GAMEPAD" Comment="GAP_APPEARANCE_GAMEPAD"/>
+        <PossibleValue Value="GAP_APPEARANCE_DIGITIZER_TABLET" Comment="GAP_APPEARANCE_DIGITIZER_TABLET"/>
+        <PossibleValue Value="GAP_APPEARANCE_CARD_READER" Comment="GAP_APPEARANCE_CARD_READER"/>
+        <PossibleValue Value="GAP_APPEARANCE_DIGITAL_PEN" Comment="GAP_APPEARANCE_DIGITAL_PEN"/>
+        <PossibleValue Value="GAP_APPEARANCE_BARCODE_SCANNER" Comment="GAP_APPEARANCE_BARCODE_SCANNER"/>
+        <PossibleValue Value="GAP_APPEARANCE_GENERIC_GLUCOSE_METER" Comment="GAP_APPEARANCE_GENERIC_GLUCOSE_METER"/>
+        <PossibleValue Value="GAP_APPEARANCE_GENERIC_RUNNING_WALKING_SENSOR" Comment="GAP_APPEARANCE_GENERIC_RUNNING_WALKING_SENSOR"/>
+        <PossibleValue Value="GAP_APPEARANCE_RUNNING_WALKING_IN_SHOE" Comment="GAP_APPEARANCE_RUNNING_WALKING_IN_SHOE"/>
+        <PossibleValue Value="GAP_APPEARANCE_RUNNING_WALKING_ON_SHOE" Comment="GAP_APPEARANCE_RUNNING_WALKING_ON_SHOE"/>
+        <PossibleValue Value="GAP_APPEARANCE_RUNNING_WALKING_ON_HIP" Comment="GAP_APPEARANCE_RUNNING_WALKING_ON_HIP"/>
+        <PossibleValue Value="GAP_APPEARANCE_GENERIC_CYCLING" Comment="GAP_APPEARANCE_GENERIC_CYCLING"/>
+        <PossibleValue Value="GAP_APPEARANCE_CYCLING_CYCLING_COMPUTER" Comment="GAP_APPEARANCE_CYCLING_CYCLING_COMPUTER"/>
+        <PossibleValue Value="GAP_APPEARANCE_CYCLING_SPEED_SENSOR" Comment="GAP_APPEARANCE_CYCLING_SPEED_SENSOR"/>
+        <PossibleValue Value="GAP_APPEARANCE_CYCLING_CADENCE_SENSOR" Comment="GAP_APPEARANCE_CYCLING_CADENCE_SENSOR"/>
+        <PossibleValue Value="GAP_APPEARANCE_CYCLING_POWER_SENSOR" Comment="GAP_APPEARANCE_CYCLING_POWER_SENSOR"/>
+        <PossibleValue Value="GAP_APPEARANCE_CYCLING_SPEED_AND_CADENCE_SENSOR" Comment="GAP_APPEARANCE_CYCLING_SPEED_AND_CADENCE_SENSOR"/>
+        <PossibleValue Value="GAP_APPEARANCE_GENERIC_PULSE_OXYMETER" Comment="GAP_APPEARANCE_GENERIC_PULSE_OXYMETER"/>
+        <PossibleValue Value="GAP_APPEARANCE_FINGERTIP" Comment="GAP_APPEARANCE_FINGERTIP"/>
+        <PossibleValue Value="GAP_APPEARANCE_WRIST_WORN" Comment="GAP_APPEARANCE_WRIST_WORN"/>
+        <PossibleValue Value="GAP_APPEARANCE_GENERIC_WEIGHT_SCALE" Comment="GAP_APPEARANCE_GENERIC_WEIGHT_SCALE"/>
+        <PossibleValue Value="GAP_APPEARANCE_GENERIC_OUTDOOR_SPORT_ACTIVITY" Comment="GAP_APPEARANCE_GENERIC_OUTDOOR_SPORT_ACTIVITY"/>
+        <PossibleValue Value="GAP_APPEARANCE_LOCATION_DISPLAY_DEVICE" Comment="GAP_APPEARANCE_LOCATION_DISPLAY_DEVICE"/>
+        <PossibleValue Value="GAP_APPEARANCE_LOCATION_AND_NAVIGATION_DISPLAY_DEVICE" Comment="GAP_APPEARANCE_LOCATION_AND_NAVIGATION_DISPLAY_DEVICE"/>
+        <PossibleValue Value="GAP_APPEARANCE_LOCATION_POD" Comment="GAP_APPEARANCE_LOCATION_POD"/>
+        <PossibleValue Value="GAP_APPEARANCE_LOCATION_AND_NAVIGATION_POD" Comment="GAP_APPEARANCE_LOCATION_AND_NAVIGATION_POD"/>
+        <PossibleValue Value="GAP_APPEARANCE_GENERIC_ENVIRONMENTAL_SENSOR" Comment="GAP_APPEARANCE_GENERIC_ENVIRONMENTAL_SENSOR"/>
     </RefParameter>
-    <RefParameter Name="ADV_INTERVAL_MIN" Comment="ADV_INTERVAL_MIN" DefaultValue="0" Type="string" TabName="BLE Advertising" Group="Advertising configuration" Visible="false">
-        <Description> Shall be &amp;lt 80ms</Description>
-    </RefParameter>
-
-    <RefParameter Name="ADV_INTERVAL_MIN_HEXA" Comment="ADV_INTERVAL_MIN_HEXA" DefaultValue="0x0080" Type="hex" Min="0x0020" Max="0x4000" TabName="BLE Advertising" Group="Advertising configuration" Visible="false">
-        <Description> Shall be &amp;lt 80ms</Description>
-        <Condition Diagnostic="" Expression="(S_BLE_SP | S_BLE_RP)"/>
-    </RefParameter>
-    <RefParameter Name="ADV_INTERVAL_MIN_HEXA" Comment="ADV_INTERVAL_MIN_HEXA" DefaultValue="0" Type="string" TabName="BLE Advertising" Group="Advertising configuration" Visible="false">
-        <Description> Shall be &lt; 80ms</Description>
-    </RefParameter>
-
-    <RefParameter Name="ADV_INTERVAL_MAX" Comment="ADV_INTERVAL_MAX" DefaultValue="100" Type="integer" Min="20" Max="10240" TabName="BLE Advertising" Group="Advertising configuration">
-        <Description> Shall be &amp;gt 20ms and &amp;lt 10240ms</Description>
-        <Condition Diagnostic="" Expression="(S_BLE_SP | S_BLE_RP)"/>
-    </RefParameter>
-    <RefParameter Name="ADV_INTERVAL_MAX" Comment="ADV_INTERVAL_MAX" DefaultValue="0" Type="string" TabName="BLE Advertising" Group="Advertising configuration" Visible="false">
-        <Description> Shall be &amp;lt 100ms</Description>
-    </RefParameter>
-
-    <RefParameter Name="ADV_INTERVAL_MAX_HEXA" Comment="ADV_INTERVAL_MAX_HEXA" DefaultValue="0x00A0" Type="hex" Min="0x0020" Max="0x4000" TabName="BLE Advertising" Group="Advertising configuration" Visible="false">
-        <Description> Shall be &amp;lt 100ms</Description>
-        <Condition Diagnostic="" Expression="(S_BLE_SP | S_BLE_RP)"/>
-    </RefParameter>
-    <RefParameter Name="ADV_INTERVAL_MAX_HEXA" Comment="ADV_INTERVAL_MAX_HEXA" DefaultValue="0" Type="string" TabName="BLE Advertising" Group="Advertising configuration" Visible="false">
-        <Description> Shall be &amp;lt 100ms</Description>
+    <RefParameter Name="CFG_GAP_APPEARANCE" Comment="CFG_GAP_APPEARANCE" DefaultValue="GAP_APPEARANCE_UNKNOWN" Type="list" TabName="Configuration" Group="Application configuration - Application parameters" Visible="false">
+        <Description>GAP appearance selection</Description>
+        <PossibleValue Value="GAP_APPEARANCE_UNKNOWN" Comment="GAP_APPEARANCE_UNKNOWN"/>
+        <PossibleValue Value="GAP_APPEARANCE_GENERIC_PHONE" Comment="GAP_APPEARANCE_GENERIC_PHONE"/>
+        <PossibleValue Value="GAP_APPEARANCE_GENERIC_COMPUTER" Comment="GAP_APPEARANCE_GENERIC_COMPUTER"/>
+        <PossibleValue Value="GAP_APPEARANCE_GENERIC_WATCH" Comment="GAP_APPEARANCE_GENERIC_WATCH"/>
+        <PossibleValue Value="GAP_APPEARANCE_WATCH_SPORT_WATCH" Comment="GAP_APPEARANCE_WATCH_SPORT_WATCH"/>
+        <PossibleValue Value="GAP_APPEARANCE_GENERIC_CLOCK" Comment="GAP_APPEARANCE_GENERIC_CLOCK"/>
+        <PossibleValue Value="GAP_APPEARANCE_GENERIC_DISPLAY" Comment="GAP_APPEARANCE_GENERIC_DISPLAY"/>
+        <PossibleValue Value="GAP_APPEARANCE_GENERIC_REMOTE_CONTROL" Comment="GAP_APPEARANCE_GENERIC_REMOTE_CONTROL"/>
+        <PossibleValue Value="GAP_APPEARANCE_GENERIC_EYE_GLASSES" Comment="GAP_APPEARANCE_GENERIC_EYE_GLASSES"/>
+        <PossibleValue Value="GAP_APPEARANCE_GENERIC_TAG" Comment="GAP_APPEARANCE_GENERIC_TAG"/>
+        <PossibleValue Value="GAP_APPEARANCE_GENERIC_KEYRING" Comment="GAP_APPEARANCE_GENERIC_KEYRING"/>
+        <PossibleValue Value="GAP_APPEARANCE_GENERIC_MEDIA_PLAYER" Comment="GAP_APPEARANCE_GENERIC_MEDIA_PLAYER"/>
+        <PossibleValue Value="GAP_APPEARANCE_GENERIC_BARCODE_SCANNER" Comment="GAP_APPEARANCE_GENERIC_BARCODE_SCANNER"/>
+        <PossibleValue Value="GAP_APPEARANCE_GENERIC_THERMOMETER" Comment="GAP_APPEARANCE_GENERIC_THERMOMETER"/>
+        <PossibleValue Value="GAP_APPEARANCE_THERMOMETER_EAR" Comment="GAP_APPEARANCE_THERMOMETER_EAR"/>
+        <PossibleValue Value="GAP_APPEARANCE_GENERIC_HEART_RATE_SENSOR" Comment="GAP_APPEARANCE_GENERIC_HEART_RATE_SENSOR"/>
+        <PossibleValue Value="GAP_APPEARANCE_HEART_RATE_SENSOR_HEART_RATE_BELT" Comment="GAP_APPEARANCE_HEART_RATE_SENSOR_HEART_RATE_BELT"/>
+        <PossibleValue Value="GAP_APPEARANCE_GENERIC_BLOOD_PRESSURE" Comment="GAP_APPEARANCE_GENERIC_BLOOD_PRESSURE"/>
+        <PossibleValue Value="GAP_APPEARANCE_BLOOD_PRESSURE_ARM" Comment="GAP_APPEARANCE_BLOOD_PRESSURE_ARM"/>
+        <PossibleValue Value="GAP_APPEARANCE_BLOOD_PRESSURE_WRIST" Comment="GAP_APPEARANCE_BLOOD_PRESSURE_WRIST"/>
+        <PossibleValue Value="GAP_APPEARANCE_HUMAN_INTERFACE_DEVICE" Comment="GAP_APPEARANCE_HUMAN_INTERFACE_DEVICE"/>
+        <PossibleValue Value="GAP_APPEARANCE_KEYBOARD" Comment="GAP_APPEARANCE_KEYBOARD"/>
+        <PossibleValue Value="GAP_APPEARANCE_MOUSE" Comment="GAP_APPEARANCE_MOUSE"/>
+        <PossibleValue Value="GAP_APPEARANCE_JOYSTICK" Comment="GAP_APPEARANCE_JOYSTICK"/>
+        <PossibleValue Value="GAP_APPEARANCE_GAMEPAD" Comment="GAP_APPEARANCE_GAMEPAD"/>
+        <PossibleValue Value="GAP_APPEARANCE_DIGITIZER_TABLET" Comment="GAP_APPEARANCE_DIGITIZER_TABLET"/>
+        <PossibleValue Value="GAP_APPEARANCE_CARD_READER" Comment="GAP_APPEARANCE_CARD_READER"/>
+        <PossibleValue Value="GAP_APPEARANCE_DIGITAL_PEN" Comment="GAP_APPEARANCE_DIGITAL_PEN"/>
+        <PossibleValue Value="GAP_APPEARANCE_BARCODE_SCANNER" Comment="GAP_APPEARANCE_BARCODE_SCANNER"/>
+        <PossibleValue Value="GAP_APPEARANCE_GENERIC_GLUCOSE_METER" Comment="GAP_APPEARANCE_GENERIC_GLUCOSE_METER"/>
+        <PossibleValue Value="GAP_APPEARANCE_GENERIC_RUNNING_WALKING_SENSOR" Comment="GAP_APPEARANCE_GENERIC_RUNNING_WALKING_SENSOR"/>
+        <PossibleValue Value="GAP_APPEARANCE_RUNNING_WALKING_IN_SHOE" Comment="GAP_APPEARANCE_RUNNING_WALKING_IN_SHOE"/>
+        <PossibleValue Value="GAP_APPEARANCE_RUNNING_WALKING_ON_SHOE" Comment="GAP_APPEARANCE_RUNNING_WALKING_ON_SHOE"/>
+        <PossibleValue Value="GAP_APPEARANCE_RUNNING_WALKING_ON_HIP" Comment="GAP_APPEARANCE_RUNNING_WALKING_ON_HIP"/>
+        <PossibleValue Value="GAP_APPEARANCE_GENERIC_CYCLING" Comment="GAP_APPEARANCE_GENERIC_CYCLING"/>
+        <PossibleValue Value="GAP_APPEARANCE_CYCLING_CYCLING_COMPUTER" Comment="GAP_APPEARANCE_CYCLING_CYCLING_COMPUTER"/>
+        <PossibleValue Value="GAP_APPEARANCE_CYCLING_SPEED_SENSOR" Comment="GAP_APPEARANCE_CYCLING_SPEED_SENSOR"/>
+        <PossibleValue Value="GAP_APPEARANCE_CYCLING_CADENCE_SENSOR" Comment="GAP_APPEARANCE_CYCLING_CADENCE_SENSOR"/>
+        <PossibleValue Value="GAP_APPEARANCE_CYCLING_POWER_SENSOR" Comment="GAP_APPEARANCE_CYCLING_POWER_SENSOR"/>
+        <PossibleValue Value="GAP_APPEARANCE_CYCLING_SPEED_AND_CADENCE_SENSOR" Comment="GAP_APPEARANCE_CYCLING_SPEED_AND_CADENCE_SENSOR"/>
+        <PossibleValue Value="GAP_APPEARANCE_GENERIC_PULSE_OXYMETER" Comment="GAP_APPEARANCE_GENERIC_PULSE_OXYMETER"/>
+        <PossibleValue Value="GAP_APPEARANCE_FINGERTIP" Comment="GAP_APPEARANCE_FINGERTIP"/>
+        <PossibleValue Value="GAP_APPEARANCE_WRIST_WORN" Comment="GAP_APPEARANCE_WRIST_WORN"/>
+        <PossibleValue Value="GAP_APPEARANCE_GENERIC_WEIGHT_SCALE" Comment="GAP_APPEARANCE_GENERIC_WEIGHT_SCALE"/>
+        <PossibleValue Value="GAP_APPEARANCE_GENERIC_OUTDOOR_SPORT_ACTIVITY" Comment="GAP_APPEARANCE_GENERIC_OUTDOOR_SPORT_ACTIVITY"/>
+        <PossibleValue Value="GAP_APPEARANCE_LOCATION_DISPLAY_DEVICE" Comment="GAP_APPEARANCE_LOCATION_DISPLAY_DEVICE"/>
+        <PossibleValue Value="GAP_APPEARANCE_LOCATION_AND_NAVIGATION_DISPLAY_DEVICE" Comment="GAP_APPEARANCE_LOCATION_AND_NAVIGATION_DISPLAY_DEVICE"/>
+        <PossibleValue Value="GAP_APPEARANCE_LOCATION_POD" Comment="GAP_APPEARANCE_LOCATION_POD"/>
+        <PossibleValue Value="GAP_APPEARANCE_LOCATION_AND_NAVIGATION_POD" Comment="GAP_APPEARANCE_LOCATION_AND_NAVIGATION_POD"/>
+        <PossibleValue Value="GAP_APPEARANCE_GENERIC_ENVIRONMENTAL_SENSOR" Comment="GAP_APPEARANCE_GENERIC_ENVIRONMENTAL_SENSOR"/>
     </RefParameter>
 
 <!-- ************************* PAIRING BEGIN ************************* -->
@@ -293,64 +408,52 @@
         <Description>Encryption key minimum size</Description>
     </RefParameter>
 
-    <RefParameter Name="CFG_IO_CAPABILITY" Comment="CFG_IO_CAPABILITY" DefaultValue="CFG_IO_CAPABILITY_DISPLAY_YES_NO" Type="list" TabName="Configuration" Group="Application configuration - Application parameters">
-        <Description>Define IO capabilities&lt;br&gt;Possible values:&lt;br&gt;- CFG_IO_CAPABILITY_DISPLAY_ONLY (0x00)&lt;br&gt;- CFG_IO_CAPABILITY_DISPLAY_YES_NO (0x01)&lt;br&gt;- CFG_IO_CAPABILITY_KEYBOARD_ONLY (0x02)&lt;br&gt;- CFG_IO_CAPABILITY_NO_INPUT_NO_OUTPUT (0x03)&lt;br&gt;- CFG_IO_CAPABILITY_KEYBOARD_DISPLAY (0x04)</Description>
-        <Condition Diagnostic="" Expression="(S_BLE_CP | S_BLE_RP | S_BLE_SP)"/>
-        <PossibleValue Value="CFG_IO_CAPABILITY_DISPLAY_ONLY" Comment="Display only (0x00)"/>
-        <PossibleValue Value="CFG_IO_CAPABILITY_DISPLAY_YES_NO" Comment="Display Yes No (0x01)"/>
-        <PossibleValue Value="CFG_IO_CAPABILITY_KEYBOARD_ONLY" Comment="Keyboard only (0x02)"/>
-        <PossibleValue Value=" CFG_IO_CAPABILITY_NO_INPUT_NO_OUTPUT" Comment="No input, no output (0x03)"/>
-        <PossibleValue Value=" CFG_IO_CAPABILITY_KEYBOARD_DISPLAY" Comment="Keyboard and display (0x04)"/>
-    </RefParameter>
-    <RefParameter Name="CFG_IO_CAPABILITY" Comment="CFG_IO_CAPABILITY" DefaultValue="CFG_IO_CAPABILITY_DISPLAY_YES_NO" Type="UniqueElementList" TabName="Configuration" Group="Application configuration - Application parameters" Visible="false">
-        <PossibleValue Value="CFG_IO_CAPABILITY_DISPLAY_YES_NO" Comment="Display Yes No (0x01)"/>
+    <RefParameter Name="CFG_IO_CAPABILITY" Comment="CFG_IO_CAPABILITY" DefaultValue="IO_CAP_DISPLAY_YES_NO" Type="list" TabName="Configuration" Group="Application configuration - Application parameters">
         <Description>Define IO capabilities</Description>
+        <Condition Diagnostic="" Expression="(S_BLE_CP | S_BLE_RP | S_BLE_SP) &amp; S_BLE_HOST"/>
+        <PossibleValue Value="IO_CAP_DISPLAY_ONLY" Comment="Display only (0x00)"/>
+        <PossibleValue Value="IO_CAP_DISPLAY_YES_NO" Comment="Display Yes No (0x01)"/>
+        <PossibleValue Value="IO_CAP_KEYBOARD_ONLY" Comment="Keyboard only (0x02)"/>
+        <PossibleValue Value=" IO_CAP_NO_INPUT_NO_OUTPUT" Comment="No input, no output (0x03)"/>
+        <PossibleValue Value=" IO_CAP_KEYBOARD_DISPLAY" Comment="Keyboard and display (0x04)"/>
+    </RefParameter>
+		<RefParameter Name="CFG_IO_CAPABILITY" Comment="CFG_IO_CAPABILITY" DefaultValue="IO_CAP_DISPLAY_YES_NO" Type="uniqueElementList" TabName="Configuration" Group="Application configuration - Application parameters" Visible="false">
+        <Description>Define IO capabilities</Description>
+        <PossibleValue Value="IO_CAP_DISPLAY_YES_NO" Comment="Display Yes No (0x01)"/>
     </RefParameter>
 
-    <RefParameter Name="CFG_MITM_PROTECTION" Comment="CFG_MITM_PROTECTION" DefaultValue="CFG_MITM_PROTECTION_REQUIRED" Type="list" TabName="Configuration" Group="Application configuration - Application parameters">
+    <RefParameter Name="CFG_MITM_PROTECTION" Comment="CFG_MITM_PROTECTION" DefaultValue="MITM_PROTECTION_REQUIRED" Type="list" TabName="Configuration" Group="Application configuration - Application parameters">
         <Description>Activate/deactivate Define Man In The Middle(MITM) protection mode&lt;br&gt;Possible values:&lt;br&gt;- MITM protection not required (0x00)&lt;br&gt;- MITM protection required (0x01)</Description>
         <Condition Diagnostic="" Expression="(S_BLE_CP | S_BLE_RP | S_BLE_SP) &amp; S_BLE_HOST"/>
-        <PossibleValue Value="CFG_MITM_PROTECTION_NOT_REQUIRED" Comment="MITM protection not required (0x00)"/>
-        <PossibleValue Value="CFG_MITM_PROTECTION_REQUIRED" Comment="MITM protection required (0x01)" Semaphore="S_CFG_MPR"/>
+        <PossibleValue Value="MITM_PROTECTION_NOT_REQUIRED" Comment="MITM protection not required (0x00)"/>
+        <PossibleValue Value="MITM_PROTECTION_REQUIRED" Comment="MITM protection required (0x01)" Semaphore="S_CFG_MPR"/>
     </RefParameter>
-    <RefParameter Name="CFG_MITM_PROTECTION" Comment="CFG_MITM_PROTECTION" DefaultValue="CFG_MITM_PROTECTION_REQUIRED" Type="UniqueElementList" TabName="Configuration" Group="Application configuration - Application parameters" Visible="false">
-        <PossibleValue Value="CFG_MITM_PROTECTION_REQUIRED" Comment="MITM protection required (0x01)" Semaphore="S_CFG_MPR"/>
-        <Description>Activate/deactivate Define Man In The Middle(MITM) protection mode</Description>
+    <RefParameter Name="CFG_MITM_PROTECTION" Comment="CFG_MITM_PROTECTION" DefaultValue="MITM_PROTECTION_REQUIRED" Type="list" TabName="Configuration" Group="Application configuration - Application parameters" Visible="false">
+        <Description>Activate/deactivate Define Man In The Middle(MITM) protection mode&lt;br&gt;Possible values:&lt;br&gt;- MITM protection not required (0x00)&lt;br&gt;- MITM protection required (0x01)</Description>
+        <PossibleValue Value="MITM_PROTECTION_REQUIRED" Comment="MITM protection required (0x01)" Semaphore="S_CFG_MPR"/>
     </RefParameter>
 
     <RefParameter Name="CFG_SC_SUPPORT" Comment="CFG_SC_SUPPORT" DefaultValue="CFG_SECURE_OPTIONAL" Type="list" TabName="Configuration" Group="Application configuration - Application parameters">
         <Description>Define Secure Connections Support&lt;br&gt;Possible values:&lt;br&gt;- Secure Connections Paring not supported (0x00)&lt;br&gt;- Secure Connections Paring supported but optional (0x01)&lt;br&gt;- Secure Connections Paring supported and mandatory(0x02)</Description>
-        <Condition Diagnostic="" Expression="S_BLE_PP &amp; S_BLE_HOST"/>
+        <Condition Diagnostic="" Expression="S_BLE_HOST &amp; S_BLE_PP"/>
         <PossibleValue Value="CFG_SECURE_NOT_SUPPORTED" Comment="Secure Connections Paring not supported (0x00)" Semaphore="S_CFG_SNS"/>
         <PossibleValue Value="CFG_SECURE_OPTIONAL" Comment="Secure Connections Paring supported but optional (0x01)" Semaphore="S_CFG_SO"/>
         <PossibleValue Value="CFG_SECURE_MANDATORY" Comment="Secure Connections Paring supported and mandatory(0x02)" Semaphore="S_CFG_SM"/>
     </RefParameter>
-    <RefParameter Name="CFG_SC_SUPPORT" Comment="CFG_SC_SUPPORT" DefaultValue="CFG_SECURE_OPTIONAL" Type="list" TabName="Configuration" Group="Application configuration - Application parameters">
+    <RefParameter Name="CFG_SC_SUPPORT" Comment="CFG_SC_SUPPORT" DefaultValue="CFG_SECURE_OPTIONAL" Type="uniqueElementList" TabName="Configuration" Group="Application configuration - Application parameters" Visible="false">
         <Description>Define Secure Connections Support&lt;br&gt;Possible values:&lt;br&gt;- Secure Connections Paring not supported (0x00)&lt;br&gt;- Secure Connections Paring supported but optional (0x01)&lt;br&gt;- Secure Connections Paring supported and mandatory(0x02)</Description>
-        <Condition Diagnostic="" Expression="(S_BLE_CP | S_BLE_RP | S_BLE_SP) &amp; S_BLE_HOST"/>
-        <PossibleValue Value="CFG_SECURE_NOT_SUPPORTED" Comment="Secure Connections Paring not supported (0x00)" Semaphore="S_CFG_SNS"/>
         <PossibleValue Value="CFG_SECURE_OPTIONAL" Comment="Secure Connections Paring supported but optional (0x01)" Semaphore="S_CFG_SO"/>
-        <PossibleValue Value="CFG_SECURE_MANDATORY" Comment="Secure Connections Paring supported and mandatory(0x02)" Semaphore="S_CFG_SM"/>
-    </RefParameter>
-    <RefParameter Name="CFG_SC_SUPPORT" Comment="CFG_SC_SUPPORT" DefaultValue="CFG_SECURE_OPTIONAL" Type="UniqueElementList" TabName="Configuration" Group="Application configuration - Application parameters" Visible="false">
-        <PossibleValue Value="CFG_SECURE_OPTIONAL" Comment="MITM protection required" Semaphore="S_CFG_SO"/>
-        <Description>Define Secure Connections Support</Description>
     </RefParameter>
 
-    <RefParameter Name="CFG_KEYPRESS_NOTIFICATION_SUPPORT" Comment="CFG_KEYPRESS_NOTIFICATION_SUPPORT" DefaultValue="CFG_KEYPRESS_NOT_SUPPORTED" Type="list" TabName="Configuration" Group="Application configuration - Application parameters">
-        <Description>Define MITM modes&lt;br&gt;Possible values:&lt;br&gt;- Keypress notification not supported (0x00)&lt;br&gt;- Keypress notification supported (0x01)</Description>
-        <Condition Diagnostic="" Expression="S_BLE_PP"/>
-        <PossibleValue Value="CFG_KEYPRESS_NOT_SUPPORTED" Comment="Keypress notification not supported (0x00)"/>
-        <PossibleValue Value="CFG_KEYPRESS_SUPPORTED" Comment="Keypress notification supported (0x01)" Semaphore="S_CFG_KS"/>
+    <RefParameter Name="CFG_KEYPRESS_NOTIFICATION_SUPPORT" Comment="CFG_KEYPRESS_NOTIFICATION_SUPPORT" DefaultValue="KEYPRESS_NOT_SUPPORTED" Type="list" TabName="Configuration" Group="Application configuration - Application parameters">
+        <Description>Define Keypress notification support</Description>
+        <Condition Diagnostic="" Expression="S_BLE_HOST &amp; S_BLE_PP"/>
+        <PossibleValue Value="KEYPRESS_NOT_SUPPORTED" Comment="Keypress notification not supported (0x00)"/>
+        <PossibleValue Value="KEYPRESS_SUPPORTED" Comment="Keypress notification supported (0x01)" Semaphore="S_CFG_KS"/>
     </RefParameter>
-    <RefParameter Name="CFG_KEYPRESS_NOTIFICATION_SUPPORT" Comment="CFG_KEYPRESS_NOTIFICATION_SUPPORT" DefaultValue="CFG_KEYPRESS_NOT_SUPPORTED" Type="list" TabName="Configuration" Group="Application configuration - Application parameters">
-        <Condition Diagnostic="" Expression="S_BLE_HOST &amp; !S_BLE_PP"/>
-        <PossibleValue Value="CFG_KEYPRESS_NOT_SUPPORTED" Comment="Keypress notification not supported (0x00)"/>
-        <PossibleValue Value="CFG_KEYPRESS_SUPPORTED" Comment="Keypress notification supported (0x01)" Semaphore="S_CFG_KS"/>
-        <Description>Define MITM modes</Description>
-    </RefParameter>
-    <RefParameter Name="CFG_KEYPRESS_NOTIFICATION_SUPPORT" Comment="CFG_KEYPRESS_NOTIFICATION_SUPPORT" DefaultValue="CFG_KEYPRESS_NOT_SUPPORTED" Type="UniqueElementList" TabName="Configuration" Group="Application configuration - Application parameters" Visible="false">
-        <Description>Define MITM modes</Description>
+    <RefParameter Name="CFG_KEYPRESS_NOTIFICATION_SUPPORT" Comment="CFG_KEYPRESS_NOTIFICATION_SUPPORT" DefaultValue="KEYPRESS_NOT_SUPPORTED" Type="uniqueElementList" TabName="Configuration" Group="Application configuration - Application parameters" Visible="false">
+        <Description>Define Keypress notification support</Description>
+        <PossibleValue Value="KEYPRESS_SUPPORTED" Comment="Keypress notification supported (0x01)" Semaphore="S_CFG_KS"/>
     </RefParameter>
 
     <RefParameter Name="CFG_BLE_IRK" Comment="CFG_BLE_IRK" Type="Array" ArraySize="16" ArrayTypeElement="uint8_t;16" Separator=", " TabName="Configuration" Group="Application configuration - Application parameters" DefaultValue="12, 34, 56, 78, 9A, BC, DE, F0, 12, 34, 56, 78, 9A, BC, DE, F0">
@@ -407,24 +510,23 @@
 
     <RefParameter Name="BLE_STACK_TYPE" Comment="BLE_STACK_TYPE" DefaultValue="BLE_STACK_TYPE_FULL" Type="UniqueElementList" TabName="Configuration" Group="Application configuration - BLE stack">
         <Condition Diagnostic="" Expression="(S_BLE_HOST &amp; S_BLE_TM)"/>
-        <Description>BLE_STACK_TYPE_BASIC: BLE stack with basic features available, advertising extended not supported. Not allowed for Transparent mode.
+        <Description>BLE_STACK_TYPE_BASIC: BLE stack with basic features available, extended advertising not supported.
         &lt;br&gt;BLE_STACK_TYPE_FULL: BLE stack with all features available</Description>
         <PossibleValue Value="BLE_STACK_TYPE_FULL" Comment="BLE_STACK_TYPE_FULL" Semaphore="Semaphore_BLE_STACK_TYPE_FULL"/>
     </RefParameter>
     <RefParameter Name="BLE_STACK_TYPE" Comment="BLE_STACK_TYPE" DefaultValue="BLE_STACK_TYPE_FULL" Type="list" TabName="Configuration" Group="Application configuration - BLE stack">
         <!-- <Condition Diagnostic="" Expression="(S_BLE_HOST &amp; !S_BLE_TM) | S_BLE_HOST_SKELETON"/> -->
-        <Description>BLE_STACK_TYPE_BASIC: BLE stack with basic features available, advertising extended not supported
+        <Description>BLE_STACK_TYPE_BASIC: BLE stack with basic features available, extended advertising not supported
         &lt;br&gt;BLE_STACK_TYPE_FULL: BLE stack with all features available</Description>
         <PossibleValue Value="BLE_STACK_TYPE_FULL" Comment="BLE_STACK_TYPE_FULL" Semaphore="Semaphore_BLE_STACK_TYPE_FULL"/>
         <PossibleValue Value="BLE_STACK_TYPE_BASIC" Comment="BLE_STACK_TYPE_BASIC" Semaphore="Semaphore_BLE_STACK_TYPE_BASIC"/>
     </RefParameter>
 
-
-    <RefParameter Name="CFG_BLE_NUM_LINK" Comment="CFG_BLE_NUM_LINK" DefaultValue="2" Type="integer" Min="1" Max="8" TabName="Configuration" Group="Application configuration - BLE stack">
+    <RefParameter Name="CFG_BLE_NUM_LINK" Comment="CFG_BLE_NUM_LINK" DefaultValue="2" Type="integer" Min="1" Max="20" TabName="Configuration" Group="Application configuration - BLE stack">
         <Condition Diagnostic="" Expression="S_BLE_HOST | S_BLE_HOST_SKELETON"/>
         <Description>Maximum number of simultaneous connections that the device will support</Description>
     </RefParameter>
-    <RefParameter Name="CFG_BLE_NUM_LINK" Comment="CFG_BLE_NUM_LINK" DefaultValue="2" Type="integer" Min="1" Max="8" TabName="Configuration" Group="Application configuration - BLE stack" Visible="false">
+    <RefParameter Name="CFG_BLE_NUM_LINK" Comment="CFG_BLE_NUM_LINK" DefaultValue="2" Type="integer" Min="1" Max="20" TabName="Configuration" Group="Application configuration - BLE stack" Visible="false">
         <Description>Maximum number of simultaneous connections that the device will support</Description>
     </RefParameter>
 
@@ -454,11 +556,11 @@
 		</Description>
     </RefParameter>
 
-    <RefParameter Name="CFG_BLE_MAX_ATT_MTU" Comment="CFG_BLE_MAX_ATT_MTU" DefaultValue="156" Min="23" Max="512" Type="integer" TabName="Configuration" Group="Application configuration - BLE stack">
+    <RefParameter Name="CFG_BLE_ATT_MTU_MAX" Comment="CFG_BLE_ATT_MTU_MAX" DefaultValue="156" Min="23" Max="512" Type="integer" TabName="Configuration" Group="Application configuration - BLE stack">
         <Condition Diagnostic="" Expression="S_BLE_HOST | S_BLE_HOST_SKELETON"/>
         <Description>Maximum supported ATT_MTU size</Description>
     </RefParameter>
-    <RefParameter Name="CFG_BLE_MAX_ATT_MTU" Comment="CFG_BLE_MAX_ATT_MTU" DefaultValue="156" Min="23" Max="512" Type="integer" TabName="Configuration" Group="Application configuration - BLE stack" Visible="false">
+    <RefParameter Name="CFG_BLE_ATT_MTU_MAX" Comment="CFG_BLE_ATT_MTU_MAX" DefaultValue="156" Min="23" Max="512" Type="integer" TabName="Configuration" Group="Application configuration - BLE stack" Visible="false">
         <Description>Maximum supported ATT_MTU size</Description>
     </RefParameter>
 
@@ -471,8 +573,7 @@
 		- 2, if server configuration descriptor is used&lt;br&gt;
 		- 2*DTM_NUM_LINK, if client configuration descriptor is used&lt;br&gt;
 		- 2, if extended properties is used&lt;br&gt;
-		The total amount of memory needed is the sum of the above quantities for each attribute.&lt;br&gt;
-		This parameter is ignored by the CPU when CFG_BLE_OPTIONS is set to 1</Description>
+		The total amount of memory needed is the sum of the above quantities for each attribute.</Description>
     </RefParameter>
     <RefParameter Name="CFG_BLE_ATT_VALUE_ARRAY_SIZE" Comment="CFG_BLE_ATT_VALUE_ARRAY_SIZE" DefaultValue="1344" Min="0" Max="65535" Type="integer" TabName="Configuration" Group="Application configuration - BLE stack" Visible="false">
         <Description>Size of the storage area for Attribute values
@@ -482,8 +583,7 @@
 		- 2, if server configuration descriptor is used&lt;br&gt;
 		- 2*DTM_NUM_LINK, if client configuration descriptor is used&lt;br&gt;
 		- 2, if extended properties is used&lt;br&gt;
-		The total amount of memory needed is the sum of the above quantities for each attribute.&lt;br&gt;
-		This parameter is ignored by the CPU when CFG_BLE_OPTIONS is set to 1</Description>
+		The total amount of memory needed is the sum of the above quantities for each attribute.</Description>
     </RefParameter>
 
     <RefParameter Name="CFG_BLE_ATTR_PREPARE_WRITE_VALUE_SIZE" Comment="CFG_BLE_ATTR_PREPARE_WRITE_VALUE_SIZE" DefaultValue="30" Type="integer" TabName="Configuration" Group="Application configuration - BLE stack">
@@ -502,188 +602,87 @@
         <Description>The memory margin to take regarding the number of allocated memory blocks for the BLE stack.</Description>
     </RefParameter>
 
-    <RefParameter Name="CFG_BLE_MAX_COC_NUMBER" Comment="CFG_BLE_MAX_COC_NUMBER" DefaultValue="64" Type="integer" Min="0" Max="64" TabName="Configuration" Group="Application configuration - BLE stack">
-        <Condition Diagnostic="" Expression="S_BLE_HOST | S_BLE_HOST_SKELETON"/>
+    <RefParameter Name="CFG_BLE_COC_NBR_MAX" Comment="CFG_BLE_COC_NBR_MAX" DefaultValue="64" Type="integer" Min="0" Max="64" TabName="Configuration" Group="Application configuration - BLE stack">
+        <Condition Diagnostic="" Expression="(S_BLE_HOST | S_BLE_HOST_SKELETON) &amp; Semaphore_BLE_STACK_TYPE_FULL"/>
         <Description>Maximum number of the connection-oriented channel</Description>
     </RefParameter>
-    <RefParameter Name="CFG_BLE_MAX_COC_NUMBER" Comment="CFG_BLE_MAX_COC_NUMBER" DefaultValue="64" Type="integer" Min="0" Max="64" TabName="Configuration" Group="Application configuration - BLE stack" Visible="false">
+    <RefParameter Name="CFG_BLE_COC_NBR_MAX" Comment="CFG_BLE_COC_NBR_MAX" DefaultValue="64" Type="integer" Min="0" Max="64" TabName="Configuration" Group="Application configuration - BLE stack" Visible="false">
         <Description>Maximum number of the connection-oriented channel</Description>
     </RefParameter>
 
-    <RefParameter Name="CFG_BLE_MAX_COC_MPS" Comment="CFG_BLE_MAX_COC_MPS" DefaultValue="248" Type="integer" Min="23" Max="248" TabName="Configuration" Group="Application configuration - BLE stack">
-        <Condition Diagnostic="" Expression="S_BLE_HOST | S_BLE_HOST_SKELETON"/>
+    <RefParameter Name="CFG_BLE_COC_MPS_MAX" Comment="CFG_BLE_COC_MPS_MAX" DefaultValue="248" Type="integer" Min="23" Max="248" TabName="Configuration" Group="Application configuration - BLE stack">
+        <Condition Diagnostic="" Expression="(S_BLE_HOST | S_BLE_HOST_SKELETON) &amp; Semaphore_BLE_STACK_TYPE_FULL"/>
         <Description>Maximum value of the connection-oriented channel Maximum Payload Size</Description>
     </RefParameter>
-    <RefParameter Name="CFG_BLE_MAX_COC_MPS" Comment="CFG_BLE_MAX_COC_MPS" DefaultValue="248" Type="integer" Min="23" Max="248" TabName="Configuration" Group="Application configuration - BLE stack" Visible="false">
+    <RefParameter Name="CFG_BLE_COC_MPS_MAX" Comment="CFG_BLE_COC_MPS_MAX" DefaultValue="248" Type="integer" Min="23" Max="248" TabName="Configuration" Group="Application configuration - BLE stack" Visible="false">
         <Description>Maximum value of the connection-oriented channel Maximum Payload Size</Description>
     </RefParameter>
 
-    <RefParameter Name="CFG_BLE_MAX_COC_INITIATOR_NBR" Comment="CFG_BLE_MAX_COC_INITIATOR_NBR" DefaultValue="32" Min="0" Max="=CFG_BLE_MAX_COC_NUMBER" Type="integer" TabName="Configuration" Group="Application configuration - BLE stack">
-        <Condition Diagnostic="" Expression="S_BLE_HOST | S_BLE_HOST_SKELETON"/>
+    <RefParameter Name="CFG_BLE_COC_INITIATOR_NBR_MAX" Comment="CFG_BLE_COC_INITIATOR_NBR_MAX" DefaultValue="32" Min="0" Max="=CFG_BLE_COC_NBR_MAX" Type="integer" TabName="Configuration" Group="Application configuration - BLE stack">
+        <Condition Diagnostic="" Expression="(S_BLE_HOST | S_BLE_HOST_SKELETON) &amp; Semaphore_BLE_STACK_TYPE_FULL"/>
         <Description>Maximum number of connection-oriented channels in initiator mode</Description>
     </RefParameter>
-    <RefParameter Name="CFG_BLE_MAX_COC_INITIATOR_NBR" Comment="CFG_BLE_MAX_COC_INITIATOR_NBR" DefaultValue="32" Min="0" Max="=CFG_BLE_MAX_COC_NUMBER" Type="integer" TabName="Configuration" Group="Application configuration - BLE stack" Visible="false">
+    <RefParameter Name="CFG_BLE_COC_INITIATOR_NBR_MAX" Comment="CFG_BLE_COC_INITIATOR_NBR_MAX" DefaultValue="32" Min="0" Max="=CFG_BLE_COC_NBR_MAX" Type="integer" TabName="Configuration" Group="Application configuration - BLE stack" Visible="false">
         <Description>Maximum number of connection-oriented channels in initiator mode</Description>
     </RefParameter>
 
     <RefParameter Name="CFG_BLE_OPTIONS" Comment="CFG_BLE_OPTIONS" DefaultValue="BLE stack Options flags:" Type="string" TabName="Configuration" Group="Application configuration - BLE stack">
-        <Condition Diagnostic="" Expression="S_BLE_HOST | S_BLE_HOST_SKELETON"/>
-        <Description> CFG_BLE_OPTIONS:BLE stack Options flags to be configured with:
-		&lt;br&gt;BLE_INIT_OPTIONS_LL_ONLY
-		&lt;br&gt;BLE_INIT_OPTIONS_LL_HOST
-		&lt;br&gt;BLE_INIT_OPTIONS_NO_SVC_CHANGE_DESC
-		&lt;br&gt;BLE_INIT_OPTIONS_WITH_SVC_CHANGE_DESC
-		&lt;br&gt;BLE_INIT_OPTIONS_DEVICE_NAME_RO
-		&lt;br&gt;BLE_INIT_OPTIONS_DEVICE_NAME_RW
-		&lt;br&gt;BLE_INIT_OPTIONS_POWER_CLASS_1
-		&lt;br&gt;BLE_INIT_OPTIONS_POWER_CLASS_2_3
-		&lt;br&gt; *which are used to set following configuration bits:
-		&lt;br&gt; * (bit 0): 1: LL only, 0: LL + host
-		&lt;br&gt; * (bit 1): 1: no service change desc., 0: with service change desc.
-		&lt;br&gt; * (bit 2): 1: device name Read-Only, 0: device name R/W
-		&lt;br&gt; * (bit 7): 1: LE Power Class 1, 0: LE Power Class 2-3
-		&lt;br&gt; * other bits: reserved (shall be set to 0)
-		</Description>
-    </RefParameter>
-    <RefParameter Name="CFG_BLE_OPTIONS" Comment="CFG_BLE_OPTIONS" DefaultValue="BLE stack Options flags:" Type="string" TabName="Configuration" Group="Application configuration - BLE stack" Visible="false">
-        <Description> CFG_BLE_OPTIONS:BLE stack Options flags to be configured with:
-		&lt;br&gt;BLE_INIT_OPTIONS_LL_ONLY
-		&lt;br&gt;BLE_INIT_OPTIONS_LL_HOST
-		&lt;br&gt;BLE_INIT_OPTIONS_NO_SVC_CHANGE_DESC
-		&lt;br&gt;BLE_INIT_OPTIONS_WITH_SVC_CHANGE_DESC
-		&lt;br&gt;BLE_INIT_OPTIONS_DEVICE_NAME_RO
-		&lt;br&gt;BLE_INIT_OPTIONS_DEVICE_NAME_RW
-		&lt;br&gt;BLE_INIT_OPTIONS_POWER_CLASS_1
-		&lt;br&gt;BLE_INIT_OPTIONS_POWER_CLASS_2_3
-		&lt;br&gt; * which are used to set following configuration bits:
-		&lt;br&gt; * (bit 0): 1: LL only, 0: LL + host
-		&lt;br&gt; * (bit 1): 1: no service change desc., 0: with service change desc.
-		&lt;br&gt; * (bit 2): 1: no service change desc., 0: with service change desc.
-		&lt;br&gt; * (bit 7): 1: LE Power Class 1, 0: LE Power Class 2-3
-		&lt;br&gt; * other bits: reserved (shall be set to 0)
-		</Description>
-	
+        <Description>BLE stack options bitmap, unspecified bits are reserved and shall be set to 0.</Description>
     </RefParameter>
 
-    <RefParameter Name="CFG_BLE_OPTIONS_LL" Comment="		- CFG_BLE_OPTIONS_LL" DefaultValue="BLE_INIT_OPTIONS_LL_HOST" Type="list" TabName="Configuration" Group="Application configuration - BLE stack">
-        <Condition Diagnostic="" Expression="S_BLE_HOST | S_BLE_HOST_SKELETON"/>
-        <Description> CFG_BLE_OPTIONS_LL:BLE stack Options flags to be configured with:
-		&lt;br&gt;BLE_INIT_OPTIONS_LL_ONLY
-		&lt;br&gt;BLE_INIT_OPTIONS_LL_HOST
-		&lt;br&gt; * (bit 0): 1: LL only, 0: LL + host
-		</Description>
-        <PossibleValue Value="BLE_INIT_OPTIONS_LL_ONLY" Comment="BLE_INIT_OPTIONS_LL_ONLY" Semaphore="Semaphore_BLE_INIT_OPTIONS_LL_ONLY"/>
-        <PossibleValue Value="BLE_INIT_OPTIONS_LL_HOST" Comment="BLE_INIT_OPTIONS_LL_HOST" Semaphore="Semaphore_BLE_INIT_OPTIONS_LL_HOST"/>
+    <RefParameter Name="BLE_OPTIONS_LL_ONLY" Comment=" - BLE_OPTIONS_LL_ONLY" DefaultValue="0" Type="list" TabName="Configuration" Group="Application configuration - BLE stack">
+        <Description>Link Layer option selection (bit 0)</Description>
+        <PossibleValue Value="0" Comment="Link Layer + Host"/>
+        <PossibleValue Value="BLE_OPTIONS_LL_ONLY" Comment="Link Layer only" Condition="!Semaphore_BLE_STACK_TYPE_FULL" Action="Disable" Diagnostic="Available only with full stack." />
     </RefParameter>
-    <RefParameter Name="CFG_BLE_OPTIONS_LL" Comment="		- CFG_BLE_OPTIONS_LL" DefaultValue="BLE_INIT_OPTIONS_LL_HOST" Type="list" TabName="Configuration" Group="Application configuration - BLE stack" Visible="false">
-        <Description> CFG_BLE_OPTIONS_LL:BLE stack Options flags to be configured with:
-		&lt;br&gt;BLE_INIT_OPTIONS_LL_ONLY
-		&lt;br&gt;BLE_INIT_OPTIONS_LL_HOST
-		&lt;br&gt; * (bit 0): 1: LL only, 0: LL + host
-		</Description>
-        <PossibleValue Value="BLE_INIT_OPTIONS_LL_ONLY" Comment="BLE_INIT_OPTIONS_LL_ONLY" Semaphore="Semaphore_BLE_INIT_OPTIONS_LL_ONLY"/>
-        <PossibleValue Value="BLE_INIT_OPTIONS_LL_HOST" Comment="BLE_INIT_OPTIONS_LL_HOST" Semaphore="Semaphore_BLE_INIT_OPTIONS_LL_HOST"/>
+    
+    <RefParameter Name="BLE_OPTIONS_NO_SVC_CHANGE_DESC" Comment=" - BLE_OPTIONS_NO_SVC_CHANGE_DESC" DefaultValue="0" Type="list" TabName="Configuration" Group="Application configuration - BLE stack">
+        <Description>Service changed descriptor option selection (bit 1)</Description>
+        <PossibleValue Value="0" Comment="With service changed descriptor"/>
+        <PossibleValue Value="BLE_OPTIONS_NO_SVC_CHANGE_DESC" Comment="No service changed descriptor"/>
     </RefParameter>
-
-    <RefParameter Name="CFG_BLE_OPTIONS_SVC" Comment="		- CFG_BLE_OPTIONS_SVC" DefaultValue="BLE_INIT_OPTIONS_WITH_SVC_CHANGE_DESC" Type="list" TabName="Configuration" Group="Application configuration - BLE stack">
-        <Condition Diagnostic="" Expression="S_BLE_HOST | S_BLE_HOST_SKELETON"/>
-        <Description> CFG_BLE_OPTIONS_SVC:BLE stack Options flags to be configured with:
-		&lt;br&gt;BLE_INIT_OPTIONS_NO_SVC_CHANGE_DESC
-		&lt;br&gt;BLE_INIT_OPTIONS_WITH_SVC_CHANGE_DESC
-		&lt;br&gt; * (bit 1): 1: no service change desc., 0: with service change desc.
-		</Description>
-        <PossibleValue Value="BLE_INIT_OPTIONS_NO_SVC_CHANGE_DESC" Comment="BLE_INIT_OPTIONS_NO_SVC_CHANGE_DESC" Semaphore="Semaphore_BLE_INIT_OPTIONS_NO_SVC_CHANGE_DESC"/>
-        <PossibleValue Value="BLE_INIT_OPTIONS_WITH_SVC_CHANGE_DESC" Comment="BLE_INIT_OPTIONS_WITH_SVC_CHANGE_DESC" Semaphore="Semaphore_BLE_INIT_OPTIONS_WITH_SVC_CHANGE_DESC"/>
+    
+    <RefParameter Name="BLE_OPTIONS_DEV_NAME_READ_ONLY" Comment=" - BLE_OPTIONS_DEV_NAME_READ_ONLY" DefaultValue="0" Type="list" TabName="Configuration" Group="Application configuration - BLE stack">
+        <Description>Devive name property option selection (bit 2)</Description>
+        <PossibleValue Value="0" Comment="Device name is read/write"/>
+        <PossibleValue Value="BLE_OPTIONS_DEV_NAME_READ_ONLY" Comment="Device name is read only"/>
     </RefParameter>
-    <RefParameter Name="CFG_BLE_OPTIONS_SVC" Comment="		- CFG_BLE_OPTIONS_SVC" DefaultValue="BLE_INIT_OPTIONS_WITH_SVC_CHANGE_DESC" Type="list" TabName="Configuration" Group="Application configuration - BLE stack" Visible="false">
-        <Description> CFG_BLE_OPTIONS_SVC:BLE stack Options flags to be configured with:
-		&lt;br&gt;BLE_INIT_OPTIONS_NO_SVC_CHANGE_DESC
-		&lt;br&gt;BLE_INIT_OPTIONS_WITH_SVC_CHANGE_DESC
-		&lt;br&gt; * (bit 1): 1: no service change desc., 0: with service change desc.
-		</Description>
-        <PossibleValue Value="BLE_INIT_OPTIONS_NO_SVC_CHANGE_DESC" Comment="BLE_INIT_OPTIONS_NO_SVC_CHANGE_DESC" Semaphore="Semaphore_BLE_INIT_OPTIONS_NO_SVC_CHANGE_DESC"/>
-        <PossibleValue Value="BLE_INIT_OPTIONS_WITH_SVC_CHANGE_DESC" Comment="BLE_INIT_OPTIONS_WITH_SVC_CHANGE_DESC" Semaphore="Semaphore_BLE_INIT_OPTIONS_WITH_SVC_CHANGE_DESC"/>	
+    
+    <RefParameter Name="BLE_OPTIONS_EXTENDED_ADV" Comment=" - BLE_OPTIONS_EXTENDED_ADV" DefaultValue="0" Type="list" TabName="Configuration" Group="Application configuration - BLE stack">
+        <Description>Extended advertising option selection (bit 3). Available only with full stack.</Description>
+        <PossibleValue Value="0" Comment="Extended advertising is not supported"/>
+        <PossibleValue Value="BLE_OPTIONS_EXTENDED_ADV" Comment="Extended advertising is supported" Condition="!Semaphore_BLE_STACK_TYPE_FULL" Action="Disable" Diagnostic="Available only with full stack." />
     </RefParameter>
-
-    <RefParameter Name="CFG_BLE_OPTIONS_DEVICE_NAME" Comment="		- CFG_BLE_OPTIONS_DEVICE_NAME" DefaultValue="BLE_INIT_OPTIONS_DEVICE_NAME_RW" Type="list" TabName="Configuration" Group="Application configuration - BLE stack">
-        <Condition Diagnostic="" Expression="S_BLE_HOST | S_BLE_HOST_SKELETON"/>
-        <Description> CFG_BLE_OPTIONS_DEVICE_NAME:BLE stack Options flags to be configured with:
-		&lt;br&gt;BLE_INIT_OPTIONS_DEVICE_NAME_RO
-		&lt;br&gt;BLE_INIT_OPTIONS_DEVICE_NAME_RW
-		&lt;br&gt; * (bit 2): 1: device name Read-Only, 0: device name R/W
-		</Description>
-        <PossibleValue Value="BLE_INIT_OPTIONS_DEVICE_NAME_RO" Comment="BLE_INIT_OPTIONS_DEVICE_NAME_RO" Semaphore="Semaphore_BLE_INIT_OPTIONS_DEVICE_NAME_RO"/>
-        <PossibleValue Value="BLE_INIT_OPTIONS_DEVICE_NAME_RW" Comment="BLE_INIT_OPTIONS_DEVICE_NAME_RW" Semaphore="Semaphore_BLE_INIT_OPTIONS_DEVICE_NAME_RW"/>
+    
+    <RefParameter Name="BLE_OPTIONS_REDUCED_DB_IN_NVM" Comment=" - BLE_OPTIONS_REDUCED_DB_IN_NVM" DefaultValue="0" Type="list" TabName="Configuration" Group="Application configuration - BLE stack">
+        <Description>Reduced database in Non Volatile Memory option selection (bit 5)</Description>
+        <PossibleValue Value="0" Comment="Full GATT DB in NVM"/>
+        <PossibleValue Value="BLE_OPTIONS_REDUCED_DB_IN_NVM" Comment="Reduced GATT DB in NVM"/>
     </RefParameter>
-    <RefParameter Name="CFG_BLE_OPTIONS_DEVICE_NAME" Comment="		- CFG_BLE_OPTIONS_DEVICE_NAME" DefaultValue="BLE_INIT_OPTIONS_DEVICE_NAME_RW" Type="list" TabName="Configuration" Group="Application configuration - BLE stack" Visible="false">
-        <Description> CFG_BLE_OPTIONS_DEVICE_NAME:BLE stack Options flags to be configured with:
-		&lt;br&gt;BLE_INIT_OPTIONS_DEVICE_NAME_RO
-		&lt;br&gt;BLE_INIT_OPTIONS_DEVICE_NAME_RW
-		&lt;br&gt; * (bit 2): 1: device name Read-Only, 0: device name R/W
-		</Description>
-        <PossibleValue Value="BLE_INIT_OPTIONS_DEVICE_NAME_RO" Comment="BLE_INIT_OPTIONS_DEVICE_NAME_RO" Semaphore="Semaphore_BLE_INIT_OPTIONS_DEVICE_NAME_RO"/>
-        <PossibleValue Value="BLE_INIT_OPTIONS_DEVICE_NAME_RW" Comment="BLE_INIT_OPTIONS_DEVICE_NAME_RW" Semaphore="Semaphore_BLE_INIT_OPTIONS_DEVICE_NAME_RW"/>	
+    
+    <RefParameter Name="BLE_OPTIONS_GATT_CACHING" Comment=" - BLE_OPTIONS_GATT_CACHING" DefaultValue="0" Type="list" TabName="Configuration" Group="Application configuration - BLE stack">
+        <Description>GATT caching option selection (bit 6)</Description>
+        <PossibleValue Value="0" Comment="GATT caching is not used"/>
+        <PossibleValue Value="BLE_OPTIONS_GATT_CACHING" Comment="GATT caching is used"  Condition="!Semaphore_BLE_STACK_TYPE_FULL" Action="Disable" Diagnostic="Available only with full stack." />
     </RefParameter>
-
-    <RefParameter Name="CFG_BLE_OPTIONS_EXT_ADV" Comment="		- CFG_BLE_OPTIONS_EXT_ADV" DefaultValue="BLE_INIT_OPTIONS_NO_EXT_ADV" Type="list" TabName="Configuration" Group="Application configuration - BLE stack">
-        <Condition Diagnostic="" Expression="S_BLE_HOST | S_BLE_HOST_SKELETON"/>
-        <Description> CFG_BLE_OPTIONS_EXT_ADV:BLE stack Options flags to be configured with:
-		&lt;br&gt;BLE_INIT_OPTIONS_EXT_ADV
-		&lt;br&gt;BLE_INIT_OPTIONS_NO_EXT_ADV
-		&lt;br&gt; * (bit 3): 1: extended advertizing supported, 0: extended advertizing not supported
-		</Description>
-        <PossibleValue Value="BLE_INIT_OPTIONS_EXT_ADV" Comment="BLE_INIT_OPTIONS_EXT_ADV" Semaphore="Semaphore_BLE_INIT_OPTIONS_EXT_ADV"/>
-        <PossibleValue Value="BLE_INIT_OPTIONS_NO_EXT_ADV" Comment="BLE_INIT_OPTIONS_NO_EXT_ADV" Semaphore="Semaphore_BLE_INIT_OPTIONS_NO_EXT_ADV"/>
+    
+    <RefParameter Name="BLE_OPTIONS_POWER_CLASS_1" Comment=" - BLE_OPTIONS_POWER_CLASS_1" DefaultValue="0" Type="list" TabName="Configuration" Group="Application configuration - BLE stack">
+        <Description>Power class option selection (bit 7)</Description>
+        <PossibleValue Value="0" Comment="Power Class 2-3"/>
+        <PossibleValue Value="BLE_OPTIONS_POWER_CLASS_1" Comment="Power Class 1"/>
     </RefParameter>
-    <RefParameter Name="CFG_BLE_OPTIONS_EXT_ADV" Comment="		- CFG_BLE_OPTIONS_EXT_ADV" DefaultValue="BLE_INIT_OPTIONS_NO_EXT_ADV" Type="list" TabName="Configuration" Group="Application configuration - BLE stack" Visible="false">
-        <Description> CFG_BLE_OPTIONS_EXT_ADV:BLE stack Options flags to be configured with:
-		&lt;br&gt;BLE_INIT_OPTIONS_EXT_ADV
-		&lt;br&gt;BLE_INIT_OPTIONS_NO_EXT_ADV
-		&lt;br&gt; * (bit 3): 1: extended advertizing supported, 0: extended advertizing not supported
-		</Description>
-        <PossibleValue Value="BLE_INIT_OPTIONS_EXT_ADV" Comment="BLE_INIT_OPTIONS_EXT_ADV" Semaphore="Semaphore_BLE_INIT_OPTIONS_EXT_ADV"/>
-        <PossibleValue Value="BLE_INIT_OPTIONS_NO_EXT_ADV" Comment="BLE_INIT_OPTIONS_NO_EXT_ADV" Semaphore="Semaphore_BLE_INIT_OPTIONS_NO_EXT_ADV"/>
+    
+    <RefParameter Name="BLE_OPTIONS_APPEARANCE_WRITABLE" Comment=" - BLE_OPTIONS_APPEARANCE_WRITABLE" DefaultValue="0" Type="list" TabName="Configuration" Group="Application configuration - BLE stack">
+        <Description>Appearance property option selection (bit 8)</Description>
+        <PossibleValue Value="0" Comment="Appearance is read only"/>
+        <PossibleValue Value="BLE_OPTIONS_APPEARANCE_WRITABLE" Comment="Appearance is read/write"/>
     </RefParameter>
-
-    <RefParameter Name="CFG_BLE_OPTIONS_CS_ALGO" Comment="		- CFG_BLE_OPTIONS_CS_ALGO" DefaultValue="BLE_INIT_OPTIONS_NO_CS_ALGO2" Type="list" TabName="Configuration" Group="Application configuration - BLE stack">
-        <Condition Diagnostic="" Expression="S_BLE_HOST | S_BLE_HOST_SKELETON"/>
-        <Description> CFG_BLE_OPTIONS_ALGO:BLE stack Options flags to be configured with:
-		&lt;br&gt;BLE_INIT_OPTIONS_CS_ALGO2
-		&lt;br&gt;BLE_INIT_OPTIONS_NO_CS_ALGO2
-		&lt;br&gt; * (bit 7): 1: CS Algo #2 supported, 0: CS Algo #2 not supported
-		</Description>
-        <PossibleValue Value="BLE_INIT_OPTIONS_CS_ALGO2" Comment="BLE_INIT_OPTIONS_CS_ALGO2" Semaphore="Semaphore_BLE_INIT_OPTIONS_CS_ALGO2"/>
-        <PossibleValue Value="BLE_INIT_OPTIONS_NO_CS_ALGO2" Comment="BLE_INIT_OPTIONS_NO_CS_ALGO2" Semaphore="Semaphore_BLE_INIT_OPTIONS_NO_CS_ALGO2"/>
-    </RefParameter>
-    <RefParameter Name="CFG_BLE_OPTIONS_CS_ALGO" Comment="		- CFG_BLE_OPTIONS_CS_ALGO" DefaultValue="BLE_INIT_OPTIONS_NO_CS_ALGO2" Type="list" TabName="Configuration" Group="Application configuration - BLE stack" Visible="false">
-        <Description> CFG_BLE_OPTIONS_ALGO:BLE stack Options flags to be configured with:
-		&lt;br&gt;BLE_INIT_OPTIONS_CS_ALGO2
-		&lt;br&gt;BLE_INIT_OPTIONS_NO_CS_ALGO2
-		&lt;br&gt; * (bit 7): 1: CS Algo #2 supported, 0: CS Algo #2 not supported
-		</Description>
-        <PossibleValue Value="BLE_INIT_OPTIONS_CS_ALGO2" Comment="BLE_INIT_OPTIONS_CS_ALGO2" Semaphore="Semaphore_BLE_INIT_OPTIONS_CS_ALGO2"/>
-        <PossibleValue Value="BLE_INIT_OPTIONS_NO_CS_ALGO2" Comment="BLE_INIT_OPTIONS_NO_CS_ALGO2" Semaphore="Semaphore_BLE_INIT_OPTIONS_NO_CS_ALGO2"/>
-    </RefParameter>
-
-    <RefParameter Name="CFG_BLE_OPTIONS_POWER_CLASS" Comment="		- CFG_BLE_OPTIONS_POWER_CLASS" DefaultValue="BLE_INIT_OPTIONS_POWER_CLASS_2_3" Type="list" TabName="Configuration" Group="Application configuration - BLE stack">
-        <Condition Diagnostic="" Expression="S_BLE_HOST | S_BLE_HOST_SKELETON"/>
-        <Description> CFG_BLE_OPTIONS_POWER_CLASS:BLE stack Options flags to be configured with:
-		&lt;br&gt;BLE_INIT_OPTIONS_POWER_CLASS_1
-		&lt;br&gt;BLE_INIT_OPTIONS_POWER_CLASS_2_3
-		&lt;br&gt; * (bit 7): 1: LE Power Class 1, 0: LE Power Class 2-3
-		</Description>
-        <PossibleValue Value="BLE_INIT_OPTIONS_POWER_CLASS_1" Comment="BLE_INIT_OPTIONS_POWER_CLASS_1" Semaphore="Semaphore_BLE_INIT_OPTIONS_POWER_CLASS_1"/>
-        <PossibleValue Value="BLE_INIT_OPTIONS_POWER_CLASS_2_3" Comment="BLE_INIT_OPTIONS_POWER_CLASS_2_3" Semaphore="Semaphore_BLE_INIT_OPTIONS_POWER_CLASS_2_3"/>
-    </RefParameter>
-    <RefParameter Name="CFG_BLE_OPTIONS_POWER_CLASS" Comment="		- CFG_BLE_OPTIONS_POWER_CLASS" DefaultValue="BLE_INIT_OPTIONS_POWER_CLASS_2_3" Type="list" TabName="Configuration" Group="Application configuration - BLE stack" Visible="false">
-        <Description> CFG_BLE_OPTIONS_POWER_CLASS:BLE stack Options flags to be configured with:
-		&lt;br&gt;BLE_INIT_OPTIONS_POWER_CLASS_1
-		&lt;br&gt;BLE_INIT_OPTIONS_POWER_CLASS_2_3
-		&lt;br&gt; * (bit 7): 1: LE Power Class 1, 0: LE Power Class 2-3
-		</Description>
-        <PossibleValue Value="BLE_INIT_OPTIONS_POWER_CLASS_1" Comment="BLE_INIT_OPTIONS_POWER_CLASS_1" Semaphore="Semaphore_BLE_INIT_OPTIONS_POWER_CLASS_1"/>
-        <PossibleValue Value="BLE_INIT_OPTIONS_POWER_CLASS_2_3" Comment="BLE_INIT_OPTIONS_POWER_CLASS_2_3" Semaphore="Semaphore_BLE_INIT_OPTIONS_POWER_CLASS_2_3"/>
-    </RefParameter>
+    
+    <!-- <RefParameter Name="BLE_OPTIONS_ENHANCED_ATT" Comment=" - BLE_OPTIONS_ENHANCED_ATT" DefaultValue="0" Type="list" TabName="Configuration" Group="Application configuration - BLE stack"> -->
+        <!-- <Description>Enhanced ATTribute option selection (bit 9)</Description> -->
+        <!-- <PossibleValue Value="0" Comment="Enhanced ATTribute is not supported"/> -->
+        <!-- <PossibleValue Value="BLE_OPTIONS_ENHANCED_ATT" Comment="Enhanced ATTribute is supported" Condition="!Semaphore_BLE_STACK_TYPE_FULL" Action="Disable" Diagnostic="Available only with full stack." /> -->
+    <!-- </RefParameter> -->
 
     <RefParameter Name="CFG_BLE_MAX_DDB_ENTRIES" Comment="CFG_BLE_MAX_DDB_ENTRIES" DefaultValue="20" Type="Integer" TabName="Configuration" Group="Application configuration - BLE stack">
         <Condition Diagnostic="" Expression="S_BLE_HOST | S_BLE_HOST_SKELETON"/>
@@ -823,10 +822,6 @@
         <Description>Max message size for debug logging service</Description>
     </RefParameter>
 
-    <RefParameter Name="INITIAL_ADV_TIMEOUT" Comment="INITIAL_ADV_TIMEOUT" DefaultValue="60" Min="1" Type="integer" TabName="Configuration" Group="Application configuration - Traces">
-        <Description>Timeout for advertising</Description>
-    </RefParameter>
-
 <!-- ************************* TRACE END ************************* -->
 
 <!-- ************************* LOG LEVEL BEGIN ************************* -->
@@ -862,12 +857,6 @@
 <!-- ************************* LOG LEVEL END ************************* -->
 
 <!-- ************************* NVM BEGIN ************************* -->
-
-    <RefParameter Name="CFG_NVM_ALIGN" Comment="CFG_NVM_ALIGN" DefaultValue="1" Type="list" TabName="Configuration" Group="Application configuration - NVM">
-        <Description></Description>
-        <PossibleValue Value="0" Comment="NO"/>
-        <PossibleValue Value="1" Comment="YES"/>
-    </RefParameter>
 
     <RefParameter Name="SNVMA_NVM_NUMBER" Comment="SNVMA_NVM_NUMBER" DefaultValue="1" Type="integer" Min="1" Max="4" TabName="Configuration" Group="Application configuration - NVM">
         <Description>Number of NVMs to be managed by the Simple NVM Arbiter</Description>
@@ -1912,7 +1901,37 @@
 
 
 <!--  Advertising begin -->
+    <RefParameter Name="ADV_INTERVAL_MIN" Comment="ADV_INTERVAL_MIN" DefaultValue="80" Type="integer" Min="20" Max="10240" TabName="BLE Advertising" Group="Advertising configuration">
+        <Description> Shall be &amp;gt 20ms and &amp;lt 10240ms</Description>
+        <Condition Diagnostic="" Expression="(S_BLE_SP | S_BLE_RP)"/>
+    </RefParameter>
+    <RefParameter Name="ADV_INTERVAL_MIN" Comment="ADV_INTERVAL_MIN" DefaultValue="0" Type="string" TabName="BLE Advertising" Group="Advertising configuration" Visible="false">
+        <Description> Shall be &amp;lt 80ms</Description>
+    </RefParameter>
 
+    <RefParameter Name="ADV_INTERVAL_MIN_HEXA" Comment="ADV_INTERVAL_MIN_HEXA" DefaultValue="0x0080" Type="hex" Min="0x0020" Max="0x4000" TabName="BLE Advertising" Group="Advertising configuration" Visible="false">
+        <Description> Shall be &amp;lt 80ms</Description>
+        <Condition Diagnostic="" Expression="(S_BLE_SP | S_BLE_RP)"/>
+    </RefParameter>
+    <RefParameter Name="ADV_INTERVAL_MIN_HEXA" Comment="ADV_INTERVAL_MIN_HEXA" DefaultValue="0" Type="string" TabName="BLE Advertising" Group="Advertising configuration" Visible="false">
+        <Description> Shall be &lt; 80ms</Description>
+    </RefParameter>
+
+    <RefParameter Name="ADV_INTERVAL_MAX" Comment="ADV_INTERVAL_MAX" DefaultValue="100" Type="integer" Min="20" Max="10240" TabName="BLE Advertising" Group="Advertising configuration">
+        <Description> Shall be &amp;gt 20ms and &amp;lt 10240ms</Description>
+        <Condition Diagnostic="" Expression="(S_BLE_SP | S_BLE_RP)"/>
+    </RefParameter>
+    <RefParameter Name="ADV_INTERVAL_MAX" Comment="ADV_INTERVAL_MAX" DefaultValue="0" Type="string" TabName="BLE Advertising" Group="Advertising configuration" Visible="false">
+        <Description> Shall be &amp;lt 100ms</Description>
+    </RefParameter>
+
+    <RefParameter Name="ADV_INTERVAL_MAX_HEXA" Comment="ADV_INTERVAL_MAX_HEXA" DefaultValue="0x00A0" Type="hex" Min="0x0020" Max="0x4000" TabName="BLE Advertising" Group="Advertising configuration" Visible="false">
+        <Description> Shall be &amp;lt 100ms</Description>
+        <Condition Diagnostic="" Expression="(S_BLE_SP | S_BLE_RP)"/>
+    </RefParameter>
+    <RefParameter Name="ADV_INTERVAL_MAX_HEXA" Comment="ADV_INTERVAL_MAX_HEXA" DefaultValue="0" Type="string" TabName="BLE Advertising" Group="Advertising configuration" Visible="false">
+        <Description> Shall be &amp;lt 100ms</Description>
+    </RefParameter>
     <RefParameter Name="ADV_TYPE" Comment="Advertising Type" DefaultValue="ADV_IND" Type="list" TabName="BLE Advertising" Group="Advertising configuration">
         <Condition Diagnostic="" Expression="(S_BLE_SP | S_BLE_RP)"/>
         <Description>List of advertising types, can be:&lt;br&gt; - Undirected scannable and connectable(ADV_IND 0x00)&lt;br&gt; - Directed non scannable(ADV_DIRECT_IND 0x01)&lt;br&gt; - Scannable but non connectable(ADV_SCAN_IND 0x02)&lt;br&gt; - Non connectable and no scan response (ADV_NONCONN_IND 0x03)&lt;br&gt; - Scan response(SCAN_RSP 0x03)</Description>
@@ -1924,42 +1943,6 @@
     </RefParameter>
     <RefParameter Name="ADV_TYPE" Comment="Advertising Type" DefaultValue="" Type="string" TabName="BLE Advertising" Visible="false">
         <Description>List of application types, can be:&lt;br&gt; - Transparent mode&lt;br&gt; - Server profile&lt;br&gt; - Client profile&lt;br&gt; - Router profile</Description>
-    </RefParameter>
-
-    <RefParameter Name="CFG_BLE_ADDRESS_TYPE" Comment="Address Type" DefaultValue="GAP_PUBLIC_ADDR" Type="list" TabName="BLE Advertising" Group="Advertising configuration">
-        <Condition Diagnostic="" Expression="(S_BLE_SP | S_BLE_RP) &amp; ! S_BLE_RP"/>
-        <Description>List of advertising types, can be:
-        &lt;br&gt; - Public address(PUBLIC_ADDR 0)
-        &lt;br&gt; - Random address (RANDOM_ADDR 1); if you activate RNG then you will get the choice between STATIC and DYNAMIC Random address
-        &lt;br&gt; - Resolvable private address (RESOLVABLE_PRIVATE_ADDR 2)
-        &lt;br&gt; - Non resolvable private address(NON_RESOLVABLE_PRIVATE_ADDR 3)</Description>
-        <PossibleValue Value="GAP_PUBLIC_ADDR" Comment="Public address(0)"/>
-        <PossibleValue Value="GAP_STATIC_RANDOM_ADDR" Comment="Random address(1)" Semaphore="Semaphore_RANDOM_ADDR"/>
-        <PossibleValue Value="GAP_RESOLVABLE_PRIVATE_ADDR" Comment="Resolvable private address(2)"/>
-        <PossibleValue Value="GAP_NON_RESOLVABLE_PRIVATE_ADDR" Comment="Non resolvable private address(3)"/>
-    </RefParameter>
-    <RefParameter Name="CFG_BLE_ADDRESS_TYPE" Comment="CFG_BLE_ADDRESS_TYPE" DefaultValue="GAP_PUBLIC_ADDR" Type="list" TabName="Configuration" Group="Application configuration - Application parameters">
-        <Condition Diagnostic="" Expression="S_BLE_RP"/>
-        <Description>List of advertising types, can be:
-        &lt;br&gt; - Public address(PUBLIC_ADDR 0)
-        &lt;br&gt; - Random address (RANDOM_ADDR 1); if you activate RNG then you will get the choice between STATIC and DYNAMIC Random address
-        &lt;br&gt; - Resolvable private address (RESOLVABLE_PRIVATE_ADDR 2)
-        &lt;br&gt; - Non resolvable private address(NON_RESOLVABLE_PRIVATE_ADDR 3)</Description>
-        <PossibleValue Value="GAP_PUBLIC_ADDR" Comment="Public address(0)"/>
-        <PossibleValue Value="GAP_STATIC_RANDOM_ADDR" Comment="Random address(1)" Semaphore="Semaphore_RANDOM_ADDR"/>
-        <PossibleValue Value="GAP_RESOLVABLE_PRIVATE_ADDR" Comment="Resolvable private address(2)"/>
-        <PossibleValue Value="GAP_NON_RESOLVABLE_PRIVATE_ADDR" Comment="Non resolvable private address(3)"/>
-    </RefParameter>
-    <RefParameter Name="CFG_BLE_ADDRESS_TYPE" Comment="CFG_BLE_ADDRESS_TYPE" DefaultValue="GAP_PUBLIC_ADDR" Type="list" TabName="Configuration" Group="Application configuration - Application parameters" Visible="false">
-        <Description>List of advertising types, can be:
-        &lt;br&gt; - Public address(PUBLIC_ADDR 0)
-        &lt;br&gt; - Random address (RANDOM_ADDR 1); if you activate RNG then you will get the choice between STATIC and DYNAMIC Random address
-        &lt;br&gt; - Resolvable private address (RESOLVABLE_PRIVATE_ADDR 2)
-        &lt;br&gt; - Non resolvable private address(NON_RESOLVABLE_PRIVATE_ADDR 3)</Description>
-        <PossibleValue Value="GAP_PUBLIC_ADDR" Comment="Public address(0)"/>
-        <PossibleValue Value="GAP_STATIC_RANDOM_ADDR" Comment="Random address(1)"/>
-        <PossibleValue Value="GAP_RESOLVABLE_PRIVATE_ADDR" Comment="Resolvable private address(2)"/>
-        <PossibleValue Value="GAP_NON_RESOLVABLE_PRIVATE_ADDR" Comment="Non resolvable private address(3)"/>
     </RefParameter>
 
     <RefParameter Name="CFG_STATIC_RANDOM_ADDRESS" Comment="RANDOM_ADDRESS type" DefaultValue="1" Type="list" TabName="BLE Advertising" Group="Advertising configuration">
@@ -1999,16 +1982,16 @@
         <PossibleValue Value="1" Comment="Static"/>
     </RefParameter>
 
-    <RefParameter Name="STATIC_RANDOM_ADDRESS" Comment="STATIC_RANDOM_ADDRESS" DefaultValue="0x000000000000" Type="hex" Min="0x000000000000" Max="0xFFFFFFFFFFFF" TabName="BLE Advertising" Group="Advertising configuration">
+    <RefParameter Name="STATIC_RANDOM_ADDRESS" Comment="STATIC_RANDOM_ADDRESS" DefaultValue="0x0008E12A1234" Type="hex" Min="0x000000000000" Max="0xFFFFFFFFFFFF" TabName="BLE Advertising" Group="Advertising configuration">
         <Condition Diagnostic="" Expression="Semaphore_STATIC_RANDOM_ADDR &amp; S_BLE_SP"/>
-        <Description>ex: 0xf257acd87a6c</Description>
+        <Description>e.g. 0x0008E12A1234</Description>
     </RefParameter>
-    <RefParameter Name="STATIC_RANDOM_ADDRESS" Comment="STATIC_RANDOM_ADDRESS" DefaultValue="0x000000000000" Type="hex" Min="0x000000000000" Max="0xFFFFFFFFFFFF" TabName="Configuration" Group="Application configuration - Application parameters">
+    <RefParameter Name="STATIC_RANDOM_ADDRESS" Comment="STATIC_RANDOM_ADDRESS" DefaultValue="0x0008E12A1234" Type="hex" Min="0x000000000000" Max="0xFFFFFFFFFFFF" TabName="Configuration" Group="Application configuration - Application parameters">
         <Condition Diagnostic="" Expression="Semaphore_STATIC_RANDOM_ADDR"/>
-        <Description>ex: 0xf257acd87a6c</Description>
+        <Description>e.g. 0x0008E12A1234</Description>
     </RefParameter>
-    <RefParameter Name="STATIC_RANDOM_ADDRESS" Comment="STATIC_RANDOM_ADDRESS" DefaultValue="0x000000000000" Type="hex" Min="0x000000000000" Max="0xFFFFFFFFFFFF" TabName="Configuration" Group="Application configuration - Application parameters" Visible="false">
-        <Description>ex: 0xf257acd87a6c</Description>
+    <RefParameter Name="STATIC_RANDOM_ADDRESS" Comment="STATIC_RANDOM_ADDRESS" DefaultValue="0x0008E12A1234" Type="hex" Min="0x000000000000" Max="0xFFFFFFFFFFFF" TabName="Configuration" Group="Application configuration - Application parameters" Visible="false">
+        <Description>e.g. 0x0008E12A1234</Description>
     </RefParameter>
 
 
@@ -2077,22 +2060,6 @@
     <!-- <RefParameter Name="GAP_OBSERVER_ROLE" Comment="Observer: Scan" DefaultValue="0" Type="string" TabName="BLE Advertising" Group="Advertising configuration" Visible="false"> -->
         <!-- <Description></Description> -->
     <!-- </RefParameter> -->
-
-    <RefParameter Name="CFG_GAP_DEVICE_NAME" Comment="CFG_GAP_DEVICE_NAME" DefaultValue="TEMPLATE" Type="stringRW" TabName="BLE Advertising" Group="Advertising configuration">
-        <Description>Device name; default value is TEMPLATE</Description>
-        <Condition Diagnostic="" Expression="(S_BLE_SP | S_BLE_RP)"/>
-    </RefParameter>
-    <RefParameter Name="CFG_GAP_DEVICE_NAME" Comment="CFG_GAP_DEVICE_NAME" DefaultValue="TEMPLATE" Type="string" TabName="BLE Advertising" Group="Advertising configuration" Visible="false">
-        <Description></Description>
-    </RefParameter>
-
-    <RefParameter Name="CFG_GAP_DEVICE_NAME_LENGTH" Comment="CFG_GAP_DEVICE_NAME_LENGTH" DefaultValue="8" Type="integerReadOnly" Min = "1" Max = "48" TabName="BLE Advertising" Group="Advertising configuration">
-        <Description>Device name lenght; max value is 48bytes, default value is 8 (TEMPLATE length)</Description>
-        <Condition Diagnostic="" Expression="(S_BLE_SP | S_BLE_RP)"/>
-    </RefParameter>
-    <RefParameter Name="CFG_GAP_DEVICE_NAME_LENGTH" Comment="CFG_GAP_DEVICE_NAME_LENGTH" DefaultValue="8" Type="integerReadOnly" Min = "8" Max = "8" TabName="BLE Advertising" Group="Advertising configuration" Visible="false">
-        <Description></Description>
-    </RefParameter>
 
     <RefParameter Name="AD_DATA_LENGTH" Comment="ad_data[] length" DefaultValue="=(IF(S_INC_TX,AD_TYPE_TX_POWER_LEVEL_LENGTH + 1,0)
     + IF(S_INC_CLN,AD_TYPE_COMPLETE_LOCAL_NAME_LENGTH + 1,0)
@@ -3311,12 +3278,12 @@
 <!-- @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ GATT begin @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ -->
 <!-- @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ -->
 
-    <RefParameter Name="NUMBER_OF_SERVICES" Comment="     Number of services" DefaultValue="0" Type="Integer" Min="0" Max="10" TabName="BLE Applications and Services" Group="Server Mode">
+    <RefParameter Name="NUMBER_OF_SERVICES" Comment="     Number of services" DefaultValue="0" Type="Integer" Min="0" Max="25" TabName="BLE Applications and Services" Group="Server Mode">
         <Condition Diagnostic="" Expression="(S_BLE_SP | S_BLE_RP)"/>
-        <Description> Number of services; maximum is 10</Description>
+        <Description> Number of services; maximum is 25</Description>
     </RefParameter>
     <RefParameter Name="NUMBER_OF_SERVICES" Comment="Number of services" DefaultValue="0" Type="Integer" Min="0" Max="0" TabName="BLE Applications and Services" Group="Server Mode" Visible="false">
-        <Description> Number of services; maximum is 10</Description>
+        <Description> Number of services; maximum is 25</Description>
     </RefParameter>
 
     <RefParameter Name="SERVICE_CHAR_GATT_DONT_NOTIFY_EVENTS" Comment="GATT_DONT_NOTIFY_EVENTS" DefaultValue="GATT_DONT_NOTIFY_EVENTS" Type="list" Visible="false" TabName="BLE Applications and Services" Group="Server Mode">
@@ -3607,12 +3574,12 @@
         <Description>Value depends of the number of characteristics with the property Notify or Indicate</Description>
     </RefParameter>
 
-    <RefParameter Name="SERVICE0_NUMBER_OF_CHARACTERISTICS" Comment="Number of characteristics" DefaultValue="0" Type="Integer" Min="0" Max="10" TabName="SERVICE0" Group="Service">
+    <RefParameter Name="SERVICE0_NUMBER_OF_CHARACTERISTICS" Comment="Number of characteristics" DefaultValue="0" Type="Integer" Min="0" Max="25" TabName="SERVICE0" Group="Service">
         <Condition Diagnostic="" Expression="S_SERVICE0"/>
-        <Description> Number of services; maximum is 10</Description>
+        <Description> Number of services; maximum is 25</Description>
     </RefParameter>
     <RefParameter Name="SERVICE0_NUMBER_OF_CHARACTERISTICS" Comment="Number of characteristics" DefaultValue="0" Type="Integer" Min="0" Max="0" TabName="SERVICE0" Group="Service" Visible="false">
-        <Description> Number of services; maximum is 10</Description>
+        <Description> Number of services; maximum is 25</Description>
     </RefParameter>
 
 <!-- @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ -->
@@ -3925,7 +3892,7 @@
     </RefParameter>
 
 
-    <RefParameter Name="SERVICE0_CHAR0_UUID" Comment="UUID"  Type="List"  DefaultValue="0x2A06"  TabName="Service1" Group="Characteristic1">
+    <RefParameter Name="SERVICE0_CHAR0_UUID" Comment="UUID"  Type="List"  DefaultValue="0x2A06"  TabName="SERVICE0" Group="Characteristic0">
         <Description>List of possible characteristics for Immediate Alert Service</Description>
         <Condition Diagnostic="" Expression="S_SERVICE0_CHAR0_UUID_SIG &amp; S_SERVICE0_0x1802"/>
         <PossibleValue Comment="Alert Level" Value="0x2A06" Semaphore="S_SERVICE0_CHAR0_0x2A06"/>
@@ -7847,7 +7814,6 @@
         <Parameter Name="DBG_TRACE_MSG_QUEUE_SIZE"/>
         <Parameter Name="MAX_DBG_TRACE_MSG_SIZE"/>
         <Parameter Name="SYS_MAX_MSG"/>
-        <Parameter Name="INITIAL_ADV_TIMEOUT"/>
 
         <!-- Pairing begin -->
         <Parameter Name="PAIRING_PARAMETERS"/>
@@ -7936,18 +7902,18 @@
         <Parameter Name="CFG_BLE_NUM_LINK"/>
         <Parameter Name="CFG_BLE_NUM_GATT_SERVICES"/>
         <Parameter Name="CFG_BLE_NUM_GATT_ATTRIBUTES"/>
-        <Parameter Name="CFG_BLE_MAX_ATT_MTU"/>
+        <Parameter Name="CFG_BLE_ATT_MTU_MAX"/>
         <Parameter Name="CFG_BLE_ATT_VALUE_ARRAY_SIZE"/>
         <Parameter Name="CFG_BLE_ATTR_PREPARE_WRITE_VALUE_SIZE"/>
         <Parameter Name="CFG_BLE_MBLOCK_COUNT_MARGIN"/>
-        <Parameter Name="CFG_BLE_MAX_COC_NUMBER"/>
-        <Parameter Name="CFG_BLE_MAX_COC_MPS"/>
-        <Parameter Name="CFG_BLE_MAX_COC_INITIATOR_NBR"/>
-        <Parameter Name="CFG_BLE_OPTIONS"/>
-        <Parameter Name="CFG_BLE_OPTIONS_LL"/>
-        <Parameter Name="CFG_BLE_OPTIONS_SVC"/>
-        <Parameter Name="CFG_BLE_OPTIONS_DEVICE_NAME"/>
-        <Parameter Name="CFG_BLE_OPTIONS_POWER_CLASS"/>
+        <Parameter Name="CFG_BLE_COC_NBR_MAX"/>
+        <Parameter Name="CFG_BLE_COC_MPS_MAX"/>
+        <Parameter Name="CFG_BLE_COC_INITIATOR_NBR_MAX"/>
+        <!-- <Parameter Name="CFG_BLE_OPTIONS"/> -->
+        <!-- <Parameter Name="CFG_BLE_OPTIONS_LL"/> -->
+        <!-- <Parameter Name="CFG_BLE_OPTIONS_SVC"/> -->
+        <!-- <Parameter Name="CFG_BLE_OPTIONS_DEVICE_NAME"/> -->
+        <!-- <Parameter Name="CFG_BLE_OPTIONS_POWER_CLASS"/> -->
         <Parameter Name="CFG_BLE_MAX_DDB_ENTRIES"/>
         <!-- BLE Stack End -->
 
@@ -7964,7 +7930,6 @@
         <Parameter Name="DBG_TRACE_MSG_QUEUE_SIZE"/>
         <Parameter Name="MAX_DBG_TRACE_MSG_SIZE"/>
         <Parameter Name="SYS_MAX_MSG"/>
-        <Parameter Name="INITIAL_ADV_TIMEOUT"/>
 
         <!-- Log Level begin -->
         <Parameter Name="APPLI_CONFIG_LOG_LEVEL"/>
@@ -7972,7 +7937,6 @@
         <!-- Log Level end -->
 
         <!-- NVM configuration begin -->
-        <Parameter Name="CFG_NVM_ALIGN"/>
         <Parameter Name="SNVMA_NVM_NUMBER"/>
         <Parameter Name="SNVMA_POLY_CRC16"/>
         <Parameter Name="SNVMA_NVM_ID_1"/>
@@ -8107,8 +8071,8 @@
         <!-- BLE application parameters begin -->
         <Parameter Name="USER_GUIDANCE"/>
         <Parameter Name="CFG_TX_POWER"/>
-        <Parameter Name="CFG_ADV_BD_ADDRESS"/>
-        <Parameter Name="CFG_BLE_ADDRESS_TYPE"/>
+        <Parameter Name="CFG_BD_ADDRESS"/>
+        <Parameter Name="CFG_BD_ADDRESS_TYPE"/>
         <Parameter Name="ADV_TYPE"/>
         <Parameter Name="CFG_STATIC_RANDOM_ADDRESS"/>
         <Parameter Name="CFG_RNG"/>
@@ -8131,18 +8095,18 @@
         <Parameter Name="CFG_BLE_NUM_LINK"/>
         <Parameter Name="CFG_BLE_NUM_GATT_SERVICES"/>
         <Parameter Name="CFG_BLE_NUM_GATT_ATTRIBUTES"/>
-        <Parameter Name="CFG_BLE_MAX_ATT_MTU"/>
+        <Parameter Name="CFG_BLE_ATT_MTU_MAX"/>
         <Parameter Name="CFG_BLE_ATT_VALUE_ARRAY_SIZE"/>
         <Parameter Name="CFG_BLE_ATTR_PREPARE_WRITE_VALUE_SIZE"/>
         <Parameter Name="CFG_BLE_MBLOCK_COUNT_MARGIN"/>
-        <Parameter Name="CFG_BLE_MAX_COC_NUMBER"/>
-        <Parameter Name="CFG_BLE_MAX_COC_MPS"/>
-        <Parameter Name="CFG_BLE_MAX_COC_INITIATOR_NBR"/>
-        <Parameter Name="CFG_BLE_OPTIONS"/>
-        <Parameter Name="CFG_BLE_OPTIONS_LL"/>
-        <Parameter Name="CFG_BLE_OPTIONS_SVC"/>
-        <Parameter Name="CFG_BLE_OPTIONS_DEVICE_NAME"/>
-        <Parameter Name="CFG_BLE_OPTIONS_POWER_CLASS"/>
+        <Parameter Name="CFG_BLE_COC_NBR_MAX"/>
+        <Parameter Name="CFG_BLE_COC_MPS_MAX"/>
+        <Parameter Name="CFG_BLE_COC_INITIATOR_NBR_MAX"/>
+        <!-- <Parameter Name="CFG_BLE_OPTIONS"/> -->
+        <!-- <Parameter Name="CFG_BLE_OPTIONS_LL"/> -->
+        <!-- <Parameter Name="CFG_BLE_OPTIONS_SVC"/> -->
+        <!-- <Parameter Name="CFG_BLE_OPTIONS_DEVICE_NAME"/> -->
+        <!-- <Parameter Name="CFG_BLE_OPTIONS_POWER_CLASS"/> -->
         <Parameter Name="CFG_BLE_MAX_DDB_ENTRIES"/>
 
         <!-- BLE Stack End -->
@@ -8172,7 +8136,6 @@
         <Parameter Name="APPLI_PRINT_FILE_FUNC_LINE"/>
 
         <!-- NVM configuration begin -->
-        <Parameter Name="CFG_NVM_ALIGN"/>
         <Parameter Name="SNVMA_NVM_NUMBER"/>
         <Parameter Name="SNVMA_POLY_CRC16"/>
         <Parameter Name="SNVMA_NVM_ID_1"/>

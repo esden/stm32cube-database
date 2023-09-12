@@ -34,38 +34,16 @@ Key: ${key}; Value: ${myHash[key]}
 
 /******************************************************************************
  *
- * BLE SERVICES CONFIGURATION
- * blesvc
+ * Service Controller configuration
  *
  ******************************************************************************/
 
 /**
- * This setting shall be set to '1' if the device needs to support the Peripheral Role
- * In the MS configuration, both BLE_CFG_PERIPHERAL and BLE_CFG_CENTRAL shall be set to '1'
- */
-#define BLE_CFG_PERIPHERAL                        (${myHash["BLE_CFG_PERIPHERAL"]})
-
-/**
- * This setting shall be set to '1' if the device needs to support the Central Role
- * In the MS configuration, both BLE_CFG_PERIPHERAL and BLE_CFG_CENTRAL shall be set to '1'
- */
-#define BLE_CFG_CENTRAL                           (${myHash["BLE_CFG_CENTRAL"]})
-
-/**
- * There is one handler per service enabled
+ * There is one handler per BLE service
  * Note: There is no handler for the Device Information Service
- *
- * This shall take into account all registered handlers
- * (from either the provided services or the custom services)
  */
 #define BLE_CFG_SVC_MAX_NBR_CB                    (${myHash["BLE_CFG_SVC_MAX_NBR_CB"]})
 #define BLE_CFG_CLT_MAX_NBR_CB                    (${myHash["BLE_CFG_CLT_MAX_NBR_CB"]})
-
-/******************************************************************************
- * GAP Service - Appearance
- ******************************************************************************/
-
-#define BLE_CFG_GAP_APPEARANCE                    (GAP_APPEARANCE_UNKNOWN)
 
 /* USER CODE BEGIN ble_conf_1 */
 

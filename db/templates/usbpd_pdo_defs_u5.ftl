@@ -1273,15 +1273,15 @@ uint32_t PORT0_PDO_ListSNK[USBPD_MAX_NB_PDO] =
     USBPD_PDO_SNK_FIXED_SET_VOLTAGE(${USBPD_PORT0_PDO_SNK_FIXED_SET_VOLTAGE_1}U)         | /* Voltage in mV               */
     USBPD_PDO_SNK_FIXED_SET_OP_CURRENT(${USBPD_PORT0_PDO_SNK_FIXED_SET_OP_CURRENT_1}U)       /* Operating current in  mA            */
     [#else]
-       [#if USBPD_PORT0_PDO_SRC_TYPE_1 == "USBPD_PDO_TYPE_BATTERY"] 
-    ${USBPD_PORT0_PDO_SRC_TYPE_1}                        | /* Battery                */
+       [#if USBPD_PORT0_PDO_SNK_TYPE_1 == "USBPD_PDO_TYPE_BATTERY"] 
+    ${USBPD_PORT0_PDO_SNK_TYPE_1}                        | /* Battery                */
     
     USBPD_PDO_SNK_BATTERY_SET_OP_POWER(${USBPD_PORT0_PDO_SNK_BATTERY_SET_OP_POWER_1}U)         | /* Power mW               */
     USBPD_PDO_SNK_BATTERY_SET_MAX_VOLTAGE(${USBPD_PORT0_PDO_SNK_BATTERY_SET_MAX_VOLTAGE_1}U)     | /* Max Voltage mV           */
     USBPD_PDO_SNK_BATTERY_SET_MIN_VOLTAGE(${USBPD_PORT0_PDO_SNK_BATTERY_SET_MIN_VOLTAGE_1}U)            /* Min Voltage mV           */
        [#else]
-          [#if USBPD_PORT0_PDO_SRC_TYPE_1 == "USBPD_PDO_TYPE_VARIABLE"] 
-    ${USBPD_PORT0_PDO_SRC_TYPE_1}                        | /* Variable Supply                */
+          [#if USBPD_PORT0_PDO_SNK_TYPE_1 == "USBPD_PDO_TYPE_VARIABLE"] 
+    ${USBPD_PORT0_PDO_SNK_TYPE_1}                        | /* Variable Supply                */
     
     USBPD_PDO_SNK_VARIABLE_SET_OP_CURRENT(${USBPD_PORT0_PDO_SNK_VARIABLE_SET_OP_CURRENT_1}U)         | /* Max Current mA           */
     USBPD_PDO_SNK_VARIABLE_SET_MAX_VOLTAGE(${USBPD_PORT0_PDO_SNK_VARIABLE_SET_MAX_VOLTAGE_1}U)     | /* Max Voltage mV           */
@@ -1310,15 +1310,15 @@ uint32_t PORT0_PDO_ListSNK[USBPD_MAX_NB_PDO] =
     USBPD_PDO_SNK_FIXED_SET_VOLTAGE(${USBPD_PORT0_PDO_SNK_FIXED_SET_VOLTAGE_2}U)         | /* Voltage in mV               */
     USBPD_PDO_SNK_FIXED_SET_OP_CURRENT(${USBPD_PORT0_PDO_SNK_FIXED_SET_OP_CURRENT_2}U)       /* Operating current in  mA            */
     [#else]
-       [#if USBPD_PORT0_PDO_SRC_TYPE_2 == "USBPD_PDO_TYPE_BATTERY"] 
-    ${USBPD_PORT0_PDO_SRC_TYPE_2}                        | /* Battery                */
+       [#if USBPD_PORT0_PDO_SNK_TYPE_2 == "USBPD_PDO_TYPE_BATTERY"] 
+    ${USBPD_PORT0_PDO_SNK_TYPE_2}                        | /* Battery                */
     
     USBPD_PDO_SNK_BATTERY_SET_OP_POWER(${USBPD_PORT0_PDO_SNK_BATTERY_SET_OP_POWER_2}U)         | /* Power mW               */
     USBPD_PDO_SNK_BATTERY_SET_MAX_VOLTAGE(${USBPD_PORT0_PDO_SNK_BATTERY_SET_MAX_VOLTAGE_2}U)     | /* Max Voltage mV           */
     USBPD_PDO_SNK_BATTERY_SET_MIN_VOLTAGE(${USBPD_PORT0_PDO_SNK_BATTERY_SET_MIN_VOLTAGE_2}U)            /* Min Voltage mV           */
        [#else]
-          [#if USBPD_PORT0_PDO_SRC_TYPE_2 == "USBPD_PDO_TYPE_VARIABLE"] 
-    ${USBPD_PORT0_PDO_SRC_TYPE_2}                        | /* Variable Supply                */
+          [#if USBPD_PORT0_PDO_SNK_TYPE_2 == "USBPD_PDO_TYPE_VARIABLE"] 
+    ${USBPD_PORT0_PDO_SNK_TYPE_2}                        | /* Variable Supply                */
     
     USBPD_PDO_SNK_VARIABLE_SET_OP_CURRENT(${USBPD_PORT0_PDO_SNK_VARIABLE_SET_OP_CURRENT_2}U)         | /* Max Current mA           */
     USBPD_PDO_SNK_VARIABLE_SET_MAX_VOLTAGE(${USBPD_PORT0_PDO_SNK_VARIABLE_SET_MAX_VOLTAGE_2}U)     | /* Max Voltage mV           */
@@ -1347,15 +1347,15 @@ uint32_t PORT0_PDO_ListSNK[USBPD_MAX_NB_PDO] =
     USBPD_PDO_SNK_FIXED_SET_VOLTAGE(${USBPD_PORT0_PDO_SNK_FIXED_SET_VOLTAGE_3}U)         | /* Voltage in mV               */
     USBPD_PDO_SNK_FIXED_SET_OP_CURRENT(${USBPD_PORT0_PDO_SNK_FIXED_SET_OP_CURRENT_3}U)       /* Operating current in  mA            */
     [#else]
-       [#if USBPD_PORT0_PDO_SRC_TYPE_3 == "USBPD_PDO_TYPE_BATTERY"] 
-    ${USBPD_PORT0_PDO_SRC_TYPE_3}                        | /* Battery                */
+       [#if USBPD_PORT0_PDO_SNK_TYPE_3 == "USBPD_PDO_TYPE_BATTERY"] 
+    ${USBPD_PORT0_PDO_SNK_TYPE_3}                        | /* Battery                */
     
     USBPD_PDO_SNK_BATTERY_SET_OP_POWER(${USBPD_PORT0_PDO_SNK_BATTERY_SET_OP_POWER_3}U)         | /* Power mW               */
     USBPD_PDO_SNK_BATTERY_SET_MAX_VOLTAGE(${USBPD_PORT0_PDO_SNK_BATTERY_SET_MAX_VOLTAGE_3}U)     | /* Max Voltage mV           */
     USBPD_PDO_SNK_BATTERY_SET_MIN_VOLTAGE(${USBPD_PORT0_PDO_SNK_BATTERY_SET_MIN_VOLTAGE_3}U)            /* Min Voltage mV           */
        [#else]
-          [#if USBPD_PORT0_PDO_SRC_TYPE_3 == "USBPD_PDO_TYPE_VARIABLE"] 
-    ${USBPD_PORT0_PDO_SRC_TYPE_3}                        | /* Variable Supply                */
+          [#if USBPD_PORT0_PDO_SNK_TYPE_3 == "USBPD_PDO_TYPE_VARIABLE"] 
+    ${USBPD_PORT0_PDO_SNK_TYPE_3}                        | /* Variable Supply                */
     
     USBPD_PDO_SNK_VARIABLE_SET_OP_CURRENT(${USBPD_PORT0_PDO_SNK_VARIABLE_SET_OP_CURRENT_3}U)         | /* Max Current mA           */
     USBPD_PDO_SNK_VARIABLE_SET_MAX_VOLTAGE(${USBPD_PORT0_PDO_SNK_VARIABLE_SET_MAX_VOLTAGE_3}U)     | /* Max Voltage mV           */
@@ -1384,15 +1384,15 @@ uint32_t PORT0_PDO_ListSNK[USBPD_MAX_NB_PDO] =
     USBPD_PDO_SNK_FIXED_SET_VOLTAGE(${USBPD_PORT0_PDO_SNK_FIXED_SET_VOLTAGE_4}U)         | /* Voltage in mV               */
     USBPD_PDO_SNK_FIXED_SET_OP_CURRENT(${USBPD_PORT0_PDO_SNK_FIXED_SET_OP_CURRENT_4}U)       /* Operating current in  mA            */
     [#else]
-       [#if USBPD_PORT0_PDO_SRC_TYPE_4 == "USBPD_PDO_TYPE_BATTERY"] 
-    ${USBPD_PORT0_PDO_SRC_TYPE_4}                        | /* Battery                */
+       [#if USBPD_PORT0_PDO_SNK_TYPE_4 == "USBPD_PDO_TYPE_BATTERY"] 
+    ${USBPD_PORT0_PDO_SNK_TYPE_4}                        | /* Battery                */
     
     USBPD_PDO_SNK_BATTERY_SET_OP_POWER(${USBPD_PORT0_PDO_SNK_BATTERY_SET_OP_POWER_4}U)         | /* Power mW               */
     USBPD_PDO_SNK_BATTERY_SET_MAX_VOLTAGE(${USBPD_PORT0_PDO_SNK_BATTERY_SET_MAX_VOLTAGE_4}U)     | /* Max Voltage mV           */
     USBPD_PDO_SNK_BATTERY_SET_MIN_VOLTAGE(${USBPD_PORT0_PDO_SNK_BATTERY_SET_MIN_VOLTAGE_4}U)            /* Min Voltage mV           */
        [#else]
-          [#if USBPD_PORT0_PDO_SRC_TYPE_4 == "USBPD_PDO_TYPE_VARIABLE"] 
-    ${USBPD_PORT0_PDO_SRC_TYPE_4}                        | /* Variable Supply                */
+          [#if USBPD_PORT0_PDO_SNK_TYPE_4 == "USBPD_PDO_TYPE_VARIABLE"] 
+    ${USBPD_PORT0_PDO_SNK_TYPE_4}                        | /* Variable Supply                */
     
     USBPD_PDO_SNK_VARIABLE_SET_OP_CURRENT(${USBPD_PORT0_PDO_SNK_VARIABLE_SET_OP_CURRENT_4}U)         | /* Max Current mA           */
     USBPD_PDO_SNK_VARIABLE_SET_MAX_VOLTAGE(${USBPD_PORT0_PDO_SNK_VARIABLE_SET_MAX_VOLTAGE_4}U)     | /* Max Voltage mV           */
@@ -1421,15 +1421,15 @@ uint32_t PORT0_PDO_ListSNK[USBPD_MAX_NB_PDO] =
     USBPD_PDO_SNK_FIXED_SET_VOLTAGE(${USBPD_PORT0_PDO_SNK_FIXED_SET_VOLTAGE_5}U)         | /* Voltage in mV               */
     USBPD_PDO_SNK_FIXED_SET_OP_CURRENT(${USBPD_PORT0_PDO_SNK_FIXED_SET_OP_CURRENT_5}U)       /* Operating current in  mA            */
     [#else]
-       [#if USBPD_PORT0_PDO_SRC_TYPE_5 == "USBPD_PDO_TYPE_BATTERY"] 
-    ${USBPD_PORT0_PDO_SRC_TYPE_5}                        | /* Battery                */
+       [#if USBPD_PORT0_PDO_SNK_TYPE_5 == "USBPD_PDO_TYPE_BATTERY"] 
+    ${USBPD_PORT0_PDO_SNK_TYPE_5}                        | /* Battery                */
     
     USBPD_PDO_SNK_BATTERY_SET_OP_POWER(${USBPD_PORT0_PDO_SNK_BATTERY_SET_OP_POWER_5}U)         | /* Power mW               */
     USBPD_PDO_SNK_BATTERY_SET_MAX_VOLTAGE(${USBPD_PORT0_PDO_SNK_BATTERY_SET_MAX_VOLTAGE_5}U)     | /* Max Voltage mV           */
     USBPD_PDO_SNK_BATTERY_SET_MIN_VOLTAGE(${USBPD_PORT0_PDO_SNK_BATTERY_SET_MIN_VOLTAGE_5}U)            /* Min Voltage mV           */
        [#else]
-          [#if USBPD_PORT0_PDO_SRC_TYPE_5 == "USBPD_PDO_TYPE_VARIABLE"] 
-    ${USBPD_PORT0_PDO_SRC_TYPE_5}                        | /* Variable Supply                */
+          [#if USBPD_PORT0_PDO_SNK_TYPE_5 == "USBPD_PDO_TYPE_VARIABLE"] 
+    ${USBPD_PORT0_PDO_SNK_TYPE_5}                        | /* Variable Supply                */
     
     USBPD_PDO_SNK_VARIABLE_SET_OP_CURRENT(${USBPD_PORT0_PDO_SNK_VARIABLE_SET_OP_CURRENT_5}U)         | /* Max Current mA           */
     USBPD_PDO_SNK_VARIABLE_SET_MAX_VOLTAGE(${USBPD_PORT0_PDO_SNK_VARIABLE_SET_MAX_VOLTAGE_5}U)     | /* Max Voltage mV           */
@@ -1458,15 +1458,15 @@ uint32_t PORT0_PDO_ListSNK[USBPD_MAX_NB_PDO] =
     USBPD_PDO_SNK_FIXED_SET_VOLTAGE(${USBPD_PORT0_PDO_SNK_FIXED_SET_VOLTAGE_6}U)         | /* Voltage in mV               */
     USBPD_PDO_SNK_FIXED_SET_OP_CURRENT(${USBPD_PORT0_PDO_SNK_FIXED_SET_OP_CURRENT_6}U)       /* Operating current in  mA            */
     [#else]
-       [#if USBPD_PORT0_PDO_SRC_TYPE_6 == "USBPD_PDO_TYPE_BATTERY"] 
-    ${USBPD_PORT0_PDO_SRC_TYPE_6}                        | /* Battery                */
+       [#if USBPD_PORT0_PDO_SNK_TYPE_6 == "USBPD_PDO_TYPE_BATTERY"] 
+    ${USBPD_PORT0_PDO_SNK_TYPE_6}                        | /* Battery                */
     
     USBPD_PDO_SNK_BATTERY_SET_OP_POWER(${USBPD_PORT0_PDO_SNK_BATTERY_SET_OP_POWER_6}U)         | /* Power mW               */
     USBPD_PDO_SNK_BATTERY_SET_MAX_VOLTAGE(${USBPD_PORT0_PDO_SNK_BATTERY_SET_MAX_VOLTAGE_6}U)     | /* Max Voltage mV           */
     USBPD_PDO_SNK_BATTERY_SET_MIN_VOLTAGE(${USBPD_PORT0_PDO_SNK_BATTERY_SET_MIN_VOLTAGE_6}U)            /* Min Voltage mV           */
        [#else]
-          [#if USBPD_PORT0_PDO_SRC_TYPE_6 == "USBPD_PDO_TYPE_VARIABLE"] 
-    ${USBPD_PORT0_PDO_SRC_TYPE_6}                        | /* Variable Supply                */
+          [#if USBPD_PORT0_PDO_SNK_TYPE_6 == "USBPD_PDO_TYPE_VARIABLE"] 
+    ${USBPD_PORT0_PDO_SNK_TYPE_6}                        | /* Variable Supply                */
     
     USBPD_PDO_SNK_VARIABLE_SET_OP_CURRENT(${USBPD_PORT0_PDO_SNK_VARIABLE_SET_OP_CURRENT_6}U)         | /* Max Current mA           */
     USBPD_PDO_SNK_VARIABLE_SET_MAX_VOLTAGE(${USBPD_PORT0_PDO_SNK_VARIABLE_SET_MAX_VOLTAGE_6}U)     | /* Max Voltage mV           */

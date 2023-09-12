@@ -251,7 +251,7 @@
         <Description>Select the alignment of the data stored after conversion.</Description>
     </RefParameter> 
     
-     <RefParameter Comment="Gain Compensation" DefaultValue="0" Group="ADCgroup" Name="GainCompensation" Max="65535" Min="0"  Type="integer">
+     <RefParameter Comment="Gain Compensation" DefaultValue="0" Group="ADCgroup" Name="GainCompensation" Max="16383" Min="0"  Type="integer">
         <Description>Specify the ADC gain compensation coefficient.</Description>
     </RefParameter>
     
@@ -428,21 +428,17 @@
     <RefParameter Comment="Oversampling Ratio" DefaultValue="null" Group="ADCgroup" Name="Ratio" Type="list" Visible="false">
         <Condition Diagnostic="" Expression="OversamplingMode=DISABLE | EnableRegularConversion=DISABLE"/>
     </RefParameter>
-    <RefParameter Comment="Oversampling Ratio" DefaultValue="ADC_OVERSAMPLING_RATIO_2" Group="ADCgroup" Name="Ratio" Type="list">
-        <Condition Diagnostic="" Expression="OversamplingMode=ENABLE"/>
-        <PossibleValue Comment="Oversampling ratio 2x " Value="ADC_OVERSAMPLING_RATIO_2"/>
-        <PossibleValue Comment="Oversampling ratio 4x " Value="ADC_OVERSAMPLING_RATIO_4"/>
-        <PossibleValue Comment="Oversampling ratio 8x " Value="ADC_OVERSAMPLING_RATIO_8"/>
-        <PossibleValue Comment="Oversampling ratio 16x " Value="ADC_OVERSAMPLING_RATIO_16"/>	  
-        <PossibleValue Action="Disable" Comment="Oversampling ratio 32x " Condition="REG_RIGHTBITSHIFT_NONE_$IpInstance" Diagnostic="shift for oversampling should be equal or greater than 1" Value="ADC_OVERSAMPLING_RATIO_32"/>
-        <PossibleValue Action="Disable" Comment="Oversampling ratio 64x " Condition="REG_RIGHTBITSHIFT_NONE_$IpInstance |REG_RIGHTBITSHIFT1_$IpInstance" Diagnostic="Shift for oversampling should be equal or greater than 2" Value="ADC_OVERSAMPLING_RATIO_64"/>
-        <PossibleValue Action="Disable" Comment="Oversampling ratio 128x " Condition="REG_RIGHTBITSHIFT_NONE_$IpInstance |REG_RIGHTBITSHIFT1_$IpInstance | REG_RIGHTBITSHIFT2_$IpInstance " Diagnostic="Shift for oversampling should be equal or greater than 3" Value="ADC_OVERSAMPLING_RATIO_128"/>
-        <PossibleValue Action="Disable" Comment="Oversampling ratio 256x " Condition="REG_RIGHTBITSHIFT_NONE_$IpInstance |REG_RIGHTBITSHIFT1_$IpInstance | REG_RIGHTBITSHIFT2_$IpInstance | REG_RIGHTBITSHIFT3_$IpInstance" Diagnostic="Shift for oversampling should be equal or greater than 4" Value="ADC_OVERSAMPLING_RATIO_256"/>
-    </RefParameter>	
-   
+    
+   <RefParameter Comment="Oversampling Ratio" DefaultValue="1" Group="ADCgroup" Max="1024" Min="1" Name="Ratio1" Type="integer"></RefParameter>
+			
+    <RefParameter Comment="Oversampling Ratio" DefaultValue="null" Group="ADCgroup" Name="Ratio" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="OversamplingMode=DISABLE | EnableRegularConversion=DISABLE"/>
+    </RefParameter>
+    <RefParameter Comment="Oversampling Ratio" DefaultValue ="=Ratio1-1" Group="ADCgroup" Max="1023" Min="0" Name="Ratio" Type="integer" Visible="false"></RefParameter>
     <RefParameter Comment="Regular Oversampling Mode" DefaultValue="null" Group="ADCgroup" Name="OversamplingStopReset" Type="list" Visible="false">
         <Condition Diagnostic="" Expression="OversamplingMode=DISABLE | EnableRegularConversion=DISABLE"/>
     </RefParameter>
+    
     <RefParameter Comment="Regular Oversampling Mode" DefaultValue="ADC_REGOVERSAMPLING_CONTINUED_MODE" Group="ADCgroup" Name="OversamplingStopReset" Type="list">
         <Condition Diagnostic="" Expression="OversamplingMode=ENABLE"/>
         <PossibleValue Action="Disable" Comment="Oversampling Continued Mode" Condition="Injected_OversamplingMode_Enabled_$IpInstance" Diagnostic="Oversampling Continued Mode available only when Injected Oversampling Disabled" Value="ADC_REGOVERSAMPLING_CONTINUED_MODE"/>
@@ -2161,6 +2157,7 @@
         <Parameter Name="OversamplingMode"/>
         <Parameter Name="RightBitShift"/>
         <Parameter Name="Ratio"/>	
+        <Parameter Name="Ratio1"/>
         <Parameter Name="OversamplingStopReset"/>
         <Parameter Name="TriggeredMode"/>	
         <Parameter Name="NbrOfConversionFlag"/>

@@ -23,6 +23,7 @@
 [#assign rx_buffer_address = 0]
 [#assign lwip_ipv6 = 0]
 [#assign BspComponent = ""]
+[#assign lwip_netif_hostname = "lwip"]
 [#if SWIP.defines??]
 	[#list SWIP.defines as definition] 	
         [#if (definition.name == "WITH_RTOS")]
@@ -62,6 +63,9 @@
         [/#if] 
         [#if (definition.name == "LWIP_IPV6") && (definition.value == "1")]
             [#assign lwip_ipv6 = 1]
+        [/#if] 
+        [#if (definition.name == "LWIP_NETIF_HOSTNAME") && (definition.value != "valueNotSetted")]
+            [#assign lwip_netif_hostname = definition.value]
         [/#if]  
 	[/#list]
 [/#if][#-- SWIP.defines --]
@@ -309,7 +313,7 @@ static void low_level_init(struct netif *netif)
 
 [#if lwip_ipv6 == 1]
   /* Pass all multicast frames: needed for IPv6 protocol*/
-  heth.Instance->MACPFR |= ETH_MACPFR_PM;
+  heth.Instance->MACFFR |= ETH_MACFFR_PM;
   
 [/#if] [#-- endif lwip_ipv6 --]
 #if LWIP_ARP || LWIP_ETHERNET 
@@ -647,7 +651,7 @@ err_t ethernetif_init(struct netif *netif)
   
 #if LWIP_NETIF_HOSTNAME
   /* Initialize interface hostname */
-  netif->hostname = "lwip";
+  netif->hostname = "${lwip_netif_hostname}";
 #endif /* LWIP_NETIF_HOSTNAME */
 
   /*

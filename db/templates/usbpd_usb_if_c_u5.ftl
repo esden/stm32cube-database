@@ -12,13 +12,14 @@
 /* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
-#include "main.h"
-#include "usbpd_usb_if.h"
-#include "usbpd_trace.h"
 
 /* USER CODE BEGIN Includes */
 
 /* USER CODE END Includes */
+
+#include "main.h"
+#include "usbpd_usb_if.h"
+#include "usbpd_trace.h"
 
 /* USB include files ----------------------------------------------------------*/
 

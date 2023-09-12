@@ -52,9 +52,11 @@
 /* USER CODE BEGIN VARIABLES */
 
 /* USER CODE END VARIABLES */
-
+[#if THREADX??]
+unsigned int MX_${name}_Init(void *memory_ptr);
+[#else]
 void MX_${name}_Init(void);
-
+[/#if]
 /*
  * -- Insert functions declaration here --
  */

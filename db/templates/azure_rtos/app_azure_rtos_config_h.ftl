@@ -36,6 +36,7 @@ extern "C" {
 [#assign TOUCHSENSING_APP_MEM_POOL_SIZE_Val = "0"]
 [#assign GUI_INTERFACE_APP_MEM_POOL_SIZE_VAL = "0"]
 [#assign STM32WPAN_APP_MEM_POOL_SIZE_Val = "0"]
+[#assign SECURE_MANAGER_API_APP_MEM_POOL_SIZE_VAL = "512"]
 
 [#assign TX_ENABLED = "true"]
 [#assign FX_ENABLED = "false"]
@@ -46,6 +47,7 @@ extern "C" {
 [#assign TOUCHSENSING_ENABLED = "false"]
 [#assign GUI_INTERFACE_ENABLED = "false"]
 [#assign STM32WPAN_ENABLED = "false"]
+[#assign SECURE_MANAGER_API_ENABLED = "false"]
 [#compress]
 [#list SWIPdatas as SWIP]
 [#if SWIP.defines??]
@@ -74,8 +76,11 @@ extern "C" {
     [#if name == "GUI_INTERFACE_ENABLED" && value == "true"]
       [#assign GUI_INTERFACE_ENABLED = value]
     [/#if]
-  [#if name == "WPAN_ENABLED" && value == "true"]
+    [#if name == "WPAN_ENABLED" && value == "true"]
       [#assign STM32WPAN_ENABLED = value]
+    [/#if]
+	[#if name == "SECURE_MANAGER_API_ENABLED" && value == "true"]
+      [#assign SECURE_MANAGER_API_ENABLED = value]
     [/#if]
 	
 	
@@ -106,8 +111,11 @@ extern "C" {
     [#if name.contains("GUI_INTERFACE_APP_MEM_POOL_SIZE")]
       [#assign GUI_INTERFACE_APP_MEM_POOL_SIZE_VAL = value]
     [/#if]
-  [#if name.contains("STM32WPAN_APP_MEM_POOL_SIZE")]
+    [#if name.contains("STM32WPAN_APP_MEM_POOL_SIZE")]
 	  [#assign STM32WPAN_APP_MEM_POOL_SIZE_VAL = value]
+	[/#if]
+	[#if name.contains("SECURE_MANAGER_API_APP_MEM_POOL_SIZE_VAL")]
+	  [#assign SECURE_MANAGER_API_APP_MEM_POOL_SIZE_VAL = value]
 	[/#if]
     [/#list]
 [/#if]
@@ -163,6 +171,9 @@ extern "C" {
 [#if STM32WPAN_ENABLED == "true" && STM32WPAN_APP_MEM_POOL_SIZE_VAL != "valueNotSetted"]
 #define STM32WPAN_APP_MEM_POOL_SIZE              ${STM32WPAN_APP_MEM_POOL_SIZE_VAL}
 [/#if]
+[#if SECURE_MANAGER_API_ENABLED == "true" && SECURE_MANAGER_API_APP_MEM_POOL_SIZE_VAL != "valueNotSetted"]
+#define SECURE_MANAGER_API_APP_MEM_POOL_SIZE    ${SECURE_MANAGER_API_APP_MEM_POOL_SIZE_VAL}
+[/#if]
 
 [#if packs??]
 [#list packs as variables]
@@ -207,6 +218,10 @@ extern "C" {
 
 [#if STM32WPAN_ENABLED == "true"]
 /* #define STM32WPAN_APP_MEM_POOL_SIZE               <Add the STM32WPAN memory pool Size> */
+[/#if]
+
+[#if SECURE_MANAGER_API_ENABLED == "true"]
+/* #define SECURE_MANAGER_API_APP_MEM_POOL_SIZE      <Add the SECURE MANAGER API memory pool Size> */
 [/#if]
 
 [/#if]

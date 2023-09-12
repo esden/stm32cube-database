@@ -109,7 +109,7 @@
 [/#compress]
 [/#list]
 
-[#if family?contains("STM32F7") || family?contains("STM32F4") || family?contains("STM32L4") ]
+[#if family?contains("STM32F7") || family?contains("STM32F4") || family?contains("STM32L4") || family?contains("STM32H7")]
 #n
 #define USB_SIZ_BOS_DESC            0x0C
 [/#if]
@@ -246,7 +246,7 @@ __ALIGN_BEGIN uint8_t USBD_FS_DeviceDesc[USB_LEN_DEV_DESC] __ALIGN_END =
 };
 
 /* USB_DeviceDescriptor */
-[#if family?contains("STM32F7") || family?contains("STM32F4") || family?contains("STM32L4") ]
+[#if family?contains("STM32F7") || family?contains("STM32F4") || family?contains("STM32L4") || family?contains("STM32H7")]
 /** BOS descriptor. */
 #if (USBD_LPM_ENABLED == 1)
 #if defined ( __ICCARM__ ) /* IAR Compiler */
@@ -370,7 +370,7 @@ __ALIGN_BEGIN uint8_t USBD_HS_DeviceDesc[USB_LEN_DEV_DESC] __ALIGN_END =
   USBD_MAX_NUM_CONFIGURATION  /*bNumConfigurations*/
 };
 
-[#if family?contains("STM32F7") || family?contains("STM32F4") || family?contains("STM32L4") ]
+[#if family?contains("STM32F7") || family?contains("STM32F4") || family?contains("STM32L4") || family?contains("STM32H7") ]
 /** BOS descriptor. */
 #if (USBD_LPM_ENABLED == 1)
 #if defined ( __ICCARM__ ) /* IAR Compiler */

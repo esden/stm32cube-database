@@ -37,19 +37,17 @@
         </Description>
     </RefParameter>
 
-    
     <RefParameter Name="Buf0Address" Comment="Physical address of buffer 0" DefaultValue="0" Max="0xFFFFFFFF" Min="0" Type="hex" />
     <RefParameter Name="Buf1Address" Comment="Physical address of buffer 1" DefaultValue="0" Max="0xFFFFFFFF" Min="0" Type="hex" />
     <RefParameter Name="Buf2Address" Comment="Physical address of buffer 2" DefaultValue="0" Max="0xFFFFFFFF" Min="0" Type="hex" />
     <RefParameter Name="Buf3Address" Comment="Physical address of buffer 3" DefaultValue="0" Max="0xFFFFFFFF" Min="0" Type="hex" />
 
-   
     <!-- Interrupt definition -->
     <RefParameter Name="ITActivation" Comment="Interrupts activation" DefaultValue="ENABLE" Type="list" >
         <PossibleValue Value="ENABLE" Comment="Enable" />
         <PossibleValue Value="DISABLE" Comment="Disable" Semaphore="DisableIt" />
     </RefParameter>
-	
+
     <RefParameter Name="GFXMMU_AHB_MASTER_ERROR_IT" Comment="AHB master error interrupt" DefaultValue="null" Type="list" Visible="false"  >
         <Condition   Diagnostic="Interrupt disable" Expression="DisableIt"/>
     </RefParameter>	
@@ -57,7 +55,7 @@
         <PossibleValue Value="Enable" Comment="Enable" Semaphore="ERRORIT" />
         <PossibleValue Value="Disable" Comment="Disable" />
     </RefParameter>	
-	
+
     <RefParameter  Name="GFXMMU_BUFFER0_OVERFLOW_IT" Comment="Buffer 0 overflow interrupt" DefaultValue="null" Type="list" Visible="false"  >
         <Condition Diagnostic="Interrupt disable" Expression="DisableIt"/>
     </RefParameter>	
@@ -65,7 +63,7 @@
         <PossibleValue Value="Enable" Comment="Enable" Semaphore="BUFFER0IT"/>
         <PossibleValue Value="Disable" Comment="Disable" />
     </RefParameter>
-	
+
     <RefParameter Name="GFXMMU_BUFFER1_OVERFLOW_IT" Comment="Buffer 1 overflow interrupt" DefaultValue="null" Type="list" Visible="false">
         <Condition Diagnostic="Interrupt disable" Expression="DisableIt"/>
     </RefParameter>	
@@ -73,7 +71,7 @@
         <PossibleValue Value="Enable" Comment="Enable" Semaphore="BUFFER1IT"/>
         <PossibleValue Value="Disable" Comment="Disable" />
     </RefParameter>
-    
+
     <RefParameter Name="GFXMMU_BUFFER2_OVERFLOW_IT" Comment="Buffer 2 overflow interrupt" DefaultValue="null" Type="list" Visible="false">
         <Condition Diagnostic="Interrupt disable" Expression="DisableIt"/>
     </RefParameter>	
@@ -81,7 +79,7 @@
         <PossibleValue Value="Enable" Comment="Enable" Semaphore="BUFFER2IT"/>
         <PossibleValue Value="Disable" Comment="Disable" />
     </RefParameter>
-    
+
     <RefParameter Name="GFXMMU_BUFFER3_OVERFLOW_IT" Comment="Buffer 3 overflow interrupt" DefaultValue="null" Type="list" Visible="false">
         <Condition Diagnostic="Interrupt disable" Expression="DisableIt"/>
     </RefParameter>	
@@ -89,31 +87,30 @@
         <PossibleValue Value="Enable" Comment="Enable" Semaphore="BUFFER3IT"/>
         <PossibleValue Value="Disable" Comment="Disable" />
     </RefParameter>
-    
+
     <!-- Prefetch and Cache definition -->
-    <RefParameter Name="CacheActivation" Comment="Cache and Prefetch Activation" DefaultValue="ENABLE" Type="list" >
-        <PossibleValue Value="ENABLE" Comment="Enable" />
-        <PossibleValue Value="DISABLE" Comment="Disable" Semaphore="Sem_PrefetchDisabled" />
+    <RefParameter Name="CacheActivation" Comment="Cache and Prefetch Activation" DefaultValue="Enable" Type="list">
+        <Condition Diagnostic="" Expression="!DIE476"/> 
+        <PossibleValue Value="ENABLE" Comment="Enable" Semaphore="Sem_PrefetchEnable"/>
+        <PossibleValue Value="DISABLE" Comment="Disable" />
         <Description>
             Cache and Prefetch activation. Activate it to specify the configuration details
         </Description>
     </RefParameter>
+  <RefParameter Name="CacheActivation" Comment="Cache and Prefetch Activation" DefaultValue="null" Type="string"  Visible="false"/>
 
-    <RefParameter Name="CacheLock" Comment="Cache Lock" DefaultValue="null" Type="list" Visible="false">
-        <Condition   Diagnostic="Activation disable" Expression="Sem_PrefetchDisabled"/>
-    </RefParameter>	
     <RefParameter Name="CacheLock" Comment="Cache Lock" DefaultValue="DISABLE" Type="list">
+        <Condition   Diagnostic="" Expression="Sem_PrefetchEnable"/>
         <PossibleValue Value="GFXMMU_CACHE_LOCK_ENABLE" Comment="Enable"/>
         <PossibleValue Value="GFXMMU_CACHE_LOCK_DISABLE" Comment="Disable" />
         <Description>
             Locking the cache to a specific buffer (defined by the Cache Lock Buffer parameter)
         </Description>
-    </RefParameter>	
-	
-    <RefParameter  Name="CacheLockBuffer" Comment="Cache Lock Buffer" DefaultValue="null" Type="list" Visible="false">
-        <Condition Diagnostic="Activation disable" Expression="Sem_PrefetchDisabled"/>
-    </RefParameter>	
+    </RefParameter>
+  <RefParameter Name="CacheLock" Comment="Cache Lock" DefaultValue="null" Type="string" Visible="false"/>
+
     <RefParameter Name="CacheLockBuffer" Comment="Cache Lock Buffer" DefaultValue="Disable" Type="list">
+        <Condition   Diagnostic="" Expression="Sem_PrefetchEnable"/>
         <PossibleValue Value="GFXMMU_CACHE_LOCK_BUFFER0" Comment="Buffer 0"/>
         <PossibleValue Value="GFXMMU_CACHE_LOCK_BUFFER1" Comment="Buffer 1"/>
         <PossibleValue Value="GFXMMU_CACHE_LOCK_BUFFER2" Comment="Buffer 2"/>
@@ -123,151 +120,164 @@
             Note: Useful only when Cache Lock parameter is enabled.
         </Description>
     </RefParameter>
-		
-    <RefParameter Name="CacheForce" Comment="Cache Force" DefaultValue="null" Type="list" Visible="false">
-        <Condition Diagnostic="Activation disable" Expression="Sem_PrefetchDisabled"/>
-    </RefParameter>	
+    <RefParameter  Name="CacheLockBuffer" Comment="Cache Lock Buffer" DefaultValue="null" Type="string"  Visible="false" />
+
     <RefParameter Name="CacheForce" Comment="Cache Force" DefaultValue="DISABLE" Type="list">
+        <Condition   Diagnostic="" Expression="Sem_PrefetchEnable"/>
         <PossibleValue Value="GFXMMU_CACHE_FORCE_ENABLE" Comment="Enable"/>
         <PossibleValue Value="GFXMMU_CACHE_FORCE_DISABLE" Comment="Disable" />
         <Description>
             Forcing the cache regardless MPU attributes
         </Description>
     </RefParameter>
-    
-    <RefParameter Name="OutterBufferability" Comment="OutterBufferability" DefaultValue="null" Type="list" Visible="false">
-        <Condition Diagnostic="Activation disable" Expression="Sem_PrefetchDisabled"/>
-    </RefParameter>	
+    <RefParameter  Name="CacheForce" Comment="Cache Force" DefaultValue="null" Type="string"  Visible="false" />
+
     <RefParameter Name="OutterBufferability" Comment="OutterBufferability" DefaultValue="DISABLE" Type="list">
+        <Condition   Diagnostic="" Expression="Sem_PrefetchEnable"/>
         <PossibleValue Value="GFXMMU_OUTTER_BUFFERABILITY_ENABLE" Comment="Enable"/>
         <PossibleValue Value="GFXMMU_OUTTER_BUFFERABILITY_DISABLE" Comment="Disable" />
         <Description>
             Bufferability of an access generated by the GFXMMU cache.
         </Description>
     </RefParameter>
-    
-    <RefParameter Name="OutterCachability" Comment="OutterCachability" DefaultValue="null" Type="list" Visible="false">
-        <Condition Diagnostic="Activation disable" Expression="Sem_PrefetchDisabled"/>
-    </RefParameter>	
+    <RefParameter  Name="OutterBufferability" Comment="OutterBufferability" DefaultValue="null" Type="string"  Visible="false" />
+
     <RefParameter Name="OutterCachability" Comment="OutterCachability" DefaultValue="DISABLE" Type="list">
+        <Condition   Diagnostic="" Expression="Sem_PrefetchEnable"/>
         <PossibleValue Value="GFXMMU_OUTTER_CACHABILITY_ENABLE" Comment="Enable"/>
         <PossibleValue Value="GFXMMU_OUTTER_CACHABILITY_DISABLE" Comment="Disable" />
         <Description>
             Cachability of an access generated by the GFXMMU cache
         </Description>
     </RefParameter>
-    
-    <RefParameter Name="Prefetch" Comment="Prefetch" DefaultValue="null" Type="list" Visible="false">
-        <Condition Diagnostic="Activation disable" Expression="Sem_PrefetchDisabled"/>
-    </RefParameter>	
+    <RefParameter  Name="OutterCachability" Comment="OutterCachability" DefaultValue="null" Type="string"  Visible="false" />
+
     <RefParameter Name="Prefetch" Comment="Prefetch" DefaultValue="DISABLE" Type="list">
+        <Condition   Diagnostic="" Expression="Sem_PrefetchEnable"/>
         <PossibleValue Value="GFXMMU_PREFETCH_ENABLE" Comment="Enable"/>
         <PossibleValue Value="GFXMMU_PREFETCH_DISABLE" Comment="Disable" />
         <Description>
             Pre-fetch enable/disable
         </Description>
     </RefParameter>
-	
+  <RefParameter  Name="Prefetch" Comment="Prefetch" DefaultValue="null" Type="string"  Visible="false" />
+        <!-- Adresse Cache -->
+  <RefParameter Name="AddressCacheActivation" Comment="Address Cache" DefaultValue="Enable" Type="list">
+        <Condition Diagnostic="" Expression="DIE476"/> 
+        <PossibleValue Value="ENABLE" Comment="Enable" Semaphore="Sem_AddressEnable" />
+        <PossibleValue Value="DISABLE" Comment="Disable" />
+        <Description>
+           Address  Cache activation. Activate it to specify the configuration details
+        </Description>
+    </RefParameter>
+   <RefParameter Name="AddressCacheActivation" Comment="Address Cache" DefaultValue="null" Type="string"  Visible="false" />
+
+    <RefParameter Name="AddressCacheLockBuffer" Comment="Adress Cache Lock Buffer" DefaultValue="Disable" Type="list" >
+        <Condition Diagnostic="" Expression="Sem_AddressEnable"/> 
+        <PossibleValue Value="GFXMMU_ADDRESSCACHE_LOCK_BUFFER0" Comment="Buffer 0"/>
+        <PossibleValue Value="GFXMMU_ADDRESSCACHE_LOCK_BUFFER1" Comment="Buffer 1"/>
+        <PossibleValue Value="GFXMMU_ADDRESSCACHE_LOCK_BUFFER2" Comment="Buffer 2"/>
+        <PossibleValue Value="GFXMMU_ADDRESSCACHE_LOCK_BUFFER3" Comment="Buffer 3"/>
+        <Description>
+            Buffer on which the cache is locked.
+            Note: Useful only when Address Cache Lock parameter is enabled.
+        </Description>
+    </RefParameter>
+    <RefParameter Name="AddressCacheLockBuffer" Comment="Adress Cache Lock Buffer" DefaultValue="null" Type="string"  Visible="false" />
+
     <!-- Creation of the value of IT selection for code creation -->
     <RefParameter Comment="" Name="UsedInterruptsARG" DefaultValue="+Buffer3Var+|Buffer2Var+|Buffer1Var+|Buffer0Var+|ErrorItVar+" Type="list" Visible="false">
         <Condition Expression="BUFFER3IT|BUFFER1IT|BUFFER2IT|BUFFER0IT|ERRORIT" Diagnostic=""/>
     </RefParameter>
     <RefParameter Comment="Periph Clock Selection" Name="UsedInterruptsARG" DefaultValue="null" Type="list" Visible="false"/>
-    
+
     <RefParameter Name="ErrorItVar" Comment="ErrorItVar" Type="list" DefaultValue="GFXMMU_AHB_MASTER_ERROR_IT" Visible="false">
         <Condition Expression="ERRORIT" Diagnostic=""/>
         <PossibleValue Comment="" Value="GFXMMU_AHB_MASTER_ERROR_IT"/>
     </RefParameter>	
     <RefParameter Name="ErrorItVar" Comment="ErrorItVar" Type="list" DefaultValue="" Visible="false"/> 
-	
+
     <RefParameter Name="Buffer0Var" Comment="Buffer0Var" Type="list" DefaultValue="GFXMMU_BUFFER0_OVERFLOW_IT" Visible="false">
         <Condition Expression="BUFFER0IT" Diagnostic=""/>
         <PossibleValue Comment="" Value="GFXMMU_BUFFER0_OVERFLOW_IT"/>
     </RefParameter>
     <RefParameter Name="Buffer0Var" Comment="Buffer0Var" Type="list" DefaultValue="" Visible="false"/> 
-    
+
     <RefParameter Name="Buffer1Var" Comment="Buffer1Var" Type="list" DefaultValue="GFXMMU_BUFFER1_OVERFLOW_IT" Visible="false">
         <Condition Expression="DisableIt" Diagnostic=""/>
         <PossibleValue Comment="" Value="GFXMMU_BUFFER1_OVERFLOW_IT"/>
     </RefParameter>
     <RefParameter Name="Buffer1Var" Comment="Buffer1Var" Type="list" DefaultValue="" Visible="false"/> 
-    
+
     <RefParameter Name="Buffer2Var" Comment="Buffer2Var" Type="list" DefaultValue="GFXMMU_BUFFER2_OVERFLOW_IT" Visible="false">
         <Condition Expression="BUFFER2IT" Diagnostic=""/>
         <PossibleValue Comment="" Value="GFXMMU_BUFFER2_OVERFLOW_IT"/>
     </RefParameter>
     <RefParameter Name="Buffer2Var" Comment="Buffer2Var" Type="list" DefaultValue="" Visible="false"/> 
-	
+
     <RefParameter Name="Buffer3Var" Comment="Buffer3Var" Type="list" DefaultValue="GFXMMU_BUFFER3_OVERFLOW_IT" Visible="false">
         <Condition Expression="BUFFER3IT" Diagnostic=""/>
         <PossibleValue Comment="" Value="GFXMMU_BUFFER3_OVERFLOW_IT"/>
     </RefParameter>
     <RefParameter Name="Buffer3Var" Comment="Buffer3Var" Type="list" DefaultValue="" Visible="false"/> 
-	
+
     <RefParameter Name="UsedInterrupts" Comment="Interrupts used" DefaultValue="null" Type="list"  Visible="false">
         <Condition Diagnostic="Interrupt disable" Expression="DisableIt"/>
     </RefParameter>
-     
+
     <RefParameter Comment="" Name="UsedActivationARG" DefaultValue="+PrefetchVar+|OutterCachabilityVar+|OutterBufferabilityVar+|CacheForceVar+|CacheLockBufferVar+|CacheLockItVar" Type="list" Visible="false">
         <Condition Expression="CacheLockIT|CacheLockBufferIT|CacheForceVar|OutterBufferabilityVar|OutterCachabilityVar|PrefetchVar" Diagnostic=""/>
     </RefParameter>
     <RefParameter Comment="Periph Clock Selection" Name="UsedActivationARG" DefaultValue="null" Type="list" Visible="false"/>
-    
+
     <RefParameter Name="CacheLockItVar" Comment="CacheLockItVar" Type="list" DefaultValue="CacheLock" Visible="false">
         <Condition Expression="CacheLockIT" Diagnostic=""/>
         <PossibleValue Comment="" Value="CacheLock"/>
     </RefParameter>
     <RefParameter Name="CacheLockItVar" Comment="CacheLockItVar" Type="list" DefaultValue="" Visible="false"/> 
-	
+
     <RefParameter Name="CacheLockBufferVar" Comment="CacheLockBufferVar" Type="list" DefaultValue="CacheLockBuffer" Visible="false">
         <Condition Expression="CacheLockBufferIT" Diagnostic=""/>
         <PossibleValue Comment="" Value="CacheLockBuffer"/>
     </RefParameter>
     <RefParameter Name="CacheLockBufferVar" Comment="CacheLockBufferVar" Type="list" DefaultValue="" Visible="false"/> 
-    
+
     <RefParameter Name="CacheForceVar" Comment="CacheForceVar" Type="list" DefaultValue="CacheForce" Visible="false">
         <Condition Expression="CacheForceIT" Diagnostic=""/>
         <PossibleValue Comment="" Value="CacheForce"/>
     </RefParameter>
     <RefParameter Name="CacheForceVar" Comment="CacheForceVar" Type="list" DefaultValue="" Visible="false"/> 
-    
+
     <RefParameter Name="OutterBufferabilityVar" Comment="OutterBufferabilityVar" Type="list" DefaultValue="OutterBufferability" Visible="false">
         <Condition Expression="OutterBufferabilityIT" Diagnostic=""/>
         <PossibleValue Comment="" Value="OutterBufferability"/>
     </RefParameter>
     <RefParameter Name="OutterBufferabilityVar" Comment="OutterBufferabilityVar" Type="list" DefaultValue="" Visible="false"/> 
-	
+
     <RefParameter Name="OutterCachabilityVar" Comment="OutterCachabilityVar" Type="list" DefaultValue="OutterCachability" Visible="false">
         <Condition Expression="OutterCachabilityIT" Diagnostic=""/>
         <PossibleValue Comment="" Value="OutterCachability"/>
     </RefParameter>
-    
+
     <RefParameter Name="PrefetchVar" Comment="PrefetchVar" Type="list" DefaultValue="" Visible="false"/> 
     <RefParameter Name="PrefetchVar" Comment="PrefetchVar" Type="list" DefaultValue="Prefetch" Visible="false">
         <Condition Expression="PrefetchIT" Diagnostic=""/>
         <PossibleValue Comment="" Value="Prefetch"/>
     </RefParameter>	
     <RefParameter Name="PrefetchVar" Comment="PrefetchVar" Type="list" DefaultValue="" Visible="false"/> 
-    
-	
-   
-    
+
     <RefParameter Name="UsedActivation" Comment="Activation used" DefaultValue="null" Type="list" Group="Cache and prefetch enabling" Visible="false">
         <Condition Diagnostic="Activation disable" Expression="DisableIt"/>
     </RefParameter>
-	
-	
+
     <!-- RefParameter updated by Java code -->
     <RefParameter Name="GFXMMUtable" Comment="GFXMMU save Table" DefaultValue="empty" Type="string"  Visible="false"/>
     <RefParameter Name="BPP" Comment="BPP" DefaultValue="1" Max="3" Min="1" Type="integer" Visible="false"/>
 
-
-	
     <RefMode Name="GFXMMU_Activate">
         <ConfigForMode>Gfxmmu_Init</ConfigForMode>	
         <Parameter Name="BlocksPerLine"                 Group="Basic Parameters"/>
         <Parameter Name="DefaultValue"                  Group="Basic Parameters"/>
-        
         <Parameter Name="Buf0Address"                   Group="Physical address of buffers"/>
         <Parameter Name="Buf1Address"                   Group="Physical address of buffers"/>
         <Parameter Name="Buf2Address"                   Group="Physical address of buffers"/>
@@ -287,6 +297,9 @@
         <Parameter Name="OutterBufferability"           Group="Cache and prefetch enabling"/>
         <Parameter Name="OutterCachability"             Group="Cache and prefetch enabling"/>
         <Parameter Name="Prefetch"                      Group="Cache and prefetch enabling"/>
+
+        <Parameter Name="AddressCacheActivation"        Group="Addresse Cache enabling"/>
+        <Parameter Name="AddressCacheLockBuffer"        Group="Addresse Cache enabling"/>
 
     </RefMode>
 

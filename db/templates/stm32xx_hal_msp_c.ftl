@@ -16,6 +16,10 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "${main_h}"
+
+[#if jpeg_utils_conf_h??]
+#include "${jpeg_utils_conf_h}"
+[/#if]
 /* USER CODE BEGIN Includes */
 
 /* USER CODE END Includes */
@@ -122,6 +126,9 @@ void HAL_MspInit(void)
         [/#if]
     [/#list]
 [/#if]
+[#if VDDA_ISOLATION??]
+ #tHAL_PWREx_EnableVddA(); 
+[/#if]
 #n
 
   [#if NVICPriorityGroup??]
@@ -161,9 +168,11 @@ void HAL_MspInit(void)
 [#if (initVector.codeInMspInit && initVector.usedDriver=="HAL" && initVector.vector!="RCC_IRQn" && initVector.vector!="RCC_WAKEUP_IRQn") || (FamilyName=="STM32WBA" && PWR_interrupt?? && Secure=="false" && initVector.vector?contains("WKUP") && initVector.usedDriver=="HAL")]
     [#if initVector.systemHandler=="false" || initVector.preemptionPriority!="0" || initVector.subPriority!="0"]
     [#if initVector.vector!="SysTick_IRQn"]
-    [#if (initVector.vector!="PVD_AVD_IRQn" && FamilyName=="STM32U5") && (initVector.vector!="PVD_PVM_IRQn" && FamilyName=="STM32U5") || (initVector.vector!="PVD_IRQn" && FamilyName=="STM32WBA")]
+    [#if (initVector.vector!="PVD_AVD_IRQn" && FamilyName=="STM32U5") && (initVector.vector!="PVD_PVM_IRQn" && FamilyName=="STM32U5") || (initVector.vector!="PVD_IRQn" && FamilyName=="STM32WBA" )]
+    [#if !(initVector.vector="RADIO_IRQn" && LOW_RADIO?? ) ]
     #t/* ${initVector.vector} interrupt configuration */
     #tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
+    [/#if]
  [/#if]
 [#if ((FamilyName!="STM32U5" && FamilyName!="STM32WBA"))]
     #t/* ${initVector.vector} interrupt configuration */
@@ -171,6 +180,11 @@ void HAL_MspInit(void)
     [/#if]
     [/#if]
     [/#if]
+    [#if initVector.vector=="RADIO_IRQn" && LOW_RADIO??]
+	#t/* ${initVector.vector} interrupt configuration */
+    #tHAL_NVIC_SetPriority(${initVector.vector}, RADIO_INTR_PRIO_LOW, ${initVector.subPriority});
+    [/#if]
+    
     [#if initVector.systemHandler=="false"]
     [#if (initVector.vector!="PVD_AVD_IRQn" && FamilyName=="STM32U5")&& (initVector.vector!="PVD_PVM_IRQn" && FamilyName=="STM32U5") || (initVector.vector!="PVD_IRQn" && FamilyName=="STM32WBA")]
     [#if EnableCode??]
@@ -193,8 +207,13 @@ void HAL_MspInit(void)
     #tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
     [/#if]
 [#if (FamilyName!="STM32U5" && (FamilyName!="STM32WBA")) || (FamilyName=="STM32WBA" && PWR_interrupt?? && Secure=="false" && initVector.vector?contains("WKUP") && initVector.usedDriver=="HAL")]
+        [#if (McuName?starts_with("STM32G0B1") || McuName?starts_with("STM32G0C1")) && initVector.vector=="RCC_IRQn"]
+    #t/* RCC_CRS_IRQn interrupt configuration */
+    #tHAL_NVIC_SetPriority(RCC_CRS_IRQn, ${initVector.preemptionPriority}, ${initVector.subPriority});
+    [#else]
     #t/* ${initVector.vector} interrupt configuration */
     #tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
+    [/#if]
     [/#if]
     [/#if]
     [/#if]
@@ -206,8 +225,12 @@ void HAL_MspInit(void)
     [/#if]
 [#if (FamilyName!="STM32U5" && (FamilyName!="STM32WBA"))|| (FamilyName=="STM32WBA" && PWR_interrupt?? && Secure=="false" && initVector.vector?contains("WKUP") && initVector.usedDriver=="HAL")]
 [#if EnableCode??]
+ [#if (McuName?starts_with("STM32G0B1") || McuName?starts_with("STM32G0C1")) && initVector.vector=="RCC_IRQn"]
+      #tHAL_NVIC_EnableIRQ(RCC_CRS_IRQn);
+      [#else]
       #tHAL_NVIC_EnableIRQ(${initVector.vector});
-[/#if] 
+[/#if]
+[/#if]
     [/#if]
 [/#if]
 [/#if]
@@ -1413,7 +1436,7 @@ static uint32_t ${entry.value}=0;
   */
 [/#compress]
 [#-- #nvoid HAL_${mode}_MspInit(${mode}_HandleTypeDef* h${mode?lower_case}){--] 
-[#if !mode?contains("TIM")||mode?contains("LPTIM")||mode?contains("HRTIM")]
+[#if !mode?contains("TIM")||mode?contains("LPTIM")||mode?contains("HRTIM")||mode?contains("GFXTIM")]
 #nvoid ${entry.key}(${mode}_HandleTypeDef* h${mode?lower_case})
 {
 [#else]
@@ -1861,7 +1884,7 @@ uint32_t DFSDM_Init = 0;
   * @retval None
   */
 [/#compress]
-[#if !mode?contains("TIM")||mode?contains("LPTIM")||mode?contains("HRTIM")]
+[#if !mode?contains("TIM")||mode?contains("LPTIM")||mode?contains("HRTIM")||mode?contains("GFXTIM")]
 #nvoid ${entry.key}(${mode}_HandleTypeDef* h${mode?lower_case})
 {
 [#else]

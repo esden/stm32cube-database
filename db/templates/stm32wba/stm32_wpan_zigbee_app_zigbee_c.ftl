@@ -599,7 +599,7 @@ static void APP_ZIGBEE_StackLayersInit(void)
   zigbee_app_info.has_init = true;
 
   /* run the task */
-  UTIL_SEQ_SetTask(1U << CFG_TASK_ZIGBEE_NETWORK_FORM, CFG_SCH_PRIO_0);
+  UTIL_SEQ_SetTask(1U << CFG_TASK_ZIGBEE_NETWORK_FORM, CFG_SEQ_PRIO_0);
 } /* APP_ZIGBEE_StackLayersInit */
 
 /**
@@ -735,7 +735,7 @@ static void APP_ZIGBEE_NwkForm(void)
   /* If Network forming/joining was not successful reschedule the current task to retry the process */
   if (zigbee_app_info.join_status != ZB_STATUS_SUCCESS)
   {
-    UTIL_SEQ_SetTask(1U << CFG_TASK_ZIGBEE_NETWORK_FORM, CFG_SCH_PRIO_0);
+    UTIL_SEQ_SetTask(1U << CFG_TASK_ZIGBEE_NETWORK_FORM, CFG_SEQ_PRIO_0);
   }
 
   /* USER CODE BEGIN NW_FORM */
@@ -1015,7 +1015,7 @@ static void Receive_Ack_From_M0(void)
 static void Receive_Notification_From_M0(void)
 {
     CptReceiveNotifyFromM0++;
-    UTIL_SEQ_SetTask(1U << (uint32_t)CFG_TASK_NOTIFY_FROM_M0_TO_M4, CFG_SCH_PRIO_0);
+    UTIL_SEQ_SetTask(1U << (uint32_t)CFG_TASK_NOTIFY_FROM_M0_TO_M4, CFG_SEQ_PRIO_0);
 }
 
 /**
@@ -1029,7 +1029,7 @@ void TL_ZIGBEE_M0RequestReceived(TL_EvtPacket_t *Reqbuffer)
     p_ZIGBEE_request_M0_to_M4 = Reqbuffer;
 
     CptReceiveRequestFromM0++;
-    UTIL_SEQ_SetTask(1U << (uint32_t)CFG_TASK_REQUEST_FROM_M0_TO_M4, CFG_SCH_PRIO_0);
+    UTIL_SEQ_SetTask(1U << (uint32_t)CFG_TASK_REQUEST_FROM_M0_TO_M4, CFG_SEQ_PRIO_0);
 }
 
 /**

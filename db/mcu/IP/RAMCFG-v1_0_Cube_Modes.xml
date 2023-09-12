@@ -126,10 +126,21 @@
         <Parameter Name="HardwareErase"/>
         <Parameter Name="WaitState"/>		
     </RefMode>
-    
-    <!-- RefMode RAMCFG BKPRAM -->
-    <RefMode Comment="RAMCFG BKPRAM" Group="BKPRAM" Name="BKPRAM_Activate">
+
+        <!-- RefMode RAMCFG SRAM6 -->
+    <RefMode Comment="RAMCFG SRAM6" Group="SRAM6" Name="RAMCFG6_Activate">
         <ConfigForMode>Ramcfg6_Init</ConfigForMode>
+        <Parameter Name="Instance">
+            <PossibleValue>RAMCFG_SRAM6</PossibleValue>
+    </Parameter>
+        <Parameter Name="HardwareErase"/>
+        <Parameter Name="WaitState"/>
+    </RefMode>
+
+
+    <!-- RefMode RAMCFG BKPRAM -->
+    <RefMode Comment="RAMCFG BKPSRAM" Group="BKPSRAM" Name="BKPRAM_Activate">
+        <ConfigForMode>Bkpram_Init</ConfigForMode>
         <Parameter Name="Instance">
             <PossibleValue>RAMCFG_BKPRAM</PossibleValue>
 	</Parameter>
@@ -190,12 +201,22 @@
 			</Mode>							
                     </ModeLogicOperator>					
 		</Mode>  
+                
+                <Mode Name="RAMCFG6_Activate" UserName="RAMCFG SRAM6" RemoveCondition="STM32H5 | DIE482 | DIE481 | DIE455">
+                    <ModeLogicOperator Name="XOR">
+            <Mode Name="RAMCFG6_Activate" UserName="Activated">
+                            <SignalLogicalOp Name="AND">
+                <Signal Name="VS_RAMCFG6"/>
+                            </SignalLogicalOp>
+            </Mode>
+                    </ModeLogicOperator>
+        </Mode>
                 						
-		<Mode Name="BKPRAM_Activate" UserName="RAMCFG BKPRAM">
+		<Mode Name="BKPRAM_Activate" UserName="RAMCFG BKPSRAM">
                     <ModeLogicOperator Name="XOR">
 			<Mode Name="BKPRAM_Activate" UserName="Activated">
                             <SignalLogicalOp Name="AND">
-				<Signal Name="VS_RAMCFG6"/>							
+				<Signal Name="VS_BKPRAM"/>
                             </SignalLogicalOp>	
                         </Mode>							
                     </ModeLogicOperator>					
@@ -209,6 +230,7 @@
         <RefSignal Name="VS_RAMCFG4" Virtual="true"/>
         <RefSignal Name="VS_RAMCFG5" Virtual="true"/>
         <RefSignal Name="VS_RAMCFG6" Virtual="true"/>
+        <RefSignal Name="VS_BKPRAM" Virtual="true"/>
         
         <Semaphore>$IpInstanceUsed_ForRCC</Semaphore>
 </IP>

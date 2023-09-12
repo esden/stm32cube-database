@@ -7,12 +7,13 @@
 #include <dt-bindings/gpio/gpio.h>
 #include <dt-bindings/input/input.h>
 #include <dt-bindings/leds/common.h>
+#include <dt-bindings/regulator/st,stm32mp13-regulator.h>
 #include <dt-bindings/rtc/rtc-stm32.h>
 /* USER CODE END includes */
 
 /{
-	model = "STMicroelectronics STM32MP135F-DK STM32CubeMX board - openstlinux-5.15-yocto-kirkstone-mp1-v22.06.15";
-	compatible = "st,stm32mp135f-board_135f-dk-mx", "st,stm32mp135";
+	model = "STMicroelectronics STM32MP135F-DK STM32CubeMX board - openstlinux-5.15-yocto-kirkstone-mp1-v22.11.23";
+	compatible = "st,stm32mp135f-board_135f-dk-mx", "st,stm32mp135f-dk", "st,stm32mp135";
 
 	/* USER CODE BEGIN root */
 
@@ -26,10 +27,10 @@
 	};
 
 	chosen{
+		stdout-path = "serial0:115200n8";
 		#address-cells = <1>;
 		#size-cells = <1>;
 		ranges;
-		stdout-path = "serial0:115200n8";
 
 		framebuffer{
 			compatible = "simple-framebuffer";
@@ -52,20 +53,12 @@
 		compatible = "gpio-leds";
 
 		led-blue{
-			function = LED_FUNCTION_HEARTBEAT;
+		    function = LED_FUNCTION_HEARTBEAT;
 			color = <LED_COLOR_ID_BLUE>;
 			gpios = <&gpioa 14 GPIO_ACTIVE_LOW>;
 			linux,default-trigger = "heartbeat";
 			default-state = "off";
 		};
-	};
-
-	v3v3_ao:v3v3_ao{
-		compatible = "regulator-fixed";
-		regulator-name = "v3v3_ao";
-		regulator-min-microvolt = <3300000>;
-		regulator-max-microvolt = <3300000>;
-		regulator-always-on;
 	};
 
 	panel_backlight:panel-backlight{
@@ -110,9 +103,12 @@
 		};
 	};
 
-	wifi_pwrseq:wifi-pwrseq{
-		compatible = "mmc-pwrseq-simple";
-		reset-gpios = <&mcp23017 11 GPIO_ACTIVE_LOW>;
+	v3v3_ao:v3v3-ao{
+		compatible = "regulator-fixed";
+		regulator-name = "v3v3_ao";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		regulator-always-on;
 	};
 
 	wake_up{
@@ -125,6 +121,11 @@
 			interrupts-extended = <&optee 0>;
 			status = "okay";
 		};
+	};
+
+	wifi_pwrseq:wifi-pwrseq{
+		compatible = "mmc-pwrseq-simple";
+		reset-gpios = <&mcp23017 11 GPIO_ACTIVE_LOW>;
 	};
 	/* USER CODE END root */
 
@@ -140,13 +141,8 @@
 
 		/* USER CODE BEGIN reserved-memory */
 
-		optee_framebuffer@dd000000{
-			reg = <0xdd000000 0x1000000>;
-			no-map;
-		};
-
-		optee@de000000{
-			reg = <0xde000000 0x2000000>;
+		optee@dd000000{
+			reg = <0xdd000000 0x3000000>;
 			no-map;
 		};
 		/* USER CODE END reserved-memory */
@@ -520,6 +516,18 @@
 		};
 	};
 
+	uart4_idle_pins_mx:uart4_idle_mx-0{
+
+		pins1{
+			pinmux = <STM32_PINMUX('D', 6, ANALOG)>;
+		};
+
+		pins2{
+			pinmux = <STM32_PINMUX('D', 8, AF8)>;
+			bias-disable;
+		};
+	};
+
 	uart4_sleep_pins_mx:uart4_sleep_mx-0{
 
 		pins{
@@ -542,6 +550,26 @@
 			bias-disable;
 			drive-push-pull;
 			slew-rate = <0>;
+		};
+	};
+
+	usart2_idle_pins_mx:usart2_idle_mx-0{
+
+		pins1{
+			pinmux = <STM32_PINMUX('D', 15, AF1)>;
+			bias-disable;
+		};
+
+		pins2{
+			pinmux = <STM32_PINMUX('D', 4, AF3)>;
+			bias-disable;
+			drive-push-pull;
+			slew-rate = <0>;
+		};
+
+		pins3{
+			pinmux = <STM32_PINMUX('E', 11, ANALOG)>,
+					<STM32_PINMUX('H', 12, ANALOG)>;
 		};
 	};
 
@@ -618,18 +646,10 @@
 
 &dma1{
 	status = "okay";
-
-	/* USER CODE BEGIN dma1 */
-	sram = <&dma_pool>;
-	/* USER CODE END dma1 */
 };
 
 &dma2{
 	status = "okay";
-
-	/* USER CODE BEGIN dma2 */
-	sram = <&dma_pool>;
-	/* USER CODE END dma2 */
 };
 
 &dmamux1{
@@ -726,7 +746,7 @@
 		microchip,irq-mirror;
 	};
 
-	stm32g0@53{
+	typec@53{
 		compatible = "st,stm32g0-typec";
 		reg = <0x53>;
 		interrupts-extended = <&optee 1>;
@@ -760,61 +780,6 @@
 	clock-frequency = <400000>;
 	/delete-property/ dmas;
 	/delete-property/ dma-names;
-
-	gc2145:gc2145@3c{
-		compatible = "galaxycore,gc2145";
-		reg = <0x3c>;
-		clocks = <&clk_ext_camera>;
-		IOVDD-supply = <&scmi_v3v3_sw>;
-		AVDD-supply = <&scmi_v3v3_sw>;
-		DVDD-supply = <&scmi_v3v3_sw>;
-		powerdown-gpios = <&mcp23017 3 (GPIO_ACTIVE_LOW | GPIO_PUSH_PULL)>;
-		reset-gpios = <&mcp23017 4 (GPIO_ACTIVE_LOW | GPIO_PUSH_PULL)>;
-		status = "okay";
-
-		port{
-
-			gc2145_ep:endpoint{
-				remote-endpoint = <&mipid02_0>;
-				clock-lanes = <0>;
-				data-lanes = <1 2>;
-			};
-		};
-	};
-
-	goodix:goodix_ts@5d{
-		compatible = "goodix,gt911";
-		reg = <0x5d>;
-		pinctrl-names = "default";
-		pinctrl-0 = <&goodix_pins_a>;
-		interrupt-parent = <&gpiof>;
-		interrupts = <5 IRQ_TYPE_EDGE_FALLING>;
-		reset-gpios = <&gpioh 2 GPIO_ACTIVE_LOW>;
-		AVDD28-supply = <&scmi_v3v3_sw>;
-		VDDIO-supply = <&scmi_v3v3_sw>;
-		touchscreen-size-x = <480>;
-		touchscreen-size-y = <272>;
-		status = "okay";
-	};
-
-	ov5640:camera@3c{
-		compatible = "ovti,ov5640";
-		reg = <0x3c>;
-		clocks = <&clk_ext_camera>;
-		clock-names = "xclk";
-		DOVDD-supply = <&scmi_v3v3_sw>;
-		status = "disabled";
-		powerdown-gpios = <&mcp23017 3 (GPIO_ACTIVE_LOW | GPIO_PUSH_PULL)>;
-		reset-gpios = <&mcp23017 4 (GPIO_ACTIVE_LOW | GPIO_PUSH_PULL)>;
-
-		port{
-
-			ov5640_0:endpoint{
-				clock-lanes = <0>;
-				data-lanes = <1 2>;
-			};
-		};
-	};
 
 	stmipi:stmipi@14{
 		compatible = "st,st-mipid02";
@@ -853,15 +818,62 @@
 			};
 		};
 	};
+
+	gc2145:gc2145@3c{
+		compatible = "galaxycore,gc2145";
+		reg = <0x3c>;
+		clocks = <&clk_ext_camera>;
+		IOVDD-supply = <&scmi_v3v3_sw>;
+		AVDD-supply = <&scmi_v3v3_sw>;
+		DVDD-supply = <&scmi_v3v3_sw>;
+		powerdown-gpios = <&mcp23017 3 (GPIO_ACTIVE_LOW | GPIO_PUSH_PULL)>;
+		reset-gpios = <&mcp23017 4 (GPIO_ACTIVE_LOW | GPIO_PUSH_PULL)>;
+		status = "okay";
+
+		port{
+
+			gc2145_ep:endpoint{
+				remote-endpoint = <&mipid02_0>;
+				clock-lanes = <0>;
+				data-lanes = <1 2>;
+			};
+		};
+	};
+
+	ov5640:camera@3c{
+		compatible = "ovti,ov5640";
+		reg = <0x3c>;
+		clocks = <&clk_ext_camera>;
+		clock-names = "xclk";
+		DOVDD-supply = <&scmi_v3v3_sw>;
+		status = "disabled";
+		powerdown-gpios = <&mcp23017 3 (GPIO_ACTIVE_LOW | GPIO_PUSH_PULL)>;
+		reset-gpios = <&mcp23017 4 (GPIO_ACTIVE_LOW | GPIO_PUSH_PULL)>;
+
+		port{
+
+			ov5640_0:endpoint{
+				clock-lanes = <0>;
+				data-lanes = <1 2>;
+			};
+		};
+	};
+
+	goodix:goodix-ts@5d{
+		compatible = "goodix,gt911";
+		reg = <0x5d>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&goodix_pins_a>;
+		interrupt-parent = <&gpiof>;
+		interrupts = <5 IRQ_TYPE_EDGE_FALLING>;
+		reset-gpios = <&gpioh 2 GPIO_ACTIVE_LOW>;
+		AVDD28-supply = <&scmi_v3v3_sw>;
+		VDDIO-supply = <&scmi_v3v3_sw>;
+		touchscreen-size-x = <480>;
+		touchscreen-size-y = <272>;
+		status = "okay";
+	};
 	/* USER CODE END i2c5 */
-};
-
-&iwdg2{
-	status = "okay";
-
-	/* USER CODE BEGIN iwdg2 */
-	timeout-sec = <32>;
-	/* USER CODE END iwdg2 */
 };
 
 &ltdc{
@@ -873,11 +885,8 @@
 	/* USER CODE BEGIN ltdc */
 
 	port{
-		#address-cells = <1>;
-		#size-cells = <0>;
 
-		ltdc_out_rgb:endpoint@0{
-			reg = <0>;
+		ltdc_out_rgb:endpoint{
 			remote-endpoint = <&panel_in_rgb>;
 		};
 	};
@@ -938,14 +947,17 @@
 	brcmf:bcrmf@1{
 		reg = <1>;
 		compatible = "brcm,bcm4329-fmac";
+		interrupt-parent = <&gpiof>;
+		interrupts = <0 IRQ_TYPE_LEVEL_HIGH>; /* WL_HOST_WAKE */
+		interrupt-names = "host-wake";
 	};
 	/* USER CODE END sdmmc2 */
 };
 
 &uart4{
-	pinctrl-names = "default", "sleep";
+	pinctrl-names = "default", "idle", "sleep";
 	pinctrl-0 = <&uart4_pins_mx>;
-	pinctrl-1 = <&uart4_sleep_pins_mx>;
+	pinctrl-1 = <&uart4_idle_pins_mx>;
 	status = "okay";
 
 	/* USER CODE BEGIN uart4 */
@@ -955,9 +967,9 @@
 };
 
 &usart2{
-	pinctrl-names = "default", "sleep";
+	pinctrl-names = "default", "idle", "sleep";
 	pinctrl-0 = <&usart2_pins_mx>;
-	pinctrl-1 = <&usart2_sleep_pins_mx>;
+	pinctrl-1 = <&usart2_idle_pins_mx>;
 	status = "okay";
 
 	/* USER CODE BEGIN usart2 */
@@ -978,6 +990,14 @@
 
 	/* USER CODE BEGIN usbh_ehci */
 	phys = <&usbphyc_port0>;
+	#address-cells = <1>;
+	#size-cells = <0>;
+
+	hub@1{
+		compatible = "usb424,2514";
+		reg = <1>;
+		vdd-supply = <&scmi_v3v3_sw>;
+	};
 	/* USER CODE END usbh_ehci */
 };
 
@@ -1021,11 +1041,6 @@
 	st,enable-hs-rx-gain-eq;
 	st,no-hs-ftime-ctrl;
 	st,no-lsfs-sc;
-
-	connector{
-		compatible = "usb-a-connector";
-		vbus-supply = <&scmi_v3v3_sw>;
-	};
 	/* USER CODE END usbphyc_port0 */
 };
 
@@ -1049,54 +1064,51 @@
 
 /* USER CODE BEGIN addons */
 
+&arm_wdt{
+	timeout-sec = <32>;
+	status = "okay";
+};
+
 &scmi_regu{
 
 	scmi_vddcpu:voltd-vddcpu{
-		voltd-name = "vddcpu";
+		reg = <VOLTD_SCMI_STPMIC1_BUCK1>;
 		regulator-name = "vddcpu";
 	};
 
 	scmi_vdd:voltd-vdd{
-		voltd-name = "vdd";
+		reg = <VOLTD_SCMI_STPMIC1_BUCK3>;
 		regulator-name = "vdd";
 	};
 
 	scmi_vddcore:voltd-vddcore{
-		voltd-name = "vddcore";
+		reg = <VOLTD_SCMI_STPMIC1_BUCK4>;
 		regulator-name = "vddcore";
 	};
 
-	scmi_vdd_adc:voltd-vdd_adc{
-		voltd-name = "vdd_adc";
+	scmi_vdd_adc:voltd-vdd-adc{
+		reg = <VOLTD_SCMI_STPMIC1_LDO1>;
 		regulator-name = "vdd_adc";
 	};
 
-	scmi_vdd_usb:voltd-vdd_usb{
-		voltd-name = "vdd_usb";
+	scmi_vdd_usb:voltd-vdd-usb{
+		reg = <VOLTD_SCMI_STPMIC1_LDO4>;
 		regulator-name = "vdd_usb";
 	};
 
-	scmi_vdd_sd:voltd-vdd_sd{
-		voltd-name = "vdd_sd";
+	scmi_vdd_sd:voltd-vdd-sd{
+		reg = <VOLTD_SCMI_STPMIC1_LDO5>;
 		regulator-name = "vdd_sd";
 	};
 
-	scmi_v1v8_periph:voltd-v1v8_periph{
-		voltd-name = "v1v8_periph";
+	scmi_v1v8_periph:voltd-v1v8-periph{
+		reg = <VOLTD_SCMI_STPMIC1_LDO6>;
 		regulator-name = "v1v8_periph";
 	};
 
-	scmi_v3v3_sw:voltd-v3v3_sw{
-		voltd-name = "v3v3_sw";
+	scmi_v3v3_sw:voltd-v3v3-sw{
+		reg = <VOLTD_SCMI_STPMIC1_PWR_SW2>;
 		regulator-name = "v3v3_sw";
-	};
-};
-
-&sram{
-
-	dma_pool:dma-sram@0{
-		reg = <0x0 0x4000>;
-		pool;
 	};
 };
 /* USER CODE END addons */

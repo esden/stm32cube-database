@@ -21,35 +21,6 @@
 /**************************************************************************/
 /**************************************************************************/
 
-[#assign familyName=FamilyName?lower_case]
-[#if familyName?starts_with("stm32c0")]
-/**************************************************************************/
-/*                                                                        */
-/*  PORT SPECIFIC C INFORMATION                            RELEASE        */
-/*                                                                        */
-/*    tx_user.h                                           PORTABLE C      */
-/*                                                           6.0          */
-/*                                                                        */
-/*  AUTHOR                                                                */
-/*                                                                        */
-/*    William E. Lamie, Microsoft Corporation                             */
-/*                                                                        */
-/*  DESCRIPTION                                                           */
-/*                                                                        */
-/*    This file contains user defines for configuring ThreadX in specific */
-/*    ways. This file will have an effect only if the application and     */
-/*    ThreadX library are built with TX_INCLUDE_USER_DEFINE_FILE defined. */
-/*    Note that all the defines in this file may also be made on the      */
-/*    command line when building ThreadX library and application objects. */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  05-19-2020      William E. Lamie        Initial Version 6.0           */
-/*                                                                        */
-/**************************************************************************/
-[#else]
 /**************************************************************************/
 /*                                                                        */
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */
@@ -93,7 +64,6 @@
 /*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
-[/#if]
 
 #ifndef TX_USER_H
 #define TX_USER_H
@@ -337,7 +307,7 @@
 #define TX_MINIMUM_STACK                ${TX_MINIMUM_STACK_value}
 [/#if]
 
-/* Determine if timer expirations (application timers, timeouts, and tx_thread_sleep calls
+/* Determine if timer expirations (application timers, timeouts, and tx_thread_sleep) calls
    should be processed within the a system timer thread or directly in the timer ISR.
    By default, the timer thread is used. When the following is defined, the timer expiration
    processing is done directly from the timer ISR, thereby eliminating the timer thread control

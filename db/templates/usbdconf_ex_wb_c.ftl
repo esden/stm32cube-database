@@ -13,6 +13,7 @@
 /* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
+#include "main.h"
 [#if SWIncludes??]
 [#list SWIncludes as include]
 #include "${include}"

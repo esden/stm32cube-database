@@ -13,26 +13,9 @@
   *           - Setup behavior of Floating Point Unit
   *           - Setup Interrupt Target
   *
-  ******************************************************************************/
-/*
-  * Copyright (c) 2023 STMicroelectronics, all rights reserved
-  *
-  * SPDX-License-Identifier: Apache-2.0
- 
-  *
- * Licensed under the Apache License, Version 2.0 (the License); you may
- * not use this file except in compliance with the License.
- * You may obtain a copy of the License at
-  *
- * http://www.apache.org/licenses/LICENSE-2.0
-   *
-
-
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an AS IS BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+  ******************************************************************************
+[@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
+  ******************************************************************************
  */
 /* USER CODE END Header */
 
@@ -106,13 +89,12 @@
 /*
 //     <o>Start Address <0-0xFFFFFFE0>
 */
-
 #define SAU_INIT_START0     0x08080000      /* start address of SAU region 0 */
 
 /*
 //     <o>End Address <0x1F-0xFFFFFFFF>
 */
-#define SAU_INIT_END0       0x081FFFFF      /* end address of SAU region 0 */
+#define SAU_INIT_END0       0x080FFFFF      /* end address of SAU region 0 */
 
 
 /*
@@ -472,35 +454,37 @@
 //   <o.3>  GPDMA_Channel6_IRQn   [#if enabledIT?contains("GPDMA1_Channel6_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"3"/][#else]<0=> Secure state[/#if]
 //   <o.4>  GPDMA_Channel7_IRQn   [#if enabledIT?contains("GPDMA1_Channel7_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"4"/][#else]<0=> Secure state[/#if]
 //   <o.5>  TIM1_BRK_IRQn         [#if enabledIT?contains("TIM1_BRK_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"9"/][#else]<0=> Secure state[/#if]
-//   <o.6> TIM1_UP_IRQn           [#if enabledIT?contains("TIM1_UP_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"10"/][#else]<0=> Secure state[/#if]
-//   <o.7> TIM1_TRG_COM_IRQn      [#if enabledIT?contains("TIM1_TRG_COM_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"11"/][#else]<0=> Secure state[/#if]
-//   <o.8> TIM1_CC_IRQn           [#if enabledIT?contains("TIM1_CC_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"12"/][#else]<0=> Secure state[/#if]
-//   <o.9> TIM2_IRQn              [#if enabledIT?contains("TIM2_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"13"/][#else]<0=> Secure state[/#if]
+//   <o.6>  TIM1_UP_IRQn          [#if enabledIT?contains("TIM1_UP_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"10"/][#else]<0=> Secure state[/#if]
+//   <o.7>  TIM1_TRG_COM_IRQn     [#if enabledIT?contains("TIM1_TRG_COM_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"11"/][#else]<0=> Secure state[/#if]
+//   <o.8>  TIM1_CC_IRQn          [#if enabledIT?contains("TIM1_CC_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"12"/][#else]<0=> Secure state[/#if]
+//   <o.9>  TIM2_IRQn             [#if enabledIT?contains("TIM2_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"13"/][#else]<0=> Secure state[/#if]
 [#if McuName?starts_with("STM32WBA54") || McuName?starts_with("STM32WBA55") || McuName?starts_with("STM32WBA52")]
 //   <o.10> TIM3_IRQn             [#if enabledIT?contains("TIM3_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"14"/][#else]<0=> Secure state[/#if]
 //   <o.11> I2C1_EV_IRQn          [#if enabledIT?contains("I2C1_EV_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"23"/][#else]<0=> Secure state[/#if]
 //   <o.12> I2C1_ER_IRQn          [#if enabledIT?contains("I2C1_ER_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"24"/][#else]<0=> Secure state[/#if]
 [/#if]
-//   <o.13> I2C3_EV_IRQn          [#if enabledIT?contains("I2C3_EV_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"24"/][#else]<0=> Secure state[/#if]
-//   <o.14> I2C3_ER_IRQn          [#if enabledIT?contains("I2C3_ER_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"24"/][#else]<0=> Secure state[/#if]
 [#if McuName?starts_with("STM32WBA54") || McuName?starts_with("STM32WBA55") || McuName?starts_with("STM32WBA52")]
-//   <o.15> SPI1_IRQn             [#if enabledIT?contains("SPI1_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"27"/][#else]<0=> Secure state[/#if]
+//   <o.13> SPI1_IRQn             [#if enabledIT?contains("SPI1_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"27"/][#else]<0=> Secure state[/#if]
 [/#if]
-//   <o.16> USART1_IRQn           [#if enabledIT?contains("USART1_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"29"/][#else]<0=> Secure state[/#if]
+//   <o.14> USART1_IRQn           [#if enabledIT?contains("USART1_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"29"/][#else]<0=> Secure state[/#if]
 [#if McuName?starts_with("STM32WBA54") || McuName?starts_with("STM32WBA55") || McuName?starts_with("STM32WBA52")]
-//   <o.17> USART2_IRQn           [#if enabledIT?contains("USART2_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"30"/][#else]<0=> Secure state[/#if]
+//   <o.15> USART2_IRQn           [#if enabledIT?contains("USART2_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"30"/][#else]<0=> Secure state[/#if]
 [/#if]
-//   <o.18> LPUART1_IRQn          [#if enabledIT?contains("LPUART1_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"30"/][#else]<0=> Secure state[/#if]
-//   <o.19> LPTIM1_IRQn           [#if enabledIT?contains("LPTIM1_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"30"/][#else]<0=> Secure state[/#if]
+//   <o.16> LPUART1_IRQn          [#if enabledIT?contains("LPUART1_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"30"/][#else]<0=> Secure state[/#if]
+//   <o.17> LPTIM1_IRQn           [#if enabledIT?contains("LPTIM1_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"30"/][#else]<0=> Secure state[/#if]
 [#if McuName?starts_with("STM32WBA54") || McuName?starts_with("STM32WBA55") || McuName?starts_with("STM32WBA52")]
-//   <o.20> LPTIM2_IRQn           [#if enabledIT?contains("LPTIM2_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"30"/][#else]<0=> Secure state[/#if]
+//   <o.18> LPTIM2_IRQn           [#if enabledIT?contains("LPTIM2_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"30"/][#else]<0=> Secure state[/#if]
 [/#if]
-//   <o.21> TIM16_IRQn            [#if enabledIT?contains("TIM16_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"30"/][#else]<0=> Secure state[/#if]
+//   <o.19> TIM16_IRQn            [#if enabledIT?contains("TIM16_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"30"/][#else]<0=> Secure state[/#if]
 [#if McuName?starts_with("STM32WBA54") || McuName?starts_with("STM32WBA55") || McuName?starts_with("STM32WBA52")]
-//   <o.22> TIM17_IRQn            [#if enabledIT?contains("TIM17_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"30"/][#else]<0=> Secure state[/#if]
+//   <o.20> TIM17_IRQn            [#if enabledIT?contains("TIM17_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"30"/][#else]<0=> Secure state[/#if]
 [/#if]
 [#if McuName?starts_with("STM32WBA54") || McuName?starts_with("STM32WBA55")]
-//   <o.23> COMP_IRQn             [#if enabledIT?contains("COMP_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"30"/][#else]<0=> Secure state[/#if]
+//   <o.21> COMP_IRQn             [#if enabledIT?contains("COMP_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"30"/][#else]<0=> Secure state[/#if]
+[/#if]
+//   <o.22> I2C3_EV_IRQn          [#if enabledIT?contains("I2C3_EV_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"24"/][#else]<0=> Secure state[/#if]
+//   <o.23> I2C3_ER_IRQn          [#if enabledIT?contains("I2C3_ER_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"24"/][#else]<0=> Secure state[/#if]
+[#if McuName?starts_with("STM32WBA54") || McuName?starts_with("STM32WBA55")]
 //   <o.24> SAI1_IRQn             [#if enabledIT?contains("SAI1_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"30"/][#else]<0=> Secure state[/#if]
 [/#if]
 //   <o.25> TSC_IRQn              [#if enabledIT?contains("TSC_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"30"/][#else]<0=> Secure state[/#if]

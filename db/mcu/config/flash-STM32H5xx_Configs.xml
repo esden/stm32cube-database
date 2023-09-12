@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<IP xmlns="http://mcd.rou.st.com/modules.php?name=mcu" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" DBVersion="V4.0" Name="flash" Version="1.0.0" ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Configs.xsd">
+
+	<RefConfig Name="Activate_FlashIP">
+		<IFCondition Expression="1=1">
+			<CallLibMethod Name="HAL_FLASH_Unlock" />
+		</IFCondition>
+		
+		<IFCondition Expression="SEM_FLASH_OB_ProductState|SEM_FLASH_OB_USER|SEM_FLASH_OB_NSBOOTADDR|SEM_FLASH_OB_NSBOOTLOCK|SEM_FLASH_OB_SECBOOTADDR|SEM_FLASH_OB_SECBOOTLOCK|SEM_FLASH_OB_WMSEC1 | SEM_FLASH_OB_WMSEC2 | SEM_FLASH_OB_WRP1 | SEM_FLASH_OB_WRP2 | SEM_FLASH_OB_OTP_LOCK | SEM_FLASH_OB_EDATA1 | SEM_FLASH_OB_EDATA2 | SEM_FLASH_OB_HDP1 | SEM_FLASH_OB_HDP2">
+			<CallLibMethod Name="OBSettingsSection" Type="HardCode">
+				<HardCode Text="#n#t/* Option Bytes settings */#n" />
+			</CallLibMethod>
+		</IFCondition>
+		
+		<IFCondition Expression="!SEM_FLASH_OB_NSBOOTADDR &amp; !SEM_FLASH_OB_NSBOOTLOCK &amp; !SEM_FLASH_OB_SECBOOTADDR &amp; !SEM_FLASH_OB_SECBOOTLOCK &amp;
+								 !SEM_FLASH_OB_WMSEC1 &amp; !SEM_FLASH_OB_WMSEC2 &amp; !SEM_FLASH_OB_WRP1 &amp; !SEM_FLASH_OB_WRP2 &amp; 
+								 !SEM_FLASH_OB_EDATA1 &amp; !SEM_FLASH_OB_EDATA1 &amp; !SEM_FLASH_OB_HDP1 &amp; !SEM_FLASH_OB_HDP2 &amp;
+								 (SEM_FLASH_OB_ProductState|SEM_FLASH_OB_USER|SEM_FLASH_OB_OTP_LOCK)">
+			<CallLibMethod Name="HAL_FLASH_OB_Unlock" />
+			<CallLibMethod Name="HAL_FLASHEx_OBProgram" />
+			<CallLibMethod Name="HAL_FLASH_OB_Lock" />
+		</IFCondition>
+		
+		
+		<IFCondition Expression="SEM_FLASH_OB_NSBOOTADDR| SEM_FLASH_OB_NSBOOTLOCK | SEM_FLASH_OB_SECBOOTADDR | SEM_FLASH_OB_SECBOOTLOCK|
+								 SEM_FLASH_OB_WMSEC1 | SEM_FLASH_OB_WMSEC2|SEM_FLASH_OB_WRP1|SEM_FLASH_OB_WRP2 |
+								 SEM_FLASH_OB_EDATA1 | SEM_FLASH_OB_EDATA2 |
+								 SEM_FLASH_OB_HDP1 | SEM_FLASH_OB_HDP2">
+			<CallLibMethod Name="HAL_FLASH_OB_Unlock" />
+		</IFCondition>
+		<!-- BOOTADDR -->
+		<IFCondition Expression="SEM_FLASH_OB_NSBOOTADDR &amp; SEM_FLASH_OB_NSBOOTLOCK">
+			<CallLibMethod Name="HAL_FLASHEx_OBProgram">
+				<MethodArg Name="BootConfig" FValue="OB_BOOT_NS" />
+				<MethodArg Name="BootAddr" ParameterName="OB_NSBOOTADD_Address" />
+				<MethodArg Name="BootLock" ParameterName="OB_NSBootLock" />
+			</CallLibMethod>
+		</IFCondition>
+		<IFCondition Expression="SEM_FLASH_OB_NSBOOTADDR &amp; !SEM_FLASH_OB_NSBOOTLOCK">
+			<CallLibMethod Name="HAL_FLASHEx_OBProgram">
+				<MethodArg Name="BootConfig" FValue="OB_BOOT_NS" />
+				<MethodArg Name="BootAddr" ParameterName="OB_NSBOOTADD_Address" />
+			</CallLibMethod>
+		</IFCondition>
+		<IFCondition Expression="SEM_FLASH_OB_NSBOOTLOCK &amp; !SEM_FLASH_OB_NSBOOTADDR">
+			<CallLibMethod Name="HAL_FLASHEx_OBProgram">
+				<MethodArg Name="BootConfig" FValue="OB_BOOT_NS" />
+				<MethodArg Name="BootLock" ParameterName="OB_NSBootLock" />
+			</CallLibMethod>
+		</IFCondition>
+		
+		<IFCondition Expression="SEM_FLASH_OB_SECBOOTADDR &amp; SEM_FLASH_OB_SECBOOTLOCK">
+			<CallLibMethod Name="HAL_FLASHEx_OBProgram">
+				<MethodArg Name="BootConfig" FValue="OB_BOOT_SEC" />
+				<MethodArg Name="BootAddr" ParameterName="OB_SECBOOTADD_Address" />
+				<MethodArg Name="BootLock" ParameterName="OB_SECBootLock" />
+			</CallLibMethod>
+		</IFCondition>
+		<IFCondition Expression="SEM_FLASH_OB_SECBOOTADDR &amp; !SEM_FLASH_OB_SECBOOTLOCK">
+			<CallLibMethod Name="HAL_FLASHEx_OBProgram">
+				<MethodArg Name="BootConfig" FValue="OB_BOOT_SEC" />
+				<MethodArg Name="BootAddr" ParameterName="OB_SECBOOTADD_Address" />
+			</CallLibMethod>
+		</IFCondition>
+		<IFCondition Expression="SEM_FLASH_OB_SECBOOTLOCK &amp; !SEM_FLASH_OB_SECBOOTADDR">
+			<CallLibMethod Name="HAL_FLASHEx_OBProgram">
+				<MethodArg Name="BootConfig" FValue="OB_BOOT_SEC" />
+				<MethodArg Name="BootLock" ParameterName="OB_SECBootLock" />
+			</CallLibMethod>
+		</IFCondition>
+
+
+		<!-- WMSEC --> 
+		<IFCondition Expression="SEM_FLASH_OB_WMSEC1 &amp; !WMSEC_BOTHBANKS">
+			<CallLibMethod Name="HAL_FLASHEx_OBProgram">
+				<MethodArg Name="Banks" FValue="FLASH_BANK_1" />
+				<MethodArg Name="WMSecStartSector" ParameterName="WMSecStartSector_Bank1" />
+				<MethodArg Name="WMSecEndSector" ParameterName="WMSecEndSector_Bank1" />
+			</CallLibMethod>
+		</IFCondition>
+		<IFCondition Expression="SEM_FLASH_OB_WMSEC2 &amp; !WMSEC_BOTHBANKS">
+			<CallLibMethod Name="HAL_FLASHEx_OBProgram">
+				<MethodArg Name="Banks" FValue="FLASH_BANK_2" />
+				<MethodArg Name="WMSecStartSector" ParameterName="WMSecStartSector_Bank2" />
+				<MethodArg Name="WMSecEndSector" ParameterName="WMSecEndSector_Bank2" />
+			</CallLibMethod>
+		</IFCondition>
+		<IFCondition Expression="WMSEC_BOTHBANKS">
+			<CallLibMethod Name="HAL_FLASHEx_OBProgram">
+				<MethodArg Name="Banks" FValue="FLASH_BANK_BOTH" />
+				<MethodArg Name="WMSecStartSector" ParameterName="WMSecStartSector_Bank1" />
+				<MethodArg Name="WMSecEndSector" ParameterName="WMSecEndSector_Bank1" />
+			</CallLibMethod>
+		</IFCondition>
+		
+		<!-- WRP --> 
+		<IFCondition Expression="SEM_FLASH_OB_WRP1 &amp; !WRP1_ENABLE_ALLSECTORS &amp; !WRP1_DISABLE_ALLSECTORS &amp; !WRP_BOTHBANKS">
+			<CallLibMethod Name="HAL_FLASHEx_OBProgram">
+				<MethodArg Name="Banks" FValue="FLASH_BANK_1" />
+				<MethodArg Name="WRPState" FValue="OB_WRPSTATE_DISABLE" />
+				<MethodArg Name="WRPSector" ParameterName="OB_WRP1_Enabled_Sectors" />
+			</CallLibMethod>
+			<CallLibMethod Name="HAL_FLASHEx_OBProgram">
+				<MethodArg Name="Banks" FValue="FLASH_BANK_1" />
+				<MethodArg Name="WRPState" FValue="OB_WRPSTATE_ENABLE" />
+				<MethodArg Name="WRPSector" ParameterName="OB_WRP1_Disabled_Sectors" />
+			</CallLibMethod>
+		</IFCondition>
+		<IFCondition Expression="SEM_FLASH_OB_WRP1 &amp; (WRP1_ENABLE_ALLSECTORS | WRP1_DISABLE_ALLSECTORS) &amp; !WRP_BOTHBANKS">
+			<CallLibMethod Name="HAL_FLASHEx_OBProgram">
+				<MethodArg Name="Banks" FValue="FLASH_BANK_1" />
+				<MethodArg Name="WRPState" ParameterName="WRP1State" />
+				<MethodArg Name="WRPSector" ParameterName="WRP1Sector" />
+			</CallLibMethod>
+		</IFCondition>
+		<IFCondition Expression="SEM_FLASH_OB_WRP2 &amp; !WRP2_ENABLE_ALLSECTORS &amp; !WRP2_DISABLE_ALLSECTORS &amp; !WRP_BOTHBANKS">
+			<CallLibMethod Name="HAL_FLASHEx_OBProgram">
+				<MethodArg Name="Banks" FValue="FLASH_BANK_2" />
+				<MethodArg Name="WRPState" FValue="OB_WRPSTATE_DISABLE" />
+				<MethodArg Name="WRPSector" ParameterName="OB_WRP2_Enabled_Sectors" />
+			</CallLibMethod>
+			<CallLibMethod Name="HAL_FLASHEx_OBProgram">
+				<MethodArg Name="Banks" FValue="FLASH_BANK_2" />
+				<MethodArg Name="WRPState" FValue="OB_WRPSTATE_ENABLE" />
+				<MethodArg Name="WRPSector" ParameterName="OB_WRP2_Disabled_Sectors" />
+			</CallLibMethod>
+		</IFCondition>
+		<IFCondition Expression="SEM_FLASH_OB_WRP2 &amp; (WRP2_ENABLE_ALLSECTORS | WRP2_DISABLE_ALLSECTORS)&amp; !WRP_BOTHBANKS">
+			<CallLibMethod Name="HAL_FLASHEx_OBProgram">
+				<MethodArg Name="Banks" FValue="FLASH_BANK_2" />
+				<MethodArg Name="WRPState" ParameterName="WRP2State" />
+				<MethodArg Name="WRPSector" ParameterName="WRP2Sector" />
+			</CallLibMethod>
+		</IFCondition>
+		<IFCondition Expression="WRP_BOTHBANKS &amp; !WRP2_ENABLE_ALLSECTORS &amp; !WRP2_DISABLE_ALLSECTORS ">
+			<CallLibMethod Name="HAL_FLASHEx_OBProgram">
+				<MethodArg Name="Banks" FValue="FLASH_BANK_BOTH" />
+				<MethodArg Name="WRPState" FValue="OB_WRPSTATE_DISABLE" />
+				<MethodArg Name="WRPSector" ParameterName="OB_WRP2_Enabled_Sectors" />
+			</CallLibMethod>
+			<CallLibMethod Name="HAL_FLASHEx_OBProgram">
+				<MethodArg Name="WRPState" FValue="OB_WRPSTATE_ENABLE" />
+				<MethodArg Name="WRPSector" ParameterName="OB_WRP1_Disabled_Sectors" />
+			</CallLibMethod>
+		</IFCondition>
+		<IFCondition Expression="WRP_BOTHBANKS &amp; (WRP2_ENABLE_ALLSECTORS | WRP2_DISABLE_ALLSECTORS) ">
+			<CallLibMethod Name="HAL_FLASHEx_OBProgram">
+				<MethodArg Name="Banks" FValue="FLASH_BANK_BOTH" />
+				<MethodArg Name="WRPState" ParameterName="WRP2State" />
+				<MethodArg Name="WRPSector" ParameterName="WRP2Sector" />
+			</CallLibMethod>
+		</IFCondition>
+		
+		<!-- EDATA --> 
+		<IFCondition Expression="SEM_FLASH_OB_EDATA1 &amp; !EDATA_BOTHBANKS">
+			<CallLibMethod Name="HAL_FLASHEx_OBProgram">
+				<MethodArg Name="Banks" FValue="FLASH_BANK_1" />
+				<MethodArg Name="EDATASize" ParameterName="EDATA1size" />
+			</CallLibMethod>
+		</IFCondition>
+		<IFCondition Expression="SEM_FLASH_OB_EDATA2 &amp; !EDATA_BOTHBANKS">
+			<CallLibMethod Name="HAL_FLASHEx_OBProgram">
+				<MethodArg Name="Banks" FValue="FLASH_BANK_2" />
+				<MethodArg Name="EDATASize" ParameterName="EDATA2size" />
+			</CallLibMethod>
+		</IFCondition>
+		<IFCondition Expression="EDATA_BOTHBANKS">
+			<CallLibMethod Name="HAL_FLASHEx_OBProgram">
+				<MethodArg Name="Banks" FValue="FLASH_BANK_BOTH" />
+				<MethodArg Name="EDATASize" ParameterName="EDATA2size" />
+			</CallLibMethod>
+		</IFCondition>
+		
+		<!-- HDP --> 
+		<IFCondition Expression="SEM_FLASH_OB_HDP1 &amp; !HDP_BOTHBANKS">
+			<CallLibMethod Name="HAL_FLASHEx_OBProgram">
+				<MethodArg Name="Banks" FValue="FLASH_BANK_1" />
+				<MethodArg Name="HDPStartSector" ParameterName="HDP1start" />
+				<MethodArg Name="HDPEndSector" ParameterName="HDP1end" />
+			</CallLibMethod>
+		</IFCondition>
+		<IFCondition Expression="SEM_FLASH_OB_HDP2 &amp; !HDP_BOTHBANKS">
+			<CallLibMethod Name="HAL_FLASHEx_OBProgram">
+				<MethodArg Name="Banks" FValue="FLASH_BANK_2" />
+				<MethodArg Name="HDPStartSector" ParameterName="HDP2start" />
+				<MethodArg Name="HDPEndSector" ParameterName="HDP2end" />
+			</CallLibMethod>
+		</IFCondition>
+		<IFCondition Expression="HDP_BOTHBANKS">
+			<CallLibMethod Name="HAL_FLASHEx_OBProgram">
+				<MethodArg Name="Banks" FValue="FLASH_BANK_BOTH" />
+				<MethodArg Name="HDPStartSector" ParameterName="HDP2start" />
+				<MethodArg Name="HDPEndSector" ParameterName="HDP2end" />
+			</CallLibMethod>
+		</IFCondition>
+
+		<IFCondition Expression="SEM_FLASH_OB_NSBOOTADDR| SEM_FLASH_OB_NSBOOTLOCK |SEM_FLASH_OB_SECBOOTADDR | SEM_FLASH_OB_SECBOOTLOCK |
+								 SEM_FLASH_OB_WMSEC1 | SEM_FLASH_OB_WMSEC2 | SEM_FLASH_OB_WRP1 | SEM_FLASH_OB_WRP2 | SEM_FLASH_OB_OTP_LOCK |
+								 SEM_FLASH_OB_EDATA1 | SEM_FLASH_OB_EDATA2 |
+								 SEM_FLASH_OB_HDP1 | SEM_FLASH_OB_HDP2">
+			<CallLibMethod Name="HAL_FLASH_OB_Lock" />
+		</IFCondition>
+		
+		<IFCondition Expression="SEM_FLASH_B1_AREA|SEM_FLASH_B2_AREA|SEM_FLASH_B3_AREA|SEM_FLASH_B4_AREA|SEM_FLASH_B5_AREA|SEM_FLASH_B6_AREA|SEM_FLASH_B7_AREA | SEM_FLASH_B8_AREA">
+			<CallLibMethod Name="BBprotectionSection" Type="HardCode">
+				<HardCode Text="#n#t/* Block-based sector protection */#n" />
+			</CallLibMethod>
+		</IFCondition>
+		
+		<IFCondition Expression="SEM_FLASH_B1_AREA">
+			<CallLibMethod Name="HAL_FLASHEx_ConfigBBAttributes" >
+				<MethodArg Name="Bank" ParameterName="B1_Bank" />
+				<MethodArg Name="BBAttributesType" ParameterName="B1_AttributesType" />
+				<MethodArg Name="BBAttributes_array" ParameterName="B1_AttributesArray" />
+			</CallLibMethod>
+		</IFCondition>
+		<IFCondition Expression="SEM_FLASH_B2_AREA">
+			<CallLibMethod Name="HAL_FLASHEx_ConfigBBAttributes" >
+				<MethodArg Name="Bank" ParameterName="B2_Bank" />
+				<MethodArg Name="BBAttributesType" ParameterName="B2_AttributesType" />
+				<MethodArg Name="BBAttributes_array" ParameterName="B2_AttributesArray" />
+			</CallLibMethod>
+		</IFCondition>
+		<IFCondition Expression="SEM_FLASH_B3_AREA">
+			<CallLibMethod Name="HAL_FLASHEx_ConfigBBAttributes" >
+				<MethodArg Name="Bank" ParameterName="B3_Bank" />
+				<MethodArg Name="BBAttributesType" ParameterName="B3_AttributesType" />
+				<MethodArg Name="BBAttributes_array" ParameterName="B3_AttributesArray" />
+			</CallLibMethod>
+		</IFCondition>
+		<IFCondition Expression="SEM_FLASH_B4_AREA">
+			<CallLibMethod Name="HAL_FLASHEx_ConfigBBAttributes" >
+				<MethodArg Name="Bank" ParameterName="B4_Bank" />
+				<MethodArg Name="BBAttributesType" ParameterName="B4_AttributesType" />
+				<MethodArg Name="BBAttributes_array" ParameterName="B4_AttributesArray" />
+			</CallLibMethod>
+		</IFCondition>
+		<IFCondition Expression="SEM_FLASH_B5_AREA">
+			<CallLibMethod Name="HAL_FLASHEx_ConfigBBAttributes" >
+				<MethodArg Name="Bank" ParameterName="B5_Bank" />
+				<MethodArg Name="BBAttributesType" ParameterName="B5_AttributesType" />
+				<MethodArg Name="BBAttributes_array" ParameterName="B5_AttributesArray" />
+			</CallLibMethod>
+		</IFCondition>
+		<IFCondition Expression="SEM_FLASH_B6_AREA">
+			<CallLibMethod Name="HAL_FLASHEx_ConfigBBAttributes" >
+				<MethodArg Name="Bank" ParameterName="B6_Bank" />
+				<MethodArg Name="BBAttributesType" ParameterName="B6_AttributesType" />
+				<MethodArg Name="BBAttributes_array" ParameterName="B6_AttributesArray" />
+			</CallLibMethod>
+		</IFCondition>
+		<IFCondition Expression="SEM_FLASH_B7_AREA">
+			<CallLibMethod Name="HAL_FLASHEx_ConfigBBAttributes" >
+				<MethodArg Name="Bank" ParameterName="B7_Bank" />
+				<MethodArg Name="BBAttributesType" ParameterName="B7_AttributesType" />
+				<MethodArg Name="BBAttributes_array" ParameterName="B7_AttributesArray" />
+			</CallLibMethod>
+		</IFCondition>
+		<IFCondition Expression="SEM_FLASH_B8_AREA">
+			<CallLibMethod Name="HAL_FLASHEx_ConfigBBAttributes" >
+				<MethodArg Name="Bank" ParameterName="B8_Bank" />
+				<MethodArg Name="BBAttributesType" ParameterName="B8_AttributesType" />
+				<MethodArg Name="BBAttributes_array" ParameterName="B8_AttributesArray" />
+			</CallLibMethod>
+		</IFCondition>
+		<IFCondition Expression="1=1">
+			<CallLibMethod Name="HAL_FLASH_Lock" />
+		</IFCondition>
+		<IFCondition Expression="SEM_FLASH_OB_ProductState|SEM_FLASH_OB_USER|SEM_FLASH_OB_NSBOOTADDR|SEM_FLASH_OB_NSBOOTLOCK|SEM_FLASH_OB_SECBOOTADDR|SEM_FLASH_OB_SECBOOTLOCK|SEM_FLASH_OB_WMSEC1 | SEM_FLASH_OB_WMSEC2 | SEM_FLASH_OB_WRP1 | SEM_FLASH_OB_WRP2 | SEM_FLASH_OB_OTP_LOCK | SEM_FLASH_OB_EDATA1 | SEM_FLASH_OB_EDATA2 | SEM_FLASH_OB_HDP1 | SEM_FLASH_OB_HDP2">
+			<CallLibMethod Name="OBlaunch" Type="HardCode">
+				<HardCode Text="#n#t/* Launch Option Bytes Loading */
+							#n#t/*HAL_FLASH_OB_Launch(); */#n" />
+			</CallLibMethod>
+		</IFCondition>
+	</RefConfig>
+
+
+	<LibMethod Comment="" Name="HAL_FLASHEx_OBProgram">
+		<Argument AddressOf="true" GenericType="struct" Name="pOBInit" TypeName="FLASH_OBProgramInitTypeDef">
+			<Argument AddressOf="false" GenericType="simple" Name="OptionType" OptimizationCondition="equal" />
+			<Argument AddressOf="false" GenericType="simple" Name="ProductState" OptimizationCondition="equal" />
+			<Argument AddressOf="false" GenericType="simple" Name="USERType" OptimizationCondition="equal" />
+			<Argument AddressOf="false" GenericType="simple" Name="USERConfig" OptimizationCondition="equal" />
+			<Argument AddressOf="false" GenericType="simple" Name="USERConfig2" OptimizationCondition="equal" />
+			<Argument AddressOf="false" GenericType="simple" Name="Banks" OptimizationCondition="equal" />
+			<Argument AddressOf="false" GenericType="simple" Name="WRPState" OptimizationCondition="equal" />
+			<Argument AddressOf="false" GenericType="simple" Name="WRPSector" OptimizationCondition="equal" />
+			<Argument AddressOf="false" GenericType="simple" Name="BootConfig" OptimizationCondition="equal" />
+			<Argument AddressOf="false" GenericType="simple" Name="BootAddr" OptimizationCondition="equal" />
+			<Argument AddressOf="false" GenericType="simple" Name="BootLock" OptimizationCondition="equal" />
+			<Argument AddressOf="false" GenericType="simple" Name="OTPBlockLock" OptimizationCondition="equal" />
+			<Argument AddressOf="false" GenericType="simple" Name="HDPStartSector" OptimizationCondition="equal" />
+			<Argument AddressOf="false" GenericType="simple" Name="HDPEndSector" OptimizationCondition="equal" />
+			<Argument AddressOf="false" GenericType="simple" Name="EDATASize" OptimizationCondition="equal" />
+			<Argument AddressOf="false" GenericType="simple" Name="WMSecStartSector" OptimizationCondition="equal" />
+			<Argument AddressOf="false" GenericType="simple" Name="WMSecEndSector" OptimizationCondition="equal" />
+		</Argument>
+	</LibMethod>
+	
+	<LibMethod Comment="" Name="HAL_FLASHEx_ConfigBBAttributes">
+		<Argument AddressOf="true" Context="local" GenericType="struct" Name="FLASH_BBSecInitStruct" TypeName="FLASH_BBAttributesTypeDef">
+			<Argument AddressOf="false" GenericType="simple" Name="Bank" OptimizationCondition="equal" />
+			<Argument AddressOf="false" GenericType="simple" Name="BBAttributesType" OptimizationCondition="equal" />
+			<Argument AddressOf="true" Context="local" GenericType="struct" Name="" TypeName="">
+				<Argument AddressOf="false" Context="local" GenericType="Array" Name="BBAttributes_array" TypeName="uint32_t" Optional="false"/>
+			</Argument>
+		</Argument>
+		
+	</LibMethod>
+
+	<LibMethod Comment="" Name="HAL_FLASH_Unlock" />
+	<LibMethod Comment="" Name="HAL_FLASH_OB_Unlock" />
+	<LibMethod Comment="" Name="HAL_FLASH_Lock" />
+	<LibMethod Comment="" Name="HAL_FLASH_OB_Lock" />
+
+	<RefComponent Cclass="System Core" Cgroup="Flash" Cversion="1Gg0Gg0">
+		<File Category="header" Name="Drivers/STM32H5xx_HAL_Driver/Inc/stm32h5xx_hal_flash.h" />
+		<File Category="header" Name="Drivers/STM32H5xx_HAL_Driver/Inc/stm32h5xx_hal_flash_ex.h" />
+		<File Category="source" Name="Drivers/STM32H5xx_HAL_Driver/Src/stm32h5xx_hal_flash.c" />
+		<File Category="source" Name="Drivers/STM32H5xx_HAL_Driver/Src/stm32h5xx_hal_flash_ex.c" />
+	</RefComponent>
+</IP>

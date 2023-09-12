@@ -7,9 +7,9 @@
 [#--------------------------]
 [#macro gen_optee]
 [#local module = "gen_optee"]
-/* SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause) */
+// SPDX-License-Identifier: (GPL-2.0-or-later OR BSD-3-Clause)
 /*
- * Copyright (C) STMicroelectronics ${year} - All Rights Reserved
+ * Copyright (C) ${year}, STMicroelectronics - All Rights Reserved
  * Author: STM32CubeMX code generation for STMicroelectronics.
  */
 
@@ -66,7 +66,11 @@
 	/*model = "STMicroelectronics unknown STM32CubeMX board";*/
 	[/#if]
 	[#if mx_socRPN?has_content && mx_socFtRPN?has_content && mx_projectName?has_content]
+	[#if mx_isCustomBoard]
 	compatible = "st,${mx_socRPN}-${mx_projectName}-mx", "st,${mx_socFtRPN}";
+	 [#else]
+	compatible = "st,${mx_socRPN}-${mx_projectName}-mx", "st,${mx_boardName_lowercase}", "st,${mx_socFtRPN}";
+	[/#if]
 	[#else]
 		[@mlog  logMod=module logType="ERR" logMsg="compatible' not generated" varsMap={} /]
 	/*compatible = "st,???-mx", "st,???";*/

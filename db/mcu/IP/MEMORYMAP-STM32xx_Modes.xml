@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<IP DBVersion="V4.0" IPType="service" Name="MEMORYMAP" Version="STM32xx"
+	xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance"
+	ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd"
+	xmlns="http://mcd.rou.st.com/modules.php?name=mcu">
+	<About>MEMORYMAP: Memory Map UC48 UC58</About>
+
+    <RefParameter Comment="Name" DefaultValue="YourRegionName" Group="Current application region attributes" Name="Name" Type="StringRW"/>
+
+    <RefParameter Comment="Core Name" Group="Current application region attributes" Name="CoreName" Type="list" />
+
+	<!-- Currently the ContextName cannot be modified so it is set a not visible -->
+    <RefParameter Comment="Context Name" Group="Current application region attributes" Name="ContextName" Type="list" />
+
+    <!-- start address constraint vs MPU alignments: To be done by the MMBuilder -->
+    <RefParameter Comment="Start address" DefaultValue="0x0" Max="0xAFFFFFFF" Min="0x0" Name="StartAddress" Type="hex" Group="Current application region attributes"/>
+
+    <!-- size constraint vs MPU: To be done by the MMBuilder -->
+    <RefParameter Comment="Size" DefaultValue="0" Max="0xFFFFFFFF" Min="0" Name="Size" Type="decimal" Group="Current application region attributes">
+    </RefParameter>
+    <RefParameter Comment="Size unit" DefaultValue="KB" Name="SizeUnit" Type="list" Group="Current application region attributes">
+        <PossibleValue Comment="B" Value="B"/>
+        <PossibleValue Comment="KB" Value="KB"/>
+        <PossibleValue Comment="MB" Value="MB"/>
+    </RefParameter>
+
+    <!-- 1) Condition to add: this refparam is only for TZEN = 1 (DONE)
+         2) different default values cf table in the spec: Done by the MMBuilder -->
+    <RefParameter Comment="Security" DefaultValue="NS" Group="Current application region attributes" Name="Security" Type="list">
+        <Condition Diagnostic="" Expression="S_SECURE"/>
+        <PossibleValue Comment="Non-Secure" Value="NS" Semaphore="S_MMT_CurReg_NS"/>
+        <PossibleValue Comment="Non-Secure Callable" Value="NSC"/>
+        <PossibleValue Comment="Secure" Value="S"/>
+    </RefParameter>
+    <RefParameter Comment="Security" DefaultValue="T0" Group="Current application region attributes" Name="Security" Type="list" Visible="false">
+    </RefParameter>
+
+    <RefParameter Comment="Security" DefaultValue="null" Group="Current application region attributes" Name="Security" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="!S_SECURE"/>
+    </RefParameter>
+
+    <RefParameter Comment="Memory Type" DefaultValue="RAM" Group="Current application region attributes" Name="MemType" Type="list" Visible="false">
+        <PossibleValue Comment="RAM" Value="RAM"  Semaphore="S_MMT_CurReg_RAM"/>
+        <PossibleValue Comment="ROM" Value="ROM"/>
+    </RefParameter>
+
+    <RefParameter Comment="Memory Source" DefaultValue="INT" Group="Current application region attributes" Name="MemSource" Type="list" Visible="false">
+        <PossibleValue Comment="Internal" Value="INT"/>
+        <PossibleValue Comment="External" Value="EXT" Semaphore="S_MMT_CurReg_EXT"/>
+    </RefParameter>
+
+    <!-- This parameter tells if the region is a default region mandatory for the linked file and cannot be deleted by the user (only move or resize allowed) -->
+    <RefParameter Comment="Default Data Region" DefaultValue="false" Group="Current application region attributes"  Name="DefaultDataRegion" Type="boolean">
+	    <Condition Diagnostic="" Expression="S_MMT_CurReg_DefaultData"/>
+        <PossibleValue Comment="true" Value="true" Semaphore="S_MMT_CurReg_DefaultData"/>
+        <PossibleValue Comment="false" Value="false"/>
+        <Description>This region will contain default linker sections (eg: heap and stack)</Description>
+    </RefParameter>
+
+    <RefParameter Comment="Default Code Region"  DefaultValue="false" Group="Current application region attributes"  Name="DefaultCodeRegion" Type="boolean">
+		<Condition Diagnostic="" Expression="S_MMT_CurReg_DefaultCode"/>
+        <PossibleValue Comment="true" Value="true" Semaphore="S_MMT_CurReg_DefaultCode"/>
+        <PossibleValue Comment="false" Value="false"/>
+        <Description>This region will contain default linker sections for code</Description>
+    </RefParameter>
+
+    <RefParameter Comment="Default Code Region"  DefaultValue="false" Group="Current application region attributes"  Name="DefaultCodeRegion" Type="boolean" Visible="false">
+        <PossibleValue Comment="false" Value="false"/>
+    </RefParameter>
+
+    <RefParameter Comment="ISR vector"  DefaultValue="true" Group="Current application region attributes"  Name="ISRRegion" Type="boolean">
+        <Condition Diagnostic="" Expression="S_MMT_CurReg_DefaultCode"/>
+        <PossibleValue Comment="true" Value="true" Semaphore="S_MMT_CurReg_ISRVectorPresent"/>
+        <PossibleValue Comment="false" Value="false"/>
+        <Description>Define if ISR vector is present on this region</Description>
+    </RefParameter>
+    <RefParameter Comment="ISR vector"  DefaultValue="false" Group="Current application region attributes"  Name="ISRRegion" Type="boolean" Visible="false">
+        <PossibleValue Comment="false" Value="false"/>
+    </RefParameter>
+
+    <RefParameter Comment="Root Boot"  DefaultValue="true" Group="Current application region attributes"  Name="RootBootRegion" Type="boolean">
+        <Condition Diagnostic="" Expression="S_MMT_CurReg_DefaultCode&amp;(!S_SECURE|!S_MMT_CurReg_NS)"/>
+        <PossibleValue Comment="true" Value="true" Semaphore = "S_MMT_CurReg_RootBoot"/>
+        <PossibleValue Comment="false" Value="false"/>
+        <Description>Define if this application is the first one to run after reset</Description>
+    </RefParameter>
+    <RefParameter Comment="Root Boot"  DefaultValue="false" Group="Current application region attributes"  Name="RootBootRegion" Type="boolean" Visible="false">
+        <PossibleValue Comment="false" Value="false"/>
+    </RefParameter>
+
+    <RefParameter Comment="Boot Address" DefaultValue="NSBOOTADD0" Group="Current application region attributes" Name="NSBOOTADD" Type="list">
+         <!-- only available on TZEN = 0 and on root boot region and not available on H5 -->
+        <Condition Diagnostic="" Expression="!S_SECURE&amp;S_MMT_CurReg_RootBoot&amp;!(DIE474|DIE484)"/>
+        <PossibleValue Comment="Boot Address 0" Value="NSBOOTADD0"/>
+        <PossibleValue Comment="Boot Address 1" Value="NSBOOTADD1"/>
+        <Description>The boot address will be set by this tool into the option bytes. You need to set appropriately "NSWBOOT0" bit (in option bytes) as well as the "NBOOT0" bit (in option bytes) or "GPIO PH3 pin".</Description>
+    </RefParameter>
+    
+    <RefParameter Comment="Secured by Watermark"  DefaultValue="true" Group="Current application region attributes"  Name="SecuredByWatermark" Type="boolean">
+        <Condition Diagnostic="" Expression="S_SECURE&amp;!S_MMT_CurReg_NS&amp;S_MMT_RootBoot&amp;S_MMT_CurReg_InFlash"/>
+        <PossibleValue Comment="true" Value="true"/>
+        <PossibleValue Comment="false" Value="false"/>
+        <Description>Define if this region should be secured by FLASH watermark in option bytes</Description>
+    </RefParameter>
+
+	<!-- This parameter indicates if need to generated OTA sections in default code region. And this parameter is available only for WB and for Application, i.e. not BootLoader (rootboot is disabled) -->
+    <RefParameter Comment="OTA tags"  DefaultValue="false" Group="Current application region attributes"  Name="OTATagsRegion" Type="boolean">
+        <Condition Diagnostic="" Expression="S_MMT_CurReg_DefaultCode&amp;!S_MMT_CurReg_RootBoot&amp;(DIE495|DIE496|DIE494)"/>
+        <PossibleValue Comment="true" Value="true"/>
+        <PossibleValue Comment="false" Value="false"/>
+        <Description>Define if this region contains OTA start tag and OTA end tag</Description>
+    </RefParameter>
+    <RefParameter Comment="OTA tags"  DefaultValue="false" Group="Current application region attributes"  Name="OTATagsRegion" Type="boolean" Visible="false">
+        <PossibleValue Comment="false" Value="false"/>
+    </RefParameter>
+
+	<!-- This parameter indicates if need to generated .bootInfo section in default code region. And this parameter is available only for WB  i.e.  BootLoader (rootboot is enabled) -->
+    <RefParameter Comment="Generate boot info section"  DefaultValue="false" Group="Current application region attributes"  Name="BootInfoRegion" Type="boolean">
+        <Condition Diagnostic="" Expression="S_MMT_CurReg_DefaultCode&amp;S_MMT_CurReg_RootBoot&amp;(DIE495|DIE496|DIE494)"/>
+        <PossibleValue Comment="true" Value="true"/>
+        <PossibleValue Comment="false" Value="false"/>
+        <Description>Define if this region contains the boot info section</Description>
+    </RefParameter>
+    <RefParameter Comment="Generate boot info section"  DefaultValue="false" Group="Current application region attributes"  Name="BootInfoRegion" Type="boolean" Visible="false">
+        <PossibleValue Comment="false" Value="false"/>
+    </RefParameter>
+
+<!-- This parameter indicates if need to generated the ThreadX Heap section  -->
+    <RefParameter Comment="ThreadX Heap section"  DefaultValue="false" Group="Current application region attributes"  Name="ThreadXHeapRegion" Type="boolean">
+        <Condition Diagnostic="" Expression="S_MMT_CurReg_ThreadXHeap"/>
+        <PossibleValue Comment="true" Value="true"/>
+        <PossibleValue Comment="false" Value="false"/>
+        <Description>&lt;html&gt;Define if this region is used as ThreadX Heap section.&lt;br&gt;
+		             Grayed if already set in another Application Region &lt;/html&gt;</Description>
+    </RefParameter>
+    <RefParameter Comment="ThreadX Heap section"  DefaultValue="false" Group="Current application region attributes"  Name="ThreadXHeapRegion" Type="boolean" Visible="false">
+        <PossibleValue Comment="false" Value="false"/>
+    </RefParameter>
+
+	<!-- This parameter tells if the region is automatically created by the CoreEngine and cannot be used or modified by the User -->
+    <RefParameter Comment="The region is reserved" DefaultValue="false" Group="Current application region attributes"  Name="ReservedRegion" Type="boolean" Visible="false">
+        <Description></Description>
+    </RefParameter>
+
+	<!-- This parameter tells if the region is invalid. A region could be invalid in case the hardware region is removed after its creation -->
+    <RefParameter Comment="The region is invalid" DefaultValue="false" Group="Current application region attributes"  Name="InvalidRegion" Type="boolean" Visible="false">
+        <Description></Description>
+    </RefParameter>
+
+	<!-- This parameter tells if the region is Locked That is, the user cannot modify it, parameters are readonly -->
+    <RefParameter Comment="The region is locked" DefaultValue="false" Group="Current application region attributes"  Name="LockedRegion" Type="boolean" Visible="false">
+        <Description></Description>
+    </RefParameter>
+
+	<!-- This parameter tells if the region is Locked That is, the user cannot modify it, parameters are readonly -->
+    <RefParameter Comment="This region must be checked vs alignment" DefaultValue="false" Group="Current application region attributes"  Name="IgnoreAlignmentCheck" Type="boolean" Visible="false">
+        <Description></Description>
+    </RefParameter>
+
+    <RefParameter Comment="Secure Read/Write" DefaultValue="NotAllowed" Group="Current application region attributes" Name="SecureAccess" Type="list">
+        <Condition Diagnostic="" Expression="S_SECURE&amp;S_MMT_CurReg_NS&amp;S_MMT_CurReg_RAM"/>
+        <PossibleValue Comment="Not Allowed" Value="NotAllowed"/>
+        <PossibleValue Comment="Allowed" Value="Allowed"/>
+	<Description>Define if read/write access by the secure application is allowed to this non-secure region</Description>
+    </RefParameter>
+    <RefParameter Comment="Secure Read/Write access on this region" DefaultValue="null" Group="Current application region attributes" Name="SecureAccess" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="!S_MMT_CurReg_NS"/>
+    </RefParameter>
+
+    <RefParameter Comment="Access Permission" DefaultValue="RW_all" Group="Current application region attributes" Name="AP" Type="list">
+        <PossibleValue Comment="RW by privileged code only" Value="RW_priv_only"/>
+        <PossibleValue Comment="RW by privileged code and RO by unprivileged code" Value="RW_priv_RO_unpriv" Condition="!DIE450&amp;!DIE480&amp;!DIE483" Action="Remove"/>
+        <PossibleValue Comment="RW by any privilege level" Value="RW_all"/>
+        <PossibleValue Comment="RO by privileged code only" Value="RO_priv_only"/>
+        <PossibleValue Comment="RO by any privilege level" Value="RO_all"/>
+	<Description>Define if this region is accessible by privileged or unprivileged mode</Description>
+    </RefParameter>
+
+    <RefParameter Comment="Code execution" DefaultValue="Permitted" Group="Current application region attributes" Name="XN" Type="list">
+        <PossibleValue Comment="Permitted" Value="Permitted"/>
+        <PossibleValue Comment="Not Permitted" Value="NotPermitted" Condition="S_MMT_CurReg_DefaultCode" Action="Remove"/>
+	<Description>Define if instruction fetch is permitted at this region</Description>
+    </RefParameter>
+
+    <RefParameter Comment="Shareability" DefaultValue="NonShareable" Group="Current application region attributes" Name="Shareability" Type="list">
+        <PossibleValue Comment="Shareable" Value="Shareable"/>
+        <PossibleValue Comment="Non-Shareable" Value="NonShareable"/>
+	<Description>Define if this region is shared by different masters (cores, DMAs)</Description>
+    </RefParameter>
+
+    <!-- 1) different recommanded values for different memories: done by the builder
+    2) "Advanced settings" (DONE)
+    3) "Trensient" is only available for MPU armv8 -->
+    <RefParameter Comment="Cacheability" DefaultValue="WBRAWA" Group="Current application region attributes" Name="Cacheability" Type="list">
+        <!-- allow user to turn back to the default value for the zones [0x4000 0000 : 0x6000 0000] and [0xA000 0000 : 0xC000 0000](HSPI) -->
+        <PossibleValue Comment="Device, Non-Cacheable" Value="Device_NGNRE" Condition="!(StartAddress&gt;=0x40000000&amp;StartAddress&lt;=0x60000000|StartAddress&gt;=0xA0000000&amp;StartAddress&lt;=0xC0000000)" Action="Remove"/>
+        <PossibleValue Comment="Non-Cacheable (recommended for multimaster/DMA)" Value="NonCacheable"/>
+        <PossibleValue Comment="Write-Through Read Allocate for ROM/Flash (not recommened for multimaster/DMA)" Value="WTRA"/>
+        <PossibleValue Comment="Write-Back Read Write Allocate for RAM (not recommended for multimaster/DMA)" Value="WBRAWA"/>
+        <PossibleValue Comment="Advanced Settings" Value="Advanced" Semaphore="S_MMT_CurReg_AdvancedSettings"/>
+	<Description>Configure the cacheability of this region</Description>
+    </RefParameter>
+    <RefParameter Comment="Write policy" DefaultValue="WB" Group="Current application region attributes" Name="WritePolicy" Type="list">
+        <Condition Diagnostic="" Expression="S_MMT_CurReg_AdvancedSettings"/>
+        <PossibleValue Comment="Write-Through" Value="WT"/>
+        <PossibleValue Comment="Write-Back" Value="WB"/>
+    </RefParameter>
+    <RefParameter Comment="Write policy" DefaultValue="null" Group="Current application region attributes" Name="WritePolicy" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="!S_MMT_CurReg_AdvancedSettings"/>
+    </RefParameter>
+    <RefParameter Comment="Read allocate" DefaultValue="Y" Group="Current application region attributes" Name="ReadAllocate" Type="list">
+        <Condition Diagnostic="" Expression="S_MMT_CurReg_AdvancedSettings"/>
+        <PossibleValue Comment="Yes" Value="Y" Semaphore="S_MMT_CurReg_RA"/>
+        <PossibleValue Comment="No" Value="N"/>
+    </RefParameter>
+    <RefParameter Comment="Read allocate" DefaultValue="null" Group="Current application region attributes" Name="ReadAllocate" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="!S_MMT_CurReg_AdvancedSettings"/>
+    </RefParameter>
+    <RefParameter Comment="Write allocate" DefaultValue="Y" Group="Current application region attributes" Name="WriteAllocate" Type="list">
+        <Condition Diagnostic="" Expression="S_MMT_CurReg_AdvancedSettings"/>
+        <PossibleValue Comment="Yes" Value="Y" Semaphore="S_MMT_CurReg_WA"/>
+        <PossibleValue Comment="No" Value="N"/>
+    </RefParameter>
+    <RefParameter Comment="Write allocate" DefaultValue="null" Group="Current application region attributes" Name="WriteAllocate" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="!S_MMT_CurReg_AdvancedSettings"/>
+    </RefParameter>
+    <RefParameter Comment="Transient" DefaultValue="Y" Group="Current application region attributes" Name="Transient" Type="list">
+        <Condition Diagnostic="" Expression="S_MMT_CurReg_AdvancedSettings&amp;(S_MMT_CurReg_RA|S_MMT_CurReg_WA)"/>
+        <PossibleValue Comment="Yes" Value="Y"/>
+        <PossibleValue Comment="No" Value="N"/>
+    </RefParameter>
+    <RefParameter Comment="Transient" DefaultValue="null" Group="Current application region attributes" Name="Transient" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="!S_MMT_CurReg_AdvancedSettings&amp;!(S_MMT_CurReg_RA|S_MMT_CurReg_WA)"/>
+    </RefParameter>
+
+    <RefMode Name="CurAppReg">
+        <ConfigForMode>MMT_CurAppRegConfig</ConfigForMode>
+        <Parameter Name="Name"/>
+        <Parameter Name="CoreName"/>
+        <Parameter Name="ContextName"/>
+        <Parameter Name="StartAddress"/>
+        <Parameter Name="Size"/>
+        <Parameter Name="SizeUnit"/>
+        <Parameter Name="MemType"/>
+        <Parameter Name="Security"/>
+        <Parameter Name="SecureAccess"/>
+        <Parameter Name="AP"/>
+        <Parameter Name="XN"/>
+        <Parameter Name="Shareability"/>
+        <Parameter Name="Cacheability"/>
+        <Parameter Name="WritePolicy"/>
+        <Parameter Name="ReadAllocate"/>
+        <Parameter Name="WriteAllocate"/>
+        <Parameter Name="Transient"/>
+        <Parameter Name="DefaultDataRegion"/>
+        <Parameter Name="DefaultCodeRegion"/>
+        <Parameter Name="ISRRegion"/>
+        <Parameter Name="RootBootRegion"/>
+        <Parameter Name="OTATagsRegion"/>
+        <Parameter Name="ThreadXHeapRegion"/>
+        <Parameter Name="BootInfoRegion"/>
+        <Parameter Name="ReservedRegion"/>
+        <Parameter Name="InvalidRegion"/>
+        <Parameter Name="LockedRegion"/>
+        <Parameter Name="IgnoreAlignmentCheck"/>
+    </RefMode>
+
+    <!-- ModeLogicOperator for DTS -->
+    <ModeLogicOperator Name="OR">
+        <Mode Name="Memory_Map_State" UserName="Activated"  RemoveDisable="true">
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="CurAppReg" UserName="Current Application Region">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="VS_MEMORYMAP" />
+                    </SignalLogicalOp>
+                </Mode>
+            </ModeLogicOperator>
+        </Mode>
+    </ModeLogicOperator>
+
+    <!-- RefSignal for DTS -->
+    <RefSignal Name="VS_MEMORYMAP" Virtual="true"/>
+
+</IP>

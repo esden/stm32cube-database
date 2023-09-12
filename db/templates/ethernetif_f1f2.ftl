@@ -20,6 +20,7 @@
 [#assign dp83848 = 0]
 [#assign lwip_ipv6 = 0]
 [#assign cmsis_version = "n/a"]
+[#assign lwip_netif_hostname = "lwip"]
 [#if SWIP.defines??]
 	[#list SWIP.defines as definition] 	
 		[#if (definition.name == "WITH_RTOS")]
@@ -56,6 +57,9 @@
         [/#if]
         [#if (definition.name == "LWIP_IPV6") && (definition.value == "1")]
             [#assign lwip_ipv6 = 1]
+        [/#if] 
+        [#if (definition.name == "LWIP_NETIF_HOSTNAME") && (definition.value != "valueNotSetted")]
+            [#assign lwip_netif_hostname = definition.value]
         [/#if]
 	[/#list]
 [/#if][#-- SWIP.defines --]
@@ -603,7 +607,7 @@ err_t ethernetif_init(struct netif *netif)
   
 #if LWIP_NETIF_HOSTNAME
   /* Initialize interface hostname */
-  netif->hostname = "lwip";
+  netif->hostname = "${lwip_netif_hostname}";
 #endif /* LWIP_NETIF_HOSTNAME */
 
   netif->name[0] = IFNAME0;

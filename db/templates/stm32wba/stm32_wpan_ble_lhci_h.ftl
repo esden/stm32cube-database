@@ -65,7 +65,7 @@ extern "C" {
     uint32_t    InfoStack;
     uint32_t    Reserved;
   }LHCI_WirelessFwInfoTable_t;
-  
+
   typedef __PACKED_STRUCT
   {
     uint32_t    Version;
@@ -92,7 +92,7 @@ extern "C" {
     MB_FusInfoTable_t           FusInfoTable;
     MB_WirelessFwInfoTable_t    WirelessFwInfoTable;
   } MB_DeviceInfoTable_t;
-  
+
   typedef __PACKED_STRUCT
   {
     uint8_t                   	status;
@@ -110,6 +110,14 @@ extern "C" {
     LHCI_WirelessFwInfoTable_t  	WirelessFwInf;
     uint32_t                  	AppFwInf;
   } LHCI_C1_Device_Information_ccrp_t;
+
+#define LHCI_OCF_C1_RF_CONTROL_ANTENNA_SWITCH          ( LHCI_OCF_BASE + 3 )
+#define LHCI_OPCODE_C1_RF_CONTROL_ANTENNA_SWITCH       (( LHCI_OGF << 10) + LHCI_OCF_C1_RF_CONTROL_ANTENNA_SWITCH)
+
+  typedef __PACKED_STRUCT
+  {
+    uint8_t    enable; /* Requested state for Antenna switch (enable: yes/no) */
+  } LHCI_C1_RF_CONTROL_AntennaSwitch_cmd_t;
 
   /* Exported constants --------------------------------------------------------*/
   /* External variables --------------------------------------------------------*/
@@ -138,6 +146,14 @@ extern "C" {
    * @retval None
    */
   void LHCI_C1_Read_Device_Information( BleCmdSerial_t *pcmd  );
+
+  /**
+   * @brief RF Antenna Switch control
+   *
+   * @param  None
+   * @retval None
+   */
+  void LHCI_C1_RF_CONTROL_AntennaSwitch( BleCmdSerial_t *pcmd );
 
   #ifdef __cplusplus
 }

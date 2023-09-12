@@ -156,12 +156,12 @@
 /*
 //     <o>Start Address <0-0xFFFFFFE0>
 */
-#define SAU_INIT_START2     0x20040000      /* start address of SAU region 2 */
+#define SAU_INIT_START2     0x20050000      /* start address of SAU region 2 */
 
 /*
 //     <o>End Address <0x1F-0xFFFFFFFF>
 */
-#define SAU_INIT_END2       0x200BFFFF      /* end address of SAU region 2 */
+#define SAU_INIT_END2       0x2009FFFF      /* end address of SAU region 2 */
 
 /*
 //     <o>Region is
@@ -500,8 +500,8 @@
 [/#if]
 [/#list]
 [/#if]
-
 [#assign res1 = String.format("0x%08X" , Integer.valueOf(decVal1)) /]
+
 #define NVIC_INIT_ITNS1_VAL      ${res1}
 
 /*

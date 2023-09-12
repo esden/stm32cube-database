@@ -53,6 +53,10 @@ Key: ${key}; Value: ${myHash[key]}
 
 /* Private typedef -----------------------------------------------------------*/
 
+/* USER CODE BEGIN PTD */
+
+/* USER CODE END PTD */
+
 typedef enum
 {
   NOTIFICATION_INFO_RECEIVED_EVT,
@@ -128,10 +132,6 @@ typedef struct
 /* USER CODE END BleClientAppContext_t */
 
 }BleClientAppContext_t;
-
-/* USER CODE BEGIN PTD */
-
-/* USER CODE END PTD */
 
 /* Private defines ------------------------------------------------------------*/
 [#if myHash["THREADX_STATUS"]?number == 1 ]
@@ -610,7 +610,7 @@ __USED static void gatt_Notification(GATT_CLIENT_APP_Notification_evt_t *p_Notif
       P2PLedSelection = p_Notif->DataTransfered.p_Payload[0];
       P2PLedLevel = p_Notif->DataTransfered.p_Payload[1];
 
-      UTIL_SEQ_SetTask( 1u<<CFG_TASK_SEND_NOTIF_ID, CFG_SCH_PRIO_0);
+      UTIL_SEQ_SetTask( 1u<<CFG_TASK_SEND_NOTIF_ID, CFG_SEQ_PRIO_0);
       break;
     }
 [/#if]
@@ -1169,13 +1169,13 @@ static void P2Pclient_write_char(void)
 
       if (ret != BLE_STATUS_SUCCESS)
       {
-        APP_DBG("aci_gatt_write_without_resp failed, connHdl=0x%04X, ValueHdl=0x%04X\n",
+        APP_DBG_MSG("aci_gatt_write_without_resp failed, connHdl=0x%04X, ValueHdl=0x%04X\n",
                 a_ClientContext[index].connHdl,
                 a_ClientContext[index].P2PWriteToServerValueHdl);
       }
       else
       {
-        APP_DBG("aci_gatt_write_without_resp success, connHdl=0x%04X, ValueHdl=0x%04X\n",
+        APP_DBG_MSG("aci_gatt_write_without_resp success, connHdl=0x%04X, ValueHdl=0x%04X\n",
           a_ClientContext[index].connHdl,
           a_ClientContext[index].P2PWriteToServerValueHdl);
       }

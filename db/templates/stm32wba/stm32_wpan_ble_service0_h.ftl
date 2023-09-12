@@ -101,11 +101,9 @@ typedef enum
   [@customServChar characteristic/],
   [/#list]
 [/#if]
-
   /* USER CODE BEGIN Service${SvcNbr}_CharOpcode_t */
 
   /* USER CODE END Service${SvcNbr}_CharOpcode_t */
-  
   ${SERVICE_SHORT_NAME_UpperCase}_CHAROPCODE_LAST
 } ${SERVICE_SHORT_NAME_UpperCase}_CharOpcode_t;
 
@@ -121,11 +119,9 @@ typedef enum
       [/#list]
   [/#list]
 [/#if]
-
   /* USER CODE BEGIN Service${SvcNbr}_OpcodeEvt_t */
 
   /* USER CODE END Service${SvcNbr}_OpcodeEvt_t */
-
   ${SERVICE_SHORT_NAME_UpperCase}_BOOT_REQUEST_EVT
 } ${SERVICE_SHORT_NAME_UpperCase}_OpcodeEvt_t;
 
@@ -137,7 +133,6 @@ typedef struct
   /* USER CODE BEGIN Service${SvcNbr}_Data_t */
 
   /* USER CODE END Service${SvcNbr}_Data_t */
-
 } ${SERVICE_SHORT_NAME_UpperCase}_Data_t;
 
 typedef struct
@@ -145,12 +140,11 @@ typedef struct
   ${SERVICE_SHORT_NAME_UpperCase}_OpcodeEvt_t       EvtOpcode;
   ${SERVICE_SHORT_NAME_UpperCase}_Data_t             DataTransfered;
   uint16_t                ConnectionHandle;
+  uint16_t                AttributeHandle;
   uint8_t                 ServiceInstance;
-
   /* USER CODE BEGIN Service${SvcNbr}_NotificationEvt_t */
 
   /* USER CODE END Service${SvcNbr}_NotificationEvt_t */
-
 } ${SERVICE_SHORT_NAME_UpperCase}_NotificationEvt_t;
 
 /* USER CODE BEGIN ET */

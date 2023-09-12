@@ -976,6 +976,10 @@
 #n
 #t/* USER CODE END ${instName}_Init 0 */    
 #n
+[#if  instName?starts_with("LPDMA")]
+#t/* Peripheral clock enable */
+#t__HAL_RCC_${instName}_CLK_ENABLE();
+[/#if]
 
         [#-- assign ipInstanceIndex = instName?replace(name,"")--]
         [#assign args = ""]
@@ -1185,6 +1189,11 @@ static void MX_${instName}_DeInit(void)
   #t{
   #t#tError_Handler();
   #t}
+  #t/* Init ${instName} peripheral */
+  #tif (HAL_${mode}_DeInit(&${hnadlerName}) != HAL_OK)
+  #t{
+    #t#tError_Handler();
+  #t}
   #t/* UnRegister ${mode} msp callbacks */
 [#if mode == "OPAMP"]
   #tif (HAL_${mode}_UnRegisterCallback(&${hnadlerName}, HAL_${mode}_MSP_DEINIT_CB_ID) != HAL_OK)
@@ -1193,11 +1202,6 @@ static void MX_${instName}_DeInit(void)
 [/#if]
   #t{
   #t#tError_Handler();
-  #t} 
-#t/* Init ${instName} peripheral */
-  #tif (HAL_${mode}_DeInit(&${hnadlerName}) != HAL_OK)
-  #t{
-    #t#tError_Handler();
   #t}
         [/#list]
     [/#if] [#-- if ipvar.initCallBacks?? --]

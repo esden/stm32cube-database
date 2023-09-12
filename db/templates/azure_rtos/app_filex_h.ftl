@@ -331,7 +331,7 @@ UINT MX_FileX_Init(VOID *memory_ptr);
 [/#if]
 
 [#if name?contains("LX_NOR_USE_SIMULATOR_DRIVER")  && value == "true"]
-[#if LINK_NOR_SIMULATOR_DRIVER_value == "1" && FORMAT_NOR_SIMULATOR_MEDIA_value == "1"]
+[#if LINK_NOR_SIMULATOR_DRIVER_value == "1" || FORMAT_NOR_SIMULATOR_MEDIA_value == "1"]
 /* fx nor_simulator volume name */
 #ifndef FX_NOR_SIMULATOR_VOLUME_NAME
   #define FX_NOR_SIMULATOR_VOLUME_NAME "STM32_NOR_SIMULATOR_FLASH_DISK"

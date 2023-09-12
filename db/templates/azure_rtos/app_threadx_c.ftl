@@ -182,7 +182,7 @@ UINT App_ThreadX_Init(VOID *memory_ptr)
 {
   UINT ret = TX_SUCCESS;
   [#-- The condition for display pack is added as a workaround for ticket 145290, (void)byte_pool; in the user section App_ThreadX_MEM_POOL should be removed from examples in the next display pack release --]
-[#if familyName?starts_with("stm32c0") || (familyName?starts_with("stm32u5")&&(DisplayPack=="true")&&((TX_APP_GENERATE_INIT_CODE_value == "false")||(TX_APP_CREATION_value="0")))]
+[#if (familyName?starts_with("stm32u5")&&(DisplayPack=="true")&&(TX_APP_GENERATE_INIT_CODE_value == "false"))]
   TX_BYTE_POOL *byte_pool = (TX_BYTE_POOL*)memory_ptr;
   
    /* USER CODE BEGIN App_ThreadX_MEM_POOL */
@@ -271,6 +271,7 @@ CHAR *pointer;
 }
 [#if AZRTOS_APP_MEM_ALLOCATION_METHOD_VAL != "0"]
 [#if TX_APP_GENERATE_INIT_CODE_value != "false"]
+[#if TX_APP_CREATION_value != "0"]
 /**
   * @brief  Function implementing the ${TX_APP_THREAD_ENTRY_value} thread.
   * @param  thread_input: Not used.
@@ -282,6 +283,7 @@ void ${TX_APP_THREAD_ENTRY_value}(ULONG thread_input)
 
   /* USER CODE END ${TX_APP_THREAD_ENTRY_value} */
 }
+[/#if]
 [/#if]
 [/#if]
 

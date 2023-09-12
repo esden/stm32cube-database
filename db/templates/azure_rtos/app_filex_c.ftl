@@ -178,7 +178,13 @@ TX_THREAD       fx_app_thread;
 [#if FX_SRAM_INTERFACE_value == "1"]
 [#if LINK_SRAM_DRIVER_value == "1" || FORMAT_SRAM_MEDIA_value == "1"]
 /* Buffer for FileX FX_MEDIA sector cache. */
+[#if FamilyName=="STM32C0"]
+uint32_t fx_sram_media_memory[FX_SRAM_SECTOR_SIZE / sizeof(uint32_t)];
+
+[#else]
 ALIGN_32BYTES (uint32_t fx_sram_media_memory[FX_SRAM_SECTOR_SIZE / sizeof(uint32_t)]);
+
+[/#if]
 /* Define FileX global data structures.  */
 FX_MEDIA        sram_disk;
 [/#if]
@@ -196,7 +202,7 @@ ALIGN_32BYTES (uint32_t fx_sd_media_memory[FX_STM32_SD_DEFAULT_SECTOR_SIZE / siz
 FX_MEDIA        sdio_disk;
 [/#if]
 [#if FORMAT_SD_MEDIA_value == "1"]
-HAL_SD_CardInfoTypeDef *pCardInfo;
+HAL_SD_CardInfoTypeDef *pCardInfoSD;
 [/#if]
 [/#if]
 [/#if]
@@ -212,7 +218,7 @@ ALIGN_32BYTES (uint32_t fx_mmc_media_memory[FX_STM32_MMC_DEFAULT_SECTOR_SIZE / s
 FX_MEDIA        mmc_disk;
 [/#if]
 [#if FORMAT_MMC_MEDIA_value == "1"]
-HAL_MMC_CardInfoTypeDef *pCardInfo;
+HAL_MMC_CardInfoTypeDef *pCardInfoMMC;
 [/#if]
 [/#if]
 [/#if]
@@ -280,14 +286,14 @@ UINT MX_FileX_Init(void)
   /* USER CODE BEGIN MX_FileX_Init */
 
   /* USER CODE END MX_FileX_Init */
-[#if FamilyName!="STM32C0"]
+
 /* Initialize FileX.  */
   fx_system_initialize();
 
   /* USER CODE BEGIN MX_FileX_Init 1*/
 
   /* USER CODE END MX_FileX_Init 1*/
-[/#if]
+
   return ret;
 }
 [#else]
@@ -319,7 +325,7 @@ UINT MX_FileX_Init(VOID *memory_ptr)
   VOID *pointer;
 
 /* USER CODE BEGIN MX_FileX_MEM_POOL */
-  (void)byte_pool;
+
 /* USER CODE END MX_FileX_MEM_POOL */
 
 /* USER CODE BEGIN 0 */
@@ -382,24 +388,31 @@ UINT MX_FileX_Init(VOID *memory_ptr)
 */
  void ${FILEX_APPLICATION_THREAD_ENTRY_NAME_value}(ULONG thread_input)
  {
+[#if FX_SRAM_INTERFACE_value??]
 [#if FX_SRAM_INTERFACE_value == "1"]
 [#if FORMAT_SRAM_MEDIA_value == "1" || LINK_SRAM_DRIVER_value == "1"]
   UINT sram_status = FX_SUCCESS;
 [/#if]
 [/#if]
+[/#if]
 
+[#if FX_SD_INTERFACE_value??]
 [#if FX_SD_INTERFACE_value == "1"]
 [#if FORMAT_SD_MEDIA_value == "1" || LINK_SD_DRIVER_value == "1"]
   UINT sd_status = FX_SUCCESS;
 [/#if]
 [/#if]
+[/#if]
 
+[#if FX_MMC_INTERFACE_value??]
 [#if FX_MMC_INTERFACE_value == "1"]
 [#if FORMAT_MMC_MEDIA_value == "1" || LINK_MMC_DRIVER_value == "1"]
   UINT mmc_status = FX_SUCCESS;
 [/#if]
 [/#if]
+[/#if]
 
+[#if FX_LX_NOR_INTERFACE_value??]
 [#if FX_LX_NOR_INTERFACE_value == "1" && LX_NOR_USE_OSPI_DRIVER_value =="true"]
 [#if FORMAT_NOR_OSPI_MEDIA_value == "1" || LINK_NOR_OSPI_DRIVER_value == "1"]  
   UINT nor_ospi_status = FX_SUCCESS;
@@ -407,15 +420,16 @@ UINT MX_FileX_Init(VOID *memory_ptr)
 [/#if]
 
 [#if LX_NOR_USE_SIMULATOR_DRIVER_value == "true" && FX_LX_NOR_INTERFACE_value == "1"]
-[#if FORMAT_NOR_SIMULATOR_MEDIA_value == "1"]  
+[#if FORMAT_NOR_SIMULATOR_MEDIA_value == "1" || LINK_NOR_SIMULATOR_DRIVER_value == "1"]  
   UINT nor_sim_status = FX_SUCCESS;
 [/#if]
 [/#if]
-
+[/#if]
 /* USER CODE BEGIN ${FILEX_APPLICATION_THREAD_ENTRY_NAME_value} 0*/
   
 /* USER CODE END ${FILEX_APPLICATION_THREAD_ENTRY_NAME_value} 0*/
 
+[#if FX_SRAM_INTERFACE_value??]
 [#if FX_SRAM_INTERFACE_value == "1"]
 [#if FORMAT_SRAM_MEDIA_value == "1"]
 /* Format the SRAM_BASE memory as FAT */
@@ -456,7 +470,9 @@ UINT MX_FileX_Init(VOID *memory_ptr)
   }
 [/#if]
 [/#if]
+[/#if]
 
+[#if FX_SD_INTERFACE_value??]
 [#if FX_SD_INTERFACE_value == "1"]
 [#if FORMAT_SD_MEDIA_value == "1"]
 /* Format the SD memory as FAT */
@@ -469,7 +485,7 @@ UINT MX_FileX_Init(VOID *memory_ptr)
                                FX_SD_NUMBER_OF_FATS,                // Number of FATs
                                32,                                  // Directory Entries
                                FX_SD_HIDDEN_SECTORS,                // Hidden sectors
-                               pCardInfo->BlockNbr,                 // Total sectors
+                               pCardInfoSD->BlockNbr,                 // Total sectors
                                FX_STM32_SD_DEFAULT_SECTOR_SIZE,     // Sector size
                                8,                                   // Sectors per cluster
                                1,                                   // Heads
@@ -497,8 +513,9 @@ UINT MX_FileX_Init(VOID *memory_ptr)
   }
 [/#if]
 [/#if]
+[/#if]
 
-
+[#if FX_MMC_INTERFACE_value??]
 [#if FX_MMC_INTERFACE_value == "1"]
 [#if FORMAT_MMC_MEDIA_value == "1"]
 /* Format the MMC memory as FAT */
@@ -511,7 +528,7 @@ UINT MX_FileX_Init(VOID *memory_ptr)
                                 FX_MMC_NUMBER_OF_FATS,                 // Number of FATs
                                 32,                                    // Directory Entries
                                 FX_MMC_HIDDEN_SECTORS,                 // Hidden sectors
-                                pCardInfo->BlockNbr,                   // Total sectors
+                                pCardInfoMMC->BlockNbr,                   // Total sectors
                                 FX_STM32_MMC_DEFAULT_SECTOR_SIZE,      // Sector size
                                 8,                                     // Sectors per cluster
                                 1,                                     // Heads
@@ -539,8 +556,9 @@ UINT MX_FileX_Init(VOID *memory_ptr)
   }
 [/#if]
 [/#if]
+[/#if]
 
-
+[#if FX_LX_NOR_INTERFACE_value??]
 [#if FX_LX_NOR_INTERFACE_value == "1" && LX_NOR_USE_OSPI_DRIVER_value =="true"]
 [#if FORMAT_NOR_OSPI_MEDIA_value == "1"]
 /* Format the OCTO-SPI NOR flash as FAT */
@@ -620,6 +638,7 @@ UINT MX_FileX_Init(VOID *memory_ptr)
     while(1);
     /* USER CODE END NOR Simulator open error */
   }
+[/#if]
 [/#if]
 [/#if]
 /* USER CODE BEGIN ${FILEX_APPLICATION_THREAD_ENTRY_NAME_value} 1*/

@@ -124,9 +124,7 @@ extern "C" {
 [/#if]
 [/#if]
 #include "app_azure_rtos_config.h"
-[#if REG_USBX_DEVICE_CON_CK_value == "1"]
 #include "ux_dcd_stm32.h"
-[/#if]
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */

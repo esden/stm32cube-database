@@ -21,6 +21,7 @@
 [#assign TOUCHSENSING_ENABLED = "false"]
 [#assign GUI_INTERFACE_ENABLED = "false"]
 [#assign STM32WPAN_ENABLED = "false"]
+[#assign SECURE_MANAGER_API_ENABLED = "false"]
 [#compress]
 [#list SWIPdatas as SWIP]
 [#if SWIP.defines??]
@@ -52,6 +53,9 @@
     [#if name == "WPAN_ENABLED" && value == "true"]
       [#assign STM32WPAN_ENABLED = value]
     [/#if]
+	[#if name == "SECURE_MANAGER_API_ENABLED" && value == "true"]
+      [#assign SECURE_MANAGER_API_ENABLED = value]
+    [/#if]
 	
     [/#list]
 [/#if]
@@ -67,11 +71,11 @@
 
 /* Includes ------------------------------------------------------------------*/
 
-#include "${FamilyName?lower_case}xx_hal.h"
-#include "app_azure_rtos_config.h"
 [#if TX_ENABLED == "true"]
 #include "app_threadx.h"
 [/#if]
+#include "${FamilyName?lower_case}xx_hal.h"
+#include "app_azure_rtos_config.h"
 [#if FX_ENABLED == "true"]
 #include "app_filex.h"
 [/#if]
@@ -98,6 +102,9 @@
 [/#if]
 [#if STM32WPAN_ENABLED == "true"]
 #include "app_entry.h"
+[/#if]
+[#if SECURE_MANAGER_API_ENABLED == "true"]
+#include "secure_manager_api.h"
 [/#if]
 
 /* Private includes ----------------------------------------------------------*/

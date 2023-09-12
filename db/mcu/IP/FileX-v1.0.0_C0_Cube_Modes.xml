@@ -3,6 +3,10 @@
     
 	<RefMode Abstract="true" Name="FileX_Core">
         <ConfigForMode>FileOoSystemJjFileXJjCore</ConfigForMode>
+        <Parameter Added="true" Name="FX_EXFAT_MAX_CACHE_SIZE"/>
+        <Parameter Added="true" Name="FX_FAULT_TOLERANT_CACHE_SIZE"/>
+        <Parameter Added="true" Name="FX_FAULT_TOLERANT_CACHE_SIZE_NB_SIZE"/>
+        <Parameter Added="true" Name="FX_EXFAT_MAX_CACHE_SIZE_NB_BIT"/>
         <Parameter Added="true" Name="FX_DISABLE_DIRECT_DATA_READ_CACHE_FILL"/>
         <Parameter Added="true" Name="FX_DISABLE_ERROR_CHECKING"/>
         <Parameter Added="true" Name="FX_DONT_UPDATE_OPEN_FILES"/>
@@ -32,7 +36,7 @@
         <Parameter Added="true" Name="FX_NO_TIMER"/>
         <Parameter Added="true" Name="FX_SINGLE_THREAD"/>
 		<Parameter Added="true" Name="FX_STANDALONE_ENABLE"/>
-		
+
 		<Parameter Added="true" Name="FX_DISABLE_CACHE"/>
 		<Parameter Added="true" Name="FX_DISABLE_FILE_CLOSE"/>
 		<Parameter Added="true" Name="FX_DISABLE_FAST_OPEN"/>
@@ -41,13 +45,31 @@
 		<Parameter Added="true" Name="FX_DISABLE_ONE_LINE_FUNCTION"/>
 		<Parameter Added="true" Name="FX_DISABLE_FAT_ENTRY_REFRESH"/>
 		<Parameter Added="true" Name="FX_DISABLE_CONSECUTIVE_DETECT"/>
-	
-        <Parameter Name="useRTOS">
+		<Parameter Added="true" Name="GENERATE_FILEX_INIT_CODE">
+            <Condition Diagnostic="" Expression="SEMFileXCcFileOoSystemJjFileXJjCore &amp; SEMThreadXCcRTOSJjThreadXJjCore &amp; DIE453" Name="FX_APP_MEM_POOL_CONDITION" />
+        </Parameter>
+        <Parameter Added="true" Name="FILEX_APPLICATION_THREAD_ENTRY_NAME">
+            <Condition Diagnostic="" Expression="SEMFileXCcFileOoSystemJjFileXJjCore &amp; SEMThreadXCcRTOSJjThreadXJjCore &amp; DIE453" Name="FX_APP_MEM_POOL_CONDITION" />
+        </Parameter>
+        <Parameter Added="true" Name="FILEX_APPLICATION_THREAD_PRIORITY">
+            <Condition Diagnostic="" Expression="SEMFileXCcFileOoSystemJjFileXJjCore &amp; SEMThreadXCcRTOSJjThreadXJjCore &amp; DIE453" Name="FX_APP_MEM_POOL_CONDITION" />
+        </Parameter>
+        <Parameter Added="true" Name="FILEX_APPLICATION_THREAD_STACK_SIZE">
+            <Condition Diagnostic="" Expression="SEMFileXCcFileOoSystemJjFileXJjCore &amp; SEMThreadXCcRTOSJjThreadXJjCore &amp; DIE453" Name="FX_APP_MEM_POOL_CONDITION" />
+        </Parameter>
+        <Parameter Added="true" Name="LINK_SRAM_DRIVER">
+            <Condition Diagnostic="" Expression="SEMFileXCcFileOoSystemJjFileXJjCore &amp; SEMInterfacesCcFileOoSystemJjFileXOoInternalOoRAMOointerface &amp; SEMThreadXCcRTOSJjThreadXJjCore &amp; DIE453" Name="FX_SRAM_ENABLED" />
+        </Parameter>
+		<Parameter Added="true" Name="FORMAT_SRAM_MEDIA">
+            <Condition Diagnostic="" Expression="SEMFileXCcFileOoSystemJjFileXJjCore &amp; SEMInterfacesCcFileOoSystemJjFileXOoInternalOoRAMOointerface &amp; SEMThreadXCcRTOSJjThreadXJjCore &amp; DIE453" Name="FX_SRAM_ENABLED" />
+        </Parameter>
+		<Parameter Name="useRTOS">
 			<PossibleValue>1</PossibleValue>
+			<Condition Diagnostic="" Expression="SEMThreadXCcRTOSJjThreadXJjCore" Name="FX_APP_MEM_POOL_CONDITION"/>
 		</Parameter>
 		<Parameter Added="true" Name="FX_APP_MEM_POOL_SIZE">
 		  <Condition Diagnostic="" Expression="SEMThreadXCcRTOSJjThreadXJjCore" Name="FX_APP_MEM_POOL_CONDITION"/>
-		  </Parameter>
+		</Parameter>
 		<Parameter Added="true" Name="AZRTOS_APP_MEM_ALLOCATION_METHOD">
 		  <Condition Diagnostic="" Expression="SEMThreadXCcRTOSJjThreadXJjCore" Name="APP_MEM_ALLOCATION_CONDITION"/>
 		</Parameter>
@@ -55,12 +77,18 @@
 		  <Condition Diagnostic="" Expression="SEMThreadXCcRTOSJjThreadXJjCore" />
 		</Parameter>
 	</RefMode>
-	
+
 	<RefMode Abstract="true" Name="Internal_RAM_interface">
         <ConfigForMode>FileOoSystemJjFileXJjInternalOoRamOointerface</ConfigForMode>
 		<Parameter Added="true" Name="FX_SRAM_BASE_ADDRESS_RANGES"/>
 		<Parameter Added="true" Name="FX_SRAM_BASE_ADDRESS"/>
         <Parameter Added="true" Name="SRAM_DISK_SIZE"/>
+		<Parameter Added="true" Name="LINK_SRAM_DRIVER" >
+            <Condition Diagnostic="" Expression="DIE453"/>
+        </Parameter>
+		<Parameter Added="true" Name="FORMAT_SRAM_MEDIA" >
+            <Condition Diagnostic="" Expression="DIE453"/>
+        </Parameter>
 		<Parameter Name="FX_SRAM_INTERFACE">
 			<PossibleValue>1</PossibleValue>
 		</Parameter>
@@ -112,12 +140,12 @@
 		</Mode>
 	</ModeLogicOperator>
 	<Condition Diagnostic="Available only if FREERTOS is disabled" Expression="!S_XCUBEFREERTOS$context&amp;!S_XCUBEFREERTOS"/>
-	
+
     <RefSignal Name="VS_FileOoSystemJjFileXJjCore" Virtual="true"/>
 	<RefSignal Name="VS_InternalOoRAMOointerface" Virtual="true"/>
 	<RefSignal Name="VS_CustomOointerface" Virtual="true"/>
 
-	<RefParameter Added="true" Comment="FileX version" DefaultValue="6.1.8" Group="Version" Name="FileX_Version" TabName="FileX" Type="string">
+    <RefParameter Added="true" Comment="FileX version" DefaultValue="6.2.0" Group="Version" Name="FileX_Version" TabName="FileX" Type="string">
         <Description>FileX version</Description>
     </RefParameter>
     <RefParameter Added="true" Comment="FX_DISABLE_DIRECT_DATA_READ_CACHE_FILL" DefaultValue="0" Group="Core" Name="FX_DISABLE_DIRECT_DATA_READ_CACHE_FILL" TabName="FileX" Type="list">
@@ -127,19 +155,19 @@
     </RefParameter>
     <RefParameter Added="true" Comment="FX_DISABLE_ERROR_CHECKING" DefaultValue="0" Group="Core" Name="FX_DISABLE_ERROR_CHECKING" TabName="FileX" Type="list">
         <Description>Removes the basic FileX error checking API and results in improved performance (as much as 30%) and smaller code size.
-</Description>
+		</Description>
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
     </RefParameter>
     <RefParameter Added="true" Comment="FX_DONT_UPDATE_OPEN_FILES" DefaultValue="0" Group="Core" Name="FX_DONT_UPDATE_OPEN_FILES" TabName="FileX" Type="list">
         <Description>Defined, FileX does not update already opened files
-</Description>
+		</Description>
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
     </RefParameter>
-    <RefParameter Added="true" Comment="FX_DRIVER_USE_64BIT_LBA" DefaultValue="0" Group="Core" Name="FX_DRIVER_USE_64BIT_LBA" TabName="FileX" Type="list">
+	<RefParameter Added="true" Comment="FX_DRIVER_USE_64BIT_LBA" DefaultValue="0" Group="Core" Name="FX_DRIVER_USE_64BIT_LBA" TabName="FileX" Type="list">
         <Description>Defined, enables 64-bits sector addresses used in I/O driver.
-</Description>
+	</Description>
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
     </RefParameter>
@@ -149,13 +177,11 @@
         <PossibleValue Comment="Enabled" Value="1"/>
     </RefParameter>
     <RefParameter Added="true" Comment="FX_ENABLE_FAULT_TOLERANT" DefaultValue="0" Group="Core" Name="FX_ENABLE_FAULT_TOLERANT" TabName="FileX" Type="list">
-        <Description>Defined, enables FileX fault tolerant service.
-		&lt;br&gt; &lt;font color=&quot;red&quot;&gt; If FX_ENABLE_FAULT_TOLERANT and FX_DISABLE_CACHE are enabled simultaneously, compilation errors will be generated in the project.&lt;/font&gt;
-		</Description>
+        <Description>Defined, enables FileX fault tolerant service.</Description>
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
     </RefParameter>
-    <RefParameter Added="true" Comment="FX_FAT_MAP_SIZE" DefaultValue="128" Group="Core" Max="2147483647" Min="1" Name="FX_FAT_MAP_SIZE" TabName="FileX" Type="integer" Unit="">
+    <RefParameter Added="true" Comment="FX_FAT_MAP_SIZE" DefaultValue="128" Group="Core" Max="16777215" Min="1" Name="FX_FAT_MAP_SIZE" TabName="FileX" Type="hex" Unit="">
         <Description>Specifies the number of sectors that can be represented in the FAT update map.
 The default value is 256, but this can be overridden with a command-line define.
 Larger values help reduce unneeded updates of secondary FAT sectors.</Description>
@@ -165,7 +191,7 @@ Larger values help reduce unneeded updates of secondary FAT sectors.</Descriptio
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
     </RefParameter>
-    <RefParameter Added="true" Comment="FX_FAULT_TOLERANT_BOOT_INDEX" DefaultValue="116" Group="Core" Max="2147483647" Min="0" Name="FX_FAULT_TOLERANT_BOOT_INDEX" TabName="FileX" Type="integer" Unit="">
+    <RefParameter Added="true" Comment="FX_FAULT_TOLERANT_BOOT_INDEX" DefaultValue="116" Group="Core" Max="2147483647" Min="0" Name="FX_FAULT_TOLERANT_BOOT_INDEX" TabName="FileX" Type="hex" Unit="">
         <Description>Define byte offset in boot sector where the cluster number of the Fault Tolerant Log file is.</Description>
     </RefParameter>
     <RefParameter Added="true" Comment="FX_FAULT_TOLERANT_DATA" DefaultValue="0" Group="Core" Name="FX_FAULT_TOLERANT_DATA" TabName="FileX" Type="list">
@@ -182,14 +208,14 @@ All values must be a power of 2.</Description>
         <Description>This value defines the maximum file name length, which includes full path name.</Description>
         <ValueCondition Diagnostic="The value of FX_MAX_LAST_NAME_LEN must be greater or equal to FX_MAX_LONG_NAME_LEN" Expression="Value &gt;=  FX_MAX_LONG_NAME_LEN"/>
     </RefParameter>
-    
-	<RefParameter Added="true" Comment="FX_MAX_LONG_NAME_LEN" DefaultValue="256" Group="Core" Max="256" Min="13" Name="FX_MAX_LONG_NAME_LEN" TabName="FileX" Type="integer" Unit="">
+
+    <RefParameter Added="true" Comment="FX_MAX_LONG_NAME_LEN" DefaultValue="256" Group="Core" Max="256" Min="13" Name="FX_MAX_LONG_NAME_LEN" TabName="FileX" Type="integer" Unit="">
         <Description>Defines the maximum size of long file names supported by FileX.</Description>
     </RefParameter>
     <RefParameter Added="true" Comment="FX_MAX_SECTOR_CACHE" DefaultValue="=INTPOW(2,MAX_SECTOR_CACHE_NB_BIT)" Group="Core" Name="FX_MAX_SECTOR_CACHE" TabName="FileX" Type="string">
         <Description>Defines the maximum number of logical sectors that can be cached by FileX.
 		The cache memory supplied to FileX at fx_media_open determines how many sectors can actually be cached The FX_MAX_SECTOR_CACHE is 2 to the power of MAX_SECTOR_CACHE_NB_BIT.
-</Description>
+		</Description>
     </RefParameter>
     <RefParameter Added="true" Comment="FX_MEDIA_DISABLE_SEARCH_CACHE" DefaultValue="0" Group="Core" Name="FX_MEDIA_DISABLE_SEARCH_CACHE" TabName="FileX" Type="list">
         <Description>Defined, the file search cache optimization is disabled.</Description>
@@ -200,7 +226,7 @@ All values must be a power of 2.</Description>
         <Description>Defined, gathering of media statistics is disabled.</Description>
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
-    </RefParameter>   
+    </RefParameter>
     <RefParameter Added="true" Comment="FX_RENAME_PATH_INHERIT" DefaultValue="0" Group="Core" Name="FX_RENAME_PATH_INHERIT" TabName="FileX" Type="list">
         <Description>Defined, renaming inherits path information.</Description>
         <PossibleValue Comment="Disabled" Value="0"/>
@@ -211,19 +237,19 @@ All values must be a power of 2.</Description>
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
     </RefParameter>
-    <RefParameter Added="true" Comment="FX_UPDATE_RATE_IN_SECONDS" DefaultValue="10" Group="Core" Max="2147483647" Min="0" Name="FX_UPDATE_RATE_IN_SECONDS" TabName="FileX" Type="integer" Unit="">
+    <RefParameter Added="true" Comment="FX_UPDATE_RATE_IN_SECONDS" DefaultValue="10" Group="Core" Max="65535" Min="0" Name="FX_UPDATE_RATE_IN_SECONDS" TabName="FileX" Type="hex" Unit="">
         <Description>Defines the number of seconds the time parameters are updated in FileX.</Description>
     </RefParameter>
     <RefParameter Added="true" Comment="FX_UPDATE_RATE_IN_TICKS" DefaultValue="=(FX_UPDATE_RATE_IN_SECONDS*TX_TIMER_TICKS_PER_SECOND)" Group="Core" Name="FX_UPDATE_RATE_IN_TICKS" TabName="FileX" Type="string">
         <Description>Defines the number of ThreadX timer ticks required to achieve the update rate. That is, the update rate, but in ticks.</Description>
     </RefParameter>
-    <RefParameter Added="true" Comment="MAX_FAT_CACHE_NB_BIT" DefaultValue="4" Group="Core" Max="10" Min="3" Name="MAX_FAT_CACHE_NB_BIT" TabName="FileX" Type="integer" Unit="">
+    <RefParameter Added="true" Comment="MAX_FAT_CACHE_NB_BIT" DefaultValue="4" Group="Core" Max="7" Min="3" Name="MAX_FAT_CACHE_NB_BIT" TabName="FileX" Type="integer" Unit="">
         <Description>Represents the power of which FX_MAX_FAT_CACHE is raised to</Description>
     </RefParameter>
-	<RefParameter Added="true" Comment="MAX_SECTOR_CACHE_NB_BIT" DefaultValue="8" Group="Core" Max="10" Min="1" Name="MAX_SECTOR_CACHE_NB_BIT" TabName="FileX" Type="integer" Unit="">
+	<RefParameter Added="true" Comment="MAX_SECTOR_CACHE_NB_BIT" DefaultValue="6" Group="Core" Max="6" Min="1" Name="MAX_SECTOR_CACHE_NB_BIT" TabName="FileX" Type="integer" Unit="">
         <Description>represents the power of which FX_MAX_SECTOR_CACHE is raised to</Description>
     </RefParameter>
-	
+
 	<RefParameter Added="true" Comment="SRAM Disk Address ranges" DefaultValue="SRAM3_BASE_NS" Group="SRAM Disk Driver" Name="FX_SRAM_BASE_ADDRESS_RANGES" TabName="FileX" Type="list">
         <Description>define the address range from which the SRAM file system will be created</Description>
 		<PossibleValue Comment="SRAM_BASE (0x20000000UL)" Value="SRAM_BASE" />
@@ -245,10 +271,12 @@ All values must be a power of 2.</Description>
         <Description>define the SRAM file system disk size</Description>
 		<Condition Diagnostic="" Expression="DIE453"/>
     </RefParameter>
-    
 
 	<RefParameter Name="useRTOS" Comment="" DefaultValue="0" Type="integer" Min="0" Max="1" Group="" TabName="" Visible="false">
 		<Description></Description>		
+	</RefParameter>
+	<RefParameter Name="FileXTracing" Comment="" DefaultValue="0" Type="integer" Min="0" Max="1" Group="" TabName="" Visible="false">
+		<Description></Description>
 	</RefParameter>
 	<RefParameter Name="FX_SRAM_INTERFACE" Comment="" DefaultValue="0" Type="integer" Min="0" Max="1" Group="" TabName="" Visible="false">
 		<Description></Description>		
@@ -257,20 +285,20 @@ All values must be a power of 2.</Description>
 	<RefParameter Name="FX_CUSTOM_INTERFACE" Comment="" DefaultValue="0" Type="integer" Min="0" Max="1" Group="" TabName="" Visible="false">
 		<Description></Description>		
 	</RefParameter>
-	<RefParameter Added="true" Comment="FileX memory pool size" DefaultValue="1024" Group="Memory Configuration" Max="262144" Min="512" Name="FX_APP_MEM_POOL_SIZE" TabName="FileX" Type="integer" Unit="">
-        <Description>Default memory pool size for the FileX application.</Description>
+	<RefParameter Added="true" Comment="FileX memory pool size" DefaultValue="1024" Group="Memory Configuration" Max="2048" Min="1024" Name="FX_APP_MEM_POOL_SIZE" TabName="FileX" Type="integer" Unit="">
+        <Description>Default memory pool size for the FileX application.&lt;font color=&quot;red&quot;&gt;The allocated memory for all enabled middelwares should not exceed the total size of available memory.&lt;/font&gt;</Description>
         <Condition Diagnostic="" Expression="(ThreadX:AZRTOS_APP_MEM_ALLOCATION_METHOD = 1)"/>
     </RefParameter>
 	<RefParameter Added="true" Comment="Memory Allocation" DefaultValue="=(ThreadX:AZRTOS_APP_MEM_ALLOCATION_METHOD)" Group="Core" Name="AZRTOS_APP_MEM_ALLOCATION_METHOD" TabName="FileX" Type="list" Visible="false">
         <Description></Description>
-     </RefParameter>
+    </RefParameter>
 	<RefParameter Added="true" Comment="ULONG64 TYPE" DefaultValue="false" Group="Core" Name="ULONG_64_DEFINED" TabName="FileX" Type="boolean" Visible="false">
         <Description>the default value of the ULONG64 type</Description>
         <PossibleValue Comment="true" Value="true"/>
         <PossibleValue Comment="false" Value="false"/>
     </RefParameter>
-	
-	<RefParameter Added="true" Comment="FX_NO_LOCAL_PATH" DefaultValue="1" Group="Core" Name="FX_NO_LOCAL_PATH" TabName="FileX" Type="list">
+
+    <RefParameter Added="true" Comment="FX_NO_LOCAL_PATH" DefaultValue="1" Group="Core" Name="FX_NO_LOCAL_PATH" TabName="FileX" Type="list">
         <Description>Defined, local path logic is disabled.</Description>
         <PossibleValue Comment="Enabled" Value="1"/>
 		<Condition Diagnostic="" Expression="!SEMThreadXCcRTOSJjThreadXJjCore" />
@@ -279,7 +307,7 @@ All values must be a power of 2.</Description>
         <Description>Defined, local path logic is disabled.</Description>
         <PossibleValue Comment="Disabled" Value="0"/>
     </RefParameter>
-	<RefParameter Added="true" Comment="FX_SINGLE_THREAD" DefaultValue="1" Group="Core" Name="FX_SINGLE_THREAD" TabName="FileX" Type="list">
+    <RefParameter Added="true" Comment="FX_SINGLE_THREAD" DefaultValue="1" Group="Core" Name="FX_SINGLE_THREAD" TabName="FileX" Type="list">
         <Description>Eliminates ThreadX protection logic from the FileX source. It should be used if FileX is being used only from one thread or if FileX is being used without ThreadX.</Description>
         <PossibleValue Comment="Enabled" Value="1"/>
 		<Condition Diagnostic="" Expression="!SEMThreadXCcRTOSJjThreadXJjCore" />
@@ -288,7 +316,7 @@ All values must be a power of 2.</Description>
         <Description>Eliminates ThreadX protection logic from the FileX source. It should be used if FileX is being used only from one thread or if FileX is being used without ThreadX.</Description>
         <PossibleValue Comment="Disabled" Value="0"/>
     </RefParameter>
-	<RefParameter Added="true" Comment="FX_NO_TIMER" DefaultValue="1" Group="Core" Name="FX_NO_TIMER" TabName="FileX" Type="list">
+    <RefParameter Added="true" Comment="FX_NO_TIMER" DefaultValue="1" Group="Core" Name="FX_NO_TIMER" TabName="FileX" Type="list">
         <Description>Eliminates the ThreadX timer setup to update the FileX system time and date. 
 Doing so causes default time and date to be placed on all file operations.</Description>
         <PossibleValue Comment="Enabled" Value="1"/>
@@ -300,20 +328,18 @@ Doing so causes default time and date to be placed on all file operations.</Desc
         <PossibleValue Comment="Disabled" Value="0"/>
     </RefParameter>
 	<RefParameter Name="FX_STANDALONE_ENABLE" Comment="FX_STANDALONE_ENABLE" DefaultValue="0" Type="list"  Group="Core" TabName="FileX" Visible="false">
-		<Description></Description>	
+		<Description>Configure the FileX in Standalone mode</Description>
 		<PossibleValue Comment="Enabled" Value="0"/>
 		<Condition Diagnostic="" Expression="SEMThreadXCcRTOSJjThreadXJjCore" />		
 	</RefParameter>
 	<RefParameter Name="FX_STANDALONE_ENABLE" Comment="FX_STANDALONE_ENABLE" DefaultValue="1" Type="list"  Group="Core" TabName="FileX" Visible="false">
-		<Description></Description>		
+		<Description>Configure the FileX in Standalone mode</Description>
 		<PossibleValue Comment="Enabled" Value="1"/>
 		<Condition Diagnostic="" Expression="!SEMThreadXCcRTOSJjThreadXJjCore" />
 	</RefParameter>
 	
 	<RefParameter Added="true" Comment="FX_DISABLE_CACHE" DefaultValue="0" Group="Core" Name="FX_DISABLE_CACHE" TabName="FileX" Type="list">
-        <Description>If defined, cache is disabled.
-		&lt;br&gt; &lt;font color=&quot;red&quot;&gt; If FX_DISABLE_CACHE and FX_ENABLE_FAULT_TOLERANT are enabled simultaneously, compilation errors will be generated in the project.&lt;/font&gt;
-		</Description>
+        <Description>Determine if cache is disabled.</Description>
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
     </RefParameter>
@@ -352,9 +378,55 @@ Doing so causes default time and date to be placed on all file operations.</Desc
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
     </RefParameter>
-	
+
 	<RefParameter Added="true" Comment="FileX MemPool Name" DefaultValue="fx_app_byte_pool" Group="Memory Configuration" Name="FILEX_MEM_POOL_VAR_NAME" TabName="FileX" Type="stringRW">
         <Description>Default FileX memory pool var name &lt;br&gt; &lt;font color=&quot;red&quot;&gt; &lt;b&gt;This is a variable name. It should be C compliant declaration, Otherwise compilation errors will be generated in the project. &lt;/b&gt; &lt;/font&gt;</Description>
-		<Condition Diagnostic="" Expression="(ThreadX:AZRTOS_APP_MEM_ALLOCATION_METHOD = 1)"/>
+		<Condition Diagnostic="" Expression="(ThreadX:AZRTOS_APP_MEM_ALLOCATION_METHOD = 1) &amp; DIE453"/>
+    </RefParameter>
+    <RefParameter Added="true" Comment="FX_EXFAT_MAX_CACHE_SIZE" DefaultValue="=INTPOW(2,FX_EXFAT_MAX_CACHE_SIZE_NB_BIT)" Group="Core" Name="FX_EXFAT_MAX_CACHE_SIZE" TabName="FileX" Type="string">
+        <Description>Define bitmap cache size for exFAT. Size should be minimum one sector size and maximum 4096. For applications using multiple media devices with varying sector size, the value should be set to the size of largest sector size.
+					The FX_EXFAT_MAX_CACHE_SIZE is 2 power of FX_EXFAT_MAX_CACHE_SIZE_NB_BIT. </Description>
+    </RefParameter>
+    <RefParameter Added="true" Comment="FX_FAULT_TOLERANT_CACHE_SIZE" DefaultValue="=INTPOW(2,FX_FAULT_TOLERANT_CACHE_SIZE_NB_SIZE)" Group="Core" Name="FX_FAULT_TOLERANT_CACHE_SIZE" TabName="FileX" Type="string">
+        <Description>Define the size of fault tolerant cache, which is used when freeing FAT chain.
+					The FX_FAULT_TOLERANT_CACHE_SIZE is 2 power of FX_FAULT_TOLERANT_CACHE_SIZE_NB_SIZE. 
+		</Description>
+    </RefParameter>
+    <RefParameter Added="true" Comment="FX_FAULT_TOLERANT_CACHE_SIZE_NB_SIZE" DefaultValue="10" Group="Core" Max="14" Min="3" Name="FX_FAULT_TOLERANT_CACHE_SIZE_NB_SIZE" TabName="FileX" Type="integer" Unit="">
+        <Description>Represents the exponent power of which FX_FAULT_TOLERANT_CACHE_SIZE is rised to.</Description>
+    </RefParameter>
+	<RefParameter Added="true" Comment="FX_EXFAT_MAX_CACHE_SIZE_NB_BIT" DefaultValue="9" Group="Core" Max="12" Min="7" Name="FX_EXFAT_MAX_CACHE_SIZE_NB_BIT" TabName="FileX" Type="integer" Unit="">
+        <Description>Represents the exponent power of which FX_EXFAT_MAX_CACHE_SIZE is rised to.</Description>
+    </RefParameter>
+	<RefParameter Added="true" Comment="FileX Generate Init Code" DefaultValue="true" Group="FileX Core Init" Name="GENERATE_FILEX_INIT_CODE" TabName="FileX" Type="boolean">
+        <Description>Generate application code to initialize the FileX/LevelX stack in MX_FileX_Init() function.</Description>
+        <PossibleValue Comment="true" Value="true"/>
+        <PossibleValue Comment="false" Value="false"/>
+        <Condition Diagnostic="" Expression="(AZRTOS_APP_MEM_ALLOCATION_METHOD = 1) &amp; DIE453" />
+    </RefParameter>
+    <RefParameter Added="true" Comment="FileX Application Thread Entry Name" DefaultValue="fx_app_thread_entry" Group="FileX Core Init" Name="FILEX_APPLICATION_THREAD_ENTRY_NAME" TabName="FileX" Type="stringRW">
+        <Description>Main thread entry function Name.</Description>
+        <Condition Diagnostic="" Expression="(GENERATE_FILEX_INIT_CODE = true) &amp; (AZRTOS_APP_MEM_ALLOCATION_METHOD = 1) &amp; DIE453" />
+    </RefParameter>
+    <RefParameter Added="true" Comment="FileX Application Thread Priority" DefaultValue="10" Group="FileX Core Init" Max="31" Min="0" Name="FILEX_APPLICATION_THREAD_PRIORITY" TabName="FileX" Type="integer" Unit="">
+        <Description>FileX Application Thread Priority value for FileX application. </Description>
+        <Condition Diagnostic="" Expression="(GENERATE_FILEX_INIT_CODE = true) &amp; (AZRTOS_APP_MEM_ALLOCATION_METHOD = 1) &amp; DIE453" />
+    </RefParameter>
+    <RefParameter Added="true" Comment="FileX Application Thread Stack Size" DefaultValue="1024" Group="FileX Core Init" Max="2048" Min="1024" Name="FILEX_APPLICATION_THREAD_STACK_SIZE" TabName="FileX" Type="integer" Unit="">
+        <Description>Thread stack size value for FileX application. &lt;font color=&quot;red&quot;&gt;The allocated memory for all enabled middelwares should not exceed the total size of available memory.&lt;/font&gt;</Description>
+        <Condition Diagnostic="" Expression="(GENERATE_FILEX_INIT_CODE = true) &amp; (AZRTOS_APP_MEM_ALLOCATION_METHOD = 1)"/>
+        <ValueCondition Diagnostic="Stack size shall not exceed FileX mem pool size" Expression="Value&lt;= FX_APP_MEM_POOL_SIZE  &amp; DIE453" />
+    </RefParameter>
+    <RefParameter Added="true" Comment="Link SRAM Driver" DefaultValue="1" Group="FileX Drivers" Name="LINK_SRAM_DRIVER" TabName="FileX" Type="list">
+        <Description>Generates fx_media_open() function call to link the SRAM Driver to the application.</Description>
+        <PossibleValue Comment="true" Value="1"/>
+        <PossibleValue Comment="false" Value="0"/>
+        <Condition Diagnostic="" Expression="(GENERATE_FILEX_INIT_CODE = true) &amp; (AZRTOS_APP_MEM_ALLOCATION_METHOD = 1) &amp; SEMThreadXCcRTOSJjThreadXJjCore &amp; DIE453" />
+    </RefParameter>
+    <RefParameter Added="true" Comment="Format SRAM Media" DefaultValue="1" Group="FileX Drivers" Name="FORMAT_SRAM_MEDIA" TabName="FileX" Type="list">
+        <Description>Generates fx_media_format() function call to format the SRAM Media.</Description>
+        <PossibleValue Comment="true" Value="1"/>
+        <PossibleValue Comment="false" Value="0"/>
+        <Condition Diagnostic="" Expression="(GENERATE_FILEX_INIT_CODE = true) &amp; (AZRTOS_APP_MEM_ALLOCATION_METHOD = 1) &amp; SEMThreadXCcRTOSJjThreadXJjCore &amp; DIE453" />
     </RefParameter>
 </IP>

@@ -16,6 +16,7 @@
 #include "RTDebug.h"
 
 /* Private typedef -----------------------------------------------------------*/
+#define PLL_INPUTRANGE0_FREQMAX         8000000u  /* 8 MHz is maximum frequency for VCO input range 0 */
 
 /* Private define ------------------------------------------------------------*/
 
@@ -71,7 +72,7 @@ static void scm_systemclockconfig(void)
   {
     case HSE_16MHZ:
 
-      if(LL_RCC_GetSysClkSource() == LL_RCC_SYS_CLKSOURCE_PLL1R)
+      if(LL_RCC_GetSysClkSource() == LL_RCC_SYS_CLKSOURCE_STATUS_PLL1R)
       {
         /* currently running on PLL */
         SwitchPlltoHse32();
@@ -86,7 +87,7 @@ static void scm_systemclockconfig(void)
 
     case HSE_32MHZ:
 
-      if(LL_RCC_GetAHB5Divider() == LL_RCC_AHB5_DIVIDER_2)
+      if (LL_RCC_HSE_IsEnabledPrescaler())
       {
         /* currently running on HSE16 */
         SwitchHse16toHse32();
@@ -94,7 +95,7 @@ static void scm_systemclockconfig(void)
         /* Ensure time base clock coherency */
         SystemCoreClockUpdate();
       }
-      else if(LL_RCC_GetSysClkSource() == LL_RCC_SYS_CLKSOURCE_PLL1R)
+      else if(LL_RCC_GetSysClkSource() == LL_RCC_SYS_CLKSOURCE_STATUS_PLL1R)
       {
         /* currently running on PLL */
         SwitchPlltoHse32();
@@ -125,7 +126,7 @@ static void scm_systemclockconfig(void)
 
     case SYS_PLL:
 
-      if(LL_RCC_GetAHB5Divider() == LL_RCC_AHB5_DIVIDER_2)
+      if (LL_RCC_HSE_IsEnabledPrescaler())
       {
         /* currently running on HSE16 */
         SwitchHse16toHse32();
@@ -213,6 +214,9 @@ static void SwitchPlltoHse32(void)
 
 static void ConfigStartPll(void)
 {
+  /* Enable PLL1 output for SYSCLK (PLL1R) */
+  LL_RCC_PLL1_EnableDomain_PLL1R();
+
   /* Configure and start the PLL */
   LL_RCC_PLL1_SetMainSource(LL_RCC_PLL1SOURCE_HSE);
 
@@ -225,7 +229,9 @@ static void ConfigStartPll(void)
 
 static void ConfigHwPll(scm_pll_config_t *p_hw_config)
 {
-    /* Apply user PLL mode */
+  uint32_t freq_vco_in = 0;
+
+  /* Apply user PLL mode */
   if(p_hw_config->pll_mode == PLL_FRACTIONAL_MODE)
   {
     scm_pll_fractional_update(p_hw_config->PLLFractional);
@@ -235,6 +241,20 @@ static void ConfigHwPll(scm_pll_config_t *p_hw_config)
     /* Integer configuration will be used for PLL mode */
     LL_RCC_PLL1FRACN_Disable();
   }
+
+  /* Apply correct frequency range for VCO_IN */
+  /* Note as PLL clock source is always HSE 32MHz, only PLL1M value impact VCO_IN */
+
+  freq_vco_in = 32000000UL/p_hw_config->PLLM;
+  if (freq_vco_in > PLL_INPUTRANGE0_FREQMAX)
+  {
+    freq_vco_in = RCC_PLL_VCOINPUT_RANGE1;
+  }
+  else
+  {
+    freq_vco_in = RCC_PLL_VCOINPUT_RANGE0;
+  }
+  __HAL_RCC_PLL1_VCOINPUTRANGE_CONFIG(freq_vco_in);
 
   __HAL_RCC_PLL1_CONFIG(RCC_PLLSOURCE_HSE, /* PLL clock source is always HSE 32MHz */
                         p_hw_config->PLLM,
@@ -248,6 +268,12 @@ static void ConfigHwPll(scm_pll_config_t *p_hw_config)
 }
 
 /* Public functions ----------------------------------------------------------*/
+
+/**
+  * @brief  System Clock Manager init code
+  * @param  None
+  * @retval None
+  */
 void scm_init()
 {
   /* init scm_system_clock_config with LP config
@@ -255,15 +281,8 @@ void scm_init()
    * SHALL BE CALLED AFTER SystemClock_Config()
    **/
 
-  /* Default PLL configuration => 100Mhz integer mode */
-  scm_system_clock_config.pll.PLLM = 4;
-  scm_system_clock_config.pll.PLLN = 25;
-  scm_system_clock_config.pll.PLLP = 2;
-  scm_system_clock_config.pll.PLLQ = 2;
-  scm_system_clock_config.pll.PLLR = 2;
-  scm_system_clock_config.pll.PLLFractional = 0;
-  scm_system_clock_config.pll.pll_mode = PLL_INTEGER_MODE;
-  scm_system_clock_config.pll.AHB5_PLL1_CLKDivider = RCC_SYSCLK_PLL1_DIV4;
+  /* Default PLL configuration => no configuration */
+  memset(&(scm_system_clock_config.pll), 0, sizeof(scm_pll_config_t));
 
   /* Reading FLASH and SRAMs waitstates from registers */
   scm_system_clock_config.flash_ws_cfg = __HAL_FLASH_GET_LATENCY();
@@ -274,7 +293,6 @@ void scm_init()
 
   /* Enable RAMCFG clock */
   __HAL_RCC_RAMCFG_CLK_ENABLE();
-
 
   /* Reading system core clock configuration from registers */
 
@@ -304,7 +322,7 @@ void scm_init()
     case LL_RCC_SYS_CLKSOURCE_STATUS_HSE:
 
       /* Get AHB5 divider for HSE frequency */
-      if(LL_RCC_GetAHB5Divider() == LL_RCC_AHB5_DIVIDER_2)
+      if (LL_RCC_HSE_IsEnabledPrescaler())
       {
         /* System core clock is HSE_16MHz */
         scm_system_clock_config.targeted_clock_freq = HSE_16MHZ;
@@ -341,6 +359,12 @@ void scm_init()
   }
 }
 
+/**
+  * @brief  Setup the system clock source in usable configuration for Connectivity use cases.
+  *         Called at startup or out of low power modes.
+  * @param  None
+  * @retval None
+  */
 void scm_setup(void)
 {
   SYSTEM_DEBUG_SIGNAL_SET(SCM_SETUP);
@@ -401,6 +425,12 @@ void scm_setup(void)
   SYSTEM_DEBUG_SIGNAL_RESET(SCM_SETUP);
 }
 
+/**
+  * @brief  Configure the PLL mode and parameters before PLL selection as system clock.
+  * @param  p_pll_config PLL coniguration to apply
+  * @retval None
+  * @note   scm_pll_setconfig to be called before PLL activation (PLL set as system core clock)
+  */
 void scm_pll_setconfig(const scm_pll_config_t *p_pll_config)
 {
   /* Initial PLL configuration */
@@ -416,6 +446,14 @@ void scm_pll_setconfig(const scm_pll_config_t *p_pll_config)
   ConfigHwPll(&scm_system_clock_config.pll);
 }
 
+/**
+  * @brief  Configure the PLL for switching fractional parameters on the fly.
+  * @param  pll_frac Up to date fractional configuration.
+  * @retval None
+  * @note   A PLL update is requested only when the system clock is
+  *         running on the PLL with a different configuration that the
+  *         one required
+  */
 void scm_pll_fractional_update(uint32_t pll_frac)
 {
   /* PLL1FRACEN set to 0 */
@@ -431,6 +469,17 @@ void scm_pll_fractional_update(uint32_t pll_frac)
   SystemCoreClockUpdate();
 }
 
+/**
+  * @brief  Set the system clock to the requested frequency.
+  * @param  user_id This parameter can be one of the following:
+  *         @arg SCM_USER_APP
+  *         @arg SCM_USER_LL_FW
+  * @param  sysclockconfig This parameter can be one of the following:
+  *         @arg HSE_16MHZ
+  *         @arg HSE_32MHZ
+  *         @arg SYS_PLL
+  * @retval None
+  */
 void scm_setsystemclock(scm_user_id_t user_id, scm_clockconfig_t sysclockconfig)
 {
   scm_clockconfig_t max_freq_requested;
@@ -511,14 +560,37 @@ void scm_setsystemclock(scm_user_id_t user_id, scm_clockconfig_t sysclockconfig)
       scm_systemclockconfig();
     }
   }
+  else if(scm_system_clock_config.targeted_clock_freq == SYS_PLL)
+  {
+    /* PLL has requested but system clock is already on PLL */
+    scm_pllready();
+  }
 
   UTILS_EXIT_LIMITED_CRITICAL_SECTION();
 }
 
-__WEAK void scm_pllconfigready(void)
+/**
+  * @brief  Called each time the PLL is ready
+  * @param  None
+  * @retval None
+  * @note   This function is defined as weak in SCM module.
+  *         Can be overridden by user.
+  */
+__WEAK void scm_pllready(void)
 {
+  /* To be override by user */
 }
 
+/**
+  * @brief  Configure the Flash and SRAMs wait cycle (when required for system clock source change)
+  * @param  ws_lp_config: This parameter can be one of the following:
+  *         @arg LP
+  *         @arg RUN
+  *         @arg HSE16
+  *         @arg HSE32
+  *         @arg PLL
+  * @retval None
+  */
 void scm_setwaitstates(const scm_ws_lp_t ws_lp_config)
 {
   /* Configure flash and SRAMs */
@@ -568,6 +640,12 @@ void scm_setwaitstates(const scm_ws_lp_t ws_lp_config)
   }
 }
 
+/**
+  * @brief  SCM HSERDY interrupt handler.
+  *         Switch system clock on HSE.
+  * @param  None
+  * @retval None
+  */
 void scm_hserdy_isr(void)
 {
   SYSTEM_DEBUG_SIGNAL_SET(SCM_HSERDY_ISR);
@@ -628,6 +706,12 @@ void scm_hserdy_isr(void)
   SYSTEM_DEBUG_SIGNAL_RESET(SCM_HSERDY_ISR);
 }
 
+/**
+  * @brief  SCM PLLRDY interrupt handler.
+  *         Switch system clock on PLL.
+  * @param  None
+  * @retval None
+  */
 void scm_pllrdy_isr(void)
 {
   if(scm_system_clock_config.targeted_clock_freq == SYS_PLL)
@@ -637,12 +721,12 @@ void scm_pllrdy_isr(void)
 
     /* Switch to PLL */
     LL_RCC_SetSysClkSource(LL_RCC_SYS_CLKSOURCE_PLL1R);
-    while (LL_RCC_GetSysClkSource() != LL_RCC_SYS_CLKSOURCE_PLL1R);
+    while (LL_RCC_GetSysClkSource() != LL_RCC_SYS_CLKSOURCE_STATUS_PLL1R);
 
     /* Ensure time base clock coherency */
     SystemCoreClockUpdate();
 
-    scm_pllconfigready();
+    scm_pllready();
   }
   else
   {
@@ -659,6 +743,13 @@ void scm_pllrdy_isr(void)
   }
 }
 
+/**
+  * @brief  Notify the state of the Radio
+  * @param  radio_state: This parameter can be one of the following:
+  *         @arg SCM_RADIO_ACTIVE
+  *         @arg SCM_RADIO_NOT_ACTIVE
+  * @retval None
+  */
 void scm_notifyradiostate(const scm_radio_state_t radio_state)
 {
   if(radio_state != SCM_RADIO_NOT_ACTIVE)
@@ -673,6 +764,11 @@ void scm_notifyradiostate(const scm_radio_state_t radio_state)
   }
 }
 
+/**
+  * @brief  Restore system clock configuration when moving out of standby.
+  * @param  None
+  * @retval None
+  */
 void scm_standbyexit(void)
 {
   /* Restore PLL even if not yet used in case it has been setup upfron at initialization */

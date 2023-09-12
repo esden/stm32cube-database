@@ -24,8 +24,9 @@ NB: all the string lists should be re-ordered to insure DTS ordering.
 	[#list configs as mxMcuDataModel]
 		[#--MCU system info --]
 		[#assign mx_projectName = mxMcuDataModel.projectName?lower_case]
+		[#assign mx_boardName_lowercase = mxMcuDataModel.boardName?lower_case]
 		[#assign mx_boardName_uppercase = mxMcuDataModel.boardName]
-
+		[#assign mx_isCustomBoard= mxMcuDataModel.isCustomBoard]
 		[#--MCU info --]
 		[#assign mx_family = mxMcuDataModel.family?lower_case]
 		[#assign mx_socRPN = mxMcuDataModel.mcuParams.socRPN?lower_case]

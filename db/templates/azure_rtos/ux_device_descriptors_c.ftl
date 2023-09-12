@@ -33,6 +33,9 @@
       [#if name == "UX_DEVICE_CLASS_HID_INTERRUPT_OUT_SUPPORT"]
         [#assign UX_DEVICE_CLASS_HID_INTERRUPT_OUT_SUPPORT_value = value]
       [/#if]
+	  [#if name == "UX_PIMA_WITH_MTP_SUPPORT"]
+		[#assign UX_PIMA_WITH_MTP_SUPPORT_value = value]
+	  [/#if]
       [#list SWIPdatas as SWIP]
       [#if SWIP.variables??]
       [#list SWIP.variables as define]
@@ -84,7 +87,10 @@
 [/#list]
 [/#compress]
 
-
+[#-- Only MTP is supported in PIMA Class--]
+[#if UX_PIMA_WITH_MTP_SUPPORT_value == "0"]
+  [#assign usbd_builder_enabled = "0"]
+[/#if]
 
 /* Includes ------------------------------------------------------------------*/
 #include "ux_device_descriptors.h"

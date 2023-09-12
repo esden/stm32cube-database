@@ -138,7 +138,7 @@
 
   <!-- RefParameters for GTZC - MPCWM4 Secured -->
 
-  <RefParameter Name="MPCWM4_Area_BKPSRAM_BASE" Comment="Area Start BKPSRAM" DefaultValue="0x50036400" Type="hex" Min="0x50036400" Max="0x50036400" Visible="false"/>
+  <RefParameter Name="MPCWM4_Area_BKPSRAM_BASE" Comment="Area Start BKPSRAM" DefaultValue="0x40036400" Type="hex" Min="0x40036400" Max="0x40036400" Visible="false"/>
 
   <RefParameter Name="MPCWM4_Area_Desc" Comment="Area Descriptor" DefaultValue="MPCWM4_Area_Desc" Type="string" Visible="false"/>
   <RefParameter Name="MPCWM4_Area_Max" Comment="Area Max" DefaultValue="0x800" Type="hex" Min="0x800" Max="0x800" Visible="false"/>
@@ -199,7 +199,7 @@
 
   <RefParameter Name="MPCBB1_Area_BlockSize" Comment="Area Block Size" DefaultValue="0x200" Type="hex" Min="0x200" Max="0x200" Visible="false"/>
   <RefParameter Name="MPCBB1_Area_SuperBlockSize" Comment="Area Super-Block Size" DefaultValue="0x4000" Type="hex" Min="0x4000" Max="0x4000" Visible="false"/>
-  <RefParameter Name="MPCBB1_Area_NbSuperBlock" Comment="Area Nb Super-Block Size" DefaultValue="=(MPCBB1_Area_Max / MPCBB1_Area_SuperBlockSize)" Type="integer" Min="=(MPCBB1_Area_Max / MPCBB1_Area_SuperBlockSize)" Max="=(MPCBB1_Area_Max / MPCBB1_Area_SuperBlockSize)" Visible="false"/>
+  <RefParameter Name="MPCBB1_Area_NbSuperBlock" Comment="Area Nb Super-Block" DefaultValue="=(MPCBB1_Area_Max / MPCBB1_Area_SuperBlockSize)" Type="integer" Min="=(MPCBB1_Area_Max / MPCBB1_Area_SuperBlockSize)" Max="=(MPCBB1_Area_Max / MPCBB1_Area_SuperBlockSize)" Visible="false"/>
 
   <RefParameter Name="MPCBB1_Area_Privilege_Start_Address" Comment="    Area Start Address" DefaultValue="=MPCBB1_Area_Start_Address" Type="hex" Min="=(MPCBB1_Area_SRAM1_BASE_NS)" Max="=(MPCBB1_Area_Max + MPCBB1_Area_SRAM1_BASE_NS - MPCBB1_Area_BlockSize)" NoCheckOpt="false"/>
   <RefParameter Name="MPCBB1_Area_Privilege_Start" Comment="    Area Start Offset" DefaultValue="=(MPCBB1_Area_Privilege_Start_Address - MPCBB1_Area_SRAM1_BASE_NS)" Type="StringHex" Min="=(MPCBB1_Area_Privilege_Start_Address - MPCBB1_Area_SRAM1_BASE_NS)" Max="=(MPCBB1_Area_Privilege_Start_Address - MPCBB1_Area_SRAM1_BASE_NS)" NoCheckOpt="false" Visible="false"/>
@@ -208,7 +208,7 @@
   </RefParameter>
   <RefParameter Name="MPCBB1_Area_Privilege_BlockSize" Comment="    Area Block Size" DefaultValue="=(MPCBB1_Area_BlockSize)" Type="hex" Min="=(MPCBB1_Area_BlockSize)" Max="=(MPCBB1_Area_BlockSize)" Visible="false"/>
   <RefParameter Name="MPCBB1_Area_Privilege_SuperBlockSize" Comment="    Area Super-Block Size" DefaultValue="=(MPCBB1_Area_SuperBlockSize)" Type="hex" Min="=(MPCBB1_Area_SuperBlockSize)" Max="=(MPCBB1_Area_SuperBlockSize)" Visible="false"/>
-  <RefParameter Name="MPCBB1_Area_Privilege_NbSuperBlock" Comment="    Area Nb Super-Block Size" DefaultValue="=(MPCBB1_Area_Max / MPCBB1_Area_Privilege_SuperBlockSize)" Type="integer" Min="=(MPCBB1_Area_Max / MPCBB1_Area_Privilege_SuperBlockSize)" Max="=(MPCBB1_Area_Max / MPCBB1_Area_Privilege_SuperBlockSize)" Visible="false"/>
+  <RefParameter Name="MPCBB1_Area_Privilege_NbSuperBlock" Comment="    Area Nb Super-Block" DefaultValue="=(MPCBB1_Area_Max / MPCBB1_Area_Privilege_SuperBlockSize)" Type="integer" Min="=(MPCBB1_Area_Max / MPCBB1_Area_Privilege_SuperBlockSize)" Max="=(MPCBB1_Area_Max / MPCBB1_Area_Privilege_SuperBlockSize)" Visible="false"/>
 
   <RefParameter Name="MPCBB1_Area_Privilege" Comment="    Area Attribute" DefaultValue="not privileged" Type="list">
     <Condition Expression="S_All_MPCBB1_Privileged_$IpInstance" Diagnostic="pre-selected all MPCBB1 Privileged"/>
@@ -221,6 +221,18 @@
   </RefParameter>
 
   <RefParameter Name="MPCBB1_PrivConfig_array" Comment="Secure configuration array" DefaultValue="FFFFFFFF" Type="Array" ArraySize="1" ArrayTypeElement="uint32_t;16" Separator=":" Visible="false"/>
+<!--
+    MPCBB*_nbArea=2 : is the request from BZ 112788 - [UC48/58] GTZC update to extend security and privilege region
+        MPCBB*_nbArea=MPCBB*_Area_NbBlock/2 : is the very maximum of areas (each block alternate state from predecessor)
+  -->
+  <!-- increment NbArea & define Start_Address, Start & Size for each new area/attribute -->
+
+  <RefParameter Name="MPCBB1_NbArea" Comment="Nb Area" DefaultValue="2" Type="int" Min="2" Max="2" NoCheckOpt="false" Visible="false"/>
+  <RefParameter Name="MPCBB1_Area2_Privilege_Start_Address" Comment="    Area 2 Start Address" DefaultValue="=MPCBB1_Area_Start_Address" Type="hex" Min="=(MPCBB1_Area_SRAM1_BASE_NS)" Max="=(MPCBB1_Area_Max + MPCBB1_Area_SRAM1_BASE_NS - MPCBB1_Area_BlockSize)" NoCheckOpt="false"/>
+  <RefParameter Name="MPCBB1_Area2_Privilege_Start" Comment="    Area 2 Start Offset" DefaultValue="=(MPCBB1_Area2_Privilege_Start_Address - MPCBB1_Area_SRAM1_BASE_NS)" Type="StringHex" Min="=(MPCBB1_Area2_Privilege_Start_Address - MPCBB1_Area_SRAM1_BASE_NS)" Max="=(MPCBB1_Area2_Privilege_Start_Address - MPCBB1_Area_SRAM1_BASE_NS)" NoCheckOpt="false" Visible="false"/>
+  <RefParameter Name="MPCBB1_Area2_Privilege_Size" Comment="    Area 2 Size" DefaultValue="0x0" Type="hex" Min="0x0" Max="=(MPCBB1_Area_Max - MPCBB1_Area2_Privilege_Start)" NoCheckOpt="false">
+    <Description>0x0 : use the default HW configuration (not privileged memory)</Description>
+  </RefParameter>
 
 
   <!-- RefParameters for GTZC - MPCBB2 Secured -->
@@ -234,7 +246,7 @@
 
   <RefParameter Name="MPCBB2_Area_BlockSize" Comment="Area Block Size" DefaultValue="0x200" Type="hex" Min="0x200" Max="0x200" Visible="false"/>
   <RefParameter Name="MPCBB2_Area_SuperBlockSize" Comment="Area Super-Block Size" DefaultValue="0x4000" Type="hex" Min="0x4000" Max="0x4000" Visible="false"/>
-  <RefParameter Name="MPCBB2_Area_NbSuperBlock" Comment="Area Nb Super-Block Size" DefaultValue="=(MPCBB2_Area_Max / MPCBB2_Area_SuperBlockSize)" Type="integer" Min="=(MPCBB2_Area_Max / MPCBB2_Area_SuperBlockSize)" Max="=(MPCBB2_Area_Max / MPCBB2_Area_SuperBlockSize)" Visible="false"/>
+  <RefParameter Name="MPCBB2_Area_NbSuperBlock" Comment="Area Nb Super-Block" DefaultValue="=(MPCBB2_Area_Max / MPCBB2_Area_SuperBlockSize)" Type="integer" Min="=(MPCBB2_Area_Max / MPCBB2_Area_SuperBlockSize)" Max="=(MPCBB2_Area_Max / MPCBB2_Area_SuperBlockSize)" Visible="false"/>
 
   <RefParameter Name="MPCBB2_Area_Privilege_Start_Address" Comment="    Area Start Address" DefaultValue="=MPCBB2_Area_Start_Address" Type="hex" Min="=(MPCBB2_Area_SRAM2_BASE_NS)" Max="=(MPCBB2_Area_Max + MPCBB2_Area_SRAM2_BASE_NS - MPCBB2_Area_BlockSize)" NoCheckOpt="false"/>
   <RefParameter Name="MPCBB2_Area_Privilege_Start" Comment="    Area Start Offset" DefaultValue="=(MPCBB2_Area_Privilege_Start_Address - MPCBB2_Area_SRAM2_BASE_NS)" Type="StringHex" Min="=(MPCBB2_Area_Privilege_Start_Address - MPCBB2_Area_SRAM2_BASE_NS)" Max="=(MPCBB2_Area_Privilege_Start_Address - MPCBB2_Area_SRAM2_BASE_NS)" NoCheckOpt="false" Visible="false"/>
@@ -243,7 +255,7 @@
   </RefParameter>
   <RefParameter Name="MPCBB2_Area_Privilege_BlockSize" Comment="    Area Block Size" DefaultValue="=(MPCBB2_Area_BlockSize)" Type="hex" Min="=(MPCBB2_Area_BlockSize)" Max="=(MPCBB2_Area_BlockSize)" Visible="false"/>
   <RefParameter Name="MPCBB2_Area_Privilege_SuperBlockSize" Comment="    Area Super-Block Size" DefaultValue="=(MPCBB2_Area_SuperBlockSize)" Type="hex" Min="=(MPCBB2_Area_SuperBlockSize)" Max="=(MPCBB2_Area_SuperBlockSize)" Visible="false"/>
-  <RefParameter Name="MPCBB2_Area_Privilege_NbSuperBlock" Comment="    Area Nb Super-Block Size" DefaultValue="=(MPCBB2_Area_Max / MPCBB2_Area_Privilege_SuperBlockSize)" Type="integer" Min="=(MPCBB2_Area_Max / MPCBB2_Area_Privilege_SuperBlockSize)" Max="=(MPCBB2_Area_Max / MPCBB2_Area_Privilege_SuperBlockSize)" Visible="false"/>
+  <RefParameter Name="MPCBB2_Area_Privilege_NbSuperBlock" Comment="    Area Nb Super-Block" DefaultValue="=(MPCBB2_Area_Max / MPCBB2_Area_Privilege_SuperBlockSize)" Type="integer" Min="=(MPCBB2_Area_Max / MPCBB2_Area_Privilege_SuperBlockSize)" Max="=(MPCBB2_Area_Max / MPCBB2_Area_Privilege_SuperBlockSize)" Visible="false"/>
 
   <RefParameter Name="MPCBB2_Area_Privilege" Comment="    Area Attribute" DefaultValue="not privileged" Type="list">
     <Condition Expression="S_All_MPCBB2_Privileged_$IpInstance" Diagnostic="pre-selected all MPCBB2 Privileged"/>
@@ -254,9 +266,20 @@
     <PossibleValue Value="GTZC_MPCBB_REGION_PRIV" Comment="privileged"/>
     <PossibleValue Value="GTZC_MPCBB_REGION_NPRIV" Comment="not privileged"/>
   </RefParameter>
-
   <RefParameter Name="MPCBB2_PrivConfig_array" Comment="Secure configuration array" DefaultValue="FFFFFFFF" Type="Array" ArraySize="1" ArrayTypeElement="uint32_t;16" Separator=":" Visible="false"/>
 
+  <!--
+    MPCBB*_nbArea=2 : is the request from BZ 112788 - [UC48/58] GTZC update to extend security and privilege region
+    MPCBB*_nbArea=MPCBB*_Area_NbBlock/2 : is the very maximum of areas (each block alternate state from predecessor)
+  -->
+  <!-- increment NbArea & define Start_Address, Start & Size for each new area/attribute -->
+
+  <RefParameter Name="MPCBB2_NbArea" Comment="Nb Area" DefaultValue="2" Type="int" Min="2" Max="2" NoCheckOpt="false" Visible="false"/>
+  <RefParameter Name="MPCBB2_Area2_Privilege_Start_Address" Comment="    Area 2 Start Address" DefaultValue="=MPCBB2_Area_Start_Address" Type="hex" Min="=(MPCBB2_Area_SRAM2_BASE_NS)" Max="=(MPCBB2_Area_Max + MPCBB2_Area_SRAM2_BASE_NS - MPCBB2_Area_BlockSize)" NoCheckOpt="false"/>
+  <RefParameter Name="MPCBB2_Area2_Privilege_Start" Comment="    Area 2 Start Offset" DefaultValue="=(MPCBB2_Area2_Privilege_Start_Address - MPCBB2_Area_SRAM2_BASE_NS)" Type="StringHex" Min="=(MPCBB2_Area2_Privilege_Start_Address - MPCBB2_Area_SRAM2_BASE_NS)" Max="=(MPCBB2_Area2_Privilege_Start_Address - MPCBB2_Area_SRAM2_BASE_NS)" NoCheckOpt="false" Visible="false"/>
+  <RefParameter Name="MPCBB2_Area2_Privilege_Size" Comment="    Area 2 Size" DefaultValue="0x0" Type="hex" Min="0x0" Max="=(MPCBB2_Area_Max - MPCBB2_Area2_Privilege_Start)" NoCheckOpt="false">
+    <Description>0x0 : use the default HW configuration (not privileged memory)</Description>
+  </RefParameter>
 
   <!-- RefMode for GTZC -->
 
@@ -516,6 +539,9 @@
     <Parameter Name="MPCBB1_Area_Privilege_BlockSize" Group="MPCBB1 (SRAM1)" TabName="Block-Based Memory Protection Controller"/>
     <Parameter Name="MPCBB1_Area_Privilege" Group="MPCBB1 (SRAM1)" TabName="Block-Based Memory Protection Controller"/>
 
+    <Parameter Name="MPCBB1_Area2_Privilege_Start_Address" Group="MPCBB1 (SRAM1)" TabName="Block-Based Memory Protection Controller"/>
+    <Parameter Name="MPCBB1_Area2_Privilege_Start" Group="MPCBB1 (SRAM1)" TabName="Block-Based Memory Protection Controller"/>
+    <Parameter Name="MPCBB1_Area2_Privilege_Size" Group="MPCBB1 (SRAM1)" TabName="Block-Based Memory Protection Controller"/>
     <Parameter Name="MPCBB1_PrivConfig_array" Group="MPCBB1 (SRAM1)" TabName="Block-Based Memory Protection Controller"/>
 
 
@@ -537,6 +563,10 @@
     <Parameter Name="MPCBB2_Area_Privilege_Size" Group="MPCBB2 (SRAM2)" TabName="Block-Based Memory Protection Controller"/>
     <Parameter Name="MPCBB2_Area_Privilege_BlockSize" Group="MPCBB2 (SRAM2)" TabName="Block-Based Memory Protection Controller"/>
     <Parameter Name="MPCBB2_Area_Privilege" Group="MPCBB2 (SRAM2)" TabName="Block-Based Memory Protection Controller"/>
+
+    <Parameter Name="MPCBB2_Area2_Privilege_Start_Address" Group="MPCBB2 (SRAM2)" TabName="Block-Based Memory Protection Controller"/>
+    <Parameter Name="MPCBB2_Area2_Privilege_Start" Group="MPCBB2 (SRAM2)" TabName="Block-Based Memory Protection Controller"/>
+    <Parameter Name="MPCBB2_Area2_Privilege_Size" Group="MPCBB2 (SRAM2)" TabName="Block-Based Memory Protection Controller"/>
 
     <Parameter Name="MPCBB2_PrivConfig_array" Group="MPCBB2 (SRAM2)" TabName="Block-Based Memory Protection Controller"/>
 

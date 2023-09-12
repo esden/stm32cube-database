@@ -725,7 +725,7 @@ static void Receive_Notification_From_M0(void)
 {
   CptReceiveMsgFromM0++;
 [#if FREERTOS_STATUS = 0 ]
-  UTIL_SEQ_SetTask(TASK_MSG_FROM_M0_TO_M4,CFG_SCH_PRIO_0);
+  UTIL_SEQ_SetTask(TASK_MSG_FROM_M0_TO_M4,CFG_SEQ_PRIO_0);
 [#else]
   osThreadFlagsSet(OsTaskMsgM0ToM4Id,1);
 [/#if]
@@ -766,7 +766,7 @@ static void RxCpltCallback(void)
 
       /* UART task scheduling*/
 [#if FREERTOS_STATUS = 0 ]
-      UTIL_SEQ_SetTask(1U << CFG_TASK_SEND_CLI_TO_M0, CFG_SCH_PRIO_0);
+      UTIL_SEQ_SetTask(1U << CFG_TASK_SEND_CLI_TO_M0, CFG_SEQ_PRIO_0);
 [#else]
       osThreadFlagsSet(OsTaskCliId,1);
 [/#if]
@@ -805,7 +805,7 @@ static uint32_t  ProcessCmdString( uint8_t* buf , uint32_t len )
     memcpy(CommandString, buf,(i+1));
     indexReceiveChar = i + 1U; /* Length of the buffer containing the command string */
 [#if FREERTOS_STATUS = 0 ]
-    UTIL_SEQ_SetTask(1U << CFG_TASK_SEND_CLI_TO_M0, CFG_SCH_PRIO_0);
+    UTIL_SEQ_SetTask(1U << CFG_TASK_SEND_CLI_TO_M0, CFG_SEQ_PRIO_0);
 [#else]
     osThreadFlagsSet(OsTaskCliId,1)
 [/#if]

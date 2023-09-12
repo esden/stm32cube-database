@@ -7,7 +7,7 @@
 [#--------------------------]
 [#macro gen_uboot]
 [#local module = "gen_uboot"]
-/* SPDX-License-Identifier: GPL-2.0+ OR BSD-3-Clause*/
+// SPDX-License-Identifier: (GPL-2.0-or-later OR BSD-3-Clause)
 /*
  * Copyright (C) ${year}, STMicroelectronics - All Rights Reserved
  * Author: STM32CubeMX code generation for STMicroelectronics.
@@ -29,12 +29,12 @@
 	[/#if]
 [/#if]
 
-[#if mx_socDtRPN?has_content && mxDtDM.dts_fileNameSuffix?has_content]
+[#--if mx_socDtRPN?has_content && mxDtDM.dts_fileNameSuffix?has_content]
 #include "${mx_socDtRPN}${mxDtDM.dts_fileNameSuffix}.dtsi"
 [#else]
 	[@mlog  logMod=module logType="ERR" logMsg="unknown 'U-BOOT' dtsi" varsMap={} /]
 /*#include "???.dtsi"*/
-[/#if]
+[/#if--]
 [#if !srvcmx_isDbFeatureEnabled("noUBootSplSupport")]
 	[#if mx_ddrConfigs["general"]?? && mx_ddrConfigs["general"]["isConfigured"]?? && mx_ddrConfigs["general"]["isConfigured"]=="true" ]
 		[#if mx_socDtRPN?has_content]

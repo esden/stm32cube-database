@@ -7,9 +7,9 @@
 [#------------------------------]
 [#macro gen_fwconfig]
 [#local module = "gen_fwconfig"]
-/* SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause) */
+// SPDX-License-Identifier: (GPL-2.0-or-later OR BSD-3-Clause)
 /*
- * Copyright (C) STMicroelectronics ${year} - All Rights Reserved
+ * Copyright (C) ${year}, STMicroelectronics - All Rights Reserved
  * Author: STM32CubeMX code generation for STMicroelectronics.
  */
 

@@ -836,10 +836,14 @@
         <PossibleValue Comment="Enabled" Value="1"/>
         <Description>This option uses use a single netif only. This is the common case for small real-life targets. Some code like routing etc. can be left out.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: None.</Description>
     </RefParameter>
-    <RefParameter Name="LWIP_NETIF_HOSTNAME" Comment="LWIP_NETIF_HOSTNAME (NETIF Hostname)" Type="list" Group="Network Interfaces Options" DefaultValue="0" TabName="Key Options" Mode="Advanced" >
+    <RefParameter Name="LWIP_ENABLE_NETIF_HOSTNAME" Comment="LWIP_ENABLE_NETIF_HOSTNAME (NETIF Hostname)" Type="list" Group="Network Interfaces Options" DefaultValue="0" TabName="Key Options" Mode="Advanced" >
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
         <Description>This option uses DHCP_OPTION_HOSTNAME with netif's hostname field.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: None.</Description>
+    </RefParameter>
+    <RefParameter Name="LWIP_NETIF_HOSTNAME" Comment="LWIP_NETIF_HOSTNAME (LWIP_NETIF_HOSTNAME (LWIP NETIF Hostname))" Type="stringRW" Group="Network Interfaces Options" DefaultValue="lwip" TabName="Key Options" Mode="Advanced" >
+        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: LWIP_ENABLE_NETIF_HOSTNAME should be enabled to set a hostname." Expression="LWIP_ENABLE_NETIF_HOSTNAME"/>
+        <Description>User can specify the LwIP NETIF Hostname. Default name is "lwip".</Description>
     </RefParameter>
     <RefParameter Name="LWIP_NETIF_API" Comment="LWIP_NETIF_API (Network Interfaces API)" Type="list" Group="Network Interfaces Options" DefaultValue="0" TabName="Key Options" Mode="Advanced" >
         <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: Use LWIP_NETIF_API requires NO_SYS=0" Expression="!NO_SYS"/>
@@ -2083,8 +2087,9 @@
     </RefParameter>
     <RefParameter Name="HTTPD_USE_CUSTOM_FSDATA" Comment="HTTPD_USE_CUSTOM_FSDATA (Custom FS Data)" Type="list" Group="HTTPD - File System Options" DefaultValue="0" TabName="HTTPD" Mode="Advanced" >
         <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: HTTPD_USE_CUSTOM_FSDATA requires LWIP_HTTPD enabled." Expression="LWIP_HTTPD"/>
+        <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
-        <Description>&lt;b&gt;Warnings:&lt;/b&gt;&lt;br&gt;- HTTPD_USE_CUSTOM_FSDATA enabled requires once code has been generated to have in your project folder within Middlewares\Third_Party\LwIP\src\apps\http folder "fsdata_custom.c" instead of "fsdata.c".&lt;br&gt;- Adding "fsdata_custom.c" can be done by renaming existing "fsdata.c" file in "fsdata_custom.c".&lt;br&gt;- If "fsdata.c" has not been copied in your project, it can be taken from the Firmware Repository (Menu Help &gt; Updater Settings...) Software Package folder within Middlewares\Third_Party\LwIP\src\apps\http folder.&lt;br&gt;- Depending on project settings and IDE used, "fsdata_custom.c" or "fsdata.c" can be removed after each code generation. Please take care of this!&lt;br&gt;&lt;b&gt;Limitations&lt;/b&gt;:&lt;br&gt; It is not supported by STM32CubeMX to disable HTTPD_USE_CUSTOM_FSDATA.</Description>
+        <Description>&lt;b&gt;Warnings:&lt;/b&gt;&lt;br&gt;- If HTTPD_USE_CUSTOM_FSDATA is enabled :&lt;br&gt; - It requires to have in your generated project folder within Middlewares\Third_Party\LwIP\src\apps\http folder "fsdata_custom.c" instead of "fsdata.c".&lt;br&gt;- Adding "fsdata_custom.c" can be done by renaming existing "fsdata.c" file by "fsdata_custom.c".&lt;br&gt;- If "fsdata.c" has not been copied in your project, it can be taken from the Firmware Repository (Menu Help &gt; Updater Settings...) Software Package folder within Middlewares\Third_Party\LwIP\src\apps\http folder.&lt;br&gt;- Depending on project settings and IDE used, "fsdata_custom.c" or "fsdata.c" can be removed after each code generation. Please take care of this!&lt;br&gt;&lt;br&gt;- If HTTPD_USE_CUSTOM_FSDATA is disabled :&lt;br&gt;- There is no need to rename fsdata.c&lt;br&gt;&lt;b&gt;Limitations&lt;/b&gt;:&lt;br&gt;None.</Description>
     </RefParameter>
     <RefParameter Name="HTTPD_USE_CUSTOM_FSDATA" Comment="HTTPD_USE_CUSTOM_FSDATA (Custom FS Data)" Type="list" Group="HTTPD - File System Options" DefaultValue="null" TabName="HTTPD" Mode="Advanced" Visible="false">
         <Description>Set this to 1 to include "fsdata_custom.c" instead of "fsdata.c" for the file system (to prevent changing the file included in CVS).&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: HTTPD_USE_CUSTOM_FSDATA requires LWIP_HTTPD enabled.</Description>
@@ -3250,6 +3255,7 @@
         <Parameter Name="LWIP_ALTCP"/>
         <Parameter Name="LWIP_ALTCP_TLS"/>
         <Parameter Name="LWIP_SINGLE_NETIF"/>
+        <Parameter Name="LWIP_ENABLE_NETIF_HOSTNAME"/>
         <Parameter Name="LWIP_NETIF_HOSTNAME"/>
         <Parameter Name="LWIP_NETIF_API"/>
         <Parameter Name="LWIP_NETIF_STATUS_CALLBACK"/>

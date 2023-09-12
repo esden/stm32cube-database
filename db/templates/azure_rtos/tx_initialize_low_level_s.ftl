@@ -6,11 +6,17 @@
   [#list SWIP.defines as definition]
     [#assign value = definition.value]
     [#assign name = definition.name]
-	[#if name == "TX_TIMER_TICKS_PER_SECOND"]
+   [#if name == "TX_TIMER_TICKS_PER_SECOND"]
       [#assign TX_TIMER_TICKS_PER_SECOND_value = value]
     [/#if]
    [#if name == "AZRTOS_APP_MEM_ALLOCATION_METHOD"]
       [#assign AZRTOS_APP_MEM_ALLOCATION_METHOD_value = value]
+    [/#if]
+		[#if name == "CORTEX_CLOCK_SELECTION"]
+      [#assign CORTEX_CLOCK_SELECTION_value = value]
+    [/#if]
+		[#if name == "CORTEX_CLOCK_FREQ"]
+      [#assign CORTEX_CLOCK_FREQ_value = value?number?replace(",", "")]
     [/#if]
 
   [/#list]
@@ -70,7 +76,11 @@
 /**************************************************************************/
 /**************************************************************************/
 
+[#if FamilyName == "STM32WBA"]
+SYSTEM_CLOCK      =   ${CORTEX_CLOCK_FREQ_value}
+[#else]
 SYSTEM_CLOCK      =   ${HCLKFreq_Value}
+[/#if]
 SYSTICK_CYCLES    =   ((SYSTEM_CLOCK / ${TX_TIMER_TICKS_PER_SECOND_value}) -1)
 
 /**************************************************************************/
@@ -157,7 +167,11 @@ _tx_initialize_low_level:
     MOV     r0, #0xE000E000                         // Build address of NVIC registers
     LDR     r1, =SYSTICK_CYCLES
     STR     r1, [r0, #0x14]                         // Setup SysTick Reload Value
+[#if FamilyName == "STM32WBA"]
+    MOV     r1, #0x3                                // Build SysTick Control Enable Value
+[#else]
     MOV     r1, #0x7                                // Build SysTick Control Enable Value
+[/#if]
     STR     r1, [r0, #0x10]                         // Setup SysTick Control
 
     /* Configure handler priorities.  */
@@ -292,7 +306,11 @@ __tx_DBGHandler:
     EXTERN  __vector_table
 ;
 ;
+[#if FamilyName == "STM32WBA"]
+SYSTEM_CLOCK      EQU   ${CORTEX_CLOCK_FREQ_value}
+[#else]
 SYSTEM_CLOCK      EQU   ${HCLKFreq_Value}
+[/#if]
 SYSTICK_CYCLES    EQU   ((SYSTEM_CLOCK / ${TX_TIMER_TICKS_PER_SECOND_value}) -1)
 ;
 ;
@@ -391,7 +409,11 @@ _tx_initialize_low_level:
     MOV     r0, #0xE000E000                         ; Build address of NVIC registers
     LDR     r1, =SYSTICK_CYCLES
     STR     r1, [r0, #0x14]                         ; Setup SysTick Reload Value
+[#if FamilyName == "STM32WBA"]
+    MOV     r1, #0x3                                ; Build SysTick Control Enable Value
+[#else]
     MOV     r1, #0x7                                ; Build SysTick Control Enable Value
+[/#if]
     STR     r1, [r0, #0x10]                         ; Setup SysTick Control
 ;
 ;    /* Configure handler priorities.  */
@@ -491,7 +513,11 @@ __tx_DBGHandler:
 /**************************************************************************/
 /**************************************************************************/
 
+[#if FamilyName == "STM32WBA"]
+SYSTEM_CLOCK      =   ${CORTEX_CLOCK_FREQ_value}
+[#else]
 SYSTEM_CLOCK      =   ${HCLKFreq_Value}
+[/#if]
 SYSTICK_CYCLES    =   ((SYSTEM_CLOCK / ${TX_TIMER_TICKS_PER_SECOND_value}) -1)
 
 /**************************************************************************/
@@ -577,7 +603,11 @@ _tx_initialize_low_level:
     MOV     r0, #0xE000E000                         // Build address of NVIC registers
     LDR     r1, =SYSTICK_CYCLES
     STR     r1, [r0, #0x14]                         // Setup SysTick Reload Value
+[#if FamilyName == "STM32WBA"]
+    MOV     r1, #0x3                                // Build SysTick Control Enable Value
+[#else]
     MOV     r1, #0x7                                // Build SysTick Control Enable Value
+[/#if]
     STR     r1, [r0, #0x10]                         // Setup SysTick Control
 
     /* Configure handler priorities.  */

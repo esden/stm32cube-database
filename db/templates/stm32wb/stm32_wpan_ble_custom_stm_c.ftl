@@ -3117,6 +3117,10 @@ typedef struct{
         [/#list]
     [/#list]
 [/#if]
+/* USER CODE BEGIN Context */
+  /* Place holder for Characteristic Descriptors Handle*/
+
+/* USER CODE END Context */
 }CustomContext_t;
 
 /* USER CODE BEGIN PTD */
@@ -3601,6 +3605,8 @@ void SVCCTL_InitCustomSvc(void)
  
   Char_UUID_t  uuid;
   tBleStatus ret = BLE_STATUS_INVALID_PARAMS;
+  uint8_t max_attr_record;
+
   /* USER CODE BEGIN SVCCTL_InitCustomSvc_1 */
 
   /* USER CODE END SVCCTL_InitCustomSvc_1 */
@@ -3638,7 +3644,16 @@ void SVCCTL_InitCustomSvc(void)
           [/#if]
       [/#list]
    *                              = ${SERVICES_INFO[service?string][item_MAX_ATTRIBUTES_RECORDS]}
+   *
+   * This value doesn't take into account number of descriptors manually added
+   * In case of descriptors addded, please update the max_attr_record value accordingly in the next SVCCTL_InitService User Section
    */
+  max_attr_record = ${SERVICES_INFO[service?string][item_MAX_ATTRIBUTES_RECORDS]};
+
+  /* USER CODE BEGIN SVCCTL_InitService */
+  /* max_attr_record to be updated if descriptors have been added */
+
+  /* USER CODE END SVCCTL_InitService */
 
       [#if SERVICES_INFO[service?string][item_UUID_TYPE] == "0x01"]
           [#assign UUID_TYPE = "UUID_TYPE_16"]
@@ -3651,7 +3666,7 @@ void SVCCTL_InitCustomSvc(void)
   ret = aci_gatt_add_service(${UUID_TYPE},
                              (Service_UUID_t *) &uuid,
                              ${SERVICES_INFO[service?string][item_TYPE]},
-                             ${SERVICES_INFO[service?string][item_MAX_ATTRIBUTES_RECORDS]},
+                             max_attr_record,
                              &(CustomContext.Custom[@serviceShortNameCapitalized service/]Hdle));
   if (ret != BLE_STATUS_SUCCESS)
   {
@@ -3730,6 +3745,11 @@ void SVCCTL_InitCustomSvc(void)
   {
     APP_DBG_MSG("  Success: aci_gatt_add_char command   : [@characteristicShortName service characteristic/] \n\r");
   }
+
+  /* USER CODE BEGIN SVCCTL_Init_Service${service}_Char${characteristic}/ */
+  /* Place holder for Characteristic Descriptors */
+
+  /* USER CODE END SVCCTL_Init_Service${service}_Char${characteristic} */
       [/#list]
 
     [/#list]

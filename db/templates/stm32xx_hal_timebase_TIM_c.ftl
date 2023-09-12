@@ -2,7 +2,7 @@
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-  * @file    ${FamilyName?lower_case}xx_hal_timebase_TIM.c 
+  * @file    ${FamilyName?lower_case}xx_hal_timebase_tim.c 
   * @brief   HAL time base based on the hardware TIM.
   ******************************************************************************
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]

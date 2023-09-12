@@ -228,6 +228,10 @@ typedef struct{
 [#list 1..SERVICE_NUMBER_OF_CHARACTERISTICS?number as characteristic]
   uint16_t  [@characteristicShortNameCapitalized characteristic/]CharHdle;                  /**< [@characteristicShortName characteristic/] Characteristic Handle */
 [/#list]
+/* USER CODE BEGIN Context */
+  /* Place holder for Characteristic Descriptors Handle*/
+
+/* USER CODE END Context */
 [/#if]
 }${SERVICE_SHORT_NAME_UpperCase}_Context_t;
 
@@ -360,11 +364,16 @@ static SVCCTL_EvtAckStatus_t ${SERVICE_SHORT_NAME_UpperCase}_EventHandler(void *
       switch(p_blecore_evt->ecode)
       {
         case ACI_GATT_ATTRIBUTE_MODIFIED_VSEVT_CODE:
+        {
           /* USER CODE BEGIN EVT_BLUE_GATT_ATTRIBUTE_MODIFIED_BEGIN */
 
           /* USER CODE END EVT_BLUE_GATT_ATTRIBUTE_MODIFIED_BEGIN */
 [#if IS_ATTRIBUTE =1]
           p_attribute_modified = (aci_gatt_attribute_modified_event_rp0*)p_blecore_evt->data;
+          notification.ConnectionHandle         = p_attribute_modified->Connection_Handle;
+          notification.AttributeHandle          = p_attribute_modified->Attr_Handle;
+          notification.DataTransfered.Length    = p_attribute_modified->Attr_Data_Length;
+          notification.DataTransfered.p_Payload = p_attribute_modified->Attr_Data;
 [/#if]
 [#assign INDEX = 0]
     [#if SERVICE_NUMBER_OF_CHARACTERISTICS != "0"]
@@ -565,15 +574,16 @@ static SVCCTL_EvtAckStatus_t ${SERVICE_SHORT_NAME_UpperCase}_EventHandler(void *
               [/#if]
           {
             return_value = SVCCTL_EvtAckFlowEnable;
-            /* USER CODE BEGIN Service${SvcNbr}_Char_${characteristic?string}_ACI_GATT_ATTRIBUTE_MODIFIED_VSEVT_CODE */
 
-            /* USER CODE END Service${SvcNbr}_Char_${characteristic?string}_ACI_GATT_ATTRIBUTE_MODIFIED_VSEVT_CODE */
             [#if (SERVICES_CHARS_PROP[characteristic?string][item_PROP_WRITE_WITHOUT_RESP]??  &&
                 SERVICES_CHARS_PROP[characteristic?string][item_PROP_WRITE_WITHOUT_RESP] != " ")]
             notification.EvtOpcode = ${SERVICE_SHORT_NAME_UpperCase}_[@characteristicShortName characteristic/]_WRITE_NO_RESP_EVT;
             [#else]
             notification.EvtOpcode = ${SERVICE_SHORT_NAME_UpperCase}_[@characteristicShortName characteristic/]_WRITE_EVT;
             [/#if]
+            /* USER CODE BEGIN Service${SvcNbr}_Char_${characteristic?string}_ACI_GATT_ATTRIBUTE_MODIFIED_VSEVT_CODE */
+
+            /* USER CODE END Service${SvcNbr}_Char_${characteristic?string}_ACI_GATT_ATTRIBUTE_MODIFIED_VSEVT_CODE */
             ${SERVICE_SHORT_NAME_UpperCase}_Notification(&notification);
           } /* if(p_attribute_modified->Attr_Handle == (${SERVICE_SHORT_NAME_UpperCase}_Context.[@characteristicShortNameCapitalized characteristic/]CharHdle + CHARACTERISTIC_VALUE_ATTRIBUTE_OFFSET))*/
             [/#if]
@@ -583,9 +593,10 @@ static SVCCTL_EvtAckStatus_t ${SERVICE_SHORT_NAME_UpperCase}_EventHandler(void *
           /* USER CODE BEGIN EVT_BLUE_GATT_ATTRIBUTE_MODIFIED_END */
 
           /* USER CODE END EVT_BLUE_GATT_ATTRIBUTE_MODIFIED_END */
-          break;
-
+          break;/* ACI_GATT_ATTRIBUTE_MODIFIED_VSEVT_CODE */
+        }
         case ACI_GATT_READ_PERMIT_REQ_VSEVT_CODE :
+        {
           /* USER CODE BEGIN EVT_BLUE_GATT_READ_PERMIT_REQ_BEGIN */
 
           /* USER CODE END EVT_BLUE_GATT_READ_PERMIT_REQ_BEGIN */
@@ -622,9 +633,10 @@ static SVCCTL_EvtAckStatus_t ${SERVICE_SHORT_NAME_UpperCase}_EventHandler(void *
           /* USER CODE BEGIN EVT_BLUE_GATT_READ_PERMIT_REQ_END */
 
           /* USER CODE END EVT_BLUE_GATT_READ_PERMIT_REQ_END */
-          break;
-
+          break;/* ACI_GATT_READ_PERMIT_REQ_VSEVT_CODE */
+        }
         case ACI_GATT_WRITE_PERMIT_REQ_VSEVT_CODE:
+        {
           /* USER CODE BEGIN EVT_BLUE_GATT_WRITE_PERMIT_REQ_BEGIN */
 
           /* USER CODE END EVT_BLUE_GATT_WRITE_PERMIT_REQ_BEGIN */
@@ -660,7 +672,8 @@ static SVCCTL_EvtAckStatus_t ${SERVICE_SHORT_NAME_UpperCase}_EventHandler(void *
           /* USER CODE BEGIN EVT_BLUE_GATT_WRITE_PERMIT_REQ_END */
 
           /* USER CODE END EVT_BLUE_GATT_WRITE_PERMIT_REQ_END */
-          break;
+          break;/* ACI_GATT_WRITE_PERMIT_REQ_VSEVT_CODE */
+        }
         case ACI_GATT_TX_POOL_AVAILABLE_VSEVT_CODE:
         {
           aci_gatt_tx_pool_available_event_rp0 *p_tx_pool_available_event;
@@ -670,8 +683,8 @@ static SVCCTL_EvtAckStatus_t ${SERVICE_SHORT_NAME_UpperCase}_EventHandler(void *
           /* USER CODE BEGIN ACI_GATT_TX_POOL_AVAILABLE_VSEVT_CODE */
 
           /* USER CODE END ACI_GATT_TX_POOL_AVAILABLE_VSEVT_CODE */
-        }
           break;/* ACI_GATT_TX_POOL_AVAILABLE_VSEVT_CODE*/
+        }
         case ACI_ATT_EXCHANGE_MTU_RESP_VSEVT_CODE:
         {
           aci_att_exchange_mtu_resp_event_rp0 *p_exchange_mtu;
@@ -681,9 +694,8 @@ static SVCCTL_EvtAckStatus_t ${SERVICE_SHORT_NAME_UpperCase}_EventHandler(void *
           /* USER CODE BEGIN ACI_ATT_EXCHANGE_MTU_RESP_VSEVT_CODE */
 
           /* USER CODE END ACI_ATT_EXCHANGE_MTU_RESP_VSEVT_CODE */
-            
+          break;/* ACI_ATT_EXCHANGE_MTU_RESP_VSEVT_CODE */
         }
-          break;
         /* USER CODE BEGIN BLECORE_EVT */
 
         /* USER CODE END BLECORE_EVT */
@@ -728,6 +740,8 @@ void ${SERVICE_SHORT_NAME_UpperCase}_Init(void)
 {
   Char_UUID_t  uuid;
   tBleStatus ret = BLE_STATUS_INVALID_PARAMS;
+  uint8_t max_attr_record;
+
   /* USER CODE BEGIN SVCCTL_InitService${SvcNbr}Svc_1 */
 
   /* USER CODE END SVCCTL_InitService${SvcNbr}Svc_1 */
@@ -764,7 +778,16 @@ void ${SERVICE_SHORT_NAME_UpperCase}_Init(void)
       [/#list]
     [/#if]
    *                              = ${myHash["SERVICE"+SvcNbr+"_MAX_ATTRIBUTES_RECORDS"]}
+   * This value doesn't take into account number of descriptors manually added
+   * In case of descriptors added, please update the max_attr_record value accordingly in the next SVCCTL_InitService User Section
    */
+  max_attr_record = ${myHash["SERVICE"+SvcNbr+"_MAX_ATTRIBUTES_RECORDS"]};
+
+  /* USER CODE BEGIN SVCCTL_InitService */
+  /* max_attr_record to be updated if descriptors have been added */
+  
+  /* USER CODE END SVCCTL_InitService */
+
       [#if myHash["SERVICE"+SvcNbr+"_UUID_TYPE"] == "0x01"]
           [#assign UUID_TYPE = "UUID_TYPE_16"]
   uuid.Char_UUID_16 = 0x${myHash["SERVICE"+SvcNbr+"_UUID"]?lower_case?replace(" ","")};
@@ -776,7 +799,7 @@ void ${SERVICE_SHORT_NAME_UpperCase}_Init(void)
   ret = aci_gatt_add_service(${UUID_TYPE},
                              (Service_UUID_t *) &uuid,
                              ${myHash["SERVICE"+SvcNbr+"_TYPE"]},
-                             ${myHash["SERVICE"+SvcNbr+"_MAX_ATTRIBUTES_RECORDS"]},
+                             max_attr_record,
                              &(${SERVICE_SHORT_NAME_UpperCase}_Context.${SERVICE_SHORT_NAME?capitalize}SvcHdle));
   if (ret != BLE_STATUS_SUCCESS)
   {
@@ -866,11 +889,16 @@ void ${SERVICE_SHORT_NAME_UpperCase}_Init(void)
     APP_DBG_MSG("  Success: aci_gatt_add_char command   : [@characteristicShortName characteristic/]\n");
   }
 
+  /* USER CODE BEGIN SVCCTL_InitService${SvcNbr}Char${characteristic} */
+  /* Place holder for Characteristic Descriptors */
+
+  /* USER CODE END SVCCTL_InitService${SvcNbr}Char${characteristic} */
+
       [/#list]
     [/#if]
 
   /* USER CODE BEGIN SVCCTL_InitService${SvcNbr}Svc_2 */
-
+  
   /* USER CODE END SVCCTL_InitService${SvcNbr}Svc_2 */
 
   return;

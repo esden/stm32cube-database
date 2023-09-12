@@ -478,7 +478,7 @@
 
         [/#list]
         [#--list instanceData.configs as config--]
-            [#if instanceData.instIndex??][@common.generateConfigModelCode configModel=instanceData inst=instName  nTab=1 index=instanceData.instIndex mode="Init"/][#else][@common.generateConfigModelCode configModel=instanceData inst=instName  nTab=1 index="" mode="Init"/][/#if]
+            [#if instanceData.instIndex??][@common.generateConfigModelListCode configModel=instanceData inst=instName  nTab=1 index=instanceData.instIndex/][#else][@common.generateConfigModelListCode configModel=instanceData inst=instName  nTab=1 index=""/][/#if]
         [#--list--]
 
 #t/* USER CODE BEGIN ${instName}_Init 2 */

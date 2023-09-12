@@ -155,6 +155,11 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <MethodArg Name="PeriphID" FValue="GTZC_PERIPH_SAI1"/>
       </CallLibMethod>
     </IFCondition>
+    <IFCondition Expression="(USB_DRD_FS_Illegal_Access_Interrupt=Enabled)">
+      <CallLibMethod Name="HAL_GTZC_TZIC_EnableIT">
+        <MethodArg Name="PeriphID" FValue="GTZC_PERIPH_LTDCUSB"/>
+      </CallLibMethod>
+    </IFCondition>
     <IFCondition Expression="(SAI2_Illegal_Access_Interrupt=Enabled)">
       <CallLibMethod Name="HAL_GTZC_TZIC_EnableIT">
         <MethodArg Name="PeriphID" FValue="GTZC_PERIPH_SAI2"/>
@@ -208,11 +213,6 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
     <IFCondition Expression="(DCMI_Illegal_Access_Interrupt=Enabled)">
       <CallLibMethod Name="HAL_GTZC_TZIC_EnableIT">
         <MethodArg Name="PeriphID" FValue="GTZC_PERIPH_DCMI"/>
-      </CallLibMethod>
-    </IFCondition>
-    <IFCondition Expression="(OTG_FS_Illegal_Access_Interrupt=Enabled)">
-      <CallLibMethod Name="HAL_GTZC_TZIC_EnableIT">
-        <MethodArg Name="PeriphID" FValue="GTZC_PERIPH_OTG"/>
       </CallLibMethod>
     </IFCondition>
     <IFCondition Expression="(AES_Illegal_Access_Interrupt=Enabled)">
@@ -946,6 +946,18 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
                   <MethodArg Name="PeriphAttributes" ParameterName="SAI1_Privilege"/>
                 </CallLibMethod>
               </IFCondition>
+              <IFCondition Expression="($IpInstance=GTZC_S &amp; USB_DRD_FS_GTZC_SECURE) &amp; (USB_DRD_FS_Secure=GTZC_TZSC_PERIPH_SEC)">
+                <CallLibMethod Name="HAL_GTZC_TZSC_ConfigPeriphAttributes">
+                  <MethodArg Name="PeriphID" FValue="GTZC_PERIPH_LTDCUSB"/>
+                  <MethodArg Name="PeriphAttributes" ParameterName="USB_DRD_FS_Secure|USB_DRD_FS_Privilege"/>
+                </CallLibMethod>
+              </IFCondition>
+              <IFCondition Expression="(!($IpInstance=GTZC_S)) &amp; (!USB_DRD_FS_GTZC_SECURE) &amp; (USB_DRD_FS_Secure=GTZC_TZSC_PERIPH_NSEC) &amp; (USB_DRD_FS_Privilege=GTZC_TZSC_PERIPH_PRIV)">
+                <CallLibMethod Name="HAL_GTZC_TZSC_ConfigPeriphAttributes">
+                  <MethodArg Name="PeriphID" FValue="GTZC_PERIPH_LTDCUSB"/>
+                  <MethodArg Name="PeriphAttributes" ParameterName="USB_DRD_FS_Privilege"/>
+                </CallLibMethod>
+              </IFCondition>
               <IFCondition Expression="($IpInstance=GTZC_S &amp; SAI2_GTZC_SECURE) &amp; (SAI2_Secure=GTZC_TZSC_PERIPH_SEC)">
                 <CallLibMethod Name="HAL_GTZC_TZSC_ConfigPeriphAttributes">
                   <MethodArg Name="PeriphID" FValue="GTZC_PERIPH_SAI2"/>
@@ -1082,18 +1094,6 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
                 <CallLibMethod Name="HAL_GTZC_TZSC_ConfigPeriphAttributes">
                   <MethodArg Name="PeriphID" FValue="GTZC_PERIPH_DCMI"/>
                   <MethodArg Name="PeriphAttributes" ParameterName="DCMI_Privilege"/>
-                </CallLibMethod>
-              </IFCondition>
-              <IFCondition Expression="($IpInstance=GTZC_S &amp; USB_OTG_FS_GTZC_SECURE) &amp; (USB_OTG_FS_Secure=GTZC_TZSC_PERIPH_SEC)">
-                <CallLibMethod Name="HAL_GTZC_TZSC_ConfigPeriphAttributes">
-                  <MethodArg Name="PeriphID" FValue="GTZC_PERIPH_OTG"/>
-                  <MethodArg Name="PeriphAttributes" ParameterName="USB_OTG_FS_Secure|USB_OTG_FS_Privilege"/>
-                </CallLibMethod>
-              </IFCondition>
-              <IFCondition Expression="(!($IpInstance=GTZC_S)) &amp; (!USB_OTG_FS_GTZC_SECURE) &amp; (USB_OTG_FS_Secure=GTZC_TZSC_PERIPH_NSEC) &amp; (USB_OTG_FS_Privilege=GTZC_TZSC_PERIPH_PRIV)">
-                <CallLibMethod Name="HAL_GTZC_TZSC_ConfigPeriphAttributes">
-                  <MethodArg Name="PeriphID" FValue="GTZC_PERIPH_OTG"/>
-                  <MethodArg Name="PeriphAttributes" ParameterName="USB_OTG_FS_Privilege"/>
                 </CallLibMethod>
               </IFCondition>
               <IFCondition Expression="($IpInstance=GTZC_S &amp; AES_GTZC_SECURE) &amp; (AES_Secure=GTZC_TZSC_PERIPH_SEC)">
@@ -1541,7 +1541,7 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
 
     <!-- MPCBB -->
     <IFCondition Expression="($IpInstance=GTZC_S)">
-      <IFCondition Expression="!(MPCBB1_Area_Secure_Size = 0) | !(MPCBB1_LockConfig=UNLOCK) | !(MPCBB1_Area_Privilege_Size = 0)">
+      <IFCondition Expression="!(MPCBB1_Area_Secure_Size = 0) | !(MPCBB1_LockConfig=UNLOCK) | !(MPCBB1_Area_Privilege_Size = 0) | !(S_No_MPCBB1_Privileged_GTZC_S = 0) | !(S_No_MPCBB1_Secured = 0)">
         <CallLibMethod Name="HAL_GTZC_MPCBB_ConfigMem">
           <MethodArg Name="pMPCBB_desc" ParameterName="MPCBB_Area_Desc"/>
           <MethodArg Name="MemBaseAddress" FValue="SRAM1_BASE"/>
@@ -1564,7 +1564,7 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
     </IFCondition>
 
     <IFCondition Expression="($IpInstance=GTZC_S)">
-      <IFCondition Expression="!(MPCBB2_Area_Secure_Size = 0) | !(MPCBB2_LockConfig=UNLOCK) | !(MPCBB2_Area_Privilege_Size = 0)">
+      <IFCondition Expression="!(MPCBB2_Area_Secure_Size = 0) | !(MPCBB2_LockConfig=UNLOCK) | !(MPCBB2_Area_Privilege_Size = 0) | !(S_No_MPCBB2_Privileged_GTZC_S = 0) | !(S_No_MPCBB2_Secured = 0)">
         <CallLibMethod Name="HAL_GTZC_MPCBB_ConfigMem">
           <MethodArg Name="pMPCBB_desc" ParameterName="MPCBB_Area_Desc"/>
           <MethodArg Name="MemBaseAddress" FValue="SRAM2_BASE"/>
@@ -1610,7 +1610,7 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
 <!--     </IFCondition> -->
 
     <IFCondition Expression="($IpInstance=GTZC_S)">
-      <IFCondition Expression="!(MPCBB4_Area_Secure_Size = 0) | !(MPCBB4_LockConfig=UNLOCK) | !(MPCBB4_Area_Privilege_Size = 0)">
+      <IFCondition Expression="!(MPCBB4_Area_Secure_Size = 0) | !(MPCBB4_LockConfig=UNLOCK) | !(MPCBB4_Area_Privilege_Size = 0) | !(S_No_MPCBB4_Privileged_GTZC_S = 0) | !(S_No_MPCBB4_Secured = 0)">
         <CallLibMethod Name="HAL_GTZC_MPCBB_ConfigMem">
           <MethodArg Name="pMPCBB_desc" ParameterName="MPCBB_Area_Desc"/>
           <MethodArg Name="MemBaseAddress" FValue="SRAM4_BASE"/>

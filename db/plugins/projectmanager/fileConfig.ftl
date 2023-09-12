@@ -79,6 +79,9 @@
  [/#if]
 <HAL_Driver>${HAL_Driver}</HAL_Driver>[#-- modified to give only the hal driver path --]
 <CMSIS>${CMSISPath}</CMSIS> [#-- modified to give only the relatif path to cmsis folder --]
+ [#if ProjectType?? ]
+    <ProjectType>${ProjectType}</ProjectType>
+ [/#if]
 [#-- list of toolchains to be generated: EWARM,MDK-ARM,TrueSTUDIO,RIDE: This tag can contain one or more than one toolchain: EWARM,MDK-ARM,TrueSTUDIO,RIDE --]
 
     <Toolchain>${ide}</Toolchain>
@@ -162,6 +165,15 @@
             [#if dataKey=="Secure"]
                [#assign Secure =  elem[dataKey]]
             [/#if]
+            [#if dataKey=="isISRRegion"]
+               [#assign isISRRegion =  elem[dataKey]]
+            [/#if]
+            [#if dataKey=="bootinfo"]
+               [#assign bootinfo =  elem[dataKey]]
+            [/#if]
+            [#if dataKey=="ota"]
+               [#assign ota =  elem[dataKey]]
+            [/#if]
             [#if dataKey=="mxIncDir"]
                [#assign mxIncDir =  elem[dataKey]]
             [/#if]
@@ -185,6 +197,12 @@
             [/#if]
             [#if dataKey=="threadsafeCore"]
                [#assign threadsafeCore =  elem[dataKey]]
+            [/#if]
+ [#if dataKey=="cDefineToRemove"]
+               [#assign cDefineToRemove =  elem[dataKey]]
+            [/#if]
+            [#if dataKey=="IncludePathsToRemove"]
+               [#assign IncludePathsToRemove =  elem[dataKey]]
             [/#if]
         [/#list]   
     [/#if]
@@ -210,12 +228,13 @@
     <OutputFilesFormat>${OutputFilesFormat}</OutputFilesFormat>
     [/#if]
    [#if ReinitLink??]
-    <ReInitLinker>true</ReInitLinker>
+    <ReInitLinkerFile>true</ReInitLinkerFile>
     [/#if]
     <memories>  [#-- add MemoriesList for UC30 --] 
     [#list memoriesList as memory]
         <memory ${memory} />
     [/#list]
+
 [#if LinkerFilesUpdate??]
 <BootPathConfig>
 [#------------------------ BootPath Linker Updates ------------------]
@@ -228,13 +247,27 @@
         [/#if]
     [/#list]    
 </BootPathConfig>
-[#if ReInitLinkerFile??]
-<ReInitLinkerFile>true</ReInitLinkerFile>
-[/#if]
+
 [/#if]
 [#------------------------ BootPath Linker Updates ------------------]
 
     </memories>
+[#if LinkerUpdate??]
+<ForceLinkerUpdate>true</ForceLinkerUpdate>
+<ReInitLinkerFile>true</ReInitLinkerFile>
+[/#if]
+[#if ota?? && ota=="true"]
+<ota>true</ota>
+[/#if]
+[#if bootinfo?? && bootinfo=="true"]
+<bootinfo>true</bootinfo>
+[/#if]
+[#if isISRRegion?? && isISRRegion=="true"]
+<RemoveIsrVector>true</RemoveIsrVector>
+[/#if]
+[#if ReInitLinkerFile??]
+<ReInitLinkerFile>true</ReInitLinkerFile>
+[/#if]
 [#if PostBuildCommand??]
 <BuildAction>
 [#------------------------ BootPath Linker Updates ------------------]

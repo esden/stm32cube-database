@@ -17,7 +17,11 @@
 [#list SWIPdatas as SWIP]
     [#if SWIP.defines??]
         [#list SWIP.defines as definition]
-            [#assign myHash = {definition.name:definition.value} + myHash]
+            [#if ("${definition.value}"=="valueNotSetted")]
+              [#assign myHash = {definition.name:0} + myHash]
+            [#else]
+              [#assign myHash = {definition.name:definition.value} + myHash]
+            [/#if]
         [/#list]
     [/#if]
 [/#list]
@@ -59,12 +63,12 @@ Key: ${key}; Value: ${myHash[key]}
 /**
  * Define Advertising parameters
  */
-#define CFG_ADV_BD_ADDRESS                (${myHash["CFG_ADV_BD_ADDRESS"]})
+#define CFG_BD_ADDRESS                    (${myHash["CFG_BD_ADDRESS"]})
 [/#if]
 [#if (myHash["BLE_MODE_PERIPHERAL_CENTRAL"] == "Enabled") || (myHash["BLE_MODE_PERIPHERAL"] == "Enabled") || (myHash["BLE_MODE_CENTRAL"] == "Enabled")]
-#define CFG_BLE_ADDRESS_TYPE              ${myHash["CFG_BLE_ADDRESS_TYPE"]} /**< Bluetooth address types defined in ble_defs.h */
-[#if ((myHash["CFG_STATIC_RANDOM_ADDRESS"]?number == 1) && (myHash["CFG_BLE_ADDRESS_TYPE"] == "GAP_RANDOM_ADDR"))]
-#define CFG_STATIC_RANDOM_ADDRESS         (${myHash["STATIC_RANDOM_ADDRESS"]}) /**< Static Random Address fixed for lifetime of the device */
+#define CFG_BD_ADDRESS_TYPE               (${myHash["CFG_BD_ADDRESS_TYPE"]})
+[#if ((myHash["CFG_STATIC_RANDOM_ADDRESS"]?number == 1) && (myHash["CFG_BD_ADDRESS_TYPE"] == "GAP_RANDOM_ADDR"))]
+#define CFG_STATIC_RANDOM_ADDRESS         (${myHash["STATIC_RANDOM_ADDRESS"]}) /* Static Random Address fixed for lifetime of the device */
 [/#if]
 
 [/#if]
@@ -75,10 +79,6 @@ Key: ${key}; Value: ${myHash[key]}
 #define ADV_LP_INTERVAL_MAX               (0x0FA0)
 #define ADV_TYPE                          ${myHash["ADV_TYPE"]}
 #define ADV_FILTER                        ${myHash["ADV_FILTER"]}
-[/#if]
-[#if (myHash["BLE_MODE_PERIPHERAL_CENTRAL"] == "Enabled")]
-#define LEDBUTTON_CONN_ADV_INTERVAL_MIN   (0x1FA)
-#define LEDBUTTON_CONN_ADV_INTERVAL_MAX   (0x3E8)
 [/#if]
 [#if (myHash["BLE_MODE_CENTRAL"] == "Enabled") || (myHash["BLE_MODE_PERIPHERAL_CENTRAL"] == "Enabled") || (myHash["BLE_MODE_PERIPHERAL"] == "Enabled")]
 
@@ -100,23 +100,14 @@ Key: ${key}; Value: ${myHash[key]}
 #define CFG_ENCRYPTION_KEY_SIZE_MIN      (${myHash["CFG_ENCRYPTION_KEY_SIZE_MIN"]})
 
 /**
- * Define IO capabilities
+ * Define Input Output capabilities
  */
-#define CFG_IO_CAPABILITY_DISPLAY_ONLY        (0x00)
-#define CFG_IO_CAPABILITY_DISPLAY_YES_NO      (0x01)
-#define CFG_IO_CAPABILITY_KEYBOARD_ONLY       (0x02)
-#define CFG_IO_CAPABILITY_NO_INPUT_NO_OUTPUT  (0x03)
-#define CFG_IO_CAPABILITY_KEYBOARD_DISPLAY    (0x04)
-
-#define CFG_IO_CAPABILITY                     ${myHash["CFG_IO_CAPABILITY"]}
+#define CFG_IO_CAPABILITY                (${myHash["CFG_IO_CAPABILITY"]})
 
 /**
- * Define MITM modes
+ * Define Man In The Middle modes
  */
-#define CFG_MITM_PROTECTION_NOT_REQUIRED      (0x00)
-#define CFG_MITM_PROTECTION_REQUIRED          (0x01)
-
-#define CFG_MITM_PROTECTION                   ${myHash["CFG_MITM_PROTECTION"]}
+#define CFG_MITM_PROTECTION              (${myHash["CFG_MITM_PROTECTION"]})
 
 [/#if]
 
@@ -132,16 +123,7 @@ Key: ${key}; Value: ${myHash[key]}
 /**
  * Define Keypress Notification Support
  */
-#define CFG_KEYPRESS_NOT_SUPPORTED            (0x00)
-#define CFG_KEYPRESS_SUPPORTED                (0x01)
-
-#define CFG_KEYPRESS_NOTIFICATION_SUPPORT     ${myHash["CFG_KEYPRESS_NOTIFICATION_SUPPORT"]}
-
-/**
- * Numeric Comparison Answers
- */
-#define YES (0x01)
-#define NO  (0x00)
+#define CFG_KEYPRESS_NOTIFICATION_SUPPORT     (${myHash["CFG_KEYPRESS_NOTIFICATION_SUPPORT"]})
 
 [#if (myHash["BLE_MODE_CENTRAL"] == "Enabled") || (myHash["BLE_MODE_PERIPHERAL_CENTRAL"] == "Enabled") || (myHash["BLE_MODE_TRANSPARENT_UART"] == "Enabled") || (myHash["BLE_MODE_PERIPHERAL"] == "Enabled")]
 /**
@@ -185,27 +167,21 @@ Key: ${key}; Value: ${myHash[key]}
 
 /* USER CODE END Specific_Parameters */
 
-/******************************************************************************
- * Information Table
- *
-  * Version
-  * [0:3]   = Build - 0: Untracked - 15:Released - x: Tracked version
-  * [4:7]   = branch - 0: Mass Market - x: ...
-  * [8:15]  = Subversion
-  * [16:23] = Version minor
-  * [24:31] = Version major
-  *
- ******************************************************************************/
-#define CFG_FW_MAJOR_VERSION      (0)
-#define CFG_FW_MINOR_VERSION      (0)
-#define CFG_FW_SUBVERSION         (1)
-#define CFG_FW_BRANCH             (0)
-#define CFG_FW_BUILD              (0)
-
+[#if (myHash["BLE"] == "Enabled") || (myHash["BLE_MODE_SKELETON"] == "Enabled")]
 /******************************************************************************
  * BLE Stack
  ******************************************************************************/
-[#if (myHash["BLE"] == "Enabled") || (myHash["BLE_MODE_SKELETON"] == "Enabled")]
+/**
+ * BLE stack options, bitmap to active or not some features at BleStack_Init() function call.
+ */
+#define CFG_BLE_OPTIONS             (${myHash["BLE_OPTIONS_LL_ONLY"]} | \
+                                     ${myHash["BLE_OPTIONS_NO_SVC_CHANGE_DESC"]} | \
+                                     ${myHash["BLE_OPTIONS_DEV_NAME_READ_ONLY"]} | \
+                                     ${myHash["BLE_OPTIONS_EXTENDED_ADV"]} | \
+                                     ${myHash["BLE_OPTIONS_REDUCED_DB_IN_NVM"]} | \
+                                     ${myHash["BLE_OPTIONS_GATT_CACHING"]} | \
+                                     ${myHash["BLE_OPTIONS_POWER_CLASS_1"]} | \
+                                     ${myHash["BLE_OPTIONS_APPEARANCE_WRITABLE"]})
 
 /**
  * Maximum number of simultaneous connections that the device will support.
@@ -234,7 +210,7 @@ Key: ${key}; Value: ${myHash[key]}
  * Maximum supported ATT_MTU size
  * This setting should be aligned with ATT_MTU value configured in the ble host
  */
-#define CFG_BLE_MAX_ATT_MTU         (${myHash["CFG_BLE_MAX_ATT_MTU"]})
+#define CFG_BLE_ATT_MTU_MAX         (${myHash["CFG_BLE_ATT_MTU_MAX"]})
 
 /**
  * Size of the storage area for Attribute values
@@ -254,72 +230,37 @@ Key: ${key}; Value: ${myHash[key]}
 #define CFG_BLE_ATTR_PREPARE_WRITE_VALUE_SIZE       (${myHash["CFG_BLE_ATTR_PREPARE_WRITE_VALUE_SIZE"]})
 
 #define CFG_BLE_MBLOCK_COUNT_MARGIN                 (${myHash["CFG_BLE_MBLOCK_COUNT_MARGIN"]})
-#define CFG_BLE_MAX_COC_NUMBER                      (${myHash["CFG_BLE_MAX_COC_NUMBER"]})
-#define CFG_BLE_MAX_COC_MPS                         (${myHash["CFG_BLE_MAX_COC_MPS"]})
-#define CFG_BLE_MAX_COC_INITIATOR_NBR               (${myHash["CFG_BLE_MAX_COC_INITIATOR_NBR"]})
+
 #define PREP_WRITE_LIST_SIZE                        (BLE_DEFAULT_PREP_WRITE_LIST_SIZE)
 
-#define BLE_MEM_BLOCK_TX(mtu) \
-          (DIVC((mtu) + 4U, BLE_MEM_BLOCK_SIZE) + 1U)
-#define BLE_MEM_BLOCK_RX(mtu, n_link) \
-          ((DIVC((mtu) + 4U, BLE_MEM_BLOCK_SIZE) + 1U) * (n_link))
-#define BLE_MEM_BLOCK_MTU(mtu, n_link) \
-          (BLE_MEM_BLOCK_TX(mtu) + BLE_MEM_BLOCK_RX(mtu, n_link))
 /**
  * Number of allocated memory blocks used to transmit and receive data packets
  */
 #define CFG_BLE_MBLOCK_COUNT (BLE_MBLOCKS_CALC(PREP_WRITE_LIST_SIZE, \
-                                       CFG_BLE_MAX_ATT_MTU, CFG_BLE_NUM_LINK) \
+                                       CFG_BLE_ATT_MTU_MAX, CFG_BLE_NUM_LINK) \
                                    + CFG_BLE_MBLOCK_COUNT_MARGIN)
-/**
- * Options
- * Each definition below may be added together to build the Options value
- * WARNING : Only one definition per bit shall be added to build the Options value
- */
-#define BLE_INIT_OPTIONS_LL_ONLY                              (1<<0)
-#define BLE_INIT_OPTIONS_LL_HOST                              (0<<0)
-
-#define BLE_INIT_OPTIONS_NO_SVC_CHANGE_DESC                   (1<<1)
-#define BLE_INIT_OPTIONS_WITH_SVC_CHANGE_DESC                 (0<<1)
-
-#define BLE_INIT_OPTIONS_DEVICE_NAME_RO                       (1<<2)
-#define BLE_INIT_OPTIONS_DEVICE_NAME_RW                       (0<<2)
-
-#define BLE_INIT_OPTIONS_POWER_CLASS_1                        (1<<7)
-#define BLE_INIT_OPTIONS_POWER_CLASS_2_3                      (0<<7)
-
-/**
- * BLE stack Options flags to be configured with:
- * - BLE_INIT_OPTIONS_LL_ONLY
- * - BLE_INIT_OPTIONS_LL_HOST
- * - BLE_INIT_OPTIONS_NO_SVC_CHANGE_DESC
- * - BLE_INIT_OPTIONS_WITH_SVC_CHANGE_DESC
- * - BLE_INIT_OPTIONS_DEVICE_NAME_RO
- * - BLE_INIT_OPTIONS_DEVICE_NAME_RW
- * - BLE_INIT_OPTIONS_POWER_CLASS_1
- * - BLE_INIT_OPTIONS_POWER_CLASS_2_3
- * which are used to set following configuration bits:
- * (bit 0): 1: LL only
- *          0: LL + host
- * (bit 1): 1: no service change desc.
- *          0: with service change desc.
- * (bit 2): 1: device name Read-Only
- *          0: device name R/W
- * (bit 7): 1: LE Power Class 1
- *          0: LE Power Class 2-3
- * other bits: reserved (shall be set to 0)
- */
-#define CFG_BLE_OPTIONS  (${myHash["CFG_BLE_OPTIONS_LL"]} | ${myHash["CFG_BLE_OPTIONS_SVC"]} | ${myHash["CFG_BLE_OPTIONS_DEVICE_NAME"]} | ${myHash["CFG_BLE_OPTIONS_POWER_CLASS"]})
 
 /**
  * Maximum supported Devices in BLE Database
  */
-#define CFG_BLE_MAX_DDB_ENTRIES         (${myHash["CFG_BLE_MAX_DDB_ENTRIES"]})
+#define CFG_BLE_MAX_DDB_ENTRIES     (${myHash["CFG_BLE_MAX_DDB_ENTRIES"]})
 
-[/#if]
+/**
+ * Appearance of device set into BLE GAP
+ */
+#define CFG_GAP_APPEARANCE          (${myHash["CFG_GAP_APPEARANCE"]})
+
+/**
+ * Connection Oriented Channel parameters
+ */
+#define CFG_BLE_COC_NBR_MAX                         (${myHash["CFG_BLE_COC_NBR_MAX"]})
+#define CFG_BLE_COC_MPS_MAX                         (${myHash["CFG_BLE_COC_MPS_MAX"]})
+#define CFG_BLE_COC_INITIATOR_NBR_MAX               (${myHash["CFG_BLE_COC_INITIATOR_NBR_MAX"]})
+
 /* USER CODE BEGIN BLE_Stack */
 
 /* USER CODE END BLE_Stack */
+[/#if]
 
 /******************************************************************************
  * Low Power
@@ -371,6 +312,9 @@ typedef enum
 [#if (myHash["BLE_MODE_TRANSPARENT_UART"] == "Enabled")]
   CFG_LPM_APP_BLE,
 [/#if]
+[#if (myHash["ZIGBEE"] == "Enabled") || (myHash["ZIGBEE_SKELETON"] == "Enabled")]
+  CFG_LPM_APP_THREAD,
+[/#if]
   /* USER CODE BEGIN CFG_LPM_Id_t */
 
   /* USER CODE END CFG_LPM_Id_t */
@@ -400,6 +344,18 @@ typedef enum
  *        the level of traces : CFG_DEBUG_TRACE_FULL or CFG_DEBUG_TRACE_LIGHT
  *****************************************************************************/
 
+[#if (myHash["ZIGBEE"] == "Enabled") || (myHash["ZIGBEE_SKELETON"] == "Enabled")]
+#define LOG_REGION_ALL_MASK     0xFFFFFFFFu     /* mask to obtains all Code 'Region' */
+#define LOG_REGION_APP          0x01u           /* Log for Application Code 'Region' */
+#define LOG_REGION_ZIGBEE       0x02u           /* Log for 'ZigBee Stack' Code 'Region' */
+#define LOG_REGION_MAC          0x04u           /* Log for 'Mac Stack' Code 'Region' */
+#define LOG_REGION_LL           0x08u           /* Log for 'Low-Level Stack' Code 'Region' */
+
+#define APP_TRACE_REGION        ( LOG_REGION_APP | LOG_REGION_ZIGBEE )    /* Indicate Trace Code 'Region' for Application */
+#define APP_TRACE_LEVEL         ( VLEVEL_L )                              /* Indicate Trace Level for Application ( Essential ) */
+#define ZIGBEE_TRACE_LEVEL      ( ZB_LOG_MASK_LEVEL_5 )                   /* Indicate Trace Level for Zigbee Stack (Error/Warning/Info/Debug) */
+
+[/#if]
 #define ADV_TRACE_TIMESTAMP_ENABLE  (${myHash["ADV_TRACE_TIMESTAMP_ENABLE"]}U)
 
 /**
@@ -408,9 +364,14 @@ typedef enum
 #define CFG_DEBUG_APP_TRACE         (${myHash["CFG_DEBUG_APP_TRACE"]})
 
 /* New implementation using stm32_adv_trace */
-#define APP_DBG(...)                                      \
-{                                                                 \
+#define APP_DBG(...)                                                                  \
+{                                                                                     \
+[#if (myHash["ZIGBEE"] == "Enabled") || (myHash["ZIGBEE_SKELETON"] == "Enabled")]
+  UTIL_ADV_TRACE_COND_FSend(VLEVEL_L, LOG_REGION_APP, ADV_TRACE_TIMESTAMP_ENABLE, __VA_ARGS__); \
+[/#if]
+[#if (myHash["BLE"] == "Enabled") || (myHash["BLE_MODE_SKELETON"] == "Enabled")]
   UTIL_ADV_TRACE_COND_FSend(VLEVEL_L, ~0x0, ADV_TRACE_TIMESTAMP_ENABLE, __VA_ARGS__); \
+[/#if]
 }
 
 #if (CFG_DEBUG_APP_TRACE != 0)
@@ -469,11 +430,6 @@ typedef enum
  */
 #define SYS_MAX_MSG                 (${myHash["SYS_MAX_MSG"]}U)
 
-/**
- * Timeout for advertising
- */
-#define INITIAL_ADV_TIMEOUT         (${myHash["INITIAL_ADV_TIMEOUT"]}*1000) /**< 60s */
-
 /* USER CODE BEGIN Traces */
 
 /* USER CODE END Traces */
@@ -490,18 +446,14 @@ typedef enum
 
 [#if myHash["SEQUENCER_STATUS"]?number == 1 ]
 /******************************************************************************
- * Scheduler
+ * Sequencer
  ******************************************************************************/
-[#if (myHash["BLE"] == "Enabled") || (myHash["BLE_MODE_SKELETON"] == "Enabled")]
 
 /**
- * These are the lists of task id registered to the scheduler
+ * These are the lists of task id registered to the sequencer
  * Each task id shall be in the range [0:31]
- * This mechanism allows to implement a generic code in the API TL_BLE_HCI_StatusNot() to comply with
- * the requirement that a HCI/ACI command shall never be sent if there is already one pending
  */
-
-/**< Add in that list all tasks that may send a ACI/HCI command */
+[#if (myHash["BLE"] == "Enabled") || (myHash["BLE_MODE_SKELETON"] == "Enabled")]
 typedef enum
 {
 [#if (myHash["BLE_MODE_PERIPHERAL"] == "Enabled")]
@@ -521,12 +473,22 @@ typedef enum
   CFG_TASK_SYS_LOCAL_CMD_ID,
   CFG_TASK_TX_TO_HOST_ID,
 [/#if]
-  /* USER CODE BEGIN CFG_Task_Id_With_HCI_Cmd_t */
+  CFG_TASK_LINK_LAYER,
+  CFG_TASK_LINK_LAYER_TEMP_MEAS,
+[#if (myHash["BLE_MODE_SKELETON"] != "Enabled")]
+  CFG_TASK_BLE_HOST,
+[/#if]
+  CFG_TASK_BPKA,
+  CFG_TASK_HW_RNG,
+  CFG_TASK_AMM_BCKGND,
+  CFG_TASK_FLASH_MANAGER_BCKGND,
+  CFG_TASK_BLE_TIMER_BCKGND,
+  /* USER CODE BEGIN CFG_Task_Id_t */
 [#if PG_FILL_UCS == "True"]
 [#if PG_BSP_NUCLEO_WBA52CG == 1]
-  CFG_TASK_PB1_BUTTON_PUSHED_ID,
-  CFG_TASK_PB2_BUTTON_PUSHED_ID,
-  CFG_TASK_PB3_BUTTON_PUSHED_ID,
+  TASK_BUTTON_1,
+  TASK_BUTTON_2,
+  TASK_BUTTON_3,
 [/#if]
 [#if (RF_APPLICATION == "HEARTRATE")]
   CFG_TASK_MEAS_REQ_ID,
@@ -540,56 +502,64 @@ typedef enum
   CFG_TASK_ADV_CANCEL_ID,
   CFG_TASK_SEND_NOTIF_ID,
 [/#if]
-[#if (RF_APPLICATION == "HEALTH_TERMOMETER")]
+[#if (RF_APPLICATION == "HEALTH_THERMOMETER")]
   CFG_TASK_HTS_MEAS_REQ_ID,
   CFG_TASK_HTS_INTERMEDIATE_TEMPERATURE_REQ_ID,
   CFG_TASK_HTS_MEAS_INTERVAL_REQ_ID,
 [/#if]
+[#if (RF_APPLICATION == "P2PROUTER")]
+  CFG_TASK_FORWARD_NOTIF_ID,
+  CFG_TASK_FORWARD_WRITE_ID,
+  CFG_TASK_DEV_TABLE_NOTIF_ID,
+  CFG_TASK_CONN_DEV_ID,
 [/#if]
-
-  /* USER CODE END CFG_Task_Id_With_HCI_Cmd_t */
-  CFG_TASK_LINK_LAYER,
-  CFG_TASK_LINK_LAYER_TEMP_MEAS,
-[#if (myHash["BLE_MODE_SKELETON"] != "Enabled")]
-  CFG_TASK_BLE_HOST,
 [/#if]
-  CFG_LAST_TASK_ID_WITH_HCICMD,                                               /**< Shall be LAST in the list */
-} CFG_Task_Id_With_HCI_Cmd_t;
-
-/**< Add in that list all tasks that never send a ACI/HCI command */
-typedef enum
-{
-  CFG_FIRST_TASK_ID_WITH_NO_HCICMD = CFG_LAST_TASK_ID_WITH_HCICMD - 1,        /**< Shall be FIRST in the list */
-  CFG_TASK_BPKA,
-  CFG_TASK_HW_RNG,
-  CFG_TASK_AMM_BCKGND,
-  CFG_TASK_FLASH_MANAGER_BCKGND,
-  /* USER CODE BEGIN CFG_Task_Id_With_NO_HCI_Cmd_t */
-
-  /* USER CODE END CFG_Task_Id_With_NO_HCI_Cmd_t */
-[/#if]
-  CFG_LAST_TASK_ID_WITH_NO_HCICMD                                             /**< Shall be LAST in the list */
-} CFG_Task_Id_With_NO_HCI_Cmd_t;
-
-#define CFG_TASK_NBR    CFG_LAST_TASK_ID_WITH_NO_HCICMD
+  /* USER CODE END CFG_Task_Id_t */
+  CFG_TASK_NBR /* Shall be LAST in the list */
+} CFG_Task_Id_t;
 
 /* USER CODE BEGIN DEFINE_TASK */
 
 /* USER CODE END DEFINE_TASK */
 
+[/#if]
+[#if (myHash["ZIGBEE"] == "Enabled") || (myHash["ZIGBEE_SKELETON"] == "Enabled")]
+
+typedef enum
+{
+  CFG_TASK_TRACES,
+  CFG_TASK_HW_RNG,                /* Task linked to chip internal peripheral. */
+[#if (myHash["ZIGBEE"] == "Enabled")]
+  CFG_TASK_LINK_LAYER,
+  CFG_TASK_MAC_LAYER,
+  CFG_TASK_ZIGBEE_LAYER,
+  CFG_TASK_ZIGBEE_NETWORK_FORM,   /* Tasks linked to Zigbee Start. */
+  CFG_TASK_ZIGBEE_APP_START,
+  CFG_TASK_ZIGBEE_APP1,           /* Tasks linked to Zigbee Application. */
+  CFG_TASK_ZIGBEE_APP2,
+  CFG_TASK_ZIGBEE_APP3,
+  CFG_TASK_ZIGBEE_APP4,
+[/#if]
+  /* USER CODE BEGIN CFG_Task_Id_t */
+
+  /* USER CODE END CFG_Task_Id_t */
+  CFG_TASK_NBR /* Shall be LAST in the list */
+} CFG_Task_Id_t;
+
+[/#if]
 /**
  * This is the list of priority required by the application
- * Each Id shall be in the range 0..31
+ * Shall be in the range 0..31
  */
 typedef enum
 {
-  CFG_SCH_PRIO_0,
-  CFG_SCH_PRIO_1,
-  /* USER CODE BEGIN CFG_SCH_Prio_Id_t */
+  CFG_SEQ_PRIO_0 = 0,
+  CFG_SEQ_PRIO_1,
+  /* USER CODE BEGIN CFG_SEQ_Prio_Id_t */
 
-  /* USER CODE END CFG_SCH_Prio_Id_t */
-  CFG_PRIO_NBR
-} CFG_SCH_Prio_Id_t;
+  /* USER CODE END CFG_SEQ_Prio_Id_t */
+  CFG_SEQ_PRIO_NBR /* Shall be LAST in the list */
+} CFG_SEQ_Prio_Id_t;
 
 [#if (myHash["BLE_MODE_PERIPHERAL"] == "Enabled")||(myHash["BLE_MODE_CENTRAL"] == "Enabled")]
 /**
@@ -604,43 +574,139 @@ typedef enum
   CFG_IDLEEVT_PROC_GATT_COMPLETE,
 [/#if]
   /* USER CODE BEGIN CFG_IdleEvt_Id_t */
+[#if PG_FILL_UCS == "True"]
+[#if (RF_APPLICATION == "HEARTRATE")]
+[/#if]
+[#if (RF_APPLICATION == "P2PCLIENT")]
+  CFG_IDLEEVT_CONNECTION_COMPLETE,
+[/#if]
+[#if (RF_APPLICATION == "P2PSERVER")]
+[/#if]
+[#if (RF_APPLICATION == "HEALTH_THERMOMETER")]
+[/#if]
+[#if (RF_APPLICATION == "P2PROUTER")]
+  CFG_IDLEEVT_NODE_CONNECTION_COMPLETE,
+  CFG_IDLEEVT_NODE_MTU_EXCHANGED_COMPLETE,
+[/#if]
+[/#if]
 
   /* USER CODE END CFG_IdleEvt_Id_t */
 } CFG_IdleEvt_Id_t;
 
 [/#if]
+[#if (myHash["ZIGBEE"] == "Enabled") || (myHash["ZIGBEE_SKELETON"] == "Enabled")]
+/* Sequencer defines */
+#define TASK_TRACES                         ( 1u << CFG_TASK_TRACES )
+#define TASK_HW_RNG                         ( 1u << CFG_TASK_HW_RNG )
+[#if (myHash["ZIGBEE"] == "Enabled")]
+#define TASK_LINK_LAYER                     ( 1u << CFG_TASK_LINK_LAYER )
+#define TASK_MAC_LAYER                      ( 1u << CFG_TASK_MAC_LAYER )
+#define TASK_ZIGBEE_LAYER                   ( 1u << CFG_TASK_ZIGBEE_LAYER )
+#define TASK_ZIGBEE_NETWORK_FORM            ( 1u << CFG_TASK_ZIGBEE_NETWORK_FORM )
+#define TASK_ZIGBEE_APP_START               ( 1u << CFG_TASK_ZIGBEE_APP_START )
+#define TASK_ZIGBEE_APP1                    ( 1u << CFG_TASK_ZIGBEE_APP1 )
+#define TASK_ZIGBEE_APP2                    ( 1u << CFG_TASK_ZIGBEE_APP2 )
+#define TASK_ZIGBEE_APP3                    ( 1u << CFG_TASK_ZIGBEE_APP3 )
+#define TASK_ZIGBEE_APP4                    ( 1u << CFG_TASK_ZIGBEE_APP3 )
+[/#if]
+/* USER CODE BEGIN TASK_ID_Define */
 
+/* USER CODE END TASK_ID_Define */
+
+/* Sequencer priorities by default  */
+#define TASK_HW_RNG_PRIORITY                CFG_SEQ_PRIO_0
+[#if (myHash["ZIGBEE"] == "Enabled")]
+#define TASK_LINK_LAYER_PRIORITY            CFG_SEQ_PRIO_0
+#define TASK_MAC_LAYER_PRIORITY             CFG_SEQ_PRIO_1
+#define TASK_ZIGBEE_LAYER_PRIORITY          CFG_SEQ_PRIO_1
+#define TASK_ZIGBEE_NETWORK_FORM_PRIORITY   CFG_SEQ_PRIO_1
+#define TASK_ZIGBEE_APP_START_PRIORITY      CFG_SEQ_PRIO_1
+[/#if]
+/* USER CODE BEGIN TASK_Priority_Define */
+
+/* USER CODE END TASK_Priority_Define */
+/* Used by Sequencer */
+#define UTIL_SEQ_CONF_PRIO_NBR              CFG_SEQ_PRIO_NBR
+
+/** Sequencer defines for compatibility LowLayer  */
+#define TASK_ZIGBEE_STACK                   TASK_ZIGBEE_LAYER
+#define TASK_ZIGBEE_STACK_PRIORITY          TASK_ZIGBEE_LAYER_PRIORITY
+
+/**
+ * These are the lists of events id registered to the sequencer
+ * Each event id shall be in the range [0:31]
+ */
+typedef enum
+{
+[#if (myHash["ZIGBEE"] == "Enabled")]
+  CFG_EVENT_LINK_LAYER,
+  CFG_EVENT_MAC_LAYER,
+  CFG_EVENT_ZIGBEE_LAYER,
+  CFG_EVENT_ZIGBEE_STARTUP_ENDED,
+  CFG_EVENT_ZIGBEE_APP1,           /* Events linked to Zigbee Application. */
+  CFG_EVENT_ZIGBEE_APP2,
+  CFG_EVENT_ZIGBEE_APP3,
+  CFG_EVENT_ZIGBEE_APP4,
+[/#if]
+  /* USER CODE BEGIN CFG_Event_Id_t */
+
+  /* USER CODE END CFG_Event_Id_t */
+  CFG_EVENT_NBR                   /* Shall be LAST in the list */
+} CFG_Event_Id_t;
+
+/**< Events defines */
+[#if (myHash["ZIGBEE"] == "Enabled")]
+#define EVENT_LINK_LAYER                ( 1U << CFG_EVENT_LINK_LAYER )
+#define EVENT_MAC_LAYER                 ( 1U << CFG_EVENT_MAC_LAYER )
+#define EVENT_ZIGBEE_LAYER              ( 1U << CFG_EVENT_ZIGBEE_LAYER )
+#define EVENT_ZIGBEE_STARTUP_ENDED      ( 1U << CFG_EVENT_ZIGBEE_STARTUP_ENDED )
+#define EVENT_ZIGBEE_APP1               ( 1U << CFG_EVENT_ZIGBEE_APP1 )
+#define EVENT_ZIGBEE_APP2               ( 1U << CFG_EVENT_ZIGBEE_APP2 )
+#define EVENT_ZIGBEE_APP3               ( 1U << CFG_EVENT_ZIGBEE_APP3 )
+#define EVENT_ZIGBEE_APP4               ( 1U << CFG_EVENT_ZIGBEE_APP4 )
+[/#if]
+
+/**< Events defines for compatibility LowLayer  */
+//#define EVENT_MAC_CNF                   EVENT_MAC_LAYER
+
+
+/******************************************************************************
+ * MAC LEVEL
+ ******************************************************************************/
+//#define TRACE_MAC_CALL( ... ) { }
+#define TRACE_MAC_CALL(...)                                                           \
+{                                                                                     \
+  UTIL_ADV_TRACE_COND_FSend( VLEVEL_L, LOG_REGION_MAC, ADV_TRACE_TIMESTAMP_ENABLE, __VA_ARGS__ );  \
+}
+[/#if]
 [/#if]
 
 /******************************************************************************
  * NVM configuration
  ******************************************************************************/
-/**
- * Do not enable ALIGN mode
- * Used only by BLE Test Fw
- */
-#define CFG_NVM_ALIGN                       (${myHash["CFG_NVM_ALIGN"]})
-
-  /**
-   * This is the max size of data the BLE Stack needs to write in NVM
-   * This is different to the size allocated in the EEPROM emulator
-   * The BLE Stack shall write all data at an address in the range of [0 : (x-1)]
-   * The size is a number of 32bits values
-   * NOTE:
-   * THIS VALUE SHALL BE IN LINE WITH THE BLOCK DEFINE IN THE SCATTER FILE BLOCK_STACKLIB_FLASH_DATA
-   * There are 8x32bits = 32 Bytes header in the EEPROM for each sector.
-   * a page is a collection of 1 or more sectors
-   */
-#define CFG_NVM_BLE_MAX_SIZE                ((128*20)/4)
+[#if (myHash["BLE"] == "Enabled") || (myHash["BLE_MODE_SKELETON"] == "Enabled")]
 
 #define CFG_SNVMA_START_SECTOR_ID     (FLASH_PAGE_NB - ${SNVMA_NUMBER_OF_SECTOR_NEEDED}u)
 
-#define CFG_SNVMA_START_ADDRESS       (FLASH_BASE + (FLASH_PAGE_SIZE * (FLASH_PAGE_NB - ${SNVMA_NUMBER_OF_SECTOR_NEEDED}u)))
+#define CFG_SNVMA_START_ADDRESS       (FLASH_BASE + (FLASH_PAGE_SIZE * (CFG_SNVMA_START_SECTOR_ID)))
+
+[/#if]
+[#if (myHash["ZIGBEE"] == "Enabled") || (myHash["ZIGBEE_SKELETON"] == "Enabled")]
+  /**
+   * This is the max size of data the THREAD Stack needs to write in NVM
+   * This is different to the size allocated in the EEPROM emulator
+   * The THREAD Stack shall write all data at an address in the range of [0 : (y-1)]
+   * The size is a number of 32bits values
+   */
+#define CFG_NVMA_THREAD_NVM_SIZE                    ( 0u )
+
+[/#if]
 
 /* USER CODE BEGIN NVM_Configuration */
 
 /* USER CODE END NVM_Configuration */
 
+[#if (myHash["BLE"] == "Enabled") || (myHash["BLE_MODE_SKELETON"] == "Enabled")]
 /******************************************************************************
  * BLEPLAT configuration
  ******************************************************************************/
@@ -652,27 +718,25 @@ typedef enum
 
 /* USER CODE END BLEPLAT_Configuration */
 
+[/#if]
 /******************************************************************************
  * RT GPIO debug module configuration
  ******************************************************************************/
 
 #define RT_DEBUG_GPIO_MODULE         (${myHash["RT_DEBUG_GPIO_MODULE"]})
+#define RT_DEBUG_DTB                 (0)
 
 /******************************************************************************
  * HW RADIO configuration
  ******************************************************************************/
+/* Link Layer uses radio low interrupt (0 --> NO ; 1 --> YES) */
+#define USE_RADIO_LOW_ISR                   (${myHash["USE_RADIO_LOW_ISR"]})
 
-#define USE_RADIO_LOW_ISR                   (${myHash["USE_RADIO_LOW_ISR"]})            /* Link Layer uses radio low interrupt (0 --> NO)
-                                                                                                     (1 --> YES)
-                                                               */
+/* Link Layer event scheduling (0 --> NO, next event schediling is done at background ; 1 --> YES) */
+#define NEXT_EVENT_SCHEDULING_FROM_ISR      (${myHash["NEXT_EVENT_SCHEDULING_FROM_ISR"]})
 
-#define NEXT_EVENT_SCHEDULING_FROM_ISR      (${myHash["NEXT_EVENT_SCHEDULING_FROM_ISR"]})            /* Link Layer uses radio low interrupt (0 --> NO --> Next event schediling is done at background)
-                                                                                                     (1 --> YES)
-                                                               */
-
-#define USE_TEMPERATURE_BASED_RADIO_CALIBRATION  (${myHash["USE_TEMPERATURE_BASED_RADIO_CALIBRATION"]})       /* Link Layer uses temperature based calibration (0 --> NO)
-                                                            *                                               (1 --> YES)
-                                                            */
+/* Link Layer uses temperature based calibration (0 --> NO ; 1 --> YES) */
+#define USE_TEMPERATURE_BASED_RADIO_CALIBRATION  (${myHash["USE_TEMPERATURE_BASED_RADIO_CALIBRATION"]})
 
 #define RADIO_INTR_NUM                      RADIO_IRQn     /* 2.4GHz RADIO global interrupt */
 #define RADIO_INTR_PRIO_HIGH                (${myHash["RADIO_INTR_PRIO_HIGH"]})            /* 2.4GHz RADIO interrupt priority when radio is Active */

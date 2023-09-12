@@ -50,6 +50,16 @@
 		<PossibleValue Comment="Full Speed 12MBit/s" Value="USB_OTG_SPEED_FULL"/>
 	</RefParameter>	
 	
+	<RefParameter Comment="Speed" DefaultValue="HCD_SPEED_FULL" Name="DeviceSpeed" Type="List" Group="">		
+		<Condition Expression="VirtualMode = Host_Only" Diagnostic=""/>
+		<PossibleValue Comment="Full Speed 12MBit/s" Value="HCD_SPEED_FULL"/>
+		<PossibleValue Comment="Low Speed 1.5MBit/s" Value="HCD_SPEED_LOW"/>	
+	</RefParameter>		
+	<RefParameter Comment="Speed" DefaultValue="PCD_SPEED_FULL" Name="DeviceSpeed" Type="List" Group="">	
+		<Condition Expression="(VirtualMode = Device_DP_DM) | (VirtualMode = Device_Only)" Diagnostic=""/>
+		<PossibleValue Comment="Full Speed 12MBit/s" Value="PCD_SPEED_FULL"/>
+	</RefParameter>	
+	
 	<!-- Parameters dma_enable --> 
 	<!-- Tracker 393161 -->
 	<RefParameter Comment="Enable internal IP DMA" DefaultValue="DISABLE" Name="dma_enable" Type="List" Group="" Visible="false">
@@ -82,14 +92,14 @@
 	</RefParameter>
 	
 	<!-- Parameters Sof_enable --> 
-	<RefParameter Comment="Signal start of frame " DefaultValue="DISABLE" Name="Sof_enable" Type="List" Group="" Visible="true">
-		<PossibleValue Value="ENABLE" Comment="Enabled"/>
-		<PossibleValue Value="DISABLE" Comment="Disabled"/>			
-		<Condition Expression="!USB_FS_SOF" Diagnostic=""/>
-	</RefParameter>	
 	<RefParameter Comment="Signal start of frame " DefaultValue="ENABLE" Name="Sof_enable" Type="List" Group="">
 		<PossibleValue Value="ENABLE" Comment="Enabled"/>
 		<Condition Expression="USB_FS_SOF" Diagnostic=""/>		
+	</RefParameter>
+	<RefParameter Comment="Signal start of frame" DefaultValue="DISABLE" Name="Sof_enable" Type="List">
+		<PossibleValue Value="ENABLE" Comment="Enabled"/>
+		<PossibleValue Value="DISABLE" Comment="Disabled"/>
+		<Condition Expression="!USB_FS_SOF" Diagnostic=""/>		
 	</RefParameter>
 	
 	<!-- Parameters lpm_enable --> 
@@ -176,7 +186,12 @@
 		</Parameter>
 		<Parameter Name="Sof_enable"/>		
 		<Parameter Name="Host_channels"/>					
-		<Parameter Name="speed"/>		
+		<Parameter Name="speed">
+			<Condition Diagnostic="" Expression="!DIE482" />
+		</Parameter>		
+		<Parameter Name="DeviceSpeed">
+			<Condition Diagnostic="" Expression="DIE482" />
+		</Parameter>
 		<!-- Bug 60656 -->
 		<!--<Parameter Name="dma_enable"/>-->	
 		<Parameter Name="vbus_sensing_enable"/>		
@@ -192,7 +207,12 @@
 			<PossibleValue>Device_DP_DM</PossibleValue>
 		</Parameter>
 		<Parameter Name="dev_endpoints"/>		
-		<Parameter Name="speed"/>
+		<Parameter Name="speed">
+			<Condition Diagnostic="" Expression="!DIE482" />
+		</Parameter>		
+		<Parameter Name="DeviceSpeed">
+			<Condition Diagnostic="" Expression="DIE482" />
+		</Parameter>
 		<!--<Parameter Name="ep0_mps"/>-->					
 		<!-- Bug 60656 -->
 		<!--<Parameter Name="dma_enable"/>-->
@@ -205,9 +225,7 @@
 		<Parameter Name="vbus_sensing_enable"/>		
 		<!-- Ticket 34891 -->
 		<Parameter Name="use_dedicated_ep1"/>
-		<Parameter Name="Sof_enable">
-			<Condition Expression="!USB_FS_SOF" Diagnostic=""/>
-		</Parameter>
+		<Parameter Name="Sof_enable"/>
 	</RefMode>
 	
 	<RefMode Name="Device_Only" HalMode="PCD">
@@ -216,7 +234,12 @@
 			<PossibleValue>Device_Only</PossibleValue>
 		</Parameter>
 		<Parameter Name="dev_endpoints"/>		
-		<Parameter Name="speed"/>
+		<Parameter Name="speed">
+			<Condition Diagnostic="" Expression="!DIE482" />
+		</Parameter>		
+		<Parameter Name="DeviceSpeed">
+			<Condition Diagnostic="" Expression="DIE482" />
+		</Parameter>
 		<!--<Parameter Name="ep0_mps"/>-->						
 		<!-- Bug 60656 -->
 		<!--<Parameter Name="dma_enable"/>-->
@@ -229,9 +252,7 @@
 		<Parameter Name="vbus_sensing_enable"/>		
 		<!-- Ticket 34891 -->
 		<Parameter Name="use_dedicated_ep1"/>
-		<Parameter Name="Sof_enable">
-			<Condition Expression="!USB_FS_SOF" Diagnostic=""/>
-		</Parameter>
+		<Parameter Name="Sof_enable"/>
 	</RefMode>
         
         <RefMode Name="OTG/Dual_Role_Device" HalMode="USB">
@@ -239,10 +260,7 @@
 	</RefMode>
 	
 	<!-- USB Full Speed in Device mode with SOF -->
-	<RefMode Name="Activate_SOF_FS" HalMode="">		
-		<Parameter Name="Sof_enable"/>								
-	</RefMode>
-	
+	<RefMode Name="Activate_SOF_FS" HalMode=""/>	
 	
 	<RefMode Name="Activate_VBUS" HalMode=""/>				
 	

@@ -34,16 +34,13 @@
         <Condition Diagnostic="" Expression="!I2C6_Exist"/>
     </Background>
     <Background  imageName="STM32U5HideMux" name="STM32U5HideCK48Mux"  x="890" y="472">
-        <Condition Diagnostic="" Expression="!SDMMC1_Exist &amp; !SDMMC2_Exist &amp; !USB_OTG_FS_Exist"/>
+        <Condition Diagnostic="" Expression="!SDMMC1_Exist &amp; !SDMMC2_Exist"/>
     </Background>
     <Background  imageName="blackline" name="blacklineCK48Mux"  x="990" y="570">
-        <Condition Diagnostic="" Expression="!SDMMC1_Exist &amp; !SDMMC2_Exist &amp; !USB_OTG_FS_Exist"/>
+        <Condition Diagnostic="" Expression="!SDMMC1_Exist &amp; !SDMMC2_Exist"/>
     </Background>
     <Background  imageName="STM32U5HideMux2" name="STM32U5HideSDMMCMux"  x="1585" y="1570">
         <Condition Diagnostic="" Expression="!SDMMC1_Exist &amp; !SDMMC2_Exist"/>
-    </Background>
-    <Background  imageName="stm32U5UsbExist" name="stm32U5UsbExist"  x="977" y="532">
-        <Condition Diagnostic="" Expression="USB_OTG_FS_Exist"/>
     </Background>
     <Background  imageName="securableelem" name="LSE_SEC"  x="85" y="120">
         <Condition Diagnostic="" Expression="S_SECURE &amp; !S_LPBAM_CONF"/>
@@ -79,7 +76,7 @@
         <Condition Diagnostic="" Expression="S_SECURE &amp; !S_LPBAM_CONF"/>
     </Background>
     <Background  imageName="securableelem" name="CK48_SEC"  x="1000" y="520">
-        <Condition Diagnostic="" Expression="S_SECURE &amp; (SDMMC1_Exist |SDMMC2_Exist | USB_OTG_FS_Exist) &amp; !S_LPBAM_CONF"/>
+        <Condition Diagnostic="" Expression="S_SECURE &amp; (SDMMC1_Exist |SDMMC2_Exist) &amp; !S_LPBAM_CONF"/>
     </Background>
     
     <Tree id="ClockTree">
@@ -138,14 +135,14 @@
             <Input signalId="HSI48" from="HSI48RC"/>
         </Element>
 
-	<Element id="HSI48RC" type="fixedSource" isKey="true" refParameter="HSI48_VALUE" x="295" y="1218" isTZRes="true" refEnable="EnableCRS,USBEnable,RNGEnableLPBAM,MCOEnable,SDMMCEnableLPBAM">
+	<Element id="HSI48RC" type="fixedSource" isKey="true" refParameter="HSI48_VALUE" x="295" y="1218" isTZRes="true" refEnable="EnableCRS,RNGEnableLPBAM,MCOEnable,SDMMCEnableLPBAM">
             <Condition Diagnostic="" Expression="!S_LPBAM_CONF"/>
 			<Output signalId="HSI48" to="MCOMult"/>
             <Output signalId="HSI48" to="CK48Mult"/>
             <Output signalId="HSI48" to="RNGMult"/>
             <Output signalId="HSI48" to="CRSCLKoutput"/>
         </Element>		
-	<Element id="HSI48RC" type="fixedSource" isKey="true" refParameter="HSI48_VALUE" x="295" y="1218" refEnable="EnableCRS,USBEnable,RNGEnableLPBAM,MCOEnable,SDMMCEnableLPBAM">
+	<Element id="HSI48RC" type="fixedSource" isKey="true" refParameter="HSI48_VALUE" x="295" y="1218" refEnable="EnableCRS,RNGEnableLPBAM,MCOEnable,SDMMCEnableLPBAM">
             <Output signalId="HSI48" to="MCOMult"/>
             <Output signalId="HSI48" to="CK48Mult"/>
             <Output signalId="HSI48" to="RNGMult"/>
@@ -531,8 +528,8 @@
             <Input signalId="ADCCLK" from="ADCMult"/>
         </Element>
      
-        <Element id="CK48Mult" type="multiplexor" refParameter="CK48CLockSelection" orientation="LEFT" x="908" y="526" refEnable="USBEnable,SDMMCEnable" isTZRes="true">
-            <Condition Diagnostic="" Expression="SDMMC1_Exist | SDMMC2_Exist | USB_OTG_FS_Exist"/>
+        <Element id="CK48Mult" type="multiplexor" refParameter="CK48CLockSelection" orientation="LEFT" x="908" y="526" refEnable="SDMMCEnable" isTZRes="true">
+            <Condition Diagnostic="" Expression="SDMMC1_Exist | SDMMC2_Exist"/>
             <Input  signalId="PLL2QCLK" from="PLL2Q" refValue="RCC_CLK48CLKSOURCE_PLL2"/>
             <Input  signalId="PLLQCLK"     from="PLL1Q"     refValue="RCC_CLK48CLKSOURCE_PLL1"/>
             <Input  signalId="MSIK"         from="MSIKRC"    refValue="RCC_CLK48CLKSOURCE_MSIK"/>
@@ -544,12 +541,8 @@
          
         </Element>
 
-	<Element id="CK48output" type="activeOutput"   refParameter="CK48Freq_Value"   x="1055" y="557" refEnable="USBEnable,SDMMCEnable">
-            <Condition Diagnostic="" Expression="SDMMC1_Exist | SDMMC2_Exist | USB_OTG_FS_Exist"/>
-            <Input signalId="CK48CLK" from="CK48Mult"/>
-        </Element>
-        <Element id="USBoutput" type="activeOutput"   refParameter="USBFreq_Value"   x="1055" y="527" refEnable="USBEnable">
-            <Condition Diagnostic="" Expression="USB_OTG_FS_Exist"/>
+	    <Element id="CK48output" type="activeOutput"   refParameter="CK48Freq_Value"   x="1055" y="557" refEnable="SDMMCEnable">
+            <Condition Diagnostic="" Expression="SDMMC1_Exist | SDMMC2_Exist"/>
             <Input signalId="CK48CLK" from="CK48Mult"/>
         </Element>
  
@@ -855,7 +848,7 @@
             <Input signalId="PeriphCLK" from="TimPrescalerAPB2"/>
         </Element>
         
-        <Element id="UCPD1Output" type="output" refParameter="UCPD1outputFreq_Value" x="431" y="918" refEnable="UCPDEnable" >
+        <Element id="UCPD1Output" type="activeOutput" refParameter="UCPD1outputFreq_Value" x="431" y="918" refEnable="UCPD1Enable" >
             <Input signalId="HSI"    from="HSIRC"/>
         </Element>
         
@@ -975,14 +968,15 @@
                 <Input signalId="PLLPCLK" from="PLL1P"/>
             </Element>
 
-            <Element id="PLL1Q" type="devisor" refParameter="PLL1Q" x="575" y="548" refEnable="HSPI1Enable,USBEnablePll,SDMMCEnableLPBAM,FDCANEnableLPBAM,OCTOSPIMEnableLPBAM" refLock="PLLIsSecureLocked">
+            <Element id="PLL1Q" type="devisor" refParameter="PLL1Q" x="575" y="548" refEnable="HSPI1Enable,SDMMCEnableLPBAM,FDCANEnableLPBAM,OCTOSPIMEnableLPBAM" refLock="PLLIsSecureLocked">
                 <Input signalId="VCOOutput" from="PLLN"/>
                 <Output signalId="PLLQCLK" to="CK48Mult"/>
                 <Output signalId="PLLQCLK" to="PLLQoutput"/>
                 <Output signalId="PLLQCLK" to="OCTOSPIMMult"/>
                 <Output signalId="PLLQCLK" to="FDCANMult"/>                
             </Element>
-            <Element id="PLLQoutput" type="output" refParameter="PLLQoutputFreq_Value" x="661" y="547" refEnable="HSPI1Enable,USBEnablePll,SDMMCEnableLPBAM,FDCANEnableLPBAM,OCTOSPIMEnableLPBAM">
+
+            <Element id="PLLQoutput" type="output" refParameter="PLLQoutputFreq_Value" x="661" y="547" refEnable="HSPI1Enable,SDMMCEnableLPBAM,FDCANEnableLPBAM,OCTOSPIMEnableLPBAM">
                 <Input signalId="PLLQCLK" from="PLL1Q"/>
             </Element>
 				
@@ -993,7 +987,7 @@
             </Element>
         </Tree>
         <Tree id="PLL2">
-            <Element id="PLL2N" type="multiplicatorFrac" refParameter="PLL2N" x="509" y="641" refEnable="LTDCEnable,HSPI1Enable,OCTOSPIMEnable,FDCANEnableLPBAM,SAI1EnableLPBAM,SAI2EnableLPBAM,USBEnablePll,SDMMCEnableLPBAM,ADCEnableLPBAM,DACEnableLPBAM" refLock="PLL2IsSecureLocked">
+            <Element id="PLL2N" type="multiplicatorFrac" refParameter="PLL2N" x="509" y="641" refEnable="LTDCEnable,HSPI1Enable,OCTOSPIMEnable,FDCANEnableLPBAM,SAI1EnableLPBAM,SAI2EnableLPBAM,SDMMCEnableLPBAM,ADCEnableLPBAM,DACEnableLPBAM" refLock="PLL2IsSecureLocked">
                 <Input signalId="VCOInput2" from="PLL2M"/>
                 <Input signalId="PLL2FRACNClk" from="PLL2FRACN"/>
                 <Output signalId="VCOPLL2Output" to="PLL2Q"/>
@@ -1015,14 +1009,14 @@
                 <Input signalId="PLL2PCLK" from="PLL2P"/>
             </Element>
 
-        
-            <Element id="PLL2Q" type="devisor" refParameter="PLL2Q" x="575" y="680" refEnable="HSPI1Enable,USBEnablePll,SDMMCEnableLPBAM,OCTOSPIMEnableLPBAM" refLock="PLL2IsSecureLocked">
+            <Element id="PLL2Q" type="devisor" refParameter="PLL2Q" x="575" y="680" refEnable="HSPI1Enable,SDMMCEnableLPBAM,OCTOSPIMEnableLPBAM" refLock="PLL2IsSecureLocked">
                 <Input signalId="VCOPLL2Output" from="PLL2N"/>
                 <Output signalId="PLL2QCLK" to="CK48Mult"/>
                 <Output signalId="PLL2QCLK" to="PLL2Qoutput"/>
                 <Output signalId="PLL2QCLK" to="OCTOSPIMMult"/>
             </Element>
-            <Element id="PLL2Qoutput" type="output" refParameter="PLL2QoutputFreq_Value" x="661" y="679" refEnable="HSPI1Enable,USBEnablePll,SDMMCEnableLPBAM,OCTOSPIMEnableLPBAM">
+
+            <Element id="PLL2Qoutput" type="output" refParameter="PLL2QoutputFreq_Value" x="661" y="679" refEnable="HSPI1Enable,SDMMCEnableLPBAM,OCTOSPIMEnableLPBAM">
                 <Input signalId="PLL2QCLK" from="PLL2Q"/>
             </Element>
 										    
@@ -1235,7 +1229,7 @@
     <Label id="PLL2RoutputLabel"     type="info" text="PLL2R"     posX="661" posY="627"/>
     <Label id="PLL2PoutputLabel"     type="info" text="PLL2P"     posX="661" posY="706"/>
     
-    <Label id="HCLK2" type="SpecialInfo" posX="501" posY="928" text="To UCPD1 (MHz)"/>
+    <Label id="HCLK2" type="SpecialInfo" posX="501" posY="928" text="To UCPD1 (MHz)" refEnable="UCPD1Enable"/>
 
     <!-- freq value label -->
     <Label id="HCLK1" type="SpecialInfo" posX="1550" posY="513" text="HCLK to AHB bus, core, memory and DMA (MHz)"/>
@@ -1361,10 +1355,10 @@
     <Label id="HSIRCLabel"    type="info"       posX="302" posY="490" text="HSI RC"/>
     <Label id="HSIRCCstLabel" type="constraint" posX="302" posY="530" text="16 MHz"/>   
 	
-    <Label id="HSI48RCLabel"    type="info"       posX="302" posY="1198" text="HSI48 RC"/>
+    <Label id="HSI48RCLabel"    type="info"       posX="302" posY="1204" text="HSI48 RC"/>
     <Label id="HSI48RCCstLabel" type="constraint" posX="302" posY="1246" text="48 MHz"/> 
     
-    <Label id="SHSIRCLabel"    type="info"       posX="302" posY="1298" text="SHSI RC">
+    <Label id="SHSIRCLabel"    type="info"       posX="302" posY="1304" text="SHSI RC">
         <Condition Diagnostic="" Expression="SAES_Exist"/>
     </Label>
     <Label id="SHSIRCCstLabel" type="constraint" posX="302" posY="1346" text="48 MHz">
@@ -1656,29 +1650,26 @@
     <Label id="USBPHYHSIQLabel"  type="signal"       text="PLL1P"            posX="1262" posY="1760" refEnable="USBPHYEnable"/>
     <Label id="USBPHYMSIKQLabel"  type="signal"      text="PLL1P"           posX="1222" posY="1785" refEnable="USBPHYEnable"/>
     <!--clk48 mux-->
-    <Label id="clk48MUXLabel"    type="muxLabel"    text="CLK48 Clock Mux"    posX="865" posY="495" refEnable="USBEnable,SDMMCEnable">
-        <Condition Diagnostic="" Expression="SDMMC1_Exist | SDMMC2_Exist | USB_OTG_FS_Exist"/>
+    <Label id="clk48MUXLabel"    type="muxLabel"    text="CLK48 Clock Mux"    posX="865" posY="495" refEnable="SDMMCEnable">
+        <Condition Diagnostic="" Expression="SDMMC1_Exist | SDMMC2_Exist"/>
     </Label>
-    <Label id="clk48Output"      type="SpecialInfo" text="To USB (MHz)"       posX="1113" posY="533" refEnable="USBEnable">
-        <Condition Diagnostic="" Expression="SDMMC1_Exist | SDMMC2_Exist | USB_OTG_FS_Exist"/>
+    <Label id="clk48Output"      type="SpecialInfo" text="To CK48 (MHz)"       posX="1113" posY="563" refEnable="SDMMCEnable"/>
+    <Label id="clk48SYSCLKLabel" type="signal"      text="PLL2Q"           posX="858" posY="517" refEnable="SDMMCEnable">
+        <Condition Diagnostic="" Expression="SDMMC1_Exist | SDMMC2_Exist"/>
     </Label>
-    <Label id="clk48Output"      type="SpecialInfo" text="To CK48 (MHz)"       posX="1113" posY="563" refEnable="USBEnable,SDMMCEnable"/>
-    <Label id="clk48SYSCLKLabel" type="signal"      text="PLL2Q"           posX="858" posY="517" refEnable="USBEnable,SDMMCEnable">
-        <Condition Diagnostic="" Expression="SDMMC1_Exist | SDMMC2_Exist | USB_OTG_FS_Exist"/>
+    <Label id="clk48HSILabel"    type="signal"      text="PLL1Q"               posX="858" posY="542" refEnable="SDMMCEnable">
+        <Condition Diagnostic="" Expression="SDMMC1_Exist | SDMMC2_Exist"/>
     </Label>
-    <Label id="clk48HSILabel"    type="signal"      text="PLL1Q"               posX="858" posY="542" refEnable="USBEnable,SDMMCEnable">
-        <Condition Diagnostic="" Expression="SDMMC1_Exist | SDMMC2_Exist | USB_OTG_FS_Exist"/>
+    <Label id="clk48PCLK1Label"  type="signal"      text="MSIK"                posX="858" posY="567" refEnable="SDMMCEnable">
+        <Condition Diagnostic="" Expression="SDMMC1_Exist | SDMMC2_Exist"/>
     </Label>
-    <Label id="clk48PCLK1Label"  type="signal"      text="MSIK"                posX="858" posY="567" refEnable="USBEnable,SDMMCEnable">
-        <Condition Diagnostic="" Expression="SDMMC1_Exist | SDMMC2_Exist | USB_OTG_FS_Exist"/>
-    </Label>
-    <Label id="clk48PCLK1Label"  type="signal"      text="HSI48"              posX="858" posY="590" refEnable="USBEnable,SDMMCEnable">
-        <Condition Diagnostic="" Expression="SDMMC1_Exist | SDMMC2_Exist | USB_OTG_FS_Exist"/>
+    <Label id="clk48PCLK1Label"  type="signal"      text="HSI48"              posX="858" posY="590" refEnable="SDMMCEnable">
+        <Condition Diagnostic="" Expression="SDMMC1_Exist | SDMMC2_Exist"/>
     </Label>
     <!--ADC mux-->
     <Label id="ADCMUXLabel"    type="muxLabel"    text="DAC Clock Mux"  posX="865" posY="655" refEnable="DACEnable"/>
-    <Label id="ADCOutput"      type="SpecialInfo" text="To DAC sample and"   posX="1113" posY="696" refEnable="DACEnable"/> 	
-    <Label id="ADCOutput"      type="SpecialInfo" text="hold clock(MHz)"   posX="1113" posY="713" refEnable="DACEnable"/>
+    <Label id="ADCOutput"      type="SpecialInfo" text="To DAC Sample and"   posX="1113" posY="696" refEnable="DACEnable"/> 	
+    <Label id="ADCOutput"      type="SpecialInfo" text="Hold Clock(MHz)"   posX="1113" posY="713" refEnable="DACEnable"/>
     <Label id="ADCSYSCLKLabel" type="signal"      text="LSE"       posX="858" posY="677" refEnable="DACEnable"/>
     <Label id="ADCPCLK1Label"  type="signal"      text="LSI"         posX="858" posY="717" refEnable="DACEnable"/>
 	
@@ -1771,10 +1762,4 @@
     <BButton id="CSSLSEEnable" text="CSS" refParameter="EnableCSSLSE" x="525" y="273">
 
     </BButton>
-
-	
- 
-
 </Clock>
-
-

@@ -556,7 +556,7 @@ static void MX_AutonomousMode_DeInit(void)
         [/#list]
         [#if ipCLOCK?? && !periph?starts_with("LPDMA") && !periph?starts_with("GPIO") && !periph?starts_with("NVIC") && !periph?starts_with("TAMP") && periph!="PWR"]
             [#list ipCLOCK as clk]
-                [#if clk!="none" && clk!="__HAL_RCC_RTC_ENABLE"]
+                [#if clk!="none" && clk!="__HAL_RCC_RTC_ENABLE" && clk!="__HAL_RCC_RTCAPB_CLKAM_ENABLE"]
                     [#if !allClocks?contains(clk?replace("CLK_", "CLKAM_")?replace("VREFBUF", "VREF"))]                        
 #t/* Disable ${periph} Sleep Clock */
 #t${clk?replace("CLK_ENABLE", "CLK_SLEEP_DISABLE")?replace("VREFBUF", "VREF")}();

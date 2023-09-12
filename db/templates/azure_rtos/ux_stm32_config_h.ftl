@@ -32,7 +32,7 @@ extern "C" {
 #define UX_HCD_STM32_MAX_NB_CHANNELS          12
 [/#if]
 
-[#if DIE=="DIE481"]
+[#if DIE=="DIE481" || DIE=="DIE476"]
 #define UX_DCD_STM32_MAX_ED                   9
 #define UX_HCD_STM32_MAX_NB_CHANNELS          16
 [/#if]

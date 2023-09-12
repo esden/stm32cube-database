@@ -44,7 +44,7 @@ static bool rfts_window_req_pending = FALSE;
 static UTIL_TIMER_Object_t rfts_timer;
 
 /**
-  * @brief SNPS FW LL external event handler
+  * @brief Firmware Link Layer external event handler
   */
 static ext_evnt_hndl_t ext_event_handler;
 
@@ -57,7 +57,7 @@ static uint32_t event_started_callback(ext_evnt_hndl_t evnt_hndl, uint32_t slot_
 /* Functions Definition ------------------------------------------------------*/
 
 /**
-  * @brief  Request a time window to the SNPS FW LL
+  * @brief  Request a time window to the Firmware Link Layer
   * @param  duration: Duration in us of the time window requested
   * @param  Callback: Callback to be called when time window is allocated
   * @retval RFTS_Cmd_Status_t: Success or failure of the window request
@@ -91,7 +91,7 @@ RFTS_Cmd_Status_t RFTS_ReqWindow(uint32_t Duration, void (*Callback)(void))
   /* Register requester's callback */
   req_callback = Callback;
 
-  /* Submit request to SNPS FW LL */
+  /* Submit request to Firmware Link Layer */
   extrnl_evnt_config.deadline = 0;
   extrnl_evnt_config.strt_min = 0;
   extrnl_evnt_config.strt_max = 0;
@@ -136,7 +136,7 @@ RFTS_Cmd_Status_t RFTS_RelWindow(void)
   /* Stop RFTS module window overrun control timer */
   UTIL_TIMER_Stop(&rfts_timer);
 
-  /* Inform SNPS FW LL that time window can be released */
+  /* Inform Firmware Link Layer that time window can be released */
   if (evnt_schdlr_gnrc_evnt_cmplt(ext_event_handler) == 0)
   {
     status = RFTS_CMD_OK;
@@ -157,7 +157,7 @@ RFTS_Cmd_Status_t RFTS_RelWindow(void)
 }
 
 /**
-  * @brief  Callback called by SNPS FW LL when a time window is available
+  * @brief  Callback called by Firmware Link Layer when a time window is available
   * @note   This callback is supposed to be called under interrupt
   * @param  None
   * @retval None

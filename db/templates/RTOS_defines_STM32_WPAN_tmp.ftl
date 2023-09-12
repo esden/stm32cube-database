@@ -1,0 +1,15 @@
+[#ftl]
+[#assign STM32_WPAN_APP_MEM_POOL_SIZE = "4096"]
+[#if SWIPdatas??]
+    [#list SWIPdatas as SWIP]
+        [#if SWIP.defines??]
+            [#list SWIP.defines as definition]
+                [#if definition.name == "STM32_WPAN_APP_MEM_POOL_SIZE"]
+                    [#assign STM32_WPAN_APP_MEM_POOL_SIZE = definition.value]
+                [/#if]
+            [/#list]
+        [/#if]
+    [/#list]
+[/#if]
+
+#define STM32_WPAN_APP_MEM_POOL_SIZE                ${STM32_WPAN_APP_MEM_POOL_SIZE}

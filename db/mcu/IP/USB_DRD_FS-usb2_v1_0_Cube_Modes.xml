@@ -11,8 +11,14 @@
 	<!-- Generic RefParameters for USB Full Speed Device Mode -->
 	<RefParameter Name="Instance" DefaultValue="USB_DRD_FS" Comment="Instance" Type="" Visible="false"/>
 			
-	<RefParameter Comment="Speed" DefaultValue="USBD_FS_SPEED" Name="DeviceSpeed" Type="List" Group="Basic Parameters">			
-		<PossibleValue Comment="Full Speed 12MBit/s" Value="USBD_FS_SPEED"/>	
+	<RefParameter Comment="Speed" DefaultValue="PCD_SPEED_FULL" Name="DeviceSpeed" Type="List" Group="Basic Parameters">			
+		<PossibleValue Comment="Full Speed 12MBit/s" Value="PCD_SPEED_FULL"/>	
+		<Condition Expression="MW_USB_DRD_FS_MW_DEVICE" Diagnostic=""/>					
+	</RefParameter>
+	
+	<RefParameter Comment="Speed" DefaultValue="HCD_SPEED_FULL" Name="DeviceSpeed" Type="List" Group="Basic Parameters">			
+		<PossibleValue Comment="Full Speed 12MBit/s" Value="HCD_SPEED_FULL"/>	
+		<Condition Expression="MW_USB_DRD_FS_MW_HOST" Diagnostic=""/>					
 	</RefParameter>
 	
 	<RefParameter Comment="Device endpoints number" DefaultValue="8" Name="dev_endpoints" Min="1" Max="8" Type="integer" Group="" Visible="false">				
@@ -27,11 +33,15 @@
 	</RefParameter>
 	
     <!-- Parameters Sof_enable --> 
-    <RefParameter Comment="Signal start of frame" DefaultValue="DISABLE" Name="Sof_enable" Type="List" Group="Basic Parameters">
-        <PossibleValue Value="ENABLE" Comment="Enabled"/>
-        <PossibleValue Value="DISABLE" Comment="Disabled"/>
-    </RefParameter>
-	<RefParameter Comment="Sof Enable" DefaultValue="DISABLE" Name="Sof_enable" Type="List" Group="Basic Parameters" Visible="false"/>		
+	<RefParameter Comment="Signal start of frame " DefaultValue="ENABLE" Name="Sof_enable" Type="List" Group="Basic Parameters">
+		<PossibleValue Value="ENABLE" Comment="Enabled"/>
+		<Condition Expression="USB_FS_SOF" Diagnostic=""/>
+	</RefParameter>
+	<!-- Bug381221 -->
+	<RefParameter Comment="Signal start of frame " DefaultValue="DISABLE" Name="Sof_enable" Type="List" Group="Basic Parameters" Visible="true">
+		<PossibleValue Value="ENABLE" Comment="Enabled"/>
+		<PossibleValue Value="DISABLE" Comment="Disabled"/>
+	</RefParameter>
 	
 	<RefParameter Comment="Low Power" DefaultValue="DISABLE" Name="low_power_enable" Type="List" Group="Power Parameters" Visible="true">
 		<PossibleValue Value="ENABLE" Comment="Enabled" Semaphore="$IpInstance_INTERRUPT_WAKEUP_ON"/>
@@ -79,7 +89,10 @@
 		</Parameter>			
 		<Parameter Name="low_power_enable"/>
 		<Parameter Name="lpm_enable"/>
-		<Parameter Name="battery_charging_enable"/>			
+		<Parameter Name="battery_charging_enable"/>		
+		<Parameter Name="bulk_doublebuffer_enable"/>
+		<Parameter Name="iso_singlebuffer_enable"/>
+		<Parameter Name="Sof_enable"/>
 	</RefMode>
 	
 	<RefMode Name="Host" HalMode="HCD">
@@ -90,17 +103,12 @@
 			<PossibleValue>HCD_PHY_EMBEDDED</PossibleValue>
 		</Parameter>		
 		<Parameter Name="low_power_enable"/>	
-		<Parameter Name="lpm_enable"/>
-		<Parameter Name="battery_charging_enable"/>			
 		<Parameter Name="bulk_doublebuffer_enable"/>
-		<Parameter Name="iso_singlebuffer_enable"/>	     
+		<Parameter Name="iso_singlebuffer_enable"/>
+		<Parameter Name="Sof_enable"/>
 	</RefMode>
 	
-    <RefMode Name="Activate_SOF_FS" HalMode="">
-        <Parameter Name="Sof_enable">
-            <PossibleValue>ENABLE</PossibleValue>
-        </Parameter>
-    </RefMode>
+    <RefMode Name="Activate_SOF_FS" HalMode=""/>
 
 	<ModeLogicOperator Name="OR">
 		<Mode Name="Mode">

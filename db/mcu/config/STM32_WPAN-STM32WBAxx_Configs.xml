@@ -38,7 +38,6 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <ConfigFile Name="HW_H"/>
     <!-- System/Interfaces - src -->
         <ConfigFile Name="HW_AES_C"/>
-        <!-- <ConfigFile Name="HW_INIT_C"/> -->
         <!-- <ConfigFile Name="HW_PKA_P256_C"/> -->
         <ConfigFile Name="HW_OTP_C"/>
         <ConfigFile Name="HW_PKA_C"/>
@@ -50,10 +49,8 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
     <!-- System/Modules - inc -->
         <ConfigFile Name="ADC_CTRL_H"/>
         <ConfigFile Name="WBA_STM32WBAXX_RESETHANDLER_S"/>
-        <ConfigFile Name="APP_SYS_H"/>
         <ConfigFile Name="BLE_TIMER_H"/>
         <ConfigFile Name="DEBUG_TRACE_H"/>
-        <ConfigFile Name="GENERAL_CONFIG_H"/>
         <ConfigFile Name="OTP_H"/>
         <ConfigFile Name="SCM_H"/>
         <ConfigFile Name="STM_LIST_H"/>
@@ -97,6 +94,17 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <ConfigFile Name="LOCAL_DEBUG_TABLES_H"/>
         <ConfigFile Name="RTDEBUG_H"/>
         <ConfigFile Name="RTDEBUG_C"/>
+        <ConfigFile Name="RTDEBUG_DTB_H"/>
+        <ConfigFile Name="RTDEBUG_DTB_C"/>
+    <!-- System/Modules/RFControl - src & inc -->
+        <ConfigFile Name="RF_CONTROL_ANTSW_H"/>
+        <ConfigFile Name="RF_CONTROL_ANTSW_C"/>
+	<!-- System/Config/LowPower - src & inc -->
+        <ConfigFile Name="APP_SYS_H"/>
+        <ConfigFile Name="USER_LOW_POWER_CONFIG_H"/>
+        <ConfigFile Name="USER_LOW_POWER_CONFIG_C"/>
+        <!-- <ConfigFile Name="PERIPHERAL_INIT_H"/> -->
+        <!-- <ConfigFile Name="PERIPHERAL_INIT_C"/> -->
     <!-- System/Config/Debug_GPIO - src & inc -->
         <ConfigFile Name="APP_DEBUG_C"/>
         <ConfigFile Name="APP_DEBUG_H"/>
@@ -114,10 +122,6 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
     <!-- STM32WPAN/Target - src & inc -->
         <ConfigFile Name="BLEPLAT_C"/>
         <ConfigFile Name="POWER_TABLE_C"/>
-        <!-- <ConfigFile Name="BLE_DBG_IF_C"/> -->
-        <!-- <ConfigFile Name="BLE_DDB_IF_C"/> -->
-        <!-- <ConfigFile Name="BLE_MM_IF_C"/> -->
-        <!-- <ConfigFile Name="CRYPTO_PKA_C"/> -->
         <ConfigFile Name="BPKA_C"/>
         <ConfigFile Name="BPKA_H"/>
         <ConfigFile Name="LINKLAYER_PLAT_C"/>
@@ -142,12 +146,20 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <ConfigFile Name="BLE_SERVICE0_APP_C"/>
         <ConfigFile Name="BLE_SERVICE0_APP_H"/>
 
+    <!--  THREAD -->
+        <ConfigFile Name="THREAD_APP_THREAD_C"/>
+        <ConfigFile Name="THREAD_APP_THREAD_H"/>
+    <!--  ZIGBEE -->
+        <ConfigFile Name="ZGB_ZCL_CALLBACKS"/>
+        <ConfigFile Name="ZIGBEE_APP_ZIGBEE_C"/> 
+        <ConfigFile Name="ZIGBEE_APP_ZIGBEE_H"/>
+
     <!-- List of pre-processor defines -->
-        <Defines Name="USE_FULL_ASSERT"/>
+        <!-- <Defines Name="USE_FULL_ASSERT"/> -->
         <Defines Name="USE_FULL_LL_DRIVER"/>
         <Defines Name="PHY_2_10_a"/>
         <Defines Name="PHY_40nm_2_30_a_A1"/>
-        <Defines Name="NVM_ADAPT"/>
+        <!-- <Defines Name="NVM_ADAPT"/> -->
         <!-- <Defines Name="MBEDTLS_NO_PLATFORM_ENTROPY"/> -->
         <!-- <Defines Name="MBEDTLS_CONFIG_FILE" Value="&lt;crypto_config.h&gt;"/> -->
         <Defines Name="BLE" Condition="S_BLE_HOST | S_BLE_HOST_SKELETON"/>
@@ -175,7 +187,8 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
 
     <RefComponent Cclass="Middleware" Cgroup="WPAN_LINK_LAYER" Cversion="1.0.0">
         <!-- Header files for link_layer -->
-        <File Category="header" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/config/ble_basic/ll_fw_config.h"/>
+        <File Category="header" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/config/ble_basic/ll_fw_config.h" Condition="Semaphore_BLE_STACK_TYPE_BASIC"/>
+        <File Category="header" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/config/ble_full/ll_fw_config.h" Condition="Semaphore_BLE_STACK_TYPE_FULL"/>
         <File Category="header" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/inc/*.h"/> <!-- ok -->
         <File Category="header" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/inc/*"/>
         <File Category="header" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/inc/_40nm_reg_files/*.h"/>
@@ -342,8 +355,9 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <Argument Name="ZIGBEE" GenericType="Simple"/>
         <Argument Name="ZIGBEE_SKELETON" GenericType="Simple"/>
         <Argument Name="CFG_TX_POWER" GenericType="Simple"/>
-        <Argument Name="CFG_ADV_BD_ADDRESS" GenericType="Simple"/>
-        <Argument Name="CFG_BLE_ADDRESS_TYPE" GenericType="Simple"/>
+        <Argument Name="CFG_BD_ADDRESS" GenericType="Simple"/>
+        <Argument Name="CFG_BD_ADDRESS_TYPE" GenericType="Simple"/>
+        <Argument Name="CFG_GAP_APPEARANCE" GenericType="Simple"/>
         <Argument Name="ADV_TYPE" GenericType="Simple"/>
         <Argument Name="CFG_STATIC_RANDOM_ADDRESS" GenericType="Simple"/>
         <Argument Name="STATIC_RANDOM_ADDRESS" GenericType="Simple"/>
@@ -368,18 +382,23 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <Argument Name="CFG_BLE_NUM_LINK" GenericType="Simple"/>
         <Argument Name="CFG_BLE_NUM_GATT_SERVICES" GenericType="Simple"/>
         <Argument Name="CFG_BLE_NUM_GATT_ATTRIBUTES" GenericType="Simple"/>
-        <Argument Name="CFG_BLE_MAX_ATT_MTU" GenericType="Simple"/>
+        <Argument Name="CFG_BLE_ATT_MTU_MAX" GenericType="Simple"/>
         <Argument Name="CFG_BLE_ATT_VALUE_ARRAY_SIZE" GenericType="Simple"/>
         <Argument Name="CFG_BLE_ATTR_PREPARE_WRITE_VALUE_SIZE" GenericType="Simple"/>
         <Argument Name="CFG_BLE_MBLOCK_COUNT_MARGIN" GenericType="Simple"/>
-        <Argument Name="CFG_BLE_MAX_COC_NUMBER" GenericType="Simple"/>
-        <Argument Name="CFG_BLE_MAX_COC_MPS" GenericType="Simple"/>
-        <Argument Name="CFG_BLE_MAX_COC_INITIATOR_NBR" GenericType="Simple"/>
+        <Argument Name="CFG_BLE_COC_NBR_MAX" GenericType="Simple"/>
+        <Argument Name="CFG_BLE_COC_MPS_MAX" GenericType="Simple"/>
+        <Argument Name="CFG_BLE_COC_INITIATOR_NBR_MAX" GenericType="Simple"/>
         <Argument Name="CFG_BLE_OPTIONS" GenericType="Simple"/>
-        <Argument Name="CFG_BLE_OPTIONS_LL" GenericType="Simple"/>
-        <Argument Name="CFG_BLE_OPTIONS_SVC" GenericType="Simple"/>
-        <Argument Name="CFG_BLE_OPTIONS_DEVICE_NAME" GenericType="Simple"/>
-        <Argument Name="CFG_BLE_OPTIONS_POWER_CLASS" GenericType="Simple"/>
+        <Argument Name="BLE_OPTIONS_LL_ONLY" GenericType="Simple"/>
+        <Argument Name="BLE_OPTIONS_NO_SVC_CHANGE_DESC" GenericType="Simple"/>
+        <Argument Name="BLE_OPTIONS_DEV_NAME_READ_ONLY" GenericType="Simple"/>
+        <Argument Name="BLE_OPTIONS_EXTENDED_ADV" GenericType="Simple"/>
+        <Argument Name="BLE_OPTIONS_REDUCED_DB_IN_NVM" GenericType="Simple"/>
+        <Argument Name="BLE_OPTIONS_GATT_CACHING" GenericType="Simple"/>
+        <Argument Name="BLE_OPTIONS_POWER_CLASS_1" GenericType="Simple"/>
+        <Argument Name="BLE_OPTIONS_APPEARANCE_WRITABLE" GenericType="Simple"/>
+        <!-- <Argument Name="BLE_OPTIONS_ENHANCED_ATT" GenericType="Simple"/> -->
         <Argument Name="CFG_BLE_MAX_DDB_ENTRIES" GenericType="Simple"/>
         <Argument Name="CFG_FULL_LOW_POWER" GenericType="Simple"/>
         <Argument Name="CFG_LPM_SUPPORTED" GenericType="Simple"/>
@@ -391,10 +410,8 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <Argument Name="DBG_TRACE_USE_CIRCULAR_QUEUE" GenericType="Simple"/>
         <Argument Name="DBG_TRACE_MSG_QUEUE_SIZE" GenericType="Simple"/>
         <Argument Name="SYS_MAX_MSG" GenericType="Simple"/>
-        <Argument Name="INITIAL_ADV_TIMEOUT" GenericType="Simple"/>
         <Argument Name="APPLI_CONFIG_LOG_LEVEL" GenericType="Simple"/>
         <Argument Name="APPLI_PRINT_FILE_FUNC_LINE" GenericType="Simple"/>
-        <Argument Name="CFG_NVM_ALIGN" GenericType="Simple"/>
         <Argument Name="RT_DEBUG_GPIO_MODULE" GenericType="Simple"/>
         <Argument Name="USE_RADIO_LOW_ISR" GenericType="Simple"/>
         <Argument Name="NEXT_EVENT_SCHEDULING_FROM_ISR" GenericType="Simple"/>
@@ -477,8 +494,11 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <Argument Name="BLE_MODE_PERIPHERAL_CENTRAL" GenericType="Simple"/>
         <Argument Name="BLE_MODE_PERIPHERAL" GenericType="Simple"/>
         <Argument Name="BLE" GenericType="Simple"/>
+        <Argument Name="BLE_MODE_SKELETON" GenericType="Simple"/>
         <Argument Name="THREAD" GenericType="Simple"/>
+        <Argument Name="THREAD_SKELETON" GenericType="Simple"/>
         <Argument Name="ZIGBEE" GenericType="Simple"/>
+        <Argument Name="ZIGBEE_SKELETON" GenericType="Simple"/>
         <Argument Name="CFG_AMM_VIRTUAL_MEMORY_NUMBER" GenericType="Simple"/>
         <Argument Name="CFG_AMM_VIRTUAL_ID_NBR_1" GenericType="Simple"/>
         <Argument Name="CFG_AMM_VIRTUAL_ID_NAME_1" GenericType="Simple"/>
@@ -542,10 +562,6 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <File Category="source" Condition="all" Name="hw_aes.c" Version="1.0"/>
     </RefConfigFile>
 
-    <RefConfigFile Description="" Name="HW_INIT_C" Template="stm32wba/stm32_wpan_hw_init_c.ftl" destinationFolder="System/Interfaces/">
-        <File Category="source" Condition="all" Name="hw_init.c" Version="1.0"/>
-    </RefConfigFile>
-
     <RefConfigFile Description="" Name="HW_OTP_C" Template="stm32wba/stm32_wpan_hw_otp_c.ftl" destinationFolder="System/Interfaces/">
         <File Category="source" Condition="all" Name="hw_otp.c" Version="1.0"/>
     </RefConfigFile>
@@ -592,10 +608,6 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <File Category="header" Condition="all" Name="dbg_trace.h" Version="1.0"/>
     </RefConfigFile>
 
-    <RefConfigFile Description="" Name="GENERAL_CONFIG_H" Template="stm32wba/stm32_wpan_general_config_h.ftl" destinationFolder="System/Modules/">
-        <File Category="header" Condition="all" Name="general_config.h" Version="1.0"/>
-    </RefConfigFile>
-
     <RefConfigFile Description="" Name="OTP_H" Template="stm32wba/stm32_wpan_otp_h.ftl" destinationFolder="System/Modules/">
         <File Category="header" Condition="all" Name="otp.h" Version="1.0"/>
     </RefConfigFile>
@@ -629,6 +641,11 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
 
     <RefConfigFile Description="" Name="BLE_TIMER_C" Template="stm32wba/stm32_wpan_ble_timer_c.ftl" destinationFolder="System/Modules/">
         <File Category="source" Condition="all" Name="ble_timer.c" Version="1.0"/>
+        <!-- ftl specific items begin-->
+        <Argument Name="FREERTOS_STATUS" GenericType="Simple" Comment="0 to 1 (0 by default)"/>
+        <Argument Name="THREADX_STATUS" GenericType="Simple" Comment="0 to 1 (0 by default)"/>
+        <Argument Name="SEQUENCER_STATUS" GenericType="Simple" Comment="0 to 1 (0 by default)"/>
+        <!-- ftl specific items end-->
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="OTP_C" Template="stm32wba/stm32_wpan_otp_c.ftl" destinationFolder="System/Modules/">
@@ -754,6 +771,24 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <File Category="source" Condition="all" Name="RTDebug.c" Version="1.0"/>
     </RefConfigFile>
 
+    <RefConfigFile Description="" Name="RTDEBUG_DTB_H" Template="stm32wba/stm32_wpan_RTDebug_dtb_h.ftl" destinationFolder="System/Modules/RTDebug/">
+        <File Category="header" Condition="all" Name="RTDebug_dtb.h" Version="1.0"/>
+    </RefConfigFile>
+
+    <RefConfigFile Description="" Name="RTDEBUG_DTB_C" Template="stm32wba/stm32_wpan_RTDebug_dtb_c.ftl" destinationFolder="System/Modules/RTDebug/">
+        <File Category="source" Condition="all" Name="RTDebug_dtb.c" Version="1.0"/>
+    </RefConfigFile>
+	
+<!-- System/Modules/RFControl - src & inc -->
+
+    <RefConfigFile Description="" Name="RF_CONTROL_ANTSW_H" Template="stm32wba/stm32_wpan_rf_antenna_switch_h.ftl" destinationFolder="System/Modules/RFControl/">
+        <File Category="header" Condition="all" Name="rf_antenna_switch.h" Version="1.0"/>
+    </RefConfigFile>
+
+    <RefConfigFile Description="" Name="RF_CONTROL_ANTSW_C" Template="stm32wba/stm32_wpan_rf_antenna_switch_c.ftl" destinationFolder="System/Modules/RFControl/">
+        <File Category="source" Condition="all" Name="rf_antenna_switch.c" Version="1.0"/>
+    </RefConfigFile>
+
 <!-- System/Startup - startup files -->
 
     <RefConfigFile Description="" Name="WBA_STM32WBAXX_RESETHANDLER_S" Template="stm32wba/stm32wbaxx_ResetHandler_s.ftl" destinationFolder="System/Startup/">
@@ -766,6 +801,27 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
     <!-- <RefConfigFile Description="" Name="WBA_STM32WBAXX_RESETHANDLER_MDK-ARM_S" Template="stm32wba/stm32wbaxx_ResetHandler_MDK-ARM_s.ftl" destinationFolder="System/Startup/"> -->
         <!-- <File Category="header" Condition="SIiTcompilerIiARMCC" Name="stm32wbaxx_ResetHandler_MDK-ARM.s" Version="1.0"/> -->
     <!-- </RefConfigFile> -->
+
+<!-- System/Config/LowPower - src & inc -->
+    <RefConfigFile Description="" Name="APP_SYS_H" Template="stm32wba/stm32_wpan_app_sys_h.ftl" destinationFolder="System/Config/LowPower/">
+        <File Category="header" Condition="all" Name="app_sys.h" Version="1.0"/>
+    </RefConfigFile>
+
+    <RefConfigFile Description="" Name="USER_LOW_POWER_CONFIG_H" Template="stm32wba/stm32_wpan_user_low_power_config_h.ftl" destinationFolder="System/Config/LowPower/">
+        <File Category="header" Condition="all" Name="user_low_power_config.h" Version="1.0"/>
+    </RefConfigFile>
+
+    <RefConfigFile Description="" Name="USER_LOW_POWER_CONFIG_C" Template="stm32wba/stm32_wpan_user_low_power_config_c.ftl" destinationFolder="System/Config/LowPower/">
+        <File Category="source" Condition="all" Name="user_low_power_config.c" Version="1.0"/>
+    </RefConfigFile>
+
+    <RefConfigFile Description="" Name="PERIPHERAL_INIT_H" Template="stm32wba/stm32_wpan_peripheral_init_h.ftl" destinationFolder="System/Config/LowPower/">
+        <File Category="header" Condition="all" Name="peripheral_init.h" Version="1.0"/>
+    </RefConfigFile>
+
+    <RefConfigFile Description="" Name="PERIPHERAL_INIT_C" Template="stm32wba/stm32_wpan_peripheral_init_c.ftl" destinationFolder="System/Config/LowPower/">
+        <File Category="source" Condition="all" Name="peripheral_init.c" Version="1.0"/>
+    </RefConfigFile>
 
 <!-- System/Config/Debug_GPIO - src & inc -->
 
@@ -783,10 +839,6 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
 
     <RefConfigFile Description="" Name="DEBUG_CONFIG_H" Template="stm32wba/stm32_wpan_debug_config_h.ftl" destinationFolder="System/Config/Debug_GPIO/">
         <File Category="header" Condition="all" Name="debug_config.h" Version="1.0"/>
-    </RefConfigFile>
-
-    <RefConfigFile Description="" Name="APP_SYS_H" Template="stm32wba/stm32_wpan_app_sys_h.ftl" destinationFolder="System/Config/LowPower/">
-        <File Category="header" Condition="all" Name="app_sys.h" Version="1.0"/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="SIMPLE_NVM_ARBITER_CONF_H" Template="stm32wba/stm32_wpan_reduced_simple_nvm_arbiter_conf_h.ftl" destinationFolder="System/Config/Flash/">
@@ -841,11 +893,9 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <Argument Name="BLE_MODE_CENTRAL" GenericType="Simple"/>
         <Argument Name="BLE_MODE_PERIPHERAL_CENTRAL" GenericType="Simple"/>
         <Argument Name="BLE_STACK_TYPE" GenericType="Simple"/>
-        <Argument Name="CUSTOM_P2P_SERVER" GenericType="Simple"/>
         <Argument Name="BLE_MODE_PERIPHERAL" GenericType="Simple"/>
-        <Argument Name="P2P_SERVER_NUMBER" GenericType="Simple"/>
         <Argument Name="ADV_TYPE" GenericType="Simple"/>
-        <Argument Name="CFG_BLE_ADDRESS_TYPE" GenericType="Simple"/>
+        <Argument Name="CFG_BD_ADDRESS_TYPE" GenericType="Simple"/>
         <Argument Name="ADV_FILTER" GenericType="Simple"/>
         <!-- <Argument Name="GAP_PERIPHERAL_ROLE" GenericType="Simple"/> -->
         <!-- <Argument Name="GAP_BROADCASTER_ROLE" GenericType="Simple"/> -->
@@ -981,6 +1031,21 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <Argument Name="SERVICE8_SHORT_NAME" GenericType="Simple"/>
         <Argument Name="SERVICE9_SHORT_NAME" GenericType="Simple"/>
         <Argument Name="SERVICE10_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE11_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE12_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE13_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE14_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE15_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE16_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE17_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE18_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE19_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE20_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE21_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE22_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE23_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE24_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE25_SHORT_NAME" GenericType="Simple"/>
         <Argument Name="SERVICE1_LONG_NAME" GenericType="Simple"/>
         <Argument Name="SERVICE2_LONG_NAME" GenericType="Simple"/>
         <Argument Name="SERVICE3_LONG_NAME" GenericType="Simple"/>
@@ -991,6 +1056,21 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <Argument Name="SERVICE8_LONG_NAME" GenericType="Simple"/>
         <Argument Name="SERVICE9_LONG_NAME" GenericType="Simple"/>
         <Argument Name="SERVICE10_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE11_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE12_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE13_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE14_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE15_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE16_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE17_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE18_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE19_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE20_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE21_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE22_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE23_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE24_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE25_LONG_NAME" GenericType="Simple"/>
 
         <!-- ftl specific items end-->
     </RefConfigFile>
@@ -1023,10 +1103,6 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
 
     <RefConfigFile Description="" Name="TL_DBG_CONF_H" Template="stm32wba/stm32_wpan_tl_dbg_conf_h.ftl">
         <File Category="header" Condition="S_BLE_HOST | S_THREAD | S_ZIGBEE" Name="App/tl_dbg_conf.h" Version="1.0"/>
-    </RefConfigFile>
-
-    <RefConfigFile Description="" Name="CRYPTO_CONFIG" Template="stm32wba/stm32_wpan_crypto_config_h.ftl">
-        <File Category="header" Condition="S_BLE_HOST | S_THREAD | S_ZIGBEE" Name="App/crypto_config.h" Version="1.0"/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="BLE_GATT_CLIENT_APP_C" Template="stm32wba/stm32_wpan_ble_gatt_client_app_c.ftl">
@@ -1185,10 +1261,6 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
     <!-- STM32_WPAN/App end -->
 
     <!-- STM32_WPAN/Target begin -->
-    <RefConfigFile Description="" Name="BLE_TIMER_IF_C" Template="stm32wba/stm32_wpan_ble_timer_if_c.ftl" destinationFolder="STM32_WPAN/Target/">
-        <File Category="source" Condition="S_BLE_HOST"  Name="ble_timer_if.c" Version="1.0"/>
-    </RefConfigFile>
-
     <RefConfigFile Description="" Name="BLEPLAT_C" Template="stm32wba/stm32_wpan_ble_bleplat_c.ftl" destinationFolder="STM32_WPAN/Target/">
         <File Category="source" Condition="S_BLE_HOST | S_BLE_HOST_SKELETON"  Name="bleplat.c" Version="1.0"/>
     </RefConfigFile>
@@ -1196,22 +1268,6 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
     <RefConfigFile Description="" Name="POWER_TABLE_C" Template="stm32wba/stm32_wpan_power_table_c.ftl" destinationFolder="STM32_WPAN/Target/">
         <!-- <File Category="source" Condition="S_BLE_HOST | S_THREAD | S_ZIGBEE"  Name="power_table.c" Version="1.0"/> -->
         <File Category="source" Condition="all"  Name="power_table.c" Version="1.0"/>
-    </RefConfigFile>
-
-    <RefConfigFile Description="" Name="BLE_DBG_IF_C" Template="stm32wba/stm32_wpan_ble_dbg_if_c.ftl" destinationFolder="STM32_WPAN/Target/">
-        <File Category="source" Condition="S_BLE_HOST"  Name="ble_dbg_if.c" Version="1.0"/>
-    </RefConfigFile>
-
-    <RefConfigFile Description="" Name="BLE_DDB_IF_C" Template="stm32wba/stm32_wpan_ble_ddb_if_c.ftl" destinationFolder="STM32_WPAN/Target/">
-        <File Category="source" Condition="S_BLE_HOST"  Name="ble_ddb_if.c" Version="1.0"/>
-    </RefConfigFile>
-
-    <RefConfigFile Description="" Name="BLE_MM_IF_C" Template="stm32wba/stm32_wpan_ble_mm_if_c.ftl" destinationFolder="STM32_WPAN/Target/">
-        <File Category="source" Condition="S_BLE_HOST"  Name="ble_mm_if.c" Version="1.0"/>
-    </RefConfigFile>
-
-    <RefConfigFile Description="" Name="CRYPTO_PKA_C" Template="stm32wba/stm32_wpan_crypto_pka_c.ftl" destinationFolder="STM32_WPAN/Target/">
-        <File Category="source" Condition="S_BLE_HOST | S_THREAD | S_ZIGBEE" Name="crypto_pka.c" Version="1.0"/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="LINKLAYER_PLAT_C" Template="stm32wba/stm32_wpan_linklayer_plat_c.ftl" destinationFolder="STM32_WPAN/Target/">
@@ -1291,10 +1347,6 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
     </RefConfigFile>
 
 <!-- Core/inc end -->
-
-    <RefConfigFile Description="" Name="FREERTOS_PORT_C" Template="stm32wba/stm32_wpan_freertos_port_c.ftl" destinationFolder="Core/Src/">
-        <File Category="source" Condition="S_FREERTOS$context" Name="freertos_port.c" Version="1.0"/>
-    </RefConfigFile>
 	
     <RefConfigFile Description="" Name="THREAD_ZGB_STM_LOGGING_C" Template="stm32wba/stm32_wpan_stm_logging_c.ftl" destinationFolder="Core/Src/">
         <File Category="source" Condition="Semaphore_THREAD | Semaphore_ZIGBEE" Name="stm_logging.c" Version="1.0"/>
