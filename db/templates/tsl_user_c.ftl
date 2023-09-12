@@ -439,7 +439,7 @@ CONST TSL_State_T MyTKeys_StateMachine[] =
   /*  6 */ { TSL_STATEMASK_PROX,               TSL_tkey_ProxStateProcess },
   /*  7 */ { TSL_STATEMASK_DEB_PROX,           TSL_tkey_DebProxStateProcess },
   /*  8 */ { TSL_STATEMASK_DEB_PROX_DETECT,    TSL_tkey_DebProxDetectStateProcess },
-  /*  9 */ { TSL_STATEMASK_DEB_PROX_TOUCH,     TSL_tkey_DebProxTouchStateProcess },  
+  /*  9 */ { TSL_STATEMASK_DEB_PROX_TOUCH,     TSL_tkey_DebProxTouchStateProcess },
 #else
   /*  6 */ { TSL_STATEMASK_PROX,               0 },
   /*  7 */ { TSL_STATEMASK_DEB_PROX,           0 },
@@ -1527,7 +1527,7 @@ TSL_Params_T TSL_Params =
   TSLPRM_ACQ_MAX,
   TSLPRM_CALIB_SAMPLES,
   TSLPRM_DTO,
-#if TSLPRM_TOTAL_TKEYS > 0  
+#if TSLPRM_TOTAL_TKEYS > 0
   MyTKeys_StateMachine,   /* Default state machine for TKeys */
   &MyTKeys_Methods,       /* Default methods for TKeys */
 #endif
@@ -1554,9 +1554,9 @@ __IO TSL_tTick_ms_T ECSLastTick; /* Hold the last time value for ECS */
 void tsl_user_Init(void)
 {
   TSL_obj_GroupInit(&MyObjGroup); /* Init Objects */
-  
+
   TSL_Init(MyBanks); /* Init acquisition module */
-  
+
   tsl_user_SetThresholds(); /* Init thresholds for each object individually (optional) */
 }
 
@@ -1612,13 +1612,13 @@ tsl_user_status_t tsl_user_Exec(void)
     /* Reset flags for next banks acquisition */
     idx_bank = 0;
     config_done = 0;
-    
+
     /* Process Objects */
     TSL_obj_GroupProcess(&MyObjGroup);
-    
+
     /* DxS processing (if TSLPRM_USE_DXS option is set) */
     TSL_dxs_FirstObj(&MyObjGroup);
-    
+
     /* ECS every TSLPRM_ECS_DELAY (in ms) */
     if (TSL_tim_CheckDelay_ms(TSLPRM_ECS_DELAY, &ECSLastTick) == TSL_STATUS_OK)
     {
@@ -1646,7 +1646,157 @@ tsl_user_status_t tsl_user_Exec(void)
 
 /* USER CODE END TSL_USER_STATUS_BUSY */
   }
+
+  return status;
+}
+
+/**
+ * Interrupt TSC management. See below code example for 3 sensors in main.c:
+  * while (1)
+  {
+#define TKEY_DET(NB) (MyTKeys[(NB)].p_Data->StateId == TSL_STATEID_DETECT)
+#define TKEY_PRX(NB) (MyTKeys[(NB)].p_Data->StateId == TSL_STATEID_PROX)
+#define TKEY_REL(NB) (MyTKeys[(NB)].p_Data->StateId == TSL_STATEID_RELEASE)
+#define TKEY_CAL(NB) (MyTKeys[(NB)].p_Data->StateId == TSL_STATEID_CALIB)
+    if(tsl_user_Exec_IT() != TSL_USER_STATUS_BUSY){
+      if(!TKEY_CAL(0) && !TKEY_CAL(1) && !TKEY_CAL(2) ){
+        printf("Delta: sensor0 %3d sensor1 %3d sensor2 %3d\n"
+               ,MyTKeys[0].p_ChD->Delta
+               ,MyTKeys[1].p_ChD->Delta
+               ,MyTKeys[2].p_ChD->Delta);
+        if(TKEY_DET(0)){
+          HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_RESET);
+        }else if(TKEY_REL(0)){
+          HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_SET);
+        }
+        if(TKEY_DET(1)){
+          HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, GPIO_PIN_RESET);
+        }else if(TKEY_REL(1)){
+          HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, GPIO_PIN_SET);
+        }
+        if(TKEY_DET(2)){
+          HAL_GPIO_WritePin(LED3_GPIO_Port, LED3_Pin, GPIO_PIN_RESET);
+        }else if(TKEY_REL(2)){
+          HAL_GPIO_WritePin(LED3_GPIO_Port, LED3_Pin, GPIO_PIN_SET);
+        }
+      }
+    }else{
+      HAL_Delay(1); Can be replace by __WFI()
+    }
+  }
+ */
+
+/**
+ * Local variable used for interrupt acquisition mode
+ */
+uint32_t idx_bank_it = 0; // Bank acquisition number (from 0 to TSLPRM_TOTAL_BANKS-1)
+uint32_t config_done_it = 0; // Start first TSC acquisition done using bank 0
+uint32_t acq_done_it = 0; // TSLPRM_TOTAL_BANKS banks acquisition done
+
+/**
+  * @brief  Acquisition completed callback in non blocking mode
+  * @param  htsc: pointer to a TSC_HandleTypeDef structure that contains
+  *         the configuration information for the specified TSC.
+  * @retval None
+  */
+void HAL_TSC_ConvCpltCallback(TSC_HandleTypeDef* htsc)
+{
+/* USER CODE BEGIN HAL_TSC_ConvCpltCallback start*/
+
+/* USER CODE END HAL_TSC_ConvCpltCallback start*/
+  TSL_acq_BankGetResult(idx_bank_it, 0, 0);
+  idx_bank_it++;
+  if (idx_bank_it > TSLPRM_TOTAL_BANKS-1)
+  {
+    // End of all banks acquisition, restart bank 0 in while(1) loop (This is a choice)
+    idx_bank_it=0;
+    acq_done_it++;
+  }else{
+    // We restart next bank acquisition
+    TSL_acq_BankConfig(idx_bank_it);
+    TSL_acq_BankStartAcq_IT();
+  }
+/* USER CODE BEGIN HAL_TSC_ConvCpltCallback*/
+
+/* USER CODE END HAL_TSC_ConvCpltCallback*/
+}
+
+/**
+  * @brief  Execute STMTouch Driver main State machine using TSC Interrupt
+  * @param  None
+  * @retval status Return TSL_STATUS_OK if the acquisition is done
+  */
+tsl_user_status_t tsl_user_Exec_IT(void)
+{
+  tsl_user_status_t status = TSL_USER_STATUS_BUSY;
+
+  /* Configure and start bank acquisition */
+  if (!config_done_it)
+  {
+/* USER CODE BEGIN not config_done start*/
+
+/* USER CODE END not config_done start*/
+    idx_bank_it = 0;
+    acq_done_it = 0;
+    TSL_acq_BankConfig(idx_bank_it);
+    TSL_acq_BankStartAcq_IT();
+    config_done_it = 1;
+/* USER CODE BEGIN not config_done */
+
+/* USER CODE END not config_done */
+  }
+
+  /* Check end of all group acquisitions (interrupt mode) */
+  if (acq_done_it)
+  {
+/* USER CODE BEGIN acq_done_it start*/
+
+/* USER CODE END acq_done_it start*/
+
+    /* Process Objects */
+    TSL_obj_GroupProcess(&MyObjGroup);
+
+    /* DxS processing (if TSLPRM_USE_DXS option is set) */
+    TSL_dxs_FirstObj(&MyObjGroup);
+
+    /* ECS every TSLPRM_ECS_DELAY (in ms) */
+    if (TSL_tim_CheckDelay_ms(TSLPRM_ECS_DELAY, &ECSLastTick) == TSL_STATUS_OK)
+    {
+      if (TSL_ecs_Process(&MyObjGroup) == TSL_STATUS_OK)
+      {
+        status = TSL_USER_STATUS_OK_ECS_ON;
+      }
+      else
+      {
+        status = TSL_USER_STATUS_OK_ECS_OFF;
+      }
+    }
+    else
+    {
+      status = TSL_USER_STATUS_OK_NO_ECS;
+    }
+
+    // Restart TSLPRM_TOTAL_BANKS banks acquisition
+    idx_bank_it = 0;
+    acq_done_it = 0;
+    TSL_acq_BankConfig(idx_bank_it);
+    TSL_acq_BankStartAcq_IT();
+/* USER CODE BEGIN acq_done_it */
+
+/* USER CODE END acq_done_it */
+  }
+  else
+  {
+    status = TSL_USER_STATUS_BUSY;
+/* USER CODE BEGIN TSL_USER_STATUS_BUSY */
+
+/* USER CODE END TSL_USER_STATUS_BUSY */
+  }
   
+/* USER CODE BEGIN Process objects */
+
+/* USER CODE END Process objects */
+
   return status;
 }
 

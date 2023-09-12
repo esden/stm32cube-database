@@ -9,6 +9,20 @@
     </RefConfig>
 
     <RefConfig Name="ADC_RegularConfig" Comment="Common config">
+        <IFCondition Expression ="DIE494" >
+
+            <CallLibMethod Name="" Type="HardCode"  >
+                <HardCode Text="#t            
+            #n#t#define ADC_CHANNEL_CONF_RDY_TIMEOUT_MS ( 1U)
+    #n#t#if (USE_TIMEOUT == 1)     
+    #n#tuint32_t Timeout ; /* Variable used for Timeout management */
+    #n#t#endif /* USE_TIMEOUT */
+    #n
+    #n
+         "/>
+            </CallLibMethod>
+        </IFCondition>
+
         <IFCondition Expression ="1=1" >
 
 		
@@ -27,47 +41,120 @@
                 <MethodArg Name="DataAlignment" ParameterName="DataAlign" />
                 <MethodArg Name="LowPowerMode" ParameterName="LowPowerAutoWait" />
             </CallLibMethod>
-            <CallLibMethod Name="LL_ADC_REG_Init">
-                <MethodArg Name="ADCx" ParameterName="Instance" />
-                <MethodArg Name="TriggerSource" ParameterName="ExternalTrigConv" />
-                <MethodArg Name="SequencerLength" ParameterName="NbrOfConversion" />
-                <MethodArg Name="SequencerDiscont" ParameterName="DiscontinuousConvMode,NbrOfDiscConversion" />
-                <MethodArg Name="ContinuousMode" ParameterName="ContinuousConvMode" />
-                <MethodArg Name="DMATransfer" ParameterName="DMAContinuousRequestsForConfigFile" />
-                <MethodArg Name="Overrun" ParameterName="Overrun" />
-            </CallLibMethod>
+        
+            
 
+            <IFCondition  Expression="DIE494 &amp; Sequencer = FULLY_CONFIGURABLE ">
+                <CallLibMethod Name="LL_ADC_REG_SetSequencerConfigurable">
+                    <MethodArg Name="ADCx" ParameterName="Instance" />
+                    <MethodArg Name="Configurability" ParameterName="Sequencer" />
+                </CallLibMethod>
+           <CallLibMethod Name="" Type="HardCode"  >
+                <HardCode Text="#t
+                #n#t/* Poll for ADC channel configuration ready */
+                #n#t#if (USE_TIMEOUT == 1)
+                #n#tTimeout = ADC_CHANNEL_CONF_RDY_TIMEOUT_MS;
+                #n#t#endif /* USE_TIMEOUT */
+                #n#twhile (LL_ADC_IsActiveFlag_CCRDY(ADC1) == 0)
+                #n#t{
+                #n#t#t#if (USE_TIMEOUT == 1)
+                #n#t#t/* Check Systick counter flag to decrement the time-out value */
+                #n#t#tif (LL_SYSTICK_IsActiveCounterFlag())
+                #n#t#t{
+                #n#t#t#tif(Timeout-- == 0)
+                #n#t#t#t{
+                #n#t#t#t#tError_Handler();
+                #n#t#t#t}
+                #n#t#t}
+                #n#t#t#endif /* USE_TIMEOUT */
+                #n#t}
+                #n#t/* Clear flag ADC channel configuration ready */
+                #n#tLL_ADC_ClearFlag_CCRDY(ADC1);
+                "/>
+           </CallLibMethod>
+            </IFCondition>
+            
+            <IFCondition  Expression="DIE494 &amp; Sequencer = NOT_FULLY_CONFIGURABLE ">
+                <CallLibMethod Name="LL_ADC_REG_SetSequencerConfigurable">
+                    <MethodArg Name="ADCx" ParameterName="Instance" />
+                    <MethodArg Name="Configurability" ParameterName="Sequencer" />
+                </CallLibMethod>       
+            </IFCondition>
+            
+             
+            <IFCondition Expression ="1=1">
+
+                <CallLibMethod Name="LL_ADC_REG_Init">
+                    <MethodArg Name="ADCx" ParameterName="Instance" />
+                    <MethodArg Name="TriggerSource" ParameterName="ExternalTrigConv" />
+                    <MethodArg Name="SequencerLength" ParameterName="NbrOfConversion" />
+                    <MethodArg Name="SequencerDiscont" ParameterName="DiscontinuousConvMode,NbrOfDiscConversion" />
+                    <MethodArg Name="ContinuousMode" ParameterName="ContinuousConvMode" />
+                    <MethodArg Name="DMATransfer" ParameterName="DMAContinuousRequestsForConfigFile" />
+                    <MethodArg Name="Overrun" ParameterName="Overrun" />
+                </CallLibMethod>
+            </IFCondition>
+            <IFCondition Expression="!DIE494">
+
+            <CallLibMethod Name="LL_ADC_SetOverSamplingScope">
+                <MethodArg Name="ADCx" ParameterName="Instance" />
+                <MethodArg Name="OvsScope" ParameterName="OversamplingMode,EnableInjectedOversampling,OversamplingStopReset" />
+            </CallLibMethod>
+            </IFCondition>
             <IFCondition Expression="!(ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE)">
                 <CallLibMethod Name="LL_ADC_REG_SetTriggerEdge">
                     <MethodArg Name="ADCx" ParameterName="Instance" />
                     <MethodArg Name="ExternalTriggerEdge" ParameterName="ExternalTrigConvEdge" />
                 </CallLibMethod>
             </IFCondition>
-
-            <CallLibMethod Name="LL_ADC_SetOverSamplingScope">
+            <IFCondition Expression="DIE494 &amp; Sequencer = NOT_FULLY_CONFIGURABLE ">
+            <CallLibMethod Name="LL_ADC_REG_SetSequencerChAdd">
                 <MethodArg Name="ADCx" ParameterName="Instance" />
-                <MethodArg Name="OvsScope"
-                                   ParameterName="OversamplingMode,EnableInjectedOversampling,OversamplingStopReset" />
-            </CallLibMethod>
-
+                <MethodArg Name="Channel" ParameterName="SelectedChannel" />
+            </CallLibMethod>   
+            <CallLibMethod Name="" Type="HardCode"  >
+                <HardCode Text="#t
+                #n#t/* Poll for ADC channel configuration ready */
+                #n#t#if (USE_TIMEOUT == 1)
+                #n#tTimeout = ADC_CHANNEL_CONF_RDY_TIMEOUT_MS;
+                #n#t#endif /* USE_TIMEOUT */
+                #n#twhile (LL_ADC_IsActiveFlag_CCRDY(ADC1) == 0)
+                #n#t{
+                #n#t#t#if (USE_TIMEOUT == 1)
+                #n#t#t#t/* Check Systick counter flag to decrement the time-out value */
+                #n#t#t#tif (LL_SYSTICK_IsActiveCounterFlag())
+                #n#t#t#t{
+                #n#t#t#t#tif(Timeout-- == 0)
+                #n#t#t#t#t{
+                #n##t#t#t#t#tError_Handler();
+                #n#t#t#t#t}
+                #n#t#t#t}
+                #n#t#t#endif /* USE_TIMEOUT */
+                #n#t}
+                #n#t/* Clear flag ADC channel configuration ready */
+                #n#tLL_ADC_ClearFlag_CCRDY(ADC1);
+                "/>
+            </CallLibMethod>         
+        </IFCondition>
+            
+            <IFCondition Expression="1=1">
             <CallLibMethod Name="LL_ADC_ConfigOverSamplingRatioShift">
                 <MethodArg Name="ADCx" ParameterName="Instance" />
                 <MethodArg Name="Ratio" ParameterName="Ratio" />
                 <MethodArg Name="Shift" ParameterName="RightBitShift" />
             </CallLibMethod>
-
+            
             <CallLibMethod Name="LL_ADC_SetOverSamplingDiscont">
                 <MethodArg Name="ADCx" ParameterName="Instance" />
                 <MethodArg Name="OverSamplingDiscont" ParameterName="TriggeredMode" />
             </CallLibMethod>
-
+            </IFCondition>
             <!-- parameter EOCSelection -->
-            <IFCondition Expression="$Index=1">
+            <IFCondition Expression="!DIE494 &amp; $Index=1">
            <CallLibMethod Name="" Type="HardCode"> 
              <HardCode Text="
   #n#t/* Disable ADC deep power down (enabled by default after reset state) */
-  #n#tLL_ADC_DisableDeepPowerDown(ADC1);
-    
+  #n#tLL_ADC_DisableDeepPowerDown(ADC1);    
   #n#t/* Enable ADC internal voltage regulator */
   #n#tLL_ADC_EnableInternalRegulator(ADC1);
     
@@ -86,11 +173,43 @@
                 />
 	</CallLibMethod>
         </IFCondition>
+            <IFCondition Expression="DIE494 &amp; $Index=1">
+           <CallLibMethod Name="" Type="HardCode"> 
+             <HardCode Text="
+    
+  #n#t/* Enable ADC internal voltage regulator */
+  #n#tLL_ADC_EnableInternalRegulator(ADC1);
+    
+  #n#t/* Delay for ADC internal voltage regulator stabilization.                */
+  #n#t/* Compute number of CPU cycles to wait for, from delay in us.            */
+  #n#t/* Note: Variable divided by 2 to compensate partially                    */
+  #n#t/*       CPU processing cycles (depends on compilation optimization).     */
+  #n#t/* Note: If system core clock frequency is below 200kHz, wait time        */
+  #n#t/*       is only a few CPU processing cycles.                             */
+  #n#tuint32_t wait_loop_index;                  
+  #n#twait_loop_index = ((LL_ADC_DELAY_INTERNAL_REGUL_STAB_US * (SystemCoreClock / (100000 * 2))) / 10);
+  #n#twhile(wait_loop_index != 0)
+  #n#t{
+  #n#t#twait_loop_index--;
+  #n#t}"
+                />
+	</CallLibMethod>
+         <CallLibMethod Name="LL_ADC_SetSamplingTimeCommonChannels">
+                    <MethodArg Name="ADCx" ParameterName="Instance" />
+                    <MethodArg Name="SamplingTimeY" ParameterName="SAMPLINGTIME_COMMON1" />
+                    <MethodArg Name="SamplingTime" ParameterName="SamplingTimeCommon1" />
+                </CallLibMethod>      
+                <CallLibMethod Name="LL_ADC_SetSamplingTimeCommonChannels">
+                    <MethodArg Name="ADCx" ParameterName="Instance" />
+                    <MethodArg Name="SamplingTimeY" ParameterName="SAMPLINGTIME_COMMON2" />
+                    <MethodArg Name="SamplingTime" ParameterName="SamplingTimeCommon2" />
+                </CallLibMethod>
+        </IFCondition>
+        
         <IFCondition Expression="$Index=2">
            <CallLibMethod Name="" Type="HardCode"> 
              <HardCode Text="
   #n#t/* Disable ADC deep power down (enabled by default after reset state) */
-  #n#tLL_ADC_DisableDeepPowerDown(ADC2);
     
   #n#t/* Enable ADC internal voltage regulator */
   #n#tLL_ADC_EnableInternalRegulator(ADC2);
@@ -114,7 +233,6 @@
            <CallLibMethod Name="" Type="HardCode"> 
              <HardCode Text="
   #n#t/* Disable ADC deep power down (enabled by default after reset state) */
-  #n#tLL_ADC_DisableDeepPowerDown(ADC3);
     
   #n#t/* Enable ADC internal voltage regulator */
   #n#tLL_ADC_EnableInternalRegulator(ADC3);
@@ -167,8 +285,7 @@
             
                 <CallLibMethod Name="LL_ADC_SetOverSamplingScope">
                     <MethodArg Name="ADCx" ParameterName="Instance" />
-                    <MethodArg Name="OvsScope"
-                                           ParameterName="OversamplingMode,EnableInjectedOversampling,OversamplingStopReset" />
+                    <MethodArg Name="OvsScope"  ParameterName="OversamplingMode,EnableInjectedOversampling,OversamplingStopReset" />
                 </CallLibMethod>
 
                 <CallLibMethod Name="LL_ADC_ConfigOverSamplingRatioShift">
@@ -201,25 +318,83 @@
     </RefConfig>
 
     <RefConfig Name="ADC_RegularChannelConfig" Comment="Configure Regular Channel" >
+        
+           
         <IFCondition Expression ="1=1" >
-
+            
+           <IFCondition
+            Expression="Sequencer = FULLY_CONFIGURABLE &amp; Channel=ADC_CHANNEL_0 &amp; DIE494">
             <CallLibMethod Name="LL_ADC_REG_SetSequencerRanks">
                 <MethodArg Name="ADCx" ParameterName="Instance" />
                 <MethodArg Name="Rank" ParameterName="Rank" />
                 <MethodArg Name="Channel" ParameterName="Channel" />
             </CallLibMethod>
+            
             <CallLibMethod Name="LL_ADC_SetChannelSamplingTime">
                 <MethodArg Name="ADCx" ParameterName="Instance" />
                 <MethodArg Name="Channel" ParameterName="Channel" />
                 <MethodArg Name="SamplingTime" ParameterName="SamplingTime" />
+            </CallLibMethod>    
+        </IFCondition>
+        <IFCondition
+            Expression="DIE494 &amp;  (Sequencer = FULLY_CONFIGURABLE) &amp; (Channel=ADC_CHANNEL_2|Channel=ADC_CHANNEL_4|Channel=ADC_CHANNEL_1|Channel=ADC_CHANNEL_5|Channel=ADC_CHANNEL_6|Channel=ADC_CHANNEL_7|Channel=ADC_CHANNEL_8|Channel=ADC_CHANNEL_9|Channel=ADC_CHANNEL_10|Channel=ADC_CHANNEL_11|Channel=ADC_CHANNEL_12|Channel=ADC_CHANNEL_13|Channel=ADC_CHANNEL_14|Channel=ADC_CHANNEL_15|Channel=ADC_CHANNEL_16|Channel=ADC_CHANNEL_17|Channel=ADC_CHANNEL_18|Channel=ADC_CHANNEL_TEMPSENSOR|Channel=ADC_CHANNEL_VREFINT|Channel=ADC_CHANNEL_VBAT)">
+            <CallLibMethod Name="LL_ADC_REG_SetSequencerRanks">
+                <MethodArg Name="ADCx" ParameterName="Instance" />
+                <MethodArg Name="Rank" ParameterName="Rank" />
+                <MethodArg Name="Channel" ParameterName="Channel" />
             </CallLibMethod>
-
+            <CallLibMethod Name="" Type="HardCode"  >
+                <HardCode Text="#t
+  #n#t/* Poll for ADC channel configuration ready */
+  #n#t#if (USE_TIMEOUT == 1)
+  #n#tTimeout = ADC_CHANNEL_CONF_RDY_TIMEOUT_MS;
+  #n#t#endif /* USE_TIMEOUT */
+  #n#twhile (LL_ADC_IsActiveFlag_CCRDY(ADC1) == 0)
+  #n#t{
+  #n#t#t#if (USE_TIMEOUT == 1)
+  #n#t#t/* Check Systick counter flag to decrement the time-out value */
+  #n#t#tif (LL_SYSTICK_IsActiveCounterFlag())
+  #n#t#t{
+  #n#t#t#tif(Timeout-- == 0)
+  #n#t#t#t{
+  #n#t#t#t#tError_Handler();
+  #n#t#t#t}
+  #n#t#t}
+  #n#t#t#endif /* USE_TIMEOUT */
+  #n#t}
+  #n#t/* Clear flag ADC channel configuration ready */
+  #n#tLL_ADC_ClearFlag_CCRDY(ADC1);
+"/>
+            </CallLibMethod>
+            
+            <CallLibMethod Name="LL_ADC_SetChannelSamplingTime">
+                <MethodArg Name="ADCx" ParameterName="Instance" />
+                <MethodArg Name="Channel" ParameterName="Channel" />
+                <MethodArg Name="SamplingTime" ParameterName="SamplingTime" />
+            </CallLibMethod>    
+        </IFCondition>
+           <IFCondition
+            Expression="!DIE494">
+            <CallLibMethod Name="LL_ADC_REG_SetSequencerRanks">
+                <MethodArg Name="ADCx" ParameterName="Instance" />
+                <MethodArg Name="Rank" ParameterName="Rank" />
+                <MethodArg Name="Channel" ParameterName="Channel" />
+            </CallLibMethod>
+            
+            <CallLibMethod Name="LL_ADC_SetChannelSamplingTime">
+                <MethodArg Name="ADCx" ParameterName="Instance" />
+                <MethodArg Name="Channel" ParameterName="Channel" />
+                <MethodArg Name="SamplingTime" ParameterName="SamplingTime" />
+            </CallLibMethod>    
+        </IFCondition>
+        <IFCondition Expression="1=1">
             <CallLibMethod Name="LL_ADC_SetChannelSingleDiff">
                 <MethodArg Name="ADCx" ParameterName="Instance" />
                 <MethodArg Name="Channel" ParameterName="Channel" />
                 <MethodArg Name="SingleDiff" ParameterName="SingleDiff" />
             </CallLibMethod>
-            <IFCondition Expression="!(OffsetNumber = ADC_OFFSET_NONE)">
+        </IFCondition>
+            <IFCondition Expression=" !DIE494 &amp; !(OffsetNumber = ADC_OFFSET_NONE)">
                 <CallLibMethod Name="LL_ADC_SetOffset">
                     <MethodArg Name="ADCx" ParameterName="Instance" />
                     <MethodArg Name="Offsety" ParameterName="OffsetNumber" />
@@ -559,6 +734,13 @@
         <Argument AddressOf="false" GenericType="baseaddress" Name="ADCxy_COMMON"
                           TypeName="ADC_Common_TypeDef" />
     </LibMethod>
+     <LibMethod Comment="" Name="LL_ADC_REG_SetSequencerChAdd">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="ADCx"
+                  TypeName="ADC_TypeDef" />
+        <Argument AddressOf="false" GenericType="simple" Name="Channel"
+                  OptimizationCondition="equal" />
+		
+    </LibMethod>
     <LibMethod Comment="" Name="LL_ADC_INJ_SetTriggerSource">
         <Argument AddressOf="false" GenericType="baseaddress" Name="ADCx"
                           TypeName="ADC_TypeDef" />
@@ -592,6 +774,13 @@
     <LibMethod Comment="" Name="LL_ADC_INJ_GetSequencerLength">
         <Argument AddressOf="false" GenericType="baseaddress" Name="ADCx"
                           TypeName="ADC_TypeDef" />
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_ADC_REG_SetSequencerChAdd">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="ADCx"
+                  TypeName="ADC_TypeDef" />
+        <Argument AddressOf="false" GenericType="simple" Name="Channel"
+                  OptimizationCondition="equal" />
+		
     </LibMethod>
     <LibMethod Comment="" Name="LL_ADC_INJ_SetSequencerDiscont">
         <Argument AddressOf="false" GenericType="baseaddress" Name="ADCx"
@@ -872,6 +1061,12 @@
     <LibMethod Comment="" Name="LL_ADC_GetOverSamplingDiscont">
         <Argument AddressOf="false" GenericType="baseaddress" Name="ADCx"
                           TypeName="ADC_TypeDef" />
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_ADC_REG_SetSequencerConfigurable">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="ADCx"
+                  TypeName="ADC_TypeDef" />
+        <Argument AddressOf="false" GenericType="simple" Name="Configurability"
+                  OptimizationCondition="equal" />
     </LibMethod>
     <LibMethod Comment="" Name="LL_ADC_ConfigOverSamplingRatioShift">
         <Argument AddressOf="false" GenericType="baseaddress" Name="ADCx"
@@ -1170,6 +1365,14 @@
             <Argument AddressOf="false" GenericType="simple" Name="LowPowerMode"
                                   OptimizationCondition="equal" />
         </Argument>
+    </LibMethod>
+     <LibMethod Comment="" Name="LL_ADC_SetSamplingTimeCommonChannels">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="ADCx"
+                  TypeName="ADC_TypeDef" />
+        <Argument AddressOf="false" GenericType="simple" Name="SamplingTimeY"
+                  OptimizationCondition="equal" />
+        <Argument AddressOf="false" GenericType="simple" Name="SamplingTime"
+                  OptimizationCondition="equal" />
     </LibMethod>
     <LibMethod Comment="" Name="LL_ADC_REG_Init">
         <Argument AddressOf="false" GenericType="baseaddress" Name="ADCx"

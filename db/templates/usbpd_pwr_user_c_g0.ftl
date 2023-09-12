@@ -396,7 +396,7 @@ __weak PWR_StatusTypeDef BSP_PWR_VCONNOff(uint32_t PortId,
 /**
   * @brief  Set the VBUS disconnection voltage threshold.
   * @note   Obsolete interface, new interface should be called.
-  * @note   Callback funtion registered through BSP_PWR_RegisterVBUSDetectCallback
+  * @note   Callback function registered through BSP_PWR_RegisterVBUSDetectCallback
   *         function call is invoked when VBUS falls below programmed threshold.
   * @note   By default VBUS disconnection threshold is set to 3.3V
   * @param  PortId Type-C port identifier
@@ -420,7 +420,7 @@ __weak void BSP_PWR_SetVBUSDisconnectionThreshold(uint32_t PortId,
   * @note   Obsolete interface, new interface should be called.
   * @note   Callback function invoked when VBUS rises above 4V (VBUS present) or
   *         when VBUS falls below programmed threshold (VBUS absent).
-  * @note   Callback funtion is un-registered when callback function pointer
+  * @note   Callback function is un-registered when callback function pointer
   *         argument is NULL.
   * @param  PortId Type-C port identifier
   *         This parameter can be take one of the following values:
@@ -1022,7 +1022,7 @@ __weak int32_t BSP_USBPD_PWR_VCONNIsOn(uint32_t Instance,
 
 /**
   * @brief  Set the VBUS disconnection voltage threshold.
-  * @note   Callback funtion registered through BSP_USBPD_PWR_RegisterVBUSDetectCallback
+  * @note   Callback function registered through BSP_USBPD_PWR_RegisterVBUSDetectCallback
   *         function call is invoked when VBUS falls below programmed threshold.
   * @note   By default VBUS disconnection threshold is set to 3.3V
   * @param  Instance Type-C port identifier
@@ -1056,7 +1056,7 @@ __weak int32_t BSP_USBPD_PWR_SetVBUSDisconnectionThreshold(uint32_t Instance,
   * @brief  Register USB Type-C Current callback function.
   * @note   Callback function invoked when VBUS rises above 4V (VBUS present) or
   *         when VBUS falls below programmed threshold (VBUS absent).
-  * @note   Callback funtion is un-registered when callback function pointer
+  * @note   Callback function is un-registered when callback function pointer
   *         argument is NULL.
   * @param  Instance Type-C port identifier
   *         This parameter can be take one of the following values:

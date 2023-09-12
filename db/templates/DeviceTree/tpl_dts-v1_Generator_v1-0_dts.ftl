@@ -41,7 +41,7 @@
 
 [#--Bind some Dts elements then print elements.
 pParentElmt and each element from pElmtsList are viewed as of DTBindedDtsElmtDM type.
-Before printing, are positionned elements respecting ordering.--]
+Before printing, are positioned elements respecting ordering.--]
 [#macro DTBindedDtsElmtDMsList_print pParentElmt  pElmtsList pDtLevel pOrdering]
 [#compress]
 	[#local module = "DTBindedDtsElmtDMsList_print"]

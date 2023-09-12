@@ -5,7 +5,7 @@
  * @file    bsp_driver_sd.c for H7 (based on stm32h743i_eval_sd.c)
  * @brief   This file includes a generic uSD card driver.
  *          To be completed by the user according to the board used for the project.
- * @note    Some functions generated as weak: they can be overriden by
+ * @note    Some functions generated as weak: they can be overridden by
  *          - code in user files
  *          - or BSP code from the FW pack files
  *          if such files are added to the generated project (by the user).

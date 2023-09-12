@@ -93,6 +93,7 @@ void MX_SubGHz_Phy_Init(void)
   /* USER CODE END MX_SubGHz_Phy_Init_2 */
 }
 
+[#if !FREERTOS??][#-- If FreeRtos, only available in CM4 is not used --]
 void MX_SubGHz_Phy_Process(void)
 {
   /* USER CODE BEGIN MX_SubGHz_Phy_Process_1 */
@@ -105,6 +106,7 @@ void MX_SubGHz_Phy_Process(void)
   /* USER CODE END MX_SubGHz_Phy_Process_2 */
 [/#if]
 }
+[/#if]
 
 /* USER CODE BEGIN EF */
 

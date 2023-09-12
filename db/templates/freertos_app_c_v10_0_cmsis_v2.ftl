@@ -68,8 +68,8 @@
           [#assign index = index + 1]
         [/#list]
         [#-- specific cases to be handled hereafter: --]  
-        [#if mw == "LoRaWAN"]  
-#include "app_lorawan.h" 
+        [#if mw == "LoRaWAN"]
+#include "app_lorawan.h"
         [/#if]
         [#if mw == "Sigfox"]
 #include "app_sigfox.h"
@@ -85,7 +85,7 @@
 [/#if]
 
 /* Private includes ----------------------------------------------------------*/
-/* USER CODE BEGIN Includes */     
+/* USER CODE BEGIN Includes */
 
 /* USER CODE END Includes */
 
@@ -117,7 +117,7 @@
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
-   
+
 /* USER CODE END FunctionPrototypes */
 [#compress]
 #n
@@ -192,36 +192,36 @@ void MX_FREERTOS_Init(void);  /* (MISRA C 2004 rule 8.1) */
         [#if definition.name=="configGENERATE_RUN_TIME_STATS"]
           [#if definition.value=="1"]
 void configureTimerForRunTimeStats(void);
-unsigned long getRunTimeCounterValue(void);          
+unsigned long getRunTimeCounterValue(void);
           [/#if]
         [/#if]
         [#if definition.name=="configUSE_IDLE_HOOK"]
           [#if definition.value=="1"]
-void vApplicationIdleHook(void);       
+void vApplicationIdleHook(void);
           [/#if]
         [/#if]
         [#if definition.name=="configUSE_TICK_HOOK"]
           [#if definition.value=="1"]
-void vApplicationTickHook(void);       
+void vApplicationTickHook(void);
           [/#if]
         [/#if]   
         [#if definition.name=="configUSE_DAEMON_TASK_STARTUP_HOOK"]
           [#if definition.value=="1"]
-void vApplicationDaemonTaskStartupHook(void);       
+void vApplicationDaemonTaskStartupHook(void);
           [/#if]    
         [/#if]     
         [#if definition.name=="configCHECK_FOR_STACK_OVERFLOW"]
           [#if definition.value !="0"]
             [#if useNewHandle==0]
-void vApplicationStackOverflowHook(xTaskHandle xTask, signed char *pcTaskName);  
+void vApplicationStackOverflowHook(xTaskHandle xTask, signed char *pcTaskName);
             [#else]
-void vApplicationStackOverflowHook(TaskHandle_t xTask, signed char *pcTaskName); 
+void vApplicationStackOverflowHook(TaskHandle_t xTask, signed char *pcTaskName);
             [/#if]     
           [/#if]
         [/#if]
         [#if definition.name=="configUSE_MALLOC_FAILED_HOOK"]
           [#if definition.value=="1"]
-void vApplicationMallocFailedHook(void);       
+void vApplicationMallocFailedHook(void);
           [/#if]
         [/#if]             
       [/#list]
@@ -237,15 +237,15 @@ void vApplicationMallocFailedHook(void);
 #n
 /* USER CODE BEGIN 1 */
 /* Functions needed when configGENERATE_RUN_TIME_STATS is on */
-__weak void configureTimerForRunTimeStats(void) 
+__weak void configureTimerForRunTimeStats(void)
 {
 #n    
 }
 
-#n__weak unsigned long getRunTimeCounterValue(void) 
+#n__weak unsigned long getRunTimeCounterValue(void)
 {
     return 0;
-}  
+}
 /* USER CODE END 1 */
         [/#if]
       [/#if]
@@ -254,7 +254,7 @@ __weak void configureTimerForRunTimeStats(void)
         [#if definition.value=="1"]
 #n
 /* USER CODE BEGIN 2 */
-void vApplicationIdleHook( void ) 
+void vApplicationIdleHook( void )
 {
 #t    /* vApplicationIdleHook() will only be called if configUSE_IDLE_HOOK is set
 #t    to 1 in FreeRTOSConfig.h.  It will be called on each iteration of the idle
@@ -273,7 +273,7 @@ void vApplicationIdleHook( void )
       [#if definition.name=="configUSE_TICK_HOOK"]
         [#if definition.value=="1"]
 #n/* USER CODE BEGIN 3 */
-void vApplicationTickHook( void ) 
+void vApplicationTickHook( void )
 {
 #t    /* This function will be called by each tick interrupt if
 #t    configUSE_TICK_HOOK is set to 1 in FreeRTOSConfig.h.  User code can be
@@ -281,7 +281,7 @@ void vApplicationTickHook( void )
 #t    code must not attempt to block, and only the interrupt safe FreeRTOS API
 #t    functions can be used (those that end in FromISR()). */ 
 }
- /* USER CODE END 3 */ 	      
+ /* USER CODE END 3 */
         [/#if]
       [/#if]
 
@@ -296,12 +296,12 @@ void vApplicationStackOverflowHook(TaskHandle_t xTask, signed char *pcTaskName)
 {
 #t    /* Run time stack overflow checking is performed if
 #t    configCHECK_FOR_STACK_OVERFLOW is defined to 1 or 2. This hook function is
-#t    called if a stack overflow is detected. */ 
+#t    called if a stack overflow is detected. */
 }
- /* USER CODE END 4 */ 
+ /* USER CODE END 4 */
         [/#if]
       [/#if]
-	    
+
       [#if definition.name=="configUSE_MALLOC_FAILED_HOOK"]
         [#if definition.value=="1"]
 #n/* USER CODE BEGIN 5 */
@@ -345,7 +345,7 @@ void vApplicationDaemonTaskStartupHook(void)
 /* USER CODE BEGIN PREPOSTSLEEP */
 __weak void PreSleepProcessing(uint32_t *ulExpectedIdleTime)
 {
-/* place for user code */ 
+/* place for user code */
 }
 
 __weak void PostSleepProcessing(uint32_t *ulExpectedIdleTime)
@@ -381,7 +381,7 @@ __weak void vPortSuppressTicksAndSleep( TickType_t xExpectedIdleTime )
   */
 void MX_FREERTOS_Init(void) {
 #t/* USER CODE BEGIN Init */
-#t     
+#t
 #t/* USER CODE END Init */
 [@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_obj_creat.tmp"/]
 }
@@ -392,7 +392,7 @@ void MX_FREERTOS_Init(void) {
 
 /* Private application code --------------------------------------------------*/
 /* USER CODE BEGIN Application */
-     
+
 /* USER CODE END Application */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

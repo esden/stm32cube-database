@@ -1,15 +1,20 @@
 [#ftl]
 [#compress]
 <?xml version="1.0" encoding="UTF-8"?>
-[#macro getGroups groupArg]
+[#macro getGroups groupArg prtGrpexcluded isApplicationGroup]
 [#assign grouplibExist = "0"]
+[#if  multiConfigurationProject?? && groupArg.excludedFrom!="" && TrustZone=="1" && groupArg.excludedFrom==selectedConfig]
+    
+[#else]
+[#assign excludeFromConfig = "0"]
 <group> 
     <name>${groupArg.name}</name>
-    [#if  multiConfigurationProject?? && groupArg.excludedFrom!=""  && TrustZone=="0"]
+    [#if multiConfigurationProject?? && groupArg.excludedFrom!=""  && TrustZone=="0"]
         <excluded>
             <configuration>${Configuration}_C${groupArg.excludedFrom?replace("Config","C")}</configuration>
         </excluded>
-        [/#if]
+        [#assign excludeFromConfig = "1"]
+    [/#if]
 
     [#if groupArg.sourceFilesNameList??]
         [#list groupArg.sourceFilesNameList as filesName]
@@ -19,7 +24,16 @@
             [#else]
                 [#if underRoot != "true" || filesName?starts_with("..") || copyAsReference == "true"]
         <file>
-            <name>${filesName!''}</name>                    
+            <name>${filesName!''}</name>
+            [#if  isApplicationGroup=="0" && excludeFromConfig=="0" && prtGrpexcluded =="0" && multiConfigurationProject?? && ConfigsAndFiles??]
+                [#list ConfigsAndFiles?keys as configKey]
+                    [#if !ConfigsAndFiles[configKey]?seq_contains(filesName) && TrustZone=="0"]
+                            <excluded>
+                                <configuration>${Configuration}_${configKey?replace("CortexM", "CM")}</configuration>
+                                </excluded>
+                    [/#if]
+                [/#list]
+            [/#if]              
         </file>
                 [/#if]
             [/#if]
@@ -29,6 +43,15 @@
                 [#if filesName?ends_with(".a")||filesName?ends_with(".lib")]
     <file>
         <name>${filesName!''}</name>
+        [#if isApplicationGroup=="0" && excludeFromConfig=="0" && prtGrpexcluded =="0" && multiConfigurationProject?? && ConfigsAndFiles??]
+            [#list ConfigsAndFiles?keys as configKey]
+                [#if !ConfigsAndFiles[configKey]?seq_contains(filesName) && TrustZone=="0"]
+                        <excluded>
+                            <configuration>${Configuration}_${configKey?replace("CortexM", "CM")}</configuration>
+                            </excluded>
+                [/#if]
+            [/#list]
+        [/#if]
     </file>
     [/#if]             
             [/#list]
@@ -36,10 +59,11 @@
     [/#if]
     [#if groupArg.subGroups??]
         [#list groupArg.subGroups as subGrp]
-            [@getGroups groupArg=subGrp/]
+            [@getGroups groupArg=subGrp prtGrpexcluded=excludeFromConfig isApplicationGroup=isApplicationGroup/]
         [/#list]
     [/#if]
     </group>
+[/#if]
 [/#macro]
 <ScratchFile FileVersion="${FileVersion}">
 <FileVersion>${FileVersion}</FileVersion> [#-- add file version for UC30 --]
@@ -442,6 +466,13 @@
         <sourceEntry>
             <name>${src}</name>
         </sourceEntry>
+            [#list AppSourceEntries as SrcEntry] [#-- add application Groups --]
+                    [#if !SrcEntry?ends_with("FREERTOS")]
+            <sourceEntry>
+            <name>${SrcEntry}</name>
+            </sourceEntry>
+                    [/#if]
+                [/#list]
             [#else]
                 [#list ProjectConfigs?keys as configName]
                     [#assign elem = ProjectConfigs[configName]]
@@ -538,7 +569,7 @@
 
         [#if ThirdPartyPackList??]
             [#list  ThirdPartyPackList as pack]
-[#if pack !=  ""]
+[#if pack !=  "" && !AppSourceEntries?seq_contains(pack)]
         <sourceEntry>
             <name>${pack}</name>
             </sourceEntry>
@@ -589,7 +620,7 @@
                                     [#-- selectedConfig --]
                                     [#assign removeFromConfig = "0"]
                                     [#if multiConfigurationProject?? && ConfigsAndFiles?? && TrustZone=="1"]
-                                        [#if !ConfigsAndFiles[selectedConfig]?seq_contains(filesName?replace("/","\\"))]
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                [#if !ConfigsAndFiles[selectedConfig]?seq_contains(filesName?replace("/","\\"))]
                                                         [#assign removeFromConfig = "1"]
                                         [/#if]
                                     [/#if]
@@ -618,7 +649,7 @@
         </group> 
         [/#if]
         [#list externalGroups as grp] 
-            [@getGroups groupArg=grp/]
+            [@getGroups groupArg=grp  prtGrpexcluded="0" isApplicationGroup="0"/]
         [/#list]
     <group>
         <name>Drivers</name> 
@@ -751,7 +782,7 @@
         [/#if]
         
         [#list externalGroups as grp]
-            [@getGroups groupArg=grp/]
+            [@getGroups groupArg=grp prtGrpexcluded="0" isApplicationGroup="0"/]
         [/#list]
  
 </Groups>
@@ -765,7 +796,13 @@
             <sourceEntry>
             <name>${src}</name>
             </sourceEntry>
-
+            [#list AppSourceEntries as SrcEntry] [#-- add application Groups --]
+                    [#if !SrcEntry?ends_with("FREERTOS")]
+            <sourceEntry>
+            <name>${SrcEntry}</name>
+            </sourceEntry>
+                    [/#if]
+                [/#list]
             [#else]
             [#list ProjectConfigs?keys as configName]
                 [#assign elem = ProjectConfigs[configName]]
@@ -884,7 +921,7 @@
         
     [#if sourceStructure == "Advanced"]
         [#list MiddlewareList as Middleware] 
-            [#if Middleware != "FREERTOS"]             
+            [#if Middleware != "FREERTOS" && !AppSourceEntries?seq_contains(Middleware?replace("/","\\")?replace("CM0Plus","CM0PLUS"))]             
             [#if TrustZone == "0"]
                     <sourceEntry>
                     <name>${Middleware}</name>
@@ -925,7 +962,7 @@
         [/#if]
         [#if ThirdPartyPackList??]        
             [#list ThirdPartyPackList as pack]
-     [#if pack !=  ""]
+     [#if pack !=  "" && !AppSourceEntries?seq_contains(pack)]
         <sourceEntry>
             <name>${pack}</name>
             </sourceEntry>
@@ -1049,13 +1086,13 @@
     [/#if]
 [#-- End utilities --]
         [#list externalGroups as grp]
-            [@getGroups groupArg=grp/]
+            [@getGroups groupArg=grp prtGrpexcluded="0" isApplicationGroup="0"/]
         [/#list]
         [#-- end lib path --]
         [#-- BZ89738 --]
          [#if atLeastOneMiddlewareIsUsed]
          	[#list groups as group]
-         	 	[@getGroups groupArg=group/]
+         	 	[@getGroups groupArg=group prtGrpexcluded="0" isApplicationGroup="0"/]
          	[/#list]  
          [/#if]           
     </Groups>
@@ -1233,7 +1270,7 @@
     [/#if]
     [#list externalGroups as grp]
 
-        [@getGroups groupArg=grp/]
+        [@getGroups groupArg=grp prtGrpexcluded="0" isApplicationGroup="0"/]
     [/#list]
     [#--  BZ 81835 Start --] 
     [#if atLeastOneDocIsPresent]		
@@ -1406,7 +1443,7 @@
 [#-- App Group Case of Graphics--]
     [#list ApplicationGroups as grp]    
     [#if grp.name!="Remoteproc"] 
-[@getGroups groupArg=grp/]
+[@getGroups groupArg=grp prtGrpexcluded="0" isApplicationGroup="1"/]
     [/#if]
     [/#list]
             </group> 

@@ -4,7 +4,7 @@
  ******************************************************************************
  * File Name          : ${name}
   * @author  MCD Application Team
-  * @brief   mutex management functions iplementation based on cmsis-os V1/V2
+  * @brief   mutex management functions implementation based on cmsis-os V1/V2
              API. This file to be copied under the application project source tree.
  ******************************************************************************
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
@@ -13,7 +13,7 @@
 /* USER CODE END Header */
 
 /*
- * This files implments the mbedTLS mutex management API using the CMSIS-RTOS
+ * This files implements the mbedTLS mutex management API using the CMSIS-RTOS
  * V1 & V2 API. To correctly use this file make sure that:
  *
  *  - this file as well as the "threading_alt_template.h" files are renamed

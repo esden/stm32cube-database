@@ -56,6 +56,9 @@
 [#if TRACER_EMB??] [#-- If TRACER_EMB is used --]
 #include "tracer_emb.h"
 [/#if]
+[#if GUI_INTERFACE?? && timeBaseSource=="SysTick"] [#-- If GUI_INTERFACE is used and timebase source is SysTick --]
+#include "gui_api.h"
+[/#if]
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 

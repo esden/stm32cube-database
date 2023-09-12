@@ -12,7 +12,7 @@
 [#assign myBoardName=""]
 [#--
 ********************************
-BSP IP Datas:
+BSP IP Data:
 
 [#if BspIpDatas??]
   [#list BspIpDatas as SWIP]
@@ -32,7 +32,7 @@ Variables:
 [/#if]
 
 ********************************
-SWIP Datas:
+SWIP Data:
 
 [#if SWIPdatas??]
   [#list SWIPdatas as SWIP]

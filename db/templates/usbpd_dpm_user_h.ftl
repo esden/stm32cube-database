@@ -16,7 +16,6 @@
 [#assign SNK = false]
 [#assign DRP = false]
 [#assign DR_SWAP_TO_XFP_FEATURE = false]
-[#assign USBPD_STATEMACHINE = false]
 
 [#-- SWIPdatas is a list of SWIPconfigModel --]
 [#list SWIPdatas as SWIP]
@@ -24,9 +23,6 @@
         [#list SWIP.defines as definition]
             [#if definition.name == "USBPD_CoreLib" && definition.value != ""]
                 [#assign USBPD_CoreLib = definition.value]
-            [/#if]
-            [#if definition.name == "USBPD_StateMachine" && definition.value == "true"]
-                [#assign USBPD_STATEMACHINE = true]
             [/#if]
             [#if definition.name == "SRC" && definition.value == "true"]
                 [#assign SRC = true]
@@ -64,7 +60,7 @@
   */
 
 /* Exported typedef ----------------------------------------------------------*/
-[#if !USBPD_STATEMACHINE]
+[#if USBPD_CoreLib != "USBPDCORE_LIB_NO_PD"]
 [#if GUI_INTERFACE??]
 [#else]
 typedef struct
@@ -101,7 +97,7 @@ typedef struct
 
 /* USER CODE END Typedef */
 
-[#if !USBPD_STATEMACHINE]
+[#if USBPD_CoreLib != "USBPDCORE_LIB_NO_PD"]
 [#if GUI_INTERFACE??]
 typedef void     (*GUI_NOTIFICATION_POST)(uint8_t PortNum, uint16_t EventVal);
 typedef uint32_t (*GUI_NOTIFICATION_FORMAT_SEND)(uint32_t PortNum, uint32_t TypeNotification, uint32_t Value);
@@ -135,18 +131,19 @@ typedef void     (*GUI_SAVE_INFO)(uint8_t PortNum, uint8_t DataId, uint8_t *Ptr,
 /** @addtogroup USBPD_USER_EXPORTED_FUNCTIONS_GROUP1
   * @{
   */
-[#if !USBPD_STATEMACHINE]
+[#if USBPD_CoreLib != "USBPDCORE_LIB_NO_PD"]
 USBPD_StatusTypeDef USBPD_DPM_UserInit(void);
 [#if GUI_INTERFACE??]
 void                USBPD_DPM_SetNotification_GUI(GUI_NOTIFICATION_FORMAT_SEND PtrFormatSend, GUI_NOTIFICATION_POST PtrPost, GUI_SAVE_INFO PtrSaveInfo);
 [/#if]
 [/#if]
+void                USBPD_DPM_WaitForTime(uint32_t Time);
 [#if FREERTOS?? && Secure!="true"]
 [#else]
 void                USBPD_DPM_UserExecute(void const *argument);
 [/#if]
 void                USBPD_DPM_UserCableDetection(uint8_t PortNum, USBPD_CAD_EVENT State);
-[#if !USBPD_STATEMACHINE]
+[#if USBPD_CoreLib != "USBPDCORE_LIB_NO_PD"]
 void                USBPD_DPM_UserTimerCounter(uint8_t PortNum);
 [/#if]
 
@@ -154,7 +151,7 @@ void                USBPD_DPM_UserTimerCounter(uint8_t PortNum);
   * @}
   */
 
-[#if !USBPD_STATEMACHINE]
+[#if USBPD_CoreLib != "USBPDCORE_LIB_NO_PD"]
 /** @addtogroup USBPD_USER_EXPORTED_FUNCTIONS_GROUP2
   * @{
   */
@@ -181,6 +178,7 @@ void                USBPD_DPM_PowerRoleSwap(uint8_t PortNum, USBPD_PortPowerRole
 [/#if]
 USBPD_StatusTypeDef USBPD_DPM_EvaluateVconnSwap(uint8_t PortNum);
 USBPD_StatusTypeDef USBPD_DPM_PE_VconnPwr(uint8_t PortNum, USBPD_FunctionalState State);
+void                USBPD_DPM_EnterErrorRecovery(uint8_t PortNum);
 USBPD_StatusTypeDef USBPD_DPM_EvaluateDataRoleSwap(uint8_t PortNum);
 USBPD_FunctionalState USBPD_DPM_IsPowerReady(uint8_t PortNum, USBPD_VSAFE_StatusTypeDef Vsafe);
 

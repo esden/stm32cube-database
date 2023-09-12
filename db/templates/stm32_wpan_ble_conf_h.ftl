@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
  ******************************************************************************
   * File Name          : ${name}
@@ -8,6 +9,7 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
+/* USER CODE END Header */
 
 [#assign BLE_TRANSPARENT_MODE_UART = 0]
 [#assign BLE_TRANSPARENT_MODE_VCP = 0]
@@ -431,7 +433,7 @@
 	[#if SWIP.defines??]
 		[#list SWIP.defines as definition]
 			[#if definition.name="BLE_CFG_BLS_PULSE_RATE_UPPER_LIMIT"]
-				[#lt]#define ${definition.name}                 ${definition.value}/**< Upper Pluse Rate supported */
+				[#lt]#define ${definition.name}                 ${definition.value}/**< Upper Pulse Rate supported */
 			[/#if]
 		[/#list]
 	[/#if]
@@ -439,7 +441,7 @@
 [/#if]
 
 /******************************************************************************
- * GAP Service - Apprearance
+ * GAP Service - Appearance
  ******************************************************************************/
 
 #define BLE_CFG_UNKNOWN_APPEARANCE                  (0)

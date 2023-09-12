@@ -4,7 +4,7 @@
   * File Name       : ${name}.h
   * Description     : TCP/IP or UDP/IP networking functions implementation based
                     on LwIP API see the file "mbedTLS/library/net_socket_template.c"
-                    for the standard implmentation
+                    for the standard implementation
   ******************************************************************************
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************

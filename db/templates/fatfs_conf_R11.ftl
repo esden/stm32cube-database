@@ -337,7 +337,7 @@ extern ${variable.value} ${variable.name};
 /  number is bound to the same physical drive number and only an FAT volume found on
 /  the physical drive will be mounted. When multi-partition feature is enabled (1),
 /  each logical drive number is bound to arbitrary physical drive and partition
-/  listed in the VolToPart[]. Also f_fdisk() funciton will be available. */
+/  listed in the VolToPart[]. Also f_fdisk() function will be available. */
 
 #define _MIN_SS    ${valueMinSectorSize}  /* 512, 1024, 2048 or 4096 */
 #define _MAX_SS    ${valueMaxSectorSize}  /* 512, 1024, 2048 or 4096 */

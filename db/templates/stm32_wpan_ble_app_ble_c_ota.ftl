@@ -150,7 +150,7 @@ void APP_BLE_Init( void )
     CFG_BLE_MAX_CONN_EVENT_LENGTH,
     CFG_BLE_HSE_STARTUP_TIME,
     CFG_BLE_VITERBI_MODE,
-    CFG_BLE_LL_ONLY,
+    CFG_BLE_OPTIONS,
     0}                                  /** TODO Should be read from HW */
   };
 
@@ -231,28 +231,28 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification( void *pckt )
 {
   hci_event_pckt *event_pckt;
   evt_le_meta_event *meta_evt;
-  evt_blue_aci *blue_evt;
+  evt_blecore_aci *blecore_evt;
 
   
   event_pckt = (hci_event_pckt*) ((hci_uart_pckt *) pckt)->data;
 
   switch (event_pckt->evt)
   {
-    case EVT_DISCONN_COMPLETE:
+    case HCI_DISCONNECTION_COMPLETE_EVT_CODE:
     {
       
       Adv_Request();
       
     }
-    break; /* EVT_DISCONN_COMPLETE */
+    break; /* HCI_DISCONNECTION_COMPLETE_EVT_CODE */
 
-    case EVT_LE_META_EVENT:
+    case HCI_LE_META_EVT_CODE:
       meta_evt = (evt_le_meta_event*) event_pckt->data;
 
       switch (meta_evt->subevent)
       {
-        case EVT_LE_CONN_COMPLETE:
-          break; /* HCI_EVT_LE_CONN_COMPLETE */
+        case HCI_LE_CONNECTION_COMPLETE_SUBEVT_CODE:
+          break; /* HCI_LE_CONNECTION_COMPLETE_SUBEVT_CODE */
 
         /* USER CODE BEGIN META_EVT */
 
@@ -261,16 +261,16 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification( void *pckt )
         default:
           break;
       }
-      break; /* HCI_EVT_LE_META_EVENT */
+      break; /* HCI_LE_META_EVT_CODE */
 
-        case EVT_VENDOR:
-          blue_evt = (evt_blue_aci*) event_pckt->data;
-          switch (blue_evt->ecode)
+        case HCI_VENDOR_SPECIFIC_DEBUG_EVT_CODE:
+          blecore_evt = (evt_blecore_aci*) event_pckt->data;
+          switch (blecore_evt->ecode)
           {
-            case EVT_BLUE_GAP_PROCEDURE_COMPLETE:
-              break; /* EVT_BLUE_GAP_PROCEDURE_COMPLETE */
+            case ACI_GAP_PROC_COMPLETE_VSEVT_CODE:
+              break; /* ACI_GAP_PROC_COMPLETE_VSEVT_CODE */
           }
-          break; /* EVT_VENDOR */
+          break; /* HCI_VENDOR_SPECIFIC_DEBUG_EVT_CODE */
 
         /* USER CODE BEGIN EVENT_PCKT */
 
@@ -487,7 +487,7 @@ const uint8_t* BleGetBdAddress( void )
     bd_addr_udn[1] = (uint8_t)( (udn & 0x0000FF00) >> 8 );
     bd_addr_udn[2] = (uint8_t)( (udn & 0x00FF0000) >> 16 );
     bd_addr_udn[3] = (uint8_t)device_id;
-    bd_addr_udn[4] = (uint8_t)(company_id & 0x000000FF);;
+    bd_addr_udn[4] = (uint8_t)(company_id & 0x000000FF);
     bd_addr_udn[5] = (uint8_t)( (company_id & 0x0000FF00) >> 8 );
 
     bd_addr = (const uint8_t *)bd_addr_udn;

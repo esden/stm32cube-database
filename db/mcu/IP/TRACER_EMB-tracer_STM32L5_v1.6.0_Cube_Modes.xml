@@ -1,0 +1,646 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<IP xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance"
+    ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd"
+    xmlns="http://mcd.rou.st.com/modules.php?name=mcu"
+    DBVersion="V4.0"
+    IPType="service"
+    IpGroup="Utilities"
+    Name="TRACER_EMB"
+    Version="tracer_STM32L5_v1.6.0_Cube">
+
+    <About>TRACER_EMB : Embedded Tracer Controller</About>
+
+    <!-- Generic RefParameters for TRACER_EMB -->
+    <RefParameter Name="Version" Comment="Version" Type="1.6.0" DefaultValue="TRACER_EMB"/>
+
+    <RefParameter Name="TRACER_EMB_DMA_Request" Comment="TRACER_EMB request LPUART1 TX DMA" Type="string" DefaultValue="enabled" >
+        <Condition Expression="(TRACEREMB_LPUART1) &amp; (LPUART1_TX_DMA_Channel)" Diagnostic="LPUART1_TX DMA Channel defined"/>
+    </RefParameter>
+    <RefParameter Name="TRACER_EMB_DMA_Request" Comment="TRACER_EMB request USART1 TX DMA" Type="string" DefaultValue="enabled" >
+        <Condition Expression="(TRACEREMB_USART1) &amp; (USART1_TX_DMA_Channel)" Diagnostic="USART1_TX DMA Channel defined"/>
+    </RefParameter>
+    <RefParameter Name="TRACER_EMB_DMA_Request" Comment="TRACER_EMB request USART2 TX DMA" Type="string" DefaultValue="enabled" >
+        <Condition Expression="(TRACEREMB_USART2) &amp; (USART2_TX_DMA_Channel)" Diagnostic="USART2_TX DMA Channel defined"/>
+    </RefParameter>
+    <RefParameter Name="TRACER_EMB_DMA_Request" Comment="TRACER_EMB request USART3 TX DMA" Type="string" DefaultValue="enabled" >
+        <Condition Expression="(TRACEREMB_USART3) &amp; (USART3_TX_DMA_Channel)" Diagnostic="USART3_TX DMA Channel defined"/>
+    </RefParameter>
+    <RefParameter Name="TRACER_EMB_DMA_Request" Comment="TRACER_EMB request UART4 TX DMA" Type="string" DefaultValue="enabled" >
+        <Condition Expression="(TRACEREMB_UART4) &amp; (UART4_TX_DMA_Channel)" Diagnostic="UART4_TX DMA Channel defined"/>
+    </RefParameter>
+    <RefParameter Name="TRACER_EMB_DMA_Request" Comment="TRACER_EMB request UART5 TX DMA" Type="string" DefaultValue="enabled" >
+        <Condition Expression="(TRACEREMB_UART5) &amp; (UART5_TX_DMA_Channel)" Diagnostic="UART5_TX DMA Channel defined"/>
+    </RefParameter>
+    <RefParameter Name="TRACER_EMB_DMA_Request" Comment="TRACER_EMB request LPUART1 TX DMA" Type="integer" Min="1" Max="1" DefaultValue="disabled" >
+        <Condition Expression="(TRACEREMB_LPUART1) &amp; !LPUART1_TX_DMA_Channel" Diagnostic="No LPUART1_TX DMA Channel"/>
+    </RefParameter>
+    <RefParameter Name="TRACER_EMB_DMA_Request" Comment="TRACER_EMB request USART1 TX DMA" Type="integer" Min="1" Max="1" DefaultValue="disabled" >
+        <Condition Expression="(TRACEREMB_USART1) &amp; !USART1_TX_DMA_Channel" Diagnostic="No USART1_TX DMA Channel"/>
+    </RefParameter>
+    <RefParameter Name="TRACER_EMB_DMA_Request" Comment="TRACER_EMB request USART2 TX DMA" Type="integer" Min="1" Max="1" DefaultValue="disabled" >
+        <Condition Expression="(TRACEREMB_USART2) &amp; !USART2_TX_DMA_Channel" Diagnostic="No USART2_TX DMA Channel"/>
+    </RefParameter>
+    <RefParameter Name="TRACER_EMB_DMA_Request" Comment="TRACER_EMB request USART3 TX DMA" Type="integer" Min="1" Max="1" DefaultValue="disabled" >
+        <Condition Expression="(TRACEREMB_USART3) &amp; !USART3_TX_DMA_Channel" Diagnostic="No USART3_TX DMA Channel"/>
+    </RefParameter>
+    <RefParameter Name="TRACER_EMB_DMA_Request" Comment="TRACER_EMB request UART4 TX DMA" Type="integer" Min="1" Max="1" DefaultValue="disabled" >
+        <Condition Expression="(TRACEREMB_UART4) &amp; !UART4_TX_DMA_Channel" Diagnostic="No UART4_TX DMA Channel"/>
+    </RefParameter>
+    <RefParameter Name="TRACER_EMB_DMA_Request" Comment="TRACER_EMB request UART5 TX DMA" Type="integer" Min="1" Max="1" DefaultValue="disabled" >
+        <Condition Expression="(TRACEREMB_UART5) &amp; !UART5_TX_DMA_Channel" Diagnostic="No UART5_TX DMA Channel"/>
+    </RefParameter>
+    <RefParameter Name="TRACER_EMB_DMA_Request" Comment="USBPD request LPUART/USART IPs TX DMA" Type="string" DefaultValue="enabled" />
+
+    <!--  RefParameters for TRACER_EMB trace -->
+    <RefParameter Name="UARTinstance" DefaultValue="" Comment="" Type="list" Visible="false">
+        <PossibleValue Value="LPUART1" Comment="" Condition="!TRACEREMB_LPUART1" Semaphore="UART_Used"/>
+        <PossibleValue Value="USART1" Comment="" Condition="!TRACEREMB_USART1" Semaphore="UART_Used"/>
+        <PossibleValue Value="USART2" Comment="" Condition="!TRACEREMB_USART2" Semaphore="UART_Used"/>
+        <PossibleValue Value="USART3" Comment="" Condition="!TRACEREMB_USART3" Semaphore="UART_Used"/>
+        <PossibleValue Value="UART4" Comment="" Condition="!TRACEREMB_UART4" Semaphore="UART_Used"/>
+        <PossibleValue Value="UART5" Comment="" Condition="!TRACEREMB_UART5" Semaphore="UART_Used"/>
+    </RefParameter>
+
+    <RefParameter Name="UARTbaudrate" DefaultValue="+LPUART1:BaudRate" Comment="" Type="string" Visible="false">
+        <Condition Diagnostic="BaudRate from LPUART1" Expression="TRACEREMB_LPUART1"/>
+    </RefParameter>
+    <RefParameter Name="UARTbaudrate" DefaultValue="+USART1:BaudRate" Comment="" Type="string" Visible="false">
+        <Condition Diagnostic="BaudRate from USART1" Expression="TRACEREMB_USART1"/>
+    </RefParameter>
+    <RefParameter Name="UARTbaudrate" DefaultValue="+USART2:BaudRate" Comment="" Type="string" Visible="false">
+        <Condition Diagnostic="BaudRate from USART2" Expression="TRACEREMB_USART2"/>
+    </RefParameter>
+    <RefParameter Name="UARTbaudrate" DefaultValue="+USART3:BaudRate" Comment="" Type="string" Visible="false">
+        <Condition Diagnostic="BaudRate from USART3" Expression="TRACEREMB_USART3"/>
+    </RefParameter>
+    <RefParameter Name="UARTbaudrate" DefaultValue="+UART4:BaudRate" Comment="" Type="string" Visible="false">
+        <Condition Diagnostic="BaudRate from UART4" Expression="TRACEREMB_UART4"/>
+    </RefParameter>
+    <RefParameter Name="UARTbaudrate" DefaultValue="+UART5:BaudRate" Comment="" Type="string" Visible="false">
+        <Condition Diagnostic="BaudRate from UART5" Expression="TRACEREMB_UART5"/>
+    </RefParameter>
+    <RefParameter Name="UARTbaudrate" DefaultValue="" Comment="" Type="string" Visible="false"/>
+
+    <RefParameter Name="UARTinterrupt" DefaultValue="" Comment="" Type="string" Visible="false"/>
+
+    <RefParameter Name="UARTenableClock" DefaultValue="" Comment="" Type="list" Visible="false">
+        <PossibleValue Value="LL_APB1_GRP2_EnableClock(LL_APB1_GRP2_PERIPH_LPUART1)" Comment="" Condition="!TRACEREMB_LPUART1"/>
+        <PossibleValue Value="LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_USART1)" Comment="" Condition="!TRACEREMB_USART1"/>
+        <PossibleValue Value="LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_USART2)" Comment="" Condition="!TRACEREMB_USART2"/>
+        <PossibleValue Value="LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_USART3)" Comment="" Condition="!TRACEREMB_USART3"/>
+        <PossibleValue Value="LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_UART4)" Comment="" Condition="!TRACEREMB_UART4"/>
+        <PossibleValue Value="LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_UART5)" Comment="" Condition="!TRACEREMB_UART5"/>
+    </RefParameter>
+
+    <RefParameter Name="UARTdisableClock" DefaultValue="" Comment="" Type="list" Visible="false">
+        <PossibleValue Value="LL_APB1_GRP2_DisableClock(LL_APB1_GRP2_PERIPH_LPUART1)" Comment="" Condition="!TRACEREMB_LPUART1"/>
+        <PossibleValue Value="LL_APB2_GRP1_DisableClock(LL_APB2_GRP1_PERIPH_USART1)" Comment="" Condition="!TRACEREMB_USART1"/>
+        <PossibleValue Value="LL_APB1_GRP1_DisableClock(LL_APB1_GRP1_PERIPH_USART2)" Comment="" Condition="!TRACEREMB_USART2"/>
+        <PossibleValue Value="LL_APB1_GRP1_DisableClock(LL_APB1_GRP1_PERIPH_USART3)" Comment="" Condition="!TRACEREMB_USART3"/>
+        <PossibleValue Value="LL_APB1_GRP1_DisableClock(LL_APB1_GRP1_PERIPH_UART4)" Comment="" Condition="!TRACEREMB_UART4"/>
+        <PossibleValue Value="LL_APB1_GRP1_DisableClock(LL_APB1_GRP1_PERIPH_UART5)" Comment="" Condition="!TRACEREMB_UART5"/>
+    </RefParameter>
+
+    <!--  RefParameters for DMA Channel informations -->
+    <RefParameter Name="LPUART1_TX_DMA_CHANNEL" DefaultValue="LPUART1_TX_DMA1_Channel_1" Type="string" Comment="DMA Request for LPUART1_TX">
+        <Condition Diagnostic="DMA1_Channel1 used by LPUART1_TX" Expression="LPUART1_TX_DMA1_Channel1"/>
+    </RefParameter>
+    <RefParameter Name="LPUART1_TX_DMA_CHANNEL" DefaultValue="LPUART1_TX_DMA1_Channel_2" Type="string" Comment="DMA Request for LPUART1_TX">
+        <Condition Diagnostic="DMA1_Channel2 used by LPUART1_TX" Expression="LPUART1_TX_DMA1_Channel2"/>
+    </RefParameter>
+    <RefParameter Name="LPUART1_TX_DMA_CHANNEL" DefaultValue="LPUART1_TX_DMA1_Channel_3" Type="string" Comment="DMA Request for LPUART1_TX">
+        <Condition Diagnostic="DMA1_Channel3 used by LPUART1_TX" Expression="LPUART1_TX_DMA1_Channel3"/>
+    </RefParameter>
+    <RefParameter Name="LPUART1_TX_DMA_CHANNEL" DefaultValue="LPUART1_TX_DMA1_Channel_4" Type="string" Comment="DMA Request for LPUART1_TX">
+        <Condition Diagnostic="DMA1_Channel4 used by LPUART1_TX" Expression="LPUART1_TX_DMA1_Channel4"/>
+    </RefParameter>
+    <RefParameter Name="LPUART1_TX_DMA_CHANNEL" DefaultValue="LPUART1_TX_DMA1_Channel_5" Type="string" Comment="DMA Request for LPUART1_TX">
+        <Condition Diagnostic="DMA1_Channel5 used by LPUART1_TX" Expression="LPUART1_TX_DMA1_Channel5"/>
+    </RefParameter>
+    <RefParameter Name="LPUART1_TX_DMA_CHANNEL" DefaultValue="LPUART1_TX_DMA1_Channel_6" Type="string" Comment="DMA Request for LPUART1_TX">
+        <Condition Diagnostic="DMA1_Channel6 used by LPUART1_TX" Expression="LPUART1_TX_DMA1_Channel6"/>
+    </RefParameter>
+    <RefParameter Name="LPUART1_TX_DMA_CHANNEL" DefaultValue="LPUART1_TX_DMA1_Channel_7" Type="string" Comment="DMA Request for LPUART1_TX">
+        <Condition Diagnostic="DMA1_Channel7 used by LPUART1_TX" Expression="LPUART1_TX_DMA1_Channel7"/>
+    </RefParameter>
+    <RefParameter Name="LPUART1_TX_DMA_CHANNEL" DefaultValue="LPUART1_TX_DMA1_Channel_8" Type="string" Comment="DMA Request for LPUART1_TX">
+        <Condition Diagnostic="DMA1_Channel8 used by LPUART1_TX" Expression="LPUART1_TX_DMA1_Channel8"/>
+    </RefParameter>
+    <RefParameter Name="LPUART1_TX_DMA_CHANNEL" DefaultValue="LPUART1_TX_DMA2_Channel_1" Type="string" Comment="DMA Request for LPUART1_TX">
+        <Condition Diagnostic="DMA2_Channel1 used by LPUART1_TX" Expression="LPUART1_TX_DMA2_Channel1"/>
+    </RefParameter>
+    <RefParameter Name="LPUART1_TX_DMA_CHANNEL" DefaultValue="LPUART1_TX_DMA2_Channel_2" Type="string" Comment="DMA Request for LPUART1_TX">
+        <Condition Diagnostic="DMA2_Channel2 used by LPUART1_TX" Expression="LPUART1_TX_DMA2_Channel2"/>
+    </RefParameter>
+    <RefParameter Name="LPUART1_TX_DMA_CHANNEL" DefaultValue="LPUART1_TX_DMA2_Channel_3" Type="string" Comment="DMA Request for LPUART1_TX">
+        <Condition Diagnostic="DMA2_Channel3 used by LPUART1_TX" Expression="LPUART1_TX_DMA2_Channel3"/>
+    </RefParameter>
+    <RefParameter Name="LPUART1_TX_DMA_CHANNEL" DefaultValue="LPUART1_TX_DMA2_Channel_4" Type="string" Comment="DMA Request for LPUART1_TX">
+        <Condition Diagnostic="DMA2_Channel4 used by LPUART1_TX" Expression="LPUART1_TX_DMA2_Channel4"/>
+    </RefParameter>
+    <RefParameter Name="LPUART1_TX_DMA_CHANNEL" DefaultValue="LPUART1_TX_DMA2_Channel_5" Type="string" Comment="DMA Request for LPUART1_TX">
+        <Condition Diagnostic="DMA2_Channel5 used by LPUART1_TX" Expression="LPUART1_TX_DMA2_Channel5"/>
+    </RefParameter>
+    <RefParameter Name="LPUART1_TX_DMA_CHANNEL" DefaultValue="LPUART1_TX_DMA2_Channel_6" Type="string" Comment="DMA Request for LPUART1_TX">
+        <Condition Diagnostic="DMA2_Channel6 used by LPUART1_TX" Expression="LPUART1_TX_DMA2_Channel6"/>
+    </RefParameter>
+    <RefParameter Name="LPUART1_TX_DMA_CHANNEL" DefaultValue="LPUART1_TX_DMA2_Channel_7" Type="string" Comment="DMA Request for LPUART1_TX">
+        <Condition Diagnostic="DMA2_Channel7 used by LPUART1_TX" Expression="LPUART1_TX_DMA2_Channel7"/>
+    </RefParameter>
+    <RefParameter Name="LPUART1_TX_DMA_CHANNEL" DefaultValue="LPUART1_TX_DMA2_Channel_8" Type="string" Comment="DMA Request for LPUART1_TX">
+        <Condition Diagnostic="DMA2_Channel8 used by LPUART1_TX" Expression="LPUART1_TX_DMA2_Channel8"/>
+    </RefParameter>
+    <RefParameter Name="LPUART1_TX_DMA_CHANNEL" DefaultValue="" Type="string" Comment="No DMA Request for LPUART1_TX"/>
+
+    <RefParameter Name="USART1_TX_DMA_CHANNEL" DefaultValue="USART1_TX_DMA1_Channel_1" Type="string" Comment="DMA Request for USART1_TX">
+        <Condition Diagnostic="DMA1_Channel1 used by USART1_TX" Expression="USART1_TX_DMA1_Channel1"/>
+    </RefParameter>
+    <RefParameter Name="USART1_TX_DMA_CHANNEL" DefaultValue="USART1_TX_DMA1_Channel_2" Type="string" Comment="DMA Request for USART1_TX">
+        <Condition Diagnostic="DMA1_Channel2 used by USART1_TX" Expression="USART1_TX_DMA1_Channel2"/>
+    </RefParameter>
+    <RefParameter Name="USART1_TX_DMA_CHANNEL" DefaultValue="USART1_TX_DMA1_Channel_3" Type="string" Comment="DMA Request for USART1_TX">
+        <Condition Diagnostic="DMA1_Channel3 used by USART1_TX" Expression="USART1_TX_DMA1_Channel3"/>
+    </RefParameter>
+    <RefParameter Name="USART1_TX_DMA_CHANNEL" DefaultValue="USART1_TX_DMA1_Channel_4" Type="string" Comment="DMA Request for USART1_TX">
+        <Condition Diagnostic="DMA1_Channel4 used by USART1_TX" Expression="USART1_TX_DMA1_Channel4"/>
+    </RefParameter>
+    <RefParameter Name="USART1_TX_DMA_CHANNEL" DefaultValue="USART1_TX_DMA1_Channel_5" Type="string" Comment="DMA Request for USART1_TX">
+        <Condition Diagnostic="DMA1_Channel5 used by USART1_TX" Expression="USART1_TX_DMA1_Channel5"/>
+    </RefParameter>
+    <RefParameter Name="USART1_TX_DMA_CHANNEL" DefaultValue="USART1_TX_DMA1_Channel_6" Type="string" Comment="DMA Request for USART1_TX">
+        <Condition Diagnostic="DMA1_Channel6 used by USART1_TX" Expression="USART1_TX_DMA1_Channel6"/>
+    </RefParameter>
+    <RefParameter Name="USART1_TX_DMA_CHANNEL" DefaultValue="USART1_TX_DMA1_Channel_7" Type="string" Comment="DMA Request for USART1_TX">
+        <Condition Diagnostic="DMA1_Channel7 used by USART1_TX" Expression="USART1_TX_DMA1_Channel7"/>
+    </RefParameter>
+    <RefParameter Name="USART1_TX_DMA_CHANNEL" DefaultValue="USART1_TX_DMA1_Channel_8" Type="string" Comment="DMA Request for USART1_TX">
+        <Condition Diagnostic="DMA1_Channel8 used by USART1_TX" Expression="USART1_TX_DMA1_Channel8"/>
+    </RefParameter>
+    <RefParameter Name="USART1_TX_DMA_CHANNEL" DefaultValue="USART1_TX_DMA2_Channel_1" Type="string" Comment="DMA Request for USART1_TX">
+        <Condition Diagnostic="DMA2_Channel1 used by USART1_TX" Expression="USART1_TX_DMA2_Channel1"/>
+    </RefParameter>
+    <RefParameter Name="USART1_TX_DMA_CHANNEL" DefaultValue="USART1_TX_DMA2_Channel_2" Type="string" Comment="DMA Request for USART1_TX">
+        <Condition Diagnostic="DMA2_Channel2 used by USART1_TX" Expression="USART1_TX_DMA2_Channel2"/>
+    </RefParameter>
+    <RefParameter Name="USART1_TX_DMA_CHANNEL" DefaultValue="USART1_TX_DMA2_Channel_3" Type="string" Comment="DMA Request for USART1_TX">
+        <Condition Diagnostic="DMA2_Channel3 used by USART1_TX" Expression="USART1_TX_DMA2_Channel3"/>
+    </RefParameter>
+    <RefParameter Name="USART1_TX_DMA_CHANNEL" DefaultValue="USART1_TX_DMA2_Channel_4" Type="string" Comment="DMA Request for USART1_TX">
+        <Condition Diagnostic="DMA2_Channel4 used by USART1_TX" Expression="USART1_TX_DMA2_Channel4"/>
+    </RefParameter>
+    <RefParameter Name="USART1_TX_DMA_CHANNEL" DefaultValue="USART1_TX_DMA2_Channel_5" Type="string" Comment="DMA Request for USART1_TX">
+        <Condition Diagnostic="DMA2_Channel5 used by USART1_TX" Expression="USART1_TX_DMA2_Channel5"/>
+    </RefParameter>
+    <RefParameter Name="USART1_TX_DMA_CHANNEL" DefaultValue="USART1_TX_DMA2_Channel_6" Type="string" Comment="DMA Request for USART1_TX">
+        <Condition Diagnostic="DMA2_Channel6 used by USART1_TX" Expression="USART1_TX_DMA2_Channel6"/>
+    </RefParameter>
+    <RefParameter Name="USART1_TX_DMA_CHANNEL" DefaultValue="USART1_TX_DMA2_Channel_7" Type="string" Comment="DMA Request for USART1_TX">
+        <Condition Diagnostic="DMA2_Channel7 used by USART1_TX" Expression="USART1_TX_DMA2_Channel7"/>
+    </RefParameter>
+    <RefParameter Name="USART1_TX_DMA_CHANNEL" DefaultValue="USART1_TX_DMA2_Channel_8" Type="string" Comment="DMA Request for USART1_TX">
+        <Condition Diagnostic="DMA2_Channel8 used by USART1_TX" Expression="USART1_TX_DMA2_Channel8"/>
+    </RefParameter>
+    <RefParameter Name="USART1_TX_DMA_CHANNEL" DefaultValue="" Type="string" Comment="No DMA Request for USART1_TX"/>
+
+    <RefParameter Name="USART2_TX_DMA_CHANNEL" DefaultValue="USART2_TX_DMA1_Channel_1" Type="string" Comment="DMA Request for USART2_TX">
+        <Condition Diagnostic="DMA1_Channel1 used by USART2_TX" Expression="USART2_TX_DMA1_Channel1"/>
+    </RefParameter>
+    <RefParameter Name="USART2_TX_DMA_CHANNEL" DefaultValue="USART2_TX_DMA1_Channel_2" Type="string" Comment="DMA Request for USART2_TX">
+        <Condition Diagnostic="DMA1_Channel2 used by USART2_TX" Expression="USART2_TX_DMA1_Channel2"/>
+    </RefParameter>
+    <RefParameter Name="USART2_TX_DMA_CHANNEL" DefaultValue="USART2_TX_DMA1_Channel_3" Type="string" Comment="DMA Request for USART2_TX">
+        <Condition Diagnostic="DMA1_Channel3 used by USART2_TX" Expression="USART2_TX_DMA1_Channel3"/>
+    </RefParameter>
+    <RefParameter Name="USART2_TX_DMA_CHANNEL" DefaultValue="USART2_TX_DMA1_Channel_4" Type="string" Comment="DMA Request for USART2_TX">
+        <Condition Diagnostic="DMA1_Channel4 used by USART2_TX" Expression="USART2_TX_DMA1_Channel4"/>
+    </RefParameter>
+    <RefParameter Name="USART2_TX_DMA_CHANNEL" DefaultValue="USART2_TX_DMA1_Channel_5" Type="string" Comment="DMA Request for USART2_TX">
+        <Condition Diagnostic="DMA1_Channel5 used by USART2_TX" Expression="USART2_TX_DMA1_Channel5"/>
+    </RefParameter>
+    <RefParameter Name="USART2_TX_DMA_CHANNEL" DefaultValue="USART2_TX_DMA1_Channel_6" Type="string" Comment="DMA Request for USART2_TX">
+        <Condition Diagnostic="DMA1_Channel6 used by USART2_TX" Expression="USART2_TX_DMA1_Channel6"/>
+    </RefParameter>
+    <RefParameter Name="USART2_TX_DMA_CHANNEL" DefaultValue="USART2_TX_DMA1_Channel_7" Type="string" Comment="DMA Request for USART2_TX">
+        <Condition Diagnostic="DMA1_Channel7 used by USART2_TX" Expression="USART2_TX_DMA1_Channel7"/>
+    </RefParameter>
+    <RefParameter Name="USART2_TX_DMA_CHANNEL" DefaultValue="USART2_TX_DMA1_Channel_8" Type="string" Comment="DMA Request for USART2_TX">
+        <Condition Diagnostic="DMA1_Channel8 used by USART2_TX" Expression="USART2_TX_DMA1_Channel8"/>
+    </RefParameter>
+    <RefParameter Name="USART2_TX_DMA_CHANNEL" DefaultValue="USART2_TX_DMA2_Channel_1" Type="string" Comment="DMA Request for USART2_TX">
+        <Condition Diagnostic="DMA2_Channel1 used by USART2_TX" Expression="USART2_TX_DMA2_Channel1"/>
+    </RefParameter>
+    <RefParameter Name="USART2_TX_DMA_CHANNEL" DefaultValue="USART2_TX_DMA2_Channel_2" Type="string" Comment="DMA Request for USART2_TX">
+        <Condition Diagnostic="DMA2_Channel2 used by USART2_TX" Expression="USART2_TX_DMA2_Channel2"/>
+    </RefParameter>
+    <RefParameter Name="USART2_TX_DMA_CHANNEL" DefaultValue="USART2_TX_DMA2_Channel_3" Type="string" Comment="DMA Request for USART2_TX">
+        <Condition Diagnostic="DMA2_Channel3 used by USART2_TX" Expression="USART2_TX_DMA2_Channel3"/>
+    </RefParameter>
+    <RefParameter Name="USART2_TX_DMA_CHANNEL" DefaultValue="USART2_TX_DMA2_Channel_4" Type="string" Comment="DMA Request for USART2_TX">
+        <Condition Diagnostic="DMA2_Channel4 used by USART2_TX" Expression="USART2_TX_DMA2_Channel4"/>
+    </RefParameter>
+    <RefParameter Name="USART2_TX_DMA_CHANNEL" DefaultValue="USART2_TX_DMA2_Channel_5" Type="string" Comment="DMA Request for USART2_TX">
+        <Condition Diagnostic="DMA2_Channel5 used by USART2_TX" Expression="USART2_TX_DMA2_Channel5"/>
+    </RefParameter>
+    <RefParameter Name="USART2_TX_DMA_CHANNEL" DefaultValue="USART2_TX_DMA2_Channel_6" Type="string" Comment="DMA Request for USART2_TX">
+        <Condition Diagnostic="DMA2_Channel6 used by USART2_TX" Expression="USART2_TX_DMA2_Channel6"/>
+    </RefParameter>
+    <RefParameter Name="USART2_TX_DMA_CHANNEL" DefaultValue="USART2_TX_DMA2_Channel_7" Type="string" Comment="DMA Request for USART2_TX">
+        <Condition Diagnostic="DMA2_Channel7 used by USART2_TX" Expression="USART2_TX_DMA2_Channel7"/>
+    </RefParameter>
+    <RefParameter Name="USART2_TX_DMA_CHANNEL" DefaultValue="USART2_TX_DMA2_Channel_8" Type="string" Comment="DMA Request for USART2_TX">
+        <Condition Diagnostic="DMA2_Channel8 used by USART2_TX" Expression="USART2_TX_DMA2_Channel8"/>
+    </RefParameter>
+    <RefParameter Name="USART2_TX_DMA_CHANNEL" DefaultValue="" Type="string" Comment="No DMA Request for USART2_TX"/>
+
+    <RefParameter Name="USART3_TX_DMA_CHANNEL" DefaultValue="USART3_TX_DMA1_Channel_1" Type="string" Comment="DMA Request for USART3_TX">
+        <Condition Diagnostic="DMA1_Channel1 used by USART3_TX" Expression="USART3_TX_DMA1_Channel1"/>
+    </RefParameter>
+    <RefParameter Name="USART3_TX_DMA_CHANNEL" DefaultValue="USART3_TX_DMA1_Channel_2" Type="string" Comment="DMA Request for USART3_TX">
+        <Condition Diagnostic="DMA1_Channel2 used by USART3_TX" Expression="USART3_TX_DMA1_Channel2"/>
+    </RefParameter>
+    <RefParameter Name="USART3_TX_DMA_CHANNEL" DefaultValue="USART3_TX_DMA1_Channel_3" Type="string" Comment="DMA Request for USART3_TX">
+        <Condition Diagnostic="DMA1_Channel3 used by USART3_TX" Expression="USART3_TX_DMA1_Channel3"/>
+    </RefParameter>
+    <RefParameter Name="USART3_TX_DMA_CHANNEL" DefaultValue="USART3_TX_DMA1_Channel_4" Type="string" Comment="DMA Request for USART3_TX">
+        <Condition Diagnostic="DMA1_Channel4 used by USART3_TX" Expression="USART3_TX_DMA1_Channel4"/>
+    </RefParameter>
+    <RefParameter Name="USART3_TX_DMA_CHANNEL" DefaultValue="USART3_TX_DMA1_Channel_5" Type="string" Comment="DMA Request for USART3_TX">
+        <Condition Diagnostic="DMA1_Channel5 used by USART3_TX" Expression="USART3_TX_DMA1_Channel5"/>
+    </RefParameter>
+    <RefParameter Name="USART3_TX_DMA_CHANNEL" DefaultValue="USART3_TX_DMA1_Channel_6" Type="string" Comment="DMA Request for USART3_TX">
+        <Condition Diagnostic="DMA1_Channel6 used by USART3_TX" Expression="USART3_TX_DMA1_Channel6"/>
+    </RefParameter>
+    <RefParameter Name="USART3_TX_DMA_CHANNEL" DefaultValue="USART3_TX_DMA1_Channel_7" Type="string" Comment="DMA Request for USART3_TX">
+        <Condition Diagnostic="DMA1_Channel7 used by USART3_TX" Expression="USART3_TX_DMA1_Channel7"/>
+    </RefParameter>
+    <RefParameter Name="USART3_TX_DMA_CHANNEL" DefaultValue="USART3_TX_DMA1_Channel_8" Type="string" Comment="DMA Request for USART3_TX">
+        <Condition Diagnostic="DMA1_Channel8 used by USART3_TX" Expression="USART3_TX_DMA1_Channel8"/>
+    </RefParameter>
+    <RefParameter Name="USART3_TX_DMA_CHANNEL" DefaultValue="USART3_TX_DMA2_Channel_1" Type="string" Comment="DMA Request for USART3_TX">
+        <Condition Diagnostic="DMA2_Channel1 used by USART3_TX" Expression="USART3_TX_DMA2_Channel1"/>
+    </RefParameter>
+    <RefParameter Name="USART3_TX_DMA_CHANNEL" DefaultValue="USART3_TX_DMA2_Channel_2" Type="string" Comment="DMA Request for USART3_TX">
+        <Condition Diagnostic="DMA2_Channel2 used by USART3_TX" Expression="USART3_TX_DMA2_Channel2"/>
+    </RefParameter>
+    <RefParameter Name="USART3_TX_DMA_CHANNEL" DefaultValue="USART3_TX_DMA2_Channel_3" Type="string" Comment="DMA Request for USART3_TX">
+        <Condition Diagnostic="DMA2_Channel3 used by USART3_TX" Expression="USART3_TX_DMA2_Channel3"/>
+    </RefParameter>
+    <RefParameter Name="USART3_TX_DMA_CHANNEL" DefaultValue="USART3_TX_DMA2_Channel_4" Type="string" Comment="DMA Request for USART3_TX">
+        <Condition Diagnostic="DMA2_Channel4 used by USART3_TX" Expression="USART3_TX_DMA2_Channel4"/>
+    </RefParameter>
+    <RefParameter Name="USART3_TX_DMA_CHANNEL" DefaultValue="USART3_TX_DMA2_Channel_5" Type="string" Comment="DMA Request for USART3_TX">
+        <Condition Diagnostic="DMA2_Channel5 used by USART3_TX" Expression="USART3_TX_DMA2_Channel5"/>
+    </RefParameter>
+    <RefParameter Name="USART3_TX_DMA_CHANNEL" DefaultValue="USART3_TX_DMA2_Channel_6" Type="string" Comment="DMA Request for USART3_TX">
+        <Condition Diagnostic="DMA2_Channel6 used by USART3_TX" Expression="USART3_TX_DMA2_Channel6"/>
+    </RefParameter>
+    <RefParameter Name="USART3_TX_DMA_CHANNEL" DefaultValue="USART3_TX_DMA2_Channel_7" Type="string" Comment="DMA Request for USART3_TX">
+        <Condition Diagnostic="DMA2_Channel7 used by USART3_TX" Expression="USART3_TX_DMA2_Channel7"/>
+    </RefParameter>
+    <RefParameter Name="USART3_TX_DMA_CHANNEL" DefaultValue="USART3_TX_DMA2_Channel_8" Type="string" Comment="DMA Request for USART3_TX">
+        <Condition Diagnostic="DMA2_Channel8 used by USART3_TX" Expression="USART3_TX_DMA2_Channel8"/>
+    </RefParameter>
+    <RefParameter Name="USART3_TX_DMA_CHANNEL" DefaultValue="" Type="string" Comment="No DMA Request for USART3_TX"/>
+
+    <RefParameter Name="UART4_TX_DMA_CHANNEL" DefaultValue="UART4_TX_DMA1_Channel_1" Type="string" Comment="DMA Request for UART4_TX">
+        <Condition Diagnostic="DMA1_Channel1 used by UART4_TX" Expression="UART4_TX_DMA1_Channel1"/>
+    </RefParameter>
+    <RefParameter Name="UART4_TX_DMA_CHANNEL" DefaultValue="UART4_TX_DMA1_Channel_2" Type="string" Comment="DMA Request for UART4_TX">
+        <Condition Diagnostic="DMA1_Channel2 used by UART4_TX" Expression="UART4_TX_DMA1_Channel2"/>
+    </RefParameter>
+    <RefParameter Name="UART4_TX_DMA_CHANNEL" DefaultValue="UART4_TX_DMA1_Channel_3" Type="string" Comment="DMA Request for UART4_TX">
+        <Condition Diagnostic="DMA1_Channel3 used by UART4_TX" Expression="UART4_TX_DMA1_Channel3"/>
+    </RefParameter>
+    <RefParameter Name="UART4_TX_DMA_CHANNEL" DefaultValue="UART4_TX_DMA1_Channel_4" Type="string" Comment="DMA Request for UART4_TX">
+        <Condition Diagnostic="DMA1_Channel4 used by UART4_TX" Expression="UART4_TX_DMA1_Channel4"/>
+    </RefParameter>
+    <RefParameter Name="UART4_TX_DMA_CHANNEL" DefaultValue="UART4_TX_DMA1_Channel_5" Type="string" Comment="DMA Request for UART4_TX">
+        <Condition Diagnostic="DMA1_Channel5 used by UART4_TX" Expression="UART4_TX_DMA1_Channel5"/>
+    </RefParameter>
+    <RefParameter Name="UART4_TX_DMA_CHANNEL" DefaultValue="UART4_TX_DMA1_Channel_6" Type="string" Comment="DMA Request for UART4_TX">
+        <Condition Diagnostic="DMA1_Channel6 used by UART4_TX" Expression="UART4_TX_DMA1_Channel6"/>
+    </RefParameter>
+    <RefParameter Name="UART4_TX_DMA_CHANNEL" DefaultValue="UART4_TX_DMA1_Channel_7" Type="string" Comment="DMA Request for UART4_TX">
+        <Condition Diagnostic="DMA1_Channel7 used by UART4_TX" Expression="UART4_TX_DMA1_Channel7"/>
+    </RefParameter>
+    <RefParameter Name="UART4_TX_DMA_CHANNEL" DefaultValue="UART4_TX_DMA1_Channel_8" Type="string" Comment="DMA Request for UART4_TX">
+        <Condition Diagnostic="DMA1_Channel8 used by UART4_TX" Expression="UART4_TX_DMA1_Channel8"/>
+    </RefParameter>
+    <RefParameter Name="UART4_TX_DMA_CHANNEL" DefaultValue="UART4_TX_DMA2_Channel_1" Type="string" Comment="DMA Request for UART4_TX">
+        <Condition Diagnostic="DMA2_Channel1 used by UART4_TX" Expression="UART4_TX_DMA2_Channel1"/>
+    </RefParameter>
+    <RefParameter Name="UART4_TX_DMA_CHANNEL" DefaultValue="UART4_TX_DMA2_Channel_2" Type="string" Comment="DMA Request for UART4_TX">
+        <Condition Diagnostic="DMA2_Channel2 used by UART4_TX" Expression="UART4_TX_DMA2_Channel2"/>
+    </RefParameter>
+    <RefParameter Name="UART4_TX_DMA_CHANNEL" DefaultValue="UART4_TX_DMA2_Channel_3" Type="string" Comment="DMA Request for UART4_TX">
+        <Condition Diagnostic="DMA2_Channel3 used by UART4_TX" Expression="UART4_TX_DMA2_Channel3"/>
+    </RefParameter>
+    <RefParameter Name="UART4_TX_DMA_CHANNEL" DefaultValue="UART4_TX_DMA2_Channel_4" Type="string" Comment="DMA Request for UART4_TX">
+        <Condition Diagnostic="DMA2_Channel4 used by UART4_TX" Expression="UART4_TX_DMA2_Channel4"/>
+    </RefParameter>
+    <RefParameter Name="UART4_TX_DMA_CHANNEL" DefaultValue="UART4_TX_DMA2_Channel_5" Type="string" Comment="DMA Request for UART4_TX">
+        <Condition Diagnostic="DMA2_Channel5 used by UART4_TX" Expression="UART4_TX_DMA2_Channel5"/>
+    </RefParameter>
+    <RefParameter Name="UART4_TX_DMA_CHANNEL" DefaultValue="UART4_TX_DMA2_Channel_6" Type="string" Comment="DMA Request for UART4_TX">
+        <Condition Diagnostic="DMA2_Channel6 used by UART4_TX" Expression="UART4_TX_DMA2_Channel6"/>
+    </RefParameter>
+    <RefParameter Name="UART4_TX_DMA_CHANNEL" DefaultValue="UART4_TX_DMA2_Channel_7" Type="string" Comment="DMA Request for UART4_TX">
+        <Condition Diagnostic="DMA2_Channel7 used by UART4_TX" Expression="UART4_TX_DMA2_Channel7"/>
+    </RefParameter>
+    <RefParameter Name="UART4_TX_DMA_CHANNEL" DefaultValue="UART4_TX_DMA2_Channel_8" Type="string" Comment="DMA Request for UART4_TX">
+        <Condition Diagnostic="DMA2_Channel8 used by UART4_TX" Expression="UART4_TX_DMA2_Channel8"/>
+    </RefParameter>
+    <RefParameter Name="UART4_TX_DMA_CHANNEL" DefaultValue="" Type="string" Comment="No DMA Request for UART4_TX"/>
+
+    <RefParameter Name="UART5_TX_DMA_CHANNEL" DefaultValue="UART5_TX_DMA1_Channel_1" Type="string" Comment="DMA Request for UART5_TX">
+        <Condition Diagnostic="DMA1_Channel1 used by UART5_TX" Expression="UART5_TX_DMA1_Channel1"/>
+    </RefParameter>
+    <RefParameter Name="UART5_TX_DMA_CHANNEL" DefaultValue="UART5_TX_DMA1_Channel_2" Type="string" Comment="DMA Request for UART5_TX">
+        <Condition Diagnostic="DMA1_Channel2 used by UART5_TX" Expression="UART5_TX_DMA1_Channel2"/>
+    </RefParameter>
+    <RefParameter Name="UART5_TX_DMA_CHANNEL" DefaultValue="UART5_TX_DMA1_Channel_3" Type="string" Comment="DMA Request for UART5_TX">
+        <Condition Diagnostic="DMA1_Channel3 used by UART5_TX" Expression="UART5_TX_DMA1_Channel3"/>
+    </RefParameter>
+    <RefParameter Name="UART5_TX_DMA_CHANNEL" DefaultValue="UART5_TX_DMA1_Channel_4" Type="string" Comment="DMA Request for UART5_TX">
+        <Condition Diagnostic="DMA1_Channel4 used by UART5_TX" Expression="UART5_TX_DMA1_Channel4"/>
+    </RefParameter>
+    <RefParameter Name="UART5_TX_DMA_CHANNEL" DefaultValue="UART5_TX_DMA1_Channel_5" Type="string" Comment="DMA Request for UART5_TX">
+        <Condition Diagnostic="DMA1_Channel5 used by UART5_TX" Expression="UART5_TX_DMA1_Channel5"/>
+    </RefParameter>
+    <RefParameter Name="UART5_TX_DMA_CHANNEL" DefaultValue="UART5_TX_DMA1_Channel_6" Type="string" Comment="DMA Request for UART5_TX">
+        <Condition Diagnostic="DMA1_Channel6 used by UART5_TX" Expression="UART5_TX_DMA1_Channel6"/>
+    </RefParameter>
+    <RefParameter Name="UART5_TX_DMA_CHANNEL" DefaultValue="UART5_TX_DMA1_Channel_7" Type="string" Comment="DMA Request for UART5_TX">
+        <Condition Diagnostic="DMA1_Channel7 used by UART5_TX" Expression="UART5_TX_DMA1_Channel7"/>
+    </RefParameter>
+    <RefParameter Name="UART5_TX_DMA_CHANNEL" DefaultValue="UART5_TX_DMA1_Channel_8" Type="string" Comment="DMA Request for UART5_TX">
+        <Condition Diagnostic="DMA1_Channel8 used by UART5_TX" Expression="UART5_TX_DMA1_Channel8"/>
+    </RefParameter>
+    <RefParameter Name="UART5_TX_DMA_CHANNEL" DefaultValue="UART5_TX_DMA2_Channel_1" Type="string" Comment="DMA Request for UART5_TX">
+        <Condition Diagnostic="DMA2_Channel1 used by UART5_TX" Expression="UART5_TX_DMA2_Channel1"/>
+    </RefParameter>
+    <RefParameter Name="UART5_TX_DMA_CHANNEL" DefaultValue="UART5_TX_DMA2_Channel_2" Type="string" Comment="DMA Request for UART5_TX">
+        <Condition Diagnostic="DMA2_Channel2 used by UART5_TX" Expression="UART5_TX_DMA2_Channel2"/>
+    </RefParameter>
+    <RefParameter Name="UART5_TX_DMA_CHANNEL" DefaultValue="UART5_TX_DMA2_Channel_3" Type="string" Comment="DMA Request for UART5_TX">
+        <Condition Diagnostic="DMA2_Channel3 used by UART5_TX" Expression="UART5_TX_DMA2_Channel3"/>
+    </RefParameter>
+    <RefParameter Name="UART5_TX_DMA_CHANNEL" DefaultValue="UART5_TX_DMA2_Channel_4" Type="string" Comment="DMA Request for UART5_TX">
+        <Condition Diagnostic="DMA2_Channel4 used by UART5_TX" Expression="UART5_TX_DMA2_Channel4"/>
+    </RefParameter>
+    <RefParameter Name="UART5_TX_DMA_CHANNEL" DefaultValue="UART5_TX_DMA2_Channel_5" Type="string" Comment="DMA Request for UART5_TX">
+        <Condition Diagnostic="DMA2_Channel5 used by UART5_TX" Expression="UART5_TX_DMA2_Channel5"/>
+    </RefParameter>
+    <RefParameter Name="UART5_TX_DMA_CHANNEL" DefaultValue="UART5_TX_DMA2_Channel_6" Type="string" Comment="DMA Request for UART5_TX">
+        <Condition Diagnostic="DMA2_Channel6 used by UART5_TX" Expression="UART5_TX_DMA2_Channel6"/>
+    </RefParameter>
+    <RefParameter Name="UART5_TX_DMA_CHANNEL" DefaultValue="UART5_TX_DMA2_Channel_7" Type="string" Comment="DMA Request for UART5_TX">
+        <Condition Diagnostic="DMA2_Channel7 used by UART5_TX" Expression="UART5_TX_DMA2_Channel7"/>
+    </RefParameter>
+    <RefParameter Name="UART5_TX_DMA_CHANNEL" DefaultValue="UART5_TX_DMA2_Channel_8" Type="string" Comment="DMA Request for UART5_TX">
+        <Condition Diagnostic="DMA2_Channel8 used by UART5_TX" Expression="UART5_TX_DMA2_Channel8"/>
+    </RefParameter>
+    <RefParameter Name="UART5_TX_DMA_CHANNEL" DefaultValue="" Type="string" Comment="No DMA Request for UART5_TX"/>
+
+    <RefParameter Name="UART_TX_DMA_CHANNEL" Comment="DMA Request TX for UART" Type="string" DefaultValue="+TRACER_EMB:LPUART1_TX_DMA_CHANNEL" Unit="" Visible="false">
+        <Condition Diagnostic="LPUART1_TX used by DMA Request TX for UART" Expression="TRACEREMB_LPUART1"/>
+    </RefParameter>
+    <RefParameter Name="UART_TX_DMA_CHANNEL" Comment="DMA Request TX for UART" Type="string" DefaultValue="+TRACER_EMB:USART1_TX_DMA_CHANNEL" Unit="" Visible="false">
+        <Condition Diagnostic="USART1_TX used by DMA Request TX for UART" Expression="TRACEREMB_USART1"/>
+    </RefParameter>
+    <RefParameter Name="UART_TX_DMA_CHANNEL" Comment="DMA Request TX for UART" Type="string" DefaultValue="+TRACER_EMB:USART2_TX_DMA_CHANNEL" Unit="" Visible="false">
+        <Condition Diagnostic="USART2_TX used by DMA Request TX for UART" Expression="TRACEREMB_USART2"/>
+    </RefParameter>
+    <RefParameter Name="UART_TX_DMA_CHANNEL" Comment="DMA Request TX for UART" Type="string" DefaultValue="+TRACER_EMB:USART3_TX_DMA_CHANNEL" Unit="" Visible="false">
+        <Condition Diagnostic="USART3_TX used by DMA Request TX for UART" Expression="TRACEREMB_USART3"/>
+    </RefParameter>
+    <RefParameter Name="UART_TX_DMA_CHANNEL" Comment="DMA Request TX for UART" Type="string" DefaultValue="+TRACER_EMB:UART4_TX_DMA_CHANNEL" Unit="" Visible="false">
+        <Condition Diagnostic="UART4_TX used by DMA Request TX for UART" Expression="TRACEREMB_UART4"/>
+    </RefParameter>
+    <RefParameter Name="UART_TX_DMA_CHANNEL" Comment="DMA Request TX for UART" Type="string" DefaultValue="+TRACER_EMB:UART5_TX_DMA_CHANNEL" Unit="" Visible="false">
+        <Condition Diagnostic="UART5_TX used by DMA Request TX for UART" Expression="TRACEREMB_UART5"/>
+    </RefParameter>
+    <RefParameter Name="UART_TX_DMA_CHANNEL" Comment="DMA Request TX for UART" Type="string" DefaultValue="" Unit="" Visible="false"/>
+
+    <RefParameter Name="UART_TX_DMA_interrupt" DefaultValue="" Comment="External Interrupt number for UART TX" Type="string" Visible="false"/>
+
+    <RefParameter Name="UART_TX_DMA_enableClock" DefaultValue="" Comment="" Type="list" Visible="false">
+        <PossibleValue Value="LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_DMA1)" Comment=""/>
+        <Condition Diagnostic="External Interrupt number for UART TX" Expression="((TRACEREMB_LPUART1 &amp; LPUART1_TX_DMA1) |
+                                                                                    (TRACEREMB_USART1 &amp; USART1_TX_DMA1) |
+                                                                                    (TRACEREMB_USART2 &amp; USART2_TX_DMA1) |
+                                                                                    (TRACEREMB_USART3 &amp; USART3_TX_DMA1) |
+                                                                                    (TRACEREMB_UART4 &amp; UART4_TX_DMA1) |
+                                                                                    (TRACEREMB_UART5 &amp; UART5_TX_DMA1))"/>
+    </RefParameter>
+    <RefParameter Name="UART_TX_DMA_enableClock" DefaultValue="" Comment="" Type="list" Visible="false">
+        <PossibleValue Value="LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_DMA2)" Comment=""/>
+        <Condition Diagnostic="External Interrupt number for UART TX" Expression="((TRACEREMB_LPUART1 &amp; LPUART1_TX_DMA2) |
+                                                                                    (TRACEREMB_USART1 &amp; USART1_TX_DMA2) |
+                                                                                    (TRACEREMB_USART2 &amp; USART2_TX_DMA2) |
+                                                                                    (TRACEREMB_USART3 &amp; USART3_TX_DMA2) |
+                                                                                    (TRACEREMB_UART4 &amp; UART4_TX_DMA2) |
+                                                                                    (TRACEREMB_UART5 &amp; UART5_TX_DMA2))"/>
+    </RefParameter>
+
+    <!--  RefParameters for Gpio informations -->
+    <RefParameter Name="UART_TX_PIN" DefaultValue="P_A_2_AF_7" Type="string" Comment="TX for USART2 on PA2,AF7" Visible="false">
+        <Condition Diagnostic="TX for USART2 on PA2,AF7" Expression="TRACEREMB_USART2 &amp; PA2_USART2_TX"/>
+    </RefParameter>
+    <RefParameter Name="UART_TX_PIN" DefaultValue="P_A_9_AF_7" Type="string" Comment="TX for USART1 on PA9,AF7" Visible="false">
+        <Condition Diagnostic="TX for USART1 on PA9,AF7" Expression="TRACEREMB_USART1 &amp; PA9_USART1_TX"/>
+    </RefParameter>
+    <RefParameter Name="UART_TX_PIN" DefaultValue="P_B_6_AF_7" Type="string" Comment="TX for USART1 on PB6,AF7" Visible="false">
+        <Condition Diagnostic="TX for USART1 on PB6,AF7" Expression="TRACEREMB_USART1 &amp; PB6_USART1_TX"/>
+    </RefParameter>
+    <RefParameter Name="UART_TX_PIN" DefaultValue="P_B_10_AF_7" Type="string" Comment="TX for USART3 on PB10,AF7" Visible="false">
+        <Condition Diagnostic="TX for USART3 on PB10,AF7" Expression="TRACEREMB_USART3 &amp; PB10_USART3_TX"/>
+    </RefParameter>
+    <RefParameter Name="UART_TX_PIN" DefaultValue="P_C_4_AF_7" Type="string" Comment="TX for USART3 on PC4,AF7" Visible="false">
+        <Condition Diagnostic="TX for USART3 on PC4,AF7" Expression="TRACEREMB_USART3 &amp; PC4_USART3_TX"/>
+    </RefParameter>
+    <RefParameter Name="UART_TX_PIN" DefaultValue="P_C_10_AF_7" Type="string" Comment="TX for USART3 on PC10,AF7" Visible="false">
+        <Condition Diagnostic="TX for USART3 on PC10,AF7" Expression="TRACEREMB_USART3 &amp; PC10_USART3_TX"/>
+    </RefParameter>
+    <RefParameter Name="UART_TX_PIN" DefaultValue="P_D_5_AF_7" Type="string" Comment="TX for USART2 on PD5,AF7" Visible="false">
+        <Condition Diagnostic="TX for USART2 on PD5,AF7" Expression="TRACEREMB_USART2 &amp; PD5_USART2_TX"/>
+    </RefParameter>
+    <RefParameter Name="UART_TX_PIN" DefaultValue="P_D_8_AF_7" Type="string" Comment="TX for USART3 on PD8,AF7" Visible="false">
+        <Condition Diagnostic="TX for USART3 on PD8,AF7" Expression="TRACEREMB_USART3 &amp; PD8_USART3_TX"/>
+    </RefParameter>
+    <RefParameter Name="UART_TX_PIN" DefaultValue="P_G_9_AF_7" Type="string" Comment="TX for USART1 on PG9,AF7" Visible="false">
+        <Condition Diagnostic="TX for USART1 on PG9,AF7" Expression="TRACEREMB_USART1 &amp; PG9_USART1_TX"/>
+    </RefParameter>
+    <RefParameter Name="UART_TX_PIN" DefaultValue="P_A_0_AF_8" Type="string" Comment="TX for UART4 on PA0,AF8" Visible="false">
+        <Condition Diagnostic="TX for UART4 on PA0,AF8" Expression="TRACEREMB_UART4 &amp; PA0_UART4_TX"/>
+    </RefParameter>
+    <RefParameter Name="UART_TX_PIN" DefaultValue="P_A_2_AF_8" Type="string" Comment="TX for LPUART1 on PA2,AF8" Visible="false">
+        <Condition Diagnostic="TX for LPUART1 on PA2,AF8" Expression="TRACEREMB_LPUART1 &amp; PA2_LPUART1_TX"/>
+    </RefParameter>
+    <RefParameter Name="UART_TX_PIN" DefaultValue="P_B_11_AF_8" Type="string" Comment="TX for LPUART1 on PB11,AF8" Visible="false">
+        <Condition Diagnostic="TX for LPUART1 on PB11,AF8" Expression="TRACEREMB_LPUART1 &amp; PB11_LPUART1_TX"/>
+    </RefParameter>
+    <RefParameter Name="UART_TX_PIN" DefaultValue="P_C_1_AF_8" Type="string" Comment="TX for LPUART1 on PC1,AF8" Visible="false">
+        <Condition Diagnostic="TX for LPUART1 on PC1,AF8" Expression="TRACEREMB_LPUART1 &amp; PC1_LPUART1_TX"/>
+    </RefParameter>
+    <RefParameter Name="UART_TX_PIN" DefaultValue="P_C_10_AF_8" Type="string" Comment="TX for UART4 on PC10,AF8" Visible="false">
+        <Condition Diagnostic="TX for UART4 on PC10,AF8" Expression="TRACEREMB_UART4 &amp; PC10_UART4_TX"/>
+    </RefParameter>
+    <RefParameter Name="UART_TX_PIN" DefaultValue="P_C_12_AF_8" Type="string" Comment="TX for UART5 on PC12,AF8" Visible="false">
+        <Condition Diagnostic="TX for UART5 on PC12,AF8" Expression="TRACEREMB_UART5 &amp; PC12_UART5_TX"/>
+    </RefParameter>
+    <RefParameter Name="UART_TX_PIN" DefaultValue="P_G_7_AF_8" Type="string" Comment="TX for LPUART1 on PG7,AF8" Visible="false">
+        <Condition Diagnostic="TX for LPUART1 on PG7,AF8" Expression="TRACEREMB_LPUART1 &amp; PG7_LPUART1_TX"/>
+    </RefParameter>
+    <RefParameter Name="UART_TX_PIN" DefaultValue="" Type="string" Comment="No TX for USART trace" Visible="false"/>
+
+    <RefParameter Name="UART_RX_PIN" DefaultValue="P_A_3_AF_7" Type="string" Comment="RX for USART2 on PA3,AF7" Visible="false">
+        <Condition Diagnostic="RX for USART2 on PA3,AF7" Expression="TRACEREMB_USART2 &amp; PA3_USART2_RX"/>
+    </RefParameter>
+    <RefParameter Name="UART_RX_PIN" DefaultValue="P_A_10_AF_7" Type="string" Comment="RX for USART1 on PA10,AF7" Visible="false">
+        <Condition Diagnostic="RX for USART1 on PA10,AF7" Expression="TRACEREMB_USART1 &amp; PA10_USART1_RX"/>
+    </RefParameter>
+    <RefParameter Name="UART_RX_PIN" DefaultValue="P_A_15_AF_3" Type="string" Comment="RX for USART2 on PA15,AF3" Visible="false">
+        <Condition Diagnostic="RX for USART2 on PA15,AF3" Expression="TRACEREMB_USART2 &amp; PA15_USART2_RX"/>
+    </RefParameter>
+    <RefParameter Name="UART_RX_PIN" DefaultValue="P_B_7_AF_7" Type="string" Comment="RX for USART1 on PB7,AF7" Visible="false">
+        <Condition Diagnostic="RX for USART1 on PB7,AF7" Expression="TRACEREMB_USART1 &amp; PB7_USART1_RX"/>
+    </RefParameter>
+    <RefParameter Name="UART_RX_PIN" DefaultValue="P_B_11_AF_7" Type="string" Comment="RX for USART3 on PB11,AF7" Visible="false">
+        <Condition Diagnostic="RX for USART3 on PB11,AF7" Expression="TRACEREMB_USART3 &amp; PB11_USART3_RX"/>
+    </RefParameter>
+    <RefParameter Name="UART_RX_PIN" DefaultValue="P_C_5_AF_7" Type="string" Comment="RX for USART3 on PC5,AF7" Visible="false">
+        <Condition Diagnostic="RX for USART3 on PC5,AF7" Expression="TRACEREMB_USART3 &amp; PC5_USART3_RX"/>
+    </RefParameter>
+    <RefParameter Name="UART_RX_PIN" DefaultValue="P_C_11_AF_7" Type="string" Comment="RX for USART3 on PC11,AF7" Visible="false">
+        <Condition Diagnostic="RX for USART3 on PC11,AF7" Expression="TRACEREMB_USART3 &amp; PC11_USART3_RX"/>
+    </RefParameter>
+    <RefParameter Name="UART_RX_PIN" DefaultValue="P_D_6_AF_7" Type="string" Comment="RX for USART2 on PD6,AF7" Visible="false">
+        <Condition Diagnostic="RX for USART2 on PD6,AF7" Expression="TRACEREMB_USART2 &amp; PD6_USART2_RX"/>
+    </RefParameter>
+    <RefParameter Name="UART_RX_PIN" DefaultValue="P_D_9_AF_7" Type="string" Comment="RX for USART3 on PD9,AF7" Visible="false">
+        <Condition Diagnostic="RX for USART3 on PD9,AF7" Expression="TRACEREMB_USART3 &amp; PD9_USART3_RX"/>
+    </RefParameter>
+    <RefParameter Name="UART_RX_PIN" DefaultValue="P_G_10_AF_7" Type="string" Comment="RX for USART1 on PG10,AF7" Visible="false">
+        <Condition Diagnostic="RX for USART1 on PG10,AF7" Expression="TRACEREMB_USART1 &amp; PG10_USART1_RX"/>
+    </RefParameter>
+    <RefParameter Name="UART_RX_PIN" DefaultValue="P_A_1_AF_8" Type="string" Comment="RX for UART4 on PA1,AF8" Visible="false">
+        <Condition Diagnostic="RX for UART4 on PA1,AF8" Expression="TRACEREMB_UART4 &amp; PA1_UART4_RX"/>
+    </RefParameter>
+    <RefParameter Name="UART_RX_PIN" DefaultValue="P_A_3_AF_8" Type="string" Comment="RX for LPUART1 on PA3,AF8" Visible="false">
+        <Condition Diagnostic="RX for LPUART1 on PA3,AF8" Expression="TRACEREMB_LPUART1 &amp; PA3_LPUART1_RX"/>
+    </RefParameter>
+    <RefParameter Name="UART_RX_PIN" DefaultValue="P_B_10_AF_8" Type="string" Comment="RX for LPUART1 on PB10,AF8" Visible="false">
+        <Condition Diagnostic="RX for LPUART1 on PB10,AF8" Expression="TRACEREMB_LPUART1 &amp; PB10_LPUART1_RX"/>
+    </RefParameter>
+    <RefParameter Name="UART_RX_PIN" DefaultValue="P_C_0_AF_8" Type="string" Comment="RX for LPUART1 on PC0,AF8" Visible="false">
+        <Condition Diagnostic="RX for LPUART1 on PC0,AF8" Expression="TRACEREMB_LPUART1 &amp; PC0_LPUART1_RX"/>
+    </RefParameter>
+    <RefParameter Name="UART_RX_PIN" DefaultValue="P_C_11_AF_8" Type="string" Comment="RX for UART4 on PC11,AF8" Visible="false">
+        <Condition Diagnostic="RX for UART4 on PC11,AF8" Expression="TRACEREMB_UART4 &amp; PC11_UART4_RX"/>
+    </RefParameter>
+    <RefParameter Name="UART_RX_PIN" DefaultValue="P_D_2_AF_8" Type="string" Comment="RX for UART5 on PD2,AF8" Visible="false">
+        <Condition Diagnostic="RX for UART5 on PD2,AF8" Expression="TRACEREMB_UART5 &amp; PD2_UART5_RX"/>
+    </RefParameter>
+    <RefParameter Name="UART_RX_PIN" DefaultValue="P_G_8_AF_8" Type="string" Comment="RX for LPUART1 on PG8,AF8" Visible="false">
+        <Condition Diagnostic="RX for LPUART1 on PG8,AF8" Expression="TRACEREMB_LPUART1 &amp; PG8_LPUART1_RX"/>
+    </RefParameter>
+    <RefParameter Name="UART_RX_PIN" DefaultValue="" Type="string" Comment="No RX for USART trace" Visible="false"/>
+
+    <!-- RefModes for TRACER_EMB -->
+    <RefMode Name="TRACER_EMB" Abstract="true">
+        <ConfigForMode>TRACER_EMB_Init</ConfigForMode>
+
+        <Parameter Name="Version"/>
+
+        <Parameter Name="TRACER_EMB_DMA_Request"/>
+
+        <Parameter Name="UARTinstance"/>
+        <Parameter Name="UARTbaudrate"/>
+        <Parameter Name="UARTinterrupt"/>
+        <Parameter Name="UARTenableClock"/>
+        <Parameter Name="UARTdisableClock"/>
+        <Parameter Name="UART_TX_PIN"/>
+        <Parameter Name="UART_RX_PIN"/>
+        <Parameter Name="UART_TX_DMA_CHANNEL"/>
+        <Parameter Name="UART_TX_DMA_interrupt"/>
+        <Parameter Name="UART_TX_DMA_enableClock"/>
+    </RefMode>
+
+    <RefMode Name="TRACER_EMB_LPUART1" BaseMode="TRACER_EMB"/>
+    <RefMode Name="TRACER_EMB_USART1" BaseMode="TRACER_EMB"/>
+    <RefMode Name="TRACER_EMB_USART2" BaseMode="TRACER_EMB"/>
+    <RefMode Name="TRACER_EMB_USART3" BaseMode="TRACER_EMB"/>
+    <RefMode Name="TRACER_EMB_UART4" BaseMode="TRACER_EMB"/>
+    <RefMode Name="TRACER_EMB_UART5" BaseMode="TRACER_EMB"/>
+
+    <!-- ModeLogicOperator for TRACER_EMB -->
+    <ModeLogicOperator Name="OR">
+
+        <Mode Name="UartTrace" UserName="Uart Trace Source">
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="TRACER_EMB_LPUART1" UserName="LPUART1" RemoveCondition="!LPUART1_Exist">
+                    <Condition Expression="LPUART1_Asynchronous" Diagnostic="please enable Asynchronous mode of LPUART1 to use this mode."/>
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="VS_traceremb_lpuart1"/>
+                    </SignalLogicalOp>
+                    <Semaphore>TRACEREMB</Semaphore>
+                    <Semaphore>TRACEREMB_LPUART1</Semaphore>
+                </Mode>
+                <Mode Name="TRACER_EMB_USART1" UserName="USART1" RemoveCondition="!USART1_Exist">
+                    <Condition Expression="USART1_Asynchronous" Diagnostic="please enable Asynchronous mode of USART1 to use this mode."/>
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="VS_traceremb_usart1"/>
+                    </SignalLogicalOp>
+                    <Semaphore>TRACEREMB</Semaphore>
+                    <Semaphore>TRACEREMB_USART1</Semaphore>
+                </Mode>
+                <Mode Name="TRACER_EMB_USART2" UserName="USART2" RemoveCondition="!USART2_Exist">
+                    <Condition Expression="USART2_Asynchronous" Diagnostic="please enable Asynchronous mode of USART2 to use this mode."/>
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="VS_traceremb_usart2"/>
+                    </SignalLogicalOp>
+                    <Semaphore>TRACEREMB</Semaphore>
+                    <Semaphore>TRACEREMB_USART2</Semaphore>
+                </Mode>
+                <Mode Name="TRACER_EMB_USART3" UserName="USART3" RemoveCondition="!USART3_Exist">
+                    <Condition Expression="USART3_Asynchronous" Diagnostic="please enable Asynchronous mode of USART3 to use this mode."/>
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="VS_traceremb_usart3"/>
+                    </SignalLogicalOp>
+                    <Semaphore>TRACEREMB</Semaphore>
+                    <Semaphore>TRACEREMB_USART3</Semaphore>
+                </Mode>
+                <Mode Name="TRACER_EMB_UART4" UserName="UART4" RemoveCondition="!UART4_Exist">
+                    <Condition Expression="UART4_Asynchronous" Diagnostic="please enable Asynchronous mode of UART4 to use this mode."/>
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="VS_traceremb_uart4"/>
+                    </SignalLogicalOp>
+                    <Semaphore>TRACEREMB</Semaphore>
+                    <Semaphore>TRACEREMB_UART4</Semaphore>
+                </Mode>
+                <Mode Name="TRACER_EMB_UART5" UserName="UART5" RemoveCondition="!UART5_Exist">
+                    <Condition Expression="UART5_Asynchronous" Diagnostic="please enable Asynchronous mode of UART5 to use this mode."/>
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="VS_traceremb_uart5"/>
+                    </SignalLogicalOp>
+                    <Semaphore>TRACEREMB</Semaphore>
+                    <Semaphore>TRACEREMB_UART5</Semaphore>
+                </Mode>
+            </ModeLogicOperator>
+            <Condition Expression="USBPD_P0U1" Diagnostic="only available when USBPD activated"/>
+        </Mode>
+
+    </ModeLogicOperator>
+
+    <!-- RefSignal for TRACER_EMB -->
+    <RefSignal Name="VS_traceremb_lpuart1" Virtual="true"/>
+    <RefSignal Name="VS_traceremb_usart1" Virtual="true"/>
+    <RefSignal Name="VS_traceremb_usart2" Virtual="true"/>
+    <RefSignal Name="VS_traceremb_usart3" Virtual="true"/>
+    <RefSignal Name="VS_traceremb_uart4" Virtual="true"/>
+    <RefSignal Name="VS_traceremb_uart5" Virtual="true"/>
+
+    <Semaphore>MW_TRACER_EMB_MW</Semaphore>
+
+</IP>

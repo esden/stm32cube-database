@@ -138,7 +138,7 @@ __weak HAL_StatusTypeDef MX_${UsartInstance}_UART_Init(UART_HandleTypeDef* huart
 [#-- Bug 60723 --]
 [#-- Bug 50684 --]
 [#if useDefine]
-[#-- here we must intialize the handle with the correct exti line number --]
+[#-- here we must initialize the handle with the correct exti line number --]
 [#else]
 EXTI_HandleTypeDef hexti${BUTTON_EXTI} = {.Line = EXTI_LINE_${BUTTON_EXTI}};
 [/#if]
@@ -383,7 +383,7 @@ int32_t BSP_PB_DeInit(Button_TypeDef Button)
 
 /**
  * @brief  Returns the selected button state.
- * @param  Button Button to be adressed
+ * @param  Button Button to be addressed
  *                This parameter can be one of the following values:
  *                @arg  BUTTON_USER
  * @retval The Button GPIO pin value (GPIO_PIN_RESET = button pressed)

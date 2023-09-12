@@ -414,7 +414,16 @@ ETH_TxPacketConfig TxConfig;
                                                    [#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"]//${fargument.name}${instanceIndex}[#else]${fargument.name}[/#if].${argument.name} = ${argument.value};
                                               [/#if]
                                               [#if argument.value??]
-                                                   [#if argument.value!="N/A"][#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"]${fargument.name}${instanceIndex}[#else]${fargument.name}[/#if].${argument.name} = ${argument.value};  [/#if]
+                                                    [#if argument.value!="N/A"]
+                                                        [#assign argValue=argument.value]
+                                                        [#assign indicator = varName+"."+argument.name+" = "+argValue+" "]
+                                                        [#assign indicatorName = varName+"."+argument.name]
+                                                        [#if !listofDeclaration?contains(indicator)][#-- if not repeted --]  
+                                                            [#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"][#assign varName=fargument.name +"." +instanceIndex]${fargument.name}${instanceIndex}[#else][#assign varName=fargument.name]${fargument.name}[/#if].${argument.name} = ${argValue};
+                                                            [#assign listofDeclaration = listofDeclaration?replace(indicatorName+" =","")]
+                                                            [#assign listofDeclaration = listofDeclaration +", "+ varName+"."+argument.name+" = "+argValue+" "]                                                                                 
+                                                        [/#if]
+                                                    [/#if]
                                               [/#if]
                                           [/#if][#-- if argument=Instance--]
                                       [/#if]
@@ -1029,6 +1038,13 @@ ${variable.value} ${variable.name};
         /* ${instName} init function */
         [#if halMode!=instanceData.realIpName&&!instanceData.ipName?contains("TIM")&&!instanceData.ipName?contains("CEC")]#nvoid MX_${instName}_${halMode}_Init(void)[#else]void MX_${instName}_Init(void)[/#if]
 {
+
+#n
+#t/* USER CODE BEGIN ${instName}_Init 0 */
+#n
+#t/* USER CODE END ${instName}_Init 0 */    
+#n
+
         [#-- assign ipInstanceIndex = instName?replace(name,"")--]
         [#assign args = ""]
         [#assign listOfLocalVariables =""]
@@ -1103,9 +1119,19 @@ ${variable.value} ${variable.name};
     [#-- Generate service code --]
     [@common.generateServiceCode ipName=instName serviceType="Init" modeName="mode" instHandler=instName tabN=1 IPData=instanceData/]
 [/#if]
+
+#t/* USER CODE BEGIN ${instName}_Init 1 */
+#n
+#t/* USER CODE END ${instName}_Init 1 */
+
         [#--list instanceData.configs as config--]
             [#if instanceData.instIndex??][@common.generateConfigModelListCode configModel=instanceData inst=instName  nTab=1 index=instanceData.instIndex/][#else][@common.generateConfigModelListCode configModel=instanceData inst=instName  nTab=1 index=""/][/#if]
         [#--/#list--]
+
+#t/* USER CODE BEGIN ${instName}_Init 2 */
+#n
+#t/* USER CODE END ${instName}_Init 2 */
+
 [#-- MspPostInit callBack if needed for output gpio config --]
 [#if instanceData.initServices??]
     [#if instanceData.initServices.gpioOut??]

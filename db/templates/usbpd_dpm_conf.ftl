@@ -19,7 +19,6 @@
 #endif 
 [#assign nbPorts = "1"]
 [#assign USBPD_CoreLib = ""]
-[#assign USBPD_STATEMACHINE = false]
 [#assign SRC = false]
 [#assign SNK = false]
 [#assign DRP = false]
@@ -33,9 +32,6 @@
         [#list SWIP.defines as definition]
             [#if definition.name == "USBPD_CoreLib" && definition.value != ""]
                 [#assign USBPD_CoreLib = definition.value]
-            [/#if]
-            [#if definition.name == "USBPD_StateMachine" && definition.value == "true"]
-                [#assign USBPD_STATEMACHINE = true]
             [/#if]
             [#if definition.name == "SRC" && definition.value == "true"]
                 [#assign SRC = true]
@@ -382,7 +378,7 @@ USBPD_SettingsTypeDef       DPM_Settings[USBPD_PORT_COUNT] =
     .PE_PD3_Support.d =                           /*!< PD3 SUPPORT FEATURE                                              */
     {
       .PE_UnchunkSupport                = ${valuePE_UnchunkSupport_P0},  /* support Unchunked mode (valid only spec revision 3.0)   */
-      .PE_FastRoleSwapSupport           = ${valuePE_FastRoleSwapSupport_P0},   /* support fast role swap only spec revsion 3.0            */
+      .PE_FastRoleSwapSupport           = ${valuePE_FastRoleSwapSupport_P0},   /* support fast role swap only spec revision 3.0            */
       .Is_GetPPSStatus_Supported        = ${valueIs_GetPPSStatus_Supported_P0},  /*!< PPS message NOT supported by PE stack */
       .Is_SrcCapaExt_Supported          = ${valueIs_SrcCapaExt_Supported_P0},  /*!< Source_Capabilities_Extended message supported or not by DPM */
       .Is_Alert_Supported               = ${valueIs_Alert_Supported_P0},   /*!< Alert message supported or not by DPM */
@@ -432,7 +428,7 @@ USBPD_SettingsTypeDef       DPM_Settings[USBPD_PORT_COUNT] =
     .PE_PD3_Support.d =                         /*!< PD3 SUPPORT FEATURE                                              */
     {
       .PE_UnchunkSupport                = ${valuePE_UnchunkSupport_P1},  /* support Unchunked mode (valid only spec revision 3.0)   */
-      .PE_FastRoleSwapSupport           = ${valuePE_FastRoleSwapSupport_P1},  /* support fast role swap only spec revsion 3.0            */
+      .PE_FastRoleSwapSupport           = ${valuePE_FastRoleSwapSupport_P1},  /* support fast role swap only spec revision 3.0            */
       .Is_GetPPSStatus_Supported        = ${valueIs_GetPPSStatus_Supported_P1},  /*!< PPS message NOT supported by PE stack */
       .Is_SrcCapaExt_Supported          = ${valueIs_SrcCapaExt_Supported_P1},  /*!< Source_Capabilities_Extended message supported or not by DPM */
       .Is_Alert_Supported               = ${valueIs_Alert_Supported_P1},   /*!< Alert message supported or not by DPM */

@@ -16,7 +16,7 @@
 [/#if]
 
         [#assign v = ""]
-[#if data.ipName=="gpio"][#-- Actualy we don't need to generate code for gpio modes not associated to any peripheral --]
+[#if data.ipName=="gpio"][#-- Actually we don't need to generate code for gpio modes not associated to any peripheral --]
         [#list data.variables as variable]				
             [#if v?contains(variable.name)]
             [#-- no matches--]
@@ -53,7 +53,7 @@
 [/#if]
 
 [#if data.methods??] [#-- if the pin configuration contains a list of LibMethods--]
-[#if data.ipName=="gpio"][#-- Actualy we don't need to generate code for gpio modes not associated to any peripheral --]
+[#if data.ipName=="gpio"][#-- Actually we don't need to generate code for gpio modes not associated to any peripheral --]
 
 	[#list data.methods as method][#assign args = ""]	
 		[#if method.status=="OK"]	

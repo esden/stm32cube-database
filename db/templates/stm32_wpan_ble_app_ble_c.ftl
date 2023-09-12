@@ -78,9 +78,22 @@
 [#assign AD_SERVICE_CLASS_UUID_10 = ""]
 [#assign AD_SERVICE_CLASS_UUID_11 = ""]
 [#assign AD_SERVICE_CLASS_UUID_12 = ""]
+[#assign AD_SERVICE_CLASS_UUID_1_INV = ""]
+[#assign AD_SERVICE_CLASS_UUID_2_INV = ""]
+[#assign AD_SERVICE_CLASS_UUID_3_INV = ""]
+[#assign AD_SERVICE_CLASS_UUID_4_INV = ""]
+[#assign AD_SERVICE_CLASS_UUID_5_INV = ""]
+[#assign AD_SERVICE_CLASS_UUID_6_INV = ""]
+[#assign AD_SERVICE_CLASS_UUID_7_INV = ""]
+[#assign AD_SERVICE_CLASS_UUID_8_INV = ""]
+[#assign AD_SERVICE_CLASS_UUID_9_INV = ""]
+[#assign AD_SERVICE_CLASS_UUID_10_INV = ""]
+[#assign AD_SERVICE_CLASS_UUID_11_INV = ""]
+[#assign AD_SERVICE_CLASS_UUID_12_INV = ""]
 [#assign INCLUDE_AD_TYPE_128_BIT_SERV_UUID_CMPLT_LIST = ""]
 [#assign AD_TYPE_128_BIT_SERV_UUID_CMPLT_LIST_LENGTH = ""]
 [#assign AD_TYPE_128_BIT_SERV_UUID_CMPLT_LIST = ""]
+[#assign AD_TYPE_128_BIT_SERV_UUID_CMPLT_LIST_INV = ""]
 [#assign INCLUDE_AD_TYPE_SLAVE_CONN_INTERVAL = ""]
 [#assign AD_TYPE_SLAVE_CONN_INTERVAL_LENGTH = ""]
 [#assign AD_TYPE_SLAVE_CONN_INTERVAL_MIN_MAX = ""]
@@ -142,6 +155,7 @@
 [#assign AD_TYPE_MANUFACTURER_DATA_COMMENT_21 = ""]
 [#assign AD_TYPE_MANUFACTURER_DATA_22 = ""]
 [#assign AD_TYPE_MANUFACTURER_DATA_COMMENT_22 = ""]
+[#assign DIE = DIE]
 [#list SWIPdatas as SWIP]
 	[#if SWIP.defines??]
 		[#list SWIP.defines as definition]
@@ -310,53 +324,53 @@
             [#if definition.name == "AD_SERVICE_CLASS_UUID_NBR"]
                 [#assign AD_SERVICE_CLASS_UUID_NBR = definition.value]
             [/#if]
-            [#if definition.name == "AD_SERVICE_CLASS_UUID_1"]
-                [#assign AD_SERVICE_CLASS_UUID_1 = definition.value]
-                [#assign AD_SERVICE_CLASS_UUID_TABLE = AD_SERVICE_CLASS_UUID_TABLE + [AD_SERVICE_CLASS_UUID_1]]
+            [#if definition.name == "AD_SERVICE_CLASS_UUID_1_INV"]
+                [#assign AD_SERVICE_CLASS_UUID_1_INV = definition.value]
+                [#assign AD_SERVICE_CLASS_UUID_TABLE = AD_SERVICE_CLASS_UUID_TABLE + [AD_SERVICE_CLASS_UUID_1_INV]]
             [/#if]
-            [#if definition.name == "AD_SERVICE_CLASS_UUID_2"]
-                [#assign AD_SERVICE_CLASS_UUID_2 = definition.value]
-                [#assign AD_SERVICE_CLASS_UUID_TABLE = AD_SERVICE_CLASS_UUID_TABLE + [AD_SERVICE_CLASS_UUID_2]]
+            [#if definition.name == "AD_SERVICE_CLASS_UUID_2_INV"]
+                [#assign AD_SERVICE_CLASS_UUID_2_INV = definition.value]
+                [#assign AD_SERVICE_CLASS_UUID_TABLE = AD_SERVICE_CLASS_UUID_TABLE + [AD_SERVICE_CLASS_UUID_2_INV]]
             [/#if]
-            [#if definition.name == "AD_SERVICE_CLASS_UUID_3"]
-                [#assign AD_SERVICE_CLASS_UUID_3 = definition.value]
-                [#assign AD_SERVICE_CLASS_UUID_TABLE = AD_SERVICE_CLASS_UUID_TABLE + [AD_SERVICE_CLASS_UUID_3]]
+            [#if definition.name == "AD_SERVICE_CLASS_UUID_3_INV"]
+                [#assign AD_SERVICE_CLASS_UUID_3_INV = definition.value]
+                [#assign AD_SERVICE_CLASS_UUID_TABLE = AD_SERVICE_CLASS_UUID_TABLE + [AD_SERVICE_CLASS_UUID_3_INV]]
             [/#if]
-            [#if definition.name == "AD_SERVICE_CLASS_UUID_4"]
-                [#assign AD_SERVICE_CLASS_UUID_4 = definition.value]
-                [#assign AD_SERVICE_CLASS_UUID_TABLE = AD_SERVICE_CLASS_UUID_TABLE + [AD_SERVICE_CLASS_UUID_4]]
+            [#if definition.name == "AD_SERVICE_CLASS_UUID_4_INV"]
+                [#assign AD_SERVICE_CLASS_UUID_4_INV = definition.value]
+                [#assign AD_SERVICE_CLASS_UUID_TABLE = AD_SERVICE_CLASS_UUID_TABLE + [AD_SERVICE_CLASS_UUID_4_INV]]
             [/#if]
-            [#if definition.name == "AD_SERVICE_CLASS_UUID_5"]
-                [#assign AD_SERVICE_CLASS_UUID_5 = definition.value]
-                [#assign AD_SERVICE_CLASS_UUID_TABLE = AD_SERVICE_CLASS_UUID_TABLE + [AD_SERVICE_CLASS_UUID_5]]
+            [#if definition.name == "AD_SERVICE_CLASS_UUID_5_INV"]
+                [#assign AD_SERVICE_CLASS_UUID_5_INV = definition.value]
+                [#assign AD_SERVICE_CLASS_UUID_TABLE = AD_SERVICE_CLASS_UUID_TABLE + [AD_SERVICE_CLASS_UUID_5_INV]]
             [/#if]
-            [#if definition.name == "AD_SERVICE_CLASS_UUID_6"]
-                [#assign AD_SERVICE_CLASS_UUID_6 = definition.value]
-                [#assign AD_SERVICE_CLASS_UUID_TABLE = AD_SERVICE_CLASS_UUID_TABLE + [AD_SERVICE_CLASS_UUID_6]]
+            [#if definition.name == "AD_SERVICE_CLASS_UUID_6_INV"]
+                [#assign AD_SERVICE_CLASS_UUID_6_INV = definition.value]
+                [#assign AD_SERVICE_CLASS_UUID_TABLE = AD_SERVICE_CLASS_UUID_TABLE + [AD_SERVICE_CLASS_UUID_6_INV]]
             [/#if]
-            [#if definition.name == "AD_SERVICE_CLASS_UUID_7"]
-                [#assign AD_SERVICE_CLASS_UUID_7 = definition.value]
-                [#assign AD_SERVICE_CLASS_UUID_TABLE = AD_SERVICE_CLASS_UUID_TABLE + [AD_SERVICE_CLASS_UUID_7]]
+            [#if definition.name == "AD_SERVICE_CLASS_UUID_7_INV"]
+                [#assign AD_SERVICE_CLASS_UUID_7_INV = definition.value]
+                [#assign AD_SERVICE_CLASS_UUID_TABLE = AD_SERVICE_CLASS_UUID_TABLE + [AD_SERVICE_CLASS_UUID_7_INV]]
             [/#if]
-            [#if definition.name == "AD_SERVICE_CLASS_UUID_8"]
-                [#assign AD_SERVICE_CLASS_UUID_8 = definition.value]
-                [#assign AD_SERVICE_CLASS_UUID_TABLE = AD_SERVICE_CLASS_UUID_TABLE + [AD_SERVICE_CLASS_UUID_8]]
+            [#if definition.name == "AD_SERVICE_CLASS_UUID_8_INV"]
+                [#assign AD_SERVICE_CLASS_UUID_8_INV = definition.value]
+                [#assign AD_SERVICE_CLASS_UUID_TABLE = AD_SERVICE_CLASS_UUID_TABLE + [AD_SERVICE_CLASS_UUID_8_INV]]
             [/#if]
-            [#if definition.name == "AD_SERVICE_CLASS_UUID_9"]
-                [#assign AD_SERVICE_CLASS_UUID_9 = definition.value]
-                [#assign AD_SERVICE_CLASS_UUID_TABLE = AD_SERVICE_CLASS_UUID_TABLE + [AD_SERVICE_CLASS_UUID_9]]
+            [#if definition.name == "AD_SERVICE_CLASS_UUID_9_INV"]
+                [#assign AD_SERVICE_CLASS_UUID_9_INV = definition.value]
+                [#assign AD_SERVICE_CLASS_UUID_TABLE = AD_SERVICE_CLASS_UUID_TABLE + [AD_SERVICE_CLASS_UUID_9_INV]]
             [/#if]
-            [#if definition.name == "AD_SERVICE_CLASS_UUID_10"]
-                [#assign AD_SERVICE_CLASS_UUID_10 = definition.value]
-                [#assign AD_SERVICE_CLASS_UUID_TABLE = AD_SERVICE_CLASS_UUID_TABLE + [AD_SERVICE_CLASS_UUID_10]]
+            [#if definition.name == "AD_SERVICE_CLASS_UUID_10_INV"]
+                [#assign AD_SERVICE_CLASS_UUID_10_INV = definition.value]
+                [#assign AD_SERVICE_CLASS_UUID_TABLE = AD_SERVICE_CLASS_UUID_TABLE + [AD_SERVICE_CLASS_UUID_10_INV]]
             [/#if]
-            [#if definition.name == "AD_SERVICE_CLASS_UUID_11"]
-                [#assign AD_SERVICE_CLASS_UUID_11 = definition.value]
-                [#assign AD_SERVICE_CLASS_UUID_TABLE = AD_SERVICE_CLASS_UUID_TABLE + [AD_SERVICE_CLASS_UUID_11]]
+            [#if definition.name == "AD_SERVICE_CLASS_UUID_11_INV"]
+                [#assign AD_SERVICE_CLASS_UUID_11_INV = definition.value]
+                [#assign AD_SERVICE_CLASS_UUID_TABLE = AD_SERVICE_CLASS_UUID_TABLE + [AD_SERVICE_CLASS_UUID_11_INV]]
             [/#if]
-            [#if definition.name == "AD_SERVICE_CLASS_UUID_12"]
-                [#assign AD_SERVICE_CLASS_UUID_12 = definition.value]
-                [#assign AD_SERVICE_CLASS_UUID_TABLE = AD_SERVICE_CLASS_UUID_TABLE + [AD_SERVICE_CLASS_UUID_12]]
+            [#if definition.name == "AD_SERVICE_CLASS_UUID_12_INV"]
+                [#assign AD_SERVICE_CLASS_UUID_12_INV = definition.value]
+                [#assign AD_SERVICE_CLASS_UUID_TABLE = AD_SERVICE_CLASS_UUID_TABLE + [AD_SERVICE_CLASS_UUID_12_INV]]
             [/#if]
             [#if definition.name == "INCLUDE_AD_TYPE_128_BIT_SERV_UUID_CMPLT_LIST"]
                 [#assign INCLUDE_AD_TYPE_128_BIT_SERV_UUID_CMPLT_LIST = definition.value]
@@ -366,6 +380,9 @@
             [/#if]
             [#if definition.name == "AD_TYPE_128_BIT_SERV_UUID_CMPLT_LIST"]
                 [#assign AD_TYPE_128_BIT_SERV_UUID_CMPLT_LIST = definition.value]
+            [/#if]
+            [#if definition.name == "AD_TYPE_128_BIT_SERV_UUID_CMPLT_LIST_INV"]
+                [#assign AD_TYPE_128_BIT_SERV_UUID_CMPLT_LIST_INV = definition.value]
             [/#if]
             [#if definition.name == "INCLUDE_AD_TYPE_SLAVE_CONN_INTERVAL"]
                 [#assign INCLUDE_AD_TYPE_SLAVE_CONN_INTERVAL = definition.value]
@@ -903,12 +920,12 @@ uint8_t ad_data[${AD_DATA_LENGTH}] = {
     ${AD_TYPE_16_BIT_SERV_UUID_CMPLT_LIST_LENGTH}, AD_TYPE_16_BIT_SERV_UUID_CMPLT_LIST, [#rt]
 [#assign size = AD_SERVICE_CLASS_UUID_NBR?number-1]
 [#list 0..size as i]
-0x${AD_SERVICE_CLASS_UUID_TABLE[i]?replace(" ",", 0x")}, [#rt]
+[#assign j = size-i]
+0x${AD_SERVICE_CLASS_UUID_TABLE[j]?replace(", ",", 0x")?replace("[","")?replace("]","")},
 [/#list]
 [/#if]
-
 [#if  (INCLUDE_AD_TYPE_128_BIT_SERV_UUID_CMPLT_LIST = "1")]
-    ${AD_TYPE_128_BIT_SERV_UUID_CMPLT_LIST_LENGTH}, AD_TYPE_128_BIT_SERV_UUID_CMPLT_LIST, 0x${AD_TYPE_128_BIT_SERV_UUID_CMPLT_LIST?replace(",",", 0x")},
+    ${AD_TYPE_128_BIT_SERV_UUID_CMPLT_LIST_LENGTH}, AD_TYPE_128_BIT_SERV_UUID_CMPLT_LIST, 0x${AD_TYPE_128_BIT_SERV_UUID_CMPLT_LIST_INV?replace(", ",", 0x")?replace("[","")?replace("]","")},
 [/#if]
 [#if  (INCLUDE_AD_TYPE_SLAVE_CONN_INTERVAL = "1")]
 [#if  (AD_TYPE_SLAVE_CONN_INTERVAL_MIN_MAX = "1")]
@@ -923,7 +940,6 @@ uint8_t ad_data[${AD_DATA_LENGTH}] = {
         [#lt]'${char}', [#rt]
     [/#list][#lt]
 [/#if]
-
 [#if  (INCLUDE_AD_TYPE_MANUFACTURER_SPECIFIC_DATA = "1")]
     ${AD_TYPE_MANUFACTURER_SPECIFIC_DATA_LENGTH}, AD_TYPE_MANUFACTURER_SPECIFIC_DATA, 0x${AD_TYPE_MANUFACTURER_SPECIFIC_DATA_COMPANY_IDENTIFIER?replace(",",", 0x")}, [#rt]
 [#assign size = (AD_TYPE_MANUFACTURER_DATA_NBR?number-1)]
@@ -1177,8 +1193,11 @@ void APP_BLE_Init( void )
     CFG_BLE_MAX_CONN_EVENT_LENGTH,
     CFG_BLE_HSE_STARTUP_TIME,
     CFG_BLE_VITERBI_MODE,
-    CFG_BLE_LL_ONLY,
-    0}
+    CFG_BLE_OPTIONS,
+    0,
+    CFG_BLE_MAX_COC_INITIATOR_NBR,
+    CFG_BLE_MIN_TX_POWER,
+    CFG_BLE_MAX_TX_POWER}
   };
 
   /**
@@ -1186,10 +1205,16 @@ void APP_BLE_Init( void )
    */
   Ble_Tl_Init( );
 
+[#if DIE == "DIE494"]
+#if (CFG_LPM_STANDBY_SUPPORTED == 0)
+  UTIL_LPM_SetOffMode(1U << CFG_LPM_APP_BLE, UTIL_LPM_DISABLE);
+#endif
+[#else]
   /**
    * Do not allow standby in the application
    */
   UTIL_LPM_SetOffMode(1 << CFG_LPM_APP_BLE, UTIL_LPM_DISABLE);
+[/#if]
 
   /**
    * Register the hci transport layer to handle BLE User Asynchronous Events
@@ -1346,22 +1371,22 @@ void APP_BLE_Init( void )
 [#if  (BT_SIG_BEACON != "0")]
   if (CFG_BEACON_TYPE & CFG_EDDYSTONE_UID_BEACON_TYPE)
   {
-    APP_DBG_MSG("Eddystone UID beacon advertize\n");
+    APP_DBG_MSG("Eddystone UID beacon advertise\n");
     EddystoneUID_Process();
   }
   else if (CFG_BEACON_TYPE & CFG_EDDYSTONE_URL_BEACON_TYPE)
   {
-    APP_DBG_MSG("Eddystone URL beacon advertize\n");
+    APP_DBG_MSG("Eddystone URL beacon advertise\n");
     EddystoneURL_Process();
   }
   else if (CFG_BEACON_TYPE & CFG_EDDYSTONE_TLM_BEACON_TYPE)
   {
-    APP_DBG_MSG("Eddystone TLM beacon advertize\n");
+    APP_DBG_MSG("Eddystone TLM beacon advertise\n");
     EddystoneTLM_Process();
   }
   else if (CFG_BEACON_TYPE & CFG_IBEACON)
   {
-    APP_DBG_MSG("Ibeacon advertize\n");
+    APP_DBG_MSG("Ibeacon advertise\n");
     IBeacon_Process();
   }
 [/#if]   
@@ -1419,7 +1444,7 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification( void *pckt )
 {
   hci_event_pckt *event_pckt;
   evt_le_meta_event *meta_evt;
-  evt_blue_aci *blue_evt;
+  evt_blecore_aci *blecore_evt;
 [#if  (BT_SIG_BEACON = "0") && ((BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)
  || (BT_SIG_HEART_RATE_SENSOR = 1) ||(CUSTOM_P2P_SERVER = 1))]
   hci_le_phy_update_complete_event_rp0 *evt_le_phy_update_complete; 
@@ -1443,7 +1468,7 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification( void *pckt )
 
   switch (event_pckt->evt)
   {
-    case EVT_DISCONN_COMPLETE:
+    case HCI_DISCONNECTION_COMPLETE_EVT_CODE:
 [#if  (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)
  || (BT_SIG_HEART_RATE_SENSOR = 1) ||(CUSTOM_P2P_SERVER = 1) ||(CUSTOM_TEMPLATE = 1)] 
     {
@@ -1484,9 +1509,9 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification( void *pckt )
     }
 [/#if]
 
-    break; /* EVT_DISCONN_COMPLETE */
+    break; /* HCI_DISCONNECTION_COMPLETE_EVT_CODE */
 
-    case EVT_LE_META_EVENT:
+    case HCI_LE_META_EVT_CODE:
 [#if (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_HEART_RATE_SENSOR = 1) ||(CUSTOM_P2P_SERVER = 1) ||(CUSTOM_TEMPLATE = 1)]
     {
 [/#if]
@@ -1497,7 +1522,7 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification( void *pckt )
       switch (meta_evt->subevent)
       {
 [#if (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_HEART_RATE_SENSOR = 1) ||(CUSTOM_P2P_SERVER = 1) ||(CUSTOM_TEMPLATE = 1)]
-        case EVT_LE_CONN_UPDATE_COMPLETE:
+        case HCI_LE_CONNECTION_UPDATE_COMPLETE_SUBEVT_CODE:
           APP_DBG_MSG("\r\n\r** CONNECTION UPDATE EVENT WITH CLIENT \n");
 
           /* USER CODE BEGIN EVT_LE_CONN_UPDATE_COMPLETE */
@@ -1506,7 +1531,7 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification( void *pckt )
           break;
 [/#if]
 [#if (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_HEART_RATE_SENSOR = 1) ||(CUSTOM_P2P_SERVER = 1)]
-        case EVT_LE_PHY_UPDATE_COMPLETE:
+        case HCI_LE_PHY_UPDATE_COMPLETE_SUBEVT_CODE:
           APP_DBG_MSG("EVT_UPDATE_PHY_COMPLETE \n");
           evt_le_phy_update_complete = (hci_le_phy_update_complete_event_rp0*)meta_evt->data;
           if (evt_le_phy_update_complete->Status == 0)
@@ -1541,7 +1566,7 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification( void *pckt )
           /* USER CODE END EVT_LE_PHY_UPDATE_COMPLETE */          
           break;
 [/#if]
-        case EVT_LE_CONN_COMPLETE:
+        case HCI_LE_CONNECTION_COMPLETE_SUBEVT_CODE:
 [#if (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)
  || (BT_SIG_HEART_RATE_SENSOR = 1) ||(CUSTOM_P2P_SERVER = 1) ||(CUSTOM_TEMPLATE = 1)]
         {
@@ -1556,7 +1581,7 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification( void *pckt )
           HW_TS_Stop(BleApplicationContext.Advertising_mgr_timer_Id);
 [/#if]
 
-          APP_DBG_MSG("EVT_LE_CONN_COMPLETE for connection handle 0x%x\n", connection_complete_event->Connection_Handle);
+          APP_DBG_MSG("HCI_LE_CONNECTION_COMPLETE_SUBEVT_CODE for connection handle 0x%x\n", connection_complete_event->Connection_Handle);
           if (BleApplicationContext.Device_Connection_Status == APP_BLE_LP_CONNECTING)
           {
             /* Connection as client */
@@ -1590,7 +1615,7 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification( void *pckt )
           /* USER CODE END HCI_EVT_LE_CONN_COMPLETE */
         }
 [/#if]
-        break; /* HCI_EVT_LE_CONN_COMPLETE */
+        break; /* HCI_LE_CONNECTION_COMPLETE_SUBEVT_CODE */
 
         /* USER CODE BEGIN META_EVT */
 
@@ -1606,14 +1631,14 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification( void *pckt )
       }
 [/#if]
     }
-    break; /* HCI_EVT_LE_META_EVENT */
+    break; /* HCI_LE_META_EVT_CODE */
 
-    case EVT_VENDOR:
-      blue_evt = (evt_blue_aci*) event_pckt->data;
+    case HCI_VENDOR_SPECIFIC_DEBUG_EVT_CODE:
+      blecore_evt = (evt_blecore_aci*) event_pckt->data;
       /* USER CODE BEGIN EVT_VENDOR */
 
       /* USER CODE END EVT_VENDOR */
-      switch (blue_evt->ecode)
+      switch (blecore_evt->ecode)
       {
       /* USER CODE BEGIN ecode */
 
@@ -1629,7 +1654,7 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification( void *pckt )
        */
 [/#if]
 [#if (CUSTOM_P2P_SERVER = 1) || (CUSTOM_TEMPLATE = 1)]
-        case EVT_BLUE_L2CAP_CONNECTION_UPDATE_RESP:
+        case ACI_L2CAP_CONNECTION_UPDATE_RESP_VSEVT_CODE:
 #if (L2CAP_REQUEST_NEW_CONN_PARAM != 0 )
           mutex = 1;
 #endif
@@ -1638,45 +1663,45 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification( void *pckt )
       /* USER CODE END EVT_BLUE_L2CAP_CONNECTION_UPDATE_RESP */
       break;
 [/#if]
-        case EVT_BLUE_GAP_PROCEDURE_COMPLETE:
+        case ACI_GAP_PROC_COMPLETE_VSEVT_CODE:
 [#if (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)
  || (BT_SIG_HEART_RATE_SENSOR = 1) || (CUSTOM_P2P_SERVER = 1) || (CUSTOM_TEMPLATE = 1)]
-        APP_DBG_MSG("\r\n\r** EVT_BLUE_GAP_PROCEDURE_COMPLETE \n");
+        APP_DBG_MSG("\r\n\r** ACI_GAP_PROC_COMPLETE_VSEVT_CODE \n");
 [/#if]
         /* USER CODE BEGIN EVT_BLUE_GAP_PROCEDURE_COMPLETE */
 
         /* USER CODE END EVT_BLUE_GAP_PROCEDURE_COMPLETE */
-          break; /* EVT_BLUE_GAP_PROCEDURE_COMPLETE */
+          break; /* ACI_GAP_PROC_COMPLETE_VSEVT_CODE */
 [#if (CUSTOM_P2P_SERVER = 1) || (CUSTOM_TEMPLATE = 1)]
 #if(RADIO_ACTIVITY_EVENT != 0)
         case ACI_HAL_END_OF_RADIO_ACTIVITY_VSEVT_CODE:
         /* USER CODE BEGIN RADIO_ACTIVITY_EVENT*/
 
         /* USER CODE END RADIO_ACTIVITY_EVENT*/
-          break; /* RADIO_ACTIVITY_EVENT */
+          break; /* ACI_HAL_END_OF_RADIO_ACTIVITY_VSEVT_CODE */
 #endif
 [/#if]
 [#if (CUSTOM_TEMPLATE = 1)]
 
         /* PAIRING */
-        case (EVT_BLUE_GAP_KEYPRESS_NOTIFICATION):
-         APP_DBG_MSG("\r\n\r** EVT_BLUE_GAP_KEYPRESS_NOTIFICATION \n");
-          break;
+        case (ACI_GAP_KEYPRESS_NOTIFICATION_VSEVT_CODE):
+         APP_DBG_MSG("\r\n\r** ACI_GAP_KEYPRESS_NOTIFICATION_VSEVT_CODE \n");
+        break;
           
-        case EVT_BLUE_GAP_PASS_KEY_REQUEST:
+        case ACI_GAP_PASS_KEY_REQ_VSEVT_CODE:
             aci_gap_pass_key_resp(BleApplicationContext.BleApplicationContext_legacy.connectionHandle, CFG_FIXED_PIN);
         break;
         
-        case EVT_BLUE_GAP_NUMERIC_COMPARISON_VALUE:
-            evt_numeric_value = (aci_gap_numeric_comparison_value_event_rp0 *)blue_evt->data;
+        case ACI_GAP_NUMERIC_COMPARISON_VALUE_VSEVT_CODE:
+            evt_numeric_value = (aci_gap_numeric_comparison_value_event_rp0 *)blecore_evt->data;
             numeric_value = evt_numeric_value->Numeric_Value;
             APP_DBG_MSG("numeric_value = %lx\n", numeric_value);
             aci_gap_numeric_comparison_value_confirm_yesno(BleApplicationContext.BleApplicationContext_legacy.connectionHandle, YES);
         break;
         
-        case EVT_BLUE_GAP_PAIRING_CMPLT:
-            pairing_complete = (aci_gap_pairing_complete_event_rp0*)blue_evt->data;
-            APP_DBG_MSG("BLE_CTRL_App_Notification: EVT_BLUE_GAP_PAIRING_CMPLT, pairing_complete->Status = %d\n",pairing_complete->Status);
+        case ACI_GAP_PAIRING_COMPLETE_VSEVT_CODE:
+            pairing_complete = (aci_gap_pairing_complete_event_rp0*)blecore_evt->data;
+            APP_DBG_MSG("BLE_CTRL_App_Notification: ACI_GAP_PAIRING_COMPLETE_VSEVT_CODE, pairing_complete->Status = %d\n",pairing_complete->Status);
         break;
         /* PAIRING */
 [/#if]
@@ -1685,7 +1710,7 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification( void *pckt )
 
       /* USER CODE END BLUE_EVT */
       }
-      break; /* EVT_VENDOR */
+      break; /* HCI_VENDOR_SPECIFIC_DEBUG_EVT_CODE */
 
       /* USER CODE BEGIN EVENT_PCKT */
 
@@ -1695,7 +1720,7 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification( void *pckt )
       /* USER CODE BEGIN ECODE_DEFAULT*/
 
       /* USER CODE END ECODE_DEFAULT*/
-        break;
+      break;
   }
 
   return (SVCCTL_UserEvtFlowEnable);
@@ -2108,12 +2133,20 @@ const uint8_t* BleGetBdAddress( void )
     company_id = LL_FLASH_GetSTCompanyID();
     device_id = LL_FLASH_GetDeviceID();
 
+/**
+ * Public Address with the ST company ID
+ * bit[47:24] : 24bits (OUI) equal to the company ID
+ * bit[23:16] : Device ID.
+ * bit[15:0] : The last 16bits from the UDN
+ * Note: In order to use the Public Address in a final product, a dedicated
+ * 24bits company ID (OUI) shall be bought.
+ */
     bd_addr_udn[0] = (uint8_t)(udn & 0x000000FF);
     bd_addr_udn[1] = (uint8_t)( (udn & 0x0000FF00) >> 8 );
-    bd_addr_udn[2] = (uint8_t)( (udn & 0x00FF0000) >> 16 );
-    bd_addr_udn[3] = (uint8_t)device_id;
-    bd_addr_udn[4] = (uint8_t)(company_id & 0x000000FF);;
-    bd_addr_udn[5] = (uint8_t)( (company_id & 0x0000FF00) >> 8 );
+    bd_addr_udn[2] = (uint8_t)device_id;
+    bd_addr_udn[3] = (uint8_t)(company_id & 0x000000FF);
+    bd_addr_udn[4] = (uint8_t)( (company_id & 0x0000FF00) >> 8 );
+    bd_addr_udn[5] = (uint8_t)( (company_id & 0x00FF0000) >> 16 );
 
     bd_addr = (const uint8_t *)bd_addr_udn;
   }
@@ -2128,7 +2161,6 @@ const uint8_t* BleGetBdAddress( void )
     {
       bd_addr = M_bd_addr;
     }
-
   }
 
   return bd_addr;

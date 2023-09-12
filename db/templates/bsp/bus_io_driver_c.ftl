@@ -19,15 +19,17 @@
 [#assign SPI = ""]
 [#assign SPIInstance = ""]
 [#assign SPIDone = ""]
+[#assign SPIDmaIsTrue = false]
 
 [#assign I2C = ""]
 [#assign I2CIpInstance = ""]
 [#assign I2CIpInstanceList = ""]
+[#assign I2CDmaIsTrue = false]
 
 [#assign USART = ""]
 [#assign UsartIpInstance = ""]
 [#assign UsartIpInstanceList = ""]
-
+[#assign USARTDmaIsTrue = false]
 
 [#list BspIpDatas as SWIP] 
 	[#if SWIP.bsp??]
@@ -39,6 +41,7 @@
 					[#if SpiIpInstanceList == ""]
 						[#assign SpiIpInstance = bsp.solution]
 						[#assign SpiIpInstanceList = bsp.solution]
+						[#assign SPIDmaIsTrue = bsp.dmaUsed]
 [#-- extern SPI_HandleTypeDef h${SpiIpInstance?lower_case};						--]
 					[#elseif !SpiIpInstanceList?contains(bsp.solution)]
 						[#assign SpiIpInstance = bsp.solution]
@@ -50,6 +53,7 @@
 					[#if I2CIpInstanceList == ""]
 						[#assign I2CIpInstance = bsp.solution]	
 						[#assign I2CIpInstanceList = bsp.solution]
+						[#assign I2CDmaIsTrue = bsp.dmaUsed]
 [#-- extern I2C_HandleTypeDef h${I2CIpInstance?lower_case};	--]										
 					[#elseif !I2CIpInstanceList?contains(bsp.solution)]
 						[#assign I2CIpInstance = bsp.solution]
@@ -60,7 +64,8 @@
 				[#case "USART"]
 					[#if UsartIpInstanceList == ""]
 						[#assign UsartIpInstance = bsp.solution]	
-						[#assign UsartIpInstanceList = bsp.solution]						
+						[#assign UsartIpInstanceList = bsp.solution]
+						[#assign USARTDmaIsTrue = bsp.dmaUsed]						
 [#-- extern UART_HandleTypeDef h${UsartIpInstance?lower_case};	--]										
 					[#elseif !UsartIpInstanceList?contains(bsp.solution)]
 						[#assign UsartIpInstance = bsp.solution]
@@ -72,6 +77,7 @@
 					[#if UsartIpInstanceList == ""]
 						[#assign UsartIpInstance = bsp.solution]	
 						[#assign UsartIpInstanceList = bsp.solution]
+						[#assign USARTDmaIsTrue = bsp.dmaUsed]
 [#-- extern UART_HandleTypeDef h${UsartIpInstance?lower_case};	--]										
 					[#elseif !UsartIpInstanceList?contains(bsp.solution)]
 						[#assign UsartIpInstance = bsp.solution]
@@ -83,6 +89,7 @@
 					[#if UsartIpInstanceList == ""]
 						[#assign UsartIpInstance = bsp.solution]	
 						[#assign UsartIpInstanceList = bsp.solution]
+						[#assign USARTDmaIsTrue = bsp.dmaUsed]
 [#-- extern UART_HandleTypeDef h${UsartIpInstance?lower_case};	--]										
 					[#elseif !UsartIpInstanceList?contains(bsp.solution)]
 						[#assign UsartIpInstance = bsp.solution]
@@ -127,12 +134,12 @@
 					[#if SpiIpInstanceList == ""]
 						[#assign SpiIpInstance = bsp.solution]
 						[#assign SpiIpInstanceList = bsp.solution]
-[#-- A.T MX_PPPx_Init prototype updated after reveiw with Maher --]
+[#-- A.T MX_PPPx_Init prototype updated after review with Maher --]
 __weak HAL_StatusTypeDef MX_${SpiIpInstance}_Init(SPI_HandleTypeDef* hspi);
 					[#elseif !SpiIpInstanceList?contains(bsp.solution)]
 						[#assign SpiIpInstance = bsp.solution]
 						[#assign SpiIpInstanceList = SpiIpInstanceList + "," + bsp.solution]
-[#-- A.T MX_PPPx_Init prototype updated after reveiw with Maher --]
+[#-- A.T MX_PPPx_Init prototype updated after review with Maher --]
 __weak HAL_StatusTypeDef MX_${SpiIpInstance}_Init(SPI_HandleTypeDef* hspi);
 					[/#if]
 				[#break]
@@ -141,12 +148,12 @@ __weak HAL_StatusTypeDef MX_${SpiIpInstance}_Init(SPI_HandleTypeDef* hspi);
 					[#if I2CIpInstanceList == ""]
 						[#assign I2CIpInstance = bsp.solution]
 						[#assign I2CIpInstanceList = bsp.solution]
-[#-- A.T MX_PPPx_Init prototype updated after reveiw with Maher --]
+[#-- A.T MX_PPPx_Init prototype updated after review with Maher --]
 __weak HAL_StatusTypeDef MX_${I2CIpInstance}_Init(I2C_HandleTypeDef* hi2c);								
 					[#elseif !I2CIpInstanceList?contains(bsp.solution)]
 						[#assign I2CIpInstance = bsp.solution]
 						[#assign I2CIpInstanceList = I2CIpInstanceList + "," + bsp.solution]
-[#-- A.T MX_PPPx_Init prototype updated after reveiw with Maher --]
+[#-- A.T MX_PPPx_Init prototype updated after review with Maher --]
 __weak HAL_StatusTypeDef MX_${I2CIpInstance}_Init(I2C_HandleTypeDef* hi2c);
 					[/#if]
 				[#break]  
@@ -155,12 +162,12 @@ __weak HAL_StatusTypeDef MX_${I2CIpInstance}_Init(I2C_HandleTypeDef* hi2c);
 					[#if UsartIpInstanceList == ""]
 						[#assign UsartIpInstance = bsp.solution]
 						[#assign UsartIpInstanceList = bsp.solution]
-[#-- A.T MX_PPPx_Init prototype updated after reveiw with Maher --]
+[#-- A.T MX_PPPx_Init prototype updated after review with Maher --]
 __weak HAL_StatusTypeDef MX_${UsartIpInstance}_UART_Init(UART_HandleTypeDef* huart);								
 					[#elseif !UsartIpInstanceList?contains(bsp.solution)]
 						[#assign UsartIpInstance = bsp.solution]
 						[#assign UsartIpInstanceList = UsartIpInstanceList + "," + bsp.solution]
-[#-- A.T MX_PPPx_Init prototype updated after reveiw with Maher --]
+[#-- A.T MX_PPPx_Init prototype updated after review with Maher --]
 __weak HAL_StatusTypeDef MX_${UsartIpInstance}_UART_Init(UART_HandleTypeDef* huart);
 					[/#if]
 				[#break] 
@@ -169,12 +176,12 @@ __weak HAL_StatusTypeDef MX_${UsartIpInstance}_UART_Init(UART_HandleTypeDef* hua
 					[#if UsartIpInstanceList == ""]
 						[#assign UsartIpInstance = bsp.solution]
 						[#assign UsartIpInstanceList = bsp.solution]
-[#-- A.T MX_PPPx_Init prototype updated after reveiw with Maher --]
+[#-- A.T MX_PPPx_Init prototype updated after review with Maher --]
 __weak HAL_StatusTypeDef MX_${UsartIpInstance}_UART_Init(UART_HandleTypeDef* huart);								
 					[#elseif !UsartIpInstanceList?contains(bsp.solution)]
 						[#assign UsartIpInstance = bsp.solution]
 						[#assign UsartIpInstanceList = UsartIpInstanceList + "," + bsp.solution]
-[#-- A.T MX_PPPx_Init prototype updated after reveiw with Maher --]
+[#-- A.T MX_PPPx_Init prototype updated after review with Maher --]
 __weak HAL_StatusTypeDef MX_${UsartIpInstance}_UART_Init(UART_HandleTypeDef* huart);
 					[/#if]
 				[#break] 
@@ -183,12 +190,12 @@ __weak HAL_StatusTypeDef MX_${UsartIpInstance}_UART_Init(UART_HandleTypeDef* hua
 					[#if UsartIpInstanceList == ""]
 						[#assign UsartIpInstance = bsp.solution]
 						[#assign UsartIpInstanceList = bsp.solution]
-[#-- A.T MX_PPPx_Init prototype updated after reveiw with Maher --]
+[#-- A.T MX_PPPx_Init prototype updated after review with Maher --]
 __weak HAL_StatusTypeDef MX_${UsartIpInstance}_UART_Init(UART_HandleTypeDef* huart);								
 					[#elseif !UsartIpInstanceList?contains(bsp.solution)]
 						[#assign UsartIpInstance = bsp.solution]
 						[#assign UsartIpInstanceList = UsartIpInstanceList + "," + bsp.solution]
-[#-- A.T MX_PPPx_Init prototype updated after reveiw with Maher --]
+[#-- A.T MX_PPPx_Init prototype updated after review with Maher --]
 __weak HAL_StatusTypeDef MX_${UsartIpInstance}_UART_Init(UART_HandleTypeDef* huart);
 					[/#if]
 				[#break] 				
@@ -210,6 +217,9 @@ __weak HAL_StatusTypeDef MX_${UsartIpInstance}_UART_Init(UART_HandleTypeDef* hua
   * @{
   */
   
+[#if I2CDmaIsTrue || SPIDmaIsTrue || USARTDmaIsTrue]
+extern void Error_Handler(void);
+[/#if]
 [#if I2CisTrue]
 [#if FamilyName?starts_with("STM32L4")]
 #define DIV_ROUND_CLOSEST(x, d)  (((x) + ((d) / 2U)) / (d))
@@ -366,12 +376,12 @@ static uint32_t valid_timing_nbr = 0;
 					[#if SpiIpInstanceList == ""]
 						[#assign SpiIpInstance = bsp.solution]
 						[#assign SpiIpInstanceList = bsp.solution]
-[#-- extern : A.T removed after reveiw with Maher --]
+[#-- extern : A.T removed after review with Maher --]
 SPI_HandleTypeDef h${SpiIpInstance?lower_case};						
 					[#elseif !SpiIpInstanceList?contains(bsp.solution)]
 						[#assign SpiIpInstance = bsp.solution]
 						[#assign SpiIpInstanceList = SpiIpInstanceList + "," + bsp.solution]
-[#-- extern : A.T removed after reveiw with Maher --]
+[#-- extern : A.T removed after review with Maher --]
 SPI_HandleTypeDef h${SpiIpInstance?lower_case};
 					[/#if]
 				[#break]
@@ -379,12 +389,12 @@ SPI_HandleTypeDef h${SpiIpInstance?lower_case};
 					[#if I2CIpInstanceList == ""]
 						[#assign I2CIpInstance = bsp.solution]
 						[#assign I2CIpInstanceList = bsp.solution]
-[#-- extern : A.T removed after reveiw with Maher --]
+[#-- extern : A.T removed after review with Maher --]
 I2C_HandleTypeDef h${I2CIpInstance?lower_case};											
 					[#elseif !I2CIpInstanceList?contains(bsp.solution)]
 						[#assign I2CIpInstance = bsp.solution]
 						[#assign I2CIpInstanceList = I2CIpInstanceList + "," + bsp.solution]
-[#-- extern : A.T removed after reveiw with Maher --]
+[#-- extern : A.T removed after review with Maher --]
 I2C_HandleTypeDef h${I2CIpInstance?lower_case};
 					[/#if]
 				[#break]  
@@ -392,12 +402,12 @@ I2C_HandleTypeDef h${I2CIpInstance?lower_case};
 					[#if UsartIpInstanceList == ""]
 						[#assign UsartIpInstance = bsp.solution]	
 						[#assign UsartIpInstanceList = bsp.solution]
-[#-- extern : A.T removed after reveiw with Maher --]
+[#-- extern : A.T removed after review with Maher --]
 UART_HandleTypeDef h${UsartIpInstance?lower_case?replace("s","")};
 					[#elseif !UsartIpInstanceList?contains(bsp.solution)]
 						[#assign UsartIpInstance = bsp.solution]
 						[#assign UsartIpInstanceList = UsartIpInstanceList + "," + bsp.solution]
-[#-- extern : A.T removed after reveiw with Maher --]
+[#-- extern : A.T removed after review with Maher --]
 UART_HandleTypeDef h${UsartIpInstance?lower_case};
 					[/#if]
 				[#break] 
@@ -405,12 +415,12 @@ UART_HandleTypeDef h${UsartIpInstance?lower_case};
 					[#if UsartIpInstanceList == ""]
 						[#assign UsartIpInstance = bsp.solution]	
 						[#assign UsartIpInstanceList = bsp.solution]
-[#-- extern : A.T removed after reveiw with Maher --]
+[#-- extern : A.T removed after review with Maher --]
 UART_HandleTypeDef h${UsartIpInstance?lower_case};
 					[#elseif !UsartIpInstanceList?contains(bsp.solution)]
 						[#assign UsartIpInstance = bsp.solution]
 						[#assign UsartIpInstanceList = UsartIpInstanceList + "," + bsp.solution]
-[#-- extern : A.T removed after reveiw with Maher --]
+[#-- extern : A.T removed after review with Maher --]
 UART_HandleTypeDef h${UsartIpInstance?lower_case};
 					[/#if]
 				[#break]	
@@ -418,12 +428,12 @@ UART_HandleTypeDef h${UsartIpInstance?lower_case};
 					[#if UsartIpInstanceList == ""]
 						[#assign UsartIpInstance = bsp.solution]	
 						[#assign UsartIpInstanceList = bsp.solution]
-[#-- extern : A.T removed after reveiw with Maher --]
+[#-- extern : A.T removed after review with Maher --]
 UART_HandleTypeDef h${UsartIpInstance?lower_case};
 					[#elseif !UsartIpInstanceList?contains(bsp.solution)]
 						[#assign UsartIpInstance = bsp.solution]
 						[#assign UsartIpInstanceList = UsartIpInstanceList + "," + bsp.solution]
-[#-- extern : A.T removed after reveiw with Maher --]
+[#-- extern : A.T removed after review with Maher --]
 UART_HandleTypeDef h${UsartIpInstance?lower_case};
 					[/#if]
 				[#break]
@@ -1136,6 +1146,60 @@ int32_t BSP_${IpInstance}_Recv(uint16_t DevAddr, uint8_t *pData, uint16_t Length
   return ret;
 }
 
+[#if I2CDmaIsTrue]
+/**
+  * @brief  Write Data through I2C BUS with DMA.
+  * @param  pData: Pointer to data buffer to send
+  * @param  Length: Length of data in byte
+  * @retval BSP status
+  */
+int32_t BSP_${IpInstance}_Send_DMA(uint16_t DevAddr, uint8_t *pData, uint16_t Length)
+{
+  int32_t ret = BSP_ERROR_NONE;
+  
+  if(HAL_I2C_Master_Transmit_DMA(&h${IpInstance?lower_case}, DevAddr, pData, Length) != HAL_OK)
+  {
+      ret = BSP_ERROR_UNKNOWN_FAILURE;
+  }
+  return ret;
+}
+
+/**
+  * @brief  Receive Data from I2C BUS with DMA
+  * @param  pData: Pointer to data buffer to receive
+  * @param  Length: Length of data in byte
+  * @retval BSP status
+  */
+int32_t  BSP_${IpInstance}_Recv_DMA(uint16_t DevAddr, uint8_t *pData, uint16_t Length)
+{
+  int32_t ret = BSP_ERROR_NONE;
+  
+  if(HAL_I2C_Master_Receive_DMA(&h${IpInstance?lower_case}, DevAddr, pData, Length) != HAL_OK)
+  {
+      ret = BSP_ERROR_UNKNOWN_FAILURE;
+  }
+  return ret;
+}
+
+[#-- // LC: commented out, it does not make sense. Also the case for polling mode is commented 
+/**
+  * @brief  Send and Receive data to/from I2C BUS (Full duplex) with DMA
+  * @param  pData: Pointer to data buffer to send/receive
+  * @param  Length: Length of data in byte
+  * @retval BSP status
+  */
+int32_t BSP_${IpInstance}_SendRecv_DMA(uint8_t *pTxData, uint8_t *pRxData, uint16_t Length)
+{
+  int32_t ret = BSP_ERROR_NONE;
+  
+  //if(HAL_I2C_TransmitReceive_DMA(&h${IpInstance?lower_case}, pTxData, pRxData, Length) != HAL_OK)
+  //{
+      ret = BSP_ERROR_UNKNOWN_FAILURE;
+  //}
+  
+--]
+
+[/#if]
 [#--
 /**
   * @brief  Send and receive an amount of data through bus (Full duplex)
@@ -1288,6 +1352,59 @@ int32_t BSP_${IpInstance}_SendRecv(uint8_t *pTxData, uint8_t *pRxData, uint16_t 
   }
   return ret;
 }
+
+[#if SPIDmaIsTrue]
+/**
+  * @brief  Write Data through SPI BUS with DMA.
+  * @param  pData: Pointer to data buffer to send
+  * @param  Length: Length of data in byte
+  * @retval BSP status
+  */
+int32_t BSP_${IpInstance}_Send_DMA(uint8_t *pData, uint16_t Length)
+{
+  int32_t ret = BSP_ERROR_NONE;
+  
+  if(HAL_SPI_Transmit_DMA(&h${IpInstance?lower_case}, pData, Length) != HAL_OK)
+  {
+      ret = BSP_ERROR_UNKNOWN_FAILURE;
+  }
+  return ret;
+}
+
+/**
+  * @brief  Receive Data from SPI BUS with DMA
+  * @param  pData: Pointer to data buffer to receive
+  * @param  Length: Length of data in byte
+  * @retval BSP status
+  */
+int32_t  BSP_${IpInstance}_Recv_DMA(uint8_t *pData, uint16_t Length)
+{
+  int32_t ret = BSP_ERROR_NONE;
+  
+  if(HAL_SPI_Receive_DMA(&h${IpInstance?lower_case}, pData, Length) != HAL_OK)
+  {
+      ret = BSP_ERROR_UNKNOWN_FAILURE;
+  }
+  return ret;
+}
+
+/**
+  * @brief  Send and Receive data to/from SPI BUS (Full duplex) with DMA
+  * @param  pData: Pointer to data buffer to send/receive
+  * @param  Length: Length of data in byte
+  * @retval BSP status
+  */
+int32_t BSP_${IpInstance}_SendRecv_DMA(uint8_t *pTxData, uint8_t *pRxData, uint16_t Length)
+{
+  int32_t ret = BSP_ERROR_NONE;
+  
+  if(HAL_SPI_TransmitReceive_DMA(&h${IpInstance?lower_case}, pTxData, pRxData, Length) != HAL_OK)
+  {
+      ret = BSP_ERROR_UNKNOWN_FAILURE;
+  }
+  return ret;
+}
+[/#if]
 [/#macro]
 [#-- End macro generateBspSPI_Driver --]
 
@@ -1398,7 +1515,63 @@ int32_t  BSP_${IpInstance}_Recv(uint8_t *pData, uint16_t Length)
   }
   return ret;
 }
+[#if USARTDmaIsTrue]
+/**
+  * @brief  Write Data through USART BUS with DMA.
+  * @param  pData: Pointer to data buffer to send
+  * @param  Length: Length of data in byte
+  * @retval BSP status
+  */
+int32_t BSP_${IpInstance}_Send_DMA(uint8_t *pData, uint16_t Length)
+{
+  int32_t ret = BSP_ERROR_NONE;
+  
+  if(HAL_UART_Transmit_DMA(&h${IpInstance?lower_case?replace("s","")}, pData, Length) != HAL_OK)
+  {
+      ret = BSP_ERROR_UNKNOWN_FAILURE;
+  }
+  return ret;
+}
 
+/**
+  * @brief  Receive Data from USART BUS with DMA
+  * @param  pData: Pointer to data buffer to receive
+  * @param  Length: Length of data in byte
+  * @retval BSP status
+  */
+int32_t  BSP_${IpInstance}_Recv_DMA(uint8_t *pData, uint16_t Length)
+{
+  int32_t ret = BSP_ERROR_NONE;
+  
+  if(HAL_UART_Receive_DMA(&h${IpInstance?lower_case?replace("s","")}, pData, Length) != HAL_OK)
+  {
+      ret = BSP_ERROR_UNKNOWN_FAILURE;
+  }
+  return ret;
+}
+[#-- //LC: comment... this is an open point to me... also how UART is implemented. USART has a transmitreceive method, other functions no...
+
+/**
+  * @brief  Send and Receive data to/from USART BUS (Full duplex) with DMA
+  * @param  pData: Pointer to data buffer to send/receive
+  * @param  Length: Length of data in byte
+  * @retval BSP status
+  */
+int32_t BSP_${IpInstance}_SendRecv_DMA(uint8_t *pTxData, uint8_t *pRxData, uint16_t Length)
+{
+  int32_t ret = BSP_ERROR_NONE;
+  
+  //if(HAL_USART_TransmitReceive_DMA(&h${IpInstance?lower_case}, pTxData, pRxData, Length) != HAL_OK)
+  //{
+      ret = BSP_ERROR_UNKNOWN_FAILURE;
+  //}
+  return ret;
+}
+
+ --]
+ 
+ 
+[/#if]
 [/#macro]
 [#-- End macro generateBspSPI_Driver --]
 

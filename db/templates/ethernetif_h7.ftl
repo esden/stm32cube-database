@@ -272,9 +272,9 @@ static void low_level_init(struct netif *netif)
   int32_t PHYLinkState;
   uint32_t duplex, speed = 0;
 [#else]
-/* USER CODE BEGIN low_level_init Variables Intialization for User BSP */
+/* USER CODE BEGIN low_level_init Variables Initialization for User BSP */
 
-/* USER CODE END low_level_init Variables Intialization for User BSP */
+/* USER CODE END low_level_init Variables Initialization for User BSP */
 [/#if][#-- endif bsp --]
 [/#if][#-- endif with_rtos --]
   /* Start ETH HAL Init */
@@ -444,7 +444,7 @@ static void low_level_init(struct netif *netif)
  *
  * @note Returning ERR_MEM here if a DMA queue of your MAC is full can lead to
  *       strange results. You might consider waiting for space in the DMA queue
- *       to become availale since the stack doesn't retry to send a packet
+ *       to become available since the stack doesn't retry to send a packet
  *       dropped because of memory failure (except for the TCP timers).
  */
 
@@ -687,7 +687,7 @@ err_t ethernetif_init(struct netif *netif)
 #if LWIP_ARP
   netif->output = etharp_output;
 #else
-  /* The user should write ist own code in low_level_output_arp_off function */
+  /* The user should write its own code in low_level_output_arp_off function */
   netif->output = low_level_output_arp_off;
 #endif /* LWIP_ARP */
 #endif /* LWIP_ARP || LWIP_ETHERNET */
@@ -841,7 +841,7 @@ void ethernet_link_check_state(struct netif *netif)
 {
 [#if bsp == 1]
   ETH_MACConfigTypeDef MACConf;
-  uint32_t PHYLinkState;
+  int32_t PHYLinkState;
   uint32_t linkchanged = 0, speed = 0, duplex =0;
 [/#if][#-- endif bsp --]
   

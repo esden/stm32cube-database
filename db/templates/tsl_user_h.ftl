@@ -222,6 +222,7 @@ extern TSL_ObjectGroup_T MyObjGroup;
 
 void tsl_user_Init(void);
 tsl_user_status_t tsl_user_Exec(void);
+tsl_user_status_t tsl_user_Exec_IT(void);
 void tsl_user_SetThresholds(void);
 
 #endif /* __TSL_USER_H */

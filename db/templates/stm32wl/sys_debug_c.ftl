@@ -12,7 +12,7 @@
 /* USER CODE END Header */
 [#--
 ********************************
-BSP IP Datas:
+BSP IP Data:
 [#if BspIpDatas??]
   [#list BspIpDatas as SWIP]
     [#if SWIP.defines??]
@@ -30,7 +30,7 @@ Variables:
   [/#list]
 [/#if]
 ********************************
-SWIP Datas:
+SWIP Data:
 [#if SWIPdatas??]
   [#list SWIPdatas as SWIP]
     [#if SWIP.defines??]

@@ -91,20 +91,20 @@ void MX_LoRaWAN_Init(void)
 [/#if]
 }
 
+[#if !FREERTOS??][#-- If FreeRtos, only available in CM4 is not used --]
 void MX_LoRaWAN_Process(void)
 {
   /* USER CODE BEGIN MX_LoRaWAN_Process_1 */
 
   /* USER CODE END MX_LoRaWAN_Process_1 */
-[#if (SUBGHZ_APPLICATION != "LORA_USER_APPLICATION") || (CPUCORE == "CM0PLUS") ]
-[#if !FREERTOS??][#-- If FreeRtos is not used --]
+[#if (SUBGHZ_APPLICATION != "LORA_USER_APPLICATION") || (CPUCORE == "CM0PLUS")]
   UTIL_SEQ_Run(UTIL_SEQ_DEFAULT);
   /* USER CODE BEGIN MX_LoRaWAN_Process_2 */
 
   /* USER CODE END MX_LoRaWAN_Process_2 */
 [/#if]
-[/#if]
 }
+[/#if]
 
 /* USER CODE BEGIN EF */
 

@@ -115,7 +115,10 @@
 
 #if (USE_BSP_COM_FEATURE > 0)
   #if (USE_COM_LOG > 0)
-    #if defined(__ICCARM__) || defined(__CC_ARM) /* For IAR and MDK-ARM */
+  [#-- BZ 92300  
+    #if defined(__ICCARM__) || defined(__CC_ARM) || (defined(__ARMCC_VERSION) && (__ARMCC_VERSION >= 6010050)) /* For IAR and ARM Compiler 5 and 6*/
+  --] 
+    #if defined(__ICCARM__) || defined(__CC_ARM) /* For IAR and MDK-ARM */ 
       #include <stdio.h>
     #endif
   #endif

@@ -38,15 +38,6 @@
 	</RefParameter>
 
 
-	<!--For the moment LibJPEG is hard-linked with FATFS then the information is displayed in grey without no possibility to change value-->
-	<!--
-	<RefParameter Name="LIBJPEG_with_FATFS" Comment="FATFS" DefaultValue="Enabled" Type="String" Group="MW configuration" TabName="Config parameters" Mode="Basic">
-    <PossibleValue Comment="FATFS" Value="Enabled"/>
-    <Description>This parameter specifies the source and the destination of the compressed data :&lt;br&gt;-when this parameter is Enabled, FATFS is used as data source and destination module.&lt;br&gt;-when this parameter is Disabled, STDIO is used instead.&lt;br&gt;&lt;font color=&quot;red&quot;&gt;&lt;b&gt;Warning:&lt;/b&gt; in this version, only FATFS file system could be used.&lt;/font&gt;</Description>
-	</RefParameter>
-	-->
-
-
 	<!-- FREERTOS is displayed in grey when enabled-->
 		<RefParameter Name="FREERTOS" Comment="FREERTOS" DefaultValue="Enabled" Type="String" Group="MW configuration" TabName="Config parameters" Mode="Basic">
 		<Condition Diagnostic="" Expression="S_FREERTOS$context"/>
@@ -57,7 +48,22 @@
 		<PossibleValue Comment="FREERTOS Status" Value="Disabled"/>
 		<Description>This parameter indicates if FreeRtos is Disabled or Enabled :&lt;br&gt;-when FreeRtos is Disabled, the LibJpeg memory allocator is the C standard allocator (not configurable).&lt;br&gt;-when FreeRtos is Enabled, the LibJpeg memory allocator type can be configured in "General Settings" menu.</Description>
 	  </RefParameter>
+
+
+	<!-- HAVE_BOOLEAN-->
+	<RefParameter Name="HAVE_BOOLEAN" Comment="HAVE_BOOLEAN" DefaultValue="Undefined" Type="list" Group="MW configuration" TabName="Config parameters" Mode="Basic">
+		<PossibleValue Comment="Undefined" Value="Undefined"/>
+		<PossibleValue Comment="Defined" Semaphore="S_HAVE_BOOLEAN_defined$IpInstance" Value="Defined"/>
+		<Description>Default Value : Undefined &lt;br&gt; Defines/Undefines the HAVE_BOOLEAN C condition allowing to change the boolean type. &lt;br&gt; When conflicting with application specific header files the boolean type can be redefined by defining the HAVE_BOOLEAN condition. &lt;br&gt; In this case the boolean type takes the value of the field 'boolean type'.</Description> 	
+	</RefParameter>
 	
+	<RefParameter Name="BooleanType" Comment="    boolean type" DefaultValue="uint8_t" Type="String" Group="MW configuration" TabName="Config parameters" >
+		<Condition Diagnostic="" Expression="S_HAVE_BOOLEAN_defined$IpInstance"/>
+		<PossibleValue Comment="uint8_t" Value="uint8_t"/>
+		<Description>Set the boolean type to the specified value.</Description>
+	</RefParameter>
+
+
 	<!-- FREERTOS : default is to use FreeRtos Api-->
 	<RefParameter Name="LIBJPEG_with_FREERTOS" Comment="Use FREERTOS Memory Allocator" DefaultValue="1" Type="list" Group="General Settings" TabName="Config parameters" Mode="Basic">
 	    <Condition Diagnostic="" Expression="S_FREERTOS$context"/>
@@ -70,11 +76,7 @@
 		<Description>FreeRtos is Disabled : LibJpeg memory allocator is the C standard memory allocator.</Description>
 	</RefParameter>
 
-	<!--RefParameter Name="LIBJPEG_with_USE_HEAP_MEM" Comment="Use LIBJPEG_with_USE_HEAP_MEM" DefaultValue="0" Type="list" Group="General Settings" TabName="Config parameters">
-		<PossibleValue Comment="Enabled" Value="1"/>
-		<PossibleValue Comment="Disabled" Value="0"/>
-		<Description>Define LibJPEG dependency with USE_HEAP_MEM when available. &lt;br&gt;If USE_HEAP_MEM: &lt;br&gt;  is defined: no memory back-storage is allowed (all allocations in RAM)&lt;br&gt; is not defined: memory back-storage allowed (like virtual memory support) – swap done using the FS defined by “FatFs support” parameter</Description>
-	</RefParameter-->
+
 
 	<!-- RefParameters for LIBJPEG - JPEG basic settings-->
 	<RefParameter Name="BITS_IN_JSAMPLE" Comment="BITS_IN_JSAMPLE" DefaultValue="8" Type="list" Group="JPEG basic settings" TabName="Config parameters" Mode="Advanced">
@@ -94,7 +96,7 @@
 
 	<!-- RefParameters for LIBJPEG - JPEG encoder and decoder common capabilities options-->
 	<RefParameter Name="DCT_ISLOW_SUPPORTED" Comment="DCT_ISLOW_SUPPORTED" DefaultValue="define" Type="list" Group="JPEG encoder and decoder common capabilities options" TabName="Config parameters" Mode="Advanced">
-	  <PossibleValue Comment="Enabled" Value="define"/>
+		<PossibleValue Comment="Enabled" Value="define"/>
 		<PossibleValue Comment="Disabled" Value="undef"/>
 		<Description>Default Value : Enabled &lt;br&gt; Slow but accurate integer algorithm</Description>
 	</RefParameter>
@@ -240,6 +242,8 @@
 		<!-- Parameters for LIBJPEG - General settings-->
 		<Parameter Name="LIBJPEG_FS_type"/>
 		<Parameter Name="FREERTOS"/>
+		<Parameter Name="HAVE_BOOLEAN"/>
+		<Parameter Name="BooleanType"/>
 		<Parameter Name="LIBJPEG_with_FREERTOS"/>
 		<!--Parameter Name="LIBJPEG_with_USE_HEAP_MEM"/-->
 		<!-- Parameters for LIBJPEG - JPEG basic settings-->

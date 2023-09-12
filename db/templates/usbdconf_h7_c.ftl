@@ -24,6 +24,7 @@
 [#assign handleNameHS = ""]
 [#assign instanceNb = 0]
 [#assign includeMspDone = 0]
+[#assign className = ""]
 
 [#assign useLPM = false]
 [#list SWIPdatas as SWIP]
@@ -33,6 +34,14 @@
 [#if SWIP.variables??]
 	[#list SWIP.variables as variable]
 		[#-- extern ${variable.type} --][#if variable.value??][#--${variable.value};--]
+                [#if variable.value == "MSC"][#assign className = "MSC"][/#if]
+		[#if variable.value == "DFU"][#assign className = "DFU"][/#if]
+		[#if variable.value == "HID"][#assign className = "HID"][/#if]
+		[#if variable.value == "AUDIO"][#assign className = "AUDIO"][/#if]
+		[#if variable.value == "CCID"][#assign className = "CCID"][/#if]
+		[#if variable.value == "MTP"][#assign className = "MTP"][/#if]
+		[#if variable.value == "CDC"][#assign className = "CDC"][/#if]
+		[#if variable.value == "CUSTOM_HID"][#assign className = "CUSTOM_HID"][/#if]
 		[#if variable.value?contains("OTG_FS")][#assign handleNameFS = "FS"][/#if]
 		[#if variable.value?contains("USB_FS")][#assign handleNameUSB_FS = "FS"][/#if]
 		[#if variable.value?contains("OTG_HS")][#assign handleNameHS = "HS"][/#if]
@@ -47,6 +56,30 @@
 [#-- Global variables --]
 [/#compress]
 [/#list]
+[#if className == "AUDIO"]
+#include "usbd_audio.h"
+[/#if]
+[#if className == "DFU"]
+#include "usbd_dfu.h"
+[/#if]
+[#if className == "HID"]
+#include "usbd_hid.h"
+[/#if]
+[#if className == "MSC"]
+#include "usbd_msc.h"
+[/#if]
+[#if className == "CDC"]
+#include "usbd_cdc.h"
+[/#if]
+[#if className == "CUSTOM_HID"]
+#include "usbd_customhid.h"
+[/#if]
+[#if className == "CCID"]
+#include "usbd_ccid.h"
+[/#if]
+[#if className == "MTP"]
+#include "usbd_mtp.h"
+[/#if]
 
 
 /* USER CODE BEGIN Includes */
@@ -680,6 +713,49 @@ void HAL_PCDEx_LPM_Callback(PCD_HandleTypeDef *hpcd, PCD_LPM_MsgTypeDef msg)
 }
 [/#if]
 [/#if]
+/**
+  * @brief  Static single allocation.
+  * @param  size: Size of allocated memory
+  * @retval None
+  */
+void *USBD_static_malloc(uint32_t size)
+{
+[#if className == "AUDIO"]
+  static uint32_t mem[(sizeof(USBD_AUDIO_HandleTypeDef)/4)+1];/* On 32-bit boundary */ 
+[/#if]
+[#if className == "DFU"]
+  static uint32_t mem[(sizeof(USBD_DFU_HandleTypeDef)/4)+1];/* On 32-bit boundary */
+[/#if]
+[#if className == "HID"]
+  static uint32_t mem[(sizeof(USBD_HID_HandleTypeDef)/4)+1];/* On 32-bit boundary */
+[/#if]
+[#if className == "MSC"]
+  static uint32_t mem[(sizeof(USBD_MSC_BOT_HandleTypeDef)/4)+1];/* On 32-bit boundary */
+[/#if]
+[#if className == "CDC"]
+  static uint32_t mem[(sizeof(USBD_CDC_HandleTypeDef)/4)+1];/* On 32-bit boundary */
+[/#if]
+[#if className == "CUSTOM_HID"]
+  static uint32_t mem[(sizeof(USBD_CUSTOM_HID_HandleTypeDef)/4+1)];/* On 32-bit boundary */
+[/#if]
+[#if className == "CCID"]
+  static uint32_t mem[(sizeof(USBD_CCID_HandleTypeDef)/4)+1];/* On 32-bit boundary */
+[/#if]
+[#if className == "MTP"]
+  static uint32_t mem[(sizeof(USBD_MTP_HandleTypeDef)/4)+1];/* On 32-bit boundary */
+[/#if]
+  return mem;
+}
+
+/**
+  * @brief  Dummy memory free
+  * @param  p: Pointer to allocated  memory address
+  * @retval None
+  */
+void USBD_static_free(void *p)
+{
+
+}
 
 /**
   * @brief  Delays routine for the USB device library.

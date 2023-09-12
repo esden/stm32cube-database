@@ -19,6 +19,7 @@
   */
 /* USER CODE END Header */
 [#assign WB_LINE = Line]
+[#assign DIE = DIE]
 
 /* Includes ------------------------------------------------------------------*/  
 #include "stm32_lpm_if.h"
@@ -40,9 +41,31 @@ const struct UTIL_LPM_Driver_s UTIL_PowerDriver =
   PWR_EnterOffMode,
   PWR_ExitOffMode,
 };
+[#if DIE == "DIE494"]
+
+extern uint32_t boot_after_standby;
+extern RTC_HandleTypeDef hrtc;
+
+#define CSTACK_PREAMBLE_NUMBER 16
+uint32_t cStackPreamble[CSTACK_PREAMBLE_NUMBER];
+
+typedef void( *intfunc )( void );
+typedef union { intfunc __fun; void * __ptr; } intvec_elem;
+extern const intvec_elem __vector_table[];
+
+void CPUcontextSave(void); /* this function is implemented in startup assembly file */
+void standby_hw_save(void);
+void standby_hw_restore(void);
+[/#if]
 
 /* Private function prototypes -----------------------------------------------*/
 static void Switch_On_HSI( void );
+[#--
+[#if DIE == "DIE494"]
+static void EnterLowPower( void );
+static void ExitLowPower( void );
+[/#if]
+--]
 /* USER CODE BEGIN Private_Function_Prototypes */
 
 /* USER CODE END Private_Function_Prototypes */

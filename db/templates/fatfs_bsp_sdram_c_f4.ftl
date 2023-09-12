@@ -5,7 +5,7 @@
   * @file    bsp_driver_sdram.c (based on stm32469i_eval_sdram.c)
   * @brief   This file includes a generic SDRAM driver.
   *          To be updated by the user according to the board used for the project.
-  * @note    Functions generated as weak: they can be overriden by 
+  * @note    Functions generated as weak: they can be overridden by 
   *          - code in user files 
   *          - or BSP code from the FW pack files 
   *          if such files are added to the generated project (by the user).

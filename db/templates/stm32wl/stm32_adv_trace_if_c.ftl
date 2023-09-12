@@ -36,7 +36,9 @@ const UTIL_ADV_TRACE_Driver_s UTIL_TraceDriver =
   UART_StartRx,
   UART_TransmitDMA
 };
+/* USER CODE BEGIN EV */
 
+/* USER CODE END EV */
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN Private_Function_Prototypes */
 
@@ -74,16 +76,16 @@ UTIL_ADV_TRACE_Status_t UART_DeInit( void )
 
 UTIL_ADV_TRACE_Status_t UART_StartRx(void (*cb)(uint8_t *pdata, uint16_t size, uint8_t error))
 {
-/* USER CODE BEGIN UART_DeInit */
+/* USER CODE BEGIN UART_StartRx */
   return UTIL_ADV_TRACE_OK;
-/* USER CODE END UART_DeInit */
+/* USER CODE END UART_StartRx */
 }
 
 UTIL_ADV_TRACE_Status_t UART_TransmitDMA ( uint8_t *pdata, uint16_t size )
 {
-/* USER CODE BEGIN UART_DeInit */
+/* USER CODE BEGIN UART_TransmitDMA */
 	return UTIL_ADV_TRACE_OK;
-/* USER CODE END UART_DeInit */
+/* USER CODE END UART_TransmitDMA */
 }
 
 /* USER CODE BEGIN Private_Functions */

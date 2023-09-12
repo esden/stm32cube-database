@@ -1,5 +1,6 @@
 [#ftl]
 [#compress]
+[#assign familyName=FamilyName?lower_case]
 [#assign threadControlBlock = "NULL"]
 [#assign mutexControl       = "NULL"]
 [#assign timerControlBlock  = "NULL"]
@@ -54,12 +55,21 @@
         [/#if]
         [#-- Moved here, cf BZ 74919 --]
         [#if threadAllocation == "Dynamic"]
+         [#if familyName == "stm32g0" || familyName == "stm32g4" || familyName == "stm32wb" || familyName == "stm32wl"] [#-- avoid impact on V2 examples --]
          const osThreadAttr_t ${threadName}_attributes = {
          #t.name = "${threadName}",
          #t.priority = (osPriority_t) ${threadPriority},
          #t.stack_size = ${threadStackSize} * 4  [#-- cf BZ 78929 --]
          };
+         [#else]
+         const osThreadAttr_t ${threadName}_attributes = {
+         #t.name = "${threadName}",
+         #t.stack_size = ${threadStackSize} * 4,
+         #t.priority = (osPriority_t) ${threadPriority},
+         };
+         [/#if]
         [#else]
+         [#if familyName == "stm32g0" || familyName == "stm32g4" || familyName == "stm32wb" || familyName == "stm32wl"] [#-- avoid impact on V2 examples --]
          const osThreadAttr_t ${threadName}_attributes = {
          #t.name = "${threadName}",
          #t.stack_mem = &${threadBuffer}[0],
@@ -68,6 +78,16 @@
          #t.cb_size = sizeof(${threadControlBlock}),
          #t.priority = (osPriority_t) ${threadPriority},
          };
+         [#else]
+         const osThreadAttr_t ${threadName}_attributes = {
+         #t.name = "${threadName}",
+         #t.cb_mem = &${threadControlBlock},
+         #t.cb_size = sizeof(${threadControlBlock}),
+         #t.stack_mem = &${threadBuffer}[0],
+         #t.stack_size = sizeof(${threadBuffer}),
+         #t.priority = (osPriority_t) ${threadPriority},
+         };
+         [/#if]
         [/#if]
       [/#if]
       

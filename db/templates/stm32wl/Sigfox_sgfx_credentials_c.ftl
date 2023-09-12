@@ -10,7 +10,7 @@
   */
 [#--
 ********************************
-SWIP Datas:
+SWIP Data:
 [#if SWIPdatas??]
   [#list SWIPdatas as SWIP]
     [#if SWIP.defines??]

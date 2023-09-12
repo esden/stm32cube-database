@@ -416,6 +416,11 @@
      <Condition Diagnostic="HSE in bypass Mode" Expression="scale2"/>
     </RefParameter>  
     <RefParameter Visible="false" Comment="ADC clock Source"    Name="ADCFreq_Value"  Min="1400000"   Max="80000000" DefaultValue="16000000"  Type="double" Display="value/1000000" Unit="MHz" />
+    
+    <RefParameter Visible="false" Comment="ADC synchr"  Name="synchADCFreq_Value"  DefaultValue="=HCLKFreq_Value" Type="double" Display="value/1000000" Unit="MHz" IP="ADC1"/>
+    <RefParameter Visible="false" Comment="ADC asynchr" Name="asynchADCFreq_Value" DefaultValue="=ADCFreq_Value"  Type="double" Display="value/1000000"  Unit="MHz" IP="ADC1"/>
+     
+    
      
     
 
@@ -1631,7 +1636,34 @@
    
     <ModeLogicOperator Name="OR">
         <!-- Modes for Oscillators & Clocks -->
-        <Mode Name="OSC" UserName="High Speed Clock (HSE)">
+        <Mode Name="OSC" UserName="High Speed Clock (HSE)" RemoveCondition="DIE456">
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="HSE-External-Clock-Source" UserName="BYPASS Clock Source">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="OSC_IN"/>
+                    </SignalLogicalOp>
+                    <Semaphore>HSEByPass</Semaphore>
+                </Mode>
+                <Mode Name="HSE-External-Oscillator" UserName="Crystal/Ceramic Resonator">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="OSC_IN"/>
+                        <Signal Name="OSC_OUT"/>
+                    </SignalLogicalOp>
+                    <Semaphore>HSEOscillator</Semaphore>
+                </Mode>
+            </ModeLogicOperator>
+        </Mode>
+        <Mode Name="OSC" UserName="High Speed Clock (HSE)" RemoveCondition="!DIE456 | DIE456 &amp; (LQFP48 | UFQFPN48)">
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="HSE-External-Clock-Source" UserName="BYPASS Clock Source">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="OSC_IN"/>
+                    </SignalLogicalOp>
+                    <Semaphore>HSEByPass</Semaphore>
+                </Mode>
+            </ModeLogicOperator>
+        </Mode>
+        <Mode Name="OSC" UserName="High Speed Clock (HSE)" RemoveCondition="!DIE456  | DIE456 &amp; !LQFP48 &amp; !UFQFPN48">
             <ModeLogicOperator Name="XOR">
                 <Mode Name="HSE-External-Clock-Source" UserName="BYPASS Clock Source">
                     <SignalLogicalOp Name="AND">

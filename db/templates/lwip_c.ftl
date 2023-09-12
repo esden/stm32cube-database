@@ -238,7 +238,7 @@ uint32_t DHCPcoarseTimer = 0;
 							[/#if]
 							[#-- [#assign arg = "" + adr + fargument.name] --]
 							[#--if (!method.name?contains("Init")&&fargument.context=="global")--]
-							[#if (fargument.init=="false")][#-- MZA add the field init for Argument object, if init is false the intialization of this argument is not done --]				
+							[#if (fargument.init=="false")][#-- MZA add the field init for Argument object, if init is false the initialization of this argument is not done --]				
 								[#-- do Nothing --]
 							[#else]
 								[#list fargument.argument as argument]									
@@ -327,7 +327,7 @@ uint32_t DHCPcoarseTimer = 0;
 		[/#if]
 		[#if method.status=="KO"]
 		#n [#if nTab==2]#t#t[#else]#t[/#if]//!!! ${method.name} is commented because some parameters are missing
-		[#if method.arguments??]			[#-- here we comment all variables intialization --]
+		[#if method.arguments??]			[#-- here we comment all variables initialization --]
 				[#list method.arguments as fargument]
 					[#if fargument.addressOf] 
 						[#assign adr = "&"]

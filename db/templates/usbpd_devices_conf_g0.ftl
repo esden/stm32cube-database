@@ -164,9 +164,6 @@
             [#if definition.name == "TIMinstance"]
                 [#assign TIMinstance = definition.value]
             [/#if]
-            [#if definition.name == "TIMinterrupt"]
-                [#assign TIMinterrupt = definition.value]
-            [/#if]
             [#if definition.name == "TIMenableClock"]
                 [#assign TIMenableClock = definition.value]
             [/#if]
@@ -337,7 +334,6 @@
 #define TIMX                           ${TIMinstance}
 #define TIMX_CLK_ENABLE                ${TIMenableClock}
 #define TIMX_CLK_DISABLE               ${TIMdisableClock}
-#define TIMX_IRQ                       ${TIMinterrupt}
 #define TIMX_CHANNEL_CH1               LL_TIM_CHANNEL_CH1
 #define TIMX_CHANNEL_CH2               LL_TIM_CHANNEL_CH2
 #define TIMX_CHANNEL_CH3               LL_TIM_CHANNEL_CH3

@@ -360,9 +360,9 @@
  * See http://www.freertos.org/a00110.html
  *----------------------------------------------------------*/
 
-/* USER CODE BEGIN Includes */   	      
+/* USER CODE BEGIN Includes */
 /* Section where include file can be added */
-/* USER CODE END Includes */ 
+/* USER CODE END Includes */
 
 [#compress]
 [#assign prototypeNeeded = "false"]
@@ -387,11 +387,15 @@
 [#if configGENERATE_RUN_TIME_STATS=="1"]
 /* USER CODE BEGIN 0 */
 #textern void configureTimerForRunTimeStats(void);
-#textern unsigned long getRunTimeCounterValue(void);  
+#textern unsigned long getRunTimeCounterValue(void);
 /* USER CODE END 0 */
 [/#if]
 #endif
 [/#compress]
+
+#ifndef CMSIS_device_header
+#define CMSIS_device_header "${familyName}xx.h"
+#endif /* CMSIS_device_header */
 
 [#-- Added for 10.2.1 support --]
 [#if (familyName=="stm32l5") ]
@@ -616,7 +620,7 @@ header file. */
 /* USER CODE END 1 */
 
 [#if (familyName=="stm32l5") ]
-[#-- Removed for CM33 (L5 specs) --]
+#define SysTick_Handler xPortSysTickHandler [#-- required by 10.3.1 update --]
 [#else]
 /* Definitions that map the FreeRTOS port interrupt handlers to their CMSIS
 standard names. */
@@ -666,16 +670,16 @@ standard names. */
 [/#if]
 
 [#if configGENERATE_RUN_TIME_STATS=="1"]
-/* USER CODE BEGIN 2 */    
+/* USER CODE BEGIN 2 */
 /* Definitions needed when configGENERATE_RUN_TIME_STATS is on */
 #define portCONFIGURE_TIMER_FOR_RUN_TIME_STATS configureTimerForRunTimeStats
 #define portGET_RUN_TIME_COUNTER_VALUE getRunTimeCounterValue    
 /* USER CODE END 2 */
 [/#if]
 
-/* USER CODE BEGIN Defines */   	      
+/* USER CODE BEGIN Defines */      
 /* Section where parameter definitions can be added (for instance, to override default ones in FreeRTOS.h) */
-/* USER CODE END Defines */ 
+/* USER CODE END Defines */
 
 [#if configUSE_TICKLESS_IDLE=="1"]
 #if defined(__ICCARM__) || defined(__CC_ARM) || defined(__GNUC__)

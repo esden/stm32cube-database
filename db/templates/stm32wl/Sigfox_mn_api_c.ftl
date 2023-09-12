@@ -10,7 +10,7 @@
   */
 [#--
 ********************************
-SWIP Datas:
+SWIP Data:
 
 [#if SWIPdatas??]
   [#list SWIPdatas as SWIP]
@@ -202,7 +202,7 @@ void MN_API_DeInit(void)
   /* USER CODE END MN_API_DeInit_2 */
 [#else]
   /* USER CODE BEGIN MN_API_DeInit */
-  /*De-Initialisation of the hardare timer and RF for Monarch*/
+  /*De-Initialisation of the hardware timer and RF for Monarch*/
   /* USER CODE END MN_API_DeInit */
 [/#if]
 }
@@ -382,7 +382,7 @@ void MN_API_TimerSart(uint32_t timer_value_ms, void (*TimeoutHandle)(void *Argum
 [#else]
     /* USER CODE BEGIN MN_API_TimerSart */
   /*monarch window timer starts during timer_value_ms*/
-  /*Must call TimeoutHandle whan timer expires*/
+  /*Must call TimeoutHandle when timer expires*/
     /* USER CODE END MN_API_TimerSart */
 [/#if]
 }

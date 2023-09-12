@@ -7,6 +7,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 [#macro getGroups groupArg]
 [#assign grouplibExist = "0"]
+[#if  multiConfigurationProject?? && groupArg.excludedFrom!="" && TrustZone=="1" && groupArg.excludedFrom==selectedConfig]
+    
+[#else]
 <group> 
     <name>${groupArg.name}</name>
     [#if  multiConfigurationProject?? && groupArg.excludedFrom!=""  && MultiProject=="0"]
@@ -44,6 +47,7 @@
         [/#list]
     [/#if]
     </group>
+[/#if]
 [/#macro]
 <ScratchFile FileVersion="${FileVersion}">
 <FileVersion>${FileVersion}</FileVersion> [#-- add file version for UC30 --]

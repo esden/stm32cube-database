@@ -204,7 +204,7 @@ void Process_Kms_Cmd(MBMUX_ComParam_t *ComObj)
   /* USER CODE BEGIN Process_Kms_Cmd_1 */
 
   /* USER CODE END Process_Kms_Cmd_1 */
-  uint32_t *com_buffer = ComObj->ParamBuf;;
+  uint32_t *com_buffer = ComObj->ParamBuf;
 
   APP_LOG(TS_ON, VLEVEL_L, ">CM0PLUS(KMS)\r\n");
 
@@ -436,7 +436,7 @@ static void tiny_snprintf_like(char *buf, uint32_t maxsize, const char *strForma
 /* HAL overload functions ---------------------------------------------------------*/
 
 [#if (SUBGHZ_APPLICATION == "LORA_USER_APPLICATION") || (SUBGHZ_APPLICATION == "SUBGHZ_USER_APPLICATION") || (SUBGHZ_APPLICATION == "SIGFOX_USER_APPLICATION")]
-/* Use #if 0 if you want to keep the default HAL istead overcharge them*/
+/* Use #if 0 if you want to keep the default HAL instead overcharge them*/
 /* USER CODE BEGIN Overload_HAL_weaks_1 */
 #if 1
 /* USER CODE END Overload_HAL_weaks_1 */

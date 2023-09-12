@@ -16,7 +16,7 @@
 [#assign IS_DCDC_SUPPORTED="0"]
 [#--
 ********************************
-BSP IP Datas:
+BSP IP Data:
 [#if BspIpDatas??]
   [#list BspIpDatas as SWIP]
     [#if SWIP.defines??]
@@ -34,7 +34,7 @@ Variables:
   [/#list]
 [/#if]
 ********************************
-SWIP Datas:
+SWIP Data:
 [#if SWIPdatas??]
   [#list SWIPdatas as SWIP]
     [#if SWIP.defines??]
@@ -111,7 +111,7 @@ extern "C" {
 #define RBI_CONF_RFO_LP     RADIO_CONF_RFO_LP
 #define RBI_CONF_RFO_HP     RADIO_CONF_RFO_HP
 [#if useBsp]
-[#-- LOW LEVEL CONIFG FOR PLATFROM SETTINGS --]
+[#-- LOW LEVEL CONIFG FOR PLATFORM SETTINGS --]
 #elif defined(MX_${myBoardName})
 #define RBI_CONF_RFO_LP_HP  0
 #define RBI_CONF_RFO_LP     1
@@ -131,7 +131,7 @@ extern "C" {
 /* and define USE_BSP_DRIVER in the preprocessor definitions  or in platform.h */
 
 [#if useBsp]
-[#-- LOW LEVEL CONIFG FOR FOR PLATFROM SETTINGS --]
+[#-- LOW LEVEL CONIFG FOR FOR PLATFORM SETTINGS --]
 #elif defined(MX_${myBoardName})
 
 /* Indicates the type of switch between the ones proposed by CONFIG Constants
@@ -167,7 +167,7 @@ extern "C" {
 /* In order to use BSP driver, add the correspondent files in the IDE workspace */
 /* and define USE_BSP_DRIVER in the preprocessor definitions  or in platform.h */
 
-[#-- PIN MAPPING FOR PLATFROM SETTINGS --]
+[#-- PIN MAPPING FOR PLATFORM SETTINGS --]
 #elif defined(MX_${myBoardName})
 [#if BspIpDatas??]
 [#if useBsp]

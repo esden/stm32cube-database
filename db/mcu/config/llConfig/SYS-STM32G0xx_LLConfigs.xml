@@ -62,12 +62,16 @@
       <MethodArg Name="PVDLLevel" ParameterName="PVDLLevel" />
     </CallLibMethod>
       
-    <IFCondition Expression="!(Mode = PWR_PVD_MODE_NORMAL)">
+    <IFCondition Expression="!(Mode = PWR_PVD_MODE_NORMAL)&amp; (!DIE456 &amp; !DIE466)">
       <CallLibMethod Name="INITSTRUCT" Type="HardCode">
          <HardCode Text="#n#t/* Configure EXTI line 16 */#n#tLL_EXTI_InitTypeDef exti_initstruct;#n#texti_initstruct.Line_0_31 = LL_EXTI_LINE_16;#n#texti_initstruct.Line_32_63 = LL_EXTI_LINE_NONE;#n#texti_initstruct.LineCommand = ENABLE;"/>
       </CallLibMethod>
     </IFCondition>    
-      
+      <IFCondition Expression="!(Mode = PWR_PVD_MODE_NORMAL)&amp; (DIE456 | DIE466)">
+      <CallLibMethod Name="INITSTRUCT" Type="HardCode">
+         <HardCode Text="#n#t/* Configure EXTI line 16 */#n#tLL_EXTI_InitTypeDef exti_initstruct;#n#texti_initstruct.Line_0_31 = LL_EXTI_LINE_16;#n#texti_initstruct.LineCommand = ENABLE;"/>
+      </CallLibMethod>
+    </IFCondition>  
     <IFCondition Expression="(Mode = PWR_PVD_MODE_IT_RISING) | (Mode = PWR_PVD_MODE_IT_FALLING) | (Mode = PWR_PVD_MODE_IT_RISING_FALLING)">
       <CallLibMethod Name="MODE_IT" Type="HardCode">
         <HardCode Text="#n#texti_initstruct.Mode = LL_EXTI_MODE_IT;"/>

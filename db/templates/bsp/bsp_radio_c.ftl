@@ -65,7 +65,7 @@ int32_t BSP_RADIO_Init(void)
 }
 
 /**
-  * @brief  DeInit Radio Swicth
+  * @brief  DeInit Radio Switch
   * @retval BSP status
   */
 int32_t BSP_RADIO_DeInit(void)
@@ -109,7 +109,7 @@ int32_t BSP_RADIO_ConfigRFSwitch(BSP_RADIO_Switch_TypeDef Config)
     }
     case RADIO_SWITCH_RX:
     {
-      /*Turns On in Rx Mode the RF Swicth */
+      /*Turns On in Rx Mode the RF Switch */
       HAL_GPIO_WritePin(RF_SW_CTRL3_GPIO_PORT, RF_SW_CTRL3_PIN, GPIO_PIN_SET);
       HAL_GPIO_WritePin(RF_SW_CTRL1_GPIO_PORT, RF_SW_CTRL1_PIN, GPIO_PIN_SET); 
       HAL_GPIO_WritePin(RF_SW_CTRL2_GPIO_PORT, RF_SW_CTRL2_PIN, GPIO_PIN_RESET); 
@@ -117,7 +117,7 @@ int32_t BSP_RADIO_ConfigRFSwitch(BSP_RADIO_Switch_TypeDef Config)
     }
     case RADIO_SWITCH_RFO_LP:
     {
-      /*Turns On in Tx Low Power the RF Swicth */
+      /*Turns On in Tx Low Power the RF Switch */
       HAL_GPIO_WritePin(RF_SW_CTRL3_GPIO_PORT, RF_SW_CTRL3_PIN, GPIO_PIN_SET);
       HAL_GPIO_WritePin(RF_SW_CTRL1_GPIO_PORT, RF_SW_CTRL1_PIN, GPIO_PIN_SET); 
       HAL_GPIO_WritePin(RF_SW_CTRL2_GPIO_PORT, RF_SW_CTRL2_PIN, GPIO_PIN_SET); 
@@ -125,7 +125,7 @@ int32_t BSP_RADIO_ConfigRFSwitch(BSP_RADIO_Switch_TypeDef Config)
     }
     case RADIO_SWITCH_RFO_HP:
     {
-      /*Turns On in Tx High Power the RF Swicth */
+      /*Turns On in Tx High Power the RF Switch */
       HAL_GPIO_WritePin(RF_SW_CTRL3_GPIO_PORT, RF_SW_CTRL3_PIN, GPIO_PIN_SET);
       HAL_GPIO_WritePin(RF_SW_CTRL1_GPIO_PORT, RF_SW_CTRL1_PIN, GPIO_PIN_RESET); 
       HAL_GPIO_WritePin(RF_SW_CTRL2_GPIO_PORT, RF_SW_CTRL2_PIN, GPIO_PIN_SET); 

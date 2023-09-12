@@ -10,27 +10,42 @@
 	<RefParameter Name="Instance" DefaultValue="ETH" Comment="Instance" Type="" Visible="false"/>
 	
 	<RefParameter Comment="Warning" DefaultValue="The ETH can work only when RAM is pointing at 0x24000000"  Name="Warning" Group="General : Ethernet Configuration" Type="string"/>
-	<RefParameter Comment="Note" DefaultValue="PHY Driver must be configured from the LwIP 'Platform Settings' top right tab"  Name="Note" Group="General : Ethernet Configuration" Type="string"/>
+	<RefParameter Comment="Note" DefaultValue="PHY Driver must be configured from the LwIP 'Platform Settings' top right tab"  Name="Note" Group="General : Ethernet Configuration" Type="string">
+		<Condition Diagnostic="" Expression="S_LWIP"/>
+	</RefParameter>
+	<RefParameter Comment="Note" DefaultValue="N/A" Name="Note" Group="General : Ethernet Configuration" Type="string" Visible="false"/>
+
 	<!-- ST MicroElectronics prefixe Adress -->
 	<RefParameter Comment="Ethernet MAC Address" ArraySize="6" ArrayTypeElement="uint8_t;16" Name="MACAddr" Type="Array" Separator=":" Group="General : Ethernet Configuration" DefaultValue="00:80:E1:00:00:00"/>
 
 	<RefParameter Comment="Rx Descriptor Length" DefaultValue="4" Max="256" Min="0" Type="integer" Name="ETH_RX_DESC_CNT" Group="General : Ethernet Configuration"/>
 	<RefParameter Comment="First Rx Descriptor Address" DefaultValue="0x30040000" Max="0xFFFFFFFF" Min="0x0" Type="hex" Name="RxDescAddress" Group="General : Ethernet Configuration">
-	<Description>The Fisrt Tx Description address must be only in the D2 SRAM and AXI SRAM.These areas must not be cacheable.</Description>
+	<Description>The Fisrt Rx Description address must be only in the D2 SRAM.These areas must not be cacheable.</Description>
 	</RefParameter>
     <RefParameter Name="TxDesc" Comment="Tx Desc" Type="string" Group="General : Ethernet  Configuration" DefaultValue="DMATxDscrTab"  Visible="false"/>
 
 	<RefParameter Comment="Tx Descriptor Length" DefaultValue="4" Max="256" Min="0" Type="integer" Name="ETH_TX_DESC_CNT" Group="General : Ethernet Configuration"/>
 	<RefParameter Comment="First Tx Descriptor Address" DefaultValue="0x30040060" Max="0xFFFFFFFF" Min="=RxDescAddress+ETH_RX_DESC_CNT*24" Type="hex" Name="TxDescAddress" Group="General : Ethernet Configuration">
-	<Description>The First Rx Descriptor address must be only in the D2 SRAM and AXI SRAM. These areas must not be cacheable.</Description>
+	<Description>The First Tx Descriptor address must be only in the D2 SRAM. These areas must not be cacheable.</Description>
 	</RefParameter>
 	 <RefParameter Name="RxDesc" Comment="Rx Desc" Type="string" Group="General : Ethernet  Configuration" DefaultValue="DMARxDscrTab"  Visible="false"/>
+	
+	<!-- BZ 97589 Start -->
+	<RefParameter Comment="Rx Buffers Address" DefaultValue="0x30040200" Max="0xFFFFFFFF" Min="=TxDescAddress+ETH_TX_DESC_CNT*24"  Type="hex" Name="RxBuffAddress" Group="General : Ethernet Configuration" Visible="false">
+		<Condition Expression="S_AzureRTOS$context" Diagnostic="NetXDuo in use"/>
+		<Description>Rx Buffers Address not used with NetXDuo Mw</Description>
+	</RefParameter>
 	<RefParameter Comment="Rx Buffers Address" DefaultValue="0x30040200" Max="0xFFFFFFFF" Min="=TxDescAddress+ETH_TX_DESC_CNT*24"  Type="hex" Name="RxBuffAddress" Group="General : Ethernet Configuration">
-	<Description>The Fisrt Tx Description address must be only in the D2 SRAM and AXI SRAM.</Description>
+		<Description>The Fisrt Tx Description address must be only in the D2 SRAM and AXI SRAM.</Description>
+	</RefParameter>
+	<RefParameter Comment="Rx Buffers Length" DefaultValue="4" Max="1536" Min="4" Type="integer" Name="RxBuffLen" Group="General : Ethernet Configuration" Visible="true">
+		<Condition Expression="S_AzureRTOS$context" Diagnostic="NetXDuo in use"/>
+		<Description>The Rx Buffer is declared into the NetXDuo Mw. Length for the HAL is set to 0 for this buffer to avoid allocating unnecessary memory space</Description>
 	</RefParameter>
 	<RefParameter Comment="Rx Buffers Length" DefaultValue="1524" Max="1536" Min="0" Type="integer" Name="RxBuffLen" Group="General : Ethernet Configuration">
-	<Description>To ensure the zero copy capabilities, a received frame can't be divided into more than one buffer greater than the Rx Buffers Length. That is why we recommend to set this parameter to Ethernet Maximum Transfert Unit(MTU).</Description>
+		<Description>To ensure the zero copy capabilities, a received frame can't be divided into more than one buffer greater than the Rx Buffers Length. That is why we recommend to set this parameter to Ethernet Maximum Transfert Unit(MTU).</Description>
 	</RefParameter>
+	<!-- BZ 97589 End -->
 	
 	<RefParameter Comment="Media Interface" DefaultValue="HAL_ETH_MII_MODE" Name="MediaInterface" Type="list" Group="General : Ethernet  Configuration" Visible="false">
 		<PossibleValue Value="HAL_ETH_MII_MODE" Comment=""/>
@@ -51,7 +66,7 @@
 		<Parameter Name="ETH_RX_DESC_CNT"/>
 		<Parameter Name="RxDescAddress"/>
 		 <Parameter Name="RxDesc"/> 
-		<Parameter Name="RxBuffAddress"/>
+		<Parameter Name="RxBuffAddress"/>					
         <Parameter Name="RxBuffLen"/>
 		<Parameter Name="MediaInterface">
 			<PossibleValue>HAL_ETH_MII_MODE</PossibleValue>
@@ -86,8 +101,8 @@
 		<Parameter Name="TxDesc"/>
 		<Parameter Name="ETH_RX_DESC_CNT"/>
 		<Parameter Name="RxDescAddress"/>
-		 <Parameter Name="RxDesc"/>
-		<Parameter Name="RxBuffAddress"/>
+		<Parameter Name="RxDesc"/>
+		<Parameter Name="RxBuffAddress"/>					
         <Parameter Name="RxBuffLen"/>
 		<Parameter Name="MediaInterface">
 			<PossibleValue>HAL_ETH_RMII_MODE</PossibleValue>

@@ -35,6 +35,7 @@
     <PossibleValue Value="GTZC_TZSC_PERIPH_NSEC" Comment="not secured"/>
     <PossibleValue Value="GTZC_TZSC_PERIPH_SEC" Comment="secured"/>
   </RefParameter>
+
   <RefParameter Name="AES_Secure" Comment="AES" DefaultValue="GTZC_TZSC_PERIPH_SEC" Type="list" Group="Secureable Peripherals" TabName="TrustZone Security Controller - Securable Peripherals">
     <Condition Expression="AES_Exist &amp; S_All_IP_Secured" Diagnostic="pre-selected all Peripheral Secured"/>
     <PossibleValue Value="GTZC_TZSC_PERIPH_SEC" Comment="secured"/>
@@ -42,16 +43,6 @@
   </RefParameter>
   <RefParameter Name="AES_Secure" Comment="AES" DefaultValue="GTZC_TZSC_PERIPH_NSEC" Type="list" Group="Secureable Peripherals" TabName="TrustZone Security Controller - Securable Peripherals">
     <Condition Expression="AES_Exist" Diagnostic="pre-selected no Peripheral Secured"/>
-    <PossibleValue Value="GTZC_TZSC_PERIPH_NSEC" Comment="not secured"/>
-    <PossibleValue Value="GTZC_TZSC_PERIPH_SEC" Comment="secured"/>
-  </RefParameter>
-  <!-- ICACHE do not synchronize with context -->
-  <RefParameter Name="ICACHE_Secure" Comment="ICACHE" DefaultValue="GTZC_TZSC_PERIPH_SEC" Type="list" Group="Secureable Peripherals" TabName="TrustZone Security Controller - Securable Peripherals">
-    <Condition Expression="S_ICACHE_REG_Secure" Diagnostic="pre-selected all Peripheral Secured"/>
-    <PossibleValue Value="GTZC_TZSC_PERIPH_SEC" Comment="secured"/>
-    <PossibleValue Value="GTZC_TZSC_PERIPH_NSEC" Comment="not secured"/>
-  </RefParameter>
-  <RefParameter Name="ICACHE_Secure" Comment="ICACHE" DefaultValue="GTZC_TZSC_PERIPH_NSEC" Type="list" Group="Secureable Peripherals" TabName="TrustZone Security Controller - Securable Peripherals">
     <PossibleValue Value="GTZC_TZSC_PERIPH_NSEC" Comment="not secured"/>
     <PossibleValue Value="GTZC_TZSC_PERIPH_SEC" Comment="secured"/>
   </RefParameter>
@@ -76,17 +67,58 @@
     <PossibleValue Value="GTZC_TZSC_PERIPH_SEC" Comment="secured"/>
   </RefParameter>
 
+  <!-- CRS synchronize with RCC mode -->
+  <RefParameter Name="CRS_Secure" Comment="CRS" DefaultValue="GTZC_TZSC_PERIPH_SEC" Type="list" Group="Secureable Peripherals" TabName="TrustZone Security Controller - Securable Peripherals">
+    <Condition Expression="S_All_IP_Secured" Diagnostic="pre-selected all Peripheral Secured"/>
+    <PossibleValue Value="GTZC_TZSC_PERIPH_SEC" Comment="secured" Semaphore="CRS_GTZC_SECURE"/>
+    <PossibleValue Value="GTZC_TZSC_PERIPH_NSEC" Comment="not secured"/>
+  </RefParameter>
+  <RefParameter Name="CRS_Secure" Comment="CRS" DefaultValue="GTZC_TZSC_PERIPH_NSEC" Type="list" Group="Secureable Peripherals" TabName="TrustZone Security Controller - Securable Peripherals">
+    <PossibleValue Value="GTZC_TZSC_PERIPH_NSEC" Comment="not secured"/>
+    <PossibleValue Value="GTZC_TZSC_PERIPH_SEC" Comment="secured" Semaphore="CRS_GTZC_SECURE"/>
+  </RefParameter>
+
+  <!-- ICACHE synchronize with ICACHE Secure mode -->
+  <RefParameter Name="ICACHE_Secure" Comment="ICACHE" DefaultValue="GTZC_TZSC_PERIPH_SEC" Type="list" Group="Secureable Peripherals" TabName="TrustZone Security Controller - Securable Peripherals">
+    <Condition Expression="S_ICACHE_REG_Secure | S_All_IP_Secured" Diagnostic="pre-selected all Peripheral Secured"/>
+    <PossibleValue Value="GTZC_TZSC_PERIPH_SEC" Comment="secured" Semaphore="ICACHE_GTZC_SECURE"/>
+    <PossibleValue Value="GTZC_TZSC_PERIPH_NSEC" Comment="not secured"/>
+  </RefParameter>
+  <RefParameter Name="ICACHE_Secure" Comment="ICACHE" DefaultValue="GTZC_TZSC_PERIPH_NSEC" Type="list" Group="Secureable Peripherals" TabName="TrustZone Security Controller - Securable Peripherals">
+    <PossibleValue Value="GTZC_TZSC_PERIPH_NSEC" Comment="not secured"/>
+    <PossibleValue Value="GTZC_TZSC_PERIPH_SEC" Comment="secured" Semaphore="ICACHE_GTZC_SECURE"/>
+  </RefParameter>
+
+  <RefParameter Name="CRS_Privilege_Status" Comment="(!($IpInstance=GTZC_S) &amp; (+GTZC_S:CRS_Secure=GTZC_TZSC_PERIPH_NSEC))" DefaultValue="true" Type="boolean" Group="Secureable Peripherals" TabName="TrustZone Security Controller - Securable Peripherals" Visible="false">
+    <Condition Expression="((+GTZC_S:CRS_Secure=GTZC_TZSC_PERIPH_NSEC) &amp; !($IpInstance=GTZC_S))" Diagnostic=""/>
+  </RefParameter>
+  <RefParameter Name="CRS_Privilege_Status" Comment="($IpInstance=GTZC_S &amp; (+GTZC_S:CRS_Secure=GTZC_TZSC_PERIPH_SEC))" DefaultValue="true" Type="boolean" Group="Secureable Peripherals" TabName="TrustZone Security Controller - Securable Peripherals" Visible="false">
+    <Condition Expression="((GTZC_S:CRS_Secure=GTZC_TZSC_PERIPH_SEC) &amp; ($IpInstance=GTZC_S))" Diagnostic=""/>
+  </RefParameter>
+  <RefParameter Name="CRS_Privilege_Status" Comment="($IpInstance=GTZC)" DefaultValue="true" Type="boolean" Group="Secureable Peripherals" TabName="TrustZone Security Controller - Securable Peripherals" Visible="false">
+    <Condition Expression="($IpInstance=GTZC)" Diagnostic=""/>
+  </RefParameter>
+  <RefParameter Name="CRS_Privilege_Status" Comment="" DefaultValue="false" Type="boolean" Group="Secureable Peripherals" TabName="TrustZone Security Controller - Securable Peripherals" Visible="false"/>
+  <RefParameter Name="ICACHE_Privilege_Status" Comment="(!($IpInstance=GTZC_S) &amp; (+GTZC_S:ICACHE_Secure=GTZC_TZSC_PERIPH_NSEC))" DefaultValue="true" Type="boolean" Group="Secureable Peripherals" TabName="TrustZone Security Controller - Securable Peripherals" Visible="false">
+    <Condition Expression="((+GTZC_S:ICACHE_Secure=GTZC_TZSC_PERIPH_NSEC) &amp; !($IpInstance=GTZC_S))" Diagnostic=""/>
+  </RefParameter>
+  <RefParameter Name="ICACHE_Privilege_Status" Comment="($IpInstance=GTZC_S &amp; (+GTZC_S:ICACHE_Secure=GTZC_TZSC_PERIPH_SEC))" DefaultValue="true" Type="boolean" Group="Secureable Peripherals" TabName="TrustZone Security Controller - Securable Peripherals" Visible="false">
+    <Condition Expression="((+GTZC_S:ICACHE_Secure=GTZC_TZSC_PERIPH_SEC) &amp; $IpInstance=GTZC_S)" Diagnostic=""/>
+  </RefParameter>
+  <RefParameter Name="ICACHE_Privilege_Status" Comment="($IpInstance=GTZC)" DefaultValue="true" Type="boolean" Group="Secureable Peripherals" TabName="TrustZone Security Controller - Securable Peripherals" Visible="false">
+    <Condition Expression="($IpInstance=GTZC)" Diagnostic=""/>
+  </RefParameter>
+  <RefParameter Name="ICACHE_Privilege_Status" Comment="" DefaultValue="false" Type="boolean" Group="Secureable Peripherals" TabName="TrustZone Security Controller - Securable Peripherals" Visible="false"/>
 
   <!-- RefParameters for GTZC - Peripheral Privileged -->
-  <RefParameter Name="TZSC_Privilege_IP_Choice" Comment="Configure Privilege Peripheral" DefaultValue="by Individual Privileging from full Not Privileged" Type="list" Group="Privilegeable Peripherals" TabName="TrustZone Security Controller - Privilegeable Peripherals">
-    <PossibleValue Value="by Individual Privileging from full Not Privileged" Comment="by Individual Privileging from full Not Privileged" Semaphore="S_No_IP_Privileged"/>
-    <PossibleValue Value="by Individual Unprivileging from full Privileged" Comment="by Individual Unprivileging from full Privileged" Semaphore="S_All_IP_Privileged"/>
-    <Description>Privilege/Unprivilege all the Peripherals in one time until individuals are modified.</Description>
+  <RefParameter Name="TZSC_Privilege_IP_Choice" Comment="Configure Privilege Peripheral" DefaultValue="by Individual Privileging from full Not Privileged" Type="list" TabName="TrustZone Security Controller - Privilegeable Peripherals">
+    <PossibleValue Value="by Individual Privileging from full Not Privileged" Comment="by Individual Privileging from full Not Privileged" Semaphore="S_$IpInstance_No_IP_Privileged"/>
+    <PossibleValue Value="by Individual Unprivileging from full Privileged" Comment="by Individual Unprivileging from full Privileged" Semaphore="S_$IpInstance_All_IP_Privileged"/>
   </RefParameter>
 
   <RefParameter Name="Privilegeable_Peripheral" Comment="Privilegeable Peripheral" DefaultValue="Privilege Attribute" Type="string" Group="Privilegeable Peripherals" TabName="TrustZone Security Controller - Privilegeable Peripherals"/>
   <RefParameter Name="IP_Privilege" Comment="" DefaultValue="GTZC_TZSC_PERIPH_PRIV" Type="list" Group="Privilegeable Peripherals" TabName="TrustZone Security Controller - Privilegeable Peripherals">
-    <Condition Expression="S_All_IP_Privileged" Diagnostic="pre-selected all Peripheral Privileged"/>
+    <Condition Expression="S_$IpInstance_All_IP_Privileged" Diagnostic="pre-selected all Peripheral Privileged"/>
     <PossibleValue Value="GTZC_TZSC_PERIPH_PRIV" Comment="privileged"/>
     <PossibleValue Value="GTZC_TZSC_PERIPH_NPRIV" Comment="not privileged"/>
   </RefParameter>
@@ -95,7 +127,7 @@
     <PossibleValue Value="GTZC_TZSC_PERIPH_PRIV" Comment="privileged"/>
   </RefParameter>
   <RefParameter Name="AES_Privilege" Comment="AES" DefaultValue="GTZC_TZSC_PERIPH_PRIV" Type="list" Group="Privilegeable Peripherals" TabName="TrustZone Security Controller - Privilegeable Peripherals">
-    <Condition Expression="AES_Exist &amp; S_All_IP_Privileged" Diagnostic="pre-selected all Peripheral Privileged"/>
+    <Condition Expression="AES_Exist &amp; S_$IpInstance_All_IP_Privileged" Diagnostic="pre-selected all Peripheral Privileged"/>
     <PossibleValue Value="GTZC_TZSC_PERIPH_PRIV" Comment="privileged"/>
     <PossibleValue Value="GTZC_TZSC_PERIPH_NPRIV" Comment="not privileged"/>
   </RefParameter>
@@ -105,7 +137,7 @@
     <PossibleValue Value="GTZC_TZSC_PERIPH_PRIV" Comment="privileged"/>
   </RefParameter>
   <RefParameter Name="PKA_Privilege" Comment="PKA" DefaultValue="GTZC_TZSC_PERIPH_PRIV" Type="list" Group="Privilegeable Peripherals" TabName="TrustZone Security Controller - Privilegeable Peripherals">
-    <Condition Expression="PKA_Exist &amp; S_All_IP_Privileged" Diagnostic="pre-selected all Peripheral Privileged"/>
+    <Condition Expression="PKA_Exist &amp; S_$IpInstance_All_IP_Privileged" Diagnostic="pre-selected all Peripheral Privileged"/>
     <PossibleValue Value="GTZC_TZSC_PERIPH_PRIV" Comment="privileged"/>
     <PossibleValue Value="GTZC_TZSC_PERIPH_NPRIV" Comment="not privileged"/>
   </RefParameter>
@@ -115,7 +147,7 @@
     <PossibleValue Value="GTZC_TZSC_PERIPH_PRIV" Comment="privileged"/>
   </RefParameter>
   <RefParameter Name="OTFDEC1_Privilege" Comment="OTFDEC1" DefaultValue="GTZC_TZSC_PERIPH_PRIV" Type="list" Group="Privilegeable Peripherals" TabName="TrustZone Security Controller - Privilegeable Peripherals">
-    <Condition Expression="OTFDEC1_Exist &amp; S_All_IP_Privileged" Diagnostic="pre-selected all Peripheral Privileged"/>
+    <Condition Expression="OTFDEC1_Exist &amp; S_$IpInstance_All_IP_Privileged" Diagnostic="pre-selected all Peripheral Privileged"/>
     <PossibleValue Value="GTZC_TZSC_PERIPH_PRIV" Comment="privileged"/>
     <PossibleValue Value="GTZC_TZSC_PERIPH_NPRIV" Comment="not privileged"/>
   </RefParameter>
@@ -238,8 +270,8 @@
   <!-- RefParameters for GTZC - MPCBB Common -->
   <RefParameter Name="MPCBB_ConfigSettings" Comment="Configuration Settings" DefaultValue="" Type="string" TabName="MPCBB"/>
   <RefParameter Name="MPCBB_SRWILADIS" Comment="Authorize Secure Read/Write on Non-secure area" DefaultValue="GTZC_MPCBB_SRWILADIS_ENABLE" Type="list" TabName="MPCBB">
-    <PossibleValue Value="GTZC_MPCBB_SRWILADIS_DISABLE" Comment="Secure Read/Write access not allowed on non-secure SRAM block"/>
-    <PossibleValue Value="GTZC_MPCBB_SRWILADIS_ENABLE" Comment="Secure Read/Write access allowed on non-secure SRAM block"/>
+    <PossibleValue Value="GTZC_MPCBB_SRWILADIS_ENABLE" Comment="Secure Read/Write access not allowed on non-secure SRAM block"/>
+    <PossibleValue Value="GTZC_MPCBB_SRWILADIS_DISABLE" Comment="Secure Read/Write access allowed on non-secure SRAM block"/>
   </RefParameter>
   <RefParameter Name="MPCBB_INVSECSTATE" Comment="Default security state" DefaultValue="GTZC_MPCBB_INVSECSTATE_NOT_INVERTED" Type="list" TabName="MPCBB">
     <PossibleValue Value="GTZC_MPCBB_INVSECSTATE_NOT_INVERTED" Comment="Default state (source clock secured if a secure area exists in the MPCBB and vice-versa)"/>
@@ -256,20 +288,20 @@
     <PossibleValue Value="LOCK" Comment="MPCBB memory attribute settings are locked until next reset"/>
   </RefParameter>
 
-
   <!-- RefParameters for GTZC - MPCBB1 Secured -->
   <RefParameter Name="MPCBB1_NonSecureArea_Choice" Comment="Configure Memory" DefaultValue="Use default memory template from partition_stm32l5xx.h" Type="list">
-    <PossibleValue Value="from full Secured" Comment="from full Secured" Semaphore="S_All_MPCBB1_Secured"/>
-    <PossibleValue Value="from full Not Secured" Comment="from full Not Secured" Semaphore="S_No_MPCBB1_Secured"/>
-    <PossibleValue Value="Use default memory template from partition_stm32l5xx.h" Comment="Use default memory template from partition_stm32l5xx.h" Semaphore="S_Default_MPCBB1_template"/>
+    <Condition Expression="($IpInstance=GTZC_S)" Diagnostic=""/>
+    <PossibleValue Value="from full Secured" Comment="from full Secured" Semaphore="S_$IpInstance_All_MPCBB1_Secured"/>
+    <PossibleValue Value="from full Not Secured" Comment="from full Not Secured" Semaphore="S_$IpInstance_No_MPCBB1_Secured"/>
+    <PossibleValue Value="Use default memory template from partition_stm32l5xx.h" Comment="Use default memory template from partition_stm32l5xx.h" Semaphore="S_$IpInstance_Default_MPCBB1_template"/>
+    <Description>Secure/Unsecure all the memory range in one time until sizes are modified.</Description>
   </RefParameter>
 
   <RefParameter Name="MPCBB1_NonSecureArea_SRAM1_BASE_NS" Comment="Non Secure Area Start SRAM1_BASE_NS" DefaultValue="0x20000000" Type="hex" Min="0x20000000" Max="0x20000000" Visible="false"/>
 
-  <RefParameter Name="MPCBB1_NonSecureArea_Desc" Comment="Non Secure Area Descriptor" DefaultValue="MPCBB1_NonSecureArea_Desc" Type="string" Visible="false"/>
   <RefParameter Name="MPCBB1_NonSecureArea_Max" Comment="Non Secure Area Max" DefaultValue="0x30000" Type="hex" Min="0x30000" Max="0x30000" Visible="false"/>
   <RefParameter Name="MPCBB1_NonSecureArea_Start_Address" Comment="Non Secure Area Start Address" DefaultValue="0x20018000" Type="hex" Min="0x20018000" Max="0x20018000" NoCheckOpt="false">
-    <Condition Expression="S_Default_MPCBB1_template" Diagnostic="ST default Template configuration scatter file"/>
+    <Condition Expression="S_$IpInstance_Default_MPCBB1_template" Diagnostic="ST default Template configuration scatter file"/>
   </RefParameter>
   <RefParameter Name="MPCBB1_NonSecureArea_Start_Address" Comment="Non Secure Area Start Address" DefaultValue="0x20000000" Type="hex" Min="=(MPCBB1_NonSecureArea_SRAM1_BASE_NS)" Max="=(MPCBB1_NonSecureArea_Max + MPCBB1_NonSecureArea_SRAM1_BASE_NS - MPCBB1_NonSecureArea_BlockSize)" NoCheckOpt="true"/>
   <RefParameter Name="MPCBB1_NonSecureArea_Start" Comment="Non Secure Area Start Offset" DefaultValue="=(MPCBB1_NonSecureArea_Start_Address - MPCBB1_NonSecureArea_SRAM1_BASE_NS)" Type="StringHex" Min="=(MPCBB1_NonSecureArea_Start_Address - MPCBB1_NonSecureArea_SRAM1_BASE_NS)" Max="=(MPCBB1_NonSecureArea_Start_Address - MPCBB1_NonSecureArea_SRAM1_BASE_NS)" NoCheckOpt="false" Visible="false"/>
@@ -277,21 +309,24 @@
     <Condition Expression="!S_SECURE" Diagnostic="pre-selected no MPCBB1 Secured"/>
   </RefParameter>
   <RefParameter Name="MPCBB1_NonSecureArea_Size" Comment="Non Secure Area Size" DefaultValue="0x18000" Type="hex" Min="0x18000" Max="0x18000" NoCheckOpt="false">
-    <Condition Expression="S_Default_MPCBB1_template" Diagnostic="ST default Template configuration scatter file"/>
+    <Condition Expression="S_$IpInstance_Default_MPCBB1_template" Diagnostic="ST default Template configuration scatter file"/>
   </RefParameter>
   <RefParameter Name="MPCBB1_NonSecureArea_Size" Comment="Non Secure Area Size" DefaultValue="0x30000" Type="hex" Min="0x0" Max="=(MPCBB1_NonSecureArea_Max - MPCBB1_NonSecureArea_Start)" NoCheckOpt="false">
-    <Condition Expression="S_No_MPCBB1_Secured" Diagnostic="pre-selected no MPCBB1 Secured"/>
+    <Condition Expression="S_$IpInstance_No_MPCBB1_Secured" Diagnostic="pre-selected no MPCBB1 Secured"/>
   </RefParameter>
   <RefParameter Name="MPCBB1_NonSecureArea_Size" Comment="Non Secure Area Size" DefaultValue="0x0" Type="hex" Min="0x0" Max="=(MPCBB1_NonSecureArea_Max - MPCBB1_NonSecureArea_Start)" NoCheckOpt="false"/>
   <RefParameter Name="MPCBB1_NonSecureArea_BlockSize" Comment="Non Secure Area Block Size" DefaultValue="0x100" Type="hex" Min="0x100" Max="0x100" Visible="false"/>
   <RefParameter Name="MPCBB1_NonSecureArea_SuperBlockSize" Comment="Non Secure Area Super-Block Size" DefaultValue="0x2000" Type="hex" Min="0x2000" Max="0x2000" Visible="false"/>
   <RefParameter Name="MPCBB1_NonSecureArea_NbSuperBlock" Comment="Non Secure Area Nb Super-Block Size" DefaultValue="=(MPCBB1_NonSecureArea_Max / MPCBB1_NonSecureArea_SuperBlockSize)" Type="integer" Min="=(MPCBB1_NonSecureArea_Max / MPCBB1_NonSecureArea_SuperBlockSize)" Max="=(MPCBB1_NonSecureArea_Max / MPCBB1_NonSecureArea_SuperBlockSize)" Visible="false"/>
 
+  <RefParameter Name="MPCBB1_NonSecureArea_Secure" Comment="Area Secure Attribute" DefaultValue="not secured" Type="list" Visible="false">
+    <PossibleValue Value="GTZC_MPCBB_REGION_NSEC" Comment="not secured"/>
+  </RefParameter>
   <RefParameter Name="MPCBB1_SecConfig_array" Comment="Secure configuration array" DefaultValue="00000000:00000000:00000000:00000000:00000000:00000000:00000000:00000000:00000000:00000000:00000000:00000000:00000000:00000000:00000000:00000000:00000000:00000000:00000000:00000000:00000000:00000000:00000000:00000000" Type="Array" ArraySize="24" ArrayTypeElement="uint32_t;16" Separator=":" Visible="false">
-    <Condition Expression="S_No_MPCBB1_Secured" Diagnostic="memory not secured"/>
+    <Condition Expression="S_$IpInstance_No_MPCBB1_Secured" Diagnostic="memory not secured"/>
   </RefParameter>
   <RefParameter Name="MPCBB1_SecConfig_array" Comment="Secure configuration array" DefaultValue="FFFFFFFF:FFFFFFFF:FFFFFFFF:FFFFFFFF:FFFFFFFF:FFFFFFFF:FFFFFFFF:FFFFFFFF:FFFFFFFF:FFFFFFFF:FFFFFFFF:FFFFFFFF:00000000:00000000:00000000:00000000:00000000:00000000:00000000:00000000:00000000:00000000:00000000:00000000" Type="Array" ArraySize="24" ArrayTypeElement="uint32_t;16" Separator=":" Visible="false">
-    <Condition Expression="S_Default_MPCBB1_template" Diagnostic="ST default Template configuration scatter file"/>
+    <Condition Expression="S_$IpInstance_Default_MPCBB1_template" Diagnostic="ST default Template configuration scatter file"/>
   </RefParameter>
   <RefParameter Name="MPCBB1_SecConfig_array" Comment="Secure configuration array" DefaultValue="FFFFFFFF:FFFFFFFF:FFFFFFFF:FFFFFFFF:FFFFFFFF:FFFFFFFF:FFFFFFFF:FFFFFFFF:FFFFFFFF:FFFFFFFF:FFFFFFFF:FFFFFFFF:FFFFFFFF:FFFFFFFF:FFFFFFFF:FFFFFFFF:FFFFFFFF:FFFFFFFF:FFFFFFFF:FFFFFFFF:FFFFFFFF:FFFFFFFF:FFFFFFFF:FFFFFFFF" Type="Array" ArraySize="24" ArrayTypeElement="uint32_t;16" Separator=":" Visible="false"/>
   <RefParameter Name="MPCBB1_LockConfig_array" Comment="Lock configuration array" DefaultValue="00000000" Type="Array" ArraySize="1" ArrayTypeElement="uint32_t;16" Separator=":" Visible="false">
@@ -309,17 +344,17 @@
 
   <!-- RefParameters for GTZC - MPCBB2 Secured -->
   <RefParameter Name="MPCBB2_NonSecureArea_Choice" Comment="Configure Memory" DefaultValue="Use default memory template from partition_stm32l5xx.h" Type="list">
-    <PossibleValue Value="from full Secured" Comment="from full Secured" Semaphore="S_All_MPCBB2_Secured"/>
-    <PossibleValue Value="from full Not Secured" Comment="from full Not Secured" Semaphore="S_No_MPCBB2_Secured"/>
-    <PossibleValue Value="Use default memory template from partition_stm32l5xx.h" Comment="Use default memory template from partition_stm32l5xx.h" Semaphore="S_Default_MPCBB2_template"/>
+    <Condition Expression="($IpInstance=GTZC_S)" Diagnostic=""/>
+    <PossibleValue Value="from full Secured" Comment="from full Secured" Semaphore="S_$IpInstance_All_MPCBB2_Secured"/>
+    <PossibleValue Value="from full Not Secured" Comment="from full Not Secured" Semaphore="S_$IpInstance_No_MPCBB2_Secured"/>
+    <PossibleValue Value="Use default memory template from partition_stm32l5xx.h" Comment="Use default memory template from partition_stm32l5xx.h" Semaphore="S_$IpInstance_Default_MPCBB2_template"/>
   </RefParameter>
 
   <RefParameter Name="MPCBB2_NonSecureArea_SRAM2_BASE_NS" Comment="Non Secure Area Start SRAM2_BASE_NS" DefaultValue="0x20030000" Type="hex" Min="0x20030000" Max="0x20030000" Visible="false"/>
 
-  <RefParameter Name="MPCBB2_NonSecureArea_Desc" Comment="Non Secure Area Descriptor" DefaultValue="MPCBB2_NonSecureArea_Desc" Type="string" Visible="false"/>
   <RefParameter Name="MPCBB2_NonSecureArea_Max" Comment="Non Secure Area Max" DefaultValue="0x10000" Type="hex" Min="0x10000" Max="0x10000" Visible="false"/>
   <RefParameter Name="MPCBB2_NonSecureArea_Start_Address" Comment="Non Secure Area Start Address" DefaultValue="0x20030000" Type="hex" Min="0x20030000" Max="0x20030000" NoCheckOpt="false">
-    <Condition Expression="S_Default_MPCBB2_template" Diagnostic="ST default Template configuration scatter file"/>
+    <Condition Expression="S_$IpInstance_Default_MPCBB2_template" Diagnostic="ST default Template configuration scatter file"/>
   </RefParameter>
   <RefParameter Name="MPCBB2_NonSecureArea_Start_Address" Comment="Non Secure Area Start Address" DefaultValue="0x20030000" Type="hex" Min="=(MPCBB2_NonSecureArea_SRAM2_BASE_NS)" Max="=(MPCBB2_NonSecureArea_Max + MPCBB2_NonSecureArea_SRAM2_BASE_NS - MPCBB2_NonSecureArea_BlockSize)" NoCheckOpt="true"/>
   <RefParameter Name="MPCBB2_NonSecureArea_Start" Comment="Non Secure Area Start Offset" DefaultValue="=(MPCBB2_NonSecureArea_Start_Address - MPCBB2_NonSecureArea_SRAM2_BASE_NS)" Type="StringHex" Min="=(MPCBB2_NonSecureArea_Start_Address - MPCBB2_NonSecureArea_SRAM2_BASE_NS)" Max="=(MPCBB2_NonSecureArea_Start_Address - MPCBB2_NonSecureArea_SRAM2_BASE_NS)" NoCheckOpt="false" Visible="false"/>
@@ -327,21 +362,24 @@
     <Condition Expression="!S_SECURE" Diagnostic="pre-selected no MPCBB2 Secured"/>
   </RefParameter>
   <RefParameter Name="MPCBB2_NonSecureArea_Size" Comment="Non Secure Area Size" DefaultValue="0x10000" Type="hex" Min="0x10000" Max="0x10000" NoCheckOpt="false">
-    <Condition Expression="S_Default_MPCBB2_template" Diagnostic="ST default Template configuration scatter file"/>
+    <Condition Expression="S_$IpInstance_Default_MPCBB2_template" Diagnostic="ST default Template configuration scatter file"/>
   </RefParameter>
   <RefParameter Name="MPCBB2_NonSecureArea_Size" Comment="Non Secure Area Size" DefaultValue="0x10000" Type="hex" Min="0x0" Max="=(MPCBB2_NonSecureArea_Max - MPCBB2_NonSecureArea_Start)" NoCheckOpt="false">
-    <Condition Expression="S_No_MPCBB2_Secured" Diagnostic="pre-selected no MPCBB2 Secured"/>
+    <Condition Expression="S_$IpInstance_No_MPCBB2_Secured" Diagnostic="pre-selected no MPCBB2 Secured"/>
   </RefParameter>
   <RefParameter Name="MPCBB2_NonSecureArea_Size" Comment="Non Secure Area Size" DefaultValue="0x0" Type="hex" Min="0x0" Max="=(MPCBB2_NonSecureArea_Max - MPCBB2_NonSecureArea_Start)" NoCheckOpt="false"/>
   <RefParameter Name="MPCBB2_NonSecureArea_BlockSize" Comment="Non Secure Area Block Size" DefaultValue="0x100" Type="hex" Min="0x100" Max="0x100" Visible="false"/>
   <RefParameter Name="MPCBB2_NonSecureArea_SuperBlockSize" Comment="Non Secure Area Super-Block Size" DefaultValue="0x2000" Type="hex" Min="0x2000" Max="0x2000" Visible="false"/>
   <RefParameter Name="MPCBB2_NonSecureArea_NbSuperBlock" Comment="Non Secure Area Nb Super-Block Size" DefaultValue="=(MPCBB2_NonSecureArea_Max / MPCBB2_NonSecureArea_SuperBlockSize)" Type="integer" Min="=(MPCBB2_NonSecureArea_Max / MPCBB2_NonSecureArea_SuperBlockSize)" Max="=(MPCBB2_NonSecureArea_Max / MPCBB2_NonSecureArea_SuperBlockSize)" Visible="false"/>
 
-  <RefParameter Name="MPCBB2_SecConfig_array" Comment="Secure configuration array" DefaultValue="00000000:00000000:00000000:00000000:00000000:00000000:00000000:00000000" Type="Array" ArraySize="8" ArrayTypeElement="uint32_t;16" Separator=":" Visible="false">
-    <Condition Expression="S_No_MPCBB2_Secured" Diagnostic="memory not secured"/>
+  <RefParameter Name="MPCBB2_NonSecureArea_Secure" Comment="Area Secure Attribute" DefaultValue="not secured" Type="list" Visible="false">
+    <PossibleValue Value="GTZC_MPCBB_REGION_NSEC" Comment="not secured"/>
   </RefParameter>
   <RefParameter Name="MPCBB2_SecConfig_array" Comment="Secure configuration array" DefaultValue="00000000:00000000:00000000:00000000:00000000:00000000:00000000:00000000" Type="Array" ArraySize="8" ArrayTypeElement="uint32_t;16" Separator=":" Visible="false">
-    <Condition Expression="S_Default_MPCBB2_template" Diagnostic="ST default Template configuration scatter file"/>
+    <Condition Expression="S_$IpInstance_No_MPCBB2_Secured" Diagnostic="memory not secured"/>
+  </RefParameter>
+  <RefParameter Name="MPCBB2_SecConfig_array" Comment="Secure configuration array" DefaultValue="00000000:00000000:00000000:00000000:00000000:00000000:00000000:00000000" Type="Array" ArraySize="8" ArrayTypeElement="uint32_t;16" Separator=":" Visible="false">
+    <Condition Expression="S_$IpInstance_Default_MPCBB2_template" Diagnostic="ST default Template configuration scatter file"/>
   </RefParameter>
   <RefParameter Name="MPCBB2_SecConfig_array" Comment="Secure configuration array" DefaultValue="FFFFFFFF:FFFFFFFF:FFFFFFFF:FFFFFFFF:FFFFFFFF:FFFFFFFF:FFFFFFFF:FFFFFFFF" Type="Array" ArraySize="8" ArrayTypeElement="uint32_t;16" Separator=":" Visible="false"/>
   <RefParameter Name="MPCBB2_LockConfig_array" Comment="Lock configuration array" DefaultValue="00000000" Type="Array" ArraySize="1" ArrayTypeElement="uint32_t;16" Separator=":" Visible="false">
@@ -358,10 +396,33 @@
 
 
   <!-- RefParameters for GTZC - IT Secured -->
-  <RefParameter Name="TZIC_Configure_IT_Choice" Comment="Configure Illegal access IT" DefaultValue="by Individual Enabling from full Disabled" Type="list" Group="Illegal Access ITs for securable &amp; TZ-Aware Peripherals" TabName="TrustZone Illegal access Controller">
+  <RefParameter Name="TZIC_Configure_IT_Choice" Comment="Configure Illegal access IT" DefaultValue="by Individual modifying from Default" Type="list" Group="Illegal Access ITs for securable &amp; TZ-Aware Peripherals" TabName="TrustZone Illegal access Controller">
     <PossibleValue Value="by Individual Enabling from full Disabled" Comment="by Individual Enabling from full Disabled" Semaphore="S_Full_IT_Disabled"/>
     <PossibleValue Value="by Individual Disabling from full Enabled" Comment="by Individual Disabling from full Enabled" Semaphore="S_Full_IT_Enabled"/>
+    <PossibleValue Value="by Individual modifying from Default" Comment="by Individual modifying from Default" Semaphore="S_Full_IT_Default"/>
     <Description>Enable/Disable all the Interrupts in one time until individuals are modified.</Description>
+  </RefParameter>
+
+  <RefParameter Name="Full_IT_Disabled" Comment="Full_IT_Disabled" DefaultValue="Enabled" Type="list" Group="Illegal Access ITs for securable &amp; TZ-Aware Peripherals" TabName="GTZC Illegal Access Controller" Visible="false">
+    <Condition Expression="S_Full_IT_Disabled" Diagnostic="pre-selected no IT Secured"/>
+    <PossibleValue Value="Enabled" Comment="enabled"/>
+  </RefParameter>
+  <RefParameter Name="Full_IT_Disabled" Comment="Full_IT_Disabled" DefaultValue="Disabled" Type="list" Group="Illegal Access ITs for securable &amp; TZ-Aware Peripherals" TabName="GTZC Illegal Access Controller" Visible="false">
+    <PossibleValue Value="Disabled" Comment="disabled"/>
+  </RefParameter>
+  <RefParameter Name="Full_IT_Enabled" Comment="Full_IT_Enabled" DefaultValue="Enabled" Type="list" Group="Illegal Access ITs for securable &amp; TZ-Aware Peripherals" TabName="GTZC Illegal Access Controller" Visible="false">
+    <Condition Expression="S_Full_IT_Enabled" Diagnostic="pre-selected all IT Secured"/>
+    <PossibleValue Value="Enabled" Comment="enabled"/>
+  </RefParameter>
+  <RefParameter Name="Full_IT_Enabled" Comment="Full_IT_Enabled" DefaultValue="Disabled" Type="list" Group="Illegal Access ITs for securable &amp; TZ-Aware Peripherals" TabName="GTZC Illegal Access Controller" Visible="false">
+    <PossibleValue Value="Disabled" Comment="disabled"/>
+  </RefParameter>
+  <RefParameter Name="Full_IT_Default" Comment="Full_IT_Default" DefaultValue="Enabled" Type="list" Group="Illegal Access ITs for securable &amp; TZ-Aware Peripherals" TabName="GTZC Illegal Access Controller" Visible="false">
+    <Condition Expression="S_Full_IT_Default" Diagnostic="pre-selected default IT Secured"/>
+    <PossibleValue Value="Enabled" Comment="enabled"/>
+  </RefParameter>
+  <RefParameter Name="Full_IT_Default" Comment="Full_IT_Default" DefaultValue="Disabled" Type="list" Group="Illegal Access ITs for securable &amp; TZ-Aware Peripherals" TabName="GTZC Illegal Access Controller" Visible="false">
+    <PossibleValue Value="Disabled" Comment="disabled"/>
   </RefParameter>
 
   <RefParameter Name="Illegal_Access_Interrupt_Peripheral" Comment="Illegal Access Interrupt Peripheral" DefaultValue="Illegal Access Interrupt State" Type="string" Group="Illegal Access ITs for securable &amp; TZ-Aware Peripherals" TabName="TrustZone Illegal access Controller"/>
@@ -371,6 +432,12 @@
     <PossibleValue Value="Enabled" Comment="enabled"/>
   </RefParameter>
   <RefParameter Name="Illegal_Access_Interrupt" Comment="" DefaultValue="Disabled" Type="list" Group="Illegal Access ITs for securable &amp; TZ-Aware Peripherals" TabName="TrustZone Illegal access Controller">
+    <Condition Expression="S_Full_IT_Disabled" Diagnostic="pre-selected no IT Secured"/>
+    <PossibleValue Value="Disabled" Comment="disabled"/>
+    <PossibleValue Value="Enabled" Comment="enabled"/>
+  </RefParameter>
+  <RefParameter Name="Illegal_Access_Interrupt" Comment="" DefaultValue="Default" Type="list" Group="Illegal Access ITs for securable &amp; TZ-Aware Peripherals" TabName="TrustZone Illegal access Controller">
+    <Condition Expression="S_Full_IT_Default" Diagnostic="pre-selected default IT Secured"/>
     <PossibleValue Value="Disabled" Comment="disabled"/>
     <PossibleValue Value="Enabled" Comment="enabled"/>
   </RefParameter>
@@ -380,7 +447,12 @@
     <PossibleValue Value="Enabled" Comment="enabled"/>
   </RefParameter>
   <RefParameter Name="AES_Illegal_Access_Interrupt" Comment="AES" DefaultValue="Disabled" Type="list" Group="Illegal Access ITs for securable &amp; TZ-Aware Peripherals" TabName="TrustZone Illegal access Controller">
-    <Condition Expression="AES_Exist" Diagnostic=""/>
+    <Condition Expression="AES_Exist &amp; S_Full_IT_Disabled" Diagnostic=""/>
+    <PossibleValue Value="Disabled" Comment="disabled"/>
+    <PossibleValue Value="Enabled" Comment="enabled"/>
+  </RefParameter>
+  <RefParameter Name="AES_Illegal_Access_Interrupt" Comment="AES" DefaultValue="Default" Type="list" Group="Illegal Access ITs for securable &amp; TZ-Aware Peripherals" TabName="TrustZone Illegal access Controller">
+    <Condition Expression="AES_Exist &amp; S_Full_IT_Default" Diagnostic="pre-selected default IT Secured"/>
     <PossibleValue Value="Disabled" Comment="disabled"/>
     <PossibleValue Value="Enabled" Comment="enabled"/>
   </RefParameter>
@@ -390,7 +462,12 @@
     <PossibleValue Value="Enabled" Comment="enabled"/>
   </RefParameter>
   <RefParameter Name="PKA_Illegal_Access_Interrupt" Comment="PKA" DefaultValue="Disabled" Type="list" Group="Illegal Access ITs for securable &amp; TZ-Aware Peripherals" TabName="TrustZone Illegal access Controller">
-    <Condition Expression="PKA_Exist" Diagnostic=""/>
+    <Condition Expression="PKA_Exist &amp; S_Full_IT_Disabled" Diagnostic=""/>
+    <PossibleValue Value="Disabled" Comment="disabled"/>
+    <PossibleValue Value="Enabled" Comment="enabled"/>
+  </RefParameter>
+  <RefParameter Name="PKA_Illegal_Access_Interrupt" Comment="PKA" DefaultValue="Default" Type="list" Group="Illegal Access ITs for securable &amp; TZ-Aware Peripherals" TabName="TrustZone Illegal access Controller">
+    <Condition Expression="PKA_Exist &amp; S_Full_IT_Default" Diagnostic="pre-selected default IT Secured"/>
     <PossibleValue Value="Disabled" Comment="disabled"/>
     <PossibleValue Value="Enabled" Comment="enabled"/>
   </RefParameter>
@@ -400,7 +477,12 @@
     <PossibleValue Value="Enabled" Comment="enabled"/>
   </RefParameter>
   <RefParameter Name="OTFDEC1_Illegal_Access_Interrupt" Comment="OTFDEC1" DefaultValue="Disabled" Type="list" Group="Illegal Access ITs for securable &amp; TZ-Aware Peripherals" TabName="TrustZone Illegal access Controller">
-    <Condition Expression="OTFDEC1_Exist" Diagnostic=""/>
+    <Condition Expression="OTFDEC1_Exist &amp; S_Full_IT_Disabled" Diagnostic=""/>
+    <PossibleValue Value="Disabled" Comment="disabled"/>
+    <PossibleValue Value="Enabled" Comment="enabled"/>
+  </RefParameter>
+  <RefParameter Name="OTFDEC1_Illegal_Access_Interrupt" Comment="OTFDEC1" DefaultValue="Default" Type="list" Group="Illegal Access ITs for securable &amp; TZ-Aware Peripherals" TabName="TrustZone Illegal access Controller">
+    <Condition Expression="OTFDEC1_Exist &amp; S_Full_IT_Default" Diagnostic="pre-selected default IT Secured"/>
     <PossibleValue Value="Disabled" Comment="disabled"/>
     <PossibleValue Value="Enabled" Comment="enabled"/>
   </RefParameter>
@@ -411,278 +493,747 @@
   <RefMode Name="GTZC_Enable">
     <ConfigForMode>GTZC_Init</ConfigForMode>
     <!-- Parameters for GTZC - General settings -->
-    <Parameter Name="TZSC_Lock" Group="Lock all TZSC"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
+    <Parameter Name="TZSC_Lock" Group="Lock all TZSC"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
 
     <!-- Parameters for GTZC - Peripheral Secured -->
-    <Parameter Name="TZSC_Secure_IP_Choice"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="Securable_Peripheral"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="ADC_Secure" RefParameter="IP_Secure" Comment="ADC1|2"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
+    <Parameter Name="TZSC_Secure_IP_Choice"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="Securable_Peripheral"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="ADC_Secure" RefParameter="IP_Secure" Comment="ADC1|2"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
     <!-- AES -->
-    <Parameter Name="AES_Secure" RefParameter="AES_Secure" Comment="AES"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="AES_Exist &amp; S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="COMP_Secure" RefParameter="IP_Secure" Comment="COMP1|2"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="CRC_Secure" RefParameter="IP_Secure" Comment="CRC"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="CRS_Secure" RefParameter="IP_Secure" Comment="CRS"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="DAC1_Secure" RefParameter="IP_Secure" Comment="DAC1"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="DFSDM1_Secure" RefParameter="IP_Secure" Comment="DFSDM1"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="FDCAN1_Secure" RefParameter="IP_Secure" Comment="FDCAN1"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="FMC_Secure" RefParameter="IP_Secure" Comment="FMC"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="HASH_Secure" RefParameter="IP_Secure" Comment="HASH"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="I2C1_Secure" RefParameter="IP_Secure" Comment="I2C1"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="I2C2_Secure" RefParameter="IP_Secure" Comment="I2C2"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="I2C3_Secure" RefParameter="IP_Secure" Comment="I2C3"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="I2C4_Secure" RefParameter="IP_Secure" Comment="I2C4"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
+    <Parameter Name="AES_Secure" RefParameter="AES_Secure" Comment="AES"><Condition Diagnostic="only Active with TZEN enabled" Expression="AES_Exist &amp; $IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="COMP_Secure" RefParameter="IP_Secure" Comment="COMP1|2"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="CRC_Secure" RefParameter="IP_Secure" Comment="CRC"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="CRS_Secure" RefParameter="CRS_Secure" Comment="CRS">
+        <PossibleValue Comment="secured" Semaphore="CRS_GTZC_SECURE">GTZC_TZSC_PERIPH_SEC</PossibleValue>
+        <PossibleValue Comment="not secured">GTZC_TZSC_PERIPH_NSEC</PossibleValue>
+        <Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/>
+    </Parameter>
+    <Parameter Name="DAC1_Secure" RefParameter="IP_Secure" Comment="DAC1"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="DFSDM1_Secure" RefParameter="IP_Secure" Comment="DFSDM1"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="FDCAN1_Secure" RefParameter="IP_Secure" Comment="FDCAN1"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="FMC_Secure" RefParameter="IP_Secure" Comment="FMC"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="HASH_Secure" RefParameter="IP_Secure" Comment="HASH"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="I2C1_Secure" RefParameter="IP_Secure" Comment="I2C1"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="I2C2_Secure" RefParameter="IP_Secure" Comment="I2C2"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="I2C3_Secure" RefParameter="IP_Secure" Comment="I2C3"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="I2C4_Secure" RefParameter="IP_Secure" Comment="I2C4"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
     <!-- ICACHE do not synchronize with context -->
-    <Parameter Name="ICACHE_Secure" RefParameter="ICACHE_Secure" Comment="ICACHE"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="IWDG_Secure" RefParameter="IP_Secure" Comment="IWDG"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="LPTIM1_Secure" RefParameter="IP_Secure" Comment="LPTIM1"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="LPTIM2_Secure" RefParameter="IP_Secure" Comment="LPTIM2"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="LPTIM3_Secure" RefParameter="IP_Secure" Comment="LPTIM3"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="LPUART1_Secure" RefParameter="IP_Secure" Comment="LPUART1"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="OCTOSPI1_Secure" RefParameter="IP_Secure" Comment="OCTOSPI1"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="OPAMP_Secure" RefParameter="IP_Secure" Comment="OPAMP1|2"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
+    <Parameter Name="ICACHE_Secure" RefParameter="ICACHE_Secure" Comment="ICACHE">
+        <PossibleValue Comment="secured" Semaphore="ICACHE_GTZC_SECURE">GTZC_TZSC_PERIPH_SEC</PossibleValue>
+        <PossibleValue Comment="not secured">GTZC_TZSC_PERIPH_NSEC</PossibleValue>
+        <Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/>
+    </Parameter>
+    <Parameter Name="IWDG_Secure" RefParameter="IP_Secure" Comment="IWDG"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="LPTIM1_Secure" RefParameter="IP_Secure" Comment="LPTIM1"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="LPTIM2_Secure" RefParameter="IP_Secure" Comment="LPTIM2"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="LPTIM3_Secure" RefParameter="IP_Secure" Comment="LPTIM3"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="LPUART1_Secure" RefParameter="IP_Secure" Comment="LPUART1"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="OCTOSPI1_Secure" RefParameter="IP_Secure" Comment="OCTOSPI1"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="OPAMP_Secure" RefParameter="IP_Secure" Comment="OPAMP1|2"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
     <!-- PKA -->
-    <Parameter Name="PKA_Secure" RefParameter="PKA_Secure" Comment="PKA"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="PKA_Exist &amp; S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="RNG_Secure" RefParameter="IP_Secure" Comment="RNG"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="SAI1_Secure" RefParameter="IP_Secure" Comment="SAI1"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="SAI2_Secure" RefParameter="IP_Secure" Comment="SAI2"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="SDMMC1_Secure" RefParameter="IP_Secure" Comment="SDMMC1"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="SPI1_Secure" RefParameter="IP_Secure" Comment="SPI1"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="SPI2_Secure" RefParameter="IP_Secure" Comment="SPI2"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="SPI3_Secure" RefParameter="IP_Secure" Comment="SPI3"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="TIM1_Secure" RefParameter="IP_Secure" Comment="TIM1"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="TIM2_Secure" RefParameter="IP_Secure" Comment="TIM2"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="TIM3_Secure" RefParameter="IP_Secure" Comment="TIM3"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="TIM4_Secure" RefParameter="IP_Secure" Comment="TIM4"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="TIM5_Secure" RefParameter="IP_Secure" Comment="TIM5"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="TIM6_Secure" RefParameter="IP_Secure" Comment="TIM6"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="TIM7_Secure" RefParameter="IP_Secure" Comment="TIM7"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="TIM8_Secure" RefParameter="IP_Secure" Comment="TIM8"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="TIM15_Secure" RefParameter="IP_Secure" Comment="TIM15"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="TIM16_Secure" RefParameter="IP_Secure" Comment="TIM16"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="TIM17_Secure" RefParameter="IP_Secure" Comment="TIM17"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="TSC_Secure" RefParameter="IP_Secure" Comment="TSC"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="USART1_Secure" RefParameter="IP_Secure" Comment="USART1"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="USART2_Secure" RefParameter="IP_Secure" Comment="USART2"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="USART3_Secure" RefParameter="IP_Secure" Comment="USART3"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="UART4_Secure" RefParameter="IP_Secure" Comment="UART4"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="UART5_Secure" RefParameter="IP_Secure" Comment="UART5"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="UCPD1_Secure" RefParameter="IP_Secure" Comment="UCPD1"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="USB_Secure" RefParameter="IP_Secure" Comment="USB"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="VREFBUF_Secure" RefParameter="IP_Secure" Comment="VREFBUF"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="WWDG_Secure" RefParameter="IP_Secure" Comment="WWDG"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
+    <Parameter Name="PKA_Secure" RefParameter="PKA_Secure" Comment="PKA"><Condition Diagnostic="only Active with TZEN enabled" Expression="PKA_Exist &amp; $IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="RNG_Secure" RefParameter="IP_Secure" Comment="RNG"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="SAI1_Secure" RefParameter="IP_Secure" Comment="SAI1"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="SAI2_Secure" RefParameter="IP_Secure" Comment="SAI2"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="SDMMC1_Secure" RefParameter="IP_Secure" Comment="SDMMC1"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="SPI1_Secure" RefParameter="IP_Secure" Comment="SPI1"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="SPI2_Secure" RefParameter="IP_Secure" Comment="SPI2"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="SPI3_Secure" RefParameter="IP_Secure" Comment="SPI3"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="TIM1_Secure" RefParameter="IP_Secure" Comment="TIM1"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="TIM2_Secure" RefParameter="IP_Secure" Comment="TIM2"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="TIM3_Secure" RefParameter="IP_Secure" Comment="TIM3"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="TIM4_Secure" RefParameter="IP_Secure" Comment="TIM4"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="TIM5_Secure" RefParameter="IP_Secure" Comment="TIM5"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="TIM6_Secure" RefParameter="IP_Secure" Comment="TIM6"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="TIM7_Secure" RefParameter="IP_Secure" Comment="TIM7"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="TIM8_Secure" RefParameter="IP_Secure" Comment="TIM8"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="TIM15_Secure" RefParameter="IP_Secure" Comment="TIM15"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="TIM16_Secure" RefParameter="IP_Secure" Comment="TIM16"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="TIM17_Secure" RefParameter="IP_Secure" Comment="TIM17"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="TSC_Secure" RefParameter="IP_Secure" Comment="TSC"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="UART4_Secure" RefParameter="IP_Secure" Comment="UART4"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="UART5_Secure" RefParameter="IP_Secure" Comment="UART5"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="UCPD1_Secure" RefParameter="IP_Secure" Comment="UCPD1"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="USART1_Secure" RefParameter="IP_Secure" Comment="USART1"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="USART2_Secure" RefParameter="IP_Secure" Comment="USART2"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="USART3_Secure" RefParameter="IP_Secure" Comment="USART3"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="USB_Secure" RefParameter="IP_Secure" Comment="USB"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="VREFBUF_Secure" RefParameter="IP_Secure" Comment="VREFBUF"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="WWDG_Secure" RefParameter="IP_Secure" Comment="WWDG"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
 
+    <Parameter Name="CRS_Privilege_Status"></Parameter>
+    <Parameter Name="ICACHE_Privilege_Status"></Parameter>
 
     <!-- Parameters for GTZC - Peripheral Privileged -->
-    <Parameter Name="TZSC_Privilege_IP_Choice"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="Privilegeable_Peripheral"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="ADC_Privilege" RefParameter="IP_Privilege" Comment="ADC1|2"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_GTZC_Enabled"/></Parameter>
+    <Parameter Name="TZSC_Privilege_IP_Choice"></Parameter>
+    <Parameter Name="Privilegeable_Peripheral"></Parameter>
+    <Parameter Name="ADC_Privilege" RefParameter="IP_Privilege" Comment="ADC1|2">
+        <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="($IpInstance=GTZC_S &amp; ADC1_GTZC_SECURE) | (!($IpInstance=GTZC_S)) &amp; (!ADC1_GTZC_SECURE)"/>
+    </Parameter>
     <!-- AES -->
-    <Parameter Name="AES_Privilege" RefParameter="AES_Privilege" Comment="AES"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="AES_Exist &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="COMP_Privilege" RefParameter="IP_Privilege" Comment="COMP1|2"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="CRC_Privilege" RefParameter="IP_Privilege" Comment="CRC"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="CRS_Privilege" RefParameter="IP_Privilege" Comment="CRS"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="DAC1_Privilege" RefParameter="IP_Privilege" Comment="DAC1"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="DFSDM1_Privilege" RefParameter="IP_Privilege" Comment="DFSDM1"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="FDCAN1_Privilege" RefParameter="IP_Privilege" Comment="FDCAN1"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="FMC_REG_Privilege" RefParameter="IP_Privilege" Comment="FMC"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="HASH_Privilege" RefParameter="IP_Privilege" Comment="HASH"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="I2C1_Privilege" RefParameter="IP_Privilege" Comment="I2C1"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="I2C2_Privilege" RefParameter="IP_Privilege" Comment="I2C2"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="I2C3_Privilege" RefParameter="IP_Privilege" Comment="I2C3"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="I2C4_Privilege" RefParameter="IP_Privilege" Comment="I2C4"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="ICACHE_REG_Privilege" RefParameter="IP_Privilege" Comment="ICACHE_REG"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="IWDG_Privilege" RefParameter="IP_Privilege" Comment="IWDG"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="LPTIM1_Privilege" RefParameter="IP_Privilege" Comment="LPTIM1"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="LPTIM2_Privilege" RefParameter="IP_Privilege" Comment="LPTIM2"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="LPTIM3_Privilege" RefParameter="IP_Privilege" Comment="LPTIM3"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="LPUART1_Privilege" RefParameter="IP_Privilege" Comment="LPUART1"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="OCTOSPI1_REG_Privilege" RefParameter="IP_Privilege" Comment="OCTOSPI1"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="OPAMP_Privilege" RefParameter="IP_Privilege" Comment="OPAMP1|2"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_GTZC_Enabled"/></Parameter>
+    <Parameter Name="AES_Privilege" RefParameter="AES_Privilege" Comment="AES">
+        <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="AES_Exist &amp; (($IpInstance=GTZC_S &amp; AES_GTZC_SECURE) | (!($IpInstance=GTZC_S)) &amp; (!AES_GTZC_SECURE))"/>
+    </Parameter>
+    <Parameter Name="COMP_Privilege" RefParameter="IP_Privilege" Comment="COMP1|2">
+        <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="($IpInstance=GTZC_S &amp; COMP1_GTZC_SECURE) | (!($IpInstance=GTZC_S)) &amp; (!COMP1_GTZC_SECURE)"/>
+    </Parameter>
+    <Parameter Name="CRC_Privilege" RefParameter="IP_Privilege" Comment="CRC">
+        <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="($IpInstance=GTZC_S &amp; CRC_GTZC_SECURE) | (!($IpInstance=GTZC_S)) &amp; (!CRC_GTZC_SECURE)"/>
+    </Parameter>
+    <Parameter Name="CRS_Privilege" RefParameter="IP_Privilege" Comment="CRS">
+        <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="CRS_Privilege_Status=true"/>
+    </Parameter>
+    <Parameter Name="DAC1_Privilege" RefParameter="IP_Privilege" Comment="DAC1">
+        <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="($IpInstance=GTZC_S &amp; DAC1_GTZC_SECURE) | (!($IpInstance=GTZC_S)) &amp; (!DAC1_GTZC_SECURE)"/>
+    </Parameter>
+    <Parameter Name="DFSDM1_Privilege" RefParameter="IP_Privilege" Comment="DFSDM1">
+        <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="($IpInstance=GTZC_S &amp; DFSDM1_GTZC_SECURE) | (!($IpInstance=GTZC_S)) &amp; (!DFSDM1_GTZC_SECURE)"/>
+    </Parameter>
+    <Parameter Name="FDCAN1_Privilege" RefParameter="IP_Privilege" Comment="FDCAN1">
+        <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="($IpInstance=GTZC_S &amp; FDCAN1_GTZC_SECURE) | (!($IpInstance=GTZC_S)) &amp; (!FDCAN1_GTZC_SECURE)"/>
+    </Parameter>
+    <Parameter Name="FMC_Privilege" RefParameter="IP_Privilege" Comment="FMC">
+        <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="($IpInstance=GTZC_S &amp; FMC_GTZC_SECURE) | (!($IpInstance=GTZC_S)) &amp; (!FMC_GTZC_SECURE)"/>
+    </Parameter>
+    <Parameter Name="HASH_Privilege" RefParameter="IP_Privilege" Comment="HASH">
+        <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="($IpInstance=GTZC_S &amp; HASH_GTZC_SECURE) | (!($IpInstance=GTZC_S)) &amp; (!HASH_GTZC_SECURE)"/>
+    </Parameter>
+    <Parameter Name="I2C1_Privilege" RefParameter="IP_Privilege" Comment="I2C1">
+        <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="($IpInstance=GTZC_S &amp; I2C1_GTZC_SECURE) | (!($IpInstance=GTZC_S)) &amp; (!I2C1_GTZC_SECURE)"/>
+    </Parameter>
+    <Parameter Name="I2C2_Privilege" RefParameter="IP_Privilege" Comment="I2C2">
+        <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="($IpInstance=GTZC_S &amp; I2C2_GTZC_SECURE) | (!($IpInstance=GTZC_S)) &amp; (!I2C2_GTZC_SECURE)"/>
+    </Parameter>
+    <Parameter Name="I2C3_Privilege" RefParameter="IP_Privilege" Comment="I2C3">
+        <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="($IpInstance=GTZC_S &amp; I2C3_GTZC_SECURE) | (!($IpInstance=GTZC_S)) &amp; (!I2C3_GTZC_SECURE)"/>
+    </Parameter>
+    <Parameter Name="I2C4_Privilege" RefParameter="IP_Privilege" Comment="I2C4">
+        <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="($IpInstance=GTZC_S &amp; I2C4_GTZC_SECURE) | (!($IpInstance=GTZC_S)) &amp; (!I2C4_GTZC_SECURE)"/>
+    </Parameter>
+    <Parameter Name="ICACHE_Privilege" RefParameter="IP_Privilege" Comment="ICACHE_REG">
+        <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="ICACHE_Privilege_Status=true"/>
+    </Parameter>
+    <Parameter Name="IWDG_Privilege" RefParameter="IP_Privilege" Comment="IWDG">
+        <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="($IpInstance=GTZC_S &amp; IWDG_GTZC_SECURE) | (!($IpInstance=GTZC_S)) &amp; (!IWDG_GTZC_SECURE)"/>
+    </Parameter>
+    <Parameter Name="LPTIM1_Privilege" RefParameter="IP_Privilege" Comment="LPTIM1">
+        <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="($IpInstance=GTZC_S &amp; LPTIM1_GTZC_SECURE) | (!($IpInstance=GTZC_S)) &amp; (!LPTIM1_GTZC_SECURE)"/>
+    </Parameter>
+    <Parameter Name="LPTIM2_Privilege" RefParameter="IP_Privilege" Comment="LPTIM2">
+        <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="($IpInstance=GTZC_S &amp; LPTIM2_GTZC_SECURE) | (!($IpInstance=GTZC_S)) &amp; (!LPTIM2_GTZC_SECURE)"/>
+    </Parameter>
+    <Parameter Name="LPTIM3_Privilege" RefParameter="IP_Privilege" Comment="LPTIM3">
+        <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="($IpInstance=GTZC_S &amp; LPTIM3_GTZC_SECURE) | (!($IpInstance=GTZC_S)) &amp; (!LPTIM3_GTZC_SECURE)"/>
+    </Parameter>
+    <Parameter Name="LPUART1_Privilege" RefParameter="IP_Privilege" Comment="LPUART1">
+        <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="($IpInstance=GTZC_S &amp; LPUART1_GTZC_SECURE) | (!($IpInstance=GTZC_S)) &amp; (!LPUART1_GTZC_SECURE)"/>
+    </Parameter>
+    <Parameter Name="OCTOSPI1_Privilege" RefParameter="IP_Privilege" Comment="OCTOSPI1">
+        <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="($IpInstance=GTZC_S &amp; OCTOSPI1_GTZC_SECURE) | (!($IpInstance=GTZC_S)) &amp; (!OCTOSPI1_GTZC_SECURE)"/>
+    </Parameter>
+    <Parameter Name="OPAMP_Privilege" RefParameter="IP_Privilege" Comment="OPAMP1|2">
+        <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="($IpInstance=GTZC_S &amp; OPAMP1_GTZC_SECURE) | (!($IpInstance=GTZC_S)) &amp; (!OPAMP1_GTZC_SECURE)"/>
+    </Parameter>
     <!-- PKA -->
-    <Parameter Name="PKA_Privilege" RefParameter="PKA_Privilege" Comment="PKA"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="PKA_Exist &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="RNG_Privilege" RefParameter="IP_Privilege" Comment="RNG"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="SAI1_Privilege" RefParameter="IP_Privilege" Comment="SAI1"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="SAI2_Privilege" RefParameter="IP_Privilege" Comment="SAI2"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="SDMMC1_Privilege" RefParameter="IP_Privilege" Comment="SDMMC1"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="SPI1_Privilege" RefParameter="IP_Privilege" Comment="SPI1"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="SPI2_Privilege" RefParameter="IP_Privilege" Comment="SPI2"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="SPI3_Privilege" RefParameter="IP_Privilege" Comment="SPI3"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="TIM1_Privilege" RefParameter="IP_Privilege" Comment="TIM1"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="TIM2_Privilege" RefParameter="IP_Privilege" Comment="TIM2"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="TIM3_Privilege" RefParameter="IP_Privilege" Comment="TIM3"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="TIM4_Privilege" RefParameter="IP_Privilege" Comment="TIM4"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="TIM5_Privilege" RefParameter="IP_Privilege" Comment="TIM5"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="TIM6_Privilege" RefParameter="IP_Privilege" Comment="TIM6"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="TIM7_Privilege" RefParameter="IP_Privilege" Comment="TIM7"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="TIM8_Privilege" RefParameter="IP_Privilege" Comment="TIM8"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="TIM15_Privilege" RefParameter="IP_Privilege" Comment="TIM15"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="TIM16_Privilege" RefParameter="IP_Privilege" Comment="TIM16"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="TIM17_Privilege" RefParameter="IP_Privilege" Comment="TIM17"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="TSC_Privilege" RefParameter="IP_Privilege" Comment="TSC"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="USART1_Privilege" RefParameter="IP_Privilege" Comment="USART1"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="USART2_Privilege" RefParameter="IP_Privilege" Comment="USART2"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="USART3_Privilege" RefParameter="IP_Privilege" Comment="USART3"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="UART4_Privilege" RefParameter="IP_Privilege" Comment="UART4"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="UART5_Privilege" RefParameter="IP_Privilege" Comment="UART5"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="UCPD1_Privilege" RefParameter="IP_Privilege" Comment="UCPD1"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="USBFS_Privilege" RefParameter="IP_Privilege" Comment="USBFS"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="VREFBUF_Privilege" RefParameter="IP_Privilege" Comment="VREFBUF"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="WWDG_Privilege" RefParameter="IP_Privilege" Comment="WWDG"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_GTZC_Enabled"/></Parameter>
+    <Parameter Name="PKA_Privilege" RefParameter="PKA_Privilege" Comment="PKA">
+        <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="PKA_Exist &amp; (($IpInstance=GTZC_S &amp; PKA_GTZC_SECURE) | (!($IpInstance=GTZC_S)) &amp; (!PKA_GTZC_SECURE))"/>
+    </Parameter>
+    <Parameter Name="RNG_Privilege" RefParameter="IP_Privilege" Comment="RNG">
+        <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="($IpInstance=GTZC_S &amp; RNG_GTZC_SECURE) | (!($IpInstance=GTZC_S)) &amp; (!RNG_GTZC_SECURE)"/>
+    </Parameter>
+    <Parameter Name="SAI1_Privilege" RefParameter="IP_Privilege" Comment="SAI1">
+        <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="($IpInstance=GTZC_S &amp; SAI1_GTZC_SECURE) | (!($IpInstance=GTZC_S)) &amp; (!SAI1_GTZC_SECURE)"/>
+    </Parameter>
+    <Parameter Name="SAI2_Privilege" RefParameter="IP_Privilege" Comment="SAI2">
+        <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="($IpInstance=GTZC_S &amp; SAI2_GTZC_SECURE) | (!($IpInstance=GTZC_S)) &amp; (!SAI2_GTZC_SECURE)"/>
+    </Parameter>
+    <Parameter Name="SDMMC1_Privilege" RefParameter="IP_Privilege" Comment="SDMMC1">
+        <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="($IpInstance=GTZC_S &amp; SDMMC1_GTZC_SECURE) | (!($IpInstance=GTZC_S)) &amp; (!SDMMC1_GTZC_SECURE)"/>
+    </Parameter>
+    <Parameter Name="SPI1_Privilege" RefParameter="IP_Privilege" Comment="SPI1">
+        <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="($IpInstance=GTZC_S &amp; SPI1_GTZC_SECURE) | (!($IpInstance=GTZC_S)) &amp; (!SPI1_GTZC_SECURE)"/>
+    </Parameter>
+    <Parameter Name="SPI2_Privilege" RefParameter="IP_Privilege" Comment="SPI2">
+        <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="($IpInstance=GTZC_S &amp; SPI2_GTZC_SECURE) | (!($IpInstance=GTZC_S)) &amp; (!SPI2_GTZC_SECURE)"/>
+    </Parameter>
+    <Parameter Name="SPI3_Privilege" RefParameter="IP_Privilege" Comment="SPI3">
+        <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="($IpInstance=GTZC_S &amp; SPI3_GTZC_SECURE) | (!($IpInstance=GTZC_S)) &amp; (!SPI3_GTZC_SECURE)"/>
+    </Parameter>
+    <Parameter Name="TIM1_Privilege" RefParameter="IP_Privilege" Comment="TIM1">
+        <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="($IpInstance=GTZC_S &amp; TIM1_GTZC_SECURE) | (!($IpInstance=GTZC_S)) &amp; (!TIM1_GTZC_SECURE)"/>
+    </Parameter>
+    <Parameter Name="TIM2_Privilege" RefParameter="IP_Privilege" Comment="TIM2">
+        <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="($IpInstance=GTZC_S &amp; TIM2_GTZC_SECURE) | (!($IpInstance=GTZC_S)) &amp; (!TIM2_GTZC_SECURE)"/>
+    </Parameter>
+    <Parameter Name="TIM3_Privilege" RefParameter="IP_Privilege" Comment="TIM3">
+        <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="($IpInstance=GTZC_S &amp; TIM3_GTZC_SECURE) | (!($IpInstance=GTZC_S)) &amp; (!TIM3_GTZC_SECURE)"/>
+    </Parameter>
+    <Parameter Name="TIM4_Privilege" RefParameter="IP_Privilege" Comment="TIM4">
+        <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="($IpInstance=GTZC_S &amp; TIM4_GTZC_SECURE) | (!($IpInstance=GTZC_S)) &amp; (!TIM4_GTZC_SECURE)"/>
+    </Parameter>
+    <Parameter Name="TIM5_Privilege" RefParameter="IP_Privilege" Comment="TIM5">
+        <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="($IpInstance=GTZC_S &amp; TIM5_GTZC_SECURE) | (!($IpInstance=GTZC_S)) &amp; (!TIM5_GTZC_SECURE)"/>
+    </Parameter>
+    <Parameter Name="TIM6_Privilege" RefParameter="IP_Privilege" Comment="TIM6">
+        <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="($IpInstance=GTZC_S &amp; TIM6_GTZC_SECURE) | (!($IpInstance=GTZC_S)) &amp; (!TIM6_GTZC_SECURE)"/>
+    </Parameter>
+    <Parameter Name="TIM7_Privilege" RefParameter="IP_Privilege" Comment="TIM7">
+        <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="($IpInstance=GTZC_S &amp; TIM7_GTZC_SECURE) | (!($IpInstance=GTZC_S)) &amp; (!TIM7_GTZC_SECURE)"/>
+    </Parameter>
+    <Parameter Name="TIM8_Privilege" RefParameter="IP_Privilege" Comment="TIM8">
+        <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="($IpInstance=GTZC_S &amp; TIM8_GTZC_SECURE) | (!($IpInstance=GTZC_S)) &amp; (!TIM8_GTZC_SECURE)"/>
+    </Parameter>
+    <Parameter Name="TIM15_Privilege" RefParameter="IP_Privilege" Comment="TIM15">
+        <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="($IpInstance=GTZC_S &amp; TIM15_GTZC_SECURE) | (!($IpInstance=GTZC_S)) &amp; (!TIM15_GTZC_SECURE)"/>
+    </Parameter>
+    <Parameter Name="TIM16_Privilege" RefParameter="IP_Privilege" Comment="TIM16">
+        <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="($IpInstance=GTZC_S &amp; TIM16_GTZC_SECURE) | (!($IpInstance=GTZC_S)) &amp; (!TIM16_GTZC_SECURE)"/>
+    </Parameter>
+    <Parameter Name="TIM17_Privilege" RefParameter="IP_Privilege" Comment="TIM17">
+        <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="($IpInstance=GTZC_S &amp; TIM17_GTZC_SECURE) | (!($IpInstance=GTZC_S)) &amp; (!TIM17_GTZC_SECURE)"/>
+    </Parameter>
+    <Parameter Name="TSC_Privilege" RefParameter="IP_Privilege" Comment="TSC">
+        <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="($IpInstance=GTZC_S &amp; TSC_GTZC_SECURE) | (!($IpInstance=GTZC_S)) &amp; (!TSC_GTZC_SECURE)"/>
+    </Parameter>
+    <Parameter Name="UART4_Privilege" RefParameter="IP_Privilege" Comment="UART4">
+        <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="($IpInstance=GTZC_S &amp; UART4_GTZC_SECURE) | (!($IpInstance=GTZC_S)) &amp; (!UART4_GTZC_SECURE)"/>
+    </Parameter>
+    <Parameter Name="UART5_Privilege" RefParameter="IP_Privilege" Comment="UART5">
+        <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="($IpInstance=GTZC_S &amp; UART5_GTZC_SECURE) | (!($IpInstance=GTZC_S)) &amp; (!UART5_GTZC_SECURE)"/>
+    </Parameter>
+    <Parameter Name="UCPD1_Privilege" RefParameter="IP_Privilege" Comment="UCPD1">
+        <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="($IpInstance=GTZC_S &amp; UCPD1_GTZC_SECURE) | (!($IpInstance=GTZC_S)) &amp; (!UCPD1_GTZC_SECURE)"/>
+    </Parameter>
+    <Parameter Name="USART1_Privilege" RefParameter="IP_Privilege" Comment="USART1">
+        <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="($IpInstance=GTZC_S &amp; USART1_GTZC_SECURE) | (!($IpInstance=GTZC_S)) &amp; (!USART1_GTZC_SECURE)"/>
+    </Parameter>
+    <Parameter Name="USART2_Privilege" RefParameter="IP_Privilege" Comment="USART2">
+        <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="($IpInstance=GTZC_S &amp; USART2_GTZC_SECURE) | (!($IpInstance=GTZC_S)) &amp; (!USART2_GTZC_SECURE)"/>
+    </Parameter>
+    <Parameter Name="USART3_Privilege" RefParameter="IP_Privilege" Comment="USART3">
+        <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="($IpInstance=GTZC_S &amp; USART3_GTZC_SECURE) | (!($IpInstance=GTZC_S)) &amp; (!USART3_GTZC_SECURE)"/>
+    </Parameter>
+    <Parameter Name="USBFS_Privilege" RefParameter="IP_Privilege" Comment="USBFS">
+        <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="($IpInstance=GTZC_S &amp; USB_GTZC_SECURE) | (!($IpInstance=GTZC_S)) &amp; (!USB_GTZC_SECURE)"/>
+    </Parameter>
+    <Parameter Name="VREFBUF_Privilege" RefParameter="IP_Privilege" Comment="VREFBUF">
+        <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="($IpInstance=GTZC_S &amp; VREFBUF_GTZC_SECURE) | (!($IpInstance=GTZC_S)) &amp; (!VREFBUF_GTZC_SECURE)"/>
+    </Parameter>
+    <Parameter Name="WWDG_Privilege" RefParameter="IP_Privilege" Comment="WWDG">
+        <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="($IpInstance=GTZC_S &amp; WWDG_GTZC_SECURE) | (!($IpInstance=GTZC_S)) &amp; (!WWDG_GTZC_SECURE)"/>
+    </Parameter>
 
 
     <!-- Parameters for GTZC - MPCWM1 Secured -->
-    <Parameter Name="MPCWM1_NonSecureArea_Choice" Group="MPCWM1 (OCTOSPI)" TabName="TrustZone Security Controller - Memory Protection Controller WaterMark"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="MPCWM1_NonSecureArea1_Desc" Group="MPCWM1 (OCTOSPI)" TabName="TrustZone Security Controller - Memory Protection Controller WaterMark"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="MPCWM1_NonSecureArea1_Start_Address" Group="MPCWM1 (OCTOSPI)" TabName="TrustZone Security Controller - Memory Protection Controller WaterMark"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="MPCWM1_NonSecureArea1_Start" Group="MPCWM1 (OCTOSPI)" TabName="TrustZone Security Controller - Memory Protection Controller WaterMark"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="MPCWM1_NonSecureArea1_Size" Group="MPCWM1 (OCTOSPI)" TabName="TrustZone Security Controller - Memory Protection Controller WaterMark"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="MPCWM1_NonSecureArea1_Attribute" Group="MPCWM1 (OCTOSPI)" TabName="TrustZone Security Controller - Memory Protection Controller WaterMark"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="MPCWM1_NonSecureArea2_Desc" Group="MPCWM1 (OCTOSPI)" TabName="TrustZone Security Controller - Memory Protection Controller WaterMark"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="MPCWM1_NonSecureArea2_Start_Address" Group="MPCWM1 (OCTOSPI)" TabName="TrustZone Security Controller - Memory Protection Controller WaterMark"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="MPCWM1_NonSecureArea2_Start" Group="MPCWM1 (OCTOSPI)" TabName="TrustZone Security Controller - Memory Protection Controller WaterMark"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="MPCWM1_NonSecureArea2_Size" Group="MPCWM1 (OCTOSPI)" TabName="TrustZone Security Controller - Memory Protection Controller WaterMark"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="MPCWM1_NonSecureArea2_Attribute" Group="MPCWM1 (OCTOSPI)" TabName="TrustZone Security Controller - Memory Protection Controller WaterMark"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
+    <Parameter Name="MPCWM1_NonSecureArea_Choice" Group="MPCWM1 (OCTOSPI)" TabName="TrustZone Security Controller - Memory Protection Controller WaterMark"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="MPCWM1_NonSecureArea1_Desc" Group="MPCWM1 (OCTOSPI)" TabName="TrustZone Security Controller - Memory Protection Controller WaterMark"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="MPCWM1_NonSecureArea1_Start_Address" Group="MPCWM1 (OCTOSPI)" TabName="TrustZone Security Controller - Memory Protection Controller WaterMark"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="MPCWM1_NonSecureArea1_Start" Group="MPCWM1 (OCTOSPI)" TabName="TrustZone Security Controller - Memory Protection Controller WaterMark"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="MPCWM1_NonSecureArea1_Size" Group="MPCWM1 (OCTOSPI)" TabName="TrustZone Security Controller - Memory Protection Controller WaterMark"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="MPCWM1_NonSecureArea1_Attribute" Group="MPCWM1 (OCTOSPI)" TabName="TrustZone Security Controller - Memory Protection Controller WaterMark"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="MPCWM1_NonSecureArea2_Desc" Group="MPCWM1 (OCTOSPI)" TabName="TrustZone Security Controller - Memory Protection Controller WaterMark"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="MPCWM1_NonSecureArea2_Start_Address" Group="MPCWM1 (OCTOSPI)" TabName="TrustZone Security Controller - Memory Protection Controller WaterMark"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="MPCWM1_NonSecureArea2_Start" Group="MPCWM1 (OCTOSPI)" TabName="TrustZone Security Controller - Memory Protection Controller WaterMark"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="MPCWM1_NonSecureArea2_Size" Group="MPCWM1 (OCTOSPI)" TabName="TrustZone Security Controller - Memory Protection Controller WaterMark"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="MPCWM1_NonSecureArea2_Attribute" Group="MPCWM1 (OCTOSPI)" TabName="TrustZone Security Controller - Memory Protection Controller WaterMark"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
 
 
     <!-- Parameters for GTZC - MPCWM2 Secured -->
-    <Parameter Name="MPCWM2_NonSecureArea_Choice" Group="MPCWM2 (FMC_NOR)" TabName="TrustZone Security Controller - Memory Protection Controller WaterMark"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="MPCWM2_NonSecureArea1_Desc" Group="MPCWM2 (FMC_NOR)" TabName="TrustZone Security Controller - Memory Protection Controller WaterMark"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="MPCWM2_NonSecureArea1_Start_Address" Group="MPCWM2 (FMC_NOR)" TabName="TrustZone Security Controller - Memory Protection Controller WaterMark"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="MPCWM2_NonSecureArea1_Start" Group="MPCWM2 (FMC_NOR)" TabName="TrustZone Security Controller - Memory Protection Controller WaterMark"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="MPCWM2_NonSecureArea1_Size" Group="MPCWM2 (FMC_NOR)" TabName="TrustZone Security Controller - Memory Protection Controller WaterMark"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="MPCWM2_NonSecureArea1_Attribute" Group="MPCWM2 (FMC_NOR)" TabName="TrustZone Security Controller - Memory Protection Controller WaterMark"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="MPCWM2_NonSecureArea2_Desc" Group="MPCWM2 (FMC_NOR)" TabName="TrustZone Security Controller - Memory Protection Controller WaterMark"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="MPCWM2_NonSecureArea2_Start_Address" Group="MPCWM2 (FMC_NOR)" TabName="TrustZone Security Controller - Memory Protection Controller WaterMark"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="MPCWM2_NonSecureArea2_Start" Group="MPCWM2 (FMC_NOR)" TabName="TrustZone Security Controller - Memory Protection Controller WaterMark"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="MPCWM2_NonSecureArea2_Size" Group="MPCWM2 (FMC_NOR)" TabName="TrustZone Security Controller - Memory Protection Controller WaterMark"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="MPCWM2_NonSecureArea2_Attribute" Group="MPCWM2 (FMC_NOR)" TabName="TrustZone Security Controller - Memory Protection Controller WaterMark"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
+    <Parameter Name="MPCWM2_NonSecureArea_Choice" Group="MPCWM2 (FMC_NOR)" TabName="TrustZone Security Controller - Memory Protection Controller WaterMark"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="MPCWM2_NonSecureArea1_Desc" Group="MPCWM2 (FMC_NOR)" TabName="TrustZone Security Controller - Memory Protection Controller WaterMark"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="MPCWM2_NonSecureArea1_Start_Address" Group="MPCWM2 (FMC_NOR)" TabName="TrustZone Security Controller - Memory Protection Controller WaterMark"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="MPCWM2_NonSecureArea1_Start" Group="MPCWM2 (FMC_NOR)" TabName="TrustZone Security Controller - Memory Protection Controller WaterMark"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="MPCWM2_NonSecureArea1_Size" Group="MPCWM2 (FMC_NOR)" TabName="TrustZone Security Controller - Memory Protection Controller WaterMark"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="MPCWM2_NonSecureArea1_Attribute" Group="MPCWM2 (FMC_NOR)" TabName="TrustZone Security Controller - Memory Protection Controller WaterMark"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="MPCWM2_NonSecureArea2_Desc" Group="MPCWM2 (FMC_NOR)" TabName="TrustZone Security Controller - Memory Protection Controller WaterMark"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="MPCWM2_NonSecureArea2_Start_Address" Group="MPCWM2 (FMC_NOR)" TabName="TrustZone Security Controller - Memory Protection Controller WaterMark"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="MPCWM2_NonSecureArea2_Start" Group="MPCWM2 (FMC_NOR)" TabName="TrustZone Security Controller - Memory Protection Controller WaterMark"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="MPCWM2_NonSecureArea2_Size" Group="MPCWM2 (FMC_NOR)" TabName="TrustZone Security Controller - Memory Protection Controller WaterMark"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="MPCWM2_NonSecureArea2_Attribute" Group="MPCWM2 (FMC_NOR)" TabName="TrustZone Security Controller - Memory Protection Controller WaterMark"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
 
 
     <!-- Parameters for GTZC - MPCWM3 Secured -->
-    <Parameter Name="MPCWM3_NonSecureArea_Choice" Group="MPCWM3 (FMC_NAND)" TabName="TrustZone Security Controller - Memory Protection Controller WaterMark"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="MPCWM3_NonSecureArea_Desc" Group="MPCWM3 (FMC_NAND)" TabName="TrustZone Security Controller - Memory Protection Controller WaterMark"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="MPCWM3_NonSecureArea_Start_Address" Group="MPCWM3 (FMC_NAND)" TabName="TrustZone Security Controller - Memory Protection Controller WaterMark"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="MPCWM3_NonSecureArea_Start" Group="MPCWM3 (FMC_NAND)" TabName="TrustZone Security Controller - Memory Protection Controller WaterMark"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="MPCWM3_NonSecureArea_Size" Group="MPCWM3 (FMC_NAND)" TabName="TrustZone Security Controller - Memory Protection Controller WaterMark"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="MPCWM3_NonSecureArea_Attribute" Group="MPCWM3 (FMC_NAND)" TabName="TrustZone Security Controller - Memory Protection Controller WaterMark"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
+    <Parameter Name="MPCWM3_NonSecureArea_Choice" Group="MPCWM3 (FMC_NAND)" TabName="TrustZone Security Controller - Memory Protection Controller WaterMark"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="MPCWM3_NonSecureArea_Desc" Group="MPCWM3 (FMC_NAND)" TabName="TrustZone Security Controller - Memory Protection Controller WaterMark"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="MPCWM3_NonSecureArea_Start_Address" Group="MPCWM3 (FMC_NAND)" TabName="TrustZone Security Controller - Memory Protection Controller WaterMark"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="MPCWM3_NonSecureArea_Start" Group="MPCWM3 (FMC_NAND)" TabName="TrustZone Security Controller - Memory Protection Controller WaterMark"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="MPCWM3_NonSecureArea_Size" Group="MPCWM3 (FMC_NAND)" TabName="TrustZone Security Controller - Memory Protection Controller WaterMark"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="MPCWM3_NonSecureArea_Attribute" Group="MPCWM3 (FMC_NAND)" TabName="TrustZone Security Controller - Memory Protection Controller WaterMark"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
 
 
     <!-- Parameters for GTZC - MPCBB1 Secured -->
     <!-- Configuration Settings -->
-    <Parameter Name="MPCBB1_ConfigSettings" RefParameter="MPCBB_ConfigSettings" Group="MPCBB1 (SRAM1)" TabName="Block-Based Memory Protection Controller"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="MPCBB1_SRWILADIS" RefParameter="MPCBB_SRWILADIS" Group="MPCBB1 (SRAM1)" TabName="Block-Based Memory Protection Controller"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="MPCBB1_INVSECSTATE" RefParameter="MPCBB_INVSECSTATE" Group="MPCBB1 (SRAM1)" TabName="Block-Based Memory Protection Controller"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="MPCBB1_Lock" RefParameter="MPCBB_Lock" Group="MPCBB1 (SRAM1)" TabName="Block-Based Memory Protection Controller"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
+    <Parameter Name="MPCBB1_ConfigSettings" RefParameter="MPCBB_ConfigSettings" Group="MPCBB1 (SRAM1)" TabName="Block-Based Memory Protection Controller"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="MPCBB1_SRWILADIS" RefParameter="MPCBB_SRWILADIS" Group="MPCBB1 (SRAM1)" TabName="Block-Based Memory Protection Controller"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="MPCBB1_INVSECSTATE" RefParameter="MPCBB_INVSECSTATE" Group="MPCBB1 (SRAM1)" TabName="Block-Based Memory Protection Controller"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="MPCBB1_Lock" RefParameter="MPCBB_Lock" Group="MPCBB1 (SRAM1)" TabName="Block-Based Memory Protection Controller"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
     <!-- Memory Attribute Settings -->
-    <Parameter Name="MPCBB1_MemorySettings" RefParameter="MPCBB_MemorySettings" Group="MPCBB1 (SRAM1)" TabName="Block-Based Memory Protection Controller"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="MPCBB1_NonSecureArea_Choice" Group="MPCBB1 (SRAM1)" TabName="Block-Based Memory Protection Controller"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="MPCBB1_NonSecureArea_Start_Address" Group="MPCBB1 (SRAM1)" TabName="Block-Based Memory Protection Controller"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="MPCBB1_NonSecureArea_Start" Group="MPCBB1 (SRAM1)" TabName="Block-Based Memory Protection Controller"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="MPCBB1_NonSecureArea_Size" Group="MPCBB1 (SRAM1)" TabName="Block-Based Memory Protection Controller"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="MPCBB1_NonSecureArea_BlockSize" Group="MPCBB1 (SRAM1)" TabName="Block-Based Memory Protection Controller"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="MPCBB1_SecConfig_array" Group="MPCBB1 (SRAM1)" TabName="Block-Based Memory Protection Controller"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="MPCBB1_LockConfig" RefParameter="MPCBB_LockConfig" Group="MPCBB1 (SRAM1)" TabName="Block-Based Memory Protection Controller"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="MPCBB1_LockConfig_array" Group="MPCBB1 (SRAM1)" TabName="Block-Based Memory Protection Controller"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
+    <Parameter Name="MPCBB1_MemorySettings" RefParameter="MPCBB_MemorySettings" Group="MPCBB1 (SRAM1)" TabName="Block-Based Memory Protection Controller"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="MPCBB1_NonSecureArea_Choice" Group="MPCBB1 (SRAM1)" TabName="Block-Based Memory Protection Controller"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="MPCBB1_NonSecureArea_Start_Address" Group="MPCBB1 (SRAM1)" TabName="Block-Based Memory Protection Controller"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="MPCBB1_NonSecureArea_Start" Group="MPCBB1 (SRAM1)" TabName="Block-Based Memory Protection Controller"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="MPCBB1_NonSecureArea_Size" Group="MPCBB1 (SRAM1)" TabName="Block-Based Memory Protection Controller"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="MPCBB1_NonSecureArea_BlockSize" Group="MPCBB1 (SRAM1)" TabName="Block-Based Memory Protection Controller"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="MPCBB1_NonSecureArea_Secure" Group="MPCBB1 (SRAM1)" TabName="Block-Based Memory Protection Controller"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="MPCBB1_SecConfig_array" Group="MPCBB1 (SRAM1)" TabName="Block-Based Memory Protection Controller"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="MPCBB1_LockConfig" RefParameter="MPCBB_LockConfig" Group="MPCBB1 (SRAM1)" TabName="Block-Based Memory Protection Controller"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="MPCBB1_LockConfig_array" Group="MPCBB1 (SRAM1)" TabName="Block-Based Memory Protection Controller"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
     <!-- Lock Parameter -->
     <!-- <Parameter Name="MPCBB1_NonSecureArea_LockAttributes_array" Group="MPCBB1 (SRAM1)" TabName="Block-Based Memory Protection Controller"/> -->
 
 
     <!-- Parameters for GTZC - MPCBB2 Secured -->
     <!-- Configuration Settings -->
-    <Parameter Name="MPCBB2_ConfigSettings" RefParameter="MPCBB_ConfigSettings" Group="MPCBB2 (SRAM2)" TabName="Block-Based Memory Protection Controller"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="MPCBB2_SRWILADIS" RefParameter="MPCBB_SRWILADIS" Group="MPCBB2 (SRAM2)" TabName="Block-Based Memory Protection Controller"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="MPCBB2_INVSECSTATE" RefParameter="MPCBB_INVSECSTATE" Group="MPCBB2 (SRAM2)" TabName="Block-Based Memory Protection Controller"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="MPCBB2_Lock" RefParameter="MPCBB_Lock" Group="MPCBB2 (SRAM2)" TabName="Block-Based Memory Protection Controller"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
+    <Parameter Name="MPCBB2_ConfigSettings" RefParameter="MPCBB_ConfigSettings" Group="MPCBB2 (SRAM2)" TabName="Block-Based Memory Protection Controller"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="MPCBB2_SRWILADIS" RefParameter="MPCBB_SRWILADIS" Group="MPCBB2 (SRAM2)" TabName="Block-Based Memory Protection Controller"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="MPCBB2_INVSECSTATE" RefParameter="MPCBB_INVSECSTATE" Group="MPCBB2 (SRAM2)" TabName="Block-Based Memory Protection Controller"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="MPCBB2_Lock" RefParameter="MPCBB_Lock" Group="MPCBB2 (SRAM2)" TabName="Block-Based Memory Protection Controller"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
     <!-- Memory Attribute Settings -->
-    <Parameter Name="MPCBB2_MemorySettings" RefParameter="MPCBB_MemorySettings" Group="MPCBB2 (SRAM2)" TabName="Block-Based Memory Protection Controller"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="MPCBB2_NonSecureArea_Choice" Group="MPCBB2 (SRAM2)" TabName="Block-Based Memory Protection Controller"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="MPCBB2_NonSecureArea_Start_Address" Group="MPCBB2 (SRAM2)" TabName="Block-Based Memory Protection Controller"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="MPCBB2_NonSecureArea_Start" Group="MPCBB2 (SRAM2)" TabName="Block-Based Memory Protection Controller"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="MPCBB2_NonSecureArea_Size" Group="MPCBB2 (SRAM2)" TabName="Block-Based Memory Protection Controller"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="MPCBB2_NonSecureArea_BlockSize" Group="MPCBB2 (SRAM2)" TabName="Block-Based Memory Protection Controller"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="MPCBB2_SecConfig_array" Group="MPCBB2 (SRAM2)" TabName="Block-Based Memory Protection Controller"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="MPCBB2_LockConfig" RefParameter="MPCBB_LockConfig" Group="MPCBB2 (SRAM2)" TabName="Block-Based Memory Protection Controller"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="MPCBB2_LockConfig_array" Group="MPCBB2 (SRAM2)" TabName="Block-Based Memory Protection Controller"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
+    <Parameter Name="MPCBB2_MemorySettings" RefParameter="MPCBB_MemorySettings" Group="MPCBB2 (SRAM2)" TabName="Block-Based Memory Protection Controller"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="MPCBB2_NonSecureArea_Choice" Group="MPCBB2 (SRAM2)" TabName="Block-Based Memory Protection Controller"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="MPCBB2_NonSecureArea_Start_Address" Group="MPCBB2 (SRAM2)" TabName="Block-Based Memory Protection Controller"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="MPCBB2_NonSecureArea_Start" Group="MPCBB2 (SRAM2)" TabName="Block-Based Memory Protection Controller"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="MPCBB2_NonSecureArea_Size" Group="MPCBB2 (SRAM2)" TabName="Block-Based Memory Protection Controller"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="MPCBB2_NonSecureArea_BlockSize" Group="MPCBB2 (SRAM2)" TabName="Block-Based Memory Protection Controller"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="MPCBB2_NonSecureArea_Secure" Group="MPCBB2 (SRAM2)" TabName="Block-Based Memory Protection Controller"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="MPCBB2_SecConfig_array" Group="MPCBB2 (SRAM2)" TabName="Block-Based Memory Protection Controller"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="MPCBB2_LockConfig" RefParameter="MPCBB_LockConfig" Group="MPCBB2 (SRAM2)" TabName="Block-Based Memory Protection Controller"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="MPCBB2_LockConfig_array" Group="MPCBB2 (SRAM2)" TabName="Block-Based Memory Protection Controller"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
     <!-- Lock Parameter -->
     <!-- <Parameter Name="MPCBB2_NonSecureArea_LockAttributes_array" Group="MPCBB2 (SRAM2)" TabName="Block-Based Memory Protection Controller"/> -->
 
 
     <!-- Parameters for GTZC - IT Secured - TabName="TrustZone Illegal access Controller" -->
-    <Parameter Name="TZIC_Configure_IT_Choice"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="Illegal_Access_Interrupt_Peripheral"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="ADC_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="ADC1|2"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
+    <Parameter Name="TZIC_Configure_IT_Choice"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+
+    <Parameter Name="Full_IT_Disabled"><Condition Diagnostic="only Active in GTZC_S" Expression="($IpInstance=GTZC_S)"/></Parameter>
+    <Parameter Name="Full_IT_Enabled"><Condition Diagnostic="only Active in GTZC_S" Expression="($IpInstance=GTZC_S)"/></Parameter>
+    <Parameter Name="Full_IT_Default"><Condition Diagnostic="only Active in GTZC_S" Expression="($IpInstance=GTZC_S)"/></Parameter>
+
+    <Parameter Name="Illegal_Access_Interrupt_Peripheral"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
+    <Parameter Name="ADC_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="ADC1|2">
+      <Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/>
+      <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+      <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+      <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
     <!-- AES -->
-    <Parameter Name="AES_Illegal_Access_Interrupt" RefParameter="AES_Illegal_Access_Interrupt" Comment="AES"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="AES_Exist &amp; S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="COMP_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="COMP1|2"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="CRC_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="CRS"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="CRS_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="CRS"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="DAC1_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="DAC1"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="DFSDM1_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="DFSDM1"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="DMA1_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="DMA1"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="DMA2_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="DMA2"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="DMAMUX1_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="DMAMUX1"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="EXTI_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="EXTI"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="FDCAN1_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="FDCAN1"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="FLASH_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="FLASH"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="FLASH_REG_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="FLASH_REG"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="FMC_MEM_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="FMC_MEM"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="FMC_REG_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="FMC_REG"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="HASH_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="HASH"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="I2C1_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="I2C1"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="I2C2_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="I2C2"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="I2C3_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="I2C3"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="I2C4_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="I2C4"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="ICACHE_REG_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="ICACHE_REG"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="IWDG_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="IWDG"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="LPTIM1_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="LPTIM1"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="LPTIM2_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="LPTIM2"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="LPTIM3_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="LPTIM3"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="LPUART1_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="LPUART1"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="MPCBB1_REG_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="MPCBB1_REG"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="MPCBB2_REG_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="MPCBB2_REG"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="OCTOSPI1_MEM_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="OCTOSPI1_MEM"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="OCTOSPI1_REG_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="OCTOSPI1_REG"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="OPAMP_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="OPAMP"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
+    <Parameter Name="AES_Illegal_Access_Interrupt" RefParameter="AES_Illegal_Access_Interrupt" Comment="AES">
+      <Condition Diagnostic="only Active with TZEN enabled" Expression="AES_Exist &amp; $IpInstance=GTZC_S"/>
+      <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+      <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+      <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
+    <Parameter Name="COMP_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="COMP1|2">
+      <Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/>
+      <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+      <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+      <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
+    <Parameter Name="CRC_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="CRS">
+      <Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/>
+      <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+      <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+      <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
+    <Parameter Name="CRS_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="CRS">
+      <Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/>
+      <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+      <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+      <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
+    <Parameter Name="DAC1_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="DAC1">
+      <Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/>
+      <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+      <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+      <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
+    <Parameter Name="DFSDM1_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="DFSDM1">
+      <Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/>
+      <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+      <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+      <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
+    <Parameter Name="DMA1_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="DMA1">
+      <Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/>
+      <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+      <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+      <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
+    <Parameter Name="DMA2_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="DMA2">
+      <Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/>
+      <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+      <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+      <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
+    <Parameter Name="DMAMUX1_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="DMAMUX1">
+      <Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/>
+      <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+      <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+      <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
+    <Parameter Name="EXTI_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="EXTI">
+      <Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/>
+      <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+      <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+      <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
+    <Parameter Name="FDCAN1_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="FDCAN1">
+      <Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/>
+      <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+      <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+      <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
+    <Parameter Name="FLASH_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="FLASH">
+      <Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/>
+      <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+      <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+      <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
+    <Parameter Name="FLASH_REG_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="FLASH_REG">
+      <Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/>
+      <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+      <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+      <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
+    <Parameter Name="FMC_MEM_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="FMC_MEM">
+      <Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/>
+      <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+      <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+      <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
+    <Parameter Name="FMC_REG_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="FMC_REG">
+      <Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/>
+      <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+      <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+      <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
+    <Parameter Name="HASH_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="HASH">
+      <Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/>
+      <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+      <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+      <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
+    <Parameter Name="I2C1_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="I2C1">
+      <Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/>
+      <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+      <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+      <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
+    <Parameter Name="I2C2_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="I2C2">
+      <Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/>
+      <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+      <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+      <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
+    <Parameter Name="I2C3_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="I2C3">
+      <Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/>
+      <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+      <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+      <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
+    <Parameter Name="I2C4_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="I2C4">
+      <Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/>
+      <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+      <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+      <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
+    <Parameter Name="ICACHE_REG_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="ICACHE_REG">
+      <Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/>
+      <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+      <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+      <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
+    <Parameter Name="IWDG_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="IWDG">
+      <Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/>
+      <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+      <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+      <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
+    <Parameter Name="LPTIM1_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="LPTIM1">
+      <Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/>
+      <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+      <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+      <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
+    <Parameter Name="LPTIM2_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="LPTIM2">
+      <Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/>
+      <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+      <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+      <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
+    <Parameter Name="LPTIM3_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="LPTIM3">
+      <Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/>
+      <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+      <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+      <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
+    <Parameter Name="LPUART1_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="LPUART1">
+      <Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/>
+      <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+      <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+      <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
+    <Parameter Name="MPCBB1_REG_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="MPCBB1_REG">
+      <Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/>
+      <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+      <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+      <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
+    <Parameter Name="MPCBB2_REG_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="MPCBB2_REG">
+      <Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/>
+      <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+      <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+      <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
+    <Parameter Name="OCTOSPI1_MEM_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="OCTOSPI1_MEM">
+      <Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/>
+      <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+      <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+      <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
+    <Parameter Name="OCTOSPI1_REG_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="OCTOSPI1_REG">
+      <Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/>
+      <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+      <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+      <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
+    <Parameter Name="OPAMP_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="OPAMP">
+      <Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/>
+      <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+      <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+      <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
     <!-- OTFDEC1 -->
-    <Parameter Name="OTFDEC1_Illegal_Access_Interrupt" RefParameter="OTFDEC1_Illegal_Access_Interrupt" Comment="OTFDEC1"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="OTFDEC1_Exist &amp; S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
+    <Parameter Name="OTFDEC1_Illegal_Access_Interrupt" RefParameter="OTFDEC1_Illegal_Access_Interrupt" Comment="OTFDEC1">
+      <Condition Diagnostic="only Active with TZEN enabled" Expression="OTFDEC1_Exist &amp; $IpInstance=GTZC_S"/>
+      <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+      <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+      <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
     <!-- PKA -->
-    <Parameter Name="PKA_Illegal_Access_Interrupt" RefParameter="PKA_Illegal_Access_Interrupt" Comment="PKA"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="PKA_Exist &amp; S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="PWR_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="PWR"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="RCC_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="RCC"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="RNG_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="RNG"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="RTC_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="RTC"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="SAI1_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="SAI1"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="SAI2_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="SAI2"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="SDMMC1_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="SDMMC1"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="SPI1_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="SPI1"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="SPI2_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="SPI2"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="SPI3_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="SPI3"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="SRAM1_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="SRAM1"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="SRAM2_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="SRAM2"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="SYSCFG_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="SYS"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="TIM1_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="TIM1"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="TIM2_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="TIM2"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="TIM3_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="TIM3"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="TIM4_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="TIM4"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="TIM5_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="TIM5"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="TIM6_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="TIM6"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="TIM7_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="TIM7"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="TIM8_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="TIM8"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="TIM15_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="TIM15"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="TIM16_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="TIM16"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="TIM17_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="TIM17"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="TSC_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="TSC"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="TZIC_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="TZIC"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="TZSC_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="TZSC"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="USART1_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="USART1"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="USART2_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="USART2"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="USART3_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="USART3"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="UART4_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="UART4"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="UART5_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="UART5"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="UCPD1_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="UCPD1"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="USBFS_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="USBFS"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="VREFBUF_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="VREFBUF"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
-    <Parameter Name="WWDG_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="WWDG"><Condition Diagnostic="only Active with TZEN enabled and GTZC enabled" Expression="S_SECURE &amp; S_GTZC_Enabled"/></Parameter>
+    <Parameter Name="PKA_Illegal_Access_Interrupt" RefParameter="PKA_Illegal_Access_Interrupt" Comment="PKA">
+      <Condition Diagnostic="only Active with TZEN enabled" Expression="PKA_Exist &amp; $IpInstance=GTZC_S"/>
+      <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+      <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+      <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
+    <Parameter Name="PWR_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="PWR">
+      <Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/>
+      <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+      <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+      <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
+    <Parameter Name="RCC_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="RCC">
+      <Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/>
+      <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+      <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+      <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
+    <Parameter Name="RNG_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="RNG">
+      <Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/>
+      <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+      <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+      <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
+    <Parameter Name="RTC_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="RTC">
+      <Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/>
+      <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+      <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+      <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
+    <Parameter Name="SAI1_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="SAI1">
+      <Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/>
+      <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+      <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+      <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
+    <Parameter Name="SAI2_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="SAI2">
+      <Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/>
+      <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+      <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+      <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
+    <Parameter Name="SDMMC1_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="SDMMC1">
+      <Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/>
+      <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+      <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+      <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
+    <Parameter Name="SPI1_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="SPI1">
+      <Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/>
+      <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+      <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+      <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
+    <Parameter Name="SPI2_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="SPI2">
+      <Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/>
+      <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+      <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+      <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
+    <Parameter Name="SPI3_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="SPI3">
+      <Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/>
+      <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+      <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+      <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
+    <Parameter Name="SRAM1_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="SRAM1">
+      <Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/>
+      <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+      <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+      <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
+    <Parameter Name="SRAM2_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="SRAM2">
+      <Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/>
+      <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+      <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+      <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
+    <Parameter Name="SYSCFG_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="SYS">
+      <Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/>
+      <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+      <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+      <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
+    <Parameter Name="TIM1_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="TIM1">
+      <Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/>
+      <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+      <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+      <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
+    <Parameter Name="TIM2_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="TIM2">
+      <Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/>
+      <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+      <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+      <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
+    <Parameter Name="TIM3_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="TIM3">
+      <Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/>
+      <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+      <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+      <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
+    <Parameter Name="TIM4_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="TIM4">
+      <Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/>
+      <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+      <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+      <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
+    <Parameter Name="TIM5_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="TIM5">
+      <Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/>
+      <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+      <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+      <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
+    <Parameter Name="TIM6_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="TIM6">
+      <Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/>
+      <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+      <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+      <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
+    <Parameter Name="TIM7_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="TIM7">
+      <Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/>
+      <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+      <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+      <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
+    <Parameter Name="TIM8_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="TIM8">
+      <Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/>
+      <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+      <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+      <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
+    <Parameter Name="TIM15_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="TIM15">
+      <Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/>
+      <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+      <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+      <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
+    <Parameter Name="TIM16_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="TIM16">
+      <Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/>
+      <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+      <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+      <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
+    <Parameter Name="TIM17_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="TIM17">
+      <Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/>
+      <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+      <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+      <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
+    <Parameter Name="TSC_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="TSC">
+      <Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/>
+      <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+      <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+      <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
+    <Parameter Name="TZIC_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="TZIC">
+      <Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/>
+      <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+      <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+      <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
+    <Parameter Name="TZSC_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="TZSC">
+      <Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/>
+      <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+      <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+      <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
+    <Parameter Name="UART4_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="UART4">
+      <Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/>
+      <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+      <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+      <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
+    <Parameter Name="UART5_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="UART5">
+      <Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/>
+      <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+      <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+      <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
+    <Parameter Name="UCPD1_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="UCPD1">
+      <Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/>
+      <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+      <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+      <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
+    <Parameter Name="USART1_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="USART1">
+      <Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/>
+      <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+      <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+      <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
+    <Parameter Name="USART2_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="USART2">
+      <Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/>
+      <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+      <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+      <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
+    <Parameter Name="USART3_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="USART3">
+      <Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/>
+      <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+      <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+      <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
+    <Parameter Name="USBFS_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="USBFS">
+      <Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/>
+      <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+      <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+      <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
+    <Parameter Name="VREFBUF_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="VREFBUF">
+      <Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/>
+      <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+      <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+      <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
+    <Parameter Name="WWDG_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="WWDG">
+      <Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/>
+      <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+      <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+      <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
   </RefMode>
 
 
@@ -695,6 +1246,7 @@
             <Signal IOMode="" Name="VS_GTZC_Enable"/>
           </SignalLogicalOp>
           <Semaphore>S_GTZC_Enabled</Semaphore>
+          <Semaphore>$IpInstance</Semaphore>
         </Mode>
       </ModeLogicOperator>
     </Mode>

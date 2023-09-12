@@ -619,7 +619,7 @@ E2P_ErrorStatus_t E2P_Read_SeNvm(sfx_u8 *read_data, uint32_t len)
   E2P_Read(EE_SE_NVM_1_ID, &data_from_eeprom);
   read_data[i++] = (sfx_u8) data_from_eeprom;
   E2P_Read(EE_SE_NVM_2_ID, &data_from_eeprom);
-  read_data[i++] = (sfx_u8) data_from_eeprom;;
+  read_data[i++] = (sfx_u8) data_from_eeprom;
   E2P_Read(EE_SE_NVM_3_ID, &data_from_eeprom);
   read_data[i++] = (sfx_u8) data_from_eeprom;
   E2P_Read(EE_SE_NVM_4_ID, &data_from_eeprom);

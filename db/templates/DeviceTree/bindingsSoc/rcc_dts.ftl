@@ -69,7 +69,7 @@
 	[#-- pll nodes --]
 	[#-- Nb pll available --]
 	[#assign nbPLL=0]
-	[#assign temporarely_remove_csg_parameter = false] [#-- if 'false' : csg = < 0 1 SSCG_MODE_DOWN_SPREAD>; not print in LSE, temporarely setting --]
+	[#assign temporarely_remove_csg_parameter = false] [#-- if 'false' : csg = < 0 1 SSCG_MODE_DOWN_SPREAD>; not print in LSE, temporarily setting --]
 [#t]
 	[#list peripheralParams.get("RCC").entrySet() as paramEntry]
 		[#if paramEntry.key?matches("DIVN[1-9]")][#assign nbPLL=nbPLL+1][/#if]

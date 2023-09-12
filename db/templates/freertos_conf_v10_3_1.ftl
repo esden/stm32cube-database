@@ -327,9 +327,9 @@
  * See http://www.freertos.org/a00110.html
  *----------------------------------------------------------*/
 
-/* USER CODE BEGIN Includes */   	      
+/* USER CODE BEGIN Includes */
 /* Section where include file can be added */
-/* USER CODE END Includes */ 
+/* USER CODE END Includes */
 
 [#compress]
 [#assign prototypeNeeded = "false"]
@@ -354,7 +354,7 @@
 [#if configGENERATE_RUN_TIME_STATS=="1"]
 /* USER CODE BEGIN 0 */
 #textern void configureTimerForRunTimeStats(void);
-#textern unsigned long getRunTimeCounterValue(void);  
+#textern unsigned long getRunTimeCounterValue(void);
 /* USER CODE END 0 */
 [/#if]
 #endif
@@ -466,7 +466,7 @@
 /* Defaults to size_t for backward compatibility, but can be changed
    if lengths will always be less than the number of bytes in a size_t. */
 #define configMESSAGE_BUFFER_LENGTH_TYPE         size_t
-/* USER CODE END MESSAGE_BUFFER_LENGTH_TYPE */ 
+/* USER CODE END MESSAGE_BUFFER_LENGTH_TYPE */
 [#-- for 10.2.1 support --]
 
 /* Co-routine definitions. */
@@ -533,7 +533,7 @@ to exclude the API function. */
 #define INCLUDE_xTaskGetHandle               1
 [/#if]
 
-[#if (familyName=="stm32g0") || (familyName=="stm32f0") || (familyName=="stm32l0")]  [#-- BZ 47214 --] 
+[#if (familyName=="stm32g0") || (familyName=="stm32f0") || (familyName=="stm32l0")]  [#-- BZ 47214 --]
 [#else]
 /* Cortex-M specific definitions. */
 #ifdef __NVIC_PRIO_BITS
@@ -627,9 +627,9 @@ standard names. */
 /* USER CODE END 2 */
 [/#if]
 
-/* USER CODE BEGIN Defines */   	      
+/* USER CODE BEGIN Defines */    
 /* Section where parameter definitions can be added (for instance, to override default ones in FreeRTOS.h) */
-/* USER CODE END Defines */ 
+/* USER CODE END Defines */
 
 [#if configUSE_TICKLESS_IDLE=="1"]
 #if defined(__ICCARM__) || defined(__CC_ARM) || defined(__GNUC__)

@@ -11,6 +11,7 @@
 /* USER CODE END Header */
 [#assign FREERTOS_STATUS = 0]
 [#assign CFG_UART_GUI = ""]
+[#assign DIE = DIE]
 [#list SWIPdatas as SWIP]
 	[#if SWIP.defines??]
 		[#list SWIP.defines as definition]
@@ -138,14 +139,21 @@ void TM_Init( void  )
     CFG_BLE_MAX_CONN_EVENT_LENGTH,
     CFG_BLE_HSE_STARTUP_TIME,
     CFG_BLE_VITERBI_MODE,
-    CFG_BLE_LL_ONLY,
-    0}
+    CFG_BLE_OPTIONS,
+    0,
+    CFG_BLE_MAX_COC_INITIATOR_NBR,
+    CFG_BLE_MIN_TX_POWER,
+    CFG_BLE_MAX_TX_POWER}
   };
 
 
 
   ipccdba = READ_BIT( FLASH->IPCCBR, FLASH_IPCCBR_IPCCDBA );
+[#if DIE == "DIE494"]
+  p_RefTable = (MB_RefTable_t*)((ipccdba<<2) + (SRAM_BASE + 0x00030000));
+[#else]
   p_RefTable = (MB_RefTable_t*)((ipccdba<<2) + SRAM2A_BASE);
+[/#if]
 
   tl_ble_init_conf.p_cmdbuffer = (uint8_t*)&BleCmdBuffer;
   tl_ble_init_conf.p_AclDataBuffer = HciAclDataBuffer;
@@ -489,7 +497,11 @@ void shci_send( uint16_t cmd_code, uint8_t len_cmd_payload, uint8_t * p_cmd_payl
   MB_RefTable_t * p_ref_table;
 
   ipccdba = READ_BIT( FLASH->IPCCBR, FLASH_IPCCBR_IPCCDBA );
+[#if DIE == "DIE494"]
+  p_ref_table = (MB_RefTable_t*)((ipccdba<<2) + (SRAM_BASE + 0x00030000));
+[#else]
   p_ref_table = (MB_RefTable_t*)((ipccdba<<2) + SRAM2A_BASE);
+[/#if]
 
   SysLocalCmdStatus = 1;
 

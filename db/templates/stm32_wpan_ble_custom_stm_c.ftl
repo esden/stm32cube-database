@@ -3023,7 +3023,7 @@ static SVCCTL_EvtAckStatus_t Custom_STM_Event_Handler(void *Event)
 {
   SVCCTL_EvtAckStatus_t return_value;
   hci_event_pckt *event_pckt;
-  evt_blue_aci *blue_evt;
+  evt_blecore_aci *blecore_evt;
 /* USER CODE BEGIN Custom_STM_Event_Handler_1 */
 
 /* USER CODE END Custom_STM_Event_Handler_1 */
@@ -3033,9 +3033,9 @@ static SVCCTL_EvtAckStatus_t Custom_STM_Event_Handler(void *Event)
 
   switch(event_pckt->evt)
   {
-    case EVT_VENDOR:
-      blue_evt = (evt_blue_aci*)event_pckt->data;
-      switch(blue_evt->ecode)
+    case HCI_VENDOR_SPECIFIC_DEBUG_EVT_CODE:
+      blecore_evt = (evt_blecore_aci*)event_pckt->data;
+      switch(blecore_evt->ecode)
       {
 [#assign gatt_notify_attribute_write = 0]
 [#assign gatt_notify_write_req_and_wait_for_appl_resp = 0]
@@ -3066,7 +3066,7 @@ static SVCCTL_EvtAckStatus_t Custom_STM_Event_Handler(void *Event)
 [#--
 [#if gatt_notify_attribute_write > 0]
 --]
-        case EVT_BLUE_GATT_ATTRIBUTE_MODIFIED:
+        case ACI_GATT_ATTRIBUTE_MODIFIED_VSEVT_CODE:
           /* USER CODE BEGIN EVT_BLUE_GATT_ATTRIBUTE_MODIFIED */
 
           /* USER CODE END EVT_BLUE_GATT_ATTRIBUTE_MODIFIED */
@@ -3078,7 +3078,7 @@ static SVCCTL_EvtAckStatus_t Custom_STM_Event_Handler(void *Event)
 [#--
 [#if gatt_notify_write_req_and_wait_for_appl_resp > 0]
 --]
-        case EVT_BLUE_GATT_READ_PERMIT_REQ :
+        case ACI_GATT_READ_PERMIT_REQ_VSEVT_CODE :
           /* USER CODE BEGIN EVT_BLUE_GATT_READ_PERMIT_REQ */
 
           /* USER CODE END EVT_BLUE_GATT_READ_PERMIT_REQ */
@@ -3090,7 +3090,7 @@ static SVCCTL_EvtAckStatus_t Custom_STM_Event_Handler(void *Event)
 [#--
 [#if gatt_notify_read_req_and_wait_for_appl_resp > 0]
 --]
-        case EVT_BLUE_GATT_WRITE_PERMIT_REQ:
+        case ACI_GATT_WRITE_PERMIT_REQ_VSEVT_CODE:
           /* USER CODE BEGIN EVT_BLUE_GATT_WRITE_PERMIT_REQ */
 
           /* USER CODE END EVT_BLUE_GATT_WRITE_PERMIT_REQ */
@@ -3108,7 +3108,7 @@ static SVCCTL_EvtAckStatus_t Custom_STM_Event_Handler(void *Event)
       /* USER CODE BEGIN EVT_VENDOR*/
 
       /* USER CODE END EVT_VENDOR*/
-      break; /* EVT_VENDOR */
+      break; /* HCI_VENDOR_SPECIFIC_DEBUG_EVT_CODE */
 
     /* USER CODE BEGIN EVENT_PCKT_CASES*/
 

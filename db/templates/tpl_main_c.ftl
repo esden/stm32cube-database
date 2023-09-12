@@ -50,10 +50,6 @@
 
 [#list ips as ip]
 [#if !ip?contains("FATFS") && !ip?contains("FREERTOS") && !ip?contains("NVIC")&& !ip?contains("NVIC1")&& !ip?contains("NVIC2")&& !ip?contains("CORTEX") && !ip?contains("TRACER_EMB")&& !ip?contains("GUI_INTERFACE")]
-[#if ip?contains("STM32_WPAN")]
-#include "app_entry.h"
-#include "app_common.h"
-[/#if]
 [#if ip?contains("Sigfox")]
 #include "app_sigfox.h"
 [/#if]
@@ -63,7 +59,7 @@
 [#if ip?contains("LoRaWAN")]
 #include "app_lorawan.h"
 [/#if]
-[#if ((!ip?contains("LWIP")&& !ip?contains("STM32_WPAN")&& !ip?contains("LoRaWAN")&& !ip?contains("SubGHz_Phy")&& !ip?contains("Sigfox") && !ip?contains("KMS")) || (ip?contains("LWIP") && (MBEDTLSUSed=="false")))]
+[#if ((!ip?contains("LWIP")&& !ip?contains("STM32_WPAN")&& !ip?contains("LoRaWAN")&& !ip?contains("SubGHz_Phy")&& !ip?contains("Sigfox") && !ip?contains("KMS") && !ip?contains("MotorControl")) || (ip?contains("LWIP") && (MBEDTLSUSed=="false")))]
     [#assign ipExistsIntoreducevoids=false]
     [#if reducevoids??]
         [#list reducevoids as voidr]
@@ -168,20 +164,32 @@ extern PCD_HandleTypeDef ${handleName};
 ETH_DMADescTypeDef  DMARxDscrTab[ETH_RX_DESC_CNT]; /* Ethernet Rx DMA Descriptors */
 #pragma location=[#if TxDescAddress??]${TxDescAddress}[#else]0x30040060[/#if]
 ETH_DMADescTypeDef  DMATxDscrTab[ETH_TX_DESC_CNT]; /* Ethernet Tx DMA Descriptors */
+[#-- BZ 97589 --]
+[#if NetXDuo??]
+[#else]
 #pragma location=[#if RxBuffAddress??]${RxBuffAddress}[#else]0x30040200[/#if]
 uint8_t Rx_Buff[ETH_RX_DESC_CNT][ETH_MAX_PACKET_SIZE]; /* Ethernet Receive Buffers */
+[/#if]
 
 #elif defined ( __CC_ARM )  /* MDK ARM Compiler */
 
 __attribute__((at([#if RxDescAddress??]${RxDescAddress}[#else]0x30040000[/#if]))) ETH_DMADescTypeDef  DMARxDscrTab[ETH_RX_DESC_CNT]; /* Ethernet Rx DMA Descriptors */
 __attribute__((at([#if TxDescAddress??]${TxDescAddress}[#else]0x30040060[/#if]))) ETH_DMADescTypeDef  DMATxDscrTab[ETH_TX_DESC_CNT]; /* Ethernet Tx DMA Descriptors */
+[#-- BZ 97589 --]
+[#if NetXDuo??]
+[#else]
 __attribute__((at([#if RxBuffAddress??]${RxBuffAddress}[#else]0x30040200[/#if]))) uint8_t Rx_Buff[ETH_RX_DESC_CNT][ETH_MAX_PACKET_SIZE]; /* Ethernet Receive Buffer */
+[/#if]
 
 #elif defined ( __GNUC__ ) /* GNU Compiler */ 
 
 ETH_DMADescTypeDef DMARxDscrTab[ETH_RX_DESC_CNT] __attribute__((section(".RxDecripSection"))); /* Ethernet Rx DMA Descriptors */
 ETH_DMADescTypeDef DMATxDscrTab[ETH_TX_DESC_CNT] __attribute__((section(".TxDecripSection")));   /* Ethernet Tx DMA Descriptors */
+[#-- BZ 97589 --]
+[#if NetXDuo??]
+[#else]
 uint8_t Rx_Buff[ETH_RX_DESC_CNT][ETH_MAX_PACKET_SIZE] __attribute__((section(".RxArraySection"))); /* Ethernet Receive Buffers */
+[/#if]
 
 #endif
 
@@ -513,23 +521,42 @@ int main(void)
   }
 /* USER CODE END Boot_Mode_Sequence_2 */
 [/#if]
-#n
+
 [#list voids as void]
 [#if void.functionName?? && void.functionName?contains("GTZC") && !void.isNotGenerated && void.genCode]
-#t/* ${void.functionName} initialisation */
+#t/* GTZC initialisation */
 #t${void.functionName}();
 [/#if]
 [/#list]
-#n
+
 [#list voids as void]
 [#if void.functionName?? && void.functionName?contains("IPCC") && !void.isNotGenerated && void.genCode]
-    #t/* IPCC initialisation */
+[#if FamilyName=="STM32MP1"]
+#telse
+#t{
+    #t#t/* IPCC initialisation */
+	#t#t MX_IPCC_Init();
+[#if !OPENAMP??]
+#t}
+[/#if]
+[#else] [#--Ticket 99342  --]
+#n
+ #t/* IPCC initialisation */
 	#t MX_IPCC_Init();
+[/#if]
 [/#if]
 [/#list]
 [#if OPENAMP??]
+[#if FamilyName=="STM32MP1"]
+#t#t/* OpenAmp initialisation ---------------------------------*/
+    #t#tMX_OPENAMP_Init(RPMSG_REMOTE, NULL);
+#t}
+
+[#else] [#-- Ticket 99342 --]
+#n
 #t/* OpenAmp initialisation ---------------------------------*/
     #tMX_OPENAMP_Init(RPMSG_REMOTE, NULL);
+[/#if]
 [/#if]
 [#if RESMGR_UTILITY??]
 #t/* Resource Manager Utility initialisation ---------------------------------*/
@@ -1046,7 +1073,7 @@ static void MX_NVIC_Init(void)
             [#assign ipName = instanceData.ipName]
             [#list instanceData.initCallBackInitMethodList as initCallBack]
                 [#if initCallBack?contains("PostInit")]
-                #t${initCallBack}([#if ipName?contains("TIM")&&!(ipName?contains("HRTIM")||ipName?contains("LPTIM"))]&htim[#else]&h${instanceData.realIpName?lower_case}[/#if]${instanceData.instIndex});
+                #t${initCallBack}([#if ipName?contains("TIM")&&!(ipName?contains("HRTIM"))]&htim[#else]&h${instanceData.realIpName?lower_case}[/#if]${instanceData.instIndex});
                 [/#if]
             [/#list]
         [#else][#-- Else if LL is used gpio code should be generated --]

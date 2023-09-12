@@ -47,7 +47,7 @@ extern "C" {
 [#if ((SUBGHZ_APPLICATION != "LORA_USER_APPLICATION") && (SUBGHZ_APPLICATION != "SUBGHZ_USER_APPLICATION") && (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION"))]
 #include "stm32_adv_trace.h"
 [#else]
-#include "sys_app.h"   /* temporay w.a waiting Ticket 92161 resolution */
+#include "sys_app.h"   /* temporary w.a waiting Ticket 92161 resolution */
 [/#if]
 
 /* USER CODE BEGIN Includes */

@@ -112,7 +112,7 @@ See BSP_SD_ErrorCallback() and BSP_SD_AbortCallback() below
 
 [#if use_dma = 1]
 /* 
- * when using cachable memory region, it may be needed to maintain the cache
+ * when using cacheable memory region, it may be needed to maintain the cache
  * validity. Enable the define below to activate a cache maintenance at each
  * read and write operation.
  * Notice: This is applicable only for cortex M7 based platform.
@@ -124,7 +124,7 @@ See BSP_SD_ErrorCallback() and BSP_SD_AbortCallback() below
 
 [#if use_dma = 1]  [#--Added to support v2.1.0 template --]
 /*
-* Some DMA requires 4-Byte aligned address buffer to correctly read/wite data,
+* Some DMA requires 4-Byte aligned address buffer to correctly read/write data,
 * in FatFs some accesses aren't thus we need a 4-byte aligned scratch buffer to correctly
 * transfer data
 */
@@ -188,7 +188,7 @@ const Diskio_drvTypeDef  SD_Driver =
 static int SD_CheckStatusWithTimeout(uint32_t timeout)
 {
   uint32_t timer = osKernelSysTick();
-  /* block until SDIO peripherial is ready again or a timeout occur */
+  /* block until SDIO peripheral is ready again or a timeout occur */
   while( osKernelSysTick() - timer < timeout)
   {
     if (BSP_SD_GetCardState() == SD_TRANSFER_OK)
@@ -369,7 +369,7 @@ DRESULT SD_read(BYTE lun, BYTE *buff, DWORD sector, UINT count)
           res = RES_OK;
 #if (ENABLE_SD_DMA_CACHE_MAINTENANCE == 1) [#-- Code only for Cortex M7!!! --]
           /*
-          * Invalidate the chache before reading into the buffer,  to get actual data
+          * Invalidate the cache before reading into the buffer,  to get actual data
           */
           alignedAddr = (uint32_t)buff & ~0x1F;
           SCB_InvalidateDCache_by_Addr((uint32_t*)alignedAddr, count*BLOCKSIZE + ((uint32_t)buff - alignedAddr));
@@ -449,7 +449,7 @@ DRESULT SD_read(BYTE lun, BYTE *buff, DWORD sector, UINT count)
       while((ReadStatus == 0) && ((HAL_GetTick() - timeout) < SD_TIMEOUT))
       {
       }
-      /* incase of a timeout return error */
+      /* in case of a timeout return error */
       if (ReadStatus == 0)
       {
         res = RES_ERROR;
@@ -579,7 +579,7 @@ DRESULT SD_write(BYTE lun, const BYTE *buff, DWORD sector, UINT count)
 #endif
 #if (ENABLE_SD_DMA_CACHE_MAINTENANCE == 1)   [#-- Code only for Cortex M7!!! --]
     /*
-    * Invalidate the chache before writting into the buffer.
+    * Invalidate the cache before writing into the buffer.
     * This is not needed if the memory region is configured as W/T.
     */
     alignedAddr = (uint32_t)buff & ~0x1F;
@@ -690,7 +690,7 @@ DRESULT SD_write(BYTE lun, const BYTE *buff, DWORD sector, UINT count)
       while((WriteStatus == 0) && ((HAL_GetTick() - timeout) < SD_TIMEOUT))
       {
       }
-      /* incase of a timeout return error */
+      /* in case of a timeout return error */
       if (WriteStatus == 0)
       {
         res = RES_ERROR;

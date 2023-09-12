@@ -737,7 +737,7 @@ void MX_${instName}_Init(void)
     [#assign words = instanceList?word_list]
     [#-- declare Variable GPIO_InitTypeDef once --]
     [#assign v = ""]
-    [#list words as inst] [#-- loop on ip instances datas --] 
+    [#list words as inst] [#-- loop on ip instances data --] 
       [#assign services = getInitServiceMode(inst)]
       [#if services.gpio??]
         [#assign service=services.gpio]

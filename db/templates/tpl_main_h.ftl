@@ -42,8 +42,10 @@ extern "C" {
 #n
 [/#if]
 /* Includes ------------------------------------------------------------------*/
+[#assign includesList = ""]
 [#if isHALUsed??]
 #include "${FamilyName?lower_case}xx_hal.h"
+[#assign includesList = includesList+" "+"${FamilyName?lower_case}xx_hal.h"]
 [/#if]
 [#assign RESMGR_UTILITYUsed = false]
 [#list ips as ip]
@@ -61,16 +63,22 @@ extern "C" {
 #include "resmgr_utility.h"
 [/#if]
 [#list ips as ip]
-[#if ip?contains("STM32_WPAN") && !HALCompliant??]
+[#if ip?contains("STM32_WPAN")]
 #include "app_conf.h"
+#include "app_entry.h"
+#include "app_common.h"
 [/#if]
 [#if ip?contains("KMS")]
 #include "app_kms.h"
 [/#if]
+[#if ip?contains("MotorControl")]
+#include "${ip?lower_case}.h"
+[/#if]
+
 [/#list]
 [#compress]
 [#--include "mxconstants.h"--]
-[#assign includesList = ""]
+
 [#if LLincludes??] [#-- Include LL headers --]
     [#list LLincludes as inc]
         [#if !includesList?contains(inc)]
@@ -279,7 +287,7 @@ void Error_Handler(void);
 [/#if]
 [#if HALCompliant??]
 [#list voids as void]
-  [#if ((void.bspUsed?? && void.bspUsed) && !void.isNotGenerated)||(void.isStatic?? && !void.isStatic && void.functionName!="SystemClock_Config")]
+  [#if (void.isStatic?? && !void.isStatic) && ((void.bspUsed?? && void.bspUsed && !void.isNotGenerated)||(void.functionName!="SystemClock_Config"))]
 [#if !void.ipType?contains("thirdparty")&&!void.ipType?contains("middleware")&&!void.functionName?contains("VREFBUF")&&void.functionName!="Init" && !void.functionName?contains("MotorControl") && !void.functionName?contains("ETZPC") && !void.functionName?contains("TRACER_EMB") && !void.functionName?contains("GUI_INTERFACE")]
 void ${""?right_pad(2)}${void.functionName}(void);
 [/#if]

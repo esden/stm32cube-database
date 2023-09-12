@@ -123,7 +123,15 @@ extern ${variable.value} ${variable.name};
   * @brief Aliases.
   * @{
   */
+[#if family?contains("STM32F4")]
+/* Memory management macros make sure to use static memory allocation */
+/** Alias for memory allocation. */
 
+#define USBD_malloc         (void *)USBD_static_malloc
+
+/** Alias for memory release. */
+#define USBD_free           USBD_static_free
+[#else]
 /* Memory management macros */
 
 /** Alias for memory allocation. */
@@ -131,6 +139,7 @@ extern ${variable.value} ${variable.name};
 
 /** Alias for memory release. */
 #define USBD_free           free
+[/#if]
 
 /** Alias for memory set. */
 #define USBD_memset         memset
@@ -196,6 +205,10 @@ extern ${variable.value} ${variable.name};
   */
 
 /* Exported functions -------------------------------------------------------*/
+[#if family?contains("STM32F4")]
+void *USBD_static_malloc(uint32_t size);
+void USBD_static_free(void *p);
+[/#if]
 
 /**
   * @}

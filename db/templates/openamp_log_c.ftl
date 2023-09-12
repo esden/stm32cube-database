@@ -3,7 +3,7 @@
   ******************************************************************************
   * @file    log.c
   * @author  MCD Application Team
-  * @brief   Ressource table
+  * @brief   Resource table
   *
   *   This file provides services for logging
   *

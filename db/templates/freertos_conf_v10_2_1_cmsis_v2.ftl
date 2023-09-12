@@ -333,9 +333,9 @@
  * See http://www.freertos.org/a00110.html
  *----------------------------------------------------------*/
 
-/* USER CODE BEGIN Includes */   	      
+/* USER CODE BEGIN Includes */
 /* Section where include file can be added */
-/* USER CODE END Includes */ 
+/* USER CODE END Includes */
 
 [#compress]
 [#assign prototypeNeeded = "false"]
@@ -639,9 +639,9 @@ standard names. */
 /* USER CODE END 2 */
 [/#if]
 
-/* USER CODE BEGIN Defines */   	      
+/* USER CODE BEGIN Defines */  
 /* Section where parameter definitions can be added (for instance, to override default ones in FreeRTOS.h) */
-/* USER CODE END Defines */ 
+/* USER CODE END Defines */
 
 [#if configUSE_TICKLESS_IDLE=="1"]
 #if defined(__ICCARM__) || defined(__CC_ARM) || defined(__GNUC__)

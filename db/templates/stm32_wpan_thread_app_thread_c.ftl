@@ -176,11 +176,12 @@ PLACE_IN_SECTION("MB_MEM1") ALIGN(4) static TL_TH_Config_t ThreadConfigBuffer;
 PLACE_IN_SECTION("MB_MEM2") ALIGN(4) static TL_CmdPacket_t ThreadOtCmdBuffer;
 PLACE_IN_SECTION("MB_MEM2") ALIGN(4) static uint8_t ThreadNotifRspEvtBuffer[sizeof(TL_PacketHeader_t) + TL_EVT_HDR_SIZE + 255U];
 PLACE_IN_SECTION("MB_MEM2") ALIGN(4) static TL_CmdPacket_t ThreadCliCmdBuffer;
+extern uint8_t g_ot_notification_allowed;
 
 [#if FREERTOS_STATUS = 1 ]
 static osThreadId_t OsTaskMsgM0ToM4Id;      /* Task managing the M0 to M4 messaging        */
 #if (CFG_FULL_LOW_POWER == 0)
-static osThreadId_t OsTaskCliId;            /* Task used to manage CLI comamnd             */
+static osThreadId_t OsTaskCliId;            /* Task used to manage CLI command             */
 #endif /* (CFG_FULL_LOW_POWER == 0) */
 
 [/#if]
@@ -197,7 +198,7 @@ void APP_THREAD_Init( void )
   /* USER CODE END APP_THREAD_INIT_1 */
 
   SHCI_CmdStatus_t ThreadInitStatus;
-  
+
   /* Check the compatibility with the Coprocessor Wireless Firmware loaded */
   APP_THREAD_CheckWirelessFirmwareInfo();
 
@@ -221,7 +222,7 @@ void APP_THREAD_Init( void )
 
   /* Send Thread start system cmd to M0 */
   ThreadInitStatus = SHCI_C2_THREAD_Init();
-  
+
   /* Prevent unused argument(s) compilation warning */
   UNUSED(ThreadInitStatus);
 
@@ -438,7 +439,7 @@ static void APP_THREAD_TraceError(const char * pMess, uint32_t ErrCode)
 
 /**
  * @brief Check if the Coprocessor Wireless Firmware loaded supports Thread
- *        and display associated informations
+ *        and display associated information
  * @param  None
  * @retval None
  */
@@ -555,14 +556,7 @@ Thread_OT_Cmd_Request_t* THREAD_Get_NotificationPayloadBuffer(void)
   return (Thread_OT_Cmd_Request_t*)(p_thread_notif_M0_to_M4)->evtserial.evt.payload;
 }
 
-/**
- * @brief  This function is used to transfer the Ot commands from the
- *         M4 to the M0.
- *
- * @param   None
- * @return  None
- */
-void Ot_Cmd_Transfer(void)
+static void Ot_Cmd_Transfer_Common(void)
 {
   /* OpenThread OT command cmdcode range 0x280 .. 0x3DF = 352 */
   p_thread_otcmdbuffer->cmdserial.cmd.cmdcode = 0x280U;
@@ -578,6 +572,33 @@ void Ot_Cmd_Transfer(void)
 }
 
 /**
+ * @brief  This function is used to transfer the Ot commands from the
+ *         M4 to the M0.
+ *
+ * @param   None
+ * @return  None
+ */
+void Ot_Cmd_Transfer(void)
+{
+  Ot_Cmd_Transfer_Common();
+}
+
+/**
+ * @brief  This function is used to transfer the Ot commands from the
+ *         M4 to the M0 with Notification M0 to M4 allowed.
+ *
+ * @param   None
+ * @return  None
+ */
+void Ot_Cmd_TransferWithNotif(void)
+{
+  /* Flag to specify to UTIL_SEQ_EvtIdle that M0 to M4 notifications are allowed */
+  g_ot_notification_allowed = 1U;
+
+  Ot_Cmd_Transfer_Common();
+}
+
+/**
  * @brief  This function is called when acknowledge from OT command is received from the M0+.
  *
  * @param   Otbuffer : a pointer to TL_EvtPacket_t
@@ -589,6 +610,9 @@ void TL_OT_CmdEvtReceived( TL_EvtPacket_t * Otbuffer )
   UNUSED(Otbuffer);
 
   Receive_Ack_From_M0();
+
+  /* Does not allow OpenThread M0 to M4 notification */
+  g_ot_notification_allowed = 0U;
 }
 
 /**
@@ -898,7 +922,7 @@ void VCP_DataReceived(uint8_t* Buf , uint32_t *Len)
   uint32_t char_remaining = 0;
   static uint32_t len_total = 0;
 
-  /* Copy the characteres in the temporary buffer */
+  /* Copy the characters in the temporary buffer */
   for (i = 0; i < *Len; i++)
   {
     TmpString[len_total++] = Buf[i];

@@ -235,6 +235,42 @@
 
 	</RefParameter>
 	
+    
+    <!-- These both parameters have been added to generate an error if the DAC OUT1 or OUT2 is not connected to a on-chip analog IP BZ35379-->
+    <RefParameter Name="DAC_ConnectedPeripherals_OUT1" Comment="On chip peripheral(s)" DefaultValue="YES" Type="list" Visible="true">
+        <Condition Expression="COMP1_DACChannel1|COMP2_DACChannel1|ADC2_DAC1_OUT1|OPAMP1_Dac" Diagnostic=""/>
+        <PossibleValue Value="YES" Comment="connected"/>
+        <Description>
+            DAC OUT1 is connected to one (or more) on chip analog peripheral(s) (ADCs, COMPs and/or OPAMPs)&lt;br/&gt;
+            The internal link is fully configured
+        </Description>
+    </RefParameter>
+    <RefParameter Name="DAC_ConnectedPeripherals_OUT1" Comment="On chip peripheral(s)" DefaultValue="NO" Type="list">
+        <PossibleValue Value="NO" Comment="not yet connected"/>
+        <Description>
+            DAC OUT1 is selected to be connected to on chip analog peripherals such as ADCs, COMPs and/or OPAMPs (if these IPs are present on the current MCU)&lt;br/&gt;
+            This internal link is "potentially" configured here&lt;br/&gt;
+            To make it effective (DAC_OUT1 used as an Input Signal in COMP, ADC and/or OPAMP peripherals), it has to be configured in the connected peripheral itself
+        </Description>
+    </RefParameter>
+
+    <RefParameter Name="DAC_ConnectedPeripherals_OUT2" Comment="On chip peripheral(s)" DefaultValue="YES" Type="list" Visible="true">
+        <Condition Expression="COMP1_DACChannel2|COMP2_DACChannel2|ADC2_DAC1_OUT2|OPAMP2_Dac" Diagnostic=""/>
+        <PossibleValue Value="YES" Comment="connected"/>
+        <Description>
+            DAC OUT2 is connected to one (or more) on chip analog peripheral(s) (ADCs, COMPs and/or OPAMPs)&lt;br/&gt;
+            The internal link is fully configured
+        </Description>
+    </RefParameter>
+    <RefParameter Name="DAC_ConnectedPeripherals_OUT2" Comment="On chip peripheral(s)" DefaultValue="NO" Type="list">
+        <PossibleValue Value="NO" Comment="not yet connected"/>
+        <Description>
+            DAC OUT2 is selected to be connected to on chip analog peripherals such as ADCs, COMPs and/or OPAMPs (if these IPs are present on the current MCU)&lt;br/&gt;
+            This internal link is "potentially" configured here&lt;br/&gt;
+            To make it effective (DAC_OUT2 used as an Input Signal in COMP, ADC and/or OPAMP peripherals), it has to be configured in the connected peripheral itself
+        </Description>
+    </RefParameter>
+    
                 
     <RefMode Name="DAC_OUT1_ExtAndInt" Comment="DAC Out1 Mode" Group="DAC Out1 Settings" >
         <Condition Expression="$IpInstance_OUT1_ExtAndInt" Diagnostic=""/>
@@ -259,6 +295,7 @@
                 <Parameter Name="DAC_SampleTime"/>
                 <Parameter Name="DAC_HoldTime"/>
                 <Parameter Name="DAC_RefreshTime"/>
+                <Parameter Name="DAC_ConnectedPeripherals_OUT1"/>
     </RefMode>	
     <RefMode Name="DAC_OUT1_Int" Comment="DAC Out1 Mode" Group="DAC Out1 Settings" >
         <Condition Expression="$IpInstance_OUT1_Int" Diagnostic=""/>
@@ -283,6 +320,7 @@
                 <Parameter Name="DAC_SampleTime"/>
                 <Parameter Name="DAC_HoldTime"/>
                 <Parameter Name="DAC_RefreshTime"/>
+                <Parameter Name="DAC_ConnectedPeripherals_OUT1"/>
     </RefMode>	
 	<RefMode Name="DAC_OUT1" Comment="DAC Out1 Mode" Group="DAC Out1 Settings" >
     	<!--Condition Expression="$IpInstance_OUT1_Ext" Diagnostic=""/-->
@@ -345,6 +383,7 @@
         <Parameter Name="DAC_SampleTime"/>
         <Parameter Name="DAC_HoldTime"/>
         <Parameter Name="DAC_RefreshTime"/>
+        <Parameter Name="DAC_ConnectedPeripherals_OUT2"/>
     </RefMode>
     <RefMode Name="DAC_OUT2_Int" Comment="DAC Out2 Mode" Group="DAC Out2 Settings">
         <Condition Expression="$IpInstance_OUT2_Int" Diagnostic=""/>
@@ -369,6 +408,7 @@
         <Parameter Name="DAC_SampleTime"/>
         <Parameter Name="DAC_HoldTime"/>
         <Parameter Name="DAC_RefreshTime"/>
+        <Parameter Name="DAC_ConnectedPeripherals_OUT2"/>
     </RefMode>
     <RefMode Name="DAC_OUT2" Comment="DAC Out2 Mode" Group="DAC Out2 Settings">
         <!--Condition Expression="$IpInstance_OUT2_Ext" Diagnostic=""/-->
@@ -400,23 +440,23 @@
            
     </RefMode>
     <ModeLogicOperator Name="OR">
-        <Mode Name="DAC_OUT1" UserName="OUT1 mode">
+        <Mode Name="DAC_OUT1" UserName="OUT1 connected to">
             <ModeLogicOperator Name="XOR">
-                <Mode Name="DAC_OUT1" UserName="Connected to external pin only">
+                <Mode Name="DAC_OUT1" UserName="only to external pin">
                     <SignalLogicalOp Name="AND">
                         <Signal Name="OUT1"/>
                     </SignalLogicalOp>
                     <Semaphore>$IpInstance_OUT1_Ext</Semaphore>
                     <Semaphore>$IpInstance_OUT1_Conf</Semaphore>
                 </Mode>
-                <Mode Name="DAC_OUT1_Int" UserName="Connected to on chip-peripherals only">
+                <Mode Name="DAC_OUT1_Int" UserName="only to on chip analog peripherals">
                     <SignalLogicalOp Name="AND">
                         <Signal Name="VS_DACI1"/>
                     </SignalLogicalOp>
                     <Semaphore>$IpInstance_OUT1_Int</Semaphore>
                     <Semaphore>$IpInstance_OUT1_Conf</Semaphore>
                 </Mode>
-                <Mode Name="DAC_OUT1_ExtAndInt" UserName="Connected to external pin and to on chip-peripherals">
+                <Mode Name="DAC_OUT1_ExtAndInt" UserName="both to external pin and to on chip analog peripherals">
                     <SignalLogicalOp Name="AND">
                         <Signal Name="OUT1"/>
                     </SignalLogicalOp>
@@ -427,23 +467,23 @@
             </ModeLogicOperator>
             <Semaphore>$IpInstance_Channel1_Used</Semaphore>
         </Mode>
-        <Mode Name="DAC_OUT2" UserName="OUT2 mode" RemoveCondition="DIE462">
+        <Mode Name="DAC_OUT2" UserName="OUT2 connected to" RemoveCondition="DIE462">
             <ModeLogicOperator Name="XOR">
-                <Mode Name="DAC_OUT2"  UserName="Connected to external pin only">
+                <Mode Name="DAC_OUT2"  UserName="only to external pin">
                     <SignalLogicalOp Name="AND">
                         <Signal Name="OUT2"/>
                     </SignalLogicalOp>
                     <Semaphore>$IpInstance_OUT2_Ext</Semaphore>
                     <Semaphore>$IpInstance_OUT2_Conf</Semaphore>
                 </Mode>
-                <Mode Name="DAC_OUT2_Int" UserName="Connected to on chip-peripherals only">
+                <Mode Name="DAC_OUT2_Int" UserName="only to on chip analog peripherals">
                     <SignalLogicalOp Name="AND">
                         <Signal Name="VS_DACI2"/>
                     </SignalLogicalOp>
                     <Semaphore>$IpInstance_OUT2_Int</Semaphore>
                     <Semaphore>$IpInstance_OUT2_Conf</Semaphore>
                 </Mode>
-                <Mode Name="DAC_OUT2_ExtAndInt" UserName="Connected to external pin and to on chip-peripherals">
+                <Mode Name="DAC_OUT2_ExtAndInt" UserName="both to external pin and to on chip analog peripherals">
                     <SignalLogicalOp Name="AND">
                         <Signal Name="OUT2"/>
                     </SignalLogicalOp>

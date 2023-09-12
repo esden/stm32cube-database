@@ -185,11 +185,11 @@ int32_t BSP_SPI1_Recv(uint8_t *pRxData, uint32_t Length)
   * @param  Length data length
   * @retval BSP status
   */
-int32_t BSP_SPI1_SendRecv(uint8_t *pTxData, uint8_t *pRxData, uint32_t Legnth)
+int32_t BSP_SPI1_SendRecv(uint8_t *pTxData, uint8_t *pRxData, uint32_t Length)
 {
   int32_t ret = BSP_ERROR_NONE;
 
-  if(HAL_SPI_TransmitReceive(&hSpiHandle, pTxData, pRxData, (uint16_t)Legnth, NUCLEO_SPI_TIMEOUT_MAX) != HAL_OK)
+  if(HAL_SPI_TransmitReceive(&hSpiHandle, pTxData, pRxData, (uint16_t)Length, NUCLEO_SPI_TIMEOUT_MAX) != HAL_OK)
   {
     ret = BSP_ERROR_BUS_FAILURE;
   }

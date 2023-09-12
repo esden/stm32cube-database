@@ -54,6 +54,43 @@
 [#assign ADV_FILTER = 0]
 [#assign CFG_GAP_DEVICE_NAME = ""]
 [#assign CFG_GAP_DEVICE_NAME_LENGTH = 0]
+[#assign APPLI_PRINT_FILE_FUNC_LINE = 0]
+[#assign CFG_BLE_IRK_HEX = "0"]
+[#assign CFG_BLE_ERK_HEX = "0"]
+[#assign CFG_USE_SMPS = 0]
+[#assign OFFSET_PAYLOAD_LENGTH = 9]
+[#assign OFFSET_PAYLOAD_DATA = 10]
+[#assign CFG_BLE_NUM_LINK = 2]
+[#assign CFG_BLE_NUM_GATT_SERVICES = 8]
+[#assign CFG_BLE_NUM_GATT_ATTRIBUTES = 68]
+[#assign CFG_BLE_MAX_ATT_MTU = 156]
+[#assign CFG_BLE_ATT_VALUE_ARRAY_SIZE = 1344]
+[#assign CFG_BLE_DATA_LENGTH_EXTENSION = 1]
+[#assign CFG_BLE_SLAVE_SCA = 500]
+[#assign CFG_BLE_MASTER_SCA = 0]
+[#assign CFG_BLE_LSE_SOURCE = 0]
+[#assign CFG_BLE_HSE_STARTUP_TIME = "0x0148"]
+[#assign CFG_BLE_MAX_CONN_EVENT_LENGTH = "0xFFFFFFFF"]
+[#assign CFG_BLE_VITERBI_MODE = 1]
+[#assign CFG_BLE_OPTIONS_LL = "SHCI_C2_BLE_INIT_OPTIONS_LL_HOST"]
+[#assign CFG_BLE_OPTIONS_SVC = "SHCI_C2_BLE_INIT_OPTIONS_WITH_SVC_CHANGE_DESC"]
+[#assign CFG_BLE_OPTIONS_DEVICE_NAME = "SHCI_C2_BLE_INIT_OPTIONS_DEVICE_NAME_RW"]
+[#assign CFG_BLE_OPTIONS_POWER_CLASS = "SHCI_C2_BLE_INIT_OPTIONS_POWER_CLASS_2_3"]
+[#assign CFG_BLE_MAX_COC_INITIATOR_NBR = 32]
+[#assign CFG_BLE_MIN_TX_POWER = 0]
+[#assign CFG_BLE_MAX_TX_POWER = 0]
+[#assign CFG_TLBLE_EVT_QUEUE_LENGTH = 5]
+[#assign CFG_TLBLE_MOST_EVENT_PAYLOAD_SIZE = 255]
+[#assign DBG_TRACE_USE_CIRCULAR_QUEUE = 1]
+[#assign DBG_TRACE_MSG_QUEUE_SIZE = 4096]
+[#assign MAX_DBG_TRACE_MSG_SIZE = 1024]
+[#assign CFG_RTCCLK_DIVIDER_CONF = 0]
+[#assign CFG_RTCCLK_DIV = 16]
+[#assign CFG_RTC_WUCKSEL_DIVIDER = 0]
+[#assign CFG_RTC_ASYNCH_PRESCALER = "0x0F"]
+[#assign CFG_RTC_SYNCH_PRESCALER = "0x7FFF"]
+[#assign CFG_LPM_STANDBY_SUPPORTED = 0]
+[#assign DIE = DIE]
 [#--
 [#list SWIPdatas as SWIP]
     [#if SWIP.defines??]
@@ -214,6 +251,114 @@
             [#if (definition.name == "CFG_GAP_DEVICE_NAME_LENGTH")]
                 [#assign CFG_GAP_DEVICE_NAME_LENGTH = definition.value]
             [/#if]
+            [#if (definition.name == "APPLI_PRINT_FILE_FUNC_LINE")]
+                [#assign APPLI_PRINT_FILE_FUNC_LINE = definition.value]
+            [/#if]
+            [#if (definition.name == "CFG_BLE_IRK_HEX")]
+                [#assign CFG_BLE_IRK_HEX = definition.value]
+            [/#if]
+            [#if (definition.name == "CFG_BLE_ERK_HEX")]
+                [#assign CFG_BLE_ERK_HEX = definition.value]
+            [/#if]
+            [#if (definition.name == "CFG_USE_SMPS")]
+                [#assign CFG_USE_SMPS = definition.value]
+            [/#if]
+            [#if (definition.name == "OFFSET_PAYLOAD_LENGTH")]
+                [#assign OFFSET_PAYLOAD_LENGTH = definition.value]
+            [/#if]
+            [#if (definition.name == "OFFSET_PAYLOAD_DATA")]
+                [#assign OFFSET_PAYLOAD_DATA = definition.value]
+            [/#if]
+            [#if (definition.name == "CFG_BLE_NUM_LINK")]
+                [#assign CFG_BLE_NUM_LINK = definition.value]
+            [/#if]
+            [#if (definition.name == "CFG_BLE_NUM_GATT_SERVICES")]
+                [#assign CFG_BLE_NUM_GATT_SERVICES = definition.value]
+            [/#if]
+            [#if (definition.name == "CFG_BLE_NUM_GATT_ATTRIBUTES")]
+                [#assign CFG_BLE_NUM_GATT_ATTRIBUTES = definition.value]
+            [/#if]
+            [#if (definition.name == "CFG_BLE_MAX_ATT_MTU")]
+                [#assign CFG_BLE_MAX_ATT_MTU = definition.value]
+            [/#if]
+            [#if (definition.name == "CFG_BLE_ATT_VALUE_ARRAY_SIZE")]
+                [#assign CFG_BLE_ATT_VALUE_ARRAY_SIZE = definition.value]
+            [/#if]
+            [#if (definition.name == "CFG_BLE_DATA_LENGTH_EXTENSION")]
+                [#assign CFG_BLE_DATA_LENGTH_EXTENSION = definition.value]
+            [/#if]
+            [#if (definition.name == "CFG_BLE_SLAVE_SCA")]
+                [#assign CFG_BLE_SLAVE_SCA = definition.value]
+            [/#if]
+            [#if (definition.name == "CFG_BLE_MASTER_SCA")]
+                [#assign CFG_BLE_MASTER_SCA = definition.value]
+            [/#if]
+            [#if (definition.name == "CFG_BLE_LSE_SOURCE")]
+                [#assign CFG_BLE_LSE_SOURCE = definition.value]
+            [/#if]
+            [#if (definition.name == "CFG_BLE_HSE_STARTUP_TIME")]
+                [#assign CFG_BLE_HSE_STARTUP_TIME = definition.value]
+            [/#if]
+            [#if (definition.name == "CFG_BLE_MAX_CONN_EVENT_LENGTH")]
+                [#assign CFG_BLE_MAX_CONN_EVENT_LENGTH = definition.value]
+            [/#if]
+            [#if (definition.name == "CFG_BLE_VITERBI_MODE")]
+                [#assign CFG_BLE_VITERBI_MODE = definition.value]
+            [/#if]
+            [#if (definition.name == "CFG_BLE_OPTIONS_LL")]
+                [#assign CFG_BLE_OPTIONS_LL = definition.value]
+            [/#if]
+            [#if (definition.name == "CFG_BLE_OPTIONS_SVC")]
+                [#assign CFG_BLE_OPTIONS_SVC = definition.value]
+            [/#if]
+            [#if (definition.name == "CFG_BLE_OPTIONS_DEVICE_NAME")]
+                [#assign CFG_BLE_OPTIONS_DEVICE_NAME = definition.value]
+            [/#if]
+            [#if (definition.name == "CFG_BLE_OPTIONS_POWER_CLASS")]
+                [#assign CFG_BLE_OPTIONS_POWER_CLASS = definition.value]
+            [/#if]
+            [#if (definition.name == "CFG_BLE_MAX_COC_INITIATOR_NBR")]
+                [#assign CFG_BLE_MAX_COC_INITIATOR_NBR = definition.value]
+            [/#if]
+            [#if (definition.name == "CFG_BLE_MIN_TX_POWER")]
+                [#assign CFG_BLE_MIN_TX_POWER = definition.value]
+            [/#if]
+            [#if (definition.name == "CFG_BLE_MAX_TX_POWER")]
+                [#assign CFG_BLE_MAX_TX_POWER = definition.value]
+            [/#if]
+            [#if (definition.name == "CFG_TLBLE_EVT_QUEUE_LENGTH")]
+                [#assign CFG_TLBLE_EVT_QUEUE_LENGTH = definition.value]
+            [/#if]
+            [#if (definition.name == "CFG_TLBLE_MOST_EVENT_PAYLOAD_SIZE")]
+                [#assign CFG_TLBLE_MOST_EVENT_PAYLOAD_SIZE = definition.value]
+            [/#if]
+            [#if (definition.name == "DBG_TRACE_USE_CIRCULAR_QUEUE")]
+                [#assign DBG_TRACE_USE_CIRCULAR_QUEUE = definition.value]
+            [/#if]
+            [#if (definition.name == "DBG_TRACE_MSG_QUEUE_SIZE")]
+                [#assign DBG_TRACE_MSG_QUEUE_SIZE = definition.value]
+            [/#if]
+            [#if (definition.name == "MAX_DBG_TRACE_MSG_SIZE")]
+                [#assign MAX_DBG_TRACE_MSG_SIZE = definition.value]
+            [/#if]
+            [#if (definition.name == "CFG_RTCCLK_DIVIDER_CONF")]
+                [#assign CFG_RTCCLK_DIVIDER_CONF = definition.value]
+            [/#if]
+            [#if (definition.name == "CFG_RTCCLK_DIV")]
+                [#assign CFG_RTCCLK_DIV = definition.value]
+            [/#if]
+            [#if (definition.name == "CFG_RTC_WUCKSEL_DIVIDER")]
+                [#assign CFG_RTC_WUCKSEL_DIVIDER = definition.value]
+            [/#if]
+            [#if (definition.name == "CFG_RTC_ASYNCH_PRESCALER")]
+                [#assign CFG_RTC_ASYNCH_PRESCALER = definition.value]
+            [/#if]
+            [#if (definition.name == "CFG_RTC_SYNCH_PRESCALER")]
+                [#assign CFG_RTC_SYNCH_PRESCALER = definition.value]
+            [/#if]
+            [#if (definition.name == "CFG_LPM_STANDBY_SUPPORTED")]
+                [#assign CFG_LPM_STANDBY_SUPPORTED = definition.value]
+            [/#if]
 		[/#list]
 	[/#if]
 [/#list]
@@ -349,17 +494,24 @@
 /**
 *   Identity root key used to derive LTK and CSRK
 */
-#define CFG_BLE_IRK     {0x12,0x34,0x56,0x78,0x9a,0xbc,0xde,0xf0,0x12,0x34,0x56,0x78,0x9a,0xbc,0xde,0xf0}
+#define CFG_BLE_IRK     {${CFG_BLE_IRK_HEX}}
 
 /**
 * Encryption root key used to derive LTK and CSRK
 */
-#define CFG_BLE_ERK     {0xfe,0xdc,0xba,0x09,0x87,0x65,0x43,0x21,0xfe,0xdc,0xba,0x09,0x87,0x65,0x43,0x21}
+#define CFG_BLE_ERK     {${CFG_BLE_ERK_HEX}}
+
+[/#if]
+/**
+ * SMPS supply
+ * SMPS not used when Set to 0
+ * SMPS used when Set to 1
+ */
+#define CFG_USE_SMPS    ${CFG_USE_SMPS}
 
 /* USER CODE BEGIN Generic_Parameters */
 
 /* USER CODE END Generic_Parameters */
-[/#if]
 
 /**< specific parameters */
 /*****************************************************/
@@ -379,12 +531,6 @@
 #define CONN_L2   (CONN_L(10))
 #define OOB_DEMO                                1   /* Out Of Box Demo */  
 [/#if]
-[#if (CUSTOM_P2P_SERVER = 1) || ( BLE_TRANSPARENT_MODE_UART = 1)]
-#define PUSH_BUTTON_SW1_EXTI_IRQHandler                         EXTI4_IRQHandler
-[/#if]
-[#if (CUSTOM_P2P_SERVER = 1)]
-#define PUSH_BUTTON_SW2_EXTI_IRQHandler                         EXTI0_IRQHandler
-[/#if]
 
 [#if (BT_SIG_BEACON != "0")]
 /**
@@ -399,8 +545,8 @@
 #define CFG_BEACON_TYPE                 (${BT_SIG_BEACON})
 
 #define OTA_BEACON_DATA_ADDRESS         FLASH_BASE + 0x6000
-#define OFFSET_PAYLOAD_LENGTH           9
-#define OFFSET_PAYLOAD_DATA             10
+#define OFFSET_PAYLOAD_LENGTH           ${OFFSET_PAYLOAD_LENGTH}
+#define OFFSET_PAYLOAD_DATA             ${OFFSET_PAYLOAD_DATA}
 [/#if]
 [#if (BT_SIG_HEART_RATE_SENSOR = 1)]
 /**
@@ -530,6 +676,8 @@
 #define L2CAP_SLAVE_LATENCY             0x0000
 #define L2CAP_TIMEOUT_MULTIPLIER        0x1F4
 
+[/#if]
+[#if (BLE = 1)]
 /* USER CODE BEGIN Specific_Parameters */
 
 /* USER CODE END Specific_Parameters */
@@ -609,18 +757,15 @@
  * Maximum number of simultaneous connections that the device will support.
  * Valid values are from 1 to 8
  */
-[#if (BT_SIG_BEACON != "0") || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1)|| (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)|| (BT_SIG_HEART_RATE_SENSOR = 1)|| (CUSTOM_OTA = 1)|| (CUSTOM_P2P_SERVER = 1)|| (CUSTOM_P2P_CLIENT = 1)|| ( BLE_TRANSPARENT_MODE_UART = 1 )|| ( BLE_TRANSPARENT_MODE_VCP = 1)|| (CUSTOM_TEMPLATE = 1)]
-#define CFG_BLE_NUM_LINK            2
-[/#if]
-[#if (CUSTOM_P2P_ROUTER = 1)]
-#define CFG_BLE_NUM_LINK            8
+[#if (BT_SIG_BEACON != "0") || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1)|| (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)|| (BT_SIG_HEART_RATE_SENSOR = 1)|| (CUSTOM_OTA = 1)|| (CUSTOM_P2P_SERVER = 1)|| (CUSTOM_P2P_CLIENT = 1)|| (CUSTOM_P2P_ROUTER = 1)|| ( BLE_TRANSPARENT_MODE_UART = 1 )|| ( BLE_TRANSPARENT_MODE_VCP = 1)|| (CUSTOM_TEMPLATE = 1)]
+#define CFG_BLE_NUM_LINK            ${CFG_BLE_NUM_LINK}
 [/#if]
 
 /**
  * Maximum number of Services that can be stored in the GATT database.
  * Note that the GAP and GATT services are automatically added so this parameter should be 2 plus the number of user services
  */
-#define CFG_BLE_NUM_GATT_SERVICES   8
+#define CFG_BLE_NUM_GATT_SERVICES   ${CFG_BLE_NUM_GATT_SERVICES}
 
 /**
  * Maximum number of Attributes
@@ -629,12 +774,13 @@
  * Note that certain characteristics and relative descriptors are added automatically during device initialization
  * so this parameters should be 9 plus the number of user Attributes
  */
-#define CFG_BLE_NUM_GATT_ATTRIBUTES 68
+#define CFG_BLE_NUM_GATT_ATTRIBUTES ${CFG_BLE_NUM_GATT_ATTRIBUTES}
 
 /**
  * Maximum supported ATT_MTU size
+ * This parameter is ignored by the CPU2 when CFG_BLE_OPTIONS is set to 1"
  */
-#define CFG_BLE_MAX_ATT_MTU             (156)
+#define CFG_BLE_MAX_ATT_MTU             (${CFG_BLE_MAX_ATT_MTU})
 
 /**
  * Size of the storage area for Attribute values
@@ -645,17 +791,20 @@
  *  - 2*DTM_NUM_LINK, if client configuration descriptor is used
  *  - 2, if extended properties is used
  *  The total amount of memory needed is the sum of the above quantities for each attribute.
+ * This parameter is ignored by the CPU2 when CFG_BLE_OPTIONS is set to 1"
  */
-#define CFG_BLE_ATT_VALUE_ARRAY_SIZE    (1344)
+#define CFG_BLE_ATT_VALUE_ARRAY_SIZE    (${CFG_BLE_ATT_VALUE_ARRAY_SIZE})
 
 [#if (BT_SIG_BEACON != "0") || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1)|| (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)|| (BT_SIG_HEART_RATE_SENSOR = 1)|| (CUSTOM_OTA = 1)|| (CUSTOM_P2P_SERVER = 1)|| (CUSTOM_P2P_CLIENT = 1)|| (CUSTOM_P2P_ROUTER = 1)|| ( BLE_TRANSPARENT_MODE_UART = 1 )|| ( BLE_TRANSPARENT_MODE_VCP = 1)|| (CUSTOM_TEMPLATE = 1)]
 /**
  * Prepare Write List size in terms of number of packet
+ * This parameter is ignored by the CPU2 when CFG_BLE_OPTIONS is set to 1"
  */
 #define CFG_BLE_PREPARE_WRITE_LIST_SIZE         BLE_PREP_WRITE_X_ATT(CFG_BLE_MAX_ATT_MTU)
 
 /**
  * Number of allocated memory blocks
+ * This parameter is overwritten by the CPU2 with an hardcoded optimal value when the parameter when CFG_BLE_OPTIONS is set to 1
  */
 #define CFG_BLE_MBLOCK_COUNT            (BLE_MBLOCKS_CALC(CFG_BLE_PREPARE_WRITE_LIST_SIZE, CFG_BLE_MAX_ATT_MTU, CFG_BLE_NUM_LINK))
 [/#if]
@@ -663,12 +812,12 @@
 /**
  * Enable or disable the Extended Packet length feature. Valid values are 0 or 1.
  */
-#define CFG_BLE_DATA_LENGTH_EXTENSION   1
+#define CFG_BLE_DATA_LENGTH_EXTENSION   ${CFG_BLE_DATA_LENGTH_EXTENSION}
 
 /**
  * Sleep clock accuracy in Slave mode (ppm value)
  */
-#define CFG_BLE_SLAVE_SCA   500
+#define CFG_BLE_SLAVE_SCA   ${CFG_BLE_SLAVE_SCA}
 
 /**
  * Sleep clock accuracy in Master mode
@@ -681,38 +830,61 @@
  * 6 : 21 ppm to 30 ppm
  * 7 : 0 ppm to 20 ppm
  */
-#define CFG_BLE_MASTER_SCA   0
+#define CFG_BLE_MASTER_SCA   ${CFG_BLE_MASTER_SCA}
 
 /**
  *  Source for the low speed clock for RF wake-up
  *  1 : external high speed crystal HSE/32/32
  *  0 : external low speed crystal ( no calibration )
  */
-#define CFG_BLE_LSE_SOURCE  0
+#define CFG_BLE_LSE_SOURCE  ${CFG_BLE_LSE_SOURCE}
 
 /**
  * Start up time of the high speed (16 or 32 MHz) crystal oscillator in units of 625/256 us (~2.44 us)
  */
-#define CFG_BLE_HSE_STARTUP_TIME  0x148
+#define CFG_BLE_HSE_STARTUP_TIME  ${CFG_BLE_HSE_STARTUP_TIME}
 
 /**
  * Maximum duration of the connection event when the device is in Slave mode in units of 625/256 us (~2.44 us)
  */
-#define CFG_BLE_MAX_CONN_EVENT_LENGTH  ( 0xFFFFFFFF )
+#define CFG_BLE_MAX_CONN_EVENT_LENGTH  (${CFG_BLE_MAX_CONN_EVENT_LENGTH})
 
 /**
  * Viterbi Mode
  * 1 : enabled
  * 0 : disabled
  */
-#define CFG_BLE_VITERBI_MODE  1
+#define CFG_BLE_VITERBI_MODE  ${CFG_BLE_VITERBI_MODE}
 
 /**
- *  LL Only Mode
- *  1 : LL Only
- *  0 : LL + Host
+ * BLE stack Options flags to be configured with:
+ * - SHCI_C2_BLE_INIT_OPTIONS_LL_ONLY
+ * - SHCI_C2_BLE_INIT_OPTIONS_LL_HOST
+ * - SHCI_C2_BLE_INIT_OPTIONS_NO_SVC_CHANGE_DESC
+ * - SHCI_C2_BLE_INIT_OPTIONS_WITH_SVC_CHANGE_DESC
+ * - SHCI_C2_BLE_INIT_OPTIONS_DEVICE_NAME_RO
+ * - SHCI_C2_BLE_INIT_OPTIONS_DEVICE_NAME_RW
+ * - SHCI_C2_BLE_INIT_OPTIONS_POWER_CLASS_1
+ * - SHCI_C2_BLE_INIT_OPTIONS_POWER_CLASS_2_3
+ * which are used to set following configuration bits:
+ * (bit 0): 1: LL only
+ *          0: LL + host
+ * (bit 1): 1: no service change desc.
+ *          0: with service change desc.
+ * (bit 2): 1: device name Read-Only
+ *          0: device name R/W
+ * (bit 7): 1: LE Power Class 1
+ *          0: LE Power Class 2-3
+ * other bits: reserved (shall be set to 0)
  */
-#define CFG_BLE_LL_ONLY  0
+#define CFG_BLE_OPTIONS  (${CFG_BLE_OPTIONS_LL} | ${CFG_BLE_OPTIONS_SVC} | ${CFG_BLE_OPTIONS_DEVICE_NAME} | ${CFG_BLE_OPTIONS_POWER_CLASS})
+
+#define CFG_BLE_MAX_COC_INITIATOR_NBR   (${CFG_BLE_MAX_COC_INITIATOR_NBR})
+
+#define CFG_BLE_MIN_TX_POWER            (${CFG_BLE_MIN_TX_POWER})
+
+#define CFG_BLE_MAX_TX_POWER            (${CFG_BLE_MAX_TX_POWER})
+
 [/#if]
 [/#if]
 /******************************************************************************
@@ -732,7 +904,7 @@
  * to the application a HCI command did not receive its command event within 30s (Default HCI Timeout).
  */
 [#if (BLE = 1)]
-#define CFG_TLBLE_EVT_QUEUE_LENGTH 5
+#define CFG_TLBLE_EVT_QUEUE_LENGTH ${CFG_TLBLE_EVT_QUEUE_LENGTH}
 [#else]
 #define CFG_TL_EVT_QUEUE_LENGTH 5
 [/#if]
@@ -742,10 +914,9 @@
  * It should not exceed 255 which is the maximum HCI packet payload size (a greater value is a lost of memory as it will
  * never be used)
  * With the current wireless firmware implementation, this parameter shall be kept to 255
- *
  */
 [#if (BLE = 1)]
-#define CFG_TLBLE_MOST_EVENT_PAYLOAD_SIZE 255   /**< Set to 255 with the memory manager and the mailbox */
+#define CFG_TLBLE_MOST_EVENT_PAYLOAD_SIZE ${CFG_TLBLE_MOST_EVENT_PAYLOAD_SIZE}   /**< Set to 255 with the memory manager and the mailbox */
 
 #define TL_BLE_EVENT_FRAME_SIZE ( TL_EVT_HDR_SIZE + CFG_TLBLE_MOST_EVENT_PAYLOAD_SIZE )
 [#else]
@@ -786,6 +957,18 @@
         [/#list]
     [/#if]
 [/#list]
+
+/******************************************************************************
+ * IPCC interface
+ ******************************************************************************/
+
+/**
+ * The IPCC is dedicated to the communication between the CPU2 and the CPU1
+ * and shall not be modified by the application
+ * The two following definitions shall not be modified
+ */
+#define HAL_IPCC_TX_IRQHandler(...)  HW_IPCC_Tx_Handler( )
+#define HAL_IPCC_RX_IRQHandler(...)  HW_IPCC_Rx_Handler( )
 
  [#if THREAD = 1 || ZIGBEE = 1]
 /******************************************************************************
@@ -835,7 +1018,17 @@
     [/#if]
 [/#list]
 [/#if]
+[#if DIE == "DIE494"]
+ /**
+ * This shall be set to 1 when standby is supported while the wireless stack on CPU2 is running
+ * (i.e the CPU2 is allowed to enter standby between RF activity)
+ * Otherwise, it should be set to 0 for marginal code and test execution saving
+ * In this case the lowest power mode available will be Stop 1
+ * Note that keeping that setting to 1 when standby is not supported does not hurt
+ */
+#define CFG_LPM_STANDBY_SUPPORTED    ${CFG_LPM_STANDBY_SUPPORTED}
 
+[/#if]
 /******************************************************************************
  * Timer Server
  ******************************************************************************/
@@ -844,7 +1037,7 @@
  *  The lower is the value, the better is the power consumption and the accuracy of the timerserver
  *  The higher is the value, the finest is the granularity
  *
- *  CFG_RTC_ASYNCH_PRESCALER: This sets the asynchronous prescaler of the RTC. It should as high as possible ( to ouput
+ *  CFG_RTC_ASYNCH_PRESCALER: This sets the asynchronous prescaler of the RTC. It should as high as possible ( to output
  *  clock as low as possible) but the output clock should be equal or higher frequency compare to the clock feeding
  *  the wakeup timer. A lower clock speed would impact the accuracy of the timer server.
  *
@@ -859,15 +1052,8 @@
  *
  *  The following settings are computed with LSI as input to the RTC
  */
-[#list SWIPdatas as SWIP]
-    [#if SWIP.defines??]
-        [#list SWIP.defines as definition]
-            [#if definition.name="CFG_RTCCLK_DIVIDER_CONF"]
-                [#lt]#define ${definition.name} ${definition.value}
-            [/#if]
-        [/#list]
-    [/#if]
-[/#list]
+
+#define CFG_RTCCLK_DIVIDER_CONF ${CFG_RTCCLK_DIVIDER_CONF}
 
 #if (CFG_RTCCLK_DIVIDER_CONF == 0)
 /**
@@ -875,10 +1061,26 @@
  * It does not support 1Hz calendar
  * It divides the RTC CLK by 16
  */
-#define CFG_RTCCLK_DIV  (16)
+
+[#if (CFG_RTCCLK_DIVIDER_CONF != "0")]
+#define CFG_RTCCLK_DIV  (${CFG_RTCCLK_DIV})
+[#if (CFG_RTCCLK_DIV == "16")]
 #define CFG_RTC_WUCKSEL_DIVIDER (0)
-#define CFG_RTC_ASYNCH_PRESCALER (CFG_RTCCLK_DIV - 1)
-#define CFG_RTC_SYNCH_PRESCALER (0x7FFF)
+[#elseif (CFG_RTCCLK_DIV == "8")]
+#define CFG_RTC_WUCKSEL_DIVIDER (1)
+[#elseif (CFG_RTCCLK_DIV == "4")]
+#define CFG_RTC_WUCKSEL_DIVIDER (2)
+[#elseif (CFG_RTCCLK_DIV == "2")]
+#define CFG_RTC_WUCKSEL_DIVIDER (3)
+[/#if]
+#define CFG_RTC_ASYNCH_PRESCALER (${CFG_RTC_ASYNCH_PRESCALER})
+#define CFG_RTC_SYNCH_PRESCALER (${CFG_RTC_SYNCH_PRESCALER})
+[#else]
+#define CFG_RTCCLK_DIV  (${CFG_RTCCLK_DIV})
+#define CFG_RTC_WUCKSEL_DIVIDER (${CFG_RTC_WUCKSEL_DIVIDER})
+#define CFG_RTC_ASYNCH_PRESCALER (${CFG_RTC_ASYNCH_PRESCALER})
+#define CFG_RTC_SYNCH_PRESCALER (${CFG_RTC_SYNCH_PRESCALER})
+[/#if]
 
 #else
 
@@ -1101,14 +1303,14 @@ typedef enum
 /**
  * When not set, the traces is looping on sending the trace over UART
  */
-#define DBG_TRACE_USE_CIRCULAR_QUEUE 1
+#define DBG_TRACE_USE_CIRCULAR_QUEUE ${DBG_TRACE_USE_CIRCULAR_QUEUE}
 
 /**
  * max buffer Size to queue data traces and max data trace allowed.
  * Only Used if DBG_TRACE_USE_CIRCULAR_QUEUE is defined
  */
-#define DBG_TRACE_MSG_QUEUE_SIZE 4096
-#define MAX_DBG_TRACE_MSG_SIZE 1024
+#define DBG_TRACE_MSG_QUEUE_SIZE ${DBG_TRACE_MSG_QUEUE_SIZE}
+#define MAX_DBG_TRACE_MSG_SIZE ${MAX_DBG_TRACE_MSG_SIZE}
 
 [#if (THREAD = 1 || ZIGBEE = 1)]
 /******************************************************************************
@@ -1397,7 +1599,7 @@ typedef enum
  ******************************************************************************/
 /**
  * Supported requester to the MCU Low Power Manager - can be increased up  to 32
- * It lits a bit mapping of all user of the Low Power Manager
+ * It list a bit mapping of all user of the Low Power Manager
  */
 typedef enum
 {

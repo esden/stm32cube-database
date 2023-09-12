@@ -26,6 +26,7 @@
 [#assign BLE = 0]
 [#assign ZIGBEE = 0]
 [#assign CFG_DEBUG_TRACE_UART  = ""]
+[#assign DIE = DIE]
 
 [#list SWIPdatas as SWIP]
     [#if SWIP.defines??]
@@ -188,6 +189,9 @@ extern RTC_HandleTypeDef hrtc; /**< RTC handler declaration */
 PLACE_IN_SECTION("MB_MEM2") ALIGN(4) static uint8_t EvtPool[POOL_SIZE];
 PLACE_IN_SECTION("MB_MEM2") ALIGN(4) static TL_CmdPacket_t SystemCmdBuffer;
 PLACE_IN_SECTION("MB_MEM2") ALIGN(4) static uint8_t SystemSpareEvtBuffer[sizeof(TL_PacketHeader_t) + TL_EVT_HDR_SIZE + 255U];
+[#if THREAD = 1]
+uint8_t g_ot_notification_allowed = 0U;
+[/#if]
 [#if BLE = 1 ]
 PLACE_IN_SECTION("MB_MEM2") ALIGN(4) static uint8_t BleSpareEvtBuffer[sizeof(TL_PacketHeader_t) + TL_EVT_HDR_SIZE + 255];
 [#if (BLE_TRANSPARENT_MODE_UART = 1) || (BLE_TRANSPARENT_MODE_VCP = 1)]
@@ -378,6 +382,12 @@ static void SystemPower_Config(void)
    */
   HAL_PWREx_EnableVddUSB();
 #endif
+[#if DIE == "DIE494"]
+  /**
+   * Active SRAM retention for standby support
+   */
+  HAL_PWREx_EnableSRAMRetention();
+[/#if]
 
   return;
 }
@@ -655,8 +665,16 @@ void UTIL_SEQ_EvtIdle( UTIL_SEQ_bm_t task_id_bm, UTIL_SEQ_bm_t evt_waited_bm )
   {
   case EVENT_ACK_FROM_M0_EVT:
 [#if THREAD = 1]
-    /* Does not allow other tasks when waiting for OT Cmd response */
-    UTIL_SEQ_Run(0);
+    if(g_ot_notification_allowed == 1U)
+    {
+      /* Some OT API send M0 to M4 notifications so allow notifications when waiting for OT Cmd response */
+      UTIL_SEQ_Run(TASK_MSG_FROM_M0_TO_M4);
+    }
+    else
+    {
+      /* Does not allow other tasks when waiting for OT Cmd response */
+      UTIL_SEQ_Run(0);
+    }
 [#else]
     /**
      * Run only the task CFG_TASK_REQUEST_FROM_M0_TO_M4 to process

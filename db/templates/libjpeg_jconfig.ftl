@@ -27,9 +27,26 @@
  * Note that the max_memory_to_use option is ignored by this implementation.
  */
 
+[#-- SWIPdatas is a list of SWIPconfigModel --]
+[#list SWIPdatas as SWIP]
+	[#if SWIP.defines??]
+		[#list SWIP.defines as definition]
+			[#if definition.name=="HAVE_BOOLEAN"]
+				[#assign HAVE_BOOLEAN = definition.value]
+			[/#if]
+			[#if definition.name=="BooleanType"]
+				[#assign BooleanType = definition.value]
+			[/#if]
+		[/#list]
+	[/#if]
+[/#list]
 
 /*Import File manager wrapping*/
 #include "jdata_conf.h"
+
+[#if HAVE_BOOLEAN=="Defined"]
+#include <stdint.h>
+[/#if]
 
 /*
  * These symbols indicate the properties of your machine or compiler.
@@ -39,8 +56,8 @@
 #define NO_GETENV
 #undef  USE_MSDOS_MEMMGR
 #undef  USE_MAC_MEMMGR
-/*Enabling 'USE_HEAP_MEM' disables the use of 'temp files' from 'backing-store management' : refer to 'jmemsys.h' for details.
-Moreover, this porting version does not proposed validated 'temp files' support : it is recommended to keep this macro 'defined'.*/
+/*Enabling USE_HEAP_MEM disables the use of temp files from backing-store management : refer to jmemsys.h for details.
+Moreover, this porting version does not proposed validated temp files support : it is recommended to keep this macro defined.*/
 #define USE_HEAP_MEM
 #define MAX_ALLOC_CHUNK  0x10000 /* 64kB */
 
@@ -119,6 +136,11 @@ Moreover, this porting version does not proposed validated 'temp files' support 
 typedef unsigned char boolean;
 #endif
 #define HAVE_BOOLEAN    /* prevent jmorecfg.h from redefining it */
+[#if HAVE_BOOLEAN=="Defined"]
+    [#lt]#else
+    [#lt]#define HAVE_BOOLEAN    /* prevent jmorecfg.h from redefining it */
+    [#lt]typedef ${BooleanType} boolean;
+[/#if]
 #endif
 
 

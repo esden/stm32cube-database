@@ -12,6 +12,7 @@
 /* USER CODE END Header */
 
 
+[#assign DIE = DIE]
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef HW_IF_H
 #define HW_IF_H
@@ -38,7 +39,12 @@ extern "C" {
 #include "stm32wbxx_usb_dongle.h"
 #endif
 #ifdef  USE_STM32WBXX_NUCLEO
+[#if DIE == "DIE495"]
 #include "stm32wbxx_nucleo.h"
+[/#if]
+[#if DIE == "DIE494"]
+#include "nucleo_wb15cc.h"
+[/#if]
 #endif
 #ifdef  USE_X_NUCLEO_EPD
 #include "x_nucleo_epd.h"
@@ -140,7 +146,7 @@ extern "C" {
    * @param  pTimerId: Timer Id returned to the user to request operation (start, stop, delete)
    * @param  TimerMode: Mode of the virtual timer (Single shot or repeated)
    * @param  pTimerCallBack: Callback when the virtual timer expires
-   * @retval HW_TS_ReturnStatus_t: Return whether the creation is sucessfull or not
+   * @retval HW_TS_ReturnStatus_t: Return whether the creation is sucessful or not
    */
   HW_TS_ReturnStatus_t HW_TS_Create(uint32_t TimerProcessID, uint8_t *pTimerId, HW_TS_Mode_t TimerMode, HW_TS_pTimerCb_t pTimerCallBack);
 

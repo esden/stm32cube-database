@@ -12,14 +12,15 @@
 [#list SWIPdatas as SWIP]
   [#if SWIP.defines??]
     [#list SWIP.defines as definition]
-      [#if definition.name=="USE_MPU"]
+      [#if definition.name=="configENABLE_MPU"]
         [#assign useMPU = definition.value]
       [/#if]
      [/#list]
   [/#if]
 [/#list]
 
-[#if useMPU == "1"]  [#-- Defines for F4 (from STM32469I_EVAL) --]
+[#if useMPU == "1"]  [#-- Defines for STM32F4 (from STM32469I_EVAL) --]
+/* USER CODE BEGIN SETTINGS_MPU */
 #if defined ( __GNUC__ )
 extern uint32_t __FLASH_segment_start__[];
 extern uint32_t __FLASH_segment_end__[];
@@ -38,6 +39,7 @@ const uint32_t * __privileged_functions_end__ = ( uint32_t * ) 0x08004000UL;
 const uint32_t * __privileged_data_start__ = ( uint32_t * ) 0x20000000UL;
 const uint32_t * __privileged_data_end__ = ( uint32_t * ) 0x20000200UL;
 #endif
+/* USER CODE END SETTINGS_MPU */
 [/#if]
 
 [#list SWIPdatas as SWIP]
@@ -81,16 +83,12 @@ const uint32_t * __privileged_data_end__ = ( uint32_t * ) 0x20000200UL;
         [/#list]
         [#assign nbThreads = nbThreads + 1]
         
-        [#if (nbThreads == 1) && (useMPU == "1") && (familyName=="stm32wb")]
-          [#-- For WB and MPU: do not generate default task --]
-        [#else]
-          TaskHandle_t ${threadName}Handle;
-          [#if threadControlBlock != "NULL"]
-            [#-- /* Buffer that the task being created will use as its stack. */ --]
-            StackType_t ${threadBuffer}[ ${threadStackSize} ];
-            [#-- /* Structure that will hold the TCB of the task being created. */ --]
-            StaticTask_t ${threadControlBlock};
-          [/#if]
+        TaskHandle_t ${threadName}Handle;
+        [#if threadControlBlock != "NULL"]
+          [#-- /* Buffer that the task being created will use as its stack. */ --]
+          StackType_t ${threadBuffer}[ ${threadStackSize} ];
+          [#-- /* Structure that will hold the TCB of the task being created. */ --]
+          StaticTask_t ${threadControlBlock};
         [/#if]
       [/#if]
       

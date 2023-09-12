@@ -11,7 +11,6 @@
   */
 /* USER CODE END Header */
 [#assign USBPD_CoreLib = ""]
-[#assign USBPD_STATEMACHINE = false]
 
 [#assign SNK = false]
 [#assign SRC = false]
@@ -26,9 +25,6 @@
             [/#if]
             [#if definition.name == "USBPD_CoreLib" && definition.value != ""]
                 [#assign USBPD_CoreLib = definition.value]
-            [/#if]
-            [#if definition.name == "USBPD_StateMachine" && definition.value == "true"]
-                [#assign USBPD_STATEMACHINE = true]
             [/#if]
             [#if definition.name == "SNK" && definition.value == "true"]
                 [#assign SNK = true]
@@ -54,7 +50,7 @@
 #include "main.h"
 #include "usbpd_core.h"
 #include "usbpd_dpm_user.h"
-[#if !USBPD_STATEMACHINE]
+[#if USBPD_CoreLib != "USBPDCORE_LIB_NO_PD"]
 #include "usbpd_pdo_defs.h"
 #include "usbpd_dpm_core.h"
 #include "usbpd_dpm_conf.h"
@@ -72,6 +68,9 @@
 #include "string.h"
 #include "stdio.h"
 #endif /* _TRACE */
+/* USER CODE BEGIN Includes */
+
+/* USER CODE END Includes */
 
 /** @addtogroup STM32_USBPD_APPLICATION
   * @{
@@ -90,7 +89,7 @@
 /** @defgroup USBPD_USER_PRIVATE_DEFINES USBPD USER Private Defines
   * @{
   */
-[#if !USBPD_STATEMACHINE]
+[#if USBPD_CoreLib != "USBPDCORE_LIB_NO_PD"]
 [#if GUI_INTERFACE??]
 #define DPM_GUI_NOTIF_ISCONNECTED       (1 << 5)
 #define DPM_GUI_NOTIF_POWER_EVENT       (1 << 15)
@@ -126,7 +125,7 @@ void                USBPD_DPM_UserExecute(void *argument);
         USBPD_TRACE_Add(USBPD_TRACE_DEBUG, (uint8_t)(_PORT_), 0, (uint8_t*)_str, DPM_USER_DEBUG_TRACE_SIZE);   \
   } while(0)
 
-[#if !USBPD_STATEMACHINE]
+[#if USBPD_CoreLib != "USBPDCORE_LIB_NO_PD"]
 #define DPM_USER_ERROR_TRACE(_PORT_, _STATUS_, ...)  do {                                                      \
     if (USBPD_OK != _STATUS_) {                                                                                \
         char _str[DPM_USER_DEBUG_TRACE_SIZE];                                                                  \
@@ -140,7 +139,7 @@ void                USBPD_DPM_UserExecute(void *argument);
 [/#if]
 #else
 #define DPM_USER_DEBUG_TRACE(_PORT_, ...)
-[#if !USBPD_STATEMACHINE]
+[#if USBPD_CoreLib != "USBPDCORE_LIB_NO_PD"]
 #define DPM_USER_ERROR_TRACE(_PORT_, _STATUS_, ...)
 [/#if]
 #endif /* _TRACE */
@@ -155,13 +154,14 @@ void                USBPD_DPM_UserExecute(void *argument);
 /** @defgroup USBPD_USER_PRIVATE_VARIABLES USBPD USER Private Variables
   * @{
   */
-[#if !USBPD_STATEMACHINE]
+[#if USBPD_CoreLib != "USBPDCORE_LIB_NO_PD"]
 [#if GUI_INTERFACE??]
 GUI_NOTIFICATION_POST         DPM_GUI_PostNotificationMessage   = NULL;
 GUI_NOTIFICATION_FORMAT_SEND  DPM_GUI_FormatAndSendNotification = NULL;
 GUI_SAVE_INFO                 DPM_GUI_SaveInfo                  = NULL;
 [/#if]
 [/#if]
+
 /* USER CODE BEGIN Private_Variables */
 
 
@@ -200,7 +200,7 @@ GUI_SAVE_INFO                 DPM_GUI_SaveInfo                  = NULL;
   * @brief  Initialize DPM (port power role, PWR_IF, CAD and PE Init procedures)
   * @retval USBPD Status
   */
-[#if !USBPD_STATEMACHINE]
+[#if USBPD_CoreLib != "USBPDCORE_LIB_NO_PD"]
 USBPD_StatusTypeDef USBPD_DPM_UserInit(void)
 {
 /* USER CODE BEGIN USBPD_DPM_UserInit */
@@ -225,6 +225,20 @@ void USBPD_DPM_SetNotification_GUI(GUI_NOTIFICATION_FORMAT_SEND PtrFormatSend, G
 
 [/#if]
 [/#if]
+
+/**
+  * @brief  User delay implementation which is OS dependent
+  * @param  Time time in ms
+  * @retval None
+  */
+void USBPD_DPM_WaitForTime(uint32_t Time)
+{
+[#if FREERTOS?? && Secure!="true"]
+  osDelay(Time);
+[#else]
+  HAL_Delay(Time);
+[/#if]
+}
 
 /**
   * @brief  User processing time, it is recommended to avoid blocking task for long time
@@ -260,7 +274,7 @@ void USBPD_DPM_UserExecute(void const *argument)
   */
 void USBPD_DPM_UserCableDetection(uint8_t PortNum, USBPD_CAD_EVENT State)
 {
-[#if !USBPD_STATEMACHINE]
+[#if USBPD_CoreLib != "USBPDCORE_LIB_NO_PD"]
 [#if GUI_INTERFACE??]
   switch(State)
   {
@@ -291,7 +305,7 @@ DPM_USER_DEBUG_TRACE(PortNum, "ADVICE: update USBPD_DPM_UserCableDetection");
     // {
       // if (USBPD_OK != USBPD_PWR_IF_VBUSEnable(PortNum))
       // {
-        // /* Should not occurr */
+        // /* Should not occur */
         // HAL_Delay(6000);
         // NVIC_SystemReset();
       // }
@@ -303,7 +317,7 @@ DPM_USER_DEBUG_TRACE(PortNum, "ADVICE: update USBPD_DPM_UserCableDetection");
     // {
       // if (USBPD_OK != USBPD_PWR_IF_VBUSDisable(PortNum))
       // {
-        // /* Should not occurr */
+        // /* Should not occur */
         // while(1);
       // }
       // break;
@@ -313,7 +327,7 @@ DPM_USER_DEBUG_TRACE(PortNum, "ADVICE: update USBPD_DPM_UserCableDetection");
 /* USER CODE END USBPD_DPM_UserCableDetection */
 }
 
-[#if !USBPD_STATEMACHINE]
+[#if USBPD_CoreLib != "USBPDCORE_LIB_NO_PD"]
 /**
   * @brief  function used to manage user timer.
   * @param  PortNum Port number
@@ -331,7 +345,7 @@ void USBPD_DPM_UserTimerCounter(uint8_t PortNum)
   * @}
   */
 
-[#if !USBPD_STATEMACHINE]
+[#if USBPD_CoreLib != "USBPDCORE_LIB_NO_PD"]
 /** @defgroup USBPD_USER_EXPORTED_FUNCTIONS_GROUP2 USBPD USER Exported Callbacks functions called by PE
   * @{
   */
@@ -599,6 +613,19 @@ void USBPD_DPM_ExtendedMessageReceived(uint8_t PortNum, USBPD_ExtendedMsg_TypeDe
 /* USER CODE BEGIN USBPD_DPM_ExtendedMessageReceived */
 
 /* USER CODE END USBPD_DPM_ExtendedMessageReceived */
+}
+
+/**
+  * @brief  DPM callback to allow PE to enter ERROR_RECOVERY state.
+  * @param  PortNum Port number
+  * @retval None
+  */
+void USBPD_DPM_EnterErrorRecovery(uint8_t PortNum)
+{
+/* USER CODE BEGIN USBPD_DPM_EnterErrorRecovery */
+  /* Inform CAD to enter recovery mode */
+  USBPD_CAD_EnterErrorRecovery(PortNum);
+/* USER CODE END USBPD_DPM_EnterErrorRecovery */
 }
 
 /**
@@ -1023,7 +1050,7 @@ USBPD_StatusTypeDef USBPD_DPM_RequestGetSinkCapabilityExt(uint8_t PortNum)
 }
 
 /**
-  * @brief  Request the PE to get a manufacturer infor
+  * @brief  Request the PE to get a manufacturer info
   * @param  PortNum The current port number
   * @param  SOPType SOP Type
   * @param  pManuInfoData Pointer on manufacturer info based on @ref USBPD_GMIDB_TypeDef

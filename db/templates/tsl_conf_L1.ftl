@@ -1001,7 +1001,7 @@ be configured to output push-pull low (excepted for Linear sensors).
     [/#if]
 
     [#if touchsensing_mode = "software"]
-    /** Delay for transfering charges from Cx to Cs capacitor and then discharge Cx
+    /** Delay for transferring charges from Cx to Cs capacitor and then discharge Cx
    (range=0..65535)
    - 0: no delay (it takes about 2.8 microseconds for a CT cycle)
    - (1..65535): delay (in  microseconds) = 0.75 * TSLPRM_DELAY_TRANSFER + 1

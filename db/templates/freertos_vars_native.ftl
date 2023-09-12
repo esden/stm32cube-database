@@ -19,8 +19,10 @@
   [/#if]
 [/#list]
 
-[#if useMPU == "1"]  [#-- Defines for xx (from yy board) --]
+[#if useMPU == "1"]  [#-- Defines for STM32XX (from yy board) --]
+/* USER CODE BEGIN SETTINGS_MPU */
 /* put here the regions for the right series (from the right boarD) */
+/* USER CODE END SETTINGS_MPU */
 [/#if]
 
 [#list SWIPdatas as SWIP]
@@ -63,20 +65,16 @@
           [#assign index = index + 1]
         [/#list]
         [#assign nbThreads = nbThreads + 1]
-        
-        [#if (nbThreads == 1) && (useMPU == "1") && (familyName=="stm32wb")]
-          [#-- For WB and MPU: do not generate default task --]
-        [#else]
-          TaskHandle_t ${threadName}Handle;
-          [#if threadControlBlock != "NULL"]
-            [#-- /* Buffer that the task being created will use as its stack. */ --]
-            StackType_t ${threadBuffer}[ ${threadStackSize} ];
-            [#-- /* Structure that will hold the TCB of the task being created. */ --]
-            StaticTask_t ${threadControlBlock};
-          [/#if]
+
+        TaskHandle_t ${threadName}Handle;
+        [#if threadControlBlock != "NULL"]
+          [#-- /* Buffer that the task being created will use as its stack. */ --]
+          StackType_t ${threadBuffer}[ ${threadStackSize} ];
+          [#-- /* Structure that will hold the TCB of the task being created. */ --]
+          StaticTask_t ${threadControlBlock};
         [/#if]
       [/#if]
-      
+
       [#if variable.name=="Mutexes"]
         [#assign s = variable.valueList]
         [#assign index = 0]
@@ -99,7 +97,7 @@
           [/#if]
         [/#if]
       [/#if]
-      
+
       [#if variable.name=="RecursiveMutexes"]
         [#assign s = variable.valueList]
         [#assign index = 0]
@@ -122,7 +120,7 @@
           [/#if]
         [/#if]
       [/#if]
-      
+
       [#if variable.name=="Timers"]
         [#assign s = variable.valueList]
         [#assign index = 0]
@@ -160,7 +158,7 @@
           [/#if]
         [/#if]  
       [/#if]
-      
+
       [#if variable.name=="Queues"]
         [#assign s = variable.valueList]
         [#assign index = 0]
@@ -200,7 +198,7 @@
           [/#if]
         [/#if]  
       [/#if]
-      
+
       [#if variable.name=="Semaphores"]
         [#assign s = variable.valueList]
         [#assign index = 0]
@@ -223,7 +221,7 @@
           [/#if]
         [/#if]
       [/#if]
-      
+
       [#if variable.name=="BinarySemaphores"]
         [#assign s = variable.valueList]
         [#assign index = 0]
@@ -246,8 +244,8 @@
           [/#if]
         [/#if]
       [/#if]
-    [/#list] 
-     
+    [/#list]
+
   [/#if]
 [/#list]
 [/#compress]

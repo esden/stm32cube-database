@@ -86,7 +86,7 @@
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
-   
+
 /* USER CODE END FunctionPrototypes */
 [#compress]
 #n
@@ -98,8 +98,8 @@
       [#list SWIP.variables as variable]
         [#if variable.name=="MiddlewareInUse"]
           [#assign s = variable.valueList]
-          [#assign index = 0] 
-          [#list s as i] 
+          [#assign index = 0]
+          [#list s as i]
             [#if index == 0]
               [#assign mw = i]
             [/#if]
@@ -117,7 +117,7 @@ void MX_FREERTOS_Init(void);  /* (MISRA C 2004 rule 8.1) */
 [/#if]
 
 [#list SWIPdatas as SWIP]
-  [#if SWIP.defines??]     
+  [#if SWIP.defines??]
     [#list SWIP.defines as definition]
       [#if definition.name=="MEMORY_ALLOCATION"]
         [#if definition.value!="0"] [#--Not "Dynamic" alone --]
@@ -125,7 +125,7 @@ void MX_FREERTOS_Init(void);  /* (MISRA C 2004 rule 8.1) */
 void vApplicationGetIdleTaskMemory( StaticTask_t **ppxIdleTaskTCBBuffer, StackType_t **ppxIdleTaskStackBuffer, uint32_t *pulIdleTaskStackSize );
           [#if useTimers==1]
 #n/* GetTimerTaskMemory prototype (linked to static allocation support) */
-void vApplicationGetTimerTaskMemory( StaticTask_t **ppxTimerTaskTCBBuffer, StackType_t **ppxTimerTaskStackBuffer, uint32_t *pulTimerTaskStackSize );            
+void vApplicationGetTimerTaskMemory( StaticTask_t **ppxTimerTaskTCBBuffer, StackType_t **ppxTimerTaskStackBuffer, uint32_t *pulTimerTaskStackSize );
           [/#if]
         [/#if]
       [/#if]
@@ -138,34 +138,34 @@ void vApplicationGetTimerTaskMemory( StaticTask_t **ppxTimerTaskTCBBuffer, Stack
     [#list SWIP.defines as definition]
       [#if definition.name=="configGENERATE_RUN_TIME_STATS"]
         [#if definition.value=="1"]
-          [#assign hookUsed = 1]         
+          [#assign hookUsed = 1]   
         [/#if]
       [/#if]
       [#if definition.name=="configUSE_IDLE_HOOK"]
         [#if definition.value=="1"]
-          [#assign hookUsed = 1]      
+          [#assign hookUsed = 1]    
         [/#if]
       [/#if]
       [#if definition.name=="configUSE_TICK_HOOK"]
         [#if definition.value=="1"]
-          [#assign hookUsed = 1]      
+          [#assign hookUsed = 1]
         [/#if]
-      [/#if]   
+      [/#if]
       [#if definition.name=="configUSE_DAEMON_TASK_STARTUP_HOOK"]
         [#if definition.value=="1"]
-          [#assign hookUsed = 1]         
-        [/#if]    
-      [/#if]     
+          [#assign hookUsed = 1]
+        [/#if]
+      [/#if]
         [#if definition.name=="configCHECK_FOR_STACK_OVERFLOW"]
           [#if definition.value !="0"]
-            [#assign hookUsed = 1]    
+            [#assign hookUsed = 1]
           [/#if]
         [/#if]
         [#if definition.name=="configUSE_MALLOC_FAILED_HOOK"]
           [#if definition.value=="1"]
-            [#assign hookUsed = 1]       
+            [#assign hookUsed = 1]
           [/#if]
-        [/#if]             
+        [/#if]      
      [/#list]
  [/#if]
 [/#list]
@@ -178,36 +178,36 @@ void vApplicationGetTimerTaskMemory( StaticTask_t **ppxTimerTaskTCBBuffer, Stack
         [#if definition.name=="configGENERATE_RUN_TIME_STATS"]
           [#if definition.value=="1"]
 void configureTimerForRunTimeStats(void);
-unsigned long getRunTimeCounterValue(void);          
+unsigned long getRunTimeCounterValue(void);
           [/#if]
         [/#if]
         [#if definition.name=="configUSE_IDLE_HOOK"]
           [#if definition.value=="1"]
-void vApplicationIdleHook(void);       
+void vApplicationIdleHook(void);
           [/#if]
         [/#if]
         [#if definition.name=="configUSE_TICK_HOOK"]
           [#if definition.value=="1"]
-void vApplicationTickHook(void);       
+void vApplicationTickHook(void);
           [/#if]
-        [/#if]   
+        [/#if]
         [#if definition.name=="configUSE_DAEMON_TASK_STARTUP_HOOK"]
           [#if definition.value=="1"]
-void vApplicationDaemonTaskStartupHook(void);       
-          [/#if]    
-        [/#if]     
+void vApplicationDaemonTaskStartupHook(void);
+          [/#if]
+        [/#if]
         [#if definition.name=="configCHECK_FOR_STACK_OVERFLOW"]
           [#if definition.value !="0"]
             [#if useNewHandle==0]
-void vApplicationStackOverflowHook(xTaskHandle xTask, signed char *pcTaskName);  
+void vApplicationStackOverflowHook(xTaskHandle xTask, signed char *pcTaskName);
             [#else]
-void vApplicationStackOverflowHook(TaskHandle_t xTask, signed char *pcTaskName); 
-            [/#if]     
+void vApplicationStackOverflowHook(TaskHandle_t xTask, signed char *pcTaskName);
+            [/#if]
           [/#if]
         [/#if]
         [#if definition.name=="configUSE_MALLOC_FAILED_HOOK"]
           [#if definition.value=="1"]
-void vApplicationMallocFailedHook(void);       
+void vApplicationMallocFailedHook(void);
           [/#if]
         [/#if]             
       [/#list]
@@ -223,24 +223,24 @@ void vApplicationMallocFailedHook(void);
 #n
 /* USER CODE BEGIN 1 */
 /* Functions needed when configGENERATE_RUN_TIME_STATS is on */
-__weak void configureTimerForRunTimeStats(void) 
+__weak void configureTimerForRunTimeStats(void)
 {
-#n    
+#n
 }
 
-#n__weak unsigned long getRunTimeCounterValue(void) 
+#n__weak unsigned long getRunTimeCounterValue(void)
 {
     return 0;
-}  
+}
 /* USER CODE END 1 */
         [/#if]
       [/#if]
-		    
+
       [#if definition.name=="configUSE_IDLE_HOOK"]
         [#if definition.value=="1"]
 #n
 /* USER CODE BEGIN 2 */
-__weak void vApplicationIdleHook( void ) 
+__weak void vApplicationIdleHook( void )
 {
 #t    /* vApplicationIdleHook() will only be called if configUSE_IDLE_HOOK is set
 #t    to 1 in FreeRTOSConfig.h.  It will be called on each iteration of the idle
@@ -254,12 +254,12 @@ __weak void vApplicationIdleHook( void )
 }
 /* USER CODE END 2 */
         [/#if]
-      [/#if]  
+      [/#if]
 
       [#if definition.name=="configUSE_TICK_HOOK"]
         [#if definition.value=="1"]
 #n/* USER CODE BEGIN 3 */
-__weak void vApplicationTickHook( void ) 
+__weak void vApplicationTickHook( void )
 {
 #t    /* This function will be called by each tick interrupt if
 #t    configUSE_TICK_HOOK is set to 1 in FreeRTOSConfig.h.  User code can be
@@ -267,7 +267,7 @@ __weak void vApplicationTickHook( void )
 #t    code must not attempt to block, and only the interrupt safe FreeRTOS API
 #t    functions can be used (those that end in FromISR()). */ 
 }
- /* USER CODE END 3 */ 	      
+ /* USER CODE END 3 */
         [/#if]
       [/#if]
 
@@ -282,16 +282,16 @@ __weak void vApplicationStackOverflowHook(TaskHandle_t xTask, signed char *pcTas
 {
 #t    /* Run time stack overflow checking is performed if
 #t    configCHECK_FOR_STACK_OVERFLOW is defined to 1 or 2. This hook function is
-#t    called if a stack overflow is detected. */ 
+#t    called if a stack overflow is detected. */
 }
- /* USER CODE END 4 */ 
+ /* USER CODE END 4 */
         [/#if]
       [/#if]
-	    
+
       [#if definition.name=="configUSE_MALLOC_FAILED_HOOK"]
         [#if definition.value=="1"]
 #n/* USER CODE BEGIN 5 */
-__weak void vApplicationMallocFailedHook(void) 
+__weak void vApplicationMallocFailedHook(void)
 {
 #t    /* vApplicationMallocFailedHook() will only be called if
 #t    configUSE_MALLOC_FAILED_HOOK is set to 1 in FreeRTOSConfig.h.  It is a hook
@@ -307,14 +307,14 @@ __weak void vApplicationMallocFailedHook(void)
 /* USER CODE END 5 */
         [/#if]
       [/#if]
-	    
+
       [#if definition.name=="configUSE_DAEMON_TASK_STARTUP_HOOK"]
         [#if definition.value=="1"]
 #n/* USER CODE BEGIN DAEMON_TASK_STARTUP_HOOK */
-void vApplicationDaemonTaskStartupHook(void) 
+void vApplicationDaemonTaskStartupHook(void)
 {
 }
-/* USER CODE END DAEMON_TASK_STARTUP_HOOK */	    
+/* USER CODE END DAEMON_TASK_STARTUP_HOOK */
         [/#if]
       [/#if]
     [/#list]
@@ -323,7 +323,7 @@ void vApplicationDaemonTaskStartupHook(void)
 [/#compress]
 
 [#list SWIPdatas as SWIP]
-  [#if SWIP.defines??]     
+  [#if SWIP.defines??]
     [#list SWIP.defines as definition]
       [#if definition.name=="configUSE_TICKLESS_IDLE"]
         [#if definition.value=="1"]
@@ -331,7 +331,7 @@ void vApplicationDaemonTaskStartupHook(void)
 /* USER CODE BEGIN PREPOSTSLEEP */
 __weak void PreSleepProcessing(uint32_t *ulExpectedIdleTime)
 {
-/* place for user code */ 
+/* place for user code */
 }
 
 __weak void PostSleepProcessing(uint32_t *ulExpectedIdleTime)
@@ -360,14 +360,14 @@ __weak void vPortSuppressTicksAndSleep( TickType_t xExpectedIdleTime )
 /* USER CODE BEGIN GET_IDLE_TASK_MEMORY */
 static StaticTask_t xIdleTaskTCBBuffer;
 static StackType_t xIdleStack[configMINIMAL_STACK_SIZE];
-  
+
 void vApplicationGetIdleTaskMemory( StaticTask_t **ppxIdleTaskTCBBuffer, StackType_t **ppxIdleTaskStackBuffer, uint32_t *pulIdleTaskStackSize )
 {
   *ppxIdleTaskTCBBuffer = &xIdleTaskTCBBuffer;
   *ppxIdleTaskStackBuffer = &xIdleStack[0];
   *pulIdleTaskStackSize = configMINIMAL_STACK_SIZE;
   /* place for user code */
-}                   
+}
 /* USER CODE END GET_IDLE_TASK_MEMORY */
 #n
             [#if useTimers==1]
@@ -375,14 +375,14 @@ void vApplicationGetIdleTaskMemory( StaticTask_t **ppxIdleTaskTCBBuffer, StackTy
 /* USER CODE BEGIN GET_TIMER_TASK_MEMORY */
 static StaticTask_t xTimerTaskTCBBuffer;
 static StackType_t xTimerStack[configTIMER_TASK_STACK_DEPTH];
-  
+
 void vApplicationGetTimerTaskMemory( StaticTask_t **ppxTimerTaskTCBBuffer, StackType_t **ppxTimerTaskStackBuffer, uint32_t *pulTimerTaskStackSize )  
 {
   *ppxTimerTaskTCBBuffer = &xTimerTaskTCBBuffer;
   *ppxTimerTaskStackBuffer = &xTimerStack[0];
   *pulTimerTaskStackSize = configTIMER_TASK_STACK_DEPTH;
   /* place for user code */
-}                   
+}
 /* USER CODE END GET_TIMER_TASK_MEMORY */
 #n
             [/#if]
@@ -390,7 +390,7 @@ void vApplicationGetTimerTaskMemory( StaticTask_t **ppxTimerTaskTCBBuffer, Stack
       [/#if]
     [/#list]
   [/#if]
-[/#list]	
+[/#list]
 
 [#if inMain == 0]
 #n
@@ -401,18 +401,18 @@ void vApplicationGetTimerTaskMemory( StaticTask_t **ppxTimerTaskTCBBuffer, Stack
   */
 void MX_FREERTOS_Init(void) {
 #t/* USER CODE BEGIN Init */
-#t     
+#t
 #t/* USER CODE END Init */
 [@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_obj_creat.tmp"/]
 }
 [@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_default_thread.tmp"/]
 [@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_threads.tmp"/]
 [@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_callbacks.tmp"/]
-[/#if]  
+[/#if]
 
 /* Private application code --------------------------------------------------*/
 /* USER CODE BEGIN Application */
-     
+
 /* USER CODE END Application */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

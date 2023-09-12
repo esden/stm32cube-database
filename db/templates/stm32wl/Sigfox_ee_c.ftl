@@ -234,7 +234,7 @@ int32_t EE_Read(int32_t bank, uint16_t addr, uint32_t *data)
   /* USER CODE BEGIN EE_Read_1 */
 
   /* USER CODE END EE_Read_1 */
-  EE_var_t *pv = &EE_var[CFG_EE_BANK1_SIZE && bank];;
+  EE_var_t *pv = &EE_var[CFG_EE_BANK1_SIZE && bank];
 
   /* Read element starting from active page */
   return EE_ReadEl(pv, addr, data, pv->current_write_page);
@@ -248,7 +248,7 @@ int32_t EE_Write(int32_t bank, uint16_t addr, uint32_t data)
   /* USER CODE BEGIN EE_Write_1 */
 
   /* USER CODE END EE_Write_1 */
-  EE_var_t *pv = &EE_var[CFG_EE_BANK1_SIZE && bank];;
+  EE_var_t *pv = &EE_var[CFG_EE_BANK1_SIZE && bank];
   uint32_t page;
 
   /* Check if current pool is full */

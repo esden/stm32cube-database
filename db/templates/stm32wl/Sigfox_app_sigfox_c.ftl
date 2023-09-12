@@ -101,19 +101,21 @@ void MX_Sigfox_Init(void)
   /* USER CODE END MX_Sigfox_Init_2 */
 }
 
+[#if !FREERTOS??][#-- If FreeRtos, only available in CM4 is not used --]
 void MX_Sigfox_Process(void)
 {
   /* USER CODE BEGIN MX_Sigfox_Process_1 */
 
   /* USER CODE END MX_Sigfox_Process_1 */
-[#if (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION") ]
+[#if (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION")]
   UTIL_SEQ_Run(UTIL_SEQ_DEFAULT);
-[/#if]
-
   /* USER CODE BEGIN MX_Sigfox_Process_2 */
 
   /* USER CODE END MX_Sigfox_Process_2 */
+[/#if]
 }
+[/#if]
+
 /* USER CODE BEGIN EF */
 
 /* USER CODE END EF */

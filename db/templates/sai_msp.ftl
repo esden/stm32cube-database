@@ -460,7 +460,7 @@ static uint32_t ${saiInst}_client =0;
 [#assign words = instanceList]
 [#-- declare Variable GPIO_InitTypeDef once --]
        [#assign v = ""]
-[#list words as inst] [#-- loop on ip instances datas --] 
+[#list words as inst] [#-- loop on ip instances data --] 
  [#assign services = getInitServiceMode(inst)]
  [#if services.gpioA??][#assign service=services.gpioA]
         [#list service.variables as variable] [#-- variables declaration --]

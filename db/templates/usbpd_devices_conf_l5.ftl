@@ -13,7 +13,6 @@
 
 [#assign USBPD1Used = false]
 [#assign USBPDCORE_LIB_NO_PD = false]
-[#assign USBPD_STATEMACHINE = false]
 
 [#-- SWIPdatas is a list of SWIPconfigModel --]
 [#list SWIPdatas as SWIP]
@@ -21,9 +20,6 @@
         [#list SWIP.defines as definition]
             [#if definition.name == "USBPD_CoreLib" && definition.value == "USBPDCORE_LIB_NO_PD"]
                 [#assign USBPDCORE_LIB_NO_PD = true]
-            [/#if]
-            [#if definition.name == "USBPD_StateMachine" && definition.value == "true"]
-                [#assign USBPD_STATEMACHINE = true]
             [/#if]
             [#if definition.name == "USBPD_PORT0"]
                 [#assign USBPD_PORT0 = definition.value]
@@ -164,9 +160,6 @@
             [#if definition.name == "TIMinstance"]
                 [#assign TIMinstance = definition.value]
             [/#if]
-            [#if definition.name == "TIMinterrupt"]
-                [#assign TIMinterrupt = definition.value]
-            [/#if]
             [#if definition.name == "TIMenableClock"]
                 [#assign TIMenableClock = definition.value]
             [/#if]
@@ -202,10 +195,8 @@
         [#t]#include "${FamilyName?lower_case}xx_ll_tim.h"
     [/#if]
 [/#if]
-[#if !USBPDCORE_LIB_NO_PD || USBPD_STATEMACHINE]
 #include "usbpd_pwr_user.h"
 #include "usbpd_pwr_if.h"
-[/#if]
 
 /* USER CODE BEGIN Includes */
 
@@ -278,7 +269,6 @@
 #define TIMX                           ${TIMinstance}
 #define TIMX_CLK_ENABLE                ${TIMenableClock}
 #define TIMX_CLK_DISABLE               ${TIMdisableClock}
-#define TIMX_IRQ                       ${TIMinterrupt}
 #define TIMX_CHANNEL_CH1               LL_TIM_CHANNEL_CH1
 #define TIMX_CHANNEL_CH2               LL_TIM_CHANNEL_CH2
 #define TIMX_CHANNEL_CH3               LL_TIM_CHANNEL_CH3

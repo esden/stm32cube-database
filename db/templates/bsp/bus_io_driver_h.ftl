@@ -56,6 +56,11 @@
 [#assign I2CisTrue = false]
 [#assign I2CInstance = ""]
 
+[#assign DMAisTrue = false]
+
+[#if busIODriverWithDma??]
+	[#assign DMAisTrue = true]	
+[/#if]
 
 [#list BspIpDatas as SWIP] 
 	[#if SWIP.bsp??]
@@ -356,17 +361,21 @@ extern UART_HandleTypeDef h${UsartIpInstance?lower_case?replace("s","")};
 [#assign USART = ""]
 [#assign USARTisTrue = false]
 [#assign USARTInstance = ""]
+[#assign USARTDmaIsTrue = false]
 
 [#assign SpiIpInstance = ""]
 [#assign SpiIpInstanceList = ""]
 [#assign SPI = ""]
 [#assign SPIInstance = ""]
 [#assign SPIDone = ""]
+[#assign SPIDmaIsTrue = false]
+
 
 [#assign I2CIpInstance = ""]
 [#assign I2CIpInstanceList = ""]
 [#assign I2C = ""]
 [#assign I2CInstance = ""]
+[#assign I2CDmaIsTrue = false]
 
 [#list BspIpDatas as SWIP] 
 	[#if SWIP.bsp??]
@@ -379,6 +388,7 @@ extern UART_HandleTypeDef h${UsartIpInstance?lower_case?replace("s","")};
 /* BUS IO driver over SPI Peripheral */
 						[#assign SpiIpInstance = bsp.solution]
 						[#assign SpiIpInstanceList = bsp.solution]
+						[#assign SPIDmaIsTrue = bsp.dmaUsed]						
 						[@generateBspSPI_Driver SpiIpInstance/]						
 					[#elseif !SpiIpInstanceList?contains(bsp.solution)]
 						[#assign SpiIpInstance = bsp.solution]
@@ -391,6 +401,7 @@ extern UART_HandleTypeDef h${UsartIpInstance?lower_case?replace("s","")};
 /* BUS IO driver over I2C Peripheral */
 						[#assign I2CIpInstance = bsp.solution]
 						[#assign I2CIpInstanceList = bsp.solution]
+						[#assign I2CDmaIsTrue = bsp.dmaUsed]
 						[@generateBspI2C_Driver I2CIpInstance/]						
 					[#elseif !I2CIpInstanceList?contains(bsp.solution)]
 						[#assign I2CIpInstance = bsp.solution]
@@ -403,6 +414,7 @@ extern UART_HandleTypeDef h${UsartIpInstance?lower_case?replace("s","")};
 					[#if UsartIpInstanceList == ""]
 						[#assign UsartIpInstance = bsp.solution]
 						[#assign UsartIpInstanceList = bsp.solution]
+						[#assign USARTDmaIsTrue = bsp.dmaUsed]
 						[@generateBspUSART_Driver UsartIpInstance/]						
 					[#elseif !UsartIpInstanceList?contains(bsp.solution)]
 						[#assign UsartIpInstance = bsp.solution]
@@ -415,6 +427,7 @@ extern UART_HandleTypeDef h${UsartIpInstance?lower_case?replace("s","")};
 					[#if UsartIpInstanceList == ""]
 						[#assign UsartIpInstance = bsp.solution]
 						[#assign UsartIpInstanceList = bsp.solution]
+						[#assign USARTDmaIsTrue = bsp.dmaUsed]
 						[@generateBspUSART_Driver UsartIpInstance/]							
 					[#elseif !UsartIpInstanceList?contains(bsp.solution)]
 						[#assign UsartIpInstance = bsp.solution]
@@ -427,6 +440,7 @@ extern UART_HandleTypeDef h${UsartIpInstance?lower_case?replace("s","")};
 					[#if UsartIpInstanceList == ""]
 						[#assign UsartIpInstance = bsp.solution]
 						[#assign UsartIpInstanceList = bsp.solution]
+						[#assign USARTDmaIsTrue = bsp.dmaUsed]
 						[@generateBspUSART_Driver UsartIpInstance/]							
 					[#elseif !UsartIpInstanceList?contains(bsp.solution)]
 						[#assign UsartIpInstance = bsp.solution]
@@ -458,7 +472,10 @@ int32_t BSP_${IpInstance}_SendRecv(uint16_t DevAddr, uint8_t *pTxdata, uint8_t *
 int32_t BSP_${IpInstance}_RegisterDefaultMspCallbacks (void);
 int32_t BSP_${IpInstance}_RegisterMspCallbacks (BSP_I2C_Cb_t *Callbacks);
 #endif /* (USE_HAL_I2C_REGISTER_CALLBACKS == 1U) */
-
+[#if I2CDmaIsTrue]
+int32_t BSP_${IpInstance}_Send_DMA(uint16_t DevAddr, uint8_t *pData, uint16_t Length);
+int32_t BSP_${IpInstance}_Recv_DMA(uint16_t DevAddr, uint8_t *pData, uint16_t Length);
+[/#if]
 [/#macro]
 [#-- End macro generateBspI2C_Driver --]
 
@@ -474,7 +491,11 @@ int32_t BSP_${IpInstance}_SendRecv(uint8_t *pTxData, uint8_t *pRxData, uint16_t 
 int32_t BSP_${IpInstance}_RegisterDefaultMspCallbacks (void);
 int32_t BSP_${IpInstance}_RegisterMspCallbacks (BSP_SPI_Cb_t *Callbacks);
 #endif /* (USE_HAL_SPI_REGISTER_CALLBACKS == 1U) */
-
+[#if SPIDmaIsTrue]
+int32_t BSP_${IpInstance}_Send_DMA(uint8_t *pData, uint16_t Length);
+int32_t BSP_${IpInstance}_Recv_DMA(uint8_t *pData, uint16_t Length);
+int32_t BSP_${IpInstance}_SendRecv_DMA(uint8_t *pTxData, uint8_t *pRxData, uint16_t Length);
+[/#if]
 [/#macro]
 [#-- End macro generateBspSPI_Driver --]
 
@@ -489,7 +510,11 @@ int32_t BSP_${IpInstance}_Recv(uint8_t *pData, uint16_t Length);
 int32_t BSP_${IpInstance}_RegisterDefaultMspCallbacks (void);
 int32_t BSP_${IpInstance}_RegisterMspCallbacks (BSP_UART_Cb_t *Callbacks);
 #endif /* (USE_HAL_UART_REGISTER_CALLBACKS == 1U)  */
-
+[#if USARTDmaIsTrue]
+int32_t BSP_${IpInstance}_Send_DMA(uint8_t *pData, uint16_t Length);
+int32_t BSP_${IpInstance}_Recv_DMA(uint8_t *pData, uint16_t Length);
+int32_t BSP_${IpInstance}_SendRecv_DMA(uint8_t *pTxData, uint8_t *pRxData, uint16_t Length);
+[/#if]
 [/#macro]
 [#-- End macro generateBspUSART_Driver --]
 

@@ -115,64 +115,92 @@
 
 
   <!-- RefParameters for GTZC - Common MPCWM Privileged -->
+  <!-- unactive "92654" for 6.2.0 - need to be reactivated for 6.3.0 -->
+  <!-- RefParameter Name="MPCWM_Activation" Comment="Memory Protection Controller WaterMark Activation Status" DefaultValue="disabled" Type="list">
+    <PossibleValue Value="MPCWM_DISABLE" Comment="disabled"/ -->
+  <RefParameter Name="MPCWM_Activation" Comment="Memory Protection Controller WaterMark Activation Status" DefaultValue="enabled" Type="list" Visible="false">
+  <!-- unactive "92654" for 6.2.0 - need to be reactivated for 6.3.0 -->
+    <PossibleValue Value="MPCWM_ENABLE" Comment="enabled" Semaphore="S_MPCWM_ENABLE"/>
+  </RefParameter>
   <RefParameter Name="MPCWM_NonPrivilegeArea_Desc" Comment="Non Privilege Area Descriptor" DefaultValue="MPCWM1_NonPrivilegeArea_Desc" Type="string" Visible="false"/>
 
 
   <!-- RefParameters for GTZC - MPCWM1 Privileged -->
-  <RefParameter Name="MPCWM1_NonPrivilegeArea_Choice" Comment="Configure Memory" DefaultValue="from full Privileged" Type="list">
-    <PossibleValue Value="from full Privileged" Comment="from full Privileged" Semaphore="S_All_MPCWM1_Privileged"/>
-    <PossibleValue Value="from full Not Privileged" Comment="from full Not Privileged" Semaphore="S_No_MPCWM1_Privileged"/>
+  <RefParameter Name="MPCWM1_NonPrivilegeArea_Choice" Comment="Configure Memory" DefaultValue="from full Not Privileged" Type="string">
+    <Condition Expression="!S_MPCWM_ENABLE" Diagnostic="Memory Protection Controller WaterMark disabled"/>
+  </RefParameter>
+  <RefParameter Name="MPCWM1_NonPrivilegeArea_Choice" Comment="Configure Memory" DefaultValue="from full Not Privileged" Type="list">
+    <PossibleValue Value="from full Not Privileged" Comment="from full Not Privileged" Semaphore="S_No_MPCWM1_Privileged_$IpInstance"/>
+    <PossibleValue Value="from full Privileged" Comment="from full Privileged" Semaphore="S_All_MPCWM1_Privileged_$IpInstance"/>
     <Description>Privilege/Unprivilege all the memory range in one time until sizes are modified.</Description>
   </RefParameter>
 
   <RefParameter Name="MPCWM1_Area_FLASH_BASE" Comment="Memory Base Address FLASH_BASE" DefaultValue="0x08000000" Type="hex" Min="0x08000000" Max="0x08000000" Visible="false"/>
   <RefParameter Name="MPCWM1_NonPrivilegeArea_Max" Comment="Non Privilege Area Max" DefaultValue="0x08040000" Type="hex" Min="0x08040000" Max="0x08040000" Visible="false"/>
+  <RefParameter Name="MPCWM1_NonPrivilegeArea_Size" Comment="Non Privilege Area Size" DefaultValue="0x40000" Type="string">
+    <Condition Expression="!S_MPCWM_ENABLE" Diagnostic="Memory Protection Controller WaterMark disabled"/>
+  </RefParameter>
   <RefParameter Name="MPCWM1_NonPrivilegeArea_Size" Comment="Non Privilege Area Size" DefaultValue="0x40000" Type="hex" Min="0x0" Max="=(MPCWM1_NonPrivilegeArea_Max - MPCWM1_Area_FLASH_BASE)" NoCheckOpt="false">
-    <Condition Expression="S_No_MPCWM1_Privileged" Diagnostic="pre-selected no MPCWM1 Privileged"/>
+    <Condition Expression="S_No_MPCWM1_Privileged_$IpInstance" Diagnostic="pre-selected no MPCWM1 Privileged"/>
   </RefParameter>
   <RefParameter Name="MPCWM1_NonPrivilegeArea_Size" Comment="Non Privilege Area Size" DefaultValue="0x0" Type="hex" Min="0x0" Max="=(MPCWM1_NonPrivilegeArea_Max - MPCWM1_Area_FLASH_BASE)" NoCheckOpt="false"/>
   <RefParameter Name="MPCWM1_NonPrivilegeArea_BlockSize" Comment="Non Privilege Area Block Size" DefaultValue="0x800" Type="hex" Min="0x800" Max="0x800" Visible="false"/>
 
   <RefParameter Name="MPCWM1_NonPrivilegeWriteableArea_Max" Comment="Non Privilege Writeable Area Max" DefaultValue="0x08040000" Type="hex" Min="0x08040000" Max="0x08040000" Visible="false"/>
+  <RefParameter Name="MPCWM1_NonPrivilegeWriteableArea_Size" Comment="Non Privilege Writeable Area Size" DefaultValue="0x40000" Type="string">
+    <Condition Expression="!S_MPCWM_ENABLE" Diagnostic="Memory Protection Controller WaterMark disabled"/>
+  </RefParameter>
   <RefParameter Name="MPCWM1_NonPrivilegeWriteableArea_Size" Comment="Non Privilege Writeable Area Size" DefaultValue="0x0" Type="string" Min="0x0" Max="0x0">
     <Condition Expression="MPCWM1_NonPrivilegeArea_Size=0" Diagnostic="only available when Non Privilege Area Size is different to 0x0"/>
   </RefParameter>
   <RefParameter Name="MPCWM1_NonPrivilegeWriteableArea_Size" Comment="Non Privilege Writeable Area Size" DefaultValue="=(MPCWM1_NonPrivilegeArea_Size)" Type="hex" Min="0x0" Max="=(MPCWM1_NonPrivilegeArea_Size)" NoCheckOpt="false">
-    <Condition Expression="S_No_MPCWM1_Privileged" Diagnostic="pre-selected no MPCWM1 Privileged"/>
+    <Condition Expression="S_No_MPCWM1_Privileged_$IpInstance" Diagnostic="pre-selected no MPCWM1 Privileged"/>
   </RefParameter>
   <RefParameter Name="MPCWM1_NonPrivilegeWriteableArea_Size" Comment="Non Privilege Writeable Area Size" DefaultValue="0x0" Type="hex" Min="0x0" Max="=(MPCWM1_NonPrivilegeArea_Size)" NoCheckOpt="false"/>
   <RefParameter Name="MPCWM1_NonPrivilegeWriteableArea_BlockSize" Comment="Non Privilege Area Block Size" DefaultValue="0x800" Type="hex" Min="0x800" Max="0x800" Visible="false"/>
 
 
   <!-- RefParameters for GTZC - MPCWM2 Privileged -->
-  <RefParameter Name="MPCWM2_NonPrivilegeArea_Choice" Comment="Configure Memory" DefaultValue="from full Privileged" Type="list">
-    <PossibleValue Value="from full Privileged" Comment="from full Privileged" Semaphore="S_All_MPCWM2_Privileged"/>
-    <PossibleValue Value="from full Not Privileged" Comment="from full Not Privileged" Semaphore="S_No_MPCWM2_Privileged"/>
+  <RefParameter Name="MPCWM2_NonPrivilegeArea_Choice" Comment="Configure Memory" DefaultValue="from full Not Privileged" Type="string">
+    <Condition Expression="!S_MPCWM_ENABLE" Diagnostic="Memory Protection Controller WaterMark disabled"/>
+  </RefParameter>
+  <RefParameter Name="MPCWM2_NonPrivilegeArea_Choice" Comment="Configure Memory" DefaultValue="from full Not Privileged" Type="list">
+    <PossibleValue Value="from full Not Privileged" Comment="from full Not Privileged" Semaphore="S_No_MPCWM2_Privileged_$IpInstance"/>
+    <PossibleValue Value="from full Privileged" Comment="from full Privileged" Semaphore="S_All_MPCWM2_Privileged_$IpInstance"/>
     <Description>Privilege/Unprivilege all the memory range in one time until sizes are modified.</Description>
   </RefParameter>
 
   <RefParameter Name="MPCWM2_NonPrivilegeArea_SRAM1_BASE" Comment="Memory Base Address SRAM1_BASE" DefaultValue="0x20000000" Type="hex" Min="0x20000000" Max="0x20000000" Visible="false"/>
 
   <RefParameter Name="MPCWM2_NonPrivilegeArea_Max" Comment="Non Privilege Area Max" DefaultValue="0x20008000" Type="hex" Min="0x20008000" Max="0x20008000" Visible="false"/>
+  <RefParameter Name="MPCWM2_NonPrivilegeArea_Size" Comment="Non Privilege Area Size" DefaultValue="0x8000" Type="string">
+    <Condition Expression="!S_MPCWM_ENABLE" Diagnostic="Memory Protection Controller WaterMark disabled"/>
+  </RefParameter>
   <RefParameter Name="MPCWM2_NonPrivilegeArea_Size" Comment="Non Privilege Area Size" DefaultValue="0x8000" Type="hex" Min="0x0" Max="=(MPCWM2_NonPrivilegeArea_Max - MPCWM2_NonPrivilegeArea_SRAM1_BASE)" NoCheckOpt="false">
-    <Condition Expression="S_No_MPCWM2_Privileged" Diagnostic="pre-selected no MPCWM2 Privileged"/>
+    <Condition Expression="S_No_MPCWM2_Privileged_$IpInstance" Diagnostic="pre-selected no MPCWM2 Privileged"/>
   </RefParameter>
   <RefParameter Name="MPCWM2_NonPrivilegeArea_Size" Comment="Non Privilege Area Size" DefaultValue="0x0" Type="hex" Min="0x0" Max="=(MPCWM2_NonPrivilegeArea_Max - MPCWM2_NonPrivilegeArea_SRAM1_BASE)" NoCheckOpt="false"/>
   <RefParameter Name="MPCWM2_NonPrivilegeArea_BlockSize" Comment="Non Privilege Area Block Size" DefaultValue="0x400" Type="hex" Min="0x400" Max="0x400" Visible="false"/>
 
 
   <!-- RefParameters for GTZC - MPCWM3 Privileged -->
-  <RefParameter Name="MPCWM3_NonPrivilegeArea_Choice" Comment="Configure Memory" DefaultValue="from full Privileged" Type="list">
-    <PossibleValue Value="from full Privileged" Comment="from full Privileged" Semaphore="S_All_MPCWM3_Privileged"/>
-    <PossibleValue Value="from full Not Privileged" Comment="from full Not Privileged" Semaphore="S_No_MPCWM3_Privileged"/>
+  <RefParameter Name="MPCWM3_NonPrivilegeArea_Choice" Comment="Configure Memory" DefaultValue="from full Not Privileged" Type="string">
+    <Condition Expression="!S_MPCWM_ENABLE" Diagnostic="Memory Protection Controller WaterMark disabled"/>
+  </RefParameter>
+  <RefParameter Name="MPCWM3_NonPrivilegeArea_Choice" Comment="Configure Memory" DefaultValue="from full Not Privileged" Type="list">
+    <PossibleValue Value="from full Not Privileged" Comment="from full Not Privileged" Semaphore="S_No_MPCWM3_Privileged_$IpInstance"/>
+    <PossibleValue Value="from full Privileged" Comment="from full Privileged" Semaphore="S_All_MPCWM3_Privileged_$IpInstance"/>
     <Description>Privilege/Unprivilege all the memory range in one time until sizes are modified.</Description>
   </RefParameter>
 
   <RefParameter Name="MPCWM3_NonPrivilegeArea_SRAM2_BASE" Comment="Memory Base Address SRAM2_BASE" DefaultValue="0x20008000" Type="hex" Min="0x20008000" Max="0x20008000" Visible="false"/>
 
   <RefParameter Name="MPCWM3_NonPrivilegeArea_Max" Comment="Non Privilege Area Max" DefaultValue="0x20010000" Type="hex" Min="0x20010000" Max="0x20010000" Visible="false"/>
+  <RefParameter Name="MPCWM3_NonPrivilegeArea_Size" Comment="Non Privilege Area Size" DefaultValue="0x8000" Type="string">
+    <Condition Expression="!S_MPCWM_ENABLE" Diagnostic="Memory Protection Controller WaterMark disabled"/>
+  </RefParameter>
   <RefParameter Name="MPCWM3_NonPrivilegeArea_Size" Comment="Non Privilege Area Size" DefaultValue="0x8000" Type="hex" Min="0x0" Max="=(MPCWM3_NonPrivilegeArea_Max - MPCWM3_NonPrivilegeArea_SRAM2_BASE)" NoCheckOpt="false">
-    <Condition Expression="S_No_MPCWM3_Privileged" Diagnostic="pre-selected no MPCWM3 Privileged"/>
+    <Condition Expression="S_No_MPCWM3_Privileged_$IpInstance" Diagnostic="pre-selected no MPCWM3 Privileged"/>
   </RefParameter>
   <RefParameter Name="MPCWM3_NonPrivilegeArea_Size" Comment="Non Privilege Area Size" DefaultValue="0x0" Type="hex" Min="0x0" Max="=(MPCWM3_NonPrivilegeArea_Max - MPCWM3_NonPrivilegeArea_SRAM2_BASE)" NoCheckOpt="false"/>
   <RefParameter Name="MPCWM3_NonPrivilegeArea_BlockSize" Comment="Non Privilege Area Block Size" DefaultValue="0x400" Type="hex" Min="0x400" Max="0x400" Visible="false"/>
@@ -180,21 +208,66 @@
 
 
   <!-- RefParameters for GTZC - IT Secured -->
-  <RefParameter Name="TZIC_Configure_IT_Choice" Comment="Configure Illegal access IT" DefaultValue="by Individual Enabling from full Disabled" Type="list" Group="Illegal Access ITs for securable &amp; TZ-Aware Peripherals" TabName="GTZC Illegal Access Controller">
-    <PossibleValue Value="by Individual Enabling from full Disabled" Comment="by Individual Enabling from full Disabled" Semaphore="S_Full_IT_Disabled"/>
-    <PossibleValue Value="by Individual Disabling from full Enabled" Comment="by Individual Disabling from full Enabled" Semaphore="S_Full_IT_Enabled"/>
+  <RefParameter Name="TZIC_Configure_IT_Choice" Comment="Configure Illegal access IT" DefaultValue="by Individual modifying from Default" Type="list" Group="Illegal Access ITs for securable &amp; TZ-Aware Peripherals" TabName="GTZC Illegal Access Controller">
+    <PossibleValue Value="by Individual Enabling from full Disabled" Comment="by Individual Enabling from full Disabled" Semaphore="S_Full_IT_Disabled_$IpInstance"/>
+    <PossibleValue Value="by Individual Disabling from full Enabled" Comment="by Individual Disabling from full Enabled" Semaphore="S_Full_IT_Enabled_$IpInstance"/>
+    <PossibleValue Value="by Individual modifying from Default" Comment="by Individual modifying from Default" Semaphore="S_Full_IT_Default_$IpInstance"/>
     <Description>Enable/Disable all the Interrupts in one time until individuals are modified.</Description>
+  </RefParameter>
+
+  <RefParameter Name="Full_IT_Disabled" Comment="Full_IT_Disabled" DefaultValue="Enabled" Type="list" Group="Illegal Access ITs for securable &amp; TZ-Aware Peripherals" TabName="GTZC Illegal Access Controller" Visible="false">
+    <Condition Expression="S_Full_IT_Disabled_$IpInstance" Diagnostic="pre-selected no IT Secured"/>
+    <PossibleValue Value="Enabled" Comment="enabled"/>
+  </RefParameter>
+  <RefParameter Name="Full_IT_Disabled" Comment="Full_IT_Disabled" DefaultValue="Disabled" Type="list" Group="Illegal Access ITs for securable &amp; TZ-Aware Peripherals" TabName="GTZC Illegal Access Controller" Visible="false">
+    <PossibleValue Value="Disabled" Comment="disabled"/>
+  </RefParameter>
+  <RefParameter Name="Full_IT_Enabled" Comment="Full_IT_Enabled" DefaultValue="Enabled" Type="list" Group="Illegal Access ITs for securable &amp; TZ-Aware Peripherals" TabName="GTZC Illegal Access Controller" Visible="false">
+    <Condition Expression="S_Full_IT_Enabled_$IpInstance" Diagnostic="pre-selected all IT Secured"/>
+    <PossibleValue Value="Enabled" Comment="enabled"/>
+  </RefParameter>
+  <RefParameter Name="Full_IT_Enabled" Comment="Full_IT_Enabled" DefaultValue="Disabled" Type="list" Group="Illegal Access ITs for securable &amp; TZ-Aware Peripherals" TabName="GTZC Illegal Access Controller" Visible="false">
+    <PossibleValue Value="Disabled" Comment="disabled"/>
+  </RefParameter>
+  <RefParameter Name="Full_IT_Default" Comment="Full_IT_Default" DefaultValue="Enabled" Type="list" Group="Illegal Access ITs for securable &amp; TZ-Aware Peripherals" TabName="GTZC Illegal Access Controller" Visible="false">
+    <Condition Expression="S_Full_IT_Default_$IpInstance" Diagnostic="pre-selected default IT Secured"/>
+    <PossibleValue Value="Enabled" Comment="enabled"/>
+  </RefParameter>
+  <RefParameter Name="Full_IT_Default" Comment="Full_IT_Default" DefaultValue="Disabled" Type="list" Group="Illegal Access ITs for securable &amp; TZ-Aware Peripherals" TabName="GTZC Illegal Access Controller" Visible="false">
+    <PossibleValue Value="Disabled" Comment="disabled"/>
   </RefParameter>
 
   <RefParameter Name="Illegal_Access_Interrupt_Peripheral" Comment="Illegal Access Interrupt Peripheral" DefaultValue="Illegal Access Interrupt State" Type="string" Group="Illegal Access ITs for securable &amp; TZ-Aware Peripherals" TabName="GTZC Illegal Access Controller"/>
   <RefParameter Name="Illegal_Access_Interrupt" Comment="" DefaultValue="Enabled" Type="list" Group="Illegal Access ITs for securable &amp; TZ-Aware Peripherals" TabName="GTZC Illegal Access Controller">
-    <Condition Expression="S_Full_IT_Enabled" Diagnostic="pre-selected all IT Secured"/>
-    <PossibleValue Value="Disabled" Comment="disabled"/>
-    <PossibleValue Value="Enabled" Comment="enabled"/>
+    <Condition Expression="S_Full_IT_Enabled_$IpInstance" Diagnostic="pre-selected all IT Secured"/>
   </RefParameter>
   <RefParameter Name="Illegal_Access_Interrupt" Comment="" DefaultValue="Disabled" Type="list" Group="Illegal Access ITs for securable &amp; TZ-Aware Peripherals" TabName="GTZC Illegal Access Controller">
-    <PossibleValue Value="Disabled" Comment="disabled"/>
+    <Condition Expression="S_Full_IT_Disabled_$IpInstance" Diagnostic="pre-selected no IT Secured"/>
+  </RefParameter>
+  <RefParameter Name="Illegal_Access_Interrupt" Comment="" DefaultValue="Default" Type="list" Group="Illegal Access ITs for securable &amp; TZ-Aware Peripherals" TabName="GTZC Illegal Access Controller">
+    <Condition Expression="S_Full_IT_Default_$IpInstance" Diagnostic="pre-selected default IT Secured"/>
+  </RefParameter>
+
+  <RefParameter Name="IAI_Disabled" Comment="IAI_Disabled" DefaultValue="Enabled" Type="list" Group="Illegal Access ITs for securable &amp; TZ-Aware Peripherals" TabName="GTZC Illegal Access Controller" Visible="false">
+    <Condition Expression="S_IAI_DISABLED" Diagnostic="pre-selected all IT Secured"/>
     <PossibleValue Value="Enabled" Comment="enabled"/>
+  </RefParameter>
+  <RefParameter Name="IAI_Disabled" Comment="IAI_Disabled" DefaultValue="Disabled" Type="list" Group="Illegal Access ITs for securable &amp; TZ-Aware Peripherals" TabName="GTZC Illegal Access Controller" Visible="false">
+    <PossibleValue Value="Disabled" Comment="disabled"/>
+  </RefParameter>
+  <RefParameter Name="IAI_Enabled" Comment="IAI_Enabled" DefaultValue="Enabled" Type="list" Group="Illegal Access ITs for securable &amp; TZ-Aware Peripherals" TabName="GTZC Illegal Access Controller" Visible="false">
+    <Condition Expression="S_IAI_ENABLED" Diagnostic="pre-selected no IT Secured"/>
+    <PossibleValue Value="Enabled" Comment="enabled"/>
+  </RefParameter>
+  <RefParameter Name="IAI_Enabled" Comment="IAI_Enabled" DefaultValue="Disabled" Type="list" Group="Illegal Access ITs for securable &amp; TZ-Aware Peripherals" TabName="GTZC Illegal Access Controller" Visible="false">
+    <PossibleValue Value="Disabled" Comment="disabled"/>
+  </RefParameter>
+  <RefParameter Name="IAI_Default" Comment="IAI_Default" DefaultValue="Enabled" Type="list" Group="Illegal Access ITs for securable &amp; TZ-Aware Peripherals" TabName="GTZC Illegal Access Controller" Visible="false">
+    <Condition Expression="S_IAI_DEFAULT" Diagnostic="pre-selected default IT Secured"/>
+    <PossibleValue Value="Enabled" Comment="enabled"/>
+  </RefParameter>
+  <RefParameter Name="IAI_Default" Comment="IAI_Default" DefaultValue="Disabled" Type="list" Group="Illegal Access ITs for securable &amp; TZ-Aware Peripherals" TabName="GTZC Illegal Access Controller" Visible="false">
+    <PossibleValue Value="Disabled" Comment="disabled"/>
   </RefParameter>
 
   <!-- RefMode for GTZC -->
@@ -232,6 +305,8 @@
 
 
     <!-- Parameters for GTZC - MPCWM1 Secured -->
+    <Parameter Name="MPCWM_Activation" TabName="GTZC Security Controller - Memory Protection Controller WaterMark"><Condition Diagnostic="only Active in GTZC_S" Expression="($IpInstance=GTZC_S)"/></Parameter>
+
     <Parameter Name="MPCWM_NonPrivilegeArea_Desc" Group="MPCWM Common" TabName="GTZC Security Controller - Memory Protection Controller WaterMark"><Condition Diagnostic="only Active in GTZC_S" Expression="($IpInstance=GTZC_S)"/></Parameter>
 
     <Parameter Name="MPCWM1_NonPrivilegeArea_Choice" Group="MPCWM1 (FLASH)" TabName="GTZC Security Controller - Memory Protection Controller WaterMark"><Condition Diagnostic="only Active in GTZC_S" Expression="($IpInstance=GTZC_S)"/></Parameter>
@@ -251,21 +326,101 @@
 
     <!-- Parameters for GTZC - Interrupts Secured -->
     <Parameter Name="TZIC_Configure_IT_Choice"><Condition Diagnostic="only Active in GTZC_S" Expression="($IpInstance=GTZC_S)"/></Parameter>
+
+    <Parameter Name="Full_IT_Disabled"><Condition Diagnostic="only Active in GTZC_S" Expression="($IpInstance=GTZC_S)"/></Parameter>
+    <Parameter Name="Full_IT_Enabled"><Condition Diagnostic="only Active in GTZC_S" Expression="($IpInstance=GTZC_S)"/></Parameter>
+    <Parameter Name="Full_IT_Default"><Condition Diagnostic="only Active in GTZC_S" Expression="($IpInstance=GTZC_S)"/></Parameter>
+
     <Parameter Name="Illegal_Access_Interrupt_Peripheral"><Condition Diagnostic="only Active in GTZC_S" Expression="($IpInstance=GTZC_S)"/></Parameter>
-    <Parameter Name="TZIC_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="TZIC"><Condition Diagnostic="only Active in GTZC_S" Expression="($IpInstance=GTZC_S)"/></Parameter>
-    <Parameter Name="TZSC_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="TZSC"><Condition Diagnostic="only Active in GTZC_S" Expression="($IpInstance=GTZC_S)"/></Parameter>
-    <Parameter Name="AES_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="AES"><Condition Diagnostic="only Active in GTZC_S" Expression="($IpInstance=GTZC_S)"/></Parameter>
-    <Parameter Name="RNG_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="RNG"><Condition Diagnostic="only Active in GTZC_S" Expression="($IpInstance=GTZC_S)"/></Parameter>
-    <Parameter Name="SUBGHZSPI_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="SUBGHZSPI"><Condition Diagnostic="only Active in GTZC_S" Expression="($IpInstance=GTZC_S)"/></Parameter>
-    <Parameter Name="PWR_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="PWR"><Condition Diagnostic="only Active in GTZC_S" Expression="($IpInstance=GTZC_S)"/></Parameter>
-    <Parameter Name="FLASH_IF_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="FLASH_IF"><Condition Diagnostic="only Active in GTZC_S" Expression="($IpInstance=GTZC_S)"/></Parameter>
-    <Parameter Name="DMA1_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="DMA1"><Condition Diagnostic="only Active in GTZC_S" Expression="($IpInstance=GTZC_S)"/></Parameter>
-    <Parameter Name="DMA2_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="DMA2"><Condition Diagnostic="only Active in GTZC_S" Expression="($IpInstance=GTZC_S)"/></Parameter>
-    <Parameter Name="DMAMUX1_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="DMAMUX1"><Condition Diagnostic="only Active in GTZC_S" Expression="($IpInstance=GTZC_S)"/></Parameter>
-    <Parameter Name="FLASH_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="FLASH"><Condition Diagnostic="only Active in GTZC_S" Expression="($IpInstance=GTZC_S)"/></Parameter>
-    <Parameter Name="SRAM1_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="SRAM1"><Condition Diagnostic="only Active in GTZC_S" Expression="($IpInstance=GTZC_S)"/></Parameter>
-    <Parameter Name="SRAM2_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="SRAM2"><Condition Diagnostic="only Active in GTZC_S" Expression="($IpInstance=GTZC_S)"/></Parameter>
-    <Parameter Name="PKA_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="PKA"><Condition Diagnostic="only Active in GTZC_S" Expression="($IpInstance=GTZC_S)"/></Parameter>
+    <Parameter Name="TZIC_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="TZIC">
+        <Condition Diagnostic="only Active in GTZC_S" Expression="($IpInstance=GTZC_S)"/>
+        <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+        <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+        <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
+    <Parameter Name="TZSC_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="TZSC">
+        <Condition Diagnostic="only Active in GTZC_S" Expression="($IpInstance=GTZC_S)"/>
+        <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+        <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+        <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
+    <Parameter Name="AES_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="AES">
+        <Condition Diagnostic="only Active in GTZC_S" Expression="($IpInstance=GTZC_S)"/>
+        <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+        <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+        <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
+    <Parameter Name="RNG_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="RNG">
+        <Condition Diagnostic="only Active in GTZC_S" Expression="($IpInstance=GTZC_S)"/>
+        <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+        <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+        <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
+    <Parameter Name="SUBGHZSPI_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="SUBGHZSPI">
+        <Condition Diagnostic="only Active in GTZC_S" Expression="($IpInstance=GTZC_S)"/>
+        <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+        <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+        <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
+    <Parameter Name="PWR_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="PWR">
+        <Condition Diagnostic="only Active in GTZC_S" Expression="($IpInstance=GTZC_S)"/>
+        <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+        <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+        <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
+    <Parameter Name="FLASHIF_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="FLASH_IF">
+        <Condition Diagnostic="only Active in GTZC_S" Expression="($IpInstance=GTZC_S)"/>
+        <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+        <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+        <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
+    <Parameter Name="DMA1_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="DMA1">
+        <Condition Diagnostic="only Active in GTZC_S" Expression="($IpInstance=GTZC_S)"/>
+        <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+        <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+        <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
+    <Parameter Name="DMA2_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="DMA2">
+        <Condition Diagnostic="only Active in GTZC_S" Expression="($IpInstance=GTZC_S)"/>
+        <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+        <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+        <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
+    <Parameter Name="DMAMUX_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="DMAMUX1">
+        <Condition Diagnostic="only Active in GTZC_S" Expression="($IpInstance=GTZC_S)"/>
+        <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+        <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+        <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
+    <Parameter Name="FLASH_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="FLASH">
+        <Condition Diagnostic="only Active in GTZC_S" Expression="($IpInstance=GTZC_S)"/>
+        <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+        <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+        <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
+    <Parameter Name="SRAM1_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="SRAM1">
+        <Condition Diagnostic="only Active in GTZC_S" Expression="($IpInstance=GTZC_S)"/>
+        <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+        <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+        <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
+    <Parameter Name="SRAM2_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="SRAM2">
+        <Condition Diagnostic="only Active in GTZC_S" Expression="($IpInstance=GTZC_S)"/>
+        <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+        <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+        <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
+    <Parameter Name="PKA_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="PKA">
+        <Condition Diagnostic="only Active in GTZC_S" Expression="($IpInstance=GTZC_S)"/>
+        <PossibleValue Comment="disabled" Semaphore="S_IAI_DISABLED">Disabled</PossibleValue>
+        <PossibleValue Comment="enabled" Semaphore="S_IAI_ENABLED">Enabled</PossibleValue>
+        <PossibleValue Comment="default" Semaphore="S_IAI_DEFAULT">Default</PossibleValue>
+    </Parameter>
+
+    <Parameter Name="IAI_Disabled"><Condition Diagnostic="only Active in GTZC_S" Expression="($IpInstance=GTZC_S)"/></Parameter>
+    <Parameter Name="IAI_Enabled"><Condition Diagnostic="only Active in GTZC_S" Expression="($IpInstance=GTZC_S)"/></Parameter>
+    <Parameter Name="IAI_Default"><Condition Diagnostic="only Active in GTZC_S" Expression="($IpInstance=GTZC_S)"/></Parameter>
+
   </RefMode>
 
 

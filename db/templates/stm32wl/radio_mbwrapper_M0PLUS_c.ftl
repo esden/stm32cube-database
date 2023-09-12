@@ -11,7 +11,7 @@
   */
 [#--
 ********************************
-SWIP Datas:
+SWIP Data:
 [#if SWIPdatas??]
   [#list SWIPdatas as SWIP]
     [#if SWIP.defines??]
@@ -115,7 +115,7 @@ void Process_Radio_Cmd(MBMUX_ComParam_t *ComObj)
   /* USER CODE BEGIN Process_Radio_Cmd_1 */
 
   /* USER CODE END Process_Radio_Cmd_1 */
-  uint32_t *com_buffer = ComObj->ParamBuf;;
+  uint32_t *com_buffer = ComObj->ParamBuf;
   uint32_t ret_uint;
   int32_t ret_int;
   RadioState_t status;

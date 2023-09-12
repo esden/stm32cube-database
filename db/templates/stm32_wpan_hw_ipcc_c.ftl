@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
  ******************************************************************************
   * File Name          : ${name}
@@ -8,6 +9,8 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
+/* USER CODE END Header */
+[#assign DIE = DIE]
 
 /* Includes ------------------------------------------------------------------*/
 #include "app_common.h"
@@ -19,6 +22,13 @@
 #define HW_IPCC_RX_PENDING( channel )  (LL_C2_IPCC_IsActiveFlag_CHx( IPCC, channel )) && (((~(IPCC->C1MR)) & (channel << 0U)))
 
 /* Private macros ------------------------------------------------------------*/
+[#if DIE == "DIE494"]
+#if ( (STM32WB15xx != 0) && (CFG_LPM_STANDBY_SUPPORTED != 0) )
+#define HW_IPCC_SET_FLAG_CHX(x) HW_IPCC_SetFlagCHx(x)
+#else
+#define HW_IPCC_SET_FLAG_CHX(x) LL_C1_IPCC_SetFlag_CHx(IPCC, x)
+#endif
+[/#if]
 /* Private typedef -----------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
 static void (*FreeBufCb)( void );
@@ -58,6 +68,12 @@ static void HW_IPCC_ZIGBEE_StackNotifEvtHandler( void );
 static void HW_IPCC_ZIGBEE_StackM0RequestHandler( void );
 #endif
 
+[#if DIE == "DIE494"]
+#if ( (STM32WB15xx != 0) && (CFG_LPM_STANDBY_SUPPORTED != 0) )
+static void IPCC_Wakeup_CPU2(void);
+static void HW_IPCC_SetFlagCHx(uint32_t Channel);
+#endif
+[/#if]
 /* Public function definition -----------------------------------------------*/
 
 /******************************************************************************
@@ -215,6 +231,33 @@ void HW_IPCC_Init( void )
   return;
 }
 
+[#if DIE == "DIE494"]
+#if(CFG_LPM_STANDBY_SUPPORTED != 0)
+static void IPCC_Wakeup_CPU2(void)
+{
+
+  /**
+   * When the device is out of standby, it is required to use the EXTI mechanism to wakeup CPU2
+   */
+  LL_C2_EXTI_EnableEvent_32_63( LL_EXTI_LINE_41 );
+  LL_EXTI_EnableRisingTrig_32_63( LL_EXTI_LINE_41 );
+
+  __SEV( );       /* Set the internal event flag and send an event to the CPU2 */
+  __WFE( );       /* Clear the internal event flag */
+
+  
+  return;
+}
+
+static void HW_IPCC_SetFlagCHx(uint32_t Channel)
+{
+  IPCC_Wakeup_CPU2();
+  LL_C1_IPCC_SetFlag_CHx(IPCC, Channel);
+  
+  return;
+}
+#endif
+[/#if]
 /******************************************************************************
  * BLE
  ******************************************************************************/
@@ -227,7 +270,11 @@ void HW_IPCC_BLE_Init( void )
 
 void HW_IPCC_BLE_SendCmd( void )
 {
+[#if DIE == "DIE494"]
+  HW_IPCC_SET_FLAG_CHX( HW_IPCC_BLE_CMD_CHANNEL );
+[#else]
   LL_C1_IPCC_SetFlag_CHx( IPCC, HW_IPCC_BLE_CMD_CHANNEL );
+[/#if]
 
   return;
 }
@@ -243,7 +290,11 @@ static void HW_IPCC_BLE_EvtHandler( void )
 
 void HW_IPCC_BLE_SendAclData( void )
 {
+[#if DIE == "DIE494"]
+  HW_IPCC_SET_FLAG_CHX( HW_IPCC_HCI_ACL_DATA_CHANNEL );
+[#else]
   LL_C1_IPCC_SetFlag_CHx( IPCC, HW_IPCC_HCI_ACL_DATA_CHANNEL );
+[/#if]
   LL_C1_IPCC_EnableTransmitChannel( IPCC, HW_IPCC_HCI_ACL_DATA_CHANNEL );
 
   return;
@@ -273,7 +324,11 @@ void HW_IPCC_SYS_Init( void )
 
 void HW_IPCC_SYS_SendCmd( void )
 {
+[#if DIE == "DIE494"]
+  HW_IPCC_SET_FLAG_CHX( HW_IPCC_SYSTEM_CMD_RSP_CHANNEL );
+[#else]
   LL_C1_IPCC_SetFlag_CHx( IPCC, HW_IPCC_SYSTEM_CMD_RSP_CHANNEL );
+[/#if]
   LL_C1_IPCC_EnableTransmitChannel( IPCC, HW_IPCC_SYSTEM_CMD_RSP_CHANNEL );
 
   return;
@@ -313,7 +368,11 @@ void HW_IPCC_MAC_802_15_4_Init( void )
 
 void HW_IPCC_MAC_802_15_4_SendCmd( void )
 {
+[#if DIE == "DIE494"]
+  HW_IPCC_SET_FLAG_CHX( HW_IPCC_MAC_802_15_4_CMD_RSP_CHANNEL );
+[#else]
   LL_C1_IPCC_SetFlag_CHx( IPCC, HW_IPCC_MAC_802_15_4_CMD_RSP_CHANNEL );
+[/#if]
   LL_C1_IPCC_EnableTransmitChannel( IPCC, HW_IPCC_MAC_802_15_4_CMD_RSP_CHANNEL );
 
   return;
@@ -362,7 +421,11 @@ void HW_IPCC_THREAD_Init( void )
 
 void HW_IPCC_OT_SendCmd( void )
 {
+[#if DIE == "DIE494"]
+  HW_IPCC_SET_FLAG_CHX( HW_IPCC_THREAD_OT_CMD_RSP_CHANNEL );
+[#else]
   LL_C1_IPCC_SetFlag_CHx( IPCC, HW_IPCC_THREAD_OT_CMD_RSP_CHANNEL );
+[/#if]
   LL_C1_IPCC_EnableTransmitChannel( IPCC, HW_IPCC_THREAD_OT_CMD_RSP_CHANNEL );
 
   return;
@@ -370,7 +433,11 @@ void HW_IPCC_OT_SendCmd( void )
 
 void HW_IPCC_CLI_SendCmd( void )
 {
+[#if DIE == "DIE494"]
+  HW_IPCC_SET_FLAG_CHX( HW_IPCC_THREAD_CLI_CMD_CHANNEL );
+[#else]
   LL_C1_IPCC_SetFlag_CHx( IPCC, HW_IPCC_THREAD_CLI_CMD_CHANNEL );
+[/#if]
 
   return;
 }
@@ -558,7 +625,11 @@ void HW_IPCC_ZIGBEE_Init( void )
 
 void HW_IPCC_ZIGBEE_SendM4RequestToM0( void )
 {
+[#if DIE == "DIE494"]
+  HW_IPCC_SET_FLAG_CHX( HW_IPCC_ZIGBEE_CMD_APPLI_CHANNEL );
+[#else]
   LL_C1_IPCC_SetFlag_CHx( IPCC, HW_IPCC_ZIGBEE_CMD_APPLI_CHANNEL );
+[/#if]
   LL_C1_IPCC_EnableTransmitChannel( IPCC, HW_IPCC_ZIGBEE_CMD_APPLI_CHANNEL );
 
   return;
@@ -626,7 +697,11 @@ void HW_IPCC_MM_SendFreeBuf( void (*cb)( void ) )
   {
     cb();
 
+[#if DIE == "DIE494"]
+    HW_IPCC_SET_FLAG_CHX( HW_IPCC_MM_RELEASE_BUFFER_CHANNEL );
+[#else]
     LL_C1_IPCC_SetFlag_CHx( IPCC, HW_IPCC_MM_RELEASE_BUFFER_CHANNEL );
+[/#if]
   }
 
   return;
@@ -638,7 +713,11 @@ static void HW_IPCC_MM_FreeBufHandler( void )
 
   FreeBufCb();
 
+[#if DIE == "DIE494"]
+  HW_IPCC_SET_FLAG_CHX( HW_IPCC_MM_RELEASE_BUFFER_CHANNEL );
+[#else]
   LL_C1_IPCC_SetFlag_CHx( IPCC, HW_IPCC_MM_RELEASE_BUFFER_CHANNEL );
+[/#if]
 
   return;
 }

@@ -41,7 +41,7 @@
 
  /* Includes ------------------------------------------------------------------*/
  /**
-   * @brief Include Maibox interface  header file
+   * @brief Include Mailbox interface  header file
    */
 
 #ifdef MAILBOX_IPCC_IF_ENABLED
@@ -183,7 +183,7 @@ extern int __OPENAMP_region_end__[];    /* defined by linker script */
                         [#lt]#define VRING_BUFF_ADDRESS   ${definition.value}             /* allocated by Master processor: CA7 */
 			[/#if]
                         [#if definition.name="VRING_ALIGNMENT"]
-                        [#lt]#define VRING_ALIGNMENT      ${definition.value}         /* fixed to match with 4k page alignement requested by linux  */
+                        [#lt]#define VRING_ALIGNMENT      ${definition.value}         /* fixed to match with 4k page alignment requested by linux  */
 			[/#if]
                         [#if definition.name="VRING_NUM_BUFFS"]
                         [#lt]#define VRING_NUM_BUFFS      ${definition.value}             /* number of rpmsg buffer */
