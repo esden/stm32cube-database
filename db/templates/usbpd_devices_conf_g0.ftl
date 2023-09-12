@@ -170,8 +170,6 @@
     [/#if]
 [/#list]
 
-/* CubeMX Generated */
-#define CUBEMX_GENERATED
 
 #ifndef USBPD_DEVICE_CONF_H
 #define USBPD_DEVICE_CONF_H

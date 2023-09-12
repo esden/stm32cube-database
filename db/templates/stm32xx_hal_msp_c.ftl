@@ -158,7 +158,7 @@ void HAL_MspInit(void)
 #t/* Peripheral interrupt init */
 [/#if]
 
-[#if initVector.codeInMspInit && initVector.usedDriver=="HAL"]
+[#if initVector.codeInMspInit && initVector.usedDriver=="HAL" &&initVector.vector!="RCC_IRQn"]
     [#if initVector.systemHandler=="false" || initVector.preemptionPriority!="0" || initVector.subPriority!="0"]
     [#if initVector.vector!="SysTick_IRQn"]
     [#if (initVector.vector!="PVD_AVD_IRQn" && FamilyName=="STM32U5") && (initVector.vector!="PVD_PVM_IRQn" && FamilyName=="STM32U5")]
@@ -173,11 +173,14 @@ void HAL_MspInit(void)
     [/#if]
     [#if initVector.systemHandler=="false"]
     [#if (initVector.vector!="PVD_AVD_IRQn" && FamilyName=="STM32U5")&& (initVector.vector!="PVD_PVM_IRQn" && FamilyName=="STM32U5")]
+    [#if EnableCode??]
       #tHAL_NVIC_EnableIRQ(${initVector.vector});
+[/#if]
     [/#if]
 [#if FamilyName!="STM32U5"]
-    #t/* ${initVector.vector} interrupt configuration */
-   #tHAL_NVIC_EnableIRQ(${initVector.vector});
+ [#if EnableCode??]
+    #tHAL_NVIC_EnableIRQ(${initVector.vector});
+ [/#if]
     [/#if]
 [/#if]
 [/#if]
@@ -197,11 +200,14 @@ void HAL_MspInit(void)
     [/#if]
     [#if initVector.systemHandler=="false"]
     [#if (initVector.vector!="PVD_AVD_IRQn" && FamilyName=="STM32U5")&& (initVector.vector!="PVD_PVM_IRQn" && FamilyName=="STM32U5")]
+     [#if EnableCode??]
       #tHAL_NVIC_EnableIRQ(${initVector.vector});
+[/#if]
     [/#if]
 [#if FamilyName!="STM32U5"]
-    #t/* ${initVector.vector} interrupt configuration */
-   #tHAL_NVIC_EnableIRQ(${initVector.vector});
+[#if EnableCode??]
+      #tHAL_NVIC_EnableIRQ(${initVector.vector});
+ [/#if]
     [/#if]
 [/#if]
 [/#if]
@@ -243,6 +249,7 @@ void HAL_MspInit(void)
 [#assign useGpio = false]
 [#assign useDma = false]
 [#assign useNvic = false]
+[#assign GenerateNvicEnable = false]
 [#-- extract hal mode list used by all instances of the ip --]
 [#assign halModeList= ""]
 
@@ -267,6 +274,10 @@ void HAL_MspInit(void)
     [#if instanceData.initServices.nvic??]
         [#assign useNvic = true]
     [/#if]
+[#if instanceData.initServices.EnableCode??]
+        [#assign GenerateNvicEnable = true]
+    [/#if]
+
   [/#if]
 [/#list]
 
@@ -1031,6 +1042,28 @@ void HAL_MspInit(void)
     #t#t#tHAL_PWREx_EnableVddUSB();
   #t#t}
 [/#if]
+[#if ipName?contains("OTG_HS")&&FamilyName=="STM32U5"]
+#n#t#t/* Enable VDDUSB */
+  #t#tif(__HAL_RCC_PWR_IS_CLK_DISABLED())
+  #t#t{
+    #t#t#t__HAL_RCC_PWR_CLK_ENABLE();
+    
+    #t#t#tHAL_PWREx_EnableVddUSB();
+    #n#t#t#t/*configure VOSR register of USB*/
+    #t#t#tHAL_PWREx_EnableUSBHSTranceiverSupply();
+    
+    #t#t#t__HAL_RCC_PWR_CLK_DISABLE();
+  #t#t}
+  #t#telse
+  #t#t{
+    #t#t#tHAL_PWREx_EnableVddUSB();
+    #n#t#t#t/*configure VOSR register of USB*/
+    #t#t#tHAL_PWREx_EnableUSBHSTranceiverSupply();
+  #t#t}
+#n#t#t/*Configuring the SYSCFG registers OTG_HS PHY*/
+#t#t/*OTG_HS PHY enable*/
+#t#t#tHAL_SYSCFG_EnableOTGPHY(SYSCFG_OTG_HS_PHY_ENABLE);
+[/#if]
 [#-- bug 322189 Init End--]
     [#if dmaExist]
 #t[@generateConfigCode ipName=ipName type=serviceType serviceName="dma" instHandler=instHandler tabN=tabN/]
@@ -1057,7 +1090,9 @@ void HAL_MspInit(void)
                 [#list initService.nvic as initVector]
                   [#if !initVector.vector?contains("WKUP") && !initVector.vector?contains("WakeUp") && initVector.codeInMspInit]
                     #t#tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
+[#if GenerateNvicEnable]
                     #t#tHAL_NVIC_EnableIRQ(${initVector.vector});
+   [/#if]
                   [/#if]
                 [/#list]
                 [#assign lowPower = "no"]
@@ -1137,7 +1172,9 @@ void HAL_MspInit(void)
                     [#list initService.nvic as initVector]
                        [#if initVector.vector?contains("WKUP") || initVector.vector?contains("WakeUp")]
                            #t#t#tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
+                           [#if GenerateNvicEnable]
                            #t#t#tHAL_NVIC_EnableIRQ(${initVector.vector});
+                            [/#if]
                        [/#if]
                     [/#list]
                     #t#t}
@@ -1147,7 +1184,9 @@ void HAL_MspInit(void)
               [#list initService.nvic as initVector]
                 [#if initVector.codeInMspInit]
                   #t#tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
+[#if GenerateNvicEnable]
                   #t#tHAL_NVIC_EnableIRQ(${initVector.vector});
+[/#if]
                 [/#if]
               [/#list]
             [/#if]

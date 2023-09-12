@@ -12,8 +12,8 @@
 /* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __P2P_APPLICATION_H
-#define __P2P_APPLICATION_H
+#ifndef P2P_APPLICATION_H
+#define P2P_APPLICATION_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -70,4 +70,4 @@ uint8_t P2P_Client_APP_Get_State( void );
 }
 #endif
 
-#endif /*__P2P_APPLICATION_H */
+#endif /*P2P_APPLICATION_H */

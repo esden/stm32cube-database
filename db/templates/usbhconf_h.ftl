@@ -156,7 +156,11 @@ extern ${variable.value} ${variable.name};
 #if (USBH_DEBUG_LEVEL > 1U)
 
 #define  USBH_ErrLog(...) do { \
+[#if FamilyName.contains("STM32F7") | FamilyName.contains("STM32G0")]
+                            printf("ERROR: "); \
+[#else]
                             printf("ERROR: ") ; \
+[/#if]
                             printf(__VA_ARGS__); \
                             printf("\n"); \
 } while (0)
@@ -166,7 +170,11 @@ extern ${variable.value} ${variable.name};
 
 #if (USBH_DEBUG_LEVEL > 2U)
 #define  USBH_DbgLog(...)   do { \
+[#if FamilyName.contains("STM32F7") | FamilyName.contains("STM32G0")]
+                            printf("ERROR: "); \
+[#else]
                             printf("DEBUG : ") ; \
+[/#if]
                             printf(__VA_ARGS__); \
                             printf("\n"); \
 } while (0)

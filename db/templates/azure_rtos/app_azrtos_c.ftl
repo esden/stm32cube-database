@@ -62,7 +62,17 @@
 [#if packs??]
 [#assign PACK_IN_USE = "true"]
 [#list packs as variables]
+[#if variables.value != "ThreadX" ]
+[#assign result = "false"]
+[#assign name=contextFolder + mxTmpFolder+"/RTOS_pool_create_${variables.name}.tmp"/]
+[#assign exist = common.fileExist(name)]  
+  [#if exist?contains("true")] 
+	[#assign result = "true"]
+  [/#if]	    
+  [#if result?contains("true")]
 #include "app_${variables.value?lower_case}.h"
+  [/#if]
+[/#if]  
 [/#list]
 [/#if]
 /* Private includes ----------------------------------------------------------*/
@@ -425,8 +435,15 @@ VOID tx_application_define(VOID *first_unused_memory)
 [/#if]
 [#if packs??]
 [#list packs as variables]
-[@common.optinclude name=mxTmpFolder+"/RTOS_pool_create_${variables.name}.tmp"/]
-    if (MX_${variables.value}_Init(memory_ptr) != TX_SUCCESS)
+[#if variables.value != "ThreadX" ]
+[@common.optinclude name=contextFolder + mxTmpFolder+"/RTOS_pool_create_${variables.name}.tmp"/]
+  [#assign result = "false"]
+  [#assign exist = common.fileExist(name)]  
+  [#if exist?contains("true")] 
+	[#assign result = "true"]
+  [/#if]   
+  [#if result?contains("true")]
+    if (MX_${variables.value?replace("-","_")}_Init(memory_ptr) != TX_SUCCESS)
     {
       /* USER CODE BEGIN  MX_${variables.name}_Init_Error */
 
@@ -436,6 +453,8 @@ VOID tx_application_define(VOID *first_unused_memory)
 
     /* USER CODE END  MX_${variables.name}_Init_Success */
   }
+  [/#if]
+[/#if]
 [/#list]
 [/#if]
 #else

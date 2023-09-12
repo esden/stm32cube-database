@@ -323,6 +323,7 @@
     <RefParameter Visible="false"  Comment="RTC Clock Selection" DefaultValue="RCC_RFWKPCLKSOURCE_LSI" Name="RFWKPClockSelection" Type="list" IP="RFWKP">
         <PossibleValue Comment="RFWKPclksource Lse"           Value="RCC_RFWKPCLKSOURCE_LSE"         Semaphore="RFWKPSourceLSE"/>
         <PossibleValue Comment="RFWKP clksource Hse div1024"  Value="RCC_RFWKPCLKSOURCE_HSE_DIV1024" Semaphore="RFWKPSourceHSE"/>
+        <PossibleValue Comment="RFWKP clksource LSI"  Value="RCC_RFWKPCLKSOURCE_LSI" Semaphore="RFWKPSourceLSI"/>
          
     </RefParameter> 
     <!--RCC_RTC_Clock_SourceVirtual-->
@@ -499,7 +500,10 @@
 	
 	
     <!--frequence Values --> 
-    <!--Source frequency Values --> 
+    <!--Source frequency Values -->
+    <RefParameter Visible="false" Comment="HSE OSC"    Name="HSE_VALUE" DefaultValue="32000000" Max="32000000" Min="32000000" Type="double" Display="value/1000000" Unit="MHz">
+        <Condition Diagnostic="" Expression="STM32WB1MMCHx"/>
+    </RefParameter>
     <RefParameter Visible="false" Comment="HSE OSC"    Name="HSE_VALUE" DefaultValue="32000000" Max="32000000" Min="32000000"       Type="double" Display="value/1000000" Unit="MHz"><!--HSE bypass and !PLL and !CSS-->
         <Condition Diagnostic="HSE for RF" Expression="(HSEByPass | HSEOscillator)  &amp; RFUsed_ForRCC"/>
     </RefParameter>   
@@ -1000,7 +1004,7 @@
 	
     <!-- LSI used -->
     <RefParameter Visible="false" Comment="LSI used flag" DefaultValue="1" Name="LSIUsed" Type="integer" Min="1" Max="1">
-        <Condition Expression="(RNGUsed_ForRCC &amp; RNGCLKSOURCE_LSI) | (MCOConfig &amp; (MCOSourceLSI))|(RFUsed_ForRCC &amp; RFWKPSourceLSI)|(LSCOSSourceLSI &amp; LSCOConfig)|RCC_DAC_SAMPLEANDHOLD|(SEM2RCC_LSI_REQUIRED_TIM16 &amp; TIM16 &amp;  Semaphore_input_Channel1TIM16)|(LPTIM1SOURCELSI &amp; LPTIM1Used_ForRCC)|(LPTIM2SOURCELSI &amp; LPTIM2Used_ForRCC)|(IWDGUsed_ForRCC|((RTCClockSelection=RCC_RTCCLKSOURCE_LSI)&amp;(RTCUsed_ForRCC|LCDUsed_ForRCC))|((RCC_MCO1Source=RCC_MCO1SOURCE_LSI1)&amp;(((Semaphore_input_Channel1TIM16 &amp; TIM16 &amp; SEM2RCC_MCO_REQUIRED_TIM16)|MCOConfig))))" Diagnostic=""/>
+        <Condition Expression="RFWKPSourceLSI &amp; RF_Used|(RNGUsed_ForRCC &amp; RNGCLKSOURCE_LSI) | (MCOConfig &amp; (MCOSourceLSI))|(RFUsed_ForRCC &amp; RFWKPSourceLSI)|(LSCOSSourceLSI &amp; LSCOConfig)|RCC_DAC_SAMPLEANDHOLD|(SEM2RCC_LSI_REQUIRED_TIM16 &amp; TIM16 &amp;  Semaphore_input_Channel1TIM16)|(LPTIM1SOURCELSI &amp; LPTIM1Used_ForRCC)|(LPTIM2SOURCELSI &amp; LPTIM2Used_ForRCC)|(IWDGUsed_ForRCC|((RTCClockSelection=RCC_RTCCLKSOURCE_LSI)&amp;(RTCUsed_ForRCC|LCDUsed_ForRCC))|((RCC_MCO1Source=RCC_MCO1SOURCE_LSI1)&amp;(((Semaphore_input_Channel1TIM16 &amp; TIM16 &amp; SEM2RCC_MCO_REQUIRED_TIM16)|MCOConfig))))" Diagnostic=""/>
     </RefParameter>
     <RefParameter Visible="false" Comment="LSI used flag" DefaultValue="0" Name="LSIUsed" Type="integer" Min="0" Max="0"/>
    
@@ -1610,7 +1614,7 @@
         <PossibleValue Value="1" Comment="Enabled"/>
         <PossibleValue Value="0" Comment="Disabled"/>
     </RefParameter>
-    <RefParameter Name="PREFETCH_ENABLE" Comment="Prefetch Buffer" Type="list" DefaultValue="0" Group="System Parameters">
+    <RefParameter Name="PREFETCH_ENABLE" Comment="Prefetch Buffer" Type="list" DefaultValue="1" Group="System Parameters">
         <PossibleValue Value="1" Comment="Enabled"/>
         <PossibleValue Value="0" Comment="Disabled"/>
     </RefParameter>
@@ -1675,6 +1679,16 @@
     <RefParameter Name="CodegenConfigPeriph" Comment="Generate the peripherals clock configuration" Type="list" DefaultValue="true" Group="Peripherals Clock Configuration">
         <PossibleValue Value="false" Comment="FALSE"/>
         <PossibleValue Value="true" Comment="TRUE"/>
+    </RefParameter>
+    
+    <RefParameter Visible="false" Comment="Hse is Internal osc" DefaultValue="true" Name="HSEOSCisInternal" Type="list">
+        <Condition Diagnostic="Hse is Internal osc" Expression="STM32WB1MMCHx"/>
+        <PossibleValue Comment="Hse is Internal osc" Value="true"/>
+    </RefParameter>
+    
+    <RefParameter Visible="false" Comment="LSE is Internal osc" DefaultValue="true" Name="LSEOSCisInternal" Type="list">
+        <Condition Diagnostic="LSE is Internal osc" Expression="STM32WB1MMCHx"/>
+        <PossibleValue Comment="LSE is Internal osc" Value="true"/>
     </RefParameter>
 
 	
@@ -1802,7 +1816,28 @@
    
     <ModeLogicOperator Name="OR">
         <!-- Modes for Oscillators & Clocks -->
-        <Mode Name="OSC" UserName="High Speed Clock (HSE)">
+        <Mode Name="OSC" UserName="High Speed Clock (HSE)" RemoveCondition="!STM32WB1MMCHx">
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="HSE-External-Clock-Source" UserName="Crystal/Ceramic Resonator">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="V_OSC_IN"/>
+                    </SignalLogicalOp>
+                    <Semaphore>HSEOscillator</Semaphore>
+                </Mode>
+            </ModeLogicOperator>
+         </Mode>
+         
+        <Mode Name="OSC32" UserName="Low Speed Clock (LSE) " RemoveCondition="!STM32WB1MMCHx">
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="LSE-External-Clock-Source" UserName="Crystal/Ceramic Resonator">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="V_OSC32_IN"/>
+                    </SignalLogicalOp>
+                    <Semaphore>LSEOscillator</Semaphore>
+                </Mode>
+            </ModeLogicOperator>
+        </Mode>
+        <Mode Name="OSC" UserName="High Speed Clock (HSE)" RemoveCondition="STM32WB1MMCHx">
             <ModeLogicOperator Name="XOR">
                 <Mode Name="HSE-External-Clock-Source" UserName="BYPASS Clock Source">
                     <SignalLogicalOp Name="AND">
@@ -1820,7 +1855,7 @@
                 </Mode>
             </ModeLogicOperator>
         </Mode>
-        <Mode Name="OSC" UserName="High Speed Clock (HSE)" >
+        <Mode Name="OSC" UserName="High Speed Clock (HSE)" RemoveCondition="STM32WB1MMCHx">
             <ModeLogicOperator Name="XOR">
                 <Mode Name="HSE-External-Clock-Source-for-LittleOrca" UserName="BYPASS Clock Source">
 			
@@ -1833,7 +1868,7 @@
            
             </ModeLogicOperator>
         </Mode>
-        <Mode Name="OSC32" UserName="Low Speed Clock (LSE) ">
+        <Mode Name="OSC32" UserName="Low Speed Clock (LSE) " RemoveCondition="STM32WB1MMCHx">
             <ModeLogicOperator Name="XOR">
                 <Mode Name="LSE-External-Clock-Source" UserName="BYPASS Clock Source">
                     <SignalLogicalOp Name="AND">
@@ -1883,7 +1918,10 @@
     <RefSignal IOMode="System" Name="OSC32_OUT"/>
     <RefSignal IOMode="System" Name="OSC_IN"/>
     <RefSignal IOMode="System" Name="OSC_OUT"/>
-
+    
+    <RefSignal Name="V_OSC_IN"  Virtual="true"/>
+    <RefSignal Name="V_OSC_OUT" Virtual="true"/>
+    <RefSignal Name="V_OSC32_IN" Virtual="true"/>
   
     <RefSignal Virtual="true" Name="LSE" />
 </IP>	

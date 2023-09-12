@@ -1,5 +1,6 @@
 [#ftl]
 [#assign cmp0 =1]
+[#assign GenerateNvicEnable = false]
 [#-- macro generateConfigModelCode --]
 
 [#macro generateConfigModelCode configModel inst nTab index mode]
@@ -396,6 +397,18 @@
   [/#if]
 [/#macro]
 
+[#function fileExist name]    
+  [#assign result = "false"]
+  [#assign objectConstructor = "freemarker.template.utility.ObjectConstructor"?new()]
+  [#assign file = objectConstructor("java.io.File",workspace+"/" + name)]
+  [#assign exist = file.exists()]  
+  [#if exist]  	
+    [#return "true"]
+  [#else]
+  	[#return "false"]
+  [/#if]
+[/#function]
+
 [#macro optincludeFile path name]
   [#assign objectConstructor = "freemarker.template.utility.ObjectConstructor"?new()]
   [#assign file = objectConstructor("java.io.File",workspace+"/"+path+"/"+name)]
@@ -411,6 +424,7 @@
 
 [#list configModel.configs as config]
 [#assign bz36245=false]
+[#assign link = "."]
 [#if config.methods??] [#-- if the pin configuration contains a list of LibMethods--]
     [#assign methodList = config.methods]
 [#else] [#assign methodList = config.libMethod]
@@ -1960,6 +1974,28 @@ ${bufferType} ${bufferName}[${bufferSize}];
 #t#t#tHAL_PWREx_EnableVddUSB();
 #t#t}
 [/#if]
+[#if ipName?contains("OTG_HS")&&FamilyName=="STM32U5"]
+#n#t#t/* Enable VDDUSB */
+  #t#tif(__HAL_RCC_PWR_IS_CLK_DISABLED())
+  #t#t{
+    #t#t#t__HAL_RCC_PWR_CLK_ENABLE();
+    
+    #t#t#tHAL_PWREx_EnableVddUSB();
+    #n#t#t#t/*configure VOSR register of USB*/
+    #t#t#tHAL_PWREx_EnableUSBHSTranceiverSupply();
+    
+    #t#t#t__HAL_RCC_PWR_CLK_DISABLE();
+  #t#t}
+  #t#telse
+  #t#t{
+    #t#t#tHAL_PWREx_EnableVddUSB();
+    #n#t#t#t/*configure VOSR register of USB*/
+    #t#t#tHAL_PWREx_EnableUSBHSTranceiverSupply();
+  #t#t}
+#n#t#t/*Configuring the SYSCFG registers OTG_HS PHY*/
+#t#t/*OTG_HS PHY enable*/
+#t#t#tHAL_SYSCFG_EnableOTGPHY(SYSCFG_OTG_HS_PHY_ENABLE);
+[/#if]
 [#-- bug 322189 Init End--]
     [#if nvicExist]
         [#if IPData.initServices??&&IPData.initServices.nvic??&&IPData.initServices.nvic?size>0]
@@ -1971,6 +2007,15 @@ ${bufferType} ${bufferName}[${bufferSize}];
             [/#if]
           [/#list]
         [/#if]
+  
+   
+    [#if IPData.initServices??]
+[#if IPData.initServices.EnableCode??]
+        [#assign GenerateNvicEnable = true]
+    [/#if]
+ [/#if]
+
+
         [#if IPData.initServices.nvic??&&IPData.initServices.nvic?size>0]
            [#if codeInMspInit || ipName?contains("USB")]
            [#-- Always generate comment for USB: it is not worth the trouble to compute when it is really needed --]
@@ -1984,8 +2029,9 @@ ${bufferType} ${bufferName}[${bufferSize}];
                 [#list IPData.initServices.nvic as initVector]
                   [#if !initVector.vector?contains("WKUP") && !initVector.vector?contains("WakeUp") && initVector.codeInMspInit]
 #t#tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
+[#if GenerateNvicEnable]
 #t#tHAL_NVIC_EnableIRQ(${initVector.vector});
-                  [/#if]
+                  [/#if][/#if]
                 [/#list]
                 [#assign lowPower = "no"]
                 [#list IPData.initServices.nvic as initVector]
@@ -2013,8 +2059,9 @@ ${bufferType} ${bufferName}[${bufferSize}];
                     [#list IPData.initServices.nvic as initVector]
                        [#if initVector.vector?contains("WKUP") || initVector.vector?contains("WakeUp")]
 #t#t#tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
+[#if GenerateNvicEnable]
 #t#t#tHAL_NVIC_EnableIRQ(${initVector.vector});
-                       [/#if]
+                      [/#if] [/#if]
                     [/#list]
 #t#t}
                   [/#if]
@@ -2024,20 +2071,24 @@ ${bufferType} ${bufferName}[${bufferSize}];
                 [#if initVector.codeInMspInit]
                     [#if IPData.usedDriver == "HAL"]                
 #t#tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
+[#if GenerateNvicEnable]
 #t#tHAL_NVIC_EnableIRQ(${initVector.vector});
+[/#if]
                     [#else]
                         [#if !NVICPriorityGroup??]
 #tNVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority});
                         [#else]
 #tNVIC_SetPriority(${initVector.vector}, NVIC_EncodePriority(NVIC_GetPriorityGrouping(),${initVector.preemptionPriority}, ${initVector.subPriority}));
                         [/#if]
+[#if GenerateNvicEnable]
 #tNVIC_EnableIRQ(${initVector.vector});
-                    [/#if]
+                    [/#if][/#if]
                 [/#if]
               [/#list]
            [/#if]
         [/#if]
     [/#if]
+
     [#else] [#-- else serviceType = DeInit --]
  [#--assign service = getInitServiceMode(ipName,IPData)--]
 [#assign service = ""]
@@ -2129,6 +2180,9 @@ ${bufferType} ${bufferName}[${bufferSize}];
     [#list IPdatas as IP]  
     [#list IP.configModelList as instanceData]
     [#if instanceData.initServices??]
+[#if instanceData.initServices.EnableCode??]
+        [#assign GenerateNvicEnable = true]
+    [/#if]
         [#if instanceData.initServices.gpioOut??]
             [#list instanceData.initCallBackInitMethodList as initCallBack]
                 [#if initCallBack?contains("PostInit")]

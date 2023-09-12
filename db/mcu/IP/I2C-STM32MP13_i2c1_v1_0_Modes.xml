@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><IP xmlns="http://mcd.rou.st.com/modules.php?name=mcu" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" DBVersion="V3.0" IPType="peripheral" Name="I2C" Version="STM32MP13_i2c1_v1_0" ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../db/IP_Modes_V3_0.xsd">
+    <About>I2C: Inter Integrated Circuit interface</About>
+ 
+
+    <!-- RefMode for I2C -->
+    <RefMode HalMode="I2C" Name="I2C">
+    </RefMode> 
+
+	
+    <!-- RefMode for SMBus -->
+    <RefMode HalMode="SMBUS" Name="SMBus-two-wire-Interface"> 
+    </RefMode> 
+	
+    <RefMode HalMode="SMBUS" Name="SMBus-Alert-mode">
+    </RefMode>        
+
+	
+    <ModeLogicOperator Name="OR">
+        <Mode Name="I2C">
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="I2C">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="SCL"/>
+                        <Signal Name="SDA"/>
+                    </SignalLogicalOp>
+                    <Semaphore>$IpInstance_Dma</Semaphore>
+                </Mode>
+                <Mode Name="SMBus-Alert-mode">
+                    <Semaphore>$IpInstance_SMBUS_Enable</Semaphore>
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="SCL"/>
+                        <Signal Name="SDA"/>
+                        <Signal Name="SMBA"/>
+                    </SignalLogicalOp>
+                </Mode>
+                <Mode Name="SMBus-two-wire-Interface">
+                    <Semaphore>$IpInstance_SMBUS_Enable</Semaphore>
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="SCL"/>
+                        <Signal Name="SDA"/>
+                    </SignalLogicalOp>
+                </Mode>
+            </ModeLogicOperator>
+        </Mode>
+    </ModeLogicOperator>
+	
+    <RefSignal IOMode="AlternateFunctionOpenDrain" Name="SCL"/>        
+    <RefSignal IOMode="AlternateFunctionOpenDrain" Name="SDA"/>       
+    <RefSignal IOMode="AlternateFunctionOpenDrain" Name="SMBA"/>
+    <Semaphore>$IpInstanceUsed_ForRCC</Semaphore>
+</IP>

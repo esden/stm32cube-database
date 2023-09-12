@@ -30,7 +30,7 @@ ${TABnode}*/
 	[/#if]
 #n	
 
-[#if (mx_socDtRPN == "stm32mp15") && !srvcmx_isTargetedFw_inDTS("TF-A")]
+[#if !srvcmx_isTargetedFw_inDTS("TF-A")]
 	[#--reserved memory--]
 ${TABnode}reserved-memory {
 ${TABprop}#address-cells = <1>;

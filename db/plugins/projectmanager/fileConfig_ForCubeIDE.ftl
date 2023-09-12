@@ -746,7 +746,7 @@
                                                 [#list group.sourceFilesNameList as filesName]
                                                     [#-- selectedConfig --]
                                                     [#assign removeFromConfig = "0"]
-                                                    [#if multiConfigurationProject?? && ConfigsAndFiles??  && TrustZone=="1"]
+                                                    [#if multiConfigurationProject?? && ConfigsAndFiles??]
                                                         [#if !ConfigsAndFiles[selectedConfig]?seq_contains(filesName?replace("/","\\"))]
                                                                         [#assign removeFromConfig = "1"]
                                                         [/#if]

@@ -1,10 +1,8 @@
 [#ftl]
-
 [#assign  mmc_instance = "0"]
 [#assign  maintain_cpu_cache = "0"]
 [#assign  use_dma = "0"]
 [#assign FX_STANDALONE_ENABLE_value = "0"]
-
 [#assign  sector_size = "512"]
 [#assign  mmc_init = "1"]
 [#compress]
@@ -13,38 +11,29 @@
   [#list SWIP.defines as definition]
     [#assign value = definition.value]
     [#assign name = definition.name]
-    [#if name == "GLUE_FUNCTIONS"]
-      [#assign glue_functions = value]
-    [/#if]
-	[#if name == "SDMMC_INSTANCE"]
+	
+	[#if name == "MMC_INSTANCE"]
       [#assign mmc_instance = value]
     [/#if]
-	
-	[#if name == "USE_MMC_DMA"]
-      [#if value.contains("1")]
-        [#assign use_dma = "1"]
-      [/#if]
-    [/#if]
-
-    [#if name == "ENABLE_CACHE_MAINTENANCE"]
+	[#if name == "MMC_ENABLE_CACHE_MAINTENANCE"]
       [#if value.contains("true")]
         [#assign maintain_cpu_cache = "1"]
       [/#if]
     [/#if]
-    [#if name == "SD_SECTOR_SIZE"]
+	[#if name == "MMC_SECTOR_SIZE"]
       [#assign sector_size = value]
     [/#if]
-    [#if name == "FX_DRIVER_SDMMC_INIT"]
+    [#if name == "FX_DRIVER_MMC_INIT"]
       [#assign mmc_init = value]
     [/#if]
+	
 	[#if name == "FX_STANDALONE_ENABLE"]
 		[#assign FX_STANDALONE_ENABLE_value = value]
 	[/#if]
-    [/#list]
+  [/#list]
 [/#if]
 [/#list]
 [/#compress]
-
 /**************************************************************************/
 /*                                                                        */
 /*       Copyright (c) Microsoft Corporation. All rights reserved.        */
@@ -80,10 +69,10 @@ extern "C" {
 #define FX_STM32_MMC_DEFAULT_TIMEOUT                         (10 * TX_TIMER_TICKS_PER_SECOND)
 [/#if]
 [#if FX_STANDALONE_ENABLE_value == "1"]
-#define FX_STM32_MMC_DEFAULT_TIMEOUT                           (10 * 1000)
+#define FX_STM32_MMC_DEFAULT_TIMEOUT                         (10 * 1000)
 [/#if]
 
-/* Default MMC sector size typically 512 for uMMC */
+/* Default MMC sector size ,used by the driver */
 #define FX_STM32_MMC_DEFAULT_SECTOR_SIZE                     512
 
 /* let the filex low-level driver initialize the MMC driver */
@@ -93,7 +82,7 @@ extern "C" {
 /* Use the MMC DMA API, when enabled cache maintenance
  * may be required
  */
-#define FX_STM32_MMC_DMA_API                                   ${use_dma}
+#define FX_STM32_MMC_DMA_API                                 ${use_dma}
 
 /* Enable the cache maintenance, needed when using SD DMA
  * and accessing buffers in cacheable area
@@ -102,11 +91,11 @@ extern "C" {
  * For STM32U5 this flag should be always set to 0 unless external
  * memories are being used.
  */
-#define FX_STM32_SD_CACHE_MAINTENANCE						${maintain_cpu_cache}
+#define FX_STM32_SD_CACHE_MAINTENANCE						 ${maintain_cpu_cache}
 
 
 /* MMC instance default to 0 */
-#define FX_STM32_MMC_INSTANCE                                	${mmc_instance}
+#define FX_STM32_MMC_INSTANCE                                ${mmc_instance}
 
 /* USER CODE BEGIN EC */
 
@@ -121,7 +110,12 @@ extern "C" {
 
 /* USER CODE BEGIN FX_STM32_MMC_CURRENT_TIME */
 
-#define FX_STM32_MMC_CURRENT_TIME                                     tx_time_get
+[#if FX_STANDALONE_ENABLE_value == "0"]
+#define FX_STM32_MMC_CURRENT_TIME()                          tx_time_get()
+[/#if]
+[#if FX_STANDALONE_ENABLE_value == "1"]
+#define FX_STM32_MMC_CURRENT_TIME()                          HAL_GetTick()
+[/#if]
 
 /* USER CODE END FX_STM32_MMC_CURRENT_TIME */
 

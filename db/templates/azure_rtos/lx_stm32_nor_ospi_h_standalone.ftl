@@ -4,9 +4,8 @@
 [#assign ospi_init_driver = "1"]
 [#assign ospi_erase_flash = "0"]
 [#assign glue_api = "DMA_API"]
-[#assign txrx_cmplt = "GloabalVars"]
+[#assign TRANSFER_NOTIFICATION = "Global_state_variables"]
 [#assign ospi_instance = 0]
-
 [#assign ospi_comp = "custom"]
 [#assign use_dma = 0]
 
@@ -32,8 +31,8 @@
       [#assign ospi_erase_flash = value]
     [/#if]
 
-    [#if name == "LX_OSPI_TRANSFER_CMPLT_NOTIF"]
-      [#assign txrx_cmplt = value]
+    [#if name == "TRANSFER_NOTIFICATION"]
+      [#assign TRANSFER_NOTIFICATION = value]
     [/#if]
 
     [#if name == "LX_OSPI_INSTANCE"]
@@ -90,7 +89,7 @@ extern "C" {
 
 /* USER CODE END ET */
 
-[#if txrx_cmplt != "Custom"]
+[#if TRANSFER_NOTIFICATION != "Custom"]
 /* The following semaphore is being to notify about RX/TX completion. It needs to be released in the transfer callbacks */
 extern __IO UINT ospi_rx_cplt;
 extern __IO UINT ospi_tx_cplt;
@@ -149,7 +148,7 @@ extern __IO UINT ospi_tx_cplt;
 
 /* USER CODE BEGIN LX_STM32_OSPI_READ_CPLT_NOTIFY */
 
-[#if glue_api == "DMA_API" && txrx_cmplt != "Custom"]
+[#if glue_api == "DMA_API" && TRANSFER_NOTIFICATION != "Custom"]
 /* USER CODE BEGIN LX_STM32_OSPI_READ_CPLT_NOTIFY */
 
 #define LX_STM32_OSPI_READ_CPLT_NOTIFY(__status__)          do { \
@@ -203,7 +202,7 @@ extern __IO UINT ospi_tx_cplt;
 /* Define how to notify about write completion operation */
 /* USER CODE BEGIN LX_STM32_OSPI_WRITE_CPLT_NOTIFY */
 
-[#if glue_api == "DMA_API" && txrx_cmplt != "Custom"]
+[#if glue_api == "DMA_API" && TRANSFER_NOTIFICATION != "Custom"]
 /* USER CODE BEGIN LX_STM32_OSPI_WRITE_CPLT_NOTIFY */
 
 #define LX_STM32_OSPI_WRITE_CPLT_NOTIFY(__status__)            do { \

@@ -1761,6 +1761,28 @@ ${bufferType} ${bufferName}[${bufferSize}];
 #t#t#tHAL_PWREx_EnableVddUSB();
 #t#t}
 [/#if]
+[#if ipName?contains("OTG_HS")&&FamilyName=="STM32U5"]
+#n#t#t/* Enable VDDUSB */
+  #t#tif(__HAL_RCC_PWR_IS_CLK_DISABLED())
+  #t#t{
+    #t#t#t__HAL_RCC_PWR_CLK_ENABLE();
+    
+    #t#t#tHAL_PWREx_EnableVddUSB();
+    #n#t#t#t/*configure VOSR register of USB*/
+    #t#t#tHAL_PWREx_EnableUSBHSTranceiverSupply();
+    
+    #t#t#t__HAL_RCC_PWR_CLK_DISABLE();
+  #t#t}
+  #t#telse
+  #t#t{
+    #t#t#tHAL_PWREx_EnableVddUSB();
+    #n#t#t#t/*configure VOSR register of USB*/
+    #t#t#tHAL_PWREx_EnableUSBHSTranceiverSupply();
+  #t#t}
+#n#t#t/*Configuring the SYSCFG registers OTG_HS PHY*/
+#t#t/*OTG_HS PHY enable*/
+#t#t#tHAL_SYSCFG_EnableOTGPHY(SYSCFG_OTG_HS_PHY_ENABLE);
+[/#if]
 [#-- bug 322189 Init End--]
     [#if nvicExist]
         [#if IPData.initServices??&&IPData.initServices.nvic??&&IPData.initServices.nvic?size>0]

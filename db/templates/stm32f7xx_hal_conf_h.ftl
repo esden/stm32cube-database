@@ -131,7 +131,7 @@
 #define  TICK_INT_PRIORITY            ((uint32_t)[#if TICK_INT_PRIORITY??]${TICK_INT_PRIORITY}[#else]0x0F[/#if]U) /*!< tick interrupt priority */
 #define  USE_RTOS                     [#if advancedSettings?? && advancedSettings.USE_RTOS??]${advancedSettings.USE_RTOS}[#else]0[/#if]U
 #define  PREFETCH_ENABLE              [#if PREFETCH_ENABLE??]${PREFETCH_ENABLE}[#else]1[/#if]U
-#define  ART_ACCLERATOR_ENABLE        [#if ART_ACCELERATOR_ENABLE??]${ART_ACCELERATOR_ENABLE}[#else]1[/#if]U /* To enable instruction cache and prefetch */
+#define  ART_ACCELERATOR_ENABLE        [#if ART_ACCELERATOR_ENABLE??]${ART_ACCELERATOR_ENABLE}[#else]1[/#if]U /* To enable instruction cache and prefetch */
 
 #define  USE_HAL_ADC_REGISTER_CALLBACKS         0U /* ADC register callback disabled       */
 #define  USE_HAL_CAN_REGISTER_CALLBACKS         0U /* CAN register callback disabled       */

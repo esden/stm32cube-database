@@ -12,8 +12,8 @@
 /* USER CODE END Header */
 /* USER CODE BEGIN UserCode */
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __TEMPLATE_SERVER_APP_H
-#define __TEMPLATE_SERVER_APP_H
+#ifndef TEMPLATE_SERVER_APP_H
+#define TEMPLATE_SERVER_APP_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -31,6 +31,4 @@ extern "C" {
 }
 #endif
 
-#endif /*__P2P_SERVER_APP_H */
-
-/* USER CODE END UserCode*/
+#endif /*P2P_SERVER_APP_H */

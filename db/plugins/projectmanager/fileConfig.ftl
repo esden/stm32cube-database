@@ -80,7 +80,9 @@
 
     <Toolchain>${ide}</Toolchain>
 [#if ide=="EWARM" || ide=="MDK-ARM"]
+	[#if Toolversion??]
     <Toolversion>${Toolversion}</Toolversion>
+    [/#if]
 [/#if]
 [#if staticLibraryProject??]<StaticLibraryProject>true</StaticLibraryProject> [#-- Static Library Project --][/#if]
 

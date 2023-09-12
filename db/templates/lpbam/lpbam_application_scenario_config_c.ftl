@@ -1,4 +1,10 @@
 [#ftl]
+[#assign coreDir=""]
+
+[#assign coreDir=sourceDir]
+[#if cpucore!="" && (contextFolder=="" || contextFolder=="/")]
+    [#assign contextFolder = cpucore?replace("ARM_CORTEX_","C")?replace("+","PLUS")+"/"]
+[/#if]
 /* USER CODE BEGIN Header */
 /**
   **********************************************************************************************************************
@@ -60,7 +66,7 @@
 [#if PC_PERIPHERALS??]
     [#list PC_PERIPHERALS as periph]
 [#if periph!="VREFBUF"]
-    [@common.optinclude name=sourceDir+"/Src/"+LPBAM_NAME?replace(" ","_")+ "_" + periph.toLowerCase() + "_handler.tmp"/]
+    [@common.optinclude name=contextFolder+sourceDir+"/Src/"+LPBAM_NAME?replace(" ","_")+ "_" + periph.toLowerCase() + "_handler.tmp"/]
 [/#if]
     [/#list]
 [/#if]
@@ -590,10 +596,10 @@ static void MX_AutonomousMode_DeInit(void)
 
 [#if PC_PERIPHERALS??]
    [#list PC_PERIPHERALS as periph]
-   [@common.optinclude name=sourceDir+"/Src/"+LPBAM_NAME?replace(" ","_")+ "_" + periph.toLowerCase() + "_init.tmp"/]
+   [@common.optinclude name=contextFolder+sourceDir+"/Src/"+LPBAM_NAME?replace(" ","_")+ "_" + periph.toLowerCase() + "_init.tmp"/]
    [/#list]
 [/#if]
-[@common.optinclude name=sourceDir+"/Src/"+LPBAM_NAME?replace(" ","_")+ "_gpio.tmp"/][#-- ADD GPIO Code--]
+[@common.optinclude name=contextFolder+sourceDir+"/Src/"+LPBAM_NAME?replace(" ","_")+ "_gpio.tmp"/][#-- ADD GPIO Code--]
 [#-- Queue Link/Unlik --]
 [#if Queues??]
     [#list Queues as QName]

@@ -44,11 +44,11 @@
 [#if FamilyName?lower_case=="stm32l5"]
 #define INDEX_PAGE              (FLASH_PAGE_NB - 1u)                           /* Index of latest page */
 [#else]
-#if defined (FLASH_OPTR_DBANK)
+#if defined (FLASH_OPTR_DBANK) || defined(FLASH_DBANK_SUPPORT)
 #define INDEX_PAGE              ((FLASH_PAGE_NB * 2u) - 1u)                    /* Index of latest page */
 #else
 #define INDEX_PAGE              (FLASH_PAGE_NB - 1u)                           /* Index of latest page */
-#endif /* FLASH_OPTR_DBANK */
+#endif /* FLASH_OPTR_DBANK || FLASH_DBANK_SUPPORT */
 [/#if]
 #define ADDR_FLASH_LAST_PAGE    (FLASH_BASE + (INDEX_PAGE * FLASH_PAGE_SIZE))  /* Base @ of latest page */
 #define ADDR_FLASH_PAGE_END     (ADDR_FLASH_LAST_PAGE + FLASH_PAGE_SIZE - 1u)

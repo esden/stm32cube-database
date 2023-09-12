@@ -19,11 +19,20 @@
         <PossibleValue Comment="Tamper activated after 4 consecutive samples" Value="RTC_TAMPERFILTER_4SAMPLE"/>
         <PossibleValue Comment="Tamper activated after 8 consecutive samples" Value="RTC_TAMPERFILTER_8SAMPLE"/>
     </RefParameter>
-    <RefParameter Comment="Tamper state" DefaultValue="TAMP_PRIVILEGE_FULL_YES"  Group="Privilege Tamper" TabName="TZSC Privilegeable TAMP"  Name="tampPrivilegeFull" Type="list" >
+    <RefParameter Comment="Tamper state" DefaultValue="__NULL" Visible ="false"   Group="Privilege Tamper" TabName="TAMP Privilege"  Name="tampPrivilegeFull" Type="list" >
+        <Condition Diagnostic="" Expression="S_LPBAM_CONF"/>
+
+    </RefParameter>
+    <RefParameter Comment="Monotonic Counter Privilege" DefaultValue="__NULL" Visible ="false"   Group="Privilege Tamper" TabName="TAMP Privilege"  Name="MonotonicCounterPrivilege" Type="list" >
+        <Condition Diagnostic="" Expression="S_LPBAM_CONF"/>
+
+    </RefParameter>
+    
+     <RefParameter Comment="Tamper state" DefaultValue="TAMP_PRIVILEGE_FULL_YES"  Group="Privilege Tamper" TabName="TAMP Privilege"  Name="tampPrivilegeFull" Type="list" >
         <PossibleValue Comment=" Fully privilege" Value="TAMP_PRIVILEGE_FULL_YES" />
         <PossibleValue Comment=" Non-privilege" Value="TAMP_PRIVILEGE_FULL_NO" />  
     </RefParameter>
-    <RefParameter Comment="Monotonic Counter Privilege" DefaultValue="TAMP_MONOTONIC_CNT_PRIVILEGE_NO"  Group="Privilege Tamper" TabName="TZSC Privilegeable TAMP"  Name="MonotonicCounterPrivilege" Type="list" >
+    <RefParameter Comment="Monotonic Counter Privilege" DefaultValue="TAMP_MONOTONIC_CNT_PRIVILEGE_NO"  Group="Privilege Tamper" TabName="TAMP Privilege"  Name="MonotonicCounterPrivilege" Type="list" >
          <Condition Diagnostic="" Expression="STM32U5"/>
         <PossibleValue Comment=" Privileged " Value="TAMP_MONOTONIC_CNT_PRIVILEGE_YES" />
         <PossibleValue Comment=" Not privileged" Value="TAMP_MONOTONIC_CNT_PRIVILEGE_NO" />
@@ -182,17 +191,31 @@
         <Condition Expression="Semaphore_ActiveTamper1|Semaphore_ActiveTamper2|Semaphore_ActiveTamper3|Semaphore_ActiveTamper4|Semaphore_ActiveTamper5|Semaphore_ActiveTamper6|Semaphore_ActiveTamper7|Semaphore_ActiveTamper8"   Diagnostic="" /> 
     </RefParameter>
    
-    <RefParameter Comment="State" DefaultValue="TAMP_SECURE_FULL_NO" Group="Tamper TZEN=1  "  Name="tampSecureFull" TabName="TZSC Securable TAMP" Type="list">
+   
+   <RefParameter Comment="State" DefaultValue="__NULL" Group="Tamper TZEN=1  "  Name="tampSecureFull" Visible="false" TabName="TAMP Security" Type="list">
+                    <Condition Diagnostic="" Expression="S_SECURE &amp; S_LPBAM_CONF"/>
+
+    </RefParameter>
+     <RefParameter Comment="Monotonic Counter Secure" DefaultValue="__NULL"  Group="Tamper TZEN=1  " Visible="false" TabName="TAMP Security"  Name="MonotonicCounterSecure" Type="list" >
+                    <Condition Diagnostic="" Expression="S_SECURE &amp; S_LPBAM_CONF"/>
+
+    </RefParameter>
+    <RefParameter Comment="Monotonic Counter Secure" DefaultValue="__NULL"  Group="Tamper TZEN=1  " TabName="TAMP Security"  Name="MonotonicCounterSecure" Type="list"  Visible="false">     
+                    <Condition Diagnostic="" Expression="S_SECURE &amp; S_LPBAM_CONF"/>
+
+    </RefParameter>
+    
+    <RefParameter Comment="State" DefaultValue="TAMP_SECURE_FULL_NO" Group="Tamper TZEN=1  "  Name="tampSecureFull" TabName="TAMP Security" Type="list">
         <Condition Expression="S_SECURE"   Diagnostic=" Specifies If the TAMP is fully secured or not" />
         <PossibleValue Comment="Secure  " Value="TAMP_SECURE_FULL_YES"  /> 
         <PossibleValue Comment="Non-secure  " Value="TAMP_SECURE_FULL_NO" />
     </RefParameter>
-     <RefParameter Comment="Monotonic Counter Secure" DefaultValue="TAMP_MONOTONIC_CNT_SECURE_NO"  Group="Tamper TZEN=1  " TabName="TZSC Securable TAMP"  Name="MonotonicCounterSecure" Type="list" >
+     <RefParameter Comment="Monotonic Counter Secure" DefaultValue="TAMP_MONOTONIC_CNT_SECURE_NO"  Group="Tamper TZEN=1  " TabName="TAMP Security"  Name="MonotonicCounterSecure" Type="list" >
          <Condition Diagnostic="" Expression="S_SECURE &amp; STM32U5"/>
         <PossibleValue Comment="Non-secure " Value="TAMP_MONOTONIC_CNT_SECURE_NO" />
         <PossibleValue Comment="Secure" Value="TAMP_MONOTONIC_CNT_SECURE_YES" />
     </RefParameter>
-    <RefParameter Comment="Monotonic Counter Secure" DefaultValue="null"  Group="Tamper TZEN=1  " TabName="TZSC Securable TAMP"  Name="MonotonicCounterSecure" Type="list"  Visible="false">     
+    <RefParameter Comment="Monotonic Counter Secure" DefaultValue="null"  Group="Tamper TZEN=1  " TabName="TAMP Security"  Name="MonotonicCounterSecure" Type="list"  Visible="false">     
     </RefParameter>
     <RefParameter Comment="Tamper1_Interrupt_mode" DefaultValue="RTC_ATAMP_INTERRUPT_DISABLE" Group="Tamper1" Name="Interrupt1" Type="list">
         <Condition Expression="Tamper1_ON &amp; Semaphore_ActiveTamper1" Diagnostic="" />
@@ -2329,7 +2352,7 @@
         </Mode>
         <!-- goal is to have access to TAMP1/TAMP2 IN4/OUT4/IN5/TAMP_OUT5 -->
         <Mode UserName="Active Output1" Name="Tamper 1_OUT" >
-            <Condition Diagnostic="Active Output1 1is available when Tamper 1 is activated" Expression="RTC_ENABLED &amp; (Semaphore_ActiveTamper1|Semaphore_ActiveTamper2|Semaphore_ActiveTamper3|Semaphore_ActiveTamper4|Semaphore_ActiveTamper5|Semaphore_ActiveTamper6|Semaphore_ActiveTamper7|Semaphore_ActiveTamper8)"/>
+            <Condition Diagnostic="Active Output1 is available when at least one Tamper is activated in  Active Input Mode" Expression="RTC_ENABLED &amp; (Semaphore_ActiveTamper1|Semaphore_ActiveTamper2|Semaphore_ActiveTamper3|Semaphore_ActiveTamper4|Semaphore_ActiveTamper5|Semaphore_ActiveTamper6|Semaphore_ActiveTamper7|Semaphore_ActiveTamper8)"/>
        
             <ModeLogicOperator Name="XOR">
                 <Mode Name="Tamper 1 OUT enabled" UserName="Tamper1 Routed to TAMP_OUT1" >
@@ -2346,7 +2369,7 @@
             <Semaphore>RTC_TAMPER_INTERRUPT</Semaphore>
         </Mode>
         <Mode UserName="Active Output2" Name="Tamper 2_OUT">
-            <Condition Diagnostic="Active Output2 1is available when Tamper 2 is activated" Expression="RTC_ENABLED &amp; (Semaphore_ActiveTamper1|Semaphore_ActiveTamper2|Semaphore_ActiveTamper3|Semaphore_ActiveTamper4|Semaphore_ActiveTamper5|Semaphore_ActiveTamper6|Semaphore_ActiveTamper7|Semaphore_ActiveTamper8)"/>                    
+            <Condition Diagnostic="Active Output2 is available when at least one Tamper is activated in  Active Input Mode" Expression="RTC_ENABLED &amp; (Semaphore_ActiveTamper1|Semaphore_ActiveTamper2|Semaphore_ActiveTamper3|Semaphore_ActiveTamper4|Semaphore_ActiveTamper5|Semaphore_ActiveTamper6|Semaphore_ActiveTamper7|Semaphore_ActiveTamper8)"/>                    
             <ModeLogicOperator Name="XOR">
                 <Mode Name="Tamper 2 OUT enabled" UserName="Tamper2 Routed to TAMP_OUT2">
                     <SignalLogicalOp Name="AND">
@@ -2360,7 +2383,7 @@
             <Semaphore>RTC_TAMPER_INTERRUPT</Semaphore>
         </Mode>
         <Mode UserName="Active Output3" Name="Tamper 3_OUT">
-            <Condition Diagnostic="Active Output3 1is available when Tamper 3 is activated" Expression="RTC_ENABLED &amp; (Semaphore_ActiveTamper1|Semaphore_ActiveTamper2|Semaphore_ActiveTamper3|Semaphore_ActiveTamper4|Semaphore_ActiveTamper5|Semaphore_ActiveTamper6|Semaphore_ActiveTamper7|Semaphore_ActiveTamper8)"/>
+            <Condition Diagnostic="Active Output3 is available when at least one Tamper is activated in  Active Input Mode" Expression="RTC_ENABLED &amp; (Semaphore_ActiveTamper1|Semaphore_ActiveTamper2|Semaphore_ActiveTamper3|Semaphore_ActiveTamper4|Semaphore_ActiveTamper5|Semaphore_ActiveTamper6|Semaphore_ActiveTamper7|Semaphore_ActiveTamper8)"/>
                     
             <ModeLogicOperator Name="XOR">
                 <Mode Name="Tamper 3 OUT enabled" UserName="Tamper3 Routed to TAMP_OUT3">
@@ -2375,7 +2398,7 @@
             <Semaphore>RTC_TAMPER_INTERRUPT</Semaphore>
         </Mode>
         <Mode UserName="Active Output4" Name="Tamper 4_OUT">
-            <Condition Diagnostic="Active Output4 1is available when Tamper 4 is activated" Expression="RTC_ENABLED &amp; (Semaphore_ActiveTamper1|Semaphore_ActiveTamper2|Semaphore_ActiveTamper3|Semaphore_ActiveTamper4|Semaphore_ActiveTamper5|Semaphore_ActiveTamper6|Semaphore_ActiveTamper7|Semaphore_ActiveTamper8)"/>
+            <Condition Diagnostic="Active Output4 is available when at least one Tamper is activated in  Active Input Mode" Expression="RTC_ENABLED &amp; (Semaphore_ActiveTamper1|Semaphore_ActiveTamper2|Semaphore_ActiveTamper3|Semaphore_ActiveTamper4|Semaphore_ActiveTamper5|Semaphore_ActiveTamper6|Semaphore_ActiveTamper7|Semaphore_ActiveTamper8)"/>
                     
             <ModeLogicOperator Name="XOR">
                 <Mode Name="Tamper 4 OUT enabled" UserName="Tamper4 Routed to TAMP_OUT4">
@@ -2390,7 +2413,7 @@
             <Semaphore>RTC_TAMPER_INTERRUPT</Semaphore>
         </Mode>
         <Mode UserName="Active Output5" Name="Tamper 5_OUT">
-            <Condition Diagnostic="Active Output5 1is available when Tamper 5 is activated" Expression="RTC_ENABLED &amp; (Semaphore_ActiveTamper1|Semaphore_ActiveTamper2|Semaphore_ActiveTamper3|Semaphore_ActiveTamper4|Semaphore_ActiveTamper5|Semaphore_ActiveTamper6|Semaphore_ActiveTamper7|Semaphore_ActiveTamper8)"/>
+            <Condition Diagnostic="Active Output5 is available when at least one Tamper is activated in  Active Input Mode" Expression="RTC_ENABLED &amp; (Semaphore_ActiveTamper1|Semaphore_ActiveTamper2|Semaphore_ActiveTamper3|Semaphore_ActiveTamper4|Semaphore_ActiveTamper5|Semaphore_ActiveTamper6|Semaphore_ActiveTamper7|Semaphore_ActiveTamper8)"/>
                     
             <ModeLogicOperator Name="XOR">
                 <Mode Name="Tamper 5 OUT enabled" UserName="Tamper5 Routed to TAMP_OUT5">
@@ -2405,7 +2428,7 @@
             <Semaphore>RTC_TAMPER_INTERRUPT</Semaphore>
         </Mode>
         <Mode UserName="Active Output6" Name="Tamper 6_OUT">
-            <Condition Diagnostic="Active Output6 1is available when Tamper 6 is activated" Expression="RTC_ENABLED  &amp; (Semaphore_ActiveTamper1|Semaphore_ActiveTamper2|Semaphore_ActiveTamper3|Semaphore_ActiveTamper4|Semaphore_ActiveTamper5|Semaphore_ActiveTamper6|Semaphore_ActiveTamper7|Semaphore_ActiveTamper8)"/>
+            <Condition Diagnostic="Active Output6 is available when at least one Tamper is activated in  Active Input Mode" Expression="RTC_ENABLED  &amp; (Semaphore_ActiveTamper1|Semaphore_ActiveTamper2|Semaphore_ActiveTamper3|Semaphore_ActiveTamper4|Semaphore_ActiveTamper5|Semaphore_ActiveTamper6|Semaphore_ActiveTamper7|Semaphore_ActiveTamper8)"/>
                     
             <ModeLogicOperator Name="XOR">
                 <Mode Name="Tamper 6 OUT enabled" UserName="Tamper6 Routed to TAMP_OUT6">
@@ -2420,7 +2443,7 @@
             <Semaphore>RTC_TAMPER_INTERRUPT</Semaphore>
         </Mode>
         <Mode UserName="Active Output7" Name="Tamper 7_OUT">
-            <Condition Diagnostic="Active Output7 1is available when Tamper 7 is activated" Expression="RTC_ENABLED  &amp; (Semaphore_ActiveTamper1|Semaphore_ActiveTamper2|Semaphore_ActiveTamper3|Semaphore_ActiveTamper4|Semaphore_ActiveTamper5|Semaphore_ActiveTamper6|Semaphore_ActiveTamper7|Semaphore_ActiveTamper8)"/>
+            <Condition Diagnostic="Active Output7 is available when at least one Tamper is activated in  Active Input Mode" Expression="RTC_ENABLED  &amp; (Semaphore_ActiveTamper1|Semaphore_ActiveTamper2|Semaphore_ActiveTamper3|Semaphore_ActiveTamper4|Semaphore_ActiveTamper5|Semaphore_ActiveTamper6|Semaphore_ActiveTamper7|Semaphore_ActiveTamper8)"/>
                     
             <ModeLogicOperator Name="XOR">
                 <Mode Name="Tamper 7 OUT enabled" UserName="Tamper7 Routed to TAMP_OUT7">
@@ -2435,7 +2458,7 @@
             <Semaphore>RTC_TAMPER_INTERRUPT</Semaphore>
         </Mode>
         <Mode UserName="Active Output8" Name="Tamper 8_OUT">
-            <Condition Diagnostic="Active Output8 1is available when Tamper 8 is activated" Expression="RTC_ENABLED   &amp; (Semaphore_ActiveTamper1|Semaphore_ActiveTamper2|Semaphore_ActiveTamper3|Semaphore_ActiveTamper4|Semaphore_ActiveTamper5|Semaphore_ActiveTamper6|Semaphore_ActiveTamper7|Semaphore_ActiveTamper8)"/>
+            <Condition Diagnostic="Active Output8 is available when at least one Tamper is activated in  Active Input Mode" Expression="RTC_ENABLED   &amp; (Semaphore_ActiveTamper1|Semaphore_ActiveTamper2|Semaphore_ActiveTamper3|Semaphore_ActiveTamper4|Semaphore_ActiveTamper5|Semaphore_ActiveTamper6|Semaphore_ActiveTamper7|Semaphore_ActiveTamper8)"/>
                     
             <ModeLogicOperator Name="XOR">
                 <Mode Name="Tamper 8 OUT enabled" UserName="Tamper8 Routed to TAMP_OUT8">

@@ -158,6 +158,10 @@ typedef enum
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
+[#if THREADX??][#-- If AzRtos is used --]
+/* If resume happens when the task is running, task will not be suspended at next loop */
+static __IO uint8_t App_MainThread_RescheduleFlag = 0;
+[/#if]
 /* Radio events function pointer */
 static RadioEvents_t RadioEvents;
 /* USER CODE BEGIN PV */
@@ -546,7 +550,17 @@ void App_Main_Thread_Entry(unsigned long thread_input)
   /* Infinite loop */
   while (1)
   {
-    tx_thread_suspend(&App_MainThread);
+    if (App_MainThread_RescheduleFlag > 0)
+    {
+      /* if RescheduleFlag was set during Process() don't suspend  */
+      App_MainThread_RescheduleFlag--;
+    }
+    else
+    {
+      tx_thread_suspend(&App_MainThread);
+      /* if RescheduleFlag was set during suspend it should be reset */
+      App_MainThread_RescheduleFlag = 0;
+    }
     /*do what else you want*/
     /* USER CODE BEGIN App_Main_Thread_Entry_Loop */
 [#if (SUBGHZ_APPLICATION != "SUBGHZ_USER_APPLICATION") && (FILL_UCS == "true")]
@@ -575,6 +589,10 @@ static void OnTxDone(void)
   /* Update the State of the FSM*/
   State = TX;
 [#if THREADX??]
+  if (App_MainThread_RescheduleFlag < 255)
+  {
+    App_MainThread_RescheduleFlag++;
+  }
   tx_thread_resume(&App_MainThread);
 [#else]
   /* Run PingPong process in background*/
@@ -583,6 +601,10 @@ static void OnTxDone(void)
 [#elseif (INTERNAL_USER_SUBGHZ_APP == "SUBGHZ_PER")]
   RadioTxDone_flag = 1;
 [#if THREADX??]
+  if (App_MainThread_RescheduleFlag < 255)
+  {
+    App_MainThread_RescheduleFlag++;
+  }
   tx_thread_resume(&App_MainThread);
 [#else]
   UTIL_SEQ_SetTask((1 << CFG_SEQ_Task_SubGHz_Phy_App_Process), CFG_SEQ_Prio_0);
@@ -631,6 +653,10 @@ static void OnRxDone(uint8_t *payload, uint16_t size, int16_t rssi, int8_t LoraS
   }
   APP_LOG(TS_OFF, VLEVEL_H, "\n\r");
 [#if THREADX??]
+  if (App_MainThread_RescheduleFlag < 255)
+  {
+    App_MainThread_RescheduleFlag++;
+  }
   tx_thread_resume(&App_MainThread);
 [#else]
   /* Run PingPong process in background*/
@@ -643,6 +669,10 @@ static void OnRxDone(uint8_t *payload, uint16_t size, int16_t rssi, int8_t LoraS
   /* Set Rxdone flag */
   RadioRxDone_flag = 1;
 [#if THREADX??]
+  if (App_MainThread_RescheduleFlag < 255)
+  {
+    App_MainThread_RescheduleFlag++;
+  }
   tx_thread_resume(&App_MainThread);
 [#else]
   /* Run Per process in background*/
@@ -670,6 +700,10 @@ static void OnTxTimeout(void)
   /* Update the State of the FSM*/
   State = TX_TIMEOUT;
 [#if THREADX??]
+  if (App_MainThread_RescheduleFlag < 255)
+  {
+    App_MainThread_RescheduleFlag++;
+  }
   tx_thread_resume(&App_MainThread);
 [#else]
   /* Run PingPong process in background*/
@@ -678,6 +712,10 @@ static void OnTxTimeout(void)
 [#elseif (INTERNAL_USER_SUBGHZ_APP == "SUBGHZ_PER")]
   RadioTxTimeout_flag = 1;
 [#if THREADX??]
+  if (App_MainThread_RescheduleFlag < 255)
+  {
+    App_MainThread_RescheduleFlag++;
+  }
   tx_thread_resume(&App_MainThread);
 [#else]
   /* Run Per process in background*/
@@ -697,6 +735,10 @@ static void OnRxTimeout(void)
   /* Update the State of the FSM*/
   State = RX_TIMEOUT;
 [#if THREADX??]
+  if (App_MainThread_RescheduleFlag < 255)
+  {
+    App_MainThread_RescheduleFlag++;
+  }
   tx_thread_resume(&App_MainThread);
 [#else]
   /* Run PingPong process in background*/
@@ -705,6 +747,10 @@ static void OnRxTimeout(void)
 [#elseif (INTERNAL_USER_SUBGHZ_APP == "SUBGHZ_PER")]
   RadioRxTimeout_flag = 1;
 [#if THREADX??]
+  if (App_MainThread_RescheduleFlag < 255)
+  {
+    App_MainThread_RescheduleFlag++;
+  }
   tx_thread_resume(&App_MainThread);
 [#else]
   /* Run Per process in background*/
@@ -724,6 +770,10 @@ static void OnRxError(void)
   /* Update the State of the FSM*/
   State = RX_ERROR;
 [#if THREADX??]
+  if (App_MainThread_RescheduleFlag < 255)
+  {
+    App_MainThread_RescheduleFlag++;
+  }
   tx_thread_resume(&App_MainThread);
 [#else]
   /* Run PingPong process in background*/
@@ -732,6 +782,10 @@ static void OnRxError(void)
 [#elseif (INTERNAL_USER_SUBGHZ_APP == "SUBGHZ_PER")]
   RadioError_flag = 1;
 [#if THREADX??]
+  if (App_MainThread_RescheduleFlag < 255)
+  {
+    App_MainThread_RescheduleFlag++;
+  }
   tx_thread_resume(&App_MainThread);
 [#else]
   /* Run Per process in background*/

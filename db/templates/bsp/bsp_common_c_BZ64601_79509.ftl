@@ -27,6 +27,8 @@
 [#assign useDefine = false]
 [#assign useEXTI = false]
 
+[#assign halMode = false]
+[#assign halModeName = ""]
 [#if HalExtiUseDefine??]
 [#if HalExtiUseDefine == "true"]
 [#assign useDefine = true]
@@ -84,6 +86,14 @@
      				[#assign useEXTI = true]  
      				[/#if]  
      		[/#if]
+     		[#if bsp.bspName?contains("BSP USART")]
+     			[#assign ipName = bsp.ipNameUsed]
+     			[#if bsp.halMode == ipName]
+     				[#assign halMode = true]
+     			[#else]	  
+     				[#assign halModeName = bsp.halMode]	
+     			[/#if]  
+     		[/#if]     		
      	[/#list]
     [/#if]
 [/#list]
@@ -236,7 +246,11 @@ static COM_TypeDef COM_ActiveLogPort;
 #if (USE_HAL_UART_REGISTER_CALLBACKS == 1U)
 static uint32_t Is${UsartInstance?lower_case?replace("u","U")}MspCbValid = 0;
 #endif
-__weak HAL_StatusTypeDef MX_${UsartInstance}_UART_Init(UART_HandleTypeDef* huart);
+[#if halMode]
+__weak HAL_StatusTypeDef MX_${UsartInstance}_Init(UART_HandleTypeDef* huart);
+[#else]
+__weak HAL_StatusTypeDef MX_${UsartInstance}_${halModeName}_Init(UART_HandleTypeDef* huart);
+[/#if]
 [/#if]
 [#if useBUTTON]
 [#-- Bug 60723 --]
@@ -811,8 +825,11 @@ int32_t BSP_COM_Init(COM_TypeDef COM)
       }
     }
 #endif
-  
-    if (MX_${UsartInstance}_UART_Init(&hcom_uart[COM]))
+[#if halMode]
+    if (MX_${UsartInstance}_Init(&hcom_uart[COM]))
+[#else]
+    if (MX_${UsartInstance}_${halModeName}_Init(&hcom_uart[COM]))
+[/#if]    
     {
       ret = BSP_ERROR_PERIPH_FAILURE;
     }
@@ -972,16 +989,31 @@ FILE __stdout;
 
 #endif /* If not Microlib */
 #endif /* For arm compiler 5 */
+#if defined(__ICCARM__) /* For IAR */
+size_t __write(int Handle, const unsigned char *Buf, size_t Bufsize)
+{
+  int i;
 
-#if defined(__ICCARM__) || defined(__CC_ARM) || (defined(__ARMCC_VERSION) && (__ARMCC_VERSION >= 6010050)) /* For IAR and ARM Compiler 5 and 6*/
- int fputc (int ch, FILE *f)
-#else /* For GCC Toolchains */
- int __io_putchar (int ch)
-#endif /* For IAR and ARM Compiler 5 and 6 */
-{ 
-  (void)HAL_UART_Transmit(&hcom_uart[COM_ActiveLogPort], (uint8_t *)&ch, 1, COM_POLL_TIMEOUT); 
+  for(i=0; i<Bufsize; i++)
+  {
+    (void)HAL_UART_Transmit(&hcom_uart[COM_ActiveLogPort], (uint8_t *)&Buf[i], 1, COM_POLL_TIMEOUT);
+  }
+
+  return Bufsize;  
+}
+#elif defined(__CC_ARM) || (defined(__ARMCC_VERSION) && (__ARMCC_VERSION >= 6010050)) /* For ARM Compiler 5 and 6 */
+int fputc (int ch, FILE *f)
+{
+  (void)HAL_UART_Transmit(&hcom_uart[COM_ActiveLogPort], (uint8_t *)&ch, 1, COM_POLL_TIMEOUT);
   return ch;
 }
+#else /* For GCC Toolchains */
+int __io_putchar (int ch)
+{
+  (void)HAL_UART_Transmit(&hcom_uart[COM_ActiveLogPort], (uint8_t *)&ch, 1, COM_POLL_TIMEOUT);
+  return ch;
+}
+#endif /* For IAR */
 #endif /* USE_COM_LOG */ 
 /**
  * @brief  Initializes ${UsartInstance} MSP.

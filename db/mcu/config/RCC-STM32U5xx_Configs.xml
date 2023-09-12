@@ -21,7 +21,12 @@
             <MethodArg Name="WakeUpClk" ParameterName="RCC_Stop_WakeUpClockARG"/>
         </CallLibMethod>
     </RefConfig>
-    <RefConfig Comment="Initializes the CPU, AHB and APB busses clocks" Name="RCC_OSCConfig">
+    <RefConfig Comment="Set the OTG PHY reference clock selection" Name="USB_OTG_PHY_CLK_CONFIG">
+        <CallLibMethod Name="HAL_SYSCFG_SetOTGPHYReferenceClockSelection" ReturnHAL="false">
+            <MethodArg Name="RefClockSelection" ParameterName="USBRefClockSelection"/>
+        </CallLibMethod>
+    </RefConfig>
+    <RefConfig Comment="Initializes the CPU, AHB and APB buses clocks" Name="RCC_OSCConfig">
         <CallLibMethod Name="HAL_RCC_OscConfig">
             <MethodArg Name="HSEState" ParameterName="HSEStateARG"/>
             <MethodArg Name="LSEState" ParameterName="LSEStateARG"/>
@@ -63,29 +68,29 @@
     </RefConfig>
 
     <RefConfig Comment="Enable the force of MSIK in stop mode" Name="MSIKSTOP_ENABLE">
-        <IFCondition Expression="MSIKERON=true">
+        <IFCondition Expression="MSIKERON=true &amp; !norccCodegenMsi">
             <CallLibMethod Name="__HAL_RCC_MSIKSTOP_ENABLE" ReturnHAL="false"/>
         </IFCondition>
     </RefConfig>
     <RefConfig Comment="Disable the force MSIK in stop mode" Name="MSIKSTOP_DISABLE">
-        <IFCondition Expression="MSIKERON=false &amp; S_LPBAM_CONF">
+        <IFCondition Expression="MSIKERON=false &amp; S_LPBAM_CONF &amp; !norccCodegenMsi">
             <CallLibMethod Name="__HAL_RCC_MSIKSTOP_DISABLE" ReturnHAL="false"/>
         </IFCondition>
     </RefConfig>
     
     <RefConfig Comment="Enable the force of HSI in stop mode" Name="HSISTOP_ENABLE">
-        <IFCondition Expression="HSIKERON=true">
+        <IFCondition Expression="HSIKERON=true &amp; !norccCodegenHsi">
             <CallLibMethod Name="__HAL_RCC_HSISTOP_ENABLE" ReturnHAL="false"/>
         </IFCondition>
     </RefConfig>
     <RefConfig Comment="Disable the force HSI in stop mode" Name="HSISTOP_DISABLE">
-        <IFCondition Expression="HSIKERON=false &amp; S_LPBAM_CONF">
+        <IFCondition Expression="HSIKERON=false &amp; S_LPBAM_CONF &amp; !norccCodegenHsi">
             <CallLibMethod Name="__HAL_RCC_HSISTOP_DISABLE" ReturnHAL="false"/>
         </IFCondition>
     </RefConfig>
 
-    <RefConfig Comment="Initializes the CPU, AHB and APB busses clocks" Name="RCC_LPBAMClockConfig">
-        <IFCondition Expression="S_LPBAM_CONF">
+    <RefConfig Comment="Initializes the CPU, AHB and APB buses clocks" Name="RCC_LPBAMClockConfig">
+        <IFCondition Expression="S_LPBAM_CONF&amp; !norccCodegenSys">
             <IFCondition Expression ="WakeUpClockMSI">
             <CallLibMethod Name="" Type="HardCode">
                 <HardCode Text="#tif ((__HAL_RCC_GET_PLL_OSCSOURCE() == RCC_PLLSOURCE_MSI) &amp;&amp; #n#t#t#t(__HAL_RCC_GET_SYSCLK_SOURCE() == RCC_SYSCLKSOURCE_STATUS_PLLCLK))#n#t{"/>
@@ -111,7 +116,7 @@
             </IFCondition>
         </IFCondition>
     </RefConfig>
-    <RefConfig Comment="Initializes the CPU, AHB and APB busses clocks" Name="RCC_ClockConfig">
+    <RefConfig Comment="Initializes the CPU, AHB and APB buses clocks" Name="RCC_ClockConfig">
         <IFCondition Expression="!S_LPBAM_CONF">
         <CallLibMethod Name="HAL_RCC_ClockConfig">
             <MethodArg Name="ClockType" ParameterName="ClockTypeARG"/>
@@ -274,24 +279,39 @@
         </CallLibMethod>
     </RefConfig>
 
-    <RefConfig Name="ConfigAttributesSECPRIV">
+     <RefConfig Name="ConfigAttributesSECPRIV">
+        <IFCondition Diagnostic=" " Expression="!S_LPBAM_CONF">
         <CallLibMethod Name="HAL_RCC_ConfigAttributes" ReturnHAL="false">
             <MethodArg Name="Item" ParameterName="ItemSECPRIV"/>
             <MethodArg Name="Attributes" ParameterName="AttributesSECPRIV"/>
         </CallLibMethod>
+        </IFCondition>
     </RefConfig>
-    <RefConfig Name="ConfigAttributesSEC">
+    <RefConfig Name="ConfigAttributesSECNPRIV">
+        <IFCondition Diagnostic=" " Expression="!S_LPBAM_CONF">
         <CallLibMethod Name="HAL_RCC_ConfigAttributes" ReturnHAL="false">
             <MethodArg Name="Item" ParameterName="ItemSEC"/>
             <MethodArg Name="Attributes" ParameterName="AttributesSEC"/>
         </CallLibMethod>
+        </IFCondition>
     </RefConfig>
     <RefConfig Name="ConfigAttributesPRIV">
-        <CallLibMethod Name="HAL_RCC_ConfigAttributes" ReturnHAL="false">
-            <MethodArg Name="Item" ParameterName="ItemPRIV"/>
-            <MethodArg Name="Attributes" ParameterName="AttributesPRIV"/>
-        </CallLibMethod>
+        <IFCondition Expression="RCC_TZ_PRIV &amp; !S_LPBAM_CONF">
+            <CallLibMethod Name="HAL_RCC_ConfigAttributes" ReturnHAL="false">
+                <MethodArg Name="Item" FValue="RCC_ALL"/>
+                <MethodArg Name="Attributes" FValue="RCC_NSEC_PRIV"/>
+            </CallLibMethod>
+        </IFCondition>
     </RefConfig>
+    <RefConfig Name="ConfigAttributesPRIVNSEC">
+        <IFCondition Expression="RCC_TZ_NSEC_PRIV &amp; !S_LPBAM_CONF">
+            <CallLibMethod Name="HAL_RCC_ConfigAttributes" ReturnHAL="false">
+                <MethodArg Name="Item" ParameterName="ItemPRIV"/>
+                <MethodArg Name="Attributes" ParameterName="AttributesPRIV"/>
+            </CallLibMethod>
+        </IFCondition>
+    </RefConfig>
+
     <LibMethod Comment="Enable the CRS" Name="__HAL_RCC_CRS_CLK_ENABLE">
     </LibMethod>
     <LibMethod Comment="Enable the force of the Internal Multi Speed kernel oscillator (MSIK) in stop mode" Name="__HAL_RCC_MSIKSTOP_ENABLE"/>
@@ -318,7 +338,7 @@
     </LibMethod>
     <LibMethod Comment="Enable MSI PLL mode fast startup" Name="HAL_RCCEx_EnableMSIPLLFastStartup"/>     
 
-    <LibMethod Comment="Initializes the CPU, AHB and APB busses clocks" Name="HAL_RCC_OscConfig">
+    <LibMethod Comment="Initializes the CPU, AHB and APB buses clocks" Name="HAL_RCC_OscConfig">
         <Argument AddressOf="true" GenericType="struct" Name="RCC_OscInitStruct" TypeName="RCC_OscInitTypeDef">
             <Argument AddressOf="false" GenericType="simple" Name="OscillatorType" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="HSEState" OptimizationCondition="equal"/>
@@ -462,6 +482,9 @@
         <Argument AddressOf="false" GenericType="simple" Name="WakeUpClk" OptimizationCondition="equal"/>
     </LibMethod>
     <LibMethod Comment="" Name="HAL_RCCEx_EnableLSECSS"/>
+    <LibMethod Comment="Configure the wakeup clock" Name="HAL_SYSCFG_SetOTGPHYReferenceClockSelection">
+        <Argument AddressOf="false" GenericType="simple" Name="RefClockSelection" OptimizationCondition="equal"/>
+    </LibMethod>    
    
     <RefComponent Cclass="HAL" Cgroup="COMMON" Cversion="0.3.0">
         <File Category="header" Name="Drivers/CMSIS/Device/ST/STM32U5xx/Include/partition_stm32u5xx.h" Condition="S_SECURE"/>
@@ -482,6 +505,11 @@
         <File Category="source" Name="Drivers/STM32U5xx_HAL_Driver/Src/stm32u5xx_hal_cortex.c"/>
         <File Category="header" Name="Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_hal_cortex.h"/>
            
+        <File Category="header" Name="Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_ll_bus.h"/>
+        <File Category="header" Name="Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_ll_rcc.h"/>
+        <File Category="header" Name="Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_ll_crs.h"/>
+        <File Category="header" Name="Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_ll_system.h"/>
+        <File Category="header" Name="Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_ll_utils.h"/>
     </RefComponent>
     <RefComponent Cclass="HAL" Cgroup="FLASH" Cversion="0.3.0">
         <File Category="header" Name="Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_hal_flash.h"/>
@@ -495,26 +523,32 @@
         <File Category="header" Name="Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_hal_gpio.h"/>
         <File Category="source" Name="Drivers/STM32U5xx_HAL_Driver/Src/stm32u5xx_hal_gpio.c"/>
         <File Category="header" Name="Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_hal_gpio_ex.h"/>        
+        <File Category="header" Name="Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_ll_gpio.h"/>
     </RefComponent>
     <RefComponent Cclass="HAL" Cgroup="DMA" Cversion="0.3.0">
         <File Category="header" Name="Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_hal_dma.h"/>
         <File Category="source" Name="Drivers/STM32U5xx_HAL_Driver/Src/stm32u5xx_hal_dma.c"/>
         <File Category="header" Name="Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_hal_dma_ex.h"/>
         <File Category="source" Name="Drivers/STM32U5xx_HAL_Driver/Src/stm32u5xx_hal_dma_ex.c"/>
+        <File Category="header" Name="Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_ll_dma.h"/>
+        <File Category="header" Name="Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_ll_dmamux.h"/>
     </RefComponent>
     <RefComponent Cclass="HAL" Cgroup="EXTI" Cversion="0.3.0">
         <File Category="header" Name="Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_hal_exti.h"/>
         <File Category="source" Name="Drivers/STM32U5xx_HAL_Driver/Src/stm32u5xx_hal_exti.c"/>
+        <File Category="header" Name="Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_ll_exti.h"/>
     </RefComponent>
     <RefComponent Cclass="HAL" Cgroup="PWR" Cversion="0.3.0">
         <File Category="header" Name="Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_hal_pwr.h"/>
         <File Category="header" Name="Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_hal_pwr_ex.h"/>
         <File Category="source" Name="Drivers/STM32U5xx_HAL_Driver/Src/stm32u5xx_hal_pwr.c"/>
         <File Category="source" Name="Drivers/STM32U5xx_HAL_Driver/Src/stm32u5xx_hal_pwr_ex.c"/>
+        <File Category="header" Name="Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_ll_pwr.h"/>
     </RefComponent>
     <RefComponent Cclass="HAL" Cgroup="CORTEX" Cversion="0.3.0">
         <File Category="header" Name="Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_hal_cortex.h"/>
         <File Category="source" Name="Drivers/STM32U5xx_HAL_Driver/Src/stm32u5xx_hal_cortex.c"/>
+        <File Category="header" Name="Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_ll_cortex.h"/>
     </RefComponent>
     <RefComponent Cclass="HAL" Cgroup="GTZC" Cversion="0.3.0">
         <File Category="header" Name="Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_hal_gtzc.h"/>

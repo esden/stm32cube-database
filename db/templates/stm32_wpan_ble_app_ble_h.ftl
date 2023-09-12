@@ -87,57 +87,56 @@ extern "C" {
 /* Exported types ------------------------------------------------------------*/
 
 [#if  ((BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (CUSTOM_P2P_SERVER = 1) || (BT_SIG_HEART_RATE_SENSOR = 1) || (CUSTOM_TEMPLATE = 1)) && (CUSTOM_P2P_CLIENT = 0) && (CUSTOM_P2P_ROUTER = 0)]
-    typedef enum
-    {
-      APP_BLE_IDLE,
-      APP_BLE_FAST_ADV,
-      APP_BLE_LP_ADV,
-      APP_BLE_SCAN,
-      APP_BLE_LP_CONNECTING,
-      APP_BLE_CONNECTED_SERVER,
-      APP_BLE_CONNECTED_CLIENT
-    } APP_BLE_ConnStatus_t;
+typedef enum
+{
+  APP_BLE_IDLE,
+  APP_BLE_FAST_ADV,
+  APP_BLE_LP_ADV,
+  APP_BLE_SCAN,
+  APP_BLE_LP_CONNECTING,
+  APP_BLE_CONNECTED_SERVER,
+  APP_BLE_CONNECTED_CLIENT
+} APP_BLE_ConnStatus_t;
     
 [/#if]
 [#if  (CUSTOM_P2P_CLIENT = 1)]
-    typedef enum
-    {
-      APP_BLE_IDLE,
-      APP_BLE_FAST_ADV,
-      APP_BLE_LP_ADV,
-      APP_BLE_SCAN,
-      APP_BLE_LP_CONNECTING,
-      APP_BLE_CONNECTED_SERVER,
-      APP_BLE_CONNECTED_CLIENT,
-      
-      APP_BLE_DISCOVER_SERVICES,
-      APP_BLE_DISCOVER_CHARACS,
-      APP_BLE_DISCOVER_WRITE_DESC,
-      APP_BLE_DISCOVER_NOTIFICATION_CHAR_DESC,
-      APP_BLE_ENABLE_NOTIFICATION_DESC,
-      APP_BLE_DISABLE_NOTIFICATION_DESC
-    } APP_BLE_ConnStatus_t;
+typedef enum
+{
+  APP_BLE_IDLE,
+  APP_BLE_FAST_ADV,
+  APP_BLE_LP_ADV,
+  APP_BLE_SCAN,
+  APP_BLE_LP_CONNECTING,
+  APP_BLE_CONNECTED_SERVER,
+  APP_BLE_CONNECTED_CLIENT,
+
+  APP_BLE_DISCOVER_SERVICES,
+  APP_BLE_DISCOVER_CHARACS,
+  APP_BLE_DISCOVER_WRITE_DESC,
+  APP_BLE_DISCOVER_NOTIFICATION_CHAR_DESC,
+  APP_BLE_ENABLE_NOTIFICATION_DESC,
+  APP_BLE_DISABLE_NOTIFICATION_DESC
+} APP_BLE_ConnStatus_t;
 
 [/#if]
 [#if  (CUSTOM_P2P_ROUTER = 1)]
-  typedef enum
-    {
-      APP_BLE_IDLE,
-      APP_BLE_FAST_ADV,
-      APP_BLE_LP_ADV,
-      APP_BLE_SCAN,
-      APP_BLE_CONNECTING,
-      APP_BLE_CONNECTED,
-       
-      APP_BLE_DISCOVER_SERVICES,
-      APP_BLE_DISCOVER_CHARACS,
-      APP_BLE_DISCOVER_LED_CHAR_DESC,
-      APP_BLE_DISCOVER_BUTTON_CHAR_DESC,
-      APP_BLE_DISCOVER_NOTIFICATION_CHAR_DESC,
-      APP_BLE_ENABLE_NOTIFICATION_BUTTON_DESC,
-      APP_BLE_DISABLE_NOTIFICATION_TX_DESC
-    } APP_BLE_ConnStatus_t;  
+typedef enum
+{
+  APP_BLE_IDLE,
+  APP_BLE_FAST_ADV,
+  APP_BLE_LP_ADV,
+  APP_BLE_SCAN,
+  APP_BLE_CONNECTING,
+  APP_BLE_CONNECTED,
 
+  APP_BLE_DISCOVER_SERVICES,
+  APP_BLE_DISCOVER_CHARACS,
+  APP_BLE_DISCOVER_LED_CHAR_DESC,
+  APP_BLE_DISCOVER_BUTTON_CHAR_DESC,
+  APP_BLE_DISCOVER_NOTIFICATION_CHAR_DESC,
+  APP_BLE_ENABLE_NOTIFICATION_BUTTON_DESC,
+  APP_BLE_DISABLE_NOTIFICATION_TX_DESC
+} APP_BLE_ConnStatus_t;  
 
 typedef enum
 {
@@ -148,8 +147,8 @@ typedef enum
 
 typedef struct
 {
-  uint8_t * pPayload;
-  uint8_t     Length;
+  uint8_t *pPayload;
+  uint8_t Length;
 }P2P_Client_Data_t;  
 
 typedef struct
@@ -180,13 +179,13 @@ typedef struct
 /* USER CODE END EM */
 
 /* Exported functions ---------------------------------------------*/
-  void APP_BLE_Init( void ); 
+void APP_BLE_Init(void); 
 
 [#if  (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (CUSTOM_P2P_SERVER = 1) || (BT_SIG_HEART_RATE_SENSOR = 1)]
-  APP_BLE_ConnStatus_t APP_BLE_Get_Server_Connection_Status(void);
+APP_BLE_ConnStatus_t APP_BLE_Get_Server_Connection_Status(void);
 [/#if]
 [#if  (CUSTOM_P2P_ROUTER = 1) || (CUSTOM_P2P_CLIENT = 1)]
-  APP_BLE_ConnStatus_t APP_BLE_Get_Client_Connection_Status( uint16_t Connection_Handle );
+APP_BLE_ConnStatus_t APP_BLE_Get_Client_Connection_Status( uint16_t Connection_Handle );
 [/#if]
 
 /* USER CODE BEGIN EF */

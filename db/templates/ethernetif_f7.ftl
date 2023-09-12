@@ -4,84 +4,110 @@
   ******************************************************************************
   * File Name          : ethernetif.c
   * Description        : This file provides code for the configuration
-  *                      of the ${name} MiddleWare.
+  *                      of the ethernetif.c MiddleWare.
   ******************************************************************************
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
 /* USER CODE END Header */
-
 [#-- SWIPdatas is a list of SWIPconfigModel --]
 [#compress] 
 [#list SWIPdatas as SWIP]
 [#assign with_rtos = 0]
-[#assign netif_callback = 0]
-[#assign lwip_arp = 0]
-[#assign lan8742a = 0]
-[#assign dp83848 = 0]
-[#assign lwip_ipv6 = 0]
 [#assign cmsis_version = "n/a"]
+[#assign custom_pbuf = 0]
+[#assign lwip_arp = 0]
+[#assign bsp = 0][#-- bsp is LAN8742 for H7 --]
+[#assign tx_descr_address = 0]
+[#assign rx_descr_address = 0]
+[#assign rx_buffer_address = 0]
+[#assign lwip_ipv6 = 0]
+[#assign BspComponent = ""]
 [#if SWIP.defines??]
 	[#list SWIP.defines as definition] 	
-		[#if (definition.name == "WITH_RTOS")]
-			[#if definition.value == "1"]
-				[#assign with_rtos = 1]
-			[/#if][#-- "1" --]
-		[/#if][#-- WITH_RTOS --]
-		[#if (definition.name == "CMSIS_VERSION") && (with_rtos == 1)]
-			[#if definition.value == "0"]
-				[#assign cmsis_version = "v1"]
-			[/#if]
-			[#if definition.value == "1"]
-				[#assign cmsis_version = "v2"]
-			[/#if]
-		[/#if][#-- CMSIS_VERSION --]
-		[#if (definition.name == "NO_SYS")]
-			[#if definition.value == "0"]
-				[#assign with_rtos = 1]
-			[#else]
-				[#assign with_rtos = 0]
-			[/#if][#-- "0" --]
-		[/#if][#-- NO_SYS --]
-		[#if (definition.name == "LWIP_NETIF_LINK_CALLBACK") && (definition.value == "1")]
-			[#assign netif_callback = 1] 
-		[/#if]
+        [#if (definition.name == "WITH_RTOS")]
+            [#if definition.value == "1"]
+                [#assign with_rtos = 1]
+            [/#if][#-- "1" --]
+        [/#if][#-- WITH_RTOS --]
+        [#if (definition.name == "NO_SYS")]
+            [#if definition.value == "0"]
+                [#assign with_rtos = 1]
+            [#else]
+                [#assign with_rtos = 0]
+            [/#if][#-- "0" --]
+        [/#if][#-- NO_SYS --]
+        [#if (definition.name == "CMSIS_VERSION") && (with_rtos == 1)]
+            [#if definition.value == "0"]
+               [#assign cmsis_version = "v1"]
+            [/#if]
+            [#if definition.value == "1"]
+               [#assign cmsis_version = "v2"]
+            [/#if]
+        [/#if][#-- CMSIS_VERSION --]
+        [#if (definition.name == "LWIP_SUPPORT_CUSTOM_PBUF") && (definition.value == "1")]
+            [#assign custom_pbuf = 1] 
+        [/#if]
 		[#if (definition.name == "LWIP_ARP") && (definition.value == "1")]
             [#assign lwip_arp = 1] 
         [/#if]
-        [#if (definition.name == "PHY") && (definition.value == "LAN8742A_PHY_ADDRESS")]
-            [#assign lan8742a = 1]
+        [#if (definition.name == "TX_DESCRIPTOR_ADDRESS")]
+            [#assign tx_descr_address = definition.value]
         [/#if]
-        [#if (definition.name == "PHY") && (definition.value == "DP83848_PHY_ADDRESS")]
-            [#assign dp83848 = 1]
+        [#if (definition.name == "RX_DESCRIPTOR_ADDRESS")]
+            [#assign rx_descr_address = definition.value]
         [/#if]
+        [#if (definition.name == "RX_BUFFER_ADDRESS")]
+            [#assign rx_buffer_address = definition.value]
+        [/#if] 
         [#if (definition.name == "LWIP_IPV6") && (definition.value == "1")]
             [#assign lwip_ipv6 = 1]
-        [/#if]
+        [/#if]  
 	[/#list]
 [/#if][#-- SWIP.defines --]
 [/#list][/#compress]
 
+[#if BspComponentDatas??]
+[#list BspComponentDatas as BspComponent]
+[#if BspComponent.variables??]
+[#list BspComponent.variables as variables]
+		[#if variables.name?contains("BspComponent")]
+			[#assign BspComponent = variables.value]
+			[#if (variables.value == "Undefined")]			
+				[#assign bsp = 0]
+			[#else]
+				[#assign bsp = 1]
+			[/#if][#-- end "Choose" --]
+		[/#if][#-- end "BspComponent" --]
+[/#list]
+[/#if][#-- end "BspComponent.variables??" --]
+[/#list]
+[/#if][#-- end "BspComponentDatas??" --]
+
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "lwip/opt.h"
-[#compress]
 [#if with_rtos == 0]
 #include "lwip/mem.h"
 #include "lwip/memp.h"
-[/#if][#-- endif with_rtos --][/#compress]
-
+[/#if][#-- endif with_rtos --]
 #include "lwip/timeouts.h"
 #include "netif/ethernet.h"
 #include "netif/etharp.h"
 #include "lwip/ethip6.h"
 #include "ethernetif.h"
+[#if bsp == 1]
+#include "${BspComponent?lower_case}.h"
+[#else]
+/* USER CODE BEGIN Include for User BSP */
+
+/* USER CODE END Include for User BSP */
+[/#if][#-- endif bsp --]
 #include <string.h>
-[#compress]
 [#if with_rtos == 1]
 #include "cmsis_os.h"
 #include "lwip/tcpip.h"
-[/#if][#-- endif with_rtos --][/#compress]
+[/#if][#-- endif with_rtos --]
 
 /* Within 'USER CODE' section, code will be kept by default at each generation */
 /* USER CODE BEGIN 0 */
@@ -104,63 +130,151 @@
 #define IFNAME0 's'
 #define IFNAME1 't'
 
+/* ETH Setting  */
+#define ETH_DMA_TRANSMIT_TIMEOUT               ( 20U )
+#define ETH_TX_BUFFER_MAX             ((ETH_TX_DESC_CNT) * 2U)
+/* ETH_RX_BUFFER_SIZE parameter is defined in lwipopts.h */
+
 /* USER CODE BEGIN 1 */
 
 /* USER CODE END 1 */
 
 /* Private variables ---------------------------------------------------------*/
-#if defined ( __ICCARM__ ) /*!< IAR Compiler */
-  #pragma data_alignment=4   
-#endif
-__ALIGN_BEGIN ETH_DMADescTypeDef  DMARxDscrTab[ETH_RXBUFNB] __ALIGN_END;/* Ethernet Rx MA Descriptor */
+/* 
+@Note: This interface is implemented to operate in zero-copy mode only:
+        - Rx buffers will be allocated from LwIP stack memory heap,
+          then passed to ETH HAL driver.
+        - Tx buffers will be allocated from LwIP stack memory heap, 
+          then passed to ETH HAL driver.
+
+@Notes: 
+  1.a. ETH DMA Rx descriptors must be contiguous, the default count is 4, 
+       to customize it please redefine ETH_RX_DESC_CNT in ETH GUI (Rx Descriptor Length)
+       so that updated value will be generated in stm32xxxx_hal_conf.h
+  1.b. ETH DMA Tx descriptors must be contiguous, the default count is 4, 
+       to customize it please redefine ETH_TX_DESC_CNT in ETH GUI (Tx Descriptor Length)
+       so that updated value will be generated in stm32xxxx_hal_conf.h
+
+  2.a. Rx Buffers number must be between ETH_RX_DESC_CNT and 2*ETH_RX_DESC_CNT
+  2.b. Rx Buffers must have the same size: ETH_RX_BUFFER_SIZE, this value must
+       passed to ETH DMA in the init field (heth.Init.RxBuffLen)
+  2.c  The RX Ruffers addresses and sizes must be properly defined to be aligned
+       to L1-CACHE line size (32 bytes).       
+*/
+
+/* Data Type Definitions */
+typedef enum
+{
+  RX_ALLOC_OK       = 0x00,
+  RX_ALLOC_ERROR    = 0x01
+} RxAllocStatusTypeDef;
+
+typedef struct
+{
+  struct pbuf_custom pbuf_custom;
+  uint8_t buff[(ETH_RX_BUFFER_SIZE + 31) & ~31] __ALIGNED(32);
+} RxBuff_t;
+
+/* Memory Pool Declaration */
+#define ETH_RX_BUFFER_CNT             12U
+LWIP_MEMPOOL_DECLARE(RX_POOL, ETH_RX_BUFFER_CNT, sizeof(RxBuff_t), "Zero-copy RX PBUF pool");
+
+/* Variable Definitions */
+static uint8_t RxAllocStatus;
 
 #if defined ( __ICCARM__ ) /*!< IAR Compiler */
-  #pragma data_alignment=4   
-#endif
-__ALIGN_BEGIN ETH_DMADescTypeDef  DMATxDscrTab[ETH_TXBUFNB] __ALIGN_END;/* Ethernet Tx DMA Descriptor */
 
-#if defined ( __ICCARM__ ) /*!< IAR Compiler */
-  #pragma data_alignment=4   
-#endif
-__ALIGN_BEGIN uint8_t Rx_Buff[ETH_RXBUFNB][ETH_RX_BUF_SIZE] __ALIGN_END; /* Ethernet Receive Buffer */
+#pragma location=${rx_descr_address}
+ETH_DMADescTypeDef  DMARxDscrTab[ETH_RX_DESC_CNT]; /* Ethernet Rx DMA Descriptors */
+#pragma location=${tx_descr_address}
+ETH_DMADescTypeDef  DMATxDscrTab[ETH_TX_DESC_CNT]; /* Ethernet Tx DMA Descriptors */
 
-#if defined ( __ICCARM__ ) /*!< IAR Compiler */
-  #pragma data_alignment=4   
+#elif defined ( __CC_ARM )  /* MDK ARM Compiler */
+
+__attribute__((at(${rx_descr_address}))) ETH_DMADescTypeDef  DMARxDscrTab[ETH_RX_DESC_CNT]; /* Ethernet Rx DMA Descriptors */
+__attribute__((at(${tx_descr_address}))) ETH_DMADescTypeDef  DMATxDscrTab[ETH_TX_DESC_CNT]; /* Ethernet Tx DMA Descriptors */
+
+#elif defined ( __GNUC__ ) /* GNU Compiler */ 
+
+ETH_DMADescTypeDef DMARxDscrTab[ETH_RX_DESC_CNT] __attribute__((section(".RxDecripSection"))); /* Ethernet Rx DMA Descriptors */
+ETH_DMADescTypeDef DMATxDscrTab[ETH_TX_DESC_CNT] __attribute__((section(".TxDecripSection")));   /* Ethernet Tx DMA Descriptors */
+
 #endif
-__ALIGN_BEGIN uint8_t Tx_Buff[ETH_TXBUFNB][ETH_TX_BUF_SIZE] __ALIGN_END; /* Ethernet Transmit Buffer */
 
 /* USER CODE BEGIN 2 */
 
 /* USER CODE END 2 */
 
-[#compress]
 [#if with_rtos == 1]
-/* Semaphore to signal incoming packets */
-osSemaphoreId s_xSemaphore = NULL;
-[/#if][#-- endif with_rtos --][/#compress]
+osSemaphoreId RxPktSemaphore = NULL;   /* Semaphore to signal incoming packets */
+osSemaphoreId TxPktSemaphore = NULL;   /* Semaphore to signal transmit packet complete */
+[/#if][#-- endif with_rtos --]
 
 /* Global Ethernet handle */
 ETH_HandleTypeDef heth;
+ETH_TxPacketConfig TxConfig;
+
+/* Private function prototypes -----------------------------------------------*/
+[#if bsp == 1]
+int32_t ETH_PHY_IO_Init(void);
+int32_t ETH_PHY_IO_DeInit (void);
+int32_t ETH_PHY_IO_ReadReg(uint32_t DevAddr, uint32_t RegAddr, uint32_t *pRegVal);
+int32_t ETH_PHY_IO_WriteReg(uint32_t DevAddr, uint32_t RegAddr, uint32_t RegVal);
+int32_t ETH_PHY_IO_GetTick(void);
+
+${BspComponent?lower_case}_Object_t ${BspComponent};
+${BspComponent?lower_case}_IOCtx_t  ${BspComponent}_IOCtx = {ETH_PHY_IO_Init,
+                                  ETH_PHY_IO_DeInit,
+                                  ETH_PHY_IO_WriteReg,
+                                  ETH_PHY_IO_ReadReg,
+                                  ETH_PHY_IO_GetTick};
+[#else]
+/* USER CODE BEGIN Private function prototypes for User BSP */
+
+/* USER CODE END Private function prototypes for User BSP */
+[/#if][#-- endif bsp --]
 
 /* USER CODE BEGIN 3 */
 
 /* USER CODE END 3 */
 
 /* Private functions ---------------------------------------------------------*/
-[#include mxTmpFolder+"/eth_Msp.tmp"]
+[#if custom_pbuf == 1]
+void pbuf_free_custom(struct pbuf *p);
+[/#if][#-- endif custom_pbuf --]
 
-[#if with_rtos == 1]
+[#if with_rtos == 1][#-- rtos used MAIN --]
 /**
   * @brief  Ethernet Rx Transfer completed callback
-  * @param  heth: ETH handle
+  * @param  handlerEth: ETH handler
   * @retval None
   */
-void HAL_ETH_RxCpltCallback(ETH_HandleTypeDef *heth)
+void HAL_ETH_RxCpltCallback(ETH_HandleTypeDef *handlerEth)
 {
-  osSemaphoreRelease(s_xSemaphore);
+  osSemaphoreRelease(RxPktSemaphore);
 }
-
-[/#if][#-- endif with_rtos --]
+/**
+  * @brief  Ethernet Tx Transfer completed callback
+  * @param  handlerEth: ETH handler
+  * @retval None
+  */
+void HAL_ETH_TxCpltCallback(ETH_HandleTypeDef *handlerEth)
+{
+  osSemaphoreRelease(TxPktSemaphore);
+}
+/**
+  * @brief  Ethernet DMA transfer error callback
+  * @param  handlerEth: ETH handler
+  * @retval None
+  */
+void HAL_ETH_ErrorCallback(ETH_HandleTypeDef *handlerEth)
+{
+  if((HAL_ETH_GetDMAError(handlerEth) & ETH_DMASR_RBUS) == ETH_DMASR_RBUS)
+  {
+     osSemaphoreRelease(RxPktSemaphore);
+  }
+}
+[/#if][#-- endif with_rtos MAIN --]
 
 /* USER CODE BEGIN 4 */
 
@@ -171,42 +285,43 @@ void HAL_ETH_RxCpltCallback(ETH_HandleTypeDef *heth)
                        LL Driver Interface ( LwIP stack --> ETH) 
 *******************************************************************************/
 /**
- * In this function, the hardware should be initialized.
+ * @brief In this function, the hardware should be initialized.
  * Called from ethernetif_init().
  *
  * @param netif the already initialized lwip network interface structure
  *        for this ethernetif
  */
 static void low_level_init(struct netif *netif)
-{ 
-[#if (dp83848 == 1) || (lan8742a ==1)]  
-  uint32_t regvalue = 0;
-[/#if]
-  HAL_StatusTypeDef hal_eth_init_status;
+{
+  HAL_StatusTypeDef hal_eth_init_status = HAL_OK;
 [#if cmsis_version = "v2"]
 /* USER CODE BEGIN OS_THREAD_ATTR_CMSIS_RTOS_V2 */
   osThreadAttr_t attributes;
 /* USER CODE END OS_THREAD_ATTR_CMSIS_RTOS_V2 */
-[/#if][#-- endif cmsis_version --]  
+[/#if][#-- endif cmsis_version --]
+[#if with_rtos == 1]
+[#if bsp == 1]
+  uint32_t duplex, speed = 0;
+  int32_t PHYLinkState = 0;
+  ETH_MACConfigTypeDef MACConf = {0};
+[#else]
+/* USER CODE BEGIN low_level_init Variables Initialization for User BSP */
+
+/* USER CODE END low_level_init Variables Initialization for User BSP */
+[/#if][#-- endif bsp --]
+[/#if][#-- endif with_rtos --]
+  /* Start ETH HAL Init */
+[#include mxTmpFolder+"/eth_HalInit.tmp"]
+  /* End ETH HAL Init */
   
-/* Init ETH */
-[#include mxTmpFolder+"/eth_HalInit.tmp"]  
-  
-  if (hal_eth_init_status == HAL_OK)
-  {
-    /* Set netif link flag */  
-    netif->flags |= NETIF_FLAG_LINK_UP;
-  }
+  /* Initialize the RX POOL */
+  LWIP_MEMPOOL_INIT(RX_POOL);
+
 [#if lwip_ipv6 == 1]
   /* Pass all multicast frames: needed for IPv6 protocol*/
-  heth.Instance->MACFFR |= ETH_MULTICASTFRAMESFILTER_NONE;
-[/#if]
-  /* Initialize Tx Descriptors list: Chain Mode */
-  HAL_ETH_DMATxDescListInit(&heth, DMATxDscrTab, &Tx_Buff[0][0], ETH_TXBUFNB);
-     
-  /* Initialize Rx Descriptors list: Chain Mode  */
-  HAL_ETH_DMARxDescListInit(&heth, DMARxDscrTab, &Rx_Buff[0][0], ETH_RXBUFNB);
- 
+  heth.Instance->MACPFR |= ETH_MACPFR_PM;
+  
+[/#if] [#-- endif lwip_ipv6 --]
 #if LWIP_ARP || LWIP_ETHERNET 
 
   /* set MAC hardware address length */
@@ -221,7 +336,7 @@ static void low_level_init(struct netif *netif)
   netif->hwaddr[5] =  heth.Init.MACAddr[5];
   
   /* maximum transfer unit */
-  netif->mtu = 1500;
+  netif->mtu = ETH_MAX_PAYLOAD;
   
   /* Accept broadcast address and ARP traffic */
   /* don't set NETIF_FLAG_ETHARP if this device is not an ethernet one */
@@ -230,17 +345,23 @@ static void low_level_init(struct netif *netif)
   #else 
     netif->flags |= NETIF_FLAG_BROADCAST;
   #endif /* LWIP_ARP */
-  
+      
 [#if with_rtos == 1]
-/* create a binary semaphore used for informing ethernetif of frame reception */
 [#if cmsis_version = "v2"]
-  s_xSemaphore = osSemaphoreNew(1, 1, NULL);
-[#else]
-  osSemaphoreDef(SEM);
-  s_xSemaphore = osSemaphoreCreate(osSemaphore(SEM), 1);
+  /* create a binary semaphore used for informing ethernetif of frame reception */
+  RxPktSemaphore = osSemaphoreNew(1, 1, NULL);
+  
+  /* create a binary semaphore used for informing ethernetif of frame transmission */
+  TxPktSemaphore = osSemaphoreNew(1, 1, NULL);
+[#else][#-- else cmsis_version --]
+  /* create a binary semaphore used for informing ethernetif of frame reception */
+  RxPktSemaphore = xSemaphoreCreateBinary();
+  
+  /* create a binary semaphore used for informing ethernetif of frame transmission */
+  TxPktSemaphore = xSemaphoreCreateBinary();
 [/#if][#-- endif cmsis_version --]
 
-/* create the task that handles the ETH_MAC */
+  /* create the task that handles the ETH_MAC */
 [#if cmsis_version = "v2"]
 /* USER CODE BEGIN OS_THREAD_NEW_CMSIS_RTOS_V2 */
   memset(&attributes, 0x0, sizeof(osThreadAttr_t));
@@ -248,56 +369,97 @@ static void low_level_init(struct netif *netif)
   attributes.stack_size = INTERFACE_THREAD_STACK_SIZE;
   attributes.priority = osPriorityRealtime;
   osThreadNew(ethernetif_input, netif, &attributes);
-/* USER CODE END OS_THREAD_NEW_CMSIS_RTOS_V2 */ 
+/* USER CODE END OS_THREAD_NEW_CMSIS_RTOS_V2 */
 [#else]
 /* USER CODE BEGIN OS_THREAD_DEF_CREATE_CMSIS_RTOS_V1 */
   osThreadDef(EthIf, ethernetif_input, osPriorityRealtime, 0, INTERFACE_THREAD_STACK_SIZE);
   osThreadCreate (osThread(EthIf), netif);
-/* USER CODE END OS_THREAD_DEF_CREATE_CMSIS_RTOS_V1 */  
+/* USER CODE END OS_THREAD_DEF_CREATE_CMSIS_RTOS_V1 */
 [/#if][#-- endif cmsis_version --]
 [/#if][#-- endif with_rtos --]
-  /* Enable MAC and DMA transmission and reception */
-  HAL_ETH_Start(&heth);
 
+[#if bsp == 1]
 /* USER CODE BEGIN PHY_PRE_CONFIG */ 
     
 /* USER CODE END PHY_PRE_CONFIG */
-  
-[#if dp83848 == 1]  
-  /**** Configure PHY to generate an interrupt when Eth Link state changes ****/
-  /* Read Register Configuration */
-  HAL_ETH_ReadPHYRegister(&heth, PHY_MICR, &regvalue);
-  
-  regvalue |= (PHY_MICR_INT_EN | PHY_MICR_INT_OE);
+  /* Set PHY IO functions */
+  ${BspComponent}_RegisterBusIO(&${BspComponent}, &${BspComponent}_IOCtx);
 
-  /* Enable Interrupts */
-  HAL_ETH_WritePHYRegister(&heth, PHY_MICR, regvalue );
-  
-  /* Read Register Configuration */
-  HAL_ETH_ReadPHYRegister(&heth, PHY_MISR, &regvalue);
-  
-  regvalue |= PHY_MISR_LINK_INT_EN;
+  /* Initialize the ${BspComponent} ETH PHY */
+  ${BspComponent}_Init(&${BspComponent});
+[#else]
+/* USER CODE BEGIN low_level_init Code 1 for User BSP */ 
     
-  /* Enable Interrupt on change of link status */
-  HAL_ETH_WritePHYRegister(&heth, PHY_MISR, regvalue);
-[/#if][#-- endif dp83848 --]
+/* USER CODE END low_level_init Code 1 for User BSP */
+[/#if][#-- endif bsp --] 
 
-[#if lan8742a == 1]
-  /* Read Register Configuration */
-  HAL_ETH_ReadPHYRegister(&heth, PHY_ISFR, &regvalue);
-  regvalue |= (PHY_ISFR_INT4);
-
-  /* Enable Interrupt on change of link status */ 
-  HAL_ETH_WritePHYRegister(&heth, PHY_ISFR , regvalue );
+  if (hal_eth_init_status == HAL_OK)
+  {
+[#if with_rtos == 1]
+[#if bsp == 1]
+    PHYLinkState = ${BspComponent}_GetLinkState(&${BspComponent});
   
-  /* Read Register Configuration */
-  HAL_ETH_ReadPHYRegister(&heth, PHY_ISFR , &regvalue);
-[/#if][#-- endif lan8742a --]
-
+    /* Get link state */  
+    if(PHYLinkState <= ${BspComponent}_STATUS_LINK_DOWN)
+    {
+      netif_set_link_down(netif);
+      netif_set_down(netif);
+    }
+    else 
+    {
+      switch (PHYLinkState)
+      {
+      case ${BspComponent}_STATUS_100MBITS_FULLDUPLEX:
+        duplex = ETH_FULLDUPLEX_MODE;
+        speed = ETH_SPEED_100M;
+        break;
+      case ${BspComponent}_STATUS_100MBITS_HALFDUPLEX:
+        duplex = ETH_HALFDUPLEX_MODE;
+        speed = ETH_SPEED_100M;
+        break;
+      case ${BspComponent}_STATUS_10MBITS_FULLDUPLEX:
+        duplex = ETH_FULLDUPLEX_MODE;
+        speed = ETH_SPEED_10M;
+        break;
+      case ${BspComponent}_STATUS_10MBITS_HALFDUPLEX:
+        duplex = ETH_HALFDUPLEX_MODE;
+        speed = ETH_SPEED_10M;
+        break;
+      default:
+        duplex = ETH_FULLDUPLEX_MODE;
+        speed = ETH_SPEED_100M;
+        break;      
+      }
+    
+    /* Get MAC Config MAC */
+    HAL_ETH_GetMACConfig(&heth, &MACConf); 
+    MACConf.DuplexMode = duplex;
+    MACConf.Speed = speed;
+    HAL_ETH_SetMACConfig(&heth, &MACConf);
+    
+    HAL_ETH_Start_IT(&heth);
+    netif_set_up(netif);
+    netif_set_link_up(netif);
+    
 /* USER CODE BEGIN PHY_POST_CONFIG */ 
     
 /* USER CODE END PHY_POST_CONFIG */
+    }
+[#else][#-- endif bsp --]
+/* USER CODE BEGIN low_level_init Code 2 for User BSP */ 
+    
+/* USER CODE END low_level_init Code 2 for User BSP */
+[/#if][#-- endelse bsp --]
 
+[#else][#-- endif with_rtos --]
+  /* Get link state */
+  ethernet_link_check_state(netif);
+[/#if][#-- endelse with_rtos --]
+  }
+  else
+  {
+    Error_Handler();
+  }
 #endif /* LWIP_ARP || LWIP_ETHERNET */
 
 /* USER CODE BEGIN LOW_LEVEL_INIT */ 
@@ -306,7 +468,7 @@ static void low_level_init(struct netif *netif)
 }
 
 /**
- * This function should do the actual transmission of the packet. The packet is
+ * @brief This function should do the actual transmission of the packet. The packet is
  * contained in the pbuf that is passed to the function. This pbuf
  * might be chained.
  *
@@ -323,82 +485,61 @@ static void low_level_init(struct netif *netif)
 
 static err_t low_level_output(struct netif *netif, struct pbuf *p)
 {
-  err_t errval;
-  struct pbuf *q;
-  uint8_t *buffer = (uint8_t *)(heth.TxDesc->Buffer1Addr);
-  __IO ETH_DMADescTypeDef *DmaTxDesc;
-  uint32_t framelength = 0;
-  uint32_t bufferoffset = 0;
-  uint32_t byteslefttocopy = 0;
-  uint32_t payloadoffset = 0;
-  DmaTxDesc = heth.TxDesc;
-  bufferoffset = 0;
+  uint32_t i = 0U;
+  struct pbuf *q = NULL;
+  err_t errval = ERR_OK;
+  ETH_BufferTypeDef Txbuffer[ETH_TX_DESC_CNT] = {0};
   
-  /* copy frame from pbufs to driver buffers */
+  memset(Txbuffer, 0 , ETH_TX_DESC_CNT*sizeof(ETH_BufferTypeDef));
+  
   for(q = p; q != NULL; q = q->next)
-    {
-      /* Is this buffer available? If not, goto error */
-      if((DmaTxDesc->Status & ETH_DMATXDESC_OWN) != (uint32_t)RESET)
-      {
-        errval = ERR_USE;
-        goto error;
-      }
-    
-      /* Get bytes in current lwIP buffer */
-      byteslefttocopy = q->len;
-      payloadoffset = 0;
-    
-      /* Check if the length of data to copy is bigger than Tx buffer size*/
-      while( (byteslefttocopy + bufferoffset) > ETH_TX_BUF_SIZE )
-      {
-        /* Copy data to Tx buffer*/
-        memcpy( (uint8_t*)((uint8_t*)buffer + bufferoffset), (uint8_t*)((uint8_t*)q->payload + payloadoffset), (ETH_TX_BUF_SIZE - bufferoffset) );
-      
-        /* Point to next descriptor */
-        DmaTxDesc = (ETH_DMADescTypeDef *)(DmaTxDesc->Buffer2NextDescAddr);
-      
-        /* Check if the buffer is available */
-        if((DmaTxDesc->Status & ETH_DMATXDESC_OWN) != (uint32_t)RESET)
-        {
-          errval = ERR_USE;
-          goto error;
-        }
-      
-        buffer = (uint8_t *)(DmaTxDesc->Buffer1Addr);
-      
-        byteslefttocopy = byteslefttocopy - (ETH_TX_BUF_SIZE - bufferoffset);
-        payloadoffset = payloadoffset + (ETH_TX_BUF_SIZE - bufferoffset);
-        framelength = framelength + (ETH_TX_BUF_SIZE - bufferoffset);
-        bufferoffset = 0;
-      }
-    
-      /* Copy the remaining bytes */
-      memcpy( (uint8_t*)((uint8_t*)buffer + bufferoffset), (uint8_t*)((uint8_t*)q->payload + payloadoffset), byteslefttocopy );
-      bufferoffset = bufferoffset + byteslefttocopy;
-      framelength = framelength + byteslefttocopy;
-    }
-  
-  /* Prepare transmit descriptors to give to DMA */ 
-  HAL_ETH_TransmitFrame(&heth, framelength);
-  
-  errval = ERR_OK;
-  
-error:
-  
-  /* When Transmit Underflow flag is set, clear it and issue a Transmit Poll Demand to resume transmission */
-  if ((heth.Instance->DMASR & ETH_DMASR_TUS) != (uint32_t)RESET)
   {
-    /* Clear TUS ETHERNET DMA flag */
-    heth.Instance->DMASR = ETH_DMASR_TUS;
-
-    /* Resume DMA transmission*/
-    heth.Instance->DMATPDR = 0;
+    if(i >= ETH_TX_DESC_CNT)	
+      return ERR_IF;
+    
+    Txbuffer[i].buffer = q->payload;
+    Txbuffer[i].len = q->len;
+    
+    if(i>0)
+    {
+      Txbuffer[i-1].next = &Txbuffer[i];
+    }
+    
+    if(q->next == NULL)
+    {
+      Txbuffer[i].next = NULL;
+    }
+    
+    i++;
   }
+
+  TxConfig.Length = p->tot_len;
+  TxConfig.TxBuffer = Txbuffer;
+  TxConfig.pData = p;
+
+[#if with_rtos == 1]
+  pbuf_ref(p);
+  
+  HAL_ETH_Transmit_IT(&heth, &TxConfig);
+[#if cmsis_version = "v1"]
+  while(osSemaphoreWait(TxPktSemaphore, TIME_WAITING_FOR_INPUT)!=osOK)
+[#else]
+  while(osSemaphoreAcquire(TxPktSemaphore, TIME_WAITING_FOR_INPUT)!=osOK)
+[/#if][#-- endif cmsis_version --]
+
+  {
+  }
+
+  HAL_ETH_ReleaseTxPacket(&heth);
+[#else][#-- endif with_rtos --]
+  HAL_ETH_Transmit(&heth, &TxConfig, ETH_DMA_TRANSMIT_TIMEOUT);
+[/#if][#-- endelse with_rtos --]
+  
   return errval;
 }
 
 /**
- * Should allocate a pbuf and transfer the bytes of the incoming
+ * @brief Should allocate a pbuf and transfer the bytes of the incoming
  * packet from the interface into the pbuf.
  *
  * @param netif the lwip network interface structure for this ethernetif
@@ -408,90 +549,17 @@ error:
 static struct pbuf * low_level_input(struct netif *netif)
 {
   struct pbuf *p = NULL;
-  struct pbuf *q = NULL;
-  uint16_t len = 0;
-  uint8_t *buffer;
-  __IO ETH_DMADescTypeDef *dmarxdesc;
-  uint32_t bufferoffset = 0;
-  uint32_t payloadoffset = 0;
-  uint32_t byteslefttocopy = 0;
-  uint32_t i=0;
-  
 
-  /* get received frame */
-[#if with_rtos == 1]
-  if (HAL_ETH_GetReceivedFrame_IT(&heth) != HAL_OK)
-[#else]
-  if (HAL_ETH_GetReceivedFrame(&heth) != HAL_OK)
-[/#if] 
-  
-    return NULL;
-  
-  /* Obtain the size of the packet and put it into the "len" variable. */
-  len = heth.RxFrameInfos.length;
-  buffer = (uint8_t *)heth.RxFrameInfos.buffer;
-  
-  if (len > 0)
+  if(RxAllocStatus == RX_ALLOC_OK)
   {
-    /* We allocate a pbuf chain of pbufs from the Lwip buffer pool */
-    p = pbuf_alloc(PBUF_RAW, len, PBUF_POOL);
+    HAL_ETH_ReadData(&heth, (void **)&p);
   }
-  
-  if (p != NULL)
-  {
-    dmarxdesc = heth.RxFrameInfos.FSRxDesc;
-    bufferoffset = 0;
-    for(q = p; q != NULL; q = q->next)
-    {
-      byteslefttocopy = q->len;
-      payloadoffset = 0;
-      
-      /* Check if the length of bytes to copy in current pbuf is bigger than Rx buffer size*/
-      while( (byteslefttocopy + bufferoffset) > ETH_RX_BUF_SIZE )
-      {
-        /* Copy data to pbuf */
-        memcpy( (uint8_t*)((uint8_t*)q->payload + payloadoffset), (uint8_t*)((uint8_t*)buffer + bufferoffset), (ETH_RX_BUF_SIZE - bufferoffset));
-        
-        /* Point to next descriptor */
-        dmarxdesc = (ETH_DMADescTypeDef *)(dmarxdesc->Buffer2NextDescAddr);
-        buffer = (uint8_t *)(dmarxdesc->Buffer1Addr);
-        
-        byteslefttocopy = byteslefttocopy - (ETH_RX_BUF_SIZE - bufferoffset);
-        payloadoffset = payloadoffset + (ETH_RX_BUF_SIZE - bufferoffset);
-        bufferoffset = 0;
-      }
-      /* Copy remaining data in pbuf */
-      memcpy( (uint8_t*)((uint8_t*)q->payload + payloadoffset), (uint8_t*)((uint8_t*)buffer + bufferoffset), byteslefttocopy);
-      bufferoffset = bufferoffset + byteslefttocopy;
-    }
-  }  
-  
-    /* Release descriptors to DMA */
-    /* Point to first descriptor */
-    dmarxdesc = heth.RxFrameInfos.FSRxDesc;
-    /* Set Own bit in Rx descriptors: gives the buffers back to DMA */
-    for (i=0; i< heth.RxFrameInfos.SegCount; i++)
-    {  
-      dmarxdesc->Status |= ETH_DMARXDESC_OWN;
-      dmarxdesc = (ETH_DMADescTypeDef *)(dmarxdesc->Buffer2NextDescAddr);
-    }
-    
-    /* Clear Segment_Count */
-    heth.RxFrameInfos.SegCount =0;  
-  
-  /* When Rx Buffer unavailable flag is set: clear it and resume reception */
-  if ((heth.Instance->DMASR & ETH_DMASR_RBUS) != (uint32_t)RESET)  
-  {
-    /* Clear RBUS ETHERNET DMA flag */
-    heth.Instance->DMASR = ETH_DMASR_RBUS;
-    /* Resume DMA reception */
-    heth.Instance->DMARPDR = 0;
-  }
+
   return p;
 }
 
 /**
- * This function should be called when a packet is ready to be read
+ * @brief This function should be called when a packet is ready to be read
  * from the interface. It uses the function low_level_input() that
  * should handle the actual reception of bytes from the network
  * interface. Then the type of the received packet is determined and
@@ -501,61 +569,53 @@ static struct pbuf * low_level_input(struct netif *netif)
  */
 [#if with_rtos == 1]
 [#if cmsis_version = "v1"]
-void ethernetif_input(void const * argument)
-[#else][#-- endif cmsis_version --]
+static void ethernetif_input(void const * argument)
+[#else]
 void ethernetif_input(void* argument)
 [/#if][#-- endif cmsis_version --]
-[#else][#-- endif with_rtos --]
+[#else][#-- else with_rtos --]
 void ethernetif_input(struct netif *netif)
 [/#if][#-- endif with_rtos --]
 {
-[#if with_rtos == 0]
-  err_t err;
-[/#if][#-- endif with_rtos --]
-  struct pbuf *p;
+  struct pbuf *p = NULL;
 [#if with_rtos == 1]
   struct netif *netif = (struct netif *) argument;
   
   for( ;; )
   {
-[#if cmsis_version = "v2"]
-    if (osSemaphoreAcquire(s_xSemaphore, TIME_WAITING_FOR_INPUT) == osOK)
-[#else][#-- endif cmsis_version --]
-    if (osSemaphoreWait(s_xSemaphore, TIME_WAITING_FOR_INPUT) == osOK)
+[#if cmsis_version = "v1"]
+    if (osSemaphoreWait(RxPktSemaphore, TIME_WAITING_FOR_INPUT) == osOK)
+[#else][#-- else cmsis_version v2 --]
+    if (osSemaphoreAcquire(RxPktSemaphore, TIME_WAITING_FOR_INPUT) == osOK)
 [/#if][#-- endif cmsis_version --]
     {
       do
-      {   
-        LOCK_TCPIP_CORE();
+      {
         p = low_level_input( netif );
-        if   (p != NULL)
+        if (p != NULL)
         {
           if (netif->input( p, netif) != ERR_OK )
           {
-            pbuf_free(p);
+            pbuf_free(p);           
           }
         }
-        UNLOCK_TCPIP_CORE();
       } while(p!=NULL);
     }
-[#else][#-- endif with_rtos --]
-
-  /* move received packet into a new pbuf */
-  p = low_level_input(netif);
-    
-  /* no packet could be read, silently ignore this */
-  if (p == NULL) return;
-    
-  /* entry point to the LwIP stack */
-  err = netif->input(p, netif);
-    
-  if (err != ERR_OK)
-  {
-    LWIP_DEBUGF(NETIF_DEBUG, ("ethernetif_input: IP input error\n"));
-    pbuf_free(p);
-    p = NULL;    
-[/#if][#-- endif with_rtos --]
   }
+[#else][#-- else with_rtos --]
+
+  do
+  {
+    p = low_level_input( netif );
+    if (p != NULL)
+    {
+      if (netif->input( p, netif) != ERR_OK )
+      {
+        pbuf_free(p);
+      }
+    }
+  } while(p!=NULL);
+[/#if][#-- endif with_rtos --]
 }
 
 #if !LWIP_ARP
@@ -580,7 +640,7 @@ static err_t low_level_output_arp_off(struct netif *netif, struct pbuf *q, const
 #endif /* LWIP_ARP */ 
 
 /**
- * Should be called at the beginning of the program to set up the
+ * @brief Should be called at the beginning of the program to set up the
  * network interface. It calls the function low_level_init() to do the
  * actual setup of the hardware.
  *
@@ -600,6 +660,13 @@ err_t ethernetif_init(struct netif *netif)
   netif->hostname = "lwip";
 #endif /* LWIP_NETIF_HOSTNAME */
 
+  /*
+   * Initialize the snmp variables and counters inside the struct netif.
+   * The last argument should be replaced with your link speed, in units
+   * of bits per second.
+   */
+  // MIB2_INIT_NETIF(netif, snmp_ifType_ethernet_csmacd, LINK_SPEED_OF_YOUR_NETIF_IN_BPS);
+    
   netif->name[0] = IFNAME0;
   netif->name[1] = IFNAME1;
   /* We directly use etharp_output() here to save a function call.
@@ -630,24 +697,37 @@ err_t ethernetif_init(struct netif *netif)
   return ERR_OK;
 }
 
+[#if custom_pbuf == 1]
+/**
+  * @brief  Custom Rx pbuf free callback
+  * @param  pbuf: pbuf to be freed
+  * @retval None
+  */
+void pbuf_free_custom(struct pbuf *p)
+{
+  struct pbuf_custom* custom_pbuf = (struct pbuf_custom*)p;
+  LWIP_MEMPOOL_FREE(RX_POOL, custom_pbuf);
+  
+  /* If the Rx Buffer Pool was exhausted, signal the ethernetif_input task to
+   * call HAL_ETH_GetRxDataBuffer to rebuild the Rx descriptors. */
+  
+  if (RxAllocStatus == RX_ALLOC_ERROR)
+  {
+    RxAllocStatus = RX_ALLOC_OK;
+[#if with_rtos == 1]
+    osSemaphoreRelease(RxPktSemaphore);
+[/#if][#-- endif with_rtos --]
+  }
+}
+[/#if][#-- endif custom_pbuf --]
+
 /* USER CODE BEGIN 6 */
 
 /**
 * @brief  Returns the current time in milliseconds
 *         when LWIP_TIMERS == 1 and NO_SYS == 1
 * @param  None
-* @retval Time
-*/
-u32_t sys_jiffies(void)
-{
-  return HAL_GetTick();
-}
-
-/**
-* @brief  Returns the current time in milliseconds
-*         when LWIP_TIMERS == 1 and NO_SYS == 1
-* @param  None
-* @retval Time
+* @retval Current Time value
 */
 u32_t sys_now(void)
 {
@@ -656,196 +736,265 @@ u32_t sys_now(void)
 
 /* USER CODE END 6 */
 
-[#if netif_callback == 1]
-[#if with_rtos == 0]
-/**
-  * @brief  This function sets the netif link status.
-  * @note   This function should be included in the main loop to poll 
-  *         for the link status update  
-  * @param  netif: the network interface
-  * @retval None
-  */
-uint32_t EthernetLinkTimer=0; 
-  
-void ethernetif_set_link(struct netif *netif)
-[#else][#-- with_rtos (0) --]
-/**
-  * @brief  This function sets the netif link status.
-  * @param  netif: the network interface
-  * @retval None
-  */
-[#if cmsis_version = "v1"]
-void ethernetif_set_link(void const *argument)
-[#else][#-- endif cmsis_version --]
-void ethernetif_set_link(void* argument)
-[/#if][#-- endif cmsis_version --]
+[#if bsp == 1]
 
-[/#if][#-- with_rtos (1) --]
+/**
+  * @brief  Initializes the ETH MSP.
+  * @param  ethHandle: ETH handle
+  * @retval None
+  */
+[#include mxTmpFolder+"/eth_Msp.tmp"]
+
+/*******************************************************************************
+                       PHI IO Functions
+*******************************************************************************/
+/**
+  * @brief  Initializes the MDIO interface GPIO and clocks.
+  * @param  None
+  * @retval 0 if OK, -1 if ERROR
+  */
+int32_t ETH_PHY_IO_Init(void)
+{  
+  /* We assume that MDIO GPIO configuration is already done
+     in the ETH_MspInit() else it should be done here 
+  */
+  
+  /* Configure the MDIO Clock */
+  HAL_ETH_SetMDIOClockRange(&heth);
+  
+  return 0;
+}
+
+/**
+  * @brief  De-Initializes the MDIO interface .
+  * @param  None
+  * @retval 0 if OK, -1 if ERROR
+  */
+int32_t ETH_PHY_IO_DeInit (void)
 {
-  uint32_t regvalue = 0;
-[#if (with_rtos == 1)]
-  struct link_str *link_arg = (struct link_str *)argument;
+  return 0;
+}
+
+/**
+  * @brief  Read a PHY register through the MDIO interface.
+  * @param  DevAddr: PHY port address
+  * @param  RegAddr: PHY register address
+  * @param  pRegVal: pointer to hold the register value 
+  * @retval 0 if OK -1 if Error
+  */
+int32_t ETH_PHY_IO_ReadReg(uint32_t DevAddr, uint32_t RegAddr, uint32_t *pRegVal)
+{
+  if(HAL_ETH_ReadPHYRegister(&heth, DevAddr, RegAddr, pRegVal) != HAL_OK)
+  {
+    return -1;
+  }
+  
+  return 0;
+}
+
+/**
+  * @brief  Write a value to a PHY register through the MDIO interface.
+  * @param  DevAddr: PHY port address
+  * @param  RegAddr: PHY register address
+  * @param  RegVal: Value to be written 
+  * @retval 0 if OK -1 if Error
+  */
+int32_t ETH_PHY_IO_WriteReg(uint32_t DevAddr, uint32_t RegAddr, uint32_t RegVal)
+{
+  if(HAL_ETH_WritePHYRegister(&heth, DevAddr, RegAddr, RegVal) != HAL_OK)
+  {
+    return -1;
+  }
+  
+  return 0;
+}
+
+/**
+  * @brief  Get the time in millisecons used for internal PHY driver process.
+  * @retval Time value
+  */
+int32_t ETH_PHY_IO_GetTick(void)
+{
+  return HAL_GetTick();
+}
+[#else]
+/* USER CODE BEGIN PHI IO Functions for User BSP */ 
+    
+/* USER CODE END PHI IO Functions for User BSP */
+[/#if][#-- endif bsp --]
+
+/**
+  * @brief  Check the ETH link state then update ETH driver and netif link accordingly.
+  * @retval None
+  */
+[#if with_rtos == 1]
+[#if cmsis_version = "v2"]
+void ethernet_link_thread(void* argument)
+[#else] [#-- endif cmsis_version --]
+void ethernet_link_thread(void const * argument)
+[/#if][#-- endelse cmsis_version --]
+[#else][#-- else with_rtos --]  
+void ethernet_link_check_state(struct netif *netif)
+[/#if][#-- endelse with_rtos --]
+{
+[#if bsp == 1]
+  ETH_MACConfigTypeDef MACConf = {0};
+  int32_t PHYLinkState = 0;
+  uint32_t linkchanged = 0U, speed = 0U, duplex = 0U;
+[/#if][#-- endif bsp --]
+  
+[#if with_rtos == 1]
+[#if bsp == 1]
+  struct netif *netif = (struct netif *) argument;
+[/#if][#-- endif bsp --]
+/* USER CODE BEGIN ETH link init */
+
+/* USER CODE END ETH link init */
   
   for(;;)
   {
-    /* Read PHY_BSR*/
-    HAL_ETH_ReadPHYRegister(&heth, PHY_BSR, &regvalue);
-    
-    regvalue &= PHY_LINKED_STATUS;
-    
-    /* Check whether the netif link down and the PHY link is up */
-    if(!netif_is_link_up(link_arg->netif) && (regvalue))
-    {
-      /* network cable is connected */ 
-      netif_set_link_up(link_arg->netif);        
-    }
-    else if(netif_is_link_up(link_arg->netif) && (!regvalue))
-    {
-      /* network cable is dis-connected */
-      netif_set_link_down(link_arg->netif);
-    }
-    
-    /* Suspend thread for 200 ms */
-    osDelay(200);
-  }
-[#else][#-- with_rtos (1) --]
-  /* Ethernet Link every 200ms */
-  if (HAL_GetTick() - EthernetLinkTimer >= 200)
-  {
-    EthernetLinkTimer = HAL_GetTick(); 
-    
-    /* Read PHY_BSR*/
-    HAL_ETH_ReadPHYRegister(&heth, PHY_BSR, &regvalue);
-    
-    regvalue &= PHY_LINKED_STATUS;
-    
-    /* Check whether the netif link down and the PHY link is up */
-    if(!netif_is_link_up(netif) && (regvalue))
-    {
-      /* network cable is connected */ 
-      netif_set_link_up(netif);        
-    }
-    else if(netif_is_link_up(netif) && (!regvalue))
-    {
-      /* network cable is disconnected */
-      netif_set_link_down(netif);
-    }
-  }
-[/#if][#-- with_rtos (0) --]
-}
-[/#if][#-- netif_callback (1) --]
-
-
-/* USER CODE BEGIN 7 */
-
-/* USER CODE END 7 */
-
-
-#if LWIP_NETIF_LINK_CALLBACK
-/**
-  * @brief  Link callback function, this function is called on change of link status
-  *         to update low level driver configuration.
-* @param  netif: The network interface
-  * @retval None
-  */
-void ethernetif_update_config(struct netif *netif)
-{
-  __IO uint32_t tickstart = 0;
-  uint32_t regvalue = 0;
+[/#if][#-- endif with_rtos --]
+[#if bsp == 1]
+  PHYLinkState = ${BspComponent}_GetLinkState(&${BspComponent});
   
-  if(netif_is_link_up(netif))
-  { 
-    /* Restart the auto-negotiation */
-    if(heth.Init.AutoNegotiation != ETH_AUTONEGOTIATION_DISABLE)
+  if(netif_is_link_up(netif) && (PHYLinkState <= ${BspComponent}_STATUS_LINK_DOWN))
+  {
+[#if with_rtos == 1]
+    HAL_ETH_Stop_IT(&heth);
+[#else]
+    HAL_ETH_Stop(&heth);
+[/#if][#-- endif with_rtos --]
+    netif_set_down(netif);
+    netif_set_link_down(netif);
+  }
+  else if(!netif_is_link_up(netif) && (PHYLinkState > ${BspComponent}_STATUS_LINK_DOWN))
+  {
+    switch (PHYLinkState)
     {
-      /* Enable Auto-Negotiation */
-      HAL_ETH_WritePHYRegister(&heth, PHY_BCR, PHY_AUTONEGOTIATION);
-      
-      /* Get tick */
-      tickstart = HAL_GetTick();
-      
-      /* Wait until the auto-negotiation will be completed */
-      do
-      {
-        HAL_ETH_ReadPHYRegister(&heth, PHY_BSR, &regvalue);
-        
-        /* Check for the Timeout ( 1s ) */
-        if((HAL_GetTick() - tickstart ) > 1000)
-        {     
-          /* In case of timeout */ 
-          goto error;
-        }   
-      } while (((regvalue & PHY_AUTONEGO_COMPLETE) != PHY_AUTONEGO_COMPLETE));
-      
-      /* Read the result of the auto-negotiation */
-      HAL_ETH_ReadPHYRegister(&heth, PHY_SR, &regvalue);
-      
-      /* Configure the MAC with the Duplex Mode fixed by the auto-negotiation process */
-      if((regvalue & PHY_DUPLEX_STATUS) != (uint32_t)RESET)
-      {
-        /* Set Ethernet duplex mode to Full-duplex following the auto-negotiation */
-        heth.Init.DuplexMode = ETH_MODE_FULLDUPLEX;  
-      }
-      else
-      {
-        /* Set Ethernet duplex mode to Half-duplex following the auto-negotiation */
-        heth.Init.DuplexMode = ETH_MODE_HALFDUPLEX;           
-      }
-      /* Configure the MAC with the speed fixed by the auto-negotiation process */
-      if(regvalue & PHY_SPEED_STATUS)
-      {  
-        /* Set Ethernet speed to 10M following the auto-negotiation */
-        heth.Init.Speed = ETH_SPEED_10M; 
-      }
-      else
-      {   
-        /* Set Ethernet speed to 100M following the auto-negotiation */ 
-        heth.Init.Speed = ETH_SPEED_100M;
-      }
+    case ${BspComponent}_STATUS_100MBITS_FULLDUPLEX:
+      duplex = ETH_FULLDUPLEX_MODE;
+      speed = ETH_SPEED_100M;
+      linkchanged = 1;
+      break;
+    case ${BspComponent}_STATUS_100MBITS_HALFDUPLEX:
+      duplex = ETH_HALFDUPLEX_MODE;
+      speed = ETH_SPEED_100M;
+      linkchanged = 1;
+      break;
+    case ${BspComponent}_STATUS_10MBITS_FULLDUPLEX:
+      duplex = ETH_FULLDUPLEX_MODE;
+      speed = ETH_SPEED_10M;
+      linkchanged = 1;
+      break;
+    case ${BspComponent}_STATUS_10MBITS_HALFDUPLEX:
+      duplex = ETH_HALFDUPLEX_MODE;
+      speed = ETH_SPEED_10M;
+      linkchanged = 1;
+      break;
+    default:
+      break;      
     }
-    else /* AutoNegotiation Disable */
+    
+    if(linkchanged)
     {
-    error :
-      /* Check parameters */
-      assert_param(IS_ETH_SPEED(heth.Init.Speed));
-      assert_param(IS_ETH_DUPLEX_MODE(heth.Init.DuplexMode));
-      
-      /* Set MAC Speed and Duplex Mode to PHY */
-      HAL_ETH_WritePHYRegister(&heth, PHY_BCR, ((uint16_t)(heth.Init.DuplexMode >> 3) |
-                                                     (uint16_t)(heth.Init.Speed >> 1))); 
+      /* Get MAC Config MAC */
+      HAL_ETH_GetMACConfig(&heth, &MACConf); 
+      MACConf.DuplexMode = duplex;
+      MACConf.Speed = speed;
+      HAL_ETH_SetMACConfig(&heth, &MACConf);
+      HAL_ETH_Start(&heth);
+      netif_set_up(netif);
+      netif_set_link_up(netif);
     }
+  }
+[/#if][#-- endif bsp --]
 
-    /* ETHERNET MAC Re-Configuration */
-    HAL_ETH_ConfigMAC(&heth, (ETH_MACInitTypeDef *) NULL);
+[#if with_rtos == 1]
+/* USER CODE BEGIN ETH link Thread core code for User BSP */
+    
+/* USER CODE END ETH link Thread core code for User BSP */
+[/#if][#-- endif with_rtos --]
 
-    /* Restart MAC interface */
-    HAL_ETH_Start(&heth);   
+[#if with_rtos == 1]
+    osDelay(100);
+  }
+[/#if][#-- endif with_rtos --]   
+}
+
+void HAL_ETH_RxAllocateCallback(uint8_t **buff)
+{
+/* USER CODE BEGIN HAL ETH RxAllocateCallback */
+[#if custom_pbuf == 1]
+  struct pbuf_custom *p = LWIP_MEMPOOL_ALLOC(RX_POOL);
+  if (p)
+  {
+    /* Get the buff from the struct pbuf address. */
+    *buff = (uint8_t *)p + offsetof(RxBuff_t, buff);
+    p->custom_free_function = pbuf_free_custom;
+    /* Initialize the struct pbuf.
+    * This must be performed whenever a buffer's allocated because it may be
+    * changed by lwIP or the app, e.g., pbuf_free decrements ref. */
+    pbuf_alloced_custom(PBUF_RAW, 0, PBUF_REF, p, *buff, ETH_RX_BUFFER_SIZE);
   }
   else
   {
-    /* Stop MAC interface */
-    HAL_ETH_Stop(&heth);
+    RxAllocStatus = RX_ALLOC_ERROR;
+    *buff = NULL;
+  }
+[/#if][#-- endif custom_pbuf --]   
+/* USER CODE END HAL ETH RxAllocateCallback */  
+}
+
+void HAL_ETH_RxLinkCallback(void **pStart, void **pEnd, uint8_t *buff, uint16_t Length)
+{
+/* USER CODE BEGIN HAL ETH RxLinkCallback */
+
+  struct pbuf **ppStart = (struct pbuf **)pStart;
+  struct pbuf **ppEnd = (struct pbuf **)pEnd;
+  struct pbuf *p = NULL;
+
+  /* Get the struct pbuf from the buff address. */
+  p = (struct pbuf *)(buff - offsetof(RxBuff_t, buff));
+  p->next = NULL;
+  p->tot_len = 0;
+  p->len = Length;
+
+  /* Chain the buffer. */
+  if (!*ppStart)
+  {
+    /* The first buffer of the packet. */
+    *ppStart = p;
+  }
+  else
+  {
+    /* Chain the buffer to the end of the packet. */
+    (*ppEnd)->next = p;
+  }
+  *ppEnd  = p;
+
+  /* Update the total length of all the buffers of the chain. Each pbuf in the chain should have its tot_len
+   * set to its own length, plus the length of all the following pbufs in the chain. */
+  for (p = *ppStart; p != NULL; p = p->next)
+  {
+    p->tot_len += Length;
   }
 
-  ethernetif_notify_conn_changed(netif);
+  /* Invalidate data cache because Rx DMA's writing to physical memory makes it stale. */
+  SCB_InvalidateDCache_by_Addr((uint32_t *)buff, Length);
+  
+/* USER CODE END HAL ETH RxLinkCallback */  
+}
+
+void HAL_ETH_TxFreeCallback(uint32_t * buff)
+{
+/* USER CODE BEGIN HAL ETH TxFreeCallback */
+
+  pbuf_free((struct pbuf *)buff);
+  
+/* USER CODE END HAL ETH TxFreeCallback */  
 }
 
 /* USER CODE BEGIN 8 */
-/**
-  * @brief  This function notify user about link status changement.
-  * @param  netif: the network interface
-  * @retval None
-  */
-__weak void ethernetif_notify_conn_changed(struct netif *netif)
-{
-  /* NOTE : This is function could be implemented in user file 
-            when the callback is needed,
-  */
 
-}
-/* USER CODE END 8 */ 
-#endif /* LWIP_NETIF_LINK_CALLBACK */
+/* USER CODE END 8 */
 
-/* USER CODE BEGIN 9 */
-
-/* USER CODE END 9 */

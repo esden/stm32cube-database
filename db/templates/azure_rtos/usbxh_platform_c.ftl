@@ -114,7 +114,8 @@ void USBH_DriverVBUS(uint8_t state)
   HAL_StatusTypeDef status = HAL_OK;
   [/#if]   
   [#if IpNameFS?contains("I2C")]
-  uint8_t Component_Addr = ${I2CAddrFS} << 1;    
+#error "[This error is thrown on purpose] : define the Component_Addr address just below"
+  uint8_t Component_Addr = 0x00 << 1;    
   /* USER CODE BEGIN PREPARE_I2C_DATA_VBUS_FS */
   uint8_t data = state;
   /* USER CODE END PREPARE_I2C_DATA_VBUS_FS */
@@ -159,7 +160,8 @@ void USBH_DriverVBUS(uint8_t state)
   HAL_StatusTypeDef status = HAL_OK;
   [/#if]   
   [#if IpNameHS?contains("I2C")]
-  uint8_t Component_Addr = ${I2CAddrHS} << 1;  
+#error "[This error is thrown on purpose] : define the Component_Addr address just below"
+  uint8_t Component_Addr = 0x00 << 1;  
   /* USER CODE BEGIN PREPARE_DATA_VBUS_HS */
   uint8_t data = state;
   /* USER CODE END PREPARE_DATA_VBUS_HS */

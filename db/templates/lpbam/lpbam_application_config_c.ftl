@@ -39,10 +39,12 @@ void MX_${LPBAM_NAME?replace(" ","_")}_Init(void)
 {
 #t/* USER CODE BEGIN ${LPBAM_NAME?replace(" ","_")}_Init 0 */
 #n#t/* USER CODE END ${LPBAM_NAME?replace(" ","_")}_Init 0 */
+[#if generateWaitState?? && (generateWaitState == "true")]
 #n
 #t/* Configure SRAM wait states */
 #tMX_SRAM_WaitState_Config();
- 
+[/#if]
+#n 
 #t/* Configure system clock */
 #tMX_SystemClock_Config();
 

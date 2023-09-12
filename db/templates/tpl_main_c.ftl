@@ -25,7 +25,7 @@
 [#assign usb_device = false]
 /* Includes ------------------------------------------------------------------*/
 #include "${main_h}"
-[#if (H7_ETH_NoLWIP?? || F4_ETH_NoLWIP??) && HALCompliant??]
+[#if (H7_ETH_NoLWIP?? || F4_ETH_NoLWIP?? || F7_ETH_NoLWIP??) && HALCompliant??]
 #include "string.h"
 [/#if]
 [#-- IF GFXMMU is used and all is generated in the main and the Lut is configured--]
@@ -202,46 +202,31 @@ extern PCD_HandleTypeDef ${handleName};
 [/#if]
 /* Private variables ---------------------------------------------------------*/
 [#-- WorkAround for Ticket 30863 --]
-[#if (H7_ETH_NoLWIP?? || F4_ETH_NoLWIP??) && HALCompliant??]
-[#if H7_ETH_NoLWIP??]
+[#if (H7_ETH_NoLWIP?? || F7_ETH_NoLWIP?? || F4_ETH_NoLWIP??) && HALCompliant??]
+[#if H7_ETH_NoLWIP?? || F7_ETH_NoLWIP??]
 #if defined ( __ICCARM__ ) /*!< IAR Compiler */
 #pragma location=[#if RxDescAddress??]${RxDescAddress}[#else]0x30040000[/#if]
 ETH_DMADescTypeDef  DMARxDscrTab[ETH_RX_DESC_CNT]; /* Ethernet Rx DMA Descriptors */
 #pragma location=[#if TxDescAddress??]${TxDescAddress}[#else]0x30040060[/#if]
 ETH_DMADescTypeDef  DMATxDscrTab[ETH_TX_DESC_CNT]; /* Ethernet Tx DMA Descriptors */
-[#-- BZ 97589 --]
-[#if NetXDuo??]
-[#else]
-#pragma location=[#if RxBuffAddress??]${RxBuffAddress}[#else]0x30040200[/#if]
-uint8_t Rx_Buff[ETH_RX_DESC_CNT][ETH_MAX_PACKET_SIZE]; /* Ethernet Receive Buffers */
-[/#if]
 
 #elif defined ( __CC_ARM )  /* MDK ARM Compiler */
 
 __attribute__((at([#if RxDescAddress??]${RxDescAddress}[#else]0x30040000[/#if]))) ETH_DMADescTypeDef  DMARxDscrTab[ETH_RX_DESC_CNT]; /* Ethernet Rx DMA Descriptors */
 __attribute__((at([#if TxDescAddress??]${TxDescAddress}[#else]0x30040060[/#if]))) ETH_DMADescTypeDef  DMATxDscrTab[ETH_TX_DESC_CNT]; /* Ethernet Tx DMA Descriptors */
-[#-- BZ 97589 --]
-[#if NetXDuo??]
-[#else]
-__attribute__((at([#if RxBuffAddress??]${RxBuffAddress}[#else]0x30040200[/#if]))) uint8_t Rx_Buff[ETH_RX_DESC_CNT][ETH_MAX_PACKET_SIZE]; /* Ethernet Receive Buffer */
-[/#if]
 
 #elif defined ( __GNUC__ ) /* GNU Compiler */ 
 ETH_DMADescTypeDef DMARxDscrTab[ETH_RX_DESC_CNT] __attribute__((section(".RxDecripSection"))); /* Ethernet Rx DMA Descriptors */
 ETH_DMADescTypeDef DMATxDscrTab[ETH_TX_DESC_CNT] __attribute__((section(".TxDecripSection")));   /* Ethernet Tx DMA Descriptors */
-[#-- BZ 97589 --]
-[#if NetXDuo??]
-[#else]
-uint8_t Rx_Buff[ETH_RX_DESC_CNT][ETH_MAX_PACKET_SIZE] __attribute__((section(".RxArraySection"))); /* Ethernet Receive Buffers */
-[/#if]
+
 #endif
-[/#if] [#-- end if (H7_ETH_NoLWIP?? || F4_ETH_NoLWIP??) --]
+[/#if] [#-- end if (H7_ETH_NoLWIP?? || F7_ETH_NoLWIP?? || F4_ETH_NoLWIP??) --]
 ETH_TxPacketConfig TxConfig;
 [#if F4_ETH_NoLWIP??]
 ETH_DMADescTypeDef  DMARxDscrTab[ETH_RX_DESC_CNT]; /* Ethernet Rx DMA Descriptors */
 ETH_DMADescTypeDef  DMATxDscrTab[ETH_TX_DESC_CNT]; /* Ethernet Tx DMA Descriptors */
-[/#if] [#--  F4_ETH_NoLWIP?? --]
-[/#if] [#-- (H7_ETH_NoLWIP?? || F4_ETH_NoLWIP??) && HALCompliant?? --]
+[/#if] [#--  F4_ETH_NoLWIP??/F7_ETH_NoLWIP?? --]
+[/#if][#-- (H7_ETH_NoLWIP?? || F7_ETH_NoLWIP??  || F4_ETH_NoLWIP??) && HALCompliant?? --]
 [#-- End workaround for Ticket 30863 --]
 [#-- If HAL compliant generate Global variable : Peripherals handler -Begin --]
 [#if HALCompliant??][#-- if HALCompliant Begin --]
@@ -547,7 +532,9 @@ int main(void)
         [/#if]
         [/#if]
         [#if initVector.systemHandler=="false"]
+[#if EnableCode??]
     #tNVIC_EnableIRQ(${initVector.vector});
+[/#if]
         [/#if]
     
 [/#if]
@@ -725,7 +712,9 @@ int main(void)
 	(THREADX?? && (void.functionName?contains("FileX") || 
 	void.functionName?contains("USBX") || 
 	void.functionName?contains("NetXDuo") || 
-	void.functionName?contains("LevelX"))) ||
+	void.functionName?contains("LevelX") ||
+	[#-- BZ 120745 remove call to MX_MwName_init when ThreadX is used--]
+	void.ipType?contains("thirdparty"))) ||
 	(!THREADX?? && void.functionName?contains("LevelX")) ||
             (THREADX?? &&(void.functionName?contains("LoRaWAN") || 
                 void.functionName?contains("Sigfox") || 
@@ -755,10 +744,10 @@ int main(void)
 [/#if]
 [/#if]
 [/#list]
-[#if FamilyName=="STM32U5" && preOsInitFct?? && preOsInitFct?size > 0]
+[#if preOsInitFct?? && preOsInitFct?size > 0]
 #t/* Call PreOsInit function */
 [#list preOsInitFct as preOsInit]
-#t#t${preOsInit}();
+#t${preOsInit}();
 [/#list]
 [/#if]
 [#if vectors??]
@@ -781,6 +770,13 @@ int main(void)
   [/#if]
 [/#list]
 
+[#if postOsInitFct?? && postOsInitFct?size > 0]
+#t/* Call PostOsInit function */
+[#list postOsInitFct as postOsInitFct]
+#t${postOsInitFct}();
+[/#list]
+[/#if]
+
 [#if HALCompliant??][#-- Put after UBSPD init to keep examples generated unchanged --]
 [@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_obj_creat.tmp"/][#-- any RTOS can include here --]
 [/#if]
@@ -788,8 +784,6 @@ int main(void)
 [#if THREADX??][#-- If ThreadX (Azure_RTOS) is used --]
   MX_ThreadX_Init();
 [/#if]
-[#if FREERTOS??][#-- If FreeRtos is used --]
-  [#if HALCompliant??]
 [#list voids as void]
 [#if void.functionName?? && void.functionName?contains("APPE_Init")]
 [#-- BZ 114099 --]
@@ -799,19 +793,11 @@ int main(void)
 [/#if]
 [/#if]
 [/#list]
-  [#else]
+[#if FREERTOS??][#-- If FreeRtos is used --]
+  [#if !HALCompliant??]
   /* Call init function for freertos objects (in freertos.c) */
   MX_FREERTOS_Init(); 
   [/#if]
-[#else][#-- If FreeRtos is not used --]
-[#list voids as void]
-[#if void.functionName?? && void.functionName?contains("APPE_Init")]
-[#if !void.isNotGenerated && void.genCode]
-#t/* Init code for STM32_WPAN */
-#tMX_APPE_Init();
-[/#if]
-[/#if]
-[/#list]
 [/#if][#-- If FreeRtos is used --]
 #n
 [@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_kernelStart.tmp"/]
@@ -1025,8 +1011,9 @@ static void SystemPower_Config(void)
     [/#if]
     [#if initVector.systemHandler=="false"]
     [#if initVector.vector=="PVD_AVD_IRQn" || initVector.vector=="PWR_S3WU_IRQn" || initVector.vector=="PVD_PVM_IRQn"]
+[#if EnableCode??]
       #tHAL_NVIC_EnableIRQ(${initVector.vector});
-    
+    [/#if]
     [/#if]
     [/#if]
 [/#list]
@@ -1062,8 +1049,9 @@ static void SystemPower_Config(void)
         [/#if]
         [/#if]
         [#if initVector.systemHandler=="false"]
+[#if EnableCode??]
     #tNVIC_EnableIRQ(${initVector.vector});
-        [/#if]    
+        [/#if][/#if]    
 [/#if]
 [/#list]
 [/#if]
@@ -1090,14 +1078,18 @@ static void MX_NVIC_Init(void)
     [@common.generateUsbWakeUpInterrupt ipName=ipName tabN=2/]
     [#if vector.usedDriver == "HAL"]
     #t#tHAL_NVIC_SetPriority(${vector.vector}, ${vector.preemptionPriority}, ${vector.subPriority});
+[#if EnableCode??]
     #t#tHAL_NVIC_EnableIRQ(${vector.vector});
+[/#if]
     [#else]
       [#if !NVICPriorityGroup??]
     #t#tNVIC_SetPriority(${vector.vector}, ${vector.preemptionPriority});
       [#else]
     #t#tNVIC_SetPriority(${vector.vector}, NVIC_EncodePriority(NVIC_GetPriorityGrouping(),${vector.preemptionPriority}, ${vector.subPriority}));
       [/#if]
+[#if EnableCode??]
     #t#tNVIC_EnableIRQ(${vector.vector});
+[/#if]
     [/#if]
     #t}
   [#else]
@@ -1111,11 +1103,13 @@ static void MX_NVIC_Init(void)
       [/#if]
     [/#if]
     [#if vector.systemHandler=="false"]
+[#if EnableCode??]
       [#if vector.usedDriver == "HAL"]
       #tHAL_NVIC_EnableIRQ(${vector.vector});
       [#else]
       #tNVIC_EnableIRQ(${vector.vector});
       [/#if]
+[/#if]
     [/#if]
   [/#if]
 [/#list]
@@ -1390,7 +1384,6 @@ static void MX_NVIC_Init(void)
 
 /* USER CODE END 4 */
 #n
-
 [#if HALCompliant??] [#-- If FreeRtos is used (and tmp files included in the main) --]
 [@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_default_thread.tmp"/]
 [@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_threads.tmp"/]

@@ -1,30 +1,19 @@
 [#ftl]
-
 [#assign  sd_instance = "0"]
 [#assign  maintain_cpu_cache = "0"]
 [#assign  use_dma = "0"]
-
 [#assign  sector_size = "512"]
 [#assign  sd_init = "1"]
-[#assign FX_STANDALONE_ENABLE_value = "3"]
+[#assign FX_STANDALONE_ENABLE_value = "0"]
 [#compress]
 [#list SWIPdatas as SWIP]
 [#if SWIP.defines??]
   [#list SWIP.defines as definition]
     [#assign value = definition.value]
     [#assign name = definition.name]
-    [#if name == "GLUE_FUNCTIONS"]
-      [#assign glue_functions = value]
-    [/#if]
 	[#if name == "SDMMC_INSTANCE"]
       [#assign sd_instance = value]
     [/#if]
-	[#if name == "USE_SD_DMA"]
-      [#if value.contains("1")]
-        [#assign use_dma = "1"]
-      [/#if]
-    [/#if]
-
     [#if name == "ENABLE_CACHE_MAINTENANCE"]
       [#if value.contains("true")]
         [#assign maintain_cpu_cache = "1"]
@@ -43,7 +32,6 @@
 [/#if]
 [/#list]
 [/#compress]
-
 /**************************************************************************/
 /*                                                                        */
 /*       Copyright (c) Microsoft Corporation. All rights reserved.        */

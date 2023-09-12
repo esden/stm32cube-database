@@ -22,9 +22,7 @@
 #include "usbpd_core.h"
 #include "usbpd_dpm_core.h"
 #include "usbpd_dpm_conf.h"
-[#if (USBPD_CORELIB != "USBPDCORE_LIB_NO_PD")]
 #include "usbpd_hw_if.h"
-[/#if]
 
 /* USER CODE BEGIN 0 */
 /* USER CODE END 0 */
@@ -34,8 +32,15 @@
 /* USER CODE BEGIN 1 */
 /* USER CODE END 1 */
 
+[#if THREADX??]
+unsigned int USBPD_PreInitOs(void);
+[/#if]
 /* USBPD init function */
+[#if THREADX??]
+unsigned int    MX_USBPD_Init(void *memory_ptr);
+[#else]
 void MX_USBPD_Init(void);
+[/#if]
 [#if GUI_INTERFACE??]
 const uint8_t*  BSP_GetBoardName(void);
 const uint8_t*  BSP_GetBoardID(void);

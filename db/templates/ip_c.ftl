@@ -22,7 +22,7 @@
 [#assign ipvar = IP]
 /* Includes ------------------------------------------------------------------*/
 #include "${name?lower_case}.h"
-[#if name=="ETH" && F4_ETH_NoLWIP??]
+[#if name=="ETH" && (F4_ETH_NoLWIP?? || F7_ETH_NoLWIP??)]
 #include "string.h"
 [/#if]
 
@@ -110,27 +110,23 @@
 [@common.optincludeFile path=coreDir+"Inc" name="gfxmmu_lut.h"/]
 [/#if]
 [#-- WorkAround for Ticket 30863 --]
-[#if name=="ETH" && H7_ETH_NoLWIP??]
+[#if name=="ETH" && (H7_ETH_NoLWIP?? || F7_ETH_NoLWIP??)]
 #if defined ( __ICCARM__ ) /*!< IAR Compiler */
 
 #pragma location=[#if RxDescAddress??]${RxDescAddress}[#else]0x30040000[/#if]
 ETH_DMADescTypeDef  DMARxDscrTab[ETH_RX_DESC_CNT]; /* Ethernet Rx DMA Descriptors */
 #pragma location=[#if TxDescAddress??]${TxDescAddress}[#else]0x30040060[/#if]
 ETH_DMADescTypeDef  DMATxDscrTab[ETH_TX_DESC_CNT]; /* Ethernet Tx DMA Descriptors */
-#pragma location=[#if RxBuffAddress??]${RxBuffAddress}[#else]0x30040200[/#if]
-uint8_t Rx_Buff[ETH_RX_DESC_CNT][ETH_MAX_PACKET_SIZE]; /* Ethernet Receive Buffers */
 
 #elif defined ( __CC_ARM )  /* MDK ARM Compiler */
 
 __attribute__((at([#if RxDescAddress??]${RxDescAddress}[#else]0x30040000[/#if]))) ETH_DMADescTypeDef  DMARxDscrTab[ETH_RX_DESC_CNT]; /* Ethernet Rx DMA Descriptors */
 __attribute__((at([#if TxDescAddress??]${TxDescAddress}[#else]0x30040060[/#if]))) ETH_DMADescTypeDef  DMATxDscrTab[ETH_TX_DESC_CNT]; /* Ethernet Tx DMA Descriptors */
-__attribute__((at([#if RxBuffAddress??]${RxBuffAddress}[#else]0x30040200[/#if]))) uint8_t Rx_Buff[ETH_RX_DESC_CNT][ETH_MAX_PACKET_SIZE]; /* Ethernet Receive Buffer */
 
 #elif defined ( __GNUC__ ) /* GNU Compiler */ 
 
 ETH_DMADescTypeDef DMARxDscrTab[ETH_RX_DESC_CNT] __attribute__((section(".RxDecripSection"))); /* Ethernet Rx DMA Descriptors */
 ETH_DMADescTypeDef DMATxDscrTab[ETH_TX_DESC_CNT] __attribute__((section(".TxDecripSection")));   /* Ethernet Tx DMA Descriptors */
-uint8_t Rx_Buff[ETH_RX_DESC_CNT][ETH_MAX_PACKET_SIZE] __attribute__((section(".RxArraySection"))); /* Ethernet Receive Buffers */
 
 #endif
 
@@ -407,7 +403,9 @@ ETH_TxPacketConfig TxConfig;
 [#macro generateConfigModelCode configModel inst nTab index mode]
 [#if configModel.clockEnableMacro?? && mode=="Init"] [#-- Enable Port clock --]
     [#list configModel.clockEnableMacro as clkmacroList]
+[#if !clkmacroList.equals("")]
             [#if nTab==2]#t#t[#else]#t[/#if]${clkmacroList}[#if !clkmacroList?contains("(")]()[/#if];
+[/#if]
     [/#list]
 [/#if]
 [#if configModel.methods??] [#-- if the pin configuration contains a list of LibMethods--]
@@ -963,6 +961,28 @@ ETH_TxPacketConfig TxConfig;
   #t#t{
     #t#t#tHAL_PWREx_EnableVddUSB();
   #t#t}
+[/#if]
+[#if ipName?contains("OTG_HS")&&FamilyName=="STM32U5"]
+#n#t#t/* Enable VDDUSB */
+  #t#tif(__HAL_RCC_PWR_IS_CLK_DISABLED())
+  #t#t{
+    #t#t#t__HAL_RCC_PWR_CLK_ENABLE();
+    
+    #t#t#tHAL_PWREx_EnableVddUSB();
+    #n#t#t#t/*configure VOSR register of USB*/
+    #t#t#tHAL_PWREx_EnableUSBHSTranceiverSupply();
+    
+    #t#t#t__HAL_RCC_PWR_CLK_DISABLE();
+  #t#t}
+  #t#telse
+  #t#t{
+    #t#t#tHAL_PWREx_EnableVddUSB();
+    #n#t#t#t/*configure VOSR register of USB*/
+    #t#t#tHAL_PWREx_EnableUSBHSTranceiverSupply();
+  #t#t}
+#n#t#t/*Configuring the SYSCFG registers OTG_HS PHY*/
+#t#t/*OTG_HS PHY enable*/
+#t#t#tHAL_SYSCFG_EnableOTGPHY(SYSCFG_OTG_HS_PHY_ENABLE);
 [/#if]
 [#-- bug 322189 Init End--]
     [#if nvicExist]

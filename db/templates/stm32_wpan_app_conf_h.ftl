@@ -71,17 +71,26 @@
 [#assign CFG_BLE_DATA_LENGTH_EXTENSION = 1]
 [#assign CFG_BLE_SLAVE_SCA = 500]
 [#assign CFG_BLE_MASTER_SCA = 0]
+[#-- BZ126317
 [#assign CFG_BLE_LSE_SOURCE = 0]
-[#assign CFG_BLE_HSE_STARTUP_TIME = "0x0148"]
+--]
+ [#assign CFG_BLE_HSE_STARTUP_TIME = "0x0148"]
 [#assign CFG_BLE_MAX_CONN_EVENT_LENGTH = "0xFFFFFFFF"]
 [#assign CFG_BLE_VITERBI_MODE = 1]
 [#assign CFG_BLE_OPTIONS_LL = "SHCI_C2_BLE_INIT_OPTIONS_LL_HOST"]
 [#assign CFG_BLE_OPTIONS_SVC = "SHCI_C2_BLE_INIT_OPTIONS_WITH_SVC_CHANGE_DESC"]
 [#assign CFG_BLE_OPTIONS_DEVICE_NAME = "SHCI_C2_BLE_INIT_OPTIONS_DEVICE_NAME_RW"]
+[#assign CFG_BLE_OPTIONS_EXT_ADV = "SHCI_C2_BLE_INIT_OPTIONS_NO_EXT_ADV"]
+[#assign CFG_BLE_OPTIONS_CS_ALGO = "SHCI_C2_BLE_INIT_OPTIONS_NO_CS_ALGO2"]
 [#assign CFG_BLE_OPTIONS_POWER_CLASS = "SHCI_C2_BLE_INIT_OPTIONS_POWER_CLASS_2_3"]
 [#assign CFG_BLE_MAX_COC_INITIATOR_NBR = 32]
 [#assign CFG_BLE_MIN_TX_POWER = 0]
 [#assign CFG_BLE_MAX_TX_POWER = 0]
+[#assign CFG_BLE_RX_MODEL_CONFIG = "SHCI_C2_BLE_INIT_RX_MODEL_AGC_RSSI_LEGACY"]
+[#assign CFG_BLE_MAX_ADV_SET_NBR = 0]
+[#assign CFG_BLE_MAX_ADV_DATA_LEN = 0]
+[#assign CFG_BLE_TX_PATH_COMPENS = 0]
+[#assign CFG_BLE_RX_PATH_COMPENS = 0]
 [#assign CFG_TLBLE_EVT_QUEUE_LENGTH = 5]
 [#assign CFG_TLBLE_MOST_EVENT_PAYLOAD_SIZE = 255]
 [#assign DBG_TRACE_USE_CIRCULAR_QUEUE = 1]
@@ -303,9 +312,11 @@
             [#if (definition.name == "CFG_BLE_MASTER_SCA")]
                 [#assign CFG_BLE_MASTER_SCA = definition.value]
             [/#if]
+[#-- BZ126317
             [#if (definition.name == "CFG_BLE_LSE_SOURCE")]
                 [#assign CFG_BLE_LSE_SOURCE = definition.value]
             [/#if]
+--]
             [#if (definition.name == "CFG_BLE_HSE_STARTUP_TIME")]
                 [#assign CFG_BLE_HSE_STARTUP_TIME = definition.value]
             [/#if]
@@ -324,6 +335,12 @@
             [#if (definition.name == "CFG_BLE_OPTIONS_DEVICE_NAME")]
                 [#assign CFG_BLE_OPTIONS_DEVICE_NAME = definition.value]
             [/#if]
+            [#if (definition.name == "CFG_BLE_OPTIONS_EXT_ADV")]
+                [#assign CFG_BLE_OPTIONS_EXT_ADV = definition.value]
+            [/#if]
+            [#if (definition.name == "CFG_BLE_OPTIONS_CS_ALGO")]
+                [#assign CFG_BLE_OPTIONS_CS_ALGO = definition.value]
+            [/#if]
             [#if (definition.name == "CFG_BLE_OPTIONS_POWER_CLASS")]
                 [#assign CFG_BLE_OPTIONS_POWER_CLASS = definition.value]
             [/#if]
@@ -335,6 +352,21 @@
             [/#if]
             [#if (definition.name == "CFG_BLE_MAX_TX_POWER")]
                 [#assign CFG_BLE_MAX_TX_POWER = definition.value]
+            [/#if]
+            [#if (definition.name == "CFG_BLE_RX_MODEL_CONFIG")]
+                [#assign CFG_BLE_RX_MODEL_CONFIG = definition.value]
+            [/#if]
+            [#if (definition.name == "CFG_BLE_MAX_ADV_SET_NBR")]
+                [#assign CFG_BLE_MAX_ADV_SET_NBR = definition.value]
+            [/#if]
+            [#if (definition.name == "CFG_BLE_MAX_ADV_DATA_LEN")]
+                [#assign CFG_BLE_MAX_ADV_DATA_LEN = definition.value]
+            [/#if]
+            [#if (definition.name == "CFG_BLE_TX_PATH_COMPENS")]
+                [#assign CFG_BLE_TX_PATH_COMPENS = definition.value]
+            [/#if]
+            [#if (definition.name == "CFG_BLE_RX_PATH_COMPENS")]
+                [#assign CFG_BLE_RX_PATH_COMPENS = definition.value]
             [/#if]
             [#if (definition.name == "CFG_TLBLE_EVT_QUEUE_LENGTH")]
                 [#assign CFG_TLBLE_EVT_QUEUE_LENGTH = definition.value]
@@ -410,10 +442,10 @@
 [/#if]
 
 [#if (BT_SIG_BEACON != "0") || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1)|| (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)|| (BT_SIG_HEART_RATE_SENSOR = 1)|| (CUSTOM_OTA = 1)|| (CUSTOM_P2P_SERVER = 1)|| (CUSTOM_TEMPLATE = 1)]
-#define CFG_FAST_CONN_ADV_INTERVAL_MIN    (${CFG_FAST_CONN_ADV_INTERVAL_MIN_HEXA})   /**< 80ms */
-#define CFG_FAST_CONN_ADV_INTERVAL_MAX    (${CFG_FAST_CONN_ADV_INTERVAL_MAX_HEXA})  /**< 100ms */
-#define CFG_LP_CONN_ADV_INTERVAL_MIN      (${CFG_LP_CONN_ADV_INTERVAL_MIN_HEXA}) /**< 1s */
-#define CFG_LP_CONN_ADV_INTERVAL_MAX      (${CFG_LP_CONN_ADV_INTERVAL_MAX_HEXA}) /**< 2.5s */
+#define CFG_FAST_CONN_ADV_INTERVAL_MIN    (${CFG_FAST_CONN_ADV_INTERVAL_MIN_HEXA})      /**< 80ms */
+#define CFG_FAST_CONN_ADV_INTERVAL_MAX    (${CFG_FAST_CONN_ADV_INTERVAL_MAX_HEXA})      /**< 100ms */
+#define CFG_LP_CONN_ADV_INTERVAL_MIN      (${CFG_LP_CONN_ADV_INTERVAL_MIN_HEXA})     /**< 1s */
+#define CFG_LP_CONN_ADV_INTERVAL_MAX      (${CFG_LP_CONN_ADV_INTERVAL_MAX_HEXA})     /**< 2.5s */
 [/#if]
 [#if (CUSTOM_TEMPLATE = 1)]
 #define ADV_TYPE                          ${ADV_TYPE}
@@ -447,13 +479,13 @@
 /**
  * Define IO capabilities
  */
-#define CFG_IO_CAPABILITY_DISPLAY_ONLY       (0x00)
-#define CFG_IO_CAPABILITY_DISPLAY_YES_NO     (0x01)
-#define CFG_IO_CAPABILITY_KEYBOARD_ONLY      (0x02)
-#define CFG_IO_CAPABILITY_NO_INPUT_NO_OUTPUT (0x03)
-#define CFG_IO_CAPABILITY_KEYBOARD_DISPLAY   (0x04)
+#define CFG_IO_CAPABILITY_DISPLAY_ONLY        (0x00)
+#define CFG_IO_CAPABILITY_DISPLAY_YES_NO      (0x01)
+#define CFG_IO_CAPABILITY_KEYBOARD_ONLY       (0x02)
+#define CFG_IO_CAPABILITY_NO_INPUT_NO_OUTPUT  (0x03)
+#define CFG_IO_CAPABILITY_KEYBOARD_DISPLAY    (0x04)
 
-#define CFG_IO_CAPABILITY              ${CFG_IO_CAPABILITY}
+#define CFG_IO_CAPABILITY                     ${CFG_IO_CAPABILITY}
 
 /**
  * Define MITM modes
@@ -461,25 +493,25 @@
 #define CFG_MITM_PROTECTION_NOT_REQUIRED      (0x00)
 #define CFG_MITM_PROTECTION_REQUIRED          (0x01)
 
-#define CFG_MITM_PROTECTION             ${CFG_MITM_PROTECTION}
+#define CFG_MITM_PROTECTION                   ${CFG_MITM_PROTECTION}
 
 [/#if]
 /**
  * Define Secure Connections Support
  */
-#define CFG_SECURE_NOT_SUPPORTED       (0x00)
-#define CFG_SECURE_OPTIONAL            (0x01)
-#define CFG_SECURE_MANDATORY           (0x02)
+#define CFG_SECURE_NOT_SUPPORTED              (0x00)
+#define CFG_SECURE_OPTIONAL                   (0x01)
+#define CFG_SECURE_MANDATORY                  (0x02)
 
-#define CFG_SC_SUPPORT                 ${CFG_SC_SUPPORT}
+#define CFG_SC_SUPPORT                        ${CFG_SC_SUPPORT}
 
 /**
  * Define Keypress Notification Support
  */
-#define CFG_KEYPRESS_NOT_SUPPORTED      (0x00)
-#define CFG_KEYPRESS_SUPPORTED          (0x01)
+#define CFG_KEYPRESS_NOT_SUPPORTED            (0x00)
+#define CFG_KEYPRESS_SUPPORTED                (0x01)
 
-#define CFG_KEYPRESS_NOTIFICATION_SUPPORT             ${CFG_KEYPRESS_NOTIFICATION_SUPPORT}
+#define CFG_KEYPRESS_NOTIFICATION_SUPPORT     ${CFG_KEYPRESS_NOTIFICATION_SUPPORT}
    
 /**
  * Numeric Comparison Answers
@@ -797,7 +829,7 @@
 
 /**
  * Maximum supported ATT_MTU size
- * This parameter is ignored by the CPU2 when CFG_BLE_OPTIONS is set to 1"
+ * This parameter is ignored by the CPU2 when CFG_BLE_OPTIONS has SHCI_C2_BLE_INIT_OPTIONS_LL_ONLY flag set
  */
 #define CFG_BLE_MAX_ATT_MTU             (${CFG_BLE_MAX_ATT_MTU})
 
@@ -810,20 +842,20 @@
  *  - 2*DTM_NUM_LINK, if client configuration descriptor is used
  *  - 2, if extended properties is used
  *  The total amount of memory needed is the sum of the above quantities for each attribute.
- * This parameter is ignored by the CPU2 when CFG_BLE_OPTIONS is set to 1"
+ * This parameter is ignored by the CPU2 when CFG_BLE_OPTIONS has SHCI_C2_BLE_INIT_OPTIONS_LL_ONLY flag set
  */
 #define CFG_BLE_ATT_VALUE_ARRAY_SIZE    (${CFG_BLE_ATT_VALUE_ARRAY_SIZE})
 
 [#if (BT_SIG_BEACON != "0") || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1)|| (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)|| (BT_SIG_HEART_RATE_SENSOR = 1)|| (CUSTOM_OTA = 1)|| (CUSTOM_P2P_SERVER = 1)|| (CUSTOM_P2P_CLIENT = 1)|| (CUSTOM_P2P_ROUTER = 1)|| ( BLE_TRANSPARENT_MODE_UART = 1 )|| ( BLE_TRANSPARENT_MODE_VCP = 1)|| (CUSTOM_TEMPLATE = 1)]
 /**
  * Prepare Write List size in terms of number of packet
- * This parameter is ignored by the CPU2 when CFG_BLE_OPTIONS is set to 1"
+ * This parameter is ignored by the CPU2 when CFG_BLE_OPTIONS has SHCI_C2_BLE_INIT_OPTIONS_LL_ONLY flag set
  */
 #define CFG_BLE_PREPARE_WRITE_LIST_SIZE         BLE_PREP_WRITE_X_ATT(CFG_BLE_MAX_ATT_MTU)
 
 /**
  * Number of allocated memory blocks
- * This parameter is overwritten by the CPU2 with an hardcoded optimal value when the parameter when CFG_BLE_OPTIONS is set to 1
+ * This parameter is overwritten by the CPU2 with an hardcoded optimal value when the parameter CFG_BLE_OPTIONS has SHCI_C2_BLE_INIT_OPTIONS_LL_ONLY flag set
  */
 #define CFG_BLE_MBLOCK_COUNT            (BLE_MBLOCKS_CALC(CFG_BLE_PREPARE_WRITE_LIST_SIZE, CFG_BLE_MAX_ATT_MTU, CFG_BLE_NUM_LINK))
 [/#if]
@@ -851,12 +883,25 @@
  */
 #define CFG_BLE_MASTER_SCA   ${CFG_BLE_MASTER_SCA}
 
+[#-- BZ126317
 /**
  *  Source for the low speed clock for RF wake-up
  *  1 : external high speed crystal HSE/32/32
  *  0 : external low speed crystal ( no calibration )
  */
 #define CFG_BLE_LSE_SOURCE  ${CFG_BLE_LSE_SOURCE}
+--]
+/**
+ * LsSource
+ * Some information for Low speed clock mapped in bits field
+ * - bit 0:   1: Calibration for the RF system wakeup clock source   0: No calibration for the RF system wakeup clock source
+ * - bit 1:   1: STM32W5M Module device                              0: Other devices as STM32WBxx SOC, STM32WB1M module
+ */
+#if defined(STM32WB5Mxx)
+  #define CFG_BLE_LSE_SOURCE  (SHCI_C2_BLE_INIT_CFG_BLE_LSE_NOCALIB | SHCI_C2_BLE_INIT_CFG_BLE_LSE_MOD5MM_DEV)
+#else
+  #define CFG_BLE_LSE_SOURCE  (SHCI_C2_BLE_INIT_CFG_BLE_LSE_NOCALIB | SHCI_C2_BLE_INIT_CFG_BLE_LSE_OTHER_DEV)
+#endif
 
 /**
  * Start up time of the high speed (16 or 32 MHz) crystal oscillator in units of 625/256 us (~2.44 us)
@@ -896,15 +941,15 @@
  *          0: with service change desc.
  * (bit 2): 1: device name Read-Only
  *          0: device name R/W
- * (bit 3): 1: extended advertizing supported       [NOT SUPPORTED]
- *          0: extended advertizing not supported   [NOT SUPPORTED]
+ * (bit 3): 1: extended advertizing supported
+ *          0: extended advertizing not supported
  * (bit 4): 1: CS Algo #2 supported
  *          0: CS Algo #2 not supported
  * (bit 7): 1: LE Power Class 1
  *          0: LE Power Class 2-3
  * other bits: reserved (shall be set to 0)
  */
-#define CFG_BLE_OPTIONS  (SHCI_C2_BLE_INIT_OPTIONS_LL_HOST | SHCI_C2_BLE_INIT_OPTIONS_WITH_SVC_CHANGE_DESC | SHCI_C2_BLE_INIT_OPTIONS_DEVICE_NAME_RW | SHCI_C2_BLE_INIT_OPTIONS_NO_EXT_ADV | SHCI_C2_BLE_INIT_OPTIONS_NO_CS_ALGO2 | SHCI_C2_BLE_INIT_OPTIONS_POWER_CLASS_2_3)
+#define CFG_BLE_OPTIONS  (${CFG_BLE_OPTIONS_LL} | ${CFG_BLE_OPTIONS_SVC} | ${CFG_BLE_OPTIONS_DEVICE_NAME} | ${CFG_BLE_OPTIONS_EXT_ADV} | ${CFG_BLE_OPTIONS_CS_ALGO} | ${CFG_BLE_OPTIONS_POWER_CLASS})
 
 #define CFG_BLE_MAX_COC_INITIATOR_NBR   (${CFG_BLE_MAX_COC_INITIATOR_NBR})
 
@@ -922,7 +967,37 @@
  * other bits: reserved (shall be set to 0)
  */
 
-#define CFG_BLE_RX_MODEL_CONFIG         SHCI_C2_BLE_INIT_RX_MODEL_AGC_RSSI_LEGACY
+#define CFG_BLE_RX_MODEL_CONFIG         (${CFG_BLE_RX_MODEL_CONFIG})
+
+/* Maximum number of advertising sets.
+ * Range: 1 .. 8 with limitation:
+ * This parameter is linked to CFG_BLE_MAX_ADV_DATA_LEN such as both compliant with allocated Total memory computed with BLE_EXT_ADV_BUFFER_SIZE based 
+ * on Max Extended advertising configuration supported.
+ * This parameter is considered by the CPU2 when CFG_BLE_OPTIONS has SHCI_C2_BLE_INIT_OPTIONS_EXT_ADV flag set
+ */   
+
+#define CFG_BLE_MAX_ADV_SET_NBR     (${CFG_BLE_MAX_ADV_SET_NBR})
+
+ /* Maximum advertising data length (in bytes)
+ * Range: 31 .. 1650 with limitation:
+ * This parameter is linked to CFG_BLE_MAX_ADV_SET_NBR such as both compliant with allocated Total memory computed with BLE_EXT_ADV_BUFFER_SIZE based 
+ * on Max Extended advertising configuration supported.
+ * This parameter is considered by the CPU2 when CFG_BLE_OPTIONS has SHCI_C2_BLE_INIT_OPTIONS_EXT_ADV flag set
+ */ 
+ 
+#define CFG_BLE_MAX_ADV_DATA_LEN    (${CFG_BLE_MAX_ADV_DATA_LEN})
+ 
+ /* RF TX Path Compensation Value (16-bit signed integer). Units: 0.1 dB.
+  * Range: -1280 .. 1280
+  */
+
+#define CFG_BLE_TX_PATH_COMPENS    (${CFG_BLE_TX_PATH_COMPENS})
+
+ /* RF RX Path Compensation Value (16-bit signed integer). Units: 0.1 dB.
+  * Range: -1280 .. 1280
+  */
+
+#define CFG_BLE_RX_PATH_COMPENS    (${CFG_BLE_RX_PATH_COMPENS})
 
 [/#if]
 [/#if]
@@ -973,14 +1048,14 @@
  * Select UART interfaces
  */
 [#if (BLE_TRANSPARENT_MODE_UART = 1) ||(BLE_TRANSPARENT_MODE_VCP = 1) ]
-    [#lt]#define CFG_UART_GUI          ${CFG_UART_GUI}
+    [#lt]#define CFG_UART_GUI            ${CFG_UART_GUI}
 [/#if]
 	[#lt]#define CFG_DEBUG_TRACE_UART    ${CFG_DEBUG_TRACE_UART}
 [#if (BLE_TRANSPARENT_MODE_UART = 0) && (BLE_TRANSPARENT_MODE_VCP = 0)]
-    [#lt]#define CFG_CONSOLE_MENU      ${CFG_CONSOLE_MENU}
+    [#lt]#define CFG_CONSOLE_MENU        ${CFG_CONSOLE_MENU}
 [/#if]
 [#if (THREAD = 1 || ZIGBEE = 1)]
-    [#lt]#define CFG_CLI_UART    ${CFG_CLI_UART}
+    [#lt]#define CFG_CLI_UART            ${CFG_CLI_UART}
 [/#if]
 /******************************************************************************
  * USB interface
@@ -1109,23 +1184,23 @@
  */
 
 [#if (CFG_RTCCLK_DIVIDER_CONF != "0")]
-#define CFG_RTCCLK_DIV  (${CFG_RTCCLK_DIV})
+#define CFG_RTCCLK_DIV            (${CFG_RTCCLK_DIV})
 [#if (CFG_RTCCLK_DIV == "16")]
-#define CFG_RTC_WUCKSEL_DIVIDER (0)
+#define CFG_RTC_WUCKSEL_DIVIDER   (0)
 [#elseif (CFG_RTCCLK_DIV == "8")]
-#define CFG_RTC_WUCKSEL_DIVIDER (1)
+#define CFG_RTC_WUCKSEL_DIVIDER   (1)
 [#elseif (CFG_RTCCLK_DIV == "4")]
-#define CFG_RTC_WUCKSEL_DIVIDER (2)
+#define CFG_RTC_WUCKSEL_DIVIDER   (2)
 [#elseif (CFG_RTCCLK_DIV == "2")]
-#define CFG_RTC_WUCKSEL_DIVIDER (3)
+#define CFG_RTC_WUCKSEL_DIVIDER   (3)
 [/#if]
-#define CFG_RTC_ASYNCH_PRESCALER (${CFG_RTC_ASYNCH_PRESCALER})
-#define CFG_RTC_SYNCH_PRESCALER (${CFG_RTC_SYNCH_PRESCALER})
+#define CFG_RTC_ASYNCH_PRESCALER  (${CFG_RTC_ASYNCH_PRESCALER})
+#define CFG_RTC_SYNCH_PRESCALER   (${CFG_RTC_SYNCH_PRESCALER})
 [#else]
-#define CFG_RTCCLK_DIV  (${CFG_RTCCLK_DIV})
-#define CFG_RTC_WUCKSEL_DIVIDER (${CFG_RTC_WUCKSEL_DIVIDER})
-#define CFG_RTC_ASYNCH_PRESCALER (${CFG_RTC_ASYNCH_PRESCALER})
-#define CFG_RTC_SYNCH_PRESCALER (${CFG_RTC_SYNCH_PRESCALER})
+#define CFG_RTCCLK_DIV            (${CFG_RTCCLK_DIV})
+#define CFG_RTC_WUCKSEL_DIVIDER   (${CFG_RTC_WUCKSEL_DIVIDER})
+#define CFG_RTC_ASYNCH_PRESCALER  (${CFG_RTC_ASYNCH_PRESCALER})
+#define CFG_RTC_SYNCH_PRESCALER   (${CFG_RTC_SYNCH_PRESCALER})
 [/#if]
 
 #else
@@ -1278,7 +1353,7 @@ typedef enum
 #if (CFG_DEBUG_TRACE != 0)
 #undef CFG_LPM_SUPPORTED
 #undef CFG_DEBUGGER_SUPPORTED
-#define CFG_LPM_SUPPORTED         0
+#define CFG_LPM_SUPPORTED           0
 #define CFG_DEBUGGER_SUPPORTED      1
 #endif
 
@@ -1357,7 +1432,7 @@ typedef enum
  * Only Used if DBG_TRACE_USE_CIRCULAR_QUEUE is defined
  */
 #define DBG_TRACE_MSG_QUEUE_SIZE ${DBG_TRACE_MSG_QUEUE_SIZE}
-#define MAX_DBG_TRACE_MSG_SIZE ${MAX_DBG_TRACE_MSG_SIZE}
+#define MAX_DBG_TRACE_MSG_SIZE   ${MAX_DBG_TRACE_MSG_SIZE}
 
 [#if (THREAD = 1 || ZIGBEE = 1)]
 /******************************************************************************
@@ -1404,101 +1479,101 @@ typedef enum
 typedef enum
 {
 [#if BT_SIG_BEACON != "0"]
-    CFG_TASK_BEACON_UPDATE_REQ_ID,
+  CFG_TASK_BEACON_UPDATE_REQ_ID,
 [/#if]
 [#if (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_HEART_RATE_SENSOR = 1)]
-    CFG_TASK_ADV_UPDATE_ID,
+  CFG_TASK_ADV_UPDATE_ID,
 [/#if]
 [#if BT_SIG_BLOOD_PRESSURE_SENSOR = 1]
-    CFG_TASK_BLS_MEAS_REQ_ID,
-    CFG_TASK_BLS_INT_CUFF_PRESSURE_REQ_ID,
+  CFG_TASK_BLS_MEAS_REQ_ID,
+  CFG_TASK_BLS_INT_CUFF_PRESSURE_REQ_ID,
 [/#if]
 [#if BT_SIG_HEALTH_THERMOMETER_SENSOR = 1]
-    CFG_TASK_HTS_MEAS_REQ_ID,
-    CFG_TASK_HTS_INTERMEDIATE_TEMPERATURE_REQ_ID,
-    CFG_TASK_HTS_MEAS_INTERVAL_REQ_ID,
-    CFG_TASK_HTS_DISCONNECTION_REQ_ID,
+  CFG_TASK_HTS_MEAS_REQ_ID,
+  CFG_TASK_HTS_INTERMEDIATE_TEMPERATURE_REQ_ID,
+  CFG_TASK_HTS_MEAS_INTERVAL_REQ_ID,
+  CFG_TASK_HTS_DISCONNECTION_REQ_ID,
 [/#if]
 [#if BT_SIG_HEART_RATE_SENSOR = 1]
-    CFG_TASK_MEAS_REQ_ID,
+  CFG_TASK_MEAS_REQ_ID,
 [/#if]
 [#if (CUSTOM_P2P_SERVER = 1) || (CUSTOM_TEMPLATE = 1)]
-    CFG_TASK_ADV_CANCEL_ID,
+  CFG_TASK_ADV_CANCEL_ID,
 #if (L2CAP_REQUEST_NEW_CONN_PARAM != 0 )
-    CFG_TASK_CONN_UPDATE_REG_ID,
+  CFG_TASK_CONN_UPDATE_REG_ID,
 #endif
 [/#if]
 [#if CUSTOM_P2P_CLIENT = 1]
-    CFG_TASK_START_SCAN_ID,
-    CFG_TASK_CONN_DEV_1_ID,
-    CFG_TASK_SEARCH_SERVICE_ID,
-    CFG_TASK_CONN_UPDATE_ID,
+  CFG_TASK_START_SCAN_ID,
+  CFG_TASK_CONN_DEV_1_ID,
+  CFG_TASK_SEARCH_SERVICE_ID,
+  CFG_TASK_CONN_UPDATE_ID,
 [/#if]
 [#if CUSTOM_P2P_ROUTER = 1]
-    CFG_TASK_START_ADV_ID,
-    CFG_TASK_START_SCAN_ID,
-    CFG_TASK_CONN_DEV_1_ID,
-    CFG_TASK_CONN_DEV_2_ID,
-    CFG_TASK_CONN_DEV_3_ID,
-    CFG_TASK_CONN_DEV_4_ID,
-    CFG_TASK_CONN_DEV_5_ID,
-    CFG_TASK_CONN_DEV_6_ID,
-    CFG_TASK_SEARCH_SERVICE_ID,
+  CFG_TASK_START_ADV_ID,
+  CFG_TASK_START_SCAN_ID,
+  CFG_TASK_CONN_DEV_1_ID,
+  CFG_TASK_CONN_DEV_2_ID,
+  CFG_TASK_CONN_DEV_3_ID,
+  CFG_TASK_CONN_DEV_4_ID,
+  CFG_TASK_CONN_DEV_5_ID,
+  CFG_TASK_CONN_DEV_6_ID,
+  CFG_TASK_SEARCH_SERVICE_ID,
 [/#if]
 [#if (BT_SIG_BEACON != "0") || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_HEART_RATE_SENSOR = 1) || (CUSTOM_OTA = 1) || (CUSTOM_P2P_SERVER = 1) || (CUSTOM_P2P_ROUTER = 1) || (CUSTOM_P2P_CLIENT = 1) || (CUSTOM_TEMPLATE = 1)]
-    CFG_TASK_HCI_ASYNCH_EVT_ID,
+  CFG_TASK_HCI_ASYNCH_EVT_ID,
 [/#if]
 [#if (BLE_TRANSPARENT_MODE_UART = 1) || (BLE_TRANSPARENT_MODE_VCP = 1)]
-    CFG_TASK_BLE_HCI_CMD_ID,
-    CFG_TASK_SYS_HCI_CMD_ID,
-    CFG_TASK_HCI_ACL_DATA_ID,
-    CFG_TASK_SYS_LOCAL_CMD_ID,
-    CFG_TASK_TX_TO_HOST_ID,
+  CFG_TASK_BLE_HCI_CMD_ID,
+  CFG_TASK_SYS_HCI_CMD_ID,
+  CFG_TASK_HCI_ACL_DATA_ID,
+  CFG_TASK_SYS_LOCAL_CMD_ID,
+  CFG_TASK_TX_TO_HOST_ID,
 [/#if]
 [#if (BT_SIG_BEACON != "0") || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_HEART_RATE_SENSOR = 1) || (CUSTOM_OTA = 1) || (CUSTOM_P2P_SERVER = 1) || (CUSTOM_P2P_ROUTER = 1) || (CUSTOM_P2P_CLIENT = 1) || (BLE_TRANSPARENT_MODE_UART = 1) || (BLE_TRANSPARENT_MODE_VCP = 1) || (CUSTOM_TEMPLATE = 1)]
-    /* USER CODE BEGIN CFG_Task_Id_With_HCI_Cmd_t */
+  /* USER CODE BEGIN CFG_Task_Id_With_HCI_Cmd_t */
 
-    /* USER CODE END CFG_Task_Id_With_HCI_Cmd_t */
+  /* USER CODE END CFG_Task_Id_With_HCI_Cmd_t */
 [#else]
 [#-- BZ 112688, 109187 --]
-    CFG_TASK_APP_WITH_HCICMD_1,
-    CFG_TASK_APP_WITH_HCICMD_2,
-    CFG_TASK_APP_WITH_HCICMD_3,
-    CFG_TASK_APP_WITH_HCICMD_4,
-    CFG_TASK_APP_WITH_HCICMD_5,
-    /* USER CODE BEGIN CFG_Task_Id_With_HCI_Cmd_t */
+  CFG_TASK_APP_WITH_HCICMD_1,
+  CFG_TASK_APP_WITH_HCICMD_2,
+  CFG_TASK_APP_WITH_HCICMD_3,
+  CFG_TASK_APP_WITH_HCICMD_4,
+  CFG_TASK_APP_WITH_HCICMD_5,
+  /* USER CODE BEGIN CFG_Task_Id_With_HCI_Cmd_t */
 
-    /* USER CODE END CFG_Task_Id_With_HCI_Cmd_t */
+  /* USER CODE END CFG_Task_Id_With_HCI_Cmd_t */
 [/#if]
-    CFG_LAST_TASK_ID_WITH_HCICMD,                                               /**< Shall be LAST in the list */
+  CFG_LAST_TASK_ID_WITH_HCICMD,                                               /**< Shall be LAST in the list */
 } CFG_Task_Id_With_HCI_Cmd_t;
 
 /**< Add in that list all tasks that never send a ACI/HCI command */
 typedef enum
 {
-    CFG_FIRST_TASK_ID_WITH_NO_HCICMD = CFG_LAST_TASK_ID_WITH_HCICMD - 1,        /**< Shall be FIRST in the list */
+  CFG_FIRST_TASK_ID_WITH_NO_HCICMD = CFG_LAST_TASK_ID_WITH_HCICMD - 1,        /**< Shall be FIRST in the list */
 [#if (BLE_TRANSPARENT_MODE_VCP = 1)]
-    CFG_TASK_VCP_SEND_DATA_ID,
+  CFG_TASK_VCP_SEND_DATA_ID,
 [/#if]
-    CFG_TASK_SYSTEM_HCI_ASYNCH_EVT_ID,
+  CFG_TASK_SYSTEM_HCI_ASYNCH_EVT_ID,
 [#if (BT_SIG_BEACON != "0") || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_HEART_RATE_SENSOR = 1) || (CUSTOM_OTA = 1) || (CUSTOM_P2P_SERVER = 1) || (CUSTOM_P2P_ROUTER = 1) || (CUSTOM_P2P_CLIENT = 1) || (BLE_TRANSPARENT_MODE_UART = 1) || (BLE_TRANSPARENT_MODE_VCP = 1) || (CUSTOM_TEMPLATE = 1)]
-    /* USER CODE BEGIN CFG_Task_Id_With_NO_HCI_Cmd_t */
+  /* USER CODE BEGIN CFG_Task_Id_With_NO_HCI_Cmd_t */
 
-    /* USER CODE END CFG_Task_Id_With_NO_HCI_Cmd_t */
+  /* USER CODE END CFG_Task_Id_With_NO_HCI_Cmd_t */
 [#else]
-    CFG_TASK_APP_WITH_NO_HCICMD_1,
-    CFG_TASK_APP_WITH_NO_HCICMD_2,
-    CFG_TASK_APP_WITH_NO_HCICMD_3,
-    CFG_TASK_APP_WITH_NO_HCICMD_4,
-    CFG_TASK_APP_WITH_NO_HCICMD_5,
-    /* USER CODE BEGIN CFG_Task_Id_With_NO_HCI_Cmd_t */
+  CFG_TASK_APP_WITH_NO_HCICMD_1,
+  CFG_TASK_APP_WITH_NO_HCICMD_2,
+  CFG_TASK_APP_WITH_NO_HCICMD_3,
+  CFG_TASK_APP_WITH_NO_HCICMD_4,
+  CFG_TASK_APP_WITH_NO_HCICMD_5,
+  /* USER CODE BEGIN CFG_Task_Id_With_NO_HCI_Cmd_t */
 
-    /* USER CODE END CFG_Task_Id_With_NO_HCI_Cmd_t */
+  /* USER CODE END CFG_Task_Id_With_NO_HCI_Cmd_t */
 [/#if]
-    CFG_LAST_TASK_ID_WITHO_NO_HCICMD                                            /**< Shall be LAST in the list */
+  CFG_LAST_TASK_ID_WITH_NO_HCICMD                                            /**< Shall be LAST in the list */
 } CFG_Task_Id_With_NO_HCI_Cmd_t;
 
-#define CFG_TASK_NBR    CFG_LAST_TASK_ID_WITHO_NO_HCICMD
+#define CFG_TASK_NBR    CFG_LAST_TASK_ID_WITH_NO_HCICMD
 
 /**
  * This is the list of priority required by the application
@@ -1506,11 +1581,13 @@ typedef enum
  */
 typedef enum
 {
-    CFG_SCH_PRIO_0,
+  CFG_SCH_PRIO_0,
 [#if BLE_TRANSPARENT_MODE_VCP = 1]
-    CFG_SCH_PRIO_1,
+  CFG_SCH_PRIO_1,
 [/#if]
-    CFG_PRIO_NBR,
+  /* USER CODE BEGIN CFG_SCH_Prio_Id_t */
+
+  /* USER CODE END CFG_SCH_Prio_Id_t */
 } CFG_SCH_Prio_Id_t;
 
 /**
@@ -1520,16 +1597,19 @@ typedef enum
 {
 [#if (BLE_TRANSPARENT_MODE_VCP = 1) || (BLE_TRANSPARENT_MODE_UART = 1)]
 [#else]
-    CFG_IDLEEVT_HCI_CMD_EVT_RSP_ID,
+  CFG_IDLEEVT_HCI_CMD_EVT_RSP_ID,
 [/#if]
-    CFG_IDLEEVT_SYSTEM_HCI_CMD_EVT_RSP_ID,
+  CFG_IDLEEVT_SYSTEM_HCI_CMD_EVT_RSP_ID,
+  /* USER CODE BEGIN CFG_IdleEvt_Id_t */
+
+  /* USER CODE END CFG_IdleEvt_Id_t */
 } CFG_IdleEvt_Id_t;
 
 [#else]
-  /**
-   * This is the list of task id required by the application
-   * Each Id shall be in the range 0..31
-   */
+/**
+ * This is the list of task id required by the application
+ * Each Id shall be in the range 0..31
+ */
 
 typedef enum
 {
@@ -1569,14 +1649,16 @@ typedef enum
  */
 typedef enum
 {
-    CFG_SCH_PRIO_0,
-    CFG_SCH_PRIO_1,
-    CFG_PRIO_NBR,
+  CFG_SCH_PRIO_0,
+  CFG_SCH_PRIO_1,
+  /* USER CODE BEGIN CFG_SCH_Prio_Id_t */
+
+  /* USER CODE END CFG_SCH_Prio_Id_t */
 } CFG_SCH_Prio_Id_t;
 
-  /**
-   * This is a bit mapping over 32bits listing all events id supported in the application
-   */
+/**
+ * This is a bit mapping over 32bits listing all events id supported in the application
+ */
 typedef enum
 {
   CFG_EVT_SYSTEM_HCI_CMD_EVT_RESP,
@@ -1604,6 +1686,9 @@ typedef enum
 /******************************************************************************
  * FreeRTOS
  ******************************************************************************/
+/* USER CODE BEGIN FreeRTOS */
+
+/* USER CODE END FreeRTOS */
 #define CFG_SHCI_USER_EVT_PROCESS_NAME        "SHCI_USER_EVT_PROCESS"
 #define CFG_SHCI_USER_EVT_PROCESS_ATTR_BITS   (0)
 #define CFG_SHCI_USER_EVT_PROCESS_CB_MEM      (0)
@@ -1670,16 +1755,16 @@ typedef enum
  */
 typedef enum
 {
-    CFG_LPM_APP,
+  CFG_LPM_APP,
 [#if (BLE = 1)]
-    CFG_LPM_APP_BLE,
+  CFG_LPM_APP_BLE,
 [/#if]
 [#if (THREAD = 1)]
-    CFG_LPM_APP_THREAD,
+  CFG_LPM_APP_THREAD,
 [/#if]
-    /* USER CODE BEGIN CFG_LPM_Id_t */
+  /* USER CODE BEGIN CFG_LPM_Id_t */
 
-    /* USER CODE END CFG_LPM_Id_t */
+  /* USER CODE END CFG_LPM_Id_t */
 } CFG_LPM_Id_t;
 
 

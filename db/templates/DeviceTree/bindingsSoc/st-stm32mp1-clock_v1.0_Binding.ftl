@@ -31,7 +31,7 @@ ${TABP}/* USER CODE BEGIN clocks */
 ${TABP}/* USER CODE END clocks */
 #n
 [#t]
-[#if !srvcmx_isTargetedFw_inDTS("TF-A")]
+[#if !srvcmx_isTargetedFw_inDTS("TF-A") && !srvcmx_isTargetedFw_inDTS("OP-TEE")]
 #ifndef CONFIG_TFABOOT
 [/#if]
 		[#list RCCClockSourceParam.get("Source").entrySet() as paramEntry]
@@ -112,7 +112,7 @@ ${TABN1}/* USER CODE END ${nodeLabel} */
 [/#if]
 			[#lt]${TABP}};
 [#else]
-[#if srvcmx_isTargetedFw_inDTS("TF-A")]
+[#if srvcmx_isTargetedFw_inDTS("TF-A") || srvcmx_isTargetedFw_inDTS("OP-TEE")]
 	[#if paramEntry.key == "clk_lse: clk-lse"]
 #n
 		[#lt]${TABP}${paramEntry.key} {
@@ -147,7 +147,7 @@ ${TABN1}/* USER CODE END ${nodeLabel} */
 [/#if]
 [/#if]
 		[/#list]
-[#if !srvcmx_isTargetedFw_inDTS("TF-A")]
+[#if !srvcmx_isTargetedFw_inDTS("TF-A") && !srvcmx_isTargetedFw_inDTS("OP-TEE")]
 #endif	/*CONFIG_TFABOOT*/
 [/#if]
 ${TABN}};

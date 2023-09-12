@@ -13,29 +13,10 @@
 [#t]
 [#t]
 [#-- Clock Tree configuration (rcc node)--]
-[#if srvcmx_isTargetedFw_inDTS("TF-A")][#--FW contextualization--]
-[#assign HSICalibration="Disable"]
-[#assign CSICalibration="Disable"]
-[#assign PeriodicCalibrationValue=0]
-[#list srvc_javaMap_getKeysList(peripheralParams.get("RCC"))?sort as key]
-[#assign paramEntry = {"key":key, "value":srvc_javaEntrySet_getValue(peripheralParams.get("RCC").entrySet(), key)}]
-[#if paramEntry.key == "HSICalibration"][#assign HSICalibration=paramEntry.value]
-[#if (HSICalibration = "Enable") ]
-[#lt]${T1}st,hsi-cal;
-[/#if]
-[/#if]
-[#if paramEntry.key == "CSICalibration"][#assign CSICalibration=paramEntry.value]
-[#if (CSICalibration = "Enable") ]
-[#lt]${T1}st,csi-cal;
-[/#if]
-[/#if]
-[#if paramEntry.key == "PeriodicCalibrationValue"][#assign PeriodicCalibrationValue=paramEntry.value?number][/#if]
-[/#list]
-[#t]
-[#if (HSICalibration = "Enable") | (CSICalibration = "Enable") ]
-[#lt]${T1}st,cal-sec = <${PeriodicCalibrationValue}>;
-[/#if]
-[/#if]
+
+	/* USER CODE BEGIN rcc */
+	/* USER CODE END rcc */
+
 	[#lt]${T1}st,clksrc = <
 [#t]
 		[#list peripheralRCCParams.get("CLKSystemSource").entrySet() as paramEntry]
@@ -53,6 +34,7 @@
 	[#lt]${T1}>;
 [#t]
 [#t]
+[#if peripheralRCCParams.get("CLKIPClockSelection")??]
 	[#lt]${T1}st,pkcs = <
 [#t]
 		[#list peripheralRCCParams.get("CLKIPClockSelection").entrySet() as paramEntry]
@@ -61,6 +43,7 @@
 [#t]
 	[#lt]${T1}>;
 [#t]
+[/#if]
 	[#-- pll nodes --]
 	[#-- Nb pll available --]
 	[#assign nbPLL=0]

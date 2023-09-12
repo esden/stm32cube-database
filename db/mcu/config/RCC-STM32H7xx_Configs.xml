@@ -53,14 +53,26 @@
             <MethodArg Name="CLKSource" ParameterName="Cortex_Div"/>
         </CallLibMethod-->
     </RefConfig>
-    <RefConfig Comment="Configure the main internal regulator output voltage" Name="RCC_ConfigVoltageScaling">
-        
+    <RefConfig Comment="Configure the main internal regulator output voltage" Name="RCC_ConfigVoltageScaling">        
+        <IFCondition Expression="DIE450 &amp; (SupplySource=PWR_LDO_SUPPLY) &amp; scale0">
+            <CallLibMethod Name="__HAL_PWR_VOLTAGESCALING_CONFIG" ReturnHAL="false">
+                <MethodArg Name="REGULATOR" FValue="PWR_REGULATOR_VOLTAGE_SCALE1"/>
+            </CallLibMethod>
+            <CallLibMethod Name="" Type="HardCode">
+                <HardCode Text="#n#twhile(!__HAL_PWR_GET_FLAG(PWR_FLAG_VOSRDY)) {}"/>
+            </CallLibMethod>
+            <CallLibMethod Name="" Type="HardCode">
+                <HardCode Text="#n#t__HAL_RCC_SYSCFG_CLK_ENABLE();"/>
+            </CallLibMethod>
+        </IFCondition>
+        <IFCondition Expression="1=1">
         <CallLibMethod Name="__HAL_PWR_VOLTAGESCALING_CONFIG" ReturnHAL="false">
             <MethodArg Name="REGULATOR" ParameterName="PWR_Regulator_Voltage_Scale"/>
         </CallLibMethod>
 		<CallLibMethod Name="" Type="HardCode">
                 <HardCode Text="#n#twhile(!__HAL_PWR_GET_FLAG(PWR_FLAG_VOSRDY)) {}"/>
             </CallLibMethod>
+        </IFCondition>
     </RefConfig>
     <RefConfig Name="RCC_MCO1Config">
         <CallLibMethod Name="HAL_RCC_MCOConfig" ReturnHAL="false">
@@ -74,6 +86,11 @@
             <MethodArg Name="RCC_MCOSource" ParameterName="RCC_MCO2Source"/>
             <MethodArg Name="RCC_MCOx" ParameterName="RCC_MCO2"/>
             <MethodArg Name="RCC_MCODiv" ParameterName="RCC_MCODiv2"/>
+        </CallLibMethod>
+    </RefConfig>
+    <RefConfig Name="AXI_CLOCK_GATING">        
+        <CallLibMethod Name="" Type="HardCode">
+            <HardCode Text="#n#t/*AXI clock gating */#n#tRCC->CKGAENR = 0xFFFFFFFF;"/>
         </CallLibMethod>
     </RefConfig>
     <RefConfig Comment="Enables the Clock Security System" Name="RCC_CSS_Enable">
@@ -442,6 +459,11 @@
         <File Category="header" Name="Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_rcc_ex.h"/>
         <File Category="source" Name="Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_rcc.c"/>
         <File Category="source" Name="Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_rcc_ex.c"/>
+        <File Category="header" Name="Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_ll_bus.h"/>
+        <File Category="header" Name="Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_ll_rcc.h"/>
+        <File Category="header" Name="Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_ll_crs.h"/>
+        <File Category="header" Name="Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_ll_system.h"/>
+        <File Category="header" Name="Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_ll_utils.h"/>
     </RefComponent>
     <RefComponent Cclass="HAL" Cgroup="FLASH" Cversion="0.8.4">
         <File Category="header" Name="Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash.h"/>
@@ -453,16 +475,20 @@
         <File Category="header" Name="Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_gpio.h"/>
         <File Category="source" Name="Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_gpio.c"/>
         <File Category="header" Name="Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_gpio_ex.h"/>          
+        <File Category="header" Name="Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_ll_gpio.h"/>
     </RefComponent>
     <RefComponent Cclass="HAL" Cgroup="HSEM" Cversion="0.8.4">
         <File Category="header" Name="Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_hsem.h"/>
         <File Category="source" Name="Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_hsem.c"/>
+        <File Category="header" Name="Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_ll_hsem.h"/>
     </RefComponent>
     <RefComponent Cclass="HAL" Cgroup="DMA" Cversion="0.8.4">       
         <File Category="header" Name="Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_dma.h"/>
         <File Category="header" Name="Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_dma_ex.h"/>
         <File Category="source" Name="Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dma.c"/>
         <File Category="source" Name="Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dma_ex.c"/>  
+        <File Category="header" Name="Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_ll_dma.h"/>
+        <File Category="header" Name="Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_ll_dmamux.h"/>
     </RefComponent>
     <RefComponent Cclass="HAL" Cgroup="MDMA" Cversion="0.4.0">
         <File Category="header" Name="Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_mdma.h"/>
@@ -473,10 +499,12 @@
         <File Category="header" Name="Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_pwr_ex.h"/>
         <File Category="source" Name="Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_pwr.c"/>
         <File Category="source" Name="Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_pwr_ex.c"/>
+        <File Category="header" Name="Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_ll_pwr.h"/>
     </RefComponent>
     <RefComponent Cclass="HAL" Cgroup="CORTEX" Cversion="0.8.4">
         <File Category="header" Name="Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_cortex.h"/> 
         <File Category="source" Name="Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_cortex.c"/>       
+        <File Category="header" Name="Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_ll_cortex.h"/>
     </RefComponent>
     <RefComponent Cclass="HAL" Cgroup="COMMON" Cversion="0.8.4">
         <File Category="header" Name="Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal.h"/>
@@ -493,5 +521,6 @@
     	<RefComponent Cclass="HAL" Cgroup="EXTI" Cversion="0.1.0">
         <File Category="header" Name="Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_exti.h"/>
         <File Category="source" Name="Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_exti.c"/>
+        <File Category="header" Name="Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_ll_exti.h"/>
     </RefComponent>
 </IP>

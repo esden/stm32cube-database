@@ -525,7 +525,19 @@ int32_t BSP_${IpInstance}_SendRecv_DMA(uint8_t *pTxData, uint8_t *pRxData, uint1
 
 [#-- macro generateBspUSART_Driver --]
 [#macro generateBspUSART_Driver IpInstance bsp]
+[#assign ipName = bsp.ipNameUsed]
+[#assign halMode = false]
+[#assign ipName = bsp.ipNameUsed]
+[#if bsp.halMode == ipName]
+    [#assign halMode = true]
+[#else]	  
+	[#assign halModeName = bsp.halMode]	
+[/#if] 
+[#if halMode]
 HAL_StatusTypeDef MX_${IpInstance}_Init(UART_HandleTypeDef* huart);
+[#else]
+HAL_StatusTypeDef MX_${IpInstance}_${halModeName}_Init(UART_HandleTypeDef* huart);
+[/#if]
 int32_t BSP_${IpInstance}_Init(void);
 int32_t BSP_${IpInstance}_DeInit(void);
 int32_t BSP_${IpInstance}_Send(uint8_t *pData, uint16_t Length);

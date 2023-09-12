@@ -26,7 +26,7 @@ Pinctrl nodes maybe in random order (NoZ, Z, NoZ, ...).
 	[/#if]
 
 	[#--filter nodes per FW--]
-	[#if (pFwName=="TF-A")||(pFwName=="SP_MIN")][#--Contextualize--]
+	[#if (pFwName=="TF-A")||(pFwName=="SP_MIN")||(pFwName=="OP-TEE")][#--Contextualize--]
 		[#--generate only the "default" config--]
 		[#local pinCtrlConfigNodesList = [] ]
 		[#list pPinctrlConfigsList as pinctrlConfig]

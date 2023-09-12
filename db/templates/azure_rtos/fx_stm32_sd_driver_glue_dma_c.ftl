@@ -1,4 +1,28 @@
 [#ftl]
+[#assign  sd_instance = 0]
+[#compress]
+[#list SWIPdatas as SWIP]
+[#if SWIP.defines??]
+  [#list SWIP.defines as definition]
+    [#assign value = definition.value]
+    [#assign name = definition.name]
+	[#if name == "SDMMC_INSTANCE"]
+		[#if value == "0"]
+			[#assign sd_instance = 0]
+		[#else]
+			[#assign sd_instance = 1]
+		[/#if]
+    [/#if]
+    [#if name == "GLUE_FUNCTIONS"]
+      [#assign glue_functions = value]
+    [/#if]
+	[#if name == "TRANSFER_NOTIFICATION"]
+      [#assign transfer_notification = value]
+	[/#if]
+    [/#list]
+[/#if]
+[/#list]
+[/#compress]
 /**************************************************************************/
 /*                                                                        */
 /*       Copyright (c) Microsoft Corporation. All rights reserved.        */
@@ -9,31 +33,6 @@
 /*       and in the root directory of this software.                      */
 /*                                                                        */
 /**************************************************************************/
-[#assign  sd_instance = 0]
-
-[#compress]
-[#list SWIPdatas as SWIP]
-[#if SWIP.defines??]
-  [#list SWIP.defines as definition]
-    [#assign value = definition.value]
-    [#assign name = definition.name]
-    [#if name == "GLUE_FUNCTIONS"]
-      [#assign glue_functions = value]
-    [/#if]
-	[#if name == "TRANSFER_NOTIFICATION"]
-      [#assign transfer_notification = value]
-    [/#if]
-	[#if name == "SDMMC_INSTANCE"]
-		[#if value == "0"]
-			[#assign sd_instance = 0]
-		[#else]
-			[#assign sd_instance = 1]
-		[/#if]
-    [/#if]
-    [/#list]
-[/#if]
-[/#list]
-[/#compress]
 
 #include "fx_stm32_sd_driver.h"
 
@@ -142,7 +141,7 @@ INT fx_stm32_sd_get_status(UINT instance)
 INT fx_stm32_sd_read_blocks(UINT instance, UINT *buffer, UINT start_block, UINT total_blocks)
 {
   INT ret = 0;
-
+  
   /* USER CODE BEGIN PRE_READ_BLOCKS */
   [#if transfer_notification=="ThreadX_Semaphore"]
 	UNUSED(instance);

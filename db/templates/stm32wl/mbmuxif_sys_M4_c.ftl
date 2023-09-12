@@ -101,6 +101,7 @@ UTIL_MEM_PLACE_IN_SECTION("MB_MEM1") uint32_t
 aSystemPrioBNotifAckBuff[MAX_PARAM_OF_SYS_PRIOB_NOTIF_FUNCTIONS];/*shared*/
 [#if THREADX??]
 
+static __IO uint8_t Thd_SystemNotifRcv_RescheduleFlag = 0;
 static TX_THREAD Thd_SystemNotifRcv;
 static TX_SEMAPHORE Sem_MbSystemRespRcv;
 [/#if]
@@ -660,6 +661,10 @@ static void MBMUXIF_IsrSystemNotifRcvCb(void *ComObj)
   /* USER CODE END MBMUXIF_IsrSystemNotifRcvCb_1 */
   SystemComObj = (MBMUX_ComParam_t *) ComObj;
 [#if THREADX??][#-- If AzRtos is used --]
+  if (Thd_SystemNotifRcv_RescheduleFlag < 255)
+  {
+    Thd_SystemNotifRcv_RescheduleFlag++;
+  }
   tx_thread_resume(&Thd_SystemNotifRcv);
 [#else]
 [#if !FREERTOS??][#-- If FreeRtos is not used --]
@@ -703,7 +708,17 @@ static void Thd_MbSystemNotifRcv_Entry(ULONG thread_input)
   /* Infinite loop */
   for (;;)
   {
-    tx_thread_suspend(&Thd_SystemNotifRcv);
+    if (Thd_SystemNotifRcv_RescheduleFlag > 0)
+    {
+      /* if RescheduleFlag was set during MBMUXIF_TaskSystemNotifRcv() don't suspend  */
+      Thd_SystemNotifRcv_RescheduleFlag--;
+    }
+    else
+    {
+      tx_thread_suspend(&Thd_SystemNotifRcv);
+      /* if RescheduleFlag was set during suspend it should be reset */
+      Thd_SystemNotifRcv_RescheduleFlag = 0;
+    }
     MBMUXIF_TaskSystemNotifRcv();  /*what you want to do*/
     /* USER CODE BEGIN Thd_MbSystemNotifRcv_Entry_2 */
 

@@ -2735,6 +2735,34 @@
        "5":[SERVICE5_CHAR5_LONG_NAME, SERVICE5_CHAR5_SHORT_NAME]}
 }]
 
+[#assign SERVICES_CHARS_VALUE_LENGTH = {
+  "1":{"1":SERVICE1_CHAR1_VALUE_LENGTH,
+       "2":SERVICE1_CHAR2_VALUE_LENGTH,
+       "3":SERVICE1_CHAR3_VALUE_LENGTH,
+       "4":SERVICE1_CHAR4_VALUE_LENGTH,
+       "5":SERVICE1_CHAR5_VALUE_LENGTH},
+  "2":{"1":SERVICE2_CHAR1_VALUE_LENGTH,
+       "2":SERVICE2_CHAR2_VALUE_LENGTH,
+       "3":SERVICE2_CHAR3_VALUE_LENGTH,
+       "4":SERVICE2_CHAR4_VALUE_LENGTH,
+       "5":SERVICE2_CHAR5_VALUE_LENGTH},
+  "3":{"1":SERVICE3_CHAR1_VALUE_LENGTH,
+       "2":SERVICE3_CHAR2_VALUE_LENGTH,
+       "3":SERVICE3_CHAR3_VALUE_LENGTH,
+       "4":SERVICE3_CHAR4_VALUE_LENGTH,
+       "5":SERVICE3_CHAR5_VALUE_LENGTH},
+  "4":{"1":SERVICE4_CHAR1_VALUE_LENGTH,
+       "2":SERVICE4_CHAR2_VALUE_LENGTH,
+       "3":SERVICE4_CHAR3_VALUE_LENGTH,
+       "4":SERVICE4_CHAR4_VALUE_LENGTH,
+       "5":SERVICE4_CHAR5_VALUE_LENGTH},
+  "5":{"1":SERVICE5_CHAR1_VALUE_LENGTH,
+       "2":SERVICE5_CHAR2_VALUE_LENGTH,
+       "3":SERVICE5_CHAR3_VALUE_LENGTH,
+       "4":SERVICE5_CHAR4_VALUE_LENGTH,
+       "5":SERVICE5_CHAR5_VALUE_LENGTH}
+}]
+
 [#assign item = 0]
 [#assign item_UUID_TYPE = item][#assign item = item + 1]
 [#assign item_UUID = item][#assign item = item + 1]
@@ -2804,34 +2832,6 @@
        "3":SERVICE5_CHAR3_VALUE_OFFSET,
        "4":SERVICE5_CHAR4_VALUE_OFFSET,
        "5":SERVICE5_CHAR5_VALUE_OFFSET}
-}]
-
-[#assign SERVICES_CHARS_VALUE_LENGTH = {
-  "1":{"1":SERVICE1_CHAR1_VALUE_LENGTH,
-       "2":SERVICE1_CHAR2_VALUE_LENGTH,
-       "3":SERVICE1_CHAR3_VALUE_LENGTH,
-       "4":SERVICE1_CHAR4_VALUE_LENGTH,
-       "5":SERVICE1_CHAR5_VALUE_LENGTH},
-  "2":{"1":SERVICE2_CHAR1_VALUE_LENGTH,
-       "2":SERVICE2_CHAR2_VALUE_LENGTH,
-       "3":SERVICE2_CHAR3_VALUE_LENGTH,
-       "4":SERVICE2_CHAR4_VALUE_LENGTH,
-       "5":SERVICE2_CHAR5_VALUE_LENGTH},
-  "3":{"1":SERVICE3_CHAR1_VALUE_LENGTH,
-       "2":SERVICE3_CHAR2_VALUE_LENGTH,
-       "3":SERVICE3_CHAR3_VALUE_LENGTH,
-       "4":SERVICE3_CHAR4_VALUE_LENGTH,
-       "5":SERVICE3_CHAR5_VALUE_LENGTH},
-  "4":{"1":SERVICE4_CHAR1_VALUE_LENGTH,
-       "2":SERVICE4_CHAR2_VALUE_LENGTH,
-       "3":SERVICE4_CHAR3_VALUE_LENGTH,
-       "4":SERVICE4_CHAR4_VALUE_LENGTH,
-       "5":SERVICE4_CHAR5_VALUE_LENGTH},
-  "5":{"1":SERVICE5_CHAR1_VALUE_LENGTH,
-       "2":SERVICE5_CHAR2_VALUE_LENGTH,
-       "3":SERVICE5_CHAR3_VALUE_LENGTH,
-       "4":SERVICE5_CHAR4_VALUE_LENGTH,
-       "5":SERVICE5_CHAR5_VALUE_LENGTH}
 }]
 
 [#assign SERVICES_CHARS_LENGTH_CHARACTERISTIC = {
@@ -3061,6 +3061,10 @@
     ${SERVICES_NAMES[service?string][item_LONG_NAME]}[#t]
 [/#macro]
 
+[#macro serviceShortName service]
+    ${SERVICES_NAMES[service?string][item_SHORT_NAME]}[#t]
+[/#macro]
+
 [#macro characteristicShortName service characteristic]
     ${SERVICES_CHARS_NAMES[service?string][characteristic?string][item_SHORT_NAME]?upper_case}[#t]
 [/#macro]
@@ -3145,10 +3149,11 @@ typedef struct{
 [#if NUMBER_OF_SERVICES != "0"]
     [#list 1..NUMBER_OF_SERVICES?number as service]
         [#list 1..SERVICES_NUMBER_OF_CHARACTERISTICS[service?string]?number as characteristic]
-static const uint8_t Size[@characteristicShortNameCapitalized service characteristic/]=${SERVICES_CHARS_VALUE_LENGTH[service?string][characteristic?string]};
+uint8_t Size[@characteristicShortNameCapitalized service characteristic/] = ${SERVICES_CHARS_VALUE_LENGTH[service?string][characteristic?string]};
         [/#list]
     [/#list]
 [/#if]
+
 /**
  * START of Section BLE_DRIVER_CONTEXT
  */
@@ -3179,9 +3184,9 @@ static SVCCTL_EvtAckStatus_t Custom_STM_Event_Handler(void *pckt);
 #define COPY_UUID_128(uuid_struct, uuid_15, uuid_14, uuid_13, uuid_12, uuid_11, uuid_10, uuid_9, uuid_8, uuid_7, uuid_6, uuid_5, uuid_4, uuid_3, uuid_2, uuid_1, uuid_0) \
 do {\
     uuid_struct[0] = uuid_0; uuid_struct[1] = uuid_1; uuid_struct[2] = uuid_2; uuid_struct[3] = uuid_3; \
-        uuid_struct[4] = uuid_4; uuid_struct[5] = uuid_5; uuid_struct[6] = uuid_6; uuid_struct[7] = uuid_7; \
-            uuid_struct[8] = uuid_8; uuid_struct[9] = uuid_9; uuid_struct[10] = uuid_10; uuid_struct[11] = uuid_11; \
-                uuid_struct[12] = uuid_12; uuid_struct[13] = uuid_13; uuid_struct[14] = uuid_14; uuid_struct[15] = uuid_15; \
+    uuid_struct[4] = uuid_4; uuid_struct[5] = uuid_5; uuid_struct[6] = uuid_6; uuid_struct[7] = uuid_7; \
+    uuid_struct[8] = uuid_8; uuid_struct[9] = uuid_9; uuid_struct[10] = uuid_10; uuid_struct[11] = uuid_11; \
+    uuid_struct[12] = uuid_12; uuid_struct[13] = uuid_13; uuid_struct[14] = uuid_14; uuid_struct[15] = uuid_15; \
 }while(0)
 
 /* Hardware Characteristics Service */
@@ -3244,11 +3249,11 @@ static SVCCTL_EvtAckStatus_t Custom_STM_Event_Handler(void *Event)
   return_value = SVCCTL_EvtNotAck;
   event_pckt = (hci_event_pckt *)(((hci_uart_pckt*)Event)->data);
 
-  switch(event_pckt->evt)
+  switch (event_pckt->evt)
   {
     case HCI_VENDOR_SPECIFIC_DEBUG_EVT_CODE:
       blecore_evt = (evt_blecore_aci*)event_pckt->data;
-      switch(blecore_evt->ecode)
+      switch (blecore_evt->ecode)
       {
         case ACI_GATT_ATTRIBUTE_MODIFIED_VSEVT_CODE:
           /* USER CODE BEGIN EVT_BLUE_GATT_ATTRIBUTE_MODIFIED_BEGIN */
@@ -3266,10 +3271,10 @@ static SVCCTL_EvtAckStatus_t Custom_STM_Event_Handler(void *Event)
                 (SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_INDICATE]?? &&
                 SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_INDICATE] != "")]
               [#if INDEX = 0]
-          if(attribute_modified->Attr_Handle == (CustomContext.Custom[@characteristicShortNameCapitalized service characteristic/]Hdle + CHARACTERISTIC_DESCRIPTOR_ATTRIBUTE_OFFSET))
+          if (attribute_modified->Attr_Handle == (CustomContext.Custom[@characteristicShortNameCapitalized service characteristic/]Hdle + CHARACTERISTIC_DESCRIPTOR_ATTRIBUTE_OFFSET))
                 [#assign INDEX = INDEX + 1]
               [#else]
-          else if(attribute_modified->Attr_Handle == (CustomContext.Custom[@characteristicShortNameCapitalized service characteristic/]Hdle + CHARACTERISTIC_DESCRIPTOR_ATTRIBUTE_OFFSET))              
+          else if (attribute_modified->Attr_Handle == (CustomContext.Custom[@characteristicShortNameCapitalized service characteristic/]Hdle + CHARACTERISTIC_DESCRIPTOR_ATTRIBUTE_OFFSET))              
               [/#if]
           {
             return_value = SVCCTL_EvtAckFlowEnable;
@@ -3277,7 +3282,7 @@ static SVCCTL_EvtAckStatus_t Custom_STM_Event_Handler(void *Event)
 
             /* USER CODE END CUSTOM_STM_Service_${service?string}_Char_${characteristic?string} */
 
-            switch(attribute_modified->Attr_Data[0])
+            switch (attribute_modified->Attr_Data[0])
             {
               /* USER CODE BEGIN CUSTOM_STM_Service_${service?string}_Char_${characteristic?string}_attribute_modified  */
 
@@ -3327,7 +3332,7 @@ static SVCCTL_EvtAckStatus_t Custom_STM_Event_Handler(void *Event)
                 /* USER CODE END CUSTOM_STM_Service_${service?string}_Char_${characteristic?string}_default */
                 break;
             }
-          }  /* if(attribute_modified->Attr_Handle == (CustomContext.Custom[@characteristicShortNameCapitalized service characteristic/]Hdle + CHARACTERISTIC_DESCRIPTOR_ATTRIBUTE_OFFSET))*/
+          }  /* if (attribute_modified->Attr_Handle == (CustomContext.Custom[@characteristicShortNameCapitalized service characteristic/]Hdle + CHARACTERISTIC_DESCRIPTOR_ATTRIBUTE_OFFSET))*/
 
             [/#if]
             [#if (SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_NOTIFY]??  &&
@@ -3335,17 +3340,17 @@ static SVCCTL_EvtAckStatus_t Custom_STM_Event_Handler(void *Event)
                 (SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_INDICATE]?? &&
                 SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_INDICATE] == "")]
               [#if INDEX = 0]
-          if(attribute_modified->Attr_Handle == (CustomContext.Custom[@characteristicShortNameCapitalized service characteristic/]Hdle + CHARACTERISTIC_DESCRIPTOR_ATTRIBUTE_OFFSET))
+          if (attribute_modified->Attr_Handle == (CustomContext.Custom[@characteristicShortNameCapitalized service characteristic/]Hdle + CHARACTERISTIC_DESCRIPTOR_ATTRIBUTE_OFFSET))
                 [#assign INDEX = INDEX + 1]
               [#else]
-          else if(attribute_modified->Attr_Handle == (CustomContext.Custom[@characteristicShortNameCapitalized service characteristic/]Hdle + CHARACTERISTIC_DESCRIPTOR_ATTRIBUTE_OFFSET))              
+          else if (attribute_modified->Attr_Handle == (CustomContext.Custom[@characteristicShortNameCapitalized service characteristic/]Hdle + CHARACTERISTIC_DESCRIPTOR_ATTRIBUTE_OFFSET))              
               [/#if]
           {
             return_value = SVCCTL_EvtAckFlowEnable;
             /* USER CODE BEGIN CUSTOM_STM_Service_${service?string}_Char_${characteristic?string} */
             
             /* USER CODE END CUSTOM_STM_Service_${service?string}_Char_${characteristic?string} */            
-            switch(attribute_modified->Attr_Data[0])
+            switch (attribute_modified->Attr_Data[0])
             {
               /* USER CODE BEGIN CUSTOM_STM_Service_${service?string}_Char_${characteristic?string}_attribute_modified */
 
@@ -3381,7 +3386,7 @@ static SVCCTL_EvtAckStatus_t Custom_STM_Event_Handler(void *Event)
                 /* USER CODE END CUSTOM_STM_Service_${service?string}_Char_${characteristic?string}_default */
               break;
             }
-          }  /* if(attribute_modified->Attr_Handle == (CustomContext.Custom[@characteristicShortNameCapitalized service characteristic/]Hdle + CHARACTERISTIC_DESCRIPTOR_ATTRIBUTE_OFFSET))*/
+          }  /* if (attribute_modified->Attr_Handle == (CustomContext.Custom[@characteristicShortNameCapitalized service characteristic/]Hdle + CHARACTERISTIC_DESCRIPTOR_ATTRIBUTE_OFFSET))*/
   
             [/#if]
             [#if (SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_NOTIFY]??  &&
@@ -3389,10 +3394,10 @@ static SVCCTL_EvtAckStatus_t Custom_STM_Event_Handler(void *Event)
                 (SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_INDICATE]?? &&
                 SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_INDICATE] != "")]
               [#if INDEX = 0]
-          if(attribute_modified->Attr_Handle == (CustomContext.Custom[@characteristicShortNameCapitalized service characteristic/]Hdle + CHARACTERISTIC_DESCRIPTOR_ATTRIBUTE_OFFSET))
+          if (attribute_modified->Attr_Handle == (CustomContext.Custom[@characteristicShortNameCapitalized service characteristic/]Hdle + CHARACTERISTIC_DESCRIPTOR_ATTRIBUTE_OFFSET))
                 [#assign INDEX = INDEX + 1]
               [#else]
-          else if(attribute_modified->Attr_Handle == (CustomContext.Custom[@characteristicShortNameCapitalized service characteristic/]Hdle + CHARACTERISTIC_DESCRIPTOR_ATTRIBUTE_OFFSET))
+          else if (attribute_modified->Attr_Handle == (CustomContext.Custom[@characteristicShortNameCapitalized service characteristic/]Hdle + CHARACTERISTIC_DESCRIPTOR_ATTRIBUTE_OFFSET))
               [/#if]
           {
             return_value = SVCCTL_EvtAckFlowEnable;
@@ -3400,7 +3405,7 @@ static SVCCTL_EvtAckStatus_t Custom_STM_Event_Handler(void *Event)
 
             /* USER CODE END CUSTOM_STM_Service_${service?string}_Char_${characteristic?string} */
 
-            switch(attribute_modified->Attr_Data[0])
+            switch (attribute_modified->Attr_Data[0])
             {
               /* USER CODE BEGIN CUSTOM_STM_Service_${service?string}_Char_${characteristic?string}_attribute_modified */
 
@@ -3436,7 +3441,7 @@ static SVCCTL_EvtAckStatus_t Custom_STM_Event_Handler(void *Event)
               /* USER CODE END CUSTOM_STM_Service_${service?string}_Char_${characteristic?string}_default */
               break;
             }
-          }  /* if(attribute_modified->Attr_Handle == (CustomContext.Custom[@characteristicLongName service characteristic/]Hdle + CHARACTERISTIC_DESCRIPTOR_ATTRIBUTE_OFFSET))*/
+          }  /* if (attribute_modified->Attr_Handle == (CustomContext.Custom[@characteristicLongName service characteristic/]Hdle + CHARACTERISTIC_DESCRIPTOR_ATTRIBUTE_OFFSET))*/
 
             [/#if]
         [/#list]
@@ -3452,17 +3457,17 @@ static SVCCTL_EvtAckStatus_t Custom_STM_Event_Handler(void *Event)
                 SERVICES_CHARS_GATT_NOTIFY[service?string][characteristic?string][item_GATT_NOTIFY_ATTR_WRITE]??  &&
                 SERVICES_CHARS_GATT_NOTIFY[service?string][characteristic?string][item_GATT_NOTIFY_ATTR_WRITE] != "")]
               [#if INDEX = 0]
-          if(attribute_modified->Attr_Handle == (CustomContext.Custom[@characteristicShortNameCapitalized service characteristic/]Hdle + CHARACTERISTIC_VALUE_ATTRIBUTE_OFFSET))
+          if (attribute_modified->Attr_Handle == (CustomContext.Custom[@characteristicShortNameCapitalized service characteristic/]Hdle + CHARACTERISTIC_VALUE_ATTRIBUTE_OFFSET))
                 [#assign INDEX = INDEX + 1]
               [#else]
-          else if(attribute_modified->Attr_Handle == (CustomContext.Custom[@characteristicShortNameCapitalized service characteristic/]Hdle + CHARACTERISTIC_VALUE_ATTRIBUTE_OFFSET))              
+          else if (attribute_modified->Attr_Handle == (CustomContext.Custom[@characteristicShortNameCapitalized service characteristic/]Hdle + CHARACTERISTIC_VALUE_ATTRIBUTE_OFFSET))              
               [/#if]
           {
             return_value = SVCCTL_EvtAckFlowEnable;
             /* USER CODE BEGIN CUSTOM_STM_Service_${service?string}_Char_${characteristic?string}_ACI_GATT_ATTRIBUTE_MODIFIED_VSEVT_CODE */
 
             /* USER CODE END CUSTOM_STM_Service_${service?string}_Char_${characteristic?string}_ACI_GATT_ATTRIBUTE_MODIFIED_VSEVT_CODE */
-          } /* if(attribute_modified->Attr_Handle == (CustomContext.Custom[@characteristicShortNameCapitalized service characteristic/]Hdle + CHARACTERISTIC_VALUE_ATTRIBUTE_OFFSET))*/
+          } /* if (attribute_modified->Attr_Handle == (CustomContext.Custom[@characteristicShortNameCapitalized service characteristic/]Hdle + CHARACTERISTIC_VALUE_ATTRIBUTE_OFFSET))*/
             [/#if]
         [/#list]
     [/#list]
@@ -3488,10 +3493,10 @@ static SVCCTL_EvtAckStatus_t Custom_STM_Event_Handler(void *Event)
                 SERVICES_CHARS_GATT_NOTIFY[service?string][characteristic?string][item_GATT_NOTIFY_READ_REQ_AND_WAIT_FOR_APPL_RESP]??  &&
                 SERVICES_CHARS_GATT_NOTIFY[service?string][characteristic?string][item_GATT_NOTIFY_READ_REQ_AND_WAIT_FOR_APPL_RESP] != "")]
               [#if INDEX = 0]
-          if(read_req->Attribute_Handle == (CustomContext.Custom[@characteristicShortNameCapitalized service characteristic/]Hdle + CHARACTERISTIC_VALUE_ATTRIBUTE_OFFSET))
+          if (read_req->Attribute_Handle == (CustomContext.Custom[@characteristicShortNameCapitalized service characteristic/]Hdle + CHARACTERISTIC_VALUE_ATTRIBUTE_OFFSET))
                 [#assign INDEX = INDEX + 1]
               [#else]
-          else if(read_req->Attribute_Handle == (CustomContext.Custom[@characteristicShortNameCapitalized service characteristic/]Hdle + CHARACTERISTIC_VALUE_ATTRIBUTE_OFFSET))
+          else if (read_req->Attribute_Handle == (CustomContext.Custom[@characteristicShortNameCapitalized service characteristic/]Hdle + CHARACTERISTIC_VALUE_ATTRIBUTE_OFFSET))
               [/#if]
           {
             return_value = SVCCTL_EvtAckFlowEnable;
@@ -3502,7 +3507,7 @@ static SVCCTL_EvtAckStatus_t Custom_STM_Event_Handler(void *Event)
             /*USER CODE BEGIN CUSTOM_STM_Service_${service?string}_Char_${characteristic?string}_ACI_GATT_READ_PERMIT_REQ_VSEVT_CODE_2 */
 
             /*USER CODE END CUSTOM_STM_Service_${service?string}_Char_${characteristic?string}_ACI_GATT_READ_PERMIT_REQ_VSEVT_CODE_2*/
-          } /* if(read_req->Attribute_Handle == (CustomContext.Custom[@characteristicShortNameCapitalized service characteristic/]Hdle + CHARACTERISTIC_VALUE_ATTRIBUTE_OFFSET))*/
+          } /* if (read_req->Attribute_Handle == (CustomContext.Custom[@characteristicShortNameCapitalized service characteristic/]Hdle + CHARACTERISTIC_VALUE_ATTRIBUTE_OFFSET))*/
             [/#if]
         [/#list]
     [/#list]
@@ -3530,10 +3535,10 @@ static SVCCTL_EvtAckStatus_t Custom_STM_Event_Handler(void *Event)
                 SERVICES_CHARS_GATT_NOTIFY[service?string][characteristic?string][item_GATT_NOTIFY_WRITE_REQ_AND_WAIT_FOR_APPL_RESP]??  &&
                 SERVICES_CHARS_GATT_NOTIFY[service?string][characteristic?string][item_GATT_NOTIFY_WRITE_REQ_AND_WAIT_FOR_APPL_RESP] != "")]
               [#if INDEX = 0]
-          if(write_perm_req->Attribute_Handle == (CustomContext.Custom[@characteristicShortNameCapitalized service characteristic/]Hdle + CHARACTERISTIC_VALUE_ATTRIBUTE_OFFSET))
+          if (write_perm_req->Attribute_Handle == (CustomContext.Custom[@characteristicShortNameCapitalized service characteristic/]Hdle + CHARACTERISTIC_VALUE_ATTRIBUTE_OFFSET))
                 [#assign INDEX = INDEX + 1]
               [#else]
-          else if(write_perm_req->Attribute_Handle == (CustomContext.Custom[@characteristicShortNameCapitalized service characteristic/]Hdle + CHARACTERISTIC_VALUE_ATTRIBUTE_OFFSET))
+          else if (write_perm_req->Attribute_Handle == (CustomContext.Custom[@characteristicShortNameCapitalized service characteristic/]Hdle + CHARACTERISTIC_VALUE_ATTRIBUTE_OFFSET))
               [/#if]
           {
             return_value = SVCCTL_EvtAckFlowEnable;
@@ -3541,7 +3546,7 @@ static SVCCTL_EvtAckStatus_t Custom_STM_Event_Handler(void *Event)
             /*USER CODE BEGIN CUSTOM_STM_Service_${service?string}_Char_${characteristic?string}_ACI_GATT_WRITE_PERMIT_REQ_VSEVT_CODE */
 
             /*USER CODE END CUSTOM_STM_Service_${service?string}_Char_${characteristic?string}_ACI_GATT_WRITE_PERMIT_REQ_VSEVT_CODE*/
-          } /*if(write_perm_req->Attribute_Handle == (CustomContext.Custom[@characteristicShortNameCapitalized service characteristic/]Hdle + CHARACTERISTIC_VALUE_ATTRIBUTE_OFFSET))*/
+          } /*if (write_perm_req->Attribute_Handle == (CustomContext.Custom[@characteristicShortNameCapitalized service characteristic/]Hdle + CHARACTERISTIC_VALUE_ATTRIBUTE_OFFSET))*/
 
             [/#if]
         [/#list]
@@ -3595,6 +3600,7 @@ void SVCCTL_InitCustomSvc(void)
 {
  
   Char_UUID_t  uuid;
+  tBleStatus ret = BLE_STATUS_INVALID_PARAMS;
   /* USER CODE BEGIN SVCCTL_InitCustomSvc_1 */
 
   /* USER CODE END SVCCTL_InitCustomSvc_1 */
@@ -3609,7 +3615,7 @@ void SVCCTL_InitCustomSvc(void)
 [#if NUMBER_OF_SERVICES != "0"]
     [#list 1..NUMBER_OF_SERVICES?number as service]
 
-  /*
+  /**
    *          [@serviceLongName service/]
    *
    * Max_Attribute_Records = 1 + 2*${SERVICES_NUMBER_OF_CHARACTERISTICS[service?string]} + 1*no_of_char_with_notify_or_indicate_property + 1*no_of_char_with_broadcast_property
@@ -3642,11 +3648,19 @@ void SVCCTL_InitCustomSvc(void)
           [#assign UUID_TYPE = "UUID_TYPE_128"]
   [@copyServ service/]_UUID(uuid.Char_UUID_128);
       [/#if]
-  aci_gatt_add_service(${UUID_TYPE},
-                       (Service_UUID_t *) &uuid,
-                       ${SERVICES_INFO[service?string][item_TYPE]},
-                       ${SERVICES_INFO[service?string][item_MAX_ATTRIBUTES_RECORDS]},
-                       &(CustomContext.Custom[@serviceShortNameCapitalized service/]Hdle));
+  ret = aci_gatt_add_service(${UUID_TYPE},
+                             (Service_UUID_t *) &uuid,
+                             ${SERVICES_INFO[service?string][item_TYPE]},
+                             ${SERVICES_INFO[service?string][item_MAX_ATTRIBUTES_RECORDS]},
+                             &(CustomContext.Custom[@serviceShortNameCapitalized service/]Hdle));
+  if (ret != BLE_STATUS_SUCCESS)
+  {
+    APP_DBG_MSG("  Fail   : aci_gatt_add_service command: [@serviceShortName service/], error code: 0x%x \n\r", ret);
+  }
+  else
+  {
+    APP_DBG_MSG("  Success: aci_gatt_add_service command: [@serviceShortName service/] \n\r");
+  }
 
       [#list 1..SERVICES_NUMBER_OF_CHARACTERISTICS[service?string]?number as characteristic]
           [#-- prop_list definition --]
@@ -3699,15 +3713,23 @@ void SVCCTL_InitCustomSvc(void)
               [#assign UUID_TYPE = "UUID_TYPE_128"]
   [@copyServChar service characteristic/]_UUID(uuid.Char_UUID_128);
           [/#if]
-  aci_gatt_add_char(CustomContext.Custom[@serviceShortNameCapitalized service/]Hdle,
-                    ${UUID_TYPE}, &uuid,
-                    Size[@characteristicShortNameCapitalized service characteristic/],
-                    ${prop_list},
-                    ${attr_perm_list},
-                    ${gatt_notify_list},
-                    ${SERVICES_CHARS_ENC_KEY_SIZE[service?string][characteristic?string]},
-                    ${SERVICES_CHARS_LENGTH_CHARACTERISTIC[service?string][characteristic?string]},
-                    &(CustomContext.Custom[@characteristicShortNameCapitalized service characteristic/]Hdle));
+  ret = aci_gatt_add_char(CustomContext.Custom[@serviceShortNameCapitalized service/]Hdle,
+                          ${UUID_TYPE}, &uuid,
+                          Size[@characteristicShortNameCapitalized service characteristic/],
+                          ${prop_list},
+                          ${attr_perm_list},
+                          ${gatt_notify_list},
+                          ${SERVICES_CHARS_ENC_KEY_SIZE[service?string][characteristic?string]},
+                          ${SERVICES_CHARS_LENGTH_CHARACTERISTIC[service?string][characteristic?string]},
+                          &(CustomContext.Custom[@characteristicShortNameCapitalized service characteristic/]Hdle));
+  if (ret != BLE_STATUS_SUCCESS)
+  {
+    APP_DBG_MSG("  Fail   : aci_gatt_add_char command   : [@characteristicShortName service characteristic/], error code: 0x%x \n\r", ret);
+  }
+  else
+  {
+    APP_DBG_MSG("  Success: aci_gatt_add_char command   : [@characteristicShortName service characteristic/] \n\r");
+  }
       [/#list]
 
     [/#list]
@@ -3728,26 +3750,34 @@ void SVCCTL_InitCustomSvc(void)
  */
 tBleStatus Custom_STM_App_Update_Char(Custom_STM_Char_Opcode_t CharOpcode, uint8_t *pPayload) 
 {
-  tBleStatus result = BLE_STATUS_INVALID_PARAMS;
+  tBleStatus ret = BLE_STATUS_INVALID_PARAMS;
   /* USER CODE BEGIN Custom_STM_App_Update_Char_1 */
 
   /* USER CODE END Custom_STM_App_Update_Char_1 */
 
-  switch(CharOpcode)
+  switch (CharOpcode)
   {
 
 [#if NUMBER_OF_SERVICES != "0"]
     [#list 1..NUMBER_OF_SERVICES?number as service]
         [#list 1..SERVICES_NUMBER_OF_CHARACTERISTICS[service?string]?number as characteristic]
     case [@customServChar service characteristic/]:
-      result = aci_gatt_update_char_value(CustomContext.Custom[@serviceShortNameCapitalized service/]Hdle,
-                                          CustomContext.Custom[@characteristicShortNameCapitalized service characteristic/]Hdle,
-                                          ${SERVICES_CHARS_VALUE_OFFSET[service?string][characteristic?string]}, /* charValOffset */
-                                          Size[@characteristicShortNameCapitalized service characteristic/], /* charValueLen */
-                                          (uint8_t *)  pPayload);
-      /* USER CODE BEGIN CUSTOM_STM_Service_${service?string}_Char_${characteristic?string}*/
+      ret = aci_gatt_update_char_value(CustomContext.Custom[@serviceShortNameCapitalized service/]Hdle,
+                                       CustomContext.Custom[@characteristicShortNameCapitalized service characteristic/]Hdle,
+                                       ${SERVICES_CHARS_VALUE_OFFSET[service?string][characteristic?string]}, /* charValOffset */
+                                       Size[@characteristicShortNameCapitalized service characteristic/], /* charValueLen */
+                                       (uint8_t *)  pPayload);
+      if (ret != BLE_STATUS_SUCCESS)
+      {
+        APP_DBG_MSG("  Fail   : aci_gatt_update_char_value [@characteristicShortName service characteristic/] command, result : 0x%x \n\r", ret);
+      }
+      else
+      {
+        APP_DBG_MSG("  Success: aci_gatt_update_char_value [@characteristicShortName service characteristic/] command\n\r");
+      }
+      /* USER CODE BEGIN CUSTOM_STM_App_Update_Service_${service?string}_Char_${characteristic?string}*/
 
-      /* USER CODE END CUSTOM_STM_Service_${service?string}_Char_${characteristic?string}*/
+      /* USER CODE END CUSTOM_STM_App_Update_Service_${service?string}_Char_${characteristic?string}*/
       break;
 
         [/#list]
@@ -3762,5 +3792,5 @@ tBleStatus Custom_STM_App_Update_Char(Custom_STM_Char_Opcode_t CharOpcode, uint8
 
   /* USER CODE END Custom_STM_App_Update_Char_2 */
 
-  return result;
+  return ret;
 }

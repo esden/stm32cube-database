@@ -105,6 +105,7 @@ extern ${variable.value} ${variable.name};
 [#assign lwip_mbed = 0]
 [#assign lwip_httpd = 0]
 [#assign cmsis_version = "v1"]
+[#assign newlib_used = 0]
 	
 [#if SWIP.defines??]
 	[#list SWIP.defines as definition]
@@ -114,6 +115,13 @@ extern ${variable.value} ${variable.name};
 			    [#assign lwip_rtos = 1]
 			[#else]	
 			    [#assign lwip_rtos = 0] 
+			[/#if]
+		[/#if]
+		[#if definition.name == "RTOS_USE_NEWLIB_REENTRANT"] 
+			[#if definition.value == "1"] 
+			    [#assign newlib_used = 1]
+			[#else]	
+			    [#assign newlib_used = 0] 
 			[/#if]
 		[/#if]
 		[#if definition.name == "LWIP_USE_EXTERNAL_MBEDTLS"] 
@@ -181,6 +189,10 @@ extern ${variable.value} ${variable.name};
            [#if lwip_rtos == 1]
 /*----- ${definition.name} enabled (Since FREERTOS is set) -----*/
 #define ${definition.name}   1
+               [#if GCC_USED?? && (newlib_used == 1)]
+/* Temporary workaround to avoid conflict on errno defined in STM32CubeIDE and lwip sys_arch.c errno */               
+#undef LWIP_PROVIDE_ERRNO
+               [/#if]
            [#else]
 /*----- ${definition.name} disabled (Since FREERTOS is not set) -----*/
 #define ${definition.name}   0
@@ -561,7 +573,7 @@ extern ${variable.value} ${variable.name};
 /*----- Value in opt.h for ${definition.name}: 1 -----*/
 #define ${definition.name}  ${definition.value}
             [/#if]
-            [#if (definition.name=="CHECKSUM_GEN_ICMP") && (definition.value != "valueNotSetted")&& (definition.value == "0")]
+            [#if (definition.name=="CHECKSUM_GEN_ICMP") && (definition.value != "valueNotSetted") && (definition.value == "0")]
 /*----- Value in opt.h for ${definition.name}: 1 -----*/
 #define ${definition.name}  ${definition.value}
             [/#if]
@@ -589,20 +601,26 @@ extern ${variable.value} ${variable.name};
 /*----- Value in opt.h for ${definition.name}: 1 -----*/
 #define ${definition.name}   ${definition.value}
             [/#if]
-            [#if (series == "stm32h7") || (series == "stm32f4")]
-            [#if (definition.name=="LWIP_SUPPORT_CUSTOM_PBUF") && (definition.value != "valueNotSetted") && (definition.value == "1")]
+            [#if (series == "stm32h7")]
+                [#if (definition.name=="LWIP_SUPPORT_CUSTOM_PBUF") && (definition.value != "valueNotSetted") && (definition.value == "1")]
 /*----- Value supported for H7 devices: 1 -----*/
 #define ${definition.name}   ${definition.value}
-            [/#if]
-            [#if (definition.name=="LWIP_RAM_HEAP_POINTER") && (definition.value != "valueNotSetted")]
+                [/#if]
+                [#if (definition.name=="LWIP_RAM_HEAP_POINTER") && (definition.value != "valueNotSetted")]
 /*----- Default Value for H7 devices: 0x30044000 -----*/
 #define ${definition.name}   ${definition.value}
-            [/#if]
-            [#if (definition.value != "valueNotSetted") && (definition.name=="ETH_RX_BUFFER_SIZE")]
+                [/#if]
+                [#if (definition.value != "valueNotSetted") && (definition.name=="ETH_RX_BUFFER_SIZE")]
 /*----- Default value in ETH configuration GUI in CubeMx: 1524 -----*/
 #define ${definition.name}   ${definition.value}
-            [/#if]
-            [/#if][#-- stm32h7/f4 --]
+                [/#if]
+            [/#if][#-- stm32f4 --]
+            [#if (series == "stm32f4") || (series == "stm32f7")]
+                [#if (definition.value != "valueNotSetted") && (definition.name=="ETH_RX_BUFFER_SIZE")]
+/*----- Default value in ETH configuration GUI in CubeMx: 1524 -----*/
+#define ${definition.name}   ${definition.value}
+                [/#if]
+            [/#if][#-- stm32f7/f4 --]
 		[/#if][#-- definition.defaultValue --]
 	[/#list][#-- SWIP.defines line 108 --]
 /*-----------------------------------------------------------------------------*/

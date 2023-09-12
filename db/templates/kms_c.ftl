@@ -122,8 +122,11 @@
     [#assign halMode= instanceData.halMode]
     [#assign ipName = instanceData.ipName]
         /* ${ipName}${instName} init function */
-        [#--[#if halMode!=instName]void ${halMode}_${instName}_Init(void)[#else]void MX_${instName}_Init(void)[/#if] --]
+[#if !THREADX??][#-- If AzRtos is not used --]
 void MX_${ipName}${instName}_Init(void)
+[#else]
+uint32_t MX_${ipName}${instName}_Init(void *memory_ptr)
+[/#if]
 {
     /***************************************/
 	[#-- MZA je dois remplir la liste des configs, pour l'instant j'utilise la liste des methods --]
@@ -144,6 +147,9 @@ void MX_${ipName}${instName}_Init(void)
     #t/* USER CODE BEGIN ${userCodeIdx} */
     #t/* USER CODE END ${userCodeIdx} */
 [#assign userCodeIdx = userCodeIdx+1]
+[#if THREADX??]
+    #treturn TX_SUCCESS;
+[/#if]
 
 #n}#n
 [/#list]

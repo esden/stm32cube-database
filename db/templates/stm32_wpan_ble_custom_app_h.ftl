@@ -12,8 +12,8 @@
 /* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __CUSTOM_APP_H
-#define __CUSTOM_APP_H
+#ifndef CUSTOM_APP_H
+#define CUSTOM_APP_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -58,8 +58,8 @@ typedef struct
 /* USER CODE END EM */
 
 /* Exported functions ---------------------------------------------*/
-  void Custom_APP_Init( void );
-  void Custom_APP_Notification( Custom_App_ConnHandle_Not_evt_t *pNotification );
+void Custom_APP_Init(void);
+void Custom_APP_Notification(Custom_App_ConnHandle_Not_evt_t *pNotification);
 /* USER CODE BEGIN EF */
 
 /* USER CODE END EF */
@@ -68,4 +68,4 @@ typedef struct
 }
 #endif
 
-#endif /*__CUSTOM_APP_H */
+#endif /* CUSTOM_APP_H */

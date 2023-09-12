@@ -1,1 +1,1 @@
-Manifest=openstlinux-21-02-05
+Manifest=openstlinux-22-05-06

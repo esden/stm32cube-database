@@ -1102,18 +1102,17 @@ PLACE_IN_SECTION("BLE_APP_CONTEXT") static Custom_App_Context_t Custom_App_Conte
  * END of Section BLE_APP_CONTEXT
  */
 
-/* USER CODE BEGIN PV */
 uint8_t UpdateCharData[247];
 uint8_t NotifyCharData[247];
 
-uint8_t SecureReadData;
+/* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 [#if NUMBER_OF_SERVICES != "0"]
     [#list 1..NUMBER_OF_SERVICES?number as service]
-  /* ${SERVICES_NAMES[service?string][item_LONG_NAME]} */
+/* ${SERVICES_NAMES[service?string][item_LONG_NAME]} */
         [#list 1..SERVICES_NUMBER_OF_CHARACTERISTICS[service?string]?number as characteristic]
             [#if SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_NOTIFY]??  &&
                 SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_NOTIFY] != "" ||
@@ -1143,7 +1142,7 @@ void Custom_STM_App_Notification(Custom_STM_App_Notification_evt_t *pNotificatio
   /* USER CODE BEGIN CUSTOM_STM_App_Notification_1 */
 
   /* USER CODE END CUSTOM_STM_App_Notification_1 */
-  switch(pNotification->Custom_Evt_Opcode)
+  switch (pNotification->Custom_Evt_Opcode)
   {
     /* USER CODE BEGIN CUSTOM_STM_App_Notification_Custom_Evt_Opcode */
 
@@ -1151,7 +1150,7 @@ void Custom_STM_App_Notification(Custom_STM_App_Notification_evt_t *pNotificatio
 
 [#if NUMBER_OF_SERVICES != "0"]
     [#list 1..NUMBER_OF_SERVICES?number as service]
-  /* ${SERVICES_NAMES[service?string][item_LONG_NAME]} */
+    /* ${SERVICES_NAMES[service?string][item_LONG_NAME]} */
         [#list 1..SERVICES_NUMBER_OF_CHARACTERISTICS[service?string]?number as characteristic]
             [#list item_PROP_START..item_PROP_END as item]
                 [#if SERVICES_CHARS_PROP[service?string][characteristic?string][item]?? &&
@@ -1181,7 +1180,7 @@ void Custom_APP_Notification(Custom_App_ConnHandle_Not_evt_t *pNotification)
 
   /* USER CODE END CUSTOM_APP_Notification_1 */
 
-  switch(pNotification->Custom_Evt_Opcode)
+  switch (pNotification->Custom_Evt_Opcode)
   {
     /* USER CODE BEGIN CUSTOM_APP_Notification_Custom_Evt_Opcode */
 
@@ -1232,7 +1231,7 @@ void Custom_APP_Init(void)
 
 [#if NUMBER_OF_SERVICES != "0"]
     [#list 1..NUMBER_OF_SERVICES?number as service]
-  /* ${SERVICES_NAMES[service?string][item_LONG_NAME]} */
+/* ${SERVICES_NAMES[service?string][item_LONG_NAME]} */
         [#list 1..SERVICES_NUMBER_OF_CHARACTERISTICS[service?string]?number as characteristic]
             [#if SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_NOTIFY]??  &&
                 SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_NOTIFY] != "" ||
@@ -1240,10 +1239,20 @@ void Custom_APP_Init(void)
                 SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_INDICATE] != ""]
 void Custom_[@capitalizeServChar service characteristic/]_Update_Char(void) /* Property Read */
 { 
-  Custom_STM_App_Update_Char([@customServChar service characteristic/], (uint8_t *)UpdateCharData);
-  /* USER CODE BEGIN [@capitalizeServChar service characteristic/]_UC*/
+  uint8_t updateflag = 0;
 
-  /* USER CODE END [@capitalizeServChar service characteristic/]_UC*/
+  /* USER CODE BEGIN [@capitalizeServChar service characteristic/]_UC_1*/
+
+  /* USER CODE END [@capitalizeServChar service characteristic/]_UC_1*/
+
+  if (updateflag != 0)
+  {
+    Custom_STM_App_Update_Char([@customServChar service characteristic/], (uint8_t *)UpdateCharData);
+  }
+  
+  /* USER CODE BEGIN [@capitalizeServChar service characteristic/]_UC_Last*/
+
+  /* USER CODE END [@capitalizeServChar service characteristic/]_UC_Last*/
   return;
 }
 
@@ -1251,18 +1260,22 @@ void Custom_[@capitalizeServChar service characteristic/]_Update_Char(void) /* P
             [#if SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_NOTIFY]?? &&
                 SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_NOTIFY] != ""]
 void Custom_[@capitalizeServChar service characteristic/]_Send_Notification(void) /* Property Notification */
- { 
-  if(Custom_App_Context.[@capitalizeServChar service characteristic/]_Notification_Status)
-  {     
-    Custom_STM_App_Update_Char([@customServChar service characteristic/], (uint8_t *)NotifyCharData);
-    /* USER CODE BEGIN [@capitalizeServChar service characteristic/]_NS*/
+{ 
+  uint8_t updateflag = 0;
 
-    /* USER CODE END [@capitalizeServChar service characteristic/]_NS*/
-  }
-  else
+  /* USER CODE BEGIN [@capitalizeServChar service characteristic/]_NS_1*/
+
+  /* USER CODE END [@capitalizeServChar service characteristic/]_NS_1*/
+
+  if (updateflag != 0)
   {
-    APP_DBG_MSG("-- CUSTOM APPLICATION : CAN'T INFORM CLIENT -  NOTIFICATION DISABLED\n "); 
+    Custom_STM_App_Update_Char([@customServChar service characteristic/], (uint8_t *)NotifyCharData);
   }
+  
+  /* USER CODE BEGIN [@capitalizeServChar service characteristic/]_NS_Last*/
+
+  /* USER CODE END [@capitalizeServChar service characteristic/]_NS_Last*/
+
   return;
 }
 
@@ -1271,17 +1284,21 @@ void Custom_[@capitalizeServChar service characteristic/]_Send_Notification(void
                 SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_INDICATE] != ""]
 void Custom_[@capitalizeServChar service characteristic/]_Send_Indication(void) /* Property Indication */
 { 
-  if(Custom_App_Context.[@capitalizeServChar service characteristic/]_Indication_Status)
-  {     
-    Custom_STM_App_Update_Char([@customServChar service characteristic/], (uint8_t *)NotifyCharData);
-    /* USER CODE BEGIN [@capitalizeServChar service characteristic/]_IS*/
+  uint8_t updateflag = 0;
 
-    /* USER CODE END [@capitalizeServChar service characteristic/]_IS*/
-  }
-  else
+  /* USER CODE BEGIN [@capitalizeServChar service characteristic/]_IS_1*/
+
+  /* USER CODE END [@capitalizeServChar service characteristic/]_IS_1*/
+
+  if (updateflag != 0)
   {
-    APP_DBG_MSG("-- CUSTOM APPLICATION : CAN'T INFORM CLIENT -  INDICATION DISABLED\n "); 
+    Custom_STM_App_Update_Char([@customServChar service characteristic/], (uint8_t *)NotifyCharData);
   }
+  
+  /* USER CODE BEGIN [@capitalizeServChar service characteristic/]_IS_Last*/
+
+  /* USER CODE END [@capitalizeServChar service characteristic/]_IS_Last*/
+
   return;
 }
 

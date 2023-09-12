@@ -1,23 +1,16 @@
 [#ftl]
-/**************************************************************************/
-/*                                                                        */
-/*       Copyright (c) Microsoft Corporation. All rights reserved.        */
-/*                                                                        */
-/*       This software is licensed under the Microsoft Software License   */
-/*       Terms for Microsoft Azure RTOS. Full text of the license can be  */
-/*       found in the LICENSE file at https://aka.ms/AzureRTOS_EULA       */
-/*       and in the root directory of this software.                      */
-/*                                                                        */
-/**************************************************************************/
-
 [#compress]
 [#list SWIPdatas as SWIP]
 [#if SWIP.defines??]
   [#list SWIP.defines as definition]
     [#assign value = definition.value]
     [#assign name = definition.name]
-    [#if name == "GLUE_FUNCTIONS"]
-      [#assign glue_functions = value]
+	[#if name == "SD_INSTANCE"]
+		[#if value == "0"]
+			[#assign sd_instance = 0]
+		[#else]
+			[#assign sd_instance = 1]
+		[/#if]
     [/#if]
 	[#if name == "SDMMC_INSTANCE"]
 		[#if value == "0"]
@@ -30,6 +23,16 @@
 [/#if]
 [/#list]
 [/#compress]
+/**************************************************************************/
+/*                                                                        */
+/*       Copyright (c) Microsoft Corporation. All rights reserved.        */
+/*                                                                        */
+/*       This software is licensed under the Microsoft Software License   */
+/*       Terms for Microsoft Azure RTOS. Full text of the license can be  */
+/*       found in the LICENSE file at https://aka.ms/AzureRTOS_EULA       */
+/*       and in the root directory of this software.                      */
+/*                                                                        */
+/**************************************************************************/
 
 #include "fx_stm32_sd_driver.h"
 

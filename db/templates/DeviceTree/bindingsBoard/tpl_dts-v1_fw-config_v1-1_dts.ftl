@@ -32,7 +32,10 @@
 
 		[#if ddrProfile?has_content]
 #define DDR_SIZE	${ddrHexSizeStr} /* ${ddrProfile} */
-#include "${mx_socDtRPN}-fw-config.dts"
+#include "${mx_socDtRPN}-fw-config.dtsi"
+			[#if srvcmx_isDeviceEnabled("mce")]
+#include "${mx_socDtRPN}-fw-config-mem-encrypt.dtsi"
+			[/#if]
 		[#else]
 [@mlog  logMod=module logType="ERR" logMsg="Unknown DDR profile: FW config not generated" varsMap={} /]
 		[/#if]

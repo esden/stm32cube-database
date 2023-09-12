@@ -21,6 +21,10 @@
 [#assign userCodeIdx = 0]
 
 /* Includes ------------------------------------------------------------------*/
+[#if THREADX??]
+#include <stdint.h>
+#include "tx_api.h"
+[/#if]
 [#if includes??]
 [#list includes as include]
 [#if include != ""]
@@ -64,8 +68,11 @@ extern ${variable.value} ${variable.name};
         [#assign instMode= instanceData.halMode]
         [#assign ipName = instanceData.ipName]
 /* ${ipName}${instName} init function */
-[#--[#if instMode!=instName]void ${instMode}_${instName}_Init(void);[#else]void MX_${instName}_Init(void);[/#if]--]
+[#if !THREADX??][#-- If AzRtos is not used --]
 void MX_${ipName}${instName}_Init(void);
+[#else]
+uint32_t MX_${ipName}${instName}_Init(void *memory_ptr);
+[/#if]
 [/#list]
 [#list halModeList?split(" ") as mode]
 [#if mode !=""]
@@ -75,8 +82,6 @@ void HAL_${mode}_BspDeInit(${mode}_HandleTypeDef* h${mode?lower_case});
 [/#list]
 
 [/#list]
-
-[#--void ${ipName}${instName}_Init(void);--]
 
 /* USER CODE BEGIN ${userCodeIdx} */
 /* USER CODE END ${userCodeIdx} */

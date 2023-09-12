@@ -4,7 +4,6 @@
 [#assign ospi_init_driver = "1"]
 [#assign ospi_erase_flash = "0"]
 [#assign glue_api = "DMA_API"]
-[#assign txrx_cmplt = "TxSem"]
 
 [#assign ospi_comp = "custom"]
 [#assign ospi_instance = 1]
@@ -31,10 +30,6 @@
       [#assign ospi_erase_flash = value]
     [/#if]
 
-    [#if name == "LX_OSPI_TRANSFER_CMPLT_NOTIF"]
-      [#assign txrx_cmplt = value]
-    [/#if]
-
     [#if name == "LX_OSPI_INSTANCE"]
     [#if value == "1"]
       [#assign ospi_instance = 2]
@@ -49,6 +44,10 @@
       [#assign LX_USE_OCTOSPI_value = value]
     [/#if]
 
+	[#if name == "TRANSFER_NOTIFICATION"]
+      [#assign TRANSFER_NOTIFICATION_value = value]
+    [/#if]
+	
   [/#list]
 [/#if]
 [/#list]
@@ -67,7 +66,7 @@
 [#if LX_USE_OCTOSPI_value == "octo SPI"]
 [#if ospi_comp == "MX25LM51245G"]
 
-/* HAL Polling based implementation for OctoSPI component MX25LM51245G
+/* HAL DMA API based implementation for OctoSPI component MX25LM51245G
  * The present implementation assumes the following settings are set:
 
   Instance              = OCTOSPI${ospi_instance}
@@ -104,7 +103,7 @@ ULONG ospi_sector_buffer[LX_STM32_OSPI_SECTOR_SIZE / sizeof(ULONG)];
 /* USER CODE END SECTOR_BUFFER */
 [#if glue_api == "DMA_API"]
 
-  [#if txrx_cmplt != "custom"]
+  [#if TRANSFER_NOTIFICATION_value == "Global_state_variables"]
 __IO UINT ospi_rx_cplt;
 __IO UINT ospi_tx_cplt;
   [/#if]
@@ -330,6 +329,18 @@ INT lx_stm32_ospi_read(UINT instance, ULONG *address, ULONG *buffer, ULONG words
     return 1;
   }
 
+  [#if TRANSFER_NOTIFICATION_value == "Global_state_variables"]
+  /* Reset the ospi_rx_cplt to 0 before reading operation */
+  ospi_rx_cplt = 0;
+  [/#if]
+  [#if TRANSFER_NOTIFICATION_value == "Custom"]
+  /* Add any operation needed before reading operation */
+
+  /* USER CODE BEGIN PRE_OSPI_DMA_READ */
+
+  /* USER CODE END PRE_OSPI_DMA_READ */
+  
+  [/#if]
   /* Reception of the data */
   if (HAL_OSPI_Receive_DMA(&hospi${ospi_instance}, (uint8_t*)buffer) != HAL_OK)
   {
@@ -365,8 +376,9 @@ INT lx_stm32_ospi_write(UINT instance, ULONG *address, ULONG *buffer, ULONG word
   uint32_t current_size;
   uint32_t data_buffer;
 
-
-   UINT timeout_start;
+  [#if TRANSFER_NOTIFICATION_value == "Global_state_variables"]
+  UINT timeout_start;
+  [/#if]
 [/#if]
 
   /* USER CODE BEGIN PRE_OSPI_WRITE */
@@ -416,8 +428,10 @@ INT lx_stm32_ospi_write(UINT instance, ULONG *address, ULONG *buffer, ULONG word
   /* Perform the write page by page */
   do
   {
+	[#if TRANSFER_NOTIFICATION_value == "Global_state_variables"]
     ospi_tx_cplt = 0;
-
+	[/#if]
+	
     s_command.Address = current_addr;
     s_command.NbData  = current_size;
 
@@ -438,7 +452,7 @@ INT lx_stm32_ospi_write(UINT instance, ULONG *address, ULONG *buffer, ULONG word
     {
       return 1;
     }
-
+	[#if TRANSFER_NOTIFICATION_value == "Global_state_variables"]
     /* Check success of the transmission of the data */
 
     timeout_start = HAL_GetTick();
@@ -475,6 +489,35 @@ INT lx_stm32_ospi_write(UINT instance, ULONG *address, ULONG *buffer, ULONG word
 /* at this stage the write operation is successful and the ospi_tx_cplt is set to 1
  * thus LX_STM32_OSPI_WRITE_CPLT_NOTIFY() will correctly notify the low-level driver
  */
+ [/#if]
+ 
+ [#if TRANSFER_NOTIFICATION_value == "Custom"]
+ 
+	/* Add a check for successful data transmission */
+    
+    /* USER CODE BEGIN POST_OSPI_DMA_WRITE */
+
+    /* USER CODE END POST_OSPI_DMA_WRITE */
+    
+    /* Configure automatic polling mode to wait for end of program */
+    if (ospi_auto_polling_ready(&hospi${ospi_instance}, HAL_OSPI_TIMEOUT_DEFAULT_VALUE) != 0)
+    {
+      return 1;
+    }
+    else
+    {
+      /* Update the address and data variables for next page programming */
+      current_addr += current_size;
+      data_buffer += current_size;
+
+      current_size = ((current_addr + LX_STM32_OSPI_PAGE_SIZE) > end_addr) ? (end_addr - current_addr) : LX_STM32_OSPI_PAGE_SIZE;
+    }
+  } while(current_addr < end_addr);
+
+/* At this stage the write operation is successful
+ * Add LX_STM32_OSPI_WRITE_CPLT_NOTIFY() implementation to notify the low-level driver
+ */
+ [/#if]
 
 [/#if]
   /* USER CODE BEGIN POST_OSPI_WRITE */
@@ -942,6 +985,16 @@ static uint8_t ospi_set_octal_mode(OSPI_HandleTypeDef *hospi)
   * @retval None
   */
 
+[#if TRANSFER_NOTIFICATION_value == "Custom"]
+void HAL_OSPI_RxCpltCallback(OSPI_HandleTypeDef *hospi)
+{
+  /* Custom transfer completion notification mechanism goes here */
+  
+  /* USER CODE BEGIN RX_CMPLT */
+
+  /* USER CODE END RX_CMPLT */
+}
+[#else]
 void HAL_OSPI_RxCpltCallback(OSPI_HandleTypeDef *hospi)
 {
   /* USER CODE BEGIN PRE_RX_CMPLT */
@@ -954,6 +1007,7 @@ void HAL_OSPI_RxCpltCallback(OSPI_HandleTypeDef *hospi)
 
   /* USER CODE END POST_RX_CMPLT */
 }
+[/#if]
 
 /**
   * @brief  Tx Transfer completed callbacks.
@@ -961,6 +1015,16 @@ void HAL_OSPI_RxCpltCallback(OSPI_HandleTypeDef *hospi)
   * @retval None
   */
 
+[#if TRANSFER_NOTIFICATION_value == "Custom"]
+void HAL_OSPI_TxCpltCallback(OSPI_HandleTypeDef *hospi)
+{
+  /* Custom transfer completion notification mechanism goes here */
+
+  /* USER CODE BEGIN TX_CMPLT */
+
+  /* USER CODE END TX_CMPLT */
+}
+[#else]
 void HAL_OSPI_TxCpltCallback(OSPI_HandleTypeDef *hospi)
 {
   /* USER CODE BEGIN PRE_TX_CMPLT */
@@ -974,11 +1038,13 @@ void HAL_OSPI_TxCpltCallback(OSPI_HandleTypeDef *hospi)
   /* USER CODE END POST_TX_CMPLT */
 }
 [/#if]
+
+[/#if]
 [#else]
 #error "[This error is thrown on purpose] : the OCTOSPI IP is onfigured as ${LX_USE_OCTOSPI_value} which is not supported yet.
 [#if ospi_comp == "MX25LM51245G"]
 
-/* HAL Polling based implementation for OctoSPI component MX25LM51245G
+/* HAL DMA API based implementation for OctoSPI component MX25LM51245G
  * The present implementation assumes the following settings are set:
 
   Instance              = OCTOSPI${ospi_instance}
@@ -1015,7 +1081,7 @@ ULONG ospi_sector_buffer[LX_STM32_OSPI_SECTOR_SIZE / sizeof(ULONG)];
 /* USER CODE END SECTOR_BUFFER */
 [#if glue_api == "DMA_API"]
 
-  [#if txrx_cmplt != "custom"]
+  [#if TRANSFER_NOTIFICATION_value == "Global_state_variables"]
 __IO UINT ospi_rx_cplt;
 __IO UINT ospi_tx_cplt;
   [/#if]
@@ -1248,13 +1314,29 @@ static uint8_t ospi_set_octal_mode(OSPI_HandleTypeDef *hospi)
   * @retval None
   */
 
+[#if TRANSFER_NOTIFICATION_value == "Custom"]
 void HAL_OSPI_RxCpltCallback(OSPI_HandleTypeDef *hospi)
 {
+  /* Custom transfer completion notification mechanism goes here */
+  
   /* USER CODE BEGIN RX_CMPLT */
 
   /* USER CODE END RX_CMPLT */
-
 }
+[#else]
+void HAL_OSPI_RxCpltCallback(OSPI_HandleTypeDef *hospi)
+{
+  /* USER CODE BEGIN PRE_RX_CMPLT */
+
+  /* USER CODE END PRE_RX_CMPLT */
+
+  ospi_rx_cplt = 1;
+
+  /* USER CODE BEGIN POST_RX_CMPLT */
+
+  /* USER CODE END POST_RX_CMPLT */
+}
+[/#if]
 
 /**
   * @brief  Tx Transfer completed callbacks.
@@ -1262,13 +1344,29 @@ void HAL_OSPI_RxCpltCallback(OSPI_HandleTypeDef *hospi)
   * @retval None
   */
 
+[#if TRANSFER_NOTIFICATION_value == "Custom"]
 void HAL_OSPI_TxCpltCallback(OSPI_HandleTypeDef *hospi)
 {
+  /* Custom transfer completion notification mechanism goes here */
+
   /* USER CODE BEGIN TX_CMPLT */
 
   /* USER CODE END TX_CMPLT */
-
 }
+[#else]
+void HAL_OSPI_TxCpltCallback(OSPI_HandleTypeDef *hospi)
+{
+  /* USER CODE BEGIN PRE_TX_CMPLT */
+
+  /* USER CODE END PRE_TX_CMPLT */
+
+  ospi_tx_cplt = 1;
+
+  /* USER CODE BEGIN POST_TX_CMPLT */
+
+  /* USER CODE END POST_TX_CMPLT */
+}
+[/#if]
 [/#if]
 
 [/#if]

@@ -4,7 +4,7 @@
 [#assign ospi_init_driver = "1"]
 [#assign ospi_erase_flash = "0"]
 [#assign glue_api = "DMA_API"]
-[#assign txrx_cmplt = "TxSem"]
+[#assign TRANSFER_NOTIFICATION = "ThreadX_Semaphore"]
 [#assign ospi_instance = 0]
 [#assign ospi_comp = "custom"]
 [#assign use_dma = 0]
@@ -31,8 +31,8 @@
       [#assign ospi_erase_flash = value]
     [/#if]
 
-    [#if name == "LX_OSPI_TRANSFER_CMPLT_NOTIF"]
-      [#assign txrx_cmplt = value]
+    [#if name == "TRANSFER_NOTIFICATION"]
+      [#assign TRANSFER_NOTIFICATION = value]
     [/#if]
 
     [#if name == "LX_OSPI_INSTANCE"]
@@ -92,7 +92,7 @@ extern "C" {
 /* USER CODE END ET */
 
 [#if glue_api == "DMA_API"]
-  [#if txrx_cmplt == "TxSem"]
+  [#if TRANSFER_NOTIFICATION == "ThreadX_Semaphore"]
 /* The following semaphore is being to notify about RX/TX completion. It needs to be released in the transfer callbacks */
 extern TX_SEMAPHORE ospi_rx_semaphore;
 extern TX_SEMAPHORE ospi_tx_semaphore;
@@ -134,7 +134,7 @@ extern TX_SEMAPHORE ospi_tx_semaphore;
 
 /* Macro called after initializing the OSPI driver
  * e.g. create a semaphore used for transfer notification */
-[#if glue_api == "DMA_API" && txrx_cmplt == "TxSem" ]
+[#if glue_api == "DMA_API" && TRANSFER_NOTIFICATION == "ThreadX_Semaphore" ]
  /* USER CODE BEGIN LX_STM32_OSPI_POST_INIT */
 
 #define LX_STM32_OSPI_POST_INIT()                        do { \
@@ -158,7 +158,7 @@ extern TX_SEMAPHORE ospi_tx_semaphore;
 
 /* Macro called before performing read operation */
 
-[#if glue_api == "DMA_API" && txrx_cmplt == "TxSem" ]
+[#if glue_api == "DMA_API" && TRANSFER_NOTIFICATION == "ThreadX_Semaphore" ]
 /* USER CODE BEGIN LX_STM32_OSPI_PRE_READ_TRANSFER */
 
 #define LX_STM32_OSPI_PRE_READ_TRANSFER(__status__)
@@ -174,7 +174,7 @@ extern TX_SEMAPHORE ospi_tx_semaphore;
 
 /* Define how to notify about Read completion operation */
 
-[#if glue_api == "DMA_API" && txrx_cmplt == "TxSem" ]
+[#if glue_api == "DMA_API" && TRANSFER_NOTIFICATION == "ThreadX_Semaphore" ]
 /* USER CODE BEGIN LX_STM32_OSPI_READ_CPLT_NOTIFY */
 
 #define LX_STM32_OSPI_READ_CPLT_NOTIFY(__status__)      do { \
@@ -219,7 +219,7 @@ extern TX_SEMAPHORE ospi_tx_semaphore;
 
 /* Define how to notify about write completion operation */
 
-[#if glue_api == "DMA_API" && txrx_cmplt == "TxSem" ]
+[#if glue_api == "DMA_API" && TRANSFER_NOTIFICATION == "ThreadX_Semaphore" ]
 /* USER CODE BEGIN LX_STM32_OSPI_WRITE_CPLT_NOTIFY */
 
 #define LX_STM32_OSPI_WRITE_CPLT_NOTIFY(__status__)     do { \

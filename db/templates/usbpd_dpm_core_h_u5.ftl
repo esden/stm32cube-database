@@ -74,7 +74,7 @@ void                USBPD_DPM_Run(void);
 [/#if]
 [#if !USBPDCORE_LIB_NO_PD]
 void                USBPD_DPM_TimerCounter(void);
-[/#if] /* USBPDCORE_LIB_NO_PD */
+[/#if]
 __WEAK void         USBPD_DPM_ErrorHandler(void);
 /* USER CODE BEGIN functions */
 

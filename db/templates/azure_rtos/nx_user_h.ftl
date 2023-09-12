@@ -1535,6 +1535,10 @@
 	[#if name == "NX_WEB_HTTP_SERVER_RETRY_MAX"]
       [#assign NX_WEB_HTTP_SERVER_RETRY_MAX_value = value]
     [/#if]
+	
+	[#if name == "NX_ENABLE_TCPIP_OFFLOAD"]
+      [#assign NX_ENABLE_TCPIP_OFFLOAD_value = value]
+    [/#if]
   [/#list]
 [/#if]
 [/#list]
@@ -5528,6 +5532,22 @@
 [#else]
 #define NX_WEB_HTTP_SERVER_RETRY_MAX			${NX_WEB_HTTP_SERVER_RETRY_MAX_value}
 [/#if]
+
+/* Defined, the TCP/IP offload feature is enabled.
+   NX_ENABLE_INTERFACE_CAPABILITY must be defined to enable this feature. */
+[#if NX_ENABLE_TCPIP_OFFLOAD_value == "0"]
+/*
+#define NX_ENABLE_TCPIP_OFFLOAD
+*/
+[#else]
+#define NX_ENABLE_TCPIP_OFFLOAD
+[/#if]
+
+#ifdef NX_DISABLE_IPV6
+#ifdef NX_DISABLE_IPV4
+#error "At least one of the IPv4 or IPv6 protocols must be enabled"
+#endif
+#endif
 
 /* USER CODE BEGIN 2 */
 

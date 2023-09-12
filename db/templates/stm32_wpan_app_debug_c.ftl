@@ -21,6 +21,9 @@
 #include "shci.h"
 #include "tl.h"
 #include "dbg_trace.h"
+[#if DIE == "DIE494"]
+#include "standby.h"
+[/#if]
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -39,8 +42,11 @@ typedef PACKED_STRUCT
 #define GPIO_NBR_OF_RF_SIGNALS                  9
 #define GPIO_CFG_NBR_OF_FEATURES                38
 #define NBR_OF_TRACES_CONFIG_PARAMETERS         4
+[#if DIE == "DIE494"]
+#define NBR_OF_GENERAL_CONFIG_PARAMETERS        14
+[#else]
 #define NBR_OF_GENERAL_CONFIG_PARAMETERS        4
-
+[/#if]
 /**
  * THIS SHALL BE SET TO A VALUE DIFFERENT FROM 0 ONLY ON REQUEST FROM ST SUPPORT
  */
@@ -67,7 +73,11 @@ typedef PACKED_STRUCT
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN PV */
 PLACE_IN_SECTION("MB_MEM2") ALIGN(4) static SHCI_C2_DEBUG_TracesConfig_t APPD_TracesConfig={0, 0, 0, 0};
+[#if DIE == "DIE494"]
+PLACE_IN_SECTION("MB_MEM2") ALIGN(4) static SHCI_C2_DEBUG_GeneralConfig_t APPD_GeneralConfig={BLE_DTB_CFG, SYS_DBG_CFG1, {0, 0}, 0, 0, 0, 0, 0};
+[#else]
 PLACE_IN_SECTION("MB_MEM2") ALIGN(4) static SHCI_C2_DEBUG_GeneralConfig_t APPD_GeneralConfig={BLE_DTB_CFG, SYS_DBG_CFG1, {0, 0}};
+[/#if]
 
 #ifdef CFG_DEBUG_TRACE_UART
 #if(CFG_HW_LPUART1_ENABLED == 1)
@@ -222,6 +232,14 @@ void APPD_Init( void )
 void APPD_EnableCPU2( void )
 {
 /* USER CODE BEGIN APPD_EnableCPU2 */
+[#if DIE == "DIE494"]
+  APPD_GeneralConfig.STBY_DebugGpioaPinList = STBY_DebugGpioaPinList;
+  APPD_GeneralConfig.STBY_DebugGpiobPinList = STBY_DebugGpiobPinList;
+  APPD_GeneralConfig.STBY_DebugGpiocPinList = STBY_DebugGpiocPinList;
+  APPD_GeneralConfig.STBY_DtbGpioaPinList = STBY_DtbGpioaPinList;
+  APPD_GeneralConfig.STBY_DtbGpiobPinList = STBY_DtbGpiobPinList;
+
+[/#if]
   SHCI_C2_DEBUG_Init_Cmd_Packet_t DebugCmdPacket =
   {
     {{0,0,0}},                            /**< Does not need to be initialized */
@@ -256,7 +274,43 @@ static void APPD_SetCPU2GpioConfig( void )
   uint16_t gpioa_pin_list;
   uint16_t gpiob_pin_list;
   uint16_t gpioc_pin_list;
+[#if DIE == "DIE494"]
+  gpioa_pin_list = STBY_DebugGpioaPinList;
+  gpiob_pin_list = STBY_DebugGpiobPinList;
+  gpioc_pin_list = STBY_DebugGpiocPinList;
+  
+  if(gpioa_pin_list == UINT16_MAX)
+  {
+    gpioa_pin_list = 0;
+    gpiob_pin_list = 0;
+    gpioc_pin_list = 0;
 
+    for(local_loop = 0 ; local_loop < GPIO_CFG_NBR_OF_FEATURES; local_loop++)
+    {
+      if( aGpioConfigList[local_loop].enable != 0)
+      {
+        switch((uint32_t)aGpioConfigList[local_loop].port)
+        {
+          case (uint32_t)GPIOA:
+            gpioa_pin_list |= aGpioConfigList[local_loop].pin;
+            break;
+          case (uint32_t)GPIOB:
+            gpiob_pin_list |= aGpioConfigList[local_loop].pin;
+            break;
+          case (uint32_t)GPIOC:
+            gpioc_pin_list |= aGpioConfigList[local_loop].pin;
+            break;
+          default:
+            break;
+        }
+      }
+    }
+    
+    STBY_DebugGpioaPinList = gpioa_pin_list;
+    STBY_DebugGpiobPinList = gpiob_pin_list;
+    STBY_DebugGpiocPinList = gpioc_pin_list;
+  }
+[#else]
   gpioa_pin_list = 0;
   gpiob_pin_list = 0;
   gpioc_pin_list = 0;
@@ -268,22 +322,20 @@ static void APPD_SetCPU2GpioConfig( void )
       switch((uint32_t)aGpioConfigList[local_loop].port)
       {
         case (uint32_t)GPIOA:
-            gpioa_pin_list |= aGpioConfigList[local_loop].pin;
+          gpioa_pin_list |= aGpioConfigList[local_loop].pin;
           break;
-
         case (uint32_t)GPIOB:
-            gpiob_pin_list |= aGpioConfigList[local_loop].pin;
+          gpiob_pin_list |= aGpioConfigList[local_loop].pin;
           break;
-
         case (uint32_t)GPIOC:
-            gpioc_pin_list |= aGpioConfigList[local_loop].pin;
+          gpioc_pin_list |= aGpioConfigList[local_loop].pin;
           break;
-
         default:
           break;
       }
     }
   }
+[/#if]
 
   gpio_config.Pull = GPIO_NOPULL;
   gpio_config.Mode = GPIO_MODE_OUTPUT_PP;
@@ -328,7 +380,37 @@ static void APPD_BleDtbCfg( void )
   uint8_t local_loop;
   uint16_t gpioa_pin_list;
   uint16_t gpiob_pin_list;
+[#if DIE == "DIE494"]
+  gpioa_pin_list = STBY_DtbGpioaPinList;
+  gpiob_pin_list = STBY_DtbGpiobPinList;
 
+  if(gpioa_pin_list == UINT16_MAX)
+  {
+    gpioa_pin_list = 0;
+    gpiob_pin_list = 0;
+    
+    for(local_loop = 0 ; local_loop < GPIO_NBR_OF_RF_SIGNALS; local_loop++)
+    {
+      if( aRfConfigList[local_loop].enable != 0)
+      {
+        switch((uint32_t)aRfConfigList[local_loop].port)
+        {
+          case (uint32_t)GPIOA:
+            gpioa_pin_list |= aRfConfigList[local_loop].pin;
+            break;
+          case (uint32_t)GPIOB:
+            gpiob_pin_list |= aRfConfigList[local_loop].pin;
+            break;
+          default:
+            break;
+        }
+      }
+    }
+    
+    STBY_DtbGpioaPinList = gpioa_pin_list;
+    STBY_DtbGpiobPinList = gpiob_pin_list;
+  }
+[#else]
   gpioa_pin_list = 0;
   gpiob_pin_list = 0;
 
@@ -339,19 +421,17 @@ static void APPD_BleDtbCfg( void )
       switch((uint32_t)aRfConfigList[local_loop].port)
       {
         case (uint32_t)GPIOA:
-            gpioa_pin_list |= aRfConfigList[local_loop].pin;
+          gpioa_pin_list |= aRfConfigList[local_loop].pin;
           break;
-
         case (uint32_t)GPIOB:
-            gpiob_pin_list |= aRfConfigList[local_loop].pin;
+          gpiob_pin_list |= aRfConfigList[local_loop].pin;
           break;
-
         default:
           break;
       }
     }
   }
-
+[/#if]
   gpio_config.Pull = GPIO_NOPULL;
   gpio_config.Mode = GPIO_MODE_AF_PP;
   gpio_config.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
@@ -372,6 +452,11 @@ static void APPD_BleDtbCfg( void )
     __HAL_RCC_C2GPIOB_CLK_ENABLE();
     HAL_GPIO_Init(GPIOB, &gpio_config);
   }
+[#if DIE == "DIE494"]
+#else
+  STBY_DtbGpioaPinList = 0;
+  STBY_DtbGpiobPinList = 0;
+[/#if]
 #endif
 
 /* USER CODE END APPD_BleDtbCfg */

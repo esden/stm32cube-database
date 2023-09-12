@@ -67,6 +67,7 @@ static osSemaphoreId_t Sem_MbLoRaRespRcv;
 osThreadId_t Thd_LoraNotifRcvProcessId;
 [/#if]
 [#if THREADX??]
+static __IO uint8_t Thd_LoraNotifRcv_RescheduleFlag = 0;
 static TX_THREAD Thd_LoraNotifRcv;
 static TX_SEMAPHORE Sem_MbLoraRespRcv;
 [/#if]
@@ -311,6 +312,10 @@ static void MBMUXIF_IsrLoraNotifRcvCb(void *ComObj)
   /* USER CODE END MBMUXIF_IsrLoraNotifRcvCb_1 */
   LoraComObj = (MBMUX_ComParam_t *) ComObj;
 [#if THREADX??][#-- If AzRtos is used --]
+  if (Thd_LoraNotifRcv_RescheduleFlag < 255)
+  {
+    Thd_LoraNotifRcv_RescheduleFlag++;
+  }
   tx_thread_resume(&Thd_LoraNotifRcv);
 [#else]
 [#if !FREERTOS??][#-- If FreeRtos is not used --]
@@ -365,7 +370,17 @@ static void Thd_MbLoraNotifRcv_Entry(ULONG thread_input)
   /* Infinite loop */
   for (;;)
   {
-    tx_thread_suspend(&Thd_LoraNotifRcv);
+    if (Thd_LoraNotifRcv_RescheduleFlag > 0)
+    {
+      /* if RescheduleFlag was set during MBMUXIF_TaskLoraNotifRcv() don't suspend  */
+      Thd_LoraNotifRcv_RescheduleFlag--;
+    }
+    else
+    {
+      tx_thread_suspend(&Thd_LoraNotifRcv);
+      /* if RescheduleFlag was set during suspend it should be reset */
+      Thd_LoraNotifRcv_RescheduleFlag = 0;
+    }
     MBMUXIF_TaskLoraNotifRcv();  /*what you want to do*/
     /* USER CODE BEGIN Thd_MbLoraNotifRcv_Entry_2 */
 

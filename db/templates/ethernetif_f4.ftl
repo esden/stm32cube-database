@@ -142,9 +142,9 @@
 /* Private variables ---------------------------------------------------------*/
 /* 
 @Note: This interface is implemented to operate in zero-copy mode only:
-        - Rx buffers are allocated statically and passed directly to the LwIP stack
-          they will return back to ETH DMA after been processed by the stack.
-        - Tx Buffers will be allocated from LwIP stack memory heap, 
+        - Rx buffers will be allocated from LwIP stack memory heap,
+          then passed to ETH HAL driver.
+        - Tx buffers will be allocated from LwIP stack memory heap, 
           then passed to ETH HAL driver.
 
 @Notes: 
@@ -181,9 +181,6 @@ LWIP_MEMPOOL_DECLARE(RX_POOL, ETH_RX_BUFFER_CNT, sizeof(RxBuff_t), "Zero-copy RX
 
 /* Variable Definitions */
 static uint8_t RxAllocStatus;
-
-__IO uint32_t TxPkt = 0;
-__IO uint32_t RxPkt = 0;
 
 ETH_DMADescTypeDef  DMARxDscrTab[ETH_RX_DESC_CNT]; /* Ethernet Rx DMA Descriptors */
 ETH_DMADescTypeDef  DMATxDscrTab[ETH_TX_DESC_CNT]; /* Ethernet Tx DMA Descriptors */
@@ -457,7 +454,7 @@ static void low_level_init(struct netif *netif)
 }
 
 /**
- * This function should do the actual transmission of the packet. The packet is
+ * @brief This function should do the actual transmission of the packet. The packet is
  * contained in the pbuf that is passed to the function. This pbuf
  * might be chained.
  *
@@ -477,7 +474,7 @@ static err_t low_level_output(struct netif *netif, struct pbuf *p)
   uint32_t i = 0U;
   struct pbuf *q = NULL;
   err_t errval = ERR_OK;
-  ETH_BufferTypeDef Txbuffer[ETH_TX_DESC_CNT];
+  ETH_BufferTypeDef Txbuffer[ETH_TX_DESC_CNT] = {0};
   
   memset(Txbuffer, 0 , ETH_TX_DESC_CNT*sizeof(ETH_BufferTypeDef));
   
@@ -528,7 +525,7 @@ static err_t low_level_output(struct netif *netif, struct pbuf *p)
 }
 
 /**
- * Should allocate a pbuf and transfer the bytes of the incoming
+ * @brief Should allocate a pbuf and transfer the bytes of the incoming
  * packet from the interface into the pbuf.
  *
  * @param netif the lwip network interface structure for this ethernetif
@@ -548,7 +545,7 @@ static struct pbuf * low_level_input(struct netif *netif)
 }
 
 /**
- * This function should be called when a packet is ready to be read
+ * @brief This function should be called when a packet is ready to be read
  * from the interface. It uses the function low_level_input() that
  * should handle the actual reception of bytes from the network
  * interface. Then the type of the received packet is determined and
@@ -629,7 +626,7 @@ static err_t low_level_output_arp_off(struct netif *netif, struct pbuf *q, const
 #endif /* LWIP_ARP */ 
 
 /**
- * Should be called at the beginning of the program to set up the
+ * @brief Should be called at the beginning of the program to set up the
  * network interface. It calls the function low_level_init() to do the
  * actual setup of the hardware.
  *
@@ -705,8 +702,6 @@ void pbuf_free_custom(struct pbuf *p)
     RxAllocStatus = RX_ALLOC_OK;
 [#if with_rtos == 1]
     osSemaphoreRelease(RxPktSemaphore);
-[#else][#-- else with_rtos --]
-    RxPkt = 1 ;
 [/#if][#-- endif with_rtos --]
   }
 }
@@ -729,6 +724,11 @@ u32_t sys_now(void)
 
 [#if bsp == 1]
 
+/**
+  * @brief  Initializes the ETH MSP.
+  * @param  ethHandle: ETH handle
+  * @retval None
+  */
 [#include mxTmpFolder+"/eth_Msp.tmp"]
 
 /*******************************************************************************
@@ -811,7 +811,6 @@ int32_t ETH_PHY_IO_GetTick(void)
 
 /**
   * @brief  Check the ETH link state then update ETH driver and netif link accordingly.
-  * @param  argument: netif
   * @retval None
   */
 [#if with_rtos == 1]
@@ -911,7 +910,7 @@ void ethernet_link_check_state(struct netif *netif)
 void HAL_ETH_RxAllocateCallback(uint8_t **buff)
 {
 /* USER CODE BEGIN HAL ETH RxAllocateCallback */
-
+[#if custom_pbuf == 1]
   struct pbuf_custom *p = LWIP_MEMPOOL_ALLOC(RX_POOL);
   if (p)
   {
@@ -928,6 +927,7 @@ void HAL_ETH_RxAllocateCallback(uint8_t **buff)
     RxAllocStatus = RX_ALLOC_ERROR;
     *buff = NULL;
   }
+[/#if][#-- endif custom_pbuf --]   
 /* USER CODE END HAL ETH RxAllocateCallback */  
 }
 

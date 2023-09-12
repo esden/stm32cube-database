@@ -174,7 +174,7 @@ in voltage and temperature.*/
 #define  VDD_VALUE                    ([#if vdd_value??]${vdd_value}[#else]3300[/#if]UL)                                        /*!< Value of VDD in mv */
 #define  TICK_INT_PRIORITY            [#if TICK_INT_PRIORITY??]${TICK_INT_PRIORITY}U[#else]((1U<<__NVIC_PRIO_BITS) - 1U)[/#if] /*!< tick interrupt priority */       
 #define  USE_RTOS                     [#if advancedSettings?? && advancedSettings.USE_RTOS??]${advancedSettings.USE_RTOS}[#else]0[/#if]U
-#define  PREFETCH_ENABLE              [#if PREFETCH_ENABLE??]1[#else]1[/#if]U
+#define  PREFETCH_ENABLE              [#if PREFETCH_ENABLE??]${PREFETCH_ENABLE}[#else]0[/#if]U
 #define  INSTRUCTION_CACHE_ENABLE     [#if INSTRUCTION_CACHE_ENABLE??]${INSTRUCTION_CACHE_ENABLE}[#else]1[/#if]U
 
    

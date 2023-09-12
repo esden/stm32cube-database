@@ -121,6 +121,7 @@ __IO int16_t RssiBuffWriteIdx;
 int16_t RssiBuffReadIdx;
 static void process_MonarchBackGround(void);
 [#if THREADX??][#-- If AzRtos is used --]
+static __IO uint8_t Thd_MonarchProcess_RescheduleFlag = 0;
 static TX_THREAD Thd_MonarchProcessId;
 static uint8_t FirstTimeInit = 1;
 [/#if]
@@ -528,6 +529,10 @@ void HAL_LPTIM_AutoReloadMatchCallback(LPTIM_HandleTypeDef *hlptim)
     }
     /*run process_MonarchBackGround in background*/
 [#if THREADX??][#-- If AzRtos is used --]
+    if (Thd_MonarchProcess_RescheduleFlag < 255)
+    {
+      Thd_MonarchProcess_RescheduleFlag++;
+    }
     tx_thread_resume(&Thd_MonarchProcessId);
 [#else]
 [#if !FREERTOS??][#-- If FreeRtos is not used --]
@@ -576,7 +581,17 @@ void Thd_MonarchProcess_Entry(unsigned long thread_input)
   /* Infinite loop */
   while (1)
   {
-    tx_thread_suspend(&Thd_MonarchProcessId);
+    if (Thd_MonarchProcess_RescheduleFlag > 0)
+    {
+      /* if RescheduleFlag was set during process_MonarchBackGround() don't suspend  */
+      Thd_MonarchProcess_RescheduleFlag--;
+    }
+    else
+    {
+      tx_thread_suspend(&Thd_MonarchProcessId);
+      /* if RescheduleFlag was set during suspend it should be reset */
+      Thd_MonarchProcess_RescheduleFlag = 0;
+    }
     process_MonarchBackGround();
     /*do what you want*/
     /* USER CODE BEGIN Thd_MonarchProcess_Entry_Loop */

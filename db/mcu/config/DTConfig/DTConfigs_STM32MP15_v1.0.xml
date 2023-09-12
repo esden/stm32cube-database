@@ -4,6 +4,11 @@
 
 <DTConfigs xsi:noNamespaceSchemaLocation="" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
+	<!--DB features list-->
+	<DbFeaturesList>
+		<Feature Name="noUBootSplSupport"/>
+	</DbFeaturesList>
+
 	<Configs>
 
 		<!--Devices creation-->
@@ -13,7 +18,7 @@
 
 		<Device MatcherMxDM="DFSDM1" MatchToName="DFSDM"/>
 
-		<Device MatcherMxDM="DMA" MatchToName="DMAMUX1" SetterMatcherCtxt="(^CortexA7NS)" />
+		<Device MatcherMxDM="DMA" MatchToName="DMAMUX1" SetterMatcherCtxt="(^CortexA7NS$)" />
 
 		<Device MatcherMxDM="(ETZPC)" MatchToName="$1" FilterMatcherCtxt="(^CortexA7S$)" />
 
@@ -47,14 +52,43 @@
 		<!--default config-->
 		<DefaultGenProcessConfig />
 
-		<!-- TF-A -->
+		<GenProcessConfig GenType="ddrConfigGen" ProcessName="ddrConfigGen">
+			<Output UpdateDirective="removeElmt">
+				<GenFolderId>u-boot</GenFolderId>
+			</Output>
+		</GenProcessConfig>
+
+		<GenProcessConfig GenType="dtsBind" ProcessName="uboot-dtsBind">
+			<Input UpdateDirective="removeElmt">
+				<MatcherCtxt>BootLoader</MatcherCtxt>
+				<MatchToFw>U-BOOT</MatchToFw>
+			</Input>
+			<Input>
+				<MatcherCtxt></MatcherCtxt>
+				<MatchToFw>U-BOOT</MatchToFw>
+			</Input>
+		</GenProcessConfig>
 
 		<GenProcessConfig GenType="dtsBind" ProcessName="fwconfig-dtsBind">
 			<Configs>
 				<OutputNameSuffix>-fw-config</OutputNameSuffix>
 				<OutputNameExtension>dts</OutputNameExtension>
-				<Binding>tpl_dts-v1_fw-config_v1-0_dts.ftl</Binding>
+				<Binding>tpl_dts-v1_fw-config_v1-1_dts.ftl</Binding>
 			</Configs>
+		</GenProcessConfig>
+
+		<GenProcessConfig GenType="dtsBind" ProcessName="optee-dtsBind">
+			<Input>
+				<MatcherCtxt>CortexA7S</MatcherCtxt>
+				<MatchToFw>OP-TEE</MatchToFw>
+			</Input>
+			<Configs>
+				<OutputNameExtension>dts</OutputNameExtension>
+				<Binding>tpl_dts-v1_op-tee_v1-0_dts.ftl</Binding>
+			</Configs>
+			<Output>
+				<GenFolderId>op-tee</GenFolderId>
+			</Output>
 		</GenProcessConfig>
 
 
@@ -146,10 +180,12 @@
 		</DTGenCfg>
 
 		<DTGenCfg  MatcherDevice="ETZPC" MatchToName="">
+			<Binding MatcherFw="(^SP_MIN$)" Name="st-stm32-etzpc_v1.0_mp15_sp-min_Binding">
+			</Binding>
 			<Binding MatcherFw="(^.+$)" Name="st-stm32-etzpc_v1.0_mp15_Binding">
 			</Binding>
 
-			<Bind MatcherFw="(^SP_MIN$)" />
+			<Bind MatcherFw="(^SP_MIN|OP-TEE$)" />
 		</DTGenCfg>
 
 		<DTGenCfg  MatcherDevice="FDCAN(.+)" MatchToName="">
@@ -223,9 +259,9 @@
 		</DTGenCfg>
 
 		<DTGenCfg  MatcherDevice="RCC" MatchToName="">
-			<Binding MatcherFw="(^LINUX$)" Name="default_v1.0_Binding">
+			<Binding MatcherFw="(^U-BOOT|LINUX$)" Name="default_v1.0_Binding">
 			</Binding>
-			<Binding MatcherFw="(^TF-A|SP_MIN|U-BOOT$)" Name="st-stm32mp1-rcc_v1.0_Binding"> <!--tf-a & sp_min are exclusive, only one will match-->
+			<Binding MatcherFw="(^TF-A|SP_MIN|OP-TEE$)" Name="st-stm32mp1-rcc_v1.0_Binding">
 			</Binding>
 
 			<Bind MatcherFw="(?!^(CUBE)$)(^.+$)" />
@@ -310,7 +346,7 @@
 		<!--HW sections cfg-->
 
 		<DTGenCfg MatcherDevice="" MatchToName="socdevices_common">
-			<Binding  MatcherFw="(^.+$)" Name="socdevices_common_v1.0_Binding">
+			<Binding  MatcherFw="(^.+$)" Name="socdevices_common_v1.1_Binding">
 			</Binding>
 
 			<Bind MatcherFw="(^.+$)" />
@@ -324,17 +360,19 @@
 		</DTGenCfg>
 
 		<DTGenCfg MatcherDevice="" MatchToName="clocks">
-			<Binding  MatcherFw="(^.+$)" Name="clocks_v1.0_Binding">
+			<Binding  MatcherFw="(^TF-A|OP-TEE$)" Name="clocks_v1.0_Binding">
+			</Binding>
+			<Binding  MatcherFw="(^LINUX$)" Name="clocks_v1.1_Binding">
 			</Binding>
 
-			<Bind MatcherFw="(^LINUX|TF-A|U-BOOT$)" />
+			<Bind MatcherFw="(^LINUX|TF-A|OP-TEE$)" />
 		</DTGenCfg>
 
 		<DTGenCfg MatcherDevice="" MatchToName="pinctrl">
 			<Binding  MatcherFw="(^.+$)" Name="st-stm32-pinctrl_v1.0_Binding">
 			</Binding>
 
-			<Bind MatcherFw="(^LINUX|TF-A|U-BOOT$)" />
+			<Bind MatcherFw="(^LINUX|U-BOOT|TF-A|OP-TEE$)" />
 		</DTGenCfg>
 
 	</Configs>

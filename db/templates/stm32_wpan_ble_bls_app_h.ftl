@@ -12,8 +12,8 @@
 /* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __BLS_APP_H
-#define __BLS_APP_H
+#ifndef BLS_APP_H
+#define BLS_APP_H
 
 #ifdef __cplusplus
 extern "C" 
@@ -46,7 +46,6 @@ void BLSAPP_Measurement(void);
 void BLSAPP_IntCuffPressure(void);
 /* USER CODE BEGIN EFP */
 
-
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
@@ -58,6 +57,4 @@ void BLSAPP_IntCuffPressure(void);
 }
 #endif
 
-#endif /*__BLS_APP_H */
-
-/* USER CODE END */
+#endif /*BLS_APP_H */

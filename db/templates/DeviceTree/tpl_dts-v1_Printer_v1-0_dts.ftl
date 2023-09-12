@@ -484,6 +484,8 @@ pParentElmt belongs to DTDtsElmtDM type.--]
 				[#--else: parent.parent is .dts level => stop algorithm--]
 				[/#if]
 			[/#if]
+
+			[#local usName = usName?replace(",", "-")]
 		[#else]
 			[#local errors = "empty parent"]
 		[/#if]

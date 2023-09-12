@@ -1450,6 +1450,13 @@ int32_t BSP_${IpInstance}_SendRecv_DMA(uint8_t *pTxData, uint8_t *pRxData, uint1
 
 [#-- macro generateBspUSART_Driver --]
 [#macro generateBspUSART_Driver IpInstance bsp]
+[#assign ipName = bsp.ipNameUsed]
+[#assign halMode = false]
+[#if bsp.halMode == ipName]
+    [#assign halMode = true]
+[#else]	  
+	[#assign halModeName = bsp.halMode]	
+[/#if]
 /*******************************************************************************
                             BUS OPERATIONS OVER USART
 *******************************************************************************/
@@ -1483,7 +1490,11 @@ int32_t BSP_${IpInstance}_Init(void)
       if(ret == BSP_ERROR_NONE)
       {
         /* Init the UART */
+        [#if halMode]
+        if (MX_${IpInstance}_Init(&h${IpInstance?lower_case?replace("s","")}) != HAL_OK)
+        [#else]
         if (MX_${IpInstance}_UART_Init(&h${IpInstance?lower_case?replace("s","")}) != HAL_OK)
+        [/#if]
         {
           ret = BSP_ERROR_BUS_FAILURE;
         }
@@ -2036,7 +2047,7 @@ static uint32_t Compute_SCLL_SCLH (uint32_t clock_src_freq, uint32_t I2C_speed)
   * @brief  Convert the SPI baudrate into prescaler.
   * @param  clock_src_hz : SPI source clock in HZ.
   * @param  baudrate_mbps : SPI baud rate in mbps.
-  * @retval Prescaler dividor
+  * @retval Prescaler divisor
   */
 static uint32_t SPI_GetPrescaler( uint32_t clock_src_hz, uint32_t baudrate_mbps )
 {

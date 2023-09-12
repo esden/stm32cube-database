@@ -65,6 +65,7 @@ UTIL_MEM_PLACE_IN_SECTION("MB_MEM1") uint32_t aSigfoxCmdRespBuff[MAX_PARAM_OF_SI
 UTIL_MEM_PLACE_IN_SECTION("MB_MEM1") uint32_t aSigfoxNotifAckBuff[MAX_PARAM_OF_SIGFOX_NOTIF_FUNCTIONS];/*shared*/
 
 [#if THREADX??]
+static __IO uint8_t Thd_SigfoxNotifRcv_RescheduleFlag = 0;
 static TX_THREAD Thd_SigfoxNotifRcv;
 static TX_SEMAPHORE Sem_MbSigfoxRespRcv;
 [/#if]
@@ -299,6 +300,10 @@ static void MBMUXIF_IsrSigfoxNotifRcvCb(void *ComObj)
   /* USER CODE END MBMUXIF_IsrSigfoxNotifRcvCb_1 */
   SigfoxComObj = (MBMUX_ComParam_t *) ComObj;
 [#if THREADX??][#-- If AzRtos is used --]
+  if (Thd_SigfoxNotifRcv_RescheduleFlag < 255)
+  {
+    Thd_SigfoxNotifRcv_RescheduleFlag++;
+  }
   tx_thread_resume(&Thd_SigfoxNotifRcv);
 [#else]
 [#if !FREERTOS??][#-- If FreeRtos is not used --]
@@ -353,7 +358,17 @@ static void Thd_MbSigfoxNotifRcv_Entry(ULONG thread_input)
   /* Infinite loop */
   for (;;)
   {
-    tx_thread_suspend(&Thd_SigfoxNotifRcv);
+    if (Thd_SigfoxNotifRcv_RescheduleFlag > 0)
+    {
+      /* if RescheduleFlag was set during MBMUXIF_TaskSigfoxNotifRcv() don't suspend  */
+      Thd_SigfoxNotifRcv_RescheduleFlag--;
+    }
+    else
+    {
+      tx_thread_suspend(&Thd_SigfoxNotifRcv);
+      /* if RescheduleFlag was set during suspend it should be reset */
+      Thd_SigfoxNotifRcv_RescheduleFlag = 0;
+    }
     MBMUXIF_TaskSigfoxNotifRcv();  /*what you want to do*/
     /* USER CODE BEGIN Thd_MbSigfoxNotifRcv_Entry_2 */
 

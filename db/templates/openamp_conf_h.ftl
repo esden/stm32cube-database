@@ -15,13 +15,13 @@
 #ifndef __OPENAMP_CONF__H__
 #define __OPENAMP_CONF__H__
 
-#ifdef __cplusplus
- extern "C" {
-#endif
-
 /* Includes ------------------------------------------------------------------*/
 #if defined (__LOG_TRACE_IO_) || defined(__LOG_UART_IO_)
 #include "openamp_log.h"
+#endif
+
+#ifdef __cplusplus
+ extern "C" {
 #endif
 
  /* ########################## Mailbox Interface Selection ############################## */

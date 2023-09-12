@@ -327,7 +327,7 @@ static void OnPingSlotPeriodicityChanged(uint8_t pingSlotPeriodicity);
 static void OnSystemReset(void);
 
 [#if THREADX??][#-- If AzRtos is used --]
-[#if  (CPUCORE == "") ]
+[#if  (CPUCORE == "") && ((SUBGHZ_APPLICATION == "LORA_END_NODE") || (SUBGHZ_APPLICATION == "LORA_AT_SLAVE"))]
 /**
   * @brief  Entry point for the thread when receiving MailBox LmHandler Notification
   * @param  thread_input Not used
@@ -385,7 +385,8 @@ static void OnJoinTimerLedEvent(void *context);
 
 /* Private variables ---------------------------------------------------------*/
 [#if THREADX??][#-- If AzRtos is used --]
-[#if  (CPUCORE == "") ]
+[#if  (CPUCORE == "") && ((SUBGHZ_APPLICATION == "LORA_END_NODE") || (SUBGHZ_APPLICATION == "LORA_AT_SLAVE"))]
+static __IO uint8_t Thd_LmHandlerProcess_RescheduleFlag = 0;
 TX_THREAD Thd_LmHandlerProcessId;
 [/#if]
 [#if (SUBGHZ_APPLICATION == "LORA_AT_SLAVE")]
@@ -1003,7 +1004,16 @@ static void Thd_LmHandlerProcess_Entry(unsigned long thread_input)
   /* Infinite loop */
   for (;;)
   {
-    tx_thread_suspend(&Thd_LmHandlerProcessId);
+    if (Thd_LmHandlerProcess_RescheduleFlag > 0)
+    {
+      APP_LOG(TS_ON, VLEVEL_H, "Thd_LmHandlerProcess_RescheduleFlag: %d \n", Thd_LmHandlerProcess_RescheduleFlag);
+    }
+    else
+    {
+      tx_thread_suspend(&Thd_LmHandlerProcessId);
+      APP_LOG(TS_ON, VLEVEL_H, "Thd_LmHandlerProcess resumed from suspend \n");
+    }
+    Thd_LmHandlerProcess_RescheduleFlag = 0;
     LmHandlerProcess();
     /* USER CODE BEGIN Thd_LmHandlerProcess_Entry_2 */
 
@@ -1601,6 +1611,10 @@ static void OnMacProcessNotify(void)
 [#if (SUBGHZ_APPLICATION == "LORA_END_NODE") || (SUBGHZ_APPLICATION == "LORA_AT_SLAVE")]
 [#if CPUCORE != "CM4"]
 [#if THREADX??]
+  if (Thd_LmHandlerProcess_RescheduleFlag < 255)
+  {
+    Thd_LmHandlerProcess_RescheduleFlag++;
+  }
   tx_thread_resume(&Thd_LmHandlerProcessId);
 [#elseif FREERTOS??]
   osThreadFlagsSet(Thd_LmHandlerProcessId, 1);

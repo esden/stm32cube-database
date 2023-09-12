@@ -1,23 +1,16 @@
 [#ftl]
-/**************************************************************************/
-/*                                                                        */
-/*       Copyright (c) Microsoft Corporation. All rights reserved.        */
-/*                                                                        */
-/*       This software is licensed under the Microsoft Software License   */
-/*       Terms for Microsoft Azure RTOS. Full text of the license can be  */
-/*       found in the LICENSE file at https://aka.ms/AzureRTOS_EULA       */
-/*       and in the root directory of this software.                      */
-/*                                                                        */
-/**************************************************************************/
-
 [#compress]
 [#list SWIPdatas as SWIP]
 [#if SWIP.defines??]
   [#list SWIP.defines as definition]
     [#assign value = definition.value]
     [#assign name = definition.name]
-    [#if name == "GLUE_FUNCTIONS"]
-      [#assign glue_functions = value]
+	[#if name == "MMC_INSTANCE"]
+		[#if value == "0"]
+			[#assign mmc_instance = 0]
+		[#else]
+			[#assign mmc_instance = 1]
+		[/#if]
     [/#if]
 	[#if name == "SDMMC_INSTANCE"]
 		[#if value == "0"]
@@ -30,10 +23,21 @@
 [/#if]
 [/#list]
 [/#compress]
+/**************************************************************************/
+/*                                                                        */
+/*       Copyright (c) Microsoft Corporation. All rights reserved.        */
+/*                                                                        */
+/*       This software is licensed under the Microsoft Software License   */
+/*       Terms for Microsoft Azure RTOS. Full text of the license can be  */
+/*       found in the LICENSE file at https://aka.ms/AzureRTOS_EULA       */
+/*       and in the root directory of this software.                      */
+/*                                                                        */
+/**************************************************************************/
+
 
 #include "fx_stm32_mmc_driver.h"
 
-extern MMC_HandleTypeDef hsd${mmc_instance+1};
+extern MMC_HandleTypeDef hmmc${mmc_instance+1};
 #if (FX_STM32_MMC_INIT == 1)
 extern void MX_SDMMC${mmc_instance+1}_MMC_Init(void);
 #endif

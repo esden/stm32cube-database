@@ -98,7 +98,7 @@
 
 /* USER CODE END 0 */
 /* Private function prototypes -----------------------------------------------*/
-[#if ((series == "stm32h7") || (series == "stm32f4")) && (netif_callback == 1) ]
+[#if ((series == "stm32h7") || (series == "stm32f4") || (series == "stm32f7")) && (netif_callback == 1) ]
 static void ethernet_link_status_updated(struct netif *netif);
 [#if with_rtos == 0]
 static void Ethernet_Link_Periodic_Handle(struct netif *netif);
@@ -401,7 +401,7 @@ uint32_t DHCPcoarseTimer = 0;
 /* USER CODE BEGIN 1 */
 
 /* USER CODE END 1 */
-[#if (series != "stm32h7") && (series != "stm32f4")]
+[#if (series != "stm32h7") && (series != "stm32f4") && (series != "stm32f7")]
   [#if (netif_callback == 1) && (with_rtos == 1)]
 /* Semaphore to signal Ethernet Link state update */
 osSemaphoreId Netif_LinkSemaphore = NULL;
@@ -564,13 +564,13 @@ void MX_LWIP_Init(void)
 #n  
 [#if (netif_callback == 1) ] [#-- No RTOS needed --]
 #t/* Set the link callback function, this function is called on change of link status*/
-[#if (series != "stm32h7") && (series != "stm32f4")]
+[#if (series != "stm32h7") && (series != "stm32f4") && (series != "stm32f7")]
 #tnetif_set_link_callback(&gnetif, ethernetif_update_config);
-[#else][#-- case series == "stm32h7/f4" --]
+[#else][#-- case series == "stm32h7/f7/f4" --]
 #tnetif_set_link_callback(&gnetif, ethernet_link_status_updated);
 [/#if][#-- endif series --]
 #n 
-[#if ((series != "stm32h7") && (series != "stm32f4")) && (with_rtos == 1)]
+[#if ((series != "stm32h7") && (series != "stm32f4") && (series != "stm32f7")) && (with_rtos == 1)]
 #t/* create a binary semaphore used for informing ethernetif of frame reception */
 [#if cmsis_version = "v2"]
 #tNetif_LinkSemaphore = osSemaphoreNew(1, 1, NULL);
@@ -596,7 +596,7 @@ void MX_LWIP_Init(void)
 #tosThreadCreate (osThread(LinkThr), &link_arg);
 /* USER CODE END OS_THREAD_DEF_CREATE_CMSIS_RTOS_V1 */
 [/#if][#-- endif cmsis_version --]
-[#else][#-- case series == "stm32h7/f4" --]
+[#else][#-- case series == "stm32h7/f7/f4" --]
 #t/* Create the Ethernet link handler thread */
 [#if with_rtos == 1]
 [#if cmsis_version = "v2"]
@@ -636,7 +636,7 @@ void MX_LWIP_Init(void)
 #endif
 
 #n
-[#if (series == "stm32h7") || (series == "stm32f4")]
+[#if (series == "stm32h7") || (series == "stm32f4") || (series == "stm32f7")]
 [#if (with_rtos == 0) && (netif_callback == 1)] 
 /**
   * @brief  Ethernet Link periodic check
@@ -685,7 +685,7 @@ void MX_LWIP_Process(void)
   sys_check_timeouts();
 [/#if][#-- endif lwip_timers --]
 
-[#if ((series == "stm32h7") || (series == "stm32f4")) && (netif_callback == 1)]  
+[#if ((series == "stm32h7") || (series == "stm32f4") || (series == "stm32f7")) && (netif_callback == 1)]  
   Ethernet_Link_Periodic_Handle(&gnetif);
 [/#if][#-- endif series && netif_callback --] 
 
@@ -695,7 +695,7 @@ void MX_LWIP_Process(void)
 [/#if][#-- endif with_rtos --]
 
 
-[#if (netif_callback == 1) && ((series == "stm32h7") || (series == "stm32f4"))]
+[#if (netif_callback == 1) && ((series == "stm32h7") || (series == "stm32f4") || (series == "stm32f7"))]
 /**
   * @brief  Notify the User about the network interface config status 
   * @param  netif: the network interface

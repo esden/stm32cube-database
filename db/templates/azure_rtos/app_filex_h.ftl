@@ -32,6 +32,9 @@ extern "C" {
 [#if name?contains("FX_SD_INTERFACE") && value == "1"]
 #include "fx_stm32_sd_driver.h"
 [/#if]
+[#if name?contains("FX_MMC_INTERFACE") && value == "1"]
+#include "fx_stm32_mmc_driver.h"
+[/#if]
 [#if name?contains("FX_LX_NOR_INTERFACE") && value == "1"]
 #include "fx_stm32_levelx_nor_driver.h"
 [/#if]

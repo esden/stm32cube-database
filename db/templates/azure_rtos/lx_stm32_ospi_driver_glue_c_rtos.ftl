@@ -4,7 +4,6 @@
 [#assign ospi_init_driver = "1"]
 [#assign ospi_erase_flash = "0"]
 [#assign glue_api = "DMA_API"]
-[#assign txrx_cmplt = "TxSem"]
 
 [#assign ospi_comp = "custom"]
 [#assign ospi_instance = 1]
@@ -31,10 +30,6 @@
       [#assign ospi_erase_flash = value]
     [/#if]
 
-    [#if name == "LX_OSPI_TRANSFER_CMPLT_NOTIF"]
-      [#assign txrx_cmplt = value]
-    [/#if]
-
     [#if name == "LX_OSPI_INSTANCE"]
     [#if value == "1"]
       [#assign ospi_instance = 2]
@@ -47,6 +42,10 @@
 
 	[#if name == "LX_USE_OCTOSPI"]
       [#assign LX_USE_OCTOSPI_value = value]
+    [/#if]
+	
+	[#if name == "TRANSFER_NOTIFICATION"]
+      [#assign TRANSFER_NOTIFICATION_value = value]
     [/#if]
 	
   [/#list]
@@ -67,7 +66,7 @@
 [#if LX_USE_OCTOSPI_value == "octo SPI"]
 [#if ospi_comp == "MX25LM51245G"]
 
-/* HAL Polling based implementation for OctoSPI component MX25LM51245G
+/* HAL DMA API implementation for OctoSPI component MX25LM51245G
  * The present implementation assumes the following settings are set:
 
   Instance              = OCTOSPI${ospi_instance}
@@ -104,7 +103,7 @@ ULONG ospi_sector_buffer[LX_STM32_OSPI_SECTOR_SIZE / sizeof(ULONG)];
 /* USER CODE END SECTOR_BUFFER */
 [#if glue_api == "DMA_API"]
 
-[#if txrx_cmplt == "TxSem"]
+[#if TRANSFER_NOTIFICATION_value == "ThreadX_Semaphore"]
 TX_SEMAPHORE ospi_rx_semaphore;
 TX_SEMAPHORE ospi_tx_semaphore;
 [/#if]
@@ -371,7 +370,7 @@ INT lx_stm32_ospi_write(UINT instance, ULONG *address, ULONG *buffer, ULONG word
   /* USER CODE END PRE_OSPI_WRITE */
 
 [#if glue_api == "DMA_API"]
-
+[#if TRANSFER_NOTIFICATION_value == "ThreadX_Semaphore"]
   /* Calculation of the size between the write address and the end of the page */
   current_size = LX_STM32_OSPI_PAGE_SIZE - ((uint32_t)address % LX_STM32_OSPI_PAGE_SIZE);
 
@@ -456,6 +455,93 @@ INT lx_stm32_ospi_write(UINT instance, ULONG *address, ULONG *buffer, ULONG word
    /* Release ospi_transfer_semaphore in case of writing success */
     tx_semaphore_put(&ospi_tx_semaphore);
 
+[/#if]
+[#if TRANSFER_NOTIFICATION_value == "Custom"]
+  /* Calculation of the size between the write address and the end of the page */
+  current_size = LX_STM32_OSPI_PAGE_SIZE - ((uint32_t)address % LX_STM32_OSPI_PAGE_SIZE);
+
+  /* Check if the size of the data is less than the remaining place in the page */
+  if (current_size > (((uint32_t) words) * sizeof(ULONG)))
+  {
+    current_size = ((uint32_t) words) * sizeof(ULONG);
+  }
+
+  /* Initialize the address variables */
+  current_addr = (uint32_t) address;
+  end_addr = ((uint32_t) address) + ((uint32_t) words) * sizeof(ULONG);
+  data_buffer= (uint32_t)buffer;
+
+  /* Initialize the program command */
+
+  s_command.OperationType         = HAL_OSPI_OPTYPE_COMMON_CFG;
+  s_command.FlashId               = HAL_OSPI_FLASH_ID_1;
+  s_command.Instruction           = LX_STM32_OSPI_OCTAL_PAGE_PROG_CMD;
+  s_command.InstructionMode       = HAL_OSPI_INSTRUCTION_8_LINES;
+  s_command.InstructionSize       = HAL_OSPI_INSTRUCTION_16_BITS;
+  s_command.AddressMode           = HAL_OSPI_ADDRESS_8_LINES;
+  s_command.AddressSize           = HAL_OSPI_ADDRESS_32_BITS;
+  s_command.AlternateBytesMode    = HAL_OSPI_ALTERNATE_BYTES_NONE;
+  s_command.DataMode              = HAL_OSPI_DATA_8_LINES;
+  s_command.DummyCycles           = 0;
+  s_command.SIOOMode              = HAL_OSPI_SIOO_INST_EVERY_CMD;
+
+  /* DTR mode is enabled */
+  s_command.InstructionDtrMode    = HAL_OSPI_INSTRUCTION_DTR_ENABLE;
+  s_command.AddressDtrMode        = HAL_OSPI_ADDRESS_DTR_ENABLE;
+  s_command.DataDtrMode           = HAL_OSPI_DATA_DTR_ENABLE;
+  s_command.DQSMode               = HAL_OSPI_DQS_DISABLE;
+
+  /* USER CODE BEGIN OSPI_WRITE_CMD */
+
+  /* USER CODE END OSPI_WRITE_CMD */
+
+  /* Perform the write page by page */
+  do
+  {
+    s_command.Address = current_addr;
+    s_command.NbData  = current_size;
+
+    /* Enable write operations */
+    if (ospi_set_write_enable(&hospi1) != 0)
+    {
+      return 1;
+    }
+
+    /* Configure the command */
+    if (HAL_OSPI_Command(&hospi1, &s_command, HAL_OSPI_TIMEOUT_DEFAULT_VALUE) != HAL_OK)
+    {
+      return 1;
+    }
+
+    /* Transmission of the data */
+    if (HAL_OSPI_Transmit_DMA(&hospi1, (uint8_t*)data_buffer) != HAL_OK)
+    {
+      return 1;
+    }
+
+    /* Add a check for successful data transmission */
+
+    /* USER CODE BEGIN POST_OSPI_DMA_WRITE */
+
+    /* USER CODE END POST_OSPI_DMA_WRITE */
+
+    /* Configure automatic polling mode to wait for end of program */
+    if (ospi_auto_polling_ready(&hospi1, HAL_OSPI_TIMEOUT_DEFAULT_VALUE) != 0)
+    {
+      return 1;
+    }
+
+    /* Update the address and data variables for next page programming */
+    current_addr += current_size;
+    data_buffer += current_size;
+
+    current_size = ((current_addr + LX_STM32_OSPI_PAGE_SIZE) > end_addr) ? (end_addr - current_addr) : LX_STM32_OSPI_PAGE_SIZE;
+  } while (current_addr < end_addr);
+
+/* At this stage the write operation is successful
+ * Add LX_STM32_OSPI_WRITE_CPLT_NOTIFY() implementation to notify the low-level driver
+ */
+[/#if]
 [/#if]
   /* USER CODE BEGIN POST_OSPI_WRITE */
 
@@ -930,6 +1016,16 @@ static uint8_t ospi_set_octal_mode(OSPI_HandleTypeDef *hospi)
   * @param  hqspi OSPI handle
   * @retval None
   */
+[#if TRANSFER_NOTIFICATION_value == "Custom"]
+void HAL_OSPI_RxCpltCallback(OSPI_HandleTypeDef *hospi)
+{
+  /* Custom transfer completion notification mechanism goes here */
+  
+  /* USER CODE BEGIN RX_CMPLT */
+
+  /* USER CODE END RX_CMPLT */
+}
+[#else]
 void HAL_OSPI_RxCpltCallback(OSPI_HandleTypeDef *hospi)
 {
   /* USER CODE BEGIN PRE_RX_CMPLT */
@@ -942,12 +1038,23 @@ void HAL_OSPI_RxCpltCallback(OSPI_HandleTypeDef *hospi)
 
   /* USER CODE END POST_RX_CMPLT */
 }
+[/#if]
 
 /**
   * @brief  Tx Transfer completed callbacks.
   * @param  hqspi OSPI handle
   * @retval None
   */
+[#if TRANSFER_NOTIFICATION_value == "Custom"]
+void HAL_OSPI_TxCpltCallback(OSPI_HandleTypeDef *hospi)
+{
+  /* Custom transfer completion notification mechanism goes here */
+  
+  /* USER CODE BEGIN TX_CMPLT */
+
+  /* USER CODE END TX_CMPLT */
+}
+[#else]
 void HAL_OSPI_TxCpltCallback(OSPI_HandleTypeDef *hospi)
 {
   /* USER CODE BEGIN PRE_TX_CMPLT */
@@ -961,11 +1068,12 @@ void HAL_OSPI_TxCpltCallback(OSPI_HandleTypeDef *hospi)
   /* USER CODE END POST_TX_CMPLT */
 }
 [/#if]
+[/#if]
 [#else]
 #error "[This error is thrown on purpose] : the OCTOSPI IP is onfigured as ${LX_USE_OCTOSPI_value} which is not supported yet.
 [#if ospi_comp == "MX25LM51245G"]
 
-/* HAL Polling based implementation for OctoSPI component MX25LM51245G
+/* HAL DMA API implementation for OctoSPI component MX25LM51245G
  * The present implementation assumes the following settings are set:
 
   Instance              = OCTOSPI${ospi_instance}
@@ -1002,7 +1110,7 @@ ULONG ospi_sector_buffer[LX_STM32_OSPI_SECTOR_SIZE / sizeof(ULONG)];
 /* USER CODE END SECTOR_BUFFER */
 [#if glue_api == "DMA_API"]
 
-[#if txrx_cmplt == "TxSem"]
+[#if TRANSFER_NOTIFICATION_value == "ThreadX_Semaphore"]
 TX_SEMAPHORE ospi_rx_semaphore;
 TX_SEMAPHORE ospi_tx_semaphore;
 [/#if]
@@ -1240,26 +1348,58 @@ static uint8_t ospi_set_octal_mode(OSPI_HandleTypeDef *hospi)
   * @param  hqspi OSPI handle
   * @retval None
   */
+[#if TRANSFER_NOTIFICATION_value == "Custom"]
 void HAL_OSPI_RxCpltCallback(OSPI_HandleTypeDef *hospi)
 {
+  /* Custom transfer completion notification mechanism goes here */
+  
   /* USER CODE BEGIN RX_CMPLT */
 
   /* USER CODE END RX_CMPLT */
-
 }
+[#else]
+void HAL_OSPI_RxCpltCallback(OSPI_HandleTypeDef *hospi)
+{
+  /* USER CODE BEGIN PRE_RX_CMPLT */
+
+  /* USER CODE END PRE_RX_CMPLT */
+
+  tx_semaphore_put(&ospi_rx_semaphore);
+
+  /* USER CODE BEGIN POST_RX_CMPLT */
+
+  /* USER CODE END POST_RX_CMPLT */
+}
+[/#if]
 
 /**
   * @brief  Tx Transfer completed callbacks.
   * @param  hqspi OSPI handle
   * @retval None
   */
+[#if TRANSFER_NOTIFICATION_value == "Custom"]
 void HAL_OSPI_TxCpltCallback(OSPI_HandleTypeDef *hospi)
 {
+  /* Custom transfer completion notification mechanism goes here */
+  
   /* USER CODE BEGIN TX_CMPLT */
 
   /* USER CODE END TX_CMPLT */
-
 }
+[#else]
+void HAL_OSPI_TxCpltCallback(OSPI_HandleTypeDef *hospi)
+{
+  /* USER CODE BEGIN PRE_TX_CMPLT */
+
+  /* USER CODE END PRE_TX_CMPLT */
+
+  tx_semaphore_put(&ospi_tx_semaphore);
+
+  /* USER CODE BEGIN POST_TX_CMPLT */
+
+  /* USER CODE END POST_TX_CMPLT */
+}
+[/#if]
 [/#if]
 
 

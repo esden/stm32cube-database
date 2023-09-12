@@ -13,8 +13,8 @@
     <!-- Generic RefParameters for USBPD -->
     <RefParameter Name="Instance" Comment="Instance" Type="" DefaultValue="USBPD" Visible="false"/>
 
-    <RefParameter Name="Core_Version" DefaultValue="4.0.0" Comment="Core" Group="USBPD Versions" Type="String" />
-    <RefParameter Name="Device_Version" DefaultValue="3.3.0" Comment="Device" Group="USBPD Versions" Type="String" />
+    <RefParameter Name="Core_Version" DefaultValue="4.1.0" Comment="Core" Group="USBPD Versions" Type="String" />
+    <RefParameter Name="Device_Version" DefaultValue="3.4.1" Comment="Device" Group="USBPD Versions" Type="String" />
 
     <RefParameter Name="USBPD_NVIC_Request" Comment="USBPD request UCPD1 and UCPD2 NVIC" Group="USBPD needs" Type="list" DefaultValue="USBPD request IT for UCPD1 and UCPD2" >
         <Condition Expression="(USBPD_P1U1 | USBPD_P1U2) &amp; !(UCPD1_2_IRQn | USB_UCPD1_2_IRQn)" Diagnostic="USBPD request IT for UCPD1 and UCPD2"/>
@@ -76,11 +76,26 @@
     <RefParameter Name="USBPD_NbPorts" Comment="Number of USBPD ports" Type="list" Group="USB IF and Manufacturer ID" TabName="DPM Core Parameters" DefaultValue="1" Visible="false">
         <PossibleValue Value="1" Comment="1"/>
     </RefParameter>
+    <RefParameter Name="USBPD_FREERTOS_NOTUSED" Comment="USBPD_FREERTOS_NOTUSED" Type="list" Group="USB IF and Manufacturer ID" TabName="DPM Core Parameters" DefaultValue="yes" Visible="false">
+        <Condition Expression="!(S_FREERTOS$context)" Diagnostic="FREERTOS is not used "/>
+        <PossibleValue Value="yes" Comment="FREERTOS not used" Semaphore="S_USBPD_FREERTOS_NOT_USED" />
+    </RefParameter>
+    <RefParameter Name="USBPD_FREERTOS_NOTUSED" Comment="USBPD_FREERTOS_NOTUSED" Type="list" Group="USB IF and Manufacturer ID" TabName="DPM Core Parameters" DefaultValue="no" Visible="false">
+        <PossibleValue Value="no" Comment="FREERTOS used"/>
+    </RefParameter>
+    <RefParameter Name="USBPD_VID" Comment="Vendor ID" Type="string" Group="USB IF and Manufacturer ID" TabName="DPM Core Parameters" DefaultValue="+STMicroelectronics.X-CUBE-AZRTOS-G0:USBD_VID">
+        <Condition Expression="S_AzureRTOS$context &amp; SEMUSBXCcUSBJjUSBXJjUXOoDeviceOoCoreStack" Diagnostic="USBPD works with USBX and use the USBX PID"/>
+        <Description>The Vendor ID is defined by the USBD_VID parameter of USBX peripheral.</Description>
+    </RefParameter>
     <RefParameter Name="USBPD_VID" Comment="Vendor ID" Type="stringRW" Group="USB IF and Manufacturer ID" TabName="DPM Core Parameters" DefaultValue="0x0483">
         <Description>
             The Vendor ID is assigned by the USB Implementers Forum.&lt;br&gt;
             The Vendor ID for STMicroelectronics is 0x0483.
         </Description>
+    </RefParameter>
+    <RefParameter Name="USBPD_PID" Comment="Product ID" Type="string" Group="USB IF and Manufacturer ID" TabName="DPM Core Parameters" DefaultValue="+STMicroelectronics.X-CUBE-AZRTOS-G0:USBD_PID">
+        <Condition Expression="S_AzureRTOS$context &amp; SEMUSBXCcUSBJjUSBXJjUXOoDeviceOoCoreStack" Diagnostic="USBPD works with USBX and use the USBX PID"/>
+        <Description>The Product ID is defined by the USBD_PID parameter of USBX peripheral.</Description>
     </RefParameter>
     <RefParameter Name="USBPD_PID" Comment="Product ID" Type="stringRW" Group="USB IF and Manufacturer ID" TabName="DPM Core Parameters" DefaultValue="0x0002">
         <Description>The Product ID is assigned by the USB Implementers Forum.</Description>
@@ -144,8 +159,7 @@
     </RefParameter>
 
     <RefParameter Name="PE_SpecRevision_P0" Comment="Specification revision value" Type="list" Group="Port 0 Parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_SPECIFICATION_REV3">
-        <PossibleValue Value="USBPD_SPECIFICATION_REV3" Comment="Revision 3.0" Semaphore="USBPD_SPEC_REV3"/>
-        <PossibleValue Value="USBPD_SPECIFICATION_REV2" Comment="Revision 2.0" Semaphore="USBPD_SPEC_REV2"/>
+        <PossibleValue Value="USBPD_SPECIFICATION_REV3" Comment="Revision 3 (PD3)" Semaphore="USBPD_SPEC_REV3"/>
     </RefParameter>
     <RefParameter Name="PE_DefaultRole_P0" Comment="Default port role" Type="list" Group="Port 0 Parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_PORTPOWERROLE_SNK">
         <!--PossibleValue Value="USBPD_CABLEPLUG_FROMDFPUFP" Comment="Message originated from a DFP or UFP" Condition="!(DualRoleUCPD1|DualRoleUCPD2)"/-->
@@ -203,103 +217,103 @@
         <PossibleValue Value="USBPD_TRUE" Comment="Supported"/>
     </RefParameter>
 
-    <RefParameter Name="PE_UnchunkSupport_P0" Comment="Unchunk mode" Type="list" Group="PD Revision 3.0 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE">
+    <RefParameter Name="PE_UnchunkSupport_P0" Comment="Unchunk mode" Type="list" Group="PD Revision 3 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE">
         <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
         <PossibleValue Value="USBPD_TRUE" Comment="Supported"/>
-        <Condition Diagnostic="Only available if the specification revision value is set to 3.0" Expression="PE_SpecRevision_P0=USBPD_SPECIFICATION_REV3"/>
+        <Condition Diagnostic="Only available if the specification revision value is set to 3" Expression="PE_SpecRevision_P0=USBPD_SPECIFICATION_REV3"/>
     </RefParameter>
-    <RefParameter Name="PE_UnchunkSupport_P0" Comment="Unchunk mode" Type="list" Group="PD Revision 3.0 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE" Visible="false">
+    <RefParameter Name="PE_UnchunkSupport_P0" Comment="Unchunk mode" Type="list" Group="PD Revision 3 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE" Visible="false">
         <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
     </RefParameter>
-    <RefParameter Name="PE_FastRoleSwapSupport_P0" Comment="Fast role swap" Type="list" Group="PD Revision 3.0 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE">
-        <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
-        <PossibleValue Value="USBPD_TRUE" Comment="Supported"/>
-        <Condition Expression="PE_SpecRevision_P0=USBPD_SPECIFICATION_REV3" Diagnostic="Only available if the specification revision value is set to 3.0"/>
-    </RefParameter>
-    <RefParameter Name="PE_FastRoleSwapSupport_P0" Comment="Fast role swap" Type="list" Group="PD Revision 3.0 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE" Visible="false">
-        <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
-    </RefParameter>
-    <RefParameter Name="Is_GetPPSStatus_Supported_P0" Comment="PPS message" Type="list" Group="PD Revision 3.0 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE">
+    <RefParameter Name="PE_FastRoleSwapSupport_P0" Comment="Fast role swap" Type="list" Group="PD Revision 3 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE">
         <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
         <PossibleValue Value="USBPD_TRUE" Comment="Supported"/>
-        <Condition Diagnostic="Only available if the specification revision value is set to 3.0" Expression="PE_SpecRevision_P0=USBPD_SPECIFICATION_REV3"/>
+        <Condition Expression="PE_SpecRevision_P0=USBPD_SPECIFICATION_REV3" Diagnostic="Only available if the specification revision value is set to 3"/>
     </RefParameter>
-    <RefParameter Name="Is_GetPPSStatus_Supported_P0" Comment="PPS message" Type="list" Group="PD Revision 3.0 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE" Visible="false">
+    <RefParameter Name="PE_FastRoleSwapSupport_P0" Comment="Fast role swap" Type="list" Group="PD Revision 3 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE" Visible="false">
         <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
     </RefParameter>
-    <RefParameter Name="Is_SrcCapaExt_Supported_P0" Comment="Source Capabilities Extended message" Type="list" Group="PD Revision 3.0 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE">
+    <RefParameter Name="Is_GetPPSStatus_Supported_P0" Comment="PPS message" Type="list" Group="PD Revision 3 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE">
         <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
         <PossibleValue Value="USBPD_TRUE" Comment="Supported"/>
-        <Condition Diagnostic="Only available if the specification revision value is set to 3.0" Expression="PE_SpecRevision_P0=USBPD_SPECIFICATION_REV3"/>
+        <Condition Diagnostic="Only available if the specification revision value is set to 3" Expression="PE_SpecRevision_P0=USBPD_SPECIFICATION_REV3"/>
     </RefParameter>
-    <RefParameter Name="Is_SrcCapaExt_Supported_P0" Comment="Source Capabilities Extended message" Type="list" Group="PD Revision 3.0 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE" Visible="false">
+    <RefParameter Name="Is_GetPPSStatus_Supported_P0" Comment="PPS message" Type="list" Group="PD Revision 3 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE" Visible="false">
         <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
     </RefParameter>
-    <RefParameter Name="Is_Alert_Supported_P0" Comment="Alert message" Type="list" Group="PD Revision 3.0 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE">
+    <RefParameter Name="Is_SrcCapaExt_Supported_P0" Comment="Source Capabilities Extended message" Type="list" Group="PD Revision 3 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE">
+        <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
+        <PossibleValue Value="USBPD_TRUE" Comment="Supported"/>
+        <Condition Diagnostic="Only available if the specification revision value is set to 3" Expression="PE_SpecRevision_P0=USBPD_SPECIFICATION_REV3"/>
+    </RefParameter>
+    <RefParameter Name="Is_SrcCapaExt_Supported_P0" Comment="Source Capabilities Extended message" Type="list" Group="PD Revision 3 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE" Visible="false">
+        <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
+    </RefParameter>
+    <RefParameter Name="Is_Alert_Supported_P0" Comment="Alert message" Type="list" Group="PD Revision 3 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE">
         <PossibleValue Value="USBPD_FALSE" Comment="Not supported" Condition="Is_GetStatus_Supported_P0=USBPD_TRUE"/>
         <PossibleValue Value="USBPD_TRUE" Comment="Supported"/> <!-- Supported if Is_GetStatus_Supported_P0 is TRUE -->
-        <Condition Diagnostic="Only available if the specification revision value is set to 3.0" Expression="PE_SpecRevision_P0=USBPD_SPECIFICATION_REV3"/>
+        <Condition Diagnostic="Only available if the specification revision value is set to 3" Expression="PE_SpecRevision_P0=USBPD_SPECIFICATION_REV3"/>
     </RefParameter>
-    <RefParameter Name="Is_Alert_Supported_P0" Comment="Alert message" Type="list" Group="PD Revision 3.0 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE" Visible="false">
+    <RefParameter Name="Is_Alert_Supported_P0" Comment="Alert message" Type="list" Group="PD Revision 3 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE" Visible="false">
         <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
     </RefParameter>
-    <RefParameter Name="Is_GetStatus_Supported_P0" Comment="Status message" Type="list" Group="PD Revision 3.0 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE">
-        <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
-        <PossibleValue Value="USBPD_TRUE" Comment="Supported"/>
-        <Condition Diagnostic="Only available if the specification revision value is set to 3.0" Expression="PE_SpecRevision_P0=USBPD_SPECIFICATION_REV3"/>
-    </RefParameter>
-    <RefParameter Name="Is_GetStatus_Supported_P0" Comment="Status message" Type="list" Group="PD Revision 3.0 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE" Visible="false">
-        <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
-    </RefParameter>
-    <RefParameter Name="Is_GetManufacturerInfo_Supported_P0" Comment="Manufacturer Info message" Type="list" Group="PD Revision 3.0 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE">
+    <RefParameter Name="Is_GetStatus_Supported_P0" Comment="Status message" Type="list" Group="PD Revision 3 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE">
         <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
         <PossibleValue Value="USBPD_TRUE" Comment="Supported"/>
-        <Condition Diagnostic="Only available if the specification revision value is set to 3.0" Expression="PE_SpecRevision_P0=USBPD_SPECIFICATION_REV3"/>
+        <Condition Diagnostic="Only available if the specification revision value is set to 3" Expression="PE_SpecRevision_P0=USBPD_SPECIFICATION_REV3"/>
     </RefParameter>
-    <RefParameter Name="Is_GetManufacturerInfo_Supported_P0" Comment="Manufacturer Info message" Type="list" Group="PD Revision 3.0 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE" Visible="false">
+    <RefParameter Name="Is_GetStatus_Supported_P0" Comment="Status message" Type="list" Group="PD Revision 3 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE" Visible="false">
         <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
     </RefParameter>
-    <RefParameter Name="Is_GetCountryCodes_Supported_P0" Comment="Country Codes message" Type="list" Group="PD Revision 3.0 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE">
-        <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
-        <PossibleValue Value="USBPD_TRUE" Comment="Supported"/>
-        <Condition Diagnostic="Only available if the specification revision value is set to 3.0" Expression="PE_SpecRevision_P0=USBPD_SPECIFICATION_REV3"/>
-    </RefParameter>
-    <RefParameter Name="Is_GetCountryCodes_Supported_P0" Comment="Country Codes message" Type="list" Group="PD Revision 3.0 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE" Visible="false">
-        <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
-    </RefParameter>
-    <RefParameter Name="Is_GetCountryInfo_Supported_P0" Comment="Country Info message" Type="list" Group="PD Revision 3.0 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE">
+    <RefParameter Name="Is_GetManufacturerInfo_Supported_P0" Comment="Manufacturer Info message" Type="list" Group="PD Revision 3 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE">
         <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
         <PossibleValue Value="USBPD_TRUE" Comment="Supported"/>
-        <Condition Diagnostic="Only available if the specification revision value is set to 3.0" Expression="PE_SpecRevision_P0=USBPD_SPECIFICATION_REV3"/>
+        <Condition Diagnostic="Only available if the specification revision value is set to 3" Expression="PE_SpecRevision_P0=USBPD_SPECIFICATION_REV3"/>
     </RefParameter>
-    <RefParameter Name="Is_GetCountryInfo_Supported_P0" Comment="Country Info message" Type="list" Group="PD Revision 3.0 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE" Visible="false">
+    <RefParameter Name="Is_GetManufacturerInfo_Supported_P0" Comment="Manufacturer Info message" Type="list" Group="PD Revision 3 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE" Visible="false">
         <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
     </RefParameter>
-    <RefParameter Name="Is_SecurityRequest_Supported_P0" Comment="Security Response message" Type="list" Group="PD Revision 3.0 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE">
-        <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
-        <PossibleValue Value="USBPD_TRUE" Comment="Supported"/>
-        <Condition Diagnostic="Only available if the specification revision value is set to 3.0" Expression="PE_SpecRevision_P0=USBPD_SPECIFICATION_REV3"/>
-    </RefParameter>
-    <RefParameter Name="Is_SecurityRequest_Supported_P0" Comment="Security Response message" Type="list" Group="PD Revision 3.0 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE" Visible="false">
-        <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
-    </RefParameter>
-    <RefParameter Name="Is_FirmUpdateRequest_Supported_P0" Comment="Firmware update Response message" Type="list" Group="PD Revision 3.0 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE">
+    <RefParameter Name="Is_GetCountryCodes_Supported_P0" Comment="Country Codes message" Type="list" Group="PD Revision 3 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE">
         <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
         <PossibleValue Value="USBPD_TRUE" Comment="Supported"/>
-        <Condition Diagnostic="Only available if the specification revision value is set to 3.0" Expression="PE_SpecRevision_P0=USBPD_SPECIFICATION_REV3"/>
+        <Condition Diagnostic="Only available if the specification revision value is set to 3" Expression="PE_SpecRevision_P0=USBPD_SPECIFICATION_REV3"/>
     </RefParameter>
-    <RefParameter Name="Is_FirmUpdateRequest_Supported_P0" Comment="Firmware update Response message" Type="list" Group="PD Revision 3.0 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE" Visible="false">
+    <RefParameter Name="Is_GetCountryCodes_Supported_P0" Comment="Country Codes message" Type="list" Group="PD Revision 3 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE" Visible="false">
         <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
     </RefParameter>
-    <RefParameter Name="Is_SnkCapaExt_Supported_P0" Comment="Sink Capabilities Extended message" Type="list" Group="PD Revision 3.0 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_TRUE" Visible="false">
+    <RefParameter Name="Is_GetCountryInfo_Supported_P0" Comment="Country Info message" Type="list" Group="PD Revision 3 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE">
+        <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
+        <PossibleValue Value="USBPD_TRUE" Comment="Supported"/>
+        <Condition Diagnostic="Only available if the specification revision value is set to 3" Expression="PE_SpecRevision_P0=USBPD_SPECIFICATION_REV3"/>
+    </RefParameter>
+    <RefParameter Name="Is_GetCountryInfo_Supported_P0" Comment="Country Info message" Type="list" Group="PD Revision 3 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE" Visible="false">
+        <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
+    </RefParameter>
+    <RefParameter Name="Is_SecurityRequest_Supported_P0" Comment="Security Response message" Type="list" Group="PD Revision 3 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE">
+        <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
+        <PossibleValue Value="USBPD_TRUE" Comment="Supported"/>
+        <Condition Diagnostic="Only available if the specification revision value is set to 3" Expression="PE_SpecRevision_P0=USBPD_SPECIFICATION_REV3"/>
+    </RefParameter>
+    <RefParameter Name="Is_SecurityRequest_Supported_P0" Comment="Security Response message" Type="list" Group="PD Revision 3 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE" Visible="false">
+        <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
+    </RefParameter>
+    <RefParameter Name="Is_FirmUpdateRequest_Supported_P0" Comment="Firmware update Response message" Type="list" Group="PD Revision 3 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE">
+        <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
+        <PossibleValue Value="USBPD_TRUE" Comment="Supported"/>
+        <Condition Diagnostic="Only available if the specification revision value is set to 3" Expression="PE_SpecRevision_P0=USBPD_SPECIFICATION_REV3"/>
+    </RefParameter>
+    <RefParameter Name="Is_FirmUpdateRequest_Supported_P0" Comment="Firmware update Response message" Type="list" Group="PD Revision 3 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE" Visible="false">
+        <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
+    </RefParameter>
+    <RefParameter Name="Is_SnkCapaExt_Supported_P0" Comment="Sink Capabilities Extended message" Type="list" Group="PD Revision 3 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_TRUE" Visible="false">
         <PossibleValue Value="USBPD_TRUE" Comment="IOCCompatibility"/>
     </RefParameter>
-    <RefParameter Name="Is_GetBattery_Supported_P0" Comment="Get Battery Capabitity and Status messages" Type="list" Group="PD Revision 3.0 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE">
+    <RefParameter Name="Is_GetBattery_Supported_P0" Comment="Get Battery Capabitity and Status messages" Type="list" Group="PD Revision 3 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE">
         <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
         <PossibleValue Value="USBPD_TRUE" Comment="Supported"/>
-        <Condition Diagnostic="Only available if the specification revision value is set to 3.0" Expression="PE_SpecRevision_P0=USBPD_SPECIFICATION_REV3"/>
+        <Condition Diagnostic="Only available if the specification revision value is set to 3" Expression="PE_SpecRevision_P0=USBPD_SPECIFICATION_REV3"/>
     </RefParameter>
-    <RefParameter Name="Is_GetBattery_Supported_P0" Comment="Get Battery Capabitity and Status messages" Type="list" Group="PD Revision 3.0 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE" Visible="false">
+    <RefParameter Name="Is_GetBattery_Supported_P0" Comment="Get Battery Capabitity and Status messages" Type="list" Group="PD Revision 3 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE" Visible="false">
         <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
     </RefParameter>
 
@@ -420,10 +434,8 @@
         <Description>SOP" debug is not supported by default</Description>
     </RefParameter>
 
-    <RefParameter Name="PE_SpecRevision_P1" Comment="Specification revision value" Type="list" Group="Port 1 Parameters" TabName="Stack Port 1 Parameters" DefaultValue="USBPD_SPECIFICATION_REV2">
-        <!--PossibleValue Value="USBPD_SPECIFICATION_REV1" Comment="Revision 1.0"/-->
-        <PossibleValue Value="USBPD_SPECIFICATION_REV2" Comment="Revision 2.0" Semaphore="USBPD_SPEC_REV2"/>
-        <PossibleValue Value="USBPD_SPECIFICATION_REV3" Comment="Revision 3.0" Semaphore="USBPD_SPEC_REV3"/>
+    <RefParameter Name="PE_SpecRevision_P1" Comment="Specification revision value" Type="list" Group="Port 1 Parameters" TabName="Stack Port 1 Parameters" DefaultValue="USBPD_SPECIFICATION_REV3">
+        <PossibleValue Value="USBPD_SPECIFICATION_REV3" Comment="Revision 3 (PD3)" Semaphore="USBPD_SPEC_REV3"/>
     </RefParameter>
     <RefParameter Name="PE_DefaultRole_P1" Comment="Default port role" Type="list" Group="Port 1 Parameters" TabName="Stack Port 1 Parameters" DefaultValue="USBPD_PORTPOWERROLE_SNK">
         <!--PossibleValue Value="USBPD_CABLEPLUG_FROMDFPUFP" Comment="Message originated from a DFP or UFP" Condition="!(DualRoleUCPD1|DualRoleUCPD2)"/-->
@@ -481,103 +493,103 @@
         <PossibleValue Value="USBPD_TRUE" Comment="Supported"/>
     </RefParameter>
 
-    <RefParameter Name="PE_UnchunkSupport_P1" Comment="Unchunk mode" Type="list" Group="PD Revision 3.0 specific parameters" TabName="Stack Port 1 Parameters" DefaultValue="USBPD_FALSE">
+    <RefParameter Name="PE_UnchunkSupport_P1" Comment="Unchunk mode" Type="list" Group="PD Revision 3 specific parameters" TabName="Stack Port 1 Parameters" DefaultValue="USBPD_FALSE">
         <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
         <PossibleValue Value="USBPD_TRUE" Comment="Supported"/>
-        <Condition Diagnostic="Only available if the specification revision value is set to 3.0" Expression="PE_SpecRevision_P1=USBPD_SPECIFICATION_REV3"/>
+        <Condition Diagnostic="Only available if the specification revision value is set to 3" Expression="PE_SpecRevision_P1=USBPD_SPECIFICATION_REV3"/>
     </RefParameter>
-    <RefParameter Name="PE_UnchunkSupport_P1" Comment="Unchunk mode" Type="list" Group="PD Revision 3.0 specific parameters" TabName="Stack Port 1 Parameters" DefaultValue="USBPD_FALSE" Visible="false">
+    <RefParameter Name="PE_UnchunkSupport_P1" Comment="Unchunk mode" Type="list" Group="PD Revision 3 specific parameters" TabName="Stack Port 1 Parameters" DefaultValue="USBPD_FALSE" Visible="false">
         <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
     </RefParameter>
-    <RefParameter Name="PE_FastRoleSwapSupport_P1" Comment="Fast role swap" Type="list" Group="PD Revision 3.0 specific parameters" TabName="Stack Port 1 Parameters" DefaultValue="USBPD_FALSE">
-        <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
-        <PossibleValue Value="USBPD_TRUE" Comment="Supported"/>
-        <Condition Expression="PE_SpecRevision_P1=USBPD_SPECIFICATION_REV3" Diagnostic="Only available if the specification revision value is set to 3.0"/>
-    </RefParameter>
-    <RefParameter Name="PE_FastRoleSwapSupport_P1" Comment="Fast role swap" Type="list" Group="PD Revision 3.0 specific parameters" TabName="Stack Port 1 Parameters" DefaultValue="USBPD_FALSE" Visible="false">
-        <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
-    </RefParameter>
-    <RefParameter Name="Is_GetPPSStatus_Supported_P1" Comment="PPS message" Type="list" Group="PD Revision 3.0 specific parameters" TabName="Stack Port 1 Parameters" DefaultValue="USBPD_FALSE">
+    <RefParameter Name="PE_FastRoleSwapSupport_P1" Comment="Fast role swap" Type="list" Group="PD Revision 3 specific parameters" TabName="Stack Port 1 Parameters" DefaultValue="USBPD_FALSE">
         <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
         <PossibleValue Value="USBPD_TRUE" Comment="Supported"/>
-        <Condition Diagnostic="Only available if the specification revision value is set to 3.0" Expression="PE_SpecRevision_P1=USBPD_SPECIFICATION_REV3"/>
+        <Condition Expression="PE_SpecRevision_P1=USBPD_SPECIFICATION_REV3" Diagnostic="Only available if the specification revision value is set to 3"/>
     </RefParameter>
-    <RefParameter Name="Is_GetPPSStatus_Supported_P1" Comment="PPS message" Type="list" Group="PD Revision 3.0 specific parameters" TabName="Stack Port 1 Parameters" DefaultValue="USBPD_FALSE" Visible="false">
+    <RefParameter Name="PE_FastRoleSwapSupport_P1" Comment="Fast role swap" Type="list" Group="PD Revision 3 specific parameters" TabName="Stack Port 1 Parameters" DefaultValue="USBPD_FALSE" Visible="false">
         <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
     </RefParameter>
-    <RefParameter Name="Is_SrcCapaExt_Supported_P1" Comment="Source Capabilities Extended message" Type="list" Group="PD Revision 3.0 specific parameters" TabName="Stack Port 1 Parameters" DefaultValue="USBPD_FALSE">
+    <RefParameter Name="Is_GetPPSStatus_Supported_P1" Comment="PPS message" Type="list" Group="PD Revision 3 specific parameters" TabName="Stack Port 1 Parameters" DefaultValue="USBPD_FALSE">
         <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
         <PossibleValue Value="USBPD_TRUE" Comment="Supported"/>
-        <Condition Diagnostic="Only available if the specification revision value is set to 3.0" Expression="PE_SpecRevision_P1=USBPD_SPECIFICATION_REV3"/>
+        <Condition Diagnostic="Only available if the specification revision value is set to 3" Expression="PE_SpecRevision_P1=USBPD_SPECIFICATION_REV3"/>
     </RefParameter>
-    <RefParameter Name="Is_SrcCapaExt_Supported_P1" Comment="Source Capabilities Extended message" Type="list" Group="PD Revision 3.0 specific parameters" TabName="Stack Port 1 Parameters" DefaultValue="USBPD_FALSE" Visible="false">
+    <RefParameter Name="Is_GetPPSStatus_Supported_P1" Comment="PPS message" Type="list" Group="PD Revision 3 specific parameters" TabName="Stack Port 1 Parameters" DefaultValue="USBPD_FALSE" Visible="false">
         <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
     </RefParameter>
-    <RefParameter Name="Is_Alert_Supported_P1" Comment="Alert message" Type="list" Group="PD Revision 3.0 specific parameters" TabName="Stack Port 1 Parameters" DefaultValue="USBPD_FALSE">
+    <RefParameter Name="Is_SrcCapaExt_Supported_P1" Comment="Source Capabilities Extended message" Type="list" Group="PD Revision 3 specific parameters" TabName="Stack Port 1 Parameters" DefaultValue="USBPD_FALSE">
+        <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
+        <PossibleValue Value="USBPD_TRUE" Comment="Supported"/>
+        <Condition Diagnostic="Only available if the specification revision value is set to 3" Expression="PE_SpecRevision_P1=USBPD_SPECIFICATION_REV3"/>
+    </RefParameter>
+    <RefParameter Name="Is_SrcCapaExt_Supported_P1" Comment="Source Capabilities Extended message" Type="list" Group="PD Revision 3 specific parameters" TabName="Stack Port 1 Parameters" DefaultValue="USBPD_FALSE" Visible="false">
+        <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
+    </RefParameter>
+    <RefParameter Name="Is_Alert_Supported_P1" Comment="Alert message" Type="list" Group="PD Revision 3 specific parameters" TabName="Stack Port 1 Parameters" DefaultValue="USBPD_FALSE">
         <PossibleValue Value="USBPD_FALSE" Comment="Not supported" Condition="Is_GetStatus_Supported_P1=USBPD_TRUE"/>
         <PossibleValue Value="USBPD_TRUE" Comment="Supported"/> <!-- Supported if Is_GetStatus_Supported_P1 is TRUE -->
-        <Condition Diagnostic="Only available if the specification revision value is set to 3.0" Expression="PE_SpecRevision_P1=USBPD_SPECIFICATION_REV3"/>
+        <Condition Diagnostic="Only available if the specification revision value is set to 3" Expression="PE_SpecRevision_P1=USBPD_SPECIFICATION_REV3"/>
     </RefParameter>
-    <RefParameter Name="Is_Alert_Supported_P1" Comment="Alert message" Type="list" Group="PD Revision 3.0 specific parameters" TabName="Stack Port 1 Parameters" DefaultValue="USBPD_FALSE" Visible="false">
+    <RefParameter Name="Is_Alert_Supported_P1" Comment="Alert message" Type="list" Group="PD Revision 3 specific parameters" TabName="Stack Port 1 Parameters" DefaultValue="USBPD_FALSE" Visible="false">
         <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
     </RefParameter>
-    <RefParameter Name="Is_GetStatus_Supported_P1" Comment="Status message" Type="list" Group="PD Revision 3.0 specific parameters" TabName="Stack Port 1 Parameters" DefaultValue="USBPD_FALSE">
-        <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
-        <PossibleValue Value="USBPD_TRUE" Comment="Supported"/>
-        <Condition Diagnostic="Only available if the specification revision value is set to 3.0" Expression="PE_SpecRevision_P1=USBPD_SPECIFICATION_REV3"/>
-    </RefParameter>
-    <RefParameter Name="Is_GetStatus_Supported_P1" Comment="Status message" Type="list" Group="PD Revision 3.0 specific parameters" TabName="Stack Port 1 Parameters" DefaultValue="USBPD_FALSE" Visible="false">
-        <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
-    </RefParameter>
-    <RefParameter Name="Is_GetManufacturerInfo_Supported_P1" Comment="Manufacturer Info message" Type="list" Group="PD Revision 3.0 specific parameters" TabName="Stack Port 1 Parameters" DefaultValue="USBPD_FALSE">
+    <RefParameter Name="Is_GetStatus_Supported_P1" Comment="Status message" Type="list" Group="PD Revision 3 specific parameters" TabName="Stack Port 1 Parameters" DefaultValue="USBPD_FALSE">
         <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
         <PossibleValue Value="USBPD_TRUE" Comment="Supported"/>
-        <Condition Diagnostic="Only available if the specification revision value is set to 3.0" Expression="PE_SpecRevision_P1=USBPD_SPECIFICATION_REV3"/>
+        <Condition Diagnostic="Only available if the specification revision value is set to 3" Expression="PE_SpecRevision_P1=USBPD_SPECIFICATION_REV3"/>
     </RefParameter>
-    <RefParameter Name="Is_GetManufacturerInfo_Supported_P1" Comment="Manufacturer Info message" Type="list" Group="PD Revision 3.0 specific parameters" TabName="Stack Port 1 Parameters" DefaultValue="USBPD_FALSE" Visible="false">
+    <RefParameter Name="Is_GetStatus_Supported_P1" Comment="Status message" Type="list" Group="PD Revision 3 specific parameters" TabName="Stack Port 1 Parameters" DefaultValue="USBPD_FALSE" Visible="false">
         <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
     </RefParameter>
-    <RefParameter Name="Is_GetCountryCodes_Supported_P1" Comment="Country Codes message" Type="list" Group="PD Revision 3.0 specific parameters" TabName="Stack Port 1 Parameters" DefaultValue="USBPD_FALSE">
-        <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
-        <PossibleValue Value="USBPD_TRUE" Comment="Supported"/>
-        <Condition Diagnostic="Only available if the specification revision value is set to 3.0" Expression="PE_SpecRevision_P1=USBPD_SPECIFICATION_REV3"/>
-    </RefParameter>
-    <RefParameter Name="Is_GetCountryCodes_Supported_P1" Comment="Country Codes message" Type="list" Group="PD Revision 3.0 specific parameters" TabName="Stack Port 1 Parameters" DefaultValue="USBPD_FALSE" Visible="false">
-        <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
-    </RefParameter>
-    <RefParameter Name="Is_GetCountryInfo_Supported_P1" Comment="Country Info message" Type="list" Group="PD Revision 3.0 specific parameters" TabName="Stack Port 1 Parameters" DefaultValue="USBPD_FALSE">
+    <RefParameter Name="Is_GetManufacturerInfo_Supported_P1" Comment="Manufacturer Info message" Type="list" Group="PD Revision 3 specific parameters" TabName="Stack Port 1 Parameters" DefaultValue="USBPD_FALSE">
         <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
         <PossibleValue Value="USBPD_TRUE" Comment="Supported"/>
-        <Condition Diagnostic="Only available if the specification revision value is set to 3.0" Expression="PE_SpecRevision_P1=USBPD_SPECIFICATION_REV3"/>
+        <Condition Diagnostic="Only available if the specification revision value is set to 3" Expression="PE_SpecRevision_P1=USBPD_SPECIFICATION_REV3"/>
     </RefParameter>
-    <RefParameter Name="Is_GetCountryInfo_Supported_P1" Comment="Country Info message" Type="list" Group="PD Revision 3.0 specific parameters" TabName="Stack Port 1 Parameters" DefaultValue="USBPD_FALSE" Visible="false">
+    <RefParameter Name="Is_GetManufacturerInfo_Supported_P1" Comment="Manufacturer Info message" Type="list" Group="PD Revision 3 specific parameters" TabName="Stack Port 1 Parameters" DefaultValue="USBPD_FALSE" Visible="false">
         <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
     </RefParameter>
-    <RefParameter Name="Is_SecurityRequest_Supported_P1" Comment="Security Response message" Type="list" Group="PD Revision 3.0 specific parameters" TabName="Stack Port 1 Parameters" DefaultValue="USBPD_FALSE">
-        <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
-        <PossibleValue Value="USBPD_TRUE" Comment="Supported"/>
-        <Condition Diagnostic="Only available if the specification revision value is set to 3.0" Expression="PE_SpecRevision_P1=USBPD_SPECIFICATION_REV3"/>
-    </RefParameter>
-    <RefParameter Name="Is_SecurityRequest_Supported_P1" Comment="Security Response message" Type="list" Group="PD Revision 3.0 specific parameters" TabName="Stack Port 1 Parameters" DefaultValue="USBPD_FALSE" Visible="false">
-        <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
-    </RefParameter>
-    <RefParameter Name="Is_FirmUpdateRequest_Supported_P1" Comment="Firmware update Response message" Type="list" Group="PD Revision 3.0 specific parameters" TabName="Stack Port 1 Parameters" DefaultValue="USBPD_FALSE">
+    <RefParameter Name="Is_GetCountryCodes_Supported_P1" Comment="Country Codes message" Type="list" Group="PD Revision 3 specific parameters" TabName="Stack Port 1 Parameters" DefaultValue="USBPD_FALSE">
         <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
         <PossibleValue Value="USBPD_TRUE" Comment="Supported"/>
-        <Condition Diagnostic="Only available if the specification revision value is set to 3.0" Expression="PE_SpecRevision_P1=USBPD_SPECIFICATION_REV3"/>
+        <Condition Diagnostic="Only available if the specification revision value is set to 3" Expression="PE_SpecRevision_P1=USBPD_SPECIFICATION_REV3"/>
     </RefParameter>
-    <RefParameter Name="Is_FirmUpdateRequest_Supported_P1" Comment="Firmware update Response message" Type="list" Group="PD Revision 3.0 specific parameters" TabName="Stack Port 1 Parameters" DefaultValue="USBPD_FALSE" Visible="false">
+    <RefParameter Name="Is_GetCountryCodes_Supported_P1" Comment="Country Codes message" Type="list" Group="PD Revision 3 specific parameters" TabName="Stack Port 1 Parameters" DefaultValue="USBPD_FALSE" Visible="false">
         <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
     </RefParameter>
-    <RefParameter Name="Is_SnkCapaExt_Supported_P1" Comment="Sink Capabilities Extended message" Type="list" Group="PD Revision 3.0 specific parameters" TabName="Stack Port 1 Parameters" DefaultValue="USBPD_TRUE" Visible="false">
+    <RefParameter Name="Is_GetCountryInfo_Supported_P1" Comment="Country Info message" Type="list" Group="PD Revision 3 specific parameters" TabName="Stack Port 1 Parameters" DefaultValue="USBPD_FALSE">
+        <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
+        <PossibleValue Value="USBPD_TRUE" Comment="Supported"/>
+        <Condition Diagnostic="Only available if the specification revision value is set to 3" Expression="PE_SpecRevision_P1=USBPD_SPECIFICATION_REV3"/>
+    </RefParameter>
+    <RefParameter Name="Is_GetCountryInfo_Supported_P1" Comment="Country Info message" Type="list" Group="PD Revision 3 specific parameters" TabName="Stack Port 1 Parameters" DefaultValue="USBPD_FALSE" Visible="false">
+        <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
+    </RefParameter>
+    <RefParameter Name="Is_SecurityRequest_Supported_P1" Comment="Security Response message" Type="list" Group="PD Revision 3 specific parameters" TabName="Stack Port 1 Parameters" DefaultValue="USBPD_FALSE">
+        <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
+        <PossibleValue Value="USBPD_TRUE" Comment="Supported"/>
+        <Condition Diagnostic="Only available if the specification revision value is set to 3" Expression="PE_SpecRevision_P1=USBPD_SPECIFICATION_REV3"/>
+    </RefParameter>
+    <RefParameter Name="Is_SecurityRequest_Supported_P1" Comment="Security Response message" Type="list" Group="PD Revision 3 specific parameters" TabName="Stack Port 1 Parameters" DefaultValue="USBPD_FALSE" Visible="false">
+        <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
+    </RefParameter>
+    <RefParameter Name="Is_FirmUpdateRequest_Supported_P1" Comment="Firmware update Response message" Type="list" Group="PD Revision 3 specific parameters" TabName="Stack Port 1 Parameters" DefaultValue="USBPD_FALSE">
+        <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
+        <PossibleValue Value="USBPD_TRUE" Comment="Supported"/>
+        <Condition Diagnostic="Only available if the specification revision value is set to 3" Expression="PE_SpecRevision_P1=USBPD_SPECIFICATION_REV3"/>
+    </RefParameter>
+    <RefParameter Name="Is_FirmUpdateRequest_Supported_P1" Comment="Firmware update Response message" Type="list" Group="PD Revision 3 specific parameters" TabName="Stack Port 1 Parameters" DefaultValue="USBPD_FALSE" Visible="false">
+        <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
+    </RefParameter>
+    <RefParameter Name="Is_SnkCapaExt_Supported_P1" Comment="Sink Capabilities Extended message" Type="list" Group="PD Revision 3 specific parameters" TabName="Stack Port 1 Parameters" DefaultValue="USBPD_TRUE" Visible="false">
         <PossibleValue Value="USBPD_TRUE" Comment="IOCCompatibility"/>
     </RefParameter>
-    <RefParameter Name="Is_GetBattery_Supported_P1" Comment="Get Battery Capabitity and Status messages" Type="list" Group="PD Revision 3.0 specific parameters" TabName="Stack Port 1 Parameters" DefaultValue="USBPD_FALSE">
+    <RefParameter Name="Is_GetBattery_Supported_P1" Comment="Get Battery Capabitity and Status messages" Type="list" Group="PD Revision 3 specific parameters" TabName="Stack Port 1 Parameters" DefaultValue="USBPD_FALSE">
         <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
         <PossibleValue Value="USBPD_TRUE" Comment="Supported"/>
-        <Condition Diagnostic="Only available if the specification revision value is set to 3.0" Expression="PE_SpecRevision_P1=USBPD_SPECIFICATION_REV3"/>
+        <Condition Diagnostic="Only available if the specification revision value is set to 3" Expression="PE_SpecRevision_P1=USBPD_SPECIFICATION_REV3"/>
     </RefParameter>
-    <RefParameter Name="Is_GetBattery_Supported_P1" Comment="Get Battery Capabitity and Status messages" Type="list" Group="PD Revision 3.0 specific parameters" TabName="Stack Port 1 Parameters" DefaultValue="USBPD_FALSE" Visible="false">
+    <RefParameter Name="Is_GetBattery_Supported_P1" Comment="Get Battery Capabitity and Status messages" Type="list" Group="PD Revision 3 specific parameters" TabName="Stack Port 1 Parameters" DefaultValue="USBPD_FALSE" Visible="false">
         <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
     </RefParameter>
 
@@ -1333,12 +1345,21 @@
         <PossibleValue Value="USBPDCORE_LIB_PD3_FULL" Comment="USBPDCORE_LIB_PD3_FULL"/>
     </RefParameter>
 
+    <RefParameter Name="USBPD_DEVICE_APP_MEM_POOL_SIZE" Comment="USBPD memory pool size" DefaultValue="6144" Max="20480" Min="512" Type="integer" Group="Application selection" TabName="DPM Core Parameters" Visible="true">
+        <Description>Default memory pool size for the USBPD application.</Description>
+        <Condition Diagnostic="" Expression="S_AzureRTOS$context"/>
+    </RefParameter>
+    <RefParameter Name="USBPD_DEVICE_APP_MEM_POOL_SIZE" Comment="USBPD memory pool size" DefaultValue="6144" Max="6144" Min="6144" Type="integer" Group="Application selection" TabName="DPM Core Parameters" Visible="false">
+        <Description>Default memory pool size for the USBPD application.</Description>
+    </RefParameter>
+
     <!-- RefModes for USBPD -->
     <RefMode Name="USBPD_Common">
         <ConfigForMode>USBPD_Init</ConfigForMode>
 
         <Parameter Name="Core_Version"/>
         <Parameter Name="Device_Version"/>
+        <Parameter Name="USBPD_FREERTOS_NOTUSED"/>
 
         <Parameter Name="USBPD_NVIC_Request"/>
         <Parameter Name="USBPD_DMA_Request"/>
@@ -1362,7 +1383,7 @@
         <Parameter Name="TIMinstance"/>
         <Parameter Name="TIMenableClock"/>
         <Parameter Name="TIMdisableClock"/>
-
+        <Parameter Name="USBPD_DEVICE_APP_MEM_POOL_SIZE"/>
     </RefMode>
 
     <RefMode Name="USBPD_P0" BaseMode="USBPD_Common">
@@ -1543,28 +1564,28 @@
         <Mode Name="StackConfig" UserName="Stack Configuration" RemoveDisable="true">
             <Condition Expression="USBPD_P0U1 | USBPD_P0U2" Diagnostic="please select a USBPD Port Configuration"/>
             <ModeLogicOperator Name="XOR">
-                <Mode Name="PD3_Full_Stack" UserName="PD3 Full Stack">
+                <Mode Name="PD3_Full_Stack" UserName="Full Stack">
                     <Condition Expression="(SourceUCPD1|SinkUCPD1|DualRoleUCPD1|SourceUCPD2|SinkUCPD2|DualRoleUCPD2)" Diagnostic="UCPD1 | UCPD2 is/are activated"/>
                     <SignalLogicalOp Name="AND">
                         <Signal Name="VS_PD3FULL"/>
                     </SignalLogicalOp>
                     <Semaphore>USBPD_PD3FULL</Semaphore>
                 </Mode>
-                <Mode Name="PD3_Config1" UserName="PD3 Config 1">
+                <Mode Name="PD3_Config1" UserName="Config 1">
                     <Condition Expression="(SourceUCPD1|SinkUCPD1|DualRoleUCPD1|SourceUCPD2|SinkUCPD2|DualRoleUCPD2)" Diagnostic="UCPD1 | UCPD2 is/are activated"/>
                     <SignalLogicalOp Name="AND">
                         <Signal Name="VS_PD3CFG1"/>
                     </SignalLogicalOp>
                     <Semaphore>USBPD_PD3CFG1</Semaphore>
                 </Mode>
-                <Mode Name="PD3_Min_Src" UserName="PD3 Min Source">
+                <Mode Name="PD3_Min_Src" UserName="Min Source">
                     <Condition Expression="(SourceUCPD1 &amp; SourceUCPD2)" Diagnostic="UCPD1 &amp; UCPD2 should be Source"/>
                     <SignalLogicalOp Name="AND">
                         <Signal Name="VS_PD3MINSRC"/>
                     </SignalLogicalOp>
                     <Semaphore>USBPD_PD3MINSRC</Semaphore>
                 </Mode>
-                <Mode Name="PD3_Min_Snk" UserName="PD3 Min Sink">
+                <Mode Name="PD3_Min_Snk" UserName="Min Sink">
                     <Condition Expression="(SinkUCPD1 &amp; SinkUCPD2)" Diagnostic="UCPD1 &amp; UCPD2 should be Sink"/>
                     <SignalLogicalOp Name="AND">
                         <Signal Name="VS_PD3MINSNK"/>

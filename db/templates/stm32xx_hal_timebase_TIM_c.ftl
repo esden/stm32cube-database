@@ -20,6 +20,12 @@
 /* Private variables ---------------------------------------------------------*/
 TIM_HandleTypeDef        h${instance?lower_case}; 
 /* Private function prototypes -----------------------------------------------*/
+[#if FamilyName=="STM32F1"]
+void ${instance}_IRQHandler(void);
+[/#if]
+[#if isTim_callback?? && isTim_callback=="1"]
+ void TimeBase_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim);
+ [/#if]
 /* Private functions ---------------------------------------------------------*/
 
 /**
@@ -47,31 +53,43 @@ TIM_HandleTypeDef        h${instance?lower_case};
 HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
 {
   RCC_ClkInitTypeDef    clkconfig;
-[#if FamilyName!="STM32H7"]
+[#if FamilyName!="STM32H7" && FamilyName!="STM32F0" && FamilyName!="STM32F1" && FamilyName!="STM32F2" && FamilyName!="STM32F3" && FamilyName!="STM32F4" && FamilyName!="STM32F7" && FamilyName!="STM32G0" && FamilyName!="STM32L0" && FamilyName!="STM32L1" && FamilyName!="STM32L4"]
   uint32_t              uwTimclock = 0;
   uint32_t              uwPrescalerValue = 0;
 [/#if]
-[#if FamilyName=="STM32H7"]
+[#if FamilyName=="STM32H7" || FamilyName=="STM32G0" || FamilyName=="STM32L0" || FamilyName=="STM32L4"]
 [#if APB=="APB1"]
   uint32_t              uwTimclock, uwAPB1Prescaler;
 [#else]
   uint32_t              uwTimclock;
+[#if FamilyName=="STM32L0"]
+  uint32_t              uwAPB2Prescaler;
+[/#if]
 [/#if]
 
   uint32_t              uwPrescalerValue;
 [/#if]
+[#if FamilyName=="STM32F0" || FamilyName=="STM32F1" || FamilyName=="STM32F2" || FamilyName=="STM32F3" || FamilyName=="STM32F4" || FamilyName=="STM32F7"  || FamilyName=="STM32L1"]
+[#if APB=="APB1"]
+  uint32_t              uwTimclock, uwAPB1Prescaler = 0U;
+[#else]
+  uint32_t              uwTimclock = 0U;
+[/#if]
+
+  uint32_t              uwPrescalerValue = 0U;
+[/#if]
   uint32_t              pFLatency;
-[#if FamilyName=="STM32U5"]
+[#if FamilyName=="STM32U5" || FamilyName=="STM32F0"  || FamilyName=="STM32F2" || FamilyName=="STM32F3" || FamilyName=="STM32F4" || FamilyName=="STM32F7"  || FamilyName=="STM32L0" ]
   HAL_StatusTypeDef     status;
 [/#if]
-[#if FamilyName=="STM32WL"]
+[#if FamilyName=="STM32WL" || FamilyName=="STM32F1" || FamilyName=="STM32G0" || FamilyName=="STM32L1" || FamilyName=="STM32L4"]
   HAL_StatusTypeDef     status = HAL_OK;
 
 [/#if]
 [#if FamilyName=="STM32G4"]
   HAL_StatusTypeDef     status = HAL_OK;
 [/#if]
-[#if FamilyName!="STM32WL" && FamilyName!="STM32H7" && FamilyName!="STM32G4" && FamilyName!="STM32U5"]
+[#if FamilyName!="STM32WL" && FamilyName!="STM32H7" && FamilyName!="STM32G4" && FamilyName!="STM32U5" && FamilyName!="STM32F0" && FamilyName!="STM32F1"  && FamilyName!="STM32F2" && FamilyName!="STM32F3" && FamilyName!="STM32F4" && FamilyName!="STM32F7" && FamilyName!="STM32G0" && FamilyName!="STM32L1" && FamilyName!="STM32L4"]
   /*Configure the ${instance} IRQ priority */
   HAL_NVIC_SetPriority(${timeBaseInterrupt}, TickPriority ,0); 
   
@@ -104,13 +122,17 @@ HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
   /* Get clock configuration */
   HAL_RCC_GetClockConfig(&clkconfig, &pFLatency);
   
-[#if FamilyName=="STM32H7"]
+[#if FamilyName=="STM32H7" || FamilyName=="STM32F0" || FamilyName=="STM32F1" || FamilyName=="STM32F2" || FamilyName=="STM32F3" || FamilyName=="STM32F4" || FamilyName=="STM32F7" || FamilyName=="STM32G0" || FamilyName=="STM32L0" || FamilyName=="STM32L1" || FamilyName=="STM32L4"]
  [#if APB=="APB1"]
   /* Get ${APB} prescaler */
   uw${APB}Prescaler = clkconfig.${APB}CLKDivider; 
 [/#if] 
+[#if APB=="APB2" &&  FamilyName=="STM32L0"]
+  /* Get ${APB} prescaler */
+  uw${APB}Prescaler = clkconfig.${APB}CLKDivider; 
+[/#if] 
 [/#if]
-[#if FamilyName=="STM32H7"]
+[#if FamilyName=="STM32H7" || FamilyName=="STM32F0" || FamilyName=="STM32F1" || FamilyName=="STM32F2" || FamilyName=="STM32F3" || FamilyName=="STM32F4" || FamilyName=="STM32F7" || FamilyName=="STM32G0" || FamilyName=="STM32L0" || FamilyName=="STM32L1" || FamilyName=="STM32L4"]
   /* Compute ${instance} clock */
     [#if APB=="APB1"]
   if (uwAPB1Prescaler == RCC_HCLK_DIV1)
@@ -123,8 +145,17 @@ HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
   }
         
     [#else]
-        
-  [#if TIMAPB2Presc?? && TIMAPB2Presc!="1"]
+ [#if APB=="APB2" && FamilyName=="STM32L0"]
+  if (uwAPB2Prescaler == RCC_HCLK_DIV1)
+  {
+    uwTimclock = HAL_RCC_GetPCLK2Freq();
+  }
+  else
+  {
+    uwTimclock = 2U * HAL_RCC_GetPCLK2Freq();
+  }   
+[/#if]    
+  [#if TIMAPB2Presc?? && TIMAPB2Presc!="1" && FamilyName!="STM32L0"]
   uwTimclock = ${TIMAPB2Presc}*HAL_RCC_GetPCLK2Freq();
         [#else]
   uwTimclock = HAL_RCC_GetPCLK2Freq();
@@ -132,7 +163,7 @@ HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
      
     [/#if]
    [/#if]
-[#if FamilyName!="STM32H7"]
+[#if FamilyName!="STM32H7" && FamilyName!="STM32F0" && FamilyName!="STM32F1"  && FamilyName!="STM32F2" && FamilyName!="STM32F3" && FamilyName!="STM32F4" && FamilyName!="STM32F7" && FamilyName!="STM32G0" && FamilyName!="STM32L0" && FamilyName!="STM32L1" && FamilyName!="STM32L4"]
   /* Compute ${instance} clock */
     [#if APB=="APB1"]
         [#if TIMAPB1Presc?? && TIMAPB1Presc!="1"]
@@ -164,7 +195,10 @@ HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
   h${instance?lower_case}.Init.Prescaler = uwPrescalerValue;
   h${instance?lower_case}.Init.ClockDivision = 0;
   h${instance?lower_case}.Init.CounterMode = TIM_COUNTERMODE_UP;
-[#if FamilyName=="STM32WL" || FamilyName=="STM32G4" || FamilyName=="STM32U5"]
+[#if FamilyName=="STM32F0" || FamilyName=="STM32F1" || FamilyName=="STM32F2" || FamilyName=="STM32F3" || FamilyName=="STM32F4" || FamilyName=="STM32F7" || FamilyName=="STM32G0" || FamilyName=="STM32L4"]
+  h${instance?lower_case}.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+[/#if]
+[#if FamilyName=="STM32WL" || FamilyName=="STM32G4" || FamilyName=="STM32U5" || FamilyName=="STM32F0" || FamilyName=="STM32F1" || FamilyName=="STM32F2" || FamilyName=="STM32F3" || FamilyName=="STM32F4" || FamilyName=="STM32F7" || FamilyName=="STM32G0" || FamilyName=="STM32L0" || FamilyName=="STM32L1" || FamilyName=="STM32L4"]
 
   status = HAL_TIM_Base_Init(&h${instance?lower_case});
   if (status == HAL_OK)
@@ -173,7 +207,7 @@ HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
     status = HAL_TIM_Base_Start_IT(&h${instance?lower_case});
     if (status == HAL_OK)
     {
-    [#if FamilyName!="STM32U5"]
+    [#if FamilyName!="STM32U5" && FamilyName!="STM32L0"]
     /* Enable the ${instance} global Interrupt */
         HAL_NVIC_EnableIRQ(${timeBaseInterrupt}); 
       /* Configure the SysTick IRQ priority */
@@ -194,10 +228,14 @@ HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
       }
     }
   }
+ [#if isTim_callback?? && isTim_callback=="1"]
+  HAL_TIM_RegisterCallback(&h${instance?lower_case}, HAL_TIM_PERIOD_ELAPSED_CB_ID, TimeBase_TIM_PeriodElapsedCallback);
+ [/#if]
 [#if FamilyName=="STM32U5"]
   /* Enable the ${instance} global Interrupt */
   HAL_NVIC_EnableIRQ(${timeBaseInterrupt}); 
   [/#if]
+
  /* Return function status */
   return status;
 [#else]
@@ -207,8 +245,11 @@ HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
     /* Start the TIM time Base generation in interrupt mode */
     return HAL_TIM_Base_Start_IT(&h${instance?lower_case});
   }
-  
-  /* Return function status */
+  [#if isTim_callback?? && isTim_callback=="1"]
+  HAL_TIM_RegisterCallback(&h${instance?lower_case}, HAL_TIM_PERIOD_ELAPSED_CB_ID, TimeBase_TIM_PeriodElapsedCallback);
+ [/#if]
+ 
+  /* Return function status */ 
   return HAL_ERROR;
 [/#if]
 }
@@ -236,29 +277,24 @@ void HAL_ResumeTick(void)
   /* Enable ${instance} Update interrupt */
   __HAL_TIM_ENABLE_IT(&h${instance?lower_case}, TIM_IT_UPDATE);
 }
-
-[#--/**
+[#if isTim_callback?? && isTim_callback=="1"]
+ /**
   * @brief  Period elapsed callback in non blocking mode
-  * @note   This function is called  when ${instance} interrupt took place, inside
+  * @note   This function is called  when TIM6 interrupt took place, inside
   * HAL_TIM_IRQHandler(). It makes a direct call to HAL_IncTick() to increment
   * a global variable "uwTick" used as application time base.
-  * @param  htim : TIM handle
+  * @param  htim TIM handle
   * @retval None
   */
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+
+void TimeBase_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
+  /* Prevent unused argument(s) compilation warning */
+  UNUSED(htim);
+
   HAL_IncTick();
 }
---]
+ [/#if]
 
-[#--/**
-  * @brief  This function handles TIM interrupt request.
-  * @param  None
-  * @retval None
-  */
-void TIM6_DAC_IRQHandler(void) 
-{
-  HAL_TIM_IRQHandler(&h${instance});
-}--]
 
 

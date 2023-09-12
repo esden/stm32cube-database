@@ -360,20 +360,22 @@
             </CallLibMethod>
         </IFCondition>
 
-        <IFCondition Expression ="RCC_TZ_PRIV">
+        <IFCondition Expression ="RCC_TZ_SEC_PRIV">
+            <!--CallLibMethod Name="LL_RCC_EnableSecPrivilegedMode"/-->
             <CallLibMethod Name="LL_RCC_EnablePrivilegedMode"/>
-        </IFCondition>
-        <IFCondition Expression ="RCC_TZ_PRIV">
             <CallLibMethod Name="LL_RCC_ConfigSecure">
                 <MethodArg Name="Configuration" ParameterName="ItemSECPRIV"/>
             </CallLibMethod>
-            <Else>
-                <IFCondition Expression ="S_SECURE">
-                    <CallLibMethod Name="LL_RCC_ConfigSecure">
-                        <MethodArg Name="Configuration" ParameterName="ItemSEC"/>
-                    </CallLibMethod>
-                </IFCondition>
-            </Else>                  
+        </IFCondition>
+        <IFCondition Expression ="RCC_TZ_PRIV|RCC_TZ_NSEC_PRIV">
+            <!--CallLibMethod Name="LL_RCC_EnableNSecPrivilegedMode"/-->
+            <CallLibMethod Name="LL_RCC_EnablePrivilegedMode"/>
+        </IFCondition>
+
+        <IFCondition Expression ="RCC_TZ_SEC_NPRIV">
+            <CallLibMethod Name="LL_RCC_ConfigSecure">
+                <MethodArg Name="Configuration" ParameterName="ItemSEC"/>
+            </CallLibMethod>
         </IFCondition>
     </RefConfig>
 
@@ -945,6 +947,12 @@
             </CallLibMethod>
         </IFCondition>         
     </RefConfig>
+    
+    <RefConfig Comment="Set the OTG PHY reference clock selection" Name="USB_OTG_PHY_CLK_CONFIG">
+        <CallLibMethod Name="HAL_SYSCFG_SetOTGPHYReferenceClockSelection" ReturnHAL="false">
+            <MethodArg Name="RefClockSelection" ParameterName="USBRefClockSelection"/>
+        </CallLibMethod>
+    </RefConfig>
 
     <LibMethod Comment="" Name="LL_PWR_SetRegulVoltageScaling">
         <Argument AddressOf="false" GenericType="simple" Name="VoltageScaling"/>
@@ -1290,6 +1298,9 @@
     <LibMethod Comment="" Name="LL_RCC_MSIK_DisableInStopMode"/>
     <LibMethod Comment="" Name="LL_RCC_HSI_EnableInStopMode"/>
     <LibMethod Comment="" Name="LL_RCC_HSI_DisableInStopMode"/>
+    <LibMethod Comment="Configure the wakeup clock" Name="HAL_SYSCFG_SetOTGPHYReferenceClockSelection">
+        <Argument AddressOf="false" GenericType="simple" Name="RefClockSelection" OptimizationCondition="equal"/>
+    </LibMethod>
       
     <LibMethod Comment="" Name="LL_RCC_Enable_MSIPLLFAST"/>
     <RefComponent Cclass="HAL" Cgroup="RCC" Cversion="1.5.0">

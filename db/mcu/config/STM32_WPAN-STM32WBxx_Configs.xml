@@ -110,6 +110,7 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <ConfigFile Name="STM32_LMP_IF_H"/>
         <ConfigFile Name="BLE_VCP_CONF_H"/>
         <ConfigFile Name="WB_HW_IF_H"/>
+        <ConfigFile Name="BLE_STANDBY_STM32WB15_H"/>
     <!-- Core - src -->
         <ConfigFile Name="WB_APP_ENTRY_C"/>
         <ConfigFile Name="BLE_APP_DEBUG_C"/>
@@ -482,12 +483,15 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <SubComponent Csub="THREAD" Cvariant="Enabled">
             <!-- list here all the remaining files to be copy/paste in case of minimal distribution -->
             <!-- Header files for -->
-			<File Category="header" Name="thread/openthread/stack/third_party/mbedtls/repo/include/*"/>
-			<File Category="header" Name="thread/openthread/stack/third_party/mbedtls/repo/include/mbedtls/*.h"/>
-			<File Category="header" Name="thread/openthread/core/openthread_api/*.h"/>
+            <File Category="header" Name="thread/openthread/core/openthread_api/*.h"/>
             <File Category="header" Name="thread/openthread/stack/include/*.h"/>
             <File Category="header" Name="thread/openthread/stack/include/openthread/*.h"/>
             <File Category="header" Name="thread/openthread/stack/include/openthread/platform/*.h"/>
+            <File Category="header" Name="thread/openthread/stack/src/core/*.h"/>
+            <File Category="header" Name="thread/openthread/stack/src/core/config/*.h"/>
+            <File Category="header" Name="thread/openthread/stack/third_party/mbedtls/*.h"/>
+            <File Category="header" Name="thread/openthread/stack/third_party/mbedtls/repo/include/*"/>
+            <File Category="header" Name="thread/openthread/stack/third_party/mbedtls/repo/include/mbedtls/*.h"/>
             <File Category="header" Name="interface/patterns/ble_thread/tl/tl_thread_hci.h"/>
            <!-- Source files for -->
             <File Category="source" Name="thread/openthread/core/openthread_api/*.c"/>
@@ -614,7 +618,9 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <Argument Name="CFG_BLE_DATA_LENGTH_EXTENSION" GenericType="Simple"/>
         <Argument Name="CFG_BLE_SLAVE_SCA" GenericType="Simple"/>
         <Argument Name="CFG_BLE_MASTER_SCA" GenericType="Simple"/>
+<!--
         <Argument Name="CFG_BLE_LSE_SOURCE" GenericType="Simple"/>
+-->
         <Argument Name="CFG_BLE_HSE_STARTUP_TIME" GenericType="Simple"/>
         <Argument Name="CFG_BLE_MAX_CONN_EVENT_LENGTH" GenericType="Simple"/>
         <Argument Name="CFG_BLE_VITERBI_MODE" GenericType="Simple"/>
@@ -622,10 +628,17 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <Argument Name="CFG_BLE_OPTIONS_LL" GenericType="Simple"/>
         <Argument Name="CFG_BLE_OPTIONS_SVC" GenericType="Simple"/>
         <Argument Name="CFG_BLE_OPTIONS_DEVICE_NAME" GenericType="Simple"/>
+        <Argument Name="CFG_BLE_OPTIONS_EXT_ADV" GenericType="Simple"/>
+        <Argument Name="CFG_BLE_OPTIONS_CS_ALGO" GenericType="Simple"/>
         <Argument Name="CFG_BLE_OPTIONS_POWER_CLASS" GenericType="Simple"/>
         <Argument Name="CFG_BLE_MAX_COC_INITIATOR_NBR" GenericType="Simple"/>
         <Argument Name="CFG_BLE_MIN_TX_POWER" GenericType="Simple"/>
         <Argument Name="CFG_BLE_MAX_TX_POWER" GenericType="Simple"/>
+        <Argument Name="CFG_BLE_RX_MODEL_CONFIG" GenericType="Simple"/>
+        <Argument Name="CFG_BLE_MAX_ADV_SET_NBR" GenericType="Simple"/>
+        <Argument Name="CFG_BLE_MAX_ADV_DATA_LEN" GenericType="Simple"/>
+        <Argument Name="CFG_BLE_TX_PATH_COMPENS" GenericType="Simple"/>
+        <Argument Name="CFG_BLE_RX_PATH_COMPENS" GenericType="Simple"/>
         <Argument Name="CFG_TLBLE_EVT_QUEUE_LENGTH" GenericType="Simple"/>
         <Argument Name="CFG_TLBLE_MOST_EVENT_PAYLOAD_SIZE" GenericType="Simple"/>
         <Argument Name="DBG_TRACE_USE_CIRCULAR_QUEUE" GenericType="Simple"/>
@@ -1105,8 +1118,12 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <File Category="header" Condition="all" Name="App/tl_dbg_conf.h" Version="1.0"/>
     </RefConfigFile>
 
-    <RefConfigFile Description="" Name="BLE_STANDBY_STM32WB15_C" Template="stm32_wpan_standby_stm32wb15_c.ftl"  destinationFolder="Core/Src/">
-        <File Category="source" Condition="DIE494" Name="standby_stm32wb15.c" Version="1.0"/>
+    <RefConfigFile Description="" Name="BLE_STANDBY_STM32WB15_C" Template="stm32_wpan_standby_c.ftl"  destinationFolder="Core/Src/">
+        <File Category="source" Condition="DIE494" Name="standby.c" Version="1.0"/>
+    </RefConfigFile>
+
+    <RefConfigFile Description="" Name="BLE_STANDBY_STM32WB15_H" Template="stm32_wpan_standby_h.ftl"  destinationFolder="Core/Inc/">
+        <File Category="header" Condition="DIE494" Name="standby.h" Version="1.0"/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="THREAD_APP_THREAD_C" Template="stm32_wpan_thread_app_thread_c.ftl">
@@ -1115,6 +1132,7 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <Argument Name="CFG_CLI_UART" GenericType="Simple" Comment=""/>
         <Argument Name="PANID" GenericType="Simple" Comment=""/>
         <Argument Name="CHANNEL" GenericType="Simple" Comment=""/>
+        <Argument Name="NETWORKKEY" GenericType="Simple" Comment=""/>
         <Argument Name="FREERTOS_STATUS" GenericType="Simple" Comment=""/>
     </RefConfigFile>
 
@@ -1361,20 +1379,20 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
                   Comment="zcl/security/zcl.ias_ace.h:ias_ace:iasAce:static struct ZbZclIasAce$ROLECallbacksT:IasAce$ROLECallbacks_$ENDPOINT:ZbZclIasAce$ROLEAlloc:(zigbee_app_info.zb, SW$ENDPOINT_ENDPOINT, NULL):(zigbee_app_info.zb, SW$ENDPOINT_ENDPOINT, &amp;IasAceServerCallbacks_$ENDPOINT, NULL)"/>
         <Argument Name="CB_IAS_ACE_SERVER_ARMREQ_ENDPOINT1" GenericType="Simple" Comment="arm_req:static bool:(struct ZbZclClusterT *cluster, void *arg, struct ZbZclIasAceClientCommandArmT *arm_req, struct ZbZclIasAceServerCommandArmRspT *arm_rsp)"/>
         <Argument Name="CB_IAS_ACE_SERVER_BYPASSREQ_ENDPOINT1" GenericType="Simple" Comment="bypass_req:static void:(struct ZbZclClusterT *cluster, void *arg, struct ZbZclIasAceClientCommandBypassT *bypass_req, struct ZbZclIasAceServerCommandBypassRspT *bypass_rsp)"/>
-        <Argument Name="CB_IAS_ACE_SERVER_EMERGREQ_ENDPOINT1" GenericType="Simple" Comment="emerg_req:static uint8_t:(struct ZbZclClusterT *cluster, void *arg, struct ZbZclAddrInfoT *srcInfo)"/>
-        <Argument Name="CB_IAS_ACE_SERVER_FIREREQ_ENDPOINT1" GenericType="Simple" Comment="fire_req:static uint8_t:(struct ZbZclClusterT *cluster, void *arg, struct ZbZclAddrInfoT *srcInfo)"/>
-        <Argument Name="CB_IAS_ACE_SERVER_PANICREQ_ENDPOINT1" GenericType="Simple" Comment="panic_req:static uint8_t:(struct ZbZclClusterT *cluster, void *arg, struct ZbZclAddrInfoT *srcInfo)"/>
+        <Argument Name="CB_IAS_ACE_SERVER_EMERGREQ_ENDPOINT1" GenericType="Simple" Comment="emerg_req:static enum ZclStatusCodeT:(struct ZbZclClusterT *cluster, void *arg, struct ZbZclAddrInfoT *srcInfo)"/>
+        <Argument Name="CB_IAS_ACE_SERVER_FIREREQ_ENDPOINT1" GenericType="Simple" Comment="fire_req:static enum ZclStatusCodeT:(struct ZbZclClusterT *cluster, void *arg, struct ZbZclAddrInfoT *srcInfo)"/>
+        <Argument Name="CB_IAS_ACE_SERVER_PANICREQ_ENDPOINT1" GenericType="Simple" Comment="panic_req:static enum ZclStatusCodeT:(struct ZbZclClusterT *cluster, void *arg, struct ZbZclAddrInfoT *srcInfo)"/>
 
         <Argument Name="ZCL_IAS_WD_ENDPOINT1" GenericType="Simple" 
                   Comment="zcl/security/zcl.ias_wd.h:ias_wd:iasWd:static struct ZbZclIasWd$ROLECallbacksT:IasWd$ROLECallbacks_$ENDPOINT:ZbZclIasWd$ROLEAlloc:(zigbee_app_info.zb, SW$ENDPOINT_ENDPOINT, NULL):(zigbee_app_info.zb, SW$ENDPOINT_ENDPOINT, &amp;IasWdServerCallbacks_$ENDPOINT, NULL)"/>
-        <Argument Name="CB_IAS_WD_SERVER_STARTWARNING_ENDPOINT1" GenericType="Simple" Comment="start_warning:static uint8_t:(struct ZbZclClusterT *cluster, void *arg, struct ZbZclIasWdClientStartWarningReqT *req)"/>
-        <Argument Name="CB_IAS_WD_SERVER_SQUAWK_ENDPOINT1" GenericType="Simple" Comment="squawk:static uint8_t:(struct ZbZclClusterT *cluster, void *arg, struct ZbZclIasWdClientSquawkReqT *req)"/>
+        <Argument Name="CB_IAS_WD_SERVER_STARTWARNING_ENDPOINT1" GenericType="Simple" Comment="start_warning:static enum ZclStatusCodeT:(struct ZbZclClusterT *cluster, void *arg, struct ZbZclIasWdClientStartWarningReqT *req)"/>
+        <Argument Name="CB_IAS_WD_SERVER_SQUAWK_ENDPOINT1" GenericType="Simple" Comment="squawk:static enum ZclStatusCodeT:(struct ZbZclClusterT *cluster, void *arg, struct ZbZclIasWdClientSquawkReqT *req)"/>
 
         <Argument Name="ZCL_IAS_ZONE_ENDPOINT1" GenericType="Simple" 
                   Comment="zcl/security/zcl.ias_zone.h:ias_zone:iasZone:static struct ZbZclIasZone$ROLECallbacksT:IasZone$ROLECallbacks_$ENDPOINT:ZbZclIasZone$ROLEAlloc:(zigbee_app_info.zb, SW$ENDPOINT_ENDPOINT, &amp;IasZoneClientCallbacks_$ENDPOINT, NULL):(zigbee_app_info.zb, SW$ENDPOINT_ENDPOINT, ZCL_IAS_ZONE_SVR_ATTR_ZONE_TYPE, 0x00, false, &amp;IasZoneServerCallbacks_$ENDPOINT, NULL)"/>
-        <Argument Name="CB_IAS_ZONE_SERVER_MODECHANGE_ENDPOINT1" GenericType="Simple" Comment="mode_change:static uint8_t:(struct ZbZclClusterT *cluster, void *arg, enum ZbZclIasZoneServerModeT mode, struct ZbZclIasZoneClientTestModeReqT *req)"/>
+        <Argument Name="CB_IAS_ZONE_SERVER_MODECHANGE_ENDPOINT1" GenericType="Simple" Comment="mode_change:static enum ZclStatusCodeT:(struct ZbZclClusterT *cluster, void *arg, enum ZbZclIasZoneServerModeT mode, struct ZbZclIasZoneClientTestModeReqT *req)"/>
         <Argument Name="CB_IAS_ZONE_CLIENT_ZONESTATUSCHANGE_ENDPOINT1" GenericType="Simple" Comment="zone_status_change:static void:(struct ZbZclClusterT *cluster, void *arg, struct ZbZclIasZoneServerStatusChangeNotifyT *notify, const struct ZbApsAddrT *src)"/>
-        <Argument Name="CB_IAS_ZONE_CLIENT_ZONEENROLLREQ_ENDPOINT1" GenericType="Simple" Comment="zone_enroll_req:static uint8_t:(struct ZbZclClusterT *cluster, void *arg, struct ZbZclIasZoneServerEnrollRequestT *req, uint64_t ext_src_addr, enum ZbZclIasZoneClientResponseCodeT *rsp_code, uint8_t *zone_id)"/>
+        <Argument Name="CB_IAS_ZONE_CLIENT_ZONEENROLLREQ_ENDPOINT1" GenericType="Simple" Comment="zone_enroll_req:static enum ZclStatusCodeT:(struct ZbZclClusterT *cluster, void *arg, struct ZbZclIasZoneServerEnrollRequestT *req, uint64_t ext_src_addr, enum ZbZclIasZoneClientResponseCodeT *rsp_code, uint8_t *zone_id)"/>
 
         <Argument Name="ZCL_MESSAGING_ENDPOINT1" GenericType="Simple" 
                   Comment="zcl/se/zcl.message.h:messaging:messaging:static struct ZbZclMsg$ROLECallbacksT:Msg$ROLECallbacks_$ENDPOINT:ZbZclMsg$ROLEAlloc:(zigbee_app_info.zb, SW$ENDPOINT_ENDPOINT, &amp;MsgClientCallbacks_$ENDPOINT, NULL):(zigbee_app_info.zb, SW$ENDPOINT_ENDPOINT, &amp;MsgServerCallbacks_$ENDPOINT, NULL)"/>
@@ -1424,7 +1442,7 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
 
         <Argument Name="ZCL_OTA_UPGRADE_ENDPOINT1" GenericType="Simple" 
                   Comment="zcl/general/zcl.ota.h:otaUpgrade:otaUpgrade:static struct ZbZclOta$ROLECallbacksT:Ota$ROLECallbacks_$ENDPOINT:ZbZclOta$ROLEAlloc:(zigbee_app_info.zb, &amp;otaClientConfig_$ENDPOINT, NULL):(zigbee_app_info.zb, &amp;otaServerConfig_$ENDPOINT, NULL):struct ZbZclOta$ROLEConfig ota$ROLEConfig_$ENDPOINT "/>
-        <Argument Name="CB_OTAUPGRADE_CLIENT_DISCOVERCOMPLETE_ENDPOINT1" GenericType="Simple" Comment="discover_complete:static enum ZclStatusCodeT :(struct ZbZclClusterT *cluster, void *arg)"/>
+        <Argument Name="CB_OTAUPGRADE_CLIENT_DISCOVERCOMPLETE_ENDPOINT1" GenericType="Simple" Comment="discover_complete:static void :(struct ZbZclClusterT *cluster, enum ZclStatusCodeT status, void *arg)"/>
         <Argument Name="CB_OTAUPGRADE_CLIENT_IMAGENOTIFY_ENDPOINT1" GenericType="Simple" Comment="image_notify:static enum ZclStatusCodeT :(struct ZbZclClusterT *cluster, uint8_t payload_type, uint8_t jitter, struct ZbZclOtaImageDefinition *image_definition, struct ZbApsdeDataIndT *data_ind, struct ZbZclHeaderT *zcl_header)"/>
         <Argument Name="CB_OTAUPGRADE_CLIENT_QUERYNEXT_ENDPOINT1" GenericType="Simple" Comment="query_next:static void :(struct ZbZclClusterT *cluster, enum ZclStatusCodeT status, struct ZbZclOtaImageDefinition *image_definition, uint32_t image_size, void *arg)"/>
         <Argument Name="CB_OTAUPGRADE_CLIENT_UPDATERAW_ENDPOINT1" GenericType="Simple" Comment="update_raw:static enum ZclStatusCodeT :(struct ZbZclClusterT *cluster, uint8_t length, uint8_t *data, void *arg)"/>
@@ -2492,6 +2510,32 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <Argument Name="SERVICE5_CHAR3_PROP_INDICATE" GenericType="Simple"/>
         <Argument Name="SERVICE5_CHAR4_PROP_INDICATE" GenericType="Simple"/>
         <Argument Name="SERVICE5_CHAR5_PROP_INDICATE" GenericType="Simple"/>
+
+        <Argument Name="SERVICE1_CHAR1_VALUE_LENGTH" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR2_VALUE_LENGTH" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR3_VALUE_LENGTH" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR4_VALUE_LENGTH" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR5_VALUE_LENGTH" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR1_VALUE_LENGTH" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR2_VALUE_LENGTH" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR3_VALUE_LENGTH" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR4_VALUE_LENGTH" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR5_VALUE_LENGTH" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR1_VALUE_LENGTH" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR2_VALUE_LENGTH" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR3_VALUE_LENGTH" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR4_VALUE_LENGTH" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR5_VALUE_LENGTH" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR1_VALUE_LENGTH" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR2_VALUE_LENGTH" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR3_VALUE_LENGTH" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR4_VALUE_LENGTH" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR5_VALUE_LENGTH" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR1_VALUE_LENGTH" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR2_VALUE_LENGTH" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR3_VALUE_LENGTH" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR4_VALUE_LENGTH" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR5_VALUE_LENGTH" GenericType="Simple"/>
 
     </RefConfigFile>
 

@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Clock xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" savedConfig="false" xsi:noNamespaceSchemaLocation="../../../../../../../doc/V4/Development/Specifications/db/MCU_Clock.xsd">
 
+    <Background  imageName="STM32WB1MMCHx" name="STM32WB1MMCHx"  x="100" y="59">
+        <Condition Diagnostic="" Expression="STM32WB1MMCHx"/>
+    </Background> 
+
     <Background  imageName="hidemux3inputs" name="hideSPI"  x="723" y="888">
         <Condition Diagnostic="" Expression="STM32WBx0_Value_Line"/>
     </Background>
@@ -57,13 +61,19 @@
             <Output signalId="HSE"  to="HSERFWKPDevisor" />
            
         </Element>
+        <Element id="LSIRC" type="fixedSource" refParameter="LSI1_VALUE" x="295" y="260">
+            <Condition Diagnostic="" Expression="STM32WB1MMCHx"/>
+            <Output signalId="LSI1" to="LSIMult"/>
+        </Element>
         <Element id="LSIRC" type="fixedSource" refParameter="LSI1_VALUE" x="295" y="234">
+            <Condition Diagnostic="" Expression="!STM32WB1MMCHx"/>
             <Output signalId="LSI1" to="LSIMult"/>
         </Element>
         <Element id="LSI2RC" type="fixedSource" refParameter="LSI2_VALUE" x="295" y="328">
             <Output signalId="LSI2" to="LSIMult"/>
         </Element>
         <!--LSI Mux-->
+        
         <Element id="LSIMult" type="multiplexor" refParameter="LSISource1" x="420" y="292" refEnable="LSIEnable" >
             <Input signalId="LSI1"    from="LSIRC"        refValue="RCC_LSCOSOURCE_LSI1"/>
             <Input signalId="LSI2"    from="LSI2RC"       refValue="RCC_LSCOSOURCE_LSI2"/>
@@ -76,6 +86,7 @@
          
             <Output signalId="LSI" to="IWDGOutput"/>
         </Element>
+
         <Element id="LSEOSC" type="variedSource" refParameter="LSE_VALUE" x="200" y="194">
             <Output signalId="LSE" to="RTCClkSource"/>
             <Output signalId="LSE" to="RFWKPClkSource"/>
@@ -259,16 +270,17 @@
             <Input signalId="LPTIM2CLK" from="LPTIM2Mult"/>
         </Element>
         <!--IP RFWKP-->
-        <Element id="HSERFWKPDevisor" type="devisor" refParameter="RCC_RFWKP_Clock_Source_FROM_HSE" x="1220" y="885" refEnable="EnableHSERFDevisor">
+        <Element id="HSERFWKPDevisor" type="devisor" refParameter="RCC_RFWKP_Clock_Source_FROM_HSE" x="1250" y="890" refEnable="EnableHSERFDevisor">
             <Input signalId="HSE" from="HSEOSC"/>
             <Output signalId="HSE_RFWKP"  to="RFWKPClkSource" />
         </Element>
         <Element id="RFWKPClkSource" type="multiplexor" refParameter="RFWKPClockSelection" x="1302" y="895" refEnable="RFEnable">
             <Input signalId="HSE_RFWKP" from="HSERFWKPDevisor"    refValue="RCC_RFWKPCLKSOURCE_HSE_DIV1024"                     />
             <Input signalId="LSE"     from="LSEOSC"           refValue="RCC_RFWKPCLKSOURCE_LSE"/>
+            <Input signalId="LSI"     from="LSIRC"            refValue="RCC_RFWKPCLKSOURCE_LSI"/>
             <Output signalId="RFWKPCLK" to="RFWKPOutput"/>
         </Element>
-        <Element id="RFWKPOutput" type="activeOutput" refParameter="RFWKPFreq_Value" x="1358" y="910" refEnable="RFEnable">
+        <Element id="RFWKPOutput" type="activeOutput" refParameter="RFWKPFreq_Value" x="1358" y="925" refEnable="RFEnable">
             <Input signalId="RFWKPCLK" from="RFWKPClkSource"/>
         </Element>        
 
@@ -589,8 +601,18 @@
     <Label id="HSIRCCstLabel" type="constraint" posX="302" posY="530" text="16 MHz"/> 
     <Label id="MSIRCLabel"    type="info"       posX="302" posY="377" text="MSI RC"/>
     <Label id="MSIRCCstLabel" type="constraint" posX="302" posY="415" text="KHz"/>
-    <Label id="LSI_RCLabel"   type="Info"       posX="302" posY="222" text="LSI1 RC"/>
-    <Label id="LSI_RCcST"     type="constraint" posX="302" posY="260" text="32 KHz"/>
+    <Label id="LSI_RCLabel"   type="Info"       posX="302" posY="222" text="LSI1 RC">
+        <Condition Diagnostic="" Expression="!STM32WB1MMCHx"/>
+    </Label>
+    <Label id="LSI_RCLabel"   type="Info"       posX="302" posY="247" text="LSI1 RC">
+        <Condition Diagnostic="" Expression="STM32WB1MMCHx"/>
+    </Label>
+    <Label id="LSI_RCcST"     type="constraint" posX="302" posY="260" text="32 KHz">
+        <Condition Diagnostic="" Expression="!STM32WB1MMCHx"/>
+    </Label>
+    <Label id="LSI_RCcST"     type="constraint" posX="302" posY="290" text="32 KHz">
+        <Condition Diagnostic="" Expression="STM32WB1MMCHx"/>
+    </Label>
     <Label id="LSI_RCLabel"   type="Info"       posX="302" posY="313" text="LSI2 RC"/>
     <Label id="LSI_RCcST"     type="constraint" posX="302" posY="353" text="32 KHz"/>
     
@@ -675,10 +697,11 @@
     <Label id="LPTIM2LSELabel"    type="signal"      text="HSI"               posX="1260" posY="785"  refEnable="LPTIM2Enable"/>
     <Label id="LPTIM2PCLK1Label"  type="signal"      text="LSE"               posX="1260" posY="810" refEnable="LPTIM2Enable"/>
     <!--RF system wakeup mux-->
-    <Label id="LPTIM2MUXLabel"    type="muxLabel"    text="RFWKP Clock Mux"  posX="1250" posY="860"  refEnable="RFEnable"/>
-    <Label id="LPTIM2Output"      type="SpecialInfo" text="To RF system wakeup (KHz)"   posX="1415" posY="915"  refEnable="RFEnable"/> 	
-    <Label id="LPTIM2HSILabel"    type="signal"      text="HSE"               posX="1260" posY="885"  refEnable="HSEHCLKRFEnable"/>
-    <Label id="LPTIM2LSELabel"    type="signal"      text="LSE"               posX="1260" posY="920"  refEnable="RFEnable"/>
+    <Label id="LPTIM2MUXLabel"    type="muxLabel"    text="RFWKP Clock Mux"  posX="1250" posY="865"  refEnable="RFEnable"/>
+    <Label id="LPTIM2Output"      type="SpecialInfo" text="To RF system wakeup (KHz)"   posX="1415" posY="930"  refEnable="RFEnable"/> 	
+    <Label id="LPTIM2HSILabel"    type="signal"      text="HSE"               posX="1220" posY="890"  refEnable="HSEHCLKRFEnable"/>
+    <Label id="LPTIM2LSELabel"    type="signal"      text="LSE"               posX="1260" posY="925"  refEnable="RFEnable"/>
+    <Label id="LPTIM2LSELabel"    type="signal"      text="LSI"               posX="1260" posY="955"  refEnable="RFEnable"/>
     <!--I2C1 mux-->
     <Label id="I2C1MUXLabel"    type="muxLabel"    text="I2C1 Clock Mux" posX="830" posY="715" refEnable="I2C1Enable"/>
     <Label id="I2C1Output"      type="SpecialInfo" text="To I2C1 (MHz)"  posX="993" posY="783" refEnable="I2C1Enable"/> 	

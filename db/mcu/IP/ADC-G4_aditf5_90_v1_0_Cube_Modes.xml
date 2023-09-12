@@ -93,6 +93,32 @@
         <PossibleValue  Comment="DMA access mode enabled" Value="ENABLE"/>
     </RefParameter>
         
+    <RefParameter Visible="false" Comment="comm" DefaultValue="+ChannelVREF+|ChannelTS+|ChannelVBAT" Name="CommonPathInternal" Type="list"/>
+    
+    <RefParameter Comment="ChannelVREF" DefaultValue="ADC_CHANNEL_VREFINT" Name="ChannelVREF" Type="list" Visible="false">
+             <Condition Expression="VrefTSelected$IpInstance" Diagnostic=""/>
+
+        <PossibleValue Comment="ADC_CHANNEL_VREFINT" Value="ADC_CHANNEL_VREFINT"/>
+    </RefParameter>
+    <RefParameter Comment="ChannelVREF" DefaultValue="null" Name="ChannelVREF" Type="list" Visible="false"></RefParameter>
+    
+    <RefParameter Comment="ChannelTS" DefaultValue="ADC_CHANNEL_TEMPSENSOR_ADC1" Name="ChannelTS" Type="list" Visible="false">
+                <Condition Expression="VtsATSelected$IpInstance" Diagnostic=""/>
+
+        <PossibleValue Comment="ADC_CHANNEL_TEMPSENSOR_ADC1" Value="ADC_CHANNEL_TEMPSENSOR_ADC1"/>
+    </RefParameter>
+    <RefParameter Comment="ChannelTS" DefaultValue="ADC_CHANNEL_TEMPSENSOR_ADC5" Name="ChannelTS" Type="list" Visible="false">
+                <Condition Expression="VtsATSelected$IpInstance" Diagnostic=""/>
+
+        <PossibleValue Comment="ADC_CHANNEL_TEMPSENSOR_ADC5" Value="ADC_CHANNEL_TEMPSENSOR_ADC5"/>
+    </RefParameter>
+    <RefParameter Comment="ChannelTS" DefaultValue="null" Name="ChannelTS" Type="list" Visible="false"></RefParameter>
+    
+    <RefParameter Comment="Channelvbat" DefaultValue="ADC_CHANNEL_VBAT" Name="ChannelVBAT" Type="list" Visible="false">
+        <Condition Expression="VbatfTSelected$IpInstance" Diagnostic=""/>
+        <PossibleValue Comment="ADC_CHANNEL_VBAT" Value="ADC_CHANNEL_VBAT"/>
+    </RefParameter>
+    <RefParameter Comment="Channelvbat" DefaultValue="null" Name="ChannelVBAT" Type="list" Visible="false"></RefParameter> 
         
     <RefParameter Comment="DMA Access Mode" DefaultValue="null" Group="ADCs_Common_Settings" Name="DMAAccessMode" Type="list" Visible="false">
         <Condition Diagnostic="" Expression="Mode=ADC_MODE_INDEPENDENT | Mode=null "/>
@@ -195,7 +221,7 @@
         <PossibleValue Action="DISABLE" Condition="(((FHzAsyncCLK/256)&gt;60000000)|(140000&gt;(FHzAsyncCLK/256)))" Diagnostic="Prescaler divider not respecting Fadc Min Max Constraint" Comment="Asynchronous clock mode divided by 256" Semaphore="$IpInstanceUsedAsynchronousCLK_ForRCC" Value="ADC_CLOCK_ASYNC_DIV256"/>
         <Description>frequency of the clock to the ADC. The clock is common for all the ADCs.</Description>
     </RefParameter>  
-		
+   
     <!-- Possible Value of Resolution parameter -->
     <RefParameter Comment="Resolution" DefaultValue="ADC_RESOLUTION_12B" Group="ADCgroup" Name="Resolution" Type="list">
         <PossibleValue Action="Disable" Comment="ADC 12-bit resolution" Condition="isNotAllowed_12b10b" Diagnostic="In case of usage of channels on injected group, ADC frequency should be low than AHB clock frequency /4 for resolution 12 or 10 bits." Semaphore="ADC_RESOLUTION12b_$IpInstance" Value="ADC_RESOLUTION_12B"/>
@@ -3818,6 +3844,8 @@
                 </Mode>
             </ModeLogicOperator>
             <Semaphore>channelSelected$IpInstance</Semaphore>
+            <Semaphore>VtsATSelected$IpInstance</Semaphore>
+
         </Mode>
         
         <Mode Name="IN-Vbat" RemoveCondition="($IpNumber=2)|($IpNumber=4)" UserName="Vbat Channel">
@@ -3829,6 +3857,8 @@
                 </Mode>
             </ModeLogicOperator>
             <Semaphore>channelSelected$IpInstance</Semaphore>
+             <Semaphore>VbatfTSelected$IpInstance</Semaphore>
+
         </Mode>
         <Mode Name="IN-Vrefint" RemoveCondition="($IpNumber=2)" UserName="Vrefint Channel">
             <ModeLogicOperator Name="XOR">
@@ -3839,6 +3869,8 @@
                 </Mode>
             </ModeLogicOperator>
             <Semaphore>channelSelected$IpInstance</Semaphore>
+            <Semaphore>VrefTSelected$IpInstance</Semaphore>
+
         </Mode>
     
         <!-- DAC inputs  -->

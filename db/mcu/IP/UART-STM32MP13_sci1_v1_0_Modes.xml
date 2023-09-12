@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><IP xmlns="http://mcd.rou.st.com/modules.php?name=mcu" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" DBVersion="V4.0" IPType="peripheral" IpGroup="Connectivity" Name="UART" Version="STM32MP13_sci1_v1_0" ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd">
+	
+    <About>UART : Universal Asynchronous Receiver Transmitter</About>
+      
+    <!-- RefMode for Asynchronous HardwareControl -->
+    <RefMode BaseMode="usartBasic" HalMode="UART" Name="Asynchronous">
+        <Condition Diagnostic="" Expression="$IpInstance_HardwareControl"/>
+    </RefMode>
+	  
+    <!-- RefMode for Asynchronous UART -->
+    <RefMode BaseMode="usartBasic" HalMode="UART" Name="Asynchronous">
+    </RefMode>
+
+    <!-- RefMode for 'Single Wire' UART -->
+    <RefMode BaseMode="usartBasic" HalMode="UART" Name="Half_duplex(single_wire_mode)">
+    </RefMode>
+		
+    <!-- RefMode for 'MultiProcessor Communication' UART -->
+    <RefMode BaseMode="usartBasic" HalMode="UART" Name="Multiprocessor_communication">
+    </RefMode>
+    
+    <!-- RefModes for LIN -->
+    <RefMode BaseMode="usartBasic" HalMode="UART" Name="LIN">
+    </RefMode>
+	
+    <!-- RefModes for IRDA -->
+    <RefMode BaseMode="usartBasic" HalMode="IRDA" Name="IrDA">
+    </RefMode>
+	
+    <!-- RefModes for Harwdware Flow Control -->
+    <RefMode Name="CTS_Only"/>
+	
+    <RefMode Name="RTS_Only"/>
+	
+    <RefMode Name="CTS_RTS"/>
+	
+    <!-- RefModes for RS485 -->
+    <RefMode HalMode="UART" Name="Hardware Flow Control (RS485)">
+    </RefMode>
+	
+    <!-- ModeLogicOperator for UART/Modbus -->
+    <ModeLogicOperator Name="OR">
+        <Mode Name="Mode">
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="Asynchronous">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="RX"/>
+                        <Signal Name="TX"/>
+                    </SignalLogicalOp>
+                    <Semaphore>$IpInstance_Asynchronous</Semaphore>
+                    <Semaphore>Asynchronous</Semaphore>
+                    <Semaphore>S_$IpInstance_TX_RX</Semaphore>
+                </Mode>
+                <Mode Name="Half_duplex(single_wire_mode)" UserName="Single Wire (Half-Duplex)">
+                    <SignalLogicalOp Name="AND">
+                        <Signal IOMode="AlternateFunctionOpenDrainAndPushPullDefaultOD" Name="TX"/>
+                    </SignalLogicalOp>
+                    <Semaphore>S_$IpInstance_TX_RX</Semaphore>
+                </Mode>
+                <Mode Name="Multiprocessor_communication" UserName="Multiprocessor Communication">
+                    <SignalLogicalOp Name="AND">
+                        <Signal IOMode="AlternateFunctionOpenDrainAndPushPullDefaultOD" Name="RX"/>
+                        <Signal IOMode="AlternateFunctionOpenDrainAndPushPullDefaultOD" Name="TX"/>
+                    </SignalLogicalOp>
+                    <Semaphore>S_$IpInstance_TX_RX</Semaphore>
+                </Mode>
+                <Mode Name="IrDA">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="RX"/>
+                        <Signal Name="TX"/>
+                    </SignalLogicalOp>
+                    <Semaphore>$IpInstance_IRDA</Semaphore>
+                    <Semaphore>S_$IpInstance_TX_RX</Semaphore>
+                </Mode>
+                <Mode Name="LIN">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="RX"/>
+                        <Signal Name="TX"/>
+                    </SignalLogicalOp>
+                    <Semaphore>$IpInstance_LIN</Semaphore>
+                    <Semaphore>S_$IpInstance_TX_RX</Semaphore>
+                </Mode>
+            </ModeLogicOperator>
+        </Mode>
+	
+        <Mode Name="Hardware Flow Control (RS232)">
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="CTS_Only" UserName="CTS Only">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="CTS"/>
+                    </SignalLogicalOp>
+                    <Semaphore>$IpInstance_Clear</Semaphore>
+                </Mode>
+                <Mode Name="RTS_Only" UserName="RTS Only">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="RTS"/>
+                    </SignalLogicalOp>
+                    <Semaphore>$IpInstance_Request</Semaphore>
+                </Mode>
+                <Mode Name="CTS_RTS" UserName="CTS/RTS">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="CTS"/>
+                        <Signal Name="RTS"/>
+                    </SignalLogicalOp>
+                    <Semaphore>$IpInstance_CTS_RTS</Semaphore>
+                </Mode>
+            </ModeLogicOperator>
+            <Condition Diagnostic="Active only with Asynchronous Mode" Expression="$IpInstance_Asynchronous &amp; !$IpInstance_HardwareControl"/>
+            <Semaphore>$IpInstance_FlowControl</Semaphore>
+        </Mode>
+        <Mode Name="Hardware Flow Control (RS485)">
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="Hardware Flow Control (RS485)">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="DE"/>
+                    </SignalLogicalOp>
+                </Mode>
+            </ModeLogicOperator>
+            <Condition Diagnostic="Active only with Asynchronous Mode" Expression="!$IpInstance_FlowControl &amp; $IpInstance_Asynchronous"/>
+            <Semaphore>$IpInstance_HardwareControl</Semaphore>
+        </Mode>
+    </ModeLogicOperator>
+	
+    <!-- RefSignal for UART/Modbus -->
+    <RefSignal IOMode="AlternateFunctionPuPdOnly" Name="CTS"/>
+    <RefSignal IOMode="AlternateFunctionPushPull" Name="RTS"/>
+    <RefSignal IOMode="AlternateFunctionPushPull" Name="DE"/>
+    <RefSignal IOMode="AlternateFunctionPuPdOnly" Name="RX"/>
+    <RefSignal IOMode="AlternateFunctionOpenDrainAndPushPullDefaultPP" Name="TX"/>
+    <Semaphore>$IpInstanceUsed_ForRCC</Semaphore>
+</IP>

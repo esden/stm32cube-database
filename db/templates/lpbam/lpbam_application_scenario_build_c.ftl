@@ -783,7 +783,7 @@ static void MX_${QName?replace(" ","_")}_Q_Build(void)
                     #ttransfer_idx = 0;
                     #n
                     #t/* Repeat inserting I2C master Tx data queue until completing all data */
-                    #twhile (${sizeArg}.Size != 0U)
+                    #twhile (data_size != 0U)
                     #t{
                     #t#tif (${method.name}(${args}) != LPBAM_OK)                
                     #t#t{
@@ -791,16 +791,15 @@ static void MX_${QName?replace(" ","_")}_Q_Build(void)
                     #t#t}
                     #n       
                     #t#ttransfer_idx++;
+                    #n
                     #t#tif (data_size > LPBAM_I2C_MAX_DATA_SIZE)
                     #t#t{
                       #t#t#tdata_size -= LPBAM_I2C_MAX_DATA_SIZE;
                     #t#t}
                     #t#telse
                     #t#t{
-                      #t#tdata_size = 0U;
+                      #t#t#tdata_size = 0U;
                     #t#t}
-                    #n
-                    #t#t${sizeArg}.Size = data_size;
                     #t}
                 [#else]
                     [#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}(${args}) != [#if method.returnHAL == "true"]LPBAM_OK[#else]${method.returnHAL}[/#if])                

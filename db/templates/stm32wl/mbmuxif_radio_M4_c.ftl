@@ -66,6 +66,7 @@ static osSemaphoreId_t Sem_MbRadioRespRcv;
 osThreadId_t Thd_RadioNotifRcvProcessId;
 [/#if]
 [#if THREADX??]
+static __IO uint8_t Thd_RadioNotifRcv_RescheduleFlag = 0;
 static TX_THREAD Thd_RadioNotifRcv;
 static TX_SEMAPHORE Sem_MbRadioRespRcv;
 [/#if]
@@ -304,6 +305,10 @@ static void MBMUXIF_IsrRadioNotifRcvCb(void *ComObj)
   /* USER CODE END MBMUXIF_IsrRadioNotifRcvCb_1 */
   RadioComObj = (MBMUX_ComParam_t *) ComObj;
 [#if THREADX??][#-- If AzRtos is used --]
+  if (Thd_RadioNotifRcv_RescheduleFlag < 255)
+  {
+    Thd_RadioNotifRcv_RescheduleFlag++;
+  }
   tx_thread_resume(&Thd_RadioNotifRcv);
 [#else]
 [#if !FREERTOS??][#-- If FreeRtos is not used --]
@@ -358,7 +363,17 @@ static void Thd_MbRadioNotifRcv_Entry(ULONG thread_input)
   /* Infinite loop */
   for (;;)
   {
-    tx_thread_suspend(&Thd_RadioNotifRcv);
+    if (Thd_RadioNotifRcv_RescheduleFlag > 0)
+    {
+      /* if RescheduleFlag was set during MBMUXIF_TaskRadioNotifRcv() don't suspend  */
+      Thd_RadioNotifRcv_RescheduleFlag--;
+    }
+    else
+    {
+      tx_thread_suspend(&Thd_RadioNotifRcv);
+      /* if RescheduleFlag was set during suspend it should be reset */
+      Thd_RadioNotifRcv_RescheduleFlag = 0;
+    }
     MBMUXIF_TaskRadioNotifRcv();  /*what you want to do*/
     /* USER CODE BEGIN Thd_MbRadioNotifRcv_Entry_2 */
 

@@ -8,7 +8,7 @@
    
        
     <RefConfig Name="FileOoSystemJjFileXJjCore">
-        <Component Name="Middleware:FileX:Core:USEIiRTOS"/>
+        <Component Name="Middleware:FileX:Core:true"/>
         <ConfigFile Name="FX_USER"/>
         <ConfigFile Name="APP_FILEX_C" />
 		<ConfigFile Name="APP_FILEX_H" />
@@ -26,14 +26,15 @@
         <Component Name="Middleware:FileX:SD interface:true"/>
         <ConfigFile Name="FX_CUSTOM_SD_DRIVER_H"/>
         <ConfigFile Name="FX_DMA_SD_DRIVER_H"/>
-		<ConfigFile Name="FX_CUSTOM_MMC_DRIVER_H"/>
-        <ConfigFile Name="FX_DMA_MMC_DRIVER_H"/>
-        <!-- <ConfigFile Name="FX_POLLING_SD_DRIVER_H"/> -->
         <ConfigFile Name="FX_CUSTOM_SD_GLUE_FUNCTIONS_C"/>
         <ConfigFile Name="FX_DMA_SD_GLUE_FUNCTIONS_C"/>
+    </RefConfig>
+	<RefConfig Name="FileOoSystemJjFileXJjMMCOointerface">
+        <Component Name="Middleware:FileX:MMC interface:true"/>
+		<ConfigFile Name="FX_CUSTOM_MMC_DRIVER_H"/>
+        <ConfigFile Name="FX_DMA_MMC_DRIVER_H"/>
 		<ConfigFile Name="FX_CUSTOM_MMC_GLUE_FUNCTIONS_C"/>
         <ConfigFile Name="FX_DMA_MMC_GLUE_FUNCTIONS_C"/>
-        <!-- <ConfigFile Name="FX_POLLING_GLUE_FUNCTIONS_C"/> -->
     </RefConfig>
 	<RefConfig Name="FileOoSystemJjFileXJjLevelXOoNOROointerface">
 		<Component Name="Middleware:FileX:LevelX NOR interface:true"/>
@@ -49,14 +50,13 @@
         <ConfigFile Name="FX_STM32_CUSTOM_DRIVER_H_FTL"/>
     </RefConfig>
 	
-
+	<!-- APP fILEX header and source files -->
 	<RefConfigFile Description="FileX initialisation file" Name="APP_FILEX_H" Template="azure_rtos/app_filex_h.ftl" destinationFolder="FileX/App">
 		<File Category="header" Condition="all" Name="app_filex.h" />
 		<Argument AddressOf="true" Context="global" GenericType="struct" Name="FX_STANDALONE_ENABLE" TypeName=""/>
-		<Argument AddressOf="true" Context="global" GenericType="struct" Name="useRTOS" TypeName=""/>
-		<Argument AddressOf="true" Context="global" GenericType="struct" Name="FileXTracing" TypeName=""/>
 		<Argument AddressOf="true" Context="global" GenericType="struct" Name="FX_SRAM_INTERFACE" TypeName=""/>
 		<Argument AddressOf="true" Context="global" GenericType="struct" Name="FX_SD_INTERFACE" TypeName=""/>
+		<Argument AddressOf="true" Context="global" GenericType="struct" Name="FX_MMC_INTERFACE" TypeName=""/>
 		<Argument AddressOf="true" Context="global" GenericType="struct" Name="FX_LX_NOR_INTERFACE" TypeName=""/>
 		<Argument AddressOf="true" Context="global" GenericType="struct" Name="FX_LX_NAND_INTERFACE" TypeName=""/>
 		<Argument AddressOf="true" Context="global" GenericType="struct" Name="FX_CUSTOM_INTERFACE" TypeName=""/>
@@ -71,7 +71,9 @@
 		<Argument Added="true" AddressOf="false" GenericType="simple" Name="AZRTOS_APP_MEM_ALLOCATION_METHOD" OptimizationCondition="equal"/>
 		<Argument Added="true" AddressOf="false" GenericType="simple" Name="FX_STANDALONE_ENABLE" OptimizationCondition="equal"/>
 	</RefConfigFile>
-    <RefConfigFile Added="true" Description="FileX's template for fx_user.h" Name="FX_USER" Template="azure_rtos/fx_user_h.ftl" destinationFolder="FileX/App">
+    
+	<!-- FX_USER header file -->
+	<RefConfigFile Added="true" Description="FileX's template for fx_user.h" Name="FX_USER" Template="azure_rtos/fx_user_h.ftl" destinationFolder="FileX/App">
         <File Category="header" Condition="all" Name="./fx_user.h"/>
         <Argument Added="true" AddressOf="false" GenericType="simple" Name="FX_MAX_LAST_NAME_LEN" OptimizationCondition="equal"/>
         <Argument Added="true" AddressOf="false" GenericType="simple" Name="FX_DISABLE_ERROR_CHECKING" OptimizationCondition="equal"/>
@@ -115,103 +117,88 @@
 		<Argument Added="true" AddressOf="false" GenericType="simple" Name="FX_DISABLE_CONSECUTIVE_DETECT" OptimizationCondition="equal"/> 
 		
 	</RefConfigFile>
-    <RefConfigFile Added="true" Description="Fx sram driver header template" Name="FX_SRAM_DRIVER_H" Template="azure_rtos/fx_stm32_sram_driver_template_h.ftl" destinationFolder="FileX/Target">
+    
+	<!-- SRAM header file -->
+	<RefConfigFile Added="true" Description="Fx sram driver header template" Name="FX_SRAM_DRIVER_H" Template="azure_rtos/fx_stm32_sram_driver_template_h.ftl" destinationFolder="FileX/Target">
         <File Category="header" Condition="SEMInterfacesCcFileOoSystemJjFileXOoInternalOoRAMOointerface" Name="./fx_stm32_sram_driver.h"/>
         <Argument Added="true" AddressOf="false" GenericType="simple" Name="SRAM_DISK_SIZE" OptimizationCondition="equal"/>
         <Argument Added="true" AddressOf="false" GenericType="simple" Name="FX_SRAM_BASE_ADDRESS" OptimizationCondition="equal"/>
     </RefConfigFile>
-    <RefConfigFile Added="true" Description="FileX sd driver header template" Name="FX_CUSTOM_SD_DRIVER_H" Template="azure_rtos/fx_stm32_sd_driver_h.ftl" destinationFolder="FileX/Target">
-		<File Category="header" Condition="!SD_DMA_API" Name="./fx_stm32_sd_driver.h"/>
+    
+	<!-- SD header files -->
+	<RefConfigFile Added="true" Description="FileX sd driver header template" Name="FX_CUSTOM_SD_DRIVER_H" Template="azure_rtos/fx_stm32_sd_driver_h.ftl" destinationFolder="FileX/Target">
+		<File Category="header" Condition="GLUE_FUNCTIONS=Custom" Name="./fx_stm32_sd_driver.h"/>
         <Argument Added="true" AddressOf="false" GenericType="simple" Name="SD_SECTOR_SIZE" OptimizationCondition="equal"/>
         <Argument Added="true" AddressOf="false" GenericType="simple" Name="FX_DRIVER_SDMMC_INIT" OptimizationCondition="equal"/>
-        <Argument Added="true" AddressOf="false" GenericType="simple" Name="LX_DRIVER_CALLS_OSPI_INIT" OptimizationCondition="equal"/>
         <Argument Added="true" AddressOf="false" GenericType="simple" Name="ENABLE_CACHE_MAINTENANCE" OptimizationCondition="equal"/>
         <Argument Added="true" AddressOf="false" GenericType="simple" Name="SDMMC_INSTANCE" OptimizationCondition="equal"/>
-		<Argument Added="true" AddressOf="false" GenericType="simple" Name="SRAM_DISK_SIZE" OptimizationCondition="equal"/>
-		<Argument Added="true" AddressOf="false" GenericType="simple" Name="GLUE_FUNCTIONS" OptimizationCondition="equal"/>
-		<Argument Added="true" AddressOf="false" GenericType="simple" Name="TRANSFER_NOTIFICATION" OptimizationCondition="equal"/>
+		<Argument Added="true" AddressOf="false" GenericType="simple" Name="FX_STANDALONE_ENABLE" OptimizationCondition="equal"/>
 		<Argument Added="true" AddressOf="false" GenericType="simple" Name="useRTOS" OptimizationCondition="equal"/>
 		<Argument Added="true" AddressOf="false" GenericType="simple" Name="FX_STANDALONE_ENABLE" OptimizationCondition="equal"/>
     </RefConfigFile>
-    <RefConfigFile Added="true" Description="FileX sd driver header template" Name="FX_DMA_SD_DRIVER_H" Template="azure_rtos/fx_stm32_sd_driver_dma_it_rtos_h.ftl" destinationFolder="FileX/Target">
-		<File Category="header" Condition="!MMC_CUSTOM_API &amp; SD_DMA_API &amp; !SD_CUSTOM_API" Name="./fx_stm32_sd_driver.h"/>
+    <RefConfigFile Added="true" Description="FileX sd driver header template" Name="FX_DMA_SD_DRIVER_H" Template="azure_rtos/fx_stm32_sd_driver_dma_h.ftl" destinationFolder="FileX/Target">
+		<File Category="header" Condition="GLUE_FUNCTIONS=DMA_API" Name="./fx_stm32_sd_driver.h"/>
         <Argument Added="true" AddressOf="false" GenericType="simple" Name="SD_SECTOR_SIZE" OptimizationCondition="equal"/>
         <Argument Added="true" AddressOf="false" GenericType="simple" Name="FX_DRIVER_SDMMC_INIT" OptimizationCondition="equal"/>
-        <Argument Added="true" AddressOf="false" GenericType="simple" Name="LX_DRIVER_CALLS_OSPI_INIT" OptimizationCondition="equal"/>
         <Argument Added="true" AddressOf="false" GenericType="simple" Name="ENABLE_CACHE_MAINTENANCE" OptimizationCondition="equal"/>
         <Argument Added="true" AddressOf="false" GenericType="simple" Name="SDMMC_INSTANCE" OptimizationCondition="equal"/>
-		<Argument Added="true" AddressOf="false" GenericType="simple" Name="SRAM_DISK_SIZE" OptimizationCondition="equal"/>
 		<Argument Added="true" AddressOf="false" GenericType="simple" Name="GLUE_FUNCTIONS" OptimizationCondition="equal"/>
 		<Argument Added="true" AddressOf="false" GenericType="simple" Name="TRANSFER_NOTIFICATION" OptimizationCondition="equal"/>
+		<Argument Added="true" AddressOf="false" GenericType="simple" Name="FX_STANDALONE_ENABLE" OptimizationCondition="equal"/>
 		<Argument Added="true" AddressOf="false" GenericType="simple" Name="useRTOS" OptimizationCondition="equal"/>
 		<Argument Added="true" AddressOf="false" GenericType="simple" Name="FX_STANDALONE_ENABLE" OptimizationCondition="equal"/>
     </RefConfigFile>
+	<!-- SD GlUE file -->
+	<RefConfigFile Added="true" Description="FileX sd driver source template" Name="FX_CUSTOM_SD_GLUE_FUNCTIONS_C" Template="azure_rtos/fx_stm32_sd_driver_glue_c.ftl" destinationFolder="FileX/Target">
+		<File Category="source" Condition="GLUE_FUNCTIONS=Custom" Name="./fx_stm32_sd_driver_glue.c"/>
+		<Argument Added="true" AddressOf="false" GenericType="simple" Name="SDMMC_INSTANCE" OptimizationCondition="equal"/>
+    </RefConfigFile>
+    <RefConfigFile Added="true" Description="FileX sd driver source template" Name="FX_DMA_SD_GLUE_FUNCTIONS_C" Template="azure_rtos/fx_stm32_sd_driver_glue_dma_c.ftl" destinationFolder="FileX/Target">
+		<File Category="source" Condition="GLUE_FUNCTIONS=DMA_API" Name="./fx_stm32_sd_driver_glue.c"/>
+		<Argument Added="true" AddressOf="false" GenericType="simple" Name="SDMMC_INSTANCE" OptimizationCondition="equal"/>
+        <Argument Added="true" AddressOf="false" GenericType="simple" Name="GLUE_FUNCTIONS" OptimizationCondition="equal"/>
+        <Argument Added="true" AddressOf="false" GenericType="simple" Name="TRANSFER_NOTIFICATION" OptimizationCondition="equal"/>
+	</RefConfigFile>
+	
+	<!-- MMC header files -->
 	<RefConfigFile Added="true" Description="FileX mmc driver header template" Name="FX_CUSTOM_MMC_DRIVER_H" Template="azure_rtos/fx_stm32_mmc_driver_h.ftl" destinationFolder="FileX/Target">
-		<File Category="header" Condition="MMC_CUSTOM_API &amp; !SD_DMA_API &amp; !SD_CUSTOM_API" Name="./fx_stm32_mmc_driver.h"/>
-        <Argument Added="true" AddressOf="false" GenericType="simple" Name="SD_SECTOR_SIZE" OptimizationCondition="equal"/>
-        <Argument Added="true" AddressOf="false" GenericType="simple" Name="FX_DRIVER_SDMMC_INIT" OptimizationCondition="equal"/>
-        <Argument Added="true" AddressOf="false" GenericType="simple" Name="LX_DRIVER_CALLS_OSPI_INIT" OptimizationCondition="equal"/>
-        <Argument Added="true" AddressOf="false" GenericType="simple" Name="ENABLE_CACHE_MAINTENANCE" OptimizationCondition="equal"/>
-        <Argument Added="true" AddressOf="false" GenericType="simple" Name="SDMMC_INSTANCE" OptimizationCondition="equal"/>
-		<Argument Added="true" AddressOf="false" GenericType="simple" Name="SRAM_DISK_SIZE" OptimizationCondition="equal"/>
-		<Argument Added="true" AddressOf="false" GenericType="simple" Name="GLUE_FUNCTIONS" OptimizationCondition="equal"/>
-		<Argument Added="true" AddressOf="false" GenericType="simple" Name="TRANSFER_NOTIFICATION" OptimizationCondition="equal"/>
+		<File Category="header" Condition="MMC_GLUE_FUNCTIONS=Custom" Name="./fx_stm32_mmc_driver.h"/>
+        <Argument Added="true" AddressOf="false" GenericType="simple" Name="MMC_SECTOR_SIZE" OptimizationCondition="equal"/>
+        <Argument Added="true" AddressOf="false" GenericType="simple" Name="FX_DRIVER_MMC_INIT" OptimizationCondition="equal"/>
+        <Argument Added="true" AddressOf="false" GenericType="simple" Name="MMC_ENABLE_CACHE_MAINTENANCE" OptimizationCondition="equal"/>
+        <Argument Added="true" AddressOf="false" GenericType="simple" Name="MMC_INSTANCE" OptimizationCondition="equal"/>
+		<Argument Added="true" AddressOf="false" GenericType="simple" Name="FX_STANDALONE_ENABLE" OptimizationCondition="equal"/>
 		<Argument Added="true" AddressOf="false" GenericType="simple" Name="useRTOS" OptimizationCondition="equal"/>
 		<Argument Added="true" AddressOf="false" GenericType="simple" Name="FX_STANDALONE_ENABLE" OptimizationCondition="equal"/>
     </RefConfigFile>
-    <!-- <RefConfigFile Added="true" Description="FileX mmc driver header template" Name="FX_DMA_MMC_DRIVER_H" Template="azure_rtos/fx_stm32_mmc_driver_dma_it_rtos_h.ftl" destinationFolder="FileX/Target"> -->
-		<!-- <File Category="header" Condition="SEMInterfacesCcFileOoSystemJjFileXOoSDOointerface &amp; MMC_DMA_API" Name="./fx_stm32_mmc_driver_dma_it_rtos.h"/> -->
-        <!-- <Argument Added="true" AddressOf="false" GenericType="simple" Name="SD_SECTOR_SIZE" OptimizationCondition="equal"/> -->
-        <!-- <Argument Added="true" AddressOf="false" GenericType="simple" Name="FX_DRIVER_SDMMC_INIT" OptimizationCondition="equal"/> -->
-        <!-- <Argument Added="true" AddressOf="false" GenericType="simple" Name="LX_DRIVER_CALLS_OSPI_INIT" OptimizationCondition="equal"/> -->
-        <!-- <Argument Added="true" AddressOf="false" GenericType="simple" Name="ENABLE_CACHE_MAINTENANCE" OptimizationCondition="equal"/> -->
-        <!-- <Argument Added="true" AddressOf="false" GenericType="simple" Name="SDMMC_INSTANCE" OptimizationCondition="equal"/> -->
-		<!-- <Argument Added="true" AddressOf="false" GenericType="simple" Name="SRAM_DISK_SIZE" OptimizationCondition="equal"/> -->
-		<!-- <Argument Added="true" AddressOf="false" GenericType="simple" Name="GLUE_FUNCTIONS" OptimizationCondition="equal"/> -->
-		<!-- <Argument Added="true" AddressOf="false" GenericType="simple" Name="TRANSFER_NOTIFICATION" OptimizationCondition="equal"/> -->
-    <!-- </RefConfigFile> -->
-    <!-- <RefConfigFile Added="true" Description="FileX sd driver header template" Name="FX_POLLING_SD_DRIVER_H" Template="azure_rtos/fx_stm32_sd_driver_polling_h.ftl" destinationFolder="FileX/Target"> -->
-		<!-- <File Category="header" Condition="SEMInterfacesCcFileOoSystemJjFileXOoSDOointerface &amp; SD_POLLING_API" Name="./fx_stm32_sd_driver_polling.h"/> -->
-        <!-- <Argument Added="true" AddressOf="false" GenericType="simple" Name="SD_SECTOR_SIZE" OptimizationCondition="equal"/> -->
-        <!-- <Argument Added="true" AddressOf="false" GenericType="simple" Name="FX_DRIVER_SDMMC_INIT" OptimizationCondition="equal"/> -->
-        <!-- <Argument Added="true" AddressOf="false" GenericType="simple" Name="LX_DRIVER_CALLS_OSPI_INIT" OptimizationCondition="equal"/> -->
-        <!-- <Argument Added="true" AddressOf="false" GenericType="simple" Name="ENABLE_CACHE_MAINTENANCE" OptimizationCondition="equal"/> -->
-        <!-- <Argument Added="true" AddressOf="false" GenericType="simple" Name="SDMMC_INSTANCE" OptimizationCondition="equal"/> -->
-		<!-- <Argument Added="true" AddressOf="false" GenericType="simple" Name="SRAM_DISK_SIZE" OptimizationCondition="equal"/> -->
-		<!-- <Argument Added="true" AddressOf="false" GenericType="simple" Name="GLUE_FUNCTIONS" OptimizationCondition="equal"/> -->
-    <!-- </RefConfigFile> -->
-    <RefConfigFile Added="true" Description="FileX sd driver header template" Name="FX_CUSTOM_SD_GLUE_FUNCTIONS_C" Template="azure_rtos/fx_stm32_sd_driver_glue_c.ftl" destinationFolder="FileX/Target">
-		<File Category="source" Condition="!SD_DMA_API &amp; !MMC_CUSTOM_API &amp; SD_CUSTOM_API" Name="./fx_stm32_sd_driver_glue.c"/>
-        <Argument Added="true" AddressOf="false" GenericType="simple" Name="GLUE_FUNCTIONS" OptimizationCondition="equal"/>
-		<Argument Added="true" AddressOf="false" GenericType="simple" Name="SDMMC_INSTANCE" OptimizationCondition="equal"/>
-        <Argument Added="true" AddressOf="false" GenericType="simple" Name="TRANSFER_NOTIFICATION" OptimizationCondition="equal"/>
+    <RefConfigFile Added="true" Description="FileX mmc driver header template" Name="FX_DMA_MMC_DRIVER_H" Template="azure_rtos/fx_stm32_mmc_driver_dma_h.ftl" destinationFolder="FileX/Target">
+		<File Category="header" Condition="MMC_GLUE_FUNCTIONS=DMA_API" Name="./fx_stm32_mmc_driver.h"/>
+        <Argument Added="true" AddressOf="false" GenericType="simple" Name="MMC_SECTOR_SIZE" OptimizationCondition="equal"/>
+        <Argument Added="true" AddressOf="false" GenericType="simple" Name="FX_DRIVER_MMC_INIT" OptimizationCondition="equal"/>
+        <Argument Added="true" AddressOf="false" GenericType="simple" Name="MMC_ENABLE_CACHE_MAINTENANCE" OptimizationCondition="equal"/>
+        <Argument Added="true" AddressOf="false" GenericType="simple" Name="MMC_INSTANCE" OptimizationCondition="equal"/>
+		<Argument Added="true" AddressOf="false" GenericType="simple" Name="MMC_GLUE_FUNCTIONS" OptimizationCondition="equal"/>
+		<Argument Added="true" AddressOf="false" GenericType="simple" Name="MMC_TRANSFER_NOTIFICATION" OptimizationCondition="equal"/>
+		<Argument Added="true" AddressOf="false" GenericType="simple" Name="FX_STANDALONE_ENABLE" OptimizationCondition="equal"/>
 		<Argument Added="true" AddressOf="false" GenericType="simple" Name="useRTOS" OptimizationCondition="equal"/>
 		<Argument Added="true" AddressOf="false" GenericType="simple" Name="FX_STANDALONE_ENABLE" OptimizationCondition="equal"/>
     </RefConfigFile>
-    <RefConfigFile Added="true" Description="FileX sd driver header template" Name="FX_DMA_SD_GLUE_FUNCTIONS_C" Template="azure_rtos/fx_stm32_sd_driver_glue_hal_c.ftl" destinationFolder="FileX/Target">
-		<File Category="source" Condition="SD_DMA_API &amp; !MMC_CUSTOM_API &amp; !SD_CUSTOM_API" Name="./fx_stm32_sd_driver_glue.c"/>
-        <Argument Added="true" AddressOf="false" GenericType="simple" Name="GLUE_FUNCTIONS" OptimizationCondition="equal"/>
-        <Argument Added="true" AddressOf="false" GenericType="simple" Name="TRANSFER_NOTIFICATION" OptimizationCondition="equal"/>
-		<Argument Added="true" AddressOf="false" GenericType="simple" Name="SDMMC_INSTANCE" OptimizationCondition="equal"/>
+	<!-- MMC GLUE file -->
+    <RefConfigFile Added="true" Description="FileX mmc driver source template" Name="FX_CUSTOM_MMC_GLUE_FUNCTIONS_C" Template="azure_rtos/fx_stm32_mmc_driver_glue_c.ftl" destinationFolder="FileX/Target">
+		<File Category="source" Condition="MMC_GLUE_FUNCTIONS=Custom" Name="./fx_stm32_mmc_driver_glue.c"/>
+		<Argument Added="true" AddressOf="false" GenericType="simple" Name="MMC_INSTANCE" OptimizationCondition="equal"/>
 		<Argument Added="true" AddressOf="false" GenericType="simple" Name="FX_STANDALONE_ENABLE" OptimizationCondition="equal"/>
     </RefConfigFile>
-	<RefConfigFile Added="true" Description="FileX mmc driver header template" Name="FX_CUSTOM_MMC_GLUE_FUNCTIONS_C" Template="azure_rtos/fx_stm32_mmc_driver_glue_c.ftl" destinationFolder="FileX/Target">
-		<File Category="source" Condition="MMC_CUSTOM_API &amp; !SD_DMA_API &amp; !SD_CUSTOM_API" Name="./fx_stm32_mmc_driver_glue.c"/>
-        <Argument Added="true" AddressOf="false" GenericType="simple" Name="GLUE_FUNCTIONS" OptimizationCondition="equal"/>
-        <Argument Added="true" AddressOf="false" GenericType="simple" Name="TRANSFER_NOTIFICATION" OptimizationCondition="equal"/>
+    <RefConfigFile Added="true" Description="FileX mmc driver source template" Name="FX_DMA_MMC_GLUE_FUNCTIONS_C" Template="azure_rtos/fx_stm32_mmc_driver_glue_dma_c.ftl" destinationFolder="FileX/Target">
+		<File Category="source" Condition="MMC_GLUE_FUNCTIONS=DMA_API" Name="./fx_stm32_mmc_driver_glue.c"/>
+        <Argument Added="true" AddressOf="false" GenericType="simple" Name="MMC_INSTANCE" OptimizationCondition="equal"/>
+		<Argument Added="true" AddressOf="false" GenericType="simple" Name="MMC_GLUE_FUNCTIONS" OptimizationCondition="equal"/>
+        <Argument Added="true" AddressOf="false" GenericType="simple" Name="MMC_TRANSFER_NOTIFICATION" OptimizationCondition="equal"/>
 		<Argument Added="true" AddressOf="false" GenericType="simple" Name="FX_STANDALONE_ENABLE" OptimizationCondition="equal"/>
 		<Argument Added="true" AddressOf="false" GenericType="simple" Name="SDMMC_INSTANCE" OptimizationCondition="equal"/>
     </RefConfigFile>
-    <!-- <RefConfigFile Added="true" Description="FileX mmc driver header template" Name="FX_DMA_MMC_GLUE_FUNCTIONS_C" Template="azure_rtos/fx_stm32_mmc_driver_glue_hal_c.ftl" destinationFolder="FileX/Target"> -->
-		<!-- <File Category="source" Condition="SEMInterfacesCcFileOoSystemJjFileXOoSDOointerface &amp; MMC_DMA_API" Name="./fx_stm32_mmc_driver_glue_hal.c"/> -->
-        <!-- <Argument Added="true" AddressOf="false" GenericType="simple" Name="GLUE_FUNCTIONS" OptimizationCondition="equal"/> -->
-        <!-- <Argument Added="true" AddressOf="false" GenericType="simple" Name="TRANSFER_NOTIFICATION" OptimizationCondition="equal"/> -->
-    <!-- </RefConfigFile> -->
-    <!-- <RefConfigFile Added="true" Description="FileX sd driver header template" Name="FX_POLLING_GLUE_FUNCTIONS_C" Template="azure_rtos/fx_stm32_sd_driver_glue_polling_c.ftl" destinationFolder="FileX/Target"> -->
-		<!-- <File Category="source" Condition="SEMInterfacesCcFileOoSystemJjFileXOoSDOointerface &amp; SD_POLLING_API" Name="./fx_stm32_sd_driver_glue_polling.c"/> -->
-        <!-- <Argument Added="true" AddressOf="false" GenericType="simple" Name="GLUE_FUNCTIONS" OptimizationCondition="equal"/> -->
-    <!-- </RefConfigFile> -->
 
+	<!-- LX NOR header file -->
     <RefConfigFile Added="true" Description="FileX level NOR driver header template" Name="FX_LX_NOR_DRVIER_H" Template="azure_rtos/fx_stm32_levelx_nor_driver_template_h.ftl" destinationFolder="FileX/Target">
         <File Category="header" Condition="SEMInterfacesCcFileOoSystemJjFileXOoLevelXOoNOROointerface" Name="./fx_stm32_levelx_nor_driver.h"/>
         <Argument Added="true" AddressOf="false" GenericType="simple" Name="PHYSICAL_SECTORS_PER_BLOCK" OptimizationCondition="equal"/>
@@ -225,6 +212,8 @@
    		<Argument Added="true" AddressOf="false" GenericType="simple" Name="LX_NOR_USE_OSPI_DRIVER" OptimizationCondition="equal"/>
    		<Argument Added="true" AddressOf="false" GenericType="simple" Name="LX_NOR_USE_QSPI_DRIVER" OptimizationCondition="equal"/>
     </RefConfigFile>
+	
+	<!-- LX NAND header file -->
 	<RefConfigFile Added="true" Description="FileX LevelX nand driver header template" Name="FX_LEVELX_NAND_DRIVER_H" Template="azure_rtos/fx_stm32_levelx_nand_driver_template_h.ftl" destinationFolder="FileX/Target">
         <File Category="header" Condition="SEMInterfacesCcFileOoSystemJjFileXOoLevelXOoNANDOointerface" Name="./fx_stm32_levelx_nand_driver.h"/>
         <Argument Added="true" AddressOf="false" GenericType="simple" Name="FX_LX_NAND_CUSTOM_DRIVER_NAME" OptimizationCondition="equal"/>
@@ -233,6 +222,8 @@
    		<Argument Added="true" AddressOf="false" GenericType="simple" Name="LX_NAND_USE_CUSTOM_DRIVER" OptimizationCondition="equal"/>
    		<Argument Added="true" AddressOf="false" GenericType="simple" Name="LX_NAND_USE_SIMULATOR_DRIVER" OptimizationCondition="equal"/>
     </RefConfigFile>
+	
+	<!-- Custom driver header and source files -->
 	<RefConfigFile Added="true" Description="FileX custom driver source ftl" Name="FX_STM32_CUSTOM_DRIVER_C_FTL" Template="azure_rtos/fx_stm32_custom_driver_c.ftl" destinationFolder="FileX/Target">
         <File Category="source" Condition="SEMInterfacesCcFileOoSystemJjFileXOoCustomOointerface" Name="./fx_stm32_custom_driver.c"/>
     </RefConfigFile>
@@ -241,7 +232,7 @@
     </RefConfigFile>
 	
     <RefComponent Cclass="Middleware" Cgroup="FileX" Cversion="6Gg1Gg9">
-        <SubComponent Csub="Core" Cvariant="USEIiRTOS" Cversion="6Gg1Gg9">
+        <SubComponent Csub="Core" Cvariant="true" Cversion="6Gg1Gg9">
             <File Category="source" Condition="" Name="filex/common/src/fx_directory_attributes_read.c"/>
             <File Category="source" Condition="" Name="filex/common/src/fx_directory_attributes_set.c"/>
             <File Category="source" Condition="" Name="filex/common/src/fx_directory_create.c"/>
@@ -490,6 +481,9 @@
         </SubComponent>
 		<SubComponent Csub="SD interface" Cvariant="true" Cversion="1Gg0Gg0">
 			<File Category="source" Condition="" Name="filex/common/drivers/fx_stm32_sd_driver.c"/>
+        </SubComponent>
+		<SubComponent Csub="MMC interface" Cvariant="true" Cversion="1Gg0Gg0">
+			<File Category="source" Condition="" Name="filex/common/drivers/fx_stm32_mmc_driver.c"/>
         </SubComponent>
 		<SubComponent Csub="LevelX NOR interface" Cvariant="true" Cversion="1Gg0Gg0">
 			<File Category="source" Condition="" Name="filex/common/drivers/fx_stm32_levelx_nor_driver.c"/>

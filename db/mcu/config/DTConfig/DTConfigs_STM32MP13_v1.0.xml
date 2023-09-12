@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!--DeviceTree configuration-->
+
+<DTConfigs xsi:noNamespaceSchemaLocation="" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+	<!--DB features list-->
+	<DbFeaturesList>
+		<Feature Name="noUBootSplSupport"/>
+	</DbFeaturesList>
+
+	<Configs>
+
+		<!--Devices creation-->
+		<!--////////////////-->
+
+		<Device MatcherMxDM="CRYP1" MatchToName="CRYP"/>
+
+		<Device MatcherMxDM="DFSDM1" MatchToName="DFSDM"/>
+
+		<!--"(^" and "$)" mandatory-->
+		<Device MatcherMxDM="(^DMA$)" MatchToName="DMAMUX1" SetterMatcherCtxt="(^CortexA7NS)" />
+		<Device MatcherMxDM="(^DMA$)" MatchToName="DMAMUX2" SetterMatcherCtxt="(^CortexA7S)" />
+
+		<Device MatcherMxDM="(ETZPC)" MatchToName="$1" FilterMatcherCtxt="(^CortexA7S$)" />
+
+		<Device MatcherMxDM="HASH1" MatchToName="HASH"/>
+
+		<!--forgot MDMA_A7S-->
+		<Device MatcherMxDM="(MDMA_A7NS)" MatchToName="MDMA" SetterMatcherCtxt="(^CortexA7NS$)" />
+
+		<Device MatcherMxDM="(GPIO)" MatchToName="$1" SetterMatcherCtxt="(^CortexA7S|CortexA7NS$)" />
+
+		<Device MatcherMxDM="RNG1" MatchToName="RNG"/>
+
+		<Device MatcherMxDM="(^USBH_HS1|USBH_HS2$)" MatchToName="USBH_EHCI"/>
+		<Device MatcherMxDM="(^USBH_HS1|USBH_HS2$)" MatchToName="USBH_OHCI"/>
+
+		<!--special case: usbo allows to create several devices => can not process it using default case.
+		Do not rename it to retrieve pinCtrl from IP name-->
+		<Device MatcherMxDM="(USB_OTG_HS)" MatchToName="$1"/>
+		<Device MatcherMxDM="(^USB_OTG_HS|USBH_HS1|USBH_HS2$)" MatchToName="USBPHYC"/>
+
+
+		<!--Remaining Data Models (default case)-->
+		<Device MatcherMxDM="(?!^(MDMA_A7S|DEBUG|SYS|BKPSRAM)$)(^.+$)" MatchToName="$2"/>
+
+
+		<!--dts file generation configurations-->
+		<!--//////////////////////////////////-->
+
+		<!--default config-->
+		<DefaultGenProcessConfig Name="CA7" />
+
+		<!--Devices binding configuration-->
+		<!--/////////////////////////////-->
+
+		<!--Default -->
+		<!--DO NOT MODIFY !-->
+		<DefaultDTGenConfig>
+			<Binding  MatcherFw="(^.+$)" Name="default_v1.0_Binding">
+			</Binding>
+		</DefaultDTGenConfig>
+
+
+		<!--Devices Cfg-->
+
+		<DTGenCfg  MatcherDevice="ADC(\d)" MatchToName="">
+			<Binding MatcherFw="(^.+$)" Name="default_v1.0_Binding">
+				<NodeDef 	MatcherNode="" 				MatchToLabel=""			MatchToNodeName="adc_$mxDeviceInstance" 	MatchToUnitAddress=""/>
+			</Binding>
+
+			<Bind MatcherFw="(^.+$)" />
+		</DTGenCfg>
+
+		<DTGenCfg  MatcherDevice="DMA1" MatchToName="">
+			<Bind MatcherFw="(?!^(U-BOOT)$)(^.+$)" />
+			<Bind MatcherFw="(?!^(U-BOOT)$)(^.+$)" MatcherDeviceAssignableCtxt="(^CortexA7NS$)" />
+		</DTGenCfg>
+
+		<DTGenCfg  MatcherDevice="DMA2" MatchToName="">
+			<Bind MatcherFw="(?!^(U-BOOT)$)(^.+$)" />
+			<Bind MatcherFw="(?!^(U-BOOT)$)(^.+$)" MatcherDeviceAssignableCtxt="(^CortexA7NS$)" />
+		</DTGenCfg>
+
+		<DTGenCfg  MatcherDevice="DMA3" MatchToName="">
+<!-- +tmp: no op-tee binding-->
+			<!--Bind MatcherFw="(^.+$)" /-->
+			<!--Bind MatcherFw="" MatcherDeviceAssignableCtxt="(^CortexA7S$)" /-->
+			<Bind MatcherFw="(?!^(OP-TEE)$)" />
+<!-- -tmp-->
+		</DTGenCfg>
+
+		<DTGenCfg  MatcherDevice="DMAMUX1" MatchToName="">
+			<Binding MatcherFw="(^.+$)" Name="st-stm32-dmamux_v1.0_Binding">
+			</Binding>
+
+			<Bind MatcherFw="(?!^(U-BOOT)$)(^.+$)" />
+		</DTGenCfg>
+
+		<!--+tmp: no op-tee binding-->
+		<DTGenCfg  MatcherDevice="DMAMUX2" MatchToName="">
+<!-- +tmp: no op-tee binding-->
+			<!--Bind MatcherFw="(^.+$)" /-->
+			<Bind MatcherFw="(?!^(OP-TEE)$)" />
+<!-- -tmp-->
+		</DTGenCfg>
+
+		<DTGenCfg  MatcherDevice="ETZPC" MatchToName="">
+			<Binding MatcherFw="(^.+$)" Name="st-stm32-etzpc_v1.0_mp13_Binding">
+			</Binding>
+
+			<Bind MatcherFw="(^OP-TEE$)" />
+		</DTGenCfg>
+
+		<DTGenCfg  MatcherDevice="FDCAN(.+)" MatchToName="">
+			<Binding MatcherFw="(^.+$)" Name="default_v1.0_Binding">
+				<NodeDef 	MatcherNode="" 				MatchToLabel=""			MatchToNodeName="m_can$mxDeviceInstance" 	MatchToUnitAddress=""/>
+			</Binding>
+
+			<Bind MatcherFw="(^.+$)" />
+		</DTGenCfg>
+
+		 <DTGenCfg  MatcherDevice="LPTIM(.+)" MatchToName="">
+			<Binding MatcherFw="(^.+$)" Name="stm32-lptimer_v1.0_Binding">
+				<NodeDef 	MatcherNode="" 				MatchToLabel=""			MatchToNodeName="lptimer$mxDeviceInstance" 	MatchToUnitAddress=""/>
+			</Binding>
+
+			<Bind MatcherFw="(^.+$)" />
+		</DTGenCfg>
+
+		<DTGenCfg  MatcherDevice="MDMA" MatchToName="">
+			<Bind MatcherFw="(?!^(U-BOOT)$)(^.+$)" />
+		</DTGenCfg>
+
+		<DTGenCfg  MatcherDevice="PWR" MatchToName="">
+			<Binding MatcherFw="(^.+$)" Name="default_v1.0_Binding">
+				<NodeDef 	MatcherNode="" 				MatchToLabel=""			MatchToNodeName="pwr_regulators" 	MatchToUnitAddress=""/>
+			</Binding>
+
+			<Bind MatcherFw="(^.+$)" />
+		</DTGenCfg>
+
+		<DTGenCfg  MatcherDevice="QUADSPI" MatchToName="">
+			<Binding MatcherFw="(^.+$)" Name="default_v1.0_Binding">
+				<NodeDef 	MatcherNode="" 				MatchToLabel=""			MatchToNodeName="qspi" 	MatchToUnitAddress=""/>
+			</Binding>
+
+			<Bind MatcherFw="(^.+$)" />
+		</DTGenCfg>
+
+		<DTGenCfg  MatcherDevice="RCC" MatchToName="">
+			<Binding MatcherFw="(^U-BOOT|LINUX$)" Name="default_v1.0_Binding">
+			</Binding>
+			<Binding MatcherFw="(^TF-A|OP-TEE$)" Name="st-stm32mp1-rcc_v1.1_Binding">
+			</Binding>
+
+			<Bind MatcherFw="(^.+$)" />
+		</DTGenCfg>
+
+		<DTGenCfg  MatcherDevice="SAI1" MatchToName="">
+			<Binding MatcherFw="(^.+$)" Name="st-stm32-sai_v1.0_Binding">
+				<NodeDef 	MatcherNode="/saia" 				MatchToLabel="sai1a"			MatchToNodeName="audio-controller" 	MatchToUnitAddress="4400a004"/>
+				<NodeDef 	MatcherNode="/saib" 				MatchToLabel="sai1b"			MatchToNodeName="audio-controller" 	MatchToUnitAddress="4400a024"/>
+			</Binding>
+
+			<Bind MatcherFw="(^.+$)" />
+		</DTGenCfg>
+
+		<DTGenCfg  MatcherDevice="SAI2" MatchToName="">
+			<Binding MatcherFw="(^.+$)" Name="st-stm32-sai_v1.0_Binding">
+				<NodeDef 	MatcherNode="/saia" 				MatchToLabel="sai2a"			MatchToNodeName="audio-controller" 	MatchToUnitAddress="4400b004"/>
+				<NodeDef 	MatcherNode="/saib" 				MatchToLabel="sai2b"			MatchToNodeName="audio-controller" 	MatchToUnitAddress="4400b024"/>
+			</Binding>
+
+			<Bind MatcherFw="(^.+$)" />
+		</DTGenCfg>
+
+		<DTGenCfg  MatcherDevice="TAMP" MatchToName="">
+			<Bind MatcherFw="(^OP-TEE$)" />
+		</DTGenCfg>
+
+		<DTGenCfg  MatcherDevice="TIM(.+)" MatchToName="">
+			<Binding MatcherFw="(^.+$)" Name="stm32-timers_v1.0_Binding">
+				<NodeDef 	MatcherNode="" 				MatchToLabel=""			MatchToNodeName="timers$mxDeviceInstance" 	MatchToUnitAddress=""/>
+				<NodeDef 	MatcherNode="/timer" 		MatchToLabel=""			MatchToNodeName="timer" 	MatchToUnitAddress="$mxDeviceInstance_minus1"/>
+			</Binding>
+
+			<Bind MatcherFw="(^.+$)" />
+		</DTGenCfg>
+
+		<DTGenCfg  MatcherDevice="USB_OTG_HS" MatchToName="">
+			<Binding MatcherFw="(^.+$)" Name="default_v1.0_Binding">
+				<NodeDef 	MatcherNode="" 				MatchToLabel=""			MatchToNodeName="usbotg_hs" 	MatchToUnitAddress=""/>
+			</Binding>
+
+			<Bind MatcherFw="(^.+$)" />
+		</DTGenCfg>
+
+		<DTGenCfg  MatcherDevice="USBPHYC" MatchToName="">
+			<Binding MatcherFw="(^.+$)" Name="phy-stm32-usbphyc_v1.0_Binding">
+			</Binding>
+
+			<Bind MatcherFw="(^.+$)" />
+		</DTGenCfg>
+
+		<!--Remaining Devices-->
+		<DTGenCfg  MatcherDevice="(?!^(DDR|GIC|GPIO|MCE)$)(^.+$)" MatchToName="">
+			<Bind MatcherFw="(^.+$)" />
+		</DTGenCfg>
+
+
+		<!--HW sections cfg-->
+
+		<DTGenCfg MatcherDevice="" MatchToName="socdevices_common">
+			<Binding  MatcherFw="(^.+$)" Name="socdevices_common_v1.1_Binding">
+			</Binding>
+
+			<Bind MatcherFw="(^.+$)" />
+		</DTGenCfg>
+
+		<DTGenCfg MatcherDevice="" MatchToName="memories">
+			<Binding  MatcherFw="(^.+$)" Name="memories_v1.0_Binding">
+			</Binding>
+
+			<Bind MatcherFw="(^.+$)" />
+		</DTGenCfg>
+
+		<DTGenCfg MatcherDevice="" MatchToName="clocks">
+			<Binding  MatcherFw="(^.+$)" Name="clocks_v1.1_Binding">
+			</Binding>
+
+			<Bind MatcherFw="(?!^(U-BOOT)$)(^.+$)" />
+		</DTGenCfg>
+
+		<DTGenCfg MatcherDevice="" MatchToName="pinctrl">
+			<Binding  MatcherFw="(^.+$)" Name="st-stm32-pinctrl_v1.0_Binding">
+			</Binding>
+
+			<Bind MatcherFw="(^.+$)" />
+		</DTGenCfg>
+
+	</Configs>
+
+</DTConfigs>
