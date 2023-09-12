@@ -124,9 +124,11 @@
 #include "shci_tl.h"
 [/#if]
 #include "stm32_lpm.h"
-#include "dbg_trace.h"
 [#if THREAD = 1 ]
+#include "dbg_trace.h"
 #include "shci.h"
+[#else]
+#include "app_debug.h"
 [/#if]
 
 /* Private includes -----------------------------------------------------------*/
@@ -198,7 +200,7 @@ const osThreadAttr_t ShciUserEvtProcess_attr = {
     .cb_size = CFG_SHCI_USER_EVT_PROCESS_CB_SIZE,
     .stack_mem = CFG_SHCI_USER_EVT_PROCESS_STACK_MEM,
     .priority = CFG_SHCI_USER_EVT_PROCESS_PRIORITY,
-    .stack_size = CFG_SHCI_USER_EVT_PROCESS_STACk_SIZE
+    .stack_size = CFG_SHCI_USER_EVT_PROCESS_STACK_SIZE
 };
 [/#if]
 
@@ -216,7 +218,9 @@ size_t DbgTraceWrite(int handle, const unsigned char * buf, size_t bufSize);
 static void ShciUserEvtProcess(void *argument);
 [/#if]
 static void SystemPower_Config( void );
+[#if (THREAD = 1)]
 static void Init_Debug( void );
+[/#if]
 static void appe_Tl_Init( void );
 [#if (BLE = 1)]
 [#if (BLE_TRANSPARENT_MODE_UART = 1) || (BLE_TRANSPARENT_MODE_VCP = 1)]
@@ -277,6 +281,7 @@ void APPE_Init( void )
  * LOCAL FUNCTIONS
  *
  *************************************************************/
+[#if (THREAD = 1)]
 static void Init_Debug( void )
 {
 #if (CFG_DEBUGGER_SUPPORTED == 1)
@@ -318,6 +323,7 @@ static void Init_Debug( void )
 
   return;
 }
+[/#if]
 
 /**
  * @brief  Configure the system for power optimization
@@ -427,8 +433,12 @@ static void shci_user_evt_proc ( void )
    */
 
   /**< Traces channel initialization */
+[#if (THREAD = 1)]
   TL_TRACES_Init( );
-
+[/#if]
+[#if (BLE = 1)]
+  APPD_EnableCPU2( );
+[/#if]
   UTIL_LPM_SetOffMode(1 << CFG_LPM_APP, UTIL_LPM_ENABLE);
 
   LST_remove_head( &SysEvtQueue, (tListNode **)&p_evt_rx );
@@ -520,7 +530,12 @@ static void APPE_SysEvtReadyProcessing( void )
 {
 [/#if]
   /* Traces channel initialization */
+[#if (THREAD = 1)]
   TL_TRACES_Init( );
+[/#if]
+[#if (BLE = 1)]
+  APPD_EnableCPU2( );
+[/#if]
 
 [#if (BLE = 1)]
   APP_BLE_Init( );
@@ -697,6 +712,7 @@ void TL_TRACES_EvtReceived( TL_EvtPacket_t * hcievt )
   TL_MM_EvtDone( hcievt );
 }
 [/#if]
+[#if (THREAD = 1)]
 /**
   * @brief  Initialisation of the trace mechanism
   * @param  None
@@ -705,12 +721,7 @@ void TL_TRACES_EvtReceived( TL_EvtPacket_t * hcievt )
 #if(CFG_DEBUG_TRACE != 0)
 void DbgOutputInit( void )
 {
-[#if CFG_DEBUG_TRACE_UART  = "hw_lpuart1" ]
     MX_LPUART1_UART_Init();
-[/#if]
-[#if CFG_DEBUG_TRACE_UART  = "hw_uart1" ]
-    MX_USART1_UART_Init();
-[/#if]
 
   return;
 }
@@ -729,6 +740,7 @@ void DbgOutputTraces(  uint8_t *p_data, uint16_t size, void (*cb)(void) )
   return;
 }
 #endif
+[/#if]
 
 /* USER CODE BEGIN FD_WRAP_FUNCTIONS */
 

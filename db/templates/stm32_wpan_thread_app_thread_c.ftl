@@ -84,7 +84,7 @@ const osThreadAttr_t ThreadMsgM0ToM4Process_attr = {
     .cb_size = CFG_THREAD_MSG_M0_TO_M4_PROCESS_CB_SIZE,
     .stack_mem = CFG_THREAD_MSG_M0_TO_M4_PROCESS_STACK_MEM,
     .priority = CFG_THREAD_MSG_M0_TO_M4_PROCESS_PRIORITY,
-    .stack_size = CFG_THREAD_MSG_M0_TO_M4_PROCESS_STACk_SIZE
+    .stack_size = CFG_THREAD_MSG_M0_TO_M4_PROCESS_STACK_SIZE
 };
 
 const osThreadAttr_t ThreadCliProcess_attr = {
@@ -94,7 +94,7 @@ const osThreadAttr_t ThreadCliProcess_attr = {
      .cb_size = CFG_THREAD_CLI_PROCESS_CB_SIZE,
      .stack_mem = CFG_THREAD_CLI_PROCESS_STACK_MEM,
      .priority = CFG_THREAD_CLI_PROCESS_PRIORITY,
-     .stack_size = CFG_THREAD_CLI_PROCESS_STACk_SIZE
+     .stack_size = CFG_THREAD_CLI_PROCESS_STACK_SIZE
  };
 
  [/#if]

@@ -474,11 +474,6 @@
                 <HardCode Text="#n"/>
             </CallLibMethod>
         </IFCondition>
-        <IFCondition Expression ="USE_FULL_LL_DRIVER">
-            <CallLibMethod Name="LL_SYSTICK_SetClkSource">
-                <MethodArg Name="Source" ParameterName="Cortex_Div"/>            
-            </CallLibMethod>
-        </IFCondition>
 
         <IFCondition Expression ="1=1">
             <CallLibMethod Name="" Type="HardCode">
@@ -645,10 +640,16 @@
             </CallLibMethod>
         </IFCondition>
 		
-        <IFCondition Expression ="(CodegenConfigPeriph=true) &amp; (USB_OTG_HSEmbeddedPHYUsed_ForRCC|USBUsed_ForRCC | (RNGUsed_ForRCC &amp; RNGCLKSOURCE_CLK48))">
+        <IFCondition Expression ="(CodegenConfigPeriph=true) &amp; (USB_OTG_HSEmbeddedPHYUsed_ForRCC|USBUsed_ForRCC | (RNGUsed_ForRCC &amp; RNGCLKSOURCE_CLK48 &amp; !STM32WBx0_Value_Line))">
             <CallLibMethod Name="LL_RCC_SetUSBClockSource">
                 <MethodArg Name="USBxSource" ParameterName="CK48CLockSelection"/>
          
+            </CallLibMethod>
+        </IFCondition>
+        
+        <IFCondition Expression ="(CodegenConfigPeriph=true) &amp; RNGUsed_ForRCC &amp; RNGCLKSOURCE_CLK48 &amp; STM32WBx0_Value_Line">
+            <CallLibMethod Name="LL_RCC_SetCLK48ClockSource">
+                <MethodArg Name="CLK48xSource" ParameterName="RNGClockSelectionARG"/>         
             </CallLibMethod>
         </IFCondition>
 
@@ -796,6 +797,9 @@
     <LibMethod Comment="" Name="LL_RCC_SetUSBClockSource">
         <Argument AddressOf="false" GenericType="simple" Name="USBxSource"/>
     </LibMethod>
+    <LibMethod Comment="" Name="LL_RCC_SetCLK48ClockSource">
+        <Argument AddressOf="false" GenericType="simple" Name="CLK48xSource"/>
+    </LibMethod>
 	
     <LibMethod Comment="" Name="LL_RCC_SetADCClockSource">
         <Argument AddressOf="false" GenericType="simple" Name="ADCxSource"/>
@@ -892,9 +896,6 @@
     </LibMethod>
     <LibMethod Comment="" Name="LL_Init1msTick">
         <Argument AddressOf="false" GenericType="simple" Name="HCLKFrequency"/>
-    </LibMethod>
-    <LibMethod Comment="" Name="LL_SYSTICK_SetClkSource">
-        <Argument AddressOf="false" GenericType="simple" Name="Source"/>
     </LibMethod>
     <LibMethod Comment="" Name="LL_APB1_GRP1_EnableClock">
         <Argument AddressOf="false" GenericType="simple" Name="Periphs"/>

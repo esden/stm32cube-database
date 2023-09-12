@@ -88,7 +88,7 @@
 
             <!-- parameter EOCSelection -->
             <IFCondition Expression="(EOCSelection = ADC_EOC_SINGLE_CONV)">
-                <CallLibMethod Name="LL_ADC_DisableIT_JEOC">
+                <CallLibMethod Name="LL_ADC_EnableIT_JEOC">
                     <MethodArg Name="ADCx" ParameterName="Instance" />
                 </CallLibMethod>
                 <CallLibMethod Name="LL_ADC_DisableIT_JEOS">
@@ -97,7 +97,7 @@
             </IFCondition>
 
             <IFCondition Expression="(EOCSelection = ADC_EOC_SINGLE_SEQ_CONV)">
-                <CallLibMethod Name="LL_ADC_DisableIT_JEOS">
+                <CallLibMethod Name="LL_ADC_EnableIT_JEOS">
                     <MethodArg Name="ADCx" ParameterName="Instance" />
                 </CallLibMethod>
                 <CallLibMethod Name="LL_ADC_DisableIT_JEOC">
@@ -134,19 +134,14 @@
        
 
         <!-- parameter EOCSelection -->
-        <CallLibMethod Name="LL_ADC_DisableIT_EOC">
-            <MethodArg Name="ADCx" ParameterName="Instance" />
-        </CallLibMethod>
-        <CallLibMethod Name="LL_ADC_DisableIT_EOS">
-            <MethodArg Name="ADCx" ParameterName="Instance" />
-        </CallLibMethod>
+       
         <CallLibMethod Name="LL_ADC_DisableDeepPowerDown">
             <MethodArg Name="ADCx" ParameterName="Instance" />
         </CallLibMethod>
         <CallLibMethod Name="LL_ADC_EnableInternalRegulator">
             <MethodArg Name="ADCx" ParameterName="Instance" />
         </CallLibMethod>
-<!--        <IFCondition Expression="(EOCSelection = ADC_EOC_SINGLE_CONV)">
+      <IFCondition Expression="(EOCSelection = ADC_EOC_SINGLE_CONV)">
             <CallLibMethod Name="LL_ADC_EnableIT_EOC">
                 <MethodArg Name="ADCx" ParameterName="Instance" />
             </CallLibMethod>
@@ -162,7 +157,7 @@
             <CallLibMethod Name="LL_ADC_DisableIT_EOC">
                 <MethodArg Name="ADCx" ParameterName="Instance" />
             </CallLibMethod>
-        </IFCondition>-->
+        </IFCondition>
 
     </RefConfig>
 
@@ -331,10 +326,64 @@
             </CallLibMethod>
         </IFCondition>
     </RefConfig>
+    <RefConfig Name="ADC_AnalogWDGConfigForAWD2" Comment="Configure Analog WatchDog 2">
+        <!--CallLibMethod Name="LL_ADC_SetAnalogWDMonitChannels">
+            <MethodArg Name="ADCx" ParameterName="Instance" />
+            <MethodArg Name="AWDy" ParameterName="AWD2WatchdogNumber" />
+            <MethodArg Name="AWDChannelGroup" ParameterName="WatchdogMode,WatchdogChannel" />
+        </CallLibMethod-->
+
+        <CallLibMethod Name="LL_ADC_ConfigAnalogWDThresholds">
+            <MethodArg Name="ADCx" ParameterName="Instance" />
+            <MethodArg Name="AWDy" ParameterName="AWD2WatchdogNumber" />
+            <MethodArg Name="AWDThresholdHighValue" ParameterName="AWD2HighThreshold" />
+            <MethodArg Name="AWDThresholdLowValue" ParameterName="AWD2LowThreshold" />
+        </CallLibMethod>
+       
+        <!-- parameter AWD1ITMode ENABLE -->
+        <IFCondition Expression="(AWD2ITMode=ENABLE)">
+            <CallLibMethod Name="LL_ADC_EnableIT_AWD2">
+                <MethodArg Name="ADCx" ParameterName="Instance" />
+            </CallLibMethod>
+        </IFCondition>
+        <!-- parameter AWD1ITMode DISABLE -->
+        <IFCondition Expression="(AWD2ITMode=DISABLE)">
+            <CallLibMethod Name="LL_ADC_DisableIT_AWD2">
+                <MethodArg Name="ADCx" ParameterName="Instance" />
+            </CallLibMethod>
+        </IFCondition>
+    </RefConfig>
+    <RefConfig Name="ADC_AnalogWDGConfigForAWD3" Comment="Configure Analog WatchDog 3">
+        <!--CallLibMethod Name="LL_ADC_SetAnalogWDMonitChannels">
+            <MethodArg Name="ADCx" ParameterName="Instance" />
+            <MethodArg Name="AWDy" ParameterName="AWD3WatchdogNumber" />
+            <MethodArg Name="AWDChannelGroup" ParameterName="WatchdogMode,WatchdogChannel" />
+        </CallLibMethod-->
+
+        <CallLibMethod Name="LL_ADC_ConfigAnalogWDThresholds">
+            <MethodArg Name="ADCx" ParameterName="Instance" />
+            <MethodArg Name="AWDy" ParameterName="AWD3WatchdogNumber" />
+            <MethodArg Name="AWDThresholdHighValue" ParameterName="AWD3HighThreshold" />
+            <MethodArg Name="AWDThresholdLowValue" ParameterName="AWD3LowThreshold" />
+        </CallLibMethod>
+       
+        <!-- parameter AWD1ITMode ENABLE -->
+        <IFCondition Expression="(AWD3ITMode=ENABLE)">
+            <CallLibMethod Name="LL_ADC_EnableIT_AWD3">
+                <MethodArg Name="ADCx" ParameterName="Instance" />
+            </CallLibMethod>
+        </IFCondition>
+        <!-- parameter AWD1ITMode DISABLE -->
+        <IFCondition Expression="(AWD3ITMode = DISABLE)">
+            <CallLibMethod Name="LL_ADC_DisableIT_AWD3">
+                <MethodArg Name="ADCx" ParameterName="Instance" />
+            </CallLibMethod>
+        </IFCondition>
+    </RefConfig>
 
     <RefConfig Name="ADC_RegularChannelConfigForWD"
                Comment="Configure the regular channel to be monitored by WatchDog 2 or 3">
-        <IFCondition Expression="(MonitoredBy=ADC_ANALOGWATCHDOG_2 &amp; EnableAnalogWatchDog2=true)|(MonitoredBy=ADC_ANALOGWATCHDOG_3 &amp; EnableAnalogWatchDog3=true)">
+        <IFCondition Expression="MonitoredBy=ADC_ANALOGWATCHDOG_2|MonitoredBy=ADC_ANALOGWATCHDOG_3">
             <CallLibMethod Name="LL_ADC_SetAnalogWDMonitChannels">
                 <MethodArg Name="ADCx" ParameterName="Instance" />
                 <MethodArg Name="AWDy" ParameterName="MonitoredBy" />

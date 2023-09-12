@@ -68,6 +68,7 @@
             <MethodArg Name="RFWakeUpClockSelection"  ParameterName="RFWKPClockSelectionARG"/>
             <MethodArg Name="SmpsClockSelection"   ParameterName="SMPSClockSelectionARG"/>
             <MethodArg Name="SmpsDivSelection"     ParameterName="SMPSDivARG"/>
+            <MethodArg Name="I2sClockSelection"     ParameterName="I2sClockSelectionARG"/>
             <MethodArg Name="PLLN" 			  ParameterName="PLLSAI1NARG"/>
             <MethodArg Name="PLLP" 			  ParameterName="PLLSAI1PARG"/>
             <MethodArg Name="PLLQ"	   		  ParameterName="PLLSAI1QARG"/>
@@ -120,9 +121,15 @@
     </RefConfig>
   
   <RefConfig Comment="Configure LSE Drive Capability" Name="RCC_LSEDRIVE_CONFIG">
+        <IFCondition Expression="LSEOscillator &amp; (LSEUsed=1) &amp; CodegenConfigPeriph=true">
+            <CallLibMethod Name="HAL_PWR_EnableBkUpAccess" ReturnHAL="false">
+            </CallLibMethod>
+        </IFCondition>
+        <IFCondition Expression="1=1">
         <CallLibMethod Name="__HAL_RCC_LSEDRIVE_CONFIG" ReturnHAL="false">
             <MethodArg Name="__RCC_LSEDRIVE__" ParameterName="LSE_Drive_Capability"/>
         </CallLibMethod>
+        </IFCondition>
     </RefConfig>
   
   <RefConfig Comment="Configure the Systick interrupt time" Name="RCC_interrupt_Time_SYSTICK_Config">
@@ -273,7 +280,10 @@
             <Argument AddressOf="false" GenericType="simple" Name="RFWakeUpClockSelection" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="SmpsClockSelection" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="SmpsDivSelection" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="I2sClockSelection" OptimizationCondition="equal"/>
         </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_PWR_EnableBkUpAccess">
     </LibMethod>
     
     <RefComponent Cclass="HAL" Cgroup="RCC" Cversion="0.8.4">

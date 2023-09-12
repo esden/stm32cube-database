@@ -1,6 +1,8 @@
 [#ftl]
 [#compress]
 
+[#assign dtsGeneratorModule = "tpl_dts-v1_Generator_vx-x_dts.ftl"]
+
 [#----------------------------------------------------]
 [#-- DTS FTL binder and printer (specific "dts-v1") --]
 [#-- All the DTS structuring should be defined in FTL
@@ -24,11 +26,11 @@
 [#--Check DTGen config--]
 [#assign global_allowBinding = true]
 [#if !mxDtDM.dts_fwsList?has_content]
-	[@mlog  logMod=module logType="ERR" logMsg="wrong DTGen configuration: no FW specified" varsMap={} /]
+	[@mlog  logMod=dtsGeneratorModule logType="ERR" logMsg="wrong DTGen configuration: no FW specified" varsMap={} /]
 	[#assign global_allowBinding = false]
 [/#if]
 [#if !mxDtDM.dts_name?has_content || !mxDtDM.dts_template?has_content]
-	[@mlog  logMod=module logType="ERR" logMsg="wrong DTGen configuration" varsMap={"mxDtDM.dts_name":mxDtDM.dts_name!,"mxDtDM.dts_template":mxDtDM.dts_template!} /]
+	[@mlog  logMod=dtsGeneratorModule logType="ERR" logMsg="wrong DTGen configuration" varsMap={"mxDtDM.dts_name":mxDtDM.dts_name!,"mxDtDM.dts_template":mxDtDM.dts_template!} /]
 	[#assign global_allowBinding = false]
 [/#if]
 
@@ -160,7 +162,7 @@ Before printing, are positionned elements respecting ordering.--]
 
 		[#--Print elmts--]
 [/#compress]
-		[@DTDtsElmtDMsList_print pElmtsList=outElmtsList pElmtClassPrintLevel="DTBindedDtsElmtDM" pDtLevel=pDtLevel/]
+		[@DTDtsElmtDMsList_print pElmtsList=outElmtsList pElmtClassPrintLevel="DTBindedDtsElmtDM" pDtLevel=pDtLevel pConfigsList=[]/]
 [/#macro]
 
 

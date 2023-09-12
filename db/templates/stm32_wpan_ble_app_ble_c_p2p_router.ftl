@@ -14,6 +14,7 @@
 
 [#assign FREERTOS_STATUS = 0]
 [#assign LOCAL_NAME_FORMATTED = "This text shouldn't appear"]
+[#assign LOCAL_NAME = "STM32WB"]
 
 [#list SWIPdatas as SWIP]
 	[#if SWIP.defines??]
@@ -24,6 +25,10 @@
             [#if definition.name == "LOCAL_NAME_FORMATTED"]
                 [#assign LOCAL_NAME_FORMATTED = definition.value]
             [/#if]
+            [#if definition.name == "LOCAL_NAME"]
+		        [#assign LOCAL_NAME = definition.value]
+            [/#if]
+
         [/#list]
 	[/#if]
 [/#list]
@@ -926,7 +931,7 @@ static void Ble_Hci_Gap_Gatt_Init(void){
 
   if (role > 0)
   {
-    const char *name = "STM32WB";
+    const char *name = "${LOCAL_NAME}";
 
     aci_gap_init(role, 0,
                  APPBLE_GAP_DEVICE_NAME_LENGTH,

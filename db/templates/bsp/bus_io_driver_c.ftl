@@ -911,20 +911,20 @@ int32_t BSP_${IpInstance}_Init(void)
     	/* Init the I2C */
     	if(MX_${IpInstance}_Init(&h${IpInstance?lower_case}) != HAL_OK)
     	{
-      		ret = BSP_ERROR_BUS_FAILURE;
+      	  ret = BSP_ERROR_BUS_FAILURE;
     	}
-	[#if FamilyName.contains("STM32L1") || FamilyName.contains("STM32F1") || FamilyName.contains("STM32F2")]
+	[#if FamilyName.contains("STM32L1") || FamilyName.contains("STM32F1") || FamilyName.contains("STM32F2") || FamilyName.contains("STM32F4")]
 	[#else]
     	else if(HAL_I2CEx_ConfigAnalogFilter(&h${IpInstance?lower_case}, I2C_ANALOGFILTER_ENABLE) != HAL_OK) 
     	{
       	  ret = BSP_ERROR_BUS_FAILURE;    		
     	}
 	[/#if]
-    	else
-    	{
-      		ret = BSP_ERROR_NONE;
-    	}
-	  }	
+        else
+        {
+      	  ret = BSP_ERROR_NONE;
+        }
+      }	
     }
   }
   return ret;
@@ -944,14 +944,14 @@ int32_t BSP_${IpInstance}_DeInit(void)
     if (--${I2CIpInstance}InitCounter == 0)
     {    
   #if (USE_HAL_I2C_REGISTER_CALLBACKS == 0U)
-    	/* DeInit the I2C */ 
-    	${IpInstance?upper_case}_MspDeInit(&h${IpInstance?lower_case});
+      /* DeInit the I2C */ 
+      ${IpInstance?upper_case}_MspDeInit(&h${IpInstance?lower_case});
   #endif  
-  		/* DeInit the I2C */ 
-  		if (HAL_I2C_DeInit(&h${IpInstance?lower_case}) != HAL_OK) 
-  		{
-    		ret = BSP_ERROR_BUS_FAILURE;
-  		}
+      /* DeInit the I2C */ 
+      if (HAL_I2C_DeInit(&h${IpInstance?lower_case}) != HAL_OK)
+      {
+        ret = BSP_ERROR_BUS_FAILURE;
+      }
     }
   }
   return ret;

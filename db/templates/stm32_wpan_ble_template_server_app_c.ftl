@@ -20,7 +20,6 @@
         [/#list]
 	[/#if]
 [/#list]
-/* USER CODE BEGIN UserCode */
 /* Includes ------------------------------------------------------------------*/
 #include "app_common.h"
 #include "dbg_trace.h"
@@ -31,6 +30,9 @@
 [#else]
 #include "cmsis_os.h"
 [/#if]
+/* USER CODE BEGIN Includes */
+
+/* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 typedef struct
@@ -39,9 +41,24 @@ typedef struct
   uint16_t Parameter;
 } TEMPLATE_Server_App_Context_t;
 
+/* USER CODE BEGIN TypeDef */
+
+/* USER CODE END TypeDef */
+
 /* Private defines -----------------------------------------------------------*/
+/* USER CODE BEGIN Defines */
+
+/* USER CODE END Defines */
+
 /* Private macros ------------------------------------------------------------*/
+/* USER CODE BEGIN Macros */
+
+/* USER CODE END Macros */
+
 /* Private variables ---------------------------------------------------------*/
+/* USER CODE BEGIN PrivateVariables */
+
+/* USER CODE END PrivateVariables */
 
 /**
  * START of Section BLE_APP_CONTEXT
@@ -52,11 +69,26 @@ PLACE_IN_SECTION("BLE_APP_CONTEXT") static TEMPLATE_Server_App_Context_t TEMPLAT
  * END of Section BLE_APP_CONTEXT
  */
 /* Global variables ----------------------------------------------------------*/
+/* USER CODE BEGIN GlobalVariables */
+
+/* USER CODE END GlobalVariables */
+
 /* Private function prototypes -----------------------------------------------*/
+/* USER CODE BEGIN FunctionPrototypes */
+
+/* USER CODE END FunctionPrototypes */
+
 /* Functions Definition ------------------------------------------------------*/
+/* USER CODE BEGIN FunctionDefinition */
+
+/* USER CODE END FunctionDefinition */
+
 /* Private functions ---------------------------------------------------------*/
 static void TEMPLATE_APP_context_Init(void);
 static void TEMPLATE_Send_Notification_Task(void);
+/* USER CODE BEGIN PrivateFunctions */
+
+/* USER CODE END PrivateFunctions */
 
 /* Public functions ----------------------------------------------------------*/
 void TEMPLATE_STM_App_Notification(TEMPLATE_STM_App_Notification_evt_t *pNotification)
@@ -158,4 +190,3 @@ static void TEMPLATE_Send_Notification_Task(void)
 }
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
-/* USER CODE END UserCode */

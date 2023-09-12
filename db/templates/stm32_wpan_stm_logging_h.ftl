@@ -18,7 +18,6 @@
     [/#if]
 [/#list]
 
-
 #ifndef STM_LOGGING_H_
 #define STM_LOGGING_H_
 

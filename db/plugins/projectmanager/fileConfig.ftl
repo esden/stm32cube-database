@@ -836,6 +836,12 @@
             
         [/#if]       
         [/#if]
+        [#if ResMgr_Utility?? || UtilitiesGroup??]
+            <sourceEntry>
+                <name>Utilities</name>
+            </sourceEntry>
+        [/#if]
+
         [#list MiddlewareList as Middleware] 
             [#if TrustZone == "0"]
                     <sourceEntry>
@@ -882,12 +888,7 @@
         <sourceEntry>
             <name>Packs</name>
             </sourceEntry>
-	[/#if]
-        [#if ResMgr_Utility??]
-        <sourceEntry>
-            <name>Utilities</name>
-            </sourceEntry>
-        [/#if]
+	[/#if]        
         </sourceEntries>
 [#-- add lib path --]   
 <Groups>
@@ -933,9 +934,6 @@
                                             [#list usedMw as mw][#assign n = group.name]
                                                 [#assign used = false]
                                                 [#assign mwName= mw?replace("_M7","")?replace("_M4","")]
-                                                [#if (n?lower_case=="stemwin" || n?lower_case=="touchgfx") && mwName=="GRAPHICS"]
-                                                    [#assign used = true]
-                                                [/#if]
                                                 [#if n?starts_with("USB_DEVICE") && mwName?starts_with("USB_DEVICE")]
                                                     [#assign used = true]
                                                 [/#if]
@@ -1018,9 +1016,6 @@
                                             [#list usedMw as mw][#assign n = group.name]
                                                 [#assign used = false]
                                                 [#assign mwName= mw?replace("_M7","")?replace("_M4","")]
-                                                [#if (n?lower_case=="stemwin" || n?lower_case=="touchgfx") && mwName=="GRAPHICS"]
-                                                    [#assign used = true]
-                                                [/#if]
                                                 [#if n?starts_with("USB_DEVICE") && mwName?starts_with("USB_DEVICE")]
                                                     [#assign used = true]
                                                 [/#if]
@@ -1057,9 +1052,6 @@
                             [#list usedMw as mw][#assign n = group.name]
                                 [#assign used = false]
                                 [#assign mwName= mw?replace("_M7","")?replace("_M7","")]
-                                [#if (n?lower_case=="stemwin" || n?lower_case=="touchgfx") && mwName=="GRAPHICS"]
-                                    [#assign used = true]
-                                [/#if]
                                 [#if n?starts_with("USB_Device") && mwName?starts_with("USB_DEVICE")]
                                                     [#assign used = true]
                                                 [/#if]
@@ -1288,57 +1280,8 @@
         [/#if]
     [/#if]
 [#-- Other source groups --]  
-    [#if USE_Touch_GFX_STACK?? && ide!="MDK-ARM" && ide!="STM32CubeIDE"]
-            <group>
-                <name>TouchGFX</name>         
-                <group>
-                    <name>gui</name> 
-                    <file></file>
-                    </group>
-                <group>
-                    <name>generated</name>
-                    <file></file>
-                    </group>
-                </group> 
-    [/#if]
-    [#--if USE_Touch_GFX_STACK_M4?? && ide!="MDK-ARM"]
-            <group>
-                <name>CM4</name> 
-                <excluded>
-                    <configuration>${Configuration}_CM7</configuration>
-                    </excluded>
-                <group>
-                    <name>TouchGFX</name>         
-                    <group>
-                        <name>gui</name> 
-                        <file></file>
-                        </group>
-                    <group>
-                        <name>generated</name>
-                        <file></file>
-                        </group>
-                    </group> 
-                </group>
-    [/#if--]
-     [#if USE_Touch_GFX_STACK_M7?? && ide!="MDK-ARM"]
-            <group>
-                <name>CM7</name> 
-                <excluded>
-                    <configuration>${Configuration}_CM4</configuration>
-                    </excluded>
-                <group>
-                    <name>TouchGFX</name>         
-                    <group>
-                        <name>gui</name> 
-                        <file></file>
-                        </group>
-                    <group>
-                        <name>generated</name>
-                        <file></file>
-                        </group>
-                    </group> 
-                </group>
-    [/#if]
+
+
 
 [#-- App Group Case of Graphics--]
     [#list ApplicationGroups as grp]

@@ -24,7 +24,7 @@
   [#list SWIP.defines as definition]
    [#if definition.name="BOARD_NAME"] 
     [#if definition.value="stm32wb55rg"]
-#include "stm32_adafruit_sd.h"   [#-- File to include to be confirmed by Mohamed Bechir --]
+#include "stm32_adafruit_sd.h"
     [/#if]
    [/#if]
   [/#list]

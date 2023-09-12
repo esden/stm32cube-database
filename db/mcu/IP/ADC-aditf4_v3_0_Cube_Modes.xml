@@ -174,7 +174,7 @@
         <Condition Diagnostic="" Expression="Sequencer=FULLY_CONFIGURABLE"/>
         <Description>Number of regular channels to be converted</Description>
     </RefParameter>
-    <RefParameter Comment="Number Of Conversion" DefaultValue="null" Group="ADCgroup"  Name="NbrOfConversion" Type="list" Visible="false">
+    <RefParameter Comment="Number Of Conversion" DefaultValue="0" Group="ADCgroup"  Name="NbrOfConversion" Type="list" Visible="false">
         <Condition Diagnostic="" Expression="Sequencer=NOT_FULLY_CONFIGURABLE"/>
         <Description>Number of regular channels to be converted</Description>
     </RefParameter>
@@ -369,6 +369,9 @@
         <PossibleValue Comment="Channel Temperature Sensor" Value="ADC_CHANNEL_TEMPSENSOR"/>
        
     </RefParameter>
+    
+        
+    
     <!-- Possible Value of Channel parameter -->
     <!--RefParameter Comment="Channel" DefaultValue="" Group="ADCChannel" Name="Channel" Type="list" Visible="false">
         <Condition Diagnostic="" Expression="Sequencer=not_fully_configurable"/>
@@ -428,9 +431,25 @@
                      To enable Scan conversion Mode : the number of Conversion should be  > 1</Description>
     </RefParameter>
    
-	    
+	    <RefParameter Visible="false" Comment="comm" DefaultValue="+ChannelVREF+|ChannelTS+|ChannelVBAT" Name="commmn" Type="list"/>
+
+    
+     <RefParameter Comment="ChannelVREF" DefaultValue="ADC_CHANNEL_VREFINT" Name="ChannelVREF" Type="list" Visible="false">
+             <Condition Expression="VrefTSelected$IpInstance" Diagnostic=""/>
+
+        <PossibleValue Comment="ADC_CHANNEL_VREFINT" Value="ADC_CHANNEL_VREFINT"/>
+    </RefParameter>
+    <RefParameter Comment="ChannelTS" DefaultValue="ADC_CHANNEL_TEMPSENSOR" Name="ChannelTS" Type="list" Visible="false">
+                <Condition Expression="VtsATSelected$IpInstance" Diagnostic=""/>
+
+        <PossibleValue Comment="ADC_CHANNEL_TEMPSENSOR" Value="ADC_CHANNEL_TEMPSENSOR"/>
+    </RefParameter>
+    <RefParameter Comment="Channelvbat" DefaultValue="ADC_CHANNEL_VBAT" Name="ChannelVBAT" Type="list" Visible="false">
+        <Condition Expression="VbatfTSelected$IpInstance" Diagnostic=""/>
+        <PossibleValue Comment="ADC_CHANNEL_VBAT" Value="ADC_CHANNEL_VBAT"/>
+    </RefParameter>
     <!-- Possible Value of SamplingTime parameters  -->
-    <RefParameter Comment="Scan Direction" DefaultValue="ADC_SCAN_SEQ_FIXED" Group="ADCChannel" Name="ScanConvMode" Type="list"><!-- aligned with HAL v1.2.0-->
+    <RefParameter Comment="Scan Conversion Mode" DefaultValue="ADC_SCAN_SEQ_FIXED" Group="ADCChannel" Name="ScanConvMode" Type="list"><!-- aligned with HAL v1.2.0-->
         <Condition Diagnostic="" Expression="(Sequencer=NOT_FULLY_CONFIGURABLE)"/>
         <PossibleValue Comment="Forward" Value="ADC_SCAN_SEQ_FIXED"/><!-- aligned with HAL v1.2.0-->
         <PossibleValue Comment="Backward" Value="ADC_SCAN_SEQ_FIXED_BACKWARD"/>
@@ -489,6 +508,8 @@
     
     <!-- WatchDog2 parameters -->
     <RefMode Comment="Analog Watchdog 2" Group="WatchDog2" Name="Analog Watchdog 2">
+        <ConfigForMode>ADC_AnalogWDGConfigForAWD2</ConfigForMode>
+
         <Parameter Name="EnableAnalogWatchDog2"/>
         <Parameter Name="AWD2WatchdogNumber"/>
         <Parameter Name="AWD2HighThreshold"/>
@@ -498,7 +519,8 @@
     
     <!-- WatchDog3 parameters -->
     <RefMode Comment="Analog Watchdog 3" Group="WatchDog3" Name="Analog Watchdog 3">
-        <Parameter Name="EnableAnalogWatchDog3"/>
+        <ConfigForMode>ADC_AnalogWDGConfigForAWD3</ConfigForMode>
+       <Parameter Name="EnableAnalogWatchDog3"/>
         <Parameter Name="AWD3WatchdogNumber"/>
         <Parameter Name="AWD3HighThreshold"/>
         <Parameter Name="AWD3LowThreshold"/>
@@ -529,7 +551,7 @@
         <Condition Diagnostic="" Expression="EnableAnalogWatchDog1=false"/>
     </RefParameter>
     <RefParameter Comment="Watchdog Mode" DefaultValue="ADC_ANALOGWATCHDOG_SINGLE_REG" Group="ADCgroup" Name="WatchdogMode" Type="list">
-        <PossibleValue Comment="Single regular channel" Value="ADC_ANALOGWATCHDOG_SINGLE_REG"/>
+        <PossibleValue Comment="Single regular channel"  Value="ADC_ANALOGWATCHDOG_SINGLE_REG"/>
         <PossibleValue Comment="All regular channels" Semaphore="AllRegular" Value="ADC_ANALOGWATCHDOG_ALL_REG"/>
         <Description>Configures the ADC analog watchdog mode.</Description>
     </RefParameter>
@@ -567,6 +589,7 @@
      
         <Description>ADC channel for the analog watchdog</Description> 
     </RefParameter>
+      
         
     <!-- Possible value of HighThreshold parameter -->
     <RefParameter Comment="High Threshold" DefaultValue="null" Group="ADCgroup" Name="AWD1HighThreshold" Type="list" Visible="false">
@@ -633,7 +656,7 @@
              <Condition Diagnostic="" Expression="Sequencer=NOT_FULLY_CONFIGURABLE"/>
          </RefParameter>
     <RefParameter Comment="Watchdog instance" DefaultValue="ADC_ANALOGWATCHDOG_2" Group="ADCgroup" Name="AWD2WatchdogNumber" Type="list" Visible="false">
-        <PossibleValue Comment="WatchDog 2" Value="ADC_ANALOGWATCHDOG_2  "/>
+        <PossibleValue Comment="WatchDog 2" Value="ADC_ANALOGWATCHDOG_2"/>
         <Description>Number of used watchDogs.</Description>
     </RefParameter>
 	 
@@ -1100,6 +1123,8 @@
                 </Mode>
             </ModeLogicOperator>
             <Semaphore>channelSelected</Semaphore>
+             <Semaphore>channelSelected0</Semaphore>
+
         </Mode>
         <Mode Name="IN1">
             <ModeLogicOperator Name="OR">
@@ -1287,7 +1312,8 @@
                 <Mode Name="IN-TempSens" UserName="Single-ended">
                     <SignalLogicalOp Name="AND">
                         <Signal Name="TempSens_Input"/>
-                    </SignalLogicalOp>
+                    </SignalLogicalOp>                   
+                    <Semaphore>VtsATSelected$IpInstance</Semaphore>
                 </Mode>
             </ModeLogicOperator>
             <Semaphore>channelSelected</Semaphore>
@@ -1298,6 +1324,9 @@
                     <SignalLogicalOp Name="AND">
                         <Signal Name="Vref_Input"/>
                     </SignalLogicalOp>
+                    
+                    <Semaphore>VrefTSelected$IpInstance</Semaphore>
+
                 </Mode>
             </ModeLogicOperator>
             <Semaphore>channelSelected</Semaphore>
@@ -1308,7 +1337,8 @@
                 <Mode Name="IN-Vbat" UserName="Vbat Channel">
                     <SignalLogicalOp Name="AND">
                         <Signal Name="Vbat_Input"/>
-                    </SignalLogicalOp>
+                    </SignalLogicalOp>                 
+                    <Semaphore>VbatfTSelected$IpInstance</Semaphore>
                 </Mode>
             </ModeLogicOperator>
             <Semaphore>channelSelected</Semaphore>

@@ -6,7 +6,7 @@ DBVersion="V4.0"
 IncludeFile="app_entry.h,app_common.h,dbg_trace.h"
 Name="STM32_WPAN"
 RootFolder="Middlewares/ST/STM32_WPAN/"
-Version="STM32Cube_FW_WB_V1.0.0"
+Version="STM32Cube_FW_WB_V1.3.0"
 ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Configs.xsd">
 
     <RefConfig Comment="" Name="STM32_WPAN_Init">
@@ -71,7 +71,9 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <ConfigFile Name="BLE_P2P_ROUTER_APP_C"/>
         <ConfigFile Name="BLE_P2P_SERVER_APP_C"/>
         <ConfigFile Name="BLE_TM_C"/>
+<!--
         <ConfigFile Name="BLE_TEMPLATE_SERVER_APP_C"/>
+-->
 
         <ConfigFile Name="THREAD_APP_THREAD_C"/>
         <ConfigFile Name="THREAD_APP_THREAD_H"/>
@@ -88,6 +90,7 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
 
     <!-- Core - inc -->
         <ConfigFile Name="BLE_APP_COMMON_H"/>
+        <ConfigFile Name="STM32_APP_DEBUG_H"/>
         <ConfigFile Name="BLE_APP_CONF_H"/>
         <ConfigFile Name="BLE_APP_ENTRY_H"/>
         <ConfigFile Name="BLE_HW_CONF_H"/>
@@ -97,6 +100,7 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <ConfigFile Name="BLE_HW_IF_H"/>
     <!-- Core - src -->
         <ConfigFile Name="BLE_APP_ENTRY_C"/>
+        <ConfigFile Name="STM32_APP_DEBUG_C"/>
 <!--
         <ConfigFile Name="BLE_HW_LPM_C"/>
 -->
@@ -104,6 +108,12 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <ConfigFile Name="BLE_HW_UART_C"/>
         <ConfigFile Name="STM32_LMP_IF_C"/>
         <ConfigFile Name="FREERTOS_PORT_C"/>
+
+        <ConfigFile Name="BLE_CUSTOM_STM_C"/>
+        <ConfigFile Name="BLE_CUSTOM_STM_H"/>
+        <ConfigFile Name="BLE_CUSTOM_APP_C"/>
+        <ConfigFile Name="BLE_CUSTOM_APP_H"/>
+
         <Defines Name="OPENTHREAD_CONFIG_FILE" Value="&lt;openthread_api_config_ftd.h&gt;" Condition="Semaphore_FTD_CLI | Semaphore_FTD"/>
         <Defines Name="OPENTHREAD_CONFIG_FILE" Value="&lt;openthread_api_config_mtd.h&gt;" Condition="Semaphore_MTD"/>
         <Defines Name="THREAD_WB" Value="" Condition="S_THREAD"/>
@@ -207,7 +217,7 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
             <File Category="header" Name="ble/core/template/compiler.h"/>
             <File Category="header" Name="ble/core/template/osal.h"/>
         <!-- Source files for ble/core/template -->
-             <File Category="source" Name="ble/core/template/osal.c"/>
+            <File Category="source" Name="ble/core/template/osal.c"/>
         <!-- Header files for ble/svc/Inc -->
             <File Category="header" Name="ble/svc/Inc/bls.h"/>
             <File Category="header" Name="ble/svc/Inc/crs_stm.h"/>
@@ -385,9 +395,14 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
 
     <RefComponent Cclass="Middleware" Cgroup="CUSTOM_TEMPLATE" Cversion="1.0.0">
         <SubComponent Csub="TEMPLATE" Cvariant="Enabled">
-            <File Category="source" Name="ble/svc/Src/template_stm.c"/>
-            <File Category="header" Name="ble/svc/Inc/template_stm.h"/>
+            <File Category="source" Name="ble/core/auto/ble_gap_aci.c"/>
+            <File Category="source" Name="ble/core/auto/ble_gatt_aci.c"/>
+            <File Category="source" Name="ble/core/auto/ble_hal_aci.c"/>
+            <File Category="source" Name="ble/core/auto/ble_hci_le.c"/>
 
+            <File Category="source" Name="interface/patterns/ble_thread/tl/hci_tl.c"/>
+            <File Category="source" Name="interface/patterns/ble_thread/tl/hci_tl_if.c"/>
+            <File Category="source" Name="interface/patterns/ble_thread/tl/shci_tl.c"/>
             <File Category="source" Name="interface/patterns/ble_thread/tl/shci_tl_if.c"/>
         </SubComponent>
     </RefComponent>
@@ -420,12 +435,12 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <File Category="header" Condition="all" Name="app_common.h" Version="1.0"/>
     </RefConfigFile>
 
-    <RefConfigFile Description="" Name="THREAD_STM_LOGGING_H" Template="stm32_wpan_stm_logging_h.ftl" destinationFolder="Core/Inc/">
-        <File Category="header" Condition="Semaphore_THREAD" Name="stm_logging.h" Version="1.0"/>
+    <RefConfigFile Description="" Name="STM32_APP_DEBUG_H" Template="stm32_wpan_app_debug_h.ftl" destinationFolder="Core/Inc/">
+        <File Category="header" Condition="Semaphore_BLE" Name="app_debug.h" Version="1.0"/>
     </RefConfigFile>
 
-    <RefConfigFile Description="" Name="THREAD_STM_LOGGING_C" Template="stm32_wpan_stm_logging_c.ftl" destinationFolder="Core/Src/">
-        <File Category="header" Condition="Semaphore_THREAD" Name="stm_logging.c" Version="1.0"/>
+    <RefConfigFile Description="" Name="THREAD_STM_LOGGING_H" Template="stm32_wpan_stm_logging_h.ftl" destinationFolder="Core/Inc/">
+        <File Category="header" Condition="Semaphore_THREAD" Name="stm_logging.h" Version="1.0"/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="BLE_APP_CONF_H" Template="stm32_wpan_app_conf_h.ftl" destinationFolder="Core/Inc/">
@@ -459,8 +474,6 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <Argument Name="CFG_FAST_CONN_ADV_INTERVAL_MAX_HEXA" GenericType="Simple"/>
         <Argument Name="CFG_LP_CONN_ADV_INTERVAL_MIN_HEXA" GenericType="Simple"/>
         <Argument Name="CFG_LP_CONN_ADV_INTERVAL_MAX_HEXA" GenericType="Simple"/>
-        <Argument Name="CFG_IO_CAPABILITY" GenericType="Simple"/>
-        <Argument Name="CFG_MITM_PROTECTION" GenericType="Simple"/>
         <Argument Name="P2P_SERVER_NUMBER" GenericType="Simple"/>
         <Argument Name="L2CAP_REQUEST_NEW_CONN_PARAM" GenericType="Simple"/>
         <Argument Name="CFG_UART_GUI" GenericType="Simple"/>
@@ -482,6 +495,23 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
 <!--
         <Argument Name="APP_DBG_EN" GenericType="Simple"/>
 -->
+    <!-- Pairing begin -->
+        <Argument Name="CFG_BONDING_MODE" GenericType="Simple"/>
+        <Argument Name="CFG_USED_FIXED_PIN" GenericType="Simple"/>
+        <Argument Name="CFG_FIXED_PIN" GenericType="Simple"/>
+        <Argument Name="CFG_ENCRYPTION_KEY_SIZE_MAX" GenericType="Simple"/>
+        <Argument Name="CFG_ENCRYPTION_KEY_SIZE_MIN" GenericType="Simple"/>
+        <Argument Name="CFG_IDENTITY_ADDRESS_TYPE" GenericType="Simple"/>
+        <Argument Name="CFG_IO_CAPABILITY" GenericType="Simple"/>
+        <Argument Name="CFG_MITM_PROTECTION" GenericType="Simple"/>
+        <Argument Name="CFG_SC_SUPPORT" GenericType="Simple"/>
+        <Argument Name="CFG_KEYPRESS_NOTIFICATION_SUPPORT" GenericType="Simple"/>
+    <!-- Pairing end -->
+    <!-- Advertising begin -->
+        <Argument Name="ADV_TYPE" GenericType="Simple"/>
+        <Argument Name="BLE_ADDR_TYPE" GenericType="Simple"/>
+        <Argument Name="ADV_FILTER" GenericType="Simple"/>        
+    <!-- Advertising end -->
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="BLE_APP_ENTRY_H" Template="stm32_wpan_app_entry_h.ftl" destinationFolder="Core/Inc/"> 
@@ -546,6 +576,7 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <File Category="header" Condition="all" Name="stm32_lpm_if.h" Version="1.0"/>
     </RefConfigFile>
 
+
 <!-- Core/inc end -->
 
 <!-- Core/src begin -->
@@ -573,7 +604,11 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <Argument Name="CFG_DEBUG_TRACE_UART" GenericType="Simple"/>
         <!-- ftl specific items end-->
 
-        </RefConfigFile>
+    </RefConfigFile>
+
+    <RefConfigFile Description="" Name="STM32_APP_DEBUG_C" Template="stm32_wpan_app_debug_c.ftl" destinationFolder="Core/Src/">
+        <File Category="source" Condition="Semaphore_BLE" Name="app_debug.c" Version="1.0"/>
+    </RefConfigFile>
 
     <RefConfigFile Description="" Name="BLE_HW_LPM_C" Template="stm32_wpan_hw_lpm_c.ftl" destinationFolder="Core/Src/">
         <File Category="source" Condition="all" Name="hw_lpm.c" Version="1.0"/>
@@ -595,6 +630,11 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
     <RefConfigFile Description="" Name="FREERTOS_PORT_C" Template="stm32_wpan_freertos_port_c.ftl" destinationFolder="Core/Src/">
         <File Category="source" Condition="S_FREERTOS$context" Name="freertos_port.c" Version="1.0"/>
     </RefConfigFile>
+	
+    <RefConfigFile Description="" Name="THREAD_STM_LOGGING_C" Template="stm32_wpan_stm_logging_c.ftl" destinationFolder="Core/Src/">
+        <File Category="source" Condition="Semaphore_THREAD" Name="stm_logging.c" Version="1.0"/>
+    </RefConfigFile>
+
 <!-- Core/src end -->
 <!-- Utilities/lpm/tiny_lpm begin -->
 
@@ -609,7 +649,10 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
 <!-- STM32_WPAN/app begin -->
     
     <RefConfigFile Description="" Name="BLE_APP_BLE_C" Template="stm32_wpan_ble_app_ble_c.ftl">
-        <File Category="source" Name="App/app_ble.c" Version="1.0" Condition="!Semaphore_BLE_TRANSPARENT_MODE &amp; S_BLE_HOST &amp; (Semaphore_BT_SIG_BEACON | Semaphore_BT_SIG_BLOOD_PRESSURE_SENSOR | Semaphore_BT_SIG_HEALTH_THERMOMETER_SENSOR | Semaphore_BT_SIG_HEART_RATE_SENSOR | Semaphore_CUSTOM_P2P_SERVER)"/>
+<!--
+        <File Category="source" Name="App/app_ble.c" Version="1.0" Condition="!Semaphore_BLE_TRANSPARENT_MODE &amp; S_BLE_HOST &amp; (Semaphore_BT_SIG_BEACON | Semaphore_BT_SIG_BLOOD_PRESSURE_SENSOR | Semaphore_BT_SIG_HEALTH_THERMOMETER_SENSOR | Semaphore_BT_SIG_HEART_RATE_SENSOR | Semaphore_CUSTOM_P2P_SERVER) | (Semaphore_CUSTOM_TEMPLATE)"/>
+-->
+        <File Category="source" Name="App/app_ble.c" Version="1.0" Condition="(Semaphore_BT_SIG_BEACON | Semaphore_BT_SIG_BLOOD_PRESSURE_SENSOR | Semaphore_BT_SIG_HEALTH_THERMOMETER_SENSOR | Semaphore_BT_SIG_HEART_RATE_SENSOR | Semaphore_CUSTOM_P2P_SERVER | Semaphore_CUSTOM_TEMPLATE)"/>
     <!-- ftl specific items begin-->
         <Argument Name="FREERTOS_STATUS" GenericType="Simple" Comment="0 to 1 (0 by default)"/>
         <Argument Name="BLE_CFG_PERIPHERAL" GenericType="Simple" Comment="0 to 1 (1 by default)"/>
@@ -628,12 +671,121 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <Argument Name="LOCAL_NAME_FORMATTED" GenericType="Simple"/>
         <Argument Name="LOCAL_NAME" GenericType="Simple"/>
         <Argument Name="P2P_SERVER_NUMBER" GenericType="Simple"/>
+        <Argument Name="ADV_TYPE" GenericType="Simple"/>
+        <Argument Name="BLE_ADDR_TYPE" GenericType="Simple"/>
+        <Argument Name="ADV_FILTER" GenericType="Simple"/>
+        <Argument Name="GAP_PERIPHERAL_ROLE" GenericType="Simple"/>
+        <Argument Name="GAP_BROADCASTER_ROLE" GenericType="Simple"/>
+        <Argument Name="GAP_CENTRAL_ROLE" GenericType="Simple"/>
+        <Argument Name="GAP_OBSERVER_ROLE" GenericType="Simple"/>
+        <Argument Name="CFG_GAP_DEVICE_NAME" GenericType="Simple"/>
+        <Argument Name="CFG_GAP_DEVICE_NAME_LENGTH" GenericType="Simple"/>
+        <Argument Name="AD_DATA_LENGTH" GenericType="Simple"/>
+        <Argument Name="INCLUDE_AD_TYPE_TX_POWER_LEVEL" GenericType="Simple"/>
+        <Argument Name="AD_TYPE_TX_POWER_LEVEL_LENGTH" GenericType="Simple"/>
+        <Argument Name="AD_TYPE_TX_POWER_LEVEL" GenericType="Simple"/>
+        <Argument Name="INCLUDE_AD_TYPE_COMPLETE_LOCAL_NAME" GenericType="Simple"/>
+        <Argument Name="AD_TYPE_COMPLETE_LOCAL_NAME_LENGTH" GenericType="Simple"/>
+        <Argument Name="AD_TYPE_COMPLETE_LOCAL_NAME" GenericType="Simple"/>
+        <Argument Name="INCLUDE_AD_TYPE_SHORTENED_LOCAL_NAME " GenericType="Simple"/>
+        <Argument Name="AD_TYPE_SHORTENED_LOCAL_NAME_LENGTH" GenericType="Simple"/>
+        <Argument Name="AD_TYPE_SHORTENED_LOCAL_NAME " GenericType="Simple"/>
+        <Argument Name="INCLUDE_AD_TYPE_APPEARANCE" GenericType="Simple"/>
+        <Argument Name="AD_TYPE_APPEARANCE_LENGTH" GenericType="Simple"/>
+        <Argument Name="AD_TYPE_APPEARANCE" GenericType="Simple"/>
+        <Argument Name="INCLUDE_AD_TYPE_ADVERTISING_INTERVAL" GenericType="Simple"/>
+        <Argument Name="AD_TYPE_ADVERTISING_INTERVAL_VALUE" GenericType="Simple"/>
+        <Argument Name="AD_TYPE_ADVERTISING_INTERVAL_VALUE_HEXA" GenericType="Simple"/>
+        <Argument Name="CFG_FAST_CONN_ADV_INTERVAL_MAX_HEXA" GenericType="Simple"/>
+        <Argument Name="CFG_FAST_CONN_ADV_INTERVAL_MAX" GenericType="Simple"/>
+        <Argument Name="AD_TYPE_ADVERTISING_INTERVAL_LENGTH" GenericType="Simple"/>
+        <Argument Name="AD_TYPE_ADVERTISING_INTERVAL" GenericType="Simple"/>
+        <Argument Name="INCLUDE_AD_TYPE_LE_ROLE" GenericType="Simple"/>
+        <Argument Name="AD_TYPE_LE_ROLE_LENGTH" GenericType="Simple"/>
+        <Argument Name="AD_TYPE_LE_ROLE" GenericType="Simple"/>
+        <Argument Name="INCLUDE_AD_TYPE_16_BIT_SERV_UUID_CMPLT_LIST" GenericType="Simple"/>
+        <Argument Name="AD_TYPE_16_BIT_SERV_UUID_CMPLT_LIST_LENGTH" GenericType="Simple"/>
+        <Argument Name="AD_SERVICE_CLASS_UUID_NBR" GenericType="Simple"/>
+        <Argument Name="AD_SERVICE_CLASS_UUID_1" GenericType="Simple"/>
+        <Argument Name="AD_SERVICE_CLASS_UUID_2" GenericType="Simple"/>
+        <Argument Name="AD_SERVICE_CLASS_UUID_3" GenericType="Simple"/>
+        <Argument Name="AD_SERVICE_CLASS_UUID_4" GenericType="Simple"/>
+        <Argument Name="AD_SERVICE_CLASS_UUID_5" GenericType="Simple"/>
+        <Argument Name="AD_SERVICE_CLASS_UUID_6" GenericType="Simple"/>
+        <Argument Name="AD_SERVICE_CLASS_UUID_7" GenericType="Simple"/>
+        <Argument Name="AD_SERVICE_CLASS_UUID_8" GenericType="Simple"/>
+        <Argument Name="AD_SERVICE_CLASS_UUID_9" GenericType="Simple"/>
+        <Argument Name="AD_SERVICE_CLASS_UUID_10" GenericType="Simple"/>
+        <Argument Name="AD_SERVICE_CLASS_UUID_11" GenericType="Simple"/>
+        <Argument Name="INCLUDE_AD_TYPE_128_BIT_SERV_UUID_CMPLT_LIST" GenericType="Simple"/>
+        <Argument Name="AD_TYPE_128_BIT_SERV_UUID_CMPLT_LIST_LENGTH" GenericType="Simple"/>
+        <Argument Name="AD_TYPE_128_BIT_SERV_UUID_CMPLT_LIST" GenericType="Simple"/>
+        <Argument Name="INCLUDE_AD_TYPE_SLAVE_CONN_INTERVAL" GenericType="Simple"/>
+        <Argument Name="AD_TYPE_SLAVE_CONN_INTERVAL_LENGTH" GenericType="Simple"/>
+        <Argument Name="AD_TYPE_SLAVE_CONN_INTERVAL_MIN_MAX" GenericType="Simple"/>
+        <Argument Name="AD_TYPE_SLAVE_CONN_INTERVAL_MIN" GenericType="Simple"/>
+        <Argument Name="AD_TYPE_SLAVE_CONN_INTERVAL_MIN_HEXA" GenericType="Simple"/>
+        <Argument Name="AD_TYPE_SLAVE_CONN_INTERVAL_MAX" GenericType="Simple"/>
+        <Argument Name="AD_TYPE_SLAVE_CONN_INTERVAL_MAX_HEXA" GenericType="Simple"/>
+        <Argument Name="INCLUDE_AD_TYPE_URI" GenericType="Simple"/>
+        <Argument Name="AD_TYPE_URI_LENGTH" GenericType="Simple"/>
+        <Argument Name="AD_TYPE_URI_CODE_POINT" GenericType="Simple"/>
+        <Argument Name="AD_TYPE_URI_DATA" GenericType="Simple"/>
+        <Argument Name="AD_TYPE_URI_DATA_LENGTH" GenericType="Simple"/>
+        <Argument Name="INCLUDE_AD_TYPE_MANUFACTURER_SPECIFIC_DATA" GenericType="Simple"/>
+        <Argument Name="AD_TYPE_MANUFACTURER_SPECIFIC_DATA_LENGTH" GenericType="Simple"/>
+        <Argument Name="AD_TYPE_MANUFACTURER_SPECIFIC_DATA_COMPANY_IDENTIFIER" GenericType="Simple"/>
+        <Argument Name="AD_TYPE_MANUFACTURER_DATA_NBR" GenericType="Simple"/>
+        <Argument Name="AD_TYPE_MANUFACTURER_DATA_1" GenericType="Simple"/>
+        <Argument Name="AD_TYPE_MANUFACTURER_DATA_COMMENT_1" GenericType="Simple"/>
+        <Argument Name="AD_TYPE_MANUFACTURER_DATA_2" GenericType="Simple"/>
+        <Argument Name="AD_TYPE_MANUFACTURER_DATA_COMMENT_2" GenericType="Simple"/>
+        <Argument Name="AD_TYPE_MANUFACTURER_DATA_3" GenericType="Simple"/>
+        <Argument Name="AD_TYPE_MANUFACTURER_DATA_COMMENT_3" GenericType="Simple"/>
+        <Argument Name="AD_TYPE_MANUFACTURER_DATA_4" GenericType="Simple"/>
+        <Argument Name="AD_TYPE_MANUFACTURER_DATA_COMMENT_4" GenericType="Simple"/>
+        <Argument Name="AD_TYPE_MANUFACTURER_DATA_5" GenericType="Simple"/>
+        <Argument Name="AD_TYPE_MANUFACTURER_DATA_COMMENT_5" GenericType="Simple"/>
+        <Argument Name="AD_TYPE_MANUFACTURER_DATA_6" GenericType="Simple"/>
+        <Argument Name="AD_TYPE_MANUFACTURER_DATA_COMMENT_6" GenericType="Simple"/>
+        <Argument Name="AD_TYPE_MANUFACTURER_DATA_7" GenericType="Simple"/>
+        <Argument Name="AD_TYPE_MANUFACTURER_DATA_COMMENT_7" GenericType="Simple"/>
+        <Argument Name="AD_TYPE_MANUFACTURER_DATA_8" GenericType="Simple"/>
+        <Argument Name="AD_TYPE_MANUFACTURER_DATA_COMMENT_8" GenericType="Simple"/>
+        <Argument Name="AD_TYPE_MANUFACTURER_DATA_9" GenericType="Simple"/>
+        <Argument Name="AD_TYPE_MANUFACTURER_DATA_COMMENT_9" GenericType="Simple"/>
+        <Argument Name="AD_TYPE_MANUFACTURER_DATA_10" GenericType="Simple"/>
+        <Argument Name="AD_TYPE_MANUFACTURER_DATA_COMMENT_10" GenericType="Simple"/>
+        <Argument Name="AD_TYPE_MANUFACTURER_DATA_11" GenericType="Simple"/>
+        <Argument Name="AD_TYPE_MANUFACTURER_DATA_COMMENT_11" GenericType="Simple"/>
+        <Argument Name="AD_TYPE_MANUFACTURER_DATA_12" GenericType="Simple"/>
+        <Argument Name="AD_TYPE_MANUFACTURER_DATA_COMMENT_12" GenericType="Simple"/>
+        <Argument Name="AD_TYPE_MANUFACTURER_DATA_13" GenericType="Simple"/>
+        <Argument Name="AD_TYPE_MANUFACTURER_DATA_COMMENT_13" GenericType="Simple"/>
+        <Argument Name="AD_TYPE_MANUFACTURER_DATA_14" GenericType="Simple"/>
+        <Argument Name="AD_TYPE_MANUFACTURER_DATA_COMMENT_14" GenericType="Simple"/>
+        <Argument Name="AD_TYPE_MANUFACTURER_DATA_15" GenericType="Simple"/>
+        <Argument Name="AD_TYPE_MANUFACTURER_DATA_COMMENT_15" GenericType="Simple"/>
+        <Argument Name="AD_TYPE_MANUFACTURER_DATA_16" GenericType="Simple"/>
+        <Argument Name="AD_TYPE_MANUFACTURER_DATA_COMMENT_16" GenericType="Simple"/>
+        <Argument Name="AD_TYPE_MANUFACTURER_DATA_17" GenericType="Simple"/>
+        <Argument Name="AD_TYPE_MANUFACTURER_DATA_COMMENT_17" GenericType="Simple"/>
+        <Argument Name="AD_TYPE_MANUFACTURER_DATA_18" GenericType="Simple"/>
+        <Argument Name="AD_TYPE_MANUFACTURER_DATA_COMMENT_18" GenericType="Simple"/>
+        <Argument Name="AD_TYPE_MANUFACTURER_DATA_19" GenericType="Simple"/>
+        <Argument Name="AD_TYPE_MANUFACTURER_DATA_COMMENT_19" GenericType="Simple"/>
+        <Argument Name="AD_TYPE_MANUFACTURER_DATA_20" GenericType="Simple"/>
+        <Argument Name="AD_TYPE_MANUFACTURER_DATA_COMMENT_20" GenericType="Simple"/>
+        <Argument Name="AD_TYPE_MANUFACTURER_DATA_21" GenericType="Simple"/>
+        <Argument Name="AD_TYPE_MANUFACTURER_DATA_COMMENT_21" GenericType="Simple"/>
+        <Argument Name="AD_TYPE_MANUFACTURER_DATA_22" GenericType="Simple"/>
+        <Argument Name="AD_TYPE_MANUFACTURER_DATA_COMMENT_22" GenericType="Simple"/>
 
         <!-- ftl specific items end-->
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="BLE_APP_BLE_C_OTA" Template="stm32_wpan_ble_app_ble_c_ota.ftl">
-        <File Category="source" Name="App/app_ble.c" Version="1.0" Condition="Semaphore_CUSTOM_OTAS &amp; S_BLE_HOST"/>
+        <File Category="source" Name="App/app_ble.c" Version="1.0" Condition="Semaphore_CUSTOM_OTAS"/>
     <!-- ftl specific items begin-->
         <Argument Name="FREERTOS_STATUS" GenericType="Simple" Comment="0 to 1 (0 by default)"/>
         <Argument Name="BLE_CFG_PERIPHERAL" GenericType="Simple" Comment="0 to 1 (1 by default)"/>
@@ -650,31 +802,12 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <Argument Name="CUSTOM_P2P_SERVER" GenericType="Simple"/>
         <Argument Name="CUSTOM_TEMPLATE" GenericType="Simple"/>
         <Argument Name="LOCAL_NAME_FORMATTED" GenericType="Simple"/>
+		<Argument Name="LOCAL_NAME" GenericType="Simple"/>
     <!-- ftl specific items end-->
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="BLE_APP_BLE_C_P2P_CLIENT" Template="stm32_wpan_ble_app_ble_c_p2p_client.ftl">
-        <File Category="source" Name="App/app_ble.c" Version="1.0" Condition="Semaphore_CUSTOM_P2P_CLIENT &amp; S_BLE_HOST"/>
-    <!-- ftl specific items begin-->
-        <Argument Name="FREERTOS_STATUS" GenericType="Simple" Comment="0 to 1 (0 by default)"/>
-        <Argument Name="BLE_CFG_PERIPHERAL" GenericType="Simple" Comment="0 to 1 (1 by default)"/>
-        <Argument Name="BLE_APPLICATION_TYPE" GenericType="Simple"/>
-		<Argument Name="BLE_TRANSPARENT_MODE_UART" GenericType="Simple"/>
-		<Argument Name="BLE_TRANSPARENT_MODE_VCP" GenericType="Simple"/>
-        <Argument Name="BT_SIG_BEACON" GenericType="Simple"/>
-        <Argument Name="BT_SIG_BLOOD_PRESSURE_SENSOR" GenericType="Simple"/>
-        <Argument Name="BT_SIG_HEALTH_THERMOMETER_SENSOR" GenericType="Simple"/>
-		<Argument Name="BT_SIG_HEART_RATE_SENSOR" GenericType="Simple"/>
-        <Argument Name="CUSTOM_OTA" GenericType="Simple"/>
-        <Argument Name="CUSTOM_P2P_CLIENT" GenericType="Simple"/>
-        <Argument Name="CUSTOM_P2P_ROUTER" GenericType="Simple"/>
-        <Argument Name="CUSTOM_P2P_SERVER" GenericType="Simple"/>
-        <Argument Name="CUSTOM_TEMPLATE" GenericType="Simple"/>
-    <!-- ftl specific items end-->
-    </RefConfigFile>
-
-    <RefConfigFile Description="" Name="BLE_APP_BLE_C_P2P_ROUTER" Template="stm32_wpan_ble_app_ble_c_p2p_router.ftl">
-        <File Category="source" Name="App/app_ble.c" Version="1.0" Condition="Semaphore_CUSTOM_P2P_ROUTER &amp; S_BLE_HOST"/>
+        <File Category="source" Name="App/app_ble.c" Version="1.0" Condition="Semaphore_CUSTOM_P2P_CLIENT"/>
     <!-- ftl specific items begin-->
         <Argument Name="FREERTOS_STATUS" GenericType="Simple" Comment="0 to 1 (0 by default)"/>
         <Argument Name="BLE_CFG_PERIPHERAL" GenericType="Simple" Comment="0 to 1 (1 by default)"/>
@@ -691,11 +824,34 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <Argument Name="CUSTOM_P2P_SERVER" GenericType="Simple"/>
         <Argument Name="CUSTOM_TEMPLATE" GenericType="Simple"/>
         <Argument Name="LOCAL_NAME_FORMATTED" GenericType="Simple"/>
+		<Argument Name="LOCAL_NAME" GenericType="Simple"/>
+    <!-- ftl specific items end-->
+    </RefConfigFile>
+
+    <RefConfigFile Description="" Name="BLE_APP_BLE_C_P2P_ROUTER" Template="stm32_wpan_ble_app_ble_c_p2p_router.ftl">
+        <File Category="source" Name="App/app_ble.c" Version="1.0" Condition="Semaphore_CUSTOM_P2P_ROUTER"/>
+    <!-- ftl specific items begin-->
+        <Argument Name="FREERTOS_STATUS" GenericType="Simple" Comment="0 to 1 (0 by default)"/>
+        <Argument Name="BLE_CFG_PERIPHERAL" GenericType="Simple" Comment="0 to 1 (1 by default)"/>
+        <Argument Name="BLE_APPLICATION_TYPE" GenericType="Simple"/>
+		<Argument Name="BLE_TRANSPARENT_MODE_UART" GenericType="Simple"/>
+		<Argument Name="BLE_TRANSPARENT_MODE_VCP" GenericType="Simple"/>
+        <Argument Name="BT_SIG_BEACON" GenericType="Simple"/>
+        <Argument Name="BT_SIG_BLOOD_PRESSURE_SENSOR" GenericType="Simple"/>
+        <Argument Name="BT_SIG_HEALTH_THERMOMETER_SENSOR" GenericType="Simple"/>
+		<Argument Name="BT_SIG_HEART_RATE_SENSOR" GenericType="Simple"/>
+        <Argument Name="CUSTOM_OTA" GenericType="Simple"/>
+        <Argument Name="CUSTOM_P2P_CLIENT" GenericType="Simple"/>
+        <Argument Name="CUSTOM_P2P_ROUTER" GenericType="Simple"/>
+        <Argument Name="CUSTOM_P2P_SERVER" GenericType="Simple"/>
+        <Argument Name="CUSTOM_TEMPLATE" GenericType="Simple"/>
+        <Argument Name="LOCAL_NAME_FORMATTED" GenericType="Simple"/>
+		<Argument Name="LOCAL_NAME" GenericType="Simple"/>
     <!-- ftl specific items end-->
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="BLE_APP_BLE_H" Template="stm32_wpan_ble_app_ble_h.ftl">
-        <File Category="header" Name="App/app_ble.h" Version="1.0" Condition="!Semaphore_BLE_TRANSPARENT_MODE &amp; S_BLE_HOST"/>
+        <File Category="header" Name="App/app_ble.h" Version="1.0" Condition="!Semaphore_BLE_TRANSPARENT_MODE"/>
     <!-- ftl specific items begin-->
         <Argument Name="FREERTOS_STATUS" GenericType="Simple" Comment="0 to 1 (0 by default)"/>
         <Argument Name="BLE_CFG_PERIPHERAL" GenericType="Simple" Comment="0 to 1 (1 by default)"/>
@@ -790,8 +946,8 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
     <RefConfigFile Description="" Name="THREAD_APP_THREAD_H" Template="stm32_wpan_thread_app_thread_h.ftl">
         <File Category="header" Condition="Semaphore_THREAD" Name="App/app_thread.h" Version="1.0"/>
         <Argument Name="THREAD_APPLICATION" GenericType="Simple" Comment="String (Full Thread Device with Command Line Interface by default)"/>
-    </RefConfigFile>    
-    
+    </RefConfigFile>
+
     <RefConfigFile Description="" Name="BLE_EDDYSTONE_BEACON_H" Template="stm32_wpan_ble_eddystone_beacon_h.ftl">
         <File Category="header" Condition="Semaphore_BT_SIG_BEACON &amp; S_BLE_HOST" Name="App/eddystone_beacon.h" Version="1.0"/>
     </RefConfigFile>
@@ -914,6 +1070,1126 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
 
     <RefConfigFile Description="" Name="BLE_TEMPLATE_SERVER_APP_H" Template="stm32_wpan_ble_template_server_app_h.ftl">
         <File Category="header" Condition="Semaphore_CUSTOM_TEMPLATE &amp; S_BLE_HOST" Name="App/template_server_app.h" Version="1.0"/>
+    </RefConfigFile>
+
+    <RefConfigFile Description="" Name="BLE_CUSTOM_STM_C" Template="stm32_wpan_ble_custom_stm_c.ftl">
+        <File Category="source" Name="App/custom_stm.c" Version="1.0" Condition="Semaphore_BLE_SERVER_PROFILE &amp; Semaphore_CUSTOM_TEMPLATE"/>
+    <!-- ftl specific items begin-->
+        <Argument Name="NUMBER_OF_SERVICES" GenericType="Simple"/>
+        <Argument Name="SERVICE1_NUMBER_OF_CHARACTERISTICS" GenericType="Simple"/>
+        <Argument Name="SERVICE2_NUMBER_OF_CHARACTERISTICS" GenericType="Simple"/>
+        <Argument Name="SERVICE3_NUMBER_OF_CHARACTERISTICS" GenericType="Simple"/>
+        <Argument Name="SERVICE4_NUMBER_OF_CHARACTERISTICS" GenericType="Simple"/>
+        <Argument Name="SERVICE5_NUMBER_OF_CHARACTERISTICS" GenericType="Simple"/>
+
+        <Argument Name="SERVICE1_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE2_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE3_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE4_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE5_LONG_NAME" GenericType="Simple"/>
+
+        <Argument Name="SERVICE1_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE2_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE3_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE4_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE5_SHORT_NAME" GenericType="Simple"/>
+
+        <Argument Name="SERVICE1_CHAR1_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR2_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR3_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR4_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR5_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR1_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR2_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR3_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR4_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR5_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR1_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR2_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR3_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR4_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR5_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR1_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR2_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR3_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR4_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR5_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR1_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR2_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR3_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR4_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR5_LONG_NAME" GenericType="Simple"/>
+
+        <Argument Name="SERVICE1_CHAR1_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR2_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR3_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR4_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR5_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR1_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR2_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR3_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR4_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR5_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR1_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR2_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR3_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR4_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR5_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR1_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR2_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR3_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR4_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR5_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR1_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR2_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR3_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR4_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR5_SHORT_NAME" GenericType="Simple"/>
+
+        <Argument Name="SERVICE1_TYPE" GenericType="Simple"/>
+        <Argument Name="SERVICE2_TYPE" GenericType="Simple"/>
+        <Argument Name="SERVICE3_TYPE" GenericType="Simple"/>
+        <Argument Name="SERVICE4_TYPE" GenericType="Simple"/>
+        <Argument Name="SERVICE5_TYPE" GenericType="Simple"/>
+
+        <Argument Name="SERVICE1_UUID" GenericType="Simple"/>
+        <Argument Name="SERVICE2_UUID" GenericType="Simple"/>
+        <Argument Name="SERVICE3_UUID" GenericType="Simple"/>
+        <Argument Name="SERVICE4_UUID" GenericType="Simple"/>
+        <Argument Name="SERVICE5_UUID" GenericType="Simple"/>
+
+        <Argument Name="SERVICE1_UUID_TYPE" GenericType="Simple"/>
+        <Argument Name="SERVICE2_UUID_TYPE" GenericType="Simple"/>
+        <Argument Name="SERVICE3_UUID_TYPE" GenericType="Simple"/>
+        <Argument Name="SERVICE4_UUID_TYPE" GenericType="Simple"/>
+        <Argument Name="SERVICE5_UUID_TYPE" GenericType="Simple"/>
+
+        <Argument Name="SERVICE1_MAX_ATTRIBUTES_RECORDS" GenericType="Simple"/>
+        <Argument Name="SERVICE2_MAX_ATTRIBUTES_RECORDS" GenericType="Simple"/>
+        <Argument Name="SERVICE3_MAX_ATTRIBUTES_RECORDS" GenericType="Simple"/>
+        <Argument Name="SERVICE4_MAX_ATTRIBUTES_RECORDS" GenericType="Simple"/>
+        <Argument Name="SERVICE5_MAX_ATTRIBUTES_RECORDS" GenericType="Simple"/>
+
+        <Argument Name="SERVICE1_CHAR1_UUID" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR2_UUID" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR3_UUID" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR4_UUID" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR5_UUID" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR1_UUID" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR2_UUID" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR3_UUID" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR4_UUID" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR5_UUID" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR1_UUID" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR2_UUID" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR3_UUID" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR4_UUID" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR5_UUID" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR1_UUID" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR2_UUID" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR3_UUID" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR4_UUID" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR5_UUID" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR1_UUID" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR2_UUID" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR3_UUID" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR4_UUID" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR5_UUID" GenericType="Simple"/>
+
+        <Argument Name="SERVICE1_CHAR1_UUID_TYPE" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR2_UUID_TYPE" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR3_UUID_TYPE" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR4_UUID_TYPE" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR5_UUID_TYPE" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR1_UUID_TYPE" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR2_UUID_TYPE" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR3_UUID_TYPE" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR4_UUID_TYPE" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR5_UUID_TYPE" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR1_UUID_TYPE" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR2_UUID_TYPE" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR3_UUID_TYPE" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR4_UUID_TYPE" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR5_UUID_TYPE" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR1_UUID_TYPE" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR2_UUID_TYPE" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR3_UUID_TYPE" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR4_UUID_TYPE" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR5_UUID_TYPE" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR1_UUID_TYPE" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR2_UUID_TYPE" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR3_UUID_TYPE" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR4_UUID_TYPE" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR5_UUID_TYPE" GenericType="Simple"/>
+
+        <Argument Name="SERVICE1_CHAR1_VALUE_OFFSET" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR2_VALUE_OFFSET" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR3_VALUE_OFFSET" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR4_VALUE_OFFSET" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR5_VALUE_OFFSET" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR1_VALUE_OFFSET" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR2_VALUE_OFFSET" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR3_VALUE_OFFSET" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR4_VALUE_OFFSET" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR5_VALUE_OFFSET" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR1_VALUE_OFFSET" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR2_VALUE_OFFSET" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR3_VALUE_OFFSET" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR4_VALUE_OFFSET" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR5_VALUE_OFFSET" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR1_VALUE_OFFSET" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR2_VALUE_OFFSET" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR3_VALUE_OFFSET" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR4_VALUE_OFFSET" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR5_VALUE_OFFSET" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR1_VALUE_OFFSET" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR2_VALUE_OFFSET" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR3_VALUE_OFFSET" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR4_VALUE_OFFSET" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR5_VALUE_OFFSET" GenericType="Simple"/>
+
+        <Argument Name="SERVICE1_CHAR1_VALUE_LENGTH" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR2_VALUE_LENGTH" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR3_VALUE_LENGTH" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR4_VALUE_LENGTH" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR5_VALUE_LENGTH" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR1_VALUE_LENGTH" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR2_VALUE_LENGTH" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR3_VALUE_LENGTH" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR4_VALUE_LENGTH" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR5_VALUE_LENGTH" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR1_VALUE_LENGTH" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR2_VALUE_LENGTH" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR3_VALUE_LENGTH" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR4_VALUE_LENGTH" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR5_VALUE_LENGTH" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR1_VALUE_LENGTH" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR2_VALUE_LENGTH" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR3_VALUE_LENGTH" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR4_VALUE_LENGTH" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR5_VALUE_LENGTH" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR1_VALUE_LENGTH" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR2_VALUE_LENGTH" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR3_VALUE_LENGTH" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR4_VALUE_LENGTH" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR5_VALUE_LENGTH" GenericType="Simple"/>
+
+        <Argument Name="SERVICE1_CHAR1_LENGTH_CHARACTERISTIC" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR2_LENGTH_CHARACTERISTIC" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR3_LENGTH_CHARACTERISTIC" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR4_LENGTH_CHARACTERISTIC" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR5_LENGTH_CHARACTERISTIC" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR1_LENGTH_CHARACTERISTIC" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR2_LENGTH_CHARACTERISTIC" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR3_LENGTH_CHARACTERISTIC" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR4_LENGTH_CHARACTERISTIC" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR5_LENGTH_CHARACTERISTIC" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR1_LENGTH_CHARACTERISTIC" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR2_LENGTH_CHARACTERISTIC" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR3_LENGTH_CHARACTERISTIC" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR4_LENGTH_CHARACTERISTIC" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR5_LENGTH_CHARACTERISTIC" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR1_LENGTH_CHARACTERISTIC" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR2_LENGTH_CHARACTERISTIC" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR3_LENGTH_CHARACTERISTIC" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR4_LENGTH_CHARACTERISTIC" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR5_LENGTH_CHARACTERISTIC" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR1_LENGTH_CHARACTERISTIC" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR2_LENGTH_CHARACTERISTIC" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR3_LENGTH_CHARACTERISTIC" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR4_LENGTH_CHARACTERISTIC" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR5_LENGTH_CHARACTERISTIC" GenericType="Simple"/>
+
+        <Argument Name="SERVICE1_CHAR1_ENC_KEY_SIZE" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR2_ENC_KEY_SIZE" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR3_ENC_KEY_SIZE" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR4_ENC_KEY_SIZE" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR5_ENC_KEY_SIZE" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR1_ENC_KEY_SIZE" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR2_ENC_KEY_SIZE" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR3_ENC_KEY_SIZE" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR4_ENC_KEY_SIZE" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR5_ENC_KEY_SIZE" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR1_ENC_KEY_SIZE" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR2_ENC_KEY_SIZE" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR3_ENC_KEY_SIZE" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR4_ENC_KEY_SIZE" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR5_ENC_KEY_SIZE" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR1_ENC_KEY_SIZE" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR2_ENC_KEY_SIZE" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR3_ENC_KEY_SIZE" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR4_ENC_KEY_SIZE" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR5_ENC_KEY_SIZE" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR1_ENC_KEY_SIZE" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR2_ENC_KEY_SIZE" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR3_ENC_KEY_SIZE" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR4_ENC_KEY_SIZE" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR5_ENC_KEY_SIZE" GenericType="Simple"/>
+
+        <Argument Name="SERVICE_CHAR_PROP_NONE" GenericType="Simple"/>
+
+        <Argument Name="SERVICE1_CHAR1_PROP_BROADCAST" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR2_PROP_BROADCAST" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR3_PROP_BROADCAST" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR4_PROP_BROADCAST" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR5_PROP_BROADCAST" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR1_PROP_BROADCAST" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR2_PROP_BROADCAST" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR3_PROP_BROADCAST" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR4_PROP_BROADCAST" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR5_PROP_BROADCAST" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR1_PROP_BROADCAST" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR2_PROP_BROADCAST" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR3_PROP_BROADCAST" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR4_PROP_BROADCAST" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR5_PROP_BROADCAST" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR1_PROP_BROADCAST" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR2_PROP_BROADCAST" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR3_PROP_BROADCAST" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR4_PROP_BROADCAST" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR5_PROP_BROADCAST" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR1_PROP_BROADCAST" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR2_PROP_BROADCAST" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR3_PROP_BROADCAST" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR4_PROP_BROADCAST" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR5_PROP_BROADCAST" GenericType="Simple"/>
+
+        <Argument Name="SERVICE1_CHAR1_PROP_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR2_PROP_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR3_PROP_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR4_PROP_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR5_PROP_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR1_PROP_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR2_PROP_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR3_PROP_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR4_PROP_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR5_PROP_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR1_PROP_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR2_PROP_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR3_PROP_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR4_PROP_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR5_PROP_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR1_PROP_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR2_PROP_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR3_PROP_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR4_PROP_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR5_PROP_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR1_PROP_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR2_PROP_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR3_PROP_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR4_PROP_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR5_PROP_READ" GenericType="Simple"/>
+
+        <Argument Name="SERVICE1_CHAR1_PROP_WRITE_WITHOUT_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR2_PROP_WRITE_WITHOUT_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR3_PROP_WRITE_WITHOUT_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR4_PROP_WRITE_WITHOUT_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR5_PROP_WRITE_WITHOUT_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR1_PROP_WRITE_WITHOUT_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR2_PROP_WRITE_WITHOUT_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR3_PROP_WRITE_WITHOUT_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR4_PROP_WRITE_WITHOUT_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR5_PROP_WRITE_WITHOUT_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR1_PROP_WRITE_WITHOUT_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR2_PROP_WRITE_WITHOUT_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR3_PROP_WRITE_WITHOUT_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR4_PROP_WRITE_WITHOUT_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR5_PROP_WRITE_WITHOUT_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR1_PROP_WRITE_WITHOUT_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR2_PROP_WRITE_WITHOUT_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR3_PROP_WRITE_WITHOUT_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR4_PROP_WRITE_WITHOUT_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR5_PROP_WRITE_WITHOUT_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR1_PROP_WRITE_WITHOUT_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR2_PROP_WRITE_WITHOUT_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR3_PROP_WRITE_WITHOUT_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR4_PROP_WRITE_WITHOUT_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR5_PROP_WRITE_WITHOUT_RESP" GenericType="Simple"/>
+
+        <Argument Name="SERVICE1_CHAR1_PROP_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR2_PROP_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR3_PROP_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR4_PROP_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR5_PROP_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR1_PROP_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR2_PROP_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR3_PROP_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR4_PROP_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR5_PROP_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR1_PROP_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR2_PROP_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR3_PROP_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR4_PROP_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR5_PROP_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR1_PROP_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR2_PROP_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR3_PROP_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR4_PROP_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR5_PROP_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR1_PROP_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR2_PROP_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR3_PROP_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR4_PROP_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR5_PROP_WRITE" GenericType="Simple"/>
+
+        <Argument Name="SERVICE1_CHAR1_PROP_NOTIFY" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR2_PROP_NOTIFY" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR3_PROP_NOTIFY" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR4_PROP_NOTIFY" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR5_PROP_NOTIFY" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR1_PROP_NOTIFY" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR2_PROP_NOTIFY" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR3_PROP_NOTIFY" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR4_PROP_NOTIFY" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR5_PROP_NOTIFY" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR1_PROP_NOTIFY" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR2_PROP_NOTIFY" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR3_PROP_NOTIFY" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR4_PROP_NOTIFY" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR5_PROP_NOTIFY" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR1_PROP_NOTIFY" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR2_PROP_NOTIFY" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR3_PROP_NOTIFY" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR4_PROP_NOTIFY" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR5_PROP_NOTIFY" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR1_PROP_NOTIFY" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR2_PROP_NOTIFY" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR3_PROP_NOTIFY" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR4_PROP_NOTIFY" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR5_PROP_NOTIFY" GenericType="Simple"/>
+
+        <Argument Name="SERVICE1_CHAR1_PROP_INDICATE" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR2_PROP_INDICATE" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR3_PROP_INDICATE" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR4_PROP_INDICATE" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR5_PROP_INDICATE" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR1_PROP_INDICATE" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR2_PROP_INDICATE" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR3_PROP_INDICATE" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR4_PROP_INDICATE" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR5_PROP_INDICATE" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR1_PROP_INDICATE" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR2_PROP_INDICATE" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR3_PROP_INDICATE" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR4_PROP_INDICATE" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR5_PROP_INDICATE" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR1_PROP_INDICATE" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR2_PROP_INDICATE" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR3_PROP_INDICATE" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR4_PROP_INDICATE" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR5_PROP_INDICATE" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR1_PROP_INDICATE" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR2_PROP_INDICATE" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR3_PROP_INDICATE" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR4_PROP_INDICATE" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR5_PROP_INDICATE" GenericType="Simple"/>
+
+        <Argument Name="SERVICE_CHAR_ATTR_PERMISSION_NONE" GenericType="Simple"/>
+
+        <Argument Name="SERVICE1_CHAR1_ATTR_PERMISSION_AUTHEN_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR2_ATTR_PERMISSION_AUTHEN_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR3_ATTR_PERMISSION_AUTHEN_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR4_ATTR_PERMISSION_AUTHEN_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR5_ATTR_PERMISSION_AUTHEN_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR1_ATTR_PERMISSION_AUTHEN_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR2_ATTR_PERMISSION_AUTHEN_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR3_ATTR_PERMISSION_AUTHEN_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR4_ATTR_PERMISSION_AUTHEN_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR5_ATTR_PERMISSION_AUTHEN_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR1_ATTR_PERMISSION_AUTHEN_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR2_ATTR_PERMISSION_AUTHEN_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR3_ATTR_PERMISSION_AUTHEN_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR4_ATTR_PERMISSION_AUTHEN_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR5_ATTR_PERMISSION_AUTHEN_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR1_ATTR_PERMISSION_AUTHEN_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR2_ATTR_PERMISSION_AUTHEN_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR3_ATTR_PERMISSION_AUTHEN_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR4_ATTR_PERMISSION_AUTHEN_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR5_ATTR_PERMISSION_AUTHEN_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR1_ATTR_PERMISSION_AUTHEN_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR2_ATTR_PERMISSION_AUTHEN_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR3_ATTR_PERMISSION_AUTHEN_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR4_ATTR_PERMISSION_AUTHEN_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR5_ATTR_PERMISSION_AUTHEN_READ" GenericType="Simple"/>
+
+        <Argument Name="SERVICE1_CHAR1_ATTR_PERMISSION_AUTHOR_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR2_ATTR_PERMISSION_AUTHOR_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR3_ATTR_PERMISSION_AUTHOR_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR4_ATTR_PERMISSION_AUTHOR_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR5_ATTR_PERMISSION_AUTHOR_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR1_ATTR_PERMISSION_AUTHOR_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR2_ATTR_PERMISSION_AUTHOR_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR3_ATTR_PERMISSION_AUTHOR_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR4_ATTR_PERMISSION_AUTHOR_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR5_ATTR_PERMISSION_AUTHOR_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR1_ATTR_PERMISSION_AUTHOR_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR2_ATTR_PERMISSION_AUTHOR_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR3_ATTR_PERMISSION_AUTHOR_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR4_ATTR_PERMISSION_AUTHOR_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR5_ATTR_PERMISSION_AUTHOR_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR1_ATTR_PERMISSION_AUTHOR_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR2_ATTR_PERMISSION_AUTHOR_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR3_ATTR_PERMISSION_AUTHOR_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR4_ATTR_PERMISSION_AUTHOR_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR5_ATTR_PERMISSION_AUTHOR_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR1_ATTR_PERMISSION_AUTHOR_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR2_ATTR_PERMISSION_AUTHOR_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR3_ATTR_PERMISSION_AUTHOR_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR4_ATTR_PERMISSION_AUTHOR_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR5_ATTR_PERMISSION_AUTHOR_READ" GenericType="Simple"/>
+
+        <Argument Name="SERVICE1_CHAR1_ATTR_PERMISSION_ENCRY_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR2_ATTR_PERMISSION_ENCRY_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR3_ATTR_PERMISSION_ENCRY_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR4_ATTR_PERMISSION_ENCRY_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR5_ATTR_PERMISSION_ENCRY_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR1_ATTR_PERMISSION_ENCRY_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR2_ATTR_PERMISSION_ENCRY_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR3_ATTR_PERMISSION_ENCRY_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR4_ATTR_PERMISSION_ENCRY_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR5_ATTR_PERMISSION_ENCRY_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR1_ATTR_PERMISSION_ENCRY_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR2_ATTR_PERMISSION_ENCRY_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR3_ATTR_PERMISSION_ENCRY_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR4_ATTR_PERMISSION_ENCRY_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR5_ATTR_PERMISSION_ENCRY_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR1_ATTR_PERMISSION_ENCRY_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR2_ATTR_PERMISSION_ENCRY_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR3_ATTR_PERMISSION_ENCRY_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR4_ATTR_PERMISSION_ENCRY_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR5_ATTR_PERMISSION_ENCRY_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR1_ATTR_PERMISSION_ENCRY_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR2_ATTR_PERMISSION_ENCRY_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR3_ATTR_PERMISSION_ENCRY_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR4_ATTR_PERMISSION_ENCRY_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR5_ATTR_PERMISSION_ENCRY_READ" GenericType="Simple"/>
+
+        <Argument Name="SERVICE1_CHAR1_ATTR_PERMISSION_AUTHEN_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR2_ATTR_PERMISSION_AUTHEN_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR3_ATTR_PERMISSION_AUTHEN_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR4_ATTR_PERMISSION_AUTHEN_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR5_ATTR_PERMISSION_AUTHEN_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR1_ATTR_PERMISSION_AUTHEN_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR2_ATTR_PERMISSION_AUTHEN_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR3_ATTR_PERMISSION_AUTHEN_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR4_ATTR_PERMISSION_AUTHEN_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR5_ATTR_PERMISSION_AUTHEN_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR1_ATTR_PERMISSION_AUTHEN_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR2_ATTR_PERMISSION_AUTHEN_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR3_ATTR_PERMISSION_AUTHEN_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR4_ATTR_PERMISSION_AUTHEN_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR5_ATTR_PERMISSION_AUTHEN_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR1_ATTR_PERMISSION_AUTHEN_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR2_ATTR_PERMISSION_AUTHEN_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR3_ATTR_PERMISSION_AUTHEN_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR4_ATTR_PERMISSION_AUTHEN_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR5_ATTR_PERMISSION_AUTHEN_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR1_ATTR_PERMISSION_AUTHEN_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR2_ATTR_PERMISSION_AUTHEN_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR3_ATTR_PERMISSION_AUTHEN_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR4_ATTR_PERMISSION_AUTHEN_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR5_ATTR_PERMISSION_AUTHEN_WRITE" GenericType="Simple"/>
+
+        <Argument Name="SERVICE1_CHAR1_ATTR_PERMISSION_AUTHOR_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR2_ATTR_PERMISSION_AUTHOR_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR3_ATTR_PERMISSION_AUTHOR_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR4_ATTR_PERMISSION_AUTHOR_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR5_ATTR_PERMISSION_AUTHOR_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR1_ATTR_PERMISSION_AUTHOR_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR2_ATTR_PERMISSION_AUTHOR_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR3_ATTR_PERMISSION_AUTHOR_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR4_ATTR_PERMISSION_AUTHOR_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR5_ATTR_PERMISSION_AUTHOR_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR1_ATTR_PERMISSION_AUTHOR_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR2_ATTR_PERMISSION_AUTHOR_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR3_ATTR_PERMISSION_AUTHOR_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR4_ATTR_PERMISSION_AUTHOR_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR5_ATTR_PERMISSION_AUTHOR_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR1_ATTR_PERMISSION_AUTHOR_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR2_ATTR_PERMISSION_AUTHOR_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR3_ATTR_PERMISSION_AUTHOR_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR4_ATTR_PERMISSION_AUTHOR_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR5_ATTR_PERMISSION_AUTHOR_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR1_ATTR_PERMISSION_AUTHOR_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR2_ATTR_PERMISSION_AUTHOR_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR3_ATTR_PERMISSION_AUTHOR_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR4_ATTR_PERMISSION_AUTHOR_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR5_ATTR_PERMISSION_AUTHOR_WRITE" GenericType="Simple"/>
+
+        <Argument Name="SERVICE1_CHAR1_ATTR_PERMISSION_ENCRY_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR2_ATTR_PERMISSION_ENCRY_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR3_ATTR_PERMISSION_ENCRY_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR4_ATTR_PERMISSION_ENCRY_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR5_ATTR_PERMISSION_ENCRY_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR1_ATTR_PERMISSION_ENCRY_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR2_ATTR_PERMISSION_ENCRY_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR3_ATTR_PERMISSION_ENCRY_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR4_ATTR_PERMISSION_ENCRY_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR5_ATTR_PERMISSION_ENCRY_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR1_ATTR_PERMISSION_ENCRY_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR2_ATTR_PERMISSION_ENCRY_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR3_ATTR_PERMISSION_ENCRY_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR4_ATTR_PERMISSION_ENCRY_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR5_ATTR_PERMISSION_ENCRY_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR1_ATTR_PERMISSION_ENCRY_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR2_ATTR_PERMISSION_ENCRY_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR3_ATTR_PERMISSION_ENCRY_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR4_ATTR_PERMISSION_ENCRY_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR5_ATTR_PERMISSION_ENCRY_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR1_ATTR_PERMISSION_ENCRY_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR2_ATTR_PERMISSION_ENCRY_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR3_ATTR_PERMISSION_ENCRY_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR4_ATTR_PERMISSION_ENCRY_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR5_ATTR_PERMISSION_ENCRY_WRITE" GenericType="Simple"/>
+
+        <Argument Name="SERVICE_CHAR_GATT_DONT_NOTIFY_EVENTS" GenericType="Simple"/>
+
+        <Argument Name="SERVICE1_CHAR1_GATT_NOTIFY_ATTRIBUTE_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR2_GATT_NOTIFY_ATTRIBUTE_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR3_GATT_NOTIFY_ATTRIBUTE_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR4_GATT_NOTIFY_ATTRIBUTE_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR5_GATT_NOTIFY_ATTRIBUTE_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR1_GATT_NOTIFY_ATTRIBUTE_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR2_GATT_NOTIFY_ATTRIBUTE_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR3_GATT_NOTIFY_ATTRIBUTE_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR4_GATT_NOTIFY_ATTRIBUTE_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR5_GATT_NOTIFY_ATTRIBUTE_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR1_GATT_NOTIFY_ATTRIBUTE_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR2_GATT_NOTIFY_ATTRIBUTE_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR3_GATT_NOTIFY_ATTRIBUTE_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR4_GATT_NOTIFY_ATTRIBUTE_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR5_GATT_NOTIFY_ATTRIBUTE_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR1_GATT_NOTIFY_ATTRIBUTE_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR2_GATT_NOTIFY_ATTRIBUTE_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR3_GATT_NOTIFY_ATTRIBUTE_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR4_GATT_NOTIFY_ATTRIBUTE_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR5_GATT_NOTIFY_ATTRIBUTE_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR1_GATT_NOTIFY_ATTRIBUTE_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR2_GATT_NOTIFY_ATTRIBUTE_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR3_GATT_NOTIFY_ATTRIBUTE_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR4_GATT_NOTIFY_ATTRIBUTE_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR5_GATT_NOTIFY_ATTRIBUTE_WRITE" GenericType="Simple"/>
+
+        <Argument Name="SERVICE1_CHAR1_GATT_NOTIFY_WRITE_REQ_AND_WAIT_FOR_APPL_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR2_GATT_NOTIFY_WRITE_REQ_AND_WAIT_FOR_APPL_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR3_GATT_NOTIFY_WRITE_REQ_AND_WAIT_FOR_APPL_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR4_GATT_NOTIFY_WRITE_REQ_AND_WAIT_FOR_APPL_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR5_GATT_NOTIFY_WRITE_REQ_AND_WAIT_FOR_APPL_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR1_GATT_NOTIFY_WRITE_REQ_AND_WAIT_FOR_APPL_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR2_GATT_NOTIFY_WRITE_REQ_AND_WAIT_FOR_APPL_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR3_GATT_NOTIFY_WRITE_REQ_AND_WAIT_FOR_APPL_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR4_GATT_NOTIFY_WRITE_REQ_AND_WAIT_FOR_APPL_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR5_GATT_NOTIFY_WRITE_REQ_AND_WAIT_FOR_APPL_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR1_GATT_NOTIFY_WRITE_REQ_AND_WAIT_FOR_APPL_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR2_GATT_NOTIFY_WRITE_REQ_AND_WAIT_FOR_APPL_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR3_GATT_NOTIFY_WRITE_REQ_AND_WAIT_FOR_APPL_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR4_GATT_NOTIFY_WRITE_REQ_AND_WAIT_FOR_APPL_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR5_GATT_NOTIFY_WRITE_REQ_AND_WAIT_FOR_APPL_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR1_GATT_NOTIFY_WRITE_REQ_AND_WAIT_FOR_APPL_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR2_GATT_NOTIFY_WRITE_REQ_AND_WAIT_FOR_APPL_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR3_GATT_NOTIFY_WRITE_REQ_AND_WAIT_FOR_APPL_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR4_GATT_NOTIFY_WRITE_REQ_AND_WAIT_FOR_APPL_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR5_GATT_NOTIFY_WRITE_REQ_AND_WAIT_FOR_APPL_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR1_GATT_NOTIFY_WRITE_REQ_AND_WAIT_FOR_APPL_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR2_GATT_NOTIFY_WRITE_REQ_AND_WAIT_FOR_APPL_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR3_GATT_NOTIFY_WRITE_REQ_AND_WAIT_FOR_APPL_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR4_GATT_NOTIFY_WRITE_REQ_AND_WAIT_FOR_APPL_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR5_GATT_NOTIFY_WRITE_REQ_AND_WAIT_FOR_APPL_RESP" GenericType="Simple"/>
+
+        <Argument Name="SERVICE1_CHAR1_GATT_NOTIFY_READ_REQ_AND_WAIT_FOR_APPL_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR2_GATT_NOTIFY_READ_REQ_AND_WAIT_FOR_APPL_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR3_GATT_NOTIFY_READ_REQ_AND_WAIT_FOR_APPL_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR4_GATT_NOTIFY_READ_REQ_AND_WAIT_FOR_APPL_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR5_GATT_NOTIFY_READ_REQ_AND_WAIT_FOR_APPL_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR1_GATT_NOTIFY_READ_REQ_AND_WAIT_FOR_APPL_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR2_GATT_NOTIFY_READ_REQ_AND_WAIT_FOR_APPL_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR3_GATT_NOTIFY_READ_REQ_AND_WAIT_FOR_APPL_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR4_GATT_NOTIFY_READ_REQ_AND_WAIT_FOR_APPL_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR5_GATT_NOTIFY_READ_REQ_AND_WAIT_FOR_APPL_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR1_GATT_NOTIFY_READ_REQ_AND_WAIT_FOR_APPL_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR2_GATT_NOTIFY_READ_REQ_AND_WAIT_FOR_APPL_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR3_GATT_NOTIFY_READ_REQ_AND_WAIT_FOR_APPL_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR4_GATT_NOTIFY_READ_REQ_AND_WAIT_FOR_APPL_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR5_GATT_NOTIFY_READ_REQ_AND_WAIT_FOR_APPL_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR1_GATT_NOTIFY_READ_REQ_AND_WAIT_FOR_APPL_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR2_GATT_NOTIFY_READ_REQ_AND_WAIT_FOR_APPL_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR3_GATT_NOTIFY_READ_REQ_AND_WAIT_FOR_APPL_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR4_GATT_NOTIFY_READ_REQ_AND_WAIT_FOR_APPL_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR5_GATT_NOTIFY_READ_REQ_AND_WAIT_FOR_APPL_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR1_GATT_NOTIFY_READ_REQ_AND_WAIT_FOR_APPL_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR2_GATT_NOTIFY_READ_REQ_AND_WAIT_FOR_APPL_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR3_GATT_NOTIFY_READ_REQ_AND_WAIT_FOR_APPL_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR4_GATT_NOTIFY_READ_REQ_AND_WAIT_FOR_APPL_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR5_GATT_NOTIFY_READ_REQ_AND_WAIT_FOR_APPL_RESP" GenericType="Simple"/>
+
+    </RefConfigFile>
+
+    <RefConfigFile Description="" Name="BLE_CUSTOM_STM_H" Template="stm32_wpan_ble_custom_stm_h.ftl">
+        <File Category="header" Name="App/custom_stm.h" Version="1.0" Condition="Semaphore_BLE_SERVER_PROFILE &amp; Semaphore_CUSTOM_TEMPLATE"/>
+    <!-- ftl specific items begin-->
+        <Argument Name="NUMBER_OF_SERVICES" GenericType="Simple"/>
+        <Argument Name="SERVICE1_NUMBER_OF_CHARACTERISTICS" GenericType="Simple"/>
+        <Argument Name="SERVICE2_NUMBER_OF_CHARACTERISTICS" GenericType="Simple"/>
+        <Argument Name="SERVICE3_NUMBER_OF_CHARACTERISTICS" GenericType="Simple"/>
+        <Argument Name="SERVICE4_NUMBER_OF_CHARACTERISTICS" GenericType="Simple"/>
+        <Argument Name="SERVICE5_NUMBER_OF_CHARACTERISTICS" GenericType="Simple"/>
+
+        <Argument Name="SERVICE1_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE2_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE3_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE4_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE5_LONG_NAME" GenericType="Simple"/>
+
+        <Argument Name="SERVICE1_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE2_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE3_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE4_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE5_SHORT_NAME" GenericType="Simple"/>
+
+        <Argument Name="SERVICE1_CHAR1_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR2_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR3_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR4_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR5_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR1_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR2_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR3_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR4_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR5_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR1_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR2_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR3_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR4_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR5_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR1_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR2_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR3_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR4_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR5_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR1_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR2_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR3_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR4_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR5_LONG_NAME" GenericType="Simple"/>
+
+        <Argument Name="SERVICE1_CHAR1_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR2_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR3_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR4_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR5_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR1_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR2_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR3_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR4_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR5_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR1_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR2_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR3_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR4_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR5_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR1_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR2_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR3_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR4_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR5_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR1_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR2_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR3_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR4_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR5_SHORT_NAME" GenericType="Simple"/>
+
+        <Argument Name="SERVICE1_CHAR1_PROP_BROADCAST" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR2_PROP_BROADCAST" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR3_PROP_BROADCAST" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR4_PROP_BROADCAST" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR5_PROP_BROADCAST" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR1_PROP_BROADCAST" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR2_PROP_BROADCAST" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR3_PROP_BROADCAST" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR4_PROP_BROADCAST" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR5_PROP_BROADCAST" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR1_PROP_BROADCAST" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR2_PROP_BROADCAST" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR3_PROP_BROADCAST" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR4_PROP_BROADCAST" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR5_PROP_BROADCAST" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR1_PROP_BROADCAST" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR2_PROP_BROADCAST" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR3_PROP_BROADCAST" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR4_PROP_BROADCAST" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR5_PROP_BROADCAST" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR1_PROP_BROADCAST" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR2_PROP_BROADCAST" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR3_PROP_BROADCAST" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR4_PROP_BROADCAST" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR5_PROP_BROADCAST" GenericType="Simple"/>
+
+        <Argument Name="SERVICE1_CHAR1_PROP_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR2_PROP_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR3_PROP_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR4_PROP_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR5_PROP_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR1_PROP_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR2_PROP_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR3_PROP_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR4_PROP_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR5_PROP_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR1_PROP_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR2_PROP_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR3_PROP_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR4_PROP_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR5_PROP_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR1_PROP_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR2_PROP_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR3_PROP_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR4_PROP_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR5_PROP_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR1_PROP_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR2_PROP_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR3_PROP_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR4_PROP_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR5_PROP_READ" GenericType="Simple"/>
+
+        <Argument Name="SERVICE1_CHAR1_PROP_WRITE_WITHOUT_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR2_PROP_WRITE_WITHOUT_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR3_PROP_WRITE_WITHOUT_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR4_PROP_WRITE_WITHOUT_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR5_PROP_WRITE_WITHOUT_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR1_PROP_WRITE_WITHOUT_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR2_PROP_WRITE_WITHOUT_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR3_PROP_WRITE_WITHOUT_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR4_PROP_WRITE_WITHOUT_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR5_PROP_WRITE_WITHOUT_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR1_PROP_WRITE_WITHOUT_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR2_PROP_WRITE_WITHOUT_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR3_PROP_WRITE_WITHOUT_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR4_PROP_WRITE_WITHOUT_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR5_PROP_WRITE_WITHOUT_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR1_PROP_WRITE_WITHOUT_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR2_PROP_WRITE_WITHOUT_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR3_PROP_WRITE_WITHOUT_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR4_PROP_WRITE_WITHOUT_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR5_PROP_WRITE_WITHOUT_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR1_PROP_WRITE_WITHOUT_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR2_PROP_WRITE_WITHOUT_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR3_PROP_WRITE_WITHOUT_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR4_PROP_WRITE_WITHOUT_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR5_PROP_WRITE_WITHOUT_RESP" GenericType="Simple"/>
+
+        <Argument Name="SERVICE1_CHAR1_PROP_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR2_PROP_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR3_PROP_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR4_PROP_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR5_PROP_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR1_PROP_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR2_PROP_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR3_PROP_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR4_PROP_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR5_PROP_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR1_PROP_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR2_PROP_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR3_PROP_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR4_PROP_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR5_PROP_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR1_PROP_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR2_PROP_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR3_PROP_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR4_PROP_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR5_PROP_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR1_PROP_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR2_PROP_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR3_PROP_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR4_PROP_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR5_PROP_WRITE" GenericType="Simple"/>
+
+        <Argument Name="SERVICE1_CHAR1_PROP_NOTIFY" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR2_PROP_NOTIFY" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR3_PROP_NOTIFY" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR4_PROP_NOTIFY" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR5_PROP_NOTIFY" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR1_PROP_NOTIFY" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR2_PROP_NOTIFY" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR3_PROP_NOTIFY" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR4_PROP_NOTIFY" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR5_PROP_NOTIFY" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR1_PROP_NOTIFY" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR2_PROP_NOTIFY" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR3_PROP_NOTIFY" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR4_PROP_NOTIFY" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR5_PROP_NOTIFY" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR1_PROP_NOTIFY" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR2_PROP_NOTIFY" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR3_PROP_NOTIFY" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR4_PROP_NOTIFY" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR5_PROP_NOTIFY" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR1_PROP_NOTIFY" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR2_PROP_NOTIFY" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR3_PROP_NOTIFY" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR4_PROP_NOTIFY" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR5_PROP_NOTIFY" GenericType="Simple"/>
+
+        <Argument Name="SERVICE1_CHAR1_PROP_INDICATE" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR2_PROP_INDICATE" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR3_PROP_INDICATE" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR4_PROP_INDICATE" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR5_PROP_INDICATE" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR1_PROP_INDICATE" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR2_PROP_INDICATE" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR3_PROP_INDICATE" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR4_PROP_INDICATE" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR5_PROP_INDICATE" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR1_PROP_INDICATE" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR2_PROP_INDICATE" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR3_PROP_INDICATE" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR4_PROP_INDICATE" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR5_PROP_INDICATE" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR1_PROP_INDICATE" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR2_PROP_INDICATE" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR3_PROP_INDICATE" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR4_PROP_INDICATE" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR5_PROP_INDICATE" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR1_PROP_INDICATE" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR2_PROP_INDICATE" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR3_PROP_INDICATE" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR4_PROP_INDICATE" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR5_PROP_INDICATE" GenericType="Simple"/>
+
+    </RefConfigFile>
+
+    <RefConfigFile Description="" Name="BLE_CUSTOM_APP_C" Template="stm32_wpan_ble_custom_app_c.ftl">
+        <File Category="source" Name="App/custom_app.c" Version="1.0" Condition="Semaphore_BLE_SERVER_PROFILE &amp; Semaphore_CUSTOM_TEMPLATE"/>
+    <!-- ftl specific items begin-->
+        <Argument Name="NUMBER_OF_SERVICES" GenericType="Simple"/>
+        <Argument Name="SERVICE1_NUMBER_OF_CHARACTERISTICS" GenericType="Simple"/>
+        <Argument Name="SERVICE2_NUMBER_OF_CHARACTERISTICS" GenericType="Simple"/>
+        <Argument Name="SERVICE3_NUMBER_OF_CHARACTERISTICS" GenericType="Simple"/>
+        <Argument Name="SERVICE4_NUMBER_OF_CHARACTERISTICS" GenericType="Simple"/>
+        <Argument Name="SERVICE5_NUMBER_OF_CHARACTERISTICS" GenericType="Simple"/>
+
+        <Argument Name="SERVICE1_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE2_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE3_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE4_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE5_LONG_NAME" GenericType="Simple"/>
+
+        <Argument Name="SERVICE1_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE2_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE3_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE4_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE5_SHORT_NAME" GenericType="Simple"/>
+
+        <Argument Name="SERVICE1_CHAR1_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR2_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR3_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR4_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR5_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR1_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR2_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR3_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR4_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR5_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR1_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR2_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR3_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR4_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR5_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR1_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR2_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR3_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR4_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR5_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR1_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR2_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR3_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR4_LONG_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR5_LONG_NAME" GenericType="Simple"/>
+
+        <Argument Name="SERVICE1_CHAR1_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR2_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR3_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR4_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR5_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR1_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR2_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR3_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR4_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR5_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR1_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR2_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR3_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR4_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR5_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR1_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR2_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR3_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR4_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR5_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR1_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR2_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR3_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR4_SHORT_NAME" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR5_SHORT_NAME" GenericType="Simple"/>
+
+        <Argument Name="SERVICE1_CHAR1_PROP_BROADCAST" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR2_PROP_BROADCAST" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR3_PROP_BROADCAST" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR4_PROP_BROADCAST" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR5_PROP_BROADCAST" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR1_PROP_BROADCAST" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR2_PROP_BROADCAST" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR3_PROP_BROADCAST" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR4_PROP_BROADCAST" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR5_PROP_BROADCAST" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR1_PROP_BROADCAST" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR2_PROP_BROADCAST" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR3_PROP_BROADCAST" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR4_PROP_BROADCAST" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR5_PROP_BROADCAST" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR1_PROP_BROADCAST" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR2_PROP_BROADCAST" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR3_PROP_BROADCAST" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR4_PROP_BROADCAST" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR5_PROP_BROADCAST" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR1_PROP_BROADCAST" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR2_PROP_BROADCAST" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR3_PROP_BROADCAST" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR4_PROP_BROADCAST" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR5_PROP_BROADCAST" GenericType="Simple"/>
+
+        <Argument Name="SERVICE1_CHAR1_PROP_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR2_PROP_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR3_PROP_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR4_PROP_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR5_PROP_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR1_PROP_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR2_PROP_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR3_PROP_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR4_PROP_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR5_PROP_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR1_PROP_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR2_PROP_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR3_PROP_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR4_PROP_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR5_PROP_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR1_PROP_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR2_PROP_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR3_PROP_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR4_PROP_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR5_PROP_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR1_PROP_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR2_PROP_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR3_PROP_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR4_PROP_READ" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR5_PROP_READ" GenericType="Simple"/>
+
+        <Argument Name="SERVICE1_CHAR1_PROP_WRITE_WITHOUT_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR2_PROP_WRITE_WITHOUT_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR3_PROP_WRITE_WITHOUT_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR4_PROP_WRITE_WITHOUT_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR5_PROP_WRITE_WITHOUT_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR1_PROP_WRITE_WITHOUT_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR2_PROP_WRITE_WITHOUT_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR3_PROP_WRITE_WITHOUT_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR4_PROP_WRITE_WITHOUT_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR5_PROP_WRITE_WITHOUT_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR1_PROP_WRITE_WITHOUT_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR2_PROP_WRITE_WITHOUT_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR3_PROP_WRITE_WITHOUT_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR4_PROP_WRITE_WITHOUT_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR5_PROP_WRITE_WITHOUT_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR1_PROP_WRITE_WITHOUT_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR2_PROP_WRITE_WITHOUT_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR3_PROP_WRITE_WITHOUT_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR4_PROP_WRITE_WITHOUT_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR5_PROP_WRITE_WITHOUT_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR1_PROP_WRITE_WITHOUT_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR2_PROP_WRITE_WITHOUT_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR3_PROP_WRITE_WITHOUT_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR4_PROP_WRITE_WITHOUT_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR5_PROP_WRITE_WITHOUT_RESP" GenericType="Simple"/>
+
+        <Argument Name="SERVICE1_CHAR1_PROP_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR2_PROP_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR3_PROP_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR4_PROP_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR5_PROP_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR1_PROP_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR2_PROP_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR3_PROP_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR4_PROP_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR5_PROP_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR1_PROP_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR2_PROP_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR3_PROP_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR4_PROP_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR5_PROP_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR1_PROP_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR2_PROP_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR3_PROP_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR4_PROP_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR5_PROP_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR1_PROP_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR2_PROP_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR3_PROP_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR4_PROP_WRITE" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR5_PROP_WRITE" GenericType="Simple"/>
+
+        <Argument Name="SERVICE1_CHAR1_PROP_NOTIFY" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR2_PROP_NOTIFY" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR3_PROP_NOTIFY" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR4_PROP_NOTIFY" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR5_PROP_NOTIFY" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR1_PROP_NOTIFY" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR2_PROP_NOTIFY" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR3_PROP_NOTIFY" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR4_PROP_NOTIFY" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR5_PROP_NOTIFY" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR1_PROP_NOTIFY" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR2_PROP_NOTIFY" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR3_PROP_NOTIFY" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR4_PROP_NOTIFY" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR5_PROP_NOTIFY" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR1_PROP_NOTIFY" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR2_PROP_NOTIFY" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR3_PROP_NOTIFY" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR4_PROP_NOTIFY" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR5_PROP_NOTIFY" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR1_PROP_NOTIFY" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR2_PROP_NOTIFY" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR3_PROP_NOTIFY" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR4_PROP_NOTIFY" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR5_PROP_NOTIFY" GenericType="Simple"/>
+
+        <Argument Name="SERVICE1_CHAR1_PROP_INDICATE" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR2_PROP_INDICATE" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR3_PROP_INDICATE" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR4_PROP_INDICATE" GenericType="Simple"/>
+        <Argument Name="SERVICE1_CHAR5_PROP_INDICATE" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR1_PROP_INDICATE" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR2_PROP_INDICATE" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR3_PROP_INDICATE" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR4_PROP_INDICATE" GenericType="Simple"/>
+        <Argument Name="SERVICE2_CHAR5_PROP_INDICATE" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR1_PROP_INDICATE" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR2_PROP_INDICATE" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR3_PROP_INDICATE" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR4_PROP_INDICATE" GenericType="Simple"/>
+        <Argument Name="SERVICE3_CHAR5_PROP_INDICATE" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR1_PROP_INDICATE" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR2_PROP_INDICATE" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR3_PROP_INDICATE" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR4_PROP_INDICATE" GenericType="Simple"/>
+        <Argument Name="SERVICE4_CHAR5_PROP_INDICATE" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR1_PROP_INDICATE" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR2_PROP_INDICATE" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR3_PROP_INDICATE" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR4_PROP_INDICATE" GenericType="Simple"/>
+        <Argument Name="SERVICE5_CHAR5_PROP_INDICATE" GenericType="Simple"/>
+
+    </RefConfigFile>
+
+    <RefConfigFile Description="" Name="BLE_CUSTOM_APP_H" Template="stm32_wpan_ble_custom_app_h.ftl">
+        <File Category="header" Name="App/custom_app.h" Version="1.0" Condition="Semaphore_BLE_SERVER_PROFILE &amp; Semaphore_CUSTOM_TEMPLATE"/>
     </RefConfigFile>
 
 <!-- STM32_WPAN/app end -->

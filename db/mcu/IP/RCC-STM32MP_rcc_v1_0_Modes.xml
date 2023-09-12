@@ -905,14 +905,14 @@
     <RefParameter Visible="false" Comment="DDRC Clock"     Name="DDRCFreq_Value"     DefaultValue="300000000"  Min="300000000" Max="533000000"    Type="double"  Display="value/1000000" Unit="MHz" IP="DDR">
         <Condition Expression="DDR3" Diagnostic=""/>
     </RefParameter>
-    <RefParameter Visible="false" Comment="DDRC Clock"     Name="DDRCFreq_Value"     DefaultValue="200000000" Min="200000000"  Max="533000000"    Type="double"  Display="value/1000000" Unit="MHz" IP="DDR">
+    <RefParameter Visible="false" Comment="DDRC Clock"     Name="DDRCFreq_Value"     DefaultValue="200000000" Min="10000000"  Max="533000000"    Type="double"  Display="value/1000000" Unit="MHz" IP="DDR">
         <Condition Expression="LPDDR2|LPDDR3" Diagnostic=""/>
     </RefParameter>
     <RefParameter Visible="false" Comment="DDRC Clock"     Name="DDRCFreq_Value"     DefaultValue="32000"      Type="double"  Display="value/1000000" Unit="MHz" IP="DDR"/>
     <RefParameter Visible="false" Comment="DDRPERFM Clock"     Name="DDRPERFMFreq_Value"     DefaultValue="300000000"  Min="300000000" Max="533000000"    Type="double"  Display="value/1000000" Unit="MHz" IP="DDR">
         <Condition Expression="DDR3" Diagnostic=""/>
     </RefParameter>
-    <RefParameter Visible="false" Comment="DDRPERFM Clock"     Name="DDRPERFMFreq_Value"     DefaultValue="10000000" Min="10000000"  Max="400000000"    Type="double"  Display="value/1000000" Unit="MHz" IP="DDR">
+    <RefParameter Visible="false" Comment="DDRPERFM Clock"     Name="DDRPERFMFreq_Value"     DefaultValue="10000000" Min="10000000"  Max="533000000"    Type="double"  Display="value/1000000" Unit="MHz" IP="DDR">
         <Condition Expression="LPDDR2|LPDDR3" Diagnostic=""/>
     </RefParameter>
     <RefParameter Visible="false" Comment="DDRPERFM Clock"     Name="DDRPERFMFreq_Value"     DefaultValue="32000"      Type="double"  Display="value/1000000" Unit="MHz" IP="DDR"/>
@@ -1030,7 +1030,7 @@
     <!--MCUCLKFreq_VALUE-->
     <RefParameter Visible="false" Comment="MCU Clock Source"   Name="MCUCLKFreq_VALUE"     DefaultValue="209000000"  Max="209000000"  Type="double" Display="value/1000000" Unit="MHz" />
     <!--MPUCLKFreq_VALUE-->
-    <RefParameter Visible="false" Comment="MPU Clock Source"      Name="MPUCLKFreq_VALUE"     DefaultValue="96000000"    Max="650000000" Type="double" Display="value/1000000" Unit="MHz" />
+    <RefParameter Visible="false" Comment="MPU Clock Source"      Name="MPUCLKFreq_VALUE"     DefaultValue="96000000"    Max="800000000" Type="double" Display="value/1000000" Unit="MHz" />
     <!--AXICLKFreq_VALUE-->
     <RefParameter Visible="false" Comment="CKPER Clock Source"      Name="CKPERCLKFreq_VALUE"     DefaultValue="96000000"    Type="double" Display="value/1000000" Unit="MHz" />
 
@@ -1827,10 +1827,7 @@
 	
     <RefParameter Visible="false" Comment="Lsi State" DefaultValue="RCC_LSI_ON" Name="LSIState" Type="list">
         <PossibleValue Comment="Lsi ON" Value="RCC_LSI_ON"/>
-    </RefParameter>
-	
-	
-	
+    </RefParameter>	
     <!-- HSI state control -->
     <!-- HSI osillator type -->	
     <RefParameter Visible="false" Comment="Clock Type HSI" DefaultValue="" Name="OscillatorTypeHSI" Type="list">
@@ -1892,11 +1889,7 @@
 	
     <RefParameter Visible="false" Comment="CSI State" DefaultValue="RCC_CSI_ON" Name="CSIState" Type="list">
         <PossibleValue Comment="CSI On" Value="RCC_CSI_ON"/>
-    </RefParameter>
-
-	
-	
-	
+    </RefParameter>	
     <!--params for clock source-->
     <!--params for HSE-->
     <RefParameter Visible="false" Comment="Lse StateARG" DefaultValue="+HSEState" Name="HSEStateARG" Type="list">
@@ -1912,8 +1905,6 @@
     </RefParameter>
 	
     <RefParameter Visible="false" Comment="Lse StateARG" DefaultValue="null" Name="LSEStateARG" Type="list"/>
-	
-	
     <!--params for HSI-->
     <RefParameter Visible="false" Comment="HSI StateARG" DefaultValue="+HSIState" Name="HSIStateARG" Type="list">
         <Condition Diagnostic="HSI used" Expression="HSIUsed=1"/>
@@ -1927,10 +1918,6 @@
     </RefParameter>
 	
     <RefParameter Visible="false" Comment="CSI StateARG" DefaultValue="null" Name="CSIStateARG" Type="list"/>
-	
-	
-	
-	
     <!--params for LSI-->
     <RefParameter Visible="false" Comment="LSI StateARG" DefaultValue="+LSIState" Name="LSIStateARG" Type="list">
         <Condition Diagnostic="LSI used" Expression="LSIUsed=1"/>
@@ -2105,7 +2092,7 @@
    
     <!-- PLL1 used -->
     <RefParameter Visible="false" Comment="PLL1 Is Used" DefaultValue="1" Name="PLL1Used" Min="1" Max="1" Type="integer">
-        <Condition Expression="MPUSOURCE_PLL1 | MPUSOURCE_MPUDIV" Diagnostic=""/>
+        <Condition Expression="(MPUSOURCE_PLL1 | MPUSOURCE_MPUDIV) &amp; (PLL1UserDefinedConfig=true)" Diagnostic=""/>
     </RefParameter>
 	
     <RefParameter Visible="false" Comment="PLL1 is Used" DefaultValue="0" Name="PLL1Used" Min="0" Max="0" Type="integer"/>
@@ -2328,8 +2315,10 @@
     </RefParameter>
     
     <RefParameter Visible="false" Comment="Clock Type MpuClk" DefaultValue="RCC_CLOCKTYPE_MPU" Name="ClockTypeMpu" Type="list">
+        <Condition Expression="PLL1UserDefinedConfig=true" Diagnostic=""/>
         <PossibleValue Comment="Mpukclk" Value="RCC_CLOCKTYPE_MPU" Semaphore="MpuClkToConfigure"/>
     </RefParameter>
+    <RefParameter Visible="false" Comment="Clock Type MpuClk" DefaultValue="" Name="ClockTypeMpu" Type="list"/>
     
     <RefParameter Visible="false" Comment="Clock Type AHB" DefaultValue="RCC_CLOCKTYPE_HCLK" Name="ClockTypeHCLK" Type="list">
         <PossibleValue Comment="RCC_CLOCKTYPE_HCLK" Value="RCC_CLOCKTYPE_HCLK" Semaphore="HCLKtoConfigure"/>
@@ -3569,6 +3558,19 @@
         <Condition Diagnostic="PLLSAIP not used" Expression=" (PLL2Used=1|PLL3Used=1)"/>
     </RefParameter>
     <RefParameter Visible="false" Name="PLLSourceMARGForMacro" Comment="PLLSourceMARGForMacro" Type="list" DefaultValue="null"/>
+    
+    <RefParameter Visible="true" Name="PLL1UserDefinedConfigEnable" Comment="User defined configuration &lt;br&gt;    The CPU will run at the maximum frequency supported by the part number selected while creating the project " Type="list" DefaultValue="true" Group="PLL1 configuration">    
+    <Condition Diagnostic="" Expression="PLL1UserDefinedConfig=true"/>
+        <PossibleValue Value="true" Comment="TRUE"/>
+    </RefParameter>
+    <RefParameter Visible="true" Name="PLL1UserDefinedConfigEnable" Comment="User defined configuration &lt;br&gt;    The CPU will run at the maximum frequency supported by the part number selected while creating the project " Type="list" DefaultValue="false" Group="PLL1 configuration">    
+        <PossibleValue Value="false" Comment="FALSE"/>
+    </RefParameter>
+    
+    <RefParameter Visible="true" Name="PLL1UserDefinedConfig" Comment="User defined configuration" Type="list" DefaultValue="false" Group="PLL1 configuration">
+        <PossibleValue Value="false" Comment="FALSE"/>
+        <PossibleValue Value="true" Comment="TRUE"/>
+    </RefParameter>
     <RefMode Name="ClockTree">
         <ConfigForMode>RCC_MODIFY_REG</ConfigForMode>
         <ConfigForMode>RCC_LSEDRIVE_CONFIG</ConfigForMode>
@@ -3866,7 +3868,7 @@
         <Parameter Name="HSICalibration"/>
         <Parameter Name="CSICalibration"/>
         <Parameter Name="PeriodicCalibrationValue"/>
-
+        <Parameter Name="PLL1UserDefinedConfig"/>
     </RefMode>
 
 	

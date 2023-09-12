@@ -624,7 +624,7 @@ USBD_StatusTypeDef USBD_LL_Init(USBD_HandleTypeDef *pdev)
 #thpcd_USB_FS.pData = pdev;
 #t/* Link the driver to the stack. */
 #tpdev->pData = &hpcd_USB_FS;
-[#if DIE == "DIE472" || DIE == "DIE476" || DIE="DIE495"]
+[#if DIE == "DIE472" || DIE == "DIE476" || DIE="DIE495" || DIE="DIE496"]
 /* Enable USB power on Pwrctrl CR2 register. */
 #tHAL_PWREx_EnableVddUSB();
 [/#if]

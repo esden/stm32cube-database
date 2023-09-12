@@ -551,6 +551,7 @@
 #t}
 #t${mspinitvar} = 1;
 
+
 [#assign listOfLocalVariables =""]
     [#assign resultList =""]
 [#list ipvar.configModelList as instanceData]
@@ -566,16 +567,23 @@
 [/#list]
 #n
 [#assign clockInst=""]
-[#assign nTab=1]
 
 [#list ipvar.configModelList as instanceData]
 [#if instanceData.initServices??]
     [#if instanceData.initServices.pclockConfig??]
+[#if FamilyName=="STM32MP1"]
+#tif(IS_ENGINEERING_BOOT_MODE())
+#t{
+[/#if]
 [#assign   pclockConfig=instanceData.initServices.pclockConfig] [#--list0--]
 [@common.generateConfigModelListCode configModel=pclockConfig inst=""  nTab=2 index=""/]#n
+[#if FamilyName=="STM32MP1"]
+#t}
+[/#if]
 #n
     [/#if]
 [/#if]
+
 [/#list]
 [#assign ipHandler = "h" + ipvar.ipName?lower_case]
 

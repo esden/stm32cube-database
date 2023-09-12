@@ -436,6 +436,7 @@
 [/#if]
 
 [#if configUSE_NEWLIB_REENTRANT=="1"]
+/* The following flag must be enabled only when using newlib */
 #define configUSE_NEWLIB_REENTRANT          1
 [/#if]
 

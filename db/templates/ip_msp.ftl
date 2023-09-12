@@ -791,6 +791,7 @@ void ${entry.key}(${mode}_HandleTypeDef* ${mode?lower_case}Handle)
 [/#list]
 [#-- --]
 [#if mspIsEmpty=="no"]
+
 [#if IP.ipName==ipvar.ipName]
     [#assign listOfLocalVariables = ""]
     [#assign  resultList  = ""]
@@ -830,23 +831,33 @@ void ${entry.key}(${mode}_HandleTypeDef* ${mode?lower_case}Handle)
         [/#if]
     [/#list]
 [/#if]
+
  #tif(${mode?lower_case}Handle->Instance==${words[0]?replace("I2S","SPI")})
 #t{
 [#if words?size > 1] [#-- Check if there is more than one ip instance--]        
 #t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspInit 0 */
 
 #n#t/* USER CODE END ${words[0]?replace("I2S","SPI")}_MspInit 0 */
+
 [#list IP.configModelList as instanceData]
 [#if instanceData.initServices??]
     [#if instanceData.initServices.pclockConfig??]
 [#assign   pclockConfig=instanceData.initServices.pclockConfig] [#--list0--]
 [#if pclockConfig.ipName?replace("USB_DEVICE","USB")?replace("USB_Device","USB")==words[0]]
+[#if FamilyName=="STM32MP1"]
+#tif(IS_ENGINEERING_BOOT_MODE())
+#t{
+[/#if]
 [@common.generateConfigModelListCode configModel=pclockConfig inst=words[0]  nTab=2 index=""/]#n
+[#if FamilyName=="STM32MP1"]
+#t}
+[/#if]
 [/#if]
 #n
     [/#if]
 [/#if]
 [/#list]
+
         [@generateServiceCode ipName=words[0] serviceType="Init" modeName=mode instHandler=ipHandler tabN=2/] 
 #t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspInit 1 */
 
@@ -860,17 +871,26 @@ void ${entry.key}(${mode}_HandleTypeDef* ${mode?lower_case}Handle)
 #t/* USER CODE BEGIN ${words[i]?replace("I2S","SPI")}_MspInit 0 */
 
 #n#t/* USER CODE END ${words[i]?replace("I2S","SPI")}_MspInit 0 */
+
 [#list IP.configModelList as instanceData]
 [#if instanceData.initServices??]
     [#if instanceData.initServices.pclockConfig??]
 [#assign   pclockConfig=instanceData.initServices.pclockConfig] [#--list0--]
 [#if pclockConfig.ipName?replace("USB_DEVICE","USB")?replace("USB_Device","USB")==words[i]]
+[#if FamilyName=="STM32MP1"]
+#tif(IS_ENGINEERING_BOOT_MODE())
+#t{
+[/#if]
 [@common.generateConfigModelListCode configModel=pclockConfig inst=words[i]  nTab=2 index=""/]#n
+[#if FamilyName=="STM32MP1"]
+#t}
+[/#if]
 [/#if]
 #n
     [/#if]
 [/#if]
 [/#list]
+
         [@generateServiceCode ipName=words[i] serviceType="Init" modeName=mode instHandler=ipHandler tabN=2/] 
 #t/* USER CODE BEGIN ${words[i]?replace("I2S","SPI")}_MspInit 1 */
 
@@ -884,17 +904,26 @@ void ${entry.key}(${mode}_HandleTypeDef* ${mode?lower_case}Handle)
 #t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspInit 0 */
 
 #n#t/* USER CODE END ${words[0]?replace("I2S","SPI")}_MspInit 0 */
+
 [#list IP.configModelList as instanceData]
 [#if instanceData.initServices??]
     [#if instanceData.initServices.pclockConfig??]
 [#assign   pclockConfig=instanceData.initServices.pclockConfig] [#--list0--]
 [#if pclockConfig.ipName?replace("USB_DEVICE","USB")?replace("USB_Device","USB")==words[0]]
+[#if FamilyName=="STM32MP1"]
+#tif(IS_ENGINEERING_BOOT_MODE())
+#t{
+[/#if]
 [@common.generateConfigModelListCode configModel=pclockConfig inst=words[0]  nTab=2 index=""/]#n
+[#if FamilyName=="STM32MP1"]
+#t}
+[/#if]
 [/#if]
 #n
     [/#if]
 [/#if]
 [/#list]
+
     [@generateServiceCode ipName=words[0] serviceType="Init" modeName=mode instHandler=ipHandler tabN=2/] 
 #t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspInit 1 */
 
@@ -979,17 +1008,26 @@ uint32_t DFSDM_Init = 0;
 #t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspInit 0 */
 
 #n#t/* USER CODE END ${words[0]?replace("I2S","SPI")}_MspInit 0 */
+
 [#list IP.configModelList as instanceData]
 [#if instanceData.initServices??]
     [#if instanceData.initServices.pclockConfig??]
 [#assign   pclockConfig=instanceData.initServices.pclockConfig] [#--list0--]
 [#if pclockConfig.ipName?replace("USB_DEVICE","USB")?replace("USB_Device","USB")==words[0]]
+[#if FamilyName=="STM32MP1"]
+#tif(IS_ENGINEERING_BOOT_MODE())
+#t{
+[/#if]
 [@common.generateConfigModelListCode configModel=pclockConfig inst=words[0]  nTab=2 index=""/]#n
+[#if FamilyName=="STM32MP1"]
+#t}
+[/#if]
 [/#if]
 #n
     [/#if]
 [/#if]
-[/#list] 
+[/#list]
+
         [@generateConfigCode ipName=words[0] type="Init" serviceName="gpioOut" instHandler=ipHandler tabN=2/]  
 #t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspInit 1 */
 
@@ -1003,17 +1041,26 @@ uint32_t DFSDM_Init = 0;
 #t/* USER CODE BEGIN ${words[i]?replace("I2S","SPI")}_MspInit 0 */
 
 #n#t/* USER CODE END ${words[i]?replace("I2S","SPI")}_MspInit 0 */
+
 [#list IP.configModelList as instanceData]
 [#if instanceData.initServices??]
     [#if instanceData.initServices.pclockConfig??]
 [#assign   pclockConfig=instanceData.initServices.pclockConfig] [#--list0--]
 [#if pclockConfig.ipName?replace("USB_DEVICE","USB")?replace("USB_Device","USB")==words[i]]
+[#if FamilyName=="STM32MP1"]
+#tif(IS_ENGINEERING_BOOT_MODE())
+#t{
+[/#if]
 [@common.generateConfigModelListCode configModel=pclockConfig inst=words[i]  nTab=2 index=""/]#n
+[#if FamilyName=="STM32MP1"]
+#t}
+[/#if]
 [/#if]
 #n
     [/#if]
 [/#if]
 [/#list]
+
        #t[@generateConfigCode ipName=words[i] type="Init" serviceName="gpioOut" instHandler=ipHandler tabN=2/] 
 #t/* USER CODE BEGIN ${words[i]?replace("I2S","SPI")}_MspInit 1 */
 
@@ -1027,17 +1074,26 @@ uint32_t DFSDM_Init = 0;
 #t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspInit 0 */
 
 #n#t/* USER CODE END ${words[0]?replace("I2S","SPI")}_MspInit 0 */
+
 [#list IP.configModelList as instanceData]
 [#if instanceData.initServices??]
     [#if instanceData.initServices.pclockConfig??]
 [#assign   pclockConfig=instanceData.initServices.pclockConfig] [#--list0--]
 [#if pclockConfig.ipName?replace("USB_DEVICE","USB")?replace("USB_Device","USB")==words[0]]
+[#if FamilyName=="STM32MP1"]
+#tif(IS_ENGINEERING_BOOT_MODE())
+#t{
+[/#if]
 [@common.generateConfigModelListCode configModel=pclockConfig inst=words[0]  nTab=2 index=""/]#n
+[#if FamilyName=="STM32MP1"]
+#t}
+[/#if]
 [/#if]
 #n
     [/#if]
 [/#if]
 [/#list]
+
     #t[@generateConfigCode ipName=words[0] type="Init" serviceName="gpioOut" instHandler=ipHandler tabN=2/]
     
 #t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspInit 1 */

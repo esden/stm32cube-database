@@ -10,6 +10,7 @@
   ******************************************************************************
   */
 /* USER CODE END Header */
+[#assign USBPD_CoreLib = ""]
 [#assign SNK = false]
 [#assign SRC = false]
 [#assign DRP = false]
@@ -19,6 +20,9 @@
         [#list SWIP.defines as definition]
             [#if definition.name=="USBPD_NbPorts"]
                 [#assign nbPorts = definition.value]
+            [/#if]
+            [#if definition.name == "USBPD_CoreLib" && definition.value != ""]
+                [#assign USBPD_CoreLib = definition.value]
             [/#if]
             [#if definition.name == "SNK" && definition.value == "true"]
                 [#assign SNK = true]
@@ -43,7 +47,9 @@
 #include "usbpd_dpm_core.h"
 #include "usbpd_dpm_conf.h"
 #include "usbpd_dpm_user.h"
+[#if USBPD_CoreLib == "USBPDCORE_LIB_PD3_FULL" | USBPD_CoreLib == "USBPDCORE_LIB_PD3_CONFIG_1"]
 #include "usbpd_vdm_user.h"
+[/#if]
 #if defined(_TRACE)
 #include "usbpd_trace.h"
 #include "stdio.h"
@@ -585,6 +591,7 @@ USBPD_FunctionalState USBPD_DPM_IsPowerReady(uint8_t PortNum, USBPD_VSAFE_Status
   * @{
   */
 
+[#if USBPD_CoreLib != "USBPDCORE_LIB_NO_PD"]
 /**
   * @brief  Request the PE to send a hard reset
   * @param  PortNum The current port number
@@ -859,7 +866,11 @@ USBPD_StatusTypeDef USBPD_DPM_RequestGetSourceCapabilityExt(uint8_t PortNum)
   */
 USBPD_StatusTypeDef USBPD_DPM_RequestGetSinkCapabilityExt(uint8_t PortNum)
 {
+[#if SNK || DRP]
   return USBPD_PE_Request_CtrlMessage(PortNum, USBPD_CONTROLMSG_GET_SNK_CAPEXT, USBPD_SOPTYPE_SOP);
+[#else]
+  return USBPD_ERROR;
+[/#if]
 }
 
 /**
@@ -958,6 +969,7 @@ USBPD_StatusTypeDef USBPD_DPM_RequestSecurityRequest(uint8_t PortNum)
   return USBPD_ERROR;
 /* USER CODE END USBPD_DPM_RequestSecurityRequest */
 }
+[/#if]
 
 /**
   * @}

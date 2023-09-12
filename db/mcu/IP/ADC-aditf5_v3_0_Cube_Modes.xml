@@ -412,7 +412,7 @@
     </RefParameter>	-->
    
     
-    <RefParameter Comment="Oversampling Ratio" DefaultValue="2" Group="ADCgroup" Max="1024" Min="2" Name="Ratio" Type="integer">
+    <RefParameter Comment="Oversampling Ratio" DefaultValue="1" Group="ADCgroup" Max="1024" Min="1" Name="Ratio" Type="integer">
            
     </RefParameter>
   
@@ -744,7 +744,7 @@
                    <PossibleValue Action="Disable" Comment="Oversampling ratio 256x " Condition="INJ_RIGHTBITSHIFT_NONE_$IpInstance |INJ_RIGHTBITSHIFT1_$IpInstance | INJ_RIGHTBITSHIFT2_$IpInstance | INJ_RIGHTBITSHIFT3_$IpInstance" Diagnostic="Shift for oversampling should be equal or greater than 4" Value="ADC_OVERSAMPLING_RATIO_256"/>
     </RefParameter>	-->
    
-    <RefParameter Comment="Oversampling Ratio" DefaultValue="2" Group="ADCgroup" Max="1024" Min="2" Name="InjOversamplingRatio" Type="integer">
+    <RefParameter Comment="Oversampling Ratio" DefaultValue="1" Group="ADCgroup" Max="1024" Min="1" Name="InjOversamplingRatio" Type="integer">
            
     </RefParameter>
 	        
@@ -1549,15 +1549,6 @@
     </RefParameter>
 	
 
-    <!-- Possible value of ITMode parameter -->
-    <RefParameter Comment="Interrupt Mode" DefaultValue="null" Group="ADCgroup" Name="AWD3ITMode" Type="list" Visible="false">
-        <Condition Diagnostic="" Expression="EnableAnalogWatchDog3=false"/>
-    </RefParameter>
-    <RefParameter Comment="Interrupt Mode" DefaultValue="DISABLE" Group="ADCgroup" Name="AWD3ITMode" Type="list">
-        <PossibleValue Comment="Disabled" Value="DISABLE"/>
-        <PossibleValue Comment="Enabled" Value="ENABLE"/>
-        <Description>Specifies whether the analog watchdog is configured in interrupt mode or in polling mode.</Description>
-    </RefParameter>
 	
 
 	
@@ -1619,15 +1610,7 @@
     </RefParameter>
 	
 		    
-    <!-- Possible value of ITMode parameter -->
-    <RefParameter Comment="Interrupt Mode" DefaultValue="null" Group="ADCgroup" Name="AWD2ITMode" Type="list" Visible="false">
-        <Condition Diagnostic="" Expression="EnableAnalogWatchDog2=false"/>
-    </RefParameter>
-    <RefParameter Comment="Interrupt Mode" DefaultValue="DISABLE" Group="ADCgroup" Name="AWD2ITMode" Type="list">
-        <PossibleValue Comment="Disabled" Value="DISABLE"/>
-        <PossibleValue Comment="Enabled" Value="ENABLE"/>
-        <Description>Specifies whether the analog watchdog is configured in interrupt mode or in polling mode.</Description>
-    </RefParameter>
+   
 	
     
   	
@@ -1818,6 +1801,25 @@
         <PossibleValue Comment="Enabled" Value="ENABLE"/>
         <Description>Specifies whether the analog watchdog is configured in interrupt mode or in polling mode.</Description>
     </RefParameter>	
+     <!-- Possible value of ITMode parameter -->
+    <RefParameter Comment="Interrupt Mode" DefaultValue="null" Group="ADCgroup" Name="AWD2ITMode" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="EnableAnalogWatchDog2=false"/>
+    </RefParameter>
+    <RefParameter Comment="Interrupt Mode" DefaultValue="DISABLE" Group="ADCgroup" Name="AWD2ITMode" Type="list">
+        <PossibleValue Comment="Disabled" Value="DISABLE"/>
+        <PossibleValue Comment="Enabled" Value="ENABLE"/>
+        <Description>Specifies whether the analog watchdog is configured in interrupt mode or in polling mode.</Description>
+    </RefParameter>
+    
+    <!-- Possible value of ITMode parameter -->
+    <RefParameter Comment="Interrupt Mode" DefaultValue="null" Group="ADCgroup" Name="AWD3ITMode" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="EnableAnalogWatchDog3=false"/>
+    </RefParameter>
+    <RefParameter Comment="Interrupt Mode" DefaultValue="DISABLE" Group="ADCgroup" Name="AWD3ITMode" Type="list">
+        <PossibleValue Comment="Disabled" Value="DISABLE"/>
+        <PossibleValue Comment="Enabled" Value="ENABLE"/>
+        <Description>Specifies whether the analog watchdog is configured in interrupt mode or in polling mode.</Description>
+    </RefParameter>
 	
     <!-- List of all available channel used to -->
     <RefParameter Comment="Channel" DefaultValue="ADC_CHANNEL_0" Group="ADCChannel" Name="AllChannels" Type="list" Visible="true">
@@ -2047,9 +2049,10 @@
         <Parameter Name="AWD1LowThreshold"/>
         <Parameter Name="AWD1ITMode"/>
     </RefMode>
-	
-    <!-- WatchDog2 parameters -->
+<!-- WatchDog2 parameters -->
     <RefMode Comment="Analog Watchdog 2" Group="WatchDog2" Name="Analog Watchdog 2">
+                <ConfigForMode>ADC_AnalogWDGConfigForAWD2</ConfigForMode>
+
         <Parameter Name="EnableAnalogWatchDog2"/>
         <Parameter Name="AWD2WatchdogNumber"/>
         <Parameter Name="AWD2HighThreshold"/>
@@ -2058,6 +2061,8 @@
     </RefMode> 
 	
     <RefMode Comment="Analog Watchdog 3" Group="WatchDog3" Name="Analog Watchdog 3">
+                <ConfigForMode>ADC_AnalogWDGConfigForAWD3</ConfigForMode>
+
         <Parameter Name="EnableAnalogWatchDog3"/>
         <Parameter Name="AWD3WatchdogNumber"/>
         <Parameter Name="AWD3HighThreshold"/>
@@ -2731,7 +2736,7 @@
         
         <!-- Internal channels -->  
         
-        <Mode Name="IN-Vbat" RemoveCondition="($IpNumber=1) | !(DIE480) " UserName="Vbat Channel">
+        <Mode Name="IN-Vbat" RemoveCondition="(DIE480 &amp;!($IpNumber=2)) | (!DIE480 &amp;!($IpNumber=3))" UserName="Vbat Channel">
             <ModeLogicOperator Name="XOR">
                 <Mode Name="IN-Vbat" UserName="Vbat Channel">
                     <SignalLogicalOp Name="AND">
@@ -2742,7 +2747,7 @@
             <Semaphore>channelSelected$IpInstance</Semaphore>
         </Mode>
         
-        <Mode Name="IN-TempSens" RemoveCondition="($IpNumber=1) | !(DIE480)" UserName="Temperature Sensor Channel">
+        <Mode Name="IN-TempSens" RemoveCondition="(DIE480 &amp;!($IpNumber=2)) | (!DIE480 &amp;!($IpNumber=3))" UserName="Temperature Sensor Channel">
             <ModeLogicOperator Name="XOR">
                 <Mode Name="IN-TempSens" UserName="Temperature Sensor Channel">
                     <SignalLogicalOp Name="AND">
@@ -2754,7 +2759,7 @@
         </Mode>
         
    
-        <Mode Name="IN-Vrefint" RemoveCondition="($IpNumber=1) | !(DIE480)" UserName="Vrefint Channel">
+        <Mode Name="IN-Vrefint" RemoveCondition="(DIE480 &amp;!($IpNumber=2)) | (!DIE480 &amp;!($IpNumber=3))" UserName="Vrefint Channel">
             <ModeLogicOperator Name="XOR">
                 <Mode Name="IN-Vrefint" UserName="Vrefint Channel">
                     <SignalLogicalOp Name="AND">

@@ -45,6 +45,11 @@ extern "C" {
 [#if isHALUsed??]
 #include "${FamilyName?lower_case}xx_hal.h"
 [/#if]
+[#list ips as ip]
+[#if ip?contains("STM32_WPAN") && !HALCompliant??]
+#include "app_conf.h"
+[/#if]
+[/#list]
 [#compress]
 [#--include "mxconstants.h"--]
 [#assign includesList = ""]

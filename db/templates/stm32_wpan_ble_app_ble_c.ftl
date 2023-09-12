@@ -5,12 +5,11 @@
   * File Name          : ${name}
   * Description        : Application file for BLE Middleware.
   *
- ******************************************************************************
+  *****************************************************************************
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
 /* USER CODE END Header */
-
 [#assign BLE_TRANSPARENT_MODE_UART = 0]
 [#assign BLE_TRANSPARENT_MODE_VCP = 0]
 [#assign BT_SIG_BEACON = 0]
@@ -27,7 +26,121 @@
 [#assign LOCAL_NAME_FORMATTED = "This text shouldn't appear"]
 [#assign LOCAL_NAME = "STM32WB"]
 [#assign P2P_SERVER_NUMBER = ""]
-
+[#assign ADV_TYPE = ""]
+[#assign BLE_ADDR_TYPE = ""]
+[#assign ADV_FILTER = ""]
+[#assign GAP_PERIPHERAL_ROLE = ""]
+[#assign GAP_BROADCASTER_ROLE = ""]
+[#assign GAP_CENTRAL_ROLE = ""]
+[#assign GAP_OBSERVER_ROLE = ""]
+[#assign CFG_GAP_DEVICE_NAME = ""]
+[#assign CFG_GAP_DEVICE_NAME_LENGTH = ""]
+[#assign CFG_FAST_CONN_ADV_INTERVAL_MIN = ""]
+[#assign CFG_FAST_CONN_ADV_INTERVAL_MAX = ""]
+[#assign AD_DATA_LENGTH = ""]
+[#assign INCLUDE_AD_TYPE_TX_POWER_LEVEL = ""]
+[#assign AD_TYPE_TX_POWER_LEVEL_LENGTH = ""]
+[#assign AD_TYPE_TX_POWER_LEVEL = ""]
+[#assign INCLUDE_AD_TYPE_COMPLETE_LOCAL_NAME = ""]
+[#assign AD_TYPE_COMPLETE_LOCAL_NAME_LENGTH = ""]
+[#assign AD_TYPE_COMPLETE_LOCAL_NAME = ""]
+[#assign INCLUDE_AD_TYPE_SHORTENED_LOCAL_NAME  = ""]
+[#assign AD_TYPE_SHORTENED_LOCAL_NAME_LENGTH = ""]
+[#assign AD_TYPE_SHORTENED_LOCAL_NAME  = ""]
+[#assign INCLUDE_AD_TYPE_APPEARANCE = ""]
+[#assign AD_TYPE_APPEARANCE_LENGTH = ""]
+[#assign AD_TYPE_APPEARANCE = ""]
+[#assign INCLUDE_AD_TYPE_ADVERTISING_INTERVAL = ""]
+[#assign AD_TYPE_ADVERTISING_INTERVAL_LENGTH = ""]
+[#assign AD_TYPE_ADVERTISING_INTERVAL = ""]
+[#assign AD_TYPE_ADVERTISING_INTERVAL_VALUE = ""]
+[#assign AD_TYPE_ADVERTISING_INTERVAL_VALUE_HEXA = ""]
+[#assign CFG_FAST_CONN_ADV_INTERVAL_MAX_HEXA = 0]
+[#assign CFG_SC_SUPPORT = 0]
+[#assign CFG_KEYPRESS_NOTIFICATION_SUPPORT = 0]
+[#assign INCLUDE_AD_TYPE_LE_ROLE = ""]
+[#assign AD_TYPE_LE_ROLE_LENGTH = ""]
+[#assign AD_TYPE_LE_ROLE = ""]
+[#assign INCLUDE_AD_TYPE_16_BIT_SERV_UUID_CMPLT_LIST = ""]
+[#assign AD_TYPE_16_BIT_SERV_UUID_CMPLT_LIST_LENGTH = ""]
+[#assign AD_SERVICE_CLASS_UUID_NBR = ""]
+[#assign AD_SERVICE_CLASS_UUID_TABLE = []]
+[#assign AD_SERVICE_CLASS_UUID_1 = ""]
+[#assign AD_SERVICE_CLASS_UUID_2 = ""]
+[#assign AD_SERVICE_CLASS_UUID_3 = ""]
+[#assign AD_SERVICE_CLASS_UUID_4 = ""]
+[#assign AD_SERVICE_CLASS_UUID_5 = ""]
+[#assign AD_SERVICE_CLASS_UUID_6 = ""]
+[#assign AD_SERVICE_CLASS_UUID_7 = ""]
+[#assign AD_SERVICE_CLASS_UUID_8 = ""]
+[#assign AD_SERVICE_CLASS_UUID_9 = ""]
+[#assign AD_SERVICE_CLASS_UUID_10 = ""]
+[#assign AD_SERVICE_CLASS_UUID_11 = ""]
+[#assign AD_SERVICE_CLASS_UUID_12 = ""]
+[#assign INCLUDE_AD_TYPE_128_BIT_SERV_UUID_CMPLT_LIST = ""]
+[#assign AD_TYPE_128_BIT_SERV_UUID_CMPLT_LIST_LENGTH = ""]
+[#assign AD_TYPE_128_BIT_SERV_UUID_CMPLT_LIST = ""]
+[#assign INCLUDE_AD_TYPE_SLAVE_CONN_INTERVAL = ""]
+[#assign AD_TYPE_SLAVE_CONN_INTERVAL_LENGTH = ""]
+[#assign AD_TYPE_SLAVE_CONN_INTERVAL_MIN_MAX = ""]
+[#assign AD_TYPE_SLAVE_CONN_INTERVAL_MIN = ""]
+[#assign AD_TYPE_SLAVE_CONN_INTERVAL_MIN_HEXA = ""]
+[#assign AD_TYPE_SLAVE_CONN_INTERVAL_MAX = ""]
+[#assign AD_TYPE_SLAVE_CONN_INTERVAL_MAX_HEXA = ""]
+[#assign INCLUDE_AD_TYPE_URI = ""]
+[#assign AD_TYPE_URI_LENGTH = ""]
+[#assign AD_TYPE_URI_CODE_POINT = ""]
+[#assign AD_TYPE_URI_DATA = ""]
+[#assign AD_TYPE_URI_DATA_LENGTH = ""]
+[#assign INCLUDE_AD_TYPE_MANUFACTURER_SPECIFIC_DATA = ""]
+[#assign AD_TYPE_MANUFACTURER_SPECIFIC_DATA_LENGTH = ""]
+[#assign AD_TYPE_MANUFACTURER_SPECIFIC_DATA_COMPANY_IDENTIFIER = ""]
+[#assign AD_TYPE_MANUFACTURER_DATA_NBR = ""]
+[#assign AD_TYPE_MANUFACTURER_DATA_TABLE = []]
+[#assign AD_TYPE_MANUFACTURER_DATA_1 = ""]
+[#assign AD_TYPE_MANUFACTURER_DATA_COMMENT_1 = ""]
+[#assign AD_TYPE_MANUFACTURER_DATA_2 = ""]
+[#assign AD_TYPE_MANUFACTURER_DATA_COMMENT_2 = ""]
+[#assign AD_TYPE_MANUFACTURER_DATA_3 = ""]
+[#assign AD_TYPE_MANUFACTURER_DATA_COMMENT_3 = ""]
+[#assign AD_TYPE_MANUFACTURER_DATA_4 = ""]
+[#assign AD_TYPE_MANUFACTURER_DATA_COMMENT_4 = ""]
+[#assign AD_TYPE_MANUFACTURER_DATA_5 = ""]
+[#assign AD_TYPE_MANUFACTURER_DATA_COMMENT_5 = ""]
+[#assign AD_TYPE_MANUFACTURER_DATA_6 = ""]
+[#assign AD_TYPE_MANUFACTURER_DATA_COMMENT_6 = ""]
+[#assign AD_TYPE_MANUFACTURER_DATA_7 = ""]
+[#assign AD_TYPE_MANUFACTURER_DATA_COMMENT_7 = ""]
+[#assign AD_TYPE_MANUFACTURER_DATA_8 = ""]
+[#assign AD_TYPE_MANUFACTURER_DATA_COMMENT_8 = ""]
+[#assign AD_TYPE_MANUFACTURER_DATA_9 = ""]
+[#assign AD_TYPE_MANUFACTURER_DATA_COMMENT_9 = ""]
+[#assign AD_TYPE_MANUFACTURER_DATA_10 = ""]
+[#assign AD_TYPE_MANUFACTURER_DATA_COMMENT_10 = ""]
+[#assign AD_TYPE_MANUFACTURER_DATA_11 = ""]
+[#assign AD_TYPE_MANUFACTURER_DATA_COMMENT_11 = ""]
+[#assign AD_TYPE_MANUFACTURER_DATA_12 = ""]
+[#assign AD_TYPE_MANUFACTURER_DATA_COMMENT_12 = ""]
+[#assign AD_TYPE_MANUFACTURER_DATA_13 = ""]
+[#assign AD_TYPE_MANUFACTURER_DATA_COMMENT_13 = ""]
+[#assign AD_TYPE_MANUFACTURER_DATA_14 = ""]
+[#assign AD_TYPE_MANUFACTURER_DATA_COMMENT_14 = ""]
+[#assign AD_TYPE_MANUFACTURER_DATA_15 = ""]
+[#assign AD_TYPE_MANUFACTURER_DATA_COMMENT_15 = ""]
+[#assign AD_TYPE_MANUFACTURER_DATA_16 = ""]
+[#assign AD_TYPE_MANUFACTURER_DATA_COMMENT_16 = ""]
+[#assign AD_TYPE_MANUFACTURER_DATA_17 = ""]
+[#assign AD_TYPE_MANUFACTURER_DATA_COMMENT_17 = ""]
+[#assign AD_TYPE_MANUFACTURER_DATA_18 = ""]
+[#assign AD_TYPE_MANUFACTURER_DATA_COMMENT_18 = ""]
+[#assign AD_TYPE_MANUFACTURER_DATA_19 = ""]
+[#assign AD_TYPE_MANUFACTURER_DATA_COMMENT_19 = ""]
+[#assign AD_TYPE_MANUFACTURER_DATA_20 = ""]
+[#assign AD_TYPE_MANUFACTURER_DATA_COMMENT_20 = ""]
+[#assign AD_TYPE_MANUFACTURER_DATA_21 = ""]
+[#assign AD_TYPE_MANUFACTURER_DATA_COMMENT_21 = ""]
+[#assign AD_TYPE_MANUFACTURER_DATA_22 = ""]
+[#assign AD_TYPE_MANUFACTURER_DATA_COMMENT_22 = ""]
 [#list SWIPdatas as SWIP]
 	[#if SWIP.defines??]
 		[#list SWIP.defines as definition]
@@ -79,6 +192,402 @@
             [#if definition.name == "P2P_SERVER_NUMBER"]
                 [#assign P2P_SERVER_NUMBER = definition.value]
             [/#if]
+            [#if definition.name == "ADV_TYPE"]
+                [#assign ADV_TYPE = definition.value]
+            [/#if]
+            [#if definition.name == "BLE_ADDR_TYPE"]
+                [#assign BLE_ADDR_TYPE = definition.value]
+            [/#if]
+            [#if definition.name == "ADV_FILTER"]
+                [#assign ADV_FILTER = definition.value]
+            [/#if]
+            [#if definition.name == "GAP_PERIPHERAL_ROLE"]
+                [#assign GAP_PERIPHERAL_ROLE = definition.value]
+            [/#if]
+            [#if definition.name == "GAP_BROADCASTER_ROLE"]
+                [#assign GAP_BROADCASTER_ROLE = definition.value]
+            [/#if]
+            [#if definition.name == "GAP_CENTRAL_ROLE"]
+                [#assign GAP_CENTRAL_ROLE = definition.value]
+            [/#if]
+            [#if definition.name == "GAP_OBSERVER_ROLE"]
+                [#assign GAP_OBSERVER_ROLE = definition.value]
+            [/#if]
+            [#if definition.name == "CFG_GAP_DEVICE_NAME"]
+                [#assign CFG_GAP_DEVICE_NAME = definition.value]
+            [/#if]
+            [#if definition.name == "CFG_GAP_DEVICE_NAME_LENGTH"]
+                [#assign CFG_GAP_DEVICE_NAME_LENGTH = definition.value]
+            [/#if]
+            [#if definition.name == "CFG_FAST_CONN_ADV_INTERVAL_MIN"]
+                [#assign CFG_FAST_CONN_ADV_INTERVAL_MIN = definition.value]
+            [/#if]
+            [#if definition.name == "CFG_FAST_CONN_ADV_INTERVAL_MAX"]
+                [#assign CFG_FAST_CONN_ADV_INTERVAL_MAX = definition.value]
+            [/#if]
+            [#if definition.name == "CFG_FAST_CONN_ADV_INTERVAL_MAX_HEXA"]
+                [#assign CFG_FAST_CONN_ADV_INTERVAL_MAX_HEXA = definition.value]
+            [/#if]
+			[#if definition.name == "CFG_SC_SUPPORT"]
+                [#assign CFG_SC_SUPPORT = definition.value]
+            [/#if]
+			 [#if definition.name == "CFG_KEYPRESS_NOTIFICATION_SUPPORT"]
+                [#assign CFG_KEYPRESS_NOTIFICATION_SUPPORT = definition.value]
+            [/#if]
+            [#if definition.name == "AD_DATA_LENGTH"]
+                [#assign AD_DATA_LENGTH = definition.value]
+            [/#if]
+            [#if definition.name == "INCLUDE_AD_TYPE_TX_POWER_LEVEL"]
+                [#assign INCLUDE_AD_TYPE_TX_POWER_LEVEL = definition.value]
+            [/#if]
+            [#if definition.name == "AD_TYPE_TX_POWER_LEVEL_LENGTH"]
+                [#assign AD_TYPE_TX_POWER_LEVEL_LENGTH = definition.value]
+            [/#if]
+            [#if definition.name == "AD_TYPE_TX_POWER_LEVEL"]
+                [#assign AD_TYPE_TX_POWER_LEVEL = definition.value]
+            [/#if]
+            [#if definition.name == "INCLUDE_AD_TYPE_COMPLETE_LOCAL_NAME"]
+                [#assign INCLUDE_AD_TYPE_COMPLETE_LOCAL_NAME = definition.value]
+            [/#if]
+            [#if definition.name == "AD_TYPE_COMPLETE_LOCAL_NAME_LENGTH"]
+                [#assign AD_TYPE_COMPLETE_LOCAL_NAME_LENGTH = definition.value]
+            [/#if]
+            [#if definition.name == "AD_TYPE_COMPLETE_LOCAL_NAME"]
+                [#assign AD_TYPE_COMPLETE_LOCAL_NAME = definition.value]
+            [/#if]
+            [#if definition.name == "INCLUDE_AD_TYPE_SHORTENED_LOCAL_NAME "]
+                [#assign INCLUDE_AD_TYPE_SHORTENED_LOCAL_NAME  = definition.value]
+            [/#if]
+            [#if definition.name == "AD_TYPE_SHORTENED_LOCAL_NAME_LENGTH"]
+                [#assign AD_TYPE_SHORTENED_LOCAL_NAME_LENGTH = definition.value]
+            [/#if]
+            [#if definition.name == "AD_TYPE_SHORTENED_LOCAL_NAME "]
+                [#assign AD_TYPE_SHORTENED_LOCAL_NAME  = definition.value]
+            [/#if]
+            [#if definition.name == "INCLUDE_AD_TYPE_APPEARANCE"]
+                [#assign INCLUDE_AD_TYPE_APPEARANCE = definition.value]
+            [/#if]
+            [#if definition.name == "AD_TYPE_APPEARANCE_LENGTH"]
+                [#assign AD_TYPE_APPEARANCE_LENGTH = definition.value]
+            [/#if]
+            [#if definition.name == "AD_TYPE_APPEARANCE"]
+                [#assign AD_TYPE_APPEARANCE = definition.value]
+            [/#if]
+            [#if definition.name == "INCLUDE_AD_TYPE_ADVERTISING_INTERVAL"]
+                [#assign INCLUDE_AD_TYPE_ADVERTISING_INTERVAL = definition.value]
+            [/#if]
+            [#if definition.name == "AD_TYPE_ADVERTISING_INTERVAL_VALUE"]
+                [#assign AD_TYPE_ADVERTISING_INTERVAL_VALUE = definition.value]
+            [/#if]
+            [#if definition.name == "AD_TYPE_ADVERTISING_INTERVAL_VALUE_HEXA"]
+                [#assign AD_TYPE_ADVERTISING_INTERVAL_VALUE_HEXA = definition.value]
+            [/#if]
+            [#if definition.name == "AD_TYPE_ADVERTISING_INTERVAL_LENGTH"]
+                [#assign AD_TYPE_ADVERTISING_INTERVAL_LENGTH = definition.value]
+            [/#if]
+            [#if definition.name == "AD_TYPE_ADVERTISING_INTERVAL"]
+                [#assign AD_TYPE_ADVERTISING_INTERVAL = definition.value]
+            [/#if]
+            [#if definition.name == "INCLUDE_AD_TYPE_LE_ROLE"]
+                [#assign INCLUDE_AD_TYPE_LE_ROLE = definition.value]
+            [/#if]
+            [#if definition.name == "AD_TYPE_LE_ROLE_LENGTH"]
+                [#assign AD_TYPE_LE_ROLE_LENGTH = definition.value]
+            [/#if]
+            [#if definition.name == "AD_TYPE_LE_ROLE"]
+                [#assign AD_TYPE_LE_ROLE = definition.value]
+            [/#if]
+            [#if definition.name == "INCLUDE_AD_TYPE_16_BIT_SERV_UUID_CMPLT_LIST"]
+                [#assign INCLUDE_AD_TYPE_16_BIT_SERV_UUID_CMPLT_LIST = definition.value]
+            [/#if]
+            [#if definition.name == "AD_TYPE_16_BIT_SERV_UUID_CMPLT_LIST_LENGTH"]
+                [#assign AD_TYPE_16_BIT_SERV_UUID_CMPLT_LIST_LENGTH = definition.value]
+            [/#if]
+            [#if definition.name == "AD_SERVICE_CLASS_UUID_NBR"]
+                [#assign AD_SERVICE_CLASS_UUID_NBR = definition.value]
+            [/#if]
+            [#if definition.name == "AD_SERVICE_CLASS_UUID_1"]
+                [#assign AD_SERVICE_CLASS_UUID_1 = definition.value]
+                [#assign AD_SERVICE_CLASS_UUID_TABLE = AD_SERVICE_CLASS_UUID_TABLE + [AD_SERVICE_CLASS_UUID_1]]
+            [/#if]
+            [#if definition.name == "AD_SERVICE_CLASS_UUID_2"]
+                [#assign AD_SERVICE_CLASS_UUID_2 = definition.value]
+                [#assign AD_SERVICE_CLASS_UUID_TABLE = AD_SERVICE_CLASS_UUID_TABLE + [AD_SERVICE_CLASS_UUID_2]]
+            [/#if]
+            [#if definition.name == "AD_SERVICE_CLASS_UUID_3"]
+                [#assign AD_SERVICE_CLASS_UUID_3 = definition.value]
+                [#assign AD_SERVICE_CLASS_UUID_TABLE = AD_SERVICE_CLASS_UUID_TABLE + [AD_SERVICE_CLASS_UUID_3]]
+            [/#if]
+            [#if definition.name == "AD_SERVICE_CLASS_UUID_4"]
+                [#assign AD_SERVICE_CLASS_UUID_4 = definition.value]
+                [#assign AD_SERVICE_CLASS_UUID_TABLE = AD_SERVICE_CLASS_UUID_TABLE + [AD_SERVICE_CLASS_UUID_4]]
+            [/#if]
+            [#if definition.name == "AD_SERVICE_CLASS_UUID_5"]
+                [#assign AD_SERVICE_CLASS_UUID_5 = definition.value]
+                [#assign AD_SERVICE_CLASS_UUID_TABLE = AD_SERVICE_CLASS_UUID_TABLE + [AD_SERVICE_CLASS_UUID_5]]
+            [/#if]
+            [#if definition.name == "AD_SERVICE_CLASS_UUID_6"]
+                [#assign AD_SERVICE_CLASS_UUID_6 = definition.value]
+                [#assign AD_SERVICE_CLASS_UUID_TABLE = AD_SERVICE_CLASS_UUID_TABLE + [AD_SERVICE_CLASS_UUID_6]]
+            [/#if]
+            [#if definition.name == "AD_SERVICE_CLASS_UUID_7"]
+                [#assign AD_SERVICE_CLASS_UUID_7 = definition.value]
+                [#assign AD_SERVICE_CLASS_UUID_TABLE = AD_SERVICE_CLASS_UUID_TABLE + [AD_SERVICE_CLASS_UUID_7]]
+            [/#if]
+            [#if definition.name == "AD_SERVICE_CLASS_UUID_8"]
+                [#assign AD_SERVICE_CLASS_UUID_8 = definition.value]
+                [#assign AD_SERVICE_CLASS_UUID_TABLE = AD_SERVICE_CLASS_UUID_TABLE + [AD_SERVICE_CLASS_UUID_8]]
+            [/#if]
+            [#if definition.name == "AD_SERVICE_CLASS_UUID_9"]
+                [#assign AD_SERVICE_CLASS_UUID_9 = definition.value]
+                [#assign AD_SERVICE_CLASS_UUID_TABLE = AD_SERVICE_CLASS_UUID_TABLE + [AD_SERVICE_CLASS_UUID_9]]
+            [/#if]
+            [#if definition.name == "AD_SERVICE_CLASS_UUID_10"]
+                [#assign AD_SERVICE_CLASS_UUID_10 = definition.value]
+                [#assign AD_SERVICE_CLASS_UUID_TABLE = AD_SERVICE_CLASS_UUID_TABLE + [AD_SERVICE_CLASS_UUID_10]]
+            [/#if]
+            [#if definition.name == "AD_SERVICE_CLASS_UUID_11"]
+                [#assign AD_SERVICE_CLASS_UUID_11 = definition.value]
+                [#assign AD_SERVICE_CLASS_UUID_TABLE = AD_SERVICE_CLASS_UUID_TABLE + [AD_SERVICE_CLASS_UUID_11]]
+            [/#if]
+            [#if definition.name == "AD_SERVICE_CLASS_UUID_12"]
+                [#assign AD_SERVICE_CLASS_UUID_12 = definition.value]
+                [#assign AD_SERVICE_CLASS_UUID_TABLE = AD_SERVICE_CLASS_UUID_TABLE + [AD_SERVICE_CLASS_UUID_12]]
+            [/#if]
+            [#if definition.name == "INCLUDE_AD_TYPE_128_BIT_SERV_UUID_CMPLT_LIST"]
+                [#assign INCLUDE_AD_TYPE_128_BIT_SERV_UUID_CMPLT_LIST = definition.value]
+            [/#if]
+            [#if definition.name == "AD_TYPE_128_BIT_SERV_UUID_CMPLT_LIST_LENGTH"]
+                [#assign AD_TYPE_128_BIT_SERV_UUID_CMPLT_LIST_LENGTH = definition.value]
+            [/#if]
+            [#if definition.name == "AD_TYPE_128_BIT_SERV_UUID_CMPLT_LIST"]
+                [#assign AD_TYPE_128_BIT_SERV_UUID_CMPLT_LIST = definition.value]
+            [/#if]
+            [#if definition.name == "INCLUDE_AD_TYPE_SLAVE_CONN_INTERVAL"]
+                [#assign INCLUDE_AD_TYPE_SLAVE_CONN_INTERVAL = definition.value]
+            [/#if]
+            [#if definition.name == "AD_TYPE_SLAVE_CONN_INTERVAL_LENGTH"]
+                [#assign AD_TYPE_SLAVE_CONN_INTERVAL_LENGTH = definition.value]
+            [/#if]
+            [#if definition.name == "AD_TYPE_SLAVE_CONN_INTERVAL_MIN_MAX"]
+                [#assign AD_TYPE_SLAVE_CONN_INTERVAL_MIN_MAX = definition.value]
+            [/#if]
+            [#if definition.name == "AD_TYPE_SLAVE_CONN_INTERVAL_MIN"]
+                [#assign AD_TYPE_SLAVE_CONN_INTERVAL_MIN = definition.value]
+            [/#if]
+            [#if definition.name == "AD_TYPE_SLAVE_CONN_INTERVAL_MIN_HEXA"]
+                [#assign AD_TYPE_SLAVE_CONN_INTERVAL_MIN_HEXA = definition.value]
+            [/#if]
+            [#if definition.name == "AD_TYPE_SLAVE_CONN_INTERVAL_MAX"]
+                [#assign AD_TYPE_SLAVE_CONN_INTERVAL_MAX = definition.value]
+            [/#if]
+            [#if definition.name == "AD_TYPE_SLAVE_CONN_INTERVAL_MAX_HEXA"]
+                [#assign AD_TYPE_SLAVE_CONN_INTERVAL_MAX_HEXA = definition.value]
+            [/#if]
+            [#if definition.name == "INCLUDE_AD_TYPE_URI"]
+                [#assign INCLUDE_AD_TYPE_URI = definition.value]
+            [/#if]
+            [#if definition.name == "AD_TYPE_URI_LENGTH"]
+                [#assign AD_TYPE_URI_LENGTH = definition.value]
+            [/#if]
+            [#if definition.name == "AD_TYPE_URI_CODE_POINT"]
+                [#assign AD_TYPE_URI_CODE_POINT = definition.value]
+            [/#if]
+            [#if definition.name == "AD_TYPE_URI_DATA"]
+                [#assign AD_TYPE_URI_DATA = definition.value]
+            [/#if]
+            [#if definition.name == "AD_TYPE_URI_DATA_LENGTH"]
+                [#assign AD_TYPE_URI_DATA_LENGTH = definition.value]
+            [/#if]
+            [#if definition.name == "INCLUDE_AD_TYPE_MANUFACTURER_SPECIFIC_DATA"]
+                [#assign INCLUDE_AD_TYPE_MANUFACTURER_SPECIFIC_DATA = definition.value]
+            [/#if]
+            [#if definition.name == "AD_TYPE_MANUFACTURER_SPECIFIC_DATA_LENGTH"]
+                [#assign AD_TYPE_MANUFACTURER_SPECIFIC_DATA_LENGTH = definition.value]
+            [/#if]
+            [#if definition.name == "AD_TYPE_MANUFACTURER_SPECIFIC_DATA_COMPANY_IDENTIFIER"]
+                [#assign AD_TYPE_MANUFACTURER_SPECIFIC_DATA_COMPANY_IDENTIFIER = definition.value]
+            [/#if]
+            [#if definition.name == "AD_TYPE_MANUFACTURER_DATA_NBR"]
+                [#assign AD_TYPE_MANUFACTURER_DATA_NBR = definition.value]
+            [/#if]
+            [#if definition.name == "AD_TYPE_MANUFACTURER_DATA_1"]
+                [#assign AD_TYPE_MANUFACTURER_DATA_1 = definition.value]
+                [#assign AD_TYPE_MANUFACTURER_DATA_TABLE = AD_TYPE_MANUFACTURER_DATA_TABLE + [AD_TYPE_MANUFACTURER_DATA_1]]
+            [/#if]
+            [#if definition.name == "AD_TYPE_MANUFACTURER_DATA_COMMENT_1"]
+                [#assign AD_TYPE_MANUFACTURER_DATA_COMMENT_1 = definition.value]
+                [#assign AD_TYPE_MANUFACTURER_DATA_TABLE = AD_TYPE_MANUFACTURER_DATA_TABLE + [AD_TYPE_MANUFACTURER_DATA_COMMENT_1]]
+            [/#if]
+            [#if definition.name == "AD_TYPE_MANUFACTURER_DATA_2"]
+                [#assign AD_TYPE_MANUFACTURER_DATA_2 = definition.value]
+                [#assign AD_TYPE_MANUFACTURER_DATA_TABLE = AD_TYPE_MANUFACTURER_DATA_TABLE + [AD_TYPE_MANUFACTURER_DATA_2]]
+            [/#if]
+            [#if definition.name == "AD_TYPE_MANUFACTURER_DATA_COMMENT_2"]
+                [#assign AD_TYPE_MANUFACTURER_DATA_COMMENT_2 = definition.value]
+                [#assign AD_TYPE_MANUFACTURER_DATA_TABLE = AD_TYPE_MANUFACTURER_DATA_TABLE + [AD_TYPE_MANUFACTURER_DATA_COMMENT_2]]
+            [/#if]
+            [#if definition.name == "AD_TYPE_MANUFACTURER_DATA_3"]
+                [#assign AD_TYPE_MANUFACTURER_DATA_3 = definition.value]
+                [#assign AD_TYPE_MANUFACTURER_DATA_TABLE = AD_TYPE_MANUFACTURER_DATA_TABLE + [AD_TYPE_MANUFACTURER_DATA_3]]
+            [/#if]
+            [#if definition.name == "AD_TYPE_MANUFACTURER_DATA_COMMENT_3"]
+                [#assign AD_TYPE_MANUFACTURER_DATA_COMMENT_3 = definition.value]
+                [#assign AD_TYPE_MANUFACTURER_DATA_TABLE = AD_TYPE_MANUFACTURER_DATA_TABLE + [AD_TYPE_MANUFACTURER_DATA_COMMENT_3]]
+            [/#if]
+            [#if definition.name == "AD_TYPE_MANUFACTURER_DATA_4"]
+                [#assign AD_TYPE_MANUFACTURER_DATA_4 = definition.value]
+                [#assign AD_TYPE_MANUFACTURER_DATA_TABLE = AD_TYPE_MANUFACTURER_DATA_TABLE + [AD_TYPE_MANUFACTURER_DATA_4]]
+            [/#if]
+            [#if definition.name == "AD_TYPE_MANUFACTURER_DATA_COMMENT_4"]
+                [#assign AD_TYPE_MANUFACTURER_DATA_COMMENT_4 = definition.value]
+                [#assign AD_TYPE_MANUFACTURER_DATA_TABLE = AD_TYPE_MANUFACTURER_DATA_TABLE + [AD_TYPE_MANUFACTURER_DATA_COMMENT_4]]
+            [/#if]
+            [#if definition.name == "AD_TYPE_MANUFACTURER_DATA_5"]
+                [#assign AD_TYPE_MANUFACTURER_DATA_5 = definition.value]
+                [#assign AD_TYPE_MANUFACTURER_DATA_TABLE = AD_TYPE_MANUFACTURER_DATA_TABLE + [AD_TYPE_MANUFACTURER_DATA_5]]
+            [/#if]
+            [#if definition.name == "AD_TYPE_MANUFACTURER_DATA_COMMENT_5"]
+                [#assign AD_TYPE_MANUFACTURER_DATA_COMMENT_5 = definition.value]
+                [#assign AD_TYPE_MANUFACTURER_DATA_TABLE = AD_TYPE_MANUFACTURER_DATA_TABLE + [AD_TYPE_MANUFACTURER_DATA_COMMENT_5]]
+            [/#if]
+            [#if definition.name == "AD_TYPE_MANUFACTURER_DATA_6"]
+                [#assign AD_TYPE_MANUFACTURER_DATA_6 = definition.value]
+                [#assign AD_TYPE_MANUFACTURER_DATA_TABLE = AD_TYPE_MANUFACTURER_DATA_TABLE + [AD_TYPE_MANUFACTURER_DATA_6]]
+            [/#if]
+            [#if definition.name == "AD_TYPE_MANUFACTURER_DATA_COMMENT_6"]
+                [#assign AD_TYPE_MANUFACTURER_DATA_COMMENT_6 = definition.value]
+                [#assign AD_TYPE_MANUFACTURER_DATA_TABLE = AD_TYPE_MANUFACTURER_DATA_TABLE + [AD_TYPE_MANUFACTURER_DATA_COMMENT_6]]
+            [/#if]
+            [#if definition.name == "AD_TYPE_MANUFACTURER_DATA_7"]
+                [#assign AD_TYPE_MANUFACTURER_DATA_7 = definition.value]
+                [#assign AD_TYPE_MANUFACTURER_DATA_TABLE = AD_TYPE_MANUFACTURER_DATA_TABLE + [AD_TYPE_MANUFACTURER_DATA_7]]
+            [/#if]
+            [#if definition.name == "AD_TYPE_MANUFACTURER_DATA_COMMENT_7"]
+                [#assign AD_TYPE_MANUFACTURER_DATA_COMMENT_7 = definition.value]
+                [#assign AD_TYPE_MANUFACTURER_DATA_TABLE = AD_TYPE_MANUFACTURER_DATA_TABLE + [AD_TYPE_MANUFACTURER_DATA_COMMENT_7]]
+            [/#if]
+            [#if definition.name == "AD_TYPE_MANUFACTURER_DATA_8"]
+                [#assign AD_TYPE_MANUFACTURER_DATA_8 = definition.value]
+                [#assign AD_TYPE_MANUFACTURER_DATA_TABLE = AD_TYPE_MANUFACTURER_DATA_TABLE + [AD_TYPE_MANUFACTURER_DATA_8]]
+            [/#if]
+            [#if definition.name == "AD_TYPE_MANUFACTURER_DATA_COMMENT_8"]
+                [#assign AD_TYPE_MANUFACTURER_DATA_COMMENT_8 = definition.value]
+                [#assign AD_TYPE_MANUFACTURER_DATA_TABLE = AD_TYPE_MANUFACTURER_DATA_TABLE + [AD_TYPE_MANUFACTURER_DATA_COMMENT_8]]
+            [/#if]
+            [#if definition.name == "AD_TYPE_MANUFACTURER_DATA_9"]
+                [#assign AD_TYPE_MANUFACTURER_DATA_9 = definition.value]
+                [#assign AD_TYPE_MANUFACTURER_DATA_TABLE = AD_TYPE_MANUFACTURER_DATA_TABLE + [AD_TYPE_MANUFACTURER_DATA_9]]
+            [/#if]
+            [#if definition.name == "AD_TYPE_MANUFACTURER_DATA_COMMENT_9"]
+                [#assign AD_TYPE_MANUFACTURER_DATA_COMMENT_9 = definition.value]
+                [#assign AD_TYPE_MANUFACTURER_DATA_TABLE = AD_TYPE_MANUFACTURER_DATA_TABLE + [AD_TYPE_MANUFACTURER_DATA_COMMENT_9]]
+            [/#if]
+            [#if definition.name == "AD_TYPE_MANUFACTURER_DATA_10"]
+                [#assign AD_TYPE_MANUFACTURER_DATA_10 = definition.value]
+                [#assign AD_TYPE_MANUFACTURER_DATA_TABLE = AD_TYPE_MANUFACTURER_DATA_TABLE + [AD_TYPE_MANUFACTURER_DATA_10]]
+            [/#if]
+            [#if definition.name == "AD_TYPE_MANUFACTURER_DATA_COMMENT_10"]
+                [#assign AD_TYPE_MANUFACTURER_DATA_COMMENT_10 = definition.value]
+                [#assign AD_TYPE_MANUFACTURER_DATA_TABLE = AD_TYPE_MANUFACTURER_DATA_TABLE + [AD_TYPE_MANUFACTURER_DATA_COMMENT_10]]
+            [/#if]
+            [#if definition.name == "AD_TYPE_MANUFACTURER_DATA_11"]
+                [#assign AD_TYPE_MANUFACTURER_DATA_11 = definition.value]
+                [#assign AD_TYPE_MANUFACTURER_DATA_TABLE = AD_TYPE_MANUFACTURER_DATA_TABLE + [AD_TYPE_MANUFACTURER_DATA_11]]
+            [/#if]
+            [#if definition.name == "AD_TYPE_MANUFACTURER_DATA_COMMENT_11"]
+                [#assign AD_TYPE_MANUFACTURER_DATA_COMMENT_11 = definition.value]
+                [#assign AD_TYPE_MANUFACTURER_DATA_TABLE = AD_TYPE_MANUFACTURER_DATA_TABLE + [AD_TYPE_MANUFACTURER_DATA_COMMENT_11]]
+            [/#if]
+            [#if definition.name == "AD_TYPE_MANUFACTURER_DATA_12"]
+                [#assign AD_TYPE_MANUFACTURER_DATA_12 = definition.value]
+                [#assign AD_TYPE_MANUFACTURER_DATA_TABLE = AD_TYPE_MANUFACTURER_DATA_TABLE + [AD_TYPE_MANUFACTURER_DATA_12]]
+            [/#if]
+            [#if definition.name == "AD_TYPE_MANUFACTURER_DATA_COMMENT_12"]
+                [#assign AD_TYPE_MANUFACTURER_DATA_COMMENT_12 = definition.value]
+                [#assign AD_TYPE_MANUFACTURER_DATA_TABLE = AD_TYPE_MANUFACTURER_DATA_TABLE + [AD_TYPE_MANUFACTURER_DATA_COMMENT_12]]
+            [/#if]
+            [#if definition.name == "AD_TYPE_MANUFACTURER_DATA_13"]
+                [#assign AD_TYPE_MANUFACTURER_DATA_13 = definition.value]
+                [#assign AD_TYPE_MANUFACTURER_DATA_TABLE = AD_TYPE_MANUFACTURER_DATA_TABLE + [AD_TYPE_MANUFACTURER_DATA_13]]
+            [/#if]
+            [#if definition.name == "AD_TYPE_MANUFACTURER_DATA_COMMENT_13"]
+                [#assign AD_TYPE_MANUFACTURER_DATA_COMMENT_13 = definition.value]
+                [#assign AD_TYPE_MANUFACTURER_DATA_TABLE = AD_TYPE_MANUFACTURER_DATA_TABLE + [AD_TYPE_MANUFACTURER_DATA_COMMENT_13]]
+            [/#if]
+            [#if definition.name == "AD_TYPE_MANUFACTURER_DATA_14"]
+                [#assign AD_TYPE_MANUFACTURER_DATA_14 = definition.value]
+                [#assign AD_TYPE_MANUFACTURER_DATA_TABLE = AD_TYPE_MANUFACTURER_DATA_TABLE + [AD_TYPE_MANUFACTURER_DATA_14]]
+            [/#if]
+            [#if definition.name == "AD_TYPE_MANUFACTURER_DATA_COMMENT_14"]
+                [#assign AD_TYPE_MANUFACTURER_DATA_COMMENT_14 = definition.value]
+                [#assign AD_TYPE_MANUFACTURER_DATA_TABLE = AD_TYPE_MANUFACTURER_DATA_TABLE + [AD_TYPE_MANUFACTURER_DATA_COMMENT_14]]
+            [/#if]
+            [#if definition.name == "AD_TYPE_MANUFACTURER_DATA_15"]
+                [#assign AD_TYPE_MANUFACTURER_DATA_15 = definition.value]
+                [#assign AD_TYPE_MANUFACTURER_DATA_TABLE = AD_TYPE_MANUFACTURER_DATA_TABLE + [AD_TYPE_MANUFACTURER_DATA_15]]
+            [/#if]
+            [#if definition.name == "AD_TYPE_MANUFACTURER_DATA_COMMENT_15"]
+                [#assign AD_TYPE_MANUFACTURER_DATA_COMMENT_15 = definition.value]
+                [#assign AD_TYPE_MANUFACTURER_DATA_TABLE = AD_TYPE_MANUFACTURER_DATA_TABLE + [AD_TYPE_MANUFACTURER_DATA_COMMENT_15]]
+            [/#if]
+            [#if definition.name == "AD_TYPE_MANUFACTURER_DATA_16"]
+                [#assign AD_TYPE_MANUFACTURER_DATA_16 = definition.value]
+                [#assign AD_TYPE_MANUFACTURER_DATA_TABLE = AD_TYPE_MANUFACTURER_DATA_TABLE + [AD_TYPE_MANUFACTURER_DATA_16]]
+            [/#if]
+            [#if definition.name == "AD_TYPE_MANUFACTURER_DATA_COMMENT_16"]
+                [#assign AD_TYPE_MANUFACTURER_DATA_COMMENT_16 = definition.value]
+                [#assign AD_TYPE_MANUFACTURER_DATA_TABLE = AD_TYPE_MANUFACTURER_DATA_TABLE + [AD_TYPE_MANUFACTURER_DATA_COMMENT_16]]
+            [/#if]
+            [#if definition.name == "AD_TYPE_MANUFACTURER_DATA_17"]
+                [#assign AD_TYPE_MANUFACTURER_DATA_17 = definition.value]
+                [#assign AD_TYPE_MANUFACTURER_DATA_TABLE = AD_TYPE_MANUFACTURER_DATA_TABLE + [AD_TYPE_MANUFACTURER_DATA_17]]
+            [/#if]
+            [#if definition.name == "AD_TYPE_MANUFACTURER_DATA_COMMENT_17"]
+                [#assign AD_TYPE_MANUFACTURER_DATA_COMMENT_17 = definition.value]
+                [#assign AD_TYPE_MANUFACTURER_DATA_TABLE = AD_TYPE_MANUFACTURER_DATA_TABLE + [AD_TYPE_MANUFACTURER_DATA_COMMENT_17]]
+            [/#if]
+            [#if definition.name == "AD_TYPE_MANUFACTURER_DATA_18"]
+                [#assign AD_TYPE_MANUFACTURER_DATA_18 = definition.value]
+                [#assign AD_TYPE_MANUFACTURER_DATA_TABLE = AD_TYPE_MANUFACTURER_DATA_TABLE + [AD_TYPE_MANUFACTURER_DATA_18]]
+            [/#if]
+            [#if definition.name == "AD_TYPE_MANUFACTURER_DATA_COMMENT_18"]
+                [#assign AD_TYPE_MANUFACTURER_DATA_COMMENT_18 = definition.value]
+                [#assign AD_TYPE_MANUFACTURER_DATA_TABLE = AD_TYPE_MANUFACTURER_DATA_TABLE + [AD_TYPE_MANUFACTURER_DATA_COMMENT_18]]
+            [/#if]
+            [#if definition.name == "AD_TYPE_MANUFACTURER_DATA_19"]
+                [#assign AD_TYPE_MANUFACTURER_DATA_19 = definition.value]
+                [#assign AD_TYPE_MANUFACTURER_DATA_TABLE = AD_TYPE_MANUFACTURER_DATA_TABLE + [AD_TYPE_MANUFACTURER_DATA_19]]
+            [/#if]
+            [#if definition.name == "AD_TYPE_MANUFACTURER_DATA_COMMENT_19"]
+                [#assign AD_TYPE_MANUFACTURER_DATA_COMMENT_19 = definition.value]
+                [#assign AD_TYPE_MANUFACTURER_DATA_TABLE = AD_TYPE_MANUFACTURER_DATA_TABLE + [AD_TYPE_MANUFACTURER_DATA_COMMENT_19]]
+            [/#if]
+            [#if definition.name == "AD_TYPE_MANUFACTURER_DATA_20"]
+                [#assign AD_TYPE_MANUFACTURER_DATA_20 = definition.value]
+                [#assign AD_TYPE_MANUFACTURER_DATA_TABLE = AD_TYPE_MANUFACTURER_DATA_TABLE + [AD_TYPE_MANUFACTURER_DATA_20]]
+            [/#if]
+            [#if definition.name == "AD_TYPE_MANUFACTURER_DATA_COMMENT_20"]
+                [#assign AD_TYPE_MANUFACTURER_DATA_COMMENT_20 = definition.value]
+                [#assign AD_TYPE_MANUFACTURER_DATA_TABLE = AD_TYPE_MANUFACTURER_DATA_TABLE + [AD_TYPE_MANUFACTURER_DATA_COMMENT_20]]
+            [/#if]
+            [#if definition.name == "AD_TYPE_MANUFACTURER_DATA_21"]
+                [#assign AD_TYPE_MANUFACTURER_DATA_21 = definition.value]
+                [#assign AD_TYPE_MANUFACTURER_DATA_TABLE = AD_TYPE_MANUFACTURER_DATA_TABLE + [AD_TYPE_MANUFACTURER_DATA_21]]
+            [/#if]
+            [#if definition.name == "AD_TYPE_MANUFACTURER_DATA_COMMENT_21"]
+                [#assign AD_TYPE_MANUFACTURER_DATA_COMMENT_21 = definition.value]
+                [#assign AD_TYPE_MANUFACTURER_DATA_TABLE = AD_TYPE_MANUFACTURER_DATA_TABLE + [AD_TYPE_MANUFACTURER_DATA_COMMENT_21]]
+            [/#if]
+            [#if definition.name == "AD_TYPE_MANUFACTURER_DATA_22"]
+                [#assign AD_TYPE_MANUFACTURER_DATA_22 = definition.value]
+                [#assign AD_TYPE_MANUFACTURER_DATA_TABLE = AD_TYPE_MANUFACTURER_DATA_TABLE + [AD_TYPE_MANUFACTURER_DATA_22]]
+            [/#if]
+            [#if definition.name == "AD_TYPE_MANUFACTURER_DATA_COMMENT_22"]
+                [#assign AD_TYPE_MANUFACTURER_DATA_COMMENT_22 = definition.value]
+                [#assign AD_TYPE_MANUFACTURER_DATA_TABLE = AD_TYPE_MANUFACTURER_DATA_TABLE + [AD_TYPE_MANUFACTURER_DATA_COMMENT_22]]
+            [/#if]
+
         [/#list]
 	[/#if]
 [/#list]
@@ -125,7 +634,7 @@
 #include "p2p_server_app.h"
 [/#if]
 [#if  (CUSTOM_TEMPLATE = 1)]
-#include "template_server_app.h"
+#include "custom_app.h"
 [/#if]
 
 /* Private includes ----------------------------------------------------------*/
@@ -135,7 +644,8 @@
 
 /* Private typedef -----------------------------------------------------------*/
 
-[#if  (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_HEART_RATE_SENSOR = 1) || (CUSTOM_P2P_SERVER = 1)]
+[#if  (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)
+ || (BT_SIG_HEART_RATE_SENSOR = 1) || (CUSTOM_P2P_SERVER = 1) || (CUSTOM_TEMPLATE = 1)]
 /**
  * security parameters structure
  */ 
@@ -262,7 +772,7 @@ typedef struct
    */
    uint8_t Advertising_mgr_timer_Id;
 
-[#if  (CUSTOM_P2P_SERVER = 1)]
+[#if  (CUSTOM_P2P_SERVER = 1) || (CUSTOM_TEMPLATE = 1)]
   uint8_t SwitchOffGPIO_timer_Id;
 [/#if]
 }BleApplicationContext_t;
@@ -272,7 +782,9 @@ typedef struct
 /* USER CODE END PTD */
 
 /* Private defines -----------------------------------------------------------*/
+[#if (CUSTOM_TEMPLATE = 0)]
 #define APPBLE_GAP_DEVICE_NAME_LENGTH 7
+[/#if]
 [#if  (BT_SIG_BEACON = 1)]
   /**
   * Boot Mode:    1 (OTA)
@@ -283,7 +795,8 @@ typedef struct
 #define APP_SECTORS                                                            7
 #define DATA_SECTOR                                                            6
 [/#if]
-[#if  (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_HEART_RATE_SENSOR = 1) || (CUSTOM_P2P_SERVER = 1)]
+[#if  (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)
+ || (BT_SIG_HEART_RATE_SENSOR = 1) || (CUSTOM_P2P_SERVER = 1) || (CUSTOM_TEMPLATE = 1)]
 #define FAST_ADV_TIMEOUT               (30*1000*1000/CFG_TS_TICK_VAL) /**< 30s */
 #define INITIAL_ADV_TIMEOUT            (60*1000*1000/CFG_TS_TICK_VAL) /**< 60s */
 [/#if]
@@ -327,7 +840,7 @@ static const uint8_t BLE_CFG_ER_VALUE[16] = CFG_BLE_ERK;
 [#if  (BT_SIG_BEACON = 1)]
 static uint8_t sector_type;
 [/#if]
-[#if  (BT_SIG_BEACON = 1) || (BT_SIG_HEART_RATE_SENSOR = 1) || (CUSTOM_P2P_SERVER = 1)]
+[#if  (BT_SIG_BEACON = 1) || (BT_SIG_HEART_RATE_SENSOR = 1) || (CUSTOM_P2P_SERVER = 1) || (CUSTOM_TEMPLATE = 1)]
 /**
  * These are the two tags used to manage a power failure during OTA
  * The MagicKeywordAdress shall be mapped @0x140 from start of the binary image
@@ -337,21 +850,96 @@ PLACE_IN_SECTION("TAG_OTA_END") const uint32_t MagicKeywordValue = 0x94448A29 ;
 PLACE_IN_SECTION("TAG_OTA_START") const uint32_t MagicKeywordAddress = (uint32_t)&MagicKeywordValue;
 
 [/#if]
-[#if  (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_HEART_RATE_SENSOR = 1) || (CUSTOM_P2P_SERVER = 1)]
+[#if  (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)
+ || (BT_SIG_HEART_RATE_SENSOR = 1) || (CUSTOM_P2P_SERVER = 1) || (CUSTOM_TEMPLATE = 1)]
 PLACE_IN_SECTION("BLE_APP_CONTEXT") static BleApplicationContext_t BleApplicationContext;
+[/#if]
+[#if  (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)
+ || (BT_SIG_HEART_RATE_SENSOR = 1) || (CUSTOM_P2P_SERVER = 1)]
 PLACE_IN_SECTION("BLE_APP_CONTEXT") static uint16_t AdvIntervalMin, AdvIntervalMax;
-
 [/#if]
 
+[#if (CUSTOM_TEMPLATE = 1)]
+Custom_App_ConnHandle_Not_evt_t handleNotification;
+[#else]
 [#if  (CUSTOM_P2P_SERVER = 1)]
 P2PS_APP_ConnHandle_Not_evt_t handleNotification;
+[/#if]
+[/#if]
+[#if  (CUSTOM_P2P_SERVER = 1) || (CUSTOM_TEMPLATE = 1)]
 
 #if L2CAP_REQUEST_NEW_CONN_PARAM != 0
 #define SIZE_TAB_CONN_INT            2
 float tab_conn_interval[SIZE_TAB_CONN_INT] = {50, 1000} ; /* ms */
 uint8_t index_con_int, mutex; 
-#endif 
+#endif
+[/#if]
 
+[#if  (CUSTOM_TEMPLATE = 1)]
+/**
+ * Advertising Data
+ */
+uint8_t ad_data[${AD_DATA_LENGTH}] = {
+[#if  (INCLUDE_AD_TYPE_TX_POWER_LEVEL = "1")]
+    ${AD_TYPE_TX_POWER_LEVEL_LENGTH}, AD_TYPE_TX_POWER_LEVEL, ${AD_TYPE_TX_POWER_LEVEL}, //Transmission Power
+[/#if]
+[#if  (INCLUDE_AD_TYPE_COMPLETE_LOCAL_NAME = "1")]
+    ${AD_TYPE_COMPLETE_LOCAL_NAME_LENGTH}, AD_TYPE_COMPLETE_LOCAL_NAME, [#rt]
+    [#list AD_TYPE_COMPLETE_LOCAL_NAME?split("(?!^)", "r") as char][#t]
+        [#lt]'${char}', [#rt]
+    [/#list][#lt] //Complete name
+[/#if]
+[#if  (INCLUDE_AD_TYPE_SHORTENED_LOCAL_NAME  = "1")]
+    ${AD_TYPE_SHORTENED_LOCAL_NAME_LENGTH}, AD_TYPE_SHORTENED_LOCAL_NAME , [#rt]
+    [#list AD_TYPE_SHORTENED_LOCAL_NAME ?split("(?!^)", "r") as char][#t]
+        [#lt]'${char}', [#rt]
+    [/#list][#lt] //Shortened name
+[/#if]
+[#if  (INCLUDE_AD_TYPE_APPEARANCE = "1")]
+    ${AD_TYPE_APPEARANCE_LENGTH}, AD_TYPE_APPEARANCE, ${AD_TYPE_APPEARANCE},
+[/#if]
+[#if  (INCLUDE_AD_TYPE_ADVERTISING_INTERVAL = "1")]
+    ${AD_TYPE_ADVERTISING_INTERVAL_LENGTH}, AD_TYPE_ADVERTISING_INTERVAL, [#assign res = CFG_FAST_CONN_ADV_INTERVAL_MAX_HEXA?matches("(.){2}")] ${res[0]}${res[1]}, ${res[0]}${res[2]} /* ${AD_TYPE_ADVERTISING_INTERVAL_VALUE} ms */,
+[/#if]
+[#if  (INCLUDE_AD_TYPE_LE_ROLE = "1")]
+    ${AD_TYPE_LE_ROLE_LENGTH}, AD_TYPE_LE_ROLE, ${AD_TYPE_LE_ROLE},
+[/#if]
+[#if  (INCLUDE_AD_TYPE_16_BIT_SERV_UUID_CMPLT_LIST = "1")]
+    ${AD_TYPE_16_BIT_SERV_UUID_CMPLT_LIST_LENGTH}, AD_TYPE_16_BIT_SERV_UUID_CMPLT_LIST, [#rt]
+[#assign size = AD_SERVICE_CLASS_UUID_NBR?number-1]
+[#list 0..size as i]
+0x${AD_SERVICE_CLASS_UUID_TABLE[i]?replace(" ",", 0x")}, [#rt]
+[/#list]
+[/#if]
+
+[#if  (INCLUDE_AD_TYPE_128_BIT_SERV_UUID_CMPLT_LIST = "1")]
+    ${AD_TYPE_128_BIT_SERV_UUID_CMPLT_LIST_LENGTH}, AD_TYPE_128_BIT_SERV_UUID_CMPLT_LIST, 0x${AD_TYPE_128_BIT_SERV_UUID_CMPLT_LIST?replace(",",", 0x")},
+[/#if]
+[#if  (INCLUDE_AD_TYPE_SLAVE_CONN_INTERVAL = "1")]
+[#if  (AD_TYPE_SLAVE_CONN_INTERVAL_MIN_MAX = "1")]
+    ${AD_TYPE_SLAVE_CONN_INTERVAL_LENGTH}, AD_TYPE_SLAVE_CONN_INTERVAL, ${AD_TYPE_SLAVE_CONN_INTERVAL_MIN_HEXA} /* ${AD_TYPE_SLAVE_CONN_INTERVAL_MIN} ms */, ${AD_TYPE_SLAVE_CONN_INTERVAL_MAX_HEXA} /* ${AD_TYPE_SLAVE_CONN_INTERVAL_MAX} ms*/,
+[#else]
+    ${AD_TYPE_SLAVE_CONN_INTERVAL_LENGTH}, AD_TYPE_SLAVE_CONN_INTERVAL, 0xFFFF,0xFFFF,
+[/#if]
+[/#if]
+[#if  (INCLUDE_AD_TYPE_URI = "1")]
+    ${AD_TYPE_URI_LENGTH}, AD_TYPE_URI, 0x${AD_TYPE_URI_CODE_POINT?replace(",",", 0x")}, '/', '/', [#rt]
+    [#list AD_TYPE_URI_DATA?split("(?!^)", "r") as char][#t]
+        [#lt]'${char}', [#rt]
+    [/#list][#lt]
+[/#if]
+
+[#if  (INCLUDE_AD_TYPE_MANUFACTURER_SPECIFIC_DATA = "1")]
+    ${AD_TYPE_MANUFACTURER_SPECIFIC_DATA_LENGTH}, AD_TYPE_MANUFACTURER_SPECIFIC_DATA, 0x${AD_TYPE_MANUFACTURER_SPECIFIC_DATA_COMPANY_IDENTIFIER?replace(",",", 0x")}, [#rt]
+[#assign size = (AD_TYPE_MANUFACTURER_DATA_NBR?number-1)]
+[#list 0..size as i]
+0x${AD_TYPE_MANUFACTURER_DATA_TABLE[2*i]?replace(" ",", 0x")} /* ${AD_TYPE_MANUFACTURER_DATA_TABLE[2*i+1]} */, [#rt]
+[/#list]
+[/#if]
+
+};
+[/#if]
+[#if  (CUSTOM_P2P_SERVER = 1)]
 /**
  * Advertising Data
  */
@@ -515,7 +1103,7 @@ const osThreadAttr_t AdvUpdateProcess_attr = {
     .cb_size = CFG_ADV_UPDATE_PROCESS_CB_SIZE,
     .stack_mem = CFG_ADV_UPDATE_PROCESS_STACK_MEM,
     .priority = CFG_ADV_UPDATE_PROCESS_PRIORITY,
-    .stack_size = CFG_ADV_UPDATE_PROCESS_STACk_SIZE
+    .stack_size = CFG_ADV_UPDATE_PROCESS_STACK_SIZE
 };
 
 const osThreadAttr_t HciUserEvtProcess_attr = {
@@ -525,7 +1113,7 @@ const osThreadAttr_t HciUserEvtProcess_attr = {
     .cb_size = CFG_HCI_USER_EVT_PROCESS_CB_SIZE,
     .stack_mem = CFG_HCI_USER_EVT_PROCESS_STACK_MEM,
     .priority = CFG_HCI_USER_EVT_PROCESS_PRIORITY,
-    .stack_size = CFG_HCI_USER_EVT_PROCESS_STACk_SIZE
+    .stack_size = CFG_HCI_USER_EVT_PROCESS_STACK_SIZE
 };
 
 [/#if]
@@ -541,7 +1129,8 @@ static const uint8_t* BleGetBdAddress( void );
 [#if  (BT_SIG_BEACON = 1)]
 static void Beacon_Update( void );
 [/#if]
-[#if  (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_HEART_RATE_SENSOR = 1) || (CUSTOM_P2P_SERVER = 1)]
+[#if  (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)
+ || (BT_SIG_HEART_RATE_SENSOR = 1) || (CUSTOM_P2P_SERVER = 1) || (CUSTOM_TEMPLATE = 1)]
 static void Adv_Request( APP_BLE_ConnStatus_t New_Status );
 [/#if]
 [#if  (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_HEART_RATE_SENSOR = 1)]
@@ -552,7 +1141,7 @@ static void AdvUpdateProcess(void *argument);
 [/#if]
 static void Adv_Update( void );
 [/#if]
-[#if  (CUSTOM_P2P_SERVER = 1)]
+[#if  (CUSTOM_P2P_SERVER = 1) || (CUSTOM_TEMPLATE = 1)]
 static void Adv_Cancel( void );
 static void Adv_Cancel_Req( void );
 static void Switch_OFF_GPIO( void );
@@ -631,7 +1220,8 @@ void APP_BLE_Init( void )
 
 
 
-[#if  (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_HEART_RATE_SENSOR = 1) || (CUSTOM_P2P_SERVER = 1)]
+[#if  (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)
+ || (BT_SIG_HEART_RATE_SENSOR = 1) || (CUSTOM_P2P_SERVER = 1) || (CUSTOM_TEMPLATE = 1)]
   /**
    * Initialization of the BLE App Context
    */
@@ -712,11 +1302,31 @@ void APP_BLE_Init( void )
 
 [/#if]
 [#if  (CUSTOM_TEMPLATE = 1)]
+  UTIL_SEQ_RegTask( 1<<CFG_TASK_ADV_CANCEL_ID, UTIL_SEQ_RFU, Adv_Cancel);
   /**
-   * Initialize Custom Server Application
+   * Initialization of ADV - Ad Manufacturer Element - Support OTA Bit Mask
    */
-  TEMPLATE_APP_Init();
+#if(RADIO_ACTIVITY_EVENT != 0)  
+  aci_hal_set_radio_activity_mask(0x0006);
+#endif  
   
+#if (L2CAP_REQUEST_NEW_CONN_PARAM != 0 )
+  index_con_int = 0; 
+  mutex = 1; 
+#endif
+  /**
+   * Initialize P2P Server Application
+   */
+  Custom_APP_Init();
+
+  /**
+   * Create timer to handle the Advertising Stop
+   */
+  HW_TS_Create(CFG_TIM_PROC_ID_ISR, &(BleApplicationContext.Advertising_mgr_timer_Id), hw_ts_SingleShot, Adv_Cancel_Req);
+  /**
+   * Create timer to handle the Led Switch OFF
+   */
+  HW_TS_Create(CFG_TIM_PROC_ID_ISR, &(BleApplicationContext.SwitchOffGPIO_timer_Id), hw_ts_SingleShot, Switch_OFF_GPIO);
 [/#if]
 
 [#if  (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_HEART_RATE_SENSOR = 1)]
@@ -767,9 +1377,10 @@ void APP_BLE_Init( void )
   BleApplicationContext.BleApplicationContext_legacy.advtServUUID[0] = AD_TYPE_16_BIT_SERV_UUID;
   BleApplicationContext.BleApplicationContext_legacy.advtServUUIDlen = 1;
 [/#if]
-[#if  (CUSTOM_P2P_SERVER = 1)]
+[#if  (CUSTOM_P2P_SERVER = 1) || (CUSTOM_TEMPLATE = 1)]
   BleApplicationContext.BleApplicationContext_legacy.advtServUUID[0] = NULL;
   BleApplicationContext.BleApplicationContext_legacy.advtServUUIDlen = 0;
+
 [/#if]
 [#if  (BT_SIG_BLOOD_PRESSURE_SENSOR = 1)]
   Add_Advertisment_Service_UUID(BLOOD_PRESSURE_SERVICE_UUID);
@@ -780,17 +1391,19 @@ void APP_BLE_Init( void )
 [#if  (BT_SIG_HEART_RATE_SENSOR = 1)]
   Add_Advertisment_Service_UUID(HEART_RATE_SERVICE_UUID);
 [/#if]
-[#if  (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_HEART_RATE_SENSOR = 1) || (CUSTOM_P2P_SERVER = 1)] 
+[#if  (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_HEART_RATE_SENSOR = 1) || (CUSTOM_P2P_SERVER = 1) || (CUSTOM_TEMPLATE = 1)] 
+[#if  (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_HEART_RATE_SENSOR = 1) || (CUSTOM_P2P_SERVER = 1)]
   /* Initialize intervals for reconnexion without intervals update */
   AdvIntervalMin = CFG_FAST_CONN_ADV_INTERVAL_MIN;
   AdvIntervalMax = CFG_FAST_CONN_ADV_INTERVAL_MAX;
 
+[/#if]
 [#if (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_HEART_RATE_SENSOR = 1)] 
   /**
   * Start to Advertise to be connected by Collector
    */
 [/#if]
-[#if  (CUSTOM_P2P_SERVER = 1)] 
+[#if  (CUSTOM_P2P_SERVER = 1) || (CUSTOM_TEMPLATE = 1)] 
   /**
    * Start to Advertise to be connected by P2P Client
    */
@@ -810,18 +1423,28 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification( void *pckt )
   hci_event_pckt *event_pckt;
   evt_le_meta_event *meta_evt;
   evt_blue_aci *blue_evt;
-[#if  (BT_SIG_BEACON = 0)]
+[#if  (BT_SIG_BEACON = 0) && ((BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)
+ || (BT_SIG_HEART_RATE_SENSOR = 1) ||(CUSTOM_P2P_SERVER = 1))]
   hci_le_phy_update_complete_event_rp0 *evt_le_phy_update_complete; 
   uint8_t TX_PHY, RX_PHY;
   tBleStatus ret = BLE_STATUS_INVALID_PARAMS;
 [/#if]
 
   event_pckt = (hci_event_pckt*) ((hci_uart_pckt *) pckt)->data;
+[#if (CUSTOM_TEMPLATE = 1)]
+
+  /* PAIRING */
+  aci_gap_numeric_comparison_value_event_rp0 *evt_numeric_value;
+  aci_gap_pairing_complete_event_rp0 *pairing_complete;
+  uint32_t numeric_value;
+  /* PAIRING */
+[/#if]
 
   switch (event_pckt->evt)
   {
     case EVT_DISCONN_COMPLETE:
-[#if  (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_HEART_RATE_SENSOR = 1) ||(CUSTOM_P2P_SERVER = 1)] 
+[#if  (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)
+ || (BT_SIG_HEART_RATE_SENSOR = 1) ||(CUSTOM_P2P_SERVER = 1) ||(CUSTOM_TEMPLATE = 1)] 
     {
       hci_disconnection_complete_event_rp0 *disconnection_complete_event;
       disconnection_complete_event = (hci_disconnection_complete_event_rp0 *) event_pckt->data;
@@ -836,14 +1459,21 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification( void *pckt )
 
       /* restart advertising */
       Adv_Request(APP_BLE_FAST_ADV);
-[#if  (CUSTOM_P2P_SERVER = 1)] 
+[#if  (CUSTOM_P2P_SERVER = 1) || (CUSTOM_TEMPLATE = 1)]
  /*
 * SPECIFIC to P2P Server APP
-*/     
+*/
+[/#if]
+[#if (CUSTOM_TEMPLATE = 1)]
+      handleNotification.Custom_Evt_Opcode = CUSTOM_DISCON_HANDLE_EVT;
+      handleNotification.ConnectionHandle = BleApplicationContext.BleApplicationContext_legacy.connectionHandle;
+      Custom_APP_Notification(&handleNotification);
+[#else]
+[#if  (CUSTOM_P2P_SERVER = 1)]
       handleNotification.P2P_Evt_Opcode = PEER_DISCON_HANDLE_EVT;
       handleNotification.ConnectionHandle = BleApplicationContext.BleApplicationContext_legacy.connectionHandle;
       P2PS_APP_Notification(&handleNotification);
-
+[/#if]
 [/#if]
       /* USER CODE BEGIN EVT_DISCONN_COMPLETE */
 
@@ -854,7 +1484,7 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification( void *pckt )
     break; /* EVT_DISCONN_COMPLETE */
 
     case EVT_LE_META_EVENT:
-[#if (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_HEART_RATE_SENSOR = 1) ||(CUSTOM_P2P_SERVER = 1)]
+[#if (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_HEART_RATE_SENSOR = 1) ||(CUSTOM_P2P_SERVER = 1) ||(CUSTOM_TEMPLATE = 1)]
     {
 [/#if]
       meta_evt = (evt_le_meta_event*) event_pckt->data;
@@ -863,8 +1493,8 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification( void *pckt )
       /* USER CODE END EVT_LE_META_EVENT */
       switch (meta_evt->subevent)
       {
-[#if (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_HEART_RATE_SENSOR = 1) ||(CUSTOM_P2P_SERVER = 1)]
-        case EVT_LE_CONN_UPDATE_COMPLETE: 
+[#if (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_HEART_RATE_SENSOR = 1) ||(CUSTOM_P2P_SERVER = 1) ||(CUSTOM_TEMPLATE = 1)]
+        case EVT_LE_CONN_UPDATE_COMPLETE:
           APP_DBG_MSG("\r\n\r** CONNECTION UPDATE EVENT WITH CLIENT \n");
 
           /* USER CODE BEGIN EVT_LE_CONN_UPDATE_COMPLETE */
@@ -909,7 +1539,8 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification( void *pckt )
           break;
 [/#if]
         case EVT_LE_CONN_COMPLETE:
-[#if (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_HEART_RATE_SENSOR = 1) ||(CUSTOM_P2P_SERVER = 1)]
+[#if (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)
+ || (BT_SIG_HEART_RATE_SENSOR = 1) ||(CUSTOM_P2P_SERVER = 1) ||(CUSTOM_TEMPLATE = 1)]
         {
           hci_le_connection_complete_event_rp0 *connection_complete_event;
 
@@ -932,13 +1563,21 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification( void *pckt )
             BleApplicationContext.Device_Connection_Status = APP_BLE_CONNECTED_SERVER;
           }
           BleApplicationContext.BleApplicationContext_legacy.connectionHandle = connection_complete_event->Connection_Handle;
-[#if  (CUSTOM_P2P_SERVER = 1)] 
- /*
+[#if  (CUSTOM_P2P_SERVER = 1) || (CUSTOM_TEMPLATE = 1)] 
+/*
 * SPECIFIC to P2P Server APP
-*/             
+*/
+[/#if]
+[#if  (CUSTOM_TEMPLATE = 1)]
+          handleNotification.Custom_Evt_Opcode = CUSTOM_CONN_HANDLE_EVT;
+          handleNotification.ConnectionHandle = BleApplicationContext.BleApplicationContext_legacy.connectionHandle;
+          Custom_APP_Notification(&handleNotification);
+[#else]
+[#if  (CUSTOM_P2P_SERVER = 1)] 
           handleNotification.P2P_Evt_Opcode = PEER_CONN_HANDLE_EVT;
           handleNotification.ConnectionHandle = BleApplicationContext.BleApplicationContext_legacy.connectionHandle;
           P2PS_APP_Notification(&handleNotification);
+[/#if]
 [/#if]
           /* USER CODE BEGIN HCI_EVT_LE_CONN_COMPLETE */
 
@@ -952,7 +1591,8 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification( void *pckt )
 
           /* USER CODE END SUBEVENT_DEFAULT */
           break;
-[#if (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_HEART_RATE_SENSOR = 1) ||(CUSTOM_P2P_SERVER = 1)]
+[#if (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)
+ || (BT_SIG_HEART_RATE_SENSOR = 1) || (CUSTOM_P2P_SERVER = 1) || (CUSTOM_TEMPLATE = 1)]
       }
 [/#if]
     }
@@ -968,7 +1608,7 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification( void *pckt )
       /* USER CODE BEGIN ecode */
 
       /* USER CODE END ecode */
-[#if (CUSTOM_P2P_SERVER = 1)]
+[#if (CUSTOM_P2P_SERVER = 1) || (CUSTOM_TEMPLATE = 1)]
 /*
 * SPECIFIC to P2P Server APP
 */
@@ -982,14 +1622,15 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification( void *pckt )
       break;
 [/#if]
         case EVT_BLUE_GAP_PROCEDURE_COMPLETE:
-[#if (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_HEART_RATE_SENSOR = 1) ||(CUSTOM_P2P_SERVER = 1)]
+[#if (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)
+ || (BT_SIG_HEART_RATE_SENSOR = 1) || (CUSTOM_P2P_SERVER = 1) || (CUSTOM_TEMPLATE = 1)]
         APP_DBG_MSG("\r\n\r** EVT_BLUE_GAP_PROCEDURE_COMPLETE \n");
 [/#if]
         /* USER CODE BEGIN EVT_BLUE_GAP_PROCEDURE_COMPLETE */
 
         /* USER CODE END EVT_BLUE_GAP_PROCEDURE_COMPLETE */
           break; /* EVT_BLUE_GAP_PROCEDURE_COMPLETE */
-[#if (CUSTOM_P2P_SERVER = 1)]
+[#if (CUSTOM_P2P_SERVER = 1) || (CUSTOM_TEMPLATE = 1)]
 #if(RADIO_ACTIVITY_EVENT != 0)
         case ACI_HAL_END_OF_RADIO_ACTIVITY_VSEVT_CODE:
         /* USER CODE BEGIN RADIO_ACTIVITY_EVENT*/
@@ -997,6 +1638,31 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification( void *pckt )
         /* USER CODE END RADIO_ACTIVITY_EVENT*/
           break; /* RADIO_ACTIVITY_EVENT */
 #endif
+[/#if]
+[#if (CUSTOM_TEMPLATE = 1)]
+
+        /* PAIRING */
+        case (EVT_BLUE_GAP_KEYPRESS_NOTIFICATION):
+         APP_DBG_MSG("\r\n\r** EVT_BLUE_GAP_KEYPRESS_NOTIFICATION \n");
+          break;
+          
+        case EVT_BLUE_GAP_PASS_KEY_REQUEST:
+            aci_gap_pass_key_resp(BleApplicationContext.BleApplicationContext_legacy.connectionHandle, CFG_FIXED_PIN);
+        break;
+        
+        case EVT_BLUE_GAP_NUMERIC_COMPARISON_VALUE:
+            evt_numeric_value = (aci_gap_numeric_comparison_value_event_rp0 *)blue_evt->data;
+            numeric_value = evt_numeric_value->Numeric_Value;
+            APP_DBG_MSG("numeric_value = %x\n", numeric_value);
+            aci_gap_numeric_comparison_value_confirm_yesno(BleApplicationContext.BleApplicationContext_legacy.connectionHandle, YES);
+        break;
+        
+        case EVT_BLUE_GAP_PAIRING_CMPLT:
+            pairing_complete = (aci_gap_pairing_complete_event_rp0*)blue_evt->data;
+            APP_DBG_MSG("BLE_CTRL_App_Notification: EVT_BLUE_GAP_PAIRING_CMPLT, pairing_complete->Status = %d\n",pairing_complete->Status);
+        break;
+        /* PAIRING */
+        
 [/#if]
       }
       break; /* EVT_VENDOR */
@@ -1011,7 +1677,8 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification( void *pckt )
   return (SVCCTL_UserEvtFlowEnable);
 }
 
-[#if (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_HEART_RATE_SENSOR = 1) ||(CUSTOM_P2P_SERVER = 1)]
+[#if (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)
+ || (BT_SIG_HEART_RATE_SENSOR = 1) || (CUSTOM_P2P_SERVER = 1) || (CUSTOM_TEMPLATE = 1)]
 APP_BLE_ConnStatus_t APP_BLE_Get_Server_Connection_Status(void)
 {
     return BleApplicationContext.Device_Connection_Status;
@@ -1045,7 +1712,8 @@ static void Ble_Tl_Init( void )
 static void Ble_Hci_Gap_Gatt_Init(void){
 
   uint8_t role;
-[#if (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_HEART_RATE_SENSOR = 1) ||(CUSTOM_P2P_SERVER = 1)]
+[#if (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)
+ || (BT_SIG_HEART_RATE_SENSOR = 1) || (CUSTOM_P2P_SERVER = 1) || (CUSTOM_TEMPLATE = 1)]
   uint8_t index;
 [/#if]
   uint16_t gap_service_handle, gap_dev_name_char_handle, gap_appearance_char_handle;
@@ -1080,7 +1748,8 @@ static void Ble_Hci_Gap_Gatt_Init(void){
   aci_hal_write_config_data( CONFIG_DATA_RANDOM_ADDRESS_OFFSET, CONFIG_DATA_RANDOM_ADDRESS_LEN, (uint8_t*)srd_bd_addr );
   
 [/#if]                        
-[#if (BT_SIG_HEART_RATE_SENSOR = 1) || (CUSTOM_P2P_SERVER = 1)]                        
+[#if (BT_SIG_HEART_RATE_SENSOR = 1) || (CUSTOM_P2P_SERVER = 1) || (CUSTOM_TEMPLATE = 1)]
+[#if (BT_SIG_HEART_RATE_SENSOR = 1) || (CUSTOM_P2P_SERVER = 1)]
   /* BLE MAC in ADV Packet */
   manuf_data[ sizeof(manuf_data)-6] = bd_addr[5];
   manuf_data[ sizeof(manuf_data)-5] = bd_addr[4];
@@ -1088,7 +1757,8 @@ static void Ble_Hci_Gap_Gatt_Init(void){
   manuf_data[ sizeof(manuf_data)-3] = bd_addr[2];
   manuf_data[ sizeof(manuf_data)-2] = bd_addr[1];
   manuf_data[ sizeof(manuf_data)-1] = bd_addr[0];
-  
+
+[/#if]   
 [#if (BT_SIG_HEART_RATE_SENSOR = 1)]
   /**
    * Write Identity root key used to derive LTK and CSRK 
@@ -1160,13 +1830,17 @@ static void Ble_Hci_Gap_Gatt_Init(void){
 
   if (role > 0)
   {
-[#if  (BT_SIG_BEACON = 1)]
-    const char *name = "BEACON";
+[#if (CUSTOM_TEMPLATE = 1)]
+    const char *name = CFG_GAP_DEVICE_NAME;
 [#else]
     const char *name = "${LOCAL_NAME}";
 [/#if]
     aci_gap_init(role, 0,
+[#if (CUSTOM_TEMPLATE = 1)]
+                CFG_GAP_DEVICE_NAME_LENGTH,
+[#else]
                  APPBLE_GAP_DEVICE_NAME_LENGTH,
+[/#if]
                  &gap_service_handle, &gap_dev_name_char_handle, &gap_appearance_char_handle);
 
     if (aci_gatt_update_char_value(gap_service_handle, gap_dev_name_char_handle, 0, strlen(name), (uint8_t *) name))
@@ -1183,14 +1857,15 @@ static void Ble_Hci_Gap_Gatt_Init(void){
   {
     BLE_DBG_SVCCTL_MSG("Appearance aci_gatt_update_char_value failed.\n");
   }
-[#if (BT_SIG_HEART_RATE_SENSOR = 1) || (CUSTOM_P2P_SERVER = 1)]
+[#if (BT_SIG_HEART_RATE_SENSOR = 1) || (CUSTOM_P2P_SERVER = 1) || (CUSTOM_TEMPLATE = 1)]
 /**
    * Initialize Default PHY
    */
   hci_le_set_default_phy(ALL_PHYS_PREFERENCE,TX_2M_PREFERRED,RX_2M_PREFERRED); 
 
 [/#if]
-[#if (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_HEART_RATE_SENSOR = 1) ||(CUSTOM_P2P_SERVER = 1)]
+[#if (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)
+ || (BT_SIG_HEART_RATE_SENSOR = 1) || (CUSTOM_P2P_SERVER = 1) || (CUSTOM_TEMPLATE = 1)]
   /**
    * Initialize IO capability
    */
@@ -1202,11 +1877,11 @@ static void Ble_Hci_Gap_Gatt_Init(void){
    */
   BleApplicationContext.BleApplicationContext_legacy.bleSecurityParam.mitm_mode = CFG_MITM_PROTECTION;
   BleApplicationContext.BleApplicationContext_legacy.bleSecurityParam.OOB_Data_Present = 0;
-  BleApplicationContext.BleApplicationContext_legacy.bleSecurityParam.encryptionKeySizeMin = 8;
-  BleApplicationContext.BleApplicationContext_legacy.bleSecurityParam.encryptionKeySizeMax = 16;
-  BleApplicationContext.BleApplicationContext_legacy.bleSecurityParam.Use_Fixed_Pin = 1;
-  BleApplicationContext.BleApplicationContext_legacy.bleSecurityParam.Fixed_Pin = 111111;
-  BleApplicationContext.BleApplicationContext_legacy.bleSecurityParam.bonding_mode = 1;
+  BleApplicationContext.BleApplicationContext_legacy.bleSecurityParam.encryptionKeySizeMin = CFG_ENCRYPTION_KEY_SIZE_MIN;
+  BleApplicationContext.BleApplicationContext_legacy.bleSecurityParam.encryptionKeySizeMax = CFG_ENCRYPTION_KEY_SIZE_MAX;
+  BleApplicationContext.BleApplicationContext_legacy.bleSecurityParam.Use_Fixed_Pin = CFG_USED_FIXED_PIN;
+  BleApplicationContext.BleApplicationContext_legacy.bleSecurityParam.Fixed_Pin = CFG_FIXED_PIN;
+  BleApplicationContext.BleApplicationContext_legacy.bleSecurityParam.bonding_mode = CFG_BONDING_MODE;
   for (index = 0; index < 16; index++)
   {
     BleApplicationContext.BleApplicationContext_legacy.bleSecurityParam.OOB_Data[index] = (uint8_t) index;
@@ -1214,14 +1889,14 @@ static void Ble_Hci_Gap_Gatt_Init(void){
 
   aci_gap_set_authentication_requirement(BleApplicationContext.BleApplicationContext_legacy.bleSecurityParam.bonding_mode,
                                          BleApplicationContext.BleApplicationContext_legacy.bleSecurityParam.mitm_mode,
-                                         1,
-                                         0,
+                                         CFG_SC_SUPPORT,
+                                         CFG_KEYPRESS_NOTIFICATION_SUPPORT,
                                          BleApplicationContext.BleApplicationContext_legacy.bleSecurityParam.encryptionKeySizeMin,
                                          BleApplicationContext.BleApplicationContext_legacy.bleSecurityParam.encryptionKeySizeMax,
                                          BleApplicationContext.BleApplicationContext_legacy.bleSecurityParam.Use_Fixed_Pin,
                                          BleApplicationContext.BleApplicationContext_legacy.bleSecurityParam.Fixed_Pin,
-                                         0
-                                        );
+                                         PUBLIC_ADDR
+                                         );
 
   /**
    * Initialize whitelist
@@ -1273,10 +1948,13 @@ static void Beacon_Update( void )
 
 
 
-[#if (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_HEART_RATE_SENSOR = 1) ||(CUSTOM_P2P_SERVER = 1)]
+[#if (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)
+ || (BT_SIG_HEART_RATE_SENSOR = 1) ||(CUSTOM_P2P_SERVER = 1) ||(CUSTOM_TEMPLATE = 1)]
 static void Adv_Request(APP_BLE_ConnStatus_t New_Status)
 {
   tBleStatus ret = BLE_STATUS_INVALID_PARAMS;
+[#if (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)
+ || (BT_SIG_HEART_RATE_SENSOR = 1) ||(CUSTOM_P2P_SERVER = 1)]
   uint16_t Min_Inter, Max_Inter;
 
   if (New_Status == APP_BLE_FAST_ADV)
@@ -1289,7 +1967,7 @@ static void Adv_Request(APP_BLE_ConnStatus_t New_Status)
     Min_Inter = CFG_LP_CONN_ADV_INTERVAL_MIN;
     Max_Inter = CFG_LP_CONN_ADV_INTERVAL_MAX;
   }
-
+[/#if]
 
     /**
      * Stop the timer, it will be restarted for a new shot
@@ -1297,6 +1975,8 @@ static void Adv_Request(APP_BLE_ConnStatus_t New_Status)
      */
     HW_TS_Stop(BleApplicationContext.Advertising_mgr_timer_Id);
 
+[#if (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)
+ || (BT_SIG_HEART_RATE_SENSOR = 1) ||(CUSTOM_P2P_SERVER = 1)]
     APP_DBG_MSG("First index in %d state \n", BleApplicationContext.Device_Connection_Status);
 
     if ((New_Status == APP_BLE_LP_ADV)
@@ -1315,9 +1995,24 @@ static void Adv_Request(APP_BLE_ConnStatus_t New_Status)
       }
     }
 
+[/#if]
     BleApplicationContext.Device_Connection_Status = New_Status;
     /* Start Fast or Low Power Advertising */
     ret = aci_gap_set_discoverable(
+[#if (CUSTOM_TEMPLATE = 1)]
+        ADV_TYPE,
+        CFG_FAST_CONN_ADV_INTERVAL_MIN,
+        CFG_FAST_CONN_ADV_INTERVAL_MAX,
+        BLE_ADDR_TYPE,
+        ADV_FILTER,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0);
+
+[#else]
         ADV_IND,
         Min_Inter,
         Max_Inter,
@@ -1329,10 +2024,17 @@ static void Adv_Request(APP_BLE_ConnStatus_t New_Status)
         BleApplicationContext.BleApplicationContext_legacy.advtServUUID,
         0,
         0);
-[#if (BT_SIG_HEART_RATE_SENSOR = 1) ||(CUSTOM_P2P_SERVER = 1)]   
+
+[/#if]
+[#if (CUSTOM_TEMPLATE = 1)]
+    /* Update Advertising data */
+    ret = aci_gap_update_adv_data(sizeof(ad_data), (uint8_t*) ad_data);
+
+[#else]
+[#if (BT_SIG_HEART_RATE_SENSOR = 1) || (CUSTOM_P2P_SERVER = 1)]
     /* Update Advertising data */
     ret = aci_gap_update_adv_data(sizeof(manuf_data), (uint8_t*) manuf_data);
-
+[/#if]
 [/#if]
     if (ret == BLE_STATUS_SUCCESS)
     {
@@ -1359,13 +2061,10 @@ static void Adv_Request(APP_BLE_ConnStatus_t New_Status)
       }
     }
 
-[/#if]
-
-[#if (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_HEART_RATE_SENSOR = 1) ||(CUSTOM_P2P_SERVER = 1)]
   return;
 }
-
 [/#if]
+
 
 const uint8_t* BleGetBdAddress( void )
 {
@@ -1481,12 +2180,28 @@ static void HciUserEvtProcess(void *argument)
 }
 [/#if]
 [/#if]
-[#if (CUSTOM_P2P_SERVER = 1)]
+[#if (CUSTOM_P2P_SERVER = 1) && (CUSTOM_TEMPLATE = 0)]
 /*************************************************************
  *
  *SPECIFIC FUNCTIONS FOR P2P SERVER
  *
  *************************************************************/
+[/#if]
+[#if (CUSTOM_P2P_SERVER = 0) && (CUSTOM_TEMPLATE = 1)]
+/*************************************************************
+ *
+ *SPECIFIC FUNCTIONS FOR CUSTOM
+ *
+ *************************************************************/
+[/#if]
+[#if (CUSTOM_P2P_SERVER = 1) && (CUSTOM_TEMPLATE = 1)]
+/*************************************************************
+ *
+ *SPECIFIC FUNCTIONS FOR CUSTOM & P2P SERVER
+ *
+ *************************************************************/
+[/#if]
+[#if (CUSTOM_P2P_SERVER = 1) || (CUSTOM_TEMPLATE = 1)]
 static void Adv_Cancel( void )
 {
 /* USER CODE BEGIN Adv_Cancel_1 */

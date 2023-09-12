@@ -89,13 +89,17 @@
            
         </Element>
         <Element id="LSIRC" type="fixedSource" refParameter="LSI_VALUE" x="295" y="234" isTZRes="true">
-            <Output signalId="LSI" to="IWDGOutput"/>
-            <Output signalId="LSI" to="RTCClkSource"/>
-            <Output signalId="LSI" to="LPTIM1Mult"/>
-            <Output signalId="LSI" to="LPTIM2Mult"/>
-            <Output signalId="LSI" to="MCOMult"/>
-            <Output signalId="LSI" to="LSCOMult"/>
-
+            <Output signalId="LSI" to="LSIDIV"/>
+        </Element>
+        <Element id="LSIDIV" type="devisor" refParameter="LSIDIV" x="375" y="234">
+            <Input  signalId="LSI"       from="LSIRC" refValue="RCC_LSI_DIV1"/>
+            <Input  signalId="LSI"       from="LSIRC" refValue="RCC_LSI_DIV128"/>
+            <Output signalId="LSIclk" to="IWDGOutput"/>
+            <Output signalId="LSIclk" to="RTCClkSource"/>
+            <Output signalId="LSIclk" to="LPTIM1Mult"/>
+            <Output signalId="LSIclk" to="LPTIM2Mult"/>
+            <Output signalId="LSIclk" to="MCOMult"/>
+            <Output signalId="LSIclk" to="LSCOMult"/>
         </Element>
         <Element id="LSEOSC" type="variedSource" refParameter="LSE_VALUE" x="200" y="194" isTZRes="true">
             <Output signalId="LSE" to="RTCClkSource"/>
@@ -197,7 +201,7 @@
         <Element id="RTCClkSource" type="multiplexor" refParameter="RTCClockSelection" x="540" y="166" refEnable="RTCEnable,LCDEnable" refSecure="RTCTZEnable">
             <Input signalId="HSE_RTC" from="HSERTCDevisor"    refValue="RCC_RTCCLKSOURCE_HSE_DIV32"                     />
             <Input signalId="LSE"     from="LSEOSC"           refValue="RCC_RTCCLKSOURCE_LSE"/>
-            <Input signalId="LSI"     from="LSIRC"  	      refValue="RCC_RTCCLKSOURCE_LSI"/>
+            <Input signalId="LSIclk"     from="LSIDIV"	      refValue="RCC_RTCCLKSOURCE_LSI"/>
             <Output signalId="RTCCLK" to="RTCOutput"/>
 			<Output signalId="RTCCLK"  to="LCDOutput"/>
         </Element>
@@ -208,7 +212,7 @@
             <Input signalId="RTCCLK" from="RTCClkSource"/>
         </Element>
         <Element id="IWDGOutput" type="activeOutput" refParameter="WatchDogFreq_Value" x="613" y="281" refEnable="IWDGEnable" >
-            <Input signalId="LSI" from="LSIRC"/>
+            <Input signalId="LSIclk" from="LSIRC"/>
         </Element>
     
         <Element id="USART1Mult" type="multiplexor" refParameter="USART1CLockSelectionVirtual" orientation="LEFT" x="1425" y="462" refEnable="USART1Enable" refSecure="USART1TZEnable">
@@ -275,7 +279,7 @@
         </Element>
         <Element id="LPTIM1Mult" type="multiplexor" refParameter="LPTIM1CLockSelectionVirtual" orientation="LEFT" x="1425" y="889" refEnable="LPTIM1Enable" refSecure="LPTIM1TZEnable">
             <Input signalId="PCLK1" from="APB1Prescaler" refValue="RCC_LPTIM1CLKSOURCE_PCLK1"/>
-            <Input signalId="LSI"   from="LSIRC"         refValue="RCC_LPTIM1CLKSOURCE_LSI"  />
+            <Input signalId="LSIclk"     from="LSIDIV"   refValue="RCC_LPTIM1CLKSOURCE_LSI"  />
             <Input signalId="HSI"   from="HSIRC"         refValue="RCC_LPTIM1CLKSOURCE_HSI"   />
             <Input signalId="LSE"   from="LSEOSC"        refValue="RCC_LPTIM1CLKSOURCE_LSE"/>
             <Output signalId="LPTIM1CLK" to="LPTIM1output"/>
@@ -285,7 +289,7 @@
         </Element>
         <Element id="LPTIM2Mult" type="multiplexor" refParameter="LPTIM2CLockSelectionVirtual" orientation="LEFT" x="1304" y="950" refEnable="LPTIM2Enable" refSecure="LPTIM2TZEnable">
             <Input signalId="PCLK1" from="APB1Prescaler" refValue="RCC_LPTIM2CLKSOURCE_PCLK1"/>
-            <Input signalId="LSI"   from="LSIRC"         refValue="RCC_LPTIM2CLKSOURCE_LSI"  />
+            <Input signalId="LSIclk"     from="LSIDIV"   refValue="RCC_LPTIM2CLKSOURCE_LSI"  />
             <Input signalId="HSI"   from="HSIRC"         refValue="RCC_LPTIM2CLKSOURCE_HSI"   />
             <Input signalId="LSE"   from="LSEOSC"        refValue="RCC_LPTIM2CLKSOURCE_LSE"/>
             <Output signalId="LPTIM2CLK" to="LPTIM2output"/>
@@ -429,7 +433,7 @@
         <!-- OCTOSPIM clock selection -->
 	<Element id="LPTIM3Mult" type="multiplexor" refParameter="LPTIM3CLockSelectionVirtual" orientation="LEFT" x="1304" y="1090" refEnable="LPTIM3Enable" refSecure="LPTIM3TZEnable">
             <Input signalId="PCLK1"  from="APB1Prescaler"  refValue="RCC_LPTIM3CLKSOURCE_PCLK1"/>
-            <Input signalId="LSI"    from="LSIRC"          refValue="RCC_LPTIM3CLKSOURCE_LSI"/>
+            <Input signalId="LSIclk"     from="LSIDIV"     refValue="RCC_LPTIM3CLKSOURCE_LSI"/>
             <Input signalId="HSI"    from="HSIRC"          refValue="RCC_LPTIM3CLKSOURCE_HSI"/>
             <Input signalId="LSE"    from="LSEOSC"         refValue="RCC_LPTIM3CLKSOURCE_LSE"/>            
             <Output signalId="LPTIM3CLK"   to="LPTIM3output"/>
@@ -451,7 +455,7 @@
         <!--MCO Mux-->
         <Element id="MCOMult" type="multiplexor" refParameter="RCC_MCO1SourceVirtual" x="497" y="986" refEnable="MCOEnable" refSecure="MCOTZEnable">
             <Input signalId="LSE"    from="LSEOSC"       refValue="RCC_MCO1SOURCE_LSE"/>
-            <Input signalId="LSI"    from="LSIRC"        refValue="RCC_MCO1SOURCE_LSI"/>
+            <Input signalId="LSIclk"     from="LSIDIV"   refValue="RCC_MCO1SOURCE_LSI"/>
             <Input signalId="HSE"    from="HSEOSC"       refValue="RCC_MCO1SOURCE_HSE"/>
             <Input signalId="HSI"    from="HSIRC"        refValue="RCC_MCO1SOURCE_HSI"   />
             <Input signalId="PLLCLK" from="PLLR"         refValue="RCC_MCO1SOURCE_PLLCLK"/>
@@ -470,9 +474,8 @@
         </Element>
 		<!--LSCO Mux-->
         <Element id="LSCOMult" type="multiplexor" refParameter="LSCOSource1Virtual" x="405" y="1140" refEnable="LSCOEnable">
-            <Input signalId="LSI"    from="LSIRC"        refValue="RCC_LSCOSOURCE_LSI"/>
-			<Input signalId="LSE"    from="LSEOSC"       refValue="RCC_LSCOSOURCE_LSE"/>
-            
+            <Input signalId="LSIclk"     from="LSIDIV"    refValue="RCC_LSCOSOURCE_LSI"/>
+            <Input signalId="LSE"    from="LSEOSC"       refValue="RCC_LSCOSOURCE_LSE"/>          
             
             <Output signalId="LSCOInput" to="LSCOOutput"/>
         </Element>
@@ -665,6 +668,7 @@
         <Signal id="MSI"   refParameter="MSI_VALUE"/>
         <Signal id="HSI"   refParameter="HSI_VALUE"/>
         <Signal id="HSI48" refParameter="HSI48_VALUE"/>
+        <Signal id="LSIclk"/>
         <Signal id="SAI1ExtClock"/>
         <Signal id="SAI2ExtClock"/>
         <Signal id="SYSCLKInput"/>

@@ -18,20 +18,20 @@
     </RefParameter>
 
     <RefParameter Comment="Memory Type" DefaultValue="HAL_OSPI_MEMTYPE_MICRON" Name="MemoryType" Type="list" Group="Generic">
-	<Condition Diagnostic="" Expression="!(Sem_$IpInstance_HyperBus) &amp; !(DIE470)"/>
+	<Condition Diagnostic="" Expression="!(Sem_$IpInstance_HyperBus|s_o1_hyperbusmx) &amp; !(DIE470)"/>
 	<PossibleValue Comment="Micron" Value="HAL_OSPI_MEMTYPE_MICRON"/>
 	<PossibleValue Comment="Macronix" Value="HAL_OSPI_MEMTYPE_MACRONIX"/>
 	<PossibleValue Comment="AP Memory" Value="HAL_OSPI_MEMTYPE_APMEMORY"/>
 	<PossibleValue Comment="Macronix RAM" Value="HAL_OSPI_MEMTYPE_MACRONIX_RAM"/>
     </RefParameter>
     <RefParameter Comment="Memory Type" DefaultValue="HAL_OSPI_MEMTYPE_MICRON" Name="MemoryType" Type="list" Group="Generic">
-	<Condition Diagnostic="" Expression="!(Sem_$IpInstance_HyperBus) &amp; (DIE470)"/>
+	<Condition Diagnostic="" Expression="!(Sem_$IpInstance_HyperBus|s_o1_hyperbusmx) &amp; (DIE470)"/>
 	<PossibleValue Comment="Micron" Value="HAL_OSPI_MEMTYPE_MICRON"/>
 	<PossibleValue Comment="Macronix" Value="HAL_OSPI_MEMTYPE_MACRONIX"/>
 	<PossibleValue Comment="Macronix RAM" Value="HAL_OSPI_MEMTYPE_MACRONIX_RAM"/>
     </RefParameter>
     <RefParameter Comment="Memory Type" DefaultValue="HAL_OSPI_MEMTYPE_HYPERBUS" Name="MemoryType" Type="list" Group="Generic">
-	<Condition Diagnostic="" Expression="(Sem_$IpInstance_HyperBus)"/>
+	<Condition Diagnostic="" Expression="(Sem_$IpInstance_HyperBus|s_o1_hyperbusmx)"/>
 	<PossibleValue Comment="HyperBus(TM)" Value="HAL_OSPI_MEMTYPE_HYPERBUS"/>
     </RefParameter>
 
@@ -50,17 +50,35 @@
     </RefParameter>
 
     <RefParameter Comment="Clock Mode" DefaultValue="HAL_OSPI_CLOCK_MODE_0" Name="ClockMode" Type="list" Group="Generic">
+	     <Condition Diagnostic="" Expression="(s_o1_singlemx |
+						    s_o1_dualmx |
+						    s_o1_quadmx |
+						    s_o1_dualsinglemx |
+						    s_o1_dualdualmx |
+						    s_o1_dualquadmx |
+						    s_o1_octomx |
+						    s_o1_hyperbusmx
+						    )"/>
+	<PossibleValue Comment="Low" Value="HAL_OSPI_CLOCK_MODE_0"/>
+    </RefParameter>
+
+    <RefParameter Comment="Clock Mode" DefaultValue="HAL_OSPI_CLOCK_MODE_0" Name="ClockMode" Type="list" Group="Generic">
 	<PossibleValue Comment="Low" Value="HAL_OSPI_CLOCK_MODE_0"/>
 	<PossibleValue Comment="High" Value="HAL_OSPI_CLOCK_MODE_3"/>
     </RefParameter>
 
     <RefParameter Comment="Wrap Size" DefaultValue="HAL_OSPI_WRAP_NOT_SUPPORTED" Name="WrapSize" Type="list" Group="Generic">
+	<Condition Diagnostic="" Expression="!(DIE470) &amp; !(DIE471)"/>
 	<PossibleValue Comment="Not Supported" Value="HAL_OSPI_WRAP_NOT_SUPPORTED"/>
 	<PossibleValue Comment="16 Bytes" Value="HAL_OSPI_WRAP_16_BYTES"/>
 	<PossibleValue Comment="32 Bytes" Value="HAL_OSPI_WRAP_32_BYTES"/>
 	<PossibleValue Comment="64 Bytes" Value="HAL_OSPI_WRAP_64_BYTES"/>
 	<PossibleValue Comment="128 Bytes" Value="HAL_OSPI_WRAP_128_BYTES"/>
     </RefParameter>
+    <RefParameter Comment="Wrap Size" DefaultValue="HAL_OSPI_WRAP_NOT_SUPPORTED" Name="WrapSize" Type="list" Group="Generic" Visible="false">
+        <PossibleValue Comment="Not Supported" Value="HAL_OSPI_WRAP_NOT_SUPPORTED"/>
+    </RefParameter>
+
 
     <RefParameter Comment="Delay Hold Quarter Cycle" DefaultValue="HAL_OSPI_DHQC_DISABLE" Name="DelayHoldQuarterCycle" Type="list" Group="Generic">
 	<PossibleValue Comment="Disable" Value="HAL_OSPI_DHQC_DISABLE"/>
@@ -68,6 +86,11 @@
     </RefParameter>
 
     <RefParameter Comment="Chip Select Boundary" DefaultValue="0" Max="31" Min="0" Name="ChipSelectBoundary" Type="integer" Group="Generic"/>
+
+    <!-- Refresh -->
+    <RefParameter Comment="Refresh Rate" DefaultValue="0" Max="0xFFFFFFFF" Min="0" Name="Refresh" Type="integer" Group="Generic">
+	<Condition Diagnostic="" Expression="!(DIE470)"/>
+    </RefParameter>
        
     <!-- ************************Memory Mapped Parameters************************** -->
     <!-- <RefParameter Comment="Time Out Activation" DefaultValue="HAL_OSPI_TIMEOUT_COUNTER_DISABLE" Name="TimeOutActivation" Type="list" Group="Operation Type">
@@ -116,24 +139,53 @@
 
     <!--HAL_OSPI_HyperbusCfg-->
     <RefParameter Comment="RW Recovery Time" DefaultValue="0"  Max="255" Min="0" Name="RWRecoveryTime" Type="integer"  Group="Hyperbus(TM)">
-   	<Condition Diagnostic="" Expression="(MemoryType= HAL_OSPI_MEMTYPE_HYPERBUS)&amp;(Sem_$IpInstance_HyperBus)"/>
+   	<Condition Diagnostic="" Expression="(MemoryType= HAL_OSPI_MEMTYPE_HYPERBUS)&amp;(Sem_$IpInstance_HyperBus|s_o1_hyperbusmx)"/>
     </RefParameter>
-        
+ 
     <RefParameter Comment="Access Time" DefaultValue="0"  Max="255" Min="0" Name="AccessTime" Type="integer"  Group="Hyperbus(TM)">
-	<Condition Diagnostic="" Expression="(MemoryType= HAL_OSPI_MEMTYPE_HYPERBUS)&amp;(Sem_$IpInstance_HyperBus)"/>     
+	<Condition Diagnostic="" Expression="(MemoryType= HAL_OSPI_MEMTYPE_HYPERBUS)&amp;(Sem_$IpInstance_HyperBus|s_o1_hyperbusmx)"/>
     </RefParameter>
 
     <RefParameter Comment="Write Zero Latency " DefaultValue="HAL_OSPI_SIOO_INST_EVERY_CMD" Name="WriteZeroLatency" Type="list" Group="Hyperbus(TM)">
-	<Condition Diagnostic="" Expression="(MemoryType= HAL_OSPI_MEMTYPE_HYPERBUS)&amp;(Sem_$IpInstance_HyperBus)"/>     
+	<Condition Diagnostic="" Expression="(MemoryType= HAL_OSPI_MEMTYPE_HYPERBUS)&amp;(Sem_$IpInstance_HyperBus|s_o1_hyperbusmx)"/>
 	<PossibleValue Comment="Disable" Value="HAL_OSPI_NO_LATENCY_ON_WRITE" />
 	<PossibleValue Comment="Enable" Value="HAL_OSPI_LATENCY_ON_WRITE" />
     </RefParameter>
 
     <RefParameter Comment="Latency Mode " DefaultValue="HAL_OSPI_VARIABLE_LATENCY" Name="LatencyMode" Type="list" Group="Hyperbus(TM)">
-	<Condition Diagnostic="" Expression="(MemoryType= HAL_OSPI_MEMTYPE_HYPERBUS)&amp;(Sem_$IpInstance_HyperBus)"/>     
+	<Condition Diagnostic="" Expression="(MemoryType= HAL_OSPI_MEMTYPE_HYPERBUS)&amp;(Sem_$IpInstance_HyperBus|s_o1_hyperbusmx)"/>
 	<PossibleValue Comment="Variable" Value="HAL_OSPI_VARIABLE_LATENCY" />
 	<PossibleValue Comment="Fixed" Value="HAL_OSPI_FIXED_LATENCY" />
     </RefParameter>
+
+    <!-- *********************************************** -->
+    <!-- Multiplexed mode -->
+    <!-- Req2AckTime -->
+    <RefParameter Comment="Switching Duration Clock Number" DefaultValue="=(OCTOSPI1:Req2AckTime)" Name="Req2AckTime" Type="integer"  Group="Multiplexed" Visible="false">
+	    <Condition Diagnostic="" Expression="($Index=2) &amp;
+		    					(s_o2_singlemx|
+		    					s_o2_dualmx |
+							s_o2_quadmx |
+							s_o2_dualsinglemx |
+							s_o2_dualdualmx |
+							s_o2_dualquadmx |
+							s_o2_octomx |
+							s_o2_hyperbusmx
+		    					)"/>
+    </RefParameter>
+    <RefParameter Comment="Switching Duration Clock Number" DefaultValue="1"  Max="256" Min="1" Name="Req2AckTime" Type="integer"  Group="Multiplexed">
+	    <Condition Diagnostic="" Expression="($Index=1) &amp;
+		    					(s_o1_singlemx|
+		    					s_o1_dualmx |
+							s_o1_quadmx |
+							s_o1_dualsinglemx |
+							s_o1_dualdualmx |
+							s_o1_dualquadmx |
+							s_o1_octomx |
+							s_o1_hyperbusmx 
+							)"/>
+    </RefParameter>
+    
 
     <!-- *********************************************** -->
     <!--Regular Command Mode-->
@@ -343,122 +395,12 @@
     <RefParameter Comment="" DefaultValue="_DISABLE" Name="" Type="list" >
 	<PossibleValue Comment="Disable" Value="_DISABLE" />
 	<PossibleValue Comment="Enable" Value="_ENABLE" />
-    </RefParameter>  
+    </RefParameter>
  
-    <RefMode Name="hyperbus_mode" HalMode="">
-	<ConfigForMode>OSPI_Init</ConfigForMode>
-	<ConfigForMode>IOManager_Config</ConfigForMode>
-	<ConfigForMode>Memory_mapped</ConfigForMode>
-	<ConfigForMode>Auto_Polling</ConfigForMode>
-	<ConfigForMode>HyperBus</ConfigForMode>
-        <Parameter Name="FifoThreshold" />
-        <Parameter Name="DualQuad" />
-        <Parameter Name="MemoryType" />
-        <Parameter Name="DeviceSize" />
-        <Parameter Name="ChipSelectHighTime" />
-        <Parameter Name="FreeRunningClock" />
-        <Parameter Name="ClockMode" />
-        <Parameter Name="WrapSize" />
-        <Parameter Name="ClockPrescaler" />
-        <Parameter Name="SampleShifting" />
-        <Parameter Name="DelayHoldQuarterCycle" />
-        <Parameter Name="ChipSelectBoundary" />	
-        <!--Operation Type-->
-	<!-- <Parameter Name="OperationType" />
-        <Parameter Name="Match"/>
-        <Parameter Name="Mask" />
-        <Parameter Name="MatchMode" />
-        <Parameter Name="AutomaticStop" />
-        <Parameter Name="Interval" />
-        <Parameter Name="TimeOutActivation" />
-	<Parameter Name="TimeOutPeriod" /> -->
-        <!-- Regular Command Struct-->
-        <!--   <Parameter Name="AddressSize" />
-        <Parameter Name="DQSMode" />
-        <Parameter Name="Address" />	
-        <Parameter Name="NbData" />	
-        <Parameter Name="AddressSpace" />-->
-	<!-- <Parameter Name="FlashId" />	
-	<Parameter Name="Instruction" />	
-	<Parameter Name="InstructionMode" />	
-	<Parameter Name="InstructionSize" />	
-	<Parameter Name="InstructionDtrMode" />	
-	<Parameter Name="AddressMode" />	
-	<Parameter Name="AddressDtrMode" />	
-	<Parameter Name="AlternateBytes" />	
-	<Parameter Name="AlternateBytesMode" />	
-	<Parameter Name="AlternateBytesSize" />	
-	<Parameter Name="AlternateBytesDtrMode" />	
-	<Parameter Name="DataMode" />	
-	<Parameter Name="DataDtrMode" />	
-	<Parameter Name="DummyCycles" />	
-	<Parameter Name="SIOOMode" />	-->
-	<!--Hyperbus Params -->
-	<Parameter Name="RWRecoveryTime" />	
-	<Parameter Name="AccessTime" />	
-	<Parameter Name="WriteZeroLatency" />	
-	<Parameter Name="LatencyMode" />
-    </RefMode> 
-
-    <RefMode Name="octo_mode" HalMode="">
-	<ConfigForMode>OSPI_Init</ConfigForMode>
-	<ConfigForMode>IOManager_Config</ConfigForMode>
-	<ConfigForMode>Memory_mapped</ConfigForMode>
-	<ConfigForMode>Auto_Polling</ConfigForMode>
-        <Parameter Name="FifoThreshold" />
-        <Parameter Name="DualQuad" />
-        <Parameter Name="MemoryType" />
-        <Parameter Name="DeviceSize" />
-        <Parameter Name="ChipSelectHighTime" />
-        <Parameter Name="FreeRunningClock" />
-        <Parameter Name="ClockMode" />
-        <Parameter Name="WrapSize" />
-        <Parameter Name="ClockPrescaler" />
-        <Parameter Name="SampleShifting" />
-        <Parameter Name="DelayHoldQuarterCycle" />
-        <Parameter Name="ChipSelectBoundary" />	
-        <!--Operation Type-->
-	<!-- <Parameter Name="OperationType" />
-        <Parameter Name="Match"/>
-        <Parameter Name="Mask" />
-        <Parameter Name="MatchMode" />
-        <Parameter Name="AutomaticStop" />
-        <Parameter Name="Interval" />
-        <Parameter Name="TimeOutActivation" />
-	<Parameter Name="TimeOutPeriod" /> -->
-        <!-- Regular Command Struct-->
-        <!--   <Parameter Name="AddressSize" />
-        <Parameter Name="DQSMode" />
-        <Parameter Name="Address" />	
-        <Parameter Name="NbData" />	
-        <Parameter Name="AddressSpace" />-->
-	<!-- <Parameter Name="FlashId" />	
-	<Parameter Name="Instruction" />	
-	<Parameter Name="InstructionMode" />	
-	<Parameter Name="InstructionSize" />	
-	<Parameter Name="InstructionDtrMode" />	
-	<Parameter Name="AddressMode" />	
-	<Parameter Name="AddressDtrMode" />	
-	<Parameter Name="AlternateBytes" />	
-	<Parameter Name="AlternateBytesMode" />	
-	<Parameter Name="AlternateBytesSize" />	
-	<Parameter Name="AlternateBytesDtrMode" />	
-	<Parameter Name="DataMode" />	
-	<Parameter Name="DataDtrMode" />	
-	<Parameter Name="DummyCycles" />	
-	<Parameter Name="SIOOMode" />	-->
-	<!--Hyperbus Params -->
-	<!-- <Parameter Name="RWRecoveryTime" />	
-	<Parameter Name="AccessTime" />	
-	<Parameter Name="WriteZeroLatency" />	
-	<Parameter Name="LatencyMode" /> -->
-    </RefMode> 
-
     <RefMode Name="single_mode"  HalMode="" >
 	<ConfigForMode>OSPI_Init</ConfigForMode>
 	<ConfigForMode>IOManager_Config</ConfigForMode>
-	<ConfigForMode>Memory_mapped</ConfigForMode>  
-	<ConfigForMode>Auto_Polling</ConfigForMode> 
+	<!-- Initialization -->
         <Parameter Name="FifoThreshold" />
         <Parameter Name="DualQuad" />
         <Parameter Name="MemoryType" />
@@ -471,28 +413,34 @@
         <Parameter Name="SampleShifting" />
         <Parameter Name="DelayHoldQuarterCycle" />
         <Parameter Name="ChipSelectBoundary" />	
-        <!--Operation Type-->	
-	<!-- <Parameter Name="OperationType" />	
-	<Parameter Name="Match" />
-	<Parameter Name="Mask" />	
-	<Parameter Name="MatchMode"/>	
-	<Parameter Name="AutomaticStop"/>	
-	<Parameter Name="Interval"/>	
-	<Parameter Name="TimeOutActivation" />
-	<Parameter Name="TimeOutPeriod" /> -->
-   	<!-- Regular Command Struct-->
-        <!-- <Parameter Name="AddressSize" />	 
-	<Parameter Name="DQSMode" />	 
-	<Parameter Name="Address" />	
-	<Parameter Name="NbData" />	
-	<Parameter Name="AddressSpace" />-->						
+        <Parameter Name="Refresh" />
+    </RefMode>
+
+    <RefMode Name="single_mode_mx"  HalMode="" >
+	<ConfigForMode>OSPI_Init</ConfigForMode>
+	<ConfigForMode>IOManager_Config</ConfigForMode>
+	<!-- Multiplexed -->
+	<Parameter Name="Req2AckTime" />
+	<!-- Initialization -->
+        <Parameter Name="FifoThreshold" />
+        <Parameter Name="DualQuad" />
+        <Parameter Name="MemoryType" />
+        <Parameter Name="DeviceSize" />
+        <Parameter Name="ChipSelectHighTime" />
+        <Parameter Name="FreeRunningClock" />
+        <Parameter Name="ClockMode" />
+        <Parameter Name="WrapSize" />
+        <Parameter Name="ClockPrescaler" />
+        <Parameter Name="SampleShifting" />
+        <Parameter Name="DelayHoldQuarterCycle" />
+        <Parameter Name="ChipSelectBoundary" />	
+        <Parameter Name="Refresh" />
     </RefMode>
     
     <RefMode Name="dual_mode"  HalMode="">
         <ConfigForMode>OSPI_Init</ConfigForMode>
         <ConfigForMode>IOManager_Config</ConfigForMode>
-        <ConfigForMode>Memory_mapped</ConfigForMode>
-        <ConfigForMode>Auto_Polling</ConfigForMode>
+	<!-- Initialization -->
         <Parameter Name="FifoThreshold" />
         <Parameter Name="DualQuad" />
         <Parameter Name="MemoryType" />
@@ -505,28 +453,34 @@
         <Parameter Name="SampleShifting" />
         <Parameter Name="DelayHoldQuarterCycle" />
         <Parameter Name="ChipSelectBoundary" />	
-        <!--Operation Type-->	
-	<!-- <Parameter Name="OperationType" />	
-	<Parameter Name="Match" />
-	<Parameter Name="Mask" />	
-	<Parameter Name="MatchMode"/>	
-	<Parameter Name="AutomaticStop"/>	
-	<Parameter Name="Interval"/>	
-	<Parameter Name="TimeOutActivation" />
-	<Parameter Name="TimeOutPeriod" /> -->
-        <!-- Regular Command Struct-->
-        <!--   <Parameter Name="AddressSize" />	 
-	<Parameter Name="DQSMode" />	 
-	<Parameter Name="Address" />	
-	<Parameter Name="NbData" />	
-	<Parameter Name="AddressSpace" />-->
+        <Parameter Name="Refresh" />
+    </RefMode>
+
+    <RefMode Name="dual_mode_mx"  HalMode="">
+        <ConfigForMode>OSPI_Init</ConfigForMode>
+        <ConfigForMode>IOManager_Config</ConfigForMode>
+	<!-- Multiplexed -->
+	<Parameter Name="Req2AckTime" />
+	<!-- Initialization -->
+        <Parameter Name="FifoThreshold" />
+        <Parameter Name="DualQuad" />
+        <Parameter Name="MemoryType" />
+        <Parameter Name="DeviceSize" />
+        <Parameter Name="ChipSelectHighTime" />
+        <Parameter Name="FreeRunningClock" />
+        <Parameter Name="ClockMode" />
+        <Parameter Name="WrapSize" />
+        <Parameter Name="ClockPrescaler" />
+        <Parameter Name="SampleShifting" />
+        <Parameter Name="DelayHoldQuarterCycle" />
+        <Parameter Name="ChipSelectBoundary" />	
+        <Parameter Name="Refresh" />
     </RefMode>
 
     <RefMode Name="quad_mode"  HalMode="">
         <ConfigForMode>OSPI_Init</ConfigForMode>
         <ConfigForMode>IOManager_Config</ConfigForMode>
-        <ConfigForMode>Memory_mapped</ConfigForMode>  
-        <ConfigForMode>Auto_Polling</ConfigForMode> 
+	<!-- Initialization -->
          <Parameter Name="FifoThreshold" />
         <Parameter Name="DualQuad" />
         <Parameter Name="MemoryType" />
@@ -539,28 +493,34 @@
         <Parameter Name="SampleShifting" />
         <Parameter Name="DelayHoldQuarterCycle" />
         <Parameter Name="ChipSelectBoundary" />	
-        <!--Operation Type-->	
-	<!-- <Parameter Name="OperationType" />	
-	<Parameter Name="Match" />
-	<Parameter Name="Mask" />	
-	<Parameter Name="MatchMode"/>	
-	<Parameter Name="AutomaticStop"/>	
-	<Parameter Name="Interval"/>	
-	<Parameter Name="TimeOutActivation" />
-	<Parameter Name="TimeOutPeriod" /> -->
-	<!-- Regular Command Struct-->
-	<!-- <Parameter Name="AddressSize" />	 
-	<Parameter Name="DQSMode" />	 
-	<Parameter Name="Address" />	
-	<Parameter Name="NbData" />	
-	<Parameter Name="AddressSpace" /> -->   		
-    </RefMode>  
+        <Parameter Name="Refresh" />
+    </RefMode>
+
+    <RefMode Name="quad_mode_mx"  HalMode="">
+        <ConfigForMode>OSPI_Init</ConfigForMode>
+        <ConfigForMode>IOManager_Config</ConfigForMode>
+	<!-- Multiplexed -->
+	<Parameter Name="Req2AckTime" />
+	<!-- Initialization -->
+         <Parameter Name="FifoThreshold" />
+        <Parameter Name="DualQuad" />
+        <Parameter Name="MemoryType" />
+        <Parameter Name="DeviceSize" />
+        <Parameter Name="ChipSelectHighTime" />
+        <Parameter Name="FreeRunningClock" />
+        <Parameter Name="ClockMode" />
+        <Parameter Name="WrapSize" />
+        <Parameter Name="ClockPrescaler" />
+        <Parameter Name="SampleShifting" />
+        <Parameter Name="DelayHoldQuarterCycle" />
+        <Parameter Name="ChipSelectBoundary" />	
+        <Parameter Name="Refresh" />
+    </RefMode>
 
     <RefMode Name="dual_single_mode"  HalMode="">
 	<ConfigForMode>OSPI_Init</ConfigForMode>
 	<ConfigForMode>IOManager_Config</ConfigForMode>
-	<ConfigForMode>Memory_mapped</ConfigForMode>
-	<ConfigForMode>Auto_Polling</ConfigForMode>
+	<!-- Initialization -->
         <Parameter Name="FifoThreshold" />
         <Parameter Name="DualQuad" />
         <Parameter Name="MemoryType" />
@@ -573,28 +533,34 @@
         <Parameter Name="SampleShifting" />
         <Parameter Name="DelayHoldQuarterCycle" />
         <Parameter Name="ChipSelectBoundary" />
-        <!--Operation Type-->
-	<!-- <Parameter Name="OperationType" />
-	<Parameter Name="Match" />
-	<Parameter Name="Mask" />
-	<Parameter Name="MatchMode"/>
-	<Parameter Name="AutomaticStop"/>
-	<Parameter Name="Interval"/>
-	<Parameter Name="TimeOutActivation" />
-	<Parameter Name="TimeOutPeriod" /> -->
-	<!-- Regular Command Struct-->
-	<!--  <Parameter Name="AddressSize" />
-	<Parameter Name="DQSMode" />
-	<Parameter Name="Address" />
-	<Parameter Name="NbData" />
-	<Parameter Name="AddressSpace" />-->
+        <Parameter Name="Refresh" />
+    </RefMode>
+
+    <RefMode Name="dual_single_mode_mx"  HalMode="">
+	<ConfigForMode>OSPI_Init</ConfigForMode>
+	<ConfigForMode>IOManager_Config</ConfigForMode>
+	<!-- Multiplexed -->
+	<Parameter Name="Req2AckTime" />
+	<!-- Initialization -->
+        <Parameter Name="FifoThreshold" />
+        <Parameter Name="DualQuad" />
+        <Parameter Name="MemoryType" />
+        <Parameter Name="DeviceSize" />
+        <Parameter Name="ChipSelectHighTime" />
+        <Parameter Name="FreeRunningClock" />
+        <Parameter Name="ClockMode" />
+        <Parameter Name="WrapSize" />
+        <Parameter Name="ClockPrescaler" />
+        <Parameter Name="SampleShifting" />
+        <Parameter Name="DelayHoldQuarterCycle" />
+        <Parameter Name="ChipSelectBoundary" />
+        <Parameter Name="Refresh" />
     </RefMode>
 
     <RefMode Name="dual_dual_mode"  HalMode="">
 	<ConfigForMode>OSPI_Init</ConfigForMode>
 	<ConfigForMode>IOManager_Config</ConfigForMode>
-	<ConfigForMode>Memory_mapped</ConfigForMode>
-	<ConfigForMode>Auto_Polling</ConfigForMode>
+	<!-- Initialization -->
         <Parameter Name="FifoThreshold" />
         <Parameter Name="DualQuad" />
         <Parameter Name="MemoryType" />
@@ -607,28 +573,34 @@
         <Parameter Name="SampleShifting" />
         <Parameter Name="DelayHoldQuarterCycle" />
         <Parameter Name="ChipSelectBoundary" />
-        <!--Operation Type-->
-	<!-- <Parameter Name="OperationType" />
-	<Parameter Name="Match" />
-	<Parameter Name="Mask" />
-	<Parameter Name="MatchMode"/>
-	<Parameter Name="AutomaticStop"/>
-	<Parameter Name="Interval"/>
-	<Parameter Name="TimeOutActivation" />
-	<Parameter Name="TimeOutPeriod" /> -->
-	<!-- Regular Command Struct-->
-	<!--  <Parameter Name="AddressSize" />
-	<Parameter Name="DQSMode" />
-	<Parameter Name="Address" />
-	<Parameter Name="NbData" />
-	<Parameter Name="AddressSpace" />-->
+        <Parameter Name="Refresh" />
+    </RefMode>
+
+    <RefMode Name="dual_dual_mode_mx"  HalMode="">
+	<ConfigForMode>OSPI_Init</ConfigForMode>
+	<ConfigForMode>IOManager_Config</ConfigForMode>
+	<!-- Multiplexed -->
+	<Parameter Name="Req2AckTime" />
+	<!-- Initialization -->
+        <Parameter Name="FifoThreshold" />
+        <Parameter Name="DualQuad" />
+        <Parameter Name="MemoryType" />
+        <Parameter Name="DeviceSize" />
+        <Parameter Name="ChipSelectHighTime" />
+        <Parameter Name="FreeRunningClock" />
+        <Parameter Name="ClockMode" />
+        <Parameter Name="WrapSize" />
+        <Parameter Name="ClockPrescaler" />
+        <Parameter Name="SampleShifting" />
+        <Parameter Name="DelayHoldQuarterCycle" />
+        <Parameter Name="ChipSelectBoundary" />
+        <Parameter Name="Refresh" />
     </RefMode>
     
     <RefMode Name="dual_quad_mode"  HalMode="">
 	<ConfigForMode>OSPI_Init</ConfigForMode>
 	<ConfigForMode>IOManager_Config</ConfigForMode>
-	<ConfigForMode>Memory_mapped</ConfigForMode>
-	<ConfigForMode>Auto_Polling</ConfigForMode>
+	<!-- Initialization -->
         <Parameter Name="FifoThreshold" />
         <Parameter Name="DualQuad" />
         <Parameter Name="MemoryType" />
@@ -641,44 +613,163 @@
         <Parameter Name="SampleShifting" />
         <Parameter Name="DelayHoldQuarterCycle" />
         <Parameter Name="ChipSelectBoundary" />
-        <!--Operation Type-->
-	<!-- <Parameter Name="OperationType" />
-	<Parameter Name="Match" />
-	<Parameter Name="Mask" />
-	<Parameter Name="MatchMode"/>
-	<Parameter Name="AutomaticStop"/>
-	<Parameter Name="Interval"/>
-	<Parameter Name="TimeOutActivation" />
-	<Parameter Name="TimeOutPeriod" /> -->
-	<!-- Regular Command Struct-->
-	<!--  <Parameter Name="AddressSize" />
-	<Parameter Name="DQSMode" />
-	<Parameter Name="Address" />
-	<Parameter Name="NbData" />
-	<Parameter Name="AddressSpace" />-->
+        <Parameter Name="Refresh" />
     </RefMode>
 
-    <RefMode Name="octal_mode"  HalMode="" BaseMode="octo_mode"/>
+    <RefMode Name="dual_quad_mode_mx"  HalMode="">
+	<ConfigForMode>OSPI_Init</ConfigForMode>
+	<ConfigForMode>IOManager_Config</ConfigForMode>
+	<!-- Multiplexed -->
+	<Parameter Name="Req2AckTime" />
+	<!-- Initialization -->
+        <Parameter Name="FifoThreshold" />
+        <Parameter Name="DualQuad" />
+        <Parameter Name="MemoryType" />
+        <Parameter Name="DeviceSize" />
+        <Parameter Name="ChipSelectHighTime" />
+        <Parameter Name="FreeRunningClock" />
+        <Parameter Name="ClockMode" />
+        <Parameter Name="WrapSize" />
+        <Parameter Name="ClockPrescaler" />
+        <Parameter Name="SampleShifting" />
+        <Parameter Name="DelayHoldQuarterCycle" />
+        <Parameter Name="ChipSelectBoundary" />
+        <Parameter Name="Refresh" />
+    </RefMode>
 
-    <RefMode Name="octalDiff_mode"  HalMode="" BaseMode="octo_mode"/>
+    <RefMode Name="octo_mode" HalMode="">
+	<ConfigForMode>OSPI_Init</ConfigForMode>
+	<ConfigForMode>IOManager_Config</ConfigForMode>
+	<!-- Initialization -->
+        <Parameter Name="FifoThreshold" />
+        <Parameter Name="DualQuad" />
+        <Parameter Name="MemoryType" />
+        <Parameter Name="DeviceSize" />
+        <Parameter Name="ChipSelectHighTime" />
+        <Parameter Name="FreeRunningClock" />
+        <Parameter Name="ClockMode" />
+        <Parameter Name="WrapSize" />
+        <Parameter Name="ClockPrescaler" />
+        <Parameter Name="SampleShifting" />
+        <Parameter Name="DelayHoldQuarterCycle" />
+        <Parameter Name="ChipSelectBoundary" />	
+        <Parameter Name="Refresh" />
+    </RefMode>
+
+    <RefMode Name="octo_mode_mx" HalMode="">
+	<ConfigForMode>OSPI_Init</ConfigForMode>
+	<ConfigForMode>IOManager_Config</ConfigForMode>
+	<!-- Multiplexed -->
+	<Parameter Name="Req2AckTime" />
+	<!-- Initialization -->
+        <Parameter Name="FifoThreshold" />
+        <Parameter Name="DualQuad" />
+        <Parameter Name="MemoryType" />
+        <Parameter Name="DeviceSize" />
+        <Parameter Name="ChipSelectHighTime" />
+        <Parameter Name="FreeRunningClock" />
+        <Parameter Name="ClockMode" />
+        <Parameter Name="WrapSize" />
+        <Parameter Name="ClockPrescaler" />
+        <Parameter Name="SampleShifting" />
+        <Parameter Name="DelayHoldQuarterCycle" />
+        <Parameter Name="ChipSelectBoundary" />	
+        <Parameter Name="Refresh" />
+    </RefMode>
+
+    <RefMode Name="hyperbus_mode" HalMode="">
+	<ConfigForMode>OSPI_Init</ConfigForMode>
+	<ConfigForMode>IOManager_Config</ConfigForMode>
+	<ConfigForMode>HyperBus</ConfigForMode>
+	<!-- Initialization -->
+        <Parameter Name="FifoThreshold" />
+        <Parameter Name="DualQuad" />
+        <Parameter Name="MemoryType" />
+        <Parameter Name="DeviceSize" />
+        <Parameter Name="ChipSelectHighTime" />
+        <Parameter Name="FreeRunningClock" />
+        <Parameter Name="ClockMode" />
+        <Parameter Name="WrapSize" />
+        <Parameter Name="ClockPrescaler" />
+        <Parameter Name="SampleShifting" />
+        <Parameter Name="DelayHoldQuarterCycle" />
+        <Parameter Name="ChipSelectBoundary" />	
+        <Parameter Name="Refresh" />
+	<!--Hyperbus Params -->
+	<Parameter Name="RWRecoveryTime" />	
+	<Parameter Name="AccessTime" />	
+	<Parameter Name="WriteZeroLatency" />	
+	<Parameter Name="LatencyMode" />
+    </RefMode>
+
+    <RefMode Name="hyperbus_mode_mx" HalMode="">
+	<ConfigForMode>OSPI_Init</ConfigForMode>
+	<ConfigForMode>IOManager_Config</ConfigForMode>
+	<ConfigForMode>HyperBus</ConfigForMode>
+	<!-- Multiplexed -->
+	<Parameter Name="Req2AckTime" />
+	<!-- Initialization -->
+        <Parameter Name="FifoThreshold" />
+        <Parameter Name="DualQuad" />
+        <Parameter Name="MemoryType" />
+        <Parameter Name="DeviceSize" />
+        <Parameter Name="ChipSelectHighTime" />
+        <Parameter Name="FreeRunningClock" />
+        <Parameter Name="ClockMode" />
+        <Parameter Name="WrapSize" />
+        <Parameter Name="ClockPrescaler" />
+        <Parameter Name="SampleShifting" />
+        <Parameter Name="DelayHoldQuarterCycle" />
+        <Parameter Name="ChipSelectBoundary" />	
+        <Parameter Name="Refresh" />
+	<!--Hyperbus Params -->
+	<Parameter Name="RWRecoveryTime" />	
+	<Parameter Name="AccessTime" />	
+	<Parameter Name="WriteZeroLatency" />	
+	<Parameter Name="LatencyMode" />
+    </RefMode>
 
     <!-- ************************************* Modes ********************************************* -->
     <!--ModeLogicOperator Name="XOR">
             <Mode Name="Mode">-->
                     <ModeLogicOperator Name="OR">
-                            <Mode Name="Mode">                                
+			    <!-- OCTOSPI1 Mode -->
+                            <Mode Name="Mode" RemoveCondition="$Index=2">
+				    <Condition Expression="
+					    (OCTOSPI1:$ModeExist_O1_P1_CLK &amp; !OCTOSPI1:$ModeExist_O1_P2_CLK &amp; !Sem_OSPI2_CLK_Port1) |
+					    (!OCTOSPI1:$ModeExist_O1_P1_CLK &amp; OCTOSPI1:$ModeExist_O1_P2_CLK &amp; !Sem_OSPI2_CLK_Port2) |
+					    (OCTOSPI1:$ModeExist_O1_P1_CLK &amp; OCTOSPI1:$ModeExist_O1_P2_CLK)
+					    " Diagnostic=""/>
                                     <ModeLogicOperator Name="XOR">
                                             <Mode Name="single_mode" UserName="Single SPI">
                                                     <SignalLogicalOp Name="AND">
-                                                            <Signal Name="VS_dual"/>                                                       
+                                                            <Signal Name="VS_dual"/>
                                                     </SignalLogicalOp>
                                                     <Semaphore>Sem_$IpInstance_Single</Semaphore>
                                             </Mode>
+					    <Mode Name="single_mode_mx" UserName="Single SPI -- MULTIPLEXED --" RemoveCondition="DIE470">
+				    		    <Condition Expression="
+							OCTOSPI1:$ModeExist_OCTOSPI1_Port1_NCS &amp; OCTOSPI1:$ModeExist_OCTOSPI1_Port2_NCS
+							" Diagnostic=""/>
+                                                    <SignalLogicalOp Name="AND">
+                                                            <Signal Name="VS_dual_mx"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>s_o1_singlemx</Semaphore>
+                                            </Mode> 
                                             <Mode Name="dual_mode" UserName="Dual SPI">
                                                     <SignalLogicalOp Name="AND">
-                                                            <Signal Name="VS_dual"/>                        
+                                                            <Signal Name="VS_dual"/>
                                                     </SignalLogicalOp>
                                                     <Semaphore>Sem_$IpInstance_Dual</Semaphore>
+                                            </Mode>
+					    <Mode Name="dual_mode_mx" UserName="Dual SPI -- MULTIPLEXED --" RemoveCondition="DIE470">
+						    <Condition Expression="
+							OCTOSPI1:$ModeExist_OCTOSPI1_Port1_NCS &amp; OCTOSPI1:$ModeExist_OCTOSPI1_Port2_NCS
+							" Diagnostic=""/>
+                                                    <SignalLogicalOp Name="AND">
+                                                            <Signal Name="VS_dual_mx"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>s_o1_dualmx</Semaphore>
                                             </Mode>
                                             <Mode Name="quad_mode" UserName="Quad SPI">
                                                     <SignalLogicalOp Name="AND">
@@ -686,11 +777,29 @@
                                                     </SignalLogicalOp>
                                                     <Semaphore>Sem_$IpInstance_Quad</Semaphore>
                                             </Mode>
+                                            <Mode Name="quad_mode_mx" UserName="Quad SPI -- MULTIPLEXED --" RemoveCondition="DIE470">
+						    <Condition Expression="
+							OCTOSPI1:$ModeExist_OCTOSPI1_Port1_NCS &amp; OCTOSPI1:$ModeExist_OCTOSPI1_Port2_NCS
+							" Diagnostic=""/>
+                                                    <SignalLogicalOp Name="AND">
+                                                            <Signal Name="VS_quad_mx"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>s_o1_quadmx</Semaphore>
+                                            </Mode>
 					    <Mode Name="dual_single_mode" UserName="Dual-Single SPI">
                                                     <SignalLogicalOp Name="AND">
                                                             <Signal Name="VS_dualsingle"/>
                                                     </SignalLogicalOp>
                                                     <Semaphore>Sem_$IpInstance_DualSingle</Semaphore>
+					    </Mode>
+					    <Mode Name="dual_single_mode_mx" UserName="Dual-Single SPI -- MULTIPLEXED --" RemoveCondition="DIE470">
+						    <Condition Expression="
+							OCTOSPI1:$ModeExist_OCTOSPI1_Port1_NCS &amp; OCTOSPI1:$ModeExist_OCTOSPI1_Port2_NCS
+							" Diagnostic=""/>
+                                                    <SignalLogicalOp Name="AND">
+                                                            <Signal Name="VS_dualsingle_mx"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>s_o1_dualsinglemx</Semaphore>
                                             </Mode>
 					    <Mode Name="dual_dual_mode" UserName="Dual-Dual SPI">
                                                     <SignalLogicalOp Name="AND">
@@ -698,11 +807,29 @@
                                                     </SignalLogicalOp>
                                                     <Semaphore>Sem_$IpInstance_DualDual</Semaphore>
                                             </Mode>
+					    <Mode Name="dual_dual_mode_mx" UserName="Dual-Dual SPI -- MULTIPLEXED --" RemoveCondition="DIE470">
+						    <Condition Expression="
+							OCTOSPI1:$ModeExist_OCTOSPI1_Port1_NCS &amp; OCTOSPI1:$ModeExist_OCTOSPI1_Port2_NCS
+							" Diagnostic=""/>
+                                                    <SignalLogicalOp Name="AND">
+                                                            <Signal Name="VS_dualdual_mx"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>s_o1_dualdualmx</Semaphore>
+                                            </Mode>
                                             <Mode Name="dual_quad_mode" UserName="Dual-Quad SPI">
                                                     <SignalLogicalOp Name="AND">
                                                             <Signal Name="VS_octo"/>
                                                     </SignalLogicalOp>
                                                     <Semaphore>Sem_$IpInstance_DualQuad</Semaphore>
+                                            </Mode>
+					    <Mode Name="dual_quad_mode_mx" UserName="Dual-Quad SPI -- MULTIPLEXED --" RemoveCondition="DIE470">
+						    <Condition Expression="
+							OCTOSPI1:$ModeExist_OCTOSPI1_Port1_NCS &amp; OCTOSPI1:$ModeExist_OCTOSPI1_Port2_NCS
+							" Diagnostic=""/>
+                                                    <SignalLogicalOp Name="AND">
+                                                            <Signal Name="VS_octo_mx"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>s_o1_dualquadmx</Semaphore>
                                             </Mode>
                                             <Mode Name="octo_mode" UserName="Octo SPI">
                                                     <SignalLogicalOp Name="AND">
@@ -710,18 +837,483 @@
                                                     </SignalLogicalOp>
                                                     <Semaphore>Sem_$IpInstance_Octo</Semaphore>
                                             </Mode>
+					    <Mode Name="octo_mode_mx" UserName="Octo SPI -- MULTIPLEXED --" RemoveCondition="DIE470">
+						    <Condition Expression="
+							OCTOSPI1:$ModeExist_OCTOSPI1_Port1_NCS &amp; OCTOSPI1:$ModeExist_OCTOSPI1_Port2_NCS
+							" Diagnostic=""/>
+                                                    <SignalLogicalOp Name="AND">
+                                                            <Signal Name="VS_octo_mx"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>s_o1_octomx</Semaphore>
+                                            </Mode>
 					    <Mode Name="hyperbus_mode" UserName="HyperBus(TM)">
                                                     <SignalLogicalOp Name="AND">
                                                             <Signal Name="VS_octo"/>
                                                     </SignalLogicalOp>
                                                     <Semaphore>Sem_$IpInstance_HyperBus</Semaphore>
+					    </Mode>
+					    <Mode Name="hyperbus_mode_mx" UserName="HyperBus(TM) -- MULTIPLEXED --" RemoveCondition="DIE470">
+						    <Condition Expression="
+							OCTOSPI1:$ModeExist_OCTOSPI1_Port1_NCS &amp; OCTOSPI1:$ModeExist_OCTOSPI1_Port2_NCS
+							" Diagnostic=""/>
+                                                    <SignalLogicalOp Name="AND">
+                                                            <Signal Name="VS_hyperbus_mx"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>s_o1_hyperbusmx</Semaphore>
                                             </Mode>
                                     </ModeLogicOperator>
-                                    <Semaphore>$IpInstance_Used</Semaphore>
+                                    <Semaphore>Sem_$IpInstance_O1_Used</Semaphore>
                             </Mode>
+
+			    <!-- OCTOSPI2 Mode -->
+			    <Mode Name="Mode" RemoveCondition="$Index=1">
+				    <Condition Expression="
+					    (OCTOSPI2:$ModeExist_O2_P1_CLK &amp; !OCTOSPI2:$ModeExist_O2_P2_CLK &amp; !Sem_OSPI1_CLK_Port1) |
+					    (!OCTOSPI2:$ModeExist_O2_P1_CLK &amp; OCTOSPI2:$ModeExist_O2_P2_CLK &amp; !Sem_OSPI1_CLK_Port2) |
+					    (OCTOSPI2:$ModeExist_O2_P1_CLK &amp; OCTOSPI2:$ModeExist_O2_P2_CLK)
+					    " Diagnostic=""/>
+
+                                    <ModeLogicOperator Name="XOR">
+                                            <Mode Name="single_mode" UserName="Single SPI">
+						    <Condition Expression="
+							    !s_o1_singlemx &amp;
+							    !s_o1_dualmx &amp;
+							    !s_o1_quadmx &amp;
+							    !s_o1_dualsinglemx &amp;
+							    !s_o1_dualdualmx &amp;
+							    !s_o1_dualquadmx &amp;
+							    !s_o1_octomx &amp;
+							    !s_o1_hyperbusmx
+							    " Diagnostic=""/>
+                                                    <SignalLogicalOp Name="AND">
+                                                            <Signal Name="VS_dual"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>Sem_$IpInstance_Single</Semaphore>
+                                            </Mode>
+					    <Mode Name="single_mode_mx" UserName="Single SPI -- MULTIPLEXED --" RemoveCondition="DIE470">
+						    <Condition Expression="
+							    s_o1_singlemx
+							    " Diagnostic=""/>
+                                                    <SignalLogicalOp Name="AND">
+                                                            <Signal Name="VS_dual_mx"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>s_o2_singlemx</Semaphore>
+                                            </Mode> 
+                                            <Mode Name="dual_mode" UserName="Dual SPI">
+						    <Condition Expression="
+							    !s_o1_singlemx &amp;
+							    !s_o1_dualmx &amp;
+							    !s_o1_quadmx &amp;
+							    !s_o1_dualsinglemx &amp;
+							    !s_o1_dualdualmx &amp;
+							    !s_o1_dualquadmx &amp;
+							    !s_o1_octomx &amp;
+							    !s_o1_hyperbusmx
+							    " Diagnostic=""/> 
+                                                    <SignalLogicalOp Name="AND">
+                                                            <Signal Name="VS_dual"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>Sem_$IpInstance_Dual</Semaphore>
+                                            </Mode>
+					    <Mode Name="dual_mode_mx" UserName="Dual SPI -- MULTIPLEXED --" RemoveCondition="DIE470">
+						    <Condition Expression="
+							    s_o1_dualmx
+							    " Diagnostic=""/>
+                                                    <SignalLogicalOp Name="AND">
+                                                            <Signal Name="VS_dual_mx"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>s_o2_dualmx</Semaphore>
+                                            </Mode>
+                                            <Mode Name="quad_mode" UserName="Quad SPI">
+						    <Condition Expression="
+							    !s_o1_singlemx &amp;
+							    !s_o1_dualmx &amp;
+							    !s_o1_quadmx &amp;
+							    !s_o1_dualsinglemx &amp;
+							    !s_o1_dualdualmx &amp;
+							    !s_o1_dualquadmx &amp;
+							    !s_o1_octomx &amp;
+							    !s_o1_hyperbusmx
+							    " Diagnostic=""/>
+                                                    <SignalLogicalOp Name="AND">
+                                                            <Signal Name="VS_quad"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>Sem_$IpInstance_Quad</Semaphore>
+                                            </Mode>
+					    <Mode Name="quad_mode_mx" UserName="Quad SPI -- MULTIPLEXED --" RemoveCondition="DIE470">
+						    <Condition Expression="
+							    s_o1_quadmx
+							    " Diagnostic=""/>
+                                                    <SignalLogicalOp Name="AND">
+                                                            <Signal Name="VS_quad_mx"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>s_o2_quadmx</Semaphore>
+                                            </Mode>
+					    <Mode Name="dual_single_mode" UserName="Dual-Single SPI">
+						    <Condition Expression="
+							    !s_o1_singlemx &amp;
+							    !s_o1_dualmx &amp;
+							    !s_o1_quadmx &amp;
+							    !s_o1_dualsinglemx &amp;
+							    !s_o1_dualdualmx &amp;
+							    !s_o1_dualquadmx &amp;
+							    !s_o1_octomx &amp;
+							    !s_o1_hyperbusmx
+							    " Diagnostic=""/>
+                                                    <SignalLogicalOp Name="AND">
+                                                            <Signal Name="VS_dualsingle"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>Sem_$IpInstance_DualSingle</Semaphore>
+                                            </Mode>
+					    <Mode Name="dual_single_mode_mx" UserName="Dual-Single SPI -- MULTIPLEXED --" RemoveCondition="DIE470">
+						    <Condition Expression="
+							    s_o1_dualsinglemx
+							    " Diagnostic=""/>
+                                                    <SignalLogicalOp Name="AND">
+                                                            <Signal Name="VS_octo_mx"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>s_o2_dualsinglemx</Semaphore>
+                                            </Mode>
+					    <Mode Name="dual_dual_mode" UserName="Dual-Dual SPI">
+						    <Condition Expression="
+							    !s_o1_singlemx &amp;
+							    !s_o1_dualmx &amp;
+							    !s_o1_quadmx &amp;
+							    !s_o1_dualsinglemx &amp;
+							    !s_o1_dualdualmx &amp;
+							    !s_o1_dualquadmx &amp;
+							    !s_o1_octomx &amp;
+							    !s_o1_hyperbusmx
+							    " Diagnostic=""/>
+                                                    <SignalLogicalOp Name="AND">
+                                                            <Signal Name="VS_dualdual"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>Sem_$IpInstance_DualDual</Semaphore>
+                                            </Mode>
+					    <Mode Name="dual_dual_mode_mx" UserName="Dual-Dual SPI -- MULTIPLEXED --" RemoveCondition="DIE470">
+						    <Condition Expression="
+							    s_o1_dualdualmx
+							    " Diagnostic=""/>
+                                                    <SignalLogicalOp Name="AND">
+                                                            <Signal Name="VS_octo_mx"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>s_o2_dualdualmx</Semaphore>
+                                            </Mode>
+                                            <Mode Name="dual_quad_mode_mx" UserName="Dual-Quad SPI">
+						    <Condition Expression="
+							    !s_o1_singlemx &amp;
+							    !s_o1_dualmx &amp;
+							    !s_o1_quadmx &amp;
+							    !s_o1_dualsinglemx &amp;
+							    !s_o1_dualdualmx &amp;
+							    !s_o1_dualquadmx &amp;
+							    !s_o1_octomx &amp;
+							    !s_o1_hyperbusmx
+							    " Diagnostic=""/>
+                                                    <SignalLogicalOp Name="AND">
+                                                            <Signal Name="VS_octo"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>Sem_$IpInstance_DualQuad</Semaphore>
+                                            </Mode>
+					    <Mode Name="dual_quad_mode_mx" UserName="Dual-Quad SPI -- MULTIPLEXED --" RemoveCondition="DIE470">
+						    <Condition Expression="
+							    s_o1_dualquadmx
+							    " Diagnostic=""/>
+                                                    <SignalLogicalOp Name="AND">
+                                                            <Signal Name="VS_octo_mx"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>s_o2_dualquadmx</Semaphore>
+                                            </Mode>
+                                            <Mode Name="octo_mode" UserName="Octo SPI">
+						    <Condition Expression="
+							    !s_o1_singlemx &amp;
+							    !s_o1_dualmx &amp;
+							    !s_o1_quadmx &amp;
+							    !s_o1_dualsinglemx &amp;
+							    !s_o1_dualdualmx &amp;
+							    !s_o1_dualquadmx &amp;
+							    !s_o1_octomx &amp;
+							    !s_o1_hyperbusmx
+							    " Diagnostic=""/>
+                                                    <SignalLogicalOp Name="AND">
+                                                            <Signal Name="VS_octo"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>Sem_$IpInstance_Octo</Semaphore>
+                                            </Mode>
+					    <Mode Name="octo_mode_mx" UserName="Octo SPI -- MULTIPLEXED --" RemoveCondition="DIE470">
+						    <Condition Expression="
+							    s_o1_octomx
+							    " Diagnostic=""/>
+                                                    <SignalLogicalOp Name="AND">
+                                                            <Signal Name="VS_octo_mx"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>s_o2_octomx</Semaphore>
+                                            </Mode>
+					    <Mode Name="hyperbus_mode" UserName="HyperBus(TM)">
+						    <Condition Expression="
+							    !s_o1_singlemx &amp;
+							    !s_o1_dualmx &amp;
+							    !s_o1_quadmx &amp;
+							    !s_o1_dualsinglemx &amp;
+							    !s_o1_dualdualmx &amp;
+							    !s_o1_dualquadmx &amp;
+							    !s_o1_octomx &amp;
+							    !s_o1_hyperbusmx
+							    " Diagnostic=""/>
+                                                    <SignalLogicalOp Name="AND">
+                                                            <Signal Name="VS_octo"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>Sem_$IpInstance_HyperBus</Semaphore>
+                                            </Mode>
+					    <Mode Name="hyperbus_mode_mx" UserName="HyperBus(TM) -- MULTIPLEXED --" RemoveCondition="DIE470">
+						    <Condition Expression="
+							    s_o1_hyperbusmx
+							    " Diagnostic=""/>
+                                                    <SignalLogicalOp Name="AND">
+                                                            <Signal Name="VS_hyperbus_mx"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>s_o2_hyperbusmx</Semaphore>
+                                            </Mode>
+                                    </ModeLogicOperator>
+                                    <Semaphore>Sem_$IpInstance_O2_Used</Semaphore>
+                            </Mode>
+
+			    <!-- OCTOSPI1 modes -->
+			    <Mode Name="OCTOSPI1_Clock_CLK" UserName="Clock"  RemoveCondition="$Index=2">
+                                    <ModeLogicOperator Name="XOR">
+                                            <Mode Name="O1_P1_CLK" UserName="Port1 CLK">
+						    <Condition Expression="
+							    !Sem_OSPI2_CLK_Port1 &amp;
+							    (Sem_$IpInstance_Single |
+							    Sem_$IpInstance_Dual |
+							    Sem_$IpInstance_Quad |
+							    Sem_$IpInstance_DualSingle |
+							    Sem_$IpInstance_DualDual |
+							    Sem_$IpInstance_DualQuad |
+							    Sem_$IpInstance_Octo |
+							    Sem_$IpInstance_HyperBus)
+							    " Diagnostic=""/>
+                                                    <SignalLogicalOp Name="AND">
+                                                            <Signal Name="$SingleInstanceOCTOSPIM_P1_CLK"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>Sem_Port1CLK_$IpInstance_CLK</Semaphore>
+						    <Semaphore>Sem_OSPI1_CLK_Port1</Semaphore>
+                                            </Mode>
+					    <Mode Name="O1_P1_CLK_MX" UserName="Port1 CLK -- MULTIPLEXED --" RemoveCondition="!OCTOSPI1:$ModeExist_O1_P1_CLK | DIE470">
+						    <Condition Expression=" 
+							    (s_o1_singlemx |
+							    s_o1_dualmx |
+							    s_o1_quadmx |
+							    s_o1_dualsinglemx |
+							    s_o1_dualdualmx |
+							    s_o1_dualquadmx |
+							    s_o1_octomx |
+							    s_o1_hyperbusmx)
+							    " Diagnostic=""/>
+                                                    <SignalLogicalOp Name="AND">
+                                                            <Signal Name="$SingleInstanceOCTOSPIM_P1_CLK"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>Sem_Port1CLK_$IpInstance_CLK</Semaphore>
+						    <Semaphore>Sem_OSPI1_CLK_Port1_MX</Semaphore>
+                                            </Mode>
+                                            <Mode Name="O1_P2_CLK" UserName="Port2 CLK">
+						    <Condition Expression="
+							    !Sem_OSPI2_CLK_Port2 &amp;
+							    (Sem_$IpInstance_Single |
+							    Sem_$IpInstance_Dual |
+							    Sem_$IpInstance_Quad |
+							    Sem_$IpInstance_DualSingle |
+							    Sem_$IpInstance_DualDual |
+							    Sem_$IpInstance_DualQuad |
+							    Sem_$IpInstance_Octo |
+							    Sem_$IpInstance_HyperBus)
+							    " Diagnostic=""/>
+                                                    <SignalLogicalOp Name="AND">
+                                                            <Signal Name="$SingleInstanceOCTOSPIM_P2_CLK"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>Sem_Port2CLK_$IpInstance_CLK</Semaphore>
+						    <Semaphore>Sem_OSPI1_CLK_Port2</Semaphore>
+                                            </Mode>
+					    <Mode Name="O1_P2_CLK_MX" UserName="Port2 CLK -- MULTIPLEXED --" RemoveCondition="!OCTOSPI1:$ModeExist_O1_P2_CLK | DIE470">
+						    <Condition Expression=" 
+							    (s_o1_singlemx |
+							    s_o1_dualmx |
+							    s_o1_quadmx |
+							    s_o1_dualsinglemx |
+							    s_o1_dualdualmx |
+							    s_o1_dualquadmx |
+							    s_o1_octomx |
+							    s_o1_hyperbusmx)
+							    " Diagnostic=""/>
+                                                    <SignalLogicalOp Name="AND">
+                                                            <Signal Name="$SingleInstanceOCTOSPIM_P2_CLK"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>Sem_Port2CLK_$IpInstance_CLK</Semaphore>
+						    <Semaphore>Sem_OSPI1_CLK_Port2_MX</Semaphore>
+                                            </Mode>
+                                    </ModeLogicOperator>
+                                    <Semaphore>Sem_$IpInstance_CLK</Semaphore>
+                            </Mode>
+
+                            <Mode Name="OCTOSPI1_Clock_NCLK" UserName="HyperBus(TM) 1.8V Inverted Clock"  RemoveCondition="($Index=2)">
+                                    <ModeLogicOperator Name="XOR">
+                                            <Mode Name="OCTOSPI1_Port1_NCLK" UserName="Port1 NCLK" RemoveCondition="!(DIE471)">
+						    <Condition Expression="
+							    !Sem_OSPI2_NCLK_Port1 &amp;
+							    (Sem_$IpInstance_HyperBus &amp;
+							    Sem_Port1CLK_$IpInstance_CLK)
+							    " Diagnostic=""/>
+                                                    <SignalLogicalOp Name="AND">
+                                                            <Signal Name="$SingleInstanceOCTOSPIM_P1_NCLK"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>Sem_Port1CLK_$IpInstance_NCLK</Semaphore>
+						    <Semaphore>Sem_OSPI1_NCLK_Port1</Semaphore>
+					    </Mode>
+					    <Mode Name="OCTOSPI1_Port1_NCLK_MX" UserName="Port1 NCLK -- MULTIPLEXED --" RemoveCondition="!(DIE471)">
+						    <Condition Expression="
+							    s_o1_hyperbusmx
+							    " Diagnostic=""/>
+                                                    <SignalLogicalOp Name="AND">
+                                                            <Signal Name="$SingleInstanceOCTOSPIM_P1_NCLK"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>Sem_Port1CLK_$IpInstance_NCLK</Semaphore>
+						    <Semaphore>Sem_OSPI1_NCLK_Port1_MX</Semaphore>
+                                            </Mode>
+                                            <Mode Name="OCTOSPI1_Port2_NCLK" UserName="Port2 NCLK" RemoveCondition="!(DIE471)">
+						    <Condition Expression="
+							    !Sem_OSPI2_NCLK_Port2 &amp;
+							    (Sem_$IpInstance_HyperBus &amp;
+							    Sem_Port2CLK_$IpInstance_CLK)
+							    " Diagnostic=""/>
+                                                    <SignalLogicalOp Name="AND">
+                                                            <Signal Name="$SingleInstanceOCTOSPIM_P2_NCLK"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>Sem_Port2CLK_$IpInstance_NCLK</Semaphore>
+						    <Semaphore>Sem_OSPI1_NCLK_Port2</Semaphore>
+					    </Mode>
+					    <Mode Name="OCTOSPI1_Port2_NCLK_MX" UserName="Port2 NCLK -- MULTIPLEXED --" RemoveCondition="!(DIE471)">
+						    <Condition Expression="
+							    s_o1_hyperbusmx
+							    " Diagnostic=""/>
+                                                    <SignalLogicalOp Name="AND">
+                                                            <Signal Name="$SingleInstanceOCTOSPIM_P2_NCLK"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>Sem_Port2CLK_$IpInstance_NCLK</Semaphore>
+						    <Semaphore>Sem_OSPI1_NCLK_Port2_MX</Semaphore>
+                                            </Mode>
+                                    </ModeLogicOperator>
+                                    <Semaphore>Sem_$IpInstance_NCLK</Semaphore>
+			    </Mode>
+
+			    <Mode Name="OCTOSPI1_Control_NCS" UserName="Chip Select"  RemoveCondition="($Index=2)">
+                                    <ModeLogicOperator Name="XOR">
+                                            <Mode Name="OCTOSPI1_Port1_NCS" UserName="Port1 NCS">
+						    <Condition Expression="
+							    !Sem_OSPI2_NCS_Port1 &amp;
+							    (Sem_$IpInstance_Single |
+							    Sem_$IpInstance_Dual |
+							    Sem_$IpInstance_Quad |
+							    Sem_$IpInstance_DualSingle |
+							    Sem_$IpInstance_DualDual |
+							    Sem_$IpInstance_DualQuad |
+							    Sem_$IpInstance_Octo |
+							    Sem_$IpInstance_HyperBus |
+							    s_o1_singlemx |
+							    s_o1_dualmx |
+							    s_o1_quadmx |
+							    s_o1_dualsinglemx |
+							    s_o1_dualdualmx |
+							    s_o1_dualquadmx |
+							    s_o1_octomx |
+							    s_o1_hyperbusmx
+							    )" Diagnostic=""/>
+                                                    <SignalLogicalOp Name="AND">
+                                                            <Signal Name="$SingleInstanceOCTOSPIM_P1_NCS"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>Sem_Port1NCS_$IpInstance_NCS</Semaphore>
+						    <Semaphore>Sem_OSPI1_NCS_Port1</Semaphore>
+                                            </Mode>
+                                            <Mode Name="OCTOSPI1_Port2_NCS" UserName="Port2 NCS">
+						    <Condition Expression="
+							    !Sem_OSPI2_NCS_Port2 &amp;
+							    (Sem_$IpInstance_Single |
+							    Sem_$IpInstance_Dual |
+							    Sem_$IpInstance_Quad |
+							    Sem_$IpInstance_DualSingle |
+							    Sem_$IpInstance_DualDual |
+							    Sem_$IpInstance_DualQuad |
+							    Sem_$IpInstance_Octo |
+							    Sem_$IpInstance_HyperBus |
+							    s_o1_singlemx |
+							    s_o1_dualmx |
+							    s_o1_quadmx |
+							    s_o1_dualsinglemx |
+							    s_o1_dualdualmx |
+							    s_o1_dualquadmx |
+							    s_o1_octomx |
+							    s_o1_hyperbusmx
+							    )" Diagnostic=""/>
+                                                    <SignalLogicalOp Name="AND">
+                                                            <Signal Name="$SingleInstanceOCTOSPIM_P2_NCS"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>Sem_Port2NCS_$IpInstance_NCS</Semaphore>
+						    <Semaphore>Sem_OSPI1_NCS_Port2</Semaphore>
+                                            </Mode>
+                                    </ModeLogicOperator>
+                                    <Semaphore>Sem_$IpInstance_NCS</Semaphore>
+                            </Mode>
+
+			    <Mode Name="OCTOSPI1_DQS" UserName="Data Strobe"  RemoveCondition="($Index=2)">
+                                    <ModeLogicOperator Name="XOR">
+                                            <Mode Name="OCTOSPI1_Port1_DQS" UserName="Port1 DQS (RWDS)">
+						    <Condition Expression="
+							    !Sem_OSPI2_DQS_Port1 &amp;
+							    (Sem_$IpInstance_Octo|Sem_$IpInstance_HyperBus)" Diagnostic=""/>
+                                                    <SignalLogicalOp Name="AND">
+                                                            <Signal Name="$SingleInstanceOCTOSPIM_P1_DQS"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>Sem_Port1DQS_$IpInstance_DQS</Semaphore>
+						    <Semaphore>Sem_OSPI1_DQS_Port1</Semaphore>
+                                            </Mode>
+					    <Mode Name="OCTOSPI1_Port1_DQS_MX" UserName="Port1 DQS (RWDS) -- MULTIPLEXED --" RemoveCondition="!OCTOSPI1:$ModeExist_OCTOSPI1_Port1_DQS | DIE470">
+						    <Condition Expression="
+							    (s_o1_octomx |
+							    s_o1_hyperbusmx)
+							    " Diagnostic=""/>
+                                                    <SignalLogicalOp Name="AND">
+                                                            <Signal Name="$SingleInstanceOCTOSPIM_P1_DQS"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>Sem_Port1DQS_$IpInstance_DQS</Semaphore>
+						    <Semaphore>Sem_OSPI1_DQS_Port1_MX</Semaphore>
+                                            </Mode>
+                                            <Mode Name="OCTOSPI1_Port2_DQS" UserName="Port2 DQS (RWDS)">
+						    <Condition Expression="
+							    !Sem_OSPI2_DQS_Port2 &amp;
+							    (Sem_$IpInstance_Octo|Sem_$IpInstance_HyperBus)" Diagnostic=""/>
+                                                    <SignalLogicalOp Name="AND">
+                                                            <Signal Name="$SingleInstanceOCTOSPIM_P2_DQS"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>Sem_Port2DQS_$IpInstance_DQS</Semaphore>
+						    <Semaphore>Sem_OSPI1_DQS_Port2</Semaphore>
+					    </Mode>
+					    <Mode Name="OCTOSPI1_Port2_DQS_MX" UserName="Port2 DQS (RWDS) -- MULTIPLEXED --" RemoveCondition="!OCTOSPI1:$ModeExist_OCTOSPI1_Port2_DQS | DIE470">
+						    <Condition Expression="
+							    (s_o1_octomx |
+							    s_o1_hyperbusmx)
+							    " Diagnostic=""/>
+                                                    <SignalLogicalOp Name="AND">
+                                                            <Signal Name="$SingleInstanceOCTOSPIM_P2_DQS"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>Sem_Port2DQS_$IpInstance_DQS</Semaphore>
+						    <Semaphore>Sem_OSPI1_DQS_Port2_MX</Semaphore>
+					    </Mode>
+                                    </ModeLogicOperator>
+                                    <Semaphore>Sem_$IpInstance_DQS</Semaphore>
+                            </Mode>
+
                             <Mode Name="OCTOSPI1_Data[3:0]" UserName="Data [3:0]"  RemoveCondition="$Index=2">
                                     <ModeLogicOperator Name="XOR">
-                                            <Mode Name="OCTOSPI1_IOL_Port1L1" UserName="Port1 IO[1:0]">
+                                            <Mode Name="OCTOSPI1_IOL_Port1L_10" UserName="Port1 IO[1:0]">
 						    <Condition Expression="
 							    (!Sem_OSPI2_DataL_Port1L_10 &amp; !Sem_OSPI2_DataH_Port1L_10) &amp;
 							    (!Sem_OSPI2_DataL_Port1L &amp; !Sem_OSPI2_DataH_Port1L) &amp;
@@ -734,7 +1326,24 @@
                                                     <Semaphore>Sem_Port1L_$IpInstance_IOL</Semaphore>
 						    <Semaphore>Sem_OSPI1_DataL_Port1L_10</Semaphore>
                                             </Mode>
-                                            <Mode Name="OCTOSPI1_IOL_Port1L2" UserName="Port1 IO[3:0]">
+
+					    <Mode Name="OCTOSPI1_IOL_Port1L_10_MX" UserName="Port1 IO[1:0] -- MULTIPLEXED --" RemoveCondition="!OCTOSPI1:$ModeExist_OCTOSPI1_IOL_Port1L_10 | DIE470">
+						    <Condition Expression="
+							    !Sem_OSPI1_DataH_Port1L_10_MX &amp; 
+							    (s_o1_singlemx |
+							    s_o1_dualmx |
+							    s_o1_dualsinglemx |
+							    s_o1_dualdualmx)
+							    " Diagnostic=""/>
+                                                    <SignalLogicalOp Name="AND">
+                                                            <Signal Name="$SingleInstanceOCTOSPIM_P1_IO0"/>
+                                                            <Signal Name="$SingleInstanceOCTOSPIM_P1_IO1"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>Sem_Port1L_$IpInstance_IOL</Semaphore>
+                                                    <Semaphore>Sem_OSPI1_DataL_Port1L_10_MX</Semaphore>
+                                            </Mode>
+
+                                            <Mode Name="OCTOSPI1_IOL_Port1L" UserName="Port1 IO[3:0]">
 						    <Condition Expression="
 							    (!Sem_OSPI2_DataL_Port1L_10 &amp; !Sem_OSPI2_DataH_Port1L_10) &amp;
 							    (!Sem_OSPI2_DataL_Port1L &amp; !Sem_OSPI2_DataH_Port1L) &amp;
@@ -749,7 +1358,26 @@
                                                     <Semaphore>Sem_Port1L_$IpInstance_IOL</Semaphore>
 						    <Semaphore>Sem_OSPI1_DataL_Port1L</Semaphore>
                                             </Mode>
-                                            <Mode Name="OCTOSPI1_IOL_Port1H1" UserName="Port1 IO[5:4]">
+
+					    <Mode Name="OCTOSPI1_IOL_Port1L_30_MX" UserName="Port1 IO[3:0] -- MULTIPLEXED --" RemoveCondition="!OCTOSPI1:$ModeExist_OCTOSPI1_IOL_Port1L | DIE470">
+						    <Condition Expression="
+							    !Sem_OSPI1_DataH_Port1L_30_MX &amp;
+							    (s_o1_quadmx |
+							    s_o1_dualquadmx |
+							    s_o1_octomx |
+							    s_o1_hyperbusmx)
+							    " Diagnostic=""/>
+                                                    <SignalLogicalOp Name="AND">
+                                                            <Signal Name="$SingleInstanceOCTOSPIM_P1_IO0"/>
+                                                            <Signal Name="$SingleInstanceOCTOSPIM_P1_IO1"/>
+                                                            <Signal Name="$SingleInstanceOCTOSPIM_P1_IO2"/>
+                                                            <Signal Name="$SingleInstanceOCTOSPIM_P1_IO3"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>Sem_Port1L_$IpInstance_IOL</Semaphore>
+                                                    <Semaphore>Sem_OSPI1_DataL_Port1L_30_MX</Semaphore>
+					    </Mode>
+
+                                            <Mode Name="OCTOSPI1_IOL_Port1H_54" UserName="Port1 IO[5:4]">
 						    <Condition Expression="
 							    (!Sem_OSPI2_DataL_Port1H_54 &amp; !Sem_OSPI2_DataH_Port1H_54) &amp;
 							    (!Sem_OSPI2_DataL_Port1H &amp; !Sem_OSPI2_DataH_Port1H) &amp;
@@ -762,7 +1390,24 @@
                                                     <Semaphore>Sem_Port1H_$IpInstance_IOL</Semaphore>
 						    <Semaphore>Sem_OSPI1_DataL_Port1H_54</Semaphore>
                                             </Mode>
-                                            <Mode Name="OCTOSPI1_IOL_Port1H2" UserName="Port1 IO[7:4]">
+
+					    <Mode Name="OCTOSPI1_IOL_Port1H_54_MX" UserName="Port1 IO[5:4] -- MULTIPLEXED --" RemoveCondition="!OCTOSPI1:$ModeExist_OCTOSPI1_IOL_Port1H_54 | DIE470">
+						    <Condition Expression="
+							    !Sem_OSPI1_DataH_Port1H_54_MX &amp;
+							    (s_o1_singlemx |
+							    s_o1_dualmx |
+							    s_o1_dualsinglemx |
+							    s_o1_dualdualmx)
+							    " Diagnostic=""/>
+                                                    <SignalLogicalOp Name="AND">
+                                                            <Signal Name="$SingleInstanceOCTOSPIM_P1_IO4"/>
+                                                            <Signal Name="$SingleInstanceOCTOSPIM_P1_IO5"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>Sem_Port1H_$IpInstance_IOL</Semaphore>
+                                                    <Semaphore>Sem_OSPI1_DataL_Port1H_54_MX</Semaphore>
+                                            </Mode>
+
+                                            <Mode Name="OCTOSPI1_IOL_Port1H" UserName="Port1 IO[7:4]">
 						    <Condition Expression="
 							    (!Sem_OSPI2_DataL_Port1H_54 &amp; !Sem_OSPI2_DataH_Port1H_54) &amp;
 							    (!Sem_OSPI2_DataL_Port1H &amp; !Sem_OSPI2_DataH_Port1H) &amp;
@@ -777,7 +1422,26 @@
                                                     <Semaphore>Sem_Port1H_$IpInstance_IOL</Semaphore>
 						    <Semaphore>Sem_OSPI1_DataL_Port1H</Semaphore>
                                             </Mode>
-                                            <Mode Name="OCTOSPI1_IOL_Port2L1" UserName="Port2 IO[1:0]">
+
+					    <Mode Name="OCTOSPI1_IOL_Port1H_74_MX" UserName="Port1 IO[7:4] -- MULTIPLEXED --" RemoveCondition="!OCTOSPI1:$ModeExist_OCTOSPI1_IOL_Port1H | DIE470">
+						    <Condition Expression="
+							    !Sem_OSPI1_DataH_Port1H_74_MX &amp;
+							    (s_o1_quadmx |
+							    s_o1_dualquadmx |
+							    s_o1_octomx |
+							    s_o1_hyperbusmx)
+							    " Diagnostic=""/>
+                                                    <SignalLogicalOp Name="AND">
+                                                            <Signal Name="$SingleInstanceOCTOSPIM_P1_IO4"/>
+                                                            <Signal Name="$SingleInstanceOCTOSPIM_P1_IO5"/>
+                                                            <Signal Name="$SingleInstanceOCTOSPIM_P1_IO6"/>
+                                                            <Signal Name="$SingleInstanceOCTOSPIM_P1_IO7"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>Sem_Port1H_$IpInstance_IOL</Semaphore>
+                                                    <Semaphore>Sem_OSPI1_DataL_Port1H_74_MX</Semaphore>
+                                            </Mode>
+
+                                            <Mode Name="OCTOSPI1_IOL_Port2L_10" UserName="Port2 IO[1:0]">
 						    <Condition Expression="
 							    (!Sem_OSPI2_DataL_Port2L_10 &amp; !Sem_OSPI2_DataH_Port2L_10) &amp;
 							    (!Sem_OSPI2_DataL_Port2L &amp; !Sem_OSPI2_DataH_Port2L) &amp;
@@ -789,8 +1453,25 @@
                                                     </SignalLogicalOp>
                                                     <Semaphore>Sem_Port2L_$IpInstance_IOL</Semaphore>
 						    <Semaphore>Sem_OSPI1_DataL_Port2L_10</Semaphore>
+					    </Mode>
+
+					    <Mode Name="OCTOSPI1_IOL_Port2L_10_MX" UserName="Port2 IO[1:0] -- MULTIPLEXED --" RemoveCondition="!OCTOSPI1:$ModeExist_OCTOSPI1_IOL_Port2L_10 | DIE470">
+						    <Condition Expression="
+							    !Sem_OSPI1_DataH_Port2L_10_MX &amp; 
+							    (s_o1_singlemx |
+							    s_o1_dualmx |
+							    s_o1_dualsinglemx |
+							    s_o1_dualdualmx)
+							    " Diagnostic=""/>
+                                                    <SignalLogicalOp Name="AND">
+                                                            <Signal Name="$SingleInstanceOCTOSPIM_P2_IO0"/>
+                                                            <Signal Name="$SingleInstanceOCTOSPIM_P2_IO1"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>Sem_Port2L_$IpInstance_IOL</Semaphore>
+                                                    <Semaphore>Sem_OSPI1_DataL_Port2L_10_MX</Semaphore>
                                             </Mode>
-                                            <Mode Name="OCTOSPI1_IOL_Port2L2" UserName="Port2 IO[3:0]">
+
+                                            <Mode Name="OCTOSPI1_IOL_Port2L" UserName="Port2 IO[3:0]">
 						    <Condition Expression="
 							    (!Sem_OSPI2_DataL_Port2L_10 &amp; !Sem_OSPI2_DataH_Port2L_10) &amp;
 							    (!Sem_OSPI2_DataL_Port2L &amp; !Sem_OSPI2_DataH_Port2L) &amp;
@@ -804,8 +1485,27 @@
                                                     </SignalLogicalOp>
                                                     <Semaphore>Sem_Port2L_$IpInstance_IOL</Semaphore>
 						    <Semaphore>Sem_OSPI1_DataL_Port2L</Semaphore>
+					    </Mode>
+
+					    <Mode Name="OCTOSPI1_IOL_Port2L_30_MX" UserName="Port2 IO[3:0] -- MULTIPLEXED --" RemoveCondition="!OCTOSPI1:$ModeExist_OCTOSPI1_IOL_Port2L | DIE470">
+						    <Condition Expression="
+							    !Sem_OSPI1_DataH_Port2L_30_MX &amp;
+							    (s_o1_quadmx |
+							    s_o1_dualquadmx |
+							    s_o1_octomx |
+							    s_o1_hyperbusmx)
+							    " Diagnostic=""/>
+                                                    <SignalLogicalOp Name="AND">
+                                                            <Signal Name="$SingleInstanceOCTOSPIM_P2_IO0"/>
+                                                            <Signal Name="$SingleInstanceOCTOSPIM_P2_IO1"/>
+                                                            <Signal Name="$SingleInstanceOCTOSPIM_P2_IO2"/>
+                                                            <Signal Name="$SingleInstanceOCTOSPIM_P2_IO3"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>Sem_Port2L_$IpInstance_IOL</Semaphore>
+                                                    <Semaphore>Sem_OSPI1_DataL_Port2L_30_MX</Semaphore>
                                             </Mode>
-                                            <Mode Name="OCTOSPI1_IOL_Port2H1" UserName="Port2 IO[5:4]">
+
+                                            <Mode Name="OCTOSPI1_IOL_Port2H_54" UserName="Port2 IO[5:4]">
 						    <Condition Expression="
 							    (!Sem_OSPI2_DataL_Port2H_54 &amp; !Sem_OSPI2_DataH_Port2H_54) &amp;
 							    (!Sem_OSPI2_DataL_Port2H &amp; !Sem_OSPI2_DataH_Port2H) &amp;
@@ -818,7 +1518,24 @@
                                                     <Semaphore>Sem_Port2H_$IpInstance_IOL</Semaphore>
 						    <Semaphore>Sem_OSPI1_DataL_Port2H_54</Semaphore>
                                             </Mode>
-                                            <Mode Name="OCTOSPI1_IOL_Port2H2" UserName="Port2 IO[7:4]">
+
+					    <Mode Name="OCTOSPI1_IOL_Port2H_54_MX" UserName="Port2 IO[5:4] -- MULTIPLEXED --" RemoveCondition="!OCTOSPI1:$ModeExist_OCTOSPI1_IOL_Port2H_54 | DIE470">
+						    <Condition Expression="
+							    !Sem_OSPI1_DataH_Port2H_54_MX &amp; 
+							    (s_o1_singlemx |
+							    s_o1_dualmx |
+							    s_o1_dualsinglemx |
+							    s_o1_dualdualmx)
+							    " Diagnostic=""/>
+                                                    <SignalLogicalOp Name="AND">
+                                                            <Signal Name="$SingleInstanceOCTOSPIM_P2_IO4"/>
+                                                            <Signal Name="$SingleInstanceOCTOSPIM_P2_IO5"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>Sem_Port2H_$IpInstance_IOL</Semaphore>
+                                                    <Semaphore>Sem_OSPI1_DataL_Port2H_54_MX</Semaphore>
+					    </Mode>
+
+                                            <Mode Name="OCTOSPI1_IOL_Port2H" UserName="Port2 IO[7:4]">
 						    <Condition Expression="
 							    (!Sem_OSPI2_DataL_Port2H_54 &amp; !Sem_OSPI2_DataH_Port2H_54) &amp;
 							    (!Sem_OSPI2_DataL_Port2H &amp; !Sem_OSPI2_DataH_Port2H) &amp;
@@ -833,12 +1550,32 @@
                                                     <Semaphore>Sem_Port2H_$IpInstance_IOL</Semaphore>
 						    <Semaphore>Sem_OSPI1_DataL_Port2H</Semaphore>
                                             </Mode>
+
+					    <Mode Name="OCTOSPI1_IOL_Port2H_74_MX" UserName="Port2 IO[7:4] -- MULTIPLEXED --" RemoveCondition="!OCTOSPI1:$ModeExist_OCTOSPI1_IOL_Port2H | DIE470">
+						    <Condition Expression="
+							    !Sem_OSPI1_DataH_Port2H_74_MX &amp;
+							    (s_o1_quadmx |
+							    s_o1_dualquadmx |
+							    s_o1_octomx |
+							    s_o1_hyperbusmx)
+							    " Diagnostic=""/>
+                                                    <SignalLogicalOp Name="AND">
+                                                            <Signal Name="$SingleInstanceOCTOSPIM_P2_IO4"/>
+                                                            <Signal Name="$SingleInstanceOCTOSPIM_P2_IO5"/>
+                                                            <Signal Name="$SingleInstanceOCTOSPIM_P2_IO6"/>
+                                                            <Signal Name="$SingleInstanceOCTOSPIM_P2_IO7"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>Sem_Port2H_$IpInstance_IOL</Semaphore>
+                                                    <Semaphore>Sem_OSPI1_DataL_Port2H_74_MX</Semaphore>
+					    </Mode>
+
                                     </ModeLogicOperator>
-                                    <Semaphore>Sem_$IpInstance_DataL</Semaphore>
+				    <!-- <Semaphore>Sem_$IpInstance_DataL</Semaphore> -->
                             </Mode>
+
                             <Mode Name="OCTOSPI1_Data[7:4]" UserName="Data [7:4]"  RemoveCondition="$Index=2">
                                     <ModeLogicOperator Name="XOR">
-                                            <Mode Name="OCTOSPI1_IOH1_Port1L" UserName="Port1 IO[1:0]">
+                                            <Mode Name="OCTOSPI1_IOH_Port1L_10" UserName="Port1 IO[1:0]">
 						    <Condition Expression="
 							    (!Sem_OSPI2_DataL_Port1L_10 &amp; !Sem_OSPI2_DataH_Port1L_10) &amp;
 							    (!Sem_OSPI2_DataL_Port1L &amp; !Sem_OSPI2_DataH_Port1L) &amp;
@@ -851,7 +1588,22 @@
                                                     <Semaphore>Sem_Port1L_$IpInstance_IOH</Semaphore>                                         
 						    <Semaphore>Sem_OSPI1_DataH_Port1L_10</Semaphore>
                                             </Mode>
-                                            <Mode Name="OCTOSPI1_IOH1_Port1L" UserName="Port1 IO[3:0]">
+
+					    <Mode Name="OCTOSPI1_IOH_Port1L_10_MX" UserName="Port1 IO[1:0] -- MULTIPLEXED --" RemoveCondition="!OCTOSPI1:$ModeExist_OCTOSPI1_IOH_Port1L_10 | DIE470">
+						    <Condition Expression="
+							    !Sem_OSPI1_DataL_Port1L_10_MX &amp;
+							    (s_o1_dualsinglemx |
+							    s_o1_dualdualmx)
+							    " Diagnostic=""/>
+                                                    <SignalLogicalOp Name="AND">
+                                                            <Signal Name="$SingleInstanceOCTOSPIM_P1_IO0"/>
+                                                            <Signal Name="$SingleInstanceOCTOSPIM_P1_IO1"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>Sem_Port1L_$IpInstance_IOH</Semaphore>                                         
+                                                    <Semaphore>Sem_OSPI1_DataH_Port1L_10_MX</Semaphore>
+					    </Mode>
+
+                                            <Mode Name="OCTOSPI1_IOH_Port1L" UserName="Port1 IO[3:0]">
 						    <Condition Expression="
 							    (!Sem_OSPI2_DataL_Port1L_10 &amp; !Sem_OSPI2_DataH_Port1L_10) &amp;
 							    (!Sem_OSPI2_DataL_Port1L &amp; !Sem_OSPI2_DataH_Port1L) &amp;
@@ -865,8 +1617,26 @@
                                                     </SignalLogicalOp>           
                                                     <Semaphore>Sem_Port1L_$IpInstance_IOH</Semaphore>                                         
 						    <Semaphore>Sem_OSPI1_DataH_Port1L</Semaphore>
+					    </Mode>
+
+					    <Mode Name="OCTOSPI1_IOH_Port1L_30_MX" UserName="Port1 IO[3:0] -- MULTIPLEXED --" RemoveCondition="!OCTOSPI1:$ModeExist_OCTOSPI1_IOH_Port1L | DIE470">
+						    <Condition Expression="
+							    !Sem_OSPI1_DataL_Port1L_30_MX &amp;
+							    (s_o1_dualquadmx |
+							    s_o1_octomx |
+							    s_o1_hyperbusmx)
+							    " Diagnostic=""/>
+                                                    <SignalLogicalOp Name="AND">
+                                                            <Signal Name="$SingleInstanceOCTOSPIM_P1_IO0"/>
+                                                            <Signal Name="$SingleInstanceOCTOSPIM_P1_IO1"/>
+                                                            <Signal Name="$SingleInstanceOCTOSPIM_P1_IO2"/>
+                                                            <Signal Name="$SingleInstanceOCTOSPIM_P1_IO3"/>
+                                                    </SignalLogicalOp>           
+                                                    <Semaphore>Sem_Port1L_$IpInstance_IOH</Semaphore>                                         
+                                                    <Semaphore>Sem_OSPI1_DataH_Port1L_30_MX</Semaphore>
                                             </Mode>
-                                            <Mode Name="OCTOSPI1_IOH1_Port1H" UserName="Port1 IO[5:4]">
+
+                                            <Mode Name="OCTOSPI1_IOH_Port1H_54" UserName="Port1 IO[5:4]">
 						    <Condition Expression="
 							    (!Sem_OSPI2_DataL_Port1H_54 &amp; !Sem_OSPI2_DataH_Port1H_54) &amp;
 							    (!Sem_OSPI2_DataL_Port1H &amp; !Sem_OSPI2_DataH_Port1H) &amp;
@@ -879,7 +1649,22 @@
                                                     <Semaphore>Sem_Port1H_$IpInstance_IOH</Semaphore>
 						    <Semaphore>Sem_OSPI1_DataH_Port1H_54</Semaphore>
                                             </Mode>
-                                            <Mode Name="OCTOSPI1_IOH1_Port1H" UserName="Port1 IO[7:4]">
+
+					    <Mode Name="OCTOSPI1_IOH_Port1H_54_MX" UserName="Port1 IO[5:4] -- MULTIPLEXED --" RemoveCondition="!OCTOSPI1:$ModeExist_OCTOSPI1_IOH_Port1H_54 | DIE470">
+						    <Condition Expression="
+							    !Sem_OSPI1_DataL_Port1H_54_MX &amp;
+							    (s_o1_dualsinglemx |
+							    s_o1_dualdualmx)
+							    " Diagnostic=""/>
+                                                    <SignalLogicalOp Name="AND">
+                                                            <Signal Name="$SingleInstanceOCTOSPIM_P1_IO4"/>
+                                                            <Signal Name="$SingleInstanceOCTOSPIM_P1_IO5"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>Sem_Port1H_$IpInstance_IOH</Semaphore>
+						    <Semaphore>Sem_OSPI1_DataH_Port1H_54_MX</Semaphore>
+                                            </Mode>
+
+                                            <Mode Name="OCTOSPI1_IOH_Port1H" UserName="Port1 IO[7:4]">
 						    <Condition Expression="
 							    (!Sem_OSPI2_DataL_Port1H_54 &amp; !Sem_OSPI2_DataH_Port1H_54) &amp;
 							    (!Sem_OSPI2_DataL_Port1H &amp; !Sem_OSPI2_DataH_Port1H) &amp;
@@ -893,8 +1678,26 @@
                                                     </SignalLogicalOp>
                                                     <Semaphore>Sem_Port1H_$IpInstance_IOH</Semaphore>
 						    <Semaphore>Sem_OSPI1_DataH_Port1H</Semaphore>
+					    </Mode>
+
+					    <Mode Name="OCTOSPI1_IOH_Port1H_74_MX" UserName="Port1 IO[7:4] -- MULTIPLEXED --" RemoveCondition="!OCTOSPI1:$ModeExist_OCTOSPI1_IOH_Port1H | DIE470">
+						    <Condition Expression="
+							    !Sem_OSPI1_DataL_Port1H_74_MX &amp;
+							    (s_o1_dualquadmx |
+							    s_o1_octomx |
+							    s_o1_hyperbusmx)
+							    " Diagnostic=""/>
+                                                    <SignalLogicalOp Name="AND">
+                                                            <Signal Name="$SingleInstanceOCTOSPIM_P1_IO4"/>
+                                                            <Signal Name="$SingleInstanceOCTOSPIM_P1_IO5"/>
+                                                            <Signal Name="$SingleInstanceOCTOSPIM_P1_IO6"/>
+                                                            <Signal Name="$SingleInstanceOCTOSPIM_P1_IO7"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>Sem_Port1H_$IpInstance_IOH</Semaphore>
+						    <Semaphore>Sem_OSPI1_DataH_Port1H_74_MX</Semaphore>
                                             </Mode>
-					    <Mode Name="OCTOSPI1_IOH1_Port2L" UserName="Port2 IO[1:0]">
+
+					    <Mode Name="OCTOSPI1_IOH_Port2L_10" UserName="Port2 IO[1:0]">
 						    <Condition Expression="
 							    (!Sem_OSPI2_DataL_Port2L_10 &amp; !Sem_OSPI2_DataH_Port2L_10) &amp;
 							    (!Sem_OSPI2_DataL_Port2L &amp; !Sem_OSPI2_DataH_Port2L) &amp;
@@ -906,8 +1709,23 @@
                                                     </SignalLogicalOp>
                                                     <Semaphore>Sem_Port2L_$IpInstance_IOH</Semaphore>
 						    <Semaphore>Sem_OSPI1_DataH_Port2L_10</Semaphore>
+					    </Mode>
+
+					    <Mode Name="OCTOSPI1_IOH_Port2L_10_MX" UserName="Port2 IO[1:0] -- MULTIPLEXED --" RemoveCondition="!OCTOSPI1:$ModeExist_OCTOSPI1_IOH_Port2L_10 | DIE470">
+						    <Condition Expression="
+							    !Sem_OSPI1_DataL_Port2L_10_MX &amp;
+							    (s_o1_dualsinglemx |
+							    s_o1_dualdualmx)
+							    " Diagnostic=""/>
+                                                    <SignalLogicalOp Name="AND">
+                                                            <Signal Name="$SingleInstanceOCTOSPIM_P2_IO0"/>
+                                                            <Signal Name="$SingleInstanceOCTOSPIM_P2_IO1"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>Sem_Port2L_$IpInstance_IOH</Semaphore>
+						    <Semaphore>Sem_OSPI1_DataH_Port2L_10_MX</Semaphore>
                                             </Mode>
-                                            <Mode Name="OCTOSPI1_IOH1_Port2L" UserName="Port2 IO[3:0]">
+
+                                            <Mode Name="OCTOSPI1_IOH_Port2L" UserName="Port2 IO[3:0]">
 						    <Condition Expression="
 							    (!Sem_OSPI2_DataL_Port2L_10 &amp; !Sem_OSPI2_DataH_Port2L_10) &amp;
 							    (!Sem_OSPI2_DataL_Port2L &amp; !Sem_OSPI2_DataH_Port2L) &amp;
@@ -921,8 +1739,26 @@
                                                     </SignalLogicalOp>
                                                     <Semaphore>Sem_Port2L_$IpInstance_IOH</Semaphore>
 						    <Semaphore>Sem_OSPI1_DataH_Port2L</Semaphore>
+					    </Mode>
+
+					    <Mode Name="OCTOSPI1_IOH_Port2L_30_MX" UserName="Port2 IO[3:0] -- MULTIPLEXED --" RemoveCondition="!OCTOSPI1:$ModeExist_OCTOSPI1_IOH_Port2L | DIE470">
+						    <Condition Expression="
+							    !Sem_OSPI1_DataL_Port2L_30_MX &amp;
+							    (s_o1_dualquadmx |
+							    s_o1_octomx |
+							    s_o1_hyperbusmx)
+							    " Diagnostic=""/>
+                                                    <SignalLogicalOp Name="AND">
+                                                            <Signal Name="$SingleInstanceOCTOSPIM_P2_IO0"/>
+                                                            <Signal Name="$SingleInstanceOCTOSPIM_P2_IO1"/>
+                                                            <Signal Name="$SingleInstanceOCTOSPIM_P2_IO2"/>
+                                                            <Signal Name="$SingleInstanceOCTOSPIM_P2_IO3"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>Sem_Port2L_$IpInstance_IOH</Semaphore>
+						    <Semaphore>Sem_OSPI1_DataH_Port2L_30_MX</Semaphore>
                                             </Mode>
-					    <Mode  Name="OCTOSPI1_IOH1_Port2H" UserName="Port2 IO[5:4]">
+
+					    <Mode  Name="OCTOSPI1_IOH_Port2H_54" UserName="Port2 IO[5:4]">
 						    <Condition Expression="
 							    (!Sem_OSPI2_DataL_Port2H_54 &amp; !Sem_OSPI2_DataH_Port2H_54) &amp;
 							    (!Sem_OSPI2_DataL_Port2H &amp; !Sem_OSPI2_DataH_Port2H) &amp;
@@ -935,7 +1771,22 @@
                                                     <Semaphore>Sem_Port2H_$IpInstance_IOH</Semaphore>
 						    <Semaphore>Sem_OSPI1_DataH_Port2H_54</Semaphore>
                                             </Mode>
-                                            <Mode  Name="OCTOSPI1_IOH1_Port2H" UserName="Port2 IO[7:4]">
+
+					    <Mode  Name="OCTOSPI1_IOH_Port2H_54_MX" UserName="Port2 IO[5:4] -- MULTIPLEXED --" RemoveCondition="!OCTOSPI1:$ModeExist_OCTOSPI1_IOH_Port2H_54 | DIE470">
+						    <Condition Expression="
+							    !Sem_OSPI1_DataL_Port2H_54_MX &amp;
+							    (s_o1_dualsinglemx |
+							    s_o1_dualdualmx)
+							    " Diagnostic=""/>
+                                                    <SignalLogicalOp Name="AND">
+                                                            <Signal Name="$SingleInstanceOCTOSPIM_P2_IO4"/>
+                                                            <Signal Name="$SingleInstanceOCTOSPIM_P2_IO5"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>Sem_Port2H_$IpInstance_IOH</Semaphore>
+						    <Semaphore>Sem_OSPI1_DataH_Port2H_54_MX</Semaphore>
+                                            </Mode>
+
+                                            <Mode  Name="OCTOSPI1_IOH_Port2H" UserName="Port2 IO[7:4]">
 						    <Condition Expression="
 							    (!Sem_OSPI2_DataL_Port2H_54 &amp; !Sem_OSPI2_DataH_Port2H_54) &amp;
 							    (!Sem_OSPI2_DataL_Port2H &amp; !Sem_OSPI2_DataH_Port2H) &amp;
@@ -949,173 +1800,266 @@
                                                     </SignalLogicalOp>
                                                     <Semaphore>Sem_Port2H_$IpInstance_IOH</Semaphore>
 						    <Semaphore>Sem_OSPI1_DataH_Port2H</Semaphore>
+					    </Mode>
+
+					    <Mode  Name="OCTOSPI1_IOH_Port2H_74_MX" UserName="Port2 IO[7:4] -- MULTIPLEXED --" RemoveCondition="!OCTOSPI1:$ModeExist_OCTOSPI1_IOH_Port2H | DIE470">
+						    <Condition Expression="
+							    !Sem_OSPI1_DataL_Port2H_74_MX &amp;
+							    (s_o1_dualquadmx |
+							    s_o1_octomx |
+							    s_o1_hyperbusmx)
+							    " Diagnostic=""/>
+                                                    <SignalLogicalOp Name="AND">
+                                                            <Signal Name="$SingleInstanceOCTOSPIM_P2_IO4"/>
+                                                            <Signal Name="$SingleInstanceOCTOSPIM_P2_IO5"/>
+                                                            <Signal Name="$SingleInstanceOCTOSPIM_P2_IO6"/>
+                                                            <Signal Name="$SingleInstanceOCTOSPIM_P2_IO7"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>Sem_Port2H_$IpInstance_IOH</Semaphore>
+						    <Semaphore>Sem_OSPI1_DataH_Port2H_74_MX</Semaphore>
                                             </Mode>
                                     </ModeLogicOperator>
-                                    <Semaphore>Sem_$IpInstance_DataH</Semaphore>
+				    <!-- <Semaphore>Sem_$IpInstance_DataH</Semaphore> -->
                             </Mode>
-                            <Mode Name="OCTOSPI1_Control_NCS" UserName="Chip Select"  RemoveCondition="($Index=2 | !OCTOSPI2_Exist)">
+                            
+			    <!-- OCTOSPI2 modes -->
+			    <Mode Name="OCTOSPI2_Clock_CLK" UserName="Clock"  RemoveCondition="$Index=1">
                                     <ModeLogicOperator Name="XOR">
-                                            <Mode Name="OCTOSPI1_Port1_NCS" UserName="Port1 NCS">
-						    <Condition Expression="
-							    !Sem_OSPI2_NCS_Port1 &amp;
-							    (Sem_$IpInstance_Single|Sem_$IpInstance_Dual|Sem_$IpInstance_Quad|Sem_$IpInstance_DualSingle|Sem_$IpInstance_DualDual|Sem_$IpInstance_DualQuad|Sem_$IpInstance_Octo|Sem_$IpInstance_HyperBus)" Diagnostic=""/>
-                                                    <SignalLogicalOp Name="AND">
-                                                            <Signal Name="$SingleInstanceOCTOSPIM_P1_NCS"/>
-                                                    </SignalLogicalOp>
-                                                    <Semaphore>Sem_Port1NCS_$IpInstance_NCS</Semaphore>
-						    <Semaphore>Sem_OSPI1_NCS_Port1</Semaphore>
-                                            </Mode>
-                                            <Mode Name="OCTOSPI1_Port2_NCS" UserName="Port2 NCS">
-						    <Condition Expression="
-							    !Sem_OSPI2_NCS_Port2 &amp;
-							    (Sem_$IpInstance_Single|Sem_$IpInstance_Dual|Sem_$IpInstance_Quad|Sem_$IpInstance_DualSingle|Sem_$IpInstance_DualDual|Sem_$IpInstance_DualQuad|Sem_$IpInstance_Octo|Sem_$IpInstance_HyperBus)" Diagnostic=""/>
-                                                    <SignalLogicalOp Name="AND">
-                                                            <Signal Name="$SingleInstanceOCTOSPIM_P2_NCS"/>
-                                                    </SignalLogicalOp>
-                                                    <Semaphore>Sem_Port2NCS_$IpInstance_NCS</Semaphore>
-						    <Semaphore>Sem_OSPI1_NCS_Port2</Semaphore>
-                                            </Mode>
-                                    </ModeLogicOperator>
-                                    <Semaphore>Sem_$IpInstance_NCS</Semaphore>
-                            </Mode>
-			    <Mode Name="OCTOSPI1_Control_NCS" UserName="Chip Select (NCS)"  RemoveCondition="(OCTOSPI1_Exist &amp; OCTOSPI2_Exist)">
-                                    <ModeLogicOperator Name="XOR">
-                                            <Mode Name="OCTOSPI1_Port1_NCS" UserName="Port1 NCS">
-						    <Condition Expression="
-							    !Sem_OSPI2_NCS_Port1 &amp;
-							    (Sem_$IpInstance_Single|Sem_$IpInstance_Dual|Sem_$IpInstance_Quad|Sem_$IpInstance_DualSingle|Sem_$IpInstance_DualDual|Sem_$IpInstance_DualQuad|Sem_$IpInstance_Octo|Sem_$IpInstance_HyperBus)" Diagnostic=""/>
-                                                    <SignalLogicalOp Name="AND">
-                                                            <Signal Name="$SingleInstanceOCTOSPIM_P1_NCS"/>
-                                                    </SignalLogicalOp>
-                                                    <Semaphore>Sem_Port1NCS_$IpInstance_NCS</Semaphore>
-						    <Semaphore>Sem_OSPI1_NCS_Port1</Semaphore>
-                                            </Mode>
-                                    </ModeLogicOperator>
-                                    <Semaphore>Sem_$IpInstance_NCS</Semaphore>
-                            </Mode>
-			    <Mode Name="OCTOSPI1_DQS" UserName="Data Strobe"  RemoveCondition="($Index=2 | !OCTOSPI2_Exist)">
-                                    <ModeLogicOperator Name="XOR">
-                                            <Mode Name="OCTOSPI1_Port1_DQS" UserName="Port1 DQS">
-						    <Condition Expression="
-							    !Sem_OSPI2_DQS_Port1 &amp;
-							    (Sem_$IpInstance_Octo|Sem_$IpInstance_HyperBus)" Diagnostic=""/>
-                                                    <SignalLogicalOp Name="AND">
-                                                            <Signal Name="$SingleInstanceOCTOSPIM_P1_DQS"/>
-                                                    </SignalLogicalOp>
-                                                    <Semaphore>Sem_Port1DQS_$IpInstance_DQS</Semaphore>
-						    <Semaphore>Sem_OSPI1_DQS_Port1</Semaphore>
-                                            </Mode>
-                                            <Mode Name="OCTOSPI1_Port2_DQS" UserName="Port2 DQS">
-						    <Condition Expression="
-							    !Sem_OSPI2_DQS_Port2 &amp;
-							    (Sem_$IpInstance_Octo|Sem_$IpInstance_HyperBus)" Diagnostic=""/>
-                                                    <SignalLogicalOp Name="AND">
-                                                            <Signal Name="$SingleInstanceOCTOSPIM_P2_DQS"/>
-                                                    </SignalLogicalOp>
-                                                    <Semaphore>Sem_Port2DQS_$IpInstance_DQS</Semaphore>
-						    <Semaphore>Sem_OSPI1_DQS_Port2</Semaphore>
-                                            </Mode>
-                                    </ModeLogicOperator>
-                                    <Semaphore>Sem_$IpInstance_DQS</Semaphore>
-                            </Mode>
-			    <Mode Name="OCTOSPI1_DQS" UserName="Data Strobe (DQS/RWDS)"  RemoveCondition="(OCTOSPI1_Exist &amp; OCTOSPI2_Exist)">
-                                    <ModeLogicOperator Name="XOR">
-                                            <Mode Name="OCTOSPI1_Port1_DQS" UserName="Port1 DQS">
-						    <Condition Expression="
-							    !Sem_OSPI2_DQS_Port1 &amp;
-							    (Sem_$IpInstance_Octo|Sem_$IpInstance_HyperBus)" Diagnostic=""/>
-                                                    <SignalLogicalOp Name="AND">
-                                                            <Signal Name="$SingleInstanceOCTOSPIM_P1_DQS"/>
-                                                    </SignalLogicalOp>
-                                                    <Semaphore>Sem_Port1DQS_$IpInstance_DQS</Semaphore>
-						    <Semaphore>Sem_OSPI1_DQS_Port1</Semaphore>
-                                            </Mode>
-                                    </ModeLogicOperator>
-                                    <Semaphore>Sem_$IpInstance_DQS</Semaphore>
-                            </Mode>
-                            <Mode Name="OCTOSPI1_Clock_CLK" UserName="Clock"  RemoveCondition="($Index=2 | !OCTOSPI2_Exist)">
-                                    <ModeLogicOperator Name="XOR">
-                                            <Mode Name="OCTOSPI1_Port1_CLK" UserName="Port1 CLK">
-						    <Condition Expression="
-							    !Sem_OSPI2_CLK_Port1 &amp;
-							    (Sem_$IpInstance_Single|Sem_$IpInstance_Dual|Sem_$IpInstance_Quad|Sem_$IpInstance_DualSingle|Sem_$IpInstance_DualDual|Sem_$IpInstance_DualQuad|Sem_$IpInstance_Octo|Sem_$IpInstance_HyperBus)" Diagnostic=""/>
+                                            <Mode Name="O2_P1_CLK" UserName="Port1 CLK">
+                                                    <Condition Expression="
+							    !Sem_OSPI1_CLK_Port1 &amp;
+							    (Sem_$IpInstance_Single |
+							    Sem_$IpInstance_Dual |
+							    Sem_$IpInstance_Quad |
+							    Sem_$IpInstance_DualSingle |
+							    Sem_$IpInstance_DualDual |
+							    Sem_$IpInstance_DualQuad |
+							    Sem_$IpInstance_Octo |
+							    Sem_$IpInstance_HyperBus)
+							    " Diagnostic=""/>
                                                     <SignalLogicalOp Name="AND">
                                                             <Signal Name="$SingleInstanceOCTOSPIM_P1_CLK"/>
                                                     </SignalLogicalOp>
                                                     <Semaphore>Sem_Port1CLK_$IpInstance_CLK</Semaphore>
-						    <Semaphore>Sem_OSPI1_CLK_Port1</Semaphore>
+						    <Semaphore>Sem_OSPI2_CLK_Port1</Semaphore>
                                             </Mode>
-                                            <Mode Name="OCTOSPI1_Port2_CLK" UserName="Port2 CLK">
+					    <Mode Name="O2_P1_CLK_MX" UserName="Port1 CLK -- MULTIPLEXED --" RemoveCondition="!OCTOSPI2:$ModeExist_O2_P1_CLK | DIE470">
 						    <Condition Expression="
-							    !Sem_OSPI2_CLK_Port2 &amp;
-							    (Sem_$IpInstance_Single|Sem_$IpInstance_Dual|Sem_$IpInstance_Quad|Sem_$IpInstance_DualSingle|Sem_$IpInstance_DualDual|Sem_$IpInstance_DualQuad|Sem_$IpInstance_Octo|Sem_$IpInstance_HyperBus)" Diagnostic=""/>
+							    Sem_OSPI1_CLK_Port1_MX &amp; 
+							    (s_o2_singlemx |
+							    s_o2_dualmx |
+							    s_o2_quadmx |
+							    s_o2_dualsinglemx |
+							    s_o2_dualdualmx |
+							    s_o2_dualquadmx |
+							    s_o2_octomx |
+							    s_o2_hyperbusmx)
+							    " Diagnostic=""/>
+                                                    <SignalLogicalOp Name="AND">
+                                                            <Signal Name="VS_ospi2_mx_p1_clk"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>Sem_Port1CLK_$IpInstance_CLK</Semaphore>
+						    <Semaphore>Sem_OSPI2_CLK_Port1_MX</Semaphore>
+                                            </Mode>
+                                            <Mode Name="O2_P2_CLK" UserName="Port2 CLK">
+                                                    <Condition Expression="
+							    !Sem_OSPI1_CLK_Port2 &amp;
+							    (Sem_$IpInstance_Single |
+							    Sem_$IpInstance_Dual |
+							    Sem_$IpInstance_Quad |
+							    Sem_$IpInstance_DualSingle |
+							    Sem_$IpInstance_DualDual |
+							    Sem_$IpInstance_DualQuad |
+							    Sem_$IpInstance_Octo |
+							    Sem_$IpInstance_HyperBus)
+							    " Diagnostic=""/>
                                                     <SignalLogicalOp Name="AND">
                                                             <Signal Name="$SingleInstanceOCTOSPIM_P2_CLK"/>                                               
                                                     </SignalLogicalOp>
                                                     <Semaphore>Sem_Port2CLK_$IpInstance_CLK</Semaphore>
-						    <Semaphore>Sem_OSPI1_CLK_Port2</Semaphore>
-                                            </Mode>   
-                                    </ModeLogicOperator>
-                                    <Semaphore>Sem_$IpInstance_CLK</Semaphore>
-                            </Mode>
-			    <Mode Name="OCTOSPI1_Clock_CLK" UserName="Clock (CLK)"  RemoveCondition="(OCTOSPI1_Exist &amp; OCTOSPI2_Exist)">
-                                    <ModeLogicOperator Name="XOR">
-                                            <Mode Name="OCTOSPI1_Port1_CLK" UserName="Port1 CLK">
-						    <Condition Expression="
-							    !Sem_OSPI2_CLK_Port1 &amp;
-							    (Sem_$IpInstance_Single|Sem_$IpInstance_Dual|Sem_$IpInstance_Quad|Sem_$IpInstance_DualSingle|Sem_$IpInstance_DualDual|Sem_$IpInstance_DualQuad|Sem_$IpInstance_Octo|Sem_$IpInstance_HyperBus)" Diagnostic=""/>
-                                                    <SignalLogicalOp Name="AND">
-                                                            <Signal Name="$SingleInstanceOCTOSPIM_P1_CLK"/>
-                                                    </SignalLogicalOp>
-                                                    <Semaphore>Sem_Port1CLK_$IpInstance_CLK</Semaphore>
-						    <Semaphore>Sem_OSPI1_CLK_Port1</Semaphore>
+						    <Semaphore>Sem_OSPI2_CLK_Port2</Semaphore>
                                             </Mode>
-                                    </ModeLogicOperator>
+					    <Mode Name="O2_P2_CLK_MX" UserName="Port2 CLK -- MULTIPLEXED --" RemoveCondition="!OCTOSPI2:$ModeExist_O2_P2_CLK | DIE470">
+						    <Condition Expression="
+							    Sem_OSPI1_CLK_Port2_MX &amp; 
+							    (s_o2_singlemx |
+							    s_o2_dualmx |
+							    s_o2_quadmx |
+							    s_o2_dualsinglemx |
+							    s_o2_dualdualmx |
+							    s_o2_dualquadmx |
+							    s_o2_octomx |
+							    s_o2_hyperbusmx)
+							    " Diagnostic=""/>
+                                                    <SignalLogicalOp Name="AND">
+                                                            <Signal Name="VS_ospi2_mx_p2_clk"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>Sem_Port2CLK_$IpInstance_CLK</Semaphore>
+						    <Semaphore>Sem_OSPI2_CLK_Port2_MX</Semaphore>
+                                            </Mode>
+         			    </ModeLogicOperator>
                                     <Semaphore>Sem_$IpInstance_CLK</Semaphore>
                             </Mode>
-                            <Mode Name="OCTOSPI1_Clock_NCLK" UserName="HyperBus(TM) 1.8V Inverted Clock"  RemoveCondition="($Index=2 | !OCTOSPI2_Exist)">
+
+			    <Mode Name="OCTOSPI2_Clock_NCLK" UserName="HyperBus(TM) 1.8V Inverted Clock"  RemoveCondition="$Index=1">
                                     <ModeLogicOperator Name="XOR">
-                                            <Mode Name="OCTOSPI1_Port1_NCLK" UserName="Port1 NCLK" RemoveCondition="!(DIE471)">
-						    <Condition Expression="
-							    !Sem_OSPI2_NCLK_Port1 &amp;
+                                            <Mode Name="OCTOSPI2_Port1_NCLK" UserName="Port1 NCLK" RemoveCondition="!(DIE471)">
+                                                    <Condition Expression="
+							    !Sem_OSPI1_NCLK_Port1 &amp;
 							    (Sem_$IpInstance_HyperBus &amp; Sem_Port1CLK_$IpInstance_CLK)" Diagnostic=""/>
                                                     <SignalLogicalOp Name="AND">
                                                             <Signal Name="$SingleInstanceOCTOSPIM_P1_NCLK"/>
                                                     </SignalLogicalOp>
                                                     <Semaphore>Sem_Port1CLK_$IpInstance_NCLK</Semaphore>
-						    <Semaphore>Sem_OSPI1_NCLK_Port1</Semaphore>
+						    <Semaphore>Sem_OSPI2_NCLK_Port1</Semaphore>
                                             </Mode>
-                                            <Mode Name="OCTOSPI1_Port2_NCLK" UserName="Port2 NCLK" RemoveCondition="!(DIE471)">
+					    <Mode Name="OCTOSPI2_Port1_NCLK_MX" UserName="Port1 NCLK -- MULTIPLEXED --" RemoveCondition="!(DIE471) | !OCTOSPI2:$ModeExist_OCTOSPI2_Port1_NCLK">
 						    <Condition Expression="
-							    !Sem_OSPI2_NCLK_Port2 &amp;
+							    s_o2_hyperbusmx &amp;
+							    Sem_OSPI1_NCLK_Port1_MX
+							    " Diagnostic=""/>
+                                                    <SignalLogicalOp Name="AND">
+                                                            <Signal Name="VS_ospi2_mx_p1_nclk"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>Sem_Port1CLK_$IpInstance_NCLK</Semaphore>
+						    <Semaphore>Sem_OSPI2_NCLK_Port1_MX</Semaphore>
+                                            </Mode>
+                                            <Mode Name="OCTOSPI2_Port2_NCLK" UserName="Port2 NCLK" RemoveCondition="!(DIE471)">
+                                                    <Condition Expression="
+							    !Sem_OSPI1_NCLK_Port2 &amp;
 							    (Sem_$IpInstance_HyperBus &amp; Sem_Port2CLK_$IpInstance_CLK)" Diagnostic=""/>
                                                     <SignalLogicalOp Name="AND">
                                                             <Signal Name="$SingleInstanceOCTOSPIM_P2_NCLK"/>
                                                     </SignalLogicalOp>
                                                     <Semaphore>Sem_Port2CLK_$IpInstance_NCLK</Semaphore>
-						    <Semaphore>Sem_OSPI1_NCLK_Port2</Semaphore>
+						    <Semaphore>Sem_OSPI2_CLK_Port2</Semaphore>
                                             </Mode>
-                                    </ModeLogicOperator>
-                                    <Semaphore>Sem_$IpInstance_NCLK</Semaphore>
-                            </Mode>
-			    <Mode Name="OCTOSPI1_Clock_NCLK" UserName="HyperBus(TM) 1.8V Inverted Clock (NCLK)"  RemoveCondition="(OCTOSPI1_Exist &amp; OCTOSPI2_Exist)">
-                                    <ModeLogicOperator Name="XOR">
-                                            <Mode Name="OCTOSPI1_Port1_NCLK" UserName="Port1 NCLK" RemoveCondition="!(DIE471)">
-                                                    <Condition Expression="(Sem_$IpInstance_HyperBus &amp; Sem_Port1CLK_$IpInstance_CLK)" Diagnostic=""/>
+					    <Mode Name="OCTOSPI2_Port2_NCLK_MX" UserName="Port2 NCLK -- MULTIPLEXED --" RemoveCondition="!(DIE471) | !OCTOSPI2:$ModeExist_OCTOSPI2_Port2_NCLK">
+						    <Condition Expression="
+							    s_o2_hyperbusmx &amp;
+							    Sem_OSPI1_NCLK_Port2_MX
+							    " Diagnostic=""/>
                                                     <SignalLogicalOp Name="AND">
-                                                            <Signal Name="$SingleInstanceOCTOSPIM_P1_NCLK"/>
+                                                            <Signal Name="VS_ospi2_mx_p2_nclk"/>
                                                     </SignalLogicalOp>
-                                                    <Semaphore>Sem_Port1CLK_$IpInstance_NCLK</Semaphore>
-						    <Semaphore>Sem_OSPI1_NCLK_Port1</Semaphore>
+                                                    <Semaphore>Sem_Port2CLK_$IpInstance_NCLK</Semaphore>
+						    <Semaphore>Sem_OSPI2_NCLK_Port2_MX</Semaphore>
                                             </Mode>
                                     </ModeLogicOperator>
                                     <Semaphore>Sem_$IpInstance_NCLK</Semaphore>
-                            </Mode>
-                            
-                            <!-- OCTOSPI2 modes -->
-                                <Mode Name="OCTOSPI2_Data[3:0]" UserName="Data [3:0]"  RemoveCondition="$Index=1">
+			    </Mode>
+
+			    <Mode Name="OCTOSPI2_Control_NCS" UserName="Chip Select"  RemoveCondition="$Index=1">
                                     <ModeLogicOperator Name="XOR">
-                                            <Mode Name="OCTOSPI2_IOL_Port1L1" UserName="Port1 IO[1:0]">
+                                            <Mode Name="OCTOSPI2_Port1_NCS" UserName="Port1 NCS">
+						    <Condition Expression="
+							    !Sem_OSPI1_NCS_Port1 &amp;
+							    (Sem_$IpInstance_Single |
+							    Sem_$IpInstance_Dual |
+							    Sem_$IpInstance_Quad |
+							    Sem_$IpInstance_DualSingle |
+							    Sem_$IpInstance_DualDual |
+							    Sem_$IpInstance_DualQuad |
+							    Sem_$IpInstance_Octo |
+							    Sem_$IpInstance_HyperBus |
+							    s_o2_singlemx |
+							    s_o2_dualmx |
+							    s_o2_quadmx |
+							    s_o2_dualsinglemx |
+							    s_o2_dualdualmx |
+							    s_o2_dualquadmx |
+							    s_o2_octomx |
+							    s_o2_hyperbusmx
+							    )" Diagnostic=""/>
+                                                    <SignalLogicalOp Name="AND">
+                                                            <Signal Name="$SingleInstanceOCTOSPIM_P1_NCS"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>Sem_Port1NCS_$IpInstance_NCS</Semaphore>
+						    <Semaphore>Sem_OSPI2_NCS_Port1</Semaphore>
+                                            </Mode>
+                                            <Mode Name="OCTOSPI2_Port2_NCS" UserName="Port2 NCS">
+                                                    <Condition Expression="
+							    !Sem_OSPI1_NCS_Port2 &amp;
+							    (Sem_$IpInstance_Single |
+							    Sem_$IpInstance_Dual |
+							    Sem_$IpInstance_Quad |
+							    Sem_$IpInstance_DualSingle |
+							    Sem_$IpInstance_DualDual |
+							    Sem_$IpInstance_DualQuad |
+							    Sem_$IpInstance_Octo |
+							    Sem_$IpInstance_HyperBus |
+							    s_o2_singlemx |
+							    s_o2_dualmx |
+							    s_o2_quadmx |
+							    s_o2_dualsinglemx |
+							    s_o2_dualdualmx |
+							    s_o2_dualquadmx |
+							    s_o2_octomx |
+							    s_o2_hyperbusmx
+							    )" Diagnostic=""/>
+                                                    <SignalLogicalOp Name="AND">
+                                                            <Signal Name="$SingleInstanceOCTOSPIM_P2_NCS"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>Sem_Port2NCS_$IpInstance_NCS</Semaphore>
+						    <Semaphore>Sem_OSPI2_NCS_Port2</Semaphore>
+                                            </Mode>
+                                    </ModeLogicOperator>
+                                    <Semaphore>Sem_$IpInstance_NCS</Semaphore>
+                            </Mode>
+
+			    <Mode Name="OCTOSPI2_DQS" UserName="Data Strobe"  RemoveCondition="$Index=1">
+                                    <ModeLogicOperator Name="XOR">
+                                            <Mode Name="OCTOSPI2_Port1_DQS" UserName="Port1 DQS (RWDS)">
+                                                    <Condition Expression="
+							    !Sem_OSPI1_DQS_Port1 &amp;
+							    (Sem_$IpInstance_Octo|Sem_$IpInstance_HyperBus)" Diagnostic=""/>
+                                                    <SignalLogicalOp Name="AND">
+                                                            <Signal Name="$SingleInstanceOCTOSPIM_P1_DQS"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>Sem_Port1DQS_$IpInstance_DQS</Semaphore>
+						    <Semaphore>Sem_OSPI2_DQS_Port1</Semaphore>
+                                            </Mode>
+					    <Mode Name="OCTOSPI2_Port1_DQS_MX" UserName="Port1 DQS (RWDS) -- MULTIPLEXED --" RemoveCondition="!OCTOSPI2:$ModeExist_OCTOSPI2_Port1_DQS | DIE470">
+						    <Condition Expression="
+							    Sem_OSPI1_DQS_Port1_MX &amp;
+							    (s_o2_octomx |
+							    s_o2_hyperbusmx)
+							    " Diagnostic=""/>
+                                                    <SignalLogicalOp Name="AND">
+                                                            <Signal Name="VS_ospi2_mx_p1_dqs"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>Sem_Port1DQS_$IpInstance_DQS</Semaphore>
+						    <Semaphore>Sem_OSPI2_DQS_Port1_MX</Semaphore>
+                                            </Mode>
+                                            <Mode Name="OCTOSPI2_Port2_DQS" UserName="Port2 DQS (RWDS)">
+                                                    <Condition Expression="
+							    !Sem_OSPI1_DQS_Port2 &amp;
+							    (Sem_$IpInstance_Octo|Sem_$IpInstance_HyperBus)" Diagnostic=""/>
+                                                    <SignalLogicalOp Name="AND">
+                                                            <Signal Name="$SingleInstanceOCTOSPIM_P2_DQS"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>Sem_Port2DQS_$IpInstance_DQS</Semaphore>
+						    <Semaphore>Sem_OSPI2_DQS_Port2</Semaphore>
+                                            </Mode>
+					    <Mode Name="OCTOSPI2_Port2_DQS_MX" UserName="Port2 DQS (RWDS) -- MULTIPLEXED --" RemoveCondition="!OCTOSPI2:$ModeExist_OCTOSPI2_Port2_DQS | DIE470">
+						    <Condition Expression="
+							    Sem_OSPI1_DQS_Port2_MX &amp;
+							    (s_o2_octomx |
+							    s_o2_hyperbusmx)
+							    " Diagnostic=""/>
+                                                    <SignalLogicalOp Name="AND">
+                                                            <Signal Name="VS_ospi2_mx_p2_dqs"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>Sem_Port2DQS_$IpInstance_DQS</Semaphore>
+						    <Semaphore>Sem_OSPI2_DQS_Port2_MX</Semaphore>
+					    </Mode>
+                                    </ModeLogicOperator>
+                                    <Semaphore>Sem_$IpInstance_DQS</Semaphore>
+                            </Mode>
+
+                            <Mode Name="OCTOSPI2_Data[3:0]" UserName="Data [3:0]"  RemoveCondition="$Index=1">
+                                    <ModeLogicOperator Name="XOR">
+                                            <Mode Name="OCTOSPI2_IOL_Port1L_10" UserName="Port1 IO[1:0]">
 						    <Condition Expression="
 							    (!Sem_OSPI1_DataL_Port1L_10 &amp; !Sem_OSPI1_DataH_Port1L_10) &amp;
 							    (!Sem_OSPI1_DataL_Port1L &amp; !Sem_OSPI1_DataH_Port1L) &amp;
@@ -1127,23 +2071,58 @@
                                                     </SignalLogicalOp>
                                                     <Semaphore>Sem_Port1L_$IpInstance_IOL</Semaphore>
 						    <Semaphore>Sem_OSPI2_DataL_Port1L_10</Semaphore>
+					    </Mode>
+
+					    <Mode Name="OCTOSPI2_IOL_Port1L_10_MX" UserName="Port1 IO[1:0] -- MULTIPLEXED --" RemoveCondition="DIE470 | !OCTOSPI2:$ModeExist_OCTOSPI2_IOL_Port1L_10">
+						    <Condition Expression="
+							    Sem_OSPI1_DataL_Port1L_10_MX &amp;
+							    !Sem_OSPI2_DataH_Port1L_10_MX &amp; 
+							    (s_o2_singlemx |
+							    s_o2_dualmx |
+							    s_o2_dualsinglemx |
+							    s_o2_dualdualmx)
+							    " Diagnostic=""/>
+                                                    <SignalLogicalOp Name="AND">
+                                                            <Signal Name="VS_ospi2_mx_p1_10"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>Sem_Port1L_$IpInstance_IOL</Semaphore>
+                                                    <Semaphore>Sem_OSPI2_DataL_Port1L_10_MX</Semaphore>
                                             </Mode>
-                                            <Mode Name="OCTOSPI2_IOL_Port1L2" UserName="Port1 IO[3:0]">
+
+                                            <Mode Name="OCTOSPI2_IOL_Port1L" UserName="Port1 IO[3:0]">
 						    <Condition Expression="
 							    (!Sem_OSPI1_DataL_Port1L_10 &amp; !Sem_OSPI1_DataH_Port1L_10) &amp;
 							    (!Sem_OSPI1_DataL_Port1L &amp; !Sem_OSPI1_DataH_Port1L) &amp;
 							    !Sem_Port1L_$IpInstance_IOH &amp;
 							    (Sem_$IpInstance_Quad|Sem_$IpInstance_Octo|Sem_$IpInstance_DualQuad|Sem_$IpInstance_HyperBus)" Diagnostic=""/>
                                                     <SignalLogicalOp Name="AND">
-                                                            <Signal Name="$SingleInstanceOCTOSPIM_P1_IO0"/>
+							    <Signal Name="$SingleInstanceOCTOSPIM_P1_IO0"/>
                                                             <Signal Name="$SingleInstanceOCTOSPIM_P1_IO1"/>
                                                             <Signal Name="$SingleInstanceOCTOSPIM_P1_IO2"/>
                                                             <Signal Name="$SingleInstanceOCTOSPIM_P1_IO3"/>
                                                     </SignalLogicalOp>
                                                     <Semaphore>Sem_Port1L_$IpInstance_IOL</Semaphore>
 						    <Semaphore>Sem_OSPI2_DataL_Port1L</Semaphore>
-                                            </Mode>
-                                            <Mode Name="OCTOSPI2_IOL_Port1H1" UserName="Port1 IO[5:4]">
+					    </Mode>
+
+					    <Mode Name="OCTOSPI2_IOL_Port1L_30_MX" UserName="Port1 IO[3:0] -- MULTIPLEXED --" RemoveCondition="DIE470 | !OCTOSPI2:$ModeExist_OCTOSPI2_IOL_Port1L">
+						    <Condition Expression="
+							    Sem_OSPI1_DataL_Port1L_30_MX &amp;
+							    !Sem_OSPI2_DataH_Port1L_30_MX &amp;
+							    (s_o2_quadmx |
+							    s_o2_dualquadmx |
+							    s_o2_octomx |
+							    s_o2_hyperbusmx)
+							    " Diagnostic=""/>
+                                                    <SignalLogicalOp Name="AND">
+                                                            <Signal Name="VS_ospi2_mx_p1_30"/>
+                                                            
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>Sem_Port1L_$IpInstance_IOL</Semaphore>
+                                                    <Semaphore>Sem_OSPI2_DataL_Port1L_30_MX</Semaphore>
+					    </Mode>
+
+                                            <Mode Name="OCTOSPI2_IOL_Port1H_54" UserName="Port1 IO[5:4]">
 						    <Condition Expression="
 							    (!Sem_OSPI1_DataL_Port1H_54 &amp; !Sem_OSPI1_DataH_Port1H_54) &amp;
 							    (!Sem_OSPI1_DataL_Port1H &amp; !Sem_OSPI1_DataH_Port1H) &amp;
@@ -1155,8 +2134,25 @@
                                                     </SignalLogicalOp>
                                                     <Semaphore>Sem_Port1H_$IpInstance_IOL</Semaphore>
 						    <Semaphore>Sem_OSPI2_DataL_Port1H_54</Semaphore>
+					    </Mode>
+
+					    <Mode Name="OCTOSPI2_IOL_Port1H_54_MX" UserName="Port1 IO[5:4] -- MULTIPLEXED --" RemoveCondition="DIE470 | !OCTOSPI2:$ModeExist_OCTOSPI2_IOL_Port1H_54">
+						    <Condition Expression="
+							    Sem_OSPI1_DataL_Port1H_54_MX &amp;
+							    !Sem_OSPI2_DataH_Port1H_54_MX &amp;
+							    (s_o2_singlemx |
+							    s_o2_dualmx |
+							    s_o2_dualsinglemx |
+							    s_o2_dualdualmx)
+							    " Diagnostic=""/>
+                                                    <SignalLogicalOp Name="AND">
+                                                            <Signal Name="VS_ospi2_mx_p1_54"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>Sem_Port1H_$IpInstance_IOL</Semaphore>
+                                                    <Semaphore>Sem_OSPI2_DataL_Port1H_54_MX</Semaphore>
                                             </Mode>
-                                            <Mode Name="OCTOSPI2_IOL_Port1H2" UserName="Port1 IO[7:4]">
+
+                                            <Mode Name="OCTOSPI2_IOL_Port1H" UserName="Port1 IO[7:4]">
 						    <Condition Expression="
 							    (!Sem_OSPI1_DataL_Port1H_54 &amp; !Sem_OSPI1_DataH_Port1H_54) &amp;
 							    (!Sem_OSPI1_DataL_Port1H &amp; !Sem_OSPI1_DataH_Port1H) &amp;
@@ -1170,8 +2166,25 @@
                                                     </SignalLogicalOp>
                                                     <Semaphore>Sem_Port1H_$IpInstance_IOL</Semaphore>
 						    <Semaphore>Sem_OSPI2_DataL_Port1H</Semaphore>
-                                            </Mode>
-                                            <Mode Name="OCTOSPI2_IOL_Port2L1" UserName="Port2 IO[1:0]">
+					    </Mode>
+
+					    <Mode Name="OCTOSPI2_IOL_Port1H_74_MX" UserName="Port1 IO[7:4] -- MULTIPLEXED --" RemoveCondition="DIE470 | !OCTOSPI2:$ModeExist_OCTOSPI2_IOL_Port1H">
+						    <Condition Expression="
+							    Sem_OSPI1_DataL_Port1H_74_MX &amp;
+							    !Sem_OSPI2_DataH_Port1H_74_MX &amp;
+							    (s_o2_quadmx |
+							    s_o2_dualquadmx |
+							    s_o2_octomx |
+							    s_o2_hyperbusmx)
+							    " Diagnostic=""/>
+                                                    <SignalLogicalOp Name="AND">
+                                                            <Signal Name="VS_ospi2_mx_p1_74"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>Sem_Port1H_$IpInstance_IOL</Semaphore>
+                                                    <Semaphore>Sem_OSPI2_DataL_Port1H_74_MX</Semaphore>
+					    </Mode>
+					    
+                                            <Mode Name="OCTOSPI2_IOL_Port2L_10" UserName="Port2 IO[1:0]">
 						    <Condition Expression="
 							    (!Sem_OSPI1_DataL_Port2L_10 &amp; !Sem_OSPI1_DataH_Port2L_10) &amp;
 							    (!Sem_OSPI1_DataL_Port2L &amp; !Sem_OSPI1_DataH_Port2L) &amp;
@@ -1183,8 +2196,25 @@
                                                     </SignalLogicalOp>
                                                     <Semaphore>Sem_Port2L_$IpInstance_IOL</Semaphore>
 						    <Semaphore>Sem_OSPI2_DataL_Port2L_10</Semaphore>
+					    </Mode>
+
+					    <Mode Name="OCTOSPI2_IOL_Port2L_10_MX" UserName="Port2 IO[1:0] -- MULTIPLEXED --" RemoveCondition="DIE470 | !OCTOSPI2:$ModeExist_OCTOSPI2_IOL_Port2L_10">
+						    <Condition Expression="
+							    Sem_OSPI1_DataL_Port2L_10_MX &amp;
+							    !Sem_OSPI2_DataH_Port2L_10_MX &amp; 
+							    (s_o2_singlemx |
+							    s_o2_dualmx |
+							    s_o2_dualsinglemx |
+							    s_o2_dualdualmx)
+							    " Diagnostic=""/>
+                                                    <SignalLogicalOp Name="AND">
+                                                            <Signal Name="VS_ospi2_mx_p2_10"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>Sem_Port2L_$IpInstance_IOL</Semaphore>
+                                                    <Semaphore>Sem_OSPI2_DataL_Port2L_10_MX</Semaphore>
                                             </Mode>
-                                            <Mode Name="OCTOSPI2_IOL_Port2L2" UserName="Port2 IO[3:0]">
+
+                                            <Mode Name="OCTOSPI2_IOL_Port2L" UserName="Port2 IO[3:0]">
 						    <Condition Expression="
 							    (!Sem_OSPI1_DataL_Port2L_10 &amp; !Sem_OSPI1_DataH_Port2L_10) &amp;
 							    (!Sem_OSPI1_DataL_Port2L &amp; !Sem_OSPI1_DataH_Port2L) &amp;
@@ -1198,8 +2228,25 @@
                                                     </SignalLogicalOp>
                                                     <Semaphore>Sem_Port2L_$IpInstance_IOL</Semaphore>
 						    <Semaphore>Sem_OSPI2_DataL_Port2L</Semaphore>
+					    </Mode>
+
+					    <Mode Name="OCTOSPI2_IOL_Port2L_30_MX" UserName="Port2 IO[3:0] -- MULTIPLEXED --" RemoveCondition="DIE470 | !OCTOSPI2:$ModeExist_OCTOSPI2_IOL_Port2L">
+						    <Condition Expression="
+							    Sem_OSPI1_DataL_Port2L_30_MX &amp;
+							    !Sem_OSPI2_DataH_Port2L_30_MX &amp;
+							    (s_o2_quadmx |
+							    s_o2_dualquadmx |
+							    s_o2_octomx |
+							    s_o2_hyperbusmx)
+							    " Diagnostic=""/>
+                                                    <SignalLogicalOp Name="AND">
+                                                            <Signal Name="VS_ospi2_mx_p2_30"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>Sem_Port2L_$IpInstance_IOL</Semaphore>
+                                                    <Semaphore>Sem_OSPI2_DataL_Port2L_30_MX</Semaphore>
                                             </Mode>
-                                            <Mode Name="OCTOSPI2_IOL_Port2H1" UserName="Port2 IO[5:4]">
+
+                                            <Mode Name="OCTOSPI2_IOL_Port2H_54" UserName="Port2 IO[5:4]">
 						    <Condition Expression="
 							    (!Sem_OSPI1_DataL_Port2H_54 &amp; !Sem_OSPI1_DataH_Port2H_54) &amp;
 							    (!Sem_OSPI1_DataL_Port2H &amp; !Sem_OSPI1_DataH_Port2H) &amp;
@@ -1211,8 +2258,25 @@
                                                     </SignalLogicalOp>
                                                     <Semaphore>Sem_Port2H_$IpInstance_IOL</Semaphore>
 						    <Semaphore>Sem_OSPI2_DataL_Port2H_54</Semaphore>
-                                            </Mode>
-                                            <Mode Name="OCTOSPI2_IOL_Port2H2" UserName="Port2 IO[7:4]">
+					    </Mode>
+
+					    <Mode Name="OCTOSPI2_IOL_Port2H_54_MX" UserName="Port2 IO[5:4] -- MULTIPLEXED --" RemoveCondition="DIE470 | !OCTOSPI2:$ModeExist_OCTOSPI2_IOL_Port2H_54">
+						    <Condition Expression="
+							    Sem_OSPI1_DataL_Port2H_54_MX &amp;
+							    !Sem_OSPI2_DataH_Port2H_54_MX &amp; 
+							    (s_o2_singlemx |
+							    s_o2_dualmx |
+							    s_o2_dualsinglemx |
+							    s_o2_dualdualmx)
+							    " Diagnostic=""/>
+                                                    <SignalLogicalOp Name="AND">
+                                                            <Signal Name="VS_ospi2_mx_p2_54"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>Sem_Port2H_$IpInstance_IOL</Semaphore>
+                                                    <Semaphore>Sem_OSPI2_DataL_Port2H_54_MX</Semaphore>
+					    </Mode>
+
+                                            <Mode Name="OCTOSPI2_IOL_Port2H" UserName="Port2 IO[7:4]">
 						    <Condition Expression="
 							    (!Sem_OSPI1_DataL_Port2H_54 &amp; !Sem_OSPI1_DataH_Port2H_54) &amp;
 							    (!Sem_OSPI1_DataL_Port2H &amp; !Sem_OSPI1_DataH_Port2H) &amp;
@@ -1226,13 +2290,31 @@
                                                     </SignalLogicalOp>
                                                     <Semaphore>Sem_Port2H_$IpInstance_IOL</Semaphore>
 						    <Semaphore>Sem_OSPI2_DataL_Port2H</Semaphore>
-                                            </Mode>
+					    </Mode>
+
+					    <Mode Name="OCTOSPI2_IOL_Port2H_74_MX" UserName="Port2 IO[7:4] -- MULTIPLEXED --" RemoveCondition="DIE470 | !OCTOSPI2:$ModeExist_OCTOSPI2_IOL_Port2H">
+						    <Condition Expression="
+							    Sem_OSPI1_DataL_Port2H_74_MX &amp;
+							    !Sem_OSPI2_DataH_Port2H_74_MX &amp;
+							    (s_o2_quadmx |
+							    s_o2_dualquadmx |
+							    s_o2_octomx |
+							    s_o2_hyperbusmx)
+							    " Diagnostic=""/>
+                                                    <SignalLogicalOp Name="AND">
+                                                            <Signal Name="VS_ospi2_mx_p2_74"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>Sem_Port2H_$IpInstance_IOL</Semaphore>
+                                                    <Semaphore>Sem_OSPI2_DataL_Port2H_74_MX</Semaphore>
+					    </Mode>
+
                                     </ModeLogicOperator>
-                                    <Semaphore>Sem_$IpInstance_DataL</Semaphore>
+				    <!-- <Semaphore>Sem_$IpInstance_DataL</Semaphore> -->
                             </Mode>
+
                             <Mode Name="OCTOSPI2_Data[7:4]" UserName="Data [7:4]"  RemoveCondition="$Index=1">
                                     <ModeLogicOperator Name="XOR">
-                                            <Mode Name="OCTOSPI2_IOH_Port1L" UserName="Port1 IO[1:0]">
+                                            <Mode Name="OCTOSPI2_IOH_Port1L_10" UserName="Port1 IO[1:0]">
 						    <Condition Expression="
 							    (!Sem_OSPI1_DataL_Port1L_10 &amp; !Sem_OSPI1_DataH_Port1L_10) &amp;
 							    (!Sem_OSPI1_DataL_Port1L &amp; !Sem_OSPI1_DataH_Port1L) &amp;
@@ -1245,6 +2327,21 @@
                                                     <Semaphore>Sem_Port1L_$IpInstance_IOH</Semaphore>                                         
 						    <Semaphore>Sem_OSPI2_DataH_Port1L_10</Semaphore>
                                             </Mode> 
+
+					    <Mode Name="OCTOSPI2_IOH_Port1L_10_MX" UserName="Port1 IO[1:0] -- MULTIPLEXED --" RemoveCondition="DIE470 | !OCTOSPI2:$ModeExist_OCTOSPI2_IOH_Port1L_10">
+						    <Condition Expression="
+							    Sem_OSPI1_DataH_Port1L_10_MX &amp;
+							    !Sem_OSPI2_DataL_Port1L_10_MX &amp;
+							    (s_o2_dualsinglemx |
+							    s_o2_dualdualmx)
+							    " Diagnostic=""/>
+                                                    <SignalLogicalOp Name="AND">
+                                                            <Signal Name="VS_ospi2_mx_p1_10"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>Sem_Port1L_$IpInstance_IOH</Semaphore>                                         
+                                                    <Semaphore>Sem_OSPI2_DataH_Port1L_10_MX</Semaphore>
+					    </Mode>
+
                                             <Mode Name="OCTOSPI2_IOH_Port1L" UserName="Port1 IO[3:0]">
 						    <Condition Expression="
 							    (!Sem_OSPI1_DataL_Port1L_10 &amp; !Sem_OSPI1_DataH_Port1L_10) &amp;
@@ -1259,8 +2356,24 @@
                                                     </SignalLogicalOp>           
                                                     <Semaphore>Sem_Port1L_$IpInstance_IOH</Semaphore>                                         
 						    <Semaphore>Sem_OSPI2_DataH_Port1L</Semaphore>
+					    </Mode>
+
+					    <Mode Name="OCTOSPI2_IOH_Port1L_30_MX" UserName="Port1 IO[3:0] -- MULTIPLEXED --" RemoveCondition="DIE470 | !OCTOSPI2:$ModeExist_OCTOSPI2_IOH_Port1L">
+						    <Condition Expression="
+							    Sem_OSPI1_DataH_Port1L_30_MX &amp;
+							    !Sem_OSPI2_DataL_Port1L_30_MX &amp;
+							    (s_o2_dualquadmx |
+							    s_o2_octomx |
+							    s_o2_hyperbusmx)
+							    " Diagnostic=""/>
+                                                    <SignalLogicalOp Name="AND">
+                                                            <Signal Name="VS_ospi2_mx_p1_30"/>
+                                                    </SignalLogicalOp>           
+                                                    <Semaphore>Sem_Port1L_$IpInstance_IOH</Semaphore>                                         
+                                                    <Semaphore>Sem_OSPI2_DataH_Port1L_30_MX</Semaphore>
                                             </Mode>
-					    <Mode Name="OCTOSPI2_IOH_Port1H" UserName="Port1 IO[5:4]">
+
+					    <Mode Name="OCTOSPI2_IOH_Port1H_54" UserName="Port1 IO[5:4]">
 						    <Condition Expression="
 							    (!Sem_OSPI1_DataL_Port1H_54 &amp; !Sem_OSPI1_DataH_Port1H_54) &amp;
 							    (!Sem_OSPI1_DataL_Port1H &amp; !Sem_OSPI1_DataH_Port1H) &amp;
@@ -1272,7 +2385,22 @@
                                                     </SignalLogicalOp>
                                                     <Semaphore>Sem_Port1H_$IpInstance_IOH</Semaphore>
 						    <Semaphore>Sem_OSPI2_DataH_Port1H_54</Semaphore>
-                                            </Mode>
+					    </Mode>
+
+					    <Mode Name="OCTOSPI2_IOH_Port1H_54_MX" UserName="Port1 IO[5:4] -- MULTIPLEXED --" RemoveCondition="DIE470 | !OCTOSPI2:$ModeExist_OCTOSPI2_IOH_Port1H_54">
+						    <Condition Expression="
+							    Sem_OSPI1_DataH_Port1H_54_MX &amp;
+							    !Sem_OSPI2_DataL_Port1H_54_MX &amp;
+							    (s_o2_dualsinglemx |
+							    s_o2_dualdualmx)
+							    " Diagnostic=""/>
+                                                    <SignalLogicalOp Name="AND">
+                                                            <Signal Name="VS_ospi2_mx_p1_54"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>Sem_Port1H_$IpInstance_IOH</Semaphore>
+						    <Semaphore>Sem_OSPI2_DataH_Port1H_54_MX</Semaphore>
+					    </Mode>
+
                                             <Mode Name="OCTOSPI2_IOH_Port1H" UserName="Port1 IO[7:4]">
 						    <Condition Expression="
 							    (!Sem_OSPI1_DataL_Port1H_54 &amp; !Sem_OSPI1_DataH_Port1H_54) &amp;
@@ -1288,7 +2416,23 @@
                                                     <Semaphore>Sem_Port1H_$IpInstance_IOH</Semaphore>
 						    <Semaphore>Sem_OSPI2_DataH_Port1H</Semaphore>
                                             </Mode>
-                                            <Mode Name="OCTOSPI2_IOH_Port2L" UserName="Port2 IO[1:0]">
+
+					    <Mode Name="OCTOSPI2_IOH_Port1H_74_MX" UserName="Port1 IO[7:4] -- MULTIPLEXED --" RemoveCondition="DIE470 | !OCTOSPI2:$ModeExist_OCTOSPI2_IOH_Port1H">
+						    <Condition Expression="
+							    Sem_OSPI1_DataH_Port1H_74_MX &amp;
+							    !Sem_OSPI2_DataL_Port1H_74_MX &amp;
+							    (s_o2_dualquadmx |
+							    s_o2_octomx |
+							    s_o2_hyperbusmx)
+							    " Diagnostic=""/>
+                                                    <SignalLogicalOp Name="AND">
+                                                            <Signal Name="VS_ospi2_mx_p1_74"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>Sem_Port1H_$IpInstance_IOH</Semaphore>
+						    <Semaphore>Sem_OSPI2_DataH_Port1H_74_MX</Semaphore>
+					    </Mode>
+
+                                            <Mode Name="OCTOSPI2_IOH_Port2L_10" UserName="Port2 IO[1:0]">
 						    <Condition Expression="
 							    (!Sem_OSPI1_DataL_Port2L_10 &amp; !Sem_OSPI1_DataH_Port2L_10) &amp;
 							    (!Sem_OSPI1_DataL_Port2L &amp; !Sem_OSPI1_DataH_Port2L) &amp;
@@ -1300,7 +2444,22 @@
                                                     </SignalLogicalOp>
                                                     <Semaphore>Sem_Port2L_$IpInstance_IOH</Semaphore>
 						    <Semaphore>Sem_OSPI2_DataH_Port2L_10</Semaphore>
-                                            </Mode>
+					    </Mode>
+
+					    <Mode Name="OCTOSPI2_IOH_Port2L_10_MX" UserName="Port2 IO[1:0] -- MULTIPLEXED --" RemoveCondition="DIE470 | !OCTOSPI2:$ModeExist_OCTOSPI2_IOH_Port2L_10">
+						    <Condition Expression="
+							    Sem_OSPI1_DataH_Port2L_10_MX &amp;
+							    !Sem_OSPI2_DataL_Port2L_10_MX &amp;
+							    (s_o2_dualsinglemx |
+							    s_o2_dualdualmx)
+							    " Diagnostic=""/>
+                                                    <SignalLogicalOp Name="AND">
+                                                            <Signal Name="VS_ospi2_mx_p2_10"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>Sem_Port2L_$IpInstance_IOH</Semaphore>
+						    <Semaphore>Sem_OSPI2_DataH_Port2L_10_MX</Semaphore>
+					    </Mode>
+
                                             <Mode Name="OCTOSPI2_IOH_Port2L" UserName="Port2 IO[3:0]">
 						    <Condition Expression="
 							    (!Sem_OSPI1_DataL_Port2L_10 &amp; !Sem_OSPI1_DataH_Port2L_10) &amp;
@@ -1315,9 +2474,26 @@
                                                     </SignalLogicalOp>
                                                     <Semaphore>Sem_Port2L_$IpInstance_IOH</Semaphore>
 						    <Semaphore>Sem_OSPI2_DataH_Port2L</Semaphore>
-                                            </Mode>
-                                            <Mode  Name="OCTOSPI2_IOH_Port2H" UserName="Port2 IO[5:4]">
+					    </Mode>
+
+					    <Mode Name="OCTOSPI2_IOH_Port2L_30_MX" UserName="Port2 IO[3:0] -- MULTIPLEXED --" RemoveCondition="DIE470 | !OCTOSPI2:$ModeExist_OCTOSPI2_IOH_Port2L">
 						    <Condition Expression="
+							    Sem_OSPI1_DataH_Port2L_30_MX &amp;
+							    !Sem_OSPI2_DataL_Port2L_30_MX &amp;
+							    (s_o2_dualquadmx |
+							    s_o2_octomx |
+							    s_o2_hyperbusmx)
+							    " Diagnostic=""/>
+                                                    <SignalLogicalOp Name="AND">
+                                                            <Signal Name="VS_ospi2_mx_p2_30"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>Sem_Port2L_$IpInstance_IOH</Semaphore>
+						    <Semaphore>Sem_OSPI2_DataH_Port2L_30_MX</Semaphore>
+                                            </Mode>
+
+                                            <Mode  Name="OCTOSPI2_IOH_Port2H_54" UserName="Port2 IO[5:4]">
+						    <Condition Expression="
+							    (!Sem_OSPI1_DataL_Port2H_54 &amp; !Sem_OSPI1_DataH_Port2H_54) &amp;
 							    (!Sem_OSPI1_DataL_Port2H &amp; !Sem_OSPI1_DataH_Port2H) &amp;
 							    !Sem_OSPI2_DataL_Port2H_54 &amp;
 							    (Sem_$IpInstance_DualSingle|Sem_$IpInstance_DualDual)" Diagnostic=""/>
@@ -1327,7 +2503,22 @@
                                                     </SignalLogicalOp>
                                                     <Semaphore>Sem_Port2H_$IpInstance_IOH</Semaphore>
 						    <Semaphore>Sem_OSPI2_DataH_Port2H_54</Semaphore>
+					    </Mode>
+
+					    <Mode  Name="OCTOSPI2_IOH_Port2H_54_MX" UserName="Port2 IO[5:4] -- MULTIPLEXED --" RemoveCondition="DIE470 | !OCTOSPI2:$ModeExist_OCTOSPI2_IOH_Port2H_54">
+						    <Condition Expression="
+							    Sem_OSPI1_DataH_Port2H_54_MX &amp;
+							    !Sem_OSPI2_DataL_Port2H_54_MX &amp;
+							    (s_o2_dualsinglemx |
+							    s_o2_dualdualmx)
+							    " Diagnostic=""/>
+                                                    <SignalLogicalOp Name="AND">
+                                                            <Signal Name="VS_ospi2_mx_p2_54"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>Sem_Port2H_$IpInstance_IOH</Semaphore>
+						    <Semaphore>Sem_OSPI2_DataH_Port2H_54_MX</Semaphore>
                                             </Mode>
+
                                             <Mode  Name="OCTOSPI2_IOH_Port2H" UserName="Port2 IO[7:4]">
 						    <Condition Expression="
 							    (!Sem_OSPI1_DataL_Port2H_54 &amp; !Sem_OSPI1_DataH_Port2H_54) &amp;
@@ -1342,117 +2533,29 @@
                                                     </SignalLogicalOp>
                                                     <Semaphore>Sem_Port2H_$IpInstance_IOH</Semaphore>
 						    <Semaphore>Sem_OSPI2_DataH_Port2H</Semaphore>
-                                            </Mode>
+					    </Mode>
+
+					    <Mode  Name="OCTOSPI2_IOH_Port2H_74_MX" UserName="Port2 IO[7:4] -- MULTIPLEXED --" RemoveCondition="DIE470 | !OCTOSPI2:$ModeExist_OCTOSPI2_IOH_Port2H">
+						    <Condition Expression="
+							    Sem_OSPI1_DataH_Port2H_74_MX &amp;
+							    !Sem_OSPI2_DataL_Port2H_74_MX &amp;
+							    (s_o2_dualquadmx |
+							    s_o2_octomx |
+							    s_o2_hyperbusmx)
+							    " Diagnostic=""/>
+                                                    <SignalLogicalOp Name="AND">
+                                                            <Signal Name="VS_ospi2_mx_p2_74"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>Sem_Port2H_$IpInstance_IOH</Semaphore>
+						    <Semaphore>Sem_OSPI2_DataH_Port2H_74_MX</Semaphore>
+					    </Mode>
+
                                     </ModeLogicOperator>
                                     <Semaphore>Sem_$IpInstance_DataH</Semaphore>
                             </Mode>
-                            <Mode Name="OCTOSPI2_Control_NCS" UserName="Chip Select"  RemoveCondition="$Index=1">
-                                    <ModeLogicOperator Name="XOR">
-                                            <Mode Name="OCTOSPI2_Port1_NCS" UserName="Port1 NCS">
-						    <Condition Expression="
-							    !Sem_OSPI1_NCS_Port1 &amp;
-							    (Sem_$IpInstance_Single|Sem_$IpInstance_Dual|Sem_$IpInstance_Quad|Sem_$IpInstance_DualSingle|Sem_$IpInstance_DualDual|Sem_$IpInstance_DualQuad|Sem_$IpInstance_Octo|Sem_$IpInstance_HyperBus)" Diagnostic=""/>
-                                                    <SignalLogicalOp Name="AND">
-                                                            <Signal Name="$SingleInstanceOCTOSPIM_P1_NCS"/>
-                                                    </SignalLogicalOp>
-                                                    <Semaphore>Sem_Port1NCS_$IpInstance_NCS</Semaphore>
-						    <Semaphore>Sem_OSPI2_NCS_Port1</Semaphore>
-                                            </Mode>
-                                            <Mode Name="OCTOSPI2_Port2_NCS" UserName="Port2 NCS">
-                                                    <Condition Expression="
-							    !Sem_OSPI1_NCS_Port2 &amp;
-							    (Sem_$IpInstance_Single|Sem_$IpInstance_Dual|Sem_$IpInstance_Quad|Sem_$IpInstance_DualSingle|Sem_$IpInstance_DualDual|Sem_$IpInstance_DualQuad|Sem_$IpInstance_Octo|Sem_$IpInstance_HyperBus)" Diagnostic=""/>
-                                                    <SignalLogicalOp Name="AND">
-                                                            <Signal Name="$SingleInstanceOCTOSPIM_P2_NCS"/>
-                                                    </SignalLogicalOp>
-                                                    <Semaphore>Sem_Port2NCS_$IpInstance_NCS</Semaphore>
-						    <Semaphore>Sem_OSPI2_NCS_Port2</Semaphore>
-                                            </Mode>
-                                    </ModeLogicOperator>
-                                    <Semaphore>Sem_$IpInstance_NCS</Semaphore>
-                            </Mode>
-			    <Mode Name="OCTOSPI2_DQS" UserName="Data Strobe"  RemoveCondition="$Index=1">
-                                    <ModeLogicOperator Name="XOR">
-                                            <Mode Name="OCTOSPI2_Port1_DQS" UserName="Port1 DQS">
-                                                    <Condition Expression="
-							    !Sem_OSPI1_DQS_Port1 &amp;
-							    (Sem_$IpInstance_Octo|Sem_$IpInstance_HyperBus)" Diagnostic=""/>
-                                                    <SignalLogicalOp Name="AND">
-                                                            <Signal Name="$SingleInstanceOCTOSPIM_P1_DQS"/>
-                                                    </SignalLogicalOp>
-                                                    <Semaphore>Sem_Port1DQS_$IpInstance_DQS</Semaphore>
-						    <Semaphore>Sem_OSPI2_DQS_Port1</Semaphore>
-                                            </Mode>
-                                            <Mode Name="OCTOSPI2_Port2_DQS" UserName="Port2 DQS">
-                                                    <Condition Expression="
-							    !Sem_OSPI1_DQS_Port2 &amp;
-							    (Sem_$IpInstance_Octo|Sem_$IpInstance_HyperBus)" Diagnostic=""/>
-                                                    <SignalLogicalOp Name="AND">
-                                                            <Signal Name="$SingleInstanceOCTOSPIM_P2_DQS"/>
-                                                    </SignalLogicalOp>
-                                                    <Semaphore>Sem_Port2DQS_$IpInstance_DQS</Semaphore>
-						    <Semaphore>Sem_OSPI2_DQS_Port2</Semaphore>
-                                            </Mode>
-                                    </ModeLogicOperator>
-                                    <Semaphore>Sem_$IpInstance_DQS</Semaphore>
-                            </Mode>
-                            <Mode Name="OCTOSPI2_Clock_CLK" UserName="Clock"  RemoveCondition="$Index=1">
-                                    <ModeLogicOperator Name="XOR">
-                                            <Mode Name="OCTOSPI2_Port1_CLK" UserName="Port1 CLK">
-                                                    <Condition Expression="
-							    !Sem_OSPI1_CLK_Port1 &amp;
-							    (Sem_$IpInstance_Single|Sem_$IpInstance_Dual|Sem_$IpInstance_Quad|Sem_$IpInstance_DualSingle|Sem_$IpInstance_DualDual|Sem_$IpInstance_DualQuad|Sem_$IpInstance_Octo|Sem_$IpInstance_HyperBus)" Diagnostic=""/>
-                                                    <SignalLogicalOp Name="AND">
-                                                            <Signal Name="$SingleInstanceOCTOSPIM_P1_CLK"/>
-                                                    </SignalLogicalOp>
-                                                    <Semaphore>Sem_Port1CLK_$IpInstance_CLK</Semaphore>
-						    <Semaphore>Sem_OSPI2_CLK_Port1</Semaphore>
-                                            </Mode>
-                                            <Mode Name="OCTOSPI2_Port2_CLK" UserName="Port2 CLK">
-                                                    <Condition Expression="
-							    !Sem_OSPI1_CLK_Port2 &amp;
-							    (Sem_$IpInstance_Single|Sem_$IpInstance_Dual|Sem_$IpInstance_Quad|Sem_$IpInstance_DualSingle|Sem_$IpInstance_DualDual|Sem_$IpInstance_DualQuad|Sem_$IpInstance_Octo|Sem_$IpInstance_HyperBus)" Diagnostic=""/>
-                                                    <SignalLogicalOp Name="AND">
-                                                            <Signal Name="$SingleInstanceOCTOSPIM_P2_CLK"/>                                               
-                                                    </SignalLogicalOp>
-                                                    <Semaphore>Sem_Port2CLK_$IpInstance_CLK</Semaphore>
-						    <Semaphore>Sem_OSPI2_CLK_Port2</Semaphore>
-                                            </Mode>   
-                                    </ModeLogicOperator>
-                                    <Semaphore>Sem_$IpInstance_CLK</Semaphore>
-                            </Mode>
-			    <Mode Name="OCTOSPI2_Clock_NCLK" UserName="HyperBus(TM) 1.8V Inverted Clock"  RemoveCondition="$Index=1">
-                                    <ModeLogicOperator Name="XOR">
-                                            <Mode Name="OCTOSPI2_Port1_NCLK" UserName="Port1 NCLK" RemoveCondition="!(DIE471)">
-                                                    <Condition Expression="
-							    !Sem_OSPI1_NCLK_Port1 &amp;
-							    (Sem_$IpInstance_HyperBus &amp; Sem_Port1CLK_$IpInstance_CLK)" Diagnostic=""/>
-                                                    <SignalLogicalOp Name="AND">
-                                                            <Signal Name="$SingleInstanceOCTOSPIM_P1_NCLK"/>
-                                                    </SignalLogicalOp>
-                                                    <Semaphore>Sem_Port1CLK_$IpInstance_NCLK</Semaphore>
-						    <Semaphore>Sem_OSPI2_NCLK_Port1</Semaphore>
-                                            </Mode>
-                                            <Mode Name="OCTOSPI2_Port2_NCLK" UserName="Port2 NCLK" RemoveCondition="!(DIE471)">
-                                                    <Condition Expression="
-							    !Sem_OSPI1_NCLK_Port2 &amp;
-							    (Sem_$IpInstance_HyperBus &amp; Sem_Port2CLK_$IpInstance_CLK)" Diagnostic=""/>
-                                                    <SignalLogicalOp Name="AND">
-                                                            <Signal Name="$SingleInstanceOCTOSPIM_P2_NCLK"/>
-                                                    </SignalLogicalOp>
-                                                    <Semaphore>Sem_Port2CLK_$IpInstance_NCLK</Semaphore>
-						    <Semaphore>Sem_OSPI2_CLK_Port2</Semaphore>
-                                            </Mode>
-                                    </ModeLogicOperator>
-                                    <Semaphore>Sem_$IpInstance_NCLK</Semaphore>
-                            </Mode>
 
                     </ModeLogicOperator>
-          <!--  </Mode>
-    </ModeLogicOperator>-->
-    <!--        </Mode>           
 
-    </ModeLogicOperator> -->
     <!--*********************************************************************************************-->
     <RefSignal IOMode="AlternateFunctionPushPullHighSpeedDefault" Name="$SingleInstanceOCTOSPIM_P1_IO0"/>
     <RefSignal IOMode="AlternateFunctionPushPullHighSpeedDefault" Name="$SingleInstanceOCTOSPIM_P1_IO1"/>
@@ -1478,11 +2581,35 @@
     <RefSignal IOMode="AlternateFunctionPushPullHighSpeedDefault" Name="$SingleInstanceOCTOSPIM_P2_CLK"/>
     <RefSignal IOMode="AlternateFunctionPushPullHighSpeedDefault" Name="$SingleInstanceOCTOSPIM_P2_DQS"/>
     <RefSignal IOMode="AlternateFunctionPushPullHighSpeedDefault" Name="$SingleInstanceOCTOSPIM_P2_NCLK"/>
+
     <RefSignal Name="VS_dualsingle" Virtual="true"/>
+    <RefSignal Name="VS_dualsingle_mx" Virtual="true"/>
+    <RefSignal Name="VS_dualdual_mx" Virtual="true"/>
     <RefSignal Name="VS_dualdual" Virtual="true"/>
     <RefSignal Name="VS_dual" Virtual="true"/>
+    <RefSignal Name="VS_dual_mx" Virtual="true"/>
     <RefSignal Name="VS_quad" Virtual="true"/>
+    <RefSignal Name="VS_quad_mx" Virtual="true"/>
     <RefSignal Name="VS_octo" Virtual="true"/>
-    <RefSignal Name="VS_octoDiff" Virtual="true"/>
+    <RefSignal Name="VS_octo_mx" Virtual="true"/>
+    <RefSignal Name="VS_hyperbus" Virtual="true"/>
+    <RefSignal Name="VS_hyperbus_mx" Virtual="true"/>
+
+    <RefSignal Name="VS_ospi2_mx_p1_10" Virtual="true"/>
+    <RefSignal Name="VS_ospi2_mx_p1_30" Virtual="true"/>
+    <RefSignal Name="VS_ospi2_mx_p1_54" Virtual="true"/>
+    <RefSignal Name="VS_ospi2_mx_p1_74" Virtual="true"/>
+    <RefSignal Name="VS_ospi2_mx_p1_dqs" Virtual="true"/>
+    <RefSignal Name="VS_ospi2_mx_p1_clk" Virtual="true"/>
+    <RefSignal Name="VS_ospi2_mx_p1_nclk" Virtual="true"/>
+
+    <RefSignal Name="VS_ospi2_mx_p2_10" Virtual="true"/>
+    <RefSignal Name="VS_ospi2_mx_p2_30" Virtual="true"/>
+    <RefSignal Name="VS_ospi2_mx_p2_54" Virtual="true"/>
+    <RefSignal Name="VS_ospi2_mx_p2_74" Virtual="true"/>
+    <RefSignal Name="VS_ospi2_mx_p2_dqs" Virtual="true"/>
+    <RefSignal Name="VS_ospi2_mx_p2_clk" Virtual="true"/>
+    <RefSignal Name="VS_ospi2_mx_p2_nclk" Virtual="true"/>
+
     <Semaphore>$IpInstanceUsed_ForRCC</Semaphore>
 </IP>

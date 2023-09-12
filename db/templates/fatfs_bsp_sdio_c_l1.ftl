@@ -4,7 +4,7 @@
  * @file    bsp_driver_sd.c for L1 (based on stm32l152d_eval_sd.c)
  * @brief   This file includes a generic uSD card driver.
  *          To be completed by the user according to the board used for the project.
- * @note    Functions generated as weak: they can be overriden by
+ * @note    Some functions generated as weak: they can be overriden by
  *          - code in user files
  *          - or BSP code from the FW pack files
  *          if such files are added to the generated project (by the user).
@@ -296,7 +296,7 @@ __weak void BSP_SD_GetCardInfo(BSP_SD_CardInfo *CardInfo)
   * @param hsd: SD handle
   * @retval None
   */
-__weak void HAL_SD_AbortCallback(SD_HandleTypeDef *hsd)
+void HAL_SD_AbortCallback(SD_HandleTypeDef *hsd)
 {
   BSP_SD_AbortCallback();
 }
@@ -306,7 +306,7 @@ __weak void HAL_SD_AbortCallback(SD_HandleTypeDef *hsd)
   * @param hsd: SD handle
   * @retval None
   */
-__weak void HAL_SD_TxCpltCallback(SD_HandleTypeDef *hsd)
+void HAL_SD_TxCpltCallback(SD_HandleTypeDef *hsd)
 {
   BSP_SD_WriteCpltCallback();
 }
@@ -316,7 +316,7 @@ __weak void HAL_SD_TxCpltCallback(SD_HandleTypeDef *hsd)
   * @param hsd: SD handle
   * @retval None
   */
-__weak void HAL_SD_RxCpltCallback(SD_HandleTypeDef *hsd)
+void HAL_SD_RxCpltCallback(SD_HandleTypeDef *hsd)
 {
   BSP_SD_ReadCpltCallback();
 }

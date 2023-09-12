@@ -61,6 +61,19 @@ Global variables Api:
 [/#function]
 
 
+[#-- Return true if the key is found in the map.
+--]
+[#function srvc_map_isContainsKey  map keyIn]
+
+	[#local keys = map?keys]
+	[#if keys?seq_contains(keyIn)]
+		[#return true]
+	[#else]
+		[#return false]
+	[/#if]
+[/#function]
+
+
 [#-- Return value from map if key found.
 The exact value of "keyIn" is searched.
 Return empty value if key not found.--]
@@ -143,6 +156,20 @@ is supposed to contain elmts of list type--]
 	[#local map = map + {key:newElmtsList}]
 
 [#return map!]
+[/#function]
+
+
+[#--Search in a strings list an element starting the provided string.
+	Return the 1st found element from the list. Empty if nothing match.--]
+[#function srvc_list_getStringElmtStartingTheString  pStringsListIn pStringIn]
+
+	[#list pStringsListIn as elmt]
+		[#if pStringIn?starts_with(elmt)]
+			[#return elmt]
+			[#break]
+		[/#if]
+	[/#list]
+[#return ""]
 [/#function]
 
 

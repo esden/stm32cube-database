@@ -50,8 +50,7 @@
 	/* USER CODE BEGIN bsec */
 	board_id: board_id@ec {
 		reg = <0xec 0x4>;
-		status = "okay";
-		secure-status = "okay";
+		st,non-secure-otp;
 	};
 	/* USER CODE END bsec */
 };
@@ -84,6 +83,7 @@
 	/* USER CODE BEGIN i2c4 */
 	i2c-scl-rising-time-ns = <185>;
 	i2c-scl-falling-time-ns = <20>;
+	clock-frequency = <400000>;
 
 	pmic: stpmic@33 {
 		compatible = "st,stpmic1";
@@ -91,11 +91,8 @@
 		interrupts-extended = <&exti_pwr 55 IRQ_TYPE_EDGE_FALLING>;
 		interrupt-controller;
 		#interrupt-cells = <2>;
+		wakeup-source;
 		status = "okay";
-
-		st,main-control-register = <0x04>;
-		st,vin-control-register = <0xc0>;
-		st,usb-control-register = <0x20>;
 
 		regulators {
 			compatible = "st,stpmic1-regulators";
@@ -523,9 +520,26 @@
 	secure-status = "okay";
 	/* USER CODE BEGIN timers15 */
 	st,hsi-cal-input = <7>;
-	st,csi_cal-input = <8>;
+	st,csi-cal-input = <8>;
 	/* USER CODE END timers15 */
 };
 
 /* USER CODE BEGIN addons */
+&nvmem_layout {
+	nvmem-cells =<&part_number_otp>,
+		      <&monotonic_otp>,
+		      <&nand_otp>,
+		      <&uid_otp>,
+		      <&package_otp>,
+		      <&hw2_otp>,
+		      <&board_id>;
+
+	nvmem-cell-names = "part_number_otp",
+			   "monotonic_otp",
+			   "nand_otp",
+			   "uid_otp",
+			   "package_otp",
+			   "hw2_otp",
+			   "board_id";
+};
 /* USER CODE END addons */

@@ -1,14 +1,15 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
  ******************************************************************************
   * File Name          : ${name}
   * Description        : App Common application configuration file for STM32WPAN Middleware.
   *
- ******************************************************************************
+  ******************************************************************************
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
-
+/* USER CODE END Header */
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef APP_COMMON_H
 #define APP_COMMON_H

@@ -22,6 +22,7 @@
 [#assign includeClassMsc = 0]
 [#assign includeClassMtp = 0]
 [#assign includeClassCustomHid = 0]
+[#assign includeClassBillBoard = 0]
 
 [#assign instanceNb = 0]
 [#assign instanceNbCallBack = 0]
@@ -91,6 +92,14 @@
 #include "usbd_custom_hid_if.h"
                 [/#if]
         [/#if]
+        
+        [#if className == "billboard"]
+                [#if includeClassBillBoard == 0]
+                [#assign includeClassBillBoard = 1]
+#include "usbd_billboard.h"
+                [/#if]
+        [/#if]
+        
 [/#if]
 
         [#if className == "audio"]
@@ -154,7 +163,13 @@
 #include "usbd_mtp.h"
                 [/#if]
         [/#if]
-
+        
+ 		[#if className == "billboard"]
+                [#if includeClassBillBoard == 0]
+                [#assign includeClassBillBoard = 1]
+#include "usbd_billboard.h"
+                [/#if]
+        [/#if]
 
 [/#list]
 [/#list]

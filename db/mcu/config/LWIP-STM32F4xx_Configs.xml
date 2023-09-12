@@ -14,8 +14,10 @@
         <Component Name="Middleware:LWIP:HTTPD:$LWIP_HTTPD"/>
         <Component Name="Middleware:LWIP:SNMP:$LWIP_SNMP"/>
         <Component Name="Middleware:LWIP:SNTP:$LWIP_SNTP"/>
+        <Component Name="Middleware:LWIP:SMTP:$LWIP_SMTP"/>
         <Component Name="Middleware:LWIP:TFTP:$LWIP_TFTP"/>
         <Component Name="Middleware:LWIP:MDNS:$LWIP_MDNS"/>
+        <Component Name="Middleware:LWIP:ALTCP_TLS:$LWIP_ALTCP"/>
         <Component Name="Middleware:LWIP:MDNS_POLARSSL_MD5:$LWIP_INCLUDED_POLARSSL_MD5"/>
         <Component Name="Middleware:LWIP:MDNS_POLARSSL_MD4:$LWIP_INCLUDED_POLARSSL_MD4"/>
         <Component Name="Middleware:LWIP:MDNS_POLARSSL_SHA1:$LWIP_INCLUDED_POLARSSL_SHA1"/>
@@ -46,7 +48,7 @@
         <Argument AddressOf="true" GenericType="Array" Name="GATEWAY_ADDRESS" TypeName="uint8_t" Context="global" ArraySize="4"/>
     </LibMethod>
 
-    <RefComponent Cclass="Middleware" Cgroup="LWIP" Cversion="v2.0.3">
+    <RefComponent Cclass="Middleware" Cgroup="LWIP" Cversion="v2.1.2">
         <File Name="src/api/*.c" Category="source"/>
         <File Name="src/core/*.c" Category="source"/>
         <File Name="src/core/ipv4/*.c" Category="source"/>
@@ -80,8 +82,12 @@
         <File Name="src/include/netif/ppp/pppos.h" Category="header"/>
         <File Name="src/include/netif/ppp/upap.h" Category="header"/>
         <File Name="src/include/netif/ppp/vj.h" Category="header"/>
-        <File Name="src/include/posix/*.h" Category="header"/>
-        <File Name="src/include/posix/sys/*.h" Category="header"/>
+        <File Name="src/include/compat/posix/*.h" Category="header"/>
+        <File Name="src/include/compat/posix/arpa/*.h" Category="header"/>
+        <File Name="src/include/compat/posix/net/*.h" Category="header"/>
+        <File Name="src/include/compat/posix/sys/*.h" Category="header"/>
+        <File Name="src/include/compat/posix/sys/*.h" Category="header"/>
+        <File Name="src/include/compat/stdc/*.h" Category="header"/>
         <File Name="src/netif/ppp/auth.c" Category="source"/>
         <File Name="src/netif/ppp/ccp.c" Category="source"/>
         <File Name="src/netif/ppp/chap_ms.c" Category="source"/>
@@ -106,9 +112,14 @@
         <File Name="src/netif/ppp/upap.c" Category="source"/>
         <File Name="src/netif/ppp/utils.c" Category="source"/>
         <File Name="src/netif/ppp/vj.c" Category="source"/>
+        <File Name="src/netif/bridgeif.c" Category="source"/>
+        <File Name="src/netif/bridgeif_fdb.c" Category="source"/>
         <File Name="src/netif/ethernet.c" Category="source"/>
-        <File Name="src/netif/slipif.c" Category="source"/>
         <File Name="src/netif/lowpan6.c" Category="source"/>
+        <File Name="src/netif/lowpan6_ble.c" Category="source"/>
+        <File Name="src/netif/lowpan6_common.c" Category="source"/>
+        <File Name="src/netif/slipif.c" Category="source"/>
+        <File Name="src/netif/zepif.c" Category="source"/>
         <File Name="system/*" Category="header"/>
         <File Name="system/arch/*.h" Category="header"/>
         <File Name="system/OS/*.c" Category="source" Condition="FreeRTOS"/>
@@ -136,10 +147,10 @@
         <File Category="source" Name="src/netif/ppp/polarssl/arc4.c"/>
             </SubComponent>
         <SubComponent Csub="HTTPD" Cvariant="1">
-            <File Category="source" Name="src/apps/httpd/httpd.c"/>
-            <File Category="source" Name="src/apps/httpd/fs.c"/>
-            <File Category="header" Name="src/apps/httpd/fsdata.h"/>
-            <File Category="header" Name="src/apps/httpd/httpd_structs.h"/>
+            <File Category="source" Name="src/apps/http/httpd.c"/>
+            <File Category="source" Name="src/apps/http/fs.c"/>
+            <File Category="header" Name="src/apps/http/fsdata.h"/>
+            <File Category="header" Name="src/apps/http/httpd_structs.h"/>
         </SubComponent>
         <SubComponent Csub="SNMP" Cvariant="1">
             <File Category="source" Name="src/apps/snmp/*.c"/>
@@ -154,10 +165,17 @@
         <SubComponent Csub="MDNS" Cvariant="1">
             <File Category="source" Name="src/apps/mdns/*.c"/>
         </SubComponent>
+        <SubComponent Csub="ALTCP_TLS" Cvariant="1">
+            <File Category="source" Name="src/apps/altcp_tls/*.c"/>
+        <File Category="header" Name="src/apps/altcp_tls/*.h"/>
+        </SubComponent>
+        <SubComponent Csub="SMTP" Cvariant="1">
+            <File Category="source" Name="src/apps/smtp/*.c"/>
+        </SubComponent>
         </RefComponent>
 
     <RefConfigFile Name="LwIP_Config" Description="Modification of LwIP stack default configuration done in opt.h file" Template="lwip_conf.ftl">
-        <File Name="Target/lwipopts.h" Category="header" Version="v2.0.3" Condition="all"/>
+        <File Name="Target/lwipopts.h" Category="header" Version="v2.1.2" Condition="all"/>
         <Argument Name="LwIP Version" GenericType="simple"/>
         <Argument Name="LWIP_DHCP" GenericType="simple"/>
         <Argument Name="IP_ADDRESS" GenericType="simple"/>
@@ -188,16 +206,20 @@
         <Argument Name="LWIP_TIMERS_CUSTOM" GenericType="simple"/>
         <Argument Name="MEMCPY(dst,src,len)" GenericType="simple"/>
         <Argument Name="SMEMCPY(dst,src,len)" GenericType="simple"/>
+        <Argument Name="MEMMOVE(dst,src,len)" GenericType="simple"/>
         <Argument Name="LWIP_MPU_COMPATIBLE" GenericType="simple"/>
         <Argument Name="LWIP_TCPIP_CORE_LOCKING" GenericType="simple"/>
         <Argument Name="LWIP_TCPIP_CORE_LOCKING_INPUT" GenericType="simple"/>
         <Argument Name="SYS_LIGHTWEIGHT_PROT" GenericType="simple"/>
         <Argument Name="MEM_LIBC_MALLOC" GenericType="simple"/>
         <Argument Name="MEMP_MEM_MALLOC" GenericType="simple"/>
+        <Argument Name="MEMP_MEM_INIT" GenericType="simple"/>
         <Argument Name="MEM_ALIGNMENT" GenericType="simple"/>
         <Argument Name="MEM_SIZE" GenericType="simple"/>
         <Argument Name="MEMP_OVERFLOW_CHECK" GenericType="simple"/>
         <Argument Name="MEMP_SANITY_CHECK" GenericType="simple"/>
+        <Argument Name="MEM_OVERFLOW_CHECK" GenericType="simple"/>
+        <Argument Name="MEM_SANITY_CHECK" GenericType="simple"/>
         <Argument Name="MEM_USE_POOLS" GenericType="simple"/>
         <Argument Name="MEM_USE_POOLS_TRY_BIGGER_POOL" GenericType="simple"/>
         <Argument Name="MEMP_USE_CUSTOM_POOLS" GenericType="simple"/>
@@ -207,6 +229,7 @@
         <Argument Name="MEMP_NUM_RAW_PCB" GenericType="simple"/>
         <Argument Name="MEMP_NUM_TCP_PCB_LISTEN" GenericType="simple"/>
         <Argument Name="MEMP_NUM_TCP_SEG" GenericType="simple"/>
+        <Argument Name="MEMP_NUM_ALTCP_PCB" GenericType="simple"/>
         <Argument Name="MEMP_NUM_REASSDATA" GenericType="simple"/>
         <Argument Name="MEMP_NUM_FRAG_PBUF" GenericType="simple"/>
         <Argument Name="MEMP_NUM_ARP_QUEUE" GenericType="simple"/>
@@ -215,6 +238,7 @@
         <Argument Name="MEMP_NUM_NETBUF" GenericType="simple"/>
         <Argument Name="MEMP_NUM_NETCONN" GenericType="simple"/>
         <Argument Name="MEMP_NUM_TCPIP_MSG_API" GenericType="simple"/>
+        <Argument Name="MEMP_NUM_SELECT_CB" GenericType="simple"/>
         <Argument Name="MEMP_NUM_TCPIP_MSG_INPKT" GenericType="simple"/>
         <Argument Name="MEMP_NUM_NETDB" GenericType="simple"/>
         <Argument Name="MEMP_NUM_LOCALHOSTLIST" GenericType="simple"/>
@@ -227,6 +251,7 @@
         <Argument Name="PBUF_LINK_HLEN" GenericType="simple"/>
         <Argument Name="PBUF_LINK_ENCAPSULATION_HLEN" GenericType="simple"/>
         <Argument Name="PBUF_POOL_BUFSIZE" GenericType="simple"/>
+        <Argument Name="LWIP_PBUF_REF_T" GenericType="simple"/>
         <Argument Name="PBUF_IP_HLEN" GenericType="simple"/>
         <Argument Name="PBUF_TRANSPORT_HLEN" GenericType="simple"/>
         <Argument Name="LWIP_ARP" GenericType="simple"/>
@@ -250,7 +275,6 @@
         <Argument Name="IP_SOF_BROADCAST" GenericType="simple"/>
         <Argument Name="IP_SOF_BROADCAST_RECV" GenericType="simple"/>
         <Argument Name="IP_FORWARD_ALLOW_TX_ON_RX_NETIF" GenericType="simple"/>
-        <Argument Name="LWIP_RANDOMIZE_INITIAL_LOCAL_PORTS" GenericType="simple"/>
         <Argument Name="ICMP_TTL" GenericType="simple"/>
         <Argument Name="LWIP_BROADCAST_PING" GenericType="simple"/>
         <Argument Name="LWIP_MULTICAST_PING" GenericType="simple"/>
@@ -258,7 +282,6 @@
         <Argument Name="LWIP_RAW" GenericType="simple"/>
         <Argument Name="RAW_TTL" GenericType="simple"/>
         <Argument Name="DHCP_DOES_ARP_CHECK" GenericType="simple"/>
-        <Argument Name="LWIP_DHCP_CHECK_LINK_UP" GenericType="simple"/>
         <Argument Name="LWIP_DHCP_BOOTP_FILE" GenericType="simple"/>
         <Argument Name="LWIP_DHCP_GET_NTP_SRV" GenericType="simple"/>
         <Argument Name="LWIP_DHCP_MAX_NTP_SERVERS" GenericType="simple"/>
@@ -270,6 +293,7 @@
         <Argument Name="DNS_TABLE_SIZE" GenericType="simple"/>
         <Argument Name="DNS_MAX_NAME_LENGTH" GenericType="simple"/>
         <Argument Name="DNS_MAX_SERVERS" GenericType="simple"/>
+        <Argument Name="DNS_MAX_RETRIES" GenericType="simple"/>
         <Argument Name="DNS_DOES_NAME_CHECK" GenericType="simple"/>
         <Argument Name="LWIP_DNS_SECURE" GenericType="simple"/>
         <Argument Name="LWIP_DNS_SECURE_RAND_XID" GenericType="simple"/>
@@ -286,6 +310,8 @@
         <Argument Name="TCP_MAXRTX" GenericType="simple"/>
         <Argument Name="TCP_SYNMAXRTX" GenericType="simple"/>
         <Argument Name="TCP_QUEUE_OOSEQ" GenericType="simple"/>
+        <Argument Name="LWIP_TCP_SACK_OUT" GenericType="simple"/>
+        <Argument Name="LWIP_TCP_MAX_SACK_NUM" GenericType="simple"/>
         <Argument Name="TCP_MSS" GenericType="simple"/>
         <Argument Name="TCP_CALCULATE_EFF_SEND_MSS" GenericType="simple"/>
         <Argument Name="TCP_SND_BUF" GenericType="simple"/>
@@ -293,7 +319,9 @@
         <Argument Name="TCP_SNDLOWAT" GenericType="simple"/>
         <Argument Name="TCP_SNDQUEUELOWAT" GenericType="simple"/>
         <Argument Name="TCP_OOSEQ_MAX_BYTES" GenericType="simple"/>
+        <Argument Name="TCP_OOSEQ_BYTES_LIMIT(pcb)" GenericType="simple"/>
         <Argument Name="TCP_OOSEQ_MAX_PBUFS" GenericType="simple"/>
+        <Argument Name="TCP_OOSEQ_PBUFS_LIMIT(pcb)" GenericType="simple"/>
         <Argument Name="TCP_LISTEN_BACKLOG" GenericType="simple"/>
         <Argument Name="TCP_DEFAULT_LISTEN_BACKLOG" GenericType="simple"/>
         <Argument Name="TCP_OVERSIZE" GenericType="simple"/>
@@ -303,9 +331,14 @@
         <Argument Name="LWIP_CALLBACK_API" GenericType="simple"/>
         <Argument Name="LWIP_WND_SCALE" GenericType="simple"/>
         <Argument Name="TCP_RCV_SCALE" GenericType="simple"/>
+        <Argument Name="LWIP_TCP_PCB_NUM_EXT_ARGS" GenericType="simple"/>
+        <Argument Name="LWIP_ALTCP" GenericType="simple"/>
+        <Argument Name="LWIP_ALTCP_TLS" GenericType="simple"/>
+        <Argument Name="LWIP_SINGLE_NETIF" GenericType="simple"/>
         <Argument Name="LWIP_NETIF_HOSTNAME" GenericType="simple"/>
         <Argument Name="LWIP_NETIF_API" GenericType="simple"/>
         <Argument Name="LWIP_NETIF_STATUS_CALLBACK" GenericType="simple"/>
+        <Argument Name="LWIP_NETIF_EXT_STATUS_CALLBACK" GenericType="simple"/>
         <Argument Name="LWIP_NETIF_LINK_CALLBACK" GenericType="simple"/>
         <Argument Name="LWIP_NETIF_REMOVE_CALLBACK" GenericType="simple"/>
         <Argument Name="LWIP_NETIF_HWADDRHINT" GenericType="simple"/>
@@ -336,7 +369,6 @@
         <Argument Name="LWIP_NETCONN_FULLDUPLEX" GenericType="simple"/>
         <Argument Name="LWIP_SOCKET" GenericType="simple"/>
         <Argument Name="LWIP_COMPAT_SOCKETS" GenericType="simple"/>
-        <Argument Name="LWIP_SOCKET_SET_ERRNO" GenericType="simple"/>
         <Argument Name="LWIP_POSIX_SOCKETS_IO_NAMES" GenericType="simple"/>
         <Argument Name="LWIP_SOCKET_OFFSET" GenericType="simple"/>
         <Argument Name="LWIP_TCP_KEEPALIVE" GenericType="simple"/>
@@ -350,6 +382,8 @@
         <Argument Name="SO_REUSE" GenericType="simple"/>
         <Argument Name="SO_REUSE_RXTOALL" GenericType="simple"/>
         <Argument Name="LWIP_FIONREAD_LINUXMODE" GenericType="simple"/>
+        <Argument Name="LWIP_SOCKET_SELECT" GenericType="simple"/>
+        <Argument Name="LWIP_SOCKET_POLL" GenericType="simple"/>
         <Argument Name="LWIP_USE_EXTERNAL_POLARSSL" GenericType="simple"/>
         <Argument Name="LWIP_USE_EXTERNAL_MBEDTLS" GenericType="simple"/>
         <Argument Name="LWIP_INCLUDED_POLARSSL_MD5" GenericType="simple"/>
@@ -364,6 +398,7 @@
         <Argument Name="PPPOS_SUPPORT" GenericType="simple"/>
         <Argument Name="LWIP_PPP_API" GenericType="simple"/>
         <Argument Name="MEMP_NUM_PPP_PCB" GenericType="simple"/>
+        <Argument Name="PPP_NUM_TIMEOUTS_PER_PCB" GenericType="simple"/>
         <Argument Name="MEMP_NUM_PPPOS_INTERFACES" GenericType="simple"/>
         <Argument Name="MEMP_NUM_PPPOE_INTERFACES" GenericType="simple"/>
         <Argument Name="MEMP_NUM_PPPOL2TP_INTERFACES" GenericType="simple"/>
@@ -411,18 +446,28 @@
         <Argument Name="PPP_DEFMRU" GenericType="simple"/>
         <Argument Name="PPP_MAXMRU" GenericType="simple"/>
         <Argument Name="PPP_MINMRU" GenericType="simple"/>
+        <Argument Name="PPP_NUM_TIMEOUTS" GenericType="simple"/>
         <Argument Name="PPPOL2TP_DEFMRU" GenericType="simple"/>
         <Argument Name="MAXNAMELEN" GenericType="simple"/>
         <Argument Name="MAXSECRETLEN" GenericType="simple"/>
         <Argument Name="LWIP_IPV6" GenericType="simple"/>
+        <Argument Name="IPV6_REASS_MAXAGE" GenericType="simple"/>
+        <Argument Name="LWIP_IPV6_SCOPES" GenericType="simple"/>
+        <Argument Name="LWIP_IPV6_SCOPES_DEBUG" GenericType="simple"/>
         <Argument Name="LWIP_IPV6_NUM_ADDRESSES" GenericType="simple"/>
         <Argument Name="LWIP_IPV6_FORWARD" GenericType="simple"/>
         <Argument Name="LWIP_IPV6_FRAG" GenericType="simple"/>
         <Argument Name="LWIP_IPV6_REASS" GenericType="simple"/>
         <Argument Name="LWIP_IPV6_SEND_ROUTER_SOLICIT" GenericType="simple"/>
         <Argument Name="LWIP_IPV6_AUTOCONFIG" GenericType="simple"/>
+        <Argument Name="LWIP_IPV6_ADDRESS_LIFETIMES" GenericType="simple"/>
         <Argument Name="LWIP_IPV6_DUP_DETECT_ATTEMPTS" GenericType="simple"/>
         <Argument Name="LWIP_IPV6_DHCP6" GenericType="simple"/>
+        <Argument Name="LWIP_IPV6_DHCP6_STATEFUL" GenericType="simple"/>
+        <Argument Name="LWIP_IPV6_DHCP6_STATELESS" GenericType="simple"/>
+        <Argument Name="LWIP_DHCP6_GET_NTP_SRV" GenericType="simple"/>
+        <Argument Name="LWIP_DHCP6_MAX_NTP_SERVERS" GenericType="simple"/>
+        <Argument Name="LWIP_DHCP6_MAX_DNS_SERVERS" GenericType="simple"/>
         <Argument Name="LWIP_ICMP6" GenericType="simple"/>
         <Argument Name="LWIP_ICMP6_DATASIZE" GenericType="simple"/>
         <Argument Name="LWIP_ICMP6_HL" GenericType="simple"/>
@@ -449,6 +494,7 @@
         <Argument Name="LWIP_HTTPD_CGI_SSI" GenericType="simple"/>
         <Argument Name="LWIP_HTTPD_SSI" GenericType="simple"/>
         <Argument Name="LWIP_HTTPD_SSI_RAW" GenericType="simple"/>
+        <Argument Name="LWIP_HTTPD_SSI_BY_FILE_EXTENSION" GenericType="simple"/>
         <Argument Name="LWIP_HTTPD_SUPPORT_POST" GenericType="simple"/>
         <Argument Name="LWIP_HTTPD_MAX_CGI_PARAMETERS" GenericType="simple"/>
         <Argument Name="LWIP_HTTPD_SSI_MULTIPART" GenericType="simple"/>
@@ -459,6 +505,8 @@
         <Argument Name="LWIP_HTTPD_DYNAMIC_HEADERS" GenericType="simple"/>
         <Argument Name="HTTPD_USE_MEM_POOL" GenericType="simple"/>
         <Argument Name="HTTPD_SERVER_PORT" GenericType="simple"/>
+        <Argument Name="HTTPD_SERVER_PORT_HTTPS" GenericType="simple"/>
+        <Argument Name="HTTPD_ENABLE_HTTPS" GenericType="simple"/>
         <Argument Name="HTTPD_MAX_RETRIES" GenericType="simple"/>
         <Argument Name="HTTPD_POLL_INTERVAL" GenericType="simple"/>
         <Argument Name="HTTPD_TCP_PRIO" GenericType="simple"/>
@@ -505,24 +553,34 @@
         <Argument Name="SNMP_LWIP_MIB2_SYSLOCATION" GenericType="simple"/>
         <Argument Name="SNMP_LWIP_GETBULK_MAX_REPETITIONS" GenericType="simple"/>
         <Argument Name="LWIP_SNMP_V3" GenericType="simple"/>
-        <Argument Name="LWIP_SNMP_V3_CRYPTO" GenericType="simple"/>
         <Argument Name="LWIP_SNMP_V3_MBEDTLS" GenericType="simple"/>
+        <Argument Name="LWIP_SNMP_V3_CRYPTO" GenericType="simple"/>
+        <Argument Name="LWIP_SNMP_CONFIGURE_VERSIONS" GenericType="simple"/>
         <Argument Name="LWIP_SNTP" GenericType="simple"/>
         <Argument Name="SNTP_MAX_SERVERS" GenericType="simple"/>
         <Argument Name="SNTP_GET_SERVERS_FROM_DHCP" GenericType="simple"/>
-        <Argument Name="SNTP_SERVER_DNS" GenericType="simple"/>
         <Argument Name="SNTP_PORT" GenericType="simple"/>
         <Argument Name="SNTP_CHECK_RESPONSE" GenericType="simple"/>
-        <Argument Name="SNTP_STARTUP_DELAY" GenericType="simple"/>
-        <Argument Name="SNTP_STARTUP_DELAY_FUNC" GenericType="simple"/>
+        <Argument Name="SNTP_COMP_ROUNDTRIP" GenericType="simple"/>
         <Argument Name="SNTP_RECV_TIMEOUT" GenericType="simple"/>
         <Argument Name="SNTP_UPDATE_DELAY" GenericType="simple"/>
         <Argument Name="SNTP_RETRY_TIMEOUT" GenericType="simple"/>
         <Argument Name="SNTP_RETRY_TIMEOUT_MAX" GenericType="simple"/>
         <Argument Name="SNTP_RETRY_TIMEOUT_EXP" GenericType="simple"/>
+        <Argument Name="SNTP_MONITOR_SERVER_REACHABILITY" GenericType="simple"/>
+        <Argument Name="LWIP_SMTP" GenericType="simple"/>
+        <Argument Name="SMTP_BODYDH" GenericType="simple"/>
+        <Argument Name="SMTP_MAX_SERVERNAME_LEN" GenericType="simple"/>
+        <Argument Name="SMTP_MAX_USERNAME_LEN" GenericType="simple"/>
+        <Argument Name="SMTP_MAX_PASS_LEN" GenericType="simple"/>
+        <Argument Name="SMTP_COPY_AUTHDATA" GenericType="simple"/>
+        <Argument Name="SMTP_CHECK_DATA" GenericType="simple"/>
+        <Argument Name="SMTP_SUPPORT_AUTH_PLAIN" GenericType="simple"/>
+        <Argument Name="SMTP_SUPPORT_AUTH_LOGIN" GenericType="simple"/>
         <Argument Name="LWIP_MDNS" GenericType="simple"/>
         <Argument Name="LWIP_MDNS_RESPONDER" GenericType="simple"/>
         <Argument Name="MDNS_MAX_SERVICES" GenericType="simple"/>
+        <Argument Name="MDNS_RESP_USENETIF_EXTCALLBACK" GenericType="simple"/>
         <Argument Name="LWIP_TFTP" GenericType="simple"/>
         <Argument Name="TFTP_PORT" GenericType="simple"/>
         <Argument Name="TFTP_TIMEOUT_MSECS" GenericType="simple"/>
@@ -602,18 +660,21 @@
         <Argument Name="DNS_DEBUG" GenericType="simple"/>
         <Argument Name="PPP_DEBUG" GenericType="simple"/>
         <Argument Name="IP6_DEBUG" GenericType="simple"/>
+        <Argument Name="DHCP6_DEBUG" GenericType="simple"/>
         <Argument Name="HTTPD_DEBUG" GenericType="simple"/>
         <Argument Name="HTTPD_DEBUG_TIMING" GenericType="simple"/>
         <Argument Name="SNMP_DEBUG" GenericType="simple"/>
         <Argument Name="SNMP_MIB_DEBUG" GenericType="simple"/>
         <Argument Name="SNTP_DEBUG" GenericType="simple"/>
+        <Argument Name="SMTP_DEBUG" GenericType="simple"/>
         <Argument Name="MDNS_DEBUG" GenericType="simple"/>
         <Argument Name="TFTP_DEBUG" GenericType="simple"/>
         <Argument Name="LWIP_PROVIDE_ERRNO" GenericType="simple"/>
+        <Argument Name="LWIP_TESTMODE" GenericType="simple"/>
         </RefConfigFile>
 
-    <RefConfigFile Name="NETIF_Config" Description="Ethernet Interface configuration (Source)" Template="ethernetif_f1f2f4f7.ftl">
-        <File Name="Target/ethernetif.c" Category="source" Version="v2.0.3" Condition="all"/>
+    <RefConfigFile Name="NETIF_Config" Description="Ethernet Interface configuration (Source)" Template="ethernetif_f4f7.ftl">
+        <File Name="Target/ethernetif.c" Category="source" Version="v2.1.2" Condition="all"/>
         <Argument Name="heth" GenericType="struct" AddressOf="true"  TypeName="ETH_HandleTypeDef" Context="global"/>
         <Argument Name="WITH_RTOS" GenericType="simple"/>
         <Argument Name="CMSIS_VERSION" GenericType="simple"/>
@@ -628,10 +689,10 @@
         <Argument Name="RX_BUFFER_ADDRESS" GenericType="simple"/>
     </RefConfigFile>
     <RefConfigFile Name="Pools_Config" Description="Custom Memory Pools configuration" Template="lwippools.ftl">
-        <File Name="Target/lwippools.h" Category="header" Version="v2.0.3" Condition="S_MEMP_USE_CUSTOM_POOLS"/>
+        <File Name="Target/lwippools.h" Category="header" Version="v2.1.2" Condition="S_MEMP_USE_CUSTOM_POOLS"/>
         </RefConfigFile>
     <RefConfigFile Name="NETIF_Config_Header" Description="Ethernet Interface configuration (Header)" Template="ethernetif_header.ftl">
-        <File Name="Target/ethernetif.h" Category="header" Version="v2.0.3" Condition="all"/>
+        <File Name="Target/ethernetif.h" Category="header" Version="v2.1.2" Condition="all"/>
         <Argument Name="NO_SYS" GenericType="simple"/>
         <Argument Name="CMSIS_VERSION" GenericType="simple"/>
         </RefConfigFile>

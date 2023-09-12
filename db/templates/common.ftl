@@ -454,7 +454,7 @@
                         [#list fargument.argument as argument]	
 
                             [#if argument.genericType != "struct"]
-                                [#if argument.mandatory]
+                                [#if argument.mandatory && !argument.refMethod??]
                                 [#if argument.value?? && argument.value!="__NULL"]
                                     [#if instanceIndex??&&fargument.context=="global"]
                                         [#assign argValue=argument.value?replace("$Index",instanceIndex)]
@@ -540,17 +540,18 @@
                                                    [/#if]
                                                 [/#if]
                                           [#else]
+
                                               [#if argument.status=="KO"]
                                                    [#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"]//${fargument.name}${instanceIndex}[#else]${fargument.name}[/#if].${argument.name} = ${argument.value};                                        
                                               [/#if]
                                               [#if argument.value?? && argument.value!="__NULL"]
 
-
-
-
-
-
-                                                   [#if argument.value!="N/A"][#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"]${fargument.name}${instanceIndex}[#else]${fargument.name}[/#if].${argument.name} = ${argument.value};  [/#if]
+[#if argument.refMethod??] [#-- CallLibMethod for Argument value --]
+    [#assign argumentValue=""]
+    [@callLibMethod CLmethod=argument.refMethod configModelRef=configModel instRef=inst nTabRef=nTab indexRef=index argumentValue=argumentValue/]
+    [#assign argTmp = argumentValue]
+[/#if] [#-- end if fargument.refMethod??--] [#-- New --]
+                                                   [#if argument.value!="N/A"][#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"]${fargument.name}${instanceIndex}[#else]${fargument.name}[/#if].${argument.name} = [#if argument.refMethod??]${argumentValue}[#else]${argument.value}[/#if];  [/#if]
  [#if index1 == fargument.argument?size]
                                                                 #n
                                                             [/#if]
@@ -558,7 +559,7 @@
                                               [/#if]                                    
                                           [/#if][#-- if argument=Instance--]                                
                                       [/#if]    
-                                [/#if][#-- if argument.mandatory--]                                
+                                [/#if][#-- if argument.mandatory--]     
                             [#else]
                             [#assign index2=0]
                             [#list argument.argument as argument2]
@@ -1348,7 +1349,7 @@ ${bufferType} ${bufferName}[${bufferSize}];
 [#--assign CLmethod = argumentRef.refMethod--]
         [#if CLmethod.status=="OK"]
 
-                [#if CLmethod.arguments??]
+                [#if CLmethod.arguments??][#assign intArgs = ""]
                     [#list CLmethod.arguments as fargument][#compress]
                     [#if fargument.addressOf] [#local adr = "&"][#else ][#local adr = ""][/#if][/#compress] 
                     [#if fargument.genericType == "struct"]{
@@ -1405,7 +1406,7 @@ ${bufferType} ${bufferName}[${bufferSize}];
                                     [#if instanceIndex??&&fargument.context=="global"][#local varName=fargument.name +"." +instanceIndex][#else][#local varName=fargument.name][/#if]
                                         [#local indicator = varName+"."+argument.name+" = "+argValue+" "]
                                         [#local indicatorName = varName+"."+argument.name]
-                                        [#if !listofDeclaration?contains(indicator)][#-- if not repeted --]  
+                                        [#if !listofDeclaration?contains(indicator)][#-- if not repeted --] 
                                             [#if nTabRef==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"][#local varName=fargument.name +"." +instanceIndex]${fargument.name}${instanceIndex}[#else][#local varName=fargument.name]${fargument.name}[/#if].${argument.name} = ${argValue};                                        
                                             [#local listofDeclaration = listofDeclaration?replace(indicatorName+" =","")]
                                             [#local listofDeclaration = listofDeclaration +", "+ varName+"."+argument.name+" = "+argValue+" "]                                                                                 
@@ -1576,10 +1577,10 @@ ${bufferType} ${bufferName}[${bufferSize}];
 
                                                 [/#if]
                                             [/#if]    
-[#else] [#if fargument.status=="NULL"][#local arg = "" + adr + "NULL"] [/#if]                    
+                        [#else] [#if fargument.status=="NULL"][#local arg = "" + adr + "NULL"] [/#if]                    
                         [/#if]
                     [/#if]
-                    [#if args == "" && arg!=""][#local args = args + arg ][#else][#if arg!=""][#local args = args + ', ' + arg][/#if][/#if]
+                    [#if intArgs == "" && arg!=""][#local intArgs = intArgs + arg ][#else][#if arg!=""][#local intArgs = intArgs + ', ' + arg][/#if][/#if]
                     [/#list]
                     [#local retval=""]
             [#list CLmethod.arguments as argument]
@@ -1589,8 +1590,8 @@ ${bufferType} ${bufferName}[${bufferSize}];
             [/#list]
 [#if S_FATFS_SDIO?? && (instRef=="SDIO" || instRef?starts_with("SDMMC"))] [#-- if HAL_SD_Init  and SDIO is used with FATFS--]
 [#else]		    
-[#--[#if nTab==2]#t#t[#else]#t[/#if]${CLmethod.name}(${args});#n--]
-[#assign argumentValue = CLmethod.name+"("+args+")"] [#-- New --]
+[#--[#if nTab==2]#t#t[#else]#t[/#if]${CLmethod.name}(${intArgs});#n--]
+[#assign argumentValue = CLmethod.name+"("+intArgs+")"] [#-- New --]
         [#-- delete call method--]
 [/#if]
 
@@ -1651,11 +1652,11 @@ ${bufferType} ${bufferName}[${bufferSize}];
                                                 [#local arg = "" + adr + fargument.value]                                                
                                             [/#if]
                                         [/#if]
-                    [#if args == ""][#local args = args + arg ]
-                    [#else][#local args = args + ', ' + arg]
+                    [#if intArgs == ""][#local intArgs = intArgs + arg ]
+                    [#else][#local intArgs = intArgs + ', ' + arg]
                                         [/#if]
                                 [/#list]
-                                [#if nTabRef==2]#t#t[#else]#t[/#if]#t//${CLmethod.name}(${args});[#local argumentValue = CLmethod.name+"}("+args+")"]
+                                [#if nTabRef==2]#t#t[#else]#t[/#if]#t//${CLmethod.name}(${intArgs});[#local argumentValue = CLmethod.name+"}("+intArgs+")"]
                         [#else] [#-- if CLmethod without argument --]
 [#assign argumentValue = CLmethod.name+"()"]                            
                                [#--[#if nTabRef==2]#t#t[#else]#t[/#if]${CLmethod.name}();--]

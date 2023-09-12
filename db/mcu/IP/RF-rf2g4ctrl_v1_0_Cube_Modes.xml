@@ -27,10 +27,23 @@
                 </Mode>
             </ModeLogicOperator>
         </Mode>
+		<Mode Name="RF_internal" UserName="Activate RF" RemoveCondition="$ModeExist_RF0_Activate |$ModeExist_RF1_Activate">
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="RF_Activate" UserName="Activate RF">
+                    <SignalLogicalOp Name="AND">
+                        <Signal  Name="VS_RF"/>
+                    </SignalLogicalOp>
+                    <Condition Diagnostic="Active only if: &lt;br&gt; HSE clock is activated in RCC &lt;br&gt; CPU2 and HSE frequencies should be equal to 32MHz" Expression="(HSEByPass|HSEOscillator)"/> 
+                    <Semaphore>S_RF1</Semaphore>
+					<Semaphore>S_RF0</Semaphore>
+                </Mode>
+            </ModeLogicOperator>
+        </Mode>
     </ModeLogicOperator>
 
     <!-- RefSignal for USART/UART/IRDA/SmartCard -->
     <RefSignal IOMode="System" Name="RF0"/>
     <RefSignal IOMode="System" Name="RF1"/>
+	<RefSignal Name="VS_RF" Virtual="true"/>
 	<Semaphore>$IpInstanceUsed_ForRCC</Semaphore>
 </IP>

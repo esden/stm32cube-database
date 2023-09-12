@@ -240,18 +240,27 @@
  #t#tif(hsai->Instance==${ipName}_Block_A)  
 #t#t{    
     [#if serviceType=="Init"]  #t#t/* ${ipName} clock enable */
+
 [#list ipvar.configModelList as instanceData]
 [#if instanceData.initServices??]
     [#if instanceData.initServices.pclockConfigA??]
 [#assign   pclockConfig=instanceData.initServices.pclockConfigA] [#--list0--]
 [#assign string_element = pclockConfig.ipName]
 [#if string_element==ipName+"_SAIA"]
+[#if FamilyName=="STM32MP1"]
+#tif(IS_ENGINEERING_BOOT_MODE())
+#t{
+[/#if]
 [@common.generateConfigModelListCode configModel=pclockConfig inst=string_element  nTab=2 index=""/]#n
+[#if FamilyName=="STM32MP1"]
+#t}
+[/#if]
 [/#if]
 #n
     [/#if]
 [/#if]
-[/#list] 
+[/#list]
+
 #t#tif (${ipName}_client == 0)
 #t#t{
            [#if initService.clock??]
@@ -323,18 +332,27 @@
 #t#tif(hsai->Instance==${ipName}_Block_B)
 #t#t{
     [#if serviceType=="Init"]  #t#t#t/* ${ipName} clock enable */
+
 [#list ipvar.configModelList as instanceData]
 [#if instanceData.initServices??]
     [#if instanceData.initServices.pclockConfigB??]
 [#assign   pclockConfig=instanceData.initServices.pclockConfigB] [#--list0--]
 [#assign string_element = pclockConfig.ipName]
 [#if string_element==ipName+"_SAIB"]
+[#if FamilyName=="STM32MP1"]
+#tif(IS_ENGINEERING_BOOT_MODE())
+#t{
+[/#if]
 [@common.generateConfigModelListCode configModel=pclockConfig inst=string_element  nTab=2 index=""/]#n
+[#if FamilyName=="STM32MP1"]
+#t}
+[/#if]
 [/#if]
 #n
     [/#if]
 [/#if]
 [/#list]
+
 #t#t#tif (${ipName}_client == 0)
 #t#t#t{
            [#if initService.clock??]
@@ -583,6 +601,7 @@ static uint32_t ${saiInst}_client =0;
 [#-- --]
 [#assign listOfLocalVariables = ""]
 [#assign  resultList  = ""]
+
 [#list ipvar.configModelList as instanceData]
     [#if instanceData.initServices??]
         [#if instanceData.initServices.pclockConfigA??]
@@ -614,6 +633,8 @@ static uint32_t ${saiInst}_client =0;
                 [/#if]
 [/#if]
             [/#list]
+
+
         [/#if]
         [#if instanceData.initServices.pclockConfigB??]
             [#list instanceData.initServices.pclockConfigB.configs as config] [#--list1--]
@@ -647,6 +668,7 @@ static uint32_t ${saiInst}_client =0;
         [/#if]
     [/#if]
 [/#list]
+
 [#list words as sai]
 /* ${sai} */
     [@generateServiceCode ipName=sai serviceType="Init" modeName=mode instHandler=ipHandler tabN=2/] 

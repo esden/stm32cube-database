@@ -439,6 +439,15 @@ uint32_t EthernetLinkTimer;
 ip6_addr_t ip6addr;
 [/#if]
 
+[#if with_rtos == 1]
+[#if (cmsis_version = "v2") && (netif_callback == 1)]
+/* USER CODE BEGIN OS_THREAD_ATTR_CMSIS_RTOS_V2 */
+#define INTERFACE_THREAD_STACK_SIZE            ( 1024 )
+osThreadAttr_t attributes;
+/* USER CODE END OS_THREAD_ATTR_CMSIS_RTOS_V2 */
+[/#if][#-- endif cmsis_version and netif_callback --]
+[/#if][#-- endif with_rtos --]
+
 [#-- Global variables --]
 [/#compress]
 
@@ -486,10 +495,6 @@ void MX_LWIP_Init(void)
 [#if with_rtos == 1]
 #t/* Initilialize the LwIP stack with RTOS */
 #ttcpip_init( NULL, NULL );
-[#if cmsis_version = "v2"]
-#t#define INTERFACE_THREAD_STACK_SIZE            ( 350 )
-#tosThreadAttr_t attributes;
-[/#if][#-- endif cmsis_version --]
 [/#if][#-- endif with_rtos --]
 #n
 [/#compress]
@@ -576,27 +581,35 @@ void MX_LWIP_Init(void)
 #tlink_arg.semaphore = Netif_LinkSemaphore;
 #t/* Create the Ethernet link handler thread */
 [#if cmsis_version = "v2"]
+/* USER CODE BEGIN OS_THREAD_NEW_CMSIS_RTOS_V2 */
 #tmemset(&attributes, 0x0, sizeof(osThreadAttr_t));
 #tattributes.name = "LinkThr";
 #tattributes.stack_size = INTERFACE_THREAD_STACK_SIZE;
-#tattributes.priority = osPriorityRealtime;
-#tosThreadNew(ethernetif_input, &link_arg, &attributes);
+#tattributes.priority = osPriorityBelowNormal;
+#tosThreadNew(ethernetif_set_link, &link_arg, &attributes);
+/* USER CODE END OS_THREAD_NEW_CMSIS_RTOS_V2 */
 [#else][#-- else cmsis_version --]
-#tosThreadDef(LinkThr, ethernetif_set_link, osPriorityNormal, 0, configMINIMAL_STACK_SIZE * 2);
+/* USER CODE BEGIN OS_THREAD_DEF_CREATE_CMSIS_RTOS_V1 */
+#tosThreadDef(LinkThr, ethernetif_set_link, osPriorityBelowNormal, 0, configMINIMAL_STACK_SIZE * 2);
 #tosThreadCreate (osThread(LinkThr), &link_arg);
+/* USER CODE END OS_THREAD_DEF_CREATE_CMSIS_RTOS_V1 */
 [/#if][#-- endif cmsis_version --]
 [#else][#-- case series == "stm32h7" --]
 #t/* Create the Ethernet link handler thread */
 [#if with_rtos == 1]
 [#if cmsis_version = "v2"]
+/* USER CODE BEGIN H7_OS_THREAD_NEW_CMSIS_RTOS_V2 */
 #tmemset(&attributes, 0x0, sizeof(osThreadAttr_t));
 #tattributes.name = "EthLink";
 #tattributes.stack_size = INTERFACE_THREAD_STACK_SIZE;
-#tattributes.priority = osPriorityRealtime;
-#tosThreadNew(ethernetif_input, &gnetif, &attributes);
+#tattributes.priority = osPriorityBelowNormal;
+#tosThreadNew(ethernet_link_thread, &gnetif, &attributes);
+/* USER CODE END H7_OS_THREAD_NEW_CMSIS_RTOS_V2 */
 [#else][#-- else cmsis_version --]
-#tosThreadDef(EthLink, ethernet_link_thread, osPriorityNormal, 0, configMINIMAL_STACK_SIZE *2); 
+/* USER CODE BEGIN H7_OS_THREAD_DEF_CREATE_CMSIS_RTOS_V1 */
+#tosThreadDef(EthLink, ethernet_link_thread, osPriorityBelowNormal, 0, configMINIMAL_STACK_SIZE *2); 
 #tosThreadCreate (osThread(EthLink), &gnetif);
+/* USER CODE END H7_OS_THREAD_DEF_CREATE_CMSIS_RTOS_V1 */
 [/#if][#-- endif cmsis_version --]
 [/#if][#-- endif with_rtos --]
 [/#if][#-- endif series --]

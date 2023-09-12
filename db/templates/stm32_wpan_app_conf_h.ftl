@@ -1,14 +1,14 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
  ******************************************************************************
   * File Name          : ${name}
   * Description        : Application configuration file for STM32WPAN Middleware.
-  *
- ******************************************************************************
+  ******************************************************************************
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
-
+/* USER CODE END Header */
 [#assign BLE_TRANSPARENT_MODE_UART = 0]
 [#assign BLE_TRANSPARENT_MODE_VCP = 0]
 [#assign BT_SIG_BEACON = 0]
@@ -28,9 +28,37 @@
 [#assign CFG_DEBUG_TRACE_LIGHT = 0]
 [#assign CFG_DEBUG_TRACE_FULL = 0]
 [#assign CFG_DEBUG_TRACE = 0]
-[#assign CFG_DEBUG_TRACE_UART = 0]
+[#assign CFG_DEBUG_TRACE_UART = "0"]
+[#assign CFG_UART_GUI = "0"]
+[#assign CFG_CONSOLE_MENU = ""]
+[#assign CFG_CLI_UART = "0"]
 [#assign CFG_DEBUGGER_SUPPORTED = 0]
-
+[#assign CFG_ADV_BD_ADDRESS = 0]
+[#assign CFG_FAST_CONN_ADV_INTERVAL_MAX_HEXA = 0]
+[#assign CFG_FAST_CONN_ADV_INTERVAL_MIN_HEXA = 0]
+[#assign CFG_LP_CONN_ADV_INTERVAL_MAX_HEXA = 0]
+[#assign CFG_LP_CONN_ADV_INTERVAL_MIN_HEXA = 0]
+[#assign CFG_BONDING_MODE = 0]
+[#assign CFG_USED_FIXED_PIN = 0]
+[#assign CFG_FIXED_PIN = 0]
+[#assign CFG_ENCRYPTION_KEY_SIZE_MAX = 0]
+[#assign CFG_ENCRYPTION_KEY_SIZE_MIN = 0]
+[#assign CFG_IO_CAPABILITY = 0]
+[#assign CFG_MITM_PROTECTION = 0]
+[#assign CFG_SC_SUPPORT = 0]
+[#assign CFG_KEYPRESS_NOTIFICATION_SUPPORT = 0]
+[#assign ADV_TYPE = 0]
+[#assign BLE_ADDR_TYPE = 0]
+[#assign ADV_FILTER = 0]
+[#--
+[#list SWIPdatas as SWIP]
+    [#if SWIP.defines??]
+        [#list SWIP.defines as definition]
+                ${definition.name}: ${definition.value}
+        [/#list]
+    [/#if]
+[/#list]
+--]
 [#list SWIPdatas as SWIP]
 	[#if SWIP.defines??]
 		[#list SWIP.defines as definition]
@@ -74,6 +102,12 @@
             [#if (definition.name == "FREERTOS_STATUS") && (definition.value == "1")]
                 [#assign FREERTOS_STATUS = 1]
             [/#if]
+            [#if (definition.name == "BLE") && (definition.value == "Enabled")]
+                [#assign BLE = 1]
+            [/#if]
+            [#if (definition.name == "THREAD") && (definition.value == "Enabled")]
+                [#assign THREAD = 1]
+            [/#if]
             [#if definition.name == "BLE_APPLICATION_TYPE"]
                 [#assign BLE_APPLICATION_TYPE = definition.value]
             [/#if]
@@ -83,14 +117,23 @@
             [#if definition.name == "CFG_DEBUG_TRACE"]
                 [#assign CFG_DEBUG_TRACE = definition.value]
             [/#if]
-            [#if definition.name == "CFG_DEBUG_TRACE_UART"]
+            [#if (definition.name == "CFG_DEBUG_TRACE_UART") && !(definition.value == "")]
                 [#assign CFG_DEBUG_TRACE_UART = definition.value]
             [/#if]
-            [#if (definition.name == "BLE") && (definition.value == "Enabled")]
-                [#assign BLE = 1]
+			[#if (definition.name == "CFG_UART_GUI") && !(definition.value == "")]
+                [#assign CFG_UART_GUI = definition.value]
             [/#if]
-            [#if (definition.name == "THREAD") && (definition.value == "Enabled")]
-                [#assign THREAD = 1]
+			[#if (definition.name == "CFG_CONSOLE_MENU") && (definition.value == "No UART selected") && (THREAD == 1)]
+                [#assign CFG_CONSOLE_MENU = ""]
+            [/#if]
+			[#if (definition.name == "CFG_CONSOLE_MENU") && (definition.value == "No UART selected") && (BLE == 1)]
+                [#assign CFG_CONSOLE_MENU = 0]
+            [/#if]
+			[#if (definition.name == "CFG_CONSOLE_MENU") && (definition.value != "No UART selected")]
+                [#assign CFG_CONSOLE_MENU = definition.value]
+            [/#if]
+			[#if (definition.name == "CFG_CLI_UART") && !(definition.value == "")]
+                [#assign CFG_CLI_UART = definition.value]
             [/#if]
             [#if (definition.name == "CFG_FULL_LOW_POWER") && (definition.value == "Enabled")]
                 [#assign CFG_FULL_LOW_POWER = 1]
@@ -104,7 +147,58 @@
             [#if (definition.name == "CFG_DEBUGGER_SUPPORTED") && (definition.value == "Enabled")]
                 [#assign CFG_DEBUGGER_SUPPORTED = 1]
             [/#if]
-		[/#list]
+            [#if (definition.name == "CFG_ADV_BD_ADDRESS")]
+                [#assign CFG_ADV_BD_ADDRESS = definition.value]
+            [/#if]
+            [#if (definition.name == "CFG_FAST_CONN_ADV_INTERVAL_MIN_HEXA")]
+                [#assign CFG_FAST_CONN_ADV_INTERVAL_MIN_HEXA = definition.value]
+            [/#if]
+            [#if (definition.name == "CFG_FAST_CONN_ADV_INTERVAL_MAX_HEXA")]
+                [#assign CFG_FAST_CONN_ADV_INTERVAL_MAX_HEXA = definition.value]
+            [/#if]
+            [#if (definition.name == "CFG_LP_CONN_ADV_INTERVAL_MIN_HEXA")]
+                [#assign CFG_LP_CONN_ADV_INTERVAL_MIN_HEXA = definition.value]
+            [/#if]
+            [#if (definition.name == "CFG_LP_CONN_ADV_INTERVAL_MAX_HEXA")]
+                [#assign CFG_LP_CONN_ADV_INTERVAL_MAX_HEXA = definition.value]
+            [/#if]
+            [#if (definition.name == "CFG_BONDING_MODE")]
+                [#assign CFG_BONDING_MODE = definition.value]
+            [/#if]
+            [#if (definition.name == "CFG_USED_FIXED_PIN")]
+                [#assign CFG_USED_FIXED_PIN = definition.value]
+            [/#if]
+            [#if (definition.name == "CFG_FIXED_PIN")]
+                [#assign CFG_FIXED_PIN = definition.value]
+            [/#if]
+            [#if (definition.name == "CFG_ENCRYPTION_KEY_SIZE_MAX")]
+                [#assign CFG_ENCRYPTION_KEY_SIZE_MAX = definition.value]
+            [/#if]
+            [#if (definition.name == "CFG_ENCRYPTION_KEY_SIZE_MIN")]
+                [#assign CFG_ENCRYPTION_KEY_SIZE_MIN = definition.value]
+            [/#if]
+            [#if (definition.name == "CFG_IO_CAPABILITY")]
+                [#assign CFG_IO_CAPABILITY = definition.value]
+            [/#if]
+            [#if (definition.name == "CFG_MITM_PROTECTION")]
+                [#assign CFG_MITM_PROTECTION = definition.value]
+            [/#if]
+            [#if (definition.name == "CFG_SC_SUPPORT")]
+                [#assign CFG_SC_SUPPORT = definition.value]
+            [/#if]
+            [#if (definition.name == "CFG_KEYPRESS_NOTIFICATION_SUPPORT")]
+                [#assign CFG_KEYPRESS_NOTIFICATION_SUPPORT = definition.value]
+            [/#if]
+            [#if (definition.name == "ADV_TYPE")]
+                [#assign ADV_TYPE = definition.value]
+            [/#if]
+            [#if (definition.name == "BLE_ADDR_TYPE")]
+                [#assign BLE_ADDR_TYPE = definition.value]
+            [/#if]
+            [#if (definition.name == "ADV_FILTER")]
+                [#assign ADV_FILTER = definition.value]
+            [/#if]
+        [/#list]
 	[/#if]
 [/#list]
 
@@ -121,7 +215,7 @@
  ******************************************************************************/
 [#if (THREAD = 0)]
 
-[#if (BT_SIG_BEACON = 1) || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1)|| (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)|| (BT_SIG_HEART_RATE_SENSOR = 1)|| (CUSTOM_OTA = 1)|| (CUSTOM_P2P_SERVER = 1)|| (CUSTOM_P2P_CLIENT = 1)|| (CUSTOM_P2P_ROUTER = 1)]
+[#if (BT_SIG_BEACON = 1) || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1)|| (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)|| (BT_SIG_HEART_RATE_SENSOR = 1)|| (CUSTOM_OTA = 1)|| (CUSTOM_P2P_SERVER = 1)|| (CUSTOM_P2P_CLIENT = 1)|| (CUSTOM_P2P_ROUTER = 1)|| (CUSTOM_TEMPLATE = 1)]
 /**< generic parameters ******************************************************/
 
 /**
@@ -132,69 +226,34 @@
 /**
  * Define Advertising parameters
  */
-[#list SWIPdatas as SWIP]
-    [#if SWIP.defines??]
-        [#list SWIP.defines as definition]
-            [#if definition.name="CFG_ADV_BD_ADDRESS"]
-                [#lt]#define ${definition.name}                (${definition.value})
-            [/#if]
-        [/#list]
-    [/#if]
-[/#list]
+#define CFG_ADV_BD_ADDRESS                (${CFG_ADV_BD_ADDRESS})
 [/#if]
-[#if (BT_SIG_BEACON = 1) || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1)|| (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)|| (BT_SIG_HEART_RATE_SENSOR = 1)|| (CUSTOM_OTA = 1)|| (CUSTOM_P2P_SERVER = 1)]
-[#list SWIPdatas as SWIP]
-    [#if SWIP.defines??]
-        [#list SWIP.defines as definition]
-            [#if definition.name="CFG_FAST_CONN_ADV_INTERVAL_MIN_HEXA"]
-                [#lt]#define CFG_FAST_CONN_ADV_INTERVAL_MIN    (${definition.value})   /**< 80ms */
-            [/#if]
-        [/#list]
-    [/#if]
-[/#list]
-[#list SWIPdatas as SWIP]
-    [#if SWIP.defines??]
-        [#list SWIP.defines as definition]
-            [#if definition.name="CFG_FAST_CONN_ADV_INTERVAL_MAX_HEXA"]
-                [#lt]#define CFG_FAST_CONN_ADV_INTERVAL_MAX    (${definition.value})  /**< 100ms */
-            [/#if]
-        [/#list]
-    [/#if]
-[/#list]
-[#list SWIPdatas as SWIP]
-    [#if SWIP.defines??]
-        [#list SWIP.defines as definition]
-            [#if definition.name="CFG_LP_CONN_ADV_INTERVAL_MIN_HEXA"]
-                [#lt]#define CFG_LP_CONN_ADV_INTERVAL_MIN      (${definition.value}) /**< 1s */
-            [/#if]
-        [/#list]
-    [/#if]
-[/#list]
-[#list SWIPdatas as SWIP]
-    [#if SWIP.defines??]
-        [#list SWIP.defines as definition]
-            [#if definition.name="CFG_LP_CONN_ADV_INTERVAL_MAX_HEXA"]
-                [#lt]#define CFG_LP_CONN_ADV_INTERVAL_MAX      (${definition.value}) /**< 2.5s */
-            [/#if]
-        [/#list]
-    [/#if]
-[/#list]
+[#if (BT_SIG_BEACON = 1) || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1)|| (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)|| (BT_SIG_HEART_RATE_SENSOR = 1)|| (CUSTOM_OTA = 1)|| (CUSTOM_P2P_SERVER = 1)|| (CUSTOM_TEMPLATE = 1)]
+#define CFG_FAST_CONN_ADV_INTERVAL_MIN    (${CFG_FAST_CONN_ADV_INTERVAL_MIN_HEXA})   /**< 80ms */
+#define CFG_FAST_CONN_ADV_INTERVAL_MAX    (${CFG_FAST_CONN_ADV_INTERVAL_MAX_HEXA})  /**< 100ms */
+#define CFG_LP_CONN_ADV_INTERVAL_MIN      (${CFG_LP_CONN_ADV_INTERVAL_MIN_HEXA}) /**< 1s */
+#define CFG_LP_CONN_ADV_INTERVAL_MAX      (${CFG_LP_CONN_ADV_INTERVAL_MAX_HEXA}) /**< 2.5s */
+[/#if]
+[#if (CUSTOM_TEMPLATE = 1)]
+#define ADV_TYPE                           ${ADV_TYPE}
+#define BLE_ADDR_TYPE                      ${BLE_ADDR_TYPE}
+#define ADV_FILTER                         ${ADV_FILTER}
 [/#if]
 [#if (CUSTOM_P2P_ROUTER = 1)]
 #define LEDBUTTON_CONN_ADV_INTERVAL_MIN  (0x1FA)
 #define LEDBUTTON_CONN_ADV_INTERVAL_MAX  (0x3E8)
 
 [/#if]
-[#if (BT_SIG_BEACON = 1) || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1)|| (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)|| (BT_SIG_HEART_RATE_SENSOR = 1)|| (CUSTOM_OTA = 1)|| (CUSTOM_P2P_SERVER = 1)|| (CUSTOM_P2P_CLIENT = 1)|| (CUSTOM_P2P_ROUTER = 1)]
+[#if (BT_SIG_BEACON = 1) || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1)|| (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)|| (BT_SIG_HEART_RATE_SENSOR = 1)|| (CUSTOM_OTA = 1)|| (CUSTOM_P2P_SERVER = 1)|| (CUSTOM_P2P_CLIENT = 1)|| (CUSTOM_P2P_ROUTER = 1)|| (CUSTOM_TEMPLATE = 1)]
 
 /**
  * Define IO Authentication
  */
-#define CFG_BONDING_MODE                  (1)
-#define CFG_FIXED_PIN                     (111111)
-#define CFG_USED_FIXED_PIN                (0)
-#define CFG_ENCRYPTION_KEY_SIZE_MAX       (16)
-#define CFG_ENCRYPTION_KEY_SIZE_MIN       (8)
+#define CFG_BONDING_MODE                 (${CFG_BONDING_MODE})
+#define CFG_FIXED_PIN                    (${CFG_FIXED_PIN})
+#define CFG_USED_FIXED_PIN               (${CFG_USED_FIXED_PIN})
+#define CFG_ENCRYPTION_KEY_SIZE_MAX      (${CFG_ENCRYPTION_KEY_SIZE_MAX})
+#define CFG_ENCRYPTION_KEY_SIZE_MIN      (${CFG_ENCRYPTION_KEY_SIZE_MIN})
 
 /**
  * Define IO capabilities
@@ -205,15 +264,7 @@
 #define CFG_IO_CAPABILITY_NO_INPUT_NO_OUTPUT (0x03)
 #define CFG_IO_CAPABILITY_KEYBOARD_DISPLAY   (0x04)
 
-[#list SWIPdatas as SWIP]
-    [#if SWIP.defines??]
-        [#list SWIP.defines as definition]
-            [#if definition.name="CFG_IO_CAPABILITY"]
-                [#lt]#define ${definition.name}             ${definition.value}
-            [/#if]
-        [/#list]
-    [/#if]
-[/#list]
+#define CFG_IO_CAPABILITY              ${CFG_IO_CAPABILITY}
 
 /**
  * Define MITM modes
@@ -221,18 +272,40 @@
 #define CFG_MITM_PROTECTION_NOT_REQUIRED      (0x00)
 #define CFG_MITM_PROTECTION_REQUIRED          (0x01)
 
-[#list SWIPdatas as SWIP]
-    [#if SWIP.defines??]
-        [#list SWIP.defines as definition]
-            [#if definition.name="CFG_MITM_PROTECTION"]
-                [#lt]#define ${definition.name}             ${definition.value}
-            [/#if]
-        [/#list]
-    [/#if]
-[/#list]
-[/#if]
+#define CFG_MITM_PROTECTION             ${CFG_MITM_PROTECTION}
 
-[#if (BT_SIG_BLOOD_PRESSURE_SENSOR = 1)|| (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)|| (BT_SIG_HEART_RATE_SENSOR = 1)|| (CUSTOM_P2P_SERVER = 1)]
+[/#if]
+/**
+ * Define Secure Connections Support
+ */
+#define CFG_SECURE_NOT_SUPPORTED       (0x00)
+#define CFG_SECURE_OPTIONAL            (0x01)
+#define CFG_SECURE_MANDATORY           (0x02)
+
+#define CFG_SC_SUPPORT                 ${CFG_SC_SUPPORT}
+
+/**
+ * Define Keypress Notification Support
+ */
+#define CFG_KEYPRESS_NOT_SUPPORTED      (0x00)
+#define CFG_KEYPRESS_SUPPORTED          (0x01)
+
+#define CFG_KEYPRESS_NOTIFICATION_SUPPORT             ${CFG_KEYPRESS_NOTIFICATION_SUPPORT}
+   
+/**
+ * Numeric Comparison Answers
+ */   
+#define YES (0x01)
+#define NO  (0x00)
+
+/**
+ * Device name configuration for Generic Access Service
+ */
+#define CFG_GAP_DEVICE_NAME             "TEMPLATE"
+#define CFG_GAP_DEVICE_NAME_LENGTH      (8)
+
+[#if (BT_SIG_BLOOD_PRESSURE_SENSOR = 1)|| (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)
+ || (BT_SIG_HEART_RATE_SENSOR = 1) || (CUSTOM_P2P_SERVER = 1) || (CUSTOM_TEMPLATE = 1)]
 /**
  * Define PHY
  */
@@ -245,7 +318,7 @@
 #define RX_2M                                           0x02 
 [/#if]
 
-[#if (BT_SIG_BEACON = 1) || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1)|| (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)|| (BT_SIG_HEART_RATE_SENSOR = 1)|| (CUSTOM_OTA = 1)|| (CUSTOM_P2P_SERVER = 1)|| (CUSTOM_P2P_CLIENT = 1)|| (CUSTOM_P2P_ROUTER = 1)|| ( BLE_TRANSPARENT_MODE_UART = 1)|| ( BLE_TRANSPARENT_MODE_VCP = 1)]
+[#if (BT_SIG_BEACON = 1) || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1)|| (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)|| (BT_SIG_HEART_RATE_SENSOR = 1)|| (CUSTOM_OTA = 1)|| (CUSTOM_P2P_SERVER = 1)|| (CUSTOM_P2P_CLIENT = 1)|| (CUSTOM_P2P_ROUTER = 1)|| ( BLE_TRANSPARENT_MODE_UART = 1)|| ( BLE_TRANSPARENT_MODE_VCP = 1)|| (CUSTOM_TEMPLATE = 1)]
 /**
 *   Identity root key used to derive LTK and CSRK
 */
@@ -394,14 +467,14 @@
 #define CFG_DEV_ID_P2P_SERVER2                  (0x84)
 #define CFG_DEV_ID_P2P_SERVER3                  (0x87)
 #define CFG_DEV_ID_P2P_SERVER4                  (0x88)
-#define CFG_DEV_ID_P2P_SERVER5                  (0x89)   
-#define CFG_DEV_ID_P2P_SERVER6                  (0x8A)   
+#define CFG_DEV_ID_P2P_SERVER5                  (0x89)
+#define CFG_DEV_ID_P2P_SERVER6                  (0x8A)
 #define CFG_DEV_ID_P2P_ROUTER                   (0x85)
 
-
+[/#if]
+[#if (CUSTOM_P2P_SERVER = 1) || (CUSTOM_TEMPLATE = 1)]
 #define  RADIO_ACTIVITY_EVENT   1          /* 1 for OOB Demo */
 
-   
 /**
 * AD Element - Group B Feature
 */ 
@@ -429,6 +502,11 @@
 #define L2CAP_INTERVAL_MAX              CONN_P(1000) /* 1s */
 #define L2CAP_SLAVE_LATENCY             0x0000
 #define L2CAP_TIMEOUT_MULTIPLIER        0x1F4
+
+/* USER CODE BEGIN Specific_Parameters */
+
+/* USER CODE END Specific_Parameters */
+
 [/#if]
 [#if (CUSTOM_OTA = 1)]
 /**
@@ -464,7 +542,7 @@
 #define CFG_DEV_ID_P2P_ROUTER                   (0x85)
 
 #define CFG_P2P_DEMO_MULTI                      1
-   
+
 
 #define CONN_L(x) ((int)((x)/0.625f))
 #define CONN_P(x) ((int)((x)/1.25f))
@@ -495,7 +573,7 @@
 #define CFG_FW_BUILD              (0)
 
 [/#if]
-[#if (BT_SIG_BEACON = 1) || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1)|| (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)|| (BT_SIG_HEART_RATE_SENSOR = 1)|| (CUSTOM_OTA = 1)|| (CUSTOM_P2P_SERVER = 1)|| (CUSTOM_P2P_CLIENT = 1)|| (CUSTOM_P2P_ROUTER = 1)|| ( BLE_TRANSPARENT_MODE_UART = 1 )|| ( BLE_TRANSPARENT_MODE_VCP = 1)]
+[#if (BT_SIG_BEACON = 1) || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1)|| (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)|| (BT_SIG_HEART_RATE_SENSOR = 1)|| (CUSTOM_OTA = 1)|| (CUSTOM_P2P_SERVER = 1)|| (CUSTOM_P2P_CLIENT = 1)|| (CUSTOM_P2P_ROUTER = 1)|| ( BLE_TRANSPARENT_MODE_UART = 1 )|| ( BLE_TRANSPARENT_MODE_VCP = 1)|| (CUSTOM_TEMPLATE = 1)]
 
 /******************************************************************************
  * BLE Stack
@@ -651,46 +729,14 @@
  * Select UART interfaces
  */
 [#if (BLE_TRANSPARENT_MODE_UART = 1) ||(BLE_TRANSPARENT_MODE_VCP = 1) ]
-[#list SWIPdatas as SWIP]
-    [#if SWIP.defines??]
-        [#list SWIP.defines as definition]
-            [#if definition.name="CFG_UART_GUI"]
-                [#lt]#define ${definition.name}          ${definition.value}
-            [/#if]
-        [/#list]
-    [/#if]
-[/#list]
+    [#lt]#define CFG_UART_GUI          ${CFG_UART_GUI}
 [/#if]
-[#list SWIPdatas as SWIP]
-    [#if SWIP.defines??]
-        [#list SWIP.defines as definition]
-            [#if definition.name="CFG_DEBUG_TRACE_UART"]
-                [#lt]#define ${definition.name}    ${definition.value}
-            [/#if]
-        [/#list]
-    [/#if]
-[/#list]
+	[#lt]#define CFG_DEBUG_TRACE_UART    ${CFG_DEBUG_TRACE_UART}
 [#if (BLE_TRANSPARENT_MODE_UART = 0) && (BLE_TRANSPARENT_MODE_VCP = 0)]
-[#list SWIPdatas as SWIP]
-    [#if SWIP.defines??]
-        [#list SWIP.defines as definition]
-            [#if definition.name="CFG_CONSOLE_MENU"]
-                [#lt]#define ${definition.name}      ${definition.value}
-            [/#if]
-        [/#list]
-    [/#if]
-[/#list]
+    [#lt]#define CFG_CONSOLE_MENU      ${CFG_CONSOLE_MENU}
 [/#if]
 [#if (THREAD = 1)]
-[#list SWIPdatas as SWIP]
-    [#if SWIP.defines??]
-        [#list SWIP.defines as definition]
-            [#if definition.name="CFG_CLI_UART"]
-                [#lt]#define ${definition.name}    ${definition.value}
-            [/#if]
-        [/#list]
-    [/#if]
-[/#list]
+    [#lt]#define CFG_CLI_UART    ${CFG_CLI_UART}
 [/#if]
 /******************************************************************************
  * USB interface
@@ -1092,7 +1138,7 @@ typedef enum
 [#if BT_SIG_HEART_RATE_SENSOR = 1]
     CFG_TASK_MEAS_REQ_ID,
 [/#if]
-[#if CUSTOM_P2P_SERVER = 1]
+[#if (CUSTOM_P2P_SERVER = 1) || (CUSTOM_TEMPLATE = 1)]
     CFG_TASK_ADV_CANCEL_ID,
     CFG_TASK_SW1_BUTTON_PUSHED_ID,
 #if (L2CAP_REQUEST_NEW_CONN_PARAM != 0 )
@@ -1117,20 +1163,17 @@ typedef enum
     CFG_TASK_CONN_DEV_6_ID,
     CFG_TASK_SEARCH_SERVICE_ID,
 [/#if]
-[#if (BT_SIG_BEACON = 1) || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_HEART_RATE_SENSOR = 1) || (CUSTOM_OTA = 1) || (CUSTOM_P2P_SERVER = 1) || (CUSTOM_P2P_ROUTER = 1) || (CUSTOM_P2P_CLIENT = 1)]
+[#if (BT_SIG_BEACON = 1) || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_HEART_RATE_SENSOR = 1) || (CUSTOM_OTA = 1) || (CUSTOM_P2P_SERVER = 1) || (CUSTOM_P2P_ROUTER = 1) || (CUSTOM_P2P_CLIENT = 1) || (CUSTOM_TEMPLATE = 1)]
     CFG_TASK_HCI_ASYNCH_EVT_ID,
 [/#if]
 [#if (BLE_TRANSPARENT_MODE_UART = 1) || (BLE_TRANSPARENT_MODE_VCP = 1)]
-  CFG_TASK_BLE_HCI_CMD_ID,
-  CFG_TASK_SYS_HCI_CMD_ID,
-  CFG_TASK_HCI_ACL_DATA_ID,
-  CFG_TASK_SYS_LOCAL_CMD_ID,
-  CFG_TASK_TX_TO_HOST_ID,
+    CFG_TASK_BLE_HCI_CMD_ID,
+    CFG_TASK_SYS_HCI_CMD_ID,
+    CFG_TASK_HCI_ACL_DATA_ID,
+    CFG_TASK_SYS_LOCAL_CMD_ID,
+    CFG_TASK_TX_TO_HOST_ID,
 [/#if]
-[#if CUSTOM_TEMPLATE = 1]
-  CFG_IdleTask_Update_Parameter,
-[/#if]
-[#if (BT_SIG_BEACON = 1) || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_HEART_RATE_SENSOR = 1) || (CUSTOM_OTA = 1) || (CUSTOM_P2P_SERVER = 1) || (CUSTOM_P2P_ROUTER = 1) || (CUSTOM_P2P_CLIENT = 1) || (BLE_TRANSPARENT_MODE_UART = 1) || (BLE_TRANSPARENT_MODE_VCP = 1)]
+[#if (BT_SIG_BEACON = 1) || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_HEART_RATE_SENSOR = 1) || (CUSTOM_OTA = 1) || (CUSTOM_P2P_SERVER = 1) || (CUSTOM_P2P_ROUTER = 1) || (CUSTOM_P2P_CLIENT = 1) || (BLE_TRANSPARENT_MODE_UART = 1) || (BLE_TRANSPARENT_MODE_VCP = 1) || (CUSTOM_TEMPLATE = 1)]
 /* USER CODE BEGIN CFG_Task_Id_With_HCI_Cmd_t */
 
 /* USER CODE END CFG_Task_Id_With_HCI_Cmd_t */
@@ -1201,9 +1244,9 @@ typedef enum
 /* Scheduler types and defines        */
 /*------------------------------------*/
 #define TASK_MSG_FROM_M0_TO_M4      (1U << CFG_TASK_MSG_FROM_M0_TO_M4)
-/* USER CODE BEGIN DEFINE_TASK */ 
+/* USER CODE BEGIN DEFINE_TASK */
 
-/* USER CODE END DEFINE_TASK */  
+/* USER CODE END DEFINE_TASK */
  
 /**
  * This is the list of priority required by the application
@@ -1246,7 +1289,7 @@ typedef enum
 #define CFG_SHCI_USER_EVT_PROCESS_CB_SIZE     (0)
 #define CFG_SHCI_USER_EVT_PROCESS_STACK_MEM   (0)
 #define CFG_SHCI_USER_EVT_PROCESS_PRIORITY    osPriorityNone
-#define CFG_SHCI_USER_EVT_PROCESS_STACk_SIZE  (128 * 7)
+#define CFG_SHCI_USER_EVT_PROCESS_STACK_SIZE  (128 * 7)
 
 [#if (THREAD = 1)]
 #define CFG_THREAD_MSG_M0_TO_M4_PROCESS_NAME        "THREAD_MSG_M0_TO_M4_PROCESS"
@@ -1255,7 +1298,7 @@ typedef enum
 #define CFG_THREAD_MSG_M0_TO_M4_PROCESS_CB_SIZE     (0)
 #define CFG_THREAD_MSG_M0_TO_M4_PROCESS_STACK_MEM   (0)
 #define CFG_THREAD_MSG_M0_TO_M4_PROCESS_PRIORITY    osPriorityLow
-#define CFG_THREAD_MSG_M0_TO_M4_PROCESS_STACk_SIZE  (128 * 8)
+#define CFG_THREAD_MSG_M0_TO_M4_PROCESS_STACK_SIZE  (128 * 8)
 
 #define CFG_THREAD_CLI_PROCESS_NAME        "THREAD_CLI_PROCESS"
 #define CFG_THREAD_CLI_PROCESS_ATTR_BITS   (0)
@@ -1263,7 +1306,7 @@ typedef enum
 #define CFG_THREAD_CLI_PROCESS_CB_SIZE     (0)
 #define CFG_THREAD_CLI_PROCESS_STACK_MEM   (0)
 #define CFG_THREAD_CLI_PROCESS_PRIORITY    osPriorityNormal
-#define CFG_THREAD_CLI_PROCESS_STACk_SIZE  (128 * 8)
+#define CFG_THREAD_CLI_PROCESS_STACK_SIZE  (128 * 8)
 
 [/#if]
 [#if (BLE = 1)]
@@ -1273,7 +1316,7 @@ typedef enum
 #define CFG_HCI_USER_EVT_PROCESS_CB_SIZE      (0)
 #define CFG_HCI_USER_EVT_PROCESS_STACK_MEM    (0)
 #define CFG_HCI_USER_EVT_PROCESS_PRIORITY     osPriorityNone
-#define CFG_HCI_USER_EVT_PROCESS_STACk_SIZE   (128 * 8)
+#define CFG_HCI_USER_EVT_PROCESS_STACK_SIZE   (128 * 8)
 
 #define CFG_ADV_UPDATE_PROCESS_NAME           "ADV_UPDATE_PROCESS"
 #define CFG_ADV_UPDATE_PROCESS_ATTR_BITS      (0)
@@ -1281,7 +1324,7 @@ typedef enum
 #define CFG_ADV_UPDATE_PROCESS_CB_SIZE        (0)
 #define CFG_ADV_UPDATE_PROCESS_STACK_MEM      (0)
 #define CFG_ADV_UPDATE_PROCESS_PRIORITY       osPriorityNone
-#define CFG_ADV_UPDATE_PROCESS_STACk_SIZE     (128 * 6)
+#define CFG_ADV_UPDATE_PROCESS_STACK_SIZE     (128 * 6)
 
 #define CFG_HRS_PROCESS_NAME                  "HRS_PROCESS"
 #define CFG_HRS_PROCESS_ATTR_BITS             (0)
@@ -1289,7 +1332,7 @@ typedef enum
 #define CFG_HRS_PROCESS_CB_SIZE               (0)
 #define CFG_HRS_PROCESS_STACK_MEM             (0)
 #define CFG_HRS_PROCESS_PRIORITY              osPriorityNone
-#define CFG_HRS_PROCESS_STACk_SIZE            (128 * 5)
+#define CFG_HRS_PROCESS_STACK_SIZE            (128 * 5)
 
 [/#if]
 /* USER CODE BEGIN FreeRTOS_Defines */

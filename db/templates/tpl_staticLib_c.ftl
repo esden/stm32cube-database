@@ -1,9 +1,7 @@
 [#ftl]
-[#if GRAPHICS??]
-[#assign coreDir="Core/"]
-[#else]
+
 [#assign coreDir=""]
-[/#if]
+
 [#assign coreDir=sourceDir]
 /**
   ******************************************************************************

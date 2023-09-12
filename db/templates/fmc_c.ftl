@@ -638,6 +638,7 @@ void MX_${instName}_Init(void)
 #t#treturn;
 #t}
 #t${mspinitvar} = 1;
+
 [#assign listOfLocalVariables =""]
     [#assign resultList =""]
 [#list ipvar.configModelList as instanceData]
@@ -652,18 +653,26 @@ void MX_${instName}_Init(void)
 [/#if]
 [/#list]
 #n
-[#assign clockInst=""]
-[#assign nTab=1]
+
 
 [#list ipvar.configModelList as instanceData]
 [#if instanceData.initServices??]
     [#if instanceData.initServices.pclockConfig??]
+[#if FamilyName=="STM32MP1"]
+#tif(IS_ENGINEERING_BOOT_MODE())
+#t{
+[/#if]
+[#assign clockInst=""]
 [#assign   pclockConfig=instanceData.initServices.pclockConfig] [#--list0--]
 [@common.generateConfigModelListCode configModel=pclockConfig inst=""  nTab=2 index=""/]#n
+[#if FamilyName=="STM32MP1"]
+#t}
+[/#if]
 #n
     [/#if]
 [/#if]
 [/#list]
+
 [#assign ipHandler = ipvar.ipName?lower_case+ "Handle"]
 [@generateServiceCode ipName=ipvar.ipName serviceType="Init" modeName=ipvar.ipName instHandler=ipHandler tabN=1/]
 #t/* USER CODE BEGIN ${ipvar.ipName}_MspInit 1 */

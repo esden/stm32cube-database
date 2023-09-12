@@ -15,6 +15,7 @@ NB: all the string lists should be re-ordered to insure DTS ordering.
 [@srvcmx_init /]
 
 [#macro srvcmx_init]
+	[#local module = "srvcmx_init"]
 
 	[#--Get info from MX McuDataModels.
 		*MCU & DTS data arrive in native MX format => should be changed into lower-case when needed
@@ -73,11 +74,22 @@ NB: all the string lists should be re-ordered to insure DTS ordering.
 		[#assign mx_dt_enabledDevicesNamesList = mx_dt_enabledDevicesNamesList + [device.name]]
 	[/#list]
 
+	[#--get a Map of the FW associated to the binding devices "for this dts".
+		key= deviceName value= fwName
+		NB: several elmts can reference the same device but a device is binded one time per FW in a dts => map can be used
+		NB: a device reference only one FW per dts--]
+	[#assign mx_dts_fwNamesAssociatedToBindedDevicesMap = {}]
+	[#list mxDtDM.dts_bindedElmtsList as elmt]
+		[#if srvcmx_isBindedHwADevice(elmt)]
+			[#assign mx_dts_fwNamesAssociatedToBindedDevicesMap = mx_dts_fwNamesAssociatedToBindedDevicesMap + {elmt.deviceName:elmt.fwName}]
+		[/#if]
+	[/#list]
+
 [/#macro]
 
 
 [#--------------------------------------------------------------------------------------------------------------------------------]
-[#-- Contexts & Runtime contexts info --]
+[#-- Contexts & Runtime contexts info: cover all the DT (not specific to a DTS) --]
 [#--------------------------------------------------------------------------------------------------------------------------------]
 
 [#-- return the names list of all available runtimeContexts
@@ -114,7 +126,7 @@ NB: all the string lists should be re-ordered to insure DTS ordering.
 
 
 [#--------------------------------------------------------------------------------------------------------------------------------]
-[#-- Extracting global (not specific to a DTS) DT info --]
+[#-- Extracting misc info covering all the DT (not specific to a DTS) --]
 [#--------------------------------------------------------------------------------------------------------------------------------]
 
 [#--returns true if the DbFeature is enabled--]
@@ -181,10 +193,11 @@ NB: all the string lists should be re-ordered to insure DTS ordering.
 
 
 [#--------------------------------------------------------------------------------------------------------------------------------]
-[#-- Extracting info from Device --]
+[#-- Extracting info from Device.
+	Device can be shared: this info are global, covering all the DT (not specific to a DTS)  --]
 [#--------------------------------------------------------------------------------------------------------------------------------]
 
-[#--true if device exist and is enabled--]
+[#--true if device exists and is enabled--]
 [#function srvcmx_isDeviceEnabled		pDeviceName]
 
 	[#if mx_dt_enabledDevicesNamesList?seq_contains(pDeviceName)]
@@ -195,7 +208,7 @@ NB: all the string lists should be re-ordered to insure DTS ordering.
 
 [#--true if device is enabled and "non secured".
 else false.
-NB: it is supposed that device checked is enabled as "dt_enabledDevicesMap" is used.
+NB: it is supposed that the device checked is enabled (for "dt_enabledDevicesMap" is used)
 --]
 [#function srvcmx_isEnabledDeviceNonSecure		pDeviceName]
 
@@ -208,7 +221,7 @@ NB: it is supposed that device checked is enabled as "dt_enabledDevicesMap" is u
 [/#function]
 
 
-[#--return the nber of runtime ctxts the device is assigned to.
+[#--return the nber of runtime ctxts the device is assigned to, covering all the DT.
 NB: independently to its state--]
 [#function srvcmx_getDeviceRtCtxtNber		pDeviceName]
 
@@ -216,13 +229,27 @@ NB: independently to its state--]
 	[#if  device??]
 		[#return device.rtCtxtAssignmentNber]
 	[/#if]
-
+r
 [#return 0]
 [/#function]
 
 
 [#--------------------------------------------------------------------------------------------------------------------------------]
-[#-- Extracting info from current printed DTS --]
+[#-- Extracting info from Device.
+	Device can be shared: this info are specific to the current DTS  --]
+[#--------------------------------------------------------------------------------------------------------------------------------]
+
+[#--return the FW name to which the binded device is assigned to for the current DTS.
+	return empty string if error.
+NB: only the binded devices are scanned - a device is binded only one time per dts => only one FW name can be returned--]
+[#function srvcmx_getFwNameOfBindedDevice_inDTS		pDeviceName]
+
+	[#return srvc_map_getValue(mx_dts_fwNamesAssociatedToBindedDevicesMap, pDeviceName)!"" ]
+[/#function]
+
+
+[#--------------------------------------------------------------------------------------------------------------------------------]
+[#-- Extracting info from current DTS --]
 [#--------------------------------------------------------------------------------------------------------------------------------]
 
 [#--returns true if the DTS configures the proposed FW--]
@@ -239,6 +266,22 @@ NB: independently to its state--]
 [#function srvcmx_getListOfDevicesWithPinCtrl_inDTS]
 
 [#return mxDtDM.dts_devicesWithPinCtrlList?sort]
+[/#function]
+
+
+[#--The bindedHwName is provided as a "regexp".
+The bindedHw is considered as "existing" on the 1st match.
+Returns the 1st found "bindedHwName" as a "String".
+--]
+[#function srvcmx_getMatchingBindedHwName_inDTS		pBindedHwNameRegexp]
+
+	[#--we list binded elmts to found the parent dtsElmt--]
+	[#list mxDtDM.dts_bindedElmtsList as elmt]
+		[#if elmt.bindedHwName?matches(pBindedHwNameRegexp)]
+			[#return elmt.bindedHwName]
+		[/#if]
+	[/#list]
+[#return ""]
 [/#function]
 
 
@@ -273,22 +316,6 @@ NB: independently to its state--]
 	[/#list]
 
 	[#return elmtsList]
-[/#function]
-
-
-[#--The bindedHwName is provided as a "regexp".
-The bindedHw is considered as "existing" on the 1st match.
-Returns the 1st found "bindedHwName" as a "String".
---]
-[#function srvcmx_getMatchingBindedHwName_inDTS		pBindedHwNameRegexp]
-
-	[#--we list binded elmts to found the parent dtsElmt--]
-	[#list mxDtDM.dts_bindedElmtsList as elmt]
-		[#if elmt.bindedHwName?matches(pBindedHwNameRegexp)]
-			[#return elmt.bindedHwName]
-		[/#if]
-	[/#list]
-[#return ""]
 [/#function]
 
 

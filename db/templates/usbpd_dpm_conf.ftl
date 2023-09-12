@@ -18,6 +18,7 @@
  extern "C" {
 #endif 
 [#assign nbPorts = "1"]
+[#assign USBPD_CoreLib = ""]
 [#assign SRC = false]
 [#assign SNK = false]
 [#assign DRP = false]
@@ -28,6 +29,9 @@
 [#list SWIPdatas as SWIP]
     [#if SWIP.defines??]
         [#list SWIP.defines as definition]
+            [#if definition.name == "USBPD_CoreLib" && definition.value != ""]
+                [#assign USBPD_CoreLib = definition.value]
+            [/#if]
             [#if definition.name == "SRC" && definition.value == "true"]
                 [#assign SRC = true]
             [/#if]
@@ -295,11 +299,12 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "usbpd_pdo_defs.h"
-#include "usbpd_vdm_user.h"
 #include "usbpd_dpm_user.h"
+[#if USBPD_CoreLib == "USBPDCORE_LIB_PD3_FULL" | USBPD_CoreLib == "USBPDCORE_LIB_PD3_CONFIG_1"]
+#include "usbpd_vdm_user.h"
+[/#if]
 
 [#if GUI_INTERFACE??]
-/* Section where include file can be added */
 #include "gui_api.h"
 #include "usbpd_gui_memmap.h"
 [/#if]
@@ -356,6 +361,7 @@ USBPD_SettingsTypeDef       DPM_Settings[USBPD_PORT_COUNT] =
 [/#if]
     .CAD_TryFeature = ${valueCAD_TryFeature_P0},              /* CAD try feature                                         */
     .CAD_AccesorySupport = ${valueCAD_AccesorySupport_P0},         /* CAD accessory support                                   */
+[#if USBPD_CoreLib != "USBPDCORE_LIB_NO_PD"]
     .PE_PD3_Support.d =                           /*!< PD3 SUPPORT FEATURE                                              */
     {
       .PE_UnchunkSupport                = ${valuePE_UnchunkSupport_P0},  /* support Unchunked mode (valid only spec revision 3.0)   */
@@ -373,6 +379,7 @@ USBPD_SettingsTypeDef       DPM_Settings[USBPD_PORT_COUNT] =
       .Is_GetBattery_Supported          = ${valueIs_GetBattery_Supported_P0},  /*!< Get Battery Capabitity and Status messages supported by PE */
 [/#if]
     },
+[/#if]
 
     .CAD_SRCToggleTime = ${valueCAD_SRCToggleTime_P0},                    /* uint8_t CAD_SRCToggleTime; */
     .CAD_SNKToggleTime = ${valueCAD_SNKToggleTime_P0},                    /* uint8_t CAD_SNKToggleTime; */

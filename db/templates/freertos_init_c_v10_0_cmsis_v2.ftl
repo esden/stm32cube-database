@@ -15,8 +15,6 @@
 [#assign timerAllocation = "Dynamic"]
 [#assign queueThreadId = "NULL"]
 
-[#-- osKernelInitialize(); /* commented and replaced by the include of the new tmp file (always done in the main) */  --]
-
 [#list SWIPdatas as SWIP]
   [#if SWIP.variables??]
     [#list SWIP.variables as variable]
@@ -41,20 +39,6 @@
             #t/* Create the mutex(es) */
           [/#if]
             #t/* creation of ${mutexName} */
-          [#-- removed here, cf BZ 74919 --]
-          [#--
-          [#if mutexAllocation == "Dynamic"]
-            #tconst osMutexAttr_t ${mutexName}_attributes = {
-            #t#t.name = "${mutexName}"
-            #t};
-          [#else]
-            #tconst osMutexAttr_t ${mutexName}_attributes = {
-            #t#t.name = "${mutexName}",
-            #t#t.cb_mem = &${mutexControl},
-            #t#t.cb_size = sizeof(${mutexControl}),
-            #t};
-          [/#if]
-          --]
             #t${mutexName}Handle = osMutexNew(&${mutexName}_attributes);
             #n
         [/#if]
@@ -87,22 +71,6 @@
             #n#t/* Create the recursive mutex(es) */
           [/#if]
             #t/* creation of ${mutexName} */
-          [#-- removed here, cf BZ 74919 --]
-          [#--
-          [#if mutexAllocation == "Dynamic"]
-            #tconst osMutexAttr_t ${mutexName}_attributes = {
-            #t#t.name = "${mutexName}",
-            #t#t.attr_bits = osMutexRecursive, 
-            #t};
-          [#else]
-            #tconst osMutexAttr_t ${mutexName}_attributes = {
-            #t#t.name = "${mutexName}",
-            #t#t.attr_bits = osMutexRecursive, 
-            #t#t.cb_mem = &${mutexControl},
-            #t#t.cb_size = sizeof(${mutexControl}),
-            #t};
-          [/#if]
-          --]
             #t${mutexName}Handle = osMutexNew(&${mutexName}_attributes);
             #n
         [/#if]
@@ -139,21 +107,7 @@
           [#if nbSemaphores == 1]
             #n#t/* Create the semaphores(s) */
           [/#if]
-            #t/* creation of ${semaphoreName} */
-          [#-- removed here, cf BZ 74919 --]
-          [#--
-          [#if semaphoreAllocation == "Dynamic"]
-            #tconst osSemaphoreAttr_t ${semaphoreName}_attributes = {
-            #t#t.name = "${semaphoreName}"
-            #t};
-          [#else]
-            #tconst osSemaphoreAttr_t ${semaphoreName}_attributes = {
-            #t#t.name = "${semaphoreName}",
-            #t#t.cb_mem = &${semaphoreControl},
-            #t#t.cb_size = sizeof(${semaphoreControl}),            
-            #t};
-          [/#if]
-          --]
+          #t/* creation of ${semaphoreName} */
           #t${semaphoreName}Handle = osSemaphoreNew(1, 1, &${semaphoreName}_attributes);
           #n
         [/#if]
@@ -189,20 +143,6 @@
             #n#t/* Create the semaphores(s) */
           [/#if]
           #t/* creation of ${semaphoreName} */
-          [#-- removed here, cf BZ 74919 --]
-          [#--  
-          [#if semaphoreAllocation == "Dynamic"]
-            #tconst osSemaphoreAttr_t ${semaphoreName}_attributes = {
-            #t#t.name = "${semaphoreName}"
-            #t};
-          [#else]
-            #tconst osSemaphoreAttr_t ${semaphoreName}_attributes = {
-            #t#t.name = "${semaphoreName}",
-            #t#t.cb_mem = &${semaphoreControl},
-            #t#t.cb_size = sizeof(${semaphoreControl}),            
-            #t};
-          [/#if]
-          --]
           #t${semaphoreName}Handle = osSemaphoreNew(${semaphoreCount}, ${semaphoreCount}, &${semaphoreName}_attributes);
           #n
         [/#if]
@@ -255,20 +195,6 @@
             #n#t/* Create the timer(s) */
           [/#if]
           #t/* creation of ${timerName} */
-          [#-- removed here, cf BZ 74919 --]
-          [#--  
-          [#if timerAllocation == "Dynamic"]
-          #tconst osTimerAttr_t ${timerName}_attributes = {
-          #t#t.name = "${timerName}"
-          #t};
-          [#else]
-          #tconst osTimerAttr_t ${timerName}_attributes = {
-          #t#t.name = "${timerName}",
-          #t#t.cb_mem = &${timerControlBlock},
-          #t#t.cb_size = sizeof(${timerControlBlock}), 
-          #t};
-          [/#if]
-          --]
           #t${timerName}Handle = osTimerNew(${timerCallback}, ${timerType}, ${timerParameters}, &${timerName}_attributes);
           #n
         [/#if]
@@ -318,22 +244,6 @@
             #n#t/* Create the queue(s) */
           [/#if]
           #t/* creation of ${queueName} */
-          [#-- removed here, cf BZ 74919 --]
-          [#--  
-          [#if queueAllocation == "Dynamic"]
-            #tconst osMessageQueueAttr_t ${queueName}_attributes = {
-            #t#t.name = "${queueName}"
-            #t};
-          [#else]
-            #tconst osMessageQueueAttr_t ${queueName}_attributes = {
-            #t#t.name = "${queueName}",
-            #t#t.cb_mem = &${queueControlBlock},
-            #t#t.cb_size = sizeof(${queueControlBlock}),
-            #t#t.mq_mem = &${queueBuffer},
-            #t#t.mq_size = sizeof(${queueBuffer})         
-            #t};
-          [/#if]
-          --]
           [#-- what about the sizeof here??? cd native code  --]
           [#if queueIsIntegerType = "0"]
           #t${queueName}Handle = osMessageQueueNew (${queueSize}, sizeof(${queueElementType}), &${queueName}_attributes);
@@ -396,28 +306,8 @@
           #n#t/* Create the thread(s) */
         [/#if]
         #t/* creation of ${threadName} */
-        [#-- removed here, cf BZ 74919 --]
-        [#--  
-        [#if threadAllocation == "Dynamic"]
-         #tconst osThreadAttr_t ${threadName}_attributes = {
-         #t#t.name = "${threadName}",
-         #t#t.priority = (osPriority_t) ${threadPriority},
-         #t#t.stack_size = ${threadStackSize}
-         #t};
-        [#else]
-         #tconst osThreadAttr_t ${threadName}_attributes = {
-         #t#t.name = "${threadName}",
-         #t#t.stack_mem = &${threadBuffer}[0],
-         #t#t.stack_size = sizeof(${threadBuffer}),
-         #t#t.cb_mem = &${threadControlBlock},
-         #t#t.cb_size = sizeof(${threadControlBlock}),
-         #t#t.priority = (osPriority_t) ${threadPriority},
-         #t};
-        [/#if]
-        --]
-         [#-- #t${threadName}Handle = osThreadNew(${threadFunction}, NULL, &${threadName}_attributes); --] [#-- BZ 74920 --]
-         #t${threadName}Handle = osThreadNew(${threadFunction}, ${threadArguments}, &${threadName}_attributes); 
-         #n
+        #t${threadName}Handle = osThreadNew(${threadFunction}, ${threadArguments}, &${threadName}_attributes); 
+        #n
       [/#if]
 	[/#list]
   [/#if]

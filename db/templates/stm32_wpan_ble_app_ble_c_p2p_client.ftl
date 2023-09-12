@@ -12,11 +12,16 @@
 /* USER CODE END Header */
 
 [#assign FREERTOS_STATUS = 0]
+[#assign LOCAL_NAME = "STM32WB"]
+
 [#list SWIPdatas as SWIP]
 	[#if SWIP.defines??]
 		[#list SWIP.defines as definition]
             [#if (definition.name == "FREERTOS_STATUS") && (definition.value == "1")]
                 [#assign FREERTOS_STATUS = 1]
+            [/#if]
+            [#if definition.name == "LOCAL_NAME"]
+                [#assign LOCAL_NAME = definition.value]
             [/#if]
         [/#list]
 	[/#if]
@@ -731,7 +736,7 @@ static void Ble_Tl_Init( void )
 
   if (role > 0)
   {
-    const char *name = "STM32WB";
+    const char *name = "${LOCAL_NAME}";
 
     aci_gap_init(role, 0,
                  APPBLE_GAP_DEVICE_NAME_LENGTH,

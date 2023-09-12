@@ -25,22 +25,36 @@
                      Forced when CubeIDE is in use (as newlib is used to generate projects) </Description>
     </RefParameter>
     -->
-    <RefParameter Name="configUSE_NEWLIB_REENTRANT" Comment="USE_NEWLIB_REENTRANT" DefaultValue="0" Type="list" Group="Newlib" TabName="Advanced settings">
+    <RefParameter Name="configUSE_NEWLIB_REENTRANT" Comment="USE_NEWLIB_REENTRANT" DefaultValue="0" Type="list" Group="Newlib settings (see parameter description first)" TabName="Advanced settings">
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
-        <Description>If configUSE_NEWLIB_REENTRANT is set to 1 then a newlib reent structure will be allocated for each created task.&lt;br&gt; 
-                     Note Newlib support has been included by popular demand, but is not used by the FreeRTOS maintainers themselves.&lt;br&gt; 
+        <Description>(from https://freertos.org/a00110.html)&lt;br&gt;
+                     If configUSE_NEWLIB_REENTRANT is set to 1 then a newlib reent structure will be allocated for each created task.&lt;br&gt; 
+                     Note&lt;br&gt;
+                     Newlib support has been included by popular demand, but is not used by the FreeRTOS maintainers themselves.&lt;br&gt; 
                      FreeRTOS is not responsible for resulting newlib operation.&lt;br&gt; 
                      User must be familiar with newlib and must provide system-wide implementations of the necessary stubs.&lt;br&gt; 
-                     Be warned that (at the time of writing) the current newlib design implements a system-wide malloc() that must be provided with locks. </Description>
+                     Be warned that (at the time of writing) the current newlib design implements a system-wide malloc() that must be provided with locks.&lt;br&gt;&lt;br&gt;
+                     &lt;b&gt;Warning: &lt;/b&gt; &lt;br&gt;
+                     if enabled without using newlib, CubeMx project compilation will fail ("cannot open source file "reent.h")
+        </Description>
     </RefParameter>
     
-    <!-- For the moment, only F4 config file to be modified to take into account the semaphore for copying or not (in 5.6) -->
-    <RefParameter Name="copyHeapFile" Comment="COPY_HEAP_FILE" DefaultValue="1" Type="list" Group="Newlib" TabName="Advanced settings">
+    <!-- For the first step, only F4/F7/G0/G4/H7/L4/MP1/WB config files to be modified to take into account the semaphore for copying or not (in 5.6) -->
+    <RefParameter Name="copyHeapFile" Comment="Use FW pack heap file" DefaultValue="1" Type="list" Group="Project settings (see parameter description first)" TabName="Advanced settings">
+        <Condition Diagnostic="Can be changed on F4/F7/G0/G4/H7/L4/MP1/WB series" Expression="STM32F4|STM32F7|STM32G0|STM32G4|STM32H7|STM32L4|STM32MP1|STM32WB"/> 
         <PossibleValue Comment="Disabled" Value="0" Semaphore="S_DO_NOT_COPY_HEAP_FILE"/>
         <PossibleValue Comment="Enabled" Value="1"/>
-        <Description>Copy the heap file (defined in "Memory Management scheme" to the project"). </Description>
-    </RefParameter> 
+        <Description>If &lt;b&gt;Enabled&lt;/b&gt; (default value), copies the heap file (defined in "Memory Management scheme") from the FW pack to the generated project. &lt;br&gt;
+                     If &lt;b&gt;Disabled&lt;/b&gt;, it is up to the user to provide a file with, at least, vPortFree() and pvPortMalloc() implementations inside (they will otherwise be missing at linking time).
+        </Description>
+    </RefParameter>
+    <RefParameter Name="copyHeapFile" Comment="Use FW pack heap file" DefaultValue="1" Type="list" Group="Project settings" TabName="Advanced settings">
+        <PossibleValue Comment="Enabled" Value="1"/>
+        <Description>Copies the heap file (defined in "Memory Management scheme") from the FW pack to the generated project.&lt;br&gt;
+                     Can only be disabled on F4/F7/G0/G4/H7/L4/MP1/WB series (as a first step). 
+        </Description>
+    </RefParameter>
     
     <!-- Possible use of different APIS in the future (not yet supported) -->
     <RefParameter Name="FreeRTOS_API" Comment="FreeRTOS API" DefaultValue="2" Type="uniqueElementList" Group="API" TabName="Config parameters">
@@ -89,13 +103,13 @@
         <PossibleValue Comment="New version of FreeRTOS" Value="10.0.1" Semaphore="S_VERSION_10_0_0"/>
         <Condition Diagnostic="Version available for F3" Expression="STM32F3"/>
     </RefParameter>
-    <RefParameter Name="FREERTOS_version" Comment="FreeRTOS version" DefaultValue="10.0.1" Type="String" Group="Versions" TabName="Config parameters">
-        <PossibleValue Comment="Version of FreeRTOS" Value="10.0.1" Semaphore="S_VERSION_10_0_0"/>
-        <Condition Diagnostic="Version available for F4" Expression="STM32F4"/>
+    <RefParameter Name="FREERTOS_version" Comment="FreeRTOS version" DefaultValue="10.2.1" Type="String" Group="Versions" TabName="Config parameters">
+        <PossibleValue Comment="Version of FreeRTOS" Value="10.2.1" Semaphore="S_VERSION_10_2_1"/>
+        <Condition Diagnostic="New version available for F4" Expression="STM32F4"/>
     </RefParameter>
-    <RefParameter Name="FREERTOS_version" Comment="FreeRTOS version" DefaultValue="10.0.1" Type="String" Group="Versions" TabName="Config parameters">
-        <PossibleValue Comment="Version of FreeRTOS" Value="10.0.1" Semaphore="S_VERSION_10_0_0"/>
-        <Condition Diagnostic="Version available for F7" Expression="STM32F7"/>
+    <RefParameter Name="FREERTOS_version" Comment="FreeRTOS version" DefaultValue="10.2.1" Type="String" Group="Versions" TabName="Config parameters">
+        <PossibleValue Comment="Version of FreeRTOS" Value="10.2.1" Semaphore="S_VERSION_10_2_1"/>
+        <Condition Diagnostic="New version available for F7" Expression="STM32F7"/>
     </RefParameter>
     <RefParameter Name="FREERTOS_version" Comment="FreeRTOS version" DefaultValue="10.0.1" Type="String" Group="Versions" TabName="Config parameters">
         <PossibleValue Comment="Version of FreeRTOS" Value="10.0.1" Semaphore="S_VERSION_10_0_0"/>
@@ -121,20 +135,21 @@
         <PossibleValue Comment="Version of FreeRTOS" Value="10.2.1" Semaphore="S_VERSION_10_2_1"/>
         <Condition Diagnostic="New version available for L5" Expression="STM32L5"/>
     </RefParameter>
-    <RefParameter Name="FREERTOS_version" Comment="FreeRTOS version" DefaultValue="10.0.1" Type="String" Group="Versions" TabName="Config parameters">
-        <PossibleValue Comment="Version of FreeRTOS" Value="10.0.1" Semaphore="S_VERSION_10_0_0"/>
-        <Condition Diagnostic="Version available for WB" Expression="STM32WB"/>
+    <RefParameter Name="FREERTOS_version" Comment="FreeRTOS version" DefaultValue="10.2.1" Type="String" Group="Versions" TabName="Config parameters">
+        <PossibleValue Comment="Version of FreeRTOS" Value="10.2.1" Semaphore="S_VERSION_10_2_1"/>
+        <Condition Diagnostic="New version available for WB" Expression="STM32WB"/>
     </RefParameter>
-    <RefParameter Name="FREERTOS_version" Comment="FreeRTOS version" DefaultValue="10.0.1" Type="String" Group="Versions" TabName="Config parameters">
-        <PossibleValue Comment="Version of FreeRTOS" Value="10.0.1" Semaphore="S_VERSION_10_0_0"/>
-        <Condition Diagnostic="Version available for MP1" Expression="STM32MP1"/>
+    <RefParameter Name="FREERTOS_version" Comment="FreeRTOS version" DefaultValue="10.2.1" Type="String" Group="Versions" TabName="Config parameters">
+        <PossibleValue Comment="Version of FreeRTOS" Value="10.2.1" Semaphore="S_VERSION_10_2_1"/>
+        <Condition Diagnostic="New version available for MP1" Expression="STM32MP1"/>
     </RefParameter>
-    <RefParameter Name="FREERTOS_version" Comment="FreeRTOS version" DefaultValue="10.0.1" Type="String" Group="Versions" TabName="Config parameters">
-        <PossibleValue Comment="Version of FreeRTOS" Value="10.0.1" Semaphore="S_VERSION_10_0_0"/>
-        <Condition Diagnostic="Version available for G4" Expression="STM32G4"/>
+    <RefParameter Name="FREERTOS_version" Comment="FreeRTOS version" DefaultValue="10.2.1" Type="String" Group="Versions" TabName="Config parameters">
+        <PossibleValue Comment="Version of FreeRTOS" Value="10.2.1" Semaphore="S_VERSION_10_2_1"/>
+        <Condition Diagnostic="New version available for G4" Expression="STM32G4"/>
     </RefParameter>
-    <RefParameter Name="FREERTOS_version" Comment="FreeRTOS version" DefaultValue="10.0.1" Type="String" Group="Versions" TabName="Config parameters">
-        <PossibleValue Comment="Default version of FreeRTOS" Value="10.0.1" Semaphore="S_VERSION_10_0_0"/>
+    <!--  default version for new series: current "new one" (10.2.1) -->
+    <RefParameter Name="FREERTOS_version" Comment="FreeRTOS version" DefaultValue="10.2.1" Type="String" Group="Versions" TabName="Config parameters">
+        <PossibleValue Comment="Default version of FreeRTOS" Value="10.2.1" Semaphore="S_VERSION_10_2_1"/>
     </RefParameter>
 
     <RefParameter Name="RAM_SIZE" Comment="RAM_SIZE" DefaultValue="=$RamSize" Type="integer" Visible="false"/>
@@ -182,7 +197,7 @@
     </RefParameter>
 
     <!-- Note: configUSE_PORT_OPTIMISED_TASK_SELECTION is forced as disabled for CMSIS-RTOS v2, then max prio can be > 32 --> <!-- uniqueElementList removed in 5.5.0 -->
-    <RefParameter Name="configMAX_PRIORITIES" Comment="MAX_PRIORITIES" DefaultValue="56" Max="56" Min="56" Type="integer" Group="Kernel settings" TabName="Config parameters" NoCheckOpt="false">
+    <RefParameter Name="configMAX_PRIORITIES" Comment="MAX_PRIORITIES" DefaultValue="56" Type="uniqueElementList" Group="Kernel settings" TabName="Config parameters" NoCheckOpt="false">
         <Condition Diagnostic="Default set to 56 when CMSIS RTOS V2 is Enabled" Expression="S_CMSIS_RTOS_V2$context"/>
         <Description>Sets the maximum priority that can be assigned to a task. &lt;br&gt;
                      Tasks can be assigned a priority from zero, which is the lowest priority, to (MAX_PRIORITIES-1), which is the highest priority.
@@ -190,7 +205,7 @@
                      Set to 56 when CMSIS-RTOS v2 is in use.</Description>
     </RefParameter>
     <RefParameter Name="configMAX_PRIORITIES" Comment="MAX_PRIORITIES" DefaultValue="7" Max="32" Min="4"  Type="integer" Group="Kernel settings" TabName="Config parameters" NoCheckOpt="false">
-        <Condition Diagnostic="Limited to 32 when configUSE_PORT_OPTIMISED_TASK_SELECTION is Enabled" Expression="configUSE_PORT_OPTIMISED_TASK_SELECTION=1"/>
+        <Condition Diagnostic="Limited to 32 when configUSE_PORT_OPTIMISED_TASK_SELECTION is Enabled" Expression="S_CMSIS_RTOS_V1$context &amp; configUSE_PORT_OPTIMISED_TASK_SELECTION=1"/>
         <Description>Sets the maximum priority that can be assigned to a task. &lt;br&gt;
                      Tasks can be assigned a priority from zero, which is the lowest priority, to (MAX_PRIORITIES-1), which is the highest priority.</Description>
     </RefParameter>
@@ -306,21 +321,12 @@
 	
 	<!-- cf BZL 55923 -->
 	<RefParameter Name="configUSE_APPLICATION_TASK_TAG" Comment="USE_APPLICATION_TASK_TAG" DefaultValue="0" Type="list" Group="Kernel settings" TabName="Config parameters">
-	    <Condition Diagnostic="Both values allowed when TouchGFX not in use." Expression="!USE_Touch_GFX_STACK"/>
 		<PossibleValue Comment="Disabled" Value="0"/>
 		<PossibleValue Comment="Enabled" Value="1"/>
 		<Description>USE_APPLICATION_TASK_TAG must be defined as 1 for the vTaskSetApplicationTaskTag function to be available.&lt;br&gt;
 		             This function is intended for advanced users only. &lt;br&gt; 
 		             A 'tag' value can be assigned to each task. This value is for the use of the application only - the RTOS kernel itself does not make use of it in any way. &lt;br&gt;
 		             The FreeRTOS trace macros documentation page provides a good example of how an application might make use of this feature.</Description>
-	</RefParameter>
-	<RefParameter Name="configUSE_APPLICATION_TASK_TAG" Comment="USE_APPLICATION_TASK_TAG" DefaultValue="1" Type="list" Group="Kernel settings" TabName="Config parameters">
-		<PossibleValue Comment="Enabled" Value="1"/>
-		<Description>USE_APPLICATION_TASK_TAG must be defined as 1 for the vTaskSetApplicationTaskTag function to be available.&lt;br&gt;
-		             This function is intended for advanced users only. &lt;br&gt; 
-		             A 'tag' value can be assigned to each task. This value is for the use of the application only - the RTOS kernel itself does not make use of it in any way. &lt;br&gt;
-		             The FreeRTOS trace macros documentation page provides a good example of how an application might make use of this feature. &lt;br&gt;
-		             Forced to 1 (Enabled) when TouchGFX is in use. </Description>
 	</RefParameter>
 
 	<!--<RefParameter Name="configTOTAL_HEAP_SIZE" Comment="TOTAL_HEAP_SIZE" DefaultValue="15" Unit="KByte(s)" Type="integer" Max="$RamSize" Min="1" Group="Kernel settings" TabName="Config parameters">    -->
@@ -1085,7 +1091,7 @@
     </RefParameter>
 
     <RefParameter Name="configENABLE_FPU" Comment="ENABLE_FPU" DefaultValue="0" Type="list" Group="MPU/FPU" TabName="Config parameters">
-        <Condition Diagnostic="Available on H7 and L4 series (supporting FreeRTOS 10.2.1)" Expression="S_VERSION_10_2_1"/>
+        <Condition Diagnostic="Available on F4,F7,G4,H7,L4,L5,MP1 and WB series (supporting FreeRTOS 10.2.1)" Expression="S_VERSION_10_2_1"/>
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
         <Description>Use or not FPU with FreeRTOS.</Description>
@@ -1096,7 +1102,7 @@
     </RefParameter>
     
     <RefParameter Name="configMESSAGE_BUFFER_LENGTH_TYPE" Comment="MESSAGE_BUFFER_LENGTH_TYPE" DefaultValue="size_t" Type="uniqueElementList" Group="Added with 10.2.1 support" TabName="Config parameters">
-        <Condition Diagnostic="Available on H7 and L4 series (supporting FreeRTOS 10.2.1)" Expression="S_VERSION_10_2_1"/>
+        <Condition Diagnostic="Available on F4,F7,G4,H7,L4,L5,MP1 and WB series (supporting FreeRTOS 10.2.1)" Expression="S_VERSION_10_2_1"/>
         <PossibleValue Comment="size_t" Value="size_t"/>
         <Description>Defaults to size_t for backward compatibility, but can be overridden in FreeRTOSConfig.h if lengths will always be less than the number of bytes in a size_t.</Description>
     </RefParameter>
@@ -1106,7 +1112,7 @@
     </RefParameter>
     
     <RefParameter Name="configUSE_POSIX_ERRNO" Comment="USE_POSIX_ERRNO" DefaultValue="0" Type="list" Group="Added with 10.2.1 support" TabName="Config parameters">
-        <Condition Diagnostic="Available on H7 and L4 series (supporting FreeRTOS 10.2.1)" Expression="S_VERSION_10_2_1"/>
+        <Condition Diagnostic="Available on F4,F7,G4,H7,L4,L5,MP1 and WB series (supporting FreeRTOS 10.2.1)" Expression="S_VERSION_10_2_1"/>
 	    <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
         <Description>Description to be completed.</Description>
@@ -1117,7 +1123,7 @@
     </RefParameter>
         
     <RefParameter Name="INCLUDE_uxTaskGetStackHighWaterMark2" Comment="uxTaskGetStackHighWaterMark2" DefaultValue="0" Type="list" Group="Include definitions" TabName="Include parameters">
-        <Condition Diagnostic="Available on H7 and L4 series (supporting FreeRTOS 10.2.1)" Expression="S_VERSION_10_2_1"/>
+        <Condition Diagnostic="Available on F4,F7,G4,H7,L4,L5,MP1 and WB series (supporting FreeRTOS 10.2.1)" Expression="S_VERSION_10_2_1"/>
 	    <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
         <Description>Description to be completed.</Description>
@@ -1126,7 +1132,12 @@
 	    <PossibleValue Comment="Disabled" Value="0"/>
         <Description>Not available in previous versions.</Description>
     </RefParameter>
+    <!--  New For FreeRTOS v10.2.1 -->  
     
+    <!--  10.2.1 but only for secure chips -->
+    <!--  Check L5 Modes file the day it needs to be updated -->
+    <!--  10.2.1 but only for secure chips -->
+
     <!-- Custom GUI data -->
     <RefParameter Name="FirstAddedTab" Comment="First additional tab" DefaultValue="Tasks and Queues" Type="string" Visible="false"/>
     <RefParameter Name="SecondAddedTab" Comment="Second additional tab" DefaultValue="Timers and Semaphores" Type="string" Visible="false"/>
@@ -1261,10 +1272,9 @@
         <Parameter Name="configOVERRIDE_DEFAULT_TICK_CONFIGURATION"/>
         
         <!-- NEWLIB -->
-        <!-- commented for 5.5.0 
+        <!-- uncommented for 5.6.0 -->
         <Parameter Name="configUSE_NEWLIB_REENTRANT"/>
         <Parameter Name="copyHeapFile"/>
-        -->
         
         <!--  new ones for 10.2.1 -->
         <Parameter Name="configMESSAGE_BUFFER_LENGTH_TYPE"/>

@@ -3,16 +3,17 @@
 
     <RefConfig Name="ADC_RegularConfig" Comment="Configure the global features of the ADC (Clock, Resolution, Data Alignment and number of conversion)">
 	
-        <IFCondition Expression="(ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV1) | (ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV2) |(ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV4) ">
-            <CallLibMethod Name="LL_ADC_Init">
-                <MethodArg Name="ADCx" ParameterName="Instance" />
-                <MethodArg Name="Clock" ParameterName="ClockPrescaler" />
-                <MethodArg Name="Resolution" ParameterName="Resolution" />
-                <MethodArg Name="DataAlignment" ParameterName="DataAlign" />
-                <MethodArg Name="LowPowerMode" ParameterName="LowPowerAutoWait,LowPowerAutoPowerOff" />
-            </CallLibMethod>
-        </IFCondition>
-        
+            <IFCondition Expression="(ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV1) | (ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV2) |(ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV4) ">
+
+                <CallLibMethod Name="LL_ADC_Init">
+                    <MethodArg Name="ADCx" ParameterName="Instance" />
+                    <MethodArg Name="Clock" ParameterName="ClockPrescaler" />
+                    <MethodArg Name="Resolution" ParameterName="Resolution" />
+                    <MethodArg Name="DataAlignment" ParameterName="DataAlign" />
+                    <MethodArg Name="LowPowerMode" ParameterName="LowPowerAutoWait,LowPowerAutoPowerOff" />
+                </CallLibMethod>
+            </IFCondition>
+
         <IFCondition Expression="!(ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV1) &amp; !(ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV2)  &amp; !(ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV4) ">
             <CallLibMethod Name="LL_ADC_Init">
                 <MethodArg Name="ADCx" ParameterName="Instance" />
@@ -21,6 +22,7 @@
                 <MethodArg Name="LowPowerMode" ParameterName="LowPowerAutoWait,LowPowerAutoPowerOff" />
             </CallLibMethod>
         </IFCondition>
+
         <CallLibMethod Name="LL_ADC_REG_Init">
             <MethodArg Name="ADCx" ParameterName="Instance" />
             <MethodArg Name="TriggerSource" ParameterName="ExternalTrigConv" />
@@ -30,6 +32,7 @@
             <MethodArg Name="DMATransfer" ParameterName="DMAContinuousRequestsForConfigFile" />
             <MethodArg Name="Overrun" ParameterName="Overrun" />
         </CallLibMethod>
+
         <IFCondition Expression="!(ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV1) &amp; !(ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV2)  &amp; !(ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV4) ">
             <CallLibMethod Name="LL_ADC_SetClock">
                 <MethodArg Name="ADCx" ParameterName="Instance" />
@@ -108,7 +111,9 @@
     </RefConfig>
                 
     <RefConfig Name="ADC_RegularChannelConfig" Comment="Configure Regular Channel">
+
          
+
         <IFCondition
             Expression="Sequencer = NOT_FULLY_CONFIGURABLE ">
             <CallLibMethod Name="LL_ADC_REG_SetSequencerChAdd">
@@ -122,20 +127,18 @@
             </CallLibMethod>
         </IFCondition>  
    
-     
-  
-        <IFCondition
-            Expression="(Channel = ADC_CHANNEL_TEMPSENSOR) | (Channel = ADC_CHANNEL_VREFINT) | (Channel = ADC_CHANNEL_VBAT)">
+                  <IFCondition Expression ="(Channel = ADC_CHANNEL_TEMPSENSOR) | (Channel = ADC_CHANNEL_VREFINT) | (Channel = ADC_CHANNEL_VBAT)">
+
             <CallLibMethod Name="LL_ADC_SetCommonPathInternalCh">
                 <MethodArg Name="ADCxy_COMMON">
                     <CallLibMethod Name="__LL_ADC_COMMON_INSTANCE">
                         <MethodArg Name="ADCx" ParameterName="Instance" />
                     </CallLibMethod>
                 </MethodArg>
-                <MethodArg Name="PathInternal" ParameterName="Channel" />
+                <MethodArg Name="PathInternal" ParameterName="commmn" />
             </CallLibMethod>
         </IFCondition>
- 
+  
     </RefConfig>
     
     <RefConfig Name="ADC_RegularChannelRankConfig" Comment="Configure Regular Channel">
@@ -159,15 +162,15 @@
         
          
   
-        <IFCondition
-            Expression="(Channel = ADC_CHANNEL_TEMPSENSOR) | (Channel = ADC_CHANNEL_VREFINT) | (Channel = ADC_CHANNEL_VBAT)">
+        <IFCondition Expression ="(Channel = ADC_CHANNEL_TEMPSENSOR) | (Channel = ADC_CHANNEL_VREFINT) | (Channel = ADC_CHANNEL_VBAT)">
+
             <CallLibMethod Name="LL_ADC_SetCommonPathInternalCh">
                 <MethodArg Name="ADCxy_COMMON">
                     <CallLibMethod Name="__LL_ADC_COMMON_INSTANCE">
                         <MethodArg Name="ADCx" ParameterName="Instance" />
                     </CallLibMethod>
                 </MethodArg>
-                <MethodArg Name="PathInternal" ParameterName="Channel" />
+                <MethodArg Name="PathInternal" ParameterName="commmn" />
             </CallLibMethod>
         </IFCondition>
  
@@ -194,6 +197,58 @@
         <!-- parameter AWD1ITMode DISABLE -->
         <IFCondition Expression="(AWD1ITMode = DISABLE)">
             <CallLibMethod Name="LL_ADC_DisableIT_AWD1">
+                <MethodArg Name="ADCx" ParameterName="Instance" />
+            </CallLibMethod>
+        </IFCondition>
+    </RefConfig>
+        <RefConfig Name="ADC_AnalogWDGConfigForAWD2" Comment="Configure Analog WatchDog 2">
+        <CallLibMethod Name="LL_ADC_SetAnalogWDMonitChannels">
+            <MethodArg Name="ADCx" ParameterName="Instance" />
+            <MethodArg Name="AWDy" ParameterName="AWD2WatchdogNumber" />
+            <MethodArg Name="AWDChannelGroup" ParameterName="WatchdogMode,WatchdogChannel" />
+        </CallLibMethod>
+
+        <CallLibMethod Name="LL_ADC_ConfigAnalogWDThresholds">
+            <MethodArg Name="ADCx" ParameterName="Instance" />
+            <MethodArg Name="AWDy" ParameterName="AWD2WatchdogNumber" />
+            <MethodArg Name="AWDThresholdHighValue" ParameterName="AWD2HighThreshold" />
+            <MethodArg Name="AWDThresholdLowValue" ParameterName="AWD2LowThreshold" />
+        </CallLibMethod>
+        <!-- parameter AWD1ITMode ENABLE -->
+        <IFCondition Expression="(AWD2ITMode = ENABLE)">
+            <CallLibMethod Name="LL_ADC_EnableIT_AWD2">
+                <MethodArg Name="ADCx" ParameterName="Instance" />
+            </CallLibMethod>
+        </IFCondition>
+        <!-- parameter AWD1ITMode DISABLE -->
+        <IFCondition Expression="(AWD2ITMode = DISABLE)">
+            <CallLibMethod Name="LL_ADC_DisableIT_AWD2">
+                <MethodArg Name="ADCx" ParameterName="Instance" />
+            </CallLibMethod>
+        </IFCondition>
+    </RefConfig>
+        <RefConfig Name="ADC_AnalogWDGConfigForAWD3" Comment="Configure Analog WatchDog 3">
+        <CallLibMethod Name="LL_ADC_SetAnalogWDMonitChannels">
+            <MethodArg Name="ADCx" ParameterName="Instance" />
+            <MethodArg Name="AWDy" ParameterName="AWD3WatchdogNumber" />
+            <MethodArg Name="AWDChannelGroup" ParameterName="WatchdogMode,WatchdogChannel" />
+        </CallLibMethod>
+
+        <CallLibMethod Name="LL_ADC_ConfigAnalogWDThresholds">
+            <MethodArg Name="ADCx" ParameterName="Instance" />
+            <MethodArg Name="AWDy" ParameterName="AWD3WatchdogNumber" />
+            <MethodArg Name="AWDThresholdHighValue" ParameterName="AWD3HighThreshold" />
+            <MethodArg Name="AWDThresholdLowValue" ParameterName="AWD3LowThreshold" />
+        </CallLibMethod>
+        <!-- parameter AWD1ITMode ENABLE -->
+        <IFCondition Expression="(AWD3ITMode = ENABLE)">
+            <CallLibMethod Name="LL_ADC_EnableIT_AWD3">
+                <MethodArg Name="ADCx" ParameterName="Instance" />
+            </CallLibMethod>
+        </IFCondition>
+        <!-- parameter AWD1ITMode DISABLE -->
+        <IFCondition Expression="(AWD3ITMode = DISABLE)">
+            <CallLibMethod Name="LL_ADC_DisableIT_AWD3">
                 <MethodArg Name="ADCx" ParameterName="Instance" />
             </CallLibMethod>
         </IFCondition>
@@ -402,12 +457,7 @@
         <Argument AddressOf="false" GenericType="simple" Name="OverSamplingDiscont"
                   OptimizationCondition="equal" />
     </LibMethod>
-    <LibMethod Comment="" Name="LL_ADC_SetCommonPathInternalCh">
-        <Argument AddressOf="false" GenericType="baseaddress" Name="ADCxy_COMMON"
-                  TypeName="ADC_Common_TypeDef" />
-        <Argument AddressOf="false" GenericType="simple" Name="PathInternal"
-                  OptimizationCondition="equal" />
-    </LibMethod>
+    
     <LibMethod Comment="" Name="LL_ADC_SetAnalogWDMonitChannels">
         <Argument AddressOf="false" GenericType="baseaddress" Name="ADCx"
                   TypeName="ADC_TypeDef" />
@@ -441,6 +491,12 @@
     <LibMethod Comment="" Name="LL_ADC_DisableIT_AWD3">
         <Argument AddressOf="false" GenericType="baseaddress" Name="ADCx"
                   TypeName="ADC_TypeDef" />
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_ADC_SetCommonPathInternalCh" Optimizable="true" >
+        <Argument AddressOf="false" GenericType="baseaddress" Name="ADCxy_COMMON"
+                  TypeName="ADC_Common_TypeDef" />
+        <Argument AddressOf="false" GenericType="simple" Name="PathInternal"
+                  OptimizationCondition="equal" />
     </LibMethod>
         
     

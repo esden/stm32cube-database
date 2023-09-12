@@ -441,6 +441,10 @@
 	</RefParameter>
 	<RefParameter Comment="Number of A7NS requests" DefaultValue="0" Group="" Max="16" Min="0" Name="NbRequestsMDMA_A7NS" Type="integer" Visible="false"/>
 	<RefParameter Comment="Number of A7S requests" DefaultValue="0" Group="" Max="16" Min="0" Name="NbRequestsMDMA_A7S" Type="integer" Visible="false"/>
+	<RefParameter Comment="Mandatory request" DefaultValue="DISABLE" Group="" Name="Mandatory" Type="list">
+		<PossibleValue Comment="Not mandatory" Value="DISABLE"/>
+		<PossibleValue Comment="Mandatory request" Value="ENABLE"/>
+	</RefParameter>
 	<RefMode Abstract="true" BaseMode="" Comment="MDMA_Request" Name="MDMA_Request">
 		<ConfigForMode>HAL_MDMA_Init</ConfigForMode>
 		<Parameter Name="Instance"/>
@@ -469,6 +473,7 @@
 		<Parameter Name="Rank"/>
 		<Parameter Name="node"/>
 		<Parameter Name="pNewNode"/>
+		<Parameter Name="Mandatory"/>
 	</RefMode>
 	<RefMode Abstract="true" BaseMode="" Comment="MDMA" Name="MDMA">
 		<Parameter Name="ClockEnableMode">
@@ -635,6 +640,9 @@
 		<Parameter Name="IpInstance">
 			<PossibleValue>FMC:FMC</PossibleValue>
 		</Parameter>
+		<Parameter Name="Mandatory">
+			<PossibleValue Condition="!FMC_CUBE">ENABLE</PossibleValue>
+		</Parameter>
 	</RefMode>
 	<RefMode BaseMode="MDMA_Request" Comment="FMC_ERROR" Name="FMC_ERROR">
 		<Parameter Name="Request">
@@ -642,6 +650,9 @@
 		</Parameter>
 		<Parameter Name="IpInstance">
 			<PossibleValue>FMC:FMC</PossibleValue>
+		</Parameter>
+		<Parameter Name="Mandatory">
+			<PossibleValue Condition="!FMC_CUBE">ENABLE</PossibleValue>
 		</Parameter>
 	</RefMode>
 	<RefMode BaseMode="MDMA_Request" Comment="HASH1_IN" Name="HASH1_IN">
@@ -653,6 +664,9 @@
 		</Parameter>
 		<Parameter Name="IpInstance">
 			<PossibleValue>HASH1:HASH1</PossibleValue>
+		</Parameter>
+		<Parameter Name="Mandatory">
+			<PossibleValue Condition="!HASH1_CUBE">ENABLE</PossibleValue>
 		</Parameter>
 	</RefMode>
 	<RefMode BaseMode="MDMA_Request" Comment="I2C4_RX" Name="I2C4_RX">
@@ -711,6 +725,9 @@
 		</Parameter>
 		<Parameter Name="IpInstance">
 			<PossibleValue>QUADSPI:QUADSPI</PossibleValue>
+		</Parameter>
+		<Parameter Name="Mandatory">
+			<PossibleValue Condition="!QUADSPI_CUBE">ENABLE</PossibleValue>
 		</Parameter>
 	</RefMode>
 	<RefMode BaseMode="MDMA_Request" Comment="QUADSPI_TC" Name="QUADSPI_TC">
@@ -921,9 +938,15 @@
 						<Mode Name="FMC_DATA"/>
 						<Mode Name="FMC_ERROR"/>
 						<Mode Name="QUADSPI_FIFO_TH"/>
-						<Mode Name="QUADSPI_TC"/>
-						<Mode Name="CRYP1_IN"/>
-						<Mode Name="CRYP1_OUT"/>
+						<Mode Name="QUADSPI_TC">
+							<Condition Diagnostic="" Expression="!QUADSPI_LINUX"/>
+						</Mode>
+						<Mode Name="CRYP1_IN">
+							<Condition Diagnostic="" Expression="!CRYP1_LINUX"/>
+						</Mode>
+						<Mode Name="CRYP1_OUT">
+							<Condition Diagnostic="" Expression="!CRYP1_LINUX"/>
+						</Mode>
 						<Mode Name="HASH1_IN"/>
 						<Mode Name="USART1_RX"/>
 						<Mode Name="USART1_TX"/>

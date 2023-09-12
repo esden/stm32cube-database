@@ -60,8 +60,7 @@
         <PossibleValue Comment="Dual interleaved mode only" Semaphore="DualMode_Interl_$IpInstance" Value="ADC_DUALMODE_INTERL"/>
         <PossibleValue Comment="Dual alternate trigger mode only" Semaphore="DualMode3_$IpInstance" Value="ADC_DUALMODE_ALTERTRIG"/>
     </RefParameter>
-    <RefParameter Comment="Mode" DefaultValue="__NULL" Group="ADCsgroup" Name="Mode" Type="list">
-        <PossibleValue Comment="No mode" Value="__NULL"/>
+    <RefParameter Comment="Mode" DefaultValue="ADC_MODE_INDEPENDENT" Group="ADCsgroup" Name="Mode" Type="list">
         <PossibleValue Comment="Independent mode" Value="ADC_MODE_INDEPENDENT"/>
         <Description>Multi ADC mode selection: Configures the ADC to operate in independent or multi mode</Description>
     </RefParameter>
@@ -465,19 +464,19 @@
         <PossibleValue Action="Disable" Comment="Oversampling ratio 256x " Condition="REG_RIGHTBITSHIFT_NONE_$IpInstance |REG_RIGHTBITSHIFT1_$IpInstance | REG_RIGHTBITSHIFT2_$IpInstance | REG_RIGHTBITSHIFT3_$IpInstance" Diagnostic="Shift for oversampling should be equal or greater than 4" Value="ADC_OVERSAMPLING_RATIO_256"/>
     </RefParameter>	
    
-    <RefParameter Comment="Regular Oversampling Mode" DefaultValue="null" Group="ADCGroup" Name="OversamplingStopReset" Type="list" Visible="false">
+   <RefParameter Comment="Regular Oversampling Mode" DefaultValue="null" Group="ADCgroup" Name="OversamplingStopReset" Type="list" Visible="false">
         <Condition Diagnostic="" Expression="OversamplingMode=DISABLE | EnableRegularConversion=DISABLE"/>
     </RefParameter>
-    <RefParameter Comment="Regular Oversampling Mode" DefaultValue="ADC_REGOVERSAMPLING_CONTINUED_MODE" Group="ADCGroup" Name="OversamplingStopReset" Type="list">
+    <RefParameter Comment="Regular Oversampling Mode" DefaultValue="ADC_REGOVERSAMPLING_CONTINUED_MODE" Group="ADCgroup" Name="OversamplingStopReset" Type="list">
         <Condition Diagnostic="" Expression="OversamplingMode=ENABLE"/>
         <PossibleValue Action="Disable" Comment="Oversampling Continued Mode" Condition="Injected_OversamplingMode_Enabled_$IpInstance" Diagnostic="Oversampling Continued Mode available only when Injected Oversampling Disabled" Value="ADC_REGOVERSAMPLING_CONTINUED_MODE"/>
         <PossibleValue Comment="Oversampling Resumed Mode" Value="ADC_REGOVERSAMPLING_RESUMED_MODE"/>		  
     </RefParameter>
    
-    <RefParameter Comment="Regular Oversampling Trigger" DefaultValue="null" Group="ADCGroup" Name="TriggeredMode" Type="list" Visible="false">
+    <RefParameter Comment="Regular Oversampling Trigger" DefaultValue="null" Group="ADCgroup" Name="TriggeredMode" Type="list" Visible="false">
         <Condition Diagnostic="" Expression="OversamplingMode=DISABLE | EnableRegularConversion=DISABLE"/>
     </RefParameter>
-    <RefParameter Comment="Triggered Regular Oversampling" DefaultValue="ADC_TRIGGEREDMODE_SINGLE_TRIGGER" Group="ADCGroup" Name="TriggeredMode" Type="list">
+    <RefParameter Comment="Triggered Regular Oversampling" DefaultValue="ADC_TRIGGEREDMODE_SINGLE_TRIGGER" Group="ADCgroup" Name="TriggeredMode" Type="list">
         <Condition Diagnostic="" Expression="OversamplingMode=ENABLE"/>
         <PossibleValue Comment="Single trigger for all oversampled conversions" Value="ADC_TRIGGEREDMODE_SINGLE_TRIGGER"/>
         <PossibleValue Action="Disable" Comment="Trigger for each oversampled conversion" Condition="OversamplingStopReset=ADC_REGOVERSAMPLING_CONTINUED_MODE | Injected_OversamplingMode_Enabled_$IpInstance" Diagnostic="Multi-Trigger Oversampled conversion available Only When: Oversampling Resumed Mode Selected And Injected Oversampling Disabled " Value="ADC_TRIGGEREDMODE_MULTI_TRIGGER"/>
@@ -494,18 +493,24 @@
         <Description>Number of regular channels to be converted</Description>
     </RefParameter>
     
-    <RefParameter Comment="ChannelVREF" DefaultValue="ADC_CHANNEL_VREFINT" Name="ChannelVREF" Type="list" Visible="false">
-        <Condition Expression="VREFSelected$IpInstance" Diagnostic=""/>
+    <RefParameter Visible="false" Comment="comm" DefaultValue="+ChannelVREF+|ChannelTS+|ChannelVBAT" Name="commmn" Type="list"/>
+
+    
+     <RefParameter Comment="ChannelVREF" DefaultValue="ADC_CHANNEL_VREFINT" Name="ChannelVREF" Type="list" Visible="false">
+             <Condition Expression="VrefTSelected$IpInstance" Diagnostic=""/>
+
         <PossibleValue Comment="ADC_CHANNEL_VREFINT" Value="ADC_CHANNEL_VREFINT"/>
     </RefParameter>
     <RefParameter Comment="ChannelTS" DefaultValue="ADC_CHANNEL_TEMPSENSOR" Name="ChannelTS" Type="list" Visible="false">
-        <Condition Expression="TempSelected$IpInstance" Diagnostic=""/>
+                <Condition Expression="VtsATSelected$IpInstance" Diagnostic=""/>
+
         <PossibleValue Comment="ADC_CHANNEL_TEMPSENSOR" Value="ADC_CHANNEL_TEMPSENSOR"/>
     </RefParameter>
     <RefParameter Comment="Channelvbat" DefaultValue="ADC_CHANNEL_VBAT" Name="ChannelVBAT" Type="list" Visible="false">
-        <Condition Expression="VBATSelected$IpInstance" Diagnostic=""/>
+        <Condition Expression="VbatfTSelected$IpInstance" Diagnostic=""/>
         <PossibleValue Comment="ADC_CHANNEL_VBAT" Value="ADC_CHANNEL_VBAT"/>
     </RefParameter>
+    
         
     <!-- ExternalTrigConv -->
     <RefParameter Comment="External Trigger Conversion Source" DefaultValue="null" Group="ADCGroup" Name="ExternalTrigConv" Type="list" Visible="false">
@@ -725,10 +730,10 @@
         <Description>Enable/Disable Injected Oversampling</Description> 
     </RefParameter>
 	
-    <RefParameter Comment="Oversampling Right Shift" DefaultValue="null" Group="ADCGroup" Name="InjOversamplingRightShift" Type="list" Visible="false">
+    <RefParameter Comment="Oversampling Right Shift" DefaultValue="null" Group="ADCgroup" Name="InjOversamplingRightShift" Type="list" Visible="false">
         <Condition Diagnostic="" Expression="EnableInjectedOversampling=DISABLE | EnableInjectedConversion=DISABLE"/>
     </RefParameter>
-    <RefParameter Comment="Oversampling Right Shift" DefaultValue="ADC_RIGHTBITSHIFT_NONE" Group="ADCGroup" Name="InjOversamplingRightShift" Type="list">
+    <RefParameter Comment="Oversampling Right Shift" DefaultValue="ADC_RIGHTBITSHIFT_NONE" Group="ADCgroup" Name="InjOversamplingRightShift" Type="list">
         <Condition Diagnostic="" Expression="EnableInjectedOversampling=ENABLE"/>
         <PossibleValue Comment="No bit shift for oversampling" Semaphore="INJ_RIGHTBITSHIFT_NONE_$IpInstance" Value="ADC_RIGHTBITSHIFT_NONE"/>
         <PossibleValue Comment="1 bit shift for oversampling" Semaphore="INJ_RIGHTBITSHIFT1_$IpInstance" Value="ADC_RIGHTBITSHIFT_1"/> 
@@ -738,7 +743,10 @@
         <PossibleValue Comment="5 bit shift for oversampling" Semaphore="INJ_RIGHTBITSHIFT5_$IpInstance" Value="ADC_RIGHTBITSHIFT_5"/>
         <PossibleValue Comment="6 bit shift for oversampling" Semaphore="INJ_RIGHTBITSHIFT6_$IpInstance" Value="ADC_RIGHTBITSHIFT_6"/>
         <PossibleValue Comment="7 bit shift for oversampling" Semaphore="INJ_RIGHTBITSHIFT7_$IpInstance" Value="ADC_RIGHTBITSHIFT_7"/>
-        <PossibleValue Comment="8 bit shift for oversampling" Semaphore="INJ_RIGHTBITSHIFT8_$IpInstance" Value="ADC_RIGHTBITSHIFT_8"/>	 
+        <PossibleValue Comment="8 bit shift for oversampling" Semaphore="INJ_RIGHTBITSHIFT8_$IpInstance" Value="ADC_RIGHTBITSHIFT_8"/>
+        <PossibleValue Comment="9 bit shift for oversampling" Semaphore="INJ_RIGHTBITSHIFT8_$IpInstance" Value="ADC_RIGHTBITSHIFT_9"/>	
+        <PossibleValue Comment="10 bit shift for oversampling" Semaphore="INJ_RIGHTBITSHIFT8_$IpInstance" Value="ADC_RIGHTBITSHIFT_10"/>	
+        <PossibleValue Comment="11 bit shift for oversampling" Semaphore="INJ_RIGHTBITSHIFT8_$IpInstance" Value="ADC_RIGHTBITSHIFT_11"/>		 
     </RefParameter>		
 			
     <RefParameter Comment="Oversampling Ratio" DefaultValue="null" Group="ADCGroup" Name="InjOversamplingRatio" Type="list" Visible="false">
@@ -1533,6 +1541,8 @@
     </RefParameter>
     <RefParameter Comment="Analog WatchDog Channel" DefaultValue="" Group="ADCChannel" Name="WatchdogChannel" Type="list">
         <Condition Diagnostic="" Expression="($IpNumber=2) | ($IpNumber=1)"/>
+                <PossibleValue Comment="Channel 0" Value="ADC_CHANNEL_0"/>
+
         <PossibleValue Comment="Channel 1" Value="ADC_CHANNEL_1"/>
         <PossibleValue Comment="Channel 2" Value="ADC_CHANNEL_2"/>
         <PossibleValue Comment="Channel 3" Value="ADC_CHANNEL_3"/>
@@ -1558,6 +1568,8 @@
     </RefParameter>	
     <RefParameter Comment="Analog WatchDog Channel" DefaultValue="" Group="ADCChannel" Name="WatchdogChannel" Type="list">
         <Condition Diagnostic="" Expression="($IpNumber=3)"/>
+                <PossibleValue Comment="Channel 0" Value="ADC_CHANNEL_0"/>
+
         <PossibleValue Comment="Channel 1" Value="ADC_CHANNEL_1"/>
         <PossibleValue Comment="Channel 2" Value="ADC_CHANNEL_2"/>
         <PossibleValue Comment="Channel 3" Value="ADC_CHANNEL_3"/>
@@ -1818,8 +1830,10 @@
         <Parameter Name="AWD1ITMode"/>
     </RefMode>
 	
-    <!-- WatchDog2 parameters -->
+   <!-- WatchDog2 parameters -->
     <RefMode Comment="Analog Watchdog 2" Group="WatchDog2" Name="Analog Watchdog 2">
+                <ConfigForMode>ADC_AnalogWDGConfigForAWD2</ConfigForMode>
+
         <Parameter Name="EnableAnalogWatchDog2"/>
         <Parameter Name="AWD2WatchdogNumber"/>
         <Parameter Name="AWD2HighThreshold"/>
@@ -1828,12 +1842,15 @@
     </RefMode> 
 	
     <RefMode Comment="Analog Watchdog 3" Group="WatchDog3" Name="Analog Watchdog 3">
+                <ConfigForMode>ADC_AnalogWDGConfigForAWD3</ConfigForMode>
+
         <Parameter Name="EnableAnalogWatchDog3"/>
         <Parameter Name="AWD3WatchdogNumber"/>
         <Parameter Name="AWD3HighThreshold"/>
         <Parameter Name="AWD3LowThreshold"/>
         <Parameter Name="AWD3ITMode"/>
     </RefMode>
+   
 	
 
     <!-- RefModes-Differential -->
@@ -2062,6 +2079,10 @@
         <Parameter Name="Channel">
             <PossibleValue>ADC_CHANNEL_VBAT</PossibleValue>
         </Parameter>
+    </RefMode>
+     <RefMode Comment=" " Group=" " Name="ADC_EnableInternalRegulator0"  >
+           <Condition Diagnostic="" Expression="!STM32WB"/>
+        <ConfigForMode>ADC_EnableInternalRegulator</ConfigForMode>         
     </RefMode>
     
 	
@@ -2479,6 +2500,7 @@
                     <SignalLogicalOp Name="AND">
                         <Signal Name="TempSens_Input"/>
                     </SignalLogicalOp>
+                    
                 </Mode>
                 <Mode Name="IN-DAC1-OUT1" UserName="VDAC1_OUT1 Channel">
                     <SignalLogicalOp Name="AND">
@@ -2536,6 +2558,8 @@
                     <SignalLogicalOp Name="AND">
                         <Signal Name="TempSens_Input"/>
                     </SignalLogicalOp>
+                                        <Semaphore>VtsATSelected$IpInstance</Semaphore>
+
                 </Mode>
             </ModeLogicOperator>
             <Semaphore>channelSelected$IpInstance</Semaphore>
@@ -2548,6 +2572,8 @@
                     <SignalLogicalOp Name="AND">
                         <Signal Name="Vbat_Input"/>
                     </SignalLogicalOp>
+                                        <Semaphore>VbatfTSelected$IpInstance</Semaphore>
+
                 </Mode>
             </ModeLogicOperator>
             <Semaphore>channelSelected$IpInstance</Semaphore>
@@ -2559,6 +2585,8 @@
                     <SignalLogicalOp Name="AND">
                         <Signal Name="Vref_Input"/>
                     </SignalLogicalOp>
+                                        <Semaphore>VrefTSelected$IpInstance</Semaphore>
+
                 </Mode>
             </ModeLogicOperator>
             <Semaphore>channelSelected$IpInstance</Semaphore>

@@ -5,7 +5,7 @@
   * @brief   This file includes a generic uSD card driver.
   *
   * @note    To be completed by the user according to the board in use for the project.
-  *          Functions generated as weak (can be overwritten by user code or
+  *          Some functions generated as weak (can be overwritten by user code or
   *          BSP code from the FW pack).
   ******************************************************************************
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
@@ -264,7 +264,7 @@ __weak void BSP_SD_GetCardInfo(BSP_SD_CardInfo *CardInfo)
   * @param hsd: SD handle
   * @retval None
   */
-__weak void HAL_SD_AbortCallback(SD_HandleTypeDef *hsd)
+void HAL_SD_AbortCallback(SD_HandleTypeDef *hsd)
 {
   BSP_SD_AbortCallback();
 }
@@ -274,7 +274,7 @@ __weak void HAL_SD_AbortCallback(SD_HandleTypeDef *hsd)
   * @param hsd: SD handle
   * @retval None
   */
-__weak void HAL_SD_TxCpltCallback(SD_HandleTypeDef *hsd)
+void HAL_SD_TxCpltCallback(SD_HandleTypeDef *hsd)
 {
   BSP_SD_WriteCpltCallback();
 }
@@ -284,7 +284,7 @@ __weak void HAL_SD_TxCpltCallback(SD_HandleTypeDef *hsd)
   * @param hsd: SD handle
   * @retval None
   */
-__weak void HAL_SD_RxCpltCallback(SD_HandleTypeDef *hsd)
+void HAL_SD_RxCpltCallback(SD_HandleTypeDef *hsd)
 {
   BSP_SD_ReadCpltCallback();
 }

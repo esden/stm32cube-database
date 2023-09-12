@@ -1054,6 +1054,7 @@ ${variable.value} ${variable.name};
                [/#if]	
            [/#list]  
     [/#if]
+
 [#assign listOfLocalVariables =""]
     [#assign resultList =""]
 [#if instanceData.initServices??]
@@ -1067,15 +1068,25 @@ ${variable.value} ${variable.name};
 [/#if]
 #n
 [#assign clockInst=""]
-[#assign nTab=1]
 
 [#if instanceData.initServices??]
     [#if instanceData.initServices.pclockConfig??]
+[#if FamilyName=="STM32MP1"]
+#tif(IS_ENGINEERING_BOOT_MODE())
+#t{
+[#assign nTab=2]
+[#else]
+[#assign nTab=1]
+[/#if]
 [#assign   pclockConfig=instanceData.initServices.pclockConfig] [#--list0--]
-[@common.generateConfigModelListCode configModel=pclockConfig inst=""  nTab=1 index=""/]#n
+[@common.generateConfigModelListCode configModel=pclockConfig inst=""  nTab=nTab index=""/]#n
+[#if FamilyName=="STM32MP1"]
+#t}
+[/#if]
 #n
     [/#if]
 [/#if]
+
     [#-- if used with LL and MspPost init is required using gpioOut service --]
     [#if instanceData.initServices?? && instanceData.initServices.gpioOut?? ]
            [#assign service=instanceData.initServices.gpioOut]
@@ -1229,12 +1240,14 @@ static uint32_t ${entry.value}=0;
 [#-- --]
 [#if mspIsEmpty=="no"]
 [#if IP.ipName==ipvar.ipName]
+
     [#assign listOfLocalVariables = ""]
     [#assign  resultList  = ""]
     [#list IP.configModelList as instanceData]
 [#assign  halMode  = getHalMode(IP.ipName)]
         [#if instanceData.initServices??  && halMode==instanceData.halMode]
             [#if instanceData.initServices.pclockConfig??]
+
                 [#list instanceData.initServices.pclockConfig.configs as config] [#--list1--]
                     [#assign listOfLocalVariables = getLocalVariableCLK(config)]
 [#if listOfLocalVariables !="" ]
@@ -1266,6 +1279,7 @@ static uint32_t ${entry.value}=0;
             [/#if]
         [/#if]
     [/#list]
+
 [/#if]
     [#if  words[0]?contains("DFSDM")]
         [#assign word0 = words[0]]  
@@ -1286,17 +1300,26 @@ static uint32_t ${entry.value}=0;
 #t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspInit 0 */
 
 #n#t/* USER CODE END ${words[0]?replace("I2S","SPI")}_MspInit 0 */
+
 [#list IP.configModelList as instanceData]
 [#if instanceData.initServices??]
     [#if instanceData.initServices.pclockConfig??]
 [#assign   pclockConfig=instanceData.initServices.pclockConfig] [#--list0--]
 [#if pclockConfig.ipName?replace("HDMI_CEC","CEC")==words[0]]
+[#if FamilyName=="STM32MP1"]
+#tif(IS_ENGINEERING_BOOT_MODE())
+#t{
+[/#if]
 [@common.generateConfigModelListCode configModel=pclockConfig inst=words[0]  nTab=2 index=""/]#n
+[#if FamilyName=="STM32MP1"]
+#t}
+[/#if]
 [/#if]
 #n
     [/#if]
 [/#if]
 [/#list]
+
     [@generateServiceCode ipName=words[0] serviceType="Init" modeName=mode instHandler=mode?lower_case+"Handle" tabN=2/] 
     [#if words[0]?contains("DFSDM")]
     [@generateServiceCodeDFSDM ipName=words[0] serviceType="DeInit" modeName=mode instHandler=mode?lower_case+"Handle" tabN=2/]
@@ -1326,17 +1349,26 @@ static uint32_t ${entry.value}=0;
 #t/* USER CODE BEGIN ${words[i]?replace("I2S","SPI")}_MspInit 0 */
 
 #n#t/* USER CODE END ${words[i]?replace("I2S","SPI")}_MspInit 0 */
+
 [#list IP.configModelList as instanceData]
 [#if instanceData.initServices??]
     [#if instanceData.initServices.pclockConfig??]
 [#assign   pclockConfig=instanceData.initServices.pclockConfig] [#--list0--]
 [#if pclockConfig.ipName?replace("HDMI_CEC","CEC")==words[i]]
+[#if FamilyName=="STM32MP1"]
+#tif(IS_ENGINEERING_BOOT_MODE())
+#t{
+[/#if]
 [@common.generateConfigModelListCode configModel=pclockConfig inst=words[i]  nTab=2 index=""/]#n
+[#if FamilyName=="STM32MP1"]
+#t}
+[/#if]
 [/#if]
 #n
     [/#if]
 [/#if]
 [/#list]
+
         [@generateServiceCode ipName=words[i] serviceType="Init" modeName=mode instHandler=mode?lower_case+"Handle" tabN=2/] 
 #t/* USER CODE BEGIN ${words[i]?replace("I2S","SPI")}_MspInit 1 */
 
@@ -1353,17 +1385,26 @@ static uint32_t ${entry.value}=0;
 #t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspInit 0 */
 
 #n#t/* USER CODE END ${words[0]?replace("I2S","SPI")}_MspInit 0 */
+
 [#list IP.configModelList as instanceData]
 [#if instanceData.initServices??]
     [#if instanceData.initServices.pclockConfig??]
 [#assign   pclockConfig=instanceData.initServices.pclockConfig] [#--list0--]
 [#if pclockConfig.ipName?replace("HDMI_CEC","CEC")==words[0]]
+[#if FamilyName=="STM32MP1"]
+#tif(IS_ENGINEERING_BOOT_MODE())
+#t{
+[/#if]
 [@common.generateConfigModelListCode configModel=pclockConfig inst=words[0]  nTab=2 index=""/]#n
+[#if FamilyName=="STM32MP1"]
+#t}
+[/#if]
 [/#if]
 #n
     [/#if]
 [/#if]
 [/#list]
+
     [@generateServiceCode ipName=words[0] serviceType="Init" modeName=mode instHandler=mode?lower_case+"Handle" tabN=2/] 
 #t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspInit 1 */
 

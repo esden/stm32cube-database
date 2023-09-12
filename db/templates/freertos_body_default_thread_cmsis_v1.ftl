@@ -59,7 +59,7 @@ __weak void ${defaultTaskFunction}(void const * argument)
 {
 [#compress] [#-- To avoid blank lines at the beginning --]
 [#-- Start Detection of middlewares used --]
-[#assign USE_GRAPHICS = false]
+[#assign USE_MBEDTLS = false] 
 [#list SWIPdatas as SWIP]
   [#if SWIP.variables??]
     [#list SWIP.variables as variable]
@@ -72,15 +72,14 @@ __weak void ${defaultTaskFunction}(void const * argument)
           [/#if]
           [#assign index = index + 1]
         [/#list]
-        [#if mw == "GRAPHICS"]
-          [#assign USE_GRAPHICS = true]
-        [/#if]        
+        [#if mw == "MBEDTLS"]
+          [#assign USE_MBEDTLS = true]
+        [/#if]
 	  [/#if]
     [/#list]
   [/#if]
 [/#list]
 [#-- End of middlewares used detection --]
-
 [#list SWIPdatas as SWIP]
   [#if SWIP.variables??]
     [#list SWIP.variables as variable]
@@ -94,70 +93,16 @@ __weak void ${defaultTaskFunction}(void const * argument)
           [#assign index = index + 1]
         [/#list]
         [#-- specific cases to be handled --]  
-        [#if mw == "USB_HOST" || mw == "USB_DEVICE"]
+        [#if mw == "USB_HOST" || mw == "USB_DEVICE" || ((mw = "LWIP") && (USE_MBEDTLS == false)) ]
 #t/* init code for ${mw} */
 #tMX_${mw}_Init();#n[#--  could be replaced by the call to the start function here! --]
         [#else]
           [#-- nothing generated in the default task --]  
         [/#if]
-
-        [#-- specific cases to be handled (no Init generation): MOVED TO main function--]
-        [#-- 
-        [#if mw!="USBPD" && mw!="TRACER_EMB" && mw!="OPENAMP" && mw!="RESMGR_UTILITY" && mw!="MotorControl"]
-          [#if mw!="GRAPHICS"]
-            [#if !((mw == "LWIP") && (USE_MBEDTLS == true))]
-              [#if (mw == "MBEDTLS")]
-#t/* Up to user define the empty MX_MBEDTLS_Init() function located in mbedtls.c file */#n
-              [#else]
-                [#if !mw?contains("WPAN")]
-#t/* init code for ${mw?replace("MX_","")?replace("_Init","")} */
-#tMX_${mw}_Init();#n
-                [/#if]
-              [/#if]
-            [#else]
-#t/* MX_LWIP_Init() is generated within mbedtls_net_init() function in net_cockets.c file */
-#t/* Up to user to call mbedtls_net_init() function in MBEDTLS initialization step */#n
-            [/#if]
-          [#else]
-            [#assign USE_GRAPHICS = true]
-          [/#if]
-        [/#if] 
-        --]  
-
       [/#if]  [#-- end if variable.name=="MiddlewareInUse"--]  
     [/#list]
   [/#if]
 [/#list]
-
-[#if USE_GRAPHICS] 
-/* Graphic application */  
-#tGRAPHICS_MainTask();#n
-[/#if]
-
-[#-- No more in default task --]
-[#--
-[#list SWIPdatas as SWIP]
-  [#if SWIP.variables??]
-    [#list SWIP.variables as variable]
-      [#if variable.name=="ThirdPartyInUse"]
-        [#assign s = variable.valueList]
-        [#assign index = 0] 
-        [#list s as i] 
-          [#if index == 0]
-            [#assign mw = i]
-          [/#if]
-          [#assign index = index + 1]
-        [/#list]
-        [#if !mw?contains("WPAN")]
-#t/* init code for ${mw?replace("MX_","")?replace("_Init","")} */
-#tMX_${mw}_Init();#n
-        [/#if]
-      [/#if]
-    [/#list]
-  [/#if]
-[/#list]
---]
-
 [/#compress]
 [#if inMain == 1]
 #t/* USER CODE BEGIN 5 */

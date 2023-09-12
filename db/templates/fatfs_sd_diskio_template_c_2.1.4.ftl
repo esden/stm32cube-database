@@ -1,5 +1,5 @@
 [#ftl]
-[#-- Currently used for H7 series --]
+[#-- Currently used for F4, F7, H7, L1 and L4 series --]
 [#assign familyName=FamilyName?lower_case]
 [#assign use_dma=0]
 [#assign use_rtos=0]

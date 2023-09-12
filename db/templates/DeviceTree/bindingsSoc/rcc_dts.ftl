@@ -103,10 +103,10 @@
 				[#lt]${T2}cfg = < ${DIVM} ${DIVN} ${DIVP} ${DIVQ} ${DIVR} ${PQR} >;
 								[#if PLLMODE == "RCC_PLL_FRACTIONAL"]
 [#if PLLFRAC?starts_with("0x")]
-									[#lt]${T2}frac = < ${PLLFRAC}>;
+									[#lt]${T2}frac = < ${PLLFRAC} >;
 [#else]
 [#assign fractional = String.format("0x%x" , Integer.valueOf(PLLFRAC))]
-									[#lt]${T2}frac = < ${fractional}>;
+									[#lt]${T2}frac = < ${fractional} >;
 [/#if]
 								[/#if]
 				[#if PLLCSG == "true"]

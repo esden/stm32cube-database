@@ -24,16 +24,16 @@
 	[@mlog  logMod=module logType="ERR" logMsg="unknown SOC dtsi" varsMap={} /]
 /*#include "???.dtsi"*/
 [/#if]
-[#local coproDeviceName = srvcmx_getMatchingBindedHwName_inDTS(".+_copro")]
-[#if coproDeviceName?has_content][#--at least 1 IP should be assigned--]
-	[#local coproName = coproDeviceName?replace("_copro", "")]
-#include "${mx_socRPNSuperset}-${coproName}-srm.dtsi"
-[/#if]
 [#if mx_socRPNSuperset?has_content]
 #include "${mx_socRPNSuperset}${mx_socPackageType}-pinctrl.dtsi"
 [#else]
 	[@mlog  logMod=module logType="ERR" logMsg="unknown SOC pinCtrl dtsi" varsMap={} /]
 /*#include "???-pinctrl.dtsi"*/
+[/#if]
+[#local coproDeviceName = srvcmx_getMatchingBindedHwName_inDTS(".+_copro")]
+[#if coproDeviceName?has_content][#--at least 1 IP should be assigned--]
+	[#local coproName = coproDeviceName?replace("_copro", "")]
+#include "${mx_socRPNSuperset}-${coproName}-srm.dtsi"
 [/#if]
 
 /* USER CODE BEGIN includes */

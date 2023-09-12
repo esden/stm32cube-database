@@ -11,6 +11,7 @@
   */
 /* USER CODE END Header */
 
+[#assign USBPD_CoreLib = ""]
 [#assign SNK = false]
 [#assign DRP = false]
 [#assign DR_SWAP_TO_XFP_FEATURE = false]
@@ -19,6 +20,9 @@
 [#list SWIPdatas as SWIP]
     [#if SWIP.defines??]
         [#list SWIP.defines as definition]
+            [#if definition.name == "USBPD_CoreLib" && definition.value != ""]
+                [#assign USBPD_CoreLib = definition.value]
+            [/#if]
             [#if definition.name == "SNK" && definition.value == "true"]
                 [#assign SNK = true]
             [/#if]
@@ -70,7 +74,9 @@ typedef struct
 [#else]
   uint32_t            Reserved_ReqPower[6];                       /*!< Reserved bits to match with Resquested power information            */
 [/#if]
+[#if USBPD_CoreLib != "USBPDCORE_LIB_NO_PD"]
   USBPD_MIDB_TypeDef  DPM_ManuInfoPort;                         /*!< Manufacturer information used for the port            */
+[/#if]
   uint16_t            ReservedManu;                             /*!< Reserved bits to match with Manufacturer information            */
 } USBPD_USER_SettingsTypeDef;
 
@@ -157,6 +163,7 @@ USBPD_FunctionalState USBPD_DPM_IsPowerReady(uint8_t PortNum, USBPD_VSAFE_Status
   * @}
   */
 
+[#if USBPD_CoreLib != "USBPDCORE_LIB_NO_PD"]
 /** @addtogroup USBPD_USER_EXPORTED_FUNCTIONS_GROUP3
   * @{
   */
@@ -193,6 +200,7 @@ USBPD_StatusTypeDef USBPD_DPM_RequestGetCountryInfo(uint8_t PortNum, uint16_t Co
 USBPD_StatusTypeDef USBPD_DPM_RequestGetBatteryCapability(uint8_t PortNum, uint8_t *pBatteryCapRef);
 USBPD_StatusTypeDef USBPD_DPM_RequestGetBatteryStatus(uint8_t PortNum, uint8_t *pBatteryStatusRef);
 USBPD_StatusTypeDef USBPD_DPM_RequestSecurityRequest(uint8_t PortNum);
+[/#if]
 /* USER CODE BEGIN Function */
 
 /* USER CODE END Function */

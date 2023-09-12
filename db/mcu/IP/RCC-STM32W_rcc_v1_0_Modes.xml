@@ -588,7 +588,10 @@
 	
 	
     <!--frequence Values --> 
-    <!--Source frequency Values --> 
+    <!--Source frequency Values -->
+    <RefParameter Visible="false" Comment="HSE OSC"    Name="HSE_VALUE" DefaultValue="32000000" Max="32000000" Min="32000000"       Type="double" Display="value/1000000" Unit="MHz"><!--HSE bypass and !PLL and !CSS-->
+        <Condition Diagnostic="HSE for RF" Expression="STM32WB5MMGHx"/>
+    </RefParameter>
     <RefParameter Visible="false" Comment="HSE OSC"    Name="HSE_VALUE" DefaultValue="32000000" Max="32000000" Min="32000000"       Type="double" Display="value/1000000" Unit="MHz"><!--HSE bypass and !PLL and !CSS-->
         <Condition Diagnostic="HSE for RF" Expression="(HSEByPass | HSEOscillator)  &amp; RFUsed_ForRCC"/>
     </RefParameter> 
@@ -606,7 +609,7 @@
     <RefParameter Visible="false" Comment="HSE OSC"    Name="HSE_VALUE" DefaultValue="8000000" Max="48000000" Min="4000000" Type="double" Display="value/1000000" Unit="MHz"/><!--HSE in OSI mode-->
 	
     <RefParameter Visible="false" Comment="LSE OSC"    Name="LSE_VALUE" DefaultValue="32768" Max="32768" Min="32768" Type="double" Display="value/1000" Unit="KHz"><!--LSE on OSi mode-->
-        <Condition Diagnostic="LSE In crystal Mode" Expression="LSEOscillator"/>
+        <Condition Diagnostic="LSE In crystal Mode" Expression="LSEOscillator|STM32WB5MMGHx"/>
     </RefParameter>
     <RefParameter Visible="false" Comment="LSE OSC"    Name="LSE_VALUE" DefaultValue="32768" Max="1000000" Min="1000"  Type="double" Display="value/1000" Unit="KHz"/>
    
@@ -1188,9 +1191,16 @@
     <RefParameter Visible="false" Comment="Hse State" DefaultValue="RCC_HSE_OFF" Name="HSEState" Type="list">
         <PossibleValue Comment="Hse Off" Value="RCC_HSE_OFF"/>
     </RefParameter>
-	
-	
-	
+    
+    <RefParameter Visible="false" Comment="Hse is Internal osc" DefaultValue="true" Name="HSEOSCisInternal" Type="list">
+        <Condition Diagnostic="Hse is Internal osc" Expression="STM32WB5MMGHx"/>
+        <PossibleValue Comment="Hse is Internal osc" Value="true"/>
+    </RefParameter>
+    
+    <RefParameter Visible="false" Comment="LSE is Internal osc" DefaultValue="true" Name="LSEOSCisInternal" Type="list">
+        <Condition Diagnostic="LSE is Internal osc" Expression="STM32WB5MMGHx"/>
+        <PossibleValue Comment="LSE is Internal osc" Value="true"/>
+    </RefParameter>
 	
     <!-- LSE state control -->
     <!-- LSE osillator type -->
@@ -1444,7 +1454,7 @@
     <!-- <RefParameter Visible="false" Comment="Periph Clock Selection" Name="PeriphClockSelectionARG" DefaultValue="null" Type="list"/> -->
      
     
-    <RefParameter Visible="false" Comment="Periph Clock Selection" Name="PeriphClockSelection" DefaultValue="+RCC_PERIPHCLK_SMPSVar+|RCC_PERIPHCLK_RFWKPVar+|RCC_PERIPHCLK_RTCVar+|RCC_PERIPHCLK_USART1Var+|RCC_PERIPHCLK_LPUART1Var+|RCC_PERIPHCLK_LPTIM1Var+|RCC_PERIPHCLK_LPTIM2Var+|RCC_PERIPHCLK_SAI1Var+|RCC_PERIPHCLK_I2C1Var+|RCC_PERIPHCLK_I2C3Var+|RCC_PERIPHCLK_USBVar+|RCC_PERIPHCLK_RNGVar+|RCC_PERIPHCLK_ADCVar" Type="list"/>
+    <RefParameter Visible="false" Comment="Periph Clock Selection" Name="PeriphClockSelection" DefaultValue="+RCC_PERIPHCLK_SMPSVar+|RCC_PERIPHCLK_RFWKPVar+|RCC_PERIPHCLK_RTCVar+|RCC_PERIPHCLK_USART1Var+|RCC_PERIPHCLK_LPUART1Var+|RCC_PERIPHCLK_LPTIM1Var+|RCC_PERIPHCLK_LPTIM2Var+|RCC_PERIPHCLK_SAI1Var+|RCC_PERIPHCLK_I2C1Var+|RCC_PERIPHCLK_I2C3Var+|RCC_PERIPHCLK_CLK48SELVar+|RCC_PERIPHCLK_USBVar+|RCC_PERIPHCLK_RNGVar+|RCC_PERIPHCLK_ADCVar" Type="list"/>
    
 
     <RefParameter Visible="false" Name="RCC_PERIPHCLK_SMPSVar" Comment="RCC_PERIPHCLK_SMPSVar" Type="list" DefaultValue="RCC_PERIPHCLK_SMPS">
@@ -1463,11 +1473,19 @@
     <RefParameter Visible="false" Name="RCC_PERIPHCLK_RFWKPVar" Comment="RCC_PERIPHCLK_RFWKPVar" Type="list" DefaultValue=""/> 
 
     <RefParameter Visible="false" Name="RCC_PERIPHCLK_USBVar" Comment="RCC_PERIPHCLK_USBVar" Type="list" DefaultValue="RCC_PERIPHCLK_USB">
-        <Condition Expression="(USBUsed_ForRCC | (RNGUsed_ForRCC &amp; RNGCLKSOURCE_CLK48))" Diagnostic="RTC Activated"/>
+        <Condition Expression="(USBUsed_ForRCC)" Diagnostic="RTC Activated"/>
         <PossibleValue Comment="Periphclk RTC" Value="RCC_PERIPHCLK_USB"/>
     </RefParameter>
 	
-    <RefParameter Visible="false" Name="RCC_PERIPHCLK_USBVar" Comment="RCC_PERIPHCLK_USBVar" Type="list" DefaultValue=""/> 
+    <RefParameter Visible="false" Name="RCC_PERIPHCLK_USBVar" Comment="RCC_PERIPHCLK_USBVar" Type="list" DefaultValue=""/>
+    
+    
+    <RefParameter Visible="false" Name="RCC_PERIPHCLK_CLK48SELVar" Comment="RCC_PERIPHCLK_CLK48SELVar" Type="list" DefaultValue="RCC_PERIPHCLK_CLK48SEL">
+        <Condition Expression="(RNGUsed_ForRCC &amp; RNGCLKSOURCE_CLK48)" Diagnostic="RTC Activated"/>
+        <PossibleValue Comment="" Value="RCC_PERIPHCLK_CLK48SEL"/>
+    </RefParameter>
+	
+    <RefParameter Visible="false" Name="RCC_PERIPHCLK_CLK48SELVar" Comment="RCC_PERIPHCLK_CLK48SELVar" Type="list" DefaultValue=""/> 
 	
 
 
@@ -1651,11 +1669,20 @@
 	
 	
     <RefParameter Visible="false" Name="USBClockSelectionARG" Comment="USBClockSelectionARG" Type="list" DefaultValue="+CK48CLockSelection">
-        <Condition Expression="(USBUsed_ForRCC | (RNGUsed_ForRCC &amp; RNGCLKSOURCE_CLK48)) &amp; CodegenConfigPeriph=true" Diagnostic="LCD Activated"/>
+        <Condition Expression="(USBUsed_ForRCC) &amp; CodegenConfigPeriph=true" Diagnostic="LCD Activated"/>
     </RefParameter>
     <RefParameter Visible="false" Name="USBClockSelectionARG" Comment="USBClockSelectionARG" Type="list" DefaultValue="null"/>
 	
 	
+    <RefParameter Visible="false" Name="RNGClockSelectionARG" Comment="RNGClockSelectionARG" Type="list" DefaultValue="RCC_RNGCLKSOURCE_PLL">
+        <Condition Expression="RNGUsed_ForRCC &amp; CodegenConfigPeriph=true &amp; RNGCLKSOURCE_CLK48 &amp; CK48SourcePLLCLK" Diagnostic="LCD Activated"/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="RNGClockSelectionARG" Comment="RNGClockSelectionARG" Type="list" DefaultValue="RCC_RNGCLKSOURCE_MSI">
+        <Condition Expression="RNGUsed_ForRCC &amp; CodegenConfigPeriph=true &amp; RNGCLKSOURCE_CLK48 &amp; CK48SourceMSI" Diagnostic="LCD Activated"/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="RNGClockSelectionARG" Comment="RNGClockSelectionARG" Type="list" DefaultValue="RCC_RNGCLKSOURCE_HSI48">
+        <Condition Expression="RNGUsed_ForRCC &amp; CodegenConfigPeriph=true &amp; RNGCLKSOURCE_CLK48" Diagnostic="LCD Activated"/>
+    </RefParameter>
     <RefParameter Visible="false" Name="RNGClockSelectionARG" Comment="RNGClockSelectionARG" Type="list" DefaultValue="+RNGCLockSelection">
         <Condition Expression="RNGUsed_ForRCC &amp; CodegenConfigPeriph=true" Diagnostic="LCD Activated"/>
     </RefParameter>
@@ -2461,7 +2488,7 @@
    
     <ModeLogicOperator Name="OR">
         <!-- Modes for Oscillators & Clocks -->
-        <Mode Name="OSC" UserName="High Speed Clock (HSE)">
+        <Mode Name="OSC" UserName="High Speed Clock (HSE)" RemoveCondition="STM32WB5MMGHx">
             <ModeLogicOperator Name="XOR">
                 <Mode Name="HSE-External-Clock-Source" UserName="BYPASS Clock Source">
                     <SignalLogicalOp Name="AND">
@@ -2474,6 +2501,16 @@
                     <SignalLogicalOp Name="AND">
                         <Signal Name="OSC_IN"/>
                         <Signal Name="OSC_OUT"/>
+                    </SignalLogicalOp>
+                    <Semaphore>HSEOscillator</Semaphore>
+                </Mode>
+            </ModeLogicOperator>
+        </Mode>        
+        <Mode Name="OSC" UserName="High Speed Clock (HSE)" RemoveCondition="!STM32WB5MMGHx">
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="HSE-External-Clock-Source" UserName="Crystal/Ceramic Resonator">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="V_OSC_IN"/>
                     </SignalLogicalOp>
                     <Semaphore>HSEOscillator</Semaphore>
                 </Mode>
@@ -2492,7 +2529,7 @@
            
             </ModeLogicOperator>
         </Mode>
-        <Mode Name="OSC32" UserName="Low Speed Clock (LSE) ">
+        <Mode Name="OSC32" UserName="Low Speed Clock (LSE) " RemoveCondition="STM32WB5MMGHx">
             <ModeLogicOperator Name="XOR">
                 <Mode Name="LSE-External-Clock-Source" UserName="BYPASS Clock Source">
                     <SignalLogicalOp Name="AND">
@@ -2505,6 +2542,16 @@
                     <SignalLogicalOp Name="AND">
                         <Signal Name="OSC32_IN"/>
                         <Signal Name="OSC32_OUT"/>
+                    </SignalLogicalOp>
+                    <Semaphore>LSEOscillator</Semaphore>
+                </Mode>
+            </ModeLogicOperator>
+        </Mode>
+        <Mode Name="OSC32" UserName="Low Speed Clock (LSE) " RemoveCondition="!STM32WB5MMGHx">
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="LSE-External-Clock-Source" UserName="Crystal/Ceramic Resonator">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="V_OSC32_IN"/>
                     </SignalLogicalOp>
                     <Semaphore>LSEOscillator</Semaphore>
                 </Mode>
@@ -2580,8 +2627,10 @@
     <RefSignal IOMode="System" Name="OSC_OUT"/>
     <RefSignal IOMode="AlternateFunctionPushPull" Name="$SingleInstanceSAI1_EXTCLK"/>
     <RefSignal IOMode="AlternateFunctionPushPull" Name="$SingleInstanceCRS_SYNC"/>
+    <RefSignal Name="V_OSC_IN"  Virtual="true"/>
+    <RefSignal Name="V_OSC_OUT" Virtual="true"/>
+    <RefSignal Name="V_OSC32_IN" Virtual="true"/>
 
-  
     <RefSignal Virtual="true" Name="USB" />
     <RefSignal Virtual="true" Name="LSE" />
 </IP>	

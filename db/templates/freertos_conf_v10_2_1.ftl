@@ -482,7 +482,8 @@
 [/#if]
 
 [#if configUSE_NEWLIB_REENTRANT=="1"]
-#define configUSE_NEWLIB_REENTRANT               1
+/* The following flag must be enabled only when using newlib */
+#define configUSE_NEWLIB_REENTRANT          1
 [/#if]
 
 /* Set the following definitions to 1 to include the API function, or zero

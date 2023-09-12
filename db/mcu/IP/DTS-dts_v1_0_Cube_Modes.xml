@@ -7,70 +7,93 @@
     ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd" 
     xmlns="http://mcd.rou.st.com/modules.php?name=mcu">
     <About>DTS : Digital Temperature Sensor</About>
-
-    <!-- Generic RefParameters for DTS --> 
-    <!--RefParameter Name="" Comment="" DefaultValue="" Type="list" Group="Mode Config"  Visible="true">
-        <PossibleValue Value="" Comment=""/>
-        <PossibleValue Value="" Comment=""/>
-    </RefParameter-->
+ 
+    
+    <RefParameter Name="RefClock" Comment="Reference Clock Selection" DefaultValue="DTS_REFCLKSEL_PCLK" Type="list" Group="Basic parameters"  Visible="true">
+        <Description>
+            The clock selection allows to select two kind of clock &lt;br/&gt;
+            - Low Speed External oscillator (&lt;b&gt;LSE&lt;/b&gt;) which allows also to realize Quick Measurement (without sensor calibration beore to take the measure) &lt;br/&gt;
+            - Peripheral Clock (&lt;b&gt;PCLK&lt;/b&gt;) which has a higher speed 
+        </Description>
+        <PossibleValue Value="DTS_REFCLKSEL_LSE" Comment="Low speed reference clock (LSE)" Semaphore="DTS_REFCLK_LSE"/>
+        <PossibleValue Value="DTS_REFCLKSEL_PCLK" Comment="High speed reference clock (PCLK)" Semaphore="DTS_REFCLK_PCLK"/>
+    </RefParameter>
+    
+    <RefParameter Name="QuickMeasure" Comment="Quick Measurement" DefaultValue="DTS_QUICKMEAS_DISABLE" Type="list" Group="Basic parameters"  Visible="true" >
+        <Description>Quick Measurement is possible only when the LSE reference clock is selected</Description>
+        <PossibleValue Value="DTS_QUICKMEAS_DISABLE" Comment="Disable the Quick Measurement (Measure with calibration)"/>
+        <PossibleValue Condition="!DTS_REFCLK_LSE" Value="DTS_QUICKMEAS_ENABLE" Comment="Enable the Quick Measurement (Measure without calibration)" Diagnostic="Select LSE Clock Reference to able the quick measurement"/>
+    </RefParameter>
   
-    <RefParameter Name="QuickMeasure" Comment="Quick Measure" DefaultValue="DTS_QUICKMEAS_DISABLE" Type="list" Group="Mode Config"  Visible="true">
-        <PossibleValue Value="DTS_QUICKMEAS_ENABLE" Comment="Enable the Quick Measure (Measure without calibration)"/>
-        <PossibleValue Value="DTS_QUICKMEAS_DISABLE" Comment="Disable the Quick Measure (Measure with calibration)"/>
+    <RefParameter Name="TriggerInput" Comment="Input Trigger Selection" DefaultValue="DTS_TRIGGER_HW_NONE" Type="list" Group="Basic parameters"  Visible="true">
+        <Description>
+            The temperature measurement can be triggered either by software or by an external event which can be &lt;br/&gt;
+            a Low Power Timer (LPTIM) or the EXTernal Interrupt (EXTI13)
+        </Description>
+        <PossibleValue Value="DTS_TRIGGER_HW_NONE" Comment="No Hardware trigger detection" Diagnostic="Measurement trigger done by software"/>
+        <PossibleValue Condition="!Semaphore_ModeSelectedLPTIM1" Value="DTS_TRIGGER_LPTIMER1" Comment="External Interrupt Mode with LPTIMER1 trigger detection" Diagnostic="Activate LPTIM1 IP"/>
+        <PossibleValue Condition="!Semaphore_ModeSelectedLPTIM2" Value="DTS_TRIGGER_LPTIMER2" Comment="External Interrupt Mode with LPTIMER2 trigger detection" Diagnostic="Activate LPTIM2 IP"/>
+        <PossibleValue Condition="!Semaphore_ModeSelectedLPTIM3" Value="DTS_TRIGGER_LPTIMER3" Comment="External Interrupt Mode with LPTIMER3 trigger detection" Diagnostic="Activate LPTIM3 IP"/>
+        <PossibleValue Condition="!GPIO_EXTI13_SEM" Value="DTS_TRIGGER_EXTI13" Comment="External Interrupt Mode with EXTI13 trigger detection" Diagnostic="Associate the GPIO_EXTI13 state to one among of pin numbered 13 in the pinout view"/>
     </RefParameter>
     
-    <RefParameter Name="RefClock" Comment="Ref Clock" DefaultValue="DTS_REFCLKSEL_PCLK" Type="list" Group="Mode Config"  Visible="true">
-        <PossibleValue Value="DTS_REFCLKSEL_LSE" Comment="Low speed REF clock (LSE)"/>
-        <PossibleValue Value="DTS_REFCLKSEL_PCLK" Comment="High speed REF clock (PCLK)"/>
+    <RefParameter Name="SamplingTime" Comment="Sampling Time" DefaultValue="DTS_SMP_TIME_1_CYCLE" Type="list" Group="Basic parameters"  Visible="true">
+        <Description>
+            To increase the measurement accuracy, the sampling time could by incremented &lt;br/&gt;
+            - In LSE reference clock : the sampling time is based on LSE clock cycles (from 1 to 15) &lt;br/&gt;
+            - In PCLK refernce clock : the sampling time is based on the measured frequency cycles (from 1 to 15)
+        </Description>
+        <PossibleValue Value="DTS_SMP_TIME_1_CYCLE" Comment="1 cycle for the sampling time"/>
+        <PossibleValue Value="DTS_SMP_TIME_2_CYCLE" Comment="2 cycles for the sampling time"/>
+        <PossibleValue Value="DTS_SMP_TIME_3_CYCLE" Comment="3 cycles for the sampling time"/>
+        <PossibleValue Value="DTS_SMP_TIME_4_CYCLE" Comment="4 cycles for the sampling time"/>
+        <PossibleValue Value="DTS_SMP_TIME_5_CYCLE" Comment="5 cycles for the sampling time"/>
+        <PossibleValue Value="DTS_SMP_TIME_6_CYCLE" Comment="6 cycles for the sampling time"/>
+        <PossibleValue Value="DTS_SMP_TIME_7_CYCLE" Comment="7 cycles for the sampling time"/>
+        <PossibleValue Value="DTS_SMP_TIME_8_CYCLE" Comment="8 cycles for the sampling time"/>
+        <PossibleValue Value="DTS_SMP_TIME_9_CYCLE" Comment="9 cycles for the sampling time"/>
+        <PossibleValue Value="DTS_SMP_TIME_10_CYCLE" Comment="10 cycles for the sampling time"/>
+        <PossibleValue Value="DTS_SMP_TIME_11_CYCLE" Comment="11 cycles for the sampling time"/>
+        <PossibleValue Value="DTS_SMP_TIME_12_CYCLE" Comment="12 cycles for the sampling time"/>
+        <PossibleValue Value="DTS_SMP_TIME_13_CYCLE" Comment="13 cycles for the sampling time"/>
+        <PossibleValue Value="DTS_SMP_TIME_14_CYCLE" Comment="14 cycles for the sampling time"/>
+        <PossibleValue Value="DTS_SMP_TIME_15_CYCLE" Comment="15 cycles for the sampling time"/>
     </RefParameter>
     
-    <RefParameter Name="TriggerInput" Comment="Trigger Input" DefaultValue="DTS_TRIGGER_HW_NONE" Type="list" Group="Mode Config"  Visible="true">
-        <PossibleValue Value="DTS_TRIGGER_HW_NONE" Comment="No Hardware trigger detection"/>
-        <PossibleValue Condition="!Semaphore_ETRLPTIM1" Value="DTS_TRIGGER_LPTIMER1" Comment="External Interrupt Mode with LPTIMER1 trigger detection"/>
-        <PossibleValue Condition="!Semaphore_ETRLPTIM2" Value="DTS_TRIGGER_LPTIMER2" Comment="External Interrupt Mode with LPTIMER2 trigger detection"/>
-        <PossibleValue Condition="!Semaphore_ETRLPTIM3" Value="DTS_TRIGGER_LPTIMER3" Comment="External Interrupt Mode with LPTIMER3 trigger detection"/>
-        <PossibleValue Condition="!GPIO_EXTI13_SEM" Value="DTS_TRIGGER_EXTI13" Comment="External Interrupt Mode with EXTI13 trigger detection"/>
+    <RefParameter Name="Divider" Comment="Divider" DefaultValue="0" Type="integer" Group="Basic parameters"  Visible="true" Min="0" Max="0" >
+        <Condition Expression="DTS_REFCLK_LSE" Diagnostic="Divider available only on PCLK clock reference"/>
+        <Description>
+            The divider is used to divide PCLK reference clock for calibration phase &lt;br/&gt;
+            When the LSE reference clock is selected, the divider is not used and has to be set to 0
+        </Description>
     </RefParameter>
     
-    <RefParameter Name="SamplingTime" Comment="Sampling Time" DefaultValue="DTS_SMP_TIME_1_CYCLE" Type="list" Group="Mode Config"  Visible="true">
-        <PossibleValue Value="DTS_SMP_TIME_1_CYCLE" Comment="1 clock cycle for the sampling time"/>
-        <PossibleValue Value="DTS_SMP_TIME_2_CYCLE" Comment="2 clock cycle for the sampling time"/>
-        <PossibleValue Value="DTS_SMP_TIME_3_CYCLE" Comment="3 clock cycle for the sampling time"/>
-        <PossibleValue Value="DTS_SMP_TIME_4_CYCLE" Comment="4 clock cycle for the sampling time"/>
-        <PossibleValue Value="DTS_SMP_TIME_5_CYCLE" Comment="5 clock cycle for the sampling time"/>
-        <PossibleValue Value="DTS_SMP_TIME_6_CYCLE" Comment="6 clock cycle for the sampling time"/>
-        <PossibleValue Value="DTS_SMP_TIME_7_CYCLE" Comment="7 clock cycle for the sampling time"/>
-        <PossibleValue Value="DTS_SMP_TIME_8_CYCLE" Comment="8 clock cycle for the sampling time"/>
-        <PossibleValue Value="DTS_SMP_TIME_9_CYCLE" Comment="9 clock cycle for the sampling time"/>
-        <PossibleValue Value="DTS_SMP_TIME_10_CYCLE" Comment="10 clock cycle for the sampling time"/>
-        <PossibleValue Value="DTS_SMP_TIME_11_CYCLE" Comment="11 clock cycle for the sampling time"/>
-        <PossibleValue Value="DTS_SMP_TIME_12_CYCLE" Comment="12 clock cycle for the sampling time"/>
-        <PossibleValue Value="DTS_SMP_TIME_13_CYCLE" Comment="13 clock cycle for the sampling time"/>
-        <PossibleValue Value="DTS_SMP_TIME_14_CYCLE" Comment="14 clock cycle for the sampling time"/>
-        <PossibleValue Value="DTS_SMP_TIME_15_CYCLE" Comment="15 clock cycle for the sampling time"/>
+    <RefParameter Name="Divider" Comment="Divider" DefaultValue="0" Type="integer" Group="Basic parameters"  Visible="true" Min="0" Max="127">
+        <Description>
+            The divider is used to divide PCLK reference clock for calibration phase &lt;br/&gt;
+            When the LSE reference clock is selected, the divider is not used and has to be set to 0
+        </Description>
     </RefParameter>
-    
-    <RefParameter Name="Divider" Comment="Divider" DefaultValue="0" Type="integer" Group="Mode Config"  Visible="true" Min="0" Max="127"/>
 
-    <RefParameter Name="HighThreshold" Comment="High Threshold" DefaultValue="0x0" Type="hex" Group="Mode Config"  Visible="true" Min="0x0" Max="0xFFFF"/>
+    <RefParameter Name="HighThreshold" Comment="High Threshold" DefaultValue="0x0" Type="hex" Group="Basic parameters"  Visible="true" Min="0x0" Max="0xFFFF"/>
     
-    <RefParameter Name="LowThreshold" Comment="Low Threshold" DefaultValue="0x0" Type="Hex" Group="Mode Config"  Visible="true" Min="0x0" Max="0xFFFF"/>
+    <RefParameter Name="LowThreshold" Comment="Low Threshold" DefaultValue="0x0" Type="Hex" Group="Basic parameters"  Visible="true" Min="0x0" Max="0xFFFF"/>
     
     <RefMode Name="DTS" Comment="DTS initialization" HalMode="DTS" Abstract="true">
         <ConfigForMode>DTS_Init</ConfigForMode>
-        <Parameter Name="QuickMeasure"/>
         <Parameter Name="RefClock"/>
+        <Parameter Name="QuickMeasure"/>
         <Parameter Name="TriggerInput"/>
         <Parameter Name="SamplingTime"/>
         <Parameter Name="Divider"/>
         <Parameter Name="HighThreshold"/>    
         <Parameter Name="LowThreshold"/>
     </RefMode>
- 
+
     <ModeLogicOperator Name="OR">
-        <Mode Name="DTS">
+        <Mode Name="DTS" UserName="Activated">
             <ModeLogicOperator Name="XOR">
-                <Mode Name="DTS" UserName="DTS">
+                <Mode Name="DTS">
                     <SignalLogicalOp Name="AND">
                         <Signal IOMode="" Name="VS-DTS"/>
                     </SignalLogicalOp>		

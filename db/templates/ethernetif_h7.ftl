@@ -118,8 +118,10 @@
 
 /* The time to block waiting for input. */
 #define TIME_WAITING_FOR_INPUT                 ( portMAX_DELAY )
+/* USER CODE BEGIN OS_THREAD_STACK_SIZE_WITH_RTOS */
 /* Stack size of the interface thread */
 #define INTERFACE_THREAD_STACK_SIZE            ( 350 )
+/* USER CODE END OS_THREAD_STACK_SIZE_WITH_RTOS */
 [/#if][#-- endif with_rtos --][/#compress]
 
 /* Network interface name */
@@ -257,7 +259,9 @@ static void low_level_init(struct netif *netif)
 {
   HAL_StatusTypeDef hal_eth_init_status;
 [#if cmsis_version = "v2"]
+/* USER CODE BEGIN OS_THREAD_ATTR_CMSIS_RTOS_V2 */
   osThreadAttr_t attributes;
+/* USER CODE END OS_THREAD_ATTR_CMSIS_RTOS_V2 */
 [/#if][#-- endif cmsis_version --]    
   uint32_t idx = 0;
 [#if with_rtos == 1]
@@ -323,14 +327,18 @@ static void low_level_init(struct netif *netif)
 
   /* create the task that handles the ETH_MAC */
 [#if cmsis_version = "v2"]
+/* USER CODE BEGIN OS_THREAD_NEW_CMSIS_RTOS_V2 */
   memset(&attributes, 0x0, sizeof(osThreadAttr_t));
   attributes.name = "EthIf";
   attributes.stack_size = INTERFACE_THREAD_STACK_SIZE;
   attributes.priority = osPriorityRealtime;
   osThreadNew(ethernetif_input, netif, &attributes);
+/* USER CODE END OS_THREAD_NEW_CMSIS_RTOS_V2 */
 [#else]
+/* USER CODE BEGIN OS_THREAD_DEF_CREATE_CMSIS_RTOS_V1 */
   osThreadDef(EthIf, ethernetif_input, osPriorityRealtime, 0, INTERFACE_THREAD_STACK_SIZE);
   osThreadCreate (osThread(EthIf), netif);
+/* USER CODE END OS_THREAD_DEF_CREATE_CMSIS_RTOS_V1 */
 [/#if][#-- endif cmsis_version --]
 [/#if][#-- endif with_rtos --]
 [#if bsp == 1]
