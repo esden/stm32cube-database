@@ -10,10 +10,12 @@
                 [#assign grouplibExist = "1"]
                 [#break]
             [#else]
+            [#if underRoot != "true"]
             <file>
                     <name>${filesName!''}</name>
             </file>
             [/#if]
+    [/#if]
         [/#list]
         [#if grouplibExist=="1"]            
             [#list groupArg.sourceFilesNameList as filesName]
@@ -297,6 +299,9 @@
                 </group> 
             [/#if]
         [/#if]
+    [#list externalGroups as grp]
+        [@getGroups groupArg=grp/]
+    [/#list]
         [#-- end lib path --]
     [/#if]
 [/#if] [#-- End if under root --]
