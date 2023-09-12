@@ -1,11 +1,13 @@
 [#ftl]
+[#assign FMCUsedWithMW = "false"] 
 [#list IPdatas as IP]
 [#-- Global variables --]
     [#if IP.variables??]
         [#list IP.variables as variable]
             ${variable.value} ${variable.name};
         [/#list] 
-    [#-- Global variables --]#n        
+    [#-- Global variables --]#n      
+      
         [#list IP.configModelList as instanceData]
             [#assign FMCUsedWithMW = "false"] 
             [#if instanceData.isMWUsed=="true"]  

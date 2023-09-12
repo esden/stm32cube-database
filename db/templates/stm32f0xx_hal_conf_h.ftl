@@ -50,7 +50,7 @@
   * @brief This is the list of modules to be used in the HAL driver 
   */
 #define HAL_MODULE_ENABLED  
-  [#assign allModules = ["ADC","AES","CAN","CEC","COMP","CRC","CRYP","TSC","DAC","I2S","IWDG","LCD","LPTIM","RNG","RTC","SPI","TIM","UART","USART","IRDA","SMARTCARD","SMBUS","WWDG","PCD"]]
+  [#assign allModules = ["ADC","AES","CAN","CEC","COMP","CRC","CRYP","TSC","DAC","I2S","IWDG","LCD","LPTIM","RNG","RTC","SPI","TIM","UART","USART","IRDA","SMARTCARD","SMBUS","WWDG","PCD","EXTI"]]
   [#list allModules as module]
 	[#if isModuleUsed(module)]
 [#compress]#define HAL_${module?replace("AES","CRYP")}_MODULE_ENABLED[/#compress]
@@ -188,6 +188,10 @@
 #ifdef HAL_RCC_MODULE_ENABLED
  #include "stm32f0xx_hal_rcc.h"
 #endif /* HAL_RCC_MODULE_ENABLED */
+
+#ifdef HAL_EXTI_MODULE_ENABLED
+ #include "stm32f0xx_hal_exti.h"
+#endif /* HAL_EXTI_MODULE_ENABLED */
 
 #ifdef HAL_GPIO_MODULE_ENABLED
  #include "stm32f0xx_hal_gpio.h"

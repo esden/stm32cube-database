@@ -17,10 +17,10 @@
 
 [#list SWIPdatas as SWIP]
   [#if SWIP.variables??]
-	[#list SWIP.variables as variable]
-	  [#if variable.name=="Mutexes"]       
+        [#list SWIP.variables as variable]
+          [#if variable.name=="Mutexes"]
         [#assign s = variable.valueList]
-	    [#assign index = 0]
+        [#assign index = 0]
         [#list s as i]
           [#if index == 0] 
             [#assign mutexName = i]
@@ -45,19 +45,19 @@
             #tosMutexStaticDef(${mutexName}, &${mutexControl});
           [/#if]
           #t${mutexName}Handle = osMutexCreate(osMutex(${mutexName}));
-          #n       
+          #n
         [/#if]
       [/#if] 	
-	[/#list]
+    [/#list]
   [/#if] 
 [/#list]
 
 [#list SWIPdatas as SWIP]
   [#if SWIP.variables??]
-	[#list SWIP.variables as variable]
-	  [#if variable.name=="RecursiveMutexes"]       
+    [#list SWIP.variables as variable]
+      [#if variable.name=="RecursiveMutexes"]
         [#assign s = variable.valueList]
-	    [#assign index = 0]
+        [#assign index = 0]
         [#list s as i]
           [#if index == 0] 
             [#assign mutexName = i]
@@ -82,10 +82,10 @@
             #tosMutexStaticDef(${mutexName}, &${mutexControl});
           [/#if]
           #t${mutexName}Handle = osRecursiveMutexCreate(osMutex(${mutexName}));
-          #n       
+          #n
         [/#if]
       [/#if] 	
-	[/#list]
+    [/#list]
   [/#if] 
 [/#list]
 
@@ -96,10 +96,10 @@
 
 [#list SWIPdatas as SWIP]
   [#if SWIP.variables??]
-	[#list SWIP.variables as variable]
-	  [#if variable.name=="BinarySemaphores"]       
+    [#list SWIP.variables as variable]
+      [#if variable.name=="BinarySemaphores"]
         [#assign s = variable.valueList]
-	    [#assign index = 0]
+        [#assign index = 0]
         [#list s as i]
           [#if index == 0] 
             [#assign semaphoreName = i]
@@ -127,7 +127,7 @@
           #n
         [/#if]
       [/#if]
-	[/#list]
+    [/#list]
   [/#if]
 [/#list]
 
@@ -157,7 +157,7 @@
           [#if nbSemaphores == 1]
             #n#t/* Create the semaphores(s) */
           [/#if]
-          #t/* definition and creation of ${semaphoreName} */        
+          #t/* definition and creation of ${semaphoreName} */
           [#if semaphoreAllocation == "Dynamic"]
             #tosSemaphoreDef(${semaphoreName});
           [#else]
@@ -167,7 +167,7 @@
           #n 
         [/#if]
       [/#if]
-	[/#list]
+    [/#list]
   [/#if]
 [/#list]
 
@@ -180,8 +180,8 @@
   [#if SWIP.variables??]
     [#list SWIP.variables as variable]
       [#if variable.name=="Timers"]
-	    [#assign s = variable.valueList]
-	    [#assign index = 0]
+        [#assign s = variable.valueList]
+        [#assign index = 0]
         [#list s as i]
           [#if index == 0]
             [#assign timerName = i]
@@ -230,15 +230,15 @@
 
 #n
 #t/* USER CODE BEGIN RTOS_TIMERS */
-#t/* start timers, add new ones, ... */          
+#t/* start timers, add new ones, ... */
 #t/* USER CODE END RTOS_TIMERS */
 
 [#list SWIPdatas as SWIP]
   [#if SWIP.variables??]
-	[#list SWIP.variables as variable]
+    [#list SWIP.variables as variable]
       [#if variable.name=="Threads"]
-	    [#assign s = variable.valueList]
-	    [#assign index = 0]
+        [#assign s = variable.valueList]
+        [#assign index = 0]
         [#list s as i]
           [#if index == 0]
             [#assign threadName = i]
@@ -269,7 +269,7 @@
           [/#if]
           [#if index == 9]
             [#assign threadControlBlock = i]
-          [/#if]      
+          [/#if]
           [#assign index = index + 1]
         [/#list]
         [#assign nbThreads = nbThreads + 1]
@@ -297,10 +297,10 @@
 
 [#list SWIPdatas as SWIP]
   [#if SWIP.variables??]
-	[#list SWIP.variables as variable]
+    [#list SWIP.variables as variable]
       [#if variable.name=="Queues"]
-	    [#assign s = variable.valueList]
-	    [#assign index = 0]
+        [#assign s = variable.valueList]
+        [#assign index = 0]
         [#list s as i]
           [#if index == 0]
             [#assign queueName = i]
@@ -322,7 +322,7 @@
           [/#if]
           [#if index == 6]
             [#assign queueControlBlock = i]
-          [/#if]          
+          [/#if]
           [#assign index = index + 1]
         [/#list]
         [#if queueName != "0"]       
@@ -332,6 +332,7 @@
           [/#if]
           #t/* definition and creation of ${queueName} */
           [#if queueAllocation == "Dynamic"]
+            /* what about the sizeof here??? cd native code */
             #tosMessageQDef(${queueName}, ${queueSize}, ${queueElementType});
           [#else]
             #tosMessageQStaticDef(${queueName}, ${queueSize}, ${queueElementType}, ${queueBuffer}, &${queueControlBlock});

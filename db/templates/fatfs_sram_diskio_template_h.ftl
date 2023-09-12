@@ -4,7 +4,7 @@
   * @file    sram_diskio.h (based on sram_diskio_template.h v2.0.2)
   * @brief   Header for sram_diskio.c module
   ******************************************************************************
-[@common.optinclude name=sourceDir+"Src/license.tmp"/][#--include License text --]
+[@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
 

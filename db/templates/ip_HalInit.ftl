@@ -143,7 +143,7 @@
                     [#list method.name?split("/") as n]
                         [#assign tplName = n]
                     [/#list]
-                    [@optinclude name=sourceDir+"Src/${tplName?replace('ftl','tmp')}" /] 
+                    [@optinclude name=mxTmpFolder+"/${tplName?replace('ftl','tmp')}" /] 
                 [/#if]
             [/#if]
             [#if method.status=="OK" && method.type != "Template" && method.type != "HardCode"]                           		
@@ -566,13 +566,16 @@
 [#-- Section1: Create the void mx_<IpInstance>_<HalMode>_init() function for each ip instance --]
 [#compress]
 [#list IP.configModelList as instanceData]
-[#if instanceData.isMWUsed=="true" && instanceData.instanceName==name]
+[#if (instanceData.isMWUsed=="true" ||instanceData.isBSPUsed=="true" )&& instanceData.instanceName==name]
      [#assign instName = instanceData.instanceName] 
         [#assign halMode= instanceData.halMode]
-      [#--  /* ${instName} init function */ --]
-      [#--  [#if halMode!=realIpName]void MX_${instName}_${halMode}_Init(void)[#else]void MX_${instName}_Init(void)[/#if] --]
-[#-- { --]
-        [#-- assign ipInstanceIndex = instName?replace(name,"")--]
+[#if instanceData.isBSPUsed=="true" ][#-- added for periph used by BSP --]
+[#-- added for periph used by BSP --]
+/* ${instName} init function */ [#-- added for periph used by BSP --]
+        [#if halMode!=instanceData.realIpName&&!instanceData.ipName?contains("TIM")&&!instanceData.ipName?contains("CEC")]#HAL_StatusTypeDef MX_${instName}_${halMode}_Init(${instanceData.instancehandler})[#else]HAL_StatusTypeDef MX_${instName}_Init(${instanceData.instancehandler})[/#if][#-- added for periph used by BSP --]
+{[#-- added for periph used by BSP --]
+#tHAL_StatusTypeDef ret = HAL_OK;
+[/#if]
         [#assign args = ""]
         [#assign listOfLocalVariables =""]
         [#assign resultList =""]
@@ -595,7 +598,11 @@
             [#if instanceData.instIndex??][@common.generateConfigModelListCode configModel=instanceData inst=instName  nTab=1 index=instanceData.instIndex/][#else][@common.generateConfigModelListCode configModel=instanceData inst=instName  nTab=1 index=""/][/#if]
                 [/#if]
 
-#n[#-- } --]
+#n
+[#if instanceData.isBSPUsed=="true" ][#-- added for periph used by BSP --]
+#treturn ret;
+} [#-- added for periph used by BSP --]
+[/#if]
 [/#if]
   
 [/#list]

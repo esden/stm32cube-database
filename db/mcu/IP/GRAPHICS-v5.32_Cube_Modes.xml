@@ -73,6 +73,29 @@
     <RefParameter Name="Use_DSI" Comment="DSI instance" DefaultValue="0" Type="list" Visible="false">
        	 <PossibleValue Comment="0" Value="0"/>
     </RefParameter>
+    
+      <!-- ********************************** SDRAM BANK 2         ******************************************* -->
+    
+     <RefParameter Name="RES_Signal" Comment="RES Signal" Group="MFX Driver" DefaultValue="MFX-IO-PIN9" Type="list" >
+         <Description>Select MFX-IO-PIN9 with Eval board or MFX-IO-PIN10 with Discovery board.
+          </Description>     
+          <Condition Diagnostic="" Expression=" STM32L4 &amp; Display_Interface_LTDC_DSIHOST  &amp; S_USE_MFX"  />
+          <PossibleValue Comment="MFX-IO-PIN9" Value="MFX-IO-PIN9" Semaphore="S_Graphics_Eval"/>
+       	 <PossibleValue Comment="MFX-IO-PIN10" Value="MFX-IO-PIN10" Semaphore="S_Graphics_Disco"/>
+       	 
+    </RefParameter>
+    
+     <RefParameter Name="RES_Signal" Comment="RES Signal" Group="MFX Driver" DefaultValue="Disabled" Type="list" >
+        
+          <Condition Diagnostic="" Expression=" STM32L4 &amp; Display_Interface_LTDC_DSIHOST  &amp; !S_USE_MFX"  />
+          <PossibleValue Comment="Disabled" Value="Disabled" />
+    </RefParameter>
+     <!--RefParameter Name="DISCO-EVAL" Comment="DISCO-EVAL" Group="Board" DefaultValue="DISCO" Type="list" Visible="false">
+         
+          <PossibleValue Comment="EVAL" Value="EVAL" Semaphore="S_Graphics_Eval"/>
+       	 <PossibleValue Comment="DISCO" Value="DISCO" Semaphore="S_Graphics_Disco"/>
+       	 
+    </RefParameter-->
     <!-- **********************************  Color Conversion Layer0    **********************************************************************-->
    
     <RefParameter Name="LIN_Color_Conversion_Layer0" Comment="Layer0 - Color Conversion" DefaultValue="GUICC_0" Type="list" Group="Frame Buffer" >
@@ -417,7 +440,36 @@
     
     
     
-    <!--     ******************************* USE_OTM8009A        ****************************************** -->
+    <!--     ******************************* LCD PIN VIA MFX        ****************************************** -->
+     <!--RefParameter Name="LCD_PIN_VIA_MFX" Comment="LCD PIN VIA MFX" DefaultValue="0" Type="list"  Group="LCD Driver" >
+        <Condition Diagnostic="" Expression="(STM32L4) &amp; !I2CMode_Enable " />
+        <Description> Enable or Disable the MFX driver.&lt;/b&gt; &lt;br&gt;For information : &lt;/b&gt; &lt;br&gt;
+         Available only if I2C peripheral is enabled .&lt;/b&gt; &lt;br&gt;
+         Specifies the I2C instance to be used with STemWin from the 'Platform Settings' top right tab".       </Description>
+        
+        <PossibleValue Comment="Disabled" Value="0" />
+    </RefParameter--> 
+    
+     <RefParameter Name="LCD_PIN_VIA_MFX" Comment="LCD PIN VIA MFX" DefaultValue="1" Type="list"  Group="MFX Driver" >
+          <Description> Enable or Disable the MFX driver.&lt;/b&gt; &lt;br&gt;For information : &lt;/b&gt; &lt;br&gt;
+         Available only if I2C peripheral is enabled .&lt;/b&gt; &lt;br&gt;
+         Specifies the I2C instance to be used for the MFX driver from the 'Platform Settings' top right tab".       </Description>
+        <Condition Diagnostic="" Expression="(STM32L4 )  " />
+        <PossibleValue Comment="Enabled" Value="1" Semaphore="S_USE_MFX" Condition="!I2CMode_Enable" Action="Remove"/>
+        <PossibleValue Comment="Disabled" Value="0" Condition="I2CMode_Enable" Action="Remove"/>
+    </RefParameter> 
+    
+    <RefParameter Name="LCD_PIN_VIA_MFX" Comment="LCD PIN VIA MFX" DefaultValue="0" Type="list"  Group="LCD Driver" Visible="false" />
+        
+       
+   
+    
+     <!--     ******************************* LCD PIN VIA MFX        ****************************************** -->
+     <RefParameter Name="USE_OTM8009A" Comment="Use LCD Screen" DefaultValue="0" Type="list"  Group="LCD Driver" Visible="false">
+        <Description> Enable or Disable the OTM8009 LCD driver. </Description>
+        <Condition Diagnostic="" Expression="(STM32L4 ) " />
+       
+    </RefParameter> 
     <RefParameter Name="USE_OTM8009A" Comment="Use LCD Screen" DefaultValue="1" Type="list"  Group="LCD Driver" >
         <Description> Enable or Disable the OTM8009 LCD driver. </Description>
         <Condition Diagnostic="" Expression="(Display_Interface_LTDC_DSIHOST )&amp; ( (S_OTM8009A_ORIENTATION_LANDSCAPE | S_OTM8009A_ORIENTATION_PORTRAIT)  &amp;  (Check_OTM8009A_PixelFormat) )" />
@@ -426,8 +478,16 @@
     </RefParameter> 
     <RefParameter Name="USE_OTM8009A" Comment="LCD Screen" DefaultValue="0" Type="list"  Group="LCD Driver" >
         <Condition Diagnostic="" Expression="(Display_Interface_LTDC_DSIHOST )" />
-        <Description> Enable or Disable the OTM8009 LCD driver. </Description>
+        <Description> Select the LCD screen. 
+         &lt;br&gt; &lt; For information : &lt;/b&gt; &lt;br&gt;
+         The OTM8009 LCD driver available only when the LTDC IP is configured in 24 or 16 bits -DSI mode.
+        </Description>
         <PossibleValue Comment="Other Screen" Value="0" />
+    </RefParameter> 
+     <RefParameter Name="ZONE" Comment="ZONE" DefaultValue="2" Type="list"   Group="General Settings" Visible="false">
+        <Condition Diagnostic="" Expression="(STM32L4 )" />
+        <Description> Enable or Disable the ZONE parameter. </Description>
+       
     </RefParameter> 
      <RefParameter Name="ZONE" Comment="ZONE" DefaultValue="2" Type="list"   Group="General Settings" >
         <Condition Diagnostic="" Expression="(Display_Interface_LTDC_DSIHOST )" />
@@ -438,6 +498,11 @@
     
     
     <!--     ******************************* PixelFormat        ****************************************** -->
+    <RefParameter Name="OTM8009A_PixelFormat" Comment="OTM8009A PixelFormat" DefaultValue="0" Type="list" Group="LCD Driver"  Visible="false"  >
+        <Description>The OTM8009A PixelFormat is available only when the LTDC IP is configured in 16 bits -DSI mode and the OTM8009A Orientation parameter is enabled. </Description>
+        <Condition Diagnostic="" Expression=" (STM32L4)  " />
+       
+    </RefParameter> 
    
     <RefParameter Name="OTM8009A_PixelFormat" Comment="OTM8009A PixelFormat" DefaultValue="0" Type="list" Group="LCD Driver"   >
         <Description>The OTM8009A PixelFormat is available only when the LTDC IP is configured in 16 bits -DSI mode and the OTM8009A Orientation parameter is enabled. </Description>
@@ -465,12 +530,17 @@
     </RefParameter> 
   
     <!--     ******************************* Orientation            ****************************************** -->
+      <RefParameter Name="OTM8009A_Orientation" Comment="OTM8009A Orientation" DefaultValue="none" Type="list" Group="LCD Driver" Visible="false" >
+       <Condition Diagnostic="" Expression=" (STM32L4)  "/>     
+    </RefParameter>
     
    <RefParameter Name="OTM8009A_Orientation" Comment="OTM8009A Orientation" DefaultValue="none" Type="list" Group="LCD Driver" >
-        <Description>The landscape orientation choice of LCD screen is available only when the parameter "Active Height"(set in LTDC) is less than or equal to 480. </Description>
+        <Description>Select the OTM8009A Orientation. </Description>
         <Condition Diagnostic="" Expression=" (S_USE_OTM8009A)  &amp;  (Check_OTM8009A_PixelFormat) "/>     
-        <PossibleValue Comment="OTM8009A_ORIENTATION_LANDSCAPE" Value="OTM8009A_ORIENTATION_LANDSCAPE"  Diagnostic="The landscape orientation choice of LCD screen is available only when the LTDC IP is configured with the parameter 'Active Height' is less than or equal to 480."      Condition="!(LTDC:ActiveH &lt;= 480) " Action="Disable"   />
-       <PossibleValue Comment="OTM8009A_ORIENTATION_PORTRAIT" Value="OTM8009A_ORIENTATION_PORTRAIT"  Diagnostic="The Portrait orientation choice of LCD screen is available only when the LTDC IP is configured with the parameter 'Active Height' is greater than 800."      Condition="!(LTDC:ActiveH &gt; 800 )" Action="Disable"   />
+        <!--PossibleValue Comment="OTM8009A_ORIENTATION_LANDSCAPE" Value="OTM8009A_ORIENTATION_LANDSCAPE"  Diagnostic="The landscape orientation choice of LCD screen is available only when the LTDC IP is configured with the parameter 'Active Height' is less than or equal to 480."      Condition="!(LTDC:ActiveH &lt;= 480) " Action="Disable"   /-->
+        <PossibleValue Comment="OTM8009A_ORIENTATION_LANDSCAPE" Value="OTM8009A_ORIENTATION_LANDSCAPE"  Diagnostic="The landscape orientation choice of LCD screen is available only when the parameter 'Active Height'(set in LTDC IP) is less than or equal to 'Active Width'(set in LTDC IP)."      Condition="!(LTDC:ActiveH &lt;=LTDC:ActiveW) " Action="Disable"   />
+       <!--PossibleValue Comment="OTM8009A_ORIENTATION_PORTRAIT" Value="OTM8009A_ORIENTATION_PORTRAIT"  Diagnostic="The Portrait orientation choice of LCD screen is available only when the LTDC IP is configured with the parameter 'Active Height' is greater than 800."      Condition="!(LTDC:ActiveH &gt; 800 )" Action="Disable"   /-->
+       <PossibleValue Comment="OTM8009A_ORIENTATION_PORTRAIT" Value="OTM8009A_ORIENTATION_PORTRAIT"  Diagnostic="The Portrait orientation choice of LCD screen is available only when the the parameter 'Active Height'(set in LTDC IP) is greater than 'Active Width'(set in LTDC IP)."      Condition="!(LTDC:ActiveH &gt; LTDC:ActiveW)" Action="Disable"   />
        
     </RefParameter>
     
@@ -480,18 +550,22 @@
       <PossibleValue Comment="OTM8009A_ORIENTATION_PORTRAIT" Value="OTM8009A_ORIENTATION_PORTRAIT"/>
     </RefParameter> -->
     <RefParameter Name="OTM8009A_Orientation" Comment="OTM8009A Orientation" DefaultValue="0" Type="list" Group="LCD Driver" Visible="false">
-        <Description> The landscape orientation choice of LCD screen is available only when the LTDC IP is configured with the parameter Active Height is greater than 800 or is less than or equal to 480. </Description>
+      <Description>Select the OTM8009A Orientation. </Description>
         <Condition Diagnostic="" Expression=" !(S_USE_OTM8009A) &amp; (Display_Interface_LTDC_DSIHOST)"/>     
         <PossibleValue Comment="none" Value="0" />
         
     </RefParameter>
     
     <!--     *******************************Chek  Orientation            ****************************************** -->
-    
+    <RefParameter Name="Check_OTM8009A_Orientation" Comment="Check_OTM8009A_Orientation" DefaultValue="0" Type="list" Group="LCD Driver" Visible="false" >
+         <Condition Diagnostic="" Expression=" STM32L4"/>    
+    </RefParameter>
     <RefParameter Name="Check_OTM8009A_Orientation" Comment="Check_OTM8009A_Orientation" DefaultValue="0" Type="list" Group="LCD Driver" Visible="false" >
          
-        <PossibleValue Comment="OTM8009A_ORIENTATION_LANDSCAPE" Value="OTM8009A_ORIENTATION_LANDSCAPE" Diagnostic="" Semaphore="S_OTM8009A_ORIENTATION_LANDSCAPE" Condition="!(LTDC:ActiveH &lt;= 480) " Action="Remove"/>
-        <PossibleValue Comment="OTM8009A_ORIENTATION_PORTRAIT" Value="OTM8009A_ORIENTATION_PORTRAIT" Diagnostic="" Semaphore="S_OTM8009A_ORIENTATION_PORTRAIT" Condition="!(LTDC:ActiveH &gt; 800 )" Action="Remove"/>
+        <!--PossibleValue Comment="OTM8009A_ORIENTATION_LANDSCAPE" Value="OTM8009A_ORIENTATION_LANDSCAPE" Diagnostic="" Semaphore="S_OTM8009A_ORIENTATION_LANDSCAPE" Condition="!(LTDC:ActiveH &lt;= 480) " Action="Remove"/-->
+        <PossibleValue Comment="OTM8009A_ORIENTATION_LANDSCAPE" Value="OTM8009A_ORIENTATION_LANDSCAPE" Diagnostic="" Semaphore="S_OTM8009A_ORIENTATION_LANDSCAPE" Condition="!(LTDC:ActiveH &lt;=LTDC:ActiveW) " Action="Remove"/>
+        <!-- PossibleValue Comment="OTM8009A_ORIENTATION_PORTRAIT" Value="OTM8009A_ORIENTATION_PORTRAIT" Diagnostic="" Semaphore="S_OTM8009A_ORIENTATION_PORTRAIT" Condition="!(LTDC:ActiveH &gt; 800 )" Action="Remove"/-->
+        <PossibleValue Comment="OTM8009A_ORIENTATION_PORTRAIT" Value="OTM8009A_ORIENTATION_PORTRAIT" Diagnostic="" Semaphore="S_OTM8009A_ORIENTATION_PORTRAIT" Condition="!(LTDC:ActiveH &gt; LTDC:ActiveW )" Action="Remove"/>
     </RefParameter>
     
    <RefParameter Name="Use_ili9341" Comment="Use ili9341" DefaultValue="1" Type="list" Group="LCD Driver" Visible="true" >
@@ -572,7 +646,7 @@
     </RefParameter>
     
       <RefParameter Name="RefreshCount_SDRAM_Param" Comment="SDRAM Refresh Count" DefaultValue="0" Type="String" Group="SDRAM Instances" Visible="false" >
-           <Condition Diagnostic="" Expression=" Display_Interface_FMC" />
+           <Condition Diagnostic="" Expression=" Display_Interface_FMC | STM32L4" />
     </RefParameter>
     <RefParameter Name="RefreshCount_SDRAM_Param" Comment="SDRAM Refresh Count" DefaultValue="=RefreshCount_SDRAM" Type="String" Group="SDRAM Instances"  />
 
@@ -834,10 +908,19 @@
  
     <!-- ************************************************ LIN Frame buffer adress             *************************************   -->
     
+     <RefParameter Comment="Layer 0 - Color Frame Buffer Start Address(Set in GFXMMU)" DefaultValue="=GFXMMU:Buf0Address"  Name="Frame_Buffer_StartAddress_Layer0_DPI_DSI" Type="StringHex" Group="Frame Buffer" >
+        <Condition Diagnostic="" Expression="STM32L4 &amp; (Display_Interface_LTDC_DSIHOST) "/>
+        <Description>The color frame buffer address must be set from GFXMMU configuration. </Description>
+    </RefParameter> 
+    
+    
+    
     <RefParameter Comment="Layer 0 - Color Frame Buffer Start Address(Set in LTDC)" DefaultValue="=LTDC:FBStartAdress_L0"  Name="Frame_Buffer_StartAddress_Layer0_DPI_DSI" Type="StringHex" Group="Frame Buffer" >
         <Condition Diagnostic="" Expression=" Display_Interface_LTDC_DSIHOST | Display_Interface_LTDC_FMC"/>
         <Description>The color frame buffer address must be set from LTDC configuration. </Description>
     </RefParameter> 
+    
+    
     <RefParameter Comment="Layer1 - Color Frame Buffer Start Address(Set in LTDC)" DefaultValue="=LTDC:FBStartAdress_L1"  Name="Frame_Buffer_StartAddress_Layer1_DPI_DSI" Type="StringHex" Group="Frame Buffer" >
         <Description>The color frame buffer address must be set from LTDC configuration. </Description>
         <Condition Diagnostic="" Expression="(GUI_NUM_LAYERS=2) &amp; (Display_Interface_LTDC_DSIHOST | Display_Interface_LTDC_FMC)"/>
@@ -1840,7 +1923,7 @@
     <RefParameter Name="EA_1_input_iniparam1s1" Comment="ProjectPath" DefaultValue="[MXPROJECTROOTPATH]\STemWin\App\" Type="string" Group="Settings" TabName="EA_1_STemWin" Visible="false">
         <Condition  Diagnostic="" Expression="USE_STemWin_STACK &amp;S_UseGUIBuilder "/>
     </RefParameter>
-    <RefParameter Name="EA_1_Apptype" Comment="Graphic Application Category" DefaultValue="FrameWindow"  Type="list" Group="Settings" TabName="EA_1_STemWin">
+    <RefParameter Name="EA_1_Apptype" Comment="Graphics Application Category" DefaultValue="FrameWindow"  Type="list" Group="Settings" TabName="EA_1_STemWin">
         <Condition  Diagnostic="" Expression="USE_STemWin_STACK &amp;S_UseGUIBuilder "/>
         <PossibleValue Comment="FrameWindow" Value="FrameWindow"/>
         <PossibleValue Comment="Window" Value="Window"/>
@@ -2299,6 +2382,7 @@
         <Parameter Name="GUI_Optimization" />
         <Parameter Name="GUI_DefaultFont"/>
         <Parameter Name="DMA2D_Graphics"/>
+       
         <Parameter Name="Use_ili9341"/> 
         <Parameter Name="Use_ili9341_Check"/> 
         <Parameter Name="USE_OTM8009A"/>
@@ -2313,8 +2397,8 @@
         <Parameter Name="RefreshCount_SDRAM_Param"/> 
         <Parameter Name="ZONE"/>
         <Parameter Name="HSRAM"/>
-        
-       
+        <Parameter Name="LCD_PIN_VIA_MFX"/>
+        <Parameter Name="RES_Signal"/>
         <Parameter Name="USE_Embedded_Wizard"/>
         <Parameter Name="USE_STTouchGFX"/>
        
@@ -2558,6 +2642,18 @@
   
     </RefMode>
     
+    
+      <RefMode Name="STemWin" BaseMode="STemWin_Inputs" HalMode="STemWin">
+        <ConfigForMode>STemWin_Config</ConfigForMode> 
+        <Condition Expression="STM32L4" Diagnostic="" />
+       
+        <!-- BspDependency Name="LCD Reset Pin XRES" Comment="C" BspIpName="GPIO" BspModeName="Output" Component="GPIO" /-->
+        <BspDependency Name="I2C_Instance" Comment="" BspIpName="I2C" BspModeName="I2C" />
+      
+       
+  
+    </RefMode>
+    
     <RefMode Name="STemWin" BaseMode="STemWin_Inputs" HalMode="STemWin">
         <ConfigForMode>STemWin_Config</ConfigForMode> 
        
@@ -2649,12 +2745,19 @@
         
         <Mode Name="Graphics Framework" UserName="Graphics Framework">
             <ModeLogicOperator Name="XOR">		
-                <Mode Name="STemWin" UserName="STemWin" RemoveCondition="STM32F429_439">			
+                <Mode Name="STemWin" UserName="STemWin" RemoveCondition="STM32F429_439 | STM32L4">			
                     <SignalLogicalOp Name="AND">
                         <Signal IOMode="" Name="VS-STemWin"/>
                     </SignalLogicalOp>																
                     <Semaphore>USE_STemWin_STACK</Semaphore>
                     <Condition Expression="(MW_DMA2D_MW|!MW_DMA2D_MW)&amp; CRC &amp;  ((  ((MW_LTDC_MW) | (MW_LTDC_MW &amp; MW_DSIHOST_MW))  &amp; (SdramChipSelect2|SdramChipSelect1 ) &amp; (MW_FMC_MW))|((MW_FMC_MW) &amp; (Lcd1|Lcd2|Lcd3|Lcd4)))" Diagnostic="STemWin is active only when CRC IP and (FMC SRAM IP configured with memory type in LCD interface mode) or (FMC SDRAM IP and (LTDC IP or LTDC IP (DSI mode) and DSIHOST IP (TE mode)) ) are configured"/> 
+                </Mode>
+                <Mode Name="STemWin" UserName="STemWin" RemoveCondition="!STM32L4">			
+                    <SignalLogicalOp Name="AND">
+                        <Signal IOMode="" Name="VS-STemWin"/>
+                    </SignalLogicalOp>																
+                    <Semaphore>USE_STemWin_STACK</Semaphore>
+                    <Condition Expression="(MW_DMA2D_MW|!MW_DMA2D_MW)&amp; CRC &amp;  (  (  (MW_LTDC_MW) | (MW_LTDC_MW &amp; MW_DSIHOST_MW  &amp;  MW_GFXMMU_MW)   )       |((MW_FMC_MW) &amp; (Lcd1|Lcd2|Lcd3|Lcd4)))" Diagnostic="STemWin is active only when CRC IP and (FMC SRAM IP configured with memory type in LCD interface mode) or (FMC SDRAM IP and (LTDC IP or LTDC IP (DSI mode) and DSIHOST IP (TE mode)) ) are configured"/> 
                 </Mode>
                 <Mode Name="STemWin_F429_439" UserName="STemWin"  RemoveCondition="!STM32F429_439">			
                     <SignalLogicalOp Name="AND">
@@ -2684,7 +2787,7 @@
         
         <Mode Name="Display Interface" UserName="Display Interface ">
             <ModeLogicOperator Name="XOR">
-                <Mode Name="Display Serial Interface using LTDC-DSIHOST" RemoveCondition="!(DSIHOST_Exist)">
+                <Mode Name="Display Serial Interface using LTDC-DSIHOST" RemoveCondition="!(DSIHOST_Exist) | (STM32L4 )">
                     <SignalLogicalOp Name="AND">
                         <Signal IOMode="" Name="VS-DisplayInterface-DSI-LTDC"/>
                     </SignalLogicalOp>
@@ -2692,13 +2795,38 @@
                 
                     <Semaphore>Display_Interface_LTDC_DSIHOST</Semaphore>
                 </Mode>	
-                <Mode Name="Display Parallel Interface using LTDC">									
+                
+                
+                
+                 <Mode Name="Display Serial Interface using LTDC-DSIHOST-GFXMMU" RemoveCondition="!(GFXMMU_Exist) &amp; !(STM32L4 )">
+                    <SignalLogicalOp Name="AND">
+                        <Signal IOMode="" Name="VS-DisplayInterface-DSI-LTDC-GFXMMU"/>
+                    </SignalLogicalOp>
+                    <Condition Expression=" (MW_LTDC_MW) &amp; (MW_GFXMMU_MW) &amp; (MW_DSIHOST_MW)   &amp; (USE_STemWin_STACK)" Diagnostic="Active only when one stack is selected and LTDC IP is configured in DSI mode ,DSIHOST IP is configured in TE Pin mode and GFXMMU IP is configured "/>
+                
+                    <Semaphore>Display_Interface_LTDC_DSIHOST</Semaphore>
+                </Mode>	
+                
+                
+                <Mode Name="Display Parallel Interface using LTDC" RemoveCondition=" (STM32L4 )">									
                     <SignalLogicalOp Name="AND">
                         <Signal IOMode="" Name="VS-DisplayInterface-LTDC"/>
                     </SignalLogicalOp>                                    
-                    <Condition Expression=" (MW_LTDC_MW) &amp; (USE_STemWin_STACK|USE_Embedded_Wizard_STACK|USE_Touch_GFX_STACK) &amp;   (MW_FMC_MW) &amp; (SdramChipSelect2|SdramChipSelect1)" Diagnostic="Active only when one stack is selected and LTDC IP and at least FMC SDRAM IP configured"/>
+                    <Condition Expression=" (MW_LTDC_MW) &amp; (USE_STemWin_STACK|USE_Embedded_Wizard_STACK|USE_Touch_GFX_STACK) &amp;   (MW_FMC_MW) &amp; (SdramChipSelect2|SdramChipSelect1)" Diagnostic="Active only when one stack is selected ,LTDC IP is configured and at least FMC SDRAM IP is configured"/>
                     <Semaphore>Display_Interface_LTDC_FMC</Semaphore>
                 </Mode>	
+                
+                
+                
+                <Mode Name="Display Parallel Interface using LTDC" RemoveCondition=" !(STM32L4 )">									
+                    <SignalLogicalOp Name="AND">
+                        <Signal IOMode="" Name="VS-DisplayInterface-LTDC"/>
+                    </SignalLogicalOp>                                    
+                    <Condition Expression=" (MW_LTDC_MW)  &amp; (USE_STemWin_STACK)" Diagnostic="Active only when one stack is selected and LTDC IP is configured"/>
+                    <Semaphore>Display_Interface_LTDC_FMC</Semaphore>
+                </Mode>	
+                
+                
                 <Mode Name="Display Bus Interface using FMC">	
                     <SignalLogicalOp Name="AND">
                         <Signal IOMode="" Name="VS-DisplayInterface-FMC"/>
@@ -2706,6 +2834,9 @@
                     <Condition Expression=" (MW_FMC_MW) &amp; (Lcd1|Lcd2|Lcd3|Lcd4) &amp; (USE_STemWin_STACK)" Diagnostic="Active only when STemWin is selected and at least one FMC SRAM IP configured with memory type in LCD interface mode"/>
                     <Semaphore>Display_Interface_FMC</Semaphore>
                 </Mode>
+                
+                
+                
             </ModeLogicOperator>															
             <Semaphore>Display_Interface</Semaphore>
         </Mode>
@@ -2733,6 +2864,7 @@
     <RefSignal Name="VS-Embedded-Wizard" Virtual="true"/>	
     <RefSignal Name="VS-Touch-GFX" Virtual="true"/>	
     <RefSignal Name="VS-DisplayInterface-DSI-LTDC" Virtual="true"/>	
+    <RefSignal Name="VS-DisplayInterface-DSI-LTDC-GFXMMU" Virtual="true"/>	
     <RefSignal Name="VS-DisplayInterface-LTDC" Virtual="true"/>	
     <RefSignal Name="VS-DisplayInterface-FMC" Virtual="true"/>
     <RefSignal Name="VS-DisplayInterface-SPI" Virtual="true"/>	

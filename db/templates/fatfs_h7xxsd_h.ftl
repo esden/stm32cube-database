@@ -5,9 +5,25 @@
   * @brief   This file contains the common defines and functions prototypes for 
   *          the bsp_driver_sd.c driver.
   ******************************************************************************
-[@common.optinclude name=sourceDir+"Src/license.tmp"/][#--include License text --]
+[@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
+
+[#assign use_dma=0]
+[#assign use_rtos=0]
+[#if SWIPdatas??]
+ [#list SWIPdatas as SWIP]
+  [#if SWIP.defines??]
+   [#list SWIP.defines as definition] 
+    [#if definition.name="USE_DMA_CODE_SD"]
+     [#if definition.value="1"]
+      [#assign use_dma=1]
+     [/#if]
+    [/#if]
+   [/#list]
+  [/#if]
+ [/#list]
+[/#if]
 
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __${FamilyName}_SD_H
@@ -50,7 +66,7 @@
 /* USER CODE BEGIN BSP_H_CODE */
 #define SD_DetectIRQHandler()             HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_8)
 
-/* Exported functions --------------------------------------------------------*/   
+/* Exported functions --------------------------------------------------------*/
 uint8_t BSP_SD_Init(void);
 uint8_t BSP_SD_ITConfig(void);
 uint8_t BSP_SD_ReadBlocks(uint32_t *pData, uint32_t ReadAddr, uint32_t NumOfBlocks, uint32_t Timeout);
@@ -61,8 +77,14 @@ uint8_t BSP_SD_Erase(uint32_t StartAddr, uint32_t EndAddr);
 uint8_t BSP_SD_GetCardState(void);
 void    BSP_SD_GetCardInfo(BSP_SD_CardInfo *CardInfo);
 uint8_t BSP_SD_IsDetected(void);
+
+/* These functions can be modified in case the current settings (e.g. DMA stream)
+   need to be changed for specific application needs */
+void    BSP_SD_AbortCallback(void);
+void    BSP_SD_WriteCpltCallback(void);
+void    BSP_SD_ReadCpltCallback(void);
 /* USER CODE END BSP_H_CODE */ 
-   
+
 #ifdef __cplusplus
 }
 #endif

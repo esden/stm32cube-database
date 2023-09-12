@@ -11,7 +11,7 @@
 
 [#-- Global variables --]#n 
 [#list IP.configModelList as instanceData]
-[#if instanceData.isMWUsed=="false"]
+[#if instanceData.isMWUsed=="false" && instanceData.isBusDriverUSed=="false"]
      [#assign instName = instanceData.instanceName]
         [#assign halMode= instanceData.halMode]
 #nvoid MPU_Config(void)

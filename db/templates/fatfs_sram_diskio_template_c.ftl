@@ -4,7 +4,7 @@
   * @file    sram_diskio.c (based on sram_diskio_template.c v2.0.2)
   * @brief   SRAM Disk I/O driver
   ******************************************************************************
-[@common.optinclude name=sourceDir+"Src/license.tmp"/][#--include License text --]
+[@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
 /* USER CODE BEGIN firstSection */ 

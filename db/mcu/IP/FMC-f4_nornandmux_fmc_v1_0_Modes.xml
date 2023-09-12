@@ -375,7 +375,10 @@
     </RefParameter>
     <!-- End NOR Flash 1 RefParameters -->
     <!-- Begin NAND Flash 1 RefParameters -->
-
+    <RefParameter Comment="Nand Coherent Pinout" DefaultValue="MEMORY_PINOUT_OK" Name="NandCoherentPinout1" Type="list" TabName="NAND 1" Group="NAND control" Visible="false">
+        <Condition Expression="STM32MP1&amp;NandDataAddressMux1&amp;!NandPccWait1" Diagnostic=""/>
+        <PossibleValue Comment="PINOUT KO" Value="MEMORY_WAIT_KO"/>
+    </RefParameter>
     <RefParameter Comment="Nand Coherent Pinout" DefaultValue="MEMORY_PINOUT_OK" Name="NandCoherentPinout1" Type="list" TabName="NAND 1" Group="NAND control" Visible="false">
         <Condition Expression="NandDataAddressMux1" Diagnostic=""/>
         <PossibleValue Comment="PINOUT OK" Value="MEMORY_PINOUT_OK"/>
@@ -389,12 +392,11 @@
     </RefParameter>
     <!-- FMC_PCRx PWID -->
     <RefParameter Comment="Data size" DefaultValue="FMC_NAND_PCC_MEM_BUS_WIDTH_8" Name="NandMemoryDataWidth1" Type="list" TabName="NAND 1" Group="NAND control" Visible="false">
-        <Condition Expression="_8b_dmux1|_9b_dmux1|_10b_dmux1|_11b_dmux1|_12b_dmux1|_13b_dmux1|_14b_dmux1|_15b_dmux1" Diagnostic=""/>
+        <Condition Expression="_8b_dmux1" Diagnostic=""/>
         <PossibleValue Comment="8 bits" Value="FMC_NAND_PCC_MEM_BUS_WIDTH_8"/>
     </RefParameter>
-    <RefParameter Comment="Data size" DefaultValue="FMC_NAND_PCC_MEM_BUS_WIDTH_16" Name="NandMemoryDataWidth1" Type="list" TabName="NAND 1" Group="NAND control">
+    <RefParameter Comment="Data size" DefaultValue="FMC_NAND_PCC_MEM_BUS_WIDTH_16" Name="NandMemoryDataWidth1" Type="list" TabName="NAND 1" Group="NAND control" Visible="false">
         <Condition Expression="_16b_dmux1" Diagnostic=""/>
-        <PossibleValue Comment="8 bits" Value="FMC_NAND_PCC_MEM_BUS_WIDTH_8"/>
         <PossibleValue Comment="16 bits" Value="FMC_NAND_PCC_MEM_BUS_WIDTH_16"/>
     </RefParameter>
     <RefParameter Comment="Data size" DefaultValue="FMC_NAND_PCC_MEM_BUS_WIDTH_16" Name="NandMemoryDataWidth1" Type="list" TabName="NAND 1" Group="NAND control">
@@ -1025,7 +1027,7 @@
               </SignalLogicalOp>
               <Semaphore>NandChipSelect2_1</Semaphore>
             </Mode>
-            <Mode Name="NandChipSelect3_1" UserName="NCE3">
+            <Mode Name="NandChipSelect3_1" UserName="NCE3" ShrinkName="NCE3 Chip Select">
               <SignalLogicalOp Name="AND">
                 <Signal Name="NCE3"/>
               </SignalLogicalOp>
@@ -1035,68 +1037,33 @@
           <Semaphore>NandFlash1</Semaphore>
         </Mode>
         <Mode Name="NandDataAddressMux1" UserName="Data/Address">
-          <ModeLogicOperator Name="LIST">
+          <SignalLogicalOp Name="AND">
+            <Signal Name="D0"/>
+            <Signal Name="D1"/>
+            <Signal Name="D2"/>
+            <Signal Name="D3"/>
+            <Signal Name="D4"/>
+            <Signal Name="D5"/>
+            <Signal Name="D6"/>
+            <Signal Name="D7"/>
+            <Signal Name="ALE"/>
+            <Signal Name="CLE"/>
+            <Signal Name="NOE"/>
+            <Signal Name="NWE"/>
+          </SignalLogicalOp>
+          <ModeLogicOperator Name="XOR">
             <Mode Name="8b-dmux1" UserName="8 bits">
-              <SignalLogicalOp Name="AND">
-                <Signal Name="D0"/>
-                <Signal Name="D1"/>
-                <Signal Name="D2"/>
-                <Signal Name="D3"/>
-                <Signal Name="D4"/>
-                <Signal Name="D5"/>
-                <Signal Name="D6"/>
-                <Signal Name="D7"/>
-                <Signal Name="ALE"/>
-                <Signal Name="CLE"/>
-                <Signal Name="NOE"/>
-                <Signal Name="NWE"/>
-              </SignalLogicalOp>
               <Semaphore>_8b_dmux1</Semaphore>
-            </Mode>
-            <Mode Name="9b-dmux1" UserName="9 bits">
-              <SignalLogicalOp Name="AND">
-                <Signal Name="D8"/>
-              </SignalLogicalOp>
-              <Semaphore>_9b_dmux1</Semaphore>
-            </Mode>
-            <Mode Name="10b-dmux1" UserName="10 bits">
-              <SignalLogicalOp Name="AND">
-                <Signal Name="D9"/>
-              </SignalLogicalOp>
-              <Semaphore>_10b_dmux1</Semaphore>
-            </Mode>
-            <Mode Name="11b-dmux1" UserName="11 bits">
-              <SignalLogicalOp Name="AND">
-                <Signal Name="D10"/>
-              </SignalLogicalOp>
-              <Semaphore>_11b_dmux1</Semaphore>
-            </Mode>
-            <Mode Name="12b-dmux1" UserName="12 bits">
-              <SignalLogicalOp Name="AND">
-                <Signal Name="D11"/>
-              </SignalLogicalOp>
-              <Semaphore>_12b_dmux1</Semaphore>
-            </Mode>
-            <Mode Name="13b-dmux1" UserName="13 bits">
-              <SignalLogicalOp Name="AND">
-                <Signal Name="D12"/>
-              </SignalLogicalOp>
-              <Semaphore>_13b_dmux1</Semaphore>
-            </Mode>
-            <Mode Name="14b-dmux1" UserName="14 bits">
-              <SignalLogicalOp Name="AND">
-                <Signal Name="D13"/>
-              </SignalLogicalOp>
-              <Semaphore>_14b_dmux1</Semaphore>
-            </Mode>
-            <Mode Name="15b-dmux1" UserName="15 bits">
-              <SignalLogicalOp Name="AND">
-                <Signal Name="D14"/>
-              </SignalLogicalOp>
-              <Semaphore>_15b_dmux1</Semaphore>
             </Mode>
             <Mode Name="16b-dmux1" UserName="16 bits">
               <SignalLogicalOp Name="AND">
+                <Signal Name="D8"/>
+                <Signal Name="D9"/>
+                <Signal Name="D10"/>
+                <Signal Name="D11"/>
+                <Signal Name="D12"/>
+                <Signal Name="D13"/>
+                <Signal Name="D14"/>
                 <Signal Name="D15"/>
               </SignalLogicalOp>
               <Semaphore>_16b_dmux1</Semaphore>
@@ -1107,7 +1074,7 @@
         </Mode>
         <Mode Name="NandReadyOrBusy1" UserName="Ready or busy">
           <ModeLogicOperator Name="XOR">
-            <Mode Name="Wait1" UserName="NWAIT">
+            <Mode Name="Wait1" UserName="NWAIT" ShrinkName="NWAIT Ready/Busy">
               <SignalLogicalOp Name="AND">
                 <Signal Name="NWAIT"/>
               </SignalLogicalOp>
@@ -1204,6 +1171,6 @@
   <RefSignal IOMode="AlternateFunctionPushPullHighSpeedDefault" Name="NL" ShareableGroupName="FMC_NL"/>
   <RefSignal IOMode="AlternateFunctionPushPullHighSpeedDefault" Name="NOE"/>
   <RefSignal IOMode="AlternateFunctionPushPullHighSpeedDefault" Name="NWAIT"/>
-  <RefSignal IOMode="AlternateFunctionPushPullHighSpeedDefault" Name="NWE"/> 
+  <RefSignal IOMode="AlternateFunctionPushPullHighSpeedDefault" Name="NWE"/>
   <!-- End RefSignals -->
 </IP>

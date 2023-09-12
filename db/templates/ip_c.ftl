@@ -5,7 +5,7 @@
   * Description        : This file provides code for the configuration
   *                      of the ${name} instances.
   ******************************************************************************
-[@common.optinclude name=sourceDir+"Src/license.tmp"/][#--include License text --]
+[@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
 
@@ -723,6 +723,15 @@ ETH_TxPacketConfig TxConfig;
             [/#if]            
         [/#list]
         [/#if]    
+[#assign usedDriverFlag = ""]
+[#list ipvar.configModelList as instanceData]
+    [#if instanceData.usedDriver?? && instanceData.usedDriver == "LL"]
+        [#assign usedDriverFlag = usedDriverFlag+" LL"]    
+    [#else]
+        [#assign usedDriverFlag = usedDriverFlag+" HAL"]     
+    [/#if]
+    
+[/#list]
     [#if serviceType=="Init"] 
         [#if !ipName?contains("I2C")&& !ipName?contains("USB")] [#-- if not I2C --]
             [#if initService.clock??]
@@ -988,7 +997,7 @@ ${variable.value} ${variable.name};
 [@common.generateCecRxBuffer configModelList=IP.configModelList methodName="HAL_CEC_Init" argumentName="RxBuffer" bufferType="uint8_t" bufferSize="16"/]
 [#-- Global variables --]#n
 [#list IP.configModelList as instanceData]
-[#if instanceData.isMWUsed=="false"]
+[#if instanceData.isMWUsed=="false" && instanceData.isBusDriverUSed=="false"]
      [#assign instName = instanceData.instanceName]
         [#assign halMode= instanceData.halMode]
         /* ${instName} init function */

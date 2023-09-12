@@ -4,7 +4,7 @@
   * @file    sdram_diskio.h (based on sdram_diskio_template.h v2.0.2)
   * @brief   Header for sdram_diskio.c module
   ******************************************************************************
-[@common.optinclude name=sourceDir+"Src/license.tmp"/][#--include License text --]
+[@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
 

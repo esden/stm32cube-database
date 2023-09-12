@@ -5,7 +5,7 @@
   * Description        : This file provides code for the MSP Initialization 
   *                      and de-Initialization codes.
   ******************************************************************************
-[@common.optinclude name=sourceDir+"Src/license.tmp"/][#--include License text --]
+[@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
 /* Includes ------------------------------------------------------------------*/
@@ -1040,10 +1040,10 @@ static uint32_t ${entry.value}=0;
 
 [#assign initServicesList = {"test0":"test1"}]
 [#-- Section2: Msp Init --]
-[#if ipvar.initCallBacks??]
+[#if ipvar.initCallBacksForMsp??]
 [#compress]
 [#assign DFSDM_var = "false"]
-[#list ipvar.initCallBacks.entrySet() as entry]
+[#list ipvar.initCallBacksForMsp.entrySet() as entry]
 [#assign instanceList = entry.value] 
 [#assign mode=entry.key?replace("_MspInit","")?replace("MspInit","")?replace("_BspInit","")?replace("HAL_","")]
 
@@ -1233,7 +1233,7 @@ static uint32_t ${entry.value}=0;
 [#-- Section2:End --]
 [#-- --]
 [#-- Section2-1: Msp Post Init --]
-[#if ipvar.initCallBacks??]
+[#if ipvar.initCallBacksForMsp??]
 [#compress]
 [#-- Get List of all IP instances to cerate the MspPostInit --]
 [#assign DFSDM_var = "false"]
@@ -1368,9 +1368,9 @@ uint32_t DFSDM_Init = 0;
 [/#if]
 [#-- Section2-1:End --]
 [#-- --]
-[#if ipvar.deInitCallBacks??]
+[#if ipvar.deInitCallBacksForMsp??]
 [#compress]
-[#list ipvar.deInitCallBacks.entrySet() as entry]
+[#list ipvar.deInitCallBacksForMsp.entrySet() as entry]
 [#assign instanceList = entry.value]
 [#assign mode=entry.key?replace("_MspDeInit","")?replace("MspDeInit","")?replace("_BspDeInit","")?replace("HAL_","")]
 [#assign ipHandler = "h" + mode?lower_case]
@@ -1485,20 +1485,20 @@ uint32_t DFSDM_Init = 0;
 [/#if]
 #n}#n
 [#--break--] [#-- use the first msp--]
-[/#list][#--list ipvar.deInitCallBacks.entrySet() as entry--]
+[/#list][#--list ipvar.deInitCallBacksForMsp.entrySet() as entry--]
 [/#compress]
-[/#if][#--if ipvar.deInitCallBacks??--]
+[/#if][#--if ipvar.deInitCallBacksForMsp??--]
 [#-- Section3: End --]
 [/#list]
 #n
 [#-- FMC MSP --]
-[@common.optinclude name=sourceDir+"Src/mx_FMC_MSP.tmp"/]
+[@common.optinclude name=mxTmpFolder+"/mx_fmc_MSP.tmp"/]
 
 [#-- FSMC MSP --]
-[@common.optinclude name=sourceDir+"Src/mx_FSMC_MSP.tmp"/]
+[@common.optinclude name=mxTmpFolder+"/mx_fsmc_MSP.tmp"/]
 
 [#-- SAI MSP --]
-[@common.optinclude name=sourceDir+"Src/sai_msp.tmp"/]
+[@common.optinclude name=mxTmpFolder+"/sai_msp.tmp"/]
 
 /* USER CODE BEGIN 1 */
 

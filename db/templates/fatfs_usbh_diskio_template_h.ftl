@@ -22,7 +22,7 @@
 [/#if]
   * @brief   Header for usbh_diskio.c module
   ******************************************************************************
-[@common.optinclude name=sourceDir+"Src/license.tmp"/][#--include License text --]
+[@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
 /* Define to prevent recursive inclusion -------------------------------------*/

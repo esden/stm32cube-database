@@ -111,7 +111,7 @@ DMA2D_HandleTypeDef           hdma2d;
    [#assign sdramBank ="FMC_SDRAM_CMD_TARGET_BANK2"] 
    [/#if]
 
-[@common.optinclude name=coreDir+"Src/fmc_vars.tmp"/] 
+[@common.optinclude name=mxTmpFolder+"/fmc_vars.tmp"/] 
 [#if definition.value == "SDRAM1_BANK1" | definition.value == "SDRAM1_BANK2"]
                     [#assign  hsdramvalue="hsdram1"]
 [/#if]
@@ -181,7 +181,7 @@ void MX_LCD_Init(void)
 /* De-Initialize LTDC */
   HAL_LTDC_DeInit(&hltdc);
 /* Configure LTDC */
- [@common.optinclude name=coreDir+"Src/ltdc_HalInit.tmp"/] 
+ [@common.optinclude name=mxTmpFolder+"/ltdc_HalInit.tmp"/] 
 
 }
 
@@ -191,7 +191,7 @@ void MX_LCD_Init(void)
   */ 
 void MX_FMC_Init(void) 
 {  
-[@common.optinclude name=coreDir+"Src/fmc_HalInit.tmp"/] 
+[@common.optinclude name=mxTmpFolder+"/fmc_HalInit.tmp"/] 
 }
 [/#if]
 
@@ -262,12 +262,12 @@ void MX_SDRAM_InitEx(void)
 void MX_DMA2D_Init(void) 
 {
 /* Configure the DMA2D default mode */ 
- [@common.optinclude name=coreDir+"Src/dma2d_HalInit.tmp"/] 
+ [@common.optinclude name=mxTmpFolder+"/dma2d_HalInit.tmp"/] 
 }
 
 [/#if]
 
-[@common.optinclude name=coreDir+"Src/spi_HalInit.tmp"/] 
+[@common.optinclude name=mxTmpFolder+"/spi_HalInit.tmp"/] 
 
 
 
@@ -311,12 +311,12 @@ void MX_DMA2D_Init(void)
 
  [/#if]
 /*  MSPInit/deInit Implementation */
-[@common.optinclude name=coreDir+"Src/ltdc_MSP.tmp"/] 
+[@common.optinclude name=mxTmpFolder+"/ltdc_MSP.tmp"/] 
 [#if   UseSDRAM?? && UseSDRAM!="0"    ]
-[@common.optinclude name=coreDir+"Src/fmc_MSP.tmp"/] 
+[@common.optinclude name=mxTmpFolder+"/fmc_MSP.tmp"/] 
 [/#if]
 [#if  dma2d?? && dma2d == "1" ]
-[@common.optinclude name=coreDir+"Src/dma2d_MSP.tmp"/] 
+[@common.optinclude name=mxTmpFolder+"/dma2d_MSP.tmp"/] 
 [/#if]
 
 [/#if]

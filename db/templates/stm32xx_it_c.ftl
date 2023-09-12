@@ -41,6 +41,9 @@
 [#if FREERTOS??] [#-- If FreeRtos is used --]
 #include "cmsis_os.h"
 [/#if]
+[#if TOUCHSENSING??] [#-- If TouchSensing is used --]
+#include "tsl_time.h"
+[/#if]
 
 [#assign noUsbWakeUpInterruptHalHandler = missingUsbWakeUpInterruptHalHandler()]
 [#if noUsbWakeUpInterruptHalHandler]
@@ -88,6 +91,13 @@ extern ${ipHandler.handlerType} ${ipHandler.handler};
         [#assign handleList = handleList + "(" + ipHandler.handler + ")"]
     [/#list]
   [/#list]
+[/#list]
+[#list services as service]
+  [#if service.bspExtihandles??]
+    [#list service.bspExtihandles as ipHandle]
+extern ${ipHandle.type} ${ipHandle.name};
+    [/#list]
+  [/#if]
 [/#list]
 #n
 [#-- If Time Base Source is different to Systick--]

@@ -6,7 +6,7 @@
 [#--  * @packageVersion : ${fwVersion} --]
   * @brief          : This file implements the board support package for the USB host library
   ******************************************************************************
-[@common.optinclude name=sourceDir+"Src/license.tmp"/][#--include License text --]
+[@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
 
@@ -71,10 +71,10 @@
 /* USER CODE END PV */
 
 [#if handleNameFS == "FS"]
-[#include sourceDir+"Src/usb_otg_fs_vars.tmp"]
+[#include mxTmpFolder+"/usb_otg_fs_vars.tmp"]
 [/#if]
 [#if handleNameHS == "HS"]
-[#include sourceDir+"Src/usb_otg_hs_vars.tmp"]
+[#include mxTmpFolder+"/usb_otg_hs_vars.tmp"]
 [/#if]
 
 /* USER CODE BEGIN 0 */
@@ -99,14 +99,14 @@
 [#if handleNameFS == "FS"]
 [#if includeMspDone == 0]
 [#assign includeMspDone = 1]
-[#include sourceDir+"Src/usb_otg_fs_Msp.tmp"]
+[#include mxTmpFolder+"/usb_otg_fs_Msp.tmp"]
 [/#if]
 [/#if]
 
 [#if handleNameHS == "HS"]
 [#if includeMspDone == 0]
 [#assign includeMspDone = 1]
-[#include sourceDir+"Src/usb_otg_hs_Msp.tmp"]
+[#include mxTmpFolder+"/usb_otg_hs_Msp.tmp"]
 [/#if]
 [/#if]
 
@@ -173,7 +173,7 @@ USBH_StatusTypeDef USBH_LL_Init(USBH_HandleTypeDef *phost)
 #t/* Link the driver to the stack. */
 #thhcd_USB_OTG_FS.pData = phost;
 #tphost->pData = &hhcd_USB_OTG_FS;
-[#include sourceDir+"Src/usb_otg_fs_HalInit.tmp"]
+[#include mxTmpFolder+"/usb_otg_fs_HalInit.tmp"]
 #tUSBH_LL_SetTimer(phost, HAL_HCD_GetCurrentFrame(&hhcd_USB_OTG_FS));
 #t}
 [/#if]
@@ -182,7 +182,7 @@ USBH_StatusTypeDef USBH_LL_Init(USBH_HandleTypeDef *phost)
 #t/* Link the driver to the stack. */
 #thhcd_USB_OTG_HS.pData = phost;
 #tphost->pData = &hhcd_USB_OTG_HS;
-[#include sourceDir+"Src/usb_otg_hs_HalInit.tmp"]
+[#include mxTmpFolder+"/usb_otg_hs_HalInit.tmp"]
 #tUSBH_LL_SetTimer(phost, HAL_HCD_GetCurrentFrame(&hhcd_USB_OTG_HS));
 #t}
 [/#if]

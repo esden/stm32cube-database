@@ -5,7 +5,7 @@
   * Description        : This file contains all the functions prototypes for 
   *                      the gpio  
   ******************************************************************************
-[@common.optinclude name=sourceDir+"Src/license.tmp"/][#--include License text --]
+[@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
 

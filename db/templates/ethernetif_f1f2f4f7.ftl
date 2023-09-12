@@ -5,7 +5,7 @@
   * Description        : This file provides code for the configuration
   *                      of the ${name} MiddleWare.
   ******************************************************************************
-[@common.optinclude name=sourceDir+"Src/license.tmp"/][#--include License text --]
+[@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
 [#-- SWIPdatas is a list of SWIPconfigModel --]
@@ -132,7 +132,7 @@ ETH_HandleTypeDef heth;
 /* USER CODE END 3 */
 
 /* Private functions ---------------------------------------------------------*/
-[#include sourceDir+"Src/eth_Msp.tmp"]
+[#include mxTmpFolder+"/eth_Msp.tmp"]
 
 [#if with_rtos == 1]
 /**
@@ -170,7 +170,7 @@ static void low_level_init(struct netif *netif)
   HAL_StatusTypeDef hal_eth_init_status;
   
 /* Init ETH */
-[#include sourceDir+"Src/eth_HalInit.tmp"]  
+[#include mxTmpFolder+"/eth_HalInit.tmp"]  
   
   if (hal_eth_init_status == HAL_OK)
   {

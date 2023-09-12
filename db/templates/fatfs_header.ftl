@@ -4,7 +4,7 @@
   * @file   fatfs.h
   * @brief  Header for fatfs applications
   ******************************************************************************
-[@common.optinclude name=sourceDir+"Src/license.tmp"/][#--include License text --]
+[@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
 
@@ -16,14 +16,14 @@
 #endif
 
 [#compress]
-[@common.optinclude name=sourceDir+"Src/fatfs_inc.tmp"/][#--include fatfs includes --]
+[@common.optinclude name=mxTmpFolder+"/fatfs_inc.tmp"/][#--include fatfs includes --]
 
 #n/* USER CODE BEGIN Includes */     
 #n
 #n/* USER CODE END Includes */
 #n
 
-[@common.optinclude name=sourceDir+"Src/fatfs_ext_vars.tmp"/]
+[@common.optinclude name=mxTmpFolder+"/fatfs_ext_vars.tmp"/]
 
 #nvoid MX_FATFS_Init(void);
 

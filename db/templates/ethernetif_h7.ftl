@@ -5,7 +5,7 @@
   * Description        : This file provides code for the configuration
   *                      of the ethernetif.c MiddleWare.
   ******************************************************************************
-[@common.optinclude name=sourceDir+"Src/license.tmp"/][#--include License text --]
+[@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
 [#-- SWIPdatas is a list of SWIPconfigModel --]
@@ -203,7 +203,7 @@ ${BspComponent?lower_case}_IOCtx_t  ${BspComponent}_IOCtx = {ETH_PHY_IO_Init,
 void pbuf_free_custom(struct pbuf *p);
 [/#if][#-- endif custom_pbuf --]
 
-[#include sourceDir+"Src/eth_Msp.tmp"]
+[#include mxTmpFolder+"/eth_Msp.tmp"]
 
 [#if with_rtos == 1]
 /**
@@ -239,7 +239,7 @@ static void low_level_init(struct netif *netif)
   HAL_StatusTypeDef hal_eth_init_status;
   
   /* Init ETH */
-[#include sourceDir+"Src/eth_HalInit.tmp"]  
+[#include mxTmpFolder+"/eth_HalInit.tmp"]  
   
   for(idx = 0; idx < ETH_RX_DESC_CNT; idx ++)
   {
@@ -802,7 +802,11 @@ void ethernet_link_check_state(struct netif *netif)
 [#else][#-- else bsp == 0 --] 
 
 /* USER CODE BEGIN 7 */
-
+[#if with_rtos == 1]
+  while(1) {
+    osDelay(100);
+  }
+[/#if][#-- endif with_rtos --]  
 /* USER CODE END 7 */    
 [/#if][#-- endif bsp --]  
 }

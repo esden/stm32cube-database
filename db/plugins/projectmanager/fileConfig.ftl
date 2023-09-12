@@ -134,7 +134,8 @@
     [#if underRoot == "true"]
     	<copyAsReference>${copyAsReference}</copyAsReference>
     	[#if copyAsReference == "true"]
-            <sourceEntries>               
+            <sourceEntries>    
+            
                 <sourceEntry>
                         <name>${inc}</name>
                 </sourceEntry>
@@ -152,9 +153,17 @@
 		    		<name>${HALDriver}</name>
 		    	</sourceEntry>
 		    	[#if atLeastOneMiddlewareIsUsed]
+                        
 		    		<sourceEntry>
 		    			<name>Middlewares</name>
 		    		</sourceEntry>
+                                [#list MiddlewareList as Middleware]
+                                <sourceEntry>
+                                <name>${Middleware}</name>
+                                </sourceEntry>
+                                [/#list]
+                                
+                       
 		    	 [/#if]
 				 [#-- MZA Bug41441 --]			
 				[#if atLeastOneCmsisPackIsUsed]
@@ -252,6 +261,7 @@
             [/#list]
 	[#else] [#-- Copy All/Needed option --]
 	  		<sourceEntries>
+                        
 		    	<sourceEntry>
 		    		<name>${inc}</name>
 		    	</sourceEntry>
@@ -269,9 +279,16 @@
 		    		<name>${HALDriver}</name>
 		    	</sourceEntry>
 		    	[#if atLeastOneMiddlewareIsUsed]
+		    		 
 		    		<sourceEntry>
 		    			<name>Middlewares</name>
 		    		</sourceEntry>
+                                [#list MiddlewareList as Middleware]
+                                <sourceEntry>
+                                <name>${Middleware}</name>
+                                </sourceEntry>
+                                [/#list]
+                            
 		    	 [/#if]
 				 [#-- MZA Bug41441 --]			
 				[#if atLeastOneCmsisPackIsUsed]
@@ -472,6 +489,13 @@
 [#list ApplicationGroups as grp]        
     <group>
         <name>${grp.name!''}</name>
+        [#if grp.sourceFilesNameList??]
+            [#list grp.sourceFilesNameList as filesName]
+                    <file>
+                            <name>${filesName!''}</name>
+                    </file>
+            [/#list]
+        [/#if]
             [#if grp.subGroups??]
                     [#list grp.subGroups as subGrp]	
                     <group>

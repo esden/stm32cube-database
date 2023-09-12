@@ -54,7 +54,7 @@
   */
 #define HAL_MODULE_ENABLED  
 
-  [#assign allModules = ["ADC","FDCAN","CEC", "COMP", "CRC","CRYP","DAC","DCMI","DMA2D","ETH","NAND","NOR","SRAM","SDRAM","HASH", "HRTIM", "HSEM", "JPEG", "OPAMP", "I2S", "SMBUS","IWDG","LPTIM","LTDC","QUADSPI","RNG","RTC","SAI","SD","MMC","SPDIFRX","SPI", "SWPMI","TIM","UART","USART","IRDA","SMARTCARD","WWDG","PCD","HCD", "DFSDM", "DSI","JPEG", "MDIOS"]]
+  [#assign allModules = ["ADC","FDCAN","CEC", "COMP", "CRC","CRYP","DAC","DCMI","DMA2D","ETH","NAND","NOR","SRAM","SDRAM","HASH", "HRTIM", "HSEM", "JPEG", "OPAMP", "I2S", "SMBUS","IWDG","LPTIM","LTDC","QUADSPI","RNG","RTC","SAI","SD","MMC","SPDIFRX","SPI", "SWPMI","TIM","UART","USART","IRDA","SMARTCARD","WWDG","PCD","HCD", "DFSDM", "DSI","JPEG", "MDIOS","EXTI"]]
   [#list allModules as module]
 	[#if isModuleUsed(module)]
 [#compress]#define HAL_${module?replace("QUADSPI","QSPI")}_MODULE_ENABLED[/#compress]
@@ -176,6 +176,10 @@
 #ifdef HAL_RCC_MODULE_ENABLED
   #include "stm32h7xx_hal_rcc.h"
 #endif /* HAL_RCC_MODULE_ENABLED */
+
+#ifdef HAL_EXTI_MODULE_ENABLED
+  #include "stm32h7xx_hal_exti.h"
+#endif /* HAL_EXTI_MODULE_ENABLED */
 
 #ifdef HAL_GPIO_MODULE_ENABLED
   #include "stm32h7xx_hal_gpio.h"

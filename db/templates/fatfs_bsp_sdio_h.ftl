@@ -14,7 +14,7 @@
   * @brief   This file contains the common defines and functions prototypes for 
   *          the bsp_driver_sd.c driver.
   ******************************************************************************
-[@common.optinclude name=sourceDir+"Src/license.tmp"/][#--include License text --]
+[@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
 
@@ -78,6 +78,12 @@ void BSP_SD_DMA_Rx_IRQHandler(void);
 uint8_t BSP_SD_GetCardState(void);
 void    BSP_SD_GetCardInfo(HAL_SD_CardInfoTypeDef *CardInfo);
 uint8_t BSP_SD_IsDetected(void);
+
+/* These functions can be modified in case the current settings (e.g. DMA stream)
+   need to be changed for specific application needs */
+void    BSP_SD_AbortCallback(void);
+void    BSP_SD_WriteCpltCallback(void);
+void    BSP_SD_ReadCpltCallback(void);
 /* USER CODE END BSP_H_CODE */
 #endif
    

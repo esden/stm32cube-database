@@ -6,7 +6,7 @@
   *                      It implements also file based read/write functions.
   *
   ******************************************************************************
-[@common.optinclude name=sourceDir+"Src/license.tmp"/][#--include License text --]  
+[@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]  
   ******************************************************************************
   */
 

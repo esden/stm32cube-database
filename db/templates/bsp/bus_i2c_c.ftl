@@ -4,7 +4,7 @@
   * @file           : bus_i2c.c
   * @brief          : source file for the BSP BUS IO driver over I2C
   ******************************************************************************
-[@common.optinclude name=sourceDir+"Src/license.tmp"/][#--include License text --]
+[@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
 */
 [#assign IpInstance = ""]
@@ -30,7 +30,7 @@
 [/#list]	
                                               
 /* Includes ------------------------------------------------------------------*/
-#include "bus_i2c.h"
+#include "${BoardName}_bus.h"
 [#if isHalSupported?? && isHALUsed?? ]
 #include "${FamilyName?lower_case}xx_hal.h"
 [/#if]

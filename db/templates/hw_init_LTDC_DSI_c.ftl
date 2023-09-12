@@ -67,7 +67,6 @@ LTDC_HandleTypeDef            hltdc;
 extern ${variable.value} ${variable.name};
 	[/#list]
 [/#if]
-
 [#if SWIP.defines??]
 	[#list SWIP.defines as definition]	
 	[#-- IF to take care of the specific formatting of each argument of this file  --]
@@ -113,7 +112,7 @@ LTDC_LayerCfgTypeDef          pLayerCfg;
 
 [@common.optinclude name="ST-EmbeddedWizard/Ew_QUADSPI_tmp.c"/] 
 
-[@common.optinclude name=coreDir+"Src/fmc_vars.tmp"/] 
+[@common.optinclude name=mxTmpFolder+"/fmc_vars.tmp"/] 
 [#-- ELSE IF --]
 [#elseif definition.name = "RefreshCount_SDRAM_Param"]
 [#if definition.value != "0" ]
@@ -164,7 +163,7 @@ static FMC_SDRAM_CommandTypeDef Command;
 void MX_DMA2D_Init(void) 
 {
    /* Configure the DMA2D default mode */ 
- [@common.optinclude name=coreDir+"Src/dma2d_HalInit.tmp"/] 
+ [@common.optinclude name=mxTmpFolder+"/dma2d_HalInit.tmp"/] 
 }
 [/#if]
 /**
@@ -175,19 +174,19 @@ void MX_DMA2D_Init(void)
 void MX_LCD_Init(void) 
 {
 [#if USE_EmbeddedWizard !="1"]
-  LTDC_LayerCfgTypeDef             pLayerCfg;
+  LTDC_LayerCfgTypeDef    pLayerCfg;
 [/#if]
    [#-- ELSE IF --]
 [#elseif definition.name = "GUI_NUM_LAYERS"]
  [#if definition.value == "2" ]
-  LTDC_LayerCfgTypeDef pLayerCfg1;
+  LTDC_LayerCfgTypeDef    pLayerCfg1;
 [/#if]
 
 
 /* De-Initialize LTDC */
   HAL_LTDC_DeInit(&hltdc);
 /* Configure LTDC */
- [@common.optinclude name=coreDir+"Src/ltdc_HalInit.tmp"/] 
+ [@common.optinclude name=mxTmpFolder+"/ltdc_HalInit.tmp"/] 
 }
 
  
@@ -197,7 +196,7 @@ void MX_LCD_Init(void)
   */ 
 void MX_FMC_Init(void) 
 {  
- [@common.optinclude name=coreDir+"Src/fmc_HalInit.tmp"/] 
+ [@common.optinclude name=mxTmpFolder+"/fmc_HalInit.tmp"/] 
 }
 [/#if]
 [#if  UseSDRAM?? && UseSDRAM!="0" ]
@@ -274,7 +273,7 @@ void MX_DSI_Init(void)
 /* Base address of DSI Host/Wrapper registers to be set before calling De-Init */
 
  
-[@common.optinclude name=coreDir+"Src/dsihost_HalInit.tmp"/]  
+[@common.optinclude name=mxTmpFolder+"/dsihost_HalInit.tmp"/]  
  
  /* Start DSI */
   HAL_DSI_Start(&(hdsi));
@@ -386,13 +385,13 @@ void DSI_IO_WriteCmd(uint32_t NbrParams, uint8_t *pParams)
  [/#if]
 
   /*  MSPInit/deInit Implementation */
-[@common.optinclude name=coreDir+"Src/ltdc_MSP.tmp"/] 
-[@common.optinclude name=coreDir+"Src/dsihost_MSP.tmp"/] 
+[@common.optinclude name=mxTmpFolder+"/ltdc_MSP.tmp"/] 
+[@common.optinclude name=mxTmpFolder+"/dsihost_MSP.tmp"/] 
 [#if dma2dvalue?? && dma2dvalue=="1"]
-[@common.optinclude name=coreDir+"Src/dma2d_MSP.tmp"/] 
+[@common.optinclude name=mxTmpFolder+"/dma2d_MSP.tmp"/] 
 [/#if]
 [#if   UseSDRAM?? && UseSDRAM!="0"    ]
-[@common.optinclude name=coreDir+"Src/fmc_MSP.tmp"/] 
+[@common.optinclude name=mxTmpFolder+"/fmc_MSP.tmp"/] 
 [/#if]
 
 [/#if]

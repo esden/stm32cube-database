@@ -5,7 +5,7 @@
   * Description        : This file provides initialization code for LWIP
   *                      middleWare.
   ******************************************************************************
-[@common.optinclude name=sourceDir+"Src/license.tmp"/][#--include License text --]
+[@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
 [#compress][#--- Macro START ---]
@@ -88,7 +88,7 @@ static void Ethernet_Link_Periodic_Handle(struct netif *netif);
 [/#if][#-- endif with_rtos --]
 [/#if][#-- endif series && netif_callback --] 
 /* ETH Variables initialization ----------------------------------------------*/
-[#include sourceDir+"Src/eth_vars.tmp"]
+[#include mxTmpFolder+"/eth_vars.tmp"]
 
 [#compress][#if lwip_dhcp == 1]
 [#if with_rtos == 0]

@@ -25,7 +25,7 @@
  [/#if]
   * @brief   This file includes a generic SRAM driver.
   ******************************************************************************
-[@common.optinclude name=sourceDir+"Src/license.tmp"/][#--include License text --]
+[@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
 [#-- SWIPdatas is a list of SWIPconfigModel --]  

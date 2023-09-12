@@ -6,11 +6,11 @@
 [#list SWIPdatas as SWIP]
   [#if SWIP.variables??]
   
-	[#list SWIP.variables as variable]
-	  
-	  [#if variable.name=="Threads"]
-	  [#assign s = variable.valueList]
-	    [#assign index = 0]
+    [#list SWIP.variables as variable]
+    
+      [#if variable.name=="Threads"]
+        [#assign s = variable.valueList]
+        [#assign index = 0]
         [#list s as i]
           [#if index == 3]
             [#assign threadFunction = i]
@@ -50,9 +50,9 @@
         [/#if]
       [/#if]
       
- 	  [#if variable.name == "Timers"]
-	    [#assign s = variable.valueList]
-	    [#assign index = 0]
+      [#if variable.name == "Timers"]
+        [#assign s = variable.valueList]
+        [#assign index = 0]
         [#list s as i]
           [#if index == 1]
             [#assign timerCallback = i]
@@ -82,9 +82,9 @@
         }
         #n
         [/#if]
+       [/#if]   
       [/#if]   
-      [/#if]   
-	[/#list]
+    [/#list]
 	
   [/#if]
 [/#list]

@@ -1,4 +1,5 @@
 [#ftl]
+[#assign cmp0 =1]
 [#-- macro generateConfigModelCode --]
 
 [#macro generateConfigModelCode configModel inst nTab index]
@@ -17,6 +18,7 @@
 [#if writeConfigComments]
     [#if configModel.comments??] 
         [#if nTab == 2]#t[/#if][#if nTab == 2]#t/**${configModel.comments?replace("#t","#t#t")} #n#t#t*/[#else]#t/**${configModel.comments?replace("#t","#t")} #n#t*/[/#if]
+
     [/#if]
 [/#if]
     [#list methodList as method][#assign args = ""]	      
@@ -382,8 +384,7 @@
 [#macro generateConfigModelListCode configModel inst nTab index]
 [#assign listofDeclaration = ""]
 [#assign listofCalledMethod = ""]
-[#assign bz36245=false]
-[#assign bz36245_BKPSet=false]
+
 [#list configModel.configs as config]
 [#assign bz36245=false]
 [#if config.methods??] [#-- if the pin configuration contains a list of LibMethods--]
@@ -410,7 +411,7 @@
                     [#list method.name?split("/") as n]
                         [#assign tplName = n]
                     [/#list]
-                    [@optinclude name=sourceDir+"Src/${tplName?replace('ftl','tmp')}" /] 
+                    [@optinclude name=mxTmpFolder+"/${tplName?replace('ftl','tmp')}" /] 
                 [/#if]
             [/#if]
             [#if method.status=="OK" && method.type != "Template" && method.type != "HardCode"]
@@ -458,6 +459,8 @@
                                         [#list argument?keys as k]
                                             [#if k == "name"]
                                                 [#if argument[k] == "Rank"]
+
+
                                                     [#assign argValue="ADC_REGULAR_RANK_"+argument.value]
                                                 [#elseif argument[k] == "InjectedRank"]
                                                     [#assign argValue="ADC_INJECTED_RANK_"+argument.value]
@@ -518,7 +521,7 @@
                                                             [#if index1 == fargument.argument?size]
                                                                 #n
                                                             [/#if]
-                                                            [#if configModel.ipName=="RTC" && config.name=="RTC_Init_Only" && Line!="STM32F0x0 Value Line"]
+                                                            [#if configModel.ipName=="RTC" && config.name=="RTC_Init_Only"]
                                                                 [#list configModel.configs as bz36245config]
                                                                     [#if bz36245config.name=="RTC_Init"]
                                                                         [#assign bz36245=true]
@@ -526,12 +529,10 @@
                                                                 [/#list]
                                                             [/#if]
                                                             [#if bz36245]
-                                                                [#if FamilyName=="STM32F1"]
-                                                                    #tif(HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR1) != 0x32F2){
-                                                                [#else]
-                                                                    if(HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR0) != 0x32F2){
-                                                                [/#if]
-                                                                [#assign bz36245_BKPSet=true]
+                                                              
+
+
+
                                                             [/#if]
                                                    [/#if]
                                                 [/#if]
@@ -540,10 +541,17 @@
                                                    [#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"]//${fargument.name}${instanceIndex}[#else]${fargument.name}[/#if].${argument.name} = ${argument.value};                                        
                                               [/#if]
                                               [#if argument.value?? && argument.value!="__NULL"]
+
+
+
+
+
+
                                                    [#if argument.value!="N/A"][#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"]${fargument.name}${instanceIndex}[#else]${fargument.name}[/#if].${argument.name} = ${argument.value};  [/#if]
- [#if index1 == fargument.argument?size]
+                                                  [#if index1 == fargument.argument?size]
                                                                 #n
                                                             [/#if]
+
                                               [/#if]                                    
                                           [/#if][#-- if argument=Instance--]                                
                                       [/#if]    
@@ -661,10 +669,13 @@
                                 [/#if][#-- if argument.mandatory --]
 [/#list]
 [/#if]
+
 [#assign index2=index2 + 1]
                             [/#list]
                             [/#if]
 [#assign index1 =index1 + 1]
+
+
                         [/#list][#-- list  fargument.argument as argument--]
                         [/#if]
                     [#else][#-- if fargument a simple type struct --]
@@ -703,6 +714,7 @@
                     #t/* USER CODE END MACADDRESS */
                     #n
                 [/#if]
+
 [#--[#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n--]
         [#if method.returnHAL=="false"]
             [#-- Check if Method is already called (listofCalledMethod)--]
@@ -712,6 +724,11 @@
                 [#if method.optimizale??&&method.optimizale==true]
                 [#assign listofCalledMethod = listofCalledMethod + ", "+ methodName]
                 [/#if]
+            [#if bz36245]
+
+             }
+
+               [/#if]
             [/#if]
         [#else]
             [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
@@ -721,10 +738,38 @@
                 [#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}(${args}) != [#if method.returnHAL == "true"]HAL_OK[#else]${method.returnHAL}[/#if])
                 [#if nTab==2]#t#t[#else]#t[/#if]{
                 [#if nTab==2]#t#t[#else]#t[/#if]#t_Error_Handler(__FILE__, __LINE__);
+
+				[#if inst=="RTC"]
+                [#assign cmp0 = cmp0 +1]
+                [/#if]
+
                 [#if nTab==2]#t#t[#else]#t[/#if]}
                 [#if method.optimizale??&&method.optimizale==true]
                 [#assign listofCalledMethod = listofCalledMethod + ", "+ methodName]
                 [/#if]
+
+
+           [#if inst=="RTC"]
+
+
+ #t/* USER CODE BEGIN RTC_Init ${cmp0  } */
+#n
+ #t/* USER CODE END RTC_Init ${cmp0 } */
+           [/#if]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             [/#if]
         [/#if]#n
 [/#if]
@@ -819,16 +864,8 @@
 [#-- assign instanceIndex = "" --]
  [#-- else there is no LibMethod to call--]
 [/#list]
-[#if bz36245_BKPSet]
-    [#if FamilyName=="STM32F1"]
-            #t#tHAL_RTCEx_BKUPWrite(&hrtc,RTC_BKP_DR1,0x32F2);
-        #t}
-    [#else]
-            #t#tHAL_RTCEx_BKUPWrite(&hrtc,RTC_BKP_DR0,0x32F2);
-        #t}
-    [/#if]
-[#else]
-[/#if]
+
+
 
 [/#macro]
 [#-- End macro generateConfigModelListCode --]
@@ -1274,6 +1311,7 @@ ${bufferType} ${bufferName}[${bufferSize}];
 [#if CLmethod??]
 [#--assign CLmethod = argumentRef.refMethod--]
         [#if CLmethod.status=="OK"]
+
                 [#if CLmethod.arguments??]
                     [#list CLmethod.arguments as fargument][#compress]
                     [#if fargument.addressOf] [#local adr = "&"][#else ][#local adr = ""][/#if][/#compress] 
@@ -1491,6 +1529,7 @@ ${bufferType} ${bufferName}[${bufferSize}];
                         [#if fargument.status=="OK" && fargument.value?? && fargument.value!="__NULL"]
                             [#if name??][#local argIndex = instRef?replace(name,"")]  [/#if]
                                             [#if argIndex??] 
+
                                                 [#local argValue=fargument.value?replace("$Index",argIndex)]
                                                 [#if fargument.returnValue!="true"]
                                                     [#local arg = "" + adr + argValue]
@@ -1498,6 +1537,7 @@ ${bufferType} ${bufferName}[${bufferSize}];
                                             [#else]
                                                 [#if fargument.returnValue!="true"]
                                                     [#local arg = "" + adr + fargument.value]                                                
+
                                                 [/#if]
                                             [/#if]    
 [#else] [#if fargument.status=="NULL"][#local arg = "" + adr + "NULL"] [/#if]                    
@@ -1786,6 +1826,8 @@ ${bufferType} ${bufferName}[${bufferSize}];
 #t#tHAL_NVIC_EnableIRQ(${initVector.vector});
                     [#else]
                         [#if FamilyName=="STM32L0" || FamilyName=="STM32F0"]
+
+
 #tNVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority});
                         [#else]
 #tNVIC_SetPriority(${initVector.vector}, NVIC_EncodePriority(NVIC_GetPriorityGrouping(),${initVector.preemptionPriority}, ${initVector.subPriority}));

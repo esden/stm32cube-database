@@ -6,7 +6,7 @@
   ******************************************************************************
   *  FatFs - Generic FAT file system module  R0.12c (C)ChaN, 2017
   ******************************************************************************
-[@common.optinclude name=sourceDir+"Src/license.tmp"/][#--include License text --]
+[@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
 

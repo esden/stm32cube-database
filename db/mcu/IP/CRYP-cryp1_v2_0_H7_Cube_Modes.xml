@@ -8,7 +8,7 @@
     Name="CRYP"
     Version="cryp1_v2_0_H7_Cube">
 
-    <RefParameter Name="Algorithm" Comment="Data encryption algorithm" DefaultValue="TDESECB" Type="list" Group="Algorithm">
+    <RefParameter Name="Algorithm" Comment="Data encryption algorithm" DefaultValue="CRYP_TDES_ECB" Type="list" Group="Algorithm">
         <Description>AES/TDES Data encryption types list</Description>
         <PossibleValue Value="CRYP_TDES_ECB" Comment="TDES ECB" Semaphore="Semaphore_CRYP_Coding_TDESECB"/>
         <PossibleValue Value="CRYP_TDES_CBC" Comment="TDES CBC" Semaphore="Semaphore_CRYP_Coding_TDESCBC"/>
@@ -74,11 +74,11 @@
 
     <RefParameter Name="Header" Comment="Header" Group="Parameters" Type="Array" Separator=" " ArraySize="1" ArrayTypeElement="uint32_t;16" DefaultValue="00000000" Visible="false">
         <Condition Diagnostic="" Expression="Semaphore_CRYP_Coding_AESGCM"/>
-        <Description>The header (also known as additional authentication data) is used in GCM and CCM modes as first part of the message and precede the payload</Description>
+        <Description>The header also known as Additional Authentication Data is used for authentication</Description>
     </RefParameter>
-    <RefParameter Name="Header" Comment="B1" Group="Parameters" Type="Array" Separator=" " ArraySize="4" ArrayTypeElement="uint32_t;16" DefaultValue="00000000 00000000 00000000 00000000">
+    <RefParameter Name="Header" Comment="Header(B1)" Group="Parameters" Type="Array" Separator=" " ArraySize="4" ArrayTypeElement="uint32_t;16" DefaultValue="00000000 00000000 00000000 00000000">
         <Condition Diagnostic="" Expression="Semaphore_CRYP_Coding_AESCCM"/>
-        <Description>B1 is the first message block of 16-bytes blocks(B) associated to the Associated Data (A), part of CBC-MAC mode Counter</Description>
+        <Description>The header, also named B1 is used for authentication and composed of the associated data length and Associated Data.</Description>
     </RefParameter>
     <RefParameter Name="Header" Comment="Header" Group="Parameters" Type="list" DefaultValue="null" Visible="false">
         <Description>Not used.</Description>
@@ -86,7 +86,7 @@
 
     <RefParameter Name="HeaderInput" Comment="Header" Group="Parameters" Type="StringRW"  DefaultValue="0">
         <Condition Diagnostic="" Expression="Semaphore_CRYP_Coding_AESGCM"/>    
-        <Description>The header (also known as additional authentication data) is used in GCM and CCM modes as first part of the message and precede the payload</Description>
+        <Description>The header, also known as Additional Authentication Data in GCM mode is used as first part of the message just after the Initial Counter Block (ICB), and precede the plain text message.&lt;br&gt; Input format: hexadecimal (ex: 0123456789abcdef)</Description>
     </RefParameter>
     <RefParameter Name="HeaderInput" Comment="Header input" Group="Parameters" Type="list" DefaultValue="null" Visible="false">
         <Description>Not used.</Description>
@@ -112,6 +112,12 @@
         <Description>Not used</Description>
     </RefParameter>
     
+<!--    <RefParameter Comment="Data width unit" DefaultValue="" Name="DataWidthUnit" Type="List" Group="Parameters">
+        <Description> Data With Unit.By default, size unit is word</Description>
+        <PossibleValue Comment="Word" Value="CRYP_DATAWIDTHUNIT_WORD"/>
+        <PossibleValue Comment="Byte" Value="CRYP_DATAWIDTHUNIT_BYTE"/>
+    </RefParameter>
+-->    
     <RefMode Name="CRYP_Activate" HalMode ="CRYP">
         <ConfigForMode>CRYP_Init</ConfigForMode>
         <Parameter Name="Algorithm"/>
@@ -119,10 +125,11 @@
         <Parameter Name="KeySize"/>
         <Parameter Name="pKey"/>
         <Parameter Name="pInitVect"/>
+        <Parameter Name="HeaderSize"/>
         <Parameter Name="HeaderInput"/>
         <Parameter Name="Header"/>
-        <Parameter Name="HeaderSize"/>
         <Parameter Name="B0"/>
+<!--        <Parameter Name="DataWidthUnit"/> -->
     </RefMode>
 
     <ModeLogicOperator Name="OR">

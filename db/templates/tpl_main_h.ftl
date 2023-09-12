@@ -17,7 +17,7 @@
   * @brief          : Header for main.c file.
   *                   This file contains the common defines of the application.
   ******************************************************************************
-[@common.optinclude name=sourceDir+"Src/license.tmp"/][#--include License text --]
+[@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
 
@@ -90,9 +90,12 @@
 #n
 
 [#compress]
-[#if GRAPHICS??]
-    [#if USE_OTM??]
+[#if GRAPHICS?? ]
+    [#if USE_OTM?? && FamilyName!="STM32L4"]
         #include "otm8009a.h"
+    [/#if]
+    [#if USE_MFX?? && FamilyName=="STM32L4"]
+        #include "mfxstm32l152.h"
     [/#if]
     #include "${FamilyName?lower_case}xx_hal.h"
     [#if USE_STemWin_STACK??]
@@ -105,7 +108,7 @@
             #include "WM.h"
         [/#if]
         #include "GUI_App.h"
-        #include "STemWin_wrapper.h"
+        #include "STemwin_wrapper.h"
     [/#if]
     [#if USE_Embedded_Wizard_STACK??]
         #include "xprintf.h"

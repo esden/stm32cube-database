@@ -46,10 +46,6 @@
   */
 #include "HW_Init.h"
 
-/** @addtogroup HARDWARE CONFIGURATION
-* @{
-*/
-
 /** @defgroup HARDWARE CONFIGURATION_Private_Variables
 * @{
 */ 
@@ -65,25 +61,22 @@ extern ${variable.value} ${variable.name};
     [#list SWIP.defines as definition]	
 	[#-- IF to take care of the specific formatting of each argument of this file  --]
         [#if definition.name = "HSRAM" ]
-[@common.optinclude name=coreDir+"Src/fmc_vars.tmp"/] 
+[@common.optinclude name=mxTmpFolder+"/fmc_vars.tmp"/] 
         [/#if]
     [/#list]
 [/#if]
 [/#list]
-/**
-* @}
-*/
 
 /**
   * @brief  Initializes LCD IO.
   */ 
 void MX_FMC_Init(void) 
 {  
- [@common.optinclude name=coreDir+"Src/fmc_HalInit.tmp"/] 
+ [@common.optinclude name=mxTmpFolder+"/fmc_HalInit.tmp"/] 
 }
 
 /*  MSPInit/deInit Implementation */
-[@common.optinclude name=coreDir+"Src/fmc_MSP.tmp"/] 
+[@common.optinclude name=mxTmpFolder+"/fmc_MSP.tmp"/] 
 
 /**
 * @}

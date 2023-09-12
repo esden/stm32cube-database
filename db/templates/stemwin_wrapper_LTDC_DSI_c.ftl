@@ -144,7 +144,7 @@ extern ${variable.value} ${variable.name};
 [/#list]
 
 /* Includes ------------------------------------------------------------------*/
-#include "STemWin_wrapper.h"
+#include "STemwin_wrapper.h"
 #include "GUI_Private.h"
 #include "WM.h"
 
@@ -183,7 +183,7 @@ extern ${variable.value} ${variable.name};
 
 #define LCD_LAYER0_FRAME_BUFFER        ((uint32_t)${Frame_Buffer_StartAddress_Layer0_DPI_DSI}) /* LTDC Layer 0 frame buffer */
 [#if layers?? &&  layers== "1" ]
-#define LCD_LAYER1_FRAME_BUFFER        ((uint32_t)${Frame_Buffer_StartAddress_Layer1_DPI_DSI}) /* LTDC Layer 0 frame buffer */
+#define LCD_LAYER1_FRAME_BUFFER        ((uint32_t)${Frame_Buffer_StartAddress_Layer1_DPI_DSI}) /* LTDC Layer 1 frame buffer */
 [/#if]
 
 
@@ -282,6 +282,7 @@ void            DSI_IRQHandler(void);
 [#if  OTM== "1" ]
 void            LCD_SetUpdateRegion(int idx);
 [#else]
+
 /* USER CODE BEGIN LCD_UpdateRegion */
 // void         LCD_SetUpdateRegion(int idx); 
 /* USER CODE END LCD_UpdateRegion */
@@ -316,10 +317,10 @@ DEFINE_DMA2D_COLORCONVERSION(M4444I, LTDC_PIXEL_FORMAT_ARGB4444)
 
 
 [#assign objectConstructor = "freemarker.template.utility.ObjectConstructor"?new()]
-[#assign file = objectConstructor("java.io.File",workspace+"/"+"STemWin/hw_init_LCD_Reset_tmp.c")]
+[#assign file = objectConstructor("java.io.File",workspace+"/"+"STemWin/Target/hw_init_LCD_Reset_tmp.c")]
   [#assign exist = file.exists()]
   [#if exist]
- [@common.optinclude name="STemWin/hw_init_LCD_Reset_tmp.c"/] 
+ [@common.optinclude name="STemWin/Target/hw_init_LCD_Reset_tmp.c"/] 
   [#else]
 
 
@@ -1326,7 +1327,7 @@ void GRAPHICS_HW_Init(void)
   MX_FMC_Init(); 
   MX_SDRAM_InitEx();
 [#assign objectConstructor = "freemarker.template.utility.ObjectConstructor"?new()]
-[#assign file = objectConstructor("java.io.File",workspace+"/"+"STemWin/hw_init_LCD_Reset_tmp.c")]
+[#assign file = objectConstructor("java.io.File",workspace+"/"+"STemWin/Target/hw_init_LCD_Reset_tmp.c")]
   [#assign exist = file.exists()]
   [#if exist]
   LCD_LL_Reset();

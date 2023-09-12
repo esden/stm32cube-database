@@ -51,7 +51,7 @@
   */
 
 #define HAL_MODULE_ENABLED  
-  [#assign allModules = ["ADC", "AES","COMP","CRC","CRYP","DAC", "FIREWALL", "I2S","IWDG","LCD","LPTIM","RNG","RTC","SPI","TIM", "TSC","UART","USART","IRDA","SMARTCARD","SMBUS","WWDG", "PCD"]]
+  [#assign allModules = ["ADC", "AES","COMP","CRC","CRYP","DAC", "FIREWALL", "I2S","IWDG","LCD","LPTIM","RNG","RTC","SPI","TIM", "TSC","UART","USART","IRDA","SMARTCARD","SMBUS","WWDG", "PCD","EXTI"]]
   [#list allModules as module]
 	[#if isModuleUsed(module)]
 [#compress]#define HAL_${module?replace("AES","CRYP")}_MODULE_ENABLED[/#compress]
@@ -171,6 +171,10 @@
 #ifdef HAL_RCC_MODULE_ENABLED
   #include "stm32l0xx_hal_rcc.h"
 #endif /* HAL_RCC_MODULE_ENABLED */
+
+#ifdef HAL_EXTI_MODULE_ENABLED
+  #include "stm32l0xx_hal_exti.h"
+#endif /* HAL_EXTI_MODULE_ENABLED */
 
 #ifdef HAL_GPIO_MODULE_ENABLED
   #include "stm32l0xx_hal_gpio.h"

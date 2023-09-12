@@ -5,7 +5,7 @@
 [#--  * @packageVersion : ${fwVersion} --]
   * @brief          : Header for usbd_ccid_if.c file.
   ******************************************************************************
-[@common.optinclude name=sourceDir+"Src/license.tmp"/][#--include License text --]
+[@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
 

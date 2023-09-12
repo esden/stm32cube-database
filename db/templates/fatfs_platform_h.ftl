@@ -4,7 +4,7 @@
   * @file           : fatfs_platform.h
   * @brief          : fatfs_platform header file
   ******************************************************************************
-[@common.optinclude name=sourceDir+"Src/license.tmp"/][#--include License text --]
+[@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
 */
 /* Includes ------------------------------------------------------------------*/

@@ -45,7 +45,7 @@
   */
 
 #include "GUIDRV_FlexColor.h"
-#include "STemWin_wrapper.h"
+#include "STemwin_wrapper.h"
 
 /*********************************************************************
 *

@@ -78,7 +78,7 @@ extern ${variable.value} ${variable.name};
 *    Multi tasking support
 */
        
- #define GUI_OS         #t#t (${definition.value})       // Compile with multitasking support
+ #define GUI_OS           #t#t (${definition.value})       // Compile with multitasking support
 
 
 

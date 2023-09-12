@@ -4,7 +4,7 @@
   * @file    bsp_driver_sram.c (based on stm32h743i_eval_sram.c)
   * @brief   This file includes a generic SRAM driver.
   ******************************************************************************
-[@common.optinclude name=sourceDir+"Src/license.tmp"/][#--include License text --]
+[@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
 

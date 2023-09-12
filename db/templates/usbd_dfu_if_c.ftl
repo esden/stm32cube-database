@@ -4,7 +4,7 @@
   * @file           : usbd_dfu_if.c
   * @brief          : Usb device for Download Firmware Update.
   ******************************************************************************
-[@common.optinclude name=sourceDir+"Src/license.tmp"/][#--include License text --]
+[@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
 

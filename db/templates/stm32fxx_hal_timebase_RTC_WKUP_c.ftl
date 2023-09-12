@@ -4,7 +4,7 @@
   * @file    ${FamilyName?lower_case}_hal_timebase_RTC_WKUP.c 
   * @brief   HAL time base based on the hardware RTC_WKUP.
   ******************************************************************************
-[@common.optinclude name=sourceDir+"Src/license.tmp"/][#--include License text --]
+[@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
 

@@ -5,7 +5,7 @@
   * Description        : User configuration file for TOUCHSENSING
   *                      middleWare.
   ******************************************************************************
-[@common.optinclude name=sourceDir+"Src/license.tmp"/][#--include License text --]
+[@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
  [#assign channelnbr = 0]
@@ -1388,7 +1388,7 @@ CONST TSL_Object_T MyObjects[TSLPRM_TOTAL_OBJECTS] =
 [#-- ************************************************************************************************** --]
 [#-- list of objects  1 per key, 1 per linear/rot --]
 [#-- if touchkey --]
-  { TSL_OBJ_TOUCHKEY, (TSL_TouchKeyB_T *)&MyTKeysB[${i}] }[#if i!=(total_channels_nb-1)],[/#if]
+  { TSL_OBJ_TOUCHKEYB, (TSL_TouchKeyB_T *)&MyTKeysB[${i}] }[#if i!=(total_channels_nb-1)],[/#if]
     [/#list]
 [/#if]
 [#if total_linrots_nb != 0]
@@ -1402,7 +1402,7 @@ CONST TSL_Object_T MyObjects[TSLPRM_TOTAL_OBJECTS] =
 [#if total_linrots_b_nb != 0]
     [#list 0..(total_linrots_b_nb -1) as i]
 [#-- if linrot --]
-  { TSL_OBJ_LINEAR, (TSL_LinRotB_T *)&MyLinRotsB[${i}] }[#if index1!=(total_objects_nb-1)],[/#if]
+  { TSL_OBJ_LINEARB, (TSL_LinRotB_T *)&MyLinRotsB[${i}] }[#if index1!=(total_objects_nb-1)],[/#if]
 [#-- ************************************************************************************************** --]
         [#assign index1 = index1 +1]
     [/#list]
@@ -1521,8 +1521,8 @@ tsl_user_status_t tsl_user_Exec(void)
     /* DxS processing (if TSLPRM_USE_DXS option is set) */
     TSL_dxs_FirstObj(&MyObjGroup);
     
-    /* ECS every 100ms */
-    if (TSL_tim_CheckDelay_ms(100, &ECSLastTick) == TSL_STATUS_OK)
+    /* ECS every TSLPRM_ECS_DELAY (in ms) */
+    if (TSL_tim_CheckDelay_ms(TSLPRM_ECS_DELAY, &ECSLastTick) == TSL_STATUS_OK)
     {
       if (TSL_ecs_Process(&MyObjGroup) == TSL_STATUS_OK)
       {

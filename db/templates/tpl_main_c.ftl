@@ -11,7 +11,7 @@
   * @file           : main.c
   * @brief          : Main program body
   ******************************************************************************
-[@common.optinclude name=coreDir+"Src/license.tmp"/][#--include License text --]
+[@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
 [#assign staticVoids =""]
@@ -26,11 +26,11 @@
 #include "string.h"
 [/#if]
 [#-- IF GFXMMU is used and all is generated in the main and the Lut is configured--]
-[#if GFXMMUisUsed?? && HALCompliant??]
+[#if GFXMMUisUsed?? && HALCompliant?? && !Display_Interface_LTDC_DSIHOST?? ]
 [@common.optincludeFile path=coreDir+"Inc" name="gfxmmu_lut.h"/]
 [/#if]
 [#-- move includes to main.h --]
-[@common.optinclude name=coreDir+"Src/rtos_inc.tmp"/][#--include freertos includes --]
+[@common.optinclude name=mxTmpFolder+"/rtos_inc.tmp"/][#--include freertos includes --]
 [#-- if !HALCompliant??--][#-- if HALCompliant Begin --]
 [#assign LWIPUSed = "false"]
 [#assign MBEDTLSUSed = "false"]
@@ -136,25 +136,25 @@ ${dHandle};
     [#compress]
     [#-- BDMA global variables --]
     [#-- ADD BDMA Code Begin--]
-    [@common.optinclude name=coreDir+"Src/bdma_GV.tmp"/]
+    [@common.optinclude name=mxTmpFolder+"/bdma_GV.tmp"/]
     [#-- ADD BDMA Code End--]
     [#-- DMA global variables --]
     [#-- ADD DMA Code Begin--]
-    [@common.optinclude name=coreDir+"Src/dma_GV.tmp"/]
+    [@common.optinclude name=mxTmpFolder+"/dma_GV.tmp"/]
     [#-- ADD DMA Code End--]
     [#-- ADD MDMA Code Begin--]
-    [@common.optinclude name=coreDir+"Src/mdma_GV.tmp"/]
+    [@common.optinclude name=mxTmpFolder+"/mdma_GV.tmp"/]
     [#-- ADD MDMA Code End--]
     [#-- FMCGlobal variables --]
     [#-- Add FMC Code Begin--]
-    [@common.optinclude name=coreDir+"Src/mx_fmc_GV.tmp"/]
+    [@common.optinclude name=mxTmpFolder+"/mx_fmc_GV.tmp"/]
     [#--ADD FMC Code End--]
     [#-- Add FSMC Code Begin--]
-    [@common.optinclude name=coreDir+"Src/mx_fsmc_GV.tmp"/]
+    [@common.optinclude name=mxTmpFolder+"/mx_fsmc_GV.tmp"/]
     [#--ADD FSMC Code End--] 
     [#-- RTOS variables --]
     [#-- ADD RTOS Code Begin--]
-    [@common.optinclude name=coreDir+"Src/rtos_vars.tmp"/]   
+    [@common.optinclude name=mxTmpFolder+"/rtos_vars.tmp"/]   
     [#-- ADD RTOS Code End--]
     [/#compress]
 [/#if][#-- if HALCompliant End --]
@@ -218,7 +218,7 @@ static void MPU_Config(void);
             [/#if]
         [/#if]
     [/#list]
- [@common.optinclude name=coreDir+"Src/rtos_pfp.tmp"/]
+ [@common.optinclude name=mxTmpFolder+"/rtos_pfp.tmp"/]
 [#else]
     [#list voids as void]
         [#if void.isNotGenerated?? && !void.isNotGenerated&&void.functionName?contains("GRAPHICS")]
@@ -360,13 +360,13 @@ int main(void)
 #tGRAPHICS_Init();#n      
       [/#if]
   [#if HALCompliant??]
-  [@common.optinclude name=coreDir+"Src/rtos_HalInit.tmp"/] [#-- include generated tmp file22 Augst 2014 --]
+  [@common.optinclude name=mxTmpFolder+"/rtos_HalInit.tmp"/] [#-- include generated tmp file22 Augst 2014 --]
   [#else]
   /* Call init function for freertos objects (in freertos.c) */
   MX_FREERTOS_Init();
   [/#if]
 
-  [@common.optinclude name=coreDir+"Src/rtos_start.tmp"/] [#-- include generated tmp file 13 Nov 2014 --] 
+  [@common.optinclude name=mxTmpFolder+"/rtos_start.tmp"/] [#-- include generated tmp file 13 Nov 2014 --] 
   /* We should never get here as control is now taken by the scheduler */
 [/#if]
 
@@ -418,7 +418,7 @@ int main(void)
     [#if clockConfig??]
 static void LL_Init(void)
 {
-#t[@common.optinclude name=coreDir+"Src/system.tmp"/] [#-- if LL include system.tmp --]
+#t[@common.optinclude name=mxTmpFolder+"/system.tmp"/] [#-- if LL include system.tmp --]
 }
     [/#if]
 [/#if]
@@ -560,14 +560,21 @@ static void MX_NVIC_Init(void)
 [#compress]
 [#list IP.configModelList as instanceData]
 [#assign ipName = instanceData.ipName]
-[#if instanceData.isMWUsed=="false" && !ipName?contains("CORTEX") ]
+[#if instanceData.isMWUsed=="false" && instanceData.isBusDriverUSed=="false" && !ipName?contains("CORTEX") ]
      [#assign instName = instanceData.instanceName]
 
         [#assign halMode= instanceData.halMode]
         /* ${instName} init function */ 
        
             [#if halMode!=ipName&&!ipName?contains("TIM")&&!ipName?contains("CEC")][#if staticVoids?contains('MX_${instName}_${halMode}_Init')]static[/#if] void MX_${instName}_${halMode}_Init(void)[#else][#if staticVoids?contains('MX_${instName}_Init')]static[/#if] void MX_${instName}_Init(void)[/#if]
-            {       
+            {     
+  #n
+        [#if ipName=="RTC"]
+
+ #t/* USER CODE BEGIN RTC_Init 0 */
+#n
+ #t/* USER CODE END RTC_Init 0 */
+        [/#if]
 #n
         [#-- assign ipInstanceIndex = instName?replace(name,"")--]
         [#assign args = ""]
@@ -576,6 +583,12 @@ static void MX_NVIC_Init(void)
  	[#--list instanceData.configs as config--]
             [@common.getLocalVariableList instanceData=instanceData/]            
         [#--/#list--]#n
+[#if ipName=="RTC"]
+ #t/* USER CODE BEGIN RTC_Init 1 */
+#n
+ #t/* USER CODE END RTC_Init 1 */
+ [/#if]
+#n
         [#--list instanceData.configs as config--]
 [#--debug instance name = ${instName}--]
 [#if instanceData.usedDriver?? && instanceData.usedDriver!="HAL"][#--Check if LL driver is used. instanceData:ConfigModel --]
@@ -613,7 +626,7 @@ static void MX_NVIC_Init(void)
 [#if instanceData.instIndex??][@common.generateConfigModelListCode configModel=instanceData inst=instName  nTab=1 index=instanceData.instIndex/][#else][@common.generateConfigModelListCode configModel=instanceData inst=instName  nTab=1 index=""/][/#if]
 
 [#list ips as ip]
-[#if ip?contains("PDM2PCM")]
+[#if ip?contains("PDM2PCM") && instName?contains("CRC")]
 #t__HAL_CRC_DR_RESET(&h${instName?lower_case});
 [/#if]
 [/#list]
@@ -642,15 +655,15 @@ static void MX_NVIC_Init(void)
 [/#list][/#if]
 [/#list]
 
-[@common.optinclude name=coreDir+"Src/bdma.tmp"/][#-- ADD BDMA Code--]
-[@common.optinclude name=coreDir+"Src/dma.tmp"/][#-- ADD DMA Code--]
-[@common.optinclude name=coreDir+"Src/mdma.tmp"/][#-- ADD MDMA Code--]
-[@common.optinclude name=coreDir+"Src/mx_fmc_HC.tmp"/][#-- FMC Init --]
-[@common.optinclude name=coreDir+"Src/gpio.tmp"/][#-- ADD GPIO Code--]
+[@common.optinclude name=mxTmpFolder+"/bdma.tmp"/][#-- ADD BDMA Code--]
+[@common.optinclude name=mxTmpFolder+"/dma.tmp"/][#-- ADD DMA Code--]
+[@common.optinclude name=mxTmpFolder+"/mdma.tmp"/][#-- ADD MDMA Code--]
+[@common.optinclude name=mxTmpFolder+"/mx_fmc_HC.tmp"/][#-- FMC Init --]
+[@common.optinclude name=mxTmpFolder+"/gpio.tmp"/][#-- ADD GPIO Code--]
 [/#if] [#-- if HALCompliant End --]
 #n
 [#-- FSMC Init --]
-[@common.optinclude name=coreDir+"Src/mx_fsmc_HC.tmp"/]
+[@common.optinclude name=mxTmpFolder+"/mx_fsmc_HC.tmp"/]
 #n
 /* USER CODE BEGIN 4 */
 
@@ -658,13 +671,13 @@ static void MX_NVIC_Init(void)
 #n
 
 [#if HALCompliant??] [#-- If FreeRtos is used --]
-[@common.optinclude name=coreDir+"Src/rtos_threads.tmp"/]
-[@common.optinclude name=coreDir+"Src/rtos_user_threads.tmp"/] 
+[@common.optinclude name=mxTmpFolder+"/rtos_threads.tmp"/]
+[@common.optinclude name=mxTmpFolder+"/rtos_user_threads.tmp"/] 
 [/#if] [#-- If FreeRtos is used --]
 
 [#if mpuControl??] [#-- if MPU config is enabled --]
 /* MPU Configuration */
-[@common.optinclude name=coreDir+"Src/cortex.tmp"/]
+[@common.optinclude name=mxTmpFolder+"/cortex.tmp"/]
 [/#if]
 [#-- For Tim timebase --]
 [#if timeBaseSource?? && timeBaseSource.contains("TIM")]

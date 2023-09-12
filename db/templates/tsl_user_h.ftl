@@ -4,7 +4,7 @@
   * File Name          : ${name}.h
   * Description        : Touch-Sensing user configuration.
   ******************************************************************************
-[@common.optinclude name=sourceDir+"Src/license.tmp"/][#--include License text --]
+[@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
 */
 /* Define to prevent recursive inclusion -------------------------------------*/
@@ -38,7 +38,6 @@ typedef enum
   TSL_USER_STATUS_OK_ECS_ON  = 2, /**< The bank acquisition is ok, ECS finished */
   TSL_USER_STATUS_OK_ECS_OFF = 3  /**< The bank acquisition is ok, ECS not executed */
 } tsl_user_status_t;
-
 
 [#-- ************************************************************** --]
 [#-- list of channels IOs --]
@@ -106,6 +105,9 @@ typedef enum
 [#list SWIPdatas as SWIP]
     [#if SWIP.defines??]
         [#list SWIP.defines as define]
+            [#if define.name == "TSC_SHIELDIOs"]
+                [#assign shield_io = define.value]
+            [/#if]
             [#assign bankNb = 0]
             [#assign i = 0]
             [#assign j = 0]
@@ -156,7 +158,11 @@ typedef enum
                             [/#list]
                             [#assign counter = nbrofbankitemnbr + 1]
                             [#assign bankNbInt = bankNbInt + 1]
-                            [#assign ChannelsIOMSK = ChannelsIOMSK + ")"]
+                            [#if shield_io?contains("+TSC:ShieldIOs")]
+                                [#assign ChannelsIOMSK = ChannelsIOMSK + ")"]
+                            [#else]
+                                [#assign ChannelsIOMSK = ChannelsIOMSK + " | SHIELD_IO_MSK)"]
+                            [/#if]
                             [#assign ChannelsGRPMSK = ChannelsGRPMSK + ")"]
                             [#lt]${ChannelsIOMSK}
                             [#lt]${ChannelsGRPMSK}

@@ -24,16 +24,16 @@
   ******************************************************************************
 [#if use_dma = 1]
  [#if use_rtos = 1]
-  * @file    sd_diskio.c (based on sd_diskio_dma_rtos_template.c v2.0.2)
+  * @file    sd_diskio.c (based on sd_diskio_dma_rtos_template.c v2.0.2 as FreeRTOS is enabled)
  [#else]
-  * @file    sd_diskio.c (based on sd_diskio_dma_template.c v2.0.2)
+  * @file    sd_diskio.c (based on sd_diskio_dma_template.c v2.0.2 as "Use dma template" is enabled)
  [/#if]
 [#else]
-  * @file    sd_diskio.c (based on sd_diskio_template.c v2.0.2)
+  * @file    sd_diskio.c (based on sd_diskio_template.c v2.0.2 as "Use dma template" is disabled)
 [/#if]
   * @brief   SD Disk I/O driver
   ******************************************************************************
-[@common.optinclude name=sourceDir+"Src/license.tmp"/][#--include License text --]
+[@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */ 
 /* USER CODE BEGIN firstSection */

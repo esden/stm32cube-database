@@ -72,6 +72,7 @@ extern  WM_HWIN CreateWindow(void);
   #n
   #n
 void GRAPHICS_MainTask(void) {
+
 [#if GFXType == "FrameWindow"]
   /* 1- Create a FrameWin using GUIBuilder */
   CreateFramewin();
@@ -79,7 +80,8 @@ void GRAPHICS_MainTask(void) {
 [#if GFXType == "Window"]
   /* 2- Create a Window using GUIBuilder */
   CreateWindow();
-[/#if]  
+[/#if] 
+ 
 /* USER CODE BEGIN GRAPHICS_MainTask */
  /* User can implement his graphic application here */
   /* Hello Word example */

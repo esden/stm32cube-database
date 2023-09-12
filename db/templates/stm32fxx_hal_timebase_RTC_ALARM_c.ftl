@@ -4,7 +4,7 @@
   * @file    ${FamilyName?lower_case}xx_hal_timebase_RTC_ALARM.c 
   * @brief   HAL time base based on the hardware RTC_ALARM.
   ******************************************************************************
-[@common.optinclude name=sourceDir+"Src/license.tmp"/][#--include License text --]
+[@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
 

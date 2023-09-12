@@ -142,7 +142,7 @@ extern ${variable.value} ${variable.name};
 [/#list]
 
 /* Includes ------------------------------------------------------------------*/
-#include "STemWin_wrapper.h"
+#include "STemwin_wrapper.h"
 #include "GUI_Private.h"
 #include "WM.h"
 
@@ -193,10 +193,10 @@ volatile char   TransferInProgress  = 0;
 
 [#if useIli9341?? && useIli9341=="1"]
 [#assign objectConstructor = "freemarker.template.utility.ObjectConstructor"?new()]
-[#assign file = objectConstructor("java.io.File",workspace+"/"+"STemWin/stemWin_Wrapper_STM32F429_tmp.c")]
+[#assign file = objectConstructor("java.io.File",workspace+"/"+"STemWin/Target/stemWin_Wrapper_STM32F429_tmp.c")]
   [#assign exist = file.exists()]
   [#if exist]
- [@common.optinclude name="STemWin/stemWin_Wrapper_STM32F429_tmp.c"/] 
+ [@common.optinclude name="STemWin/Target/stemWin_Wrapper_STM32F429_tmp.c"/] 
   [#else]
 /**
   * @brief  Configures the LCD_SPI interface.

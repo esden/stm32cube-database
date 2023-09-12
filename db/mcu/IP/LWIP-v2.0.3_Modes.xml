@@ -3257,7 +3257,7 @@
         <BspDependency Name="Driver_PHY" Comment="&lt;html&gt;PHY Driver can be set either to Choose or to LAN8742:&lt;br&gt;&lt;b&gt;Choose&lt;/b&gt;:&lt;br&gt;- BSP PHY Driver components provided by ST are not used and up to user to implement&lt;br&gt; his own driver with same architecture and constraints than LAN8742&lt;br&gt; - ST specification will be published soon to explain how user can develop his own&lt;br&gt; BSP driver component.&lt;br&gt;&lt;b&gt;LAN8742&lt;/b&gt;:&lt;br&gt;- LAN8742 BSP PHY Driver component is used and STM32CubeMX copies lan8742.c/.h files&lt;br&gt; from ST Firmware Package to the user's project Drivers/BSP/Components directory.&lt;/ul&gt;&lt;br&gt;&lt;i&gt;Note&lt;/i&gt;: BSP files cannot be updated or they will be overwritten at each project generation.&lt;/html&gt;" BspIpName="" BspModeName="" Api="BSP_COMPONENT_DRIVER" Component="LAN8742"/>
     </RefMode>
     <ModeLogicOperator Name="OR">
-        <Mode Name="Enabled">
+        <Mode Name="Enabled" RemoveCondition="STM32H7">
             <ModeLogicOperator Name="XOR">
                 <Mode Name="Enabled">
                     <SignalLogicalOp Name="AND">
@@ -3267,6 +3267,17 @@
                 </Mode>
             </ModeLogicOperator>
             <Condition Expression="IF(MW_ETH_MW, IF(!S_MBEDTLS | (S_MBEDTLS &amp; S_FREERTOS),1,0),0)" Diagnostic="Active only if: ETH IP configured / FREERTOS is enabled when MBEDTLS is enabled."/>
+        </Mode>
+        <Mode Name="Enabled" RemoveCondition="!STM32H7">
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="Enabled">
+                    <SignalLogicalOp Name="AND">
+                        <Signal IOMode="" Name="VS_Enabled"/>
+                    </SignalLogicalOp>
+                    <Semaphore>S_LWIP</Semaphore>
+                </Mode>
+            </ModeLogicOperator>
+            <Condition Expression="IF(MW_ETH_MW &amp; S_M7_DCACHE_ENABLED, IF(!S_MBEDTLS | (S_MBEDTLS &amp; S_FREERTOS),1,0),0)" Diagnostic="Active only if: ETH IP configured / FREERTOS is enabled when MBEDTLS is enabled.&lt;br&gt;&lt;font color=&quot;red&quot;&gt;For STM32H7, CORTEX_M7 CPU DCache parameter must be Enabled to allow LwIP activation."/>
         </Mode>
     </ModeLogicOperator>
 <RefSignal Name="VS_Enabled" Virtual="true"/>
