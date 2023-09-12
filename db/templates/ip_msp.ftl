@@ -395,12 +395,12 @@
    
 [#if serviceName=="gpio"]
  [#assign instanceIndex =""]
-    [@generateConfigModelCode configModel=gpioService inst=ipName nTab=tabN index="" mode="type"/]
+    [@generateConfigModelCode configModel=gpioService inst=ipName nTab=tabN index="" mode=type/]
 [/#if]
 [#if serviceName=="dma" && dmaService??]
  [#assign instanceIndex =""]
     [#list dmaService as dmaconfig] 
-     [@generateConfigModelCode configModel=dmaconfig inst=ipName  nTab=tabN index="" mode="type"/]
+     [@generateConfigModelCode configModel=dmaconfig inst=ipName  nTab=tabN index="" mode=type/]
         [#assign dmaCurrentRequest = dmaconfig.instanceName?lower_case]
         [#assign prefixList = dmaCurrentRequest?split("_")]
         [#list prefixList as p][#assign prefix= p][/#list]
@@ -582,7 +582,7 @@
                 [/#list]
                 [#assign lowPower = "no"]
                 [#list initService.nvic as initVector]
-                   [#if (instHandler=="pcdHandle") && (initVector.vector?contains("WKUP") || initVector.vector?contains("WakeUp") || ((initVector.vector == "USB_IRQn"||(initVector.vector == "OTG_FS_IRQn")) && USB_INTERRUPT_WAKEUP??))]
+                   [#if (instHandler=="pcdHandle") && (initVector.vector?contains("WKUP") || initVector.vector?contains("WakeUp") || ((initVector.vector == "USB_IRQn"||(initVector.vector == "OTG_FS_IRQn")||(initVector.vector == "USB_LP_IRQn")) && USB_INTERRUPT_WAKEUP??))]
                       [#assign lowPower = "yes"]
                    [/#if]
                 [/#list]
@@ -688,18 +688,27 @@
 [#assign instanceList = entry.value] 
 [#if (instanceList?size==1 && (name==instanceList.get(0)||name=="USB")|| (name=="DSIHOST" && instanceList.get(0)=="DSI")) || instanceList?size>1]
 [#assign mode=entry.key?replace("_MspInit","")?replace("MspInit","")?replace("_BspInit","")?replace("HAL_","")]
-
 [#assign ipHandler = mode?lower_case+ "Handle"]
-
-
 [#-- #nvoid HAL_${mode}_MspInit(${mode}_HandleTypeDef* h${mode?lower_case}){--] 
+[#compress]
 [#if name !="TIM"]
+    [#if (name=="USB" && FamilyName=="STM32WB")]
+#if (USE_HAL_${mode}_REGISTER_CALLBACK == 1U)
+static void ${entry.key}(${mode}_HandleTypeDef* ${mode?lower_case}Handle)
+#else
+void ${entry.key}(${mode}_HandleTypeDef* ${mode?lower_case}Handle)
+#endif /* USE_HAL_${mode}_REGISTER_CALLBACK */
+{
+    [#else]
 #nvoid ${entry.key}(${mode}_HandleTypeDef* ${mode?lower_case}Handle)
 {
+    [/#if]
 [#else]
+
 #nvoid ${entry.key}(${name}_HandleTypeDef* ${mode?lower_case}Handle)
 {
 [/#if]
+[/#compress]
 [#--Check if the Msp init will be empty start--] 
     [#assign mspIsEmpty="yes"] 
     [#list instanceList as inst]
@@ -925,8 +934,17 @@ uint32_t DFSDM_Init = 0;
 [#assign mode=entry.key?replace("_MspDeInit","")?replace("MspDeInit","")?replace("_BspDeInit","")?replace("HAL_","")]
 [#assign ipHandler = mode?lower_case+ "Handle"]
 [#if name !="TIM"]
+    [#if (name=="USB" && FamilyName=="STM32WB")]
+#if (USE_HAL_${mode}_REGISTER_CALLBACK == 1U)
+static void ${entry.key}(${mode}_HandleTypeDef* ${mode?lower_case}Handle)
+#else
+void ${entry.key}(${mode}_HandleTypeDef* ${mode?lower_case}Handle)
+#endif /* USE_HAL_${mode}_REGISTER_CALLBACK */
+{
+    [#else]
 #nvoid ${entry.key}(${mode}_HandleTypeDef* ${mode?lower_case}Handle)
 {
+    [/#if]
 [#else]
 #nvoid ${entry.key}(${name}_HandleTypeDef* ${mode?lower_case}Handle)
 {

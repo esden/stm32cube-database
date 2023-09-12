@@ -126,7 +126,6 @@
 [#if configModel.methods??] [#-- if the pin configuration contains a list of LibMethods--]
     [#assign methodList = configModel.methods]
 [#else] [#assign methodList = configModel.libMethod]
-
 [/#if]
 [#assign writeConfigComments=false]
 [#list methodList as method]
@@ -136,8 +135,9 @@
 [#-- [#if configModel.comments??] #t/**${configModel.comments} #n#t*/[/#if] --]
 [/#if]
 	[#list methodList as method][#assign args = ""]	  
+[#assign handler = ""]
             [#if method.hardCode??] [#-- Hard code --]              
-                ${method.hardCode.text} 
+                ${method.hardCode.text?replace("$IpInstance",inst)} 
             [#else]
                 [#if method.type == "Template"] [#-- Template code --]  
                     [#list method.name?split("/") as n]
@@ -149,6 +149,9 @@
             [#if method.status=="OK" && method.type != "Template" && method.type != "HardCode"]                           		
              	[#if method.arguments??]
                     [#list method.arguments as fargument][#compress]
+[#if inst=="USB"]
+[#assign handler = fargument.name]
+[/#if]
                     [#if fargument.addressOf] [#assign adr = "&"][#else ][#assign adr = ""][/#if][/#compress] 
                     [#if fargument.genericType == "struct"]
                         [#if fargument.context??]
@@ -305,6 +308,21 @@
 				[#assign retval=argument.name]
 			[/#if]
 		    [/#list]
+                    [#-- add Register Callbacks for USB STM32WB Start --]
+                    [#if FamilyName=="STM32WB" && inst == "USB" && handler!=""]                    
+                    [#if handler?contains("pcd")]
+                    [#assign USBmodule = "PCD"]
+                    [#else]
+                    [#assign USBmodule = "HCD"]
+                    [/#if]
+                        #n#t#if (USE_HAL_${USBmodule}_REGISTER_CALLBACKS == 1U)
+                        #t/* register Msp Callbacks (before the Init) */
+                        #tHAL_${USBmodule}_RegisterCallback(&${handler}, HAL_${USBmodule}_MSPINIT_CB_ID, ${USBmodule}_MspInit);
+                        #tHAL_${USBmodule}_RegisterCallback(&${handler}, HAL_${USBmodule}_MSPDEINIT_CB_ID, ${USBmodule}_MspDeInit);
+                        #t#endif /* USE_HAL_${USBmodule}_REGISTER_CALLBACKS */#n
+                    
+                    [#-- add Register Callbacks for USB STM32WB End --]
+                    [/#if]
 		    [#if retval??&& retval!=""]
 			[#if nTab==2]#t#t[#else]#t[/#if]${retval} = ${method.name}(${args});
 		    [#else]

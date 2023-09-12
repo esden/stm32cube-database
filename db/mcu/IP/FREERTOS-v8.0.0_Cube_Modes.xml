@@ -10,46 +10,53 @@
     <About>FREERTOS: Free Real Time Operating System</About>
     
     <!-- Possible use of different APIS in the future (not yet supported) -->
-    <!-- 
-    <RefParameter Name="FreeRTOS_API" Comment="FreeRTOS API" DefaultValue="0" Type="list" Group="API" TabName="Config parameters">
-        <Condition Diagnostic="APi to be set among available ones" Expression="S_MULTIPLE_APIS"/>
-        <PossibleValue Comment="CMSIS v1" Value="0" Semaphore="S_CMSIS_V1_API"/>
-        <PossibleValue Comment="CMSIS v2" Value="1" />
-        <PossibleValue Comment="Native" Value="2" Semaphore="S_NATIVE_API"/>
-        <Description>Decide which API to use: CMSIS v1, CMSIS v2 or Native.</Description>
+    <RefParameter Name="FreeRTOS_API" Comment="FreeRTOS API" DefaultValue="2" Type="uniqueElementList" Group="API" TabName="Config parameters">
+        <Condition Diagnostic="Native API to be used for the project." Expression="S_FREERTOS_NATIVE"/>
+        <PossibleValue Comment="Native" Value="2"/>
+        <Description>Shows which API is used: CMSIS v1, CMSIS v2 or Native.</Description>
     </RefParameter>
+     <RefParameter Name="FreeRTOS_API" Comment="FreeRTOS API" DefaultValue="1" Type="uniqueElementList" Group="API" TabName="Config parameters">
+        <Condition Diagnostic="CMSIS v2 API to be used for the project." Expression="S_CMSIS_RTOS_V2"/>
+        <PossibleValue Comment="CMSIS v2" Value="1"/>
+        <Description>Shows which API is used: CMSIS v1, CMSIS v2 or Native.</Description>
+    </RefParameter>   
     <RefParameter Name="FreeRTOS_API" Comment="FreeRTOS API" DefaultValue="0" Type="uniqueElementList" Group="API" TabName="Config parameters">
-        <PossibleValue Comment="CMSIS v1" Value="0" Semaphore="S_CMSIS_V1_API"/>
-        <Description>One API currently available (more could be added in a near future: CMSIS v2, native).</Description>
+        <PossibleValue Comment="CMSIS v1" Value="0"/>
+        <Description>Shows which API is used: CMSIS v1, CMSIS v2 or Native.</Description>
     </RefParameter>
-    -->
     
-    <!-- For future use of MPU mode (not yet supported) -->
-    <!-- 
+    <!-- For future use of MPU mode (support started with Dory/WB series) -->
     <RefParameter Name="USE_MPU" Comment="Use MPU" DefaultValue="0" Type="list" Group="MPU" TabName="Config parameters">
-        <Condition Diagnostic="Available for H7 (with API set as Native)" Expression="STM32H7 &amp; S_NATIVE"/>
+        <Condition Diagnostic="Available for Dory" Expression="S_FREERTOS_NATIVE &amp; STM32WB"/>
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1" Semaphore="S_FREERTOS_WITH_MPU"/>
-        <Description>Use or not Memory Protection Unit with FreeRTOS.</Description>
-    </RefParameter>
-    <RefParameter Name="USE_MPU" Comment="Use MPU" DefaultValue="0" Type="list" Group="MPU" TabName="Config parameters">
-        <PossibleValue Comment="Disabled" Value="0"/>
-        <Condition Diagnostic="Only available for F7 and H7 (with API set as Native)" Expression="(STM32F7|STM32F4|STM32L4) | (!S_NATIVE)"/>
-        <Description>Use or not Memory Protection Unit with FreeRTOS. .</Description>
+        <Description>Use or not Memory Protection Unit with FreeRTOS. Very first step of implementation on Dory for Examples Migration. To be consolidated.</Description>
     </RefParameter>
     <RefParameter Name="USE_MPU" Comment="Use MPU" DefaultValue="0" Type="list" Group="MPU" TabName="Config parameters" Visible="false">
         <PossibleValue Comment="Disabled" Value="0"/>
         <Description>Use or not Memory Protection Unit with FreeRTOS (not available).</Description>
     </RefParameter>
-    -->
 
+    <!-- In config files, does not do the job correctly with conditions and semaphores -->
+    <RefParameter Name="COPY_CMSIS_FILES" Comment="..." DefaultValue="2" Type="list" Group="CMSIS" TabName="Config parameters" Visible="false">
+        <Condition Diagnostic="Ok if CMSIS v2 API" Expression="S_CMSIS_RTOS_V2"/>
+        <PossibleValue Comment="Flag value" Value="2"/>
+    </RefParameter>
+    <RefParameter Name="COPY_CMSIS_FILES" Comment="..." DefaultValue="1" Type="list" Group="CMSIS" TabName="Config parameters" Visible="false">
+        <Condition Diagnostic="Ok if CMSIS v1 API" Expression="S_CMSIS_RTOS_V1"/>
+        <PossibleValue Comment="Flag value" Value="1"/>
+    </RefParameter>
+    <RefParameter Name="COPY_CMSIS_FILES" Comment="..." DefaultValue="0" Type="list" Group="CMSIS" TabName="Config parameters" Visible="false">
+        <Condition Diagnostic="Ok if NAtive API with MPU" Expression="S_FREERTOS_WITH_MPU"/>
+        <PossibleValue Comment="Flag value" Value="0"/>
+    </RefParameter>   
+    <RefParameter Name="COPY_CMSIS_FILES" Comment="..." DefaultValue="99" Type="list" Group="CMSIS" TabName="Config parameters" Visible="false">
+        <PossibleValue Comment="Flag value" Value="99"/>
+    </RefParameter>
+    
     <!-- Semaphore of CMSIS_version TO BE UPDATED when FW packages come and support new FreeRTOS and CMSI versions -->
     <!-- Note: also used in NvicVector.java (be careful when renaming!!!) -->
     <RefParameter Name="CMSIS_version" Comment="CMSIS-RTOS version" DefaultValue="1.02" Type="String" Group="Versions" TabName="Config parameters">
-        <Condition Diagnostic="Current version of CMSIS-RTOS" Expression="!S_NATIVE_API"/>  <!-- Diagnostic for 4.27.0 release -->
-        <PossibleValue Comment="Version of CMSIS" Value="1.02" Semaphore="S_CMSIS_RTOS_V1"/>
-    </RefParameter>
-    <RefParameter Name="CMSIS_version" Comment="CMSIS-RTOS version" DefaultValue="1.02" Type="String" Group="Versions" TabName="Config parameters" Visible="false">
         <PossibleValue Comment="Version version of CMSIS" Value="1.02"/>
     </RefParameter>
 
@@ -69,13 +76,13 @@
         <PossibleValue Comment="Version of FreeRTOS" Value="9.0.0" Semaphore="S_VERSION_9_0_0"/>
         <Condition Diagnostic="Version available for F3" Expression="STM32F3"/>
     </RefParameter>
-    <RefParameter Name="FREERTOS_version" Comment="FreeRTOS version" DefaultValue="9.0.0" Type="String" Group="Versions" TabName="Config parameters">
-        <PossibleValue Comment="Version of FreeRTOS" Value="9.0.0" Semaphore="S_VERSION_9_0_0"/>
-        <Condition Diagnostic="Version available for F4" Expression="STM32F4"/>
+    <RefParameter Name="FREERTOS_version" Comment="FreeRTOS version" DefaultValue="10.0.1" Type="String" Group="Versions" TabName="Config parameters">
+        <PossibleValue Comment="Version of FreeRTOS" Value="10.0.1" Semaphore="S_VERSION_10_0_0"/>
+        <Condition Diagnostic="New version available for F4" Expression="STM32F4"/>
     </RefParameter>
-    <RefParameter Name="FREERTOS_version" Comment="FreeRTOS version" DefaultValue="9.0.0" Type="String" Group="Versions" TabName="Config parameters">
-        <PossibleValue Comment="Version of FreeRTOS" Value="9.0.0" Semaphore="S_VERSION_9_0_0"/>
-        <Condition Diagnostic="Version available for F7" Expression="STM32F7"/>
+    <RefParameter Name="FREERTOS_version" Comment="FreeRTOS version" DefaultValue="10.0.1" Type="String" Group="Versions" TabName="Config parameters">
+        <PossibleValue Comment="Version of FreeRTOS" Value="10.0.1" Semaphore="S_VERSION_10_0_0"/>
+        <Condition Diagnostic="New version available for F7" Expression="STM32F7"/>
     </RefParameter>
     <RefParameter Name="FREERTOS_version" Comment="FreeRTOS version" DefaultValue="10.0.1" Type="String" Group="Versions" TabName="Config parameters">
         <PossibleValue Comment="Version of FreeRTOS" Value="10.0.1" Semaphore="S_VERSION_10_0_0"/>
@@ -96,6 +103,14 @@
     <RefParameter Name="FREERTOS_version" Comment="FreeRTOS version" DefaultValue="10.0.1" Type="String" Group="Versions" TabName="Config parameters">
         <PossibleValue Comment="Version of FreeRTOS" Value="10.0.1" Semaphore="S_VERSION_10_0_0"/>
         <Condition Diagnostic="New version available for L4" Expression="STM32L4"/>
+    </RefParameter>
+    <RefParameter Name="FREERTOS_version" Comment="FreeRTOS version" DefaultValue="10.0.1" Type="String" Group="Versions" TabName="Config parameters">
+        <PossibleValue Comment="Version of FreeRTOS" Value="10.0.1" Semaphore="S_VERSION_10_0_0"/>
+        <Condition Diagnostic="New version available for Dory" Expression="STM32WB"/>
+    </RefParameter>
+    <RefParameter Name="FREERTOS_version" Comment="FreeRTOS version" DefaultValue="10.0.1" Type="String" Group="Versions" TabName="Config parameters">
+        <PossibleValue Comment="Version of FreeRTOS" Value="10.0.1" Semaphore="S_VERSION_10_0_0"/>
+        <Condition Diagnostic="New version available for MP1" Expression="STM32MP1"/>
     </RefParameter>
     <RefParameter Name="FREERTOS_version" Comment="FreeRTOS version" DefaultValue="9.0.0" Type="String" Group="Versions" TabName="Config parameters">
         <PossibleValue Comment="Default version of FreeRTOS" Value="9.0.0" Semaphore="S_VERSION_9_0_0"/>
@@ -483,7 +498,7 @@
 	
 	
 	<RefParameter Name="configLIBRARY_LOWEST_INTERRUPT_PRIORITY" Comment="LIBRARY_LOWEST_INTERRUPT_PRIORITY" DefaultValue="15" Max="15" Min="1"  Type="integer" Group="Interrupt nesting behaviour configuration" TabName="Config parameters" NoCheckOpt="false">
-	    <Condition Diagnostic="Values for F1/F2/F3/F4/L1/L4/F7/H7" Expression="STM32F4 | STM32F2 | STM32F3 | STM32L1 | STM32F1 | STM32F7 | STM32H7 | STM32L4"/>
+	    <Condition Diagnostic="Values for F1/F2/F3/F4/L1/L4/F7/H7/WB/MP1" Expression="STM32F4 | STM32F2 | STM32F3 | STM32L1 | STM32F1 | STM32F7 | STM32H7 | STM32L4 | STM32WB | STM32MP1"/>
 	    <Description>The lowest interrupt priority that can be used in a call to a "set priority" function.</Description>
 	</RefParameter>
 	<RefParameter Name="configLIBRARY_LOWEST_INTERRUPT_PRIORITY" Comment="LIBRARY_LOWEST_INTERRUPT_PRIORITY" DefaultValue="3" Max="3" Min="1"  Type="integer" Group="Interrupt nesting behaviour configuration" TabName="Config parameters" NoCheckOpt="false">
@@ -492,7 +507,7 @@
 	
     <!-- <RefParameter Name="configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY" Comment="LIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY" DefaultValue="5" Max="15" Min="1"  Type="integer" Group="Interrupt nesting behaviour configuration" TabName="Config parameters">  -->
 	<RefParameter Name="configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY" Comment="LIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY" DefaultValue="5" Max="=configLIBRARY_LOWEST_INTERRUPT_PRIORITY" Min="1" Type="integer" Group="Interrupt nesting behaviour configuration" TabName="Config parameters" NoCheckOpt="false">
-	    <Condition Diagnostic="Values for F1/F2/F3/F4/L1/L4/F7/H7" Expression="STM32F4 | STM32F2 | STM32F3 | STM32L1 | STM32F1 | STM32F7 | STM32H7 | STM32L4"/>
+	    <Condition Diagnostic="Values for F1/F2/F3/F4/L1/L4/F7/H7/WB/MP1" Expression="STM32F4 | STM32F2 | STM32F3 | STM32L1 | STM32F1 | STM32F7 | STM32H7 | STM32L4 | STM32WB | STM32MP1"/>
 	    <Description>The highest interrupt priority that can be used by any interrupt service routine that makes calls to interrupt safe FreeRTOS API functions. &lt;br&gt; 
                      DO NOT CALL INTERRUPT SAFE FREERTOS API FUNCTIONS FROM ANY INTERRUPT THAT HAS A HIGHER PRIORITY THAN THIS! (higher priorities are lower numeric values).</Description>
     </RefParameter>
@@ -807,7 +822,7 @@
                      - Relies on one or more architecture specific assembly instructions (typically a Count Leading Zeros [CLZ] of equivalent instruction) so can only be used with the architecture for which it was specifically written.&lt;br&gt;
                      - Is more efficient than the generic method.&lt;br&gt;
                      - Typically imposes a limit of 32 on the maximum number of available priorities.</Description>
-	</RefParameter>
+	</RefParameter>    
 	-->
 
     <!--  New for FreeRTOS 8.2.1 -->  
@@ -939,8 +954,8 @@
 
     <!-- Basemode for FREERTOS -->
     <RefMode Name="FreeRTOS_Basemode" Comment="Internal basemode for FreeRTOS" Abstract="true">
-        <!-- <Parameter Name="FreeRTOS_API"/> -->
-        <!-- <Parameter Name="USE_MPU"/> -->                       <!-- will be added once native api is in place -->
+        <Parameter Name="FreeRTOS_API"/>
+        <Parameter Name="USE_MPU"/>                      <!-- will be completely ready once native api is in place... first try for Dory Examples Migration -->
         <!-- <Parameter Name="CMSIS_version"/>   -->
         <Parameter Name="FREERTOS_version"/>
         <Parameter Name="configUSE_PREEMPTION"/>
@@ -1032,13 +1047,14 @@
         <Parameter Name="CountingSemaphores01"/>
     </RefMode>
     
-    <!-- RefMode for Old-fashioned Enabled -->
+    <!-- RefMode for Old-fashioned Enabled 
     <RefMode Name="Enabled" BaseMode="FreeRTOS_Basemode" Abstract="false">
         <ConfigForMode>FREERTOS_ENABLE_Init</ConfigForMode>
         <Parameter Name="CMSIS_version"/>
     </RefMode>
+    -->
 	
-	<!-- ModeLogicOperator for FREERTOS -->
+	<!-- ModeLogicOperator for FREERTOS
     <ModeLogicOperator Name="OR">
 		<Mode Name="Enabled">
 			<ModeLogicOperator Name="XOR">
@@ -1051,47 +1067,69 @@
 			</ModeLogicOperator>
 		</Mode>
     </ModeLogicOperator>
+    -->
 	
-	<!-- RefSignal for FREERTOS -->
+	<!-- RefSignal for FREERTOS 
 	<RefSignal Name="VS_ENABLE" Virtual="true"/>
+	-->
 	
-	<!-- RefMode for CMSIS 
-	<RefMode Name="CMSIS" BaseMode="FreeRTOS_Basemode" Abstract="false">
+	<!-- RefMode for CMSIS -->
+	<RefMode Name="CMSIS_V1" BaseMode="FreeRTOS_Basemode" Abstract="false">
 		<ConfigForMode>FREERTOS_ENABLE_Init</ConfigForMode>
 		<Parameter Name="CMSIS_version"/>
 	</RefMode>
-	-->
+	
+    <RefMode Name="CMSIS_V2" BaseMode="FreeRTOS_Basemode" Abstract="false">
+		<ConfigForMode>FREERTOS_CMSIS_V2_ENABLE_Init</ConfigForMode>
+		<Parameter Name="CMSIS_version"/>
+	</RefMode>
 
-	<!-- RefMode for Native mode 
+	<!-- RefMode for Native mode -->
 	<RefMode Name="Native" BaseMode="FreeRTOS_Basemode" Abstract="false">
 		<ConfigForMode>FREERTOS_NATIVE_ENABLE_Init</ConfigForMode>
 	</RefMode>
-	-->
 	
-	<!-- Part to uncomment when trying "native" mode
+    <!-- Part to uncomment when trying "native" mode -->
     <ModeLogicOperator Name="OR">
-      <Mode Name="Mode">
-	    <ModeLogicOperator Name="XOR">
-		  <Mode Name="CMSIS">
-			<SignalLogicalOp Name="AND">
-				<Signal IOMode="" Name="VS_CMSIS"/>
-			</SignalLogicalOp>
-			<Semaphore>S_FREERTOS</Semaphore>
-			<Semaphore>S_FREERTOS_CMSIS</Semaphore>
-		  </Mode>
-	      <Mode Name="Native">
-		    <SignalLogicalOp Name="AND">
-			    <Signal IOMode="" Name="VS_NATIF"/>
-		    </SignalLogicalOp>
-		    <Semaphore>S_FREERTOS</Semaphore>
-		    <Semaphore>S_FREERTOS_NATIVE</Semaphore>
+      <Mode Name="Interface">
+        <Condition Expression="!(S_BLE_HOST | S_THREAD)" Diagnostic="Not possible to activate FREERTOS when ST32_WPAN is activated"/>
+        <ModeLogicOperator Name="XOR">
+        
+          <Mode Name="CMSIS_V1">
+            <SignalLogicalOp Name="AND">
+              <Signal IOMode="" Name="VS_CMSIS_V1"/>
+            </SignalLogicalOp>
+            <Semaphore>S_FREERTOS</Semaphore>
+            <Semaphore>S_CMSIS_RTOS_V1</Semaphore>    <!-- Note: also used in NvicVector.java (be careful when renaming!!!) -->
+          </Mode>
+          
+          <!-- "CMSIS_V2" to be delivered soon -->
+          <Mode Name="CMSIS_V2">
+            <SignalLogicalOp Name="AND">
+              <Signal IOMode="" Name="VS_CMSIS_V2"/>
+            </SignalLogicalOp>
+            <Semaphore>S_FREERTOS</Semaphore> 
+            <Semaphore>S_CMSIS_RTOS_V2</Semaphore>   <!-- Note: not forget to add it in NvicVector.java (be careful when renaming as well!!!) -->
+            <Condition Expression="STM32xxx" Diagnostic="Not yet available for that series"/>
+          </Mode>
+          
+          <!-- "Native" to be delivered in the future -->
+          <!--
+          <Mode Name="Native">
+            <SignalLogicalOp Name="AND">
+              <Signal IOMode="" Name="VS_NATIVE"/>
+            </SignalLogicalOp>
+            <Semaphore>S_FREERTOS</Semaphore>
+            <Semaphore>S_FREERTOS_NATIVE</Semaphore>
+            <Condition Expression="STM32WB" Diagnostic="Not yet available for that series (only supported on STM32WB series)"/>
 	      </Mode>
-	    </ModeLogicOperator>
+	      -->
+        </ModeLogicOperator>
       </Mode>
     </ModeLogicOperator>
     
-	<RefSignal Name="VS_CMSIS" Virtual="true"/>
-	<RefSignal Name="VS_NATIF" Virtual="true"/>
-   -->
+    <RefSignal Name="VS_CMSIS_V1" Virtual="true"/>
+    <RefSignal Name="VS_CMSIS_V2" Virtual="true"/>
+    <!--  <RefSignal Name="VS_NATIVE" Virtual="true"/> -->
 
 </IP>

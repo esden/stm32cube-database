@@ -41,7 +41,7 @@
 	
 	
 	<RefParameter Comment="Data Size" DefaultValue="SPI_DATASIZE_4BIT" Group="Basic Parameters" Name="DataSize" Type="list">
-		<Condition Diagnostic="" Expression="STM32L4"/>
+		<Condition Diagnostic="" Expression="STM32L4 | DIE495"/>
 		<PossibleValue Comment="4 Bits" Semaphore="$IpInstance_DATASIZE_BYTE" Value="SPI_DATASIZE_4BIT"/>
 		<PossibleValue Comment="5 Bits" Semaphore="$IpInstance_DATASIZE_BYTE" Value="SPI_DATASIZE_5BIT"/>
 		<PossibleValue Comment="6 Bits" Semaphore="$IpInstance_DATASIZE_BYTE" Value="SPI_DATASIZE_6BIT"/>
@@ -92,7 +92,16 @@
 		<Description>Calculated Baudrate value based on SPI Clock source and Prescaler</Description>
 		<Condition Diagnostic="" Expression="(($IpInstance_Slave &amp; (TIMode = SPI_TIMODE_ENABLE)) | $IpInstance_Master) &amp; STM32L0"/>
 	</RefParameter>
-	
+
+        <RefParameter Comment="Baud Rate" DefaultValue="8000000" Group="Clock Parameters" Max="32000000" Min="0" Name="CalculateBaudRate" Type="string">
+		<Description>Calculated Baudrate value based on SPI Clock source and Prescaler</Description>
+		<Condition Diagnostic="" Expression="$IpInstance_Master &amp; DIE495"/>
+	</RefParameter>
+        <RefParameter Comment="Baud Rate" DefaultValue="8000000" Group="Clock Parameters" Max="24000000" Min="0" Name="CalculateBaudRate" Type="string">
+		<Description>Calculated Baudrate value based on SPI Clock source and Prescaler</Description>
+		<Condition Diagnostic="" Expression="($IpInstance_Slave &amp; (TIMode = SPI_TIMODE_ENABLE)) &amp; DIE495"/>
+	</RefParameter>
+        
 	<RefParameter Comment="Baud Rate" DefaultValue="null" Group="Clock Parameters" Max="40000000" Min="0" Name="CalculateBaudRate" Type="string" Visible="false"/>
 		
 	<RefParameter Comment="Clock Polarity (CPOL)" DefaultValue="SPI_POLARITY_LOW" Group="Clock Parameters" Name="CLKPolarity" Type="list">
@@ -140,7 +149,7 @@
         </RefParameter>
 		
 	<RefParameter Comment="NSSP Mode" DefaultValue="SPI_NSS_PULSE_ENABLE" Group="Advanced Parameters" Name="NSSPMode" Type="list">
-	 <Condition Diagnostic="" Expression="$IpInstance_Master &amp; (TIMode = SPI_TIMODE_DISABLE) &amp; (CLKPhase = SPI_PHASE_1EDGE) &amp; STM32L4"/>
+	 <Condition Diagnostic="" Expression="$IpInstance_Master &amp; (TIMode = SPI_TIMODE_DISABLE) &amp; (CLKPhase = SPI_PHASE_1EDGE) &amp; (STM32L4 | DIE495)"/>
 	 	<PossibleValue Comment="Enabled" Value="SPI_NSS_PULSE_ENABLE"/>
 		<PossibleValue Comment="Disabled" Value="SPI_NSS_PULSE_DISABLE"/>
 	</RefParameter>
@@ -418,7 +427,7 @@
 	</RefMode>
 	
 	
-	
+
 	<!-- ModeLogicOperator for SPI -->
 	<ModeLogicOperator Name="OR">
 		<Mode Name="Mode">
@@ -435,7 +444,7 @@
 				</Mode>
 				<Mode Name="Full_Duplex_Slave" UserName="Full-Duplex Slave">
 					<SignalLogicalOp Name="AND">
-						<Signal Name="MISO"/>
+						<Signal IOMode="AlternateFunctionOpenDrainAndPushPullDefaultPP" Name="MISO"/>
 						<Signal Name="MOSI"/>
 						<Signal Name="SCK"/>
 					</SignalLogicalOp>
@@ -454,7 +463,7 @@
 				</Mode>
             	<Mode Name="Simplex_Bidirectional_Slave" UserName="Half-Duplex Slave">
 					<SignalLogicalOp Name="AND">
-						<Signal Name="MISO"/>
+						<Signal IOMode="AlternateFunctionOpenDrainAndPushPullDefaultPP" Name="MISO"/>
 						<Signal Name="SCK"/>
 					</SignalLogicalOp>
 					<Semaphore>$IpInstance_DmaTransmit</Semaphore>
@@ -491,7 +500,7 @@
             	<Mode Name="TX_Only_Simplex_Unidirect_Slave" UserName="Transmit Only Slave">
             		<!-- SPI is in 'Full-Duplex' Mode, but only 'Slave Out' line is on pinout -->
 					<SignalLogicalOp Name="AND">
-						<Signal Name="MISO"/>
+						<Signal IOMode="AlternateFunctionOpenDrainAndPushPullDefaultPP" Name="MISO"/>
 						<Signal Name="SCK"/>
 					</SignalLogicalOp>
 					<Semaphore>$IpInstance_DmaTransmit</Semaphore>

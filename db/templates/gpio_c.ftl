@@ -78,6 +78,7 @@ void MX_${data.ipName}_GPIO_Init(void)
 
 
 [#if data.methods??] [#-- if the pin configuration contains a list of LibMethods--]
+[#if data.ipName=="gpio" && FamilyName!="STM32MP1"]
 	[#list data.methods as method][#assign args = ""]	
 		[#if method.status=="OK"]	
                 [#-- --]                
@@ -183,6 +184,7 @@ void MX_${data.ipName}_GPIO_Init(void)
 [/#compress]
 [/#if]
 #n
+[/#if]
 }
 #n
 [/#if] [#-- else there is no LibMethod to call--]

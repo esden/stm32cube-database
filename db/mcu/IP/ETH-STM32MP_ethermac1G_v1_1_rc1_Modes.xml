@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<IP DBVersion="V4.0" IPType="peripheral" Name="ETH" Version="STM32MP_ethermac1G_v1_1_rc1" 
+    xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" 
+    ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd" 
+    xmlns="http://mcd.rou.st.com/modules.php?name=mcu">
+  <About>ETH: Ethernet MAC interface</About>
+    <!-- Generic RefParameters for ETH MII/RMII Modes -->
+    <!-- Generic RefParameters for ETH MII/RMII Modes Extracted from HAL Library with LibExtractor-->
+    <RefParameter Name="hal_eth_init_status" DefaultValue="1" Comment="" Type="" Visible="false"/>
+    <RefParameter Name="Instance" DefaultValue="ETH" Comment="Instance" Type="" Visible="false"/>
+    <RefMode Name="MII (Media Independent Interface)" HalMode="ETH">
+        <ConfigForMode>Init</ConfigForMode>
+        <Parameter Name="Instance"/>
+    </RefMode>
+    <RefMode Name="RMII (Reduced MII)" HalMode="ETH">
+        <ConfigForMode>Init</ConfigForMode>
+        <Parameter Name="Instance"/>
+    </RefMode>
+    <RefMode Name="RGMII (Reduced GMII)" HalMode="ETH">
+        <ConfigForMode>Init</ConfigForMode>
+        <Parameter Name="Instance"/>
+    </RefMode>
+    <RefMode Name="GMII (Gigabit MII)" HalMode="ETH">
+        <ConfigForMode>Init</ConfigForMode>
+        <Parameter Name="Instance"/>
+    </RefMode>
+    <ModeLogicOperator Name="OR">
+        <Mode Name="Mode"> <!-- Fig. 81 RM0436: Peripheral clock distribution for Ethernet  -->
+            <ModeLogicOperator Name="XOR">
+                <!-- RMII: Reduced Media Independent Interface (Small packages: ex. TFBGA257/LFBGA354 no ref to ETH 125MHz Clock Input and TX_ER in tooltip) -->
+                <Mode Name="RMII (Reduced MII)" RemoveCondition="STM32MP151AAAx|STM32MP153AAAx|STM32MP157AAAx|STM32MP151AACx|STM32MP153AACx|STM32MP157AACx|STM32MP151CAAx|STM32MP153CAAx|STM32MP157CAAx|STM32MP151CACx|STM32MP153CACx|STM32MP157CACx"> <!-- Fig. 42 AN5031 / Mode 1) RMII with Quartz on PHY --> <!-- Fig. 42 AN5031 / Mode 2) RMII without Quartz, 25MHz feed to PHY / 1) + Add CLK --> <!-- Fig. 43 AN5031 / Mode 3) RMII without Quartz, 50MHz feed to PHY 2) + remove REF_CLK -->
+                    <Condition Diagnostic="Available only if &lt;b&gt;ETH Clock Output&lt;/b&gt; or &lt;b&gt;ETH Ref Clock Input&lt;/b&gt; is enabled&lt;br&gt;&lt;i&gt;Set ETH Mode to Disable or unset/set Runtime context to release constraints." Expression="Semaphore_Internal_Clock|Semaphore_Ref_Clock"/>
+                    <Semaphore>Semaphore_No_125MHz_Clock</Semaphore>
+                    <Semaphore>Semaphore_PPS_OUT_and_PHY_INTN</Semaphore> <!-- Optional signals: PHY_INTN, PPS_OUT -->
+                    <Semaphore>Semaphore_No_TX_ER</Semaphore>
+                    <SignalLogicalOp Name="AND"> <!-- How to ensure Quartz at 25MHz? EXT_CLK(XTAL_OUT)? --> <!-- How to ensure RCC at 50MHz? --> <!-- How to ensure ETH_REF_CLK_SEL bit set by RCC in SYSCFG -->
+                        <Signal IOMode="AlternateFunctionPushPullMediumSpeedDefault" Name="MDC"/>
+                        <Signal Name="MDIO"/>
+                        <Signal Name="CRS_DV"/>
+                        <Signal Name="RXD0"/>
+                        <Signal Name="RXD1"/>
+                        <Signal Name="TX_EN"/>
+                        <Signal IOMode="AlternateFunctionPushPullMediumSpeedDefault" Name="TXD0"/>
+                        <Signal IOMode="AlternateFunctionPushPullMediumSpeedDefault" Name="TXD1"/>
+                    </SignalLogicalOp>
+                </Mode>
+                <!-- RMII: Reduced Media Independent Interface (Big packages: ex. LFBGA448/TFBGA361) -->
+                <Mode Name="RMII (Reduced MII)" RemoveCondition="STM32MP151AABx|STM32MP153AABx|STM32MP157AABx|STM32MP151AADx|STM32MP153AADx|STM32MP157AADx|STM32MP151CABx|STM32MP153CABx|STM32MP157CABx|STM32MP151CADx|STM32MP153CADx|STM32MP157CADx"> <!-- Fig. 42 AN5031 / Mode 1) RMII with Quartz on PHY --> <!-- Fig. 42 AN5031 / Mode 2) RMII without Quartz, 25MHz feed to PHY / 1) + Add CLK --> <!-- Fig. 43 AN5031 / Mode 3) RMII without Quartz, 50MHz feed to PHY 2) + remove REF_CLK -->
+                    <Condition Diagnostic="Available only if &lt;b&gt;ETH Clock Output&lt;/b&gt; or &lt;b&gt;ETH Ref Clock Input&lt;/b&gt; is enabled and &lt;b&gt;ETH 125 MHz Clock Input&lt;/b&gt; and &lt;b&gt;TX_ER&lt;/b&gt; are disabled&lt;br&gt;&lt;i&gt;Set ETH Mode to Disable or unset/set Runtime context to release constraints." Expression="(Semaphore_Internal_Clock|Semaphore_Ref_Clock) &amp; !Semaphore_125MHz_Clock &amp; !Semaphore_TX_ER"/>
+                    <Semaphore>Semaphore_No_125MHz_Clock</Semaphore>
+                    <Semaphore>Semaphore_PPS_OUT_and_PHY_INTN</Semaphore> <!-- Optional signals: PHY_INTN, PPS_OUT -->
+                    <Semaphore>Semaphore_No_TX_ER</Semaphore>
+                    <SignalLogicalOp Name="AND"> <!-- How to ensure Quartz at 25MHz? EXT_CLK(XTAL_OUT)? --> <!-- How to ensure RCC at 50MHz? --> <!-- How to ensure ETH_REF_CLK_SEL bit set by RCC in SYSCFG -->
+                        <Signal IOMode="AlternateFunctionPushPullMediumSpeedDefault" Name="MDC"/>
+                        <Signal Name="MDIO"/>
+                        <Signal Name="CRS_DV"/>
+                        <Signal Name="RXD0"/>
+                        <Signal Name="RXD1"/>
+                        <Signal Name="TX_EN"/>
+                        <Signal IOMode="AlternateFunctionPushPullMediumSpeedDefault" Name="TXD0"/>
+                        <Signal IOMode="AlternateFunctionPushPullMediumSpeedDefault" Name="TXD1"/>
+                    </SignalLogicalOp>
+                </Mode>
+                <!-- RGMII: Reduced Gigabit Media Independent Interface -->
+                <Mode Name="RGMII (Reduced GMII)" RemoveCondition="STM32MP151AABx|STM32MP153AABx|STM32MP157AABx|STM32MP151AADx|STM32MP153AADx|STM32MP157AADx|STM32MP151CABx|STM32MP153CABx|STM32MP157CABx|STM32MP151CADx|STM32MP153CADx|STM32MP157CADx"> <!-- Fig. 44 AN5031 / Mode 4) RGMII with Quartz on PHY --> <!-- Fig. 44 AN5031 / Mode 5) RGMII without Quartz, 25MHz feed to PHY / 4) + Add CLK--> <!-- Fig. 44 AN5031 / Mode 6) RGMII with Quartz on PHY, no 125MHz from PHY / 5) remove CLK125 and CLK -->
+                    <Semaphore>Semaphore_Allow_Internal_Clock</Semaphore>
+                    <Semaphore>Semaphore_No_Ref_Clock</Semaphore>
+                    <Semaphore>Semaphore_PPS_OUT_and_PHY_INTN</Semaphore> <!-- Optional signals: PHY_INTN, PPS_OUT -->
+                    <Semaphore>Semaphore_No_TX_ER</Semaphore>
+                    <Condition Diagnostic="Available only if &lt;b&gt;ETH Ref Clock Input&lt;/b&gt; and &lt;b&gt;TX_ER&lt;/b&gt; are disabled&lt;br&gt;&lt;i&gt;Set ETH Mode to Disable or unset/set Runtime context to release constraints." Expression="!Semaphore_Ref_Clock &amp; !Semaphore_TX_ER"/> <!-- Temporary condition -->
+                    <SignalLogicalOp Name="AND"> <!-- How to ensure RCC at 125MHz? --> <!-- How to ensure ETH_REF_CLK_SEL bit set by RCC in SYSCFG -->
+                        <Signal IOMode="AlternateFunctionPushPullHighSpeedByDefault" Name="MDC"/>
+                        <Signal Name="MDIO"/>
+                        <Signal Name="GTX_CLK"/>
+                        <Signal Name="RX_CLK"/>
+                        <Signal Name="RX_CTL"/>
+                        <Signal Name="RXD0"/>
+                        <Signal Name="RXD1"/>
+                        <Signal Name="RXD2"/>
+                        <Signal Name="RXD3"/>
+                        <Signal Name="TX_CTL"/>
+                        <Signal IOMode="AlternateFunctionPushPullHighSpeedByDefault" Name="TXD0"/> 
+                        <Signal IOMode="AlternateFunctionPushPullHighSpeedByDefault" Name="TXD1"/>
+                        <Signal IOMode="AlternateFunctionPushPullHighSpeedByDefault" Name="TXD2"/>
+                        <Signal IOMode="AlternateFunctionPushPullHighSpeedByDefault" Name="TXD3"/>
+                    </SignalLogicalOp>
+                </Mode>
+                <!-- MII: Media Independent Interface (Small packages: ex. TFBGA257/LFBGA354 no ref to ETH 125MHz Clock Input in tooltip) -->
+                <Mode Name="MII (Media Independent Interface)" RemoveCondition="STM32MP151AAAx|STM32MP153AAAx|STM32MP157AAAx|STM32MP151AACx|STM32MP153AACx|STM32MP157AACx|STM32MP151CAAx|STM32MP153CAAx|STM32MP157CAAx|STM32MP151CACx|STM32MP153CACx|STM32MP157CACx"> <!-- Mode 7) MII with Quartz on PHY  --> <!-- Mode 8) MII without Quartz, 25MHz feed to PHY   -->
+                    <Semaphore>Semaphore_No_Ref_Clock</Semaphore>
+                    <Semaphore>Semaphore_No_125MHz_Clock</Semaphore>
+                    <Semaphore>Semaphore_PPS_OUT_and_PHY_INTN</Semaphore> <!-- Optional signals: PHY_INTN, PPS_OUT -->
+                    <Condition Diagnostic="&lt;font color=&quot;red&quot;&gt;Warning: Not yet supported on ST boards&lt;/font&gt;&lt;br&gt;Available only if &lt;b&gt;ETH Ref Clock Input&lt;/b&gt; is disabled&lt;br&gt;&lt;i&gt;Set ETH Mode to Disable or unset/set Runtime context to release constraints." Expression="1 &amp; !Semaphore_Ref_Clock"/> <!-- Tested: ok / ok to show this mode in alpha2 release? -->
+                    <SignalLogicalOp Name="AND">
+                        <Signal IOMode="AlternateFunctionPushPullMediumSpeedDefault" Name="MDC"/>
+                        <Signal Name="MDIO"/>
+                        <Signal Name="COL"/>
+                        <Signal Name="CRS"/>
+                        <Signal Name="RX_CLK"/>
+                        <Signal Name="TX_CLK"/>
+                        <Signal Name="RX_DV"/>
+                        <Signal Name="RX_ER"/>
+                        <Signal Name="RXD0"/>
+                        <Signal Name="RXD1"/>
+                        <Signal Name="RXD2"/>
+                        <Signal Name="RXD3"/>
+                        <Signal Name="TX_EN"/>
+                        <Signal IOMode="AlternateFunctionPushPullMediumSpeedDefault" Name="TXD0"/>
+                        <Signal IOMode="AlternateFunctionPushPullMediumSpeedDefault" Name="TXD1"/>
+                        <Signal IOMode="AlternateFunctionPushPullMediumSpeedDefault" Name="TXD2"/>
+                        <Signal IOMode="AlternateFunctionPushPullMediumSpeedDefault" Name="TXD3"/>
+                    </SignalLogicalOp>
+                </Mode>
+                <!-- MII: Media Independent Interface (Big packages: ex. LFBGA448/TFBGA361) -->
+                <Mode Name="MII (Media Independent Interface)" RemoveCondition="STM32MP151AABx|STM32MP153AABx|STM32MP157AABx|STM32MP151AADx|STM32MP153AADx|STM32MP157AADx|STM32MP151CABx|STM32MP153CABx|STM32MP157CABx|STM32MP151CADx|STM32MP153CADx|STM32MP157CADx"> <!-- Mode 7) MII with Quartz on PHY  --> <!-- Mode 8) MII without Quartz, 25MHz feed to PHY   -->
+                    <Semaphore>Semaphore_No_Ref_Clock</Semaphore>
+                    <Semaphore>Semaphore_No_125MHz_Clock</Semaphore>
+                    <Semaphore>Semaphore_PPS_OUT_and_PHY_INTN</Semaphore> <!-- Optional signals: PHY_INTN, PPS_OUT -->
+                    <Semaphore>Semaphore_MII</Semaphore>
+                    <Condition Diagnostic="&lt;font color=&quot;red&quot;&gt;Warning: Not yet supported on ST boards&lt;/font&gt;&lt;br&gt;Available only if &lt;b&gt;ETH Ref Clock Input&lt;/b&gt; and &lt;b&gt;ETH 125MHz Clock Input&lt;/b&gt; are disabled&lt;br&gt;&lt;i&gt;Set ETH Mode to Disable or unset/set Runtime context to release constraints." Expression="1 &amp; (!Semaphore_Ref_Clock &amp; !Semaphore_125MHz_Clock)"/> <!-- Tested: ok / ok to show this mode in alpha2 release? -->
+                    <SignalLogicalOp Name="AND">
+                        <Signal IOMode="AlternateFunctionPushPullMediumSpeedDefault" Name="MDC"/>
+                        <Signal Name="MDIO"/>
+                        <Signal Name="COL"/>
+                        <Signal Name="CRS"/>
+                        <Signal Name="RX_CLK"/>
+                        <Signal Name="TX_CLK"/>
+                        <Signal Name="RX_DV"/>
+                        <Signal Name="RX_ER"/>
+                        <Signal Name="RXD0"/>
+                        <Signal Name="RXD1"/>
+                        <Signal Name="RXD2"/>
+                        <Signal Name="RXD3"/>
+                        <Signal Name="TX_EN"/>
+                        <Signal IOMode="AlternateFunctionPushPullMediumSpeedDefault" Name="TXD0"/>
+                        <Signal IOMode="AlternateFunctionPushPullMediumSpeedDefault" Name="TXD1"/>
+                        <Signal IOMode="AlternateFunctionPushPullMediumSpeedDefault" Name="TXD2"/>
+                        <Signal IOMode="AlternateFunctionPushPullMediumSpeedDefault" Name="TXD3"/>
+                    </SignalLogicalOp>
+                </Mode>
+                <!-- GMII: Gigabit Media Independent Interface -->
+                <Mode Name="GMII (Gigabit MII)" RemoveCondition="STM32MP151AABx|STM32MP153AABx|STM32MP157AABx|STM32MP151AADx|STM32MP153AADx|STM32MP157AADx|STM32MP151CABx|STM32MP153CABx|STM32MP157CABx|STM32MP151CADx|STM32MP153CADx|STM32MP157CADx"> <!-- Mode 9) GMII with Quartz on PHY / Quartz frequency? --> <!-- Mode 10) GMII without Quartz, 25MHz feed to PHY -->
+                    <Semaphore>Semaphore_No_Ref_Clock</Semaphore>
+                    <Semaphore>Semaphore_PPS_OUT_and_PHY_INTN</Semaphore> <!-- Optional signals: PHY_INTN, PPS_OUT -->
+                    <Condition Diagnostic="&lt;font color=&quot;red&quot;&gt;Warning: Not yet supported on ST boards&lt;/font&gt;&lt;br&gt;Available only if &lt;b&gt;ETH Ref Clock Input&lt;/b&gt; is disabled and &lt;b&gt;ETH 125MHz Clock Input&lt;/b&gt; and &lt;b&gt;TX_ER&lt;/b&gt; are enabled&lt;br&gt;&lt;i&gt;Set ETH Mode to Disable or unset/set Runtime context to release constraints." Expression="1 &amp; (!Semaphore_Ref_Clock &amp; Semaphore_125MHz_Clock &amp; Semaphore_TX_ER)"/> <!-- Tested: ok / ok to show this mode in alpha2 release? -->
+                    <SignalLogicalOp Name="AND">
+                        <Signal IOMode="AlternateFunctionPushPullMediumSpeedDefault" Name="MDC"/>
+                        <Signal Name="MDIO"/>
+                        <Signal Name="COL"/>
+                        <Signal Name="CRS"/>
+                        <Signal Name="GTX_CLK"/>
+                        <Signal Name="RX_CLK"/>
+                        <Signal Name="TX_CLK"/>
+                        <Signal Name="RX_DV"/>
+                        <Signal Name="RX_ER"/>
+                        <Signal Name="RXD0"/>
+                        <Signal Name="RXD1"/>
+                        <Signal Name="RXD2"/>
+                        <Signal Name="RXD3"/>
+                        <Signal Name="RXD4"/>
+                        <Signal Name="RXD5"/>
+                        <Signal Name="RXD6"/>
+                        <Signal Name="RXD7"/>
+                        <Signal Name="TX_EN"/> 
+                        <Signal IOMode="AlternateFunctionPushPullMediumSpeedDefault" Name="TXD0"/>
+                        <Signal IOMode="AlternateFunctionPushPullMediumSpeedDefault" Name="TXD1"/>
+                        <Signal IOMode="AlternateFunctionPushPullMediumSpeedDefault" Name="TXD2"/>
+                        <Signal IOMode="AlternateFunctionPushPullMediumSpeedDefault" Name="TXD3"/>
+                        <Signal Name="TXD4"/>
+                        <Signal Name="TXD5"/>
+                        <Signal Name="TXD6"/>
+                        <Signal Name="TXD7"/>
+                    </SignalLogicalOp>
+                </Mode>
+            </ModeLogicOperator>            
+            <Semaphore>MW_ETH_MW</Semaphore>
+        </Mode>
+        <Mode Name="ETH Ref Clock Input">
+            <ModeLogicOperator Name="XOR">    
+                <Mode Name="ETH Ref Clock Input">
+                    <Condition Diagnostic="Available only if ETH Mode is set to &lt;b&gt;Disable&lt;/b&gt; or &lt;b&gt;RMII&lt;/b&gt;" Expression="!Semaphore_No_Ref_Clock &amp; !Semaphore_125MHz_Clock"/>
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="REF_CLK"/>
+                    </SignalLogicalOp>
+                    <Semaphore>MW_ETH_MW</Semaphore>
+                </Mode>
+            </ModeLogicOperator>
+            <Semaphore>Semaphore_Ref_Clock</Semaphore>
+        </Mode>
+        <Mode Name="ETH 125MHz Clock Input" RemoveCondition="STM32MP157AABx|STM32MP157AADx|STM32MP157CABx|STM32MP157CADx">
+            <ModeLogicOperator Name="XOR">    
+                <Mode Name="ETH 125MHz Clock Input">
+                    <Condition Diagnostic="Available only if ETH Mode is set to &lt;b&gt;Disable&lt;/b&gt;, &lt;b&gt;RGMII&lt;/b&gt; or &lt;b&gt;GMII&lt;/b&gt;" Expression="!Semaphore_No_125MHz_Clock &amp; !Semaphore_Ref_Clock"/>
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="CLK125"/>
+                    </SignalLogicalOp>
+                    <Semaphore>MW_ETH_MW</Semaphore>
+                </Mode>
+            </ModeLogicOperator>
+            <Semaphore>Semaphore_125MHz_Clock</Semaphore>
+        </Mode>
+        <Mode Name="ETH Clock Output (PHY without Quartz)">
+            <ModeLogicOperator Name="XOR">    
+                <Mode Name="ETH Clock Output (PHY without Quartz)">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="CLK"/>
+                    </SignalLogicalOp>
+                    <Semaphore>MW_ETH_MW</Semaphore>
+                </Mode>
+            </ModeLogicOperator>
+            <Semaphore>Semaphore_Internal_Clock</Semaphore>
+        </Mode>
+        <Mode Name="ETH PTP_Synchro PPS_OUT"> <!-- Check if Refmode parameters are different when PTP_Synchro is used (cf H7) => duplicate ETH modes ? -->
+            <ModeLogicOperator Name="XOR"> <!-- PTP: Preision Time Protocol -->
+                <Mode Name="ETH PPS Output">
+                    <Condition Diagnostic="Available only if one ETH Mode is enabled and if TIM2 or TIM3 is enabled with Slave Mode enabled and ETR as Trigger Source or if FDCAN is enabled" Expression="Semaphore_PPS_OUT_and_PHY_INTN  &amp; ((Semaphore_TriggerSourceETRTIM2 &amp; Semaphore_ETH_ControllerModeTIM2) | (Semaphore_TriggerSourceETRTIM3 &amp; Semaphore_ETH_ControllerModeTIM3) |((FDCAN_FLEXIBLE_DATARATE_FDCAN1 | FDCAN_FLEXIBLE_DATARATE_FDCAN2) | (FDCAN_Master_FDCAN1 | FDCAN_Slave_FDCAN2)))"/>
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="PPS_OUT"/>
+                    </SignalLogicalOp>
+                    <Semaphore>MW_ETH_MW</Semaphore>
+                </Mode>
+            </ModeLogicOperator>
+        </Mode>
+        <Mode Name="ETH PHY_INTN"> <!-- Check if Refmode parameters are different when PHY_INTN is used => duplicate ETH modes ? -->
+            <ModeLogicOperator Name="XOR">    
+                <Mode Name="ETH PHY_INTN">
+                    <Condition Diagnostic="Available only if one ETH Mode is enabled" Expression="Semaphore_PPS_OUT_and_PHY_INTN"/>
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="PHY_INTN"/> <!-- Input only -->
+                    </SignalLogicalOp>
+                    <Semaphore>MW_ETH_MW</Semaphore>
+                </Mode>
+            </ModeLogicOperator>
+        </Mode>
+        <Mode Name="ETH TX_ER"> <!-- Check if Refmode parameters are different when PHY_INTN is used => duplicate ETH modes ? -->
+            <ModeLogicOperator Name="XOR">    
+                <Mode Name="ETH TX_ER">
+                    <Condition Diagnostic="Available only if one MII Mode is enabled" Expression="!Semaphore_No_TX_ER &amp; !Semaphore_Ref_Clock"/>
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="TX_ER"/>
+                    </SignalLogicalOp>
+                    <Semaphore>MW_ETH_MW</Semaphore>
+                </Mode>
+            </ModeLogicOperator>
+            <Semaphore>Semaphore_TX_ER</Semaphore>
+        </Mode>
+    </ModeLogicOperator>
+    <Semaphore>ETHUsed_ForRCC</Semaphore>
+    <RefSignal IOMode="AlternateFunctionPuPdOnly" Name="CRS_DV"/> <!-- Input only -->
+    <RefSignal IOMode="AlternateFunctionPuPdOnly" Name="RXD0"/> <!-- Input only -->
+    <RefSignal IOMode="AlternateFunctionPuPdOnly" Name="RXD1"/> <!-- Input only -->
+    <RefSignal IOMode="AlternateFunctionPuPdOnly" Name="RXD2"/> <!-- Input only -->
+    <RefSignal IOMode="AlternateFunctionPuPdOnly" Name="RXD3"/> <!-- Input only -->
+    <RefSignal IOMode="AlternateFunctionPuPdOnly" Name="RX_CLK"/> <!-- Input only -->
+    <RefSignal IOMode="AlternateFunctionPuPdOnly" Name="RX_CTL"/> <!-- Input only -->
+    <RefSignal IOMode="AlternateFunctionPuPdOnly" Name="PHY_INTN"/> <!-- Input only / Optional signals: PHY_INTN -->
+    <RefSignal IOMode="AlternateFunctionPuPdOnly" Name="COL"/> <!-- Input only -->
+    <RefSignal IOMode="AlternateFunctionPuPdOnly" Name="CRS"/> <!-- Input only -->
+    <RefSignal IOMode="AlternateFunctionPuPdOnly" Name="RX_DV"/> <!-- Input only -->
+    <RefSignal IOMode="AlternateFunctionPuPdOnly" Name="RX_ER"/> <!-- Input only -->
+    <RefSignal IOMode="AlternateFunctionPuPdOnly" Name="TX_CLK"/> <!-- Input only -->
+    <RefSignal IOMode="AlternateFunctionPuPdOnly" Name="RXD4"/> <!-- Input only -->
+    <RefSignal IOMode="AlternateFunctionPuPdOnly" Name="RXD5"/> <!-- Input only -->
+    <RefSignal IOMode="AlternateFunctionPuPdOnly" Name="RXD6"/> <!-- Input only -->
+    <RefSignal IOMode="AlternateFunctionPuPdOnly" Name="RXD7"/> <!-- Input only -->
+    <RefSignal IOMode="AlternateFunctionPushPullHighSpeedByDefault" Name="CLK125"/> <!-- only for RGMII and GMII -->
+    <RefSignal IOMode="AlternateFunctionPushPullHighSpeedByDefault" Name="GTX_CLK"/> <!-- only for RGMII and GMII -->
+    <RefSignal IOMode="AlternateFunctionPushPullHighSpeedByDefault" Name="TX_CTL"/> <!-- only for RGMII -->
+    <RefSignal IOMode="AlternateFunctionPushPullMediumSpeedDefault" Name="TXD4"/> <!-- only for GMII -->
+    <RefSignal IOMode="AlternateFunctionPushPullMediumSpeedDefault" Name="TXD5"/> <!-- only for GMII -->
+    <RefSignal IOMode="AlternateFunctionPushPullMediumSpeedDefault" Name="TXD6"/> <!-- only for GMII -->
+    <RefSignal IOMode="AlternateFunctionPushPullMediumSpeedDefault" Name="TXD7"/> <!-- only for GMII -->
+    <RefSignal IOMode="AlternateFunctionPushPullMediumSpeedDefault" Name="REF_CLK"/> <!-- only for RMII -->
+    <RefSignal IOMode="AlternateFunctionPushPull" Name="MDIO"/>
+    <RefSignal IOMode="AlternateFunctionPushPullMediumSpeedDefault" Name="PPS_OUT"/> <!-- Limitation: Medium to avoid disturbing other interfaces -->
+    <RefSignal IOMode="AlternateFunctionPushPullMediumSpeedDefault" Name="CLK"/> <!-- Limitation: Medium to avoid disturbing other interfaces -->
+    <RefSignal IOMode="AlternateFunctionPushPullMediumSpeedDefault" Name="TX_ER"/> <!-- No limitation since signal only for MII -->
+    <RefSignal Name="MDC"/> <!-- variable speed depending on ETH mode -->
+    <RefSignal Name="TXD0"/> <!-- variable speed depending on ETH mode -->
+    <RefSignal Name="TXD1"/> <!-- variable speed depending on ETH mode -->
+    <RefSignal Name="TXD2"/> <!-- variable speed depending on ETH mode -->
+    <RefSignal Name="TXD3"/> <!-- variable speed depending on ETH mode -->
+</IP>

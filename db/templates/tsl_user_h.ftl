@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /*
  ******************************************************************************
   * File Name          : ${name}.h
@@ -7,11 +8,16 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
 */
+/* USER CODE END Header */
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __TSL_USER_H
 #define __TSL_USER_H
 
 #include "tsl.h"
+/* USER CODE BEGIN Includes */
+
+/* USER CODE END Includes */
+
 [#-- ************************************************************** --]
 [#-- list of includes platform dependent --]
 [#if isHalSupported?? && isHALUsed?? ]

@@ -137,7 +137,7 @@
 [/#if]
 	[#list methodList as method][#assign args = ""]	  
             [#if method.hardCode??] [#-- Hard code --]              
-                ${method.hardCode.text} 
+                ${method.hardCode.text?replace("$IpInstance",inst)} 
             [#else]
                 [#if method.type == "Template"] [#-- Template code --]  
                     [#list method.name?split("/") as n]

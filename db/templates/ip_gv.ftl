@@ -5,7 +5,7 @@
         [#list IP.variablesForMw as variable]
             [#assign ipname= IP.ipName]
             [#if variable.name?contains(ipname)]
-                ${variable.value} ${variable.name};
+${variable.value} ${variable.name};
             [/#if]       
         [/#list]
     [/#if]

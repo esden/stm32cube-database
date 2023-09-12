@@ -38,14 +38,16 @@
             [/#if]	
             [#if variables.name?contains("GPIO_INT_NUM")]
                 [#assign IrqNumber = variables.value]
+				
             [/#if]
             [#if variables.name?contains("EXTI_LINE_NUMBER")]
                 [#assign ExtiLine = variables.value]
+				
             [/#if]			
             [#if variables.value?contains("BSP LED")]
                 [#assign LED2_PORT = IpName]
                 [#assign LED2_PIN = IpInstance]	
-				[#assign useLED = true]				
+				[#assign useLED = true]								
             [/#if]
             [#if variables.value?contains("BSP BUTTON")]
                 [#assign BUTTON_PORT = IpName]
@@ -72,10 +74,17 @@
 #endif 
 
 /* Includes ------------------------------------------------------------------*/ 
-#include "${FamilyName?lower_case}xx_hal.h"
-#include <stdio.h>
+#include "${BoardName}_conf.h"
+#include "${BoardName}_errno.h"
 #include "main.h"
 
+#if (USE_BSP_COM_FEATURE > 0)
+  #if (USE_COM_LOG > 0)
+    #ifndef __GNUC__
+      #include <stdio.h>
+    #endif
+  #endif
+#endif
 /** @addtogroup BSP
  * @{
  */
@@ -91,61 +100,99 @@
 /** @defgroup ${BoardName?upper_case}_LOW_LEVEL_Exported_Types ${BoardName?upper_case} LOW LEVEL Exported Types
  * @{
  */
+ 
+ /** 
+  * @brief Define for ${BoardName?upper_case} board  
+  */ 
+#if !defined (USE_${BoardName?upper_case})
+ #define USE_${BoardName?upper_case}
+#endif
+#ifndef USE_BSP_COM_FEATURE
+   #define USE_BSP_COM_FEATURE                  0U
+#endif
+
+#ifndef USE_BSP_COM
+  #define USE_BSP_COM                           0U
+#endif
+ 
+#ifndef USE_COM_LOG
+  #define USE_COM_LOG                           1U
+#endif
+  
+#ifndef BSP_BUTTON_KEY_IT_PRIORITY
+  #define BSP_BUTTON_KEY_IT_PRIORITY            15U
+#endif 
+  
 typedef enum 
 {
-  LED2 = 0U
+  LED2 = 0
 } Led_TypeDef;
 
 typedef enum 
-{  
-  BUTTON_USER = 0U,
-  /* Alias */
-  BUTTON_KEY  = BUTTON_USER
+{
+  BUTTON_KEY = 0U
 } Button_TypeDef;
 
 typedef enum 
 {  
-  BUTTON_MODE_GPIO = 0U,
-  BUTTON_MODE_EXTI = 1U
+  BUTTON_MODE_GPIO = 0,
+  BUTTON_MODE_EXTI = 1
 } ButtonMode_TypeDef;
 
+#if (USE_BSP_COM_FEATURE > 0)
 typedef enum 
 {
   COM1 = 0U,
-} COM_TypeDef;
+}COM_TypeDef;
+
+typedef enum
+{          
+ COM_STOPBITS_1     =   UART_STOPBITS_1,                                 
+ COM_STOPBITS_2     =   UART_STOPBITS_2,
+}COM_StopBitsTypeDef;
+
+typedef enum
+{
+ COM_PARITY_NONE     =  UART_PARITY_NONE,                  
+ COM_PARITY_EVEN     =  UART_PARITY_EVEN,                  
+ COM_PARITY_ODD      =  UART_PARITY_ODD,                   
+}COM_ParityTypeDef;
+
+typedef enum
+{
+ COM_HWCONTROL_NONE    =  UART_HWCONTROL_NONE,               
+ COM_HWCONTROL_RTS     =  UART_HWCONTROL_RTS,                
+ COM_HWCONTROL_CTS     =  UART_HWCONTROL_CTS,                
+ COM_HWCONTROL_RTS_CTS =  UART_HWCONTROL_RTS_CTS, 
+}COM_HwFlowCtlTypeDef;
+
+typedef struct
+{
+  uint32_t             BaudRate;      
+  uint32_t             WordLength;    
+  COM_StopBitsTypeDef  StopBits;      
+  COM_ParityTypeDef    Parity;               
+  COM_HwFlowCtlTypeDef HwFlowCtl;                           
+}COM_InitTypeDef;
+#endif
+
+#define MX_UART_InitTypeDef          COM_InitTypeDef
+#define MX_UART_StopBitsTypeDef      COM_StopBitsTypeDef
+#define MX_UART_ParityTypeDef        COM_ParityTypeDef
+#define MX_UART_HwFlowCtlTypeDef     COM_HwFlowCtlTypeDef
 [#if useUSART]
 #if (USE_HAL_UART_REGISTER_CALLBACKS == 1)
 typedef struct
 {
-  pUART_CallbackTypeDef  pMspUartInitCb;
-  pUART_CallbackTypeDef  pMspUartDeInitCb;
-} BSP_UART_Cb_t;
+  void (* pMspInitCb)(UART_HandleTypeDef *);
+  void (* pMspDeInitCb)(UART_HandleTypeDef *);
+} BSP_COM_Cb_t;
 #endif /* (USE_HAL_UART_REGISTER_CALLBACKS == 1) */
 [/#if]
 
 /**
  * @}
  */ 
-
-/** @defgroup ${BoardName?upper_case}_LOW_LEVEL_Exported_Constants ${BoardName?upper_case} LOW LEVEL Exported Constants
- * @{
- */ 
-/** 
- * @brief Define for ${BoardName?upper_case} board  
- */ 
-/* Common Error codes */
-#define BSP_ERROR_NONE                    0
-#define BSP_ERROR_NO_INIT                -1
-#define BSP_ERROR_WRONG_PARAM            -2
-#define BSP_ERROR_BUSY                   -3
-#define BSP_ERROR_PERIPH_FAILURE         -4
-#define BSP_ERROR_COMPONENT_FAILURE      -5
-#define BSP_ERROR_UNKNOWN_FAILURE        -6
-#define BSP_ERROR_UNKNOWN_COMPONENT      -7 
-#define BSP_ERROR_BUS_FAILURE            -8 
-#define BSP_ERROR_CLOCK_FAILURE          -9  
-#define BSP_ERROR_MSP_FAILURE            -10  
-#define BSP_ERROR_FEATURE_NOT_SUPPORTED  -11
 
 [#if useLED]
 /** @defgroup ${BoardName?upper_case}_LOW_LEVEL_LED ${BoardName?upper_case} LOW LEVEL LED
@@ -156,7 +203,7 @@ typedef struct
 #define LED2_GPIO_PORT                    ${LED2_PORT}
 #define LED2_GPIO_CLK_ENABLE()            __HAL_RCC_${LED2_PORT}_CLK_ENABLE()
 #define LED2_GPIO_CLK_DISABLE()           __HAL_RCC_${LED2_PORT}_CLK_DISABLE()  
-#define LED2_GPIO_PIN                     ${LED2_PIN}
+#define LED2_PIN                     ${LED2_PIN}
 [/#if]
 /**
  * @}
@@ -175,13 +222,13 @@ typedef struct
 /**
  * @brief Key push-button
  */
-#define KEY_BUTTON_GPIO_PIN               ${BUTTON_PIN}
+#define KEY_BUTTON_PIN	                  ${BUTTON_PIN}
 #define KEY_BUTTON_GPIO_PORT              ${BUTTON_PORT}
 #define KEY_BUTTON_GPIO_CLK_ENABLE()      __HAL_RCC_${BUTTON_PORT}_CLK_ENABLE()   
 #define KEY_BUTTON_GPIO_CLK_DISABLE()     __HAL_RCC_${BUTTON_PORT}_CLK_DISABLE()  
 #define KEY_BUTTON_EXTI_IRQn              ${BUTTON_IRQn}
 #define KEY_BUTTON_EXTI_LINE              EXTI_LINE_${BUTTON_EXTI} 
-#define BSP_BUTTON_KEY_IT_PRIORITY        0xF
+
 /**
  * @}
  */ 
@@ -198,50 +245,41 @@ typedef struct
 #define COM1_UART                        ${UsartInstance}
 
 #define COM_POLL_TIMEOUT                 1000
+[#-- Bug 61525--]
+[#-- extern UART_HandleTypeDef hComHandle[COMn] --]
+extern UART_HandleTypeDef hcom_uart[COMn];
+[#-- Bug 61525--]
+#define  h${UsartInstance?lower_case?replace("usart", "uart")} hcom_uart[COM1]
+[#--#define UartHandle h${UsartInstance?lower_case?replace("usart", "uart")}--]
 
-#define USE_COM_LOG                      1U
-
-#define UartHandle h${UsartInstance?lower_case?replace("usart", "uart")}
-
-typedef enum
-{          
- COM_STOPBITS_1 =   UART_STOPBITS_1,                                 
- COM_STOPBITS_2 =   UART_STOPBITS_2,
-} COM_StopBitsTypeDef;
-
-typedef enum
-{
- COM_PARITY_NONE =  UART_PARITY_NONE,                  
- COM_PARITY_EVEN =  UART_PARITY_EVEN,                  
- COM_PARITY_ODD  =  UART_PARITY_ODD,                   
-} COM_ParityTypeDef;
-
-
-typedef enum
-{
- COM_HWCONTROL_NONE    =  UART_HWCONTROL_NONE,               
- COM_HWCONTROL_RTS     =  UART_HWCONTROL_RTS,                
- COM_HWCONTROL_CTS     =  UART_HWCONTROL_CTS,                
- COM_HWCONTROL_RTS_CTS =  UART_HWCONTROL_RTS_CTS, 
-} COM_HwFlowCtlTypeDef;
-
-typedef struct
-{
-  uint32_t             BaudRate;      
-  uint32_t             WordLength;    
-  COM_StopBitsTypeDef  StopBits;      
-  COM_ParityTypeDef    Parity;               
-  COM_HwFlowCtlTypeDef HwFlowCtl;                           
-} COM_InitTypeDef;
 [/#if]
 /**
  * @}
  */
   
+/**
+  * @}
+  */ 
+
+/**
+  * @}
+  */
+
+
+/** @defgroup ${BoardName?upper_case}_LOW_LEVEL_Exported_Variables LOW LEVEL Exported Constants
+  * @{
+  */   
+[#if useBUTTON]
+extern EXTI_HandleTypeDef* hExtiButtonHandle[BUTTONn];
+[/#if]
+/**
+  * @}
+  */ 
+    
 /** @defgroup ${BoardName?upper_case}_LOW_LEVEL_Exported_Functions ${BoardName?upper_case} LOW LEVEL Exported Functions
  * @{
  */ 
-/* Exported Functions --------------------------------------------------------*/
+
 int32_t  BSP_GetVersion(void);  
 [#if useLED]
 int32_t  BSP_LED_Init(Led_TypeDef Led);
@@ -256,18 +294,21 @@ int32_t  BSP_PB_Init(Button_TypeDef Button, ButtonMode_TypeDef ButtonMode);
 int32_t  BSP_PB_DeInit(Button_TypeDef Button);
 int32_t  BSP_PB_GetState(Button_TypeDef Button);
 void     BSP_PB_Callback(Button_TypeDef Button);
+void     BSP_PB_IRQHandler (Button_TypeDef Button);
 [/#if]
 [#if useUSART]
+#if (USE_BSP_COM_FEATURE > 0)
 int32_t  BSP_COM_Init(COM_TypeDef COM);
 int32_t  BSP_COM_DeInit(COM_TypeDef COM);
+#endif
 
-#if (USE_COM_LOG == 1)
+#if (USE_COM_LOG > 0)
 int32_t  BSP_COM_SelectLogPort(COM_TypeDef COM);
 #endif
 
 #if (USE_HAL_UART_REGISTER_CALLBACKS == 1) 
-int32_t BSP_${UsartInstance}_RegisterDefaultMspCallbacks(void);
-int32_t BSP_${UsartInstance}_RegisterMspCallbacks(BSP_UART_Cb_t *Callback);
+int32_t BSP_COM_RegisterDefaultMspCallbacks(COM_TypeDef COM);
+int32_t BSP_COM_RegisterMspCallbacks(COM_TypeDef COM , BSP_COM_Cb_t *Callback);
 #endif /* USE_HAL_UART_REGISTER_CALLBACKS */
 [/#if]
 

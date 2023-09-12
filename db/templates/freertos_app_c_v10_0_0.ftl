@@ -102,7 +102,7 @@
           [/#if]
           [#assign index = index + 1]
         [/#list]
-        [#if mw!="USBPD"]
+        [#if mw!="USBPD" && mw!="TRACER_EMB"]
 extern void MX_${mw}_Init(void);
         [/#if]
 	  [/#if]

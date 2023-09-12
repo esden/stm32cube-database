@@ -38,6 +38,9 @@ TIM_HandleTypeDef        h${instance?lower_case};
 [#if FamilyName=="STM32F0"]
 [#assign APB = "APB1"]
 [/#if]
+[#if FamilyName=="STM32G0"]
+[#assign APB = "APB1"]
+[/#if]
 HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
 {
   RCC_ClkInitTypeDef    clkconfig;

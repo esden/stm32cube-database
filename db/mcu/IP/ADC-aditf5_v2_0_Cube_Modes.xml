@@ -191,6 +191,15 @@
         <Description>frequency of the clock to the ADC. The clock is common for all the ADCs.</Description>
     </RefParameter>  
 		
+                <!-- Possible Value of Resolution parameter -->
+    <!--RefParameter Comment="Resolution" DefaultValue="ADC_RESOLUTION_12B" Group="ADCgroup" Name="Resolution" Type="list">
+        <Condition Expression="STM32WB" Diagnostic=""/>
+        <PossibleValue Comment="ADC 12-bit resolution" Value="ADC_RESOLUTION_12B"/>
+        <PossibleValue Comment="ADC 10-bit resolution" Value="ADC_RESOLUTION_10B"/>
+        <PossibleValue Comment="ADC 8-bit resolution"  Value="ADC_RESOLUTION_8B"/>
+        <PossibleValue Comment="ADC 6-bit resolution"  Value="ADC_RESOLUTION_6B"/>
+        <Description>Resolution of the ADC conversion</Description>
+    </RefParameter-->
     <!-- Possible Value of Resolution parameter -->
     <RefParameter Comment="Resolution" DefaultValue="ADC_RESOLUTION_12B" Group="ADCgroup" Name="Resolution" Type="list">
         <PossibleValue Action="Disable" Comment="ADC 12-bit resolution" Condition="isNotAllowed_12b10b" Diagnostic="In case of usage of channels on injected group, ADC frequency should be low than AHB clock frequency /4 for resolution 12 or 10 bits." Semaphore="ADC_RESOLUTION12b_$IpInstance" Value="ADC_RESOLUTION_12B"/>
@@ -281,85 +290,62 @@
     <RefParameter Comment="Number Of Discontinuous Conversions" DefaultValue="1" Group="ADCgroup" Max="8" Min="1" Name="NbrOfDiscConversion" Type="integer"/>
 		
     <!-- Possible values of DMAContinuousRequests parameter -->
-    
-       <RefParameter Comment="DMA Continuous Requests" DefaultValue="DISABLE" Group="ADCgroup" Name="DMAContinuousRequests" Type="list">
-           <Condition Diagnostic="" Expression="DMARequest_ADC1 &amp; $IpNumber=1"/>
-        <PossibleValue Comment="Disabled" Value="DISABLE"/>
-        <PossibleValue Comment="Enabled" Value="ENABLE"/>
-        <Description>Enable/Disable DMA Continuous Requests</Description>
-    </RefParameter>
-    
-     <RefParameter Comment="DMA Continuous Requests" DefaultValue="DISABLE" Group="ADCgroup" Name="DMAContinuousRequests" Type="list">
-           <Condition Diagnostic="" Expression="DMARequest_ADC2 &amp; $IpNumber=2"/>
-        <PossibleValue Comment="Disabled" Value="DISABLE"/>
-        <PossibleValue Comment="Enabled" Value="ENABLE"/>
-        <Description>Enable/Disable DMA Continuous Requests</Description>
-    </RefParameter>
-   
-    
-     <RefParameter Comment="DMA Continuous Requests" DefaultValue="DISABLE" Group="ADCgroup" Name="DMAContinuousRequests" Type="list">
-           <Condition Diagnostic="" Expression="DMARequest_ADC3 &amp; $IpNumber=3"/>
-        <PossibleValue Comment="Disabled" Value="DISABLE"/>
-        <PossibleValue Comment="Enabled" Value="ENABLE"/>
-        <Description>Enable/Disable DMA Continuous Requests</Description>
-    </RefParameter>
-    
     <RefParameter Comment="DMA Continuous Requests" DefaultValue="DISABLE" Group="ADCgroup" Name="DMAContinuousRequests" Type="list">
         <PossibleValue Comment="Disabled" Value="DISABLE"/>
-        <!--PossibleValue Comment="Enabled" Value="ENABLE" /-->      
-        <Description>DMA continuous requests are enabled if a DMA request is configured in DMA Settings Tab.</Description>
+        <PossibleValue Comment="Enabled" Semaphore="Semaphore_DMAContinuousRequests_Enable" Value="ENABLE" Action="remove" Condition="!DMARequest_ADC1|VBATSelected$IpInstance | TempSelected$IpInstance | VREFSelected$IpInstance" Diagnostic="The DMAContinuousRequests parameter can be set to enable only if DMA request is active in DMA settings tab"/>
+        <Description>Enable/Disable DMA Continuous Requests</Description>
     </RefParameter>
-	 <RefParameter Comment="DMA Continuous Requests" DefaultValue="LIMITED" Group="ADCgroup" Name="DMAContinuousRequestsForConfigFile" Type="list" Visible="false">
+<!--    <RefParameter Comment="DMA Continuous Requests" DefaultValue="NONE" Group="ADCgroup" Name="DMAContinuousRequestsForConfigFile" Type="list" Visible="false">
+        <PossibleValue Comment="none" Value="NONE"/>
+        <Description>Enable/Disable DMA Continuous Requests</Description>
+    </RefParameter>-->
+      <RefParameter Comment="DMA Continuous Requests" DefaultValue="LIMITED" Group="ADCgroup" Name="DMAContinuousRequestsForConfigFile" Type="list" Visible="false">
          <Condition Diagnostic="" Expression="$IpNumber=1 &amp; DMARequest_ADC1 &amp; DMAContinuousRequests=DISABLE"/>
-        <PossibleValue Comment="limited" Value="LIMITED"/>
+        <PossibleValue Comment="LIMITED" Value="LIMITED"/>
         <Description>Enable/Disable DMA Continuous Requests</Description>
     </RefParameter>
     <RefParameter Comment="DMA Continuous Requests" DefaultValue="UNLIMITED" Group="ADCgroup" Name="DMAContinuousRequestsForConfigFile" Type="list" Visible="false">
          <Condition Diagnostic="" Expression="$IpNumber=1 &amp; DMARequest_ADC1 &amp; DMAContinuousRequests=ENABLE"/>
-        <PossibleValue Comment="unlimited" Value="UNLIMITED"/>
+        <PossibleValue Comment="LIMITED" Value="UNLIMITED"/>
         <Description>Enable/Disable DMA Continuous Requests</Description>
     </RefParameter>
-    <!--RefParameter Comment="DMA Continuous Requests" DefaultValue="NONE" Group="ADCgroup" Name="DMAContinuousRequestsForConfigFile" Type="list" Visible="false">
+    <RefParameter Comment="DMA Continuous Requests" DefaultValue="NONE" Group="ADCgroup" Name="DMAContinuousRequestsForConfigFile" Type="list" Visible="false">
          <Condition Diagnostic="" Expression="$IpNumber=1 &amp; !DMARequest_ADC1 &amp; DMAContinuousRequests=DISABLE"/>
         <PossibleValue Comment="none" Value="NONE"/>
         <Description>Enable/Disable DMA Continuous Requests</Description>
-    </RefParameter-->
+    </RefParameter>
     <RefParameter Comment="DMA Continuous Requests" DefaultValue="LIMITED" Group="ADCgroup" Name="DMAContinuousRequestsForConfigFile" Type="list" Visible="false">
          <Condition Diagnostic="" Expression="$IpNumber=2 &amp; DMARequest_ADC2 &amp; DMAContinuousRequests=DISABLE"/>
-        <PossibleValue Comment="limited" Value="LIMITED"/>
+        <PossibleValue Comment="LIMITED" Value="LIMITED"/>
         <Description>Enable/Disable DMA Continuous Requests</Description>
     </RefParameter>
     <RefParameter Comment="DMA Continuous Requests" DefaultValue="UNLIMITED" Group="ADCgroup" Name="DMAContinuousRequestsForConfigFile" Type="list" Visible="false">
          <Condition Diagnostic="" Expression="$IpNumber=2 &amp; DMARequest_ADC2 &amp; DMAContinuousRequests=ENABLE"/>
-        <PossibleValue Comment="unlimited" Value="UNLIMITED"/>
+        <PossibleValue Comment="LIMITED" Value="UNLIMITED"/>
         <Description>Enable/Disable DMA Continuous Requests</Description>
     </RefParameter>
-    <!--RefParameter Comment="DMA Continuous Requests" DefaultValue="NONE" Group="ADCgroup" Name="DMAContinuousRequestsForConfigFile" Type="list" Visible="false">
+    <RefParameter Comment="DMA Continuous Requests" DefaultValue="NONE" Group="ADCgroup" Name="DMAContinuousRequestsForConfigFile" Type="list" Visible="false">
          <Condition Diagnostic="" Expression="$IpNumber=2 &amp; !DMARequest_ADC2 &amp; DMAContinuousRequests=DISABLE"/>
         <PossibleValue Comment="none" Value="NONE"/>
         <Description>Enable/Disable DMA Continuous Requests</Description>
-    </RefParameter-->
+    </RefParameter>
     
-     <RefParameter Comment="DMA Continuous Requests" DefaultValue="LIMITED" Group="ADCgroup" Name="DMAContinuousRequestsForConfigFile" Type="list" Visible="false">
+    <RefParameter Comment="DMA Continuous Requests" DefaultValue="LIMITED" Group="ADCgroup" Name="DMAContinuousRequestsForConfigFile" Type="list" Visible="false">
          <Condition Diagnostic="" Expression="$IpNumber=3 &amp; DMARequest_ADC3 &amp; DMAContinuousRequests=DISABLE"/>
-        <PossibleValue Comment="limited" Value="LIMITED"/>
+        <PossibleValue Comment="LIMITED" Value="LIMITED"/>
         <Description>Enable/Disable DMA Continuous Requests</Description>
     </RefParameter>
     <RefParameter Comment="DMA Continuous Requests" DefaultValue="UNLIMITED" Group="ADCgroup" Name="DMAContinuousRequestsForConfigFile" Type="list" Visible="false">
          <Condition Diagnostic="" Expression="$IpNumber=3 &amp; DMARequest_ADC3 &amp; DMAContinuousRequests=ENABLE"/>
-        <PossibleValue Comment="unlimited" Value="UNLIMITED"/>
+        <PossibleValue Comment="LIMITED" Value="UNLIMITED"/>
         <Description>Enable/Disable DMA Continuous Requests</Description>
     </RefParameter>
-    <!--RefParameter Comment="DMA Continuous Requests" DefaultValue="NONE" Group="ADCgroup" Name="DMAContinuousRequestsForConfigFile" Type="list" Visible="false">
+    <RefParameter Comment="DMA Continuous Requests" DefaultValue="NONE" Group="ADCgroup" Name="DMAContinuousRequestsForConfigFile" Type="list" Visible="false">
          <Condition Diagnostic="" Expression="$IpNumber=3 &amp; !DMARequest_ADC3 &amp; DMAContinuousRequests=DISABLE"/>
         <PossibleValue Comment="none" Value="NONE"/>
         <Description>Enable/Disable DMA Continuous Requests</Description>
-    </RefParameter-->
-    <RefParameter Comment="DMA Continuous Requests" DefaultValue="NONE" Group="ADCgroup" Name="DMAContinuousRequestsForConfigFile" Type="list" Visible="false">
-        <PossibleValue Comment="none" Value="NONE"/>
-        <Description>Enable/Disable DMA Continuous Requests</Description>
     </RefParameter>
-    <!-- Possible values of EOCSelection parameter -->
+    
     <RefParameter Comment="End Of Conversion Selection" DefaultValue="ADC_EOC_SINGLE_CONV" Group="ADCgroup" Name="EOCSelection" Type="list">
         <PossibleValue Comment="End of single conversion" Value="ADC_EOC_SINGLE_CONV"/>
         <PossibleValue Comment="End of sequence of conversion" Value="ADC_EOC_SEQ_CONV"/>
@@ -460,6 +446,19 @@
     <RefParameter Comment="Number Of Conversion" DefaultValue="1" Group="ADCgroup" Max="16" Min="1" Name="NbrOfConversion" Type="integer">
         <Description>Number of regular channels to be converted</Description>
     </RefParameter>
+    
+    <RefParameter Comment="ChannelVREF" DefaultValue="ADC_CHANNEL_VREFINT" Name="ChannelVREF" Type="list" Visible="false">
+      <Condition Expression="VREFSelected$IpInstance" Diagnostic=""/>
+      <PossibleValue Comment="ADC_CHANNEL_VREFINT" Value="ADC_CHANNEL_VREFINT"/>
+    </RefParameter>
+    <RefParameter Comment="ChannelTS" DefaultValue="ADC_CHANNEL_TEMPSENSOR" Name="ChannelTS" Type="list" Visible="false">
+      <Condition Expression="TempSelected$IpInstance" Diagnostic=""/>
+      <PossibleValue Comment="ADC_CHANNEL_TEMPSENSOR" Value="ADC_CHANNEL_TEMPSENSOR"/>
+    </RefParameter>
+    <RefParameter Comment="Channelvbat" DefaultValue="ADC_CHANNEL_VBAT" Name="ChannelVBAT" Type="list" Visible="false">
+      <Condition Expression="VBATSelected$IpInstance" Diagnostic=""/>
+      <PossibleValue Comment="ADC_CHANNEL_VBAT" Value="ADC_CHANNEL_VBAT"/>
+    </RefParameter>
         
     <!-- ExternalTrigConv -->
     <RefParameter Comment="External Trigger Conversion Source" DefaultValue="null" Group="ADCgroup" Name="ExternalTrigConv" Type="list" Visible="false">
@@ -538,7 +537,7 @@
 	
     <!-- Possible Value of OffsetNumber parameters  -->
     <RefParameter Comment="Offset Number" DefaultValue="ADC_OFFSET_NONE" Group="ADCgroup" Name="OffsetNumber" Type="list">
-        <Condition Diagnostic="" Expression="Regular_OversamplingMode_Enabled_$IpInstance"/>
+        <Condition Diagnostic="" Expression="Regular_OversamplingMode_Enabled_$IpInstance | Injected_OversamplingMode_Enabled_$IpInstance "/>
         <PossibleValue Comment="No offset" Value="ADC_OFFSET_NONE"/>
         <Description>Offset correction is not supported in oversampling mode</Description>
     </RefParameter>
@@ -1331,7 +1330,9 @@
         <Condition Diagnostic="" Expression="ADC_RESOLUTION6b_$IpInstance"/>
         <Description>Configures the ADC analog watchdog High threshold value.</Description>
     </RefParameter>
-	
+    <RefParameter Comment="High Threshold" DefaultValue="0" Group="ADCgroup" Max="63" Min="=AWD3LowThreshold" Name="AWD3HighThreshold" Type="integer">
+        <Description>Configures the ADC analog watchdog High threshold value.</Description>
+    </RefParameter>
 
     <!-- Possible value of LowThreshold parameter -->
     <RefParameter Comment="Low Threshold" DefaultValue="null" Group="ADCgroup" Name="AWD3LowThreshold" Type="list" Visible="false">
@@ -1397,7 +1398,9 @@
         <Condition Diagnostic="" Expression="ADC_RESOLUTION6b_$IpInstance"/>
         <Description>Configures the ADC analog watchdog High threshold value.</Description>
     </RefParameter>
-	
+     <RefParameter Comment="High Threshold" DefaultValue="0" Group="ADCgroup" Max="63" Min="=AWD2LowThreshold" Name="AWD2HighThreshold" Type="integer">
+        <Description>Configures the ADC analog watchdog High threshold value.</Description>
+    </RefParameter>
 		    
     <!-- Possible value of LowThreshold parameter -->
     <RefParameter Comment="Low Threshold" DefaultValue="null" Group="ADCgroup" Name="AWD2LowThreshold" Type="list" Visible="false">
@@ -1550,7 +1553,9 @@
         <Condition Diagnostic="" Expression="ADC_RESOLUTION6b_$IpInstance"/>
         <Description>Configures the ADC analog watchdog High threshold value.</Description>
     </RefParameter>	
-		 	
+    <RefParameter Comment="High Threshold" DefaultValue="0" Group="ADCgroup" Max="63" Min="=AWD1LowThreshold" Name="AWD1HighThreshold" Type="integer">
+        <Description>Configures the ADC analog watchdog High threshold value.</Description>
+    </RefParameter>	
     <!-- Possible value of LowThreshold parameter -->	
     <RefParameter Comment="Low Threshold" DefaultValue="null" Group="ADCgroup" Name="AWD1LowThreshold" Type="list" Visible="false">
         <Condition Diagnostic="" Expression="EnableAnalogWatchDog1=false"/>
@@ -1703,6 +1708,7 @@
     </RefMode>				
     <RefMode BaseMode="ADC_Regular_ConversionMode" Comment="Regular Channel Settings" Group="ADC_Regular_ConversionMode" Name="ChannelRegularConversion">
         <ConfigForMode>ADC_RegularChannelConfig</ConfigForMode>
+        <ConfigForMode>ADC_InternalChannelConfig</ConfigForMode>
         <ConfigForMode>ADC_RegularChannelConfigForWD</ConfigForMode>
         <Parameter Name="Rank"/>
         <Parameter Name="Channel"/>
@@ -2013,6 +2019,26 @@
     <ModeLogicOperator Name="OR">
     
         <!-- External channels -->
+        <Mode Name="IN0MPU" UserName="IN0">
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="IN0-Differential" UserName="IN0 Differential">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="IN0"/>
+                        <Signal Name="IN1"/>
+                    </SignalLogicalOp>
+                    <Semaphore>IN0Used_$IpInstance</Semaphore>
+                    <Semaphore>IN0DiffUsed_$IpInstance</Semaphore>
+                    <Condition Diagnostic="Channel1 is already used" Expression="!IN1Used_$IpInstance"/>
+                </Mode>
+                <Mode Name="IN0-Single-Ended" UserName="IN0 Single-ended">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="IN0"/>
+                    </SignalLogicalOp>
+                </Mode>
+            
+            </ModeLogicOperator>
+            <Semaphore>channelSelected$IpInstance</Semaphore>
+        </Mode>
         <Mode Name="IN1">
             <ModeLogicOperator Name="XOR">
                 <Mode Name="IN1-Differential" UserName="IN1 Differential">
@@ -2385,7 +2411,17 @@
             <Semaphore>channelSelected$IpInstance</Semaphore>
             <Condition Diagnostic="Channel16 is already used" Expression="!IN15DiffUsed_$IpInstance"/>
         </Mode>
-             
+        <Mode Name="IN17MPU" UserName="IN17">
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="IN17-Single-Ended" UserName="IN17 Single-ended">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="IN17"/>
+                    </SignalLogicalOp>
+                </Mode>
+            
+            </ModeLogicOperator>
+            <Semaphore>channelSelected$IpInstance</Semaphore>
+        </Mode>
         <Mode Name="IN17" RemoveCondition="!((DIE435 | DIE462)  &amp;(!ADC2_Exist))">
             <ModeLogicOperator Name="XOR">
                 <Mode Name="IN-TempSens" UserName="Temperature Sensor Channel">
@@ -2402,6 +2438,29 @@
             </ModeLogicOperator>
             <Semaphore>channelSelected$IpInstance</Semaphore>
         </Mode>
+        <Mode Name="IN18MPU" UserName="IN18">
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="IN18-Single-Ended" UserName="IN18 Single-ended">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="IN18"/>
+                    </SignalLogicalOp>
+                </Mode>
+            
+            </ModeLogicOperator>
+            <Semaphore>channelSelected$IpInstance</Semaphore>
+        </Mode>
+        <Mode Name="IN19MPU" UserName="IN19">
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="IN19-Single-Ended" UserName="IN19 Single-ended">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="IN19"/>
+                    </SignalLogicalOp>
+                </Mode>
+            
+            </ModeLogicOperator>
+            <Semaphore>channelSelected$IpInstance</Semaphore>
+        </Mode>
+
         <Mode Name="IN18" RemoveCondition="!((DIE435)  &amp;(!ADC2_Exist))">
             <ModeLogicOperator Name="XOR">
                 <Mode Name="IN-Vbat" UserName="Vbat Channel">
@@ -2429,6 +2488,7 @@
                 </Mode>
             </ModeLogicOperator>
             <Semaphore>channelSelected$IpInstance</Semaphore>
+            <Semaphore>TempSelected$IpInstance</Semaphore>
         </Mode>
         
         <Mode Name="IN-Vbat" RemoveCondition="($IpNumber=2) | ((DIE435)  &amp;(!ADC2_Exist))" UserName="Vbat Channel">
@@ -2440,6 +2500,7 @@
                 </Mode>
             </ModeLogicOperator>
             <Semaphore>channelSelected$IpInstance</Semaphore>
+            <Semaphore>VBATSelected$IpInstance</Semaphore>
         </Mode>
         <Mode Name="IN-Vrefint" RemoveCondition="($IpNumber=2)|($IpNumber=3)" UserName="Vrefint Channel">
             <ModeLogicOperator Name="XOR">
@@ -2450,6 +2511,7 @@
                 </Mode>
             </ModeLogicOperator>
             <Semaphore>channelSelected$IpInstance</Semaphore>
+            <Semaphore>VREFSelected$IpInstance</Semaphore>
         </Mode>
     
         <!-- DAC inputs  -->
@@ -2512,6 +2574,7 @@
     <RefSignal IOMode="EXTI" Name="EXTI11" ShareableGroupName="GPXTI11"/>
     <RefSignal IOMode="EXTI" Name="EXTI15" ShareableGroupName="GPXTI15"/>
     
+    <RefSignal IOMode="AnalogForADC" Name="IN0" ShareableGroupName="ADCx_IN0:ADC1,ADC2,ADC3"/>
     <RefSignal IOMode="AnalogForADC" Name="IN1" ShareableGroupName="ADCx_IN1:ADC1,ADC2,ADC3"/>
     <RefSignal IOMode="AnalogForADC" Name="IN2" ShareableGroupName="ADCx_IN2:ADC1,ADC2,ADC3"/>
     <RefSignal IOMode="AnalogForADC" Name="IN3" ShareableGroupName="ADCx_IN3:ADC1,ADC2,ADC3"/>
@@ -2532,6 +2595,9 @@
     <RefSignal IOMode="AnalogForADC" Name="IN14" ShareableGroupName="ADCx_IN14:ADC1,ADC2"/>
     <RefSignal IOMode="AnalogForADC" Name="IN15" ShareableGroupName="ADCx_IN15:ADC1,ADC2"/>
     <RefSignal IOMode="AnalogForADC" Name="IN16" ShareableGroupName="ADCx_IN16:ADC1,ADC2"/>
+    <RefSignal IOMode="AnalogForADC" Name="IN17" ShareableGroupName="ADCx_IN17:ADC1,ADC2"/>
+    <RefSignal IOMode="AnalogForADC" Name="IN18" ShareableGroupName="ADCx_IN18:ADC1,ADC2"/>
+    <RefSignal IOMode="AnalogForADC" Name="IN19" ShareableGroupName="ADCx_IN19:ADC1,ADC2"/>
     
     <RefSignal IOMode="AnalogForADC" Name="TempSens_Input" Virtual="true"/>
     <RefSignal IOMode="AnalogForADC" Name="Vref_Input" Virtual="true"/>

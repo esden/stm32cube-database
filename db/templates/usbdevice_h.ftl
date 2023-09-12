@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file           : ${name?lower_case}.h
@@ -9,6 +10,7 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
+/* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __${name?upper_case}__H__
@@ -54,7 +56,22 @@
 	[/#list]
 [/#if]
 [#-- Global variables --]
+/* Private variables ---------------------------------------------------------*/
+/* USER CODE BEGIN PV */
 
+/* USER CODE END PV */
+
+/* Private function prototypes -----------------------------------------------*/
+/* USER CODE BEGIN PFP */
+
+/* USER CODE END PFP */
+
+/*
+ * -- Insert your variables declaration here --
+ */
+/* USER CODE BEGIN VARIABLES */
+
+/* USER CODE END VARIABLES */
 /**
   * @}
   */
@@ -81,7 +98,12 @@
 void MX_USB_DEVICE_Init(void);
 
 [/#list]
+/*
+ * -- Insert functions declaration here --
+ */
+/* USER CODE BEGIN FD */
 
+/* USER CODE END FD */
 /**
   * @}
   */

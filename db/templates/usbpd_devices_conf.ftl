@@ -12,25 +12,6 @@
 /* USER CODE END Header */
 
 [#assign USBPD1Used = false]
-[#assign UARTUsed = false]
-[#assign UARTinstance = ""]
-[#assign UARTbaudrate = ""]
-[#assign UARTinterrupt = ""]
-[#assign UARTenableClock = ""]
-[#assign UART_TX_PIN = ""]
-[#assign UART_TX_GPIO_PORT = ""]
-[#assign UART_TX_GPIO_PIN = ""]
-[#assign UART_TX_SELECT_AF = ""]
-[#assign UART_RX_PIN = ""]
-[#assign UART_RX_GPIO_PORT = ""]
-[#assign UART_RX_GPIO_PIN = ""]
-[#assign UART_RX_SELECT_AF = ""]
-[#assign UART_TX_DMA_CHANNEL = ""]
-[#assign UART_TX_DMA_REQUEST = ""]
-[#assign UART_TX_DMA = ""]
-[#assign UART_TX_DMA_LL_CHANNEL = ""]
-[#assign UART_TX_DMA_CHANNEL_ID = ""]
-[#assign UART_TX_DMA_interrupt = ""]
 
 [#-- SWIPdatas is a list of SWIPconfigModel --]
 [#list SWIPdatas as SWIP]
@@ -181,63 +162,6 @@
             [#if definition.name == "TIMenableClock"]
                 [#assign TIMenableClock = definition.value]
             [/#if]
-            [#if definition.name == "UARTinstance" && definition.value != ""]
-                [#assign UARTUsed = true]
-                [#assign UARTinstance = definition.value]
-            [/#if]
-            [#if definition.name == "UARTbaudrate"]
-                [#assign UARTbaudrate = definition.value]
-            [/#if]
-            [#if definition.name == "UARTinterrupt"]
-                [#assign UARTinterrupt = definition.value]
-            [/#if]
-            [#if definition.name == "UARTenableClock"]
-                [#assign UARTenableClock = definition.value]
-            [/#if]
-            [#if definition.name == "UART_TX_PIN"]
-                [#assign UART_TX_PIN = definition.value]
-                [#if UART_TX_PIN != "" && UART_TX_PIN != "valueNotSetted"]
-                    [#assign UART_TX_PIN_elems = UART_TX_PIN.split("_")]
-                    [#assign UART_TX_GPIO_PORT = UART_TX_PIN_elems[1]]
-                    [#assign UART_TX_GPIO_PIN = UART_TX_PIN_elems[2]]
-                    [#assign UART_TX_SELECT_AF = UART_TX_PIN_elems[4]]
-                [#else]
-                    [#assign UART_TX_GPIO_PORT = "valueNotSetted"]
-                    [#assign UART_TX_GPIO_PIN = "valueNotSetted"]
-                    [#assign UART_TX_SELECT_AF = "valueNotSetted"]
-                [/#if]
-            [/#if]
-            [#if definition.name == "UART_RX_PIN"]
-                [#assign UART_RX_PIN = definition.value]
-                [#if UART_RX_PIN != "" && UART_RX_PIN != "valueNotSetted"]
-                    [#assign UART_RX_PIN_elems = UART_RX_PIN.split("_")]
-                    [#assign UART_RX_GPIO_PORT = UART_RX_PIN_elems[1]]
-                    [#assign UART_RX_GPIO_PIN = UART_RX_PIN_elems[2]]
-                    [#assign UART_RX_SELECT_AF = UART_RX_PIN_elems[4]]
-                [#else]
-                    [#assign UART_RX_GPIO_PORT = "valueNotSetted"]
-                    [#assign UART_RX_GPIO_PIN = "valueNotSetted"]
-                    [#assign UART_RX_SELECT_AF = "valueNotSetted"]
-                [/#if]
-            [/#if]
-            [#if definition.name == "UART_TX_DMA_CHANNEL"]
-                [#assign UART_TX_DMA_CHANNEL = definition.value]
-                [#if UART_TX_DMA_CHANNEL != "" && UART_TX_DMA_CHANNEL != "valueNotSetted"]
-                    [#assign UART_TX_DMA_CHANNEL_elems = UART_TX_DMA_CHANNEL.split("_")]
-                    [#assign UART_TX_DMA_REQUEST = UART_TX_DMA_CHANNEL_elems[0] + "_" + UART_TX_DMA_CHANNEL_elems[1]]
-                    [#assign UART_TX_DMA = UART_TX_DMA_CHANNEL_elems[2]]
-                    [#assign UART_TX_DMA_LL_CHANNEL = UART_TX_DMA_CHANNEL_elems[3]?upper_case + "_" + UART_TX_DMA_CHANNEL_elems[4]]
-                    [#assign UART_TX_DMA_CHANNEL_ID = UART_TX_DMA_CHANNEL_elems[4]]
-                [#else]
-                    [#assign UART_TX_DMA_REQUEST = "valueNotSetted"]
-                    [#assign UART_TX_DMA = "valueNotSetted"]
-                    [#assign UART_TX_DMA_LL_CHANNEL = "valueNotSetted"]
-                    [#assign UART_TX_DMA_CHANNEL_ID = "valueNotSetted"]
-                [/#if]
-            [/#if]
-            [#if definition.name == "UART_TX_DMA_interrupt"]
-                [#assign UART_TX_DMA_interrupt = definition.value]
-            [/#if]
         [/#list]
     [/#if]
 [/#list]
@@ -264,14 +188,6 @@
     [/#if][#t]
     [#if TIMinstance?starts_with("TIM")][#t]
         [#t]#include "stm32g0xx_ll_tim.h"
-    [/#if]
-[/#if]
-[#if UARTinstance??]
-    [#if UARTinstance?starts_with("LPUART")][#t]
-        [#t]#include "stm32g0xx_ll_lpuart.h"
-    [/#if][#t]
-    [#if UARTinstance?starts_with("UART") || UARTinstance?starts_with("USART")][#t]
-        [#t]#include "stm32g0xx_ll_usart.h"
     [/#if]
 [/#if]
 
@@ -400,42 +316,6 @@
 [/#if]
 
 /* -----------------------------------------------------------------------------
-      Definitions for TRACE feature
--------------------------------------------------------------------------------*/
-
-/* Enable below USE_FULL_LL_DRIVER_USART compilation flag to use generic LL_USART_Init() function */
-/* #define USE_FULL_LL_DRIVER_USART */
-
-[#if !UARTUsed]/*[/#if]
-#define TRACE_BAUDRATE                          ${UARTbaudrate}u
-
-#define TRACE_USART_INSTANCE                    ${UARTinstance}
-
-#define TRACE_TX_GPIO                           GPIO${UART_TX_GPIO_PORT}
-#define TRACE_TX_PIN                            LL_GPIO_PIN_${UART_TX_GPIO_PIN}
-#define TRACE_TX_AF                             LL_GPIO_AF_${UART_TX_SELECT_AF}
-#define TRACE_RX_GPIO                           GPIO${UART_RX_GPIO_PORT}
-#define TRACE_RX_PIN                            LL_GPIO_PIN_${UART_RX_GPIO_PIN}
-#define TRACE_RX_AF                             LL_GPIO_AF_${UART_RX_SELECT_AF}
-#define TRACE_GPIO_ENABLE_CLOCK()               LL_IOP_GRP1_EnableClock(LL_IOP_GRP1_PERIPH_GPIO${UART_TX_GPIO_PORT})
-
-#define TRACE_ENABLE_CLK_USART()                ${UARTenableClock}
-#define TRACE_SET_CLK_SOURCE_USART()            // No need for clock source selection in case of USART3 // LL_RCC_SetUSARTClockSource(LL_RCC_USART3_CLKSOURCE_PCLK2)
-#define TRACE_USART_IRQ                         ${UARTinterrupt}
-#define TRACE_TX_AF_FUNCTION                    LL_GPIO_SetAFPin_0_7
-#define TRACE_RX_AF_FUNCTION                    LL_GPIO_SetAFPin_0_7
-[#if UART_TX_DMA != "" && UART_TX_DMA != "valueNotSetted"]
-#define TRACE_DMA_INSTANCE                      ${UART_TX_DMA}
-#define TRACE_ENABLE_CLK_DMA()                  ${USBPDenableClock}
-#define TRACE_TX_DMA_REQUEST                    LL_DMAMUX_REQ_${UART_TX_DMA_REQUEST}
-#define TRACE_TX_DMA_CHANNEL                    LL_DMA_${UART_TX_DMA_LL_CHANNEL}
-#define TRACE_TX_DMA_IRQ                        ${UART_TX_DMA_interrupt}
-#define TRACE_TX_DMA_ACTIVE_FLAG                LL_DMA_IsActiveFlag_TC${UART_TX_DMA_CHANNEL_ID}
-#define TRACE_TX_DMA_CLEAR_FLAG                 LL_DMA_ClearFlag_GI${UART_TX_DMA_CHANNEL_ID}
-[/#if]
-[#if !UARTUsed]*/[/#if]
-
-/* -----------------------------------------------------------------------------
       Definitions for timer service feature
 -------------------------------------------------------------------------------*/
 
@@ -447,19 +327,19 @@
 #define TIMX_CHANNEL_CH3               LL_TIM_CHANNEL_CH3
 #define TIMX_CHANNEL_CH4               LL_TIM_CHANNEL_CH4
 #define TIMX_CHANNEL1_SETEVENT         do{                                                                    \
-                                          LL_TIM_OC_SetCompareCH1(TIMX, (us_time + TIMX->CNT) % TIM_MAX_TIME);\
+                                          LL_TIM_OC_SetCompareCH1(TIMX, (TimeUs + TIMX->CNT) % TIM_MAX_TIME);\
                                           LL_TIM_ClearFlag_CC1(TIMX);                                         \
                                        }while(0)
 #define TIMX_CHANNEL2_SETEVENT         do{                                                                    \
-                                          LL_TIM_OC_SetCompareCH2(TIMX, (us_time + TIMX->CNT) % TIM_MAX_TIME);\
+                                          LL_TIM_OC_SetCompareCH2(TIMX, (TimeUs + TIMX->CNT) % TIM_MAX_TIME);\
                                           LL_TIM_ClearFlag_CC2(TIMX);                                         \
                                        }while(0)
 #define TIMX_CHANNEL3_SETEVENT         do{                                                                    \
-                                          LL_TIM_OC_SetCompareCH3(TIMX, (us_time + TIMX->CNT) % TIM_MAX_TIME);\
+                                          LL_TIM_OC_SetCompareCH3(TIMX, (TimeUs + TIMX->CNT) % TIM_MAX_TIME);\
                                           LL_TIM_ClearFlag_CC3(TIMX);                                         \
                                        }while(0)
 #define TIMX_CHANNEL4_SETEVENT         do{                                                                    \
-                                          LL_TIM_OC_SetCompareCH4(TIMX, (us_time + TIMX->CNT) % TIM_MAX_TIME);\
+                                          LL_TIM_OC_SetCompareCH4(TIMX, (TimeUs + TIMX->CNT) % TIM_MAX_TIME);\
                                           LL_TIM_ClearFlag_CC4(TIMX);                                         \
                                        }while(0)
 #define TIMX_CHANNEL1_GETFLAG          LL_TIM_IsActiveFlag_CC1

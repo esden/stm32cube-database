@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 [#assign use_dma=0]
 [#assign use_rtos=0]
 [#if SWIPdatas??]
@@ -35,6 +36,7 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
+/* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __SD_DISKIO_H

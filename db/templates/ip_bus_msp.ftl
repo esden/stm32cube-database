@@ -4,6 +4,13 @@
 [#assign useGpio = false]
 [#assign useDma = false]
 [#assign useNvic = false]
+[#list IP.configModelList as instanceData]
+    [#if instanceData.dmaHandel??]
+        [#list instanceData.dmaHandel as dHandle]
+${dHandle};
+        [/#list]
+    [/#if]
+[/#list]
 
 
 [#-- extract hal mode list used by all instances of the ip --]
@@ -121,7 +128,12 @@
 
 [#-- macro generateConfigModelCode --]
 
-[#macro generateConfigModelCode configModel inst nTab index]
+[#macro generateConfigModelCode configModel inst nTab index mode]
+[#if configModel.clockEnableMacro?? && mode=="Init"] [#-- Enable Port clock --]
+    [#list configModel.clockEnableMacro as clkmacroList]	
+            [#if nTab==2]#t#t[#else]#t[/#if]${clkmacroList}[#if !clkmacroList?contains("(")]()[/#if];
+    [/#list]
+[/#if]
 [#if configModel.methods??] [#-- if the pin configuration contains a list of LibMethods--]
     [#assign methodList = configModel.methods]
 [#else] [#assign methodList = configModel.libMethod]
@@ -390,19 +402,19 @@
    
 [#if serviceName=="gpio"]
  [#assign instanceIndex =""]
-    [@generateConfigModelCode configModel=gpioService inst=ipName nTab=tabN index=""/]
+    [@generateConfigModelCode configModel=gpioService inst=ipName nTab=tabN index="" mode=type/]
 [/#if]
 [#if serviceName=="dma" && dmaService??]
  [#assign instanceIndex =""]
     [#list dmaService as dmaconfig] 
-     [@generateConfigModelCode configModel=dmaconfig inst=ipName  nTab=tabN index=""/]
+     [@generateConfigModelCode configModel=dmaconfig inst=ipName  nTab=tabN index="" mode=type/]
         [#assign dmaCurrentRequest = dmaconfig.instanceName?lower_case]
         [#assign prefixList = dmaCurrentRequest?split("_")]
         [#list prefixList as p][#assign prefix= p][/#list]
                 [#if dmaconfig.dmaRequestName==""] [#-- if dma request name different from instanceName: case of I2S1 for example --]
-#t__HAL_LINKDMA(${instHandler},[#if dmaconfig.dmaHandel??]${dmaconfig.dmaHandel}[#else]hdma${prefix}[/#if],hdma_${dmaconfig.instanceName?lower_case});#n
+#t__HAL_LINKDMA(${instHandler},[#if dmaconfig.dmaHandel??]${dmaconfig.dmaHandel[0]}[#else]hdma${prefix}[/#if],hdma_${dmaconfig.instanceName?lower_case});#n
                 [#else]
-#t__HAL_LINKDMA(${instHandler},[#if dmaconfig.dmaHandel??]${dmaconfig.dmaHandel}[#else]hdma${prefix}[/#if],hdma_${dmaconfig.dmaRequestName?lower_case});#n
+#t__HAL_LINKDMA(${instHandler},[#if dmaconfig.dmaHandel??]${dmaconfig.dmaHandel[0]}[#else]hdma${prefix}[/#if],hdma_${dmaconfig.dmaRequestName?lower_case});#n
                 [/#if]        
 
 #n
@@ -577,7 +589,7 @@
                 [/#list]
                 [#assign lowPower = "no"]
                 [#list initService.nvic as initVector]
-                   [#if (instHandler=="pcdHandle") && (initVector.vector?contains("WKUP") || initVector.vector?contains("WakeUp") || ((initVector.vector == "USB_IRQn"||(initVector.vector == "OTG_FS_IRQn")) && USB_INTERRUPT_WAKEUP??))]
+                   [#if (instHandler=="pcdHandle") && (initVector.vector?contains("WKUP") || initVector.vector?contains("WakeUp") || ((initVector.vector == "USB_IRQn"||(initVector.vector == "OTG_FS_IRQn")||(initVector.vector == "USB_LP_IRQn")) && USB_INTERRUPT_WAKEUP??))]
                       [#assign lowPower = "yes"]
                    [/#if]
                 [/#list]
@@ -645,7 +657,7 @@
         [#list prefixList as p][#assign prefix= p][/#list]
         [#assign ipdmahandler1 = "hdma" + prefix]
          [#-- [#if getDmaHandler(ipName)!=""][#assign ipdmahandler = getDmaHandler(ipName)][#else][#assign ipdmahandler = ipdmahandler1][/#if]--]
-           [#if dmaconfig.dmaHandel??][#assign ipdmahandler = dmaconfig.dmaHandel][#else][#assign ipdmahandler = ipdmahandler1][/#if]
+           [#if dmaconfig.dmaHandel??][#assign ipdmahandler = dmaconfig.dmaHandel[0]][#else][#assign ipdmahandler = ipdmahandler1][/#if]
         #t#tHAL_DMA_DeInit(${instHandler}->${ipdmahandler});
     [/#list] [#-- list dmaService as dmaconfig --]
 [/#if]    
@@ -733,7 +745,7 @@
                         [#if fargument.genericType == "struct" && fargument.context??]
                             [#if fargument.context=="global"]
 
-#tstatic ${fargument.typeName} ${fargument.name}_${dmaRequest.instanceName?lower_case};
+[#-- #tstatic ${fargument.typeName} ${fargument.name}_${dmaRequest.instanceName?lower_case};--]
                             [/#if]
                         [/#if]
                     [/#list]
@@ -744,7 +756,6 @@
      [/#if]   [#-- if dmaService?? && dmaService.size!=0 --]
 [/#if]
 [/#list]
-
 [#assign words = instanceList]
 [#-- declare Variable GPIO_InitTypeDef once --]
        [#assign v = ""]

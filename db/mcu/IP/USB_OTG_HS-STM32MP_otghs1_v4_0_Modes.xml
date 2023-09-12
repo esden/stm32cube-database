@@ -1,0 +1,327 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<IP DBVersion="V4.0" 
+	IPType="peripheral" 
+	Name="USB_OTG_HS" 
+	Version="STM32MP_otghs1_v4_0" 
+	xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" 
+	ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd" 
+	xmlns="http://mcd.rou.st.com/modules.php?name=mcu">
+  <About>USB_OTG_HS: Universal Serial Bus On-The-Go High-Speed</About>
+	
+	<!-- Generic RefParameters for USB High Speed Host & Device Modes -->
+	<RefParameter Name="Instance" DefaultValue="USB_OTG_HS" Comment="Instance" Type="" Visible="false"/>
+	
+	<!-- Virtual Mode Parameter, to define RefParameter in function of RefMode -->
+	<RefParameter Comment="" DefaultValue="Ext_Phy_Host" Name="VirtualMode" Type="list" Visible="false" >
+		<PossibleValue Comment="" Value="Ext_Phy_Host"/>
+		<PossibleValue Comment="" Value="Ext_Phy_Device"/>
+		<PossibleValue Comment="" Value="Int_Phy_Host"/>
+		<PossibleValue Comment="" Value="Int_Phy_Device"/>			
+	</RefParameter>
+	
+	<!-- Bug356587 -->		
+	<!-- Parameters dev_endpoints --> 
+	<RefParameter Comment="Device endpoints number" DefaultValue="null" Name="dev_endpoints" Type="List" Group="" Visible="false">	
+		<Condition Expression="(VirtualMode = Ext_Phy_Host) | (VirtualMode = Int_Phy_Host)" Diagnostic=""/>		
+	</RefParameter>	
+	<!-- Bug356587 -->		
+	<RefParameter Comment="Device endpoints number" DefaultValue="9" Name="dev_endpoints" Min="1" Max="9" Type="integer" Group="" Visible="false">
+		<Condition Expression="DIE452 | DIE450" Diagnostic=""/>		
+	</RefParameter>
+	<RefParameter Comment="Device endpoints number" DefaultValue="7" Name="dev_endpoints" Min="1" Max="7" Type="integer" Group="" Visible="false">				
+	</RefParameter>	
+	
+	<!-- Parameters Host_channels --> 
+	<RefParameter Comment="Host Channels" DefaultValue="16" Name="Host_channels"  Min="1" Max="16" Type="integer" Visible="false">	
+		<Condition Expression="(VirtualMode = Ext_Phy_Host) | (VirtualMode = Int_Phy_Host)" Diagnostic=""/>		
+	</RefParameter>
+	<RefParameter Comment="Host Channels" DefaultValue="null" Name="Host_channels"  Min="1" Max="16" Type="integer" Visible="false">				
+	</RefParameter>
+	
+	<!-- Parameters phy_itface --> 	
+	<RefParameter Comment="Physical interface" DefaultValue="USB_OTG_ULPI_PHY" Name="phy_itface" Type="List">
+		<PossibleValue Value="USB_OTG_ULPI_PHY" Comment="External Phy"/>
+		<Condition Expression="(VirtualMode = Ext_Phy_Host) | (VirtualMode = Ext_Phy_Device)" Diagnostic=""/>		
+	</RefParameter>	
+	<RefParameter Comment="Physical interface" DefaultValue="USB_OTG_HS_EMBEDDED_PHY" Name="phy_itface" Type="List">		
+		<Condition Expression="(STM32F7x3) &amp; ((VirtualMode = Int_Phy_Host) | (VirtualMode = Int_Phy_Device))" Diagnostic=""/>		
+		<PossibleValue Value="USB_OTG_HS_EMBEDDED_PHY" Comment="Internal Phy"/>	
+	</RefParameter>	
+	<RefParameter Comment="Physical interface" DefaultValue="USB_OTG_EMBEDDED_PHY" Name="phy_itface" Type="List">		
+		<Condition Expression="(STM32F7x2) &amp; ((VirtualMode = Int_Phy_Host) | (VirtualMode = Int_Phy_Device))" Diagnostic=""/>		
+		<PossibleValue Value="USB_OTG_EMBEDDED_PHY" Comment="Internal Phy"/>	
+	</RefParameter>	
+	<RefParameter Comment="Physical interface" DefaultValue="USB_OTG_ULPI_PHY" Name="phy_itface" Type="List" Visible="false"/>
+
+	<!-- Parameters speed --> 	
+	<RefParameter Comment="Speed" DefaultValue="USB_OTG_SPEED_HIGH" Name="speed" Type="List">	
+		<Condition Expression="(VirtualMode = Ext_Phy_Host) | (VirtualMode = Ext_Phy_Device)" Diagnostic=""/>	
+		<PossibleValue Comment="High Speed 480MBit/s" Value="USB_OTG_SPEED_HIGH" />
+		<PossibleValue Comment="Host Full Speed 12MBit/s" Value="USB_OTG_SPEED_HIGH_IN_FULL"/>
+		<PossibleValue Comment="Low Speed 1.5MBit/s" Value="USB_OTG_SPEED_LOW" />
+	</RefParameter>	
+	<RefParameter Comment="Speed" DefaultValue="USB_OTG_SPEED_HIGH" Name="speed" Type="List">	
+		<Condition Expression="(STM32F7x3) &amp; ((VirtualMode = Int_Phy_Host) | (VirtualMode = Int_Phy_Device))" Diagnostic=""/>		
+		<PossibleValue Comment="High Speed 480MBit/s" Value="USB_OTG_SPEED_HIGH" />
+		<PossibleValue Comment="Host Full Speed 12MBit/s" Value="USB_OTG_SPEED_HIGH_IN_FULL"/>	
+		<PossibleValue Comment="Low Speed 1.5MBit/s" Value="USB_OTG_SPEED_LOW" />
+	</RefParameter>
+	<RefParameter Comment="Speed" DefaultValue="USB_OTG_SPEED_FULL" Name="speed" Type="List">	
+		<Condition Expression="(STM32F7x2) &amp; ((VirtualMode = Int_Phy_Host) | (VirtualMode = Int_Phy_Device))" Diagnostic=""/>			
+		<PossibleValue Comment="Host Full Speed 12MBit/s" Value="USB_OTG_SPEED_FULL"/>
+		<PossibleValue Comment="Low Speed 1.5MBit/s" Value="USB_OTG_SPEED_LOW" />		
+	</RefParameter>
+	
+	<!-- Parameters dma_enable --> 
+	<RefParameter Comment="Enable internal IP DMA" DefaultValue="DISABLE" Name="dma_enable" Type="List">
+		<PossibleValue Value="ENABLE" Comment="Enabled" Semaphore="SEM_HS_USE_BUFF_WO_ALIGNMENT"/>
+		<PossibleValue Value="DISABLE" Comment="Disabled"/>		
+	</RefParameter>	
+	
+	<!-- Parameters ep0_mps --> 
+	<RefParameter Comment="Endpoint 0 Max Packet size" DefaultValue="null" Name="ep0_mps" Type="List">
+		<Condition Expression="(VirtualMode = Ext_Phy_Host) |(VirtualMode = Int_Phy_Host)" Diagnostic=""/>
+		<PossibleValue Value="DEP0CTL_MPS_64" Comment="64 Bytes"/>
+		<!--
+		<PossibleValue Value="DEP0CTL_MPS_32" Comment="32 Bytes"/>
+		<PossibleValue Value="DEP0CTL_MPS_16" Comment="16 Bytes"/>
+		<PossibleValue Value="DEP0CTL_MPS_8"  Comment="8 Bytes"/>
+		-->
+	</RefParameter>			
+	<RefParameter Comment="Endpoint 0 Max Packet size" DefaultValue="DEP0CTL_MPS_64" Name="ep0_mps" Type="List" Visible="true">
+		<PossibleValue Value="DEP0CTL_MPS_64" Comment="64 Bytes"/>
+		<PossibleValue Value="DEP0CTL_MPS_32" Comment="32 Bytes"/>
+		<PossibleValue Value="DEP0CTL_MPS_16" Comment="16 Bytes"/>
+		<PossibleValue Value="DEP0CTL_MPS_8"  Comment="8 Bytes"/>
+	</RefParameter>		
+	
+	<!-- Parameters Sof_enable --> 
+	<RefParameter Comment="Signal start of frame" DefaultValue="DISABLE" Name="Sof_enable" Type="List">
+		<PossibleValue Value="ENABLE" Comment="Enabled"/>
+		<PossibleValue Value="DISABLE" Comment="Disabled"/>		
+	</RefParameter>
+	
+	<!-- Parameters lpm_enable --> 
+	<RefParameter Comment="Link Power Management" DefaultValue="DISABLE" Name="lpm_enable" Type="List" Group="" Visible="true">
+		<Condition Expression="(MW_USB_OTG_HS_MW_DEVICE | MW_USB_OTG_HS_MW_FS_DEVICE)" Diagnostic=""/>		
+		<PossibleValue Value="DISABLE" Comment="Disabled"/>	
+		<PossibleValue Value="ENABLE" Comment="Enabled"/>
+	</RefParameter>
+	
+	<!-- Parameters low_power_enable --> 
+	<RefParameter Comment="Low power" DefaultValue="DISABLE" Name="low_power_enable" Type="List" Visible="false">
+		<Condition Expression="MW_USB_OTG_HS_MW_HOST" Diagnostic=""/>			
+		<PossibleValue Value="DISABLE" Comment="Disabled"/>		
+	</RefParameter>
+	<RefParameter Comment="Low power" DefaultValue="DISABLE" Name="low_power_enable" Type="List" Visible="false">
+		<Condition Expression="MW_USB_OTG_HS_MW_FS_HOST" Diagnostic=""/>			
+		<PossibleValue Value="DISABLE" Comment="Disabled"/>		
+	</RefParameter>	
+	<RefParameter Comment="Low power" DefaultValue="DISABLE" Name="low_power_enable" Type="List">
+	  <Condition Expression="(!MW_USB_OTG_HS_MW_HOST)&amp;(!MW_USB_OTG_HS_MW_FS_HOST)" Diagnostic=""/>			
+		<PossibleValue Value="ENABLE" Comment="Enabled" Semaphore="$IpInstance_INTERRUPT_WAKEUP_ON"/>
+		<PossibleValue Value="DISABLE" Comment="Disabled"/>		
+	</RefParameter>
+	
+	<!-- Parameters vbus_sensing_enable --> 
+    <RefParameter Comment="VBUS sensing" DefaultValue="ENABLE" Name="vbus_sensing_enable" Type="List">
+        <Condition Expression="((VirtualMode = Int_Phy_Device)|(VirtualMode = Ext_Phy_Device)) &amp; VBUS_SENSING_ON_HS" Diagnostic=""/>
+		<PossibleValue Value="ENABLE" Comment="Enabled"/>
+    </RefParameter>	
+    <RefParameter Comment="VBUS sensing" DefaultValue="DISABLE" Name="vbus_sensing_enable" Type="List">
+        <Condition Expression="((VirtualMode = Int_Phy_Device)|(VirtualMode = Ext_Phy_Device)) &amp; !VBUS_SENSING_ON_HS" Diagnostic=""/>
+        <PossibleValue Value="DISABLE" Comment="Disabled"/>
+    </RefParameter>
+    <RefParameter Comment="VBUS sensing" DefaultValue="DISABLE" Name="vbus_sensing_enable" Type="List" Visible="false">		
+		<PossibleValue Value="ENABLE" Comment="Enabled"/>
+		<PossibleValue Value="DISABLE" Comment="Disabled"/>		
+	</RefParameter>
+	
+	<!-- Parameters use_dedicated_ep1 --> 
+	<RefParameter Comment="Use dedicated end point 1 interrupt" DefaultValue="null" Name="use_dedicated_ep1" Type="List" >
+		<Condition Expression="(VirtualMode = Int_Phy_Host) | (VirtualMode = Ext_Phy_Host)" Diagnostic=""/>
+		<PossibleValue Value="DISABLE" Comment="Disabled"/>	
+	</RefParameter>	
+	<!--  Bug356454 -->
+	<RefParameter Comment="Use dedicated end point 1 interrupt" DefaultValue="DISABLE" Name="use_dedicated_ep1" Type="List" >
+		<PossibleValue Value="ENABLE" Comment="Enabled" Semaphore="$IpInstance_USE_DEDICATED_EP1_ON"/>
+		<PossibleValue Value="DISABLE" Comment="Disabled"/>		
+	</RefParameter>
+	
+	<!-- Parameters use_external_vbus --> 
+	<RefParameter Comment="Use external vbus" DefaultValue="ENABLE" Name="use_external_vbus" Type="List">
+		<Condition Expression="(VirtualMode = Int_Phy_Host) | (VirtualMode = Ext_Phy_Host)" Diagnostic=""/>
+		<PossibleValue Value="ENABLE" Comment="Enabled"/>	
+		<PossibleValue Value="DISABLE" Comment="Disabled"/>			
+	</RefParameter>	
+	<RefParameter Comment="Use external vbus" DefaultValue="DISABLE" Name="use_external_vbus" Type="List" Visible="false">
+		<PossibleValue Value="ENABLE" Comment="Enabled"/>
+		<PossibleValue Value="DISABLE" Comment="Disabled"/>		
+	</RefParameter>
+	
+	<!-- USB High Speed in Host mode -->
+	<RefMode Name="External_Phy_Host" HalMode="HCD">
+		<ConfigForMode>HCD_Init_HS</ConfigForMode>
+		<Parameter Name="VirtualMode">		
+			<PossibleValue>Ext_Phy_Host</PossibleValue>
+		</Parameter>
+		<!--<Parameter Name="dev_endpoints"/>-->
+		<Parameter Name="Host_channels"/>	
+		<Parameter Name="Sof_enable"/>
+		<Parameter Name="speed"/>		
+		<Parameter Name="dma_enable"/>			
+		<Parameter Name="phy_itface"/>					
+		<Parameter Name="low_power_enable"/>
+		<Parameter Name="vbus_sensing_enable"/>	
+		<Parameter Name="use_external_vbus"/>
+	</RefMode>
+	
+	<!-- USB High Speed in Device mode -->
+	<RefMode Name="External_Phy_Device" HalMode="PCD">
+		<ConfigForMode>PCD_Init_HS</ConfigForMode>
+		<Parameter Name="VirtualMode">		
+			<PossibleValue>Ext_Phy_Device</PossibleValue>
+		</Parameter>
+		<Parameter Name="Sof_enable">
+			<Condition Expression="!USB_FS_SOF" Diagnostic=""/>
+		</Parameter>
+		<Parameter Name="speed"/>
+		<Parameter Name="dev_endpoints"/>
+		<Parameter Name="ep0_mps"/>		
+		<Parameter Name="dma_enable"/>
+		<Parameter Name="phy_itface"/>			
+		<Parameter Name="low_power_enable"/>	
+		<Parameter Name="lpm_enable"/>
+		<Parameter Name="use_dedicated_ep1"/>
+		<Parameter Name="vbus_sensing_enable"/>	
+	</RefMode>
+	
+	<!-- USB Full Speed in Host mode -->
+	<RefMode Name="Internal_Phy_Host" HalMode="HCD">
+		<ConfigForMode>HCD_Init_HS</ConfigForMode>
+		<Parameter Name="VirtualMode">		
+			<PossibleValue>Int_Phy_Host</PossibleValue>
+		</Parameter>
+		<Parameter Name="Sof_enable"/>
+		<Parameter Name="Host_channels"/>			
+		<Parameter Name="speed"/>		
+		<Parameter Name="dma_enable"/>
+		<Parameter Name="phy_itface"/>			
+		<Parameter Name="low_power_enable"/>	
+		<Parameter Name="vbus_sensing_enable"/>			
+	</RefMode>
+	
+	<!-- USB Full Speed in Device mode -->
+	<RefMode Name="Internal_Phy_Device" HalMode="PCD">
+		<ConfigForMode>PCD_Init_HS</ConfigForMode>
+		<Parameter Name="VirtualMode">		
+			<PossibleValue>Int_Phy_Device</PossibleValue>
+		</Parameter>
+		<Parameter Name="dev_endpoints"/>	
+		<Parameter Name="Sof_enable">
+			<Condition Expression="!USB_FS_SOF" Diagnostic=""/>
+		</Parameter>
+		<Parameter Name="speed"/>
+		<Parameter Name="ep0_mps"/>
+		<Parameter Name="dma_enable"/>
+		<Parameter Name="phy_itface"/>					
+		<Parameter Name="low_power_enable"/>
+		<Parameter Name="lpm_enable"/>
+		<Parameter Name="use_dedicated_ep1"/>	
+		<Parameter Name="vbus_sensing_enable"/>	
+	</RefMode>
+	
+	
+	<!-- USB Full Speed in Device mode with SOF -->
+	<RefMode Name="Activate_SOF_FS" HalMode="">		
+		<Parameter Name="Sof_enable">
+			<PossibleValue>ENABLE</PossibleValue>
+		</Parameter>			
+	</RefMode>
+	
+	<!-- tracker 233865 -->
+	<RefMode Name="Activate_VBUS_FS" HalMode="">			
+	</RefMode>
+	
+	<!-- ModeLogicOperator for HS/FS -->
+	<ModeLogicOperator Name="OR">	
+		<!-- ModeLogicOperator for HS -->		
+		<Mode Name="High Speed" UserName="High Speed" RemoveCondition="">
+			<ModeLogicOperator Name="XOR">
+				<Mode Name="Ext_Phy_OTG/Dual-Role-Device" UserName="OTG/Dual_Role_Device">
+					<SignalLogicalOp Name="AND">							
+						<Signal Name="DM"/>
+						<Signal Name="DP"/>
+						<Signal Name="ID"/>		
+					</SignalLogicalOp>		
+					<Semaphore>OTG_DUAL_ROL_DEVICE_HS</Semaphore>
+				</Mode>	 
+				<Mode Name="Ext_Phy_OTG/Dual-Role-Device-TypeC" UserName="OTG/Dual_Role_Device Type C">
+					<SignalLogicalOp Name="AND">							
+						<Signal Name="DM"/>
+						<Signal Name="DP"/>						
+					</SignalLogicalOp>		
+					<Semaphore>OTG_DUAL_ROL_DEVICE_HS</Semaphore>
+				</Mode>	
+				<Mode Name="External_Phy_Host" UserName="Host_Only">
+					<SignalLogicalOp Name="AND">							
+						<Signal Name="DM"/>
+						<Signal Name="DP"/>
+						<Signal Name="ID"/>		
+					</SignalLogicalOp>
+					<Semaphore>MW_USB_OTG_HS_MW_HOST</Semaphore>	
+					<ContextCondition Expression="$IpInstance_CUBE" Diagnostic="Not available in this context"/>					
+				</Mode>	  
+				<Mode Name="External_Phy_Device" UserName="Device_Only">
+					<SignalLogicalOp Name="AND">							
+						<Signal Name="DM"/>
+						<Signal Name="DP"/>
+						<Signal Name="ID"/>			
+					</SignalLogicalOp>	
+					<Semaphore>MW_USB_OTG_HS_MW_DEVICE</Semaphore>
+					<ContextCondition Expression="$IpInstance_CUBE" Diagnostic="Not available in this context"/>
+				</Mode>					
+			</ModeLogicOperator>	
+			<Semaphore>$IpInstanceHS</Semaphore>           	
+		</Mode>
+		<!-- ModeLogicOperator for FS -->				
+		<Mode Name="Activate_SOF">
+			<ModeLogicOperator Name="XOR">
+				<Mode Name="Activate_SOF_FS" UserName="Activate-SOF">
+					<SignalLogicalOp Name="AND">				
+						<Signal Name="SOF"/>				
+					</SignalLogicalOp>
+				</Mode>						
+			</ModeLogicOperator>
+			<Semaphore>USB_FS_SOF</Semaphore>
+			<!-- Tracker 325936 -->
+			<Condition Expression="  OTG_DUAL_ROL_DEVICE_HS | MW_USB_OTG_HS_MW_HOST |MW_USB_OTG_HS_MW_DEVICE" Diagnostic="USB in Host or Device mode must be selected first or Not available in Device Tree context"/>
+			<ContextCondition Expression="$IpInstance_CUBE" Diagnostic="Not available in this context"/>
+		</Mode>
+		<Mode Name="Activate_VBUS">
+			<ModeLogicOperator Name="XOR">
+				<Mode Name="Activate_VBUS_FS" UserName="Activate-VBUS">
+					<SignalLogicalOp Name="AND">				
+						<Signal Name="VBUS"/>				
+					</SignalLogicalOp>
+					<Semaphore>VBUS_SENSING_ON_HS</Semaphore>
+				</Mode>					
+			</ModeLogicOperator>
+			<ContextCondition Expression="$IpInstance_CUBE" Diagnostic="Not available in this context"/>
+			<!-- to keep compatibility with device mode -->
+			<Condition Expression=" OTG_DUAL_ROL_DEVICE_HS | MW_USB_OTG_HS_MW_HOST |MW_USB_OTG_HS_MW_DEVICE" Diagnostic="USB in Host or Device mode must be selected first or Not available in Device Tree context"/>
+			<ContextCondition Expression="$IpInstance_CUBE" Diagnostic="Not available in this context"/>
+		</Mode>	
+	</ModeLogicOperator>	
+	
+	<!-- USB OTG1 HS -->
+	<!-- Internal PHY FS/HS -->	
+	<RefSignal IOMode="System" Name="DM"/>
+	<RefSignal IOMode="System" Name="DP"/>
+	<RefSignal IOMode="Analog_NoPuPd" Name="ID"/>	
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="SOF"/>	
+	<RefSignal IOMode="System" Name="VBUS"/>	
+	
+	<!-- Clock Semaphore for this IP. -->
+	<Semaphore>USB_OTG_HSUsed_ForRCC</Semaphore>
+</IP>

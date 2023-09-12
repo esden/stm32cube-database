@@ -1,0 +1,83 @@
+﻿<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<IP xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance"
+    ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/SpecIFications/db/IP_Modes.xsd"
+    xmlns="http://mcd.rou.st.com/modules.php?name=mcu"
+    DBVersion="V4.0"
+    IPType="middleware"
+    IpGroup="Middleware"
+    Name="OPENAMP"
+    Version="v1.0.0_Cube">
+    <About>OPENAMP: Open Asymmetric Multi-Processing</About>
+
+    <!-- RefParameters for OPENAMP - Version-->
+    <RefParameter Name="OPENAMP_Version" Comment="OPENAMP version" DefaultValue="v2018.10_rc1" Type="String" TabName="Parameter Settings" Group="Version">
+        <PossibleValue Comment="Current version of OPENAMP" Value="v2018.10"/>
+    </RefParameter>
+
+    <RefParameter Name="Mode" Comment="Mode" DefaultValue="REMOTE" Type="String" TabName="Parameter Settings" Group="Communication Mode" Visible="true"></RefParameter>
+    <RefParameter Name="SHM_START_ADDRESS" Comment="SHM_START_ADDRESS" DefaultValue="0x10040000" Type="String" TabName="Parameter Settings" Group="Configuration" Visible="true"/>
+    <RefParameter Name="SHM_SIZE" Comment="SHM_SIZE" DefaultValue="0x00008000" Type="String" TabName="Parameter Settings" Group="Configuration" Visible="true"/>
+    <RefParameter Name="VRING_RX_ADDRESS" Comment="VRING_RX_ADDRESS" DefaultValue="-1" Type="String" TabName="Parameter Settings" Group="Configuration" Visible="false"/>
+    <RefParameter Name="VRING_TX_ADDRESS" Comment="VRING_TX_ADDRESS" DefaultValue="-1" Type="String" TabName="Parameter Settings" Group="Configuration" Visible="false"/>
+    <RefParameter Name="VRING_BUFF_ADDRESS" Comment="VRING_BUFF_ADDRESS" DefaultValue="-1" Type="String" TabName="Parameter Settings" Group="Configuration" Visible="false"/>
+    <RefParameter Name="VRING_ALIGNMENT" Comment="VRING_ALIGNMENT" DefaultValue="16" Type="String" TabName="Parameter Settings" Group="Configuration" Visible="false"/>
+    <RefParameter Name="VRING_NUM_BUFFS" Comment="VRING_NUM_BUFFS" DefaultValue="16" Type="String" TabName="Parameter Settings" Group="Configuration" Visible="true"/>
+    
+    <!-- Fixed parameters-->
+    <RefParameter Name="NUM_RESOURCE_ENTRIES" Comment="NUM_RESOURCE_ENTRIES" DefaultValue="2" Type="String" TabName="Parameter Settings" Group="Configuration" Visible="false"/>
+    <RefParameter Name="VRING_COUNT" Comment="VRING_COUNT" DefaultValue="2" Type="String" TabName="Parameter Settings" Group="Configuration" Visible="false"/>
+    <RefParameter Name="VDEV_ID" Comment="VDEV_ID" DefaultValue="0xFF" Type="String" TabName="Parameter Settings" Group="Configuration" Visible="false"/>
+    <RefParameter Name="VRING0_ID" Comment="VRING0_ID" DefaultValue="0" Type="String" TabName="Parameter Settings" Group="Configuration" Visible="false"/>
+    <RefParameter Name="VRING1_ID" Comment="VRING1_ID" DefaultValue="1" Type="String" TabName="Parameter Settings" Group="Configuration" Visible="false"/>
+
+    
+    <RefParameter Name="MASTER_CPU_ID" Comment="MASTER_CPU_ID" DefaultValue="0" Type="String" TabName="Parameter Settings" Group="Configuration" Visible="false"/>
+    <RefParameter Name="REMOTE_CPU_ID" Comment="REMOTE_CPU_ID" DefaultValue="1" Type="String" TabName="Parameter Settings" Group="Configuration" Visible="false"/>
+    <RefParameter Name="IPCC_CPU_A7" Comment="IPCC_CPU_A7" DefaultValue="MASTER_CPU_ID" Type="String" TabName="Parameter Settings" Group="Configuration" Visible="false"/>
+    <RefParameter Name="IPCC_CPU_M4" Comment="IPCC_CPU_M4" DefaultValue="REMOTE_CPU_ID" Type="String" TabName="Parameter Settings" Group="Configuration" Visible="false"/>
+    <RefParameter Name="RX_NO_MSG" Comment="RX_NO_MSG" DefaultValue="0" Type="String" TabName="Parameter Settings" Group="Configuration" Visible="false"/>
+    <RefParameter Name="RX_NEW_MSG" Comment="RX_NEW_MSG" DefaultValue="1" Type="String" TabName="Parameter Settings" Group="Configuration" Visible="false"/>
+    <RefParameter Name="RX_BUF_FREE" Comment="RX_BUF_FREE" DefaultValue="2" Type="String" TabName="Parameter Settings" Group="Configuration" Visible="false"/>
+    
+    <RefMode Name="OpenAmp_Enabled">
+        <ConfigForMode>OPENAMP_Init</ConfigForMode>
+        <Parameter Name="OPENAMP_Version"/>
+        <Parameter Name="Mode"/>
+        <Parameter Name="SHM_START_ADDRESS"/>
+        <Parameter Name="SHM_SIZE"/>
+        <Parameter Name="VRING_RX_ADDRESS"/>
+        <Parameter Name="VRING_TX_ADDRESS"/>
+        <Parameter Name="VRING_BUFF_ADDRESS"/>
+        <Parameter Name="VRING_ALIGNMENT"/>
+        <Parameter Name="VRING_NUM_BUFFS"/>
+        <Parameter Name="NUM_RESOURCE_ENTRIES"/>
+        <Parameter Name="VRING_COUNT"/>
+        <Parameter Name="VDEV_ID"/>
+        <Parameter Name="VRING0_ID"/>
+        <Parameter Name="VRING1_ID"/>
+        <Parameter Name="MASTER_CPU_ID"/>
+        <Parameter Name="REMOTE_CPU_ID"/>
+        <Parameter Name="IPCC_CPU_A7"/>
+        <Parameter Name="IPCC_CPU_M4"/>
+        <Parameter Name="RX_NO_MSG"/>
+        <Parameter Name="RX_NEW_MSG"/>
+        <Parameter Name="RX_BUF_FREE"/>
+    </RefMode>
+    <!-- ModeLogicOperator for OPENAMP -->
+    <ModeLogicOperator Name="OR">
+        <Mode Name="Enabled">
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="OpenAmp_Enabled">
+                    <SignalLogicalOp Name="AND">
+                        <Signal IOMode="Basic" Name="VS_OPENAMP"/>
+                    </SignalLogicalOp>
+                    <Condition Expression="IPCC_ENABLED" Diagnostic="Active only when IPCC is configured"/>
+                </Mode>
+            </ModeLogicOperator>
+            <Semaphore>OPENAMP_ENABLED</Semaphore>
+        </Mode>
+    </ModeLogicOperator>
+
+    <!-- RefSignal for OPENAMP -->
+    <RefSignal Name="VS_OPENAMP" Virtual="true" />    
+</IP>

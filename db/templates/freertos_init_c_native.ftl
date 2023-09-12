@@ -245,6 +245,66 @@
 [#list SWIPdatas as SWIP]
   [#if SWIP.variables??]
     [#list SWIP.variables as variable]
+      [#if variable.name=="Queues"]
+        [#assign s = variable.valueList]
+        [#assign index = 0]
+        [#list s as i]
+          [#if index == 0]
+            [#assign queueName = i]
+          [/#if]
+          [#if index == 1]
+            [#assign queueSize = i]
+          [/#if]
+          [#if index == 2]
+            [#assign queueElementType = i]
+          [/#if]
+          [#if index == 3]
+            [#assign queueIsIntegerType = i]
+          [/#if]
+          [#if index == 4]
+            [#assign queueAllocation = i]
+          [/#if]
+          [#if index == 5]
+            [#assign queueBuffer = i]
+          [/#if]
+          [#if index == 6]
+            [#assign queueControlBlock = i]
+          [/#if]
+          [#assign index = index + 1]
+        [/#list]
+        [#if queueName != "0"]       
+          [#assign nbQueues = nbQueues + 1]
+          [#if nbQueues == 1]
+            #n#t/* Create the queue(s) */
+          [/#if]
+          #t/* definition and creation of ${queueName} */
+          [#if queueAllocation == "Dynamic"]
+           [#if queueIsIntegerType = "0"]
+             #t${queueName}Handle = xQueueCreate(${queueSize}, sizeof(${queueElementType}));
+           [#else]
+             #t${queueName}Handle = xQueueCreate(${queueSize}, ${queueElementType});
+           [/#if]
+          [#else]
+           [#if queueIsIntegerType = "0"]
+             #t${queueName}Handle = xQueueCreateStatic(${queueSize}, sizeof(${queueElementType}), ${queueBuffer}, &${queueControlBlock});
+           [#else]
+             #t${queueName}Handle = xQueueCreateStatic(${queueSize}, ${queueElementType}, ${queueBuffer}, &${queueControlBlock});
+           [/#if]
+          [/#if]
+        [/#if]
+      [/#if]
+	[/#list]
+  [/#if]
+[/#list]
+      
+#n
+#t/* USER CODE BEGIN RTOS_QUEUES */
+#t/* add queues, ... */          
+#t/* USER CODE END RTOS_QUEUES */
+
+[#list SWIPdatas as SWIP]
+  [#if SWIP.variables??]
+    [#list SWIP.variables as variable]
       [#if variable.name=="Threads"]
         [#assign s = variable.valueList]
         [#assign index = 0]
@@ -304,65 +364,5 @@
 #t/* add threads, ... */          
 #t/* USER CODE END RTOS_THREADS */
 #n
-
-[#list SWIPdatas as SWIP]
-  [#if SWIP.variables??]
-    [#list SWIP.variables as variable]
-      [#if variable.name=="Queues"]
-        [#assign s = variable.valueList]
-        [#assign index = 0]
-        [#list s as i]
-          [#if index == 0]
-            [#assign queueName = i]
-          [/#if]
-          [#if index == 1]
-            [#assign queueSize = i]
-          [/#if]
-          [#if index == 2]
-            [#assign queueElementType = i]
-          [/#if]
-          [#if index == 3]
-            [#assign queueIsIntegerType = i]
-          [/#if]
-          [#if index == 4]
-            [#assign queueAllocation = i]
-          [/#if]
-          [#if index == 5]
-            [#assign queueBuffer = i]
-          [/#if]
-          [#if index == 6]
-            [#assign queueControlBlock = i]
-          [/#if]
-          [#assign index = index + 1]
-        [/#list]
-        [#if queueName != "0"]       
-          [#assign nbQueues = nbQueues + 1]
-          [#if nbQueues == 1]
-            #n#t/* Create the queue(s) */
-          [/#if]
-          #t/* definition and creation of ${queueName} */
-          [#if queueAllocation == "Dynamic"]
-           [#if queueIsIntegerType = "0"]
-             #t${queueName}Handle = xQueueCreate(${queueSize}, sizeof(${queueElementType}));
-           [#else]
-             #t${queueName}Handle = xQueueCreate(${queueSize}, ${queueElementType});
-           [/#if]
-          [#else]
-           [#if queueIsIntegerType = "0"]
-             #t${queueName}Handle = xQueueCreateStatic(${queueSize}, sizeof(${queueElementType}), ${queueBuffer}, &${queueControlBlock});
-           [#else]
-             #t${queueName}Handle = xQueueCreateStatic(${queueSize}, ${queueElementType}, ${queueBuffer}, &${queueControlBlock});
-           [/#if]
-          [/#if]
-        [/#if]
-      [/#if]
-	[/#list]
-  [/#if]
-[/#list]
-      
-#n
-#t/* USER CODE BEGIN RTOS_QUEUES */
-#t/* add queues, ... */          
-#t/* USER CODE END RTOS_QUEUES */
 
 [/#compress]

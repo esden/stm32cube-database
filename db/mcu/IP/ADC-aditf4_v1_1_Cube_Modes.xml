@@ -3,6 +3,7 @@
 	<RefParameter Comment="Master List" DefaultValue="" Name="MasterList" Type="list" Visible="false"/>
     <!-- ADC_Settings parameters -->    
     <RefMode Comment="ADC Settings" Group="ADC_Settings" Name="ADC_Settings">
+        <ConfigForMode>ADC_InternalChannelConfig</ConfigForMode>
         <ConfigForMode>ADC_RegularConfig</ConfigForMode>
         <Parameter Name="ClockPrescaler"/>
         <Parameter Name="Resolution"/>
@@ -198,8 +199,19 @@
         <PossibleValue Comment="Disable the selected rank (selected channel) from sequencer" Value="ADC_RANK_NONE"/>
         <Description>The rank in the regular group sequencer</Description>
     </RefParameter> -->
-	    
-	    
+    <RefParameter Comment="ChannelVREF" DefaultValue="ADC_CHANNEL_VREFINT" Name="ChannelVREF" Type="list" Visible="false">
+      <Condition Expression="VREFSelected$IpInstance" Diagnostic=""/>
+      <PossibleValue Comment="ADC_CHANNEL_VREFINT" Value="ADC_CHANNEL_VREFINT"/>
+    </RefParameter>
+    <RefParameter Comment="ChannelTS" DefaultValue="ADC_CHANNEL_TEMPSENSOR" Name="ChannelTS" Type="list" Visible="false">
+      <Condition Expression="TempSelected$IpInstance" Diagnostic=""/>
+      <PossibleValue Comment="ADC_CHANNEL_TEMPSENSOR" Value="ADC_CHANNEL_TEMPSENSOR"/>
+    </RefParameter>
+    <RefParameter Comment="ChannelVBAT" DefaultValue="ADC_CHANNEL_VBAT" Name="ChannelVBAT" Type="list" Visible="false">
+      <Condition Expression="VBATSelected$IpInstance" Diagnostic=""/>
+      <PossibleValue Comment="ADC_CHANNEL_VBAT" Value="ADC_CHANNEL_VBAT"/>
+    </RefParameter>
+        
     <!-- Possible Value of Channel parameter -->
     <RefParameter Comment="Channel" DefaultValue="" Group="ADCChannel" Name="Channel" Type="list" Visible="true">
         <PossibleValue Comment="Channel 0" Value="ADC_CHANNEL_0"/>
@@ -697,6 +709,7 @@
                 </Mode>
             </ModeLogicOperator>
             <Semaphore>channelSelected$IpInstance</Semaphore>
+            <Semaphore>TempSelected$IpInstance</Semaphore>
         </Mode>
         <Mode Name="IN-Vrefint" UserName="Vrefint Channel">
             <ModeLogicOperator Name="XOR">
@@ -707,6 +720,7 @@
                 </Mode>
             </ModeLogicOperator>
             <Semaphore>channelSelected$IpInstance</Semaphore>
+            <Semaphore>VREFSelected$IpInstance</Semaphore>
         </Mode>
         <Mode Name="IN-Vbat" RemoveCondition="($IpNumber=2)|($IpNumber=3)|($IpNumber=4)|STM32F0x0_Value_Line" UserName="Vbat Channel">
             <ModeLogicOperator Name="XOR">
@@ -717,7 +731,8 @@
                 </Mode>
             </ModeLogicOperator>
             <Semaphore>channelSelected$IpInstance</Semaphore>
-        </Mode>
+            <Semaphore>VBATSelected$IpInstance</Semaphore>
+            </Mode>
     </ModeLogicOperator>
     <Semaphore>$IpInstance_USED</Semaphore>
 	

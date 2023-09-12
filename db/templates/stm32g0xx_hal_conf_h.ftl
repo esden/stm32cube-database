@@ -71,6 +71,7 @@ extern "C" {
 	[#return used]
   [/#function]
 #define HAL_GPIO_MODULE_ENABLED
+#define HAL_EXTI_MODULE_ENABLED
 #define HAL_DMA_MODULE_ENABLED
 #define HAL_RCC_MODULE_ENABLED
 #define HAL_FLASH_MODULE_ENABLED
@@ -172,7 +173,7 @@ in voltage and temperature.*/
 * Deactivated: CRC code cleaned from driver
 */
 
-#define USE_SPI_CRC                     [#if CRC_SPI??]${CRC_SPI}[#else]1U[/#if]
+#define USE_SPI_CRC                     [#if CRC_SPI??]${CRC_SPI}[#else]0U[/#if]
 
 /* ################## CRYP peripheral configuration ########################## */
 
@@ -188,7 +189,7 @@ in voltage and temperature.*/
 
 /* Includes ------------------------------------------------------------------*/
 /**
-  * @brief Include modules header file
+  * @brief Include module's header file
   */
 
 #ifdef HAL_RCC_MODULE_ENABLED

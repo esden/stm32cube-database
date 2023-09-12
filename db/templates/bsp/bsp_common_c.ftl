@@ -29,7 +29,7 @@
 				[#assign IpInstance = variables.value]
 			[/#if]		
 			[#if variables.name?contains("GPIO_INT_NUM")]
-				[#assign IrqNumber = variables.value]
+				[#assign IrqNumber = variables.value]				
 			[/#if]			
 			[#if variables.value?contains("BLE driver")]
 				[#assign SpiInstance = IpInstance]
@@ -56,9 +56,8 @@
 [/#list]
 
 /* Includes ------------------------------------------------------------------*/ 
-#include "${FamilyName?lower_case}xx_hal.h"
-#include "${FamilyName?lower_case}xx_it.h"
 #include "${FamilyName?lower_case}_${BoardName}.h"
+
 [#if useBUTTON]
 #include "${FamilyName?lower_case}xx_hal_exti.h"
 [/#if] 
@@ -76,11 +75,6 @@
  *         available on ${FamilyName?upper_case}xx-Nucleo Kit from STMicroelectronics.
  * @{
  */ 
-
-/** @defgroup ${BoardName?upper_case}_LOW_LEVEL_Private_TypesDefinitions ${BoardName?upper_case} LOW LEVEL Private TypesDefinitions
- * @{
- */
-typedef void (* BSP_EXTI_LineCallback)(void);
 
 /**
  * @}
@@ -109,12 +103,9 @@ typedef void (* BSP_EXTI_LineCallback)(void);
  * @{
  */
 [#if useBUTTON] 
-static void BUTTON_KEY_EXTI_Callback(void);
+typedef void (* BSP_EXTI_LineCallback) (void);
 [/#if]
-[#if useUSART]
-static void ${UsartInstance}_MspInit(UART_HandleTypeDef *huart);
-static void ${UsartInstance}_MspDeInit(UART_HandleTypeDef *huart); 
-[/#if]
+
 /**
  * @}
  */ 
@@ -122,22 +113,22 @@ static void ${UsartInstance}_MspDeInit(UART_HandleTypeDef *huart);
 /** @defgroup ${BoardName?upper_case}_LOW_LEVEL_Private_Variables ${BoardName?upper_case} LOW LEVEL Private Variables
  * @{
  */
-/* Private Variables -----------------------------------------------------------*/
 [#if useLED]
-static GPIO_TypeDef*  LED_GPIO_PORT[LEDn] = {LED2_GPIO_PORT};
-static const uint16_t LED_GPIO_PIN[LEDn]  = {LED2_GPIO_PIN};
+static GPIO_TypeDef*  LED_PORT[LEDn] = {LED2_GPIO_PORT};
+static const uint16_t LED_PIN[LEDn]  = {LED2_PIN};
 [/#if]
 [#if useBUTTON]
 static GPIO_TypeDef*   BUTTON_PORT[BUTTONn] = {KEY_BUTTON_GPIO_PORT}; 
-static const uint16_t  BUTTON_PIN[BUTTONn]  = {KEY_BUTTON_GPIO_PIN}; 
+static const uint16_t  BUTTON_PIN[BUTTONn]  = {KEY_BUTTON_PIN}; 
 static const IRQn_Type BUTTON_IRQn[BUTTONn] = {KEY_BUTTON_EXTI_IRQn};
-
-EXTI_HandleTypeDef *hExtiButtonHandle[BUTTONn];
+EXTI_HandleTypeDef* hExtiButtonHandle[BUTTONn];
 [/#if]
 [#if useUSART]
 USART_TypeDef* COM_USART[COMn] = {COM1_UART};
-UART_HandleTypeDef hComHandle[COMn];
-#if (USE_COM_LOG == 1)
+[#--UART_HandleTypeDef hComHandle[COMn];--]
+[#-- Bug 61525 --]
+UART_HandleTypeDef hcom_uart[COMn];
+#if (USE_COM_LOG > 0)
 static COM_TypeDef COM_ActiveLogPort;
 #endif
 #if (USE_HAL_UART_REGISTER_CALLBACKS == 1)
@@ -146,8 +137,8 @@ static uint32_t Is${UsartInstance?lower_case?replace("u","U")}MspCbValid = 0;
 __weak HAL_StatusTypeDef MX_${UsartInstance}_UART_Init(UART_HandleTypeDef* huart);
 [/#if]
 [#if useBUTTON]
-EXTI_HandleTypeDef hexti${BUTTON_EXTI};
-const uint32_t BUTTON_EXTI_LINE[BUTTONn] = {KEY_BUTTON_EXTI_LINE};
+[#-- Bug 60723 --]
+EXTI_HandleTypeDef hexti${BUTTON_EXTI} = {.Line = EXTI_LINE_${BUTTON_EXTI}};
 [/#if]
 /**
  * @}
@@ -156,13 +147,22 @@ const uint32_t BUTTON_EXTI_LINE[BUTTONn] = {KEY_BUTTON_EXTI_LINE};
 /** @defgroup ${BoardName?upper_case}_LOW_LEVEL_Private_Functions ${BoardName?upper_case} LOW LEVEL Private Functions
  * @{
  */ 
+[#if useBUTTON]
+static void BUTTON_KEY_EXTI_Callback(void);
+[/#if]
+[#if useUSART]
+#if (USE_BSP_COM_FEATURE > 0)
+static void ${UsartInstance}_MspInit(UART_HandleTypeDef *huart);
+static void ${UsartInstance}_MspDeInit(UART_HandleTypeDef *huart); 
+#endif
+[/#if]
 /**
  * @brief  This method returns the ${FamilyName?upper_case}xx NUCLEO BSP Driver revision
  * @retval version: 0xXYZR (8bits for each decimal, R for RC)
  */
 int32_t BSP_GetVersion(void)
 {
-  return __${BoardName?upper_case}_BSP_VERSION;
+  return (int32_t)__${BoardName?upper_case}_BSP_VERSION;
 }
 
 [#if useLED]
@@ -178,20 +178,19 @@ int32_t BSP_GetVersion(void)
  */
 int32_t BSP_LED_Init(Led_TypeDef Led)
 {
-  GPIO_InitTypeDef gpio_init_structure;
+  GPIO_InitTypeDef GPIO_InitStruct;
   
   /* LED2 is on the same GPIO Port */
   LED2_GPIO_CLK_ENABLE();    
   
   /* Configure the GPIO_LED pin */
-  gpio_init_structure.Mode  = GPIO_MODE_OUTPUT_PP;
-  gpio_init_structure.Pull  = GPIO_PULLUP;
-  gpio_init_structure.Speed = GPIO_SPEED_FREQ_HIGH; 
-  gpio_init_structure.Pin   = LED_GPIO_PIN [Led];
-  HAL_GPIO_Init(LED_GPIO_PORT [Led], &gpio_init_structure); 
+  GPIO_InitStruct.Pin   = LED_PIN [Led];
+  GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull  = GPIO_PULLUP;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH; 
   
-  /* By default, turn off LED */
-  HAL_GPIO_WritePin(LED_GPIO_PORT [Led], LED_GPIO_PIN [Led], GPIO_PIN_RESET);
+  HAL_GPIO_Init(LED_PORT [Led], &GPIO_InitStruct); 
+  HAL_GPIO_WritePin(LED_PORT [Led], LED_PIN [Led], GPIO_PIN_RESET);
   
   return BSP_ERROR_NONE;
 }
@@ -209,14 +208,14 @@ int32_t BSP_LED_Init(Led_TypeDef Led)
  */
 int32_t BSP_LED_DeInit(Led_TypeDef Led)
 {
-  GPIO_InitTypeDef gpio_init_structure;
-  
-  /* DeInit the GPIO_LED pin */ 
-  gpio_init_structure.Pin = LED_GPIO_PIN [Led];
+  GPIO_InitTypeDef GPIO_InitStruct;
   
   /* Turn off LED */ 
-  HAL_GPIO_WritePin(LED_GPIO_PORT [Led], (uint16_t)LED_GPIO_PIN[Led], GPIO_PIN_RESET);
-  HAL_GPIO_DeInit(LED_GPIO_PORT [Led], gpio_init_structure.Pin);
+  HAL_GPIO_WritePin(LED_PORT [Led], (uint16_t)LED_PIN[Led], GPIO_PIN_RESET);
+  
+  /* DeInit the GPIO_LED pin */ 
+  GPIO_InitStruct.Pin = LED_PIN [Led];    
+  HAL_GPIO_DeInit(LED_PORT [Led], GPIO_InitStruct.Pin);
   
   return BSP_ERROR_NONE;
 }
@@ -233,7 +232,7 @@ int32_t BSP_LED_DeInit(Led_TypeDef Led)
  */
 int32_t BSP_LED_On(Led_TypeDef Led)
 {
-  HAL_GPIO_WritePin(LED_GPIO_PORT [Led], (uint16_t)LED_GPIO_PIN [Led], GPIO_PIN_SET);
+  HAL_GPIO_WritePin(LED_PORT [Led], LED_PIN [Led], GPIO_PIN_SET);
   
   return BSP_ERROR_NONE;
 }
@@ -250,7 +249,7 @@ int32_t BSP_LED_On(Led_TypeDef Led)
  */
 int32_t BSP_LED_Off(Led_TypeDef Led)
 {
-  HAL_GPIO_WritePin(LED_GPIO_PORT [Led], (uint16_t)LED_GPIO_PIN [Led], GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(LED_PORT [Led], LED_PIN [Led], GPIO_PIN_RESET);
   
   return BSP_ERROR_NONE;
 }
@@ -267,7 +266,7 @@ int32_t BSP_LED_Off(Led_TypeDef Led)
  */
 int32_t BSP_LED_Toggle(Led_TypeDef Led)
 {
-  HAL_GPIO_TogglePin(LED_GPIO_PORT[Led], (uint16_t)LED_GPIO_PIN[Led]);
+  HAL_GPIO_TogglePin(LED_PORT[Led], (uint16_t)LED_PIN[Led]);
   
   return BSP_ERROR_NONE;
 }
@@ -284,7 +283,7 @@ int32_t BSP_LED_Toggle(Led_TypeDef Led)
  */
 int32_t BSP_LED_GetState(Led_TypeDef Led) 
 { 
-  return (int32_t)HAL_GPIO_ReadPin(LED_GPIO_PORT [Led], LED_GPIO_PIN [Led]); 
+  return (int32_t)HAL_GPIO_ReadPin(LED_PORT [Led], LED_PIN [Led]); 
 }
 [/#if]
 [#if useBUTTON]
@@ -302,7 +301,7 @@ int32_t BSP_LED_GetState(Led_TypeDef Led)
   */
 int32_t BSP_PB_Init(Button_TypeDef Button, ButtonMode_TypeDef ButtonMode)
 {
-  GPIO_InitTypeDef gpio_init_structure;
+  GPIO_InitTypeDef GPIO_InitStruct;
   hExtiButtonHandle[Button] = &hexti${BUTTON_EXTI};
   
   static BSP_EXTI_LineCallback ButtonCallback[BUTTONn] ={BUTTON_KEY_EXTI_Callback};                                                
@@ -311,25 +310,25 @@ int32_t BSP_PB_Init(Button_TypeDef Button, ButtonMode_TypeDef ButtonMode)
   
   /* Enable the BUTTON clock*/ 
   KEY_BUTTON_GPIO_CLK_ENABLE();
-  gpio_init_structure.Pin = BUTTON_PIN [Button];
-  gpio_init_structure.Pull = GPIO_NOPULL;
-  gpio_init_structure.Speed = GPIO_SPEED_FREQ_HIGH;
+  GPIO_InitStruct.Pin = BUTTON_PIN [Button];
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
   
   if(ButtonMode == BUTTON_MODE_GPIO)
   {
     /* Configure Button pin as input */
-    gpio_init_structure.Mode = GPIO_MODE_INPUT;    
-    HAL_GPIO_Init(BUTTON_PORT [Button], &gpio_init_structure);
+    GPIO_InitStruct.Mode = GPIO_MODE_INPUT;    
+    HAL_GPIO_Init(BUTTON_PORT [Button], &GPIO_InitStruct);
   }
-  else if(ButtonMode == BUTTON_MODE_EXTI)
+  else /* (ButtonMode == BUTTON_MODE_EXTI) */
   {      
     /* Configure Button pin as input with External interrupt */    
-    gpio_init_structure.Mode = GPIO_MODE_IT_RISING; 
+    GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING; 
     
-    HAL_GPIO_Init(BUTTON_PORT[Button], &gpio_init_structure);
+    HAL_GPIO_Init(BUTTON_PORT[Button], &GPIO_InitStruct);
     
-    HAL_EXTI_GetHandle(hExtiButtonHandle[Button], BUTTON_EXTI_LINE[Button]);  
-    HAL_EXTI_RegisterCallback(hExtiButtonHandle[Button],  HAL_EXTI_COMMON_CB_ID, ButtonCallback[Button]);
+    (void)HAL_EXTI_GetHandle(hExtiButtonHandle[Button], BUTTON_EXTI_LINE[Button]);  
+    (void)HAL_EXTI_RegisterCallback(hExtiButtonHandle[Button],  HAL_EXTI_COMMON_CB_ID, ButtonCallback[Button]);
       
     /* Enable and set Button EXTI Interrupt to the lowest priority */
     HAL_NVIC_SetPriority((BUTTON_IRQn[Button]), BSP_BUTTON_PRIO[Button], 0x00);
@@ -349,11 +348,11 @@ int32_t BSP_PB_Init(Button_TypeDef Button, ButtonMode_TypeDef ButtonMode)
  */
 int32_t BSP_PB_DeInit(Button_TypeDef Button)
 {
-  GPIO_InitTypeDef gpio_init_structure;
+  GPIO_InitTypeDef GPIO_InitStruct;
   
-  gpio_init_structure.Pin = BUTTON_PIN[Button];
+  GPIO_InitStruct.Pin = BUTTON_PIN[Button];
   HAL_NVIC_DisableIRQ((IRQn_Type)(BUTTON_IRQn[Button]));
-  HAL_GPIO_DeInit(BUTTON_PORT[Button], gpio_init_structure.Pin);
+  HAL_GPIO_DeInit(BUTTON_PORT[Button], GPIO_InitStruct.Pin);
   
   return BSP_ERROR_NONE;
 }
@@ -367,16 +366,16 @@ int32_t BSP_PB_DeInit(Button_TypeDef Button)
  */
 int32_t BSP_PB_GetState(Button_TypeDef Button)
 {
-  return (int32_t)HAL_GPIO_ReadPin(BUTTON_PORT[Button], BUTTON_PIN[Button]);
+  return (int32_t)(HAL_GPIO_ReadPin(BUTTON_PORT[Button], BUTTON_PIN[Button]));
 }
 
 /**
  * @brief  Key EXTI line detection callbacks.
  * @retval None
  */
-static void BUTTON_KEY_EXTI_Callback(void)
-{   
-  BSP_PB_Callback(BUTTON_KEY);
+void BSP_PB_IRQHandler (Button_TypeDef Button)
+{
+  HAL_EXTI_IRQHandler( hExtiButtonHandle[Button] );   
 }
 
 /**
@@ -392,8 +391,20 @@ __weak void BSP_PB_Callback(Button_TypeDef Button)
   /* This function should be implemented by the user application.
      It is called into this driver when an event on Button is triggered. */   
 }
+
+/**
+  * @brief  Key EXTI line detection callbacks.
+  * @retval None
+  */
+static void BUTTON_KEY_EXTI_Callback(void)
+{   
+  BSP_PB_Callback(BUTTON_KEY);
+}
+
+
 [/#if]
 [#if useUSART]
+#if (USE_BSP_COM_FEATURE > 0)
 /**
  * @brief  Configures COM port.
  * @param  COM: COM port to be configured.
@@ -404,22 +415,34 @@ __weak void BSP_PB_Callback(Button_TypeDef Button)
  */
 int32_t BSP_COM_Init(COM_TypeDef COM) 
 {
-#if (USE_HAL_UART_REGISTER_CALLBACKS == 0)
-  /* Init the UART Msp */
-  ${UsartInstance}_MspInit(&hComHandle[COM]);
-#else
-  if(Is${UsartInstance?lower_case?replace("u","U")}MspCbValid == 0U)
+  int32_t ret = BSP_ERROR_NONE;
+  
+  if(COM > COMn)
   {
-    if(BSP_${UsartInstance}_RegisterDefaultMspCallbacks() != BSP_ERROR_NONE)
+    ret = BSP_ERROR_WRONG_PARAM;
+  }
+  else
+  {  
+#if (USE_HAL_UART_REGISTER_CALLBACKS == 0)
+    /* Init the UART Msp */
+    ${UsartInstance}_MspInit(&hcom_uart[COM]);
+#else
+    if(Is${UsartInstance?lower_case?replace("u","U")}MspCbValid == 0U)
     {
-      return BSP_ERROR_MSP_FAILURE;
+      if(BSP_COM_RegisterDefaultMspCallbacks() != BSP_ERROR_NONE)
+      {
+        return BSP_ERROR_MSP_FAILURE;
+      }
+    }
+#endif
+  
+    if (MX_${UsartInstance}_UART_Init(&hcom_uart[COM]))
+    {
+      ret = BSP_ERROR_PERIPH_FAILURE;
     }
   }
-#endif
 
-  MX_${UsartInstance}_UART_Init(&hComHandle[COM]);
-
-  return BSP_ERROR_NONE;
+  return ret;
 }
 
 /**
@@ -430,19 +453,28 @@ int32_t BSP_COM_Init(COM_TypeDef COM)
  */
 int32_t BSP_COM_DeInit(COM_TypeDef COM)
 {
-  /* USART configuration */
-  hComHandle[COM].Instance = COM_USART[COM];
+  int32_t ret = BSP_ERROR_NONE;
   
-#if (USE_HAL_UART_REGISTER_CALLBACKS == 0)  
-  ${UsartInstance}_MspDeInit(&hComHandle[COM]);  
-#endif /* (USE_HAL_UART_REGISTER_CALLBACKS == 0) */
-  
-  if(HAL_UART_DeInit(&hComHandle[COM]) != HAL_OK)
+  if(COM > COMn)
   {
-    return BSP_ERROR_PERIPH_FAILURE;
+    ret = BSP_ERROR_WRONG_PARAM;
+  }
+  else
+  {  
+    /* USART configuration */
+    hcom_uart[COM].Instance = COM_USART[COM];
+  
+    #if (USE_HAL_UART_REGISTER_CALLBACKS == 0)  
+      ${UsartInstance}_MspDeInit(&hcom_uart[COM]);  
+    #endif /* (USE_HAL_UART_REGISTER_CALLBACKS == 0) */
+  
+    if(HAL_UART_DeInit(&hcom_uart[COM]) != HAL_OK)
+    {
+      ret = BSP_ERROR_PERIPH_FAILURE;
+    }
   }
   
-  return BSP_ERROR_NONE;
+  return ret;
 }
 
 /**
@@ -455,36 +487,38 @@ int32_t BSP_COM_DeInit(COM_TypeDef COM)
  */
 [@common.optinclude name=mxTmpFolder+"/${UsartInstance?lower_case}_CommonD_HalInit.tmp"/]
 
-/**
- * @brief  Initializes ${UsartInstance} MSP.
- * @param  huart ${UsartInstance} handle
- * @retval None
- */
-[@common.optinclude name=mxTmpFolder+"/${UsartInstance?lower_case}_CommonD_Msp.tmp"/]
-
+#endif 
 #if (USE_HAL_UART_REGISTER_CALLBACKS == 1) 
 /**
  * @brief Register Default ${UsartInstance} Bus Msp Callbacks
  * @retval BSP status
  */
-int32_t BSP_${UsartInstance}_RegisterDefaultMspCallbacks(void)
+int32_t BSP_COM_RegisterDefaultMspCallbacks(COM_TypeDef COM)
 {
   int32_t ret = BSP_ERROR_NONE;
   
-  __HAL_UART_RESET_HANDLE_STATE(&hComHandle[COM1]);
-  
-  /* Register default MspInit/MspDeInit Callback */
-  if(HAL_UART_RegisterCallback(&hComHandle[COM1], HAL_UART_MSPINIT_CB_ID, ${UsartInstance}_MspInit) != HAL_OK)
+  if(COM >= COMn)
   {
-    ret = BSP_ERROR_PERIPH_FAILURE;
-  }
-  else if(HAL_UART_RegisterCallback(&hComHandle[COM1], HAL_UART_MSPDEINIT_CB_ID, ${UsartInstance}_MspDeInit) != HAL_OK)
-  {
-    ret = BSP_ERROR_PERIPH_FAILURE;
+    ret = BSP_ERROR_WRONG_PARAM;
   }
   else
-  {
-    Is${UsartInstance?lower_case?replace("u","U")}MspCbValid = 1U;
+  {  
+    
+    __HAL_UART_RESET_HANDLE_STATE(&hcom_uart[COM1]);
+  
+    /* Register default MspInit/MspDeInit Callback */
+    if(HAL_UART_RegisterCallback(&hcom_uart[COM1], HAL_UART_MSPINIT_CB_ID, ${UsartInstance}_MspInit) != HAL_OK)
+    {
+      ret = BSP_ERROR_PERIPH_FAILURE;
+    }
+    else if(HAL_UART_RegisterCallback(&hcom_uart[COM1], HAL_UART_MSPDEINIT_CB_ID, ${UsartInstance}_MspDeInit) != HAL_OK)
+    {
+      ret = BSP_ERROR_PERIPH_FAILURE;
+    }
+    else
+    {
+      Is${UsartInstance?lower_case?replace("u","U")}MspCbValid = 1U;
+    }
   }
   
   /* BSP status */  
@@ -496,24 +530,31 @@ int32_t BSP_${UsartInstance}_RegisterDefaultMspCallbacks(void)
  * @param Callbacks pointer to ${UsartInstance} MspInit/MspDeInit callback functions
  * @retval BSP status
  */
-int32_t BSP_${UsartInstance}_RegisterMspCallbacks (BSP_UART_Cb_t *Callback)
+int32_t BSP_COM_RegisterMspCallbacks (COM_TypeDef COM , BSP_COM_Cb_t *Callback)
 {
   int32_t ret = BSP_ERROR_NONE;
   
-  __HAL_UART_RESET_HANDLE_STATE(&hComHandle[COM1]);
-  
-  /* Register MspInit/MspDeInit Callbacks */
-  if(HAL_UART_RegisterCallback(&hComHandle[COM1], HAL_UART_MSPINIT_CB_ID, Callback->pMspUsartInitCb) != HAL_OK)
+  if(COM >= COMn)
   {
-    ret = BSP_ERROR_PERIPH_FAILURE;
-  }
-  else if(HAL_UART_RegisterCallback(&hComHandle[COM1], HAL_UART_MSPDEINIT_CB_ID, Callback->pMspUsartDeInitCb) != HAL_OK)
-  {
-    ret = BSP_ERROR_PERIPH_FAILURE;
+    ret = BSP_ERROR_WRONG_PARAM;
   }
   else
   {
-    Is${UsartInstance?lower_case?replace("u","U")}MspCbValid = 1U;
+    __HAL_UART_RESET_HANDLE_STATE(&hcom_uart[COM1]);
+  
+    /* Register MspInit/MspDeInit Callbacks */
+    if(HAL_UART_RegisterCallback(&hcom_uart[COM1], HAL_UART_MSPINIT_CB_ID, Callback->pMspUsartInitCb) != HAL_OK)
+    {
+      ret = BSP_ERROR_PERIPH_FAILURE;
+    }
+    else if(HAL_UART_RegisterCallback(&hcom_uart[COM1], HAL_UART_MSPDEINIT_CB_ID, Callback->pMspUsartDeInitCb) != HAL_OK)
+    {
+      ret = BSP_ERROR_PERIPH_FAILURE;
+    }
+    else
+    {
+      Is${UsartInstance?lower_case?replace("u","U")}MspCbValid = 1U;
+    }
   }
   
   /* BSP status */  
@@ -521,7 +562,7 @@ int32_t BSP_${UsartInstance}_RegisterMspCallbacks (BSP_UART_Cb_t *Callback)
 }
 #endif /* USE_HAL_UART_REGISTER_CALLBACKS */
 
-#if (USE_COM_LOG == 1)
+#if (USE_COM_LOG > 0)
 /**
  * @brief  Select the active COM port.
  * @param  COM COM port to be activated.
@@ -543,11 +584,19 @@ int32_t BSP_COM_SelectLogPort(COM_TypeDef COM)
  int fputc (int ch, FILE *f) 
 #endif /* __GNUC__ */ 
 { 
-  HAL_UART_Transmit(&hComHandle[COM_ActiveLogPort], (uint8_t *)&ch, 1, COM_POLL_TIMEOUT); 
+  HAL_UART_Transmit(&hcom_uart[COM_ActiveLogPort], (uint8_t *)&ch, 1, COM_POLL_TIMEOUT); 
   return ch;
 }
 #endif /* USE_COM_LOG */ 
+/**
+ * @brief  Initializes ${UsartInstance} MSP.
+ * @param  huart ${UsartInstance} handle
+ * @retval None
+ */
+[@common.optinclude name=mxTmpFolder+"/${UsartInstance?lower_case}_CommonD_Msp.tmp"/]
+
 [/#if]
+
 
 /**
  * @}

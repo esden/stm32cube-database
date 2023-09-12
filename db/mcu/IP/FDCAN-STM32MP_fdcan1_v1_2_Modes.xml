@@ -1,0 +1,902 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<IP DBVersion="V4.0" IPType="peripheral" Name="FDCAN" Version="STM32MP_fdcan1_v1_2" 
+    xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd" 
+    xmlns="http://mcd.rou.st.com/modules.php?name=mcu">
+    <About>CAN: Controller Area Network</About>
+	
+    <!--**** Generic RefParameters for CAN Modes ****-->
+   
+    <RefParameter Name="Instance" DefaultValue="FDCAN$Index" Comment="Instance" Type="" Visible="false" Group="Basic Parameters"/>
+   
+    <RefParameter Comment="Frame Format" DefaultValue="FDCAN_FRAME_CLASSIC" Name="FrameFormat" Type="list" Group="Basic Parameters">
+        <Description>Specifies the FDCAN frame format.</Description>
+        <Condition Diagnostic="" Expression="FDCAN_Master_$IpInstance|FDCAN_Slave_$IpInstance"/>
+        <PossibleValue Comment="Classic mode " Value="FDCAN_FRAME_CLASSIC"/>
+    </RefParameter>
+    <RefParameter Comment="Frame Format" DefaultValue="FDCAN_FRAME_FD_NO_BRS" Name="FrameFormat" Type="list" Group="Basic Parameters">
+        <Description>Specifies the FDCAN frame format.</Description>
+        <Condition Diagnostic="" Expression="FDCAN_FLEXIBLE_DATARATE_$IpInstance"/>
+        <PossibleValue Comment="FD mode without BitRate Switshing " Value="FDCAN_FRAME_FD_NO_BRS"/>
+        <PossibleValue Comment="FD mode with BitRate Switshing " Value="FDCAN_FRAME_FD_BRS"/>
+    </RefParameter>
+
+    <RefParameter Comment="Mode" DefaultValue="FDCAN_MODE_NORMAL" Name="Mode" Type="list" Group="Basic Parameters">
+        <Description>Specifies the FDCAN operating mode.</Description>
+        <PossibleValue Comment="Normal mode " Value="FDCAN_MODE_NORMAL"/>
+        <PossibleValue Comment="Restricted Operation " Value="FDCAN_MODE_RESTRICTED_OPERATION"/>
+        <PossibleValue Comment="Bus Monitoring mode " Value="FDCAN_MODE_BUS_MONITORING"/>
+        <PossibleValue Comment="Internal LoopBack mode " Value="FDCAN_MODE_INTERNAL_LOOPBACK"/>
+        <PossibleValue Comment="External LoopBack mode " Value="FDCAN_MODE_EXTERNAL_LOOPBACK"/>
+    </RefParameter>
+    <RefParameter Comment="Auto Retransmission" DefaultValue="DISABLE" Name="AutoRetransmission" Type="list" Group="Basic Parameters">
+        <Description>Enable or disable the automatic retransmission mode.</Description>
+        <PossibleValue Comment="Disable" Value="DISABLE"/>
+        <PossibleValue Comment="Enable" Value="ENABLE"/>
+    </RefParameter>
+
+    <RefParameter Comment="Clock Divider" DefaultValue="FDCAN_CLOCK_DIV1" Name="ClockDivider" Type="list" Group="Clock Divider">
+        <Description>Specifies the FDCAN kernel clock divider when the clock calibration is bypassed.</Description>
+        <PossibleValue Comment="Divide kernel clock by 1 " Value="FDCAN_CLOCK_DIV1"/>
+        <PossibleValue Comment="Divide kernel clock by 2 " Value="FDCAN_CLOCK_DIV2"/>
+        <PossibleValue Comment="Divide kernel clock by 4 " Value="FDCAN_CLOCK_DIV4"/>
+        <PossibleValue Comment="Divide kernel clock by 6 " Value="FDCAN_CLOCK_DIV6"/>
+        <PossibleValue Comment="Divide kernel clock by 8 " Value="FDCAN_CLOCK_DIV8"/>
+        <PossibleValue Comment="Divide kernel clock by 10 " Value="FDCAN_CLOCK_DIV10"/>
+        <PossibleValue Comment="Divide kernel clock by 12 " Value="FDCAN_CLOCK_DIV12"/>
+        <PossibleValue Comment="Divide kernel clock by 14 " Value="FDCAN_CLOCK_DIV14"/>
+        <PossibleValue Comment="Divide kernel clock by 16 " Value="FDCAN_CLOCK_DIV16"/>
+        <PossibleValue Comment="Divide kernel clock by 18 " Value="FDCAN_CLOCK_DIV18"/>
+        <PossibleValue Comment="Divide kernel clock by 20 " Value="FDCAN_CLOCK_DIV20"/>
+        <PossibleValue Comment="Divide kernel clock by 22 " Value="FDCAN_CLOCK_DIV22"/>
+        <PossibleValue Comment="Divide kernel clock by 24 " Value="FDCAN_CLOCK_DIV24"/>
+        <PossibleValue Comment="Divide kernel clock by 26 " Value="FDCAN_CLOCK_DIV26"/>
+        <PossibleValue Comment="Divide kernel clock by 28 " Value="FDCAN_CLOCK_DIV28"/>
+        <PossibleValue Comment="Divide kernel clock by 30 " Value="FDCAN_CLOCK_DIV30"/>
+    </RefParameter>
+    <RefParameter Comment="Tx Delay Compensation" DefaultValue="DISABLE" Name="TxDelayCompensation" Type="list" Group="Basic Parameters">
+        <Description>Enable or disable the transmitter delay compensation.</Description>
+        <PossibleValue Comment="Disable" Value="DISABLE"/>
+        <PossibleValue Comment="Enable" Value="ENABLE"/>
+    </RefParameter>
+    <RefParameter Comment="Nominal Prescaler" DefaultValue="1" Max="512" Min="1" Name="NominalPrescaler" Type="integer" Group="Basic Parameters">
+        <Description>Specifies the value by which the oscillator frequency is divided for generating the nominal bit time quanta.</Description>
+    </RefParameter>
+    <RefParameter Comment="Nominal Sync Jump Width" DefaultValue="1" Max="128" Min="1" Name="NominalSyncJumpWidth" Type="integer" Group="Basic Parameters">
+        <Description>Specifies the maximum number of time quanta the FDCAN hardware is allowed to lengthen or shorten a bit to perform resynchronization.</Description>
+    </RefParameter>
+    <RefParameter Comment="Nominal Time Seg1" DefaultValue="2" Max="256" Min="2" Name="NominalTimeSeg1" Type="integer" Group="Basic Parameters">
+        <Description>Specifies the number of time quanta in Bit Segment 1.</Description>
+    </RefParameter>
+    <RefParameter Comment="Nominal Time Seg2" DefaultValue="2" Max="128" Min="2" Name="NominalTimeSeg2" Type="integer" Group="Basic Parameters">
+        <Description>Specifies the number of time quanta in Bit Segment 2.</Description>
+    </RefParameter>
+    <RefParameter Comment="Data Prescaler" DefaultValue="1" Max="32" Min="1" Name="DataPrescaler" Type="integer" Group="Basic Parameters">
+        <Description>Specifies the value by which the oscillator frequency is divided for generating the data bit time quanta.</Description>
+    </RefParameter>
+    <RefParameter Comment="Data Sync Jump Width" DefaultValue="1" Max="16" Min="1" Name="DataSyncJumpWidth" Type="integer" Group="Basic Parameters">
+        <Description>Specifies the maximum number of time quanta the FDCAN hardware is allowed to lengthen or shorten a data bit to perform resynchronization.</Description>
+    </RefParameter>
+    <RefParameter Comment="Data Time Seg1" DefaultValue="1" Max="32" Min="1" Name="DataTimeSeg1" Type="integer" Group="Basic Parameters">
+        <Description>Specifies the number of time quanta in Data Bit Segment 1.</Description>
+    </RefParameter>
+    <RefParameter Comment="Data Time Seg2" DefaultValue="1" Max="16" Min="1" Name="DataTimeSeg2" Type="integer" Group="Basic Parameters">
+        <Description>Specifies the number of time quanta in Data Bit Segment 2.</Description>
+    </RefParameter>
+    <RefParameter Comment="Std Filters Nbr" DefaultValue="0" Max="128" Min="0" Name="StdFiltersNbr" Type="integer" Group="Basic Parameters">
+        <Description>Specifies the number of standard Message ID filter.</Description>
+    </RefParameter>
+    <RefParameter Comment="Ext Filters Nbr" DefaultValue="0" Max="64" Min="0" Name="ExtFiltersNbr" Type="integer" Group="Basic Parameters">
+        <Description>Specifies the number of extended Message ID filters.</Description>
+    </RefParameter>
+    <RefParameter Comment="Rx Fifo0 Elmts Nbr" DefaultValue="0" Max="64" Min="0" Name="RxFifo0ElmtsNbr" Type="integer" Group="Basic Parameters">
+        <Description>Specifies the number of Rx FIFO0 Elements.</Description>
+    </RefParameter>
+    <RefParameter Comment="Rx Fifo0 Elmt Size" DefaultValue="FDCAN_DATA_BYTES_8" Name="RxFifo0ElmtSize" Type="list" Group="Basic Parameters">
+        <Description>Specifies the Data Field Size in an Rx FIFO0 element.</Description>
+        <PossibleValue Comment="8 bytes data field " Value="FDCAN_DATA_BYTES_8"/>
+        <PossibleValue Comment="12 bytes data field " Value="FDCAN_DATA_BYTES_12"/>
+        <PossibleValue Comment="16 bytes data field " Value="FDCAN_DATA_BYTES_16"/>
+        <PossibleValue Comment="20 bytes data field " Value="FDCAN_DATA_BYTES_20"/>
+        <PossibleValue Comment="24 bytes data field " Value="FDCAN_DATA_BYTES_24"/>
+        <PossibleValue Comment="32 bytes data field " Value="FDCAN_DATA_BYTES_32"/>
+        <PossibleValue Comment="48 bytes data field " Value="FDCAN_DATA_BYTES_48"/>
+        <PossibleValue Comment="64 bytes data field " Value="FDCAN_DATA_BYTES_64"/>
+    </RefParameter>
+    <RefParameter Comment="Rx Fifo1 Elmts Nbr" DefaultValue="0" Max="64" Min="0" Name="RxFifo1ElmtsNbr" Type="integer" Group="Basic Parameters">
+        <Description>Specifies the number of Rx FIFO 1 Elements.</Description>
+    </RefParameter>
+    <RefParameter Comment="Rx Fifo1 Elmt Size" DefaultValue="FDCAN_DATA_BYTES_8" Name="RxFifo1ElmtSize" Type="list" Group="Basic Parameters">
+        <Description>Specifies the Rx FIFO 1 Data Field Size.</Description>
+        <PossibleValue Comment="8 bytes data field " Value="FDCAN_DATA_BYTES_8"/>
+        <PossibleValue Comment="12 bytes data field " Value="FDCAN_DATA_BYTES_12"/>
+        <PossibleValue Comment="16 bytes data field " Value="FDCAN_DATA_BYTES_16"/>
+        <PossibleValue Comment="20 bytes data field " Value="FDCAN_DATA_BYTES_20"/>
+        <PossibleValue Comment="24 bytes data field " Value="FDCAN_DATA_BYTES_24"/>
+        <PossibleValue Comment="32 bytes data field " Value="FDCAN_DATA_BYTES_32"/>
+        <PossibleValue Comment="48 bytes data field " Value="FDCAN_DATA_BYTES_48"/>
+        <PossibleValue Comment="64 bytes data field " Value="FDCAN_DATA_BYTES_64"/>
+    </RefParameter>
+    <RefParameter Comment="Rx Buffers Nbr" DefaultValue="0" Max="64" Min="0" Name="RxBuffersNbr" Type="integer" Group="Basic Parameters">
+        <Description>Specifies the number of Dedicated Rx Buffer elements.</Description>
+    </RefParameter>
+    <RefParameter Comment="Rx Buffer Size" DefaultValue="FDCAN_DATA_BYTES_8" Name="RxBufferSize" Type="list" Group="Basic Parameters">
+        <Description>Specifies the Rx Buffer Data Field Size.</Description>
+        <PossibleValue Comment="8 bytes data field " Value="FDCAN_DATA_BYTES_8"/>
+        <PossibleValue Comment="12 bytes data field " Value="FDCAN_DATA_BYTES_12"/>
+        <PossibleValue Comment="16 bytes data field " Value="FDCAN_DATA_BYTES_16"/>
+        <PossibleValue Comment="20 bytes data field " Value="FDCAN_DATA_BYTES_20"/>
+        <PossibleValue Comment="24 bytes data field " Value="FDCAN_DATA_BYTES_24"/>
+        <PossibleValue Comment="32 bytes data field " Value="FDCAN_DATA_BYTES_32"/>
+        <PossibleValue Comment="48 bytes data field " Value="FDCAN_DATA_BYTES_48"/>
+        <PossibleValue Comment="64 bytes data field " Value="FDCAN_DATA_BYTES_64"/>
+    </RefParameter>
+    <RefParameter Comment="Tx Events Nbr" DefaultValue="0" Max="32" Min="0" Name="TxEventsNbr" Type="integer" Group="Basic Parameters">
+        <Description>Specifies the number of Tx Event FIFO elements.</Description>
+    </RefParameter>
+    <RefParameter Comment="Tx Buffers Nbr" DefaultValue="0" Max="32" Min="0" Name="TxBuffersNbr" Type="integer" Group="Basic Parameters">
+        <Description>Specifies the number of Dedicated Tx Buffers.</Description>
+    </RefParameter>
+    <RefParameter Comment="Tx Fifo Queue Elmts Nbr" DefaultValue="0" Max="4294967295" Min="0" Name="TxFifoQueueElmtsNbr" Type="integer" Group="Basic Parameters">
+        <Description>Specifies the number of Tx Buffers used for Tx FIFO/Queue.</Description>
+    </RefParameter>
+    <RefParameter Comment="Tx Fifo Queue Mode" DefaultValue="FDCAN_TX_FIFO_OPERATION" Name="TxFifoQueueMode" Type="list" Group="Basic Parameters">
+        <Description>Tx FIFO/Queue Mode selection.</Description>
+        <PossibleValue Comment="FIFO mode " Value="FDCAN_TX_FIFO_OPERATION"/>
+        <PossibleValue Comment="Queue mode " Value="FDCAN_TX_QUEUE_OPERATION"/>
+    </RefParameter>
+    <RefParameter Comment="Tx Elmt Size" DefaultValue="FDCAN_DATA_BYTES_8" Name="TxElmtSize" Type="list" Group="Basic Parameters">
+        <Description>Specifies the Tx Element Data Field Size.</Description>
+        <PossibleValue Comment="8 bytes data field " Value="FDCAN_DATA_BYTES_8"/>
+        <PossibleValue Comment="12 bytes data field " Value="FDCAN_DATA_BYTES_12"/>
+        <PossibleValue Comment="16 bytes data field " Value="FDCAN_DATA_BYTES_16"/>
+        <PossibleValue Comment="20 bytes data field " Value="FDCAN_DATA_BYTES_20"/>
+        <PossibleValue Comment="24 bytes data field " Value="FDCAN_DATA_BYTES_24"/>
+        <PossibleValue Comment="32 bytes data field " Value="FDCAN_DATA_BYTES_32"/>
+        <PossibleValue Comment="48 bytes data field " Value="FDCAN_DATA_BYTES_48"/>
+        <PossibleValue Comment="64 bytes data field " Value="FDCAN_DATA_BYTES_64"/>
+    </RefParameter>
+    <RefParameter Comment="Standard Filter Sa" DefaultValue="0" Max="4294967295" Min="0" Name="StandardFilterSA" Type="integer" Group="msgRam">
+        <Description>Specifies the Filter List Standard Start Address.</Description>
+    </RefParameter>
+    <RefParameter Comment="Extended Filter Sa" DefaultValue="0" Max="4294967295" Min="0" Name="ExtendedFilterSA" Type="integer" Group="msgRam">
+        <Description>Specifies the Filter List Extended Start Address.</Description>
+    </RefParameter>
+    <RefParameter Comment="Rx Fifo0 Sa" DefaultValue="0" Max="4294967295" Min="0" Name="RxFIFO0SA" Type="integer" Group="msgRam">
+        <Description>Specifies the Rx FIFO 0 Start Address.</Description>
+    </RefParameter>
+    <RefParameter Comment="Rx Fifo1 Sa" DefaultValue="0" Max="4294967295" Min="0" Name="RxFIFO1SA" Type="integer" Group="msgRam">
+        <Description>Specifies the Rx FIFO 1 Start Address.</Description>
+    </RefParameter>
+    <RefParameter Comment="Rx Buffer Sa" DefaultValue="0" Max="4294967295" Min="0" Name="RxBufferSA" Type="integer" Group="msgRam">
+        <Description>Specifies the Rx Buffer Start Address.</Description>
+    </RefParameter>
+    <RefParameter Comment="Tx Event Fifosa" DefaultValue="0" Max="4294967295" Min="0" Name="TxEventFIFOSA" Type="integer" Group="msgRam">
+        <Description>Specifies the Event FIFO Start Address.</Description>
+    </RefParameter>
+    <RefParameter Comment="Tx Buffer Sa" DefaultValue="0" Max="4294967295" Min="0" Name="TxBufferSA" Type="integer" Group="msgRam">
+        <Description>Specifies the Tx Buffers Start Address.</Description>
+    </RefParameter>
+    <RefParameter Comment="Tx Fifoqsa" DefaultValue="0" Max="4294967295" Min="0" Name="TxFIFOQSA" Type="integer" Group="msgRam">
+        <Description>Specifies the Tx FIFO/Queue Start Address.</Description>
+    </RefParameter>
+    <RefParameter Comment="Error Code" DefaultValue="0" Max="0" Min="0" Name="ErrorCode" Type="integer" Group="Error_Code">
+        <Description>FDCAN Error code </Description>
+    </RefParameter>
+    <RefParameter Comment="Id Type" DefaultValue="FDCAN_STANDARD_ID" Name="Filter_IdType" Type="list">
+        <Description>Specifies the identifier type.</Description>
+        <PossibleValue Comment="Standard ID element " Value="FDCAN_STANDARD_ID"/>
+        <PossibleValue Comment="Extended ID element " Value="FDCAN_EXTENDED_ID"/>
+    </RefParameter>
+    <RefParameter Comment="Filter Index" DefaultValue="0" Max="4294967295" Min="0" Name="Filter_FilterIndex" Type="integer">
+        <Description>0 and 63, if IdType is FDCAN_EXTENDED_ID </Description>
+    </RefParameter>
+    <RefParameter Comment="Filter Type" DefaultValue="FDCAN_FILTER_RANGE" Name="FilterType" Type="list">
+        <Description>Specifies the filter type.</Description>
+        <PossibleValue Comment="Range filter from FilterID1 to FilterID2 " Value="FDCAN_FILTER_RANGE"/>
+        <PossibleValue Comment="Dual ID filter for FilterID1 or FilterID2 " Value="FDCAN_FILTER_DUAL"/>
+        <PossibleValue Comment="Classic filter: FilterID1 = filter, FilterID2 = mask " Value="FDCAN_FILTER_MASK"/>
+        <PossibleValue Comment="Range filter from FilterID1 to FilterID2, EIDM mask not applied " Value="FDCAN_FILTER_RANGE_NO_EIDM"/>
+    </RefParameter>
+    <RefParameter Comment="Filter Config" DefaultValue="FDCAN_FILTER_DISABLE" Name="FilterConfig" Type="list">
+        <Description>Specifies the filter configuration.</Description>
+        <PossibleValue Comment="Disable filter element " Value="FDCAN_FILTER_DISABLE"/>
+        <PossibleValue Comment="Store in Rx FIFO 0 if filter matches " Value="FDCAN_FILTER_TO_RXFIFO0"/>
+        <PossibleValue Comment="Store in Rx FIFO 1 if filter matches " Value="FDCAN_FILTER_TO_RXFIFO1"/>
+        <PossibleValue Comment="Reject ID if filter matches " Value="FDCAN_FILTER_REJECT"/>
+        <PossibleValue Comment="Set high priority if filter matches " Value="FDCAN_FILTER_HP"/>
+        <PossibleValue Comment="Set high priority and store in FIFO 0 if filter matches " Value="FDCAN_FILTER_TO_RXFIFO0_HP"/>
+        <PossibleValue Comment="Set high priority and store in FIFO 1 if filter matches " Value="FDCAN_FILTER_TO_RXFIFO1_HP"/>
+        <PossibleValue Comment="Store into Rx Buffer, configuration of FilterMode ignored " Value="FDCAN_FILTER_TO_RXBUFFER"/>
+    </RefParameter>
+    <RefParameter Comment="Filter Id1" DefaultValue="0" Max="4294967295" Min="0" Name="FilterID1" Type="integer">
+        <Description>0 and 0x1FFFFFFF, if IdType is FDCAN_EXTENDED_ID </Description>
+    </RefParameter>
+    <RefParameter Comment="Filter Id2" DefaultValue="0" Max="4294967295" Min="0" Name="FilterID2" Type="integer">
+        <Description>0 and 0x1FFFFFFF, if IdType is FDCAN_EXTENDED_ID This parameter is ignored if FilterConfig is set to FDCAN_FILTER_TO_RXBUFFER </Description>
+    </RefParameter>
+    <RefParameter Comment="Rx Buffer Index" DefaultValue="0" Max="63" Min="0" Name="RxBufferIndex" Type="integer">
+        <Description>Contains the index of the Rx buffer in which the matching message will be stored.</Description>
+    </RefParameter>
+    <RefParameter Comment="Identifier" DefaultValue="0" Max="4294967295" Min="0" Name="TxHeader_Identifier" Type="integer">
+        <Description>0 and 0x1FFFFFFF, if IdType is FDCAN_EXTENDED_ID </Description>
+    </RefParameter>
+    <RefParameter Comment="Id Type" DefaultValue="FDCAN_STANDARD_ID" Name="TxHeader_IdType" Type="list">
+        <Description>Specifies the identifier type for the message that will be transmitted.</Description>
+        <PossibleValue Comment="Standard ID element " Value="FDCAN_STANDARD_ID"/>
+        <PossibleValue Comment="Extended ID element " Value="FDCAN_EXTENDED_ID"/>
+    </RefParameter>
+    <RefParameter Comment="Tx Frame Type" DefaultValue="FDCAN_DATA_FRAME" Name="TxFrameType" Type="list">
+        <Description>Specifies the frame type of the message that will be transmitted.</Description>
+        <PossibleValue Comment="Data frame " Value="FDCAN_DATA_FRAME"/>
+        <PossibleValue Comment="Remote frame " Value="FDCAN_REMOTE_FRAME"/>
+    </RefParameter>
+    <RefParameter Comment="Data Length" DefaultValue="FDCAN_DLC_0_BYTES" Name="TxHeader_DataLength" Type="list">
+        <Description>Specifies the length of the frame that will be transmitted.</Description>
+        <PossibleValue Comment="0 bytes data field " Value="FDCAN_DLC_0_BYTES"/>
+        <PossibleValue Comment="1 bytes data field " Value="FDCAN_DLC_1_BYTES"/>
+        <PossibleValue Comment="2 bytes data field " Value="FDCAN_DLC_2_BYTES"/>
+        <PossibleValue Comment="3 bytes data field " Value="FDCAN_DLC_3_BYTES"/>
+        <PossibleValue Comment="4 bytes data field " Value="FDCAN_DLC_4_BYTES"/>
+        <PossibleValue Comment="5 bytes data field " Value="FDCAN_DLC_5_BYTES"/>
+        <PossibleValue Comment="6 bytes data field " Value="FDCAN_DLC_6_BYTES"/>
+        <PossibleValue Comment="7 bytes data field " Value="FDCAN_DLC_7_BYTES"/>
+        <PossibleValue Comment="8 bytes data field " Value="FDCAN_DLC_8_BYTES"/>
+        <PossibleValue Comment="12 bytes data field " Value="FDCAN_DLC_12_BYTES"/>
+        <PossibleValue Comment="16 bytes data field " Value="FDCAN_DLC_16_BYTES"/>
+        <PossibleValue Comment="20 bytes data field " Value="FDCAN_DLC_20_BYTES"/>
+        <PossibleValue Comment="24 bytes data field " Value="FDCAN_DLC_24_BYTES"/>
+        <PossibleValue Comment="32 bytes data field " Value="FDCAN_DLC_32_BYTES"/>
+        <PossibleValue Comment="48 bytes data field " Value="FDCAN_DLC_48_BYTES"/>
+        <PossibleValue Comment="64 bytes data field " Value="FDCAN_DLC_64_BYTES"/>
+    </RefParameter>
+    <RefParameter Comment="Error State Indicator" DefaultValue="FDCAN_ESI_ACTIVE" Name="TxHeader_ErrorStateIndicator" Type="list">
+        <Description>Specifies the error state indicator.</Description>
+        <PossibleValue Comment="Transmitting node is error active " Value="FDCAN_ESI_ACTIVE"/>
+        <PossibleValue Comment="Transmitting node is error passive " Value="FDCAN_ESI_PASSIVE"/>
+    </RefParameter>
+    <RefParameter Comment="Bit Rate Switch" DefaultValue="FDCAN_BRS_OFF" Name="TxHeader_BitRateSwitch" Type="list">
+        <Description>Specifies whether the Tx frame will be transmitted with or without bit rate switching.</Description>
+        <PossibleValue Comment="FDCAN frames transmitted/received without bit rate switching " Value="FDCAN_BRS_OFF"/>
+        <PossibleValue Comment="FDCAN frames transmitted/received with bit rate switching " Value="FDCAN_BRS_ON"/>
+    </RefParameter>
+    <RefParameter Comment="Fd Format" DefaultValue="FDCAN_CLASSIC_CAN" Name="TxHeader_FDFormat" Type="list">
+        <Description>Specifies whether the Tx frame will be transmitted in classic or FD format.</Description>
+        <PossibleValue Comment="Frame transmitted/received in Classic CAN format " Value="FDCAN_CLASSIC_CAN"/>
+        <PossibleValue Comment="Frame transmitted/received in FDCAN format " Value="FDCAN_FD_CAN"/>
+    </RefParameter>
+    <RefParameter Comment="Tx Event Fifo" DefaultValue="FDCAN_NO_TX_EVENTS" Name="TxEventFIFO" Type="list">
+        <Description>Specifies the event FIFO control.</Description>
+        <PossibleValue Comment="Do not store Tx events " Value="FDCAN_NO_TX_EVENTS"/>
+        <PossibleValue Comment="Store Tx events " Value="FDCAN_STORE_TX_EVENTS"/>
+    </RefParameter>
+    <RefParameter Comment="Message Marker" DefaultValue="0" Max="0xFF" Min="0" Name="MessageMarker" Type="integer">
+        <Description>Specifies the message marker to be copied into Tx Event FIFO element for identification of Tx message status.</Description>
+    </RefParameter>
+    <RefParameter Comment="Tx Location" DefaultValue="FDCAN_TX_FIFO" Name="TxLocation" Type="list">
+        <Description>Contains the location of the element to be transmitted.</Description>
+        <PossibleValue Comment="Store message to Tx FIFO " Value="FDCAN_TX_FIFO"/>
+        <PossibleValue Comment="Store message to Tx Buffer 0 " Value="FDCAN_TX_BUFFER0"/>
+        <PossibleValue Comment="Store message to Tx Buffer 1 " Value="FDCAN_TX_BUFFER1"/>
+        <PossibleValue Comment="Store message to Tx Buffer 2 " Value="FDCAN_TX_BUFFER2"/>
+        <PossibleValue Comment="Store message to Tx Buffer 3 " Value="FDCAN_TX_BUFFER3"/>
+        <PossibleValue Comment="Store message to Tx Buffer 4 " Value="FDCAN_TX_BUFFER4"/>
+        <PossibleValue Comment="Store message to Tx Buffer 5 " Value="FDCAN_TX_BUFFER5"/>
+        <PossibleValue Comment="Store message to Tx Buffer 6 " Value="FDCAN_TX_BUFFER6"/>
+        <PossibleValue Comment="Store message to Tx Buffer 7 " Value="FDCAN_TX_BUFFER7"/>
+        <PossibleValue Comment="Store message to Tx Buffer 8 " Value="FDCAN_TX_BUFFER8"/>
+        <PossibleValue Comment="Store message to Tx Buffer 9 " Value="FDCAN_TX_BUFFER9"/>
+        <PossibleValue Comment="Store message to Tx Buffer 10 " Value="FDCAN_TX_BUFFER10"/>
+        <PossibleValue Comment="Store message to Tx Buffer 11 " Value="FDCAN_TX_BUFFER11"/>
+        <PossibleValue Comment="Store message to Tx Buffer 12 " Value="FDCAN_TX_BUFFER12"/>
+        <PossibleValue Comment="Store message to Tx Buffer 13 " Value="FDCAN_TX_BUFFER13"/>
+        <PossibleValue Comment="Store message to Tx Buffer 14 " Value="FDCAN_TX_BUFFER14"/>
+        <PossibleValue Comment="Store message to Tx Buffer 15 " Value="FDCAN_TX_BUFFER15"/>
+        <PossibleValue Comment="Store message to Tx Buffer 16 " Value="FDCAN_TX_BUFFER16"/>
+        <PossibleValue Comment="Store message to Tx Buffer 17 " Value="FDCAN_TX_BUFFER17"/>
+        <PossibleValue Comment="Store message to Tx Buffer 18 " Value="FDCAN_TX_BUFFER18"/>
+        <PossibleValue Comment="Store message to Tx Buffer 19 " Value="FDCAN_TX_BUFFER19"/>
+        <PossibleValue Comment="Store message to Tx Buffer 20 " Value="FDCAN_TX_BUFFER20"/>
+        <PossibleValue Comment="Store message to Tx Buffer 21 " Value="FDCAN_TX_BUFFER21"/>
+        <PossibleValue Comment="Store message to Tx Buffer 22 " Value="FDCAN_TX_BUFFER22"/>
+        <PossibleValue Comment="Store message to Tx Buffer 23 " Value="FDCAN_TX_BUFFER23"/>
+        <PossibleValue Comment="Store message to Tx Buffer 24 " Value="FDCAN_TX_BUFFER24"/>
+        <PossibleValue Comment="Store message to Tx Buffer 25 " Value="FDCAN_TX_BUFFER25"/>
+        <PossibleValue Comment="Store message to Tx Buffer 26 " Value="FDCAN_TX_BUFFER26"/>
+        <PossibleValue Comment="Store message to Tx Buffer 27 " Value="FDCAN_TX_BUFFER27"/>
+        <PossibleValue Comment="Store message to Tx Buffer 28 " Value="FDCAN_TX_BUFFER28"/>
+        <PossibleValue Comment="Store message to Tx Buffer 29 " Value="FDCAN_TX_BUFFER29"/>
+        <PossibleValue Comment="Store message to Tx Buffer 30 " Value="FDCAN_TX_BUFFER30"/>
+        <PossibleValue Comment="Store message to Tx Buffer 31 " Value="FDCAN_TX_BUFFER31"/>
+    </RefParameter>
+    <RefParameter Comment="P Tx Data" DefaultValue="0" Max="0" Min="0" Name="pTxData" Type="integer"/>
+    <RefParameter Comment="Rx Location" DefaultValue="0" Max="4294967295" Min="0" Name="RxLocation" Type="integer"/>
+    <RefParameter Comment="Identifier" DefaultValue="0" Max="4294967295" Min="0" Name="RxHeader_Identifier" Type="integer">
+        <Description>0 and 0x1FFFFFFF, if IdType is FDCAN_EXTENDED_ID </Description>
+    </RefParameter>
+    <RefParameter Comment="Id Type" DefaultValue="FDCAN_STANDARD_ID" Name="RxHeader_IdType" Type="list">
+        <Description>Specifies the identifier type of the received message.</Description>
+        <PossibleValue Comment="Standard ID element " Value="FDCAN_STANDARD_ID"/>
+        <PossibleValue Comment="Extended ID element " Value="FDCAN_EXTENDED_ID"/>
+    </RefParameter>
+    <RefParameter Comment="Rx Frame Type" DefaultValue="FDCAN_DATA_FRAME" Name="RxFrameType" Type="list">
+        <Description>Specifies the the received message frame type.</Description>
+        <PossibleValue Comment="Data frame " Value="FDCAN_DATA_FRAME"/>
+        <PossibleValue Comment="Remote frame " Value="FDCAN_REMOTE_FRAME"/>
+    </RefParameter>
+    <RefParameter Comment="Data Length" DefaultValue="FDCAN_DLC_0_BYTES" Name="RxHeader_DataLength" Type="list">
+        <Description>Specifies the received frame length.</Description>
+        <PossibleValue Comment="0 bytes data field " Value="FDCAN_DLC_0_BYTES"/>
+        <PossibleValue Comment="1 bytes data field " Value="FDCAN_DLC_1_BYTES"/>
+        <PossibleValue Comment="2 bytes data field " Value="FDCAN_DLC_2_BYTES"/>
+        <PossibleValue Comment="3 bytes data field " Value="FDCAN_DLC_3_BYTES"/>
+        <PossibleValue Comment="4 bytes data field " Value="FDCAN_DLC_4_BYTES"/>
+        <PossibleValue Comment="5 bytes data field " Value="FDCAN_DLC_5_BYTES"/>
+        <PossibleValue Comment="6 bytes data field " Value="FDCAN_DLC_6_BYTES"/>
+        <PossibleValue Comment="7 bytes data field " Value="FDCAN_DLC_7_BYTES"/>
+        <PossibleValue Comment="8 bytes data field " Value="FDCAN_DLC_8_BYTES"/>
+        <PossibleValue Comment="12 bytes data field " Value="FDCAN_DLC_12_BYTES"/>
+        <PossibleValue Comment="16 bytes data field " Value="FDCAN_DLC_16_BYTES"/>
+        <PossibleValue Comment="20 bytes data field " Value="FDCAN_DLC_20_BYTES"/>
+        <PossibleValue Comment="24 bytes data field " Value="FDCAN_DLC_24_BYTES"/>
+        <PossibleValue Comment="32 bytes data field " Value="FDCAN_DLC_32_BYTES"/>
+        <PossibleValue Comment="48 bytes data field " Value="FDCAN_DLC_48_BYTES"/>
+        <PossibleValue Comment="64 bytes data field " Value="FDCAN_DLC_64_BYTES"/>
+    </RefParameter>
+    <RefParameter Comment="Error State Indicator" DefaultValue="FDCAN_ESI_ACTIVE" Name="RxHeader_ErrorStateIndicator" Type="list">
+        <Description>Specifies the error state indicator.</Description>
+        <PossibleValue Comment="Transmitting node is error active " Value="FDCAN_ESI_ACTIVE"/>
+        <PossibleValue Comment="Transmitting node is error passive " Value="FDCAN_ESI_PASSIVE"/>
+    </RefParameter>
+    <RefParameter Comment="Bit Rate Switch" DefaultValue="FDCAN_BRS_OFF" Name="RxHeader_BitRateSwitch" Type="list">
+        <Description>Specifies whether the Rx frame is received with or without bit rate switching.</Description>
+        <PossibleValue Comment="FDCAN frames transmitted/received without bit rate switching " Value="FDCAN_BRS_OFF"/>
+        <PossibleValue Comment="FDCAN frames transmitted/received with bit rate switching " Value="FDCAN_BRS_ON"/>
+    </RefParameter>
+    <RefParameter Comment="Fd Format" DefaultValue="FDCAN_CLASSIC_CAN" Name="RxHeader_FDFormat" Type="list">
+        <Description>Specifies whether the Rx frame is received in classic or FD format.</Description>
+        <PossibleValue Comment="Frame transmitted/received in Classic CAN format " Value="FDCAN_CLASSIC_CAN"/>
+        <PossibleValue Comment="Frame transmitted/received in FDCAN format " Value="FDCAN_FD_CAN"/>
+    </RefParameter>
+    <RefParameter Comment="Rx Timestamp" DefaultValue="0" Max="0xFFFF" Min="0" Name="RxTimestamp" Type="integer">
+        <Description>Specifies the timestamp counter value captured on start of frame reception.</Description>
+    </RefParameter>
+    <RefParameter Comment="Filter Index" DefaultValue="0" Max="4294967295" Min="0" Name="RxHeader_FilterIndex" Type="integer">
+        <Description>0 and 64, if IdType is FDCAN_EXTENDED_ID </Description>
+    </RefParameter>
+    <RefParameter Comment="Non Matching Frame" DefaultValue="FDCAN_MATCHING_FRAME" Name="NonMatchingFrame" Type="list">
+        <Description>Specifies whether the accepted frame did not match any Rx filter.</Description>
+        <PossibleValue Comment="Received frame matched an Rx filter element " Value="FDCAN_MATCHING_FRAME"/>
+        <PossibleValue Comment="Received frame did not match any Rx filter element " Value="FDCAN_NON_MATCHING_FRAME"/>
+    </RefParameter>
+    <RefParameter Comment="P Rx Data" DefaultValue="0" Max="0" Min="0" Name="pRxData" Type="integer"/>
+    <RefParameter Comment="Message Ram Offset" DefaultValue="0" Max="2560" Min="0" Name="MessageRAMOffset" Type="integer" Group="Basic Parameters">		
+        <Description>Specifies the message RAM start address.</Description>		
+    </RefParameter>
+    <RefParameter Comment="Operation Mode" DefaultValue="FDCAN_EVENT_DRIVEN_COMMUNICATION" Name="OperationMode" Type="list" Group="Basic Parameters" Visible="false" >		
+        <Description>Specifies the FDCAN Operation Mode.</Description>		
+        <PossibleValue Comment="Event-driven FDCAN communication " Value="FDCAN_EVENT_DRIVEN_COMMUNICATION"/>		
+        <PossibleValue Comment="Time triggered communication, level 1 " Value="FDCAN_TT_COMMUNICATION_LEVEL1"/>		
+        <PossibleValue Comment="Time triggered communication, level 2 " Value="FDCAN_TT_COMMUNICATION_LEVEL2"/>		
+        <PossibleValue Comment="Time triggered communication, level 0 " Value="FDCAN_TT_COMMUNICATION_LEVEL0"/>		
+    </RefParameter>		
+    	
+    <RefParameter Comment="Time Master" DefaultValue="FDCAN_TT_SLAVE" Name="TimeMaster" Type="list" Group="TT Pararams" >		
+        <Description>Specifies whether the instance is a slave or a potential master.</Description>		
+        <PossibleValue Comment="Time slave " Value="FDCAN_TT_SLAVE"/>		
+        <PossibleValue Comment="Potential time master " Value="FDCAN_TT_POTENTIAL_MASTER"/>		
+    </RefParameter>		
+    <RefParameter Comment="Sync Dev Limit" DefaultValue="0" Max="7" Min="0" Name="SyncDevLimit" Type="integer" Group="TT Pararams" >		
+        <Description>Specifies the Synchronization Deviation Limit SDL of the TUR numerator : TUR = (Numerator ± SDL) / Denominator.</Description>		
+    </RefParameter>		
+    <RefParameter Comment="Init Ref Trig Offset" DefaultValue="0" Max="127" Min="0" Name="InitRefTrigOffset" Type="integer" Group="TT Pararams">		
+        <Description>Specifies the Initial Reference Trigger Offset.</Description>		
+    </RefParameter>		
+    <RefParameter Comment="External Clk Sync" DefaultValue="FDCAN_TT_EXT_CLK_SYNC_DISABLE" Name="ExternalClkSync" Type="list" Group="TT Pararams">		
+        <Description>Enable or disable External Clock Synchronization.</Description>		
+        <PossibleValue Comment="External clock synchronization in Level 0,2 disabled " Value="FDCAN_TT_EXT_CLK_SYNC_DISABLE"/>		
+        <PossibleValue Comment="External clock synchronization in Level 0,2 enabled " Value="FDCAN_TT_EXT_CLK_SYNC_ENABLE"/>		
+    </RefParameter>		
+    <RefParameter Comment="App Wdg Limit" DefaultValue="0" Max="255" Min="0" Name="AppWdgLimit" Type="integer" Group="TT Pararams">		
+        <Description>Specifies the Application Watchdog Limit : maximum time after which the application has to serve the application watchdog.</Description>		
+    </RefParameter>		
+    <RefParameter Comment="Global Time Filter" DefaultValue="FDCAN_TT_GLOBAL_TIME_FILTERING_DISABLE" Name="GlobalTimeFilter" Type="list" Group="TT Pararams">		
+        <Description>Enable or disable Global Time Filtering.</Description>		
+        <PossibleValue Comment="Global time filtering in Level 0,2 disabled " Value="FDCAN_TT_GLOBAL_TIME_FILTERING_DISABLE"/>		
+        <PossibleValue Comment="Global time filtering in Level 0,2 enabled " Value="FDCAN_TT_GLOBAL_TIME_FILTERING_ENABLE"/>		
+    </RefParameter>		
+    <RefParameter Comment="Clock Calibration" DefaultValue="FDCAN_TT_AUTO_CLK_CALIBRATION_DISABLE" Name="TTConfig_ClockCalibration" Type="list">		
+        <Description>Enable or disable Automatic Clock Calibration.</Description>		
+        <PossibleValue Comment="Automatic clock calibration in Level 0,2 disabled " Value="FDCAN_TT_AUTO_CLK_CALIBRATION_DISABLE"/>		
+        <PossibleValue Comment="Automatic clock calibration in Level 0,2 enabled " Value="FDCAN_TT_AUTO_CLK_CALIBRATION_ENABLE"/>		
+    </RefParameter>		
+    <RefParameter Comment="Evt Trig Polarity" DefaultValue="FDCAN_TT_EVENT_TRIGGER_POLARITY_RISING" Name="EvtTrigPolarity" Type="list" Group="TT Pararams">		
+        <Description>Specifies the Event Trigger Polarity.</Description>		
+        <PossibleValue Comment="Rising edge trigger " Value="FDCAN_TT_EVENT_TRIGGER_POLARITY_RISING"/>		
+        <PossibleValue Comment="Falling edge trigger " Value="FDCAN_TT_EVENT_TRIGGER_POLARITY_FALLING"/>		
+    </RefParameter>		
+   
+   		
+    <RefParameter Comment="Tx Enable Window" DefaultValue="1" Max="16" Min="1" Name="TxEnableWindow" Type="integer" Group="TT Pararams">		
+        <Description>Specifies the length of Tx enable window in NTUs.</Description>		
+    </RefParameter>		
+    <RefParameter Comment="Exp Tx Trig Nbr" DefaultValue="0" Max="4095" Min="0" Name="ExpTxTrigNbr" Type="integer" Group="TT Pararams">		
+        <Description>Specifies the number of expected Tx_Triggers in the system matrix.</Description>		
+    </RefParameter>		
+    <RefParameter Comment="Tur Numerator" DefaultValue="0x10000" Max="0x1FFFF" Min="0x10000" Name="TURNumerator" Type="integer" Group="TT Pararams">		
+        <Description>Specifies the TUR (Time Unit Ratio) numerator.</Description>		
+    </RefParameter>		
+    <RefParameter Comment="Tur Denominator" DefaultValue="0x0001" Max="0x3FFF" Min="0x0001" Name="TURDenominator" Type="integer" Group="TT Pararams">		
+        <Description>Specifies the TUR (Time Unit Ratio) denominator.</Description>		
+    </RefParameter>		
+    <RefParameter Comment="Trigger Memory Nbr" DefaultValue="0" Max="64" Min="0" Name="TriggerMemoryNbr" Type="integer" Group="TT Pararams">		
+        <Description>Specifies the number of trigger memory elements.</Description>		
+    </RefParameter>		
+    <RefParameter Comment="Stop Watch Trig Sel" DefaultValue="FDCAN_TT_STOP_WATCH_TRIGGER_0" Name="StopWatchTrigSel" Type="list" Group="TT Pararams">		
+        <Description>Specifies the input to be used as stop watch trigger.</Description>		
+        <PossibleValue Comment="fdcan1_swt0 selected as stop watch trigger " Value="FDCAN_TT_STOP_WATCH_TRIGGER_0"/>		
+        <PossibleValue Comment="fdcan1_swt1 selected as stop watch trigger " Value="FDCAN_TT_STOP_WATCH_TRIGGER_1"/>		
+        <PossibleValue Comment="fdcan1_swt2 selected as stop watch trigger " Value="FDCAN_TT_STOP_WATCH_TRIGGER_2"/>		
+        <PossibleValue Comment="fdcan1_swt3 selected as stop watch trigger " Value="FDCAN_TT_STOP_WATCH_TRIGGER_3"/>		
+    </RefParameter>		
+    <RefParameter Comment="Event Trig Sel" DefaultValue="FDCAN_TT_EVENT_TRIGGER_0" Name="EventTrigSel" Type="list" Group="TT Pararams">		
+        <Description>Specifies the input to be used as event trigger.</Description>		
+        <PossibleValue Comment="fdcan1_evt0 selected as event trigger " Value="FDCAN_TT_EVENT_TRIGGER_0"/>		
+        <PossibleValue Comment="fdcan1_evt1 selected as event trigger " Value="FDCAN_TT_EVENT_TRIGGER_1"/>		
+        <PossibleValue Comment="fdcan1_evt2 selected as event trigger " Value="FDCAN_TT_EVENT_TRIGGER_2"/>		
+        <PossibleValue Comment="fdcan1_evt3 selected as event trigger " Value="FDCAN_TT_EVENT_TRIGGER_3"/>		
+    </RefParameter>
+    <RefParameter Comment="Tt Memory Sa" DefaultValue="0" Max="4294967295" Min="0" Name="TTMemorySA" Type="integer" Group="msgRam">		
+        <Description>Specifies the Trigger Memory Start Address.</Description>		
+    </RefParameter>
+    <RefParameter Comment="Clock Calibration" DefaultValue="DISABLE" Name="ClkCalUnit_ClockCalibration" Type="list">		
+        <Description>Enable or disable the clock calibration.</Description>		
+        <PossibleValue Comment="Disable" Value="DISABLE"/>		
+        <PossibleValue Comment="Enable" Value="ENABLE"/>		
+    </RefParameter>		
+	
+    <RefParameter Comment="Min Osc Clk Periods" DefaultValue="0x00" Max="0xFF" Min="0x00" Name="MinOscClkPeriods" Type="integer">		
+        <Description>Configures the minimum number of periods in two CAN bit times.</Description>		
+    </RefParameter>		
+    <RefParameter Comment="Cal Field Length" DefaultValue="FDCAN_CALIBRATION_FIELD_LENGTH_32BITS" Name="CalFieldLength" Type="list">		
+        <Description>Specifies the calibration field length.</Description>		
+        <PossibleValue Comment="Calibration field length is 32 bits " Value="FDCAN_CALIBRATION_FIELD_LENGTH_32BITS"/>		
+        <PossibleValue Comment="Calibration field length is 64 bits " Value="FDCAN_CALIBRATION_FIELD_LENGTH_64BITS"/>		
+    </RefParameter>		
+    <RefParameter Comment="Time Quanta Per Bit Time" DefaultValue="4" Max="25" Min="4" Name="TimeQuantaPerBitTime" Type="integer">		
+        <Description>Configures the number of time quanta per bit time.</Description>		
+    </RefParameter>		
+    <RefParameter Comment="Watchdog Start Value" DefaultValue="0x0000" Max="0xFFFF" Min="0x0000" Name="WatchdogStartValue" Type="integer">		
+        <Description>Start value of the Calibration Watchdog Counter.</Description>		
+    </RefParameter>
+    <RefParameter Comment="Non Matching Std" DefaultValue="0" Max="4294967295" Min="0" Name="NonMatchingStd" Type="integer"/>		
+    <RefParameter Comment="Non Matching Ext" DefaultValue="0" Max="4294967295" Min="0" Name="NonMatchingExt" Type="integer"/>		
+    <RefParameter Comment="Reject Remote Std" DefaultValue="0" Max="4294967295" Min="0" Name="RejectRemoteStd" Type="integer"/>		
+    <RefParameter Comment="Reject Remote Ext" DefaultValue="0" Max="4294967295" Min="0" Name="RejectRemoteExt" Type="integer"/>		
+    <RefParameter Comment="Mask" DefaultValue="0" Max="4294967295" Min="0" Name="Mask" Type="integer"/>		
+    <RefParameter Comment="Fifo" DefaultValue="0" Max="4294967295" Min="0" Name="FIFO" Type="integer"/>		
+    <RefParameter Comment="Watermark" DefaultValue="0" Max="4294967295" Min="0" Name="Watermark" Type="integer"/>		
+    <RefParameter Comment="Counter Start Value" DefaultValue="0" Max="4294967295" Min="0" Name="CounterStartValue" Type="integer"/>		
+    <RefParameter Comment="Timestamp Prescaler" DefaultValue="0" Max="4294967295" Min="0" Name="TimestampPrescaler" Type="integer"/>		
+    <RefParameter Comment="Timestamp Operation" DefaultValue="0" Max="4294967295" Min="0" Name="TimestampOperation" Type="integer"/>		
+    <RefParameter Comment="Timeout Operation" DefaultValue="0" Max="4294967295" Min="0" Name="TimeoutOperation" Type="integer"/>		
+    <RefParameter Comment="Timeout Period" DefaultValue="0" Max="4294967295" Min="0" Name="TimeoutPeriod" Type="integer"/>		
+    <RefParameter Comment="Tdc Offset" DefaultValue="0" Max="4294967295" Min="0" Name="TdcOffset" Type="integer"/>		
+    <RefParameter Comment="Tdc Filter" DefaultValue="0" Max="4294967295" Min="0" Name="TdcFilter" Type="integer"/>
+    <RefParameter Comment="Identifier" DefaultValue="0" Max="4294967295" Min="0" Name="TxEventFifo_Identifier" Type="integer">		
+        <Description>0 and 0x1FFFFFFF, if IdType is FDCAN_EXTENDED_ID </Description>			
+    </RefParameter>			<!--**** 'Bit Timings' RefParameters for CAN Modes ****-->
+    <RefParameter Comment="Id Type" DefaultValue="FDCAN_STANDARD_ID" Name="TxEventFifo_IdType" Type="list">			
+        <Description>Specifies the identifier type for the message that will be transmitted.</Description>			
+        <PossibleValue Comment="Standard ID element " Value="FDCAN_STANDARD_ID"/>			<!-- **** Transmission RefParameters for CAN Modes ****-->
+        <PossibleValue Comment="Extended ID element " Value="FDCAN_EXTENDED_ID"/>			
+    </RefParameter>		
+    <RefParameter Comment="Tx Frame Type" DefaultValue="FDCAN_DATA_FRAME" Name="TxEventFifo_TxFrameType" Type="list">			<!-- Filter Fifo : Display only if Filter Activated FilterFiFo-->
+        <Description>Specifies the frame type of the message that will be transmitted.</Description>		
+        <PossibleValue Comment="Data frame " Value="FDCAN_DATA_FRAME"/>			
+        <PossibleValue Comment="Remote frame " Value="FDCAN_REMOTE_FRAME"/>			<!--**** 'Advanced/Debug' RefParameters for CAN Modes Mode ****-->
+    </RefParameter>			
+    <RefParameter Comment="Data Length" DefaultValue="FDCAN_DLC_0_BYTES" Name="TxEventFifo_DataLength" Type="list">			
+        <Description>Specifies the length of the frame that will be transmitted.</Description>			
+        <PossibleValue Comment="0 bytes data field " Value="FDCAN_DLC_0_BYTES"/>		
+        <PossibleValue Comment="1 bytes data field " Value="FDCAN_DLC_1_BYTES"/>			
+        <PossibleValue Comment="2 bytes data field " Value="FDCAN_DLC_2_BYTES"/>		
+        <PossibleValue Comment="3 bytes data field " Value="FDCAN_DLC_3_BYTES"/>		
+        <PossibleValue Comment="4 bytes data field " Value="FDCAN_DLC_4_BYTES"/>		
+        <PossibleValue Comment="5 bytes data field " Value="FDCAN_DLC_5_BYTES"/>		
+        <PossibleValue Comment="6 bytes data field " Value="FDCAN_DLC_6_BYTES"/>		
+        <PossibleValue Comment="7 bytes data field " Value="FDCAN_DLC_7_BYTES"/>		
+        <PossibleValue Comment="8 bytes data field " Value="FDCAN_DLC_8_BYTES"/>		
+        <PossibleValue Comment="12 bytes data field " Value="FDCAN_DLC_12_BYTES"/>		
+        <PossibleValue Comment="16 bytes data field " Value="FDCAN_DLC_16_BYTES"/>		
+        <PossibleValue Comment="20 bytes data field " Value="FDCAN_DLC_20_BYTES"/>		
+        <PossibleValue Comment="24 bytes data field " Value="FDCAN_DLC_24_BYTES"/>		
+        <PossibleValue Comment="32 bytes data field " Value="FDCAN_DLC_32_BYTES"/>		
+        <PossibleValue Comment="48 bytes data field " Value="FDCAN_DLC_48_BYTES"/>		
+        <PossibleValue Comment="64 bytes data field " Value="FDCAN_DLC_64_BYTES"/>		
+    </RefParameter>		
+    <RefParameter Comment="Error State Indicator" DefaultValue="FDCAN_ESI_ACTIVE" Name="TxEventFifo_ErrorStateIndicator" Type="list">		
+        <Description>Specifies the error state indicator.</Description>		
+        <PossibleValue Comment="Transmitting node is error active " Value="FDCAN_ESI_ACTIVE"/>		
+        <PossibleValue Comment="Transmitting node is error passive " Value="FDCAN_ESI_PASSIVE"/>		
+    </RefParameter>		
+    <RefParameter Comment="Bit Rate Switch" DefaultValue="FDCAN_BRS_OFF" Name="TxEventFifo_BitRateSwitch" Type="list">		
+        <Description>Specifies whether the Tx frame will be transmitted with or without bit rate switching.</Description>		
+        <PossibleValue Comment="FDCAN frames transmitted/received without bit rate switching " Value="FDCAN_BRS_OFF"/>		
+        <PossibleValue Comment="FDCAN frames transmitted/received with bit rate switching " Value="FDCAN_BRS_ON"/>		
+    </RefParameter>		
+    <RefParameter Comment="Fd Format" DefaultValue="FDCAN_CLASSIC_CAN" Name="TxEventFifo_FDFormat" Type="list">		
+        <Description>Specifies whether the Tx frame will be transmitted in classic or FD format.</Description>		
+        <PossibleValue Comment="Frame transmitted/received in Classic CAN format " Value="FDCAN_CLASSIC_CAN"/>		
+        <PossibleValue Comment="Frame transmitted/received in FDCAN format " Value="FDCAN_FD_CAN"/>		
+    </RefParameter>		
+    <RefParameter Comment="Tx Timestamp" DefaultValue="0" Max="0xFFFF" Min="0" Name="TxTimestamp" Type="integer">		
+        <Description>Specifies the timestamp counter value captured on start of frame transmission.</Description>		
+    </RefParameter>		
+    <RefParameter Comment="Message Marker" DefaultValue="0" Max="0xFF" Min="0" Name="TxEventFifo_MessageMarker" Type="integer">		
+        <Description>Specifies the message marker to be copied into Tx Event FIFO element for identification of Tx message status.</Description>		
+    </RefParameter>		
+    <RefParameter Comment="Event Type" DefaultValue="FDCAN_TX_EVENT" Name="EventType" Type="list">		
+        <Description>Specifies the event type.</Description>		
+        <PossibleValue Comment="Tx event " Value="FDCAN_TX_EVENT"/>		
+        <PossibleValue Comment="Transmission in spite of cancellation " Value="FDCAN_TX_IN_SPITE_OF_CANCELLATION"/>		
+    </RefParameter>		
+    <RefParameter Comment="Id Type" DefaultValue="0" Max="4294967295" Min="0" Name="_IdType" Type="integer"/>		
+    <RefParameter Comment="Identifier" DefaultValue="0" Max="4294967295" Min="0" Name="_Identifier" Type="integer"/>		
+    <RefParameter Comment="Payload" DefaultValue="0" Max="4294967295" Min="0" Name="Payload" Type="integer"/>		
+    <RefParameter Comment="Trigger Index" DefaultValue="0" Max="63" Min="0" Name="TriggerIndex" Type="integer">		
+        <Description>Specifies the trigger which will be configured.</Description>		
+    </RefParameter>		
+    <RefParameter Comment="Time Mark" DefaultValue="0" Max="0xFFFF" Min="0" Name="TimeMark" Type="integer">		
+        <Description>Specifies the cycle time for which the trigger becomes active.</Description>		
+    </RefParameter>		
+    <RefParameter Comment="Repeat Factor" DefaultValue="FDCAN_TT_REPEAT_EVERY_CYCLE" Name="Trigger_RepeatFactor" Type="list">		
+        <Description>Specifies the trigger repeat factor.</Description>		
+        <PossibleValue Comment="Trigger valid for all cycles " Value="FDCAN_TT_REPEAT_EVERY_CYCLE"/>		
+        <PossibleValue Comment="Trigger valid every 2dn cycle " Value="FDCAN_TT_REPEAT_EVERY_2ND_CYCLE"/>		
+        <PossibleValue Comment="Trigger valid every 4th cycle " Value="FDCAN_TT_REPEAT_EVERY_4TH_CYCLE"/>		
+        <PossibleValue Comment="Trigger valid every 8th cycle " Value="FDCAN_TT_REPEAT_EVERY_8TH_CYCLE"/>		
+        <PossibleValue Comment="Trigger valid every 16th cycle " Value="FDCAN_TT_REPEAT_EVERY_16TH_CYCLE"/>		
+        <PossibleValue Comment="Trigger valid every 32nd cycle " Value="FDCAN_TT_REPEAT_EVERY_32ND_CYCLE"/>		
+        <PossibleValue Comment="Trigger valid every 64th cycle " Value="FDCAN_TT_REPEAT_EVERY_64TH_CYCLE"/>		
+    </RefParameter>		
+    <RefParameter Comment="Start Cycle" DefaultValue="0" Max="RepeatFactor" Min="0" Name="Trigger_StartCycle" Type="integer">		
+        <Description>Specifies the index of the first cycle in which the trigger becomes active.</Description>		
+    </RefParameter>		
+    <RefParameter Comment="Tm Event Int" DefaultValue="FDCAN_TT_TM_NO_INTERNAL_EVENT" Name="TmEventInt" Type="list">		
+        <Description>Enable or disable the internal time mark event.</Description>		
+        <PossibleValue Comment="No action " Value="FDCAN_TT_TM_NO_INTERNAL_EVENT"/>		
+        <PossibleValue Comment="Internal event is generated when trigger becomes active " Value="FDCAN_TT_TM_GENERATE_INTERNAL_EVENT"/>		
+    </RefParameter>		
+    <RefParameter Comment="Tm Event Ext" DefaultValue="FDCAN_TT_TM_NO_EXTERNAL_EVENT" Name="TmEventExt" Type="list">		
+        <Description>Enable or disable the external time mark event.</Description>		
+        <PossibleValue Comment="No action " Value="FDCAN_TT_TM_NO_EXTERNAL_EVENT"/>		
+        <PossibleValue Comment="External event (pulse) is generated when trigger becomes active " Value="FDCAN_TT_TM_GENERATE_EXTERNAL_EVENT"/>		
+    </RefParameter>		
+    <RefParameter Comment="Trigger Type" DefaultValue="FDCAN_TT_TX_REF_TRIGGER" Name="TriggerType" Type="list">		
+        <Description>Specifies the trigger type.</Description>		
+        <PossibleValue Comment="Transmit reference message in strictly time-triggered operation " Value="FDCAN_TT_TX_REF_TRIGGER"/>		
+        <PossibleValue Comment="Transmit reference message in external event-synchronized time-triggered operation " Value="FDCAN_TT_TX_REF_TRIGGER_GAP"/>		
+        <PossibleValue Comment="Start a single transmission in an exclusive time window " Value="FDCAN_TT_TX_TRIGGER_SINGLE"/>		
+        <PossibleValue Comment="Start a continuous transmission in an exclusive time window " Value="FDCAN_TT_TX_TRIGGER_CONTINUOUS"/>		
+        <PossibleValue Comment="Start a transmission in an arbitration time window " Value="FDCAN_TT_TX_TRIGGER_ARBITRATION"/>		
+        <PossibleValue Comment="Start a merged arbitration window " Value="FDCAN_TT_TX_TRIGGER_MERGED"/>		
+        <PossibleValue Comment="Check for missing reference messages in strictly time-triggered operation " Value="FDCAN_TT_WATCH_TRIGGER"/>		
+        <PossibleValue Comment="Check for missing reference messages in external event-synchronized time-triggered operation " Value="FDCAN_TT_WATCH_TRIGGER_GAP"/>		
+        <PossibleValue Comment="Check for the reception of periodic messages in exclusive time windows " Value="FDCAN_TT_RX_TRIGGER"/>		
+        <PossibleValue Comment="Generate internal/external events depending on TmEventInt/TmEventExt configuration " Value="FDCAN_TT_TIME_BASE_TRIGGER"/>		
+        <PossibleValue Comment="Illegal trigger, to be assigned to the unused triggers after a FDCAN_TT_WATCH_TRIGGER(_GAP) " Value="FDCAN_TT_END_OF_LIST"/>		
+    </RefParameter>		
+    <RefParameter Comment="Filter Type" DefaultValue="FDCAN_STANDARD_ID" Name="Trigger_FilterType" Type="list">		
+        <Description>Specifies the filter identifier type.</Description>		
+        <PossibleValue Comment="Standard ID element " Value="FDCAN_STANDARD_ID"/>		
+        <PossibleValue Comment="Extended ID element " Value="FDCAN_EXTENDED_ID"/>		
+    </RefParameter>		
+    <RefParameter Comment="Tx Buffer Index" DefaultValue="FDCAN_TX_BUFFER0" Name="TxBufferIndex" Type="list">		
+        <Description>Specifies the index of the Tx buffer for which the trigger is valid.</Description>		
+        <PossibleValue Comment="Add message to Tx Buffer 0 " Value="FDCAN_TX_BUFFER0"/>		
+        <PossibleValue Comment="Add message to Tx Buffer 1 " Value="FDCAN_TX_BUFFER1"/>		
+        <PossibleValue Comment="Add message to Tx Buffer 2 " Value="FDCAN_TX_BUFFER2"/>		
+        <PossibleValue Comment="Add message to Tx Buffer 3 " Value="FDCAN_TX_BUFFER3"/>		
+        <PossibleValue Comment="Add message to Tx Buffer 4 " Value="FDCAN_TX_BUFFER4"/>		
+        <PossibleValue Comment="Add message to Tx Buffer 5 " Value="FDCAN_TX_BUFFER5"/>		
+        <PossibleValue Comment="Add message to Tx Buffer 6 " Value="FDCAN_TX_BUFFER6"/>		
+        <PossibleValue Comment="Add message to Tx Buffer 7 " Value="FDCAN_TX_BUFFER7"/>		
+        <PossibleValue Comment="Add message to Tx Buffer 8 " Value="FDCAN_TX_BUFFER8"/>		
+        <PossibleValue Comment="Add message to Tx Buffer 9 " Value="FDCAN_TX_BUFFER9"/>		
+        <PossibleValue Comment="Add message to Tx Buffer 10 " Value="FDCAN_TX_BUFFER10"/>		
+        <PossibleValue Comment="Add message to Tx Buffer 11 " Value="FDCAN_TX_BUFFER11"/>		
+        <PossibleValue Comment="Add message to Tx Buffer 12 " Value="FDCAN_TX_BUFFER12"/>		
+        <PossibleValue Comment="Add message to Tx Buffer 13 " Value="FDCAN_TX_BUFFER13"/>		
+        <PossibleValue Comment="Add message to Tx Buffer 14 " Value="FDCAN_TX_BUFFER14"/>		
+        <PossibleValue Comment="Add message to Tx Buffer 15 " Value="FDCAN_TX_BUFFER15"/>		
+        <PossibleValue Comment="Add message to Tx Buffer 16 " Value="FDCAN_TX_BUFFER16"/>		
+        <PossibleValue Comment="Add message to Tx Buffer 17 " Value="FDCAN_TX_BUFFER17"/>		
+        <PossibleValue Comment="Add message to Tx Buffer 18 " Value="FDCAN_TX_BUFFER18"/>		
+        <PossibleValue Comment="Add message to Tx Buffer 19 " Value="FDCAN_TX_BUFFER19"/>		
+        <PossibleValue Comment="Add message to Tx Buffer 20 " Value="FDCAN_TX_BUFFER20"/>		
+        <PossibleValue Comment="Add message to Tx Buffer 21 " Value="FDCAN_TX_BUFFER21"/>		
+        <PossibleValue Comment="Add message to Tx Buffer 22 " Value="FDCAN_TX_BUFFER22"/>		
+        <PossibleValue Comment="Add message to Tx Buffer 23 " Value="FDCAN_TX_BUFFER23"/>		
+        <PossibleValue Comment="Add message to Tx Buffer 24 " Value="FDCAN_TX_BUFFER24"/>		
+        <PossibleValue Comment="Add message to Tx Buffer 25 " Value="FDCAN_TX_BUFFER25"/>		
+        <PossibleValue Comment="Add message to Tx Buffer 26 " Value="FDCAN_TX_BUFFER26"/>		
+        <PossibleValue Comment="Add message to Tx Buffer 27 " Value="FDCAN_TX_BUFFER27"/>		
+        <PossibleValue Comment="Add message to Tx Buffer 28 " Value="FDCAN_TX_BUFFER28"/>		
+        <PossibleValue Comment="Add message to Tx Buffer 29 " Value="FDCAN_TX_BUFFER29"/>		
+        <PossibleValue Comment="Add message to Tx Buffer 30 " Value="FDCAN_TX_BUFFER30"/>		
+        <PossibleValue Comment="Add message to Tx Buffer 31 " Value="FDCAN_TX_BUFFER31"/>		
+    </RefParameter>		
+    <RefParameter Comment="Filter Index" DefaultValue="0" Max="4294967295" Min="0" Name="Trigger_FilterIndex" Type="integer">		
+        <Description>0 and 63, if FilterType is FDCAN_EXTENDED_ID This parameter is taken in consideration only if the trigger is configured for reception.</Description>		
+    </RefParameter>		
+    <RefParameter Comment="Time Preset" DefaultValue="0" Max="4294967295" Min="0" Name="TimePreset" Type="integer"/>		
+    <RefParameter Comment="New Tur Numerator" DefaultValue="0" Max="4294967295" Min="0" Name="NewTURNumerator" Type="integer"/>		
+    <RefParameter Comment="Source" DefaultValue="0" Max="4294967295" Min="0" Name="Source" Type="integer"/>		
+    <RefParameter Comment="Polarity" DefaultValue="0" Max="4294967295" Min="0" Name="Polarity" Type="integer"/>		
+    <RefParameter Comment="Time Mark Source" DefaultValue="0" Max="4294967295" Min="0" Name="TimeMarkSource" Type="integer"/>		
+    <RefParameter Comment="Time Mark Value" DefaultValue="0" Max="4294967295" Min="0" Name="TimeMarkValue" Type="integer"/>		
+    <RefParameter Comment="Repeat Factor" DefaultValue="0" Max="4294967295" Min="0" Name="_RepeatFactor" Type="integer"/>		
+    <RefParameter Comment="Start Cycle" DefaultValue="0" Max="4294967295" Min="0" Name="_StartCycle" Type="integer"/>		
+    <RefParameter Comment="Target Phase" DefaultValue="0" Max="4294967295" Min="0" Name="TargetPhase" Type="integer"/>		
+    <RefParameter Comment="It List" DefaultValue="0" Max="4294967295" Min="0" Name="ITList" Type="integer"/>		
+    <RefParameter Comment="Interrupt Line" DefaultValue="0" Max="4294967295" Min="0" Name="InterruptLine" Type="integer"/>		
+    <RefParameter Comment="Active I Ts" DefaultValue="0" Max="4294967295" Min="0" Name="ActiveITs" Type="integer"/>		
+    <RefParameter Comment="Buffer Indexes" DefaultValue="0" Max="4294967295" Min="0" Name="BufferIndexes" Type="integer"/>		
+    <RefParameter Comment="Clk Calibration I Ts" DefaultValue="0" Max="4294967295" Min="0" Name="ClkCalibrationITs" Type="integer"/>		
+    <RefParameter Comment="Tx Event Fifo I Ts" DefaultValue="0" Max="4294967295" Min="0" Name="TxEventFifoITs" Type="integer"/>		
+    <RefParameter Comment="Rx Fifo0 I Ts" DefaultValue="0" Max="4294967295" Min="0" Name="RxFifo0ITs" Type="integer"/>		
+    <RefParameter Comment="Rx Fifo1 I Ts" DefaultValue="0" Max="4294967295" Min="0" Name="RxFifo1ITs" Type="integer"/>		
+    <RefParameter Comment="Tt Sched Sync I Ts" DefaultValue="0" Max="4294967295" Min="0" Name="TTSchedSyncITs" Type="integer"/>		
+    <RefParameter Comment="Tt Time Mark I Ts" DefaultValue="0" Max="4294967295" Min="0" Name="TTTimeMarkITs" Type="integer"/>		
+    <RefParameter Comment="Sw Time" DefaultValue="0" Max="4294967295" Min="0" Name="SWTime" Type="integer"/>		
+    <RefParameter Comment="Sw Cycle Count" DefaultValue="0" Max="4294967295" Min="0" Name="SWCycleCount" Type="integer"/>		
+    <RefParameter Comment="Tt Glob Time I Ts" DefaultValue="0" Max="4294967295" Min="0" Name="TTGlobTimeITs" Type="integer"/>		
+    <RefParameter Comment="Tt Dist Errors" DefaultValue="0" Max="4294967295" Min="0" Name="TTDistErrors" Type="integer"/>		
+    <RefParameter Comment="Tt Fatal Errors" DefaultValue="0" Max="4294967295" Min="0" Name="TTFatalErrors" Type="integer"/>
+
+    <RefParameter Comment="Transmit Pause" DefaultValue="DISABLE" Name="TransmitPause" Type="list" Group="Basic Parameters">
+        <Description>Enable or disable the Transmit Pause feature.</Description>
+        <PossibleValue Comment="Disable" Value="DISABLE"/>
+        <PossibleValue Comment="Enable" Value="ENABLE"/>
+    </RefParameter>
+    <RefParameter Comment="Protocol Exception" DefaultValue="DISABLE" Name="ProtocolException" Type="list" Group="Basic Parameters">
+        <Description>Enable or disable the Protocol Exception Handling.</Description>
+        <PossibleValue Comment="Disable" Value="DISABLE"/>
+        <PossibleValue Comment="Enable" Value="ENABLE"/>
+    </RefParameter>
+    
+    <RefParameter Comment="End Address" DefaultValue="0" Max="4294967295" Min="0" Name="EndAddress" Type="integer" Group="msgRam">
+        <Description>Specifies the End Address of the allocated RAM.</Description>
+    </RefParameter>
+    
+    
+    
+    <RefParameter Comment="Clock Calibration" DefaultValue="DISABLE" Name="ClockCalibration" Type="list" Group="TT Pararams">
+        <Description>Enable or disable the ClockCalibration.</Description>
+        <PossibleValue Comment="Disable" Value="DISABLE"/>
+        <PossibleValue Comment="Enable" Value="ENABLE"/>
+    </RefParameter>
+    <RefParameter Comment="Gap Enable" DefaultValue="FDCAN_STRICTLY_TT_OPERATION" Name="GapEnable" Type="list" Group="TT Pararams">		
+        <Description>Specifies the FDCAN TT Operation.</Description>		
+        <PossibleValue Comment="Strictly time-triggered operation " Value="FDCAN_STRICTLY_TT_OPERATION"/>		
+        <PossibleValue Comment="External event-synchronized time-triggered operation " Value="FDCAN_EXT_EVENT_SYNC_TT_OPERATION"/>		
+    </RefParameter>	
+    <RefParameter Comment="Basic Cycles Nbr" DefaultValue="FDCAN_TT_1_BASIC_CYCLE_PER_MARTIX" Name="BasicCyclesNbr" Type="list" Group="TT Pararams">		
+        <Description>Specifies the nubmer of basic cycles in the system matrix.</Description>		
+        <PossibleValue Comment="1 Basic Cycle per Matrix " Value="FDCAN_TT_1_BASIC_CYCLE_PER_MARTIX"/>		
+        <PossibleValue Comment="2 Basic Cycles per Matrix " Value="FDCAN_TT_2_BASIC_CYCLES_PER_MARTIX"/>		
+        <PossibleValue Comment="4 Basic Cycles per Matrix " Value="FDCAN_TT_4_BASIC_CYCLES_PER_MARTIX"/>		
+        <PossibleValue Comment="8 Basic Cycles per Matrix " Value="FDCAN_TT_8_BASIC_CYCLES_PER_MARTIX"/>		
+        <PossibleValue Comment="16 Basic Cycles per Matrix " Value="FDCAN_TT_16_BASIC_CYCLES_PER_MARTIX"/>		
+        <PossibleValue Comment="32 Basic Cycles per Matrix " Value="FDCAN_TT_32_BASIC_CYCLES_PER_MARTIX"/>		
+        <PossibleValue Comment="64 Basic Cycles per Matrix " Value="FDCAN_TT_64_BASIC_CYCLES_PER_MARTIX"/>		
+    </RefParameter>		
+    <RefParameter Comment="Cycle Start Sync" DefaultValue="FDCAN_TT_NO_SYNC_PULSE" Name="CycleStartSync" Type="list" Group="TT Pararams">		
+        <Description>Enable or disable synchronization pulse output at pin fdcan1_soc.</Description>		
+        <PossibleValue Comment="No sync pulse " Value="FDCAN_TT_NO_SYNC_PULSE"/>		
+        <PossibleValue Comment="Sync pulse at start of basic cycle " Value="FDCAN_TT_SYNC_PULSE_AT_START_OF_BASIC_CYCLE"/>		
+        <PossibleValue Comment="Sync pulse at start of matrix " Value="FDCAN_TT_SYNC_PULSE_AT_START_OF_MATRIX"/>		
+    </RefParameter>	
+
+    <!-- RefMode for 'Master' FDCAN Mode -->
+    <RefMode Name="FDCANMaster" BaseMode="canBasic">
+        <ConfigForMode>Can_Init</ConfigForMode>
+        <Parameter Name="Instance"/>
+        <Parameter Name="OperationMode"/>
+        <Parameter Name="FrameFormat"/>
+        <Parameter Name="Mode"/>
+        <Parameter Name="AutoRetransmission"/>
+<!--        <Parameter Name="TxDelayCompensation"/>-->
+        <Parameter Name="TransmitPause"/>
+        <Parameter Name="ProtocolException"/>
+        <Parameter Name="ClockDivider"/>
+        <Parameter Name="NominalPrescaler"/>
+        <Parameter Name="NominalSyncJumpWidth"/>
+        <Parameter Name="NominalTimeSeg1"/>
+        <Parameter Name="NominalTimeSeg2"/>
+        <Parameter Name="DataPrescaler"/>
+        <Parameter Name="DataSyncJumpWidth"/>
+        <Parameter Name="DataTimeSeg1"/>
+        <Parameter Name="DataTimeSeg2"/>
+        <Parameter Name="MessageRAMOffset"/>
+        <Parameter Name="StdFiltersNbr"/>
+        <Parameter Name="ExtFiltersNbr"/>
+        <Parameter Name="RxFifo0ElmtsNbr"/>
+        <Parameter Name="RxFifo0ElmtSize"/>
+        <Parameter Name="RxFifo1ElmtsNbr"/>
+        <Parameter Name="RxFifo1ElmtSize"/>
+        <Parameter Name="RxBuffersNbr"/>
+        <Parameter Name="RxBufferSize"/>
+        <Parameter Name="TxEventsNbr"/>
+        <Parameter Name="TxBuffersNbr"/>
+        <Parameter Name="TxFifoQueueElmtsNbr"/>
+        <Parameter Name="TxFifoQueueMode"/>
+        <Parameter Name="TxElmtSize"/>
+<!--        <Parameter Name="StandardFilterSA"/>
+        <Parameter Name="ExtendedFilterSA"/>                  
+        <Parameter Name="RxFIFO0SA"/> 
+        <Parameter Name="RxFIFO1SA"/> 
+        <Parameter Name="RxBufferSA"/>
+        <Parameter Name="TxEventFIFOSA"/>
+        <Parameter Name="TxBufferSA"/>
+        <Parameter Name="TxFIFOQSA"/>
+        <Parameter Name="TTMemorySA"/>
+        <Parameter Name="ErrorCode"/>
+        <Parameter Name="EndAddress"/>-->
+    </RefMode>
+	
+    <!-- For the Moment, only one Filter can be Parameter (90% of use cases). -->
+    <RefMode Name="FDCANSlave" BaseMode="canBasic">
+        <ConfigForMode>Can_Init</ConfigForMode>
+        <Parameter Name="Instance"/>
+        <Parameter Name="OperationMode"/>
+        <Parameter Name="FrameFormat"/>
+        <Parameter Name="Mode"/>
+        <Parameter Name="AutoRetransmission"/>
+<!--        <Parameter Name="TxDelayCompensation"/>-->
+        <Parameter Name="TransmitPause"/>
+        <Parameter Name="ProtocolException"/>
+<!--        <Parameter Name="ClockDivider"/>-->
+        <Parameter Name="NominalPrescaler"/>
+        <Parameter Name="NominalSyncJumpWidth"/>
+        <Parameter Name="NominalTimeSeg1"/>
+        <Parameter Name="NominalTimeSeg2"/>
+        <Parameter Name="DataPrescaler"/>
+        <Parameter Name="DataSyncJumpWidth"/>
+        <Parameter Name="DataTimeSeg1"/>
+        <Parameter Name="DataTimeSeg2"/>
+        <Parameter Name="MessageRAMOffset"/>
+        <Parameter Name="StdFiltersNbr"/>
+        <Parameter Name="ExtFiltersNbr"/>
+        <Parameter Name="RxFifo0ElmtsNbr"/>
+        <Parameter Name="RxFifo0ElmtSize"/>
+        <Parameter Name="RxFifo1ElmtsNbr"/>
+        <Parameter Name="RxFifo1ElmtSize"/>
+        <Parameter Name="RxBuffersNbr"/>
+        <Parameter Name="RxBufferSize"/>
+        <Parameter Name="TxEventsNbr"/>
+        <Parameter Name="TxBuffersNbr"/>
+        <Parameter Name="TxFifoQueueElmtsNbr"/>
+        <Parameter Name="TxFifoQueueMode"/>
+        <Parameter Name="TxElmtSize"/>     
+<!--        <Parameter Name="StandardFilterSA"/>
+        <Parameter Name="ExtendedFilterSA"/>                  
+        <Parameter Name="RxFIFO0SA"/>
+        <Parameter Name="RxFIFO1SA"/> 
+        <Parameter Name="RxBufferSA"/>
+        <Parameter Name="TxEventFIFOSA"/>
+        <Parameter Name="TxBufferSA"/>
+        <Parameter Name="TxFIFOQSA"/>
+        <Parameter Name="TTMemorySA"/>
+        <Parameter Name="ErrorCode"/>
+        <Parameter Name="EndAddress"/>-->
+
+          
+    </RefMode>
+		
+    <RefMode Name="FDCANFD" BaseMode="canBasic">
+        <ConfigForMode>Can_Init</ConfigForMode>
+        <Parameter Name="Instance"/>
+        <Parameter Name="OperationMode"/>
+        <Parameter Name="FrameFormat"/>
+        <Parameter Name="Mode"/>
+        <Parameter Name="AutoRetransmission"/>
+<!--        <Parameter Name="TxDelayCompensation"/>-->
+        <Parameter Name="TransmitPause"/>
+        <Parameter Name="ProtocolException"/>
+<!--        <Parameter Name="ClockDivider"/>-->
+        <Parameter Name="NominalPrescaler"/>
+        <Parameter Name="NominalSyncJumpWidth"/>
+        <Parameter Name="NominalTimeSeg1"/>
+        <Parameter Name="NominalTimeSeg2"/>
+        <Parameter Name="DataPrescaler"/>
+        <Parameter Name="DataSyncJumpWidth"/>
+        <Parameter Name="DataTimeSeg1"/>
+        <Parameter Name="DataTimeSeg2"/>
+        <Parameter Name="MessageRAMOffset"/>
+        <Parameter Name="StdFiltersNbr"/>
+        <Parameter Name="ExtFiltersNbr"/>
+        <Parameter Name="RxFifo0ElmtsNbr"/>
+        <Parameter Name="RxFifo0ElmtSize"/>
+        <Parameter Name="RxFifo1ElmtsNbr"/>
+        <Parameter Name="RxFifo1ElmtSize"/>
+        <Parameter Name="RxBuffersNbr"/>
+        <Parameter Name="RxBufferSize"/>
+        <Parameter Name="TxEventsNbr"/>
+        <Parameter Name="TxBuffersNbr"/>
+        <Parameter Name="TxFifoQueueElmtsNbr"/>
+        <Parameter Name="TxFifoQueueMode"/>
+        <Parameter Name="TxElmtSize"/>
+       
+<!--        <Parameter Name="StandardFilterSA"/>
+        <Parameter Name="ExtendedFilterSA"/>                  
+        <Parameter Name="RxFIFO0SA"/>
+        <Parameter Name="RxFIFO1SA"/> 
+        <Parameter Name="RxBufferSA"/>
+        <Parameter Name="TxEventFIFOSA"/>
+        <Parameter Name="TxBufferSA"/>
+        <Parameter Name="TxFIFOQSA"/>
+        <Parameter Name="TTMemorySA"/>
+        <Parameter Name="ErrorCode"/>
+        <Parameter Name="EndAddress"/>-->
+    </RefMode>
+
+    <!-- Modes for CAN. Suppose Silent and/or Loopback Modes are Debug, and need Tx/Rx on Board -->
+    <ModeLogicOperator Name="OR">
+        <Mode Name="Mode" UserName="Mode">
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="FDCANMaster" UserName="Classic" ShrinkName="Master Mode" RemoveCondition="$IpNumber=2" >
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="RX"/>
+                        <Signal Name="TX"/>
+                    </SignalLogicalOp>
+                    <Condition Expression="$IpNumber=1" Diagnostic="Master active only on CAN1"/>
+                    <Semaphore>FDCAN_Master_$IpInstance</Semaphore>
+                </Mode>
+                <Mode Name="FDCANSlave" UserName="Classic" ShrinkName="Slave Mode" RemoveCondition="$IpNumber=1" >
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="RX"/>
+                        <Signal Name="TX"/>
+                    </SignalLogicalOp>
+                    <Condition Expression="$IpNumber=2" Diagnostic="Slave active only on CAN2"/>
+                    <Semaphore>FDCAN_Slave_$IpInstance</Semaphore>
+                </Mode>
+                <Mode Name="FDCANFD" UserName="FD">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="RX"/>
+                        <Signal Name="TX"/>
+                    </SignalLogicalOp>
+                    <Semaphore>FDCAN_FLEXIBLE_DATARATE_$IpInstance</Semaphore>
+                </Mode>
+            </ModeLogicOperator>
+            <Semaphore>USB_OR_CAN</Semaphore>
+        </Mode>
+        <Mode Name="Enable_FDCAN_TXFD">
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="Enable_FDCAN_TXFD" UserName="Enable FDCAN_TXFD">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="TXFD"/>
+                    </SignalLogicalOp>
+                </Mode>
+            </ModeLogicOperator>
+            <Condition Expression="FDCAN_FLEXIBLE_DATARATE_$IpInstance" Diagnostic="Activable only in FD Mode"/>
+        </Mode>
+        <Mode Name="Enable_FDCAN_RXFD">
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="Enable_FDCAN_RXFD" UserName="Enable FDCAN_RXFD">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="RXFD"/>
+                    </SignalLogicalOp>
+                </Mode>
+            </ModeLogicOperator>
+            <Condition Expression="FDCAN_FLEXIBLE_DATARATE_$IpInstance" Diagnostic="Activable only in FD Mode"/>
+        </Mode>
+    </ModeLogicOperator>
+		
+    <!-- RefSignal for CAN -->
+    <RefSignal IOMode="AlternateFunctionPuPdOnly" Name="RX"/>
+    <RefSignal IOMode="AlternateFunctionPushPull" Name="TX"/>
+    <RefSignal IOMode="AlternateFunctionPuPdOnly" Name="RXFD"/>
+    <RefSignal IOMode="AlternateFunctionPushPull" Name="TXFD"/>
+    <Semaphore>$IpInstanceUsed_ForRCC</Semaphore>
+</IP>

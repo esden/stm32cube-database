@@ -15,7 +15,7 @@
     </RefParameter>
     <RefParameter Name="FATFS_version" Comment="FATFS version" DefaultValue="12" Type="uniqueElementList" Group="Version" TabName="Set Defines">
         <PossibleValue Comment="R0.12c" Value="12"/>
-        <Condition Diagnostic="Version available for F4,F7,H7,L4,L0,G0" Expression="STM32F4|STM32F7|STM32H7|STM32L4|STM32L0|STM32G0"/>
+        <Condition Diagnostic="Version available for F4,F7,H7,L4,L0,G0,WB" Expression="STM32F4|STM32F7|STM32H7|STM32L4|STM32L0|STM32G0|STM32WB"/>
     </RefParameter>	
     <RefParameter Name="FATFS_version" Comment="FATFS version" DefaultValue="13" Type="uniqueElementList" Group="Version" TabName="Set Defines">
         <PossibleValue Comment="R0.13" Value="13"/>
@@ -305,7 +305,7 @@
     <!-- BZ 48303  -->
     <RefParameter Name="DISKIO_CODE" Comment="Diskio code" DefaultValue="0" Type="list" Group="User Defined" TabName="Advanced Settings"> 
 	    <!--  <Condition Diagnostic="Choice to customize the User Defined code to generate." Expression="STM32G081B_EVAL"/>  -->
-	    <Condition Diagnostic="Choice allowing to customize the User Defined code to generate." Expression="STM32G0"/>
+	    <Condition Diagnostic="Choice allowing to customize the User Defined code to generate." Expression="STM32G0|STM32WB"/>
         <PossibleValue Comment="User" Value="0" />
         <PossibleValue Comment="SD" Value="1" Semaphore="USER_SD_DISKIO"/>
         <Description>Default is User to generate user_diskio.* files, while SD will provide the generation of sd_diskio.* files.</Description>
@@ -338,6 +338,12 @@
         <PossibleValue Comment="STM32G081B-EVAL" Value="stm32g081b" />
         <PossibleValue Comment="NUCLEO-G071RB" Value="stm32g071rb" />
         <PossibleValue Comment="NUCLEO-G070RB" Value="stm32g070rb" />
+        <Description>If not equals to None, will include the right header file in the generated sd_diskio.h.</Description>
+    </RefParameter>
+    <RefParameter Name="BOARD_NAME" Type="list" Comment="Name" DefaultValue="none" Group="Board" TabName="Advanced Settings">
+        <Condition Diagnostic="Choice allowing to customize the ST Board to use." Expression="STM32WB &amp; (!DISKIO_CODE=0)"/>
+        <PossibleValue Comment="None" Value="none" />
+        <PossibleValue Comment="STM32WB55RG-NUCLEO" Value="stm32wb55rg" />
         <Description>If not equals to None, will include the right header file in the generated sd_diskio.h.</Description>
     </RefParameter>
     <RefParameter Name="BOARD_NAME" Type="list" Comment="Name" DefaultValue="0" Group="Board" TabName="Advanced Settings" Visible="false"/>
@@ -1156,7 +1162,7 @@
                     <Semaphore>S_FATFS_SDRAM</Semaphore>
                 </Mode>
             </ModeLogicOperator>
-            <Condition Expression="SdramChipSelect1|SdramChipSelect2" Diagnostic="Active only with at least one FMC SDRAM IP configured"/>
+            <Condition Expression="!S_FREERTOS_NATIVE &amp; (SdramChipSelect1|SdramChipSelect2)" Diagnostic="Active only with at least one FMC SDRAM IP configured and FreeRTOS not in native mode"/>
         </Mode>
 
         <Mode Name="SRAM" UserName="External SRAM" RemoveCondition="!FMC:$modeexist_Sram1 &amp; !FSMC:$modeexist_Sram1 &amp; !FMC:$modeexist_Psram1 &amp; !FSMC:$modeexist_Psram1 &amp; !FMC:$modeexist_MuxedPsram1 &amp; !FSMC:$modeexist_MuxedPsram1 &amp; !FSMC_NOR_RAM:$modeexist_8-bit-PSRAM  &amp; !FSMC:$modeexist_Lcd1">
@@ -1168,7 +1174,7 @@
                     <Semaphore>S_FATFS_SRAM</Semaphore>
                 </Mode>
             </ModeLogicOperator>
-            <Condition Expression="Sram1|Sram2|Sram3|Sram4|Psram1|Psram2|Psram3|Psram4|MuxedPsram1|MuxedPsram2|MuxedPsram3|MuxedPsram4|Lcd1|Lcd2|Lcd3|Lcd4" Diagnostic="Active only with at least one SRAM / PSRAM / Muxed PSRAM / LCD Interface configured"/>
+            <Condition Expression="!S_FREERTOS_NATIVE &amp; (Sram1|Sram2|Sram3|Sram4|Psram1|Psram2|Psram3|Psram4|MuxedPsram1|MuxedPsram2|MuxedPsram3|MuxedPsram4|Lcd1|Lcd2|Lcd3|Lcd4)" Diagnostic="Active only with at least one SRAM / PSRAM / Muxed PSRAM / LCD Interface configured"/>
         </Mode>
 
         <Mode Name="SDIO" UserName="SD Card" RemoveCondition="!SDIO:$modeexist_SD_1_bit &amp; !SDMMC:$modeexist_SD_1_bit &amp; !SDMMC1:$modeexist_SD_1_bit">
@@ -1180,7 +1186,7 @@
                     <Semaphore>S_FATFS_SDIO</Semaphore>
                 </Mode>
             </ModeLogicOperator>
-            <Condition Expression="SDIO_SD_Card|SDMMC1_SD_Card|SDMMC2_SD_Card" Diagnostic="Active only with SDIO/SDMMC IP configured in a SD mode"/>
+            <Condition Expression="!S_FREERTOS_NATIVE &amp; (SDIO_SD_Card|SDMMC1_SD_Card|SDMMC2_SD_Card)" Diagnostic="Active only with SDIO/SDMMC IP configured in a SD mode"/>
         </Mode>
 
         <Mode Name="USB" UserName="USB Disk" RemoveCondition="!USB_HOST:$modeexist_MSC_HS &amp; !USB_HOST:$modeexist_MSC_FS">
@@ -1192,7 +1198,7 @@
                     <Semaphore>S_FATFS_USB</Semaphore>
                 </Mode>
             </ModeLogicOperator>
-            <Condition Expression="USB_HOST_MSC_FS|USB_HOST_MSC_HS|ALL_Classes_FS|ALL_Classes_HS" Diagnostic="Active only with USB Host (class MSC) middleware"/>
+            <Condition Expression="!S_FREERTOS_NATIVE &amp; (USB_HOST_MSC_FS|USB_HOST_MSC_HS|ALL_Classes_FS|ALL_Classes_HS)" Diagnostic="Active only with USB Host (class MSC) middleware"/>
         </Mode>
 
         <Mode Name="User_defined" UserName="User-defined">
@@ -1204,6 +1210,7 @@
                     <Semaphore>S_FATFS_Generic</Semaphore>
                 </Mode>
             </ModeLogicOperator>
+            <Condition Expression="!S_FREERTOS_NATIVE" Diagnostic="Active only if FreeRTOS interface is not Native"/>
         </Mode>
     </ModeLogicOperator>
 

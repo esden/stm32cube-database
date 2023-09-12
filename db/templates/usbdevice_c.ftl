@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file           : ${name?lower_case}.c
@@ -9,6 +10,7 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
+/* USER CODE END Header */
 
 [#-- Create global variables --]
 [#assign includeDone = 0]
@@ -163,6 +165,11 @@
 [#--/* #define for FS and HS identification */--]
 [#--#define DEVICE_HS           0--]
 [#--#define DEVICE_FS           1--]
+[#-- macro generateFunctionWithReturnCode --]
+[#macro generateFunctionWithReturnCode MyConfig MyInst MynTab]
+[@generateConfigModelCode configModel=MyConfig inst=MyInst  nTab=MynTab/]
+[/#macro]
+[#-- End macro generateFunctionWithReturnCode --]
 
 [#-- macro generateConfigModelCode --]
 [#macro generateConfigModelCode configModel inst nTab]
@@ -171,6 +178,7 @@
 [#else]
         [#assign methodList = configModel.libMethod]
 [/#if]
+[#assign USBD_Start=false]
 [#local myInst=inst]
 
         [#list methodList as method]
@@ -225,7 +233,7 @@
                                                                                 [#assign AdrMza = ""]
                                                                         [/#if]
                                                                 [/#compress]
-                                                                [#if argument.genericType != "struct"]        tata
+                                                                [#if argument.genericType != "struct"]        
                                                                         [#if argument.mandatory]
                                                                                 [#if instanceIndex??&&fargument.context=="global"]
                                                                                         [#assign argValue=argument.value?replace("$Index",instanceIndex)]
@@ -296,7 +304,11 @@
                                 [/#if]
 
                 [/#list]
-                                [#if nTab==2]#t#t[#else]#t[/#if]${return}${method.name}(${args});#n
+                                
+                                [#if USBD_Start] #t#t[#else]#t[/#if]if (${return}${method.name}(${args}) != USBD_OK)
+								[#if USBD_Start] #t#t[#else]#t[/#if]{
+								[#if USBD_Start] #t#t#t#t[#else]#t#t[/#if]Error_Handler();
+								[#if USBD_Start] #t#t[#else]#t[/#if]}
                                 [#else]
                     [#if nTab==2]#t#t[#else]#t[/#if]${return}${method.name}();
                                 [/#if]
@@ -457,7 +469,7 @@ void MX_${name}_Init(void)
 
         #t/* Init Device Library, add supported class and start the library. */
         [#list instanceData.configs as config]
-        [@generateConfigModelCode configModel=config inst=instName  nTab=1/]
+        [@generateFunctionWithReturnCode MyConfig=config MyInst=instName  MynTab=1/]
     [/#list]
         [#assign instName= "${instanceNb}"]
         [#assign instanceNb = instanceNb + 1]

@@ -172,21 +172,82 @@
 		<PossibleValue Comment="Enabled" Value="SAI_OUTPUTDRIVE_ENABLE"/>
 	</RefParameter>
 	
-	<RefParameter Comment="    Synchronization External" DefaultValue="SAI_SYNCEXT_DISABLE" Group="Advanced Parameters" Name="SynchroExt" Type="list">
-		<PossibleValue Comment="Disabled" Value="SAI_SYNCEXT_DISABLE"/>
-		<PossibleValue Comment="Input enabled" Value="SAI_SYNCEXT_OUTBLOCKA_ENABLE"/>
+	<!-- Ticket 36069 -->
+	<RefParameter Comment="    Synchronization External" DefaultValue="SAI_SYNCEXT_DISABLE" Group="Advanced Parameters" Name="SynchroExt" Type="list">		
+		<PossibleValue Comment="Disabled" Value="SAI_SYNCEXT_DISABLE"/>	
+		<Condition Diagnostic="" Expression="($IpInstance_SAIA_Master | $IpInstance_SAIA_AsyncSlave) &amp; !($IpInstance_SAIB_Master | $IpInstance_SAIB_AsyncSlave)"/>
+		<PossibleValue Comment="Output SAI A enabled" Value="SAI_SYNCEXT_OUTBLOCKA_ENABLE"/>		
+	</RefParameter>
+	<RefParameter Comment="    Synchronization External" DefaultValue="SAI_SYNCEXT_DISABLE" Group="Advanced Parameters" Name="SynchroExt" Type="list">		
+		<PossibleValue Comment="Disabled" Value="SAI_SYNCEXT_DISABLE"/>	
+		<Condition Diagnostic=""  Expression="(!$IpInstance_SAIA_Master &amp; !$IpInstance_SAIA_AsyncSlave) &amp; ($IpInstance_SAIB_Master | $IpInstance_SAIB_AsyncSlave)"/>		
+		<PossibleValue Comment="Output SAI B enabled" Value="SAI_SYNCEXT_OUTBLOCKB_ENABLE"/>
+	</RefParameter>	
+	<RefParameter Comment="    Synchronization External" DefaultValue="SAI_SYNCEXT_DISABLE" Group="Advanced Parameters" Name="SynchroExt" Type="list">	
+		<Condition Diagnostic="" Expression="($IpInstance_SAIA_Master | $IpInstance_SAIA_AsyncSlave) &amp; ($IpInstance_SAIB_Master | $IpInstance_SAIB_AsyncSlave)"/>
+		<PossibleValue Comment="Disabled" Value="SAI_SYNCEXT_DISABLE"/>		
 		<PossibleValue Comment="Output SAI A enabled" Value="SAI_SYNCEXT_OUTBLOCKA_ENABLE"/>
 		<PossibleValue Comment="Output SAI B enabled" Value="SAI_SYNCEXT_OUTBLOCKB_ENABLE"/>
 	</RefParameter>
 	
-	<RefParameter Comment="    Synchronization" DefaultValue="SAI_ASYNCHRONOUS" Group="Advanced Parameters" Name="Synchro" Type="list" Visible="false">
-		<PossibleValue Comment="Asynchronous" Value="SAI_ASYNCHRONOUS"/>
-		<PossibleValue Comment="Synchronous" Value="SAI_SYNCHRONOUS"/>
+	<!-- SAI_A DIE434 -->
+	<RefParameter Comment="    Synchronization Inputs" DefaultValue="SAI_SYNCHRONOUS" Group="Advanced Parameters" Name="Synchro_A" Type="list" Visible="true">	
+		<Condition Diagnostic="" Expression="($IpNumber=1) &amp; ($IpInstance_SAIA_SyncSlave) &amp; (DIE434)"/>		
+		<PossibleValue Comment="Synchronous with other block of same SAI" Value="SAI_SYNCHRONOUS"/>		
 	</RefParameter>	
-
-
+	<RefParameter Comment="    Synchronization Inputs" DefaultValue="SAI_ASYNCHRONOUS" Group="Advanced Parameters" Name="Synchro_A" Type="list" Visible="true">	
+		<Condition Diagnostic="" Expression="($IpNumber=1) &amp; (DIE434)"/>
+		<PossibleValue Comment="Asynchronous" Value="SAI_ASYNCHRONOUS"/>
+		<PossibleValue Comment="Synchronous with other block of same SAI" Value="SAI_SYNCHRONOUS"/>		
+	</RefParameter>
+	<!-- SAI_B  DIE434-->
+	<RefParameter Comment="    Synchronization Inputs" DefaultValue="SAI_SYNCHRONOUS" Group="Advanced Parameters" Name="Synchro_B" Type="list" Visible="true">	
+		<Condition Diagnostic="" Expression="($IpNumber=1) &amp; ($IpInstance_SAIB_SyncSlave) &amp; (DIE434)"/>		
+		<PossibleValue Comment="Synchronous with other block of same SAI" Value="SAI_SYNCHRONOUS"/>		
+	</RefParameter>
+	<RefParameter Comment="    Synchronization Inputs" DefaultValue="SAI_ASYNCHRONOUS" Group="Advanced Parameters" Name="Synchro_B" Type="list" Visible="true">	
+		<Condition Diagnostic="" Expression="($IpNumber=1) &amp; (DIE434)"/>
+		<PossibleValue Comment="Asynchronous" Value="SAI_ASYNCHRONOUS"/>
+		<PossibleValue Comment="Synchronous with other block of same SAI" Value="SAI_SYNCHRONOUS"/>		
+	</RefParameter>
 	
+	<!-- SAI_A -->	
+	<RefParameter Comment="    Synchronization Inputs" DefaultValue="SAI_SYNCHRONOUS" Group="Advanced Parameters" Name="Synchro_A" Type="list" Visible="true">	
+		<Condition Diagnostic="" Expression="($IpNumber=1) &amp; ($IpInstance_SAIA_SyncSlave) &amp; !(DIE434)"/>		
+		<PossibleValue Comment="Synchronous with other block of same SAI" Value="SAI_SYNCHRONOUS"/>
+		<PossibleValue Comment="Synchronous with other SAI, SAI2" Value="SAI_SYNCHRONOUS_EXT_SAI2"/>				
+	</RefParameter>	
+	<RefParameter Comment="    Synchronization Inputs" DefaultValue="SAI_SYNCHRONOUS" Group="Advanced Parameters" Name="Synchro_A" Type="list" Visible="true">
+		<Condition Diagnostic="" Expression="($IpNumber=2)  &amp; ($IpInstance_SAIA_SyncSlave) &amp; !(DIE434)"/>				
+		<PossibleValue Comment="Synchronous with other block of same SAI" Value="SAI_SYNCHRONOUS"/>		
+		<PossibleValue Comment="Synchronous with other SAI, SAI1" Value="SAI_SYNCHRONOUS_EXT_SAI1"/>		
+	</RefParameter>
+	<RefParameter Comment="    Synchronization Inputs" DefaultValue="SAI_ASYNCHRONOUS" Group="Advanced Parameters" Name="Synchro_A" Type="list" Visible="true">	
+		<PossibleValue Comment="Asynchronous" Value="SAI_ASYNCHRONOUS"/>					
+	</RefParameter>
+	
+	<!-- SAI_B -->		
+	<RefParameter Comment="    Synchronization Inputs" DefaultValue="SAI_SYNCHRONOUS" Group="Advanced Parameters" Name="Synchro_B" Type="list" Visible="true">	
+		<Condition Diagnostic="" Expression="($IpNumber=1) &amp; ($IpInstance_SAIB_SyncSlave) &amp; !(DIE434)"/>		
+		<PossibleValue Comment="Synchronous with other block of same SAI" Value="SAI_SYNCHRONOUS"/>
+		<PossibleValue Comment="Synchronous with other SAI, SAI2" Value="SAI_SYNCHRONOUS_EXT_SAI2"/>				
+	</RefParameter>	
+	<RefParameter Comment="    Synchronization Inputs" DefaultValue="SAI_SYNCHRONOUS" Group="Advanced Parameters" Name="Synchro_B" Type="list" Visible="true">
+		<Condition Diagnostic="" Expression="($IpNumber=2)  &amp; ($IpInstance_SAIB_SyncSlave) &amp; !(DIE434)"/>				
+		<PossibleValue Comment="Synchronous with other block of same SAI" Value="SAI_SYNCHRONOUS"/>		
+		<PossibleValue Comment="Synchronous with other SAI, SAI1" Value="SAI_SYNCHRONOUS_EXT_SAI1"/>		
+	</RefParameter>	
+	<RefParameter Comment="    Synchronization Inputs" DefaultValue="SAI_ASYNCHRONOUS" Group="Advanced Parameters" Name="Synchro_B" Type="list" Visible="true">	
+		<PossibleValue Comment="Asynchronous" Value="SAI_ASYNCHRONOUS"/>					
+	</RefParameter>
 
+	<RefParameter Comment="    Synchronization Inputs" DefaultValue="SAI_ASYNCHRONOUS" Group="Advanced Parameters" Name="Synchro" Type="list" Visible="true">	
+		<PossibleValue Comment="Asynchronous" Value="SAI_ASYNCHRONOUS"/>
+		<PossibleValue Comment="Synchronous with other block of same SAI" Value="SAI_SYNCHRONOUS"/>
+		<PossibleValue Comment="Synchronous with other SAI, SAI1" Value="SAI_SYNCHRONOUS_EXT_SAI1"/>
+		<PossibleValue Comment="Synchronous with other SAI, SAI2" Value="SAI_SYNCHRONOUS_EXT_SAI2"/>				
+	</RefParameter>	
+	
 	<!-- Frame Parameters for SAI  -->
 	<RefParameter Comment="Frame Parameters" DefaultValue="" Group="Data Frame Parameters" Name="FrameParameter" Type="subtitle" Visible="false">
 		<Condition Diagnostic="" Expression="(Protocol=SAI_AC97_PROTOCOL) |(Protocol=SAI_SPDIF_PROTOCOL)"/>
@@ -375,7 +436,7 @@
 	<!-- Clock Parameters for SAI  -->
 	<RefParameter Comment="Clock Parameters" DefaultValue="" Group="Clock Parameters" Name="ClockParameter" Type="subtitle"/>
 	
-	<RefParameter Comment="    Clock Source" DefaultValue="SAI_CLKSOURCE_PLLSAI" Group="Clock Parameters" Name="ClockSourcetiti" Type="list">
+	<RefParameter Comment="    Clock Source" DefaultValue="SAI_CLKSOURCE_PLLSAI" Group="Clock Parameters" Name="ClockSource" Type="list">
 		<Condition Diagnostic="" Expression="(VirtualMode=VM_MASTER) &amp; (!STM32F446) &amp; (!STM32F7) &amp; (!STM32L4)"/>
 		<PossibleValue Comment="SAI PLL Clock" Value="SAI_CLKSOURCE_PLLSAI"/>
 		<PossibleValue Comment="I2S PLL Clock" Value="SAI_CLKSOURCE_PLLI2S"/>
@@ -491,9 +552,9 @@
 		<Parameter Name="VirtualMode">
 			<PossibleValue>VM_MASTER</PossibleValue>
 		</Parameter>		
-		<Parameter Name="Synchro">
+		<Parameter Name="Synchro_A">
 			<PossibleValue>SAI_ASYNCHRONOUS</PossibleValue>
-		</Parameter>
+		</Parameter>					
 		<Parameter Name="MClockEnable">
 			<PossibleValue>SAI_MASTERCLOCK_DISABLE</PossibleValue>
 		</Parameter>
@@ -550,7 +611,9 @@
 		<Parameter Name="AdvancedParameter"/>
 		<Parameter Name="FIFOThreshold"/>
 		<Parameter Name="OutputDrive"/>
-		<Parameter Name="SynchroExt"/>	
+		<!--<Parameter Name="SynchroExt" RefParameter="SynchroExt_A"/>-->	
+		<!-- Bug35768 -->
+	
 		<Condition Diagnostic="" Expression="!$IpInstance_SAIA_INIT_PROTOCOL"/>
 	</RefMode>
 	<!-- RefModes 'Master Basic Mode' for SAI_A -->
@@ -562,9 +625,11 @@
 		<Parameter Name="VirtualMode">
 			<PossibleValue>VM_MASTER</PossibleValue>
 		</Parameter>		
-		<Parameter Name="Synchro">
+		<Parameter Name="Synchro_A">
 			<PossibleValue>SAI_ASYNCHRONOUS</PossibleValue>
 		</Parameter>
+			
+		
 		<Parameter Name="MClockEnable">
 			<PossibleValue>SAI_MASTERCLOCK_DISABLE</PossibleValue>
 		</Parameter>
@@ -592,7 +657,8 @@
 		<Parameter Name="AdvancedParameter"/>
 		<Parameter Name="FIFOThreshold"/>
 		<Parameter Name="OutputDrive"/>
-		<Parameter Name="SynchroExt"/>		
+		<!--<Parameter Name="SynchroExt" RefParameter="SynchroExt_A"/>-->	
+				
 		<Parameter Name="InitProtocol">
 			<PossibleValue>Enable</PossibleValue>
 		</Parameter>	
@@ -609,9 +675,11 @@
 		<Parameter Name="VirtualMode">
 			<PossibleValue>VM_MASTER</PossibleValue>
 		</Parameter>
-		<Parameter Name="Synchro">
+		<Parameter Name="Synchro_A">
 			<PossibleValue>SAI_ASYNCHRONOUS</PossibleValue>
 		</Parameter>
+			
+		
 		<Parameter Name="MClockEnable">
 			<PossibleValue>SAI_MASTERCLOCK_ENABLE</PossibleValue>
 		</Parameter>
@@ -668,7 +736,8 @@
 		<Parameter Name="AdvancedParameter"/>
 		<Parameter Name="FIFOThreshold"/>
 		<Parameter Name="OutputDrive"/>
-		<Parameter Name="SynchroExt"/>	
+		<!--<Parameter Name="SynchroExt" RefParameter="SynchroExt_A"/>-->		
+	
 		<Condition Diagnostic="" Expression="!$IpInstance_SAIA_INIT_PROTOCOL"/>		
 	</RefMode>
 	
@@ -682,9 +751,11 @@
 		<Parameter Name="VirtualMode">
 			<PossibleValue>VM_MASTER</PossibleValue>
 		</Parameter>
-		<Parameter Name="Synchro">
+		<Parameter Name="Synchro_A">
 			<PossibleValue>SAI_ASYNCHRONOUS</PossibleValue>
 		</Parameter>
+			
+		
 		<Parameter Name="MClockEnable">
 			<PossibleValue>SAI_MASTERCLOCK_ENABLE</PossibleValue>
 		</Parameter>
@@ -712,84 +783,16 @@
 		<Parameter Name="AdvancedParameter"/>
 		<Parameter Name="FIFOThreshold"/>
 		<Parameter Name="OutputDrive"/>
-		<Parameter Name="SynchroExt"/>
+		<!--<Parameter Name="SynchroExt" RefParameter="SynchroExt_A"/>-->	
+	
         <Parameter Name="InitProtocol">
 			<PossibleValue>Enable</PossibleValue>
 		</Parameter>		
 		<Condition Diagnostic="" Expression="$IpInstance_SAIA_INIT_PROTOCOL"/>
 	</RefMode>
 	
-	<!-- RefModes 'Slave Asynchronous Expert Mode' for SAI_A -->
-	<RefMode Comment="SAI A Asynchronus slave" Group="SAI A" Name="SAI_A_AsyncSlave">
-		<ConfigForMode>SaiA_Init</ConfigForMode>
-		<!-- Selected Mode Fixed Parameters -->
-		<Parameter Name="Instance">
-			<PossibleValue>SAI$Index_Block_A</PossibleValue>
-		</Parameter>
-		<Parameter Name="VirtualMode">
-			<PossibleValue>VM_SLAVE</PossibleValue>
-		</Parameter>	
-		<Parameter Name="Synchro">
-			<PossibleValue>SAI_ASYNCHRONOUS</PossibleValue>
-		</Parameter>
-		<!-- Basic Parameters -->	
-		<Parameter Name="BasicParameter"/>
-		<Parameter Name="Protocol"/>				
-		<Parameter Name="AudioMode"/>
-		<Parameter Name="FrameLength"/>
-		<Parameter Name="DataSize"/>
-		<Parameter Name="SlotSize"/>
-		<Parameter Name="MonoStereoMode"/>
-		<Parameter Name="CompandingMode"/>
-		<Parameter Name="TriState"/>				
-		<!-- DataFrame Parameters -->
-		<Parameter Name="FrameParameter"/>
-		<Parameter Name="FirstBit"/>
-		<Parameter Name="ActiveFrameLength"/>
-		<Parameter Name="FSDefinition"/>
-		<Parameter Name="FSPolarity"/>
-		<Parameter Name="FSOffset"/>
-		<!-- Block Slot Parameters -->
-		<Parameter Name="SlotParameter"/>
-		<Parameter Name="FirstBitOffset"/>
-		<Parameter Name="SlotNumber"/>
-		<Parameter Name="SlotActive"/>
-		<Parameter Name="VirtualSlotActive"/>
-		<Parameter Name="VirtualSlotActive0"/>
-		<Parameter Name="VirtualSlotActive1"/>
-		<Parameter Name="VirtualSlotActive2"/>
-		<Parameter Name="VirtualSlotActive3"/>
-		<Parameter Name="VirtualSlotActive4"/>
-		<Parameter Name="VirtualSlotActive5"/>
-		<Parameter Name="VirtualSlotActive6"/>
-		<Parameter Name="VirtualSlotActive7"/>
-		<Parameter Name="VirtualSlotActive8"/>
-		<Parameter Name="VirtualSlotActive9"/>
-		<Parameter Name="VirtualSlotActive10"/>
-		<Parameter Name="VirtualSlotActive11"/>
-		<Parameter Name="VirtualSlotActive12"/>
-		<Parameter Name="VirtualSlotActive13"/>
-		<Parameter Name="VirtualSlotActive14"/>
-		<Parameter Name="VirtualSlotActive15"/>
-		<!-- Clock Parameters -->
-		<Parameter Name="ClockParameter"/>
-		<!--Not used by STM32L4 -->
-		<Parameter Name="ClockSource"/>		
-		<Parameter Name="NoDivider"/>
-		<Parameter Name="AudioFrequency"/>
-		<!--<Parameter Name="RealAudioFreq"/>
-		<Parameter Name="ErrorAudioFreq"/>-->
-		<Parameter Name="ClockStrobing"/>
-		<Parameter Name="Mckdiv"/>
-		<!-- Advanced Parameters -->
-		<Parameter Name="AdvancedParameter"/>
-		<Parameter Name="FIFOThreshold"/>
-		<Parameter Name="OutputDrive"/>
-		<Parameter Name="SynchroExt"/>	
-		<Condition Diagnostic="" Expression="!$IpInstance_SAIA_INIT_PROTOCOL"/>		
-	</RefMode>	
-	<!-- RefModes 'Slave Asynchronous Basic Mode' for SAI_A -->
-	<RefMode Comment="SAI A Asynchronus slave" Group="SAI A" Name="SAI_A_AsyncSlave">
+	<!-- RefModes 'Slave Synchronous Basic Mode' for SAI_A -->
+	<RefMode Comment="SAI A Synchronus slave Basic" Group="SAI A" Name="SAI_A_SyncSlave">
 		<ConfigForMode>SaiA_InitProtocol</ConfigForMode>
 		<!-- Selected Mode Fixed Parameters -->
 		<Parameter Name="Instance">
@@ -797,10 +800,9 @@
 		</Parameter>
 		<Parameter Name="VirtualMode">
 			<PossibleValue>VM_SLAVE</PossibleValue>
-		</Parameter>	
-		<Parameter Name="Synchro">
-			<PossibleValue>SAI_ASYNCHRONOUS</PossibleValue>
-		</Parameter>
+		</Parameter>		
+		<Parameter Name="Synchro"/>
+			
 		<!-- Basic Parameters -->
 		<Parameter Name="BasicParameter"/>			
 		<Parameter Name="AudioMode"/>						
@@ -825,13 +827,13 @@
 		<Parameter Name="AdvancedParameter"/>
 		<Parameter Name="FIFOThreshold"/>
 		<Parameter Name="OutputDrive"/>
-		<Parameter Name="SynchroExt"/>	
-        <Parameter Name="InitProtocol">
+		<!--<Parameter Name="SynchroExt" RefParameter="SynchroExt_A"/>-->	
+		
+		<Parameter Name="InitProtocol">
 			<PossibleValue>Enable</PossibleValue>
-		</Parameter>	
+		</Parameter>
 		<Condition Diagnostic="" Expression="$IpInstance_SAIA_INIT_PROTOCOL"/>
 	</RefMode>
-	
 	<!-- RefModes 'Slave Synchronous Expert Mode' for SAI_A -->
 	<RefMode Comment="SAI A Synchronus slave" Group="SAI A" Name="SAI_A_SyncSlave">
 		<ConfigForMode>SaiA_Init</ConfigForMode>
@@ -843,8 +845,9 @@
 			<PossibleValue>VM_SLAVE</PossibleValue>
 		</Parameter>		
 		<Parameter Name="Synchro">
-			<PossibleValue>SAI_SYNCHRONOUS</PossibleValue>
+			<!--<PossibleValue>SAI_SYNCHRONOUS</PossibleValue>-->
 		</Parameter>
+			
 		<!-- Basic Parameters -->	
 		<Parameter Name="BasicParameter"/>
 		<Parameter Name="Protocol"/>	
@@ -898,11 +901,84 @@
 		<Parameter Name="AdvancedParameter"/>
 		<Parameter Name="FIFOThreshold"/>
 		<Parameter Name="OutputDrive"/>
-		<Parameter Name="SynchroExt"/>	
+		<!--<Parameter Name="SynchroExt" RefParameter="SynchroExt_A"/>-->		
+		
 		<Condition Diagnostic="" Expression="!$IpInstance_SAIA_INIT_PROTOCOL"/>		
 	</RefMode>
+	
+	<!-- RefModes 'Slave Asynchronous Expert Mode' for SAI_A -->
+	<RefMode Comment="SAI A Asynchronus slave Expert" Group="SAI A" Name="SAI_A_AsyncSlave">
+		<ConfigForMode>SaiA_Init</ConfigForMode>
+		<!-- Selected Mode Fixed Parameters -->
+		<Parameter Name="Instance">
+			<PossibleValue>SAI$Index_Block_A</PossibleValue>
+		</Parameter>
+		<Parameter Name="VirtualMode">
+			<PossibleValue>VM_SLAVE</PossibleValue>
+		</Parameter>	
+		<Parameter Name="Synchro_A">
+			<PossibleValue>SAI_ASYNCHRONOUS</PossibleValue>
+		</Parameter>		
+		
+		<!-- Basic Parameters -->	
+		<Parameter Name="BasicParameter"/>
+		<Parameter Name="Protocol"/>				
+		<Parameter Name="AudioMode"/>
+		<Parameter Name="FrameLength"/>
+		<Parameter Name="DataSize"/>
+		<Parameter Name="SlotSize"/>
+		<Parameter Name="MonoStereoMode"/>
+		<Parameter Name="CompandingMode"/>
+		<Parameter Name="TriState"/>				
+		<!-- DataFrame Parameters -->
+		<Parameter Name="FrameParameter"/>
+		<Parameter Name="FirstBit"/>
+		<Parameter Name="ActiveFrameLength"/>
+		<Parameter Name="FSDefinition"/>
+		<Parameter Name="FSPolarity"/>
+		<Parameter Name="FSOffset"/>
+		<!-- Block Slot Parameters -->
+		<Parameter Name="SlotParameter"/>
+		<Parameter Name="FirstBitOffset"/>
+		<Parameter Name="SlotNumber"/>
+		<Parameter Name="SlotActive"/>
+		<Parameter Name="VirtualSlotActive"/>
+		<Parameter Name="VirtualSlotActive0"/>
+		<Parameter Name="VirtualSlotActive1"/>
+		<Parameter Name="VirtualSlotActive2"/>
+		<Parameter Name="VirtualSlotActive3"/>
+		<Parameter Name="VirtualSlotActive4"/>
+		<Parameter Name="VirtualSlotActive5"/>
+		<Parameter Name="VirtualSlotActive6"/>
+		<Parameter Name="VirtualSlotActive7"/>
+		<Parameter Name="VirtualSlotActive8"/>
+		<Parameter Name="VirtualSlotActive9"/>
+		<Parameter Name="VirtualSlotActive10"/>
+		<Parameter Name="VirtualSlotActive11"/>
+		<Parameter Name="VirtualSlotActive12"/>
+		<Parameter Name="VirtualSlotActive13"/>
+		<Parameter Name="VirtualSlotActive14"/>
+		<Parameter Name="VirtualSlotActive15"/>
+		<!-- Clock Parameters -->
+		<Parameter Name="ClockParameter"/>
+		<!--Not used by STM32L4 -->
+		<Parameter Name="ClockSource"/>		
+		<Parameter Name="NoDivider"/>
+		<Parameter Name="AudioFrequency"/>
+		<!--<Parameter Name="RealAudioFreq"/>
+		<Parameter Name="ErrorAudioFreq"/>-->
+		<Parameter Name="ClockStrobing"/>
+		<Parameter Name="Mckdiv"/>
+		<!-- Advanced Parameters -->
+		<Parameter Name="AdvancedParameter"/>
+		<Parameter Name="FIFOThreshold"/>
+		<Parameter Name="OutputDrive"/>
+		<!--<Parameter Name="SynchroExt" RefParameter="SynchroExt_A"/>-->		
+	
+		<Condition Diagnostic="" Expression="!$IpInstance_SAIA_INIT_PROTOCOL"/>		
+	</RefMode>	
 	<!-- RefModes 'Slave Asynchronous Basic Mode' for SAI_A -->
-	<RefMode Comment="SAI A Synchronus slave" Group="SAI A" Name="SAI_A_SyncSlave">
+	<RefMode Comment="SAI A ASynchronus slave" Group="SAI A" Name="SAI_A_AsyncSlave">
 		<ConfigForMode>SaiA_InitProtocol</ConfigForMode>
 		<!-- Selected Mode Fixed Parameters -->
 		<Parameter Name="Instance">
@@ -910,9 +986,9 @@
 		</Parameter>
 		<Parameter Name="VirtualMode">
 			<PossibleValue>VM_SLAVE</PossibleValue>
-		</Parameter>		
-		<Parameter Name="Synchro">
-			<PossibleValue>SAI_SYNCHRONOUS</PossibleValue>
+		</Parameter>	
+		<Parameter Name="Synchro_A">
+			<PossibleValue>SAI_ASYNCHRONOUS</PossibleValue>
 		</Parameter>
 		<!-- Basic Parameters -->
 		<Parameter Name="BasicParameter"/>			
@@ -938,10 +1014,11 @@
 		<Parameter Name="AdvancedParameter"/>
 		<Parameter Name="FIFOThreshold"/>
 		<Parameter Name="OutputDrive"/>
-		<Parameter Name="SynchroExt"/>		
+		<!--<Parameter Name="SynchroExt" RefParameter="SynchroExt_A"/>-->		
+			
         <Parameter Name="InitProtocol">
 			<PossibleValue>Enable</PossibleValue>
-		</Parameter>
+		</Parameter>	
 		<Condition Diagnostic="" Expression="$IpInstance_SAIA_INIT_PROTOCOL"/>
 	</RefMode>
 	
@@ -955,9 +1032,9 @@
 		<Parameter Name="VirtualMode">
 			<PossibleValue>VM_SPDIF</PossibleValue>
 		</Parameter>	
-		<Parameter Name="Synchro">
+		<Parameter Name="Synchro_A">
 			<PossibleValue>SAI_ASYNCHRONOUS</PossibleValue>
-		</Parameter>
+		</Parameter>				
 		<!-- Basic Parameters -->	
 		<Parameter Name="BasicParameter"/>
 		<Parameter Name="Protocol">
@@ -1013,7 +1090,7 @@
 		<Parameter Name="AdvancedParameter"/>
 		<Parameter Name="FIFOThreshold"/>
 		<Parameter Name="OutputDrive"/>
-		<Parameter Name="SynchroExt"/>	
+		
 		<Condition Diagnostic="" Expression="!$IpInstance_SAIA_INIT_PROTOCOL"/>		
 	</RefMode>
 	<RefMode Comment="Basic protocol" Group="SAI A" Name="SAI_A_BASIC">			
@@ -1031,9 +1108,11 @@
 		<Parameter Name="VirtualMode">
 			<PossibleValue>VM_MASTER</PossibleValue>
 		</Parameter>		
-		<Parameter Name="Synchro">
+		<Parameter Name="Synchro_B">
 			<PossibleValue>SAI_ASYNCHRONOUS</PossibleValue>
 		</Parameter>
+			
+		
 		<Parameter Name="MClockEnable">
 			<PossibleValue>SAI_MASTERCLOCK_DISABLE</PossibleValue>
 		</Parameter>
@@ -1090,7 +1169,8 @@
 		<Parameter Name="AdvancedParameter"/>
 		<Parameter Name="FIFOThreshold"/>
 		<Parameter Name="OutputDrive"/>
-		<Parameter Name="SynchroExt"/>	
+		<!--<Parameter Name="SynchroExt" RefParameter="SynchroExt_B"/>-->
+	
 		<Condition Diagnostic="" Expression="!$IpInstance_SAIB_INIT_PROTOCOL"/>
 	</RefMode>
 	<!-- RefModes 'Master Basic Mode' for SAI_B -->
@@ -1102,9 +1182,11 @@
 		<Parameter Name="VirtualMode">
 			<PossibleValue>VM_MASTER</PossibleValue>
 		</Parameter>		
-		<Parameter Name="Synchro">
+		<Parameter Name="Synchro_B">
 			<PossibleValue>SAI_ASYNCHRONOUS</PossibleValue>
 		</Parameter>
+			
+		
 		<Parameter Name="MClockEnable">
 			<PossibleValue>SAI_MASTERCLOCK_DISABLE</PossibleValue>
 		</Parameter>
@@ -1132,7 +1214,8 @@
 		<Parameter Name="AdvancedParameter"/>
 		<Parameter Name="FIFOThreshold"/>
 		<Parameter Name="OutputDrive"/>
-		<Parameter Name="SynchroExt"/>	        
+		<!--<Parameter Name="SynchroExt" RefParameter="SynchroExt_B"/>-->	
+		       
         <Parameter Name="InitProtocol">
 			<PossibleValue>Enable</PossibleValue>
 		</Parameter>
@@ -1149,9 +1232,11 @@
 		<Parameter Name="VirtualMode">
 			<PossibleValue>VM_MASTER</PossibleValue>
 		</Parameter>
-		<Parameter Name="Synchro">
+		<Parameter Name="Synchro_B">
 			<PossibleValue>SAI_ASYNCHRONOUS</PossibleValue>
 		</Parameter>
+			
+		
 		<Parameter Name="MClockEnable">
 			<PossibleValue>SAI_MASTERCLOCK_ENABLE</PossibleValue>
 		</Parameter>
@@ -1208,7 +1293,8 @@
 		<Parameter Name="AdvancedParameter"/>
 		<Parameter Name="FIFOThreshold"/>
 		<Parameter Name="OutputDrive"/>
-		<Parameter Name="SynchroExt"/>	
+		<!--<Parameter Name="SynchroExt" RefParameter="SynchroExt_B"/>-->	
+		
 		<Condition Diagnostic="" Expression="!$IpInstance_SAIB_INIT_PROTOCOL"/>
 	</RefMode>
 	<!-- RefModes 'Master witch clock Basic Mode' for SAI_B -->
@@ -1221,9 +1307,11 @@
 		<Parameter Name="VirtualMode">
 			<PossibleValue>VM_MASTER</PossibleValue>
 		</Parameter>
-		<Parameter Name="Synchro">
+		<Parameter Name="Synchro_B">
 			<PossibleValue>SAI_ASYNCHRONOUS</PossibleValue>
 		</Parameter>
+			
+		
 		<Parameter Name="MClockEnable">
 			<PossibleValue>SAI_MASTERCLOCK_ENABLE</PossibleValue>
 		</Parameter>
@@ -1251,7 +1339,8 @@
 		<Parameter Name="AdvancedParameter"/>
 		<Parameter Name="FIFOThreshold"/>
 		<Parameter Name="OutputDrive"/>
-		<Parameter Name="SynchroExt"/>	
+		<!--<Parameter Name="SynchroExt" RefParameter="SynchroExt_B"/>-->	
+		
 		<Parameter Name="InitProtocol">
 			<PossibleValue>Enable</PossibleValue>
 		</Parameter>
@@ -1268,7 +1357,7 @@
 		<Parameter Name="VirtualMode">
 			<PossibleValue>VM_SLAVE</PossibleValue>
 		</Parameter>	
-		<Parameter Name="Synchro">
+		<Parameter Name="Synchro_B">
 			<PossibleValue>SAI_ASYNCHRONOUS</PossibleValue>
 		</Parameter>
 		<!-- Basic Parameters -->	
@@ -1324,7 +1413,8 @@
 		<Parameter Name="AdvancedParameter"/>
 		<Parameter Name="FIFOThreshold"/>
 		<Parameter Name="OutputDrive"/>
-		<Parameter Name="SynchroExt"/>	
+		<!--<Parameter Name="SynchroExt" RefParameter="SynchroExt_B"/>-->		
+	
 		<Condition Diagnostic="" Expression="!$IpInstance_SAIB_INIT_PROTOCOL"/>
 	</RefMode>
 	<!-- RefModes 'Slave Asynchronous Basic Mode' for SAI_B -->
@@ -1337,7 +1427,7 @@
 		<Parameter Name="VirtualMode">
 			<PossibleValue>VM_SLAVE</PossibleValue>
 		</Parameter>	
-		<Parameter Name="Synchro">
+		<Parameter Name="Synchro_B">
 			<PossibleValue>SAI_ASYNCHRONOUS</PossibleValue>
 		</Parameter>
 		<!-- Basic Parameters -->
@@ -1364,7 +1454,8 @@
 		<Parameter Name="AdvancedParameter"/>
 		<Parameter Name="FIFOThreshold"/>
 		<Parameter Name="OutputDrive"/>
-		<Parameter Name="SynchroExt"/>	
+		<!--<Parameter Name="SynchroExt" RefParameter="SynchroExt_B"/>-->
+	
 		<Parameter Name="InitProtocol">
 			<PossibleValue>Enable</PossibleValue>
 		</Parameter>
@@ -1381,9 +1472,7 @@
 		<Parameter Name="VirtualMode">
 			<PossibleValue>VM_SLAVE</PossibleValue>
 		</Parameter>		
-		<Parameter Name="Synchro">
-			<PossibleValue>SAI_SYNCHRONOUS</PossibleValue>
-		</Parameter>
+		<Parameter Name="Synchro"/>
 		<!-- Basic Parameters -->	
 		<Parameter Name="BasicParameter"/>
 		<Parameter Name="Protocol"/>						
@@ -1437,7 +1526,8 @@
 		<Parameter Name="AdvancedParameter"/>
 		<Parameter Name="FIFOThreshold"/>
 		<Parameter Name="OutputDrive"/>
-		<Parameter Name="SynchroExt"/>	
+		<!--<Parameter Name="SynchroExt" RefParameter="SynchroExt_B"/>-->
+		
 		<Condition Diagnostic="" Expression="!$IpInstance_SAIB_INIT_PROTOCOL"/>
 	</RefMode>
 	<!-- RefModes 'Slave Asynchronous Basic Mode' for SAI_B -->
@@ -1450,9 +1540,8 @@
 		<Parameter Name="VirtualMode">
 			<PossibleValue>VM_SLAVE</PossibleValue>
 		</Parameter>		
-		<Parameter Name="Synchro">
-			<PossibleValue>SAI_SYNCHRONOUS</PossibleValue>
-		</Parameter>
+		<Parameter Name="Synchro"/>
+			
 		<!-- Basic Parameters -->
 		<Parameter Name="BasicParameter"/>			
 		<Parameter Name="AudioMode"/>						
@@ -1477,7 +1566,8 @@
 		<Parameter Name="AdvancedParameter"/>
 		<Parameter Name="FIFOThreshold"/>
 		<Parameter Name="OutputDrive"/>
-		<Parameter Name="SynchroExt"/>	
+		<!--<Parameter Name="SynchroExt" RefParameter="SynchroExt_B"/>-->
+		
 		<Parameter Name="InitProtocol">
 			<PossibleValue>Enable</PossibleValue>
 		</Parameter>
@@ -1494,9 +1584,11 @@
 		<Parameter Name="VirtualMode">
 			<PossibleValue>VM_SPDIF</PossibleValue>
 		</Parameter>	
-		<Parameter Name="Synchro">
+		<Parameter Name="Synchro_B">
 			<PossibleValue>SAI_ASYNCHRONOUS</PossibleValue>
 		</Parameter>
+			
+		
 		<!-- Basic Parameters -->	
 		<Parameter Name="BasicParameter"/>
 		<Parameter Name="Protocol">
@@ -1552,7 +1644,7 @@
 		<Parameter Name="AdvancedParameter"/>
 		<Parameter Name="FIFOThreshold"/>
 		<Parameter Name="OutputDrive"/>
-		<Parameter Name="SynchroExt"/>	
+		
 		<Condition Diagnostic="" Expression="!$IpInstance_SAIB_INIT_PROTOCOL"/>
 	</RefMode>
 	
@@ -1563,6 +1655,11 @@
 		</Parameter>		
 	</RefMode>	
 		
+	<RefMode Comment="SynchroExternal"  Name="SynchroExternal">						
+		<Parameter Name="SynchroExt">			
+		</Parameter>
+	</RefMode>
+	
 	<!-- ModeLogicOperator for SAI -->
 	<ModeLogicOperator Name="XOR">
 		<Mode Name="SAI_A" UserName="SAI A">
@@ -1575,7 +1672,8 @@
 								<Signal Name="SCK_A"/>
 								<Signal Name="FS_A"/>
 							</SignalLogicalOp>
-							<Semaphore>$IpInstance_SAIA_Master</Semaphore>							
+							<Semaphore>$IpInstance_SAIA_Master</Semaphore>	
+							<Semaphore>SAIA_Master</Semaphore>	
 						</Mode>						
 						<Mode Name="SAI_A_MasterWithClock" UserName="Master with Master Clock Out">
 							<SignalLogicalOp Name="AND">
@@ -1584,7 +1682,8 @@
 								<Signal Name="FS_A"/>
 								<Signal Name="MCLK_A"/>
 							</SignalLogicalOp>
-							<Semaphore>$IpInstance_SAIA_Master</Semaphore>							
+							<Semaphore>$IpInstance_SAIA_Master</Semaphore>	
+							<Semaphore>SAIA_Master</Semaphore>
 						</Mode>
 						<Mode Name="SAI_A_AsyncSlave" UserName="Asynchronous Slave">
 							<SignalLogicalOp Name="AND">
@@ -1593,14 +1692,21 @@
 								<Signal Name="FS_A"/>
 							</SignalLogicalOp>
 							<Semaphore>$IpInstance_SAIA_AsyncSlave</Semaphore>
+							<Semaphore>$IpInstance_SAIA_Slave</Semaphore>
+							<Semaphore>SAIA_Slave</Semaphore>
 							<!--<Condition Expression="!$IpInstance_SAIA_SPDIF" Diagnostic=""/>-->
 						</Mode>						
 						<Mode Name="SAI_A_SyncSlave" RemoveCondition="((!$ModeExist_SAI_B_Master) &amp; (!$ModeExist_SAI_B_MasterWithClock) &amp; (!$ModeExist_SAI_B_AsyncSlave))" ShrinkName="SAI_A in Synchronous Slave Mode" UserName="Synchronous Slave"> 
 							<SignalLogicalOp Name="AND">
 								<Signal Name="SD_A"/>
 							</SignalLogicalOp>
+							<Semaphore>$IpInstance_SAIA_SyncSlave</Semaphore>
+							<Semaphore>$IpInstance_SAIA_Slave</Semaphore>
+							<Semaphore>SAIA_Slave</Semaphore>
 							<!--<Condition Expression="($IpInstance_SAIB_Master | $IpInstance_SAIB_AsyncSlave) &amp; (!$IpInstance_SAIA_SPDIF)" Diagnostic="Need to have SAI_B on 'Master' or 'Asynchronous Slave' Mode"/>-->
-							<Condition Diagnostic="Need to have SAI_B on 'Master' or 'Asynchronous Slave' Mode" Expression="($IpInstance_SAIB_Master | $IpInstance_SAIB_AsyncSlave)"/>
+							<!--<Condition Diagnostic="Need to have SAI_B on 'Master' or 'Asynchronous Slave' Mode" Expression="($IpInstance_SAIB_Master | $IpInstance_SAIB_AsyncSlave)"/>-->
+							<!-- Ticket 60119 -->
+							<Condition Diagnostic="Need to have one SAI on 'Master' or 'Asynchronous Slave' Mode" Expression="(SAI_Master | SAI_AsyncSlave)"/>
 						</Mode>							
 						<Mode Name="SAI_A_SPDIF" UserName="SPDIF TX Transmitter (IEC60958)">
 							<SignalLogicalOp Name="AND">
@@ -1638,7 +1744,9 @@
 								<Signal Name="SCK_B"/>
 								<Signal Name="FS_B"/>
 							</SignalLogicalOp>
-							<Semaphore>$IpInstance_SAIB_Master</Semaphore>							
+							<Semaphore>$IpInstance_SAIB_Master</Semaphore>	
+							<Semaphore>SAIB_Master</Semaphore>	
+							<Semaphore>SAI_Master</Semaphore>
 						</Mode>						
 						<Mode Name="SAI_B_MasterWithClock" UserName="Master with Master Clock Out">
 							<SignalLogicalOp Name="AND">
@@ -1647,7 +1755,9 @@
 								<Signal Name="FS_B"/>
 								<Signal Name="MCLK_B"/>
 							</SignalLogicalOp>
-							<Semaphore>$IpInstance_SAIB_Master</Semaphore>							
+							<Semaphore>$IpInstance_SAIB_Master</Semaphore>	
+							<Semaphore>SAIB_Master</Semaphore>
+							<Semaphore>SAI_Master</Semaphore>
 						</Mode>
 						<Mode Name="SAI_B_AsyncSlave" UserName="Asynchronous Slave">
 							<SignalLogicalOp Name="AND">
@@ -1656,14 +1766,20 @@
 								<Signal Name="FS_B"/>
 							</SignalLogicalOp>
 							<Semaphore>$IpInstance_SAIB_AsyncSlave</Semaphore>
+							<Semaphore>SAIB_Slave</Semaphore>
+							<Semaphore>SAI_AsyncSlave</Semaphore>
 							<!--<Condition Expression="!$IpInstance_SAIB_SPDIF" Diagnostic=""/>-->
 						</Mode>						
 						<Mode Name="SAI_B_SyncSlave" RemoveCondition="((!$ModeExist_SAI_A_Master) &amp; (!$ModeExist_SAI_A_MasterWithClock) &amp; (!$ModeExist_SAI_A_AsyncSlave))" ShrinkName="SAI_B in Synchronous Slave Mode" UserName="Synchronous Slave"> 
 							<SignalLogicalOp Name="AND">
 								<Signal Name="SD_B"/>
 							</SignalLogicalOp>
+							<Semaphore>$IpInstance_SAIB_SyncSlave</Semaphore>
+							<Semaphore>SAIB_Slave</Semaphore>
 							<!--<Condition Expression="($IpInstance_SAIA_Master | $IpInstance_SAIA_AsyncSlave) &amp; (!$IpInstance_SAIB_SPDIF)" Diagnostic="Need to have SAI_A on 'Master' or 'Asynchronous Slave' Mode"/>-->
-							<Condition Diagnostic="Need to have SAI_A on 'Master' or 'Asynchronous Slave' Mode" Expression="($IpInstance_SAIA_Master | $IpInstance_SAIA_AsyncSlave)"/>
+							<!--<Condition Diagnostic="Need to have SAI_A on 'Master' or 'Asynchronous Slave' Mode" Expression="($IpInstance_SAIA_Master | $IpInstance_SAIA_AsyncSlave)"/>-->
+							<!-- Ticket 60119 -->
+							<Condition Diagnostic="Need to have one SAI on 'Master' or 'Asynchronous Slave' Mode" Expression="(SAI_Master | SAI_AsyncSlave)"/>
 						</Mode>							
 						<Mode Name="SAI_B_SPDIF" UserName="SPDIF TX Transmitter (IEC60958)">
 							<SignalLogicalOp Name="AND">
@@ -1689,6 +1805,25 @@
 					</ModeLogicOperator>										
 				</Mode>								
 			</ModeLogicOperator>
+		</Mode>			
+	
+			
+		<Mode Name="SynchroExternal" UserName="External Synchro Out" RemoveCondition="DIE434 | DIE462">
+			<ModeLogicOperator Name="OR">
+				<Mode Name="SynchroExternal" UserName="External Synchro Out">
+					<ModeLogicOperator Name="XOR">
+						<Mode Name="SynchroExternal" UserName="External Synchro Out">
+							<SignalLogicalOp Name="AND">
+								<Signal Name="VP_$IpInstance_SYNCHRO_EXTERNAL"/>							
+							</SignalLogicalOp>	
+							<Semaphore>$IpInstance_SYNCHRO_EXTERNAL</Semaphore>	
+							<!--<Condition Diagnostic="Need to have a mode selected" Expression="($IpInstance_SAIA_Mode | $IpInstance_SAIB_Mode) &amp; (!$IpInstance_SAIA_SPDIF) &amp; (!$IpInstance_PDM)"/>-->
+							<!-- Bug 60846 -->
+							<Condition Diagnostic="Need to have a mode selected" Expression="($IpInstance_SAIA_Master | $IpInstance_SAIA_AsyncSlave | $IpInstance_SAIB_Master | $IpInstance_SAIB_AsyncSlave)"/>
+						</Mode>							
+					</ModeLogicOperator>					
+				</Mode>	
+			</ModeLogicOperator>
 		</Mode>
 	</ModeLogicOperator>
 	
@@ -1704,6 +1839,7 @@
 	<RefSignal IOMode="AlternateFunctionPushPull" Name="FS_B"/>
 	<RefSignal IOMode="AlternateFunctionPushPull" Name="MCLK_B"/>
 	
+	<RefSignal Name="VP_$IpInstance_SYNCHRO_EXTERNAL" Virtual="true"/>
 	<RefSignal Name="VP_$IpInstance_SAIA_SAI_BASIC" Virtual="true"/>
 	<RefSignal Name="VP_$IpInstance_SAIA_SAI_EXPERT" Virtual="true"/>
 	<RefSignal Name="VP_$IpInstance_SAIA_SAI_FREE" Virtual="true"/>

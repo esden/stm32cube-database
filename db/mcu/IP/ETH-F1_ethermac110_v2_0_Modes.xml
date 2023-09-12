@@ -1,0 +1,639 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<IP DBVersion="V4.0" IPType="peripheral" Name="ETH" Version="F1_ethermac110_v2_0" 
+	xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" 
+	ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd" 
+	xmlns="http://mcd.rou.st.com/modules.php?name=mcu">
+  <About>ETH: Ethernet MAC interface</About>
+	<!-- Generic RefParameters for ETH MII/RMII Modes -->
+	<!-- Generic RefParameters for ETH MII/RMII Modes Extracted from HAL Library with LibExtractor-->
+	<RefParameter Name="hal_eth_init_status" DefaultValue="1" Comment="" Type="" Visible="false"/>
+	<RefParameter Name="Instance" DefaultValue="ETH" Comment="Instance" Type="" Visible="false"/>
+	<RefParameter Comment="Auto Negotiation" DefaultValue="ETH_AUTONEGOTIATION_DISABLE" Name="AutoNegotiation" Type="list" Group="Advanced : Ethernet Media Configuration">
+	<Condition Diagnostic="" Expression="MW_ETH_Half_Duplex|MW_ETH_Full_Duplex"/>  
+		<PossibleValue Comment="Disabled" Value="ETH_AUTONEGOTIATION_DISABLE"/>
+	</RefParameter>
+	<RefParameter Comment="Auto Negotiation" DefaultValue="ETH_AUTONEGOTIATION_ENABLE" Name="AutoNegotiation" Type="list" Group="Advanced : Ethernet Media Configuration">
+		<PossibleValue Comment="Enabled" Value="ETH_AUTONEGOTIATION_ENABLE"/>
+		<PossibleValue Comment="Disabled" Value="ETH_AUTONEGOTIATION_DISABLE"/>
+	</RefParameter>
+	
+	<RefParameter Comment="Speed" DefaultValue="null" Name="Speed" Type="list" Group="Advanced : Ethernet Media Configuration" Visible="false">
+		<Condition Diagnostic="" Expression="AutoNegotiation=ETH_AUTONEGOTIATION_ENABLE"/>        		
+	</RefParameter>
+	<RefParameter Comment="Speed" DefaultValue="ETH_SPEED_100M" Name="Speed" Type="list" Group="Advanced : Ethernet Media Configuration" Visible="true">
+		<Condition Diagnostic="" Expression="AutoNegotiation=ETH_AUTONEGOTIATION_DISABLE"/>        		
+		<PossibleValue Comment="10 MBits/s" Value="ETH_SPEED_10M"/>
+		<PossibleValue Comment="100 MBits/s" Value="ETH_SPEED_100M"/>
+	</RefParameter>	
+	<RefParameter Comment="Speed" DefaultValue="null" Name="Speed" Type="list" Group="Advanced parameters" Visible="false"/>
+        <RefParameter Comment="Duplex Mode" DefaultValue="ETH_MODE_FULLDUPLEX" Name="DuplexMode" Type="list" Group="Advanced : Ethernet Media Configuration" Visible="true">
+		<Condition Diagnostic="" Expression="MW_ETH_Full_Duplex"/> 
+		<PossibleValue Comment="Full Duplex" Value="ETH_MODE_FULLDUPLEX"/>
+	</RefParameter>
+	<RefParameter Comment="Duplex Mode" DefaultValue="ETH_MODE_HALFDUPLEX" Name="DuplexMode" Type="list" Group="Advanced : Ethernet Media Configuration" Visible="true">
+		<Condition Diagnostic="" Expression="MW_ETH_Half_Duplex"/> 
+		<PossibleValue Comment="Half Duplex" Value="ETH_MODE_HALFDUPLEX"/>
+	</RefParameter>
+	<RefParameter Comment="Duplex Mode" DefaultValue="null" Name="DuplexMode" Type="list" Group="Advanced : Ethernet Media Configuration" Visible="false">
+		<Condition Diagnostic="" Expression="AutoNegotiation=ETH_AUTONEGOTIATION_ENABLE"/> 
+	</RefParameter>
+	
+	<RefParameter Comment="Duplex Mode" DefaultValue="ETH_MODE_FULLDUPLEX" Name="DuplexMode" Type="list" Group="Advanced : Ethernet Media Configuration" Visible="true">
+		<Condition Diagnostic="" Expression="AutoNegotiation=ETH_AUTONEGOTIATION_DISABLE"/> 
+		<PossibleValue Comment="Full Duplex" Value="ETH_MODE_FULLDUPLEX"/>
+		<PossibleValue Comment="Half Duplex" Value="ETH_MODE_HALFDUPLEX"/>
+	</RefParameter>
+	
+	<RefParameter Comment="PHY Address" DefaultValue="1" Max="31" Min="0" Name="PhyAddress" Type="integer" Group="General : Ethernet Configuration"/>
+	
+	<!-- ST MicroElectronics prefixe Adress -->
+	<RefParameter Comment="Ethernet MAC Address" ArraySize="6" ArrayTypeElement="uint8_t;16" Name="MACAddr" Type="Array" Separator=":" Group="General : Ethernet Configuration" DefaultValue="00:80:E1:00:00:00"/>
+	
+	<RefParameter Comment="Rx Mode" DefaultValue="ETH_RXINTERRUPT_MODE" Name="RxMode" Type="list" Group="Ethernet Basic Configuration">
+		<Condition Diagnostic="" Expression="S_FREERTOS &amp;S_LWIP"/>
+		<PossibleValue Comment="Interrupt Mode" Value="ETH_RXINTERRUPT_MODE" Semaphore="ETH_RX_INTERRUPT_ON"/>
+		<!--<PossibleValue Comment="Polling Mode" Value="ETH_RXPOLLING_MODE"/>-->
+	</RefParameter>
+	<RefParameter Comment="Rx Mode" DefaultValue="ETH_RXPOLLING_MODE" Name="RxMode" Type="list" Group="Ethernet Basic Configuration">
+		<Condition Diagnostic="" Expression="S_LWIP"/>
+		<PossibleValue Comment="Polling Mode" Value="ETH_RXPOLLING_MODE"/>
+	</RefParameter>
+	<RefParameter Comment="Rx Mode" DefaultValue="ETH_RXPOLLING_MODE" Name="RxMode" Type="list" Group="Ethernet Basic Configuration">
+		<PossibleValue Comment="Interrupt Mode" Value="ETH_RXINTERRUPT_MODE"  Semaphore="ETH_RX_INTERRUPT_ON"/>
+		<PossibleValue Comment="Polling Mode" Value="ETH_RXPOLLING_MODE"/>
+	</RefParameter>	
+	<RefParameter Comment="Media Interface" DefaultValue="ETH_MEDIA_INTERFACE_MII" Name="MediaInterface" Type="list" Group="General : Ethernet  Configuration" Visible="false">
+		<PossibleValue Value="ETH_MEDIA_INTERFACE_MII" Comment=""/>
+		<PossibleValue Value="ETH_MEDIA_INTERFACE_RMII" Comment=""/>
+	</RefParameter>
+	<RefParameter Comment="TX IP Header Checksum Computation" DefaultValue="ETH_CHECKSUM_BY_HARDWARE" Name="ChecksumMode" Type="list" Group="Ethernet Basic Configuration">
+		<PossibleValue Comment="By hardware" Value="ETH_CHECKSUM_BY_HARDWARE" />
+		<PossibleValue Comment="By software" Value="ETH_CHECKSUM_BY_SOFTWARE"/>
+	</RefParameter>
+	
+	<!-- MZA Add PHY #define value -->
+	<RefParameter  Comment="PHY" DefaultValue="LAN8742A_PHY_ADDRESS" Name="PHY_Name_RMII" Type="list" TabName="Advanced Parameters" Group="External PHY Configuration" Visible="true">
+            <PossibleValue Value="LAN8742A_PHY_ADDRESS" Comment="LAN8742A_PHY_ADDRESS"/>
+            <PossibleValue Value="DP83848_PHY_ADDRESS" Comment="DP83848_PHY_ADDRESS"/>
+            <PossibleValue Value="userPHY" Comment="user PHY"/>
+        </RefParameter>
+        <RefParameter  Comment="PHY" DefaultValue="DP83848_PHY_ADDRESS" Name="PHY_Name_MII" Type="list" TabName="Advanced Parameters" Group="External PHY Configuration" Visible="true">
+            <PossibleValue Value="DP83848_PHY_ADDRESS" Comment="DP83848_PHY_ADDRESS"/>
+            <PossibleValue Value="userPHY" Comment="user PHY"/>
+        </RefParameter>
+        <RefParameter Comment="PHY name" DefaultValue="user PHY Name" Name="PHY_User_Name" Type="stringRW" TabName="Advanced Parameters" Group="External PHY Configuration" Visible="true">
+            <Condition Diagnostic="PHY User Name - should be set with a string and should not be blank" Expression="PHY_Name_RMII=userPHY|PHY_Name_MII=userPHY"/>
+            <PossibleValue Value="PHY_USER_NAME" Comment="PHY User name"/>
+            <Description> PHY name </Description>
+        </RefParameter>
+        <RefParameter Comment="PHY name" DefaultValue="null" Name="PHY_User_Name" Type="stringRW" TabName="Advanced Parameters" Group="External PHY Configuration" Visible="false"/>
+
+        <RefParameter Comment="PHY name  arg" DefaultValue="+PHY_User_Name+PHY_NameString" Name="PHY_Name" Type="string" TabName="Advanced Parameters" Group="External PHY Configuration" Visible="false">
+            <Condition Diagnostic="" Expression="PHY_Name_RMII=userPHY|PHY_Name_MII=userPHY"/>
+            <Description> PHY name </Description>
+        </RefParameter>
+        <RefParameter Comment="PHY name  arg" DefaultValue="+PHY_Name_MII" Name="PHY_Name" Type="string" TabName="Advanced Parameters" Group="External PHY Configuration" Visible="false">
+            <Condition Diagnostic="" Expression="MII"/>
+            <Description> PHY name </Description>
+        </RefParameter>
+        <RefParameter Comment="PHY name arg" DefaultValue="+PHY_Name_RMII" Name="PHY_Name" Type="string" TabName="Advanced Parameters" Group="External PHY Configuration" Visible="false">
+            <Description> PHY name </Description>
+        </RefParameter>
+        <RefParameter Comment="static string" DefaultValue="_PHY_ADDRESS" Name="PHY_NameString" Type="string" TabName="Advanced Parameters" Group="External PHY Configuration" Visible="false">
+            <Description> PHY name </Description>
+        </RefParameter>
+
+	<RefParameter Comment="PHY Address Value"  Name="PHY_Value"  DefaultValue="=PhyAddress"  Type="string"  TabName="Advanced Parameters" Group="External PHY Configuration" Visible="true"/>
+	<RefParameter Comment="PHY Reset delay these values are based on a 1 ms Systick interrupt" DefaultValue="0x000000FF" Name="PHY_RESET_DELAY"  Min="0x00000000" Max="0xFFFFFFFF"  Type="hex"  TabName="Advanced Parameters" Group="External PHY Configuration" Visible="true"/>
+	<RefParameter Comment="PHY Configuration delay " DefaultValue="0x00000FFF" Name="PHY_CONFIG_DELAY"  Min="0x0000" Max="0xFFFFFFFF"  Type="hex" TabName="Advanced Parameters" Group="External PHY Configuration" Visible="true"/>		
+	<RefParameter Comment="PHY Read TimeOut" DefaultValue="0x0000FFFF" Name="PHY_READ_TO"  Min="0x0000" Max="0xFFFFFFFF"  Type="hex" TabName="Advanced Parameters" Group="External PHY Configuration" Visible="true"/>
+	<RefParameter Comment="PHY Write TimeOut" DefaultValue="0x0000FFFF" Name="PHY_WRITE_TO"  Min="0x0000" Max="0xFFFFFFFF"  Type="hex" TabName="Advanced Parameters"  Group="External PHY Configuration" Visible="true"/>
+	<RefParameter Comment="Transceiver Basic Control Register" DefaultValue="0x00" Name="PHY_BCR"  Min="0x0000" Max="0xFFFF"  Type="hex" TabName="Advanced Parameters" Group="Common : External PHY Configuration" Visible="true"/>		
+	<RefParameter Comment="Transceiver Basic Status Register" DefaultValue="0x01" Name="PHY_BSR"  Min="0x0000" Max="0xFFFF"  Type="hex" TabName="Advanced Parameters" Group="Common : External PHY Configuration" Visible="true"/>		
+	<RefParameter Comment="PHY Reset" DefaultValue="0x8000" Name="PHY_RESET"  Min="0x0000" Max="0xFFFF"  Type="hex" TabName="Advanced Parameters" Group="Common : External PHY Configuration" Visible="true"/>		
+	<RefParameter Comment="Select loop-back mode" DefaultValue="0x4000" Name="PHY_LOOPBACK"  Min="0x0000" Max="0xFFFF"  Type="hex" TabName="Advanced Parameters" Group="Common : External PHY Configuration" Visible="true"/>		
+	<RefParameter Comment="Set the full-duplex mode at 100 Mb/s" DefaultValue="0x2100" Name="PHY_FULLDUPLEX_100M"  Min="0x0000" Max="0xFFFF"  Type="hex" TabName="Advanced Parameters" Group="Common : External PHY Configuration" Visible="true"/>		
+	<RefParameter Comment="Set the half-duplex mode at 100 Mb/s" DefaultValue="0x2000" Name="PHY_HALFDUPLEX_100M"  Min="0x0000" Max="0xFFFF"  Type="hex" TabName="Advanced Parameters" Group="Common : External PHY Configuration" Visible="true"/>		
+	<RefParameter Comment="Set the full-duplex mode at 10 Mb/s" DefaultValue="0x0100" Name="PHY_FULLDUPLEX_10M"  Min="0x0000" Max="0xFFFF"  Type="hex" TabName="Advanced Parameters" Group="Common : External PHY Configuration" Visible="true"/>		
+	<RefParameter Comment="Set the half-duplex mode at 10 Mb/s" DefaultValue="0x0000" Name="PHY_HALFDUPLEX_10M"  Min="0x0000" Max="0xFFFF"  Type="hex" TabName="Advanced Parameters" Group="Common : External PHY Configuration" Visible="true"/>		
+	<RefParameter Comment="Enable auto-negotiation function" DefaultValue="0x1000" Name="PHY_AUTONEGOTIATION"  Min="0x0000" Max="0xFFFF"  Type="hex" TabName="Advanced Parameters" Group="Common : External PHY Configuration" Visible="true"/>		
+	<RefParameter Comment="Restart auto-negotiation function" DefaultValue="0x0200" Name="PHY_RESTART_AUTONEGOTIATION"  Min="0x0000" Max="0xFFFF"  Type="hex" TabName="Advanced Parameters" Group="Common : External PHY Configuration" Visible="true"/>		
+	<RefParameter Comment="Select the power down mode" DefaultValue="0x0800" Name="PHY_POWERDOWN"  Min="0x0000" Max="0xFFFF"  Type="hex" TabName="Advanced Parameters" Group="Common : External PHY Configuration" Visible="true"/>		
+	<RefParameter Comment="Isolate PHY from MII" DefaultValue="0x0400" Name="PHY_ISOLATE"  Min="0x0000" Max="0xFFFF"  Type="hex" TabName="Advanced Parameters" Group="Common : External PHY Configuration" Visible="true"/>		
+	<RefParameter Comment="Auto-Negotiation process completed" DefaultValue="0x0020" Name="PHY_AUTONEGO_COMPLETE"  Min="0x0000" Max="0xFFFF"  Type="hex" TabName="Advanced Parameters" Group="Common : External PHY Configuration" Visible="true"/>		
+	<RefParameter Comment="Valid link established" DefaultValue="0x0004" Name="PHY_LINKED_STATUS"  Min="0x0000" Max="0xFFFF"  Type="hex" TabName="Advanced Parameters" Group="Common : External PHY Configuration" Visible="true"/>		
+	<RefParameter Comment="Jabber condition detected" DefaultValue="0x0002" Name="PHY_JABBER_DETECTION"  Min="0x0000" Max="0xFFFF"  Type="hex" TabName="Advanced Parameters" Group="Common : External PHY Configuration" Visible="true"/>		
+
+	<RefParameter Comment="PHY special control/status register Offset" DefaultValue="0x10" Name="PHY_SR"  Min="0x0000" Max="0xFFFF"  Type="hex" TabName="Advanced Parameters" Group="Extended : External PHY Configuration" Visible="true">
+		<Condition Diagnostic="PHY_User_status_register_offset" Expression="PHY_Name_MII=DP83848_PHY_ADDRESS|PHY_Name_RMII=LAN8742A_PHY_ADDRESS|PHY_Name_RMII=DP83848_PHY_ADDRESS|PHY_Name_MII=userPHY|PHY_Name_RMII=userPHY"/>
+        <Description> PHY name </Description>
+    </RefParameter>
+	<RefParameter Comment="PHY special control/status register Offset" DefaultValue="0x10" Name="PHY_SR"  Min="0x0000" Max="0xFFFF"  Type="hex" TabName="Advanced Parameters" Group="Extended : External PHY Configuration" Visible="false"/>
+	<RefParameter Comment="MII Interrupt Control Register" DefaultValue="0x11" Name="PHY_MICR"  Min="0x0000" Max="0xFFFF"  Type="hex" TabName="Advanced Parameters" Group="Extended : External PHY Configuration" Visible="true">
+		<Condition Diagnostic="PHY_User_MII_Interrupt_Control_Register" Expression="PHY_Name_MII=DP83848_PHY_ADDRESS"/>
+        <Description> PHY name </Description>
+    </RefParameter>
+    <RefParameter Comment="MII Interrupt Control Register" DefaultValue="0x11" Name="PHY_MICR"  Min="0x0000" Max="0xFFFF"  Type="hex" TabName="Advanced Parameters" Group="Extended : External PHY Configuration" Visible="false"/>
+
+	<RefParameter Comment="MII Interrupt Status and Misc. Control Register" DefaultValue="0x12" Name="PHY_MISR"  Min="0x0000" Max="0xFFFF"  Type="hex" TabName="Advanced Parameters" Group="Extended : External PHY Configuration" Visible="true">
+        <Condition Diagnostic="PHY_User_MII_Interrupt_Status" Expression="PHY_Name_MII=DP83848_PHY_ADDRESS"/>
+        <Description> PHY name </Description>
+    </RefParameter>
+	<RefParameter Comment="MII Interrupt Status and Misc. Control Register" DefaultValue="0x12" Name="PHY_MISR"  Min="0x0000" Max="0xFFFF"  Type="hex" TabName="Advanced Parameters" Group="Extended : External PHY Configuration" Visible="false"/>
+	<RefParameter Comment="PHY Link mask" DefaultValue="0x0001" Name="PHY_LINK_STATUS"  Min="0x0000" Max="0xFFFF"  Type="hex" TabName="Advanced Parameters" Group="Extended : External PHY Configuration" Visible="true">
+        <Condition Diagnostic="PHY_User_Link_Mask" Expression="PHY_Name_MII=DP83848_PHY_ADDRESS"/>
+        <Description> PHY name </Description>
+    </RefParameter>
+	<RefParameter Comment="PHY Link mask" DefaultValue="0x0001" Name="PHY_LINK_STATUS"  Min="0x0000" Max="0xFFFF"  Type="hex" TabName="Advanced Parameters" Group="Extended : External PHY Configuration" Visible="false"/>
+	<RefParameter Comment="PHY Speed mask" DefaultValue="0x0002" Name="PHY_SPEED_STATUS"  Min="0x0000" Max="0xFFFF"  Type="hex" TabName="Advanced Parameters" Group="Extended : External PHY Configuration" Visible="true">
+		<Condition Diagnostic="PHY_User_speed_mask" Expression="PHY_Name_MII=DP83848_PHY_ADDRESS|PHY_Name_RMII=LAN8742A_PHY_ADDRESS|PHY_Name_RMII=DP83848_PHY_ADDRESS|PHY_Name_MII=userPHY|PHY_Name_RMII=userPHY"/>
+        <Description> PHY name </Description>
+    </RefParameter>
+	<RefParameter Comment="PHY Speed mask" DefaultValue="0x0002" Name="PHY_SPEED_STATUS"  Min="0x0000" Max="0xFFFF"  Type="hex" TabName="Advanced Parameters" Group="Extended : External PHY Configuration" Visible="false"/>
+	<RefParameter Comment="PHY Duplex mask " DefaultValue="0x0004" Name="PHY_DUPLEX_STATUS"  Min="0x0000" Max="0xFFFF"  Type="hex" TabName="Advanced Parameters" Group="Extended : External PHY Configuration" Visible="true">
+		<Condition Diagnostic="PHY_User_Duplex_mask" Expression="PHY_Name_MII=DP83848_PHY_ADDRESS|PHY_Name_RMII=LAN8742A_PHY_ADDRESS|PHY_Name_RMII=DP83848_PHY_ADDRESS|PHY_Name_MII=userPHY|PHY_Name_RMII=userPHY"/>
+        <Description> PHY name </Description>
+    </RefParameter>
+	<RefParameter Comment="PHY Duplex mask " DefaultValue="0x0004" Name="PHY_DUPLEX_STATUS"  Min="0x0000" Max="0xFFFF"  Type="hex" TabName="Advanced Parameters" Group="Extended : External PHY Configuration" Visible="false"/>
+	<RefParameter Comment="PHY Enable interrupts" DefaultValue="0x0002" Name="PHY_MICR_INT_EN"  Min="0x0000" Max="0xFFFF"  Type="hex" TabName="Advanced Parameters" Group="Extended : External PHY Configuration" Visible="true">
+        <Condition Diagnostic="PHY_User_enable_interrupts" Expression="PHY_Name_MII=DP83848_PHY_ADDRESS"/>
+        <Description> PHY name </Description>
+    </RefParameter>
+	<RefParameter Comment="PHY Enable interrupts" DefaultValue="0x0002" Name="PHY_MICR_INT_EN"  Min="0x0000" Max="0xFFFF"  Type="hex" TabName="Advanced Parameters" Group="Extended : External PHY Configuration" Visible="false"/>
+	<RefParameter Comment="PHY Enable output interrupt events" DefaultValue="0x0001" Name="PHY_MICR_INT_OE"  Min="0x0000" Max="0xFFFF"  Type="hex"  TabName="Advanced Parameters" Group="Extended : External PHY Configuration" Visible="true">
+        <Condition Diagnostic="PHY_User_enable_output_interrupt_events" Expression="PHY_Name_MII=DP83848_PHY_ADDRESS"/>
+        <Description> PHY name </Description>
+    </RefParameter>
+	<RefParameter Comment="PHY Enable output interrupt events" DefaultValue="0x0001" Name="PHY_MICR_INT_OE"  Min="0x0000" Max="0xFFFF"  Type="hex"  TabName="Advanced Parameters" Group="Extended : External PHY Configuration" Visible="false"/>
+	<RefParameter Comment="Enable Interrupt on change of link status" DefaultValue="0x0020" Name="PHY_MISR_LINK_INT_EN"  Min="0x0000" Max="0xFFFF"  Type="hex" TabName="Advanced Parameters" Group="Extended : External PHY Configuration" Visible="true">
+        <Condition Diagnostic="PHY_User_enable_interrupt_on_change_of_link_status" Expression="PHY_Name_MII=DP83848_PHY_ADDRESS"/>
+        <Description> PHY name </Description>
+    </RefParameter>
+	<RefParameter Comment="Enable Interrupt on change of link status" DefaultValue="0x0020" Name="PHY_MISR_LINK_INT_EN"  Min="0x0000" Max="0xFFFF"  Type="hex" TabName="Advanced Parameters" Group="Extended : External PHY Configuration" Visible="false"/>
+	<RefParameter Comment="PHY link status interrupt mask" DefaultValue="0x2000" Name="PHY_LINK_INTERRUPT"  Min="0x0000" Max="0xFFFF"  Type="hex" TabName="Advanced Parameters" Group="Extended : External PHY Configuration" Visible="true">
+        <Condition Diagnostic="PHY_User_HY_link_status_interrupt_mask" Expression="PHY_Name_MII=DP83848_PHY_ADDRESS"/>
+        <Description> PHY name </Description>
+    </RefParameter>
+    <RefParameter Comment="PHY link status interrupt mask" DefaultValue="0x2000" Name="PHY_LINK_INTERRUPT"  Min="0x0000" Max="0xFFFF"  Type="hex" TabName="Advanced Parameters" Group="Extended : External PHY Configuration" Visible="false"/>
+    <RefParameter Comment="PHY Interrupt Source Flag register Offset" DefaultValue="0x000B" Name="PHY_ISFR"  Min="0x0000" Max="0xFFFF"  Type="hex" TabName="Advanced Parameters" Group="Extended : External PHY Configuration" Visible="true">
+    	<Condition Diagnostic="PHY_User_Source_Flag_Register" Expression="PHY_Name_RMII=LAN8742A_PHY_ADDRESS|PHY_Name_RMII=DP83848_PHY_ADDRESS"/>
+        <Description> PHY name </Description>
+    </RefParameter>
+    <RefParameter Comment="PHY Interrupt Source Flag register Offset" DefaultValue="0x000B" Name="PHY_ISFR"  Min="0x0000" Max="0xFFFF"  Type="hex" TabName="Advanced Parameters" Group="Extended : External PHY Configuration" Visible="false"/>
+    <RefParameter Comment="PHY Link down inturrupt" DefaultValue="0x000B" Name="PHY_ISFR_INT4"  Min="0x0000" Max="0xFFFF"  Type="hex" TabName="Advanced Parameters" Group="Extended : External PHY Configuration" Visible="true">
+    	<Condition Diagnostic="PHY_User_HY_link_status_interrupt_mask" Expression="PHY_Name_RMII=LAN8742A_PHY_ADDRESS|PHY_Name_RMII=DP83848_PHY_ADDRESS"/>
+        <Description> PHY name </Description>
+    </RefParameter>
+	<RefParameter Comment="PHY Link down inturrupt" DefaultValue="0x000B" Name="PHY_ISFR_INT4"  Min="0x0000" Max="0xFFFF"  Type="hex" TabName="Advanced Parameters" Group="Extended : External PHY Configuration" Visible="false"/>
+	
+
+	<!-- RefMode for ETH -->
+	<RefMode Name="MII" HalMode="ETH">
+		<ConfigForMode>Init</ConfigForMode>
+		<Parameter Name="AutoNegotiation"/>
+		<Parameter Name="Speed"/>
+		<Parameter Name="DuplexMode"/> 
+		<Parameter Name="MACAddr"/>
+		<Parameter Name="RxMode"/>
+		<Parameter Name="ChecksumMode"/>
+		<Parameter Name="PhyAddress"/>
+		<Parameter Name="MediaInterface">
+			<PossibleValue>ETH_MEDIA_INTERFACE_MII</PossibleValue>
+		</Parameter>
+		<Parameter Name="PHY_Name_MII"/>
+                <Parameter Name="PHY_Name"/>
+		<Parameter Name="PHY_Value"/>
+		<Parameter Name="PHY_User_Name"/>
+		<Parameter Name="PHY_RESET_DELAY"/>
+		<Parameter Name="PHY_CONFIG_DELAY"/>
+		<Parameter Name="PHY_READ_TO"/>
+		<Parameter Name="PHY_WRITE_TO"/>
+		<Parameter Name="PHY_BCR"/>
+		<Parameter Name="PHY_BSR"/>
+		<Parameter Name="PHY_RESET"/>
+		<Parameter Name="PHY_LOOPBACK"/>
+		<Parameter Name="PHY_FULLDUPLEX_100M"/>
+		<Parameter Name="PHY_HALFDUPLEX_100M"/>
+		<Parameter Name="PHY_FULLDUPLEX_10M"/>
+		<Parameter Name="PHY_HALFDUPLEX_10M"/>
+		<Parameter Name="PHY_AUTONEGOTIATION"/>
+		<Parameter Name="PHY_RESTART_AUTONEGOTIATION"/>
+		<Parameter Name="PHY_POWERDOWN"/>
+		<Parameter Name="PHY_ISOLATE"/>
+		<Parameter Name="PHY_AUTONEGO_COMPLETE"/>
+		<Parameter Name="PHY_LINKED_STATUS"/>
+		<Parameter Name="PHY_JABBER_DETECTION"/>
+		<Parameter Name="PHY_SR"/>
+		<Parameter Name="PHY_MICR"/>
+		<Parameter Name="PHY_MISR"/>
+		<Parameter Name="PHY_LINK_STATUS"/>
+		<Parameter Name="PHY_SPEED_STATUS"/>
+		<Parameter Name="PHY_DUPLEX_STATUS"/>
+		<Parameter Name="PHY_MICR_INT_EN"/>
+		<Parameter Name="PHY_MICR_INT_OE"/>
+		<Parameter Name="PHY_MISR_LINK_INT_EN"/>
+		<Parameter Name="PHY_LINK_INTERRUPT"/>
+<!-- 		<Parameter Name="PHY_ISFR"/> -->
+<!-- 		<Parameter Name="PHY_ISFR_INT4"/> -->
+		
+		<Parameter Name="Instance"/>
+	</RefMode>
+	<RefMode Name="MII Half Duplex Only" HalMode="ETH">
+		<ConfigForMode>Init</ConfigForMode>   
+		<Parameter Name="AutoNegotiation"/>
+		<Parameter Name="Speed"/>
+		<Parameter Name="DuplexMode"/> 
+		<Parameter Name="MACAddr"/>
+		<Parameter Name="RxMode"/>
+		<Parameter Name="ChecksumMode"/>
+		<Parameter Name="PhyAddress"/>
+		<Parameter Name="MediaInterface">
+			<PossibleValue>ETH_MEDIA_INTERFACE_MII</PossibleValue>
+		</Parameter>
+		<Parameter Name="PHY_Name_MII"/>
+                <Parameter Name="PHY_Name"/>
+		<Parameter Name="PHY_Value"/>
+		<Parameter Name="PHY_User_Name"/>
+		<Parameter Name="PHY_RESET_DELAY"/>
+		<Parameter Name="PHY_CONFIG_DELAY"/>
+		<Parameter Name="PHY_READ_TO"/>
+		<Parameter Name="PHY_WRITE_TO"/>
+		<Parameter Name="PHY_BCR"/>
+		<Parameter Name="PHY_BSR"/>
+		<Parameter Name="PHY_RESET"/>
+		<Parameter Name="PHY_LOOPBACK"/>
+		<Parameter Name="PHY_FULLDUPLEX_100M"/>
+		<Parameter Name="PHY_HALFDUPLEX_100M"/>
+		<Parameter Name="PHY_FULLDUPLEX_10M"/>
+		<Parameter Name="PHY_HALFDUPLEX_10M"/>
+		<Parameter Name="PHY_AUTONEGOTIATION"/>
+		<Parameter Name="PHY_RESTART_AUTONEGOTIATION"/>
+		<Parameter Name="PHY_POWERDOWN"/>
+		<Parameter Name="PHY_ISOLATE"/>
+		<Parameter Name="PHY_AUTONEGO_COMPLETE"/>
+		<Parameter Name="PHY_LINKED_STATUS"/>
+		<Parameter Name="PHY_JABBER_DETECTION"/>
+		<Parameter Name="PHY_SR"/>
+		<Parameter Name="PHY_MICR"/>
+		<Parameter Name="PHY_MISR"/>
+		<Parameter Name="PHY_LINK_STATUS"/>
+		<Parameter Name="PHY_SPEED_STATUS"/>
+		<Parameter Name="PHY_DUPLEX_STATUS"/>
+		<Parameter Name="PHY_MICR_INT_EN"/>
+		<Parameter Name="PHY_MICR_INT_OE"/>
+		<Parameter Name="PHY_MISR_LINK_INT_EN"/>
+		<Parameter Name="PHY_LINK_INTERRUPT"/>
+<!-- 		<Parameter Name="PHY_ISFR"/> -->
+<!-- 		<Parameter Name="PHY_ISFR_INT4"/> -->
+		<Parameter Name="Instance"/>
+	</RefMode>
+	<RefMode Name="MII Full Duplex Only" HalMode="ETH">
+		<ConfigForMode>Init</ConfigForMode>   
+		<Parameter Name="AutoNegotiation"/>
+		<Parameter Name="Speed"/>
+		<Parameter Name="DuplexMode"/> 
+		<Parameter Name="MACAddr"/>
+		<Parameter Name="RxMode"/>
+		<Parameter Name="ChecksumMode"/>
+		<Parameter Name="PhyAddress"/>
+		<Parameter Name="MediaInterface">
+			<PossibleValue>ETH_MEDIA_INTERFACE_MII</PossibleValue>
+		</Parameter>
+		<Parameter Name="PHY_Name_MII"/>
+                <Parameter Name="PHY_Name"/>
+		<Parameter Name="PHY_Value"/>
+		<Parameter Name="PHY_User_Name"/>
+		<Parameter Name="PHY_RESET_DELAY"/>
+		<Parameter Name="PHY_CONFIG_DELAY"/>
+		<Parameter Name="PHY_READ_TO"/>
+		<Parameter Name="PHY_WRITE_TO"/>
+		<Parameter Name="PHY_BCR"/>
+		<Parameter Name="PHY_BSR"/>
+		<Parameter Name="PHY_RESET"/>
+		<Parameter Name="PHY_LOOPBACK"/>
+		<Parameter Name="PHY_FULLDUPLEX_100M"/>
+		<Parameter Name="PHY_HALFDUPLEX_100M"/>
+		<Parameter Name="PHY_FULLDUPLEX_10M"/>
+		<Parameter Name="PHY_HALFDUPLEX_10M"/>
+		<Parameter Name="PHY_AUTONEGOTIATION"/>
+		<Parameter Name="PHY_RESTART_AUTONEGOTIATION"/>
+		<Parameter Name="PHY_POWERDOWN"/>
+		<Parameter Name="PHY_ISOLATE"/>
+		<Parameter Name="PHY_AUTONEGO_COMPLETE"/>
+		<Parameter Name="PHY_LINKED_STATUS"/>
+		<Parameter Name="PHY_JABBER_DETECTION"/>
+		<Parameter Name="PHY_SR"/>
+		<Parameter Name="PHY_MICR"/>
+		<Parameter Name="PHY_MISR"/>
+		<Parameter Name="PHY_LINK_STATUS"/>
+		<Parameter Name="PHY_SPEED_STATUS"/>
+		<Parameter Name="PHY_DUPLEX_STATUS"/>
+		<Parameter Name="PHY_MICR_INT_EN"/>
+		<Parameter Name="PHY_MICR_INT_OE"/>
+		<Parameter Name="PHY_MISR_LINK_INT_EN"/>
+		<Parameter Name="PHY_LINK_INTERRUPT"/>
+<!-- 		<Parameter Name="PHY_ISFR"/> -->
+<!-- 		<Parameter Name="PHY_ISFR_INT4"/> -->
+		<Parameter Name="Instance"/>
+	</RefMode>
+	<!--
+	<RefMode Name="MII_PTP_Synchro" HalMode="ETH">
+		<ConfigForMode>Init</ConfigForMode>   
+		<Parameter Name="AutoNegotiation"/>
+		<Parameter Name="Speed"/>
+		<Parameter Name="DuplexMode"/> 
+		<Parameter Name="MACAddr"/>
+		<Parameter Name="RxMode"/>
+		<Parameter Name="ChecksumMode"/>		
+		<Parameter Name="PhyAddress"/>
+		<Parameter Name="MediaInterface">
+			<PossibleValue>ETH_MEDIA_INTERFACE_MII</PossibleValue>
+		</Parameter>
+		<Parameter Name="Instance"/>
+	</RefMode>
+	-->
+	<RefMode Name="MII_PTP_Synchro" HalMode="ETH">
+	    <ConfigForMode>MII_PTP_Synchro</ConfigForMode>  
+	</RefMode>
+	<RefMode Name="RMII_PTP_Synchro" HalMode="ETH">
+	    <ConfigForMode>RMII_PTP_Synchro</ConfigForMode>  
+	</RefMode>
+	<RefMode Name="RMII" HalMode="ETH">
+		<ConfigForMode>Init</ConfigForMode>   
+		<Parameter Name="AutoNegotiation"/>
+		<Parameter Name="Speed"/>
+		<Parameter Name="DuplexMode"/> 
+		<Parameter Name="MACAddr"/>
+		<Parameter Name="RxMode"/>
+		<Parameter Name="ChecksumMode"/> 
+		<Parameter Name="PhyAddress"/>
+		<Parameter Name="MediaInterface">
+			<PossibleValue>ETH_MEDIA_INTERFACE_RMII</PossibleValue>
+		</Parameter>
+		<Parameter Name="PHY_Name_RMII"/>
+                <Parameter Name="PHY_Name"/>
+		<Parameter Name="PHY_Value"/>
+		<Parameter Name="PHY_User_Name"/>
+		<Parameter Name="PHY_RESET_DELAY"/>
+		<Parameter Name="PHY_CONFIG_DELAY"/>
+		<Parameter Name="PHY_READ_TO"/>
+		<Parameter Name="PHY_WRITE_TO"/>
+		<Parameter Name="PHY_BCR"/>
+		<Parameter Name="PHY_BSR"/>
+		<Parameter Name="PHY_RESET"/>
+		<Parameter Name="PHY_LOOPBACK"/>
+		<Parameter Name="PHY_FULLDUPLEX_100M"/>
+		<Parameter Name="PHY_HALFDUPLEX_100M"/>
+		<Parameter Name="PHY_FULLDUPLEX_10M"/>
+		<Parameter Name="PHY_HALFDUPLEX_10M"/>
+		<Parameter Name="PHY_AUTONEGOTIATION"/>
+		<Parameter Name="PHY_RESTART_AUTONEGOTIATION"/>
+		<Parameter Name="PHY_POWERDOWN"/>
+		<Parameter Name="PHY_ISOLATE"/>
+		<Parameter Name="PHY_AUTONEGO_COMPLETE"/>
+		<Parameter Name="PHY_LINKED_STATUS"/>
+		<Parameter Name="PHY_JABBER_DETECTION"/>
+		<Parameter Name="PHY_SR"/>
+<!-- 		<Parameter Name="PHY_MICR"/> -->
+<!-- 		<Parameter Name="PHY_MISR"/> -->
+<!-- 		<Parameter Name="PHY_LINK_STATUS"/> -->
+		<Parameter Name="PHY_SPEED_STATUS"/>
+		<Parameter Name="PHY_DUPLEX_STATUS"/>
+<!-- 		<Parameter Name="PHY_MICR_INT_EN"/> -->
+<!-- 		<Parameter Name="PHY_MICR_INT_OE"/> -->
+<!-- 		<Parameter Name="PHY_MISR_LINK_INT_EN"/> -->
+<!-- 		<Parameter Name="PHY_LINK_INTERRUPT"/> -->
+		<Parameter Name="PHY_ISFR"/>
+		<Parameter Name="PHY_ISFR_INT4"/>
+		<Parameter Name="Instance"/>
+	</RefMode>
+	<!--
+	<RefMode Name="RMII_PTP_Synchro" HalMode="ETH">
+		<ConfigForMode>Init</ConfigForMode>   
+		<Parameter Name="AutoNegotiation"/>
+		<Parameter Name="Speed"/>
+		<Parameter Name="DuplexMode"/> 
+		<Parameter Name="MACAddr"/>
+		<Parameter Name="RxMode"/>
+		<Parameter Name="ChecksumMode"/> 
+		<Parameter Name="PhyAddress"/>
+		<Parameter Name="MediaInterface">
+			<PossibleValue>ETH_MEDIA_INTERFACE_RMII</PossibleValue>
+		</Parameter>
+		<Parameter Name="Instance"/>
+	</RefMode>
+	-->
+	<ModeLogicOperator Name="OR">
+		<Mode Name="Mode">
+			<ModeLogicOperator Name="XOR">
+				<Mode Name="MII">				
+					<SignalLogicalOp Name="AND">
+						<Signal Name="COL"/>
+						<Signal Name="CRS"/>
+						<Signal Name="MDC"/>
+						<Signal Name="MDIO"/>
+						<Signal Name="RXD0"/>
+						<Signal Name="RXD1"/>
+						<Signal Name="RXD2"/>
+						<Signal Name="RXD3"/>
+						<Signal Name="RX_CLK"/>
+						<Signal Name="RX_DV"/>
+						<Signal Name="TXD0"/>
+						<Signal Name="TXD1"/>
+						<Signal Name="TXD2"/>
+						<Signal Name="TXD3"/>
+						<Signal Name="TX_CLK"/>
+						<Signal Name="TX_EN"/>
+					</SignalLogicalOp>
+					<Semaphore>MII</Semaphore>
+					<Semaphore>MW_ETH_MW</Semaphore>
+				</Mode>
+				<Mode Name="MII Half Duplex Only">				
+					<SignalLogicalOp Name="AND">
+						<Signal Name="COL"/>
+						<Signal Name="CRS"/>
+						<Signal Name="MDC"/>
+						<Signal Name="MDIO"/>
+						<Signal Name="RXD0"/>
+						<Signal Name="RXD1"/>
+						<Signal Name="RXD2"/>
+						<Signal Name="RXD3"/>
+						<Signal Name="RX_CLK"/>
+						<Signal Name="RX_DV"/>
+						<Signal Name="TXD0"/>
+						<Signal Name="TXD1"/>
+						<Signal Name="TXD2"/>
+						<Signal Name="TXD3"/>
+						<Signal Name="TX_CLK"/>
+						<Signal Name="TX_EN"/>
+					</SignalLogicalOp>
+					<Semaphore>MII</Semaphore>	
+					<Semaphore>MW_ETH_MW</Semaphore>
+				    <Semaphore>MW_ETH_Half_Duplex</Semaphore>
+				</Mode>
+				<Mode Name="MII Full Duplex Only">				
+					<SignalLogicalOp Name="AND">
+						<Signal Name="MDC"/>
+						<Signal Name="MDIO"/>
+						<Signal Name="RXD0"/>
+						<Signal Name="RXD1"/>
+						<Signal Name="RXD2"/>
+						<Signal Name="RXD3"/>
+						<Signal Name="RX_CLK"/>
+						<Signal Name="RX_DV"/>
+						<Signal Name="TXD0"/>
+						<Signal Name="TXD1"/>
+						<Signal Name="TXD2"/>
+						<Signal Name="TXD3"/>
+						<Signal Name="TX_CLK"/>
+						<Signal Name="TX_EN"/>
+					</SignalLogicalOp>
+					<Semaphore>MII</Semaphore>	
+					<Semaphore>MW_ETH_MW</Semaphore>
+					<Semaphore>MW_ETH_Full_Duplex</Semaphore>
+				</Mode>
+				<Mode Name="MII_PTP_Synchro">				
+					<SignalLogicalOp Name="AND">
+						<Signal Name="COL"/>
+						<Signal Name="CRS"/>
+						<Signal Name="MDC"/>
+						<Signal Name="MDIO"/>
+						<Signal Name="PPS_OUT"/>
+						<Signal Name="RXD0"/>
+						<Signal Name="RXD1"/>
+						<Signal Name="RXD2"/>
+						<Signal Name="RXD3"/>
+						<Signal Name="RX_CLK"/>
+						<Signal Name="RX_DV"/>
+						<Signal Name="TXD0"/>
+						<Signal Name="TXD1"/>
+						<Signal Name="TXD2"/>
+						<Signal Name="TXD3"/>
+						<Signal Name="TX_CLK"/>
+						<Signal Name="TX_EN"/>
+					</SignalLogicalOp>
+					<!--<Semaphore>MII_PTP_Synchro</Semaphore>-->
+					<Semaphore>MII</Semaphore>	
+					<Semaphore>MW_ETH_MW</Semaphore>
+					<Condition Expression="(Semaphore_ETH_TriggerSourceITR1TIM2)&amp;(Semaphore_ETH_ControllerModeTIM2)" Diagnostic="Only active when TIM2 has an enabled Slave Mode with ITR1 as trigger source"/>
+
+				</Mode>		
+                <Mode Name="MII Full Duplex Only_PTP_Synchro">				
+					<SignalLogicalOp Name="AND">
+					
+						<Signal Name="MDC"/>
+						<Signal Name="MDIO"/>
+						<Signal Name="PPS_OUT"/>
+						<Signal Name="RXD0"/>
+						<Signal Name="RXD1"/>
+						<Signal Name="RXD2"/>
+						<Signal Name="RXD3"/>
+						<Signal Name="RX_CLK"/>
+						<Signal Name="RX_DV"/>
+						<Signal Name="TXD0"/>
+						<Signal Name="TXD1"/>
+						<Signal Name="TXD2"/>
+						<Signal Name="TXD3"/>
+						<Signal Name="TX_CLK"/>
+						<Signal Name="TX_EN"/>
+					</SignalLogicalOp>
+					<!--<Semaphore>MII_PTP_Synchro</Semaphore>-->
+					<Semaphore>MII</Semaphore>	
+					<Semaphore>MW_ETH_MW</Semaphore>
+					<Condition Expression="(Semaphore_ETH_TriggerSourceITR1TIM2)&amp;(Semaphore_ETH_ControllerModeTIM2)" Diagnostic="Only active when TIM2 has an enabled Slave Mode with ITR1 as trigger source"/>
+
+				</Mode>	
+				<Mode Name="MII Half Duplex Only_PTP_Synchro">				
+					<SignalLogicalOp Name="AND">
+						<Signal Name="COL"/>
+						<Signal Name="CRS"/>
+						<Signal Name="MDC"/>
+						<Signal Name="MDIO"/>
+						<Signal Name="PPS_OUT"/>
+						<Signal Name="RXD0"/>
+						<Signal Name="RXD1"/>
+						<Signal Name="RXD2"/>
+						<Signal Name="RXD3"/>
+						<Signal Name="RX_CLK"/>
+						<Signal Name="RX_DV"/>
+						<Signal Name="TXD0"/>
+						<Signal Name="TXD1"/>
+						<Signal Name="TXD2"/>
+						<Signal Name="TXD3"/>
+						<Signal Name="TX_CLK"/>
+						<Signal Name="TX_EN"/>
+					</SignalLogicalOp>
+					<!--<Semaphore>MII_PTP_Synchro</Semaphore>-->
+					<Semaphore>MII</Semaphore>	
+					<Semaphore>MW_ETH_MW</Semaphore>
+					<Condition Expression="(Semaphore_ETH_TriggerSourceITR1TIM2)&amp;(Semaphore_ETH_ControllerModeTIM2)" Diagnostic="Only active when TIM2 has an enabled Slave Mode with ITR1 as trigger source"/>
+
+				</Mode>					
+				<Mode Name="RMII">				
+					<SignalLogicalOp Name="AND">
+						<Signal Name="CRS_DV"/>
+						<Signal Name="MDC"/>
+						<Signal Name="MDIO"/>
+						<Signal Name="REF_CLK"/>
+						<Signal Name="RXD0"/>
+						<Signal Name="RXD1"/>
+						<Signal Name="TXD0"/>
+						<Signal Name="TXD1"/>
+						<Signal Name="TX_EN"/>
+					</SignalLogicalOp>
+					<!--<Semaphore>RMII</Semaphore>-->
+					<Semaphore>MW_ETH_MW</Semaphore>
+				</Mode>
+				<Mode Name="RMII_PTP_Synchro">				
+					<SignalLogicalOp Name="AND">
+						<Signal Name="CRS_DV"/>
+						<Signal Name="MDC"/>
+						<Signal Name="MDIO"/>
+						<Signal Name="PPS_OUT"/>
+						<Signal Name="REF_CLK"/>
+						<Signal Name="RXD0"/>
+						<Signal Name="RXD1"/>
+						<Signal Name="TXD0"/>
+						<Signal Name="TXD1"/>
+						<Signal Name="TX_EN"/>
+					</SignalLogicalOp>
+					<!--<Semaphore>RMII_PTP_Synchro</Semaphore>-->
+					<Semaphore>MW_ETH_MW</Semaphore>
+					<Condition Expression="(Semaphore_ETH_TriggerSourceITR1TIM2)&amp;(Semaphore_ETH_ControllerModeTIM2)" Diagnostic="Only active when TIM2 has an enabled Slave Mode with ITR1 as trigger source"/>
+			
+				</Mode>
+			</ModeLogicOperator>
+			<Semaphore>ETHUsed_ForRCC</Semaphore>
+		</Mode>
+		<Mode Name="Activate Rx Err signal">	
+            <ModeLogicOperator Name="XOR">	
+                <Mode Name="Activate Rx Err signal">			
+					<SignalLogicalOp Name="AND">
+						<Signal Name="RX_ER"/>
+					</SignalLogicalOp>
+				</Mode>
+		    </ModeLogicOperator>
+					<Condition Expression="MII" Diagnostic="Active only with an MII Mode"/>		
+	    </Mode>
+	</ModeLogicOperator>
+	<RefSignal IOMode="InputFloating" Name="COL"/>
+	<RefSignal IOMode="InputFloating" Name="CRS"/>
+	<RefSignal IOMode="InputFloating" Name="CRS_DV"/>
+	<RefSignal IOMode="AlternateFunctionPushPullHighSpeed" Name="MDC"/>
+	<RefSignal IOMode="AlternateFunctionPushPullHighSpeed" Name="MDIO"/>
+	<RefSignal IOMode="AlternateFunctionPushPullHighSpeed" Name="PPS_OUT"/>
+	<RefSignal IOMode="InputFloating" Name="RXD0"/>
+	<RefSignal IOMode="InputFloating" Name="RXD1"/>
+	<RefSignal IOMode="InputFloating" Name="RXD2"/>
+	<RefSignal IOMode="InputFloating" Name="RXD3"/>
+	<RefSignal IOMode="InputFloating" Name="RX_CLK"/>
+	<RefSignal IOMode="InputFloating" Name="REF_CLK"/>
+	<RefSignal IOMode="InputFloating" Name="RX_DV"/>
+	<RefSignal IOMode="InputFloating" Name="RX_ER"/>
+	<RefSignal IOMode="AlternateFunctionPushPullHighSpeed" Name="TXD0"/>
+	<RefSignal IOMode="AlternateFunctionPushPullHighSpeed" Name="TXD1"/>
+	<RefSignal IOMode="AlternateFunctionPushPullHighSpeed" Name="TXD2"/>
+	<RefSignal IOMode="AlternateFunctionPushPullHighSpeed" Name="TXD3"/>
+	<RefSignal IOMode="InputFloating" Name="TX_CLK"/>
+	<RefSignal IOMode="AlternateFunctionPushPullHighSpeed" Name="TX_EN"/>
+</IP>

@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
  ******************************************************************************
   * File Name          : ${name}.c
@@ -8,7 +9,8 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
- [#assign channelnbr = 0]
+/* USER CODE END Header */
+[#assign channelnbr = 0]
 [#list SWIPdatas as SWIP]  
     [#if SWIP.defines??]
         [#list SWIP.defines as define]
@@ -283,6 +285,10 @@
 [#assign total_6ch_linrots_rot_M_B_NBR_nb = total_6ch_linrots_rot_M_B_NBR?number ]
 
 #include "tsl_user.h"
+/* Private includes ----------------------------------------------------------*/
+/* USER CODE BEGIN Includes */
+
+/* USER CODE END Includes */
 
 /*============================================================================*/
 /* Channels                                                                   */
@@ -1565,7 +1571,9 @@ void tsl_user_SetThresholds(void)
 [#-- If touchkey(s) is(are) enabled --]
   void MyTKeys_ErrorStateProcess(void)
 {
+/* USER CODE BEGIN MyTKeys_ErrorStateProcess */
   /* Add here your own processing when a sensor is in Error state */
+/* USER CODE END MyTKeys_ErrorStateProcess */
 }
 [#-- ************************************************************************************************** --]
 [/#if]
@@ -1573,7 +1581,9 @@ void tsl_user_SetThresholds(void)
 [#-- If linrot(s) is(are) enabled --]
 void MyLinRots_ErrorStateProcess(void)
 {
+/* USER CODE BEGIN MyLinRots_ErrorStateProcess */
   /* Add here your own processing when a sensor is in Error state */
+/* USER CODE END MyLinRots_ErrorStateProcess */
 }
 [#-- ************************************************************************************************** --]
 [/#if]
@@ -1588,7 +1598,9 @@ void MyLinRots_ErrorStateProcess(void)
 [#-- If touchkey(s) is(are) enabled --]
 void MyTKeys_OffStateProcess(void)
 {
+/* USER CODE BEGIN MyTKeys_OffStateProcess */
   /* Add here your own processing when a sensor is in Off state */
+/* USER CODE END MyTKeys_OffStateProcess */
 }
 
 [/#if]
@@ -1596,7 +1608,9 @@ void MyTKeys_OffStateProcess(void)
 [#-- If linrot(s) is(are) enabled --]
 void MyLinRots_OffStateProcess(void)
 {
+/* USER CODE BEGIN MyLinRots_OffStateProcess */
   /* Add here your own processing when a sensor is in Off state */
+/* USER CODE END MyLinRots_OffStateProcess */
 }
 [#-- ************************************************************************************************** --]
 [/#if]

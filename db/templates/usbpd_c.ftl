@@ -38,6 +38,12 @@ void MX_USBPD_Init(void)
     while(1);
   }
 
+  /* Initialise the DPM application */
+  if (USBPD_OK != USBPD_DPM_UserInit())
+  {
+    while(1);
+  }
+
   /* USER CODE BEGIN 3 */
   /* USER CODE END 3 */
 

@@ -42,7 +42,7 @@
 	
 	
 	<RefParameter Comment="Data Size" DefaultValue="SPI_DATASIZE_4BIT" Group="Basic Parameters" Name="DataSize" Type="list">
-		<Condition Diagnostic="" Expression="STM32L4 | DIE460"/>
+		<Condition Diagnostic="" Expression="STM32L4 | DIE495 | DIE460"/>
 		<PossibleValue Comment="4 Bits" Semaphore="$IpInstance_DATASIZE_BYTE" Value="SPI_DATASIZE_4BIT"/>
 		<PossibleValue Comment="5 Bits" Semaphore="$IpInstance_DATASIZE_BYTE" Value="SPI_DATASIZE_5BIT"/>
 		<PossibleValue Comment="6 Bits" Semaphore="$IpInstance_DATASIZE_BYTE" Value="SPI_DATASIZE_6BIT"/>
@@ -83,12 +83,16 @@
 		<PossibleValue Comment="256" Value="SPI_BAUDRATEPRESCALER_256"/>
 	</RefParameter>
 	<RefParameter Comment="Prescaler (for Baud Rate)" DefaultValue="null" Group="Clock Parameters" Name="BaudRatePrescaler" Type="list" Visible="false"/>
-	
+
+        <RefParameter Comment="Baud Rate" DefaultValue="8000000" Group="Clock Parameters" Max="32000000" Min="0" Name="CalculateBaudRate" Type="string">
+		<Description>Calculated Baudrate value based on SPI Clock source and Prescaler</Description>
+		<Condition Diagnostic="" Expression="$IpInstance_Master &amp; DIE495"/>
+	</RefParameter>	
 	<RefParameter Comment="Baud Rate" DefaultValue="8000000" Group="Clock Parameters" Max="40000000" Min="0" Name="CalculateBaudRate" Type="string">
 		<Description>Calculated Baudrate value based on SPI Clock source and Prescaler</Description>
 		<Condition Diagnostic="" Expression="$IpInstance_Master"/>
 	</RefParameter>
-	
+
 	<RefParameter Comment="Baud Rate" DefaultValue="8000000" Group="Clock Parameters" Max="24000000" Min="0" Name="CalculateBaudRate" Type="string">
 		<Description>Calculated Baudrate value based on SPI Clock source and Prescaler</Description>
 		<Condition Diagnostic="" Expression="$IpInstance_Slave &amp; (TIMode = SPI_TIMODE_ENABLE)"/>
@@ -436,7 +440,7 @@
 				</Mode>
 				<Mode Name="Full_Duplex_Slave" UserName="Full-Duplex Slave">
 					<SignalLogicalOp Name="AND">
-						<Signal Name="MISO"/>
+						<Signal IOMode="AlternateFunctionOpenDrainAndPushPullDefaultPP" Name="MISO"/>
 						<Signal Name="MOSI"/>
 						<Signal Name="SCK"/>
 					</SignalLogicalOp>
@@ -455,7 +459,7 @@
 				</Mode>
             	<Mode Name="Simplex_Bidirectional_Slave" UserName="Half-Duplex Slave">
 					<SignalLogicalOp Name="AND">
-						<Signal Name="MISO"/>
+						<Signal IOMode="AlternateFunctionOpenDrainAndPushPullDefaultPP" Name="MISO"/>
 						<Signal Name="SCK"/>
 					</SignalLogicalOp>
 					<Semaphore>$IpInstance_DmaTransmit</Semaphore>
@@ -492,7 +496,7 @@
             	<Mode Name="TX_Only_Simplex_Unidirect_Slave" UserName="Transmit Only Slave">
             		<!-- SPI is in 'Full-Duplex' Mode, but only 'Slave Out' line is on pinout -->
 					<SignalLogicalOp Name="AND">
-						<Signal Name="MISO"/>
+						<Signal IOMode="AlternateFunctionOpenDrainAndPushPullDefaultPP" Name="MISO"/>
 						<Signal Name="SCK"/>
 					</SignalLogicalOp>
 					<Semaphore>$IpInstance_DmaTransmit</Semaphore>

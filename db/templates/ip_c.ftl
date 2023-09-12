@@ -21,6 +21,9 @@
 [#assign ipvar = IP]
 /* Includes ------------------------------------------------------------------*/
 #include "${name?lower_case}.h"
+[#if RESMGR_UTILITY??]
+#include "resmgr_utility.h"
+[/#if]
 [#assign useGpio = false]
 [#assign useBdma = false]
 [#assign useDma = false]
@@ -790,7 +793,13 @@ ETH_TxPacketConfig TxConfig;
          [/#if]
     [/#if]
     [#if gpioExist]
+        [#if FamilyName=="STM32MP1"]
+            [#-- if defined (CONFIG_MASTER_MODE) --]
+        [/#if]
         #t[@generateConfigCode ipName=ipName type=serviceType serviceName="gpio" instHandler=instHandler tabN=tabN/]
+[#if FamilyName=="STM32MP1"]
+       [#-- #endif --]
+    [/#if]
     [/#if]
 [#-- if I2C clk_enable should be after GPIO Init Begin --]
     [#if serviceType=="Init" && (ipName?contains("I2C")||ipName?contains("USB"))] 
@@ -862,7 +871,7 @@ ETH_TxPacketConfig TxConfig;
                 [/#list]
                 [#assign lowPower = "no"]
                 [#list initService.nvic as initVector]
-                   [#if (instHandler=="pcdHandle") && (initVector.vector?contains("WKUP") || initVector.vector?contains("WakeUp") || (((initVector.vector == "USB_IRQn")||(initVector.vector == "OTG_FS_IRQn")) && USB_INTERRUPT_WAKEUP??))]
+                   [#if (instHandler=="pcdHandle") && (initVector.vector?contains("WKUP") || initVector.vector?contains("WakeUp") || (((initVector.vector == "USB_IRQn")||(initVector.vector == "OTG_FS_IRQn")||(initVector.vector == "USB_LP_IRQn")) && USB_INTERRUPT_WAKEUP??))]
                       [#assign lowPower = "yes"]
                    [/#if]
                 [/#list]
@@ -1003,6 +1012,11 @@ ${variable.value} ${variable.name};
         [#assign resultList =""] 	
 [@common.getLocalVariableList instanceData=instanceData/]      
 #n      
+
+[#if RESMGR_UTILITY??]
+    [@common.optinclude name=mxTmpFolder+"/resmgrutility_"+instName+".tmp"/][#-- ADD RESMGR_UTILITY Code--]
+[/#if]
+
 [#-- if used Driver is LL --]
 [#if instanceData.usedDriver?? && instanceData.usedDriver!="HAL"][#--Check if LL driver is used. instanceData:ConfigModel --]
     [#-- varaible declaration --]

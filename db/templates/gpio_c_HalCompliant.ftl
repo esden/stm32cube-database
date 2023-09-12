@@ -11,6 +11,7 @@
 static void MX_GPIO_Init(void) 
 {
         [#assign v = ""]
+[#if data.ipName=="gpio" && FamilyName!="STM32MP1"][#-- Actualy we don't need to generate code for gpio modes not associated to any peripheral --]
         [#list data.variables as variable]				
             [#if v?contains(variable.name)]
             [#-- no matches--]
@@ -19,18 +20,19 @@ static void MX_GPIO_Init(void)
         	[#assign v = v + " "+ variable.name/]	
             [/#if]	
         [/#list]
+[/#if]
 [#if isHalSupported=="true"]
     [#if clock?size >0 ]#n#t/* GPIO Ports Clock Enable */[/#if]
-    [#list clock as clockMacro]
-        [#if clockMacro!=""] 
-            [#if clockMacro?contains("(")]
-                #t${clockMacro};
-            [#else]
-                #t${clockMacro}();
+        [#list clock as clockMacro]
+            [#if clockMacro!=""] 
+                [#if clockMacro?contains("(")]
+                    #t${clockMacro};
+                [#else]
+                    #t${clockMacro}();
+                [/#if]
             [/#if]
-        [/#if]
-    [/#list] 
-[/#if]
+        [/#list] 
+    [/#if]
 
 [#else] [#-- peripheral gpio init function --]
 [#if data.comments??]
@@ -49,10 +51,11 @@ static void MX_${data.ipName}_GPIO_Init(void)
                 [#assign v = v + " "+ variable.name/]	
             [/#if]	
         [/#list]
-    [/#if]
-
+[/#if]
 
 [#if data.methods??] [#-- if the pin configuration contains a list of LibMethods--]
+[#if data.ipName=="gpio" && FamilyName!="STM32MP1"][#-- Actualy we don't need to generate code for gpio modes not associated to any peripheral --]
+
 	[#list data.methods as method][#assign args = ""]	
 		[#if method.status=="OK"]	
                 [#-- --]                
@@ -159,9 +162,11 @@ static void MX_${data.ipName}_GPIO_Init(void)
 [/#compress]
 [/#if]
 #n
+[/#if]
 }
 
 #n
+
 [/#if] [#-- else there is no LibMethod to call--]
 
 

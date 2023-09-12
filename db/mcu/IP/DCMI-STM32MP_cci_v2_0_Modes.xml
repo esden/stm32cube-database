@@ -1,0 +1,310 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<IP DBVersion="V4.0" IPType="peripheral" Name="DCMI" Version="STM32MP_cci_v2_0" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd" xmlns="http://mcd.rou.st.com/modules.php?name=mcu">
+  <About>DCMI: Digital Camera Module Interface</About>
+
+  <!-- Generic RefParameters for DMCI --> 
+  <!-- <RefParameter Name="Instance" DefaultValue="DMCI" Comment="Instance" Type="" Visible="false"/> --> 
+
+  <RefParameter Name="SynchroMode" Comment="Synchronization Mode" DefaultValue="DCMI_SYNCHRO_EMBEDDED" Type="list" Visible="false">
+    <Condition Diagnostic="SynchroMode" Expression="DCMI_Embedded"/>
+    <PossibleValue Value="DCMI_SYNCHRO_EMBEDDED" Comment="Embedded synchronization data capture is synchronized with synchronization codes embedded in the data flow"/>
+  </RefParameter>
+  <RefParameter Name="SynchroMode" Comment="Synchronization Mode" DefaultValue="DCMI_SYNCHRO_HARDWARE" Type="list"  Visible="false">
+    <PossibleValue Value="DCMI_SYNCHRO_HARDWARE" Comment="Hardware synchronization data capture (frame/line start/stop) is synchronized with the HSYNC/VSYNC signals"/>
+  </RefParameter>
+
+  <RefParameter Name="PCKPolarity" Comment="Pixel clock polarity" DefaultValue="DCMI_PCKPOLARITY_FALLING" Type="list" Group="Mode Config"  Visible="true">
+    <PossibleValue Value="DCMI_PCKPOLARITY_FALLING" Comment="Active on Falling edge"/> 
+    <PossibleValue Value="DCMI_PCKPOLARITY_RISING" Comment="Active on Rising edge"/>
+   </RefParameter>
+
+  <RefParameter Name="VSPolarity" Comment="Vertical synchronization polarity" DefaultValue="DCMI_VSPOLARITY_LOW" Type="list" Group="Mode Config"  Visible="true">
+    <Condition Diagnostic="VSPolarity" Expression="DCMI_Embedded=0"/>
+    <PossibleValue Value="DCMI_VSPOLARITY_HIGH" Comment="Active High"/>
+    <PossibleValue Value="DCMI_VSPOLARITY_LOW" Comment="Active Low"/>
+  </RefParameter>
+  <RefParameter Name="VSPolarity" Comment="Vertical synchronization polarity" DefaultValue="null" Type="list" Group="Mode Config"  Visible="false">
+  </RefParameter>
+
+  <RefParameter Name="HSPolarity" Comment="Horizontal synchronization polarity" DefaultValue="DCMI_HSPOLARITY_LOW" Type="list" Group="Mode Config"  Visible="true">
+    <Condition Diagnostic="VSPolarity" Expression="DCMI_Embedded=0"/>
+    <PossibleValue Value="DCMI_HSPOLARITY_HIGH" Comment="Active High"/>
+    <PossibleValue Value="DCMI_HSPOLARITY_LOW" Comment="Active Low"/>
+  </RefParameter>
+  <RefParameter Name="HSPolarity" Comment="Horizontal synchronization polarity" DefaultValue="null" Type="list" Group="Mode Config"  Visible="false">
+  </RefParameter>
+
+  <RefParameter Name="CaptureRate" Comment="Frequency of frame capture" DefaultValue="DCMI_CR_ALL_FRAME" Type="list" Group="Mode Config"  Visible="true">
+    <!--<Condition Diagnostic="CaptureRate" Expression="DCMI_Embedded=0"/>-->
+    <PossibleValue Value="DCMI_CR_ALTERNATE_4_FRAME" Comment="One frame in 4 frames captured"/>
+    <PossibleValue Value="DCMI_CR_ALTERNATE_2_FRAME" Comment="Every alternate frame captured"/>
+    <PossibleValue Value="DCMI_CR_ALL_FRAME" Comment="All frames are captured"/>
+  </RefParameter>
+  <RefParameter Name="CaptureRate" Comment="Frequency of frame capture" DefaultValue="null" Type="list" Group="Mode Config"  Visible="false">
+  </RefParameter>
+
+  <RefParameter Name="ExtendedDataMode" Comment="Data width set to 14 bits" DefaultValue="DCMI_EXTEND_DATA_14B" Type="list" Visible="false">
+    <Condition Diagnostic="" Expression="DCMI_14_bits"/>
+    <PossibleValue Value="DCMI_EXTEND_DATA_14B" Comment="14-bit data on every pixel clock"/>
+  </RefParameter>
+  <RefParameter Name="ExtendedDataMode" Comment="Data width set to 12 bits" DefaultValue="DCMI_EXTEND_DATA_12B"  Type="list" Visible="false">
+    <Condition Diagnostic="" Expression="DCMI_12_bits"/>
+    <PossibleValue Value="DCMI_EXTEND_DATA_12B" Comment="12-bit data on every pixel clock"/>
+  </RefParameter>
+  <RefParameter Name="ExtendedDataMode" Comment="Data width set to 10 bits" DefaultValue="DCMI_EXTEND_DATA_10B" Type="list"  Visible="false">
+    <Condition Diagnostic="" Expression="DCMI_10_bits"/>
+    <PossibleValue Value="DCMI_EXTEND_DATA_10B" Comment="10-bit data on every pixel clock"/>
+  </RefParameter>
+  <RefParameter Name="ExtendedDataMode" Comment="Data width set to 8 bits" DefaultValue="DCMI_EXTEND_DATA_8B" Type="list" Visible="false">
+    <Condition Diagnostic="" Expression="DCMI_8_bits"/>
+    <PossibleValue Value="DCMI_EXTEND_DATA_8B" Comment="8-bit data on every pixel clock"/>
+  </RefParameter>
+  <RefParameter Name="ExtendedDataMode" Comment="Data width set to 8 bits" DefaultValue="DCMI_EXTEND_DATA_8B" Type="list" Visible="false">
+    <PossibleValue Value="DCMI_EXTEND_DATA_8B" Comment="8-bit data on every pixel clock"/>
+  </RefParameter>
+
+  <RefParameter Name="FrameStartCode" Comment="Frame Start Code" DefaultValue="0" Max="255" Min="0" Type="integer" Group="Synchro Config">
+    <Condition Diagnostic="" Expression="DCMI_Embedded"/>
+  </RefParameter>
+
+  <RefParameter Name="FrameEndCode" Comment="Frame End Code" DefaultValue="0" Max="255" Min="0" Type="integer" Group="Synchro Config">
+    <Condition Diagnostic="" Expression="DCMI_Embedded"/>
+  </RefParameter>
+
+  <RefParameter Name="LineEndCode" Comment="Line End Code" DefaultValue="0" Max="255" Min="0" Type="integer" Group="Synchro Config">
+    <Condition Diagnostic="" Expression="DCMI_Embedded"/>
+  </RefParameter>
+
+  <RefParameter Name="LineStartCode" Comment="Line Start Code" DefaultValue="0" Max="255" Min="0" Type="integer" Group="Synchro Config">
+    <Condition Diagnostic="" Expression="DCMI_Embedded"/>
+  </RefParameter>
+
+  <RefParameter Name="JPEGMode" Comment="JPEG mode" DefaultValue="DCMI_JPEG_DISABLE" Type="list" Group="Mode Config">
+    <Condition Diagnostic="JPEGMode" Expression="DCMI_Embedded=0"/>
+    <PossibleValue Value="DCMI_JPEG_ENABLE" Comment="Enabled"/>
+    <PossibleValue Value="DCMI_JPEG_DISABLE" Comment="Disabled"/>
+  </RefParameter>
+  <RefParameter Name="JPEGMode" Comment="JPEG mode" DefaultValue="null" Type="list" Group="Mode Config" Visible="false">
+  </RefParameter>
+
+  <RefParameter Comment="Byte Select Mode" DefaultValue="DCMI_BSM_ALL" Name="ByteSelectMode" Type="list" Group="Interface Capture Config">
+    <Condition Expression="DCMI_8_bits" Diagnostic="Extended data mode not set to 8-bit data"/>
+    <Description>Specifies the data to be captured by the interface.</Description>
+    <PossibleValue Comment="Interface captures all received bytes" Value="DCMI_BSM_ALL" Semaphore="AllReceivedBytes"/>
+    <PossibleValue Comment="Interface captures every other byte from the received data" Value="DCMI_BSM_OTHER"/>
+    <PossibleValue Comment="Interface captures one byte out of four" Value="DCMI_BSM_ALTERNATE_4"/>
+    <PossibleValue Comment="Interface captures two bytes out of four" Value="DCMI_BSM_ALTERNATE_2"/>
+  </RefParameter>
+  <RefParameter Comment="Byte Select Mode" DefaultValue="DCMI_BSM_ALL" Name="ByteSelectMode" Type="list" Visible="false">
+    <PossibleValue Comment="Interface captures all received bytes" Value="DCMI_BSM_ALL" Semaphore="AllReceivedBytes"/>
+  </RefParameter>
+
+  <RefParameter Comment="Byte Select Start" DefaultValue="DCMI_OEBS_ODD" Name="ByteSelectStart" Type="list" Group="Interface Capture Config">
+    <Condition Expression="!AllReceivedBytes" Diagnostic="ByteSelectMode set to all received data"/>
+    <Description>Specifies if the data to be captured by the interface is even or odd.</Description>
+    <PossibleValue Comment="Interface captures first data from the frame/line start, second one being dropped" Value="DCMI_OEBS_ODD"/>
+    <PossibleValue Comment="Interface captures second data from the frame/line start, first one being dropped" Value="DCMI_OEBS_EVEN"/>
+  </RefParameter>
+  <RefParameter Comment="Byte Select Start" DefaultValue="DCMI_OEBS_ODD" Name="ByteSelectStart" Type="list" Visible="false">
+    <PossibleValue Comment="Interface captures first data from the frame/line start, second one being dropped" Value="DCMI_OEBS_ODD"/>
+  </RefParameter>
+
+  <RefParameter Comment="Line Select Mode" DefaultValue="DCMI_LSM_ALL" Name="LineSelectMode" Type="list" Group="Interface Capture Config">
+    <Description>Specifies the lines of data to be captured by the interface.</Description>
+    <PossibleValue Comment="Interface captures all received lines" Value="DCMI_LSM_ALL" Semaphore="AllReceivedLines"/>
+    <PossibleValue Comment="Interface captures one line out of two" Value="DCMI_LSM_ALTERNATE_2"/>
+  </RefParameter>
+
+  <RefParameter Comment="Line Select Start" DefaultValue="DCMI_OELS_ODD" Name="LineSelectStart" Type="list" Group="Interface Capture Config">
+    <Condition Expression="!AllReceivedLines" Diagnostic="LineSelectMode set to all received lines"/>
+    <Description>Specifies if the line of data to be first captured by the interface is even or odd.</Description>
+    <PossibleValue Comment="Interface captures first line from the frame start, second one being dropped" Value="DCMI_OELS_ODD"/>
+    <PossibleValue Comment="Interface captures second line from the frame start, first one being dropped" Value="DCMI_OELS_EVEN"/>
+  </RefParameter>
+  <RefParameter Comment="Line Select Start" DefaultValue="DCMI_OELS_ODD" Name="LineSelectStart" Type="list" Visible="false">
+    <PossibleValue Comment="Interface captures first line from the frame start, second one being dropped" Value="DCMI_OELS_ODD"/>
+  </RefParameter>
+
+  <RefMode Name="DCMI_Init_External_Synchro" Comment="DCMI initialization" HalMode="DCMI" Abstract="true">
+    <ConfigForMode>DCMI_Init</ConfigForMode>
+	  <Parameter Name="ExtendedDataMode"/>
+	  <Parameter Name="PCKPolarity"/>
+	  <Parameter Name="VSPolarity"/>
+	  <Parameter Name="HSPolarity"/>
+	  <Parameter Name="CaptureRate"/>
+	  <Parameter Name="JPEGMode"/>
+	  <Parameter Name="SynchroMode"/>
+	  <Parameter Name="ByteSelectMode"/>
+    <Parameter Name="ByteSelectStart"/>
+    <Parameter Name="LineSelectMode"/>
+    <Parameter Name="LineSelectStart"/>
+  </RefMode>
+ 
+  <!-- RefMode for SynchroModeSoftware -->
+  <RefMode Name="Slave_8_bits_Embedded_Synchro" Comment="Slave 8 bits Embedded-Synchro" HalMode="DCMI">
+    <ConfigForMode>DCMI_Init</ConfigForMode>
+	  <Parameter Name="ExtendedDataMode"/>
+	  <Parameter Name="PCKPolarity"/>
+	  <Parameter Name="FrameStartCode"/>
+	  <Parameter Name="FrameEndCode"/>
+	  <Parameter Name="LineEndCode"/>
+	  <Parameter Name="LineStartCode"/>
+	  <Parameter Name="CaptureRate"/>
+	  <Parameter Name="JPEGMode">
+	    <PossibleValue>DCMI_JPEG_DISABLE</PossibleValue>
+	  </Parameter>
+	  <Parameter Name="SynchroMode"/>
+	  <Parameter Name="ByteSelectMode"/>
+    <Parameter Name="ByteSelectStart"/>
+    <Parameter Name="LineSelectMode"/>
+    <Parameter Name="LineSelectStart"/>
+  </RefMode>
+
+  <!-- RefMode for SynchroModeHardware -->
+  <RefMode Name="Slave_8_bits_External_Synchro" Comment="Slave 8 bits External Synchro" BaseMode="DCMI_Init_External_Synchro">
+  </RefMode>
+
+  <RefMode Name="Slave_10_bits_External_Synchro" Comment="Slave 10 bits External Synchro" BaseMode="DCMI_Init_External_Synchro">
+  </RefMode>
+
+  <RefMode Name="Slave_12_bits_External_Synchro" Comment="Slave 12 bits External Synchro" BaseMode="DCMI_Init_External_Synchro">
+  </RefMode>
+
+  <RefMode Name="Slave_14_bits_External_Synchro" Comment="Slave 14 bits External Synchro" BaseMode="DCMI_Init_External_Synchro">
+  </RefMode>
+
+	<ModeLogicOperator Name="OR">
+		<Mode Name="DCMI">
+			<ModeLogicOperator Name="XOR">
+				<Mode Name="Slave_8_bits_Embedded_Synchro" UserName="Slave 8 bits Embedded Synchro">
+          <Semaphore>DCMI_Embedded</Semaphore>
+          <Semaphore>DCMI_8_bits</Semaphore>
+					<SignalLogicalOp Name="AND">
+						<Signal Name="D0"/>
+						<Signal Name="D1"/>
+						<Signal Name="D2"/>
+						<Signal Name="D3"/>
+						<Signal Name="D4"/>
+						<Signal Name="D5"/>
+						<Signal Name="D6"/>
+						<Signal Name="D7"/>
+						<Signal Name="PIXCLK"/>
+					</SignalLogicalOp>
+				</Mode>
+				<Mode Name="Slave_8_bits_External_Synchro" UserName="Slave 8 bits External Synchro">
+				  <Semaphore>DCMI_8_bits</Semaphore>
+					<SignalLogicalOp Name="AND">
+						<Signal Name="D0"/>
+						<Signal Name="D1"/>
+						<Signal Name="D2"/>
+						<Signal Name="D3"/>
+						<Signal Name="D4"/>
+						<Signal Name="D5"/>
+						<Signal Name="D6"/>
+						<Signal Name="D7"/>
+						<Signal Name="HSYNC"/>
+						<Signal Name="PIXCLK"/>
+						<Signal Name="VSYNC"/>
+					</SignalLogicalOp>
+				</Mode>
+				<Mode Name="Slave_10_bits_External_Synchro" UserName="Slave 10 bits External Synchro">
+          <Semaphore>DCMI_10_bits</Semaphore>
+					<SignalLogicalOp Name="AND">
+						<Signal Name="D0"/>
+						<Signal Name="D1"/>
+						<Signal Name="D2"/>
+						<Signal Name="D3"/>
+						<Signal Name="D4"/>
+						<Signal Name="D5"/>
+						<Signal Name="D6"/>
+						<Signal Name="D7"/>
+						<Signal Name="D8"/>
+						<Signal Name="D9"/>
+						<Signal Name="HSYNC"/>
+						<Signal Name="PIXCLK"/>
+						<Signal Name="VSYNC"/>
+					</SignalLogicalOp>
+				</Mode>
+				<Mode Name="Slave_12_bits_External_Synchro" UserName="Slave 12 bits External Synchro">
+          <Semaphore>DCMI_12_bits</Semaphore>
+					<SignalLogicalOp Name="AND">
+						<Signal Name="D0"/>
+						<Signal Name="D1"/>
+						<Signal Name="D10"/>
+						<Signal Name="D11"/>
+						<Signal Name="D2"/>
+						<Signal Name="D3"/>
+						<Signal Name="D4"/>
+						<Signal Name="D5"/>
+						<Signal Name="D6"/>
+						<Signal Name="D7"/>
+						<Signal Name="D8"/>
+						<Signal Name="D9"/>
+						<Signal Name="HSYNC"/>
+						<Signal Name="PIXCLK"/>
+						<Signal Name="VSYNC"/>
+					</SignalLogicalOp>
+				</Mode>
+				<Mode Name="Slave_14_bits_External_Synchro" UserName="Slave 14 bits External Synchro">
+          <Semaphore>DCMI_14_bits</Semaphore>
+					<SignalLogicalOp Name="AND">
+						<Signal Name="D0"/>
+						<Signal Name="D1"/>
+						<Signal Name="D10"/>
+						<Signal Name="D11"/>
+						<Signal Name="D12"/>
+						<Signal Name="D13"/>
+						<Signal Name="D2"/>
+						<Signal Name="D3"/>
+						<Signal Name="D4"/>
+						<Signal Name="D5"/>
+						<Signal Name="D6"/>
+						<Signal Name="D7"/>
+						<Signal Name="D8"/>
+						<Signal Name="D9"/>
+						<Signal Name="HSYNC"/>
+						<Signal Name="PIXCLK"/>
+						<Signal Name="VSYNC"/>
+					</SignalLogicalOp>
+				</Mode>
+			</ModeLogicOperator>
+		</Mode>
+	</ModeLogicOperator>
+  <RefSignal IOMode="AlternateFunctionPuPdOnly" Name="D0"/>
+	<RefSignal IOMode="AlternateFunctionPuPdOnly" Name="D1"/>
+	<RefSignal IOMode="AlternateFunctionPuPdOnly" Name="D2"/>
+	<RefSignal IOMode="AlternateFunctionPuPdOnly" Name="D3"/>
+	<RefSignal IOMode="AlternateFunctionPuPdOnly" Name="D4"/>
+	<RefSignal IOMode="AlternateFunctionPuPdOnly" Name="D5"/>
+	<RefSignal IOMode="AlternateFunctionPuPdOnly" Name="D6"/>
+	<RefSignal IOMode="AlternateFunctionPuPdOnly" Name="D7"/>
+	<RefSignal IOMode="AlternateFunctionPuPdOnly" Name="D8"/>
+	<RefSignal IOMode="AlternateFunctionPuPdOnly" Name="D9"/>
+	<RefSignal IOMode="AlternateFunctionPuPdOnly" Name="D10"/>
+	<RefSignal IOMode="AlternateFunctionPuPdOnly" Name="D11"/>
+	<RefSignal IOMode="AlternateFunctionPuPdOnly" Name="D12"/>
+	<RefSignal IOMode="AlternateFunctionPuPdOnly" Name="D13"/>
+	<RefSignal IOMode="AlternateFunctionPuPdOnly" Name="HSYNC"/>
+	<RefSignal IOMode="AlternateFunctionPuPdOnly" Name="PIXCLK"/>
+	<RefSignal IOMode="AlternateFunctionPuPdOnly" Name="VSYNC"/>
+	<!--
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="D0"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="D1"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="D2"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="D3"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="D4"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="D5"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="D6"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="D7"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="D8"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="D9"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="D10"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="D11"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="D12"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="D13"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="HSYNC"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="PIXCLK"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="VSYNC"/>
+	-->
+        <Semaphore>$IpInstanceUsed_ForRCC</Semaphore>
+</IP>

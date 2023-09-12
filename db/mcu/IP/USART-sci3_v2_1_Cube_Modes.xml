@@ -47,7 +47,7 @@
         <Condition Diagnostic="" Expression="$IpInstance_UART_AutoBaudRate_Enable"/>
     </RefParameter>
     <RefParameter Comment="Baud Rate" DefaultValue="921600" Group="Basic Parameters" Max="10500000" Min="110" Name="BaudRate" Type="integer" Unit="Bits/s">
-        <Condition Diagnostic="" Expression="USBPD_$IpInstance"/>
+        <Condition Diagnostic="" Expression="TRACEREMB_$IpInstance"/>
     </RefParameter>
     <RefParameter Comment="Baud Rate" DefaultValue="115200" Group="Basic Parameters" Max="10500000" Min="110" Name="BaudRate" Type="integer" Unit="Bits/s" Visible="true"/>
    
@@ -82,6 +82,12 @@
     <RefParameter Comment="Word Length" DefaultValue="WORDLENGTH_8B" Group="Basic Parameters" Name="WordLength" Type="list">
         <Condition Diagnostic="" Expression="VirtualMode = VM_LIN"/>
         <PossibleValue Comment="8 Bits (including Parity)" Value="WORDLENGTH_8B"/>
+    </RefParameter>
+    <RefParameter Comment="Word Length" DefaultValue="WORDLENGTH_8B" Group="Basic Parameters" Name="WordLength" Type="list">
+        <Condition Diagnostic="" Expression="Semaphore_DBG_TRACE_UART_CFG_hw_uart1 | Semaphore_CFG_CONSOLE_MENU_hw_uart1 | Semaphore_CFG_UART_CLI_hw_uart1"/>
+        <PossibleValue Comment="7 Bits (including Parity)" Semaphore="$IpInstance_Uart_7B" Value="WORDLENGTH_7B"/>
+        <PossibleValue Comment="8 Bits (including Parity)" Value="WORDLENGTH_8B"/>
+        <PossibleValue Comment="9 Bits (including Parity)" Value="WORDLENGTH_9B"/>
     </RefParameter>
     <RefParameter Comment="Word Length" DefaultValue="WORDLENGTH_7B" Group="Basic Parameters" Name="WordLength" Type="list">
         <PossibleValue Comment="7 Bits (including Parity)" Semaphore="$IpInstance_Uart_7B" Value="WORDLENGTH_7B"/>
@@ -125,6 +131,10 @@
         <Condition Diagnostic="" Expression="WordLength=WORDLENGTH_9B"/>
         <PossibleValue Comment="9 Bits (including Parity)" Value="UART_WORDLENGTH_9B"/>
     </RefParameter>
+    <RefParameter Comment="Word Length" DefaultValue="SMARTCARD_WORDLENGTH_9B" Group="Basic Parameters" Name="SmartCardWordLength" Type="list">
+        <Condition Diagnostic="" Expression="WordLength=WORDLENGTH_9B"/>
+        <PossibleValue Comment="9 Bits (including Parity)" Value="SMARTCARD_WORDLENGTH_9B"/>
+    </RefParameter>
 	
 	
     <!-- Stop Bits Parameters for Synchronous, SmartCard and Others (based on Asyncronous). N.B. IrDa do not have Stop Bits -->
@@ -142,22 +152,11 @@
         <PossibleValue Comment="0.5" Value="STOPBITS_0_5"/>
         <PossibleValue Comment="1.5" Value="STOPBITS_1_5"/>
     </RefParameter>
-    <RefParameter Comment="Stop Bits" DefaultValue="STOPBITS_1" Group="Basic Parameters" Name="StopBits" Type="list">
-        <Condition Diagnostic="" Expression="$IpInstance_Asynchronous"/>
-        <PossibleValue Comment="1" Value="STOPBITS_1"/>
-        <PossibleValue Comment="2" Value="STOPBITS_2"/>
-        <PossibleValue Comment="1.5" Value="STOPBITS_1_5"/>
-    </RefParameter>
     <RefParameter Comment="Stop Bits" DefaultValue="STOPBITS_1_5" Group="Basic Parameters" Name="StopBits" Type="list">
         <Condition Diagnostic="" Expression="VirtualMode = VM_SMARTCARD"/>
         <PossibleValue Comment="1.5" Value="STOPBITS_1_5"/>
         <PossibleValue Comment="0.5" Value="STOPBITS_0_5"/>
     </RefParameter>
-    <RefParameter Comment="Stop Bits" DefaultValue="STOPBITS_1_5" Group="Basic Parameters" Name="StopBits" Type="list">
-        <Condition Diagnostic="" Expression="VirtualMode = VM_SMARTCARD"/>
-        <PossibleValue Comment="1.5" Value="STOPBITS_1_5"/>
-    </RefParameter>
-
     <RefParameter Comment="Stop Bits" DefaultValue="STOPBITS_1" Group="Basic Parameters" Name="StopBits" Type="list">
         <PossibleValue Comment="1" Value="STOPBITS_1"/>
         <PossibleValue Comment="2" Value="STOPBITS_2"/>
@@ -346,6 +345,11 @@
         <PossibleValue Comment="None" Value="UART_HWCONTROL_NONE"/>
     </RefParameter>
 	
+    <RefParameter Comment="Over Sampling" DefaultValue="UART_OVERSAMPLING_8" Group="Advanced Parameters" Name="OverSampling" Type="list">
+        <Condition Diagnostic="" Expression="Semaphore_DBG_TRACE_UART_CFG_hw_uart1 | Semaphore_CFG_CONSOLE_MENU_hw_uart1 | Semaphore_CFG_UART_CLI_hw_uart1 | Semaphore_CFG_UART_GUI_hw_uart1"/>
+        <PossibleValue Comment="16 Samples" Value="UART_OVERSAMPLING_16"/>
+        <PossibleValue Comment="8 Samples" Value="UART_OVERSAMPLING_8"/>
+    </RefParameter>
     <RefParameter Comment="Over Sampling" DefaultValue="UART_OVERSAMPLING_16" Group="Advanced Parameters" Name="OverSampling" Type="list">
         <Condition Diagnostic="" Expression="VirtualMode = VM_ASYNC"/>
         <PossibleValue Comment="16 Samples" Value="UART_OVERSAMPLING_16"/>
@@ -745,11 +749,11 @@
         <PossibleValue Comment="Enable" Semaphore="$IpInstance_SC_TxPinLevelInvertENABLE" Value="SMARTCARD_ADVFEATURE_TXINV_ENABLE"/>
     </RefParameter>   
     <RefParameter Comment="TX Pin Active Level Inversion" DefaultValue="UART_ADVFEATURE_TXINV_DISABLE" Group="Advanced Features" Name="UartTxPinLevelInvertParam" Type="list">
-        <Condition Diagnostic="" Expression="(TxPinLevelInvertParam=ADVFEATURE_TXINV_DISABLE)"/>
+        <Condition Diagnostic="" Expression="(TxPinLevelInvertParam=ADVFEATURE_TXINV_DISABLE) &amp; !(VirtualClockMode = VM_SMARTCARD)"/>
         <PossibleValue Comment="Disable" Value="UART_ADVFEATURE_TXINV_DISABLE"/>
     </RefParameter>
     <RefParameter Comment="TX Pin Active Level Inversion" DefaultValue="UART_ADVFEATURE_TXINV_DISABLE" Group="Advanced Features" Name="UartTxPinLevelInvertParam" Type="list">
-        <Condition Diagnostic="" Expression="(TxPinLevelInvertParam=ADVFEATURE_TXINV_ENABLE)"/>
+        <Condition Diagnostic="" Expression="(TxPinLevelInvertParam=ADVFEATURE_TXINV_ENABLE) &amp; !(VirtualClockMode = VM_SMARTCARD)"/>
         <PossibleValue Comment="Enable" Semaphore="$IpInstance_TxPinLevelInvertENABLE" Value="UART_ADVFEATURE_TXINV_ENABLE"/>
     </RefParameter>
 	
@@ -807,7 +811,7 @@
     </RefParameter>
 
     <RefParameter Comment="RX Pin Active Level Inversion" DefaultValue="UART_ADVFEATURE_RXINV_ENABLE" Group="Advanced Features" Name="UartRxPinLevelInvertParam" Type="list">
-        <Condition Diagnostic="" Expression="(RxPinLevelInvertParam=ADVFEATURE_RXINV_ENABLE)"/>
+        <Condition Diagnostic="" Expression="(RxPinLevelInvertParam=ADVFEATURE_RXINV_ENABLE) &amp; !(VirtualClockMode = VM_SMARTCARD)"/>
         <PossibleValue Comment="Enable" Semaphore="$IpInstance_RxPinLevelInvertENABLE" Value="UART_ADVFEATURE_RXINV_ENABLE"/>
     </RefParameter>
 	
@@ -866,7 +870,7 @@
     </RefParameter>
 
     <RefParameter Comment="Data Inversion" DefaultValue="UART_ADVFEATURE_DATAINV_ENABLE" Group="Advanced Features" Name="UartDataInvertParam" Type="list">
-        <Condition Diagnostic="" Expression="(DataInvertParam = ADVFEATURE_DATAINV_ENABLE)"/>
+        <Condition Diagnostic="" Expression="(DataInvertParam = ADVFEATURE_DATAINV_ENABLE) &amp; !(VirtualClockMode = VM_SMARTCARD)"/>
         <PossibleValue Comment="Enable" Semaphore="$IpInstance_DataInvertENABLE" Value="UART_ADVFEATURE_DATAINV_ENABLE"/>
     </RefParameter>
 	
@@ -924,7 +928,7 @@
     </RefParameter>
 
     <RefParameter Comment="TX and RX Pins Swapping" DefaultValue="UART_ADVFEATURE_SWAP_ENABLE" Group="Advanced Features" Name="UartSwapParam" Type="list">
-        <Condition Diagnostic="" Expression="(SwapParam=ADVFEATURE_SWAP_ENABLE)"/>
+        <Condition Diagnostic="" Expression="(SwapParam=ADVFEATURE_SWAP_ENABLE) &amp; !(VirtualMode = VM_SMARTCARD)"/>
         <PossibleValue Comment="Enable" Semaphore="$IpInstance_SwapENABLE" Value="UART_ADVFEATURE_SWAP_ENABLE"/>
     </RefParameter>
 	
@@ -984,7 +988,7 @@
     </RefParameter>
     
     <RefParameter Comment="Overrun" DefaultValue="UART_ADVFEATURE_OVERRUN_DISABLE" Group="Advanced Features" Name="UartOverrunDisableParam" Type="list">
-        <Condition Diagnostic="" Expression="(OverrunDisableParam=ADVFEATURE_OVERRUN_DISABLE)"/>
+        <Condition Diagnostic="" Expression="(OverrunDisableParam=ADVFEATURE_OVERRUN_DISABLE) &amp; !(VirtualClockMode = VM_SMARTCARD)"/>
         <PossibleValue Comment="Disable" Semaphore="$IpInstance_OverrunDisableENABLE" Value="UART_ADVFEATURE_OVERRUN_DISABLE"/>
     </RefParameter>
 	
@@ -1045,7 +1049,7 @@
         <PossibleValue Comment="Disable" Value="SMARTCARD_ADVFEATURE_DMA_DISABLEONRXERROR"/>
     </RefParameter>
     <RefParameter Comment="DMA on RX Error" DefaultValue="UART_ADVFEATURE_DMA_DISABLEONRXERROR" Group="Advanced Features" Name="UartDMADisableonRxErrorParam" Type="list">
-        <Condition Diagnostic="" Expression="(DMADisableonRxErrorParam=ADVFEATURE_DMA_DISABLEONRXERROR)"/>
+        <Condition Diagnostic="" Expression="(DMADisableonRxErrorParam=ADVFEATURE_DMA_DISABLEONRXERROR)  &amp; !(VirtualMode = VM_SMARTCARD)"/>
         <PossibleValue Comment="Disable" Semaphore="$IpInstance_DMADisableonRxErrorENABLE" Value="UART_ADVFEATURE_DMA_DISABLEONRXERROR"/>
     </RefParameter>
 	
@@ -1100,7 +1104,7 @@
         <PossibleValue Comment="Enable" Value="SMARTCARD_ADVFEATURE_MSBFIRST_ENABLE"/>
     </RefParameter>
     <RefParameter Comment="MSB First" DefaultValue="UART_ADVFEATURE_MSBFIRST_ENABLE" Group="Advanced Features" Name="UartMSBFirstParam" Type="list">
-        <Condition Diagnostic="" Expression="(MSBFirstParam=ADVFEATURE_MSBFIRST_ENABLE)"/>
+        <Condition Diagnostic="" Expression="(MSBFirstParam=ADVFEATURE_MSBFIRST_ENABLE) &amp; !(VirtualMode = VM_SMARTCARD)"/>
         <PossibleValue Comment="Enable" Semaphore="$IpInstance_MSBFirstENABLE" Value="UART_ADVFEATURE_MSBFIRST_ENABLE"/>
     </RefParameter>
 	
@@ -1334,7 +1338,7 @@
         <PossibleValue Comment="RXFIFO threshold 1 eighth full configuration " Value="UART_RXFIFO_THRESHOLD_1_8"/>
     </RefParameter>
     <RefParameter Comment="Rxfifo Threshold" DefaultValue="UART_RXFIFO_THRESHOLD_1_4" Group="Advanced Parameters" Name="UartRXFIFOThreshold" Type="list">
-        <Condition Diagnostic="" Expression="(VVirtualMode = VM_ASYNC | VirtualMode = VM_LIN) &amp; RXFIFOThreshold=RXFIFO_THRESHOLD_1QUARTERFULL"/>
+        <Condition Diagnostic="" Expression="(VirtualMode = VM_ASYNC | VirtualMode = VM_LIN) &amp; RXFIFOThreshold=RXFIFO_THRESHOLD_1QUARTERFULL"/>
         <PossibleValue Comment="RXFIFO threshold 1 quart full configuration " Value="UART_RXFIFO_THRESHOLD_1_4"/>
     </RefParameter>
     <RefParameter Comment="Rxfifo Threshold" DefaultValue="UART_RXFIFO_THRESHOLD_1_2" Group="Advanced Parameters" Name="UartRXFIFOThreshold" Type="list">
@@ -1766,6 +1770,7 @@
                     </SignalLogicalOp>
                 </Mode>
             </ModeLogicOperator>
+            <Semaphore>S_USART</Semaphore>
         </Mode>
 		
         <Mode Name="Hardware Flow Control (RS232)">
@@ -1792,6 +1797,7 @@
             </ModeLogicOperator>
             <Condition Diagnostic="Active only with Asynchronous Mode" Expression="$IpInstance_Asynchronous &amp; !$IpInstance_HardwareControl"/>
             <Semaphore>$IpInstance_FlowControl</Semaphore>
+            <Semaphore>S_USART</Semaphore>
         </Mode>
         <!--
         <Mode Name = "SmartCard Clock">
@@ -1815,6 +1821,7 @@
             </ModeLogicOperator>
             <Condition Diagnostic="Active only with Asynchronous Mode" Expression="!$IpInstance_FlowControl &amp; $IpInstance_Asynchronous"/>
             <Semaphore>$IpInstance_HardwareControl</Semaphore>
+            <Semaphore>S_USART</Semaphore>
         </Mode>
 		
         <Mode Name="Slave Select(NSS) Management">
@@ -1834,6 +1841,7 @@
             </ModeLogicOperator>
             <Condition Diagnostic="Active only with Synchronous Slave Mode" Expression="$IpInstance_Synchronous_Slave"/>
             <Semaphore>$IpInstance_Slave_Select</Semaphore>
+            <Semaphore>S_USART</Semaphore>
         </Mode>
 		
     </ModeLogicOperator>
@@ -1845,7 +1853,7 @@
     <RefSignal IOMode="AlternateFunctionPushPull" Name="CTS"/>
     <RefSignal IOMode="AlternateFunctionPushPull" Name="RTS"/>
     <RefSignal IOMode="AlternateFunctionPushPull" Name="DE"/>
-    <RefSignal IOMode="AlternateFunctionPushPullUp" Name="RX"/>
-    <RefSignal IOMode="AlternateFunctionPushPullUp" Name="TX"/>
-    <Semaphore>$IpInstanceUsed_ForRCC</Semaphore>
+    <RefSignal IOMode="AlternateFunctionOpenDrainAndPushPullDefaultPP" Name="RX"/>
+    <RefSignal IOMode="AlternateFunctionOpenDrainAndPushPullDefaultPP" Name="TX"/>
+    <Semaphore>$IpInstanceUsed_ForRCC</Semaphore>    
 </IP>

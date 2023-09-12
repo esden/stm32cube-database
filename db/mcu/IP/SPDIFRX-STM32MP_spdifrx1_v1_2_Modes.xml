@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<IP DBVersion="V4.0" IPType="peripheral" IpGroup="Multimedia"  Name="SPDIFRX" Version="STM32MP_spdifrx1_v1_2" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd" xmlns="http://mcd.rou.st.com/modules.php?name=mcu">
+  <About>SPDIF Receiver Interface (SPDIFRX) : allows to manage the S/PDIF audio protocol.</About>
+
+
+
+<RefParameter Comment="Max Frequency Supported for Incoming Audio Stream" DefaultValue="192000" Name="MaxAudioRate" Type="string" Unit="Hz" Group="IP Clocking and Limitation">
+            <Condition Diagnostic="spdifrxfreq greater than 135 MHz" Expression="((RCC:$IpInstanceFreq_Value) &gt; 135168000)"/>
+</RefParameter> 
+
+<RefParameter Comment="Max Frequency Supported for Incoming Audio Stream" DefaultValue="=(RCC:$IpInstanceFreq_Value)/704" Name="MaxAudioRate" Type="string" Unit="Hz" Group="IP Clocking and Limitation">
+            <Condition Diagnostic="spdifrxfreq greater than 135 MHz" Expression="!((RCC:$IpInstanceFreq_Value) &gt; 135168000)"/>
+</RefParameter> 
+
+<RefParameter Comment="SPDIF Clock" DefaultValue="=(RCC:$IpInstanceFreq_Value)" Name="frequenceIP" Type="string" Unit="Hz" Group="IP Clocking and Limitation">
+ </RefParameter>
+
+
+ <RefParameter Comment="Selected Input" DefaultValue="SPDIFRX_INPUT_IN0" Name="InputSelection" Type="list" Group="Pinout Selection" >
+        <Description>Specifies the SPDIF input selection</Description>
+        <PossibleValue Comment="IN0" Value="SPDIFRX_INPUT_IN0" Condition="!Semaphore_$IpInstance_IN0" Diagnostic="Not selected in the pinout view" Action="Disable"/>
+        <PossibleValue Comment="IN1" Value="SPDIFRX_INPUT_IN1" Condition="!Semaphore_$IpInstance_IN1" Diagnostic="Not selected in the pinout view" Action="Disable"/>
+        <PossibleValue Comment="IN2" Value="SPDIFRX_INPUT_IN2" Condition="!Semaphore_$IpInstance_IN2" Diagnostic="Not selected in the pinout view" Action="Disable"/>
+        <PossibleValue Comment="IN3" Value="SPDIFRX_INPUT_IN3" Condition="!Semaphore_$IpInstance_IN3" Diagnostic="Not selected in the pinout view" Action="Disable"/>
+  </RefParameter>
+
+<!-- values has to be changed next release !!!!!!!!!!-->
+    <RefParameter Comment="Retries" DefaultValue="SPDIFRX_MAXRETRIES_NONE" Name="Retries" Type="list" Group="Synchronization Configuration">
+        <Description>Specifies the Maximum allowed re-tries during synchronization phase</Description>
+        <PossibleValue Comment="No re-try is allowed (only one attempt)" Value="SPDIFRX_MAXRETRIES_NONE"/>
+        <PossibleValue Comment="3 re-tries allowed" Value="SPDIFRX_MAXRETRIES_3"/>
+        <PossibleValue Comment="15 re-tries allowed" Value="SPDIFRX_MAXRETRIES_15"/>
+        <PossibleValue Comment="63 re-tries allowed" Value="SPDIFRX_MAXRETRIES_63"/>
+    </RefParameter>
+
+
+    <RefParameter Comment="Wait For Activity" DefaultValue="SPDIFRX_WAITFORACTIVITY_OFF" Name="WaitForActivity" Type="list" Group="Synchronization Configuration">
+        <Description>Specifies the wait for activity on SPDIF selected input.</Description>
+        <PossibleValue Comment="The SPDIF-RX does not wait for activity on SPDIF_IN line before performing the synchronization" Value="SPDIFRX_WAITFORACTIVITY_OFF"/>
+        <PossibleValue Comment="The SPDIF-RX waits for activity on SPDIF_IN line before performing the synchronization" Value="SPDIFRX_WAITFORACTIVITY_ON"/>
+    </RefParameter>
+
+
+    <RefParameter Comment="Channel Selection" DefaultValue="SPDIFRX_CHANNEL_A"  Name="ChannelSelection" Type="list" Group="Channel Status Register Formatting">
+        <Description>Specifies whether the control flow will take the channel status from channel A or B.</Description>
+        <PossibleValue Comment="The control flow will take the channel status from channel A" Value="SPDIFRX_CHANNEL_A"/> 
+        <PossibleValue Comment="The control flow will take the channel status from channel B" Value="SPDIFRX_CHANNEL_B"/>
+    </RefParameter>
+
+
+    <RefParameter Comment="Data Format" DefaultValue="SPDIFRX_DATAFORMAT_LSB" Name="DataFormat" Type="list" Group="Data Register Formatting : Data Format">
+        <Description>Specifies the Data samples format (LSB, MSB,32 bits) </Description>
+        <PossibleValue Comment="Data samples are aligned in the right (LSB)" Value="SPDIFRX_DATAFORMAT_LSB"/> 
+        <PossibleValue Comment="Data samples are aligned in the left (MSB)" Value="SPDIFRX_DATAFORMAT_MSB"/>
+        <PossibleValue Comment="Data sample are packed by setting two 16-bit sample into a 32-bit word" Value="SPDIFRX_DATAFORMAT_32BITS" Semaphore="Semaphore_$IpInstance_Dataformat_3"/>
+    </RefParameter>
+
+
+    <RefParameter Comment="Stereo Mode (used in case of overrun to handle misalignement)" DefaultValue="SPDIFRX_STEREOMODE_DISABLE"  Name="StereoMode" Type="list" Group="Data Register Formatting : Data Format">
+        <Description>Specifies whether the peripheral is in stereo or mono mode</Description>
+        <PossibleValue Comment="The peripheral is in MONO mode" Value="SPDIFRX_STEREOMODE_DISABLE"/> 
+        <PossibleValue Comment="The peripheral is in STEREO mode" Value="SPDIFRX_STEREOMODE_ENABLE"/>
+    </RefParameter>
+
+ 
+    <RefParameter Comment="Preamble Type Mask" DefaultValue="SPDIFRX_PREAMBLETYPEMASK_OFF" Name="PreambleTypeMask" Type="list" Group="Data Register Formatting : Mixing Data and Control">
+        <Description>Specifies whether The preamble type bits are copied or not into the received frame</Description>
+        <PossibleValue Comment="The preamble type bits are copied into the SPDIF_DR" Value="SPDIFRX_PREAMBLETYPEMASK_OFF" Condition="(Semaphore_$IpInstance_Dataformat_3)" Diagnostic="Not available with selected Data Format" Action="Disable"/>
+        <PossibleValue Comment="The preamble type bits are not copied into the SPDIF_DR, zeros are written instead" Value="SPDIFRX_PREAMBLETYPEMASK_ON"/>
+    </RefParameter>
+
+ 
+    <RefParameter Comment="Channel Status Mask" DefaultValue="SPDIFRX_CHANNELSTATUS_OFF"  Name="ChannelStatusMask" Type="list" Group="Data Register Formatting : Mixing Data and Control">
+        <Description>Specifies whether the channel status and user bits are copied or not into the received frame</Description>
+        <PossibleValue Comment="The channel status and user bits are copied into the SPDIF_DR" Value="SPDIFRX_CHANNELSTATUS_OFF" Condition="(Semaphore_$IpInstance_Dataformat_3)" Diagnostic="Not available with selected Data Format" Action="Disable"/>
+        <PossibleValue Comment="The channel status and user bits are not copied into the SPDIF_DR, zeros are written instead" Value="SPDIFRX_CHANNELSTATUS_ON"/>
+    </RefParameter>
+
+
+    <RefParameter Comment="Validity Bit Mask" DefaultValue="SPDIFRX_VALIDITYMASK_OFF" Name="ValidityBitMask" Type="list" Group="Data Register Formatting : Mixing Data and Control">
+        <Description>Specifies whether the validity bit is copied or not into the received frame</Description>
+        <PossibleValue Comment="The validity bit is copied into the SPDIF_DR" Value="SPDIFRX_VALIDITYMASK_OFF" Condition="(Semaphore_$IpInstance_Dataformat_3)"  Diagnostic="Not available with selected Data Format" Action="Disable"/>
+        <PossibleValue Comment="The validity bit is not copied into the SPDIF_DR, a zero is written instead" Value="SPDIFRX_VALIDITYMASK_ON"/>
+    </RefParameter>
+
+
+    <RefParameter Comment="Parity Error Mask" DefaultValue="SPDIFRX_PARITYERRORMASK_OFF" Name="ParityErrorMask" Type="list" Group="Data Register Formatting : Mixing Data and Control">
+        <Description>Specifies whether the parity error bit is copied or not into the received frame</Description>
+        <PossibleValue Comment="The parity error bit is copied into the SPDIF_DR" Value="SPDIFRX_PARITYERRORMASK_OFF" Condition="(Semaphore_$IpInstance_Dataformat_3)"  Diagnostic="Not available with selected Data Format" Action="Disable"/>
+        <PossibleValue Comment="The parity error bit is not copied into the SPDIF_DR, a zero is written instead" Value="SPDIFRX_PARITYERRORMASK_ON"/>
+    </RefParameter>
+
+
+	<RefMode Name="Common_Selection" Abstract="true">
+		<ConfigForMode>SPDIFRX_Init</ConfigForMode>
+		<Parameter Name="InputSelection"/>
+		<Parameter Name="frequenceIP"/>            
+		<Parameter Name="MaxAudioRate"/>
+		<Parameter Name="WaitForActivity"/>
+		<Parameter Name="Retries"/>
+		<Parameter Name="ChannelSelection"/>
+		<Parameter Name="DataFormat"/>
+		<Parameter Name="StereoMode"/>
+		<Parameter Name="PreambleTypeMask"/>
+		<Parameter Name="ChannelStatusMask"/>
+		<Parameter Name="ValidityBitMask"/>
+		<Parameter Name="ParityErrorMask"/>
+	</RefMode>
+	<RefMode BaseMode="Common_Selection" Name="IN0">
+	</RefMode>
+	<RefMode BaseMode="Common_Selection" Name="IN1">
+	</RefMode>
+	<RefMode BaseMode="Common_Selection" Name="IN2">
+	</RefMode>
+	<RefMode BaseMode="Common_Selection" Name="IN3">
+	</RefMode>
+
+
+	<ModeLogicOperator Name="OR">
+                              <Mode Name="IN0 Selection">
+                                <ModeLogicOperator Name="OR">
+                                    <Mode Name="IN0">
+                                      <Semaphore>$IpInstanceUsed_ForRCC</Semaphore>
+                                      <Semaphore>Semaphore_$IpInstance_IN0</Semaphore>
+					<SignalLogicalOp Name="AND">
+						<Signal Name="IN0"/>
+					</SignalLogicalOp>
+                                    </Mode>
+		                 </ModeLogicOperator>
+				</Mode>
+			
+	                        <Mode Name="IN1 Selection">
+                                <ModeLogicOperator Name="OR">
+                                    <Mode Name="IN1">
+                                      <Semaphore>$IpInstanceUsed_ForRCC</Semaphore>
+                                      <Semaphore>Semaphore_$IpInstance_IN1</Semaphore>
+					<SignalLogicalOp Name="AND">
+						<Signal Name="IN1"/>
+					</SignalLogicalOp>
+                                    </Mode>
+		                 </ModeLogicOperator>
+				</Mode>
+	
+                                <Mode Name="IN2 Selection">
+                                <ModeLogicOperator Name="OR">
+                                    <Mode Name="IN2">
+                                      <Semaphore>$IpInstanceUsed_ForRCC</Semaphore>
+                                      <Semaphore>Semaphore_$IpInstance_IN2</Semaphore>
+					<SignalLogicalOp Name="AND">
+						<Signal Name="IN2"/>
+					</SignalLogicalOp>
+                                    </Mode>
+		                 </ModeLogicOperator>
+				</Mode>
+                                <Mode Name="IN3 Selection">
+                                <ModeLogicOperator Name="OR">
+                                    <Mode Name="IN3">
+                                      <Semaphore>$IpInstanceUsed_ForRCC</Semaphore>
+                                      <Semaphore>Semaphore_$IpInstance_IN3</Semaphore>
+					<SignalLogicalOp Name="AND">
+						<Signal Name="IN3"/>
+					</SignalLogicalOp>
+                                    </Mode>
+		                 </ModeLogicOperator>
+				</Mode>
+                                <Mode Name="IN4 Selection">
+                                <ModeLogicOperator Name="OR">
+                                    <Mode Name="IN4">
+                                      <Semaphore>$IpInstanceUsed_ForRCC</Semaphore>
+					<SignalLogicalOp Name="AND">
+						<Signal Name="IN4"/>
+					</SignalLogicalOp>
+                                    </Mode>
+		                 </ModeLogicOperator>
+				</Mode>
+                                <Mode Name="IN5 Selection">
+                                <ModeLogicOperator Name="OR">
+                                    <Mode Name="IN5">
+                                      <Semaphore>$IpInstanceUsed_ForRCC</Semaphore>
+					<SignalLogicalOp Name="AND">
+						<Signal Name="IN5"/>
+					</SignalLogicalOp>
+                                    </Mode>
+		                 </ModeLogicOperator>
+				</Mode>
+                                <Mode Name="IN6 Selection">
+                                <ModeLogicOperator Name="OR">
+                                    <Mode Name="IN6">
+                                      <Semaphore>$IpInstanceUsed_ForRCC</Semaphore>
+					<SignalLogicalOp Name="AND">
+						<Signal Name="IN6"/>
+					</SignalLogicalOp>
+                                    </Mode>
+		                 </ModeLogicOperator>
+				</Mode>
+                                <Mode Name="IN7 Selection">
+                                <ModeLogicOperator Name="OR">
+                                    <Mode Name="IN7">
+                                      <Semaphore>$IpInstanceUsed_ForRCC</Semaphore>
+					<SignalLogicalOp Name="AND">
+						<Signal Name="IN7"/>
+					</SignalLogicalOp>
+                                    </Mode>
+		                 </ModeLogicOperator>
+				</Mode>
+                                <Mode Name="IN8 Selection">
+                                <ModeLogicOperator Name="OR">
+                                    <Mode Name="IN8">
+                                      <Semaphore>$IpInstanceUsed_ForRCC</Semaphore>
+					<SignalLogicalOp Name="AND">
+						<Signal Name="IN8"/>
+					</SignalLogicalOp>
+                                    </Mode>
+		                 </ModeLogicOperator>
+				</Mode>
+			
+	</ModeLogicOperator>
+ 
+	<RefSignal IOMode="AlternateFunctionPuPdOnly" Name="IN0"/>
+	<RefSignal IOMode="AlternateFunctionPuPdOnly" Name="IN1"/>
+	<RefSignal IOMode="AlternateFunctionPuPdOnly" Name="IN2"/>
+	<RefSignal IOMode="AlternateFunctionPuPdOnly" Name="IN3"/>
+        <RefSignal IOMode="AlternateFunctionPuPdOnly" Name="IN4"/>
+	<RefSignal IOMode="AlternateFunctionPuPdOnly" Name="IN5"/>
+	<RefSignal IOMode="AlternateFunctionPuPdOnly" Name="IN6"/>
+	<RefSignal IOMode="AlternateFunctionPuPdOnly" Name="IN7"/>
+	<RefSignal IOMode="AlternateFunctionPuPdOnly" Name="IN8"/>
+</IP>
+
+
+

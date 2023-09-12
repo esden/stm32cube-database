@@ -88,6 +88,9 @@
             [#if definition.name=="CAD_RoleToggle_P0"]
                 [#assign valueCAD_RoleToggle_P0 = definition.value]
             [/#if]
+            [#if definition.name=="CAD_DefaultResistor_P0"]
+                [#assign valueCAD_DefaultResistor_P0 = definition.value]
+            [/#if]
             [#if definition.name=="CAD_TryFeature_P0"]
                 [#assign valueCAD_TryFeature_P0 = definition.value]
             [/#if]
@@ -126,6 +129,9 @@
             [/#if]
             [#if definition.name=="Is_FirmUpdateRequest_Supported_P0"]
                 [#assign valueIs_FirmUpdateRequest_Supported_P0 = definition.value]
+            [/#if]
+            [#if definition.name=="Is_SnkCapaExt_Supported_P0"]
+                [#assign valueIs_SnkCapaExt_Supported_P0 = definition.value]
             [/#if]
             [#if definition.name=="VDM_XID_SOP_P0"]
                 [#assign valueVDM_XID_SOP_P0 = definition.value]
@@ -212,6 +218,9 @@
                 [#if definition.name=="CAD_RoleToggle_P1"]
                     [#assign valueCAD_RoleToggle_P1 = definition.value]
                 [/#if]
+                [#if definition.name=="CAD_DefaultResistor_P1"]
+                    [#assign valueCAD_DefaultResistor_P1 = definition.value]
+                [/#if]
                 [#if definition.name=="CAD_TryFeature_P1"]
                     [#assign valueCAD_TryFeature_P1 = definition.value]
                 [/#if]
@@ -250,6 +259,9 @@
                 [/#if]
                 [#if definition.name=="Is_FirmUpdateRequest_Supported_P1"]
                     [#assign valueIs_FirmUpdateRequest_Supported_P1 = definition.value]
+                [/#if]
+                [#if definition.name=="Is_SnkCapaExt_Supported_P1"]
+                    [#assign valueIs_SnkCapaExt_Supported_P1 = definition.value]
                 [/#if]
                 [#if definition.name=="VDM_XID_SOP_P1"]
                     [#assign valueVDM_XID_SOP_P1 = definition.value]
@@ -338,7 +350,8 @@ USBPD_SettingsTypeDef       DPM_Settings[USBPD_PORT_COUNT] =
     .PE_AttemptsDiscovSOP = ${valuePE_AttemptsDiscovSOP_P0},        /*!< Can send a Discover Identity */
     .PE_PingSupport = ${valuePE_PingSupport_P0},              /* support ping                                            */
     .PE_CapscounterSupport = ${valuePE_CapscounterSupport_P0},       /* support caps counter                                    */
-    .CAD_RoleToggle = ${valueCAD_RoleToggle_P0},               /* cad role toogle                                         */
+    .CAD_RoleToggle = ${valueCAD_RoleToggle_P0},               /* cad role toggle                                         */
+    .CAD_DefaultResistor = ${valueCAD_DefaultResistor_P0},
     .CAD_TryFeature = ${valueCAD_TryFeature_P0},              /* cad try feature                                         */
     .CAD_AccesorySupport = ${valueCAD_AccesorySupport_P0},         /* cas accessory support                                   */
     .PE_PD3_Support.d =                           /*!< PD3 SUPPORT FEATURE                                              */
@@ -354,10 +367,11 @@ USBPD_SettingsTypeDef       DPM_Settings[USBPD_PORT_COUNT] =
       .Is_GetCountryInfo_Supported      = ${valueIs_GetCountryInfo_Supported_P0},  /*!< Country_Info message supported or not by DPM */
       .Is_SecurityRequest_Supported     = ${valueIs_SecurityRequest_Supported_P0},  /*!< Security_Response message supported or not by DPM */
       .Is_FirmUpdateRequest_Supported   = ${valueIs_FirmUpdateRequest_Supported_P0},  /*!< Firmware update response message supported by PE */
+      .Is_SnkCapaExt_Supported          = ${valueIs_SnkCapaExt_Supported_P0},  /*!< Sink_Capabilities_Extended message supported by PE */
     },
 
-    .CAD_SRCToogleTime = ${valueCAD_SRCToggleTime_P0},                    /* uint8_t CAD_SRCToogleTime; */
-    .CAD_SNKToogleTime = ${valueCAD_SNKToggleTime_P0},                    /* uint8_t CAD_SNKToogleTime; */
+    .CAD_SRCToggleTime = ${valueCAD_SRCToggleTime_P0},                    /* uint8_t CAD_SRCToggleTime; */
+    .CAD_SNKToggleTime = ${valueCAD_SNKToggleTime_P0},                    /* uint8_t CAD_SNKToggleTime; */
 [#if nbPorts=="2"]
 #if USBPD_PORT_COUNT >= 2
   },
@@ -375,7 +389,8 @@ USBPD_SettingsTypeDef       DPM_Settings[USBPD_PORT_COUNT] =
     .PE_AttemptsDiscovSOP = ${valuePE_AttemptsDiscovSOP_P1},        /*!< Can send a Discover Identity */
     .PE_PingSupport = ${valuePE_PingSupport_P1},              /* support ping                                            */
     .PE_CapscounterSupport = ${valuePE_CapscounterSupport_P1},       /* support caps counter                                    */
-    .CAD_RoleToggle = ${valueCAD_RoleToggle_P1},              /* cad role toogle                                         */
+    .CAD_RoleToggle = ${valueCAD_RoleToggle_P1},              /* cad role toggle                                         */
+    .CAD_DefaultResistor = ${valueCAD_DefaultResistor_P1},
     .CAD_TryFeature = ${valueCAD_TryFeature_P1},              /* cad try feature                                         */
     .CAD_AccesorySupport = ${valueCAD_AccesorySupport_P1},         /* cas accessory support                                   */
     .PE_PD3_Support.d =                         /*!< PD3 SUPPORT FEATURE                                              */
@@ -391,10 +406,11 @@ USBPD_SettingsTypeDef       DPM_Settings[USBPD_PORT_COUNT] =
       .Is_GetCountryInfo_Supported      = ${valueIs_GetCountryInfo_Supported_P1},  /*!< Country_Info message supported or not by DPM */
       .Is_SecurityRequest_Supported     = ${valueIs_SecurityRequest_Supported_P1},  /*!< Security_Response message supported or not by DPM */
       .Is_FirmUpdateRequest_Supported   = ${valueIs_FirmUpdateRequest_Supported_P1},  /*!< Firmware update response message supported by PE */
+      .Is_SnkCapaExt_Supported          = ${valueIs_SnkCapaExt_Supported_P1},  /*!< Sink_Capabilities_Extended message supported by PE */
     },
 
-    .CAD_SRCToogleTime = ${valueCAD_SRCToggleTime_P1},                    /* uint8_t CAD_SRCToogleTime; */
-    .CAD_SNKToogleTime = ${valueCAD_SNKToggleTime_P1},                    /* uint8_t CAD_SNKToogleTime; */
+    .CAD_SRCToggleTime = ${valueCAD_SRCToggleTime_P1},                    /* uint8_t CAD_SRCToggleTime; */
+    .CAD_SNKToggleTime = ${valueCAD_SNKToggleTime_P1},                    /* uint8_t CAD_SNKToggleTime; */
 #endif
 [/#if]
   }

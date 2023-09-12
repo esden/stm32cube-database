@@ -33,6 +33,16 @@
 	<RefParameter Comment="Output" DefaultValue="RTC_OUTPUT_DISABLE" Group="General" Name="OutPut" Type="list" Visible="false">
 		<PossibleValue Comment="Output Disable" Value="RTC_OUTPUT_DISABLE"/>
 	</RefParameter>
+	
+	
+	
+	
+	<RefParameter Comment="Output Remap" DefaultValue="RTC_OUTPUT_REMAP_POS1" Group="General" Name="OutPutRemap" Type="list" Visible="false">
+		<Condition Diagnostic="" Expression="(PB2_RTC_OUT_ALARM|PB2_RTC_OUT_CALIB) &amp; STM32WB"/>
+		<PossibleValue Comment="Output Remap on PB2 pin" Value="RTC_OUTPUT_REMAP_POS1"/>
+	</RefParameter>
+	<RefParameter Comment="Output Remap" DefaultValue="RTC_OUTPUT_REMAP_NONE" Group="General" Name="OutPutRemap" Type="list" Visible="false"/>
+	
 
 	<RefParameter Comment="Output Polarity" DefaultValue="RTC_OUTPUT_POLARITY_HIGH" Group="General" Name="OutPutPolarity" Type="list">
 		<Condition Diagnostic="" Expression="WakeUp_Outputed | AlarmA_Outputed | AlarmB_Outputed"/>
@@ -40,7 +50,9 @@
 		<PossibleValue Comment="Output Polarity Low" Value="RTC_OUTPUT_POLARITY_LOW"/>
 	</RefParameter>
 	<RefParameter Comment="Output Polarity" DefaultValue="RTC_OUTPUT_POLARITY_HIGH" Group="General" Name="OutPutPolarity" Type="list" Visible="false">
+		
 		<PossibleValue Comment="Output Polarity High" Value="RTC_OUTPUT_POLARITY_HIGH"/>
+		
 		<!--PossibleValue Comment="Output Polarity Low" Value="RTC_OUTPUT_POLARITY_LOW"/-->
 	</RefParameter>
 	<RefParameter Comment="Output Type" DefaultValue="RTC_OUTPUT_TYPE_OPENDRAIN" Group="General" Name="OutPutType" Type="list">
@@ -424,57 +436,57 @@
 		<PossibleValue Comment="High Level" Value="RTC_TAMPERTRIGGER_HIGHLEVEL"/>
 	</RefParameter>
 	<RefParameter Comment="Tamper 1 No Erase" DefaultValue="RTC_TAMPER_ERASE_BACKUP_ENABLE" Group="Tamper" Name="NoErase_1" Type="list">
-		<Condition Diagnostic="" Expression="STM32F7"/>
+		<Condition Diagnostic="" Expression="STM32F7 |STM32WB "/>
 		<PossibleValue Comment="No Erase Enabled" Value="RTC_TAMPER_ERASE_BACKUP_ENABLE"/>
 		<PossibleValue Comment="No Erase Disabled" Value="RTC_TAMPER_ERASE_BACKUP_DISABLE"/>
 	</RefParameter>
 	<RefParameter Comment="Tamper 1 No Erase" DefaultValue="null" Group="Tamper" Name="NoErase_1" Type="list" Visible="false"/>
 	
 	<RefParameter Comment="Tamper 1 Mask Flag" DefaultValue="RTC_TAMPERMASK_FLAG_DISABLE" Group="Tamper" Name="MaskFlag_1" Type="list">
-		<Condition Diagnostic="" Expression="STM32F7 &amp; TAMP_STAMP_IRQn"/>
+		<Condition Diagnostic="" Expression="(STM32F7  | STM32WB) &amp; TAMP_STAMP_IRQn "/>
 		<PossibleValue Comment="Mask Flag Disabled" Value="RTC_TAMPERMASK_FLAG_DISABLE"/>
 	</RefParameter>
 	
 	<RefParameter Comment="Tamper 1 Mask Flag" DefaultValue="RTC_TAMPERMASK_FLAG_DISABLE" Group="Tamper" Name="MaskFlag_1" Type="list">
-		<Condition Diagnostic="" Expression="STM32F7"/>
+		<Condition Diagnostic="" Expression="STM32F7 |STM32WB"/>
 		<PossibleValue Comment="Mask Flag Disabled" Value="RTC_TAMPERMASK_FLAG_DISABLE"/>
 		<PossibleValue Comment="Mask Flag Enabled" Value="RTC_TAMPERMASK_FLAG_ENABLE"/>
 	</RefParameter>
 	<RefParameter Comment="Tamper 1 Mask Flag" DefaultValue="null" Group="Tamper" Name="MaskFlag_1" Type="list" Visible="false"/>
 	
 	<RefParameter Comment="Tamper Interruption" DefaultValue="RTC_TAMPER1_INTERRUPT" Group="Tamper" Name="Interrupt" Type="list">
-		<Condition Diagnostic="" Expression="TAMP_STAMP_IRQn &amp; Tamper1_ON &amp; !Tamper2_ON &amp; !Tamper3_ON"/>
+		<Condition Diagnostic="" Expression=" Tamper1_ON &amp; !Tamper2_ON &amp; !Tamper3_ON &amp;  ((TAMP_STAMP_IRQn &amp; STM32F7) | (TAMP_STAMP_LSECSS_IRQn &amp; STM32WB))"/>
 		<PossibleValue Comment="Tamper 1 Interruption Only" Value="RTC_TAMPER1_INTERRUPT"/>
 	</RefParameter>
 	<RefParameter Comment="Tamper Interruption" DefaultValue="RTC_TAMPER2_INTERRUPT" Group="Tamper" Name="Interrupt" Type="list">
-		<Condition Diagnostic="" Expression="TAMP_STAMP_IRQn &amp; Tamper2_ON &amp; !Tamper1_ON &amp; !Tamper3_ON"/>
+		<Condition Diagnostic="" Expression="Tamper2_ON &amp; !Tamper1_ON &amp; !Tamper3_ON &amp;  ((TAMP_STAMP_IRQn &amp; STM32F7) | (TAMP_STAMP_LSECSS_IRQn &amp; STM32WB))"/>
 		<PossibleValue Comment="Tamper 2 Interruption Only" Value="RTC_TAMPER2_INTERRUPT"/>
 	</RefParameter>
 	<RefParameter Comment="Tamper Interruption" DefaultValue="RTC_TAMPER3_INTERRUPT" Group="Tamper" Name="Interrupt" Type="list">
-		<Condition Diagnostic="" Expression="TAMP_STAMP_IRQn &amp; !Tamper2_ON &amp; !Tamper1_ON &amp; Tamper3_ON"/>
+		<Condition Diagnostic="" Expression="!Tamper2_ON &amp; !Tamper1_ON &amp; Tamper3_ON &amp;  ((TAMP_STAMP_IRQn &amp; STM32F7) | (TAMP_STAMP_LSECSS_IRQn &amp; STM32WB))"/>
 		<PossibleValue Comment="Tamper 3 Interruption Only" Value="RTC_TAMPER3_INTERRUPT"/>
 	</RefParameter>
 	<RefParameter Comment="Tamper Interruption" DefaultValue="RTC_ALL_TAMPER_INTERRUPT" Group="Tamper" Name="Interrupt" Type="list">
-		<Condition Diagnostic="" Expression="TAMP_STAMP_IRQn &amp; Tamper1_ON &amp; Tamper2_ON &amp; Tamper3_ON"/>
+		<Condition Diagnostic="" Expression="Tamper1_ON &amp; Tamper2_ON &amp; Tamper3_ON &amp; ((TAMP_STAMP_IRQn &amp; STM32F7) | (TAMP_STAMP_LSECSS_IRQn &amp; STM32WB))"/>
 		<PossibleValue Comment="Tamper 1 Interruption Only" Value="RTC_TAMPER1_INTERRUPT"/>
 		<PossibleValue Comment="Tamper 2 Interruption Only" Value="RTC_TAMPER2_INTERRUPT"/>
 		<PossibleValue Comment="Tamper 3 Interruption Only" Value="RTC_TAMPER3_INTERRUPT"/>
 		<PossibleValue Comment="All Tampers Interruption" Value="RTC_ALL_TAMPER_INTERRUPT"/>
 	</RefParameter>
 	<RefParameter Comment="Tamper Interruption" DefaultValue="RTC_ALL_TAMPER_INTERRUPT" Group="Tamper" Name="Interrupt" Type="list">
-		<Condition Diagnostic="" Expression="TAMP_STAMP_IRQn &amp; Tamper1_ON &amp; Tamper2_ON &amp; !Tamper3_ON"/>
+		<Condition Diagnostic="" Expression=" Tamper1_ON &amp; Tamper2_ON &amp; !Tamper3_ON &amp; ((TAMP_STAMP_IRQn &amp; STM32F7) | (TAMP_STAMP_LSECSS_IRQn &amp; STM32WB))"/>
 		<PossibleValue Comment="Tamper 1 Interruption Only" Value="RTC_TAMPER1_INTERRUPT"/>
 		<PossibleValue Comment="Tamper 2 Interruption Only" Value="RTC_TAMPER2_INTERRUPT"/>
 		<PossibleValue Comment="All Tampers Interruption" Value="RTC_ALL_TAMPER_INTERRUPT"/>
 	</RefParameter>
 	<RefParameter Comment="Tamper Interruption" DefaultValue="RTC_ALL_TAMPER_INTERRUPT" Group="Tamper" Name="Interrupt" Type="list">
-		<Condition Diagnostic="" Expression="TAMP_STAMP_IRQn &amp; !Tamper1_ON &amp; Tamper2_ON &amp; Tamper3_ON"/>
+		<Condition Diagnostic="" Expression="!Tamper1_ON &amp; Tamper2_ON &amp; Tamper3_ON &amp;  ((TAMP_STAMP_IRQn &amp; STM32F7) | (TAMP_STAMP_LSECSS_IRQn &amp; STM32WB))"/>
 		<PossibleValue Comment="Tamper 2 Interruption Only" Value="RTC_TAMPER2_INTERRUPT"/>
 		<PossibleValue Comment="Tamper 3 Interruption Only" Value="RTC_TAMPER3_INTERRUPT"/>
 		<PossibleValue Comment="All Tampers Interruption" Value="RTC_ALL_TAMPER_INTERRUPT"/>
 	</RefParameter>
 	<RefParameter Comment="Tamper Interruption" DefaultValue="RTC_ALL_TAMPER_INTERRUPT" Group="Tamper" Name="Interrupt" Type="list">
-		<Condition Diagnostic="" Expression="TAMP_STAMP_IRQn &amp; Tamper1_ON &amp; !Tamper2_ON &amp; Tamper3_ON"/>
+		<Condition Diagnostic="" Expression=" Tamper1_ON &amp; !Tamper2_ON &amp; Tamper3_ON &amp;  ((TAMP_STAMP_IRQn &amp; STM32F7) | (TAMP_STAMP_LSECSS_IRQn &amp; STM32WB))"/>
 		<PossibleValue Comment="Tamper 1 Interruption Only" Value="RTC_TAMPER1_INTERRUPT"/>
 		<PossibleValue Comment="Tamper 3 Interruption Only" Value="RTC_TAMPER3_INTERRUPT"/>
 		<PossibleValue Comment="All Tampers Interruption" Value="RTC_ALL_TAMPER_INTERRUPT"/>
@@ -495,19 +507,19 @@
 	</RefParameter>
 	
 	<RefParameter Comment="Tamper 2 No Erase" DefaultValue="RTC_TAMPER_ERASE_BACKUP_ENABLE" Group="Tamper" Name="NoErase_2" Type="list">
-		<Condition Diagnostic="" Expression="STM32F7"/>
+		<Condition Diagnostic="" Expression="STM32F7 | STM32WB "/>
 		<PossibleValue Comment="No Erase Enabled" Value="RTC_TAMPER_ERASE_BACKUP_ENABLE"/>
 		<PossibleValue Comment="No Erase Disabled" Value="RTC_TAMPER_ERASE_BACKUP_DISABLE"/>
 	</RefParameter>
 	<RefParameter Comment="Tamper 2 No Erase" DefaultValue="null" Group="Tamper" Name="NoErase_2" Type="list" Visible="false"/>
 	
 	<RefParameter Comment="Tamper 2 Mask Flag" DefaultValue="RTC_TAMPERMASK_FLAG_DISABLE" Group="Tamper" Name="MaskFlag_2" Type="list">
-		<Condition Diagnostic="" Expression="STM32F7 &amp; TAMP_STAMP_IRQn"/>
+		<Condition Diagnostic="" Expression="(STM32F7  | STM32WB) &amp; TAMP_STAMP_IRQn"/>
 		<PossibleValue Comment="Mask Flag Disabled" Value="RTC_TAMPERMASK_FLAG_DISABLE"/>
 	</RefParameter>
 	
 	<RefParameter Comment="Tamper 2 Mask Flag" DefaultValue="RTC_TAMPERMASK_FLAG_DISABLE" Group="Tamper" Name="MaskFlag_2" Type="list">
-		<Condition Diagnostic="" Expression="STM32F7"/>
+		<Condition Diagnostic="" Expression="STM32F7 | STM32WB"/>
 		<PossibleValue Comment="Mask Flag Disabled" Value="RTC_TAMPERMASK_FLAG_DISABLE"/>
 		<PossibleValue Comment="Mask Flag Enabled" Value="RTC_TAMPERMASK_FLAG_ENABLE"/>
 	</RefParameter>
@@ -527,19 +539,19 @@
 	</RefParameter>
 	
 	<RefParameter Comment="Tamper 3 No Erase" DefaultValue="RTC_TAMPER_ERASE_BACKUP_ENABLE" Group="Tamper" Name="NoErase_3" Type="list">
-		<Condition Diagnostic="" Expression="STM32F7"/>
+		<Condition Diagnostic="" Expression="STM32F7 | STM32WB"/>
 		<PossibleValue Comment="No Erase Enabled" Value="RTC_TAMPER_ERASE_BACKUP_ENABLE"/>
 		<PossibleValue Comment="No Erase Disabled" Value="RTC_TAMPER_ERASE_BACKUP_DISABLE"/>
 	</RefParameter>
 	<RefParameter Comment="Tamper 3 No Erase" DefaultValue="null" Group="Tamper" Name="NoErase_3" Type="list" Visible="false"/>
 	
 	<RefParameter Comment="Tamper 3 Mask Flag" DefaultValue="RTC_TAMPERMASK_FLAG_DISABLE" Group="Tamper" Name="MaskFlag_3" Type="list">
-		<Condition Diagnostic="" Expression="STM32F7 &amp; TAMP_STAMP_IRQn"/>
+		<Condition Diagnostic="" Expression="(STM32F7  | STM32WB) &amp; TAMP_STAMP_IRQn"/>
 		<PossibleValue Comment="Mask Flag Disabled" Value="RTC_TAMPERMASK_FLAG_DISABLE"/>
 	</RefParameter>
 	
 	<RefParameter Comment="Tamper 3 Mask Flag" DefaultValue="RTC_TAMPERMASK_FLAG_DISABLE" Group="Tamper" Name="MaskFlag_3" Type="list">
-		<Condition Diagnostic="" Expression="STM32F7"/>
+		<Condition Diagnostic="" Expression="STM32F7 | STM32WB "/>
 		<PossibleValue Comment="Mask Flag Disabled" Value="RTC_TAMPERMASK_FLAG_DISABLE"/>
 		<PossibleValue Comment="Mask Flag Enabled" Value="RTC_TAMPERMASK_FLAG_ENABLE"/>
 	</RefParameter>
@@ -598,12 +610,13 @@
 	</RefMode>
 	
 	<RefMode Abstract="true" HalMode="RTC" Name="RTC_Init_And_Calender_Settings">
-		<ConfigForMode>RTC_Init</ConfigForMode>
+     <ConfigForMode>RTC_Init</ConfigForMode>
 		<!-- Basic Parameters -->
 		<Parameter Name="HourFormat"/>
 		<Parameter Name="AsynchPrediv"/>
 		<Parameter Name="SynchPrediv"/>
 		<Parameter Name="OutPut"/>
+		<Parameter Name="OutPutRemap"/>
 		<Parameter Name="OutPutPolarity"/>
 		<Parameter Name="OutPutType"/>
 		<!-- Calendar Settings -->
@@ -628,6 +641,7 @@
 		<Parameter Name="AsynchPrediv"/>
 		<Parameter Name="SynchPrediv"/>
 		<Parameter Name="OutPut"/>
+		<Parameter Name="OutPutRemap"/>
 		<Parameter Name="OutPutPolarity"/>
 		<Parameter Name="OutPutType"/>
 		<!--  -->
@@ -648,7 +662,7 @@
 	</RefMode>
 	
 	<RefMode BaseMode="Tamper" HalMode="RTC" Name="Tamper 1 enabled - Input Enabled to TAMP1">
-		<Condition Diagnostic="" Expression="TAMP_STAMP_IRQn | RTC_IRQn"/>
+		<Condition Diagnostic="" Expression="TAMP_STAMP_IRQn | RTC_IRQn |TAMP_STAMP_LSECSS_IRQn"/>
 		<ConfigForMode>RTC_SetTamper_1_IT</ConfigForMode>
 		<Parameter Name="Tamper_1">
 			<PossibleValue>RTC_TAMPER_1</PossibleValue>
@@ -656,6 +670,7 @@
 		<Parameter Name="Trigger_1"/>
 		<Parameter Name="NoErase_1"/>
 		<Parameter Name="MaskFlag_1"/>
+              
 	</RefMode>
 	<RefMode BaseMode="Tamper" HalMode="RTC" Name="Tamper 1 enabled - Input Enabled to TAMP1">
 		<ConfigForMode>RTC_SetTamper_1</ConfigForMode>
@@ -665,10 +680,11 @@
 		<Parameter Name="Trigger_1"/>
 		<Parameter Name="NoErase_1"/>
 		<Parameter Name="MaskFlag_1"/>
+               
 	</RefMode>
 	
 	<RefMode BaseMode="Tamper" HalMode="RTC" Name="Tamper 2 enabled - Input Enabled to TAMP2">
-		<Condition Diagnostic="" Expression="TAMP_STAMP_IRQn | RTC_IRQn"/>
+		<Condition Diagnostic="" Expression="TAMP_STAMP_IRQn | RTC_IRQn| TAMP_STAMP_LSECSS_IRQn"/>
 		<ConfigForMode>RTC_SetTamper_2_IT</ConfigForMode>
 		<Parameter Name="Tamper_2">
 			<PossibleValue>RTC_TAMPER_2</PossibleValue>
@@ -676,6 +692,7 @@
 		<Parameter Name="Trigger_2"/>
 		<Parameter Name="NoErase_2"/>
 		<Parameter Name="MaskFlag_2"/>
+               
 	</RefMode>
 	<RefMode BaseMode="Tamper" HalMode="RTC" Name="Tamper 2 enabled - Input Enabled to TAMP2">
 		<ConfigForMode>RTC_SetTamper_2</ConfigForMode>
@@ -685,10 +702,11 @@
 		<Parameter Name="Trigger_2"/>
 		<Parameter Name="NoErase_2"/>
 		<Parameter Name="MaskFlag_2"/>
+                
 	</RefMode>
 	
 	<RefMode BaseMode="Tamper" HalMode="RTC" Name="Tamper 3 enabled - Input Enabled to TAMP3">
-		<Condition Diagnostic="" Expression="TAMP_STAMP_IRQn | RTC_IRQn"/>
+		<Condition Diagnostic="" Expression="TAMP_STAMP_IRQn | RTC_IRQn |TAMP_STAMP_LSECSS_IRQn"/>
 		<ConfigForMode>RTC_SetTamper_3_IT</ConfigForMode>
 			<Parameter Name="Tamper_3">
 			<PossibleValue>RTC_TAMPER_3</PossibleValue>
@@ -696,6 +714,7 @@
 		<Parameter Name="Trigger_3"/>
 		<Parameter Name="NoErase_3"/>
 		<Parameter Name="MaskFlag_3"/>
+                
 	</RefMode>
 	<RefMode BaseMode="Tamper" HalMode="RTC" Name="Tamper 3 enabled - Input Enabled to TAMP3">
 		<ConfigForMode>RTC_SetTamper_3</ConfigForMode>
@@ -705,6 +724,7 @@
 		<Parameter Name="Trigger_3"/>
 		<Parameter Name="NoErase_3"/>
 		<Parameter Name="MaskFlag_3"/>
+
 	</RefMode>
 	
 	<RefMode BaseMode="Calibration" HalMode="RTC" Name="Calibration_512Hz">
@@ -917,27 +937,27 @@
 		</Parameter>
 	</RefMode>
         <!-- WakeUp -->
-	<RefMode BaseMode="RTC_Init_And_Calender_Settings" HalMode="RTC" Name="WakeUp">
+	<RefMode BaseMode="RTC_Enabled" HalMode="RTC" Name="WakeUp">
 		<Condition Diagnostic="" Expression="RTC_WKUP_IRQn | RTC_IRQn"/>
 		<ConfigForMode>RTC_WakeUp_IT</ConfigForMode>
 		<!-- Basic Parameters -->
 		<Parameter Name="WakeUpClock"/>
 		<Parameter Name="WakeUpCounter"/>
 	</RefMode>
-	<RefMode BaseMode="RTC_Init_And_Calender_Settings" HalMode="RTC" Name="WakeUp">
+	<RefMode BaseMode="RTC_Enabled" HalMode="RTC" Name="WakeUp">
 		<ConfigForMode>RTC_WakeUp</ConfigForMode>
 		<!-- Basic Parameters -->
 		<Parameter Name="WakeUpClock"/>
 		<Parameter Name="WakeUpCounter"/>
 	</RefMode>
-	<RefMode BaseMode="RTC_Init_And_Calender_Settings" HalMode="RTC" Name="WakeUpAF1">
-		<Condition Diagnostic="" Expression="RTC_WKUP_IRQn | RTC_IRQn"/>
+	<RefMode BaseMode="RTC_Enabled" HalMode="RTC" Name="WakeUpAF1">
+		<Condition Diagnostic="" Expression="RTC_WKUP_IRQn | RTC_IRQn "/>
 		<ConfigForMode>RTC_WakeUp_IT</ConfigForMode>
 		<!-- Basic Parameters -->
 		<Parameter Name="WakeUpClock"/>
 		<Parameter Name="WakeUpCounter"/>
 	</RefMode>
-	<RefMode BaseMode="RTC_Init_And_Calender_Settings" HalMode="RTC" Name="WakeUpAF1">
+	<RefMode BaseMode="RTC_Enabled"  HalMode="RTC" Name="WakeUpAF1">
 		<ConfigForMode>RTC_WakeUp</ConfigForMode>
 		<!-- Basic Parameters -->
 		<Parameter Name="WakeUpClock"/>
@@ -945,7 +965,7 @@
 	</RefMode>
         <!-- TimeStamp -->
 	<RefMode Abstract="true" BaseMode="RTC_Init_And_Calender_Settings" HalMode="RTC" Name="Timestamp">
-		<Condition Diagnostic="" Expression="TAMP_STAMP_IRQn | RTC_IRQn"/>
+		<Condition Diagnostic="" Expression="RTC_IRQn |TAMP_STAMP_LSECSS_IRQn "/>
 		<ConfigForMode>RTC_Timestamp_IT</ConfigForMode>
 		<!-- Basic Parameters -->
 		<Parameter Name="TimeStampEdge"/>
@@ -1034,8 +1054,21 @@
 			</ModeLogicOperator>
 			<Semaphore>RTC_ALARM_INTERRUPT</Semaphore>
 		</Mode>
-		<Mode Name="WakeUp">                    
+		
+		<Mode Name="Timestamp">
                 <Condition Diagnostic="RTC is already used for system time base" Expression="!SYS_$IpInstance &amp; RTC_CALENDAR"/>
+                    
+			<ModeLogicOperator Name="XOR">
+				<Mode Name="Timestamp enabled - Input Enabled to TS" UserName="Timestamp Routed to TS">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="TS"/>
+					</SignalLogicalOp>
+				</Mode>
+			</ModeLogicOperator>
+			<Semaphore>RTC_TIMESTAMP_INTERRUPT</Semaphore>
+		</Mode>
+                <Mode Name="WakeUp">                    
+                <Condition Diagnostic="RTC is already used for system time base" Expression="!SYS_$IpInstance &amp; RTC_ENABLED"/>
                     
 			<ModeLogicOperator Name="XOR">
 				<Mode Name="WakeUp" UserName="Internal WakeUp">
@@ -1052,18 +1085,6 @@
 				</Mode>
 			</ModeLogicOperator>
 			<Semaphore>RTC_WAKEUP_INTERRUPT</Semaphore>
-		</Mode>
-		<Mode Name="Timestamp">
-                <Condition Diagnostic="RTC is already used for system time base" Expression="!SYS_$IpInstance &amp; RTC_CALENDAR"/>
-                    
-			<ModeLogicOperator Name="XOR">
-				<Mode Name="Timestamp enabled - Input Enabled to TS" UserName="Timestamp Routed to TS">
-					<SignalLogicalOp Name="AND">
-						<Signal Name="TS"/>
-					</SignalLogicalOp>
-				</Mode>
-			</ModeLogicOperator>
-			<Semaphore>RTC_TIMESTAMP_INTERRUPT</Semaphore>
 		</Mode>
 		<Mode Name="Tamper 1">
                 <Condition Diagnostic="RTC is already used for system time base" Expression="!SYS_$IpInstance &amp; RTC_ENABLED"/>

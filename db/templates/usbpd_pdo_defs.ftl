@@ -22,6 +22,9 @@
 [#list SWIPdatas as SWIP]
     [#if SWIP.defines??]
         [#list SWIP.defines as definition]
+            [#if definition.name=="USBPD_NbPorts"]
+                [#assign nbPorts = definition.value]
+            [/#if]
             [#if definition.name=="PORT0_SOURCE_PDO1"]
                 [#assign PORT0_SOURCE_PDO1 = definition.value]
             [/#if]
@@ -106,13 +109,13 @@
             [#if definition.name=="PORT1_SINK_PDO7"]
                 [#assign PORT1_SINK_PDO7 = definition.value]
             [/#if]
-      [/#list]
-  [/#if]
-  [#assign instName = SWIP.ipName]   
-  [#assign fileName = SWIP.fileName]   
-  [#assign version = SWIP.version] 
+        [/#list]
+    [/#if]
+    [#assign instName = SWIP.ipName]
+    [#assign fileName = SWIP.fileName]
+    [#assign version = SWIP.version]
 [/#list]
-            
+
 /* Includes ------------------------------------------------------------------*/
 
 /* USER CODE BEGIN Includes */
@@ -207,6 +210,7 @@ const uint32_t PORT0_PDO_ListSNK[USBPD_MAX_NB_PDO] =
         (${PORT0_SINK_PDO7}U)
 };
 
+[#if nbPorts=="2"]
 /* Definition of Source PDO for Port 1 */
 const uint32_t PORT1_PDO_ListSRC[USBPD_MAX_NB_PDO] = 
 {
@@ -244,6 +248,7 @@ const uint32_t PORT1_PDO_ListSNK[USBPD_MAX_NB_PDO] =
   /* PDO 7 */
         (${PORT1_SINK_PDO7}U)
 };
+[/#if]
 #endif
 
 /* Exported functions --------------------------------------------------------*/

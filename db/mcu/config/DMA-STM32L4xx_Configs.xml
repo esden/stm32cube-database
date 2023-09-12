@@ -2,12 +2,19 @@
 <IP xmlns="http://mcd.rou.st.com/modules.php?name=mcu" DBVersion="V4.0" Name="DMA" Version="STM32Cube_FW_L4_V1.9.0" IncludeFile="stm32l4xx_hal.h" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Configs.xsd">
     <RefConfig Name="HAL_DMA_Init">
       <CallLibMethod Name="HAL_DMA_Init"/>
-      <IFCondition Expression = "(Request=DMA_REQUEST_GENERATOR0)|(Request=DMA_REQUEST_GENERATOR1)|(Request=DMA_REQUEST_GENERATOR2)|(Request=DMA_REQUEST_GENERATOR3)">
+      <IFCondition Expression = "((Request=DMA_REQUEST_GENERATOR0)|(Request=DMA_REQUEST_GENERATOR1)|(Request=DMA_REQUEST_GENERATOR2)|(Request=DMA_REQUEST_GENERATOR3))&amp; !(SignalID=NONE)">
         <CallLibMethod Name="HAL_DMAEx_ConfigMuxRequestGenerator"/>
       </IFCondition>
-      <IFCondition Expression = "(SyncEnable=ENABLE)|(EventEnable=ENABLE)">
+      <IFCondition Expression = "!(SyncSignalID=NONE)">
         <CallLibMethod Name="HAL_DMAEx_ConfigMuxSync">
           <MethodArg Name="RequestNumber" ParameterName="SyncRequestNumber"/>
+        </CallLibMethod>
+      </IFCondition>
+      <IFCondition Expression = "(SyncSignalID=NONE) &amp; (EventEnable=ENABLE)">
+        <CallLibMethod Name="HAL_DMAEx_ConfigMuxSync">
+          <MethodArg Name="RequestNumber" ParameterName="SyncRequestNumber"/>
+          <MethodArg Name="SyncSignalID" FValue="HAL_DMAMUX1_SYNC_EXTI0"/> <!--Forcage-->
+          <MethodArg Name="SyncEnable" FValue="DISABLE"/> <!--Forcage-->
         </CallLibMethod>
       </IFCondition>
       <Component Name="HAL:DMA"/>

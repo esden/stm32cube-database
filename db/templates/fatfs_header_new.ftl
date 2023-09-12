@@ -16,7 +16,7 @@
 
 [#compress]
 /* Includes ------------------------------------------------------------------*/
-[@common.optinclude name=mxTmpFolder+"/fatfs_inc.tmp"/] [#--include fatfs includes --]
+[@common.optinclude name=mxTmpFolder+"/fatfs_inc.tmp"/][#--include fatfs includes --]
 [/#compress]
 
 #n

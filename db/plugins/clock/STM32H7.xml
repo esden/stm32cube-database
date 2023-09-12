@@ -252,16 +252,16 @@
             <Input signalId="D1CPRECLK" from="D1CPRE"/>
         </Element>
 		
-        <Element id="CpuClockOutput" type="activeOutput" isKey="true" refParameter="CpuClockFreq_Value" x="1400" y="145">
+        <Element id="CpuClockOutput" type="activeOutput" isKey="true" refParameter="CpuClockFreq_Value" x="1400" y="205">
             <Input signalId="D1CPRECLK" from="D1CPRE"/>
         </Element>
 		 
-        <Element id="CortexPrescaler" type="devisor" refParameter="Cortex_Div" x="1300" y="175">
+        <Element id="CortexPrescaler" type="devisor" refParameter="Cortex_Div" x="1200" y="235">
             <Input signalId="D1CPRECLK" from="D1CPRE"/>
             <Output signalId="CortexCLK" to="CortexSysOutput" />
         </Element>
 		
-        <Element id="CortexSysOutput" type="activeOutput" refParameter="CortexFreq_Value" x="1400" y="175">
+        <Element id="CortexSysOutput" type="activeOutput" refParameter="CortexFreq_Value" x="1400" y="235">
             <Input signalId="CortexCLK" from="CortexPrescaler"/>
         </Element>
 		
@@ -282,25 +282,8 @@
              <Output signalId="HPRECLK" to="AHB4Output" />
             <Output signalId="HPRECLK" to="AHB12Output" />
             <Output signalId="HPRECLK" to="D3PPRE" />
-            <Output signalId="HPRECLK" to="Cortex2Prescaler" />
+        </Element>
 
-
-        
-
-        </Element>
-  
-		      <Element id="Cortex2Prescaler" type="devisor" refParameter="Cortex2_Div" x="1300" y="235">
-            <Input signalId="HPRECLK" from="AHBOutput"/>
-			<Output signalId="Cortex2CLK" to="CPU2SystikOutput" />
-           
-        </Element>
-		
-        <Element id="CPU2ClockOutput" type="activeOutput" refParameter="CPU2Freq_Value" x="1400" y="205">
-            <Input signalId="HPRECLK" from="AHBOutput"/>
-        </Element>
-        <Element id="CPU2SystikOutput" type="activeOutput" refParameter="CPU2SystikFreq_Value" x="1400" y="235">
-            <Input signalId="Cortex2CLK" from="Cortex2Prescaler"/>
-        </Element>
         <Element id="AXIClockOutput" type="activeOutput" refParameter="AXIClockFreq_Value" x="1400" y="265">
             <Input signalId="HPRECLK" from="AHBOutput"/>
         </Element>
@@ -459,12 +442,17 @@
         </Element>  
 		
         <Tree id="PLL1">
-            <Element id="DIVN1" type="multiplicator" refParameter="DIVN1" x="512" y="525" >
+            <Element id="DIVN1" type="multiplicatorFrac" refParameter="DIVN1" x="512" y="525" >
                 <Input signalId="VCOInput" from="DIVM1"/>
+                <Input signalId="PLL1FRACNClk" from="PLLFRACN"/>
                 <Output signalId="VCO1Output" to="DIVP1"/>
                 <Output signalId="VCO1Output" to="DIVQ1"/>
                 <Output signalId="VCO1Output" to="DIVR1"/>
-            </Element> 
+            </Element>
+            
+            <Element id="PLLFRACN" type="fractional" refParameter="PLLFRACN" x="507" y="580">
+                <Output signalId="PLL1FRACNClk" to="DIVN1"/>
+            </Element>
 							
             <Element id="DIVP1" type="devisor" refParameter="DIVP1" x="577" y="525">
                 <Input signalId="VCO1Output" from="DIVN1"/>
@@ -509,12 +497,17 @@
         </Tree>
 		
         <Tree id="PLL2">
-            <Element id="DIVN2" type="multiplicator" refParameter="DIVN2" x="512" y="657" >
+            <Element id="DIVN2" type="multiplicatorFrac" refParameter="DIVN2" x="512" y="657" >
                 <Input signalId="VCO2Input" from="DIVM2"/>
+                <Input signalId="PLL2FRACNClk" from="PLL2FRACN"/>
                 <Output signalId="VCO2Output" to="DIVP2"/>
                 <Output signalId="VCO2Output" to="DIVQ2"/>
                 <Output signalId="VCO2Output" to="DIVR2"/>
-            </Element> 
+            </Element>
+            
+            <Element id="PLL2FRACN" type="fractional" refParameter="PLL2FRACN" x="507" y="712">
++                <Output signalId="PLL2FRACNClk" to="DIVN2"/>
+            </Element>
 							
             <Element id="DIVP2" type="devisor" refParameter="DIVP2" x="577" y="657" refEnable="MCO2OutPutEnable,LPTIM2Enable,LPTIM345Enable,ADCEnable,SAI4AEnable,SAI4BEnable,LPTIM1Enable,SAI1Enable,SAI23Enable,SPI123Enable">
                 <Input signalId="VCO2Output" from="DIVN2"/>
@@ -567,8 +560,9 @@
         </Tree>
 		
         <Tree id="PLL3">
-            <Element id="DIVN3" type="multiplicator" refParameter="DIVN3" x="512" y="795" >
+            <Element id="DIVN3" type="multiplicatorFrac" refParameter="DIVN3" x="512" y="795" >
                 <Input signalId="VCO3Input" from="DIVM3"/>
+                <Input signalId="PLL3FRACNClk" from="PLL3FRACN"/>
                 <Output signalId="VCO3Output" to="DIVP3"/>
                 <Output signalId="VCO3Output" to="DIVQ3"/>
                 <Output signalId="VCO3Output" to="DIVR3"/>
@@ -582,6 +576,10 @@
                 <Output signalId="PLL3CLK" to="SAI4BMult"/>
                 <Output signalId="PLL3CLK" to="SAI4AMult"/>
                 <Output signalId="PLL3CLK" to="DIVP3output"/>
+            </Element>
+
+            <Element id="PLL3FRACN" type="fractional" refParameter="PLL3FRACN" x="507" y="850">
+                <Output signalId="PLL3FRACNClk" to="DIVN3"/>
             </Element>
 			
             <Element id="DIVP3output" type="output" refParameter="DIVP3Freq_Value" x="639" y="794" refEnable="SAI4AEnable,SAI4BEnable,SAI1Enable,SAI23Enable,SPI123Enable">
@@ -1079,7 +1077,6 @@
         <Signal id="SYSCLK"/>
         <Signal id="D1CPRECLK"/>
         <Signal id="CortexCLK"/>
-        <Signal id="Cortex2CLK"/>
         <Signal id="HPREDivCLK"/>
         <Signal id="HCLK3"/>
         <Signal id="D1PPRECLK"/>
@@ -1140,6 +1137,9 @@
         <Signal id="MCO1DivOuput"/>
         <Signal id="MCO2DivInput"/>
         <Signal id="MCO2DivOuput"/>
+        <Signal id="PLL2FRACNClk"/>
+        <Signal id="PLL1FRACNClk"/>
+        <Signal id="PLL3FRACNClk"/>
 		
     </Signals>
 	<!--RTC labels-->
@@ -1221,6 +1221,7 @@
     <Label id="PLLQLabel"       type="info" text="DIVQ1"       posX="595" posY="585"/>
     <Label id="PLLQLabel"       type="info" text="DIVR1"       posX="595" posY="625"/>
     <Label id="PLLLabel"        type="info" text="PLL1"      posX="510" posY="625"/>
+    <Label id="PLL1fracvLabel"       type="info" text="fracn1"          posX="535" posY="587"/>
     <!--Main PLL2 labels-->
     <Label id="PLLMLabel"       type="info" text="DIVM2"     posX="450" posY="645"/>
     <Label id="PLLSAINLabel"       type="info" text="DIVN2"          posX="520" posY="680"/>
@@ -1228,6 +1229,7 @@
     <Label id="PLLSAIQLabel"       type="info" text="DIVQ2"          posX="595" posY="720"/>
     <Label id="PLLSAIRLabel"       type="info" text="DIVR2"          posX="595" posY="760"/>
     <Label id="PLLSAILabel"        type="info" text="PLL2"     posX="510" posY="760"/>
+    <Label id="PLL2fracvLabel"       type="info" text="fracn2"          posX="535" posY="725"/>
     <!--Main PLL3 labels-->
     <Label id="PLLMLabel"       type="info" text="DIVM3"     posX="450" posY="780"/>
     <Label id="PLL3NLabel"       type="info" text="DIVN3"          posX="520" posY="815"/>
@@ -1235,6 +1237,7 @@
     <Label id="PLL3QLabel"       type="info" text="DIVQ3"          posX="595" posY="855"/>
     <Label id="PLL3RLabel"       type="info" text="DIVR3"          posX="595" posY="895"/>
     <Label id="PLL3Label"        type="info" text="PLL3"     posX="510" posY="895"/>
+    <Label id="PLL2fracvLabel"       type="info" text="fracn3"          posX="535" posY="865"/>
 	
     <!-- source constraint label -->
 
@@ -1276,10 +1279,8 @@
     <Label id="AHBMaxLimitConstraint"  type="dynamiConstraint" posX="1270"  posY="440" text="100 MHz max"/>
     <Label id="AHBMaxLimitConstraint"  type="dynamiConstraint" posX="1270"  posY="530" text="100 MHz max"/>
 	
-    <Label id="Power" type="SpecialInfo" posX="1460" posY="152" text="To CPU1 Clocks (MHz)"/>
-    <Label id="Power" type="SpecialInfo" posX="1460" posY="180" text="To CPU1 Systick Clock (MHz)"/>
-    <Label id="Power" type="SpecialInfo" posX="1460" posY="210" text="To CPU2 Clocks (MHz)"/>
-    <Label id="Power" type="SpecialInfo" posX="1460" posY="240" text="To CPU2 Systick Clock (MHz)"/>
+    <Label id="Power" type="SpecialInfo" posX="1460" posY="210" text="To CPU Clocks (MHz)"/>
+    <Label id="Power" type="SpecialInfo" posX="1460" posY="240" text="To CPU Systick Clock (MHz)"/>
     <Label id="Power" type="SpecialInfo" posX="1460" posY="270" text="To AXI Peripheral Clocks (MHz)"/>
     <Label id="Power" type="SpecialInfo" posX="1460" posY="300" text="To HCLK3 (MHz)"/>
     <Label id="Power" type="SpecialInfo" posX="1460" posY="330" text="To APB3 Peripheral Clocks (MHz)"/>
@@ -1351,7 +1352,7 @@
     <Label id="HRTIMEnableMUXLabel"    type="muxLabel"    text="HRTIM Clock Mux" posX="1320" posY="1665" refEnable="HRTIMEnable"/>
     <Label id="HRTIMEnableOutput"      type="SpecialInfo" text="To HRTIM (MHz)"  posX="1460" posY="1710" refEnable="HRTIMEnable"/> 	
     <Label id="HRTIMnableSYSCLKLabel" type="signal"       text="Tim2_Ck"            posX="1300" posY="1685" refEnable="HRTIMEnable"/>
-    <Label id="HRTIMEnableHSILabel"    type="signal"      text="Cpu1_Ck"           posX="1300" posY="1725" refEnable="HRTIMEnable"/>
+    <Label id="HRTIMEnableHSILabel"    type="signal"      text="Cpu_Ck"           posX="1300" posY="1725" refEnable="HRTIMEnable"/>
 	
     <!--USART234578 mux-->
     <Label id="USART234578MUXLabel"    type="muxLabel"    text="USART2,3,4,5,7,8 Clock Mux" posX="1150" posY="640" refEnable="USART234578Enable"/>
@@ -1481,8 +1482,8 @@
 	
 	
     <!--SPDIF mux-->
-    <Label id="SPDIFMUXLabel"    type="muxLabel"    text="SPDIF Clock Mux"  posX="890" posY="1140" refEnable="SPDIFEnable"/>
-    <Label id="SPDIFOutput"      type="SpecialInfo" text="To SPDIF (MHz)"   posX="1040" posY="1205" refEnable="SPDIFEnable"/> 	
+    <Label id="SPDIFMUXLabel"    type="muxLabel"    text="SPDIFRX1 Clock Mux"  posX="890" posY="1142" refEnable="SPDIFEnable"/>
+    <Label id="SPDIFOutput"      type="SpecialInfo" text="To SPDIFRX1 (MHz)"   posX="1040" posY="1205" refEnable="SPDIFEnable"/> 	
     <Label id="SPDIFSYSCLKLabel" type="signal"      text="PLL1Q"             posX="880" posY="1160" refEnable="SPDIFEnable"/>
     <Label id="SPDIFHSILabel"    type="signal"      text="PLL2R"               posX="880" posY="1185" refEnable="SPDIFEnable"/>
     <Label id="SPDIFLSELabel"    type="signal"      text="PLL3R"               posX="880" posY="1210" refEnable="SPDIFEnable"/>

@@ -1,0 +1,1 @@
+Manifest=openstlinux-4.19-thud-mp1-19-02-20

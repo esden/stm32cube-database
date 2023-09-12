@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 [#assign s = name]
 [#assign titi = s?replace("Target/","")]
 [#assign toto = titi?replace(".","__")]
@@ -12,7 +13,7 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
-
+/* USER CODE END Header */
 
 [#assign inclusion_protection = toto?upper_case]
 /* Define to prevent recursive inclusion -------------------------------------*/
@@ -88,10 +89,10 @@ extern ${variable.value} ${variable.name};
 /*---------- [#if definition.comments??]${definition.comments} [/#if] -----------*/
 [#-- Tracker 253306 --]
     [#if definition.name="USBD_DFU_APP_DEFAULT_ADD"]
-#define ${definition.name} #t#t${value}
+#define ${definition.name} #t#t${value}U
     [/#if]
     [#if definition.name!="USBD_DFU_APP_DEFAULT_ADD"]
-#define ${definition.name} #t#t${value}
+#define ${definition.name} #t#t${value}U
     [/#if]
 [#-- Tracker 253306 --]
 	[#if definition.description??]${definition.description} [/#if]

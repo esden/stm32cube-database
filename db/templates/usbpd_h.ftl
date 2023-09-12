@@ -21,6 +21,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "usbpd_core.h"
 #include "usbpd_dpm_core.h"
+#include "usbpd_dpm_user.h"
 #include "usbpd_hw_if.h"
 
 /* USER CODE BEGIN 0 */

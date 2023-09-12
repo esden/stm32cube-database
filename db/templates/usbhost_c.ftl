@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file            : ${name?lower_case}.c
@@ -9,6 +10,7 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
+/* USER CODE END Header */
 
 [#-- Create global variables --]
 [#assign includeDone = 0]
@@ -237,7 +239,7 @@
                                                                                 [#assign AdrMza = ""]
                                                                         [/#if]
                                                                 [/#compress]
-                                                                [#if argument.genericType != "struct"]        tata
+                                                                [#if argument.genericType != "struct"]        
                                                                         [#if argument.mandatory]
                                                                                 [#if instanceIndex??&&fargument.context=="global"]
                                                                                         [#assign argValue=argument.value?replace("$Index",instanceIndex)]
@@ -308,7 +310,10 @@
                                 [/#if]
 
                 [/#list]
-                                [#if nTab==2]#t#t[#else]#t[/#if]${return}${method.name}(${args});#n
+                                #tif (${return}${method.name}(${args}) != USBH_OK)
+								#t{
+								#t#tError_Handler();
+								#t}
                                 [#else]
                     [#if nTab==2]#t#t[#else]#t[/#if]${return}${method.name}();
                                 [/#if]

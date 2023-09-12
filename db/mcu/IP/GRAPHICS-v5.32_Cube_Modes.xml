@@ -611,7 +611,7 @@
     </RefParameter> 
     
  
-    <!--        IPs Instance        *****************************************  -->
+                                 <!-- IPs Instance        *****************************************  -->
     <RefParameter Name="VIRTUAL_SDRAM1" Type="integer" Comment="SDRAM1 on" DefaultValue="1" Group="SDRAM" Visible="false">
         <Condition Expression="SdramChipSelect1" Diagnostic=""/>
          
@@ -880,11 +880,11 @@
     </RefParameter> 
     
     <!-- ************************************************ Display size             *************************************   -->
-    <RefParameter Name="Xsize_PHYS" Comment="X size(Pixels)" DefaultValue="240" Max="1000" Min="0" Type="integer" Group="Physical Display Size" >
+    <RefParameter Name="Xsize_PHYS" Comment="X size(Pixels)" DefaultValue="+LTDC:ActiveW" Max="1000" Min="0" Type="integer" Group="Physical Display Size" >
         <Description> Specify physical display horizontal size. </Description>
     </RefParameter>
     
-    <RefParameter Name="Ysize_PHYS" Comment="Y size(Pixels)" DefaultValue="320" Max="1000" Min="0" Type="integer" Group="Physical Display Size" >
+    <RefParameter Name="Ysize_PHYS" Comment="Y size(Pixels)" DefaultValue="+LTDC:ActiveH" Max="1000" Min="0" Type="integer" Group="Physical Display Size" >
         <Description> Specify Physical display vertical size. </Description>
     </RefParameter>
     
@@ -1087,25 +1087,22 @@
     
     <RefParameter Name="LTDC_NUM_LAYERS" Comment="Number Of Layers" DefaultValue="=LTDC:Layers" Type="string" Group="Number of Layers" Visible="false" >
         <Description>Number of available layers must be set from LTDC configuration .
-             &lt;br&gt; &lt; For information : &lt;/b&gt; &lt;br&gt;
-            STemWin can use one or two Layers.  </Description>
+               </Description>
         <Condition Diagnostic="" Expression=" Display_Interface_LTDC_DSIHOST | Display_Interface_LTDC_FMC"/> 
     </RefParameter>
     
     <RefParameter Name="GUI_NUM_LAYERS" Comment="GUI_NUM_LAYERS(Set in LTDC)" DefaultValue="1" Type="string" Group="Number of Layers" >
          <Description>Number of available layers must be set from LTDC configuration .
-             &lt;br&gt; &lt; For information : &lt;/b&gt; &lt;br&gt;
-            STemWin can use one or two Layers.  </Description>
+              </Description>
         <Condition Diagnostic="" Expression=" (LTDC_NUM_LAYERS = 0) &amp; (Display_Interface_LTDC_FMC | Display_Interface_LTDC_DSIHOST) "/> 
         <PossibleValue Comment="1" Value="1"  />
     </RefParameter>
     
-    <RefParameter Name="GUI_NUM_LAYERS" Comment="GUI_NUM_LAYERS(Set in LTDC)" DefaultValue="2" Type="string" Group="Number of Layers" >
+    <RefParameter Name="GUI_NUM_LAYERS" Comment="GUI_NUM_LAYERS(Set in LTDC)" DefaultValue="2" Type="list" Group="Number of Layers" >
          <Description>Number of available layers must be set from LTDC configuration .
-             &lt;br&gt; &lt; For information : &lt;/b&gt; &lt;br&gt;
-            STemWin can use one or two Layers.  </Description>
+             </Description>
         <Condition Diagnostic="" Expression="(LTDC_NUM_LAYERS = 1) &amp; (Display_Interface_LTDC_FMC | Display_Interface_LTDC_DSIHOST)"/> 
-        <PossibleValue Comment="2" Value="2"  />
+        <PossibleValue Comment="2" Value="2" Condition="LTDC_NUM_LAYERS = 1" Action="Error" Diagnostic="ffff" />
     </RefParameter>
   
     <RefParameter Name="STemWin_version" Comment="Version" DefaultValue="5.40" Type="String" Group="Stack Name" Visible="false">
@@ -1171,8 +1168,6 @@
 
 
 
-
- 
 
     <RefParameter Name="EW_Memory_Pool_Size" Comment="Memory Pool Size" DefaultValue="8388608"  Min="=EW_Frame_Buffer_Width*EW_Frame_Buffer_Height*EW_Frame_Buffer_Depth" Type="integer" Group="Memory Size" >
         <Description>Configures the memory pool size value allocated for the stack .
@@ -1662,11 +1657,11 @@
  
  
     <!-- ************************************************ Display size             *************************************   -->
-    <RefParameter Name="TGFX_Buffer_Width" Comment="Width" DefaultValue="320" Max="1000" Min="0" Type="integer" Group="Physical Display Size" >
+    <RefParameter Name="TGFX_Buffer_Width" Comment="Width" DefaultValue="+LTDC:ActiveW" Max="1000" Min="0" Type="String" Group="Physical Display Size" >
         <Description> Specify physical display horizontal size. </Description>
     </RefParameter>
     
-    <RefParameter Name="TGFX_Buffer_Height" Comment="Height" DefaultValue="240" Max="1000" Min="0" Type="integer" Group="Physical Display Size" >
+    <RefParameter Name="TGFX_Buffer_Height" Comment="Height" DefaultValue="+LTDC:ActiveH" Max="1000" Min="0" Type="String" Group="Physical Display Size" >
         <Description> Specify the physical display vertical size. </Description>
     </RefParameter>
  
@@ -1838,7 +1833,7 @@
     <!-- External Application Location -->
 
     <!-- The user is allowed to customize the external appli path -->
-    <RefParameter Name="EA_1_custom_path" Comment="Customizable Path" DefaultValue="custom_off" Type="list" Group="Location" TabName="EA_1_STemWin" Visible="false">
+    <RefParameter Name="EA_1_custom_path" Comment="Customizable Path" DefaultValue="custom_off" Type="list" Group="Location" TabName="EA_1_STemWin" Visible="true">
         <Condition  Diagnostic="" Expression="USE_STemWin_STACK &amp;S_UseGUIBuilder "/>
         <PossibleValue Comment="Yes" Value="custom_on"/>
         <PossibleValue Comment="No" Value="custom_off"/>
@@ -1882,7 +1877,7 @@
     </RefParameter>
 
     <!-- type inline parameters, to remove if type is iniFile -->
-    <!-- template to be define syntax for external appli : do we use paramname = paramvalue or -paramnam paramvalue or ... -->
+    <!-- template to be define syntax for external appli : do we use paramname = paramvalue or -paramnam paramvalue or ... -->                                                                                    
     <RefParameter Name="Use_App" Comment="USe External Application flag" DefaultValue="0" Type="string" Visible="false">
         <Condition Expression="!S_UseGUIBuilder" Diagnostic=""/>
     </RefParameter>
@@ -2208,7 +2203,7 @@
     <!-- name of executable file which can be OS dependent -->
     <RefParameter Name="EA_3_executable_name" Comment="Executable name" DefaultValue="TouchGFXDesigner.exe" Type="list" Group="Location" TabName="EA_3_TouchGFX" Visible="false">
         <Condition  Diagnostic="" Expression="USE_Touch_GFX_STACK"/>
-        <PossibleValue Comment="windows_path_1" Condition="!(EA_3_os = Windows)" Value="TouchGFXDesigner.exe"/>
+        <PossibleValue Comment="windows_path_1" Condition="!(EA_3_os = Windows)" Value=""/>
         <Description>External application executable name per os</Description>
     </RefParameter>
 
@@ -2240,6 +2235,34 @@
         <Condition  Diagnostic="" Expression="USE_Touch_GFX_STACK"/> 
         <PossibleValue Comment="windows command line template" Condition="!(EA_3_os = Windows)" Value="#EA_3_input_param1#"/>
     </RefParameter>
+	
+	<!--.Number of Layers touchgfx --> 
+	
+	 <!--RefParameter Name="LTDC_NUM_LAYERS" Comment="Number Of Layers" DefaultValue="=LTDC:Layers" Type="string" Group="Number of Layers" Visible="false" >
+        <Description>Number of available layers must be set from LTDC configuration .
+             
+            </Description>
+            
+        <Condition Diagnostic="" Expression=" Display_Interface_LTDC_DSIHOST | Display_Interface_LTDC_FMC"/> 
+    </RefParameter>
+    
+    <RefParameter Name="GUI_NUM_LAYERS" Comment="GUI_NUM_LAYERS(Set in LTDC)" DefaultValue="1" Type="string" Group="Number of Layers" >
+         <Description>Number of available layers must be set from LTDC configuration .
+             </Description>
+        <Condition Diagnostic="" Expression=" (LTDC_NUM_LAYERS = 0) &amp;  (Display_Interface_LTDC_FMC | Display_Interface_LTDC_DSIHOST) "/> 
+        <Condition Diagnostic="" Expression=" USE_Touch_GFX_STACK "/>
+        <PossibleValue Comment="1" Value="1"  />
+    </RefParameter>
+    
+    <RefParameter Name="GUI_NUM_LAYERS" Comment="GUI_NUM_LAYERS(Set in LTDC)" DefaultValue="2" Type="integer" Group="Number of Layers" >
+         <Description>Number of available layers must be set from LTDC configuration .
+               </Description>
+        <Condition Diagnostic="" Expression="(LTDC_NUM_LAYERS = 1) &amp; ( Display_Interface_LTDC_FMC | Display_Interface_LTDC_DSIHOST) "/> 
+        
+        <PossibleValue Comment="2" Value="2" Expression="1=1" Action="Error" Diagnostic="" />
+    </RefParameter-->
+	
+	
     <!--.touchgfx --> 
     <RefParameter Name="EA_3_input_param1" Comment="Output File Name" DefaultValue="[MXPROJECTROOTPATH]\TouchGFX\[MXPROJECTNAME].touchgfx" Type="string" Group="Inputs" TabName="EA_3_TouchGFX" Visible="false">
         <Condition  Diagnostic="" Expression="USE_Touch_GFX_STACK"/>
@@ -2256,10 +2279,10 @@
     <RefParameter Name="EA_3_in_file1_param1" Comment="MCU target" DefaultValue="STM32F469" Type="string" Group="Inputs" TabName="EA_3_TouchGFX" Visible="false">
         <Condition  Diagnostic="" Expression="USE_Touch_GFX_STACK"/>
     </RefParameter>
-    <RefParameter Name="EA_3_in_file1_param2" Comment="Physical Display X Size" DefaultValue="=TGFX_Buffer_Width" Type="string" Group="Inputs" TabName="EA_3_TouchGFX" Visible="true">
+    <RefParameter Name="EA_3_in_file1_param2" Comment="Physical Display X Size" DefaultValue="800" Type="StringRW"  Group="Inputs" TabName="EA_3_TouchGFX" Visible="true">
         <Condition  Diagnostic="" Expression="USE_Touch_GFX_STACK"/>
     </RefParameter>
-    <RefParameter Name="EA_3_in_file1_param3" Comment="Physical Display Y Size" DefaultValue="=TGFX_Buffer_Height" Type="string" Group="Inputs" TabName="EA_3_TouchGFX" Visible="true">
+    <RefParameter Name="EA_3_in_file1_param3" Comment="Physical Display Y Size" DefaultValue="480" Type="StringRW"  Group="Inputs" TabName="EA_3_TouchGFX" Visible="true">
         <Condition  Diagnostic="" Expression="USE_Touch_GFX_STACK"/>
     </RefParameter>
     <RefParameter Name="EA_3_in_file1_param4" Comment="MXprojectName" DefaultValue="[MXPROJECTNAME]" Type="string" Group="Inputs" TabName="EA_3_TouchGFX" Visible="false">
@@ -2475,6 +2498,9 @@
         <Parameter Name="TGFX_cache_size"/>
         <Parameter Name="TGFX_cache_count"/>
         <Parameter Name="Instrumentation"/>
+	<Parameter Name="GUI_NUM_LAYERS"/>
+		
+		
         
         <Parameter Name="Use_ili9341"/> 
         <Parameter Name="Use_ili9341_Check"/> 
@@ -2825,7 +2851,7 @@
                     <SignalLogicalOp Name="AND">
                         <Signal IOMode="" Name="VS-DisplayInterface-DSI-LTDC-GFXMMU"/>
                     </SignalLogicalOp>
-                    <Condition Expression=" (MW_LTDC_MW) &amp; (MW_GFXMMU_MW) &amp; (MW_DSIHOST_MW)   &amp; (USE_STemWin_STACK)" Diagnostic="Active only when one stack is selected and LTDC IP is configured in DSI mode ,DSIHOST IP is configured in TE Pin mode and GFXMMU IP is configured "/>
+                    <Condition Expression=" (MW_LTDC_MW) &amp; (MW_GFXMMU_MW) &amp; (MW_DSIHOST_MW)   &amp; (USE_STemWin_STACK|USE_Touch_GFX_STACK)" Diagnostic="Active only when one stack is selected and LTDC IP is configured in DSI mode ,DSIHOST IP is configured in TE Pin mode and GFXMMU IP is configured "/>
                 
                     <Semaphore>Display_Interface_LTDC_DSIHOST</Semaphore>
                 </Mode>	
@@ -2845,7 +2871,7 @@
                     <SignalLogicalOp Name="AND">
                         <Signal IOMode="" Name="VS-DisplayInterface-LTDC"/>
                     </SignalLogicalOp>                                    
-                    <Condition Expression=" (MW_LTDC_MW)  &amp; (USE_STemWin_STACK)" Diagnostic="Active only when one stack is selected and LTDC IP is configured"/>
+                    <Condition Expression=" (MW_LTDC_MW)  &amp; (USE_STemWin_STACK|USE_Touch_GFX_STACK)" Diagnostic="Active only when one stack is selected and LTDC IP is configured"/>
                     <Semaphore>Display_Interface_LTDC_FMC</Semaphore>
                 </Mode>	
                 

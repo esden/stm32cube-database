@@ -136,12 +136,12 @@ static void MX_${ipName}_Init(void)
               [#if !struct_argument_already_found]
                 [#list func_argument.argument as argument1]
                   [#if argument1.genericType != "struct"]
-                    [#if argument1.mandatory && argument1.value??]
+                    [#if (argument1.mandatory | argument1.forcedValue??) && argument1.value??]
   ${func_argument_name}.${argument1.name} = ${argument1.value};
                     [/#if]
                   [#else]
                     [#list argument1.argument as argument2]
-                      [#if argument2.mandatory && argument2.value??]
+                      [#if (argument2.mandatory | argument2.forcedValue??) && argument2.value??]
   ${func_argument_name}.${argument1.name}.${argument2.name} = ${argument2.value};
                       [/#if]
                     [/#list]
@@ -200,12 +200,12 @@ static void MX_${ipName}_Init(void)
               [#assign arg = "" + addr + func_argument_name]
               [#list func_argument.argument as argument1]
                 [#if argument1.genericType != "struct"]
-                  [#if argument1.mandatory && argument1.value??]
+                  [#if (argument1.mandatory | argument1.forcedValue??) && argument1.value??]
   //${func_argument_name}.${argument1.name} = ${argument1.value};
                   [/#if]
                 [#else]
                   [#list argument1.argument as argument2]
-                    [#if argument2.mandatory && argument2.value??]
+                    [#if (argument2.mandatory | argument2.forcedValue??) && argument2.value??]
   //${func_argument_name}.${argument1.name}.${argument2.name} = ${argument2.value};
                     [/#if]
                   [/#list]

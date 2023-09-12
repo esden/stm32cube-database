@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 [#assign s = name]
 [#assign titi = s?replace("Target/","")]
 [#assign toto = titi?replace(".","__")]
@@ -12,7 +13,7 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
-
+/* USER CODE END Header */
 
 [#assign inclusion_protection = toto?upper_case]
 /* Define to prevent recursive inclusion -------------------------------------*/

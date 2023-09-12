@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file    stmCriticalSection.h
@@ -33,6 +34,7 @@
   *
   ******************************************************************************
   */
+/* USER CODE END Header */
 
 #ifndef STM_CRITICAL_SECTION_H
 #define STM_CRITICAL_SECTION_H

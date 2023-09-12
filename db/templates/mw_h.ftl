@@ -21,7 +21,9 @@
 /* Includes ------------------------------------------------------------------*/
 [#if includes??]
 [#list includes as include]
+[#if include != ""]
 #include "${include}"
+[/#if]
 [/#list]
 [/#if]
 

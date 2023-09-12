@@ -17,12 +17,12 @@
             [/#if]
     [/#if]
         [/#list]
-        [#if grouplibExist=="1"]            
+        [#if grouplibExist=="1"]
             [#list groupArg.sourceFilesNameList as filesName]
                 [#if filesName?ends_with(".a")||filesName?ends_with(".lib")]
-        <file>
+<file>
             <name>${filesName!''}</name>
-        </file>          
+    </file>
                 [/#if]
             [/#list]
         [/#if]
@@ -122,6 +122,11 @@
             <name>Packs</name>
             </sourceEntry>
 	[/#if]
+        [#if ResMgr_Utility??]
+            <sourceEntry>
+                <name>Utilities</name>
+            </sourceEntry>
+        [/#if]
         </sourceEntries>
         [#if atLeastOneMiddlewareIsUsed]
             <group>
@@ -251,6 +256,11 @@
             <name>Packs</name>
             </sourceEntry>
 	[/#if]
+        [#if ResMgr_Utility??]
+            <sourceEntry>
+                <name>Utilities</name>
+            </sourceEntry>
+        [/#if]
         </sourceEntries>
         [#-- add lib path --]        
         [#if atLeastOneMiddlewareIsUsed]
@@ -438,6 +448,7 @@
 
 [#-- App Group Case of Graphics--]
     [#list ApplicationGroups as grp]        
+    [#if grp.name!="Remoteproc"]
         <group>
         <name>${grp.name!''}</name>
         [#if grp.excludedFrom!=""]
@@ -469,8 +480,37 @@
             [/#list]	
         [/#if]
         </group>
+    [/#if]
     [/#list]
     </group> 
+[#list ApplicationGroups as grp] 
+    [#if grp.name=="Remoteproc"]
+    <group>
+        <name>${grp.name!''}</name>
+        [#if grp.sourceFilesNameList??]
+            [#list grp.sourceFilesNameList as filesName]
+                    <file>
+                            <name>${filesName!''}</name>
+                    </file>
+            [/#list]
+        [/#if]
+            [#if grp.subGroups??]
+                    [#list grp.subGroups as subGrp]	
+                    <group>
+                    <name>${subGrp.name!''}</name>
+                    [#if subGrp.sourceFilesNameList??]
+                            [#list subGrp.sourceFilesNameList as filesName]
+                                    <file>
+                                            <name>${filesName!''}</name>
+                                    </file>
+                            [/#list]
+                    [/#if]
+                    </group>
+                    [/#list]	
+            [/#if]
+    </group>
+    [/#if]
+[/#list] 
     </group>
 [/#if]
 </Project>
@@ -517,7 +557,6 @@
     [#-- <optimization>${project.compilerOptimization}</optimization> --]
     <optimization>${optimization}</optimization>
     <icfloc>${icfloc}</icfloc>
-     
 
     <UsedFreeRTOS>${usedfreeRTOS}</UsedFreeRTOS>
     <Aincludes>
@@ -586,9 +625,7 @@
 	   <include>${mxIncludePath}</include>
         [/#list]     
 	[#list halIncludePaths as halIncludePath]
-            [#if !halIncludePath?contains("CMSIS\\Include") || (halIncludePath?contains("CMSIS\\Include") && !project.deviceId?contains("STM32G0"))]
-	   <include>${halIncludePath}</include>
-            [/#if]
+            <include>${halIncludePath}</include>
         [/#list]
 
     </Cincludes>

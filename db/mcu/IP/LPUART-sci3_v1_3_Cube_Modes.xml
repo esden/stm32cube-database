@@ -1,16 +1,25 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?><IP xmlns="http://mcd.rou.st.com/modules.php?name=mcu" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" DBVersion="V3.0" IPType="peripheral" Name="LPUART" Version="sci3_v1_3_Cube" ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../db/IP_Modes_V3_0.xsd">
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><IP xmlns="http://mcd.rou.st.com/modules.php?name=mcu" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" DBVersion="V3.0" IPType="peripheral" Name="LPUART" Version="sci3_v1_3_Cube" ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd">
 	<About>LPUART: Low Power Universal Asynchronous Receiver Transmitter</About>
 	<!-- Generic RefParameters for USART/UART/IrDA/SmartCard Modes -->
 	<RefParameter Comment="Instance" DefaultValue="LPUART$Index" Name="Instance" Type="" Visible="false"/>
 	<!-- LPUART Parameters. -->
 	<!-- WordLength Parameters for Asynchronous. -->
+	<RefParameter Comment="Word Length" DefaultValue="UART_WORDLENGTH_8B" Group="Basic Parameters" Name="WordLength" Type="list">
+        <Condition Diagnostic="" Expression="Semaphore_DBG_TRACE_UART_CFG_hw_lpuart1 | Semaphore_CFG_CONSOLE_MENU_hw_lpuart1 | Semaphore_CFG_UART_CLI_hw_lpuart1 | Semaphore_CFG_UART_GUI_hw_lpuart1"/>
+		<PossibleValue Comment="7 Bits (including Parity)" Value="UART_WORDLENGTH_7B"/>
+		<PossibleValue Comment="8 Bits (including Parity)" Value="UART_WORDLENGTH_8B"/>
+		<PossibleValue Comment="9 Bits (including Parity)" Value="UART_WORDLENGTH_9B"/>
+	</RefParameter>
 	<RefParameter Comment="Word Length" DefaultValue="UART_WORDLENGTH_7B" Group="Basic Parameters" Name="WordLength" Type="list">
 		<PossibleValue Comment="7 Bits (including Parity)" Value="UART_WORDLENGTH_7B"/>
 		<PossibleValue Comment="8 Bits (including Parity)" Value="UART_WORDLENGTH_8B"/>
 		<PossibleValue Comment="9 Bits (including Parity)" Value="UART_WORDLENGTH_9B"/>
 	</RefParameter>
     <RefParameter Comment="Baud Rate" DefaultValue="921600" Group="Basic Parameters" Max="10500000" Min="110" Name="BaudRate" Type="integer" Unit="Bits/s">
-        <Condition Diagnostic="" Expression="USBPD_$IpInstance"/>
+        <Condition Diagnostic="" Expression="TRACEREMB_$IpInstance"/>
+    </RefParameter>
+    <RefParameter Comment="Baud Rate" DefaultValue="115200" Group="Basic Parameters" Max="10500000" Min="110" Name="BaudRate" Type="integer" Unit="Bits/s">
+        <Condition Diagnostic="" Expression="Semaphore_DBG_TRACE_UART_CFG_hw_lpuart1 | Semaphore_CFG_CONSOLE_MENU_hw_lpuart1 | Semaphore_CFG_UART_CLI_hw_lpuart1 | Semaphore_CFG_UART_GUI_hw_lpuart1"/>
     </RefParameter>
 	
 	<RefParameter Comment="Baud Rate" DefaultValue="209700" Group="Basic Parameters" Max="10500000" Min="110" Name="BaudRate" Type="integer" Unit="Bits/s"/>
@@ -409,6 +418,7 @@
 					</SignalLogicalOp>
 				</Mode>			
 			</ModeLogicOperator>
+                        <Semaphore>S_LPUART</Semaphore>
 		</Mode>
 		<Mode Name="Hardware Flow Control (RS232)">
 			<ModeLogicOperator Name="XOR">
@@ -434,6 +444,7 @@
 			</ModeLogicOperator>
 			<Condition Diagnostic="Active only with Asynchronous Mode" Expression="$IpInstance_Asynchronous &amp; !$IpInstance_HardwareControl"/>
 			<Semaphore>$IpInstance_FlowControl</Semaphore>
+                        <Semaphore>S_LPUART</Semaphore>
 		</Mode>
 		<Mode Name="Hardware Flow Control (RS485)">
 		    <ModeLogicOperator Name="XOR">
@@ -445,6 +456,7 @@
 		    </ModeLogicOperator>
 		<Condition Diagnostic="Active only with Asynchronous Mode" Expression="!$IpInstance_FlowControl &amp; $IpInstance_Asynchronous"/>
 		<Semaphore>$IpInstance_HardwareControl</Semaphore>
+                <Semaphore>S_LPUART</Semaphore>
 		</Mode>
 	</ModeLogicOperator>
 	<!-- RefSignal for LPUART -->
@@ -453,5 +465,5 @@
 	<RefSignal IOMode="AlternateFunctionPushPull" Name="DE"/>
 	<RefSignal IOMode="AlternateFunctionPushPullUp" Name="RX"/>
 	<RefSignal IOMode="AlternateFunctionPushPullUp" Name="TX"/>
-	<Semaphore>LPUARTUsed_ForRCC</Semaphore>
+	<Semaphore>LPUARTUsed_ForRCC</Semaphore>    
 </IP>

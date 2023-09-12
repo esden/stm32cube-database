@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file    stmCriticalSection.c
@@ -55,6 +56,7 @@
    section should be used only for word-variables or group of variables for
    which the coherence is important.
 */
+/* USER CODE END Header */
 
 #include "stmCriticalSection.h"
 

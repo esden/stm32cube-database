@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 [#assign s = name]
 [#assign titi = s?replace("Target/","")]
 [#assign toto = titi?replace(".","__")]
@@ -12,22 +13,24 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
-
+/* USER CODE END Header */
 
 [#assign inclusion_protection = toto?upper_case]
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __${inclusion_protection}__
 #define __${inclusion_protection}__
+#ifdef __cplusplus
+ extern "C" {
+#endif
+/* Includes ------------------------------------------------------------------*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "main.h"
 
-#ifdef __cplusplus
- extern "C" {
-#endif
 
-/* Includes ------------------------------------------------------------------*/
+
 [#if SWIncludes??]
 [#list SWIncludes as include]
 #include "${include}"
@@ -38,13 +41,12 @@
 
 /* USER CODE END INCLUDE */
 
-/** @addtogroup USBH_OTG_DRIVER
-  * @brief Driver for Usb host.
+/** @addtogroup STM32_USB_HOST_LIBRARY
   * @{
   */
 
-/** @defgroup USBH_CONF USBH_CONF
-  * @brief Configuration file for Usb otg low level driver.
+/** @defgroup USBH_CONF
+  * @brief usb host low level driver configuration file
   * @{
   */
 
@@ -81,11 +83,7 @@ extern ${variable.value} ${variable.name};
   * @{
   */
 
-/*
-	MiddleWare name : ${instName}
-	MiddleWare fileName : ${fileName}
-	MiddleWare version : ${version}
-*/
+
 [#if SWIP.defines??]
 	[#list SWIP.defines as definition]
 [#if definition.name="USBH_PROCESS_PRIO"]
@@ -96,7 +94,7 @@ extern ${variable.value} ${variable.name};
 [/#if]
 [#if definition.name!="USBH_PROCESS_STACK_SIZE" && definition.name!="USBH_PROCESS_PRIO"]
 /*---------- [#if definition.comments??]${definition.comments} [/#if] -----------*/
-#define ${definition.name} #t#t ${definition.value}
+#define ${definition.name} #t#t ${definition.value}U
 [/#if]
 [#if definition.description??]${definition.description} [/#if]
 	[/#list]
@@ -146,30 +144,34 @@ extern ${variable.value} ${variable.name};
 /* DEBUG macros */
 
 
-#if (USBH_DEBUG_LEVEL > 0)
-#define USBH_UsrLog(...)    printf(__VA_ARGS__);\
-                            printf("\n");
+#if (USBH_DEBUG_LEVEL > 0U)
+#define  USBH_UsrLog(...)   do { \
+                            printf(__VA_ARGS__); \
+                            printf("\n"); \
+} while (0)
 #else
-#define USBH_UsrLog(...)
+#define USBH_UsrLog(...) do {} while (0)
 #endif
 
+#if (USBH_DEBUG_LEVEL > 1U)
 
-#if (USBH_DEBUG_LEVEL > 1)
-
-#define USBH_ErrLog(...)    printf("ERROR: ");\
-                            printf(__VA_ARGS__);\
-                            printf("\n");
+#define  USBH_ErrLog(...) do { \
+                            printf("ERROR: ") ; \
+                            printf(__VA_ARGS__); \
+                            printf("\n"); \
+} while (0)
 #else
-#define USBH_ErrLog(...)
+#define USBH_ErrLog(...) do {} while (0)
 #endif
 
-
-#if (USBH_DEBUG_LEVEL > 2)
-#define USBH_DbgLog(...)    printf("DEBUG : ");\
-                            printf(__VA_ARGS__);\
-                            printf("\n");
+#if (USBH_DEBUG_LEVEL > 2U)
+#define  USBH_DbgLog(...)   do { \
+                            printf("DEBUG : ") ; \
+                            printf(__VA_ARGS__); \
+                            printf("\n"); \
+} while (0)
 #else
-#define USBH_DbgLog(...)
+#define USBH_DbgLog(...) do {} while (0)
 #endif
 
 /**

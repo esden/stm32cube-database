@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /** 
   ******************************************************************************
   * File Name       : mbedtls_config.h
@@ -7,6 +8,7 @@
  [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
+/* USER CODE END Header */
 
 #ifndef MBEDTLS_CONFIG_H
 #define MBEDTLS_CONFIG_H
@@ -30,9 +32,13 @@
  * Requires support for asm() in compiler.
  *
  * Used in:
+ *      library/aria.c
  *      library/timing.c
- *      library/padlock.c
  *      include/mbedtls/bn_mul.h
+ *
+ * Required by:
+ *      MBEDTLS_AESNI_C
+ *      MBEDTLS_PADLOCK_C
  *
  * Comment to disable the use of assembly code.
  */
@@ -434,20 +440,26 @@
  * \def MBEDTLS_AES_ALT
  *
  * MBEDTLS__MODULE_NAME__ALT: Uncomment a macro to let mbed TLS use your
- * alternate core implementation of a symmetric crypto or hash module (e.g.
- * platform specific assembly optimized implementations). Keep in mind that
- * the function prototypes should remain the same.
+ * alternate core implementation of a symmetric crypto, an arithmetic or hash
+ * module (e.g. platform specific assembly optimized implementations). Keep
+ * in mind that the function prototypes should remain the same.
  *
  * This replaces the whole module. If you only want to replace one of the
  * functions, use one of the MBEDTLS__FUNCTION_NAME__ALT flags.
  *
  * Example: In case you uncomment MBEDTLS_AES_ALT, mbed TLS will no longer
- * provide the "struct mbedtls_aes_context" definition and omit the base function
- * declarations and implementations. "aes_alt.h" will be included from
+ * provide the "struct mbedtls_aes_context" definition and omit the base
+ * function declarations and implementations. "aes_alt.h" will be included from
  * "aes.h" to include the new function definitions.
  *
  * Uncomment a macro to enable alternate implementation of the corresponding
  * module.
+ *
+ * \warning   MD2, MD4, MD5, ARC4, DES and SHA-1 are considered weak and their
+ *            use constitutes a security risk. If possible, we recommend
+ *            avoiding dependencies on them, and considering stronger message
+ *            digests and ciphers instead.
+ *
  */
 [#list SWIPdatas as SWIP]
 	[#if SWIP.defines??]
@@ -470,6 +482,19 @@
 					[#lt]//#define MBEDTLS_ARC4_ALT
 				[#else]
 					[#lt]#define MBEDTLS_ARC4_ALT
+				[/#if]
+			[/#if]
+		[/#list]
+	[/#if]
+[/#list]
+[#list SWIPdatas as SWIP]
+	[#if SWIP.defines??]
+		[#list SWIP.defines as definition]
+			[#if definition.name="MBEDTLS_ARIA_ALT"]
+				[#if definition.value="0"]
+					[#lt]//#define MBEDTLS_ARIA_ALT
+				[#else]
+					[#lt]#define MBEDTLS_ARIA_ALT
 				[/#if]
 			[/#if]
 		[/#list]
@@ -504,6 +529,32 @@
 [#list SWIPdatas as SWIP]
 	[#if SWIP.defines??]
 		[#list SWIP.defines as definition]
+			[#if definition.name="MBEDTLS_CCM_ALT"]
+				[#if definition.value="0"]
+					[#lt]//#define MBEDTLS_CCM_ALT
+				[#else]
+					[#lt]#define MBEDTLS_CCM_ALT
+				[/#if]
+			[/#if]
+		[/#list]
+	[/#if]
+[/#list]
+[#list SWIPdatas as SWIP]
+	[#if SWIP.defines??]
+		[#list SWIP.defines as definition]
+			[#if definition.name="MBEDTLS_CMAC_ALT"]
+				[#if definition.value="0"]
+					[#lt]//#define MBEDTLS_CMAC_ALT
+				[#else]
+					[#lt]#define MBEDTLS_CMAC_ALT
+				[/#if]
+			[/#if]
+		[/#list]
+	[/#if]
+[/#list]
+[#list SWIPdatas as SWIP]
+	[#if SWIP.defines??]
+		[#list SWIP.defines as definition]
 			[#if definition.name="MBEDTLS_DES_ALT"]
 				[#if definition.value="0"]
 					[#lt]//#define MBEDTLS_DES_ALT
@@ -517,11 +568,37 @@
 [#list SWIPdatas as SWIP]
 	[#if SWIP.defines??]
 		[#list SWIP.defines as definition]
-			[#if definition.name="MBEDTLS_XTEA_ALT"]
+			[#if definition.name="MBEDTLS_DHM_ALT"]
 				[#if definition.value="0"]
-					[#lt]//#define MBEDTLS_XTEA_ALT
+					[#lt]//#define MBEDTLS_DHM_ALT
 				[#else]
-					[#lt]#define MBEDTLS_XTEA_ALT
+					[#lt]#define MBEDTLS_DHM_ALT
+				[/#if]
+			[/#if]
+		[/#list]
+	[/#if]
+[/#list]
+[#list SWIPdatas as SWIP]
+	[#if SWIP.defines??]
+		[#list SWIP.defines as definition]
+			[#if definition.name="MBEDTLS_ECJPAKE_ALT"]
+				[#if definition.value="0"]
+					[#lt]//#define MBEDTLS_ECJPAKE_ALT
+				[#else]
+					[#lt]#define MBEDTLS_ECJPAKE_ALT
+				[/#if]
+			[/#if]
+		[/#list]
+	[/#if]
+[/#list]
+[#list SWIPdatas as SWIP]
+	[#if SWIP.defines??]
+		[#list SWIP.defines as definition]
+			[#if definition.name="MBEDTLS_GCM_ALT"]
+				[#if definition.value="0"]
+					[#lt]//#define MBEDTLS_GCM_ALT
+				[#else]
+					[#lt]#define MBEDTLS_GCM_ALT
 				[/#if]
 			[/#if]
 		[/#list]
@@ -582,6 +659,19 @@
 [#list SWIPdatas as SWIP]
 	[#if SWIP.defines??]
 		[#list SWIP.defines as definition]
+			[#if definition.name="MBEDTLS_RSA_ALT"]
+				[#if definition.value="0"]
+					[#lt]//#define MBEDTLS_RSA_ALT
+				[#else]
+					[#lt]#define MBEDTLS_RSA_ALT
+				[/#if]
+			[/#if]
+		[/#list]
+	[/#if]
+[/#list]
+[#list SWIPdatas as SWIP]
+	[#if SWIP.defines??]
+		[#list SWIP.defines as definition]
 			[#if definition.name="MBEDTLS_SHA1_ALT"]
 				[#if definition.value="0"]
 					[#lt]//#define MBEDTLS_SHA1_ALT
@@ -613,6 +703,19 @@
 					[#lt]//#define MBEDTLS_SHA512_ALT
 				[#else]
 					[#lt]#define MBEDTLS_SHA512_ALT
+				[/#if]
+			[/#if]
+		[/#list]
+	[/#if]
+[/#list]
+[#list SWIPdatas as SWIP]
+	[#if SWIP.defines??]
+		[#list SWIP.defines as definition]
+			[#if definition.name="MBEDTLS_XTEA_ALT"]
+				[#if definition.value="0"]
+					[#lt]//#define MBEDTLS_XTEA_ALT
+				[#else]
+					[#lt]#define MBEDTLS_XTEA_ALT
 				[/#if]
 			[/#if]
 		[/#list]
@@ -657,12 +760,24 @@
  * of mbedtls_sha1_context, so your implementation of mbedtls_sha1_process must be compatible
  * with this definition.
  *
- * Note: if you use the AES_xxx_ALT macros, then is is recommended to also set
- * MBEDTLS_AES_ROM_TABLES in order to help the linker garbage-collect the AES
- * tables.
+ * \note Because of a signature change, the core AES encryption and decryption routines are
+ *       currently named mbedtls_aes_internal_encrypt and mbedtls_aes_internal_decrypt,
+ *       respectively. When setting up alternative implementations, these functions should
+ *       be overriden, but the wrapper functions mbedtls_aes_decrypt and mbedtls_aes_encrypt
+ *       must stay untouched.
+ *
+ * \note If you use the AES_xxx_ALT macros, then is is recommended to also set
+ *       MBEDTLS_AES_ROM_TABLES in order to help the linker garbage-collect the AES
+ *       tables.
  *
  * Uncomment a macro to enable alternate implementation of the corresponding
  * function.
+ *
+ * \warning   MD2, MD4, MD5, DES and SHA-1 are considered weak and their use
+ *            constitutes a security risk. If possible, we recommend avoiding
+ *            dependencies on them, and considering stronger message digests
+ *            and ciphers instead.
+ *
  */
 [#list SWIPdatas as SWIP]
 	[#if SWIP.defines??]
@@ -841,6 +956,71 @@
 					[#lt]//#define MBEDTLS_AES_DECRYPT_ALT
 				[#else]
 					[#lt]#define MBEDTLS_AES_DECRYPT_ALT
+				[/#if]
+			[/#if]
+		[/#list]
+	[/#if]
+[/#list]
+[#list SWIPdatas as SWIP]
+	[#if SWIP.defines??]
+		[#list SWIP.defines as definition]
+			[#if definition.name="MBEDTLS_ECDH_GEN_PUBLIC_ALT"]
+				[#if definition.value="0"]
+					[#lt]//#define MBEDTLS_ECDH_GEN_PUBLIC_ALT
+				[#else]
+					[#lt]#define MBEDTLS_ECDH_GEN_PUBLIC_ALT
+				[/#if]
+			[/#if]
+		[/#list]
+	[/#if]
+[/#list]
+[#list SWIPdatas as SWIP]
+	[#if SWIP.defines??]
+		[#list SWIP.defines as definition]
+			[#if definition.name="MBEDTLS_ECDH_COMPUTE_SHARED_ALT"]
+				[#if definition.value="0"]
+					[#lt]//#define MBEDTLS_ECDH_COMPUTE_SHARED_ALT
+				[#else]
+					[#lt]#define MBEDTLS_ECDH_COMPUTE_SHARED_ALT
+				[/#if]
+			[/#if]
+		[/#list]
+	[/#if]
+[/#list]
+[#list SWIPdatas as SWIP]
+	[#if SWIP.defines??]
+		[#list SWIP.defines as definition]
+			[#if definition.name="MBEDTLS_ECDSA_VERIFY_ALT"]
+				[#if definition.value="0"]
+					[#lt]//#define MBEDTLS_ECDSA_VERIFY_ALT
+				[#else]
+					[#lt]#define MBEDTLS_ECDSA_VERIFY_ALT
+				[/#if]
+			[/#if]
+		[/#list]
+	[/#if]
+[/#list]
+[#list SWIPdatas as SWIP]
+	[#if SWIP.defines??]
+		[#list SWIP.defines as definition]
+			[#if definition.name="MBEDTLS_ECDSA_SIGN_ALT"]
+				[#if definition.value="0"]
+					[#lt]//#define MBEDTLS_ECDSA_SIGN_ALT
+				[#else]
+					[#lt]#define MBEDTLS_ECDSA_SIGN_ALT
+				[/#if]
+			[/#if]
+		[/#list]
+	[/#if]
+[/#list]
+[#list SWIPdatas as SWIP]
+	[#if SWIP.defines??]
+		[#list SWIP.defines as definition]
+			[#if definition.name="MBEDTLS_ECDSA_GENKEY_ALT"]
+				[#if definition.value="0"]
+					[#lt]//#define MBEDTLS_ECDSA_GENKEY_ALT
+				[#else]
+					[#lt]#define MBEDTLS_ECDSA_GENKEY_ALT
 				[/#if]
 			[/#if]
 		[/#list]
@@ -1064,9 +1244,20 @@
 /**
  * \def MBEDTLS_AES_ROM_TABLES
  *
- * Store the AES tables in ROM.
+ * Use precomputed AES tables stored in ROM.
  *
- * Uncomment this macro to store the AES tables in ROM.
+ * Uncomment this macro to use precomputed AES tables stored in ROM.
+ * Comment this macro to generate AES tables in RAM at runtime.
+ *
+ * Tradeoff: Using precomputed ROM tables reduces RAM usage by ~8kb
+ * (or ~2kb if \c MBEDTLS_AES_FEWER_TABLES is used) and reduces the
+ * initialization time before the first AES operation can be performed.
+ * It comes at the cost of additional ~8kb ROM use (resp. ~2kb if \c
+ * MBEDTLS_AES_FEWER_TABLES below is used), and potentially degraded
+ * performance if ROM access is slower than RAM access.
+ *
+ * This option is independent of \c MBEDTLS_AES_FEWER_TABLES.
+ *
  */
 [#list SWIPdatas as SWIP]
 	[#if SWIP.defines??]
@@ -1076,6 +1267,40 @@
 					[#lt]//#define MBEDTLS_AES_ROM_TABLES
 				[#else]
 					[#lt]#define MBEDTLS_AES_ROM_TABLES
+				[/#if]
+			[/#if]
+		[/#list]
+	[/#if]
+[/#list]
+
+/**
+ * \def MBEDTLS_AES_FEWER_TABLES
+ *
+ * Use less ROM/RAM for AES tables.
+ *
+ * Uncommenting this macro omits 75% of the AES tables from
+ * ROM / RAM (depending on the value of \c MBEDTLS_AES_ROM_TABLES)
+ * by computing their values on the fly during operations
+ * (the tables are entry-wise rotations of one another).
+ *
+ * Tradeoff: Uncommenting this reduces the RAM / ROM footprint
+ * by ~6kb but at the cost of more arithmetic operations during
+ * runtime. Specifically, one has to compare 4 accesses within
+ * different tables to 4 accesses with additional arithmetic
+ * operations within the same table. The performance gain/loss
+ * depends on the system and memory details.
+ *
+ * This option is independent of \c MBEDTLS_AES_ROM_TABLES.
+ *
+ */
+[#list SWIPdatas as SWIP]
+	[#if SWIP.defines??]
+		[#list SWIP.defines as definition]
+			[#if definition.name="MBEDTLS_AES_FEWER_TABLES"]
+				[#if definition.value="0"]
+					[#lt]//#define MBEDTLS_AES_FEWER_TABLES
+				[#else]
+					[#lt]#define MBEDTLS_AES_FEWER_TABLES
 				[/#if]
 			[/#if]
 		[/#list]
@@ -1159,6 +1384,45 @@
 		[/#list]
 	[/#if]
 [/#list]
+
+/**
+ * \def MBEDTLS_CIPHER_MODE_OFB
+ *
+ * Enable Output Feedback mode (OFB) for symmetric ciphers.
+ */
+[#list SWIPdatas as SWIP]
+	[#if SWIP.defines??]
+		[#list SWIP.defines as definition]
+			[#if definition.name="MBEDTLS_CIPHER_MODE_OFB"]
+				[#if definition.value="0"]
+					[#lt]//#define MBEDTLS_CIPHER_MODE_OFB
+				[#else]
+					[#lt]#define MBEDTLS_CIPHER_MODE_OFB
+				[/#if]
+			[/#if]
+		[/#list]
+	[/#if]
+[/#list]
+
+/**
+ * \def MBEDTLS_CIPHER_MODE_XTS
+ *
+ * Enable Xor-encrypt-xor with ciphertext stealing mode (XTS) for AES.
+ */
+[#list SWIPdatas as SWIP]
+	[#if SWIP.defines??]
+		[#list SWIP.defines as definition]
+			[#if definition.name="MBEDTLS_CIPHER_MODE_XTS"]
+				[#if definition.value="0"]
+					[#lt]//#define MBEDTLS_CIPHER_MODE_XTS
+				[#else]
+					[#lt]#define MBEDTLS_CIPHER_MODE_XTS
+				[/#if]
+			[/#if]
+		[/#list]
+	[/#if]
+[/#list]
+
 
 /**
  * \def MBEDTLS_CIPHER_NULL_CIPHER
@@ -1281,6 +1545,9 @@
  *      MBEDTLS_TLS_DHE_RSA_WITH_DES_CBC_SHA
  *
  * Uncomment this macro to enable weak ciphersuites
+ *
+ * \warning   DES is considered a weak cipher and its use constitutes a
+ *            security risk. We recommend considering stronger ciphers instead.
  */
 [#list SWIPdatas as SWIP]
 	[#if SWIP.defines??]
@@ -1485,6 +1752,19 @@
 		[/#list]
 	[/#if]
 [/#list]
+[#list SWIPdatas as SWIP]
+	[#if SWIP.defines??]
+		[#list SWIP.defines as definition]
+			[#if definition.name="MBEDTLS_ECP_DP_CURVE448_ENABLED"]
+				[#if definition.value="0"]
+					[#lt]//#define MBEDTLS_ECP_DP_CURVE448_ENABLED
+				[#else]
+					[#lt]#define MBEDTLS_ECP_DP_CURVE448_ENABLED
+				[/#if]
+			[/#if]
+		[/#list]
+	[/#if]
+[/#list]
 
 /**
  * \def MBEDTLS_ECP_NIST_OPTIM
@@ -1590,6 +1870,13 @@
  *      MBEDTLS_TLS_DHE_PSK_WITH_CAMELLIA_128_CBC_SHA256
  *      MBEDTLS_TLS_DHE_PSK_WITH_3DES_EDE_CBC_SHA
  *      MBEDTLS_TLS_DHE_PSK_WITH_RC4_128_SHA
+ *
+ * \warning    Using DHE constitutes a security risk as it
+ *             is not possible to validate custom DH parameters.
+ *             If possible, it is recommended users should consider
+ *             preferring other methods of key exchange.
+ *             See dhm.h for more details.
+ *
  */
 [#list SWIPdatas as SWIP]
 	[#if SWIP.defines??]
@@ -1737,6 +2024,13 @@
  *      MBEDTLS_TLS_DHE_RSA_WITH_CAMELLIA_128_CBC_SHA256
  *      MBEDTLS_TLS_DHE_RSA_WITH_CAMELLIA_128_CBC_SHA
  *      MBEDTLS_TLS_DHE_RSA_WITH_3DES_EDE_CBC_SHA
+ *
+ * \warning    Using DHE constitutes a security risk as it
+ *             is not possible to validate custom DH parameters.
+ *             If possible, it is recommended users should consider
+ *             preferring other methods of key exchange.
+ *             See dhm.h for more details.
+ *
  */
 [#list SWIPdatas as SWIP]
 	[#if SWIP.defines??]
@@ -2256,7 +2550,8 @@
 /**
  * \def MBEDTLS_RSA_NO_CRT
  *
- * Do not use the Chinese Remainder Theorem for the RSA private operation.
+ * Do not use the Chinese Remainder Theorem
+ * for the RSA private operation.
  *
  * Uncomment this macro to disable the use of CRT in RSA.
  *
@@ -2342,6 +2637,29 @@
 					[#lt]//#define MBEDTLS_SSL_ALL_ALERT_MESSAGES
 				[#else]
 					[#lt]#define MBEDTLS_SSL_ALL_ALERT_MESSAGES
+				[/#if]
+			[/#if]
+		[/#list]
+	[/#if]
+[/#list]
+
+/**
+ * \def MBEDTLS_SSL_ASYNC_PRIVATE
+ *
+ * Enable asynchronous external private key operations in SSL. This allows
+ * you to configure an SSL connection to call an external cryptographic
+ * module to perform private key operations instead of performing the
+ * operation inside the library.
+ *
+ */
+[#list SWIPdatas as SWIP]
+	[#if SWIP.defines??]
+		[#list SWIP.defines as definition]
+			[#if definition.name="MBEDTLS_SSL_ASYNC_PRIVATE"]
+				[#if definition.value="0"]
+					[#lt]//#define MBEDTLS_SSL_ASYNC_PRIVATE
+				[#else]
+					[#lt]#define MBEDTLS_SSL_ASYNC_PRIVATE
 				[/#if]
 			[/#if]
 		[/#list]
@@ -2523,6 +2841,13 @@
  * misuse/misunderstand.
  *
  * Comment this to disable support for renegotiation.
+ *
+ * \note   Even if this option is disabled, both client and server are aware
+ *         of the Renegotiation Indication Extension (RFC 5746) used to
+ *         prevent the SSL renegotiation attack (see RFC 5746 Sect. 1).
+ *         (See \c mbedtls_ssl_conf_legacy_renegotiation for the
+ *          configuration of this extension).
+ *
  */
 [#list SWIPdatas as SWIP]
 	[#if SWIP.defines??]
@@ -2948,6 +3273,42 @@
 [/#list]
 
 /**
+ * \def MBEDTLS_SSL_TRUNCATED_HMAC_COMPAT
+ *
+ * Fallback to old (pre-2.7), non-conforming implementation of the truncated
+ * HMAC extension which also truncates the HMAC key. Note that this option is
+ * only meant for a transitory upgrade period and is likely to be removed in
+ * a future version of the library.
+ *
+ * \warning The old implementation is non-compliant and has a security weakness
+ *          (2^80 brute force attack on the HMAC key used for a single,
+ *          uninterrupted connection). This should only be enabled temporarily
+ *          when (1) the use of truncated HMAC is essential in order to save
+ *          bandwidth, and (2) the peer is an Mbed TLS stack that doesn't use
+ *          the fixed implementation yet (pre-2.7).
+ *
+ * \deprecated This option is deprecated and will likely be removed in a
+ *             future version of Mbed TLS.
+ *
+ * Uncomment to fallback to old, non-compliant truncated HMAC implementation.
+ *
+ * Requires: MBEDTLS_SSL_TRUNCATED_HMAC
+ */
+[#list SWIPdatas as SWIP]
+	[#if SWIP.defines??]
+		[#list SWIP.defines as definition]
+			[#if definition.name="MBEDTLS_SSL_TRUNCATED_HMAC_COMPAT"]
+				[#if definition.value="0"]
+					[#lt]//#define MBEDTLS_SSL_TRUNCATED_HMAC_COMPAT
+				[#else]
+					[#lt]#define MBEDTLS_SSL_TRUNCATED_HMAC_COMPAT
+				[/#if]
+			[/#if]
+		[/#list]
+	[/#if]
+[/#list]
+
+/**
  * \def MBEDTLS_THREADING_ALT
  *
  * Provide your own alternate threading implementation.
@@ -3149,6 +3510,9 @@
  *
  * \note Currently compression can't be used with DTLS.
  *
+ * \deprecated This feature is deprecated and will be removed
+ *             in the next major revision of the library.
+ *
  * Used in: library/ssl_tls.c
  *          library/ssl_cli.c
  *          library/ssl_srv.c
@@ -3211,7 +3575,7 @@
  * Enable the AES block cipher.
  *
  * Module:  library/aes.c
- * Caller:  library/ssl_tls.c
+ * Caller:  library/cipher.c
  *          library/pem.c
  *          library/ctr_drbg.c
  *
@@ -3298,7 +3662,7 @@
  * Enable the ARCFOUR stream cipher.
  *
  * Module:  library/arc4.c
- * Caller:  library/ssl_tls.c
+ * Caller:  library/cipher.c
  *
  * This module enables the following ciphersuites (if other requisites are
  * enabled as well):
@@ -3312,6 +3676,11 @@
  *      MBEDTLS_TLS_RSA_WITH_RC4_128_MD5
  *      MBEDTLS_TLS_RSA_PSK_WITH_RC4_128_SHA
  *      MBEDTLS_TLS_PSK_WITH_RC4_128_SHA
+ *
+ * \warning   ARC4 is considered a weak cipher and its use constitutes a
+ *            security risk. If possible, we recommend avoidng dependencies on
+ *            it, and considering stronger ciphers instead.
+ *
  */
 [#list SWIPdatas as SWIP]
 	[#if SWIP.defines??]
@@ -3363,7 +3732,7 @@
  *          library/pkwrite.c
  *          library/x509_create.c
  *          library/x509write_crt.c
- *          library/mbedtls_x509write_csr.c
+ *          library/x509write_csr.c
  */
 [#list SWIPdatas as SWIP]
 	[#if SWIP.defines??]
@@ -3413,6 +3782,7 @@
  *          library/ecp.c
  *          library/ecdsa.c
  *          library/rsa.c
+ *          library/rsa_internal.c
  *          library/ssl_tls.c
  *
  * This module is required for RSA, DHM and ECC (ECDH, ECDSA) support.
@@ -3458,7 +3828,7 @@
  * Enable the Camellia block cipher.
  *
  * Module:  library/camellia.c
- * Caller:  library/ssl_tls.c
+ * Caller:  library/cipher.c
  *
  * This module enables the following ciphersuites (if other requisites are
  * enabled as well):
@@ -3513,6 +3883,70 @@
 					[#lt]//#define MBEDTLS_CAMELLIA_C
 				[#else]
 					[#lt]#define MBEDTLS_CAMELLIA_C
+				[/#if]
+			[/#if]
+		[/#list]
+	[/#if]
+[/#list]
+
+/**
+ * \def MBEDTLS_ARIA_C
+ *
+ * Enable the ARIA block cipher.
+ *
+ * Module:  library/aria.c
+ * Caller:  library/cipher.c
+ *
+ * This module enables the following ciphersuites (if other requisites are
+ * enabled as well):
+ *
+ *      MBEDTLS_TLS_RSA_WITH_ARIA_128_CBC_SHA256
+ *      MBEDTLS_TLS_RSA_WITH_ARIA_256_CBC_SHA384
+ *      MBEDTLS_TLS_DHE_RSA_WITH_ARIA_128_CBC_SHA256
+ *      MBEDTLS_TLS_DHE_RSA_WITH_ARIA_256_CBC_SHA384
+ *      MBEDTLS_TLS_ECDHE_ECDSA_WITH_ARIA_128_CBC_SHA256
+ *      MBEDTLS_TLS_ECDHE_ECDSA_WITH_ARIA_256_CBC_SHA384
+ *      MBEDTLS_TLS_ECDH_ECDSA_WITH_ARIA_128_CBC_SHA256
+ *      MBEDTLS_TLS_ECDH_ECDSA_WITH_ARIA_256_CBC_SHA384
+ *      MBEDTLS_TLS_ECDHE_RSA_WITH_ARIA_128_CBC_SHA256
+ *      MBEDTLS_TLS_ECDHE_RSA_WITH_ARIA_256_CBC_SHA384
+ *      MBEDTLS_TLS_ECDH_RSA_WITH_ARIA_128_CBC_SHA256
+ *      MBEDTLS_TLS_ECDH_RSA_WITH_ARIA_256_CBC_SHA384
+ *      MBEDTLS_TLS_RSA_WITH_ARIA_128_GCM_SHA256
+ *      MBEDTLS_TLS_RSA_WITH_ARIA_256_GCM_SHA384
+ *      MBEDTLS_TLS_DHE_RSA_WITH_ARIA_128_GCM_SHA256
+ *      MBEDTLS_TLS_DHE_RSA_WITH_ARIA_256_GCM_SHA384
+ *      MBEDTLS_TLS_ECDHE_ECDSA_WITH_ARIA_128_GCM_SHA256
+ *      MBEDTLS_TLS_ECDHE_ECDSA_WITH_ARIA_256_GCM_SHA384
+ *      MBEDTLS_TLS_ECDH_ECDSA_WITH_ARIA_128_GCM_SHA256
+ *      MBEDTLS_TLS_ECDH_ECDSA_WITH_ARIA_256_GCM_SHA384
+ *      MBEDTLS_TLS_ECDHE_RSA_WITH_ARIA_128_GCM_SHA256
+ *      MBEDTLS_TLS_ECDHE_RSA_WITH_ARIA_256_GCM_SHA384
+ *      MBEDTLS_TLS_ECDH_RSA_WITH_ARIA_128_GCM_SHA256
+ *      MBEDTLS_TLS_ECDH_RSA_WITH_ARIA_256_GCM_SHA384
+ *      MBEDTLS_TLS_PSK_WITH_ARIA_128_CBC_SHA256
+ *      MBEDTLS_TLS_PSK_WITH_ARIA_256_CBC_SHA384
+ *      MBEDTLS_TLS_DHE_PSK_WITH_ARIA_128_CBC_SHA256
+ *      MBEDTLS_TLS_DHE_PSK_WITH_ARIA_256_CBC_SHA384
+ *      MBEDTLS_TLS_RSA_PSK_WITH_ARIA_128_CBC_SHA256
+ *      MBEDTLS_TLS_RSA_PSK_WITH_ARIA_256_CBC_SHA384
+ *      MBEDTLS_TLS_PSK_WITH_ARIA_128_GCM_SHA256
+ *      MBEDTLS_TLS_PSK_WITH_ARIA_256_GCM_SHA384
+ *      MBEDTLS_TLS_DHE_PSK_WITH_ARIA_128_GCM_SHA256
+ *      MBEDTLS_TLS_DHE_PSK_WITH_ARIA_256_GCM_SHA384
+ *      MBEDTLS_TLS_RSA_PSK_WITH_ARIA_128_GCM_SHA256
+ *      MBEDTLS_TLS_RSA_PSK_WITH_ARIA_256_GCM_SHA384
+ *      MBEDTLS_TLS_ECDHE_PSK_WITH_ARIA_128_CBC_SHA256
+ *      MBEDTLS_TLS_ECDHE_PSK_WITH_ARIA_256_CBC_SHA384
+ */
+[#list SWIPdatas as SWIP]
+	[#if SWIP.defines??]
+		[#list SWIP.defines as definition]
+			[#if definition.name="MBEDTLS_ARIA_C"]
+				[#if definition.value="0"]
+					[#lt]//#define MBEDTLS_ARIA_C
+				[#else]
+					[#lt]#define MBEDTLS_ARIA_C
 				[/#if]
 			[/#if]
 		[/#list]
@@ -3677,7 +4111,7 @@
  *
  * Module:  library/des.c
  * Caller:  library/pem.c
- *          library/ssl_tls.c
+ *          library/cipher.c
  *
  * This module enables the following ciphersuites (if other requisites are
  * enabled as well):
@@ -3693,6 +4127,9 @@
  *      MBEDTLS_TLS_PSK_WITH_3DES_EDE_CBC_SHA
  *
  * PEM_PARSE uses DES/3DES for decrypting encrypted keys.
+ *
+ * \warning   DES is considered a weak cipher and its use constitutes a
+ *            security risk. We recommend considering stronger ciphers instead.
  */
 [#list SWIPdatas as SWIP]
 	[#if SWIP.defines??]
@@ -3719,6 +4156,13 @@
  *
  * This module is used by the following key exchanges:
  *      DHE-RSA, DHE-PSK
+ *
+ * \warning    Using DHE constitutes a security risk as it
+ *             is not possible to validate custom DH parameters.
+ *             If possible, it is recommended users should consider
+ *             preferring other methods of key exchange.
+ *             See dhm.h for more details.
+ *
  */
 [#list SWIPdatas as SWIP]
 	[#if SWIP.defines??]
@@ -3958,6 +4402,33 @@
 [/#list]
 
 /**
+ * \def MBEDTLS_HKDF_C
+ *
+ * Enable the HKDF algorithm (RFC 5869).
+ *
+ * Module:  library/hkdf.c
+ * Caller:
+ *
+ * Requires: MBEDTLS_MD_C
+ *
+ * This module adds support for the Hashed Message Authentication Code
+ * (HMAC)-based key derivation function (HKDF).
+ */
+[#list SWIPdatas as SWIP]
+	[#if SWIP.defines??]
+		[#list SWIP.defines as definition]
+			[#if definition.name="MBEDTLS_HKDF_C"]
+				[#if definition.value="0"]
+					[#lt]//#define MBEDTLS_HKDF_C
+				[#else]
+					[#lt]#define MBEDTLS_HKDF_C
+				[/#if]
+			[/#if]
+		[/#list]
+	[/#if]
+[/#list]
+
+/**
  * \def MBEDTLS_HMAC_DRBG_C
  *
  * Enable the HMAC_DRBG random generator.
@@ -3988,7 +4459,7 @@
  *
  * Enable the generic message digest layer.
  *
- * Module:  library/mbedtls_md.c
+ * Module:  library/md.c
  * Caller:
  *
  * Uncomment to enable generic message digest wrappers.
@@ -4012,10 +4483,15 @@
  *
  * Enable the MD2 hash algorithm.
  *
- * Module:  library/mbedtls_md2.c
+ * Module:  library/md2.c
  * Caller:
  *
  * Uncomment to enable support for (rare) MD2-signed X.509 certs.
+ *
+ * \warning   MD2 is considered a weak message digest and its use constitutes a
+ *            security risk. If possible, we recommend avoiding dependencies on
+ *            it, and considering stronger message digests instead.
+ *
  */
 [#list SWIPdatas as SWIP]
 	[#if SWIP.defines??]
@@ -4036,10 +4512,15 @@
  *
  * Enable the MD4 hash algorithm.
  *
- * Module:  library/mbedtls_md4.c
+ * Module:  library/md4.c
  * Caller:
  *
  * Uncomment to enable support for (rare) MD4-signed X.509 certs.
+ *
+ * \warning   MD4 is considered a weak message digest and its use constitutes a
+ *            security risk. If possible, we recommend avoiding dependencies on
+ *            it, and considering stronger message digests instead.
+ *
  */
 [#list SWIPdatas as SWIP]
 	[#if SWIP.defines??]
@@ -4060,13 +4541,20 @@
  *
  * Enable the MD5 hash algorithm.
  *
- * Module:  library/mbedtls_md5.c
- * Caller:  library/mbedtls_md.c
+ * Module:  library/md5.c
+ * Caller:  library/md.c
  *          library/pem.c
  *          library/ssl_tls.c
  *
- * This module is required for SSL/TLS and X.509.
- * PEM_PARSE uses MD5 for decrypting encrypted keys.
+ * This module is required for SSL/TLS up to version 1.1, and for TLS 1.2
+ * depending on the handshake parameters. Further, it is used for checking
+ * MD5-signed certificates, and for PBKDF1 when decrypting PEM-encoded
+ * encrypted keys.
+ *
+ * \warning   MD5 is considered a weak message digest and its use constitutes a
+ *            security risk. If possible, we recommend avoiding dependencies on
+ *            it, and considering stronger message digests instead.
+ *
  */
 [#list SWIPdatas as SWIP]
 	[#if SWIP.defines??]
@@ -4154,11 +4642,11 @@
  *          library/rsa.c
  *          library/x509.c
  *          library/x509_create.c
- *          library/mbedtls_x509_crl.c
- *          library/mbedtls_x509_crt.c
- *          library/mbedtls_x509_csr.c
+ *          library/x509_crl.c
+ *          library/x509_crt.c
+ *          library/x509_csr.c
  *          library/x509write_crt.c
- *          library/mbedtls_x509write_csr.c
+ *          library/x509write_csr.c
  *
  * This modules translates between OIDs and internal values.
  */
@@ -4210,9 +4698,9 @@
  * Module:  library/pem.c
  * Caller:  library/dhm.c
  *          library/pkparse.c
- *          library/mbedtls_x509_crl.c
- *          library/mbedtls_x509_crt.c
- *          library/mbedtls_x509_csr.c
+ *          library/x509_crl.c
+ *          library/x509_crt.c
+ *          library/x509_csr.c
  *
  * Requires: MBEDTLS_BASE64_C
  *
@@ -4240,7 +4728,7 @@
  * Module:  library/pem.c
  * Caller:  library/pkwrite.c
  *          library/x509write_crt.c
- *          library/mbedtls_x509write_csr.c
+ *          library/x509write_csr.c
  *
  * Requires: MBEDTLS_BASE64_C
  *
@@ -4294,8 +4782,8 @@
  * Enable the generic public (asymetric) key parser.
  *
  * Module:  library/pkparse.c
- * Caller:  library/mbedtls_x509_crt.c
- *          library/mbedtls_x509_csr.c
+ * Caller:  library/x509_crt.c
+ *          library/x509_csr.c
  *
  * Requires: MBEDTLS_PK_C
  *
@@ -4458,8 +4946,8 @@
  *
  * Enable the RIPEMD-160 hash algorithm.
  *
- * Module:  library/mbedtls_ripemd160.c
- * Caller:  library/mbedtls_md.c
+ * Module:  library/ripemd160.c
+ * Caller:  library/md.c
  *
  */
 [#list SWIPdatas as SWIP]
@@ -4482,6 +4970,7 @@
  * Enable the RSA public-key cryptosystem.
  *
  * Module:  library/rsa.c
+ *          library/rsa_internal.c
  * Caller:  library/ssl_cli.c
  *          library/ssl_srv.c
  *          library/ssl_tls.c
@@ -4511,14 +5000,20 @@
  *
  * Enable the SHA1 cryptographic hash algorithm.
  *
- * Module:  library/mbedtls_sha1.c
- * Caller:  library/mbedtls_md.c
+ * Module:  library/sha1.c
+ * Caller:  library/md.c
  *          library/ssl_cli.c
  *          library/ssl_srv.c
  *          library/ssl_tls.c
  *          library/x509write_crt.c
  *
- * This module is required for SSL/TLS and SHA1-signed certificates.
+ * This module is required for SSL/TLS up to version 1.1, for TLS 1.2
+ * depending on the handshake parameters, and for SHA1-signed certificates.
+ *
+ * \warning   SHA-1 is considered a weak message digest and its use constitutes
+ *            a security risk. If possible, we recommend avoiding dependencies
+ *            on it, and considering stronger message digests instead.
+ *
  */
 [#list SWIPdatas as SWIP]
 	[#if SWIP.defines??]
@@ -4539,9 +5034,9 @@
  *
  * Enable the SHA-224 and SHA-256 cryptographic hash algorithms.
  *
- * Module:  library/mbedtls_sha256.c
+ * Module:  library/sha256.c
  * Caller:  library/entropy.c
- *          library/mbedtls_md.c
+ *          library/md.c
  *          library/ssl_cli.c
  *          library/ssl_srv.c
  *          library/ssl_tls.c
@@ -4568,9 +5063,9 @@
  *
  * Enable the SHA-384 and SHA-512 cryptographic hash algorithms.
  *
- * Module:  library/mbedtls_sha512.c
+ * Module:  library/sha512.c
  * Caller:  library/entropy.c
- *          library/mbedtls_md.c
+ *          library/md.c
  *          library/ssl_cli.c
  *          library/ssl_srv.c
  *
@@ -4838,9 +5333,9 @@
  * Enable X.509 core for using certificates.
  *
  * Module:  library/x509.c
- * Caller:  library/mbedtls_x509_crl.c
- *          library/mbedtls_x509_crt.c
- *          library/mbedtls_x509_csr.c
+ * Caller:  library/x509_crl.c
+ *          library/x509_crt.c
+ *          library/x509_csr.c
  *
  * Requires: MBEDTLS_ASN1_PARSE_C, MBEDTLS_BIGNUM_C, MBEDTLS_OID_C,
  *           MBEDTLS_PK_PARSE_C
@@ -4866,7 +5361,7 @@
  *
  * Enable X.509 certificate parsing.
  *
- * Module:  library/mbedtls_x509_crt.c
+ * Module:  library/x509_crt.c
  * Caller:  library/ssl_cli.c
  *          library/ssl_srv.c
  *          library/ssl_tls.c
@@ -4894,8 +5389,8 @@
  *
  * Enable X.509 CRL parsing.
  *
- * Module:  library/mbedtls_x509_crl.c
- * Caller:  library/mbedtls_x509_crt.c
+ * Module:  library/x509_crl.c
+ * Caller:  library/x509_crt.c
  *
  * Requires: MBEDTLS_X509_USE_C
  *
@@ -4920,7 +5415,7 @@
  *
  * Enable X.509 Certificate Signing Request (CSR) parsing.
  *
- * Module:  library/mbedtls_x509_csr.c
+ * Module:  library/x509_csr.c
  * Caller:  library/x509_crt_write.c
  *
  * Requires: MBEDTLS_X509_USE_C
@@ -5947,8 +6442,13 @@
  * Allow SHA-1 in the default TLS configuration for certificate signing.
  * Without this build-time option, SHA-1 support must be activated explicitly
  * through mbedtls_ssl_conf_cert_profile. Turning on this option is not
- * recommended because of it is possible to generte SHA-1 collisions, however
+ * recommended because of it is possible to generate SHA-1 collisions, however
  * this may be safe for legacy infrastructure where additional controls apply.
+ *
+ * \warning   SHA-1 is considered a weak message digest and its use constitutes
+ *            a security risk. If possible, we recommend avoiding dependencies
+ *            on it, and considering stronger message digests instead.
+ *
  */
 [#list SWIPdatas as SWIP]
 	[#if SWIP.defines??]
@@ -5971,7 +6471,13 @@
  * The use of SHA-1 in TLS <= 1.1 and in HMAC-SHA-1 is always allowed by
  * default. At the time of writing, there is no practical attack on the use
  * of SHA-1 in handshake signatures, hence this option is turned on by default
- * for compatibility with existing peers.
+ * to preserve compatibility with existing peers, but the general
+ * warning applies nonetheless:
+ *
+ * \warning   SHA-1 is considered a weak message digest and its use constitutes
+ *            a security risk. If possible, we recommend avoiding dependencies
+ *            on it, and considering stronger message digests instead.
+ *
  */
 [#list SWIPdatas as SWIP]
 	[#if SWIP.defines??]
@@ -5987,10 +6493,41 @@
 	[/#if]
 [/#list]
 
+/**
+ * Uncomment the macro to let mbed TLS use your alternate implementation of
+ * mbedtls_platform_zeroize(). This replaces the default implementation in
+ * platform_util.c.
+ *
+ * mbedtls_platform_zeroize() is a widely used function across the library to
+ * zero a block of memory. The implementation is expected to be secure in the
+ * sense that it has been written to prevent the compiler from removing calls
+ * to mbedtls_platform_zeroize() as part of redundant code elimination
+ * optimizations. However, it is difficult to guarantee that calls to
+ * mbedtls_platform_zeroize() will not be optimized by the compiler as older
+ * versions of the C language standards do not provide a secure implementation
+ * of memset(). Therefore, MBEDTLS_PLATFORM_ZEROIZE_ALT enables users to
+ * configure their own implementation of mbedtls_platform_zeroize(), for
+ * example by using directives specific to their compiler, features from newer
+ * C standards (e.g using memset_s() in C11) or calling a secure memset() from
+ * their system (e.g explicit_bzero() in BSD).
+ */
+[#list SWIPdatas as SWIP]
+	[#if SWIP.defines??]
+        [#list SWIP.defines as definition]
+            [#if definition.name="MBEDTLS_PLATFORM_ZEROIZE_ALT"]
+                [#if definition.value="0"]
+                    [#lt]//#define MBEDTLS_PLATFORM_ZEROIZE_ALT
+                [#else]
+                    [#lt]#define MBEDTLS_PLATFORM_ZEROIZE_ALT
+                [/#if]
+            [/#if]
+        [/#list]
+	[/#if]
+[/#list]
+
 /* \} name SECTION: Customisation configuration options */
 
 /* Target and application specific configurations */
-
 [#list SWIPdatas as SWIP]
 	[#if SWIP.defines??]
 		[#list SWIP.defines as enableFlag]
@@ -6008,6 +6545,7 @@
 		[/#list]
 	[/#if]
 [/#list]
+
 #if defined(TARGET_LIKE_MBED) && defined(YOTTA_CFG_MBEDTLS_TARGET_CONFIG_FILE)
     #include YOTTA_CFG_MBEDTLS_TARGET_CONFIG_FILE
 #endif
@@ -6030,11 +6568,7 @@
 [#if familyName="stm32f7"]
 
 /* uncomment the defines below to enable static memory allocation feature */
-#if 0 
-    #define MBEDTLS_MEMORY_BUFFER_ALLOC_C
-    #define MBEDTLS_PLATFORM_MEMORY
-    #define MBEDTLS_DEBUG_C
-#endif
+
 [/#if]
 #include "mbedtls/check_config.h"
 

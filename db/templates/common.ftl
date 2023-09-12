@@ -4,8 +4,10 @@
 
 [#macro generateConfigModelCode configModel inst nTab index mode]
 [#if configModel.clockEnableMacro?? && mode=="Init"] [#-- Enable Port clock --]
-    [#list configModel.clockEnableMacro as clkmacroList]	
+    [#list configModel.clockEnableMacro as clkmacroList]
+        [#if clkmacroList?trim!=""]
             [#if nTab==2]#t#t[#else]#t[/#if]${clkmacroList}[#if !clkmacroList?contains("(")]()[/#if];
+        [/#if]
     [/#list]
 [/#if] 
 [#if configModel.methods??] [#-- if the pin configuration contains a list of LibMethods--]
@@ -21,14 +23,14 @@
     [#if method.status=="OK"][#assign writeConfigComments=true][/#if]
 [/#list]
 [#if writeConfigComments]
-    [#if configModel.comments??] 
+    [#if configModel.comments??]
         [#if nTab == 2]#t[/#if][#if nTab == 2]#t/**${configModel.comments?replace("#t","#t#t")} #n#t#t*/[#else]#t/**${configModel.comments?replace("#t","#t")} #n#t*/[/#if]
 
     [/#if]
 [/#if]
-    [#list methodList as method][#assign args = ""]	      
+    [#list methodList as method][#assign args = ""]
                 [#if method.hardCode??] [#-- Hard code --]
-                    ${method.hardCode}
+                    ${method.hardCode?replace("$IpInstance",inst)}
 
                 [/#if]
         [#if method.status=="OK"&&method.type!="HardCode"]
@@ -36,7 +38,7 @@
 [/#if]
                 [#if method.arguments??]
                     [#list method.arguments as fargument][#compress]
-                    [#if fargument.addressOf] [#assign adr = "&"][#else ][#assign adr = ""][/#if][/#compress] 
+                    [#if fargument.addressOf] [#assign adr = "&"][#else ][#assign adr = ""][/#if][/#compress]
                     [#if fargument.genericType == "struct"]
                         [#if fargument.context??]
                             [#if fargument.context=="global"]
@@ -50,12 +52,12 @@
                                    [/#if]
                                 [/#if]
                             [/#if]
-                        [/#if]                     
+                        [/#if]
                         [#if instanceIndex??&&fargument.context=="global"][#if fargument.status!="NULL"][#assign arg = "" + adr + fargument.name + instanceIndex][#else][#assign arg = "NULL"][/#if][#else][#if  fargument.status!="NULL"][#assign arg = "" + adr + fargument.name][#else][#assign arg = "NULL"][/#if][/#if]
                         [#-- [#assign arg = "" + adr + fargument.name] --]
                         [#if ((!method.name?contains("Init")&&fargument.context=="global")||(fargument.optional=="output"))]
                         [#else]
-                        [#list fargument.argument as argument]	
+                        [#list fargument.argument as argument]
                             [#if argument.genericType != "struct"]
                                 [#if argument.mandatory]
                                 [#if argument.value?? && argument.value!="__NULL"]
@@ -403,14 +405,14 @@
 [/#list]
 [#if writeConfigComments]
 [#if config.ipName?contains("CORTEX")]
-[#if config.comments?? && config.comments!=""] #t/**${config.comments} #n#t*/[/#if]
+[#if config.comments?? && config.comments!=""] #t/** ${config.comments} #n#t*/[/#if]
 [#else]
-[#if config.comments?? && config.comments!=""] #t/**${config.comments?replace("#t","#t")} #n#t*/[/#if]
+[#if config.comments?? && config.comments!=""] #t/** ${config.comments?replace("#t","#t")} #n#t*/[/#if]
 [/#if]
 [/#if]
     [#list methodList as method][#assign args = ""]	 
             [#if method.hardCode??] [#-- Hard code --]              
-                ${method.hardCode.text} 
+                ${method.hardCode.text?replace("$IpInstance",inst)} 
             [#else]
                 [#if method.type == "Template"] [#-- Template code --]  
                     [#list method.name?split("/") as n]
@@ -926,8 +928,10 @@
             [#if tabN==2]#t#t[#else]#t#t#t[/#if]/* Enable EXTI Line 18 for USB wakeup */
         [/#if]
     [#else]
-        [#if FamilyName=="STM32L0"]
+        [#if FamilyName=="STM32L0" || FamilyName=="STM32F0"]
             [#if tabN==2]#t#t[#else]#t#t#t[/#if]/* Enable EXTI Line 18 for USB wakeup */
+        [#elseif FamilyName=="STM32WB"]
+            [#if tabN==2]#t#t[#else]#t#t#t[/#if]/* Enable EXTI Line 28 for USB wakeup */
         [#else]
             [#if tabN==2]#t#t[#else]#t#t#t[/#if]/* Enable EXTI Line 20 for USB wakeup */
         [/#if]
@@ -1662,7 +1666,7 @@ ${bufferType} ${bufferName}[${bufferSize}];
                         [/#if]                   
                     [/#if]
 [#if tabN == 2]#t[/#if]#t/* Peripheral clock enable */ 
-                    [#list IPData.initServices.clock?split(';') as clock]    
+                    [#list IPData.initServices.clock?split(';') as clock]
                         [#--[#if ipvar.clkCommonResource.entrySet()?contains(clock?trim)]#t#t${clock?trim?replace("__","")?replace("_ENABLE","")}_ENABLED++;
                             #t#tif(${clock?trim?replace("__","")?replace("_ENABLE","")}_ENABLED==1){          
                             #t#t#t${clock?trim}();
@@ -1774,7 +1778,7 @@ ${bufferType} ${bufferName}[${bufferSize}];
                 [/#list]
                 [#assign lowPower = "no"]
                 [#list IPData.initServices.nvic as initVector]
-                   [#if (instHandler=="hpcd") && (initVector.vector?contains("WKUP") || initVector.vector?contains("WakeUp") || (((initVector.vector == "USB_IRQn")||(initVector.vector == "OTG_FS_IRQn")) && USB_INTERRUPT_WAKEUP??))]
+                   [#if (instHandler=="hpcd") && (initVector.vector?contains("WKUP") || initVector.vector?contains("WakeUp") || (((initVector.vector == "USB_IRQn")||(initVector.vector == "OTG_FS_IRQn")||(initVector.vector == "USB_LP_IRQn")) && USB_INTERRUPT_WAKEUP??))]
                       [#assign lowPower = "yes"]
                    [/#if]
                 [/#list]
@@ -2149,3 +2153,24 @@ ${bufferType} ${bufferName}[${bufferSize}];
 
 [/#macro]
 [#-- End macro generateConfigCode --]
+
+[#function getPeriphInstanceName(periph)]
+[#list configs as config]
+  [#assign peripheralParams = config.peripheralParams]
+  [#assign usedIPs = config.usedIPs]
+
+  [#list usedIPs as ip]
+    [#if ip=="SPI1"]
+        [#if peripheralParams.get(ip)??]
+        [#if peripheralParams.get(ip).get("Instance")??]        
+            [#assign instance = peripheralParams.get(ip).get("Instance")]
+            [#return instance]
+        [#else]
+            [#return "NA"]
+        [/#if]
+        [/#if]
+    [/#if]
+  [/#list]
+[/#list]
+[#return "not available"]
+[/#function]

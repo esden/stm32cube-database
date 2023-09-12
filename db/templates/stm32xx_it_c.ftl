@@ -5,31 +5,7 @@
   * @file    ${FamilyName?lower_case}xx_it.c
   * @brief   Interrupt Service Routines.
   ******************************************************************************
-  *
-  * COPYRIGHT(c) ${year} STMicroelectronics
-  *
-  * Redistribution and use in source and binary forms, with or without modification,
-  * are permitted provided that the following conditions are met:
-  *   1. Redistributions of source code must retain the above copyright notice,
-  *      this list of conditions and the following disclaimer.
-  *   2. Redistributions in binary form must reproduce the above copyright notice,
-  *      this list of conditions and the following disclaimer in the documentation
-  *      and/or other materials provided with the distribution.
-  *   3. Neither the name of STMicroelectronics nor the names of its contributors
-  *      may be used to endorse or promote products derived from this software
-  *      without specific prior written permission.
-  *
-  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-  * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-  * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-  * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-  *
+[@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
 /* USER CODE END Header */
@@ -39,7 +15,8 @@
 #include "${main_h}"
 #include "${FamilyName?lower_case}xx_it.h"
 [#if FREERTOS??] [#-- If FreeRtos is used --]
-#include "cmsis_os.h"
+[#-- #include "cmsis_os.h" --]
+[@common.optinclude name=mxTmpFolder+"/rtos_inc.tmp"/][#--include freertos includes --]
 [/#if]
 [#if TOUCHSENSING??] [#-- If TouchSensing is used --]
 #include "tsl_time.h"
@@ -51,7 +28,7 @@
 [#assign noUsbWakeUpInterruptHalHandler = missingUsbWakeUpInterruptHalHandler()]
 [#if noUsbWakeUpInterruptHalHandler]
   [#assign requireSystemClockConfig = false]
-  [#list nvic as vector]
+  [#list nvic as vector] [#-- nvic is a list of NvicVector, given by the code generator --]
     [#assign requireSystemClockConfig = usbWakeUpVector(vector.name)]
     [#if requireSystemClockConfig]
       [#break]
@@ -66,15 +43,15 @@ void SystemClock_Config(void);
 [/#compress]
 
 [#assign CortexName = "Cortex"]
-[#if FamilyName=="STM32F7"]
+[#if FamilyName=="STM32F7"]  [#-- FamilyName is in reality series name --]
   [#assign CortexName = "Cortex-M7"]
-[#elseif FamilyName=="STM32F4" || FamilyName=="STM32F3" || FamilyName=="STM32L4"]
+[#elseif FamilyName=="STM32F4" || FamilyName=="STM32F3" || FamilyName=="STM32L4" || FamilyName=="STM32G4" ||  FamilyName=="STM32MP1" ]
   [#assign CortexName = "Cortex-M4"]
 [#elseif FamilyName=="STM32F1" || FamilyName=="STM32F2" || FamilyName=="STM32L1"]
   [#assign CortexName = "Cortex-M3"]
 [#elseif FamilyName=="STM32F0"]
   [#assign CortexName = "Cortex-M0"]
-[#elseif FamilyName=="STM32L0"]
+[#elseif FamilyName=="STM32L0" ||  FamilyName=="STM32G0" ]
   [#assign CortexName = "Cortex-M0+"]
 [/#if]
 
@@ -110,10 +87,11 @@ void SystemClock_Config(void);
 
 
 /* External variables --------------------------------------------------------*/
+[#compress]
 [#assign handleList = ""]
-[#list handlers as handler]
-  [#list handler.entrySet() as entry]
-    [#list entry.value as ipHandler]
+[#list handlers as handler] [#-- handlers is a list of ipHandlers (hashmap)  --]
+  [#list handler.entrySet() as entry]  [#-- handler is a set of handles --]
+    [#list entry.value as ipHandler]  [#-- entry.value is a list of IpHandler --]
         [#if ipHandler.useNvic && !(handleList?contains("(" + ipHandler.handler + ")")) && ipHandler.handlerType!="DFSDM_Channel_HandleTypeDef"]
 extern ${ipHandler.handlerType} ${ipHandler.handler};
         [/#if]
@@ -141,6 +119,8 @@ extern void GRAPHICS_IncTick(void);
 extern void GRAPHICS_IncTick(void);
 #n
 [/#if]
+[/#compress]
+
 /* USER CODE BEGIN EV */
 
 /* USER CODE END EV */
@@ -159,19 +139,20 @@ void ${vector.irqHandler}(void)
 #t/* USER CODE BEGIN ${vector.name} 0 */
 
 #n#t/* USER CODE END ${vector.name} 0 */
-[#if vector.halHandler != "NONE" && timeBaseSource!="None"]
+[#if vector.halHandler != "NONE" && vector.halHandlerNeeded || vector.operation == "W1"] [#-- "&& timeBaseSource!="None"" is handled in NvicVector.java --]
       #t${vector.halHandler}
 [/#if]
-[#if vector.name != "HardFault_IRQn"]
-[#if vector.name != "MemoryManagement_IRQn"]
-[#if vector.name != "BusFault_IRQn"]
-[#if vector.name != "UsageFault_IRQn"]
+[#--[#if vector.name != "HardFault_IRQn"]--]
+[#--[#if vector.name != "MemoryManagement_IRQn"]--]
+[#--[#if vector.name != "BusFault_IRQn"]--]
+[#--[#if vector.name != "UsageFault_IRQn"] --]
+[#if vector.operation != "W1"]
 #t/* USER CODE BEGIN ${vector.name} 1 */
 
 #n#t/* USER CODE END ${vector.name} 1 */
-[/#if]
-[/#if]
-[/#if]
+[#--[/#if]--]
+[#--[/#if]--]
+[#--[/#if]--]
 [/#if]
 }#n
 [/#if]
@@ -247,7 +228,7 @@ void ${vector.irqHandler}(void)
 
 #n#t/* USER CODE END ${vector.name} 0 */
 
-[#if vector.halHandler == "NONE"]
+[#if vector.halHandler == "NONE" || !vector.halHandlerNeeded]
 [#elseif vector.ipName=="" || vector.irregular=="true"]
   #t${vector.halHandler}
 [#elseif vector.name=="FMC_IRQn" || vector.name=="FSMC_IRQn" || vector.name=="HASH_RNG_IRQn" || vector.name=="TIM6_DAC_IRQn"]

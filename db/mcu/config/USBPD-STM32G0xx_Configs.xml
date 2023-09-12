@@ -40,6 +40,7 @@
         <!-- USB Power Delivery - Core -->
         <File Category="header" Name="Core/inc/usbpd_core.h"/>
         <File Category="header" Name="Core/inc/usbpd_def.h"/>
+        <File Category="header" Name="Core/inc/usbpd_tcpm.h"/>
         <File Category="header" Name="Core/inc/usbpd_trace.h"/>
 
         <File Category="source" Name="Core/src/usbpd_trace.c"/>
@@ -52,15 +53,12 @@
         <File Category="library" Condition="KEIL5;SIiTideIiMDKAaARMOoV5" Name="Core/lib/USBPDCORE_PD3_FULL_CM0PLUS_Keil.lib" Version=""/>
 
         <!-- USB Power Delivery - Devices -->
-        <File Category="header" Condition="UART_Used;UART_Used" Name="Devices/STM32G0XX/inc/usbpd_bsp_trace.h"/>
         <File Category="header" Name="Devices/STM32G0XX/inc/usbpd_cad_hw_if.h"/>
         <File Category="header" Name="Devices/STM32G0XX/inc/usbpd_hw.h"/>
         <File Category="header" Name="Devices/STM32G0XX/inc/usbpd_hw_if.h"/>
         <File Category="header" Name="Devices/STM32G0XX/inc/usbpd_phy.h"/>
-        <File Category="header" Name="Devices/STM32G0XX/inc/usbpd_porthandle.h"/>
         <File Category="header" Name="Devices/STM32G0XX/inc/usbpd_timersserver.h"/>
 
-        <File Category="source" Condition="UART_Used;UART_Used" Name="Devices/STM32G0XX/src/usbpd_bsp_trace.c"/>
         <File Category="source" Name="Devices/STM32G0XX/src/usbpd_cad_hw_if.c"/>
         <File Category="source" Name="Devices/STM32G0XX/src/usbpd_hw.c"/>
         <File Category="source" Name="Devices/STM32G0XX/src/usbpd_hw_if_it.c"/>
@@ -69,7 +67,7 @@
         <File Category="source" Name="Devices/STM32G0XX/src/usbpd_pwr_hw_if.c"/>
         <File Category="source" Name="Devices/STM32G0XX/src/usbpd_timersserver.c"/>
 
-        <!-- TIM - -->
+        <!-- TIM -->
         <File Category="header" Name="../../../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_ll_tim.h"/>
         <File Category="source" Name="../../../Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_ll_tim.c"/>
 
@@ -100,6 +98,7 @@
         <Argument Name="PE_CapscounterSupport_P0" GenericType="simple" Comment="Port 0 Caps counter"/>
         <Argument Name="PE_FastRoleSwapSupport_P0" GenericType="simple" Comment="Port 0 Fast role swap"/>
         <Argument Name="CAD_RoleToggle_P0" GenericType="simple" Comment="Port 0 CAD role toggle"/>
+        <Argument Name="CAD_DefaultResistor_P0" GenericType="simple" Comment="Port 0 CAD default resistor"/>
         <Argument Name="CAD_TryFeature_P0" GenericType="simple" Comment="Port 0 CAD try feature"/>
         <Argument Name="CAD_AccesorySupport_P0" GenericType="simple" Comment="Port 0 CAD accessory support"/>
         <Argument Name="Is_GetPPSStatus_Supported_P0" GenericType="simple" Comment="Port 0 PPS message"/>
@@ -112,6 +111,7 @@
         <Argument Name="Is_GetCountryInfo_Supported_P0" GenericType="simple" Comment="Port 0 Country Info message"/>
         <Argument Name="Is_SecurityRequest_Supported_P0" GenericType="simple" Comment="Port 0 Security Response message"/>
         <Argument Name="Is_FirmUpdateRequest_Supported_P0" GenericType="simple" Comment="Port 0 Firmware update Response message"/>
+        <Argument Name="Is_SnkCapaExt_Supported_P0" GenericType="simple" Comment="Port 0 Sink Capabilities Extended message"/>
         <Argument Name="VDM_XID_SOP_P0" GenericType="simple" Comment="Port 0 USB-IF assigned XID"/>
         <Argument Name="VDM_PID_SOP_P0" GenericType="simple" Comment="Port 0 Vendor ID assigned PID"/>
         <Argument Name="VDM_ModalOperation_P0" GenericType="simple" Comment="Port 0 Product support Modes"/>
@@ -141,6 +141,7 @@
         <Argument Name="PE_CapscounterSupport_P1" GenericType="simple" Comment="Port 1 Caps counter"/>
         <Argument Name="PE_FastRoleSwapSupport_P1" GenericType="simple" Comment="Port 1 Fast role swap"/>
         <Argument Name="CAD_RoleToggle_P1" GenericType="simple" Comment="Port 1 CAD role toggle"/>
+        <Argument Name="CAD_DefaultResistor_P1" GenericType="simple" Comment="Port 1 CAD default resistor"/>
         <Argument Name="CAD_TryFeature_P1" GenericType="simple" Comment="Port 1 CAD try feature"/>
         <Argument Name="CAD_AccesorySupport_P1" GenericType="simple" Comment="Port 1 CAD accessory support"/>
         <Argument Name="Is_GetPPSStatus_Supported_P1" GenericType="simple" Comment="Port 1 PPS message"/>
@@ -153,6 +154,7 @@
         <Argument Name="Is_GetCountryInfo_Supported_P1" GenericType="simple" Comment="Port 1 Country Info message"/>
         <Argument Name="Is_SecurityRequest_Supported_P1" GenericType="simple" Comment="Port 1 Security Response message"/>
         <Argument Name="Is_FirmUpdateRequest_Supported_P1" GenericType="simple" Comment="Port 1 Firmware update Response message"/>
+        <Argument Name="Is_SnkCapaExt_Supported_P1" GenericType="simple" Comment="Port 1 Sink Capabilities Extended message"/>
         <Argument Name="VDM_XID_SOP_P1" GenericType="simple" Comment="Port 1 USB-IF assigned XID"/>
         <Argument Name="VDM_PID_SOP_P1" GenericType="simple" Comment="Port 1 Vendor ID assigned PID"/>
         <Argument Name="VDM_ModalOperation_P1" GenericType="simple" Comment="Port 1 Product support Modes"/>
@@ -182,13 +184,7 @@
 
     <RefConfigFile Description="Definitions for the header file usbpd_pdo_defs.h" Name="USBPD_PDO_DEFS" Template="usbpd_pdo_defs.ftl">
         <File Name="usbpd_pdo_defs.h" Category="header" Condition="all" Version="0.9.0"/>
-        <Argument Name="USBPD_PDP_SRC_IN_WATTS" GenericType="simple" Comment="SRC PD Power"/>
-        <Argument Name="USBPD_PDP_SNK_IN_WATTS" GenericType="simple" Comment="SINK PD Power"/>
-        <Argument Name="USBPD_CORE_PDO_SRC_FIXED_MAX_CURRENT" GenericType="simple" Comment="Max current"/>
-        <Argument Name="PORT0_NB_SOURCEPDO" GenericType="simple" Comment="Number of Source PDOs for port 0"/>
-        <Argument Name="PORT1_NB_SOURCEPDO" GenericType="simple" Comment="Number of Source PDOs for port 1"/>
-        <Argument Name="PORT0_NB_SINKPDO" GenericType="simple" Comment="Number of Sink PDOs for port 0"/>
-        <Argument Name="PORT1_NB_SINKPDO" GenericType="simple" Comment="Number of Sink PDOs for port 1"/>
+        <Argument Name="USBPD_NbPorts" GenericType="simple" Comment="The number of the USBPD ports"/>
         <Argument Name="PORT0_SOURCE_PDO1" GenericType="simple" Comment="Source PDO 1 for port 0"/>
         <Argument Name="PORT0_SOURCE_PDO2" GenericType="simple" Comment="Source PDO 2 for port 0"/>
         <Argument Name="PORT0_SOURCE_PDO3" GenericType="simple" Comment="Source PDO 3 for port 0"/>
@@ -217,10 +213,6 @@
         <Argument Name="PORT1_SINK_PDO5" GenericType="simple" Comment="Sink PDO 5 for port 1"/>
         <Argument Name="PORT1_SINK_PDO6" GenericType="simple" Comment="Sink PDO 6 for port 1"/>
         <Argument Name="PORT1_SINK_PDO7" GenericType="simple" Comment="Sink PDO 7 for port 1"/>
-        <Argument Name="USBPD_BOARD_REQUESTED_VOLTAGE_MV" GenericType="simple" Comment="Requested Voltage"/>
-        <Argument Name="USBPD_BOARD_MIN_VOLTAGE_MV" GenericType="simple" Comment="Minimum Voltage"/>
-        <Argument Name="USBPD_BOARD_MAX_VOLTAGE_MV" GenericType="simple" Comment="Maximum Voltage"/>
-        <Argument Name="USBPD_BOARD_MAX_CURRENT_MA" GenericType="simple" Comment="Maximum Current"/>
     </RefConfigFile>
 
     <RefConfigFile Description="Definitions for the header file usbpd_pwr_if.h" Name="USBPD_PWR_IF_H" Template="usbpd_pwr_if_h.ftl">
@@ -254,6 +246,7 @@
         <Argument Name="DRP" GenericType="simple" Condition="DualRoleUCPD1 | DualRoleUCPD2 | (SourceUCPD1 &amp; SinkUCPD2) | (SourceUCPD2 &amp; SinkUCPD1)"/>
         <Argument Name="SRC" GenericType="simple" Condition="(SourceUCPD1 &amp; !(SinkUCPD2 | DualRoleUCPD2)) | (SourceUCPD2 &amp; !(SinkUCPD1 | DualRoleUCPD1))"/>
         <Argument Name="SNK" GenericType="simple" Condition="(SinkUCPD1 &amp; !(SourceUCPD2 | DualRoleUCPD2)) | (SinkUCPD2 &amp; !(SourceUCPD1 | DualRoleUCPD1))"/>
+        <Argument Name="TRACE" GenericType="simple" Condition="TRACEREMB"/>
     </RefConfigFile>
 
     <RefConfigFile Description="Definitions for the source file usbpd_bsp_hw.c" Name="USBPD_DEVICES_CONF" Template="usbpd_devices_conf.ftl">
@@ -275,15 +268,6 @@
         <Argument Name="TIMinstance" GenericType="simple" Comment="USBPD Timer Service Source selected"/>
         <Argument Name="TIMinterrupt" GenericType="simple" Comment="USBPD Timer interrupt"/>
         <Argument Name="TIMenableClock" GenericType="simple" Comment="USBPD Timer enable clock"/>
-
-        <Argument Name="UARTinstance" GenericType="simple" Comment="USBPD Trace Source selected"/>
-        <Argument Name="UARTbaudrate" GenericType="simple" Comment="USBPD Trace Baud Rate"/>
-        <Argument Name="UARTinterrupt" GenericType="simple" Comment="USBPD Trace interrupt"/>
-        <Argument Name="UARTenableClock" GenericType="simple" Comment="USBPD Trace enable clock"/>
-        <Argument Name="UART_TX_PIN" GenericType="simple" Comment="USBPD Trace TX pin"/>
-        <Argument Name="UART_RX_PIN" GenericType="simple" Comment="USBPD Trace RX pin"/>
-        <Argument Name="UART_TX_DMA_CHANNEL" GenericType="simple" Comment="USBPD Trace DMA Request TX"/>
-        <Argument Name="UART_TX_DMA_interrupt" GenericType="simple" Comment="External Interrupt number for UART TX"/>
 
     </RefConfigFile>
 

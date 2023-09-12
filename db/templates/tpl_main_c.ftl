@@ -42,8 +42,11 @@
 [/#if]
 [/#list]
 [#list ips as ip]
-[#if !ip?contains("FATFS") && !ip?contains("FREERTOS") && !ip?contains("NVIC")&& !ip?contains("CORTEX")&& !ip?contains("GRAPHICS")]
-[#if !ip?contains("LWIP") || (ip?contains("LWIP") && (MBEDTLSUSed=="false"))]
+[#if !ip?contains("FATFS") && !ip?contains("FREERTOS") && !ip?contains("NVIC")&& !ip?contains("CORTEX") && !ip?contains("GRAPHICS") && !ip?contains("TRACER_EMB")]
+[#if ip?contains("STM32_WPAN")]
+#include "app_entry.h"
+[/#if]
+[#if (!ip?contains("LWIP")&& !ip?contains("STM32_WPAN")) || (ip?contains("LWIP") && (MBEDTLSUSed=="false"))]
 #include "${ip?lower_case}.h"
 [/#if][/#if]
 [#-- Examples Migration (FCR) - Begin--]
@@ -56,7 +59,7 @@
  [/#if]
 [/#if]
 [#-- Examples Migration (FCR) - End--]
-[#if ip?contains("USB_DEVICE")]
+[#if ip?contains("USB_DEVICE") || ip?contains("USB_Device")]
 [#assign usb_device = true]
 [/#if]
 [/#list]
@@ -157,6 +160,12 @@ ${dHandle};
             [/#list]#n
         [/#if][#--if Peripheral??--]
     [/#list]
+[#-- Add EXTI handler --]
+[#--if BspExtiHandler??] [#-- Fix 59273 --]
+[#--    [#list BspExtiHandler as ipHandle]
+[#-- ${ipHandle.type} ${ipHandle.name};
+[#--    [/#list]
+[/#if--]
 [/#compress]
     [#compress]
     [#-- BDMA global variables --]
@@ -230,7 +239,7 @@ static void MPU_Config(void);
 [/#if]
 [#if HALCompliant??]
     [#list voids as void]
-        [#if ((McuDualCore?? && (void.core == CoreName || void.core =="")||!McuDualCore??) )&& !void.ipType?contains("thirdparty")&&!void.functionName?contains("FREERTOS")&&void.functionName!="Init"&&!void.functionName?contains("FATFS")&& !void.functionName?contains("LWIP")&& !void.functionName?contains("MBEDTLS")&& !void.functionName?contains("USB_DEVICE")&& !void.functionName?contains("USB_HOST")&& !void.functionName?contains("CORTEX")&& !void.functionName?contains("SystemClock_Config")&& !void.functionName?contains("LIBJPEG")&& !void.functionName?contains("PDM2PCM")&& !void.functionName?contains("TOUCHSENSING")&& !void.functionName?contains("MotorControl")&& !void.functionName?contains("RESMGR_UTILITY")]
+        [#if ((McuDualCore?? && (void.core == CoreName || void.core =="")||!McuDualCore??) )&& !void.ipType?contains("thirdparty")&&!void.functionName?contains("FREERTOS")&&void.functionName!="Init"&&!void.functionName?contains("FATFS")&& !void.functionName?contains("LWIP")&& !void.functionName?contains("MBEDTLS")&& !void.functionName?contains("USB_DEVICE") && !void.functionName?contains("USB_Device") && !void.functionName?contains("USB_HOST")&& !void.functionName?contains("CORTEX")&& !void.functionName?contains("SystemClock_Config")&& !void.functionName?contains("LIBJPEG")&& !void.functionName?contains("PDM2PCM")&& !void.functionName?contains("TOUCHSENSING")&& !void.functionName?contains("MotorControl")&& !void.functionName?contains("RESMGR_UTILITY") && !void.functionName?contains("OPENAMP") && !void.functionName?contains("TRACER_EMB") && !void.functionName?contains("APPE_Init")]
             [#if !void.functionName?contains("GRAPHICS") && !void.functionName?contains("USBPD")]
                 [#if void.isStatic]
                     static void ${""?right_pad(2)}${void.functionName}(void);
@@ -239,7 +248,6 @@ static void MPU_Config(void);
                     void ${""?right_pad(2)}${void.functionName}(void);
                 [/#if]
             [/#if]
-            
             [#if !void.isNotGenerated&&void.functionName?contains("GRAPHICS")]
           extern void GRAPHICS_HW_Init(void);
           extern void ${""?right_pad(2)}${void.functionName}(void);
@@ -247,6 +255,9 @@ static void MPU_Config(void);
             [/#if]
         [/#if]
     [/#list]
+	[#if OPENAMP??]
+       int MX_OPENAMP_Init(int RPMsgRole, rpmsg_ns_bind_cb ns_bind_cb);
+    [/#if]
  [@common.optinclude name=mxTmpFolder+"/rtos_pfp.tmp"/]
 [#else]
     [#list voids as void]
@@ -286,10 +297,6 @@ int main(void)
   /* USER CODE END 1 */
 
 [#compress]
-[#if RESMGR_UTILITY??]
-#t/* Resource Manager Utility initialisation ---------------------------------*/
-    #tMX_RESMGR_UTILITY_Init();
-[/#if]
 [#if mpuControl??] [#-- if MPU config is enabled --]
 #t/* MPU Configuration--------------------------------------------------------*/
 
@@ -309,7 +316,11 @@ int main(void)
 #t/* MCU Configuration--------------------------------------------------------*/
 
 [#if clockConfig??]
+[#if mpu??] [#-- if MPU, there is no flash --]
+#n#t/* Reset of all peripherals, Initializes the Systick. */
+[#else]
 #n#t/* Reset of all peripherals, Initializes the Flash interface and the Systick. */
+[/#if]
 [#if isHALUsed??]
 #tHAL_Init();
 [#else]
@@ -332,22 +343,41 @@ int main(void)
 [/#list]
 [/#if]
 #n
+[#list voids as void]
+[#if void.functionName?? && void.functionName?contains("IPCC") && !void.isNotGenerated]
+    #t/* IPCC initialisation */
+	#t MX_IPCC_Init();
+[/#if]
+[/#list]
+[#if OPENAMP??]
+#t/* OpenAmp initialisation ---------------------------------*/
+    #tMX_OPENAMP_Init(RPMSG_REMOTE, NULL);
+[/#if]
+[#if RESMGR_UTILITY??]
+#t/* Resource Manager Utility initialisation ---------------------------------*/
+    #tMX_RESMGR_UTILITY_Init();
+[/#if]
+#n
 #t/* USER CODE BEGIN SysInit */
 
 #n#t/* USER CODE END SysInit */
 #n
 #n#t/* Initialize all configured peripherals */
 [#list voids as void]
-[#if void.functionName?? && !void.functionName?contains("FREERTOS")&&!void.functionName?contains("CORTEX")&& !void.functionName?contains("SystemClock_Config")&&void.functionName!="Init" && !void.functionName?contains("Process") && !void.functionName?contains("RESMGR_UTILITY")]
+
+[#if void.functionName?? && !void.functionName?contains("FREERTOS")&&!void.functionName?contains("CORTEX")&& !void.functionName?contains("SystemClock_Config")&&void.functionName!="Init" && !void.functionName?contains("Process") && !void.functionName?contains("RESMGR_UTILITY")  && !void.functionName?contains("OPENAMP") && !void.functionName?contains("IPCC")]
 [#if !void.isNotGenerated]
 [#if ((FREERTOS?? && void.ipType=="peripheral") || !FREERTOS??) && void.functionName!="GRAPHICS_Init"]
- [#if void.functionName?contains("FATFS") && familyName="stm32g0"]
+[#if void.functionName?contains("FATFS") && (familyName="stm32g0" || familyName="stm32wb")]
  [#-- Required by the examples migration (due to the fact that the function signature has changed and returns a value now. --]
  #tif (MX_FATFS_Init() != APP_OK) {
  #t#tError_Handler();
  #t}
  [#else]
+[#if void.functionName="APPE_Init"]
+[#else]
 #t${void.functionName}();
+[/#if]
 [/#if]
 [/#if]
 [/#if]
@@ -363,7 +393,11 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
-
+[#list voids as void]
+[#if void.functionName?? && void.functionName?contains("APPE_Init")]
+#tAPPE_Init();
+[/#if]
+[/#list]
 [#if USBPD??]
     [#lt]#t/* USBPD initialisation ---------------------------------*/
     [#lt]#tMX_USBPD_Init();
@@ -416,7 +450,7 @@ int main(void)
 [/#if]
 #n
 [#list voids as void]
-[#if void.functionName?? && void.functionName?contains("Process") && !FREERTOS??]
+[#if void.functionName?? && void.functionName?contains("Process") && !void.isNotGenerated && !FREERTOS??]
 #t${void.functionName}();
 [/#if]
 [/#list]
@@ -438,6 +472,9 @@ void SystemClock_Config(void)
 {
 [#compress]
 [#assign nbVars = 0]
+[#if FamilyName=="STM32MP1"]
+[#-- #if defined (CONFIG_MASTER_MODE) --]
+[/#if]
 [#assign listOfLocalVariables =""]
         [#assign resultList =""]
     [#list clockConfig as configModel] [#--list0--]
@@ -459,6 +496,9 @@ void SystemClock_Config(void)
    [#compress] [@common.generateConfigModelListCode configModel=configModel inst=clockInst  nTab=1 index=""/][/#compress]
     [#--/#list--]
 [/#list][/#if]
+[#if FamilyName=="STM32MP1"]
+[#--  #endif --]
+[/#if]
 }[/#if]
 [/#compress]
 
@@ -611,11 +651,11 @@ static void MX_NVIC_Init(void)
             [#if halMode!=ipName&&!ipName?contains("TIM")&&!ipName?contains("CEC")][#if staticVoids?contains('MX_${instName}_${halMode}_Init')]static[/#if] void MX_${instName}_${halMode}_Init(void)[#else][#if staticVoids?contains('MX_${instName}_Init')]static[/#if] void MX_${instName}_Init(void)[/#if]
             {     
   #n
+
 [#if RESMGR_UTILITY??]
     [@common.optinclude name=mxTmpFolder+"/resmgrutility_"+instName+".tmp"/][#-- ADD RESMGR_UTILITY Code--]
 [/#if]
       
-
 #t/* USER CODE BEGIN ${instName}_Init 0 */
 #n
  #t/* USER CODE END ${instName}_Init 0 */
