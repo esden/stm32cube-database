@@ -1,9 +1,6 @@
 [#ftl]
-[#if includes??]
-[#list includes as include]
-#include "${include}"
-[/#list]
-[/#if]
+#include "ff.h"
+#include "ff_gen_drv.h"
 
 [#list IPdatas as IP]  
 [#assign ipvar = IP]

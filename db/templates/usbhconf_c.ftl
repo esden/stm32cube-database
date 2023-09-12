@@ -155,6 +155,29 @@ void HAL_HCD_HC_NotifyURBChange_Callback(HCD_HandleTypeDef *hhcd, uint8_t chnum,
   USBH_LL_NotifyURBChange(hhcd->pData);
 #endif
 }
+[#if FamilyName.contains("STM32F7")]
+/**
+* @brief  Port Port Enabled callback.
+  * @param  hhcd: HCD handle
+  * @retval None
+  */
+void HAL_HCD_PortEnabled_Callback(HCD_HandleTypeDef *hhcd)
+{
+  USBH_LL_PortEnabled(hhcd->pData);
+} 
+
+
+/**
+  * @brief  Port Port Disabled callback.
+  * @param  hhcd: HCD handle
+  * @retval None
+  */
+void HAL_HCD_PortDisabled_Callback(HCD_HandleTypeDef *hhcd)
+{
+  USBH_LL_PortDisabled(hhcd->pData);
+} 
+
+[/#if]
 
 /*******************************************************************************
                        LL Driver Interface (USB Host Library --> HCD)

@@ -58,6 +58,7 @@
 [#assign dma2d="0"]
 [#assign useIli9341="0"]
 [#assign OTM="0"]
+[#assign freeRTOS="0"] 
 [#-- SWIPdatas is a list of SWIPconfigModel --]  
 [#list SWIPdatas as SWIP]
 [#-- Global variables --]
@@ -135,6 +136,11 @@ extern ${variable.value} ${variable.name};
 [#assign useIli9341="1"] 
 [/#if]
 
+[#-- ELSE IF --]
+[#elseif definition.name = "FREERTOS"]
+[#if definition.value == "1" ]
+[#assign freeRTOS="1"] 
+[/#if]
 
 [/#if]
 [/#list]
@@ -185,9 +191,9 @@ extern LTDC_HandleTypeDef    hltdc;
 [#if dma2d != "0" ]
 extern DMA2D_HandleTypeDef   hdma2d;
 [/#if]
-
+[#if  freeRTOS == "0" ]
 extern volatile GUI_TIMER_TIME OS_TimeMS;
-
+[/#if]
 static          LCD_LayerPropTypedef          layer_prop[GUI_NUM_LAYERS];
 volatile char   TransferInProgress  = 0;
 
@@ -1068,12 +1074,12 @@ int LCD_X_DisplayDriver(unsigned LayerIndex, unsigned Cmd, void * pData)
   }
   return r; 
 }
-
+[#if  freeRTOS == "0" ]
 void GRAPHICS_IncTick(void){
   
    OS_TimeMS++;
 } 
-
+[/#if]
 
 void GRAPHICS_HW_Init(void)
 { 

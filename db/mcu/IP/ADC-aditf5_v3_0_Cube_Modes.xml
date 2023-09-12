@@ -66,7 +66,7 @@
          <Condition Diagnostic="" Expression="Mode=ADC_MODE_INDEPENDENT | Mode=null "/>
         </RefParameter>   
         <RefParameter Comment="DMA Access Mode" DefaultValue="DISABLED" Group="ADCsgroup" Name="DMAAccessModeView" Type="list">
-          <Condition Diagnostic="" Expression="DMAAccessMode=ADC_DMAACCESSMODE_DISABLED"/>
+          <Condition Diagnostic="" Expression="DualModeData=ADC_DMAACCESSMODE_DISABLED"/>
              <PossibleValue  Comment="DMA access mode disabled" Value="DISABLED" />
             <PossibleValue  Comment="DMA access mode enabled" Value="ENABLE"/>
         </RefParameter>
@@ -77,14 +77,14 @@
         
         
         
-        <RefParameter Comment="DMA Access Mode" DefaultValue="null" Group="ADCsgroup" Name="DMAAccessMode" Type="list" Visible="false">
+        <RefParameter Comment="DMA Access Mode" DefaultValue="null" Group="ADCsgroup" Name="DualModeData" Type="list" Visible="false">
             <Condition Diagnostic="" Expression="Mode=ADC_MODE_INDEPENDENT | Mode=null "/>
         </RefParameter>
         
-        <RefParameter Comment="DMA Access Mode" DefaultValue="ADC_DMAACCESSMODE_DISABLED" Group="ADCsgroup" Name="DMAAccessMode" Type="list" Visible="false">
-            <PossibleValue Action="Remove" Condition="DMAAccessModeView=ENABLE" Comment="DMA access mode disabled" Value="ADC_DMAACCESSMODE_DISABLED"/>
-            <PossibleValue Action="Remove" Condition="(DMAAccessModeView=DISABLED) | (ADC_RESOLUTION16b_$IpInstance|ADC_RESOLUTION14b_$IpInstance|ADC_RESOLUTION12b_$IpInstance|ADC_RESOLUTION10b_$IpInstance)" Comment="DMA access mode enabled" Value="ADC_DUALMODEDATAFORMAT_32_10_BITS"/>
-            <PossibleValue Action="Remove" Condition="(DMAAccessModeView=DISABLED) | (ADC_RESOLUTION8b_$IpInstance)" Comment="DMA access mode enabled" Value="ADC_DUALMODEDATAFORMAT_8_BITS"/>
+        <RefParameter Comment="DMA Access Mode" DefaultValue="ADC_DMAACCESSMODE_DISABLED" Group="ADCsgroup" Name="DualModeData" Type="list" Visible="false">
+            <PossibleValue Action="Remove" Condition="DMAAccessModeView=ENABLE" Comment="DMA access mode enabled" Value="ADC_DMAACCESSMODE_DISABLED"/>
+            <PossibleValue Action="Remove" Condition="(DMAAccessModeView=DISABLED) | (ADC_RESOLUTION16b_$IpInstance|ADC_RESOLUTION14b_$IpInstance|ADC_RESOLUTION12b_$IpInstance|ADC_RESOLUTION10b_$IpInstance)" Comment="DMA access mode enabled" Value="ADC_DUALMODEDATAFORMAT_8_BITS"/>
+            <PossibleValue Action="Remove" Condition="(DMAAccessModeView=DISABLED) | (ADC_RESOLUTION8b_$IpInstance)" Comment="DMA access mode enabled" Value="ADC_DUALMODEDATAFORMAT_32_10_BITS"/>
         </RefParameter>
 	    
         <!-- Possible value of TwoSamplingDelay parameter -->
@@ -512,6 +512,12 @@
     </RefParameter>
 	
     <!-- Possible Value of OffsetNumber parameters  -->
+     <RefParameter Comment="Offset Number" DefaultValue="ADC_OFFSET_NONE" Group="ADCgroup" Name="OffsetNumber" Type="list">
+         <Condition Diagnostic="" Expression="Regular_OversamplingMode_Enabled_$IpInstance"/>
+        <PossibleValue Comment="No offset" Value="ADC_OFFSET_NONE"/>
+     
+        <Description>Regular Channel x offset number selection</Description>
+    </RefParameter>
     <RefParameter Comment="Offset Number" DefaultValue="ADC_OFFSET_NONE" Group="ADCgroup" Name="OffsetNumber" Type="list">
         <PossibleValue Comment="No offset" Value="ADC_OFFSET_NONE"/>
         <PossibleValue Comment="1 offset" Value="ADC_OFFSET_1"/>
@@ -527,36 +533,41 @@
         <Description>Data offset for regular channel</Description>
     </RefParameter>
 		
-    <RefParameter Comment="Offset" DefaultValue="0" Group="ADCgroup" Max="67108863" Min="0" Name="Offset" Type="integer">
+    <RefParameter Comment="Offset" DefaultValue="0" Group="ADCgroup" Max="65535" Min="0" Name="Offset" Type="integer">
         <Condition Diagnostic="" Expression="ADC_RESOLUTION16b_$IpInstance"/>
         <Description>Data offset for regular channel</Description>
     </RefParameter>
-    <RefParameter Comment="Offset" DefaultValue="0" Group="ADCgroup" Max="16777215" Min="0" Name="Offset" Type="integer">
+    <RefParameter Comment="Offset" DefaultValue="0" Group="ADCgroup" Max="16383" Min="0" Name="Offset" Type="integer">
         <Condition Diagnostic="" Expression="ADC_RESOLUTION14b_$IpInstance"/>
         <Description>Data offset for regular channel</Description>
     </RefParameter>
-    <RefParameter Comment="Offset" DefaultValue="0" Group="ADCgroup" Max="4194303" Min="0" Name="Offset" Type="integer">
+    <RefParameter Comment="Offset" DefaultValue="0" Group="ADCgroup" Max="4095" Min="0" Name="Offset" Type="integer">
         <Condition Diagnostic="" Expression="ADC_RESOLUTION12b_$IpInstance"/>
         <Description>Data offset for regular channel</Description>
     </RefParameter>
-    <RefParameter Comment="Offset" DefaultValue="0" Group="ADCgroup" Max="1048575" Min="0" Name="Offset" Type="integer">
+    <RefParameter Comment="Offset" DefaultValue="0" Group="ADCgroup" Max="1023" Min="0" Name="Offset" Type="integer">
         <Condition Diagnostic="" Expression="ADC_RESOLUTION10b_$IpInstance"/>
         <Description>Data offset for regular channel</Description>
     </RefParameter>
-    <RefParameter Comment="Offset" DefaultValue="0" Group="ADCgroup" Max="262143" Min="0" Name="Offset" Type="integer">
+    <RefParameter Comment="Offset" DefaultValue="0" Group="ADCgroup" Max="255" Min="0" Name="Offset" Type="integer">
         <Condition Diagnostic="" Expression="ADC_RESOLUTION8b_$IpInstance"/>
         <Description>Data offset for regular channel</Description>
     </RefParameter>
 
-    <RefParameter Comment="Offset" DefaultValue="0" Group="ADCgroup" Max="67108863" Min="0" Name="Offset" Type="integer" Visible="false">
+    <RefParameter Comment="Offset" DefaultValue="0" Group="ADCgroup" Max="65535" Min="0" Name="Offset" Type="integer" Visible="false">
         <Description>Data offset for regular channel</Description>
     </RefParameter>
-    <RefParameter Comment="Right offset shift" DefaultValue="null" Group="ADCgroup" Name="RightOffsetShift" Type="list" Visible="false">
+    <RefParameter Comment="Right offset shift" DefaultValue="null" Group="ADCgroup" Name="OffsetRightShift" Type="list" Visible="false">
         <Condition Diagnostic="" Expression="OffsetNumber = ADC_OFFSET_NONE"/>
         <Description>Signed saturation for injected channel</Description>
     </RefParameter>
+    <RefParameter Comment="Right offset shift" DefaultValue="DISABLE" Group="ADCgroup" Name="OffsetRightShift" Type="list">
+        <Condition Diagnostic="" Expression="OffsetNumber = ADC_OFFSET_NONE"/>
+        <PossibleValue Comment="Disable" Value="DISABLE"/>
+       
+    </RefParameter>
 			
-    <RefParameter Comment="Right offset shift" DefaultValue="DISABLE" Group="ADCgroup" Name="RightOffsetShift" Type="list">
+    <RefParameter Comment="Right offset shift" DefaultValue="DISABLE" Group="ADCgroup" Name="OffsetRightShift" Type="list">
         <PossibleValue Comment="Disable" Value="DISABLE"/>
         <PossibleValue Action="Disable" Condition="!(ADC_RESOLUTION8b_$IpInstance|ADC_RESOLUTION16b_$IpInstance)" Diagnostic="Supported only for 8-bit and 16-bit data format" Comment="Enable" Value="ENABLE"/> 
         <Description>Signed saturation for injected channel</Description>
@@ -870,7 +881,11 @@
 			 			    
     <!-- Possible Value of OffsetNumber parameters  -->
     <RefParameter Comment="Offset Number" DefaultValue="ADC_OFFSET_NONE" Group="ADCgroup" Name="InjectedOffsetNumber" Type="list" Visible="false">
-        <Condition Diagnostic="In case of usage of channels on injected group, ADC frequency should be low than AHB clock frequency /4 for resolution 12 or 10 bits, AHB clock frequency /3 for resolution 8 bits, AHB clock frequency /2 for resolution 6 bits." Expression="EnableInjectedConversion=DISABLE"/>
+        <Condition Diagnostic="" Expression="EnableInjectedConversion=DISABLE"/>
+    </RefParameter>
+      <RefParameter Comment="Offset Number" DefaultValue="ADC_OFFSET_NONE" Group="ADCgroup" Name="InjectedOffsetNumber" Type="list" >
+        <Condition Diagnostic="Offset is not supported with oversampling mode" Expression="Injected_OversamplingMode_Enabled_$IpInstance"/>
+        <PossibleValue Comment="No offset" Value="ADC_OFFSET_NONE"/>
     </RefParameter>
 
     <RefParameter Comment="Offset Number" DefaultValue="ADC_OFFSET_NONE" Group="ADCgroup" Name="InjectedOffsetNumber" Type="list">
@@ -885,31 +900,31 @@
 			     
 			     
     <!-- Possible Value of InjectedOffset parameters: Min and Max of this parameter depend on ADC resolution -->
-    <RefParameter Comment="Injected Offset" DefaultValue="0" Group="ADCgroup" Max="67108863" Min="0" Name="InjectedOffset" Type="integer" Visible="false">
-        <Condition Diagnostic="In case of usage of channels on injected group, ADC frequency should be low than AHB clock frequency /4 for resolution 12 or 10 bits, AHB clock frequency /3 for resolution 8 bits, AHB clock frequency /2 for resolution 6 bits." Expression="EnableInjectedConversion=DISABLE | InjectedOffsetNumber = ADC_OFFSET_NONE"/>  
+    <RefParameter Comment="Injected Offset" DefaultValue="0" Group="ADCgroup" Max="65535" Min="0" Name="InjectedOffset" Type="integer" Visible="false">
+        <Condition Diagnostic="" Expression="EnableInjectedConversion=DISABLE | InjectedOffsetNumber = ADC_OFFSET_NONE"/>  
     </RefParameter>
     
-    <RefParameter Comment="Injected Offset" DefaultValue="0" Group="ADCgroup" Max="67108863" Min="0" Name="InjectedOffset" Type="integer">
+    <RefParameter Comment="Injected Offset" DefaultValue="0" Group="ADCgroup" Max="65535" Min="0" Name="InjectedOffset" Type="integer">
         <Condition Diagnostic="" Expression="ADC_RESOLUTION16b_$IpInstance"/>
         <Description>Data offset for Injected channel</Description>
     </RefParameter>
-    <RefParameter Comment="Injected Offset" DefaultValue="0" Group="ADCgroup" Max="16777215" Min="0" Name="InjectedOffset" Type="integer">
+    <RefParameter Comment="Injected Offset" DefaultValue="0" Group="ADCgroup" Max="16383" Min="0" Name="InjectedOffset" Type="integer">
         <Condition Diagnostic="" Expression="ADC_RESOLUTION14b_$IpInstance"/>
         <Description>Data offset for Injected channel</Description>
     </RefParameter>
-    <RefParameter Comment="Injected Offset" DefaultValue="0" Group="ADCgroup" Max="4194303" Min="0" Name="InjectedOffset" Type="integer">
+    <RefParameter Comment="Injected Offset" DefaultValue="0" Group="ADCgroup" Max="4095" Min="0" Name="InjectedOffset" Type="integer">
         <Condition Diagnostic="" Expression="ADC_RESOLUTION12b_$IpInstance"/>
         <Description>Data offset for Injected channel</Description>
     </RefParameter>
-    <RefParameter Comment="Injected Offset" DefaultValue="0" Group="ADCgroup" Max="1048575" Min="0" Name="InjectedOffset" Type="integer">
+    <RefParameter Comment="Injected Offset" DefaultValue="0" Group="ADCgroup" Max="1023" Min="0" Name="InjectedOffset" Type="integer">
         <Condition Diagnostic="" Expression="ADC_RESOLUTION10b_$IpInstance"/>
         <Description>Data offset for Injected channel</Description>
     </RefParameter>
-    <RefParameter Comment="Injected Offset" DefaultValue="0" Group="ADCgroup" Max="262143" Min="0" Name="InjectedOffset" Type="integer">
+    <RefParameter Comment="Injected Offset" DefaultValue="0" Group="ADCgroup" Max="255" Min="0" Name="InjectedOffset" Type="integer">
         <Condition Diagnostic="" Expression="ADC_RESOLUTION8b_$IpInstance"/>
         <Description>Data offset for Injected channel</Description>
     </RefParameter>
-    <RefParameter Comment="Injected Offset" DefaultValue="0" Group="ADCgroup" Max="67108863" Min="0" Name="InjectedOffset" Type="integer" Visible="false">
+    <RefParameter Comment="Injected Offset" DefaultValue="0" Group="ADCgroup" Max="65535" Min="0" Name="InjectedOffset" Type="integer" Visible="false">
         <Description>Data offset for injected channel </Description>
     </RefParameter>
     
@@ -1109,7 +1124,7 @@
         <PossibleValue Comment="Channel 16" Value="ADC_CHANNEL_16"/>
         <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT_DIV4"/>
         <PossibleValue Comment="Channel Temperature Sensor" Value="ADC_CHANNEL_TEMPSENSOR"/>
-        <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT_DIV4"/>     
+        <PossibleValue Comment="Channel Vrefint" Value="ADC_CHANNEL_VREFINT"/>     
     </RefParameter>
     
     <!--  ########################################################################################Injected Channel parameters######################################################################################## -->
@@ -1187,7 +1202,7 @@
         <PossibleValue Comment="Channel 16" Value="ADC_CHANNEL_16"/>
         <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT_DIV4"/>
         <PossibleValue Comment="Channel Temperature Sensor" Value="ADC_CHANNEL_TEMPSENSOR"/>
-        <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT_DIV4"/>     
+        <PossibleValue Comment="Channel Vrefint" Value="ADC_CHANNEL_VREFINT"/>
     </RefParameter>
 
 
@@ -1270,7 +1285,7 @@
         <PossibleValue Comment="Channel 16" Value="ADC_CHANNEL_16"/>
         <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT_DIV4"/>
         <PossibleValue Comment="Channel Temperature Sensor" Value="ADC_CHANNEL_TEMPSENSOR"/>
-        <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT_DIV4"/> 
+         <PossibleValue Comment="Channel Vrefint" Value="ADC_CHANNEL_VREFINT"/>
         <Description>ADC channel for the analog watchdog</Description>     
     </RefParameter>
 	  
@@ -1354,7 +1369,7 @@
         <PossibleValue Comment="Channel 16" Value="ADC_CHANNEL_16"/>
         <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT_DIV4"/>
         <PossibleValue Comment="Channel Temperature Sensor" Value="ADC_CHANNEL_TEMPSENSOR"/>
-        <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT_DIV4"/> 
+         <PossibleValue Comment="Channel Vrefint" Value="ADC_CHANNEL_VREFINT"/>
         <Description>ADC channel for the analog watchdog</Description>        
     </RefParameter>
 	
@@ -1430,7 +1445,7 @@
         <PossibleValue Comment="Channel 16" Value="ADC_CHANNEL_16"/>
         <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT_DIV4"/>
         <PossibleValue Comment="Channel Temperature Sensor" Value="ADC_CHANNEL_TEMPSENSOR"/>
-        <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT_DIV4"/> 
+         <PossibleValue Comment="Channel Vrefint" Value="ADC_CHANNEL_VREFINT"/>
         <Description>ADC channel for the analog watchdog</Description>     
     </RefParameter>
 	
@@ -1836,7 +1851,7 @@
         <PossibleValue Comment="Channel 16" Value="ADC_CHANNEL_16"/>
         <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT_DIV4"/>
         <PossibleValue Comment="Channel Temperature Sensor" Value="ADC_CHANNEL_TEMPSENSOR"/>
-        <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT_DIV4"/>     
+        <PossibleValue Comment="Channel Vrefint" Value="ADC_CHANNEL_VREFINT"/>     
     </RefParameter>
 		
     <!--  ########################################################################################RefMode parameters######################################################################################## -->
@@ -1847,7 +1862,7 @@
         <ConfigForMode>multiMode</ConfigForMode>
         <Parameter Name="Mode"/>
         <Parameter Name="DMAAccessModeView"/>
-        <Parameter Name="DMAAccessMode"/>
+        <Parameter Name="DualModeData"/>
         <Parameter Name="TwoSamplingDelay"/>
     </RefMode>
 	
@@ -1918,7 +1933,7 @@
         <Parameter Name="SamplingTime"/>
         <Parameter Name="OffsetNumber"/>
         <Parameter Name="Offset"/>
-        <Parameter Name="RightOffsetShift"/>
+        <Parameter Name="OffsetRightShift"/>
         <Parameter Name="SignedSaturation"/>
         <Parameter Name="RegHighThreshold"/>
         <Parameter Name="RegLowThreshold"/>	
@@ -1935,7 +1950,7 @@
         <Parameter Name="SamplingTime"/>
         <Parameter Name="OffsetNumber"/>
         <Parameter Name="Offset"/>
-        <Parameter Name="RightOffsetShift"/>
+        <Parameter Name="OffsetRightShift"/>
         <Parameter Name="SignedSaturation"/>
         <Parameter Name="RegHighThreshold"/>
         <Parameter Name="RegLowThreshold"/>	

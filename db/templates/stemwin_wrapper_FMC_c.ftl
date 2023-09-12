@@ -74,8 +74,11 @@ extern ${variable.value} ${variable.name};
 [#-- ELSE IF --]
 [#elseif definition.name = "Ysize_PHYS"]
 #define YSIZE_PHYS  #t#t ${definition.value} 
-
+[#elseif definition.name = "FREERTOS"]
+[#assign freeRTOS = definition.value] 
+[#if freeRTOS?? && freeRTOS == "0"]
 extern volatile GUI_TIMER_TIME OS_TimeMS;
+[/#if]
 /*********************************************************************
 *
 *       Configuration checking
@@ -233,6 +236,7 @@ void LCD_X_Config(void)
 
   GUIDRV_FlexColor_SetFunc(pDevice, &PortAPI, ${displayDriver} , ${controllerMode});
 
+
 [/#if]
 [/#list]
 [/#if]
@@ -312,12 +316,12 @@ static uint16_t FMC_BANK_ReadData(void)
   return FMC_BANK->RAM;
 }
 
-
+[#if freeRTOS?? && freeRTOS == "0"]
 void GRAPHICS_IncTick(void){
   
     OS_TimeMS++;
 } 
-
+[/#if]
 void GRAPHICS_HW_Init(void)
 { 
   MX_FMC_Init();  

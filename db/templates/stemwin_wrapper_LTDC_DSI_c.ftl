@@ -58,6 +58,7 @@
 [#assign Frame_Buffer_StartAddress_Layer1_DPI_DSI="0"]
 [#assign dma2d="0"]
 [#assign OTM="0"]
+[#assign freeRTOS="0"] 
 [#-- SWIPdatas is a list of SWIPconfigModel --]  
 [#list SWIPdatas as SWIP]
 [#-- Global variables --]
@@ -138,6 +139,10 @@ extern ${variable.value} ${variable.name};
 [#assign OTM="1"]
 [/#if]
 
+[#elseif definition.name = "FREERTOS" ]
+[#if definition.value == "1" ]
+[#assign freeRTOS="1"]
+[/#if]
 [/#if]
 [/#list]
 [/#if]
@@ -195,8 +200,9 @@ extern DSI_HandleTypeDef     hdsi;
 [#if dma2d != "0" ]
 extern DMA2D_HandleTypeDef   hdma2d;
 [/#if]
+[#if  freeRTOS == "0" ]
 extern volatile GUI_TIMER_TIME OS_TimeMS;
-
+[/#if]
 [#if OTM != "0" ]
 uint8_t pPage[]       = {0x00, 0x00, 0x01, 0xDF};    /*   0 -> 479 */
 
@@ -1315,12 +1321,12 @@ int LCD_X_DisplayDriver(unsigned LayerIndex, unsigned Cmd, void * pData)
   }
   return r;
 }
-
+[#if  freeRTOS == "0" ]
 void GRAPHICS_IncTick(void){
   
   OS_TimeMS++;
 } 
-
+ [/#if]
 
 void GRAPHICS_HW_Init(void)
 { 

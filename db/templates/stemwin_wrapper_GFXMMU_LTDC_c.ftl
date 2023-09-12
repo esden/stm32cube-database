@@ -59,6 +59,7 @@
 [#assign dma2d="0"]
 [#assign useIli9341="0"]
 [#assign OTM="0"]
+[#assign freeRTOS="0"] 
 [#-- SWIPdatas is a list of SWIPconfigModel --]  
 [#list SWIPdatas as SWIP]
 [#-- Global variables --]
@@ -136,6 +137,11 @@ extern ${variable.value} ${variable.name};
 [#assign useIli9341="1"] 
 [/#if]
 
+[#-- ELSE IF --]
+[#elseif definition.name = "FREERTOS"]
+[#if definition.value == "1" ]
+[#assign freeRTOS="1"] 
+[/#if]
 
 [/#if]
 [/#list]
@@ -218,8 +224,10 @@ static void     CUSTOM_FillRect(int LayerIndex, int x0, int y0, int x1, int y1, 
 static void     CUSTOM_DrawBitmap16bpp(int LayerIndex, int x, int y, U8 const * p,  int xSize, int ySize, int BytesPerLine);
 static U32      GetBufferSize(U32 LayerIndex);
 [/#if]
-extern volatile GUI_TIMER_TIME OS_TimeMS;
+[#if  freeRTOS=="0"]
 
+extern volatile GUI_TIMER_TIME OS_TimeMS;
+[/#if]
 
 /** @defgroup LCD CONFIGURATION_Private_Variables
 * @{
@@ -866,12 +874,12 @@ void GRAPHICS_HW_Init(void)
   MX_LCD_Init();
   LCD_LL_Reset();
 }
-
+[#if freeRTOS=="0"]
 void GRAPHICS_IncTick(void){
   
   OS_TimeMS++;
 } 
-
+[/#if] 
 void GRAPHICS_Init(void)
 {
   /* Initialize the GUI */

@@ -59,6 +59,7 @@
 [#assign Frame_Buffer_StartAddress_Layer0_DPI_DSI="0"]
 [#assign Frame_Buffer_StartAddress_Layer1_DPI_DSI="0"]
 [#assign dma2d="0"]
+[#assign freeRTOS="0"] 
 
 [#-- SWIPdatas is a list of SWIPconfigModel --]  
 [#list SWIPdatas as SWIP]
@@ -144,7 +145,10 @@ extern ${variable.value} ${variable.name};
 [#if definition.value == "MFX-IO-PIN10" ]
 [#assign MFX_value="MFX-IO-PIN10"] 
 [/#if]
-
+[#elseif definition.name = "FREERTOS"]
+[#if definition.value == "1" ]
+[#assign freeRTOS="1"] 
+[/#if]
 
 [/#if]
 [/#list]
@@ -241,7 +245,9 @@ static void _Index2ColorBulk_##PFIX##_DMA2D(void * pIndex, LCD_COLOR * pColor, U
 
 volatile int LCD_ActiveRegion        = 0;
 volatile int32_t LCD_Refershing      = 0;
+[#if   freeRTOS=="0" ]
 extern volatile GUI_TIMER_TIME OS_TimeMS;
+[/#if]
 [#if  dma2d=="1" ]
 /* Array for speeding up nibble conversion for A4 bitmaps */
 static const U8 _aMirror[] = 
@@ -2126,12 +2132,12 @@ void GRAPHICS_HW_Init(void)
   MX_LCD_Init();
   MX_DSI_Init();  
 }
-
+[#if  freeRTOS=="0" ]
 void GRAPHICS_IncTick(void){
   
   OS_TimeMS++;
 } 
-
+[/#if]
 void GRAPHICS_Init(void)
 {
   /* Initialize the GUI */

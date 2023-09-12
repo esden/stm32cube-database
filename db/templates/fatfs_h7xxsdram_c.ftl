@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
  ******************************************************************************
   * @file    bsp_driver_sdram.c (based on stm32h743i_eval_sdram.c)
@@ -7,6 +8,7 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
+/* USER CODE END Header */
   
 [#-- SWIPdatas is a list of SWIPconfigModel --]  
 [#list SWIPdatas as SWIP]  
@@ -19,7 +21,12 @@
 [/#if]
 [/#list]
 
+#ifdef OLD_CODE
+/* Kept to avoid issue when migrating old projects (as some user sections were renamed/changed). */
 /* USER CODE BEGIN 0 */
+
+/* USER CODE END 0 */
+#else
 
 /* Includes ------------------------------------------------------------------*/
 #include "bsp_driver_sdram.h"
@@ -27,6 +34,7 @@
 /* Extern variables ----------------------------------------------------------*/
 extern SDRAM_HandleTypeDef ${sdramHandle};
 
+/* USER CODE BEGIN Init */
 /**
   * @brief  Initializes the SDRAM device 
   * @retval SDRAM status
@@ -39,6 +47,11 @@ uint8_t BSP_SDRAM_Init(void)
   
   return sdramstatus;
 }
+/* USER CODE END Init */
+
+/* USER CODE BEGIN BeforeReadSection */
+/* can be used to modify / undefine following code or add code */
+/* USER CODE END BeforeReadSection */
 
 /**
   * @brief  Reads an mount of data from the SDRAM memory in polling mode. 
@@ -77,6 +90,10 @@ uint8_t BSP_SDRAM_ReadData_DMA(uint32_t uwStartAddress, uint32_t *pData, uint32_
    
   return sdramstatus;
 }
+
+/* USER CODE BEGIN BeforeWriteSection */
+/* can be used to modify / undefine following code or add code */
+/* USER CODE END BeforeWriteSection */
 
 /**
   * @brief  Writes an mount of data to the SDRAM memory in polling mode.
@@ -133,6 +150,10 @@ uint8_t BSP_SDRAM_Sendcmd(FMC_SDRAM_CommandTypeDef *SdramCmd)
   return sdramstatus;
 }
 
-/* USER CODE END 0 */
+/* USER CODE BEGIN AdditionalCode */
+/* user code can be inserted here */
+/* USER CODE END AdditionalCode */
+
+#endif
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

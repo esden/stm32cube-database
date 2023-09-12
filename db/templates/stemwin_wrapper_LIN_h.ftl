@@ -50,7 +50,28 @@
 
 #ifndef STEMWIN_WRAPPER_H
 #define STEMWIN_WRAPPER_H
+[#assign freeRTOS="0"] 
+[#-- SWIPdatas is a list of SWIPconfigModel --]  
+[#list SWIPdatas as SWIP]
+[#-- Global variables --]
+[#if SWIP.variables??]
+	[#list SWIP.variables as variable]
+extern ${variable.value} ${variable.name};
+	[/#list]
+[/#if]
+[#if SWIP.defines??]
+	[#list SWIP.defines as definition]	
+	[#-- IF to take care of the specific formatting of each argument of this file  --]
 
+
+[#if definition.name = "FREERTOS" ]
+[#if definition.value == "1" ]
+[#assign freeRTOS="1"] 
+[/#if]
+[/#if]
+[/#list]
+[/#if]
+[/#list]
 /* Exported types ------------------------------------------------------------*/
 typedef struct
 {
@@ -66,8 +87,9 @@ LCD_LayerPropTypedef;
 
 void GRAPHICS_HW_Init(void);
 void GRAPHICS_Init(void);
+[#if  freeRTOS=="0"]
 void GRAPHICS_IncTick(void);
-
+[/#if]
 #endif /* STEMWIN_WRAPPER_H */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
